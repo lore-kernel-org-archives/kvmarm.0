@@ -1,201 +1,120 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 072A313C839;
-	Fri, 12 Apr 2024 14:40:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E02F91422D4
+	for <kvmarm@lists.linux.dev>; Fri, 12 Apr 2024 14:41:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712932856; cv=none; b=tiSiNg8GrJdkRXxr5dysvF4FDQMo8xzd2hkWKfGrHeM53S+K033hR3Neu61CUtkujN/0qQAW0XujZi/nCyaRIcHBYJmaRMrdYHgGaaVfMTh+/yUY6qOVELwSdMT3EoV+RAhLM2yxCkVY5JBB3XavJKuiumFWGyeEsDqp5XVvL0w=
+	t=1712932886; cv=none; b=pHuSV9kWpEbsgQ4pMY48XoTgkrB8qJJiRsgqAIPiHvjbfnjGemdRatgG5YLe8EGGLwAZUFyYoCiDB9xXQEe+Az5GtwZdhezEue5yBhcse4vFMcy0HyemII8xicvCHbqTckVauB83inYKmU+8x2+QBzsRmc08TXwa2TC1QsR0HlA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712932856; c=relaxed/simple;
-	bh=ip6fFydK0+gzKotHNwObsUiXCO5CAhdHx4vmOp5jT9c=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NyDh/xMIxmfl9P0fGpNkQqynmCfg5vCJWWOvloKThSiXedU7f565m9F04wmENPisl5vV6wsZy5sP7I7Fr+qh//QgVebtqqX806uRnunTOW0ni0T/DZZ/ApnhQQcNXwxgyKiVSR9X5ROAYslnl34+BnamolOEHRJYSMYmrcfODjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.216])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4VGK2M4h4bz6K5nM;
-	Fri, 12 Apr 2024 22:39:07 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id EFDC2140CF4;
-	Fri, 12 Apr 2024 22:40:51 +0800 (CST)
-Received: from SecurePC-101-06.china.huawei.com (10.122.247.231) by
- lhrpeml500005.china.huawei.com (7.191.163.240) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Fri, 12 Apr 2024 15:40:51 +0100
-From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-To: <linux-pm@vger.kernel.org>, <loongarch@lists.linux.dev>,
-	<linux-acpi@vger.kernel.org>, <linux-arch@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>, <x86@kernel.org>, Russell King
-	<linux@armlinux.org.uk>, "Rafael J . Wysocki" <rafael@kernel.org>, Miguel
- Luis <miguel.luis@oracle.com>, James Morse <james.morse@arm.com>, Salil Mehta
-	<salil.mehta@huawei.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
-CC: <linuxarm@huawei.com>, <justin.he@arm.com>, <jianyong.wu@arm.com>
-Subject: [PATCH v5 07/18] ACPI: Add post_eject to struct acpi_scan_handler for cpu hotplug
-Date: Fri, 12 Apr 2024 15:37:08 +0100
-Message-ID: <20240412143719.11398-8-Jonathan.Cameron@huawei.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240412143719.11398-1-Jonathan.Cameron@huawei.com>
-References: <20240412143719.11398-1-Jonathan.Cameron@huawei.com>
+	s=arc-20240116; t=1712932886; c=relaxed/simple;
+	bh=Uu4Cj6SWMI9qJ0zfNeteActA4eMTFDKFo85S630fpAU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=G2YF05f94KPcgFx30tKMml7wabJLy5f9N7I5GnuZj1Z8mj6AKPymKenwHpotgIsNAip8LpCgZ7DJZY+CJfnLDDHGHAEEh+PA/rJ56RPjGC60NjPqwp6hJGYvtl+7rJUUTRfpCsiTRDU6Z80iDFLKKqomjS3naeCugEJ4x/WeD+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X59K5Jxu; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X59K5Jxu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7D74C113CC;
+	Fri, 12 Apr 2024 14:41:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712932885;
+	bh=Uu4Cj6SWMI9qJ0zfNeteActA4eMTFDKFo85S630fpAU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=X59K5JxusBEugPPxsVs8bLijrtlq7YUQmP38m2iI+b67Liv1MdzGYxa8BeWkyNDRB
+	 kF4KQ0pRI3rX8lNFN8AloQUdUA4ewMjLupMWMqj9AqYkptRuQ3wyf2A6pckRdmXMRK
+	 xgDU+7nyLTwtI9eCqfPrDXeinI0wAhQerr8yb6WNr1uTpM+880A80szkiLtCdKEexf
+	 FOf0E5yBdUu1Ls/hszDkrfdmVoQ2N0y6aznNcxEQqFX5vHjIzFMIxH2XfLnLktTZDw
+	 8nK2vw1hVwtcPyydFtNhrvkxCRvLwQQdwJuBskymOJeLnAVtOrele4TK/Qs3eAHGpH
+	 XYpazvTN6Tydg==
+Date: Fri, 12 Apr 2024 15:41:20 +0100
+From: Will Deacon <will@kernel.org>
+To: James Morse <james.morse@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH v3 2/6] arm64: cpufeature: discover CPU support for MPAM
+Message-ID: <20240412144119.GB28052@willie-the-truck>
+References: <20240321165728.31907-1-james.morse@arm.com>
+ <20240321165728.31907-3-james.morse@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: lhrpeml500006.china.huawei.com (7.191.161.198) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240321165728.31907-3-james.morse@arm.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-From: James Morse <james.morse@arm.com>
+Hi James,
 
-struct acpi_scan_handler has a detach callback that is used to remove
-a driver when a bus is changed. When interacting with an eject-request,
-the detach callback is called before _EJ0.
+On Thu, Mar 21, 2024 at 04:57:24PM +0000, James Morse wrote:
+> ARMv8.4 adds support for 'Memory Partitioning And Monitoring' (MPAM)
+> which describes an interface to cache and bandwidth controls wherever
+> they appear in the system.
+> 
+> Add support to detect MPAM. Like SVE, MPAM has an extra id register that
+> describes some more properties, including the virtualisation support,
+> which is optional. Detect this separately so we can detect
+> mismatched/insane systems, but still use MPAM on the host even if the
+> virtualisation support is missing.
+> 
+> MPAM needs enabling at the highest implemented exception level, otherwise
+> the register accesses trap. The 'enabled' flag is accessible to lower
+> exception levels, but its in a register that traps when MPAM isn't enabled.
+> The cpufeature 'matches' hook is extended to test this on one of the
+> CPUs, so that firmware can emulate MPAM as disabled if it is reserved
+> for use by secure world.
+> 
+> Secondary CPUs that appear late could trip cpufeature's 'lower safe'
+> behaviour after the MPAM properties have been advertised to user-space.
+> Add a verify call to ensure late secondaries match the existing CPUs.
+> 
+> (If you have a boot failure that bisects here its likely your CPUs
+> advertise MPAM in the id registers, but firmware failed to either enable
+> or MPAM, or emulate the trap as if it were disabled)
 
-This means the ACPI processor driver can't use _STA to determine if a
-CPU has been made not-present, or some of the other _STA bits have been
-changed. acpi_processor_remove() needs to know the value of _STA after
-_EJ0 has been called.
+I'm probably reading this wrong, but I'm a bit confused about the mixture
+of open-coded system register definitions and updates to the 'sysreg'
+file. For example:
 
-Add a post_eject callback to struct acpi_scan_handler. This is called
-after acpi_scan_hot_remove() has successfully called _EJ0. Because
-acpi_scan_check_and_detach() also clears the handler pointer,
-it needs to be told if the caller will go on to call
-acpi_bus_post_eject(), so that acpi_device_clear_enumerated()
-and clearing the handler pointer can be deferred.
-The extra eject flag added in the previous patch is used for this
-purpose.
+> +/* CPU Registers */
+> +#define MPAM_SYSREG_EN			BIT_ULL(63)
+> +#define MPAM_SYSREG_TRAP_IDR		BIT_ULL(58)
+> +#define MPAM_SYSREG_TRAP_MPAM0_EL1	BIT_ULL(49)
+> +#define MPAM_SYSREG_TRAP_MPAM1_EL1	BIT_ULL(48)
+> +#define MPAM_SYSREG_PMG_D		GENMASK(47, 40)
+> +#define MPAM_SYSREG_PMG_I		GENMASK(39, 32)
+> +#define MPAM_SYSREG_PARTID_D		GENMASK(31, 16)
+> +#define MPAM_SYSREG_PARTID_I		GENMASK(15, 0)
 
-Signed-off-by: James Morse <james.morse@arm.com>
-Reviewed-by: Joanthan Cameron <Jonathan.Cameron@huawei.com>
-Reviewed-by: Gavin Shan <gshan@redhat.com>
-Tested-by: Miguel Luis <miguel.luis@oracle.com>
-Tested-by: Vishnu Pajjuri <vishnu@os.amperecomputing.com>
-Tested-by: Jianyong Wu <jianyong.wu@arm.com>
-Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+MPAM_SYSREG_EN is then used in conjuntion with SYS_MPAM1_EL1:
 
-----
-Russell, you hadn't signed off on this when posting last time.
-Do you want to insert a suitable tag now?
-v5:
- - Rebase to take into account the changes to scan handling in the
-   meantime.
----
- drivers/acpi/acpi_processor.c |  4 ++--
- drivers/acpi/scan.c           | 32 +++++++++++++++++++++++++++++---
- include/acpi/acpi_bus.h       |  1 +
- 3 files changed, 32 insertions(+), 5 deletions(-)
+> +static bool __maybe_unused
+> +test_has_mpam(const struct arm64_cpu_capabilities *entry, int scope)
+> +{
+> +	if (!has_cpuid_feature(entry, scope))
+> +		return false;
+> +
+> +	/* Check firmware actually enabled MPAM on this cpu. */
+> +	return (read_sysreg_s(SYS_MPAM1_EL1) & MPAM_SYSREG_EN);
+> +}
 
-diff --git a/drivers/acpi/acpi_processor.c b/drivers/acpi/acpi_processor.c
-index 3aa43dee4391..6b2ee0643d11 100644
---- a/drivers/acpi/acpi_processor.c
-+++ b/drivers/acpi/acpi_processor.c
-@@ -463,7 +463,7 @@ static int acpi_processor_add(struct acpi_device *device,
- 
- #ifdef CONFIG_ACPI_HOTPLUG_CPU
- /* Removal */
--static void acpi_processor_remove(struct acpi_device *device)
-+static void acpi_processor_post_eject(struct acpi_device *device)
- {
- 	struct acpi_processor *pr;
- 
-@@ -631,7 +631,7 @@ static struct acpi_scan_handler processor_handler = {
- 	.ids = processor_device_ids,
- 	.attach = acpi_processor_add,
- #ifdef CONFIG_ACPI_HOTPLUG_CPU
--	.detach = acpi_processor_remove,
-+	.post_eject = acpi_processor_post_eject,
- #endif
- 	.hotplug = {
- 		.enabled = true,
-diff --git a/drivers/acpi/scan.c b/drivers/acpi/scan.c
-index 79b1f4d2b6bd..992779ac31d4 100644
---- a/drivers/acpi/scan.c
-+++ b/drivers/acpi/scan.c
-@@ -276,8 +276,6 @@ static int acpi_scan_check_and_detach(struct acpi_device *adev, void *p)
- 	if (handler) {
- 		if (handler->detach)
- 			handler->detach(adev);
--
--		adev->handler = NULL;
- 	} else {
- 		device_release_driver(&adev->dev);
- 	}
-@@ -287,6 +285,28 @@ static int acpi_scan_check_and_detach(struct acpi_device *adev, void *p)
- 	 */
- 	acpi_device_set_power(adev, ACPI_STATE_D3_COLD);
- 	adev->flags.initialized = false;
-+
-+	/* For eject this is deferred to acpi_bus_post_eject() */
-+	if (!param->eject) {
-+		adev->handler = NULL;
-+		acpi_device_clear_enumerated(adev);
-+	}
-+	return 0;
-+}
-+
-+static int acpi_bus_post_eject(struct acpi_device *adev, void *not_used)
-+{
-+	struct acpi_scan_handler *handler = adev->handler;
-+
-+	acpi_dev_for_each_child_reverse(adev, acpi_bus_post_eject, NULL);
-+
-+	if (handler) {
-+		if (handler->post_eject)
-+			handler->post_eject(adev);
-+
-+		adev->handler = NULL;
-+	}
-+
- 	acpi_device_clear_enumerated(adev);
- 
- 	return 0;
-@@ -306,6 +326,10 @@ static int acpi_scan_hot_remove(struct acpi_device *device)
- 	acpi_handle handle = device->handle;
- 	unsigned long long sta;
- 	acpi_status status;
-+	struct acpi_scan_c_and_d_param p = {
-+		.check_status = false, /* Not update until after ej0 */
-+		.eject = true,
-+	};
- 
- 	if (device->handler && device->handler->hotplug.demand_offline) {
- 		if (!acpi_scan_is_offline(device, true))
-@@ -318,7 +342,7 @@ static int acpi_scan_hot_remove(struct acpi_device *device)
- 
- 	acpi_handle_debug(handle, "Ejecting\n");
- 
--	acpi_bus_trim(device);
-+	acpi_scan_check_and_detach(device, &p);
- 
- 	acpi_evaluate_lck(handle, 0);
- 	/*
-@@ -341,6 +365,8 @@ static int acpi_scan_hot_remove(struct acpi_device *device)
- 	} else if (sta & ACPI_STA_DEVICE_ENABLED) {
- 		acpi_handle_warn(handle,
- 			"Eject incomplete - status 0x%llx\n", sta);
-+	} else {
-+		acpi_bus_post_eject(device, NULL);
- 	}
- 
- 	return 0;
-diff --git a/include/acpi/acpi_bus.h b/include/acpi/acpi_bus.h
-index e193507fd743..27fdef17abe5 100644
---- a/include/acpi/acpi_bus.h
-+++ b/include/acpi/acpi_bus.h
-@@ -130,6 +130,7 @@ struct acpi_scan_handler {
- 	bool (*match)(const char *idstr, const struct acpi_device_id **matchid);
- 	int (*attach)(struct acpi_device *dev, const struct acpi_device_id *id);
- 	void (*detach)(struct acpi_device *dev);
-+	void (*post_eject)(struct acpi_device *dev);
- 	void (*bind)(struct device *phys_dev);
- 	void (*unbind)(struct device *phys_dev);
- 	struct acpi_hotplug_profile hotplug;
--- 
-2.39.2
+But that register has a 'sysreg' entry:
 
+> +Sysreg	MPAM1_EL1	3	0	10	5	0
+> +Res0	63:48
+> +Field	47:40	PMG_D
+> +Field	39:32	PMG_I
+> +Field	31:16	PARTID_D
+> +Field	15:0	PARTID_I
+> +EndSysreg
+
+where bit 63 is RES0.
+
+Will
