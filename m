@@ -1,190 +1,105 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E180BD53E;
-	Fri, 12 Apr 2024 18:30:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D3C81BF2F
+	for <kvmarm@lists.linux.dev>; Fri, 12 Apr 2024 18:41:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712946654; cv=none; b=oX9CWxw6OPgeZ+SvTf4SQ3EjarXDMlXaCLfrrts0gLg9YLOLPmfYSeSGLThMDZ2cbdLsaZEj/z+t9QiufjiOZcnRD7rRDFbjJnTDjvhfQAjgWxygzLoK8SsvVUeFf0OR1Tf/tgMYysyFUobUZPhNlFLXLvkAp4PR2hOEU1EavPo=
+	t=1712947278; cv=none; b=JQ09hVbYc+OotMyj6mNfnsYBxxZfvtIt2NSDdXsFM1L5+uO3THM/+AI0eEUNpnBqU7UlkpsuRzG9b+kMY/LQgifS8Tx4IZaK2TYbrmJZsd29mT1M5NaJzapPBPfstfMCWL8rD8XRjZhPbtP6mZOQpQ4S5mmM/7/g36EjuT3MYTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712946654; c=relaxed/simple;
-	bh=PjJ0r1jv+Gy40inFGbGqF8OvINrRwJDv/80NI2l5XUc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ob0vKW4xECMJ/+B/uGvV40f3JnGFPnUcXnjWoUnp/kjrMG7X4+b+B4F0FdNiznKELJ93pOC7fNJeEVBCQ0AYQtbUEXOQSmS6jEN7Bxc/u4Y0UCOCCgSinb9QkMJSlAca4ujV53hD8ZMHrkgSO7bkWq/faSEmoYaFFjwpQ0syU0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZQQWusNG; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1712947278; c=relaxed/simple;
+	bh=tE1aWPCZZJl7MoElbd+5YmoN+nAf47vnVFjNHq6stP4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X8YC45vh40rOrEAoU97Krdizrfl+Qss0gn69me16ga/SVy2GKFMqYOAV6eeRwUi6VSFRvMKj7OuG7iA/q8YCw5oXGFqfm9oP8FFraVYOqunDAcyuWT2UM+XpIfnAIEWPRk4xpYBEVGqlRXbp5UahWKNJ4XY8+6OSpFJC8pza1Xo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=i07hf0iR; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZQQWusNG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 732F4C32786;
-	Fri, 12 Apr 2024 18:30:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712946653;
-	bh=PjJ0r1jv+Gy40inFGbGqF8OvINrRwJDv/80NI2l5XUc=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=ZQQWusNG6ExBvY436QlvONSgQH5kbBgDfbHpEXf21tXhje42q0jreHJC9+TdiOZTb
-	 /AEVXF46pkLyBL0qmtps6lIkaCDRZE06wX4rAI9ukziCq86KHNjF+ssi2wG5/ccvIw
-	 z19wt8wvGtJ8ZjwjOfLaLcex6/4MwD1lfR6DDBFkZ5fsnZiWIJN++FbgCcL7ko1EwI
-	 9btL93ZH4JI9iDwfPNB9Y7u2Tc9fw5RxLDg/eqbtvcoFWufEQBMk1DExUfDwCFJtww
-	 C7jYNeF52ysH7D2f2zo8BxxoyzRfqvk9xpAkNeCFmpKFwgtuNH//JHaOqaPCClC0fq
-	 2nJ877KMWCiDg==
-Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-22ed9094168so239880fac.1;
-        Fri, 12 Apr 2024 11:30:53 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVOcMrqPwkhI7XSAKWKmdT5JDQlqDE82eLap96bYYWwym95Wnvg54cke3dDJ+vkqK/pH/IuULb1uMvfsKkZ5qhCKeMdLdJnUp3rGzub9bqR6i5PXhoS7C/VfF+jXKWNYAVr
-X-Gm-Message-State: AOJu0YxFypF5dceW5e9TehD8654ioljrfvyazi+1p+BE0vIfrHPA711R
-	o6SIbt1pUW02MVfDmli9rk5x2pVkKZEHzvVBwQ5ga4SLvuIO+0bPnUYh3wen09hRHkfgd09L1L0
-	ssh+cQbmEPGSWFkV5M904KjBGDo4=
-X-Google-Smtp-Source: AGHT+IFDKbKacACQlXu+Vha1dYER/o7zLL0gXJIc6Jg1rU5tcmimRio9VrXjAKDGAGecTYjA8A0m0vMnHNM03elbI48=
-X-Received: by 2002:a05:6871:612:b0:229:ee6d:77da with SMTP id
- w18-20020a056871061200b00229ee6d77damr3536849oan.2.1712946652664; Fri, 12 Apr
- 2024 11:30:52 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="i07hf0iR"
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1e411e339b8so9844455ad.3
+        for <kvmarm@lists.linux.dev>; Fri, 12 Apr 2024 11:41:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712947277; x=1713552077; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=tE1aWPCZZJl7MoElbd+5YmoN+nAf47vnVFjNHq6stP4=;
+        b=i07hf0iRXC8CGRTA9vJiw6xdWFBVfyIrwfbq9MHgLom5vvqzqxC0hAS/P08iw/8vfA
+         FzVu+Z1mr7XVMZMWYUXv+QCM7d5GWdiZwDDqEs/VGgADYBLtV3rvHkURQ4e70y/MFKsc
+         gLN1I7em2AKPAzruSiidRD9IgG1HFtRi1YdnZjux8R0vRM2Gnz9QTGHBSC4iuuCyc8XQ
+         eQN96z8YCRU7E0AN1kUu0RXn131ysdLIjQ18dxkNvi7mA7SX3fozrS7cNGp9gXz2gRZY
+         H96Fs8m98brWjAcA3d2TrqZS/ncXirpLGJROfP+mTt3Qs3/9TpatdiIgAghNVvwbjXzS
+         47uA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712947277; x=1713552077;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tE1aWPCZZJl7MoElbd+5YmoN+nAf47vnVFjNHq6stP4=;
+        b=nuxC/YxPqgl/LpR2ajkVsZlThASa6RqcuSMIqrvD8q/IjfUBln/EeTNPUWjLHsQAlm
+         vCQ7IcldMl50OuPdo3ZeShS82TUbqb73Nk3YcdYLROE1SR7REv6YYXJEtIpe3BbhAWcg
+         jG8VdlZSCqTqIHLswe5qqqGzuGXXo/BWFi+r6yNcKIIr9QdQcQhiczezmRNQi4z+aOnp
+         RWWQSB94uPTnGuclJUa1i4s0mKpsj+6oraFQNiWJZV9IPQOOBWNye8mWvCYMhjkj6tJL
+         xdqeaP+OMUUJYgCMYzICUqYJoBIjBcw5t7PMcCMaptUaU7kbvnmg8CMkFVhnrvBEFAni
+         O3tw==
+X-Forwarded-Encrypted: i=1; AJvYcCW1ptTqXaLReFILp+8sNByCcsXPSMudtm9rVz7pn8Tz9HxZ9yAOGAcm3vs4Qy2dNqK+O1hHaVrP1pt5RzANwFny7tPAHi/v
+X-Gm-Message-State: AOJu0YwIJVsFGNYYhuU5GynwpEet3Ljer3/lOtD72ByNnzH4kMaOk/ZH
+	ud+rtX1a/Tad+N4nhIEaZTICvAzd2288nizcrk6LDZ7qAE4P7LPh/FlWuIFJnw==
+X-Google-Smtp-Source: AGHT+IGQO04VC0zqxkXl9HI81WqEqxeP4e4k3T6O5AVuAZB5k5Q3DvX9OiYo61rtrsCcY43kj4509A==
+X-Received: by 2002:a17:902:650a:b0:1e0:a1f4:95f with SMTP id b10-20020a170902650a00b001e0a1f4095fmr3460792plk.14.1712947276396;
+        Fri, 12 Apr 2024 11:41:16 -0700 (PDT)
+Received: from google.com (210.73.125.34.bc.googleusercontent.com. [34.125.73.210])
+        by smtp.gmail.com with ESMTPSA id q6-20020a170902a3c600b001dd0d0d26a4sm3384097plb.147.2024.04.12.11.41.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Apr 2024 11:41:15 -0700 (PDT)
+Date: Fri, 12 Apr 2024 11:41:11 -0700
+From: David Matlack <dmatlack@google.com>
+To: James Houghton <jthoughton@google.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Paolo Bonzini <pbonzini@redhat.com>, Yu Zhao <yuzhao@google.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Sean Christopherson <seanjc@google.com>,
+	Jonathan Corbet <corbet@lwn.net>, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Shaoqin Huang <shahuang@redhat.com>, Gavin Shan <gshan@redhat.com>,
+	Ricardo Koller <ricarkol@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	David Rientjes <rientjes@google.com>,
+	Axel Rasmussen <axelrasmussen@google.com>,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-mm@kvack.org,
+	linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 0/7] mm/kvm: Improve parallelism for access bit
+ harvesting
+Message-ID: <ZhmAR1akBHjvZ9_4@google.com>
+References: <20240401232946.1837665-1-jthoughton@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20240412143719.11398-1-Jonathan.Cameron@huawei.com> <20240412143719.11398-4-Jonathan.Cameron@huawei.com>
-In-Reply-To: <20240412143719.11398-4-Jonathan.Cameron@huawei.com>
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Fri, 12 Apr 2024 20:30:40 +0200
-X-Gmail-Original-Message-ID: <CAJZ5v0gNvy2e=hOGQQ2kLpnrDr8=QGBax-E5odEJ=7BA8qW-9A@mail.gmail.com>
-Message-ID: <CAJZ5v0gNvy2e=hOGQQ2kLpnrDr8=QGBax-E5odEJ=7BA8qW-9A@mail.gmail.com>
-Subject: Re: [PATCH v5 03/18] ACPI: processor: Register deferred CPUs from acpi_processor_get_info()
-To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Cc: linux-pm@vger.kernel.org, loongarch@lists.linux.dev, 
-	linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, x86@kernel.org, Russell King <linux@armlinux.org.uk>, 
-	"Rafael J . Wysocki" <rafael@kernel.org>, Miguel Luis <miguel.luis@oracle.com>, 
-	James Morse <james.morse@arm.com>, Salil Mehta <salil.mehta@huawei.com>, 
-	Jean-Philippe Brucker <jean-philippe@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, linuxarm@huawei.com, justin.he@arm.com, 
-	jianyong.wu@arm.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240401232946.1837665-1-jthoughton@google.com>
 
-On Fri, Apr 12, 2024 at 4:38=E2=80=AFPM Jonathan Cameron
-<Jonathan.Cameron@huawei.com> wrote:
->
-> From: James Morse <james.morse@arm.com>
->
-> The arm64 specific arch_register_cpu() call may defer CPU registration
-> until the ACPI interpreter is available and the _STA method can
-> be evaluated.
->
-> If this occurs, then a second attempt is made in
-> acpi_processor_get_info(). Note that the arm64 specific call has
-> not yet been added so for now this will never be successfully
-> called.
->
-> Systems can still be booted with 'acpi=3Doff', or not include an
-> ACPI description at all as in these cases arch_register_cpu()
-> will not have deferred registration when first called.
->
-> This moves the CPU register logic back to a subsys_initcall(),
-> while the memory nodes will have been registered earlier.
-> Note this is where the call was prior to the cleanup series so
-> there should be no side effects of moving it back again for this
-> specific case.
->
-> [PATCH 00/21] Initial cleanups for vCPU HP.
-> https://lore.kernel.org/all/ZVyz%2FVe5pPu8AWoA@shell.armlinux.org.uk/
->
-> e.g. 5b95f94c3b9f ("x86/topology: Switch over to GENERIC_CPU_DEVICES")
->
-> Signed-off-by: James Morse <james.morse@arm.com>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> Tested-by: Miguel Luis <miguel.luis@oracle.com>
-> Tested-by: Vishnu Pajjuri <vishnu@os.amperecomputing.com>
-> Tested-by: Jianyong Wu <jianyong.wu@arm.com>
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> Co-developed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> Signed-off-by: Joanthan Cameron <Jonathan.Cameron@huawei.com>
-> ---
-> v5: Update commit message to make it clear this is moving the
->     init back to where it was until very recently.
->
->     No longer change the condition in the earlier registration point
->     as that will be handled by the arm64 registration routine
->     deferring until called again here.
-> ---
->  drivers/acpi/acpi_processor.c | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
->
-> diff --git a/drivers/acpi/acpi_processor.c b/drivers/acpi/acpi_processor.=
-c
-> index 93e029403d05..c78398cdd060 100644
-> --- a/drivers/acpi/acpi_processor.c
-> +++ b/drivers/acpi/acpi_processor.c
-> @@ -317,6 +317,18 @@ static int acpi_processor_get_info(struct acpi_devic=
-e *device)
->
->         c =3D &per_cpu(cpu_devices, pr->id);
->         ACPI_COMPANION_SET(&c->dev, device);
-> +       /*
-> +        * Register CPUs that are present. get_cpu_device() is used to sk=
-ip
-> +        * duplicate CPU descriptions from firmware.
-> +        */
-> +       if (!invalid_logical_cpuid(pr->id) && cpu_present(pr->id) &&
-> +           !get_cpu_device(pr->id)) {
-> +               int ret =3D arch_register_cpu(pr->id);
-> +
-> +               if (ret)
-> +                       return ret;
-> +       }
-> +
->         /*
->          *  Extra Processor objects may be enumerated on MP systems with
->          *  less than the max # of CPUs. They should be ignored _iff
-> --
+On 2024-04-01 11:29 PM, James Houghton wrote:
+> This patchset adds a fast path in KVM to test and clear access bits on
+> sptes without taking the mmu_lock. It also adds support for using a
+> bitmap to (1) test the access bits for many sptes in a single call to
+> mmu_notifier_test_young, and to (2) clear the access bits for many ptes
+> in a single call to mmu_notifier_clear_young.
 
-I am still unsure why there need to be two paths calling
-arch_register_cpu() in acpi_processor_get_info().
-
-Just below the comment partially pulled into the patch context above,
-there is this code:
-
-if (invalid_logical_cpuid(pr->id) || !cpu_present(pr->id)) {
-         int ret =3D acpi_processor_hotadd_init(pr);
-
-        if (ret)
-                return ret;
-}
-
-For the sake of the argument, fold acpi_processor_hotadd_init() into
-it and drop the redundant _STA check from it:
-
-if (invalid_logical_cpuid(pr->id) || !cpu_present(pr->id)) {
-        if (invalid_phys_cpuid(pr->phys_id))
-                return -ENODEV;
-
-        cpu_maps_update_begin();
-        cpus_write_lock();
-
-       ret =3D acpi_map_cpu(pr->handle, pr->phys_id, pr->acpi_id, &pr->id);
-       if (ret) {
-                cpus_write_unlock();
-                cpu_maps_update_done();
-                return ret;
-       }
-       ret =3D arch_register_cpu(pr->id);
-       if (ret) {
-                acpi_unmap_cpu(pr->id);
-
-                cpus_write_unlock();
-                cpu_maps_update_done();
-                return ret;
-       }
-      pr_info("CPU%d has been hot-added\n", pr->id);
-      pr->flags.need_hotplug_init =3D 1;
-
-      cpus_write_unlock();
-      cpu_maps_update_done();
-}
-
-so I'm not sure why this cannot be combined with the new code.
-
-Say acpi_map_cpu) / acpi_unmap_cpu() are turned into arch calls.
-What's the difference then?  The locking, which should be fine if I'm
-not mistaken and need_hotplug_init that needs to be set if this code
-runs after the processor driver has loaded AFAICS.
+How much improvement would we get if we _just_ made test/clear_young
+lockless on x86 and hold the read-lock on arm64? And then how much
+benefit does the bitmap look-around add on top of that?
