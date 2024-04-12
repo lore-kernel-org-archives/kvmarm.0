@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8C7020310;
-	Fri, 12 Apr 2024 10:34:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA3B954677;
+	Fri, 12 Apr 2024 10:35:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712918101; cv=none; b=O+5toXEaL2UgO1wMpEvDCgCx96s6XM53xsxVyrm09L6xJXwt0jXeCH1JY9Uhgb/iKYXLefAU6Iad4WAJ6qvu4+RwAjQOh2zACZtGoJzKCiAUlZgVoYrkpbZFOm6wIDHDj8R2UkSRx4UjhxnpHvefN89f4yAdsJCJv8ckwzxkBZI=
+	t=1712918104; cv=none; b=WYT1amHDlc9f7u8T1bfA5vQlloBIl9o1qiNvtaTeDLkNoxbX8h6h73gjjTJ8LiCt0iYm7yylWG0XdiheZg9FlEncLwSOG7qbDMpQ70CM5UEmIh+LCRmhgTX/UbZoImsH5U4KU/Re4cBJouRjSO3G0dwYNSTjUvJGUCmm5EhvikE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712918101; c=relaxed/simple;
-	bh=TeQy6V1QFnUmoIy+5MXf1Osr2I4RIgtvFReT46+9iMI=;
+	s=arc-20240116; t=1712918104; c=relaxed/simple;
+	bh=I7sjzoM/r8GL7yzwe7yecDHVw8xur7f0XhiwJ6YeBRU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Q9FjkBouFe/3PZCZ61QX1xs5InQ8v5QG2i6RqU7H82b7lVNZX5sSDLoCbBJLFiZHH34Z7UPZTjhwM+Es3uuSoXVgouaa+kPH+xareesMmwrEb/dZhLw/TTzatX3N83Elx3Fn2Fj3bXY+Esk8b5NNcFSFpgTQ9bSxjjG8kszGHoI=
+	 MIME-Version; b=n0Gbx02w/0ZWipg4BqxFn1e5FOAPYwYPikP5ow/ysSapXZ1vCnGZ1pi5xMhdlQyRTKiSvJmawVqqNetLjb1gyeudr3ukFGFDH9kcGm5FWw2ZSWiwqp2nBtC3pwIPC7uMVcR8C7ImlFITQlrJCzHCODOrgS53YKyfhq2iq8kUBwc=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 96F5415A1;
-	Fri, 12 Apr 2024 03:35:28 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8DDD8113E;
+	Fri, 12 Apr 2024 03:35:30 -0700 (PDT)
 Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.1.197.1])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 863193F64C;
-	Fri, 12 Apr 2024 03:34:57 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 975EC3F64C;
+	Fri, 12 Apr 2024 03:34:59 -0700 (PDT)
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 To: kvmarm@lists.linux.dev
 Cc: kvm@vger.kernel.org,
@@ -32,11 +32,10 @@ Cc: kvm@vger.kernel.org,
 	yuzenghui@huawei.com,
 	andrew.jones@linux.dev,
 	eric.auger@redhat.com,
-	Djordje Kovacevic <djordje.kovacevic@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [kvm-unit-tests PATCH 20/33] arm: realm: Add tests for in realm SEA
-Date: Fri, 12 Apr 2024 11:33:55 +0100
-Message-Id: <20240412103408.2706058-21-suzuki.poulose@arm.com>
+Subject: [kvm-unit-tests PATCH 21/33] lib/alloc_page: Add shared page allocation support
+Date: Fri, 12 Apr 2024 11:33:56 +0100
+Message-Id: <20240412103408.2706058-22-suzuki.poulose@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240412103408.2706058-1-suzuki.poulose@arm.com>
 References: <20240412103408.2706058-1-suzuki.poulose@arm.com>
@@ -48,202 +47,146 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Djordje Kovacevic <djordje.kovacevic@arm.com>
+From: Joey Gouly <joey.gouly@arm.com>
 
-The RMM/Host could inject Synchronous External Aborts in to the Realm
-for various reasons.
+Add support for allocating "pages" that can be shared with the host.
+Or in other words, decrypted pages. This is achieved by adding hooks for
+setting a memory region as "encrypted" or "decrypted", which can be overridden
+by the architecture specific backends.
 
-RMM injects the SEA for :
-  * Instruction/Data fetch from an IPA that is in RIPAS_EMPTY state
-  * Instruction fetch from an Unprotected IPA.
+Also add a new flag - FLAG_SHARED - for allocating shared pages.
 
-Trigger these conditions from within the Realm and verify that the
-SEAs are received.
+The page allocation/free routines get a "_shared_" variant too.
+These will be later used for Realm support and tests.
 
-Signed-off-by: Djordje Kovacevic <djordje.kovacevic@arm.com>
+Signed-off-by: Joey Gouly <joey.gouly@arm.com>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- arm/Makefile.arm64 |   1 +
- arm/realm-sea.c    | 143 +++++++++++++++++++++++++++++++++++++++++++++
- arm/unittests.cfg  |   6 ++
- 3 files changed, 150 insertions(+)
- create mode 100644 arm/realm-sea.c
+ lib/alloc_page.c     | 20 +++++++++++++++++---
+ lib/alloc_page.h     | 24 ++++++++++++++++++++++++
+ lib/asm-generic/io.h | 12 ++++++++++++
+ 3 files changed, 53 insertions(+), 3 deletions(-)
 
-diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-index 5a9943c8..b3e085d3 100644
---- a/arm/Makefile.arm64
-+++ b/arm/Makefile.arm64
-@@ -59,6 +59,7 @@ tests += $(TEST_DIR)/cache.$(exe)
- tests += $(TEST_DIR)/debug.$(exe)
- tests += $(TEST_DIR)/fpu.$(exe)
- tests += $(TEST_DIR)/realm-rsi.$(exe)
-+tests += $(TEST_DIR)/realm-sea.$(exe)
+diff --git a/lib/alloc_page.c b/lib/alloc_page.c
+index 84f01e11..e253cd1d 100644
+--- a/lib/alloc_page.c
++++ b/lib/alloc_page.c
+@@ -263,7 +263,7 @@ static bool coalesce(struct mem_area *a, u8 order, pfn_t pfn, pfn_t pfn2)
+  * - no pages in the memory block were already free
+  * - no pages in the memory block are special
+  */
+-static void _free_pages(void *mem)
++static void _free_pages(void *mem, u32 flags)
+ {
+ 	pfn_t pfn2, pfn = virt_to_pfn(mem);
+ 	struct mem_area *a = NULL;
+@@ -281,6 +281,9 @@ static void _free_pages(void *mem)
+ 	p = pfn - a->base;
+ 	order = a->page_states[p] & ORDER_MASK;
  
- include $(SRCDIR)/$(TEST_DIR)/Makefile.common
++	if (flags & FLAG_SHARED)
++		set_memory_encrypted((unsigned long)mem, BIT(order) * PAGE_SIZE);
++
+ 	/* ensure that the first page is allocated and not special */
+ 	assert(IS_ALLOCATED(a->page_states[p]));
+ 	/* ensure that the order has a sane value */
+@@ -320,7 +323,14 @@ static void _free_pages(void *mem)
+ void free_pages(void *mem)
+ {
+ 	spin_lock(&lock);
+-	_free_pages(mem);
++	_free_pages(mem, 0);
++	spin_unlock(&lock);
++}
++
++void free_pages_shared(void *mem)
++{
++	spin_lock(&lock);
++	_free_pages(mem, FLAG_SHARED);
+ 	spin_unlock(&lock);
+ }
  
-diff --git a/arm/realm-sea.c b/arm/realm-sea.c
-new file mode 100644
-index 00000000..5ef3e2a4
---- /dev/null
-+++ b/arm/realm-sea.c
-@@ -0,0 +1,143 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Copyright (C) 2022 Arm Limited.
-+ * All rights reserved.
-+ */
-+#include <libcflat.h>
-+#include <vmalloc.h>
-+#include <asm/ptrace.h>
-+#include <asm/thread_info.h>
-+#include <asm/mmu.h>
-+#include <asm/rsi.h>
-+#include <linux/compiler.h>
-+#include <alloc_page.h>
-+#include <asm/pgtable.h>
+@@ -353,7 +363,7 @@ static void _unreserve_one_page(pfn_t pfn)
+ 	i = pfn - a->base;
+ 	assert(a->page_states[i] == STATUS_SPECIAL);
+ 	a->page_states[i] = STATUS_ALLOCATED;
+-	_free_pages(pfn_to_virt(pfn));
++	_free_pages(pfn_to_virt(pfn), 0);
+ }
+ 
+ int reserve_pages(phys_addr_t addr, size_t n)
+@@ -401,6 +411,10 @@ static void *page_memalign_order_flags(u8 al, u8 ord, u32 flags)
+ 		if (area & BIT(i))
+ 			res = page_memalign_order(areas + i, al, ord, fresh);
+ 	spin_unlock(&lock);
 +
-+typedef void (*empty_fn)(void);
++	if (res && (flags & FLAG_SHARED))
++		set_memory_decrypted((unsigned long)res, BIT(ord) * PAGE_SIZE);
 +
-+static bool test_passed;
-+
-+/*
-+ * The virtual address of the page that the test has made the access to
-+ * in order to cause the I/DAbort with I/DFSC = Synchronous External Abort.
-+ */
-+static void* target_page_va;
-+
-+/*
-+ * Ensure that the @va is the executable location from EL1:
-+ * - SCTLR_EL1.WXN must be off.
-+ * - Disable the access from EL0 (controlled by AP[1] in PTE).
-+ */
-+static void enable_instruction_fetch(void* va)
+ 	if (res && !(flags & FLAG_DONTZERO))
+ 		memset(res, 0, BIT(ord) * PAGE_SIZE);
+ 	return res;
+diff --git a/lib/alloc_page.h b/lib/alloc_page.h
+index 060e0418..8c1ea7b5 100644
+--- a/lib/alloc_page.h
++++ b/lib/alloc_page.h
+@@ -21,6 +21,7 @@
+ 
+ #define FLAG_DONTZERO	0x10000
+ #define FLAG_FRESH	0x20000
++#define FLAG_SHARED	0x40000
+ 
+ /* Returns true if the page allocator has been initialized */
+ bool page_alloc_initialized(void);
+@@ -121,4 +122,27 @@ int reserve_pages(phys_addr_t addr, size_t npages);
+  */
+ void unreserve_pages(phys_addr_t addr, size_t npages);
+ 
++/* Shared page operations */
++static inline void *alloc_pages_shared(unsigned int order)
 +{
-+	unsigned long sctlr = read_sysreg(sctlr_el1);
-+	if (sctlr & SCTLR_EL1_WXN) {
-+		sctlr &= ~SCTLR_EL1_WXN;
-+		write_sysreg(sctlr, sctlr_el1);
-+		isb();
-+		flush_tlb_all();
-+	}
-+
-+	mmu_clear_user(current_thread_info()->pgtable, (u64)va);
++	return alloc_pages_flags(order, FLAG_SHARED);
 +}
 +
-+static void data_abort_handler(struct pt_regs *regs, unsigned int esr)
++static inline void *alloc_page_shared(void)
 +{
-+	if ((esr & ESR_EL1_FSC_MASK) == ESR_EL1_FSC_EXTABT)
-+		test_passed = true;
-+
-+	report_info("esr = %x", esr);
-+	/*
-+	 * Advance the PC to complete the test.
-+	 */
-+	regs->pc += 4;
++	return alloc_pages_shared(0);
 +}
 +
-+static void data_access_to_empty(void)
++void free_pages_shared(void *mem);
++
++static inline void free_page_shared(void *page)
 +{
-+	test_passed = false;
-+	target_page_va = alloc_page();
-+	phys_addr_t empty_ipa = virt_to_phys(target_page_va);
-+
-+	arm_set_memory_shared(empty_ipa, SZ_4K);
-+
-+	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_DABT_EL1, data_abort_handler);
-+	READ_ONCE(((char*)target_page_va)[0x55]);
-+	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_DABT_EL1, NULL);
-+
-+	report(test_passed, " ");
++	free_pages_shared(page);
 +}
 +
-+static void instruction_abort_handler(struct pt_regs *regs, unsigned int esr)
++static inline void free_pages_shared_by_order(void *mem, unsigned int order)
 +{
-+	if (((esr & ESR_EL1_FSC_MASK) == ESR_EL1_FSC_EXTABT) &&
-+	     (regs->pc == (u64)target_page_va))
-+		test_passed = true;
-+
-+	report_info("esr = %x", esr);
-+	/*
-+	 * Simulate the RET instruction to complete the test.
-+	 */
-+	regs->pc = regs->regs[30];
++	free_pages_shared(mem);
 +}
 +
-+static void instr_fetch_from_empty(void)
+ #endif
+diff --git a/lib/asm-generic/io.h b/lib/asm-generic/io.h
+index dc0f46f5..fb65184b 100644
+--- a/lib/asm-generic/io.h
++++ b/lib/asm-generic/io.h
+@@ -214,4 +214,16 @@ static inline void *phys_to_virt(unsigned long address)
+ }
+ #endif
+ 
++#ifndef set_memory_encrypted
++static inline void set_memory_encrypted(unsigned long mem, size_t size)
 +{
-+	phys_addr_t empty_ipa;
-+
-+	test_passed = false;
-+	target_page_va = alloc_page();
-+	enable_instruction_fetch(target_page_va);
-+
-+	empty_ipa = virt_to_phys((void*)target_page_va);
-+
-+	arm_set_memory_shared(empty_ipa, SZ_4K);
-+
-+	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_IABT_EL1, instruction_abort_handler);
-+	/*
-+	 * This should cause the IAbort with IFSC = SEA
-+	 */
-+	((empty_fn)target_page_va)();
-+	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_IABT_EL1, NULL);
-+
-+	report(test_passed, " ");
 +}
++#endif
 +
-+static void instr_fetch_from_unprotected(void)
++#ifndef set_memory_decrypted
++static inline void set_memory_decrypted(unsigned long mem, size_t size)
 +{
-+	test_passed = false;
-+	/*
-+	 * The test will attempt to execute an instruction from the start of
-+	 * the unprotected IPA space.
-+	 */
-+	target_page_va = vmap(PTE_NS_SHARED, SZ_4K);
-+	enable_instruction_fetch(target_page_va);
-+
-+	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_IABT_EL1, instruction_abort_handler);
-+	/*
-+	 * This should cause the IAbort with IFSC = SEA
-+	 */
-+	((empty_fn)target_page_va)();
-+	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_IABT_EL1, NULL);
-+
-+	report(test_passed, " ");
 +}
++#endif
 +
-+int main(int argc, char **argv)
-+{
-+	report_prefix_push("in_realm_sea");
-+
-+	report_prefix_push("data_access_to_empty");
-+	data_access_to_empty();
-+	report_prefix_pop();
-+
-+	report_prefix_push("instr_fetch_from_empty");
-+	instr_fetch_from_empty();
-+	report_prefix_pop();
-+
-+	report_prefix_push("instr_fetch_from_unprotected");
-+	instr_fetch_from_unprotected();
-+	report_prefix_pop();
-+
-+	return report_summary();
-+}
-diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index 3cf6b719..e2821c26 100644
---- a/arm/unittests.cfg
-+++ b/arm/unittests.cfg
-@@ -311,3 +311,9 @@ smp = 2
- groups = nodefault realms
- accel = kvm
- arch = arm64
-+
-+[realm-sea]
-+file = realm-sea.flat
-+groups = nodefault realms
-+accel = kvm
-+arch = arm64
+ #endif /* _ASM_GENERIC_IO_H_ */
 -- 
 2.34.1
 
