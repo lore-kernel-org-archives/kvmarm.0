@@ -1,115 +1,156 @@
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B09D52E62F
-	for <kvmarm@lists.linux.dev>; Fri, 12 Apr 2024 20:44:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D745239FD5;
+	Fri, 12 Apr 2024 20:54:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712954687; cv=none; b=XKBIWEAQw3K1NNPEkZcLFixgO+8TEJssnwRbx+QjY+9fanwbRKgf5/Q+AyVOPtL1/TKvVDzPRUYZyKMOvnaJYXoJv/Nt/2Jbk4/GJJn5BbuhaPGSe2Ki4N+PKbKgcHr1b1I1KnjyTEC8vHOazu+YUV9XQdxr2EXw0bbwkyCqtt0=
+	t=1712955276; cv=none; b=i3mu0EksJ9RDoNl0p74af+JozoHKLZfvgtaoyxMzDTUXHLnJgmZvK3HYYR6xMqSAdS7T/RvqRfOYL8Pai6VX+W3+GmDAs/ARG7Ifq5uk6CAh1PrbbRsiKh6CenSQGbFL++OcZRI2AYdGPUPE5QA4FdVBoPZcXkgwcs8T263ucPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712954687; c=relaxed/simple;
-	bh=4vp5qyEZGAMwuOagLnJKbRJSa5AiEMRLbDSwvkWArmM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g2kVj+qJjkeYEFO8A6a3hVERmor1Vq3AOJFBMNFKqfSvzmRMp5JLApcebHR+4N2qu2JHIv4BjTr4B7yiF/KdvxcsOe/hXJubWFkzpZizcex+jaVEqDdw0p3ifSOyX/GCbzkQRPaMNBNeG+Yv0aW2IQV3EwsWbQGbUxeJbRY9z8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=z1DPvTY/; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1712955276; c=relaxed/simple;
+	bh=hhUyIpqpk6o2zo0WNmlEhV8GXEcdBzbXTRRrprL9qy0=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=WBY1svULg53sZhdO4Deyaek3K3rzoumBlLCLeeab9iT9l0EFB1RCkxitau8n1WwKmQsgCc0VJ0j4cYI2amh/UbHqNWhHs/HLbVI6W6Qxs+JIH/3FEpkD+sfxE+r9xuRtJoee0iivXvFyp/ZvxcrqrYlul36N16+dmC4ltbVRygA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=4inyeoqy; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=K69eqoT0; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="z1DPvTY/"
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-6ece8991654so1255576b3a.3
-        for <kvmarm@lists.linux.dev>; Fri, 12 Apr 2024 13:44:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712954686; x=1713559486; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7z+VKNpPRufGEfzC58h5hLq5eFFz0DWRzzztXBo7m7o=;
-        b=z1DPvTY/l2VDkBLqoA8mTDNUX7n1BQ38fj4F01Hox81+4uUnv9dNVu5UyD52t98rNy
-         +ResQcAu441cxP7NYOqw6hrA3repi90ZAPg1PqPANeENMaliAulo1aKt7csX5+I7pWz8
-         pDS4NRf/Jvgh8i3kvaWLayS5UC54cpOqOEZMoslHCn8XEq3ztanqnJnJDc6FhXvO6NWr
-         vAf+eZzuFxSLZSNyDswT6Ly+Y4tfLk9E2tp2/Fy0zqTxA8nz8fxR3YzuZS7G9Itp7T2N
-         YiXjm5mExJt20eYNUfCSVswkdrPN7s5evZ4cE47AnL3pxDitj3/Qw5/PpFuYlFmnipRk
-         a7Ig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712954686; x=1713559486;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7z+VKNpPRufGEfzC58h5hLq5eFFz0DWRzzztXBo7m7o=;
-        b=vXRn6yBYHEh+l92K1GNBn0G1tc8SWc5saVPY8C6V20cX0HBL/xvRbQwETh+jKisqYK
-         0J2xCkS3dgy24+DJyBnTWe03cqhP2AOiDeTcNzS+Lm1vfTBCP7Vk9XZ5t1dlKki9Dv5R
-         oaCeLVfTYe/grLm0zd4jVY0QlJytUUXZP/ILk9Uowj2z99WZjdKibKFlP4PRsGaYm171
-         nOZO3I3WdsuVjT6+LgUcdYKZ5LKl00/O3gsW+aXbwcWkKHgYkC92Rs+ynX+ZomU9AKtC
-         dYFZThTAJd9EbiJf6v8ATQZq/p+pF20YcHwDVfrmHVO2/joBYpZDJ2WvRB244uV3yQG5
-         xivw==
-X-Forwarded-Encrypted: i=1; AJvYcCUKyptk3zvoAm+PfvCZCyF+uaDTv7uWXk/Xgyp9HJe28KTNp7Vv5GwQBYohRlhn07crOwZAynDxwloS1F9Xup6scr2gc0Dy
-X-Gm-Message-State: AOJu0YyhE6kgo2lSKOkP02UwjhA4gIgucSx3LEoqjhL2L5Nuou0nu2TI
-	UyJyIc1aBRAb9+e4g6t3x7Scz8OknHwKHc0IUs4YckLLCgTHKfWjE9HZFDYSvg==
-X-Google-Smtp-Source: AGHT+IFZFKdCRdPaL3Vb0XTMjnUQNtJVoruOo48GxoyfTAhTrJOnmmO+jVgRuAaY5z2jRsVdxr03aw==
-X-Received: by 2002:a05:6a20:8428:b0:1a9:6c42:77f5 with SMTP id c40-20020a056a20842800b001a96c4277f5mr4669546pzd.59.1712954685790;
-        Fri, 12 Apr 2024 13:44:45 -0700 (PDT)
-Received: from google.com (210.73.125.34.bc.googleusercontent.com. [34.125.73.210])
-        by smtp.gmail.com with ESMTPSA id lr31-20020a056a00739f00b006ecfe1c9630sm3368108pfb.92.2024.04.12.13.44.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Apr 2024 13:44:45 -0700 (PDT)
-Date: Fri, 12 Apr 2024 13:44:41 -0700
-From: David Matlack <dmatlack@google.com>
-To: James Houghton <jthoughton@google.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Paolo Bonzini <pbonzini@redhat.com>, Yu Zhao <yuzhao@google.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Sean Christopherson <seanjc@google.com>,
-	Jonathan Corbet <corbet@lwn.net>, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Shaoqin Huang <shahuang@redhat.com>, Gavin Shan <gshan@redhat.com>,
-	Ricardo Koller <ricarkol@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	David Rientjes <rientjes@google.com>,
-	Axel Rasmussen <axelrasmussen@google.com>,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-mm@kvack.org,
-	linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 5/7] KVM: x86: Participate in bitmap-based PTE aging
-Message-ID: <ZhmdOb7lAd3DM5Tq@google.com>
-References: <20240401232946.1837665-1-jthoughton@google.com>
- <20240401232946.1837665-6-jthoughton@google.com>
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="4inyeoqy";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="K69eqoT0"
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1712955272;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zFYNr9CZirRSWZqeBDz7mLZZYuH7MefaeEp2ihefL/4=;
+	b=4inyeoqySqn696oIZQlb9IXUMxLGpByf7AJE7/CY3qCd+WjjkE8MjR2OKow6V0vZ7qLzwJ
+	UZ+Z3xAvJ8LxU9A0fRQW+JlkXq2hlaYRtlDal7asbeGA5LeiC4jZHhVc3QdIauZLLAHox7
+	/ViUdvsemMuvP5+RZYBl195exp6cIwTO0yekVxDM2JA8pBkPnrXcsmZQW5PN1xZKTB7yW0
+	8Z4F95k9a4JoZWM5tsSVxImLVs6Wfk7WB5bkG/a9aiqCT3OYfswjoZnFG3EhOfp441eAxY
+	lpWYte7RtW1FJk/uUAJeUX/o2WmjQZw9mI/NcIEqhOPgLNtycMHUFDMUkZ+eyQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1712955272;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zFYNr9CZirRSWZqeBDz7mLZZYuH7MefaeEp2ihefL/4=;
+	b=K69eqoT0yTN1N7e3SvOMWhl0A8acYvwWN5ZnRp0dVlstFtDzCgqLvKs7ylRIQnh26GWFqf
+	iUuHNO8hLeSYkoAw==
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>, "Rafael J. Wysocki"
+ <rafael@kernel.org>
+Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+ linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
+ linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, x86@kernel.org, Miguel Luis
+ <miguel.luis@oracle.com>, James Morse <james.morse@arm.com>, Salil Mehta
+ <salil.mehta@huawei.com>, Jean-Philippe Brucker
+ <jean-philippe@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, linuxarm@huawei.com, justin.he@arm.com,
+ jianyong.wu@arm.com
+Subject: Re: [PATCH v5 03/18] ACPI: processor: Register deferred CPUs from
+ acpi_processor_get_info()
+In-Reply-To: <ZhmWkE+fCEG/WFoi@shell.armlinux.org.uk>
+References: <20240412143719.11398-1-Jonathan.Cameron@huawei.com>
+ <20240412143719.11398-4-Jonathan.Cameron@huawei.com>
+ <CAJZ5v0gNvy2e=hOGQQ2kLpnrDr8=QGBax-E5odEJ=7BA8qW-9A@mail.gmail.com>
+ <ZhmWkE+fCEG/WFoi@shell.armlinux.org.uk>
+Date: Fri, 12 Apr 2024 22:54:32 +0200
+Message-ID: <87bk6ez4hj.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240401232946.1837665-6-jthoughton@google.com>
+Content-Type: text/plain
 
-On 2024-04-01 11:29 PM, James Houghton wrote:
-> Only handle the TDP MMU case for now. In other cases, if a bitmap was
-> not provided, fallback to the slowpath that takes mmu_lock, or, if a
-> bitmap was provided, inform the caller that the bitmap is unreliable.
+On Fri, Apr 12 2024 at 21:16, Russell King (Oracle) wrote:
+> On Fri, Apr 12, 2024 at 08:30:40PM +0200, Rafael J. Wysocki wrote:
+>> Say acpi_map_cpu) / acpi_unmap_cpu() are turned into arch calls.
+>> What's the difference then?  The locking, which should be fine if I'm
+>> not mistaken and need_hotplug_init that needs to be set if this code
+>> runs after the processor driver has loaded AFAICS.
+>
+> It is over this that I walked away from progressing this code, because
+> I don't think it's quite as simple as you make it out to be.
+>
+> Yes, acpi_map_cpu() and acpi_unmap_cpu() are already arch implemented
+> functions, so Arm64 can easily provide stubs for these that do nothing.
+> That never caused me any concern.
+>
+> What does cause me great concern though are the finer details. For
+> example, above you seem to drop the evaluation of _STA for the
+> "make_present" case - I've no idea whether that is something that
+> should be deleted or not (if it is something that can be deleted,
+> then why not delete it now?)
+>
+> As for the cpu locking, I couldn't find anything in arch_register_cpu()
+> that depends on the cpu_maps_update stuff nor needs the cpus_write_lock
+> being taken - so I've no idea why the "make_present" case takes these
+> locks.
 
-I think this patch will trigger a lockdep assert in
+Anything which updates a CPU mask, e.g. cpu_present_mask, after early
+boot must hold the appropriate write locks. Otherwise it would be
+possible to online a CPU which just got marked present, but the
+registration has not completed yet.
 
-  kvm_tdp_mmu_age_gfn_range
-    kvm_tdp_mmu_handle_gfn
-      for_each_tdp_mmu_root
-        __for_each_tdp_mmu_root
-          kvm_lockdep_assert_mmu_lock_held
+> Finally, the "pr->flags.need_hotplug_init = 1" thing... it's not
+> obvious that this is required - remember that with Arm64's "enabled"
+> toggling, the "processor" is a slice of the system and doesn't
+> actually go away - it's just "not enabled" for use.
+>
+> Again, as "processors" in Arm64 are slices of the system, they have
+> to be fully described in ACPI before the OS boots, and they will be
+> marked as being "present", which means they will be enumerated, and
+> the driver will be probed. Any processor that is not to be used will
+> not have its enabled bit set. It is my understanding that every
+> processor will result in the ACPI processor driver being bound to it
+> whether its enabled or not.
+>
+> The difference between real hotplug and Arm64 hotplug is that real
+> hotplug makes stuff not-present (and thus unenumerable). Arm64 hotplug
+> makes stuff not-enabled which is still enumerable.
 
-... because it walks tdp_mmu_roots without holding mmu_lock.
+Define "real hotplug" :)
 
-Yu's patch[1] added a lockless walk to the TDP MMU. We'd need something
-similar here and also update the comment above tdp_mmu_roots describing
-how tdp_mmu_roots can be read locklessly.
+Real physical hotplug does not really exist. That's at least true for
+x86, where the physical hotplug support was chased for a while, but
+never ended up in production.
 
-[1] https://lore.kernel.org/kvmarm/ZItX64Bbx5vdjo9M@google.com/
+Though virtualization happily jumped on it to hot add/remove CPUs
+to/from a guest.
+
+There are limitations to this and we learned it the hard way on X86. At
+the end we came up with the following restrictions:
+
+    1) All possible CPUs have to be advertised at boot time via firmware
+       (ACPI/DT/whatever) independent of them being present at boot time
+       or not.
+
+       That guarantees proper sizing and ensures that associations
+       between hardware entities and software representations and the
+       resulting topology are stable for the lifetime of a system.
+
+       It is really required to know the full topology of the system at
+       boot time especially with hybrid CPUs where some of the cores
+       have hyperthreading and the others do not.
+
+
+    2) Hot add can only mark an already registered (possible) CPU
+       present. Adding non-registered CPUs after boot is not possible.
+
+       The CPU must have been registered in #1 already to ensure that
+       the system topology does not suddenly change in an incompatible
+       way at run-time.
+
+The same restriction would apply to real physical hotplug. I don't think
+that's any different for ARM64 or any other architecture.
+
+Hope that helps.
+
+Thanks,
+
+        tglx
+
