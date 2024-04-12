@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8563655C0A;
-	Fri, 12 Apr 2024 10:34:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DDE855E73;
+	Fri, 12 Apr 2024 10:34:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712918086; cv=none; b=Tso8Ugz1vlV8YgUvtSeS96LozE7Mv8wA/a3wAo9vDKD8g7CrPGA6/aSZ/adrVERL6f9H8TKbwS0Ea1cfkZfLDPOyvR2Ti0fk3ybk6bOXRZzrtZzz4u7P3LpA3s8AAU679/lSe37M+ujrebhU4PsZ/MD/p2Ikp0ozMg7jdY35ENk=
+	t=1712918088; cv=none; b=SWda6zV8jPf3evcRuBpAgCG0vfH9tYwgtXzIvwpmZSrDw9KGV0zuv6LlODFW4C/vxuIWX8YETBBhj3huvGysMEnLEnwU9OiJKlBhdzbAjqSKRFu9+Xiw2nITACz3xkfWf230OCnQCXtX2IjZ5B5p1GMt5vXl5YmAPFOqaGvG4RU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712918086; c=relaxed/simple;
-	bh=nozHs0KZimfxIaYYA8fGicVWbIDfNSY5D4zYC7kpQss=;
+	s=arc-20240116; t=1712918088; c=relaxed/simple;
+	bh=wUZU7g6gvE0//COzcxg5bmUDHl71afdnQ/iskb5dCo4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=CGOK0af2+LnW/zMWvZPyV8A8V96CyK6BfKIZxXVpAodTwxQKpSAei3mkH+GnVDosWuRHEt53JdlJGAXkTbk/c2wK5XihfoHsxppo1UFpOMVUV7EtsQwYLEWFEe93gYXJnjQUP0khgjK7qGZeL0b8unLZpnbhRi/DvnIijsKzZzI=
+	 MIME-Version; b=WqHvo95O+yUsL4GYzh73IJN7tAtx+7GCFU2SGMHkE/CSIOzfdJWscUq+O7KpHBhx2qjRHaOwIoL0eA8jFMCmb8sMmFhBelo3KS5a/w3YqEN1D5n6iDPl3qSkyHvLkVPZTvdpSYK6zFQyhAqMqmUz7s+LA9WdJ+kH8uKYvY8deTA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6A153113E;
-	Fri, 12 Apr 2024 03:35:14 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6A76C339;
+	Fri, 12 Apr 2024 03:35:16 -0700 (PDT)
 Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.1.197.1])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 73B8B3F64C;
-	Fri, 12 Apr 2024 03:34:43 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 6AB1A3F64C;
+	Fri, 12 Apr 2024 03:34:45 -0700 (PDT)
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 To: kvmarm@lists.linux.dev
 Cc: kvm@vger.kernel.org,
@@ -33,9 +33,9 @@ Cc: kvm@vger.kernel.org,
 	andrew.jones@linux.dev,
 	eric.auger@redhat.com,
 	Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [kvm-unit-tests PATCH 13/33] arm: realm: Add RSI version test
-Date: Fri, 12 Apr 2024 11:33:48 +0100
-Message-Id: <20240412103408.2706058-14-suzuki.poulose@arm.com>
+Subject: [kvm-unit-tests PATCH 14/33] arm: selftest: realm: skip pabt test when running in a realm
+Date: Fri, 12 Apr 2024 11:33:49 +0100
+Message-Id: <20240412103408.2706058-15-suzuki.poulose@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240412103408.2706058-1-suzuki.poulose@arm.com>
 References: <20240412103408.2706058-1-suzuki.poulose@arm.com>
@@ -47,103 +47,48 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Joey Gouly <joey.gouly@arm.com>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
 
-Add basic test for checking the RSI version command.
+The realm manager treats instruction aborts as fatal errors, skip this
+test.
 
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 Signed-off-by: Joey Gouly <joey.gouly@arm.com>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- arm/Makefile.arm64 |  1 +
- arm/realm-rsi.c    | 51 ++++++++++++++++++++++++++++++++++++++++++++++
- arm/unittests.cfg  |  7 +++++++
- 3 files changed, 59 insertions(+)
- create mode 100644 arm/realm-rsi.c
+ arm/selftest.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-index bd167db1..90d95e79 100644
---- a/arm/Makefile.arm64
-+++ b/arm/Makefile.arm64
-@@ -49,6 +49,7 @@ tests = $(TEST_DIR)/timer.$(exe)
- tests += $(TEST_DIR)/micro-bench.$(exe)
- tests += $(TEST_DIR)/cache.$(exe)
- tests += $(TEST_DIR)/debug.$(exe)
-+tests += $(TEST_DIR)/realm-rsi.$(exe)
- 
- include $(SRCDIR)/$(TEST_DIR)/Makefile.common
- 
-diff --git a/arm/realm-rsi.c b/arm/realm-rsi.c
-new file mode 100644
-index 00000000..6c228e42
---- /dev/null
-+++ b/arm/realm-rsi.c
-@@ -0,0 +1,51 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Copyright (C) 2022 Arm Limited.
-+ * All rights reserved.
-+ */
-+
-+#include <libcflat.h>
-+#include <asm/io.h>
-+#include <asm/page.h>
-+#include <asm/processor.h>
-+#include <asm/psci.h>
-+#include <alloc_page.h>
+diff --git a/arm/selftest.c b/arm/selftest.c
+index 1553ed8e..8caadad3 100644
+--- a/arm/selftest.c
++++ b/arm/selftest.c
+@@ -19,6 +19,7 @@
+ #include <asm/smp.h>
+ #include <asm/mmu.h>
+ #include <asm/barrier.h>
 +#include <asm/rsi.h>
-+#include <asm/pgtable.h>
-+#include <asm/processor.h>
+ 
+ static cpumask_t ready, valid;
+ 
+@@ -393,11 +394,17 @@ static void check_vectors(void *arg __unused)
+ 					  user_psci_system_off);
+ #endif
+ 	} else {
++		if (is_realm()) {
++			report_skip("pabt test not supported in a realm");
++			goto out;
++		}
 +
-+static void rsi_test_version(void)
-+{
-+	struct smccc_result res;
-+	int ret, version;
-+
-+	report_prefix_push("version");
-+
-+	ret = __rsi_get_version(RSI_ABI_VERSION, &res);
-+	if (ret < 0) {
-+		report(false, "SMC_RSI_ABI_VERSION failed (%d)", ret);
-+		return;
-+	}
-+
-+	version = res.r1;
-+	report(res.r0 == RSI_SUCCESS, "RSI ABI version %u.%u (expected: %u.%u)",
-+	       RSI_ABI_VERSION_GET_MAJOR(version),
-+	       RSI_ABI_VERSION_GET_MINOR(version),
-+	       RSI_ABI_VERSION_GET_MAJOR(RSI_ABI_VERSION),
-+	       RSI_ABI_VERSION_GET_MINOR(RSI_ABI_VERSION));
-+	report_prefix_pop();
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	report_prefix_push("rsi");
-+
-+	if (!is_realm()) {
-+		report_skip("Not a realm, skipping tests");
-+		goto exit;
-+	}
-+
-+	rsi_test_version();
-+exit:
-+	return report_summary();
-+}
-diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index fe601cbb..a46c9ec7 100644
---- a/arm/unittests.cfg
-+++ b/arm/unittests.cfg
-@@ -281,3 +281,10 @@ file = debug.flat
- arch = arm64
- extra_params = -append 'ss-migration'
- groups = debug migration
-+
-+# Realm RSI ABI test
-+[realm-rsi]
-+file = realm-rsi.flat
-+groups = nodefault realms
-+accel = kvm
-+arch = arm64
+ 		if (!check_pabt_init())
+ 			report_skip("Couldn't guess an invalid physical address");
+ 		else
+ 			report(check_pabt(), "pabt");
+ 	}
++out:
+ 	exit(report_summary());
+ }
+ 
 -- 
 2.34.1
 
