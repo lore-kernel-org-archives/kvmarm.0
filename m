@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF9213FE51;
-	Fri, 12 Apr 2024 10:35:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEAE958211;
+	Fri, 12 Apr 2024 10:35:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712918115; cv=none; b=ilBm1XB0mTe5Bxa7EuFHH9jtcFNEwaeI6d0vioPqqXn9aLiGXwqo0d56ID/5MSHv7rEY+mLUuaJ9nZcMGC/AnQSLhTnPjeu/hhCWDqTS7SCFFHXVuei7gUuN3txwdkEXN/SZYHPaHx4P45/qXdwF+038COzdiatfGNi8sLu1pM0=
+	t=1712918116; cv=none; b=MsE0GKw87cTKzWyxTGHqVN5C2IddNSNlI119dp/pLb6XnhycCThex+GlbrOiZHYU+eWESHLp4OdvHzjW7sV2qfW09FGgDTMoHAnfCdTvCOtcY3cLiPsMbewoIFplaYFqUha5vCDJEpFyyLDptouu1bdcv5hgPn4PmGIYYLxS3AU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712918115; c=relaxed/simple;
-	bh=5iZQrz7mWuKQPTDDJxIV9WSrZXQqNTLMrgKtQAr7dfI=;
+	s=arc-20240116; t=1712918116; c=relaxed/simple;
+	bh=qZBSMbMq8moFVkOkhTLUWb6wgcf/qtqL0nJ6qF8s7sk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=lYZ2noqstlo1NpPIllfT7zM6a9PSzK5Y7jzVWlNixayuhmaWyQdFdE+B2FMeXxRgyqJIWNLhJ6tvVfMPwYQ+TjUAXg2Nrt2VAUK7ph50YHalVYIWHY0wwbbyU8MxzbLXTnaJMcoNElUFHpoyNEFAS7mzs8Rqc2Q/PJWzNItBow8=
+	 MIME-Version; b=gNO2u/mDk8BY0ADkhWj3YKzv1tEfPaBgqa5ngBs/BibijfGVZz8dSMGswM4JaX6jmhAD6EaHAGjiDloB9itccH82vNYvpFhh+L1eXT5ApvDGIp0766JsGB9QnlunAuoiXFgOzGlAkFi9XcdQK62Wv9Uj12X5Lb7MzxhvE9msRDc=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B2DC4113E;
-	Fri, 12 Apr 2024 03:35:42 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9BE161596;
+	Fri, 12 Apr 2024 03:35:44 -0700 (PDT)
 Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.1.197.1])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id A82663F64C;
-	Fri, 12 Apr 2024 03:35:11 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 9E7BA3F7C5;
+	Fri, 12 Apr 2024 03:35:13 -0700 (PDT)
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 To: kvmarm@lists.linux.dev
 Cc: kvm@vger.kernel.org,
@@ -33,9 +33,9 @@ Cc: kvm@vger.kernel.org,
 	andrew.jones@linux.dev,
 	eric.auger@redhat.com,
 	Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [kvm-unit-tests PATCH 27/33] arm: realm: add RSI interface for attestation measurements
-Date: Fri, 12 Apr 2024 11:34:02 +0100
-Message-Id: <20240412103408.2706058-28-suzuki.poulose@arm.com>
+Subject: [kvm-unit-tests PATCH 28/33] arm: realm: Add helpers to decode RSI return codes
+Date: Fri, 12 Apr 2024 11:34:03 +0100
+Message-Id: <20240412103408.2706058-29-suzuki.poulose@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240412103408.2706058-1-suzuki.poulose@arm.com>
 References: <20240412103408.2706058-1-suzuki.poulose@arm.com>
@@ -47,96 +47,59 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add wrappers for the Attestation and measurement related RSI calls.
-These will be later used in the test cases
+RMM encodes error code and index in the result of an operation.
+Add helpers to decode this information for use with the attestation
+tests.
 
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- lib/arm64/asm/rsi.h | 10 +++++++++
- lib/arm64/rsi.c     | 52 +++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 62 insertions(+)
+ lib/arm64/asm/rsi.h | 33 +++++++++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
 
 diff --git a/lib/arm64/asm/rsi.h b/lib/arm64/asm/rsi.h
-index 0b726684..2566c000 100644
+index 2566c000..c7d65333 100644
 --- a/lib/arm64/asm/rsi.h
 +++ b/lib/arm64/asm/rsi.h
-@@ -29,6 +29,16 @@ int rsi_invoke(unsigned int function_id, unsigned long arg0,
- int __rsi_get_version(unsigned long ver, struct smccc_result *res);
- int rsi_get_version(unsigned long ver);
+@@ -16,6 +16,39 @@
  
-+int rsi_attest_token_init(unsigned long *challenge, unsigned long *max_size);
-+int rsi_attest_token_continue(phys_addr_t addr,
-+			      unsigned long offset,
-+			      unsigned long size,
-+			      unsigned long *len);
-+void rsi_extend_measurement(unsigned int index, unsigned long size,
-+			    unsigned long *measurement,
-+			    struct smccc_result *res);
-+void rsi_read_measurement(unsigned int index, struct smccc_result *res);
+ extern bool rsi_present;
+ 
++/*
++ * Logical representation of return code returned by RMM commands.
++ * Each failure mode of a given command should return a unique return code, so
++ * that the caller can use it to unambiguously identify the failure mode.  To
++ * avoid having a very large list of enumerated values, the return code is
++ * composed of a status which identifies the category of the error (for example,
++ * an address was misaligned), and an index which disambiguates between multiple
++ * similar failure modes (for example, a command may take multiple addresses as
++ * its input; the index identifies _which_ of them was misaligned.)
++ */
++typedef unsigned int status_t;
++typedef struct {
++	status_t status;
++	unsigned int index;
++} return_code_t;
 +
- static inline bool is_realm(void)
- {
- 	return rsi_present;
-diff --git a/lib/arm64/rsi.c b/lib/arm64/rsi.c
-index e58d9660..8fe672fc 100644
---- a/lib/arm64/rsi.c
-+++ b/lib/arm64/rsi.c
-@@ -134,3 +134,55 @@ void arm_set_memory_shared(unsigned long start, unsigned long size)
- {
- 	arm_set_memory_state(start, size, RIPAS_EMPTY, RSI_CHANGE_DESTROYED);
- }
-+
-+int rsi_attest_token_init(unsigned long *challenge, unsigned long *max_size)
++/*
++ * Convenience function for creating a return_code_t.
++ */
++static inline return_code_t make_return_code(unsigned int status,
++					     unsigned int index)
 +{
-+	struct smccc_result res;
-+
-+	rsi_invoke(SMC_RSI_ATTEST_TOKEN_INIT,
-+		   challenge[0], challenge[1], challenge[2],
-+		   challenge[3], challenge[4], challenge[5],
-+		   challenge[6], challenge[7], 0, 0, 0, &res);
-+
-+	if (max_size)
-+		*max_size = res.r1;
-+	return res.r0;
++	return (return_code_t) {status, index};
 +}
 +
-+int rsi_attest_token_continue(phys_addr_t addr,
-+			      unsigned long offset,
-+			      unsigned long size,
-+			      unsigned long *len)
++/*
++ * Unpacks a return code.
++ */
++static inline return_code_t unpack_return_code(unsigned long error_code)
 +{
-+	struct smccc_result res = { 0 };
-+
-+	rsi_invoke(SMC_RSI_ATTEST_TOKEN_CONTINUE, addr, offset, size,
-+		   0, 0, 0, 0, 0, 0, 0, 0, &res);
-+	switch (res.r0) {
-+	case RSI_SUCCESS:
-+	case RSI_INCOMPLETE:
-+		if (len)
-+			*len = res.r1;
-+		/* Fall through */
-+	default:
-+		break;
-+	}
-+	return res.r0;
++	return make_return_code(error_code & 0xff, error_code >> 8);
 +}
 +
-+void rsi_extend_measurement(unsigned int index, unsigned long size,
-+			    unsigned long *measurement, struct smccc_result *res)
-+{
-+	rsi_invoke(SMC_RSI_MEASUREMENT_EXTEND, index, size,
-+		   measurement[0], measurement[1],
-+		   measurement[2], measurement[3],
-+		   measurement[4], measurement[5],
-+		   measurement[6], measurement[7],
-+		   0, res);
-+}
-+
-+void rsi_read_measurement(unsigned int index, struct smccc_result *res)
-+{
-+	rsi_invoke(SMC_RSI_MEASUREMENT_READ, index, 0,
-+		   0, 0, 0, 0, 0, 0, 0, 0, 0, res);
-+}
+ void arm_rsi_init(void);
+ 
+ int rsi_invoke(unsigned int function_id, unsigned long arg0,
 -- 
 2.34.1
 
