@@ -1,247 +1,140 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E49E143874;
-	Fri, 12 Apr 2024 14:46:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A97E146A75
+	for <kvmarm@lists.linux.dev>; Fri, 12 Apr 2024 14:54:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712933193; cv=none; b=BLrxBYpZfWrnpgyMuWQBBV5uUwBeqB4YbIlmPG6LluwsHjPQMfPFkTVvaJ79rO/w5NF79rZPkDETMzHclIsX2mMWG5MfASOXGq7ivr5dCqH+UIF7FCYk+QRqnpSvTLs6+niGAmaUqYdOCKJwTM2ebJqIvnVWTE9U7PE8QIsZXWA=
+	t=1712933667; cv=none; b=l07J4oVSeo37Zr+5QramqAm8KXmtiTdOOtn1U235wpm1npIfi31bKpAg3b7LML5XbKkDgODfEaxJ8JaNQdwnLQLAGn6ewvUc9SJizztHBQk/rsqVQ/WPAY0ox+6BBsE0gLR9Zc7F4Uovm+0THg3Y/UB68bOZpCM0FkqI6dri3oI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712933193; c=relaxed/simple;
-	bh=Rv7MBAehN1l8e5kAHjjJdnNaTTdIY+7KU7psaQclR+U=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Hqb0VBD9T5zKE0vXOqsPD3uS7gTqLieL2IWGtt9UrFFe5xRUe7S2ojcTQ4yrs4s64Be7ccqu2NkblNcPK2lsOmfq/lIoh+rtNeynxF+CPtt2upr2IaBHxtHDw+e7aCAzjqgJ0dh6p3Csb0aCdgbha558NojccMdN41dJ/cTfq84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4VGK5G4Pmlz6K8y1;
-	Fri, 12 Apr 2024 22:41:38 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id 066131408FE;
-	Fri, 12 Apr 2024 22:46:29 +0800 (CST)
-Received: from SecurePC-101-06.china.huawei.com (10.122.247.231) by
- lhrpeml500005.china.huawei.com (7.191.163.240) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Fri, 12 Apr 2024 15:46:28 +0100
-From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-To: <linux-pm@vger.kernel.org>, <loongarch@lists.linux.dev>,
-	<linux-acpi@vger.kernel.org>, <linux-arch@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>, <x86@kernel.org>, Russell King
-	<linux@armlinux.org.uk>, "Rafael J . Wysocki" <rafael@kernel.org>, Miguel
- Luis <miguel.luis@oracle.com>, James Morse <james.morse@arm.com>, Salil Mehta
-	<salil.mehta@huawei.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
-CC: <linuxarm@huawei.com>, <justin.he@arm.com>, <jianyong.wu@arm.com>
-Subject: [PATCH v5 18/18] cpumask: Add enabled cpumask for present CPUs that can be brought online
-Date: Fri, 12 Apr 2024 15:37:19 +0100
-Message-ID: <20240412143719.11398-19-Jonathan.Cameron@huawei.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240412143719.11398-1-Jonathan.Cameron@huawei.com>
-References: <20240412143719.11398-1-Jonathan.Cameron@huawei.com>
+	s=arc-20240116; t=1712933667; c=relaxed/simple;
+	bh=ZtUMxIcPii7SYptK1bsvjnMTv2XY+8o/C+H99TV4mko=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=EiCYEkzwqaT1YYCirNJ9na+NyYRpO9UQ+7dsP6HM+R62x4ZHVm+VYtzysc3KO3pOH6if/8xg8wsFjGEh7YC0KLgWR+/N51itjlrKlawWPQNs2rkw9X0BzmWIZeO+HIur6MUZzFvxWSIn3GE7w4pNo6grdq27712i2AmC0hQSY74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mp30zKCu; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mp30zKCu"
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6ed5a1724b2so681050b3a.1
+        for <kvmarm@lists.linux.dev>; Fri, 12 Apr 2024 07:54:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712933664; x=1713538464; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZrmdCrVWtwb7lFW6AyHWbgOgdloa5ymd2fy0iQuLqTo=;
+        b=mp30zKCuOWlA7zV7oWFuyKggXl7KNGlawa+eBechqGUQvE7UtNiKEjS7poIcbb8q9X
+         Z9wb7f3vrGQ9yyZhqmY0gXDxVQamh+QEj2F30gVn9hrVZCwmPlV8jwETWcDstHR7rNwk
+         GJtLnSEyGl6oVl9Kz4KCeAxFPSZT6LeMci25FCV//01KZglP3cjt3twvNAXhW0vuevr1
+         B98cLi3Ch0D9ajrpijyns42sb1Sgp0H4gsYxvIPRNmMV9yrffWKQE/roG1PlXCKJ2h8N
+         imKtMz+pgzCTjUZcUjLPkdABMW+Bd5zTW5ynodSU1QyYxy+YF0AHlq+5o2YWNXPrmTUy
+         bfWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712933664; x=1713538464;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZrmdCrVWtwb7lFW6AyHWbgOgdloa5ymd2fy0iQuLqTo=;
+        b=xF23+hCgAslKu8FaodgEVpT0lZCJV9y6KFfRAqoXf+gdEhrWKAnrjT9B/eHsAyYY1a
+         5f2rLsTMTdXDC0SiAvSqsCMTW8M91WcPoKjmf+tdptnS5R1TVsQnTcGMukgPM9yiutKs
+         EB12mobNy+osXEOLsCUqv+UBXhr/2yF5kWp/y3aw6FsgiJuPNZ7579QwD6OZ9K6E0dF4
+         AZbqKEBnly7OKIX//8J162HhHoLiu0bbj1b/Wcps6NHIljASv0CFwHK+6+P4tDENKtww
+         0v5F9B5CdURfDAwCwLaKK3+1TbBTwp+O2PO33m624jk16qbcOMDFEAy8xQDgFwkMLInr
+         zEvA==
+X-Forwarded-Encrypted: i=1; AJvYcCWA+KcPIvhPpEfUpLwFEizxNQRdTRpgZ0bUghqLiFyTGSoiGnmxL082KuVKR6BJ4YW64Lf+7oqRKZB2/FLP24XE+anMS1hT
+X-Gm-Message-State: AOJu0Yw16FYOZfeciRJB6zfaraCVNnCTiycvZF5KpjWw9itCQhPbMa6I
+	GevMPPgbDqLGOytJBG3fjKR7c2G8udJB153iMPZXpanQYOzaFA2UErbO6mVqEb+35NFk/FZLwOp
+	OHw==
+X-Google-Smtp-Source: AGHT+IE8CrGE6yHurBu6oRRUdhNStzcxsQMqGws9O1toyt+VIrjo1lbnGIr3E72VqB9zErBllk+K4v4iLAw=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:2d94:b0:6ed:95ce:3417 with SMTP id
+ fb20-20020a056a002d9400b006ed95ce3417mr191844pfb.5.1712933663717; Fri, 12 Apr
+ 2024 07:54:23 -0700 (PDT)
+Date: Fri, 12 Apr 2024 07:54:22 -0700
+In-Reply-To: <86jzl2sovz.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: lhrpeml500006.china.huawei.com (7.191.161.198) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
+Mime-Version: 1.0
+References: <20240405115815.3226315-1-pbonzini@redhat.com> <20240405115815.3226315-2-pbonzini@redhat.com>
+ <20240412104408.GA27645@willie-the-truck> <86jzl2sovz.wl-maz@kernel.org>
+Message-ID: <ZhlLHtfeSHk9gRRO@google.com>
+Subject: Re: [PATCH 1/4] KVM: delete .change_pte MMU notifier callback
+From: Sean Christopherson <seanjc@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>, 
+	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, Nicholas Piggin <npiggin@gmail.com>, 
+	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, David Hildenbrand <david@redhat.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
+	linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-From: James Morse <james.morse@arm.com>
+On Fri, Apr 12, 2024, Marc Zyngier wrote:
+> On Fri, 12 Apr 2024 11:44:09 +0100, Will Deacon <will@kernel.org> wrote:
+> > On Fri, Apr 05, 2024 at 07:58:12AM -0400, Paolo Bonzini wrote:
+> > Also, if you're in the business of hacking the MMU notifier code, it
+> > would be really great to change the .clear_flush_young() callback so
+> > that the architecture could handle the TLB invalidation. At the moment,
+> > the core KVM code invalidates the whole VMID courtesy of 'flush_on_ret'
+> > being set by kvm_handle_hva_range(), whereas we could do a much
+> > lighter-weight and targetted TLBI in the architecture page-table code
+> > when we actually update the ptes for small ranges.
+> 
+> Indeed, and I was looking at this earlier this week as it has a pretty
+> devastating effect with NV (it blows the shadow S2 for that VMID, with
+> costly consequences).
+> 
+> In general, it feels like the TLB invalidation should stay with the
+> code that deals with the page tables, as it has a pretty good idea of
+> what needs to be invalidated and how -- specially on architectures
+> that have a HW-broadcast facility like arm64.
 
-The 'offline' file in sysfs shows all offline CPUs, including those
-that aren't present. User-space is expected to remove not-present CPUs
-from this list to learn which CPUs could be brought online.
+Would this be roughly on par with an in-line flush on arm64?  The simpler, more
+straightforward solution would be to let architectures override flush_on_ret,
+but I would prefer something like the below as x86 can also utilize a range-based
+flush when running as a nested hypervisor.
 
-CPUs can be present but not-enabled. These CPUs can't be brought online
-until the firmware policy changes, which comes with an ACPI notification
-that will register the CPUs.
-
-With only the offline and present files, user-space is unable to
-determine which CPUs it can try to bring online. Add a new CPU mask
-that shows this based on all the registered CPUs.
-
-Signed-off-by: James Morse <james.morse@arm.com>
-Tested-by: Miguel Luis <miguel.luis@oracle.com>
-Tested-by: Vishnu Pajjuri <vishnu@os.amperecomputing.com>
-Tested-by: Jianyong Wu <jianyong.wu@arm.com>
-Acked-by: Thomas Gleixner <tglx@linutronix.de>
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-
----
-v5: No change
----
- .../ABI/testing/sysfs-devices-system-cpu      |  6 +++++
- drivers/base/cpu.c                            | 10 ++++++++
- include/linux/cpumask.h                       | 25 +++++++++++++++++++
- kernel/cpu.c                                  |  3 +++
- 4 files changed, 44 insertions(+)
-
-diff --git a/Documentation/ABI/testing/sysfs-devices-system-cpu b/Documentation/ABI/testing/sysfs-devices-system-cpu
-index 710d47be11e0..808efb5b860a 100644
---- a/Documentation/ABI/testing/sysfs-devices-system-cpu
-+++ b/Documentation/ABI/testing/sysfs-devices-system-cpu
-@@ -694,3 +694,9 @@ Description:
- 		(RO) indicates whether or not the kernel directly supports
- 		modifying the crash elfcorehdr for CPU hot un/plug and/or
- 		on/offline changes.
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index ff0a20565f90..b65116294efe 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -601,6 +601,7 @@ static __always_inline kvm_mn_ret_t __kvm_handle_hva_range(struct kvm *kvm,
+        struct kvm_gfn_range gfn_range;
+        struct kvm_memory_slot *slot;
+        struct kvm_memslots *slots;
++       bool need_flush = false;
+        int i, idx;
+ 
+        if (WARN_ON_ONCE(range->end <= range->start))
+@@ -653,10 +654,22 @@ static __always_inline kvm_mn_ret_t __kvm_handle_hva_range(struct kvm *kvm,
+                                        break;
+                        }
+                        r.ret |= range->handler(kvm, &gfn_range);
 +
-+What:		/sys/devices/system/cpu/enabled
-+Date:		Nov 2022
-+Contact:	Linux kernel mailing list <linux-kernel@vger.kernel.org>
-+Description:
-+		(RO) the list of CPUs that can be brought online.
-diff --git a/drivers/base/cpu.c b/drivers/base/cpu.c
-index b9d0d14e5960..4713b86d20f2 100644
---- a/drivers/base/cpu.c
-+++ b/drivers/base/cpu.c
-@@ -95,6 +95,7 @@ void unregister_cpu(struct cpu *cpu)
- {
- 	int logical_cpu = cpu->dev.id;
++                       /*
++                        * Use a precise gfn-based TLB flush when possible, as
++                        * most mmu_notifier events affect a small-ish range.
++                        * Fall back to a full TLB flush if the gfn-based flush
++                        * fails, and don't bother trying the gfn-based flush
++                        * if a full flush is already pending.
++                        */
++                       if (range->flush_on_ret && !need_flush && r.ret &&
++                           kvm_arch_flush_remote_tlbs_range(kvm, gfn_range.start
++                                                            gfn_range.end - gfn_range.start + 1))
++                               need_flush = true;
+                }
+        }
  
-+	set_cpu_enabled(logical_cpu, false);
- 	unregister_cpu_under_node(logical_cpu, cpu_to_node(logical_cpu));
+-       if (range->flush_on_ret && r.ret)
++       if (need_flush)
+                kvm_flush_remote_tlbs(kvm);
  
- 	device_unregister(&cpu->dev);
-@@ -273,6 +274,13 @@ static ssize_t print_cpus_offline(struct device *dev,
- }
- static DEVICE_ATTR(offline, 0444, print_cpus_offline, NULL);
- 
-+static ssize_t print_cpus_enabled(struct device *dev,
-+				  struct device_attribute *attr, char *buf)
-+{
-+	return sysfs_emit(buf, "%*pbl\n", cpumask_pr_args(cpu_enabled_mask));
-+}
-+static DEVICE_ATTR(enabled, 0444, print_cpus_enabled, NULL);
-+
- static ssize_t print_cpus_isolated(struct device *dev,
- 				  struct device_attribute *attr, char *buf)
- {
-@@ -413,6 +421,7 @@ int register_cpu(struct cpu *cpu, int num)
- 	register_cpu_under_node(num, cpu_to_node(num));
- 	dev_pm_qos_expose_latency_limit(&cpu->dev,
- 					PM_QOS_RESUME_LATENCY_NO_CONSTRAINT);
-+	set_cpu_enabled(num, true);
- 
- 	return 0;
- }
-@@ -494,6 +503,7 @@ static struct attribute *cpu_root_attrs[] = {
- 	&cpu_attrs[2].attr.attr,
- 	&dev_attr_kernel_max.attr,
- 	&dev_attr_offline.attr,
-+	&dev_attr_enabled.attr,
- 	&dev_attr_isolated.attr,
- #ifdef CONFIG_NO_HZ_FULL
- 	&dev_attr_nohz_full.attr,
-diff --git a/include/linux/cpumask.h b/include/linux/cpumask.h
-index 1c29947db848..4b202b94c97a 100644
---- a/include/linux/cpumask.h
-+++ b/include/linux/cpumask.h
-@@ -93,6 +93,7 @@ static inline void set_nr_cpu_ids(unsigned int nr)
-  *
-  *     cpu_possible_mask- has bit 'cpu' set iff cpu is populatable
-  *     cpu_present_mask - has bit 'cpu' set iff cpu is populated
-+ *     cpu_enabled_mask  - has bit 'cpu' set iff cpu can be brought online
-  *     cpu_online_mask  - has bit 'cpu' set iff cpu available to scheduler
-  *     cpu_active_mask  - has bit 'cpu' set iff cpu available to migration
-  *
-@@ -125,11 +126,13 @@ static inline void set_nr_cpu_ids(unsigned int nr)
- 
- extern struct cpumask __cpu_possible_mask;
- extern struct cpumask __cpu_online_mask;
-+extern struct cpumask __cpu_enabled_mask;
- extern struct cpumask __cpu_present_mask;
- extern struct cpumask __cpu_active_mask;
- extern struct cpumask __cpu_dying_mask;
- #define cpu_possible_mask ((const struct cpumask *)&__cpu_possible_mask)
- #define cpu_online_mask   ((const struct cpumask *)&__cpu_online_mask)
-+#define cpu_enabled_mask   ((const struct cpumask *)&__cpu_enabled_mask)
- #define cpu_present_mask  ((const struct cpumask *)&__cpu_present_mask)
- #define cpu_active_mask   ((const struct cpumask *)&__cpu_active_mask)
- #define cpu_dying_mask    ((const struct cpumask *)&__cpu_dying_mask)
-@@ -1009,6 +1012,7 @@ extern const DECLARE_BITMAP(cpu_all_bits, NR_CPUS);
- #else
- #define for_each_possible_cpu(cpu) for_each_cpu((cpu), cpu_possible_mask)
- #define for_each_online_cpu(cpu)   for_each_cpu((cpu), cpu_online_mask)
-+#define for_each_enabled_cpu(cpu)   for_each_cpu((cpu), cpu_enabled_mask)
- #define for_each_present_cpu(cpu)  for_each_cpu((cpu), cpu_present_mask)
- #endif
- 
-@@ -1031,6 +1035,15 @@ set_cpu_possible(unsigned int cpu, bool possible)
- 		cpumask_clear_cpu(cpu, &__cpu_possible_mask);
- }
- 
-+static inline void
-+set_cpu_enabled(unsigned int cpu, bool can_be_onlined)
-+{
-+	if (can_be_onlined)
-+		cpumask_set_cpu(cpu, &__cpu_enabled_mask);
-+	else
-+		cpumask_clear_cpu(cpu, &__cpu_enabled_mask);
-+}
-+
- static inline void
- set_cpu_present(unsigned int cpu, bool present)
- {
-@@ -1112,6 +1125,7 @@ static __always_inline unsigned int num_online_cpus(void)
- 	return raw_atomic_read(&__num_online_cpus);
- }
- #define num_possible_cpus()	cpumask_weight(cpu_possible_mask)
-+#define num_enabled_cpus()	cpumask_weight(cpu_enabled_mask)
- #define num_present_cpus()	cpumask_weight(cpu_present_mask)
- #define num_active_cpus()	cpumask_weight(cpu_active_mask)
- 
-@@ -1120,6 +1134,11 @@ static inline bool cpu_online(unsigned int cpu)
- 	return cpumask_test_cpu(cpu, cpu_online_mask);
- }
- 
-+static inline bool cpu_enabled(unsigned int cpu)
-+{
-+	return cpumask_test_cpu(cpu, cpu_enabled_mask);
-+}
-+
- static inline bool cpu_possible(unsigned int cpu)
- {
- 	return cpumask_test_cpu(cpu, cpu_possible_mask);
-@@ -1144,6 +1163,7 @@ static inline bool cpu_dying(unsigned int cpu)
- 
- #define num_online_cpus()	1U
- #define num_possible_cpus()	1U
-+#define num_enabled_cpus()	1U
- #define num_present_cpus()	1U
- #define num_active_cpus()	1U
- 
-@@ -1157,6 +1177,11 @@ static inline bool cpu_possible(unsigned int cpu)
- 	return cpu == 0;
- }
- 
-+static inline bool cpu_enabled(unsigned int cpu)
-+{
-+	return cpu == 0;
-+}
-+
- static inline bool cpu_present(unsigned int cpu)
- {
- 	return cpu == 0;
-diff --git a/kernel/cpu.c b/kernel/cpu.c
-index 8f6affd051f7..537099bf5d02 100644
---- a/kernel/cpu.c
-+++ b/kernel/cpu.c
-@@ -3117,6 +3117,9 @@ EXPORT_SYMBOL(__cpu_possible_mask);
- struct cpumask __cpu_online_mask __read_mostly;
- EXPORT_SYMBOL(__cpu_online_mask);
- 
-+struct cpumask __cpu_enabled_mask __read_mostly;
-+EXPORT_SYMBOL(__cpu_enabled_mask);
-+
- struct cpumask __cpu_present_mask __read_mostly;
- EXPORT_SYMBOL(__cpu_present_mask);
- 
--- 
-2.39.2
+        if (r.found_memslot)
 
