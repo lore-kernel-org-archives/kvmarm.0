@@ -1,58 +1,65 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A20184437D;
-	Fri, 12 Apr 2024 11:06:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC854224D8;
+	Fri, 12 Apr 2024 13:07:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712919963; cv=none; b=rDDtxe7mnCoT+HZ4N3FZ6UgPg8Qmx6WdXV0b7yergm0J9gKkku5IVDeEhuOG/y7RjtT8dURImc4/OBqMuul6aQUU0lqUcQutEh1nmqzDHVI2mB3wULhbjbZD3jQSC8dSAbjJY4BrKnjjr3Sc+HHyvgQsXsHMBeriKfLFVpkgMvY=
+	t=1712927263; cv=none; b=iH/E8a1bESxvMQRDDxc6HNPMm7+uaZWyuN682tWdbBBlgbz0PMwe8aweteOrMqpEIGDun7r2xAlprMXCn9+/4muIxBZmvTqs0TRR5b4bTkxjJvOWHJ0WZC9MgTB1Qyl+qjA0ZjVSXRqNhDaqAWmCmk73PwhXx5a7GL/uhshW2h8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712919963; c=relaxed/simple;
-	bh=kI1dFkSS8gY/pKOFeQhwJuPlr/Nuwuy5AW7ddjhVXUM=;
+	s=arc-20240116; t=1712927263; c=relaxed/simple;
+	bh=WXXIdGk+X4xSO8A0Mdd/JdZXvSOz7cKKHzKcx7zp/e4=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZD7kSjPGooH5mf4zeprl/XpQMbUpQ+9/Vpo7ht9mUpRxvsb+8hG7EXyapPHNWwDvDH2aP77EJp28obl7PXdByRANt9jEHnIvqlr5TWyUrkwm5d83acCqtgyVQMu/jtFgO4dDnu983CjHQiK7CQ5Sem6EFy/Zdbflq4WHTjNNqRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C8tjo2zW; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=YmMAEgkC1dkAh6rJCF1JtWJEJT8jcU3rBhxyMeJizZ9bzyWivMdqYo5cBR3krZC+zaZcugYMRGftcokw8uTEplW+tMQXCQZf6D02vbrI0o7tX6vGcpmXnBHpZam62Tn42chkWaa49jh3NEmRa3Zz9ISBkqapBmvDp7JYsPNO/AU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mlWYRY6R; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C8tjo2zW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20C60C113CC;
-	Fri, 12 Apr 2024 11:06:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mlWYRY6R"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C47CC113CC;
+	Fri, 12 Apr 2024 13:07:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712919963;
-	bh=kI1dFkSS8gY/pKOFeQhwJuPlr/Nuwuy5AW7ddjhVXUM=;
+	s=k20201202; t=1712927262;
+	bh=WXXIdGk+X4xSO8A0Mdd/JdZXvSOz7cKKHzKcx7zp/e4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=C8tjo2zWsQRLxbngOxakmQFK3AjrkWpNpRiKTtRD7EyedaZ+PPZgzHtZFPHBxPwdL
-	 vydur47SemhQD2Nd80jBfJptO0btO1/VyUQ5fOujY7FaIEBCXFX5i/N34KSL/p8l3g
-	 g+u2bnbx+jtjgxGsw3wtthukImJBfSAhbYsifDBWf5fcf4lo7LbqkWX5/YtmvfWG0R
-	 wdKweW70twQxta6ftezlKQ7VoypZZKyCRg/k1Z57v2fjsj1pGfHXjMjo8iFMhpVMws
-	 AYl7P9BE4WBU+QAL8JiEw/BNYl6Cd1Fg75kVAFFBMx348TTWEwGIqFReJAgNv9Nhp8
-	 WXnxcDmGIo1Fw==
+	b=mlWYRY6R+uO4KNbt8cIf64MguVd8/GHUg7jqEfibnb2j2yYOr842hoff3W6jZ2W6Q
+	 BRWCuZA/oNlXy6/0CFH3viAXrc8qD5Z1kg2VqyfMrkRlL0GkKt6FGGkq7vjol+/rWf
+	 xhKn1pcS/RFNPqEmpu+De8hHFtcOYW9290Q6wreBB+LuxJjv7MvmphVuMNI5yVeK6v
+	 8LwCZ6+IMlvHhnGCu56SknAEpcfLvStMVcRpKtbhCnCjRQrnLJanixlnZPvxJPcLtA
+	 DyvXUuh5xMgv1rPhe/ETCYBkM2o42kXk36Yi7g8UEQFJ2zPIyYqG+w5RiuGqXWqE3I
+	 xnLxdM3U5CxIw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rvEjI-003rfo-OQ;
-	Fri, 12 Apr 2024 12:06:00 +0100
-Date: Fri, 12 Apr 2024 12:05:59 +0100
-Message-ID: <86mspysuw8.wl-maz@kernel.org>
+	id 1rvGd1-003tLC-MV;
+	Fri, 12 Apr 2024 14:07:39 +0100
+Date: Fri, 12 Apr 2024 14:07:38 +0100
+Message-ID: <86le5isp9h.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	Jonathan Corbet <corbet@lwn.net>,
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
 	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Brown <broonie@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
+	Tianrui Zhao <zhaotianrui@loongson.cn>,
+	Bibo Mao <maobibo@loongson.cn>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	David Hildenbrand <david@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC 5/8] KVM: arm64: Explicitly handle MDSELR_EL1 traps as UNDEFINED
-In-Reply-To: <5a2a74b3-f6cd-4cb6-8ee8-5dd7dc2bd686@arm.com>
-References: <20240405080008.1225223-1-anshuman.khandual@arm.com>
-	<20240405080008.1225223-6-anshuman.khandual@arm.com>
-	<86a5m8t8s6.wl-maz@kernel.org>
-	<5a2a74b3-f6cd-4cb6-8ee8-5dd7dc2bd686@arm.com>
+	loongarch@lists.linux.dev,
+	linux-mips@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	kvm-riscv@lists.infradead.org,
+	linux-mm@kvack.org,
+	linux-trace-kernel@vger.kernel.org,
+	linux-perf-users@vger.kernel.org
+Subject: Re: [PATCH 0/4] KVM, mm: remove the .change_pte() MMU notifier and set_pte_at_notify()
+In-Reply-To: <20240405115815.3226315-1-pbonzini@redhat.com>
+References: <20240405115815.3226315-1-pbonzini@redhat.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -64,141 +71,75 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: anshuman.khandual@arm.com, linux-arm-kernel@lists.infradead.org, corbet@lwn.net, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, broonie@kernel.org, mark.rutland@arm.com, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, oliver.upton@linux.dev, zhaotianrui@loongson.cn, maobibo@loongson.cn, tsbogend@alpha.franken.de, npiggin@gmail.com, anup@brainfault.org, atishp@atishpatra.org, seanjc@google.com, akpm@linux-foundation.org, david@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, loongarch@lists.linux.dev, linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 12 Apr 2024 03:41:23 +0100,
-Anshuman Khandual <anshuman.khandual@arm.com> wrote:
+On Fri, 05 Apr 2024 12:58:11 +0100,
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 > 
+> The .change_pte() MMU notifier callback was intended as an optimization
+> and for this reason it was initially called without a surrounding
+> mmu_notifier_invalidate_range_{start,end}() pair.  It was only ever
+> implemented by KVM (which was also the original user of MMU notifiers)
+> and the rules on when to call set_pte_at_notify() rather than set_pte_at()
+> have always been pretty obscure.
 > 
+> It may seem a miracle that it has never caused any hard to trigger
+> bugs, but there's a good reason for that: KVM's implementation has
+> been nonfunctional for a good part of its existence.  Already in
+> 2012, commit 6bdb913f0a70 ("mm: wrap calls to set_pte_at_notify with
+> invalidate_range_start and invalidate_range_end", 2012-10-09) changed the
+> .change_pte() callback to occur within an invalidate_range_start/end()
+> pair; and because KVM unmaps the sPTEs during .invalidate_range_start(),
+> .change_pte() has no hope of finding a sPTE to change.
 > 
-> On 4/5/24 15:45, Marc Zyngier wrote:
-> > On Fri, 05 Apr 2024 09:00:05 +0100,
-> > Anshuman Khandual <anshuman.khandual@arm.com> wrote:
-> >>
-> >> Currently read_sanitised_id_aa64dfr0_el1() caps the ID_AA64DFR0.DebugVer to
-> >> ID_AA64DFR0_DebugVer_V8P8, resulting in FEAT_Debugv8p9 not being exposed to
-> >> the guest. MDSELR_EL1 register access in the guest, is currently trapped by
-> >> the existing configuration of the fine-grained traps.
-> > 
-> > Please add support for the HDFGxTR2_EL2 registers in the trap routing
-> > arrays, add support for the corresponding FGUs in the corresponding
+> Therefore, all the code for .change_pte() can be removed from both KVM
+> and mm/, and set_pte_at_notify() can be replaced with just set_pte_at().
 > 
-> Afraid that I might not have enough background here to sufficiently understand
-> your suggestion above, but nonetheless here is an attempt in this regard.
-
-Thanks for at least giving it a try, this is *MUCH* appreciated.
-
->
-> - Add HDFGRTR2_EL2/HDFGWTR2_EL2 to enum vcpu_sysreg
-> 	enum vcpu_sysreg {
-> 		..........
-> 		VNCR(HDFGRTR2_EL2),
-> 		VNCR(HDFGWTR2_EL2),
-> 		..........
-> 	}
-
-Yes.
-
+> Please review!  Also feel free to take the KVM patches through the mm
+> tree, as I don't expect any conflicts.
 > 
-> - Add their VNCR mappings addresses
+> Thanks,
 > 
-> 	#define VNCR_HDFGRTR2_EL2      0x1A0
-> 	#define VNCR_HDFGWTR2_EL2      0x1B0
-
-Yes.
-
+> Paolo
 > 
-> - Add HDFGRTR2_EL2/HDFGWTR2_EL2 to sys_reg_descs[]
+> Paolo Bonzini (4):
+>   KVM: delete .change_pte MMU notifier callback
+>   KVM: remove unused argument of kvm_handle_hva_range()
+>   mmu_notifier: remove the .change_pte() callback
+>   mm: replace set_pte_at_notify() with just set_pte_at()
 > 
-> static const struct sys_reg_desc sys_reg_descs[] = {
-> 	..........
-> 	EL2_REG_VNCR(HDFGRTR2_EL2, reset_val, 0),
-> 	EL2_REG_VNCR(HDFGWTR2_EL2, reset_val, 0),
-> 	..........
-> }
-
-Yes
-
+>  arch/arm64/kvm/mmu.c                  | 34 -----------------
+>  arch/loongarch/include/asm/kvm_host.h |  1 -
+>  arch/loongarch/kvm/mmu.c              | 32 ----------------
+>  arch/mips/kvm/mmu.c                   | 30 ---------------
+>  arch/powerpc/include/asm/kvm_ppc.h    |  1 -
+>  arch/powerpc/kvm/book3s.c             |  5 ---
+>  arch/powerpc/kvm/book3s.h             |  1 -
+>  arch/powerpc/kvm/book3s_64_mmu_hv.c   | 12 ------
+>  arch/powerpc/kvm/book3s_hv.c          |  1 -
+>  arch/powerpc/kvm/book3s_pr.c          |  7 ----
+>  arch/powerpc/kvm/e500_mmu_host.c      |  6 ---
+>  arch/riscv/kvm/mmu.c                  | 20 ----------
+>  arch/x86/kvm/mmu/mmu.c                | 54 +--------------------------
+>  arch/x86/kvm/mmu/spte.c               | 16 --------
+>  arch/x86/kvm/mmu/spte.h               |  2 -
+>  arch/x86/kvm/mmu/tdp_mmu.c            | 46 -----------------------
+>  arch/x86/kvm/mmu/tdp_mmu.h            |  1 -
+>  include/linux/kvm_host.h              |  2 -
+>  include/linux/mmu_notifier.h          | 44 ----------------------
+>  include/trace/events/kvm.h            | 15 --------
+>  kernel/events/uprobes.c               |  5 +--
+>  mm/ksm.c                              |  4 +-
+>  mm/memory.c                           |  7 +---
+>  mm/migrate_device.c                   |  8 +---
+>  mm/mmu_notifier.c                     | 17 ---------
+>  virt/kvm/kvm_main.c                   | 50 +------------------------
+>  26 files changed, 10 insertions(+), 411 deletions(-)
 > 
-> - Add HDFGRTR2_GROUP to enum fgt_group_id
-> - Add HDFGRTR2_GROUP to reg_to_fgt_group_id()
-> - Update triage_sysreg_trap() for HDFGRTR2_GROUP
-> - Update __activate_traps_hfgxtr() both for HDFGRTR2_EL2 and HDFGWTR2_EL2
-> - Updated __deactivate_traps_hfgxtr() both for HDFGRTR2_EL2 and HDFGWTR2_EL2
 
-Yes. Don't miss check_fgt_bit() though.  You also need to update
-kvm_init_nv_sysregs() to ensure that these new registers have the
-correct RES0/RES1 behaviour depending on the supported feature set for
-the guest.
-
->
-> > structure, and condition the UNDEF on the lack of *guest* support for
-> > the feature.
-> 
-> Does something like the following looks OK for preventing guest access into
-> MDSELR_EL1 instead ?
-> 
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1711,6 +1711,19 @@ static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
->         return val;
->  }
->  
-> +static bool trap_mdselr_el1(struct kvm_vcpu *vcpu,
-> +                          struct sys_reg_params *p,
-> +                          const struct sys_reg_desc *r)
-> +{
-> +       u64 dfr0 = read_sanitised_id_aa64dfr0_el1(vcpu, r);
-> +       int dver = cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_DebugVer_SHIFT);
-> +
-> +       if (dver != ID_AA64DFR0_EL1_DebugVer_V8P9)
-> +               return undef_access(vcpu, p, r);
-
-This is very cumbersome, and we now have a much better infrastructure
-for the stuff that is handled with FGTs, see below.
-
-> +
-> +       return true;
-> +}
-> +
->  static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
->                                const struct sys_reg_desc *rd,
->                                u64 val)
-> @@ -2203,7 +2216,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->         { SYS_DESC(SYS_MDSCR_EL1), trap_debug_regs, reset_val, MDSCR_EL1, 0 },
->         DBG_BCR_BVR_WCR_WVR_EL1(2),
->         DBG_BCR_BVR_WCR_WVR_EL1(3),
-> -       { SYS_DESC(SYS_MDSELR_EL1), undef_access },
-> +       { SYS_DESC(SYS_MDSELR_EL1), trap_mdselr_el1 },
->         DBG_BCR_BVR_WCR_WVR_EL1(4),
->         DBG_BCR_BVR_WCR_WVR_EL1(5),
->         DBG_BCR_BVR_WCR_WVR_EL1(6),
-> 
-> I am sure this is rather incomplete, but will really appreciate if you could
-> provide some details and pointers.
-
-What is missing is the Fine-Grained-Undef part. You need to update
-kvm_init_sysreg() so that kvm->arch.fgu[HDFGRTR2_GROUP] has all the
-correct bits set for anything that needs to UNDEF depending on the
-guest configuration.
-
-For example, in your case, I'd expect to see something like:
-
-if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, DebugVer, V8P9))
-	kvm->arch.fgu[HDFGRTR2_GROUP] |= ~(HDFGRTR2_EL2_nMDSELR_EL1 | [...]);
-
-Then allowing the feature becomes conditioned on the bit being clear,
-and the trap handler only needs to deal with the actual emulation, and
-not the feature checking.
-
-I appreciate that this is a lot to swallow, but I'd be very happy to
-review patches implementing this and provide guidance. It is all
-pretty simple, just that there is a lot of parts all over the place.
-In the end, this is only about following the architecture.
-
-Thanks again,
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
 	M.
 
