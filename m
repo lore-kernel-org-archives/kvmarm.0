@@ -1,70 +1,53 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18F4B3DBB7;
-	Sat, 13 Apr 2024 09:56:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1D3F38FA3;
+	Sat, 13 Apr 2024 10:04:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713002189; cv=none; b=dNznbpcJ5iZs5l+Cik4vKLdHuBLqxBNH4tZzD2C7HJxzN0tQNEBEWwFixIQu79RwnrK9hbVCnB4FaOHpSPe+xr6ZDrgJ52rw+4YSTK30dQeVKfEkLzC4mnjC63qW3ri3FfXgdnwizveCHGthe92JcF2xZ5twOpER3NuQRdLp+VY=
+	t=1713002654; cv=none; b=U4WI5TGeIFzmdxFlZJ5d5jt86O5jK9tPmxvgAK25m0iONIt0eCu9Pq5Wlx7HymFwLOeOVP0HtogZNdNE8i1rNLxUnEzwquTPdXu/jDbDqM0ZYVhbsfCwrpVO+D7q7WNzLA08mAj27J6JmM3ghZCWgVfKzEXGQy9/KmM0yhMx/ig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713002189; c=relaxed/simple;
-	bh=QDdFeOtdYZxjp46RxGOVjOsa4iTVpoIZG/FPIUq7PkU=;
+	s=arc-20240116; t=1713002654; c=relaxed/simple;
+	bh=POBRYNf3GAArnS/YrpXQPpWonHaf18oGrH0uGkz3lbA=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=k4sb9BW3qRClr6agh2lOEc+GAWDMbBtdlx5PmfUjlVAuvD6YKQoFn9CuJfcESE+aYsJLN3ZK4NsGqku47mN4dWdTvbgvPruaSZpu3wOUYr5UG6wVEp43cieghAV2zGliEDhPZPVMKjb00GpIaObQAXTRS8P6zHIHFMSHtylKVp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mFZQ2ioQ; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=n+NuJzmApLZSJ6zCEX1mc1eGetJIr3scSzEaQcVolFHmGYqe6xe5cCf4GvDxUnMfD7sWRjf5leubr4vqjFiHRY2HVAMPuBxbiryVlSNirswZ4NDoweE9TpdPpnYZ/TAJCFSSsFoslvwUGfneIzNFDL7KFw2giixwhde6yoGPQ4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QEm/N5pM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mFZQ2ioQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FB85C4AF55;
-	Sat, 13 Apr 2024 09:56:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QEm/N5pM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CEC7C113CD;
+	Sat, 13 Apr 2024 10:04:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713002188;
-	bh=QDdFeOtdYZxjp46RxGOVjOsa4iTVpoIZG/FPIUq7PkU=;
+	s=k20201202; t=1713002653;
+	bh=POBRYNf3GAArnS/YrpXQPpWonHaf18oGrH0uGkz3lbA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mFZQ2ioQYI4SPEajzb0CoDJ+DBpEtqV/6Z/BFQ4PKiYU1objwuCL1h0YEV5wVvaaV
-	 CStVGbxbg2PLEvUpiruu3vkH/y4cM4+cyaR6uTFrqiuCgSAt4YmdU+kQNO4mhteYE5
-	 q333pUGrVdvWTX2jJozMVr1WfreRxN9CZWgNdxAf4RoHKNGu901fhZ7/hHch++3d1I
-	 m2eFAZSX3y2YCFXBDOjGGbQYp+igVsDeuNqTryAXEm0o7f2cHg2zXaMLKr1soTFZ2j
-	 ofMp5Ohw4rwS2q0YaHgiHwMQ7+YkitOG5MjuKApjtCEFb8HYoNf/A99GWK9EyWwGw/
-	 8+Y5NXUY8UrNA==
+	b=QEm/N5pMW5qXdleao0BfFlyRN0aPDJR0OeAhNySHfgFQ1O0ICz52ELqp6L4MF7lEh
+	 NvQStWr0CUjKs4B4ib6olFPeS7k1nPmZlKyIEOoR0spi7oWCw7U+07TlAhdErsPszs
+	 GGpxxwy1uw/3VmN7PBLe4RuLsk3x+765oRv1cmdhVDyObSjAHGxLQZQAAkwps1PTpj
+	 W+0IQgFKMs7TCc/cWTs6AXG7lVdo/NaV94zZv8UHgs3L89vLRv2SaiW885tGgPciTO
+	 FEb+Qa6kU9n7VqB+j006Jr7lM4Nojz5z0BzqAdtDEIH2C1DRmj6UgetmexT0k2Nl6S
+	 ShjpRKfFttG7A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rva7W-0047Ih-AA;
-	Sat, 13 Apr 2024 10:56:26 +0100
-Date: Sat, 13 Apr 2024 10:56:25 +0100
-Message-ID: <86h6g5si0m.wl-maz@kernel.org>
+	id 1rvaF1-0047UL-9P;
+	Sat, 13 Apr 2024 11:04:11 +0100
+Date: Sat, 13 Apr 2024 11:04:11 +0100
+Message-ID: <86frvpshno.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Will Deacon <will@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Tianrui Zhao <zhaotianrui@loongson.cn>,
-	Bibo Mao <maobibo@loongson.cn>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Anup Patel <anup@brainfault.org>,
-	Atish Patra <atishp@atishpatra.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	David Hildenbrand <david@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
+To: Sebastian Ott <sebott@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
-	loongarch@lists.linux.dev,
-	linux-mips@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	kvm-riscv@lists.infradead.org,
-	linux-mm@kvack.org,
-	linux-trace-kernel@vger.kernel.org,
-	linux-perf-users@vger.kernel.org
-Subject: Re: [PATCH 1/4] KVM: delete .change_pte MMU notifier callback
-In-Reply-To: <ZhlLHtfeSHk9gRRO@google.com>
-References: <20240405115815.3226315-1-pbonzini@redhat.com>
-	<20240405115815.3226315-2-pbonzini@redhat.com>
-	<20240412104408.GA27645@willie-the-truck>
-	<86jzl2sovz.wl-maz@kernel.org>
-	<ZhlLHtfeSHk9gRRO@google.com>
+	linux-kernel@vger.kernel.org,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 2/4] KVM: arm64: maintain per VM value for CTR_EL0
+In-Reply-To: <20240405120108.11844-3-sebott@redhat.com>
+References: <20240405120108.11844-1-sebott@redhat.com>
+	<20240405120108.11844-3-sebott@redhat.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -76,86 +59,118 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: seanjc@google.com, will@kernel.org, pbonzini@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, oliver.upton@linux.dev, zhaotianrui@loongson.cn, maobibo@loongson.cn, tsbogend@alpha.franken.de, npiggin@gmail.com, anup@brainfault.org, atishp@atishpatra.org, akpm@linux-foundation.org, david@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, loongarch@lists.linux.dev, linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org
+X-SA-Exim-Rcpt-To: sebott@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 12 Apr 2024 15:54:22 +0100,
-Sean Christopherson <seanjc@google.com> wrote:
+On Fri, 05 Apr 2024 13:01:06 +0100,
+Sebastian Ott <sebott@redhat.com> wrote:
 > 
-> On Fri, Apr 12, 2024, Marc Zyngier wrote:
-> > On Fri, 12 Apr 2024 11:44:09 +0100, Will Deacon <will@kernel.org> wrote:
-> > > On Fri, Apr 05, 2024 at 07:58:12AM -0400, Paolo Bonzini wrote:
-> > > Also, if you're in the business of hacking the MMU notifier code, it
-> > > would be really great to change the .clear_flush_young() callback so
-> > > that the architecture could handle the TLB invalidation. At the moment,
-> > > the core KVM code invalidates the whole VMID courtesy of 'flush_on_ret'
-> > > being set by kvm_handle_hva_range(), whereas we could do a much
-> > > lighter-weight and targetted TLBI in the architecture page-table code
-> > > when we actually update the ptes for small ranges.
-> > 
-> > Indeed, and I was looking at this earlier this week as it has a pretty
-> > devastating effect with NV (it blows the shadow S2 for that VMID, with
-> > costly consequences).
-> > 
-> > In general, it feels like the TLB invalidation should stay with the
-> > code that deals with the page tables, as it has a pretty good idea of
-> > what needs to be invalidated and how -- specially on architectures
-> > that have a HW-broadcast facility like arm64.
+> In preparation for CTR_EL0 emulation maintain a per VM for this
+> register and use it where appropriate.
 > 
-> Would this be roughly on par with an in-line flush on arm64?  The simpler, more
-> straightforward solution would be to let architectures override flush_on_ret,
-> but I would prefer something like the below as x86 can also utilize a range-based
-> flush when running as a nested hypervisor.
+> Signed-off-by: Sebastian Ott <sebott@redhat.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  1 +
+>  arch/arm64/kvm/sys_regs.c         | 22 +++++++++++++++-------
+>  2 files changed, 16 insertions(+), 7 deletions(-)
 > 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index ff0a20565f90..b65116294efe 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -601,6 +601,7 @@ static __always_inline kvm_mn_ret_t __kvm_handle_hva_range(struct kvm *kvm,
->         struct kvm_gfn_range gfn_range;
->         struct kvm_memory_slot *slot;
->         struct kvm_memslots *slots;
-> +       bool need_flush = false;
->         int i, idx;
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 9e8a496fb284..481216febb46 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -318,6 +318,7 @@ struct kvm_arch {
 >  
->         if (WARN_ON_ONCE(range->end <= range->start))
-> @@ -653,10 +654,22 @@ static __always_inline kvm_mn_ret_t __kvm_handle_hva_range(struct kvm *kvm,
->                                         break;
->                         }
->                         r.ret |= range->handler(kvm, &gfn_range);
+>  	/* PMCR_EL0.N value for the guest */
+>  	u8 pmcr_n;
+> +	u64 ctr_el0;
+>  
+>  	/* Iterator for idreg debugfs */
+>  	u8	idreg_debugfs_iter;
+
+Please consider the alignment of the fields. This leaves a 7 byte hole
+that could be avoided (yes, I'm on a mission to reduce the size of the
+various structures, because they are absolute pigs).
+
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 131f5b0ca2b9..4d29b1a0842d 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -215,13 +215,21 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
+>  /* CSSELR values; used to index KVM_REG_ARM_DEMUX_ID_CCSIDR */
+>  #define CSSELR_MAX 14
+>  
+> +static u64 kvm_get_ctr_el0(struct kvm *kvm)
+> +{
+> +	if (kvm->arch.ctr_el0)
+> +		return kvm->arch.ctr_el0;
+
+Is this relying on some bits not being 0?
+
 > +
-> +                       /*
-> +                        * Use a precise gfn-based TLB flush when possible, as
-> +                        * most mmu_notifier events affect a small-ish range.
-> +                        * Fall back to a full TLB flush if the gfn-based flush
-> +                        * fails, and don't bother trying the gfn-based flush
-> +                        * if a full flush is already pending.
-> +                        */
-> +                       if (range->flush_on_ret && !need_flush && r.ret &&
-> +                           kvm_arch_flush_remote_tlbs_range(kvm, gfn_range.start
-> +                                                            gfn_range.end - gfn_range.start + 1))
-> +                               need_flush = true;
->                 }
->         }
+> +	return read_sanitised_ftr_reg(SYS_CTR_EL0);
+
+Why isn't the shadow value always populated?
+
+> +}
+> +
+>  /*
+>   * Returns the minimum line size for the selected cache, expressed as
+>   * Log2(bytes).
+>   */
+> -static u8 get_min_cache_line_size(bool icache)
+> +static u8 get_min_cache_line_size(struct kvm *kvm, bool icache)
+>  {
+> -	u64 ctr = read_sanitised_ftr_reg(SYS_CTR_EL0);
+> +	u64 ctr = kvm_get_ctr_el0(kvm);
+>  	u8 field;
 >  
-> -       if (range->flush_on_ret && r.ret)
-> +       if (need_flush)
->                 kvm_flush_remote_tlbs(kvm);
+>  	if (icache)
+> @@ -248,7 +256,7 @@ static u32 get_ccsidr(struct kvm_vcpu *vcpu, u32 csselr)
+>  	if (vcpu->arch.ccsidr)
+>  		return vcpu->arch.ccsidr[csselr];
 >  
->         if (r.found_memslot)
-
-I think this works for us on HW that has range invalidation, which
-would already be a positive move.
-
-For the lesser HW that isn't range capable, it also gives the
-opportunity to perform the iteration ourselves or go for the nuclear
-option if the range is larger than some arbitrary constant (though
-this is additional work).
-
-But this still considers the whole range as being affected by
-range->handler(). It'd be interesting to try and see whether more
-precise tracking is (or isn't) generally beneficial.
+> -	line_size = get_min_cache_line_size(csselr & CSSELR_EL1_InD);
+> +	line_size = get_min_cache_line_size(vcpu->kvm, csselr & CSSELR_EL1_InD);
+>  
+>  	/*
+>  	 * Fabricate a CCSIDR value as the overriding value does not exist.
+> @@ -283,7 +291,7 @@ static int set_ccsidr(struct kvm_vcpu *vcpu, u32 csselr, u32 val)
+>  	u32 i;
+>  
+>  	if ((val & CCSIDR_EL1_RES0) ||
+> -	    line_size < get_min_cache_line_size(csselr & CSSELR_EL1_InD))
+> +	    line_size < get_min_cache_line_size(vcpu->kvm, csselr & CSSELR_EL1_InD))
+>  		return -EINVAL;
+>  
+>  	if (!ccsidr) {
+> @@ -1862,7 +1870,7 @@ static bool access_ctr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>  	if (p->is_write)
+>  		return write_to_read_only(vcpu, p, r);
+>  
+> -	p->regval = read_sanitised_ftr_reg(SYS_CTR_EL0);
+> +	p->regval = kvm_get_ctr_el0(vcpu->kvm);
+>  	return true;
+>  }
+>  
+> @@ -1882,7 +1890,7 @@ static bool access_clidr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>   */
+>  static u64 reset_clidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+>  {
+> -	u64 ctr_el0 = read_sanitised_ftr_reg(SYS_CTR_EL0);
+> +	u64 ctr_el0 = kvm_get_ctr_el0(vcpu->kvm);
+>  	u64 clidr;
+>  	u8 loc;
+>  
+> @@ -1935,7 +1943,7 @@ static u64 reset_clidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+>  static int set_clidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+>  		      u64 val)
+>  {
+> -	u64 ctr_el0 = read_sanitised_ftr_reg(SYS_CTR_EL0);
+> +	u64 ctr_el0 = kvm_get_ctr_el0(vcpu->kvm);
+>  	u64 idc = !CLIDR_LOC(val) || (!CLIDR_LOUIS(val) && !CLIDR_LOUU(val));
+>  
+>  	if ((val & CLIDR_EL1_RES0) || (!(ctr_el0 & CTR_EL0_IDC) && idc))
 
 Thanks,
 
