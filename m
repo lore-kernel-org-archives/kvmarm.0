@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1D3F38FA3;
-	Sat, 13 Apr 2024 10:04:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C25451CFA8;
+	Sat, 13 Apr 2024 10:19:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713002654; cv=none; b=U4WI5TGeIFzmdxFlZJ5d5jt86O5jK9tPmxvgAK25m0iONIt0eCu9Pq5Wlx7HymFwLOeOVP0HtogZNdNE8i1rNLxUnEzwquTPdXu/jDbDqM0ZYVhbsfCwrpVO+D7q7WNzLA08mAj27J6JmM3ghZCWgVfKzEXGQy9/KmM0yhMx/ig=
+	t=1713003579; cv=none; b=j9U9t2BlWA9OQctnEcwD0xBCZg9ECltG0O1/4TnQfMdSemMdYP8R3+auv8JpvO3Ytpcq/VA5vpA+TEBx3fnHPOdKrkE+xjHjQhkjr84d8qm0srOJmCLgxbT0SwUDr/sL0MvCp+Cl4iMWrXl4MqF/gLLykhu3siEvfOPJU+omxMY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713002654; c=relaxed/simple;
-	bh=POBRYNf3GAArnS/YrpXQPpWonHaf18oGrH0uGkz3lbA=;
+	s=arc-20240116; t=1713003579; c=relaxed/simple;
+	bh=9Hu40LkvlfQcCNkyBLs/RLhZHlI4yg/7v8dPJiVYyEs=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=n+NuJzmApLZSJ6zCEX1mc1eGetJIr3scSzEaQcVolFHmGYqe6xe5cCf4GvDxUnMfD7sWRjf5leubr4vqjFiHRY2HVAMPuBxbiryVlSNirswZ4NDoweE9TpdPpnYZ/TAJCFSSsFoslvwUGfneIzNFDL7KFw2giixwhde6yoGPQ4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QEm/N5pM; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=brgSzYd1hRa4gLodZ7ktpKw0OrQiYGIA27scsYAsjgMlOAKijwBdWtK4PQHOEzaKYPuCstQa92KhJD/toz1ah2iHRj4Go3Lj4oXP1pnI3MUsxOVPqI5HUA2628zFZt20U7UjzxrxV2GlZKCn63nAvdV5YLFI1JRB0uN0HWhL9GY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c29dNQ+y; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QEm/N5pM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CEC7C113CD;
-	Sat, 13 Apr 2024 10:04:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c29dNQ+y"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C37BC4AF07;
+	Sat, 13 Apr 2024 10:19:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713002653;
-	bh=POBRYNf3GAArnS/YrpXQPpWonHaf18oGrH0uGkz3lbA=;
+	s=k20201202; t=1713003579;
+	bh=9Hu40LkvlfQcCNkyBLs/RLhZHlI4yg/7v8dPJiVYyEs=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QEm/N5pMW5qXdleao0BfFlyRN0aPDJR0OeAhNySHfgFQ1O0ICz52ELqp6L4MF7lEh
-	 NvQStWr0CUjKs4B4ib6olFPeS7k1nPmZlKyIEOoR0spi7oWCw7U+07TlAhdErsPszs
-	 GGpxxwy1uw/3VmN7PBLe4RuLsk3x+765oRv1cmdhVDyObSjAHGxLQZQAAkwps1PTpj
-	 W+0IQgFKMs7TCc/cWTs6AXG7lVdo/NaV94zZv8UHgs3L89vLRv2SaiW885tGgPciTO
-	 FEb+Qa6kU9n7VqB+j006Jr7lM4Nojz5z0BzqAdtDEIH2C1DRmj6UgetmexT0k2Nl6S
-	 ShjpRKfFttG7A==
+	b=c29dNQ+yEubEhbE3XnXXfhoAGCvaWZ5K9uB9X21vxDxDhDmr4B+n0VE6ouSrj7cG1
+	 pjpqVKhq7uzDJ3WOpuR2H7UCz2V0J4CPBEdUN09AHuQuV3VAXxI+oGYb/LOZMqQ/Q0
+	 eZ5ZP3jd0EkZty/k32oHNI2pTXOM3ZM47DKIJRfetlxyNJXfgt2EXfVGpHHXf3WlM+
+	 PWiZG9yn7GLfpOtiXXYA6zlCFf0813Lc39o8CyLCkaZde2t13pXUW9BWdzGVRUpAIQ
+	 L8FqQc5mvo+ewtlQtGXy7rGYpwNsHbgpdRc1xkgAlUDkv5ZOpmZJGWfZb4Y2RKPXRB
+	 W7XOKRXg7YY/A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rvaF1-0047UL-9P;
-	Sat, 13 Apr 2024 11:04:11 +0100
-Date: Sat, 13 Apr 2024 11:04:11 +0100
-Message-ID: <86frvpshno.wl-maz@kernel.org>
+	id 1rvaTx-0047xk-6h;
+	Sat, 13 Apr 2024 11:19:37 +0100
+Date: Sat, 13 Apr 2024 11:19:35 +0100
+Message-ID: <86edb9sgy0.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Sebastian Ott <sebott@redhat.com>
 Cc: linux-arm-kernel@lists.infradead.org,
@@ -44,10 +44,10 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 2/4] KVM: arm64: maintain per VM value for CTR_EL0
-In-Reply-To: <20240405120108.11844-3-sebott@redhat.com>
+Subject: Re: [PATCH 3/4] KVM: arm64: add emulation for CTR_EL0 register
+In-Reply-To: <20240405120108.11844-4-sebott@redhat.com>
 References: <20240405120108.11844-1-sebott@redhat.com>
-	<20240405120108.11844-3-sebott@redhat.com>
+	<20240405120108.11844-4-sebott@redhat.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -63,114 +63,154 @@ X-SA-Exim-Rcpt-To: sebott@redhat.com, linux-arm-kernel@lists.infradead.org, kvma
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 05 Apr 2024 13:01:06 +0100,
+On Fri, 05 Apr 2024 13:01:07 +0100,
 Sebastian Ott <sebott@redhat.com> wrote:
 > 
-> In preparation for CTR_EL0 emulation maintain a per VM for this
-> register and use it where appropriate.
+> CTR_EL0 is currently handled as an invariant register, thus
+> guests will be presented with the host value of that register.
+> Add emulation for CTR_EL0 based on a per VM value.
+> 
+> When CTR_EL0 is changed the reset function for CLIDR_EL1 is
+> called to make sure we present the guest with consistent
+> register values.
+
+Isn't that a change in the userspace ABI? You are now creating an
+explicit ordering between the write to CTR_EL0 and the rest of the
+cache hierarchy registers. It has the obvious capacity to lead to the
+wrong result in a silent way...
+
 > 
 > Signed-off-by: Sebastian Ott <sebott@redhat.com>
 > ---
->  arch/arm64/include/asm/kvm_host.h |  1 +
->  arch/arm64/kvm/sys_regs.c         | 22 +++++++++++++++-------
->  2 files changed, 16 insertions(+), 7 deletions(-)
+>  arch/arm64/kvm/sys_regs.c | 72 ++++++++++++++++++++++++++++++++++-----
+>  1 file changed, 64 insertions(+), 8 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 9e8a496fb284..481216febb46 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -318,6 +318,7 @@ struct kvm_arch {
->  
->  	/* PMCR_EL0.N value for the guest */
->  	u8 pmcr_n;
-> +	u64 ctr_el0;
->  
->  	/* Iterator for idreg debugfs */
->  	u8	idreg_debugfs_iter;
-
-Please consider the alignment of the fields. This leaves a 7 byte hole
-that could be avoided (yes, I'm on a mission to reduce the size of the
-various structures, because they are absolute pigs).
-
 > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 131f5b0ca2b9..4d29b1a0842d 100644
+> index 4d29b1a0842d..b0ba292259f9 100644
 > --- a/arch/arm64/kvm/sys_regs.c
 > +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -215,13 +215,21 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
->  /* CSSELR values; used to index KVM_REG_ARM_DEMUX_ID_CCSIDR */
->  #define CSSELR_MAX 14
->  
-> +static u64 kvm_get_ctr_el0(struct kvm *kvm)
-> +{
-> +	if (kvm->arch.ctr_el0)
-> +		return kvm->arch.ctr_el0;
-
-Is this relying on some bits not being 0?
-
-> +
-> +	return read_sanitised_ftr_reg(SYS_CTR_EL0);
-
-Why isn't the shadow value always populated?
-
-> +}
-> +
->  /*
->   * Returns the minimum line size for the selected cache, expressed as
->   * Log2(bytes).
->   */
-> -static u8 get_min_cache_line_size(bool icache)
-> +static u8 get_min_cache_line_size(struct kvm *kvm, bool icache)
->  {
-> -	u64 ctr = read_sanitised_ftr_reg(SYS_CTR_EL0);
-> +	u64 ctr = kvm_get_ctr_el0(kvm);
->  	u8 field;
->  
->  	if (icache)
-> @@ -248,7 +256,7 @@ static u32 get_ccsidr(struct kvm_vcpu *vcpu, u32 csselr)
->  	if (vcpu->arch.ccsidr)
->  		return vcpu->arch.ccsidr[csselr];
->  
-> -	line_size = get_min_cache_line_size(csselr & CSSELR_EL1_InD);
-> +	line_size = get_min_cache_line_size(vcpu->kvm, csselr & CSSELR_EL1_InD);
->  
->  	/*
->  	 * Fabricate a CCSIDR value as the overriding value does not exist.
-> @@ -283,7 +291,7 @@ static int set_ccsidr(struct kvm_vcpu *vcpu, u32 csselr, u32 val)
->  	u32 i;
->  
->  	if ((val & CCSIDR_EL1_RES0) ||
-> -	    line_size < get_min_cache_line_size(csselr & CSSELR_EL1_InD))
-> +	    line_size < get_min_cache_line_size(vcpu->kvm, csselr & CSSELR_EL1_InD))
->  		return -EINVAL;
->  
->  	if (!ccsidr) {
-> @@ -1862,7 +1870,7 @@ static bool access_ctr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->  	if (p->is_write)
->  		return write_to_read_only(vcpu, p, r);
->  
-> -	p->regval = read_sanitised_ftr_reg(SYS_CTR_EL0);
-> +	p->regval = kvm_get_ctr_el0(vcpu->kvm);
+> @@ -1874,6 +1874,55 @@ static bool access_ctr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
 >  	return true;
 >  }
 >  
-> @@ -1882,7 +1890,7 @@ static bool access_clidr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->   */
->  static u64 reset_clidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+> +static u64 reset_ctr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd)
+> +{
+> +	vcpu->kvm->arch.ctr_el0 = 0;
+> +	return kvm_get_ctr_el0(vcpu->kvm);
+
+I'd expect the cached value to be reset instead of being set to
+0. What are you achieving by this?
+
+> +}
+> +
+> +static int get_ctr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+> +		   u64 *val)
+> +{
+> +	*val = kvm_get_ctr_el0(vcpu->kvm);
+> +	return 0;
+> +}
+> +
+> +static const struct sys_reg_desc *get_sys_reg_desc(u32 encoding);
+> +
+> +static int set_ctr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+> +		   u64 val)
+> +{
+> +	u64 host_val = read_sanitised_ftr_reg(SYS_CTR_EL0);
+> +	u64 old_val = kvm_get_ctr_el0(vcpu->kvm);
+> +	const struct sys_reg_desc *clidr_el1;
+> +	int ret;
+> +
+> +	if (val == old_val)
+> +		return 0;
+> +
+> +	if (kvm_vm_has_ran_once(vcpu->kvm))
+> +		return -EBUSY;
+> +
+> +	mutex_lock(&vcpu->kvm->arch.config_lock);
+> +	ret = arm64_check_features(vcpu, rd, val);
+> +	if (ret) {
+> +		mutex_unlock(&vcpu->kvm->arch.config_lock);
+> +		return ret;
+> +	}
+> +	if (val != host_val)
+> +		vcpu->kvm->arch.ctr_el0 = val;
+> +	else
+> +		vcpu->kvm->arch.ctr_el0 = 0;
+> +
+> +	mutex_unlock(&vcpu->kvm->arch.config_lock);
+> +
+> +	clidr_el1 = get_sys_reg_desc(SYS_CLIDR_EL1);
+> +	if (clidr_el1)
+> +		clidr_el1->reset(vcpu, clidr_el1);
+> +
+> +	return 0;
+
+No check against what can be changed, and in what direction? You seem
+to be allowing a guest to migrate from a host with IDC==1 to one where
+IDC==0 (same for DIC). How can that work? Same for the cache lines,
+which can be larger on the target... How will the guest survive that?
+
+> +}
+> +
+>  static bool access_clidr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>  			 const struct sys_reg_desc *r)
 >  {
-> -	u64 ctr_el0 = read_sanitised_ftr_reg(SYS_CTR_EL0);
-> +	u64 ctr_el0 = kvm_get_ctr_el0(vcpu->kvm);
->  	u64 clidr;
->  	u8 loc;
+> @@ -2460,7 +2509,11 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	{ SYS_DESC(SYS_CCSIDR2_EL1), undef_access },
+>  	{ SYS_DESC(SYS_SMIDR_EL1), undef_access },
+>  	{ SYS_DESC(SYS_CSSELR_EL1), access_csselr, reset_unknown, CSSELR_EL1 },
+> -	{ SYS_DESC(SYS_CTR_EL0), access_ctr },
+> +	{ SYS_DESC(SYS_CTR_EL0), access_ctr, .reset = reset_ctr,
+> +	  .get_user = get_ctr, .set_user = set_ctr, .val = (CTR_EL0_DIC_MASK |
+> +							    CTR_EL0_IDC_MASK |
+> +							    CTR_EL0_DminLine_MASK |
+> +							    CTR_EL0_IminLine_MASK)},
+>  	{ SYS_DESC(SYS_SVCR), undef_access },
 >  
-> @@ -1935,7 +1943,7 @@ static u64 reset_clidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
->  static int set_clidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
->  		      u64 val)
->  {
-> -	u64 ctr_el0 = read_sanitised_ftr_reg(SYS_CTR_EL0);
-> +	u64 ctr_el0 = kvm_get_ctr_el0(vcpu->kvm);
->  	u64 idc = !CLIDR_LOC(val) || (!CLIDR_LOUIS(val) && !CLIDR_LOUU(val));
+>  	{ PMU_SYS_REG(PMCR_EL0), .access = access_pmcr, .reset = reset_pmcr,
+> @@ -3623,6 +3676,13 @@ static bool index_to_params(u64 id, struct sys_reg_params *params)
+>  	}
+>  }
 >  
->  	if ((val & CLIDR_EL1_RES0) || (!(ctr_el0 & CTR_EL0_IDC) && idc))
+> +static const struct sys_reg_desc *get_sys_reg_desc(u32 encoding)
+> +{
+> +	struct sys_reg_params params = encoding_to_params(encoding);
+> +
+> +	return find_reg(&params, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
+> +}
+> +
+>  const struct sys_reg_desc *get_reg_by_id(u64 id,
+>  					 const struct sys_reg_desc table[],
+>  					 unsigned int num)
+> @@ -3676,18 +3736,11 @@ FUNCTION_INVARIANT(midr_el1)
+>  FUNCTION_INVARIANT(revidr_el1)
+>  FUNCTION_INVARIANT(aidr_el1)
+>  
+> -static u64 get_ctr_el0(struct kvm_vcpu *v, const struct sys_reg_desc *r)
+> -{
+> -	((struct sys_reg_desc *)r)->val = read_sanitised_ftr_reg(SYS_CTR_EL0);
+> -	return ((struct sys_reg_desc *)r)->val;
+> -}
+> -
+>  /* ->val is filled in by kvm_sys_reg_table_init() */
+>  static struct sys_reg_desc invariant_sys_regs[] __ro_after_init = {
+>  	{ SYS_DESC(SYS_MIDR_EL1), NULL, get_midr_el1 },
+>  	{ SYS_DESC(SYS_REVIDR_EL1), NULL, get_revidr_el1 },
+>  	{ SYS_DESC(SYS_AIDR_EL1), NULL, get_aidr_el1 },
+> -	{ SYS_DESC(SYS_CTR_EL0), NULL, get_ctr_el0 },
+>  };
+>  
+>  static int get_invariant_sys_reg(u64 id, u64 __user *uaddr)
+> @@ -4049,6 +4102,9 @@ void kvm_init_sysreg(struct kvm_vcpu *vcpu)
+>  			vcpu->arch.hcrx_el2 |= (HCRX_EL2_MSCEn | HCRX_EL2_MCE2);
+>  	}
+>  
+> +	if (vcpu->kvm->arch.ctr_el0)
+> +		vcpu->arch.hcr_el2 |= HCR_TID2;
+
+Why trap CTR_EL0 if the values are the same as the host? I really
+dislike the use of the value 0 as a such an indication. Why isn't this
+grouped with the traps in vcpu_reset_hcr()?
 
 Thanks,
 
