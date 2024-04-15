@@ -1,131 +1,209 @@
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7641582C88
-	for <kvmarm@lists.linux.dev>; Mon, 15 Apr 2024 17:03:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D7C81E87C;
+	Mon, 15 Apr 2024 17:34:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713200635; cv=none; b=QVezc9lY/pcGXD20gbKJ/bjCuUPAdoRae0/jK2d4TI9orpzMbUyMzBHQhD70cQndVPieCbS/8QmbBDdqHwEZ6tSKimIRUwtaBgeQKIZhz+1jdszeqL+xhKDYcMxS+2oOxQZq3sRo3/hHUefFCCOnD3FC/IvyeyYYBpwBwj6R38o=
+	t=1713202502; cv=none; b=L0WpBCXM4xwrX7qfBCg76prE8KJyfrT9JrkUf/S6dzN6j6ni/SJRDuiDUaZDZyS3+Im8fMIotAJ53GIDe3BHuSiiSM/yZOoEsdSQDftW0aUErmQ1m+7Uk9wi+Sw1v5TcEjRyCXghgGAezXjjJF4eMO78PntvAM1Yd/QkTsEmK0A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713200635; c=relaxed/simple;
-	bh=irgloZCVTvzuDkYp0ohKwo1sf7N8wth+rz+R9T7PAmU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=dCVr4HHeDmQ8Qf5PrF6JkIKaMY7SV+jCyO09q8HjuFkYT0uHlfHN7IFQg+kw6eOA+HMz07Jc3m5elQOUbJTX/KjcYagpRxNPkwKymH/5t3et+Hk1LkGA0vgM0YFwRmkpwCgTxuT05DgFaYZo1e3E5T4T4EbRfAGKb+bhcDDedpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eyi9uqxX; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eyi9uqxX"
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-6f00a42c5bbso478313b3a.2
-        for <kvmarm@lists.linux.dev>; Mon, 15 Apr 2024 10:03:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713200633; x=1713805433; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Zfqt/NgDwjKFxB5AgyRPdEKVaYoxBURY78UkNYsrqoM=;
-        b=eyi9uqxX/v8JCho2O5pEfp9SxQcwgxGxAf50uouMGBe+Plw1Mo61C2Jq1K51ZsJKYq
-         UAfrDICoWsZ6mMvxnEGkfdl3oqw9sJYSgYT6cXerhF40WbXHaD7NHFJ1jVsD9dYOUPOl
-         pym00ADuIi3GZoYxVFdrMtFmzuYhvRi0jphKJF2oyKES2qen83j8Exb/kZXe8dIyUWgH
-         Dil5engk63hQjxnMHjh7qtFl3ascGGqDKWzZ1aAsgnAJCcBfGMvetdwXxyA7sA8DHlaf
-         rgsF2T/LhZhUjRHHgkOsQoyG8IL4FzViffSe1K24TGWGuS+zl9HqKLo7M2rBhYd3SZTM
-         2CQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713200633; x=1713805433;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Zfqt/NgDwjKFxB5AgyRPdEKVaYoxBURY78UkNYsrqoM=;
-        b=TqqyAvlrNRR7W94eDs3Lsqixzj0cLjffdUrNTuPsJUIYlKqhDGocINRqe/fjb7KupM
-         ASRjrPDRPoDqq8+WG8IOGW5lx9Yayr593fQDLbnMgaTCWdW+KErxgkWA7vRqb6SlP5NG
-         qKvMcQAR5SUH0yzgqfosYz4vAS8M2YMfBQMqoW//U7ZZqTC39QnA2QEZgqYLxsm6nZug
-         k7AIgtPgvvNyThrgnAMpCrah4guXFPzA4y8BC/GU89Zqu7BR861rh4n9DHIIATm9rPiX
-         XGugda+IA+vap4oVAb4F7TYPmwY7AYsiLE0/qCdKeBssqPFZwnNsaUQ/I9SsBHgD5ikz
-         IiAw==
-X-Forwarded-Encrypted: i=1; AJvYcCWBzy46b73NlIswwOmuKRAr+JtCTwjOWuWxb7xz3lxa00cdgdsDRvGnz5bxSptvakwx1qoDCEX6v/d/m8IxI72T9iaiQTQ9
-X-Gm-Message-State: AOJu0YwXVGnA055nE6DsWAwbi5i6uvQMr/9uY1OKLKvtn8hWVezdq17U
-	vgypJ1dOiXy++EKlpeGSDOIlTFPOoGjndn4P8twHk3vJjJu6YUaZ8Mchul9E3TA3LX03Rbb4W3E
-	TdA==
-X-Google-Smtp-Source: AGHT+IGA4ztkhkZCfS7682EU3T6gUsIsEcYhQEyC6yG3styg4+lnibMOlTTY3gI+fKNitZWoNIXkz2MBC8E=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:9399:b0:6ec:f266:d214 with SMTP id
- ka25-20020a056a00939900b006ecf266d214mr254346pfb.4.1713200632756; Mon, 15 Apr
- 2024 10:03:52 -0700 (PDT)
-Date: Mon, 15 Apr 2024 10:03:51 -0700
-In-Reply-To: <86h6g5si0m.wl-maz@kernel.org>
+	s=arc-20240116; t=1713202502; c=relaxed/simple;
+	bh=8nW1r00CaQqsroyhph8CiKXzAWz528/ZnYH9HoUPHrE=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=HnNWqlGCBkkE6BqOSCFmmbMBHRpc49JZqfcBnIjwSrtaOwCcB+p9QITEwzhGp+V3BTdIYDimmXmrfEymtth/Zb2PFvUU3k/n6kGv7w8QJSQxe64b7Y21PADVnH1KMafDJQ6uxIe5rMX7Vazr3rjVeQTak8XKFnYLqOkPPEeEEgY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4VJDlf2GLCz6K5Wg;
+	Tue, 16 Apr 2024 01:33:02 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id 95A0D140517;
+	Tue, 16 Apr 2024 01:34:56 +0800 (CST)
+Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Mon, 15 Apr
+ 2024 18:34:55 +0100
+Date: Mon, 15 Apr 2024 18:34:54 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: "Rafael J. Wysocki" <rafael@kernel.org>, <linuxarm@huawei.com>
+CC: <linux-pm@vger.kernel.org>, <loongarch@lists.linux.dev>,
+	<linux-acpi@vger.kernel.org>, <linux-arch@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>, <x86@kernel.org>, Russell King
+	<linux@armlinux.org.uk>, Miguel Luis <miguel.luis@oracle.com>, James Morse
+	<james.morse@arm.com>, Salil Mehta <salil.mehta@huawei.com>, "Jean-Philippe
+ Brucker" <jean-philippe@linaro.org>, Catalin Marinas
+	<catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+	<justin.he@arm.com>, <jianyong.wu@arm.com>
+Subject: Re: [PATCH v5 02/18] ACPI: processor: Set the ACPI_COMPANION for
+ the struct cpu instance
+Message-ID: <20240415183454.000072f6@Huawei.com>
+In-Reply-To: <20240415175057.00002e11@Huawei.com>
+References: <20240412143719.11398-1-Jonathan.Cameron@huawei.com>
+	<20240412143719.11398-3-Jonathan.Cameron@huawei.com>
+	<CAJZ5v0izN5naWY7sTi16whds9ubXkLpgqV2gePQs869BoJTCDA@mail.gmail.com>
+	<20240415164854.0000264f@Huawei.com>
+	<CAJZ5v0hd+CNsnH9xY+UX0iy_AEaqUqJj4KdR=+yvtvy5FQEy5Q@mail.gmail.com>
+	<CAJZ5v0j6gMaHamrCvrF8s+SgC0QVtG+naXhA4Dwg0t1YJvh4Uw@mail.gmail.com>
+	<20240415175057.00002e11@Huawei.com>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20240405115815.3226315-1-pbonzini@redhat.com> <20240405115815.3226315-2-pbonzini@redhat.com>
- <20240412104408.GA27645@willie-the-truck> <86jzl2sovz.wl-maz@kernel.org>
- <ZhlLHtfeSHk9gRRO@google.com> <86h6g5si0m.wl-maz@kernel.org>
-Message-ID: <Zh1d94Pl6gneVoDd@google.com>
-Subject: Re: [PATCH 1/4] KVM: delete .change_pte MMU notifier callback
-From: Sean Christopherson <seanjc@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>, 
-	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, Nicholas Piggin <npiggin@gmail.com>, 
-	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, David Hildenbrand <david@redhat.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
-	linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-ClientProxiedBy: lhrpeml100001.china.huawei.com (7.191.160.183) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
-On Sat, Apr 13, 2024, Marc Zyngier wrote:
-> On Fri, 12 Apr 2024 15:54:22 +0100, Sean Christopherson <seanjc@google.com> wrote:
-> > 
-> > On Fri, Apr 12, 2024, Marc Zyngier wrote:
-> > > On Fri, 12 Apr 2024 11:44:09 +0100, Will Deacon <will@kernel.org> wrote:
-> > > > On Fri, Apr 05, 2024 at 07:58:12AM -0400, Paolo Bonzini wrote:
-> > > > Also, if you're in the business of hacking the MMU notifier code, it
-> > > > would be really great to change the .clear_flush_young() callback so
-> > > > that the architecture could handle the TLB invalidation. At the moment,
-> > > > the core KVM code invalidates the whole VMID courtesy of 'flush_on_ret'
-> > > > being set by kvm_handle_hva_range(), whereas we could do a much
-> > > > lighter-weight and targetted TLBI in the architecture page-table code
-> > > > when we actually update the ptes for small ranges.
-> > > 
-> > > Indeed, and I was looking at this earlier this week as it has a pretty
-> > > devastating effect with NV (it blows the shadow S2 for that VMID, with
-> > > costly consequences).
-> > > 
-> > > In general, it feels like the TLB invalidation should stay with the
-> > > code that deals with the page tables, as it has a pretty good idea of
-> > > what needs to be invalidated and how -- specially on architectures
-> > > that have a HW-broadcast facility like arm64.
-> > 
-> > Would this be roughly on par with an in-line flush on arm64?  The simpler, more
-> > straightforward solution would be to let architectures override flush_on_ret,
-> > but I would prefer something like the below as x86 can also utilize a range-based
-> > flush when running as a nested hypervisor.
+On Mon, 15 Apr 2024 17:50:57 +0100
+Jonathan Cameron <Jonathan.Cameron@Huawei.com> wrote:
 
-...
+> On Mon, 15 Apr 2024 18:19:17 +0200
+> "Rafael J. Wysocki" <rafael@kernel.org> wrote:
+>=20
+> > On Mon, Apr 15, 2024 at 6:16=E2=80=AFPM Rafael J. Wysocki <rafael@kerne=
+l.org> wrote: =20
+> > >
+> > > On Mon, Apr 15, 2024 at 5:49=E2=80=AFPM Jonathan Cameron
+> > > <Jonathan.Cameron@huawei.com> wrote:   =20
+> > > >
+> > > > On Fri, 12 Apr 2024 20:10:54 +0200
+> > > > "Rafael J. Wysocki" <rafael@kernel.org> wrote:
+> > > >   =20
+> > > > > On Fri, Apr 12, 2024 at 4:38=E2=80=AFPM Jonathan Cameron
+> > > > > <Jonathan.Cameron@huawei.com> wrote:   =20
+> > > > > >
+> > > > > > The arm64 specific arch_register_cpu() needs to access the _STA
+> > > > > > method of the DSDT object so make it available by assigning the
+> > > > > > appropriate handle to the struct cpu instance.
+> > > > > >
+> > > > > > Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+> > > > > > ---
+> > > > > >  drivers/acpi/acpi_processor.c | 3 +++
+> > > > > >  1 file changed, 3 insertions(+)
+> > > > > >
+> > > > > > diff --git a/drivers/acpi/acpi_processor.c b/drivers/acpi/acpi_=
+processor.c
+> > > > > > index 7a0dd35d62c9..93e029403d05 100644
+> > > > > > --- a/drivers/acpi/acpi_processor.c
+> > > > > > +++ b/drivers/acpi/acpi_processor.c
+> > > > > > @@ -235,6 +235,7 @@ static int acpi_processor_get_info(struct a=
+cpi_device *device)
+> > > > > >         union acpi_object object =3D { 0 };
+> > > > > >         struct acpi_buffer buffer =3D { sizeof(union acpi_objec=
+t), &object };
+> > > > > >         struct acpi_processor *pr =3D acpi_driver_data(device);
+> > > > > > +       struct cpu *c;
+> > > > > >         int device_declaration =3D 0;
+> > > > > >         acpi_status status =3D AE_OK;
+> > > > > >         static int cpu0_initialized;
+> > > > > > @@ -314,6 +315,8 @@ static int acpi_processor_get_info(struct a=
+cpi_device *device)
+> > > > > >                         cpufreq_add_device("acpi-cpufreq");
+> > > > > >         }
+> > > > > >
+> > > > > > +       c =3D &per_cpu(cpu_devices, pr->id);
+> > > > > > +       ACPI_COMPANION_SET(&c->dev, device);   =20
+> > > > >
+> > > > > This is also set for per_cpu(cpu_sys_devices, pr->id) in
+> > > > > acpi_processor_add(), via acpi_bind_one().   =20
+> > > >
+> > > > Hi Rafael,
+> > > >
+> > > > cpu_sys_devices gets filled with a pointer to this same structure.
+> > > > The contents gets set in register_cpu() so at this point
+> > > > it doesn't point anywhere.  As a side note register_cpu()
+> > > > memsets to zero the value I set it to in the code above which isn't
+> > > > great, particularly as I want to use this in post_eject for
+> > > > arm64.
+> > > >
+> > > > We could make a copy of the handle and put it back after
+> > > > the memset in register_cpu() but that is also ugly.
+> > > > It's the best I've come up with to make sure this is still set
+> > > > come remove time but is rather odd.   =20
+> > > > >
+> > > > > Moreover, there is some pr->id validation in acpi_processor_add()=
+, so
+> > > > > it seems premature to use it here this way.
+> > > > >
+> > > > > I think that ACPI_COMPANION_SET() should be called from here on
+> > > > > per_cpu(cpu_sys_devices, pr->id) after validating pr->id (so the
+> > > > > pr->id validation should all be done here) and then NULL can be p=
+assed
+> > > > > as acpi_dev to acpi_bind_one() in acpi_processor_add().  Then, th=
+ere
+> > > > > will be one physical device corresponding to the processor ACPI d=
+evice
+> > > > > and no confusion.   =20
+> > > >
+> > > > I'm fairly sure this is pointing to the same device but agreed this
+> > > > is a tiny bit confusing. However we can't use cpu_sys_devices at th=
+is point
+> > > > so I'm not immediately seeing a cleaner solution :(   =20
+> > >
+> > > Well, OK.
+> > >
+> > > Please at least consider doing the pr->id validation checks before
+> > > setting the ACPI companion for &per_cpu(cpu_devices, pr->id).
+> > >
+> > > Also, acpi_bind_one() needs to be called on the "physical" devices
+> > > passed to ACPI_COMPANION_SET() (with NULL as the second argument) for
+> > > the reference counting and physical device lookup to work.
+> > >
+> > > Please also note that acpi_primary_dev_companion() should return
+> > > per_cpu(cpu_sys_devices, pr->id) for the processor ACPI device, which
+> > > depends on the order of acpi_bind_one() calls involving the same ACPI
+> > > device.   =20
+> >=20
+> > Of course, if the value set by ACPI_COMPANION_SET() is cleared
+> > subsequently, the above is not needed, but then using
+> > ACPI_COMPANION_SET() is questionable overall. =20
+>=20
+> Agreed + smoothing over that by stashing and putting it back doesn't
+> work because there is an additional call to acpi_bind_one() inbetween
+> here and the one you reference.
+>=20
+> The arch_register_cpu() calls end up calling register_cpu() /
+> device_register() / acpi_device_notify() / acpi_bind_one()
+>=20
+> With current code that fails (silently)
+> If I make sure the handle is set before register_cpu() then it
+> succeeds, but we end up with duplicate sysfs files etc because we
+> bind twice.
+>=20
+> I think the only way around this is larger reorganization of the
+> CPU hotplug code to pull the arch_register_cpu() call to where
+> the acpi_bind_one() call is.  However that changes a lot more than I'd li=
+ke
+> (and I don't have it working yet).
+>=20
+> Alternatively find somewhere else to stash the handle, or just add it as
+> a parameter to arch_register_cpu(). Right now this feels the easier
+> path to me. arch_register_cpu(int cpu, acpi_handle handle)=20
+>=20
+> Would that be a path you'd consider?
 
-> I think this works for us on HW that has range invalidation, which
-> would already be a positive move.
-> 
-> For the lesser HW that isn't range capable, it also gives the
-> opportunity to perform the iteration ourselves or go for the nuclear
-> option if the range is larger than some arbitrary constant (though
-> this is additional work).
-> 
-> But this still considers the whole range as being affected by
-> range->handler(). It'd be interesting to try and see whether more
-> precise tracking is (or isn't) generally beneficial.
+Another option would be to do the per_cpu(processors, pr->id) =3D pr
+a few lines earlier than currently and access that directly from the
+arch_register_cpu() call.  Similarly remove that reference a bit later and
+use it in arch_unregister_cpu().
 
-I assume the idea would be to let arch code do single-page invalidations of
-stage-2 entries for each gfn?
+This seems like the simplest solution, but I may be missing something.
 
-Unless I'm having a brain fart, x86 can't make use of that functionality.  Intel
-doesn't provide any way to do targeted invalidation of stage-2 mappings.  AMD
-provides an instruction to do broadcast invalidations, but it takes a virtual
-address, i.e. a stage-1 address.  I can't tell if it's a host virtual address or
-a guest virtual address, but it's a moot point because KVM doen't have the guest
-virtual address, and if it's a host virtual address, there would need to be valid
-mappings in the host page tables for it to work, which KVM can't guarantee.
+Jonathan
+
+>=20
+> Jonathan
+>=20
+>=20
+>=20
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+
