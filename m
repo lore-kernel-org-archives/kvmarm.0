@@ -1,138 +1,197 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C50451D52B;
-	Mon, 15 Apr 2024 15:48:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F262D1E535
+	for <kvmarm@lists.linux.dev>; Mon, 15 Apr 2024 15:59:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713196141; cv=none; b=kv6vuFQo+yg/KSIONDpkuHojMiwABvG9KZ71BKWRVV7Gjb7hume2jnFb2DLMYQaZcS26Sz7GBR0JdXS10+VRbwdKAOWo2VVWQuotkEHXC8YdCxv18XhI9QiaSUGGBVyebz3kn0WKw68A+BtbyUabJlaIDV+SBDDKhOgHzksVijE=
+	t=1713196750; cv=none; b=DAZyar4zIfXL2JzdCxfYnnIlHc5BfSnb7lg6A3JSVaPuXXBIYEi7oxpOeQU06Hv4Pf6rx74KnkRKKkHbNs3NIKmHqX/RkhQLVNLY/WGgPJI5foz7SOCba64Yvpr3UGBBVTuC2+FCJk2DCZ+BM2+Nhuq21ixFNppEP1O/SPy8BN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713196141; c=relaxed/simple;
-	bh=vckgdI60nnlCSg5BIZOilFflwMtdNqSLeCq6LHe17G4=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Nxou5yB91ZyU38w0fNJ4ha8l6slTVlUMlrbVL418EZzC9FXMNMn6RkB22L5dMdsR6guAJ1bwsFeJ6fviNMo7EJMaCnIUDHeCJlQOaMXtd6ftaXfCFx7oOPtZ0i2K+Lo8s96YsVk4uKFL7u9e/+8dhSXNwD3A1vMRbfFEnSTc3SY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.216])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4VJBPK5lr5z6D8gk;
-	Mon, 15 Apr 2024 23:47:01 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id 5D426140CF4;
-	Mon, 15 Apr 2024 23:48:56 +0800 (CST)
-Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Mon, 15 Apr
- 2024 16:48:55 +0100
-Date: Mon, 15 Apr 2024 16:48:54 +0100
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: "Rafael J. Wysocki" <rafael@kernel.org>
-CC: <linux-pm@vger.kernel.org>, <loongarch@lists.linux.dev>,
-	<linux-acpi@vger.kernel.org>, <linux-arch@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>, <x86@kernel.org>, Russell King
-	<linux@armlinux.org.uk>, Miguel Luis <miguel.luis@oracle.com>, James Morse
-	<james.morse@arm.com>, Salil Mehta <salil.mehta@huawei.com>, "Jean-Philippe
- Brucker" <jean-philippe@linaro.org>, Catalin Marinas
-	<catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
-	<linuxarm@huawei.com>, <justin.he@arm.com>, <jianyong.wu@arm.com>
-Subject: Re: [PATCH v5 02/18] ACPI: processor: Set the ACPI_COMPANION for
- the struct cpu instance
-Message-ID: <20240415164854.0000264f@Huawei.com>
-In-Reply-To: <CAJZ5v0izN5naWY7sTi16whds9ubXkLpgqV2gePQs869BoJTCDA@mail.gmail.com>
-References: <20240412143719.11398-1-Jonathan.Cameron@huawei.com>
-	<20240412143719.11398-3-Jonathan.Cameron@huawei.com>
-	<CAJZ5v0izN5naWY7sTi16whds9ubXkLpgqV2gePQs869BoJTCDA@mail.gmail.com>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	s=arc-20240116; t=1713196750; c=relaxed/simple;
+	bh=7gtI375sSAmCbiaxVNHjhd6JNklbmk3aRgBlLC6Aiwo=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QJPwIyI1h7yqoHzT2hvOM5CXbz0465k30blIYB9wkE3FgnobmN6Gdmx67C+tg9TsrERtkVqO8ZOn4kwi4j2qGyu6svy/l1brXZeXH3kgqj3APtrTCaX0/mylk9DsHDhvg1zfccpneeGFJV1zEZo98XvoVdAnTyNjQVxtBAwY8aQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lbOSH3A+; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lbOSH3A+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73ACDC113CC;
+	Mon, 15 Apr 2024 15:59:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713196749;
+	bh=7gtI375sSAmCbiaxVNHjhd6JNklbmk3aRgBlLC6Aiwo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=lbOSH3A+2/gv8xFX5vcnZ+PwL7iJCfVMKN16muspYlmTlEV2f+fwDj4HLzcxIIgRr
+	 kr9C07fb4jNWcOIqWRHOvDA610hFCoaj6S3jBtWAeL08jswsF5T2vEA2lhvT0ySUH1
+	 tw0XzQm481Rhe9y7x8cMulLhGvshLpLbcMRiL8CApcprIL9HC8Y0BZ0pa/NzLaVJTy
+	 puAwWeaI1iAuUHxCFnjwERQW8dD5xaz5daAQKFyVECH//E/gCRLVeq2wpEyVzqwKvz
+	 iRQ0cJMZRZbJ98poFiI8s4D0rISfhLi7AFC5QXFCBYtwgzsbK6vcYuPm6c2h/uOdjp
+	 Bor7dT1UwTlTA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rwOjb-004guF-7i;
+	Mon, 15 Apr 2024 16:59:07 +0100
+Date: Mon, 15 Apr 2024 16:59:06 +0100
+Message-ID: <865xwisjlh.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev,
+	will@kernel.org,
+	qperret@google.com,
+	seanjc@google.com,
+	alexandru.elisei@arm.com,
+	catalin.marinas@arm.com,
+	philmd@linaro.org,
+	james.morse@arm.com,
+	suzuki.poulose@arm.com,
+	oliver.upton@linux.dev,
+	mark.rutland@arm.com,
+	broonie@kernel.org,
+	joey.gouly@arm.com,
+	rananta@google.com
+Subject: Re: [PATCH v1 07/44] KVM: arm64: Support TLB invalidation in guest context
+In-Reply-To: <CA+EHjTwHdCuzsiE1xGVgY1ZrWzty9wVF7yr5wHx=9UCC4_bc6g@mail.gmail.com>
+References: <20240327173531.1379685-1-tabba@google.com>
+	<20240327173531.1379685-8-tabba@google.com>
+	<867cgysvqq.wl-maz@kernel.org>
+	<CA+EHjTwHdCuzsiE1xGVgY1ZrWzty9wVF7yr5wHx=9UCC4_bc6g@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: lhrpeml100001.china.huawei.com (7.191.160.183) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, will@kernel.org, qperret@google.com, seanjc@google.com, alexandru.elisei@arm.com, catalin.marinas@arm.com, philmd@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, mark.rutland@arm.com, broonie@kernel.org, joey.gouly@arm.com, rananta@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 12 Apr 2024 20:10:54 +0200
-"Rafael J. Wysocki" <rafael@kernel.org> wrote:
-
-> On Fri, Apr 12, 2024 at 4:38=E2=80=AFPM Jonathan Cameron
-> <Jonathan.Cameron@huawei.com> wrote:
-> >
-> > The arm64 specific arch_register_cpu() needs to access the _STA
-> > method of the DSDT object so make it available by assigning the
-> > appropriate handle to the struct cpu instance.
-> >
-> > Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> > ---
-> >  drivers/acpi/acpi_processor.c | 3 +++
-> >  1 file changed, 3 insertions(+)
-> >
-> > diff --git a/drivers/acpi/acpi_processor.c b/drivers/acpi/acpi_processo=
-r.c
-> > index 7a0dd35d62c9..93e029403d05 100644
-> > --- a/drivers/acpi/acpi_processor.c
-> > +++ b/drivers/acpi/acpi_processor.c
-> > @@ -235,6 +235,7 @@ static int acpi_processor_get_info(struct acpi_devi=
-ce *device)
-> >         union acpi_object object =3D { 0 };
-> >         struct acpi_buffer buffer =3D { sizeof(union acpi_object), &obj=
-ect };
-> >         struct acpi_processor *pr =3D acpi_driver_data(device);
-> > +       struct cpu *c;
-> >         int device_declaration =3D 0;
-> >         acpi_status status =3D AE_OK;
-> >         static int cpu0_initialized;
-> > @@ -314,6 +315,8 @@ static int acpi_processor_get_info(struct acpi_devi=
-ce *device)
-> >                         cpufreq_add_device("acpi-cpufreq");
-> >         }
-> >
-> > +       c =3D &per_cpu(cpu_devices, pr->id);
-> > +       ACPI_COMPANION_SET(&c->dev, device); =20
+On Mon, 15 Apr 2024 16:02:02 +0100,
+Fuad Tabba <tabba@google.com> wrote:
 >=20
-> This is also set for per_cpu(cpu_sys_devices, pr->id) in
-> acpi_processor_add(), via acpi_bind_one().
-
-Hi Rafael,
-
-cpu_sys_devices gets filled with a pointer to this same structure.
-The contents gets set in register_cpu() so at this point
-it doesn't point anywhere.  As a side note register_cpu()
-memsets to zero the value I set it to in the code above which isn't
-great, particularly as I want to use this in post_eject for
-arm64.
-
-We could make a copy of the handle and put it back after
-the memset in register_cpu() but that is also ugly.
-It's the best I've come up with to make sure this is still set
-come remove time but is rather odd.
-
+> Hi Marc,
 >=20
-> Moreover, there is some pr->id validation in acpi_processor_add(), so
-> it seems premature to use it here this way.
+> On Mon, Apr 15, 2024 at 12:36=E2=80=AFPM Marc Zyngier <maz@kernel.org> wr=
+ote:
+> >
+> > On Wed, 27 Mar 2024 17:34:54 +0000,
+> > Fuad Tabba <tabba@google.com> wrote:
+> > >
+> > > From: Will Deacon <will@kernel.org>
+> > >
+> > > Typically, TLB invalidation of guest stage-2 mappings using nVHE is
+> > > performed by a hypercall originating from the host. For the invalidat=
+ion
+> > > instruction to be effective, therefore, __tlb_switch_to_{guest,host}()
+> > > swizzle the active stage-2 context around the TLBI instruction.
+> > >
+> > > With guest-to-host memory sharing and unsharing hypercalls
+> > > originating from the guest under pKVM, there is need to support
+> > > both guest and host VMID invalidations issued from guest context.
+> > >
+> > > Replace the __tlb_switch_to_{guest,host}() functions with a more gene=
+ral
+> > > {enter,exit}_vmid_context() implementation which supports being invok=
+ed
+> > > from guest context and acts as a no-op if the target context matches =
+the
+> > > running context.
+> > >
+> > > Signed-off-by: Will Deacon <will@kernel.org>
+> > > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > > ---
+> > >  arch/arm64/kvm/hyp/nvhe/tlb.c | 114 +++++++++++++++++++++++++++-----=
+--
+> > >  1 file changed, 90 insertions(+), 24 deletions(-)
+> > >
+> > > diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/=
+tlb.c
+> > > index a60fb13e2192..05a66b2ed76d 100644
+> > > --- a/arch/arm64/kvm/hyp/nvhe/tlb.c
+> > > +++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
+> > > @@ -11,13 +11,23 @@
+> > >  #include <nvhe/mem_protect.h>
+> > >
+> > >  struct tlb_inv_context {
+> > > -     u64             tcr;
+> > > +     struct kvm_s2_mmu       *mmu;
+> > > +     u64                     tcr;
+> > > +     u64                     sctlr;
+> > >  };
+> > >
+> > > -static void __tlb_switch_to_guest(struct kvm_s2_mmu *mmu,
+> > > -                               struct tlb_inv_context *cxt,
+> > > -                               bool nsh)
+> > > +static void enter_vmid_context(struct kvm_s2_mmu *mmu,
+> > > +                            struct tlb_inv_context *cxt,
+> > > +                            bool nsh)
+> > >  {
+> > > +     struct kvm_s2_mmu *host_s2_mmu =3D &host_mmu.arch.mmu;
+> > > +     struct kvm_cpu_context *host_ctxt;
+> > > +     struct kvm_vcpu *vcpu;
+> > > +
+> > > +     host_ctxt =3D &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+> > > +     vcpu =3D host_ctxt->__hyp_running_vcpu;
+> > > +     cxt->mmu =3D NULL;
+> > > +
+> > >       /*
+> > >        * We have two requirements:
+> > >        *
+> > > @@ -40,20 +50,52 @@ static void __tlb_switch_to_guest(struct kvm_s2_m=
+mu *mmu,
+> > >       else
+> > >               dsb(ish);
+> > >
+> > > +     /*
+> > > +      * If we're already in the desired context, then there's nothing
+> > > +      * to do.
+> > > +      */
+> > > +     if (vcpu) {
+> > > +             /* We're in guest context */
+> > > +             if (mmu =3D=3D vcpu->arch.hw_mmu || WARN_ON(mmu !=3D ho=
+st_s2_mmu))
+> > > +                     return;
+> >
+> > I'm a bit concerned about this one, not so much for what it does, but
+> > because it outlines an inconsistency we have.
+> >
+> > Under memory pressure, we can end-up unmapping a page via the MMU
+> > notifiers, and will provide a s2_mmu context for the TLBI. This can
+> > happen while *another* context is loaded (a vcpu from a different VM)
+> > and that vcpu faults.
+> >
+> > You'd end up with a scenario very similar to the one I debugged here:
+> >
+> > https://lore.kernel.org/kvmarm/86y1gfn67v.wl-maz@kernel.org
+> >
+> > Now, this doesn't break here because __hyp_running_vcpu is set to NULL
+> > on each exit from the HYP code. But that only happens on nVHE, and not
+> > on VHE, which bizarrely only sets this on entry and leaves a dangling
+> > pointer...
+> >
+> > I think we need to clarify how and when this pointer is considered
+> > valid.
 >=20
-> I think that ACPI_COMPANION_SET() should be called from here on
-> per_cpu(cpu_sys_devices, pr->id) after validating pr->id (so the
-> pr->id validation should all be done here) and then NULL can be passed
-> as acpi_dev to acpi_bind_one() in acpi_processor_add().  Then, there
-> will be one physical device corresponding to the processor ACPI device
-> and no confusion.
+> Right.  I'll add the patch to fix the dangling pointer in VHE. Should
+> I add a comment about the validity of the pointer where it's defined
+> as well?
 
-I'm fairly sure this is pointing to the same device but agreed this
-is a tiny bit confusing. However we can't use cpu_sys_devices at this point
-so I'm not immediately seeing a cleaner solution :(
+Don't bother with the VHE bit, I'm already on it (moving it all the
+way to load/put for consistency), and I'm currently testing the hack.
 
-Jonathan
+But adding a comment explaining that this plays the role of
+kvm_get_current_vcpu() and that it is only valid from within
+__kvm_vcpu_run() would be great.
 
->=20
-> >         /*
-> >          *  Extra Processor objects may be enumerated on MP systems with
-> >          *  less than the max # of CPUs. They should be ignored _iff
-> > --
-> > 2.39.2
-> > =20
+Thanks,
 
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
