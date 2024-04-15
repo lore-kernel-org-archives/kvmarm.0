@@ -1,262 +1,241 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70B605D471
-	for <kvmarm@lists.linux.dev>; Mon, 15 Apr 2024 11:36:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 826195A0E3;
+	Mon, 15 Apr 2024 11:37:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713181009; cv=none; b=KGu3QcuDLTd37fnvg7Twc6+Lc6uA1XZoJbz6cPmPF6cD9vLkgiUvk8p1iDg5N28FZ64MUMuYZv3P+dK47/V4xyu1c7OuG8Q8q5ilrTGF9rJNfp70pqId3HfC1KZa/7j8mHBTh0qpaqP37ruyxsepAXTYMA92GTdpQ9roGCGadXg=
+	t=1713181045; cv=none; b=ehnYpFoLAErTnZWfueLApd8bPgo4IYtiUP0DTZK0rUjRaWHGvp+TrCPHIo36f+xN57XMYlt1U8RSetKHIWk79/7og1ECR9pNm1fWH7T/PCGt/fyuUQICrwL2CCBphUUSy/DpjHLcLfe50dhsRSGMDr0vKcAaI0Iq2JtenuvJzKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713181009; c=relaxed/simple;
-	bh=0cdbyCSwrsqtUoF+KktwxZCPvkEAKMuSFqB2mfADYl0=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=njC79xo9vVqX7HhnlMX4S2CM3YLhhRzy3u/2efS4dGCqtGV+RmIzq1S1GYkV7MefK1B2cDslsNUsNPAe8ryIRpZRBpljo2HRuavUWEa/e1uyw+y033I4w6jVwCciz4/Q1aI4aQAIAQ8hK6JqMTvEWoS31pAr66FqRPdRSR6985M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D8LApa04; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1713181045; c=relaxed/simple;
+	bh=dAuH92zwHVhX0LEVXHtXGLLI/vcbgG8GTycSwAAp+ps=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BJZJqI2eyCs4wt89hM6rkgt4R3RE8P1BDcE2RVHMKJzucMqPPGSyPtrXoeHxpQbj+5c87nMKSKX1tq7TIYpevbNP6OeHRSEeGIbbeYggvqCWyWkzVJhSf51+fIjCuHtbGlBCyjaoos2OLi1uFJfB8Im2g6mq6OABBcu8hX74RS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GFioXq7A; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D8LApa04"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB392C113CC;
-	Mon, 15 Apr 2024 11:36:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GFioXq7A"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3541EC4AF0A;
+	Mon, 15 Apr 2024 11:37:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713181009;
-	bh=0cdbyCSwrsqtUoF+KktwxZCPvkEAKMuSFqB2mfADYl0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=D8LApa04tVpwXzAUwH6hkwIYLeq9CZLsvzKEVDgiTi8vfw1PunvWxjqqCG9VtA+Nc
-	 eOUXDFsgF3feFz/0VHOHoft7Q7coKINCfNgqvLlcNRmw7pIEIYrprhGZ0Sc55vpDx+
-	 k0rldq0A6O4YC2A0D2cuZbSibfANhD7KXEwYYNK4qoGUqkAXaao4okwUOclyqY1kYr
-	 hANsCHj0H8ljSNrwnxWEpld1YKUTSzruSvB+SUaHPIU13Hj59E2r/nj1MOQCOYNGQA
-	 8WNYQTiaG4JiRUWg01Hc6MBcf1TpYRtcYFgTBTCK3I68PfvvyFxDT7GbJXITnBLymD
-	 lj5ZSNfWTbUMQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rwKdj-004bdB-0m;
-	Mon, 15 Apr 2024 12:36:47 +0100
-Date: Mon, 15 Apr 2024 12:36:45 +0100
-Message-ID: <867cgysvqq.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvmarm@lists.linux.dev,
-	will@kernel.org,
-	qperret@google.com,
-	seanjc@google.com,
-	alexandru.elisei@arm.com,
-	catalin.marinas@arm.com,
-	philmd@linaro.org,
-	james.morse@arm.com,
-	suzuki.poulose@arm.com,
-	oliver.upton@linux.dev,
-	mark.rutland@arm.com,
-	broonie@kernel.org,
-	joey.gouly@arm.com,
-	rananta@google.com
-Subject: Re: [PATCH v1 07/44] KVM: arm64: Support TLB invalidation in guest context
-In-Reply-To: <20240327173531.1379685-8-tabba@google.com>
-References: <20240327173531.1379685-1-tabba@google.com>
-	<20240327173531.1379685-8-tabba@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1713181045;
+	bh=dAuH92zwHVhX0LEVXHtXGLLI/vcbgG8GTycSwAAp+ps=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=GFioXq7ARwQRstGBT785EZe+B3ehqo6BbhyRcNKTsqH3XqM9iUihaaocADgogTwWb
+	 fSILbIp2QGwBviTkOjwdkcXgg3/Mi9Z4ntWoqlto8GZxx4VK+nzxC6G5cfH8+4F9B2
+	 Yo5Msoa6OIqbk8z8LyeUe+BEkbraAiOfSvKtjOFgwdRTHaB3u2g2c6sGHvWWr48+Nu
+	 1qve/s7ObaH+n5+aFgD3aokV1vAXpB2sdzlFSJYKeIiYXm9/a8YFUd2kDhquEw66IJ
+	 dzvn1L3qPYvz41WURsskNynq3i2VZbGBC8l/cU5rBBf1MpofLQ14QS793yYSKOe2Iy
+	 T6PZVB2xomsQA==
+Received: by mail-oi1-f179.google.com with SMTP id 5614622812f47-3c70418ef53so215037b6e.1;
+        Mon, 15 Apr 2024 04:37:25 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUEw+tcF5iB8AVzglBD4gHRzR6Pg/aHL91qfOP6Ps77DHNPs/CY2r32BRPrKBy/q+NxR8hD0FzYXwTleVeZiX4/hWSKx4UAhpA/l/KuKY65cXvk4/vSh+2KSqs9oQW6nBpl
+X-Gm-Message-State: AOJu0Yy3d0uDap3CZpM2hg/rMQj0oNvbu4xu13AW4XK77/xtlR6jCStX
+	RcJuR/nUkNpPOFGRu3V3f6MuTGp1UuqK6IeWwoMwLfKCCWd+ESWttS0xopy3AnT/aKFkGOWAfDv
+	/sosy+MrOroeZveMl0hH2iGx6OZc=
+X-Google-Smtp-Source: AGHT+IHpY14yXyTboghLMyDiioWb5anYtwdH8mgCI0DLw6hEeHHIPKqNeVrAdnvPnPPNi/0OSAEM5AVOUGvqTuo39DY=
+X-Received: by 2002:a05:6870:d28d:b0:232:fa03:3736 with SMTP id
+ d13-20020a056870d28d00b00232fa033736mr11562335oae.0.1713181044363; Mon, 15
+ Apr 2024 04:37:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, will@kernel.org, qperret@google.com, seanjc@google.com, alexandru.elisei@arm.com, catalin.marinas@arm.com, philmd@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, mark.rutland@arm.com, broonie@kernel.org, joey.gouly@arm.com, rananta@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20240412143719.11398-1-Jonathan.Cameron@huawei.com>
+ <20240412143719.11398-4-Jonathan.Cameron@huawei.com> <CAJZ5v0gNvy2e=hOGQQ2kLpnrDr8=QGBax-E5odEJ=7BA8qW-9A@mail.gmail.com>
+ <ZhmWkE+fCEG/WFoi@shell.armlinux.org.uk> <87bk6ez4hj.ffs@tglx>
+ <ZhmtO6zBExkQGZLk@shell.armlinux.org.uk> <878r1iyxkr.ffs@tglx> <20240415094552.000008d7@Huawei.com>
+In-Reply-To: <20240415094552.000008d7@Huawei.com>
+From: "Rafael J. Wysocki" <rafael@kernel.org>
+Date: Mon, 15 Apr 2024 13:37:08 +0200
+X-Gmail-Original-Message-ID: <CAJZ5v0ireu4pOedLjMjK2NrLkq_2vySpdgEgGccQEiFC5=otWQ@mail.gmail.com>
+Message-ID: <CAJZ5v0ireu4pOedLjMjK2NrLkq_2vySpdgEgGccQEiFC5=otWQ@mail.gmail.com>
+Subject: Re: [PATCH v5 03/18] ACPI: processor: Register deferred CPUs from acpi_processor_get_info()
+To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>, "Russell King (Oracle)" <linux@armlinux.org.uk>, 
+	"Rafael J. Wysocki" <rafael@kernel.org>, linux-pm@vger.kernel.org, loongarch@lists.linux.dev, 
+	linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, x86@kernel.org, Miguel Luis <miguel.luis@oracle.com>, 
+	James Morse <james.morse@arm.com>, Salil Mehta <salil.mehta@huawei.com>, 
+	Jean-Philippe Brucker <jean-philippe@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, linuxarm@huawei.com, justin.he@arm.com, 
+	jianyong.wu@arm.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 27 Mar 2024 17:34:54 +0000,
-Fuad Tabba <tabba@google.com> wrote:
-> 
-> From: Will Deacon <will@kernel.org>
-> 
-> Typically, TLB invalidation of guest stage-2 mappings using nVHE is
-> performed by a hypercall originating from the host. For the invalidation
-> instruction to be effective, therefore, __tlb_switch_to_{guest,host}()
-> swizzle the active stage-2 context around the TLBI instruction.
-> 
-> With guest-to-host memory sharing and unsharing hypercalls
-> originating from the guest under pKVM, there is need to support
-> both guest and host VMID invalidations issued from guest context.
-> 
-> Replace the __tlb_switch_to_{guest,host}() functions with a more general
-> {enter,exit}_vmid_context() implementation which supports being invoked
-> from guest context and acts as a no-op if the target context matches the
-> running context.
-> 
-> Signed-off-by: Will Deacon <will@kernel.org>
-> Signed-off-by: Fuad Tabba <tabba@google.com>
-> ---
->  arch/arm64/kvm/hyp/nvhe/tlb.c | 114 +++++++++++++++++++++++++++-------
->  1 file changed, 90 insertions(+), 24 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
-> index a60fb13e2192..05a66b2ed76d 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/tlb.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
-> @@ -11,13 +11,23 @@
->  #include <nvhe/mem_protect.h>
->  
->  struct tlb_inv_context {
-> -	u64		tcr;
-> +	struct kvm_s2_mmu	*mmu;
-> +	u64			tcr;
-> +	u64			sctlr;
->  };
->  
-> -static void __tlb_switch_to_guest(struct kvm_s2_mmu *mmu,
-> -				  struct tlb_inv_context *cxt,
-> -				  bool nsh)
-> +static void enter_vmid_context(struct kvm_s2_mmu *mmu,
-> +			       struct tlb_inv_context *cxt,
-> +			       bool nsh)
->  {
-> +	struct kvm_s2_mmu *host_s2_mmu = &host_mmu.arch.mmu;
-> +	struct kvm_cpu_context *host_ctxt;
-> +	struct kvm_vcpu *vcpu;
-> +
-> +	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-> +	vcpu = host_ctxt->__hyp_running_vcpu;
-> +	cxt->mmu = NULL;
-> +
->  	/*
->  	 * We have two requirements:
->  	 *
-> @@ -40,20 +50,52 @@ static void __tlb_switch_to_guest(struct kvm_s2_mmu *mmu,
->  	else
->  		dsb(ish);
->  
-> +	/*
-> +	 * If we're already in the desired context, then there's nothing
-> +	 * to do.
-> +	 */
-> +	if (vcpu) {
-> +		/* We're in guest context */
-> +		if (mmu == vcpu->arch.hw_mmu || WARN_ON(mmu != host_s2_mmu))
-> +			return;
+On Mon, Apr 15, 2024 at 10:46=E2=80=AFAM Jonathan Cameron
+<Jonathan.Cameron@huawei.com> wrote:
+>
+> On Sat, 13 Apr 2024 01:23:48 +0200
+> Thomas Gleixner <tglx@linutronix.de> wrote:
+>
+> > Russell!
+> >
+> > On Fri, Apr 12 2024 at 22:52, Russell King (Oracle) wrote:
+> > > On Fri, Apr 12, 2024 at 10:54:32PM +0200, Thomas Gleixner wrote:
+> > >> > As for the cpu locking, I couldn't find anything in arch_register_=
+cpu()
+> > >> > that depends on the cpu_maps_update stuff nor needs the cpus_write=
+_lock
+> > >> > being taken - so I've no idea why the "make_present" case takes th=
+ese
+> > >> > locks.
+> > >>
+> > >> Anything which updates a CPU mask, e.g. cpu_present_mask, after earl=
+y
+> > >> boot must hold the appropriate write locks. Otherwise it would be
+> > >> possible to online a CPU which just got marked present, but the
+> > >> registration has not completed yet.
+> > >
+> > > Yes. As far as I've been able to determine, arch_register_cpu()
+> > > doesn't manipulate any of the CPU masks. All it seems to be doing
+> > > is initialising the struct cpu, registering the embedded struct
+> > > device, and setting up the sysfs links to its NUMA node.
+> > >
+> > > There is nothing obvious in there which manipulates any CPU masks, an=
+d
+> > > this is rather my fundamental point when I said "I couldn't find
+> > > anything in arch_register_cpu() that depends on ...".
+> > >
+> > > If there is something, then comments in the code would be a useful ai=
+d
+> > > because it's highly non-obvious where such a manipulation is located,
+> > > and hence why the locks are necessary.
+> >
+> > acpi_processor_hotadd_init()
+> > ...
+> >          acpi_map_cpu(pr->handle, pr->phys_id, pr->acpi_id, &pr->id);
+> >
+> > That ends up in fiddling with cpu_present_mask.
+> >
+> > I grant you that arch_register_cpu() is not, but it might rely on the
+> > external locking too. I could not be bothered to figure that out.
+> >
+> > >> Define "real hotplug" :)
+> > >>
+> > >> Real physical hotplug does not really exist. That's at least true fo=
+r
+> > >> x86, where the physical hotplug support was chased for a while, but
+> > >> never ended up in production.
+> > >>
+> > >> Though virtualization happily jumped on it to hot add/remove CPUs
+> > >> to/from a guest.
+> > >>
+> > >> There are limitations to this and we learned it the hard way on X86.=
+ At
+> > >> the end we came up with the following restrictions:
+> > >>
+> > >>     1) All possible CPUs have to be advertised at boot time via firm=
+ware
+> > >>        (ACPI/DT/whatever) independent of them being present at boot =
+time
+> > >>        or not.
+> > >>
+> > >>        That guarantees proper sizing and ensures that associations
+> > >>        between hardware entities and software representations and th=
+e
+> > >>        resulting topology are stable for the lifetime of a system.
+> > >>
+> > >>        It is really required to know the full topology of the system=
+ at
+> > >>        boot time especially with hybrid CPUs where some of the cores
+> > >>        have hyperthreading and the others do not.
+> > >>
+> > >>
+> > >>     2) Hot add can only mark an already registered (possible) CPU
+> > >>        present. Adding non-registered CPUs after boot is not possibl=
+e.
+> > >>
+> > >>        The CPU must have been registered in #1 already to ensure tha=
+t
+> > >>        the system topology does not suddenly change in an incompatib=
+le
+> > >>        way at run-time.
+> > >>
+> > >> The same restriction would apply to real physical hotplug. I don't t=
+hink
+> > >> that's any different for ARM64 or any other architecture.
+> > >
+> > > This makes me wonder whether the Arm64 has been barking up the wrong
+> > > tree then, and whether the whole "present" vs "enabled" thing comes
+> > > from a misunderstanding as far as a CPU goes.
+> > >
+> > > However, there is a big difference between the two. On x86, a process=
+or
+> > > is just a processor. On Arm64, a "processor" is a slice of the system
+> > > (includes the interrupt controller, PMUs etc) and we must enumerate
+> > > those even when the processor itself is not enabled. This is the whol=
+e
+> > > reason there's a difference between "present" and "enabled" and why
+> > > there's a difference between x86 cpu hotplug and arm64 cpu hotplug.
+> > > The processor never actually goes away in arm64, it's just prevented
+> > > from being used.
+> >
+> > It's the same on X86 at least in the physical world.
+>
+> There were public calls on this via the Linaro Open Discussions group,
+> so I can talk a little about how we ended up here.  Note that (in my
+> opinion) there is zero chance of this changing - it took us well over
+> a year to get to this conclusion.  So if we ever want ARM vCPU HP
+> we need to work within these constraints.
+>
+> The ARM architecture folk (the ones defining the ARM ARM, relevant ACPI
+> specs etc, not the kernel maintainers) are determined that they want
+> to retain the option to do real physical CPU hotplug in the future
+> with all the necessary work around dynamic interrupt controller
+> initialization, debug and many other messy corners.
 
-I'm a bit concerned about this one, not so much for what it does, but
-because it outlines an inconsistency we have.
+That's OK, but the difference is not in the ACPi CPU enumeration/removal co=
+de.
 
-Under memory pressure, we can end-up unmapping a page via the MMU
-notifiers, and will provide a s2_mmu context for the TLBI. This can
-happen while *another* context is loaded (a vcpu from a different VM)
-and that vcpu faults.
+> Thus anything defined had to be structured in a way that was 'different'
+> from that.
 
-You'd end up with a scenario very similar to the one I debugged here:
+Apparently, that's where things got confused.
 
-https://lore.kernel.org/kvmarm/86y1gfn67v.wl-maz@kernel.org
+> I don't mind the proposed flattening of the 2 paths if the ARM kernel
+> maintainers are fine with it but it will remove the distinctions and
+> we will need to be very careful with the CPU masks - we can't handle
+> them the same as x86 does.
 
-Now, this doesn't break here because __hyp_running_vcpu is set to NULL
-on each exit from the HYP code. But that only happens on nVHE, and not
-on VHE, which bizarrely only sets this on entry and leaves a dangling
-pointer...
+At the ACPI code level, there is no distinction.
 
-I think we need to clarify how and when this pointer is considered
-valid.
+A CPU that was not available before has just become available.  The
+platform firmware has notified the kernel about it and now
+acpi_processor_add() runs.  Why would it need to use different code
+paths depending on what _STA bits were clear before?
 
-> +
-> +		cxt->mmu = vcpu->arch.hw_mmu;
-> +	} else {
-> +		/* We're in host context */
-> +		if (mmu == host_s2_mmu)
-> +			return;
-> +
-> +		cxt->mmu = host_s2_mmu;
-> +	}
-> +
->  	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
->  		u64 val;
->  
->  		/*
->  		 * For CPUs that are affected by ARM 1319367, we need to
-> -		 * avoid a host Stage-1 walk while we have the guest's
-> -		 * VMID set in the VTTBR in order to invalidate TLBs.
-> -		 * We're guaranteed that the S1 MMU is enabled, so we can
-> -		 * simply set the EPD bits to avoid any further TLB fill.
-> +		 * avoid a Stage-1 walk with the old VMID while we have
-> +		 * the new VMID set in the VTTBR in order to invalidate TLBs.
-> +		 * We're guaranteed that the host S1 MMU is enabled, so
-> +		 * we can simply set the EPD bits to avoid any further
-> +		 * TLB fill. For guests, we ensure that the S1 MMU is
-> +		 * temporarily enabled in the next context.
->  		 */
->  		val = cxt->tcr = read_sysreg_el1(SYS_TCR);
->  		val |= TCR_EPD1_MASK | TCR_EPD0_MASK;
->  		write_sysreg_el1(val, SYS_TCR);
->  		isb();
-> +
-> +		if (vcpu) {
-> +			val = cxt->sctlr = read_sysreg_el1(SYS_SCTLR);
-> +			if (!(val & SCTLR_ELx_M)) {
-> +				val |= SCTLR_ELx_M;
-> +				write_sysreg_el1(val, SYS_SCTLR);
-> +				isb();
-> +			}
-> +		} else {
-> +			/* The host S1 MMU is always enabled. */
-> +			cxt->sctlr = SCTLR_ELx_M;
-> +		}
->  	}
->  
->  	/*
-> @@ -62,20 +104,44 @@ static void __tlb_switch_to_guest(struct kvm_s2_mmu *mmu,
->  	 * ensuring that we always have an ISB, but not two ISBs back
->  	 * to back.
->  	 */
-> -	__load_stage2(mmu, kern_hyp_va(mmu->arch));
-> +	if (vcpu)
-> +		__load_host_stage2();
-> +	else
-> +		__load_stage2(mmu, kern_hyp_va(mmu->arch));
-> +
->  	asm(ALTERNATIVE("isb", "nop", ARM64_WORKAROUND_SPECULATIVE_AT));
->  }
->  
-> -static void __tlb_switch_to_host(struct tlb_inv_context *cxt)
-> +static void exit_vmid_context(struct tlb_inv_context *cxt)
->  {
-> -	__load_host_stage2();
-> +	struct kvm_s2_mmu *mmu = cxt->mmu;
-> +	struct kvm_cpu_context *host_ctxt;
-> +	struct kvm_vcpu *vcpu;
-> +
-> +	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-> +	vcpu = host_ctxt->__hyp_running_vcpu;
-> +
-> +	if (!mmu)
-> +		return;
-> +
-> +	if (vcpu)
-> +		__load_stage2(mmu, kern_hyp_va(mmu->arch));
-> +	else
-> +		__load_host_stage2();
->  
->  	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
-> -		/* Ensure write of the host VMID */
-> +		/* Ensure write of the old VMID */
->  		isb();
-> -		/* Restore the host's TCR_EL1 */
-> +
-> +		if (!(cxt->sctlr & SCTLR_ELx_M)) {
-> +			write_sysreg_el1(cxt->sctlr, SYS_SCTLR);
-> +			isb();
-> +		}
-> +
->  		write_sysreg_el1(cxt->tcr, SYS_TCR);
->  	}
-> +
-> +	cxt->mmu = NULL;
+Yes, there is some arch stuff to be called and that arch stuff should
+figure out what to do to make things actually work.
 
-nit: do we actually need this last line?
+> I'll get on with doing that, but do need input from Will / Catalin / Jame=
+s.
+> There are some quirks that need calling out as it's not quite a simple
+> as it appears from a high level.
+>
+> Another part of that long discussion established that there is userspace
+> (Android IIRC) in which the CPU present mask must include all CPUs
+> at boot. To change that would be userspace ABI breakage so we can't
+> do that.  Hence the dance around adding yet another mask to allow the
+> OS to understand which CPUs are 'present' but not possible to online.
+>
+> Flattening the two paths removes any distinction between calls that
+> are for real hotplug and those that are for this online capable path.
 
-Thanks,
+Which calls exactly do you mean?
 
-	M.
+> As a side note, the indicating bit for these flows is defined in ACPI
+> for x86 from ACPI 6.3 as a flag in Processor Local APIC
+> (the ARM64 definition is a cut and paste of that text).  So someone
+> is interested in this distinction on x86. I can't say who but if
+> you have a mantis account you can easily follow the history and it
+> might be instructive to not everyone considering the current x86
+> flow the right way to do it.
 
--- 
-Without deviation from the norm, progress is not possible.
+So a physically absent processor is different from a physically
+present processor that has not been disabled.  No doubt about this.
+
+That said, I'm still unsure why these two cases require two different
+code paths in acpi_processor_add().
