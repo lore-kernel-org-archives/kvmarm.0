@@ -1,158 +1,95 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96895136E3C;
-	Tue, 16 Apr 2024 19:02:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83C4913958E
+	for <kvmarm@lists.linux.dev>; Tue, 16 Apr 2024 20:06:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713294135; cv=none; b=J8532YG/+dSFdyWs350DZ7mlGmO8IBjXm3D6FKT9d/mg4jFJ0dEC9qcSp1eMYExbX2WxAKDPWKk/o3hr8HuN3wrXNSbVRKiQ52E9jNRTdfcFa0ju5K03jmYf80ijmBf4YI5SfvnxO0rdJfh7rgAEsrzIWlGidpo8VDOjMK7fWoA=
+	t=1713297996; cv=none; b=g81dPsQ1N/eKQ9zx8KqU/knDJuROV3FjrSS6uKSTQI3ssBDd0R8uG/UvOQzmrUYRoZrz0YFwxGkMJFHjrCcNCTy5yS4XlVTGJCF3q5ZHcddf4wS2VrvAgiB82IvLIZoUkGGD77mR59XzhfHuGQf2/HkiL2Jrofy40IBFFPq8e+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713294135; c=relaxed/simple;
-	bh=xbskRV8m/+XN6NH2m8afNoKnmWeG0OzTrmA+SGInC2k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tVse+Dfmmqt1tdelpXUrMImcUbRqJyAbR0TrJu8PFFeNncW4Klq30+eo9yXRnrUMH4bS1Ck59Xnhv9s8+DmoSElP+0s4TwXLKt1Zq2s2dqkg0h6V4SptWl9rLwh0VbyX/0zf0aDQOwKzh/WXuktWGeH/xH6IuMqJZwlnCBj+O/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BsZ1iD5N; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1713297996; c=relaxed/simple;
+	bh=PUiKjYdx/ijwQUNZoKyA1Jd1EVBLjLbsiH4wIBNu4ik=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=atF1CMjQGP6FRwO237wa17PXjyY4XPiRFH95ThXPKQfMq1vB9P+zCQR4BafMWlQbsjKSnwv55j+cxb052lFMvQapV1LISsNyyP9rmlSJXLJSb5LPYtYNxVs6K1Q6W1vOOkHrS0/G5upOlWYy/HdXutPNDKLr3+OBBO89wcjXDeM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=B3Vgsmvr; arc=none smtp.client-ip=95.215.58.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BsZ1iD5N"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A536C4AF0A;
-	Tue, 16 Apr 2024 19:02:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713294135;
-	bh=xbskRV8m/+XN6NH2m8afNoKnmWeG0OzTrmA+SGInC2k=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=BsZ1iD5Nd0d4B6HXNkBHNhwT4LiiWc88yZUQZOPWqCQret+uyX993UiVDEdXnTQpZ
-	 i+0iRxF78oS0mCLtwntmBow82cS81/MNHk/euznN+1VogyU2uvGQNlFiP3RAekV8ZZ
-	 JUyUoVCxOUgz5WA1BpUwqxv6orExQ6CEOkIl7Ln5jgg1FrwS1lxDBRn7+JLvJ5lDsn
-	 qfIZDWeWTFh5naNuIBI1NkF4/TaI7mxKxaobY5r/KUieAf/+pzCcjsTF4Wih403x9q
-	 s5GnRQ7NhXx3QnWrU9BEPwOT48kAMz7YncYjrHuetrhWT0p7Kwou0NeqRGFTJ7KbSp
-	 rFw6bdV4pLu+Q==
-Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-5acdbfa7a45so89187eaf.2;
-        Tue, 16 Apr 2024 12:02:15 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUDWYEQ73n7C02MSS1ZyRGiWS5Iu4U9h5hnAo7rG1OQWovPCICgXJzZwA1VQTBbJDtB/Fy9X9aSBPk8NHjLCimxLhzUk0sQLC9k1rnQiGg48Kc+IklPEltIyFiOo2/UImb9
-X-Gm-Message-State: AOJu0YxCDuBgcV7vRa6Ix+jyUUBWERfqDewr5rIuvIKibZhnxX9S0RaA
-	C+zmVtRNH6XDp0VVBaQs8Fzl+Ae/RUdp0d5TrigK0BsFZUxDxCRKH+2cu5sBcbS0eT7kK/2Yx6K
-	N6GSVcyi5o1dV+cl4art3oTh6dUo=
-X-Google-Smtp-Source: AGHT+IGfLxmXEH+uUXC9TAUq3KwcPBawoHi+dzfu7++eeN3j3YN9GuWwKcm2PcJPtxo1jL4YEoWhIRWKjGy4htEVqRk=
-X-Received: by 2002:a05:6820:4008:b0:5aa:6b2e:36f0 with SMTP id
- fh8-20020a056820400800b005aa6b2e36f0mr16275342oob.0.1713294134546; Tue, 16
- Apr 2024 12:02:14 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="B3Vgsmvr"
+Date: Tue, 16 Apr 2024 20:06:26 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1713297991;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VSWPho2kknmGfgIdFVf+iWGjKotisbb0h2HUCV7V9K8=;
+	b=B3VgsmvrFpWAjoUVeUtpn8K+mXtgPiZF6T3anGdR8d0uD1r54eKA2ZgBtMPwF4zSyI4kkj
+	96MEqmfFQ1hRkQZXv0r+fON7NNgzfnWpmqaXyer9CFSpkdk1wWAZ7SFqVxbr5tqiq92FQc
+	YU8OGIo5wgGNrzVM4G+T0AB76Loc23A=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, Joey Gouly <joey.gouly@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v3 04/15] KVM: arm64: nv: Drop VCPU_HYP_CONTEXT flag
+Message-ID: <Zh7aQm-TpDb6eBsp@linux.dev>
+References: <20240321155356.3236459-1-maz@kernel.org>
+ <20240321155356.3236459-5-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20240412143719.11398-1-Jonathan.Cameron@huawei.com>
- <20240412143719.11398-4-Jonathan.Cameron@huawei.com> <CAJZ5v0gNvy2e=hOGQQ2kLpnrDr8=QGBax-E5odEJ=7BA8qW-9A@mail.gmail.com>
- <ZhmWkE+fCEG/WFoi@shell.armlinux.org.uk> <87bk6ez4hj.ffs@tglx>
- <ZhmtO6zBExkQGZLk@shell.armlinux.org.uk> <878r1iyxkr.ffs@tglx>
- <20240415094552.000008d7@Huawei.com> <CAJZ5v0ireu4pOedLjMjK2NrLkq_2vySpdgEgGccQEiFC5=otWQ@mail.gmail.com>
- <20240415125649.00001354@huawei.com> <CAJZ5v0iNSmV6EsBOc5oYWSTR9UvFOeg8_mj8Ofhum4Tonb3kNQ@mail.gmail.com>
- <20240415132351.00007439@huawei.com> <20240416184116.0000513c@huawei.com>
-In-Reply-To: <20240416184116.0000513c@huawei.com>
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Tue, 16 Apr 2024 21:02:02 +0200
-X-Gmail-Original-Message-ID: <CAJZ5v0iK61_ihUZX_tXoSGdhpYDWFhEBbEuFf6WFiiD0QSeTDg@mail.gmail.com>
-Message-ID: <CAJZ5v0iK61_ihUZX_tXoSGdhpYDWFhEBbEuFf6WFiiD0QSeTDg@mail.gmail.com>
-Subject: Re: [PATCH v5 03/18] ACPI: processor: Register deferred CPUs from acpi_processor_get_info()
-To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, 
-	"Russell King (Oracle)" <linux@armlinux.org.uk>, linux-pm@vger.kernel.org, loongarch@lists.linux.dev, 
-	linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, x86@kernel.org, Miguel Luis <miguel.luis@oracle.com>, 
-	James Morse <james.morse@arm.com>, Salil Mehta <salil.mehta@huawei.com>, 
-	Jean-Philippe Brucker <jean-philippe@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, linuxarm@huawei.com, justin.he@arm.com, 
-	jianyong.wu@arm.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240321155356.3236459-5-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Apr 16, 2024 at 7:41=E2=80=AFPM Jonathan Cameron
-<Jonathan.Cameron@huawei.com> wrote:
->
-> On Mon, 15 Apr 2024 13:23:51 +0100
-> Jonathan Cameron <Jonathan.Cameron@huawei.com> wrote:
->
-> > On Mon, 15 Apr 2024 14:04:26 +0200
-> > "Rafael J. Wysocki" <rafael@kernel.org> wrote:
+On Thu, Mar 21, 2024 at 03:53:45PM +0000, Marc Zyngier wrote:
+> It has become obvious that HCR_EL2.NV serves the exact same use
+> as VCPU_HYP_CONTEXT, only in an architectural way. So just drop
+> the flag for good.
+> 
+> Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 2 --
+>  arch/arm64/kvm/hyp/vhe/switch.c   | 7 +------
+>  2 files changed, 1 insertion(+), 8 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 839c76529bb2..3f1c3c91e5c2 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -816,8 +816,6 @@ struct kvm_vcpu_arch {
+>  #define DEBUG_STATE_SAVE_SPE	__vcpu_single_flag(iflags, BIT(5))
+>  /* Save TRBE context if active  */
+>  #define DEBUG_STATE_SAVE_TRBE	__vcpu_single_flag(iflags, BIT(6))
+> -/* vcpu running in HYP context */
+> -#define VCPU_HYP_CONTEXT	__vcpu_single_flag(iflags, BIT(7))
+>  
+>  /* SVE enabled for host EL0 */
+>  #define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
+> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> index 1581df6aec87..58415783fd53 100644
+> --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> @@ -197,7 +197,7 @@ static void early_exit_filter(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  	 * If we were in HYP context on entry, adjust the PSTATE view
+>  	 * so that the usual helpers work correctly.
+>  	 */
+> -	if (unlikely(vcpu_get_flag(vcpu, VCPU_HYP_CONTEXT))) {
+> +	if (unlikely(read_sysreg(hcr_el2) & HCR_NV)) {
 
-[cut]
+Can this be additionally predicated on vcpu_has_nv() so we condition on
+the NV cpucap and avoid the sysreg read on non-nesting hardware?
 
-> > > > I'm still very much stuck on the hotadd_init flag however, so any s=
-uggestions
-> > > > on that would be very welcome!
-> > >
-> > > I need to do some investigation which will take some time I suppose.
-> >
-> > I'll do so as well once I've gotten the rest sorted out.  That whole
-> > structure seems overly complex and liable to race, though maybe suffici=
-ent
-> > locking happens to be held that it's not a problem.
->
-> Back to this a (maybe) last outstanding problem.
->
-> Superficially I think we might be able to get around this by always
-> doing the setup in the initial online. In brief that looks something the
-> below code.  Relying on the cpu hotplug callback registration calling
-> the acpi_soft_cpu_online for all instances that are already online.
->
-> Very lightly tested on arm64 and x86 with cold and hotplugged CPUs.
-> However this is all in emulation and I don't have access to any significa=
-nt
-> x86 test farms :( So help will be needed if it's not immediately obvious =
-why
-> we can't do this.
-
-AFAICS, this should work.  At least I don't see why it wouldn't.
-
-> Of course, I'm open to other suggestions!
->
-> For now I'll put a tidied version of this one is as an RFC with the rest =
-of v6.
->
-> diff --git a/drivers/acpi/acpi_processor.c b/drivers/acpi/acpi_processor.=
-c
-> index 06e718b650e5..97ca53b516d0 100644
-> --- a/drivers/acpi/acpi_processor.c
-> +++ b/drivers/acpi/acpi_processor.c
-> @@ -340,7 +340,7 @@ static int acpi_processor_get_info(struct acpi_device=
- *device)
->          */
->         per_cpu(processor_device_array, pr->id) =3D device;
->         per_cpu(processors, pr->id) =3D pr;
-> -
-> +       pr->flags.need_hotplug_init =3D 1;
->         /*
->          *  Extra Processor objects may be enumerated on MP systems with
->          *  less than the max # of CPUs. They should be ignored _iff
-> diff --git a/drivers/acpi/processor_driver.c b/drivers/acpi/processor_dri=
-ver.c
-> index 67db60eda370..930f911fc435 100644
-> --- a/drivers/acpi/processor_driver.c
-> +++ b/drivers/acpi/processor_driver.c
-> @@ -206,7 +206,7 @@ static int acpi_processor_start(struct device *dev)
->
->         /* Protect against concurrent CPU hotplug operations */
->         cpu_hotplug_disable();
-> -       ret =3D __acpi_processor_start(device);
-> +       //      ret =3D __acpi_processor_start(device);
->         cpu_hotplug_enable();
->         return ret;
->  }
-
-So it looks like acpi_processor_start() is not necessary any more, is it?
-
-> @@ -279,7 +279,7 @@ static int __init acpi_processor_driver_init(void)
->         if (result < 0)
->                 return result;
->
-> -       result =3D cpuhp_setup_state_nocalls(CPUHP_AP_ONLINE_DYN,
-> +       result =3D cpuhp_setup_state(CPUHP_AP_ONLINE_DYN,
->                                            "acpi/cpu-drv:online",
->                                            acpi_soft_cpu_online, NULL);
->         if (result < 0)
-> >
-> > Jonathan
-
-Thanks!
+-- 
+Thanks,
+Oliver
