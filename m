@@ -1,307 +1,141 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87F1E12E48
-	for <kvmarm@lists.linux.dev>; Tue, 16 Apr 2024 03:13:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18FE517550
+	for <kvmarm@lists.linux.dev>; Tue, 16 Apr 2024 03:26:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713237236; cv=none; b=WznaMmLLRZAhhClEyQDKHoiplw3tYKTmqBHvnW2sH0MBd7oONyp3xFhpbXqyk5fq5nkrE87gCXPXZNB2fGcz2QYE963GaheJZpEOknYVKeRvz+YJ+KnWcTE6qrHQpJalLCDPRosaByLugDjGv1j8UZ4VUiMgXNH5nwiyqt1jw8M=
+	t=1713238001; cv=none; b=pvMvKmq29/ezhVNQf3EDeWZx34gFU5xIgWNW9Z+k30GCy0M7MgoUM6gh2CO3FVez2RktvwqgOWtmKChbmlYS7rdJeumHV3q28GDwe+5TaQC/YFvcJwXrQ2P0HwAZlRQVVl3BPArkAjVJWMxxk4reNywzxS3nKT4tootOVFSgKzY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713237236; c=relaxed/simple;
-	bh=U6p2ts7qX92k33AKHQGKDDr+K7bfe4jrt0INl11Qnwc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eX64ZgsoK3CjLMDgoGRBseBtNd0tJ7jcEFg7rUHqcso7YRl4wG3T2Ni08ON3fLkHoEd4NUH+qFZAoPI0wfnUQAMGNsXc8/OdzvZ/c1xpAGIl0zAk0Iyx5td3BoLb2dQiGtqF//+fjo4Ke39JpopAkZCdpCcRYB1aI+9AAza5Lkc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C442F2F4;
-	Mon, 15 Apr 2024 20:14:19 -0700 (PDT)
-Received: from [10.163.59.235] (unknown [10.163.59.235])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E49363F64C;
-	Mon, 15 Apr 2024 20:13:46 -0700 (PDT)
-Message-ID: <b63e6914-03c6-4c76-a81a-4af2fbe557e0@arm.com>
-Date: Tue, 16 Apr 2024 08:43:44 +0530
+	s=arc-20240116; t=1713238001; c=relaxed/simple;
+	bh=mSo87wrI4SUul6dOUELPanCj87ouMVYaGJuolIWl2OY=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=SfNf+f90h2o5m/1Hh87KRfYQVW9+QA6o6x7eqC5JyJEGbjKJqlmhHPgp/plFdKffnUnHODYtTyu8CtXk0YjDfR2dBkFSXcliS2bKYhIJIwnx0w5Jkh+SR87OITlV/XF6hbSq2n9EzY9P1g316QPGV8I/qcipWzHRZQtfq+SZ7/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D2xKsBWM; arc=none smtp.client-ip=209.85.215.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D2xKsBWM"
+Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-5e4f79007ffso2646814a12.2
+        for <kvmarm@lists.linux.dev>; Mon, 15 Apr 2024 20:26:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713237998; x=1713842798; darn=lists.linux.dev;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=V1fKVH44Qpf52nV3xcVtDJdI4iDiW1jMW0xvMeM9U7A=;
+        b=D2xKsBWMKUTuR2rn6WxvkmIoE3ZX5Gwfkkd+OEwxK/gfOG3451F0OvL0B/eP0CRKuR
+         ojyqZcFyZ7AmkctUz6j/X4ZCd3PvObUSek9p87FN6xhLkjktCoDzu/ZOgkUx2p8fngIS
+         Zlrj2hwS9C6vwpS9B1nQJyR7H7oKCKrLf45R5GVEoHmmrKWA8YvCS5/Rzc27nMHSXnoR
+         XtWUmUd+G5DnYfBU4+pNFigCallAQrjQIYBhsO+P//P7PZOjsKPYSI1Ul6n65ZP68ULF
+         M4ntlsWhSsMTIucchNA6LvueqgyCB2M9b/NRLYNdhztRo8v/0WTHeEyrqMWGjuQKBFdV
+         JrLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713237998; x=1713842798;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=V1fKVH44Qpf52nV3xcVtDJdI4iDiW1jMW0xvMeM9U7A=;
+        b=DvIQRBrgQ4KwJ+GD99SVuEmxhdzgPKpPDQ6AU/WdbqvljGvq1234c+gZofVsyBhzdH
+         YC/49RdWXoBLvU7y2HOSS+mAPcOXsXB4n4kYZXi0Sz2BN+uq4AEgTPynHpj+s/oC60EL
+         8iZRe38LHylDQnhn4YcLKqlJQHThF2/sjegBjeYQ6NZOpf/peb+lsJCc8L29UaE6CyZe
+         AndiAxjCJwXa7rDNWAFhBpswpkTSOqcqDlSO4L8sT/Ldlu2XNhuHDROuW97VRbn4Z78D
+         AzmT8NqbSKZ38xxrEpugcMHBbZ19eM2fEein46NXI5DR0vXwdfx6b3v0WBQxhB8I1/x6
+         VB8w==
+X-Forwarded-Encrypted: i=1; AJvYcCVoohfqgHFI2zgaf+7eAimR53bNRXveJfa9bCMCx7FToT16Djw9MPTE97T+oOLPiClHcO9GJU/VmT14fO1z9mZrFFoTDM4h
+X-Gm-Message-State: AOJu0YyGki5TLXRcSq4tZN961+Fh8OzmDfXMr0VhPFFSwkmWUmi/Ys+u
+	vHiq7QXbmn+pPxIa8lHWN30WFwptCXuDx40rYVcw20SFwCQyavmE
+X-Google-Smtp-Source: AGHT+IG5x5Eh/Udr2OWTDSmF61V8WPyGJpOzKZ0mm5b1COfHDZpLuwTMMl+u7FXvmjLfRKTR71F77A==
+X-Received: by 2002:a05:6a20:718a:b0:1a7:51e1:258c with SMTP id s10-20020a056a20718a00b001a751e1258cmr12219760pzb.61.1713237998278;
+        Mon, 15 Apr 2024 20:26:38 -0700 (PDT)
+Received: from localhost ([1.146.57.129])
+        by smtp.gmail.com with ESMTPSA id u9-20020a1709026e0900b001e4753f7715sm7263967plk.12.2024.04.15.20.26.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 15 Apr 2024 20:26:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC 8/8] arm64/hw_breakpoint: Enable FEAT_Debugv8p9
-Content-Language: en-US
-To: Marc Zyngier <maz@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, Jonathan Corbet <corbet@lwn.net>,
- Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Mark Brown <broonie@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-References: <20240405080008.1225223-1-anshuman.khandual@arm.com>
- <20240405080008.1225223-9-anshuman.khandual@arm.com>
- <868r1st8an.wl-maz@kernel.org>
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <868r1st8an.wl-maz@kernel.org>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Date: Tue, 16 Apr 2024 13:26:28 +1000
+Message-Id: <D0L86IDPMTI3.2XFZ8C6UCVD1B@gmail.com>
+Cc: "Paolo Bonzini" <pbonzini@redhat.com>, "Alexandru Elisei"
+ <alexandru.elisei@arm.com>, "Eric Auger" <eric.auger@redhat.com>, "Janosch
+ Frank" <frankja@linux.ibm.com>, "Claudio Imbrenda"
+ <imbrenda@linux.ibm.com>, =?utf-8?q?Nico_B=C3=B6hr?= <nrb@linux.ibm.com>,
+ "David Hildenbrand" <david@redhat.com>, "Shaoqin Huang"
+ <shahuang@redhat.com>, "Nikos Nikoleris" <nikos.nikoleris@arm.com>, "David
+ Woodhouse" <dwmw@amazon.co.uk>, "Ricardo Koller" <ricarkol@google.com>,
+ "rminmin" <renmm6@chinaunicom.cn>, "Gavin Shan" <gshan@redhat.com>, "Nina
+ Schoetterl-Glausch" <nsg@linux.ibm.com>, "Sean Christopherson"
+ <seanjc@google.com>, <kvm@vger.kernel.org>, <kvmarm@lists.linux.dev>,
+ <kvm-riscv@lists.infradead.org>, <linux-s390@vger.kernel.org>
+Subject: Re: [RFC kvm-unit-tests PATCH v2 00/14] add shellcheck support
+From: "Nicholas Piggin" <npiggin@gmail.com>
+To: "Thomas Huth" <thuth@redhat.com>, "Andrew Jones"
+ <andrew.jones@linux.dev>
+X-Mailer: aerc 0.17.0
+References: <20240406123833.406488-1-npiggin@gmail.com>
+ <a7cdd98e-93c1-4546-bba4-ac3a465f01f5@redhat.com>
+In-Reply-To: <a7cdd98e-93c1-4546-bba4-ac3a465f01f5@redhat.com>
 
+On Mon Apr 15, 2024 at 9:59 PM AEST, Thomas Huth wrote:
+> On 06/04/2024 14.38, Nicholas Piggin wrote:
+> > Tree here
+> >=20
+> > https://gitlab.com/npiggin/kvm-unit-tests/-/tree/shellcheck
+> >=20
+> > Again on top of the "v8 migration, powerpc improvements" series. I
+> > don't plan to rebase the other way around since it's a lot of work.
+> > So this is still in RFC until the other big series gets merged.
+> >=20
+> > Thanks to Andrew for a lot of review. A submitted the likely s390x
+> > bugs separately ahead of this series, and also disabled one of the
+> > tests and dropped its fix patch as-per review comments. Hence 3 fewer
+> > patches. Other than that, since last post:
+> >=20
+> > * Tidied commit messages and added some of Andrew's comments.
+> > * Removed the "SC2034 unused variable" blanket disable, and just
+> >    suppressed the config.mak and a couple of other warnings.
+> > * Blanket disabled "SC2235 Use { ..; } instead of (..)" and dropped
+> >    the fix for it.
+> > * Change warning suppression comments as per Andrew's review, also
+> >    mention in the new unittests doc about the "check =3D" option not
+> >    allowing whitespace etc in the name since we don't cope with that.
+> >=20
+> > Thanks,
+> > Nick
+> >=20
+> > Nicholas Piggin (14):
+> >    Add initial shellcheck checking
+> >    shellcheck: Fix SC2223
+> >    shellcheck: Fix SC2295
+> >    shellcheck: Fix SC2094
+> >    shellcheck: Fix SC2006
+> >    shellcheck: Fix SC2155
+> >    shellcheck: Fix SC2143
+> >    shellcheck: Fix SC2013
+> >    shellcheck: Fix SC2145
+> >    shellcheck: Fix SC2124
+> >    shellcheck: Fix SC2294
+> >    shellcheck: Fix SC2178
+> >    shellcheck: Fix SC2048
+> >    shellcheck: Suppress various messages
+>
+> I went ahead and pushed a bunch of your patches to the k-u-t master branc=
+h=20
+> now. However, there were also some patches which did not apply cleanly to=
+=20
+> master anymore, so please rebase the remaining patches and then send them=
+ again.
 
+Hey Thomas,
 
-On 4/5/24 15:56, Marc Zyngier wrote:
-> On Fri, 05 Apr 2024 09:00:08 +0100,
-> Anshuman Khandual <anshuman.khandual@arm.com> wrote:
->>
->> Currently there can be maximum 16 breakpoints, and 16 watchpoints available
->> on a given platform - as detected from ID_AA64DFR0_EL1.[BRPs|WRPs] register
->> fields. But these breakpoint, and watchpoints can be extended further up to
->> 64 via a new arch feature FEAT_Debugv8p9.
->>
->> This first enables banked access for the breakpoint and watchpoint register
->> set via MDSELR_EL1, extended exceptions via MDSCR_EL1.EMBWE and determining
->> available breakpoints and watchpoints in the platform from ID_AA64DFR1_EL1,
->> when FEAT_Debugv8p9 is enabled.
->>
->> Cc: Catalin Marinas <catalin.marinas@arm.com>
->> Cc: Will Deacon <will@kernel.org>
->> Cc: Mark Rutland <mark.rutland@arm.com>
->> Cc: linux-arm-kernel@lists.infradead.org
->> Cc: linux-kernel@vger.kernel.org
->> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
->> ---
->>  arch/arm64/include/asm/debug-monitors.h |  2 +-
->>  arch/arm64/include/asm/hw_breakpoint.h  | 46 +++++++++++++++++++------
->>  arch/arm64/kernel/debug-monitors.c      | 16 ++++++---
->>  arch/arm64/kernel/hw_breakpoint.c       | 33 ++++++++++++++++++
->>  4 files changed, 82 insertions(+), 15 deletions(-)
->>
->> diff --git a/arch/arm64/include/asm/debug-monitors.h b/arch/arm64/include/asm/debug-monitors.h
->> index 13d437bcbf58..75eedba2abbe 100644
->> --- a/arch/arm64/include/asm/debug-monitors.h
->> +++ b/arch/arm64/include/asm/debug-monitors.h
->> @@ -19,7 +19,7 @@
->>  /* MDSCR_EL1 enabling bits */
->>  #define DBG_MDSCR_KDE		(1 << 13)
->>  #define DBG_MDSCR_MDE		(1 << 15)
->> -#define DBG_MDSCR_MASK		~(DBG_MDSCR_KDE | DBG_MDSCR_MDE)
->> +#define DBG_MDSCR_EMBWE		(1UL << 32)
->>  
->>  #define	DBG_ESR_EVT(x)		(((x) >> 27) & 0x7)
->>  
->> diff --git a/arch/arm64/include/asm/hw_breakpoint.h b/arch/arm64/include/asm/hw_breakpoint.h
->> index bd81cf17744a..6b9822140f71 100644
->> --- a/arch/arm64/include/asm/hw_breakpoint.h
->> +++ b/arch/arm64/include/asm/hw_breakpoint.h
->> @@ -79,8 +79,8 @@ static inline void decode_ctrl_reg(u32 reg,
->>   * Limits.
->>   * Changing these will require modifications to the register accessors.
->>   */
->> -#define ARM_MAX_BRP		16
->> -#define ARM_MAX_WRP		16
->> +#define ARM_MAX_BRP		64
->> +#define ARM_MAX_WRP		64
->>  
->>  /* Virtual debug register bases. */
->>  #define AARCH64_DBG_REG_BVR	0
->> @@ -135,22 +135,48 @@ static inline void ptrace_hw_copy_thread(struct task_struct *task)
->>  }
->>  #endif
->>  
->> +static inline bool is_debug_v8p9_enabled(void)
->> +{
->> +	u64 dfr0 = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
->> +	int dver = cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_DebugVer_SHIFT);
->> +
->> +	return dver == ID_AA64DFR0_EL1_DebugVer_V8P9;
->> +}
->> +
->>  /* Determine number of BRP registers available. */
->>  static inline int get_num_brps(void)
->>  {
->> -	u64 dfr0 = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
->> -	return 1 +
->> -		cpuid_feature_extract_unsigned_field(dfr0,
->> -						ID_AA64DFR0_EL1_BRPs_SHIFT);
->> +	u64 dfr0, dfr1;
->> +	int dver, brps;
->> +
->> +	dfr0 = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
->> +	dver = cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_DebugVer_SHIFT);
->> +	if (dver == ID_AA64DFR0_EL1_DebugVer_V8P9) {
->> +		dfr1 = read_sanitised_ftr_reg(SYS_ID_AA64DFR1_EL1);
->> +		brps = cpuid_feature_extract_unsigned_field_width(dfr1,
->> +								  ID_AA64DFR1_EL1_BRPs_SHIFT, 8);
->> +	} else {
->> +		brps = cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_BRPs_SHIFT);
->> +	}
->> +	return 1 + brps;
->>  }
->>  
->>  /* Determine number of WRP registers available. */
->>  static inline int get_num_wrps(void)
->>  {
->> -	u64 dfr0 = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
->> -	return 1 +
->> -		cpuid_feature_extract_unsigned_field(dfr0,
->> -						ID_AA64DFR0_EL1_WRPs_SHIFT);
->> +	u64 dfr0, dfr1;
->> +	int dver, wrps;
->> +
->> +	dfr0 = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
->> +	dver = cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_DebugVer_SHIFT);
->> +	if (dver == ID_AA64DFR0_EL1_DebugVer_V8P9) {
->> +		dfr1 = read_sanitised_ftr_reg(SYS_ID_AA64DFR1_EL1);
->> +		wrps = cpuid_feature_extract_unsigned_field_width(dfr1,
->> +								  ID_AA64DFR1_EL1_WRPs_SHIFT, 8);
->> +	} else {
->> +		wrps = cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_WRPs_SHIFT);
->> +	}
->> +	return 1 + wrps;
->>  }
->>  
->>  #ifdef CONFIG_CPU_PM
->> diff --git a/arch/arm64/kernel/debug-monitors.c b/arch/arm64/kernel/debug-monitors.c
->> index 64f2ecbdfe5c..3299d1e8dc61 100644
->> --- a/arch/arm64/kernel/debug-monitors.c
->> +++ b/arch/arm64/kernel/debug-monitors.c
->> @@ -23,6 +23,7 @@
->>  #include <asm/debug-monitors.h>
->>  #include <asm/system_misc.h>
->>  #include <asm/traps.h>
->> +#include <asm/hw_breakpoint.h>
-> 
-> include order.
+Yeah the sc patches were based on top of the big series, so some
+collisions expected. I'll look at rebasing.
 
-Sure, will fix the order here.
-
-> 
->>  
->>  /* Determine debug architecture. */
->>  u8 debug_monitors_arch(void)
->> @@ -34,7 +35,7 @@ u8 debug_monitors_arch(void)
->>  /*
->>   * MDSCR access routines.
->>   */
->> -static void mdscr_write(u32 mdscr)
->> +static void mdscr_write(u64 mdscr)
->>  {
->>  	unsigned long flags;
->>  	flags = local_daif_save();
->> @@ -43,7 +44,7 @@ static void mdscr_write(u32 mdscr)
->>  }
->>  NOKPROBE_SYMBOL(mdscr_write);
->>  
->> -static u32 mdscr_read(void)
->> +static u64 mdscr_read(void)
->>  {
->>  	return read_sysreg(mdscr_el1);
->>  }
->> @@ -76,10 +77,11 @@ early_param("nodebugmon", early_debug_disable);
->>   */
->>  static DEFINE_PER_CPU(int, mde_ref_count);
->>  static DEFINE_PER_CPU(int, kde_ref_count);
->> +static DEFINE_PER_CPU(int, embwe_ref_count);
->>  
->>  void enable_debug_monitors(enum dbg_active_el el)
->>  {
->> -	u32 mdscr, enable = 0;
->> +	u64 mdscr, enable = 0;
->>  
->>  	WARN_ON(preemptible());
->>  
->> @@ -90,6 +92,9 @@ void enable_debug_monitors(enum dbg_active_el el)
->>  	    this_cpu_inc_return(kde_ref_count) == 1)
->>  		enable |= DBG_MDSCR_KDE;
->>  
->> +	if (is_debug_v8p9_enabled() && this_cpu_inc_return(embwe_ref_count) == 1)
->> +		enable |= DBG_MDSCR_EMBWE;
->> +
->>  	if (enable && debug_enabled) {
->>  		mdscr = mdscr_read();
->>  		mdscr |= enable;
->> @@ -100,7 +105,7 @@ NOKPROBE_SYMBOL(enable_debug_monitors);
->>  
->>  void disable_debug_monitors(enum dbg_active_el el)
->>  {
->> -	u32 mdscr, disable = 0;
->> +	u64 mdscr, disable = 0;
->>  
->>  	WARN_ON(preemptible());
->>  
->> @@ -111,6 +116,9 @@ void disable_debug_monitors(enum dbg_active_el el)
->>  	    this_cpu_dec_return(kde_ref_count) == 0)
->>  		disable &= ~DBG_MDSCR_KDE;
->>  
->> +	if (is_debug_v8p9_enabled() && this_cpu_dec_return(embwe_ref_count) == 0)
->> +		disable &= ~DBG_MDSCR_EMBWE;
->> +
->>  	if (disable) {
->>  		mdscr = mdscr_read();
->>  		mdscr &= disable;
->> diff --git a/arch/arm64/kernel/hw_breakpoint.c b/arch/arm64/kernel/hw_breakpoint.c
->> index 2f5755192c2b..7b9169535b76 100644
->> --- a/arch/arm64/kernel/hw_breakpoint.c
->> +++ b/arch/arm64/kernel/hw_breakpoint.c
->> @@ -103,10 +103,40 @@ int hw_breakpoint_slots(int type)
->>  	WRITE_WB_REG_CASE(OFF, 14, REG, VAL);	\
->>  	WRITE_WB_REG_CASE(OFF, 15, REG, VAL)
->>  
->> +static int set_bank_index(int n)
->> +{
->> +	int mdsel_bank;
->> +	int bank = n / 16, index = n % 16;
->> +
->> +	switch (bank) {
->> +	case 0:
->> +		mdsel_bank = MDSELR_EL1_BANK_BANK_0;
->> +		break;
->> +	case 1:
->> +		mdsel_bank = MDSELR_EL1_BANK_BANK_1;
->> +		break;
->> +	case 2:
->> +		mdsel_bank = MDSELR_EL1_BANK_BANK_2;
->> +		break;
->> +	case 3:
->> +		mdsel_bank = MDSELR_EL1_BANK_BANK_3;
->> +		break;
->> +	default:
->> +		pr_warn("Unknown register bank %d\n", bank);
->> +		return -EINVAL;
->> +	}
->> +	write_sysreg_s(mdsel_bank << MDSELR_EL1_BANK_SHIFT, SYS_MDSELR_EL1);
->> +	isb();
->> +	return index;
->> +}
->> +
->>  static u64 read_wb_reg(int reg, int n)
->>  {
->>  	u64 val = 0;
->>  
->> +	if (is_debug_v8p9_enabled())
->> +		n = set_bank_index(n);
->> +
->>  	switch (reg + n) {
->>  	GEN_READ_WB_REG_CASES(AARCH64_DBG_REG_BVR, AARCH64_DBG_REG_NAME_BVR, val);
->>  	GEN_READ_WB_REG_CASES(AARCH64_DBG_REG_BCR, AARCH64_DBG_REG_NAME_BCR, val);
->> @@ -122,6 +152,9 @@ NOKPROBE_SYMBOL(read_wb_reg);
->>  
->>  static void write_wb_reg(int reg, int n, u64 val)
->>  {
->> +	if (is_debug_v8p9_enabled())
->> +		n = set_bank_index(n);
->> +
->>  	switch (reg + n) {
->>  	GEN_WRITE_WB_REG_CASES(AARCH64_DBG_REG_BVR, AARCH64_DBG_REG_NAME_BVR, val);
->>  	GEN_WRITE_WB_REG_CASES(AARCH64_DBG_REG_BCR, AARCH64_DBG_REG_NAME_BCR, val);
-> 
-> Are these things guaranteed to be only used in contexts where there
-> can be no interleaving of such operations? If any interleaving can
-> occur, this is broken.
-
-That is a valid concern, breakpoints and watchpoints get used in multiple
-code paths such perf, ptrace etc, where preemption might cause wrong bank
-to be selected before the breakpoint-watchpoint registers being read thus
-impacting the state. I guess preemption should be disabled between those
-two operations i.e selection of the bank and reading its registers
-
-> 
-> 	M.
-> 
+Thanks,
+Nick
