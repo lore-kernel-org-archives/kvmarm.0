@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78EB612BE8C
-	for <kvmarm@lists.linux.dev>; Tue, 16 Apr 2024 12:54:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CAF612C46C
+	for <kvmarm@lists.linux.dev>; Tue, 16 Apr 2024 13:08:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713272091; cv=none; b=cZJTHDjN69QTC7kJUTFG0ZMfkccTMc+eeN2fG28imTHjaPvt6eJb63rSCt27xZ7hodhzvoFsDKo9QJQOLa8p9V2yXCG6idKafbDPsZV4hqCkldbt3C2cdsGrcK9PPfzc5MI78ScTHEsP52EDGq5oQxhG/LSsZsG+p2Zjq8W8KNc=
+	t=1713272906; cv=none; b=VeH3FfWrlEPPXDeFJps8g26egF5uhbtt984m4ZnyQeKlxXjKElerogvzdP9OnnYK38oSGQIL422Dph2xSpA/31tjL3Xbin/UY2vzHuVKO98IYwsB1F5YWFaxYF2Q+NKghzllqelmCoKauFtNr+ekEXj8L5lbH4ZwiK/bpzhpgl8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713272091; c=relaxed/simple;
-	bh=VyDm+MEWA3EkjDZyaFTdyrK0FbHSjCtnD/RR7v9AxXA=;
+	s=arc-20240116; t=1713272906; c=relaxed/simple;
+	bh=A+MRMNgTaZBPZSsxKsalCzXF7JNrr0WxCI6cjmPe8c0=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EzRdkXb5eAqUS0MQB4PjKGBSzyw/MF8Mgepxek5WDe4b2nS70kqTbeTS238xtJIxD3IFBevWy+bshVLZ+4dCIsrTrPw5NFk25e0Ngx0YgKfQv4uNocpOOwD+lUicf1zSGskjEtgOLQK4VVxawqkS6BPs3DQCpprzzjAFKBiXSTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KLjrC6Sq; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=B8AXzCaPBlztATIyrMuGawGO8GYEAljWCHlpV1tqmQv9t9MaxUgSf2AQiPxEaNVztBQGvL1t4f1svTZrygoe8Aol/LxSQCuNoY1iKan/cQNibRz26fqc+ryQfv7LW8dhU7ZbJIlGTNIt/QXhlKq8wHeCqazH+4x6LvqBLSFuXgA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eJRtIWEs; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KLjrC6Sq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14139C113CE;
-	Tue, 16 Apr 2024 12:54:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eJRtIWEs"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D015C113CE;
+	Tue, 16 Apr 2024 13:08:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713272091;
-	bh=VyDm+MEWA3EkjDZyaFTdyrK0FbHSjCtnD/RR7v9AxXA=;
+	s=k20201202; t=1713272906;
+	bh=A+MRMNgTaZBPZSsxKsalCzXF7JNrr0WxCI6cjmPe8c0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=KLjrC6Sq4aNF3XEOS7wZjDcjBPmn7AIWT8aTj0xG6sOqbCbtRD3Pu7wWO4F1WR5bV
-	 zKDuENFgLAUDqBm3kUOBFAN+PZ5B0+zKcao9sWVR+iJIqWD4XQRBFitDwaxoteBQZ0
-	 9uLoVy97jumQuaq4ObE3u+YeSq7/rY8awLnSDjrBdcqkQgkrSPgGhJZEAaTNyYOasA
-	 c76pTyzbhZ8OECJ+n0WThg31MiHOYJHcWwfMUEcsoMUXJ0DkqxNRFrWvL0lDc8WL6s
-	 jNJrfuotSHkL3xNAorHwKW/JzRzdDfgBTkY8t0LOvKeCi1PrHs9RQ0YQldJbuQkV59
-	 wUBnVIt47vCmw==
+	b=eJRtIWEs0nuBHl2S4VObog2M2IZDlictSLBorudLRC65FQOgxkWcmcH3pkaxFjVuz
+	 r2CURJBzPNnLh6OKmgw3SVfyjwaa6OE7zXeYbEx7wqmpz5JCr4JWSW1YN7BzmbrQEP
+	 nMpH5iiYmbPUrxljJgBeALe9XLqdQB9Dn/DvB1ZrEyHyujX053beBbz7lMF8lanTvV
+	 /JJq+g8xouOu1SjXp+e7pq37r3PKzSQsZr4gAPBlI6FRKDav+LMWc34selkTMqokZJ
+	 q13FyocWF0Dkmb3VKMNc+moAHKsCHt3kNoBPgue4souvYmoKkDIlSH0aNuWe/vNM/D
+	 6vnKjYHrlj4fA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rwiKn-0051Db-0K;
-	Tue, 16 Apr 2024 13:54:49 +0100
-Date: Tue, 16 Apr 2024 13:54:48 +0100
-Message-ID: <861q75sc13.wl-maz@kernel.org>
+	id 1rwiXv-0051V0-W8;
+	Tue, 16 Apr 2024 14:08:24 +0100
+Date: Tue, 16 Apr 2024 14:08:23 +0100
+Message-ID: <86zfttqwu0.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Fuad Tabba <tabba@google.com>
 Cc: kvmarm@lists.linux.dev,
@@ -52,9 +52,10 @@ Cc: kvmarm@lists.linux.dev,
 	rananta@google.com,
 	smostafa@google.com
 Subject: Re: [PATCH v2 01/47] KVM: arm64: Allocate per-cpu memory for the host fpsimd state in pKVM
-In-Reply-To: <20240416095638.3620345-2-tabba@google.com>
+In-Reply-To: <861q75sc13.wl-maz@kernel.org>
 References: <20240416095638.3620345-1-tabba@google.com>
 	<20240416095638.3620345-2-tabba@google.com>
+	<861q75sc13.wl-maz@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -70,80 +71,89 @@ X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, will@kernel.org, qp
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 16 Apr 2024 10:55:52 +0100,
-Fuad Tabba <tabba@google.com> wrote:
+On Tue, 16 Apr 2024 13:54:48 +0100,
+Marc Zyngier <maz@kernel.org> wrote:
 > 
-> Allocate a per-cpu fpsimd_state to store the host's state when in
-> protected mode. Since the host_fpsimd_state pointer has been
-> excluded from kvm_vcpu_arch, no memory has been allocated to
-> store it in protected mode, and its value hasn't been set.
-
-Why do we need this? The EL2 already has its own private host state,
-which has a full FP state already.
-
-On non-pKVM, we save the host's view directly into the process
-state. Obviously, we can't do that with pKVM. But we can absolutely
-use the host context for that, and we shouldn't need any extra
-allocation.
-
-> Fixes: 51e09b5572d6 ("KVM: arm64: Exclude host_fpsimd_state pointer from kvm_vcpu_arch")
-> Signed-off-by: Fuad Tabba <tabba@google.com>
-> ---
->  arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  1 +
->  arch/arm64/kvm/hyp/nvhe/pkvm.c         | 18 ++++++++++++++++++
->  arch/arm64/kvm/hyp/nvhe/setup.c        |  1 +
->  3 files changed, 20 insertions(+)
+> On Tue, 16 Apr 2024 10:55:52 +0100,
+> Fuad Tabba <tabba@google.com> wrote:
+> > 
+> > Allocate a per-cpu fpsimd_state to store the host's state when in
+> > protected mode. Since the host_fpsimd_state pointer has been
+> > excluded from kvm_vcpu_arch, no memory has been allocated to
+> > store it in protected mode, and its value hasn't been set.
 > 
-> diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-> index 82b3d62538a6..20c3f6e13b99 100644
-> --- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-> +++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-> @@ -54,6 +54,7 @@ pkvm_hyp_vcpu_to_hyp_vm(struct pkvm_hyp_vcpu *hyp_vcpu)
->  }
->  
->  void pkvm_hyp_vm_table_init(void *tbl);
-> +void pkvm_host_fpsimd_state_init(void);
->  
->  int __pkvm_init_vm(struct kvm *host_kvm, unsigned long vm_hva,
->  		   unsigned long pgd_hva);
-> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> index 26dd9a20ad6e..16ccb69e6479 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> @@ -18,6 +18,14 @@ unsigned long __icache_flags;
->  /* Used by kvm_get_vttbr(). */
->  unsigned int kvm_arm_vmid_bits;
->  
-> +/*
-> + * Host FPSIMD state. Written to when the guest accesses its own FPSIMD state,
-> + * and read when the guest state is live and we need to switch back to the host.
-> + *
-> + * Only valid when guest_owns_fp_regs() is true.
-> + */
-> +DEFINE_PER_CPU(struct user_fpsimd_state, host_fpsimd_state);
-> +
->  /*
->   * Set trap register values based on features in ID_AA64PFR0.
->   */
-> @@ -247,6 +255,16 @@ void pkvm_hyp_vm_table_init(void *tbl)
->  	vm_table = tbl;
->  }
->  
-> +void pkvm_host_fpsimd_state_init(void)
-> +{
-> +	unsigned long i;
-> +
-> +	for (i = 0; i < hyp_nr_cpus; i++) {
-> +		per_cpu_ptr(&kvm_host_data, i)->fpsimd_state =
-> +			per_cpu_ptr(&host_fpsimd_state, i);
-> +	}
+> Why do we need this? The EL2 already has its own private host state,
+> which has a full FP state already.
+> 
+> On non-pKVM, we save the host's view directly into the process
+> state. Obviously, we can't do that with pKVM. But we can absolutely
+> use the host context for that, and we shouldn't need any extra
+> allocation.
+> 
+> > Fixes: 51e09b5572d6 ("KVM: arm64: Exclude host_fpsimd_state pointer from kvm_vcpu_arch")
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > ---
+> >  arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  1 +
+> >  arch/arm64/kvm/hyp/nvhe/pkvm.c         | 18 ++++++++++++++++++
+> >  arch/arm64/kvm/hyp/nvhe/setup.c        |  1 +
+> >  3 files changed, 20 insertions(+)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+> > index 82b3d62538a6..20c3f6e13b99 100644
+> > --- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+> > +++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+> > @@ -54,6 +54,7 @@ pkvm_hyp_vcpu_to_hyp_vm(struct pkvm_hyp_vcpu *hyp_vcpu)
+> >  }
+> >  
+> >  void pkvm_hyp_vm_table_init(void *tbl);
+> > +void pkvm_host_fpsimd_state_init(void);
+> >  
+> >  int __pkvm_init_vm(struct kvm *host_kvm, unsigned long vm_hva,
+> >  		   unsigned long pgd_hva);
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> > index 26dd9a20ad6e..16ccb69e6479 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> > @@ -18,6 +18,14 @@ unsigned long __icache_flags;
+> >  /* Used by kvm_get_vttbr(). */
+> >  unsigned int kvm_arm_vmid_bits;
+> >  
+> > +/*
+> > + * Host FPSIMD state. Written to when the guest accesses its own FPSIMD state,
+> > + * and read when the guest state is live and we need to switch back to the host.
+> > + *
+> > + * Only valid when guest_owns_fp_regs() is true.
+> > + */
+> > +DEFINE_PER_CPU(struct user_fpsimd_state, host_fpsimd_state);
+> > +
+> >  /*
+> >   * Set trap register values based on features in ID_AA64PFR0.
+> >   */
+> > @@ -247,6 +255,16 @@ void pkvm_hyp_vm_table_init(void *tbl)
+> >  	vm_table = tbl;
+> >  }
+> >  
+> > +void pkvm_host_fpsimd_state_init(void)
+> > +{
+> > +	unsigned long i;
+> > +
+> > +	for (i = 0; i < hyp_nr_cpus; i++) {
+> > +		per_cpu_ptr(&kvm_host_data, i)->fpsimd_state =
+> > +			per_cpu_ptr(&host_fpsimd_state, i);
+> > +	}
+> 
+> I'd expect this to be instead:
+> 
+> 	for (i = 0; i < hyp_nr_cpus; i++)
+> 		per_cpu_ptr(&kvm_host_data, i)->fpsimd_state = &(per_cpu_ptr(&host_host_data, i)->fp_regs);
+> 
 
-I'd expect this to be instead:
+The astute reader will have noticed that this should actually be:
 
-	for (i = 0; i < hyp_nr_cpus; i++)
-		per_cpu_ptr(&kvm_host_data, i)->fpsimd_state = &(per_cpu_ptr(&host_host_data, i)->fp_regs);
+ 	for (i = 0; i < hyp_nr_cpus; i++)
+ 		per_cpu_ptr(&kvm_host_data, i)->fpsimd_state = &(per_cpu_ptr(&host_host_data, i)->host_ctxt.fp_regs);
 
-and the static allocation to go away.
+Everything else still stands for at least another 5 minutes.
 
 Thanks,
 
