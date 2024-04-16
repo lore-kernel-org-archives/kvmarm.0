@@ -1,55 +1,55 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 999ED85929
-	for <kvmarm@lists.linux.dev>; Tue, 16 Apr 2024 09:57:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA73A85929
+	for <kvmarm@lists.linux.dev>; Tue, 16 Apr 2024 09:57:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713261443; cv=none; b=lOdBW6Wmm//ofcZ3tekWtx7nlmL8hBQ7wwxWl6vf0JGw/2wuNr/WQ+fsTKj7w608nZg3je1bdU6uGjwFYO2vRFUWhpB4plEf/q6DvsgfaLM8EbuUtV7GlcCjGtY0Ck9pgxYetBCiOHlakRjCUV1SL9xtOOcw30MtY1P1JMpQ3Hc=
+	t=1713261445; cv=none; b=LBaHe961L0NBAMsZGAZ/m5QZ6lbbxrP3j76uXGv3PngU4B7jWAT5suIP/XasEtGKzHKoKbES8th1i1FAdbjLlS59GtmhLYNxNCWw83xuTv6RyB9G71g+eSIcKoBhtxzaKyOkgzAJgfKNtLrM1M1tIhzqpRDXljVeaezCqJuVRmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713261443; c=relaxed/simple;
-	bh=JKkEG2AlHclttX3lTkDrneutyQs94t9l+qGtlTDyWDA=;
+	s=arc-20240116; t=1713261445; c=relaxed/simple;
+	bh=uPgLgTaapD55PWuOwaKx5YVUzvZyzy0+mesSP7AZhRM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=iDWomNiAE1A9e0s9qPRafp7jaP1zY6TMPbn1f/PvbHXvy+7KXw60On8j7/UAJoExMZlhFmnBBaXiIQQCIFtTAOnqboyDpQ+8Wpoba0z5y/zSBAZDW5Tlg76yltwRRG8fe+tY0jB0NgfEK1eywo/R6JPLMerJw2UnKmSoQfWoPoM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dCUOep4Z; arc=none smtp.client-ip=209.85.128.73
+	 To:Cc:Content-Type; b=lC53AwbXTW2wgDQCGIzBnCC+i/4u6zlWgEI7ckb7DFJWxHe7n+bazXIxNW7X3hELNIEfvRx8os9Hmk0Y5ZujdIdH26qp4U2yKNb8MBeMIqkHpQCXHMeARj1bSIp/R2expS8TLzvuGDFrxyQw5GKoLLXdgC/Ypl+nZ9emIc4YuL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qL1Xb396; arc=none smtp.client-ip=209.85.221.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dCUOep4Z"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-416ac21981dso21910515e9.1
-        for <kvmarm@lists.linux.dev>; Tue, 16 Apr 2024 02:57:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qL1Xb396"
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-343bb240f70so2707843f8f.1
+        for <kvmarm@lists.linux.dev>; Tue, 16 Apr 2024 02:57:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713261440; x=1713866240; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1713261442; x=1713866242; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0jKJqTwWifoAIBL40mnASpfCVEuJxEZevWWy3VXKhCE=;
-        b=dCUOep4Z/DiRn04asjp3zwJoq8KrxKg7o9UsMDJPRY02InIF15M2xpSyrktSfVPU9Q
-         ri9z6tNshW9s4S8GNeI48dy/jl0khGHxEkF6GbRXMUksgrN38ZHFC0DSBDdPK84MY6hH
-         YSIBSwcVGf9R2FME4Aa+b7O3v4WsaV7cxkhF9yUXYMKb466J0YrJfegkvPC5WvxL2CZ3
-         H5RaA7pAZFLpOkd8SWbZ33dGyMPmbFukRkW0m+TLvXypM1bI0552Nrg86c5NVB2c26AF
-         Kar54afaOv/HvtYczK/9vRMjcOEfLka3Yhli8fDKD1kaKlidXapS+wZ/zUlX31q8ntb4
-         S23g==
+        bh=ROgE0JlT/QyHUtEJW/bJmZakeWq4h9AMaqCBZS7Aw1Y=;
+        b=qL1Xb3969MCyNsvPjDEMXMhVm/z4ikPECfOSVdWhxBBYfnwuMQf99SSMNzz/ANIIIv
+         zs50ThUNUIITQuNhmUVD+D+EovGFsNzxUgSIkkPO2FM8CD8VgwRaniR5kue0kKzm4XXu
+         Q7yphUSkJYa4j1UKCBeAyj7ul4m0D4wLSEGfuTL7kxdYsjaPei9nkCpT8obdSW9h4Ax1
+         sSvwzLGobm8h6FDpdVorN2YcIA3lV1x4lc6fyHleIcX28BBd97V+71oH12d5EmvqHlO3
+         EMpo/oFLMTGgId+epCX2RDoQzIBCyp6v3O2Zqa09hriEOzoP35JW8feO8AFEbP4XiV5Q
+         jK+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713261440; x=1713866240;
+        d=1e100.net; s=20230601; t=1713261442; x=1713866242;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0jKJqTwWifoAIBL40mnASpfCVEuJxEZevWWy3VXKhCE=;
-        b=PDWxs1GFo+7dWA/wdekqUBSKzkg9OrJetN2/lQmWJaGnLRokAw6qLMhNuggprtr5yb
-         jiCi2GkoTEv0fCHfUIGxZ6EPXIsXwzMUKk0ppZNE7fr5OOmCILX9AP1JF70MYbRs5TIU
-         fcJXd47RPJEdgajIEzr+7/xmnUkX5dd1FmL7RmMyuAdZXG6mIgtwgpOEZB/aSJM4/om5
-         F/t5jS94+nco5eEiGY62UtBA9qD8gcJBgN7bun1Yf1m8wMyijUfDj3dwVSb+17RcZNNw
-         MSO5CtJlT6D0oDK6B/CNmVXftI59WChEUimTJLOy21RdOow3Semm3lml/MV+tgtc7FHi
-         CjwQ==
-X-Gm-Message-State: AOJu0Yx6bT1cgzU+aL+x19l+GpHO7YUu07i90FC6aRuFBQWgOIC/mTCd
-	hAkU7C/KYomTaUY6rC2dyOFvN0oDA3gUSujDaqOdgzKe3GvH/XU2lMQ6DTIjWPU3NEql3YxrVJZ
-	LLC0W9DdfDjVQVghh2wjR49AWdxGDxwy8ciP+LqGnTaJ1LxoigNnSxrQiEgvYSqNIxyzJ7bvHpj
-	5x7DC/v5mRs8P0chCHx4dXbLq3K10=
-X-Google-Smtp-Source: AGHT+IFLroet/ohSMzJsmm6sepHK62mo8C8Vqfg4NJeF5FqvJRAGEIiaNQ5WFK81EcFlOK7/Z7kzUh41Sg==
+        bh=ROgE0JlT/QyHUtEJW/bJmZakeWq4h9AMaqCBZS7Aw1Y=;
+        b=k2SE+TeZKBazfsyO580yxkWv4OkjOZiELIlEh2+ns2wt/lnOANInhu24NFc5I1yfzV
+         jYgnagPNL6G9PJJbzmZPIOgSpTL+pfAy2dF2+UPJoPAcffbmZht0DNQtobLPu+l3dd3W
+         u7Y4ozbsSXhAne7CjyEbFiFD44q2HROKbtCFYmX/VywVeFfRwcYQzgIFbeVCuc4NSmCl
+         X3Spg2r9A4g3/+R1QGLszSc31zbBGEHt74MQVcGICu21abIVrrYDbnBNuZoL5MR/3dnT
+         GmL1A7ZOmUOP95GU/gLcF/BabHvs9+Q29E/7MdJL5frXK/umBDcDeWpFQr6+GPyxwYIL
+         n6yA==
+X-Gm-Message-State: AOJu0Yy7HlwzFghNn/pmANP2xheRipM+DTielDKlu6vo7a6rk1uK/tnM
+	SJy3v3blLXQD30RCW5ZnE2hxxY3qkOyAKseHmIA9iisO6wAOt9C6ThvK8M4VaRI8XUbaGc8RYP+
+	FOIAteyZnM2sernkITVWpHDYtNgaaFYwhetxFhM6XpuKKF83lYYVvTscl+0p63H6pA4yOvwfCmT
+	C8KQ6cJJddwNpHjHfCOKqvNaabCd4=
+X-Google-Smtp-Source: AGHT+IFhZVttPDd8/sCXkVW/WnFZ0oWAhzML69PFNQDJRdUir7aQ5rLEM7PfW/81BwiBq4L/bHi52Ff+7Q==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:600c:35d3:b0:418:9fd3:6e71 with SMTP id
- r19-20020a05600c35d300b004189fd36e71mr25770wmq.2.1713261439764; Tue, 16 Apr
- 2024 02:57:19 -0700 (PDT)
-Date: Tue, 16 Apr 2024 10:56:08 +0100
+ (user=tabba job=sendgmr) by 2002:adf:ce0c:0:b0:345:ef05:39d8 with SMTP id
+ p12-20020adfce0c000000b00345ef0539d8mr4701wrn.2.1713261441869; Tue, 16 Apr
+ 2024 02:57:21 -0700 (PDT)
+Date: Tue, 16 Apr 2024 10:56:09 +0100
 In-Reply-To: <20240416095638.3620345-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,9 +59,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240416095638.3620345-1-tabba@google.com>
 X-Mailer: git-send-email 2.44.0.683.g7961c838ac-goog
-Message-ID: <20240416095638.3620345-18-tabba@google.com>
-Subject: [PATCH v2 17/47] KVM: arm64: Refactor calculating SVE state size to
- use helpers
+Message-ID: <20240416095638.3620345-19-tabba@google.com>
+Subject: [PATCH v2 18/47] KVM: arm64: Do not map the host fpsimd state to hyp
+ in pKVM
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev
 Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com, 
@@ -71,53 +71,107 @@ Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com,
 	joey.gouly@arm.com, rananta@google.com, smostafa@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-The main factor for determining the SVE state size is the vector
-length, and future patches will need to calculate it without
-necessarily having a vcpu as a reference.
-
-No functional change intended.
+pKVM maintains its own state at EL2 for tracking the host fpsimd
+state.  Therefore, no need to map and share the host's view with
+it.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
+Reviewed-by: Mark Brown <broonie@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |  2 --
+ arch/arm64/kvm/fpsimd.c           | 31 ++++---------------------------
+ arch/arm64/kvm/reset.c            |  1 -
+ 3 files changed, 4 insertions(+), 30 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 9e4b044d4cea..39025b8af6de 100644
+index 39025b8af6de..9c4bed737d35 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -856,22 +856,24 @@ struct kvm_vcpu_arch {
- #define vcpu_sve_pffr(vcpu) (kern_hyp_va((vcpu)->arch.sve_state) +	\
- 			     sve_ffr_offset((vcpu)->arch.sve_max_vl))
+@@ -664,7 +664,6 @@ struct kvm_vcpu_arch {
+ 	struct kvm_guest_debug_arch vcpu_debug_state;
+ 	struct kvm_guest_debug_arch external_debug_state;
  
--#define vcpu_sve_max_vq(vcpu)	sve_vq_from_vl((vcpu)->arch.sve_max_vl)
+-	struct task_struct *parent_task;
+ 
+ 	/* VGIC state */
+ 	struct vgic_cpu vgic_cpu;
+@@ -1253,7 +1252,6 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu);
+ void kvm_arch_vcpu_ctxflush_fp(struct kvm_vcpu *vcpu);
+ void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu);
+ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu);
+-void kvm_vcpu_unshare_task_fp(struct kvm_vcpu *vcpu);
+ 
+ static inline bool kvm_pmu_counter_deferred(struct perf_event_attr *attr)
+ {
+diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
+index b78b87a120c5..51a1b18858b3 100644
+--- a/arch/arm64/kvm/fpsimd.c
++++ b/arch/arm64/kvm/fpsimd.c
+@@ -14,19 +14,6 @@
+ #include <asm/kvm_mmu.h>
+ #include <asm/sysreg.h>
+ 
+-void kvm_vcpu_unshare_task_fp(struct kvm_vcpu *vcpu)
+-{
+-	struct task_struct *p = vcpu->arch.parent_task;
+-	struct user_fpsimd_state *fpsimd;
 -
--#define vcpu_sve_state_size(vcpu) ({					\
-+#define sve_state_size(sve_max_vl) ({					\
- 	size_t __size_ret;						\
--	unsigned int __vcpu_vq;						\
-+	unsigned int __vq;						\
- 									\
--	if (WARN_ON(!sve_vl_valid((vcpu)->arch.sve_max_vl))) {		\
-+	if (WARN_ON(!sve_vl_valid(sve_max_vl))) {			\
- 		__size_ret = 0;						\
- 	} else {							\
--		__vcpu_vq = vcpu_sve_max_vq(vcpu);			\
--		__size_ret = SVE_SIG_REGS_SIZE(__vcpu_vq);		\
-+		__vq = sve_vq_from_vl(sve_max_vl);			\
-+		__size_ret = SVE_SIG_REGS_SIZE(__vq);			\
- 	}								\
- 									\
- 	__size_ret;							\
- })
+-	if (!is_protected_kvm_enabled() || !p)
+-		return;
+-
+-	fpsimd = &p->thread.uw.fpsimd_state;
+-	kvm_unshare_hyp(fpsimd, fpsimd + 1);
+-	put_task_struct(p);
+-}
+-
+ /*
+  * Called on entry to KVM_RUN unless this vcpu previously ran at least
+  * once and the most recent prior KVM_RUN for this vcpu was called from
+@@ -38,28 +25,18 @@ void kvm_vcpu_unshare_task_fp(struct kvm_vcpu *vcpu)
+  */
+ int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu)
+ {
+-	int ret;
+-
+ 	struct user_fpsimd_state *fpsimd = &current->thread.uw.fpsimd_state;
++	int ret;
  
-+#define vcpu_sve_max_vq(vcpu) sve_vq_from_vl((vcpu)->arch.sve_max_vl)
-+
-+#define vcpu_sve_state_size(vcpu) sve_state_size((vcpu)->arch.sve_max_vl)
-+
- #define KVM_GUESTDBG_VALID_MASK (KVM_GUESTDBG_ENABLE | \
- 				 KVM_GUESTDBG_USE_SW_BP | \
- 				 KVM_GUESTDBG_USE_HW | \
+-	kvm_vcpu_unshare_task_fp(vcpu);
++	/* pKVM has its own tracking of the host fpsimd state. */
++	if (is_protected_kvm_enabled())
++		return 0;
+ 
+ 	/* Make sure the host task fpsimd state is visible to hyp: */
+ 	ret = kvm_share_hyp(fpsimd, fpsimd + 1);
+ 	if (ret)
+ 		return ret;
+ 
+-	/*
+-	 * We need to keep current's task_struct pinned until its data has been
+-	 * unshared with the hypervisor to make sure it is not re-used by the
+-	 * kernel and donated to someone else while already shared -- see
+-	 * kvm_vcpu_unshare_task_fp() for the matching put_task_struct().
+-	 */
+-	if (is_protected_kvm_enabled()) {
+-		get_task_struct(current);
+-		vcpu->arch.parent_task = current;
+-	}
+-
+ 	return 0;
+ }
+ 
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index 29ae68f60bef..3d8064bf67c8 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -139,7 +139,6 @@ void kvm_arm_vcpu_destroy(struct kvm_vcpu *vcpu)
+ {
+ 	void *sve_state = vcpu->arch.sve_state;
+ 
+-	kvm_vcpu_unshare_task_fp(vcpu);
+ 	kvm_unshare_hyp(vcpu, vcpu + 1);
+ 	if (sve_state)
+ 		kvm_unshare_hyp(sve_state, sve_state + vcpu_sve_state_size(vcpu));
 -- 
 2.44.0.683.g7961c838ac-goog
 
