@@ -1,83 +1,123 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 453B9127E3B
-	for <kvmarm@lists.linux.dev>; Tue, 16 Apr 2024 10:57:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 455A112838A;
+	Tue, 16 Apr 2024 11:17:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713265050; cv=none; b=M3lAqnkVyTC7hm73HHTefu6hFCuEKoFqDKOsQZ4vhkNDKTO3gPuMOOnbZObaM+FMrIPC/JguFR6wFW4R9C1sIOcHU8ByAQT3Pi9VBEJ4vz69zLK/T4DyYY4XaTT6Z0jX5sszEXcZadRBsVDPr6wz3sb34fBd9paZoW8+Xcg8R0I=
+	t=1713266232; cv=none; b=UNy8mslyF5OJhIqKrgSWAiuJxhkT93vK//mRZ2yFjMdD7DhBMJyoHCPYb0PicS86iROdROKJ9ZwB8zAQ4BJchITJxVluyPIH5/hlBdH2fZyVS801oF0AEy96LaTktN5BSJ5IYAdGRkQutVuIeBvqhy/ojdS6l2p5Q5dQCPrr4ew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713265050; c=relaxed/simple;
-	bh=olyoAKtbkKU2EfEIR+bN3aTZZqwogUsVdORoA8Y7DI4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ol/6RzUenoQ1KHkMb02ZdKs3oX9uu/jcTV6xowRd89ZHkpCF6Fk1GtY66XM3lLbOsXmeZGYQ04cGFYA5Jrqk698rVOANkzMq+8JbJL/Qm2nP925esZh4kcRtBqpmHE/mF0eADnTv3DUNoHw2UbDS/F5ag2IgWOMK07k1ThRhqGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Iw0WRtVc; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Iw0WRtVc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77042C113CE;
-	Tue, 16 Apr 2024 10:57:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713265049;
-	bh=olyoAKtbkKU2EfEIR+bN3aTZZqwogUsVdORoA8Y7DI4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Iw0WRtVc7Kwo77AL4BSNh5phglc7B5YB2UkDGLjTXKjOPxxdtxNQNbpToVNo9EABd
-	 kplWZZ9zjaG2C58m33ZLZeeya/dO+Rj4yWqnY4EZtVSM+fSXtNLlsvwiRbjllFQrBr
-	 1G0XEEFp1/7olrmu7MXP9gfzDEYZ6ZIqOJkXp/abqbOZj4Lwzdu6njC3xL03bsvJ5N
-	 Qquh7w4stexVu4ZbPeAqd0CgYDvk4m62TZyJuxUU/5uXhKeh3KwVb+z0YvATqr0hjr
-	 1OguZep6SFe6rem//dBq2b3evC9NerKfXMXX5NHeaU+UT2lXJ8iJOa2VY2Dze8PCee
-	 yPRi3ojA91CaQ==
-Date: Tue, 16 Apr 2024 19:57:27 +0900
-From: Mark Brown <broonie@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvmarm@lists.linux.dev, maz@kernel.org, will@kernel.org,
-	qperret@google.com, seanjc@google.com, alexandru.elisei@arm.com,
-	catalin.marinas@arm.com, philmd@linaro.org, james.morse@arm.com,
-	suzuki.poulose@arm.com, oliver.upton@linux.dev,
-	mark.rutland@arm.com, joey.gouly@arm.com, rananta@google.com,
-	smostafa@google.com
-Subject: Re: [PATCH v2 01/47] KVM: arm64: Allocate per-cpu memory for the
- host fpsimd state in pKVM
-Message-ID: <Zh5Zl6uoOzQOEpqh@finisterre.sirena.org.uk>
-References: <20240416095638.3620345-1-tabba@google.com>
- <20240416095638.3620345-2-tabba@google.com>
+	s=arc-20240116; t=1713266232; c=relaxed/simple;
+	bh=9FhYJpvHXnQmHxgxXicQhyk+mTtDwkQy/D0WwG1gg9s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UKZVOjg1idCHDY7Wy5mm/i4QacZyZzFCoImZ/eI4jkrUQxFwBTKBPAd1sJrfI27wHKcfJR+mcP6H7WrEmgHEYKNhbWhycqG3FYPIOSUwdF4/REKcLW9Y09abzmMqs8qdwrAbWLc8m8YLlFnSXXGh4VEf0jnl+PH/t5cFatmsVdQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A532F339;
+	Tue, 16 Apr 2024 04:17:38 -0700 (PDT)
+Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3473C3F738;
+	Tue, 16 Apr 2024 04:17:08 -0700 (PDT)
+Message-ID: <d452859e-8b35-4aac-83d5-5b8d44ed4406@arm.com>
+Date: Tue, 16 Apr 2024 12:17:06 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="r9WePB6+xP9iWgd+"
-Content-Disposition: inline
-In-Reply-To: <20240416095638.3620345-2-tabba@google.com>
-X-Cookie: You might have mail.
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 04/43] arm64: RME: Handle Granule Protection Faults
+ (GPFs)
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+References: <20240412084056.1733704-1-steven.price@arm.com>
+ <20240412084309.1733783-1-steven.price@arm.com>
+ <20240412084309.1733783-5-steven.price@arm.com>
+Content-Language: en-US
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20240412084309.1733783-5-steven.price@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+
+On 12/04/2024 09:42, Steven Price wrote:
+> If the host attempts to access granules that have been delegated for use
+> in a realm these accesses will be caught and will trigger a Granule
+> Protection Fault (GPF).
+> 
+> A fault during a page walk signals a bug in the kernel and is handled by
+> oopsing the kernel. A non-page walk fault could be caused by user space
+> having access to a page which has been delegated to the kernel and will
+> trigger a SIGBUS to allow debugging why user space is trying to access a
+> delegated page.
+> 
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+>   arch/arm64/mm/fault.c | 29 ++++++++++++++++++++++++-----
+>   1 file changed, 24 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
+> index 8251e2fea9c7..91da0f446dd9 100644
+> --- a/arch/arm64/mm/fault.c
+> +++ b/arch/arm64/mm/fault.c
+> @@ -765,6 +765,25 @@ static int do_tag_check_fault(unsigned long far, unsigned long esr,
+>   	return 0;
+>   }
+>   
+> +static int do_gpf_ptw(unsigned long far, unsigned long esr, struct pt_regs *regs)
+> +{
+> +	const struct fault_info *inf = esr_to_fault_info(esr);
+> +
+> +	die_kernel_fault(inf->name, far, esr, regs);
+> +	return 0;
+> +}
+> +
+> +static int do_gpf(unsigned long far, unsigned long esr, struct pt_regs *regs)
+> +{
+> +	const struct fault_info *inf = esr_to_fault_info(esr);
+> +
+> +	if (!is_el1_instruction_abort(esr) && fixup_exception(regs))
+> +		return 0;
+> +
+> +	arm64_notify_die(inf->name, regs, inf->sig, inf->code, far, esr);
+> +	return 0;
+> +}
+> +
+>   static const struct fault_info fault_info[] = {
+>   	{ do_bad,		SIGKILL, SI_KERNEL,	"ttbr address size fault"	},
+>   	{ do_bad,		SIGKILL, SI_KERNEL,	"level 1 address size fault"	},
+> @@ -802,11 +821,11 @@ static const struct fault_info fault_info[] = {
+>   	{ do_alignment_fault,	SIGBUS,  BUS_ADRALN,	"alignment fault"		},
+>   	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 34"			},
+>   	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 35"			},
+
+Should this also be converted to do_gpf_ptw, "GPF at level -1", given we 
+support LPA2 ?
 
 
---r9WePB6+xP9iWgd+
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+> -	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 36"			},
+> -	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 37"			},
+> -	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 38"			},
+> -	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 39"			},
+> -	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 40"			},
+> +	{ do_gpf_ptw,		SIGKILL, SI_KERNEL,	"Granule Protection Fault at level 0" },
+> +	{ do_gpf_ptw,		SIGKILL, SI_KERNEL,	"Granule Protection Fault at level 1" },
+> +	{ do_gpf_ptw,		SIGKILL, SI_KERNEL,	"Granule Protection Fault at level 2" },
+> +	{ do_gpf_ptw,		SIGKILL, SI_KERNEL,	"Granule Protection Fault at level 3" },
+> +	{ do_gpf,		SIGBUS,  SI_KERNEL,	"Granule Protection Fault not on table walk" },
+>   	{ do_bad,		SIGKILL, SI_KERNEL,	"level -1 address size fault"	},
+>   	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 42"			},
+>   	{ do_translation_fault,	SIGSEGV, SEGV_MAPERR,	"level -1 translation fault"	},
 
-On Tue, Apr 16, 2024 at 10:55:52AM +0100, Fuad Tabba wrote:
-> Allocate a per-cpu fpsimd_state to store the host's state when in
-> protected mode. Since the host_fpsimd_state pointer has been
-> excluded from kvm_vcpu_arch, no memory has been allocated to
-> store it in protected mode, and its value hasn't been set.
 
-Reviewed-by: Mark Brown <broonie@kernel.org>
+Rest looks fine to me.
 
---r9WePB6+xP9iWgd+
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmYeWZYACgkQJNaLcl1U
-h9DZoAf/SOXWXKE7R6rg2hfE/JUg0a7e/oHOxTmdZqURJ7KWqKDjwhC6uJq2UVPT
-1lgdvQqrYE1WpIdZieww2ta6gmeNldOnAGYT6Xqj6GxxhkB9wYdi9EG7M+U8/zrp
-sjqZsr0poFkFSZXlh2F03y3QZ9y/s6IZyFj0Wp6xctM1zEG06/ROPTrOL+bw6E+s
-kreOJ4Q5H6/tcb21c1w4rvme/UzuvVLPKPQpe+uhnQu3crwAXj6QvX4zAm/j+pLx
-SD3mjX1EQZvdyFSNZJqNeCjAubro6zMU7MeBImevE5SoJPLruidvbfqcMrJ4tMak
-7gGq51mU25p39kYK6yULgfT8HnZwWw==
-=E/Ve
------END PGP SIGNATURE-----
-
---r9WePB6+xP9iWgd+--
+Suzuki
