@@ -1,55 +1,55 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5E7E82D82
-	for <kvmarm@lists.linux.dev>; Tue, 16 Apr 2024 09:58:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7459A8664B
+	for <kvmarm@lists.linux.dev>; Tue, 16 Apr 2024 09:58:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713261501; cv=none; b=vF3pIG8dcW/blGSC4BgHePrWgzIj0rdE+euTJLoMWbOdhdC/NymvuuPxZ0wk5ciPuruw8KK7hesypNpRPD8xo2t7BdJNQOgoJ4LNONy9ao245bB3e6d/olmwkS+IuumWmX/GB8tvVrH8WBgJVv6mW9FvfDxWhLHLXhY09wK/98Q=
+	t=1713261503; cv=none; b=cLgJKr0pHQp7JwRtSKJHJSxD+JTVbWNlEQmnuu2VjBJlA8Vllo2hwQbavgD8vL110Y65Xjl9WL3LW+oLh3Xer21n86zfthswXov2yuZn4BeSuy2E1RiAByagTQS4gOucuwEozols2XhjNntnmhUrDVyNk7MWZp0LJ4b8FqCGQag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713261501; c=relaxed/simple;
-	bh=GhYIbm4cX1n4ox/5CsEE9+JIELQNT5X+xB8qhY2QRKQ=;
+	s=arc-20240116; t=1713261503; c=relaxed/simple;
+	bh=XbOwtsuAHG0HXvsOc/mNxIwujBTOr4lyy/xXHhAO9iE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ZvI7zrfI2Fs/b3dHbw6M7U/WNVPkr+2UN3OEKEYtQmuQW+e49LT1OZuC22ye48X+GeZE+/DzkhPdYNbpeI96XJkH84Q/LLihuwlnAIPBfDAYFH41FwEoo5JltFCefzcN+CybPXey4KpYOE91XTn0ya/7rGzZs4z/D2MiLHGWQqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=c3PSV/HY; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=Rhui3rYuHNvyWM0bERor+h0zr9UN+3OYi7fAQxXL5qbF8bJ6JV37wuQ1wJGaEywV3rcEm+hh/ES9Bi48oRGX06i4391LYsYY2v1NzZO0NCdz3q8K2ruRiwrCBSmS/dgUNS+IJmVlHugDKt55l0/C9rJ67C3AC5WM4JHGtP0sOeY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rx6aX7nq; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="c3PSV/HY"
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-61814249649so70176147b3.3
-        for <kvmarm@lists.linux.dev>; Tue, 16 Apr 2024 02:58:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rx6aX7nq"
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dced704f17cso7122664276.1
+        for <kvmarm@lists.linux.dev>; Tue, 16 Apr 2024 02:58:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713261499; x=1713866299; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1713261501; x=1713866301; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MOBd5Z7KCj/kCpPtLl6MQ+Mcjjs3q6/M4oyw1j84Sn0=;
-        b=c3PSV/HYQoLXcVZiqap4Q4K13TRLs4xRjn3D9naSklitB21yxmM0NoUM4zW5nMv46w
-         diNa7OiTanygCj7Zwf+ifwpsdmo679fmucgncqpUNQAuQ+gRePzNI913e8w8sFgS0Ygv
-         DIO8+gN5UlMp5EKFXPS7VtF4FGoO85M5ZNB/CS3zvrR3HKyh/IeK7ijFFmV9V6FyBr4R
-         bsTe+Vt9djI4xTOWi57xrh1uL4P/GP5iV3w43XDoBf/9JYYkyLIoiG/f1hflryQ4h8JG
-         ameAtDDrZ9g6EuKIAd4ixQ3d1Gjq3v+cWKC5J95XTZc1iBqWRcQVwMu3UquRRgciiFap
-         dp3g==
+        bh=d5WVjI35GVkkSAI7X82yBFdxJ6M9HJ12u6871QZ2KQU=;
+        b=rx6aX7nqJjMAAlm/xYeHCZ1jR3RuafGySLfy4SD5ppUdTSpt23OfEQkleaH1j++x+h
+         LIjY1EQmvU7MSO9RlzYNsDADcSEDRiGhlWYKY7fyfuXIgN5uJME5gr7+TmYgk4fZuN2j
+         xHmXQP0Mks23SUfhrM4GUBS1g8S6y968ilKvs5ECEbWjL0w5V7KnCChTPGQY04p8Wvn7
+         kZ0Zqf0gHelvmKieZPXGe+oMOV3P2OgOSMx7LViOOTJacTNCJq3OoowmNUwWQyUV3/i+
+         GT7OEcwvPzXWzEvWv4DSKBF2CjW2s8OwyfP2RCeviqFhMrZWuexJn/av6p+zUzlbEKct
+         EWCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713261499; x=1713866299;
+        d=1e100.net; s=20230601; t=1713261501; x=1713866301;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MOBd5Z7KCj/kCpPtLl6MQ+Mcjjs3q6/M4oyw1j84Sn0=;
-        b=eifhw+0ayI0N1lO5wb5G9bEczt28ZIldKLPxFsjgRCJJBl4CldeEPRXFUyI55wVqZp
-         oidUkcwPkr35kr5cXjr7at10A5cqkiUCWB/mbua1LwmfZn+N32ErlrHxZpVXYUPYyQM1
-         PbT8xw9vuah5ZxoCFXVukfKqlY3Madh3YEjsfD795TEM/WgLkAEwwK4XBT1XuLv935J+
-         M/vI7/Snc6I1r/rVpwIKYkrK0hbJ2BjzITnxyzZiwjOn+nYXUKVncamZQGqyE41clHjQ
-         Kho+zmd9sC1OIgppJZy5XBKmw19c+OM/fBBw7vmFwQhXZauY4AY/Vptn+bohdEDr9mLq
-         fKNg==
-X-Gm-Message-State: AOJu0YxDmgXuJk8uNg6+LN4AyzTJ6UqnPSQMc8TW5PIcvuatf0sJuo2+
-	J1Ve1hz9MYKJVf+7S5mxOlN1TjPgmFwhrbRSGPPF85z9whLhW0aPhyusqq1GWHgDHUW/F5ZW3Sv
-	5MV5qAH7dG2fS4QvH97Wh4asIh7hsVlwz+Y+MpackEG8kiOzWRsE5rkeakrDEJ2EMrhtmkRPvnm
-	4/dc4U37A5+QGDPtNIyNEhIuy8pxs=
-X-Google-Smtp-Source: AGHT+IFUJAS3FGWarT+m3p8sQN2T69n/g4mvftfjRWUxWRDnLpT0CQH9knE9GqK80QOmfgp8YUsTy/ZrsQ==
+        bh=d5WVjI35GVkkSAI7X82yBFdxJ6M9HJ12u6871QZ2KQU=;
+        b=r73rV4jRuxQ3g8zLj/KN4wERfRYl3pyRz6fpdiCvkz76XuUQ2YS4OaSsu/d+G+yDLF
+         0zwWXN9BIngfjmE2G9KRcRkUI/ucwXjK+/cUdk7iAy+DbuAonJbFpxFaSnL6cMCHe44u
+         V3/TD/ZkrSQh/yXB+GKgpmyWcUm0gcEtuub4UPbKEAhPQCCkUVaox8zMlMfrbIlKwteb
+         A+KbBYXqLq+F6YRo0tqowb5CkzlcSZ2ZEmAm79lrzzBD96U0YvlvBYknRXpgH+bmFH4R
+         riAF62BQmzyKRGLoFQHCI+FgSu8wBQymQEeMg5OBdJmtVKa4ZFr+KvAqJxXpxF0BSopD
+         uLYA==
+X-Gm-Message-State: AOJu0YwrlKzucniE/k954jN+fqzZbqEjB03NM08URH/JW9ikNcERstHd
+	anK0JRE4dkJkHFOFKdX0cY7GALPsMaLfT0RPJcv1QD0tODzZWIQ6NBlXvYFMw+Qc6OEdrgS/0Bm
+	lEemH/ga4gMt0jNXqj2d0eUTzMZACAdeLBQSTj/5b9/IStd7I9h00AkkydvI9BVrIM6IrF+lDAw
+	zK2gr8un0DXyQNHDvrful2+qiLSM0=
+X-Google-Smtp-Source: AGHT+IEgIg74yUdsAYRd4TB1g4+xk4we4RAm5O3hnwvqynPZPjm67XOIP5lF53V0vkY3c9IJ5ekdRnRoEQ==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a25:6f89:0:b0:dd1:38ec:905d with SMTP id
- k131-20020a256f89000000b00dd138ec905dmr1298507ybc.11.1713261498963; Tue, 16
- Apr 2024 02:58:18 -0700 (PDT)
-Date: Tue, 16 Apr 2024 10:56:34 +0100
+ (user=tabba job=sendgmr) by 2002:a25:f624:0:b0:de1:21b4:76a5 with SMTP id
+ t36-20020a25f624000000b00de121b476a5mr1257109ybd.13.1713261501077; Tue, 16
+ Apr 2024 02:58:21 -0700 (PDT)
+Date: Tue, 16 Apr 2024 10:56:35 +0100
 In-Reply-To: <20240416095638.3620345-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,9 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240416095638.3620345-1-tabba@google.com>
 X-Mailer: git-send-email 2.44.0.683.g7961c838ac-goog
-Message-ID: <20240416095638.3620345-44-tabba@google.com>
-Subject: [PATCH v2 43/47] KVM: arm64: Force injection of a data abort on NISV
- MMIO exit
+Message-ID: <20240416095638.3620345-45-tabba@google.com>
+Subject: [PATCH v2 44/47] KVM: arm64: Remove unused vcpu parameter from guest_owns_fp_regs()
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev
 Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com, 
@@ -71,113 +70,57 @@ Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com,
 	joey.gouly@arm.com, rananta@google.com, smostafa@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-From: Marc Zyngier <maz@kernel.org>
+The host state is not per-vcpu anymore, and therefore, the vcpu
+parameter isn't used.
 
-If a vcpu exits for a data abort with an invalid syndrome, the
-expectations are that userspace has a chance to save the day if
-it has requested to see such exits.
+No functional change intended.
 
-However, this is completely futile in the case of a protected VM,
-as none of the state is available. In this particular case, inject
-a data abort directly into the vcpu, consistent with what userspace
-could do.
-
-This also helps with pKVM, which discards all syndrome information when
-forwarding data aborts that are not known to be MMIO.
-
-Finally, hide the RETURN_NISV_IO_ABORT_TO_USER cap from userspace on
-protected VMs, and document this tweak to the API.
-
-Signed-off-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- Documentation/virt/kvm/api.rst |  7 +++++++
- arch/arm64/kvm/arm.c           | 14 ++++++++++----
- arch/arm64/kvm/mmio.c          |  9 +++++++++
- 3 files changed, 26 insertions(+), 4 deletions(-)
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 2 +-
+ arch/arm64/kvm/hyp/nvhe/switch.c        | 2 +-
+ arch/arm64/kvm/hyp/vhe/switch.c         | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 0b5a33ee71ee..b11b70ae137e 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -6894,6 +6894,13 @@ Note that KVM does not skip the faulting instruction as it does for
- KVM_EXIT_MMIO, but userspace has to emulate any change to the processing state
- if it decides to decode and emulate the instruction.
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 2629420d0659..6e2ddce7f830 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -40,7 +40,7 @@ extern struct kvm_exception_table_entry __start___kvm_ex_table;
+ extern struct kvm_exception_table_entry __stop___kvm_ex_table;
  
-+This feature isn't available to protected VMs, as userspace does not
-+have access to the state that is required to perform the emulation.
-+Instead, a data abort exception is directly injected in the guest.
-+Note that although KVM_CAP_ARM_NISV_TO_USER will be reported if
-+queried outside of a protected VM context, the feature will not be
-+exposed if queried on a protected VM file descriptor.
-+
- ::
+ /* Check whether the FP regs are owned by the guest */
+-static inline bool guest_owns_fp_regs(struct kvm_vcpu *vcpu)
++static inline bool guest_owns_fp_regs(void)
+ {
+ 	return *host_data_ptr(fp_owner) == FP_STATE_GUEST_OWNED;
+ }
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index 580297a701d8..cc29e05980ec 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -53,7 +53,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+ 			val |= CPTR_EL2_TSM;
+ 	}
  
- 		/* KVM_EXIT_X86_RDMSR / KVM_EXIT_X86_WRMSR */
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 293a830d7c28..edf6b6a9632d 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -80,9 +80,13 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+-	if (!guest_owns_fp_regs(vcpu)) {
++	if (!guest_owns_fp_regs()) {
+ 		if (has_hvhe())
+ 			val &= ~(CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN |
+ 				 CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN);
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index b92f9fe2d50e..7286db75b8d6 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -75,7 +75,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
  
- 	switch (cap->cap) {
- 	case KVM_CAP_ARM_NISV_TO_USER:
--		r = 0;
--		set_bit(KVM_ARCH_FLAG_RETURN_NISV_IO_ABORT_TO_USER,
--			&kvm->arch.flags);
-+		if (kvm_vm_is_protected(kvm)) {
-+			r = -EINVAL;
-+		} else {
-+			r = 0;
-+			set_bit(KVM_ARCH_FLAG_RETURN_NISV_IO_ABORT_TO_USER,
-+				&kvm->arch.flags);
-+		}
- 		break;
- 	case KVM_CAP_ARM_MTE:
- 		mutex_lock(&kvm->lock);
-@@ -240,7 +244,6 @@ static int kvm_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_IMMEDIATE_EXIT:
- 	case KVM_CAP_VCPU_EVENTS:
- 	case KVM_CAP_ARM_IRQ_LINE_LAYOUT_2:
--	case KVM_CAP_ARM_NISV_TO_USER:
- 	case KVM_CAP_ARM_INJECT_EXT_DABT:
- 	case KVM_CAP_SET_GUEST_DEBUG:
- 	case KVM_CAP_VCPU_ATTRIBUTES:
-@@ -250,6 +253,9 @@ static int kvm_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_COUNTER_OFFSET:
- 		r = 1;
- 		break;
-+	case KVM_CAP_ARM_NISV_TO_USER:
-+		r = !kvm || !kvm_vm_is_protected(kvm);
-+		break;
- 	case KVM_CAP_SET_GUEST_DEBUG2:
- 		return KVM_GUESTDBG_VALID_MASK;
- 	case KVM_CAP_ARM_SET_DEVICE_ADDR:
-diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
-index 5e1ffb0d5363..87fd8faf2b62 100644
---- a/arch/arm64/kvm/mmio.c
-+++ b/arch/arm64/kvm/mmio.c
-@@ -133,11 +133,20 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
- 	/*
- 	 * No valid syndrome? Ask userspace for help if it has
- 	 * volunteered to do so, and bail out otherwise.
-+	 *
-+	 * In the protected VM case, there isn't much userspace can do
-+	 * though, so directly deliver an exception to the guest.
- 	 */
- 	if (!kvm_vcpu_dabt_isvalid(vcpu)) {
- 		trace_kvm_mmio_nisv(*vcpu_pc(vcpu), kvm_vcpu_get_esr(vcpu),
- 				    kvm_vcpu_get_hfar(vcpu), fault_ipa);
+ 	val |= CPTR_EL2_TAM;
  
-+		if (is_protected_kvm_enabled() &&
-+		    kvm_vm_is_protected(vcpu->kvm)) {
-+			kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
-+			return 1;
-+		}
-+
- 		if (test_bit(KVM_ARCH_FLAG_RETURN_NISV_IO_ABORT_TO_USER,
- 			     &vcpu->kvm->arch.flags)) {
- 			run->exit_reason = KVM_EXIT_ARM_NISV;
+-	if (guest_owns_fp_regs(vcpu)) {
++	if (guest_owns_fp_regs()) {
+ 		if (vcpu_has_sve(vcpu))
+ 			val |= CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN;
+ 	} else {
 -- 
 2.44.0.683.g7961c838ac-goog
 
