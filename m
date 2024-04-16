@@ -1,55 +1,55 @@
 Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C94C2907
-	for <kvmarm@lists.linux.dev>; Tue, 16 Apr 2024 09:56:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A21422907
+	for <kvmarm@lists.linux.dev>; Tue, 16 Apr 2024 09:56:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713261418; cv=none; b=R5YCjEanQQ/p8FLe9VK3pzvV99+21R3E96M4gAYnvOjf2epUvyn5pKsDlZIkPpHiTiPjYIWN9Y1lhKYPystqg8962AxPypzymaIMzoGeAWbq+o0tKsM+6VHp0HfnqpG4F1hGZWIANE+YJox20BIC+re48qLveSXQ7q1oQxyc9Tw=
+	t=1713261420; cv=none; b=XjcuyNSxqgtWdsNrYp/2MuZzF5A9PA7kMdhXFoyojoggit2+p7w/vwxz8CiL2FgLOGrS2hq0ASrSPqqtniilz6PkXKN6oCYJNDa4U8C6QwwkiwUQ4rrTTjzAK4CZEbI2DNbVf0y3iQqMzxaUWsyRgZ2vV7fUpR2s380k0LcLBu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713261418; c=relaxed/simple;
-	bh=MgMXVeSIHxvtLnkhLFq9eIssYPNxYADi9bKg31l8mgk=;
+	s=arc-20240116; t=1713261420; c=relaxed/simple;
+	bh=+2qT6hFfDpHAPO7waMYK7nVCgX2sSJA9uZNX4PucbcA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Y2L7Tvbqj1B7pYJ9GoqUc77PQSDTTKXMjCO1GacGCa4bGeMiLAcwLXIkwy+Jb99CHnPJSB71v/Ui9ss7Z95MiwZFEczev+fXiu8HWE9Y6ATYNhbhEXcdPxIbZB94s4JHPb6AUS+FoOSnsR6xKozx5qieEjOM0E6mKK036cQS20o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XKc0OJrD; arc=none smtp.client-ip=209.85.128.73
+	 To:Cc:Content-Type; b=d4ZMtE7DVdrKwx1oxLuNbUoYvhJHXqjE6kWTMfH8QiH1jn+BHAnsYdZbw20Zv/cLni/XRxiam5lv93i0wWjbVipiCYYJLoKPN4zlpIhMGLnYqEyitxDHDZCmthji6HgiJqiecDdiyA9jzJCMMlKaboGxlODNIUfcFaX/5yBBY9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ie+f6xqc; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XKc0OJrD"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-41663c713b7so25364185e9.0
-        for <kvmarm@lists.linux.dev>; Tue, 16 Apr 2024 02:56:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ie+f6xqc"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-416ac21981dso21908395e9.1
+        for <kvmarm@lists.linux.dev>; Tue, 16 Apr 2024 02:56:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713261415; x=1713866215; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1713261417; x=1713866217; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VdW9gWRjLdzJopsGZ0Jg+J0LCIyxLJlhQ5QPIbZboXo=;
-        b=XKc0OJrDZUCgGUfuFgxV7r5U9a2qN8V0V62okP39ykOBYa6TE07Uhb0Qi4uj54b+DO
-         eeakt0v6hALSZsd386tKGvXUznea4KQZ+sYMoy1DUGaJqFez6sV3L80m5Iap0Oi3Rea5
-         vz96zxHz0PLKY7WVsVlVd6ib1JLWhVX2NgDJpjy9TPYPw7FnnR+tpSF0cgnMnQgRga4v
-         Ay35qYZXBAXqYZTSoqN1RhBkp66+yATuRKMmzbAQ8SaS/sVK5ysgpBFYvA+Z+ivZlwTv
-         di3prV0heE5ilTPWcroODE+MA6Nrr9S+IrkHF5+d82MSUmKutZRJypNUi42ZjcExlSa5
-         RG1Q==
+        bh=JvJZfHyPOB9ldYUqhMcsEC3kwEy/fk07HeyVYr7a5cM=;
+        b=ie+f6xqcl4OdIoPF83vN9pXxJeYaeKJxXI6s6O7pf2ZCgyXFY/Pg1ol9sC1JYXTuGH
+         u4GGgL9iDYrmbXvA/TY3L8VUnN+6CwB1gTHNAZdLcrPI0XbT1R7JDUIU/F6au5OIFMSJ
+         RsLcHcjJLBOwjvoXcdNch/DljUv0IwbQYtLIH1O3DoPxtwqd/u9uAUwtsiCGQln5YSc9
+         i4+7xzNK9z/OC6H8ZfvJRUB9baQWuKvZFMmFHXtD2SVZfa5La4KmxrEemY8Jv7SAc4y0
+         m9QSTg7e320d/kxx34VQaRqjqgx1gZM/llXGp/C079jOjwH1lMk4ahF4wytFLTegTehy
+         1sHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713261415; x=1713866215;
+        d=1e100.net; s=20230601; t=1713261417; x=1713866217;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VdW9gWRjLdzJopsGZ0Jg+J0LCIyxLJlhQ5QPIbZboXo=;
-        b=sQPJNl6iwh4NMWLz8z+GR/+828ejgFDpJsEVzLQvhsbseopsYO6FGjSjjy4FEpprkC
-         hIgXLvSE71GKWlxOq4ZuEMRWDEvuBRlJTxg43oaeEi/vyBhu5xz/ZuPeqkW7dejOvR5P
-         +hEfXSrWt/qWJFZOAeTouzKwbDjSTlZj476x+X1hk5n9Lrpy4zVjUJOX3oTYQ9QV895+
-         u4l7hJ7Wp44O1RmvY377tcHuG9LuNwDqR7hBSmdSW6zxICWDzDshwztFo2wvTdGfvfmt
-         X5js8HMaFLOY0G23pcNVeUZFw9Toz5BAe9TaFqnkJJUFRhxOsiVZoQf81KQSJuFi7WY6
-         kliw==
-X-Gm-Message-State: AOJu0Yw0zqB+UFAJ/27BF43dbA8yEKjiPpkgQ+MZQP3Hks+odiF8RrUp
-	yS5HkrGIvFmqPO5wxEVlAtMAHLi/2u5xv8hxMUeBLvLL2L3n0e1aWikCqvUU8J1kRppJWS4rDi9
-	GXi2pQx18kffYi61rHKR3igRxffa1pvQU5zaa667yNosg69NRnRr8uUm99M0DSPmxQWSgp5omr2
-	24NheCXOOKTAI8tQRzb1I+AAcy2bU=
-X-Google-Smtp-Source: AGHT+IGOoIclkmbBI8c3JgebyUoke3PE7x2XPsRtRrBn+Xs6587fK03dGTWa+MbP5c8l8FamExFWaF3rHw==
+        bh=JvJZfHyPOB9ldYUqhMcsEC3kwEy/fk07HeyVYr7a5cM=;
+        b=wD08dVKmnIjVIxj8D9/DE2hak8NPX9bEgzBQftsD2nJEtGk02vUJvGmVDST0YH3PwT
+         olULntOqmP3iKO60e8e012vx6TIBU5wIsqkfVa0vHR/FhZAj+d/WP6mX8KsKtdiJeGMF
+         njsVi5rGFStWyp1z9lbzH0UeVTip1AR2xrTq/FxRScePVfYtZKW1ZXo+i44Xeqkjiswd
+         CNmnGX6eetPhPzhJvqfxOZzGlxqR5gMN4GQxCxghKVrp410QeiJqezlMEPiC7hhzXyWv
+         10+r0rmUfB7vwhLTPARWfcGQMqBmsCh8yc5wTp1e3OSOBiW48kr2/ukzmPxaNfZ2h+DA
+         BTRQ==
+X-Gm-Message-State: AOJu0Yz++JK14MOwB6cfpAAcQuRZG08MHF6pub8JMDVzMAf5gvMboMGt
+	jp9PoEVGHZYCNw7Gkcf9AzlF+Ndn7dFP9AXCryfzSeimoZXTZixHbXLwf1lJp2WR71KYzW9UrWZ
+	PGHcjNRUi6Ddwnc0dyjdDyN+/i6tT3aHA6zpnspwtk4Hr6oAB53CAYeUXs9n4igNI/92aOozgkt
+	BRljIjyAisTmm5ZjKIcRnXPCETptc=
+X-Google-Smtp-Source: AGHT+IHdHXbFhLv3+RBugUBc/47+EvNZhFxhms57tXYOt7oMPgUGDU+3EuLBDhaGSBecXBjtSnXcNXF1/g==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:600c:1c9e:b0:418:273a:6d18 with SMTP id
- k30-20020a05600c1c9e00b00418273a6d18mr12970wms.0.1713261414904; Tue, 16 Apr
- 2024 02:56:54 -0700 (PDT)
-Date: Tue, 16 Apr 2024 10:55:57 +0100
+ (user=tabba job=sendgmr) by 2002:a05:600c:1c8f:b0:418:d6e:945e with SMTP id
+ k15-20020a05600c1c8f00b004180d6e945emr98518wms.4.1713261417146; Tue, 16 Apr
+ 2024 02:56:57 -0700 (PDT)
+Date: Tue, 16 Apr 2024 10:55:58 +0100
 In-Reply-To: <20240416095638.3620345-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240416095638.3620345-1-tabba@google.com>
 X-Mailer: git-send-email 2.44.0.683.g7961c838ac-goog
-Message-ID: <20240416095638.3620345-7-tabba@google.com>
-Subject: [PATCH v2 06/47] KVM: arm64: Change kvm_handle_mmio_return() return polarity
+Message-ID: <20240416095638.3620345-8-tabba@google.com>
+Subject: [PATCH v2 07/47] KVM: arm64: Move setting the page as dirty out of
+ the critical section
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev
 Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com, 
@@ -70,55 +71,53 @@ Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com,
 	joey.gouly@arm.com, rananta@google.com, smostafa@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Most exit handlers return <= 0 to indicate that the host needs to
-handle the exit. Make kvm_handle_mmio_return() consistent with
-the exit handlers in handle_exit(). This makes the code easier to
-reason about, and makes it easier to add other handlers in future
-patches.
+Move the unlock earlier in user_mem_abort() to shorten the
+critical section. This also helps for future refactoring and
+reuse of similar code.
 
-No functional change intended.
+This moves out marking the page as dirty outside of the critical
+section. That code does not interact with the stage-2 page
+tables, which the read lock in the critical section protects.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/arm.c  | 2 +-
- arch/arm64/kvm/mmio.c | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/mmu.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index e57aa3502e13..0b5473fbbd08 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -974,7 +974,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index dc04bc767865..03cf0a473458 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1522,8 +1522,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
  
- 	if (run->exit_reason == KVM_EXIT_MMIO) {
- 		ret = kvm_handle_mmio_return(vcpu);
--		if (ret)
-+		if (ret <= 0)
- 			return ret;
+ 	read_lock(&kvm->mmu_lock);
+ 	pgt = vcpu->arch.hw_mmu->pgt;
+-	if (mmu_invalidate_retry(kvm, mmu_seq))
++	if (mmu_invalidate_retry(kvm, mmu_seq)) {
++		ret = -EAGAIN;
+ 		goto out_unlock;
++	}
+ 
+ 	/*
+ 	 * If we are not forced to use page mapping, check if we are
+@@ -1581,6 +1583,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 					     memcache,
+ 					     KVM_PGTABLE_WALK_HANDLE_FAULT |
+ 					     KVM_PGTABLE_WALK_SHARED);
++out_unlock:
++	read_unlock(&kvm->mmu_lock);
+ 
+ 	/* Mark the page dirty only if the fault is handled successfully */
+ 	if (writable && !ret) {
+@@ -1588,8 +1592,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 		mark_page_dirty_in_slot(kvm, memslot, gfn);
  	}
  
-diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
-index 200c8019a82a..5e1ffb0d5363 100644
---- a/arch/arm64/kvm/mmio.c
-+++ b/arch/arm64/kvm/mmio.c
-@@ -86,7 +86,7 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu)
- 
- 	/* Detect an already handled MMIO return */
- 	if (unlikely(!vcpu->mmio_needed))
--		return 0;
-+		return 1;
- 
- 	vcpu->mmio_needed = 0;
- 
-@@ -117,7 +117,7 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu)
- 	 */
- 	kvm_incr_pc(vcpu);
- 
--	return 0;
-+	return 1;
+-out_unlock:
+-	read_unlock(&kvm->mmu_lock);
+ 	kvm_release_pfn_clean(pfn);
+ 	return ret != -EAGAIN ? ret : 0;
  }
- 
- int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
 -- 
 2.44.0.683.g7961c838ac-goog
 
