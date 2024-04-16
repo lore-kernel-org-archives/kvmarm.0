@@ -1,334 +1,100 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEEA612C478;
-	Tue, 16 Apr 2024 13:30:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C244E12882C
+	for <kvmarm@lists.linux.dev>; Tue, 16 Apr 2024 13:33:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713274214; cv=none; b=nUS9Pi7/SjeS4yW7Td+an47cUrvAr1Acy4rTqscDODStS4JdnQsgACOlHJmoD7Oqb+pZiCozvo77BERMBqPIi/4AEqZ72nV4NCttaXfjuIQr45/88/+PB++9fqPRmeQMwxPk2u7zVAlr1RDXLWR3I5g+isepctSavlnX0S93gFY=
+	t=1713274395; cv=none; b=GncwBiqyrYaEiHsv2/rGPGMG23yKG1GrZn0RPyqjoGDBWmNy0BtZPMTvSK8lqisFzMYgTtoHprK3QMLx4BKYsiKAlzegsSIdMgM5zHDDVFt5d9QiPD5ZypZlHE1dkVfeXaHzTB1N0RF2DWaf40eCrju8OdeFpnE1ljj0psY/Bkw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713274214; c=relaxed/simple;
-	bh=+j/6gM3a937z2BzVy5L+xPXIwJaTO68RZyd2qEEbv9U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=n0Y/tHmHx1XNTMJlCoA8YgmE//vFesQZZEOMMqYF630YX1O3fpYNalW9STbE1UkQyShJcszm6cl3oUrgkovIAgP4DFlXCu0yzBT3ItZ/3AZ9zwP/fR0cvEnvOncBJfVNm1FqFTt/35laDbCO6kRt42/lrdhMCc++ayMmc+mRebg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 68DE4339;
-	Tue, 16 Apr 2024 06:30:40 -0700 (PDT)
-Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1EB303F738;
-	Tue, 16 Apr 2024 06:30:07 -0700 (PDT)
-Message-ID: <37fa1ff5-9e94-4def-afd6-fb9ea9356977@arm.com>
-Date: Tue, 16 Apr 2024 14:30:04 +0100
+	s=arc-20240116; t=1713274395; c=relaxed/simple;
+	bh=j6bp9ZOH43dO4u5P8+AHfLwMhLEnNfpO+fPgnH5LRwk=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MNGc1L/dPVf4n8IoXFDpMEZTz5/hWSEakaKYbT2HPmU7ewye7CjiQV94z/YXu2F6C9ZOJrMH/77juHkM/tkyXnXFLdwT+XBanC2jo8gX4ZNCby12kn8iy7H6rGQGRsIdsieCdb9c6mJzAtRlR66VlMvvd72KdI4cQLvHjOZTusk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WV70iSSV; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WV70iSSV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52FB0C113CE;
+	Tue, 16 Apr 2024 13:33:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713274395;
+	bh=j6bp9ZOH43dO4u5P8+AHfLwMhLEnNfpO+fPgnH5LRwk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=WV70iSSV3lPb7cXUUJd+PIPGdwWDJpqc7Gb74gDPvxDnapYbkRXeXqfZ2t0O5jxZp
+	 ryGMCkunkUhgG6tyfc7IHBAGROuufBdT+ZAmYv9xIGD6PWVZP/SlhEusO6mk+iAuVA
+	 9czTBn8KyiyHxEd2s1Btqhms2akdF/uAzUtNRHa+Vnl81iOHZOdhGJxBLqcfD4zQnc
+	 CF3Go3eodSwJT2OrHJPNp4Yz+wpKsNoU5SBmFI17Vbtt1c4VwQogGbZw5vsRrZdjpJ
+	 ARj4Ldv6SkHFVLjmQ65rHRP7VRJqYIBTEGX9MWIGWb6mZaQXTL4qyDKA4Qigh/M+vT
+	 WiH6PbZEmMerQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rwivx-00526E-2l;
+	Tue, 16 Apr 2024 14:33:13 +0100
+Date: Tue, 16 Apr 2024 14:33:12 +0100
+Message-ID: <86wmoxqvon.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Fuad Tabba <tabba@google.com>,
+	kvmarm@lists.linux.dev,
+	will@kernel.org,
+	qperret@google.com,
+	seanjc@google.com,
+	alexandru.elisei@arm.com,
+	catalin.marinas@arm.com,
+	philmd@linaro.org,
+	james.morse@arm.com,
+	suzuki.poulose@arm.com,
+	oliver.upton@linux.dev,
+	mark.rutland@arm.com,
+	joey.gouly@arm.com,
+	rananta@google.com,
+	smostafa@google.com
+Subject: Re: [PATCH v2 47/47] KVM: arm64: Refactor checks for FP state ownership
+In-Reply-To: <Zh5ZHLN4Dn8W+xaS@finisterre.sirena.org.uk>
+References: <20240416095638.3620345-1-tabba@google.com>
+	<20240416095638.3620345-48-tabba@google.com>
+	<Zh5ZHLN4Dn8W+xaS@finisterre.sirena.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 07/43] arm64: RME: Check for RME support at KVM init
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-References: <20240412084056.1733704-1-steven.price@arm.com>
- <20240412084309.1733783-1-steven.price@arm.com>
- <20240412084309.1733783-8-steven.price@arm.com>
-Content-Language: en-US
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20240412084309.1733783-8-steven.price@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, tabba@google.com, kvmarm@lists.linux.dev, will@kernel.org, qperret@google.com, seanjc@google.com, alexandru.elisei@arm.com, catalin.marinas@arm.com, philmd@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, mark.rutland@arm.com, joey.gouly@arm.com, rananta@google.com, smostafa@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Steven
-
-On 12/04/2024 09:42, Steven Price wrote:
-> Query the RMI version number and check if it is a compatible version. A
-> static key is also provided to signal that a supported RMM is available.
+On Tue, 16 Apr 2024 11:55:24 +0100,
+Mark Brown <broonie@kernel.org> wrote:
 > 
-> Functions are provided to query if a VM or VCPU is a realm (or rec)
-> which currently will always return false.
+> [1  <text/plain; us-ascii (7bit)>]
+> On Tue, Apr 16, 2024 at 10:56:38AM +0100, Fuad Tabba wrote:
+> > To check for fpsimd state ownership, use the helpers
+> > host_owns_fp_regs() and guest_owns_fp_regs() instead of directly
+> > using the enums.
 > 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
->   arch/arm64/include/asm/kvm_emulate.h | 18 +++++++++
->   arch/arm64/include/asm/kvm_host.h    |  4 ++
->   arch/arm64/include/asm/kvm_rme.h     | 56 ++++++++++++++++++++++++++++
->   arch/arm64/include/asm/virt.h        |  1 +
->   arch/arm64/kvm/Makefile              |  3 +-
->   arch/arm64/kvm/arm.c                 |  9 +++++
->   arch/arm64/kvm/rme.c                 | 52 ++++++++++++++++++++++++++
->   7 files changed, 142 insertions(+), 1 deletion(-)
->   create mode 100644 arch/arm64/include/asm/kvm_rme.h
->   create mode 100644 arch/arm64/kvm/rme.c
+> Reviewed-by: Mark Brown <broonie@kernel.org>
 > 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index 975af30af31f..6f08398537e2 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -611,4 +611,22 @@ static __always_inline void kvm_reset_cptr_el2(struct kvm_vcpu *vcpu)
->   
->   	kvm_write_cptr_el2(val);
->   }
-> +
-> +static inline bool kvm_is_realm(struct kvm *kvm)
-> +{
-> +	if (static_branch_unlikely(&kvm_rme_is_available))
-> +		return kvm->arch.is_realm;
-> +	return false;
-> +}
-> +
-> +static inline enum realm_state kvm_realm_state(struct kvm *kvm)
-> +{
-> +	return READ_ONCE(kvm->arch.realm.state);
-> +}
-> +
-> +static inline bool vcpu_is_rec(struct kvm_vcpu *vcpu)
-> +{
-> +	return false;
-> +}
-> +
->   #endif /* __ARM64_KVM_EMULATE_H__ */
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 9e8a496fb284..63b68b85db3f 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -27,6 +27,7 @@
->   #include <asm/fpsimd.h>
->   #include <asm/kvm.h>
->   #include <asm/kvm_asm.h>
-> +#include <asm/kvm_rme.h>
->   #include <asm/vncr_mapping.h>
->   
->   #define __KVM_HAVE_ARCH_INTC_INITIALIZED
-> @@ -348,6 +349,9 @@ struct kvm_arch {
->   	 * the associated pKVM instance in the hypervisor.
->   	 */
->   	struct kvm_protected_vm pkvm;
-> +
-> +	bool is_realm;
-> +	struct realm realm;
->   };
->   
->   struct kvm_vcpu_fault_info {
-> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
-> new file mode 100644
-> index 000000000000..922da3f47227
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/kvm_rme.h
-> @@ -0,0 +1,56 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Copyright (C) 2023 ARM Ltd.
-> + */
-> +
-> +#ifndef __ASM_KVM_RME_H
-> +#define __ASM_KVM_RME_H
-> +
-> +/**
-> + * enum realm_state - State of a Realm
-> + */
-> +enum realm_state {
-> +	/**
-> +	 * @REALM_STATE_NONE:
-> +	 *      Realm has not yet been created. rmi_realm_create() may be
-> +	 *      called to create the realm.
-> +	 */
-> +	REALM_STATE_NONE,
-> +	/**
-> +	 * @REALM_STATE_NEW:
-> +	 *      Realm is under construction, not eligible for execution. Pages
-> +	 *      may be populated with rmi_data_create().
-> +	 */
-> +	REALM_STATE_NEW,
-> +	/**
-> +	 * @REALM_STATE_ACTIVE:
-> +	 *      Realm has been created and is eligible for execution with
-> +	 *      rmi_rec_enter(). Pages may no longer be populated with
-> +	 *      rmi_data_create().
-> +	 */
-> +	REALM_STATE_ACTIVE,
-> +	/**
-> +	 * @REALM_STATE_DYING:
-> +	 *      Realm is in the process of being destroyed or has already been
-> +	 *      destroyed.
-> +	 */
-> +	REALM_STATE_DYING,
-> +	/**
-> +	 * @REALM_STATE_DEAD:
-> +	 *      Realm has been destroyed.
-> +	 */
-> +	REALM_STATE_DEAD
-> +};
-> +
-> +/**
-> + * struct realm - Additional per VM data for a Realm
-> + *
-> + * @state: The lifetime state machine for the realm
-> + */
-> +struct realm {
-> +	enum realm_state state;
-> +};
-> +
-> +int kvm_init_rme(void);
-> +
-> +#endif
-> diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
-> index 261d6e9df2e1..12cf36c38189 100644
-> --- a/arch/arm64/include/asm/virt.h
-> +++ b/arch/arm64/include/asm/virt.h
-> @@ -81,6 +81,7 @@ void __hyp_reset_vectors(void);
->   bool is_kvm_arm_initialised(void);
->   
->   DECLARE_STATIC_KEY_FALSE(kvm_protected_mode_initialized);
-> +DECLARE_STATIC_KEY_FALSE(kvm_rme_is_available);
->   
->   /* Reports the availability of HYP mode */
->   static inline bool is_hyp_mode_available(void)
-> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-> index c0c050e53157..1c1d8cdf381f 100644
-> --- a/arch/arm64/kvm/Makefile
-> +++ b/arch/arm64/kvm/Makefile
-> @@ -20,7 +20,8 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
->   	 vgic/vgic-v3.o vgic/vgic-v4.o \
->   	 vgic/vgic-mmio.o vgic/vgic-mmio-v2.o \
->   	 vgic/vgic-mmio-v3.o vgic/vgic-kvm-device.o \
-> -	 vgic/vgic-its.o vgic/vgic-debug.o
-> +	 vgic/vgic-its.o vgic/vgic-debug.o \
-> +	 rme.o
->   
->   kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o pmu.o
->   
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 3dee5490eea9..2056c660c5ee 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -38,6 +38,7 @@
->   #include <asm/kvm_mmu.h>
->   #include <asm/kvm_nested.h>
->   #include <asm/kvm_pkvm.h>
-> +#include <asm/kvm_rme.h>
->   #include <asm/kvm_emulate.h>
->   #include <asm/sections.h>
->   
-> @@ -47,6 +48,8 @@
->   
->   static enum kvm_mode kvm_mode = KVM_MODE_DEFAULT;
->   
-> +DEFINE_STATIC_KEY_FALSE(kvm_rme_is_available);
-> +
->   DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
->   
->   DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_page);
-> @@ -2562,6 +2565,12 @@ static __init int kvm_arm_init(void)
->   
->   	in_hyp_mode = is_kernel_in_hyp_mode();
->   
-> +	if (in_hyp_mode) {
-> +		err = kvm_init_rme();
-> +		if (err)
-> +			return err;
-> +	}
-> +
->   	if (cpus_have_final_cap(ARM64_WORKAROUND_DEVICE_LOAD_ACQUIRE) ||
->   	    cpus_have_final_cap(ARM64_WORKAROUND_1508412))
->   		kvm_info("Guests without required CPU erratum workarounds can deadlock system!\n" \
-> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
-> new file mode 100644
-> index 000000000000..3dbbf9d046bf
-> --- /dev/null
-> +++ b/arch/arm64/kvm/rme.c
-> @@ -0,0 +1,52 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright (C) 2023 ARM Ltd.
-> + */
-> +
-> +#include <linux/kvm_host.h>
-> +
-> +#include <asm/rmi_cmds.h>
-> +#include <asm/virt.h>
-> +
-> +static int rmi_check_version(void)
-> +{
-> +	struct arm_smccc_res res;
-> +	int version_major, version_minor;
-> +	unsigned long host_version = RMI_ABI_VERSION(RMI_ABI_MAJOR_VERSION,
-> +						     RMI_ABI_MINOR_VERSION);
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_VERSION, host_version, &res);
-> +
-> +	if (res.a0 == SMCCC_RET_NOT_SUPPORTED)
-> +		return -ENXIO;
-> +
-> +	version_major = RMI_ABI_VERSION_GET_MAJOR(res.a1);
-> +	version_minor = RMI_ABI_VERSION_GET_MINOR(res.a1);
-> +
+> It does occur to me that there's probably enough FP changes in this
+> series to warrant a separate series, there didn't look to be much
+> overlap, they look good and as you say in the cover letter this is a
+> rather large grab bag so splitting out should make things a bit more
+> digestable.
 
-We don't seem to be using the res.a0 to determin if the RMM supports our
-requested version. As per RMM spec, section B4.3.23 :
+I'm already tracking this series as a whole, and splitting FP off the
+main series will only make it harder to track.
 
-"
-The status code and lower revision output values indicate which of the 
-following is true, in order of precedence:
-  a) The RMM supports an interface revision which is compatible with the
-     requested revision.
-      • The status code is RMI_SUCCESS.
-      • The lower revision is equal to the requested revision.
-  b) The RMM does not support an interface revision which is compatible
-     with the requested revision The RMM supports an interface revision
-     which is incompatible with and less than the requested revision.
-      • The status code is RMI_ERROR_INPUT.
-      • The lower revision is the highest interface revision which is
-        both less than the requested revision and supported by the RMM.
+Plus, patch #1 really shows that there is a need to look at this code
+globally, and not with the narrow angle of the FP stuff.
 
-  c) The RMM does not support an interface revision which is compatible
-     with the requested revision The RMM supports an interface revision
-     which is incompatible with and greater than the requested revision.
-      • The status code is RMI_ERROR_INPUT.
-      • The lower revision is equal to the higher revision.
+	M.
 
-So, we could simply check the res.a0 for RMI_SUCCESS and proceed with
-marking RMM available.
-
-
-> +	if (version_major != RMI_ABI_MAJOR_VERSION) {
-> +		kvm_err("Unsupported RMI ABI (v%d.%d) host supports v%d.%d\n",
-> +			version_major, version_minor,
-> +			RMI_ABI_MAJOR_VERSION,
-> +			RMI_ABI_MINOR_VERSION);
-> +		return -ENXIO;
-> +	}
-> +
-> +	kvm_info("RMI ABI version %d.%d\n", version_major, version_minor);
-> +
-> +	return 0;
-> +}
-> +
-> +int kvm_init_rme(void)
-> +{
-> +	if (PAGE_SIZE != SZ_4K)
-> +		/* Only 4k page size on the host is supported */
-> +		return 0;
-> +
-> +	if (rmi_check_version())
-> +		/* Continue without realm support */
-> +		return 0;
-> +
-> +	/* Future patch will enable static branch kvm_rme_is_available */
-> +
-> +	return 0;
-
-Do we ever expect this to fail the kvm initialisation ? Otherwise, we
-could leave it as a void ?
-
-Suzuki
-> +}
-
+-- 
+Without deviation from the norm, progress is not possible.
