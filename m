@@ -1,66 +1,25 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE6E53770B
-	for <kvmarm@lists.linux.dev>; Tue, 16 Apr 2024 04:46:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B6E73BBFE
+	for <kvmarm@lists.linux.dev>; Tue, 16 Apr 2024 05:46:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713242786; cv=none; b=KWULr2vDw5J/kPUi7nyVTIK7QpbTtmbkS/FS2YoRLZZWK9ibrtXrUhcI2pOHhkL0ymst28b4cKCuDmoFsRkh5HZzcysB3qp8/rTfuMpEECB7bAE9Vz7+Nxkl0XuJNgbt/cpipZKQpajiroqMRNcBKA6DndlLlNx8WkO3m0emfSM=
+	t=1713246385; cv=none; b=iunsWKcpOUeJ7Ak21yqmoPN1hAppAvbhu5sRzlboYVc5+Qu7foYS/Lor5nkEBrWVJ8qFnapXZzpxqRr4AIfm74gPZkJtF8N9ma2EU21QOB0Qqv2FefOl8NozEOoT/b3Kz1Z5qgJnG0qZz+mqpuJkMjukCnZDPNH9EPVX8SdIwtg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713242786; c=relaxed/simple;
-	bh=80hUjCkjKS5u7V5gbiuzD+oIL+4s0qQV1OKu5uzzkvs=;
+	s=arc-20240116; t=1713246385; c=relaxed/simple;
+	bh=8yi+iAcNQsOCEWwn+oeKCc87Tp/mRYW3yWJYh+YDXMU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Bs38a4ZRgD6sC/KvE2C0kTK2naNDy58m3vNKv9dEXTyfblYNKam5j2CfuEyrJgM5FG0OK33DZ57WgmFEqa91kEzvXCWzePBMtmheeBfZvMsAehLneEr/V7kIY6Q5cbc2dZdIH01sbCq54V+yQrlc8SZxFEubEsJDF84/OPgWNWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RQyc/MPp; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RQyc/MPp"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713242783;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=rMDcgaXiXzVs8uPv0yj1Wn6dMRjFJOR9or+OJI4S4LI=;
-	b=RQyc/MPpf3WQkeMJ3tiXHpcRKYAp7XEyWTcK8r7jSczLfP0kqi44CKtShuczmkvQk9mQob
-	zDMd1voke4E26GPqyVMMNjogiPVFcyxqDUTwZmhOvTUzYbq/jHA689AJtK7OPLKvbuOV7b
-	nRWWeVwc9LjNsFSD9EgL93jwCDphjr8=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-443-kYeGNo-yMsubERJccCoO_A-1; Tue, 16 Apr 2024 00:46:19 -0400
-X-MC-Unique: kYeGNo-yMsubERJccCoO_A-1
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-568a9f3ba97so2252330a12.1
-        for <kvmarm@lists.linux.dev>; Mon, 15 Apr 2024 21:46:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713242778; x=1713847578;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rMDcgaXiXzVs8uPv0yj1Wn6dMRjFJOR9or+OJI4S4LI=;
-        b=XjeSZ4bRx7ZmwNG8IJA0mHEvxRm4yWLsow86fdrBO7QKXBRdVMhtmDVKw/tKVuBm5+
-         cXntpefkczy5Qe3iOwc3dAzHpXrPOtGCYBJx6Lr6Bpb9PG+4A75ecIiVeRKa6V7NmFKY
-         40s/kQFccg/X2jzMGJITvzvFF5fn7uI9E9n3NcXDcw17U8eZdUdKDhY8x7bYFkWFKj5T
-         GG+dDW9hJSdrei7FqxtrUU5WO4JfN8PZ5hbjQ1jZK2P2m0f15CPGw8tvl5Xv9UVe6Gse
-         JqxUUhb66Xxd1MZJIanyTURbpp+arNwpFsS8yApluKR/in04ZxvklmJgOI1naIbv92h5
-         NVdQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUPq9gNJOOwPnZ7CO8lxfpZ9xfFT9qvVlXBm99e9+WVwwQOeLiWULErtU1ETRGvfgdyrpx2egJ4fxklLFmvDgXha2PgQuu0
-X-Gm-Message-State: AOJu0YzlzRbpD18GJh3z5XckXViwG8pqecjfYrw6YNCOULtBlYXsaqCJ
-	Tiyjv2RFpyBdCOIWaJJYNIMPqivSh+rRFyWDeVyxP2WnJ/JeJznkau6VlMiH4qXlhHAXdLVByi1
-	S+FzXHLCsnLxv5SzEJ+vXhjGv0Zwzna6d6mjfami28A8/NB6xhfBzcw==
-X-Received: by 2002:a50:ab15:0:b0:56e:2493:e3c2 with SMTP id s21-20020a50ab15000000b0056e2493e3c2mr7416019edc.37.1713242778414;
-        Mon, 15 Apr 2024 21:46:18 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHjJiN4sk7slyW1gbhfGoFcXXDmV9FAeRULRLojKqmJEU/91CsGyWgRN1k0slv+TC4KPAhXiw==
-X-Received: by 2002:a50:ab15:0:b0:56e:2493:e3c2 with SMTP id s21-20020a50ab15000000b0056e2493e3c2mr7415995edc.37.1713242778055;
-        Mon, 15 Apr 2024 21:46:18 -0700 (PDT)
-Received: from [192.168.0.9] (ip-109-43-179-50.web.vodafone.de. [109.43.179.50])
-        by smtp.gmail.com with ESMTPSA id i8-20020a05640200c800b00562d908daf4sm5602008edu.84.2024.04.15.21.46.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 15 Apr 2024 21:46:17 -0700 (PDT)
-Message-ID: <3ed01604-3b9e-4131-9ec0-c354c6d65cc8@redhat.com>
-Date: Tue, 16 Apr 2024 06:46:15 +0200
+	 In-Reply-To:Content-Type; b=HJXAy+Weddj0mjNpceI00VjCq9DEH5pBv9y6Q8LNwhjLuZxWvedoYg3KWe4qAg7e+U85R3TCT/MofiJKF91gPpXw2Lf7EPE/BlM8WL+UI+nISAFmipsJZQZUAdPKJcryi/UBt/2PXLMcO5p8Fnpz/3ErCLa92vKfEKKL6ejlBsM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2BB132F4;
+	Mon, 15 Apr 2024 22:46:49 -0700 (PDT)
+Received: from [10.163.59.235] (unknown [10.163.59.235])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F16D23F792;
+	Mon, 15 Apr 2024 22:46:15 -0700 (PDT)
+Message-ID: <58cdb927-a2d9-4af4-900f-2132472afe9f@arm.com>
+Date: Tue, 16 Apr 2024 11:16:13 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -68,130 +27,192 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC kvm-unit-tests PATCH v2 00/14] add shellcheck support
-To: Nicholas Piggin <npiggin@gmail.com>, Andrew Jones <andrew.jones@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Eric Auger <eric.auger@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, =?UTF-8?Q?Nico_B=C3=B6hr?=
- <nrb@linux.ibm.com>, David Hildenbrand <david@redhat.com>,
- Shaoqin Huang <shahuang@redhat.com>,
- Nikos Nikoleris <nikos.nikoleris@arm.com>,
- David Woodhouse <dwmw@amazon.co.uk>, Ricardo Koller <ricarkol@google.com>,
- rminmin <renmm6@chinaunicom.cn>, Gavin Shan <gshan@redhat.com>,
- Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
- Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org,
- linux-s390@vger.kernel.org
-References: <20240406123833.406488-1-npiggin@gmail.com>
- <a7cdd98e-93c1-4546-bba4-ac3a465f01f5@redhat.com>
- <D0L86IDPMTI3.2XFZ8C6UCVD1B@gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-In-Reply-To: <D0L86IDPMTI3.2XFZ8C6UCVD1B@gmail.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+Subject: Re: [RFC 5/8] KVM: arm64: Explicitly handle MDSELR_EL1 traps as
+ UNDEFINED
 Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, Jonathan Corbet <corbet@lwn.net>,
+ Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Mark Brown <broonie@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20240405080008.1225223-1-anshuman.khandual@arm.com>
+ <20240405080008.1225223-6-anshuman.khandual@arm.com>
+ <86a5m8t8s6.wl-maz@kernel.org> <5a2a74b3-f6cd-4cb6-8ee8-5dd7dc2bd686@arm.com>
+ <86mspysuw8.wl-maz@kernel.org>
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+In-Reply-To: <86mspysuw8.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 16/04/2024 05.26, Nicholas Piggin wrote:
-> On Mon Apr 15, 2024 at 9:59 PM AEST, Thomas Huth wrote:
->> On 06/04/2024 14.38, Nicholas Piggin wrote:
->>> Tree here
->>>
->>> https://gitlab.com/npiggin/kvm-unit-tests/-/tree/shellcheck
->>>
->>> Again on top of the "v8 migration, powerpc improvements" series. I
->>> don't plan to rebase the other way around since it's a lot of work.
->>> So this is still in RFC until the other big series gets merged.
->>>
->>> Thanks to Andrew for a lot of review. A submitted the likely s390x
->>> bugs separately ahead of this series, and also disabled one of the
->>> tests and dropped its fix patch as-per review comments. Hence 3 fewer
->>> patches. Other than that, since last post:
->>>
->>> * Tidied commit messages and added some of Andrew's comments.
->>> * Removed the "SC2034 unused variable" blanket disable, and just
->>>     suppressed the config.mak and a couple of other warnings.
->>> * Blanket disabled "SC2235 Use { ..; } instead of (..)" and dropped
->>>     the fix for it.
->>> * Change warning suppression comments as per Andrew's review, also
->>>     mention in the new unittests doc about the "check =" option not
->>>     allowing whitespace etc in the name since we don't cope with that.
->>>
->>> Thanks,
->>> Nick
->>>
->>> Nicholas Piggin (14):
->>>     Add initial shellcheck checking
->>>     shellcheck: Fix SC2223
->>>     shellcheck: Fix SC2295
->>>     shellcheck: Fix SC2094
->>>     shellcheck: Fix SC2006
->>>     shellcheck: Fix SC2155
->>>     shellcheck: Fix SC2143
->>>     shellcheck: Fix SC2013
->>>     shellcheck: Fix SC2145
->>>     shellcheck: Fix SC2124
->>>     shellcheck: Fix SC2294
->>>     shellcheck: Fix SC2178
->>>     shellcheck: Fix SC2048
->>>     shellcheck: Suppress various messages
+On 4/12/24 16:35, Marc Zyngier wrote:
+> On Fri, 12 Apr 2024 03:41:23 +0100,
+> Anshuman Khandual <anshuman.khandual@arm.com> wrote:
 >>
->> I went ahead and pushed a bunch of your patches to the k-u-t master branch
->> now. However, there were also some patches which did not apply cleanly to
->> master anymore, so please rebase the remaining patches and then send them again.
+>>
+>>
+>> On 4/5/24 15:45, Marc Zyngier wrote:
+>>> On Fri, 05 Apr 2024 09:00:05 +0100,
+>>> Anshuman Khandual <anshuman.khandual@arm.com> wrote:
+>>>>
+>>>> Currently read_sanitised_id_aa64dfr0_el1() caps the ID_AA64DFR0.DebugVer to
+>>>> ID_AA64DFR0_DebugVer_V8P8, resulting in FEAT_Debugv8p9 not being exposed to
+>>>> the guest. MDSELR_EL1 register access in the guest, is currently trapped by
+>>>> the existing configuration of the fine-grained traps.
+>>>
+>>> Please add support for the HDFGxTR2_EL2 registers in the trap routing
+>>> arrays, add support for the corresponding FGUs in the corresponding
+>>
+>> Afraid that I might not have enough background here to sufficiently understand
+>> your suggestion above, but nonetheless here is an attempt in this regard.
 > 
-> Hey Thomas,
+> Thanks for at least giving it a try, this is *MUCH* appreciated.
 > 
-> Yeah the sc patches were based on top of the big series, so some
-> collisions expected. I'll look at rebasing.
+>>
+>> - Add HDFGRTR2_EL2/HDFGWTR2_EL2 to enum vcpu_sysreg
+>> 	enum vcpu_sysreg {
+>> 		..........
+>> 		VNCR(HDFGRTR2_EL2),
+>> 		VNCR(HDFGWTR2_EL2),
+>> 		..........
+>> 	}
+> 
+> Yes.
+> 
+>>
+>> - Add their VNCR mappings addresses
+>>
+>> 	#define VNCR_HDFGRTR2_EL2      0x1A0
+>> 	#define VNCR_HDFGWTR2_EL2      0x1B0
+> 
+> Yes.
+> 
+>>
+>> - Add HDFGRTR2_EL2/HDFGWTR2_EL2 to sys_reg_descs[]
+>>
+>> static const struct sys_reg_desc sys_reg_descs[] = {
+>> 	..........
+>> 	EL2_REG_VNCR(HDFGRTR2_EL2, reset_val, 0),
+>> 	EL2_REG_VNCR(HDFGWTR2_EL2, reset_val, 0),
+>> 	..........
+>> }
+> 
+> Yes
+> 
+>>
+>> - Add HDFGRTR2_GROUP to enum fgt_group_id
+>> - Add HDFGRTR2_GROUP to reg_to_fgt_group_id()
+>> - Update triage_sysreg_trap() for HDFGRTR2_GROUP
+>> - Update __activate_traps_hfgxtr() both for HDFGRTR2_EL2 and HDFGWTR2_EL2
+>> - Updated __deactivate_traps_hfgxtr() both for HDFGRTR2_EL2 and HDFGWTR2_EL2
+> 
+> Yes. Don't miss check_fgt_bit() though.  You also need to update
 
-Ah, ok, we can also try to get in the big series first ... I just lack 
-enough spare time for reviewing currently, so it might take a while :-/
+Right, added the following in there.
 
-  Thomas
+       case HDFGRTR2_GROUP:
+               sr = is_read ? HDFGRTR2_EL2 : HDFGWTR2_EL2;
+               break;
 
+> kvm_init_nv_sysregs() to ensure that these new registers have the
+> correct RES0/RES1 behaviour depending on the supported feature set for
+> the guest.
 
+Following might be sufficient for MDSELR_EL1, but wondering if these fine
+grained control registers (HDFG[RW]TR2_EL2) need to be completely defined
+for the entire guest feature set, probably required.
+
+       /* HDFG[RW]TR2_EL2 */
+       res0 = res1 = 0;
+       if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, DebugVer, V8P9))
+               res0 |= HDFGRTR2_EL2_nMDSELR_EL1;
+       set_sysreg_masks(kvm, HDFGRTR2_EL2, res0 | HDFGRTR2_EL2_RES0, res1);
+       set_sysreg_masks(kvm, HDFGWTR2_EL2, res0 | HDFGWTR2_EL2_RES0, res1);
+
+> 
+>>
+>>> structure, and condition the UNDEF on the lack of *guest* support for
+>>> the feature.
+>>
+>> Does something like the following looks OK for preventing guest access into
+>> MDSELR_EL1 instead ?
+>>
+>> --- a/arch/arm64/kvm/sys_regs.c
+>> +++ b/arch/arm64/kvm/sys_regs.c
+>> @@ -1711,6 +1711,19 @@ static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+>>         return val;
+>>  }
+>>  
+>> +static bool trap_mdselr_el1(struct kvm_vcpu *vcpu,
+>> +                          struct sys_reg_params *p,
+>> +                          const struct sys_reg_desc *r)
+>> +{
+>> +       u64 dfr0 = read_sanitised_id_aa64dfr0_el1(vcpu, r);
+>> +       int dver = cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_DebugVer_SHIFT);
+>> +
+>> +       if (dver != ID_AA64DFR0_EL1_DebugVer_V8P9)
+>> +               return undef_access(vcpu, p, r);
+> 
+> This is very cumbersome, and we now have a much better infrastructure
+> for the stuff that is handled with FGTs, see below.
+
+Okay
+
+> 
+>> +
+>> +       return true;
+>> +}
+>> +
+>>  static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+>>                                const struct sys_reg_desc *rd,
+>>                                u64 val)
+>> @@ -2203,7 +2216,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>>         { SYS_DESC(SYS_MDSCR_EL1), trap_debug_regs, reset_val, MDSCR_EL1, 0 },
+>>         DBG_BCR_BVR_WCR_WVR_EL1(2),
+>>         DBG_BCR_BVR_WCR_WVR_EL1(3),
+>> -       { SYS_DESC(SYS_MDSELR_EL1), undef_access },
+>> +       { SYS_DESC(SYS_MDSELR_EL1), trap_mdselr_el1 },
+>>         DBG_BCR_BVR_WCR_WVR_EL1(4),
+>>         DBG_BCR_BVR_WCR_WVR_EL1(5),
+>>         DBG_BCR_BVR_WCR_WVR_EL1(6),
+>>
+>> I am sure this is rather incomplete, but will really appreciate if you could
+>> provide some details and pointers.
+> 
+> What is missing is the Fine-Grained-Undef part. You need to update
+> kvm_init_sysreg() so that kvm->arch.fgu[HDFGRTR2_GROUP] has all the
+> correct bits set for anything that needs to UNDEF depending on the
+> guest configuration.
+> 
+> For example, in your case, I'd expect to see something like:
+> 
+> if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, DebugVer, V8P9))
+> 	kvm->arch.fgu[HDFGRTR2_GROUP] |= ~(HDFGRTR2_EL2_nMDSELR_EL1 | [...]);
+
+Understood.
+
+> 
+> Then allowing the feature becomes conditioned on the bit being clear,
+> and the trap handler only needs to deal with the actual emulation, and
+> not the feature checking.
+
+Got it.
+
+> 
+> I appreciate that this is a lot to swallow, but I'd be very happy to
+> review patches implementing this and provide guidance. It is all
+> pretty simple, just that there is a lot of parts all over the place.
+> In the end, this is only about following the architecture.
+
+Sure, will read through all these pointers you have mentioned here,
+and be back with an implementation.
+
+> 
+> Thanks again,
+
+Thanks for the detailed explanation.
+
+> 
+> 	M.
+> 
