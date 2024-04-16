@@ -1,162 +1,307 @@
-Received: from mail-io1-f74.google.com (mail-io1-f74.google.com [209.85.166.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBD3B156977
-	for <kvmarm@lists.linux.dev>; Mon, 15 Apr 2024 19:40:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.74
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87F1E12E48
+	for <kvmarm@lists.linux.dev>; Tue, 16 Apr 2024 03:13:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713210028; cv=none; b=WefdIcrqq5gcQ1pz15x1TjBRw95prRuZb3PlyQII24nQABvg/cFxG2sMdnbXS802B4N/2kMBHNalUCQJpXEgeKS1uQMO48/t1vnVzkmNe7kidPbiEliDtwve5mKwaAKKHqkWxq1BGUkliIFJ1qvUBWJmCr7wyt6g+0qcTR0yYz0=
+	t=1713237236; cv=none; b=WznaMmLLRZAhhClEyQDKHoiplw3tYKTmqBHvnW2sH0MBd7oONyp3xFhpbXqyk5fq5nkrE87gCXPXZNB2fGcz2QYE963GaheJZpEOknYVKeRvz+YJ+KnWcTE6qrHQpJalLCDPRosaByLugDjGv1j8UZ4VUiMgXNH5nwiyqt1jw8M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713210028; c=relaxed/simple;
-	bh=HnQrke53HbieJQg1K+HmxDC5DcgHzycPVXayX92Uel0=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=tWrMiVpENnRDtIGtdE6r9UCA6v5aYKqcjj7DNVVm5Tl9Zb1Xu5WksEbjz4lTDrMxKdq9pApeVnq5dxznnsOxyqIFWCxJKyH5oB9SCSVyw4v7uOrSrz6lyTL7VdSgPnoSSP5QCeK1FDXIELSjijrqjkXwtYjuQfkJEugrUN/6I+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yH2kkseZ; arc=none smtp.client-ip=209.85.166.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yH2kkseZ"
-Received: by mail-io1-f74.google.com with SMTP id ca18e2360f4ac-7cc7a6a04d9so453032739f.3
-        for <kvmarm@lists.linux.dev>; Mon, 15 Apr 2024 12:40:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713210026; x=1713814826; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=taYfEAMhWxZKhDVEpiZhlMgSXjBrsWj8geaLNIGWoBE=;
-        b=yH2kkseZONZ7catgmv07Zif4L5dD2MVtKW+O7gsb6df3qQnIBHZJfJKFQ2wB0e7kGa
-         bRLoobbC9NHOczpmjXwJ8eR2hgYsl09NqXu4JKH5qFrJalqVtsfJ6MubGTnhP7ClUVay
-         7iwXc3L/9R++csjmYQIZcI3NrsuW6m5OhRsBwZBYN9JrA1bg2BlQnoLTfU7X81AowJqV
-         w6uA7fSo1mpBxWSzGK+K9PEXg16dmiGBNNKW8VsL96axaUOzLCpfC5xqczNXbUsWdfO9
-         RQ4Z/ZHs54pVFutoUb6Fk9txjYb4dyI2kLPMuqtmnKTts+l0wZidIc5dia9NjxwqocUJ
-         Zslg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713210026; x=1713814826;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=taYfEAMhWxZKhDVEpiZhlMgSXjBrsWj8geaLNIGWoBE=;
-        b=WXZm9IBnH8tCY7YX473pqnZWpefKogprZdPIZx6nM7RrVpwWDWUdeCbPoyVHC7btJl
-         eHv5g/+Wi8VQ+igKI0IxYU5nPiRj/fCOZgO0XoY45cnX/XcuK72YgRNOnqf2QHB/r5Uk
-         jTjB/aAWbPUB1YrUs5LlKm/4nL1j+0Vz+ElWaUr/hGF5Ye/ceC5KD0BmHZoivpAr9WJG
-         eNzyK2HPUU4UvHx4Bu8sfZpXfG97gYeoTDuVs7Sq4+SZ1jiO92kZyhiFdHuPP8lNBk9p
-         ptF6ofBAcpAtPYiO/H3zdq9fw/dCwgXpraiognpZI4F8Y78QMZAkUhfrJmHhzwKnGkgJ
-         TP0g==
-X-Forwarded-Encrypted: i=1; AJvYcCUmTJL2ia2ledtKUMzVnWdzsUxaY3xFCktIGty9L4640zRv0kOTZjqHERSakoftwsIuOmMWVTr6adcWqckOg5OEbxcwDi/m
-X-Gm-Message-State: AOJu0YyMMeRU6inC9xYAiS3wniyaqbgIIPtjC+9A2jmaClNQJtUXtXRb
-	z66o923Kp8mQYHA1H2pFkllG3p4bPncabFJXQq/HET02MbjeQ6cnFaepTliRtqBtXA16HQArW7R
-	tEI92XPy1z+j7x86G/SvTPw==
-X-Google-Smtp-Source: AGHT+IGUqapQXFj2hPWnTQ4fKWHkr8XUX4Eacrb1Di5Og6Xvq8008PLajdkB1V4vRSdttFUHw7IRCbM2YDH38IdHzw==
-X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a05:6638:34ab:b0:482:fc24:b74c with
- SMTP id t43-20020a05663834ab00b00482fc24b74cmr472110jal.0.1713210026131; Mon,
- 15 Apr 2024 12:40:26 -0700 (PDT)
-Date: Mon, 15 Apr 2024 19:40:24 +0000
-In-Reply-To: <86sezss5cm.wl-maz@kernel.org> (message from Marc Zyngier on Thu,
- 11 Apr 2024 08:53:13 +0100)
+	s=arc-20240116; t=1713237236; c=relaxed/simple;
+	bh=U6p2ts7qX92k33AKHQGKDDr+K7bfe4jrt0INl11Qnwc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eX64ZgsoK3CjLMDgoGRBseBtNd0tJ7jcEFg7rUHqcso7YRl4wG3T2Ni08ON3fLkHoEd4NUH+qFZAoPI0wfnUQAMGNsXc8/OdzvZ/c1xpAGIl0zAk0Iyx5td3BoLb2dQiGtqF//+fjo4Ke39JpopAkZCdpCcRYB1aI+9AAza5Lkc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C442F2F4;
+	Mon, 15 Apr 2024 20:14:19 -0700 (PDT)
+Received: from [10.163.59.235] (unknown [10.163.59.235])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E49363F64C;
+	Mon, 15 Apr 2024 20:13:46 -0700 (PDT)
+Message-ID: <b63e6914-03c6-4c76-a81a-4af2fbe557e0@arm.com>
+Date: Tue, 16 Apr 2024 08:43:44 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-Message-ID: <gsnth6g2qus7.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH v3] KVM: arm64: Add early_param to control WFx trapping
-From: Colton Lewis <coltonlewis@google.com>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC 8/8] arm64/hw_breakpoint: Enable FEAT_Debugv8p9
+Content-Language: en-US
 To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, oliver.upton@linux.dev, james.morse@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
-	will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+Cc: linux-arm-kernel@lists.infradead.org, Jonathan Corbet <corbet@lwn.net>,
+ Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Mark Brown <broonie@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20240405080008.1225223-1-anshuman.khandual@arm.com>
+ <20240405080008.1225223-9-anshuman.khandual@arm.com>
+ <868r1st8an.wl-maz@kernel.org>
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+In-Reply-To: <868r1st8an.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Thanks for the review Marc.
 
-Marc Zyngier <maz@kernel.org> writes:
 
-> On Wed, 10 Apr 2024 18:54:37 +0100,
-> Colton Lewis <coltonlewis@google.com> wrote:
->> +
->> +enum kvm_interrupt_passthrough {
->> +	KVM_INTERRUPT_PASSTHROUGH_DEFAULT,
->> +	KVM_INTERRUPT_PASSTHROUGH_ALWAYS,
->> +	KVM_INTERRUPT_PASSTHROUGH_NEVER,
-
-> What does this mean? This is not dealing with interrupts, this is
-> supposed to deal with the behaviour of specific instructions
-> (WFI/WFE). The notion of "passthrough" is really odd as well. Finally,
-> both ALWAYS and NEVER are wrong -- the architecture makes no such
-> guarantee.
-
-Looking at this, I did let the language get away from me by mixing up
-interrupts and the instructions dealing with them.
-
-"Passthrough" is not a technical term but has pervaded some of my
-internal conversations about this and I've just been using it to mean
-the opposite of trapping. That can be easily swapped.
-
-I understand always and never are not what the architecture guarantees,
-but was trying to capture what KVM code is attempting to do. I could
-just drop it entirely.
-
-So the enum values could be named something like:
-
-KVM_WFX_TRAP
-KVM_WFX_NOTRAP
-KVM_WFX_NOTRAP_SINGLE_TASK (default option)
-
->> -	if (single_task_running())
->> +	if ((kvm_interrupt_passthrough == KVM_INTERRUPT_PASSTHROUGH_ALWAYS
->> +	     && kvm_vgic_global_state.has_gicv4) ||
->> +	    (kvm_interrupt_passthrough == KVM_INTERRUPT_PASSTHROUGH_DEFAULT
->> +	     && single_task_running()))
-
-> Why is this affecting both WFI and WFE? They are very different and
-> lumping them together makes little sense.
-
-It's true they are different, but I couldn't think of any cases where
-you would want trapping for one to be different than for the other. The
-current behavior also assumes trapping should be the same for both.
-
-Are you suggesting separate controls for the two?
-
->> @@ -2654,6 +2658,30 @@ static int __init early_kvm_mode_cfg(char *arg)
->>   }
->>   early_param("kvm-arm.mode", early_kvm_mode_cfg);
-
->> +static int __init early_kvm_interrupt_passthrough_cfg(char *arg)
+On 4/5/24 15:56, Marc Zyngier wrote:
+> On Fri, 05 Apr 2024 09:00:08 +0100,
+> Anshuman Khandual <anshuman.khandual@arm.com> wrote:
+>>
+>> Currently there can be maximum 16 breakpoints, and 16 watchpoints available
+>> on a given platform - as detected from ID_AA64DFR0_EL1.[BRPs|WRPs] register
+>> fields. But these breakpoint, and watchpoints can be extended further up to
+>> 64 via a new arch feature FEAT_Debugv8p9.
+>>
+>> This first enables banked access for the breakpoint and watchpoint register
+>> set via MDSELR_EL1, extended exceptions via MDSCR_EL1.EMBWE and determining
+>> available breakpoints and watchpoints in the platform from ID_AA64DFR1_EL1,
+>> when FEAT_Debugv8p9 is enabled.
+>>
+>> Cc: Catalin Marinas <catalin.marinas@arm.com>
+>> Cc: Will Deacon <will@kernel.org>
+>> Cc: Mark Rutland <mark.rutland@arm.com>
+>> Cc: linux-arm-kernel@lists.infradead.org
+>> Cc: linux-kernel@vger.kernel.org
+>> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+>> ---
+>>  arch/arm64/include/asm/debug-monitors.h |  2 +-
+>>  arch/arm64/include/asm/hw_breakpoint.h  | 46 +++++++++++++++++++------
+>>  arch/arm64/kernel/debug-monitors.c      | 16 ++++++---
+>>  arch/arm64/kernel/hw_breakpoint.c       | 33 ++++++++++++++++++
+>>  4 files changed, 82 insertions(+), 15 deletions(-)
+>>
+>> diff --git a/arch/arm64/include/asm/debug-monitors.h b/arch/arm64/include/asm/debug-monitors.h
+>> index 13d437bcbf58..75eedba2abbe 100644
+>> --- a/arch/arm64/include/asm/debug-monitors.h
+>> +++ b/arch/arm64/include/asm/debug-monitors.h
+>> @@ -19,7 +19,7 @@
+>>  /* MDSCR_EL1 enabling bits */
+>>  #define DBG_MDSCR_KDE		(1 << 13)
+>>  #define DBG_MDSCR_MDE		(1 << 15)
+>> -#define DBG_MDSCR_MASK		~(DBG_MDSCR_KDE | DBG_MDSCR_MDE)
+>> +#define DBG_MDSCR_EMBWE		(1UL << 32)
+>>  
+>>  #define	DBG_ESR_EVT(x)		(((x) >> 27) & 0x7)
+>>  
+>> diff --git a/arch/arm64/include/asm/hw_breakpoint.h b/arch/arm64/include/asm/hw_breakpoint.h
+>> index bd81cf17744a..6b9822140f71 100644
+>> --- a/arch/arm64/include/asm/hw_breakpoint.h
+>> +++ b/arch/arm64/include/asm/hw_breakpoint.h
+>> @@ -79,8 +79,8 @@ static inline void decode_ctrl_reg(u32 reg,
+>>   * Limits.
+>>   * Changing these will require modifications to the register accessors.
+>>   */
+>> -#define ARM_MAX_BRP		16
+>> -#define ARM_MAX_WRP		16
+>> +#define ARM_MAX_BRP		64
+>> +#define ARM_MAX_WRP		64
+>>  
+>>  /* Virtual debug register bases. */
+>>  #define AARCH64_DBG_REG_BVR	0
+>> @@ -135,22 +135,48 @@ static inline void ptrace_hw_copy_thread(struct task_struct *task)
+>>  }
+>>  #endif
+>>  
+>> +static inline bool is_debug_v8p9_enabled(void)
 >> +{
->> +	if (!arg)
->> +		return -EINVAL;
+>> +	u64 dfr0 = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
+>> +	int dver = cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_DebugVer_SHIFT);
 >> +
->> +	if (strcmp(arg, "always") == 0) {
->> +		kvm_interrupt_passthrough = KVM_INTERRUPT_PASSTHROUGH_ALWAYS;
->> +		return 0;
->> +	}
->> +
->> +	if (strcmp(arg, "never") == 0) {
->> +		kvm_interrupt_passthrough = KVM_INTERRUPT_PASSTHROUGH_NEVER;
->> +		return 0;
->> +	}
->> +
->> +	if (strcmp(arg, "default") == 0) {
->> +		kvm_interrupt_passthrough = KVM_INTERRUPT_PASSTHROUGH_DEFAULT;
->> +		return 0;
->> +	}
->> +
->> +	return -EINVAL;
+>> +	return dver == ID_AA64DFR0_EL1_DebugVer_V8P9;
 >> +}
->> +early_param("kvm-arm.interrupt-passthrough",  
->> early_kvm_interrupt_passthrough_cfg);
 >> +
+>>  /* Determine number of BRP registers available. */
+>>  static inline int get_num_brps(void)
+>>  {
+>> -	u64 dfr0 = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
+>> -	return 1 +
+>> -		cpuid_feature_extract_unsigned_field(dfr0,
+>> -						ID_AA64DFR0_EL1_BRPs_SHIFT);
+>> +	u64 dfr0, dfr1;
+>> +	int dver, brps;
+>> +
+>> +	dfr0 = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
+>> +	dver = cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_DebugVer_SHIFT);
+>> +	if (dver == ID_AA64DFR0_EL1_DebugVer_V8P9) {
+>> +		dfr1 = read_sanitised_ftr_reg(SYS_ID_AA64DFR1_EL1);
+>> +		brps = cpuid_feature_extract_unsigned_field_width(dfr1,
+>> +								  ID_AA64DFR1_EL1_BRPs_SHIFT, 8);
+>> +	} else {
+>> +		brps = cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_BRPs_SHIFT);
+>> +	}
+>> +	return 1 + brps;
+>>  }
+>>  
+>>  /* Determine number of WRP registers available. */
+>>  static inline int get_num_wrps(void)
+>>  {
+>> -	u64 dfr0 = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
+>> -	return 1 +
+>> -		cpuid_feature_extract_unsigned_field(dfr0,
+>> -						ID_AA64DFR0_EL1_WRPs_SHIFT);
+>> +	u64 dfr0, dfr1;
+>> +	int dver, wrps;
+>> +
+>> +	dfr0 = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
+>> +	dver = cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_DebugVer_SHIFT);
+>> +	if (dver == ID_AA64DFR0_EL1_DebugVer_V8P9) {
+>> +		dfr1 = read_sanitised_ftr_reg(SYS_ID_AA64DFR1_EL1);
+>> +		wrps = cpuid_feature_extract_unsigned_field_width(dfr1,
+>> +								  ID_AA64DFR1_EL1_WRPs_SHIFT, 8);
+>> +	} else {
+>> +		wrps = cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_WRPs_SHIFT);
+>> +	}
+>> +	return 1 + wrps;
+>>  }
+>>  
+>>  #ifdef CONFIG_CPU_PM
+>> diff --git a/arch/arm64/kernel/debug-monitors.c b/arch/arm64/kernel/debug-monitors.c
+>> index 64f2ecbdfe5c..3299d1e8dc61 100644
+>> --- a/arch/arm64/kernel/debug-monitors.c
+>> +++ b/arch/arm64/kernel/debug-monitors.c
+>> @@ -23,6 +23,7 @@
+>>  #include <asm/debug-monitors.h>
+>>  #include <asm/system_misc.h>
+>>  #include <asm/traps.h>
+>> +#include <asm/hw_breakpoint.h>
+> 
+> include order.
 
-> Again, this is not dealing with interrupts. This is dealing with the
-> *potential* trapping of instructions in certain circumstances.
+Sure, will fix the order here.
 
-Understood. Should be something like "kvm-arm.wfx-instruction-trapping".
+> 
+>>  
+>>  /* Determine debug architecture. */
+>>  u8 debug_monitors_arch(void)
+>> @@ -34,7 +35,7 @@ u8 debug_monitors_arch(void)
+>>  /*
+>>   * MDSCR access routines.
+>>   */
+>> -static void mdscr_write(u32 mdscr)
+>> +static void mdscr_write(u64 mdscr)
+>>  {
+>>  	unsigned long flags;
+>>  	flags = local_daif_save();
+>> @@ -43,7 +44,7 @@ static void mdscr_write(u32 mdscr)
+>>  }
+>>  NOKPROBE_SYMBOL(mdscr_write);
+>>  
+>> -static u32 mdscr_read(void)
+>> +static u64 mdscr_read(void)
+>>  {
+>>  	return read_sysreg(mdscr_el1);
+>>  }
+>> @@ -76,10 +77,11 @@ early_param("nodebugmon", early_debug_disable);
+>>   */
+>>  static DEFINE_PER_CPU(int, mde_ref_count);
+>>  static DEFINE_PER_CPU(int, kde_ref_count);
+>> +static DEFINE_PER_CPU(int, embwe_ref_count);
+>>  
+>>  void enable_debug_monitors(enum dbg_active_el el)
+>>  {
+>> -	u32 mdscr, enable = 0;
+>> +	u64 mdscr, enable = 0;
+>>  
+>>  	WARN_ON(preemptible());
+>>  
+>> @@ -90,6 +92,9 @@ void enable_debug_monitors(enum dbg_active_el el)
+>>  	    this_cpu_inc_return(kde_ref_count) == 1)
+>>  		enable |= DBG_MDSCR_KDE;
+>>  
+>> +	if (is_debug_v8p9_enabled() && this_cpu_inc_return(embwe_ref_count) == 1)
+>> +		enable |= DBG_MDSCR_EMBWE;
+>> +
+>>  	if (enable && debug_enabled) {
+>>  		mdscr = mdscr_read();
+>>  		mdscr |= enable;
+>> @@ -100,7 +105,7 @@ NOKPROBE_SYMBOL(enable_debug_monitors);
+>>  
+>>  void disable_debug_monitors(enum dbg_active_el el)
+>>  {
+>> -	u32 mdscr, disable = 0;
+>> +	u64 mdscr, disable = 0;
+>>  
+>>  	WARN_ON(preemptible());
+>>  
+>> @@ -111,6 +116,9 @@ void disable_debug_monitors(enum dbg_active_el el)
+>>  	    this_cpu_dec_return(kde_ref_count) == 0)
+>>  		disable &= ~DBG_MDSCR_KDE;
+>>  
+>> +	if (is_debug_v8p9_enabled() && this_cpu_dec_return(embwe_ref_count) == 0)
+>> +		disable &= ~DBG_MDSCR_EMBWE;
+>> +
+>>  	if (disable) {
+>>  		mdscr = mdscr_read();
+>>  		mdscr &= disable;
+>> diff --git a/arch/arm64/kernel/hw_breakpoint.c b/arch/arm64/kernel/hw_breakpoint.c
+>> index 2f5755192c2b..7b9169535b76 100644
+>> --- a/arch/arm64/kernel/hw_breakpoint.c
+>> +++ b/arch/arm64/kernel/hw_breakpoint.c
+>> @@ -103,10 +103,40 @@ int hw_breakpoint_slots(int type)
+>>  	WRITE_WB_REG_CASE(OFF, 14, REG, VAL);	\
+>>  	WRITE_WB_REG_CASE(OFF, 15, REG, VAL)
+>>  
+>> +static int set_bank_index(int n)
+>> +{
+>> +	int mdsel_bank;
+>> +	int bank = n / 16, index = n % 16;
+>> +
+>> +	switch (bank) {
+>> +	case 0:
+>> +		mdsel_bank = MDSELR_EL1_BANK_BANK_0;
+>> +		break;
+>> +	case 1:
+>> +		mdsel_bank = MDSELR_EL1_BANK_BANK_1;
+>> +		break;
+>> +	case 2:
+>> +		mdsel_bank = MDSELR_EL1_BANK_BANK_2;
+>> +		break;
+>> +	case 3:
+>> +		mdsel_bank = MDSELR_EL1_BANK_BANK_3;
+>> +		break;
+>> +	default:
+>> +		pr_warn("Unknown register bank %d\n", bank);
+>> +		return -EINVAL;
+>> +	}
+>> +	write_sysreg_s(mdsel_bank << MDSELR_EL1_BANK_SHIFT, SYS_MDSELR_EL1);
+>> +	isb();
+>> +	return index;
+>> +}
+>> +
+>>  static u64 read_wb_reg(int reg, int n)
+>>  {
+>>  	u64 val = 0;
+>>  
+>> +	if (is_debug_v8p9_enabled())
+>> +		n = set_bank_index(n);
+>> +
+>>  	switch (reg + n) {
+>>  	GEN_READ_WB_REG_CASES(AARCH64_DBG_REG_BVR, AARCH64_DBG_REG_NAME_BVR, val);
+>>  	GEN_READ_WB_REG_CASES(AARCH64_DBG_REG_BCR, AARCH64_DBG_REG_NAME_BCR, val);
+>> @@ -122,6 +152,9 @@ NOKPROBE_SYMBOL(read_wb_reg);
+>>  
+>>  static void write_wb_reg(int reg, int n, u64 val)
+>>  {
+>> +	if (is_debug_v8p9_enabled())
+>> +		n = set_bank_index(n);
+>> +
+>>  	switch (reg + n) {
+>>  	GEN_WRITE_WB_REG_CASES(AARCH64_DBG_REG_BVR, AARCH64_DBG_REG_NAME_BVR, val);
+>>  	GEN_WRITE_WB_REG_CASES(AARCH64_DBG_REG_BCR, AARCH64_DBG_REG_NAME_BCR, val);
+> 
+> Are these things guaranteed to be only used in contexts where there
+> can be no interleaving of such operations? If any interleaving can
+> occur, this is broken.
 
->>   enum kvm_mode kvm_get_mode(void)
->>   {
->>   	return kvm_mode;
+That is a valid concern, breakpoints and watchpoints get used in multiple
+code paths such perf, ptrace etc, where preemption might cause wrong bank
+to be selected before the breakpoint-watchpoint registers being read thus
+impacting the state. I guess preemption should be disabled between those
+two operations i.e selection of the bank and reading its registers
 
-> Finally, this needs to be documented.
-
-Right, in Documentation/admin-guide/kernel-parameters.txt
+> 
+> 	M.
+> 
