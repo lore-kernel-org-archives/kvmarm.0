@@ -1,55 +1,55 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2008485929
-	for <kvmarm@lists.linux.dev>; Tue, 16 Apr 2024 09:56:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59A3985929
+	for <kvmarm@lists.linux.dev>; Tue, 16 Apr 2024 09:56:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713261405; cv=none; b=fT71Koftj5hI+MGJEjFxvExJzSIfAeNsyK8WhXeX+QqDpNhSPznweE5l/1eoolDQGG1WYBc8rg9S6uBz1CFdgt8T13UCvsKqfoPM7iyR5S+CYbf3giwyGYig49Vyq2iaec06eYKX5Y6/5/6irhO8sTFmM+yAmmjUxeZdhHsWF3w=
+	t=1713261407; cv=none; b=CCebflNIcOg+tvtsUT3yLvr8BSIvSJe01OxyIbj66+/u82dMGl7n5gkJbWqPHQDbjMAmTato6ydqX1AoWkBA56+EAU3L3uryPaUQ21rasOtQZLKQNbOFi5jxraXCN8u6Z9e4J1yttamzL4pAUcG07z5S+1cw5o6OKIxTM4Km238=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713261405; c=relaxed/simple;
-	bh=xho9IFWx710gmg2B+pioHp5fgct7NvZPFTXSWV1TT/o=;
+	s=arc-20240116; t=1713261407; c=relaxed/simple;
+	bh=owaBLfeg248aO9lLf3q+3T7UT3i7dxvkALkzcz7b8S0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=N6CvXduyzEEirWVrjKFP7L6SKPiKI4kzt9VlSMVVFOnTQTmaVZuHupLgux0YkNqoZ07LnJt1OGSJATAA6EcJ1fo1HBrp+Ge7jMATkXK8fplA9VMOCV9tVwaGrn/aIxg+5KEumzAhyLDnJhdh2MnlnGHnvsKdPuPxED7P5EhPa1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zdu7TYTd; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=uk86akbf8obDYGTHGX14j3Tas6CnQAwiZB3IKW4siP3gZ9kjCHK8lYss+Av08MDLLR9eKNvyR3cOa9x8dfj4shbpMW8+AvqWH5pNgqtSZ2BTMExHMNqo/v1XNM/2vcpRLfrgfxKxEXwlX7dN1o8u6X/Kbhkfhq6E4QU7PcIktKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=P84p+Z+M; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zdu7TYTd"
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dcbfe1a42a4so7293999276.2
-        for <kvmarm@lists.linux.dev>; Tue, 16 Apr 2024 02:56:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="P84p+Z+M"
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-61afa79081dso2010667b3.2
+        for <kvmarm@lists.linux.dev>; Tue, 16 Apr 2024 02:56:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713261403; x=1713866203; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1713261405; x=1713866205; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NVCmuVvEeePmMsrCljb07v6UeszqANODSfX3dRuDJNY=;
-        b=zdu7TYTdgjQV1m7zmeY3AyjT+vVZhND98kCBoCl9q+DIoEBiYjszExEMnHZ4zJJU+b
-         1WK/BB8awPbfZKSjjlW4fWH8e9DIymHSe7u/DTKFv1vHgv4euuxkSi1zONZrohgJWj0S
-         Mqf9XWz8Swj9IHG7oC2WN7SX0tUXKAw7BeCEKFjkYjE5ajxaG+iEo+cgJFV2rquCYpkR
-         VxnJfYDNVpFG3ZByv2Vo3wZYGpMuJKdqAEwy9mTV+Jra4bbE5IfGEtPXoT4TJdEMbydy
-         I8FC0jzzFqQbJfmuc+NkZbUvPcJVqlezNNmhSz0YO1gzwWvR/nQR5dFkhpkrQTEvd4F9
-         Rghg==
+        bh=at9lzwCGSA7CXT/GRtJPexMfZIJS/Ma1k0CMgdbKfk4=;
+        b=P84p+Z+MF6/OwyNBr3FSPVS2Gg1mizCGD9Iy+9vI6aZG/ttvkF8W5UMDV9KDgD2UUD
+         3uLUUtE4RMWncoEapxzDGXzGZVGNf4oHD+2LDWTuhkuSBxig2LNLnDCF+e5zn25iNWY5
+         FkXuhUGacr1CaV2tj6Gjs2DjabAvRQ3TYX1EvW6w5wcSF1Mk7jWUPgVo3aHP0yYzOaUs
+         biZwspM73670S+rqcqt0wIrB3k4+k3VllTR+4sNJ5TrVAkzcEHrO9e2qkR0uSgFKmhBs
+         0bbbh6bngfHcOeBNUDOTHEuQyLJnWDPU2MdcP/jmrVx6XDaYdzDzt+83A2pFJaD+xH0D
+         1/Kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713261403; x=1713866203;
+        d=1e100.net; s=20230601; t=1713261405; x=1713866205;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NVCmuVvEeePmMsrCljb07v6UeszqANODSfX3dRuDJNY=;
-        b=P8ACW1w3iHYfi+cJigv/bb9Pw+WBDIhjj8rOJ9u23ZBJPklogaRb0IpkkVDtVRRAmy
-         9g3K5btZHs0YO6VFK/k49q4esDQlBJQObkRPBaCo4W9EJxTSsGi6MMcRYBYfAmDaPSxc
-         bJuzKH3orZDe4WoxBXR5dflZNklcZKzjlfpYxvbHPHWGVtu8MCKqiuzJpl3WueHbvHTk
-         ZA31l6KtIqYJ4nqK/CTXtj6o/Lqcb0AxArvwG1LnXzQytfFA+4i+SADiCtJGl7eEjQwK
-         kEdCnHkcUJYAgYxtJtvE94cMuJ1NPPgIO5PhvYkTsDjma1n2v3HHt/cltIt3IJg492CI
-         PIhw==
-X-Gm-Message-State: AOJu0Yy403nYtqMm5BABrCFTtVpmoobfMWClxLXMGLMCOjpe+UUKEsKf
-	vtsUBUZ2GYiomzgyBTBsOsdIjEckQCxDlzOYB4F/qMgp4iNZTBwtCIZLS9IaNRYNK+WLyH3hsTX
-	uBd/FtrfqQtC3jFv6k/lAAap87KS+fchbgqfjpiduc/1HdgiV/g6vENFsL+maOcWQdefkFJEJ08
-	H4n/k9XFCm8DsiTMKYb2Or/rna0BY=
-X-Google-Smtp-Source: AGHT+IExOZz1Z2TVdN7GjX0FUXmtnqVOe21aRrldS+w2mVLrX5mY2ehpluj7y+hggk27plygJiyZMfu4uQ==
+        bh=at9lzwCGSA7CXT/GRtJPexMfZIJS/Ma1k0CMgdbKfk4=;
+        b=j+MLpAFxDs+78ZEeahInTqPRGk8sFfCgMHjazJpIbUjvhqa6Qh56cwM304pH/GfIwr
+         hSS7D9pnoch267pzIS0fDS82YGHDV0q3OFwepnEuCO9fhPwzNYSJnglCKAy3U+Ws40au
+         qxzw97zG7YdZZNHl9G0pHrQqUWxQ4VIDBeTImI/VrmkRII9Ky9ygfWblxFW/IGruSy6q
+         E8XmNgHpfD+Y6kyVYQyBJG3TOPFlqI2e48r+RkaCOiDdJf4530rXM8C6cdf5AORmWolc
+         HeTwXPC6RPN4iNF+E0+pc0vno779p+acLLePYf7v34CA0V3Z69CcbNEDGJ+rxxy0yWcg
+         X5og==
+X-Gm-Message-State: AOJu0YwGkWcS/FQfIZWxfJgHk/nlfWxgq5ekbz0V6ql8CwskEKFaLOWW
+	IhfySsfws2iY3GDlelJtgLqzXRHPvJ6CXLtuOSE2w0pW4Na0tfdZ18inrb9IAotwK65jYvLWBil
+	bpunTjuNSUh37xdmt/Oh3qggB4gq2zKN8BEr7PABp+tnXLL6lBj6gVt5wHl/ue6EwvbmiIVxatY
+	LXkOGjjqYq9yuvb9wII3obMLpRh3s=
+X-Google-Smtp-Source: AGHT+IErPkanCpLWOqYLSbyIeNz8iDynw1uLoROXeFLWbPo52Kkfbz3Q5bFY/ZB2xyO+XC+ibLzinwNStA==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:6902:2b0e:b0:dc6:5396:c0d4 with SMTP id
- fi14-20020a0569022b0e00b00dc65396c0d4mr4063669ybb.1.1713261403081; Tue, 16
- Apr 2024 02:56:43 -0700 (PDT)
-Date: Tue, 16 Apr 2024 10:55:52 +0100
+ (user=tabba job=sendgmr) by 2002:a81:d50d:0:b0:618:66ef:b215 with SMTP id
+ i13-20020a81d50d000000b0061866efb215mr3296710ywj.2.1713261405293; Tue, 16 Apr
+ 2024 02:56:45 -0700 (PDT)
+Date: Tue, 16 Apr 2024 10:55:53 +0100
 In-Reply-To: <20240416095638.3620345-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,9 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240416095638.3620345-1-tabba@google.com>
 X-Mailer: git-send-email 2.44.0.683.g7961c838ac-goog
-Message-ID: <20240416095638.3620345-2-tabba@google.com>
-Subject: [PATCH v2 01/47] KVM: arm64: Allocate per-cpu memory for the host
- fpsimd state in pKVM
+Message-ID: <20240416095638.3620345-3-tabba@google.com>
+Subject: [PATCH v2 02/47] KVM: arm64: Do not re-initialize the KVM lock
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev
 Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com, 
@@ -71,79 +70,27 @@ Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com,
 	joey.gouly@arm.com, rananta@google.com, smostafa@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Allocate a per-cpu fpsimd_state to store the host's state when in
-protected mode. Since the host_fpsimd_state pointer has been
-excluded from kvm_vcpu_arch, no memory has been allocated to
-store it in protected mode, and its value hasn't been set.
+The lock is already initialized in core KVM code at
+kvm_create_vm().
 
-Fixes: 51e09b5572d6 ("KVM: arm64: Exclude host_fpsimd_state pointer from kvm_vcpu_arch")
+Fixes: 9d0c063a4d1d ("KVM: arm64: Instantiate pKVM hypervisor VM and vCPU structures from EL1")
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  1 +
- arch/arm64/kvm/hyp/nvhe/pkvm.c         | 18 ++++++++++++++++++
- arch/arm64/kvm/hyp/nvhe/setup.c        |  1 +
- 3 files changed, 20 insertions(+)
+ arch/arm64/kvm/pkvm.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-index 82b3d62538a6..20c3f6e13b99 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-@@ -54,6 +54,7 @@ pkvm_hyp_vcpu_to_hyp_vm(struct pkvm_hyp_vcpu *hyp_vcpu)
+diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+index b7be96a53597..e2c08443f284 100644
+--- a/arch/arm64/kvm/pkvm.c
++++ b/arch/arm64/kvm/pkvm.c
+@@ -222,7 +222,6 @@ void pkvm_destroy_hyp_vm(struct kvm *host_kvm)
+ 
+ int pkvm_init_host_vm(struct kvm *host_kvm)
+ {
+-	mutex_init(&host_kvm->lock);
+ 	return 0;
  }
  
- void pkvm_hyp_vm_table_init(void *tbl);
-+void pkvm_host_fpsimd_state_init(void);
- 
- int __pkvm_init_vm(struct kvm *host_kvm, unsigned long vm_hva,
- 		   unsigned long pgd_hva);
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index 26dd9a20ad6e..16ccb69e6479 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -18,6 +18,14 @@ unsigned long __icache_flags;
- /* Used by kvm_get_vttbr(). */
- unsigned int kvm_arm_vmid_bits;
- 
-+/*
-+ * Host FPSIMD state. Written to when the guest accesses its own FPSIMD state,
-+ * and read when the guest state is live and we need to switch back to the host.
-+ *
-+ * Only valid when guest_owns_fp_regs() is true.
-+ */
-+DEFINE_PER_CPU(struct user_fpsimd_state, host_fpsimd_state);
-+
- /*
-  * Set trap register values based on features in ID_AA64PFR0.
-  */
-@@ -247,6 +255,16 @@ void pkvm_hyp_vm_table_init(void *tbl)
- 	vm_table = tbl;
- }
- 
-+void pkvm_host_fpsimd_state_init(void)
-+{
-+	unsigned long i;
-+
-+	for (i = 0; i < hyp_nr_cpus; i++) {
-+		per_cpu_ptr(&kvm_host_data, i)->fpsimd_state =
-+			per_cpu_ptr(&host_fpsimd_state, i);
-+	}
-+}
-+
- /*
-  * Return the hyp vm structure corresponding to the handle.
-  */
-diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-index ae00dfa80801..859f22f754d3 100644
---- a/arch/arm64/kvm/hyp/nvhe/setup.c
-+++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-@@ -300,6 +300,7 @@ void __noreturn __pkvm_init_finalise(void)
- 		goto out;
- 
- 	pkvm_hyp_vm_table_init(vm_table_base);
-+	pkvm_host_fpsimd_state_init();
- out:
- 	/*
- 	 * We tail-called to here from handle___pkvm_init() and will not return,
 -- 
 2.44.0.683.g7961c838ac-goog
 
