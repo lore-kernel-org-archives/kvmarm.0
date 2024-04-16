@@ -1,344 +1,153 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E59412A177;
-	Tue, 16 Apr 2024 12:38:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78EB612BE8C
+	for <kvmarm@lists.linux.dev>; Tue, 16 Apr 2024 12:54:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713271139; cv=none; b=rMIeKux87WGUGAFobu6IuG/ACHRihIi2avbMtuecYXH+mEmEmLk/p2tq1/3cEVyevY3TbX9RBVtT+8CNhckz2yZBHFeUC0MUqGKU4BJV4JaMIyhgTQi+wPRE4WOYYQ8rL0H2dwj3EDQT69m2MKII4LGaj/5/oyDp56g7mNcjlgM=
+	t=1713272091; cv=none; b=cZJTHDjN69QTC7kJUTFG0ZMfkccTMc+eeN2fG28imTHjaPvt6eJb63rSCt27xZ7hodhzvoFsDKo9QJQOLa8p9V2yXCG6idKafbDPsZV4hqCkldbt3C2cdsGrcK9PPfzc5MI78ScTHEsP52EDGq5oQxhG/LSsZsG+p2Zjq8W8KNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713271139; c=relaxed/simple;
-	bh=Wn1oi3HNvkWuFzc1P/9TrLuABi6hae0ecEko9TXGDdQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Iv+3SLIW0aT1q65I18KOXxDVAebjrPXlAuznH6sq2S0QLKh3hNjSNQ2jNZ6GaE/WvYoZE4peNfJRPA66WLINuXGJHPWdurwl+sNVl0VdQvrnaNPsTqBWTkwEFZs0xlpQKXujZriZcI2W2Y+B2ihTOVxeyQvmRJW2p4lrZIz5usI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0B330339;
-	Tue, 16 Apr 2024 05:39:23 -0700 (PDT)
-Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 76D673F738;
-	Tue, 16 Apr 2024 05:38:52 -0700 (PDT)
-Message-ID: <e6ece61d-ceb6-44f3-a17c-c678b4562991@arm.com>
-Date: Tue, 16 Apr 2024 13:38:51 +0100
+	s=arc-20240116; t=1713272091; c=relaxed/simple;
+	bh=VyDm+MEWA3EkjDZyaFTdyrK0FbHSjCtnD/RR7v9AxXA=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EzRdkXb5eAqUS0MQB4PjKGBSzyw/MF8Mgepxek5WDe4b2nS70kqTbeTS238xtJIxD3IFBevWy+bshVLZ+4dCIsrTrPw5NFk25e0Ngx0YgKfQv4uNocpOOwD+lUicf1zSGskjEtgOLQK4VVxawqkS6BPs3DQCpprzzjAFKBiXSTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KLjrC6Sq; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KLjrC6Sq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14139C113CE;
+	Tue, 16 Apr 2024 12:54:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713272091;
+	bh=VyDm+MEWA3EkjDZyaFTdyrK0FbHSjCtnD/RR7v9AxXA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=KLjrC6Sq4aNF3XEOS7wZjDcjBPmn7AIWT8aTj0xG6sOqbCbtRD3Pu7wWO4F1WR5bV
+	 zKDuENFgLAUDqBm3kUOBFAN+PZ5B0+zKcao9sWVR+iJIqWD4XQRBFitDwaxoteBQZ0
+	 9uLoVy97jumQuaq4ObE3u+YeSq7/rY8awLnSDjrBdcqkQgkrSPgGhJZEAaTNyYOasA
+	 c76pTyzbhZ8OECJ+n0WThg31MiHOYJHcWwfMUEcsoMUXJ0DkqxNRFrWvL0lDc8WL6s
+	 jNJrfuotSHkL3xNAorHwKW/JzRzdDfgBTkY8t0LOvKeCi1PrHs9RQ0YQldJbuQkV59
+	 wUBnVIt47vCmw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rwiKn-0051Db-0K;
+	Tue, 16 Apr 2024 13:54:49 +0100
+Date: Tue, 16 Apr 2024 13:54:48 +0100
+Message-ID: <861q75sc13.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev,
+	will@kernel.org,
+	qperret@google.com,
+	seanjc@google.com,
+	alexandru.elisei@arm.com,
+	catalin.marinas@arm.com,
+	philmd@linaro.org,
+	james.morse@arm.com,
+	suzuki.poulose@arm.com,
+	oliver.upton@linux.dev,
+	mark.rutland@arm.com,
+	broonie@kernel.org,
+	joey.gouly@arm.com,
+	rananta@google.com,
+	smostafa@google.com
+Subject: Re: [PATCH v2 01/47] KVM: arm64: Allocate per-cpu memory for the host fpsimd state in pKVM
+In-Reply-To: <20240416095638.3620345-2-tabba@google.com>
+References: <20240416095638.3620345-1-tabba@google.com>
+	<20240416095638.3620345-2-tabba@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 05/43] arm64: RME: Add SMC definitions for calling the
- RMM
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-References: <20240412084056.1733704-1-steven.price@arm.com>
- <20240412084309.1733783-1-steven.price@arm.com>
- <20240412084309.1733783-6-steven.price@arm.com>
-Content-Language: en-US
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20240412084309.1733783-6-steven.price@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, will@kernel.org, qperret@google.com, seanjc@google.com, alexandru.elisei@arm.com, catalin.marinas@arm.com, philmd@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, mark.rutland@arm.com, broonie@kernel.org, joey.gouly@arm.com, rananta@google.com, smostafa@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Steven
+On Tue, 16 Apr 2024 10:55:52 +0100,
+Fuad Tabba <tabba@google.com> wrote:
+> 
+> Allocate a per-cpu fpsimd_state to store the host's state when in
+> protected mode. Since the host_fpsimd_state pointer has been
+> excluded from kvm_vcpu_arch, no memory has been allocated to
+> store it in protected mode, and its value hasn't been set.
 
-On 12/04/2024 09:42, Steven Price wrote:
-> The RMM (Realm Management Monitor) provides functionality that can be
-> accessed by SMC calls from the host.
-> 
-> The SMC definitions are based on DEN0137[1] version 1.0-eac5
-> 
-> [1] https://developer.arm.com/documentation/den0137/1-0eac5/
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
+Why do we need this? The EL2 already has its own private host state,
+which has a full FP state already.
+
+On non-pKVM, we save the host's view directly into the process
+state. Obviously, we can't do that with pKVM. But we can absolutely
+use the host context for that, and we shouldn't need any extra
+allocation.
+
+> Fixes: 51e09b5572d6 ("KVM: arm64: Exclude host_fpsimd_state pointer from kvm_vcpu_arch")
+> Signed-off-by: Fuad Tabba <tabba@google.com>
 > ---
->   arch/arm64/include/asm/rmi_smc.h | 250 +++++++++++++++++++++++++++++++
->   1 file changed, 250 insertions(+)
->   create mode 100644 arch/arm64/include/asm/rmi_smc.h
+>  arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  1 +
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c         | 18 ++++++++++++++++++
+>  arch/arm64/kvm/hyp/nvhe/setup.c        |  1 +
+>  3 files changed, 20 insertions(+)
 > 
-> diff --git a/arch/arm64/include/asm/rmi_smc.h b/arch/arm64/include/asm/rmi_smc.h
-> new file mode 100644
-> index 000000000000..c205efdb18d8
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/rmi_smc.h
-> @@ -0,0 +1,250 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+> index 82b3d62538a6..20c3f6e13b99 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+> @@ -54,6 +54,7 @@ pkvm_hyp_vcpu_to_hyp_vm(struct pkvm_hyp_vcpu *hyp_vcpu)
+>  }
+>  
+>  void pkvm_hyp_vm_table_init(void *tbl);
+> +void pkvm_host_fpsimd_state_init(void);
+>  
+>  int __pkvm_init_vm(struct kvm *host_kvm, unsigned long vm_hva,
+>  		   unsigned long pgd_hva);
+> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> index 26dd9a20ad6e..16ccb69e6479 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> @@ -18,6 +18,14 @@ unsigned long __icache_flags;
+>  /* Used by kvm_get_vttbr(). */
+>  unsigned int kvm_arm_vmid_bits;
+>  
 > +/*
-> + * Copyright (C) 2023 ARM Ltd.
+> + * Host FPSIMD state. Written to when the guest accesses its own FPSIMD state,
+> + * and read when the guest state is live and we need to switch back to the host.
 > + *
-> + * The values and structures in this file are from the Realm Management Monitor
-> + * specification (DEN0137) version A-bet0:
-> + * https://developer.arm.com/documentation/den0137/1-0bet0/
-
-This should now point to eac5 instead.
-
+> + * Only valid when guest_owns_fp_regs() is true.
 > + */
+> +DEFINE_PER_CPU(struct user_fpsimd_state, host_fpsimd_state);
 > +
-> +#ifndef __ASM_RME_SMC_H
-> +#define __ASM_RME_SMC_H
+>  /*
+>   * Set trap register values based on features in ID_AA64PFR0.
+>   */
+> @@ -247,6 +255,16 @@ void pkvm_hyp_vm_table_init(void *tbl)
+>  	vm_table = tbl;
+>  }
+>  
+> +void pkvm_host_fpsimd_state_init(void)
+> +{
+> +	unsigned long i;
 > +
-> +#include <linux/arm-smccc.h>
-> +
-> +#define SMC_RxI_CALL(func)				\
-> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,		\
-> +			   ARM_SMCCC_SMC_64,		\
-> +			   ARM_SMCCC_OWNER_STANDARD,	\
-> +			   (func))
-> +
-> +#define SMC_RMI_DATA_CREATE		SMC_RxI_CALL(0x0153)
-> +#define SMC_RMI_DATA_CREATE_UNKNOWN	SMC_RxI_CALL(0x0154)
-> +#define SMC_RMI_DATA_DESTROY		SMC_RxI_CALL(0x0155)
-> +#define SMC_RMI_FEATURES		SMC_RxI_CALL(0x0165)
-> +#define SMC_RMI_GRANULE_DELEGATE	SMC_RxI_CALL(0x0151)
-> +#define SMC_RMI_GRANULE_UNDELEGATE	SMC_RxI_CALL(0x0152)
-> +#define SMC_RMI_PSCI_COMPLETE		SMC_RxI_CALL(0x0164)
-> +#define SMC_RMI_REALM_ACTIVATE		SMC_RxI_CALL(0x0157)
-> +#define SMC_RMI_REALM_CREATE		SMC_RxI_CALL(0x0158)
-> +#define SMC_RMI_REALM_DESTROY		SMC_RxI_CALL(0x0159)
-> +#define SMC_RMI_REC_AUX_COUNT		SMC_RxI_CALL(0x0167)
-> +#define SMC_RMI_REC_CREATE		SMC_RxI_CALL(0x015a)
-> +#define SMC_RMI_REC_DESTROY		SMC_RxI_CALL(0x015b)
-> +#define SMC_RMI_REC_ENTER		SMC_RxI_CALL(0x015c)
-> +#define SMC_RMI_RTT_CREATE		SMC_RxI_CALL(0x015d)
-> +#define SMC_RMI_RTT_DESTROY		SMC_RxI_CALL(0x015e)
-> +#define SMC_RMI_RTT_FOLD		SMC_RxI_CALL(0x0166)
-> +#define SMC_RMI_RTT_INIT_RIPAS		SMC_RxI_CALL(0x0168)
-> +#define SMC_RMI_RTT_MAP_UNPROTECTED	SMC_RxI_CALL(0x015f)
-> +#define SMC_RMI_RTT_READ_ENTRY		SMC_RxI_CALL(0x0161)
-> +#define SMC_RMI_RTT_SET_RIPAS		SMC_RxI_CALL(0x0169)
-> +#define SMC_RMI_RTT_UNMAP_UNPROTECTED	SMC_RxI_CALL(0x0162)
-> +#define SMC_RMI_VERSION			SMC_RxI_CALL(0x0150)
-> +
-> +#define RMI_ABI_MAJOR_VERSION	1
-> +#define RMI_ABI_MINOR_VERSION	0
-> +
-> +#define RMI_UNASSIGNED			0
-> +#define RMI_ASSIGNED			1
-> +#define RMI_TABLE			2
-> +
-> +#define RMI_ABI_VERSION_GET_MAJOR(version) ((version) >> 16)
-> +#define RMI_ABI_VERSION_GET_MINOR(version) ((version) & 0xFFFF)
-> +#define RMI_ABI_VERSION(major, minor)      (((major) << 16) | (minor))
-> +
-> +#define RMI_RETURN_STATUS(ret)		((ret) & 0xFF)
-> +#define RMI_RETURN_INDEX(ret)		(((ret) >> 8) & 0xFF)
-> +
-> +#define RMI_SUCCESS		0
-> +#define RMI_ERROR_INPUT		1
-> +#define RMI_ERROR_REALM		2
-> +#define RMI_ERROR_REC		3
-> +#define RMI_ERROR_RTT		4
-> +
-> +#define RMI_EMPTY		0
-> +#define RMI_RAM			1
-> +#define RMI_DESTROYED		2
-> +
-> +#define RMI_NO_MEASURE_CONTENT	0
-> +#define RMI_MEASURE_CONTENT	1
-> +
-> +#define RMI_FEATURE_REGISTER_0_S2SZ		GENMASK(7, 0)
-> +#define RMI_FEATURE_REGISTER_0_LPA2		BIT(8)
-> +#define RMI_FEATURE_REGISTER_0_SVE_EN		BIT(9)
-> +#define RMI_FEATURE_REGISTER_0_SVE_VL		GENMASK(13, 10)
-> +#define RMI_FEATURE_REGISTER_0_NUM_BPS		GENMASK(17, 14)
-> +#define RMI_FEATURE_REGISTER_0_NUM_WPS		GENMASK(21, 18)
-> +#define RMI_FEATURE_REGISTER_0_PMU_EN		BIT(22)
-> +#define RMI_FEATURE_REGISTER_0_PMU_NUM_CTRS	GENMASK(27, 23)
-> +#define RMI_FEATURE_REGISTER_0_HASH_SHA_256	BIT(28)
-> +#define RMI_FEATURE_REGISTER_0_HASH_SHA_512	BIT(29)
-> +
-> +#define RMI_REALM_PARAM_FLAG_LPA2		BIT(0)
-> +#define RMI_REALM_PARAM_FLAG_SVE		BIT(1)
-> +#define RMI_REALM_PARAM_FLAG_PMU		BIT(2)
-> +
-> +/*
-> + * Note many of these fields are smaller than u64 but all fields have u64
-> + * alignment, so use u64 to ensure correct alignment.
-> + */
-> +struct realm_params {
-> +	union { /* 0x0 */
-> +		struct {
-> +			u64 flags;
-> +			u64 s2sz;
-> +			u64 sve_vl;
-> +			u64 num_bps;
-> +			u64 num_wps;
-> +			u64 pmu_num_ctrs;
-> +			u64 hash_algo;
-> +		};
-> +		u8 padding_1[0x400];
-> +	};
-> +	union { /* 0x400 */
-> +		u8 rpv[64];
-> +		u8 padding_2[0x400];
-> +	};
-> +	union { /* 0x800 */
-> +		struct {
-> +			u64 vmid;
-> +			u64 rtt_base;
-> +			s64 rtt_level_start;
-> +			u64 rtt_num_start;
-> +		};
-> +		u8 padding_3[0x800];
-> +	};
-> +};
-> +
-> +/*
-> + * The number of GPRs (starting from X0) that are
-> + * configured by the host when a REC is created.
-> + */
-> +#define REC_CREATE_NR_GPRS		8
-> +
-> +#define REC_PARAMS_FLAG_RUNNABLE	BIT_ULL(0)
-> +
-> +#define REC_PARAMS_AUX_GRANULES		16
-> +
-> +struct rec_params {
-> +	union { /* 0x0 */
-> +		u64 flags;
-> +		u8 padding1[0x100];
-> +	};
-> +	union { /* 0x100 */
-> +		u64 mpidr;
-> +		u8 padding2[0x100];
-> +	};
-> +	union { /* 0x200 */
-> +		u64 pc;
-> +		u8 padding3[0x100];
-> +	};
-> +	union { /* 0x300 */
-> +		u64 gprs[REC_CREATE_NR_GPRS];
-> +		u8 padding4[0x500];
-> +	};
-> +	union { /* 0x800 */
-> +		struct {
-> +			u64 num_rec_aux;
-> +			u64 aux[REC_PARAMS_AUX_GRANULES];
-> +		};
-> +		u8 padding5[0x800];
-> +	};
-> +};
-> +
-> +#define RMI_EMULATED_MMIO		BIT(0)
-> +#define RMI_INJECT_SEA			BIT(1)
-> +#define RMI_TRAP_WFI			BIT(2)
-> +#define RMI_TRAP_WFE			BIT(3)
+> +	for (i = 0; i < hyp_nr_cpus; i++) {
+> +		per_cpu_ptr(&kvm_host_data, i)->fpsimd_state =
+> +			per_cpu_ptr(&host_fpsimd_state, i);
+> +	}
 
-For completeness, we could add :
+I'd expect this to be instead:
 
-#define RMI_RIPAS_RESPONSE		BIT(4)
+	for (i = 0; i < hyp_nr_cpus; i++)
+		per_cpu_ptr(&kvm_host_data, i)->fpsimd_state = &(per_cpu_ptr(&host_host_data, i)->fp_regs);
 
-Not sure if we use it later in the series.
+and the static allocation to go away.
 
-> +
-> +#define REC_RUN_GPRS			31
-> +#define REC_GIC_NUM_LRS			16
-> +
-> +struct rec_entry {
-> +	union { /* 0x000 */
-> +		u64 flags;
-> +		u8 padding0[0x200];
-> +	};
-> +	union { /* 0x200 */
-> +		u64 gprs[REC_RUN_GPRS];
-> +		u8 padding2[0x100];
-> +	};
-> +	union { /* 0x300 */
-> +		struct {
-> +			u64 gicv3_hcr;
-> +			u64 gicv3_lrs[REC_GIC_NUM_LRS];
-> +		};
-> +		u8 padding3[0x100];
-> +	};
-> +	u8 padding4[0x400];
-> +};
-> +
-> +struct rec_exit {
-> +	union { /* 0x000 */
-> +		u8 exit_reason;
-> +		u8 padding0[0x100];
-> +	};
-> +	union { /* 0x100 */
-> +		struct {
-> +			u64 esr;
-> +			u64 far;
-> +			u64 hpfar;
-> +		};
-> +		u8 padding1[0x100];
-> +	};
-> +	union { /* 0x200 */
-> +		u64 gprs[REC_RUN_GPRS];
-> +		u8 padding2[0x100];
-> +	};
-> +	union { /* 0x300 */
-> +		struct {
-> +			u64 gicv3_hcr;
-> +			u64 gicv3_lrs[REC_GIC_NUM_LRS];
-> +			u64 gicv3_misr;
-> +			u64 gicv3_vmcr;
-> +		};
-> +		u8 padding3[0x100];
-> +	};
-> +	union { /* 0x400 */
-> +		struct {
-> +			u64 cntp_ctl;
-> +			u64 cntp_cval;
-> +			u64 cntv_ctl;
-> +			u64 cntv_cval;
-> +		};
-> +		u8 padding4[0x100];
-> +	};
-> +	union { /* 0x500 */
-> +		struct {
-> +			u64 ripas_base;
-> +			u64 ripas_top;
-> +			u64 ripas_value;
-> +		};
-> +		u8 padding5[0x100];
-> +	};
-> +	union { /* 0x600 */
-> +		u16 imm;
-> +		u8 padding6[0x100];
-> +	};
-> +	union { /* 0x700 */
-> +		struct {
-> +			u64 pmu_ovf_status;
+Thanks,
 
-This is u8 as per section B4.4.10 RmiPmuOverflowStatus type.
+	M.
 
-> +		};
-> +		u8 padding7[0x100];
-> +	};
-> +};
-> +
-> +struct rec_run {
-> +	struct rec_entry entry;
-> +	struct rec_exit exit;
-> +};
-> +
-> +#define RMI_EXIT_SYNC			0x00
-> +#define RMI_EXIT_IRQ			0x01
-> +#define RMI_EXIT_FIQ			0x02
-> +#define RMI_EXIT_PSCI			0x03
-> +#define RMI_EXIT_RIPAS_CHANGE		0x04
-> +#define RMI_EXIT_HOST_CALL		0x05
-> +#define RMI_EXIT_SERROR			0x06
-
-Minor nit: Like the other definitions, it may be good to keep the 
-defintions of the "exit_reason" above the field declaration.
-
-
-Rest looks fine to me.
-
-Suzuki
-> +
-> +#endif
-
+-- 
+Without deviation from the norm, progress is not possible.
