@@ -1,410 +1,111 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E552413EFF4;
-	Wed, 17 Apr 2024 13:37:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A7631411FA
+	for <kvmarm@lists.linux.dev>; Wed, 17 Apr 2024 14:02:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713361077; cv=none; b=JV4ZTQ88ExqgGcBtIzqCvg+qO61JQlMybxk2VnRbFOWyTWEYo3bZ9ynfhUXvijsuKUO2mtds1wVoUqmzw7Q50ObVqAFxANHG4/T0wtvRNTkz5NvhS2KCaR/QGt3xaqVN4Y2z3PpCfZbBLHFDN9BhuADeGp+ULuf8Wgr/40jlzdQ=
+	t=1713362525; cv=none; b=NpS8eNUZL0WJ18DApeRmUQ//JyNaxGlGNCNpViBsPIcGbqNBbaaz82x1B1yPoz0P71VYnC24gQ4WQ+LpkpZFBHh28t2IvUMu6FFxBIYRNeTEUB7MpjnWa963dpRfV23D9l9X9FGJaFFr907z7xqSrz1ZFeGVlAk8LkBhyQmlTwQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713361077; c=relaxed/simple;
-	bh=39AHeotFYiV7LmIyRhGYC2ER5DUVYKUxHjeYw5rCVhs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kBQkGZbo7RGy1sg5azaqRt8eCf5N1JLtd8ePDwZKTjpw2VHor6T6Op8FhWGWGfLRROp2zojjLobjAdlAi2HrjVmNIDm6F5jiNo1wXx55uz/HxLchQVkpD5RnLExze3l3oNvT3wcuGLlEUoArrqR5XUC6o7wG60vkOq2Te+hD91g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CF822339;
-	Wed, 17 Apr 2024 06:38:22 -0700 (PDT)
-Received: from [10.1.39.28] (FVFF763DQ05P.cambridge.arm.com [10.1.39.28])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9CCDD3F738;
-	Wed, 17 Apr 2024 06:37:52 -0700 (PDT)
-Message-ID: <eadfc969-cd41-4dbc-85ff-8d6f8e318837@arm.com>
-Date: Wed, 17 Apr 2024 14:37:51 +0100
+	s=arc-20240116; t=1713362525; c=relaxed/simple;
+	bh=GcvFtHsGPo/adYGfXVbwQgc0u1QkR/LMy1fy6H5Whzo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dQzdnSOEHBYXiVomMKBIrD1CbF+8MMh3KP+oV3AIG10hXUktzuTayrnqJuEh3gpcLogxtzIKO/Tfd4e+bABNJ3zg/EjPcHYp+ZkaZg52lXmdAPOP9PPwtMe7xBIO+Vka5c0lGXKRDBj+kfeWQy8GrIdPKpQ/JnPyRHhxiXRq7/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=XOn+gjvb; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="XOn+gjvb"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=4DfjWgrkyvkic8aAP5HZNr2ZFskxZL3uphk8p5naRQc=; b=XOn+gjvbTRu7w9/J4ik571TRh1
+	WpwMuJDjUPD+eGILxTBNMdQDeSBTbLr0K8mQTS+CQ/xvO2AhXfEwwuzqRGRBExGGX3UTjr60AT5SR
+	y2QgfBy789+J1BubFE/19NAsQURnDz1ZFGJuTd+3/dsy3ONa/XUPdmKo0JTAr1YkOBP2KZBTLAg5l
+	qUAgrutp73V7VR5y4EN6C3ZN9mMoOhr6s+qJRr9gj7NGN9EKaPgb1qyT75PL9kai2RlgNSIAUDTJ6
+	ZquxXVIAW7Ft/t3rd1M3sB0pWtdr+H273fuz5rQ+XKzGEfWZ0bpWoF/g16isq6ZG3dNx8JBtoozl5
+	7eAR19nw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53384)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rx5qy-0003LA-24;
+	Wed, 17 Apr 2024 15:01:36 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rx5qv-00060f-Aq; Wed, 17 Apr 2024 15:01:33 +0100
+Date: Wed, 17 Apr 2024 15:01:33 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>,
+	Peter Zijlstra <peterz@infradead.org>, linux-pm@vger.kernel.org,
+	loongarch@lists.linux.dev, linux-acpi@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	x86@kernel.org, "Rafael J . Wysocki" <rafael@kernel.org>,
+	Miguel Luis <miguel.luis@oracle.com>,
+	James Morse <james.morse@arm.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, linuxarm@huawei.com,
+	justin.he@arm.com, jianyong.wu@arm.com
+Subject: Re: [PATCH v6 02/16] cpu: Do not warn on arch_register_cpu()
+ returning -EPROBE_DEFER
+Message-ID: <Zh/WPYMJYepLbST/@shell.armlinux.org.uk>
+References: <20240417131909.7925-1-Jonathan.Cameron@huawei.com>
+ <20240417131909.7925-3-Jonathan.Cameron@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 13/43] arm64: RME: RTT handling
-Content-Language: en-GB
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-References: <20240412084056.1733704-1-steven.price@arm.com>
- <20240412084309.1733783-1-steven.price@arm.com>
- <20240412084309.1733783-14-steven.price@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20240412084309.1733783-14-steven.price@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240417131909.7925-3-Jonathan.Cameron@huawei.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hi Steven
-
-minort nit, Subject: arm64: RME: RTT tear down
-
-This patch is all about tearing the RTTs, so may be the subject could
-be adjusted accordingly.
-
-On 12/04/2024 09:42, Steven Price wrote:
-> The RMM owns the stage 2 page tables for a realm, and KVM must request
-> that the RMM creates/destroys entries as necessary. The physical pages
-> to store the page tables are delegated to the realm as required, and can
-> be undelegated when no longer used.
+On Wed, Apr 17, 2024 at 02:18:55PM +0100, Jonathan Cameron wrote:
+> For arm64 the CPU registration cannot complete until the ACPI
+> interpreter us up and running so in those cases the arch specific
+> arch_register_cpu() will return -EPROBE_DEFER at this stage and the
+> registration will be attempted later.
 > 
-> Creating new RTTs is the easy part, tearing down is a little more
-> tricky. The result of realm_rtt_destroy() can be used to effectively
-> walk the tree and destroy the entries (undelegating pages that were
-> given to the realm).
-
-The patch looks functionally correct to me. Some minor style related
-comments below.
-
-> Signed-off-by: Steven Price <steven.price@arm.com>
-
+> Suggested-by: Rafael J. Wysocki <rafael@kernel.org>
+> Acked-by: Rafael J. Wysocki <rafael@kernel.org>
+> Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+> 
 > ---
->   arch/arm64/include/asm/kvm_rme.h |  19 ++++
->   arch/arm64/kvm/mmu.c             |   6 +-
->   arch/arm64/kvm/rme.c             | 171 +++++++++++++++++++++++++++++++
->   3 files changed, 193 insertions(+), 3 deletions(-)
+> v6: tags
+> ---
+>  drivers/base/cpu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
-> index fba85e9ce3ae..4ab5cb5e91b3 100644
-> --- a/arch/arm64/include/asm/kvm_rme.h
-> +++ b/arch/arm64/include/asm/kvm_rme.h
-> @@ -76,5 +76,24 @@ u32 kvm_realm_ipa_limit(void);
->   int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap);
->   int kvm_init_realm_vm(struct kvm *kvm);
->   void kvm_destroy_realm(struct kvm *kvm);
-> +void kvm_realm_destroy_rtts(struct kvm *kvm, u32 ia_bits);
-> +
-> +#define RME_RTT_BLOCK_LEVEL	2
-> +#define RME_RTT_MAX_LEVEL	3
-> +
-> +#define RME_PAGE_SHIFT		12
-> +#define RME_PAGE_SIZE		BIT(RME_PAGE_SHIFT)
-> +/* See ARM64_HW_PGTABLE_LEVEL_SHIFT() */
-> +#define RME_RTT_LEVEL_SHIFT(l)	\
-> +	((RME_PAGE_SHIFT - 3) * (4 - (l)) + 3)
-> +#define RME_L2_BLOCK_SIZE	BIT(RME_RTT_LEVEL_SHIFT(2))
-> +
-> +static inline unsigned long rme_rtt_level_mapsize(int level)
-> +{
-> +	if (WARN_ON(level > RME_RTT_MAX_LEVEL))
-> +		return RME_PAGE_SIZE;
-> +
-> +	return (1UL << RME_RTT_LEVEL_SHIFT(level));
-> +}
-> 
+> diff --git a/drivers/base/cpu.c b/drivers/base/cpu.c
+> index 56fba44ba391..b9d0d14e5960 100644
+> --- a/drivers/base/cpu.c
+> +++ b/drivers/base/cpu.c
+> @@ -558,7 +558,7 @@ static void __init cpu_dev_register_generic(void)
+>  
+>  	for_each_present_cpu(i) {
+>  		ret = arch_register_cpu(i);
+> -		if (ret)
+> +		if (ret != -EPROBE_DEFER)
+>  			pr_warn("register_cpu %d failed (%d)\n", i, ret);
 
-super minor nit: We only support 4K for now, so may be could reuse
-the ARM64 generic macro helpers. I am fine either way.
+This looks very broken to me.
 
+		if (ret && ret != -EPROBE_DEFER)
 
->   #endif
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index af4564f3add5..46f0c4e80ace 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1012,17 +1012,17 @@ void stage2_unmap_vm(struct kvm *kvm)
->   void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
->   {
->   	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
-> -	struct kvm_pgtable *pgt = NULL;
-> +	struct kvm_pgtable *pgt;
->   
->   	write_lock(&kvm->mmu_lock);
-> +	pgt = mmu->pgt;
->   	if (kvm_is_realm(kvm) &&
->   	    (kvm_realm_state(kvm) != REALM_STATE_DEAD &&
->   	     kvm_realm_state(kvm) != REALM_STATE_NONE)) {
-> -		/* TODO: teardown rtts */
->   		write_unlock(&kvm->mmu_lock);
-> +		kvm_realm_destroy_rtts(kvm, pgt->ia_bits);
->   		return;
->   	}
-> -	pgt = mmu->pgt;
->   	if (pgt) {
->   		mmu->pgd_phys = 0;
->   		mmu->pgt = NULL;
-> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
-> index 9652ec6ab2fd..09b59bcad8b6 100644
-> --- a/arch/arm64/kvm/rme.c
-> +++ b/arch/arm64/kvm/rme.c
-> @@ -47,6 +47,53 @@ static int rmi_check_version(void)
->   	return 0;
->   }
->   
-> +static phys_addr_t __alloc_delegated_page(struct realm *realm,
-> +					  struct kvm_mmu_memory_cache *mc,
-> +					  gfp_t flags)
+surely, because we don't want to print a warning if arch_register_cpu()
+was successful?
 
-minor nit: Do we need "__" here ? The counter part is plain 
-free_delegated_page without the "__". We could drop the prefix
-
-Or we could split the function as:
-
-alloc_delegated_page()
-{
-   if (spare_page_available)
-	return spare_page;
-   return __alloc_delegated_page(); /* Alloc and delegate a page */
-}
-
-
-> +{
-> +	phys_addr_t phys = PHYS_ADDR_MAX;
-> +	void *virt;
-> +
-> +	if (realm->spare_page != PHYS_ADDR_MAX) {
-> +		swap(realm->spare_page, phys);
-> +		goto out;
-> +	}
-> +
-> +	if (mc)
-> +		virt = kvm_mmu_memory_cache_alloc(mc);
-> +	else
-> +		virt = (void *)__get_free_page(flags);
-> +
-> +	if (!virt)
-> +		goto out;
-> +
-> +	phys = virt_to_phys(virt);
-> +
-> +	if (rmi_granule_delegate(phys)) {
-> +		free_page((unsigned long)virt);
-> +
-> +		phys = PHYS_ADDR_MAX;
-> +	}
-> +
-> +out:
-> +	return phys;
-> +}
-> +
-> +static void free_delegated_page(struct realm *realm, phys_addr_t phys)
-> +{
-> +	if (realm->spare_page == PHYS_ADDR_MAX) {
-> +		realm->spare_page = phys;
-> +		return;
-> +	}
-> +
-> +	if (WARN_ON(rmi_granule_undelegate(phys))) {
-> +		/* Undelegate failed: leak the page */
-> +		return;
-> +	}
-> +
-> +	free_page((unsigned long)phys_to_virt(phys));
-> +}
-> +
->   u32 kvm_realm_ipa_limit(void)
->   {
->   	return u64_get_bits(rmm_feat_reg0, RMI_FEATURE_REGISTER_0_S2SZ);
-> @@ -124,6 +171,130 @@ static int realm_create_rd(struct kvm *kvm)
->   	return r;
->   }
->   
-> +static int realm_rtt_destroy(struct realm *realm, unsigned long addr,
-> +			     int level, phys_addr_t *rtt_granule,
-> +			     unsigned long *next_addr)
-> +{
-> +	unsigned long out_rtt;
-> +	unsigned long out_top;
-> +	int ret;
-> +
-> +	ret = rmi_rtt_destroy(virt_to_phys(realm->rd), addr, level,
-> +			      &out_rtt, &out_top);
-> +
-> +	if (rtt_granule)
-> +		*rtt_granule = out_rtt;
-> +	if (next_addr)
-> +		*next_addr = out_top;
-
-minor nit: As mentioned in the previous patch, we could move this check 
-to the rmi_rtt_destroy().
-
-> +
-> +	return ret;
-> +}
-> +
-> +static int realm_tear_down_rtt_level(struct realm *realm, int level,
-> +				     unsigned long start, unsigned long end)
-> +{
-> +	ssize_t map_size;
-> +	unsigned long addr, next_addr;
-> +
-> +	if (WARN_ON(level > RME_RTT_MAX_LEVEL))
-> +		return -EINVAL;
-> +
-> +	map_size = rme_rtt_level_mapsize(level - 1);
-> +
-> +	for (addr = start; addr < end; addr = next_addr) {
-> +		phys_addr_t rtt_granule;
-> +		int ret;
-> +		unsigned long align_addr = ALIGN(addr, map_size);
-> +
-> +		next_addr = ALIGN(addr + 1, map_size);
-> +
-> +		if (next_addr <= end && align_addr == addr) {
-> +			ret = realm_rtt_destroy(realm, addr, level,
-> +						&rtt_granule, &next_addr);
-> +		} else {
-> +			/* Recurse a level deeper */
-> +			ret = realm_tear_down_rtt_level(realm,
-> +							level + 1,
-> +							addr,
-> +							min(next_addr, end));
-> +			if (ret)
-> +				return ret;
-> +			continue;
-> +		}
-
-I think it would be better readable if we did something like :
-
-		/*
-		 * The target range is smaller than what this level
-		 * covers. Go deeper.
-		 */
-		if (next_addr > end || align_addr != addr) {
-			ret = realm_tear_down_rtt_level(realm,
-							level + 1, addr,
-							min(next_addr, end));
-			if (ret)
-				return ret;
-			continue;
-		}
-
-		ret = realm_rtt_destroy(realm, addr, level,
-					&rtt_granule, &next_addr);
-		
-> +
-> +		switch (RMI_RETURN_STATUS(ret)) {
-> +		case RMI_SUCCESS:
-> +			if (!WARN_ON(rmi_granule_undelegate(rtt_granule)))
-> +				free_page((unsigned long)phys_to_virt(rtt_granule));
-> +			break;
-> +		case RMI_ERROR_RTT:
-> +			if (next_addr > addr) {
-> +				/* unassigned or destroyed */
-
-minor nit:
-				/* RTT doesn't exist, skip */
-
-> +				break;
-> +			}
-
-> +			if (WARN_ON(RMI_RETURN_INDEX(ret) != level))
-> +				return -EBUSY;
-
-In practise, we only call this for the full IPA range and we wouldn't go 
-deeper, if the top level entry was missing. So, there is no reason why
-the RMM didn't walk to the requested level. May be we could add a 
-comment here :
-			/*
-			 * We tear down the RTT range for the full IPA
-			 * space, after everything is unmapped. Also we
-			 * descend down only if we cannot tear down a
-			 * top level RTT. Thus RMM must be able to walk
-			 * to the requested level. e.g., a block mapping
-			 * exists at L1 or L2.
-			 */
-
-> +			if (WARN_ON(level == RME_RTT_MAX_LEVEL)) {
-> +				// Live entry
-> +				return -EBUSY;
-
-
-The first part of the comment above applies to this. So may be it is
-good to have it.
-
-
-> +			}
-
-> +			/* Recurse a level deeper */
-
-minor nit:
-			/*
-			 * The table has active entries in it, recurse
-			 * deeper and tear down the RTTs.
-			 */
-
-> +			next_addr = ALIGN(addr + 1, map_size);
-> +			ret = realm_tear_down_rtt_level(realm,
-> +							level + 1,
-> +							addr,
-> +							next_addr);
-> +			if (ret)
-> +				return ret;
-> +			/* Try again at this level */
-
-			/*
-			 * Now that the children RTTs are destroyed,
-			 * retry at this level.
-			 */
-> +			next_addr = addr;
-> +			break;
-> +		default:
-> +			WARN_ON(1);
-> +			return -ENXIO;
-> +		}
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int realm_tear_down_rtt_range(struct realm *realm,
-> +				     unsigned long start, unsigned long end)
-> +{
-> +	return realm_tear_down_rtt_level(realm, get_start_level(realm) + 1,
-> +					 start, end);
-> +}
-> +
-> +static void ensure_spare_page(struct realm *realm)
-> +{
-> +	phys_addr_t tmp_rtt;
-> +
-> +	/*
-> +	 * Make sure we have a spare delegated page for tearing down the
-> +	 * block mappings. We do this by allocating then freeing a page.
-> +	 * We must use Atomic allocations as we are called with kvm->mmu_lock
-> +	 * held.
-> +	 */
-> +	tmp_rtt = __alloc_delegated_page(realm, NULL, GFP_ATOMIC);
-> +
-> +	/*
-> +	 * If the allocation failed, continue as we may not have a block level
-> +	 * mapping so it may not be fatal, otherwise free it to assign it
-> +	 * to the spare page.
-> +	 */
-> +	if (tmp_rtt != PHYS_ADDR_MAX)
-> +		free_delegated_page(realm, tmp_rtt);
-> +}
-> +
-> +void kvm_realm_destroy_rtts(struct kvm *kvm, u32 ia_bits)
-> +{
-> +	struct realm *realm = &kvm->arch.realm;
-> +
-> +	ensure_spare_page(realm);
-> +
-> +	WARN_ON(realm_tear_down_rtt_range(realm, 0, (1UL << ia_bits)));
-> +}
-
-minor nit: We don't seem to be using the "spare_page" yet in this patch. 
-May be a good idea to move all the related changes 
-(alloc_delegated_page() / free_delegated_page, ensure_spare_page() etc)
-to the patch where it may be better suited ?
-
-Suzuki
-
-> +
->   /* Protects access to rme_vmid_bitmap */
->   static DEFINE_SPINLOCK(rme_vmid_lock);
->   static unsigned long *rme_vmid_bitmap;
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
