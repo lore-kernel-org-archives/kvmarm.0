@@ -1,310 +1,121 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E53D1BC5C;
-	Wed, 17 Apr 2024 18:57:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE80085643
+	for <kvmarm@lists.linux.dev>; Wed, 17 Apr 2024 23:27:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713380259; cv=none; b=RAvDE5bGG5YSDCxmTGWZ7Lap2e/uALO6ZAKIUf9tLrdAPV6kR1c9tQGgWqMyae5Kc57FXvUU3lXua3BilLxDhQsQ3XBYYeComkLDe+8UbksAcg/nmRcKL4/ktEk0ZaxPkUOjchy4/tkAxtF6iABH7kK2LuRLYzp7SsZ7SZ6ULxM=
+	t=1713396460; cv=none; b=qD6l/NPCY9daeDLy1dqiVSB32OKanLd+mtAvLzlQ87JIt/ecQc8WNgVeLh7idOHXsZVLUV5dw12PwXnCFv9DI9oAG2eVm4U4peoZEECAI8v8nqpMCuxFV0QlcHh+7d8DWgsDq79wz03n4eKxOz3HutL33yFvEgEEZevfHFCQBOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713380259; c=relaxed/simple;
-	bh=KVXA+NdTpK4SJ+PCuiRSu/BpgwGrYOPU4BiLvB8PwtM=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Us4ki8/sFNsNjifxuHKnlQzkXfAfoXNVSRSRA+UaVBUJbehsEbNWcZjefJFXtCrcczClsEvvv41Nwy3pLurVcfRnMh5WWJVoGd/78tLScIdLBMMO17KhsXf3fl39LHJ01dyI6TH74GL6Tg8LKqEberJUWlMo/Jxs8jweCOpxIiA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4VKVTw3ff0z6J9Th;
-	Thu, 18 Apr 2024 02:55:32 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id 12A0E140519;
-	Thu, 18 Apr 2024 02:57:33 +0800 (CST)
-Received: from localhost (10.48.146.224) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Wed, 17 Apr
- 2024 19:57:32 +0100
-Date: Wed, 17 Apr 2024 19:57:30 +0100
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: "Rafael J. Wysocki" <rafael@kernel.org>
-CC: Salil Mehta <salil.mehta@huawei.com>, Thomas Gleixner
-	<tglx@linutronix.de>, Peter Zijlstra <peterz@infradead.org>,
-	"linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
-	"loongarch@lists.linux.dev" <loongarch@lists.linux.dev>,
-	"linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>,
-	"linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "x86@kernel.org" <x86@kernel.org>, Russell King
-	<linux@armlinux.org.uk>, Miguel Luis <miguel.luis@oracle.com>, James Morse
-	<james.morse@arm.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
-	<dave.hansen@linux.intel.com>, Linuxarm <linuxarm@huawei.com>,
-	"justin.he@arm.com" <justin.he@arm.com>, "jianyong.wu@arm.com"
-	<jianyong.wu@arm.com>
-Subject: Re: [PATCH v6 06/16] ACPI: processor: Register deferred CPUs from
- acpi_processor_get_info()
-Message-ID: <20240417195730.00006ab5@Huawei.com>
-In-Reply-To: <CAJZ5v0iFpkZZ9Ky6n5OiYsiNQ8_SRJv8hH0CLwPX=N4Ucc_snQ@mail.gmail.com>
-References: <20240417131909.7925-1-Jonathan.Cameron@huawei.com>
-	<20240417131909.7925-7-Jonathan.Cameron@huawei.com>
-	<22ace9b108ee488eb017f5b3e8facb8d@huawei.com>
-	<20240417163842.0000415e@Huawei.com>
-	<CAJZ5v0gJL0mucnN9Na2pCg0ckcTO8cNtpnAcnPD5w9eavUMQcg@mail.gmail.com>
-	<20240417180939.00003db7@huawei.com>
-	<CAJZ5v0iFpkZZ9Ky6n5OiYsiNQ8_SRJv8hH0CLwPX=N4Ucc_snQ@mail.gmail.com>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	s=arc-20240116; t=1713396460; c=relaxed/simple;
+	bh=sm5qWoL4TEVBvLhxN3SGp78DDIogApq/R3F3I+iYIyw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Cq6T7Nh88llbypeugavr4pMa1ma9h5+TAh+nuo/VexD2p4Qg3zYw5WUiPUQdQmeg9A9b5bxUt9dyoQvK1Cnz21vJSHwWuppd7iewkrcDZKquoSkKsN0uRKF/pAdNsftPD4q8fpWFkXX2+x6BX1rtV1fEzzwoiQCxg5HIjqpFP6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Geb0Ayt+; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Geb0Ayt+"
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-6ed2e00aa22so388316b3a.0
+        for <kvmarm@lists.linux.dev>; Wed, 17 Apr 2024 16:27:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713396459; x=1714001259; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=E6/yv8l0tAnEX2YrJeZG4x+G9i8KZY08S/JjSb9nTEM=;
+        b=Geb0Ayt+fOAbC5G1T/n7y7GEL9rG/Qly5ADBlV3tYR7A2eM/C6Q8TIyTA9FWjNXGMC
+         uIn0gWRApm2NesmlpjpBA6sMu5vazUZJAxmux8Ae2N11DUr7Z6Sz6IIHy2kvQuv9TBAF
+         YiDrhok8sGepPqf64qPpYHB705HxgDtKoao7uhNKuVDNeuHj5Ol7x1k/lRmqdg+GRB27
+         t1YoOrSuAmzj6sJiVMMQy6ShenyIl4SaRwvrp50qt9jrfMqd0ToQ6MiyaO45yCMSRSgm
+         al64XzeU8uUEFFOnrMWIHJ4R1CamXzWBW9AJxIUHIkhWSCOZDxf5/Rg0CarUVfVcWD5i
+         PoFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713396459; x=1714001259;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=E6/yv8l0tAnEX2YrJeZG4x+G9i8KZY08S/JjSb9nTEM=;
+        b=XFMtkjeLTyXlCsLsvUH5ZSaIpewwkSPH3PaxYJ+Um1ZRQx379pk5VZHW+NNru3RgHP
+         h9U8uerbAVgi76jCtWaDYFxQUwMcuqm9ipJEg8hBf3CG+UOUkjhUU5Q5xfg92FVvXask
+         tQLgz3XmwEyj3IV9b597gnUJAWSz9ZOeDrJxgyiR46wTLHyra5ylagMyOA49cRGUJYaF
+         ZEtcSHAJ789e6r1JtiCZA581o8knnLIIN4Jes6ZtMcsClrAHWmo30gTV6lK5DJXmiISM
+         HYnGe7rahWsNIVaPWp5PSY/9VwGH9KM7CQNkrG3goWIlIYTPKLTgemKLZEkk0PzR2qY9
+         ajQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVQTytc8oE14u4t+LLzhqgA8cFFI1zLflQpx4Na5CfupCzWT1F8ME5FVwGfQU+gBjmyEiEBPJm4nebbX5lH+9/fxpz/2yLx
+X-Gm-Message-State: AOJu0YwwEF8pW1e2xC0PsIyphQB9VYkcJwtX4jHrs5yVTHlXfwRCPceu
+	8WeRQeVpYC8uCc7JXeKHi0Ck8B3UAZ2poMK6NH5cvnUhOoS4+YPm8jF1TN+pGMILsOj4kgQEXo3
+	pRQ==
+X-Google-Smtp-Source: AGHT+IHRmT8hE59YdeqOABN9tJyRZX+WT2IsjNfAQcQ0lhinhviSJraFpoR1lplfXvbmmqqfGWbU0WcTco0=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:4616:b0:6ea:afcb:1b41 with SMTP id
+ ko22-20020a056a00461600b006eaafcb1b41mr94251pfb.2.1713396458918; Wed, 17 Apr
+ 2024 16:27:38 -0700 (PDT)
+Date: Wed, 17 Apr 2024 16:27:37 -0700
+In-Reply-To: <20240222161047.402609-5-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: lhrpeml500001.china.huawei.com (7.191.163.213) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
+Mime-Version: 1.0
+References: <20240222161047.402609-1-tabba@google.com> <20240222161047.402609-5-tabba@google.com>
+Message-ID: <ZiBa6dUWwp8_341k@google.com>
+Subject: Re: [RFC PATCH v1 04/26] KVM: Don't allow private attribute to be set
+ if mapped by host
+From: Sean Christopherson <seanjc@google.com>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, 
+	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
+	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
+	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
+	dmatlack@google.com, yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, 
+	mic@digikod.net, vbabka@suse.cz, vannapurve@google.com, 
+	ackerleytng@google.com, mail@maciej.szmigiero.name, david@redhat.com, 
+	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, 
+	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, 
+	suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
+	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
+	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, qperret@google.com, 
+	keirf@google.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, 17 Apr 2024 19:59:50 +0200
-"Rafael J. Wysocki" <rafael@kernel.org> wrote:
+On Thu, Feb 22, 2024, Fuad Tabba wrote:
+> +#ifdef CONFIG_KVM_GENERIC_PRIVATE_MEM_MAPPABLE
+> +bool kvm_is_gmem_mapped(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
+> +{
+> +	struct kvm_memslot_iter iter;
+> +
+> +	kvm_for_each_memslot_in_gfn_range(&iter, kvm_memslots(kvm), gfn_start, gfn_end) {
+> +		struct kvm_memory_slot *memslot = iter.slot;
+> +		gfn_t start, end, i;
+> +
+> +		start = max(gfn_start, memslot->base_gfn);
+> +		end = min(gfn_end, memslot->base_gfn + memslot->npages);
+> +		if (WARN_ON_ONCE(start >= end))
+> +			continue;
+> +
+> +		for (i = start; i < end; i++) {
+> +			struct page *page;
+> +			bool is_mapped;
+> +			kvm_pfn_t pfn;
+> +			int ret;
+> +
+> +			/*
+> +			 * Check the page_mapcount with the page lock held to
+> +			 * avoid racing with kvm_gmem_fault().
+> +			 */
 
-> On Wed, Apr 17, 2024 at 7:09=E2=80=AFPM Jonathan Cameron
-> <Jonathan.Cameron@huawei.com> wrote:
-> >
-> > On Wed, 17 Apr 2024 17:59:36 +0200
-> > "Rafael J. Wysocki" <rafael@kernel.org> wrote:
-> > =20
-> > > On Wed, Apr 17, 2024 at 5:38=E2=80=AFPM Jonathan Cameron
-> > > <Jonathan.Cameron@huawei.com> wrote: =20
-> > > >
-> > > > On Wed, 17 Apr 2024 16:03:51 +0100
-> > > > Salil Mehta <salil.mehta@huawei.com> wrote:
-> > > > =20
-> > > > > >  From: Jonathan Cameron <jonathan.cameron@huawei.com>
-> > > > > >  Sent: Wednesday, April 17, 2024 2:19 PM
-> > > > > >
-> > > > > >  From: James Morse <james.morse@arm.com>
-> > > > > >
-> > > > > >  The arm64 specific arch_register_cpu() call may defer CPU regi=
-stration until
-> > > > > >  the ACPI interpreter is available and the _STA method can be e=
-valuated.
-> > > > > >
-> > > > > >  If this occurs, then a second attempt is made in acpi_processo=
-r_get_info().
-> > > > > >  Note that the arm64 specific call has not yet been added so fo=
-r now this will
-> > > > > >  be called for the original hotplug case.
-> > > > > >
-> > > > > >  For architectures that do not defer until the ACPI Processor d=
-river loads
-> > > > > >  (e.g. x86), for initially present CPUs there will already be a=
- CPU device. If
-> > > > > >  present do not try to register again.
-> > > > > >
-> > > > > >  Systems can still be booted with 'acpi=3Doff', or not include =
-an ACPI
-> > > > > >  description at all as in these cases arch_register_cpu() will =
-not have
-> > > > > >  deferred registration when first called.
-> > > > > >
-> > > > > >  This moves the CPU register logic back to a subsys_initcall(),=
- while the
-> > > > > >  memory nodes will have been registered earlier.
-> > > > > >  Note this is where the call was prior to the cleanup series so=
- there should be
-> > > > > >  no side effects of moving it back again for this specific case.
-> > > > > >
-> > > > > >  [PATCH 00/21] Initial cleanups for vCPU HP.
-> > > > > >  https://lore.kernel.org/all/ZVyz%2FVe5pPu8AWoA@shell.armlinux.=
-org.uk/
-> > > > > >
-> > > > > >  e.g. 5b95f94c3b9f ("x86/topology: Switch over to GENERIC_CPU_D=
-EVICES")
-> > > > > >
-> > > > > >  Signed-off-by: James Morse <james.morse@arm.com>
-> > > > > >  Reviewed-by: Gavin Shan <gshan@redhat.com>
-> > > > > >  Tested-by: Miguel Luis <miguel.luis@oracle.com>
-> > > > > >  Tested-by: Vishnu Pajjuri <vishnu@os.amperecomputing.com>
-> > > > > >  Tested-by: Jianyong Wu <jianyong.wu@arm.com>
-> > > > > >  Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.=
-uk>
-> > > > > >  Co-developed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> > > > > >  Signed-off-by: Joanthan Cameron <Jonathan.Cameron@huawei.com>
-> > > > > >  ---
-> > > > > >  v6: Squash the two paths for conventional CPU Hotplug and arm64
-> > > > > >      vCPU HP.
-> > > > > >  v5: Update commit message to make it clear this is moving the
-> > > > > >      init back to where it was until very recently.
-> > > > > >
-> > > > > >      No longer change the condition in the earlier registration=
- point
-> > > > > >      as that will be handled by the arm64 registration routine
-> > > > > >      deferring until called again here.
-> > > > > >  ---
-> > > > > >   drivers/acpi/acpi_processor.c | 12 +++++++++++-
-> > > > > >   1 file changed, 11 insertions(+), 1 deletion(-)
-> > > > > >
-> > > > > >  diff --git a/drivers/acpi/acpi_processor.c b/drivers/acpi/acpi=
-_processor.c
-> > > > > >  index 7ecb13775d7f..0cac77961020 100644
-> > > > > >  --- a/drivers/acpi/acpi_processor.c
-> > > > > >  +++ b/drivers/acpi/acpi_processor.c
-> > > > > >  @@ -356,8 +356,18 @@ static int acpi_processor_get_info(struct
-> > > > > >  acpi_device *device)
-> > > > > >      *
-> > > > > >      *  NOTE: Even if the processor has a cpuid, it may not be =
-present
-> > > > > >      *  because cpuid <-> apicid mapping is persistent now.
-> > > > > >  +   *
-> > > > > >  +   *  Note this allows 3 flows, it is up to the arch_register=
-_cpu()
-> > > > > >  +   *  call to reject any that are not supported on a given ar=
-chitecture.
-> > > > > >  +   *  A) CPU becomes present.
-> > > > > >  +   *  B) Previously invalid logical CPU ID (Same as becoming =
-present)
-> > > > > >  +   *  C) CPU already present and now being enabled (and wasn't
-> > > > > >  registered
-> > > > > >  +   *     early on an arch that doesn't defer to here)
-> > > > > >      */
-> > > > > >  -  if (invalid_logical_cpuid(pr->id) || !cpu_present(pr->id)) {
-> > > > > >  +  if ((!invalid_logical_cpuid(pr->id) && cpu_present(pr->id) =
-&&
-> > > > > >  +       !get_cpu_device(pr->id)) ||
-> > > > > >  +      invalid_logical_cpuid(pr->id) ||
-> > > > > >  +      !cpu_present(pr->id)) { =20
-> > > > >
-> > > > > =20
-> > > > Hi Salil,
-> > > >
-> > > > Thanks for quick review!
-> > > > =20
-> > > > > Logic is clear but it is ugly. We should turn them into macro or =
-inline. =20
-> > > >
-> > > > You've found the 'ugly' in this approach vs keeping them separate.
-> > > >
-> > > > For this version I wanted to keep it clear that indeed this conditi=
-on
-> > > > is a complex mess of different things (and to let people compare
-> > > > it easily with the two paths in v5 to convinced themselves this
-> > > > is the same)
-> > > >
-> > > > It's also a little tricky to do, so will need some thought.
-> > > >
-> > > > I don't think a simple acpi_cpu_is_hotplug() condition is useful
-> > > > as it just moves the complexity away from where a reader is looking
-> > > > and it would only be used in this one case.
-> > > >
-> > > > It doesn't separate well into finer grained subconditions because
-> > > > (C) is a messy case of the vCPU HP case and a not done
-> > > > something else earlier.  The disadvantage of only deferring for
-> > > > arm64 and not other architectures.
-> > > >
-> > > > The best I can quickly come up with is something like this:
-> > > > #define acpi_cpu_not_present(cpu) \
-> > > >         (invalid_logical_cpuid(cpu) || !cpu_present(cpu))
-> > > > #define acpi_cpu_not_enabled(cpu) \
-> > > >         (!invalid_logical_cpuid(cpu) || cpu_present(cpu))
-> > > >
-> > > >         if ((apci_cpu_not_enabled(pr->id) && !get_cpu_device(pr->id=
-) ||
-> > > >             acpi_cpu_not_present(pr->id))
-> > > >
-> > > > Which would still need the same amount of documentation. The
-> > > > code still isn't enough for me to immediately be able to see
-> > > > what is going on.
-> > > >
-> > > > So maybe worth it... I'm not sure.  Rafael, you get to keep this
-> > > > fun, what would you prefer? =20
-> > >
-> > > I would use a static inline function returning bool to carry out these
-> > > checks with comments explaining the different cases in which 'true'
-> > > needs to be returned. =20
-> >
-> > The following makes a subtle logic change (I'll retest tomorrow) but
-> > I think that get_cpu_device(cpu) can never succeed in a path where
-> > hotadd makes sense.
-> >
-> > +/*
-> > + * Identify if the state transition indicates that hotadd_init
-> > + * should be called.
-> > + *
-> > + * For acpi_processor_add() to be called, the reported state must
-> > + * now be enabled and present. Conditions reflect prior state.
-> > + */
-> > +static inline bool acpi_processor_should_hotadd_init(int cpu)
-> > +{
-> > +       /* Already register, initial registration was not deferred */ =
-=20
->=20
-> "Already registered." I think.
->=20
-> > +       if (get_cpu_device(cpu))
-> > +               return false;
-> > +
-> > +       /* Processor has become present */
-> > +       if (!cpu_present(cpu))
-> > +               return true;
-> > +
-> > +       /* Logical cpuid currently invalid indicates hotadd */
-> > +       if (invalid_logical_cpuid(cpu))
-> > +               return true;
-> > +
-> > +       /*
-> > +        * Previously present and the logical cpu id is valid.
-> > +        * Deferred registration now _STA can be queries, or
-> > +        * Hotadd due to enabled becoming true on an online capable
-> > +        * CPU.
-> > +        */
-> > +       if (cpu_present(cpu))
-> > +               return true; =20
->=20
-> It returns true for both the cpu_present(cpu) and !cpu_present(cpu)
-> cases, so will it ever return false except for when
-> get_cpu_device(cpu) returns true?
+I don't see how this avoids a TOCTOU race.   kvm_gmem_fault() presumably runs with
+mmap_lock, but it definitely doesn't take slots_lock.  And this has slots_lock,
+but definitely doesn't have mmap_lock.  If the fault is blocked on the page lock,
+this will see page_mapcount() = 0, and the fault will map the page as soon as
+unlock_page() runs.   Am I missing something?
 
-It indeed looks suspicious. My logic is probably wrong.  Will check
-- I guess maybe pulling out the get_cpu_device(cpu) indeed flattens
-this as you point out. Kind of makes sense if true.
-
-Jonathan
-
->=20
-> > +
-> > +       return false;
-> > +}
-> > +
-> >  static int acpi_processor_get_info(struct acpi_device *device)
-> >  {
-> >         union acpi_object object =3D { 0 };
-> > @@ -356,18 +388,8 @@ static int acpi_processor_get_info(struct acpi_dev=
-ice *device)
-> >          *
-> >          *  NOTE: Even if the processor has a cpuid, it may not be pres=
-ent
-> >          *  because cpuid <-> apicid mapping is persistent now.
-> > -        *
-> > -        *  Note this allows 3 flows, it is up to the arch_register_cpu=
-()
-> > -        *  call to reject any that are not supported on a given archit=
-ecture.
-> > -        *  A) CPU becomes present.
-> > -        *  B) Previously invalid logical CPU ID (Same as becoming pres=
-ent)
-> > -        *  C) CPU already present and now being enabled (and wasn't re=
-gistered
-> > -        *     early on an arch that doesn't defer to here)
-> >          */
-> > -       if ((!invalid_logical_cpuid(pr->id) && cpu_present(pr->id) &&
-> > -            !get_cpu_device(pr->id)) ||
-> > -           invalid_logical_cpuid(pr->id) ||
-> > -           !cpu_present(pr->id)) {
-> > +       if (acpi_processor_should_hotadd_init(pr->id)) {
-> >                 ret =3D acpi_processor_hotadd_init(pr, device);
-> > =20
-
+I haven't thought deeply about this, but I'm pretty sure that "can this be
+mapped" needs to tracked against the guest_memfd() inode, not in KVM.  While
+each guest_memfd() *file* has a 1:1 binding with a KVM instance, the plan is to
+allow multiple files per inode, e.g. to allow intra-host migration to a new KVM
+instance, without destroying guest_memfd().
