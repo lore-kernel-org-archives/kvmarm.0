@@ -1,29 +1,29 @@
 Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DB3869DF5;
-	Thu, 18 Apr 2024 13:56:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 385F51607BD;
+	Thu, 18 Apr 2024 13:57:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713448610; cv=none; b=FXZShxeshuYnEGJSSHRByUzHD7es2q6sRHBLy3x+UwJHWHJJVxwRjnIDFSrvz3hobGTgknb5RAWbFxaHXObowLFcv+vIC+WVt+m3WJV4RFA/dCvQ5mq1HBB0D6cZ/MKc38xjFAoLZyzQllICiSK1d6CQogjKHP+Trm/2418/onw=
+	t=1713448641; cv=none; b=O6KEpELlycWZZnPYnMV9KbwKvBr4rGpQtSBe+dCu8jDXE4DMPPAKtj72diWslUVNhGVKg60cni/KNZV5GtnORS8TgWB8DS7k55vWYJjdVoc23e20mjSQR5ZRtbvj3RhNAAdYGMgCY9lFPJWjzgR4yGg0zF9muHZ8Mdn2RNDgP3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713448610; c=relaxed/simple;
-	bh=ppP0GFROJEK5J9qW3Ew0oILsB5KOIchYLxLxwRsKnNo=;
+	s=arc-20240116; t=1713448641; c=relaxed/simple;
+	bh=Q6ssnwcTXLz7vydOFWMRL9zC7krNWctKO0oi2m7nVi8=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kcgN0tlqRBbjmm5fEH2DQgGVpSzu7h124GuvMFRJtZ82wHwWKIYgHllz0dl2kZ3CkVJWmvQCQvkpOOWzdgpIHB8AJnE7iZbbu1BkxZYERu9rWAAupPZvrCJjt2tLIMRKGBJDDSkLsHiX4enaJPLJ/ZVy7Ziwj0aQoyL30T9/O9g=
+	 MIME-Version:Content-Type; b=oUSB9z+YIqGvH4Ak8K30Itd4M5tbNzjHQi8jPGcYgdqE55Fs+BQL/RzFvYrJVhHoZl0CK10xx50huOMQdbbX+Dzf0XY1PJJimScIb/LT/5S5/ejORCuaFN7jac4EBiqIQAYEtu6f+Y5kl4C+qz6ux4reXlIhjs9onl1zDeWEyjE=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4VKzmN5g61z6D94c;
-	Thu, 18 Apr 2024 21:54:44 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4VKzmz3f55z6D94Q;
+	Thu, 18 Apr 2024 21:55:15 +0800 (CST)
 Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id 9944F140519;
-	Thu, 18 Apr 2024 21:56:47 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 5C173140C98;
+	Thu, 18 Apr 2024 21:57:18 +0800 (CST)
 Received: from SecurePC-101-06.china.huawei.com (10.122.247.231) by
  lhrpeml500005.china.huawei.com (7.191.163.240) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 18 Apr 2024 14:56:46 +0100
+ 15.1.2507.35; Thu, 18 Apr 2024 14:57:17 +0100
 From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 To: Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra
 	<peterz@infradead.org>, <linux-pm@vger.kernel.org>,
@@ -38,9 +38,9 @@ To: Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra
 CC: Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave
  Hansen <dave.hansen@linux.intel.com>, <linuxarm@huawei.com>,
 	<justin.he@arm.com>, <jianyong.wu@arm.com>
-Subject: [PATCH v7 05/16] ACPI: processor: Add acpi_get_processor_handle() helper
-Date: Thu, 18 Apr 2024 14:54:01 +0100
-Message-ID: <20240418135412.14730-6-Jonathan.Cameron@huawei.com>
+Subject: [PATCH v7 06/16] ACPI: processor: Register deferred CPUs from acpi_processor_get_info()
+Date: Thu, 18 Apr 2024 14:54:02 +0100
+Message-ID: <20240418135412.14730-7-Jonathan.Cameron@huawei.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240418135412.14730-1-Jonathan.Cameron@huawei.com>
 References: <20240418135412.14730-1-Jonathan.Cameron@huawei.com>
@@ -55,65 +55,84 @@ Content-Type: text/plain
 X-ClientProxiedBy: lhrpeml100002.china.huawei.com (7.191.160.241) To
  lhrpeml500005.china.huawei.com (7.191.163.240)
 
-If CONFIG_ACPI_PROCESSOR provide a helper to retrieve the
-acpi_handle for a given CPU allowing access to methods
-in DSDT.
+From: James Morse <james.morse@arm.com>
 
-Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+The arm64 specific arch_register_cpu() call may defer CPU registration
+until the ACPI interpreter is available and the _STA method can
+be evaluated.
+
+If this occurs, then a second attempt is made in
+acpi_processor_get_info(). Note that the arm64 specific call has
+not yet been added so for now this will be called for the original
+hotplug case.
+
+For architectures that do not defer until the ACPI Processor
+driver loads (e.g. x86), for initially present CPUs there will
+already be a CPU device. If present do not try to register again.
+
+Systems can still be booted with 'acpi=off', or not include an
+ACPI description at all as in these cases arch_register_cpu()
+will not have deferred registration when first called.
+
+This moves the CPU register logic back to a subsys_initcall(),
+while the memory nodes will have been registered earlier.
+Note this is where the call was prior to the cleanup series so
+there should be no side effects of moving it back again for this
+specific case.
+
+[PATCH 00/21] Initial cleanups for vCPU HP.
+https://lore.kernel.org/all/ZVyz%2FVe5pPu8AWoA@shell.armlinux.org.uk/
+commit 5b95f94c3b9f ("x86/topology: Switch over to GENERIC_CPU_DEVICES")
+
+Signed-off-by: James Morse <james.morse@arm.com>
+Reviewed-by: Gavin Shan <gshan@redhat.com>
+Tested-by: Miguel Luis <miguel.luis@oracle.com>
+Tested-by: Vishnu Pajjuri <vishnu@os.amperecomputing.com>
+Tested-by: Jianyong Wu <jianyong.wu@arm.com>
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Co-developed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Signed-off-by: Joanthan Cameron <Jonathan.Cameron@huawei.com>
 ---
-v7: No change
-v6: New patch
+v7: Simplify the logic on whether to hotadd the CPU.
+    This path can only be reached either for coldplug in which
+    case all we care about is has register_cpu() already been
+    called (identifying deferred), or hotplug in which case
+    whether register_cpu() has been called is also sufficient.
+    Checks on _STA related elements or the validity of the ID
+    are no longer necessary here due to similar checks having
+    moved elsewhere in the path.
+v6: Squash the two paths for conventional CPU Hotplug and arm64
+    vCPU HP.
 ---
- drivers/acpi/acpi_processor.c | 10 ++++++++++
- include/linux/acpi.h          |  7 +++++++
- 2 files changed, 17 insertions(+)
+ drivers/acpi/acpi_processor.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/acpi/acpi_processor.c b/drivers/acpi/acpi_processor.c
-index ac7ddb30f10e..127ae8dcb787 100644
+index 127ae8dcb787..4e65011e706c 100644
 --- a/drivers/acpi/acpi_processor.c
 +++ b/drivers/acpi/acpi_processor.c
-@@ -35,6 +35,16 @@ EXPORT_PER_CPU_SYMBOL(processors);
- struct acpi_processor_errata errata __read_mostly;
- EXPORT_SYMBOL_GPL(errata);
+@@ -350,14 +350,14 @@ static int acpi_processor_get_info(struct acpi_device *device)
+ 	}
  
-+acpi_handle acpi_get_processor_handle(int cpu)
-+{
-+	acpi_handle handle = NULL;
-+	struct acpi_processor *pr = per_cpu(processors, cpu);;
-+
-+	if (pr)
-+		handle = pr->handle;
-+
-+	return handle;
-+}
- static int acpi_processor_errata_piix4(struct pci_dev *dev)
- {
- 	u8 value1 = 0;
-diff --git a/include/linux/acpi.h b/include/linux/acpi.h
-index 34829f2c517a..9844a3f9c4e5 100644
---- a/include/linux/acpi.h
-+++ b/include/linux/acpi.h
-@@ -309,6 +309,8 @@ int acpi_map_cpu(acpi_handle handle, phys_cpuid_t physid, u32 acpi_id,
- int acpi_unmap_cpu(int cpu);
- #endif /* CONFIG_ACPI_HOTPLUG_CPU */
+ 	/*
+-	 *  Extra Processor objects may be enumerated on MP systems with
+-	 *  less than the max # of CPUs. They should be ignored _iff
+-	 *  they are physically not present.
+-	 *
+-	 *  NOTE: Even if the processor has a cpuid, it may not be present
+-	 *  because cpuid <-> apicid mapping is persistent now.
++	 *  This code is not called unless we know the CPU is present and
++	 *  enabled. The two paths are:
++	 *  a) Initially present CPUs on architectures that do not defer
++	 *     their arch_register_cpu() calls until this point.
++	 *  b) Hotplugged CPUs (enabled bit in _STA has transitioned from not
++	 *     enabled to enabled)
+ 	 */
+-	if (invalid_logical_cpuid(pr->id) || !cpu_present(pr->id)) {
++	if (!get_cpu_device(pr->id)) {
+ 		ret = acpi_processor_hotadd_init(pr, device);
  
-+acpi_handle acpi_get_processor_handle(int cpu);
-+
- #ifdef CONFIG_ACPI_HOTPLUG_IOAPIC
- int acpi_get_ioapic_id(acpi_handle handle, u32 gsi_base, u64 *phys_addr);
- #endif
-@@ -1077,6 +1079,11 @@ static inline bool acpi_sleep_state_supported(u8 sleep_state)
- 	return false;
- }
- 
-+static inline acpi_handle acpi_get_processor_handle(int cpu)
-+{
-+	return NULL;
-+}
-+
- #endif	/* !CONFIG_ACPI */
- 
- extern void arch_post_acpi_subsys_init(void);
+ 		if (ret)
 -- 
 2.39.2
 
