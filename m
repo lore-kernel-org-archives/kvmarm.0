@@ -1,71 +1,81 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BE9054BE4
-	for <kvmarm@lists.linux.dev>; Thu, 18 Apr 2024 05:38:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from baidu.com (mx24.baidu.com [111.206.215.185])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 012D73A8EF
+	for <kvmarm@lists.linux.dev>; Thu, 18 Apr 2024 07:10:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=111.206.215.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713418706; cv=none; b=BXKZntBWN0SWBRs9K2mNNfSlgNjEmYeYqWIZ2t6+uZRiF7vMKw7wS2PfpUKxQOBUvdSi1ZFv7L5V0cvP6MoLwdPWZgR69KCUMMoaBVGZsDGT5Qn8jXhpSnO+SPqGLQ7MB0xx+zmiO923tpO3ccsRBJs5e4ZMSo/W0Jki2A+IAlU=
+	t=1713424209; cv=none; b=FvbtzrU6IfPCaMffR85IZIItF7qLU8MtxKpRguYFk54Wr/axgEXuvxSGzUerSq3fORm9P+lGd/c9uqHLCZx3qE7gRjj8Zb417nJOmxCkzkXTDtbEtgCwlSvITGYMwApvsOenwx9/7ZgHT5UuH9W95htRGxGIpmyugkmW8pjbejU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713418706; c=relaxed/simple;
-	bh=gDSXEJclSLPUkmucAi4YvSV5HLcUGxSq8okWA1JWTHw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=A1J18NhI28oT4m6VUYqFHP7wC9oh1xuQ16PTASmLSD7bpjcZYGiIW5V1th3dxAlCUqZFNBOjdzPE7j12iM59I3cOvHvVdKtf7JLEDyTgD9SZvyHaPUmDc9zHSS5++ZMyXHElE/3SPrbrLnJ9eURjO8+ZyEyBVb46A7K2pkwapI0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 51CE4339;
-	Wed, 17 Apr 2024 22:38:46 -0700 (PDT)
-Received: from a077893.arm.com (unknown [10.163.60.115])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 042623F792;
-	Wed, 17 Apr 2024 22:38:13 -0700 (PDT)
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-To: linux-arm-kernel@lists.infradead.org,
-	catalin.marinas@arm.com
-Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Mark Brown <broonie@kernel.org>,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 0/2] arm64: Drop ID_AA64PFR0_EL1_ELx_[64BIT_ONLY|32BIT_64BIT]
-Date: Thu, 18 Apr 2024 11:08:02 +0530
-Message-Id: <20240418053804.2573071-1-anshuman.khandual@arm.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1713424209; c=relaxed/simple;
+	bh=rEeZyMyRdetZw0digCbVNJOeb3XjA7vXXUxfllL4rMw=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=msiRWqzu/+4pkqY5d0MKNnu+o+4Z/0CumZuT/og/oRRPgyTfxTIb9o6/fF/bMDW7PHNnXvWo/PwYcIBb8Wx8Y9wYnY60Z9cNiKZnzbD61LfoiANmNs32foHnqvt5/PogQTQ8r0Ku2j0dgY8knZVGTIsOY9nRj8r/Q0CzF/Y8U7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; arc=none smtp.client-ip=111.206.215.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
+From: "Li,Rongqing" <lirongqing@baidu.com>
+To: Marc Zyngier <maz@kernel.org>
+CC: "oliver.upton@linux.dev" <oliver.upton@linux.dev>, "james.morse@arm.com"
+	<james.morse@arm.com>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>, "catalin.marinas@arm.com"
+	<catalin.marinas@arm.com>, "will@kernel.org" <will@kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>
+Subject: RE: [PATCH] KVM: arm64: Consider NUMA affinity when allocating
+ per-CPU stack_page
+Thread-Topic: [PATCH] KVM: arm64: Consider NUMA affinity when allocating
+ per-CPU stack_page
+Thread-Index: AQHajuYSEQnMbfiDFkC1SUvVaEYWGLFoa0cAgAUw1aA=
+Date: Thu, 18 Apr 2024 06:53:58 +0000
+Message-ID: <f5228e62a05c45a7a61698caa0543485@baidu.com>
+References: <20240415033614.43518-1-lirongqing@baidu.com>
+ <86bk6brsb5.wl-maz@kernel.org>
+In-Reply-To: <86bk6brsb5.wl-maz@kernel.org>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-baidu-bdmsfe-datecheck: 1_BJHW-Mail-Ex15_2024-04-18 14:53:58:552
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-FEAS-Client-IP: 10.127.64.38
+X-FE-Last-Public-Client-IP: 100.100.100.38
+X-FE-Policy-ID: 15:10:21:SYSTEM
 
-This series replaces custom macros usage for ID_AA64PFR0_EL1_ELx_64BIT_ONLY
-and ID_AA64PFR0_EL1_ELx_32BIT_64BIT fields, thus finally just dropping them
-off completely. This series applies on v6.9-rc4.
 
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will@kernel.org>
-Cc: Mark Rutland <mark.rutland@arm.com>
-Cc: Mark Brown <broonie@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org
-Cc: kvmarm@lists.linux.dev
-Cc: linux-kernel@vger.kernel.org
 
-Anshuman Khandual (2):
-  KVM: arm64: Replace custom macros with fields from ID_AA64PFR0_EL1
-  arm64/cpufeature: Replace custom macros with fields from ID_AA64PFR0_EL1
+> Li RongQing <lirongqing@baidu.com> wrote:
+> >
+> > per-CPU stack_page are dominantly accessed from their own local CPUs,
+> > so allocate them node-local to improve performance.
+>=20
+> Do you have any performance data to back this up?
+>=20
+> Given that this is only used in the non-VHE case, and that by doing so yo=
+u have
+> left quite a lot of performance on the floor already, I'm even more surpr=
+ised to
+> see the performance argument.
+>=20
 
- arch/arm64/include/asm/cpufeature.h            | 4 ++--
- arch/arm64/include/asm/sysreg.h                | 4 ----
- arch/arm64/kernel/cpufeature.c                 | 4 ++--
- arch/arm64/kvm/hyp/include/nvhe/fixed_config.h | 8 ++++----
- arch/arm64/kvm/hyp/nvhe/pkvm.c                 | 4 ++--
- arch/arm64/kvm/hyp/nvhe/sys_regs.c             | 2 +-
- 6 files changed, 11 insertions(+), 15 deletions(-)
+Sorry, I have not setup to test it.
 
--- 
-2.25.1
+> Furthermore, you don't address the allocation of per-CPU data, which has =
+a
+> much larger potential impact, given how the HYP code is structured.
+>=20
+
+I will add it in V2
+
+Thanks
+
+-LiRongQing
 
