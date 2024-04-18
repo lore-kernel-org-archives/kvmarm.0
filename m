@@ -1,25 +1,66 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACCDC15AAC1;
-	Thu, 18 Apr 2024 09:30:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20F0315D5C1
+	for <kvmarm@lists.linux.dev>; Thu, 18 Apr 2024 10:55:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713432644; cv=none; b=KjbM8/0+iXP179rGP7jxVJrtTzDLssnmPDF9uVLdlQr5OITAYxUDcVbGnVIcA9MoVrRf/3XiPGQatD9Vn9c5C6FZbhx6g3c4ztOGTw1ldRMNspWlsRtOxfB0vp019StwSHHMju/fMKzY4JaXTIUZoH8VgRWP5Z4GpSVAXrczpjo=
+	t=1713437706; cv=none; b=Pcj+cD+dD3pbuYrfs0FgyYjumCgriWjC5I17TPp/6wcUUrqJz2od1LksxE9b8rocUemKURwFrfMyWGs7YeMYDZiR6LiF2R6BeoN1xvjHyvC+tt1ukMBWnuT9ZidDBjwUop/7AZwa4Vf5Ydrp7z7P473FIUBCB6T6jQu5t2z0gTM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713432644; c=relaxed/simple;
-	bh=jkUdI1l7jyx9l2Q/C9KSmfjWLcjVVTRQwdO0plAvfWU=;
+	s=arc-20240116; t=1713437706; c=relaxed/simple;
+	bh=8OZXVBfeCTydRnEtyrNUdKTGo4z0B7+uEVX1yn9bW7g=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HOqLyJI0cnZkm5ZMtlikL7JQhJwQgEEyOYrhsj/WqRdkcLc2WB8vE9j/cVFfB4/hhJ7UHCkkvg/BG9XniwKjecTMR7V+I5EXsOfHtulcperzac0YcH+uHQB8An2xwu95c9a8NF3OcMlbbZV1ZBeIDXORhZp1qyG2FFQGUJzpaTg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D4500339;
-	Thu, 18 Apr 2024 02:31:09 -0700 (PDT)
-Received: from [10.57.84.16] (unknown [10.57.84.16])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AA4E33F64C;
-	Thu, 18 Apr 2024 02:30:39 -0700 (PDT)
-Message-ID: <785075df-4a0e-4cd3-bace-a59db7caa746@arm.com>
-Date: Thu, 18 Apr 2024 10:30:38 +0100
+	 In-Reply-To:Content-Type; b=PqWiU/hXH0jEFlF12V/kdKc3ijZtCcFWmIzUFTO68MyZd4jDiBoQFzQ2opi17tZtA2lN7GFhpAdmtX78HxyCKaB2j01BhG9MZON6OHcl4/1VXR4y8dx4T5lnIgx6YsclM/GkAAL5++L40LcSxl65PryubnIEiKi9r/hibNRcswg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DNCru0lC; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DNCru0lC"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713437703;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=d2jzXLERyPKZuNUFiltdpbLaYXXZisiHHnM66+w3usM=;
+	b=DNCru0lCZo9QbaDxY3Ru8RySEH7SdTcVYWMIlGfeT47RgVSJHeo7Xnhco+9degQW00L8td
+	8ARoYpx5EhLyW7v5YEXIm/KLEIKapY5I+xoNF+8jq0cxdDBv4uAygAwXZBaOSyH2Du9FDf
+	+ZnY3jgPMBfuo+VikXbzkQS3SaXQap0=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-638-4klEpCiHOO-jUwga0X-lZA-1; Thu, 18 Apr 2024 06:55:01 -0400
+X-MC-Unique: 4klEpCiHOO-jUwga0X-lZA-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-417c5cc7c96so4065175e9.1
+        for <kvmarm@lists.linux.dev>; Thu, 18 Apr 2024 03:55:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713437700; x=1714042500;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=d2jzXLERyPKZuNUFiltdpbLaYXXZisiHHnM66+w3usM=;
+        b=nqWrRFWLw9IuVCC61Q8sFtMWP29bJmkFrmMYz0kcLA4qbiUc0ig+K6/Akzl2gGaEnE
+         JHe6ow5pYoGuWNGfFzxytwQteBrKRaRXKcrghVQbNV/YeSl6s8tC4ij0qWNUvlVYLQL8
+         q8wiAnMqGYZENEHuQpr48DKfnfubCQYEJsusjJcZYhrr12Y8ycimsgxPT1hJfG0z/4/N
+         1hpZJheqWZXAgXfr+7/16lyCe0lnAZjw7OLyxf1sutUkm1Uv0Ie7j5gkNk0lWShWPgmv
+         mJR3O7d+t2jJPeJSlhI1hmNFpwgsj/6a1z/xhGoFPL+Ljg/mH48VUUZwFXv39GS2lo7C
+         pmIA==
+X-Forwarded-Encrypted: i=1; AJvYcCUeh9WHW9aIV/c+JvOyb0oMRyWYu201/H2WGo3ZhzILOgroTGToX40qn3mLcZ5actdu8o92HT9trCxmisrKEnFTyMkBiZqG
+X-Gm-Message-State: AOJu0Yy/ZswoMPhS6KgDX9O3PaxnW/JXhTwV6laAPCyq4TLEDcEydUux
+	m1ZnAzviO178XK1njcu1AgCp/RFs/1TDLoprbWNuySG5FrjFjhWxEdwhK+bqvH/h94I3Pqnwk+C
+	ZEO7U20LsThl/4HsCZaVo8HNa245LuBkTfPT1+FiuZdZ/HYHCDGX5VA==
+X-Received: by 2002:a05:600c:1389:b0:413:2852:2835 with SMTP id u9-20020a05600c138900b0041328522835mr1695092wmf.17.1713437700343;
+        Thu, 18 Apr 2024 03:55:00 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHPWCJlfAT8j/wcwR98/anAxHgFJL9cw/H7DtITEOOGUQJ/tzqQdhGyvYfGg54bfD2b5pTm8g==
+X-Received: by 2002:a05:600c:1389:b0:413:2852:2835 with SMTP id u9-20020a05600c138900b0041328522835mr1695064wmf.17.1713437699899;
+        Thu, 18 Apr 2024 03:54:59 -0700 (PDT)
+Received: from ?IPV6:2a09:80c0:192:0:5dac:bf3d:c41:c3e7? ([2a09:80c0:192:0:5dac:bf3d:c41:c3e7])
+        by smtp.gmail.com with ESMTPSA id fm25-20020a05600c0c1900b00418e2b69e14sm1962565wmb.40.2024.04.18.03.54.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 18 Apr 2024 03:54:59 -0700 (PDT)
+Message-ID: <b706671a-0a11-40a3-882a-89be26f24505@redhat.com>
+Date: Thu, 18 Apr 2024 12:54:57 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,161 +68,162 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 16/43] KVM: arm64: Support timers in realm RECs
-Content-Language: en-GB
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-References: <20240412084056.1733704-1-steven.price@arm.com>
- <20240412084309.1733783-1-steven.price@arm.com>
- <20240412084309.1733783-17-steven.price@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20240412084309.1733783-17-steven.price@arm.com>
+Subject: Re: [RFC PATCH v1 04/26] KVM: Don't allow private attribute to be set
+ if mapped by host
+To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
+ anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
+ aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
+ brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
+ xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com,
+ jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
+ yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net,
+ vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com,
+ mail@maciej.szmigiero.name, michael.roth@amd.com, wei.w.wang@intel.com,
+ liam.merwick@oracle.com, isaku.yamahata@gmail.com,
+ kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
+ steven.price@arm.com, quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
+ quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com,
+ quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com,
+ quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com,
+ yuzenghui@huawei.com, oliver.upton@linux.dev, maz@kernel.org,
+ will@kernel.org, qperret@google.com, keirf@google.com
+References: <20240222161047.402609-1-tabba@google.com>
+ <20240222161047.402609-5-tabba@google.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <20240222161047.402609-5-tabba@google.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 12/04/2024 09:42, Steven Price wrote:
-> The RMM keeps track of the timer while the realm REC is running, but on
-> exit to the normal world KVM is responsible for handling the timers.
+On 22.02.24 17:10, Fuad Tabba wrote:
+> Guest private memory should never be mapped by the host.
+> Therefore, do not allow setting the private attribute to guest
+> memory if that memory is mapped by the host.
 > 
-
-minor nit: It may be worth mentioning this will be hooked in, when we
-add the Realm exit handling.
-
-Otherwise looks good to me.
-
-
-Suzuki
-
-
-> Signed-off-by: Steven Price <steven.price@arm.com>
+> Signed-off-by: Fuad Tabba <tabba@google.com>
 > ---
->   arch/arm64/kvm/arch_timer.c  | 45 ++++++++++++++++++++++++++++++++----
->   include/kvm/arm_arch_timer.h |  2 ++
->   2 files changed, 43 insertions(+), 4 deletions(-)
+>   include/linux/kvm_host.h |  7 ++++++
+>   virt/kvm/kvm_main.c      | 51 ++++++++++++++++++++++++++++++++++++++++
+>   2 files changed, 58 insertions(+)
 > 
-> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> index 879982b1cc73..0b2be34a9ba3 100644
-> --- a/arch/arm64/kvm/arch_timer.c
-> +++ b/arch/arm64/kvm/arch_timer.c
-> @@ -162,6 +162,13 @@ static void timer_set_cval(struct arch_timer_context *ctxt, u64 cval)
->   
->   static void timer_set_offset(struct arch_timer_context *ctxt, u64 offset)
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index fad296baa84e..f52d5503ddef 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -2408,11 +2408,18 @@ static inline bool kvm_gmem_is_mappable(struct kvm *kvm, gfn_t gfn)
+>   	return !(kvm_get_memory_attributes(kvm, gfn) &
+>   		 KVM_MEMORY_ATTRIBUTE_NOT_MAPPABLE);
+>   }
+> +
+> +bool kvm_is_gmem_mapped(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end);
+>   #else
+>   static inline bool kvm_gmem_is_mappable(struct kvm *kvm, gfn_t gfn)
 >   {
-> +	struct kvm_vcpu *vcpu = ctxt->vcpu;
+>   	return false;
+>   }
 > +
-> +	if (kvm_is_realm(vcpu->kvm)) {
-> +		WARN_ON(offset);
-> +		return;
-> +	}
-> +
->   	if (!ctxt->offset.vm_offset) {
->   		WARN(offset, "timer %ld\n", arch_timer_ctx_index(ctxt));
->   		return;
-> @@ -460,6 +467,21 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
->   	}
+> +static inline bool kvm_is_gmem_mapped(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
+> +{
+> +	return false;
+> +}
+>   #endif /* CONFIG_KVM_GENERIC_PRIVATE_MEM_MAPPABLE */
+>   
+>   #endif
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index fba4dc6e4107..9f6ff314bda3 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -2516,6 +2516,48 @@ static __always_inline void kvm_handle_gfn_range(struct kvm *kvm,
+>   		KVM_MMU_UNLOCK(kvm);
 >   }
 >   
-> +void kvm_realm_timers_update(struct kvm_vcpu *vcpu)
+> +#ifdef CONFIG_KVM_GENERIC_PRIVATE_MEM_MAPPABLE
+> +bool kvm_is_gmem_mapped(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
 > +{
-> +	struct arch_timer_cpu *arch_timer = &vcpu->arch.timer_cpu;
-> +	int i;
+> +	struct kvm_memslot_iter iter;
 > +
-> +	for (i = 0; i < NR_KVM_EL0_TIMERS; i++) {
-> +		struct arch_timer_context *timer = &arch_timer->timers[i];
-> +		bool status = timer_get_ctl(timer) & ARCH_TIMER_CTRL_IT_STAT;
-> +		bool level = kvm_timer_irq_can_fire(timer) && status;
+> +	kvm_for_each_memslot_in_gfn_range(&iter, kvm_memslots(kvm), gfn_start, gfn_end) {
+> +		struct kvm_memory_slot *memslot = iter.slot;
+> +		gfn_t start, end, i;
 > +
-> +		if (level != timer->irq.level)
-> +			kvm_timer_update_irq(vcpu, level, timer);
-> +	}
-> +}
+> +		start = max(gfn_start, memslot->base_gfn);
+> +		end = min(gfn_end, memslot->base_gfn + memslot->npages);
+> +		if (WARN_ON_ONCE(start >= end))
+> +			continue;
 > +
->   /* Only called for a fully emulated timer */
->   static void timer_emulate(struct arch_timer_context *ctx)
->   {
-> @@ -831,6 +853,8 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
->   	if (unlikely(!timer->enabled))
->   		return;
->   
-> +	kvm_timer_unblocking(vcpu);
+> +		for (i = start; i < end; i++) {
+> +			struct page *page;
+> +			bool is_mapped;
+> +			kvm_pfn_t pfn;
+> +			int ret;
 > +
->   	get_timer_map(vcpu, &map);
->   
->   	if (static_branch_likely(&has_gic_active_state)) {
-> @@ -844,8 +868,6 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
->   		kvm_timer_vcpu_load_nogic(vcpu);
->   	}
->   
-> -	kvm_timer_unblocking(vcpu);
-> -
->   	timer_restore_state(map.direct_vtimer);
->   	if (map.direct_ptimer)
->   		timer_restore_state(map.direct_ptimer);
-> @@ -988,7 +1010,9 @@ static void timer_context_init(struct kvm_vcpu *vcpu, int timerid)
->   
->   	ctxt->vcpu = vcpu;
->   
-> -	if (timerid == TIMER_VTIMER)
-> +	if (kvm_is_realm(vcpu->kvm))
-> +		ctxt->offset.vm_offset = NULL;
-> +	else if (timerid == TIMER_VTIMER)
->   		ctxt->offset.vm_offset = &kvm->arch.timer_data.voffset;
->   	else
->   		ctxt->offset.vm_offset = &kvm->arch.timer_data.poffset;
-> @@ -1011,13 +1035,19 @@ static void timer_context_init(struct kvm_vcpu *vcpu, int timerid)
->   void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
->   {
->   	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
-> +	u64 cntvoff;
->   
->   	for (int i = 0; i < NR_KVM_TIMERS; i++)
->   		timer_context_init(vcpu, i);
->   
-> +	if (kvm_is_realm(vcpu->kvm))
-> +		cntvoff = 0;
-> +	else
-> +		cntvoff = kvm_phys_timer_read();
+> +			/*
+> +			 * Check the page_mapcount with the page lock held to
+> +			 * avoid racing with kvm_gmem_fault().
+> +			 */
+> +			ret = kvm_gmem_get_pfn_locked(kvm, memslot, i, &pfn, NULL);
+> +			if (WARN_ON_ONCE(ret))
+> +				continue;
 > +
->   	/* Synchronize offsets across timers of a VM if not already provided */
->   	if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags)) {
-> -		timer_set_offset(vcpu_vtimer(vcpu), kvm_phys_timer_read());
-> +		timer_set_offset(vcpu_vtimer(vcpu), cntvoff);
->   		timer_set_offset(vcpu_ptimer(vcpu), 0);
->   	}
->   
-> @@ -1525,6 +1555,13 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
->   		return -EINVAL;
->   	}
->   
-> +	/*
-> +	 * We don't use mapped IRQs for Realms because the RMI doesn't allow
-> +	 * us setting the LR.HW bit in the VGIC.
-> +	 */
-> +	if (vcpu_is_rec(vcpu))
-> +		return 0;
-> +
->   	get_timer_map(vcpu, &map);
->   
->   	ret = kvm_vgic_map_phys_irq(vcpu,
-> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-> index c819c5d16613..d8ab297560d0 100644
-> --- a/include/kvm/arm_arch_timer.h
-> +++ b/include/kvm/arm_arch_timer.h
-> @@ -112,6 +112,8 @@ int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
->   int kvm_arm_timer_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
->   int kvm_arm_timer_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
->   
-> +void kvm_realm_timers_update(struct kvm_vcpu *vcpu);
-> +
->   u64 kvm_phys_timer_read(void);
->   
->   void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu);
+> +			page = pfn_to_page(pfn);
+> +			is_mapped = page_mapcount(page);
+> +			unlock_page(page);
+> +			put_page(page);
+
+Stumbling over this, please avoid using page_mapcount(). page_mapped() 
+-- or better folio_mapped() -- is what you should be using here (iow, 
+convert it to work on folios).
+
+-- 
+Cheers,
+
+David / dhildenb
 
