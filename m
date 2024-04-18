@@ -1,54 +1,54 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E57F2171085
-	for <kvmarm@lists.linux.dev>; Thu, 18 Apr 2024 16:31:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A358171E5D
+	for <kvmarm@lists.linux.dev>; Thu, 18 Apr 2024 16:31:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713457910; cv=none; b=PsKtSLLP34OxTSfb2Y/ZByPLTPDQXOSIHPPkeor4jSwzBFg+OWmSfhkdY+QdI43P2nlDaVIBoDhFn44FRxYUALPX2gOSC4K5TN6Zs8xit3rveiosNCGoMOq5RTv0h1OgT6yfBL6WoPmrDG7E2ATSv6IPebEyJ4iyNlT30ikx3ls=
+	t=1713457911; cv=none; b=Vgb4WZu7nTPy8m2EI+J/TUvVPBlLMVsx73BiJuM//3fXwaYmcEA2gtPd9QR9WTNPVwzww17me1/Ge84I5/Ehl0feQqjl6/4qi94B5aUh7vbtGtSDSPPca8T4P2txHvj9PTgefLysirfRv99TP4ltgz6c6pqoLJU5jZ/m/34FvSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713457910; c=relaxed/simple;
-	bh=bwRIdgpsHW/V76+UX+Cj8GF/pMxY2YesRhoOXmNznx4=;
+	s=arc-20240116; t=1713457911; c=relaxed/simple;
+	bh=reTusRmlKdivguaCRBJs9NeNASz4hK8OyNTz/hTvqXQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=d9Ci64L9DF61Mtb5bh/VN8C9ImHQHO8rRrxtusjQT3RaYVokumirlI0ghZwfq6wiZ/qWvGxSx0gMVqg81YNJThdHHQKuchhvQxYhV+5E8Z4zQY2LACIriHRF2cGHs5rpmXMeg006MZqxwoCddF0hQI1lpL0ePp7dDRyY7S12HaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rBsHHHnV; arc=none smtp.client-ip=209.85.219.201
+	 To:Cc:Content-Type; b=QrZW+4Bu2Bra/RRF5gNH8hxsdAcoC8BXic5n8bUzwqGUtNPiTrjMXRdKI07unQvTuR/Sai4XiF7+W9Awa74narzLH4G+CB8MviG5WnjvAF1dDKvNZHNCVt+DBaKf0wIQSprwZplLFIKSoH9VLdOBX8HsorPdxXBZ3RaAdd7QEMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fkSYX0wR; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rBsHHHnV"
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-de4645bee83so1732658276.3
-        for <kvmarm@lists.linux.dev>; Thu, 18 Apr 2024 09:31:47 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fkSYX0wR"
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-61b1200cc92so20272087b3.0
+        for <kvmarm@lists.linux.dev>; Thu, 18 Apr 2024 09:31:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713457907; x=1714062707; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1713457909; x=1714062709; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8p9c64neWTEzUroG7YZesoYglVijCCcHGMdjez+sjDY=;
-        b=rBsHHHnVIraKqek7sEMj9XNe8b9s19itarGXqjhYsVvpW4ox7tuSt8pqflhp/550uf
-         1c9qDKk/nU1i9V+ICA8gdpwsNVDOHPXKZV4DlT+Loc2G1WmqJfGmfmECTh717RMpUmzZ
-         FLyyXVXeI90dyWmQ/mwZT4ZETe/ZudEE0F1iKdusloIs6+pizhff3eXTz7A1btTolECl
-         uBDK6zeUwAEfalZaz6aMTAspyEZ1tsK1EHCty9oejXEUNYKuSmwxg+A9pL6UyDCwYX2E
-         kdBrV8dVmWE2Lk9tzWyw1IY/flw1Gakut2nqIJUVjDM1bK1s52ixM123UPl9nk4CEIIR
-         a8YQ==
+        bh=JYz/Mm7XL97gcC37XQSh6FT+KtzHg82q93nX3l947mY=;
+        b=fkSYX0wR3bplw+sUpm8j9v0Rr5i9A5ilcnS92dbuYmsVozi3rztVBEAfkbg7Q91YUH
+         u/mejfiN4BL8OMdPpi1ml5INBaDx2BUD4dwa3uGRPWl8miNjG6YjB8sGm4ws1/Oxxc6L
+         R11Vj9UrCk05mUR3Y5b2dT2xQwGv6E1Rm7V6BdpUE8dU9m6HpEDaTtvKugtbML3MW0C5
+         /0QXDnRboa/IX+OkKrJjMvPK/BAmzHXMQ2kfGHu79yZTyFu4LsmWDps36Y5lvGJ5WltV
+         1OogW6DChgO9z1E6kYKh3IP7Qy3OuF9zs5qP2/ASJpvplbvxAfF4MtzFhSP7WGDFllB2
+         5kKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713457907; x=1714062707;
+        d=1e100.net; s=20230601; t=1713457909; x=1714062709;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8p9c64neWTEzUroG7YZesoYglVijCCcHGMdjez+sjDY=;
-        b=SU6DYnOGBnc54hTls2NfeM8lXBrfciIh+jqhAT6IP9yZd9b8HXwScqSiUDWmif8ukf
-         GQIFS+Ytz8J8AGOxxBrU6GyXQSpxRHTkhr9UOHZzFg2k73aT7TtyMWNFkYVDcjL5pFus
-         HevYkS2XOxeZ8x+cCsKoU7YIb3/KQwd07WxSeJ6djMqgq6OUT51Ac/Db1RgFJd+UNJEs
-         AaDgUIrCVvh5+JiTdmPF9oxv6ooD1bmRDmhKsxczqrqoAZILALJZvi3Op/BAsp20cYia
-         g3ykN1/GwjHjuElpzjbB4gJg5JurcZlgYNJxJ52BJpwqeB6mu9pnEc+75FLNjsTectr/
-         hLuw==
-X-Gm-Message-State: AOJu0YzPzWWtBtfEbzV+URO3aKAHE197kBXECV1pHV/bekeg5CUzZJjF
-	JhO1kEG3cfW7jdViI5tKDjzve7mJVGHvNkJsi7AFo7++mvG9TtvDZuavU10NGirn978AjjJNJfP
-	FjNltyHYoTIEbDRTv7rQRMIUPAA==
-X-Google-Smtp-Source: AGHT+IHpX3+77ZV25mCqXIANfzu2cm+jHFm8blOeRGiipeMLfzcogzWLO4ECeP8t8lYr9QlOgIVIHYowhRuQKDsITVs=
+        bh=JYz/Mm7XL97gcC37XQSh6FT+KtzHg82q93nX3l947mY=;
+        b=O2vQ3JQRoosoVNQnh+Sb1oyUGuGoqqkcBY4CdkUmijL8iiekbkyMfpuB8SKFXN8hgo
+         uO169pBjhMl/VxGTYQkjETk0bxak3SGgjtmwR2CGu/lNfrCO76Opi2anB/a+owYLdYZH
+         CYNdYOtF5HA/cO8ppctQmDtIfZiMBM5HksGWGJ4bGhoMJfbf7bmFr76WKOSTP0RZvzQt
+         ShTCOduYa5CthttmmWD4SdYGexpx7/D9NHxDMHX/xKo/ljKeJxwc3yD6HPJJ6OFJzDJF
+         Qpoll02MqNEPlZcOUF6Oex22kvp4u9m8iEHYuQmmxNyvsrEIjP/5NXO5oOS3P/ldhI6S
+         840w==
+X-Gm-Message-State: AOJu0YzEHezzDI5/5qRLozR98/vJHdqfP2MPInqqcz1ZfwdJJvgRUnmO
+	OJvKpWdEPsYk+ahnn5Thpn7LBGA1jXD+NTAAaxCJCRpMKLUXopnZW+HeWfsXkOnFIiSAa5MI40g
+	q1jEr3GY2fHSjezjcQZucmysM2w==
+X-Google-Smtp-Source: AGHT+IGRr7uB8dyL1qZY2tNdLCo6bCgG9f2Ylok0Sq5MdDUUM2WXBpExMqrkM6rHCoVTKgjGEzcyP05psJEyfeFP8OM=
 X-Received: from sebkvm.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:cd5])
- (user=sebastianene job=sendgmr) by 2002:a05:6902:2b8e:b0:dd9:1b94:edb5 with
- SMTP id fj14-20020a0569022b8e00b00dd91b94edb5mr293032ybb.10.1713457906943;
- Thu, 18 Apr 2024 09:31:46 -0700 (PDT)
-Date: Thu, 18 Apr 2024 16:30:24 +0000
+ (user=sebastianene job=sendgmr) by 2002:a05:6902:2b08:b0:dda:c59c:3953 with
+ SMTP id fi8-20020a0569022b0800b00ddac59c3953mr882660ybb.0.1713457909290; Thu,
+ 18 Apr 2024 09:31:49 -0700 (PDT)
+Date: Thu, 18 Apr 2024 16:30:25 +0000
 In-Reply-To: <20240418163025.1193763-2-sebastianene@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -58,8 +58,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240418163025.1193763-2-sebastianene@google.com>
 X-Mailer: git-send-email 2.44.0.769.g3c40516874-goog
-Message-ID: <20240418163025.1193763-4-sebastianene@google.com>
-Subject: [PATCH 2/4] KVM: arm64: Add support for FFA_PARTITION_INFO_GET
+Message-ID: <20240418163025.1193763-5-sebastianene@google.com>
+Subject: [PATCH 3/4] KVM: arm64: Fix the identification range for the FF-A smcs
 From: Sebastian Ene <sebastianene@google.com>
 To: catalin.marinas@arm.com, james.morse@arm.com, jean-philippe@linaro.org, 
 	maz@kernel.org, oliver.upton@linux.dev, qperret@google.com, 
@@ -71,80 +71,33 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	Sebastian Ene <sebastianene@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Handle the FFA_PARTITION_INFO_GET host call inside the pKVM hypervisor
-and copy the response message back to the host buffers. Save the
-returned FF-A version as we will need it later to interpret the response
-from the TEE.
+The FF-A spec 1.2 reserves the following ranges for identifying FF-A
+calls:
+0x84000060-0x840000FF: FF-A 32-bit calls
+0xC4000060-0xC40000FF: FF-A 64-bit calls.
+
+Use the range identification according to the spec and allow calls that
+are currently out of the range(eg. FFA_MSG_SEND_DIRECT_REQ2) to be
+identified correctly.
 
 Signed-off-by: Sebastian Ene <sebastianene@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/ffa.c | 46 +++++++++++++++++++++++++++++++++++
- 1 file changed, 46 insertions(+)
+ arch/arm64/kvm/hyp/include/nvhe/ffa.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-index 023712e8beeb..d53f50c73acb 100644
---- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-+++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-@@ -674,6 +674,49 @@ static void do_ffa_version(struct arm_smccc_res *res,
- 	hyp_spin_unlock(&host_buffers.lock);
- }
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/ffa.h b/arch/arm64/kvm/hyp/include/nvhe/ffa.h
+index d9fd5e6c7d3c..146e0aebfa1c 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/ffa.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/ffa.h
+@@ -9,7 +9,7 @@
+ #include <asm/kvm_host.h>
  
-+static void do_ffa_part_get(struct arm_smccc_res *res,
-+			    struct kvm_cpu_context *ctxt)
-+{
-+	DECLARE_REG(u32, uuid0, ctxt, 1);
-+	DECLARE_REG(u32, uuid1, ctxt, 2);
-+	DECLARE_REG(u32, uuid2, ctxt, 3);
-+	DECLARE_REG(u32, uuid3, ctxt, 4);
-+	DECLARE_REG(u32, flags, ctxt, 5);
-+	u32 off, count, sz, buf_sz;
-+
-+	hyp_spin_lock(&host_buffers.lock);
-+	if (!host_buffers.rx) {
-+		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-+		goto out_unlock;
-+	}
-+
-+	arm_smccc_1_1_smc(FFA_PARTITION_INFO_GET, uuid0, uuid1,
-+			  uuid2, uuid3, flags, 0, 0,
-+			  res);
-+
-+	if (res->a0 != FFA_SUCCESS)
-+		goto out_unlock;
-+
-+	count = res->a2;
-+	if (!count)
-+		goto out_unlock;
-+
-+	if (host_buffers.ffa_version > FFA_VERSION_1_0) {
-+		buf_sz = sz = res->a3;
-+		if (sz > sizeof(struct ffa_partition_info))
-+			buf_sz = sizeof(struct ffa_partition_info);
-+	} else {
-+		/* FFA_VERSION_1_0 lacks the size in the response */
-+		buf_sz = sz = 8;
-+	}
-+
-+	WARN_ON((count - 1) * sz + buf_sz > PAGE_SIZE);
-+	for (off = 0; off < count * sz; off += sz)
-+		memcpy(host_buffers.rx + off, hyp_buffers.rx + off, buf_sz);
-+out_unlock:
-+	hyp_spin_unlock(&host_buffers.lock);
-+}
-+
- bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
- {
- 	struct arm_smccc_res res;
-@@ -723,6 +766,9 @@ bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
- 	case FFA_VERSION:
- 		do_ffa_version(&res, host_ctxt);
- 		goto out_handled;
-+	case FFA_PARTITION_INFO_GET:
-+		do_ffa_part_get(&res, host_ctxt);
-+		goto out_handled;
- 	}
+ #define FFA_MIN_FUNC_NUM 0x60
+-#define FFA_MAX_FUNC_NUM 0x7F
++#define FFA_MAX_FUNC_NUM 0xFF
  
- 	if (ffa_call_supported(func_id))
+ int hyp_ffa_init(void *pages);
+ bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id);
 -- 
 2.44.0.769.g3c40516874-goog
 
