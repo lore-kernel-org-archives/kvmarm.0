@@ -1,374 +1,224 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90A447D3F4;
-	Thu, 18 Apr 2024 13:17:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46FDA160796;
+	Thu, 18 Apr 2024 13:54:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713446250; cv=none; b=WoXmJcqE+LVjGR+MDabpwj2OKqptkSUR2Ftm439L/c6iwUeoAtnkVPloTpWpVFhtwYDnNBT7APNb/nQal8FQeyZpn/Ll8AyWmhwK+av30d2lYlAN4KsJxWVwGxvHHM7UFXIeWH2VPoOlmZ6XrUPQIg17/RQPXFdsprq+Y7AsOPU=
+	t=1713448460; cv=none; b=tsllf4OmMVWAUP74NRlGsLIPqm+y0bluuyaDcGzggL6FOoXzSHzWfbH7XvW0+d3vZTeav+o7/fjcCSN+QtkQiNLnHTTML3Gi4KdMx2k/Pbm2968SXxmDJ53iLzbg/P9d+4nAPhUrNuCPU+/YZaKr4t3JAzF7Ry8oku6XF7T4gPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713446250; c=relaxed/simple;
-	bh=uFBVCzKTwIgEfdvC7/2meAWUHLTgMbNu/QYppjfZugI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YAJl6lxOJF9eh0FCivvtZKueUtxrbPxRI9qmPuWFawCTq3AFBHzwjM0pMIwjM29H/+/B+sP0OVM/CAHoPAt4gVDbapj+8gSXI8vP0cBxYa95xFC9IQQi2QTL0iPwF6tJvqhr7LkCubxuzzp5iv5ub8MNxJS3TWoXmRzfgKOPq2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AB529DA7;
-	Thu, 18 Apr 2024 06:17:55 -0700 (PDT)
-Received: from [10.1.35.34] (e122027.cambridge.arm.com [10.1.35.34])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EFCFF3F738;
-	Thu, 18 Apr 2024 06:17:23 -0700 (PDT)
-Message-ID: <f5b87486-89b5-4c86-aadb-47204fb39bea@arm.com>
-Date: Thu, 18 Apr 2024 14:17:23 +0100
+	s=arc-20240116; t=1713448460; c=relaxed/simple;
+	bh=yXKPO/hvrdFwE0im3psB1dSWiai6UVdyh79F1t1raf4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=u/sB7UvpO7d59wQye03KLNtn6POtQQghniYN+mgQaQ1W6WJN++6v0SEMQoRRxO2522xRVR+PKqr4iuFuc+ORqXPTXIE1AZM4qsBlL41/r0Noo+w8I/cwSBAtxp5qlHWNNixZksWzvduWIbAf/p4DYT2KUHxosj4CGZb9PKVpxkU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4VKzjQ2WsNz6K5sZ;
+	Thu, 18 Apr 2024 21:52:10 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id 9FF1D140119;
+	Thu, 18 Apr 2024 21:54:13 +0800 (CST)
+Received: from SecurePC-101-06.china.huawei.com (10.122.247.231) by
+ lhrpeml500005.china.huawei.com (7.191.163.240) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 18 Apr 2024 14:54:13 +0100
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+To: Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra
+	<peterz@infradead.org>, <linux-pm@vger.kernel.org>,
+	<loongarch@lists.linux.dev>, <linux-acpi@vger.kernel.org>,
+	<linux-arch@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<x86@kernel.org>, Russell King <linux@armlinux.org.uk>, "Rafael J . Wysocki"
+	<rafael@kernel.org>, Miguel Luis <miguel.luis@oracle.com>, James Morse
+	<james.morse@arm.com>, Salil Mehta <salil.mehta@huawei.com>, Jean-Philippe
+ Brucker <jean-philippe@linaro.org>, Catalin Marinas
+	<catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+CC: Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave
+ Hansen <dave.hansen@linux.intel.com>, <linuxarm@huawei.com>,
+	<justin.he@arm.com>, <jianyong.wu@arm.com>
+Subject: [PATCH v7 00/16] ACPI/arm64: add support for virtual cpu hotplug
+Date: Thu, 18 Apr 2024 14:53:56 +0100
+Message-ID: <20240418135412.14730-1-Jonathan.Cameron@huawei.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 05/43] arm64: RME: Add SMC definitions for calling the
- RMM
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-References: <20240412084056.1733704-1-steven.price@arm.com>
- <20240412084309.1733783-1-steven.price@arm.com>
- <20240412084309.1733783-6-steven.price@arm.com>
- <e6ece61d-ceb6-44f3-a17c-c678b4562991@arm.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <e6ece61d-ceb6-44f3-a17c-c678b4562991@arm.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: lhrpeml100002.china.huawei.com (7.191.160.241) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
-On 16/04/2024 13:38, Suzuki K Poulose wrote:
-> Hi Steven
-> 
-> On 12/04/2024 09:42, Steven Price wrote:
->> The RMM (Realm Management Monitor) provides functionality that can be
->> accessed by SMC calls from the host.
->>
->> The SMC definitions are based on DEN0137[1] version 1.0-eac5
->>
->> [1] https://developer.arm.com/documentation/den0137/1-0eac5/
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->>   arch/arm64/include/asm/rmi_smc.h | 250 +++++++++++++++++++++++++++++++
->>   1 file changed, 250 insertions(+)
->>   create mode 100644 arch/arm64/include/asm/rmi_smc.h
->>
->> diff --git a/arch/arm64/include/asm/rmi_smc.h
->> b/arch/arm64/include/asm/rmi_smc.h
->> new file mode 100644
->> index 000000000000..c205efdb18d8
->> --- /dev/null
->> +++ b/arch/arm64/include/asm/rmi_smc.h
->> @@ -0,0 +1,250 @@
->> +/* SPDX-License-Identifier: GPL-2.0 */
->> +/*
->> + * Copyright (C) 2023 ARM Ltd.
->> + *
->> + * The values and structures in this file are from the Realm
->> Management Monitor
->> + * specification (DEN0137) version A-bet0:
->> + * https://developer.arm.com/documentation/den0137/1-0bet0/
-> 
-> This should now point to eac5 instead.
+Whilst it is a bit quick after v6, a couple of critical issues
+were pointed out by Russell, Salil and Rafael + one build issue
+had been missed, so it seems sensible to make sure those conducting
+testing or further review have access to a fixed version.
 
-Typical - I searched through the commit logs, but forgot I'd put a
-reference in the code too! Thanks for spotting.
+v7:
+  - Fix misplaced config guard that broke bisection.
+  - Greatly simplify the condition on which we call
+    acpi_processor_hotadd_init().
+  - Improve teardown ordering.
 
->> + */
->> +
->> +#ifndef __ASM_RME_SMC_H
->> +#define __ASM_RME_SMC_H
->> +
->> +#include <linux/arm-smccc.h>
->> +
->> +#define SMC_RxI_CALL(func)                \
->> +    ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,        \
->> +               ARM_SMCCC_SMC_64,        \
->> +               ARM_SMCCC_OWNER_STANDARD,    \
->> +               (func))
->> +
->> +#define SMC_RMI_DATA_CREATE        SMC_RxI_CALL(0x0153)
->> +#define SMC_RMI_DATA_CREATE_UNKNOWN    SMC_RxI_CALL(0x0154)
->> +#define SMC_RMI_DATA_DESTROY        SMC_RxI_CALL(0x0155)
->> +#define SMC_RMI_FEATURES        SMC_RxI_CALL(0x0165)
->> +#define SMC_RMI_GRANULE_DELEGATE    SMC_RxI_CALL(0x0151)
->> +#define SMC_RMI_GRANULE_UNDELEGATE    SMC_RxI_CALL(0x0152)
->> +#define SMC_RMI_PSCI_COMPLETE        SMC_RxI_CALL(0x0164)
->> +#define SMC_RMI_REALM_ACTIVATE        SMC_RxI_CALL(0x0157)
->> +#define SMC_RMI_REALM_CREATE        SMC_RxI_CALL(0x0158)
->> +#define SMC_RMI_REALM_DESTROY        SMC_RxI_CALL(0x0159)
->> +#define SMC_RMI_REC_AUX_COUNT        SMC_RxI_CALL(0x0167)
->> +#define SMC_RMI_REC_CREATE        SMC_RxI_CALL(0x015a)
->> +#define SMC_RMI_REC_DESTROY        SMC_RxI_CALL(0x015b)
->> +#define SMC_RMI_REC_ENTER        SMC_RxI_CALL(0x015c)
->> +#define SMC_RMI_RTT_CREATE        SMC_RxI_CALL(0x015d)
->> +#define SMC_RMI_RTT_DESTROY        SMC_RxI_CALL(0x015e)
->> +#define SMC_RMI_RTT_FOLD        SMC_RxI_CALL(0x0166)
->> +#define SMC_RMI_RTT_INIT_RIPAS        SMC_RxI_CALL(0x0168)
->> +#define SMC_RMI_RTT_MAP_UNPROTECTED    SMC_RxI_CALL(0x015f)
->> +#define SMC_RMI_RTT_READ_ENTRY        SMC_RxI_CALL(0x0161)
->> +#define SMC_RMI_RTT_SET_RIPAS        SMC_RxI_CALL(0x0169)
->> +#define SMC_RMI_RTT_UNMAP_UNPROTECTED    SMC_RxI_CALL(0x0162)
->> +#define SMC_RMI_VERSION            SMC_RxI_CALL(0x0150)
->> +
->> +#define RMI_ABI_MAJOR_VERSION    1
->> +#define RMI_ABI_MINOR_VERSION    0
->> +
->> +#define RMI_UNASSIGNED            0
->> +#define RMI_ASSIGNED            1
->> +#define RMI_TABLE            2
->> +
->> +#define RMI_ABI_VERSION_GET_MAJOR(version) ((version) >> 16)
->> +#define RMI_ABI_VERSION_GET_MINOR(version) ((version) & 0xFFFF)
->> +#define RMI_ABI_VERSION(major, minor)      (((major) << 16) | (minor))
->> +
->> +#define RMI_RETURN_STATUS(ret)        ((ret) & 0xFF)
->> +#define RMI_RETURN_INDEX(ret)        (((ret) >> 8) & 0xFF)
->> +
->> +#define RMI_SUCCESS        0
->> +#define RMI_ERROR_INPUT        1
->> +#define RMI_ERROR_REALM        2
->> +#define RMI_ERROR_REC        3
->> +#define RMI_ERROR_RTT        4
->> +
->> +#define RMI_EMPTY        0
->> +#define RMI_RAM            1
->> +#define RMI_DESTROYED        2
->> +
->> +#define RMI_NO_MEASURE_CONTENT    0
->> +#define RMI_MEASURE_CONTENT    1
->> +
->> +#define RMI_FEATURE_REGISTER_0_S2SZ        GENMASK(7, 0)
->> +#define RMI_FEATURE_REGISTER_0_LPA2        BIT(8)
->> +#define RMI_FEATURE_REGISTER_0_SVE_EN        BIT(9)
->> +#define RMI_FEATURE_REGISTER_0_SVE_VL        GENMASK(13, 10)
->> +#define RMI_FEATURE_REGISTER_0_NUM_BPS        GENMASK(17, 14)
->> +#define RMI_FEATURE_REGISTER_0_NUM_WPS        GENMASK(21, 18)
->> +#define RMI_FEATURE_REGISTER_0_PMU_EN        BIT(22)
->> +#define RMI_FEATURE_REGISTER_0_PMU_NUM_CTRS    GENMASK(27, 23)
->> +#define RMI_FEATURE_REGISTER_0_HASH_SHA_256    BIT(28)
->> +#define RMI_FEATURE_REGISTER_0_HASH_SHA_512    BIT(29)
->> +
->> +#define RMI_REALM_PARAM_FLAG_LPA2        BIT(0)
->> +#define RMI_REALM_PARAM_FLAG_SVE        BIT(1)
->> +#define RMI_REALM_PARAM_FLAG_PMU        BIT(2)
->> +
->> +/*
->> + * Note many of these fields are smaller than u64 but all fields have
->> u64
->> + * alignment, so use u64 to ensure correct alignment.
->> + */
->> +struct realm_params {
->> +    union { /* 0x0 */
->> +        struct {
->> +            u64 flags;
->> +            u64 s2sz;
->> +            u64 sve_vl;
->> +            u64 num_bps;
->> +            u64 num_wps;
->> +            u64 pmu_num_ctrs;
->> +            u64 hash_algo;
->> +        };
->> +        u8 padding_1[0x400];
->> +    };
->> +    union { /* 0x400 */
->> +        u8 rpv[64];
->> +        u8 padding_2[0x400];
->> +    };
->> +    union { /* 0x800 */
->> +        struct {
->> +            u64 vmid;
->> +            u64 rtt_base;
->> +            s64 rtt_level_start;
->> +            u64 rtt_num_start;
->> +        };
->> +        u8 padding_3[0x800];
->> +    };
->> +};
->> +
->> +/*
->> + * The number of GPRs (starting from X0) that are
->> + * configured by the host when a REC is created.
->> + */
->> +#define REC_CREATE_NR_GPRS        8
->> +
->> +#define REC_PARAMS_FLAG_RUNNABLE    BIT_ULL(0)
->> +
->> +#define REC_PARAMS_AUX_GRANULES        16
->> +
->> +struct rec_params {
->> +    union { /* 0x0 */
->> +        u64 flags;
->> +        u8 padding1[0x100];
->> +    };
->> +    union { /* 0x100 */
->> +        u64 mpidr;
->> +        u8 padding2[0x100];
->> +    };
->> +    union { /* 0x200 */
->> +        u64 pc;
->> +        u8 padding3[0x100];
->> +    };
->> +    union { /* 0x300 */
->> +        u64 gprs[REC_CREATE_NR_GPRS];
->> +        u8 padding4[0x500];
->> +    };
->> +    union { /* 0x800 */
->> +        struct {
->> +            u64 num_rec_aux;
->> +            u64 aux[REC_PARAMS_AUX_GRANULES];
->> +        };
->> +        u8 padding5[0x800];
->> +    };
->> +};
->> +
->> +#define RMI_EMULATED_MMIO        BIT(0)
->> +#define RMI_INJECT_SEA            BIT(1)
->> +#define RMI_TRAP_WFI            BIT(2)
->> +#define RMI_TRAP_WFE            BIT(3)
-> 
-> For completeness, we could add :
-> 
-> #define RMI_RIPAS_RESPONSE        BIT(4)
-> 
-> Not sure if we use it later in the series.
+Fundamental change v6+: At the level of common ACPI infrastructure, use
+the existing hotplug path for arm64 even though what needs to be
+done at the architecture specific level is quite different.
 
-Yes, I'll add for completeness. Currently KVM will never reject a RIPAS
-change request from the guest. I'm not sure in what situation it would
-make sense to do such a thing. The current uABI doesn't allow the VMM to
-have a say in it either as the RIPAS change is completed before the exit
-to the VMM. The expectation is therefore that the VMM would simply
-terminate a Realm guest that attempted a RIPAS change that it disagreed
-with.
+An explicit check in arch_register_cpu() for arm64 prevents
+this code doing anything if Physical CPU Hotplug is signalled.
 
->> +
->> +#define REC_RUN_GPRS            31
->> +#define REC_GIC_NUM_LRS            16
->> +
->> +struct rec_entry {
+This should resolve any concerns about treating virtual CPU
+hotplug as if it were physical and potential unwanted side effects
+if physical CPU hotplug is added to the ARM architecture in the
+future.
 
-While I'm reading this (and the spec) again - I notice that the spec
-says "RecEnter" not 'entry' - I'll rename this to be consistent.
+v6: Thanks to Rafael for extensive help with the approach + reviews.
+Specific changes:
+ - Do not differentiate wrt code flow between traditional CPU HP
+   and the new ARM flow.  The conditions on performing hotplug actions
+   do need to be adjusted though to incorporate the slightly different
+   state transition
+     Added PRESENT + !ENABLED -> PRESENT + ENABLED
+     to existing !PRESENT + !ENABLED -> PRESENT + ENABLED
+ - Enable ACPI_HOTPLUG_CPU on arm64 and drop the earlier patches that
+   took various code out of the protection of that.  Now the paths
+ - New patch to drop unnecessary _STA check in hotplug code. This
+   code cannot be entered unless ENABLED + PRESENT are set.
+ - New patch to unify the flow of already onlined (at time of driver
+   load) and hotplugged CPUs in acpi/processor_driver.c.
+   This change is necessary because we can't easily distinguish the
+   2 cases of deferred vs hotplug calls of register_cpu() on arm64.
+   It is also a nice simplification.
+ - Use flags rather than a structure for the extra parameter to
+   acpi_scan_check_and_detach() - Thank to Shameer for offline feedback.
 
->> +    union { /* 0x000 */
->> +        u64 flags;
->> +        u8 padding0[0x200];
->> +    };
->> +    union { /* 0x200 */
->> +        u64 gprs[REC_RUN_GPRS];
->> +        u8 padding2[0x100];
->> +    };
->> +    union { /* 0x300 */
->> +        struct {
->> +            u64 gicv3_hcr;
->> +            u64 gicv3_lrs[REC_GIC_NUM_LRS];
->> +        };
->> +        u8 padding3[0x100];
->> +    };
->> +    u8 padding4[0x400];
->> +};
->> +
->> +struct rec_exit {
->> +    union { /* 0x000 */
->> +        u8 exit_reason;
->> +        u8 padding0[0x100];
->> +    };
->> +    union { /* 0x100 */
->> +        struct {
->> +            u64 esr;
->> +            u64 far;
->> +            u64 hpfar;
->> +        };
->> +        u8 padding1[0x100];
->> +    };
->> +    union { /* 0x200 */
->> +        u64 gprs[REC_RUN_GPRS];
->> +        u8 padding2[0x100];
->> +    };
->> +    union { /* 0x300 */
->> +        struct {
->> +            u64 gicv3_hcr;
->> +            u64 gicv3_lrs[REC_GIC_NUM_LRS];
->> +            u64 gicv3_misr;
->> +            u64 gicv3_vmcr;
->> +        };
->> +        u8 padding3[0x100];
->> +    };
->> +    union { /* 0x400 */
->> +        struct {
->> +            u64 cntp_ctl;
->> +            u64 cntp_cval;
->> +            u64 cntv_ctl;
->> +            u64 cntv_cval;
->> +        };
->> +        u8 padding4[0x100];
->> +    };
->> +    union { /* 0x500 */
->> +        struct {
->> +            u64 ripas_base;
->> +            u64 ripas_top;
->> +            u64 ripas_value;
->> +        };
->> +        u8 padding5[0x100];
->> +    };
->> +    union { /* 0x600 */
->> +        u16 imm;
->> +        u8 padding6[0x100];
->> +    };
->> +    union { /* 0x700 */
->> +        struct {
->> +            u64 pmu_ovf_status;
-> 
-> This is u8 as per section B4.4.10 RmiPmuOverflowStatus type.
+Updated version of James' original introduction.
 
-Indeed - I'm not sure where I got u64 from - it was probably to provide
-padding in an older version of the spec.
+This series adds what looks like cpuhotplug support to arm64 for use in
+virtual machines. It does this by moving the cpu_register() calls for
+architectures that support ACPI into an arch specific call made from
+the ACPI processor driver.
+ 
+The kubernetes folk really want to be able to add CPUs to an existing VM,
+in exactly the same way they do on x86. The use-case is pre-booting guests
+with one CPU, then adding the number that were actually needed when the
+workload is provisioned.
 
->> +        };
->> +        u8 padding7[0x100];
->> +    };
->> +};
->> +
->> +struct rec_run {
->> +    struct rec_entry entry;
->> +    struct rec_exit exit;
->> +};
->> +
->> +#define RMI_EXIT_SYNC            0x00
->> +#define RMI_EXIT_IRQ            0x01
->> +#define RMI_EXIT_FIQ            0x02
->> +#define RMI_EXIT_PSCI            0x03
->> +#define RMI_EXIT_RIPAS_CHANGE        0x04
->> +#define RMI_EXIT_HOST_CALL        0x05
->> +#define RMI_EXIT_SERROR            0x06
-> 
-> Minor nit: Like the other definitions, it may be good to keep the
-> defintions of the "exit_reason" above the field declaration.
+Wait? Doesn't arm64 support cpuhotplug already!?
+In the arm world, cpuhotplug gets used to mean removing the power from a CPU.
+The CPU is offline, and remains present. For x86, and ACPI, cpuhotplug
+has the additional step of physically removing the CPU, so that it isn't
+present anymore.
+ 
+Arm64 doesn't support this, and can't support it: CPUs are really a slice
+of the SoC, and there is not enough information in the existing ACPI tables
+to describe which bits of the slice also got removed. Without a reference
+machine: adding this support to the spec is a wild goose chase.
+ 
+Critically: everything described in the firmware tables must remain present.
+ 
+For a virtual machine this is easy as all the other bits of 'virtual SoC'
+are emulated, so they can (and do) remain present when a vCPU is 'removed'.
 
-Yes, makes sense - I'll move these.
+On a system that supports cpuhotplug the MADT has to describe every possible
+CPU at boot. Under KVM, the vGIC needs to know about every possible vCPU before
+the guest is started.
+With these constraints, virtual-cpuhotplug is really just a hypervisor/firmware
+policy about which CPUs can be brought online.
+ 
+This series adds support for virtual-cpuhotplug as exactly that: firmware
+policy. This may even work on a physical machine too; for a guest the part of
+firmware is played by the VMM. (typically Qemu).
+ 
+PSCI support is modified to return 'DENIED' if the CPU can't be brought
+online/enabled yet. The CPU object's _STA method's enabled bit is used to
+indicate firmware's current disposition. If the CPU has its enabled bit clear,
+it will not be registered with sysfs, and attempts to bring it online will
+fail. The notifications that _STA has changed its value then work in the same
+way as physical hotplug, and firmware can cause the CPU to be registered some
+time later, allowing it to be brought online.
+ 
+This creates something that looks like cpuhotplug to user-space and the
+kernel beyond arm64 architecture specific code, as the sysfs
+files appear and disappear, and the udev notifications look the same.
+ 
+One notable difference is the CPU present mask, which is exposed via sysfs.
+Because the CPUs remain present throughout, they can still be seen in that mask.
+This value does get used by webbrowsers to estimate the number of CPUs
+as the CPU online mask is constantly changed on mobile phones.
+ 
+Linux is tolerant of PSCI returning errors, as its always been allowed to do
+that. To avoid confusing OS that can't tolerate this, we needed an additional
+bit in the MADT GICC flags. This series copies ACPI_MADT_ONLINE_CAPABLE, which
+appears to be for this purpose, but calls it ACPI_MADT_GICC_CPU_CAPABLE as it
+has a different bit position in the GICC.
+ 
+This code is unconditionally enabled for all ACPI architectures, though for
+now only arm64 will have deferred the cpu_register() calls.
 
-Thanks for the review!
+If folk want to play along at home, you'll need a copy of Qemu that supports this.
+https://github.com/salil-mehta/qemu.git virt-cpuhp-armv8/rfc-v2
 
-Steve
+Replace your '-smp' argument with something like:
+ | -smp cpus=1,maxcpus=3,cores=3,threads=1,sockets=1
+ 
+ then feed the following to the Qemu montior;
+ | (qemu) device_add driver=host-arm-cpu,core-id=1,id=cpu1
+ | (qemu) device_del cpu1
 
-> 
-> Rest looks fine to me.
-> 
-> Suzuki
->> +
->> +#endif
-> 
+James Morse (7):
+  ACPI: processor: Register deferred CPUs from acpi_processor_get_info()
+  ACPI: Add post_eject to struct acpi_scan_handler for cpu hotplug
+  arm64: acpi: Move get_cpu_for_acpi_id() to a header
+  irqchip/gic-v3: Don't return errors from gic_acpi_match_gicc()
+  irqchip/gic-v3: Add support for ACPI's disabled but 'online capable'
+    CPUs
+  arm64: document virtual CPU hotplug's expectations
+  cpumask: Add enabled cpumask for present CPUs that can be brought
+    online
+
+Jean-Philippe Brucker (1):
+  arm64: psci: Ignore DENIED CPUs
+
+Jonathan Cameron (8):
+  ACPI: processor: Simplify initial onlining to use same path for cold
+    and hotplug
+  cpu: Do not warn on arch_register_cpu() returning -EPROBE_DEFER
+  ACPI: processor: Drop duplicated check on _STA (enabled + present)
+  ACPI: processor: Move checks and availability of acpi_processor
+    earlier
+  ACPI: processor: Add acpi_get_processor_handle() helper
+  ACPI: scan: switch to flags for acpi_scan_check_and_detach()
+  arm64: arch_register_cpu() variant to check if an ACPI handle is now
+    available.
+  arm64: Kconfig: Enable hotplug CPU on arm64 if ACPI_PROCESSOR is
+    enabled.
+
+ .../ABI/testing/sysfs-devices-system-cpu      |   6 +
+ Documentation/arch/arm64/cpu-hotplug.rst      |  79 ++++++++++++
+ Documentation/arch/arm64/index.rst            |   1 +
+ arch/arm64/Kconfig                            |   1 +
+ arch/arm64/include/asm/acpi.h                 |  11 ++
+ arch/arm64/kernel/acpi.c                      |  16 +++
+ arch/arm64/kernel/acpi_numa.c                 |  11 --
+ arch/arm64/kernel/psci.c                      |   2 +-
+ arch/arm64/kernel/smp.c                       |  56 ++++++++-
+ drivers/acpi/acpi_processor.c                 | 113 ++++++++++--------
+ drivers/acpi/processor_driver.c               |  44 ++-----
+ drivers/acpi/scan.c                           |  47 ++++++--
+ drivers/base/cpu.c                            |  12 +-
+ drivers/irqchip/irq-gic-v3.c                  |  32 +++--
+ include/acpi/acpi_bus.h                       |   1 +
+ include/acpi/processor.h                      |   2 +-
+ include/linux/acpi.h                          |  10 +-
+ include/linux/cpumask.h                       |  25 ++++
+ kernel/cpu.c                                  |   3 +
+ 19 files changed, 357 insertions(+), 115 deletions(-)
+ create mode 100644 Documentation/arch/arm64/cpu-hotplug.rst
+
+-- 
+2.39.2
 
