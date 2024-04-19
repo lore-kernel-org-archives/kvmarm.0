@@ -1,55 +1,55 @@
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D19DA47F6C
-	for <kvmarm@lists.linux.dev>; Fri, 19 Apr 2024 08:00:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BBDF3E485
+	for <kvmarm@lists.linux.dev>; Fri, 19 Apr 2024 08:00:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713513648; cv=none; b=Etn1LZPIkcaMTHyFjd5jLqrhzwbFbQzrjfpWAfwSG7BXjnmEe7GztDFFCnJff/iQEmdsdrf17cnf4OG6F1+6QB//C0oqV6tayso0Mw3f3VnL6q/0VCAkOUchF3wzdalQcN1CA7YXPtqHNikY7bmB2rk/dBHc9xA9eIuaIgs57vY=
+	t=1713513650; cv=none; b=mLU+tSBEwtQoaXnhSVBl+IlqtpfWPvLhfbslVfHLlHz7JmmrsQxynGMBBFHWhodoCZD0n1R+1toauAPB9rinzNacikX+CsSomOFPkIhpyayaD29S0k2ZP//qlEmEsN1dnN8Q0c+8yGxqhi2T7n/B0jRRedTqN9QqUM/1NI0iEZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713513648; c=relaxed/simple;
-	bh=z4LE2wEv7zUCJRdONGSDMcB7+NNSFl7m8zaX9bfIzVU=;
+	s=arc-20240116; t=1713513650; c=relaxed/simple;
+	bh=U2hWJlimg0PScvmQvSNiutrP8PBKAJ/bc/iqzUX2aUk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=qA4jOTvB5qzGuAUd7xFdnD5PdPKaj7NL4TYIRQEOQc8YEgd04MWC/oYFphcW0u2w5QTr/isR6jtTlfyZ+n0G4fxZwLKWhLofLa3i1cBOWMmwGjCbSlH/mKnJP+5SWKWMSmte5fI9qRdToKS+lWzDxou2MPVcOPwFgqYiCuLFkkE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RW/7thD/; arc=none smtp.client-ip=209.85.221.74
+	 To:Cc:Content-Type; b=MiGyz8mw0nEoLiSoDnXLYiO/mlj1q3P3LZlGWZlFQiBDrSqwpFvSYxVBznG3hdOuyGadAbGaNJsPmg4UelucF+hqridBbsctAGgHvENEpv9i1aNKxbrpAkpD1m3Q1jYbU3eZL+DnU9i4QtNKqPApNTb7nkHhrWofGpmM655EZJI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fKd2NJlE; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RW/7thD/"
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-347f92ab882so1075107f8f.0
-        for <kvmarm@lists.linux.dev>; Fri, 19 Apr 2024 01:00:46 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fKd2NJlE"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-4165339d3a5so9865905e9.3
+        for <kvmarm@lists.linux.dev>; Fri, 19 Apr 2024 01:00:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713513645; x=1714118445; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1713513647; x=1714118447; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dQcfky2yMPis8pZt5ituuAAZ/c63qm6kqI30Xk0h8d0=;
-        b=RW/7thD/1qmvRbpOpz/m688EaJfm5p78c91zwdf7yewy5Dl4f7YqqdCD5VWLB582cw
-         OKweuBKzntKpkh2txFClzPkxRIqFzEzFEW/ZhBQN1u0Snt1qNoKYuQxqGUKE90+Zw+JE
-         K064aFnT0XfeQyPi+Za1z7G/mA0w/Z7J/MuSZ/w2XWLJY9aIK4lDCktE+THzxoB5tgEJ
-         8PcV8Lyc1icNXcJOex3WvkZQUUKcCO2ZIcaji2lRISCjKW9wLLjVM9jZn0s4/lMzsB1C
-         s0R1adMJGHb/FWtPn4/FO70bNHabAeP5dPVb5Xf+R3rbVoBiIZrhmK+9iBkfB1SFofPm
-         u/4w==
+        bh=debhuxEdWbHQLqSSpCg9aCajtV4sBqhjNC75Uyo8+ck=;
+        b=fKd2NJlEf5Z1a5JV7RwSONeVf2lXpZIm4YcuNN6Si8l8rutQSpoYkQFVksQw4Jd7xi
+         MgDVR0fU003ZiUeCDKGWHeGnY8xyhEUKFiqr+4lR2hXrvI+8UAyv8BsyFQteXBCtX1TG
+         q8gflPpngW4Z5c8+yI6Py3UCIskqxb/leYu7Ibs5yXKsVjzLcHa+Dhlc9SdhR8IL7OMu
+         vRq8sTRR1v2m/eJdNur9zzUndoE+q8vDJOHm2wJzOPgtSOQ29exha3Az5ALhRTQD2xv8
+         mtvDavD6nPMUSCZ0dPtFUPJeR/D4ZTkcTGppzoDzH2UGgMeEIcgiUDLggcveXRLxOuGV
+         4CGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713513645; x=1714118445;
+        d=1e100.net; s=20230601; t=1713513647; x=1714118447;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dQcfky2yMPis8pZt5ituuAAZ/c63qm6kqI30Xk0h8d0=;
-        b=kUESLsL0aWKhYVixP+Jak+JTrJkIWbZ0bJ3H9vrnLZFDvozDNsJDX1JD4tNPGh3s7R
-         eS4x6K6oqSQLhVSZoXCAAtPKJO9RMpxBV9HArbNJp0LNjhb6v4UO35lrbtIC7/no8zzT
-         dVOB89czvv2J8Bw/hfN/NJNSzCQRjsA11y/FkP8SogtJ2kQsf2clGEsfaGDZwM0UXx3K
-         wSjKWDA6u76eUQsRCAlfiRs1oIcRV/rg34eVXEZUGvMc6SSsd69nhYEZwCqLJlC/cYzp
-         o0iTb7o9HyMyj8bBX99kFJmyQuQAGF/lwyzrLwR/C3jne42AG76AzUuJRgSXv51QCO0a
-         Y+Rw==
-X-Gm-Message-State: AOJu0YxJ56jE4tvKTfL2rImv82leeH61cS+X8fjRiZfXQWuY74wqRLky
-	C47sFz7+3BJa88Sf1JHpHDFqkz4QGLYcDXw4wA8XlzwPnMGY3InwHC6s9leQLcw9lnd+ZjFrxMx
-	RsPiJhbbMqoiAriYIf94N8+6K542dhFlW7BDv06td6/Gm4Mv53XG9fGt2Gy9SqupR3xGrq79cAA
-	/9qqjgHS43hLC8zJgwsKEBI7MnXA4=
-X-Google-Smtp-Source: AGHT+IFUxbwUY9TWt3F7C9Gj7Hbdjkcz89xfYfNgMVAkWHQMlstMV7obHRAIF7WClDmfUxY2WAbXfyMtFA==
+        bh=debhuxEdWbHQLqSSpCg9aCajtV4sBqhjNC75Uyo8+ck=;
+        b=QotGBTUTJxW17aD1/qKnbK+EmdVFitKjA83k6tgmG4kDaaMqJVuuK7keaBOG/G7Ew2
+         P3aKPzxbhOQGhHX22ywhX8wRFo84t6/7v9QB8zc82yyAkXp6BMIYdgY0DnP063UEbsAM
+         s9DVuIpFqcKqC2njYsj5LvG5xVUZfOWL6eDZUKRqM4OTprSFZVJlNAalT35afSRHglt+
+         NqxcesNcP2cWjmybMoCh6kJsHIlk38ve3sD3ZUXZGuWABbrIQOjz35NmsnbteXls0Lgk
+         QEFIJYJNaGuKpGZwWAAeO1O+3YCjBqGfesOTGTyvhJ95OFWUvxS9cN0/ad0T1rJTassN
+         MvKQ==
+X-Gm-Message-State: AOJu0YyUhXXEyIwqZCbMt4Ihbft9/7gPl8CSLPG/wHu6D2/9KKYpCOsb
+	2d840s7bAC3KTvwRtzkUaFmBAjIYXP4R8VCim/Mr0z4kwvczTAL6iZQYlDNfyhPMYJjLkJv/lKx
+	cQAV2uI4YIz+EvVYQnKuuU+AYmBK1lyiv5mJawduzeLT+bRFYG2aZ7GuR/4CDJE2WWmst45QT2a
+	G7GemlBQrEgNlzpgKVHrgLhJlRlaI=
+X-Google-Smtp-Source: AGHT+IHdYNFz7OIUa/3n3D7VFZdXU9nCOx/lNNaeuEGSwRxl+uM2r5LHFAdLVXYQotXCw03LOso/4A2SSA==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:adf:ed07:0:b0:347:9c81:754f with SMTP id
- a7-20020adfed07000000b003479c81754fmr3507wro.14.1713513644880; Fri, 19 Apr
- 2024 01:00:44 -0700 (PDT)
-Date: Fri, 19 Apr 2024 08:59:37 +0100
+ (user=tabba job=sendgmr) by 2002:a05:600c:3ba1:b0:418:a706:33b1 with SMTP id
+ n33-20020a05600c3ba100b00418a70633b1mr12609wms.1.1713513647136; Fri, 19 Apr
+ 2024 01:00:47 -0700 (PDT)
+Date: Fri, 19 Apr 2024 08:59:38 +0100
 In-Reply-To: <20240419075941.4085061-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240419075941.4085061-1-tabba@google.com>
 X-Mailer: git-send-email 2.44.0.769.g3c40516874-goog
-Message-ID: <20240419075941.4085061-28-tabba@google.com>
-Subject: [PATCH v3 27/31] KVM: arm64: Use atomic refcount helpers for 'struct hyp_page::refcount'
+Message-ID: <20240419075941.4085061-29-tabba@google.com>
+Subject: [PATCH v3 28/31] KVM: arm64: Reformat/beautify PTP hypercall documentation
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev
 Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com, 
@@ -72,104 +72,67 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Will Deacon <will@kernel.org>
 
-Convert the 'struct hyp_page' refcount manipulation functions over to
-the new atomic refcount helpers. For now, this will make absolutely no
-difference because the 'struct hyp_pool' locking is still serialising
-everything. One step at a time...
+The PTP hypercall documentation doesn't produce the best-looking table
+when formatting in HTML as all of the return value definitions end up
+on the same line.
+
+Reformat the PTP hypercall documentation to follow the formatting used
+by hypercalls.rst.
 
 Signed-off-by: Will Deacon <will@kernel.org>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/hyp/include/nvhe/memory.h | 18 +++++++-----------
- arch/arm64/kvm/hyp/nvhe/mem_protect.c    |  2 +-
- arch/arm64/kvm/hyp/nvhe/page_alloc.c     |  5 ++++-
- 3 files changed, 12 insertions(+), 13 deletions(-)
+ Documentation/virt/kvm/arm/ptp_kvm.rst | 38 ++++++++++++++++----------
+ 1 file changed, 24 insertions(+), 14 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/memory.h b/arch/arm64/kvm/hyp/include/nvhe/memory.h
-index ab205c4d6774..74474c82667b 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/memory.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/memory.h
-@@ -6,6 +6,7 @@
- #include <asm/page.h>
+diff --git a/Documentation/virt/kvm/arm/ptp_kvm.rst b/Documentation/virt/kvm/arm/ptp_kvm.rst
+index aecdc80ddcd8..7c0960970a0e 100644
+--- a/Documentation/virt/kvm/arm/ptp_kvm.rst
++++ b/Documentation/virt/kvm/arm/ptp_kvm.rst
+@@ -7,19 +7,29 @@ PTP_KVM is used for high precision time sync between host and guests.
+ It relies on transferring the wall clock and counter value from the
+ host to the guest using a KVM-specific hypercall.
  
- #include <linux/types.h>
-+#include <nvhe/refcount.h>
+-* ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID: 0x86000001
++``ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID``
++----------------------------------------
  
- struct hyp_page {
- 	unsigned short refcount;
-@@ -39,37 +40,32 @@ static inline phys_addr_t hyp_virt_to_phys(void *addr)
- #define hyp_page_to_pool(page)	(((struct hyp_page *)page)->pool)
+-This hypercall uses the SMC32/HVC32 calling convention:
++Retrieve current time information for the specific counter. There are no
++endianness restrictions.
  
- /*
-- * Refcounting for 'struct hyp_page'.
-- * hyp_pool::lock must be held if atomic access to the refcount is required.
-+ * Refcounting wrappers for 'struct hyp_page'.
-  */
- static inline int hyp_page_count(void *addr)
- {
- 	struct hyp_page *p = hyp_virt_to_page(addr);
- 
--	return p->refcount;
-+	return hyp_refcount_get(p->refcount);
- }
- 
- static inline void hyp_page_ref_inc(struct hyp_page *p)
- {
--	BUG_ON(p->refcount == USHRT_MAX);
--	p->refcount++;
-+	hyp_refcount_inc(p->refcount);
- }
- 
- static inline void hyp_page_ref_dec(struct hyp_page *p)
- {
--	BUG_ON(!p->refcount);
--	p->refcount--;
-+	hyp_refcount_dec(p->refcount);
- }
- 
- static inline int hyp_page_ref_dec_and_test(struct hyp_page *p)
- {
--	hyp_page_ref_dec(p);
--	return (p->refcount == 0);
-+	return hyp_refcount_dec(p->refcount) == 0;
- }
- 
- static inline void hyp_set_page_refcounted(struct hyp_page *p)
- {
--	BUG_ON(p->refcount);
--	p->refcount = 1;
-+	hyp_refcount_set(p->refcount, 1);
- }
- #endif /* __KVM_HYP_MEMORY_H */
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index caba3e4bd09e..ab5e73a82857 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -202,7 +202,7 @@ static void *guest_s2_zalloc_page(void *mc)
- 	memset(addr, 0, PAGE_SIZE);
- 	p = hyp_virt_to_page(addr);
- 	memset(p, 0, sizeof(*p));
--	p->refcount = 1;
-+	hyp_set_page_refcounted(p);
- 
- 	return addr;
- }
-diff --git a/arch/arm64/kvm/hyp/nvhe/page_alloc.c b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
-index 73437f5c2616..96b52f545af0 100644
---- a/arch/arm64/kvm/hyp/nvhe/page_alloc.c
-+++ b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
-@@ -55,7 +55,10 @@ static struct hyp_page *__find_buddy_avail(struct hyp_pool *pool,
- {
- 	struct hyp_page *buddy = __find_buddy_nocheck(pool, p, order);
- 
--	if (!buddy || buddy->order != order || buddy->refcount)
-+	if (!buddy)
-+		return NULL;
-+
-+	if (buddy->order != order || hyp_refcount_get(buddy->refcount))
- 		return NULL;
- 
- 	return buddy;
+-ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID
+-    ==============    ========    =====================================
+-    Function ID:      (uint32)    0x86000001
+-    Arguments:        (uint32)    KVM_PTP_VIRT_COUNTER(0)
+-                                  KVM_PTP_PHYS_COUNTER(1)
+-    Return Values:    (int32)     NOT_SUPPORTED(-1) on error, or
+-                      (uint32)    Upper 32 bits of wall clock time (r0)
+-                      (uint32)    Lower 32 bits of wall clock time (r1)
+-                      (uint32)    Upper 32 bits of counter (r2)
+-                      (uint32)    Lower 32 bits of counter (r3)
+-    Endianness:                   No Restrictions.
+-    ==============    ========    =====================================
+++---------------------+-------------------------------------------------------+
++| Presence:           | Optional                                              |
+++---------------------+-------------------------------------------------------+
++| Calling convention: | HVC32                                                 |
+++---------------------+----------+--------------------------------------------+
++| Function ID:        | (uint32) | 0x86000001                                 |
+++---------------------+----------+----+---------------------------------------+
++| Arguments:          | (uint32) | R1 | ``KVM_PTP_VIRT_COUNTER (0)``          |
++|                     |          |    +---------------------------------------+
++|                     |          |    | ``KVM_PTP_PHYS_COUNTER (1)``          |
+++---------------------+----------+----+---------------------------------------+
++| Return Values:      | (int32)  | R0 | ``NOT_SUPPORTED (-1)`` on error, else |
++|                     |          |    | upper 32 bits of wall clock time      |
++|                     +----------+----+---------------------------------------+
++|                     | (uint32) | R1 | Lower 32 bits of wall clock time      |
++|                     +----------+----+---------------------------------------+
++|                     | (uint32) | R2 | Upper 32 bits of counter              |
++|                     +----------+----+---------------------------------------+
++|                     | (uint32) | R3 | Lower 32 bits of counter              |
+++---------------------+----------+----+---------------------------------------+
 -- 
 2.44.0.769.g3c40516874-goog
 
