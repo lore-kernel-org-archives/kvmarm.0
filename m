@@ -1,269 +1,204 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76DA2184120
-	for <kvmarm@lists.linux.dev>; Thu, 18 Apr 2024 19:53:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 277AF3A1A8
+	for <kvmarm@lists.linux.dev>; Fri, 19 Apr 2024 07:59:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713470011; cv=none; b=OavZN9d32dmJvAjSqv2wjW6AdAMGdsGXvysHoI2BAH6lbppxiqPPGNMCBZG1KSAsmYG8fLh59hl1Nllzgz5N6vd1ytY77tdjjQB+Xs/tYa5dedhdWoKsbiNwPT2S80GWlnD57gFfH4BHTjAgJTB1lirRpKLZ94Gxa3Ht6zVE3J0=
+	t=1713513586; cv=none; b=bdT1fBejI0kgE7vVd2NvoWhxqxxV9Gprd05JHgOnWDJL5tjiDySCJgOJjXmkUJeiiyOQsPC4LogRAN1rb8/ir1E0zXc1ZcDOuzS89AvdU9lBXFe+FKB2TIZVRzxyEwZoHVsvlkPR6CsxPavnwABMUYVGPUVcDHhaLmXy84hqSCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713470011; c=relaxed/simple;
-	bh=il+9bbj7Kl9RhDUwHRlD6PElXcZpj4hshubhhFULYxI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=be3qMrl4lLHPvYdlk+26n8rCmeUQdNiv65x25iEVeRGvizswKiko5HMBp4Bh8lET0qmSdDisaioQcUruMdOdvUFM7bqeWUZR3H/CsdzdAUJ7lEyph8rw6ObC+uIx3PTG9qC7PW5Oh4qmjoFJ/stncqJP4QoGGPbqMDMclYtU3Rs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LWa+bGk5; arc=none smtp.client-ip=209.85.128.201
+	s=arc-20240116; t=1713513586; c=relaxed/simple;
+	bh=RnxT4rY9380nW8wX0fMsuPojbc5+mQ/KA+5JJ1tkf74=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=GTiEwZKspHgUlfxXfZF5h7o4tTMu+rxKJgcPNqI2LTdpzO+nFyxLzp+RCQlzg5OB3+KexbXtKGLBSW0YQKtOgMq6lqjADPd2fBJ4HI4YhXkxealo+pz0Zy5cikqkjK9F0U15vS4n07QL0LpMIwE3qxPQnzeuL3AJlnJIweEyMIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QhKPWruh; arc=none smtp.client-ip=209.85.128.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LWa+bGk5"
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-61ab173fe00so24923137b3.3
-        for <kvmarm@lists.linux.dev>; Thu, 18 Apr 2024 12:53:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QhKPWruh"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-41485831b2dso14454155e9.3
+        for <kvmarm@lists.linux.dev>; Fri, 19 Apr 2024 00:59:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713470008; x=1714074808; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9Fwrx9M7PjHp4hPBDgNAvgC8cnKrAzhv9n1yaPxLSA8=;
-        b=LWa+bGk5H4fv9LnuR9V3j4xBwQ1DrG79nGCzF3jK7Ww892jtHJT4S4xn6OVfWym+rh
-         fOCPNGUcBY4/3q6nEyXQobOZXivHjeRROjnlTtji9NrXmffCbAYiLmIDRml1DR6nrMyQ
-         8+40C6TTRbv958ZqxMqXxPTICwxPt5tbReK0U1e9Kjve+d0DG2e5zW7CHtgmAeMe16y4
-         0DuvgyRW3i1t9dQoFxy7AteaPgeFF7ShZXsNtVFYDXfUSSzeUspMeCraT4gvWKdq4Krx
-         DZVcne2ZdwtVAYbXvnH9QV4MZ0quEOzXVfnYTWAv71O22Gkrt9gtUIVlvt3D1aaetP48
-         VmIg==
+        d=google.com; s=20230601; t=1713513583; x=1714118383; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=XhVlgz97x7EXcRAgwStBgqwbDzWPrijiXPciJ0WWtZE=;
+        b=QhKPWruhERdEtUJ5tmPB2TQIsgGVoATXPhv/ItNQT+0PD5CPa2n8MbUTKThimZvkgz
+         1z3Gv0ixUlP4EtbOcA+JtUkuqSXxxrtckfJy2nHAZ8aztXCxvm5neiHVoOX3kYEuljy2
+         pPeEhU+nNUlmM1o1LsOiHBuQGa6ez0zdz65zRwUwF+jp/azy+aqY02LKwzQ5Ytd0FBCF
+         wnPPMRh9G3rboew5Q4bpxdrj04E57xxnL7HMIi2RMO32/RPOnvTwzAAWXmg3v1agGBOH
+         RN4mJ3iLhJfZyNvhI0kbfG27auqkAQk3fO4X/cmLIjBigo0DBNdmGDkVjR+YKlv4DjbC
+         TOFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713470008; x=1714074808;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9Fwrx9M7PjHp4hPBDgNAvgC8cnKrAzhv9n1yaPxLSA8=;
-        b=sLxVsv+SYAvgLzpRGjoieoVplBg4ZKaNHMVnyrBgnUfmk9oZ3o0SD77mns2YGUx5en
-         FQl3HzrsJylt29q/B/DGnxTQNC4gJUPHRY+8FDCa3W1nSdK+kyG6Flf4+UaJK5owky/p
-         lG10rThG9ioEvLV3v7ZNRDDXDTcAcVYetf0uXP1652JZUZe4CNStYXvUm/EuGG4+mKPu
-         ZNWnipfq2FA0qhG+nqpJ4v3RfCS0imIBmqZTsyOgE5WfWNaEvd0g/RWQZnYUxANUCPrg
-         16HWkVJSxpEu7mTuoXhpZUW05P6digKW1JhtGrFWNxmrzGvqihHaA0bv88klLtdxOnT7
-         nKog==
-X-Forwarded-Encrypted: i=1; AJvYcCUbMT6FZlXFGepvO3o0ZvPHuDfi+CntAlwIyQsYBlGymcZOa0zzrntTTr7uj+LCoI1pr9gi+3/YG1UiBxmm9hN+d25BqSJ4
-X-Gm-Message-State: AOJu0YzBp1rbhWQZ4XBmH0KXlDzX8+fF7IbUbCSvNFLUBa3Oo9Td3sNo
-	1KnboTLLAtt3Xa6BTJbzO9K49qbYoANgg0CFHntkc7nHGMCdHzj9PKAT+544JyyHsPa5ttGSup5
-	6rQ==
-X-Google-Smtp-Source: AGHT+IGGyn2/Eis9yr5uvFbHSsNr+5jpucEC9aioMrlcMqw+x+tJjikMNMKUFalz9faFMmsjcJGmE2MmVtI=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a0d:d9d3:0:b0:618:9044:4f8b with SMTP id
- b202-20020a0dd9d3000000b0061890444f8bmr785538ywe.7.1713470008510; Thu, 18 Apr
- 2024 12:53:28 -0700 (PDT)
-Date: Thu, 18 Apr 2024 12:53:26 -0700
-In-Reply-To: <20240418141932.GA1855@willie-the-truck>
+        d=1e100.net; s=20230601; t=1713513583; x=1714118383;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XhVlgz97x7EXcRAgwStBgqwbDzWPrijiXPciJ0WWtZE=;
+        b=vfetEosPxw4bT2dcCcdQDkhXBWs42xw0dX8AalClCP+lwu+3wjtNXqvg509PDCIGbd
+         l7PyZkhJFCHWYGGcbO5uhDsVjKe/jiya24B0BmIGlZNFmfGwUYJkt4gb96vnzAdq+pHk
+         Fbb0oylEw9WFX6/6vcSF2lbTyWA2PRxR01rOnXBCXl5ZileLrC5GzqUzBg9y8xkxCYtr
+         IYpOYNM7RPd3kkWw5Ye1+5MtolegIbpBB8yaLu/oM3/wQOp4Ub2akp9OwayuAGI09D7/
+         jymb9Lp+/mZ9id3SoBBT2QEBGDrAQ9fmTJ2OfxUb3RaPmz+SQ15coGJSYwJkzf3QpyM9
+         Oz/w==
+X-Gm-Message-State: AOJu0Yx5OxMwEFEGxfWSTNAuqT7RPnedi97bzSQrOewjBxIOJO06myAU
+	otay1gmrhCt+SrM53NcJIp3doU3IdI73zqlmTo+k9KHwMLE8M0ku40XcvBZQfWRIiY9NVT13uz1
+	BedkqAPrzJw8hKtx1MIzn337LfKIkyAp+eNjSfHWtx86VvCAMpnb7ycE4+AzcCe6ie9d40sys4M
+	IcyFHfGnmWdFUM0ID3/dt/fC4aMUw=
+X-Google-Smtp-Source: AGHT+IEBwwUM9jUtS1Svnv2FRxe4/AUuseXY9ym8kWnQJscnQ2zG1A2qw0KAo2tIw2BcLrYCQDPwKPjziA==
+X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
+ (user=tabba job=sendgmr) by 2002:a05:600c:35d5:b0:418:d3f4:681c with SMTP id
+ r21-20020a05600c35d500b00418d3f4681cmr7685wmq.6.1713513583308; Fri, 19 Apr
+ 2024 00:59:43 -0700 (PDT)
+Date: Fri, 19 Apr 2024 08:59:10 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20240405115815.3226315-1-pbonzini@redhat.com> <20240405115815.3226315-2-pbonzini@redhat.com>
- <20240412104408.GA27645@willie-the-truck> <86jzl2sovz.wl-maz@kernel.org>
- <ZhlLHtfeSHk9gRRO@google.com> <86h6g5si0m.wl-maz@kernel.org>
- <Zh1d94Pl6gneVoDd@google.com> <20240418141932.GA1855@willie-the-truck>
-Message-ID: <ZiF6NgGYLSsPNEOg@google.com>
-Subject: Re: [PATCH 1/4] KVM: delete .change_pte MMU notifier callback
-From: Sean Christopherson <seanjc@google.com>
-To: Will Deacon <will@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>, 
-	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, Nicholas Piggin <npiggin@gmail.com>, 
-	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, David Hildenbrand <david@redhat.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
-	linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+X-Mailer: git-send-email 2.44.0.769.g3c40516874-goog
+Message-ID: <20240419075941.4085061-1-tabba@google.com>
+Subject: [PATCH v3 00/31] KVM: arm64: Preamble for pKVM
+From: Fuad Tabba <tabba@google.com>
+To: kvmarm@lists.linux.dev
+Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com, 
+	seanjc@google.com, alexandru.elisei@arm.com, catalin.marinas@arm.com, 
+	philmd@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, 
+	oliver.upton@linux.dev, mark.rutland@arm.com, broonie@kernel.org, 
+	joey.gouly@arm.com, rananta@google.com, smostafa@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Apr 18, 2024, Will Deacon wrote:
-> On Mon, Apr 15, 2024 at 10:03:51AM -0700, Sean Christopherson wrote:
-> > On Sat, Apr 13, 2024, Marc Zyngier wrote:
-> > > On Fri, 12 Apr 2024 15:54:22 +0100, Sean Christopherson <seanjc@google.com> wrote:
-> > > > 
-> > > > On Fri, Apr 12, 2024, Marc Zyngier wrote:
-> > > > > On Fri, 12 Apr 2024 11:44:09 +0100, Will Deacon <will@kernel.org> wrote:
-> > > > > > On Fri, Apr 05, 2024 at 07:58:12AM -0400, Paolo Bonzini wrote:
-> > > > > > Also, if you're in the business of hacking the MMU notifier code, it
-> > > > > > would be really great to change the .clear_flush_young() callback so
-> > > > > > that the architecture could handle the TLB invalidation. At the moment,
-> > > > > > the core KVM code invalidates the whole VMID courtesy of 'flush_on_ret'
-> > > > > > being set by kvm_handle_hva_range(), whereas we could do a much
-> > > > > > lighter-weight and targetted TLBI in the architecture page-table code
-> > > > > > when we actually update the ptes for small ranges.
-> > > > > 
-> > > > > Indeed, and I was looking at this earlier this week as it has a pretty
-> > > > > devastating effect with NV (it blows the shadow S2 for that VMID, with
-> > > > > costly consequences).
-> > > > > 
-> > > > > In general, it feels like the TLB invalidation should stay with the
-> > > > > code that deals with the page tables, as it has a pretty good idea of
-> > > > > what needs to be invalidated and how -- specially on architectures
-> > > > > that have a HW-broadcast facility like arm64.
-> > > > 
-> > > > Would this be roughly on par with an in-line flush on arm64?  The simpler, more
-> > > > straightforward solution would be to let architectures override flush_on_ret,
-> > > > but I would prefer something like the below as x86 can also utilize a range-based
-> > > > flush when running as a nested hypervisor.
-> > 
-> > ...
-> > 
-> > > I think this works for us on HW that has range invalidation, which
-> > > would already be a positive move.
-> > > 
-> > > For the lesser HW that isn't range capable, it also gives the
-> > > opportunity to perform the iteration ourselves or go for the nuclear
-> > > option if the range is larger than some arbitrary constant (though
-> > > this is additional work).
-> > > 
-> > > But this still considers the whole range as being affected by
-> > > range->handler(). It'd be interesting to try and see whether more
-> > > precise tracking is (or isn't) generally beneficial.
-> > 
-> > I assume the idea would be to let arch code do single-page invalidations of
-> > stage-2 entries for each gfn?
-> 
-> Right, as it's the only code which knows which ptes actually ended up
-> being aged.
-> 
-> > Unless I'm having a brain fart, x86 can't make use of that functionality.  Intel
-> > doesn't provide any way to do targeted invalidation of stage-2 mappings.  AMD
-> > provides an instruction to do broadcast invalidations, but it takes a virtual
-> > address, i.e. a stage-1 address.  I can't tell if it's a host virtual address or
-> > a guest virtual address, but it's a moot point because KVM doen't have the guest
-> > virtual address, and if it's a host virtual address, there would need to be valid
-> > mappings in the host page tables for it to work, which KVM can't guarantee.
-> 
-> Ah, so it sounds like it would need to be an arch opt-in then.
+Changes from V2 [0]:
+- Dropped patches that are better suited for later on with pKVM [Marc]
+- Squashed some patches together to make it easier for maintainers [Marc]
+- Moved all fixes to the beginning of the series [patches 1 - 13]
+- Misc fixes [Mark, Marc, Oliver]
 
-Even if x86 (or some other arch code) could use the precise tracking, I think it
-would make sense to have the behavior be arch specific.  Adding infrastructure
-to get information from arch code, only to turn around and give it back to arch
-code would be odd.
+We are getting closer to upstreaming the remaining part of pKVM
+[1]. To make the process easier for us and for our dear
+reviewers, we are sending out this patch series as a preamble to
+the upcoming patches.
 
-Unless arm64 can't do the invalidation immediately after aging the stage-2 PTE,
-the best/easiest solution would be to let arm64 opt out of the common TLB flush
-when a SPTE is made young.
+This series is based on Linux 6.9-rc3 -- kvmarm/next
+(9ac5bab4deee). Most of the patches in this series are
+self-standing, and can be applied directly.
 
-With the range-based flushing bundled in, this?
+This series is a bit of a bombay-mix of patches we've been
+carrying. There's no one overarching theme, but they do improve
+the code by fixing existing bugs in pKVM, refactoring code to
+make it more readable and easier to re-use for pKVM, or adding
+functionality to the existing pKVM code upstream.
 
----
- include/linux/kvm_host.h |  2 ++
- virt/kvm/kvm_main.c      | 40 +++++++++++++++++++++++++---------------
- 2 files changed, 27 insertions(+), 15 deletions(-)
+None of the patches in this series intentionally affect the
+functionality of non-protected modes. Patches 1 to 13 are fixes.
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index afbc99264ffa..8fe5f5e16919 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -2010,6 +2010,8 @@ extern const struct kvm_stats_header kvm_vcpu_stats_header;
- extern const struct _kvm_stats_desc kvm_vcpu_stats_desc[];
- 
- #ifdef CONFIG_KVM_GENERIC_MMU_NOTIFIER
-+int kvm_arch_flush_tlb_if_young(void);
-+
- static inline int mmu_invalidate_retry(struct kvm *kvm, unsigned long mmu_seq)
- {
- 	if (unlikely(kvm->mmu_invalidate_in_progress))
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 38b498669ef9..5ebef8ef239c 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -595,6 +595,11 @@ static void kvm_null_fn(void)
- }
- #define IS_KVM_NULL_FN(fn) ((fn) == (void *)kvm_null_fn)
- 
-+int __weak kvm_arch_flush_tlb_if_young(void)
-+{
-+	return true;
-+}
-+
- /* Iterate over each memslot intersecting [start, last] (inclusive) range */
- #define kvm_for_each_memslot_in_hva_range(node, slots, start, last)	     \
- 	for (node = interval_tree_iter_first(&slots->hva_tree, start, last); \
-@@ -611,6 +616,7 @@ static __always_inline kvm_mn_ret_t __kvm_handle_hva_range(struct kvm *kvm,
- 	struct kvm_gfn_range gfn_range;
- 	struct kvm_memory_slot *slot;
- 	struct kvm_memslots *slots;
-+	bool need_flush = false;
- 	int i, idx;
- 
- 	if (WARN_ON_ONCE(range->end <= range->start))
-@@ -663,10 +669,22 @@ static __always_inline kvm_mn_ret_t __kvm_handle_hva_range(struct kvm *kvm,
- 					break;
- 			}
- 			r.ret |= range->handler(kvm, &gfn_range);
-+
-+		       /*
-+			* Use a precise gfn-based TLB flush when possible, as
-+			* most mmu_notifier events affect a small-ish range.
-+			* Fall back to a full TLB flush if the gfn-based flush
-+			* fails, and don't bother trying the gfn-based flush
-+			* if a full flush is already pending.
-+			*/
-+		       if (range->flush_on_ret && !need_flush && r.ret &&
-+			   kvm_arch_flush_remote_tlbs_range(kvm, gfn_range.start,
-+							    gfn_range.end - gfn_range.start + 1))
-+			       need_flush = true;
- 		}
- 	}
- 
--	if (range->flush_on_ret && r.ret)
-+	if (need_flush)
- 		kvm_flush_remote_tlbs(kvm);
- 
- 	if (r.found_memslot)
-@@ -680,7 +698,8 @@ static __always_inline kvm_mn_ret_t __kvm_handle_hva_range(struct kvm *kvm,
- static __always_inline int kvm_handle_hva_range(struct mmu_notifier *mn,
- 						unsigned long start,
- 						unsigned long end,
--						gfn_handler_t handler)
-+						gfn_handler_t handler,
-+						bool flush_on_ret)
- {
- 	struct kvm *kvm = mmu_notifier_to_kvm(mn);
- 	const struct kvm_mmu_notifier_range range = {
-@@ -688,7 +707,7 @@ static __always_inline int kvm_handle_hva_range(struct mmu_notifier *mn,
- 		.end		= end,
- 		.handler	= handler,
- 		.on_lock	= (void *)kvm_null_fn,
--		.flush_on_ret	= true,
-+		.flush_on_ret	= flush_on_ret,
- 		.may_block	= false,
- 	};
- 
-@@ -700,17 +719,7 @@ static __always_inline int kvm_handle_hva_range_no_flush(struct mmu_notifier *mn
- 							 unsigned long end,
- 							 gfn_handler_t handler)
- {
--	struct kvm *kvm = mmu_notifier_to_kvm(mn);
--	const struct kvm_mmu_notifier_range range = {
--		.start		= start,
--		.end		= end,
--		.handler	= handler,
--		.on_lock	= (void *)kvm_null_fn,
--		.flush_on_ret	= false,
--		.may_block	= false,
--	};
--
--	return __kvm_handle_hva_range(kvm, &range).ret;
-+	return kvm_handle_hva_range(mn, start, end, handler, false);
- }
- 
- void kvm_mmu_invalidate_begin(struct kvm *kvm)
-@@ -876,7 +885,8 @@ static int kvm_mmu_notifier_clear_flush_young(struct mmu_notifier *mn,
- {
- 	trace_kvm_age_hva(start, end);
- 
--	return kvm_handle_hva_range(mn, start, end, kvm_age_gfn);
-+	return kvm_handle_hva_range(mn, start, end, kvm_age_gfn,
-+				    kvm_arch_flush_tlb_if_young());
- }
- 
- static int kvm_mmu_notifier_clear_young(struct mmu_notifier *mn,
+For a technical deep dive into pKVM, please refer to Quentin
+Perret's KVM Forum Presentation [2, 3]. The pKVM core series,
+which we plan on sending for review next, the code is here [1].
 
-base-commit: eae53272c8ad4e7ed2bbb11bd0456eb5b0484f0c
+Cheers,
+Fuad, Quentin, Will, and Marc
+
+[0] https://lore.kernel.org/all/20240416095638.3620345-1-tabba@google.com/
+
+[1] https://android-kvm.googlesource.com/linux/+/refs/heads/for-upstream/pkvm-core
+
+[2] Protected KVM on arm64 (slides)
+https://static.sched.com/hosted_files/kvmforum2022/88/KVM%20forum%202022%20-%20pKVM%20deep%20dive.pdf
+
+[3] Protected KVM on arm64 (video)
+https://www.youtube.com/watch?v=9npebeVFbFw
+
+Fuad Tabba (15):
+  KVM: arm64: Initialize the kvm host data's fpsimd_state pointer in
+    pKVM
+  KVM: arm64: Move guest_owns_fp_regs() to increase its scope
+  KVM: arm64: Refactor checks for FP state ownership
+  KVM: arm64: Do not re-initialize the KVM lock
+  KVM: arm64: Do not map the host fpsimd state to hyp in pKVM
+  KVM: arm64: Fix comment for __pkvm_vcpu_init_traps()
+  KVM: arm64: Change kvm_handle_mmio_return() return polarity
+  KVM: arm64: Move setting the page as dirty out of the critical section
+  KVM: arm64: Introduce and use predicates that check for protected VMs
+  KVM: arm64: Move pstate reset value definitions to kvm_arm.h
+  KVM: arm64: Clarify rationale for ZCR_EL1 value restored on guest exit
+  KVM: arm64: Refactor calculating SVE state size to use helpers
+  KVM: arm64: Move some kvm_psci functions to a shared header
+  KVM: arm64: Refactor reset_mpidr() to extract its computation
+  KVM: arm64: Refactor kvm_vcpu_enable_ptrauth() for hyp use
+
+Marc Zyngier (3):
+  KVM: arm64: Check for PTE validity when checking for
+    executable/cacheable
+  KVM: arm64: Simplify vgic-v3 hypercalls
+  KVM: arm64: Force injection of a data abort on NISV MMIO exit
+
+Quentin Perret (4):
+  KVM: arm64: Issue CMOs when tearing down guest s2 pages
+  KVM: arm64: Avoid BUG-ing from the host abort path
+  KVM: arm64: Prevent kmemleak from accessing .hyp.data
+  KVM: arm64: Add is_pkvm_initialized() helper
+
+Will Deacon (9):
+  KVM: arm64: Avoid BBM when changing only s/w bits in Stage-2 PTE
+  KVM: arm64: Support TLB invalidation in guest context
+  KVM: arm64: Remove locking from EL2 allocation fast-paths
+  KVM: arm64: Introduce hyp_rwlock_t
+  KVM: arm64: Add atomics-based checking refcount implementation at EL2
+  KVM: arm64: Use atomic refcount helpers for 'struct
+    hyp_page::refcount'
+  KVM: arm64: Reformat/beautify PTP hypercall documentation
+  KVM: arm64: Rename firmware pseudo-register documentation file
+  KVM: arm64: Document the KVM/arm64-specific calls in hypercalls.rst
+
+ Documentation/virt/kvm/api.rst                |   7 +
+ .../virt/kvm/arm/fw-pseudo-registers.rst      | 138 ++++++++++++++
+ Documentation/virt/kvm/arm/hypercalls.rst     | 180 +++++-------------
+ Documentation/virt/kvm/arm/index.rst          |   1 +
+ Documentation/virt/kvm/arm/ptp_kvm.rst        |  38 ++--
+ arch/arm64/include/asm/kvm_arm.h              |  12 ++
+ arch/arm64/include/asm/kvm_asm.h              |   8 +-
+ arch/arm64/include/asm/kvm_emulate.h          |  11 +-
+ arch/arm64/include/asm/kvm_host.h             |  39 ++--
+ arch/arm64/include/asm/kvm_hyp.h              |   4 +-
+ arch/arm64/include/asm/virt.h                 |  12 +-
+ arch/arm64/kvm/arm.c                          |  21 +-
+ arch/arm64/kvm/fpsimd.c                       |  60 +++---
+ arch/arm64/kvm/hyp/include/hyp/switch.h       |   8 +-
+ arch/arm64/kvm/hyp/include/nvhe/gfp.h         |   6 +-
+ arch/arm64/kvm/hyp/include/nvhe/memory.h      |  18 +-
+ arch/arm64/kvm/hyp/include/nvhe/pkvm.h        |   6 +
+ arch/arm64/kvm/hyp/include/nvhe/refcount.h    |  76 ++++++++
+ arch/arm64/kvm/hyp/include/nvhe/rwlock.h      | 129 +++++++++++++
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  24 +--
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         |  10 +-
+ arch/arm64/kvm/hyp/nvhe/page_alloc.c          |  21 +-
+ arch/arm64/kvm/hyp/nvhe/pkvm.c                |  14 +-
+ arch/arm64/kvm/hyp/nvhe/setup.c               |   1 +
+ arch/arm64/kvm/hyp/nvhe/switch.c              |  10 +-
+ arch/arm64/kvm/hyp/nvhe/tlb.c                 | 115 ++++++++---
+ arch/arm64/kvm/hyp/pgtable.c                  |  21 +-
+ arch/arm64/kvm/hyp/vgic-v3-sr.c               |  27 ++-
+ arch/arm64/kvm/hyp/vhe/switch.c               |   4 +-
+ arch/arm64/kvm/mmio.c                         |  12 +-
+ arch/arm64/kvm/mmu.c                          |   8 +-
+ arch/arm64/kvm/pkvm.c                         |   2 +-
+ arch/arm64/kvm/psci.c                         |  28 ---
+ arch/arm64/kvm/reset.c                        |  20 +-
+ arch/arm64/kvm/sys_regs.c                     |  14 +-
+ arch/arm64/kvm/sys_regs.h                     |  19 ++
+ arch/arm64/kvm/vgic/vgic-v2.c                 |   9 +-
+ arch/arm64/kvm/vgic/vgic-v3.c                 |  23 +--
+ arch/arm64/kvm/vgic/vgic.c                    |  11 --
+ arch/arm64/kvm/vgic/vgic.h                    |   2 -
+ include/kvm/arm_psci.h                        |  29 +++
+ include/kvm/arm_vgic.h                        |   1 -
+ 42 files changed, 775 insertions(+), 424 deletions(-)
+ create mode 100644 Documentation/virt/kvm/arm/fw-pseudo-registers.rst
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/refcount.h
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/rwlock.h
+
+
+base-commit: 9ac5bab4deeeeb99f36695250b99c2f9bfae2379
 -- 
+2.44.0.769.g3c40516874-goog
 
