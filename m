@@ -1,342 +1,105 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DB8141C66;
-	Fri, 19 Apr 2024 13:17:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 718A012DD8A
+	for <kvmarm@lists.linux.dev>; Fri, 19 Apr 2024 13:58:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713532659; cv=none; b=bsq/zqhhDzSNcTNhSnS1ua0qY1PcR2We7TnhiSLF6WH0WdAL9cG6JQUfI6bHqrmSoN8CsfJ+dwNtsx4POWNrUp52BVr4RfIxVIca9eEpPJHDW7IVMu21DZjtrA73biWIh7xarbs2FTApAdl0mMy6LBSh47opM6NMbVzw1ALo4mg=
+	t=1713535091; cv=none; b=cxsPUDLbkQ0bbREooD0XSpnwX5B7wqqHmzdnZWpcyKtapY7gdgKJUpNRnvg8YAWMsh2GtWRdEc3w46l/g79LAAdP3YoAYd8rX4HBnpKQQvNI31rRcoG7XkSRzJlPycGG2to/ZaLCDF6dWNpXvUlEHUENZjUJ5V/fxh3bW1pt1a4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713532659; c=relaxed/simple;
-	bh=KNEnmnjXcdjG/45CnWUWM7KCLSgLT4ZKgUXAsuvu8Zc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=szuHNoBaP27NaECchuzFawRjq2Df+LzYaMY6FXTTJcEwmex5UPYNayu8EkvYrPcpv+1CXTS7Me+/wTSH6irNikFgX1XQ3+iUjC3xF1v2fnaZyWvKYSevr/XKIpuXySFCitLaEWXncXAf6eAW6Z2nIY7IFJS8Q/uXSQoc7UsZqhA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 23FF12F;
-	Fri, 19 Apr 2024 06:18:05 -0700 (PDT)
-Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 410FF3F64C;
-	Fri, 19 Apr 2024 06:17:34 -0700 (PDT)
-Message-ID: <9b37b844-d3b1-4b9f-b37e-36b0c347206e@arm.com>
-Date: Fri, 19 Apr 2024 14:17:32 +0100
+	s=arc-20240116; t=1713535091; c=relaxed/simple;
+	bh=gKtJtEltb2GnPLMyuxs+G7n5EiHdmrtpBSJFJerWnT0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Pt/+tg0vD0iMYAsmVekgBSV2oXR++VrttKfrpPrwu7amIc0CKUMKiPhhpOVcKB4QPPDCEBAlAKMyKF0zL8nS04qu0z3Nl7A0GSeMJh7/wJEoLmHjdjGr+E0EQlT49pmwwSz5cjDQGe3Gwa4C7vSxgsN4J7capsaHAQnBrHDiWBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AmC3DxMj; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AmC3DxMj"
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-de45daf49deso4296603276.2
+        for <kvmarm@lists.linux.dev>; Fri, 19 Apr 2024 06:58:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713535088; x=1714139888; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=KgrnEQ6mmP0jFk5Zb1SZY9boKJybsIIVble8n571sqI=;
+        b=AmC3DxMjFCegBnTpEWg1lUcUpV/VxpGFZJlpGry2hKL07jxm+aL70Gd8MxvTIiV4iu
+         0S0610mUtepQsWNPvITcNz4Q3t5rwkWqojVMB+vH/uuKWDuUjqPXoKTJ7e76GDX+YbH4
+         ayXMXc6M9v4AxQ0gVx3oolqhHNY/PbiOKyDwnwv9Q4LNIQVTae9UItAu+BbtAop8F4Y/
+         Tvy9N5zBfq/Nw1iNHwT/qhX0acHc0w8ts9a2tzI6YA/7AU+9LeNoEBWStygreFBKctnF
+         TSrEP/Xd5GOp1jdZ4CGcXMN103RSI+3c6IYiHnT2RqMOC0xb2qpnrVryDJGuByNCy9Zn
+         Q2Rg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713535088; x=1714139888;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KgrnEQ6mmP0jFk5Zb1SZY9boKJybsIIVble8n571sqI=;
+        b=TSC209ocVgXzLka6UeCYUEXo6th7sL2WCuiZGuzT0umrKkBi7PnJ/bY3HkeBMy+VtO
+         Gl+vw/PVfx/XvvJtXxYxb6jb8AfPMxH/kH2wQzXG2s64z5yhw1ahKmrrskJf6CHbw6Q5
+         kDFj+BS+rQC9SuE7t2brE6PzNpxEOK08lF978rxiGhTe44ypT4XKaAXdQWB1hxgG/8rj
+         39dHiM12h9+tbBrHVulwkoaQLcEr819C2+vV2AYNkksHCekpAJNWMJZ6gVu2IehZ9bxi
+         Dg8JM/5M5j3EjH7NkmiAw3Oxl9jMpkllICvJDieuTr+lt/NMUBoZZW2YU5q9Vb7xvFUw
+         9F5w==
+X-Forwarded-Encrypted: i=1; AJvYcCXtHxteRPvO2DcENAGite4TpvQo3SaJh5wGgeMj5NId/RkYxxRi5ku2ypv4KxvLh5ShYPAV9r+McXKPydRnWaoLUe3CUlyL
+X-Gm-Message-State: AOJu0YybQaq9viyL94pArhgFq/4z1ZUzxBn94YLq9u/YH+YUPro6mUm+
+	FqUz5F0WhIRsp9odj/7P/lH1l0mXqXn0PzW4oyyCAr1348S8JfjP0+LJYnpfFemQzTByIKqqISU
+	KAw==
+X-Google-Smtp-Source: AGHT+IGomtDJcb51lvQMFTT5YaGoxW/vZTzkUSuhiTLoa8vZxcxiKEVXH4dmB1G1pZ9i7NSp+ryn6A1areA=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:ad8d:0:b0:dc6:e5d3:5f03 with SMTP id
+ z13-20020a25ad8d000000b00dc6e5d35f03mr543024ybi.4.1713535088599; Fri, 19 Apr
+ 2024 06:58:08 -0700 (PDT)
+Date: Fri, 19 Apr 2024 06:58:06 -0700
+In-Reply-To: <20240419112432.GB2972@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 20/43] arm64: RME: Allow populating initial contents
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-References: <20240412084056.1733704-1-steven.price@arm.com>
- <20240412084309.1733783-1-steven.price@arm.com>
- <20240412084309.1733783-21-steven.price@arm.com>
-Content-Language: en-US
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20240412084309.1733783-21-steven.price@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20240405115815.3226315-1-pbonzini@redhat.com> <20240405115815.3226315-2-pbonzini@redhat.com>
+ <20240412104408.GA27645@willie-the-truck> <86jzl2sovz.wl-maz@kernel.org>
+ <ZhlLHtfeSHk9gRRO@google.com> <86h6g5si0m.wl-maz@kernel.org>
+ <Zh1d94Pl6gneVoDd@google.com> <20240418141932.GA1855@willie-the-truck>
+ <ZiF6NgGYLSsPNEOg@google.com> <20240419112432.GB2972@willie-the-truck>
+Message-ID: <ZiJ4bqrBUPM0E8iq@google.com>
+Subject: Re: [PATCH 1/4] KVM: delete .change_pte MMU notifier callback
+From: Sean Christopherson <seanjc@google.com>
+To: Will Deacon <will@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>, 
+	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, Nicholas Piggin <npiggin@gmail.com>, 
+	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, David Hildenbrand <david@redhat.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
+	linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On 12/04/2024 09:42, Steven Price wrote:
-> The VMM needs to populate the realm with some data before starting (e.g.
-> a kernel and initrd). This is measured by the RMM and used as part of
-> the attestation later on.
+On Fri, Apr 19, 2024, Will Deacon wrote:
+> > @@ -663,10 +669,22 @@ static __always_inline kvm_mn_ret_t __kvm_handle_hva_range(struct kvm *kvm,
+> >  					break;
+> >  			}
+> >  			r.ret |= range->handler(kvm, &gfn_range);
+> > +
+> > +		       /*
+> > +			* Use a precise gfn-based TLB flush when possible, as
+> > +			* most mmu_notifier events affect a small-ish range.
+> > +			* Fall back to a full TLB flush if the gfn-based flush
+> > +			* fails, and don't bother trying the gfn-based flush
+> > +			* if a full flush is already pending.
+> > +			*/
+> > +		       if (range->flush_on_ret && !need_flush && r.ret &&
+> > +			   kvm_arch_flush_remote_tlbs_range(kvm, gfn_range.start,
+> > +							    gfn_range.end - gfn_range.start + 1))
 > 
-> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
->   arch/arm64/kvm/rme.c | 234 +++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 234 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
-> index 0a3f823b2446..4aab507f896e 100644
-> --- a/arch/arm64/kvm/rme.c
-> +++ b/arch/arm64/kvm/rme.c
-> @@ -4,6 +4,7 @@
->    */
->   
->   #include <linux/kvm_host.h>
-> +#include <linux/hugetlb.h>
->   
->   #include <asm/kvm_emulate.h>
->   #include <asm/kvm_mmu.h>
-> @@ -547,6 +548,227 @@ void kvm_realm_unmap_range(struct kvm *kvm, unsigned long ipa, u64 size,
->   	realm_fold_rtt_range(realm, ipa, end);
->   }
->   
-> +static int realm_create_protected_data_page(struct realm *realm,
-> +					    unsigned long ipa,
-> +					    struct page *dst_page,
-> +					    struct page *src_page,
-> +					    unsigned long flags)
-> +{
-> +	phys_addr_t dst_phys, src_phys;
-> +	int ret;
-> +
-> +	dst_phys = page_to_phys(dst_page);
-> +	src_phys = page_to_phys(src_page);
-> +
-> +	if (rmi_granule_delegate(dst_phys))
-> +		return -ENXIO;
-> +
-> +	ret = rmi_data_create(virt_to_phys(realm->rd), dst_phys, ipa, src_phys,
-> +			      flags);
-> +
-> +	if (RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT) {
-> +		/* Create missing RTTs and retry */
-> +		int level = RMI_RETURN_INDEX(ret);
-> +
-> +		ret = realm_create_rtt_levels(realm, ipa, level,
-> +					      RME_RTT_MAX_LEVEL, NULL);
-> +		if (ret)
-> +			goto err;
-> +
-> +		ret = rmi_data_create(virt_to_phys(realm->rd), dst_phys, ipa,
-> +				      src_phys, flags);
-> +	}
-> +
-> +	if (ret)
-> +		goto err;
+> What's that '+ 1' needed for here?
 
-ultra minor nit:
-
-	if (!ret)
-		return 0;
-
-> +
-> +	return 0;
-> +
-> +err:
-> +	if (WARN_ON(rmi_granule_undelegate(dst_phys))) {
-> +		/* Page can't be returned to NS world so is lost */
-> +		get_page(dst_page);
-> +	}
-> +	return -ENXIO;
-> +}
-> +
-> +static int fold_rtt(struct realm *realm, unsigned long addr, int level)
-> +{
-> +	phys_addr_t rtt_addr;
-> +	int ret;
-> +
-> +	ret = realm_rtt_fold(realm, addr, level + 1, &rtt_addr);
-> +	if (ret)
-> +		return ret;
-> +
-> +	free_delegated_page(realm, rtt_addr);
-> +
-> +	return 0;
-> +}
-> +
-> +static int populate_par_region(struct kvm *kvm,
-> +			       phys_addr_t ipa_base,
-> +			       phys_addr_t ipa_end,
-> +			       u32 flags)
-> +{
-> +	struct realm *realm = &kvm->arch.realm;
-> +	struct kvm_memory_slot *memslot;
-> +	gfn_t base_gfn, end_gfn;
-> +	int idx;
-> +	phys_addr_t ipa;
-> +	int ret = 0;
-> +	struct page *tmp_page;
-> +	unsigned long data_flags = 0;
-> +
-> +	base_gfn = gpa_to_gfn(ipa_base);
-> +	end_gfn = gpa_to_gfn(ipa_end);
-> +
-> +	if (flags & KVM_ARM_RME_POPULATE_FLAGS_MEASURE)
-> +		data_flags = RMI_MEASURE_CONTENT;
-> +
-> +	idx = srcu_read_lock(&kvm->srcu);
-> +	memslot = gfn_to_memslot(kvm, base_gfn);
-> +	if (!memslot) {
-> +		ret = -EFAULT;
-> +		goto out;
-> +	}
-> +
-> +	/* We require the region to be contained within a single memslot */
-> +	if (memslot->base_gfn + memslot->npages < end_gfn) {
-> +		ret = -EINVAL;
-> +		goto out;
-> +	}
-> +
-> +	tmp_page = alloc_page(GFP_KERNEL);
-> +	if (!tmp_page) {
-> +		ret = -ENOMEM;
-> +		goto out;
-> +	}
-> +
-> +	mmap_read_lock(current->mm);
-> +
-> +	ipa = ipa_base;
-> +	while (ipa < ipa_end) {
-> +		struct vm_area_struct *vma;
-> +		unsigned long map_size;
-> +		unsigned int vma_shift;
-> +		unsigned long offset;
-> +		unsigned long hva;
-> +		struct page *page;
-> +		kvm_pfn_t pfn;
-> +		int level;
-> +
-> +		hva = gfn_to_hva_memslot(memslot, gpa_to_gfn(ipa));
-> +		vma = vma_lookup(current->mm, hva);
-> +		if (!vma) {
-> +			ret = -EFAULT;
-> +			break;
-> +		}
-> +
-> +		if (is_vm_hugetlb_page(vma))
-> +			vma_shift = huge_page_shift(hstate_vma(vma));
-> +		else
-> +			vma_shift = PAGE_SHIFT;
-> +
-> +		map_size = 1 << vma_shift;
-> +
-> +		/*
-> +		 * FIXME: This causes over mapping, but there's no good
-> +		 * solution here with the ABI as it stands
-> +		 */
-> +		ipa = ALIGN_DOWN(ipa, map_size);
-> +
-> +		switch (map_size) {
-> +		case RME_L2_BLOCK_SIZE:
-> +			level = 2;
-> +			break;
-> +		case PAGE_SIZE:
-> +			level = 3;
-> +			break;
-> +		default:
-> +			WARN_ONCE(1, "Unsupport vma_shift %d", vma_shift);
-
-Do we really need this WARNing  ? Could we not fallback to the next 
-possible mapping size ? e.g: if 1G, we could at least try 2M. I guess
-this is more or less similar to what we would do on a fault and it may
-be a good idea to see if could reuse the core bits from user_mem_abort ?
-
-> +			ret = -EFAULT;
-> +			break;
-> +		}
-> +
-> +		pfn = gfn_to_pfn_memslot(memslot, gpa_to_gfn(ipa));
-> +
-> +		if (is_error_pfn(pfn)) {
-> +			ret = -EFAULT;
-> +			break;
-> +		}
-> +
-> +		if (level < RME_RTT_MAX_LEVEL) {
-> +			/*
-> +			 * A temporary RTT is needed during the map, precreate
-> +			 * it, however if there is an error (e.g. missing
-> +			 * parent tables) this will be handled in the
-> +			 * realm_create_protected_data_page() call.
-> +			 */
-> +			realm_create_rtt_levels(realm, ipa, level,
-> +						RME_RTT_MAX_LEVEL, NULL);
-> +		}
-> +
-> +		page = pfn_to_page(pfn);
-> +
-> +		for (offset = 0; offset < map_size && !ret;
-> +		     offset += PAGE_SIZE, page++) {
-> +			phys_addr_t page_ipa = ipa + offset;
-> +
-> +			ret = realm_create_protected_data_page(realm, page_ipa,
-> +							       page, tmp_page,
-> +							       data_flags);
-> +		}
-> +		if (ret)
-> +			goto err_release_pfn;
-> +
-> +		if (level == 2) {
-> +			ret = fold_rtt(realm, ipa, level);
-> +			if (ret)
-> +				goto err_release_pfn;
-
-Do we care about the FOLD error here ? Ideally we shouldn't hit an 
-error, but unable to fold is not an error case ? We could live with
-L3 mappings ?
-
-
-Suzuki
-
-
-> +		}
-> +
-> +		ipa += map_size;
-> +		kvm_release_pfn_dirty(pfn);
-> +err_release_pfn:
-> +		if (ret) {
-> +			kvm_release_pfn_clean(pfn);
-> +			break;
-> +		}
-> +	}
-> +
-> +	mmap_read_unlock(current->mm);
-> +	__free_page(tmp_page);
-> +
-> +out:
-> +	srcu_read_unlock(&kvm->srcu, idx);
-> +	return ret;
-> +}
-> +
-> +static int kvm_populate_realm(struct kvm *kvm,
-> +			      struct kvm_cap_arm_rme_populate_realm_args *args)
-> +{
-> +	phys_addr_t ipa_base, ipa_end;
-> +
-> +	if (kvm_realm_state(kvm) != REALM_STATE_NEW)
-> +		return -EINVAL;
-> +
-> +	if (!IS_ALIGNED(args->populate_ipa_base, PAGE_SIZE) ||
-> +	    !IS_ALIGNED(args->populate_ipa_size, PAGE_SIZE))
-> +		return -EINVAL;
-> +
-> +	if (args->flags & ~RMI_MEASURE_CONTENT)
-> +		return -EINVAL;
-> +
-> +	ipa_base = args->populate_ipa_base;
-> +	ipa_end = ipa_base + args->populate_ipa_size;
-> +
-> +	if (ipa_end < ipa_base)
-> +		return -EINVAL;
-> +
-> +	return populate_par_region(kvm, ipa_base, ipa_end, args->flags);
-> +}
-> +
->   static int find_map_level(struct realm *realm,
->   			  unsigned long start,
->   			  unsigned long end)
-> @@ -808,6 +1030,18 @@ int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
->   		r = kvm_init_ipa_range_realm(kvm, &args);
->   		break;
->   	}
-> +	case KVM_CAP_ARM_RME_POPULATE_REALM: {
-> +		struct kvm_cap_arm_rme_populate_realm_args args;
-> +		void __user *argp = u64_to_user_ptr(cap->args[1]);
-> +
-> +		if (copy_from_user(&args, argp, sizeof(args))) {
-> +			r = -EFAULT;
-> +			break;
-> +		}
-> +
-> +		r = kvm_populate_realm(kvm, &args);
-> +		break;
-> +	}
->   	default:
->   		r = -EINVAL;
->   		break;
-
+ (a) To see if you're paying attention.
+ (b) Because more is always better.
+ (c) Because math is hard.
+ (d) Because I haven't tested this.
+ (e) Both (c) and (d).
