@@ -1,32 +1,32 @@
-Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECAB213D25D
-	for <kvmarm@lists.linux.dev>; Fri, 19 Apr 2024 22:39:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98AC184FCE
+	for <kvmarm@lists.linux.dev>; Fri, 19 Apr 2024 22:39:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713566363; cv=none; b=Yqeb/J0RDLI1OIwYk43Es2Gy4u5812PqqxSSFkLmD52nBCpHy/PZ74ypUBottd1+MSHHLJvG5qGrHhXNlELAvvKw90xRswma9ap2+dBJR2HvTjDj4HUsgOuCzLLqzm0hyKm0m2hDoG9sqj7RGfpZovaiNm08y+PlUZy+eU335Xo=
+	t=1713566365; cv=none; b=iAXMgj7+lSGtsNSNRf4+vwX//2UsHIABV5mVhUU1zqTApbJPIk/5Yj+uNEgtnfsO2DZ4yjJe5w40a3wJIKX/W2B8GgFLOd+i/pJBolJOb6qLJFwB45N21TYhJiEWJ6zJqwo+Uc6zWYwkIOAHmVVTHV320l5/CaYs5n7FKH9QheU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713566363; c=relaxed/simple;
-	bh=zG63o15LRk+e2MYjWHdaBOfQdW03SEcOdCMeWX/fSKQ=;
+	s=arc-20240116; t=1713566365; c=relaxed/simple;
+	bh=ex6sleJ4AOuNMEANXFt2zw4iHpeO/mhzIhh50aGJdLE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HhUKO6ovz/UfGfbw+OzG3FCITHifuUtxnt2chiBXDdvnXgZLvWEUJTZkQQdlQimX0pfGwToYQHJAdbjA6ybKYRjNWAP4jVsimfFGoe52Tnf8u8ntGK9NLorUwLbKZj5O6VXl2hs/1sWHhcqk4JaUzB7KfkzH62DSoBQj6Aw85NI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=EsrpEsqW; arc=none smtp.client-ip=95.215.58.181
+	 MIME-Version; b=YB+DjeYPqMudBcbKwg2B5/fxCGjfsfxE13wSYe4VqxfwwY261uOfklGW9jsrz0pLZmED1pRbTk9gVhIX8gX8tSiwRlNtnSEd0vXGC9rtLUAYpZczM6liXnTu8xojoKB3R1+IyRf6bD9Mk+MnoPvOai9CFdEtv+NEZ3DoQGHyttg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ORP5mmyH; arc=none smtp.client-ip=95.215.58.187
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="EsrpEsqW"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ORP5mmyH"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1713566360;
+	t=1713566362;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=14PdoBY6DBvxeFCDd7CHv10z+/kvHkQikySC0UlY6qc=;
-	b=EsrpEsqWR/7Fzg7f8xymQ4FO1881WtNYuFAV0sTO9pX9LQzASbTkchZARfYENbTrj/Kydf
-	u6gw5YKttSOajqDTjZAHJk34nquU7l560/VKdsRy8UeyUaJnb5taJnZY02Hh8bWZNoSSog
-	tGe+61JDZQTGqArtSeiNmlLSsmd3ELo=
+	bh=IlsyU5Oa9/QxxvIUOlfRjQh9pWrtSX/zjg7AZVK8nmE=;
+	b=ORP5mmyHAN6wCN9jL7epAP2SsYSkTvowsTelpT8iYWJgWGPjA4unav4l/cpVZjJKm2QDmB
+	lCmPOEh6mMCPphvmQf0mvIDs2EjLtiLlPkbhGGuuFc95vs6vtiSawPT0/ZBl1udw559yn3
+	Foc9U3DJQMY/e27tN7YuY6pmm2TN9hc=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -35,9 +35,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Eric Auger <eric.auger@redhat.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v2 06/19] KVM: arm64: vgic-its: Get rid of vgic_copy_lpi_list()
-Date: Fri, 19 Apr 2024 22:38:29 +0000
-Message-ID: <20240419223842.951452-7-oliver.upton@linux.dev>
+Subject: [PATCH v2 07/19] KVM: arm64: vgic-its: Scope translation cache invalidations to an ITS
+Date: Fri, 19 Apr 2024 22:38:30 +0000
+Message-ID: <20240419223842.951452-8-oliver.upton@linux.dev>
 In-Reply-To: <20240419223842.951452-1-oliver.upton@linux.dev>
 References: <20240419223842.951452-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -49,122 +49,195 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-The last user has been transitioned to walking the LPI xarray directly.
-Cut the wart off, and get rid of the now unneeded lpi_count while doing
-so.
+As the current LPI translation cache is global, the corresponding
+invalidation helpers are also globally-scoped. In anticipation of
+constructing a translation cache per ITS, add a helper for scoped cache
+invalidations.
+
+We still need to support global invalidations when LPIs are toggled on
+a redistributor, as a property of the translation cache is that all
+stored LPIs are known to be delieverable.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/vgic/vgic-its.c | 48 ----------------------------------
- arch/arm64/kvm/vgic/vgic.c     |  1 -
- arch/arm64/kvm/vgic/vgic.h     |  1 -
- include/kvm/arm_vgic.h         |  1 -
- 4 files changed, 51 deletions(-)
+ arch/arm64/kvm/vgic/vgic-its.c     | 45 ++++++++++++++++++++++--------
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c |  2 +-
+ arch/arm64/kvm/vgic/vgic.h         |  2 +-
+ 3 files changed, 35 insertions(+), 14 deletions(-)
 
 diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 5025ac968d27..441134ad674e 100644
+index 441134ad674e..4afd42b6a16c 100644
 --- a/arch/arm64/kvm/vgic/vgic-its.c
 +++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -86,11 +86,8 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
- 	if (ret) {
- 		xa_release(&dist->lpi_xa, intid);
- 		kfree(irq);
--		goto out_unlock;
+@@ -23,6 +23,8 @@
+ #include "vgic.h"
+ #include "vgic-mmio.h"
+ 
++static struct kvm_device_ops kvm_arm_vgic_its_ops;
++
+ static int vgic_its_save_tables_v0(struct vgic_its *its);
+ static int vgic_its_restore_tables_v0(struct vgic_its *its);
+ static int vgic_its_commit_v0(struct vgic_its *its);
+@@ -616,7 +618,7 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
+ 	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
+ }
+ 
+-void vgic_its_invalidate_cache(struct kvm *kvm)
++static void vgic_its_invalidate_cache(struct vgic_its *its)
+ {
+ 	struct vgic_dist *dist = &kvm->arch.vgic;
+ 	struct vgic_translation_cache_entry *cte;
+@@ -639,6 +641,24 @@ void vgic_its_invalidate_cache(struct kvm *kvm)
+ 	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
+ }
+ 
++void vgic_its_invalidate_all_caches(struct kvm *kvm)
++{
++	struct kvm_device *dev;
++	struct vgic_its *its;
++
++	rcu_read_lock();
++
++	list_for_each_entry_rcu(dev, &kvm->devices, vm_node) {
++		if (dev->ops != &kvm_arm_vgic_its_ops)
++			continue;
++
++		its = dev->private;
++		vgic_its_invalidate_cache(its);
++	}
++
++	rcu_read_unlock();
++}
++
+ int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
+ 			 u32 devid, u32 eventid, struct vgic_irq **irq)
+ {
+@@ -826,7 +846,7 @@ static int vgic_its_cmd_handle_discard(struct kvm *kvm, struct vgic_its *its,
+ 		 * don't bother here since we clear the ITTE anyway and the
+ 		 * pending state is a property of the ITTE struct.
+ 		 */
+-		vgic_its_invalidate_cache(kvm);
++		vgic_its_invalidate_cache(its);
+ 
+ 		its_free_ite(kvm, ite);
+ 		return 0;
+@@ -863,7 +883,7 @@ static int vgic_its_cmd_handle_movi(struct kvm *kvm, struct vgic_its *its,
+ 	ite->collection = collection;
+ 	vcpu = collection_to_vcpu(kvm, collection);
+ 
+-	vgic_its_invalidate_cache(kvm);
++	vgic_its_invalidate_cache(its);
+ 
+ 	return update_affinity(ite->irq, vcpu);
+ }
+@@ -1110,7 +1130,8 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
+ }
+ 
+ /* Requires the its_lock to be held. */
+-static void vgic_its_free_device(struct kvm *kvm, struct its_device *device)
++static void vgic_its_free_device(struct kvm *kvm, struct vgic_its *its,
++				 struct its_device *device)
+ {
+ 	struct its_ite *ite, *temp;
+ 
+@@ -1122,7 +1143,7 @@ static void vgic_its_free_device(struct kvm *kvm, struct its_device *device)
+ 	list_for_each_entry_safe(ite, temp, &device->itt_head, ite_list)
+ 		its_free_ite(kvm, ite);
+ 
+-	vgic_its_invalidate_cache(kvm);
++	vgic_its_invalidate_cache(its);
+ 
+ 	list_del(&device->dev_list);
+ 	kfree(device);
+@@ -1134,7 +1155,7 @@ static void vgic_its_free_device_list(struct kvm *kvm, struct vgic_its *its)
+ 	struct its_device *cur, *temp;
+ 
+ 	list_for_each_entry_safe(cur, temp, &its->device_list, dev_list)
+-		vgic_its_free_device(kvm, cur);
++		vgic_its_free_device(kvm, its, cur);
+ }
+ 
+ /* its lock must be held */
+@@ -1193,7 +1214,7 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
+ 	 * by removing the mapping and re-establishing it.
+ 	 */
+ 	if (device)
+-		vgic_its_free_device(kvm, device);
++		vgic_its_free_device(kvm, its, device);
+ 
+ 	/*
+ 	 * The spec does not say whether unmapping a not-mapped device
+@@ -1224,7 +1245,7 @@ static int vgic_its_cmd_handle_mapc(struct kvm *kvm, struct vgic_its *its,
+ 
+ 	if (!valid) {
+ 		vgic_its_free_collection(its, coll_id);
+-		vgic_its_invalidate_cache(kvm);
++		vgic_its_invalidate_cache(its);
+ 	} else {
+ 		struct kvm_vcpu *vcpu;
+ 
+@@ -1395,7 +1416,7 @@ static int vgic_its_cmd_handle_movall(struct kvm *kvm, struct vgic_its *its,
+ 		vgic_put_irq(kvm, irq);
  	}
  
--	atomic_inc(&dist->lpi_count);
--
- out_unlock:
- 	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
+-	vgic_its_invalidate_cache(kvm);
++	vgic_its_invalidate_cache(its);
  
-@@ -316,51 +313,6 @@ static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
  	return 0;
  }
+@@ -1747,7 +1768,7 @@ static void vgic_mmio_write_its_ctlr(struct kvm *kvm, struct vgic_its *its,
  
--/*
-- * Create a snapshot of the current LPIs targeting @vcpu, so that we can
-- * enumerate those LPIs without holding any lock.
-- * Returns their number and puts the kmalloc'ed array into intid_ptr.
-- */
--int vgic_copy_lpi_list(struct kvm *kvm, struct kvm_vcpu *vcpu, u32 **intid_ptr)
--{
--	struct vgic_dist *dist = &kvm->arch.vgic;
--	XA_STATE(xas, &dist->lpi_xa, GIC_LPI_OFFSET);
--	struct vgic_irq *irq;
--	unsigned long flags;
--	u32 *intids;
--	int irq_count, i = 0;
--
--	/*
--	 * There is an obvious race between allocating the array and LPIs
--	 * being mapped/unmapped. If we ended up here as a result of a
--	 * command, we're safe (locks are held, preventing another
--	 * command). If coming from another path (such as enabling LPIs),
--	 * we must be careful not to overrun the array.
--	 */
--	irq_count = atomic_read(&dist->lpi_count);
--	intids = kmalloc_array(irq_count, sizeof(intids[0]), GFP_KERNEL_ACCOUNT);
--	if (!intids)
--		return -ENOMEM;
--
--	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
--	rcu_read_lock();
--
--	xas_for_each(&xas, irq, VGIC_LPI_MAX_INTID) {
--		if (i == irq_count)
--			break;
--		/* We don't need to "get" the IRQ, as we hold the list lock. */
--		if (vcpu && irq->target_vcpu != vcpu)
--			continue;
--		intids[i++] = irq->intid;
--	}
--
--	rcu_read_unlock();
--	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
--
--	*intid_ptr = intids;
--	return i;
--}
--
- static int update_affinity(struct vgic_irq *irq, struct kvm_vcpu *vcpu)
- {
- 	int ret = 0;
-diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-index 4ec93587c8cd..e3ee1bc1214a 100644
---- a/arch/arm64/kvm/vgic/vgic.c
-+++ b/arch/arm64/kvm/vgic/vgic.c
-@@ -126,7 +126,6 @@ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
- 	__xa_erase(&dist->lpi_xa, irq->intid);
- 	xa_unlock_irqrestore(&dist->lpi_xa, flags);
+ 	its->enabled = !!(val & GITS_CTLR_ENABLE);
+ 	if (!its->enabled)
+-		vgic_its_invalidate_cache(kvm);
++		vgic_its_invalidate_cache(its);
  
--	atomic_dec(&dist->lpi_count);
- 	kfree_rcu(irq, rcu);
- }
+ 	/*
+ 	 * Try to process any pending commands. This function bails out early
+@@ -1880,7 +1901,7 @@ void vgic_lpi_translation_cache_destroy(struct kvm *kvm)
+ 	struct vgic_dist *dist = &kvm->arch.vgic;
+ 	struct vgic_translation_cache_entry *cte, *tmp;
  
+-	vgic_its_invalidate_cache(kvm);
++	vgic_its_invalidate_all_caches(kvm);
+ 
+ 	list_for_each_entry_safe(cte, tmp,
+ 				 &dist->lpi_translation_cache, entry) {
+@@ -2372,7 +2393,7 @@ static int vgic_its_restore_dte(struct vgic_its *its, u32 id,
+ 
+ 	ret = vgic_its_restore_itt(its, dev);
+ 	if (ret) {
+-		vgic_its_free_device(its->dev->kvm, dev);
++		vgic_its_free_device(its->dev->kvm, its, dev);
+ 		return ret;
+ 	}
+ 
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+index c15ee1df036a..a3983a631b5a 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+@@ -277,7 +277,7 @@ static void vgic_mmio_write_v3r_ctlr(struct kvm_vcpu *vcpu,
+ 			return;
+ 
+ 		vgic_flush_pending_lpis(vcpu);
+-		vgic_its_invalidate_cache(vcpu->kvm);
++		vgic_its_invalidate_all_caches(vcpu->kvm);
+ 		atomic_set_release(&vgic_cpu->ctlr, 0);
+ 	} else {
+ 		ctlr = atomic_cmpxchg_acquire(&vgic_cpu->ctlr, 0,
 diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-index e0c77e1bd9f6..060dfd96b41f 100644
+index 060dfd96b41f..e5cda1eb4bcf 100644
 --- a/arch/arm64/kvm/vgic/vgic.h
 +++ b/arch/arm64/kvm/vgic/vgic.h
-@@ -331,7 +331,6 @@ static inline bool vgic_dist_overlap(struct kvm *kvm, gpa_t base, size_t size)
- }
+@@ -337,7 +337,7 @@ struct vgic_its *vgic_msi_to_its(struct kvm *kvm, struct kvm_msi *msi);
+ int vgic_its_inject_cached_translation(struct kvm *kvm, struct kvm_msi *msi);
+ void vgic_lpi_translation_cache_init(struct kvm *kvm);
+ void vgic_lpi_translation_cache_destroy(struct kvm *kvm);
+-void vgic_its_invalidate_cache(struct kvm *kvm);
++void vgic_its_invalidate_all_caches(struct kvm *kvm);
  
- bool vgic_lpis_enabled(struct kvm_vcpu *vcpu);
--int vgic_copy_lpi_list(struct kvm *kvm, struct kvm_vcpu *vcpu, u32 **intid_ptr);
- int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
- 			 u32 devid, u32 eventid, struct vgic_irq **irq);
- struct vgic_its *vgic_msi_to_its(struct kvm *kvm, struct kvm_msi *msi);
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 8eb72721dac1..ac7f15ec1586 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -279,7 +279,6 @@ struct vgic_dist {
- 
- #define LPI_XA_MARK_DEBUG_ITER	XA_MARK_0
- 	struct xarray		lpi_xa;
--	atomic_t		lpi_count;
- 
- 	/* LPI translation cache */
- 	struct list_head	lpi_translation_cache;
+ /* GICv4.1 MMIO interface */
+ int vgic_its_inv_lpi(struct kvm *kvm, struct vgic_irq *irq);
 -- 
 2.44.0.769.g3c40516874-goog
 
