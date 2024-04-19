@@ -1,55 +1,55 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B44083E485
-	for <kvmarm@lists.linux.dev>; Fri, 19 Apr 2024 08:00:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ECBE3E485
+	for <kvmarm@lists.linux.dev>; Fri, 19 Apr 2024 08:00:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713513623; cv=none; b=ch8elX/Q51smHKmpIFrPzP1fdhL3s9bUHX6JGn3twhLEBX+oAWI5tzunT8rVCNOXF9/I8sSi7CdocJb/QXWfwUQ0gdc43QWyHV25dsXzp1jerUmKPDtL8T4WPHHF2clD2NnWXaym9XrD9xD7q4aWjveOU47HM+uSxMVfyG1R7i4=
+	t=1713513625; cv=none; b=j7E8aJg5+ZY8RvWDE4o2rA6AMPjIhZkRiyG836tiyRfyzNjapwHcIVhBHBhTjHufgyXD9Tqel1zWFdhSwMCDKdsdO/tLYBb4RhZGTPqJvuXQh+38Btck8Tjty8fcv8cRT4w0xU8hnHE9igSR3J7WCzt3cic5egHW5nxSP9M3b60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713513623; c=relaxed/simple;
-	bh=LY1wr+d6vHjd29XP+Js+n4P3hNue7ilG2SXuTIx1RDQ=;
+	s=arc-20240116; t=1713513625; c=relaxed/simple;
+	bh=Gxr8b/0ifmxOOLSmLMlwN+FmH3Wa6cC5DT0CyrUoERM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=YY6XU8ot7IcdbNmjKSkEHc7RWt2kx/429h+6oLs+lJJ6GtsxGkMI4+qj2xdSkcNVMHkb1F3MgDNS4NG5q5WnIAZwc8KkGVAsUZoF9A9+6tmR2d5Fu4ZTVqGc3Bpt4DR8g0JNca4cpLgw8i11YJ8E4DjVrlyDwfmuIzUNxPuMvB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=htnwtAI9; arc=none smtp.client-ip=209.85.128.201
+	 To:Cc:Content-Type; b=a/NAdUGYJNmNW1VpImFrzWf6pdxINffAApuNEtXS/KozU8JQ1X8PCpc0VRcnAoyMJ2CR4TL1JUAvmqdO041/+5D0eh2xptZs7wW5Nf7Wc8jtPgRQBTJFTySf2wCqGU1WHb2h0xGQb5H99jvSVlYgT08xs6N9+fZwg38uPU2L81g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LqOr4IES; arc=none smtp.client-ip=209.85.128.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="htnwtAI9"
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-60cd62fa1f9so31359607b3.0
-        for <kvmarm@lists.linux.dev>; Fri, 19 Apr 2024 01:00:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LqOr4IES"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-416ac21981dso8592175e9.1
+        for <kvmarm@lists.linux.dev>; Fri, 19 Apr 2024 01:00:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713513621; x=1714118421; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1713513622; x=1714118422; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1cxgozkRyOPnyB1VoKWBD0EwaF0L4ELuTL9ptO3a0ZE=;
-        b=htnwtAI9VY6pXqYNCmKyIjLa1bFGUJw3Vnd+kF8au/2kx2QF+IQ9GxguG5gSc2nSZ6
-         akAay6WPe7zpOf5dGo2YQcqcAUP+Mwu4SsKYfwVFXpRpVoTMk3v/bPptiPJ+Jq421O+A
-         2W95e4SlM/pIwg1YFWMIgJM64rKV3uNoIQFJhEzySJd1/sPwuB48gh/A2qZjhdwkYBhM
-         DsIjbu1v2FIfEoqX7jH96zjVYDjjuMugnswN6In+oTl1E1I6hcQIwFVJhYjqn2PrTIdX
-         DjBT2i3g7K4lInxczA3uATTKVpiMstIaZ83v0InUfiOFDeCXaNyPx9Ewbru8Y7wRJeMK
-         KHBw==
+        bh=spVyBK1DenNowX84dGQKXXu4QL2Afz95gZfImVRze/s=;
+        b=LqOr4IEStAzxIjetpRoRDS5pzvDKc9QKKqrpOmVnASbH6T+9JGLcmuQKurOiLgD6yI
+         7a7Ow2mbmSyM9jpFPQdUbI0mc0rdn7bENmNmItNgDTyQP1rrp8iQcrS3cUtmsktT/dJP
+         KYbDff3JTOTaxkdvYVbTjG6zANJeXFwlFITdRq+vYf+2fFdKlvErok5hDeLy/QcMd/ua
+         VM89jPpXw787khtxKdM98Fx7rWvg/0iu613WgVRNuAnVZfsdrmLxrsKEbN0s34+RVhiq
+         3xWAuk8KdIWssPBbSN1p6xeZfAFGYTY4xxYwUrUAzrmL9WzjX47RX/lLgtpwJPNe2xEu
+         MF6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713513621; x=1714118421;
+        d=1e100.net; s=20230601; t=1713513622; x=1714118422;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1cxgozkRyOPnyB1VoKWBD0EwaF0L4ELuTL9ptO3a0ZE=;
-        b=GChZYf51/3dQqqQWUbYJtB0EEOgmkp33EjqiZzuHv5CZl/t7q/kE7TDVGKA6ACeN6U
-         B5wU7v3MejVbWOzVw1E939zhtT9Nd9wFqd1vwzkXYv+lsO6QGzchfDO7RtGG+mmmIrZx
-         z2RbYaLSa5Y8mzSNhMobEqy+2ajR+CBK+eLSIA2hXdfJGRpDpwyfLlUY95h7wfzm8Rmy
-         3sqjKChnZyNkhjcabMU6QyJM/WoO50U/7WlvxDgROIefdqyBGCh70baFNTpjvzMQDR4h
-         Ygjta1tYE4MM1d1eWW2pDUfpCZZIHUsdm6DzB2/aSnrP7ohTjWPC74ZDJjawwfoM2d3O
-         IZLw==
-X-Gm-Message-State: AOJu0Yw+uyWH/iZTpFj4Q3WFXwIcJHh2OkZ6qP8+ZjYMsQDgkFW9bJ1S
-	l3DA8ua9Y3QNoojV8lYj6VsZ7kFCet8qRTvbESaDGoV0XjiePeSK67M2towjaFtoYk9kL66XqZT
-	SVyrltPvI03dZS8YAIFo0YqE8CsBRN1dTXs3ZmgjnV7GDAgESDkvn3pxZLcMz1+3CiCz5oV5QlX
-	qRQI6Eyw8N+ZFMfXhW7K1moVZ0jAA=
-X-Google-Smtp-Source: AGHT+IFKi6Y8lHeQpyDD2uGAS8IFKkerP3iGag11oY7MuUGAaCVBIk5iFTwP+WTTV3/+PiKTFaGOve+eQw==
+        bh=spVyBK1DenNowX84dGQKXXu4QL2Afz95gZfImVRze/s=;
+        b=QG0sr2KgjqYegNf5VzT5+w+V4Us6+MfbcxzGtwn8b8ZIldYa7DjHvzaALolbOe+u98
+         sqFM3pklMsF7IpUX+glX3avj7lMgdLrut2ro6iJ/MQQvMTowRuEl3MWhIDrGTkpcS2PP
+         v59jd5zQqExJle/kZc1Tc5CSpnmNZmmMOYxm1Vvb+YrlGBTlr+Hk/pkKjTxZOaOR4L8C
+         zuFBhsJ+L/p3Iu7dds0L2HqGj8VCwvTbxgUJYaak7n5R4VZjNxCoRO4eqNDupN6Gakj7
+         2TIo5ftST59QpMgNqht9UEqIn1/KpryWWiiXUn/HdV01J6bhM8OBDmErDDr6iCjzUevG
+         FCnA==
+X-Gm-Message-State: AOJu0Yxrp1GxbWF1rO+rsPLM+eC4y9kVCi9Ck/CmgAIbPevYKaWIZARM
+	84PPV8/f2Js2BiCSQgHkfdM6FoYc9vC5vqBAKGa77dcV5RD5pm4Ys7lvYTjxHeI1ZGMLd7vwObz
+	pfrAFXP1TSTACvV5ZI8I/g0Q+aM/nMik3usesbH5H5wYMXlVh3GiM0ibpypoOfzBWjJl8MqP8l3
+	eiHQS1PC937VCjSWTRTin1YilmWJc=
+X-Google-Smtp-Source: AGHT+IHsy38Kcf6HzYcX5lhDdSl7k65t0oYj5AU5BsaK/pSK90N+REHWG7W+pCJP8O8veEY9IDUGe/ryeQ==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:6902:c10:b0:dc6:d1d7:d03e with SMTP id
- fs16-20020a0569020c1000b00dc6d1d7d03emr152177ybb.8.1713513619992; Fri, 19 Apr
- 2024 01:00:19 -0700 (PDT)
-Date: Fri, 19 Apr 2024 08:59:26 +0100
+ (user=tabba job=sendgmr) by 2002:a05:600c:5644:b0:418:9a5b:d68 with SMTP id
+ js4-20020a05600c564400b004189a5b0d68mr19798wmb.2.1713513622193; Fri, 19 Apr
+ 2024 01:00:22 -0700 (PDT)
+Date: Fri, 19 Apr 2024 08:59:27 +0100
 In-Reply-To: <20240419075941.4085061-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240419075941.4085061-1-tabba@google.com>
 X-Mailer: git-send-email 2.44.0.769.g3c40516874-goog
-Message-ID: <20240419075941.4085061-17-tabba@google.com>
-Subject: [PATCH v3 16/31] KVM: arm64: Simplify vgic-v3 hypercalls
+Message-ID: <20240419075941.4085061-18-tabba@google.com>
+Subject: [PATCH v3 17/31] KVM: arm64: Add is_pkvm_initialized() helper
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev
 Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com, 
@@ -70,333 +70,54 @@ Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com,
 	joey.gouly@arm.com, rananta@google.com, smostafa@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-From: Marc Zyngier <maz@kernel.org>
+From: Quentin Perret <qperret@google.com>
 
-Consolidate the GICv3 VMCR accessor hypercalls into the APR save/restore
-hypercalls so that all of the EL2 GICv3 state is covered by a single pair
-of hypercalls.
+Add a helper allowing to check when the pkvm static key is enabled to
+ease the introduction of pkvm hooks in other parts of the code.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
+Signed-off-by: Quentin Perret <qperret@google.com>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/include/asm/kvm_asm.h   |  8 ++------
- arch/arm64/include/asm/kvm_hyp.h   |  4 ++--
- arch/arm64/kvm/arm.c               |  5 ++---
- arch/arm64/kvm/hyp/nvhe/hyp-main.c | 24 ++++++------------------
- arch/arm64/kvm/hyp/vgic-v3-sr.c    | 27 +++++++++++++++++++++++----
- arch/arm64/kvm/vgic/vgic-v2.c      |  9 +--------
- arch/arm64/kvm/vgic/vgic-v3.c      | 23 ++---------------------
- arch/arm64/kvm/vgic/vgic.c         | 11 -----------
- arch/arm64/kvm/vgic/vgic.h         |  2 --
- include/kvm/arm_vgic.h             |  1 -
- 10 files changed, 38 insertions(+), 76 deletions(-)
+ arch/arm64/include/asm/virt.h | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 24b5e6b23417..a6330460d9e5 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -73,10 +73,8 @@ enum __kvm_host_smccc_func {
- 	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_range,
- 	__KVM_HOST_SMCCC_FUNC___kvm_flush_cpu_context,
- 	__KVM_HOST_SMCCC_FUNC___kvm_timer_set_cntvoff,
--	__KVM_HOST_SMCCC_FUNC___vgic_v3_read_vmcr,
--	__KVM_HOST_SMCCC_FUNC___vgic_v3_write_vmcr,
--	__KVM_HOST_SMCCC_FUNC___vgic_v3_save_aprs,
--	__KVM_HOST_SMCCC_FUNC___vgic_v3_restore_aprs,
-+	__KVM_HOST_SMCCC_FUNC___vgic_v3_save_vmcr_aprs,
-+	__KVM_HOST_SMCCC_FUNC___vgic_v3_restore_vmcr_aprs,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_init_traps,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_init_vm,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_init_vcpu,
-@@ -241,8 +239,6 @@ extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
- extern void __kvm_adjust_pc(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
+index 261d6e9df2e1..ebf4a9f943ed 100644
+--- a/arch/arm64/include/asm/virt.h
++++ b/arch/arm64/include/asm/virt.h
+@@ -82,6 +82,12 @@ bool is_kvm_arm_initialised(void);
  
- extern u64 __vgic_v3_get_gic_config(void);
--extern u64 __vgic_v3_read_vmcr(void);
--extern void __vgic_v3_write_vmcr(u32 vmcr);
- extern void __vgic_v3_init_lrs(void);
+ DECLARE_STATIC_KEY_FALSE(kvm_protected_mode_initialized);
  
- extern u64 __kvm_get_mdcr_el2(void);
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index 3e2a1ac0c9bb..3e80464f8953 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -80,8 +80,8 @@ void __vgic_v3_save_state(struct vgic_v3_cpu_if *cpu_if);
- void __vgic_v3_restore_state(struct vgic_v3_cpu_if *cpu_if);
- void __vgic_v3_activate_traps(struct vgic_v3_cpu_if *cpu_if);
- void __vgic_v3_deactivate_traps(struct vgic_v3_cpu_if *cpu_if);
--void __vgic_v3_save_aprs(struct vgic_v3_cpu_if *cpu_if);
--void __vgic_v3_restore_aprs(struct vgic_v3_cpu_if *cpu_if);
-+void __vgic_v3_save_vmcr_aprs(struct vgic_v3_cpu_if *cpu_if);
-+void __vgic_v3_restore_vmcr_aprs(struct vgic_v3_cpu_if *cpu_if);
- int __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu);
- 
- #ifdef __KVM_NVHE_HYPERVISOR__
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 0b5473fbbd08..66301131d5a9 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -784,9 +784,8 @@ void kvm_vcpu_wfi(struct kvm_vcpu *vcpu)
- 	 * doorbells to be signalled, should an interrupt become pending.
++static inline bool is_pkvm_initialized(void)
++{
++	return IS_ENABLED(CONFIG_KVM) &&
++	       static_branch_likely(&kvm_protected_mode_initialized);
++}
++
+ /* Reports the availability of HYP mode */
+ static inline bool is_hyp_mode_available(void)
+ {
+@@ -89,8 +95,7 @@ static inline bool is_hyp_mode_available(void)
+ 	 * If KVM protected mode is initialized, all CPUs must have been booted
+ 	 * in EL2. Avoid checking __boot_cpu_mode as CPUs now come up in EL1.
  	 */
- 	preempt_disable();
--	kvm_vgic_vmcr_sync(vcpu);
- 	vcpu_set_flag(vcpu, IN_WFI);
--	vgic_v4_put(vcpu);
-+	kvm_vgic_put(vcpu);
- 	preempt_enable();
+-	if (IS_ENABLED(CONFIG_KVM) &&
+-	    static_branch_likely(&kvm_protected_mode_initialized))
++	if (is_pkvm_initialized())
+ 		return true;
  
- 	kvm_vcpu_halt(vcpu);
-@@ -794,7 +793,7 @@ void kvm_vcpu_wfi(struct kvm_vcpu *vcpu)
+ 	return (__boot_cpu_mode[0] == BOOT_CPU_MODE_EL2 &&
+@@ -104,8 +109,7 @@ static inline bool is_hyp_mode_mismatched(void)
+ 	 * If KVM protected mode is initialized, all CPUs must have been booted
+ 	 * in EL2. Avoid checking __boot_cpu_mode as CPUs now come up in EL1.
+ 	 */
+-	if (IS_ENABLED(CONFIG_KVM) &&
+-	    static_branch_likely(&kvm_protected_mode_initialized))
++	if (is_pkvm_initialized())
+ 		return false;
  
- 	preempt_disable();
- 	vcpu_clear_flag(vcpu, IN_WFI);
--	vgic_v4_load(vcpu);
-+	kvm_vgic_load(vcpu);
- 	preempt_enable();
- }
- 
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 26561c562f7a..d5c48dc98f67 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -175,16 +175,6 @@ static void handle___vgic_v3_get_gic_config(struct kvm_cpu_context *host_ctxt)
- 	cpu_reg(host_ctxt, 1) = __vgic_v3_get_gic_config();
- }
- 
--static void handle___vgic_v3_read_vmcr(struct kvm_cpu_context *host_ctxt)
--{
--	cpu_reg(host_ctxt, 1) = __vgic_v3_read_vmcr();
--}
--
--static void handle___vgic_v3_write_vmcr(struct kvm_cpu_context *host_ctxt)
--{
--	__vgic_v3_write_vmcr(cpu_reg(host_ctxt, 1));
--}
--
- static void handle___vgic_v3_init_lrs(struct kvm_cpu_context *host_ctxt)
- {
- 	__vgic_v3_init_lrs();
-@@ -195,18 +185,18 @@ static void handle___kvm_get_mdcr_el2(struct kvm_cpu_context *host_ctxt)
- 	cpu_reg(host_ctxt, 1) = __kvm_get_mdcr_el2();
- }
- 
--static void handle___vgic_v3_save_aprs(struct kvm_cpu_context *host_ctxt)
-+static void handle___vgic_v3_save_vmcr_aprs(struct kvm_cpu_context *host_ctxt)
- {
- 	DECLARE_REG(struct vgic_v3_cpu_if *, cpu_if, host_ctxt, 1);
- 
--	__vgic_v3_save_aprs(kern_hyp_va(cpu_if));
-+	__vgic_v3_save_vmcr_aprs(kern_hyp_va(cpu_if));
- }
- 
--static void handle___vgic_v3_restore_aprs(struct kvm_cpu_context *host_ctxt)
-+static void handle___vgic_v3_restore_vmcr_aprs(struct kvm_cpu_context *host_ctxt)
- {
- 	DECLARE_REG(struct vgic_v3_cpu_if *, cpu_if, host_ctxt, 1);
- 
--	__vgic_v3_restore_aprs(kern_hyp_va(cpu_if));
-+	__vgic_v3_restore_vmcr_aprs(kern_hyp_va(cpu_if));
- }
- 
- static void handle___pkvm_init(struct kvm_cpu_context *host_ctxt)
-@@ -337,10 +327,8 @@ static const hcall_t host_hcall[] = {
- 	HANDLE_FUNC(__kvm_tlb_flush_vmid_range),
- 	HANDLE_FUNC(__kvm_flush_cpu_context),
- 	HANDLE_FUNC(__kvm_timer_set_cntvoff),
--	HANDLE_FUNC(__vgic_v3_read_vmcr),
--	HANDLE_FUNC(__vgic_v3_write_vmcr),
--	HANDLE_FUNC(__vgic_v3_save_aprs),
--	HANDLE_FUNC(__vgic_v3_restore_aprs),
-+	HANDLE_FUNC(__vgic_v3_save_vmcr_aprs),
-+	HANDLE_FUNC(__vgic_v3_restore_vmcr_aprs),
- 	HANDLE_FUNC(__pkvm_vcpu_init_traps),
- 	HANDLE_FUNC(__pkvm_init_vm),
- 	HANDLE_FUNC(__pkvm_init_vcpu),
-diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-index 6cb638b184b1..7b397fad26f2 100644
---- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-+++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-@@ -330,7 +330,7 @@ void __vgic_v3_deactivate_traps(struct vgic_v3_cpu_if *cpu_if)
- 		write_gicreg(0, ICH_HCR_EL2);
- }
- 
--void __vgic_v3_save_aprs(struct vgic_v3_cpu_if *cpu_if)
-+static void __vgic_v3_save_aprs(struct vgic_v3_cpu_if *cpu_if)
- {
- 	u64 val;
- 	u32 nr_pre_bits;
-@@ -363,7 +363,7 @@ void __vgic_v3_save_aprs(struct vgic_v3_cpu_if *cpu_if)
- 	}
- }
- 
--void __vgic_v3_restore_aprs(struct vgic_v3_cpu_if *cpu_if)
-+static void __vgic_v3_restore_aprs(struct vgic_v3_cpu_if *cpu_if)
- {
- 	u64 val;
- 	u32 nr_pre_bits;
-@@ -455,16 +455,35 @@ u64 __vgic_v3_get_gic_config(void)
- 	return val;
- }
- 
--u64 __vgic_v3_read_vmcr(void)
-+static u64 __vgic_v3_read_vmcr(void)
- {
- 	return read_gicreg(ICH_VMCR_EL2);
- }
- 
--void __vgic_v3_write_vmcr(u32 vmcr)
-+static void __vgic_v3_write_vmcr(u32 vmcr)
- {
- 	write_gicreg(vmcr, ICH_VMCR_EL2);
- }
- 
-+void __vgic_v3_save_vmcr_aprs(struct vgic_v3_cpu_if *cpu_if)
-+{
-+	__vgic_v3_save_aprs(cpu_if);
-+	if (cpu_if->vgic_sre)
-+		cpu_if->vgic_vmcr = __vgic_v3_read_vmcr();
-+}
-+
-+void __vgic_v3_restore_vmcr_aprs(struct vgic_v3_cpu_if *cpu_if)
-+{
-+	/*
-+	 * If dealing with a GICv2 emulation on GICv3, VMCR_EL2.VFIQen
-+	 * is dependent on ICC_SRE_EL1.SRE, and we have to perform the
-+	 * VMCR_EL2 save/restore in the world switch.
-+	 */
-+	if (cpu_if->vgic_sre)
-+		__vgic_v3_write_vmcr(cpu_if->vgic_vmcr);
-+	__vgic_v3_restore_aprs(cpu_if);
-+}
-+
- static int __vgic_v3_bpr_min(void)
- {
- 	/* See Pseudocode for VPriorityGroup */
-diff --git a/arch/arm64/kvm/vgic/vgic-v2.c b/arch/arm64/kvm/vgic/vgic-v2.c
-index 7e9cdb78f7ce..ae5a44d5702d 100644
---- a/arch/arm64/kvm/vgic/vgic-v2.c
-+++ b/arch/arm64/kvm/vgic/vgic-v2.c
-@@ -464,17 +464,10 @@ void vgic_v2_load(struct kvm_vcpu *vcpu)
- 		       kvm_vgic_global_state.vctrl_base + GICH_APR);
- }
- 
--void vgic_v2_vmcr_sync(struct kvm_vcpu *vcpu)
--{
--	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
--
--	cpu_if->vgic_vmcr = readl_relaxed(kvm_vgic_global_state.vctrl_base + GICH_VMCR);
--}
--
- void vgic_v2_put(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
- 
--	vgic_v2_vmcr_sync(vcpu);
-+	cpu_if->vgic_vmcr = readl_relaxed(kvm_vgic_global_state.vctrl_base + GICH_VMCR);
- 	cpu_if->vgic_apr = readl_relaxed(kvm_vgic_global_state.vctrl_base + GICH_APR);
- }
-diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-index 4ea3340786b9..ed6e412cd74b 100644
---- a/arch/arm64/kvm/vgic/vgic-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3.c
-@@ -722,15 +722,7 @@ void vgic_v3_load(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
- 
--	/*
--	 * If dealing with a GICv2 emulation on GICv3, VMCR_EL2.VFIQen
--	 * is dependent on ICC_SRE_EL1.SRE, and we have to perform the
--	 * VMCR_EL2 save/restore in the world switch.
--	 */
--	if (likely(cpu_if->vgic_sre))
--		kvm_call_hyp(__vgic_v3_write_vmcr, cpu_if->vgic_vmcr);
--
--	kvm_call_hyp(__vgic_v3_restore_aprs, cpu_if);
-+	kvm_call_hyp(__vgic_v3_restore_vmcr_aprs, cpu_if);
- 
- 	if (has_vhe())
- 		__vgic_v3_activate_traps(cpu_if);
-@@ -738,24 +730,13 @@ void vgic_v3_load(struct kvm_vcpu *vcpu)
- 	WARN_ON(vgic_v4_load(vcpu));
- }
- 
--void vgic_v3_vmcr_sync(struct kvm_vcpu *vcpu)
--{
--	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
--
--	if (likely(cpu_if->vgic_sre))
--		cpu_if->vgic_vmcr = kvm_call_hyp_ret(__vgic_v3_read_vmcr);
--}
--
- void vgic_v3_put(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
- 
-+	kvm_call_hyp(__vgic_v3_save_vmcr_aprs, cpu_if);
- 	WARN_ON(vgic_v4_put(vcpu));
- 
--	vgic_v3_vmcr_sync(vcpu);
--
--	kvm_call_hyp(__vgic_v3_save_aprs, cpu_if);
--
- 	if (has_vhe())
- 		__vgic_v3_deactivate_traps(cpu_if);
- }
-diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-index 4ec93587c8cd..fcc5747f51e9 100644
---- a/arch/arm64/kvm/vgic/vgic.c
-+++ b/arch/arm64/kvm/vgic/vgic.c
-@@ -939,17 +939,6 @@ void kvm_vgic_put(struct kvm_vcpu *vcpu)
- 		vgic_v3_put(vcpu);
- }
- 
--void kvm_vgic_vmcr_sync(struct kvm_vcpu *vcpu)
--{
--	if (unlikely(!irqchip_in_kernel(vcpu->kvm)))
--		return;
--
--	if (kvm_vgic_global_state.type == VGIC_V2)
--		vgic_v2_vmcr_sync(vcpu);
--	else
--		vgic_v3_vmcr_sync(vcpu);
--}
--
- int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-index 0c2b82de8fa3..4b93528e6a89 100644
---- a/arch/arm64/kvm/vgic/vgic.h
-+++ b/arch/arm64/kvm/vgic/vgic.h
-@@ -214,7 +214,6 @@ int vgic_register_dist_iodev(struct kvm *kvm, gpa_t dist_base_address,
- void vgic_v2_init_lrs(void);
- void vgic_v2_load(struct kvm_vcpu *vcpu);
- void vgic_v2_put(struct kvm_vcpu *vcpu);
--void vgic_v2_vmcr_sync(struct kvm_vcpu *vcpu);
- 
- void vgic_v2_save_state(struct kvm_vcpu *vcpu);
- void vgic_v2_restore_state(struct kvm_vcpu *vcpu);
-@@ -253,7 +252,6 @@ bool vgic_v3_check_base(struct kvm *kvm);
- 
- void vgic_v3_load(struct kvm_vcpu *vcpu);
- void vgic_v3_put(struct kvm_vcpu *vcpu);
--void vgic_v3_vmcr_sync(struct kvm_vcpu *vcpu);
- 
- bool vgic_has_its(struct kvm *kvm);
- int kvm_vgic_register_its_device(void);
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 47035946648e..0c3cce31e0a2 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -388,7 +388,6 @@ int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
- 
- void kvm_vgic_load(struct kvm_vcpu *vcpu);
- void kvm_vgic_put(struct kvm_vcpu *vcpu);
--void kvm_vgic_vmcr_sync(struct kvm_vcpu *vcpu);
- 
- #define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
- #define vgic_initialized(k)	((k)->arch.vgic.initialized)
+ 	return __boot_cpu_mode[0] != __boot_cpu_mode[1];
 -- 
 2.44.0.769.g3c40516874-goog
 
