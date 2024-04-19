@@ -1,55 +1,55 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 014A046453
-	for <kvmarm@lists.linux.dev>; Fri, 19 Apr 2024 08:00:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD27747F6C
+	for <kvmarm@lists.linux.dev>; Fri, 19 Apr 2024 08:00:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713513643; cv=none; b=J+yMIQXwEWp28WeCZsL0z4X6x/vON73tTzyo/fR8f2VuZRN+Z29RuFsZAhQ6YGCY3UYeNqmwF2DVnDzc5GWVRg6EYmGzVvzi4yE26hS5ytkab8VV4rhkhMgqk1LbmD72rDoIVRwg0LTbIjepZGWaVCp281av14qE6mK6qxU+UAE=
+	t=1713513645; cv=none; b=FgSe1sa+U7FXOtOKtYWPJbTxCFRfcX4iAuLpavjlPdqmXhBn1V6oJtHSGGJ9p3JzxVF8flBo4N3JC75v1cs6oaT9IOHYfjEkOvTNMBSmfZ4zk9dmlsfu0KSYiDYAlE86TZt8ejkhzIwM948GU8gDALfeHf++wNQ9edEFZB4pXK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713513643; c=relaxed/simple;
-	bh=hW9A+WhCOqJ0bBwjzVi9ARiTNySoQC/rJskat6VliDE=;
+	s=arc-20240116; t=1713513645; c=relaxed/simple;
+	bh=ykmB3QXzlon/HDDPejA0cbLlag4oE07+pdZcXp6ZgdI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=gL6GkVMLu9Vnkk1SB5e2Ijf9jFq25TTSD0CLneTG6DqN3q2DfTkgtMvAvd2krI+/E4XIpoCytUbuioiOD82HzQDaWpDkUTPMH0wmignfH9O43e4BE7ZS9yUEpOsVjCTytvGeUIOKtMHxdCOMNqVMamSk2PFPCX0NBERwn0vlLwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Q7VdlH+8; arc=none smtp.client-ip=209.85.128.73
+	 To:Cc:Content-Type; b=ku8fuML8AmKGjUN6ZBgKMPf5rkj0iA2A8K1K2djUlDwI8enyEiPAAFV4oL2b1d4Pw+TZxkpTxvUNaFKbsmO5PQKqL9cL6ncJL/9RY398R/KFXm78Ft0yXN/maa0nf9jalu2xDVAcah8JSLt7SSeGzpQd81UjC5u2KX8/zym01Fk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fswTBEcz; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Q7VdlH+8"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-41895b0a62cso14471075e9.2
-        for <kvmarm@lists.linux.dev>; Fri, 19 Apr 2024 01:00:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fswTBEcz"
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-de45d0b7ffaso3505818276.2
+        for <kvmarm@lists.linux.dev>; Fri, 19 Apr 2024 01:00:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713513640; x=1714118440; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1713513643; x=1714118443; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zAfPm4wxB8mr/GKzLEh8KPNmIJR+QM9e3U6iSVP00jM=;
-        b=Q7VdlH+87cTYmImBWgXb4C2huBNYu7AHmChLlK8sKXRuueZwUjt4ah833MJyfH6p0e
-         3oZTa/6brXUeC2Nv/raXGFhlJo9jIb9KV8JRJY8z2aPWu1RkW7AxqR4x6q24XWEoh3M7
-         xYWikzl7Uu143E6qXg5x4+pQX01YuM58YtamEno8CtDhAoZnvOXwz17AN8waWnPGmSm3
-         3hGmdHqSnK/ews8/jjhInU41NwFqLaeFtao2PDngVKpc2FrenRamuAvtuIlGbayHWi1W
-         Yc+SMsn7NnyLvIofdo9Ir3JcchPAv9bgkiyFdbkg2Bv6Vpf4qxepLFU7CrxD++lx+fIy
-         NiFw==
+        bh=KXiV06eUdCopMOCs6eKCvPx+iGp2PhsF/4lwt1YHESY=;
+        b=fswTBEczn4DdX+n5+YISixYAv9+n6IoQxrZMsfFVlKNLtJoD3jOTQWjAKEW6ZmLhRf
+         LOSrjpyggtAeBrWtrAq1NAZ3PBPiDik8dSRwd1W4LQOx5zNLsioKTzcvJqexHQoxi22e
+         tOOcY59ileWESB3KXEeuiaM6nrd/hndxlZ7FYzfGRNoTBCFAKrZJjcFQwawDrkHu6u+T
+         8vFAlF6h8JG3kL4PXodUMcEqGEaJJxCjn/WIHzh20JQHn+3O2QrlDQBFMxAWPXovjpe3
+         6FonERMOJFzssfylnTIyL2P1eY/5Q2XreFp+J6FZN4TCJR4i7Hw3Dtxez4vmdQIuY3Ea
+         LaGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713513640; x=1714118440;
+        d=1e100.net; s=20230601; t=1713513643; x=1714118443;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zAfPm4wxB8mr/GKzLEh8KPNmIJR+QM9e3U6iSVP00jM=;
-        b=WaTynETcp2w3j5pqxKRQLAlB6dkLGh6U6xck3NRxtiLOpI1yNXlDk/raE0OTwUg+sQ
-         Zy1AQziw1EKFgPA30FNlrnpCDenPJACTNvC/e0GBA9Ur7L9sJaZ1BKmS1Fznblypt6Iy
-         il2Eq0A9QhU8KLcUBA5VnPGXbFfunygZ9Uv7HJ2XWuWdfUaAZYpRhZgfhxUq4DibpFJP
-         ADKle5K2i1bDlhG7YG1GV3aQnd6kNv46kPNg+c5Yvo7f4Zrm7Q2I0loNybFZYwmpG9TA
-         93lpDVIdQ50z8kBKUgBmoXGrKGHQNbwhIfTpQfMbqCtTUdq3/i6hVlyB0sO8hAxZ67Ef
-         RokA==
-X-Gm-Message-State: AOJu0YzyPine+vOAxmwvh5ZUfztJiiBcrCqB9tgyQ2TSIbS3xL7JTnOy
-	toiiNlJC5FJHXqO8kiIgNegdwvrIB5a8uWanPKKElG/ewc0QqtU4m3w8bNcOpLtQ3ssdbMLjcIo
-	9g1Y8a+BT+wn0pXBz35VZuVcRYSEgKoJ9haa1izvuKR8/EcfNnUlILQcSPs1Zd12pFkWsrVgri9
-	atTP6WAz2LSaKALUd+mI5YZUgqWsM=
-X-Google-Smtp-Source: AGHT+IGNTXjVUh/NHTdmUBPWqH/CTi+VxfMZVu7u8MBGMAP8JA/V23vreBMh1pgqfywmP9ifdgzBPz5z7g==
+        bh=KXiV06eUdCopMOCs6eKCvPx+iGp2PhsF/4lwt1YHESY=;
+        b=avWrsiTSlmFWh4KkMB8zIBG9pUDTiFunx9W1DPE6JOP1EI3vexrjAZ1YEznp3d9Ti1
+         eqIiBH6MBIcI08cJbC1KMScaH2f3iwYnkBmw6BDTY+/kAavOwO2v7dz0yZVO+WlTRfFc
+         zZpuOeokSnpPe4VstOexznkigmV74tffV23ou41rgURz4stVNkIXDBYZ2RzexmfbEEno
+         rCWBszWnoKzV41Kcm5pDFCHELEa0oLXlzJaV+5B7ahqaPuiLbCN9zZZRxfMLV1ikUomR
+         lzYBpPNc5B1RHvJTtaL+Ud9bDNFJZraBzbEyAQwTpLfxZ8CA84WDxIDaNlZo/sMRIcYB
+         ySQw==
+X-Gm-Message-State: AOJu0Yxn7GUV5YYIBJFRtEcvFiKsIos2WlpWT8ShdJUpS9bzAShrRadb
+	aJWkRTlYrCFUtljxq4NzHLIp1J4mkosUxo0RzUj+TEWWWrk/GMkNRpfdT1ENcoIRK4SehZeDgjN
+	dyL+p9c4emkzBM2Rhv4ce0T1/gAiIhAbNMDGAuF3YICoR4ZI8Gk3rmpkkyV8c2pA6YQtKWqpKhE
+	RG1k5u9HTgNC62qIqJvvNLGeD62WU=
+X-Google-Smtp-Source: AGHT+IG6ED5XdA1iKnz24sy77v+j2I1M/DQGxXolEO/FghUOrz1VbMqyQtUbf2bxbvbqUBOmHTGrlgymwQ==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:600c:1c9b:b0:418:d635:9b7e with SMTP id
- k27-20020a05600c1c9b00b00418d6359b7emr7674wms.8.1713513640494; Fri, 19 Apr
- 2024 01:00:40 -0700 (PDT)
-Date: Fri, 19 Apr 2024 08:59:35 +0100
+ (user=tabba job=sendgmr) by 2002:a05:6902:2991:b0:de4:7037:69a2 with SMTP id
+ ew17-20020a056902299100b00de4703769a2mr86944ybb.5.1713513642737; Fri, 19 Apr
+ 2024 01:00:42 -0700 (PDT)
+Date: Fri, 19 Apr 2024 08:59:36 +0100
 In-Reply-To: <20240419075941.4085061-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240419075941.4085061-1-tabba@google.com>
 X-Mailer: git-send-email 2.44.0.769.g3c40516874-goog
-Message-ID: <20240419075941.4085061-26-tabba@google.com>
-Subject: [PATCH v3 25/31] KVM: arm64: Introduce hyp_rwlock_t
+Message-ID: <20240419075941.4085061-27-tabba@google.com>
+Subject: [PATCH v3 26/31] KVM: arm64: Add atomics-based checking refcount
+ implementation at EL2
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev
 Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com, 
@@ -72,151 +73,100 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Will Deacon <will@kernel.org>
 
-Introduce a simple counter-based rwlock for EL2 which can reduce locking
-contention on read-mostly data structures when compared to a spinlock.
+The current nVHE refcount implementation at EL2 uses a simple spinlock
+to serialise accesses. Although this works, it forces serialisation in
+places where it is not necessary, so introduce a simple atomics-based
+refcount implementation instead.
 
 Signed-off-by: Will Deacon <will@kernel.org>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/hyp/include/nvhe/rwlock.h | 129 +++++++++++++++++++++++
- 1 file changed, 129 insertions(+)
- create mode 100644 arch/arm64/kvm/hyp/include/nvhe/rwlock.h
+ arch/arm64/kvm/hyp/include/nvhe/refcount.h | 76 ++++++++++++++++++++++
+ 1 file changed, 76 insertions(+)
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/refcount.h
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/rwlock.h b/arch/arm64/kvm/hyp/include/nvhe/rwlock.h
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/refcount.h b/arch/arm64/kvm/hyp/include/nvhe/refcount.h
 new file mode 100644
-index 000000000000..365084497e59
+index 000000000000..bf6bd4ef89bf
 --- /dev/null
-+++ b/arch/arm64/kvm/hyp/include/nvhe/rwlock.h
-@@ -0,0 +1,129 @@
++++ b/arch/arm64/kvm/hyp/include/nvhe/refcount.h
+@@ -0,0 +1,76 @@
 +/* SPDX-License-Identifier: GPL-2.0-only */
 +/*
-+ * A stand-alone rwlock implementation for use by the non-VHE KVM
-+ * hypervisor code running at EL2. This is *not* a fair lock and is
-+ * likely to scale very badly under contention.
-+ *
-+ * Copyright (C) 2022 Google LLC
++ * Atomics-based checking refcount implementation.
++ * Copyright (C) 2023 Google LLC
 + * Author: Will Deacon <will@kernel.org>
-+ *
-+ * Heavily based on the implementation removed by 087133ac9076 which was:
-+ * Copyright (C) 2012 ARM Ltd.
 + */
++#ifndef __ARM64_KVM_NVHE_REFCOUNT_H__
++#define __ARM64_KVM_NVHE_REFCOUNT_H__
 +
-+#ifndef __ARM64_KVM_NVHE_RWLOCK_H__
-+#define __ARM64_KVM_NVHE_RWLOCK_H__
++#include <asm/lse.h>
 +
-+#include <linux/bits.h>
-+
-+typedef struct {
-+	u32	__val;
-+} hyp_rwlock_t;
-+
-+#define __HYP_RWLOCK_INITIALIZER \
-+	{ .__val = 0 }
-+
-+#define __HYP_RWLOCK_UNLOCKED \
-+	((hyp_rwlock_t) __HYP_RWLOCK_INITIALIZER)
-+
-+#define DEFINE_HYP_RWLOCK(x)	hyp_rwlock_t x = __HYP_RWLOCK_UNLOCKED
-+
-+#define hyp_rwlock_init(l)						\
-+do {									\
-+	*(l) = __HYP_RWLOCK_UNLOCKED;					\
-+} while (0)
-+
-+#define __HYP_RWLOCK_WRITER_BIT	31
-+
-+static inline void hyp_write_lock(hyp_rwlock_t *lock)
++static inline s16 __ll_sc_refcount_fetch_add_16(u16 *refcount, s16 addend)
 +{
-+	u32 tmp;
-+
-+	asm volatile(ARM64_LSE_ATOMIC_INSN(
-+	/* LL/SC */
-+	"	sevl\n"
-+	"1:	wfe\n"
-+	"2:	ldaxr	%w0, %1\n"
-+	"	cbnz	%w0, 1b\n"
-+	"	stxr	%w0, %w2, %1\n"
-+	"	cbnz	%w0, 2b\n"
-+	__nops(1),
-+	/* LSE atomics */
-+	"1:	mov	%w0, wzr\n"
-+	"2:	casa	%w0, %w2, %1\n"
-+	"	cbz	%w0, 3f\n"
-+	"	ldxr	%w0, %1\n"
-+	"	cbz	%w0, 2b\n"
-+	"	wfe\n"
-+	"	b	1b\n"
-+	"3:")
-+	: "=&r" (tmp), "+Q" (lock->__val)
-+	: "r" (BIT(__HYP_RWLOCK_WRITER_BIT))
-+	: "memory");
-+}
-+
-+static inline void hyp_write_unlock(hyp_rwlock_t *lock)
-+{
-+	asm volatile(ARM64_LSE_ATOMIC_INSN(
-+	"	stlr	wzr, %0",
-+	"	swpl	wzr, wzr, %0")
-+	: "=Q" (lock->__val) :: "memory");
-+}
-+
-+static inline void hyp_read_lock(hyp_rwlock_t *lock)
-+{
-+	u32 tmp, tmp2;
++	u16 new;
++	u32 flag;
 +
 +	asm volatile(
-+	"	sevl\n"
-+	ARM64_LSE_ATOMIC_INSN(
-+	/* LL/SC */
-+	"1:	wfe\n"
-+	"2:	ldaxr	%w0, %2\n"
-+	"	add	%w0, %w0, #1\n"
-+	"	tbnz	%w0, %3, 1b\n"
-+	"	stxr	%w1, %w0, %2\n"
-+	"	cbnz	%w1, 2b\n"
-+	__nops(1),
-+	/* LSE atomics */
-+	"1:	wfe\n"
-+	"2:	ldxr	%w0, %2\n"
-+	"	adds	%w1, %w0, #1\n"
-+	"	tbnz	%w1, %3, 1b\n"
-+	"	casa	%w0, %w1, %2\n"
-+	"	sbc	%w0, %w1, %w0\n"
-+	"	cbnz	%w0, 2b")
-+	: "=&r" (tmp), "=&r" (tmp2), "+Q" (lock->__val)
-+	: "i" (__HYP_RWLOCK_WRITER_BIT)
-+	: "cc", "memory");
++	"	prfm	pstl1strm, %[refcount]\n"
++	"1:	ldxrh	%w[new], %[refcount]\n"
++	"	add	%w[new], %w[new], %w[addend]\n"
++	"	stxrh	%w[flag], %w[new], %[refcount]\n"
++	"	cbnz	%w[flag], 1b"
++	: [refcount] "+Q" (*refcount),
++	  [new] "=&r" (new),
++	  [flag] "=&r" (flag)
++	: [addend] "Ir" (addend));
++
++	return new;
 +}
 +
-+static inline void hyp_read_unlock(hyp_rwlock_t *lock)
++#ifdef CONFIG_ARM64_LSE_ATOMICS
++
++static inline s16 __lse_refcount_fetch_add_16(u16 *refcount, s16 addend)
 +{
-+	u32 tmp, tmp2;
++	s16 old;
 +
-+	asm volatile(ARM64_LSE_ATOMIC_INSN(
-+	/* LL/SC */
-+	"1:	ldxr	%w0, %2\n"
-+	"	sub	%w0, %w0, #1\n"
-+	"	stlxr	%w1, %w0, %2\n"
-+	"	cbnz	%w1, 1b",
-+	/* LSE atomics */
-+	"	movn	%w0, #0\n"
-+	"	staddl	%w0, %2\n"
-+	__nops(2))
-+	: "=&r" (tmp), "=&r" (tmp2), "+Q" (lock->__val)
-+	:
-+	: "memory");
++	asm volatile(__LSE_PREAMBLE
++	"	ldaddh	%w[addend], %w[old], %[refcount]"
++	: [refcount] "+Q" (*refcount),
++	  [old] "=r" (old)
++	: [addend] "r" (addend));
++
++	return old + addend;
 +}
 +
-+#ifdef CONFIG_NVHE_EL2_DEBUG
-+static inline void hyp_assert_write_lock_held(hyp_rwlock_t *lock)
++#endif /* CONFIG_ARM64_LSE_ATOMICS */
++
++static inline u64 __hyp_refcount_fetch_add(void *refcount, const size_t size,
++					   const s64 addend)
 +{
-+	BUG_ON(!(READ_ONCE(lock->__val) & BIT(__HYP_RWLOCK_WRITER_BIT)));
-+}
-+#else
-+static inline void hyp_assert_write_lock_held(hyp_rwlock_t *lock) { }
-+#endif
++	s64 new;
 +
-+#endif	/* __ARM64_KVM_NVHE_RWLOCK_H__ */
++	switch (size) {
++	case 2:
++		new = __lse_ll_sc_body(refcount_fetch_add_16, refcount, addend);
++		break;
++	default:
++		BUILD_BUG_ON_MSG(1, "Unsupported refcount size");
++		unreachable();
++	}
++
++	BUG_ON(new < 0);
++	return new;
++}
++
++
++#define hyp_refcount_inc(r)	__hyp_refcount_fetch_add(&(r), sizeof(r), 1)
++#define hyp_refcount_dec(r)	__hyp_refcount_fetch_add(&(r), sizeof(r), -1)
++#define hyp_refcount_get(r)	READ_ONCE(r)
++#define hyp_refcount_set(r, v)	do {			\
++	typeof(r) *__rp = &(r);				\
++	WARN_ON(hyp_refcount_get(*__rp));		\
++	WRITE_ONCE(*__rp, v);				\
++} while (0)
++
++#endif /* __ARM64_KVM_NVHE_REFCOUNT_H__ */
 -- 
 2.44.0.769.g3c40516874-goog
 
