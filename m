@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 317F47E564;
-	Fri, 19 Apr 2024 10:29:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 317B97E11E;
+	Fri, 19 Apr 2024 10:29:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713522592; cv=none; b=XiWJoTGuJIviVesBS8IGCpGg+oO+gBada+QvqgncLCb6vrd8C2wQaMOMxguMDSvdZoaO0bG7buY36pfqrUkq+H5XqgI7rzyRAAk1YpgIjYSVM2fqtlghaXElzA/0tDEOPU55Xg/eUWOAlCK1bQT5qmWEFJxUq0rD05+LFTciylc=
+	t=1713522592; cv=none; b=XRHmbNefSRsfyrOKnBoGwxdDKQgZ02dc0ah/sQca2E1JOp/E+sBB8bx3msj4d725CK0b/COESkACJOCc6PUB1kGB3mkWWdkATthXNt2o/S7AdOfSVC2xpR2RBR9Sod4QOlrUnPMp1QPnCvw/esCGGGzXjr4L4cuKFQgNRBBlE1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1713522592; c=relaxed/simple;
-	bh=0rZiPoamnUU17Xi5/XFxXZrf+/7ihZhKHezWSfWcHpE=;
+	bh=0ghS+d/37kG9I38a1NzWxGiZYdqk3MoQyhIqBHrfUaA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=WAJo7enf+FUEqt3pyLGgZoaU2gGyomRqP2m23loD91HJKI+RN9xk4yAlxy1QWXjDV6Xy1604eO6NepPueQkGBAZPc3PcdOpedI6225NzeNdl4UW+1Sp7tZ4/zMLtajpD1MmkBPR9z+dtGCfrPvzThy3+uzZNdiSICHWyS9LDlFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H1z7xiyT; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=BVMeqX6RXT7l2d7xFZwmQmoRwuera3ArCh8MVHliQ2nHS92ymRZ6aeuxVdBQdfhZm+goO5GiVE6Q1mtcHSUS/UAdK13fNOsgF3afcG4XPGp7WkUW8FWt3BqoFyRAN4rMyvIrbbhOxcsqaXITanF9ZMHPYQAJ9eYFPEEs63EpYkw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ehu+Y539; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H1z7xiyT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCCFAC072AA;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ehu+Y539"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B91A2C32786;
 	Fri, 19 Apr 2024 10:29:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1713522591;
-	bh=0rZiPoamnUU17Xi5/XFxXZrf+/7ihZhKHezWSfWcHpE=;
+	bh=0ghS+d/37kG9I38a1NzWxGiZYdqk3MoQyhIqBHrfUaA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=H1z7xiyTEIxzXpTg0RkBC6qcAQDuOZUzt+2jku/MtFaEiWNp+yguhSSeEiTZnlkQ8
-	 pgd351OXr/iUn/8YlmA1hM+lpo+kmQTIfzDQ5EO/g+8NTLPn3cS+xEEpRHmRw3HTQn
-	 DRaZtNK0mZZLgv1Tmg4vxbH5QKwcdGt/bzjbkOpLw7099k9eMzF23uxYvHbQh8Fp9C
-	 b78OIc5qdxhMFQXwY7bHv2KxzfBcYvhpbN1jwWw2VRbEgG8qokChQGWYoFAJboUax7
-	 v3RZHlLKAzCWbPEqoUGL2cvtbfSMY5SyGUsqPxd7To091DqYpSw66PO+pt4/JiqwXw
-	 vlQB7EP2G8LEA==
+	b=Ehu+Y539kz/UpKatxH9BxcNZnBjDHEECI6hn9v8xvHsrtURB9Jpvp25iPkiehHBDp
+	 lWI3NjmSiFJmsYsXmg3tqhJYgUUv9QoKUvYl6iET8FOH+dCO+SBrpl1QDD8PbmEJkM
+	 fwjfZSZNOdsY4dXh9//xQSP4lolkVCbvoDRBwfUGcQXu5sZxz97q00YyB46CEjsEjn
+	 x4lJ40LH2CMXvoPTQLuam2AdYyAkx2fSn6MftmVfonMy0bSwTfJRs5LGqnwblVb3eg
+	 lSgiZCevXrRjNps2wwx0vqzNyEiifwF1BUEXdr6MhG0e8C+AMpaFmBAO8ueXwUJ3ry
+	 4O/VlKxtHqIIA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rxlV7-00636W-Q1;
+	id 1rxlV7-00636W-I9;
 	Fri, 19 Apr 2024 11:29:49 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -45,9 +45,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Mostafa Saleh <smostafa@google.com>,
 	Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>
-Subject: [PATCH v4 04/15] KVM: arm64: nv: Drop VCPU_HYP_CONTEXT flag
-Date: Fri, 19 Apr 2024 11:29:24 +0100
-Message-Id: <20240419102935.1935571-5-maz@kernel.org>
+Subject: [PATCH v4 03/15] KVM: arm64: Constraint PAuth support to consistent implementations
+Date: Fri, 19 Apr 2024 11:29:23 +0100
+Message-Id: <20240419102935.1935571-4-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240419102935.1935571-1-maz@kernel.org>
 References: <20240419102935.1935571-1-maz@kernel.org>
@@ -63,55 +63,88 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-It has become obvious that HCR_EL2.NV serves the exact same use
-as VCPU_HYP_CONTEXT, only in an architectural way. So just drop
-the flag for good.
+PAuth comes it two parts: address authentication, and generic
+authentication. So far, KVM mandates that both are implemented.
 
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+PAuth also comes in three flavours: Q5, Q3, and IMPDEF. Only one
+can be implemented for any of address and generic authentication.
+
+Crucially, the architecture doesn't mandate that address and generic
+authentication implement the *same* flavour. This would make
+implementing ERETAx very difficult for NV, something we are not
+terribly keen on.
+
+So only allow PAuth support for KVM on systems that are not totally
+insane. Which is so far 100% of the known HW.
+
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h | 2 --
- arch/arm64/kvm/hyp/vhe/switch.c   | 7 +------
- 2 files changed, 1 insertion(+), 8 deletions(-)
+ arch/arm64/kvm/arm.c | 38 ++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 36 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index e24bd876ec9a..5566191d646a 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -817,8 +817,6 @@ struct kvm_vcpu_arch {
- #define DEBUG_STATE_SAVE_SPE	__vcpu_single_flag(iflags, BIT(5))
- /* Save TRBE context if active  */
- #define DEBUG_STATE_SAVE_TRBE	__vcpu_single_flag(iflags, BIT(6))
--/* vcpu running in HYP context */
--#define VCPU_HYP_CONTEXT	__vcpu_single_flag(iflags, BIT(7))
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 3dee5490eea9..a7178af1ab0c 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -218,6 +218,40 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+ 	kvm_arm_teardown_hypercalls(kvm);
+ }
  
- /* SVE enabled for host EL0 */
- #define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index 1581df6aec87..07fd9f70f870 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -197,7 +197,7 @@ static void early_exit_filter(struct kvm_vcpu *vcpu, u64 *exit_code)
- 	 * If we were in HYP context on entry, adjust the PSTATE view
- 	 * so that the usual helpers work correctly.
- 	 */
--	if (unlikely(vcpu_get_flag(vcpu, VCPU_HYP_CONTEXT))) {
-+	if (vcpu_has_nv(vcpu) && (read_sysreg(hcr_el2) & HCR_NV)) {
- 		u64 mode = *vcpu_cpsr(vcpu) & (PSR_MODE_MASK | PSR_MODE32_BIT);
++static bool kvm_has_full_ptr_auth(void)
++{
++	bool apa, gpa, api, gpi, apa3, gpa3;
++	u64 isar1, isar2, val;
++
++	/*
++	 * Check that:
++	 *
++	 * - both Address and Generic auth are implemented for a given
++         *   algorithm (Q5, IMPDEF or Q3)
++	 * - only a single algorithm is implemented.
++	 */
++	if (!system_has_full_ptr_auth())
++		return false;
++
++	isar1 = read_sanitised_ftr_reg(SYS_ID_AA64ISAR1_EL1);
++	isar2 = read_sanitised_ftr_reg(SYS_ID_AA64ISAR2_EL1);
++
++	apa = !!FIELD_GET(ID_AA64ISAR1_EL1_APA_MASK, isar1);
++	val = FIELD_GET(ID_AA64ISAR1_EL1_GPA_MASK, isar1);
++	gpa = (val == ID_AA64ISAR1_EL1_GPA_IMP);
++
++	api = !!FIELD_GET(ID_AA64ISAR1_EL1_API_MASK, isar1);
++	val = FIELD_GET(ID_AA64ISAR1_EL1_GPI_MASK, isar1);
++	gpi = (val == ID_AA64ISAR1_EL1_GPI_IMP);
++
++	apa3 = !!FIELD_GET(ID_AA64ISAR2_EL1_APA3_MASK, isar2);
++	val  = FIELD_GET(ID_AA64ISAR2_EL1_GPA3_MASK, isar2);
++	gpa3 = (val == ID_AA64ISAR2_EL1_GPA3_IMP);
++
++	return (apa == gpa && api == gpi && apa3 == gpa3 &&
++		(apa + api + apa3) == 1);
++}
++
+ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ {
+ 	int r;
+@@ -311,7 +345,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 		break;
+ 	case KVM_CAP_ARM_PTRAUTH_ADDRESS:
+ 	case KVM_CAP_ARM_PTRAUTH_GENERIC:
+-		r = system_has_full_ptr_auth();
++		r = kvm_has_full_ptr_auth();
+ 		break;
+ 	case KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE:
+ 		if (kvm)
+@@ -1270,7 +1304,7 @@ static unsigned long system_supported_vcpu_features(void)
+ 	if (!system_supports_sve())
+ 		clear_bit(KVM_ARM_VCPU_SVE, &features);
  
- 		switch (mode) {
-@@ -240,11 +240,6 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
- 	sysreg_restore_guest_state_vhe(guest_ctxt);
- 	__debug_switch_to_guest(vcpu);
- 
--	if (is_hyp_ctxt(vcpu))
--		vcpu_set_flag(vcpu, VCPU_HYP_CONTEXT);
--	else
--		vcpu_clear_flag(vcpu, VCPU_HYP_CONTEXT);
--
- 	do {
- 		/* Jump in the fire! */
- 		exit_code = __guest_enter(vcpu);
+-	if (!system_has_full_ptr_auth()) {
++	if (!kvm_has_full_ptr_auth()) {
+ 		clear_bit(KVM_ARM_VCPU_PTRAUTH_ADDRESS, &features);
+ 		clear_bit(KVM_ARM_VCPU_PTRAUTH_GENERIC, &features);
+ 	}
 -- 
 2.39.2
 
