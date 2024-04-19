@@ -1,55 +1,55 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 631203A1A8
-	for <kvmarm@lists.linux.dev>; Fri, 19 Apr 2024 08:00:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1118746453
+	for <kvmarm@lists.linux.dev>; Fri, 19 Apr 2024 08:00:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713513607; cv=none; b=LeSNx5her1wAgbKD++jPFIWYK9y9LOodW3PJFVuOi+2AG8mJ9+Bc002GkBCY6rR11RIRQ/Z9O0DTkD5Y1Fo0J/hRhYZdwj/XY6HO6xGeXLRmCFkyw33TqRy8+YKCqH4jgpzLFyGpgPvioWKq2b08JWADpC0lGKn7nO53bLaRB5w=
+	t=1713513608; cv=none; b=mb3fBiZZe0V+sZ+1178QqNUBYkPpWuGP37cyORCWcsK5etys8e9tP5gmk5vNUgCBptvyVDoG/mtxrjverYLCaGYZIUVhkiDmIaFdup9ZE/ebhIJJowXA8VTbGD5HLBYdB7an94bB0EjeuOt9loHuRWOpZs4fmeOF1rXV8pHyFTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713513607; c=relaxed/simple;
-	bh=AyTHGhDgYKwIm1R6XGjmqmHM8aE8x9PLQTGcj+DxhDQ=;
+	s=arc-20240116; t=1713513608; c=relaxed/simple;
+	bh=aQl+3P9AfqonTzgeDdtHDnFcvSOAmRRmkAK4rET0uXw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=SjnU4gRLKN+N3IsftKDaHaaqBXYCeUNAobPRni5YLFE7E5WJgcIs5DTSOuZZNlL31dhLcCApZbgtHt6LApiImxt9p49q4PzRHDnicNMxc2Bh3pV4S2amBkXrFD+ezNU6OIyOb3TKFVnwmATHKoCEBirHl0hnCHCl7eDiwvsncnI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=n4+0Qkw0; arc=none smtp.client-ip=209.85.128.73
+	 To:Cc:Content-Type; b=PgTd86/dwMEPIqbj2EtX+0PXNssF3JXgYXSARKUbNzadqSEB/v5QfsB4kLYRzIpe7se/KlCIroXnTIyLESSwlqHoCxxoXPEGCsvxlZlwK3RKS2jOGgSh565Y96DCoS+XxVAHjuViP5G6LwJLl6NsUBEgBMPALM30vqf0lxaP7gc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KcoqifFZ; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="n4+0Qkw0"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-418f18458a0so6896105e9.0
-        for <kvmarm@lists.linux.dev>; Fri, 19 Apr 2024 01:00:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KcoqifFZ"
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-61ab7fc5651so32939967b3.2
+        for <kvmarm@lists.linux.dev>; Fri, 19 Apr 2024 01:00:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713513604; x=1714118404; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1713513606; x=1714118406; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+57gbtltf2G7eWaOvuOveh7IKhMCfe4qtXMeZIFcBT4=;
-        b=n4+0Qkw0/NryqLVRVQuX0epNcHGFcfDnrz+KE/B0xPAfDMfdhuWd3tjtWTzA1OVJpL
-         EcayYiXPDzye8ithvh3J/xesiDBGXBM0Uav/bTozmtt2NPgAB2FSVbbw3td+91W4pNyi
-         qX/cHJv28rlgnvho9PxEF+mweGaH2kUbKiUSqo8a4jc6Yl02NXEQSGMp+MThKbKeSlob
-         XMHahhNF7XbQRYxzvsMK0YuKIm/BL6EPBzaAfFYCOCGA4B82nnQ7Z4maTZ3oTcRm7zb1
-         1jxQezOE/DVNi5XkQrJWs0jXCIWWFxUJZP6bCbJ8Kyb3mcR0yIBnnNp12sXwfAHtgzts
-         ASDg==
+        bh=0oOFADo/lIxLfuUXFGgWHGl/IkioDx7wkAvSf1CNhTI=;
+        b=KcoqifFZI2C6/dCgDXRUAJ7cFVa8aD6+OD51TguxNi14PTY7d+L+ueeFhyLOpDdCEm
+         08JHr9KgFtXqfx1jyuDyGhpiptYdQNwy2zX48WIUEin+OfTV2tA13WCyKG0etnX1MbAf
+         dinZsX0nl9UpUe8f5/9TFG6Xhn5nYHdfCDE3x/sCmtlnwXZ7BB4idDupdK1lIC8AOpqF
+         TvpOVIIUaBCfFU1vgQ6ubpzZXHsZEq10JpT5R7fKUg0kFbug9kUi8f8I+x0GO9t0DOik
+         fA5KhvVEqGyEmKeINVb4FDeFR5CkKJzZUNSbrHIXYE7dquLn4R9dbuA7KC4D6e/QO5lw
+         vbwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713513604; x=1714118404;
+        d=1e100.net; s=20230601; t=1713513606; x=1714118406;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+57gbtltf2G7eWaOvuOveh7IKhMCfe4qtXMeZIFcBT4=;
-        b=nNrKZz3VAshIrmkGOusWyvyWuwKKdhXxGkHtk3EHq/stQnVlQ6pf19ZaFq7LsGXKHB
-         Y3DVPUHanKWfcElGMzb+uVfUgoUuh9SO8zwLU5UeGJ+SuRF5j+hya+UzekbLzRXu2m2O
-         Q7hbbCbNprpW36eEZiKKHWYKxZFzsowzcay6iV1xHdDBu8DR34YCyF8JzjJBStVmgv1z
-         ztIXwmZCRjOS+wWFWwM+vbNcY8wVUgBLRBQQ6EHasBPfIhRGpef32Vm/BgPKCZWDQE8R
-         zlyvtaUUyMeOLS4s3Isah4ksUlmB3eKrHbce2SUAYWZUMC3vScUklMt7mIBxo1Lv4g3F
-         71nA==
-X-Gm-Message-State: AOJu0YyRBob8zVO1jVJIKig9Qlak4evbcDK8NFzr01EV7YPh4RBRClAF
-	HIIGGxh8miq+e2Mb1SygPeZrlGW6ognjEo3hAm/MJF8c+T5D30f5PjJjd1b3pXg69UuRNJe0AXb
-	X7UzCopGGYU1RFu2r29P2YdQvdaSka+8lM6rUxOHO2xqSntRJVnU97fhfdHPC2mhlh0KaawFcrN
-	24jzkjJeY2SJ6XmHvUSvQoX2U2Qj0=
-X-Google-Smtp-Source: AGHT+IH/6ul3vtEbp8Zg4sKkEM/3R11TtsUAcCvSLqCfdkW/pzwJ7t51+ufoUWCLY+LARlcszLaeCrkifw==
+        bh=0oOFADo/lIxLfuUXFGgWHGl/IkioDx7wkAvSf1CNhTI=;
+        b=YjZRfWmHvka9tSatzAUg3wnI/TrFQC/GHkAc2pCP/JoXII2C7BoW62za1RjZe1pR8r
+         xYtqC2ed0fTqWn/toGK6sDKKrB1am6Hrd0+s0oIcLrZqRR5xxv+tJlrdsPYKFZ9U0Tsf
+         B1fldY2sR0nZPlNQkMS+RXNzr36nKqPhoionoBBTfdAbLHttoeHntOk2foLOf7w6zzd4
+         7sQID8y0upbwIOOY678IKW4GM6ZXepHjHHZ4efVs4ppy9Gm9hMutOtJGXLLwoNQbAoz8
+         M3iczKSjUg5j8t7CG56PD4bGfyF0/l1t5gL6wrzsqH4o5/xnWNaY73lmrXueSB83xunt
+         hMFg==
+X-Gm-Message-State: AOJu0YxybNR1tfaE0h0RmC7blLzMNTci3mbRHna6qxOEJrGzUp8EiXh+
+	+GZZXj7kl4fRwdf7dTTOnKo2ksTfMFk80/zQQxhp425OAD+d7Iu16F03HWgMET6ZyGs5PiRabfF
+	yBt2xrNON5ex93kc4EzYI+tyxY3ekH/0A7nC0PjS/1XxVLqws5N9qOD55bHkuxXb+p4HInNueDU
+	5CH2YnsRHMiluy5IsoyRRBRD76iPo=
+X-Google-Smtp-Source: AGHT+IEXkiMMtxInXNSj3D7vB7ZNkttkATENAv+o2HZ7oFUmoi3JUdAViaqWsBvhSSeovzcC4eWIKU7/HQ==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:600c:5122:b0:418:9fb1:fba9 with SMTP id
- o34-20020a05600c512200b004189fb1fba9mr4627wms.8.1713513603598; Fri, 19 Apr
- 2024 01:00:03 -0700 (PDT)
-Date: Fri, 19 Apr 2024 08:59:19 +0100
+ (user=tabba job=sendgmr) by 2002:a25:ce54:0:b0:dc7:5c0d:f177 with SMTP id
+ x81-20020a25ce54000000b00dc75c0df177mr351969ybe.6.1713513606091; Fri, 19 Apr
+ 2024 01:00:06 -0700 (PDT)
+Date: Fri, 19 Apr 2024 08:59:20 +0100
 In-Reply-To: <20240419075941.4085061-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240419075941.4085061-1-tabba@google.com>
 X-Mailer: git-send-email 2.44.0.769.g3c40516874-goog
-Message-ID: <20240419075941.4085061-10-tabba@google.com>
-Subject: [PATCH v3 09/31] KVM: arm64: Support TLB invalidation in guest context
+Message-ID: <20240419075941.4085061-11-tabba@google.com>
+Subject: [PATCH v3 10/31] KVM: arm64: Do not map the host fpsimd state to hyp
+ in pKVM
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev
 Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com, 
@@ -70,259 +71,108 @@ Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com,
 	joey.gouly@arm.com, rananta@google.com, smostafa@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-From: Will Deacon <will@kernel.org>
+pKVM maintains its own state at EL2 for tracking the host fpsimd
+state. Therefore, no need to map and share the host's view with
+it.
 
-Typically, TLB invalidation of guest stage-2 mappings using nVHE is
-performed by a hypercall originating from the host. For the invalidation
-instruction to be effective, therefore, __tlb_switch_to_{guest,host}()
-swizzle the active stage-2 context around the TLBI instruction.
-
-With guest-to-host memory sharing and unsharing hypercalls
-originating from the guest under pKVM, there is need to support
-both guest and host VMID invalidations issued from guest context.
-
-Replace the __tlb_switch_to_{guest,host}() functions with a more general
-{enter,exit}_vmid_context() implementation which supports being invoked
-from guest context and acts as a no-op if the target context matches the
-running context.
-
-Signed-off-by: Will Deacon <will@kernel.org>
 Signed-off-by: Fuad Tabba <tabba@google.com>
+Reviewed-by: Mark Brown <broonie@kernel.org>
 ---
- arch/arm64/kvm/hyp/nvhe/tlb.c | 115 +++++++++++++++++++++++++++-------
- 1 file changed, 91 insertions(+), 24 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |  3 ---
+ arch/arm64/kvm/fpsimd.c           | 31 ++++---------------------------
+ arch/arm64/kvm/reset.c            |  1 -
+ 3 files changed, 4 insertions(+), 31 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
-index 2fc68da4036d..ca3c09df8d7c 100644
---- a/arch/arm64/kvm/hyp/nvhe/tlb.c
-+++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
-@@ -11,13 +11,23 @@
- #include <nvhe/mem_protect.h>
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 4609d1b9ddde..74dc5a60f171 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -663,8 +663,6 @@ struct kvm_vcpu_arch {
+ 	struct kvm_guest_debug_arch vcpu_debug_state;
+ 	struct kvm_guest_debug_arch external_debug_state;
  
- struct tlb_inv_context {
--	u64		tcr;
-+	struct kvm_s2_mmu	*mmu;
-+	u64			tcr;
-+	u64			sctlr;
- };
+-	struct task_struct *parent_task;
+-
+ 	/* VGIC state */
+ 	struct vgic_cpu vgic_cpu;
+ 	struct arch_timer_cpu timer_cpu;
+@@ -1262,7 +1260,6 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu);
+ void kvm_arch_vcpu_ctxflush_fp(struct kvm_vcpu *vcpu);
+ void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu);
+ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu);
+-void kvm_vcpu_unshare_task_fp(struct kvm_vcpu *vcpu);
  
--static void __tlb_switch_to_guest(struct kvm_s2_mmu *mmu,
--				  struct tlb_inv_context *cxt,
--				  bool nsh)
-+static void enter_vmid_context(struct kvm_s2_mmu *mmu,
-+			       struct tlb_inv_context *cxt,
-+			       bool nsh)
+ static inline bool kvm_pmu_counter_deferred(struct perf_event_attr *attr)
  {
-+	struct kvm_s2_mmu *host_s2_mmu = &host_mmu.arch.mmu;
-+	struct kvm_cpu_context *host_ctxt;
-+	struct kvm_vcpu *vcpu;
-+
-+	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-+	vcpu = host_ctxt->__hyp_running_vcpu;
-+	cxt->mmu = NULL;
-+
- 	/*
- 	 * We have two requirements:
- 	 *
-@@ -40,20 +50,55 @@ static void __tlb_switch_to_guest(struct kvm_s2_mmu *mmu,
- 	else
- 		dsb(ish);
+diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
+index d5837d65e4a1..63a6f82934a6 100644
+--- a/arch/arm64/kvm/fpsimd.c
++++ b/arch/arm64/kvm/fpsimd.c
+@@ -14,19 +14,6 @@
+ #include <asm/kvm_mmu.h>
+ #include <asm/sysreg.h>
  
-+	/*
-+	 * If we're already in the desired context, then there's nothing to do.
-+	 */
-+	if (vcpu) {
-+		/*
-+		 * We're in guest context. However, for this to work, this needs
-+		 * to be called from within __kvm_vcpu_run(), which ensures that
-+		 * __hyp_running_vcpu is set to the current guest vcpu.
-+		 */
-+		if (mmu == vcpu->arch.hw_mmu || WARN_ON(mmu != host_s2_mmu))
-+			return;
-+
-+		cxt->mmu = vcpu->arch.hw_mmu;
-+	} else {
-+		/* We're in host context. */
-+		if (mmu == host_s2_mmu)
-+			return;
-+
-+		cxt->mmu = host_s2_mmu;
-+	}
-+
- 	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
- 		u64 val;
- 
- 		/*
- 		 * For CPUs that are affected by ARM 1319367, we need to
--		 * avoid a host Stage-1 walk while we have the guest's
--		 * VMID set in the VTTBR in order to invalidate TLBs.
--		 * We're guaranteed that the S1 MMU is enabled, so we can
--		 * simply set the EPD bits to avoid any further TLB fill.
-+		 * avoid a Stage-1 walk with the old VMID while we have
-+		 * the new VMID set in the VTTBR in order to invalidate TLBs.
-+		 * We're guaranteed that the host S1 MMU is enabled, so
-+		 * we can simply set the EPD bits to avoid any further
-+		 * TLB fill. For guests, we ensure that the S1 MMU is
-+		 * temporarily enabled in the next context.
- 		 */
- 		val = cxt->tcr = read_sysreg_el1(SYS_TCR);
- 		val |= TCR_EPD1_MASK | TCR_EPD0_MASK;
- 		write_sysreg_el1(val, SYS_TCR);
- 		isb();
-+
-+		if (vcpu) {
-+			val = cxt->sctlr = read_sysreg_el1(SYS_SCTLR);
-+			if (!(val & SCTLR_ELx_M)) {
-+				val |= SCTLR_ELx_M;
-+				write_sysreg_el1(val, SYS_SCTLR);
-+				isb();
-+			}
-+		} else {
-+			/* The host S1 MMU is always enabled. */
-+			cxt->sctlr = SCTLR_ELx_M;
-+		}
- 	}
- 
- 	/*
-@@ -62,18 +107,40 @@ static void __tlb_switch_to_guest(struct kvm_s2_mmu *mmu,
- 	 * ensuring that we always have an ISB, but not two ISBs back
- 	 * to back.
- 	 */
--	__load_stage2(mmu, kern_hyp_va(mmu->arch));
-+	if (vcpu)
-+		__load_host_stage2();
-+	else
-+		__load_stage2(mmu, kern_hyp_va(mmu->arch));
-+
- 	asm(ALTERNATIVE("isb", "nop", ARM64_WORKAROUND_SPECULATIVE_AT));
- }
- 
--static void __tlb_switch_to_host(struct tlb_inv_context *cxt)
-+static void exit_vmid_context(struct tlb_inv_context *cxt)
+-void kvm_vcpu_unshare_task_fp(struct kvm_vcpu *vcpu)
+-{
+-	struct task_struct *p = vcpu->arch.parent_task;
+-	struct user_fpsimd_state *fpsimd;
+-
+-	if (!is_protected_kvm_enabled() || !p)
+-		return;
+-
+-	fpsimd = &p->thread.uw.fpsimd_state;
+-	kvm_unshare_hyp(fpsimd, fpsimd + 1);
+-	put_task_struct(p);
+-}
+-
+ /*
+  * Called on entry to KVM_RUN unless this vcpu previously ran at least
+  * once and the most recent prior KVM_RUN for this vcpu was called from
+@@ -38,28 +25,18 @@ void kvm_vcpu_unshare_task_fp(struct kvm_vcpu *vcpu)
+  */
+ int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu)
  {
--	__load_host_stage2();
-+	struct kvm_s2_mmu *mmu = cxt->mmu;
-+	struct kvm_cpu_context *host_ctxt;
-+	struct kvm_vcpu *vcpu;
-+
-+	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-+	vcpu = host_ctxt->__hyp_running_vcpu;
-+
-+	if (!mmu)
-+		return;
-+
-+	if (vcpu)
-+		__load_stage2(mmu, kern_hyp_va(mmu->arch));
-+	else
-+		__load_host_stage2();
+-	int ret;
+-
+ 	struct user_fpsimd_state *fpsimd = &current->thread.uw.fpsimd_state;
++	int ret;
  
- 	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
--		/* Ensure write of the host VMID */
-+		/* Ensure write of the old VMID */
- 		isb();
--		/* Restore the host's TCR_EL1 */
-+
-+		if (!(cxt->sctlr & SCTLR_ELx_M)) {
-+			write_sysreg_el1(cxt->sctlr, SYS_SCTLR);
-+			isb();
-+		}
-+
- 		write_sysreg_el1(cxt->tcr, SYS_TCR);
- 	}
- }
-@@ -84,7 +151,7 @@ void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
- 	struct tlb_inv_context cxt;
+-	kvm_vcpu_unshare_task_fp(vcpu);
++	/* pKVM has its own tracking of the host fpsimd state. */
++	if (is_protected_kvm_enabled())
++		return 0;
  
- 	/* Switch to requested VMID */
--	__tlb_switch_to_guest(mmu, &cxt, false);
-+	enter_vmid_context(mmu, &cxt, false);
+ 	/* Make sure the host task fpsimd state is visible to hyp: */
+ 	ret = kvm_share_hyp(fpsimd, fpsimd + 1);
+ 	if (ret)
+ 		return ret;
  
- 	/*
- 	 * We could do so much better if we had the VA as well.
-@@ -105,7 +172,7 @@ void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
- 	dsb(ish);
- 	isb();
- 
--	__tlb_switch_to_host(&cxt);
-+	exit_vmid_context(&cxt);
+-	/*
+-	 * We need to keep current's task_struct pinned until its data has been
+-	 * unshared with the hypervisor to make sure it is not re-used by the
+-	 * kernel and donated to someone else while already shared -- see
+-	 * kvm_vcpu_unshare_task_fp() for the matching put_task_struct().
+-	 */
+-	if (is_protected_kvm_enabled()) {
+-		get_task_struct(current);
+-		vcpu->arch.parent_task = current;
+-	}
+-
+ 	return 0;
  }
  
- void __kvm_tlb_flush_vmid_ipa_nsh(struct kvm_s2_mmu *mmu,
-@@ -114,7 +181,7 @@ void __kvm_tlb_flush_vmid_ipa_nsh(struct kvm_s2_mmu *mmu,
- 	struct tlb_inv_context cxt;
- 
- 	/* Switch to requested VMID */
--	__tlb_switch_to_guest(mmu, &cxt, true);
-+	enter_vmid_context(mmu, &cxt, true);
- 
- 	/*
- 	 * We could do so much better if we had the VA as well.
-@@ -135,7 +202,7 @@ void __kvm_tlb_flush_vmid_ipa_nsh(struct kvm_s2_mmu *mmu,
- 	dsb(nsh);
- 	isb();
- 
--	__tlb_switch_to_host(&cxt);
-+	exit_vmid_context(&cxt);
- }
- 
- void __kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
-@@ -152,7 +219,7 @@ void __kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
- 	start = round_down(start, stride);
- 
- 	/* Switch to requested VMID */
--	__tlb_switch_to_guest(mmu, &cxt, false);
-+	enter_vmid_context(mmu, &cxt, false);
- 
- 	__flush_s2_tlb_range_op(ipas2e1is, start, pages, stride,
- 				TLBI_TTL_UNKNOWN);
-@@ -162,7 +229,7 @@ void __kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
- 	dsb(ish);
- 	isb();
- 
--	__tlb_switch_to_host(&cxt);
-+	exit_vmid_context(&cxt);
- }
- 
- void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu)
-@@ -170,13 +237,13 @@ void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu)
- 	struct tlb_inv_context cxt;
- 
- 	/* Switch to requested VMID */
--	__tlb_switch_to_guest(mmu, &cxt, false);
-+	enter_vmid_context(mmu, &cxt, false);
- 
- 	__tlbi(vmalls12e1is);
- 	dsb(ish);
- 	isb();
- 
--	__tlb_switch_to_host(&cxt);
-+	exit_vmid_context(&cxt);
- }
- 
- void __kvm_flush_cpu_context(struct kvm_s2_mmu *mmu)
-@@ -184,19 +251,19 @@ void __kvm_flush_cpu_context(struct kvm_s2_mmu *mmu)
- 	struct tlb_inv_context cxt;
- 
- 	/* Switch to requested VMID */
--	__tlb_switch_to_guest(mmu, &cxt, false);
-+	enter_vmid_context(mmu, &cxt, false);
- 
- 	__tlbi(vmalle1);
- 	asm volatile("ic iallu");
- 	dsb(nsh);
- 	isb();
- 
--	__tlb_switch_to_host(&cxt);
-+	exit_vmid_context(&cxt);
- }
- 
- void __kvm_flush_vm_context(void)
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index 68d1d05672bd..1b7b58cb121f 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -151,7 +151,6 @@ void kvm_arm_vcpu_destroy(struct kvm_vcpu *vcpu)
  {
--	/* Same remark as in __tlb_switch_to_guest() */
-+	/* Same remark as in enter_vmid_context() */
- 	dsb(ish);
- 	__tlbi(alle1is);
- 	dsb(ish);
+ 	void *sve_state = vcpu->arch.sve_state;
+ 
+-	kvm_vcpu_unshare_task_fp(vcpu);
+ 	kvm_unshare_hyp(vcpu, vcpu + 1);
+ 	if (sve_state)
+ 		kvm_unshare_hyp(sve_state, sve_state + vcpu_sve_state_size(vcpu));
 -- 
 2.44.0.769.g3c40516874-goog
 
