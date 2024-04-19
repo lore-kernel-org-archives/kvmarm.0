@@ -1,55 +1,55 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1839947F6C
-	for <kvmarm@lists.linux.dev>; Fri, 19 Apr 2024 07:59:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A4DF47F6C
+	for <kvmarm@lists.linux.dev>; Fri, 19 Apr 2024 07:59:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713513588; cv=none; b=dcDLPC9PE+wcDN97h9Qa1bLxqFtTeC/jXLvtfA8yRmGjKXEjti2Kh2qQz6paxyyzG0SeaTarn2Lhk9qSLXvusalH4kTQnK+7HCQfk8oYqlQAJ+LQphaT4ALywjQTs3NfW1uFzy3PrYk6LDisURbNvZ9fPY/XSn0Ong5FzXi6xus=
+	t=1713513590; cv=none; b=DTu7QYnC2RPovkvlbM4LVASje/+oymcxebqFtSLf/d7Ho8XQLaW6vecwqIp73VOkorLxIKA61RYynZTznQky2nCo48zGUwRnIKHz+RuG+tYwviDGcXThX+dME6ebOhAjSY4NIwyprZfQwb7rwB50DLWqdgchWn5H+zoQwQn9rIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713513588; c=relaxed/simple;
-	bh=BShtqt08ogWEX4QFSRTIZr7L2RF+3WFNe2hPtYtmZTY=;
+	s=arc-20240116; t=1713513590; c=relaxed/simple;
+	bh=Dd1LNwy9pwRnnX0jkyDj7F3suG2nM3tlrS0jD6ZvufY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ERYbzgJucmp5vQim+h5U25I+nUi4iaxV4OOoJLqtyUOmTaQvhK07zySLu3NbEklu59l+INQ4pnoUVwTIViDwHQgCGLs9ATwrglwGb4usEKZ2EkG7Zlt9by95V++fuES2yfLFoZb3ef/fG/9IKTvnjECx2aVjHTgGkOHumK1Lwzk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ukebp6LI; arc=none smtp.client-ip=209.85.128.73
+	 To:Cc:Content-Type; b=WBmH6QQQN9Jh79reYal0D1XBQiqAAZDGVrXN9L3e0Uvi+k6g2z8AiB1XuAD9V17Bhl5mmYbLkZqd82XUBK7RXIrwxYYZPC0k8MEJXbiA0QeG8+AxvGjOfejxFWzfcU6fueE6hm5Dcj5UlD08orS0E/KJ3xB3WWA8CngWGl2ZAqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rLA1sf9T; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ukebp6LI"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-41485831b2dso14454525e9.3
-        for <kvmarm@lists.linux.dev>; Fri, 19 Apr 2024 00:59:46 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rLA1sf9T"
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-61ab00d8a2eso32618907b3.3
+        for <kvmarm@lists.linux.dev>; Fri, 19 Apr 2024 00:59:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713513585; x=1714118385; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1713513588; x=1714118388; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=arQC4jBKrcnS/52i0oXg3O8S03FeaxatNMzzV7zmtr8=;
-        b=ukebp6LIb2GMOwyJPFr1GqxB/Xe2YLx4ZkCHct5m6Tai/2UscJyjenz1sSNN/uuTiN
-         P0FsXqxnUZ7DF9jeYzX76BkVDA7VvlIx0Pn77pFQkp4umEfkqnERn/bE//mKfCD26dZg
-         INsBTNWd5DdArUkrdF2NDwJ9GR8UuSQJ/PVRl9km1JICWELOGDsga/lkpM1aOlZfEHJu
-         jZVl4er1KaQWzXI/HTx6eDAWqImhHgYyEVviIsXz6nEg15XiP6uBh0drz8xqXslJd+tN
-         KrPXMG+Mbjc2jeyt177VSWvZy962J/rtfdYX/3U5AO2fvEXVdUIwrelde6VhDUsy3o+9
-         Jaeg==
+        bh=0z5AWgfriCkyDPhI6iidH841EpkLLrOcMdlZW3FsiQI=;
+        b=rLA1sf9T01gnEyU7Jj6s10Cnf+7LpvLbz5/K8Ncd/pqC2SlieIQhFwo60u+31ZzQ3Z
+         vs7nHoajHDiubWe4Pslc2pvvn1f2elOmiociHiiFsznJNv2S4TDajDo8fKnl9uGDUiHX
+         uEAKLmmbRPUt4D7vp+PzeXQIxOlGGP+k35/X8UD7l/JqDmvfbcgVlYnkmRnCh2e6B/9w
+         L+E25pGUnCJecFFJvx4pAH3zgD36sIBOyv0VMj3dq0nWPKHhA5IfS3uwdfoBeuDjE2z1
+         5vaY34vHV65p4WyXmEuQmuZc+229vtQoz4Mgua3DboayFDQ6cB2KFjm2C7fXsFKRNwuo
+         IG7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713513585; x=1714118385;
+        d=1e100.net; s=20230601; t=1713513588; x=1714118388;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=arQC4jBKrcnS/52i0oXg3O8S03FeaxatNMzzV7zmtr8=;
-        b=WkgrexgAk/7AkdMyEe28eoi9reR/GDlT5Gw9ptYUNBPyCMlBTXuz2CXwiPcxotsZyG
-         D5wZVhXwfO+/i1uprz4ORCgiQxxIG6gVjaaE68chOXjl0cTjAzYoegzj7GPzVqt+xHzW
-         /4C7s5o/1Uq82qBrOL8xD4qouMIyoLkAAxlQF445/0GoZmjThqEF4xeXMFKbncGoQiR5
-         Vck/vF4oJqK+xM5tnI5GXn12qU5bLRJfmlE4HceK2DFyTey3P0spa8+1ku553oIkqw3H
-         loaedk/e0UyzyziYwZJtMDmmGNZMU5ldaBJul3UNdqS45TeKlcazlMV+e8cxS3WBm6RK
-         bz6Q==
-X-Gm-Message-State: AOJu0Yy+d4H4QLgFFrrkIOR2BzSPRH9yUkk887lFt7XoPtisU159MiSN
-	XPDIHJEd16k3WTjABgXr1RCu0S3hiBO+JH1FyRnBEe01h4OxVwbVON/di74w3WLXbjnCBKrv+SX
-	Rf4dWoXUJ6Fvw9i2DxfDGZR++YY5+ovgyd2LSwsj92gyZ0rsv56j8mR1c8nHajbgjknM8c1nWPy
-	O8e+wHtWZhcqMdkbtDg4wg31OB7xA=
-X-Google-Smtp-Source: AGHT+IEI7voauUp5u2J1dvcwsUJ8m5ZO+2e6cSJAzJlLQOMPzWo8fF+CSNCeQzM3lPWcvFlao23lNXlVFQ==
+        bh=0z5AWgfriCkyDPhI6iidH841EpkLLrOcMdlZW3FsiQI=;
+        b=U1abRiwEbdUUCxR5AVHBGDq8PBs/oMRcoFshgpBr/jGlLODDOJTd3IRo80a3f2HgQe
+         UjUaQL3imwHF3JR0HArwTOfHjN+4nf8w5JAn1XBLQ43dhtfu2ggJZNxK53TQ9N9qxzl3
+         sRfEYlyXbaC2295NHtQfSG1nutzKLn+DRCkXpkzpl/dSe/Nb7z3lU9jilkL99Y2Ic3Ah
+         qDxxEJQGBC9jW8yJJXU3Rq7I17XA5te8e2P7fx+FsbLpPreknRPxP+HKTWDun0tU3IQH
+         4kbTiFeKDhwVV/f2P8EaGLmsmcLpU9wSjwR6VhQ8SSmSIJomWzyy4xRNd3CVxxPfUmRk
+         WkKQ==
+X-Gm-Message-State: AOJu0YzO4tAkcVVomIEGEYDlIsSX/tC31yHUIuNQlFs/w9S0k+Adrwff
+	MCy2J7xG3cVb416feoCwY1kUD1yZ9a0amTKjGuaNysKlNJt+667zjkDf0kSt88bTwQbdm0DlRUJ
+	a5xt4ZmybqzpggTCDcOMxpyswV7VGbkGX0BiRA/8gcJTp2JyB9wCeWzZ3fO4zuoqJUuXrxHoa4w
+	WLX7CKLE6PE8ZTXqIEqXEAEDVTVU0=
+X-Google-Smtp-Source: AGHT+IGUxeEGfAsoAd7s+lQEJg9M25v22ALw2mIVeLvbRK2hk3bYMb9fDCZ6JuEsyM6cPAnnSDjyh7y8Ow==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:adf:e0c7:0:b0:33e:d448:987d with SMTP id
- m7-20020adfe0c7000000b0033ed448987dmr3888wri.6.1713513585474; Fri, 19 Apr
- 2024 00:59:45 -0700 (PDT)
-Date: Fri, 19 Apr 2024 08:59:11 +0100
+ (user=tabba job=sendgmr) by 2002:a05:6902:102d:b0:dc6:c94e:fb85 with SMTP id
+ x13-20020a056902102d00b00dc6c94efb85mr91260ybt.2.1713513587758; Fri, 19 Apr
+ 2024 00:59:47 -0700 (PDT)
+Date: Fri, 19 Apr 2024 08:59:12 +0100
 In-Reply-To: <20240419075941.4085061-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,9 +59,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240419075941.4085061-1-tabba@google.com>
 X-Mailer: git-send-email 2.44.0.769.g3c40516874-goog
-Message-ID: <20240419075941.4085061-2-tabba@google.com>
-Subject: [PATCH v3 01/31] KVM: arm64: Initialize the kvm host data's
- fpsimd_state pointer in pKVM
+Message-ID: <20240419075941.4085061-3-tabba@google.com>
+Subject: [PATCH v3 02/31] KVM: arm64: Move guest_owns_fp_regs() to increase
+ its scope
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev
 Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com, 
@@ -71,67 +71,83 @@ Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com,
 	joey.gouly@arm.com, rananta@google.com, smostafa@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Since the host_fpsimd_state has been removed from kvm_vcpu_arch,
-it isn't pointing to the hyp's version of the host fp_regs in
-protected mode.
+guest_owns_fp_regs() will be used to check fpsimd state ownership
+across kvm/arm64. Therefore, move it to kvm_host.h to widen its
+scope.
 
-Initialize the host_data fpsimd_state point to the host_data's
-context fp_regs on pKVM initialization.
+Moreover, the host state is not per-vcpu anymore, the vcpu
+parameter isn't used, so remove it as well.
 
-Fixes: 51e09b5572d6 ("KVM: arm64: Exclude host_fpsimd_state pointer from kvm_vcpu_arch")
+No functional change intended.
+
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  1 +
- arch/arm64/kvm/hyp/nvhe/pkvm.c         | 11 +++++++++++
- arch/arm64/kvm/hyp/nvhe/setup.c        |  1 +
- 3 files changed, 13 insertions(+)
+ arch/arm64/include/asm/kvm_host.h       | 6 ++++++
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 6 ------
+ arch/arm64/kvm/hyp/nvhe/switch.c        | 2 +-
+ arch/arm64/kvm/hyp/vhe/switch.c         | 2 +-
+ 4 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-index 82b3d62538a6..20c3f6e13b99 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-@@ -54,6 +54,7 @@ pkvm_hyp_vcpu_to_hyp_vm(struct pkvm_hyp_vcpu *hyp_vcpu)
- }
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 2b63fdfad5b2..2889e1d8a8c1 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -1207,6 +1207,12 @@ DECLARE_KVM_HYP_PER_CPU(struct kvm_host_data, kvm_host_data);
+ 	 &this_cpu_ptr_hyp_sym(kvm_host_data)->f)
+ #endif
  
- void pkvm_hyp_vm_table_init(void *tbl);
-+void pkvm_host_fpsimd_state_init(void);
- 
- int __pkvm_init_vm(struct kvm *host_kvm, unsigned long vm_hva,
- 		   unsigned long pgd_hva);
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index 26dd9a20ad6e..492b7fc2c0c7 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -247,6 +247,17 @@ void pkvm_hyp_vm_table_init(void *tbl)
- 	vm_table = tbl;
- }
- 
-+void pkvm_host_fpsimd_state_init(void)
++/* Check whether the FP regs are owned by the guest */
++static inline bool guest_owns_fp_regs(void)
 +{
-+	unsigned long i;
-+
-+	for (i = 0; i < hyp_nr_cpus; i++) {
-+		struct kvm_host_data *host_data = per_cpu_ptr(&kvm_host_data, i);
-+
-+		host_data->fpsimd_state = &host_data->host_ctxt.fp_regs;
-+	}
++	return *host_data_ptr(fp_owner) == FP_STATE_GUEST_OWNED;
 +}
 +
- /*
-  * Return the hyp vm structure corresponding to the handle.
-  */
-diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-index ae00dfa80801..859f22f754d3 100644
---- a/arch/arm64/kvm/hyp/nvhe/setup.c
-+++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-@@ -300,6 +300,7 @@ void __noreturn __pkvm_init_finalise(void)
- 		goto out;
+ static inline void kvm_init_host_cpu_context(struct kvm_cpu_context *cpu_ctxt)
+ {
+ 	/* The host's MPIDR is immutable, so let's set it up at boot time */
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 2629420d0659..38961b6b1a18 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -39,12 +39,6 @@ struct kvm_exception_table_entry {
+ extern struct kvm_exception_table_entry __start___kvm_ex_table;
+ extern struct kvm_exception_table_entry __stop___kvm_ex_table;
  
- 	pkvm_hyp_vm_table_init(vm_table_base);
-+	pkvm_host_fpsimd_state_init();
- out:
- 	/*
- 	 * We tail-called to here from handle___pkvm_init() and will not return,
+-/* Check whether the FP regs are owned by the guest */
+-static inline bool guest_owns_fp_regs(struct kvm_vcpu *vcpu)
+-{
+-	return *host_data_ptr(fp_owner) == FP_STATE_GUEST_OWNED;
+-}
+-
+ /* Save the 32-bit only FPSIMD system register state */
+ static inline void __fpsimd_save_fpexc32(struct kvm_vcpu *vcpu)
+ {
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index 1f82d531a494..1b22654a3180 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -53,7 +53,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+ 			val |= CPTR_EL2_TSM;
+ 	}
+ 
+-	if (!guest_owns_fp_regs(vcpu)) {
++	if (!guest_owns_fp_regs()) {
+ 		if (has_hvhe())
+ 			val &= ~(CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN |
+ 				 CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN);
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index b92f9fe2d50e..7286db75b8d6 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -75,7 +75,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+ 
+ 	val |= CPTR_EL2_TAM;
+ 
+-	if (guest_owns_fp_regs(vcpu)) {
++	if (guest_owns_fp_regs()) {
+ 		if (vcpu_has_sve(vcpu))
+ 			val |= CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN;
+ 	} else {
 -- 
 2.44.0.769.g3c40516874-goog
 
