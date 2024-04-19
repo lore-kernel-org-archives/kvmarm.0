@@ -1,68 +1,67 @@
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BBF32AF01
-	for <kvmarm@lists.linux.dev>; Fri, 19 Apr 2024 20:55:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 784BD2837F
+	for <kvmarm@lists.linux.dev>; Fri, 19 Apr 2024 20:57:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713560125; cv=none; b=H6JFaHiWVxzQfzlDL171+mxvbv/vehnsmoNi0rNp3uL1df0vGaRm0x6CZvq0LKx2t7K+4Voir+77G/nIypXh6J8pfkNoWwa9hEZvvZzvgjKHGXdjhTTMwpVyNmw+CKIZofkLCnw6afFWlhymU1GIvi6gDa2vMa21zmknbrrp+RE=
+	t=1713560261; cv=none; b=OaoRN1K3LHgoKsFS8WHO+EOx4wA2aB6boOTYCAELplJcX2je7vxeWuuDaR9ek9YtoSbQ5hbeXsN0M5ODgK2jI72tYZZKBNYTGLDSvpJ9KfZlAE3HfTKrN9gnG/fnAZt2KbbC8HiE6xAFx4LlW5V/jtsdBpcF/KxhySwb3Tq2NBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713560125; c=relaxed/simple;
-	bh=0GvM01Qlx5wuJBtCbl0XQHDADvYPFlcLL9+gjZzeNB4=;
+	s=arc-20240116; t=1713560261; c=relaxed/simple;
+	bh=qoLj+dJYefPcd1d7d+sMJMQdz9RnEJbXZl0KVW0Sv7A=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IU1+1qeEduNGIAjSOOB25MAKvgzplLgEKcIeonzM1LAwTu7To0k9krSt3fbX9Mwe5JvcmZeTZvFl0Rg6dEfqkgzREKdhLKITDUHAHnW2JVeI0deMqNV0cu3dVVhLvqelxNuBhM+aQ1NRmRcLk0aGTQX9r8SFYzAz9v1ycMlpIB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Rz0AQcHT; arc=none smtp.client-ip=209.85.160.181
+	 To:Cc:Content-Type; b=rndZ6TIclX4MyHgwC4H7HPph9sosvmLxgSICptOF5VQVyX3MeayepvBikl+b4p7aKFkQvC1hLhGEPJg7GNk9r5iRIh+/tFXwPgeMXNW011VtdoFxsP6nDhm2loFuJONrSOS8lHDwvNnjKsVIw9G9prxblTQfRZC1jzEfjUfBG6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xUtQ7oGQ; arc=none smtp.client-ip=209.85.160.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Rz0AQcHT"
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-434b5abbb0dso89401cf.0
-        for <kvmarm@lists.linux.dev>; Fri, 19 Apr 2024 13:55:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xUtQ7oGQ"
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4348110e888so25871cf.1
+        for <kvmarm@lists.linux.dev>; Fri, 19 Apr 2024 13:57:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713560123; x=1714164923; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1713560259; x=1714165059; darn=lists.linux.dev;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=AnzzcopxYVakJwmdZOL+JC6KyzHciDKz/A3YbkmreBI=;
-        b=Rz0AQcHTIPVs9SpwnsT6EDXPiXMdwg3oRJZWlJnd3EMrL0+Fc7G2m/II3iK6aX3gYQ
-         cjX/xSvTaLcRL561FJUaaNvthTJCLUy8kJX0EhjZHAPvudaZFADwjQHGK2OUEqM2rCQQ
-         ycGQ+3ZYvzdgbrEV26+szyd9kMfZD4MNERivxQq1qVVPhfL8xdqscCdVQpi/Zx6AZvCF
-         zIY/ANqqI5mbsfMK/dZZnQU8L3tirMzVUtOTxBxXpRo0jFlZLmabDcjr2ljgsCevVUu6
-         dJGgbRyIkiM5m2+q3T2ebnC59Y0sdEGrjAAzqYa7BOPnU1SY3diURpJw/JG3oi8FHKaw
-         7apg==
+        bh=qoLj+dJYefPcd1d7d+sMJMQdz9RnEJbXZl0KVW0Sv7A=;
+        b=xUtQ7oGQxeQDQ8ChZ0oVclhB4lbi5RRoYPK7+O+Y6S4ch1Rh/pYEK3Z5/iHrhLIDDm
+         whm1hOvYQPCuoqKoNcySYdm4MVfAXxeuUGwJLDluZe7TnU0F2mQLyqDOOy35DVc5MrsL
+         fLfLY39XokiWeapiSNT7+GKTQEgwzyPOmOIv0UtB0YpjRZUJ/wMhnDhFJivrS614JePw
+         SH1DJpzPV2jJ53DAmceaqg5wjvFZTo75I645Cy5tfMKwFvEC37lEj/S/TF64e0NRZ+ma
+         cS7DQe52ih6EwejI+vRHELvzacuOOKiKu1ORVYGCh8dyEArMVSlxy721hofD6UWPn0he
+         HBDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713560123; x=1714164923;
+        d=1e100.net; s=20230601; t=1713560259; x=1714165059;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=AnzzcopxYVakJwmdZOL+JC6KyzHciDKz/A3YbkmreBI=;
-        b=Xo8zkXyG9u0Yq9cTyVRZZn46ZmWXQzsZZRzR8dg+3qIvbiy3yLc0RVmd7ec7NKflaG
-         lHteZek52OtuWydQbhgLu3ISpfGsINNpB8X0K4Ove7ozAMWp3aFWYrxHwNjHkkgYGGxm
-         hUTONP00UHNJ+J8Qk0IIgENQn4J23+cCy6UHsGiAtO72iIJE0HUc2eB0VezFZKdb7Ymi
-         QUW5Y8sw8XORjEaNF4V+aRW0FEuxO/bYWEM6AVaWtKDo6wOP6WM/aOvX+f8HsKvfxoeP
-         jCPhmHAdsMXHxDBr9J0495O75gM35PQucYYdkYv80prjfvvrfcfqUNtZ3c/siKtTG6Mp
-         GvLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU6jol3KAqi6Ihm0tbdTUTVGmKgQ66iF1by/UeEVybd+o7A5FzE86eqaR5LmQxwVZWGffERR1plOZbb7LXdmOf2v87JoXYB
-X-Gm-Message-State: AOJu0Yw8bRRzWL1pUTm4X/If8mDVTyIHIWuTm/NAVdEq+Vkb18C8STnP
-	v6GLGl2yhwU1DIM0oJt5Dslz1RkZjX7ax/DhoCm1e4OxcmovzQ9En5AucraCyiKO2hrWDdihk2h
-	IOAg6dvuuX+ESg8u4OfVT7ibjW6ocWNq/QFlZ
-X-Google-Smtp-Source: AGHT+IH9sSY76fFvumrBUCB5IOWf40dprm49al51d9C63r/bzJh0mJ4NGK5So9vqJF4lfC7MlLaL31EdoOvAUHGh1YY=
-X-Received: by 2002:ac8:7357:0:b0:437:c52f:cd6a with SMTP id
- q23-20020ac87357000000b00437c52fcd6amr69580qtp.8.1713560123419; Fri, 19 Apr
- 2024 13:55:23 -0700 (PDT)
+        bh=qoLj+dJYefPcd1d7d+sMJMQdz9RnEJbXZl0KVW0Sv7A=;
+        b=VJLTleXOlVBGpgQnfXKyQxYymPXytsVshACBaalYTdIaiPl28AHHtpmMhciXC0rZjl
+         R/EqN3dlzkrS7BiRzaRDUTqcfaMxbRPghBLC5xevDL39Qb968q5+Jig32yTkR0Xf5EOg
+         oJIT5/Oit3y6ywfARsXoIlerj302MfWb119z+5yNczlVvecga9qeajbRSWR27BLAYC3s
+         umuTPSCSFRlrUBR24Bf6XEJhBgoFDgxboo0vtSGqNBTAYGcxu9ua+KOorPz47Nks+Wx7
+         Ak2nsd8RrzyTJIEXzYgzGrumYVJ40hN7EU7IFijJqgBi0iuxXwWIokGGXNp9xUaB3Tw5
+         3eqg==
+X-Forwarded-Encrypted: i=1; AJvYcCXFy5WTTvP2wDQWacbAmdw7OTw4O6NoWp9P4LgnUKw8Da0KCg2iB+V82GMUawEGfa5oHs3v9HdT6G4AUAfEzDugPc5SEAH0
+X-Gm-Message-State: AOJu0YwvDlqsFBB4U/RbQDuHKGmsSpQHyy3WfQW9uv76qq5csXpuo+yB
+	CiphjVW0y/MKgf/G2o/2xHIk6Z0viHPDpkCZCVdJukTsQMw0RiD0qRCAxbGX8EZqXW16j2s6hb+
+	9Krzh1SZsHF56v+m3jL8xl7YAuaMNpTBXPGcY
+X-Google-Smtp-Source: AGHT+IFv1QNbGHT+roZmsKKDk+4PrHigHuJTamLsAWVaJCEFFb06VO4JQpFPHTrcY52wz67cbMD5ADs0MVUpOaV74QM=
+X-Received: by 2002:ac8:729a:0:b0:437:b99c:dbf7 with SMTP id
+ v26-20020ac8729a000000b00437b99cdbf7mr13893qto.11.1713560259365; Fri, 19 Apr
+ 2024 13:57:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20240401232946.1837665-1-jthoughton@google.com>
- <20240401232946.1837665-6-jthoughton@google.com> <ZhmdOb7lAd3DM5Tq@google.com>
-In-Reply-To: <ZhmdOb7lAd3DM5Tq@google.com>
+References: <20240401232946.1837665-1-jthoughton@google.com> <ZhmAR1akBHjvZ9_4@google.com>
+In-Reply-To: <ZhmAR1akBHjvZ9_4@google.com>
 From: James Houghton <jthoughton@google.com>
-Date: Fri, 19 Apr 2024 13:54:47 -0700
-Message-ID: <CADrL8HWAzcq4N-triWiMvtpUKvb7C03+2mQpNBxV9Ci-F5GyBw@mail.gmail.com>
-Subject: Re: [PATCH v3 5/7] KVM: x86: Participate in bitmap-based PTE aging
+Date: Fri, 19 Apr 2024 13:57:03 -0700
+Message-ID: <CADrL8HW+4Yq-wBr1+DzJvSwRRL_hqt5RaCCLgOQndPGUqoX+Rg@mail.gmail.com>
+Subject: Re: [PATCH v3 0/7] mm/kvm: Improve parallelism for access bit harvesting
 To: David Matlack <dmatlack@google.com>
 Cc: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>, 
 	Yu Zhao <yuzhao@google.com>, Marc Zyngier <maz@kernel.org>, 
@@ -83,33 +82,22 @@ Cc: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.co
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Apr 12, 2024 at 1:44=E2=80=AFPM David Matlack <dmatlack@google.com>=
- wrote:
+On Fri, Apr 12, 2024 at 11:41=E2=80=AFAM David Matlack <dmatlack@google.com=
+> wrote:
 >
 > On 2024-04-01 11:29 PM, James Houghton wrote:
-> > Only handle the TDP MMU case for now. In other cases, if a bitmap was
-> > not provided, fallback to the slowpath that takes mmu_lock, or, if a
-> > bitmap was provided, inform the caller that the bitmap is unreliable.
+> > This patchset adds a fast path in KVM to test and clear access bits on
+> > sptes without taking the mmu_lock. It also adds support for using a
+> > bitmap to (1) test the access bits for many sptes in a single call to
+> > mmu_notifier_test_young, and to (2) clear the access bits for many ptes
+> > in a single call to mmu_notifier_clear_young.
 >
-> I think this patch will trigger a lockdep assert in
->
->   kvm_tdp_mmu_age_gfn_range
->     kvm_tdp_mmu_handle_gfn
->       for_each_tdp_mmu_root
->         __for_each_tdp_mmu_root
->           kvm_lockdep_assert_mmu_lock_held
->
-> ... because it walks tdp_mmu_roots without holding mmu_lock.
+> How much improvement would we get if we _just_ made test/clear_young
+> lockless on x86 and hold the read-lock on arm64? And then how much
+> benefit does the bitmap look-around add on top of that?
 
-Indeed, thanks. I'll make sure to build with CONFIG_LOCKDEP for the
-future versions and check for errors.
-
->
-> Yu's patch[1] added a lockless walk to the TDP MMU. We'd need something
-> similar here and also update the comment above tdp_mmu_roots describing
-> how tdp_mmu_roots can be read locklessly.
-
-I'll add the macro / function to do the lockless walk of tdp_mmu_roots
-and explain why it is safe. Thanks for pointing out this big mistake.
-
-> [1] https://lore.kernel.org/kvmarm/ZItX64Bbx5vdjo9M@google.com/
+I don't have these results right now. For the next version I will (1)
+separate the series into the locking change and the bitmap change, and
+I will (2) have performance data for each change separately. It is
+conceivable that the bitmap change should just be considered as a
+completely separate patchset.
