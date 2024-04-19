@@ -1,209 +1,277 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84DF980029;
-	Fri, 19 Apr 2024 11:24:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F30B885951;
+	Fri, 19 Apr 2024 13:00:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713525880; cv=none; b=cu/pZXDGLfyPbrVpefNCRo3buAfVKfsbJVOnfWHSrza4ODBz0FnxBToz3eRbwnEOn/fYrQfi0PJt8I1pB1ucC7fmRRT4BRBuTvjK4eCo4ihjLg4UF7w+JPzMqzjt8ocN9v/oAb4693k0eW6Q6M6vxxzt3iDCIZNGQcVLohEdZzs=
+	t=1713531636; cv=none; b=H4bAiZxi5tdfRSq4Ps0ykoTRCsgdrUMi1kOaKeu62jR6HT2HhfZvH4hFI5JeP6QUYjTAGB1LnuxuSF5XQjrYthAfnAYfX1r++tZjFs1nWgZm2Ov4ffxbsM+tHrqR9MNYaSpNKk23J6NMExDlluQBQY3tRsflpF7pe2mi9rAvX1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713525880; c=relaxed/simple;
-	bh=seRCd4clFxTtL6vDMULl2f9q6ycCa2mn5kfveiu4RD4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bvv3ScEL4XGdZvyW1xxgkn01Mv/gzEaS/BDzJQqGN4oB6HD8R32syr5DPoW6tKAJHaD4/EBdKW8Lp6Z8NHBdf4olO3AvnP8O9srZP5xdBxNt+OyQXvgQqUPJ4474Grjs99Z5YIb0N0t930QCtQofDkINV/7y0l6lrH+0Kgi55K4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fUooDE5x; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fUooDE5x"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7323C072AA;
-	Fri, 19 Apr 2024 11:24:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713525880;
-	bh=seRCd4clFxTtL6vDMULl2f9q6ycCa2mn5kfveiu4RD4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fUooDE5xzZcwoxp6cnIxa6nSjyz1WVMPciR6eMgeZnScdWtd6RHnirzVrYzahjF7o
-	 0Rhf5JDQK6Bbi//FiWWYsQhmxdD2E7SdEerccUuWi7NIJjAe8/oEc+JTPgi97aEKCx
-	 1qr1ylbc2JY3/PXoVlXnIjiywl20S1TiLXHN1Go61pGazmBK5iADoaJAlP4Oea0qxL
-	 4yJjj/ACTYEPqM9xhtpaqk87AOhVlC9pbpwjwCQyrrBWvF45vcjP2LjfAQa/iqIMmX
-	 0M2vJIj9IINojXoqhh6KBgTnklOD9tdz9Fd6A0k9WyLbzTHYn8x5INZivUwtKZ68Bq
-	 aiK1U7erJiBgQ==
-Date: Fri, 19 Apr 2024 12:24:32 +0100
-From: Will Deacon <will@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Tianrui Zhao <zhaotianrui@loongson.cn>,
-	Bibo Mao <maobibo@loongson.cn>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Anup Patel <anup@brainfault.org>,
-	Atish Patra <atishp@atishpatra.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	David Hildenbrand <david@redhat.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
-	linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org,
-	linux-perf-users@vger.kernel.org
-Subject: Re: [PATCH 1/4] KVM: delete .change_pte MMU notifier callback
-Message-ID: <20240419112432.GB2972@willie-the-truck>
-References: <20240405115815.3226315-1-pbonzini@redhat.com>
- <20240405115815.3226315-2-pbonzini@redhat.com>
- <20240412104408.GA27645@willie-the-truck>
- <86jzl2sovz.wl-maz@kernel.org>
- <ZhlLHtfeSHk9gRRO@google.com>
- <86h6g5si0m.wl-maz@kernel.org>
- <Zh1d94Pl6gneVoDd@google.com>
- <20240418141932.GA1855@willie-the-truck>
- <ZiF6NgGYLSsPNEOg@google.com>
+	s=arc-20240116; t=1713531636; c=relaxed/simple;
+	bh=aCwfyFsGqeYBypUL6ENw7wQt4VJhUg9101fZ8WXT9yI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HLOSr0cHnyX8fdGzPWf/IzMfS9LLHtypHb9Hdh+tjT0/KYcsWloeDoce6QouC2AsNRBiqV1DWq7Th4MU8OMwr30tzTSzTs+BhiZvdhVul+whCgPi/HiNJoQRyHu+c6VIp4GDr7L+d/cPSWlX1PQafzq+UjQUnPLNcMfHucu4aJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 41A292F;
+	Fri, 19 Apr 2024 06:01:02 -0700 (PDT)
+Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A1D633F64C;
+	Fri, 19 Apr 2024 06:00:31 -0700 (PDT)
+Message-ID: <0606bda2-7f3f-4fe9-8d7d-70dc4720dcd1@arm.com>
+Date: Fri, 19 Apr 2024 14:00:30 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZiF6NgGYLSsPNEOg@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 18/43] arm64: RME: Handle realm enter/exit
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+References: <20240412084056.1733704-1-steven.price@arm.com>
+ <20240412084309.1733783-1-steven.price@arm.com>
+ <20240412084309.1733783-19-steven.price@arm.com>
+Content-Language: en-US
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20240412084309.1733783-19-steven.price@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Apr 18, 2024 at 12:53:26PM -0700, Sean Christopherson wrote:
-> On Thu, Apr 18, 2024, Will Deacon wrote:
-> > On Mon, Apr 15, 2024 at 10:03:51AM -0700, Sean Christopherson wrote:
-> > > On Sat, Apr 13, 2024, Marc Zyngier wrote:
-> > > > On Fri, 12 Apr 2024 15:54:22 +0100, Sean Christopherson <seanjc@google.com> wrote:
-> > > > > 
-> > > > > On Fri, Apr 12, 2024, Marc Zyngier wrote:
-> > > > > > On Fri, 12 Apr 2024 11:44:09 +0100, Will Deacon <will@kernel.org> wrote:
-> > > > > > > On Fri, Apr 05, 2024 at 07:58:12AM -0400, Paolo Bonzini wrote:
-> > > > > > > Also, if you're in the business of hacking the MMU notifier code, it
-> > > > > > > would be really great to change the .clear_flush_young() callback so
-> > > > > > > that the architecture could handle the TLB invalidation. At the moment,
-> > > > > > > the core KVM code invalidates the whole VMID courtesy of 'flush_on_ret'
-> > > > > > > being set by kvm_handle_hva_range(), whereas we could do a much
-> > > > > > > lighter-weight and targetted TLBI in the architecture page-table code
-> > > > > > > when we actually update the ptes for small ranges.
-> > > > > > 
-> > > > > > Indeed, and I was looking at this earlier this week as it has a pretty
-> > > > > > devastating effect with NV (it blows the shadow S2 for that VMID, with
-> > > > > > costly consequences).
-> > > > > > 
-> > > > > > In general, it feels like the TLB invalidation should stay with the
-> > > > > > code that deals with the page tables, as it has a pretty good idea of
-> > > > > > what needs to be invalidated and how -- specially on architectures
-> > > > > > that have a HW-broadcast facility like arm64.
-> > > > > 
-> > > > > Would this be roughly on par with an in-line flush on arm64?  The simpler, more
-> > > > > straightforward solution would be to let architectures override flush_on_ret,
-> > > > > but I would prefer something like the below as x86 can also utilize a range-based
-> > > > > flush when running as a nested hypervisor.
-> > > 
-> > > ...
-> > > 
-> > > > I think this works for us on HW that has range invalidation, which
-> > > > would already be a positive move.
-> > > > 
-> > > > For the lesser HW that isn't range capable, it also gives the
-> > > > opportunity to perform the iteration ourselves or go for the nuclear
-> > > > option if the range is larger than some arbitrary constant (though
-> > > > this is additional work).
-> > > > 
-> > > > But this still considers the whole range as being affected by
-> > > > range->handler(). It'd be interesting to try and see whether more
-> > > > precise tracking is (or isn't) generally beneficial.
-> > > 
-> > > I assume the idea would be to let arch code do single-page invalidations of
-> > > stage-2 entries for each gfn?
-> > 
-> > Right, as it's the only code which knows which ptes actually ended up
-> > being aged.
-> > 
-> > > Unless I'm having a brain fart, x86 can't make use of that functionality.  Intel
-> > > doesn't provide any way to do targeted invalidation of stage-2 mappings.  AMD
-> > > provides an instruction to do broadcast invalidations, but it takes a virtual
-> > > address, i.e. a stage-1 address.  I can't tell if it's a host virtual address or
-> > > a guest virtual address, but it's a moot point because KVM doen't have the guest
-> > > virtual address, and if it's a host virtual address, there would need to be valid
-> > > mappings in the host page tables for it to work, which KVM can't guarantee.
-> > 
-> > Ah, so it sounds like it would need to be an arch opt-in then.
-> 
-> Even if x86 (or some other arch code) could use the precise tracking, I think it
-> would make sense to have the behavior be arch specific.  Adding infrastructure
-> to get information from arch code, only to turn around and give it back to arch
-> code would be odd.
+Hi Steven
 
-Sorry, yes, that's what I had in mind. Basically, a way for the arch code
-to say "I've handled the TLBI, don't worry about it."
+On 12/04/2024 09:42, Steven Price wrote:
+> Entering a realm is done using a SMC call to the RMM. On exit the
+> exit-codes need to be handled slightly differently to the normal KVM
+> path so define our own functions for realm enter/exit and hook them
+> in if the guest is a realm guest.
+> 
+> Signed-off-by: Steven Price <steven.price@arm.com>
 
-> Unless arm64 can't do the invalidation immediately after aging the stage-2 PTE,
-> the best/easiest solution would be to let arm64 opt out of the common TLB flush
-> when a SPTE is made young.
-> 
-> With the range-based flushing bundled in, this?
-> 
+Please find a comment about RIPAS change exit handling below. Rest
+looks good to me.
+
+
 > ---
->  include/linux/kvm_host.h |  2 ++
->  virt/kvm/kvm_main.c      | 40 +++++++++++++++++++++++++---------------
->  2 files changed, 27 insertions(+), 15 deletions(-)
+>   arch/arm64/include/asm/kvm_rme.h |   3 +
+>   arch/arm64/kvm/Makefile          |   2 +-
+>   arch/arm64/kvm/arm.c             |  19 +++-
+>   arch/arm64/kvm/rme-exit.c        | 180 +++++++++++++++++++++++++++++++
+>   arch/arm64/kvm/rme.c             |  11 ++
+>   5 files changed, 209 insertions(+), 6 deletions(-)
+>   create mode 100644 arch/arm64/kvm/rme-exit.c
 > 
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index afbc99264ffa..8fe5f5e16919 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -2010,6 +2010,8 @@ extern const struct kvm_stats_header kvm_vcpu_stats_header;
->  extern const struct _kvm_stats_desc kvm_vcpu_stats_desc[];
->  
->  #ifdef CONFIG_KVM_GENERIC_MMU_NOTIFIER
-> +int kvm_arch_flush_tlb_if_young(void);
+...
+
+>   
+>   	/* Tell userspace about in-kernel device output levels */
+> diff --git a/arch/arm64/kvm/rme-exit.c b/arch/arm64/kvm/rme-exit.c
+> new file mode 100644
+> index 000000000000..5bf58c9b42b7
+> --- /dev/null
+> +++ b/arch/arm64/kvm/rme-exit.c
+> @@ -0,0 +1,180 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (C) 2023 ARM Ltd.
+> + */
 > +
->  static inline int mmu_invalidate_retry(struct kvm *kvm, unsigned long mmu_seq)
->  {
->  	if (unlikely(kvm->mmu_invalidate_in_progress))
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 38b498669ef9..5ebef8ef239c 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -595,6 +595,11 @@ static void kvm_null_fn(void)
->  }
->  #define IS_KVM_NULL_FN(fn) ((fn) == (void *)kvm_null_fn)
->  
-> +int __weak kvm_arch_flush_tlb_if_young(void)
+> +#include <linux/kvm_host.h>
+> +#include <kvm/arm_hypercalls.h>
+> +#include <kvm/arm_psci.h>
+> +
+> +#include <asm/rmi_smc.h>
+> +#include <asm/kvm_emulate.h>
+> +#include <asm/kvm_rme.h>
+> +#include <asm/kvm_mmu.h>
+> +
+> +typedef int (*exit_handler_fn)(struct kvm_vcpu *vcpu);
+> +
+> +static int rec_exit_reason_notimpl(struct kvm_vcpu *vcpu)
 > +{
-> +	return true;
+> +	struct realm_rec *rec = &vcpu->arch.rec;
+> +
+> +	pr_err("[vcpu %d] Unhandled exit reason from realm (ESR: %#llx)\n",
+> +	       vcpu->vcpu_id, rec->run->exit.esr);
+> +	return -ENXIO;
 > +}
+> +
+> +static int rec_exit_sync_dabt(struct kvm_vcpu *vcpu)
+> +{
+> +	return kvm_handle_guest_abort(vcpu);
+> +}
+> +
+> +static int rec_exit_sync_iabt(struct kvm_vcpu *vcpu)
+> +{
+> +	struct realm_rec *rec = &vcpu->arch.rec;
+> +
+> +	pr_err("[vcpu %d] Unhandled instruction abort (ESR: %#llx).\n",
+> +	       vcpu->vcpu_id, rec->run->exit.esr);
+> +	return -ENXIO;
+> +}
+> +
+> +static int rec_exit_sys_reg(struct kvm_vcpu *vcpu)
+> +{
+> +	struct realm_rec *rec = &vcpu->arch.rec;
+> +	unsigned long esr = kvm_vcpu_get_esr(vcpu);
+> +	int rt = kvm_vcpu_sys_get_rt(vcpu);
+> +	bool is_write = !(esr & 1);
+> +	int ret;
+> +
+> +	if (is_write)
+> +		vcpu_set_reg(vcpu, rt, rec->run->exit.gprs[0]);
+> +
+> +	ret = kvm_handle_sys_reg(vcpu);
+> +
+> +	if (ret >= 0 && !is_write)
+> +		rec->run->entry.gprs[0] = vcpu_get_reg(vcpu, rt);
+> +
+> +	return ret;
+> +}
+> +
+> +static exit_handler_fn rec_exit_handlers[] = {
+> +	[0 ... ESR_ELx_EC_MAX]	= rec_exit_reason_notimpl,
+> +	[ESR_ELx_EC_SYS64]	= rec_exit_sys_reg,
+> +	[ESR_ELx_EC_DABT_LOW]	= rec_exit_sync_dabt,
+> +	[ESR_ELx_EC_IABT_LOW]	= rec_exit_sync_iabt
+> +};
+> +
+> +static int rec_exit_psci(struct kvm_vcpu *vcpu)
+> +{
+> +	struct realm_rec *rec = &vcpu->arch.rec;
+> +	int i;
+> +	int ret;
+> +
+> +	for (i = 0; i < REC_RUN_GPRS; i++)
+> +		vcpu_set_reg(vcpu, i, rec->run->exit.gprs[i]);
+> +
+> +	ret = kvm_smccc_call_handler(vcpu);
+> +
+> +	for (i = 0; i < REC_RUN_GPRS; i++)
+> +		rec->run->entry.gprs[i] = vcpu_get_reg(vcpu, i);
+> +
+> +	return ret;
+> +}
+> +
+> +static int rec_exit_ripas_change(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm *kvm = vcpu->kvm;
+> +	struct realm *realm = &kvm->arch.realm;
+> +	struct realm_rec *rec = &vcpu->arch.rec;
+> +	unsigned long base = rec->run->exit.ripas_base;
+> +	unsigned long top = rec->run->exit.ripas_top;
+> +	unsigned long ripas = rec->run->exit.ripas_value & 1;
+> +	int ret = -EINVAL;
+> +
+> +	if (realm_is_addr_protected(realm, base) &&
+> +	    realm_is_addr_protected(realm, top - 1)) {
+> +		kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_page_cache,
+> +					   kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu));
+> +		write_lock(&kvm->mmu_lock);
+> +		ret = realm_set_ipa_state(vcpu, base, top, ripas);
+> +		write_unlock(&kvm->mmu_lock);
+> +	}
 
-I tend to find __weak functions a little ugly, but I think the gist of the
-diff looks good to me. Thanks for putting it together!
+There are couple of issues here :
+
+1. We don't verify if the range is covered by a memslot, for ripas == 
+RIPAS_RAM conversions and reject the request if not backed by memory.
+
+2. The realm_set_ipa_state() might have partially completed the request
+before it ran out of pages in the cache. And as such we should only
+let the VMM know about what was completed, below. So, we need some
+feedback from realm_set_ipa_state() to indicate the completed range.
+
+Rest looks fine to me.
+
+Suzuki
+
 
 > +
->  /* Iterate over each memslot intersecting [start, last] (inclusive) range */
->  #define kvm_for_each_memslot_in_hva_range(node, slots, start, last)	     \
->  	for (node = interval_tree_iter_first(&slots->hva_tree, start, last); \
-> @@ -611,6 +616,7 @@ static __always_inline kvm_mn_ret_t __kvm_handle_hva_range(struct kvm *kvm,
->  	struct kvm_gfn_range gfn_range;
->  	struct kvm_memory_slot *slot;
->  	struct kvm_memslots *slots;
-> +	bool need_flush = false;
->  	int i, idx;
->  
->  	if (WARN_ON_ONCE(range->end <= range->start))
-> @@ -663,10 +669,22 @@ static __always_inline kvm_mn_ret_t __kvm_handle_hva_range(struct kvm *kvm,
->  					break;
->  			}
->  			r.ret |= range->handler(kvm, &gfn_range);
+> +	WARN(ret && ret != -ENOMEM,
+> +	     "Unable to satisfy SET_IPAS for %#lx - %#lx, ripas: %#lx\n",
+> +	     base, top, ripas);
 > +
-> +		       /*
-> +			* Use a precise gfn-based TLB flush when possible, as
-> +			* most mmu_notifier events affect a small-ish range.
-> +			* Fall back to a full TLB flush if the gfn-based flush
-> +			* fails, and don't bother trying the gfn-based flush
-> +			* if a full flush is already pending.
-> +			*/
-> +		       if (range->flush_on_ret && !need_flush && r.ret &&
-> +			   kvm_arch_flush_remote_tlbs_range(kvm, gfn_range.start,
-> +							    gfn_range.end - gfn_range.start + 1))
+> +	/* Exit to VMM to complete the change */
+> +	kvm_prepare_memory_fault_exit(vcpu, base, top - base, false, false,
+> +				      ripas == 1);
+> +
+> +	return 0;
+> +}
+> +
+> +static void update_arch_timer_irq_lines(struct kvm_vcpu *vcpu)
+> +{
+> +	struct realm_rec *rec = &vcpu->arch.rec;
+> +
+> +	__vcpu_sys_reg(vcpu, CNTV_CTL_EL0) = rec->run->exit.cntv_ctl;
+> +	__vcpu_sys_reg(vcpu, CNTV_CVAL_EL0) = rec->run->exit.cntv_cval;
+> +	__vcpu_sys_reg(vcpu, CNTP_CTL_EL0) = rec->run->exit.cntp_ctl;
+> +	__vcpu_sys_reg(vcpu, CNTP_CVAL_EL0) = rec->run->exit.cntp_cval;
+> +
+> +	kvm_realm_timers_update(vcpu);
+> +}
+> +
+> +/*
+> + * Return > 0 to return to guest, < 0 on error, 0 (and set exit_reason) on
+> + * proper exit to userspace.
+> + */
+> +int handle_rme_exit(struct kvm_vcpu *vcpu, int rec_run_ret)
+> +{
+> +	struct realm_rec *rec = &vcpu->arch.rec;
+> +	u8 esr_ec = ESR_ELx_EC(rec->run->exit.esr);
+> +	unsigned long status, index;
+> +
+> +	status = RMI_RETURN_STATUS(rec_run_ret);
+> +	index = RMI_RETURN_INDEX(rec_run_ret);
+> +
+> +	/*
+> +	 * If a PSCI_SYSTEM_OFF request raced with a vcpu executing, we might
+> +	 * see the following status code and index indicating an attempt to run
+> +	 * a REC when the RD state is SYSTEM_OFF.  In this case, we just need to
+> +	 * return to user space which can deal with the system event or will try
+> +	 * to run the KVM VCPU again, at which point we will no longer attempt
+> +	 * to enter the Realm because we will have a sleep request pending on
+> +	 * the VCPU as a result of KVM's PSCI handling.
+> +	 */
+> +	if (status == RMI_ERROR_REALM && index == 1) {
+> +		vcpu->run->exit_reason = KVM_EXIT_UNKNOWN;
+> +		return 0;
+> +	}
+> +
+> +	if (rec_run_ret)
+> +		return -ENXIO;
+> +
+> +	vcpu->arch.fault.esr_el2 = rec->run->exit.esr;
+> +	vcpu->arch.fault.far_el2 = rec->run->exit.far;
+> +	vcpu->arch.fault.hpfar_el2 = rec->run->exit.hpfar;
+> +
+> +	update_arch_timer_irq_lines(vcpu);
+> +
+> +	/* Reset the emulation flags for the next run of the REC */
+> +	rec->run->entry.flags = 0;
+> +
+> +	switch (rec->run->exit.exit_reason) {
+> +	case RMI_EXIT_SYNC:
+> +		return rec_exit_handlers[esr_ec](vcpu);
+> +	case RMI_EXIT_IRQ:
+> +	case RMI_EXIT_FIQ:
+> +		return 1;
+> +	case RMI_EXIT_PSCI:
+> +		return rec_exit_psci(vcpu);
+> +	case RMI_EXIT_RIPAS_CHANGE:
+> +		return rec_exit_ripas_change(vcpu);
+> +	}
 
-What's that '+ 1' needed for here?
+I guess, the RMI_EXIT_HOST_CALL could be handled here similar to the 
+rec_exit_psci() ?
 
-Will
+Suzuki
