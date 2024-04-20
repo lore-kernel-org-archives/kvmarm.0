@@ -1,118 +1,209 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3AB3625;
-	Sat, 20 Apr 2024 12:19:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B2673FE58
+	for <kvmarm@lists.linux.dev>; Sat, 20 Apr 2024 19:08:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713615543; cv=none; b=VsLrmQMckV0yP4ocJQfe0ZXbIvSZyFPkiaQ7D6jsYuM5nFSen6asXoUMptkkvySwjYfaVE3PQZn78MTKbVPdDuthHB7FT/F7+w4PVtz8DfgKZQve/QQ+HAVSg0U4Z3nyDNoP1pH0hpV3CvPaPIlKywA5xo682iF8dw9Gdsuys4M=
+	t=1713640120; cv=none; b=fi8y0hKHLnS0vXPG92rQs6E7sDUZ5xirUIYaXq8x2sIOqMrWYvPoWEPiT2acMK/29ymPswq3YQ8gYnLOk0Snc+h6muBampVSzINur3wa72BeD9Rpaztodrr25eEAzWH1zaz5eYu423g3BKhrPFw4+8xCdQmaUC3FuoEZzVoAYjw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713615543; c=relaxed/simple;
-	bh=s4mWIXWxyht0aSXhXrZOAfvyD8lmlWG8BLqbOkw+Oek=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=u2r54xLw9i0+xb/g81iBynnsWOPjlgscOQVwurEx2TZDHBu9968PM2cgMELJDPPM6yHsK8iqTsgP9AcKMmm6UpUIePSEsd98hr9sKuVvPfK0nhovkenK7q7HfR7fJLPH4e4Mx7WLnrkTg1xP/gyeMtjN7Yp+NIe8PGYfNAYPoEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B1odxXIU; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1713640120; c=relaxed/simple;
+	bh=WFL0kHFdG95wcA5hb20tEohy3akzzUxLXaZlNTjiH4Q=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RUlalJnbSSIVRLXXW7XVIbQdDPJnTHcwP+Nov1/c5SnOyzbiH6y3L2Dd45VBEuayiWOKMUnQngDUL12s75rGbKXXfN15j2UIZqYsTaepm9RGCSNORmYb/WKs0psXeVIosykknYNZWJsuoO6ungwv/mPCpXbqHQO+Y1JGi77B+lk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F2mj0bdd; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B1odxXIU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76BBFC072AA;
-	Sat, 20 Apr 2024 12:19:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F2mj0bdd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2C9CC116B1;
+	Sat, 20 Apr 2024 19:08:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713615542;
-	bh=s4mWIXWxyht0aSXhXrZOAfvyD8lmlWG8BLqbOkw+Oek=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=B1odxXIUau035zhgfF8Zfh6CORUGFChANdTt/3W8+S6MP0skq+XWNg+QgPpv5a5+j
-	 DweqqgggacqSR4JQkH9MPUGCn4xjp3HxK7Fy45PxI8LEDC90kEs5p5SR4LR4MfiMlA
-	 3AV2ZQIZkYqDWBEUUTIoxENqTn2zwMxLyAc5EjJLkRBA8+ZiPSSqG18ms8jh5HqvHB
-	 buboXVbTq8PNhe0FehlSaEaAACK/MRzS0eXmxo6EbkXJymmd/PWUgCfYRt1lx0MngN
-	 5G2DqzWjHskU4NpaPgRFqYKehvedCKP6dtwY5c2ZBgOWA6NOr6Dq4L/WwmeuFLnzIs
-	 OGyMhBj6tUkRQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	s=k20201202; t=1713640120;
+	bh=WFL0kHFdG95wcA5hb20tEohy3akzzUxLXaZlNTjiH4Q=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=F2mj0bdd99AIxw4gJxYHowwdMHj4R0QkjFKXC+Nmva+LppbgQaVzrS7F4n3B1UBil
+	 mEQMWMBaT6LQUbkqR3tMjchkYVJLfNBkApn0et1tIW+3RtsjyCQ4XGJlCrnvphUdPD
+	 vhMkqEcU+vPlbcKes4fEYnXeErTC+ECJy3mwr8KVIM/z/IxisjnFUrBsl0XhtSdQs0
+	 rGRDjSC/jjLOdmZ7ExqttI0yMtELilNT7NaBP58Kb/PtS7TEtKgFpwti2skMxMPX3a
+	 JkvJzcVD94F39AGcy1uuqJQjNJTMmREijZ86UD7XVSC+XXL6C6R72Wvw6rgjzbnpzS
+	 GpWYMeKlzltdg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1ry9gK-006LiQ-6G;
-	Sat, 20 Apr 2024 13:19:00 +0100
+	id 1ryG4j-006PJf-I8;
+	Sat, 20 Apr 2024 20:08:37 +0100
+Date: Sat, 20 Apr 2024 20:08:36 +0100
+Message-ID: <87wmorrgwb.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Marc Zyngier <maz@kernel.org>
-Cc: James Morse <james.morse@arm.com>,
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Mostafa Saleh <smostafa@google.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v4 00/15] KVM/arm64: Add NV support for ERET and PAuth
-Date: Sat, 20 Apr 2024 13:18:55 +0100
-Message-Id: <171361549214.2166024.2127742043464371496.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240419102935.1935571-1-maz@kernel.org>
-References: <20240419102935.1935571-1-maz@kernel.org>
+	Eric Auger <eric.auger@redhat.com>
+Subject: Re: [PATCH v2 09/19] KVM: arm64: vgic-its: Maintain a translation cache per ITS
+In-Reply-To: <20240419223842.951452-10-oliver.upton@linux.dev>
+References: <20240419223842.951452-1-oliver.upton@linux.dev>
+	<20240419223842.951452-10-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com, tabba@google.com, smostafa@google.com, will@kernel.org, catalin.marinas@arm.com
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, eric.auger@redhat.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 19 Apr 2024 11:29:20 +0100, Marc Zyngier wrote:
-> This is the fourth version of this series introducing ERET and PAuth
-> support for NV guests, and now the base prefix for the NV support
-> series.
+On Fri, 19 Apr 2024 23:38:32 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Unless someone shouts, I intend to take this in for 6.10.
+> Within the context of a single ITS, it is possible to use an xarray to
+> cache the device ID & event ID translation to a particular irq
+> descriptor. Take advantage of this to build a translation cache capable
+> of fitting all valid translations for a given ITS.
 > 
-> * From v3 [3]
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/kvm/vgic/vgic-its.c | 26 +++++++++++++++++++++++++-
+>  include/kvm/arm_vgic.h         |  6 ++++++
+>  2 files changed, 31 insertions(+), 1 deletion(-)
 > 
-> [...]
+> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> index be17a53d16ef..fd576377c084 100644
+> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> @@ -530,6 +530,11 @@ static struct vgic_its *__vgic_doorbell_to_its(struct kvm *kvm, gpa_t db)
+>  	return iodev->its;
+>  }
+>  
+> +static unsigned long vgic_its_cache_key(u32 devid, u32 eventid)
+> +{
+> +	return (((unsigned long)devid) << 32) | eventid;
+> +}
+> +
 
-Applied to next, thanks!
+Although this is correct, you may want to use the fact that our
+EIDs/DIDs are limited to 16 bits, as advertised in GITS_TYPER. By
+having a more compact index, you'd get better performance from the
+xarray itself (this is alluded to in the documentation).
 
-[01/15] KVM: arm64: Harden __ctxt_sys_reg() against out-of-range values
-        commit: 1b06b99f25e0c957feb488ff8117a37f592c3866
-[02/15] KVM: arm64: Add helpers for ESR_ELx_ERET_ISS_ERET*
-        commit: 80d8b55a57a18b0b1dac951ea28bfd657b14facc
-[03/15] KVM: arm64: Constraint PAuth support to consistent implementations
-        commit: a07e9345615fb7e7dd4fd5d88d5aaf49085739d0
-[04/15] KVM: arm64: nv: Drop VCPU_HYP_CONTEXT flag
-        commit: 6f57c6be2a0889cc0fd32b0cd2eb25dfee20dde3
-[05/15] KVM: arm64: nv: Configure HCR_EL2 for FEAT_NV2
-        commit: 04ab519bb86df10bb8b72054fce9af1d72c36805
-[06/15] KVM: arm64: nv: Add trap forwarding for ERET and SMC
-        commit: 95537f06b9e826766f32e513d714e1cda468ef15
-[07/15] KVM: arm64: nv: Fast-track 'InHost' exception returns
-        commit: dd0717a998f77f449c70bee82626cbf9913fe78d
-[08/15] KVM: arm64: nv: Honor HFGITR_EL2.ERET being set
-        commit: 4cc3f31914d6df9dba8825db933d19c60028f5a8
-[09/15] KVM: arm64: nv: Handle HCR_EL2.{API,APK} independently
-        commit: 279946ada1f26a905061d0d6f134fff9e7b14239
-[10/15] KVM: arm64: nv: Reinject PAC exceptions caused by HCR_EL2.API==0
-        commit: 15db034733e4df3ca8ab4bf0a593a8a9b4860541
-[11/15] KVM: arm64: nv: Add kvm_has_pauth() helper
-        commit: 719f5206a8fd8336d23ccda6fe2a3287fbfb4c92
-[12/15] KVM: arm64: nv: Add emulation for ERETAx instructions
-        commit: 6ccc971ee2c61a1ffb487e46bf6184f7df6aacfb
-[13/15] KVM: arm64: nv: Handle ERETA[AB] instructions
-        commit: 213b3d1ea1612c6d26153be446923831c4534689
-[14/15] KVM: arm64: nv: Advertise support for PAuth
-        commit: f4f6a95bac49144c0d507c24af9905bb999a4579
-[15/15] KVM: arm64: Drop trapping of PAuth instructions/keys
-        commit: 814ad8f96e929fa9c60bd360d2f7bccfc1df0111
+>  static struct vgic_irq *__vgic_its_check_cache(struct vgic_dist *dist,
+>  					       phys_addr_t db,
+>  					       u32 devid, u32 eventid)
+> @@ -583,6 +588,7 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
+>  				       u32 devid, u32 eventid,
+>  				       struct vgic_irq *irq)
+>  {
+> +	unsigned long cache_key = vgic_its_cache_key(devid, eventid);
+>  	struct vgic_dist *dist = &kvm->arch.vgic;
+>  	struct vgic_translation_cache_entry *cte;
+>  	unsigned long flags;
+> @@ -592,6 +598,9 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
+>  	if (irq->hw)
+>  		return;
+>  
+> +	if (xa_reserve_irq(&its->translation_cache, cache_key, GFP_KERNEL_ACCOUNT))
+> +		return;
+> +
+>  	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
+>  
+>  	if (unlikely(list_empty(&dist->lpi_translation_cache)))
+> @@ -624,6 +633,11 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
+>  	 */
+>  	lockdep_assert_held(&its->its_lock);
+>  	vgic_get_irq_kref(irq);
+> +	/*
+> +	 * Get a second ref for the ITS' translation cache. This will
+> +	 * disappear.
 
-Cheers,
+Is that for the *global* translation cache? Or this one? I guess there
+is one for each, but a clearer comment would help, even if this gets
+removed three patches down the line.
+
+> +	 */
+> +	vgic_get_irq_kref(irq);
+>  
+>  	cte->db		= db;
+>  	cte->devid	= devid;
+> @@ -633,6 +647,7 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
+>  	/* Move the new translation to the head of the list */
+>  	list_move(&cte->entry, &dist->lpi_translation_cache);
+>  
+> +	xa_store(&its->translation_cache, cache_key, irq, 0);
+>  out:
+>  	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
+>  }
+> @@ -641,7 +656,8 @@ static void vgic_its_invalidate_cache(struct vgic_its *its)
+>  {
+>  	struct vgic_dist *dist = &kvm->arch.vgic;
+>  	struct vgic_translation_cache_entry *cte;
+> -	unsigned long flags;
+> +	unsigned long flags, idx;
+> +	struct vgic_irq *irq;
+>  
+>  	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
+>  
+> @@ -658,6 +674,11 @@ static void vgic_its_invalidate_cache(struct vgic_its *its)
+>  	}
+>  
+>  	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
+> +
+> +	xa_for_each(&its->translation_cache, idx, irq) {
+> +		xa_erase(&its->translation_cache, idx);
+> +		vgic_put_irq(its->dev->kvm, irq);
+> +	}
+>  }
+>  
+>  void vgic_its_invalidate_all_caches(struct kvm *kvm)
+> @@ -1967,6 +1988,7 @@ static int vgic_its_create(struct kvm_device *dev, u32 type)
+>  
+>  	INIT_LIST_HEAD(&its->device_list);
+>  	INIT_LIST_HEAD(&its->collection_list);
+> +	xa_init_flags(&its->translation_cache, XA_FLAGS_LOCK_IRQ);
+>  
+>  	dev->kvm->arch.vgic.msis_require_devid = true;
+>  	dev->kvm->arch.vgic.has_its = true;
+> @@ -1997,6 +2019,8 @@ static void vgic_its_destroy(struct kvm_device *kvm_dev)
+>  
+>  	vgic_its_free_device_list(kvm, its);
+>  	vgic_its_free_collection_list(kvm, its);
+> +	vgic_its_invalidate_cache(its);
+> +	xa_destroy(&its->translation_cache);
+>  
+>  	mutex_unlock(&its->its_lock);
+>  	kfree(its);
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index ac7f15ec1586..0b027ed71dac 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -210,6 +210,12 @@ struct vgic_its {
+>  	struct mutex		its_lock;
+>  	struct list_head	device_list;
+>  	struct list_head	collection_list;
+> +
+> +	/*
+> +	 * Caches the (device_id, event_id) -> vgic_irq translation for
+> +	 * *deliverable* LPIs.
+
+Can you clarify what "deliverable" LPIs are? That's not an
+architectural term, and I'd rather you describe the conditions that
+allow the LPI to be cached (my guess is: mapped and enabled).
+
+> +	 */
+> +	struct xarray		translation_cache;
+>  };
+>  
+>  struct vgic_state_iter;
+
+Thanks,
 
 	M.
+
 -- 
 Without deviation from the norm, progress is not possible.
-
-
