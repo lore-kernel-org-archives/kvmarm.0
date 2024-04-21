@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A74E3D53E
-	for <kvmarm@lists.linux.dev>; Sun, 21 Apr 2024 09:54:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7ED833F7
+	for <kvmarm@lists.linux.dev>; Sun, 21 Apr 2024 10:30:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713693263; cv=none; b=lC1PQP5fevbBITt4KCZ7FL+yO+h9W+dMNEgkMP544gKPOzC8QSUi4VeCmitDXcrhPNMd+PrCCwxfzupIR6ygxELjI44isXP6JTCpsNhdKitjOwPFk3sCWpdtEMoaC250h8eEt8KcpX2aZfkL5J/EyNXQHVEsh1/N2FcSje11V9Y=
+	t=1713695412; cv=none; b=Ex4HupbxN7YLclX8o9c8jtHJQOeiNOK2MmlClR8D86++T1dQJrYLNtcTordAnrLNl9nXNptalue+eBsDV2ISSJnr8AiaVejnNPQe56H/Fgs/h1VAFal3V124ZKXaIJ+bBGK9C3ZzrFB3eHvpXT2UtZAoe0V0PdvydYcCd91yWKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713693263; c=relaxed/simple;
-	bh=yKZDKqhbwFu4n13B571jpPwl1i1u8xh5AVNphrBX/Jw=;
+	s=arc-20240116; t=1713695412; c=relaxed/simple;
+	bh=1XOqPZETFyNpmyua7ut3L/5x+o4LUqf4zkl3dtaG4ag=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=K9Fix1Ww9vhRr/sYCmPAH61yG2oVtWyuAseVtluwieqCf9ge3d26Ts5iVy9xdvNLJNK3k/Ji7/eNxifO0DF+78+VanL2+GFBFy7RHQQQF3jCAiUON7V04fcgnwO4pea7SZUsnbRbe9Y/o2o2mFIDot3TLGgMPdNeWavPKesQgik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tEKSK1p9; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=Oe94wo2rYF2bcWGP+FsZnFLL9lfzDBfSeuH3jy3hq+lz+wFf0+XVW0MP5iixi7IsZCLXwxvnlGT8slW8uSvWtj6iWPzAnKD1GtrcJi7b4NGI6xoZg5DEjgD5oTCWBGkPOt2Pij6EV9aNS8MEX2n+Pc00WG1oz0rSZvZraiFFVoI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gq59IsJs; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tEKSK1p9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47EFBC113CE;
-	Sun, 21 Apr 2024 09:54:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gq59IsJs"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B4F2C113CE;
+	Sun, 21 Apr 2024 10:30:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713693263;
-	bh=yKZDKqhbwFu4n13B571jpPwl1i1u8xh5AVNphrBX/Jw=;
+	s=k20201202; t=1713695412;
+	bh=1XOqPZETFyNpmyua7ut3L/5x+o4LUqf4zkl3dtaG4ag=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tEKSK1p9QAKIYuSSUSUCNkkCCD5w7iVo/qwjRf+rYZ161lBXKU40f05ZElwxMd9YO
-	 fdLtOBy0z0UsCJM6CKFXLQYawAeflj/Z/fiLmiigRoF+cz2R8LLfqse40NrCTMy+r/
-	 KeUyPGXJxUTW725Ur3bEdOOka+Ukm/6k+RUEOOMHsu/yPDsphLUiumyZTmJOLwzMSW
-	 H6AUxAwZvT1CQ6Kp9RiuTvO1edP39VLrKHxO7Vb2KXDYFDsgKp0hv4n2VXsk9rrrC1
-	 yEvRFpbYLrd4nfLhOl2E1g94y6HOF5E3xyD/aez+FL6pTVVdh3CZSZI/irWO2Mp4Rt
-	 Q6paI6q3WpFqg==
+	b=Gq59IsJsnD8sFCU0VwqvRFIflsdcaa/0evXCHe5wJac2RA4dJavixVtTjhsKAZ8ar
+	 C6I/NppRyvlwMoSkkJ/153qjHXeKAuFKUWKJSlSlcZDsb3nTnMhAK3DDgimbook7xo
+	 b4QoOaromWjYjVavSCYzVGsnNLRgB5TiXrAIxj3DlE8zuz+ibC1413UnnuexlGXIDG
+	 4kdwswcXxSicV6cuOM3cnXE5sfkAZXKdRvbYTJ1Py/B4m8Qsoi6EA+mtJ1LD47096J
+	 pi67PV/LpkZJ1mtrOw8CJpiLxYClMKwBfSPznHnx+lTgQrRniGBuo3K5wytdEXIigN
+	 ABTu5MYeSrKKw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1ryTts-006VyR-RJ;
-	Sun, 21 Apr 2024 10:54:21 +0100
-Date: Sun, 21 Apr 2024 10:54:20 +0100
-Message-ID: <86o7a3qbw3.wl-maz@kernel.org>
+	id 1ryUSY-006WS2-1V;
+	Sun, 21 Apr 2024 11:30:10 +0100
+Date: Sun, 21 Apr 2024 11:30:09 +0100
+Message-ID: <86mspnqa8e.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
@@ -41,10 +41,10 @@ Cc: kvmarm@lists.linux.dev,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v2 07/19] KVM: arm64: vgic-its: Scope translation cache invalidations to an ITS
-In-Reply-To: <20240419223842.951452-8-oliver.upton@linux.dev>
+Subject: Re: [PATCH v2 09/19] KVM: arm64: vgic-its: Maintain a translation cache per ITS
+In-Reply-To: <20240419223842.951452-10-oliver.upton@linux.dev>
 References: <20240419223842.951452-1-oliver.upton@linux.dev>
-	<20240419223842.951452-8-oliver.upton@linux.dev>
+	<20240419223842.951452-10-oliver.upton@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -60,49 +60,76 @@ X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@a
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 19 Apr 2024 23:38:30 +0100,
+On Fri, 19 Apr 2024 23:38:32 +0100,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> As the current LPI translation cache is global, the corresponding
-> invalidation helpers are also globally-scoped. In anticipation of
-> constructing a translation cache per ITS, add a helper for scoped cache
-> invalidations.
-> 
-> We still need to support global invalidations when LPIs are toggled on
-> a redistributor, as a property of the translation cache is that all
-> stored LPIs are known to be delieverable.
+> Within the context of a single ITS, it is possible to use an xarray to
+> cache the device ID & event ID translation to a particular irq
+> descriptor. Take advantage of this to build a translation cache capable
+> of fitting all valid translations for a given ITS.
 > 
 > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > ---
->  arch/arm64/kvm/vgic/vgic-its.c     | 45 ++++++++++++++++++++++--------
->  arch/arm64/kvm/vgic/vgic-mmio-v3.c |  2 +-
->  arch/arm64/kvm/vgic/vgic.h         |  2 +-
->  3 files changed, 35 insertions(+), 14 deletions(-)
+>  arch/arm64/kvm/vgic/vgic-its.c | 26 +++++++++++++++++++++++++-
+>  include/kvm/arm_vgic.h         |  6 ++++++
+>  2 files changed, 31 insertions(+), 1 deletion(-)
 > 
 > diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-> index 441134ad674e..4afd42b6a16c 100644
+> index be17a53d16ef..fd576377c084 100644
 > --- a/arch/arm64/kvm/vgic/vgic-its.c
 > +++ b/arch/arm64/kvm/vgic/vgic-its.c
-> @@ -23,6 +23,8 @@
->  #include "vgic.h"
->  #include "vgic-mmio.h"
->  
-> +static struct kvm_device_ops kvm_arm_vgic_its_ops;
-> +
->  static int vgic_its_save_tables_v0(struct vgic_its *its);
->  static int vgic_its_restore_tables_v0(struct vgic_its *its);
->  static int vgic_its_commit_v0(struct vgic_its *its);
-> @@ -616,7 +618,7 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
->  	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
+> @@ -530,6 +530,11 @@ static struct vgic_its *__vgic_doorbell_to_its(struct kvm *kvm, gpa_t db)
+>  	return iodev->its;
 >  }
 >  
-> -void vgic_its_invalidate_cache(struct kvm *kvm)
-> +static void vgic_its_invalidate_cache(struct vgic_its *its)
+> +static unsigned long vgic_its_cache_key(u32 devid, u32 eventid)
+> +{
+> +	return (((unsigned long)devid) << 32) | eventid;
+> +}
+> +
+>  static struct vgic_irq *__vgic_its_check_cache(struct vgic_dist *dist,
+>  					       phys_addr_t db,
+>  					       u32 devid, u32 eventid)
+> @@ -583,6 +588,7 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
+>  				       u32 devid, u32 eventid,
+>  				       struct vgic_irq *irq)
 >  {
+> +	unsigned long cache_key = vgic_its_cache_key(devid, eventid);
 >  	struct vgic_dist *dist = &kvm->arch.vgic;
+>  	struct vgic_translation_cache_entry *cte;
+>  	unsigned long flags;
+> @@ -592,6 +598,9 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
+>  	if (irq->hw)
+>  		return;
+>  
+> +	if (xa_reserve_irq(&its->translation_cache, cache_key, GFP_KERNEL_ACCOUNT))
+> +		return;
+> +
 
-Err. How does this work? Looks like you got the patch splitting wrong
-and that it doesn't bisect until patch #11.
+This thing tickles me a bit. What does it mean from the PoV of the
+caller? That although we have missed in the cache initially, someone
+else is populating it?
+
+The final code reads like this:
+
+	if (xa_reserve_irq(&its->translation_cache, cache_key, GFP_KERNEL_ACCOUNT))
+		return;
+
+	xa_lock_irqsave(&its->translation_cache, flags);
+	rcu_read_lock();
+
+	/*
+	 * We could have raced with another CPU caching the same
+	 * translation behind our back, so let's check it is not in
+	 * already
+	 */
+	db = its->vgic_its_base + GITS_TRANSLATER;
+	if (__vgic_its_check_cache(kvm, db, devid, eventid))
+		goto out;
+
+Does it mean we could drop this check? And even relax the locking?
+
+Thanks,
 
 	M.
 
