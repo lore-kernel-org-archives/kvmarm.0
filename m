@@ -1,209 +1,220 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B2673FE58
-	for <kvmarm@lists.linux.dev>; Sat, 20 Apr 2024 19:08:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 161B636C
+	for <kvmarm@lists.linux.dev>; Sun, 21 Apr 2024 00:20:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713640120; cv=none; b=fi8y0hKHLnS0vXPG92rQs6E7sDUZ5xirUIYaXq8x2sIOqMrWYvPoWEPiT2acMK/29ymPswq3YQ8gYnLOk0Snc+h6muBampVSzINur3wa72BeD9Rpaztodrr25eEAzWH1zaz5eYu423g3BKhrPFw4+8xCdQmaUC3FuoEZzVoAYjw=
+	t=1713658809; cv=none; b=ofK0erRO1n4wuxazvQjAEmxueNqbbEo67n9CDTMEjMmQBaUUlbbeaACfSqqbwIp/vqB6WoOgfiBpW8a1VNjBrOJ5SVlj8u4lD1wCbohCFjr6X/9xUHvOtu7Djgy/kRPu+7H9hnCyNFayCFXVhGWvIeahsuFEMX2B2/iIKjQoq6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713640120; c=relaxed/simple;
-	bh=WFL0kHFdG95wcA5hb20tEohy3akzzUxLXaZlNTjiH4Q=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RUlalJnbSSIVRLXXW7XVIbQdDPJnTHcwP+Nov1/c5SnOyzbiH6y3L2Dd45VBEuayiWOKMUnQngDUL12s75rGbKXXfN15j2UIZqYsTaepm9RGCSNORmYb/WKs0psXeVIosykknYNZWJsuoO6ungwv/mPCpXbqHQO+Y1JGi77B+lk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F2mj0bdd; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1713658809; c=relaxed/simple;
+	bh=3iI/ZwfiK90rE1vl9rkJqobbZPBa+/ZCwxY8qPyIrUY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bdDBdw/+L0a1/bsivP+IeFfN/JooZAPzeVE0F2LEklsegTLpwam4GVL+dSYshHbyRPursipmcVtm1A9mI1Qi1VpAp77Taf9mlEiXxHWVOTw8eHs5GnFTBJNgHGWTqx0LB4LSKTc/9x3zpFN5LTchX2/Y7hOHy0pmvtFfvTfQpI0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dQQE8ALq; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F2mj0bdd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2C9CC116B1;
-	Sat, 20 Apr 2024 19:08:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713640120;
-	bh=WFL0kHFdG95wcA5hb20tEohy3akzzUxLXaZlNTjiH4Q=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=F2mj0bdd99AIxw4gJxYHowwdMHj4R0QkjFKXC+Nmva+LppbgQaVzrS7F4n3B1UBil
-	 mEQMWMBaT6LQUbkqR3tMjchkYVJLfNBkApn0et1tIW+3RtsjyCQ4XGJlCrnvphUdPD
-	 vhMkqEcU+vPlbcKes4fEYnXeErTC+ECJy3mwr8KVIM/z/IxisjnFUrBsl0XhtSdQs0
-	 rGRDjSC/jjLOdmZ7ExqttI0yMtELilNT7NaBP58Kb/PtS7TEtKgFpwti2skMxMPX3a
-	 JkvJzcVD94F39AGcy1uuqJQjNJTMmREijZ86UD7XVSC+XXL6C6R72Wvw6rgjzbnpzS
-	 GpWYMeKlzltdg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1ryG4j-006PJf-I8;
-	Sat, 20 Apr 2024 20:08:37 +0100
-Date: Sat, 20 Apr 2024 20:08:36 +0100
-Message-ID: <87wmorrgwb.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v2 09/19] KVM: arm64: vgic-its: Maintain a translation cache per ITS
-In-Reply-To: <20240419223842.951452-10-oliver.upton@linux.dev>
-References: <20240419223842.951452-1-oliver.upton@linux.dev>
-	<20240419223842.951452-10-oliver.upton@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dQQE8ALq"
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-571e13cd856so9151a12.0
+        for <kvmarm@lists.linux.dev>; Sat, 20 Apr 2024 17:20:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713658806; x=1714263606; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oz0Tuj6DlzITFTKo1WuqGSj2CD5OL4MfynPTYKg49wk=;
+        b=dQQE8ALqOlbWoWI7mIcmr8tbyBWztxgvyVXi4oNlapGWrIU1YThD63yW/Phsx1jGSu
+         acoLXgaYMEC29K7ghfBoaktnzaQvGOtMhdfh4oCC4JYoNzj6swrevWlQmUjdVMpc9ASs
+         U+g0fUV33ujXMcob7TyW/x/8GCmpWFuY/aeFl3r0CQHYUTjAIq79qmnwwPKZ8enCPrv5
+         fvqVBGUN8ye73MD9Z/gNrBe1aQ0LkO1TTFOnqbFcbw+yY30Qc/f4XLvMaZfeao3hB9Nx
+         AIRmcpVy2fc1RtBtEHe1ZMfX4xySeye6aBpopBSIzsNFmucWKUSyU/oXJl/m0OFImuQe
+         5YKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713658806; x=1714263606;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oz0Tuj6DlzITFTKo1WuqGSj2CD5OL4MfynPTYKg49wk=;
+        b=JrHWU52WOkQ1CafMuM4NYc/uCGfcSlNNd4Mvj9hAsUBRTmMX0PpgQDvf8c/1oR9zPj
+         AoFNZNuI3NJM2c2QSujOTTkUvsW0aAldQhy2z29+ub5v1eB2RYf36Fi2z30lKPVURh/X
+         kmpon0/K4SVdtG6A57NY1jbnIi7OZeaHATVXE77Vm+hkCn8bKgURultrko0M6TTgYXIq
+         sSLiFyJ/Wd3RsZI1vxM4/SZzttH3LyuWGIVeQ9Y23jsQhvisk653DL70/cEkQLrmeGzq
+         vruQpznhITr1bWRRJaBEQy8fX4Gf4SaHyutpT/WarcJ+vxWiT/Ro+Zf92apzpIEzgkEm
+         Sivg==
+X-Forwarded-Encrypted: i=1; AJvYcCWO2Ejl6mWRAayD9XEqpSDySbhHiQzb8ef+KIZRQmzRq9LQTaSQTTcKccUY8DVSPNFx0FnueJ7AY9wprnksraVdHLFog1jP
+X-Gm-Message-State: AOJu0YxfeiKjsFDOWX7KBdXWLZDz1FDwbIWWP6U/kefFsMcXRGA/dGyO
+	9zQl8KeemO0tC8dMVvvjJYmu1/bQ63TRPnsBPo+4r8UXqJWAxxPp6pZqAnfjbKGDL/8MET6darU
+	E5v1YG7bsOF8c8YL5wD87Rw/IKzaxYcMX1dNx
+X-Google-Smtp-Source: AGHT+IFnrvPCNneqerzD05ClyZhnz2EnkFQKegicnMvDgyA8/2oshU9h8CQq7U+j3yGfhKQTM0feyi/OqvJPICIP0e4=
+X-Received: by 2002:a50:ec95:0:b0:571:fc6f:426a with SMTP id
+ e21-20020a50ec95000000b00571fc6f426amr28507edr.6.1713658806100; Sat, 20 Apr
+ 2024 17:20:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, eric.auger@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20240401232946.1837665-1-jthoughton@google.com>
+ <20240401232946.1837665-6-jthoughton@google.com> <ZhgZHJH3c5Lb5SBs@google.com>
+ <Zhgdw8mVNYZvzgWH@google.com> <CADrL8HUpHQQbQCxd8JGVRr=eT6e4SYyfYZ7eTDsv8PK44FYV_A@mail.gmail.com>
+ <ZiLc8OfXxc9QWxtg@google.com> <CADrL8HUmGFP=w5COnJzyJ+2a2gjCugqQg9WDXQ2ZAK7B9gJThA@mail.gmail.com>
+In-Reply-To: <CADrL8HUmGFP=w5COnJzyJ+2a2gjCugqQg9WDXQ2ZAK7B9gJThA@mail.gmail.com>
+From: Yu Zhao <yuzhao@google.com>
+Date: Sat, 20 Apr 2024 18:19:28 -0600
+Message-ID: <CAOUHufb5di7t4aHx7jNJvMd_L85b=xoJvO4V4RGi+nY78rpF_Q@mail.gmail.com>
+Subject: Re: [PATCH v3 5/7] KVM: x86: Participate in bitmap-based PTE aging
+To: James Houghton <jthoughton@google.com>
+Cc: David Matlack <dmatlack@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Sean Christopherson <seanjc@google.com>, 
+	Jonathan Corbet <corbet@lwn.net>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
+	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Shaoqin Huang <shahuang@redhat.com>, 
+	Gavin Shan <gshan@redhat.com>, Ricardo Koller <ricarkol@google.com>, 
+	Raghavendra Rao Ananta <rananta@google.com>, Ryan Roberts <ryan.roberts@arm.com>, 
+	David Rientjes <rientjes@google.com>, Axel Rasmussen <axelrasmussen@google.com>, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-mm@kvack.org, 
+	linux-trace-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 19 Apr 2024 23:38:32 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> Within the context of a single ITS, it is possible to use an xarray to
-> cache the device ID & event ID translation to a particular irq
-> descriptor. Take advantage of this to build a translation cache capable
-> of fitting all valid translations for a given ITS.
-> 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  arch/arm64/kvm/vgic/vgic-its.c | 26 +++++++++++++++++++++++++-
->  include/kvm/arm_vgic.h         |  6 ++++++
->  2 files changed, 31 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-> index be17a53d16ef..fd576377c084 100644
-> --- a/arch/arm64/kvm/vgic/vgic-its.c
-> +++ b/arch/arm64/kvm/vgic/vgic-its.c
-> @@ -530,6 +530,11 @@ static struct vgic_its *__vgic_doorbell_to_its(struct kvm *kvm, gpa_t db)
->  	return iodev->its;
->  }
->  
-> +static unsigned long vgic_its_cache_key(u32 devid, u32 eventid)
-> +{
-> +	return (((unsigned long)devid) << 32) | eventid;
-> +}
-> +
+On Fri, Apr 19, 2024 at 3:48=E2=80=AFPM James Houghton <jthoughton@google.c=
+om> wrote:
+>
+> On Fri, Apr 19, 2024 at 2:07=E2=80=AFPM David Matlack <dmatlack@google.co=
+m> wrote:
+> >
+> > On 2024-04-19 01:47 PM, James Houghton wrote:
+> > > On Thu, Apr 11, 2024 at 10:28=E2=80=AFAM David Matlack <dmatlack@goog=
+le.com> wrote:
+> > > > On 2024-04-11 10:08 AM, David Matlack wrote:
+> > > > bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+> > > > {
+> > > >         bool young =3D false;
+> > > >
+> > > >         if (!range->arg.metadata->bitmap && kvm_memslots_have_rmaps=
+(kvm))
+> > > >                 young =3D kvm_handle_gfn_range(kvm, range, kvm_age_=
+rmap);
+> > > >
+> > > >         if (tdp_mmu_enabled)
+> > > >                 young |=3D kvm_tdp_mmu_age_gfn_range(kvm, range);
+> > > >
+> > > >         return young;
+> > > > }
+> > > >
+> > > > bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+> > > > {
+> > > >         bool young =3D false;
+> > > >
+> > > >         if (!range->arg.metadata->bitmap && kvm_memslots_have_rmaps=
+(kvm))
+> > > >                 young =3D kvm_handle_gfn_range(kvm, range, kvm_test=
+_age_rmap);
+> > > >
+> > > >         if (tdp_mmu_enabled)
+> > > >                 young |=3D kvm_tdp_mmu_test_age_gfn(kvm, range);
+> > > >
+> > > >         return young;
+> > >
+> > >
+> > > Yeah I think this is the right thing to do. Given your other
+> > > suggestions (on patch 3), I think this will look something like this
+> > > -- let me know if I've misunderstood something:
+> > >
+> > > bool check_rmap =3D !bitmap && kvm_memslot_have_rmaps(kvm);
+> > >
+> > > if (check_rmap)
+> > >   KVM_MMU_LOCK(kvm);
+> > >
+> > > rcu_read_lock(); // perhaps only do this when we don't take the MMU l=
+ock?
+> > >
+> > > if (check_rmap)
+> > >   kvm_handle_gfn_range(/* ... */ kvm_test_age_rmap)
+> > >
+> > > if (tdp_mmu_enabled)
+> > >   kvm_tdp_mmu_test_age_gfn() // modified to be RCU-safe
+> > >
+> > > rcu_read_unlock();
+> > > if (check_rmap)
+> > >   KVM_MMU_UNLOCK(kvm);
+> >
+> > I was thinking a little different. If you follow my suggestion to first
+> > make the TDP MMU aging lockless, you'll end up with something like this
+> > prior to adding bitmap support (note: the comments are just for
+> > demonstrative purposes):
+> >
+> > bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+> > {
+> >         bool young =3D false;
+> >
+> >         /* Shadow MMU aging holds write-lock. */
+> >         if (kvm_memslots_have_rmaps(kvm)) {
+> >                 write_lock(&kvm->mmu_lock);
+> >                 young =3D kvm_handle_gfn_range(kvm, range, kvm_age_rmap=
+);
+> >                 write_unlock(&kvm->mmu_lock);
+> >         }
+> >
+> >         /* TDM MMU aging is lockless. */
+> >         if (tdp_mmu_enabled)
+> >                 young |=3D kvm_tdp_mmu_age_gfn_range(kvm, range);
+> >
+> >         return young;
+> > }
+> >
+> > Then when you add bitmap support it would look something like this:
+> >
+> > bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+> > {
+> >         unsigned long *bitmap =3D range->arg.metadata->bitmap;
+> >         bool young =3D false;
+> >
+> >         /* SHadow MMU aging holds write-lock and does not support bitma=
+p. */
+> >         if (kvm_memslots_have_rmaps(kvm) && !bitmap) {
+> >                 write_lock(&kvm->mmu_lock);
+> >                 young =3D kvm_handle_gfn_range(kvm, range, kvm_age_rmap=
+);
+> >                 write_unlock(&kvm->mmu_lock);
+> >         }
+> >
+> >         /* TDM MMU aging is lockless and supports bitmap. */
+> >         if (tdp_mmu_enabled)
+> >                 young |=3D kvm_tdp_mmu_age_gfn_range(kvm, range);
+> >
+> >         return young;
+> > }
+> >
+> > rcu_read_lock/unlock() would be called in kvm_tdp_mmu_age_gfn_range().
+>
+> Oh yes this is a lot better. I hope I would have seen this when it
+> came time to actually update this patch. Thanks.
+>
+> >
+> > That brings up a question I've been wondering about. If KVM only
+> > advertises support for the bitmap lookaround when shadow roots are not
+> > allocated, does that mean MGLRU will be blind to accesses made by L2
+> > when nested virtualization is enabled? And does that mean the Linux MM
+> > will think all L2 memory is cold (i.e. good candidate for swapping)
+> > because it isn't seeing accesses made by L2?
+>
+> Yes, I think so (for both questions). That's better than KVM not
+> participating in MGLRU aging at all, which is the case today (IIUC --
+> also ignoring the case where KVM accesses guest memory directly). We
+> could have MGLRU always invoke the mmu notifiers, but frequently
+> taking the MMU lock for writing might be worse than evicting when we
+> shouldn't. Maybe Yu tried this at some point, but I can't find any
+> results for this.
 
-Although this is correct, you may want to use the fact that our
-EIDs/DIDs are limited to 16 bits, as advertised in GITS_TYPER. By
-having a more compact index, you'd get better performance from the
-xarray itself (this is alluded to in the documentation).
-
->  static struct vgic_irq *__vgic_its_check_cache(struct vgic_dist *dist,
->  					       phys_addr_t db,
->  					       u32 devid, u32 eventid)
-> @@ -583,6 +588,7 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
->  				       u32 devid, u32 eventid,
->  				       struct vgic_irq *irq)
->  {
-> +	unsigned long cache_key = vgic_its_cache_key(devid, eventid);
->  	struct vgic_dist *dist = &kvm->arch.vgic;
->  	struct vgic_translation_cache_entry *cte;
->  	unsigned long flags;
-> @@ -592,6 +598,9 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
->  	if (irq->hw)
->  		return;
->  
-> +	if (xa_reserve_irq(&its->translation_cache, cache_key, GFP_KERNEL_ACCOUNT))
-> +		return;
-> +
->  	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
->  
->  	if (unlikely(list_empty(&dist->lpi_translation_cache)))
-> @@ -624,6 +633,11 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
->  	 */
->  	lockdep_assert_held(&its->its_lock);
->  	vgic_get_irq_kref(irq);
-> +	/*
-> +	 * Get a second ref for the ITS' translation cache. This will
-> +	 * disappear.
-
-Is that for the *global* translation cache? Or this one? I guess there
-is one for each, but a clearer comment would help, even if this gets
-removed three patches down the line.
-
-> +	 */
-> +	vgic_get_irq_kref(irq);
->  
->  	cte->db		= db;
->  	cte->devid	= devid;
-> @@ -633,6 +647,7 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
->  	/* Move the new translation to the head of the list */
->  	list_move(&cte->entry, &dist->lpi_translation_cache);
->  
-> +	xa_store(&its->translation_cache, cache_key, irq, 0);
->  out:
->  	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
->  }
-> @@ -641,7 +656,8 @@ static void vgic_its_invalidate_cache(struct vgic_its *its)
->  {
->  	struct vgic_dist *dist = &kvm->arch.vgic;
->  	struct vgic_translation_cache_entry *cte;
-> -	unsigned long flags;
-> +	unsigned long flags, idx;
-> +	struct vgic_irq *irq;
->  
->  	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
->  
-> @@ -658,6 +674,11 @@ static void vgic_its_invalidate_cache(struct vgic_its *its)
->  	}
->  
->  	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
-> +
-> +	xa_for_each(&its->translation_cache, idx, irq) {
-> +		xa_erase(&its->translation_cache, idx);
-> +		vgic_put_irq(its->dev->kvm, irq);
-> +	}
->  }
->  
->  void vgic_its_invalidate_all_caches(struct kvm *kvm)
-> @@ -1967,6 +1988,7 @@ static int vgic_its_create(struct kvm_device *dev, u32 type)
->  
->  	INIT_LIST_HEAD(&its->device_list);
->  	INIT_LIST_HEAD(&its->collection_list);
-> +	xa_init_flags(&its->translation_cache, XA_FLAGS_LOCK_IRQ);
->  
->  	dev->kvm->arch.vgic.msis_require_devid = true;
->  	dev->kvm->arch.vgic.has_its = true;
-> @@ -1997,6 +2019,8 @@ static void vgic_its_destroy(struct kvm_device *kvm_dev)
->  
->  	vgic_its_free_device_list(kvm, its);
->  	vgic_its_free_collection_list(kvm, its);
-> +	vgic_its_invalidate_cache(its);
-> +	xa_destroy(&its->translation_cache);
->  
->  	mutex_unlock(&its->its_lock);
->  	kfree(its);
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index ac7f15ec1586..0b027ed71dac 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -210,6 +210,12 @@ struct vgic_its {
->  	struct mutex		its_lock;
->  	struct list_head	device_list;
->  	struct list_head	collection_list;
-> +
-> +	/*
-> +	 * Caches the (device_id, event_id) -> vgic_irq translation for
-> +	 * *deliverable* LPIs.
-
-Can you clarify what "deliverable" LPIs are? That's not an
-architectural term, and I'd rather you describe the conditions that
-allow the LPI to be cached (my guess is: mapped and enabled).
-
-> +	 */
-> +	struct xarray		translation_cache;
->  };
->  
->  struct vgic_state_iter;
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+No, in this case only the fast path (page table scanning) is disabled.
+MGLRU still sees the A-bit from L2 using the rmap, i.e., the slow path
+calling folio_check_references().
