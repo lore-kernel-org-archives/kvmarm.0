@@ -1,128 +1,168 @@
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57C307E6
-	for <kvmarm@lists.linux.dev>; Sun, 21 Apr 2024 17:03:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE9013D548
+	for <kvmarm@lists.linux.dev>; Sun, 21 Apr 2024 19:47:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713719015; cv=none; b=sc9bY8XgpSvyjeDKYwMQnYOPVllCtSyacbEZD2imgAo5XkaS8dUs1SuMppoxGSv3Dq8a9ZguH7KZm2JLx4C/J3FRYsAVRiHTRGqWPou49Q50cynI5I8+D4hWpBfuT6wf5TAJN5FRmNSL2xORi1sGblKT25QwJbw1FvlzypVsCKE=
+	t=1713728861; cv=none; b=q8cU9DUwZeJqUVPGkjb98Ktlzr9B834Qk5ZScRTGLOtXse5xS5Icl+VtZt7QS1GrGpxTu7xELRcvtWVug7/SZ0t8OZm8P8qZSCR9Nh79JRoFw7e7xpbXTJHc8Ddhd5CM55vdoLmDyHeRjIy1KJQ8sdIc7vyrzeCdceAy4X4p+uc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713719015; c=relaxed/simple;
-	bh=IdQyYEHNH1LVzoiu9R0CjRnJRd4AGpKf2yu362x7Qlo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DQKbtVv6jZPUys890X0lH0EuJX1X72+c23EoAjCRfZoSHS5tTL8xEMaCPD20ChwAzBX9l7t5YLWbYzTV0a9gc563auz2CxHkBfStsELwLGmBWmk3J4/mFF8LczQlKRS155ExBDMbTWNitXg92koc7CDQGAlVFwWVSLP5Kh9DFHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xaib81hK; arc=none smtp.client-ip=95.215.58.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1713728861; c=relaxed/simple;
+	bh=b0EFXp8/sUOPRypih7RK9qsuUmYXmlgFunGPL6mdQG8=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LDF6CIjBPXaU6tnEwC/ASMFanabVClM+X01shC1EtTL6OlWyvwmkxn8mco2AM7Z1yls9jdfoLXEtyRfYbL1A25Y62sq/9BccVZ3AJOZFgjXbKwSQF91lszOHU/5FNdgMWCYvVTmykCCJHZ8zbooBriJGDeLSeKpAW2q/+c51sgk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lMBcf2fW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xaib81hK"
-Date: Sun, 21 Apr 2024 10:03:24 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1713719011;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ocqqMtd1Xliboul5e7kfC49oq6NYAajrGvLkT0CruOI=;
-	b=xaib81hKJDQ5Dq04epPuYyoBAJhD6+HQ5AoNU+t6LDFT9gO+bHHqmFWtFvp2V3/AitYkHe
-	DJEH61zu4SgYFuBREaLbdX6Gg6YsMKMW8f0CsTt4+qrCOxKuKhm8tNSOcQPddiMZMiLuPo
-	6GJ4xUDm7PuLF8VxhPJFH67v7/i3fkA=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, James Morse <james.morse@arm.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lMBcf2fW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35192C113CE;
+	Sun, 21 Apr 2024 19:47:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713728861;
+	bh=b0EFXp8/sUOPRypih7RK9qsuUmYXmlgFunGPL6mdQG8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=lMBcf2fWU91zTbcKhaGIc0h5b8CTpI6ll5QYxY7Xw1klO/KzEtvK3tHKVDiYPrmlv
+	 rsQ5MNqKV62q3282bPu0cjwIXKLSd92dZZZ4f3tdSdVm4qAG5HfZkjkoaZEs7GbuDl
+	 wqOl4flaNhBtzERrADKR27GLIGcbgj1FBGbiYWp1I5A7WAF/+6Z354Y/ws3TI1f3Mu
+	 m8qmpyBi7uHd/dJ68t9VrSqhlrI71nOO61ELkpFg6C+xmzD8kUsI3NA36v+VrdNRL7
+	 ovxdrJUA9YCmlippkyiJmfo+VjJgqX+HxdI9901jAEEyjHFujZFvUWv9RjijZ+3aj0
+	 R6eetFpQxpUAw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rydA2-006ar2-UZ;
+	Sun, 21 Apr 2024 20:47:39 +0100
+Date: Sun, 21 Apr 2024 20:47:39 +0100
+Message-ID: <87ttjuqyzo.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v2 09/19] KVM: arm64: vgic-its: Maintain a translation
- cache per ITS
-Message-ID: <ZiVG3JoK1Soe6Eqj@linux.dev>
+Subject: Re: [PATCH v2 09/19] KVM: arm64: vgic-its: Maintain a translation cache per ITS
+In-Reply-To: <ZiVG3JoK1Soe6Eqj@linux.dev>
 References: <20240419223842.951452-1-oliver.upton@linux.dev>
- <20240419223842.951452-10-oliver.upton@linux.dev>
- <86mspnqa8e.wl-maz@kernel.org>
+	<20240419223842.951452-10-oliver.upton@linux.dev>
+	<86mspnqa8e.wl-maz@kernel.org>
+	<ZiVG3JoK1Soe6Eqj@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86mspnqa8e.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, eric.auger@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sun, Apr 21, 2024 at 11:30:09AM +0100, Marc Zyngier wrote:
-> On Fri, 19 Apr 2024 23:38:32 +0100,
-> Oliver Upton <oliver.upton@linux.dev> wrote:
-
-[...]
-
-> > +	if (xa_reserve_irq(&its->translation_cache, cache_key, GFP_KERNEL_ACCOUNT))
-> > +		return;
-> > +
+On Sun, 21 Apr 2024 18:03:24 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> This thing tickles me a bit. What does it mean from the PoV of the
-> caller? That although we have missed in the cache initially, someone
-> else is populating it?
-
-Sorry, I'm a touch confused. This call is to preallocate space in the
-xarray to store something at index @cache_key. Even if there already was
-a valid entry (meaning no need for memory allocation), xa_reserve()
-ought to return 0.
-
-> The final code reads like this:
+> On Sun, Apr 21, 2024 at 11:30:09AM +0100, Marc Zyngier wrote:
+> > On Fri, 19 Apr 2024 23:38:32 +0100,
+> > Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> 	if (xa_reserve_irq(&its->translation_cache, cache_key, GFP_KERNEL_ACCOUNT))
+> [...]
+> 
+> > > +	if (xa_reserve_irq(&its->translation_cache, cache_key, GFP_KERNEL_ACCOUNT))
+> > > +		return;
+> > > +
+> > 
+> > This thing tickles me a bit. What does it mean from the PoV of the
+> > caller? That although we have missed in the cache initially, someone
+> > else is populating it?
+> 
+> Sorry, I'm a touch confused. This call is to preallocate space in the
+> xarray to store something at index @cache_key. Even if there already was
+> a valid entry (meaning no need for memory allocation), xa_reserve()
+> ought to return 0.
+
+Yup, I understood that. My question is about its actual effect.  From
+a cache "client" perspective, it means that the translation isn't
+getting cached because the same translation (in another context) is
+being in the process of being cached at the same time.
+
+> 
+> > The final code reads like this:
+> > 
+> > 	if (xa_reserve_irq(&its->translation_cache, cache_key, GFP_KERNEL_ACCOUNT))
+> > 		return;
+> > 
+> > 	xa_lock_irqsave(&its->translation_cache, flags);
+> > 	rcu_read_lock();
+> > 
+> > 	/*
+> > 	 * We could have raced with another CPU caching the same
+> > 	 * translation behind our back, so let's check it is not in
+> > 	 * already
+> > 	 */
+> > 	db = its->vgic_its_base + GITS_TRANSLATER;
+> > 	if (__vgic_its_check_cache(kvm, db, devid, eventid))
+> > 		goto out;
+> > 
+> > Does it mean we could drop this check? And even relax the locking?
+> 
+> I don't think so, a race still exists. For example, Userspace could issue
+> concurrent calls to KVM_SIGNAL_MSI for the same device / event.
+
+Really? When injecting an MSI, either you hit in the cache or you
+don't. If you don't, you translate the hard way, then try to fit the
+translation in the cache. If if you have a concurrent MSI being
+signalled, whoever wins the "reserve" game wins, and it is "their"
+translation that will make it into the cache.
+
+At this stage, the locking becomes irrelevant for the purpose of
+avoiding concurrent filling of the cache, because reserving serves as
+a proxy for the store.
+
+Or am I missing the point completely? Wouldn't be surprising... ;-)
+
+> We could do away with the *explicit* locking if this code were
+> restructured to drop references on old entries returned from xa_store(),
+> like:
+> 
+> static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
+> 				       u32 devid, u32 eventid,
+> 				       struct vgic_irq *irq)
+> {
+> 	unsigned long cache_key = vgic_its_cache_key(devid, eventid);
+> 	phys_addr_t db = its->vgic_its_base + GITS_TRANSLATER;
+> 	struct vgic_irq *old;
+> 
+> 	/* Do not cache a directly injected interrupt */
+> 	if (irq->hw)
 > 		return;
 > 
-> 	xa_lock_irqsave(&its->translation_cache, flags);
-> 	rcu_read_lock();
+> 	/*
+> 	 * The irq refcount is guaranteed to be nonzero while holding the
+> 	 * its_lock, as the ITE (and the reference it holds) cannot be freed.
+> 	 */
+> 	lockdep_assert_held(&its->its_lock);
+> 	vgic_get_irq_kref(irq);
 > 
 > 	/*
-> 	 * We could have raced with another CPU caching the same
-> 	 * translation behind our back, so let's check it is not in
-> 	 * already
+> 	 * We could have raced with another CPU caching the same translation
+> 	 * behind our back. Ensure we don't leak a reference if that is the case.
 > 	 */
-> 	db = its->vgic_its_base + GITS_TRANSLATER;
-> 	if (__vgic_its_check_cache(kvm, db, devid, eventid))
-> 		goto out;
-> 
-> Does it mean we could drop this check? And even relax the locking?
+> 	old = xa_store_irq(&its->translation_cache, cache_key, irq, GFP_KERNEL_ACCOUNT);
+> 	if (old)
+> 		vgic_put_irq(old);
+> }
 
-I don't think so, a race still exists. For example, Userspace could issue
-concurrent calls to KVM_SIGNAL_MSI for the same device / event.
+Exactly. By relying on the xarray for synchronisation, we can avoid
+holding any extra lock and playing the reserve game. I'm pretty keen
+on this version.
 
-We could do away with the *explicit* locking if this code were
-restructured to drop references on old entries returned from xa_store(),
-like:
+Thanks,
 
-static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
-				       u32 devid, u32 eventid,
-				       struct vgic_irq *irq)
-{
-	unsigned long cache_key = vgic_its_cache_key(devid, eventid);
-	phys_addr_t db = its->vgic_its_base + GITS_TRANSLATER;
-	struct vgic_irq *old;
-
-	/* Do not cache a directly injected interrupt */
-	if (irq->hw)
-		return;
-
-	/*
-	 * The irq refcount is guaranteed to be nonzero while holding the
-	 * its_lock, as the ITE (and the reference it holds) cannot be freed.
-	 */
-	lockdep_assert_held(&its->its_lock);
-	vgic_get_irq_kref(irq);
-
-	/*
-	 * We could have raced with another CPU caching the same translation
-	 * behind our back. Ensure we don't leak a reference if that is the case.
-	 */
-	old = xa_store_irq(&its->translation_cache, cache_key, irq, GFP_KERNEL_ACCOUNT);
-	if (old)
-		vgic_put_irq(old);
-}
+	M.
 
 -- 
-Thanks,
-Oliver
+Without deviation from the norm, progress is not possible.
