@@ -1,301 +1,119 @@
-Received: from out-176.mta0.migadu.com (out-176.mta0.migadu.com [91.218.175.176])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26CC318AED
-	for <kvmarm@lists.linux.dev>; Mon, 22 Apr 2024 21:43:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F4CB1401C
+	for <kvmarm@lists.linux.dev>; Mon, 22 Apr 2024 22:48:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713822223; cv=none; b=gG25vLfyZzdyCeR6z5qAAK9QpNkvJ6W3tS8cxYSrdpjN5pPJwEbwUednWCXPVmr2+8MS78Q24Twuf+6rOme+cwZatDkIVeu0F0D3kH49RqLNVInlK3/oRRgsS7jUqjp5owTFkOo7buUs5q+6iUgsK5upY2sCRXoo2CK2klQzLFk=
+	t=1713826140; cv=none; b=Btop3Mld+P/WrXUHwD8shkw0xPkVhjcuEssoaXI/KMm/EkMl5vtIFOTiwTOEyp3PyBCGqf0HUfhgKWYWXjwUrSnp453HiRZBugpkhejx7WraMO+BAld6WMykn2qiBelkZjPG0Dq3Pf3SjD2VvtgmhP0ZAl0GyO0ykefxkj9LnMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713822223; c=relaxed/simple;
-	bh=xLZE5bqjy1mPJu01bI1nilRUwIDr5ANAP981riTJIB8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZfNK2mmsEgIWBMEHP+103VGD8paz4wS/ItMS9rQaSIHGx8hH3AILhmnOluRaE7y52JGarfLUeOdI+uXFS9dmuXlI3tYr5cXzMpxBKQnvmxBml0IePKWgfxqmNVNWOoohlsqWwG4Yy16xIvmQzKkUfwmwrkDfjYC1NUc803TLGMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sq0vL3B/; arc=none smtp.client-ip=91.218.175.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1713826140; c=relaxed/simple;
+	bh=fm2a+0xycqqxT06+SBw2+4DgyIhfefjKQ/8uOfWuuLg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Xzo0DOBMmOoO3MFehG9mcIKUPC3rds50pSwZTCZENelo3M0HAv96nb7oMsBAJHsfeBRaBAfRpGLz+v72mcY8nrvohiwm6Sy0R5wG+e0FlRcvqZshrKF2rwHQvQAr52mQMfJuI7WHUEhLsOXbGdtJpyHD/M2cJpjd0r1JRCXGIj4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WSUQWyv+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sq0vL3B/"
-Date: Mon, 22 Apr 2024 14:43:32 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1713822220;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qOHBnIZ60BpbamfCcbp9FtjSsLepjsFEyHBNJJNk5kc=;
-	b=sq0vL3B/aLECcKUV52U/A2xmzSWt//LFJPQqNNQrrJLnJUbHK1iMaDovIXJv3A6PKtVAcN
-	sokyh40MNRsXUvgLEDA0qW01nHjv8RIFNbfk362lxy5L8Aar/Q4zkPm21veaeC4kPPRW8k
-	YkKhT4CwEp5Kykcx61b3dkDcwHSgrSI=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Colton Lewis <coltonlewis@google.com>
-Cc: kvm@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-	Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WSUQWyv+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76A74C113CC;
+	Mon, 22 Apr 2024 22:48:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713826139;
+	bh=fm2a+0xycqqxT06+SBw2+4DgyIhfefjKQ/8uOfWuuLg=;
+	h=From:To:Cc:Subject:Date:From;
+	b=WSUQWyv+Cu5v8pGzEk7LzEBVlG4c2pdAWwXAgfD+OEe8qB35toLs5QlAD+KGXau6F
+	 NeqYcDy1q8YROd7l0SwHCKsRQNoRiwKR92/N2PbXoM1nlDvI2N3RCZ1SVYay8F5ol5
+	 8eiDROQAKbmSZhrMmleQejBjJuUjJNJzWKq+67KhKxlvgNkaZXxNUecxW5M1/D0Hhd
+	 owSOjGZSjpY+S9WOF9HPL40lKkkUEY+5T8RO8k/TWg27F+2e9fev6Y09FZtN4iB383
+	 /3i6PSBc4ig046mTwUbMwmMFS+1+ixVAil288NqH8j/Cx0SFlJTUkOHeStrhl1ZEX0
+	 pWD8y76NF9ttA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rz2T2-006xt0-QU;
+	Mon, 22 Apr 2024 23:48:56 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Cc: James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4] KVM: arm64: Add early_param to control WFx trapping
-Message-ID: <ZibaBKCFMz-dJNM4@linux.dev>
-References: <20240422181716.237284-1-coltonlewis@google.com>
+	Arnd Bergmann <arnd@arndb.de>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Naresh Kamboju <naresh.kamboju@linaro.org>,
+	Linaro Kernel Functional Testing <lkft@linaro.org>
+Subject: [PATCH] KVM: arm64: nv: Work around lack of pauth support in old toolchains
+Date: Mon, 22 Apr 2024 23:48:49 +0100
+Message-Id: <20240422224849.2238222-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240422181716.237284-1-coltonlewis@google.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, arnd@arndb.de, mark.rutland@arm.com, joey.gouly@arm.com, will@kernel.org, naresh.kamboju@linaro.org, lkft@linaro.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Colton,
+We still support GCC 8.x, and it appears that this toolchain
+does not understand "pauth" as a valid architectural extension.
+After all, it's only been 8 years since ARMv8.3 was released...
 
-On Mon, Apr 22, 2024 at 06:17:16PM +0000, Colton Lewis wrote:
-> Add an early_params to control WFI and WFE trapping. This is to
-> control the degree guests can wait for interrupts on their own without
-> being trapped by KVM. Options for each param are trap, notrap, and
-> default. trap enables the trap. notrap disables the trap. default
-> preserves current behavior, disabling the trap if only a single task
-> is running and enabling otherwise.
-> 
-> Signed-off-by: Colton Lewis <coltonlewis@google.com>
-> ---
-> v4:
-> 
-> * Fixed inaccurate names that incorrectly implied this controls interrupts
->   themselves instead of instructions waiting for interrupts and events
-> * Split into two separate params as interrupts (WFI) and events (WFE) do
->   different things and may warrant separate controls.
-> * Document new params in Documentation/admin-guide/kernel-parameters.txt
-> 
-> 
-> v3:
-> https://lore.kernel.org/kvmarm/20240410175437.793508-1-coltonlewis@google.com/
-> 
-> v2:
-> https://lore.kernel.org/kvmarm/20240319164341.1674863-1-coltonlewis@google.com/
-> 
-> v1:
-> https://lore.kernel.org/kvmarm/20240129213918.3124494-1-coltonlewis@google.com/
-> 
->  .../admin-guide/kernel-parameters.txt         | 22 +++++++-
->  arch/arm64/include/asm/kvm_emulate.h          | 24 ++++++++-
->  arch/arm64/include/asm/kvm_host.h             |  7 +++
->  arch/arm64/kvm/arm.c                          | 54 +++++++++++++++++--
->  4 files changed, 101 insertions(+), 6 deletions(-)
-> 
-> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-> index 31b3a25680d0..f8d16c792e66 100644
-> --- a/Documentation/admin-guide/kernel-parameters.txt
-> +++ b/Documentation/admin-guide/kernel-parameters.txt
-> @@ -2653,6 +2653,27 @@
->  			[KVM,ARM] Allow use of GICv4 for direct injection of
->  			LPIs.
-> 
-> +	kvm-arm.wfe_trap_policy=
-> +			[KVM,ARM] Control when to set wfe instruction trap.
+This results in the NV ERETAx code breaking the build, as it relies
+on this extention to make use of the PACGA instruction.
 
-nitpick: when referring to the instruction, please capitalize it.
+Work around it by hand-assembling the instruction using a mind-bending
+trick lifted from an old patch by Will. Magic.
 
-Also, it doesn't hurt to be verbose here and say this cmdline option
-"Controls the WFE instruction trap behavior for KVM VMs"
+Fixes: e09faab353a6 ("KVM: arm64: nv: Add emulation for ERETAx instructions")
+Reported-by: Linaro Kernel Functional Testing <lkft@linaro.org>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/pauth.c | 19 +++++++++++++++++--
+ 1 file changed, 17 insertions(+), 2 deletions(-)
 
-I say this because there is a separate set of trap controls that allow
-WFE or WFI to execute in EL0 (i.e. host userspace).
-
-> +			trap: set wfe instruction trap
-> +
-> +			notrap: clear wfe instruction trap
-> +
-> +			default: set wfe instruction trap only if multiple
-> +				 tasks are running on the CPU
-
-I would strongly prefer we not make any default behavior user-visible.
-The default KVM behavior can (and will) change in the future.
-
-Only the absence of an explicit trap / notrap policy should fall back to
-KVM's default heuristics.
-
-> +	kvm-arm.wfi_trap_policy=
-> +			[KVM,ARM] Control when to set wfi instruction trap.
-> +
-> +			trap: set wfi instruction trap
-> +
-> +			notrap: clear wfi instruction trap
-> +
-> +			default: set wfi instruction trap only if multiple
-> +				 tasks are running on the CPU
-> +
-> +
->  	kvm_cma_resv_ratio=n [PPC]
->  			Reserves given percentage from system memory area for
->  			contiguous memory allocation for KVM hash pagetable
-> @@ -7394,4 +7415,3 @@
->  				memory, and other data can't be written using
->  				xmon commands.
->  			off	xmon is disabled.
-> -
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index b804fe832184..efd0a3fb6f00 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -109,9 +109,13 @@ static inline unsigned long *vcpu_hcr(struct kvm_vcpu *vcpu)
->  	return (unsigned long *)&vcpu->arch.hcr_el2;
->  }
-> 
-> -static inline void vcpu_clear_wfx_traps(struct kvm_vcpu *vcpu)
-> +static inline void vcpu_clear_wfe_trap(struct kvm_vcpu *vcpu)
->  {
->  	vcpu->arch.hcr_el2 &= ~HCR_TWE;
-> +}
-> +
-> +static inline void vcpu_clear_wfi_trap(struct kvm_vcpu *vcpu)
-> +{
->  	if (atomic_read(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe.vlpi_count) ||
->  	    vcpu->kvm->arch.vgic.nassgireq)
->  		vcpu->arch.hcr_el2 &= ~HCR_TWI;
-> @@ -119,12 +123,28 @@ static inline void vcpu_clear_wfx_traps(struct kvm_vcpu *vcpu)
->  		vcpu->arch.hcr_el2 |= HCR_TWI;
->  }
-
-This helper definitely does not do as it says on the tin. It ignores the
-policy requested on the command line and conditionally *sets* TWI. If
-the operator believes they know best and ask for a particular trap policy
-KVM should uphold it unconditionally. Even if they've managed to shoot
-themselves in the foot.
-
-> -static inline void vcpu_set_wfx_traps(struct kvm_vcpu *vcpu)
-> +static inline void vcpu_clear_wfx_traps(struct kvm_vcpu *vcpu)
-> +{
-> +	vcpu_clear_wfe_trap(vcpu);
-> +	vcpu_clear_wfi_trap(vcpu);
-> +}
-> +
-> +static inline void vcpu_set_wfe_trap(struct kvm_vcpu *vcpu)
->  {
->  	vcpu->arch.hcr_el2 |= HCR_TWE;
-> +}
-> +
-> +static inline void vcpu_set_wfi_trap(struct kvm_vcpu *vcpu)
-> +{
->  	vcpu->arch.hcr_el2 |= HCR_TWI;
->  }
-> 
-> +static inline void vcpu_set_wfx_traps(struct kvm_vcpu *vcpu)
-> +{
-> +	vcpu_set_wfe_trap(vcpu);
-> +	vcpu_set_wfi_trap(vcpu);
-> +}
-> +
->  static inline void vcpu_ptrauth_enable(struct kvm_vcpu *vcpu)
->  {
->  	vcpu->arch.hcr_el2 |= (HCR_API | HCR_APK);
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 21c57b812569..315ee7bfc1cb 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -67,6 +67,13 @@ enum kvm_mode {
->  	KVM_MODE_NV,
->  	KVM_MODE_NONE,
->  };
-> +
-> +enum kvm_wfx_trap_policy {
-> +	KVM_WFX_NOTRAP_SINGLE_TASK, /* Default option */
-> +	KVM_WFX_NOTRAP,
-> +	KVM_WFX_TRAP,
-> +};
-> +
->  #ifdef CONFIG_KVM
->  enum kvm_mode kvm_get_mode(void);
->  #else
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index a25265aca432..5106ba5a8a39 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -46,6 +46,8 @@
->  #include <kvm/arm_psci.h>
-> 
->  static enum kvm_mode kvm_mode = KVM_MODE_DEFAULT;
-> +static enum kvm_wfx_trap_policy kvm_wfi_trap_policy = KVM_WFX_NOTRAP_SINGLE_TASK;
-> +static enum kvm_wfx_trap_policy kvm_wfe_trap_policy = KVM_WFX_NOTRAP_SINGLE_TASK;
-> 
->  DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
-> 
-> @@ -423,6 +425,12 @@ void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
-> 
->  }
-> 
-> +static bool kvm_should_clear_wfx_trap(enum kvm_wfx_trap_policy p)
-> +{
-> +	return (p == KVM_WFX_NOTRAP && kvm_vgic_global_state.has_gicv4)
-> +		|| (p == KVM_WFX_NOTRAP_SINGLE_TASK && single_task_running());
-> +}
-
-style nitpick: operators should always go on the preceding line for a
-multi-line statement.
-
->  void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->  {
->  	struct kvm_s2_mmu *mmu;
-> @@ -456,10 +464,15 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->  	if (kvm_arm_is_pvtime_enabled(&vcpu->arch))
->  		kvm_make_request(KVM_REQ_RECORD_STEAL, vcpu);
-> 
-> -	if (single_task_running())
-> -		vcpu_clear_wfx_traps(vcpu);
-> +	if (kvm_should_clear_wfx_trap(kvm_wfi_trap_policy))
-> +		vcpu_clear_wfi_trap(vcpu);
->  	else
-> -		vcpu_set_wfx_traps(vcpu);
-> +		vcpu_set_wfi_trap(vcpu);
-> +
-> +	if (kvm_should_clear_wfx_trap(kvm_wfe_trap_policy))
-> +		vcpu_clear_wfe_trap(vcpu);
-> +	else
-> +		vcpu_set_wfe_trap(vcpu);
-> 
->  	if (vcpu_has_ptrauth(vcpu))
->  		vcpu_ptrauth_disable(vcpu);
-
-I find all of the layering rather hard to follow; we don't need
-accessors for doing simple bit manipulation.
-
-Rough sketch:
-
-static bool kvm_vcpu_should_clear_twi(struct kvm_vcpu *vcpu)
-{
-	if (unlikely(kvm_wfi_trap != KVM_WFX_DEFAULT))
-		return kvm_wfi_trap == KVM_WFX_NOTRAP;
-
-	return single_task_running() &&
-	       (atomic_read(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe.vlpi_count) ||
-	        vcpu->kvm->arch.vgic.nassgireq);
-}
-
-static bool kvm_vcpu_should_clear_twe(struct kvm_vcpu *vcpu)
-{
-	if (unlikely(kvm_wfe_trap != KVM_WFX_DEFAULT))
-		return kvm_wfe_trap == KVM_WFX_NOTRAP;
-
-	return single_task_running();
-}
-
-static void kvm_vcpu_load_compute_hcr(struct kvm_vcpu *vcpu)
-{
-	vcpu->arch.hcr_el2 |= HCR_TWE | HCR_TWI;
-
-	if (kvm_vcpu_should_clear_twe(vcpu))
-		vcpu->arch.hcr_el2 &= ~HCR_TWE;
-	if (kvm_vcpu_should_clear_twi(vcpu))
-		vcpu->arch.hcr_el2 &= ~HCR_TWI;
-}
-
-And if we really wanted to, the non-default trap configuration could be
-moved to vcpu_reset_hcr() if we cared.
-
+diff --git a/arch/arm64/kvm/pauth.c b/arch/arm64/kvm/pauth.c
+index a3a5c404375b..8baf2a2cbdd3 100644
+--- a/arch/arm64/kvm/pauth.c
++++ b/arch/arm64/kvm/pauth.c
+@@ -17,6 +17,22 @@
+ #include <asm/kvm_emulate.h>
+ #include <asm/pointer_auth.h>
+ 
++/*
++ * "// This is some of my finest work" (Will Deacon, 2019-02-12)
++ *
++ * The jury is still out on that one.
++ */
++#define REG(r)	"(0%x[" #r "] - ((0%x[" #r "] >> 4) * 6))"
++
++/* PACGA Xd, Xn, Xm */
++#define PACGA(d,n,m)						\
++	asm volatile(".inst 0x9AC03000   |"			\
++		     "(" REG(Rd) "<< 0)  |"			\
++		     "(" REG(Rn) "<< 5)  |"			\
++		     "(" REG(Rm) "<< 16)\n"			\
++		     : [Rd] "=r" ((d))				\
++		     : [Rn] "r" ((n)), [Rm] "r" ((m)))
++
+ static u64 compute_pac(struct kvm_vcpu *vcpu, u64 ptr,
+ 		       struct ptrauth_key ikey)
+ {
+@@ -36,8 +52,7 @@ static u64 compute_pac(struct kvm_vcpu *vcpu, u64 ptr,
+ 	__ptrauth_key_install_nosync(APGA, ikey);
+ 	isb();
+ 
+-	asm volatile(ARM64_ASM_PREAMBLE ".arch_extension pauth\n"
+-		     "pacga %0, %1, %2" : "=r" (pac) : "r" (ptr), "r" (mod));
++	PACGA(pac, ptr, mod);
+ 	isb();
+ 
+ 	__ptrauth_key_install_nosync(APGA, gkey);
 -- 
-Thanks,
-Oliver
+2.39.2
+
