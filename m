@@ -1,110 +1,130 @@
-Received: from mail-vs1-f46.google.com (mail-vs1-f46.google.com [209.85.217.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AAE048CF2
-	for <kvmarm@lists.linux.dev>; Mon, 22 Apr 2024 08:12:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B67E145B10;
+	Mon, 22 Apr 2024 10:39:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713773528; cv=none; b=Ik00lJ4dNcnVGn/jNOFQ8fMhUQ4PogwFfszW0yd0ZiLrrFVMiFcJ87wTCuyczJW/cj0ESjNq3T0tsFf94dnkiF7MEHgPjLa1AjnRkyNxLeRSdd68uGWAFdtVk4dzz1cXzKcH4OUUR4lSOwOaprcYsZDFJn8NhEwO6hiJxGPkTa8=
+	t=1713782363; cv=none; b=ELBhBsI1X6Gm/FcwuzJOYNsBw+KaF65ViajQBjb+Xq0jJAyoN+g96uzxRtTpOt9VTu9nqu9bNch1u60i9mu9w07/5sG+LdDnCm39GJBG3LDSsgNU1LSKi80fDasvWo27FY0s3+q98R/tekM6Ef3TJ8z5AqVyrmzhjgQHABDFYcs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713773528; c=relaxed/simple;
-	bh=mSp6NSho+E0BSlYpSDfx7+w1TvH1fUrtLurZd/um5hc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fz7CPypXOvEQ1Q3v7Zc9/R2L74YFRZYLlA1PL+JoJqjL4YdY8eUEwidQF4XhQFKUgUSXyhFGkKgcuNixnSTe/jLj8Ymbl2J6NF0iDqP2ajpP98QSG5VkmMc9hIo0WP2GPxH3A1rM8TOLFSjfuQuCEcLAHnoE7EIknP7V6MdON9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=k+eyXN4B; arc=none smtp.client-ip=209.85.217.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="k+eyXN4B"
-Received: by mail-vs1-f46.google.com with SMTP id ada2fe7eead31-47a3819c4bcso638979137.0
-        for <kvmarm@lists.linux.dev>; Mon, 22 Apr 2024 01:12:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713773526; x=1714378326; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mSp6NSho+E0BSlYpSDfx7+w1TvH1fUrtLurZd/um5hc=;
-        b=k+eyXN4BIB+7+FXwtCgDYJ5VaEXA8xgjl6T89iiDp8YhzXRrQGeBlNl5DEKAJAfASw
-         1b5pXphOBz61EztKPKN9nnovZTrnZ0iVxkjGqVQuoKjNyjTDfHt/FZd8flvXMGEjhXh5
-         uBr5D7aJCknoQ3eViyVGH+Twz2kspCw5oZAA0kSw6lMI2WwJr9ydpXoM/aWdVYCpysNT
-         CpHbagAxkzwnkoDjFKPSaUCeZsHwBBZhuf/mTGGowVL3KSaERyq5Pp5eEuTkiK9QHMEp
-         ZLG+OmpP5Z8RGPQccJZPxTJ3VRanggOcNPF5zvuxWOpRO1x3VXOoQBPBguvND98tVoux
-         YqCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713773526; x=1714378326;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mSp6NSho+E0BSlYpSDfx7+w1TvH1fUrtLurZd/um5hc=;
-        b=V2U7FsdRyTyzIN5IRjR1e641uIY30wREvZiXHBCDh+sNUn4Cz8uN+AZCM0L091OKvy
-         jEbjDgo8zJIZyAm+1t8naXVHWCCs/Qdv6x/uP3CPkSxcM6i0mDiKWLPJX3uI94cesxKV
-         xsKhoCP79LLjgPtU2NX8eQgjpiQwvwbQ4IeYdIAAibCZAk2jDW0jW64Mjjwlrku6XdOv
-         KpWhodaTlyCWcT4K3XnepLWBQBRgVTwnIEcOVQxhPpHf84IAkY9N4bnSFuJJiQqr5lfT
-         ajh6TAOx11BR0+hY/0W5Ixcf4e8Og4vb9PlEYR8Dsd51pgllY/vqvDND4Xn8Z5uoMwjU
-         gWRQ==
-X-Gm-Message-State: AOJu0YwjAeLelbdx654ll2Q+lhJHTA+oXLRgxmrXJS/1jCbEd2D0cBgM
-	TxPGKRbTPwrMpWtQPS1qt6NsRURGDo3X5/YX8EyjgyF09SgPbypwrLX2l3OHOfLcyB89rPasDOT
-	e6b3o3gg7ztZIb8RDR6sexDK49XRPH62QrPvK
-X-Google-Smtp-Source: AGHT+IGY4K0E672bg8rQfl8RTXeka64n2ph7HBw6d28uth6eRY77mvXIQcaNRIqBJwXt71Z9OyzbE+dSrcOSp9C/sSM=
-X-Received: by 2002:a67:ec4b:0:b0:47b:b8a6:32bc with SMTP id
- z11-20020a67ec4b000000b0047bb8a632bcmr7898486vso.33.1713773525914; Mon, 22
- Apr 2024 01:12:05 -0700 (PDT)
+	s=arc-20240116; t=1713782363; c=relaxed/simple;
+	bh=JqE3ylYWKarL5FDsaFXHHjgdDBTPGkxZWyvz1pBSwRY=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=HlsEwhNn0H3WbeX4EvqEUjY8+4ebAzISurwyUcSE8gsxqEYx2G+Jh+bt5nX8Il0tzbsbKhRJQ3Gz179nx3QgaJOQJ+eP1v+bUc6MJT0N/XjExfGWKYjO5tTyZtobIvDu0MsfPGLytbZ3bbFWN0ogf6r6AViwzxmKOd17SxhzeBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4VNMBM0NFfz6JBRQ;
+	Mon, 22 Apr 2024 18:36:59 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id 928E1140CB1;
+	Mon, 22 Apr 2024 18:39:12 +0800 (CST)
+Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Mon, 22 Apr
+ 2024 11:39:11 +0100
+Date: Mon, 22 Apr 2024 11:39:10 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra
+	<peterz@infradead.org>, <linux-pm@vger.kernel.org>,
+	<loongarch@lists.linux.dev>, <linux-acpi@vger.kernel.org>,
+	<linux-arch@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<x86@kernel.org>, Russell King <linux@armlinux.org.uk>, "Rafael J . Wysocki"
+	<rafael@kernel.org>, Miguel Luis <miguel.luis@oracle.com>, "James Morse"
+	<james.morse@arm.com>, Salil Mehta <salil.mehta@huawei.com>, Jean-Philippe
+ Brucker <jean-philippe@linaro.org>, Catalin Marinas
+	<catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+	<linuxarm@huawei.com>
+CC: Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, "Dave
+ Hansen" <dave.hansen@linux.intel.com>, <justin.he@arm.com>,
+	<jianyong.wu@arm.com>, Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v7 10/16] irqchip/gic-v3: Don't return errors from
+ gic_acpi_match_gicc()
+Message-ID: <20240422113839.00000cde@huawei.com>
+In-Reply-To: <20240418135412.14730-11-Jonathan.Cameron@huawei.com>
+References: <20240418135412.14730-1-Jonathan.Cameron@huawei.com>
+	<20240418135412.14730-11-Jonathan.Cameron@huawei.com>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20240419075941.4085061-1-tabba@google.com> <20240419075941.4085061-10-tabba@google.com>
- <ZiLaC8nrfcp9lDTD@linux.dev>
-In-Reply-To: <ZiLaC8nrfcp9lDTD@linux.dev>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 22 Apr 2024 09:11:29 +0100
-Message-ID: <CA+EHjTw5dDnqZgy_W_LmWFf94bxgVB8_np0hgvWpjY7RnpvYDA@mail.gmail.com>
-Subject: Re: [PATCH v3 09/31] KVM: arm64: Support TLB invalidation in guest context
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev, maz@kernel.org, will@kernel.org, 
-	qperret@google.com, seanjc@google.com, alexandru.elisei@arm.com, 
-	catalin.marinas@arm.com, philmd@linaro.org, james.morse@arm.com, 
-	suzuki.poulose@arm.com, mark.rutland@arm.com, broonie@kernel.org, 
-	joey.gouly@arm.com, rananta@google.com, smostafa@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100006.china.huawei.com (7.191.160.224) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
-Hi Oliver,
+On Thu, 18 Apr 2024 14:54:06 +0100
+Jonathan Cameron <Jonathan.Cameron@huawei.com> wrote:
 
-On Fri, Apr 19, 2024 at 9:54=E2=80=AFPM Oliver Upton <oliver.upton@linux.de=
-v> wrote:
->
-> On Fri, Apr 19, 2024 at 08:59:19AM +0100, Fuad Tabba wrote:
-> > From: Will Deacon <will@kernel.org>
-> >
-> > Typically, TLB invalidation of guest stage-2 mappings using nVHE is
-> > performed by a hypercall originating from the host. For the invalidatio=
-n
-> > instruction to be effective, therefore, __tlb_switch_to_{guest,host}()
-> > swizzle the active stage-2 context around the TLBI instruction.
-> >
-> > With guest-to-host memory sharing and unsharing hypercalls
-> > originating from the guest under pKVM, there is need to support
-> > both guest and host VMID invalidations issued from guest context.
-> >
-> > Replace the __tlb_switch_to_{guest,host}() functions with a more genera=
-l
-> > {enter,exit}_vmid_context() implementation which supports being invoked
-> > from guest context and acts as a no-op if the target context matches th=
-e
-> > running context.
->
-> I'd rather not introduce unnecessary asymmetry between the nVHE and VHE
-> TLB invalidations, the code duplication is annoying enough as is. Can
-> you rename to {enter,exit}_vmid_context() on the VHE side as well?
+> From: James Morse <james.morse@arm.com>
+> 
+> gic_acpi_match_gicc() is only called via gic_acpi_count_gicr_regions().
+> It should only count the number of enabled redistributors, but it
+> also tries to sanity check the GICC entry, currently returning an
+> error if the Enabled bit is set, but the gicr_base_address is zero.
+> 
+> Adding support for the online-capable bit to the sanity check will
+> complicate it, for no benefit. The existing check implicitly depends on
+> gic_acpi_count_gicr_regions() previous failing to find any GICR regions
+> (as it is valid to have gicr_base_address of zero if the redistributors
+> are described via a GICR entry).
+> 
+> Instead of complicating the check, remove it. Failures that happen at
+> this point cause the irqchip not to register, meaning no irqs can be
+> requested. The kernel grinds to a panic() pretty quickly.
+> 
+> Without the check, MADT tables that exhibit this problem are still
+> caught by gic_populate_rdist(), which helpfully also prints what went
+> wrong:
+> | CPU4: mpidr 100 has no re-distributor!
+> 
+> Signed-off-by: James Morse <james.morse@arm.com>
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+> Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 
-Will do.
+I've been focused on the ACPI aspects until now, but now realize that this
+and the next patch should have included the GIC maintainer in the
+to list. I'll fix that for future versions, but for now
 
-Thanks for all the reviews!
-/fuad
++CC Marc.
+> ---
+> v7: No change
+> ---
+>  drivers/irqchip/irq-gic-v3.c | 13 ++-----------
+>  1 file changed, 2 insertions(+), 11 deletions(-)
+> 
+> diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
+> index 6fb276504bcc..10af15f93d4d 100644
+> --- a/drivers/irqchip/irq-gic-v3.c
+> +++ b/drivers/irqchip/irq-gic-v3.c
+> @@ -2415,19 +2415,10 @@ static int __init gic_acpi_match_gicc(union acpi_subtable_headers *header,
+>  	 * If GICC is enabled and has valid gicr base address, then it means
+>  	 * GICR base is presented via GICC
+>  	 */
+> -	if (acpi_gicc_is_usable(gicc) && gicc->gicr_base_address) {
+> +	if (acpi_gicc_is_usable(gicc) && gicc->gicr_base_address)
+>  		acpi_data.enabled_rdists++;
+> -		return 0;
+> -	}
+>  
+> -	/*
+> -	 * It's perfectly valid firmware can pass disabled GICC entry, driver
+> -	 * should not treat as errors, skip the entry instead of probe fail.
+> -	 */
+> -	if (!acpi_gicc_is_usable(gicc))
+> -		return 0;
+> -
+> -	return -ENODEV;
+> +	return 0;
+>  }
+>  
+>  static int __init gic_acpi_count_gicr_regions(void)
 
-> --
-> Thanks,
-> Oliver
