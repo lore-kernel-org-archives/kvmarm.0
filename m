@@ -1,56 +1,64 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D6E8E576
-	for <kvmarm@lists.linux.dev>; Tue, 23 Apr 2024 11:33:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 484D87E761;
+	Tue, 23 Apr 2024 11:42:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713871988; cv=none; b=k+gqoZpzjWYXrXhXXs66qtgNSBLtZLo85lIUoLgb8gLyCFr3w4P5GIin6UGPID0wW3+D4tafPb3UOwGVtD9nxZKFkc7budTVrXbmGBNN4X39mjyXd/2IRju6nPeZET6ps1xOjgI9T5iVEFifvm/yvweUB6/LyQDXYrXvMqwHGWo=
+	t=1713872550; cv=none; b=bPD+raBqu4a+b+6Lpneim2ZO+97VacYf6VDVu0FP05Lzx5jg5P/qVoSAFGv/DntrfA3aoOC/LZcYmTcGVc5M+qoF7A9BoatwYxDTsHK0gdfAfJZInO2KAsgQRswWCI62lzpYSZ7CnI0625Hz2zopshfMJxQVZ+C6SPn9wNCIxlw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713871988; c=relaxed/simple;
-	bh=HNEJTtA/TGesL0cCJJJtqsekLkegSRTWZeBV7fPwewc=;
+	s=arc-20240116; t=1713872550; c=relaxed/simple;
+	bh=QMG25wM6rNvenjQtlyiQjo4wKkHfNNfh8ctqNlKRPrA=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PekY3ik87K7GTUDHTqe5fJqwaI6L6VQeBfC99HiPZt8eEl79AuLB4leLcP6zGotLRUuz1XopjukjxPrMkBWMZLh40hQWNAgLvbA/XJ4w69YvNiYk9iwU9CMqdWcjSEo31BBKV2gnDFvEcgw/u/Q+8Mo8mmN+qp1ySAbd5pqyusw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sy0BC9af; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=GL84apB1XJDN1jqESCuNTUCupX3wYKv5/Sk9eRwqpsAEY1+4Ek/sW7JGCvhq0hX9u3gMsQEnFbR5rUuA0mWILwFN6unuN23q9qZepeyHyG6EFe/wmh0+zLQTrNwG9sGjPgNQNzyAAF/pQDhAXTC++3K87y3uxCc0p5JgmyZfdNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MR/vuGmM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sy0BC9af"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCD75C2BD11;
-	Tue, 23 Apr 2024 11:33:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MR/vuGmM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B198DC116B1;
+	Tue, 23 Apr 2024 11:42:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713871987;
-	bh=HNEJTtA/TGesL0cCJJJtqsekLkegSRTWZeBV7fPwewc=;
+	s=k20201202; t=1713872549;
+	bh=QMG25wM6rNvenjQtlyiQjo4wKkHfNNfh8ctqNlKRPrA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sy0BC9afjceDT3KxOj+53ZvnXRwJvLv/h4F8ask8j+J1SMrLIr7vqdkN/aQk2fzYJ
-	 gy+2HB8XWQnRmwTMTLTHxR0TQqgOJbw1j0MKpDVAgsiE4pVLZHo/wt+5qF/M9AsDqA
-	 QKuOzxnnUQpokR7bGfjzoUWXwBkNK9y/W+8yUDVmnmYRl2vvO5oSrTB6RzZyUT3BSJ
-	 CSoSYyr4LP5bRv+E89r9+uR8KucJMDTP5dxxIZYoGVLAUkRH5Gsjqsfysi7zvytyP1
-	 ZuOS44B44kQe6zE4XyaZp+AQZ7ydQRXnzRk1gWj4QKnzDMQacMVocbYu+vh9yUWGYr
-	 Z5+/xAktdj04g==
+	b=MR/vuGmMmZRRofGLRXaEDB3/rGlBK4+EQdZ549jIGxDzw6yfyKRDZPHcr4aL2d7XD
+	 BcEuluhBq/9vbgBGzkBGvCXfLs0bOR5YogHlWCLdFwXvfZudVW3rY24wH8/Keahr9E
+	 4wXl9MlsfUfQ9yRgmgT9gQ/PVvRpIamsSVTcg+5JIxWD97abPHTsy7TApuzUcVS/5u
+	 mRNu8wtoh537Ia+HMRjN3CRdq8vHfErziu1F1xDG1aDY2+SjPJMdl6sY0XDHSQPhPe
+	 vh7RixfiRkyeUCa/1NSahJp+IGskWNsktdcJ6exYPEtB0CrJmI0ylPQRJqpRvRXO78
+	 IsfK54dedPLTA==
 Received: from [12.161.88.66] (helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rzEOW-0079k1-LD;
-	Tue, 23 Apr 2024 12:33:05 +0100
-Date: Tue, 23 Apr 2024 12:33:00 +0100
-Message-ID: <87sezctitv.wl-maz@kernel.org>
+	id 1rzEXb-0079xU-B6;
+	Tue, 23 Apr 2024 12:42:27 +0100
+Date: Tue, 23 Apr 2024 12:42:22 +0100
+Message-ID: <87r0ewtie9.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
+To: Zenghui Yu <yuzenghui@huawei.com>
+Cc: Jon Hunter <jonathanh@nvidia.com>,
+	<kvmarm@lists.linux.dev>,
+	<kvm@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>,
+	James Morse
+	<james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Arnd Bergmann <arnd@arndb.de>,
+	Oliver
+ Upton <oliver.upton@linux.dev>,
 	Joey Gouly <joey.gouly@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Naresh Kamboju <naresh.kamboju@linaro.org>,
-	Linaro Kernel Functional Testing <lkft@linaro.org>
-Subject: Re: [PATCH] KVM: arm64: nv: Work around lack of pauth support in old toolchains
-In-Reply-To: <ZidzMO-tcsFUgL1r@FVFF77S0Q05N>
-References: <20240422224849.2238222-1-maz@kernel.org>
-	<ZidzMO-tcsFUgL1r@FVFF77S0Q05N>
+	Fuad Tabba
+	<tabba@google.com>,
+	Mostafa Saleh <smostafa@google.com>,
+	Will Deacon
+	<will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
+Subject: Re: [PATCH v4 12/15] KVM: arm64: nv: Add emulation for ERETAx instructions
+In-Reply-To: <4c2fd210-fa36-8462-8a4d-70135cc2f040@huawei.com>
+References: <20240419102935.1935571-1-maz@kernel.org>
+	<20240419102935.1935571-13-maz@kernel.org>
+	<14667111-4ad6-48d2-93ee-742c5075f407@nvidia.com>
+	<4c2fd210-fa36-8462-8a4d-70135cc2f040@huawei.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -60,68 +68,52 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-SA-Exim-Connect-IP: 12.161.88.66
-X-SA-Exim-Rcpt-To: mark.rutland@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, arnd@arndb.de, joey.gouly@arm.com, will@kernel.org, naresh.kamboju@linaro.org, lkft@linaro.org
+X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, jonathanh@nvidia.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, joey.gouly@arm.com, tabba@google.com, smostafa@google.com, will@kernel.org, catalin.marinas@arm.com, linux-tegra@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 23 Apr 2024 09:37:04 +0100,
-Mark Rutland <mark.rutland@arm.com> wrote:
-> 
-> On Mon, Apr 22, 2024 at 11:48:49PM +0100, Marc Zyngier wrote:
-> > We still support GCC 8.x, and it appears that this toolchain
-> > does not understand "pauth" as a valid architectural extension.
-> > After all, it's only been 8 years since ARMv8.3 was released...
-> > 
-> > This results in the NV ERETAx code breaking the build, as it relies
-> > on this extention to make use of the PACGA instruction.
-> > 
-> > Work around it by hand-assembling the instruction using a mind-bending
-> > trick lifted from an old patch by Will. Magic.
-> > 
-> > Fixes: e09faab353a6 ("KVM: arm64: nv: Add emulation for ERETAx instructions")
-> > Reported-by: Linaro Kernel Functional Testing <lkft@linaro.org>
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/pauth.c | 19 +++++++++++++++++--
-> >  1 file changed, 17 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kvm/pauth.c b/arch/arm64/kvm/pauth.c
-> > index a3a5c404375b..8baf2a2cbdd3 100644
-> > --- a/arch/arm64/kvm/pauth.c
-> > +++ b/arch/arm64/kvm/pauth.c
-> > @@ -17,6 +17,22 @@
-> >  #include <asm/kvm_emulate.h>
-> >  #include <asm/pointer_auth.h>
-> >  
-> > +/*
-> > + * "// This is some of my finest work" (Will Deacon, 2019-02-12)
-> > + *
-> > + * The jury is still out on that one.
-> > + */
-> > +#define REG(r)	"(0%x[" #r "] - ((0%x[" #r "] >> 4) * 6))"
-> > +
-> > +/* PACGA Xd, Xn, Xm */
-> > +#define PACGA(d,n,m)						\
-> > +	asm volatile(".inst 0x9AC03000   |"			\
-> > +		     "(" REG(Rd) "<< 0)  |"			\
-> > +		     "(" REG(Rn) "<< 5)  |"			\
-> > +		     "(" REG(Rm) "<< 16)\n"			\
-> > +		     : [Rd] "=r" ((d))				\
-> > +		     : [Rn] "r" ((n)), [Rm] "r" ((m)))
-> 
-> Can you please use <asm/gpr-num.h> rather than open-coding this new REG()
-> helper? That way this'll be consistent with the way we assemble MRS/MSR in
-> <asm/sysreg.h>, and it avoids the few seconds of confusion trying to figure out
-> the maths in the REG() helper (neat trick though!).
+On Tue, 23 Apr 2024 10:40:22 +0100,
+Zenghui Yu <yuzenghui@huawei.com> wrote:
+>=20
+> On 2024/4/23 17:22, Jon Hunter wrote:
+> >=20
+> > Some of our builders currently have an older version of GCC (v6) and
+> > after this change I am seeing ...
+> >=20
+> >  =C2=A0 CC=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 arch/arm64/kvm/pauth.o
+> > /tmp/ccohst0v.s: Assembler messages:
+> > /tmp/ccohst0v.s:1177: Error: unknown architectural extension `pauth'
+> > /tmp/ccohst0v.s:1177: Error: unknown mnemonic `pacga' -- `pacga x21,x22=
+,x0'
+> > /local/workdir/tegra/mlt-linux_next/kernel/scripts/Makefile.build:244:
+> > recipe for target 'arch/arm64/kvm/pauth.o' failed
+> > make[5]: *** [arch/arm64/kvm/pauth.o] Error 1
+> > /local/workdir/tegra/mlt-linux_next/kernel/scripts/Makefile.build:485:
+> > recipe for target 'arch/arm64/kvm' failed
+> > make[4]: *** [arch/arm64/kvm] Error 2
+> > /local/workdir/tegra/mlt-linux_next/kernel/scripts/Makefile.build:485:
+> > recipe for target 'arch/arm64' failed
+> > make[3]: *** [arch/arm64] Error 2
+> >=20
+> >=20
+> > I know this is pretty old now and I am trying to get these builders
+> > updated. However, the kernel docs still show that GCC v5.1 is
+> > supported [0].
+>=20
+> Was just looking at the discussion [1] ;-) . FYI there is already a
+> patch on the list [2] which should be merged soon.
 
-Ah, I had completely forgot about this guy. Good call. I'll fold that
-patchlet in and re-push the result.
+Indeed. -next as of today already has the fix, although I'm reworking
+it to take Mark's remarks into account.
+
+Jon, can you confirm that next-20240423 builds with your setup?
 
 Thanks,
 
 	M.
 
--- 
+--=20
 Without deviation from the norm, progress is not possible.
