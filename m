@@ -1,55 +1,55 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A959713BADC
-	for <kvmarm@lists.linux.dev>; Tue, 23 Apr 2024 15:05:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AAC013BAED
+	for <kvmarm@lists.linux.dev>; Tue, 23 Apr 2024 15:05:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713884748; cv=none; b=nWR/XN04UCKENm0GkMJAzwIr+nSMXSnGYCH4Lt++RP2VasB9poSEIIwFffTMVVHsVga0MAp37Ik0+trbmo1iW9wRuzK03pRzhgogfa/EZBK4/EuXxTz4G/e9sDS2RaG0V7bfNxEAMF2Q8prjEQqsL658L8esdQESbR/mrOfAEqw=
+	t=1713884751; cv=none; b=XfBmLfjz+fMmYPc48mwB7U4G9f344ZB5XazEgOctnTytMYy5GdqxzC3Hjc9jkP3Dc9PnteXtHrFLnR9c4D98sXtS7Acc/Bmq4K5s2mbZ9cBBxEYq4bIeMkXlrnEEHsIyBF22UqJ3Y1NihPagfCKZD7wHsWMKIfATlt6ykTj33/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713884748; c=relaxed/simple;
-	bh=Fi0fqh/53uNOdX3QxpBsmLU03FADc6YcAJiIQHg+4LM=;
+	s=arc-20240116; t=1713884751; c=relaxed/simple;
+	bh=7v1umB0/A1cjS8yw+dsGSQaKZD+/21gaaXSISTzsswc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=u16+4+K5QyqTapSs65+wMGtGiVS2YBFIOjz9CFST5uYnijiEuLTD+smrTw2Bqf5CzsE99b8G/3CBdnV3eh1FX22Frv9qvI3kblC9hjPppyW6XQgAhW4v66nPfdG22YUpoeTfWTdEgg5jl8xtHfna8Yj133oZ9z2r8exNGCIvkg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Snjtvpry; arc=none smtp.client-ip=209.85.128.201
+	 To:Cc:Content-Type; b=RV2Hoq21gY5sOfojyx8EeNYOlKzBUamVCKPFnacHOTqamt3lhizEq3ePhaTczcPwpEP4kzE9WiKMw9Wfr1xMcF2lFDpuiQq+Gz+snOTQ78AoxxPzBXgNV+euCuOK6DMdddRHItea0I+E2skBwCx1PKBx1OpIRmpxyCXMxNwxcn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dNRDxBVj; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Snjtvpry"
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-61afa79081dso98276177b3.2
-        for <kvmarm@lists.linux.dev>; Tue, 23 Apr 2024 08:05:46 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dNRDxBVj"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-416e58bdc0eso24065235e9.0
+        for <kvmarm@lists.linux.dev>; Tue, 23 Apr 2024 08:05:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713884745; x=1714489545; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1713884748; x=1714489548; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0v/WveyMQKVn5E1RewUvOuzzO1kFx2OaJnddNLGMg0U=;
-        b=SnjtvpryR48uJ/IySto2q/AO2dpIPnvAAn9un3MCff92nZsUt7+I9pnKC3ELD/ewTF
-         Shu5/FNRuHfbqcG65VPU3T9a6Mz/dhuhAOkNOAVPQ2FXxlFEsnBbyj9a4snHEeDqDHdP
-         GPuOQYVBa8rPms/MfSgr7qIGqbX3b26hGaG9bA/xEuXo15FwIjqgscRlqUDEIlT1qb8P
-         /2ai7PWkgFxsM45Mu1Z9bNmsPcN2Ns7WB+FP39C56jYIf+btjwM6tPoLPBoXNIcPNX7J
-         JNiVar9CcATbPFVH5sMeImaCl0QMXah2dTgvJ1RL5J9eWgK7drnAG252BxGaMtnoJiDq
-         Kb3Q==
+        bh=bycnYl6s6b2K1Dc5tdJ0ejyT+YcdRIlqKxvzu34Tjhs=;
+        b=dNRDxBVj83NWXJCT737WVMPp3ksFK2QU2C0iBk8bw9+rdlA0ETUWDp4frRG0E7PnSm
+         V5+n3PAQCXIk0NQ10rtcN84eHPn/dJvWFuZ1KR0MYLCy7rLnUXgBbX0TeQoed427BAGg
+         xd5wmmBHoP2TbPez3UuEyVdPEYDY7YucARmTvKoBNUPeJGEGUtTS+z7ey+xEqGOxVywN
+         AK6BGeK6dNG2STsw+ERv1zQMmVHQ/fNCJnk2C6qLI9j49HTTz3xlg1Z0d335zqX8K8Yg
+         E9l7IosQuDCiAl0dT82h3VgsTyFyPpGZqeKytro/HzV/vT40jCQJT5d+uE1XWkak1NnE
+         QCng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713884745; x=1714489545;
+        d=1e100.net; s=20230601; t=1713884748; x=1714489548;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0v/WveyMQKVn5E1RewUvOuzzO1kFx2OaJnddNLGMg0U=;
-        b=TOWXoCHH7qhE8U+Sv+dtAHLd70sSD03F0QNGZJj34q/kxRJ0eiQ4nEPkh6LZTzavrK
-         8lnOAQBev8JlrtxYYs8DM8I/XqlBlAgyeGRUMdNO5WgyGJ5Xz48suXgbl57VVGBYW/b2
-         fsAjc8lWE69281WfhjEmNzN4e+3U9MZ6kzoH3XA/Oavjz1twNrntvwz/Tdgz8QcKXZjU
-         7o0f3+MBTPMkR6Q1BbPIjRpSRo5bT2T/IyQB2yEl3CmV/KhTdtT/c/YodarGqQr5AIS6
-         mMiXixLXTWVVd0LXceyQ9Nh8sXU0Gn51FKu/bpS1ZFE2/5RsFmvS1iapWiRyGFaTLZHe
-         fVSQ==
-X-Gm-Message-State: AOJu0YxwaUWebSuaT8VePRreRl4wdMn4QpIZCjRRwRgAbzLDFkWJ/99c
-	L+CAM/kOk1SkX0AwxbHVWq0ePJn4pozsVO4weLcqvN+40dc1yD6bW3TOqHI54+yC7HkS7sigm2+
-	ATv/9Mvd9dJTJiPGwTiAPIGmYTorfS4PE8c7Elt4U0GJEgpPvvgR0MSLwV3AtnsOawzJjtkDIzg
-	ivolzmuuUtnIeFd0vxn07S4bh7MZQ=
-X-Google-Smtp-Source: AGHT+IHSLRTb4beET0KTPB/k1HFcGsBJqgPxdjOX/yjFPkiB9tIO8J7GPwmdH0TBSKzjqWsEI56iO/ZUyg==
+        bh=bycnYl6s6b2K1Dc5tdJ0ejyT+YcdRIlqKxvzu34Tjhs=;
+        b=B6MtdUk2XFpO3DofeDtcz9ZDXmSRAbqWSZLortNb+4C0WTxKR6JxF1yw/8KLSNe5Jw
+         PoL4YtlANWG2LxICnzFr+QITgWlSXyJDjq7ykf4BB1AOpCor+TC0LDGq/DeEbI3E+dfa
+         srogdS2WTtSWubfQeBFfySrYF9ccDBu0TQoORPt83/XDej6kBOjkECQfQ9o45ZJ2g3yB
+         0t8yL4Qt3SJs8SJV0S44GxJ2llBnW4I5eQvAasps4OuCj137a/YQmDZTVCOHF60hXNKo
+         5oXIx8vjLfNoWgFgk7i3viVijyGQIEPoO5I0WlmDWNeFx8gwCUe+JT+hJul5RcG2aKBk
+         ppow==
+X-Gm-Message-State: AOJu0YyjxQN8u1bvYvH+DVzvnP08eJiimn5b7ZdUvDmULfzUkvLGi4R1
+	U1ZGNNLaAWM3hiBb1Cuqr3s8QxXwth7+9k0u1WNUN2G4LkZtN0zDvxLx82FlPSqOtXYeIleTe32
+	n2kMg8n7tHORT7bhSEp5OH8ZF0ANYs3t4x5UiU8FUO9f3d8loGOiOFeaolqdVZKszj8Y5cMlNzW
+	o4jNBV5SkFx/28Nw9oxDtneAztKWs=
+X-Google-Smtp-Source: AGHT+IGhPkT/h8wPuSKs6RyyIFL0299+X/8ZYh1h6/XPMkoRwvTo7yJ+69j2xgNzfnFzJb2pt/UOLfnKAQ==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:6902:2b02:b0:de5:2ce1:b62d with SMTP id
- fi2-20020a0569022b0200b00de52ce1b62dmr582464ybb.10.1713884745397; Tue, 23 Apr
- 2024 08:05:45 -0700 (PDT)
-Date: Tue, 23 Apr 2024 16:05:10 +0100
+ (user=tabba job=sendgmr) by 2002:a05:600c:3b27:b0:416:542e:c74c with SMTP id
+ m39-20020a05600c3b2700b00416542ec74cmr70591wms.7.1713884747670; Tue, 23 Apr
+ 2024 08:05:47 -0700 (PDT)
+Date: Tue, 23 Apr 2024 16:05:11 +0100
 In-Reply-To: <20240423150538.2103045-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,9 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240423150538.2103045-1-tabba@google.com>
 X-Mailer: git-send-email 2.44.0.769.g3c40516874-goog
-Message-ID: <20240423150538.2103045-3-tabba@google.com>
-Subject: [PATCH v4 02/30] KVM: arm64: Move guest_owns_fp_regs() to increase
- its scope
+Message-ID: <20240423150538.2103045-4-tabba@google.com>
+Subject: [PATCH v4 03/30] KVM: arm64: Refactor checks for FP state ownership
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev
 Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com, 
@@ -71,83 +70,128 @@ Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com,
 	joey.gouly@arm.com, rananta@google.com, smostafa@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-guest_owns_fp_regs() will be used to check fpsimd state ownership
-across kvm/arm64. Therefore, move it to kvm_host.h to widen its
-scope.
+To avoid direct comparison against the fp_owner enum, add a new
+function that performs the check, host_owns_fp_regs(), to
+complement the existing guest_owns_fp_regs().
 
-Moreover, the host state is not per-vcpu anymore, the vcpu
-parameter isn't used, so remove it as well.
+To check for fpsimd state ownership, use the helpers instead of
+directly using the enums.
 
 No functional change intended.
 
+Suggested-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
+ arch/arm64/include/asm/kvm_emulate.h    | 6 ++----
  arch/arm64/include/asm/kvm_host.h       | 6 ++++++
- arch/arm64/kvm/hyp/include/hyp/switch.h | 6 ------
+ arch/arm64/kvm/fpsimd.c                 | 5 ++---
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 2 +-
  arch/arm64/kvm/hyp/nvhe/switch.c        | 2 +-
  arch/arm64/kvm/hyp/vhe/switch.c         | 2 +-
- 4 files changed, 8 insertions(+), 8 deletions(-)
+ 6 files changed, 13 insertions(+), 10 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 16ed1edc3780..501e3e019c93 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -577,16 +577,14 @@ static __always_inline u64 kvm_get_reset_cptr_el2(struct kvm_vcpu *vcpu)
+ 	} else if (has_hvhe()) {
+ 		val = (CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN);
+ 
+-		if (!vcpu_has_sve(vcpu) ||
+-		    (*host_data_ptr(fp_owner) != FP_STATE_GUEST_OWNED))
++		if (!vcpu_has_sve(vcpu) || !guest_owns_fp_regs())
+ 			val |= CPACR_EL1_ZEN_EL1EN | CPACR_EL1_ZEN_EL0EN;
+ 		if (cpus_have_final_cap(ARM64_SME))
+ 			val |= CPACR_EL1_SMEN_EL1EN | CPACR_EL1_SMEN_EL0EN;
+ 	} else {
+ 		val = CPTR_NVHE_EL2_RES1;
+ 
+-		if (vcpu_has_sve(vcpu) &&
+-		    (*host_data_ptr(fp_owner) == FP_STATE_GUEST_OWNED))
++		if (vcpu_has_sve(vcpu) && guest_owns_fp_regs())
+ 			val |= CPTR_EL2_TZ;
+ 		if (cpus_have_final_cap(ARM64_SME))
+ 			val &= ~CPTR_EL2_TSM;
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index cdc0aad43d41..9e382a5b0875 100644
+index 9e382a5b0875..bb831a1bf4cb 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -1212,6 +1212,12 @@ DECLARE_KVM_HYP_PER_CPU(struct kvm_host_data, kvm_host_data);
- 	 &this_cpu_ptr_hyp_sym(kvm_host_data)->f)
- #endif
+@@ -1218,6 +1218,12 @@ static inline bool guest_owns_fp_regs(void)
+ 	return *host_data_ptr(fp_owner) == FP_STATE_GUEST_OWNED;
+ }
  
-+/* Check whether the FP regs are owned by the guest */
-+static inline bool guest_owns_fp_regs(void)
++/* Check whether the FP regs are owned by the host */
++static inline bool host_owns_fp_regs(void)
 +{
-+	return *host_data_ptr(fp_owner) == FP_STATE_GUEST_OWNED;
++	return *host_data_ptr(fp_owner) == FP_STATE_HOST_OWNED;
 +}
 +
  static inline void kvm_init_host_cpu_context(struct kvm_cpu_context *cpu_ctxt)
  {
  	/* The host's MPIDR is immutable, so let's set it up at boot time */
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 61772bf1d3e6..e97c981e5bef 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -40,12 +40,6 @@ struct kvm_exception_table_entry {
- extern struct kvm_exception_table_entry __start___kvm_ex_table;
- extern struct kvm_exception_table_entry __stop___kvm_ex_table;
+diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
+index 7507dcc4e553..d5837d65e4a1 100644
+--- a/arch/arm64/kvm/fpsimd.c
++++ b/arch/arm64/kvm/fpsimd.c
+@@ -141,8 +141,7 @@ void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu)
  
--/* Check whether the FP regs are owned by the guest */
--static inline bool guest_owns_fp_regs(struct kvm_vcpu *vcpu)
--{
--	return *host_data_ptr(fp_owner) == FP_STATE_GUEST_OWNED;
--}
+ 	WARN_ON_ONCE(!irqs_disabled());
+ 
+-	if (*host_data_ptr(fp_owner) == FP_STATE_GUEST_OWNED) {
 -
- /* Save the 32-bit only FPSIMD system register state */
- static inline void __fpsimd_save_fpexc32(struct kvm_vcpu *vcpu)
- {
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index 563604b55ea2..d373578c7a49 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -53,7 +53,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
- 			val |= CPTR_EL2_TSM;
++	if (guest_owns_fp_regs()) {
+ 		/*
+ 		 * Currently we do not support SME guests so SVCR is
+ 		 * always 0 and we just need a variable to point to.
+@@ -195,7 +194,7 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
+ 		isb();
  	}
  
--	if (!guest_owns_fp_regs(vcpu)) {
-+	if (!guest_owns_fp_regs()) {
- 		if (has_hvhe())
- 			val &= ~(CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN |
- 				 CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN);
+-	if (*host_data_ptr(fp_owner) == FP_STATE_GUEST_OWNED) {
++	if (guest_owns_fp_regs()) {
+ 		if (vcpu_has_sve(vcpu)) {
+ 			__vcpu_sys_reg(vcpu, ZCR_EL1) = read_sysreg_el1(SYS_ZCR);
+ 
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index e97c981e5bef..a92566f36022 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -369,7 +369,7 @@ static bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	isb();
+ 
+ 	/* Write out the host state if it's in the registers */
+-	if (*host_data_ptr(fp_owner) == FP_STATE_HOST_OWNED)
++	if (host_owns_fp_regs())
+ 		__fpsimd_save_state(*host_data_ptr(fpsimd_state));
+ 
+ 	/* Restore the guest state */
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index d373578c7a49..136f6ff2edd3 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -335,7 +335,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ 
+ 	__sysreg_restore_state_nvhe(host_ctxt);
+ 
+-	if (*host_data_ptr(fp_owner) == FP_STATE_GUEST_OWNED)
++	if (guest_owns_fp_regs())
+ 		__fpsimd_save_fpexc32(vcpu);
+ 
+ 	__debug_switch_to_host(vcpu);
 diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index 90f22926b15b..9e8d3605a9a1 100644
+index 9e8d3605a9a1..3c339d552591 100644
 --- a/arch/arm64/kvm/hyp/vhe/switch.c
 +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -107,7 +107,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+@@ -338,7 +338,7 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
  
- 	val |= CPTR_EL2_TAM;
+ 	sysreg_restore_host_state_vhe(host_ctxt);
  
--	if (guest_owns_fp_regs(vcpu)) {
-+	if (guest_owns_fp_regs()) {
- 		if (vcpu_has_sve(vcpu))
- 			val |= CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN;
- 	} else {
+-	if (*host_data_ptr(fp_owner) == FP_STATE_GUEST_OWNED)
++	if (guest_owns_fp_regs())
+ 		__fpsimd_save_fpexc32(vcpu);
+ 
+ 	__debug_switch_to_host(vcpu);
 -- 
 2.44.0.769.g3c40516874-goog
 
