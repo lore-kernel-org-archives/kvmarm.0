@@ -1,63 +1,67 @@
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1BF513B7BD
-	for <kvmarm@lists.linux.dev>; Tue, 23 Apr 2024 15:05:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A959713BADC
+	for <kvmarm@lists.linux.dev>; Tue, 23 Apr 2024 15:05:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713884747; cv=none; b=HIJTdQmWbnhkERvybjEhyKXhZA0Rrctj/7/Ino2xB8/SObTBKKNKHzJXQrXgqcyNTa8os25Hk+01nofx53uCuIpfTKiCrpc4j2NItP4ChPPrBGG5ouQjdcU4PsmDqSwb9G2d4jYs9LqYSrAhR6XBT6DIDnqhUlaDAZKyISeSUUc=
+	t=1713884748; cv=none; b=nWR/XN04UCKENm0GkMJAzwIr+nSMXSnGYCH4Lt++RP2VasB9poSEIIwFffTMVVHsVga0MAp37Ik0+trbmo1iW9wRuzK03pRzhgogfa/EZBK4/EuXxTz4G/e9sDS2RaG0V7bfNxEAMF2Q8prjEQqsL658L8esdQESbR/mrOfAEqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713884747; c=relaxed/simple;
-	bh=A4zJjTJZMdv/Bwa5Y7iVB+VJ3s2opTqOgeA+nH+Bgx0=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=aJdCYuR5BL7McZpeb5SalfEVj12IewrAXzwcdL6C2v/u9X5XTEIwxB2Rij2z5n6il9cB9/EIFNBt6qACvCLlseRSaIlXqW70DgpvKrvO1rNhwOP/vKX+04u9N2dvtEMnXAreEOXaC1X7IrB3RaBLniN2gTLx2XPg91RwhvX9ltQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=emc7Phgx; arc=none smtp.client-ip=209.85.221.74
+	s=arc-20240116; t=1713884748; c=relaxed/simple;
+	bh=Fi0fqh/53uNOdX3QxpBsmLU03FADc6YcAJiIQHg+4LM=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=u16+4+K5QyqTapSs65+wMGtGiVS2YBFIOjz9CFST5uYnijiEuLTD+smrTw2Bqf5CzsE99b8G/3CBdnV3eh1FX22Frv9qvI3kblC9hjPppyW6XQgAhW4v66nPfdG22YUpoeTfWTdEgg5jl8xtHfna8Yj133oZ9z2r8exNGCIvkg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Snjtvpry; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="emc7Phgx"
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-343c7fa0dd5so3686256f8f.0
-        for <kvmarm@lists.linux.dev>; Tue, 23 Apr 2024 08:05:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Snjtvpry"
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-61afa79081dso98276177b3.2
+        for <kvmarm@lists.linux.dev>; Tue, 23 Apr 2024 08:05:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713884741; x=1714489541; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=jpVxpDzVPkd+ABoyHQLUke6orwAwqj6kvwbLcCeOspw=;
-        b=emc7PhgxaekfYN0SFRCnUN8uAEzi++MhkmTF3t8CHX7RGGc2sr5QashttriaBLj+ds
-         NzgLZb6q7jAppgbop3chakEC75CaXkZ7oIr+y0+L9l/YgSL7beBd0OV677cjXvLtZ26s
-         VztJsSLCPDYA3adyIrgCnTdpui88BBxIVP7y+R69H9ZexpMK0yohkkek3rVxhfjVbOLb
-         QciJG9i5c7K6pWhbMc/+LQwUEIiKqdr6DDANJ7Il463H8N2AVZ6pgd/8ruzo0IaqX41q
-         LEV+ZEVXg7uU8xEU7pBeENQHmyBzxDwu7G5JqYPkyiG1a+S619jChwFbkKtjWng9MEjb
-         jUug==
+        d=google.com; s=20230601; t=1713884745; x=1714489545; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0v/WveyMQKVn5E1RewUvOuzzO1kFx2OaJnddNLGMg0U=;
+        b=SnjtvpryR48uJ/IySto2q/AO2dpIPnvAAn9un3MCff92nZsUt7+I9pnKC3ELD/ewTF
+         Shu5/FNRuHfbqcG65VPU3T9a6Mz/dhuhAOkNOAVPQ2FXxlFEsnBbyj9a4snHEeDqDHdP
+         GPuOQYVBa8rPms/MfSgr7qIGqbX3b26hGaG9bA/xEuXo15FwIjqgscRlqUDEIlT1qb8P
+         /2ai7PWkgFxsM45Mu1Z9bNmsPcN2Ns7WB+FP39C56jYIf+btjwM6tPoLPBoXNIcPNX7J
+         JNiVar9CcATbPFVH5sMeImaCl0QMXah2dTgvJ1RL5J9eWgK7drnAG252BxGaMtnoJiDq
+         Kb3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713884741; x=1714489541;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jpVxpDzVPkd+ABoyHQLUke6orwAwqj6kvwbLcCeOspw=;
-        b=HyeJyiOsf1Yp5sy89DPTXg/lbbxYIRl7Ij8gAMO7QupoN70FTVWOHfTbFIPcCUVGta
-         OCKX2Yla33EccCMA4idPenJ9xhqDX5iemrDeD4alYhubQf0J93zZ/1ISw9FMgVYyqhSU
-         1miGkzxY2h7F3v59cJ4jD58OC6x4efyr6w6DEbyGjDIkFaQ6x23MRJ0wWttvFwlN2j47
-         WfzIFeY3saLxCGE5ICkgMDOE4Yx1d7xtaWz649TrWZ5uYE79S1bNr4U0sFpoqjlsMql2
-         6Lu0bE541SYBEVHKwk+EbpAuizQs9Y0B7GVm4LsJer3R1XB/p11x2BFlvsjmEZph18+N
-         tREw==
-X-Gm-Message-State: AOJu0YzVbp1WFjTaXrEeCN7rHmyfIEx8gpH9UGtQTw+XrH9QewVSPdFu
-	omSOX7fkvf4v1oAyhC6ZLdA+JRc9t3TsoVrkV52aYCxZ5XXOJPZ+39FE1hg9QvXQJxIU8m1ctM6
-	M1Ux3v4jKQYjuG5rAE0TNt/DzfuilOM8NoospP7e2gSea0Y3FfeLHT/VNOVUdXofmDQjk9l+ad9
-	3qMIWargJyx2APbIhDZLMZ+VniXp8=
-X-Google-Smtp-Source: AGHT+IEyaqU36nMf+qt7SkFXLh72jwd7qocyr1wUgbJ9nuaxNvU9yaGI4nctQCNZBdC6T5RsP2Srir2j8g==
+        d=1e100.net; s=20230601; t=1713884745; x=1714489545;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0v/WveyMQKVn5E1RewUvOuzzO1kFx2OaJnddNLGMg0U=;
+        b=TOWXoCHH7qhE8U+Sv+dtAHLd70sSD03F0QNGZJj34q/kxRJ0eiQ4nEPkh6LZTzavrK
+         8lnOAQBev8JlrtxYYs8DM8I/XqlBlAgyeGRUMdNO5WgyGJ5Xz48suXgbl57VVGBYW/b2
+         fsAjc8lWE69281WfhjEmNzN4e+3U9MZ6kzoH3XA/Oavjz1twNrntvwz/Tdgz8QcKXZjU
+         7o0f3+MBTPMkR6Q1BbPIjRpSRo5bT2T/IyQB2yEl3CmV/KhTdtT/c/YodarGqQr5AIS6
+         mMiXixLXTWVVd0LXceyQ9Nh8sXU0Gn51FKu/bpS1ZFE2/5RsFmvS1iapWiRyGFaTLZHe
+         fVSQ==
+X-Gm-Message-State: AOJu0YxwaUWebSuaT8VePRreRl4wdMn4QpIZCjRRwRgAbzLDFkWJ/99c
+	L+CAM/kOk1SkX0AwxbHVWq0ePJn4pozsVO4weLcqvN+40dc1yD6bW3TOqHI54+yC7HkS7sigm2+
+	ATv/9Mvd9dJTJiPGwTiAPIGmYTorfS4PE8c7Elt4U0GJEgpPvvgR0MSLwV3AtnsOawzJjtkDIzg
+	ivolzmuuUtnIeFd0vxn07S4bh7MZQ=
+X-Google-Smtp-Source: AGHT+IHSLRTb4beET0KTPB/k1HFcGsBJqgPxdjOX/yjFPkiB9tIO8J7GPwmdH0TBSKzjqWsEI56iO/ZUyg==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:adf:e8c2:0:b0:349:7e66:99f with SMTP id
- k2-20020adfe8c2000000b003497e66099fmr32092wrn.13.1713884740724; Tue, 23 Apr
- 2024 08:05:40 -0700 (PDT)
-Date: Tue, 23 Apr 2024 16:05:08 +0100
+ (user=tabba job=sendgmr) by 2002:a05:6902:2b02:b0:de5:2ce1:b62d with SMTP id
+ fi2-20020a0569022b0200b00de52ce1b62dmr582464ybb.10.1713884745397; Tue, 23 Apr
+ 2024 08:05:45 -0700 (PDT)
+Date: Tue, 23 Apr 2024 16:05:10 +0100
+In-Reply-To: <20240423150538.2103045-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20240423150538.2103045-1-tabba@google.com>
 X-Mailer: git-send-email 2.44.0.769.g3c40516874-goog
-Message-ID: <20240423150538.2103045-1-tabba@google.com>
-Subject: [PATCH v4 00/30] KVM: arm64: Preamble for pKVM
+Message-ID: <20240423150538.2103045-3-tabba@google.com>
+Subject: [PATCH v4 02/30] KVM: arm64: Move guest_owns_fp_regs() to increase
+ its scope
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev
 Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com, 
@@ -67,128 +71,83 @@ Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com,
 	joey.gouly@arm.com, rananta@google.com, smostafa@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Changes from V3 [0]:
-- Rebased on latest kvmarm/next (dcbf421a8c08)
-- Dropped atomic and locking patches for now, while we rework them
-- Misc fixes (Oliver)
+guest_owns_fp_regs() will be used to check fpsimd state ownership
+across kvm/arm64. Therefore, move it to kvm_host.h to widen its
+scope.
 
-We are getting closer to upstreaming the remaining part of pKVM
-[1]. To make the process easier for us and for our dear
-reviewers, we are sending out this patch series as a preamble to
-the upcoming patches.
+Moreover, the host state is not per-vcpu anymore, the vcpu
+parameter isn't used, so remove it as well.
 
-This series is based on Linux 6.9-rc3 -- kvmarm/next
-(dcbf421a8c08). Most of the patches in this series are
-self-standing, and can be applied directly. Patches 1 to 13 are
-fixes.
+No functional change intended.
 
-This series is a bit of a bombay-mix of patches we've been
-carrying. There's no one overarching theme, but they do improve
-the code by fixing existing bugs in pKVM, refactoring code to
-make it more readable and easier to re-use for pKVM, or adding
-functionality to the existing pKVM code upstream.
+Signed-off-by: Fuad Tabba <tabba@google.com>
+---
+ arch/arm64/include/asm/kvm_host.h       | 6 ++++++
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 6 ------
+ arch/arm64/kvm/hyp/nvhe/switch.c        | 2 +-
+ arch/arm64/kvm/hyp/vhe/switch.c         | 2 +-
+ 4 files changed, 8 insertions(+), 8 deletions(-)
 
-For a technical deep dive into pKVM, please refer to Quentin
-Perret's KVM Forum Presentation [2, 3]. The pKVM core series,
-which we plan on sending for review next, the code is here [1].
-
-Cheers,
-Fuad, Quentin, Will, and Marc
-
-[0] https://lore.kernel.org/all/20240419075941.4085061-1-tabba@google.com/
-
-[1] https://android-kvm.googlesource.com/linux/+/refs/heads/for-upstream/pkvm-core
-
-[2] Protected KVM on arm64 (slides)
-https://static.sched.com/hosted_files/kvmforum2022/88/KVM%20forum%202022%20-%20pKVM%20deep%20dive.pdf
-
-[3] Protected KVM on arm64 (video)
-https://www.youtube.com/watch?v=9npebeVFbFw
-
-Fuad Tabba (18):
-  KVM: arm64: Initialize the kvm host data's fpsimd_state pointer in
-    pKVM
-  KVM: arm64: Move guest_owns_fp_regs() to increase its scope
-  KVM: arm64: Refactor checks for FP state ownership
-  KVM: arm64: Do not re-initialize the KVM lock
-  KVM: arm64: Rename __tlb_switch_to_{guest,host}() in VHE
-  KVM: arm64: Do not map the host fpsimd state to hyp in pKVM
-  KVM: arm64: Fix comment for __pkvm_vcpu_init_traps()
-  KVM: arm64: Change kvm_handle_mmio_return() return polarity
-  KVM: arm64: Move setting the page as dirty out of the critical section
-  KVM: arm64: Introduce and use predicates that check for protected VMs
-  KVM: arm64: Move pstate reset value definitions to kvm_arm.h
-  KVM: arm64: Clarify rationale for ZCR_EL1 value restored on guest exit
-  KVM: arm64: Refactor calculating SVE state size to use helpers
-  KVM: arm64: Move some kvm_psci functions to a shared header
-  KVM: arm64: Refactor reset_mpidr() to extract its computation
-  KVM: arm64: Refactor kvm_vcpu_enable_ptrauth() for hyp use
-  KVM: arm64: Refactor setting the return value in
-    kvm_vm_ioctl_enable_cap()
-  KVM: arm64: Restrict supported capabilities for protected VMs
-
-Marc Zyngier (3):
-  KVM: arm64: Check for PTE validity when checking for
-    executable/cacheable
-  KVM: arm64: Simplify vgic-v3 hypercalls
-  KVM: arm64: Force injection of a data abort on NISV MMIO exit
-
-Quentin Perret (4):
-  KVM: arm64: Issue CMOs when tearing down guest s2 pages
-  KVM: arm64: Avoid BUG-ing from the host abort path
-  KVM: arm64: Prevent kmemleak from accessing .hyp.data
-  KVM: arm64: Add is_pkvm_initialized() helper
-
-Will Deacon (5):
-  KVM: arm64: Avoid BBM when changing only s/w bits in Stage-2 PTE
-  KVM: arm64: Support TLB invalidation in guest context
-  KVM: arm64: Reformat/beautify PTP hypercall documentation
-  KVM: arm64: Rename firmware pseudo-register documentation file
-  KVM: arm64: Document the KVM/arm64-specific calls in hypercalls.rst
-
- Documentation/virt/kvm/api.rst                |   7 +
- .../virt/kvm/arm/fw-pseudo-registers.rst      | 138 ++++++++++++++
- Documentation/virt/kvm/arm/hypercalls.rst     | 180 +++++-------------
- Documentation/virt/kvm/arm/index.rst          |   1 +
- Documentation/virt/kvm/arm/ptp_kvm.rst        |  38 ++--
- arch/arm64/include/asm/kvm_arm.h              |  12 ++
- arch/arm64/include/asm/kvm_asm.h              |   8 +-
- arch/arm64/include/asm/kvm_emulate.h          |  11 +-
- arch/arm64/include/asm/kvm_host.h             |  39 ++--
- arch/arm64/include/asm/kvm_hyp.h              |   4 +-
- arch/arm64/include/asm/virt.h                 |  12 +-
- arch/arm64/kvm/arm.c                          |  63 ++++--
- arch/arm64/kvm/fpsimd.c                       |  60 +++---
- arch/arm64/kvm/hyp/include/hyp/switch.h       |   8 +-
- arch/arm64/kvm/hyp/include/nvhe/pkvm.h        |   6 +
- arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  24 +--
- arch/arm64/kvm/hyp/nvhe/mem_protect.c         |   8 +-
- arch/arm64/kvm/hyp/nvhe/pkvm.c                |  14 +-
- arch/arm64/kvm/hyp/nvhe/setup.c               |   1 +
- arch/arm64/kvm/hyp/nvhe/switch.c              |  10 +-
- arch/arm64/kvm/hyp/nvhe/tlb.c                 | 115 ++++++++---
- arch/arm64/kvm/hyp/pgtable.c                  |  21 +-
- arch/arm64/kvm/hyp/vgic-v3-sr.c               |  27 ++-
- arch/arm64/kvm/hyp/vhe/switch.c               |   4 +-
- arch/arm64/kvm/hyp/vhe/tlb.c                  |  26 +--
- arch/arm64/kvm/mmio.c                         |  12 +-
- arch/arm64/kvm/mmu.c                          |   8 +-
- arch/arm64/kvm/pkvm.c                         |   2 +-
- arch/arm64/kvm/psci.c                         |  28 ---
- arch/arm64/kvm/reset.c                        |  20 +-
- arch/arm64/kvm/sys_regs.c                     |  14 +-
- arch/arm64/kvm/sys_regs.h                     |  19 ++
- arch/arm64/kvm/vgic/vgic-v2.c                 |   9 +-
- arch/arm64/kvm/vgic/vgic-v3.c                 |  23 +--
- arch/arm64/kvm/vgic/vgic.c                    |  11 --
- arch/arm64/kvm/vgic/vgic.h                    |   2 -
- include/kvm/arm_psci.h                        |  29 +++
- include/kvm/arm_vgic.h                        |   1 -
- 38 files changed, 597 insertions(+), 418 deletions(-)
- create mode 100644 Documentation/virt/kvm/arm/fw-pseudo-registers.rst
-
-
-base-commit: dcbf421a8c082f52f3b8cc19cff736374df123d6
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index cdc0aad43d41..9e382a5b0875 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -1212,6 +1212,12 @@ DECLARE_KVM_HYP_PER_CPU(struct kvm_host_data, kvm_host_data);
+ 	 &this_cpu_ptr_hyp_sym(kvm_host_data)->f)
+ #endif
+ 
++/* Check whether the FP regs are owned by the guest */
++static inline bool guest_owns_fp_regs(void)
++{
++	return *host_data_ptr(fp_owner) == FP_STATE_GUEST_OWNED;
++}
++
+ static inline void kvm_init_host_cpu_context(struct kvm_cpu_context *cpu_ctxt)
+ {
+ 	/* The host's MPIDR is immutable, so let's set it up at boot time */
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 61772bf1d3e6..e97c981e5bef 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -40,12 +40,6 @@ struct kvm_exception_table_entry {
+ extern struct kvm_exception_table_entry __start___kvm_ex_table;
+ extern struct kvm_exception_table_entry __stop___kvm_ex_table;
+ 
+-/* Check whether the FP regs are owned by the guest */
+-static inline bool guest_owns_fp_regs(struct kvm_vcpu *vcpu)
+-{
+-	return *host_data_ptr(fp_owner) == FP_STATE_GUEST_OWNED;
+-}
+-
+ /* Save the 32-bit only FPSIMD system register state */
+ static inline void __fpsimd_save_fpexc32(struct kvm_vcpu *vcpu)
+ {
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index 563604b55ea2..d373578c7a49 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -53,7 +53,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+ 			val |= CPTR_EL2_TSM;
+ 	}
+ 
+-	if (!guest_owns_fp_regs(vcpu)) {
++	if (!guest_owns_fp_regs()) {
+ 		if (has_hvhe())
+ 			val &= ~(CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN |
+ 				 CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN);
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index 90f22926b15b..9e8d3605a9a1 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -107,7 +107,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+ 
+ 	val |= CPTR_EL2_TAM;
+ 
+-	if (guest_owns_fp_regs(vcpu)) {
++	if (guest_owns_fp_regs()) {
+ 		if (vcpu_has_sve(vcpu))
+ 			val |= CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN;
+ 	} else {
 -- 
 2.44.0.769.g3c40516874-goog
 
