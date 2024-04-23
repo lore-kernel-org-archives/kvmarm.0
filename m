@@ -1,55 +1,55 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E11313BADD
-	for <kvmarm@lists.linux.dev>; Tue, 23 Apr 2024 15:06:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A40113B7BD
+	for <kvmarm@lists.linux.dev>; Tue, 23 Apr 2024 15:06:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713884796; cv=none; b=t5ga/uvlg9OhL91rsp44oFfpBAJBRrktazYqzKDRLgxipOPWb2xRoNgBHAcJqy8WYVArBX6RQ/HMG0a4nL1XdnpatQI10rxJ5I25xn4ah3rWyFhcY/xesw4+JIu9MuEefP5YGihqUnBhKJInJJMXDPYpdkd6tVzyeGC6WX2nK6s=
+	t=1713884798; cv=none; b=i3hRQpy2aIP71Yh2eVx/K3tfOVzWMjlzbqlKp1R4E+TZhV5zEZaI2BfHsuR8hel6ZvtSUWuOHzdQI9dKaCMMViPJjOdzeSh4icrcWAH95iG1IHG3uJcIIpH2ZgtMqDT6HqKRZW+TWDWzVpff3QbNnhYEfd0Cda4XWswMBgdMb8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713884796; c=relaxed/simple;
-	bh=H120HCXBI3/guyh6tfue56/bfmVkmtQxzhaIWdicHvk=;
+	s=arc-20240116; t=1713884798; c=relaxed/simple;
+	bh=TwQAfSRbn3LY8w+X90hnbgN5Ymfx7kHarmdIPV+FEZQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Hd0nuHE9sEMW3FLHozACWYgRtbsyoQwVGtF2yot9RKj5g11UpILySuwtHfDOywuMMk07ola6SLCBEpuaHhd7lEeAdpPbgqnlzXQ9c5dcAo3/n7PkJ8YRBWixbcVV5wghMSDNnylTcA+CvWpGklFw3Lsetz2jyyOmX7KRjURvbCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AM/N3Qik; arc=none smtp.client-ip=209.85.128.74
+	 To:Cc:Content-Type; b=QR0POJgl/oBkyhMS4NO20/nzPwx3UZhc5d/RSSYvxJOech5VKZvHaPOoKlcnKZNSxTtLllDriFGL9+xvHXmnVTBZ0NG35vkTV0hssHfIV+7GG/7VvMsk7pHvvmAjLeGQ3rQ7pvx1a7fmMjXHQ4JWDzTx/pC6SM9wUKMtN+MbWIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QT7uvu4z; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AM/N3Qik"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-416ac21981dso28150065e9.1
-        for <kvmarm@lists.linux.dev>; Tue, 23 Apr 2024 08:06:35 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QT7uvu4z"
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-de465062289so12755426276.2
+        for <kvmarm@lists.linux.dev>; Tue, 23 Apr 2024 08:06:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713884793; x=1714489593; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1713884796; x=1714489596; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WAASiQj8ySouqSnzFWGUNnXYH4XrZldkqK8o7Htn7bk=;
-        b=AM/N3QikF9b829S7IzjjHHoEkXVGWoVJrZc0c7ScF/Nw7aSuQ/8xf5qcDvY5X7fSTU
-         NtkYD3TuBn66SxPCgJw2R6AuyJdPGpA2Sb6mwDTtuf0PXQDS5KCuLkz8v7yDprmAUkJe
-         0yzTFLFormzbi7X+vWciXMsH6JmuOq+5jMTO+ixLARxHXqDBf6GKUOvIKjmMm0jbP/Sm
-         /6cviSFxi4iXpHnfIFzRrjPIm7tJS3uOd9Njwy1D++Nfl4f2acP4rjLWAIzJaoATgkBa
-         KRtZ5wufiT1TtHYJFEXAc5QyEqVn2KvITBNf5kBG5uFWtGVbPGFTmk21Jl61PM/iDYVS
-         5Zxg==
+        bh=NOxZ5KTuixEl9yHchF6QpX/YqwkaE/fNJT9xow+k8E8=;
+        b=QT7uvu4za6J5FfabGVWzMojaqtQMlQLt5ucHxNLKEJ3czOgYdiT1nfu7vU3YsZ69r7
+         xYK+VDWyhx9Dq+a1X5B8s5QMiuWE2yhXNzMTR9dgU9vpOMOY8o+fUrlhyFD8OMmPKhXZ
+         3QtOZE/WvKdE+oNQluYZFb2ffOcyh/G1WXzTCC2pPgT+Mb8l2kNsPvlXbqMdFPGz+ssf
+         Rr8gXIcfqgWflCFa4UupDgkdrwXjZ1Aqwe4SLlzmSvWyrp693qSkL0s7bzWa/0F1ET+c
+         ArxwPVt1lJhl3AJl5yLJ3ZPmEyN31kZ3B1cOt/vFhvhLsOetHiy2Rd+i+QvCg8FpTYS2
+         5zxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713884793; x=1714489593;
+        d=1e100.net; s=20230601; t=1713884796; x=1714489596;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WAASiQj8ySouqSnzFWGUNnXYH4XrZldkqK8o7Htn7bk=;
-        b=SkpYnQAVjUzNRpe7RuRtwPJzP+GUsUa2hTuaeeco0RnZIc/POkLQ7qnXUrdfCDzjTE
-         MECEyqKIfQpXFH86q14a/yAyllQhJ6XWU1NN++gOzVcxZZCzgVWTFFIOvfrECJVEWhkQ
-         /F6RD849/f8P0sOdDzuBbZMkBfrB3RK1EDXOGj02a94LKO6SMRo4/9SAhmen+scZlQjF
-         2k81PyOQakdjMez4SHyDvhUcIkyMoy6cra4/NPhjRN5INzwLQu+6RrvOm46AkGBuhQ4N
-         5jYxXrrmphUfI/EQ4e5R6BFOaNKPsydC8Oy4sopfrwDX9DUSg0way8WE0qLiL7gI4jiJ
-         vjnA==
-X-Gm-Message-State: AOJu0Ywvqsn715ie5bMxgIp8PbkXOuELM78sZ+R4eaSDXV8buUZr9xjG
-	2EjGFKNoDpwjiVakmnykc4P2FtmXW0aco8O6+rhReV3ewtySY/Vg3iF0TE7vaeQCLt6ppLqMQ5O
-	B8iAXX4uaNLLgOd8FIi2JmdL+IHi3eMyARV18sFGSr8xclOmle/aDq0eXqRqvFz0OrJBrx54KFN
-	OvnfxQnKS0qgFF2udcxSSKjuz/7jE=
-X-Google-Smtp-Source: AGHT+IFueBCmr1mDA+FOyY0da133iqCu9Ntv9F/8EwpNhXh6yjKgdHb8dyDHEDsQGfSPiMpZg/x/Q2jYJA==
+        bh=NOxZ5KTuixEl9yHchF6QpX/YqwkaE/fNJT9xow+k8E8=;
+        b=AE3oa+cudM0d1NQYr8qRN55brPWmxcw1sLHyGeGCe2pkT2at1silSKgDotLIMg02ki
+         7/hnrwmOtX/okzju5g1s1WCRPj4SSjtUtK0INUBPW6zt9RJafM0YZqeivF0wJSOjPvcP
+         LokkHnOb9Nv07j4haYLhABLCTzH4Ou/UDOvVnU5bglWWoCDyJu/TaI7fTNY42lvcKv8d
+         lZTDmxb+L3jhw3QHrj/PFd1mLVrnJhvurPbMdUzHvAqlbchFw/7X6hEfP1hyLFvIJmPt
+         IMm4ugzzO/rVoLENpsjbIc/AxNvQe+1F4wJ8Seou0ZFCbbdHJENZ/KU9Fi/bZvbMyBoQ
+         YSXg==
+X-Gm-Message-State: AOJu0YxqvtvWEiFPfPbigcsdoUpzSTb2SGMHWBOA2LNfTz5KDiiX8m+E
+	b/jy1RNUwORSLqYjA5VD8bCU4anzz6wuY2rbfM/nXmBRfSEL2191OH6Y9m8ARShGFXpUH4u+6sG
+	RWaqIGbWNnSPzLrDrae6tTeQLWe15f2WrwZbqLVT47lomYHCZtkguGACCdhtDBatEg72GPxzL7D
+	kfMFn82/SG6V6TAQ+JTY6qMtah378=
+X-Google-Smtp-Source: AGHT+IH5f7dwFv+wE8mTQRkVvN6C36JhQ2TRdzqa0Wa1GcfYK7qn3HYMN0U2EEQVyVVwxXKxvWl14NJHvw==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:600c:78a:b0:418:4e4a:fec5 with SMTP id
- z10-20020a05600c078a00b004184e4afec5mr25988wmo.3.1713884793628; Tue, 23 Apr
- 2024 08:06:33 -0700 (PDT)
-Date: Tue, 23 Apr 2024 16:05:31 +0100
+ (user=tabba job=sendgmr) by 2002:a05:6902:1886:b0:dcc:6065:2b3d with SMTP id
+ cj6-20020a056902188600b00dcc60652b3dmr3984569ybb.8.1713884795971; Tue, 23 Apr
+ 2024 08:06:35 -0700 (PDT)
+Date: Tue, 23 Apr 2024 16:05:32 +0100
 In-Reply-To: <20240423150538.2103045-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240423150538.2103045-1-tabba@google.com>
 X-Mailer: git-send-email 2.44.0.769.g3c40516874-goog
-Message-ID: <20240423150538.2103045-24-tabba@google.com>
-Subject: [PATCH v4 23/30] KVM: arm64: Refactor reset_mpidr() to extract its computation
+Message-ID: <20240423150538.2103045-25-tabba@google.com>
+Subject: [PATCH v4 24/30] KVM: arm64: Refactor kvm_vcpu_enable_ptrauth() for
+ hyp use
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev
 Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com, 
@@ -70,74 +71,56 @@ Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com,
 	joey.gouly@arm.com, rananta@google.com, smostafa@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Move the computation of the mpidr to its own function in a shared
-header, as the computation will be used by hyp in protected mode.
+Move kvm_vcpu_enable_ptrauth() to a shared header to be used by
+hyp in protected mode.
 
 No functional change intended.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/sys_regs.c | 14 +-------------
- arch/arm64/kvm/sys_regs.h | 19 +++++++++++++++++++
- 2 files changed, 20 insertions(+), 13 deletions(-)
+ arch/arm64/include/asm/kvm_emulate.h | 5 +++++
+ arch/arm64/kvm/reset.c               | 7 +------
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 33efa441e21d..c6da7dd891bd 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -816,21 +816,9 @@ static u64 reset_actlr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 501e3e019c93..48178b1c8362 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -599,4 +599,9 @@ static __always_inline void kvm_reset_cptr_el2(struct kvm_vcpu *vcpu)
  
- static u64 reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
- {
--	u64 mpidr;
-+	u64 mpidr = calculate_mpidr(vcpu);
- 
--	/*
--	 * Map the vcpu_id into the first three affinity level fields of
--	 * the MPIDR. We limit the number of VCPUs in level 0 due to a
--	 * limitation to 16 CPUs in that level in the ICC_SGIxR registers
--	 * of the GICv3 to be able to address each CPU directly when
--	 * sending IPIs.
--	 */
--	mpidr = (vcpu->vcpu_id & 0x0f) << MPIDR_LEVEL_SHIFT(0);
--	mpidr |= ((vcpu->vcpu_id >> 4) & 0xff) << MPIDR_LEVEL_SHIFT(1);
--	mpidr |= ((vcpu->vcpu_id >> 12) & 0xff) << MPIDR_LEVEL_SHIFT(2);
--	mpidr |= (1ULL << 31);
- 	vcpu_write_sys_reg(vcpu, mpidr, MPIDR_EL1);
--
- 	return mpidr;
+ 	kvm_write_cptr_el2(val);
  }
- 
-diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-index 997eea21ba2a..1dfd2380a1ae 100644
---- a/arch/arm64/kvm/sys_regs.h
-+++ b/arch/arm64/kvm/sys_regs.h
-@@ -222,6 +222,25 @@ find_reg(const struct sys_reg_params *params, const struct sys_reg_desc table[],
- 	return __inline_bsearch((void *)pval, table, num, sizeof(table[0]), match_sys_reg);
- }
- 
-+static inline u64 calculate_mpidr(const struct kvm_vcpu *vcpu)
++
++static inline void kvm_vcpu_enable_ptrauth(struct kvm_vcpu *vcpu)
 +{
-+	u64 mpidr;
-+
-+	/*
-+	 * Map the vcpu_id into the first three affinity level fields of
-+	 * the MPIDR. We limit the number of VCPUs in level 0 due to a
-+	 * limitation to 16 CPUs in that level in the ICC_SGIxR registers
-+	 * of the GICv3 to be able to address each CPU directly when
-+	 * sending IPIs.
-+	 */
-+	mpidr = (vcpu->vcpu_id & 0x0f) << MPIDR_LEVEL_SHIFT(0);
-+	mpidr |= ((vcpu->vcpu_id >> 4) & 0xff) << MPIDR_LEVEL_SHIFT(1);
-+	mpidr |= ((vcpu->vcpu_id >> 12) & 0xff) << MPIDR_LEVEL_SHIFT(2);
-+	mpidr |= (1ULL << 31);
-+
-+	return mpidr;
++	vcpu_set_flag(vcpu, GUEST_HAS_PTRAUTH);
 +}
+ #endif /* __ARM64_KVM_EMULATE_H__ */
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index 3d8064bf67c8..c955419582a8 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -105,7 +105,7 @@ static int kvm_vcpu_finalize_sve(struct kvm_vcpu *vcpu)
+ 		kfree(buf);
+ 		return ret;
+ 	}
+-	
 +
- const struct sys_reg_desc *get_reg_by_id(u64 id,
- 					 const struct sys_reg_desc table[],
- 					 unsigned int num);
+ 	vcpu->arch.sve_state = buf;
+ 	vcpu_set_flag(vcpu, VCPU_SVE_FINALIZED);
+ 	return 0;
+@@ -152,11 +152,6 @@ static void kvm_vcpu_reset_sve(struct kvm_vcpu *vcpu)
+ 		memset(vcpu->arch.sve_state, 0, vcpu_sve_state_size(vcpu));
+ }
+ 
+-static void kvm_vcpu_enable_ptrauth(struct kvm_vcpu *vcpu)
+-{
+-	vcpu_set_flag(vcpu, GUEST_HAS_PTRAUTH);
+-}
+-
+ /**
+  * kvm_reset_vcpu - sets core registers and sys_regs to reset value
+  * @vcpu: The VCPU pointer
 -- 
 2.44.0.769.g3c40516874-goog
 
