@@ -1,55 +1,55 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13EFC13BAF6
-	for <kvmarm@lists.linux.dev>; Tue, 23 Apr 2024 15:06:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E11313BADD
+	for <kvmarm@lists.linux.dev>; Tue, 23 Apr 2024 15:06:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713884794; cv=none; b=GnDv8iVwhWwelYDsk4ShZIDKLlNg8327/RCE/QlhH5DqIL42dxiCgC5K2nVhHNkiRYEG9e8tw6aZGLQ6NMQM3mEyVMZH3ovMaGZZ18LukPml0dJqalntG0FpkXcfHlGm6LhA9b4R3neRmhpKpz9Zm/cGfwLE5rNWX22tgulmK4Q=
+	t=1713884796; cv=none; b=t5ga/uvlg9OhL91rsp44oFfpBAJBRrktazYqzKDRLgxipOPWb2xRoNgBHAcJqy8WYVArBX6RQ/HMG0a4nL1XdnpatQI10rxJ5I25xn4ah3rWyFhcY/xesw4+JIu9MuEefP5YGihqUnBhKJInJJMXDPYpdkd6tVzyeGC6WX2nK6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713884794; c=relaxed/simple;
-	bh=L67FIsLrYDq3m/AAQI7Q0DrdhNhFyjFPI8yfSe7VkZI=;
+	s=arc-20240116; t=1713884796; c=relaxed/simple;
+	bh=H120HCXBI3/guyh6tfue56/bfmVkmtQxzhaIWdicHvk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=BRd2lf6glYOBUSpnsazcQWE3/WQLsY8dZwlghVBaI95KjZEmLUMgx2L9pTxkXpGTmw4akBlpO1FHmwfa8qV/ywjfDUOW9kVdQm7SrZoQf1O9zqCbN+bhbaWomEreyoeUA5OvaOPEBxXbJEHXS3fDbMvemHBFDIQ1fHKX+PZkqdU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4ufYIlZz; arc=none smtp.client-ip=209.85.128.73
+	 To:Cc:Content-Type; b=Hd0nuHE9sEMW3FLHozACWYgRtbsyoQwVGtF2yot9RKj5g11UpILySuwtHfDOywuMMk07ola6SLCBEpuaHhd7lEeAdpPbgqnlzXQ9c5dcAo3/n7PkJ8YRBWixbcVV5wghMSDNnylTcA+CvWpGklFw3Lsetz2jyyOmX7KRjURvbCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AM/N3Qik; arc=none smtp.client-ip=209.85.128.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4ufYIlZz"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-417df7b0265so27373235e9.3
-        for <kvmarm@lists.linux.dev>; Tue, 23 Apr 2024 08:06:32 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AM/N3Qik"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-416ac21981dso28150065e9.1
+        for <kvmarm@lists.linux.dev>; Tue, 23 Apr 2024 08:06:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713884791; x=1714489591; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1713884793; x=1714489593; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wDNmFjC7o20jtwaWLvYt53CgdwYHs/yn65M4v44/678=;
-        b=4ufYIlZzgFTNNfRcI2HmWk2MpAO0/Vidz5zDuBXdtGlxDG3T8b5uKRsq24NIkzXskU
-         SkwYLURAH1PaehEU+qe93GtT+hY/6oaUS3fOxYGXG+JJAk0zTNV6PaBMp590rIwWJD+u
-         5GIlWuXNNJG9fYHWIDWaBzW8/iOKZmaQN4u/yoeQsfvAQu4qk5ZEW6PBqcTPVbar3WmN
-         JwsPsYbnVBYnz8t+g/L1+s/Vw6k9eOY7F8hxzzC5rQDtLKJUbbyctbZChYMagRoOUffU
-         SKdIACY2GkWXKYuJTatf/hxm7LtbQbQv5LCajpnmlYeB4qtS7I6YzJmtPJaRREDH30zx
-         24jw==
+        bh=WAASiQj8ySouqSnzFWGUNnXYH4XrZldkqK8o7Htn7bk=;
+        b=AM/N3QikF9b829S7IzjjHHoEkXVGWoVJrZc0c7ScF/Nw7aSuQ/8xf5qcDvY5X7fSTU
+         NtkYD3TuBn66SxPCgJw2R6AuyJdPGpA2Sb6mwDTtuf0PXQDS5KCuLkz8v7yDprmAUkJe
+         0yzTFLFormzbi7X+vWciXMsH6JmuOq+5jMTO+ixLARxHXqDBf6GKUOvIKjmMm0jbP/Sm
+         /6cviSFxi4iXpHnfIFzRrjPIm7tJS3uOd9Njwy1D++Nfl4f2acP4rjLWAIzJaoATgkBa
+         KRtZ5wufiT1TtHYJFEXAc5QyEqVn2KvITBNf5kBG5uFWtGVbPGFTmk21Jl61PM/iDYVS
+         5Zxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713884791; x=1714489591;
+        d=1e100.net; s=20230601; t=1713884793; x=1714489593;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wDNmFjC7o20jtwaWLvYt53CgdwYHs/yn65M4v44/678=;
-        b=wKvpnd1jXE50INzwENP72N2nU2NH7AWOmRR1TEMnhYxHyv7yt1zww73/39SMR63JI0
-         BK1hpg/p0lj0va8QZJuEHHevAocYTgs/KMPbwk5KlWDGoM+e4peCIkcC4EguoRNPxjjT
-         NXdkQxDUrZEZ2TYouRDMlQEsK1AyLhiyJHLHjFE41IA3lm+QaWCrEvW6cxl5vDxSLePD
-         Qks/jBm15nmUjmSf/XWFVKN9Zf6PmLoMirXF97LTVUNm5ZXQJSXrk9mLj1SnOevRtDKv
-         CC/iYOdVVAQdJINYTRrLlvFkbkuKWV/UX6VXz16XTO8DptVxPY1vQeieO+B882wI82p2
-         HTGQ==
-X-Gm-Message-State: AOJu0YxUSRtPyqKFtQSzdWEhUV6QmVHtrAUatBXk264u3DEOagUcN3ib
-	zRhgK7NVMsq45biyqaMfc6sPfRVROnN0NzuBgUyMBGg1V8l2cSyhQL2Sd1Vvsyhd8toujLpM3+j
-	PIdH6Rw5kjkPUfBpth+lVMO23diCjZO21m32Q931xAsgfFFgNm1Dpet5c+OX9mOXeY8M0pDhxkx
-	ah39Geme9b/5Tgn3EesrxwcsynDPM=
-X-Google-Smtp-Source: AGHT+IGwZvT9UOeK/KdeTYk9Oh0PQxSOBWs9IKYorFuKz2aY5SZxYkZxo7LQCSg+0V4ULATC/t1QB/2Azg==
+        bh=WAASiQj8ySouqSnzFWGUNnXYH4XrZldkqK8o7Htn7bk=;
+        b=SkpYnQAVjUzNRpe7RuRtwPJzP+GUsUa2hTuaeeco0RnZIc/POkLQ7qnXUrdfCDzjTE
+         MECEyqKIfQpXFH86q14a/yAyllQhJ6XWU1NN++gOzVcxZZCzgVWTFFIOvfrECJVEWhkQ
+         /F6RD849/f8P0sOdDzuBbZMkBfrB3RK1EDXOGj02a94LKO6SMRo4/9SAhmen+scZlQjF
+         2k81PyOQakdjMez4SHyDvhUcIkyMoy6cra4/NPhjRN5INzwLQu+6RrvOm46AkGBuhQ4N
+         5jYxXrrmphUfI/EQ4e5R6BFOaNKPsydC8Oy4sopfrwDX9DUSg0way8WE0qLiL7gI4jiJ
+         vjnA==
+X-Gm-Message-State: AOJu0Ywvqsn715ie5bMxgIp8PbkXOuELM78sZ+R4eaSDXV8buUZr9xjG
+	2EjGFKNoDpwjiVakmnykc4P2FtmXW0aco8O6+rhReV3ewtySY/Vg3iF0TE7vaeQCLt6ppLqMQ5O
+	B8iAXX4uaNLLgOd8FIi2JmdL+IHi3eMyARV18sFGSr8xclOmle/aDq0eXqRqvFz0OrJBrx54KFN
+	OvnfxQnKS0qgFF2udcxSSKjuz/7jE=
+X-Google-Smtp-Source: AGHT+IFueBCmr1mDA+FOyY0da133iqCu9Ntv9F/8EwpNhXh6yjKgdHb8dyDHEDsQGfSPiMpZg/x/Q2jYJA==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:600c:5102:b0:41a:3485:19c4 with SMTP id
- o2-20020a05600c510200b0041a348519c4mr51712wms.3.1713884791047; Tue, 23 Apr
- 2024 08:06:31 -0700 (PDT)
-Date: Tue, 23 Apr 2024 16:05:30 +0100
+ (user=tabba job=sendgmr) by 2002:a05:600c:78a:b0:418:4e4a:fec5 with SMTP id
+ z10-20020a05600c078a00b004184e4afec5mr25988wmo.3.1713884793628; Tue, 23 Apr
+ 2024 08:06:33 -0700 (PDT)
+Date: Tue, 23 Apr 2024 16:05:31 +0100
 In-Reply-To: <20240423150538.2103045-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240423150538.2103045-1-tabba@google.com>
 X-Mailer: git-send-email 2.44.0.769.g3c40516874-goog
-Message-ID: <20240423150538.2103045-23-tabba@google.com>
-Subject: [PATCH v4 22/30] KVM: arm64: Move some kvm_psci functions to a shared header
+Message-ID: <20240423150538.2103045-24-tabba@google.com>
+Subject: [PATCH v4 23/30] KVM: arm64: Refactor reset_mpidr() to extract its computation
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev
 Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com, 
@@ -70,110 +70,74 @@ Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com,
 	joey.gouly@arm.com, rananta@google.com, smostafa@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Move some PSCI functions and macros to a shared header to be used
-by hyp in protected mode.
+Move the computation of the mpidr to its own function in a shared
+header, as the computation will be used by hyp in protected mode.
 
 No functional change intended.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/psci.c  | 28 ----------------------------
- include/kvm/arm_psci.h | 29 +++++++++++++++++++++++++++++
- 2 files changed, 29 insertions(+), 28 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 14 +-------------
+ arch/arm64/kvm/sys_regs.h | 19 +++++++++++++++++++
+ 2 files changed, 20 insertions(+), 13 deletions(-)
 
-diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
-index 1f69b667332b..43458949d955 100644
---- a/arch/arm64/kvm/psci.c
-+++ b/arch/arm64/kvm/psci.c
-@@ -21,16 +21,6 @@
-  * as described in ARM document number ARM DEN 0022A.
-  */
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 33efa441e21d..c6da7dd891bd 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -816,21 +816,9 @@ static u64 reset_actlr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
  
--#define AFFINITY_MASK(level)	~((0x1UL << ((level) * MPIDR_LEVEL_BITS)) - 1)
--
--static unsigned long psci_affinity_mask(unsigned long affinity_level)
--{
--	if (affinity_level <= 3)
--		return MPIDR_HWID_BITMASK & AFFINITY_MASK(affinity_level);
--
--	return 0;
--}
--
- static unsigned long kvm_psci_vcpu_suspend(struct kvm_vcpu *vcpu)
+ static u64 reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
  {
- 	/*
-@@ -51,12 +41,6 @@ static unsigned long kvm_psci_vcpu_suspend(struct kvm_vcpu *vcpu)
- 	return PSCI_RET_SUCCESS;
- }
+-	u64 mpidr;
++	u64 mpidr = calculate_mpidr(vcpu);
  
--static inline bool kvm_psci_valid_affinity(struct kvm_vcpu *vcpu,
--					   unsigned long affinity)
--{
--	return !(affinity & ~MPIDR_HWID_BITMASK);
--}
--
- static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
- {
- 	struct vcpu_reset_state *reset_state;
-@@ -214,18 +198,6 @@ static void kvm_psci_system_suspend(struct kvm_vcpu *vcpu)
- 	run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
- }
- 
--static void kvm_psci_narrow_to_32bit(struct kvm_vcpu *vcpu)
--{
--	int i;
--
 -	/*
--	 * Zero the input registers' upper 32 bits. They will be fully
--	 * zeroed on exit, so we're fine changing them in place.
+-	 * Map the vcpu_id into the first three affinity level fields of
+-	 * the MPIDR. We limit the number of VCPUs in level 0 due to a
+-	 * limitation to 16 CPUs in that level in the ICC_SGIxR registers
+-	 * of the GICv3 to be able to address each CPU directly when
+-	 * sending IPIs.
 -	 */
--	for (i = 1; i < 4; i++)
--		vcpu_set_reg(vcpu, i, lower_32_bits(vcpu_get_reg(vcpu, i)));
--}
+-	mpidr = (vcpu->vcpu_id & 0x0f) << MPIDR_LEVEL_SHIFT(0);
+-	mpidr |= ((vcpu->vcpu_id >> 4) & 0xff) << MPIDR_LEVEL_SHIFT(1);
+-	mpidr |= ((vcpu->vcpu_id >> 12) & 0xff) << MPIDR_LEVEL_SHIFT(2);
+-	mpidr |= (1ULL << 31);
+ 	vcpu_write_sys_reg(vcpu, mpidr, MPIDR_EL1);
 -
- static unsigned long kvm_psci_check_allowed_function(struct kvm_vcpu *vcpu, u32 fn)
- {
- 	/*
-diff --git a/include/kvm/arm_psci.h b/include/kvm/arm_psci.h
-index e8fb624013d1..c86f228efae1 100644
---- a/include/kvm/arm_psci.h
-+++ b/include/kvm/arm_psci.h
-@@ -36,6 +36,35 @@ static inline int kvm_psci_version(struct kvm_vcpu *vcpu)
- 	return KVM_ARM_PSCI_0_1;
+ 	return mpidr;
  }
  
-+/* Narrow the PSCI register arguments (r1 to r3) to 32 bits. */
-+static inline void kvm_psci_narrow_to_32bit(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
+index 997eea21ba2a..1dfd2380a1ae 100644
+--- a/arch/arm64/kvm/sys_regs.h
++++ b/arch/arm64/kvm/sys_regs.h
+@@ -222,6 +222,25 @@ find_reg(const struct sys_reg_params *params, const struct sys_reg_desc table[],
+ 	return __inline_bsearch((void *)pval, table, num, sizeof(table[0]), match_sys_reg);
+ }
+ 
++static inline u64 calculate_mpidr(const struct kvm_vcpu *vcpu)
 +{
-+	int i;
++	u64 mpidr;
 +
 +	/*
-+	 * Zero the input registers' upper 32 bits. They will be fully
-+	 * zeroed on exit, so we're fine changing them in place.
++	 * Map the vcpu_id into the first three affinity level fields of
++	 * the MPIDR. We limit the number of VCPUs in level 0 due to a
++	 * limitation to 16 CPUs in that level in the ICC_SGIxR registers
++	 * of the GICv3 to be able to address each CPU directly when
++	 * sending IPIs.
 +	 */
-+	for (i = 1; i < 4; i++)
-+		vcpu_set_reg(vcpu, i, lower_32_bits(vcpu_get_reg(vcpu, i)));
++	mpidr = (vcpu->vcpu_id & 0x0f) << MPIDR_LEVEL_SHIFT(0);
++	mpidr |= ((vcpu->vcpu_id >> 4) & 0xff) << MPIDR_LEVEL_SHIFT(1);
++	mpidr |= ((vcpu->vcpu_id >> 12) & 0xff) << MPIDR_LEVEL_SHIFT(2);
++	mpidr |= (1ULL << 31);
++
++	return mpidr;
 +}
 +
-+static inline bool kvm_psci_valid_affinity(struct kvm_vcpu *vcpu,
-+					   unsigned long affinity)
-+{
-+	return !(affinity & ~MPIDR_HWID_BITMASK);
-+}
-+
-+
-+#define AFFINITY_MASK(level)	~((0x1UL << ((level) * MPIDR_LEVEL_BITS)) - 1)
-+
-+static inline unsigned long psci_affinity_mask(unsigned long affinity_level)
-+{
-+	if (affinity_level <= 3)
-+		return MPIDR_HWID_BITMASK & AFFINITY_MASK(affinity_level);
-+
-+	return 0;
-+}
- 
- int kvm_psci_call(struct kvm_vcpu *vcpu);
- 
+ const struct sys_reg_desc *get_reg_by_id(u64 id,
+ 					 const struct sys_reg_desc table[],
+ 					 unsigned int num);
 -- 
 2.44.0.769.g3c40516874-goog
 
