@@ -1,116 +1,91 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12F4F82C60
-	for <kvmarm@lists.linux.dev>; Tue, 23 Apr 2024 12:06:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E666384A4A;
+	Tue, 23 Apr 2024 12:06:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713873994; cv=none; b=j2kygxMGie04OcclGz7CPBpBSfidzlgd0EURSL7/L4+e0ospyTlBvqBNej9k99Xmbi0HDbNW+pzIGQLqzSMbl3ihdYutKBpZsbD9e2/08xRJrZhSxrAszym1D/kG8+DQxSdjhyKbYAMFqpwbeLun263qhfG/akA8rRwSlKZcjlI=
+	t=1713874017; cv=none; b=Fk3yF9xzXA6dhgVINeN9D3vcgatdmzraCQhyfB7RAaRJSFbKPpc3j6f1PA45/pW4jczHPogIxqTMlMAZ8HJ63olceFL0gNAnQlVpHnP8UnKlOuDZDmI3yOH6P7kFmtiIbU8c5TXqV0FQuL8jjYXMTkI0XhQMEzuYCC7gLJDuHVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713873994; c=relaxed/simple;
-	bh=kaaeIMDC16xnlq4RBOjLRjwTEjSG81FNqGzSjjjtqP0=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jpuwjgXDFYH0Lc+AC9qzCsDi/40f35fQEJgTMW3QKnBiSsjYggBQYtI0bgvdINHmVp6D7q3N/uXUcEp0g2NYVrn1IsjYm9LP70KBGO9Byjz88fdOVpruSohmx/SSMJ3+0tGdAKoqTtGgFwwk8k12v2uwkW9eNyloa/7ZhBByn14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q+VFeDUB; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q+VFeDUB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95C30C2BD11;
-	Tue, 23 Apr 2024 12:06:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713873993;
-	bh=kaaeIMDC16xnlq4RBOjLRjwTEjSG81FNqGzSjjjtqP0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Q+VFeDUBRnN+sbcaAOn+TrQY84c+T5zptmlnR7y0xRcVnwuRw1GPit3FpcjKU05N/
-	 jsrzQzV4W8atMFIsabE2JmIqQdB1+DppybZpFuRsmommPAQ7IKV/FpC0SAkp1WnlUF
-	 SU06wNA6iMZM7s8uqaLKFffgAcrUcFa3LQOmspvscvk2i5nAWiCVLLIgjIveFzY0vx
-	 t/OV1qYD8LLVO239aSRhWER2LxZ8DU0JsVxwxscNEKkeD6HMGzniw5X1blw8lMQmdt
-	 ySlZOyNSCLvkmOXfxSz8KTt9GxpMwxq1YATxW5YcFvE0rXgOmVXr0KUs84vHoep8yW
-	 syx9Lrlapo28Q==
-Received: from [12.161.88.66] (helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rzEut-007Agx-0U;
-	Tue, 23 Apr 2024 13:06:31 +0100
-Date: Tue, 23 Apr 2024 13:06:25 +0100
-Message-ID: <87o7a0tha6.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: "Aiqun Yu (Maria)" <quic_aiquny@quicinc.com>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	<kvmarm@lists.linux.dev>,
-	<linux-arm-kernel@lists.infradead.org>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose
-	<suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu
-	<yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Joey Gouly
-	<joey.gouly@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Naresh Kamboju
-	<naresh.kamboju@linaro.org>,
-	Linaro Kernel Functional Testing
-	<lkft@linaro.org>
-Subject: Re: [PATCH] KVM: arm64: nv: Work around lack of pauth support in old toolchains
-In-Reply-To: <0b970cf5-a880-469c-93ab-9a268ee4ea2b@quicinc.com>
-References: <20240422224849.2238222-1-maz@kernel.org>
-	<fa6c31c5-9334-4248-aa89-a0951f1b13c6@app.fastmail.com>
-	<0b970cf5-a880-469c-93ab-9a268ee4ea2b@quicinc.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1713874017; c=relaxed/simple;
+	bh=WlZYqWhdAH7netYQkFAGYZjAaa89jWNhRzERNv5h2Kk=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=We7wjxL1K6dr9P6Nbl2ImC/UY2hn9lajtOTaV1QlEfjzhuevtNLeSRzSSbKJTiGCYRkAvw836AJdZgZ9z4Kql3WeAMNE84BTPvks9n78Q5K/6SN/GUrrszeBSAFFOetDjPTFK8j9AZjgkXL9F6HvPP2+7oSGwUb+2n7C/wQNkQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4VP1460Qk8z1R9LL;
+	Tue, 23 Apr 2024 20:03:50 +0800 (CST)
+Received: from dggpemm500002.china.huawei.com (unknown [7.185.36.229])
+	by mail.maildlp.com (Postfix) with ESMTPS id 4D77118007D;
+	Tue, 23 Apr 2024 20:06:50 +0800 (CST)
+Received: from [10.174.178.247] (10.174.178.247) by
+ dggpemm500002.china.huawei.com (7.185.36.229) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 23 Apr 2024 20:06:49 +0800
+Subject: Re: [PATCH v7 08/16] ACPI: Add post_eject to struct acpi_scan_handler
+ for cpu hotplug
+To: Jonathan Cameron <Jonathan.Cameron@huawei.com>, Thomas Gleixner
+	<tglx@linutronix.de>, Peter Zijlstra <peterz@infradead.org>,
+	<linux-pm@vger.kernel.org>, <loongarch@lists.linux.dev>,
+	<linux-acpi@vger.kernel.org>, <linux-arch@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>, <x86@kernel.org>, Russell King
+	<linux@armlinux.org.uk>, "Rafael J . Wysocki" <rafael@kernel.org>, Miguel
+ Luis <miguel.luis@oracle.com>, James Morse <james.morse@arm.com>, Salil Mehta
+	<salil.mehta@huawei.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+CC: Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave
+ Hansen <dave.hansen@linux.intel.com>, <linuxarm@huawei.com>,
+	<justin.he@arm.com>, <jianyong.wu@arm.com>
+References: <20240418135412.14730-1-Jonathan.Cameron@huawei.com>
+ <20240418135412.14730-9-Jonathan.Cameron@huawei.com>
+From: Hanjun Guo <guohanjun@huawei.com>
+Message-ID: <df2388a1-45d8-c42e-fca0-0e21f1810a9d@huawei.com>
+Date: Tue, 23 Apr 2024 20:06:48 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 12.161.88.66
-X-SA-Exim-Rcpt-To: quic_aiquny@quicinc.com, arnd@arndb.de, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, mark.rutland@arm.com, joey.gouly@arm.com, will@kernel.org, naresh.kamboju@linaro.org, lkft@linaro.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+In-Reply-To: <20240418135412.14730-9-Jonathan.Cameron@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpemm500002.china.huawei.com (7.185.36.229)
 
-On Tue, 23 Apr 2024 13:00:55 +0100,
-"Aiqun Yu (Maria)" <quic_aiquny@quicinc.com> wrote:
+On 2024/4/18 21:54, Jonathan Cameron wrote:
+> From: James Morse <james.morse@arm.com>
 > 
+> struct acpi_scan_handler has a detach callback that is used to remove
+> a driver when a bus is changed. When interacting with an eject-request,
+> the detach callback is called before _EJ0.
 > 
+> This means the ACPI processor driver can't use _STA to determine if a
+> CPU has been made not-present, or some of the other _STA bits have been
+> changed. acpi_processor_remove() needs to know the value of _STA after
+> _EJ0 has been called.
 > 
-> On 4/23/2024 4:24 PM, Arnd Bergmann wrote:
-> > On Tue, Apr 23, 2024, at 00:48, Marc Zyngier wrote:
-> >> We still support GCC 8.x, and it appears that this toolchain
-> >> does not understand "pauth" as a valid architectural extension.
-> >> After all, it's only been 8 years since ARMv8.3 was released...
-> > 
-> > Just to clarify: I'm fairly sure that all supported toolchains
-> > support ARMv8.3 and PACGA, the problem with ".arch_extension pauth\n"
-> > seems to be that it was retroactively made an optional
-> > feature for earlier architecture versions a few years after
-> > ARMv8.3, so most binutils versions we support understand
-> > pacga as an armv8.3 feature but reject the pauth name for the
-> > extension.
-> Kind of agree with Arnd here.
-> Shall the fix just remove the ".arch_extension pauth"?
+> Add a post_eject callback to struct acpi_scan_handler. This is called
+> after acpi_scan_hot_remove() has successfully called _EJ0. Because
+> acpi_scan_check_and_detach() also clears the handler pointer,
+> it needs to be told if the caller will go on to call
+> acpi_bus_post_eject(), so that acpi_device_clear_enumerated()
+> and clearing the handler pointer can be deferred.
+> An extra flag is added to flags field introduced in the previous
+> patch to achieve this.
 > 
-> I've tried gcc 7 failed with the pauth name for the extension.
-> After I remove the ".arch_extension pauth" and use "pacga" instruction
-> directly pass the gcc 7 compilation.
+> Signed-off-by: James Morse <james.morse@arm.com>
+> Reviewed-by: Joanthan Cameron <Jonathan.Cameron@huawei.com>
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> Tested-by: Miguel Luis <miguel.luis@oracle.com>
+> Tested-by: Vishnu Pajjuri <vishnu@os.amperecomputing.com>
+> Tested-by: Jianyong Wu <jianyong.wu@arm.com>
+> Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 
-And breaks with LLVM:
-
-  CC      arch/arm64/kvm/pauth.o
-arch/arm64/kvm/pauth.c:40:9: error: instruction requires: pauth
-                     "pacga %0, %1, %2" : "=r" (pac) : "r" (ptr), "r" (mod));
-                      ^
-<inline asm>:2:1: note: instantiated into assembly here
-pacga x19, x1, x9
-^
-1 error generated.
-
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Reviewed-by: Hanjun Guo <guohanjun@huawei.com>
