@@ -1,55 +1,55 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+Received: from mail-ej1-f74.google.com (mail-ej1-f74.google.com [209.85.218.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7757D13B58D
-	for <kvmarm@lists.linux.dev>; Tue, 23 Apr 2024 15:05:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE4D813B58D
+	for <kvmarm@lists.linux.dev>; Tue, 23 Apr 2024 15:06:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713884760; cv=none; b=mURP7Cik1JxAiLqelIgMPOXPXuQ4Vre/D/ziPMedJQAfoa/TZ/urPvfqMfue3kQdMiKS+rdqnH9939kz9yhEqaYeaTc1DDfBM1fHCs0mUqrygTgy3/mOagnNnSD2KbYgULFU6XSUwmD1FGYGb/3qhKDD2UE7UtV8Fv6YALHqaSA=
+	t=1713884762; cv=none; b=j/c04o19CVqBjMBiC60E0lFjlyMJFUg1Mdmxz74MM/158cM3N38J73NwXQ6JI7sTKjoUIK5V2GX/WVtiJLuAA6g+MWnYqQ/QGSOOkf4sMp8LArDB5+rT9P/PMYOHdeOrb1x74LxFCL3IzH2KgQ8VKVhLv81SqW4eU7eCq7xRkWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713884760; c=relaxed/simple;
-	bh=ND0UI8zwOlMYrXWuXY9PS7raItt8oX6nCoN1VfoqtxM=;
+	s=arc-20240116; t=1713884762; c=relaxed/simple;
+	bh=hlFc7Pn3Sp8TMbsrXBoU2YQ0loq8e4pMpYKIy+EJERM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Ib10XcOftMho7sd5MJRVv+NfwjrY37afWjcx9+eUSNQj8/hstpZBOdCikFUMeY1o3EyffJbZvM1Y/MqRAig2fsrdc2XK58M4+lyvPTtPcTZBA75mubqT9dE3CmMIQkt7duaVQsGYD21t5mIpZZ5IBu6yH+qPTPZkRSlcfTZyoBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Q7dsjGYk; arc=none smtp.client-ip=209.85.128.74
+	 To:Cc:Content-Type; b=UX+ymSj/sw3yb4rsFFQSVtDkzkZU/QpWP1hgH7qbKqeHmlG6m+Pw5RK37tjD2/jHc1p30X/+7etvO3X0mNlJBpCyaeYpjpwTT5wa5zz7TTnO178zipVWxEjIfxz9alxw3qFzKVSbsmMsoSWhdtXDjOtVYH35GQPewzUs5+Sn2Xk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=r/XY4wQH; arc=none smtp.client-ip=209.85.218.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Q7dsjGYk"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-41a3369659eso11324865e9.1
-        for <kvmarm@lists.linux.dev>; Tue, 23 Apr 2024 08:05:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="r/XY4wQH"
+Received: by mail-ej1-f74.google.com with SMTP id a640c23a62f3a-a5741ee352bso100814666b.1
+        for <kvmarm@lists.linux.dev>; Tue, 23 Apr 2024 08:06:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713884757; x=1714489557; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1713884759; x=1714489559; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IBa5mK88uNPh7mBsQdtczbuGlBv1JXXU73/DcJ6dpWI=;
-        b=Q7dsjGYkWoFoTzATe7Jjrgt9Ygc+pHCwVer4HA1ypKrYCwjj/PLbqSVg3q1msUPeX/
-         StkLaGrQ0h1XqST3eQx9cx9F1521prSL/GVOHNKXy++fbiFAtbRS+9Z4KlHv5NYIK/6M
-         ieWtTtwNDRfXjRA6UNbpyUvbMCwMFmeAOeaQP+w2dQ4HUFk6zaaKQ1i+7IZxXa875Odd
-         3G5XgBjiEcdaQl3XI55runKJxEne0N5pryVY/6fWwSM8WLRKtNItpMgFtHi/DQ3yuoua
-         I/UAmq6LlDONgCa07emiGuGw3oPtzhgstq4xAezeJPXZuvj9j2G/y39ZSbFPofG2AdDz
-         u0zA==
+        bh=c9m/tjqud7d0EC8EggXLj3IXPN8uw3FwjULc+34dzpA=;
+        b=r/XY4wQH4o79Q9F+ntvAXhq1TfLOhp6NWloM84IM+/MsnEfv/JXYdkg6AP3ax41IH/
+         r0TjhEe2H40R6VEgo86kie7E5mLJoqrV75aG3ul0ZiFv1rrUzUXWiqUw0520BBlnMDIw
+         vS6sC9xmlcJOO3GBH2xuSJBtj1ZGlA4VItGxN2S3pqDqWcogze2WTfjM23i3Kldd9Gmm
+         ZWnXf8Lm94FFEoSCfw5A6AfxX4EYlEjlr+J7tBNgdaJ7EWyX9OFoh1MAhBla1+uzs5fg
+         A7chwDNj5Yg448MY3Oi2BXfVwbO5GIbY7KV7Y2+kNWG9Z2ss/Hir/skokIIadp4DdRnL
+         i81A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713884757; x=1714489557;
+        d=1e100.net; s=20230601; t=1713884759; x=1714489559;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IBa5mK88uNPh7mBsQdtczbuGlBv1JXXU73/DcJ6dpWI=;
-        b=nk1E3yzGtUjm+qv1QTAJasWGPBzDbrZ0mkcMq2hcULf5y+BV/cA+Sog6mm0y3evVyR
-         +L6abZ6TXm97DBV+VwRemAgLml/tXgOvz4uJYUAZUV3jidJmpFYiH+w1yuQEQYHlOBOM
-         N3cqf1FVvDIBm+Ut7thnLPeC0LwLZvVWrpVlisVU4J0jZOoWbAfdCzJ5PIRa30VTUHMw
-         O7YTIrwYaOFjNY7ptF9VVvuEwjhfIDUF/m2cUNjpVIG/XfuplkKLYxsTHyKT4kT3Iskv
-         Iafj1g3TjQQPTPg10zdggW1zcHk1fO7pxedu0sidQRX/nsx1e4ARc54YdE4Y+1xWWs/G
-         XgQQ==
-X-Gm-Message-State: AOJu0YxTn0d4/Csmf9S1HjGrQIzF9SnEEYXNLyk3S5NFXo0lFGeFswKt
-	3bfYpNGeuXErX3GuYtiHPHr2VtUBsRei0mb+dHoRooXO0CIiF4ZtYUnRakB2GNipTxTMnSHVqBL
-	urRfCeWwov121d7bpvRzZyPupfryk+mQcjSkLGKzxZDcfhByIeunqXX7soKyjr4xawHhJzTVmbd
-	MkNzOTWmfJqm6lZ9RDNpSBbD3mLf4=
-X-Google-Smtp-Source: AGHT+IHGpoCwosQMqoYqtm7YjKXgsuQlAWAVV5gMt37RCePQ0StGreVdydyRj3UoU6nHiUmg/6pfw8pBZg==
+        bh=c9m/tjqud7d0EC8EggXLj3IXPN8uw3FwjULc+34dzpA=;
+        b=lNTDKxBP92nf9+KJZoqLZCTahOK25apZHtL3Rc1lsdR87uAgTahPHg+zAgGtpMbflI
+         7YNDSa4+C1UOktZccodRMChiTVPMtexp5Qh8GTWv3iSFhig55p1fXzDYGUSJTeuq1N1b
+         GKUpQVw3qmZJzO3oVHA2qg20qhpWJ6uU0NjU685yk4PPmp9+C1DmbLmfUOnjT3kwELwu
+         ifFZu6YCbrCPcSup3AV+QQtEG876ZBkz0zwSJXgrCtmWQdjbruInB9GEGi65/Nn99aXO
+         NJPo3BszkdCOjHiR0nYBnH0N3I/DnXaNyNqEYN3wbz9vfwevgbxslWY/+Id4XRxgwLjn
+         xDdQ==
+X-Gm-Message-State: AOJu0YyzpHIBOGCqCsJ38ajoP0oDab2c3rTXD8AYV5+3AcgGp/C6GgoX
+	2ddwtNt/iqnsFejTYz65Fjfox8Ksa4O3pO5X8JvjXBOQElzO+OFhbsO2R2cG8jn1FgGVMuC4wyy
+	fws//xGHNTed6PzCC8M+7xp5jWYrf4qB+cbXO0cBK8o02VWIpo2Dsp02LfOvp8zWPLrj7N6zkDf
+	Bo9eQEartkzo9Ghbgcr2cCl8fuRY0=
+X-Google-Smtp-Source: AGHT+IGebG+8O/+kea8suHV4oaapcMEbF6BWBSQnDkiDppHU9uExrkuK1Eu4xBCUXREEs59QgUIoo+NnyQ==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:600c:2d55:b0:418:9a5b:d68 with SMTP id
- a21-20020a05600c2d5500b004189a5b0d68mr25959wmg.2.1713884756793; Tue, 23 Apr
- 2024 08:05:56 -0700 (PDT)
-Date: Tue, 23 Apr 2024 16:05:15 +0100
+ (user=tabba job=sendgmr) by 2002:a17:907:7604:b0:a55:689a:4b40 with SMTP id
+ jx4-20020a170907760400b00a55689a4b40mr10058ejc.8.1713884759139; Tue, 23 Apr
+ 2024 08:05:59 -0700 (PDT)
+Date: Tue, 23 Apr 2024 16:05:16 +0100
 In-Reply-To: <20240423150538.2103045-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240423150538.2103045-1-tabba@google.com>
 X-Mailer: git-send-email 2.44.0.769.g3c40516874-goog
-Message-ID: <20240423150538.2103045-8-tabba@google.com>
-Subject: [PATCH v4 07/30] KVM: arm64: Check for PTE validity when checking for executable/cacheable
+Message-ID: <20240423150538.2103045-9-tabba@google.com>
+Subject: [PATCH v4 08/30] KVM: arm64: Avoid BBM when changing only s/w bits in
+ Stage-2 PTE
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev
 Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com, 
@@ -70,48 +71,48 @@ Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com,
 	joey.gouly@arm.com, rananta@google.com, smostafa@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-From: Marc Zyngier <maz@kernel.org>
+From: Will Deacon <will@kernel.org>
 
-Don't just assume that the PTE is valid when checking whether it
-describes an executable or cacheable mapping.
+Break-before-make (BBM) can be expensive, as transitioning via an
+invalid mapping (i.e. the "break" step) requires the completion of TLB
+invalidation and can also cause other agents to fault concurrently on
+the invalid mapping.
 
-This makes sure that we don't issue CMOs for invalid mappings.
+Since BBM is not required when changing only the software bits of a PTE,
+avoid the sequence in this case and just update the PTE directly.
 
-Suggested-by: Will Deacon <will@kernel.org>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
+Signed-off-by: Will Deacon <will@kernel.org>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/hyp/pgtable.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/hyp/pgtable.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
 diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 5a59ef88b646..67647b853c9b 100644
+index 67647b853c9b..9e2bbee77491 100644
 --- a/arch/arm64/kvm/hyp/pgtable.c
 +++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -914,12 +914,12 @@ static void stage2_unmap_put_pte(const struct kvm_pgtable_visit_ctx *ctx,
- static bool stage2_pte_cacheable(struct kvm_pgtable *pgt, kvm_pte_t pte)
- {
- 	u64 memattr = pte & KVM_PTE_LEAF_ATTR_LO_S2_MEMATTR;
--	return memattr == KVM_S2_MEMATTR(pgt, NORMAL);
-+	return kvm_pte_valid(pte) && memattr == KVM_S2_MEMATTR(pgt, NORMAL);
- }
+@@ -979,6 +979,21 @@ static int stage2_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+ 	if (!stage2_pte_needs_update(ctx->old, new))
+ 		return -EAGAIN;
  
- static bool stage2_pte_executable(kvm_pte_t pte)
- {
--	return !(pte & KVM_PTE_LEAF_ATTR_HI_S2_XN);
-+	return kvm_pte_valid(pte) && !(pte & KVM_PTE_LEAF_ATTR_HI_S2_XN);
- }
++	/* If we're only changing software bits, then store them and go! */
++	if (!kvm_pgtable_walk_shared(ctx) &&
++	    !((ctx->old ^ new) & ~KVM_PTE_LEAF_ATTR_HI_SW)) {
++		bool old_is_counted = stage2_pte_is_counted(ctx->old);
++
++		if (old_is_counted != stage2_pte_is_counted(new)) {
++			if (old_is_counted)
++				mm_ops->put_page(ctx->ptep);
++			else
++				mm_ops->get_page(ctx->ptep);
++		}
++		WARN_ON_ONCE(!stage2_try_set_pte(ctx, new));
++		return 0;
++	}
++
+ 	if (!stage2_try_break_pte(ctx, data->mmu))
+ 		return -EAGAIN;
  
- static u64 stage2_map_walker_phys_addr(const struct kvm_pgtable_visit_ctx *ctx,
-@@ -1370,7 +1370,7 @@ static int stage2_flush_walker(const struct kvm_pgtable_visit_ctx *ctx,
- 	struct kvm_pgtable *pgt = ctx->arg;
- 	struct kvm_pgtable_mm_ops *mm_ops = pgt->mm_ops;
- 
--	if (!kvm_pte_valid(ctx->old) || !stage2_pte_cacheable(pgt, ctx->old))
-+	if (!stage2_pte_cacheable(pgt, ctx->old))
- 		return 0;
- 
- 	if (mm_ops->dcache_clean_inval_poc)
 -- 
 2.44.0.769.g3c40516874-goog
 
