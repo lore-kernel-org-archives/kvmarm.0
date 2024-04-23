@@ -1,119 +1,150 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 484D87E761;
-	Tue, 23 Apr 2024 11:42:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DB7612C474;
+	Tue, 23 Apr 2024 11:53:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713872550; cv=none; b=bPD+raBqu4a+b+6Lpneim2ZO+97VacYf6VDVu0FP05Lzx5jg5P/qVoSAFGv/DntrfA3aoOC/LZcYmTcGVc5M+qoF7A9BoatwYxDTsHK0gdfAfJZInO2KAsgQRswWCI62lzpYSZ7CnI0625Hz2zopshfMJxQVZ+C6SPn9wNCIxlw=
+	t=1713873220; cv=none; b=ezrGsRAa6e8AfW+vTtYVqq6LMhvMaj/ZAJXMx0ILnsK+sK3Jvk8ByAMkQFjd9H58WTsd5C3Yioco4zJys564KnZLcr0KswLqARFWV3N6x3tC+o6LBCbQNphcp10OmN0sp1YhFrTdsxdD6fUrNwXmMkz79EbrM8y1eJkd1OyPFDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713872550; c=relaxed/simple;
-	bh=QMG25wM6rNvenjQtlyiQjo4wKkHfNNfh8ctqNlKRPrA=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GL84apB1XJDN1jqESCuNTUCupX3wYKv5/Sk9eRwqpsAEY1+4Ek/sW7JGCvhq0hX9u3gMsQEnFbR5rUuA0mWILwFN6unuN23q9qZepeyHyG6EFe/wmh0+zLQTrNwG9sGjPgNQNzyAAF/pQDhAXTC++3K87y3uxCc0p5JgmyZfdNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MR/vuGmM; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MR/vuGmM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B198DC116B1;
-	Tue, 23 Apr 2024 11:42:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713872549;
-	bh=QMG25wM6rNvenjQtlyiQjo4wKkHfNNfh8ctqNlKRPrA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MR/vuGmMmZRRofGLRXaEDB3/rGlBK4+EQdZ549jIGxDzw6yfyKRDZPHcr4aL2d7XD
-	 BcEuluhBq/9vbgBGzkBGvCXfLs0bOR5YogHlWCLdFwXvfZudVW3rY24wH8/Keahr9E
-	 4wXl9MlsfUfQ9yRgmgT9gQ/PVvRpIamsSVTcg+5JIxWD97abPHTsy7TApuzUcVS/5u
-	 mRNu8wtoh537Ia+HMRjN3CRdq8vHfErziu1F1xDG1aDY2+SjPJMdl6sY0XDHSQPhPe
-	 vh7RixfiRkyeUCa/1NSahJp+IGskWNsktdcJ6exYPEtB0CrJmI0ylPQRJqpRvRXO78
-	 IsfK54dedPLTA==
-Received: from [12.161.88.66] (helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rzEXb-0079xU-B6;
-	Tue, 23 Apr 2024 12:42:27 +0100
-Date: Tue, 23 Apr 2024 12:42:22 +0100
-Message-ID: <87r0ewtie9.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Zenghui Yu <yuzenghui@huawei.com>
-Cc: Jon Hunter <jonathanh@nvidia.com>,
-	<kvmarm@lists.linux.dev>,
-	<kvm@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>,
-	James Morse
-	<james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver
- Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Fuad Tabba
-	<tabba@google.com>,
-	Mostafa Saleh <smostafa@google.com>,
-	Will Deacon
-	<will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
-Subject: Re: [PATCH v4 12/15] KVM: arm64: nv: Add emulation for ERETAx instructions
-In-Reply-To: <4c2fd210-fa36-8462-8a4d-70135cc2f040@huawei.com>
-References: <20240419102935.1935571-1-maz@kernel.org>
-	<20240419102935.1935571-13-maz@kernel.org>
-	<14667111-4ad6-48d2-93ee-742c5075f407@nvidia.com>
-	<4c2fd210-fa36-8462-8a4d-70135cc2f040@huawei.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1713873220; c=relaxed/simple;
+	bh=sJUlIw2u3y7di8lLXLn9J2hl+nc7e+xRy/529rTVAcI=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=i4X8wqVdi4+xkjjSfGFluJkyq/sBawsfyhTyEhbscnRA+8vNG/RplgeiXvrHdBb0ZG2iai2ebV7pUKrNFgfnbCAWRzBFWl+R5kTKxfUhYOhxI3NuFZ5pp+wE0O+G/gAiVdfxEEfgCVpo25uBa8UExDbroSwZOxnicZpZCVKXT0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4VP0mq6yPrzvPrw;
+	Tue, 23 Apr 2024 19:50:35 +0800 (CST)
+Received: from dggpemm500002.china.huawei.com (unknown [7.185.36.229])
+	by mail.maildlp.com (Postfix) with ESMTPS id 6BA521403D4;
+	Tue, 23 Apr 2024 19:53:36 +0800 (CST)
+Received: from [10.174.178.247] (10.174.178.247) by
+ dggpemm500002.china.huawei.com (7.185.36.229) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 23 Apr 2024 19:53:35 +0800
+Subject: Re: [PATCH v7 04/16] ACPI: processor: Move checks and availability of
+ acpi_processor earlier
+To: Jonathan Cameron <Jonathan.Cameron@huawei.com>, Thomas Gleixner
+	<tglx@linutronix.de>, Peter Zijlstra <peterz@infradead.org>,
+	<linux-pm@vger.kernel.org>, <loongarch@lists.linux.dev>,
+	<linux-acpi@vger.kernel.org>, <linux-arch@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>, <x86@kernel.org>, Russell King
+	<linux@armlinux.org.uk>, "Rafael J . Wysocki" <rafael@kernel.org>, Miguel
+ Luis <miguel.luis@oracle.com>, James Morse <james.morse@arm.com>, Salil Mehta
+	<salil.mehta@huawei.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+CC: Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave
+ Hansen <dave.hansen@linux.intel.com>, <linuxarm@huawei.com>,
+	<justin.he@arm.com>, <jianyong.wu@arm.com>
+References: <20240418135412.14730-1-Jonathan.Cameron@huawei.com>
+ <20240418135412.14730-5-Jonathan.Cameron@huawei.com>
+From: Hanjun Guo <guohanjun@huawei.com>
+Message-ID: <0cfc4e2d-65ab-0040-2c7d-fad83f32455b@huawei.com>
+Date: Tue, 23 Apr 2024 19:53:34 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 12.161.88.66
-X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, jonathanh@nvidia.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, joey.gouly@arm.com, tabba@google.com, smostafa@google.com, will@kernel.org, catalin.marinas@arm.com, linux-tegra@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+In-Reply-To: <20240418135412.14730-5-Jonathan.Cameron@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpemm500002.china.huawei.com (7.185.36.229)
 
-On Tue, 23 Apr 2024 10:40:22 +0100,
-Zenghui Yu <yuzenghui@huawei.com> wrote:
->=20
-> On 2024/4/23 17:22, Jon Hunter wrote:
-> >=20
-> > Some of our builders currently have an older version of GCC (v6) and
-> > after this change I am seeing ...
-> >=20
-> >  =C2=A0 CC=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 arch/arm64/kvm/pauth.o
-> > /tmp/ccohst0v.s: Assembler messages:
-> > /tmp/ccohst0v.s:1177: Error: unknown architectural extension `pauth'
-> > /tmp/ccohst0v.s:1177: Error: unknown mnemonic `pacga' -- `pacga x21,x22=
-,x0'
-> > /local/workdir/tegra/mlt-linux_next/kernel/scripts/Makefile.build:244:
-> > recipe for target 'arch/arm64/kvm/pauth.o' failed
-> > make[5]: *** [arch/arm64/kvm/pauth.o] Error 1
-> > /local/workdir/tegra/mlt-linux_next/kernel/scripts/Makefile.build:485:
-> > recipe for target 'arch/arm64/kvm' failed
-> > make[4]: *** [arch/arm64/kvm] Error 2
-> > /local/workdir/tegra/mlt-linux_next/kernel/scripts/Makefile.build:485:
-> > recipe for target 'arch/arm64' failed
-> > make[3]: *** [arch/arm64] Error 2
-> >=20
-> >=20
-> > I know this is pretty old now and I am trying to get these builders
-> > updated. However, the kernel docs still show that GCC v5.1 is
-> > supported [0].
->=20
-> Was just looking at the discussion [1] ;-) . FYI there is already a
-> patch on the list [2] which should be merged soon.
+> @@ -232,6 +263,7 @@ static int acpi_processor_get_info(struct acpi_device *device)
+>   	acpi_status status = AE_OK;
+>   	static int cpu0_initialized;
+>   	unsigned long long value;
+> +	int ret;
+>   
+>   	acpi_processor_errata();
+>   
+> @@ -316,10 +348,12 @@ static int acpi_processor_get_info(struct acpi_device *device)
+>   	 *  because cpuid <-> apicid mapping is persistent now.
+>   	 */
+>   	if (invalid_logical_cpuid(pr->id) || !cpu_present(pr->id)) {
+> -		int ret = acpi_processor_hotadd_init(pr);
+> +		ret = acpi_processor_hotadd_init(pr, device);
+>   
+>   		if (ret)
+> -			return ret;
+> +			goto err;
+> +	} else {
+> +		acpi_processor_set_per_cpu(pr, device);
+>   	}
+>   
+>   	/*
+> @@ -357,6 +391,10 @@ static int acpi_processor_get_info(struct acpi_device *device)
+>   		arch_fix_phys_package_id(pr->id, value);
+>   
+>   	return 0;
+> +
+> +err:
+> +	per_cpu(processors, pr->id) = NULL;
 
-Indeed. -next as of today already has the fix, although I'm reworking
-it to take Mark's remarks into account.
+...
 
-Jon, can you confirm that next-20240423 builds with your setup?
+> +	return ret;
+>   }
+>   
+>   /*
+> @@ -365,8 +403,6 @@ static int acpi_processor_get_info(struct acpi_device *device)
+>    * (cpu_data(cpu)) values, like CPU feature flags, family, model, etc.
+>    * Such things have to be put in and set up by the processor driver's .probe().
+>    */
+> -static DEFINE_PER_CPU(void *, processor_device_array);
+> -
+>   static int acpi_processor_add(struct acpi_device *device,
+>   					const struct acpi_device_id *id)
+>   {
+> @@ -395,28 +431,6 @@ static int acpi_processor_add(struct acpi_device *device,
+>   	if (result) /* Processor is not physically present or unavailable */
+>   		return 0;
+>   
+> -	BUG_ON(pr->id >= nr_cpu_ids);
+> -
+> -	/*
+> -	 * Buggy BIOS check.
+> -	 * ACPI id of processors can be reported wrongly by the BIOS.
+> -	 * Don't trust it blindly
+> -	 */
+> -	if (per_cpu(processor_device_array, pr->id) != NULL &&
+> -	    per_cpu(processor_device_array, pr->id) != device) {
+> -		dev_warn(&device->dev,
+> -			"BIOS reported wrong ACPI id %d for the processor\n",
+> -			pr->id);
+> -		/* Give up, but do not abort the namespace scan. */
+> -		goto err;
+> -	}
+> -	/*
+> -	 * processor_device_array is not cleared on errors to allow buggy BIOS
+> -	 * checks.
+> -	 */
+> -	per_cpu(processor_device_array, pr->id) = device;
+> -	per_cpu(processors, pr->id) = pr;
 
-Thanks,
+Nit: seems we need to remove the duplicated
+per_cpu(processors, pr->id) = NULL; in acpi_processor_add():
 
-	M.
+--- a/drivers/acpi/acpi_processor.c
++++ b/drivers/acpi/acpi_processor.c
+@@ -446,7 +446,6 @@ static int acpi_processor_add(struct acpi_device 
+*device,
+   err:
+         free_cpumask_var(pr->throttling.shared_cpu_map);
+         device->driver_data = NULL;
+-       per_cpu(processors, pr->id) = NULL;
+   err_free_pr:
+         kfree(pr);
+         return result;
 
---=20
-Without deviation from the norm, progress is not possible.
+Thanks
+Hanjun
