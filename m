@@ -1,101 +1,85 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4DD044C7E
-	for <kvmarm@lists.linux.dev>; Mon, 22 Apr 2024 23:44:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 976483C30
+	for <kvmarm@lists.linux.dev>; Tue, 23 Apr 2024 00:16:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713829479; cv=none; b=u0nf05KStsg4YeqfkwLjwGXPOqLvy1+29Gdq+p9GduvYI++IwS5yB3LX4aFWD5l9Ns14NaJDUe7NBh+rjGHyyOiJWc35+E5Er3tf0Y87CPazCw7D6NRs4k5zWp7fpGKr6u8pm5HVGloW3StaQA8+lLW/Vh9Fp8KKqKL5q8ZFTnk=
+	t=1713831363; cv=none; b=P74GIY81ZHpDoZJHfcVf2ThEd+K5EljLZgfjKgUl2oUFZOseqV+cO8hBGap17mJ4X5lCijoXXu2gg/HpnNrlXXfthtpeC8zNdTw9scbVbK2s72oo7N9ETNWni7cfbPfK5h6+E/NYP7vpwOyrJ8eYe2F62ZUnb0mC8bBPUgPSfG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713829479; c=relaxed/simple;
-	bh=yAKjVU0tlRTxf6VdiSzAaFg6I7pqSQy/n0Nei1DEvTE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K+ZbezQTZNx3VqCXMnzYxWiKJEUM792SK9JD8HBrnjSGsLf7U4xa/Xyrz85v85r7VA7EamU0fqP/U+dJsJXTJ34NIGLI0thrQy5kv1MNwOOP17TQ0EyDEhc4+5vaBTinlNaXhW2Gmy9ewBQDfL5ZQ0uad9JTgXOPmQYUyu/6vag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ps4MK4C+; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1713831363; c=relaxed/simple;
+	bh=6R2GXPZ8MNR9mzZ3mCyCouRoIEDw0zcCo16JjOYAUNU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=rnImh6Qio/b3A82M2duNj6HQKFjkQSsxgXbL3VQH4RHl3VQXO9kGfcwr8ENdAmI7spDknpqDl7vK2Nmgt1rWSH0OBJ8KCT1lr4dWZkHE/3VQjYtzoMQUfcAwS0bW2avC6soU4p0sbPdIQJF7cxsY55tkL5P1Bpiobqp+gs+pCbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iuU65sBW; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ps4MK4C+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C744C113CC;
-	Mon, 22 Apr 2024 23:44:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713829479;
-	bh=yAKjVU0tlRTxf6VdiSzAaFg6I7pqSQy/n0Nei1DEvTE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ps4MK4C+6rReKxDL4HlO7WssOuaOLLy/GKvOSAjbA7sspj19GrAmDn/+1xbNFAKxi
-	 uw/3DBxZLd8HyH7ErIBCa+HBuKzwI+dUYIYbBRttqEM0xv3/4QTqTmdvffSWKsCuKQ
-	 6zW8Dqwg7VUfVREtha8FHOsxCrwnbnhh50ulE5Sk/eQ9ZgSYxGaqg7ZNaiyzHU9jTi
-	 wQmlrzS6PAWXl95EVQF5GgOtxSxXTr/dAk8f+4eWSr5VJ700onCzZX7R3WNN7VfTQw
-	 Q81VtyeBJbtEyFarYf7zY8UWgJe2lKUA0fgtRbOiJeXglTDYMlpahPCgHTOeEMPCGh
-	 XceY8DQqRtacg==
-Date: Tue, 23 Apr 2024 00:44:32 +0100
-From: Will Deacon <will@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Fuad Tabba <tabba@google.com>, kvmarm@lists.linux.dev, maz@kernel.org,
-	qperret@google.com, seanjc@google.com, alexandru.elisei@arm.com,
-	catalin.marinas@arm.com, philmd@linaro.org, james.morse@arm.com,
-	suzuki.poulose@arm.com, mark.rutland@arm.com, broonie@kernel.org,
-	joey.gouly@arm.com, rananta@google.com, smostafa@google.com
-Subject: Re: [PATCH v3 27/31] KVM: arm64: Use atomic refcount helpers for
- 'struct hyp_page::refcount'
-Message-ID: <20240422234432.GA6818@willie-the-truck>
-References: <20240419075941.4085061-1-tabba@google.com>
- <20240419075941.4085061-28-tabba@google.com>
- <ZiLZehsi1_arusae@linux.dev>
- <CA+EHjTx67TOQKzsLJ_9PP_rYRiYb7j0RuJLzDK8B6jK_SdQMHA@mail.gmail.com>
- <CA+EHjTzc6h719kvP9FJA3xqLnOxr5gPWDq7iYOx7JfQz4Wn61w@mail.gmail.com>
- <ZibMlkG-1MnCiXXF@linux.dev>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iuU65sBW"
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2a4f59746f7so5591960a91.1
+        for <kvmarm@lists.linux.dev>; Mon, 22 Apr 2024 17:16:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713831360; x=1714436160; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8H1kEVLpGrJ5ZWFkENA9219fhA8vfTYgGM3sZ6TDcgI=;
+        b=iuU65sBWA0RZbazbm0I42vfhnqrLrYTXrPoFRV7RGGNwb+1zHM1Dhpshr5QqgLVr1o
+         2FaHE2KZDHl9RGsfdGWA2SqgEYp61gNtVwdbbdhOGpI9YIDJwkVqkTqAwM5x4DPnVMB0
+         YedkbZkbojfSYWkmAQIrMl+fBYnP3xnq5kL/0M9402CkLrAqcpS8ONomnQYMUjHynv9K
+         pEg2EkD0Arhguu+v6XNwNu3oy2fgSeTvWpcMlpQ8+ELIxkLjmorpAIXVfR2TCJbJ6CPj
+         h5lTPUzdpZasZLppYD0GdbBKxTi2MAkjOdsJY6vXbB+28qucwOFP2DWQ1Syf37lxxfk+
+         /d8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713831360; x=1714436160;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8H1kEVLpGrJ5ZWFkENA9219fhA8vfTYgGM3sZ6TDcgI=;
+        b=tqo9WbLi3JHBZGt2I2VPTXhcn8AotYi7GCEsDIO5hmsnMttIql2BEyFRq+7xuzJysj
+         h8VGSBpR6ijczrqjNOF3gGhffcewNxmIg+vkJftOhBcZ094izqZnrp7e1lHqhGDgt4nh
+         kvqlFLFm53q9CFRUuaAjcS+4Cxp+ONTYaUMdshxk/3iuDE4mmFI2QRgTu5vsXVLNrFLq
+         Rm2VlnKEt7pi85RT4wN0IWRL3jL0deudNzcXZbXlOgG95B/pHjGhlPINxE6d/QCzVd/F
+         8cRQXcDSgwX5lz+6JrzDd+sBE0A31mkHZ0TMRTs8w6HlqihcJ+CsNWSfG2q6lcI/bTny
+         9W1Q==
+X-Gm-Message-State: AOJu0YxjJwudHDVMCs+ep5QjUiXzjujbihLjTFj9XoRDTKfpb+AeNFW9
+	9AWZD3V91Wc2xEQRARM02J29olTs9jmd7OCgyyX18/QY1Hf/Lo1kbXfsA9bRm6m6Fk+o6rAXToQ
+	EtA==
+X-Google-Smtp-Source: AGHT+IG/qs/+QwIoau+irouJ8WnFn/4gnZ82DbdmH2gIfH86uzFQlhjZer6qP3BdeeJABXE5gW74XoOxbZI=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90b:3145:b0:2ae:6e94:b02b with SMTP id
+ ip5-20020a17090b314500b002ae6e94b02bmr5770pjb.4.1713831359878; Mon, 22 Apr
+ 2024 17:15:59 -0700 (PDT)
+Date: Mon, 22 Apr 2024 17:15:58 -0700
+In-Reply-To: <20240422200158.2606761-2-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZibMlkG-1MnCiXXF@linux.dev>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Mime-Version: 1.0
+References: <20240422200158.2606761-1-oliver.upton@linux.dev> <20240422200158.2606761-2-oliver.upton@linux.dev>
+Message-ID: <Zib9vslQW1iLrBAn@google.com>
+Subject: Re: [PATCH v3 01/19] KVM: Treat the device list as an rculist
+From: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Eric Auger <eric.auger@redhat.com>, kvm@vger.kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Hi Oliver,
-
-On Mon, Apr 22, 2024 at 01:46:14PM -0700, Oliver Upton wrote:
-> On Mon, Apr 22, 2024 at 02:08:17PM +0100, Fuad Tabba wrote:
+On Mon, Apr 22, 2024, Oliver Upton wrote:
+> A subsequent change to KVM/arm64 will necessitate walking the device
+> list outside of the kvm->lock. Prepare by converting to an rculist. This
+> has zero effect on the VM destruction path, as it is expected every
+> reader is backed by a reference on the kvm struct.
 > 
-> [...]
+> On the other hand, ensure a given device is completely destroyed before
+> dropping the kvm->lock in the release() path, as certain devices expect
+> to be a singleton (e.g. the vfio-kvm device).
 > 
-> > > > Adding a BUG_ON() for taking a reference on a non-refcounted page (i.e.
-> > > > p->refcount was 0) would be nice, especially since we're past the point of
-> > > > serializing everything and you can theoretically have a zero count page
-> > > > outside of the free list.
-> > > >
-> > > > Seems like otherwise we'd get actually hit the BUG_ON() in an unrelated
-> > > > allocation path.
-> > 
-> > Actually, the refcount can be 0 without it being an error. For
-> > example, when hyp pins memory shared with it by the host
-> > (mem_protect.c:hyp_pin_shared_mem()).
-> 
-> Are those not by their very definition non-refcounted pages?
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
 
-Right, we're using the refcount for two things here: (1) so that the
-allocator knows when to return the page to the pool and (2) so that the
-hypervisor can transiently prevent a page which has been shared by the
-host from being unshared. That second part is needed to e.g. prevent a
-page holding a host vCPU structure being donated to a guest as normal
-memory and then having the hypervisor write to it as a result of a host
-hypercall. We use the refcount for this because the same page can be
-shared with the hypervisor multiple times and we need to know when the
-last host sharer has dropped its pin.
-
-> I can't imagine we'd want pages in a shared state with the host to ever
-> get returned to the hyp allocator. Seems an erroneous hyp_put_page() would
-> get you there, though.
-
-Given the dual-use above, I don't think a BUG_ON() on the refcount is
-the right fix. Instead, we'd probably want a (cheap) mechanism to
-differentiate pages in states (1) and (2). This could be a new flag in
-'struct hyp_page' or perhaps we could be creative and set the 'order' to
-HYP_NO_ORDER for pinned pages and then have a BUG() to check 'p->order'
-against 'pool->max_order' in hyp_put_page().
-
-What do you think?
-
-Will
+Reviewed-by: Sean Christopherson <seanjc@google.com>
