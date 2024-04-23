@@ -1,214 +1,153 @@
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2067.outbound.protection.outlook.com [40.107.220.67])
+Received: from fout2-smtp.messagingengine.com (fout2-smtp.messagingengine.com [103.168.172.145])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF5CC1865C
-	for <kvmarm@lists.linux.dev>; Tue, 23 Apr 2024 12:30:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.67
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713875421; cv=fail; b=MQRn0PXv6vpywkCcJJk4QskxKOyF/zhTtCGuCbiNjn/HosOz1ZBP1b4mPvWrzkcf6YK/C/pht3QUtTF3uuymKBlQ2sFld/61ayLC8tjP5UR3rhWlufC42rGtaDODRYxNSmce44+HOKdl8wPZaFACdTUfYgIaAq402xwznE23Bas=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713875421; c=relaxed/simple;
-	bh=mmjOuNUQvGeGQM8J6jIsdACYACsHwylA9vBf56cnFpk=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=usdJPP417O1vJksd1THt0jAEz/B9M8RzdNdqZZ9o/48kwdkuX3RIMeYrp1EO10qPgfGjqLV5K4XNq3GAyhJ8H8hJg+d3NOPSvKGZYs7FsYwmJzqajcF6OBYY5i8OxrOYGCO4Kx8OkWbec8+Ev52z/pGhIE18B/W1p2s5mDo9iDo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=iTjWrcE4; arc=fail smtp.client-ip=40.107.220.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2019182C60
+	for <kvmarm@lists.linux.dev>; Tue, 23 Apr 2024 12:37:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.145
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713875853; cv=none; b=fox1nT29Cq2QB69j9KnDs1Brh7IDa2F414RzDGEm3FwApwew8B7f1pl8shYGODH6MeC0mymWToIr+KZjM/Lfiihx+rQC12ftruDKFBH4qitHc6/jbzOh/k1ge5fsH1eNxLngkC9WhqjD+wHcbS7f2cx+9PScxsppDWPYy8SyRnM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713875853; c=relaxed/simple;
+	bh=xkhH/UA3UyznhkBWp5482Fpqj595D+O/QTK8iwMJ5JQ=;
+	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
+	 Subject:Content-Type; b=A73Q1crjIi8bevVsDiTQxUTmiAynqrtdaMoiETr36OX9FTqRfNjkbIjgpxzUveDO6tNi6BWNKyyYgxV9/S5VqhHgssUfKd2ae1+WGMG/9nO11vOahwBmHG65chhNX8E18gVyNeZBAf9yIHZ+9+j5OcvIJkIibKJ/NsWNTNx00zY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=hyc3yZHL; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=GbO437nK; arc=none smtp.client-ip=103.168.172.145
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="iTjWrcE4"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ApQe4hheciE1szA90mV65fP75+kkAlvxPV+4CZr9w5dgkJ9P8fZn9A66qmlfktL3KhAJY5zCGq5umZmL/e+7ZdZsKCCqGGiiCNMoJByfdom+WrOfaogjgbUo69esqmMsKP65Dc3hkwA2V7j7QZE2+QBtCArYZaRst7dF06OIcWp/FZYx1bCXwQxi3j8hdJdsakOGgIaFjzXP3gOAkbwBfBsbMSwUWmlFx2EoLhDrlTiiTj3GPkNFLr1zvPAv1rhr1t/H2FYwTB8UFUGxOeRlo7Rsgtb9J+cI6ISPNSXwQWyOUUodoIBPAKn66a+gbz/f5OxTnFViaBVltP8m7eghiA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4VyiHQLBssfvZjb4lKrQXLIbwvlaOP7CL2ABoABbxZM=;
- b=H1I+EMehslpDvcTOTys0bKFBln2FAWhlC18rAOFR1g3zSpe7U8sRYix476OVhg0bKIhbjDw9xLOLG8Z4QLEUyjGdvzc3lVCpEzyMe+Ja2w9LwDgz/y4mNTiz1mLWZYhaPzjFI7YJ1bZTNWCMoNmwah2IpvqR4gbQlXu1LU/RcknnhpdLFYBHqEsG83nAskDXXB/CN5KxS2cd10BT0nP+hDfFkX4BrAyooxEkOZJ1O47DPAg2TkdpmDHGjun5XPjnikFM6d1jJ95dS3aJ7bPnQ8WfKw9o2pUjwUFid6h1GThW7YY2fMZ26NlMkwfgbUhTMaL0qpjj+zPY5ZdBQFdOog==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4VyiHQLBssfvZjb4lKrQXLIbwvlaOP7CL2ABoABbxZM=;
- b=iTjWrcE4a5w29pZvVTMww1qEcU4xXsLf84K4lenVpb+CIrtr+Q5AmgtKUEBvWIkxnTGpLzf89NFUoGnswb05Sy1FIvSzO/8K103lfWEyQ/84mgN/tLFWnTruhVMDrv64yKkKjBwlbnaXK3ijVSdZwqtzhzB4ADF+RYu1stl8RwULvxiE7uIgjUPkZZhIMvlk7lqiL6Nt5I3XYK757UTWGcV/GYe2rqFdLAd72XT7RMOckITsN4Kxp10Yj4F+Cb8HHzTVjF+xowVe/x3IvxL31h2Reb2f/UMp4rJxv0baj+NUHp0oxDextSN0NaGRvG2GXjDysrSq8QdgNglo2Bc/Yw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CO6PR12MB5444.namprd12.prod.outlook.com (2603:10b6:5:35e::8) by
- PH0PR12MB7816.namprd12.prod.outlook.com (2603:10b6:510:28c::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.44; Tue, 23 Apr
- 2024 12:30:16 +0000
-Received: from CO6PR12MB5444.namprd12.prod.outlook.com
- ([fe80::ae68:3461:c09b:e6e3]) by CO6PR12MB5444.namprd12.prod.outlook.com
- ([fe80::ae68:3461:c09b:e6e3%5]) with mapi id 15.20.7472.044; Tue, 23 Apr 2024
- 12:30:16 +0000
-Message-ID: <d0b809bc-7820-49b3-9319-18d6fbc419fd@nvidia.com>
-Date: Tue, 23 Apr 2024 13:30:09 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 12/15] KVM: arm64: nv: Add emulation for ERETAx
- instructions
-To: Marc Zyngier <maz@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, James Morse <james.morse@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
- Fuad Tabba <tabba@google.com>, Mostafa Saleh <smostafa@google.com>,
- Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
-References: <20240419102935.1935571-1-maz@kernel.org>
- <20240419102935.1935571-13-maz@kernel.org>
- <14667111-4ad6-48d2-93ee-742c5075f407@nvidia.com>
- <4c2fd210-fa36-8462-8a4d-70135cc2f040@huawei.com>
- <87r0ewtie9.wl-maz@kernel.org>
-From: Jon Hunter <jonathanh@nvidia.com>
-Content-Language: en-US
-In-Reply-To: <87r0ewtie9.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: LO3P265CA0013.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:bb::18) To CO6PR12MB5444.namprd12.prod.outlook.com
- (2603:10b6:5:35e::8)
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="hyc3yZHL";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="GbO437nK"
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailfout.nyi.internal (Postfix) with ESMTP id 3647913800F3;
+	Tue, 23 Apr 2024 08:37:30 -0400 (EDT)
+Received: from imap51 ([10.202.2.101])
+  by compute5.internal (MEProxy); Tue, 23 Apr 2024 08:37:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm2; t=1713875850; x=1713962250; bh=dYBIiyebXU
+	zVTqIXzZSOLioEANbfpV6DnHCY6//IT2M=; b=hyc3yZHLHh4eb43VLtUEQa5WaX
+	gD4p8o8tlQklQXhzMsL++yHQSG2fQ8sLndSX9tfKIUTCE09SuEzUWew7LS6A98ax
+	2MOTNZ4EWjXqgub4PJjPZCYFdomzNhPq722R8Xqf0Aq55KujJAZ9wTqVmQm7rQb0
+	omit4LgdA92iyfn2UPuidl6V3lPbu0Q1fGza7zpUONP6O03rsGrh//SmcMD5aZBx
+	+xF0nb3mS7JPIXWGhi4++o9UJhmNesigchraDx1ORd4gtP8JMvsxEhi8ecdNJTNB
+	PlDytdW2cr7WH15t6KRpQH6hFdI4Di52TUKJqq3+icMeknx+swnXdZi2OWog==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm3; t=1713875850; x=1713962250; bh=dYBIiyebXUzVTqIXzZSOLioEANbf
+	pV6DnHCY6//IT2M=; b=GbO437nKuXNwVDu2wMM+L7dEkU/CXPEMsw0jKv21D2vK
+	UzS2FXuOFKLFoW4RqXANxPZK74uL8qp0xzXHwYr9NLoZ0Lpy4PeU+bvoik1lnFpj
+	qCQwIFTyZ89rkrNe3sKoUSp9gnxa507/w/deVDnGS5VlEhQsFLpo8B9HFcpJu1cy
+	ntR9R9Jmr85swylfRbs0Bd9s4qatckAMoeyIM8HeWCKMa6jwmCqwpC52IwmUToHl
+	nzGiuY1oTSqDLbUgmBy2AIUn362+V+bSJSWo1oK8Oqn1rrbOUgH12FdsgP/shTi/
+	NyM93gV8Tfqw0RRQ7At2vCDmuCwXhA3/hY4FSDNgmQ==
+X-ME-Sender: <xms:iasnZpbkNbQlHWxCaGzQI7Q4lAU0BoSzxxvp5nI_k4fw-ED_EIjTqw>
+    <xme:iasnZgY0jzxeUb3fY28B_e_sRNJ6OlCQKQ8oeG6oVqECKgwrZ0P9VHhAhN7ceyiBO
+    Q7JxHTWsh52S8-Uw5Y>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrudeluddgheegucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
+    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
+    htvghrnhepffehueegteeihfegtefhjefgtdeugfegjeelheejueethfefgeeghfektdek
+    teffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
+    hrnhgusegrrhhnuggsrdguvg
+X-ME-Proxy: <xmx:iasnZr_inpIiRbjmPJ3azVLfBqRF9yWi2StlB5X4kL5gsr8hAjwF8w>
+    <xmx:iasnZnqRVRxeOSaRGrClCoaGfSD1ueWn-7LQbke2_ZiQlQavPAL_Fg>
+    <xmx:iasnZkpR3hUPMG2BMLIfIcM1giLqO_M0Lf5UWNCF65sj0xGwdH0e0A>
+    <xmx:iasnZtS0z6kWoeD6MC72qtgo-12c5wK6lMPYIOVNhMC8Sp-NBTm4LQ>
+    <xmx:iqsnZqiOObvLbIT5b3lzlit7se2ObtP9cDXyL3N5AU3Kx_btj64tcclN>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id A264BB6008D; Tue, 23 Apr 2024 08:37:29 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.11.0-alpha0-386-g4cb8e397f9-fm-20240415.001-g4cb8e397
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO6PR12MB5444:EE_|PH0PR12MB7816:EE_
-X-MS-Office365-Filtering-Correlation-Id: 11025c0b-590c-4f8d-1679-08dc63912185
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?SmRNa1JaVnV1a2xUejZkYk9GSU5BU0NXQndsV255OVhLQ3VTMVQzcXNKKzJy?=
- =?utf-8?B?dTR5VWZuYUx3c2YvVUNKQUlaWWcvSmplcEhGWXJmWmNCUXBaOEQ3WFlUNkVN?=
- =?utf-8?B?Z2Fha05Pc2M0MERpMDRTZmtEa1NTZyt3RjRXKzdZbWxWQVVqM1FTaWIrT3gx?=
- =?utf-8?B?bSs3ajFGRkR0b1U4M1djcXNocmpvWGYwaGphQVVLYTFSK21uZks5c3ZJaHF3?=
- =?utf-8?B?MTZxWVlKQnBPK0xqd3NWREZzMU9FTVArRG90dFIyRk9lNGJacCtXNUhmNDBy?=
- =?utf-8?B?ay9BSjZXaEdld1VVWS9EYlpPUERBckJoL0dQYTIyMm1nQ0tOR0JnL0prTkFX?=
- =?utf-8?B?TS9XSGZYemZMUE1QcitPVTF0WFJJK0FBV2I5VDR5aWpoVEJaT1I4R1k2TlQx?=
- =?utf-8?B?aGQ3ZjlFK3V2d1RrMFhBaG1qNVJ6dTFwaE9UTmhGeWMzN1QwNUU2bUxTZk5q?=
- =?utf-8?B?aENDTzRGeHIwdit1Nmpqc3pEeUhPRk5OQXNXdzEzejVpQmZqR3lDNHRBSzdm?=
- =?utf-8?B?UTliK1llN2swVHFBSm81d0VwdFJSNkwrY0VUVUpMOG81bThSa1Nod25HemRR?=
- =?utf-8?B?bTU2QW5MVXdKSm14SVppUEVoR282d0l5K1AzcGhqTDZQdkp3S0tKZW9OdENY?=
- =?utf-8?B?NmZ3OHBqeWNFODBzblZRb213dXlhUjQwcnFSR05RYTAzTlJBa1lLbkJhTjNX?=
- =?utf-8?B?UG9ORXYvUHRac1h1TFFROUFSeGFkcjZSdnErbEFjVkFCWm5CZVBSZXprbGRD?=
- =?utf-8?B?UnVEVlpiYUp3RnlsdXlBYmRoVWNXcXhJMWIxT293RGErbC9DWk1rdXBMclJX?=
- =?utf-8?B?TFI5bGJ2MDVVNGc1S1ErRlFMNTJWckxuUzhGbXVJWm5neTFlRmxTTWtoS1dL?=
- =?utf-8?B?ZGNoNlNnRVhzZnRpdW1IQ0tUTE9wWEM1UTd6bjU3SDZDSVBLQ2ozNGtwdGZU?=
- =?utf-8?B?em11d3JwREVHRHk3RU5KZHlVcXhwR0MyZjNEYmkvWVBKZ0lvQzF3K2QzckM3?=
- =?utf-8?B?SnJRc0Q4WXZqZWh1TWdwRU0vdWVzbnZqY1B1ekZja0RJamFma21Ja3FldnBv?=
- =?utf-8?B?V044Q3JlQmVnUjhabFpuNFR2bXJlUVEwWE43cEtKOGtPYXpjWUZLQWl3ZXZn?=
- =?utf-8?B?WXYzTzFvUnFxYWpObTZLaGFjVEpZa1k0T0RoVkdXTjk2ek1LejN2ckIyNWFN?=
- =?utf-8?B?NFoyODdqbGJTb2dKRk5Qdk8vaGJZM3RuTllXNVF6cWl2Z2U4ZWdKenJXZnFW?=
- =?utf-8?B?VmVUMjNEZ1M2WFN1cGVabGNTanB0bUVMcVRrMU1nbVd5T0VFdnBQQ20waHJ6?=
- =?utf-8?B?SGdIcUYyVmk1dlk4SDJvZEczTTFSdTJrSGFFWkF4WmZmRXBrdk9DR0hqTWZm?=
- =?utf-8?B?My90SHV3YU84TXJrVEhuNklnbTVBVW9EQll4QXFnVnIvajZDK0dUYmZqTi8y?=
- =?utf-8?B?NnRLcmhBemUzYXNMK1N0N0ZWVTJJRi9mRWRPVlZCUzIxejFKN1JETFVkaERx?=
- =?utf-8?B?TEsxWmEyWFdWR0l3VStOYUxtRDJLRzBHd09ab2FKbDlIU2svNXBpalArbWI3?=
- =?utf-8?B?aHl6QkZ6a2djdUxkSnFGUEZpa085Y2hIdmorRDR6czhHTVc2K1A0Y2YzZGU1?=
- =?utf-8?B?c0hXak9jWktvUkYwVWtNdDNTRy8vbE5aTDdJbzd3Rnl2dTMzSXJwcDk4RkZt?=
- =?utf-8?B?STN5S0tYSUFEWFVKdjYxQUMwK1c2dzg1N3MwZWoxcUdGVjZSS0Q3emFBPT0=?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO6PR12MB5444.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(7416005)(366007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?dENEdlo3cXJ4TnVnOTVta1NkcjRtVXJ4OVVTcEdvWWhTdm13SkpuYS9UMDVV?=
- =?utf-8?B?dk5xRjNYbi8vKzJRQ01FcGNhcXEyb2tpRmJLRDVpU3hSWnp1VWNmREdmdzdl?=
- =?utf-8?B?emJubmlYQ25oYjNsOXNweWcyME5HZTdIbUlFRDJkaG1qSkhPYkxIZ254RGQx?=
- =?utf-8?B?Wm01aFlGeFZNVFdJK002SVB5Uk0yVWdmOHk2QU9qRWhmZmJCOStodUQvODh4?=
- =?utf-8?B?ZThVSzZkc1JMNnlhSnVOWWxQUW5LVDZhcjA5QUJCbnJFNGtRc1dzeVNDaDBV?=
- =?utf-8?B?QWhRS1ZJQnJOWnpVLzh5am1ValRXZTJJeFpEUEJheDdOTHNVQVdCeW9qdUdV?=
- =?utf-8?B?SmI3QmxYQmpEWnE3dFJMT1pZUFdHT0NOcjJjNTBwOStNdSsvUmpOcjdpWVZt?=
- =?utf-8?B?Wk1BWHJnYVRIY2VDNGZYRyt5UWhlUW1kVERrWXVsVXB6OThzSzQzck01SVJn?=
- =?utf-8?B?L085RitpRk9FZUtwdlRRdmFTaDJ3cEJpeWcrK1ljR0dTSmNzcWpadFdJUEJo?=
- =?utf-8?B?OEZ4MGtBWHd1OE1ma3p2OW4zMXRPNmZQajYyQ3NuY25YZ2ZCSi9RNCsrQWw0?=
- =?utf-8?B?Wmtra01CWHNaR21OQk9QemsvVzAyeVFXTzZ0Z0xlWXE5RzdQaFNLVCtFSnJF?=
- =?utf-8?B?ZlRBMG5BMHlOeDc2VFhDQ3MvSXB5aXJGL2d1ZE5KbnJ4cWtWdkNOMUhCcE9G?=
- =?utf-8?B?NGVRckI5VGNIVU50VG9zQTZoU0VvNG1SZXl1UGFBUldVRjVKdXppQ251SFY4?=
- =?utf-8?B?NURtb0owNEZHcWtYaFBFOFBNUkNoSUdnU1o0UEhWL3hYdmZwTmZNbmYza3Ur?=
- =?utf-8?B?WDUyVDlha3JyV0lydzAwcTJlbFJPQlNqdXZrc1RKUDVlS2ptTVJDR0s2eDRL?=
- =?utf-8?B?WFBWbXlIcG5PaEJYRWFvakdreklNQnd0VUJsNnBQQW8wZmpSSXQyUU9LbDYx?=
- =?utf-8?B?ZVZKRW9mWHY0Zm1EYjZFdlJDQU5uUTJvVXB6TnRFSWRGVlZOT2JtRnR6aXZS?=
- =?utf-8?B?bFMrTmlPUUZxT1lRMm14KzAwMXMyUGF4WjZ3a1NGTmYxbk9qdGlpSHpvcDZZ?=
- =?utf-8?B?endpbWlNYm9TL2xqcDBjaFFSZmswMG5UNzExcE9HZTNrbTh6U2syK1BYY0JK?=
- =?utf-8?B?ckNPMCtnYVFOaUdnYmV3UFhwWlVUKzIzK0tZVG15VzlUV1lPNlFNUHJxUGM1?=
- =?utf-8?B?MWlOeVVQR0NNS3FuVCtkUm9GWkJWVjBTT2FzNnBrdlNBWFdremFzTzY4V25K?=
- =?utf-8?B?MC9STmxWaDcwZGR1aXV4bkhnUHZ4ZEl0TzhobkFZSXlOTllvZ0h4YXM1SHJx?=
- =?utf-8?B?K0ZlUDRlUFhQNmdTV3FhY3MxdWYzZ00yek1Gek45dUhoOFpQV0piYzZEWkpB?=
- =?utf-8?B?NHF1TTVUamtqalQ0ay9iRlBYSHMxMjJyUnFiL3BBZTVLM1ZCUGxlcDUxcVJp?=
- =?utf-8?B?eDBOaXNGb0tBT1pVTGpuRUt3ZnVpTzVPUkV1TnhwMnFxRnJqWWVIU0QwdExC?=
- =?utf-8?B?eSszWDFFUS9RWlFyd2hpYjZ2ZmxtRmNiS0hvQWV1Q2RwMFQ1T1dCeFRDT2J6?=
- =?utf-8?B?am90WDFWYnFObi9vM0pGR0U2WUtFSERxVmtTWld3cXNUcUNXcWQ5bElkMEpn?=
- =?utf-8?B?QVEwSW1VNVRBT0hBdytEeDV3WEtBZWdsMUhWSEZVeU1aRkhBMFBlSEdWME1F?=
- =?utf-8?B?UmFncC9SaHJsK2lZa3EycVZydXVzb1JJVktGYjI3NktiU2dGdVNqaUdzY1VS?=
- =?utf-8?B?b2tsZjhQWmlmeWwrdzlsdFByUkZrS1JjTS9WU1FUM05XeTdEY3hka3ZCYTFC?=
- =?utf-8?B?RVFCVStDN0Q1TlJmTTJUMkdMWTlRMHJZMWJoZWNOSGdNQnJHb29iNGJVdkw2?=
- =?utf-8?B?cldaNVdLWFVYRjNOY1lqRzlyTS9PRng0Qkh2bTdRN2t3RDduK2kxdUpEQmlv?=
- =?utf-8?B?bSt5ZWdNQVkzcjJuRWZINDhoK0hvN0JzU3dWR2ZUb0tNQ20yREhFNDk1Mmor?=
- =?utf-8?B?MXY0YXZwSVlTdnBSQXBKcjFkSUwyeXFEcHA5Z3JJTVFRVXVGbEJPT0ErQ2ti?=
- =?utf-8?B?a0pDTFJkdDdwM2xkdnh4V2xNczVGSTlleFRVekNBK3Roa1lRZ2kvUzg3Sjg5?=
- =?utf-8?B?NWYyU2d3WTZkNzdCbjl2QUdSSTNqU2pCbXZJZDZMUUZBOHoybGE0UHRGMFFt?=
- =?utf-8?B?c2dySlNmUXp3YmZ2Z2Q4VEV0amtRWGxoOVJuVFoxV0szM0c4dkppT0tMdEUv?=
- =?utf-8?B?bTlRbTZUQUhPRW13WVBrbCtIZ3RRPT0=?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 11025c0b-590c-4f8d-1679-08dc63912185
-X-MS-Exchange-CrossTenant-AuthSource: CO6PR12MB5444.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Apr 2024 12:30:16.6686
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: skWbTCAau5nOfZKdnDJAyuMJqKFDNU2Wz+THDKgvd5ktoG96Cc1SMZ/KNn+taYrb5TYyqQn0iiecwQ6EKUiMAg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7816
+Message-Id: <a495bc0d-ff35-46fc-842b-368ce59a88c1@app.fastmail.com>
+In-Reply-To: <87o7a0tha6.wl-maz@kernel.org>
+References: <20240422224849.2238222-1-maz@kernel.org>
+ <fa6c31c5-9334-4248-aa89-a0951f1b13c6@app.fastmail.com>
+ <0b970cf5-a880-469c-93ab-9a268ee4ea2b@quicinc.com>
+ <87o7a0tha6.wl-maz@kernel.org>
+Date: Tue, 23 Apr 2024 14:37:09 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Marc Zyngier" <maz@kernel.org>, "Maria Yu" <quic_aiquny@quicinc.com>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ "James Morse" <james.morse@arm.com>,
+ "Suzuki K Poulose" <suzuki.poulose@arm.com>,
+ "Oliver Upton" <oliver.upton@linux.dev>, "Zenghui Yu" <yuzenghui@huawei.com>,
+ "Mark Rutland" <mark.rutland@arm.com>, "Joey Gouly" <joey.gouly@arm.com>,
+ "Will Deacon" <will@kernel.org>,
+ "Naresh Kamboju" <naresh.kamboju@linaro.org>,
+ "Linaro Kernel Functional Testing" <lkft@linaro.org>
+Subject: Re: [PATCH] KVM: arm64: nv: Work around lack of pauth support in old
+ toolchains
+Content-Type: text/plain
 
+On Tue, Apr 23, 2024, at 14:06, Marc Zyngier wrote:
+> On Tue, 23 Apr 2024 13:00:55 +0100,
+> "Aiqun Yu (Maria)" <quic_aiquny@quicinc.com> wrote:
+>> On 4/23/2024 4:24 PM, Arnd Bergmann wrote:
+>> > On Tue, Apr 23, 2024, at 00:48, Marc Zyngier wrote:
+>> >> We still support GCC 8.x, and it appears that this toolchain
+>> >> does not understand "pauth" as a valid architectural extension.
+>> >> After all, it's only been 8 years since ARMv8.3 was released...
+>> > 
+>> > Just to clarify: I'm fairly sure that all supported toolchains
+>> > support ARMv8.3 and PACGA, the problem with ".arch_extension pauth\n"
+>> > seems to be that it was retroactively made an optional
+>> > feature for earlier architecture versions a few years after
+>> > ARMv8.3, so most binutils versions we support understand
+>> > pacga as an armv8.3 feature but reject the pauth name for the
+>> > extension.
+>> Kind of agree with Arnd here.
+>> Shall the fix just remove the ".arch_extension pauth"?
+>> 
+>> I've tried gcc 7 failed with the pauth name for the extension.
+>> After I remove the ".arch_extension pauth" and use "pacga" instruction
+>> directly pass the gcc 7 compilation.
 
-On 23/04/2024 12:42, Marc Zyngier wrote:
-> On Tue, 23 Apr 2024 10:40:22 +0100,
-> Zenghui Yu <yuzenghui@huawei.com> wrote:
->>
->> On 2024/4/23 17:22, Jon Hunter wrote:
->>>
->>> Some of our builders currently have an older version of GCC (v6) and
->>> after this change I am seeing ...
->>>
->>>     CC      arch/arm64/kvm/pauth.o
->>> /tmp/ccohst0v.s: Assembler messages:
->>> /tmp/ccohst0v.s:1177: Error: unknown architectural extension `pauth'
->>> /tmp/ccohst0v.s:1177: Error: unknown mnemonic `pacga' -- `pacga x21,x22,x0'
->>> /local/workdir/tegra/mlt-linux_next/kernel/scripts/Makefile.build:244:
->>> recipe for target 'arch/arm64/kvm/pauth.o' failed
->>> make[5]: *** [arch/arm64/kvm/pauth.o] Error 1
->>> /local/workdir/tegra/mlt-linux_next/kernel/scripts/Makefile.build:485:
->>> recipe for target 'arch/arm64/kvm' failed
->>> make[4]: *** [arch/arm64/kvm] Error 2
->>> /local/workdir/tegra/mlt-linux_next/kernel/scripts/Makefile.build:485:
->>> recipe for target 'arch/arm64' failed
->>> make[3]: *** [arch/arm64] Error 2
->>>
->>>
->>> I know this is pretty old now and I am trying to get these builders
->>> updated. However, the kernel docs still show that GCC v5.1 is
->>> supported [0].
->>
->> Was just looking at the discussion [1] ;-) . FYI there is already a
->> patch on the list [2] which should be merged soon.
-> 
-> Indeed. -next as of today already has the fix, although I'm reworking
-> it to take Mark's remarks into account.
-> 
-> Jon, can you confirm that next-20240423 builds with your setup?
+It really depends on the binutils version, not gcc of course.
 
+> And breaks with LLVM:
+>
+>   CC      arch/arm64/kvm/pauth.o
+> arch/arm64/kvm/pauth.c:40:9: error: instruction requires: pauth
+>                      "pacga %0, %1, %2" : "=r" (pac) : "r" (ptr), "r" (mod));
+>                       ^
+> <inline asm>:2:1: note: instantiated into assembly here
+> pacga x19, x1, x9
+> ^
 
-Yes that is building fine today too. Thanks!
+It works when building with LLVM_IAS=0, which we obviously don't
+want to mandate here. The variant below works for both clang+ias
+(including all still supported versions) and gcc+binutils, but at
+that point it gets obscure enough that your .inst version is easier
+to understand.
 
-Feel free to add my ...
+    Arnd
 
-Tested-by: Jon Hunter <jonathanh@nvidia.com>
-
-Jon
-
--- 
-nvpublic
+--- a/arch/arm64/kvm/pauth.c
++++ b/arch/arm64/kvm/pauth.c
+@@ -36,7 +36,12 @@ static u64 compute_pac(struct kvm_vcpu *vcpu, u64 ptr,
+        __ptrauth_key_install_nosync(APGA, ikey);
+        isb();
+ 
+-       asm volatile(ARM64_ASM_PREAMBLE ".arch_extension pauth\n"
++       asm volatile(ARM64_ASM_PREAMBLE
++#ifdef CONFIG_AS_IS_LLVM
++                    ".arch_extension pauth\n"
++#else
++                    ".arch armv8.3-a\n"
++#endif
+                     "pacga %0, %1, %2" : "=r" (pac) : "r" (ptr), "r" (mod));
+        isb();
+ 
