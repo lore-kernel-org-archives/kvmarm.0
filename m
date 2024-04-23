@@ -1,55 +1,55 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AC4A13BADD
-	for <kvmarm@lists.linux.dev>; Tue, 23 Apr 2024 15:06:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CDF413664A
+	for <kvmarm@lists.linux.dev>; Tue, 23 Apr 2024 15:06:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713884800; cv=none; b=U7WTd0wmqGjQKT3B2izUj2mRc5wOUei6fyzNrY+0mhFqnWrr0JZ9YWQdrmgvfLRf8tpVNAD5UfllVoBgj/xrYZkC9ksOXkt5+5SLjfBgRWvO0NLmrUhZjkYaQ3a+oXO/AbSRdN9FmJzpcvuxAcdSn7ygCN3VpLyJe1dwDB+GDug=
+	t=1713884804; cv=none; b=poodJUKP6e7CFXQZLXjQFXg0fC4i4J+NfSx5TDlcp+j6JqCy37zfCBKLtxzzmnWY17zCT+LTi1kZnkP/m4K6qfJAz4ad+X3raUVfK4dejyn1pDERLZDmq4jUyQta+n85pER+kAzNBCOasoT7VioVEjhISdB36p/SfcUP9ckFQvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713884800; c=relaxed/simple;
-	bh=U2hWJlimg0PScvmQvSNiutrP8PBKAJ/bc/iqzUX2aUk=;
+	s=arc-20240116; t=1713884804; c=relaxed/simple;
+	bh=MZSVKp5cR+kw0x1bWOgfWUh8Ullh17DKogOayPNYAUQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ZQ4FV0AIDlA1SoLAXZm7frOQuZnocedL35BPGdw+3KWSYpUadDoqOaQho3sgOgdp4N+ab55Yb3iWZ5Wafy6hPANucxXfx6sU0Dyg3VdEI6SKzRSjadxX2WIFFLk2eALZX2pyh+VrKXhOg6aMFAP+Tl5zJZiPJPIQ5yP1F+R5cws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zYhvegCW; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=p5o70zqBuSL3im8V++523bWhENPPdAK/di/aKwL16SwkPT2KcEX6CT0tlTPamdXzub8v12RMEAKx56rpU+obuzWUvhswLvSv+4kxxbc8niX3ROWtd8yZgSYpNChDoFIrzi9vSPyTUdyOuk74af9livTHUSZQiU6p/CbEjfmRZC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uOjmmovD; arc=none smtp.client-ip=209.85.221.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zYhvegCW"
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-61b13ce3daaso135670437b3.0
-        for <kvmarm@lists.linux.dev>; Tue, 23 Apr 2024 08:06:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uOjmmovD"
+Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-343e54fc19bso4033294f8f.2
+        for <kvmarm@lists.linux.dev>; Tue, 23 Apr 2024 08:06:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713884798; x=1714489598; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1713884801; x=1714489601; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=debhuxEdWbHQLqSSpCg9aCajtV4sBqhjNC75Uyo8+ck=;
-        b=zYhvegCWgZ66yXOHoCKzs+7NZySPoYqiMmWUgD9XS55dS1ccgZJ92GM2YBoOd453RS
-         a4yshSv9987kvyRVFUpud724F+08hi/JNaOvkonU1fIPLRgFglYp6tJYysnQ6j1heLje
-         Io9z+6eWZV4h11ezJuX/dpz1nsZY3EzkXqQt2t/0lYcZ00AduIBaaZib72nu+/5GWrj4
-         dJO+uJXXj4vEWBF/GmNFn9+p7A8EWE195dd7DWeQKqPItQ2BDfvM2X8pgCjNpqKNDiT1
-         dH6t1FNeRj9J3cZmX2xwZZ7b3bTRcXXq+jTRDm3IBjmnJj3ylPvHhzjg3qkNZmUBftdM
-         pXMQ==
+        bh=SOV7811wPLzhw1FHjBlhdYYjAPxbNp84RGhdZIl3Ung=;
+        b=uOjmmovDIU9RsmzkeE99rWATf5JKzgfXhQrxIhbWG07yijYMy12hrWd22rJBTeLUjq
+         ehz/8gndk1u3dGXBhJxk6F3GxIfe+1pYuqX1wONqD5j5DHRQFFdCwLhvKYKFTNMS4L8M
+         F/oBkZNIKqhQQ96XeO+Irnq/Whi8eJxppwpMZcdC3fJRf5+Q4Tfjif9h4a5tflAjdx5q
+         7qJHvcdWb7BZOP5th0RK8jaweRUbPTfh4cwqwCGB0pqtwcHOAwwFbZtsXiCexYd/lkP0
+         At2NHQluqm1xSjHw5ipj7EPFoox9NKdidcCvg6Tccz+6UL40vPYq7iPf21Mj91tKALO+
+         XMVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713884798; x=1714489598;
+        d=1e100.net; s=20230601; t=1713884801; x=1714489601;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=debhuxEdWbHQLqSSpCg9aCajtV4sBqhjNC75Uyo8+ck=;
-        b=fthfksym8hAZJiXd/2xLC6e+tz4foDP5hnfk5gDkN81VHgYxk7cll+fqznL5RIlWgs
-         agisW50FIABSq8KS8pqE/lANa45stt7CdvOjhSREyHrm5eYdE2pdTN4pCbwrES2mH9CF
-         2yEha8xncXgnH18wkGysfcc5plL95XAiWjr8ARwf6q0lTOs2KXNmfwQOZUmpmG0553vb
-         WojMjPeEEKY6eR6efQJGSIL2ce1xALdegiMnaojzc6GQuoXhapQwBzTM4SwZC8d5tRih
-         FYP+ouVmmlbQhlV74Jwlyn/9yjW6+O4VYhx2+Y952Gq4ksCTAsBY+xf2BA8kolz35Odl
-         cYJQ==
-X-Gm-Message-State: AOJu0Yy/hJHLGmJYva00S8Z6Q+VImJD6eKbYwQFHDukYdac9zYGS6S7c
-	Hh8JRYenpMghNnJnmoFiTA+W2FTmUABBTT1uwLyoI3Ssqqv1nf6t4zldMG3B3uWOtuElbUH6zeS
-	1DRJ81I7XjFLYL2C6AcD4oXwg2yboy0JgSOgFKZKyyfFWE8I5N5sN1RtWGwxxxdZiBrHQJJT4zF
-	ubeUbeTh/lRYJhwBXF5IF5nurzNB8=
-X-Google-Smtp-Source: AGHT+IHdvE3dDkFxCiTI+ibYP/Ey2bDxN9QkTPqpenGS/+rYgsQD5ZSHtDY24vf3hOPbIqEdrt/tF0pEhA==
+        bh=SOV7811wPLzhw1FHjBlhdYYjAPxbNp84RGhdZIl3Ung=;
+        b=fTFn5QgtyCOVXaxCnrn4jald50vpSVPMJtrfpnX83sMEm4RQ8+YK9ufZvlzRdAAd32
+         yCTohvG0kXLK80LhVytfZybzPjtg8f41plLM7uH57V2BDxa+NknYrh9fzQWi1hPMKjgy
+         l/35hkdMXgMDBocA7GUdFzFk86fjfsp5PCIOTANP6+y7OZYYhcJa6yFwPpgmWDT88TQ8
+         JSprybsf9nc4OFfJX4pb2hZcakwdF5o8ozE7rhI6fQoCBznAULuGsrm1/oQwc12Ajq1s
+         kzw9KwiR2hxbZqH/S3rl1myUf26GY3qnjgfcMoGsPe7jyRdbyEPe2Rehr746xspdntFS
+         tN2A==
+X-Gm-Message-State: AOJu0YyNFNCJpb1spoojp3hIEPCrYMAnWP9MgBkJxpIe3nXtpqEslPGH
+	3MZRilH+1PLbrqzTTiygUKfR/N2ohVy45kiMhFP/4pzniz93ot/ACHET6iHK0glbjuelIyn/SGK
+	yqfaFxXEp5SGxXGIEGxYXed+redQZjyYK7oCBe1hPjwScn8bgLEzZBY6RX0qKBb8dxA4aEjQR2r
+	7j7kInc5cDAVt97ReUV8u939dIous=
+X-Google-Smtp-Source: AGHT+IE0NIcBpzOqa8h86QNLzy1Kp2CcPvyF4bEHK5Q71o40YzDx5TrkTZixeKHQ1r8v58O5cZUL4D/bGw==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a0d:cb85:0:b0:615:33de:61d5 with SMTP id
- n127-20020a0dcb85000000b0061533de61d5mr3247702ywd.1.1713884798296; Tue, 23
- Apr 2024 08:06:38 -0700 (PDT)
-Date: Tue, 23 Apr 2024 16:05:33 +0100
+ (user=tabba job=sendgmr) by 2002:adf:ef88:0:b0:349:b639:4827 with SMTP id
+ d8-20020adfef88000000b00349b6394827mr28391wro.5.1713884800608; Tue, 23 Apr
+ 2024 08:06:40 -0700 (PDT)
+Date: Tue, 23 Apr 2024 16:05:34 +0100
 In-Reply-To: <20240423150538.2103045-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240423150538.2103045-1-tabba@google.com>
 X-Mailer: git-send-email 2.44.0.769.g3c40516874-goog
-Message-ID: <20240423150538.2103045-26-tabba@google.com>
-Subject: [PATCH v4 25/30] KVM: arm64: Reformat/beautify PTP hypercall documentation
+Message-ID: <20240423150538.2103045-27-tabba@google.com>
+Subject: [PATCH v4 26/30] KVM: arm64: Rename firmware pseudo-register
+ documentation file
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev
 Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com, 
@@ -72,67 +73,52 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Will Deacon <will@kernel.org>
 
-The PTP hypercall documentation doesn't produce the best-looking table
-when formatting in HTML as all of the return value definitions end up
-on the same line.
+In preparation for describing the guest view of KVM/arm64 hypercalls in
+hypercalls.rst, move the existing contents of the file concerning the
+firmware pseudo-registers elsewhere.
 
-Reformat the PTP hypercall documentation to follow the formatting used
-by hypercalls.rst.
-
+Cc: Raghavendra Rao Ananta <rananta@google.com>
 Signed-off-by: Will Deacon <will@kernel.org>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- Documentation/virt/kvm/arm/ptp_kvm.rst | 38 ++++++++++++++++----------
- 1 file changed, 24 insertions(+), 14 deletions(-)
+ .../kvm/arm/{hypercalls.rst => fw-pseudo-registers.rst}     | 6 +++---
+ Documentation/virt/kvm/arm/index.rst                        | 2 +-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+ rename Documentation/virt/kvm/arm/{hypercalls.rst => fw-pseudo-registers.rst} (97%)
 
-diff --git a/Documentation/virt/kvm/arm/ptp_kvm.rst b/Documentation/virt/kvm/arm/ptp_kvm.rst
-index aecdc80ddcd8..7c0960970a0e 100644
---- a/Documentation/virt/kvm/arm/ptp_kvm.rst
-+++ b/Documentation/virt/kvm/arm/ptp_kvm.rst
-@@ -7,19 +7,29 @@ PTP_KVM is used for high precision time sync between host and guests.
- It relies on transferring the wall clock and counter value from the
- host to the guest using a KVM-specific hypercall.
+diff --git a/Documentation/virt/kvm/arm/hypercalls.rst b/Documentation/virt/kvm/arm/fw-pseudo-registers.rst
+similarity index 97%
+rename from Documentation/virt/kvm/arm/hypercalls.rst
+rename to Documentation/virt/kvm/arm/fw-pseudo-registers.rst
+index 3e23084644ba..b90fd0b0fa66 100644
+--- a/Documentation/virt/kvm/arm/hypercalls.rst
++++ b/Documentation/virt/kvm/arm/fw-pseudo-registers.rst
+@@ -1,8 +1,8 @@
+ .. SPDX-License-Identifier: GPL-2.0
  
--* ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID: 0x86000001
-+``ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID``
-+----------------------------------------
+-=======================
+-ARM Hypercall Interface
+-=======================
++=======================================
++ARM firmware pseudo-registers interface
++=======================================
  
--This hypercall uses the SMC32/HVC32 calling convention:
-+Retrieve current time information for the specific counter. There are no
-+endianness restrictions.
+ KVM handles the hypercall services as requested by the guests. New hypercall
+ services are regularly made available by the ARM specification or by KVM (as
+diff --git a/Documentation/virt/kvm/arm/index.rst b/Documentation/virt/kvm/arm/index.rst
+index 7f231c724e16..d28d65122290 100644
+--- a/Documentation/virt/kvm/arm/index.rst
++++ b/Documentation/virt/kvm/arm/index.rst
+@@ -7,8 +7,8 @@ ARM
+ .. toctree::
+    :maxdepth: 2
  
--ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID
--    ==============    ========    =====================================
--    Function ID:      (uint32)    0x86000001
--    Arguments:        (uint32)    KVM_PTP_VIRT_COUNTER(0)
--                                  KVM_PTP_PHYS_COUNTER(1)
--    Return Values:    (int32)     NOT_SUPPORTED(-1) on error, or
--                      (uint32)    Upper 32 bits of wall clock time (r0)
--                      (uint32)    Lower 32 bits of wall clock time (r1)
--                      (uint32)    Upper 32 bits of counter (r2)
--                      (uint32)    Lower 32 bits of counter (r3)
--    Endianness:                   No Restrictions.
--    ==============    ========    =====================================
-++---------------------+-------------------------------------------------------+
-+| Presence:           | Optional                                              |
-++---------------------+-------------------------------------------------------+
-+| Calling convention: | HVC32                                                 |
-++---------------------+----------+--------------------------------------------+
-+| Function ID:        | (uint32) | 0x86000001                                 |
-++---------------------+----------+----+---------------------------------------+
-+| Arguments:          | (uint32) | R1 | ``KVM_PTP_VIRT_COUNTER (0)``          |
-+|                     |          |    +---------------------------------------+
-+|                     |          |    | ``KVM_PTP_PHYS_COUNTER (1)``          |
-++---------------------+----------+----+---------------------------------------+
-+| Return Values:      | (int32)  | R0 | ``NOT_SUPPORTED (-1)`` on error, else |
-+|                     |          |    | upper 32 bits of wall clock time      |
-+|                     +----------+----+---------------------------------------+
-+|                     | (uint32) | R1 | Lower 32 bits of wall clock time      |
-+|                     +----------+----+---------------------------------------+
-+|                     | (uint32) | R2 | Upper 32 bits of counter              |
-+|                     +----------+----+---------------------------------------+
-+|                     | (uint32) | R3 | Lower 32 bits of counter              |
-++---------------------+----------+----+---------------------------------------+
++   fw-pseudo-registers
+    hyp-abi
+-   hypercalls
+    pvtime
+    ptp_kvm
+    vcpu-features
 -- 
 2.44.0.769.g3c40516874-goog
 
