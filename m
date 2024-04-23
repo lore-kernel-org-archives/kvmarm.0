@@ -1,141 +1,155 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C304A7E101
-	for <kvmarm@lists.linux.dev>; Tue, 23 Apr 2024 15:06:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFD2C13BC29
+	for <kvmarm@lists.linux.dev>; Tue, 23 Apr 2024 16:15:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713884812; cv=none; b=r3TofH5kQbrLXLCXl5riaVc5Bkiwu0q3QTFOGYLjPl5lW2oVBeSvGUcy5z4O0VRkq+AKSJ3PIP1QG/SpkyA3SppDmdn+n9Z6r2tctcSg0cTU41ZxrFu1LvWALvC3oK+sc2Zd8AxF8GYJB2gZ/SPu+8EnOC1W8svhcyZFKBe0tQs=
+	t=1713888944; cv=none; b=BKX/b0HwqsjujOkLtU15kmhcRwv5dXroaOq48s4ccMmHiPl5cY4YzZlQRgf5QMg9E8S6LNXpuGjb8A0lu9aB0qJsPNLciYtuzHq8oS+3O6h/O4QGLGM+XXt3y1+BGRfJiCiBlg7kedul5Ya/R47pTNsdSLbe+L9WlHisSznPzq4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713884812; c=relaxed/simple;
-	bh=2GsIRqPZagWKhuj9EZGoOldsGx6hXMcIg/EWdwB1fmk=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=BewPyUrooPq0Or+Oz7Lwmg1LDNxhAa0ySJQOb4b8e2D/IIsBibhNRdPHSMr+Tblx8MSq957JLZF1lHwb8yXdDA9Diu6dB2409OMAxK0cNJw8lRVohkBdrNuwgv4lARd+wHNG5sMFWuxEvgL0qOwtlhzPF5IAbiYVCYLZDLJ7PE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=t23B6bpQ; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
+	s=arc-20240116; t=1713888944; c=relaxed/simple;
+	bh=VFsxRs6aRTGo6VLD+2rO7+0u3Yj+FJKKgggb7kHRJUM=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gIgepni3pOOI3Kml5eh+z8Ia8zpc65mQH08jJt2a7yoJe9QVHzbg+3uQvd/dixZ6oDiFbpsx9y115SfncUMQ7RI6DhgxXoRGzJmO6g1jAkh0vOd+u3ArwZQ8vNOdeXOJALRJE+kog53aAR/KyxSAtZMQvpttT5dxLv3jikFMaCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BZk4XoMN; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="t23B6bpQ"
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-61b32e7f94bso92052447b3.2
-        for <kvmarm@lists.linux.dev>; Tue, 23 Apr 2024 08:06:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713884810; x=1714489610; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HCT+MKeivP6eUNB+e7xF0kRsoFU+ciDO6eU9PbH4fgM=;
-        b=t23B6bpQyXQCDHY8WstnI8bVI1Pkjbdv5JsVK1ZR/N33X/heSayML3bCvGbdgD8NZr
-         85Ax4cvfuHagb33/UQ6gau9rolRMyv1lZmF4D1IE6Q87tRWdzYxnr51l01T0yjYmIHVs
-         dk3o4s34Q0LZtniZJcUMkl2yLLsjZ3WiXPuhyWe38oJilaaU9O52jRguxi5z+3pgiy2V
-         cqHwa8OwC+mnlbiHSNHLWcw6lMuiVCSioGsmzaw3MaKgVv53a6H6+PCALag7lKTeSKZ9
-         4rbTTrzxz9TOiLNwFB1GFDdx/7451Q+Wx0pqYgvqmXC4oEq+hjisRzmNNEpLSIK6t+eP
-         fq4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713884810; x=1714489610;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HCT+MKeivP6eUNB+e7xF0kRsoFU+ciDO6eU9PbH4fgM=;
-        b=tmifWCTgh99rSY4pnVSd0AOnKf4iRM3MQ2nBna9CRT/C5a2TwdWMVkeb7jVRxHhrXn
-         81ItSyifbcRNzlDK+CaQd/zwcW5F58IVlujQnswr1L4HHvZZbw+0hSt5+zQBZjNwCfAY
-         gy51UTLCpxLwg2/rOOgwvuxmbrsj2wjq1aP0FY+08bzRSTnHnqA5SHVJPZSpilLpRdk1
-         jmlnC0to90rIyo7SihOtZEnoyzHpkCGywZxxfSpghzNudnT8zUathRFadZSXPYmqQC/Y
-         9eyujavJIzQMDz65gnIM9v+GU5mqhNc228YOQhsJzzQiKf8I9fBV13vQ2u6oF1HqOL9F
-         6OdQ==
-X-Gm-Message-State: AOJu0YyZO7gJHxPiJKkLLeBi7ILhOCdJec4vUi5XrqM628P+gHsjXeHZ
-	2LxPn/myQbSZcOJSXWKq3FGxxJSXpqdbyLwSb9GDWdfCrUwE6l3oeN34j6jCUf5uqZnDjmThK54
-	9Y/0tYBbYvSSfWys3b6HyKtCxuMaqswfOGwM9lDBRyAZ6Pw2UO0QcePVUPyVVcIrpFpYr3AP050
-	60WzaAhE3j+r4AmqSwMSUZ5Qsjixo=
-X-Google-Smtp-Source: AGHT+IGZaIaQPMMMUXjrHQ1JrQQwk6m7fi/oXinDexWndwFbIgk9RfwGolRrnrLOFGR3ZT1Mx6341Pkvjw==
-X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a25:d8d5:0:b0:dcc:50ca:e153 with SMTP id
- p204-20020a25d8d5000000b00dcc50cae153mr4066836ybg.7.1713884809763; Tue, 23
- Apr 2024 08:06:49 -0700 (PDT)
-Date: Tue, 23 Apr 2024 16:05:38 +0100
-In-Reply-To: <20240423150538.2103045-1-tabba@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BZk4XoMN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E10BC116B1;
+	Tue, 23 Apr 2024 16:15:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713888944;
+	bh=VFsxRs6aRTGo6VLD+2rO7+0u3Yj+FJKKgggb7kHRJUM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=BZk4XoMNL+NkqhEJqoe7zs9sBYwRPpFwwPF8WYxGJrNgPO53zXjAQDOMrcB8ueCBN
+	 Q1D3mMfjDxuw4fbix4vNiBhF5h7AY+jHnCq4d1zaAF8rNs/1Oz6mZcNFm0QKiNcwQ0
+	 85rMr1dlTpqAtGq7/X9/ivPO1myE7h5bsdAseIA+DtCYYT7sX0PIKabXuwyI6bqR2J
+	 9h6yDEJ81ktcVfsGeP6/fEv6cQH24SdoIX+Sb3Maz4I8r5pPEOgjMpOLwKgU4HoCBP
+	 i3/UVx4U0DeLLceu55EBaYPmpaOOHFzWIl6+7FMPeRtPxS00ERLeYZ4hnDMk8Ej4gv
+	 ggPuxKvzt49mg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rzIo2-007FwL-1S;
+	Tue, 23 Apr 2024 17:15:42 +0100
+Date: Tue, 23 Apr 2024 17:15:41 +0100
+Message-ID: <86le54qclu.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: "Arnd Bergmann" <arnd@arndb.de>
+Cc: "Maria Yu" <quic_aiquny@quicinc.com>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	"James Morse" <james.morse@arm.com>,
+	"Suzuki K Poulose" <suzuki.poulose@arm.com>,
+	"Oliver Upton" <oliver.upton@linux.dev>,
+	"Zenghui Yu" <yuzenghui@huawei.com>,
+	"Mark Rutland" <mark.rutland@arm.com>,
+	"Joey Gouly" <joey.gouly@arm.com>,
+	"Will Deacon" <will@kernel.org>,
+	"Naresh Kamboju" <naresh.kamboju@linaro.org>,
+	"Linaro Kernel Functional Testing" <lkft@linaro.org>
+Subject: Re: [PATCH] KVM: arm64: nv: Work around lack of pauth support in old toolchains
+In-Reply-To: <a495bc0d-ff35-46fc-842b-368ce59a88c1@app.fastmail.com>
+References: <20240422224849.2238222-1-maz@kernel.org>
+	<fa6c31c5-9334-4248-aa89-a0951f1b13c6@app.fastmail.com>
+	<0b970cf5-a880-469c-93ab-9a268ee4ea2b@quicinc.com>
+	<87o7a0tha6.wl-maz@kernel.org>
+	<a495bc0d-ff35-46fc-842b-368ce59a88c1@app.fastmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20240423150538.2103045-1-tabba@google.com>
-X-Mailer: git-send-email 2.44.0.769.g3c40516874-goog
-Message-ID: <20240423150538.2103045-31-tabba@google.com>
-Subject: [PATCH v4 30/30] KVM: arm64: Force injection of a data abort on NISV
- MMIO exit
-From: Fuad Tabba <tabba@google.com>
-To: kvmarm@lists.linux.dev
-Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com, 
-	seanjc@google.com, alexandru.elisei@arm.com, catalin.marinas@arm.com, 
-	philmd@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, 
-	oliver.upton@linux.dev, mark.rutland@arm.com, broonie@kernel.org, 
-	joey.gouly@arm.com, rananta@google.com, smostafa@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: arnd@arndb.de, quic_aiquny@quicinc.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, mark.rutland@arm.com, joey.gouly@arm.com, will@kernel.org, naresh.kamboju@linaro.org, lkft@linaro.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-From: Marc Zyngier <maz@kernel.org>
+On Tue, 23 Apr 2024 13:37:09 +0100,
+"Arnd Bergmann" <arnd@arndb.de> wrote:
+> 
+> On Tue, Apr 23, 2024, at 14:06, Marc Zyngier wrote:
+> > On Tue, 23 Apr 2024 13:00:55 +0100,
+> > "Aiqun Yu (Maria)" <quic_aiquny@quicinc.com> wrote:
+> >> On 4/23/2024 4:24 PM, Arnd Bergmann wrote:
+> >> > On Tue, Apr 23, 2024, at 00:48, Marc Zyngier wrote:
+> >> >> We still support GCC 8.x, and it appears that this toolchain
+> >> >> does not understand "pauth" as a valid architectural extension.
+> >> >> After all, it's only been 8 years since ARMv8.3 was released...
+> >> > 
+> >> > Just to clarify: I'm fairly sure that all supported toolchains
+> >> > support ARMv8.3 and PACGA, the problem with ".arch_extension pauth\n"
+> >> > seems to be that it was retroactively made an optional
+> >> > feature for earlier architecture versions a few years after
+> >> > ARMv8.3, so most binutils versions we support understand
+> >> > pacga as an armv8.3 feature but reject the pauth name for the
+> >> > extension.
+> >> Kind of agree with Arnd here.
+> >> Shall the fix just remove the ".arch_extension pauth"?
+> >> 
+> >> I've tried gcc 7 failed with the pauth name for the extension.
+> >> After I remove the ".arch_extension pauth" and use "pacga" instruction
+> >> directly pass the gcc 7 compilation.
+> 
+> It really depends on the binutils version, not gcc of course.
 
-If a vcpu exits for a data abort with an invalid syndrome, the
-expectations are that userspace has a chance to save the day if
-it has requested to see such exits.
+Right. I'll amend the commit message to reflect that.
 
-However, this is completely futile in the case of a protected VM,
-as none of the state is available. In this particular case, inject
-a data abort directly into the vcpu, consistent with what userspace
-could do.
+> 
+> > And breaks with LLVM:
+> >
+> >   CC      arch/arm64/kvm/pauth.o
+> > arch/arm64/kvm/pauth.c:40:9: error: instruction requires: pauth
+> >                      "pacga %0, %1, %2" : "=r" (pac) : "r" (ptr), "r" (mod));
+> >                       ^
+> > <inline asm>:2:1: note: instantiated into assembly here
+> > pacga x19, x1, x9
+> > ^
+> 
+> It works when building with LLVM_IAS=0, which we obviously don't
+> want to mandate here. The variant below works for both clang+ias
+> (including all still supported versions) and gcc+binutils, but at
+> that point it gets obscure enough that your .inst version is easier
+> to understand.
 
-This also helps with pKVM, which discards all syndrome information when
-forwarding data aborts that are not known to be MMIO.
+Exactly. Either we have a good way to abstract this behind the scenes
+(which I don't see right now), or we just assume control of the
+instruction generation, which is what my patch does.
 
-Finally, document this tweak to the API.
+In general, I question the value of the ".arch_extension" requirement
+for something like Linux, where we already have a pretty fine grained
+control of what we want to see being output by the compiler. but that
+ship has sailed long ago.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
- Documentation/virt/kvm/api.rst | 7 +++++++
- arch/arm64/kvm/mmio.c          | 8 ++++++++
- 2 files changed, 15 insertions(+)
+Thanks,
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 0b5a33ee71ee..b11b70ae137e 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -6894,6 +6894,13 @@ Note that KVM does not skip the faulting instruction as it does for
- KVM_EXIT_MMIO, but userspace has to emulate any change to the processing state
- if it decides to decode and emulate the instruction.
- 
-+This feature isn't available to protected VMs, as userspace does not
-+have access to the state that is required to perform the emulation.
-+Instead, a data abort exception is directly injected in the guest.
-+Note that although KVM_CAP_ARM_NISV_TO_USER will be reported if
-+queried outside of a protected VM context, the feature will not be
-+exposed if queried on a protected VM file descriptor.
-+
- ::
- 
- 		/* KVM_EXIT_X86_RDMSR / KVM_EXIT_X86_WRMSR */
-diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
-index 5e1ffb0d5363..cd6b7b83e2c3 100644
---- a/arch/arm64/kvm/mmio.c
-+++ b/arch/arm64/kvm/mmio.c
-@@ -133,11 +133,19 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
- 	/*
- 	 * No valid syndrome? Ask userspace for help if it has
- 	 * volunteered to do so, and bail out otherwise.
-+	 *
-+	 * In the protected VM case, there isn't much userspace can do
-+	 * though, so directly deliver an exception to the guest.
- 	 */
- 	if (!kvm_vcpu_dabt_isvalid(vcpu)) {
- 		trace_kvm_mmio_nisv(*vcpu_pc(vcpu), kvm_vcpu_get_esr(vcpu),
- 				    kvm_vcpu_get_hfar(vcpu), fault_ipa);
- 
-+		if (vcpu_is_protected(vcpu)) {
-+			kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
-+			return 1;
-+		}
-+
- 		if (test_bit(KVM_ARCH_FLAG_RETURN_NISV_IO_ABORT_TO_USER,
- 			     &vcpu->kvm->arch.flags)) {
- 			run->exit_reason = KVM_EXIT_ARM_NISV;
+	M.
+
+> 
+>     arnd
+> 
+> --- a/arch/arm64/kvm/pauth.c
+> +++ b/arch/arm64/kvm/pauth.c
+> @@ -36,7 +36,12 @@ static u64 compute_pac(struct kvm_vcpu *vcpu, u64 ptr,
+>         __ptrauth_key_install_nosync(APGA, ikey);
+>         isb();
+>  
+> -       asm volatile(ARM64_ASM_PREAMBLE ".arch_extension pauth\n"
+> +       asm volatile(ARM64_ASM_PREAMBLE
+> +#ifdef CONFIG_AS_IS_LLVM
+> +                    ".arch_extension pauth\n"
+> +#else
+> +                    ".arch armv8.3-a\n"
+> +#endif
+>                      "pacga %0, %1, %2" : "=r" (pac) : "r" (ptr), "r" (mod));
+>         isb();
+>  
+> 
+
 -- 
-2.44.0.769.g3c40516874-goog
-
+Without deviation from the norm, progress is not possible.
