@@ -1,308 +1,118 @@
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2085.outbound.protection.outlook.com [40.107.94.85])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80BF056B65
-	for <kvmarm@lists.linux.dev>; Tue, 23 Apr 2024 09:22:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.85
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713864140; cv=fail; b=TyLE8sPX1PeDtzS/7LEBQy5WT/jkQ7y2gfwuEUqLH4jFZT0znjr5bzA6Qp0NRMKb0kRrU3iKdByIXSdwAXG2DH0eTiMtid5yz8fU0fmQI1j7O/xxQyFLB+1M0hqZlVvEv7LAFXwZ9E8QloF6xa5sFT/Z77bLgb0Gcj/CgD8gy48=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713864140; c=relaxed/simple;
-	bh=xuHHbZQicq49oRqlj5RlUa7C3W7KJOM2x4iMCuGUChM=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=C0HVj/u4Uh3Q06/ZdoJjjBe370e5dwmpYdOHk5W7f5qdBLf+a4rTu3HLILzfiwkAnkuoj20uwlUh373iLnp+5cMESu7Z5PkWEp+1+80c8jsEMOc7THXPxXujrYcbmccyVWoBpVVjV1ozV0ymi8CKlb8bPtyq27a9X81qmI+uT1Y=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=OMQmap5M; arc=fail smtp.client-ip=40.107.94.85
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C0DC59144;
+	Tue, 23 Apr 2024 09:31:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713864688; cv=none; b=XkfeWVwYbYFW9PGjzWahAPjobof2g+t0ZmjK0CRyWs341YzI6QXuzLF3pQIQ6X+lWWynHtMEJyCiPHbmNwq+iUEPpxbyh98PgGvTPhml3XDj8bUAvacHnjOrRSVqKiMGn1FT9R383HYnftRYiFZ9zeuhF7g7RJYs11t7G4aKAIg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713864688; c=relaxed/simple;
+	bh=mCfFITSMnCflHebZWGZOERjPx9rq/bpE5SXgFwiJHz8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QINxfAlhchBdGu0U4imace4W3snSsVTdlBaDZk0fG9P0Sxj4s+PhtK9/O+yynbhoRqiyF9Y3H1wELzlI0ld0X6K4z2oKQq67UtRKpw02d5D7kvOCDp/O9RulwSzU/R2VGX6ew8G/OQE5+jNVGCnqu1zzaPkxiCg8s2zrjS8K/+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LBqEG+4V; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="OMQmap5M"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RNta1l1MBX853nKn4a8Myi1Phay3N7Xq/bkX/ELmxqBU6rpFFt5Gc7oEF3blXsmMulD7G8zKUI9Rwl7YWAJHKybYA9QJ8LKLU5B7d6MlPiR61U4u8p9e62dJ+HBnGSxCwwaeVCzj1DL2EdIrzZtTApEzVwKKX7yKnnwHKSI20SNWZUH478JeBo54//0PIjbZzR9MeA6BYOsQstruf+jtLyidHp6iSRL+ETSU1AUi49D1GfPuKYh5fRPyWG1kRHVshYkWo37/ksscPQHuMRzEXeCJlJoH02qHJ5kAHE+qlu7URTRvGmZSm1zsc8OP4wsdSEygQQwjHwLVU3Ni1ndISA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wvS1IVOIAmGYUK5NNha0vugtIUp6xOPG15BbmlMCcaw=;
- b=hQLflVwNdA3eJ1lPzGcsZ43DTU5HlxBAiqCcK3ALVtg8VXfiU7tBCoArKpT5j5rlMWwR3ecdR4xlo72LVTwRhUzvfXZol53ka2L7wozPhsS2494eN87mVE3S10UJnnGBKRPoKqHAOV/rx/hVAiBuH8ATSI08l45lykrmYDCNrs87rh0mT0gF+vcpHtwjLdxQDjl+WjGfkUJbLhY5PzXLc7jIRy2Idhnva2lSWQqfKQ289QkAR+dS5fa7P+ICE1zZ+b7wePMvIoSALZZPEKjUXcorjxvl7VtFsZ/cYHc25zSKMaXbJKaSUo4vOn+gYlP4vC0rADlLRAW29CwjqOiNfg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wvS1IVOIAmGYUK5NNha0vugtIUp6xOPG15BbmlMCcaw=;
- b=OMQmap5MqitQyTPUSJwRyq3qgVW9nJ/MgRK+A8hQsqe3Z+r8fBTDmlj/Uuh3KBQn4naNRgaz1BqaUGfjBUjV52pO3LjhwZbVFQqysli1qvASYVDXWD7jsct4PFVP6l0U9g6ObX5pGowaHT7UWujZn0d6qalHFTA4rJOhecdA/FFyjcKJCwArD3lAbHsKCbceoL+dsJSEqllwmViiklT38VPNjEcdVqsjYzmU9BSFzwrKaDo2k/ekGg4sWJ9a5Nt09QO2FlLhWgt9O0VusUt9SHTNo9YI2WTEzDj7sVHZuZRXWSymvbL4L8rx8+/fTlcsScee6md75NZmDr1iHUCgJA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CO6PR12MB5444.namprd12.prod.outlook.com (2603:10b6:5:35e::8) by
- CH2PR12MB4056.namprd12.prod.outlook.com (2603:10b6:610:a5::19) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7472.44; Tue, 23 Apr 2024 09:22:15 +0000
-Received: from CO6PR12MB5444.namprd12.prod.outlook.com
- ([fe80::ae68:3461:c09b:e6e3]) by CO6PR12MB5444.namprd12.prod.outlook.com
- ([fe80::ae68:3461:c09b:e6e3%5]) with mapi id 15.20.7472.044; Tue, 23 Apr 2024
- 09:22:15 +0000
-Message-ID: <14667111-4ad6-48d2-93ee-742c5075f407@nvidia.com>
-Date: Tue, 23 Apr 2024 10:22:08 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 12/15] KVM: arm64: nv: Add emulation for ERETAx
- instructions
-To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc: James Morse <james.morse@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- Joey Gouly <joey.gouly@arm.com>, Fuad Tabba <tabba@google.com>,
- Mostafa Saleh <smostafa@google.com>, Will Deacon <will@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>,
- "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
-References: <20240419102935.1935571-1-maz@kernel.org>
- <20240419102935.1935571-13-maz@kernel.org>
-From: Jon Hunter <jonathanh@nvidia.com>
-Content-Language: en-US
-In-Reply-To: <20240419102935.1935571-13-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LNXP265CA0094.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:76::34) To CO6PR12MB5444.namprd12.prod.outlook.com
- (2603:10b6:5:35e::8)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LBqEG+4V"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2D8AC4AF09;
+	Tue, 23 Apr 2024 09:31:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713864687;
+	bh=mCfFITSMnCflHebZWGZOERjPx9rq/bpE5SXgFwiJHz8=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=LBqEG+4VDH76Wzj3j/0ieKNlwWtnLoLwDo9wtFs4I19rtyemYkNNiQy4RqnBHyChx
+	 RR0fJjUL7C/bNvPLRLhBJKhs5MbowPS72vAoU1iHj6M2rYygNsh1nPK4Llt+Flsq4g
+	 RvgARe4pRKfaSCsmwB0nWtIv9W4+Uakle2S7TLmoo9DIzqy0QpOU7I3ha2wXygqe8q
+	 ssPoPWXf6+XL3YV7hnVlgVeLLJUpaUdBx2k8wDtuu+XHyBX9T69k+tEbG+Ct/q64FA
+	 +YWnSfjz7+6hYZ9bZfKMsIEYwXg2o15zuxJw9bnMXgcMTtPx5Niozg1vCNJmJj60B1
+	 fQV5eu3Hr/sew==
+Received: by mail-oo1-f48.google.com with SMTP id 006d021491bc7-5ac4470de3bso287779eaf.0;
+        Tue, 23 Apr 2024 02:31:27 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUtDShvIK1ysOTlZvjvyQjLAvP4hLsNmAoJV09XlCXYP7t/U1XWsJD6ZApcON5oUNkTV6t1Vsth+HpILl89xAMn7c2a1Hj+aO1NxDac5dQVpj9qPluUY/2WtQnYq32skW9u
+X-Gm-Message-State: AOJu0Yw8xXhAGTf+oIg4rmeFQmdOkJRfD8iEOrVY+r13dSKkSLXducmX
+	MN7Ffgd8pt6MfAWAhGvQf/7K4b/+04PwIMZ/SR7oTPAe1sfLj/E5g5gmzRHLrGHflX/ZOs42qFf
+	W4Q4Qb3LZAqkWsh64dWjsxQah6Yk=
+X-Google-Smtp-Source: AGHT+IHjVLpX2cYW6/cy3xUrXl+khsjki6+LuDCfZn16luHLntfkxzCHaR4p6xIi9+3OexMVeuKhREaD/0OB+bvFSRo=
+X-Received: by 2002:a05:6870:d68c:b0:22e:77b6:4f9d with SMTP id
+ z12-20020a056870d68c00b0022e77b64f9dmr15761595oap.3.1713864686690; Tue, 23
+ Apr 2024 02:31:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO6PR12MB5444:EE_|CH2PR12MB4056:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6b59f069-d97a-42a6-52ad-08dc6376dd40
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?dXhiTmtwdFpJWW9pL3JTaUtFNi8wMTRzNjhDNWhsdG1paDFZMFMrV3RENHRO?=
- =?utf-8?B?eTVPcnFMdkswWHhrUWNubkpjelJOWitjVk02aUZvQjV4TmVQb2xMOHAzZlhI?=
- =?utf-8?B?RWxENFpLSStCMmxsbWNZdVRqRGdzRXN3VHlHMHkyNFgwYmt2MXRmQk9CZGVM?=
- =?utf-8?B?WTNnMG5lbzM0czFqTDBQZE8wVFRxVlYrdXg3elJDWTBMRTh0RGV0SEJkb2ZV?=
- =?utf-8?B?MkJicGdPTzNZZVdNak82T2pTdjQ0eGZVQ3NuTFZFaGY2OENRVjR4UnBiZWtt?=
- =?utf-8?B?VkFMVWdsQkI4M08zV3NTOWE0SGxJSVZSR1FUcUd4ak1UM2l3OHkvVlE2VUdH?=
- =?utf-8?B?dGxQRWVUdHhqVTEwWjV0cFhUQjY1OTdjZjFEWnRiZTM5bkRtb2svOE9sSUln?=
- =?utf-8?B?Rk0xZWtEV2VJOGlrZzdVWkVJTmJrOU9oTmVISjdPSVRtWVljbEtRTTRETGZs?=
- =?utf-8?B?dmh2YTg3dnN2VTg0YnR0QlRHZXhhSzRjMkprWGVsZm5jRUgvTlllcWlrSFF6?=
- =?utf-8?B?b0tHR3BNU0JSUUxhZy8rQjFCR3VXa3RvRVZ5dzdvdFE4eUtwNitQY3FmdXF6?=
- =?utf-8?B?czVHREl3S3Zrd0twTHBnUG1QMk1LSDIyTFZvcHNGdXhDQkJKRG5JUjlKRVB3?=
- =?utf-8?B?UHlNd2ZjYm9ZenArUmh5NmN1ZXJjSnRXemJXRTIrWmtldHhadzNnV29SVW5a?=
- =?utf-8?B?N3hoK1R5R3E4aEdJV2NpUWZlcm5FVmV4NjdsOHorbkc3Q2kvbERXQmwvaTIx?=
- =?utf-8?B?MUNUWWo1a1Rody83YytIU3dMUzFsUGhlcFYzZUh5dFI2dEFuN1ZORFlRcHFU?=
- =?utf-8?B?UkNqSkJlQWV2RFJsREhTU296aVFnbC9DU3hTRkRJSDNwb0lTTmxsUFpmUUpa?=
- =?utf-8?B?dkw4U0pKd05ldkVWL3B2TkkxbWZyQVhGV1BQWFVYOXVEQXE2OWxHUG02b0xS?=
- =?utf-8?B?WkswK3lmb1BRZTRZMXZpZTdnVmhLUkZCTGdKUmlleUVYVGVjNlJQMHdUOWxO?=
- =?utf-8?B?TmZmRkNnMHBSeGJadHdqWFFyVDRGcVc2Y0dJa1RMSXRBSmdJM0dRVzh1bXlt?=
- =?utf-8?B?Qjl0YzRpTVBFSURkdkFSak1DeUp0RTJVS01IU2VrQVFmb3pBcUNJWkdJandC?=
- =?utf-8?B?UEh1ZDJVMzlUamNFOUZrcTJlV1JTQ2RGM1ZkUk04OHZaNzNCeEpER0lNSVpB?=
- =?utf-8?B?V1lEWVFHS1BRTWpWZnNyYzhTRGlWeVBLZS80TFlwYUw2WjZETndHcmdoNHRN?=
- =?utf-8?B?eVhxTVJEMVRvNWtPZHJDazVKL1MvZysyblBaTkdqK0FvR1N3Sk9aNkJuV0VZ?=
- =?utf-8?B?NVZna1VtaGtBVHM2UWtyek9STTMyZXc0SngzcU1JRmN4SXV6dzFqWFdkZzZ5?=
- =?utf-8?B?SzU1Qm5aZElvWXNteFJidGlXNXpLQjJaSVlkVGNnenZrWURYbXN6aHpGTkF5?=
- =?utf-8?B?NHJVR2dPZkM4eGs4ekJsTjFENWpVS01XQzdWSGVOL09aVkxzSWxmckZ4OCt1?=
- =?utf-8?B?NlU2UDh5RUhhdVpoVmFiZzJ0QlVCNWhTMm5uMGlrYzZwTWJEN1lZQjNDRWdI?=
- =?utf-8?B?NStYcElVYW1YenZNd2F6b2VaS1Bqd2VSVVBWeHFkMjlwVXFxa1YxVTZ0SGJH?=
- =?utf-8?B?R2pvRWk4eko1ZFVZa2JsdUpUL1RVdnVHb0RONWVIcHVNcURzUEp3VHFpV2tH?=
- =?utf-8?B?ZjZEMVFrVHVUdTJ0K3o4cFgrU1lpNk5wWktTcm1xdVlTb2RFUWNUQTlnPT0=?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO6PR12MB5444.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(7416005)(376005)(366007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?UGNqYVhXQ0pGRTA3ZWVLUXp6Vm1tRW1lWkxWK2xUdGlBUU00V3IxeVAwRFVw?=
- =?utf-8?B?UWpJR1lOdWdqeFNWeHcxdUxYamw2VVBMa2EyMjJzdFpwWUpIWmxIT25jSmp0?=
- =?utf-8?B?RGRwMFRXQS9NblRCVG94Vk5vc3pLcnYrK3dTQlphYTEzdFlES0tCLzJmWEpJ?=
- =?utf-8?B?MWZFUFNUUHcvMjU4Q0tVU0QyaEZ1TFZVKzA4NUpvS2F0bEJQSjV2M1ZvOVRB?=
- =?utf-8?B?cmVHRmJBdXZIUVZTNW9CWVArLzNua2Zick1hRkJJOU5aVGJpOCszVUcybmpu?=
- =?utf-8?B?SkowTHYvQnQwWjY0NXFsb3lMYkZFUTZPVndwd3lRZzFKSGJBR0srdlBBaWFX?=
- =?utf-8?B?T0M2Wk1IRkZFRGI4WFhkQVh6cmF5TzhDOU1HYWZXMElLblZvZVdFVU15bW9w?=
- =?utf-8?B?RmFScms0ZEFGWGZwYzRMUVJ2Y1ErWWZaaW0wRXpWdmEvMU5tOERkcjFoOVFI?=
- =?utf-8?B?UmFjMWQrUC9KWk9BT09mMTlmUTRtZVNDT25hT2ZMMHk5MnJxS2RoK2F6dEx3?=
- =?utf-8?B?U2VhQUpUNXc0Q1d0TkxYL2N5VGc1Q2gzTGVKRTRtNHlGWGEvZlVNS1dxemNZ?=
- =?utf-8?B?Tnc5OGpFbTZ2cHIyZmdFYVl1OUYzL3RPWUsrSHBDcGl1L0NVaXdqeU1mdVpv?=
- =?utf-8?B?L2lrOFFjYksySUtsaERRWE9HT0p2ZnJwalcwcUxmL1hmdzJUMWlST3pPcnVE?=
- =?utf-8?B?QnNueUNQbFNwMnlxV1dncW1hOGlZbUt5NUpuakFvZWF0RW5EYTVWOWZPU094?=
- =?utf-8?B?aUt1SjF2Smh2ZkV6NlNjVElMOXk1Vy9UZXI5SzVRKytUSE4rVW0yT2tibmxy?=
- =?utf-8?B?bmxlRU0yZnN2L3hMRzVYVVpUUHR2cHRaWkdZUFpicUo1ZHFYMHpudHl5N0xl?=
- =?utf-8?B?a2FRNElLQnpsNndkSkZSdTlCNTlrKzZQWXFmTHQ1UVF5U05XaDBNeUFUT2Fm?=
- =?utf-8?B?SEY4QzJtaEhxWE8vWXlla2dLek1BU0tXRytNUWdlME1GR1V4YWsxTndaTk5a?=
- =?utf-8?B?Ulc2OSt0cjNVcjZqeWRkZVlZaVNRRmdFSG9Fd3M4RnJqOUNmbjNIZHN1aDZJ?=
- =?utf-8?B?a2pZZ3R5Y0FZeWtZeTZTWU5HbVhOcGptSjE1d1djTFYxa3RSalpoYUUxN0Q2?=
- =?utf-8?B?YTBYZEJwT0tLaDQ0SnVjN2t1TUthN0dadHcvS21valJuaXY1U28xZWlUSWU2?=
- =?utf-8?B?QWlxQjRBTE1SeXZCMkNsalk5YXcvalQ3NndrR2NCYnpzaDcrM1FWeWxRMTNl?=
- =?utf-8?B?ODFyWmdmcUdaZXZPMVZwTDdOZ01mYVJ4R1R4dDlBMU8xQmt6VmQ5bnFZRG9K?=
- =?utf-8?B?LytXcHJnN2toMkJNRXMzQzN3N0dUanpEOExtNUtpZXpLS0crd255OHg5MmI1?=
- =?utf-8?B?ZVlSN3NicVZUVWxtYXFzeXBlRy9RMFpyV0JFaWR1dnZvMU56Y0kwMk1VS0NX?=
- =?utf-8?B?VlFoOFY4T1EraktZdDdNWlhQdUJSTklYVFNZWkE1ZHlCbWtzMWdWYzN1Y2ZT?=
- =?utf-8?B?cC9JWWc3RkxuUVUyWTZPSWFWWFVabmN4WHVkU0lSTkFTNFRpYjIyWWxPSm83?=
- =?utf-8?B?S2NJUjdxOU45aUJnOFYyYVZBcnFnbkxZWWNIVDN4eU44eDFUeFJCR09OaWNY?=
- =?utf-8?B?bXFsYStpRmdmM2FKTUJwNmlLUTVqOTFsaWxwV3NzNlE5d1VvMFpvcXhBSTJn?=
- =?utf-8?B?NGE3Y0JRQ3pmbG9yNHZSUWVNSm9NRi82bjhuQ3F1N29hSXNUaTd1LzFvZlBB?=
- =?utf-8?B?NFJ6L24xQmZNbytRaC9qb3JnUU0vb20zdm5yajBWTjR2MEprVlBhcnpFdFJJ?=
- =?utf-8?B?MHpHT2lqWVNnVGdpSm8rVytkZUp2NDVDS2lveFUvallhcGJPc0R1L2g4RmEx?=
- =?utf-8?B?aUZzL1FIU2ZmUWpYM0dQTjhzQS9YMFcwcHpaSXAweGNNQUExY1lFSTAza0pS?=
- =?utf-8?B?b0YrdC9zY1A3eWxxcUd6cTlnaG1acUt0WHlnMkdRcnJiTTFEUkFtTGJMdUpS?=
- =?utf-8?B?TmYrU3hZWUw2Ny96ZzV2NC90cGdSb25PNmRKOHUyUmlReU1wTmJQNTlhNHlU?=
- =?utf-8?B?eUd1d2RuZkROMjR6QTlicUMvZmo1VHMrR2xnMkpUbVM2SmljUnVseE5wRDhM?=
- =?utf-8?B?amhUZWoyRTJCSGNubVlpcXZWa0l6di9tSGh0WWRZa3E0RFNINWRFNlpXbHIy?=
- =?utf-8?B?amRmME5HdzBZdW1NblY5ZVIvZFFnVXFhbFNDNWFwNVlaRzNqdk8zMEVsT1hj?=
- =?utf-8?B?SG9va3ZTVkFBY3A3NThqeFk5RVh3PT0=?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6b59f069-d97a-42a6-52ad-08dc6376dd40
-X-MS-Exchange-CrossTenant-AuthSource: CO6PR12MB5444.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Apr 2024 09:22:15.1593
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: XbbKxcvTbrWwUXXEKfiDGSaqFE2/Nq5LxhvT8GRuMOhYt4T61va6V0yPdz99XysjHEK0q0AYQPd6s3ZdKFoG8A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4056
+References: <20240418135412.14730-1-Jonathan.Cameron@huawei.com>
+ <20240418135412.14730-4-Jonathan.Cameron@huawei.com> <c13f7424-3a7f-4c3e-3e8d-81e9fcf0caf7@huawei.com>
+In-Reply-To: <c13f7424-3a7f-4c3e-3e8d-81e9fcf0caf7@huawei.com>
+From: "Rafael J. Wysocki" <rafael@kernel.org>
+Date: Tue, 23 Apr 2024 11:31:14 +0200
+X-Gmail-Original-Message-ID: <CAJZ5v0gDJzCTkUP3i8H3pivrCHdU4-qVf3SVCvTF9hQyKJHtBQ@mail.gmail.com>
+Message-ID: <CAJZ5v0gDJzCTkUP3i8H3pivrCHdU4-qVf3SVCvTF9hQyKJHtBQ@mail.gmail.com>
+Subject: Re: [PATCH v7 03/16] ACPI: processor: Drop duplicated check on _STA
+ (enabled + present)
+To: Hanjun Guo <guohanjun@huawei.com>
+Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Peter Zijlstra <peterz@infradead.org>, linux-pm@vger.kernel.org, loongarch@lists.linux.dev, 
+	linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, x86@kernel.org, Russell King <linux@armlinux.org.uk>, 
+	"Rafael J . Wysocki" <rafael@kernel.org>, Miguel Luis <miguel.luis@oracle.com>, 
+	James Morse <james.morse@arm.com>, Salil Mehta <salil.mehta@huawei.com>, 
+	Jean-Philippe Brucker <jean-philippe@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, linuxarm@huawei.com, justin.he@arm.com, 
+	jianyong.wu@arm.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Marc,
+On Tue, Apr 23, 2024 at 8:49=E2=80=AFAM Hanjun Guo <guohanjun@huawei.com> w=
+rote:
+>
+> On 2024/4/18 21:53, Jonathan Cameron wrote:
+> > The ACPI bus scan will only result in acpi_processor_add() being called
+> > if _STA has already been checked and the result is that the
+> > processor is enabled and present.  Hence drop this additional check.
+> >
+> > Suggested-by: Rafael J. Wysocki <rafael@kernel.org>
+> > Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+> >
+> > ---
+> > v7: No change
+> > v6: New patch to drop this unnecessary code. Now I think we only
+> >      need to explicitly read STA to print a warning in the ARM64
+> >      arch_unregister_cpu() path where we want to know if the
+> >      present bit has been unset as well.
+> > ---
+> >   drivers/acpi/acpi_processor.c | 6 ------
+> >   1 file changed, 6 deletions(-)
+> >
+> > diff --git a/drivers/acpi/acpi_processor.c b/drivers/acpi/acpi_processo=
+r.c
+> > index 7fc924aeeed0..ba0a6f0ac841 100644
+> > --- a/drivers/acpi/acpi_processor.c
+> > +++ b/drivers/acpi/acpi_processor.c
+> > @@ -186,17 +186,11 @@ static void __init acpi_pcc_cpufreq_init(void) {}
+> >   #ifdef CONFIG_ACPI_HOTPLUG_CPU
+> >   static int acpi_processor_hotadd_init(struct acpi_processor *pr)
+> >   {
+> > -     unsigned long long sta;
+> > -     acpi_status status;
+> >       int ret;
+> >
+> >       if (invalid_phys_cpuid(pr->phys_id))
+> >               return -ENODEV;
+> >
+> > -     status =3D acpi_evaluate_integer(pr->handle, "_STA", NULL, &sta);
+> > -     if (ACPI_FAILURE(status) || !(sta & ACPI_STA_DEVICE_PRESENT))
+> > -             return -ENODEV;
+> > -
+> >       cpu_maps_update_begin();
+> >       cpus_write_lock();
+>
+> Since the status bits were checked before acpi_processor_add() being
+> called, do we need to remove the if (!acpi_device_is_enabled(device))
+> check in acpi_processor_add() as well?
 
-On 19/04/2024 11:29, Marc Zyngier wrote:
-> FEAT_NV has the interesting property of relying on ERET being
-> trapped. An added complexity is that it also traps ERETAA and
-> ERETAB, meaning that the Pointer Authentication aspect of these
-> instruction must be emulated.
-> 
-> Add an emulation of Pointer Authentication, limited to ERETAx
-> (always using SP_EL2 as the modifier and ELR_EL2 as the pointer),
-> using the Generic Authentication instructions.
-> 
-> The emulation, however small, is placed in its own compilation
-> unit so that it can be avoided if the configuration doesn't
-> include it (or the toolchan in not up to the task).
-> 
-> Reviewed-by: Joey Gouly <joey.gouly@arm.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->   arch/arm64/include/asm/kvm_nested.h    |  12 ++
->   arch/arm64/include/asm/pgtable-hwdef.h |   1 +
->   arch/arm64/kvm/Makefile                |   1 +
->   arch/arm64/kvm/pauth.c                 | 196 +++++++++++++++++++++++++
->   4 files changed, 210 insertions(+)
->   create mode 100644 arch/arm64/kvm/pauth.c
-> 
-> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-> index dbc4e3a67356..5e0ab0596246 100644
-> --- a/arch/arm64/include/asm/kvm_nested.h
-> +++ b/arch/arm64/include/asm/kvm_nested.h
-> @@ -64,4 +64,16 @@ extern bool forward_smc_trap(struct kvm_vcpu *vcpu);
->   
->   int kvm_init_nv_sysregs(struct kvm *kvm);
->   
-> +#ifdef CONFIG_ARM64_PTR_AUTH
-> +bool kvm_auth_eretax(struct kvm_vcpu *vcpu, u64 *elr);
-> +#else
-> +static inline bool kvm_auth_eretax(struct kvm_vcpu *vcpu, u64 *elr)
-> +{
-> +	/* We really should never execute this... */
-> +	WARN_ON_ONCE(1);
-> +	*elr = 0xbad9acc0debadbad;
-> +	return false;
-> +}
-> +#endif
-> +
->   #endif /* __ARM64_KVM_NESTED_H */
-> diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
-> index ef207a0d4f0d..9943ff0af4c9 100644
-> --- a/arch/arm64/include/asm/pgtable-hwdef.h
-> +++ b/arch/arm64/include/asm/pgtable-hwdef.h
-> @@ -297,6 +297,7 @@
->   #define TCR_TBI1		(UL(1) << 38)
->   #define TCR_HA			(UL(1) << 39)
->   #define TCR_HD			(UL(1) << 40)
-> +#define TCR_TBID0		(UL(1) << 51)
->   #define TCR_TBID1		(UL(1) << 52)
->   #define TCR_NFD0		(UL(1) << 53)
->   #define TCR_NFD1		(UL(1) << 54)
-> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-> index c0c050e53157..04882b577575 100644
-> --- a/arch/arm64/kvm/Makefile
-> +++ b/arch/arm64/kvm/Makefile
-> @@ -23,6 +23,7 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
->   	 vgic/vgic-its.o vgic/vgic-debug.o
->   
->   kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o pmu.o
-> +kvm-$(CONFIG_ARM64_PTR_AUTH)  += pauth.o
->   
->   always-y := hyp_constants.h hyp-constants.s
->   
-> diff --git a/arch/arm64/kvm/pauth.c b/arch/arm64/kvm/pauth.c
-> new file mode 100644
-> index 000000000000..a3a5c404375b
-> --- /dev/null
-> +++ b/arch/arm64/kvm/pauth.c
-> @@ -0,0 +1,196 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (C) 2024 - Google LLC
-> + * Author: Marc Zyngier <maz@kernel.org>
-> + *
-> + * Primitive PAuth emulation for ERETAA/ERETAB.
-> + *
-> + * This code assumes that is is run from EL2, and that it is part of
-> + * the emulation of ERETAx for a guest hypervisor. That's a lot of
-> + * baked-in assumptions and shortcuts.
-> + *
-> + * Do no reuse for anything else!
-> + */
-> +
-> +#include <linux/kvm_host.h>
-> +
-> +#include <asm/kvm_emulate.h>
-> +#include <asm/pointer_auth.h>
-> +
-> +static u64 compute_pac(struct kvm_vcpu *vcpu, u64 ptr,
-> +		       struct ptrauth_key ikey)
-> +{
-> +	struct ptrauth_key gkey;
-> +	u64 mod, pac = 0;
-> +
-> +	preempt_disable();
-> +
-> +	if (!vcpu_get_flag(vcpu, SYSREGS_ON_CPU))
-> +		mod = __vcpu_sys_reg(vcpu, SP_EL2);
-> +	else
-> +		mod = read_sysreg(sp_el1);
-> +
-> +	gkey.lo = read_sysreg_s(SYS_APGAKEYLO_EL1);
-> +	gkey.hi = read_sysreg_s(SYS_APGAKEYHI_EL1);
-> +
-> +	__ptrauth_key_install_nosync(APGA, ikey);
-> +	isb();
-> +
-> +	asm volatile(ARM64_ASM_PREAMBLE ".arch_extension pauth\n"
-> +		     "pacga %0, %1, %2" : "=r" (pac) : "r" (ptr), "r" (mod));
-> +	isb();
-
-
-Some of our builders currently have an older version of GCC (v6) and
-after this change I am seeing ...
-
-   CC      arch/arm64/kvm/pauth.o
-/tmp/ccohst0v.s: Assembler messages:
-/tmp/ccohst0v.s:1177: Error: unknown architectural extension `pauth'
-/tmp/ccohst0v.s:1177: Error: unknown mnemonic `pacga' -- `pacga x21,x22,x0'
-/local/workdir/tegra/mlt-linux_next/kernel/scripts/Makefile.build:244: recipe for target 'arch/arm64/kvm/pauth.o' failed
-make[5]: *** [arch/arm64/kvm/pauth.o] Error 1
-/local/workdir/tegra/mlt-linux_next/kernel/scripts/Makefile.build:485: recipe for target 'arch/arm64/kvm' failed
-make[4]: *** [arch/arm64/kvm] Error 2
-/local/workdir/tegra/mlt-linux_next/kernel/scripts/Makefile.build:485: recipe for target 'arch/arm64' failed
-make[3]: *** [arch/arm64] Error 2
-
-
-I know this is pretty old now and I am trying to get these builders
-updated. However, the kernel docs still show that GCC v5.1 is
-supported [0].
-
-Jon
-
-
-[0] https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/tree/Documentation/process/changes.rst
--- 
-nvpublic
+No, because its caller only checks the present bit.  The function
+itself checks the enabled bit.
