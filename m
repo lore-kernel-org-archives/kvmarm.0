@@ -1,121 +1,127 @@
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 303C3768EC;
-	Tue, 23 Apr 2024 11:13:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D6E8E576
+	for <kvmarm@lists.linux.dev>; Tue, 23 Apr 2024 11:33:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713870832; cv=none; b=f2kOBhR6AsV01ia+TLbSiyb91UYWk4pdPynLU7xjRqSvEGpR7y9bZfV70vA3CWd6jUxQ8cmifyengMMcZvdQXdtMLlMosGoI9bvTjTdDz7IKoAjc36kB+qxwfLQc/obsTTREP3gkD7B3Oa4GrRM/aPki6U9cflA6pSBM/kG1mg4=
+	t=1713871988; cv=none; b=k+gqoZpzjWYXrXhXXs66qtgNSBLtZLo85lIUoLgb8gLyCFr3w4P5GIin6UGPID0wW3+D4tafPb3UOwGVtD9nxZKFkc7budTVrXbmGBNN4X39mjyXd/2IRju6nPeZET6ps1xOjgI9T5iVEFifvm/yvweUB6/LyQDXYrXvMqwHGWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713870832; c=relaxed/simple;
-	bh=V1BUX1QiySmoJgp9S3EXm+goKQR4Zi8n7fSWoAHAIus=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=gwazY/70HrJZvTPUka2GNATS40FSwDWBvgzeCqPASe/Rvj52XLaY7ApK5c4sMNq77UBi2chpVMmXLrNYIA3bgYomXZ5mIeVVZ+oXBPYCievrHULqOWygSMabqB0PFiepmb/13cqVMJTVLY/Icf5IFgib+jGjDNRePpdTouSpPZo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4VNztM487GzXlBp;
-	Tue, 23 Apr 2024 19:10:19 +0800 (CST)
-Received: from dggpemm500002.china.huawei.com (unknown [7.185.36.229])
-	by mail.maildlp.com (Postfix) with ESMTPS id 8C64A140136;
-	Tue, 23 Apr 2024 19:13:47 +0800 (CST)
-Received: from [10.174.178.247] (10.174.178.247) by
- dggpemm500002.china.huawei.com (7.185.36.229) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Tue, 23 Apr 2024 19:13:46 +0800
-Subject: Re: [PATCH v7 03/16] ACPI: processor: Drop duplicated check on _STA
- (enabled + present)
-To: "Rafael J. Wysocki" <rafael@kernel.org>
-CC: Jonathan Cameron <Jonathan.Cameron@huawei.com>, Thomas Gleixner
-	<tglx@linutronix.de>, Peter Zijlstra <peterz@infradead.org>,
-	<linux-pm@vger.kernel.org>, <loongarch@lists.linux.dev>,
-	<linux-acpi@vger.kernel.org>, <linux-arch@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>, <x86@kernel.org>, Russell King
-	<linux@armlinux.org.uk>, Miguel Luis <miguel.luis@oracle.com>, James Morse
-	<james.morse@arm.com>, Salil Mehta <salil.mehta@huawei.com>, Jean-Philippe
- Brucker <jean-philippe@linaro.org>, Catalin Marinas
-	<catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Ingo Molnar
-	<mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
-	<dave.hansen@linux.intel.com>, <linuxarm@huawei.com>, <justin.he@arm.com>,
-	<jianyong.wu@arm.com>
-References: <20240418135412.14730-1-Jonathan.Cameron@huawei.com>
- <20240418135412.14730-4-Jonathan.Cameron@huawei.com>
- <c13f7424-3a7f-4c3e-3e8d-81e9fcf0caf7@huawei.com>
- <CAJZ5v0gDJzCTkUP3i8H3pivrCHdU4-qVf3SVCvTF9hQyKJHtBQ@mail.gmail.com>
-From: Hanjun Guo <guohanjun@huawei.com>
-Message-ID: <e867fba1-3df4-8e1d-fb5e-e19ef4e0e588@huawei.com>
-Date: Tue, 23 Apr 2024 19:13:46 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+	s=arc-20240116; t=1713871988; c=relaxed/simple;
+	bh=HNEJTtA/TGesL0cCJJJtqsekLkegSRTWZeBV7fPwewc=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PekY3ik87K7GTUDHTqe5fJqwaI6L6VQeBfC99HiPZt8eEl79AuLB4leLcP6zGotLRUuz1XopjukjxPrMkBWMZLh40hQWNAgLvbA/XJ4w69YvNiYk9iwU9CMqdWcjSEo31BBKV2gnDFvEcgw/u/Q+8Mo8mmN+qp1ySAbd5pqyusw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sy0BC9af; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sy0BC9af"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCD75C2BD11;
+	Tue, 23 Apr 2024 11:33:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713871987;
+	bh=HNEJTtA/TGesL0cCJJJtqsekLkegSRTWZeBV7fPwewc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=sy0BC9afjceDT3KxOj+53ZvnXRwJvLv/h4F8ask8j+J1SMrLIr7vqdkN/aQk2fzYJ
+	 gy+2HB8XWQnRmwTMTLTHxR0TQqgOJbw1j0MKpDVAgsiE4pVLZHo/wt+5qF/M9AsDqA
+	 QKuOzxnnUQpokR7bGfjzoUWXwBkNK9y/W+8yUDVmnmYRl2vvO5oSrTB6RzZyUT3BSJ
+	 CSoSYyr4LP5bRv+E89r9+uR8KucJMDTP5dxxIZYoGVLAUkRH5Gsjqsfysi7zvytyP1
+	 ZuOS44B44kQe6zE4XyaZp+AQZ7ydQRXnzRk1gWj4QKnzDMQacMVocbYu+vh9yUWGYr
+	 Z5+/xAktdj04g==
+Received: from [12.161.88.66] (helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rzEOW-0079k1-LD;
+	Tue, 23 Apr 2024 12:33:05 +0100
+Date: Tue, 23 Apr 2024 12:33:00 +0100
+Message-ID: <87sezctitv.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Naresh Kamboju <naresh.kamboju@linaro.org>,
+	Linaro Kernel Functional Testing <lkft@linaro.org>
+Subject: Re: [PATCH] KVM: arm64: nv: Work around lack of pauth support in old toolchains
+In-Reply-To: <ZidzMO-tcsFUgL1r@FVFF77S0Q05N>
+References: <20240422224849.2238222-1-maz@kernel.org>
+	<ZidzMO-tcsFUgL1r@FVFF77S0Q05N>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-In-Reply-To: <CAJZ5v0gDJzCTkUP3i8H3pivrCHdU4-qVf3SVCvTF9hQyKJHtBQ@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpemm500002.china.huawei.com (7.185.36.229)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 12.161.88.66
+X-SA-Exim-Rcpt-To: mark.rutland@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, arnd@arndb.de, joey.gouly@arm.com, will@kernel.org, naresh.kamboju@linaro.org, lkft@linaro.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 2024/4/23 17:31, Rafael J. Wysocki wrote:
-> On Tue, Apr 23, 2024 at 8:49 AM Hanjun Guo <guohanjun@huawei.com> wrote:
->>
->> On 2024/4/18 21:53, Jonathan Cameron wrote:
->>> The ACPI bus scan will only result in acpi_processor_add() being called
->>> if _STA has already been checked and the result is that the
->>> processor is enabled and present.  Hence drop this additional check.
->>>
->>> Suggested-by: Rafael J. Wysocki <rafael@kernel.org>
->>> Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
->>>
->>> ---
->>> v7: No change
->>> v6: New patch to drop this unnecessary code. Now I think we only
->>>       need to explicitly read STA to print a warning in the ARM64
->>>       arch_unregister_cpu() path where we want to know if the
->>>       present bit has been unset as well.
->>> ---
->>>    drivers/acpi/acpi_processor.c | 6 ------
->>>    1 file changed, 6 deletions(-)
->>>
->>> diff --git a/drivers/acpi/acpi_processor.c b/drivers/acpi/acpi_processor.c
->>> index 7fc924aeeed0..ba0a6f0ac841 100644
->>> --- a/drivers/acpi/acpi_processor.c
->>> +++ b/drivers/acpi/acpi_processor.c
->>> @@ -186,17 +186,11 @@ static void __init acpi_pcc_cpufreq_init(void) {}
->>>    #ifdef CONFIG_ACPI_HOTPLUG_CPU
->>>    static int acpi_processor_hotadd_init(struct acpi_processor *pr)
->>>    {
->>> -     unsigned long long sta;
->>> -     acpi_status status;
->>>        int ret;
->>>
->>>        if (invalid_phys_cpuid(pr->phys_id))
->>>                return -ENODEV;
->>>
->>> -     status = acpi_evaluate_integer(pr->handle, "_STA", NULL, &sta);
->>> -     if (ACPI_FAILURE(status) || !(sta & ACPI_STA_DEVICE_PRESENT))
->>> -             return -ENODEV;
->>> -
->>>        cpu_maps_update_begin();
->>>        cpus_write_lock();
->>
->> Since the status bits were checked before acpi_processor_add() being
->> called, do we need to remove the if (!acpi_device_is_enabled(device))
->> check in acpi_processor_add() as well?
+On Tue, 23 Apr 2024 09:37:04 +0100,
+Mark Rutland <mark.rutland@arm.com> wrote:
 > 
-> No, because its caller only checks the present bit.  The function
-> itself checks the enabled bit.
+> On Mon, Apr 22, 2024 at 11:48:49PM +0100, Marc Zyngier wrote:
+> > We still support GCC 8.x, and it appears that this toolchain
+> > does not understand "pauth" as a valid architectural extension.
+> > After all, it's only been 8 years since ARMv8.3 was released...
+> > 
+> > This results in the NV ERETAx code breaking the build, as it relies
+> > on this extention to make use of the PACGA instruction.
+> > 
+> > Work around it by hand-assembling the instruction using a mind-bending
+> > trick lifted from an old patch by Will. Magic.
+> > 
+> > Fixes: e09faab353a6 ("KVM: arm64: nv: Add emulation for ERETAx instructions")
+> > Reported-by: Linaro Kernel Functional Testing <lkft@linaro.org>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/pauth.c | 19 +++++++++++++++++--
+> >  1 file changed, 17 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/pauth.c b/arch/arm64/kvm/pauth.c
+> > index a3a5c404375b..8baf2a2cbdd3 100644
+> > --- a/arch/arm64/kvm/pauth.c
+> > +++ b/arch/arm64/kvm/pauth.c
+> > @@ -17,6 +17,22 @@
+> >  #include <asm/kvm_emulate.h>
+> >  #include <asm/pointer_auth.h>
+> >  
+> > +/*
+> > + * "// This is some of my finest work" (Will Deacon, 2019-02-12)
+> > + *
+> > + * The jury is still out on that one.
+> > + */
+> > +#define REG(r)	"(0%x[" #r "] - ((0%x[" #r "] >> 4) * 6))"
+> > +
+> > +/* PACGA Xd, Xn, Xm */
+> > +#define PACGA(d,n,m)						\
+> > +	asm volatile(".inst 0x9AC03000   |"			\
+> > +		     "(" REG(Rd) "<< 0)  |"			\
+> > +		     "(" REG(Rn) "<< 5)  |"			\
+> > +		     "(" REG(Rm) "<< 16)\n"			\
+> > +		     : [Rd] "=r" ((d))				\
+> > +		     : [Rn] "r" ((n)), [Rm] "r" ((m)))
+> 
+> Can you please use <asm/gpr-num.h> rather than open-coding this new REG()
+> helper? That way this'll be consistent with the way we assemble MRS/MSR in
+> <asm/sysreg.h>, and it avoids the few seconds of confusion trying to figure out
+> the maths in the REG() helper (neat trick though!).
 
-Thanks for the pointer, I can see the detail in the acpi_bus_attach()
-now,
+Ah, I had completely forgot about this guy. Good call. I'll fold that
+patchlet in and re-push the result.
 
-Reviewed-by: Hanjun Guo <guohanjun@huawei.com>
+Thanks,
 
-Thanks
-Hanjun
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
