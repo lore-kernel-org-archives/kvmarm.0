@@ -1,55 +1,55 @@
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD43B12EBE7
-	for <kvmarm@lists.linux.dev>; Tue, 23 Apr 2024 15:06:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D979F13B7AE
+	for <kvmarm@lists.linux.dev>; Tue, 23 Apr 2024 15:06:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713884785; cv=none; b=OgbnbTCUyZiZgY+4VcZchdCHS9K+LLqk6B7dQZM9hZ96o+UVoN7j0or5Arlk4ny96b66+mzd5Z3F8iy+jCRDWQpXj362GACpXQ2sWyjALMgAJpaal5Q7QaMVWY2P06mVgsoKwCG+krXTzKanin1p5Z9tS/nTB3axyROsVZkw6X0=
+	t=1713884787; cv=none; b=X8byN31KQq+/dknqvSUP3HuFUO6OspxCnrWLC/8CxmdzauZbTPfiySsyf5/oRv9WfdKRONeSRAdyGCCOGGCHtqewX9PG003UiRGzhp9yk3nWlQx5DPJEvBtnPurFkDGLW6mqca2+uUYS1JeNoN//XKwanccBdptGwh3Sh+OvobE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713884785; c=relaxed/simple;
-	bh=1/WkX9FO1Xh/fYHjgZW5hJ8mme+q34WTIxwU2wX1A50=;
+	s=arc-20240116; t=1713884787; c=relaxed/simple;
+	bh=8iLlbqqvVYMn/2vf+wEKr3U1lzmJSEua4oHtkm7fj3w=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=DKp/a5GODdKGvpYGbjecqBsZzoY/SxS8JBdVDOYYtUJRlOJX2X3zfb0Q7IHXKzV9T1ea16fDB252jDsZOLclqi+bBgTOoGe0o0pcbCOp9EB/qBpGwuuHMB0mqNUqyKU9GpRYJyGXBi4s1iYQkg4egVcYwmm2UaFIYoRGPxQLW1g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NbpJwBvz; arc=none smtp.client-ip=209.85.221.74
+	 To:Cc:Content-Type; b=aKKTwv8aWtsYwIhCyJY1QpPHIfvWIqjBPL5PrO75c0PD4PLsMWCfqpG37VCxrfSrgVXvmq3gqkYuuG8h3c7UJpbC8mTV1ANLWCiiraNfjFQVOVoYNW292d6TrloozVO1WZboVIvUs4Cqt12d6zSJOyPQxVO7d6F8KdCG5NSCIp0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UV1CC1S3; arc=none smtp.client-ip=209.85.221.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NbpJwBvz"
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-349d779625eso4693207f8f.2
-        for <kvmarm@lists.linux.dev>; Tue, 23 Apr 2024 08:06:23 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UV1CC1S3"
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-343da0a889dso5228942f8f.0
+        for <kvmarm@lists.linux.dev>; Tue, 23 Apr 2024 08:06:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713884782; x=1714489582; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1713884784; x=1714489584; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xYBBjxyJ84ImgYN/xZ9lSGq3tk1iYO6c8fieKtq9YN8=;
-        b=NbpJwBvz4dmEe0BKYUqROGCpckLfsqJy7IkHlK57YtHmTIPAGfc1jLTxesqLKs8Q5B
-         YyregshjwDwdediVeqtT9SUkoG873a/C0Ts8YgW34ZPrjlpZde4Om19bsx9M31iNfUwB
-         E7GBiB81IMGtwxHOr1gG5rCqmBh73+9wnGU+vva0MFs15i6CiuOM523zA14Uze9JH33J
-         JcD3KsRrcG1hyr/fFjl4rxAuhbLdQ/1k76oWYzlWMCG5zU7eHyl/CXomHAQ2N3yJyqL9
-         9zP6oRRTn3WDW0Bjfc5UKg+ffBRGB29/r1SrDW1pgE/Sjx+Iw0ad+U4IYiCcsk8GEb1X
-         2low==
+        bh=JM0Th8iWZ5eNdmeFHmy7eXd009D2nFz+4Dj6uibCIGQ=;
+        b=UV1CC1S3YOXmu6veZf7ttBoGkQt9MLlkYW3VmfvGeM+8oZtQSCBL/iEjr8gXvevvPE
+         Coe1ktrhYWWFP4ero+irvSjLVh2Nb8NuTR5pnV43CurxDMd5Vj+J1j8MJ6PwLup0C/Hq
+         DdZJ6kztm+l7HgVs5Dl3Qpn/msBnmPkw1HJuwdEiyPsxDraV5oiwuM3SQNUrytAdQMml
+         0aJJrqfT0fAYxpEdCha9Auj29x9jBOEsk7wJdzUUXVsSR9mInbVFlz3VF/2JhLIYD6xF
+         UTqp+Jw3JDK1KNvkHK+9vTbYL8R6Tze5bA/GgC83yjPjDq3KH9yz1T0fUfbqTH4Jd/7J
+         9EyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713884782; x=1714489582;
+        d=1e100.net; s=20230601; t=1713884784; x=1714489584;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xYBBjxyJ84ImgYN/xZ9lSGq3tk1iYO6c8fieKtq9YN8=;
-        b=QVQJfdSc8bHQoDGKBFvTuDD0cG83mKfq08F4IQUOY6PQR22rsVSDPA+nh1VtmOnuPH
-         eNTKFNd1yp88/vvITxz1CasQ9Dvw2ca7NqSRy11U52Xvd73Z/6KsNN0EBGUuwtaXmxOx
-         Lqc8kDZqJ3VNZFgOX87VjSbTRcEpCRVpGN3L+gWNoGNKpvvgAyND3G+LEDrqV6oIu2SG
-         Oww9xtX2SvJKiUbL4wtgAF1nxKT52m3/5NoVQNQb6ojC1V+kZ71JWkca407ASKTnASRw
-         PmCNZyUwXt9ZlZsAMcx8c2v+njXWfBPTL3pSgNcGjQO8NZf+IpTIHbIUp2qtrGuFxPJQ
-         buZA==
-X-Gm-Message-State: AOJu0Yy8qbHDnHMAS5tcdVi4r84lmxpn8CE4eW2BxxtJIfWFIlhE4CmZ
-	iJ7ySp/g0/dLbgDt9IVnrdYnsFBN9JSC0F0Cat3jYoI1SuEDZMnxfteszKAa+fz0hd26AYzCywq
-	hQgs8l5GIsuopGLyXvJuiNF3+yxPr1C2NNFlXlQlUjVwrXJmsGjwziheOPOdQdhIiPOHNu1Kbyo
-	jMVabP3uFV44LBFJeuppAeELn+2m4=
-X-Google-Smtp-Source: AGHT+IHAgZ2B4F5FC8p3A7m7eT4394UcvPLnAjiEfVc7dCqJATpqg98MXDeT1SiQ2b2XUxgJ0qLSJgrffw==
+        bh=JM0Th8iWZ5eNdmeFHmy7eXd009D2nFz+4Dj6uibCIGQ=;
+        b=Tp00L1mNiv/wA1e4kBO3WrcIOuv+EIYoBy0wT1+n/2egZf8SdvUDDNrwU6aKaJzIiu
+         OWd4Q/6hd9JFgT2GdqIgC+6yZnXZtvjZU71WfHOC1cXtvMxbW2mJK3AUP0MsNvA/KBBG
+         YPAiIIx1T9NQszX6SWUQ8Zo5rKYEhk3/8pFwTG7oYPDtkicBD+/JZi7m82k9mh0OlAnT
+         +uiSME8pUnEFV6WkANeJGZIYHynR1pLr4mWam3HEUfkz7R+rpvtBZSGB1o18dufjQT5I
+         L7q4bkp9kN3PmN/Bf+ux8lsw+1rZxgn7f4qeJFKHs6FWbjRySz2cQ8Krhf+yYMK/2/oD
+         V8OA==
+X-Gm-Message-State: AOJu0YyiaFLMp0YHeUpIVPjP0FKtMcWfhADTJea+ZtWwV/nuMdmvD8vk
+	tvjTQhTnwXvcurcHoHLRKHfc7dLnbFDfw/Ig4FxLnUjVBR/Cjezk2K6+mPT8twj+Yp3z46+P2Ls
+	vvWSbmjKcllLMmNvCYP9aTclLtXCNAjjHAibijOR4WqTNrj2aTElC9s7sC1a/cc01go7nKsyFz2
+	xbI/2HRMFj01SI8KJo+wujo95X39Q=
+X-Google-Smtp-Source: AGHT+IHgSJW+mPpAouAclG11PqZJqaDD7TclUBpxaNv7WvrhE2JokMqaVOiJWzGaIsX80ibWjzAQ0Y9oXw==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:adf:e584:0:b0:347:c3c7:963a with SMTP id
- l4-20020adfe584000000b00347c3c7963amr34328wrm.13.1713884782110; Tue, 23 Apr
- 2024 08:06:22 -0700 (PDT)
-Date: Tue, 23 Apr 2024 16:05:26 +0100
+ (user=tabba job=sendgmr) by 2002:a5d:460f:0:b0:349:82c5:66a2 with SMTP id
+ t15-20020a5d460f000000b0034982c566a2mr33941wrq.4.1713884784187; Tue, 23 Apr
+ 2024 08:06:24 -0700 (PDT)
+Date: Tue, 23 Apr 2024 16:05:27 +0100
 In-Reply-To: <20240423150538.2103045-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,9 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240423150538.2103045-1-tabba@google.com>
 X-Mailer: git-send-email 2.44.0.769.g3c40516874-goog
-Message-ID: <20240423150538.2103045-19-tabba@google.com>
-Subject: [PATCH v4 18/30] KVM: arm64: Introduce and use predicates that check
- for protected VMs
+Message-ID: <20240423150538.2103045-20-tabba@google.com>
+Subject: [PATCH v4 19/30] KVM: arm64: Move pstate reset value definitions to kvm_arm.h
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev
 Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com, 
@@ -71,84 +70,61 @@ Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com,
 	joey.gouly@arm.com, rananta@google.com, smostafa@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-In order to determine whether or not a VM or vcpu are protected,
-introduce helpers to query this state. While at it, use the vcpu
-helper to check vcpus protected state instead of the kvm one.
+Move the macro defines of the pstate reset values to a shared
+header to be used by hyp in future patches.
 
-Co-authored-by: Marc Zyngier <maz@kernel.org>
+No functional change intended.
+
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/include/asm/kvm_host.h      | 8 ++++----
- arch/arm64/kvm/hyp/include/nvhe/pkvm.h | 5 +++++
- arch/arm64/kvm/hyp/nvhe/switch.c       | 6 ++----
- 3 files changed, 11 insertions(+), 8 deletions(-)
+ arch/arm64/include/asm/kvm_arm.h | 12 ++++++++++++
+ arch/arm64/kvm/reset.c           | 12 ------------
+ 2 files changed, 12 insertions(+), 12 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 3ba2f301462a..23a117cb3e50 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -211,6 +211,7 @@ typedef unsigned int pkvm_handle_t;
- struct kvm_protected_vm {
- 	pkvm_handle_t handle;
- 	struct kvm_hyp_memcache teardown_mc;
-+	bool enabled;
- };
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index e01bb5ca13b7..12a4b226690a 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -432,4 +432,16 @@
+ 	{ PSR_AA32_MODE_UND,	"32-bit UND" },	\
+ 	{ PSR_AA32_MODE_SYS,	"32-bit SYS" }
  
- struct kvm_mpidr_data {
-@@ -1300,10 +1301,9 @@ struct kvm *kvm_arch_alloc_vm(void);
- 
- #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
- 
--static inline bool kvm_vm_is_protected(struct kvm *kvm)
--{
--	return false;
--}
-+#define kvm_vm_is_protected(kvm)	(is_protected_kvm_enabled() && (kvm)->arch.pkvm.enabled)
++/*
++ * ARMv8 Reset Values
++ */
++#define VCPU_RESET_PSTATE_EL1	(PSR_MODE_EL1h | PSR_A_BIT | PSR_I_BIT | \
++				 PSR_F_BIT | PSR_D_BIT)
 +
-+#define vcpu_is_protected(vcpu)		kvm_vm_is_protected((vcpu)->kvm)
- 
- int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature);
- bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-index 20c3f6e13b99..22f374e9f532 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-@@ -53,6 +53,11 @@ pkvm_hyp_vcpu_to_hyp_vm(struct pkvm_hyp_vcpu *hyp_vcpu)
- 	return container_of(hyp_vcpu->vcpu.kvm, struct pkvm_hyp_vm, kvm);
- }
- 
-+static inline bool pkvm_hyp_vcpu_is_protected(struct pkvm_hyp_vcpu *hyp_vcpu)
-+{
-+	return vcpu_is_protected(&hyp_vcpu->vcpu);
-+}
++#define VCPU_RESET_PSTATE_EL2	(PSR_MODE_EL2h | PSR_A_BIT | PSR_I_BIT | \
++				 PSR_F_BIT | PSR_D_BIT)
 +
- void pkvm_hyp_vm_table_init(void *tbl);
- void pkvm_host_fpsimd_state_init(void);
++#define VCPU_RESET_PSTATE_SVC	(PSR_AA32_MODE_SVC | PSR_AA32_A_BIT | \
++				 PSR_AA32_I_BIT | PSR_AA32_F_BIT)
++
+ #endif /* __ARM64_KVM_ARM_H__ */
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index 1b7b58cb121f..3d8064bf67c8 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -33,18 +33,6 @@
+ /* Maximum phys_shift supported for any VM on this host */
+ static u32 __ro_after_init kvm_ipa_limit;
  
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index 136f6ff2edd3..6758cd905570 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -207,7 +207,7 @@ static const exit_handler_fn pvm_exit_handlers[] = {
- 
- static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm_vcpu *vcpu)
- {
--	if (unlikely(kvm_vm_is_protected(kern_hyp_va(vcpu->kvm))))
-+	if (unlikely(vcpu_is_protected(vcpu)))
- 		return pvm_exit_handlers;
- 
- 	return hyp_exit_handlers;
-@@ -226,9 +226,7 @@ static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm_vcpu *vcpu)
-  */
- static void early_exit_filter(struct kvm_vcpu *vcpu, u64 *exit_code)
- {
--	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
+-/*
+- * ARMv8 Reset Values
+- */
+-#define VCPU_RESET_PSTATE_EL1	(PSR_MODE_EL1h | PSR_A_BIT | PSR_I_BIT | \
+-				 PSR_F_BIT | PSR_D_BIT)
 -
--	if (kvm_vm_is_protected(kvm) && vcpu_mode_is_32bit(vcpu)) {
-+	if (unlikely(vcpu_is_protected(vcpu) && vcpu_mode_is_32bit(vcpu))) {
- 		/*
- 		 * As we have caught the guest red-handed, decide that it isn't
- 		 * fit for purpose anymore by making the vcpu invalid. The VMM
+-#define VCPU_RESET_PSTATE_EL2	(PSR_MODE_EL2h | PSR_A_BIT | PSR_I_BIT | \
+-				 PSR_F_BIT | PSR_D_BIT)
+-
+-#define VCPU_RESET_PSTATE_SVC	(PSR_AA32_MODE_SVC | PSR_AA32_A_BIT | \
+-				 PSR_AA32_I_BIT | PSR_AA32_F_BIT)
+-
+ unsigned int __ro_after_init kvm_sve_max_vl;
+ 
+ int __init kvm_arm_init_sve(void)
 -- 
 2.44.0.769.g3c40516874-goog
 
