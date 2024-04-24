@@ -1,93 +1,127 @@
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48CD215B12E
-	for <kvmarm@lists.linux.dev>; Wed, 24 Apr 2024 13:06:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D15A1422AF;
+	Wed, 24 Apr 2024 13:19:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713963984; cv=none; b=KNrT8/onVrrFmvkDfYsVW6SsuwZ7nM/w6WSaRDHD1lL38ffW+BRTeemTVfHVRV38ftgUBA0/xfK9DjHkfXLD+Lvco9U3wKXgCA7VNwtJD1V6ykY/N8EExzS3LhWEnaRPVwR2tKFW16ituF+ztiPt5FYi1Q/WmrvCUGzmmO0N3Yk=
+	t=1713964777; cv=none; b=enDK5dc0/UZAHjGiwqbR5ne/Ca+wZ0kxBMEardmQvpnZe2JoELkpPKRigmoEoGSQklwLnYlnn3f3QJM+pzApef/8K25trVAVLIhgCET75h469soZ0jGtDQO/0Qzm8VYv8ODWhWMmT4Q+eolQE/OT1Y63AHbHmcx8NU2ZxqNMOXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713963984; c=relaxed/simple;
-	bh=1X/4OOsHJ1KCbUAws4NmpoimMT/p0DvtpIV8MG8B394=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HrRTDttvqmK6MWzJnEeroyolB3vmcJVlXY3D0vVPTX3rKXButY8pVeda5M02xgBNJzRB6qktvwoO8gYj1oJxVOD4D7ctjOYvWQpF7t2WSCwVz17btbdM/h0KFQI7ecoggdfp5SeGF/nikDKhrFrc1rXWtdPFVrj6fTAFMHcj9ss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=zMrKFIll; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zMrKFIll"
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-51acb95b892so6169214e87.2
-        for <kvmarm@lists.linux.dev>; Wed, 24 Apr 2024 06:06:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1713963981; x=1714568781; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=oXPDyQAT+HitFMuQv0udxwIiXElf7T1dd2oYrE6rTrM=;
-        b=zMrKFIllWFQgeRwxSKLxtlw1dbsX50TMPJDeYGdk7S+3nmylVcjKtcTEjEHRw2RFS8
-         GkGL/Mm1CpRfP3+nVWZABvvsCc27KIWMYitawTeh0w236rpvsNjszV7hBm4WVjBBmPUc
-         ePc98jofq4JfnnqWT3/n4ANduuGmO7PkYWxZVM+qox51VtYp9BfODg4NhiM5VpBoZCPA
-         pnY3QwquPxTD6IbGWYyK6pHk7/lDK4WmflG4IwqnjB/lvpo5Dc6b467Sp3e5oCiineM7
-         RvWgOvDH8osYv43ZCMUjnNo5AospBDAJRswn1zuagN8fBcYPIzcqq+a8iL4zBS3vxyVK
-         oe+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713963981; x=1714568781;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=oXPDyQAT+HitFMuQv0udxwIiXElf7T1dd2oYrE6rTrM=;
-        b=u/osmnrESO1cjrCG+pXOhhABMjUztcyziSbM+EhryOvUFVbNKCQyEO75YsOkoIOolU
-         ZND1dISXoHoZhu2wk8GdPKLR/C7mCJerdSLK41wM9DYKoOz9c/iGw0A+T4sHECVPJX0k
-         DYrSlo5lF/vJ3oG30Ej6DiaWRjw5mkPaaHCU29MrbKIxGa7n+7qXLsp0Mmy/9qZAYyLd
-         GRo0z6e2cwreaLVQ7HUf6ovpLSB8SIjxfNxYXYXCVgtPyRcFoHk6aKAH17g5GJNs+mRT
-         09UOSnttqLz0jVElRePXz1m2L8d2nPO6sIXSrnqB3kz/XvKAvjWsZJv4v7sGP6EX8muW
-         BRmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUUz4SzUsGUxys1Ys6cxi76Kt5t6jqrMvvqjXaWBNUYDpXl2xZxdMPSeqIG3pWRBk1GwTI+302e5N5+F1m+MPUcRGAZamQj
-X-Gm-Message-State: AOJu0YwU8QjUrdkhZq5B+5pHF6mUKgFQATsJ+3nNWifrNdw2tbH671UR
-	yp5UCN2qJNUfNFT06y5lubHhTcMflVx8OM1Fd8IjgakUiYEQ31MATPcf/SxVrBqOTit+D1vLoRj
-	kHow3yiSqe6ddFfrAcBTqQ6xWVXMqNE8NgI+AxA==
-X-Google-Smtp-Source: AGHT+IFefKvAYRBqhr8QCesj7hq8WHWt10BLztHIAMclGVcycqHpNCSNgO9jv0EcYEOBsbpQ6CS9FIGy90LZsASyIU0=
-X-Received: by 2002:a19:915b:0:b0:51a:f31f:fc6e with SMTP id
- y27-20020a19915b000000b0051af31ffc6emr2425780lfj.14.1713963981412; Wed, 24
- Apr 2024 06:06:21 -0700 (PDT)
+	s=arc-20240116; t=1713964777; c=relaxed/simple;
+	bh=ra/7jHys5HrzBtDMjN1d+lExD93krBdyqnbBb71Q7v4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qb0dovPBSlr1+kcyP7wB4qLBEPo2WTKDjIbtEfIsclyYyKeLCNtOl4xY6o2o0EnKtfxbq8uBxqmY/yO9qk8IsEG3KZ921XyK3lY6GKpwP7bDIN5qAMacDh90dtnFxG6ln5+dEln0t4z2LwT5/VAwq3kzvPu/HTUuJJAnAB+g9/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 438422F;
+	Wed, 24 Apr 2024 06:20:02 -0700 (PDT)
+Received: from [10.57.86.198] (unknown [10.57.86.198])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2932E3F64C;
+	Wed, 24 Apr 2024 06:19:32 -0700 (PDT)
+Message-ID: <87ac462c-c453-4f3a-9b0e-5542727578aa@arm.com>
+Date: Wed, 24 Apr 2024 14:19:30 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 14/14] virt: arm-cca-guest: TSM_REPORT support for
+ realms
+Content-Language: en-GB
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Sami Mujawar <sami.mujawar@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
 References: <20240412084056.1733704-1-steven.price@arm.com>
- <20240412084213.1733764-1-steven.price@arm.com> <20240412084213.1733764-15-steven.price@arm.com>
+ <20240412084213.1733764-1-steven.price@arm.com>
+ <20240412084213.1733764-15-steven.price@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
 In-Reply-To: <20240412084213.1733764-15-steven.price@arm.com>
-From: Thomas Fossati <thomas.fossati@linaro.org>
-Date: Wed, 24 Apr 2024 15:06:04 +0200
-Message-ID: <CA+1=6ydMVk4Vcouc2ag8G7tfqZy80VWFxWHSHEKF1JaABd=A7A@mail.gmail.com>
-Subject: Re: [PATCH v2 14/14] virt: arm-cca-guest: TSM_REPORT support for realms
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	Sami Mujawar <sami.mujawar@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>, 
-	Oliver Upton <oliver.upton@linux.dev>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, 
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev, 
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Steven, Sami,
+On 12/04/2024 09:42, Steven Price wrote:
+> From: Sami Mujawar <sami.mujawar@arm.com>
+> 
+> Introduce an arm-cca-guest driver that registers with
+> the configfs-tsm module to provide user interfaces for
+> retrieving an attestation token.
+> 
+> When a new report is requested the arm-cca-guest driver
+> invokes the appropriate RSI interfaces to query an
+> attestation token.
+> 
+> The steps to retrieve an attestation token are as follows:
+>    1. Mount the configfs filesystem if not already mounted
+>       mount -t configfs none /sys/kernel/config
+>    2. Generate an attestation token
+>       report=/sys/kernel/config/tsm/report/report0
+>       mkdir $report
+>       dd if=/dev/urandom bs=64 count=1 > $report/inblob
+>       hexdump -C $report/outblob
+>       rmdir $report
+> 
+> Signed-off-by: Sami Mujawar <sami.mujawar@arm.com>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+>   drivers/virt/coco/Kconfig                     |   2 +
+>   drivers/virt/coco/Makefile                    |   1 +
+>   drivers/virt/coco/arm-cca-guest/Kconfig       |  11 +
+>   drivers/virt/coco/arm-cca-guest/Makefile      |   2 +
+>   .../virt/coco/arm-cca-guest/arm-cca-guest.c   | 208 ++++++++++++++++++
+>   5 files changed, 224 insertions(+)
+>   create mode 100644 drivers/virt/coco/arm-cca-guest/Kconfig
+>   create mode 100644 drivers/virt/coco/arm-cca-guest/Makefile
+>   create mode 100644 drivers/virt/coco/arm-cca-guest/arm-cca-guest.c
+> 
+> diff --git a/drivers/virt/coco/Kconfig b/drivers/virt/coco/Kconfig
+> index 87d142c1f932..4fb69804b622 100644
+> --- a/drivers/virt/coco/Kconfig
+> +++ b/drivers/virt/coco/Kconfig
+> @@ -12,3 +12,5 @@ source "drivers/virt/coco/efi_secret/Kconfig"
+>   source "drivers/virt/coco/sev-guest/Kconfig"
+>   
+>   source "drivers/virt/coco/tdx-guest/Kconfig"
+> +
+> +source "drivers/virt/coco/arm-cca-guest/Kconfig"
+> diff --git a/drivers/virt/coco/Makefile b/drivers/virt/coco/Makefile
+> index 18c1aba5edb7..a6228a1bf992 100644
+> --- a/drivers/virt/coco/Makefile
+> +++ b/drivers/virt/coco/Makefile
+> @@ -6,3 +6,4 @@ obj-$(CONFIG_TSM_REPORTS)	+= tsm.o
+>   obj-$(CONFIG_EFI_SECRET)	+= efi_secret/
+>   obj-$(CONFIG_SEV_GUEST)		+= sev-guest/
+>   obj-$(CONFIG_INTEL_TDX_GUEST)	+= tdx-guest/
+> +obj-$(CONFIG_ARM_CCA_GUEST)	+= arm-cca-guest/
+> diff --git a/drivers/virt/coco/arm-cca-guest/Kconfig b/drivers/virt/coco/arm-cca-guest/Kconfig
+> new file mode 100644
+> index 000000000000..c4039c10dce2
+> --- /dev/null
+> +++ b/drivers/virt/coco/arm-cca-guest/Kconfig
+> @@ -0,0 +1,11 @@
+> +config ARM_CCA_GUEST
+> +	tristate "Arm CCA Guest driver"
+> +	depends on ARM64
+> +	default m
+> +	select TSM_REPORTS
+> +	help
+> +	  The driver provides userspace interface to request and
+> +	  attestation report from the Realm Management Monitor(RMM).
+> +
+> +	  If you choose 'M' here, this module will be called
+> +	  realm-guest.
 
-On Fri, 12 Apr 2024 at 10:47, Steven Price <steven.price@arm.com> wrote:
-> +/**
-> + * arm_cca_report_new - Generate a new attestation token.
-> + *
-> + * @report: pointer to the TSM report context information.
-> + * @data:  pointer to the context specific data for this module.
-> + *
-> + * Initialise the attestation token generation using the challenge data
-> + * passed in the TSM decriptor.
+This needs to be updated to arm-cca-guest.
 
-Here, it'd be good to document two interesting facts about challenge data:
-1. It must be at least 32 bytes, and
-2. If its size is less than 64 bytes, it will be zero-padded.
+Suzuki
 
-cheers!
