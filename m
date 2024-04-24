@@ -1,69 +1,58 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-187.mta0.migadu.com (out-187.mta0.migadu.com [91.218.175.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C32EE16D9A3;
-	Wed, 24 Apr 2024 18:06:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BF8278B4E
+	for <kvmarm@lists.linux.dev>; Wed, 24 Apr 2024 19:15:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713982005; cv=none; b=DPkTcDqWc+PR4nLPEfM0kDNN3yGpIouKxHw9w/BJKFy3RWTG9e39svdeGU+A8pkYDbXfUwGg9ox//f50OV7tnboI6IPmh8HlD6sny10XwUwUriL/7GmtR9SjpMl87pudvjv3CUGFgqP8iKMD0j9rO0/XZsw0iem7Ky2wDlYNUfw=
+	t=1713986134; cv=none; b=QMjdH5nt0R6loe1TvguG4t8aeRq2LjDXBlJd0OqweUNUY5FDXSMP1OUP8mqLx5cHRkCYMpqKnAc2gzTYrlTqo0dSwTC4ft80B8rQee9yd6fLmxSbamJjZnKAVWkuYVSCx6mj4peOgDuWEHfzQBH6L8TpfrYb2cfQ+VxzPRCBxww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713982005; c=relaxed/simple;
-	bh=VPxcY4sWWUZ8OJxHmMechdqb+xtnIvwGDGmQSOr6naU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LpgL3TIVvAvi3S6ncBNaYp9irKqUZ2gH47E2N6fhCmmGRIrx//l8m/sDIOJk2ygLnMzbQaVnud7L+Bti1Df64uZ3C0ebQP5sNPAA3PNy9281SO0lOyEOZ6NzBgs5eWRnxrczodiOBzx3yfZr2CiKgPZw/pOaap3ivoLJxAD+R9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TVwzs5d3; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1713986134; c=relaxed/simple;
+	bh=cbs4/GsRFbvvwAe9pesFouoUlPJUcj+w4760zN9rM0U=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YmsK61DiaYT9osnAGu4kUWPZMXwEYSm0kxr0RNVB0L3Uf+aKo2wSyUX9wEgXQTuZcr8jDm+eOGEA5nO/89EqVKBxnHmhTuX32WC8K6ciKg+RrkVjBO3MkwTTJ65pCWIBCZJI/qfQQ2krwI0T+MMiJSf7zc/y9pVp+CO5stGIFxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=f2Ehzlp9; arc=none smtp.client-ip=91.218.175.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TVwzs5d3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F024C113CD;
-	Wed, 24 Apr 2024 18:06:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713982005;
-	bh=VPxcY4sWWUZ8OJxHmMechdqb+xtnIvwGDGmQSOr6naU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=TVwzs5d3vyxmCXrYocdQt2HmNQodz8zWkX7q1xtr+P5SeYAM2gFdhZGGyfsGguIRl
-	 TInubB8Xad3lkZneHIbkr0ghRbhHheO1vYEID6IqOr4DxefiktDs5oGV8Y5re0v11V
-	 EXu2k7xUC5cRFY3NB5R1Lrjhyxwjy9vspP8/z9Rpy9Lw6gAG36u9+kXfIfiJHjLGPB
-	 DSmeA4KzpabFXvB4pOAnvOw1y062Duqv0GnF1Jtft8gHDYkQBL9mOMCqhJ8TxnVJNx
-	 Y3MAZKWt3+qLutCPnu/Kua3Nmmo3bWAfCWzNCkPmapDmz7OSwPt+3qT+W2zcM+m6Zl
-	 0hG2sooqXnjuQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rzh11-007dMp-21;
-	Wed, 24 Apr 2024 19:06:43 +0100
-Date: Wed, 24 Apr 2024 19:06:42 +0100
-Message-ID: <86h6fqr5xp.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="f2Ehzlp9"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1713986130;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0j4vcSotV/ab5MF4MQ/aE+G24A8P8JLJufLFK3Fsk8U=;
+	b=f2Ehzlp9Y3QKl29jh0E6wfi4deuDgFWgTeIEDJ75XR1NdVNOVALCuxQ0YE/UP6H5CsCV6i
+	kCq59FQKWz2hLq1j7VcrV0KRotTjatBAl5b8k9GMBsYEoCPVAzBb5ZIZ1Nv/qwNe7U8uUn
+	yXCfBYcx23bdV3tA2dIKTTsFBi79ZSE=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Oliver Upton <oliver.upton@linux.dev>,
+	kvmarm@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>,
 	kvm@vger.kernel.org,
-	Alexander Potapenko <glider@google.com>,
-	Dmitry Vyukov <dvyukov@google.com>
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Dmitry Vyukov <dvyukov@google.com>,
+	James Morse <james.morse@arm.com>,
+	Alexander Potapenko <glider@google.com>
 Subject: Re: [PATCH 0/2] KVM: arm64: Avoid NULL dereference in vgic-v2 device attr accessors
+Date: Wed, 24 Apr 2024 19:15:19 +0000
+Message-ID: <171398579443.3801637.10801372488006477660.b4-ty@linux.dev>
 In-Reply-To: <20240424173959.3776798-1-oliver.upton@linux.dev>
 References: <20240424173959.3776798-1-oliver.upton@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvm@vger.kernel.org, glider@google.com, dvyukov@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, 24 Apr 2024 18:39:57 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
+On Wed, 24 Apr 2024 17:39:57 +0000, Oliver Upton wrote:
 > Alex reports that it is possible to trigger a NULL dereference via the
 > vgic-v2 device attribute accessors, stemming from a lack of sanitization
 > of user input...
@@ -71,24 +60,15 @@ Oliver Upton <oliver.upton@linux.dev> wrote:
 > Here's a fix + regression test for the bug. Obviously, I intend to take
 > these as a fix ASAP.
 > 
-> Oliver Upton (2):
->   KVM: arm64: vgic-v2: Check for non-NULL vCPU in vgic_v2_parse_attr()
->   KVM: selftests: Add test for uaccesses to non-existent vgic-v2 CPUIF
-> 
->  arch/arm64/kvm/vgic/vgic-kvm-device.c         |  8 +--
->  .../testing/selftests/kvm/aarch64/vgic_init.c | 49 +++++++++++++++++++
->  2 files changed, 53 insertions(+), 4 deletions(-)
-> 
-> 
-> base-commit: fec50db7033ea478773b159e0e2efb135270e3b7
+> [...]
 
-Thanks Alex for the heads up!
+Applied to kvmarm/fixes, thanks!
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
+[1/2] KVM: arm64: vgic-v2: Check for non-NULL vCPU in vgic_v2_parse_attr()
+      https://git.kernel.org/kvmarm/kvmarm/c/6ddb4f372fc6
+[2/2] KVM: selftests: Add test for uaccesses to non-existent vgic-v2 CPUIF
+      https://git.kernel.org/kvmarm/kvmarm/c/160933e330f4
 
-Please queue this at your earliest convenience.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+--
+Best,
+Oliver
