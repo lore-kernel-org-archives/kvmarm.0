@@ -1,135 +1,80 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70BC041C63
-	for <kvmarm@lists.linux.dev>; Wed, 24 Apr 2024 12:28:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A767157A72
+	for <kvmarm@lists.linux.dev>; Wed, 24 Apr 2024 12:47:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713961715; cv=none; b=u6mI3huoO6x7Jj9YwFNZbrCrx4lYV7h+TBPBpWncJeHMO20eROa58C/rpmvbmD9ZAkp4RjjOPGLFers1/PP/4Y7zFbVar1tKCRdkEf9eArfDTygNInrV11SE0Al7qwglgnYom1cVPnJXw2JV2OXUueYP+zq07tmiauROW3SJmB4=
+	t=1713962839; cv=none; b=kO9SX4NRNK3o05xv/fMpKuk5GBJBObzUiPlWHuNzmxR4zAGM2pCUYzXxFd+lYbj8R7llwrRh55Tpid2Uv2tRVyhM9HKWPxenTBtzDK7x93EtHuIbuePktjrjalcfPa07fzoA/ExT1rcVP0V79rJZ90ULDMAafSZJP5OAnbJrFfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713961715; c=relaxed/simple;
-	bh=CCy1GY5mbQgsg7GTrFabr2qhIIrcUcKNQlAZUox3rhw=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BngQngUF0bx8R8QgJm8J45bHA3WiE5pGI8VmSQbeBWqE6X26zsOFuWIE2R9CoXeiet5Xx5kdi9ia3CHgVPT+nyV9p8Ay4OEb7Im9rzk0CI2G33aVB3oDKkIQ48rI+DAKRMmMqskvr/tssYDTyy8wTD/ZDYVpwvwpPSw2S4EZWek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qrBS7nCn; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1713962839; c=relaxed/simple;
+	bh=/JDvhrg++qny8xTBIRuDmIsP0lXSnFvUn+rNxOIG9i4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YWac1yFlvK70nda7pFEQ+U7S5lOatfQVrNtI97bbCdH0ungnvCkmHcWaBGCQ4ypiNyb7hsesbOYAkaDLReplslp4DTgiDdyQpdGndTYFhNpkW/R9PvQ1cpgBIamiywW6PIOXseOL4Ar16nzNqpUTin2IfxCr/BuSpONjgwUckTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=CkSeLMDy; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qrBS7nCn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1413C32782;
-	Wed, 24 Apr 2024 12:28:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713961714;
-	bh=CCy1GY5mbQgsg7GTrFabr2qhIIrcUcKNQlAZUox3rhw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qrBS7nCnQv4qbEDzmkBqIybfLR2uzrj1jJgV2juCr56vdTpdUBvmDHEqk1EXiXldB
-	 wogHLmMLGg0/CXZSKhODu8QTLpxKaf0qgSuOGnZgb6KcbPo1HTE4CcN6FLvLnU+efg
-	 w0hB/3LqaqDEARtTdyJb3QAGkjtIRTQ/19QWNONjAoT/nB4MuS6i0nstVTZZ4Dh26s
-	 6T/xeCyxngavybS/5z+G2cCXZPu4fEoxTQwpwow5LBopyJ+WGFJCo2VRfCbQ35YXRm
-	 iSJxvSyh2xxGJ0CBR16NYOiCzwf88/JWylwYv8mayNiVxpZAJqgBe6fpj6yq5+hTTY
-	 O77B7usJU+OnA==
-Received: from [12.161.88.66] (helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rzbjk-007Wrl-9a;
-	Wed, 24 Apr 2024 13:28:32 +0100
-Date: Wed, 24 Apr 2024 13:28:29 +0100
-Message-ID: <87mspjt05u.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Dan Carpenter <dan.carpenter@linaro.org>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CkSeLMDy"
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-41a442c9dcbso27625015e9.2
+        for <kvmarm@lists.linux.dev>; Wed, 24 Apr 2024 05:47:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1713962836; x=1714567636; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7cxL1j8SNtUqcNrIi140yb/enDP0ohNkvqWAfKb7t/o=;
+        b=CkSeLMDyka7rN3M2YYNgV+9wwi+aQEBTQO1mQGtkE3SX5cL9HA8zYD0+A7dTPal+8C
+         sP1gviAguDAKGkiJyvLpWo3xoHwoVRRNE5AVn+4MHaROY4dTPYY7PohpCDf4C+5dZiTR
+         yo8O718hPS9nsfwzIaq2zkeC8P0Cz/aF1PGDwE/wuuWTEimNamWll8ESwHqWuxwh87Kf
+         ZDNBOE+kruTAlI1nG55jv4l9Fr/OBVt3xunalc2oZZ5IZgG+0MGXHC1xD3eVopntvTqL
+         3qmFwtss6WzPjdlQ/fuDHDGjwMEuExo/gr5+Q+zLTEESaDd00R1s+GCaEJmyN4bxv2D+
+         tJ9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713962836; x=1714567636;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7cxL1j8SNtUqcNrIi140yb/enDP0ohNkvqWAfKb7t/o=;
+        b=OwsgW/CtBA16HDhmQcymKyuSsaF2NYvSQiaTj/wjnY4OW1i1RdpbhAXZLNHZ68Hxss
+         Kp6FV2Xzp+eDE6Q33KfJHOQCv7DV8cUPX+X5ZmuwryAsyOg1n8BLPjksAZhhyimSTJ4E
+         zzdLHVYvewNGy3pLNB7w3E5LyBKeFLA0jZpZSOI1lqRovxT+hBI3iIC3VpE+fOyCBA9e
+         SWqa6fVmFAlFErQWcbDeNqNEM7ynpdmF1u6jLBqym6oJQgCyRh2vr+fQ5wlYHn9Xdp1O
+         M7idXvOcHWHO+bn1GUBhGkdunvtdozvwNwq/pKwK/CDUBKWLfrFq+uqYUt2ytTRBPHwd
+         Zlyw==
+X-Gm-Message-State: AOJu0YxBfl7oyCVq27K4kEZ/Zo1dq4ZdAqn0vYkwLLCnMDT+59ALwDOk
+	81gVdwz3a/Oys9A0DWKb+OButBtjnDe7LVmN2PVlSm+si7z1uJzgdP/7vwvaE5I=
+X-Google-Smtp-Source: AGHT+IELRWwqRIWM1u8jqyPR1P59KBBKHxFqcaWp7quliYiBK4B/JtP+aAyDcOcKhtr1Lz9yrN9DiQ==
+X-Received: by 2002:a05:600c:4707:b0:41a:e681:dca4 with SMTP id v7-20020a05600c470700b0041ae681dca4mr1367606wmo.27.1713962836083;
+        Wed, 24 Apr 2024 05:47:16 -0700 (PDT)
+Received: from localhost ([102.222.70.76])
+        by smtp.gmail.com with ESMTPSA id hg16-20020a05600c539000b0041aa8ad46d6sm6380331wmb.16.2024.04.24.05.47.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Apr 2024 05:47:15 -0700 (PDT)
+Date: Wed, 24 Apr 2024 15:47:11 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Marc Zyngier <maz@kernel.org>
 Cc: kvmarm@lists.linux.dev
 Subject: Re: [bug report] KVM: arm64: nv: Handle ERETA[AB] instructions
-In-Reply-To: <e23f90d2-306d-4290-8247-845472eeb860@moroto.mountain>
+Message-ID: <ca37bc54-cfcd-462e-9416-40ca3a9d3d22@moroto.mountain>
 References: <e23f90d2-306d-4290-8247-845472eeb860@moroto.mountain>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <87mspjt05u.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 12.161.88.66
-X-SA-Exim-Rcpt-To: dan.carpenter@linaro.org, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87mspjt05u.wl-maz@kernel.org>
 
-Hi Dan,
+Crud.  I should have seen that.  That's my bad.  Certainly don't change
+the code to silence the warning.
 
-On Wed, 24 Apr 2024 07:39:53 +0100,
-Dan Carpenter <dan.carpenter@linaro.org> wrote:
-> 
-> Hello Marc Zyngier,
-> 
-> Commit 213b3d1ea161 ("KVM: arm64: nv: Handle ERETA[AB] instructions")
-> from Apr 19, 2024 (linux-next), leads to the following Smatch static
-> checker warning:
-> 
-> 	arch/arm64/kvm/emulate-nested.c:2209 kvm_emulate_nested_eret()
-> 	error: uninitialized symbol 'elr'.
-> 
-> arch/arm64/kvm/emulate-nested.c
->     2173 void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
->     2174 {
->     2175         u64 spsr, elr, esr;
->     2176 
->     2177         /*
->     2178          * Forward this trap to the virtual EL2 if the virtual
->     2179          * HCR_EL2.NV bit is set and this is coming from !EL2.
->     2180          */
->     2181         if (forward_traps(vcpu, HCR_NV))
->     2182                 return;
->     2183 
->     2184         /* Check for an ERETAx */
->     2185         esr = kvm_vcpu_get_esr(vcpu);
->     2186         if (esr_iss_is_eretax(esr) && !kvm_auth_eretax(vcpu, &elr)) {
->     2187                 /*
->     2188                  * Oh no, ERETAx failed to authenticate.  If we have
->     2189                  * FPACCOMBINE, deliver an exception right away.  If we
->     2190                  * don't, then let the mangled ELR value trickle down the
->     2191                  * ERET handling, and the guest will have a little surprise.
->     2192                  */
->     2193                 if (kvm_has_pauth(vcpu->kvm, FPACCOMBINE)) {
->     2194                         esr &= ESR_ELx_ERET_ISS_ERETA;
->     2195                         esr |= FIELD_PREP(ESR_ELx_EC_MASK, ESR_ELx_EC_FPAC);
->     2196                         kvm_inject_nested_sync(vcpu, esr);
->     2197                         return;
->     2198                 }
->     2199         }
->     2200 
->     2201         preempt_disable();
->     2202         kvm_arch_vcpu_put(vcpu);
->     2203 
->     2204         spsr = __vcpu_sys_reg(vcpu, SPSR_EL2);
->     2205         spsr = kvm_check_illegal_exception_return(vcpu, spsr);
->     2206         if (!esr_iss_is_eretax(esr))
->     2207                 elr = __vcpu_sys_reg(vcpu, ELR_EL2);
-> 
-> elr is unitialized on else path
+The issue for Smatch is that it doesn't parse bitwise tests or pure
+functions properly...  I know *how* to fix it and it's not *complicated*
+but it's quite a bit of code and I haven't gotten around to doing it
+yet.
 
-Not quite.
-
-Look at line 2186, and realise that kvm_auth_eretax() does write to
-elr by being passed a pointer to it.
-
-I guess Smatch isn't capable of seeing through something being
-assigned in another compilation unit.
-
-The code *could* be written as:
-
-	if (!esr_iss_is_eretax(esr)) {
-		[...]
-		elr = vcpu_sys_reg(vcpu, ELR_EL2);
-		[...]
-	} else if (!kvm_auth_eretax(vcpu, &elr))
-		[...]
-	}
-
-but that would pointlessly duplicate some of the logic, and I'm not
-sure Smatch would grok that either.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+regards,
+dan carpenter
