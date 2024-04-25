@@ -1,659 +1,432 @@
-Received: from mail-vs1-f45.google.com (mail-vs1-f45.google.com [209.85.217.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6632D84FD4
-	for <kvmarm@lists.linux.dev>; Thu, 25 Apr 2024 09:54:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E30384FD0;
+	Thu, 25 Apr 2024 09:56:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714038842; cv=none; b=iD98H40+IR5NaeN29ri9M5hkt70/xodqYLbGxvhT6lq/z1THhAHb4tAfvQRKr2p1qF6uQJ7bQwsQYpQr+C5gRXdLAAeukAiLJPnjKwjSBotvdgEFbJ9/Hj0rTr+ClLv03bZ1fC5oZX4HQ1RFI74uOnpT3Iui4dcLUyPftbNg1Xc=
+	t=1714039006; cv=none; b=oiw/dUZr9VxVmcPem3kKEJsEihVhclQC+UYfKW3Lv0mz15Kj1REXxhYlDvDnd+c90vM2EBoHvvx0gnf0b2pYtbqQoE7BBrjfmiiUEcxblm6lH0hRrByHeDjfG08tIhzamo4r0Qa/3KFfp6wGx5QbmZGSGwKkrO7XtS8MFmChSrY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714038842; c=relaxed/simple;
-	bh=n8vlU+XM8z3wB/fXZKSaZJArUMjegdv2NMyY9ymyFkY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PW9KMItlMQeuX5bBseUAx1sX17bghZzplc/BdhXMJDBl872EXCjAOc3In5PnLzgb1UXcC2iTmip/Itdp0Uin7SEi+pMIndZux+H5Onmzq/GiOSHgoeskAJnMr8b3tFLi7VWV8b3AYvfRRjW7660p6iiblrHCfqDUHF+IRt/lB18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xgQ0WUrd; arc=none smtp.client-ip=209.85.217.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xgQ0WUrd"
-Received: by mail-vs1-f45.google.com with SMTP id ada2fe7eead31-479cbfc62e9so326508137.0
-        for <kvmarm@lists.linux.dev>; Thu, 25 Apr 2024 02:54:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714038839; x=1714643639; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2S4ZtYAwV4UTFyGGvlfOuiO1B8y2ezWGPKFTIKxi00o=;
-        b=xgQ0WUrdlVkzJjdqcrqiTrBSayq63P0C2hcckBoxJ0YrCYexBoSc/FuAij0vwtuWUJ
-         jKTp+0VZeJzBlC+pI9p2i7m+tN6Qkfhu1KzIPuNywYvx0RUrxCBTTf3/atU4Y6jSWef4
-         jcKVBURAQqnEtx+c9qMOYAJy27oPf3Ik7uLuHlu38223mV9tNFrnFMhr4vgJZXCBqCrC
-         sykN+LpUqTpbNwQN5rySaa6VJTV5ynf61N0/nYawwHw6KcCBDz36NrB+juB4gyOUDGx3
-         6EbxLxOis6rwKq7DIJDCIz9qExV92UHjouDJuzMyh10oIjCsmdfPCISKaQ6s8VRFogtI
-         IGCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714038839; x=1714643639;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2S4ZtYAwV4UTFyGGvlfOuiO1B8y2ezWGPKFTIKxi00o=;
-        b=hT6nNBQjCN/6zJaZsu7XYxMv0Qh0NXvC5+dB0/MG1zNO2au6Whd4tXXI00k57f4gyI
-         ZqTqmJLQRSj5VamraLmhqOuRH4XTPcIeNdXv8SswX5cfmCVNM6cJjp9NN0++D5OTj7jW
-         r4e7PMwxsmJeOFd1va4ILsQnkzoJ6JD2ui7RiSkz4ohyqDZ+/ZI9nXCOf+kyZo1ztDvh
-         1pAZvB6Aueytre/FlKcDCgUiJAX/KZ112OUJiruHO1VRa0Rz4atuq5k2HfBGBrOT0UH/
-         00vT1N0uXFI4wLRxpV3X+WFfqhjFvo3gjOOhv2tbRfIG9U5oQ8ue+M01J3nX0Oh1SUT3
-         eNyQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV4LcSfr57MvzJtWrrSp811svuOWB+pzzRjL3l6XMVUKBMu6R44SdlRK6Xx7GgeqS9NiWSRyQrjsxdVkCbOW74RAktvb2NN
-X-Gm-Message-State: AOJu0YwNcvPB6Pt3WQYF9+/g7M/NcJI9GlcsnrENCxeF041WMBMqA2QS
-	i2w3a6B/LfiBC1BtNVYwO7qL6yuwzeIBj69b2hF2dkjiA7YeiG5sDZNZ1NWOy/+j9Xzw3V3qrzr
-	3Gs4em4GRVjbD/lYdgZ1bg/4DLBOSaBvv1dtk
-X-Google-Smtp-Source: AGHT+IFCf96b/8rN1I/j0zet+Ph8wQszLYqyZmPfsby4JB1xvMf0BWiQIrmpfRGoF/fvks0lP7Tj4Xe4rXCwOjelin0=
-X-Received: by 2002:a05:6102:162a:b0:47c:1f69:f132 with SMTP id
- cu42-20020a056102162a00b0047c1f69f132mr189601vsb.34.1714038838785; Thu, 25
- Apr 2024 02:53:58 -0700 (PDT)
+	s=arc-20240116; t=1714039006; c=relaxed/simple;
+	bh=XYDT/4oDCAdIWOLWYH63E6kOErsy91C4cjww4e4djR4=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=g7j9rCHYyAwdUQ7Cwp6sPuZwTIfChhi6qDCv6KjAgsGM99Hp9Twj1nt+8OxPXceqpMjcNNNrj9qNWz8k49/AZUlvWbZd0mGdWflvVPnZJnbpGjPg8oMEqALQBqmw7O6I0QoZsczDVc18zYHPyIwL1qeJo239S192nWiwJSx81ic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4VQB8F39mgz6D9Lj;
+	Thu, 25 Apr 2024 17:56:29 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id 6413C1400CD;
+	Thu, 25 Apr 2024 17:56:39 +0800 (CST)
+Received: from localhost (10.122.247.231) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Thu, 25 Apr
+ 2024 10:56:38 +0100
+Date: Thu, 25 Apr 2024 10:56:37 +0100
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+To: Marc Zyngier <maz@kernel.org>, <linuxarm@huawei.com>
+CC: Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra
+	<peterz@infradead.org>, <linux-pm@vger.kernel.org>,
+	<loongarch@lists.linux.dev>, <linux-acpi@vger.kernel.org>,
+	<linux-arch@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<x86@kernel.org>, Russell King <linux@armlinux.org.uk>, "Rafael J . Wysocki"
+	<rafael@kernel.org>, Miguel Luis <miguel.luis@oracle.com>, "James Morse"
+	<james.morse@arm.com>, Salil Mehta <salil.mehta@huawei.com>, Jean-Philippe
+ Brucker <jean-philippe@linaro.org>, Catalin Marinas
+	<catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Ingo Molnar
+	<mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+	<dave.hansen@linux.intel.com>, <justin.he@arm.com>, <jianyong.wu@arm.com>
+Subject: Re: [PATCH v7 11/16] irqchip/gic-v3: Add support for ACPI's
+ disabled but 'online capable' CPUs
+Message-ID: <20240425105637.000030a7@huawei.com>
+In-Reply-To: <20240425102806.00003683@Huawei.com>
+References: <20240418135412.14730-1-Jonathan.Cameron@huawei.com>
+	<20240418135412.14730-12-Jonathan.Cameron@huawei.com>
+	<20240422114020.0000294f@Huawei.com>
+	<87plugthim.wl-maz@kernel.org>
+	<20240424135438.00001ffc@huawei.com>
+	<20240425102806.00003683@Huawei.com>
+Organization: Huawei Technologies R&D (UK) Ltd.
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.29; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20240412084056.1733704-1-steven.price@arm.com>
- <20240412084309.1733783-1-steven.price@arm.com> <20240412084309.1733783-18-steven.price@arm.com>
-In-Reply-To: <20240412084309.1733783-18-steven.price@arm.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Thu, 25 Apr 2024 10:53:22 +0100
-Message-ID: <CA+EHjTzHJjtp4uMXN8RN4j=J-j2VdMQUhPr607EPzxTYUhMURQ@mail.gmail.com>
-Subject: Re: [PATCH v2 17/43] arm64: RME: Allow VMM to set RIPAS
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, 
-	James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Christoffer Dall <christoffer.dall@arm.com>, linux-coco@lists.linux.dev, 
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: quoted-printable
+X-ClientProxiedBy: lhrpeml500003.china.huawei.com (7.191.162.67) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
-Hi,
+On Thu, 25 Apr 2024 10:28:06 +0100
+Jonathan Cameron <Jonathan.Cameron@Huawei.com> wrote:
 
-On Fri, Apr 12, 2024 at 9:43=E2=80=AFAM Steven Price <steven.price@arm.com>=
- wrote:
->
-> Each page within the protected region of the realm guest can be marked
-> as either RAM or EMPTY. Allow the VMM to control this before the guest
-> has started and provide the equivalent functions to change this (with
-> the guest's approval) at runtime.
->
-> When transitioning from RIPAS RAM (1) to RIPAS EMPTY (0) the memory is
-> unmapped from the guest and undelegated allowing the memory to be reused
-> by the host. When transitioning to RIPAS RAM the actual population of
-> the leaf RTTs is done later on stage 2 fault, however it may be
-> necessary to allocate additional RTTs to represent the range requested.
->
-> When freeing a block mapping it is necessary to temporarily unfold the
-> RTT which requires delegating an extra page to the RMM, this page can
-> then be recovered once the contents of the block mapping have been
-> freed. A spare, delegated page (spare_page) is used for this purpose.
->
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
->  arch/arm64/include/asm/kvm_rme.h |  16 ++
->  arch/arm64/kvm/mmu.c             |   8 +-
->  arch/arm64/kvm/rme.c             | 390 +++++++++++++++++++++++++++++++
->  3 files changed, 411 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kv=
-m_rme.h
-> index 915e76068b00..cc8f81cfc3c0 100644
-> --- a/arch/arm64/include/asm/kvm_rme.h
-> +++ b/arch/arm64/include/asm/kvm_rme.h
-> @@ -96,6 +96,14 @@ void kvm_realm_destroy_rtts(struct kvm *kvm, u32 ia_bi=
-ts);
->  int kvm_create_rec(struct kvm_vcpu *vcpu);
->  void kvm_destroy_rec(struct kvm_vcpu *vcpu);
->
-> +void kvm_realm_unmap_range(struct kvm *kvm,
-> +                          unsigned long ipa,
-> +                          u64 size,
-> +                          bool unmap_private);
-> +int realm_set_ipa_state(struct kvm_vcpu *vcpu,
-> +                       unsigned long addr, unsigned long end,
-> +                       unsigned long ripas);
-> +
->  #define RME_RTT_BLOCK_LEVEL    2
->  #define RME_RTT_MAX_LEVEL      3
->
-> @@ -114,4 +122,12 @@ static inline unsigned long rme_rtt_level_mapsize(in=
-t level)
->         return (1UL << RME_RTT_LEVEL_SHIFT(level));
->  }
->
-> +static inline bool realm_is_addr_protected(struct realm *realm,
-> +                                          unsigned long addr)
-> +{
-> +       unsigned int ia_bits =3D realm->ia_bits;
-> +
-> +       return !(addr & ~(BIT(ia_bits - 1) - 1));
-> +}
-> +
->  #endif
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 46f0c4e80ace..8a7b5449697f 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -310,6 +310,7 @@ static void invalidate_icache_guest_page(void *va, si=
-ze_t size)
->   * @start: The intermediate physical base address of the range to unmap
->   * @size:  The size of the area to unmap
->   * @may_block: Whether or not we are permitted to block
-> + * @only_shared: If true then protected mappings should not be unmapped
->   *
->   * Clear a range of stage-2 mappings, lowering the various ref-counts.  =
-Must
->   * be called while holding mmu_lock (unless for freeing the stage2 pgd b=
-efore
-> @@ -317,7 +318,7 @@ static void invalidate_icache_guest_page(void *va, si=
-ze_t size)
->   * with things behind our backs.
->   */
->  static void __unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t sta=
-rt, u64 size,
-> -                                bool may_block)
-> +                                bool may_block, bool only_shared)
+> On Wed, 24 Apr 2024 13:54:38 +0100
+> Jonathan Cameron <Jonathan.Cameron@huawei.com> wrote:
+>=20
+> > On Tue, 23 Apr 2024 13:01:21 +0100
+> > Marc Zyngier <maz@kernel.org> wrote:
+> >  =20
+> > > On Mon, 22 Apr 2024 11:40:20 +0100,
+> > > Jonathan Cameron <Jonathan.Cameron@Huawei.com> wrote:   =20
+> > > >=20
+> > > > On Thu, 18 Apr 2024 14:54:07 +0100
+> > > > Jonathan Cameron <Jonathan.Cameron@huawei.com> wrote:
+> > > >      =20
+> > > > > From: James Morse <james.morse@arm.com>
+> > > > >=20
+> > > > > To support virtual CPU hotplug, ACPI has added an 'online capable=
+' bit
+> > > > > to the MADT GICC entries. This indicates a disabled CPU entry may=
+ not
+> > > > > be possible to online via PSCI until firmware has set enabled bit=
+ in
+> > > > > _STA.
+> > > > >=20
+> > > > > This means that a "usable" GIC is one that is marked as either en=
+abled,
+> > > > > or online capable. Therefore, change acpi_gicc_is_usable() to che=
+ck both
+> > > > > bits. However, we need to change the test in gic_acpi_match_gicc(=
+) back
+> > > > > to testing just the enabled bit so the count of enabled distribut=
+ors is
+> > > > > correct.
+> > > > >=20
+> > > > > What about the redistributor in the GICC entry? ACPI doesn't want=
+ to say.
+> > > > > Assume the worst: When a redistributor is described in the GICC e=
+ntry,
+> > > > > but the entry is marked as disabled at boot, assume the redistrib=
+utor
+> > > > > is inaccessible.
+> > > > >=20
+> > > > > The GICv3 driver doesn't support late online of redistributors, s=
+o this
+> > > > > means the corresponding CPU can't be brought online either. Clear=
+ the
+> > > > > possible and present bits.
+> > > > >=20
+> > > > > Systems that want CPU hotplug in a VM can ensure their redistribu=
+tors
+> > > > > are always-on, and describe them that way with a GICR entry in th=
+e MADT.
+> > > > >=20
+> > > > > When mapping redistributors found via GICC entries, handle the ca=
+se
+> > > > > where the arch code believes the CPU is present and possible, but=
+ it
+> > > > > does not have an accessible redistributor. Print a warning and cl=
+ear
+> > > > > the present and possible bits.
+> > > > >=20
+> > > > > Signed-off-by: James Morse <james.morse@arm.com>
+> > > > > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> > > > > Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>    =
+ =20
+> > > >=20
+> > > > +CC Marc,
+> > > >=20
+> > > > Whilst this has been unchanged for a long time, I'm not 100% sure
+> > > > we've specifically drawn your attention to it before now.
+> > > >=20
+> > > > Jonathan
+> > > >      =20
+> > > > >=20
+> > > > > ---
+> > > > > v7: No Change.
+> > > > > ---
+> > > > >  drivers/irqchip/irq-gic-v3.c | 21 +++++++++++++++++++--
+> > > > >  include/linux/acpi.h         |  3 ++-
+> > > > >  2 files changed, 21 insertions(+), 3 deletions(-)
+> > > > >=20
+> > > > > diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-g=
+ic-v3.c
+> > > > > index 10af15f93d4d..66132251c1bb 100644
+> > > > > --- a/drivers/irqchip/irq-gic-v3.c
+> > > > > +++ b/drivers/irqchip/irq-gic-v3.c
+> > > > > @@ -2363,11 +2363,25 @@ gic_acpi_parse_madt_gicc(union acpi_subta=
+ble_headers *header,
+> > > > >  				(struct acpi_madt_generic_interrupt *)header;
+> > > > >  	u32 reg =3D readl_relaxed(acpi_data.dist_base + GICD_PIDR2) & G=
+IC_PIDR2_ARCH_MASK;
+> > > > >  	u32 size =3D reg =3D=3D GIC_PIDR2_ARCH_GICv4 ? SZ_64K * 4 : SZ_=
+64K * 2;
+> > > > > +	int cpu =3D get_cpu_for_acpi_id(gicc->uid);
+> > > > >  	void __iomem *redist_base;
+> > > > > =20
+> > > > >  	if (!acpi_gicc_is_usable(gicc))
+> > > > >  		return 0;
+> > > > > =20
+> > > > > +	/*
+> > > > > +	 * Capable but disabled CPUs can be brought online later. What =
+about
+> > > > > +	 * the redistributor? ACPI doesn't want to say!
+> > > > > +	 * Virtual hotplug systems can use the MADT's "always-on" GICR =
+entries.
+> > > > > +	 * Otherwise, prevent such CPUs from being brought online.
+> > > > > +	 */
+> > > > > +	if (!(gicc->flags & ACPI_MADT_ENABLED)) {
+> > > > > +		pr_warn_once("CPU %u's redistributor is inaccessible: this CPU=
+ can't be brought online\n", cpu);
+> > > > > +		set_cpu_present(cpu, false);
+> > > > > +		set_cpu_possible(cpu, false);
+> > > > > +		return 0;
+> > > > > +	}     =20
+> > >=20
+> > > It seems dangerous to clear those this late in the game, given how
+> > > disconnected from the architecture code this is. Are we sure that
+> > > nothing has sampled these cpumasks beforehand?   =20
+> >=20
+> > Hi Marc,
+> >=20
+> > Any firmware that does this is being considered as buggy already
+> > but given it is firmware and the spec doesn't say much about this,
+> > there is always the possibility.
+> >=20
+> > Not much happens between the point where these are setup and
+> > the point where the the gic inits and this code runs, but even if caref=
+ul
+> > review showed it was fine today, it will be fragile to future changes.
+> >=20
+> > I'm not sure there is a huge disadvantage for such broken firmware in
+> > clearing these masks from the point of view of what is used throughout
+> > the rest of the kernel. Here I think we are just looking to prevent the=
+ CPU
+> > being onlined later.
+> >=20
+> > We could add a set_cpu_broken() with appropriate mask.
+> > Given this is very arm64 specific I'm not sure Rafael will be keen on
+> > us checking such a mask in the generic ACPI code, but we could check it=
+ in
+> > arch_register_cpu() and just not register the cpu if it matches.
+> > That will cover the vCPU hotplug case.
+> >=20
+> > Does that sounds sensible, or would you prefer something else? =20
+>=20
+> Hi Marc
+>=20
+> Some experiments later (faking this on a physical board - I never liked
+> CPU 120 anyway!) and using a different mask brings it's own minor pain.
+>=20
+> When all the rest of the CPUs are brought up cpuhp_bringup_mask() is call=
+ed
+> on cpu_present_mask so we need to do a dance in there to use a temporary
+> mask with broken cpus removed.  I think it makes sense to cut that out
+> at the top of the cpuhp_bringup_mask() pile of actions rather than trying
+> to paper over each actual thing that is dying... (looks like an infinite =
+loop
+> somewhere but I haven't tracked down where yet).
+>=20
+> I'll spin a patch so you can see what it looks like, but my concern is
+> we are just moving the risk from early users of these masks to later cases
+> where code assumes cpu_present_mask definitely means they are present.
+> That is probably a small set of cases but not nice either.
+>=20
+> Looks like one of those cases where we need to pick the lesser of two evi=
+ls
+> which is probably still the cpu_broken_mask approach.
+>=20
+> On plus side if we decide to go back to the original approach having seen
+> that I already have the code :)
+>=20
+> Jonathan
+>=20
 
-I found the new added only_shared  parameter to be a bit confusing,
-since this patch also introduces kvm_realm_unmap_range(..., bool
-unmap_private), where unmap_private has a different meaning, which I
-think is really unmap_all.. It might be better if the parameter meant
-the same thing everywhere.  Having helpers to sort this out, similar
-to what you have with realm_unmap_range_*() might be even clearer.
+Patch on top of this series.  If no one shouts before I have it ready I'll
+roll a v8 with the mask introduction as a new patch and the other changes p=
+ushed into
+appropriate patches.
 
-Thanks,
-/fuad
+=46rom 361b76f36bfb4ff74fdceca7ebf14cfa43cae4a9 Mon Sep 17 00:00:00 2001
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Date: Wed, 24 Apr 2024 17:42:49 +0100
+Subject: [PATCH] cpu: Add broken cpu mask to mark CPUs where inconsistent
+ firmware means we can't start them.
 
->  {
->         struct kvm *kvm =3D kvm_s2_mmu_to_kvm(mmu);
->         phys_addr_t end =3D start + size;
-> @@ -330,7 +331,7 @@ static void __unmap_stage2_range(struct kvm_s2_mmu *m=
-mu, phys_addr_t start, u64
->
->  static void unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start=
-, u64 size)
->  {
-> -       __unmap_stage2_range(mmu, start, size, true);
-> +       __unmap_stage2_range(mmu, start, size, true, false);
->  }
->
->  static void stage2_flush_memslot(struct kvm *kvm,
-> @@ -1771,7 +1772,8 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kv=
-m_gfn_range *range)
->
->         __unmap_stage2_range(&kvm->arch.mmu, range->start << PAGE_SHIFT,
->                              (range->end - range->start) << PAGE_SHIFT,
-> -                            range->may_block);
-> +                            range->may_block,
-> +                            range->only_shared);
->
->         return false;
->  }
-> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
-> index 629a095bea61..9e5983c51393 100644
-> --- a/arch/arm64/kvm/rme.c
-> +++ b/arch/arm64/kvm/rme.c
-> @@ -79,6 +79,12 @@ static phys_addr_t __alloc_delegated_page(struct realm=
- *realm,
->         return phys;
->  }
->
-> +static phys_addr_t alloc_delegated_page(struct realm *realm,
-> +                                       struct kvm_mmu_memory_cache *mc)
-> +{
-> +       return __alloc_delegated_page(realm, mc, GFP_KERNEL);
-> +}
-> +
->  static void free_delegated_page(struct realm *realm, phys_addr_t phys)
->  {
->         if (realm->spare_page =3D=3D PHYS_ADDR_MAX) {
-> @@ -94,6 +100,151 @@ static void free_delegated_page(struct realm *realm,=
- phys_addr_t phys)
->         free_page((unsigned long)phys_to_virt(phys));
->  }
->
-> +static int realm_rtt_create(struct realm *realm,
-> +                           unsigned long addr,
-> +                           int level,
-> +                           phys_addr_t phys)
-> +{
-> +       addr =3D ALIGN_DOWN(addr, rme_rtt_level_mapsize(level - 1));
-> +       return rmi_rtt_create(virt_to_phys(realm->rd), phys, addr, level)=
-;
-> +}
-> +
-> +static int realm_rtt_fold(struct realm *realm,
-> +                         unsigned long addr,
-> +                         int level,
-> +                         phys_addr_t *rtt_granule)
-> +{
-> +       unsigned long out_rtt;
-> +       int ret;
-> +
-> +       ret =3D rmi_rtt_fold(virt_to_phys(realm->rd), addr, level, &out_r=
-tt);
-> +
-> +       if (RMI_RETURN_STATUS(ret) =3D=3D RMI_SUCCESS && rtt_granule)
-> +               *rtt_granule =3D out_rtt;
-> +
-> +       return ret;
-> +}
-> +
-> +static int realm_destroy_protected(struct realm *realm,
-> +                                  unsigned long ipa,
-> +                                  unsigned long *next_addr)
-> +{
-> +       unsigned long rd =3D virt_to_phys(realm->rd);
-> +       unsigned long addr;
-> +       phys_addr_t rtt;
-> +       int ret;
-> +
-> +loop:
-> +       ret =3D rmi_data_destroy(rd, ipa, &addr, next_addr);
-> +       if (RMI_RETURN_STATUS(ret) =3D=3D RMI_ERROR_RTT) {
-> +               if (*next_addr > ipa)
-> +                       return 0; /* UNASSIGNED */
-> +               rtt =3D alloc_delegated_page(realm, NULL);
-> +               if (WARN_ON(rtt =3D=3D PHYS_ADDR_MAX))
-> +                       return -1;
-> +               /* ASSIGNED - ipa is mapped as a block, so split */
-> +               ret =3D realm_rtt_create(realm, ipa,
-> +                                      RMI_RETURN_INDEX(ret) + 1, rtt);
-> +               if (WARN_ON(ret)) {
-> +                       free_delegated_page(realm, rtt);
-> +                       return -1;
-> +               }
-> +               /* retry */
-> +               goto loop;
-> +       } else if (WARN_ON(ret)) {
-> +               return -1;
-> +       }
-> +       ret =3D rmi_granule_undelegate(addr);
-> +
-> +       /*
-> +        * If the undelegate fails then something has gone seriously
-> +        * wrong: take an extra reference to just leak the page
-> +        */
-> +       if (WARN_ON(ret))
-> +               get_page(phys_to_page(addr));
-> +
-> +       return 0;
-> +}
-> +
-> +static void realm_unmap_range_shared(struct kvm *kvm,
-> +                                    int level,
-> +                                    unsigned long start,
-> +                                    unsigned long end)
-> +{
-> +       struct realm *realm =3D &kvm->arch.realm;
-> +       unsigned long rd =3D virt_to_phys(realm->rd);
-> +       ssize_t map_size =3D rme_rtt_level_mapsize(level);
-> +       unsigned long next_addr, addr;
-> +       unsigned long shared_bit =3D BIT(realm->ia_bits - 1);
-> +
-> +       if (WARN_ON(level > RME_RTT_MAX_LEVEL))
-> +               return;
-> +
-> +       start |=3D shared_bit;
-> +       end |=3D shared_bit;
-> +
-> +       for (addr =3D start; addr < end; addr =3D next_addr) {
-> +               unsigned long align_addr =3D ALIGN(addr, map_size);
-> +               int ret;
-> +
-> +               next_addr =3D ALIGN(addr + 1, map_size);
-> +
-> +               if (align_addr !=3D addr || next_addr > end) {
-> +                       /* Need to recurse deeper */
-> +                       if (addr < align_addr)
-> +                               next_addr =3D align_addr;
-> +                       realm_unmap_range_shared(kvm, level + 1, addr,
-> +                                                min(next_addr, end));
-> +                       continue;
-> +               }
-> +
-> +               ret =3D rmi_rtt_unmap_unprotected(rd, addr, level, &next_=
-addr);
-> +               switch (RMI_RETURN_STATUS(ret)) {
-> +               case RMI_SUCCESS:
-> +                       break;
-> +               case RMI_ERROR_RTT:
-> +                       if (next_addr =3D=3D addr) {
-> +                               next_addr =3D ALIGN(addr + 1, map_size);
-> +                               realm_unmap_range_shared(kvm, level + 1, =
-addr,
-> +                                                        next_addr);
-> +                       }
-> +                       break;
-> +               default:
-> +                       WARN_ON(1);
-> +               }
-> +       }
-> +}
-> +
-> +static void realm_unmap_range_private(struct kvm *kvm,
-> +                                     unsigned long start,
-> +                                     unsigned long end)
-> +{
-> +       struct realm *realm =3D &kvm->arch.realm;
-> +       ssize_t map_size =3D RME_PAGE_SIZE;
-> +       unsigned long next_addr, addr;
-> +
-> +       for (addr =3D start; addr < end; addr =3D next_addr) {
-> +               int ret;
-> +
-> +               next_addr =3D ALIGN(addr + 1, map_size);
-> +
-> +               ret =3D realm_destroy_protected(realm, addr, &next_addr);
-> +
-> +               if (WARN_ON(ret))
-> +                       break;
-> +       }
-> +}
-> +
-> +static void realm_unmap_range(struct kvm *kvm,
-> +                             unsigned long start,
-> +                             unsigned long end,
-> +                             bool unmap_private)
-> +{
-> +       realm_unmap_range_shared(kvm, RME_RTT_MAX_LEVEL - 1, start, end);
-> +       if (unmap_private)
-> +               realm_unmap_range_private(kvm, start, end);
-> +}
-> +
->  u32 kvm_realm_ipa_limit(void)
->  {
->         return u64_get_bits(rmm_feat_reg0, RMI_FEATURE_REGISTER_0_S2SZ);
-> @@ -190,6 +341,30 @@ static int realm_rtt_destroy(struct realm *realm, un=
-signed long addr,
->         return ret;
->  }
->
-> +static int realm_create_rtt_levels(struct realm *realm,
-> +                                  unsigned long ipa,
-> +                                  int level,
-> +                                  int max_level,
-> +                                  struct kvm_mmu_memory_cache *mc)
-> +{
-> +       if (WARN_ON(level =3D=3D max_level))
-> +               return 0;
-> +
-> +       while (level++ < max_level) {
-> +               phys_addr_t rtt =3D alloc_delegated_page(realm, mc);
-> +
-> +               if (rtt =3D=3D PHYS_ADDR_MAX)
-> +                       return -ENOMEM;
-> +
-> +               if (realm_rtt_create(realm, ipa, level, rtt)) {
-> +                       free_delegated_page(realm, rtt);
-> +                       return -ENXIO;
-> +               }
-> +       }
-> +
-> +       return 0;
-> +}
-> +
->  static int realm_tear_down_rtt_level(struct realm *realm, int level,
->                                      unsigned long start, unsigned long e=
-nd)
->  {
-> @@ -265,6 +440,68 @@ static int realm_tear_down_rtt_range(struct realm *r=
-ealm,
->                                          start, end);
->  }
->
-> +/*
-> + * Returns 0 on successful fold, a negative value on error, a positive v=
-alue if
-> + * we were not able to fold all tables at this level.
-> + */
-> +static int realm_fold_rtt_level(struct realm *realm, int level,
-> +                               unsigned long start, unsigned long end)
-> +{
-> +       int not_folded =3D 0;
-> +       ssize_t map_size;
-> +       unsigned long addr, next_addr;
-> +
-> +       if (WARN_ON(level > RME_RTT_MAX_LEVEL))
-> +               return -EINVAL;
-> +
-> +       map_size =3D rme_rtt_level_mapsize(level - 1);
-> +
-> +       for (addr =3D start; addr < end; addr =3D next_addr) {
-> +               phys_addr_t rtt_granule;
-> +               int ret;
-> +               unsigned long align_addr =3D ALIGN(addr, map_size);
-> +
-> +               next_addr =3D ALIGN(addr + 1, map_size);
-> +
-> +               ret =3D realm_rtt_fold(realm, align_addr, level, &rtt_gra=
-nule);
-> +
-> +               switch (RMI_RETURN_STATUS(ret)) {
-> +               case RMI_SUCCESS:
-> +                       if (!WARN_ON(rmi_granule_undelegate(rtt_granule))=
-)
-> +                               free_page((unsigned long)phys_to_virt(rtt=
-_granule));
-> +                       break;
-> +               case RMI_ERROR_RTT:
-> +                       if (level =3D=3D RME_RTT_MAX_LEVEL ||
-> +                           RMI_RETURN_INDEX(ret) < level) {
-> +                               not_folded++;
-> +                               break;
-> +                       }
-> +                       /* Recurse a level deeper */
-> +                       ret =3D realm_fold_rtt_level(realm,
-> +                                                  level + 1,
-> +                                                  addr,
-> +                                                  next_addr);
-> +                       if (ret < 0)
-> +                               return ret;
-> +                       else if (ret =3D=3D 0)
-> +                               /* Try again at this level */
-> +                               next_addr =3D addr;
-> +                       break;
-> +               default:
-> +                       return -ENXIO;
-> +               }
-> +       }
-> +
-> +       return not_folded;
-> +}
-> +
-> +static int realm_fold_rtt_range(struct realm *realm,
-> +                               unsigned long start, unsigned long end)
-> +{
-> +       return realm_fold_rtt_level(realm, get_start_level(realm) + 1,
-> +                                   start, end);
-> +}
-> +
->  static void ensure_spare_page(struct realm *realm)
->  {
->         phys_addr_t tmp_rtt;
-> @@ -295,6 +532,147 @@ void kvm_realm_destroy_rtts(struct kvm *kvm, u32 ia=
-_bits)
->         WARN_ON(realm_tear_down_rtt_range(realm, 0, (1UL << ia_bits)));
->  }
->
-> +void kvm_realm_unmap_range(struct kvm *kvm, unsigned long ipa, u64 size,
-> +                          bool unmap_private)
-> +{
-> +       unsigned long end =3D ipa + size;
-> +       struct realm *realm =3D &kvm->arch.realm;
-> +
-> +       end =3D min(BIT(realm->ia_bits - 1), end);
-> +
-> +       ensure_spare_page(realm);
-> +
-> +       realm_unmap_range(kvm, ipa, end, unmap_private);
-> +
-> +       realm_fold_rtt_range(realm, ipa, end);
-> +}
-> +
-> +static int find_map_level(struct realm *realm,
-> +                         unsigned long start,
-> +                         unsigned long end)
-> +{
-> +       int level =3D RME_RTT_MAX_LEVEL;
-> +
-> +       while (level > get_start_level(realm)) {
-> +               unsigned long map_size =3D rme_rtt_level_mapsize(level - =
-1);
-> +
-> +               if (!IS_ALIGNED(start, map_size) ||
-> +                   (start + map_size) > end)
-> +                       break;
-> +
-> +               level--;
-> +       }
-> +
-> +       return level;
-> +}
-> +
-> +int realm_set_ipa_state(struct kvm_vcpu *vcpu,
-> +                       unsigned long start,
-> +                       unsigned long end,
-> +                       unsigned long ripas)
-> +{
-> +       struct kvm *kvm =3D vcpu->kvm;
-> +       struct realm *realm =3D &kvm->arch.realm;
-> +       struct realm_rec *rec =3D &vcpu->arch.rec;
-> +       phys_addr_t rd_phys =3D virt_to_phys(realm->rd);
-> +       phys_addr_t rec_phys =3D virt_to_phys(rec->rec_page);
-> +       struct kvm_mmu_memory_cache *memcache =3D &vcpu->arch.mmu_page_ca=
-che;
-> +       unsigned long ipa =3D start;
-> +       int ret =3D 0;
-> +
-> +       while (ipa < end) {
-> +               unsigned long next;
-> +
-> +               ret =3D rmi_rtt_set_ripas(rd_phys, rec_phys, ipa, end, &n=
-ext);
-> +
-> +               if (RMI_RETURN_STATUS(ret) =3D=3D RMI_ERROR_RTT) {
-> +                       int walk_level =3D RMI_RETURN_INDEX(ret);
-> +                       int level =3D find_map_level(realm, ipa, end);
-> +
-> +                       if (walk_level < level) {
-> +                               ret =3D realm_create_rtt_levels(realm, ip=
-a,
-> +                                                             walk_level,
-> +                                                             level,
-> +                                                             memcache);
-> +                               if (!ret)
-> +                                       continue;
-> +                       } else {
-> +                               ret =3D -EINVAL;
-> +                       }
-> +
-> +                       break;
-> +               } else if (RMI_RETURN_STATUS(ret) !=3D RMI_SUCCESS) {
-> +                       WARN(1, "Unexpected error in %s: %#x\n", __func__=
-,
-> +                            ret);
-> +                       ret =3D -EINVAL;
-> +                       break;
-> +               }
-> +               ipa =3D next;
-> +       }
-> +
-> +       if (ripas =3D=3D RMI_EMPTY && ipa !=3D start)
-> +               kvm_realm_unmap_range(kvm, start, ipa - start, true);
-> +
-> +       return ret;
-> +}
-> +
-> +static int realm_init_ipa_state(struct realm *realm,
-> +                               unsigned long ipa,
-> +                               unsigned long end)
-> +{
-> +       phys_addr_t rd_phys =3D virt_to_phys(realm->rd);
-> +       int ret;
-> +
-> +       while (ipa < end) {
-> +               unsigned long next;
-> +
-> +               ret =3D rmi_rtt_init_ripas(rd_phys, ipa, end, &next);
-> +
-> +               if (RMI_RETURN_STATUS(ret) =3D=3D RMI_ERROR_RTT) {
-> +                       int err_level =3D RMI_RETURN_INDEX(ret);
-> +                       int level =3D find_map_level(realm, ipa, end);
-> +
-> +                       if (WARN_ON(err_level >=3D level))
-> +                               return -ENXIO;
-> +
-> +                       ret =3D realm_create_rtt_levels(realm, ipa,
-> +                                                     err_level,
-> +                                                     level, NULL);
-> +                       if (ret)
-> +                               return ret;
-> +                       /* Retry with the RTT levels in place */
-> +                       continue;
-> +               } else if (WARN_ON(ret)) {
-> +                       return -ENXIO;
-> +               }
-> +
-> +               ipa =3D next;
-> +       }
-> +
-> +       return 0;
-> +}
-> +
-> +static int kvm_init_ipa_range_realm(struct kvm *kvm,
-> +                                   struct kvm_cap_arm_rme_init_ipa_args =
-*args)
-> +{
-> +       int ret =3D 0;
-> +       gpa_t addr, end;
-> +       struct realm *realm =3D &kvm->arch.realm;
-> +
-> +       addr =3D args->init_ipa_base;
-> +       end =3D addr + args->init_ipa_size;
-> +
-> +       if (end < addr)
-> +               return -EINVAL;
-> +
-> +       if (kvm_realm_state(kvm) !=3D REALM_STATE_NEW)
-> +               return -EINVAL;
-> +
-> +       ret =3D realm_init_ipa_state(realm, addr, end);
-> +
-> +       return ret;
-> +}
-> +
->  /* Protects access to rme_vmid_bitmap */
->  static DEFINE_SPINLOCK(rme_vmid_lock);
->  static unsigned long *rme_vmid_bitmap;
-> @@ -418,6 +796,18 @@ int kvm_realm_enable_cap(struct kvm *kvm, struct kvm=
-_enable_cap *cap)
->         case KVM_CAP_ARM_RME_CREATE_RD:
->                 r =3D kvm_create_realm(kvm);
->                 break;
-> +       case KVM_CAP_ARM_RME_INIT_IPA_REALM: {
-> +               struct kvm_cap_arm_rme_init_ipa_args args;
-> +               void __user *argp =3D u64_to_user_ptr(cap->args[1]);
-> +
-> +               if (copy_from_user(&args, argp, sizeof(args))) {
-> +                       r =3D -EFAULT;
-> +                       break;
-> +               }
-> +
-> +               r =3D kvm_init_ipa_range_realm(kvm, &args);
-> +               break;
-> +       }
->         default:
->                 r =3D -EINVAL;
->                 break;
-> --
-> 2.34.1
->
+On ARM64, it is not currently possible to use CPUs where the GICC entry
+in ACPI specifies that it is online capable but not enabled. Only
+always enabled entries are supported.
+
+Previously if this condition was met, the present and possible cpu masks
+were cleared for the relevant cpus.  However, those masks may already
+have been used by other code so this is not known to be safe.
+
+An alternative is to use an additional mask (broken) and check that
+in the subset of places where these CPUs might be onlined or the
+infrastructure to indicate this is possible created.
+Specifically in bringup_nonboot_cpus() and in arch_register_cpu().
+
+Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+---
+ arch/arm64/kernel/smp.c      |  3 +++
+ drivers/irqchip/irq-gic-v3.c |  3 +--
+ include/linux/cpumask.h      | 19 +++++++++++++++++++
+ kernel/cpu.c                 |  8 +++++++-
+ 4 files changed, 30 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm64/kernel/smp.c b/arch/arm64/kernel/smp.c
+index ccb6ad347df9..39cd6a7c40d8 100644
+--- a/arch/arm64/kernel/smp.c
++++ b/arch/arm64/kernel/smp.c
+@@ -513,6 +513,9 @@ int arch_register_cpu(int cpu)
+ 	    IS_ENABLED(CONFIG_ACPI_HOTPLUG_CPU))
+ 		return -EPROBE_DEFER;
+=20
++	if (cpu_broken(cpu)) /* Inconsistent firmware - can't online */
++		return -ENODEV;
++
+ #ifdef CONFIG_ACPI_HOTPLUG_CPU
+ 	/* For now block anything that looks like physical CPU Hotplug */
+ 	if (invalid_logical_cpuid(cpu) || !cpu_present(cpu)) {
+diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
+index 66132251c1bb..a0063eb6484d 100644
+--- a/drivers/irqchip/irq-gic-v3.c
++++ b/drivers/irqchip/irq-gic-v3.c
+@@ -2377,8 +2377,7 @@ gic_acpi_parse_madt_gicc(union acpi_subtable_headers =
+*header,
+ 	 */
+ 	if (!(gicc->flags & ACPI_MADT_ENABLED)) {
+ 		pr_warn_once("CPU %u's redistributor is inaccessible: this CPU can't be =
+brought online\n", cpu);
+-		set_cpu_present(cpu, false);
+-		set_cpu_possible(cpu, false);
++		set_cpu_broken(cpu);
+ 		return 0;
+ 	}
+=20
+diff --git a/include/linux/cpumask.h b/include/linux/cpumask.h
+index 4b202b94c97a..70a93ad8e590 100644
+--- a/include/linux/cpumask.h
++++ b/include/linux/cpumask.h
+@@ -96,6 +96,7 @@ static inline void set_nr_cpu_ids(unsigned int nr)
+  *     cpu_enabled_mask  - has bit 'cpu' set iff cpu can be brought online
+  *     cpu_online_mask  - has bit 'cpu' set iff cpu available to scheduler
+  *     cpu_active_mask  - has bit 'cpu' set iff cpu available to migration
++ *     cpu_broken_mask  - has bit 'cpu' set iff the cpu should never be on=
+lined
+  *
+  *  If !CONFIG_HOTPLUG_CPU, present =3D=3D possible, and active =3D=3D onl=
+ine.
+  *
+@@ -130,12 +131,14 @@ extern struct cpumask __cpu_enabled_mask;
+ extern struct cpumask __cpu_present_mask;
+ extern struct cpumask __cpu_active_mask;
+ extern struct cpumask __cpu_dying_mask;
++extern struct cpumask __cpu_broken_mask;
+ #define cpu_possible_mask ((const struct cpumask *)&__cpu_possible_mask)
+ #define cpu_online_mask   ((const struct cpumask *)&__cpu_online_mask)
+ #define cpu_enabled_mask   ((const struct cpumask *)&__cpu_enabled_mask)
+ #define cpu_present_mask  ((const struct cpumask *)&__cpu_present_mask)
+ #define cpu_active_mask   ((const struct cpumask *)&__cpu_active_mask)
+ #define cpu_dying_mask    ((const struct cpumask *)&__cpu_dying_mask)
++#define cpu_broken_mask   ((const struct cpumask *)&__cpu_broken_mask)
+=20
+ extern atomic_t __num_online_cpus;
+=20
+@@ -1073,6 +1076,12 @@ set_cpu_dying(unsigned int cpu, bool dying)
+ 		cpumask_clear_cpu(cpu, &__cpu_dying_mask);
+ }
+=20
++static inline void
++set_cpu_broken(unsigned int cpu)
++{
++	cpumask_set_cpu(cpu, &__cpu_broken_mask);
++}
++
+ /**
+  * to_cpumask - convert a NR_CPUS bitmap to a struct cpumask *
+  * @bitmap: the bitmap
+@@ -1159,6 +1168,11 @@ static inline bool cpu_dying(unsigned int cpu)
+ 	return cpumask_test_cpu(cpu, cpu_dying_mask);
+ }
+=20
++static inline bool cpu_broken(unsigned int cpu)
++{
++	return cpumask_test_cpu(cpu, cpu_broken_mask);
++}
++
+ #else
+=20
+ #define num_online_cpus()	1U
+@@ -1197,6 +1211,11 @@ static inline bool cpu_dying(unsigned int cpu)
+ 	return false;
+ }
+=20
++static inline bool cpu_broken(unsigned int cpu)
++{
++	return false;
++}
++
+ #endif /* NR_CPUS > 1 */
+=20
+ #define cpu_is_offline(cpu)	unlikely(!cpu_online(cpu))
+diff --git a/kernel/cpu.c b/kernel/cpu.c
+index 537099bf5d02..f8b73a11869e 100644
+--- a/kernel/cpu.c
++++ b/kernel/cpu.c
+@@ -1907,12 +1907,15 @@ static inline bool cpuhp_bringup_cpus_parallel(unsi=
+gned int ncpus) { return fals
+=20
+ void __init bringup_nonboot_cpus(unsigned int max_cpus)
+ {
++	static const struct cpumask tmp_mask __initdata;
++
+ 	/* Try parallel bringup optimization if enabled */
+ 	if (cpuhp_bringup_cpus_parallel(max_cpus))
+ 		return;
+=20
++	cpumask_andnot(&tmp_mask, cpu_present_mask, cpu_broken_mask);
+ 	/* Full per CPU serialized bringup */
+-	cpuhp_bringup_mask(cpu_present_mask, max_cpus, CPUHP_ONLINE);
++	cpuhp_bringup_mask(&tmp_mask, max_cpus, CPUHP_ONLINE);
+ }
+=20
+ #ifdef CONFIG_PM_SLEEP_SMP
+@@ -3129,6 +3132,9 @@ EXPORT_SYMBOL(__cpu_active_mask);
+ struct cpumask __cpu_dying_mask __read_mostly;
+ EXPORT_SYMBOL(__cpu_dying_mask);
+=20
++struct cpumask __cpu_broken_mask __ro_after_init;
++EXPORT_SYMBOL(__cpu_broken_mask);
++
+ atomic_t __num_online_cpus __read_mostly;
+ EXPORT_SYMBOL(__num_online_cpus);
+=20
+--=20
+2.39.2
+
+
+>=20
+>=20
+> >=20
+> > Jonathan
+> >=20
+> >=20
+> >=20
+> >=20
+> >=20
+> >=20
+> >  =20
+> > >=20
+> > > Thanks,
+> > >=20
+> > > 	M.
+> > >    =20
+> >=20
+> >=20
+> > _______________________________________________
+> > linux-arm-kernel mailing list
+> > linux-arm-kernel@lists.infradead.org
+> > http://lists.infradead.org/mailman/listinfo/linux-arm-kernel =20
+>=20
+>=20
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+
