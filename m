@@ -1,86 +1,159 @@
-Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A275762D0
-	for <kvmarm@lists.linux.dev>; Wed, 24 Apr 2024 19:39:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47E594C98;
+	Thu, 25 Apr 2024 01:20:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713987600; cv=none; b=TJOiRDi2MiXyfy41AQDAH7I1azqV+yyTP6T7HD9qs84L/GHJm8hkIas6GkpdqySacCn57ggC/k6RJNxU5mIqtnWBgnpHE28JaTvtThQzCwdl2upHAG/iUK0mAj1t+VWRTu6xllUiR1hQ6tZI3YAuTn9UTSLlBNlwe4iL4Yvu9Dc=
+	t=1714008041; cv=none; b=FZu8nbWo0DwVIqrNp2x2LwVhwOHncXY5EVVc5noJp2F41dBzG/BnM+QQm8BJjeYOl8o9iCbg2sHRhRYT7G/QSDgy2K+fKT1owb9AZk9LyO4akCDfnzFb8xlwp6iG8iZGFHKgWIww5/s7xcCYDe9EgdeX8Nf8BmT4yI57X+IamGw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713987600; c=relaxed/simple;
-	bh=q7Pkz/P5Q1r9S/MSK+iYJj9CNTw0dzw9TJVCoC1wWDk=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=kFzIl8ZgmdQI9ma4d/NyCZbz7ISvw0PQ/ibT+/zLcNSkeT5g2LVaRC1XdKA4SGJytyAL08F0aQp+8CbuwRk+VTvJSkywdtUctMbrwX8sgrMLd6YJ5qIyAOpbFKgWOqi0PaMXDwUCcRfwqLk2cVuLhhz/uZF5BE+RWMCtW2ikNPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Icj8gA8i; arc=none smtp.client-ip=95.215.58.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Icj8gA8i"
-Date: Wed, 24 Apr 2024 12:39:46 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1713987595;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=cnPjgTMvR9FofAPW9yyaIH0hPQvBC2RXg4lyU2FvoVE=;
-	b=Icj8gA8i13X0T1evVK/wfxqWP6zSZZQozIiD6J9Qo7jPnDMvHGpeVJAFTK1wM7wiNQGbX7
-	px9sJWpr5n6CpDcp67NgRCzDtv0nIPBMH1VdQPmsvqH349cpE7E9sRu8noljYBlHR5Gdr/
-	LnknUHHxcWwtlWXTDg+0gKTs+1O6KBI=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, Zenghui Yu <yuzenghui@huawei.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Dmitry Vyukov <dvyukov@google.com>,
-	James Morse <james.morse@arm.com>,
-	Alexander Potapenko <glider@google.com>
-Subject: [GIT PULL] KVM/arm64 fixes for 6.9, part #2
-Message-ID: <ZilgAmeusaMd_UeZ@linux.dev>
+	s=arc-20240116; t=1714008041; c=relaxed/simple;
+	bh=zL62D1yctwFMaxehdNJzXgBvgzYkbKTm0HHQpGl9Tf0=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=GNEPEsYdJ4pazpAJrUbQx4ZULQRgXtYRKClf5EtQkykyRbLcAA/NSC6VDRVCDtAxmPeCIfyR43+kI973dMDVsFsy6qImhUWu7wGfM+X5HYNW+Np6vn65EIkZ/DNLTX/9COwdFw8eQOgsODBjctiIatcsyuqbZy5Ui5BIa84O1ac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4VPydF6KhCztT1D;
+	Thu, 25 Apr 2024 09:17:21 +0800 (CST)
+Received: from dggpemm500002.china.huawei.com (unknown [7.185.36.229])
+	by mail.maildlp.com (Postfix) with ESMTPS id 4C9A7180080;
+	Thu, 25 Apr 2024 09:20:33 +0800 (CST)
+Received: from [10.174.178.247] (10.174.178.247) by
+ dggpemm500002.china.huawei.com (7.185.36.229) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 25 Apr 2024 09:20:32 +0800
+Subject: Re: [PATCH v7 04/16] ACPI: processor: Move checks and availability of
+ acpi_processor earlier
+To: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+CC: Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra
+	<peterz@infradead.org>, <linux-pm@vger.kernel.org>,
+	<loongarch@lists.linux.dev>, <linux-acpi@vger.kernel.org>,
+	<linux-arch@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<x86@kernel.org>, Russell King <linux@armlinux.org.uk>, "Rafael J . Wysocki"
+	<rafael@kernel.org>, Miguel Luis <miguel.luis@oracle.com>, James Morse
+	<james.morse@arm.com>, Salil Mehta <salil.mehta@huawei.com>, Jean-Philippe
+ Brucker <jean-philippe@linaro.org>, Catalin Marinas
+	<catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Ingo Molnar
+	<mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+	<dave.hansen@linux.intel.com>, <linuxarm@huawei.com>, <justin.he@arm.com>,
+	<jianyong.wu@arm.com>
+References: <20240418135412.14730-1-Jonathan.Cameron@huawei.com>
+ <20240418135412.14730-5-Jonathan.Cameron@huawei.com>
+ <0cfc4e2d-65ab-0040-2c7d-fad83f32455b@huawei.com>
+ <20240424181857.00000e0f@Huawei.com>
+From: Hanjun Guo <guohanjun@huawei.com>
+Message-ID: <56cdbd13-d7c8-4f02-64f0-216b72847e45@huawei.com>
+Date: Thu, 25 Apr 2024 09:20:31 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20240424181857.00000e0f@Huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpemm500002.china.huawei.com (7.185.36.229)
 
-Hi Paolo,
+On 2024/4/25 1:18, Jonathan Cameron wrote:
+> On Tue, 23 Apr 2024 19:53:34 +0800
+> Hanjun Guo <guohanjun@huawei.com> wrote:
+> 
+>>> @@ -232,6 +263,7 @@ static int acpi_processor_get_info(struct acpi_device *device)
+>>>    	acpi_status status = AE_OK;
+>>>    	static int cpu0_initialized;
+>>>    	unsigned long long value;
+>>> +	int ret;
+>>>    
+>>>    	acpi_processor_errata();
+>>>    
+>>> @@ -316,10 +348,12 @@ static int acpi_processor_get_info(struct acpi_device *device)
+>>>    	 *  because cpuid <-> apicid mapping is persistent now.
+>>>    	 */
+>>>    	if (invalid_logical_cpuid(pr->id) || !cpu_present(pr->id)) {
+>>> -		int ret = acpi_processor_hotadd_init(pr);
+>>> +		ret = acpi_processor_hotadd_init(pr, device);
+>>>    
+>>>    		if (ret)
+>>> -			return ret;
+>>> +			goto err;
+>>> +	} else {
+>>> +		acpi_processor_set_per_cpu(pr, device);
+>>>    	}
+>>>    
+>>>    	/*
+>>> @@ -357,6 +391,10 @@ static int acpi_processor_get_info(struct acpi_device *device)
+>>>    		arch_fix_phys_package_id(pr->id, value);
+>>>    
+>>>    	return 0;
+>>> +
+>>> +err:
+>>> +	per_cpu(processors, pr->id) = NULL;
+>>
+>> ...
+>>
+>>> +	return ret;
+>>>    }
+>>>    
+>>>    /*
+>>> @@ -365,8 +403,6 @@ static int acpi_processor_get_info(struct acpi_device *device)
+>>>     * (cpu_data(cpu)) values, like CPU feature flags, family, model, etc.
+>>>     * Such things have to be put in and set up by the processor driver's .probe().
+>>>     */
+>>> -static DEFINE_PER_CPU(void *, processor_device_array);
+>>> -
+>>>    static int acpi_processor_add(struct acpi_device *device,
+>>>    					const struct acpi_device_id *id)
+>>>    {
+>>> @@ -395,28 +431,6 @@ static int acpi_processor_add(struct acpi_device *device,
+>>>    	if (result) /* Processor is not physically present or unavailable */
+>>>    		return 0;
+>>>    
+>>> -	BUG_ON(pr->id >= nr_cpu_ids);
+>>> -
+>>> -	/*
+>>> -	 * Buggy BIOS check.
+>>> -	 * ACPI id of processors can be reported wrongly by the BIOS.
+>>> -	 * Don't trust it blindly
+>>> -	 */
+>>> -	if (per_cpu(processor_device_array, pr->id) != NULL &&
+>>> -	    per_cpu(processor_device_array, pr->id) != device) {
+>>> -		dev_warn(&device->dev,
+>>> -			"BIOS reported wrong ACPI id %d for the processor\n",
+>>> -			pr->id);
+>>> -		/* Give up, but do not abort the namespace scan. */
+>>> -		goto err;
+>>> -	}
+>>> -	/*
+>>> -	 * processor_device_array is not cleared on errors to allow buggy BIOS
+>>> -	 * checks.
+>>> -	 */
+>>> -	per_cpu(processor_device_array, pr->id) = device;
+>>> -	per_cpu(processors, pr->id) = pr;
+>>
+>> Nit: seems we need to remove the duplicated
+>> per_cpu(processors, pr->id) = NULL; in acpi_processor_add():
+>>
+>> --- a/drivers/acpi/acpi_processor.c
+>> +++ b/drivers/acpi/acpi_processor.c
+>> @@ -446,7 +446,6 @@ static int acpi_processor_add(struct acpi_device
+>> *device,
+>>     err:
+>>           free_cpumask_var(pr->throttling.shared_cpu_map);
+>>           device->driver_data = NULL;
+>> -       per_cpu(processors, pr->id) = NULL;
+> 
+> I don't follow.  This path is used if processor_get_info() succeeded and
+> we later fail.  I don't see where the the duplication is?
 
-Single fix this time around for a rather straightforward NULL
-dereference in one of the vgic ioctls, along with a reproducer I've
-added as a testcase in selftests.
+It is! Thanks for the clarification.
 
-Please pull.
-
--- 
-Thanks,
-Oliver
-
-The following changes since commit fec50db7033ea478773b159e0e2efb135270e3b7:
-
-  Linux 6.9-rc3 (2024-04-07 13:22:46 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.9-2
-
-for you to fetch changes up to 160933e330f4c5a13931d725a4d952a4b9aefa71:
-
-  KVM: selftests: Add test for uaccesses to non-existent vgic-v2 CPUIF (2024-04-24 19:09:36 +0000)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for 6.9, part #2
-
-- Fix + test for a NULL dereference resulting from unsanitised user
-  input in the vgic-v2 device attribute accessors
-
-----------------------------------------------------------------
-Oliver Upton (2):
-      KVM: arm64: vgic-v2: Check for non-NULL vCPU in vgic_v2_parse_attr()
-      KVM: selftests: Add test for uaccesses to non-existent vgic-v2 CPUIF
-
- arch/arm64/kvm/vgic/vgic-kvm-device.c           |  8 ++--
- tools/testing/selftests/kvm/aarch64/vgic_init.c | 49 +++++++++++++++++++++++++
- 2 files changed, 53 insertions(+), 4 deletions(-)
+Thanks
+Hanjun
