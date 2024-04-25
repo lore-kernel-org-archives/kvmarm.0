@@ -1,231 +1,127 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDA1C143895;
-	Thu, 25 Apr 2024 12:31:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82A171494AF;
+	Thu, 25 Apr 2024 12:33:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714048320; cv=none; b=PiBkKRyQONJ4QWzh0dGl2ccvMZJL4Y32RyaJOxFVHth1qI0bL8zjS7JX0pNJvTgVHdN+yJkDcLtur0dCUn6IiiXkhKjveDyHMvMJSRH6ab5/uVvDHqMGCNeZt+jhT9jeYHh40zod1F2+FS10aVAy25VP2otrPlEHnpZkHzW9X7U=
+	t=1714048389; cv=none; b=thbG0AUEhAFbfqN9dxZ4MSEeGwlcvPbVcGSoWfaKKHy0vhb58j/P1TE9QUhBqDptp7W5DyM9Q07EsDicn2lomYvfhpSN1SZ/oegd11ED6gMy114kr7EZ2uFx3GINpSc2+lyj1gxCNnksnZOoz7uEGShDGleimuMsqnWTeYCIjsU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714048320; c=relaxed/simple;
-	bh=whSp5cqil5xFhRRdjAyrS5AlI1HyOK8o5KQbJYN9Vbw=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=G96eIYZfp4mJ594S2wvgMC0f30MOToAoNWItTofrOMeGYVBP/ANB9sjsyyJThY+gu7wt3UBTIUH1tBiHtFfbMyh+V9XV5AEMsPIiAlWdDQVhW1Dzyuj4tQr70SZIVCgx7J0bxjumCrJBdH6kGPXEJBA7FUplbgNYcfyTAGQNbc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4VQFXp3b2qz6JBTq;
-	Thu, 25 Apr 2024 20:29:30 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id BF8881400DD;
-	Thu, 25 Apr 2024 20:31:52 +0800 (CST)
-Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Thu, 25 Apr
- 2024 13:31:52 +0100
-Date: Thu, 25 Apr 2024 13:31:50 +0100
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: Marc Zyngier <maz@kernel.org>
-CC: Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra
-	<peterz@infradead.org>, <linux-pm@vger.kernel.org>,
-	<loongarch@lists.linux.dev>, <linux-acpi@vger.kernel.org>,
-	<linux-arch@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<x86@kernel.org>, Russell King <linux@armlinux.org.uk>, "Rafael J . Wysocki"
-	<rafael@kernel.org>, Miguel Luis <miguel.luis@oracle.com>, "James Morse"
-	<james.morse@arm.com>, Salil Mehta <salil.mehta@huawei.com>, Jean-Philippe
- Brucker <jean-philippe@linaro.org>, Catalin Marinas
-	<catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
-	<linuxarm@huawei.com>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov
-	<bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
-	<justin.he@arm.com>, <jianyong.wu@arm.com>
-Subject: Re: [PATCH v7 11/16] irqchip/gic-v3: Add support for ACPI's
- disabled but 'online capable' CPUs
-Message-ID: <20240425133150.000009fa@Huawei.com>
-In-Reply-To: <86il06rd19.wl-maz@kernel.org>
-References: <20240418135412.14730-1-Jonathan.Cameron@huawei.com>
-	<20240418135412.14730-12-Jonathan.Cameron@huawei.com>
-	<20240422114020.0000294f@Huawei.com>
-	<87plugthim.wl-maz@kernel.org>
-	<20240424135438.00001ffc@huawei.com>
-	<86il06rd19.wl-maz@kernel.org>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	s=arc-20240116; t=1714048389; c=relaxed/simple;
+	bh=B3vHwjyjqH1ixQmXgi7bGPwG/IbnE1RHJRVIK2Jscmc=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qNhO8oy01sOta0bawau2s/yMpLO4aZTmjvwlvdpQFciDlspaHx4LKTk1WdSStIyeSLR4qe+NfliprF+83TOgZcdqpRkDkuNPL64eb4S3MOhO2y+9GdmV2Ms+90SGSXClPnGHxZ6GOUAfPHbTe9UP5Ty1sskwtwSUKj9nLw8Ltj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B+feseYX; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B+feseYX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 212CAC113CC;
+	Thu, 25 Apr 2024 12:33:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714048389;
+	bh=B3vHwjyjqH1ixQmXgi7bGPwG/IbnE1RHJRVIK2Jscmc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=B+feseYXdjhpRwi/N3M7dtSkOqvGP3+/hGe1qwabvjbtM/vzcDor6L1dtZBrpJI/m
+	 2e5iglQpMpeNx5/HwPX6gSrgoNJAcyzptNp+4fwPjaR9X3bG5ceagXF5JKDGVdu9OB
+	 t2BuFAt6UtW33fXzI4RaKDY6/fOwSNFlJLJ2E8BF/RHu4QhX1+3gRN77gFQKy5TcU2
+	 iPr7+jCvPrLamcV6m3XZNYTOr0ArXrpNdEPIE9XK0WkX1BO+Zin5VQqqjxIAMEwAAO
+	 Ba6o0OnU9fAILD6osUSZOyQbIq/MnV1Iow2k3ww2yx6r0EuFLdaPt8u7N67CpIDhFY
+	 6nMaUoLYhfTcw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rzyHi-007tW9-PC;
+	Thu, 25 Apr 2024 13:33:06 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	Oliver Upton <oliver.upton@linux.dev>
+Cc: James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH v3 00/19] KVM: arm64: Transition to a per-ITS translation cache
+Date: Thu, 25 Apr 2024 13:33:03 +0100
+Message-Id: <171404835709.2338103.11155685781713839680.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240422200158.2606761-1-oliver.upton@linux.dev>
+References: <20240422200158.2606761-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100006.china.huawei.com (7.191.160.224) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, eric.auger@redhat.com, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 24 Apr 2024 16:33:22 +0100
-Marc Zyngier <maz@kernel.org> wrote:
-
-> On Wed, 24 Apr 2024 13:54:38 +0100,
-> Jonathan Cameron <Jonathan.Cameron@huawei.com> wrote:
-> > 
-> > On Tue, 23 Apr 2024 13:01:21 +0100
-> > Marc Zyngier <maz@kernel.org> wrote:
-> >   
-> > > On Mon, 22 Apr 2024 11:40:20 +0100,
-> > > Jonathan Cameron <Jonathan.Cameron@Huawei.com> wrote:  
-> > > > 
-> > > > On Thu, 18 Apr 2024 14:54:07 +0100
-> > > > Jonathan Cameron <Jonathan.Cameron@huawei.com> wrote:  
+On Mon, 22 Apr 2024 20:01:39 +0000, Oliver Upton wrote:
+> v2: https://lore.kernel.org/kvmarm/20240419223842.951452-1-oliver.upton@linux.dev/
+> 
+> v2 -> v3:
+>  - Add lockdep assertion to kvm_vfio_create() (Sean)
+>  - Address intermediate compilation issue in vgic_its_invalidate_cache()
+>    (Marc)
+>  - Use a more compact cache index based on the DID/EID range of the ITS
+>    (Marc)
+>  - Comment improvements (Marc)
+>  - Avoid explicit acquisition of the translation cache's xa_lock()
+>    (Marc)
+>  - Eliminate the need to disable IRQs to acquire the translation cache's
+>    xa_lock()
+>  - Collapse internal helper into vgic_its_check_cache()
 > 
 > [...]
-> 
-> > > >     
-> > > > > +	/*
-> > > > > +	 * Capable but disabled CPUs can be brought online later. What about
-> > > > > +	 * the redistributor? ACPI doesn't want to say!
-> > > > > +	 * Virtual hotplug systems can use the MADT's "always-on" GICR entries.
-> > > > > +	 * Otherwise, prevent such CPUs from being brought online.
-> > > > > +	 */
-> > > > > +	if (!(gicc->flags & ACPI_MADT_ENABLED)) {
-> > > > > +		pr_warn_once("CPU %u's redistributor is inaccessible: this CPU can't be brought online\n", cpu);
-> > > > > +		set_cpu_present(cpu, false);
-> > > > > +		set_cpu_possible(cpu, false);
-> > > > > +		return 0;
-> > > > > +	}    
-> > > 
-> > > It seems dangerous to clear those this late in the game, given how
-> > > disconnected from the architecture code this is. Are we sure that
-> > > nothing has sampled these cpumasks beforehand?  
-> > 
-> > Hi Marc,
-> > 
-> > Any firmware that does this is being considered as buggy already
-> > but given it is firmware and the spec doesn't say much about this,
-> > there is always the possibility.  
-> 
-> There is no shortage of broken firmware out there, and I expect this
-> trend to progress.
-> 
-> > Not much happens between the point where these are setup and
-> > the point where the the gic inits and this code runs, but even if careful
-> > review showed it was fine today, it will be fragile to future changes.
-> > 
-> > I'm not sure there is a huge disadvantage for such broken firmware in
-> > clearing these masks from the point of view of what is used throughout
-> > the rest of the kernel. Here I think we are just looking to prevent the CPU
-> > being onlined later.  
-> 
-> I totally agree on the goal, I simply question the way you get to it.
-> 
-> > 
-> > We could add a set_cpu_broken() with appropriate mask.
-> > Given this is very arm64 specific I'm not sure Rafael will be keen on
-> > us checking such a mask in the generic ACPI code, but we could check it in
-> > arch_register_cpu() and just not register the cpu if it matches.
-> > That will cover the vCPU hotplug case.
-> >
-> > Does that sounds sensible, or would you prefer something else?  
-> 
-> 
-> Such a 'broken_rdists' mask is exactly what I have in mind, just
-> keeping it private to the GIC driver, and not expose it anywhere else.
-> You can then fail the hotplug event early, and avoid changing the
-> global masks from within the GIC driver. At least, we don't mess with
-> the internals of the kernel, and the CPU is properly marked as dead
-> (that mechanism should already work).
-> 
-> I'd expect the handling side to look like this (will not compile, but
-> you'll get the idea):
-Hi Marc,
 
-In general this looks good - but...
+Applied to next, thanks!
 
-I haven't gotten to the bottom of why yet (and it might be a side
-effect of how I hacked the test by lying in minimal fashion and
-just frigging the MADT read functions) but the hotplug flow is only getting
-as far as calling __cpu_up() before it seems to enter an infinite loop.
-That is it never gets far enough to fail this test.
+[01/19] KVM: Treat the device list as an rculist
+        commit: ea54dd374232cc3b6d0ac0a89d715d61ebb04bf6
+[02/19] KVM: arm64: vgic-its: Walk LPI xarray in its_sync_lpi_pending_table()
+        commit: 720f73b750e66ca753c56c29801009c28bb484ac
+[03/19] KVM: arm64: vgic-its: Walk LPI xarray in vgic_its_invall()
+        commit: c64115c80fc8abacfb89c36d650b7021ebb3d739
+[04/19] KVM: arm64: vgic-its: Walk LPI xarray in vgic_its_cmd_handle_movall()
+        commit: 11f4f8f3e6e0697fb640d5c6c79b27c2233bc3da
+[05/19] KVM: arm64: vgic-debug: Use an xarray mark for debug iterator
+        commit: 85d3ccc8b75bb5a443edb3c42fa22e97da2e60ec
+[06/19] KVM: arm64: vgic-its: Get rid of vgic_copy_lpi_list()
+        commit: 30a0ce9c4928640efd3112d01d432d0778878b7e
+[07/19] KVM: arm64: vgic-its: Scope translation cache invalidations to an ITS
+        commit: c09c8ab99a8afb24f6b4a6bc7c2767fec348ae81
+[08/19] KVM: arm64: vgic-its: Maintain a translation cache per ITS
+        commit: 8201d1028caa4fae88e222c4e8cf541fdf45b821
+[09/19] KVM: arm64: vgic-its: Spin off helper for finding ITS by doorbell addr
+        commit: dedfcd17faf8718f4842e7fbfcd2e7026854d7f5
+[10/19] KVM: arm64: vgic-its: Use the per-ITS translation cache for injection
+        commit: e64f2918c6e7a2c2cbf310d1b571d1a886b91475
+[11/19] KVM: arm64: vgic-its: Rip out the global translation cache
+        commit: ec39bbfd55d07de2e2d4111f35c7ad9523c89ec3
+[12/19] KVM: arm64: vgic-its: Get rid of the lpi_list_lock
+        commit: 481c9ee846d27c72acc0c3bb23025c7fdad8c171
+[13/19] KVM: selftests: Align with kernel's GIC definitions
+        commit: d82689bdd828833bd582c2bf7a85071cacb52990
+[14/19] KVM: selftests: Standardise layout of GIC frames
+        commit: 1505bc70f80df9824e9d68d15a7452856df7488c
+[15/19] KVM: selftests: Add quadword MMIO accessors
+        commit: 232269eb7dd5242877abfab1d47a1eb049a44b95
+[16/19] KVM: selftests: Add a minimal library for interacting with an ITS
+        commit: be26db61e880b3892f189e9ef54b7b80599245bf
+[17/19] KVM: selftests: Add helper for enabling LPIs on a redistributor
+        commit: 03e560ab539009856266b0cf8c100c9f7d1f8fee
+[18/19] KVM: selftests: Use MPIDR_HWID_BITMASK from cputype.h
+        commit: c3c369b508d9a447436b7abb2fded9aec18953ff
+[19/19] KVM: selftests: Add stress test for LPI injection
+        commit: 96d36ad95b03c89857d405b3317efb0188ac59cb
 
-Getting stuck in a psci cpu_on call.  I'm guessing something that
-we didn't get to in the earlier gicv3 calls before bailing out is blocking that?
-Looks like it gets to
-SMCCC smc
-and is never seen again.
+Cheers,
 
-Any ideas on where to look?  The one advantage so far of the higher level
-approach is we never tried the hotplug callbacks at all so avoided hitting
-that call.  One (little bit horrible) solution that might avoid this would 
-be to add another cpuhp state very early on and fail at that stage.
-I'm not keen on doing that without a better explanation than I have so far!
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
 
-Thanks,
-
-J
-
- 
-> diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
-> index 6fb276504bcc..e8f02bfd0e21 100644
-> --- a/drivers/irqchip/irq-gic-v3.c
-> +++ b/drivers/irqchip/irq-gic-v3.c
-> @@ -1009,6 +1009,9 @@ static int __gic_populate_rdist(struct redist_region *region, void __iomem *ptr)
->  	u64 typer;
->  	u32 aff;
->  
-> +	if (cpumask_test_cpu(smp_processor_id(), &broken_rdists))
-> +		return 1;
-> +
->  	/*
->  	 * Convert affinity to a 32bit value that can be matched to
->  	 * GICR_TYPER bits [63:32].
-> @@ -1260,14 +1263,15 @@ static int gic_dist_supports_lpis(void)
->  		!gicv3_nolpi);
->  }
->  
-> -static void gic_cpu_init(void)
-> +static int gic_cpu_init(void)
->  {
->  	void __iomem *rbase;
-> -	int i;
-> +	int ret, i;
->  
->  	/* Register ourselves with the rest of the world */
-> -	if (gic_populate_rdist())
-> -		return;
-> +	ret = gic_populate_rdist();
-> +	if (ret)
-> +		return ret;
->  
->  	gic_enable_redist(true);
->  
-> @@ -1286,6 +1290,8 @@ static void gic_cpu_init(void)
->  
->  	/* initialise system registers */
->  	gic_cpu_sys_reg_init();
-> +
-> +	return 0;
->  }
->  
->  #ifdef CONFIG_SMP
-> @@ -1295,7 +1301,11 @@ static void gic_cpu_init(void)
->  
->  static int gic_starting_cpu(unsigned int cpu)
->  {
-> -	gic_cpu_init();
-> +	int ret;
-> +
-> +	ret = gic_cpu_init();
-> +	if (ret)
-> +		return ret;
->  
->  	if (gic_dist_supports_lpis())
->  		its_cpu_init();
-> 
-> But the question is: do you rely on these masks having been
-> "corrected" anywhere else?
-> 
-> Thanks,
-> 
-> 	M.
-> 
 
