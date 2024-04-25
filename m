@@ -1,246 +1,158 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C7D6149C79;
-	Thu, 25 Apr 2024 15:00:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C292014A087
+	for <kvmarm@lists.linux.dev>; Thu, 25 Apr 2024 15:09:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714057227; cv=none; b=OiakgR4M9SB2h4Q37AUjp5VtZWz/xoDsT+lrLzyaqSlN+257d1LQmwcIAAO3fOODalfg9zrhZNPZkrYi9I1uEv/rlndGe9HR93TnyQNitLvDe2wziW1APO9j+0GFcrgmrufygC82yqgBL0QunNB1QdHwITc3DgVj9thh5W0jtio=
+	t=1714057793; cv=none; b=RuOv9DyJ2WdzaB0Z0I+YTRZCwhL83q/ca9hrL1npsC1bLTObcr1bE3tbsNNS34OaBZhqyttjNuXmGIuNYR3/dT+5VvPFvGyhvtl5wlLiaCl5ZQImFRF7rFsTvifHpkGQPzsiwvXAMu7je+/3Okd7vgX7mYXBNlzOUn5Xz7vYV68=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714057227; c=relaxed/simple;
-	bh=HvN8k9aDJPOql2/EPOWvZFEF30jxyxQy9xYUGmACbj4=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PKWEeAV3iyswAwojYmU66CFsfSL2ua5w+2FdsScB1R2GNlwAaxrhkPrZNi9hpZAdGx1u7NICkNkMbQAA8gVd8pQM51nK8Rz8iGb8fho4FoUP4UUmhZ/goxoAr+anoG26mlu2jGtfs7/R3cYMDr3gPnvayfxBL8SpYnUXWU5Nz6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.216])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4VQJtd31g7z6DBbS;
-	Thu, 25 Apr 2024 23:00:09 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id 917A4140736;
-	Thu, 25 Apr 2024 23:00:19 +0800 (CST)
-Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Thu, 25 Apr
- 2024 16:00:18 +0100
-Date: Thu, 25 Apr 2024 16:00:17 +0100
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: Marc Zyngier <maz@kernel.org>, <linuxarm@huawei.com>
-CC: Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra
-	<peterz@infradead.org>, <linux-pm@vger.kernel.org>,
-	<loongarch@lists.linux.dev>, <linux-acpi@vger.kernel.org>,
-	<linux-arch@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<x86@kernel.org>, Russell King <linux@armlinux.org.uk>, "Rafael J . Wysocki"
-	<rafael@kernel.org>, Miguel Luis <miguel.luis@oracle.com>, "James Morse"
-	<james.morse@arm.com>, Salil Mehta <salil.mehta@huawei.com>, Jean-Philippe
- Brucker <jean-philippe@linaro.org>, Catalin Marinas
-	<catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Ingo Molnar
-	<mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
-	<dave.hansen@linux.intel.com>, <justin.he@arm.com>, <jianyong.wu@arm.com>
-Subject: Re: [PATCH v7 11/16] irqchip/gic-v3: Add support for ACPI's
- disabled but 'online capable' CPUs
-Message-ID: <20240425155726.000063f7@huawei.com>
-In-Reply-To: <20240425133150.000009fa@Huawei.com>
-References: <20240418135412.14730-1-Jonathan.Cameron@huawei.com>
-	<20240418135412.14730-12-Jonathan.Cameron@huawei.com>
-	<20240422114020.0000294f@Huawei.com>
-	<87plugthim.wl-maz@kernel.org>
-	<20240424135438.00001ffc@huawei.com>
-	<86il06rd19.wl-maz@kernel.org>
-	<20240425133150.000009fa@Huawei.com>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	s=arc-20240116; t=1714057793; c=relaxed/simple;
+	bh=14ynkVWPzNhCtgD+Z9x14gnpSJO5GRO1ma5/65Lnzr4=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Y2dlu+z0bomQl+HC6kyTdYvtlJXDf3EU7uQSCGnZnHWK8ZZGp2KrurVTmDWBtEzBlvmgiCGXJfhKHe/hdnyWC9olewO3KPHsKUcc1qmXys4b9O64dC3U7ssC/ykgP7Wfz0aumovo+/oiJavFsIRZsy9owh6IaulIMY+fJnCyyqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hwmyWVh+; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hwmyWVh+"
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-61892d91207so19448937b3.3
+        for <kvmarm@lists.linux.dev>; Thu, 25 Apr 2024 08:09:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1714057791; x=1714662591; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=m1qzGW4ycfJBkwOtQag42BpB9F1dgLw6AsC1TpSQ/BE=;
+        b=hwmyWVh+ZyU6XDorW2GpCpoVnemr/+F2aNDNZe+YLzHmCltf8bJTntNNJGB44FI1/6
+         Fb0+RsS2h7F/xtS/AUaE0yxik/m0HIbJ0LBDyHOCxxzoIkS7V0FTYkuoQNxJ8tkZscoK
+         4EPybqXtjEgKtkFKeDxE9b9J3BgVu2vYNemgeDHFcgmwq2cEMZO8QQPLI7WsIJ1b2y/a
+         gzyFzQQCrVCpQMhbLvG4DSGmHtX2pIDq/7TKqne7pfDAGjBP5l7KArqA77NlQtoKDtph
+         ItfLEPsPAHh2XQ5yrKXmppAPwuIagy+lpMWMvFNzGesQARIplgnhBXAr/hdz4NKP1G9h
+         Cc/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714057791; x=1714662591;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=m1qzGW4ycfJBkwOtQag42BpB9F1dgLw6AsC1TpSQ/BE=;
+        b=NnO8NQplW5Pc7B/MR4mh1jtCVArdwuPLDQImaUBGNSY9Gdu9qOtgSMuVG3375kzFeD
+         VxWJ3Rki9CZS8mjgyY/P5Gv1lXqfxMqCH5HBr1x3fpBno/bQruYp3U4W57+HXWJmYUhB
+         BU2w1In25k6HxPhT3YTy4mRj6AVVYavB+beQeHzPEpkH1NL89L+bE3bS1QL4oTTpMkFl
+         EyKNePLRrv2Sb3O0pch8m6hMosMoeMk550LgfCwSTwdks8xY6RHt6WB0oXUrb2EeVbQv
+         37+Mn7vWZmP6jV2jcOjqCuKdv69tW/k24uIPw5prkQkshdNn2QlfwMfCDI6kH9pG1mt1
+         1HfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWkv7m3PlUhHTa9iYA/fLPo2c+beMlnBAWi7bbrrVYbSsc9WeIzemgAtSbxBTLK7XpD17V/883XrDBzYyEt83BiYos3anID
+X-Gm-Message-State: AOJu0YwFrSbi0LhNf6zEv1r3mUUwNo9g2r9m/VISMDB09bkA3Fwd0iWB
+	PYKCfihmolgiAhz9TcbBek87VA3g1hfkxDEphnjPQq6gtfS1SKHFAU9nJk3vVap70qlFsfvP0nv
+	nYA==
+X-Google-Smtp-Source: AGHT+IESJpACVh541xxXAQ9OLoBU3w6/mlBcJ1Y0e41i9MN7u+mraz/pMXzsHrFUz1aVf7/+mBldg/ztHFs=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:698a:0:b0:de4:c2d4:e14f with SMTP id
+ e132-20020a25698a000000b00de4c2d4e14fmr1617703ybc.11.1714057790783; Thu, 25
+ Apr 2024 08:09:50 -0700 (PDT)
+Date: Thu, 25 Apr 2024 08:09:49 -0700
+In-Reply-To: <3848a9ad-07aa-48da-a2b7-264c4a990b5b@linuxfoundation.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100006.china.huawei.com (7.191.160.224) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
+Mime-Version: 1.0
+References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-26-seanjc@google.com>
+ <69ae0694-8ca3-402c-b864-99b500b24f5d@moroto.mountain> <3848a9ad-07aa-48da-a2b7-264c4a990b5b@linuxfoundation.org>
+Message-ID: <ZipyPYR8Nv_usoU4@google.com>
+Subject: Re: [PATCH v13 25/35] KVM: selftests: Convert lib's mem regions to KVM_SET_USER_MEMORY_REGION2
+From: Sean Christopherson <seanjc@google.com>
+To: Shuah Khan <skhan@linuxfoundation.org>
+Cc: Dan Carpenter <dan.carpenter@linaro.org>, Shuah Khan <shuah@kernel.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, 
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
+	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
+	Anish Moorthy <amoorthy@google.com>, David Matlack <dmatlack@google.com>, 
+	Yu Zhang <yu.c.zhang@linux.intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	"=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?=" <mic@digikod.net>, Vlastimil Babka <vbabka@suse.cz>, 
+	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
+	Maciej Szmigiero <mail@maciej.szmigiero.name>, David Hildenbrand <david@redhat.com>, 
+	Quentin Perret <qperret@google.com>, Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, 
+	Naresh Kamboju <naresh.kamboju@linaro.org>, Anders Roxell <anders.roxell@linaro.org>, 
+	Benjamin Copeland <ben.copeland@linaro.org>
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, 25 Apr 2024 13:31:50 +0100
-Jonathan Cameron <Jonathan.Cameron@Huawei.com> wrote:
-
-> On Wed, 24 Apr 2024 16:33:22 +0100
-> Marc Zyngier <maz@kernel.org> wrote:
-> 
-> > On Wed, 24 Apr 2024 13:54:38 +0100,
-> > Jonathan Cameron <Jonathan.Cameron@huawei.com> wrote:  
+On Thu, Apr 25, 2024, Shuah Khan wrote:
+> On 4/25/24 08:12, Dan Carpenter wrote:
+> > On Fri, Oct 27, 2023 at 11:22:07AM -0700, Sean Christopherson wrote:
+> > > Use KVM_SET_USER_MEMORY_REGION2 throughout KVM's selftests library so that
+> > > support for guest private memory can be added without needing an entirely
+> > > separate set of helpers.
 > > > 
-> > > On Tue, 23 Apr 2024 13:01:21 +0100
-> > > Marc Zyngier <maz@kernel.org> wrote:
-> > >     
-> > > > On Mon, 22 Apr 2024 11:40:20 +0100,
-> > > > Jonathan Cameron <Jonathan.Cameron@Huawei.com> wrote:    
-> > > > > 
-> > > > > On Thu, 18 Apr 2024 14:54:07 +0100
-> > > > > Jonathan Cameron <Jonathan.Cameron@huawei.com> wrote:    
+> > > Note, this obviously makes selftests backwards-incompatible with older KVM
+> >    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> > > versions from this point forward.
+> >    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 > > 
-> > [...]
-> >   
-> > > > >       
-> > > > > > +	/*
-> > > > > > +	 * Capable but disabled CPUs can be brought online later. What about
-> > > > > > +	 * the redistributor? ACPI doesn't want to say!
-> > > > > > +	 * Virtual hotplug systems can use the MADT's "always-on" GICR entries.
-> > > > > > +	 * Otherwise, prevent such CPUs from being brought online.
-> > > > > > +	 */
-> > > > > > +	if (!(gicc->flags & ACPI_MADT_ENABLED)) {
-> > > > > > +		pr_warn_once("CPU %u's redistributor is inaccessible: this CPU can't be brought online\n", cpu);
-> > > > > > +		set_cpu_present(cpu, false);
-> > > > > > +		set_cpu_possible(cpu, false);
-> > > > > > +		return 0;
-> > > > > > +	}      
-> > > > 
-> > > > It seems dangerous to clear those this late in the game, given how
-> > > > disconnected from the architecture code this is. Are we sure that
-> > > > nothing has sampled these cpumasks beforehand?    
-> > > 
-> > > Hi Marc,
-> > > 
-> > > Any firmware that does this is being considered as buggy already
-> > > but given it is firmware and the spec doesn't say much about this,
-> > > there is always the possibility.    
-> > 
-> > There is no shortage of broken firmware out there, and I expect this
-> > trend to progress.
-> >   
-> > > Not much happens between the point where these are setup and
-> > > the point where the the gic inits and this code runs, but even if careful
-> > > review showed it was fine today, it will be fragile to future changes.
-> > > 
-> > > I'm not sure there is a huge disadvantage for such broken firmware in
-> > > clearing these masks from the point of view of what is used throughout
-> > > the rest of the kernel. Here I think we are just looking to prevent the CPU
-> > > being onlined later.    
-> > 
-> > I totally agree on the goal, I simply question the way you get to it.
-> >   
-> > > 
-> > > We could add a set_cpu_broken() with appropriate mask.
-> > > Given this is very arm64 specific I'm not sure Rafael will be keen on
-> > > us checking such a mask in the generic ACPI code, but we could check it in
-> > > arch_register_cpu() and just not register the cpu if it matches.
-> > > That will cover the vCPU hotplug case.
-> > >
-> > > Does that sounds sensible, or would you prefer something else?    
-> > 
-> > 
-> > Such a 'broken_rdists' mask is exactly what I have in mind, just
-> > keeping it private to the GIC driver, and not expose it anywhere else.
-> > You can then fail the hotplug event early, and avoid changing the
-> > global masks from within the GIC driver. At least, we don't mess with
-> > the internals of the kernel, and the CPU is properly marked as dead
-> > (that mechanism should already work).
-> > 
-> > I'd expect the handling side to look like this (will not compile, but
-> > you'll get the idea):  
-> Hi Marc,
+> > Is there a way we could disable the tests on older kernels instead of
+> > making them fail?  Check uname or something?  There is probably a
+> > standard way to do this...  It's these tests which fail.
 > 
-> In general this looks good - but...
-> 
-> I haven't gotten to the bottom of why yet (and it might be a side
-> effect of how I hacked the test by lying in minimal fashion and
-> just frigging the MADT read functions) but the hotplug flow is only getting
-> as far as calling __cpu_up() before it seems to enter an infinite loop.
-> That is it never gets far enough to fail this test.
-> 
-> Getting stuck in a psci cpu_on call.  I'm guessing something that
-> we didn't get to in the earlier gicv3 calls before bailing out is blocking that?
-> Looks like it gets to
-> SMCCC smc
-> and is never seen again.
-> 
-> Any ideas on where to look?  The one advantage so far of the higher level
-> approach is we never tried the hotplug callbacks at all so avoided hitting
-> that call.  One (little bit horrible) solution that might avoid this would 
-> be to add another cpuhp state very early on and fail at that stage.
-> I'm not keen on doing that without a better explanation than I have so far!
+> They shouldn't fail - the tests should be skipped on older kernels.
 
-Whilst it still doesn't work I suspect I'm loosing ability to print to the console
-between that point and somewhat later and real problem is elsewhere.
+Ah, that makes sense.  Except for a few outliers that aren't all that interesting,
+all KVM selftests create memslots, so I'm tempted to just make it a hard requirement
+to spare us headache, e.g.
 
-Jonathan
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index b2262b5fad9e..4b2038b1f11f 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -2306,6 +2306,9 @@ void __attribute((constructor)) kvm_selftest_init(void)
+        /* Tell stdout not to buffer its content. */
+        setbuf(stdout, NULL);
+ 
++       __TEST_REQUIRE(kvm_has_cap(KVM_CAP_USER_MEMORY2),
++                      "KVM selftests from v6.8+ require KVM_SET_USER_MEMORY_REGION2");
++
+        kvm_selftest_arch_init();
+ }
 
-> 
-> Thanks,
-> 
-> J
-> 
->  
-> > diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
-> > index 6fb276504bcc..e8f02bfd0e21 100644
-> > --- a/drivers/irqchip/irq-gic-v3.c
-> > +++ b/drivers/irqchip/irq-gic-v3.c
-> > @@ -1009,6 +1009,9 @@ static int __gic_populate_rdist(struct redist_region *region, void __iomem *ptr)
-> >  	u64 typer;
-> >  	u32 aff;
-> >  
-> > +	if (cpumask_test_cpu(smp_processor_id(), &broken_rdists))
-> > +		return 1;
-> > +
-> >  	/*
-> >  	 * Convert affinity to a 32bit value that can be matched to
-> >  	 * GICR_TYPER bits [63:32].
-> > @@ -1260,14 +1263,15 @@ static int gic_dist_supports_lpis(void)
-> >  		!gicv3_nolpi);
-> >  }
-> >  
-> > -static void gic_cpu_init(void)
-> > +static int gic_cpu_init(void)
-> >  {
-> >  	void __iomem *rbase;
-> > -	int i;
-> > +	int ret, i;
-> >  
-> >  	/* Register ourselves with the rest of the world */
-> > -	if (gic_populate_rdist())
-> > -		return;
-> > +	ret = gic_populate_rdist();
-> > +	if (ret)
-> > +		return ret;
-> >  
-> >  	gic_enable_redist(true);
-> >  
-> > @@ -1286,6 +1290,8 @@ static void gic_cpu_init(void)
-> >  
-> >  	/* initialise system registers */
-> >  	gic_cpu_sys_reg_init();
-> > +
-> > +	return 0;
-> >  }
-> >  
-> >  #ifdef CONFIG_SMP
-> > @@ -1295,7 +1301,11 @@ static void gic_cpu_init(void)
-> >  
-> >  static int gic_starting_cpu(unsigned int cpu)
-> >  {
-> > -	gic_cpu_init();
-> > +	int ret;
-> > +
-> > +	ret = gic_cpu_init();
-> > +	if (ret)
-> > +		return ret;
-> >  
-> >  	if (gic_dist_supports_lpis())
-> >  		its_cpu_init();
-> > 
-> > But the question is: do you rely on these masks having been
-> > "corrected" anywhere else?
-> > 
-> > Thanks,
-> > 
-> > 	M.
-> >   
-> 
-> 
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+--
 
+but it's also easy enough to be more precise and skip only those that actually
+create memslots.
+
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index b2262b5fad9e..b21152adf448 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -944,6 +944,9 @@ int __vm_set_user_memory_region2(struct kvm_vm *vm, uint32_t slot, uint32_t flag
+                .guest_memfd_offset = guest_memfd_offset,
+        };
+ 
++       __TEST_REQUIRE(kvm_has_cap(KVM_CAP_USER_MEMORY2),
++                      "KVM selftests from v6.8+ require KVM_SET_USER_MEMORY_REGION2");
++
+        return ioctl(vm->fd, KVM_SET_USER_MEMORY_REGION2, &region);
+ }
+ 
+@@ -970,6 +973,9 @@ void vm_mem_add(struct kvm_vm *vm, enum vm_mem_backing_src_type src_type,
+        size_t mem_size = npages * vm->page_size;
+        size_t alignment;
+ 
++       __TEST_REQUIRE(kvm_has_cap(KVM_CAP_USER_MEMORY2),
++                      "KVM selftests from v6.8+ require KVM_SET_USER_MEMORY_REGION2");
++
+        TEST_ASSERT(vm_adjust_num_guest_pages(vm->mode, npages) == npages,
+                "Number of guest pages is not compatible with the host. "
+                "Try npages=%d", vm_adjust_num_guest_pages(vm->mode, npages));
+--
