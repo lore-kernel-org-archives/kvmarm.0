@@ -1,89 +1,163 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DB8313BC2B;
-	Fri, 26 Apr 2024 07:33:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E64F113D8AE
+	for <kvmarm@lists.linux.dev>; Fri, 26 Apr 2024 09:15:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714116840; cv=none; b=DxGqRVGP92GH5PlWbKy+xoyHBGoVeohpsLcVO0cU5uTjuizVWX14TsYgGX6GUuEZbmIsdmOomBNzsTv9t5f+KGdxZVDM3mTS+g3t3ITV1vvQOmKuaI1Ydieby3t9k0Fm8iOM9XslsoReeXjFOQjM3aAMAwRxOqKhKhfJnd55RSU=
+	t=1714122932; cv=none; b=TRedp5E1ZcYpo/kKn1gN6I6CxEr1N1l6xkFqS+ooZv7S2CbEXAFDAF12O7SUWZ6mR84RXmHrsFEfwINMCIuY+MWmoDZZzxfDbWJ7g+EIEhAMWyYIOLzvM/fPYuxD8SgGVslLE2URQ9NJuVtxmtZZ5DHkQlcSaLbfj/q0lO95Yn0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714116840; c=relaxed/simple;
-	bh=gksl38yx9eZzDHDXbUKTYhZmDGqlaFTVA8MzoHCjPSQ=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=hK2bnoeCZoVdT08nfXK04YIJzhD3hdQAngLjqGbpUaF5Vw74jGyPpqimK0QS512Zeuzjk7Tb8wyXf7m3tAMsJehbnhUDlZkS0iIfff1DWOsWfVJkiTsgti5z+n4pK/eQPh0LPM4ECOWo8m9ydm9uE0kPlCiSScUHk+8uZj4usCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r6EVUWWW; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1714122932; c=relaxed/simple;
+	bh=+FjPzM84B6BX9czEfRXFDbCKq4ptfl8l7j3daLkKm1k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kWeMIdustGmkuAw3fXufsq1Ry8M/V/5KuIIgB79w7d2gDPsT4YbplT4tvLZX0uE7Bv4U+KRNMNdaErB2J07tdZ8Uze0W+c7GxGAx8bySYu+0GohXOwtI6HK9upvCsdrJFuMOPr2wtaWWtL1qQl6L6sthnL+GeTaunSUIRWEcvmg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bp7zUzNb; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r6EVUWWW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91A6EC113CD;
-	Fri, 26 Apr 2024 07:33:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714116839;
-	bh=gksl38yx9eZzDHDXbUKTYhZmDGqlaFTVA8MzoHCjPSQ=;
-	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
-	b=r6EVUWWWwqWuB2/4TPNdaGpUi5w/svatLiUkQPW7jg/Kqfz+v9PjTsqhHX0V5+EAd
-	 O9Q7MLhBBw+u+yC3YJdVVaI93yGyVAyg60gYgQw+aYYn1jycUg0XiChWp0Iu1VFKMv
-	 DwPywl0dLcmeXRt7ZEBqHGpgzLkfbaLNMsfQI9WfrWSOqgHI+raXZsInlkpmvx5zN2
-	 Aw4iSz/F3PrrMtthz0B2wb3NwCnmeHWiHSYEJZOSeSYq9iQITvYdPXRUZEGz3Zp6OT
-	 dsVslJOA6lLCpSJkkdCeyvYqDh4fWotWkzTVM/CVN72PQmXal5hJg3KuZB1fRSHKNY
-	 lVwcEZNrXTKCg==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bp7zUzNb"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1714122929;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1jkzt/L+mhv/WzsExsbPIs4x3qKy+eN4N2XWavPkUaM=;
+	b=bp7zUzNbGmpZwdfni3O+i0sqI1M6bCH2X8GzV5/GxsU+/gaTOcSfwk95jIACjF8+nAAfXL
+	SrvhcmjFicuWkTMCnvnAhhlnuWEWUY046P+O9N9z0anMqv8OaCG3MwQWLyQSZ4YdYpAtzi
+	0wOXQIiYrj8k32etxkwD3zTxlFF1PKc=
+Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com
+ [209.85.215.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-637-Hbu8CUYUMd-uUyRD8-sR6Q-1; Fri, 26 Apr 2024 05:15:28 -0400
+X-MC-Unique: Hbu8CUYUMd-uUyRD8-sR6Q-1
+Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-5f80a77b95cso2172645a12.0
+        for <kvmarm@lists.linux.dev>; Fri, 26 Apr 2024 02:15:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714122927; x=1714727727;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1jkzt/L+mhv/WzsExsbPIs4x3qKy+eN4N2XWavPkUaM=;
+        b=CCmnrjVobx0BNhXySjVO0bYJ/+8aSzawY2L9CsvN/10JS87wPlpMbDSaQWmkBk8nN7
+         f9FHRniQfjzwZaeSWqXUf10YrZiEjpnWwzMP9kpelMbKZvFjaVZWWXQQsv6jo+Bj05WF
+         xthKGrrjTxe/WWrsApzG/ZGBa656h83B2AyjfSpIOE+61BqOKF40qvcSORcU9wbM62jx
+         RXpxTo6g+tqsC8lEwBH7E0qVB0AHcXph6xsM+Ll5Ys7Ox+i/kzctSCWfhEPTfVF3T5bH
+         UQApZcGUDJMNjGCfYBsGF/risfFQlaOs06yD+5xpqEcnQY1497avdhmuum8Fa6TJ1rRQ
+         dIjw==
+X-Forwarded-Encrypted: i=1; AJvYcCX3oFIRuPEfOq6QJ5fnFdfby3F0LJDUql+X0QRc3FqABAYGpzhRz5QUSVwEBe1VDkT+CGP0tbqHLrmbJ5FpyRP5s00pG1cr
+X-Gm-Message-State: AOJu0YxDijkbbhRQMFJf1Roke8n7+utZyLMN8liPsthxHG2HonOXSXZI
+	AFTK8/ej1jw8KmjXTfzL9ql4i88LZvV8JQTE89WkqVW16gWRtYhMKJKFhddC5gL/ODHJyWAYR5y
+	2uHFnz/yEv6oyK6z+rqXlQTueooXKLhrqnOF5r8Sf0tDIl/amGNnkQg==
+X-Received: by 2002:a05:6a20:2713:b0:1a7:5425:3044 with SMTP id u19-20020a056a20271300b001a754253044mr2110992pze.62.1714122927170;
+        Fri, 26 Apr 2024 02:15:27 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGR4IonyI1PkhIL/Wl3B+SXVRCjKsdBxoyZhUJEblO74o+J0ratyZ96kbZ9Bo6ePHW9Uj0s2w==
+X-Received: by 2002:a05:6a20:2713:b0:1a7:5425:3044 with SMTP id u19-20020a056a20271300b001a754253044mr2110962pze.62.1714122926856;
+        Fri, 26 Apr 2024 02:15:26 -0700 (PDT)
+Received: from [192.168.68.50] ([43.252.112.88])
+        by smtp.gmail.com with ESMTPSA id bm5-20020a056a00320500b006ecf3e302ffsm14955063pfb.174.2024.04.26.02.15.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 26 Apr 2024 02:15:26 -0700 (PDT)
+Message-ID: <4d4f1a85-7aad-4ea1-aaed-1bb744d3ef99@redhat.com>
+Date: Fri, 26 Apr 2024 19:15:16 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Fri, 26 Apr 2024 10:33:40 +0300
-Message-Id: <D0TVP8ILJMO0.HERRWR4PA7N6@kernel.org>
-Cc: "Dan Carpenter" <dan.carpenter@linaro.org>, "Shuah Khan"
- <shuah@kernel.org>, "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
- "Paolo Bonzini" <pbonzini@redhat.com>, "Marc Zyngier" <maz@kernel.org>,
- "Oliver Upton" <oliver.upton@linux.dev>, "Huacai Chen"
- <chenhuacai@kernel.org>, "Michael Ellerman" <mpe@ellerman.id.au>, "Anup
- Patel" <anup@brainfault.org>, "Paul Walmsley" <paul.walmsley@sifive.com>,
- "Palmer Dabbelt" <palmer@dabbelt.com>, "Albert Ou" <aou@eecs.berkeley.edu>,
- "Alexander Viro" <viro@zeniv.linux.org.uk>, "Christian Brauner"
- <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>,
- "Andrew Morton" <akpm@linux-foundation.org>, <kvm@vger.kernel.org>,
- <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
- <linux-mips@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>,
- <kvm-riscv@lists.infradead.org>, <linux-riscv@lists.infradead.org>,
- <linux-fsdevel@vger.kernel.org>, <linux-mm@kvack.org>,
- <linux-kernel@vger.kernel.org>, "Xiaoyao Li" <xiaoyao.li@intel.com>, "Xu
- Yilun" <yilun.xu@intel.com>, "Chao Peng" <chao.p.peng@linux.intel.com>,
- "Fuad Tabba" <tabba@google.com>, "Anish Moorthy" <amoorthy@google.com>,
- "David Matlack" <dmatlack@google.com>, "Yu Zhang"
- <yu.c.zhang@linux.intel.com>, "Isaku Yamahata" <isaku.yamahata@intel.com>,
- =?utf-8?q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>, "Vlastimil Babka"
- <vbabka@suse.cz>, "Vishal Annapurve" <vannapurve@google.com>, "Ackerley
- Tng" <ackerleytng@google.com>, "Maciej Szmigiero"
- <mail@maciej.szmigiero.name>, "David Hildenbrand" <david@redhat.com>,
- "Quentin Perret" <qperret@google.com>, "Michael Roth"
- <michael.roth@amd.com>, "Wang" <wei.w.wang@intel.com>, "Liam Merwick"
- <liam.merwick@oracle.com>, "Isaku Yamahata" <isaku.yamahata@gmail.com>,
- "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, "Naresh Kamboju"
- <naresh.kamboju@linaro.org>, "Anders Roxell" <anders.roxell@linaro.org>,
- "Benjamin Copeland" <ben.copeland@linaro.org>
-Subject: Re: [PATCH v13 25/35] KVM: selftests: Convert lib's mem regions to
- KVM_SET_USER_MEMORY_REGION2
-From: "Jarkko Sakkinen" <jarkko@kernel.org>
-To: "Sean Christopherson" <seanjc@google.com>, "Shuah Khan"
- <skhan@linuxfoundation.org>
-X-Mailer: aerc 0.17.0
-References: <20231027182217.3615211-1-seanjc@google.com>
- <20231027182217.3615211-26-seanjc@google.com>
- <69ae0694-8ca3-402c-b864-99b500b24f5d@moroto.mountain>
- <3848a9ad-07aa-48da-a2b7-264c4a990b5b@linuxfoundation.org>
- <ZipyPYR8Nv_usoU4@google.com>
-In-Reply-To: <ZipyPYR8Nv_usoU4@google.com>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 05/16] ACPI: processor: Add acpi_get_processor_handle()
+ helper
+To: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra <peterz@infradead.org>,
+ linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
+ linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, x86@kernel.org, Russell King
+ <linux@armlinux.org.uk>, "Rafael J . Wysocki" <rafael@kernel.org>,
+ Miguel Luis <miguel.luis@oracle.com>, James Morse <james.morse@arm.com>,
+ Salil Mehta <salil.mehta@huawei.com>,
+ Jean-Philippe Brucker <jean-philippe@linaro.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+Cc: Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>, linuxarm@huawei.com,
+ justin.he@arm.com, jianyong.wu@arm.com
+References: <20240418135412.14730-1-Jonathan.Cameron@huawei.com>
+ <20240418135412.14730-6-Jonathan.Cameron@huawei.com>
+From: Gavin Shan <gshan@redhat.com>
+In-Reply-To: <20240418135412.14730-6-Jonathan.Cameron@huawei.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu Apr 25, 2024 at 6:09 PM EEST, Sean Christopherson wrote:
-> +       __TEST_REQUIRE(kvm_has_cap(KVM_CAP_USER_MEMORY2),
-> +                      "KVM selftests from v6.8+ require KVM_SET_USER_MEM=
-ORY_REGION2");
+On 4/18/24 23:54, Jonathan Cameron wrote:
+> If CONFIG_ACPI_PROCESSOR provide a helper to retrieve the
+> acpi_handle for a given CPU allowing access to methods
+> in DSDT.
+> 
+> Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+> ---
+> v7: No change
+> v6: New patch
+> ---
+>   drivers/acpi/acpi_processor.c | 10 ++++++++++
+>   include/linux/acpi.h          |  7 +++++++
+>   2 files changed, 17 insertions(+)
+> 
+> diff --git a/drivers/acpi/acpi_processor.c b/drivers/acpi/acpi_processor.c
+> index ac7ddb30f10e..127ae8dcb787 100644
+> --- a/drivers/acpi/acpi_processor.c
+> +++ b/drivers/acpi/acpi_processor.c
+> @@ -35,6 +35,16 @@ EXPORT_PER_CPU_SYMBOL(processors);
+>   struct acpi_processor_errata errata __read_mostly;
+>   EXPORT_SYMBOL_GPL(errata);
+>   
+> +acpi_handle acpi_get_processor_handle(int cpu)
+> +{
+> +	acpi_handle handle = NULL;
+> +	struct acpi_processor *pr = per_cpu(processors, cpu);;
+                                                             ^^
 
-This would work also for casual (but not seasoned) visitor in KVM code
-as additionl documentation.
+                                                             s/;;/;
 
-BR, Jarkko
+> +
+> +	if (pr)
+> +		handle = pr->handle;
+> +
+> +	return handle;
+> +}
+>   static int acpi_processor_errata_piix4(struct pci_dev *dev)
+>   {
+>   	u8 value1 = 0;
+> diff --git a/include/linux/acpi.h b/include/linux/acpi.h
+> index 34829f2c517a..9844a3f9c4e5 100644
+> --- a/include/linux/acpi.h
+> +++ b/include/linux/acpi.h
+> @@ -309,6 +309,8 @@ int acpi_map_cpu(acpi_handle handle, phys_cpuid_t physid, u32 acpi_id,
+>   int acpi_unmap_cpu(int cpu);
+>   #endif /* CONFIG_ACPI_HOTPLUG_CPU */
+>   
+> +acpi_handle acpi_get_processor_handle(int cpu);
+> +
+>   #ifdef CONFIG_ACPI_HOTPLUG_IOAPIC
+>   int acpi_get_ioapic_id(acpi_handle handle, u32 gsi_base, u64 *phys_addr);
+>   #endif
+> @@ -1077,6 +1079,11 @@ static inline bool acpi_sleep_state_supported(u8 sleep_state)
+>   	return false;
+>   }
+>   
+> +static inline acpi_handle acpi_get_processor_handle(int cpu)
+> +{
+> +	return NULL;
+> +}
+> +
+>   #endif	/* !CONFIG_ACPI */
+>   
+>   extern void arch_post_acpi_subsys_init(void);
+
+Thanks,
+Gavin
+
