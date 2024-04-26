@@ -1,28 +1,29 @@
 Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4DF3147C89;
-	Fri, 26 Apr 2024 13:51:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4113D1482EE;
+	Fri, 26 Apr 2024 13:51:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714139492; cv=none; b=sldNe7IokSVo0TRzU5BYC3dO/Ks/2oPeWiQ1nt75AQEvt0CoyhntSx3dudkD2wNsjExeE4yWYifRk8b1b+P0Ylv3aZZtyG9RTD0DvZ3gTGADhRLoERyrVDDHEzL42kmxz0mQ/gJWK5JFrkHeVqOkf3dds0l6rVOtZeEVyiK6j0U=
+	t=1714139522; cv=none; b=WJXi8feLOtPzJ3ZNZmwH96MzBrzTthAODpgG6GuFKQ2ZJGw7PonGlI0/5vwc9ROkeeYimc0Fy1Kz4M1gesQMCdqObwPgy7YTut5v0vmDpy/HPaKTpGB3T3lcc1i3gQoHA46p6v9ddKohp75ibT8aw2HkCzhwhYw2FqFeYYDq2HU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714139492; c=relaxed/simple;
-	bh=QHkwzm7yGBz1ZP6RZARRpVjRm5TBFngEPCESKKI1c/Y=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=W8XDLqdxVEO6lrhBkAYmWIXf08IY4H0QeRIznq9ilpwqEttrCitP2QbBt6zzpZqP18vy9tyIYw9O//H2TrNcqlrH+mTHKtuzkvGcj9+qsYFItF50g7KNtN3UujQPxgrISDsevyXmTJZ2i3cBMKcBKRzjPWGbLb5SLesQ9YI7DBU=
+	s=arc-20240116; t=1714139522; c=relaxed/simple;
+	bh=a0xPCpJ3iogvoLoWwejgTlayJwbE0mxyGIn2ubJQV+c=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IUh5ageliwzrT2ZMXvpufdC2HkH3iXVYvHTSZWk7J+R+H2wVE3l4uAy2TURFSL8EZWYNmw0a8J4i0u2sPERRRRQ+eZhBpmqJHXG1MzBU5brv8swL2PMhGm7a0ZRdJ8LDpXDY6LslsUzc48HE7Zqtf6kLmGfvq7xXiQEEODuRdP0=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4VQvG10Yj3z6K6Nj;
-	Fri, 26 Apr 2024 21:48:57 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4VQvGb71RXz6K6Lx;
+	Fri, 26 Apr 2024 21:49:27 +0800 (CST)
 Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id C5D0C140A34;
-	Fri, 26 Apr 2024 21:51:25 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id AE8E8140C72;
+	Fri, 26 Apr 2024 21:51:56 +0800 (CST)
 Received: from SecurePC-101-06.china.huawei.com (10.122.247.231) by
  lhrpeml500005.china.huawei.com (7.191.163.240) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Fri, 26 Apr 2024 14:51:25 +0100
+ 15.1.2507.35; Fri, 26 Apr 2024 14:51:55 +0100
 From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 To: Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra
 	<peterz@infradead.org>, <linux-pm@vger.kernel.org>,
@@ -39,10 +40,12 @@ CC: Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave
  Hansen <dave.hansen@linux.intel.com>, <linuxarm@huawei.com>,
 	<justin.he@arm.com>, <jianyong.wu@arm.com>, Lorenzo Pieralisi
 	<lpieralisi@kernel.org>, Sudeep Holla <sudeep.holla@arm.com>
-Subject: [PATCH v8 00/16] ACPI/arm64: add support for virtual cpu hotplug
-Date: Fri, 26 Apr 2024 14:51:10 +0100
-Message-ID: <20240426135126.12802-1-Jonathan.Cameron@huawei.com>
+Subject: [PATCH v8 01/16] ACPI: processor: Simplify initial onlining to use same path for cold and hotplug
+Date: Fri, 26 Apr 2024 14:51:11 +0100
+Message-ID: <20240426135126.12802-2-Jonathan.Cameron@huawei.com>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240426135126.12802-1-Jonathan.Cameron@huawei.com>
+References: <20240426135126.12802-1-Jonathan.Cameron@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -54,146 +57,159 @@ Content-Type: text/plain
 X-ClientProxiedBy: lhrpeml500002.china.huawei.com (7.191.160.78) To
  lhrpeml500005.china.huawei.com (7.191.163.240)
 
-Thanks to Rafael, Marc, Hanjun and Gavin for reviews of v8 and tags.
+Separate code paths, combined with a flag set in acpi_processor.c to
+indicate a struct acpi_processor was for a hotplugged CPU ensured that
+per CPU data was only set up the first time that a CPU was initialized.
+This appears to be unnecessary as the paths can be combined by letting
+the online logic also handle any CPUs online at the time of driver load.
 
-v8: Details and more minor stuff in individual patch descriptions
-  - Rewrite the handling of not enabled redistributors in the gicv3 driver
-    to keep impacts local. Note this needs a dance with a new cpuhp
-    callback that runs before CPU bring up reaches the section that
-    cannot fail. This avoids clearing bits in cpu_present_mask and
-    cpu_possible_mask making the solution much less fragile.
-  - Do not carry on for that CPU if acpi_processor_set_per_cpu() detects
-    a problem, but continue to leave enough in place to perform buggy bios
-    checks.
-  - Protect against a buggy BIOS that has apparently enabled CPUs in DSDT
-    that are not in MADT. The check makes sense anyway as on arm64 we have
-    not way to 'generate' an ID if one isn't present at acpi_map_cpu().
+Motivation for this change, beyond simplification, is that ARM64
+virtual CPU HP uses the same code paths for hotplug and cold path in
+acpi_processor.c so had no easy way to set the flag for hotplug only.
+Removing this necessity will enable ARM64 vCPU HP to reuse the existing
+code paths.
 
-Updated version of James' original introduction.
+Leave noisy pr_info() in place but update it to not state the CPU
+was hotplugged.
 
-This series adds what looks like cpuhotplug support to arm64 for use in
-virtual machines. It does this by moving the cpu_register() calls for
-architectures that support ACPI into an arch specific call made from
-the ACPI processor driver.
- 
-The kubernetes folk really want to be able to add CPUs to an existing VM,
-in exactly the same way they do on x86. The use-case is pre-booting guests
-with one CPU, then adding the number that were actually needed when the
-workload is provisioned.
+Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+Reviewed-by: Hanjun Guo <guohanjun@huawei.com>
+Tested-by: Miguel Luis <miguel.luis@oracle.com>
+Reviewed-by: Gavin Shan <gshan@redhat.com>
+Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 
-Wait? Doesn't arm64 support cpuhotplug already!?
-In the arm world, cpuhotplug gets used to mean removing the power from a CPU.
-The CPU is offline, and remains present. For x86, and ACPI, cpuhotplug
-has the additional step of physically removing the CPU, so that it isn't
-present anymore.
- 
-Arm64 doesn't support this, and can't support it: CPUs are really a slice
-of the SoC, and there is not enough information in the existing ACPI tables
-to describe which bits of the slice also got removed. Without a reference
-machine: adding this support to the spec is a wild goose chase.
- 
-Critically: everything described in the firmware tables must remain present.
- 
-For a virtual machine this is easy as all the other bits of 'virtual SoC'
-are emulated, so they can (and do) remain present when a vCPU is 'removed'.
+---
+v8: No change
+---
+ drivers/acpi/acpi_processor.c   |  1 -
+ drivers/acpi/processor_driver.c | 44 ++++++++++-----------------------
+ include/acpi/processor.h        |  2 +-
+ 3 files changed, 14 insertions(+), 33 deletions(-)
 
-On a system that supports cpuhotplug the MADT has to describe every possible
-CPU at boot. Under KVM, the vGIC needs to know about every possible vCPU before
-the guest is started.
-With these constraints, virtual-cpuhotplug is really just a hypervisor/firmware
-policy about which CPUs can be brought online.
+diff --git a/drivers/acpi/acpi_processor.c b/drivers/acpi/acpi_processor.c
+index 7a0dd35d62c9..7fc924aeeed0 100644
+--- a/drivers/acpi/acpi_processor.c
++++ b/drivers/acpi/acpi_processor.c
+@@ -216,7 +216,6 @@ static int acpi_processor_hotadd_init(struct acpi_processor *pr)
+ 	 * gets online for the first time.
+ 	 */
+ 	pr_info("CPU%d has been hot-added\n", pr->id);
+-	pr->flags.need_hotplug_init = 1;
  
-This series adds support for virtual-cpuhotplug as exactly that: firmware
-policy. This may even work on a physical machine too; for a guest the part of
-firmware is played by the VMM. (typically Qemu).
+ out:
+ 	cpus_write_unlock();
+diff --git a/drivers/acpi/processor_driver.c b/drivers/acpi/processor_driver.c
+index 67db60eda370..55782eac3ff1 100644
+--- a/drivers/acpi/processor_driver.c
++++ b/drivers/acpi/processor_driver.c
+@@ -33,7 +33,6 @@ MODULE_AUTHOR("Paul Diefenbaugh");
+ MODULE_DESCRIPTION("ACPI Processor Driver");
+ MODULE_LICENSE("GPL");
  
-PSCI support is modified to return 'DENIED' if the CPU can't be brought
-online/enabled yet. The CPU object's _STA method's enabled bit is used to
-indicate firmware's current disposition. If the CPU has its enabled bit clear,
-it will not be registered with sysfs, and attempts to bring it online will
-fail. The notifications that _STA has changed its value then work in the same
-way as physical hotplug, and firmware can cause the CPU to be registered some
-time later, allowing it to be brought online.
+-static int acpi_processor_start(struct device *dev);
+ static int acpi_processor_stop(struct device *dev);
  
-This creates something that looks like cpuhotplug to user-space and the
-kernel beyond arm64 architecture specific code, as the sysfs
-files appear and disappear, and the udev notifications look the same.
+ static const struct acpi_device_id processor_device_ids[] = {
+@@ -47,7 +46,6 @@ static struct device_driver acpi_processor_driver = {
+ 	.name = "processor",
+ 	.bus = &cpu_subsys,
+ 	.acpi_match_table = processor_device_ids,
+-	.probe = acpi_processor_start,
+ 	.remove = acpi_processor_stop,
+ };
  
-One notable difference is the CPU present mask, which is exposed via sysfs.
-Because the CPUs remain present throughout, they can still be seen in that mask.
-This value does get used by webbrowsers to estimate the number of CPUs
-as the CPU online mask is constantly changed on mobile phones.
+@@ -115,12 +113,10 @@ static int acpi_soft_cpu_online(unsigned int cpu)
+ 	 * CPU got physically hotplugged and onlined for the first time:
+ 	 * Initialize missing things.
+ 	 */
+-	if (pr->flags.need_hotplug_init) {
++	if (!pr->flags.previously_online) {
+ 		int ret;
  
-Linux is tolerant of PSCI returning errors, as its always been allowed to do
-that. To avoid confusing OS that can't tolerate this, we needed an additional
-bit in the MADT GICC flags. This series copies ACPI_MADT_ONLINE_CAPABLE, which
-appears to be for this purpose, but calls it ACPI_MADT_GICC_CPU_CAPABLE as it
-has a different bit position in the GICC.
+-		pr_info("Will online and init hotplugged CPU: %d\n",
+-			pr->id);
+-		pr->flags.need_hotplug_init = 0;
++		pr_info("Will online and init CPU: %d\n", pr->id);
+ 		ret = __acpi_processor_start(device);
+ 		WARN(ret, "Failed to start CPU: %d\n", pr->id);
+ 	} else {
+@@ -167,9 +163,6 @@ static int __acpi_processor_start(struct acpi_device *device)
+ 	if (!pr)
+ 		return -ENODEV;
  
-This code is unconditionally enabled for all ACPI architectures, though for
-now only arm64 will have deferred the cpu_register() calls.
-
-If folk want to play along at home, you'll need a copy of Qemu that supports this.
-https://github.com/salil-mehta/qemu.git virt-cpuhp-armv8/rfc-v2
-
-Replace your '-smp' argument with something like:
- | -smp cpus=1,maxcpus=3,cores=3,threads=1,sockets=1
+-	if (pr->flags.need_hotplug_init)
+-		return 0;
+-
+ 	result = acpi_cppc_processor_probe(pr);
+ 	if (result && !IS_ENABLED(CONFIG_ACPI_CPU_FREQ_PSS))
+ 		dev_dbg(&device->dev, "CPPC data invalid or not present\n");
+@@ -185,32 +178,21 @@ static int __acpi_processor_start(struct acpi_device *device)
  
- then feed the following to the Qemu montior;
- | (qemu) device_add driver=host-arm-cpu,core-id=1,id=cpu1
- | (qemu) device_del cpu1
+ 	status = acpi_install_notify_handler(device->handle, ACPI_DEVICE_NOTIFY,
+ 					     acpi_processor_notify, device);
+-	if (ACPI_SUCCESS(status))
+-		return 0;
++	if (!ACPI_SUCCESS(status)) {
++		result = -ENODEV;
++		goto err_thermal_exit;
++	}
++	pr->flags.previously_online = 1;
  
-
-James Morse (7):
-  ACPI: processor: Register deferred CPUs from acpi_processor_get_info()
-  ACPI: Add post_eject to struct acpi_scan_handler for cpu hotplug
-  arm64: acpi: Move get_cpu_for_acpi_id() to a header
-  irqchip/gic-v3: Don't return errors from gic_acpi_match_gicc()
-  irqchip/gic-v3: Add support for ACPI's disabled but 'online capable'
-    CPUs
-  arm64: document virtual CPU hotplug's expectations
-  cpumask: Add enabled cpumask for present CPUs that can be brought
-    online
-
-Jean-Philippe Brucker (1):
-  arm64: psci: Ignore DENIED CPUs
-
-Jonathan Cameron (8):
-  ACPI: processor: Simplify initial onlining to use same path for cold
-    and hotplug
-  cpu: Do not warn on arch_register_cpu() returning -EPROBE_DEFER
-  ACPI: processor: Drop duplicated check on _STA (enabled + present)
-  ACPI: processor: Move checks and availability of acpi_processor
-    earlier
-  ACPI: processor: Add acpi_get_processor_handle() helper
-  ACPI: scan: switch to flags for acpi_scan_check_and_detach()
-  arm64: arch_register_cpu() variant to check if an ACPI handle is now
-    available.
-  arm64: Kconfig: Enable hotplug CPU on arm64 if ACPI_PROCESSOR is
-    enabled.
-
- .../ABI/testing/sysfs-devices-system-cpu      |   6 +
- Documentation/arch/arm64/cpu-hotplug.rst      |  79 ++++++++++++
- Documentation/arch/arm64/index.rst            |   1 +
- arch/arm64/Kconfig                            |   1 +
- arch/arm64/include/asm/acpi.h                 |  11 ++
- arch/arm64/kernel/acpi.c                      |  22 ++++
- arch/arm64/kernel/acpi_numa.c                 |  11 --
- arch/arm64/kernel/psci.c                      |   2 +-
- arch/arm64/kernel/smp.c                       |  56 ++++++++-
- drivers/acpi/acpi_processor.c                 | 115 +++++++++++-------
- drivers/acpi/processor_driver.c               |  44 ++-----
- drivers/acpi/scan.c                           |  47 +++++--
- drivers/base/cpu.c                            |  12 +-
- drivers/irqchip/irq-gic-v3.c                  |  49 ++++++--
- include/acpi/acpi_bus.h                       |   1 +
- include/acpi/processor.h                      |   2 +-
- include/linux/acpi.h                          |  10 +-
- include/linux/cpumask.h                       |  25 ++++
- kernel/cpu.c                                  |   3 +
- 19 files changed, 383 insertions(+), 114 deletions(-)
- create mode 100644 Documentation/arch/arm64/cpu-hotplug.rst
-
+-	result = -ENODEV;
+-	acpi_processor_thermal_exit(pr, device);
++	return 0;
+ 
++err_thermal_exit:
++	acpi_processor_thermal_exit(pr, device);
+ err_power_exit:
+ 	acpi_processor_power_exit(pr);
+ 	return result;
+ }
+ 
+-static int acpi_processor_start(struct device *dev)
+-{
+-	struct acpi_device *device = ACPI_COMPANION(dev);
+-	int ret;
+-
+-	if (!device)
+-		return -ENODEV;
+-
+-	/* Protect against concurrent CPU hotplug operations */
+-	cpu_hotplug_disable();
+-	ret = __acpi_processor_start(device);
+-	cpu_hotplug_enable();
+-	return ret;
+-}
+-
+ static int acpi_processor_stop(struct device *dev)
+ {
+ 	struct acpi_device *device = ACPI_COMPANION(dev);
+@@ -279,9 +261,9 @@ static int __init acpi_processor_driver_init(void)
+ 	if (result < 0)
+ 		return result;
+ 
+-	result = cpuhp_setup_state_nocalls(CPUHP_AP_ONLINE_DYN,
+-					   "acpi/cpu-drv:online",
+-					   acpi_soft_cpu_online, NULL);
++	result = cpuhp_setup_state(CPUHP_AP_ONLINE_DYN,
++				   "acpi/cpu-drv:online",
++				   acpi_soft_cpu_online, NULL);
+ 	if (result < 0)
+ 		goto err;
+ 	hp_online = result;
+diff --git a/include/acpi/processor.h b/include/acpi/processor.h
+index 3f34ebb27525..e6f6074eadbf 100644
+--- a/include/acpi/processor.h
++++ b/include/acpi/processor.h
+@@ -217,7 +217,7 @@ struct acpi_processor_flags {
+ 	u8 has_lpi:1;
+ 	u8 power_setup_done:1;
+ 	u8 bm_rld_set:1;
+-	u8 need_hotplug_init:1;
++	u8 previously_online:1;
+ };
+ 
+ struct acpi_processor {
 -- 
 2.39.2
 
