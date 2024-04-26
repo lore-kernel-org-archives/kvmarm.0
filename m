@@ -1,29 +1,29 @@
 Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E63B140389;
-	Fri, 26 Apr 2024 13:52:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65AF9146A8E;
+	Fri, 26 Apr 2024 13:53:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714139551; cv=none; b=ddz+lGg+wGveF8DpHE+AMeZwjPE2iZzOwfvxK1FO2FgZxJ8W1OTDxIkL5IL6Mp4ArESRUsFIzDxz8wnj/nlMzzHvMQ6bm/NRRVpItCVW2h7xhUGl+29uMThTst7b+cJ5j7GmN9j0jwDTf3JopleoPjw8KwhMNL0dJTfwUaiGmVY=
+	t=1714139581; cv=none; b=GSJQE219seiFDxmaVcgfWYy1/YbWIW7/JpMvX9+nJ5JEIQUVlGd9R/LOsOETS+3vsPSWpcUMVjdAzjnBgV/GEAf1NZi2DUpGcKcFAAIAscylO/ekU22E6V+Vjz7VKwqZvrqbPo9tOE+tfAgrepWBWaOKinhRdWnJyj3mlBvkZqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714139551; c=relaxed/simple;
-	bh=EqnPqYd+jON+bJvqbrJwqw2XVjsLroBVZfBzA47YEBQ=;
+	s=arc-20240116; t=1714139581; c=relaxed/simple;
+	bh=KRQx/jhSBpJ+0bXJyFoiwePzWCxc8iV5eQ951SofEq0=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nXtCUYGiuRmt8akCBNXjoR4Z6UVclKHhwWdikdtNq8DBm+bEKFPmW19BS4oX5doV7KWj8jMb/fFrtHbq3HtyOGrxuEcioL15a/XGUWSW+/NR34FS1lDK4NI0AMAm9ZEmKh0zcM4O8AoSRX8OJS/wyO4gVy9/tGw5Dlj9WwoffIw=
+	 MIME-Version:Content-Type; b=tBwTyLN91MgJGEhZu+S902V4VdOe0jy2+T7f8UNbTYFQLxnnypzNwY9v3iDKhnJ9GpJqAyTwFV4HRyDrKVYqS1bQRTWYg9qa3nPFue97gbDgGmdIxSq76LSyi2UtmM2wA8MEDK6OEpKuuhh6Bjb8fvmHROtVfGleegYf1Jw4woM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Received: from mail.maildlp.com (unknown [172.18.186.216])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4VQvHB5Svjz6K6CT;
-	Fri, 26 Apr 2024 21:49:58 +0800 (CST)
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4VQvLQ3b19z6DBLP;
+	Fri, 26 Apr 2024 21:52:46 +0800 (CST)
 Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id 746DB140B67;
-	Fri, 26 Apr 2024 21:52:27 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 28136140C72;
+	Fri, 26 Apr 2024 21:52:58 +0800 (CST)
 Received: from SecurePC-101-06.china.huawei.com (10.122.247.231) by
  lhrpeml500005.china.huawei.com (7.191.163.240) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Fri, 26 Apr 2024 14:52:26 +0100
+ 15.1.2507.35; Fri, 26 Apr 2024 14:52:57 +0100
 From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 To: Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra
 	<peterz@infradead.org>, <linux-pm@vger.kernel.org>,
@@ -40,9 +40,9 @@ CC: Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave
  Hansen <dave.hansen@linux.intel.com>, <linuxarm@huawei.com>,
 	<justin.he@arm.com>, <jianyong.wu@arm.com>, Lorenzo Pieralisi
 	<lpieralisi@kernel.org>, Sudeep Holla <sudeep.holla@arm.com>
-Subject: [PATCH v8 02/16] cpu: Do not warn on arch_register_cpu() returning -EPROBE_DEFER
-Date: Fri, 26 Apr 2024 14:51:12 +0100
-Message-ID: <20240426135126.12802-3-Jonathan.Cameron@huawei.com>
+Subject: [PATCH v8 03/16] ACPI: processor: Drop duplicated check on _STA (enabled + present)
+Date: Fri, 26 Apr 2024 14:51:13 +0100
+Message-ID: <20240426135126.12802-4-Jonathan.Cameron@huawei.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240426135126.12802-1-Jonathan.Cameron@huawei.com>
 References: <20240426135126.12802-1-Jonathan.Cameron@huawei.com>
@@ -57,37 +57,45 @@ Content-Type: text/plain
 X-ClientProxiedBy: lhrpeml500002.china.huawei.com (7.191.160.78) To
  lhrpeml500005.china.huawei.com (7.191.163.240)
 
-For arm64 the CPU registration cannot complete until the ACPI
-interpreter us up and running so in those cases the arch specific
-arch_register_cpu() will return -EPROBE_DEFER at this stage and the
-registration will be attempted later.
+The ACPI bus scan will only result in acpi_processor_add() being called
+if _STA has already been checked and the result is that the
+processor is enabled and present.  Hence drop this additional check.
 
 Suggested-by: Rafael J. Wysocki <rafael@kernel.org>
-Acked-by: Rafael J. Wysocki <rafael@kernel.org>
+Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
 Reviewed-by: Hanjun Guo <guohanjun@huawei.com>
 Reviewed-by: Gavin Shan <gshan@redhat.com>
 Tested-by: Miguel Luis <miguel.luis@oracle.com>
 Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 
 ---
-v8: No change
+V8: No change (tags added)
 ---
- drivers/base/cpu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/acpi/acpi_processor.c | 6 ------
+ 1 file changed, 6 deletions(-)
 
-diff --git a/drivers/base/cpu.c b/drivers/base/cpu.c
-index 56fba44ba391..7b83e9c87d7c 100644
---- a/drivers/base/cpu.c
-+++ b/drivers/base/cpu.c
-@@ -558,7 +558,7 @@ static void __init cpu_dev_register_generic(void)
+diff --git a/drivers/acpi/acpi_processor.c b/drivers/acpi/acpi_processor.c
+index 7fc924aeeed0..ba0a6f0ac841 100644
+--- a/drivers/acpi/acpi_processor.c
++++ b/drivers/acpi/acpi_processor.c
+@@ -186,17 +186,11 @@ static void __init acpi_pcc_cpufreq_init(void) {}
+ #ifdef CONFIG_ACPI_HOTPLUG_CPU
+ static int acpi_processor_hotadd_init(struct acpi_processor *pr)
+ {
+-	unsigned long long sta;
+-	acpi_status status;
+ 	int ret;
  
- 	for_each_present_cpu(i) {
- 		ret = arch_register_cpu(i);
--		if (ret)
-+		if (ret && ret != -EPROBE_DEFER)
- 			pr_warn("register_cpu %d failed (%d)\n", i, ret);
- 	}
- }
+ 	if (invalid_phys_cpuid(pr->phys_id))
+ 		return -ENODEV;
+ 
+-	status = acpi_evaluate_integer(pr->handle, "_STA", NULL, &sta);
+-	if (ACPI_FAILURE(status) || !(sta & ACPI_STA_DEVICE_PRESENT))
+-		return -ENODEV;
+-
+ 	cpu_maps_update_begin();
+ 	cpus_write_lock();
+ 
 -- 
 2.39.2
 
