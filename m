@@ -1,198 +1,96 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66EA1144D2F;
-	Fri, 26 Apr 2024 11:15:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F76A14532B;
+	Fri, 26 Apr 2024 11:49:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714130158; cv=none; b=cXpku8pSEwixHbm5mMoyn+KKNfZTbFntXRTbtLoUNpmXFvCMwjvp1iNhmxhJRHoPH7j4MHnSY+trLkY6prANebREApNBivdnn3LQdVBFY443l1yeJ9gRxbZmfUKh2BEKPzeGloEqH4RmxNiayxV2fJwmmmbY10S5g0jrD5EVKXU=
+	t=1714132144; cv=none; b=RyAYLfDufqam67XtQrZ8xuJbDp/6sMBFw1I7Lca1BhWXO6lWnZbirIUt1+ZKpvWzaq7WsazajXTBncoAT1DJ6bLvmtzGd8/L9wRWQeJPhWhC3l3i6sEly2QfPkFwDCRqEZ91PdzSmj36fnQ3BCRtgNinrp9j5k+h1lqRnXNN/P0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714130158; c=relaxed/simple;
-	bh=4VOZ3fa3TwY1ib1Wj2R2re2PfrNzEtuNBPqPfqNEiF8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DiuewpfTOXwwfCTD/c0wuAx59On8nZb/wxOIpmzE8sz3nxyShx4m+/KQGVpZFNWVkulwKXLhEkfi7nppU185VCMa7RWpPk+8ud2gUZQHhbKLTsjOLKf6ZuP54NZNF8YaK3lFmwkKUR/S4HJi1pHYpjRC5PFgOgR72Pho2ziiCt0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E47DE2F4;
-	Fri, 26 Apr 2024 04:16:23 -0700 (PDT)
-Received: from [10.1.25.25] (FVFF763DQ05P.cambridge.arm.com [10.1.25.25])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3FA9A3F64C;
-	Fri, 26 Apr 2024 04:15:54 -0700 (PDT)
-Message-ID: <3c5e473a-b2ad-45dd-9f3f-6b691ec73a41@arm.com>
-Date: Fri, 26 Apr 2024 12:15:53 +0100
+	s=arc-20240116; t=1714132144; c=relaxed/simple;
+	bh=vuIcmnGQq4w4qRhii36oQpxwxZeKTg+NU3UP9tdpmnQ=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BUpJEatkY61ZR52MLv9p+q6oNJbuO4x7WW0QLrBWXmhDExLFNrqra2Bbravji0LiRwhOzIMRe7dkAU0dNKguNYPYOyHUfi54HW2310A0PvZUizrwEBastQH/cglUedtQEtp1qdXy5SZGLi345aulnFLLiNSZ5na0GGua3Vr8c6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4VQrbL5Lklz6DBjc;
+	Fri, 26 Apr 2024 19:48:46 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id 46E26140447;
+	Fri, 26 Apr 2024 19:48:58 +0800 (CST)
+Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Fri, 26 Apr
+ 2024 12:48:57 +0100
+Date: Fri, 26 Apr 2024 12:48:55 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra
+	<peterz@infradead.org>, <linux-pm@vger.kernel.org>,
+	<loongarch@lists.linux.dev>, <linux-acpi@vger.kernel.org>,
+	<linux-arch@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<x86@kernel.org>, Russell King <linux@armlinux.org.uk>, "Rafael J . Wysocki"
+	<rafael@kernel.org>, Miguel Luis <miguel.luis@oracle.com>, "James Morse"
+	<james.morse@arm.com>, Salil Mehta <salil.mehta@huawei.com>, Jean-Philippe
+ Brucker <jean-philippe@linaro.org>, Catalin Marinas
+	<catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+	<linuxarm@huawei.com>
+CC: Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, "Dave
+ Hansen" <dave.hansen@linux.intel.com>, <justin.he@arm.com>,
+	<jianyong.wu@arm.com>
+Subject: Re: [PATCH v7 08/16] ACPI: Add post_eject to struct
+ acpi_scan_handler for cpu hotplug
+Message-ID: <20240426124836.00006cde@huawei.com>
+In-Reply-To: <20240418135412.14730-9-Jonathan.Cameron@huawei.com>
+References: <20240418135412.14730-1-Jonathan.Cameron@huawei.com>
+	<20240418135412.14730-9-Jonathan.Cameron@huawei.com>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH 08/33] arm: realm: Make uart available
- before MMU is enabled
-Content-Language: en-GB
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, maz@kernel.org, joey.gouly@arm.com,
- steven.price@arm.com, james.morse@arm.com, oliver.upton@linux.dev,
- yuzenghui@huawei.com, andrew.jones@linux.dev, eric.auger@redhat.com
-References: <20240412103408.2706058-1-suzuki.poulose@arm.com>
- <20240412103408.2706058-9-suzuki.poulose@arm.com> <ZiaEkwQmPf2dKGwC@arm.com>
- <c485b0b9-b467-469d-a6ef-4df0c52d0987@arm.com> <ZiaNJz3WJUcBPWMs@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <ZiaNJz3WJUcBPWMs@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100002.china.huawei.com (7.191.160.241) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
-On 22/04/2024 17:15, Alexandru Elisei wrote:
-> Hi,
+On Thu, 18 Apr 2024 14:54:04 +0100
+Jonathan Cameron <Jonathan.Cameron@huawei.com> wrote:
+
+> From: James Morse <james.morse@arm.com>
 > 
-> On Mon, Apr 22, 2024 at 05:05:54PM +0100, Suzuki K Poulose wrote:
->> On 22/04/2024 16:38, Alexandru Elisei wrote:
->>> Hi,
->>>
->>> On Fri, Apr 12, 2024 at 11:33:43AM +0100, Suzuki K Poulose wrote:
->>>> From: Joey Gouly <joey.gouly@arm.com>
->>>>
->>>> A Realm must access any emulated I/O mappings with the PTE_NS_SHARED bit set.
->>>
->>> What entity requires that a realm must access I/O mappings with the
->>> PTE_NS_SHARED bit set? Is that an architectural requirement? Or is it an
->>> implementation choice made by the VMM and/or KVM?
->>
->> RMM spec. An MMIO access in the Protected IPA must be emulated by Realm
->> world. If an MMIO access must be emulated by NS Host, it must be in the
->> Unprotected IPA.
+> struct acpi_scan_handler has a detach callback that is used to remove
+> a driver when a bus is changed. When interacting with an eject-request,
+> the detach callback is called before _EJ0.
 > 
-> That's not exactly what I was asking. I was curious to know how a realm
-> knows if a MMIO access is emulated by the Realm, and thus it must use a
-> protected address, or it's emulated by the non-secure host, and it must use
-> an unprotected address.
-
-With Arm CCA-1.0, there cannot be an emulation in the Realm world. 
-Everything is by the NS Host. It may change in the future, but the
-RSI version would make the Realm aware of the difference.
-
-
-Suzuki
-
-
-
+> This means the ACPI processor driver can't use _STA to determine if a
+> CPU has been made not-present, or some of the other _STA bits have been
+> changed. acpi_processor_remove() needs to know the value of _STA after
+> _EJ0 has been called.
 > 
-> Thanks,
-> Alex
+> Add a post_eject callback to struct acpi_scan_handler. This is called
+> after acpi_scan_hot_remove() has successfully called _EJ0. Because
+> acpi_scan_check_and_detach() also clears the handler pointer,
+> it needs to be told if the caller will go on to call
+> acpi_bus_post_eject(), so that acpi_device_clear_enumerated()
+> and clearing the handler pointer can be deferred.
+> An extra flag is added to flags field introduced in the previous
+> patch to achieve this.
 > 
->>
->> Technically, a VMM could create a memory map, where the NS emulated I/O
->> are kept in the unprotected (upper) half.
->>
->> Or the VMM retains the current model and expects the Realm to use the
->> "Unprotected" alias.
->>
->>
->> Either way, applying the PTE_NS_SHARED attribute doesn't change anything and
->> works for both the models, as far as the Realm is concerned.
->>
->>
->> Suzuki
->>
->>
->>
->>
->>>
->>> Thanks,
->>> Alex
->>>
->>>> This is modelled as a PTE attribute, but is actually part of the address.
->>>>
->>>> So, when MMU is disabled, the "physical address" must reflect this bit set. We
->>>> access the UART early before the MMU is enabled. So, make sure the UART is
->>>> accessed always with the bit set.
->>>>
->>>> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
->>>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->>>> ---
->>>>    lib/arm/asm/pgtable.h   |  5 +++++
->>>>    lib/arm/io.c            | 24 +++++++++++++++++++++++-
->>>>    lib/arm64/asm/pgtable.h |  5 +++++
->>>>    3 files changed, 33 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/lib/arm/asm/pgtable.h b/lib/arm/asm/pgtable.h
->>>> index 350039ff..7e85e7c6 100644
->>>> --- a/lib/arm/asm/pgtable.h
->>>> +++ b/lib/arm/asm/pgtable.h
->>>> @@ -112,4 +112,9 @@ static inline pte_t *pte_alloc(pmd_t *pmd, unsigned long addr)
->>>>    	return pte_offset(pmd, addr);
->>>>    }
->>>> +static inline unsigned long arm_shared_phys_alias(void *x)
->>>> +{
->>>> +	return ((unsigned long)(x) | PTE_NS_SHARED);
->>>> +}
->>>> +
->>>>    #endif /* _ASMARM_PGTABLE_H_ */
->>>> diff --git a/lib/arm/io.c b/lib/arm/io.c
->>>> index 836fa854..127727e4 100644
->>>> --- a/lib/arm/io.c
->>>> +++ b/lib/arm/io.c
->>>> @@ -15,6 +15,8 @@
->>>>    #include <asm/psci.h>
->>>>    #include <asm/spinlock.h>
->>>>    #include <asm/io.h>
->>>> +#include <asm/mmu-api.h>
->>>> +#include <asm/pgtable.h>
->>>>    #include "io.h"
->>>> @@ -30,6 +32,24 @@ static struct spinlock uart_lock;
->>>>    static volatile u8 *uart0_base = UART_EARLY_BASE;
->>>>    bool is_pl011_uart;
->>>> +static inline volatile u8 *get_uart_base(void)
->>>> +{
->>>> +	/*
->>>> +	 * The address of the UART base may be different
->>>> +	 * based on whether we are running with/without
->>>> +	 * MMU enabled.
->>>> +	 *
->>>> +	 * For realms, we must force to use the shared physical
->>>> +	 * alias with MMU disabled, to make sure the I/O can
->>>> +	 * be emulated.
->>>> +	 * When the MMU is turned ON, the mappings are created
->>>> +	 * appropriately.
->>>> +	 */
->>>> +	if (mmu_enabled())
->>>> +		return uart0_base;
->>>> +	return (u8 *)arm_shared_phys_alias((void *)uart0_base);
->>>> +}
->>>> +
->>>>    static void uart0_init_fdt(void)
->>>>    {
->>>>    	/*
->>>> @@ -109,9 +129,11 @@ void io_init(void)
->>>>    void puts(const char *s)
->>>>    {
->>>> +	volatile u8 *uart_base = get_uart_base();
->>>> +
->>>>    	spin_lock(&uart_lock);
->>>>    	while (*s)
->>>> -		writeb(*s++, uart0_base);
->>>> +		writeb(*s++, uart_base);
->>>>    	spin_unlock(&uart_lock);
->>>>    }
->>>> diff --git a/lib/arm64/asm/pgtable.h b/lib/arm64/asm/pgtable.h
->>>> index 5b9f40b0..871c03e9 100644
->>>> --- a/lib/arm64/asm/pgtable.h
->>>> +++ b/lib/arm64/asm/pgtable.h
->>>> @@ -28,6 +28,11 @@ extern unsigned long prot_ns_shared;
->>>>    */
->>>>    #define PTE_NS_SHARED		(prot_ns_shared)
->>>> +static inline unsigned long arm_shared_phys_alias(void *addr)
->>>> +{
->>>> +	return ((unsigned long)addr | PTE_NS_SHARED);
->>>> +}
->>>> +
->>>>    /*
->>>>     * Highest possible physical address supported.
->>>>     */
->>>> -- 
->>>> 2.34.1
->>>>
->>
->>
+> Signed-off-by: James Morse <james.morse@arm.com>
+> Reviewed-by: Joanthan Cameron <Jonathan.Cameron@huawei.com>
 
+Gavin's earlier review showed I can't type.
+Fixed up by dropping this RB seeing as I signed off anyway.
+
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> Tested-by: Miguel Luis <miguel.luis@oracle.com>
+> Tested-by: Vishnu Pajjuri <vishnu@os.amperecomputing.com>
+> Tested-by: Jianyong Wu <jianyong.wu@arm.com>
+> Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+> 
