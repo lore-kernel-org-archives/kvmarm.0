@@ -1,190 +1,199 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DC171E52A;
-	Fri, 26 Apr 2024 12:41:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4DF3147C89;
+	Fri, 26 Apr 2024 13:51:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714135292; cv=none; b=ptditzuVsph4EcSGNxPeRCtMaehWLWOM0nGBG+c89jhZLok631YhjJZsQIoWICo2mDsBouLBj7SlRku4XuNVqm9jM9kHsbMp/jK2UjEzFNtPYxiPjJAhzE4Z5hZeDiHmN1L/EpALIk8rvKBnbhFRORvFOz6csK5ipxffFQorUVc=
+	t=1714139492; cv=none; b=sldNe7IokSVo0TRzU5BYC3dO/Ks/2oPeWiQ1nt75AQEvt0CoyhntSx3dudkD2wNsjExeE4yWYifRk8b1b+P0Ylv3aZZtyG9RTD0DvZ3gTGADhRLoERyrVDDHEzL42kmxz0mQ/gJWK5JFrkHeVqOkf3dds0l6rVOtZeEVyiK6j0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714135292; c=relaxed/simple;
-	bh=st9N10ArNUyvvV0O3ITMWIsRRo6eZ2Ebw9/XgVcbw0s=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bVz6mIsr5RknmejyLYItEgywEN4SPsAl5FJtz+VIpbRoQn1AyapCRnrZUR+kiOdXEgSivAdCjGJkBGo+we28eG48eU0vu10/QmRK21kg2m0qzwkKyEw3pWYM1fM4h+nyBompEujojIa02JO+xHif8wDiM8THlddMhO/8sr6IXWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nhInhu73; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nhInhu73"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E95E7C113CD;
-	Fri, 26 Apr 2024 12:41:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714135291;
-	bh=st9N10ArNUyvvV0O3ITMWIsRRo6eZ2Ebw9/XgVcbw0s=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nhInhu73+ejrsJQp7XW+TlWHiMfsPF9kDo/EibrlYTgEzK8TMbXBv6CeuCa5LxVXq
-	 PVqPQwuloEel+Isr+bhThUF4SmUs9Fn25FkAiESPt17ervqrh0S/dUDRRWWQlV/by9
-	 nUTr94h0OYz1bgnzhrDD/SufHJIxw9vT68YGCSfSAhz9HNFGR74uJUL2+F/raEZG9C
-	 LAP4IbiD2z5Kqq0CRxOhWYAhg/ysrzLrVT3N/0GWozDR3tnqmGrbDGDduDjY6S4uVG
-	 Y90lnGMNgYMYAtENSOHFBBjSi/lAIfpMPfj4331iav/zEl8giMzudkZgPVBvnLnGvg
-	 0QMiJ7Mk4oB+Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1s0KtM-008DZj-AC;
-	Fri, 26 Apr 2024 13:41:28 +0100
-Date: Fri, 26 Apr 2024 13:41:27 +0100
-Message-ID: <86bk5wqoso.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-Cc: <linuxarm@huawei.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Peter Zijlstra
-	<peterz@infradead.org>,
-	<linux-pm@vger.kernel.org>,
-	<loongarch@lists.linux.dev>,
-	<linux-acpi@vger.kernel.org>,
-	<linux-arch@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>,
-	<x86@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	"Rafael J . Wysocki"
-	<rafael@kernel.org>,
-	Miguel Luis <miguel.luis@oracle.com>,
-	"James Morse"
-	<james.morse@arm.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Jean-Philippe
- Brucker <jean-philippe@linaro.org>,
-	Catalin Marinas
-	<catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Ingo Molnar
-	<mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen
-	<dave.hansen@linux.intel.com>,
-	<justin.he@arm.com>,
-	<jianyong.wu@arm.com>
-Subject: Re: [PATCH v7 11/16] irqchip/gic-v3: Add support for ACPI's disabled but 'online capable' CPUs
-In-Reply-To: <20240425175502.00007def@huawei.com>
-References: <20240418135412.14730-1-Jonathan.Cameron@huawei.com>
-	<20240418135412.14730-12-Jonathan.Cameron@huawei.com>
-	<20240422114020.0000294f@Huawei.com>
-	<87plugthim.wl-maz@kernel.org>
-	<20240424135438.00001ffc@huawei.com>
-	<86il06rd19.wl-maz@kernel.org>
-	<20240425133150.000009fa@Huawei.com>
-	<20240425155726.000063f7@huawei.com>
-	<20240425175502.00007def@huawei.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1714139492; c=relaxed/simple;
+	bh=QHkwzm7yGBz1ZP6RZARRpVjRm5TBFngEPCESKKI1c/Y=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=W8XDLqdxVEO6lrhBkAYmWIXf08IY4H0QeRIznq9ilpwqEttrCitP2QbBt6zzpZqP18vy9tyIYw9O//H2TrNcqlrH+mTHKtuzkvGcj9+qsYFItF50g7KNtN3UujQPxgrISDsevyXmTJZ2i3cBMKcBKRzjPWGbLb5SLesQ9YI7DBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4VQvG10Yj3z6K6Nj;
+	Fri, 26 Apr 2024 21:48:57 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id C5D0C140A34;
+	Fri, 26 Apr 2024 21:51:25 +0800 (CST)
+Received: from SecurePC-101-06.china.huawei.com (10.122.247.231) by
+ lhrpeml500005.china.huawei.com (7.191.163.240) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Fri, 26 Apr 2024 14:51:25 +0100
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+To: Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra
+	<peterz@infradead.org>, <linux-pm@vger.kernel.org>,
+	<loongarch@lists.linux.dev>, <linux-acpi@vger.kernel.org>,
+	<linux-arch@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<x86@kernel.org>, Russell King <linux@armlinux.org.uk>, "Rafael J . Wysocki"
+	<rafael@kernel.org>, Miguel Luis <miguel.luis@oracle.com>, James Morse
+	<james.morse@arm.com>, Salil Mehta <salil.mehta@huawei.com>, Jean-Philippe
+ Brucker <jean-philippe@linaro.org>, Catalin Marinas
+	<catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Marc Zyngier
+	<maz@kernel.org>, Hanjun Guo <guohanjun@huawei.com>
+CC: Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave
+ Hansen <dave.hansen@linux.intel.com>, <linuxarm@huawei.com>,
+	<justin.he@arm.com>, <jianyong.wu@arm.com>, Lorenzo Pieralisi
+	<lpieralisi@kernel.org>, Sudeep Holla <sudeep.holla@arm.com>
+Subject: [PATCH v8 00/16] ACPI/arm64: add support for virtual cpu hotplug
+Date: Fri, 26 Apr 2024 14:51:10 +0100
+Message-ID: <20240426135126.12802-1-Jonathan.Cameron@huawei.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: Jonathan.Cameron@Huawei.com, linuxarm@huawei.com, tglx@linutronix.de, peterz@infradead.org, linux-pm@vger.kernel.org, loongarch@lists.linux.dev, linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, x86@kernel.org, linux@armlinux.org.uk, rafael@kernel.org, miguel.luis@oracle.com, james.morse@arm.com, salil.mehta@huawei.com, jean-philippe@linaro.org, catalin.marinas@arm.com, will@kernel.org, mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, justin.he@arm.com, jianyong.wu@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: lhrpeml500002.china.huawei.com (7.191.160.78) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
-On Thu, 25 Apr 2024 17:55:27 +0100,
-Jonathan Cameron <Jonathan.Cameron@Huawei.com> wrote:
-> 
-> On Thu, 25 Apr 2024 16:00:17 +0100
-> Jonathan Cameron <Jonathan.Cameron@Huawei.com> wrote:
-> 
-> > On Thu, 25 Apr 2024 13:31:50 +0100
-> > Jonathan Cameron <Jonathan.Cameron@Huawei.com> wrote:
-> > 
-> > > On Wed, 24 Apr 2024 16:33:22 +0100
-> > > Marc Zyngier <maz@kernel.org> wrote:
+Thanks to Rafael, Marc, Hanjun and Gavin for reviews of v8 and tags.
 
-[...]
+v8: Details and more minor stuff in individual patch descriptions
+  - Rewrite the handling of not enabled redistributors in the gicv3 driver
+    to keep impacts local. Note this needs a dance with a new cpuhp
+    callback that runs before CPU bring up reaches the section that
+    cannot fail. This avoids clearing bits in cpu_present_mask and
+    cpu_possible_mask making the solution much less fragile.
+  - Do not carry on for that CPU if acpi_processor_set_per_cpu() detects
+    a problem, but continue to leave enough in place to perform buggy bios
+    checks.
+  - Protect against a buggy BIOS that has apparently enabled CPUs in DSDT
+    that are not in MADT. The check makes sense anyway as on arm64 we have
+    not way to 'generate' an ID if one isn't present at acpi_map_cpu().
 
-> > >   
-> > > > I'd expect the handling side to look like this (will not compile, but
-> > > > you'll get the idea):    
-> > > Hi Marc,
-> > > 
-> > > In general this looks good - but...
-> > > 
-> > > I haven't gotten to the bottom of why yet (and it might be a side
-> > > effect of how I hacked the test by lying in minimal fashion and
-> > > just frigging the MADT read functions) but the hotplug flow is only getting
-> > > as far as calling __cpu_up() before it seems to enter an infinite loop.
-> > > That is it never gets far enough to fail this test.
-> > > 
-> > > Getting stuck in a psci cpu_on call.  I'm guessing something that
-> > > we didn't get to in the earlier gicv3 calls before bailing out is blocking that?
-> > > Looks like it gets to
-> > > SMCCC smc
-> > > and is never seen again.
-> > > 
-> > > Any ideas on where to look?  The one advantage so far of the higher level
-> > > approach is we never tried the hotplug callbacks at all so avoided hitting
-> > > that call.  One (little bit horrible) solution that might avoid this would 
-> > > be to add another cpuhp state very early on and fail at that stage.
-> > > I'm not keen on doing that without a better explanation than I have so far!  
-> > 
-> > Whilst it still doesn't work I suspect I'm loosing ability to print to the console
-> > between that point and somewhat later and real problem is
-> > elsewhere.
+Updated version of James' original introduction.
 
-Sorry, travelling at the moment, so only spotted this now.
+This series adds what looks like cpuhotplug support to arm64 for use in
+virtual machines. It does this by moving the cpu_register() calls for
+architectures that support ACPI into an arch specific call made from
+the ACPI processor driver.
+ 
+The kubernetes folk really want to be able to add CPUs to an existing VM,
+in exactly the same way they do on x86. The use-case is pre-booting guests
+with one CPU, then adding the number that were actually needed when the
+workload is provisioned.
 
-> 
-> Hi again,
-> 
-> Found it I think.  cpuhp calls between cpu:bringup and ap:online 
-> arm made from notify_cpu_starting() are clearly marked as nofail with a comment.
-> STARTING must not fail!
-> 
-> https://elixir.bootlin.com/linux/latest/source/kernel/cpu.c#L1642
+Wait? Doesn't arm64 support cpuhotplug already!?
+In the arm world, cpuhotplug gets used to mean removing the power from a CPU.
+The CPU is offline, and remains present. For x86, and ACPI, cpuhotplug
+has the additional step of physically removing the CPU, so that it isn't
+present anymore.
+ 
+Arm64 doesn't support this, and can't support it: CPUs are really a slice
+of the SoC, and there is not enough information in the existing ACPI tables
+to describe which bits of the slice also got removed. Without a reference
+machine: adding this support to the spec is a wild goose chase.
+ 
+Critically: everything described in the firmware tables must remain present.
+ 
+For a virtual machine this is easy as all the other bits of 'virtual SoC'
+are emulated, so they can (and do) remain present when a vCPU is 'removed'.
 
-Ah, now that rings a bell! ;-)
+On a system that supports cpuhotplug the MADT has to describe every possible
+CPU at boot. Under KVM, the vGIC needs to know about every possible vCPU before
+the guest is started.
+With these constraints, virtual-cpuhotplug is really just a hypervisor/firmware
+policy about which CPUs can be brought online.
+ 
+This series adds support for virtual-cpuhotplug as exactly that: firmware
+policy. This may even work on a physical machine too; for a guest the part of
+firmware is played by the VMM. (typically Qemu).
+ 
+PSCI support is modified to return 'DENIED' if the CPU can't be brought
+online/enabled yet. The CPU object's _STA method's enabled bit is used to
+indicate firmware's current disposition. If the CPU has its enabled bit clear,
+it will not be registered with sysfs, and attempts to bring it online will
+fail. The notifications that _STA has changed its value then work in the same
+way as physical hotplug, and firmware can cause the CPU to be registered some
+time later, allowing it to be brought online.
+ 
+This creates something that looks like cpuhotplug to user-space and the
+kernel beyond arm64 architecture specific code, as the sysfs
+files appear and disappear, and the udev notifications look the same.
+ 
+One notable difference is the CPU present mask, which is exposed via sysfs.
+Because the CPUs remain present throughout, they can still be seen in that mask.
+This value does get used by webbrowsers to estimate the number of CPUs
+as the CPU online mask is constantly changed on mobile phones.
+ 
+Linux is tolerant of PSCI returning errors, as its always been allowed to do
+that. To avoid confusing OS that can't tolerate this, we needed an additional
+bit in the MADT GICC flags. This series copies ACPI_MADT_ONLINE_CAPABLE, which
+appears to be for this purpose, but calls it ACPI_MADT_GICC_CPU_CAPABLE as it
+has a different bit position in the GICC.
+ 
+This code is unconditionally enabled for all ACPI architectures, though for
+now only arm64 will have deferred the cpu_register() calls.
 
-> 
-> Whilst I have no immediate idea why that comment is there it is pretty strong
-> argument against trying to have the CPUHP_AP_IRQ_GIC_STARTING callback fail
-> and expecting it to carry on working :( 
-> There would have been a nice print message, but given I don't appear to have
-> a working console after that stage I never see it.
-> 
-> So the best I have yet come up with for this is the option of a new callback registered
-> in gic_smp_init()
-> 
-> cpuhp_setup_state_nocalls(CPUHP_BP_PREPARE_DYN,
-> 			  "irqchip/arm/gicv3:checkrdist",
-> 			  gic_broken_rdist, NULL);
-> 
-> with callback being simply 
-> 
-> static int gic_broken_rdist(unsigned int cpu)
-> {
-> 	if (cpumask_test_cpu(cpu, &broken_rdists))
-> 		return -EINVAL;
-> 
-> 	return 0;
-> }
-> 
-> That gets called cpuhp_up_callbacks() and is allows to fail and roll back the steps.
-> 
-> Not particularly satisfying but keeps the logic confined to the gicv3 driver.
-> 
-> What do you think?
+If folk want to play along at home, you'll need a copy of Qemu that supports this.
+https://github.com/salil-mehta/qemu.git virt-cpuhp-armv8/rfc-v2
 
-Good enough for me. Cc me on the resulting patch when you repost it so
-that I can eyeball it, but this is IMO the right direction.
+Replace your '-smp' argument with something like:
+ | -smp cpus=1,maxcpus=3,cores=3,threads=1,sockets=1
+ 
+ then feed the following to the Qemu montior;
+ | (qemu) device_add driver=host-arm-cpu,core-id=1,id=cpu1
+ | (qemu) device_del cpu1
+ 
 
-Thanks,
+James Morse (7):
+  ACPI: processor: Register deferred CPUs from acpi_processor_get_info()
+  ACPI: Add post_eject to struct acpi_scan_handler for cpu hotplug
+  arm64: acpi: Move get_cpu_for_acpi_id() to a header
+  irqchip/gic-v3: Don't return errors from gic_acpi_match_gicc()
+  irqchip/gic-v3: Add support for ACPI's disabled but 'online capable'
+    CPUs
+  arm64: document virtual CPU hotplug's expectations
+  cpumask: Add enabled cpumask for present CPUs that can be brought
+    online
 
-	M.
+Jean-Philippe Brucker (1):
+  arm64: psci: Ignore DENIED CPUs
+
+Jonathan Cameron (8):
+  ACPI: processor: Simplify initial onlining to use same path for cold
+    and hotplug
+  cpu: Do not warn on arch_register_cpu() returning -EPROBE_DEFER
+  ACPI: processor: Drop duplicated check on _STA (enabled + present)
+  ACPI: processor: Move checks and availability of acpi_processor
+    earlier
+  ACPI: processor: Add acpi_get_processor_handle() helper
+  ACPI: scan: switch to flags for acpi_scan_check_and_detach()
+  arm64: arch_register_cpu() variant to check if an ACPI handle is now
+    available.
+  arm64: Kconfig: Enable hotplug CPU on arm64 if ACPI_PROCESSOR is
+    enabled.
+
+ .../ABI/testing/sysfs-devices-system-cpu      |   6 +
+ Documentation/arch/arm64/cpu-hotplug.rst      |  79 ++++++++++++
+ Documentation/arch/arm64/index.rst            |   1 +
+ arch/arm64/Kconfig                            |   1 +
+ arch/arm64/include/asm/acpi.h                 |  11 ++
+ arch/arm64/kernel/acpi.c                      |  22 ++++
+ arch/arm64/kernel/acpi_numa.c                 |  11 --
+ arch/arm64/kernel/psci.c                      |   2 +-
+ arch/arm64/kernel/smp.c                       |  56 ++++++++-
+ drivers/acpi/acpi_processor.c                 | 115 +++++++++++-------
+ drivers/acpi/processor_driver.c               |  44 ++-----
+ drivers/acpi/scan.c                           |  47 +++++--
+ drivers/base/cpu.c                            |  12 +-
+ drivers/irqchip/irq-gic-v3.c                  |  49 ++++++--
+ include/acpi/acpi_bus.h                       |   1 +
+ include/acpi/processor.h                      |   2 +-
+ include/linux/acpi.h                          |  10 +-
+ include/linux/cpumask.h                       |  25 ++++
+ kernel/cpu.c                                  |   3 +
+ 19 files changed, 383 insertions(+), 114 deletions(-)
+ create mode 100644 Documentation/arch/arm64/cpu-hotplug.rst
 
 -- 
-Without deviation from the norm, progress is not possible.
+2.39.2
+
