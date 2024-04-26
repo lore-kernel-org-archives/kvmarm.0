@@ -1,103 +1,89 @@
-Received: from mail-vs1-f54.google.com (mail-vs1-f54.google.com [209.85.217.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45DFD13B298
-	for <kvmarm@lists.linux.dev>; Fri, 26 Apr 2024 07:21:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DB8313BC2B;
+	Fri, 26 Apr 2024 07:33:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714116075; cv=none; b=qR0LZWXmbbaBOdgXUCoJ6gnt6uMhAsyp3wj7XoCo/YAW19KPB23t1Ep/m4i6avg+P/SLtEBA2FHPWYCxDOnkhq6k3rZXHrxzfVX6a4tfCd2WxvAYjxdqlTwfddgDq/gNREefUBdZ0wEyD892WR9LCg/Xugka+nBvs1YHFEJ0RKM=
+	t=1714116840; cv=none; b=DxGqRVGP92GH5PlWbKy+xoyHBGoVeohpsLcVO0cU5uTjuizVWX14TsYgGX6GUuEZbmIsdmOomBNzsTv9t5f+KGdxZVDM3mTS+g3t3ITV1vvQOmKuaI1Ydieby3t9k0Fm8iOM9XslsoReeXjFOQjM3aAMAwRxOqKhKhfJnd55RSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714116075; c=relaxed/simple;
-	bh=rANPXM6l2rPw4aYc3tXkotjAQSSZfwwMFUVoI7/VEqo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mZpwVi8EQOllQjCHaGAXEsrckEN3HuzbfypiUlE37ydQbm0NIgml0jkx6ToZMviKa4mNM7Zarpbr2S2Dnhh5VXd6n9tZyamzeQF1F0wrZedG6dowDgq0PsKuA1yJ0sVb5ZYQnS3a8HvmWgMS80zWWNsAUDy0hDzBU8vwXjBmqbo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GhONS0EN; arc=none smtp.client-ip=209.85.217.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1714116840; c=relaxed/simple;
+	bh=gksl38yx9eZzDHDXbUKTYhZmDGqlaFTVA8MzoHCjPSQ=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=hK2bnoeCZoVdT08nfXK04YIJzhD3hdQAngLjqGbpUaF5Vw74jGyPpqimK0QS512Zeuzjk7Tb8wyXf7m3tAMsJehbnhUDlZkS0iIfff1DWOsWfVJkiTsgti5z+n4pK/eQPh0LPM4ECOWo8m9ydm9uE0kPlCiSScUHk+8uZj4usCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r6EVUWWW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GhONS0EN"
-Received: by mail-vs1-f54.google.com with SMTP id ada2fe7eead31-479c8f43ca5so473327137.0
-        for <kvmarm@lists.linux.dev>; Fri, 26 Apr 2024 00:21:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714116073; x=1714720873; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rANPXM6l2rPw4aYc3tXkotjAQSSZfwwMFUVoI7/VEqo=;
-        b=GhONS0ENtrbrFE5Tu5vD3ggvsgqFrefk8tssiNQ4aK9TFgdynninuWocsLITu/HhlD
-         lxHYF60ZczUfbykluVD5VoZSoHKiqxk+UFnvQjOQo6DINsVhcR6BG9BOxmujNqTQXPbE
-         VC6MUQnfNuS/umdavkjbv99L7TIZAtNrwTEyLeBuP6MwuAiDM8n9LlAuZSNoQlxTcPCi
-         SGA/YWgcYXmLQqda1igUTf2564uT4vR+ydLnmPUgkzSdmhP/Itjnx1VonihHz6EHi18X
-         sWmG9MxwH2YH55jCJs/Go78jwg2SHh0KNbZmgw5njKgwbETD/CBDQ7xyZ3lzTtYPCVYG
-         9oqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714116073; x=1714720873;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rANPXM6l2rPw4aYc3tXkotjAQSSZfwwMFUVoI7/VEqo=;
-        b=fVvpnGYIjCJhjMqVyC047ZmzbOvg5Gx2VgCaawkf/Mid7zr2Nnss8Km19WpXAiWzdC
-         k0jjLA2TaOxnlEN1AJfTgvMWcEOyQHYy3uia9j8BPvt6XEoX6uNGLysX3Ev2gtZftjHU
-         kAqpZzLbjwWAtP3pg9tzjHhpOctHTpz4pmypvPXot7M2QTZhYtULPPLJSgeQ50lNVSfk
-         hnmvE+ywOLLcvEQgbnY3IFpp+gu0gD9fz+QPh3ffum9sgx9sJWtMfSS2cYxcLmJXjeIF
-         Z3rI7SA2eDhRJpKDN+lX7oth94AaFr7/3vjvy4o1eU/eQYBlehirSttDUmxwCescdocK
-         d52g==
-X-Gm-Message-State: AOJu0YxFZRC1Y+t1XMav1I3nf17+DgQXObwRb3xIQBruQCYqXrWHVOOt
-	F7vYxx9sDeqqJXi8lrW16EXSnhbTnxHy3ceNJA1sfUIzrDVb+qmzpBMrV7gYkWONybo/aRPnp+z
-	2h6pDBNBGAibm5Vt8uVEug2vIbFYjyZYsPrr8
-X-Google-Smtp-Source: AGHT+IFjdhVyp32ZpHSQDjEmsyuj45UbL4GPHPIFvpLcBn3VDDRt7EAwXotkkY2oBeQY0ar4w9H5S0NlriJ/8jS7ZBM=
-X-Received: by 2002:a05:6102:24a6:b0:47b:5eb3:85e1 with SMTP id
- s6-20020a05610224a600b0047b5eb385e1mr1669258vse.33.1714116073008; Fri, 26 Apr
- 2024 00:21:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r6EVUWWW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91A6EC113CD;
+	Fri, 26 Apr 2024 07:33:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714116839;
+	bh=gksl38yx9eZzDHDXbUKTYhZmDGqlaFTVA8MzoHCjPSQ=;
+	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
+	b=r6EVUWWWwqWuB2/4TPNdaGpUi5w/svatLiUkQPW7jg/Kqfz+v9PjTsqhHX0V5+EAd
+	 O9Q7MLhBBw+u+yC3YJdVVaI93yGyVAyg60gYgQw+aYYn1jycUg0XiChWp0Iu1VFKMv
+	 DwPywl0dLcmeXRt7ZEBqHGpgzLkfbaLNMsfQI9WfrWSOqgHI+raXZsInlkpmvx5zN2
+	 Aw4iSz/F3PrrMtthz0B2wb3NwCnmeHWiHSYEJZOSeSYq9iQITvYdPXRUZEGz3Zp6OT
+	 dsVslJOA6lLCpSJkkdCeyvYqDh4fWotWkzTVM/CVN72PQmXal5hJg3KuZB1fRSHKNY
+	 lVwcEZNrXTKCg==
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20240423150538.2103045-1-tabba@google.com> <20240423150538.2103045-22-tabba@google.com>
- <ZirfWVZ-PsET5Aii@linux.dev>
-In-Reply-To: <ZirfWVZ-PsET5Aii@linux.dev>
-From: Fuad Tabba <tabba@google.com>
-Date: Fri, 26 Apr 2024 08:20:36 +0100
-Message-ID: <CA+EHjTzPoW8pWtRaPksL7oE73R-sP2GHWmaznq-prEcPr3VdxA@mail.gmail.com>
-Subject: Re: [PATCH v4 21/30] KVM: arm64: Refactor calculating SVE state size
- to use helpers
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev, maz@kernel.org, will@kernel.org, 
-	qperret@google.com, seanjc@google.com, alexandru.elisei@arm.com, 
-	catalin.marinas@arm.com, philmd@linaro.org, james.morse@arm.com, 
-	suzuki.poulose@arm.com, mark.rutland@arm.com, broonie@kernel.org, 
-	joey.gouly@arm.com, rananta@google.com, smostafa@google.com
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 26 Apr 2024 10:33:40 +0300
+Message-Id: <D0TVP8ILJMO0.HERRWR4PA7N6@kernel.org>
+Cc: "Dan Carpenter" <dan.carpenter@linaro.org>, "Shuah Khan"
+ <shuah@kernel.org>, "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+ "Paolo Bonzini" <pbonzini@redhat.com>, "Marc Zyngier" <maz@kernel.org>,
+ "Oliver Upton" <oliver.upton@linux.dev>, "Huacai Chen"
+ <chenhuacai@kernel.org>, "Michael Ellerman" <mpe@ellerman.id.au>, "Anup
+ Patel" <anup@brainfault.org>, "Paul Walmsley" <paul.walmsley@sifive.com>,
+ "Palmer Dabbelt" <palmer@dabbelt.com>, "Albert Ou" <aou@eecs.berkeley.edu>,
+ "Alexander Viro" <viro@zeniv.linux.org.uk>, "Christian Brauner"
+ <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+ "Andrew Morton" <akpm@linux-foundation.org>, <kvm@vger.kernel.org>,
+ <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+ <linux-mips@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>,
+ <kvm-riscv@lists.infradead.org>, <linux-riscv@lists.infradead.org>,
+ <linux-fsdevel@vger.kernel.org>, <linux-mm@kvack.org>,
+ <linux-kernel@vger.kernel.org>, "Xiaoyao Li" <xiaoyao.li@intel.com>, "Xu
+ Yilun" <yilun.xu@intel.com>, "Chao Peng" <chao.p.peng@linux.intel.com>,
+ "Fuad Tabba" <tabba@google.com>, "Anish Moorthy" <amoorthy@google.com>,
+ "David Matlack" <dmatlack@google.com>, "Yu Zhang"
+ <yu.c.zhang@linux.intel.com>, "Isaku Yamahata" <isaku.yamahata@intel.com>,
+ =?utf-8?q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>, "Vlastimil Babka"
+ <vbabka@suse.cz>, "Vishal Annapurve" <vannapurve@google.com>, "Ackerley
+ Tng" <ackerleytng@google.com>, "Maciej Szmigiero"
+ <mail@maciej.szmigiero.name>, "David Hildenbrand" <david@redhat.com>,
+ "Quentin Perret" <qperret@google.com>, "Michael Roth"
+ <michael.roth@amd.com>, "Wang" <wei.w.wang@intel.com>, "Liam Merwick"
+ <liam.merwick@oracle.com>, "Isaku Yamahata" <isaku.yamahata@gmail.com>,
+ "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, "Naresh Kamboju"
+ <naresh.kamboju@linaro.org>, "Anders Roxell" <anders.roxell@linaro.org>,
+ "Benjamin Copeland" <ben.copeland@linaro.org>
+Subject: Re: [PATCH v13 25/35] KVM: selftests: Convert lib's mem regions to
+ KVM_SET_USER_MEMORY_REGION2
+From: "Jarkko Sakkinen" <jarkko@kernel.org>
+To: "Sean Christopherson" <seanjc@google.com>, "Shuah Khan"
+ <skhan@linuxfoundation.org>
+X-Mailer: aerc 0.17.0
+References: <20231027182217.3615211-1-seanjc@google.com>
+ <20231027182217.3615211-26-seanjc@google.com>
+ <69ae0694-8ca3-402c-b864-99b500b24f5d@moroto.mountain>
+ <3848a9ad-07aa-48da-a2b7-264c4a990b5b@linuxfoundation.org>
+ <ZipyPYR8Nv_usoU4@google.com>
+In-Reply-To: <ZipyPYR8Nv_usoU4@google.com>
 
-Hi,
+On Thu Apr 25, 2024 at 6:09 PM EEST, Sean Christopherson wrote:
+> +       __TEST_REQUIRE(kvm_has_cap(KVM_CAP_USER_MEMORY2),
+> +                      "KVM selftests from v6.8+ require KVM_SET_USER_MEM=
+ORY_REGION2");
 
-On Thu, Apr 25, 2024 at 11:55=E2=80=AFPM Oliver Upton <oliver.upton@linux.d=
-ev> wrote:
->
-> Hi Fuad,
->
-> On Tue, Apr 23, 2024 at 04:05:29PM +0100, Fuad Tabba wrote:
-> > The main factor for determining the SVE state size is the vector
-> > length, and future patches will need to calculate it without
-> > necessarily having a vcpu as a reference.
->
-> Unless I'm missing something (which happens a lot), I don't see any
-> users for sve_state_size() in this series. The refactoring looks
-> fine, but let's only do it when there's users for it.
+This would work also for casual (but not seasoned) visitor in KVM code
+as additionl documentation.
 
-No, there aren't any users for this now. I thought it made sense
-though to decouple the calculation of the state size from the vcpu,
-since it's not vcpu dependent.
-
-But sure, I can hold on to this one until the remaining sve patches are rea=
-dy.
-
-Cheers,
-/fuad
-
-> --
-> Thanks,
-> Oliver
+BR, Jarkko
