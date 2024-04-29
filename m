@@ -1,109 +1,176 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 475637FD
-	for <kvmarm@lists.linux.dev>; Mon, 29 Apr 2024 02:23:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F9B11AAA5;
+	Mon, 29 Apr 2024 09:21:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714357404; cv=none; b=rMq/B5u1LPn14hHFQ8WWS6w7zAzKN7TmwAbOjo2sAzBfbv5adDQdAvHnfkWSptp2tqaCF/23Tbk+EwnVic0klxiE0QkR5IriiWc9K2Dj/GPysloERr/mBa4MESEnjHQYFStwqHCrVjKme1DHeGrFynam3PijNLGKtyk0phxoOu4=
+	t=1714382499; cv=none; b=QcivXYPj1NGS5exkKnR5z3DSHzvv5iAqq0egaAkI+YMyh2qT0CUIQ5jTwX5R7ByUnSxESARIMiasKVS4hdSlWq/Z/whOvU/Wa/kT1ujvstH87oMgIFWUD7vS1GGdsi9AUvZEfrEN8XpAXmNjs2ultofnbkn0KhkQ0GmNlGRDfXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714357404; c=relaxed/simple;
-	bh=FscvFKLev/pbFhBKOoUhHWN2J3QCiz+0dzat4SNZspg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IuCBeml5V9KG6yiOromtwaJgRCyX/G3Y5xXx3ldPdGPW87xnM8XRRVruVyTUqTW27spYdPJDP9aLQlQ7b0aUoEZnDA22z74uhEjNDppdQauzFgqgaMalNoSKDAnUMydc/Me4YrxNdjAhi7unB5X9rWAP3iXuDgX3lnVD+2T6YqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A6C812F4;
-	Sun, 28 Apr 2024 19:23:47 -0700 (PDT)
-Received: from [10.162.42.72] (a077893.blr.arm.com [10.162.42.72])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EF2BF3F73F;
-	Sun, 28 Apr 2024 19:23:17 -0700 (PDT)
-Message-ID: <ab6466f2-023e-4b5f-bb60-aadb9eee089a@arm.com>
-Date: Mon, 29 Apr 2024 07:53:14 +0530
+	s=arc-20240116; t=1714382499; c=relaxed/simple;
+	bh=psU9IiCnjLKZ0N5EAzULiwZffDrrX9StQx6qKklgmuY=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FZIG8+EeE3li2nSh7x6dOtFemuHgI0xlDoiFa2+bVMgrbH4Q4yN4Ifk5z9UJDY/QffbCM7aHTp62WBhLPJiuI42oI49BNlwCIQNJyJP2+XOSD1b+2jgw/i9y337GmdkqRzDUqAV7b7XoqkparHeLVHKyKl2neS17VT4U3ViCu/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4VSd751DX3z6K6pc;
+	Mon, 29 Apr 2024 17:18:57 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id 21420140B63;
+	Mon, 29 Apr 2024 17:21:34 +0800 (CST)
+Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Mon, 29 Apr
+ 2024 10:21:33 +0100
+Date: Mon, 29 Apr 2024 10:21:31 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: Marc Zyngier <maz@kernel.org>, <linuxarm@huawei.com>
+CC: Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra
+	<peterz@infradead.org>, <linux-pm@vger.kernel.org>,
+	<loongarch@lists.linux.dev>, <linux-acpi@vger.kernel.org>,
+	<linux-arch@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<x86@kernel.org>, Russell King <linux@armlinux.org.uk>, "Rafael J . Wysocki"
+	<rafael@kernel.org>, Miguel Luis <miguel.luis@oracle.com>, "James Morse"
+	<james.morse@arm.com>, Salil Mehta <salil.mehta@huawei.com>, Jean-Philippe
+ Brucker <jean-philippe@linaro.org>, Catalin Marinas
+	<catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Hanjun Guo
+	<guohanjun@huawei.com>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov
+	<bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+	<linuxarm@huawei.com>, <justin.he@arm.com>, <jianyong.wu@arm.com>, "Lorenzo
+ Pieralisi" <lpieralisi@kernel.org>, Sudeep Holla <sudeep.holla@arm.com>
+Subject: Re: [PATCH v8 11/16] irqchip/gic-v3: Add support for ACPI's
+ disabled but 'online capable' CPUs
+Message-ID: <20240429101938.000027b2@huawei.com>
+In-Reply-To: <87frv5u3p8.wl-maz@kernel.org>
+References: <20240426135126.12802-1-Jonathan.Cameron@huawei.com>
+	<20240426135126.12802-12-Jonathan.Cameron@huawei.com>
+	<87il04t7j2.wl-maz@kernel.org>
+	<20240426192858.000033d9@huawei.com>
+	<87frv5u3p8.wl-maz@kernel.org>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] KVM: arm64: Replace custom macros with fields from
- ID_AA64PFR0_EL1
-Content-Language: en-US
-To: Marc Zyngier <maz@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com,
- Oliver Upton <oliver.upton@linux.dev>, Will Deacon <will@kernel.org>,
- kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
- Fuad Tabba <tabba@google.com>
-References: <20240418053804.2573071-1-anshuman.khandual@arm.com>
- <20240418053804.2573071-2-anshuman.khandual@arm.com>
- <871q73rufi.wl-maz@kernel.org>
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <871q73rufi.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500006.china.huawei.com (7.191.161.198) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
+On Sun, 28 Apr 2024 12:28:03 +0100
+Marc Zyngier <maz@kernel.org> wrote:
 
-
-On 4/18/24 13:09, Marc Zyngier wrote:
-> + Fuad
+> On Fri, 26 Apr 2024 19:28:58 +0100,
+> Jonathan Cameron <Jonathan.Cameron@Huawei.com> wrote:
+> > 
+> > 
+> > I'll not send a formal v9 until early next week, so here is the current state
+> > if you have time to take another look before then.  
 > 
-> On Thu, 18 Apr 2024 06:38:03 +0100,
-> Anshuman Khandual <anshuman.khandual@arm.com> wrote:
->>
->> This replaces custom macros usage (i.e ID_AA64PFR0_EL1_ELx_64BIT_ONLY and
->> ID_AA64PFR0_EL1_ELx_32BIT_64BIT) and instead directly uses register fields
->> from ID_AA64PFR0_EL1 sysreg definition.
->>
->> Cc: Marc Zyngier <maz@kernel.org>
->> Cc: Oliver Upton <oliver.upton@linux.dev>
->> Cc: Catalin Marinas <catalin.marinas@arm.com>
->> Cc: Will Deacon <will@kernel.org>
->> Cc: linux-arm-kernel@lists.infradead.org
->> Cc: kvmarm@lists.linux.dev
->> Cc: linux-kernel@vger.kernel.org
->> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
->> ---
->>  arch/arm64/kvm/hyp/include/nvhe/fixed_config.h | 8 ++++----
->>  arch/arm64/kvm/hyp/nvhe/pkvm.c                 | 4 ++--
->>  arch/arm64/kvm/hyp/nvhe/sys_regs.c             | 2 +-
->>  3 files changed, 7 insertions(+), 7 deletions(-)
->>
->> diff --git a/arch/arm64/kvm/hyp/include/nvhe/fixed_config.h b/arch/arm64/kvm/hyp/include/nvhe/fixed_config.h
->> index 51f043649146..0034bfffced6 100644
->> --- a/arch/arm64/kvm/hyp/include/nvhe/fixed_config.h
->> +++ b/arch/arm64/kvm/hyp/include/nvhe/fixed_config.h
->> @@ -52,10 +52,10 @@
->>   *	Supported by KVM
->>   */
->>  #define PVM_ID_AA64PFR0_RESTRICT_UNSIGNED (\
->> -	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL0), ID_AA64PFR0_EL1_ELx_64BIT_ONLY) | \
->> -	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL1), ID_AA64PFR0_EL1_ELx_64BIT_ONLY) | \
->> -	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL2), ID_AA64PFR0_EL1_ELx_64BIT_ONLY) | \
->> -	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL3), ID_AA64PFR0_EL1_ELx_64BIT_ONLY) | \
->> +	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL0), ID_AA64PFR0_EL1_EL0_IMP) | \
->> +	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL1), ID_AA64PFR0_EL1_EL1_IMP) | \
->> +	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL2), ID_AA64PFR0_EL1_EL2_IMP) | \
->> +	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL3), ID_AA64PFR0_EL1_EL3_IMP) | \
+> Don't bother resending this on my account -- you only sent it on
+> Friday and there hasn't been much response to it yet. There is still a
+> problem (see below), but looks otherwise OK.
 > 
-> If you are going to rework this, can we instead use something less
-> verbose such as SYS_FIELD_GET()?
+> [...]
+> 
+> > @@ -2363,11 +2381,25 @@ gic_acpi_parse_madt_gicc(union acpi_subtable_headers *header,
+> >  				(struct acpi_madt_generic_interrupt *)header;
+> >  	u32 reg = readl_relaxed(acpi_data.dist_base + GICD_PIDR2) & GIC_PIDR2_ARCH_MASK;
+> >  	u32 size = reg == GIC_PIDR2_ARCH_GICv4 ? SZ_64K * 4 : SZ_64K * 2;
+> > +	int cpu = get_cpu_for_acpi_id(gicc->uid);  
+> 
+> I already commented that get_cpu_for_acpi_id() can...
 
-Just wondering, is not FIELD_PREP() and SYS_FIELD_GET() does the exact opposite thing.
-The earlier builds the entire register value from various constituents, where as the
-later extracts a single register field from a complete register value instead. Or did
-I just misunderstood something here.
+Indeed sorry - I blame Friday syndrome for me failing to address that.
 
 > 
-> There is also a series from Fuad moving things around, and maybe
-> that's the opportunity to rework this while limiting the amount of
-> cosmetic churn. Not to that this fixed config stuff needs to be
+> >  	void __iomem *redist_base;
+> >  
+> > -	if (!acpi_gicc_is_usable(gicc))
+> > +	/* Neither enabled or online capable means it doesn't exist, skip it */
+> > +	if (!(gicc->flags & (ACPI_MADT_ENABLED | ACPI_MADT_GICC_ONLINE_CAPABLE)))
+> >  		return 0;
+> >  
+> > +	/*
+> > +	 * Capable but disabled CPUs can be brought online later. What about
+> > +	 * the redistributor? ACPI doesn't want to say!
+> > +	 * Virtual hotplug systems can use the MADT's "always-on" GICR entries.
+> > +	 * Otherwise, prevent such CPUs from being brought online.
+> > +	 */
+> > +	if (!(gicc->flags & ACPI_MADT_ENABLED)) {
+> > +		pr_warn("CPU %u's redistributor is inaccessible: this CPU can't be brought online\n", cpu);
+> > +		cpumask_set_cpu(cpu, &broken_rdists);  
+> 
+> ... return -EINVAL, and then be passed to cpumask_set_cpu(), with
+> interesting effects. It shouldn't happen, but I trust anything that
+> comes from firmware tables as much as I trust a campaigning
+> politician's promises. This should really result in the RD being
+> considered unusable, but without affecting any CPU (there is no valid
+> CPU the first place).
+> 
+> Another question is what get_cpu_for acpi_id() returns for a disabled
+> CPU. A valid CPU number? Or -EINVAL?
+It's a match function that works by iterating over 0 to nr_cpu_ids and
 
-I guess that might be a better place to change the code instead. Because this series
-just replaces the derived register field from tools syreg, but will be happy to have
-those changes here as well in a separate pre/post patch.
+if (uid == get_acpi_id_for_cpu(cpu))
 
-> reworked in order to match the runtime feature enforcement that the
-> rest of KVM has adopted.
+So the question become does get_acpi_id_for_cpu() return a valid CPU
+number for a disabled CPU.
 
-I am afraid, did not get the above. Could you please give some more details.
+That uses acpi_cpu_get_madt_gicc(cpu)->uid so this all gets a bit circular.
+That looks it up via cpu_madt_gicc[cpu] which after the proposed updated
+patch is set if enabled or online capable.  There are however a few other
+error checks in acpi_map_gic_cpu_interface() that could lead to it
+not being set (MPIDR validity checks). I suspect all of these end up being
+fatal elsewhere which is why this hasn't blown up before.
+
+If any of those cases are possible we could get a null pointer
+dereference.
+
+Easy to harden this case via the following (which will leave us with
+-EINVAL.  There are other call sites that might trip over this.
+I'm inclined to harden them as a separate issue though so as not
+to get in the way of this patch set.
+
+
+diff --git a/arch/arm64/include/asm/acpi.h b/arch/arm64/include/asm/acpi.h
+index bc9a6656fc0c..a407f9cd549e 100644
+--- a/arch/arm64/include/asm/acpi.h
++++ b/arch/arm64/include/asm/acpi.h
+@@ -124,7 +124,8 @@ static inline int get_cpu_for_acpi_id(u32 uid)
+        int cpu;
+
+        for (cpu = 0; cpu < nr_cpu_ids; cpu++)
+-               if (uid == get_acpi_id_for_cpu(cpu))
++               if (acpi_cpu_get_madt_gicc(cpu) &&
++                   uid == get_acpi_id_for_cpu(cpu))
+                        return cpu;
+
+        return -EINVAL;
+
+I'll spin an additional patch to make that change after testing I haven't
+messed it up.
+
+At the call site in gic_acpi_parse_madt_gicc() I'm not sure we can do better
+than just skipping setting broken_rdists. I'll also pull the declaration of
+that cpu variable down into this condition so it's more obvious we only
+care about it in this error path.
+
+Jonathan
+
+
+
+
+
+> 
+> Thanks,
+> 
+> 	M.
+> 
+
