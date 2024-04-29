@@ -1,176 +1,137 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F9B11AAA5;
-	Mon, 29 Apr 2024 09:21:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18A8317995E
+	for <kvmarm@lists.linux.dev>; Mon, 29 Apr 2024 21:02:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714382499; cv=none; b=QcivXYPj1NGS5exkKnR5z3DSHzvv5iAqq0egaAkI+YMyh2qT0CUIQ5jTwX5R7ByUnSxESARIMiasKVS4hdSlWq/Z/whOvU/Wa/kT1ujvstH87oMgIFWUD7vS1GGdsi9AUvZEfrEN8XpAXmNjs2ultofnbkn0KhkQ0GmNlGRDfXY=
+	t=1714424541; cv=none; b=s42myVQ78BE1M7WWIn3Mx8XBms0Czlfhbue0U0KfCe3O+v8UPWXzuopaMtd1/1edMD52lfgBQcR4MlFKtMRD3KC049CxkkHxCeBM6ageFOrxuxPRamYSWFUHbF7Hgh+pf1XA9bU2RXLHk6yGfNhfetKjYobPGmvg5Cgfd4+1N6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714382499; c=relaxed/simple;
-	bh=psU9IiCnjLKZ0N5EAzULiwZffDrrX9StQx6qKklgmuY=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FZIG8+EeE3li2nSh7x6dOtFemuHgI0xlDoiFa2+bVMgrbH4Q4yN4Ifk5z9UJDY/QffbCM7aHTp62WBhLPJiuI42oI49BNlwCIQNJyJP2+XOSD1b+2jgw/i9y337GmdkqRzDUqAV7b7XoqkparHeLVHKyKl2neS17VT4U3ViCu/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4VSd751DX3z6K6pc;
-	Mon, 29 Apr 2024 17:18:57 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id 21420140B63;
-	Mon, 29 Apr 2024 17:21:34 +0800 (CST)
-Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Mon, 29 Apr
- 2024 10:21:33 +0100
-Date: Mon, 29 Apr 2024 10:21:31 +0100
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: Marc Zyngier <maz@kernel.org>, <linuxarm@huawei.com>
-CC: Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra
-	<peterz@infradead.org>, <linux-pm@vger.kernel.org>,
-	<loongarch@lists.linux.dev>, <linux-acpi@vger.kernel.org>,
-	<linux-arch@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<x86@kernel.org>, Russell King <linux@armlinux.org.uk>, "Rafael J . Wysocki"
-	<rafael@kernel.org>, Miguel Luis <miguel.luis@oracle.com>, "James Morse"
-	<james.morse@arm.com>, Salil Mehta <salil.mehta@huawei.com>, Jean-Philippe
- Brucker <jean-philippe@linaro.org>, Catalin Marinas
-	<catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Hanjun Guo
-	<guohanjun@huawei.com>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov
-	<bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
-	<linuxarm@huawei.com>, <justin.he@arm.com>, <jianyong.wu@arm.com>, "Lorenzo
- Pieralisi" <lpieralisi@kernel.org>, Sudeep Holla <sudeep.holla@arm.com>
-Subject: Re: [PATCH v8 11/16] irqchip/gic-v3: Add support for ACPI's
- disabled but 'online capable' CPUs
-Message-ID: <20240429101938.000027b2@huawei.com>
-In-Reply-To: <87frv5u3p8.wl-maz@kernel.org>
-References: <20240426135126.12802-1-Jonathan.Cameron@huawei.com>
-	<20240426135126.12802-12-Jonathan.Cameron@huawei.com>
-	<87il04t7j2.wl-maz@kernel.org>
-	<20240426192858.000033d9@huawei.com>
-	<87frv5u3p8.wl-maz@kernel.org>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	s=arc-20240116; t=1714424541; c=relaxed/simple;
+	bh=AbBtsHCGar1oC19onEj9oM1dARfaM70Gs2h5fz5fNyM=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=HCwtnPAM3fgGEPjTv8HYTFelRoVADVmSK30TLbFa0BWWdK8dreY9T7bAl9UZi7lRg2IeZgKh6vx+AgL/e4ZjmwGdA4B9f0m1fdvherINUkCMQPMDqJ82Jb01zBeCnUIIr1CwckKgjmLpakTQ+Z92CdbOpSDiq3l3zRlCPKDZqgA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=St5n+6KY; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="St5n+6KY"
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-5dbddee3694so3067126a12.1
+        for <kvmarm@lists.linux.dev>; Mon, 29 Apr 2024 14:02:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1714424538; x=1715029338; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=2uDJDJTdqMi/qWILeG2gkRWiCPiQQS9JXQ1eVQSPrTY=;
+        b=St5n+6KYou1zW9RGTCSi0wM85emsIp0UKbKCtuEf9WwEzzHTCpmXVvrkN2/d2b6JxE
+         GLXG9O0mC5fbu7+cMlMrEbN4JdtaE84PYuthucF4Rt2kq0gibTUdQyecMig452cF7Hki
+         LvS4CDbB9DvbLl0RK61ssoutotfzpoyGgU0++SU8opunHuXoZeqcEDmf2wn1TEpP0EG8
+         zOM+cyzERKX9eoeexwi4eYvsO7egXZpvIQRi/KZ7PxT0X2GYHBx5tn1h16IKA2krsnTZ
+         z8y0Mk1R4ip56lQWzBS6Smq633mLnVlUElSL7N16/cpaqksXPvf+CnXRD/Cz58XMDUAv
+         o0oQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714424538; x=1715029338;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2uDJDJTdqMi/qWILeG2gkRWiCPiQQS9JXQ1eVQSPrTY=;
+        b=QmonYi8+W/mpsRbQWW4rDOaXDojhcZ/49e2jwTQg80XILvZ51vi+0gDppZhTz33fjp
+         X13hmY21WjtYmMil1Ew9uh4KfPBwn0Zmj/FrHIFZhQn7iICl6S8i2DT6TQG218Lu6aYe
+         xHJCEmH2aXzZJkAMQs2ipCGh6n2DgFwci761kVfU1+I9qML1Glr9WNiplVt/BNI2kuJE
+         CWY2HaYVXbSTEF/toYIT94ZTsXww+EI5wf6fxKj1TBumLkljH5Kg92WH0mH3Ih9n2Mxb
+         85YqVmkT7ySu3zp3OvqEj6wOg4Zxub/XIpg4QQlj5P4/DQvZ/LHUnt79pFpV9nyVMcpy
+         U2Vw==
+X-Forwarded-Encrypted: i=1; AJvYcCVqdLD6KmFuOq7A4CNT8tRaQBZt6elLZZw0jPCZtbpixjWbbKf3uPnVBjdkS0oPUp+zOE9NuCgrDqVE5lBnISmzJwEcg5xv
+X-Gm-Message-State: AOJu0Yx6fIr10Sugq6nGBe+x3gXXLVpmtu9zwk5ZJSrcbDTWKyfDSLgN
+	1xCF8H0QzEKrJAT1SVgcKBhQ9wfwTVEgze+Xo2cepVXpAnDqrf3Fw3JvP7aqNBxD1gJ4EKajwJ1
+	ppw==
+X-Google-Smtp-Source: AGHT+IHjxlO7BGwfLpJTaM2K2yepr+Df3RVVAMz1TW/z+nRfFSnOvH5P7k7vUxx/UM3fHPC+zECxCajQyZo=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a63:3d84:0:b0:5f4:246c:1406 with SMTP id
+ k126-20020a633d84000000b005f4246c1406mr2059pga.3.1714424538307; Mon, 29 Apr
+ 2024 14:02:18 -0700 (PDT)
+Date: Mon, 29 Apr 2024 13:45:21 -0700
+In-Reply-To: <20240314232637.2538648-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml500006.china.huawei.com (7.191.161.198) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
+Mime-Version: 1.0
+References: <20240314232637.2538648-1-seanjc@google.com>
+X-Mailer: git-send-email 2.44.0.769.g3c40516874-goog
+Message-ID: <171442343194.161918.3828509492626949358.b4-ty@google.com>
+Subject: Re: [PATCH 00/18] KVM: selftests: Clean up x86's DT initialization
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Ackerley Tng <ackerleytng@google.com>
+Content-Type: text/plain; charset="utf-8"
 
-On Sun, 28 Apr 2024 12:28:03 +0100
-Marc Zyngier <maz@kernel.org> wrote:
-
-> On Fri, 26 Apr 2024 19:28:58 +0100,
-> Jonathan Cameron <Jonathan.Cameron@Huawei.com> wrote:
-> > 
-> > 
-> > I'll not send a formal v9 until early next week, so here is the current state
-> > if you have time to take another look before then.  
-> 
-> Don't bother resending this on my account -- you only sent it on
-> Friday and there hasn't been much response to it yet. There is still a
-> problem (see below), but looks otherwise OK.
+On Thu, 14 Mar 2024 16:26:19 -0700, Sean Christopherson wrote:
+> The vast majority of this series is x86 specific, and aims to clean up the
+> core library's handling of descriptor tables and segments.  Currently, the
+> library (a) waits until vCPUs are created to allocate per-VM assets, and
+> (b) forces tests to opt-in to allocate the structures needed to handler
+> exceptions, which has result in some rather odd tests, and makes it
+> unnecessarily difficult to debug unexpected exceptions.
 > 
 > [...]
-> 
-> > @@ -2363,11 +2381,25 @@ gic_acpi_parse_madt_gicc(union acpi_subtable_headers *header,
-> >  				(struct acpi_madt_generic_interrupt *)header;
-> >  	u32 reg = readl_relaxed(acpi_data.dist_base + GICD_PIDR2) & GIC_PIDR2_ARCH_MASK;
-> >  	u32 size = reg == GIC_PIDR2_ARCH_GICv4 ? SZ_64K * 4 : SZ_64K * 2;
-> > +	int cpu = get_cpu_for_acpi_id(gicc->uid);  
-> 
-> I already commented that get_cpu_for_acpi_id() can...
 
-Indeed sorry - I blame Friday syndrome for me failing to address that.
+Applied to kvm-x86 selftests_utils (I had already pushed stuff to "selftests",
+so the name is less than awesome).
 
-> 
-> >  	void __iomem *redist_base;
-> >  
-> > -	if (!acpi_gicc_is_usable(gicc))
-> > +	/* Neither enabled or online capable means it doesn't exist, skip it */
-> > +	if (!(gicc->flags & (ACPI_MADT_ENABLED | ACPI_MADT_GICC_ONLINE_CAPABLE)))
-> >  		return 0;
-> >  
-> > +	/*
-> > +	 * Capable but disabled CPUs can be brought online later. What about
-> > +	 * the redistributor? ACPI doesn't want to say!
-> > +	 * Virtual hotplug systems can use the MADT's "always-on" GICR entries.
-> > +	 * Otherwise, prevent such CPUs from being brought online.
-> > +	 */
-> > +	if (!(gicc->flags & ACPI_MADT_ENABLED)) {
-> > +		pr_warn("CPU %u's redistributor is inaccessible: this CPU can't be brought online\n", cpu);
-> > +		cpumask_set_cpu(cpu, &broken_rdists);  
-> 
-> ... return -EINVAL, and then be passed to cpumask_set_cpu(), with
-> interesting effects. It shouldn't happen, but I trust anything that
-> comes from firmware tables as much as I trust a campaigning
-> politician's promises. This should really result in the RD being
-> considered unusable, but without affecting any CPU (there is no valid
-> CPU the first place).
-> 
-> Another question is what get_cpu_for acpi_id() returns for a disabled
-> CPU. A valid CPU number? Or -EINVAL?
-It's a match function that works by iterating over 0 to nr_cpu_ids and
+Other KVM maintainers, I also created tags/kvm-x86-selftests-utils if you want
+to pull this into your tree to avoid later merge conflicts with the
+kvm_util_base.h => kvm_util.h rename.  I don't expect to push anything else to
+the branch, but never say never. 
 
-if (uid == get_acpi_id_for_cpu(cpu))
+Note, this branch+tag also has the _GNU_SOURCE change, and the global pseudo-RNG
+series ("thank yous" incoming), i.e. it's hopefuly a one stop shop for all your
+6.10 selftests needs!
 
-So the question become does get_acpi_id_for_cpu() return a valid CPU
-number for a disabled CPU.
+[01/18] Revert "kvm: selftests: move base kvm_util.h declarations to kvm_util_base.h"
+        https://github.com/kvm-x86/linux/commit/2b7deea3ec7c
+[02/18] KVM: sefltests: Add kvm_util_types.h to hold common types, e.g. vm_vaddr_t
+        https://github.com/kvm-x86/linux/commit/f54884f93898
+[03/18] KVM: selftests: Move GDT, IDT, and TSS fields to x86's kvm_vm_arch
+        https://github.com/kvm-x86/linux/commit/3a085fbf8228
+[04/18] KVM: selftests: Fix off-by-one initialization of GDT limit
+        https://github.com/kvm-x86/linux/commit/0d95817e0753
+[05/18] KVM: selftests: Move platform_info_test's main assert into guest code
+        https://github.com/kvm-x86/linux/commit/53635ec253c0
+[06/18] KVM: selftests: Rework platform_info_test to actually verify #GP
+        https://github.com/kvm-x86/linux/commit/dec79eab2b48
+[07/18] KVM: selftests: Explicitly clobber the IDT in the "delete memslot" testcase
+        https://github.com/kvm-x86/linux/commit/61c3cffd4cbf
+[08/18] KVM: selftests: Move x86's descriptor table helpers "up" in processor.c
+        https://github.com/kvm-x86/linux/commit/b62c32c532cd
+[09/18] KVM: selftests: Rename x86's vcpu_setup() to vcpu_init_sregs()
+        https://github.com/kvm-x86/linux/commit/d8c63805e4e5
+[10/18] KVM: selftests: Init IDT and exception handlers for all VMs/vCPUs on x86
+        https://github.com/kvm-x86/linux/commit/c1b9793b45d5
+[11/18] KVM: selftests: Map x86's exception_handlers at VM creation, not vCPU setup
+        https://github.com/kvm-x86/linux/commit/44c93b277269
+[12/18] KVM: selftests: Allocate x86's GDT during VM creation
+        https://github.com/kvm-x86/linux/commit/2a511ca99493
+[13/18] KVM: selftests: Drop superfluous switch() on vm->mode in vcpu_init_sregs()
+        https://github.com/kvm-x86/linux/commit/1051e29cb915
+[14/18] KVM: selftests: Fold x86's descriptor tables helpers into vcpu_init_sregs()
+        https://github.com/kvm-x86/linux/commit/23ef21f58cf8
+[15/18] KVM: selftests: Allocate x86's TSS at VM creation
+        https://github.com/kvm-x86/linux/commit/a2834e6e0b98
+[16/18] KVM: selftests: Add macro for TSS selector, rename up code/data macros
+        https://github.com/kvm-x86/linux/commit/f18ef97fc602
+[17/18] KVM: selftests: Init x86's segments during VM creation
+        https://github.com/kvm-x86/linux/commit/0f53a0245068
+[18/18] KVM: selftests: Drop @selector from segment helpers
+        https://github.com/kvm-x86/linux/commit/b093f87fd195
 
-That uses acpi_cpu_get_madt_gicc(cpu)->uid so this all gets a bit circular.
-That looks it up via cpu_madt_gicc[cpu] which after the proposed updated
-patch is set if enabled or online capable.  There are however a few other
-error checks in acpi_map_gic_cpu_interface() that could lead to it
-not being set (MPIDR validity checks). I suspect all of these end up being
-fatal elsewhere which is why this hasn't blown up before.
-
-If any of those cases are possible we could get a null pointer
-dereference.
-
-Easy to harden this case via the following (which will leave us with
--EINVAL.  There are other call sites that might trip over this.
-I'm inclined to harden them as a separate issue though so as not
-to get in the way of this patch set.
-
-
-diff --git a/arch/arm64/include/asm/acpi.h b/arch/arm64/include/asm/acpi.h
-index bc9a6656fc0c..a407f9cd549e 100644
---- a/arch/arm64/include/asm/acpi.h
-+++ b/arch/arm64/include/asm/acpi.h
-@@ -124,7 +124,8 @@ static inline int get_cpu_for_acpi_id(u32 uid)
-        int cpu;
-
-        for (cpu = 0; cpu < nr_cpu_ids; cpu++)
--               if (uid == get_acpi_id_for_cpu(cpu))
-+               if (acpi_cpu_get_madt_gicc(cpu) &&
-+                   uid == get_acpi_id_for_cpu(cpu))
-                        return cpu;
-
-        return -EINVAL;
-
-I'll spin an additional patch to make that change after testing I haven't
-messed it up.
-
-At the call site in gic_acpi_parse_madt_gicc() I'm not sure we can do better
-than just skipping setting broken_rdists. I'll also pull the declaration of
-that cpu variable down into this condition so it's more obvious we only
-care about it in this error path.
-
-Jonathan
-
-
-
-
-
-> 
-> Thanks,
-> 
-> 	M.
-> 
-
+--
+https://github.com/kvm-x86/linux/tree/next
