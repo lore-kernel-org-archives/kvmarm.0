@@ -1,148 +1,109 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05FB042042;
-	Sun, 28 Apr 2024 11:28:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 475637FD
+	for <kvmarm@lists.linux.dev>; Mon, 29 Apr 2024 02:23:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714303690; cv=none; b=jCHu45UqSmYVQy1p7R1rEsgfmb64/oJ4CBLqjvGyFK5YDMxBwvWzkXFYFt7EWJdtuXRuNV0bBAxC4HwYgv9cxTecjZVSLF+E1VG82/1Pqr5QGX4xG5UKtjD1n5t2s5oAF4lkQdIk0G5mhBe4LuFgiwDgW2kAfS3SToKdqeT470k=
+	t=1714357404; cv=none; b=rMq/B5u1LPn14hHFQ8WWS6w7zAzKN7TmwAbOjo2sAzBfbv5adDQdAvHnfkWSptp2tqaCF/23Tbk+EwnVic0klxiE0QkR5IriiWc9K2Dj/GPysloERr/mBa4MESEnjHQYFStwqHCrVjKme1DHeGrFynam3PijNLGKtyk0phxoOu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714303690; c=relaxed/simple;
-	bh=rJc04lQPGAte3sgRY0zpeVVbUDNqqGYs1de72FW6xAs=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WL7DzwBEwdT/G5ln1GRke5Ktju4Ho3ChlskFC/dSYBux9v4CPAXAEN7kOkNgkCI3r5irlc+M/YsA4iUp+rcVyKjbsgUIDCPRWgly69AK7uYz3XNy0maF0ey3q+dqN6fzy7rjmxDfuInUMYmZJHXeGjQoCtfwBaViK+9MSm5IiH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Btaefxo1; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Btaefxo1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71E24C113CC;
-	Sun, 28 Apr 2024 11:28:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714303689;
-	bh=rJc04lQPGAte3sgRY0zpeVVbUDNqqGYs1de72FW6xAs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Btaefxo10uErlTPoPMBzc3QSERSMGWTlDvMlrSz90PUhcYtUja0aJH4eJKGek6fJf
-	 PtZQCrETOb541/H5bYGFFkda+JnADdkWOqXsCm5npThloYgFTJUCR0NNXroWbUx55M
-	 xYx9CyZlRwd6ZlMEOMRjD6jIeyFYgDhru/uKNcBCUB3I0WawgBPWl/7MFE1Ozy6olY
-	 AYHFd/1omU+ZP63jEkw2vtrxBrBNlvmrs5SLMZENl2ET1lAAQ1qtjk4hDgfKKMiXHD
-	 qNc1cNAs8A2HJ0CDp2o+STw+a6kt21n3Z1Fru2vOYQJ+4lTtiSX48rT2itnTVkOF8h
-	 CaJ539gHZWg4Q==
-Received: from 82-132-246-56.dab.02.net ([82.132.246.56] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1s12hS-008nyp-PJ;
-	Sun, 28 Apr 2024 12:28:07 +0100
-Date: Sun, 28 Apr 2024 12:28:03 +0100
-Message-ID: <87frv5u3p8.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>,
-	Peter Zijlstra
-	<peterz@infradead.org>,
-	<linux-pm@vger.kernel.org>,
-	<loongarch@lists.linux.dev>,
-	<linux-acpi@vger.kernel.org>,
-	<linux-arch@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>,
-	<x86@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	"Rafael J . Wysocki"
-	<rafael@kernel.org>,
-	Miguel Luis <miguel.luis@oracle.com>,
-	"James Morse"
-	<james.morse@arm.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Jean-Philippe
- Brucker <jean-philippe@linaro.org>,
-	Catalin Marinas
-	<catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Hanjun Guo
-	<guohanjun@huawei.com>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov
-	<bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	<linuxarm@huawei.com>,
-	<justin.he@arm.com>,
-	<jianyong.wu@arm.com>,
-	"Lorenzo\
- Pieralisi" <lpieralisi@kernel.org>,
-	Sudeep Holla <sudeep.holla@arm.com>
-Subject: Re: [PATCH v8 11/16] irqchip/gic-v3: Add support for ACPI's disabled but 'online capable' CPUs
-In-Reply-To: <20240426192858.000033d9@huawei.com>
-References: <20240426135126.12802-1-Jonathan.Cameron@huawei.com>
-	<20240426135126.12802-12-Jonathan.Cameron@huawei.com>
-	<87il04t7j2.wl-maz@kernel.org>
-	<20240426192858.000033d9@huawei.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1714357404; c=relaxed/simple;
+	bh=FscvFKLev/pbFhBKOoUhHWN2J3QCiz+0dzat4SNZspg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IuCBeml5V9KG6yiOromtwaJgRCyX/G3Y5xXx3ldPdGPW87xnM8XRRVruVyTUqTW27spYdPJDP9aLQlQ7b0aUoEZnDA22z74uhEjNDppdQauzFgqgaMalNoSKDAnUMydc/Me4YrxNdjAhi7unB5X9rWAP3iXuDgX3lnVD+2T6YqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A6C812F4;
+	Sun, 28 Apr 2024 19:23:47 -0700 (PDT)
+Received: from [10.162.42.72] (a077893.blr.arm.com [10.162.42.72])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EF2BF3F73F;
+	Sun, 28 Apr 2024 19:23:17 -0700 (PDT)
+Message-ID: <ab6466f2-023e-4b5f-bb60-aadb9eee089a@arm.com>
+Date: Mon, 29 Apr 2024 07:53:14 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 82.132.246.56
-X-SA-Exim-Rcpt-To: Jonathan.Cameron@Huawei.com, tglx@linutronix.de, peterz@infradead.org, linux-pm@vger.kernel.org, loongarch@lists.linux.dev, linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, x86@kernel.org, linux@armlinux.org.uk, rafael@kernel.org, miguel.luis@oracle.com, james.morse@arm.com, salil.mehta@huawei.com, jean-philippe@linaro.org, catalin.marinas@arm.com, will@kernel.org, guohanjun@huawei.com, mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, linuxarm@huawei.com, justin.he@arm.com, jianyong.wu@arm.com, lpieralisi@kernel.org, sudeep.holla@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] KVM: arm64: Replace custom macros with fields from
+ ID_AA64PFR0_EL1
+Content-Language: en-US
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com,
+ Oliver Upton <oliver.upton@linux.dev>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
+ Fuad Tabba <tabba@google.com>
+References: <20240418053804.2573071-1-anshuman.khandual@arm.com>
+ <20240418053804.2573071-2-anshuman.khandual@arm.com>
+ <871q73rufi.wl-maz@kernel.org>
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+In-Reply-To: <871q73rufi.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, 26 Apr 2024 19:28:58 +0100,
-Jonathan Cameron <Jonathan.Cameron@Huawei.com> wrote:
+
+
+On 4/18/24 13:09, Marc Zyngier wrote:
+> + Fuad
 > 
+> On Thu, 18 Apr 2024 06:38:03 +0100,
+> Anshuman Khandual <anshuman.khandual@arm.com> wrote:
+>>
+>> This replaces custom macros usage (i.e ID_AA64PFR0_EL1_ELx_64BIT_ONLY and
+>> ID_AA64PFR0_EL1_ELx_32BIT_64BIT) and instead directly uses register fields
+>> from ID_AA64PFR0_EL1 sysreg definition.
+>>
+>> Cc: Marc Zyngier <maz@kernel.org>
+>> Cc: Oliver Upton <oliver.upton@linux.dev>
+>> Cc: Catalin Marinas <catalin.marinas@arm.com>
+>> Cc: Will Deacon <will@kernel.org>
+>> Cc: linux-arm-kernel@lists.infradead.org
+>> Cc: kvmarm@lists.linux.dev
+>> Cc: linux-kernel@vger.kernel.org
+>> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+>> ---
+>>  arch/arm64/kvm/hyp/include/nvhe/fixed_config.h | 8 ++++----
+>>  arch/arm64/kvm/hyp/nvhe/pkvm.c                 | 4 ++--
+>>  arch/arm64/kvm/hyp/nvhe/sys_regs.c             | 2 +-
+>>  3 files changed, 7 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/arch/arm64/kvm/hyp/include/nvhe/fixed_config.h b/arch/arm64/kvm/hyp/include/nvhe/fixed_config.h
+>> index 51f043649146..0034bfffced6 100644
+>> --- a/arch/arm64/kvm/hyp/include/nvhe/fixed_config.h
+>> +++ b/arch/arm64/kvm/hyp/include/nvhe/fixed_config.h
+>> @@ -52,10 +52,10 @@
+>>   *	Supported by KVM
+>>   */
+>>  #define PVM_ID_AA64PFR0_RESTRICT_UNSIGNED (\
+>> -	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL0), ID_AA64PFR0_EL1_ELx_64BIT_ONLY) | \
+>> -	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL1), ID_AA64PFR0_EL1_ELx_64BIT_ONLY) | \
+>> -	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL2), ID_AA64PFR0_EL1_ELx_64BIT_ONLY) | \
+>> -	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL3), ID_AA64PFR0_EL1_ELx_64BIT_ONLY) | \
+>> +	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL0), ID_AA64PFR0_EL1_EL0_IMP) | \
+>> +	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL1), ID_AA64PFR0_EL1_EL1_IMP) | \
+>> +	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL2), ID_AA64PFR0_EL1_EL2_IMP) | \
+>> +	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL3), ID_AA64PFR0_EL1_EL3_IMP) | \
 > 
-> I'll not send a formal v9 until early next week, so here is the current state
-> if you have time to take another look before then.
+> If you are going to rework this, can we instead use something less
+> verbose such as SYS_FIELD_GET()?
 
-Don't bother resending this on my account -- you only sent it on
-Friday and there hasn't been much response to it yet. There is still a
-problem (see below), but looks otherwise OK.
+Just wondering, is not FIELD_PREP() and SYS_FIELD_GET() does the exact opposite thing.
+The earlier builds the entire register value from various constituents, where as the
+later extracts a single register field from a complete register value instead. Or did
+I just misunderstood something here.
 
-[...]
+> 
+> There is also a series from Fuad moving things around, and maybe
+> that's the opportunity to rework this while limiting the amount of
+> cosmetic churn. Not to that this fixed config stuff needs to be
 
-> @@ -2363,11 +2381,25 @@ gic_acpi_parse_madt_gicc(union acpi_subtable_headers *header,
->  				(struct acpi_madt_generic_interrupt *)header;
->  	u32 reg = readl_relaxed(acpi_data.dist_base + GICD_PIDR2) & GIC_PIDR2_ARCH_MASK;
->  	u32 size = reg == GIC_PIDR2_ARCH_GICv4 ? SZ_64K * 4 : SZ_64K * 2;
-> +	int cpu = get_cpu_for_acpi_id(gicc->uid);
+I guess that might be a better place to change the code instead. Because this series
+just replaces the derived register field from tools syreg, but will be happy to have
+those changes here as well in a separate pre/post patch.
 
-I already commented that get_cpu_for_acpi_id() can...
+> reworked in order to match the runtime feature enforcement that the
+> rest of KVM has adopted.
 
->  	void __iomem *redist_base;
->  
-> -	if (!acpi_gicc_is_usable(gicc))
-> +	/* Neither enabled or online capable means it doesn't exist, skip it */
-> +	if (!(gicc->flags & (ACPI_MADT_ENABLED | ACPI_MADT_GICC_ONLINE_CAPABLE)))
->  		return 0;
->  
-> +	/*
-> +	 * Capable but disabled CPUs can be brought online later. What about
-> +	 * the redistributor? ACPI doesn't want to say!
-> +	 * Virtual hotplug systems can use the MADT's "always-on" GICR entries.
-> +	 * Otherwise, prevent such CPUs from being brought online.
-> +	 */
-> +	if (!(gicc->flags & ACPI_MADT_ENABLED)) {
-> +		pr_warn("CPU %u's redistributor is inaccessible: this CPU can't be brought online\n", cpu);
-> +		cpumask_set_cpu(cpu, &broken_rdists);
-
-... return -EINVAL, and then be passed to cpumask_set_cpu(), with
-interesting effects. It shouldn't happen, but I trust anything that
-comes from firmware tables as much as I trust a campaigning
-politician's promises. This should really result in the RD being
-considered unusable, but without affecting any CPU (there is no valid
-CPU the first place).
-
-Another question is what get_cpu_for acpi_id() returns for a disabled
-CPU. A valid CPU number? Or -EINVAL?
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+I am afraid, did not get the above. Could you please give some more details.
