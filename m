@@ -1,131 +1,126 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8153156770
-	for <kvmarm@lists.linux.dev>; Wed,  1 May 2024 11:15:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 584D87E777
+	for <kvmarm@lists.linux.dev>; Wed,  1 May 2024 11:30:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714562104; cv=none; b=MLC8IqrETbQ2VhjNGZJIKzGzlcsczL1FoGAukfi0lhNGWhlqQrS29ybbo/paXGlRUHYsr9SuGETfukMCUD0oWVd/EbRB01NGCa63an8Jb/jVgHJKFBNzWwn1hvgwJCqj7M1CpRytl57huT3a+JUkzKZyY84ResEQVjtPzIiRkpw=
+	t=1714563007; cv=none; b=qn1Wpe8cKrKo44QWtPcXfQeOfzibumBu4BlLpsW1mEsxpbAHHKnwur5PU3yX7R5wiWc1x2IeQd7UJlhubPud5jd83JRHKrQd1W862wgOENSnilki7ujG2yw9uFBZuMGkm11ZqoJJQGvY0dAHBifiB0sTuKEPNhUpl00emkRPfrA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714562104; c=relaxed/simple;
-	bh=FQodAUfD1JkLmt1uTy5qfN1UspuJsm4imcTHYIOZ1zM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nxnwI9g6k1cfIiwCQmKJKSk7SKP3oLw0A1rPtUOHp8+WrCokgBTruJ14latkaClStlf1pRYWpz2cCFL9vCdEaPyNmQm0dez+qsdo+/3iVGUvqlZG7X03JjPeUE26MYNJFBn+erBRvD2Bx2rIfoXjtf6rSSpxf60RVmPNZ8Pytc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QGRzVFwM; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1714563007; c=relaxed/simple;
+	bh=S4jV/8eYOhGDWL6g6A7riEff5ftAxPJaEFHHPj7QQDU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gxIO8HJRXcmvxbwkX46Vt8i86LOww+taydWfaOQrP4xh31vJ4nL2ulFc/nW/U5LvPs1Mjp/X9402XVwENJG5Ea9DNKeCNF9wLHal1YTSmVWdLOsOORFKtHXO4sb+Dd3OiTmTloWcjbhtG2h6I8aXOxa4iwFUOV+p9VmII56DIIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=firaHySY; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QGRzVFwM"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714562102;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=m4zwGvBc/1zudle3Fu3mxvomgwnAp7EzJRWK4hmMCrY=;
-	b=QGRzVFwM4PeI30rFlRkRFuZq6UB3Z4zYRNIcS2thKyTFmGdbjiEqDPFrroi6KN2bo7V+3D
-	N4xNmBi8cBFgecv6LEnhRhKyLupXOaArDxIuQMREqwsMCtXhZMOdDhMxh/6t8YxRDesXQc
-	RZlEsMJbCgdu8r7mfF+LQWsW8vv9uFw=
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
- [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-393--rW9U7f1MCGNchFieXD_sA-1; Wed, 01 May 2024 07:15:01 -0400
-X-MC-Unique: -rW9U7f1MCGNchFieXD_sA-1
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-2acf6bce4cfso656905a91.0
-        for <kvmarm@lists.linux.dev>; Wed, 01 May 2024 04:15:01 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="firaHySY"
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1ecc23e6c9dso413845ad.2
+        for <kvmarm@lists.linux.dev>; Wed, 01 May 2024 04:30:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1714563006; x=1715167806; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=3fmFcqT8F5hSXNzxYTaKRltCUOtWspR7LmgtxcvUq6o=;
+        b=firaHySYE9xxpOR0EabTvNoEazWHe6UTGH/X43GxiSXx1XDmhVz5MIoHdzINEYWOpf
+         Yyc1d00rXWqxBBWAEUmOEk05zMVgqQVkXYlEqaOrmMQEcuO6FQPo316Zso6EEJOMlwwu
+         AOqSUszRtl5BUqV7b3XCcn1M/tmmDPn0J3JY0q1RCXF7dDOtwzbZ4MvcVAEArse6R2fL
+         DVMWrugW8VdSg/6dCXbH8nvz+X+hS/AgcQgDTA8f9QJeQGmKc0aGGA1d9m2bWfX/rytw
+         LvSmrkUE+AwuyGfycP8o27w5kjMxmw/nfhZr60Z3eVrHQtkYLDLTJosBPuQQ1rCXRG8a
+         jMgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714562100; x=1715166900;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=m4zwGvBc/1zudle3Fu3mxvomgwnAp7EzJRWK4hmMCrY=;
-        b=Z58GqZrGXk/XxlHfHx59oFeNQpRaA1Vu7OGUhyZK1ykL4b6ohAcEjqOzMvwqehKudB
-         a6sSpW1XhLZdgTHe91jrIocJUYlNzKyH5uuhv1Y7zrFi18p2E10yW+ri5NkxbzAGPkdm
-         3h9xavnHx2Zrm671bZlW3aca54TxliFzZhZ9B/M/G7pOXKDYQXMBIV+yBqH8Ovki/hOF
-         YN6rsTCnLMIWzlPhb++dX65mZfnRwF9mcSGxfoJUQpe+cGa/ljAofnOHnx51Ok+sf0ty
-         Mu78Q+Mug+jwa+UcI6CwwOj30QIt9y54eCk69rMcp/MsCYtvCsGr6j+MP9flolt+dGdB
-         TkHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWcm2/ymIQPSwHe7qnmoJ+nHfBB57ZvMoftbbgAdeKp/1Eq+484OyaGR9SrbW6xrAg9ayUfwDgIz6oPOT83JkL9ys6giqhO
-X-Gm-Message-State: AOJu0YxEQnL6cEFyojpmSKIW+fWyjsQuTkfGxP/IXpIgAP09Dhsux8jI
-	7UiKXnd/yfPTnx5qHzAlKyEJYtRcHMurt2KfPmr5OyBQUQQ/vSQJVXb+KzLaCzgKTldIQB2wgI5
-	dpdBjUROtHQGkVPLq89LwDnFWXKgXLOoPcn8VEoIEYegiSQZJ+JQdqw==
-X-Received: by 2002:a17:90b:3749:b0:2b3:6898:d025 with SMTP id ne9-20020a17090b374900b002b36898d025mr189467pjb.9.1714562100020;
-        Wed, 01 May 2024 04:15:00 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEgkwe4UKKc3WldVwMV2boi6I+r208XEIsyNzplTWK4MFoORCuavWHQA0/i+SiniS3enNZ28Q==
-X-Received: by 2002:a17:90b:3749:b0:2b3:6898:d025 with SMTP id ne9-20020a17090b374900b002b36898d025mr189419pjb.9.1714562099556;
-        Wed, 01 May 2024 04:14:59 -0700 (PDT)
-Received: from [192.168.68.50] ([43.252.112.88])
-        by smtp.gmail.com with ESMTPSA id h9-20020a17090a050900b002a55198259fsm3245338pjh.0.2024.05.01.04.14.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 01 May 2024 04:14:59 -0700 (PDT)
-Message-ID: <27e48da5-e1d0-4e4b-978e-954f1766c350@redhat.com>
-Date: Wed, 1 May 2024 21:14:50 +1000
+        d=1e100.net; s=20230601; t=1714563006; x=1715167806;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3fmFcqT8F5hSXNzxYTaKRltCUOtWspR7LmgtxcvUq6o=;
+        b=fYdjGch+KJh9dnOh6KyMCR7wDEHc9JV+VHEfrKnJSemOPj9//i3ttLhj7oUw959Idz
+         2MScojCN/z2GWEX+bRSuMnHqI7AF+rlRlmpLOPwERkCvBncZSwNznj0CYNGksoGhAGrP
+         k1CSQLCUP0MM/vhqMR/8Ko5KisDPFgDQkO5X1GGmWy8Qu6TaJv8VSIlN9+h73K6o7h/S
+         ZeePsldC06DPCmMK+P1iXYj+nYjHvcF8XBss0XSQEf1nM0EgfIG7aohwCf6YfvydaxMq
+         YeGkHotfLGjRn/vtPhSg3k/JAiAa94osGWxBcH/bslkd1TvftL/Fi6NGuRF4zLyvtj9b
+         KHzA==
+X-Forwarded-Encrypted: i=1; AJvYcCUGkRohQ1LIxxWPbIt3TxLDaU4EvyYKv5mFwKTjLIVlHVEukXsbWmJuYvxF8pt//v7+jJRyPQvmad5bs6ERsMZPFBqO+rmh
+X-Gm-Message-State: AOJu0YzRSqKibzrQChzj80hmn/pP+WAkQg/CA4sTTiwNVtjud427mBrR
+	N2snPZjGn6ZZPIwFkODKq/Upy1xgfWG294k9qJ8cFfPADRO3nKuw
+X-Google-Smtp-Source: AGHT+IEkpQzYXzXYbs/gHLYdwxpBH/OK++tJH0WUUPJ3AyO4M069a98H6ricGGv8iuSezFZMDa/htA==
+X-Received: by 2002:a17:902:e841:b0:1eb:156f:8d01 with SMTP id t1-20020a170902e84100b001eb156f8d01mr1930616plg.40.1714563005516;
+        Wed, 01 May 2024 04:30:05 -0700 (PDT)
+Received: from wheely.local0.net ([1.146.40.196])
+        by smtp.gmail.com with ESMTPSA id y22-20020a17090264d600b001ec64b128dasm2267150pli.129.2024.05.01.04.29.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 May 2024 04:30:05 -0700 (PDT)
+From: Nicholas Piggin <npiggin@gmail.com>
+To: Andrew Jones <andrew.jones@linux.dev>
+Cc: Nicholas Piggin <npiggin@gmail.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Huth <thuth@redhat.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	=?UTF-8?q?Nico=20B=C3=B6hr?= <nrb@linux.ibm.com>,
+	David Hildenbrand <david@redhat.com>,
+	Shaoqin Huang <shahuang@redhat.com>,
+	Nikos Nikoleris <nikos.nikoleris@arm.com>,
+	David Woodhouse <dwmw@amazon.co.uk>,
+	Ricardo Koller <ricarkol@google.com>,
+	rminmin <renmm6@chinaunicom.cn>,
+	Gavin Shan <gshan@redhat.com>,
+	Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+	Sean Christopherson <seanjc@google.com>,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	kvm-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org
+Subject: [kvm-unit-tests PATCH v3 0/5] add shellcheck support
+Date: Wed,  1 May 2024 21:29:29 +1000
+Message-ID: <20240501112938.931452-1-npiggin@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 19/19] cpumask: Add enabled cpumask for present CPUs
- that can be brought online
-To: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
- Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra <peterz@infradead.org>,
- linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
- linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, x86@kernel.org, Russell King
- <linux@armlinux.org.uk>, "Rafael J . Wysocki" <rafael@kernel.org>,
- Miguel Luis <miguel.luis@oracle.com>, James Morse <james.morse@arm.com>,
- Salil Mehta <salil.mehta@huawei.com>,
- Jean-Philippe Brucker <jean-philippe@linaro.org>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Marc Zyngier <maz@kernel.org>, Hanjun Guo <guohanjun@huawei.com>
-Cc: Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>, linuxarm@huawei.com,
- justin.he@arm.com, jianyong.wu@arm.com
-References: <20240430142434.10471-1-Jonathan.Cameron@huawei.com>
- <20240430142434.10471-20-Jonathan.Cameron@huawei.com>
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20240430142434.10471-20-Jonathan.Cameron@huawei.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 5/1/24 00:24, Jonathan Cameron wrote:
-> From: James Morse <james.morse@arm.com>
-> 
-> The 'offline' file in sysfs shows all offline CPUs, including those
-> that aren't present. User-space is expected to remove not-present CPUs
-> from this list to learn which CPUs could be brought online.
-> 
-> CPUs can be present but not-enabled. These CPUs can't be brought online
-> until the firmware policy changes, which comes with an ACPI notification
-> that will register the CPUs.
-> 
-> With only the offline and present files, user-space is unable to
-> determine which CPUs it can try to bring online. Add a new CPU mask
-> that shows this based on all the registered CPUs.
-> 
-> Signed-off-by: James Morse <james.morse@arm.com>
-> Tested-by: Miguel Luis <miguel.luis@oracle.com>
-> Tested-by: Vishnu Pajjuri <vishnu@os.amperecomputing.com>
-> Tested-by: Jianyong Wu <jianyong.wu@arm.com>
-> Acked-by: Thomas Gleixner <tglx@linutronix.de>
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> 
-> ---
-> v9: No change
-> ---
->   .../ABI/testing/sysfs-devices-system-cpu      |  6 +++++
->   drivers/base/cpu.c                            | 10 ++++++++
->   include/linux/cpumask.h                       | 25 +++++++++++++++++++
->   kernel/cpu.c                                  |  3 +++
->   4 files changed, 44 insertions(+)
-> 
+This is based on upstream directly now, not ahead of the powerpc
+series.
 
-Reviewed-by: Gavin Shan <gshan@redhat.com>
+Since v2:
+- Rebased to upstream with some patches merged.
+- Just a few comment typos and small issues (e.g., quoting
+  `make shellcheck` in docs) that people picked up from the
+  last round.
+
+`make shellcheck` passes with no warnings for me after this series.
+(You should be able to put patch 1 at the end without conflicts if
+you prefer to only introduce the shellcheck Makefile target when the
+tree is clean.)
+
+Thanks,
+Nick
+
+Nicholas Piggin (5):
+  Add initial shellcheck checking
+  shellcheck: Fix SC2155
+  shellcheck: Fix SC2124
+  shellcheck: Fix SC2294
+  shellcheck: Suppress various messages
+
+ .shellcheckrc           | 30 ++++++++++++++++++++++++++++++
+ Makefile                |  4 ++++
+ README.md               |  3 +++
+ configure               |  2 ++
+ run_tests.sh            |  3 +++
+ scripts/arch-run.bash   | 33 ++++++++++++++++++++++++++-------
+ scripts/common.bash     |  5 ++++-
+ scripts/mkstandalone.sh |  2 ++
+ scripts/runtime.bash    |  6 +++++-
+ 9 files changed, 79 insertions(+), 9 deletions(-)
+ create mode 100644 .shellcheckrc
+
+-- 
+2.43.0
 
