@@ -1,166 +1,83 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93C9012FB29;
-	Wed,  1 May 2024 14:56:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2BE05024E
+	for <kvmarm@lists.linux.dev>; Wed,  1 May 2024 15:41:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714575399; cv=none; b=NtYRxj71wRac0vrCCA6NLZ+QjaOQL0rZYUK51HsyvFP2Q3MGMTtqUoGdYLIsgDHvw1ziGwANLJowr2Vdw9aRt5rP7yS/7BqhKkTjmGg6K+bpGnmoTSrGrDie0ZjfhUTus1T1ZSC92MLHvezGvNlagOaCIo5QhS4adCrqM+bbnyE=
+	t=1714578097; cv=none; b=Rlx/L0SZtl+tiTLcT49NRD2iKMcsO+0FT6txp0nonZEnqD/MrbIiQej282MNpgq2p33Wzqley7/C3uocdHLW8AF+YrzNv0A532iMYfRPRxOcQddHHGJ3LgReQfPGGE7AjMQq1yi6gxWYnQdaI2a5bx8Z/+aOjN007XsaG6GWhcg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714575399; c=relaxed/simple;
-	bh=p52p3F37XvyVfrfrsqWyEV0jgw7gj7LU4qdYq7WAN2o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZVtRyFTK09BBYEfKQlz5B+xHQXW0RY0GTy5hEUBMH9TnsYEyyLs+jz5TT5gAhehOai/MeusH7C6AdwxagDYyrB91h1cba+pF6RBptYgibkKaOxlXN9T9E9tU3H0XKLCg5o7CMc5ADj6/lZxzAzyRGVzF24g+BiPan3HRayYVhlc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 20F062F4;
-	Wed,  1 May 2024 07:57:03 -0700 (PDT)
-Received: from [10.57.82.68] (unknown [10.57.82.68])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B37333F793;
-	Wed,  1 May 2024 07:56:34 -0700 (PDT)
-Message-ID: <fcb0cd30-ba40-48d2-8ce1-c5aa1d36cd1f@arm.com>
-Date: Wed, 1 May 2024 15:56:33 +0100
+	s=arc-20240116; t=1714578097; c=relaxed/simple;
+	bh=9Ee7q9KOS+Gjz6F7GATztOtK7jVn88zdtaN486f8Kj4=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DX1hOOQBVTnuTb4c1VbFYjJ5vtPec+IJF4nbl+4IiX567Jp8adbjsBuA79d+itdmdXEMx+Xjv4DhttulPxupi5mq8nhxzeP2Lx1nnMrOsIoSY/GgAfaDlzkUGcvngN+o2BDUXPLGYNcAbsgUNIc/ObckfhN/95IWDhQ8pyHidBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CUnDdufT; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CUnDdufT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E29DC113CC;
+	Wed,  1 May 2024 15:41:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714578097;
+	bh=9Ee7q9KOS+Gjz6F7GATztOtK7jVn88zdtaN486f8Kj4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=CUnDdufTznMX1TpN/cspx/vm1qBAr1wb+xXbfhoPICw1e0OefJEZlUDVMLAwU+3mL
+	 mac3SRL4ijsJYAPV1BqrD7ZE0ZKZxcqv5J5nx3yy34mWjfcM3lVjmZRHArxuGtfDO6
+	 lr9DtqULOuaklyA955ZGfrgN8NKDR2QhuMPDaZCADb2ZKClJqfWxSxMyDdwLp8SlkS
+	 XliAgocOZGKjy4GPCGfzcGO3AnQ+22uH53b6/Wao5D+fFXbiFUlSTts57irwDkaFBz
+	 zFyMviU4ZLRfjLrxf+JNROOfC1p4uM6HOF9otOk0Fy2h/LhOGtMDZA/7DWCkr/CZb7
+	 XTixM/rjdhlqQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1s2C5O-009ksv-Lf;
+	Wed, 01 May 2024 16:41:34 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH] KVM: arm64: remove duplicated AA64MMFR1_EL1 XNX
+Date: Wed,  1 May 2024 16:41:31 +0100
+Message-Id: <171457808342.2893348.14914006409589344975.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <E1s2AxF-00AWLv-03@rmk-PC.armlinux.org.uk>
+References: <E1s2AxF-00AWLv-03@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 17/43] arm64: RME: Allow VMM to set RIPAS
-Content-Language: en-GB
-To: Jean-Philippe Brucker <jean-philippe@linaro.org>,
- Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-References: <20240412084056.1733704-1-steven.price@arm.com>
- <20240412084309.1733783-1-steven.price@arm.com>
- <20240412084309.1733783-18-steven.price@arm.com>
- <20240501142712.GB484338@myrica>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20240501142712.GB484338@myrica>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, catalin.marinas@arm.com, will@kernel.org, rmk+kernel@armlinux.org.uk, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 01/05/2024 15:27, Jean-Philippe Brucker wrote:
-> On Fri, Apr 12, 2024 at 09:42:43AM +0100, Steven Price wrote:
->> +static inline bool realm_is_addr_protected(struct realm *realm,
->> +					   unsigned long addr)
->> +{
->> +	unsigned int ia_bits = realm->ia_bits;
->> +
->> +	return !(addr & ~(BIT(ia_bits - 1) - 1));
+On Wed, 01 May 2024 15:29:05 +0100, Russell King (Oracle) wrote:
+> Commit d5a32b60dc18 ("KVM: arm64: Allow userspace to change
+> ID_AA64MMFR{0-2}_EL1") made certain fields in these registers writable,
+> but in doing so, ID_AA64MMFR1_EL1_XNX was listed twice. Remove the
+> duplication.
 > 
-> Is it enough to return !(addr & BIT(realm->ia_bits - 1))?
-
-I thought about that too. But if we are dealing with an IPA
-that is > (BIT(realm->ia_bits)), we don't want to be treating
-that as a protected address. This could only happen if the Realm
-is buggy (or the VMM has tricked it). So the existing check
-looks safer.
-
-> 
->> +static void realm_unmap_range_shared(struct kvm *kvm,
->> +				     int level,
->> +				     unsigned long start,
->> +				     unsigned long end)
->> +{
->> +	struct realm *realm = &kvm->arch.realm;
->> +	unsigned long rd = virt_to_phys(realm->rd);
->> +	ssize_t map_size = rme_rtt_level_mapsize(level);
->> +	unsigned long next_addr, addr;
->> +	unsigned long shared_bit = BIT(realm->ia_bits - 1);
->> +
->> +	if (WARN_ON(level > RME_RTT_MAX_LEVEL))
->> +		return;
->> +
->> +	start |= shared_bit;
->> +	end |= shared_bit;
->> +
->> +	for (addr = start; addr < end; addr = next_addr) {
->> +		unsigned long align_addr = ALIGN(addr, map_size);
->> +		int ret;
->> +
->> +		next_addr = ALIGN(addr + 1, map_size);
->> +
->> +		if (align_addr != addr || next_addr > end) {
->> +			/* Need to recurse deeper */
->> +			if (addr < align_addr)
->> +				next_addr = align_addr;
->> +			realm_unmap_range_shared(kvm, level + 1, addr,
->> +						 min(next_addr, end));
->> +			continue;
->> +		}
->> +
->> +		ret = rmi_rtt_unmap_unprotected(rd, addr, level, &next_addr);
->> +		switch (RMI_RETURN_STATUS(ret)) {
->> +		case RMI_SUCCESS:
->> +			break;
->> +		case RMI_ERROR_RTT:
->> +			if (next_addr == addr) {
->> +				next_addr = ALIGN(addr + 1, map_size);
->> +				realm_unmap_range_shared(kvm, level + 1, addr,
->> +							 next_addr);
->> +			}
->> +			break;
->> +		default:
->> +			WARN_ON(1);
-> 
-> In this case we also need to return, because RMM returns with next_addr ==
-> 0, causing an infinite loop. At the moment a VMM can trigger this easily
-> by creating guest memfd before creating a RD, see below
-
-Thats a good point. I agree.
-
-> 
->> +		}
->> +	}
->> +}
->> +
->> +static void realm_unmap_range_private(struct kvm *kvm,
->> +				      unsigned long start,
->> +				      unsigned long end)
->> +{
->> +	struct realm *realm = &kvm->arch.realm;
->> +	ssize_t map_size = RME_PAGE_SIZE;
->> +	unsigned long next_addr, addr;
->> +
->> +	for (addr = start; addr < end; addr = next_addr) {
->> +		int ret;
->> +
->> +		next_addr = ALIGN(addr + 1, map_size);
->> +
->> +		ret = realm_destroy_protected(realm, addr, &next_addr);
->> +
->> +		if (WARN_ON(ret))
->> +			break;
->> +	}
->> +}
->> +
->> +static void realm_unmap_range(struct kvm *kvm,
->> +			      unsigned long start,
->> +			      unsigned long end,
->> +			      bool unmap_private)
->> +{
-> 
-> Should this check for a valid kvm->arch.realm.rd, or a valid realm state?
-> I'm not sure what the best place is but none of the RMM calls will succeed
-> if the RD is NULL, causing some WARNs.
-> 
-> I can trigger this with set_memory_attributes() ioctls before creating a
-> RD for example.
 > 
 
-True, this could be triggered by a buggy VMM in other ways, and we could
-easily gate it on the Realm state >= NEW.
+Applied to next, thanks!
 
-Suzuki
+[1/1] KVM: arm64: remove duplicated AA64MMFR1_EL1 XNX
+      commit: e8533e58cae02923e8cbffca516d3d821cee1649
+
+Cheers,
+
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
 
 
