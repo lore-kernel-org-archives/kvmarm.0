@@ -1,57 +1,57 @@
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 859B56166E
-	for <kvmarm@lists.linux.dev>; Wed,  1 May 2024 11:30:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC11A6518F
+	for <kvmarm@lists.linux.dev>; Wed,  1 May 2024 11:30:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714563017; cv=none; b=QkLAnLQ1UNPwlhaqc8jUsXqAL3f/xvZXHlcTO6YOjiQhQfD262JLrt3iu8dwzHWU1d+/nWwtezAH4iqCnusuKflnVMNBHvI8liG8K3vqqRyWY/zgK6UbqptT4KYPZ14pC1NK40tyiFGfNELZVhOn+kbLTDV7sW0vIfVVkxzGdLQ=
+	t=1714563026; cv=none; b=k2qfHkze8rxFn0mWHh4U89BmGi2p0RxV8yLtt0fGHSS0HX0500VbE4tvfHZzEkhcT63i3YN3AWUCaM/SBe+XvPXLp7Z2+Am1H361q3q8XEGr/RiOqWHPWu2JiNQ2qg6CbhI4j5V+l2QB/w/Ch3HFOZ88HxFFWge5baV0mLuxIoY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714563017; c=relaxed/simple;
-	bh=aNQlpbX1V+40h70SYPNqIDOQATiZuD+yGYyg//lfbPo=;
+	s=arc-20240116; t=1714563026; c=relaxed/simple;
+	bh=8rPXa8viuRgylwUaKzJXXgmN4UO7CSiJaIGOKnKmXkk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qZF0xw3SwvufN3NT1gCIAqYJ/XqNcANYBp7WCX+51wfm4ghqpkMaX8Hh3rL4lOgcGiIGY0iBb5p1ZOLt17XY6EKBXTgE9pQptZSY1gpD7qckJGCu2qc1DE9W0VUyEIvlv+bXAisAN2UiBHU7ewD+VNFF9oMv/V4DxXY6M+GYjgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JkJtUUin; arc=none smtp.client-ip=209.85.214.182
+	 MIME-Version; b=BwHl4uYOZqcwipcITWMitWRd+vqP8315Vecqv+vT1+l0H/BipZzssikDCpWtYzqREEDQs0yNWmeIsKc49IQ9IYbI062TZMyco9s2Cslf2k+i7s7WLtnmv7KoR09S3c2l8Mhcnrzf+ZGAJDoBB/Ic6zCJSGA7CWEemzp5VeBsh9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C+flYfEm; arc=none smtp.client-ip=209.85.214.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JkJtUUin"
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1eac92f7c74so54128425ad.3
-        for <kvmarm@lists.linux.dev>; Wed, 01 May 2024 04:30:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C+flYfEm"
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1ec85c2f469so5033315ad.1
+        for <kvmarm@lists.linux.dev>; Wed, 01 May 2024 04:30:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714563015; x=1715167815; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1714563024; x=1715167824; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=qEezwiCyGwOZD1+v35KdQzu2KwTw4n21wPX8WyrxUmo=;
-        b=JkJtUUink4fd+xtEEYlu0s28rj41A0lThn2eE2vSdNOVnN6Ono48ajz2mkb6IXok3K
-         LcgxUu+8cdZoU3K5Vlmgh8Hsh/WARYSwTwfunP0n6Lmv9ulirkFPUDgmP0JuezyyCfZF
-         iBjq946ABo0IFXNs98+69thzYkJUW9S/rDDgysGSuEbxn+Lzrhap0Y76eVGpw2TWwALK
-         ubdkQ8eymvcuFc6hl/DfcyOh5xwtlySBrc9e4+JsMbn0gJ7PtD94nyfytCMV6qyydFUj
-         OtP0ITZAJv86VqsmH1dPwjHHRyNR5JmIxs01drkCbI8Wn2CboXh/UQ7NZXCifKJZSqHg
-         j0/Q==
+        bh=1mJOZjxszbvpsd8NIswtou8sxuQs1WjsSOCG5FXC6/w=;
+        b=C+flYfEmaKKD2Q2XDZbUY+hIw39QSMACvP2hp2sTTAP9YE6LvySwnI2FRB2ZDZPnwg
+         wBGLgGWZPDkfcR/bqkC3UmF/97R8z0SNnCvLxWg74Id85wH8mp4XZaWzi/71tLHJUkbW
+         LQP1hMfii2h0rPZypHsIh2DjqUiKtQjy+s5rBc7lYTLYS0P9TgaEawQEt98fmjBkd8C8
+         HJHbk1ApR7IIYS4OypJ4vJCTEHZhkoeoJhr4V3e735YRQ0iWgqoOp9HKEZ1CHvRc9gcB
+         Vym5FlW8lFSDGzpTS2I/IHjssKwV0JKkbiS+8UWeQ56JjpghuSNcJEuCa9yWc4Y+lel4
+         Vepg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714563015; x=1715167815;
+        d=1e100.net; s=20230601; t=1714563024; x=1715167824;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=qEezwiCyGwOZD1+v35KdQzu2KwTw4n21wPX8WyrxUmo=;
-        b=IW+mFPsNtGXchgHwViLloCGgFHrtWypOlowoq6Y6k/tzWEwRxqq/wGceFNAwpXEFaP
-         Xg54giZqbB78fhkrimNJfaedSJJ9/Nn7c1eRcHSHZ+hVnbkIsS+6AThujZ3YZEPulI+z
-         Xrp3QHhPSF9rjnRQTzlVd8+vMskP8fFoAnMkRLHpJrq/Oec+QV3FLjcTTanpx2NS1Cpc
-         ZJ7r28oyltNAWVEIRDZdWqkKLuuLfsHxXM/1q0rXrvnOtCiHcXKc9y8UqhK6jolfXKf0
-         gVYDGkFez1szrHAZkBRUDsVX1Jd8LEXIOjayvpwpozc5+EWx/BQ4aE9U+aJYVWp4sFZL
-         EQew==
-X-Forwarded-Encrypted: i=1; AJvYcCUqs2iZCQ9HCFVfJfzkh4fYKzasafcvas3PA5f4wlZ61csoCr56M3EHjpKJGqVxHUR546R1SPRO0xgL9X8KCf2+7r+Z3m6n
-X-Gm-Message-State: AOJu0YysjvUziwxOGxHV44WJcN2cVL+dJWo/ynnS8OA7qp02D+X1LiOi
-	+FTjVQnP53dNyta70gTv57mlEImvkMPv2EE2YerHPc4UcL54s2N4OqhUBTMY
-X-Google-Smtp-Source: AGHT+IEFPYODr4TyreDdFCG6z01houFeGcrnNZN3iQCpjD0ek1ej4HVV0Wcok3E4Ojsg5zSqMK/UaA==
-X-Received: by 2002:a17:902:a383:b0:1e2:96d3:1bc1 with SMTP id x3-20020a170902a38300b001e296d31bc1mr2081748pla.1.1714563014788;
-        Wed, 01 May 2024 04:30:14 -0700 (PDT)
+        bh=1mJOZjxszbvpsd8NIswtou8sxuQs1WjsSOCG5FXC6/w=;
+        b=gYlewCysSLtrS7gvvH1F3G3uIuiwYl1LV+Nd609xrxCtRSCtAcHfbb2tRzvLW71Gnl
+         m3UuVtzerPBxynTBfdJ5b6GSaIggMrltYs1yBI1fiqtzDiz0rIzcSn9XWLfcgmUer65G
+         TSjJCkoiwBw/HYwBQdUztKbotJe/3tBm1432WeiuWZ0l2E5NIqxd+o3QgoB96oFBhdjh
+         28bpXtP4fhpvr1JBHYDGEabEytASSrteycs6Ri5uIzHxRmGS44/mDGW6ZINRHB2ZAm0E
+         A/u6xaBN7LV5yBNiOreIRQM7jqRvhB3RyzLs32Zgqjfv3pk67/LPTCYS7+PL6dVq3Dkq
+         5ZFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXq5zV1vIRGh9nITkbDZUqQZJv37loRTlXrciZbY5N57xQJuwmA6CKXMtWC+m/HT1+M67g6KiNbLpKtr2mpnV8WZDsOJgvW
+X-Gm-Message-State: AOJu0Yy2an3w1/uJVEVm1nRvqZpU/tvKydSX2K16KhPSHej2455DPicj
+	eBK6VKT5EeEjC2AZGLHQLCSJCG5wlxDmwyYK5qfOvPJGGtyTcByW
+X-Google-Smtp-Source: AGHT+IGXK6+KiFLFpugRbIQcKHRuDTSsHf1UqbW1yDelUvCorCI+dmN8AqtsodexPzQQ7lw0BtUoig==
+X-Received: by 2002:a17:902:e812:b0:1e8:682b:7f67 with SMTP id u18-20020a170902e81200b001e8682b7f67mr3475208plg.29.1714563024087;
+        Wed, 01 May 2024 04:30:24 -0700 (PDT)
 Received: from wheely.local0.net ([1.146.40.196])
-        by smtp.gmail.com with ESMTPSA id y22-20020a17090264d600b001ec64b128dasm2267150pli.129.2024.05.01.04.30.06
+        by smtp.gmail.com with ESMTPSA id y22-20020a17090264d600b001ec64b128dasm2267150pli.129.2024.05.01.04.30.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 May 2024 04:30:14 -0700 (PDT)
+        Wed, 01 May 2024 04:30:23 -0700 (PDT)
 From: Nicholas Piggin <npiggin@gmail.com>
 To: Andrew Jones <andrew.jones@linux.dev>
 Cc: Nicholas Piggin <npiggin@gmail.com>,
@@ -75,9 +75,9 @@ Cc: Nicholas Piggin <npiggin@gmail.com>,
 	kvmarm@lists.linux.dev,
 	kvm-riscv@lists.infradead.org,
 	linux-s390@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v3 1/5] Add initial shellcheck checking
-Date: Wed,  1 May 2024 21:29:30 +1000
-Message-ID: <20240501112938.931452-2-npiggin@gmail.com>
+Subject: [kvm-unit-tests PATCH v3 2/5] shellcheck: Fix SC2155
+Date: Wed,  1 May 2024 21:29:31 +1000
+Message-ID: <20240501112938.931452-3-npiggin@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240501112938.931452-1-npiggin@gmail.com>
 References: <20240501112938.931452-1-npiggin@gmail.com>
@@ -87,105 +87,70 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-This adds a basic shellcheck style file, some directives to help
-find scripts, and a make shellcheck target.
+  SC2155 (warning): Declare and assign separately to avoid masking
+  return values.
 
-When changes settle down this could be made part of the standard
-build / CI flow.
+No bug identified.
 
-Suggested-by: Andrew Jones <andrew.jones@linux.dev>
 Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- .shellcheckrc       | 30 ++++++++++++++++++++++++++++++
- Makefile            |  4 ++++
- README.md           |  3 +++
- scripts/common.bash |  5 ++++-
- 4 files changed, 41 insertions(+), 1 deletion(-)
- create mode 100644 .shellcheckrc
+ scripts/arch-run.bash | 10 +++++++---
+ scripts/runtime.bash  |  4 +++-
+ 2 files changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/.shellcheckrc b/.shellcheckrc
-new file mode 100644
-index 000000000..491af18bd
---- /dev/null
-+++ b/.shellcheckrc
-@@ -0,0 +1,30 @@
-+# shellcheck configuration file
-+external-sources=true
-+
-+# Optional extras --  https://www.shellcheck.net/wiki/Optional
-+# Possibilities, e.g., -
-+# quote‐safe‐variables
-+# require-double-brackets
-+# require-variable-braces
-+# add-default-case
-+
-+# Disable SC2004 style? I.e.,
-+# In run_tests.sh line 67:
-+#            if (( $unittest_run_queues <= 0 )); then
-+#                  ^------------------^ SC2004 (style): $/${} is unnecessary on arithmetic variables.
-+disable=SC2004
-+
-+# Disable SC2086 for now, double quote to prevent globbing and word
-+# splitting. There are lots of places that use it for word splitting
-+# (e.g., invoking commands with arguments) that break. Should have a
-+# more consistent approach for this (perhaps use arrays for such cases)
-+# but for now disable.
-+# SC2086 (info): Double quote to prevent globbing and word splitting.
-+disable=SC2086
-+
-+# Disable SC2235.  Most developers are used to seeing expressions
-+# like a || (b && c), not a || { b && c ; }. The subshell overhead in
-+# kvm-unit-tests is negligible as it's not shell-heavy in the first
-+# place (time is dominated by qemu startup/shutdown and test execution)
-+# SC2235 (style): Use { ..; } instead of (..) to avoid subshell overhead.
-+disable=SC2235
-diff --git a/Makefile b/Makefile
-index 4f35fffc6..6240d8dfa 100644
---- a/Makefile
-+++ b/Makefile
-@@ -141,6 +141,10 @@ cscope:
- 		-name '*.[chsS]' -exec realpath --relative-base=$(CURDIR) {} \; | sort -u > ./cscope.files
- 	cscope -bk
+diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
+index 2ac7b0b84..45ec8f57d 100644
+--- a/scripts/arch-run.bash
++++ b/scripts/arch-run.bash
+@@ -415,7 +415,8 @@ initrd_cleanup ()
+ {
+ 	rm -f $KVM_UNIT_TESTS_ENV
+ 	if [ "$KVM_UNIT_TESTS_ENV_OLD" ]; then
+-		export KVM_UNIT_TESTS_ENV="$KVM_UNIT_TESTS_ENV_OLD"
++		export KVM_UNIT_TESTS_ENV
++		KVM_UNIT_TESTS_ENV="$KVM_UNIT_TESTS_ENV_OLD"
+ 	else
+ 		unset KVM_UNIT_TESTS_ENV
+ 	fi
+@@ -427,7 +428,8 @@ initrd_create ()
+ 	if [ "$ENVIRON_DEFAULT" = "yes" ]; then
+ 		trap_exit_push 'initrd_cleanup'
+ 		[ -f "$KVM_UNIT_TESTS_ENV" ] && export KVM_UNIT_TESTS_ENV_OLD="$KVM_UNIT_TESTS_ENV"
+-		export KVM_UNIT_TESTS_ENV=$(mktemp)
++		export KVM_UNIT_TESTS_ENV
++		KVM_UNIT_TESTS_ENV=$(mktemp)
+ 		env_params
+ 		env_file
+ 		env_errata || return $?
+@@ -570,7 +572,9 @@ env_generate_errata ()
  
-+.PHONY: shellcheck
-+shellcheck:
-+	shellcheck -a run_tests.sh */run */efi/run scripts/mkstandalone.sh
+ trap_exit_push ()
+ {
+-	local old_exit=$(trap -p EXIT | sed "s/^[^']*'//;s/'[^']*$//")
++	local old_exit
 +
- .PHONY: tags
- tags:
- 	ctags -R
-diff --git a/README.md b/README.md
-index 6e82dc225..2d6f7db56 100644
---- a/README.md
-+++ b/README.md
-@@ -193,3 +193,6 @@ with `git config diff.orderFile scripts/git.difforder` enables it.
- 
- We strive to follow the Linux kernels coding style so it's recommended
- to run the kernel's ./scripts/checkpatch.pl on new patches.
-+
-+Also run `make shellcheck` before submitting a patch which touches bash
-+scripts.
-diff --git a/scripts/common.bash b/scripts/common.bash
-index b9413d683..5e9ad53e2 100644
---- a/scripts/common.bash
-+++ b/scripts/common.bash
-@@ -78,8 +78,11 @@ function arch_cmd()
++	old_exit=$(trap -p EXIT | sed "s/^[^']*'//;s/'[^']*$//")
+ 	trap -- "$1; $old_exit" EXIT
  }
  
- # The current file has to be the only file sourcing the arch helper
--# file
-+# file. Shellcheck can't follow this so help it out. There doesn't appear to be a
-+# way to specify multiple alternatives, so we will have to rethink this if things
-+# get more complicated.
- ARCH_FUNC=scripts/${ARCH}/func.bash
- if [ -f "${ARCH_FUNC}" ]; then
-+# shellcheck source=scripts/s390x/func.bash
- 	source "${ARCH_FUNC}"
- fi
+diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+index e7af9bda9..597c90991 100644
+--- a/scripts/runtime.bash
++++ b/scripts/runtime.bash
+@@ -15,7 +15,9 @@ extract_summary()
+ # We assume that QEMU is going to work if it tried to load the kernel
+ premature_failure()
+ {
+-    local log="$(eval "$(get_cmdline _NO_FILE_4Uhere_)" 2>&1)"
++    local log
++
++    log="$(eval "$(get_cmdline _NO_FILE_4Uhere_)" 2>&1)"
+ 
+     echo "$log" | grep "_NO_FILE_4Uhere_" |
+         grep -q -e "could not \(load\|open\) kernel" -e "error loading" -e "failed to load" &&
 -- 
 2.43.0
 
