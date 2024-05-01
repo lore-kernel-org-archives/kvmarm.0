@@ -1,34 +1,45 @@
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AB5E42A96
-	for <kvmarm@lists.linux.dev>; Wed,  1 May 2024 18:59:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A41A714A8B
+	for <kvmarm@lists.linux.dev>; Wed,  1 May 2024 19:51:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714589967; cv=none; b=kdXp7fRhv4Qj2Jy4UOLKn5HGBfq8MU1Ts8TZgHrLKUQIM7631k9yrX7v7S3WbKlPg9hq3G/I5F3w2OGUp+rlERrSstN9GHXcFapUScDHrsEyeqzJXXIdxJmp6Jgw/CZPGhkwNxaoGrmQCXIvdju4Erq/Cufv+xNbMSQNoBcEQwA=
+	t=1714593091; cv=none; b=hrxCFjnBTuTXAntqIEvhpyfWiaQaskLtAhzI4j9TPLg6I6q4sMauD2fuu64PTeKEMMhB63yD+ZwQABcTZ67un0SI5lYYOAA7+ymy7gcxPqrmsXZ3PW4hqfkyebd6FcbP1k0yf5dKBW7ZMa2n16a4a8dYHrr9VmEPy1wl/KwHLmQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714589967; c=relaxed/simple;
-	bh=2AckizYgFfJcXL9wCxuEfbHA7kqRgQQds0FkX8AvZLA=;
+	s=arc-20240116; t=1714593091; c=relaxed/simple;
+	bh=Cev3u4UkNuuRljc4rn0EQ0sgAO9hWmZV4il1yBMnE+A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DPq6LHIY9qlf/tGBb+VB4dHnp4ymubwRnNFHHr7j7a98ntRpXy2eedH0RZIqXWq4RRg2YddVtT0Hd8whOtx5sd7UsgJzjOelNK2twGNPvy8apSOwH0SnaTujO7hztnjhs8w/qYuo83hLTgsxaW0iyCjzS7Khfx+iNzhSxYVOsBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OANV3CI5; arc=none smtp.client-ip=91.218.175.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	 Content-Type:Content-Disposition:In-Reply-To; b=AyuQZjiXahClQbvLgigMMtCIRqpjTWU9uK4V43brvxiN35O9TNnhOM5tzfvQLmLDs8nTzq6vnIawyj2yPvfgbj/7Q1gFL+VVclUBzoPSwZ5D/QOx0cYENyHh93gPkQKVIeEqghqz0kLJjYJYRe7XbeIttmoQBl+8GO4McPDv02s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ceA7Pnxk; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OANV3CI5"
-Date: Wed, 1 May 2024 18:59:17 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1714589963;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UrQ2AopEGZ3r2B+LP+ekVnW1mZ1EGD++PLfCAyg3y6E=;
-	b=OANV3CI59WqzNyGVfYeuPrmtDuPWes9D9fUsAuYKQ4gjK/XbfUMYUjkTcmeRu4Zybdin2h
-	K5O7IiK+8ucCgq0o+IuNyke6c1qDmP/mfAwQaIuCjNbh8BlqSeJEgLyNxJ07K+rHCp1nYr
-	brsxV29kTD/dacGUSLKNj/CH+7hbKdc=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ceA7Pnxk"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=0A31sCIBZJeiwuMP4GxlbOVkmUB2QfLVfijRKGWXcFU=; b=ceA7PnxkXiACKUL8mtep4lA+y5
+	S2bEbuXDW4kNrbNUgRcyDoamwX22ZQrjZ+M6xmzTd5bEl21SJvFN6I8JkVCRIzDyQKecj5dFi2vuy
+	woWHCO98NxgJfbuMkl6CkcpTQSngVCHQ2AEjLsbNSb3LKj3VahBPiZ1myDl+FE9/R9KGHUbgHRbCA
+	9XlxqtFgh+EAXTiab0w8dZ6VRLXimhlpkPhFA8uJ4I63agFziQ8QgBzrR+rtN/eraI0P9OZXZMt36
+	oEtaEn0aE8HCkplduneOK49QxfIv+tFgQO919I6+Z++xN9fWQAYLzSvAwSS8bqU3lfrBhynzpOnn6
+	kjeDnwTQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38288)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1s2Fz3-0006Zk-0G;
+	Wed, 01 May 2024 20:51:17 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1s2Fz1-0002yu-OR; Wed, 01 May 2024 20:51:15 +0100
+Date: Wed, 1 May 2024 20:51:15 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Oliver Upton <oliver.upton@linux.dev>
 Cc: Marc Zyngier <maz@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
@@ -36,10 +47,11 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
 Subject: Re: [PATCH RFC] KVM: arm64: allow ID_MMFR4_EL1 to be writable
-Message-ID: <ZjKRBcAML5T6cm4q@linux.dev>
+Message-ID: <ZjKdM935rsvd+S9/@shell.armlinux.org.uk>
 References: <E1s2DPv-00AhaA-Ra@rmk-PC.armlinux.org.uk>
  <ZjKCgIyWqNKC6TUu@linux.dev>
  <ZjKFBUXEhwZ7ZmMM@shell.armlinux.org.uk>
+ <ZjKRBcAML5T6cm4q@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,65 +60,62 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZjKFBUXEhwZ7ZmMM@shell.armlinux.org.uk>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <ZjKRBcAML5T6cm4q@linux.dev>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Wed, May 01, 2024 at 07:08:05PM +0100, Russell King (Oracle) wrote:
-> On Wed, May 01, 2024 at 05:57:20PM +0000, Oliver Upton wrote:
-> > Hi Russell,
-> > 
-> > On Wed, May 01, 2024 at 06:06:51PM +0100, Russell King (Oracle) wrote:
-> > > Between 5.4 and 5.15, the guests view of HPDS, CnP, XNX and AC2
-> > > changed their value on the same Neoverse N1 r3p1 hardware which makes
-> > > migrating between these kernels on the host problematical.
-> > 
-> > It'd be helpful to expand a bit more on how these fields changed, better
-> > yet if we can blame it back to a commit. I'm guessing the only direction
-> > of migration you care about is old -> new then?
-> 
-> Yes. For MMFR4_EL1, we see 0 with our 5.4 based kernel, and 0x21110
-> with our 5.15 kernel. I've been looking at tracking down which commit
-> is responsible but I've come up with nothing that fits.
-> 
-> The only change I can see is the FTR definition for MMFR4, but this
-> always included 4:7 (AC2) which changed 0 -> 1. So... no idea what
-> commit caused the change.
-> 
-> There are a load of other registers that we need sorting, but this
-> is just a test forray into attempting to solve this.
-
-Got it, let me see if I can find it then. Do share that list of
-problematic registers when you have it, hopefully this isn't the tip of
-the iceberg...
-
-> > 
-> > > We already permit changing HPDS in AA64MMFR1_EL1 and CnP in
-> > > AA64MMFR2_EL1. We also allow LSM as we allow that in AA64MMFR2_EL1,
-> > > so this patch includes support for that even though it isn't required.
+On Wed, May 01, 2024 at 06:59:17PM +0000, Oliver Upton wrote:
+> On Wed, May 01, 2024 at 07:08:05PM +0100, Russell King (Oracle) wrote:
+> > On Wed, May 01, 2024 at 05:57:20PM +0000, Oliver Upton wrote:
+> > > Hi Russell,
 > > > 
-> > > Discussing with Marc Zygnier, AC2 should also be fine to be writable,
-> > 
-> > typo: Zyngier
-> > 
-> > > even though we don't inject an UNDEF if the guest accesses those
-> > > registers.
+> > > On Wed, May 01, 2024 at 06:06:51PM +0100, Russell King (Oracle) wrote:
+> > > > Between 5.4 and 5.15, the guests view of HPDS, CnP, XNX and AC2
+> > > > changed their value on the same Neoverse N1 r3p1 hardware which makes
+> > > > migrating between these kernels on the host problematical.
 > > > 
-> > > The only questionable one is XNX, execute-never control distinction,
-> > > which is also in AA64MMFR1_EL1 but we don't allow to be changed there.
+> > > It'd be helpful to expand a bit more on how these fields changed, better
+> > > yet if we can blame it back to a commit. I'm guessing the only direction
+> > > of migration you care about is old -> new then?
 > > 
-> > It is quite odd for us to expose this field to non-nested VMs in the
-> > first place, though I suppose we will apply an additional set of
-> > restrictions for nested VMs when they come along.
+> > Yes. For MMFR4_EL1, we see 0 with our 5.4 based kernel, and 0x21110
+> > with our 5.15 kernel. I've been looking at tracking down which commit
+> > is responsible but I've come up with nothing that fits.
+> > 
+> > The only change I can see is the FTR definition for MMFR4, but this
+> > always included 4:7 (AC2) which changed 0 -> 1. So... no idea what
+> > commit caused the change.
+> > 
+> > There are a load of other registers that we need sorting, but this
+> > is just a test forray into attempting to solve this.
 > 
-> Yes, it did strike me as odd, since the description seems to imply that
-> XNX affects EL2, which the VM wouldn't have access to. So I'm not sure
-> why we don't just force it to zero.
+> Got it, let me see if I can find it then. Do share that list of
+> problematic registers when you have it, hopefully this isn't the tip of
+> the iceberg...
 
-Probably because we failed to catch it in the first place and setting to
-0 now would be even more UAPI breakage. Meh :-/ I don't see any immediate
-issues with the patch, especially since it is fixing a genuine UAPI
-breakage in KVM.
+There unfortunately is an iceberg, but hopefully it isn't big enough to
+sink a ship!
+
+Besides ID_MMFR4_EL1, here are the other differences we've identified.
+Note that these are Oracle's UEK kernels, so based on stable kernel
+branches.
+
+Register		Field		5.4.x	5.15.x
+ID_PFR0_EL1		CSV2		0	1
+ID_ISAR6_EL1		DP		0	1
+ID_PFR2_EL1		SSBS		0	1
+			CSV3		0	1
+ID_AA64DFR0_EL1		PMSVer		1	0
+			DebugVer	8	6
+ID_AA64MMFR1_EL1	XNX		0	1
+ID_AA64MMFR2_EL1	EVT		0	1
+KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2
+					0x12	0
+
+I think some of these differences are due to Marc's removal of the
+WA2 code in commit 29e8910a566a ("KVM: arm64: Simplify handling of
+ARCH_WORKAROUND_2"). The WA2 register for example has changed from
+avail/enabled to not_avail.
 
 -- 
-Thanks,
-Oliver
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
