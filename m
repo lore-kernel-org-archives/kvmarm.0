@@ -1,65 +1,65 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8038D55E5C
-	for <kvmarm@lists.linux.dev>; Wed,  1 May 2024 11:11:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D26156763
+	for <kvmarm@lists.linux.dev>; Wed,  1 May 2024 11:14:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714561869; cv=none; b=PHn6HqYN2c0DLfN+vUPMcQXTkeAC90CV+Z/UXkgqc/bhuLu+Y3k9ZjgZ/VQPyjg+gxV316CjxzOrtf+y7y8l5Zu6XhaQKguHoXPHHTHhX+sega8oqjCkWfut02U2g1cgpAxDdG7NZVCXAANGIvKbdLw2Ihy3c0rfvbUupNdDuwM=
+	t=1714562044; cv=none; b=RNxiVL6VOgGRViW5yWqc5/qTsCO6AyV9l1WwCpi41576l49JhoaaAzO3tAXPqv1fwjz3W2CY5xXV5MR64f01BCawm0WoC6oxzMXBVwi1AhN8hkLO2t14s4VbuQ11GjdmvwCLXCuLW1/PQYxXm+Yoq5611D7J29w9nRHCg5kTedY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714561869; c=relaxed/simple;
-	bh=HjmQN/vLfXCeKes7nGzRxBen9HgLMO+9+ng5Ze3Bavk=;
+	s=arc-20240116; t=1714562044; c=relaxed/simple;
+	bh=Gn2C+fSEj9oEgEcKRZTFnYTq392nKVc8ox1XVnAtZ4Q=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IPANYb/AKdrEtYiY/JUIE+/XtUSvKZzKILkg12SE5Ro6tQUpPxmxC3MGxm9BdEjAt82wgGzh15vGKCbk4NxJ5+eS11HoAyfw6K0TJkjMth+g21qno3MHSXFZTrCwa8g1GO4FAlUMqc3cjbPMycJkAN5T/TlEMft83dEkabC8YDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AdwJeK55; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=LK9tOWqmuEaUWFYbImdpOWr4BmKt1KKJBhIZcsRK+ObYvbk2yYmxnsBq/JhHy4BvOvkhGz06fqxKbvWhNnHkoc+ifkp9Tu/emKvZdo3Hrs0gYwo7VQ/FOc7T0bGlhhXUN0J53+B1TpZgW6wrTmTuYx65/bQ3rrkYTtnnc2Z9clg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cCrtPYnZ; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AdwJeK55"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cCrtPYnZ"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714561867;
+	s=mimecast20190719; t=1714562040;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=/9EhiTpZ039qYHHJ6iv2nIzs+2XcBDCLGyTfEI94qWw=;
-	b=AdwJeK55hxoBcMTRfNAs9Aob7W+ZGgvJsyf9DMHJOeCknTdUZnQ9eWYMfz2rnsstS0wKS+
-	2ItzrNhOPa8CuZcm+8xKQmQLYJqDeeN+jTq3Q7hZlxifuKRFd7kERReFt6axqpZUiWI/Xu
-	qC3fAcw28EI1I2/J5HfFiCBIpxneewE=
-Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
- [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=klJb2Hbg7SNB5TUedK1etVELNa99mZOeY3ik6uIdHp8=;
+	b=cCrtPYnZiWRgYHzxmllroQOT2O32EuArsrHKPmdUEGCXfQlpKMHzFE8IAEkjFtvTuezduJ
+	OJNaTsUUq4nUTXY8qAukcnVP/mBJoTgp3mdI5VcHit6yHsT2VFD4SMk0Lm9vl9nuxm72l7
+	bx+NX13bLrjZvYqa/6DoRSjQcArOxyk=
+Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
+ [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-288-vojTzYAPPNeRdz45C0Heug-1; Wed, 01 May 2024 07:11:06 -0400
-X-MC-Unique: vojTzYAPPNeRdz45C0Heug-1
-Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-6ed0a1396abso7107438b3a.3
-        for <kvmarm@lists.linux.dev>; Wed, 01 May 2024 04:11:06 -0700 (PDT)
+ us-mta-208--z-iqy4XNRC884VDzF7j_w-1; Wed, 01 May 2024 07:13:59 -0400
+X-MC-Unique: -z-iqy4XNRC884VDzF7j_w-1
+Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-5fff61c9444so6536218a12.2
+        for <kvmarm@lists.linux.dev>; Wed, 01 May 2024 04:13:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714561865; x=1715166665;
+        d=1e100.net; s=20230601; t=1714562038; x=1715166838;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/9EhiTpZ039qYHHJ6iv2nIzs+2XcBDCLGyTfEI94qWw=;
-        b=tkddQ4v9BSVL0xieA58l0rA/SguDfMrAeQzuxZFcsubLzjS1VAyd6mWz5P6Un31mhA
-         8eMyrOVjL03UZ+ocBlj/teUpLeF4W29K3Z1M1UyFdwgHL37F2ONzHY6q0/y1ADg+qsDt
-         OEmaCrnxLa/hZC8c+a0ZtmnzuctaQaAvX7Mpf2KuCo2FZQj9qL7f96XGdZDVWd2k9Upm
-         qs0rearkQywCFRJOE7WyIlIPkNoXQ3lYboJ+lv+NXvc92g2HcFYCfdl6DU01m8OM4JRv
-         eJO1xLXueiGAlerjqmRQtKFFGtq/ZZOGD4jRX6UK6A1/gPwIIayb3uk5cGiq/cgMkyiO
-         7uTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX30ObhKZZOt3mLSBk9FLgrsXzARwkdc4xeicDUmC2HnxoMLZqS3v1I7Yrr3FsrYJBoacOedR/QUMl68nn1TbrOwf4HcVsU
-X-Gm-Message-State: AOJu0Yyw32vnM6byCm4HirxYIKONvB9AnleJdI+1cwfoBzb/8fTVtMbw
-	t5ANX+mEUu6Q9+DsYMoVjgX96e82XEIYjlxx1QanIYQdw2wuNKvbnIjSJlVwm0VQwK+dzp0r20M
-	s+QFRtZE6aLiAgEqAmc2VDI5A0/fw62ODIv07B7UfDdOANuVIFVfAaw==
-X-Received: by 2002:a05:6a20:f38a:b0:1af:59b9:e3ed with SMTP id qr10-20020a056a20f38a00b001af59b9e3edmr2412174pzb.5.1714561865332;
-        Wed, 01 May 2024 04:11:05 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGjAPRGKaaujq7rTK1yaA7Ot9xIJqN3jHlI3pLra3C5HiqJNFkOQs4ByCYnk6CyZCfgy9Hx2w==
-X-Received: by 2002:a05:6a20:f38a:b0:1af:59b9:e3ed with SMTP id qr10-20020a056a20f38a00b001af59b9e3edmr2412126pzb.5.1714561864872;
-        Wed, 01 May 2024 04:11:04 -0700 (PDT)
+        bh=klJb2Hbg7SNB5TUedK1etVELNa99mZOeY3ik6uIdHp8=;
+        b=ggtNlOwII5In/ATdOJ121dL9j48hHTyXHck1pApTdnDWyJIl9crKIPkzPQV54yBd5Z
+         5H4iFcOTYHfn8ZVM/9SImMzYbwgHVsfK0u2MArJYlB+jr8mvVHOUEFnwxX+hpMXWtQ4p
+         GgC2uTCjoU8E/39H3j0inTiU3p3nViSW6QwXr3Cr5shSJESyZ2ixpFQEe7LL92mmZO4T
+         v6878CVVAsQ38kUUP62/q3T5oTYkLo+7CIusdio4kSx04F6gpwZHBQjMsXLA/u3gfMjD
+         iOy5RsMMJDj08DsC/DtsLbRdziVTrVC73Ykb67oL272EM3+7z8MJX8Dgpn7V44g8O+wC
+         lG+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWYAwmXtVV7shwACiANrAgo5VEfO+bB58gQm162vWM+Dr4bBnPlnhwt/LvK4q9zR5QhoCPtHCiMv3fGNrBL+ahls7e7ZLHf
+X-Gm-Message-State: AOJu0Yze8ceiDtwcrGpBrxYc/r/Yyo+K7+vGK44HNWzlM/RVpq6PbmI8
+	iuwFurPRMhvZQnrS9zAgUdKPqntxM7u5YfCBjdn+zm9Zpnzgl0QGzzqca02LPib03aHzisqwLXK
+	lml+8v4/M4mXsg1OwEzj8ZNynQF9mD2abKSQ0Pv+UoAkbaUl1j+W3qg==
+X-Received: by 2002:a05:6a20:551d:b0:1ad:9413:d5c3 with SMTP id ko29-20020a056a20551d00b001ad9413d5c3mr1712263pzb.17.1714562037865;
+        Wed, 01 May 2024 04:13:57 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHk8RZbujTlZAxMHP0HYG36OV8O8L5/EuxcrJRH9h3TeGMjvsyX78a8rPdkWjXbbD+MV6exNg==
+X-Received: by 2002:a05:6a20:551d:b0:1ad:9413:d5c3 with SMTP id ko29-20020a056a20551d00b001ad9413d5c3mr1712231pzb.17.1714562037414;
+        Wed, 01 May 2024 04:13:57 -0700 (PDT)
 Received: from [192.168.68.50] ([43.252.112.88])
-        by smtp.gmail.com with ESMTPSA id r10-20020a6560ca000000b005fd74e632f0sm15597042pgv.38.2024.05.01.04.10.55
+        by smtp.gmail.com with ESMTPSA id h9-20020a17090a050900b002a55198259fsm3245338pjh.0.2024.05.01.04.13.48
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 01 May 2024 04:11:04 -0700 (PDT)
-Message-ID: <47e1b241-9085-44e6-a3d0-4ded94a183ce@redhat.com>
-Date: Wed, 1 May 2024 21:10:53 +1000
+        Wed, 01 May 2024 04:13:56 -0700 (PDT)
+Message-ID: <114fcd7e-33e3-4741-936f-21b0576c59e4@redhat.com>
+Date: Wed, 1 May 2024 21:13:46 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -67,8 +67,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 12/19] arm64: acpi: Harden get_cpu_for_acpi_id()
- against missing CPU entry
+Subject: Re: [PATCH v9 17/19] arm64: Kconfig: Enable hotplug CPU on arm64 if
+ ACPI_PROCESSOR is enabled.
 To: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
  Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra <peterz@infradead.org>,
  linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
@@ -85,9 +85,9 @@ Cc: Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
  Dave Hansen <dave.hansen@linux.intel.com>, linuxarm@huawei.com,
  justin.he@arm.com, jianyong.wu@arm.com
 References: <20240430142434.10471-1-Jonathan.Cameron@huawei.com>
- <20240430142434.10471-13-Jonathan.Cameron@huawei.com>
+ <20240430142434.10471-18-Jonathan.Cameron@huawei.com>
 From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20240430142434.10471-13-Jonathan.Cameron@huawei.com>
+In-Reply-To: <20240430142434.10471-18-Jonathan.Cameron@huawei.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
@@ -95,47 +95,26 @@ Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 5/1/24 00:24, Jonathan Cameron wrote:
-> In a review discussion of the changes to support vCPU hotplug where
-> a check was added on the GICC being enabled if was was online, it was
-                                                  ^^^^^^^
-
-                                                  typo
-
-> noted that there is need to map back to the cpu and use that to index
-> into a cpumask. As such, a valid ID is needed.
+> In order to move arch_register_cpu() to be called via the same path
+> for initially present CPUs described by ACPI and hotplugged CPUs
+> ACPI_HOTPLUG_CPU needs to be enabled.
 > 
-> If an MPIDR check fails in acpi_map_gic_cpu_interface() it is possible
-> for the entry in cpu_madt_gicc[cpu] == NULL.  This function would
-> then cause a NULL pointer dereference.   Whilst a path to trigger
-> this has not been established, harden this caller against the
-> possibility.
+> The protection against invalid IDs in acpi_map_cpu() is needed as
+> at least one production BIOS is in the wild which reports entries
+> in DSDT (with no _STA method, so assumed enabled and present)
+> that don't match MADT.
 > 
+> Tested-by: Miguel Luis <miguel.luis@oracle.com>
 > Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> ---
-> v9: New patch in response to a question from Marc Zyngier.
->      Taking the easy way out - harden against a possible condition rather
->      than establishing it never happens!
-> ---
->   arch/arm64/include/asm/acpi.h | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-
-With the typo corrected:
+> ---
+> V9: No change.
+> 
+> ---
+>   arch/arm64/Kconfig       |  1 +
+>   arch/arm64/kernel/acpi.c | 22 ++++++++++++++++++++++
+>   2 files changed, 23 insertions(+)
+> 
 
 Reviewed-by: Gavin Shan <gshan@redhat.com>
-
-> diff --git a/arch/arm64/include/asm/acpi.h b/arch/arm64/include/asm/acpi.h
-> index bc9a6656fc0c..a407f9cd549e 100644
-> --- a/arch/arm64/include/asm/acpi.h
-> +++ b/arch/arm64/include/asm/acpi.h
-> @@ -124,7 +124,8 @@ static inline int get_cpu_for_acpi_id(u32 uid)
->   	int cpu;
->   
->   	for (cpu = 0; cpu < nr_cpu_ids; cpu++)
-> -		if (uid == get_acpi_id_for_cpu(cpu))
-> +		if (acpi_cpu_get_madt_gicc(cpu) &&
-> +		    uid == get_acpi_id_for_cpu(cpu))
->   			return cpu;
->   
->   	return -EINVAL;
 
