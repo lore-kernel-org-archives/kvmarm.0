@@ -1,65 +1,65 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 608A253E13
-	for <kvmarm@lists.linux.dev>; Wed,  1 May 2024 10:33:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8038D55E5C
+	for <kvmarm@lists.linux.dev>; Wed,  1 May 2024 11:11:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714559624; cv=none; b=n46bn82E5uHC0ZJFUlZAVg9MvLEzdJl2cWdhAr1bYjTeV9HQwutOqWbk6B73ikv64GpzQbdJP1HRMAeGWW0afmGT9safPur9l17acCCjfHzhSKindoLmK83npZm78Zy1G7nK45E2IoYuYZ5AUdPCcpO5IMJHCWc2hvydo4I/Suo=
+	t=1714561869; cv=none; b=PHn6HqYN2c0DLfN+vUPMcQXTkeAC90CV+Z/UXkgqc/bhuLu+Y3k9ZjgZ/VQPyjg+gxV316CjxzOrtf+y7y8l5Zu6XhaQKguHoXPHHTHhX+sega8oqjCkWfut02U2g1cgpAxDdG7NZVCXAANGIvKbdLw2Ihy3c0rfvbUupNdDuwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714559624; c=relaxed/simple;
-	bh=QNBtujc6UZHL1288knXMhnVLCejZtwYmy6UxhheX4dQ=;
+	s=arc-20240116; t=1714561869; c=relaxed/simple;
+	bh=HjmQN/vLfXCeKes7nGzRxBen9HgLMO+9+ng5Ze3Bavk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lQIe/PdpbfMUTy8LvaHs8mpqtMB6dpuNXHjqG7aeR5+d6gJYkWTXUDc1uNPTiVCx5CMNzy+icM/rkDyg8Qs4X+v0XHZA6MT4WscLrixXYxSYm/8L3xZsbI5Jw5BpnjQG0wcKspjl/CbDLoIqeBONYycSaB5Gw7NWo+MsRuDxFNg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NxkBQbiq; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=IPANYb/AKdrEtYiY/JUIE+/XtUSvKZzKILkg12SE5Ro6tQUpPxmxC3MGxm9BdEjAt82wgGzh15vGKCbk4NxJ5+eS11HoAyfw6K0TJkjMth+g21qno3MHSXFZTrCwa8g1GO4FAlUMqc3cjbPMycJkAN5T/TlEMft83dEkabC8YDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AdwJeK55; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NxkBQbiq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AdwJeK55"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714559622;
+	s=mimecast20190719; t=1714561867;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=F3Rv6xRyLMIQbC6pPBDmGwewvdeX7X4Yb9g/5DiEGHE=;
-	b=NxkBQbiqAuzMAkjP/RR1BfY59pugSogU5FlTTvVFlmYTV2jnIjqPUnWmf1zer1ZlcCJ1LW
-	BATVQjaBSQHxroeZCzhTuZNkdwlyqlIG07HcFGf/DsN3CHSPufzac6fNthPTMNswNlOS5a
-	qPibtd2aK/lEjPa+o7aB54ROYyWht6w=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=/9EhiTpZ039qYHHJ6iv2nIzs+2XcBDCLGyTfEI94qWw=;
+	b=AdwJeK55hxoBcMTRfNAs9Aob7W+ZGgvJsyf9DMHJOeCknTdUZnQ9eWYMfz2rnsstS0wKS+
+	2ItzrNhOPa8CuZcm+8xKQmQLYJqDeeN+jTq3Q7hZlxifuKRFd7kERReFt6axqpZUiWI/Xu
+	qC3fAcw28EI1I2/J5HfFiCBIpxneewE=
+Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
+ [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-325-EfPDnmIfMqu90Du_6W9phg-1; Wed, 01 May 2024 06:33:40 -0400
-X-MC-Unique: EfPDnmIfMqu90Du_6W9phg-1
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2b337e189ecso255618a91.1
-        for <kvmarm@lists.linux.dev>; Wed, 01 May 2024 03:33:40 -0700 (PDT)
+ us-mta-288-vojTzYAPPNeRdz45C0Heug-1; Wed, 01 May 2024 07:11:06 -0400
+X-MC-Unique: vojTzYAPPNeRdz45C0Heug-1
+Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-6ed0a1396abso7107438b3a.3
+        for <kvmarm@lists.linux.dev>; Wed, 01 May 2024 04:11:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714559620; x=1715164420;
+        d=1e100.net; s=20230601; t=1714561865; x=1715166665;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=F3Rv6xRyLMIQbC6pPBDmGwewvdeX7X4Yb9g/5DiEGHE=;
-        b=QgjpTTgQ6BYG/phIVsrzcrV0lrlaNZc0ZljEY9ViRlQ1kgZcUGMZ6lb67tBxxvTmUu
-         p0ETUO7bQ7AM3LOnoqzDWBfJxaAue63Sjn354aQE1LzXpeN3Nv9cX5Jw9qIcWL3JbSZo
-         WExrIGCvLf4JkAzGTbimg+meupSLwKpA7dnwL2lyPnTFGgyap7sJbmd8wF64wd3dNg66
-         Pq3sOBH73WYtLDcmzLS7hteMb8Y73Su0TNGfwM2pe6TTUG3Ro3An5ipHvRCu2snT5k0D
-         o5Qrtt3+Ga4nT/ClU53/U3OZj5CGXIgd75w+goAqLq/yEn4JKA9I3vv50PDmQ3PZ8wq7
-         Kgzw==
-X-Forwarded-Encrypted: i=1; AJvYcCXQlM+aC1pnEV3YDFTIX4CH6fQ0unxIPlrGrwokPrJFHGqK8E001+sm3mv28iUIWdsAfPD1Ru5Q97srns34XytN2QRf/Qln
-X-Gm-Message-State: AOJu0Yz9YZDRlSmyAqONANvgKTKgCgjLy0J1zpPzZ2pzsty3hPvpEH3l
-	ppuTKFDVQCMlbI1VSy6DsOHJFo3LngMpsZ4BxZFtKN4Q8rbHEG0nCdUIy3XOQQqOayzxMOkcdb2
-	CXmBD4SJiO/FCY+1eY6St1ax2DYD0Q4qubSLhnanz5PMQ8f7VKSa8zg==
-X-Received: by 2002:a17:90b:4a87:b0:29d:dd93:5865 with SMTP id lp7-20020a17090b4a8700b0029ddd935865mr1797800pjb.46.1714559619659;
-        Wed, 01 May 2024 03:33:39 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEcfTC4aIqvKn1VZq3qSHCehrwat0aEX2lF7QcvX+Yac+3lmzVjHEcywM51wkm9Rg51LzaR3g==
-X-Received: by 2002:a17:90b:4a87:b0:29d:dd93:5865 with SMTP id lp7-20020a17090b4a8700b0029ddd935865mr1797745pjb.46.1714559618837;
-        Wed, 01 May 2024 03:33:38 -0700 (PDT)
+        bh=/9EhiTpZ039qYHHJ6iv2nIzs+2XcBDCLGyTfEI94qWw=;
+        b=tkddQ4v9BSVL0xieA58l0rA/SguDfMrAeQzuxZFcsubLzjS1VAyd6mWz5P6Un31mhA
+         8eMyrOVjL03UZ+ocBlj/teUpLeF4W29K3Z1M1UyFdwgHL37F2ONzHY6q0/y1ADg+qsDt
+         OEmaCrnxLa/hZC8c+a0ZtmnzuctaQaAvX7Mpf2KuCo2FZQj9qL7f96XGdZDVWd2k9Upm
+         qs0rearkQywCFRJOE7WyIlIPkNoXQ3lYboJ+lv+NXvc92g2HcFYCfdl6DU01m8OM4JRv
+         eJO1xLXueiGAlerjqmRQtKFFGtq/ZZOGD4jRX6UK6A1/gPwIIayb3uk5cGiq/cgMkyiO
+         7uTQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX30ObhKZZOt3mLSBk9FLgrsXzARwkdc4xeicDUmC2HnxoMLZqS3v1I7Yrr3FsrYJBoacOedR/QUMl68nn1TbrOwf4HcVsU
+X-Gm-Message-State: AOJu0Yyw32vnM6byCm4HirxYIKONvB9AnleJdI+1cwfoBzb/8fTVtMbw
+	t5ANX+mEUu6Q9+DsYMoVjgX96e82XEIYjlxx1QanIYQdw2wuNKvbnIjSJlVwm0VQwK+dzp0r20M
+	s+QFRtZE6aLiAgEqAmc2VDI5A0/fw62ODIv07B7UfDdOANuVIFVfAaw==
+X-Received: by 2002:a05:6a20:f38a:b0:1af:59b9:e3ed with SMTP id qr10-20020a056a20f38a00b001af59b9e3edmr2412174pzb.5.1714561865332;
+        Wed, 01 May 2024 04:11:05 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGjAPRGKaaujq7rTK1yaA7Ot9xIJqN3jHlI3pLra3C5HiqJNFkOQs4ByCYnk6CyZCfgy9Hx2w==
+X-Received: by 2002:a05:6a20:f38a:b0:1af:59b9:e3ed with SMTP id qr10-20020a056a20f38a00b001af59b9e3edmr2412126pzb.5.1714561864872;
+        Wed, 01 May 2024 04:11:04 -0700 (PDT)
 Received: from [192.168.68.50] ([43.252.112.88])
-        by smtp.gmail.com with ESMTPSA id sz15-20020a17090b2d4f00b002aff85b97dfsm1057594pjb.27.2024.05.01.03.33.29
+        by smtp.gmail.com with ESMTPSA id r10-20020a6560ca000000b005fd74e632f0sm15597042pgv.38.2024.05.01.04.10.55
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 01 May 2024 03:33:38 -0700 (PDT)
-Message-ID: <0febde44-99f1-48ba-a233-78b9a32468da@redhat.com>
-Date: Wed, 1 May 2024 20:33:27 +1000
+        Wed, 01 May 2024 04:11:04 -0700 (PDT)
+Message-ID: <47e1b241-9085-44e6-a3d0-4ded94a183ce@redhat.com>
+Date: Wed, 1 May 2024 21:10:53 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -67,8 +67,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 06/19] ACPI: processor: Move checks and availability of
- acpi_processor earlier
+Subject: Re: [PATCH v9 12/19] arm64: acpi: Harden get_cpu_for_acpi_id()
+ against missing CPU entry
 To: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
  Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra <peterz@infradead.org>,
  linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
@@ -85,9 +85,9 @@ Cc: Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
  Dave Hansen <dave.hansen@linux.intel.com>, linuxarm@huawei.com,
  justin.he@arm.com, jianyong.wu@arm.com
 References: <20240430142434.10471-1-Jonathan.Cameron@huawei.com>
- <20240430142434.10471-7-Jonathan.Cameron@huawei.com>
+ <20240430142434.10471-13-Jonathan.Cameron@huawei.com>
 From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20240430142434.10471-7-Jonathan.Cameron@huawei.com>
+In-Reply-To: <20240430142434.10471-13-Jonathan.Cameron@huawei.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
@@ -95,206 +95,47 @@ Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 5/1/24 00:24, Jonathan Cameron wrote:
-> Make the per_cpu(processors, cpu) entries available earlier so that
-> they are available in arch_register_cpu() as ARM64 will need access
-> to the acpi_handle to distinguish between acpi_processor_add()
-> and earlier registration attempts (which will fail as _STA cannot
-> be checked).
+> In a review discussion of the changes to support vCPU hotplug where
+> a check was added on the GICC being enabled if was was online, it was
+                                                  ^^^^^^^
+
+                                                  typo
+
+> noted that there is need to map back to the cpu and use that to index
+> into a cpumask. As such, a valid ID is needed.
 > 
-> Reorder the remove flow to clear this per_cpu() after
-> arch_unregister_cpu() has completed, allowing it to be used in
-> there as well.
-> 
-> Note that on x86 for the CPU hotplug case, the pr->id prior to
-> acpi_map_cpu() may be invalid. Thus the per_cpu() structures
-> must be initialized after that call or after checking the ID
-> is valid (not hotplug path).
+> If an MPIDR check fails in acpi_map_gic_cpu_interface() it is possible
+> for the entry in cpu_madt_gicc[cpu] == NULL.  This function would
+> then cause a NULL pointer dereference.   Whilst a path to trigger
+> this has not been established, harden this caller against the
+> possibility.
 > 
 > Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> 
 > ---
-> v9: Add back a blank line accidentally removed in code move.
->      Fix up error returns so that the new cleanup in processor_add()
->      is triggered on detection of the bios bug.
->      Combined with the previous 2 patches, should solve the leak
->      that Gavin identified.
+> v9: New patch in response to a question from Marc Zyngier.
+>      Taking the easy way out - harden against a possible condition rather
+>      than establishing it never happens!
 > ---
->   drivers/acpi/acpi_processor.c | 80 +++++++++++++++++++++--------------
->   1 file changed, 49 insertions(+), 31 deletions(-)
+>   arch/arm64/include/asm/acpi.h | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
 > 
 
-It would be nice for acpi_processor_set_per_cpu() to return errno,
-explained as below. The patch looks good to me in either me.
+With the typo corrected:
 
 Reviewed-by: Gavin Shan <gshan@redhat.com>
 
-> diff --git a/drivers/acpi/acpi_processor.c b/drivers/acpi/acpi_processor.c
-> index 16e36e55a560..4a79b42d649e 100644
-> --- a/drivers/acpi/acpi_processor.c
-> +++ b/drivers/acpi/acpi_processor.c
-> @@ -183,8 +183,38 @@ static void __init acpi_pcc_cpufreq_init(void) {}
->   #endif /* CONFIG_X86 */
+> diff --git a/arch/arm64/include/asm/acpi.h b/arch/arm64/include/asm/acpi.h
+> index bc9a6656fc0c..a407f9cd549e 100644
+> --- a/arch/arm64/include/asm/acpi.h
+> +++ b/arch/arm64/include/asm/acpi.h
+> @@ -124,7 +124,8 @@ static inline int get_cpu_for_acpi_id(u32 uid)
+>   	int cpu;
 >   
->   /* Initialization */
-> +static DEFINE_PER_CPU(void *, processor_device_array);
-> +
-> +static bool acpi_processor_set_per_cpu(struct acpi_processor *pr,
-> +				       struct acpi_device *device)
-> +{
-> +	BUG_ON(pr->id >= nr_cpu_ids);
-> +
-> +	/*
-> +	 * Buggy BIOS check.
-> +	 * ACPI id of processors can be reported wrongly by the BIOS.
-> +	 * Don't trust it blindly
-> +	 */
-> +	if (per_cpu(processor_device_array, pr->id) != NULL &&
-> +	    per_cpu(processor_device_array, pr->id) != device) {
-> +		dev_warn(&device->dev,
-> +			 "BIOS reported wrong ACPI id %d for the processor\n",
-> +			 pr->id);
-> +		return false;
-> +	}
-> +	/*
-> +	 * processor_device_array is not cleared on errors to allow buggy BIOS
-> +	 * checks.
-> +	 */
-> +	per_cpu(processor_device_array, pr->id) = device;
-> +	per_cpu(processors, pr->id) = pr;
-> +
-> +	return true;
-> +}
-> +
-
-I think it'd better for acpi_processor_set_per_cpu() to return errno. -EINVAL
-is returned if a mismatched ACPI device is found, and 0 is returned on success.
-
-With the improvement, the callers needn't to translate boolen to errno.
-
->   #ifdef CONFIG_ACPI_HOTPLUG_CPU
-> -static int acpi_processor_hotadd_init(struct acpi_processor *pr)
-> +static int acpi_processor_hotadd_init(struct acpi_processor *pr,
-> +				      struct acpi_device *device)
->   {
->   	int ret;
+>   	for (cpu = 0; cpu < nr_cpu_ids; cpu++)
+> -		if (uid == get_acpi_id_for_cpu(cpu))
+> +		if (acpi_cpu_get_madt_gicc(cpu) &&
+> +		    uid == get_acpi_id_for_cpu(cpu))
+>   			return cpu;
 >   
-> @@ -198,8 +228,16 @@ static int acpi_processor_hotadd_init(struct acpi_processor *pr)
->   	if (ret)
->   		goto out;
->   
-> +	if (!acpi_processor_set_per_cpu(pr, device)) {
-> +		ret = -EINVAL;
-> +		acpi_unmap_cpu(pr->id);
-> +		goto out;
-> +	}
-> +
-
-If errno is returned from acpi_processor_set_per_cpu(), this chunk of code becomes:
-
-	ret = acpi_processor_set_per_cpu(pr, device);
-	if (ret) {
-		acpi_unmap_cpu(pr->id);
-		goto out;
-	}
-
->   	ret = arch_register_cpu(pr->id);
->   	if (ret) {
-> +		/* Leave the processor device array in place to detect buggy bios */
-> +		per_cpu(processors, pr->id) = NULL;
->   		acpi_unmap_cpu(pr->id);
->   		goto out;
->   	}
-> @@ -217,7 +255,8 @@ static int acpi_processor_hotadd_init(struct acpi_processor *pr)
->   	return ret;
->   }
->   #else
-> -static inline int acpi_processor_hotadd_init(struct acpi_processor *pr)
-> +static inline int acpi_processor_hotadd_init(struct acpi_processor *pr,
-> +					     struct acpi_device *device)
->   {
->   	return -ENODEV;
->   }
-> @@ -316,10 +355,13 @@ static int acpi_processor_get_info(struct acpi_device *device)
->   	 *  because cpuid <-> apicid mapping is persistent now.
->   	 */
->   	if (invalid_logical_cpuid(pr->id) || !cpu_present(pr->id)) {
-> -		int ret = acpi_processor_hotadd_init(pr);
-> +		int ret = acpi_processor_hotadd_init(pr, device);
->   
->   		if (ret)
->   			return ret;
-> +	} else {
-> +		if (!acpi_processor_set_per_cpu(pr, device))
-> +			return -EINVAL;
->   	}
->   
-
-		ret = acpi_processor_set_per_cpu(pr, device);
-		if (ret)
-			return ret;
-
->   	/*
-> @@ -365,8 +407,6 @@ static int acpi_processor_get_info(struct acpi_device *device)
->    * (cpu_data(cpu)) values, like CPU feature flags, family, model, etc.
->    * Such things have to be put in and set up by the processor driver's .probe().
->    */
-> -static DEFINE_PER_CPU(void *, processor_device_array);
-> -
->   static int acpi_processor_add(struct acpi_device *device,
->   					const struct acpi_device_id *id)
->   {
-> @@ -395,28 +435,6 @@ static int acpi_processor_add(struct acpi_device *device,
->   	if (result) /* Processor is not physically present or unavailable */
->   		goto err_clear_driver_data;
->   
-> -	BUG_ON(pr->id >= nr_cpu_ids);
-> -
-> -	/*
-> -	 * Buggy BIOS check.
-> -	 * ACPI id of processors can be reported wrongly by the BIOS.
-> -	 * Don't trust it blindly
-> -	 */
-> -	if (per_cpu(processor_device_array, pr->id) != NULL &&
-> -	    per_cpu(processor_device_array, pr->id) != device) {
-> -		dev_warn(&device->dev,
-> -			"BIOS reported wrong ACPI id %d for the processor\n",
-> -			pr->id);
-> -		/* Give up, but do not abort the namespace scan. */
-> -		goto err_clear_driver_data;
-> -	}
-> -	/*
-> -	 * processor_device_array is not cleared on errors to allow buggy BIOS
-> -	 * checks.
-> -	 */
-> -	per_cpu(processor_device_array, pr->id) = device;
-> -	per_cpu(processors, pr->id) = pr;
-> -
->   	dev = get_cpu_device(pr->id);
->   	if (!dev) {
->   		result = -ENODEV;
-> @@ -470,10 +488,6 @@ static void acpi_processor_remove(struct acpi_device *device)
->   	device_release_driver(pr->dev);
->   	acpi_unbind_one(pr->dev);
->   
-> -	/* Clean up. */
-> -	per_cpu(processor_device_array, pr->id) = NULL;
-> -	per_cpu(processors, pr->id) = NULL;
-> -
->   	cpu_maps_update_begin();
->   	cpus_write_lock();
->   
-> @@ -481,6 +495,10 @@ static void acpi_processor_remove(struct acpi_device *device)
->   	arch_unregister_cpu(pr->id);
->   	acpi_unmap_cpu(pr->id);
->   
-> +	/* Clean up. */
-> +	per_cpu(processor_device_array, pr->id) = NULL;
-> +	per_cpu(processors, pr->id) = NULL;
-> +
->   	cpus_write_unlock();
->   	cpu_maps_update_done();
->   
-
-Thanks,
-Gavin
+>   	return -EINVAL;
 
