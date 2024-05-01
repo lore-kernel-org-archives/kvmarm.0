@@ -1,83 +1,116 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2BE05024E
-	for <kvmarm@lists.linux.dev>; Wed,  1 May 2024 15:41:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA76812F5A7
+	for <kvmarm@lists.linux.dev>; Wed,  1 May 2024 15:43:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714578097; cv=none; b=Rlx/L0SZtl+tiTLcT49NRD2iKMcsO+0FT6txp0nonZEnqD/MrbIiQej282MNpgq2p33Wzqley7/C3uocdHLW8AF+YrzNv0A532iMYfRPRxOcQddHHGJ3LgReQfPGGE7AjMQq1yi6gxWYnQdaI2a5bx8Z/+aOjN007XsaG6GWhcg=
+	t=1714578197; cv=none; b=iFqW4g/6nvpN8m5bIrnP0tN5Al6QHHb3bj5E36r6ZIMgsyfHSwBCi8/sE1xbQeb6ZFQLazntSuf/H22uuJBxOR3TX6KJv15B6bwOWGDQ18SpKkW3+VgdxmGIDn7d4iaHoknKXqAsyPu9LqAQJwWff20HBbdQlQ7a+st5VSK74i4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714578097; c=relaxed/simple;
-	bh=9Ee7q9KOS+Gjz6F7GATztOtK7jVn88zdtaN486f8Kj4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DX1hOOQBVTnuTb4c1VbFYjJ5vtPec+IJF4nbl+4IiX567Jp8adbjsBuA79d+itdmdXEMx+Xjv4DhttulPxupi5mq8nhxzeP2Lx1nnMrOsIoSY/GgAfaDlzkUGcvngN+o2BDUXPLGYNcAbsgUNIc/ObckfhN/95IWDhQ8pyHidBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CUnDdufT; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1714578197; c=relaxed/simple;
+	bh=FsitJRTp6Lwf0h9Ef88XdEvvmnpDzeKogKZvivA/9aU=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AhUPIItwdgq+YuFa92Ahc6D60SabzcnuPr47zqul/fNkRwwPYqjxZpMiR04xi0jSQR0PxINQDthbp980K05kgRwrBsPDF3yVlygApesVVDfdT7X6UnZIG6uksG3L/+biTqngscU9BC0ZIvpd6D4coiMTk68DcRDj9/XMJBrf0lg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fx03XAaL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CUnDdufT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E29DC113CC;
-	Wed,  1 May 2024 15:41:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fx03XAaL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 399E1C072AA;
+	Wed,  1 May 2024 15:43:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714578097;
-	bh=9Ee7q9KOS+Gjz6F7GATztOtK7jVn88zdtaN486f8Kj4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=CUnDdufTznMX1TpN/cspx/vm1qBAr1wb+xXbfhoPICw1e0OefJEZlUDVMLAwU+3mL
-	 mac3SRL4ijsJYAPV1BqrD7ZE0ZKZxcqv5J5nx3yy34mWjfcM3lVjmZRHArxuGtfDO6
-	 lr9DtqULOuaklyA955ZGfrgN8NKDR2QhuMPDaZCADb2ZKClJqfWxSxMyDdwLp8SlkS
-	 XliAgocOZGKjy4GPCGfzcGO3AnQ+22uH53b6/Wao5D+fFXbiFUlSTts57irwDkaFBz
-	 zFyMviU4ZLRfjLrxf+JNROOfC1p4uM6HOF9otOk0Fy2h/LhOGtMDZA/7DWCkr/CZb7
-	 XTixM/rjdhlqQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	s=k20201202; t=1714578197;
+	bh=FsitJRTp6Lwf0h9Ef88XdEvvmnpDzeKogKZvivA/9aU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Fx03XAaLvAT68e5buk+/9uMxIiFRnJuQpRm/b+3fDoIlT/yKzmG3quwkTmBE0vOz8
+	 S1Zs6wfQPhuOqLJX3vs6g1+d2nWOFN8OzFzeC//9j+rT9+gct9SkGuxlsTWC5rRg2G
+	 cpM/HInBXa7SB0kBaIwvz4yEvJEtfhD5FN8DhX1+Gaxr5x5u0gZyBZdHkK5VZTsn6l
+	 3RcYJ216dBAlksfpzWBmkKYpSXMQDV9wq+IrEIBu9EiUbpYiTkAlm1lqPLRjR3GMiq
+	 TvYWvsRI82HAZxBqVlIlwK5aVbzVI29ZGUwtwJH0RoFx6l4aOk5JK+aIV80+Vb/7sb
+	 2GpWUl5m2yoyg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1s2C5O-009ksv-Lf;
-	Wed, 01 May 2024 16:41:34 +0100
+	id 1s2C70-009ku3-Rk;
+	Wed, 01 May 2024 16:43:14 +0100
+Date: Wed, 01 May 2024 16:43:14 +0100
+Message-ID: <868r0tr10t.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH] KVM: arm64: remove duplicated AA64MMFR1_EL1 XNX
-Date: Wed,  1 May 2024 16:41:31 +0100
-Message-Id: <171457808342.2893348.14914006409589344975.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <E1s2AxF-00AWLv-03@rmk-PC.armlinux.org.uk>
-References: <E1s2AxF-00AWLv-03@rmk-PC.armlinux.org.uk>
+To: Fuad Tabba <tabba@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	kvmarm@lists.linux.dev,
+	will@kernel.org,
+	qperret@google.com,
+	seanjc@google.com,
+	alexandru.elisei@arm.com,
+	catalin.marinas@arm.com,
+	philmd@linaro.org,
+	james.morse@arm.com,
+	suzuki.poulose@arm.com,
+	mark.rutland@arm.com,
+	broonie@kernel.org,
+	joey.gouly@arm.com,
+	rananta@google.com,
+	smostafa@google.com
+Subject: Re: [PATCH v4 00/30] KVM: arm64: Preamble for pKVM
+In-Reply-To: <CA+EHjTxVohmCnM7U=QPQ7MP-Dqo4BMc2gaqJc7kexQfR7pUtmA@mail.gmail.com>
+References: <20240423150538.2103045-1-tabba@google.com>
+	<ZjCn11tZ-XkD3doB@linux.dev>
+	<CA+EHjTxVohmCnM7U=QPQ7MP-Dqo4BMc2gaqJc7kexQfR7pUtmA@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, catalin.marinas@arm.com, will@kernel.org, rmk+kernel@armlinux.org.uk, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+X-SA-Exim-Rcpt-To: tabba@google.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, will@kernel.org, qperret@google.com, seanjc@google.com, alexandru.elisei@arm.com, catalin.marinas@arm.com, philmd@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, mark.rutland@arm.com, broonie@kernel.org, joey.gouly@arm.com, rananta@google.com, smostafa@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 01 May 2024 15:29:05 +0100, Russell King (Oracle) wrote:
-> Commit d5a32b60dc18 ("KVM: arm64: Allow userspace to change
-> ID_AA64MMFR{0-2}_EL1") made certain fields in these registers writable,
-> but in doing so, ID_AA64MMFR1_EL1_XNX was listed twice. Remove the
-> duplication.
-> 
-> 
+On Tue, 30 Apr 2024 16:36:32 +0100,
+Fuad Tabba <tabba@google.com> wrote:
+>=20
+> Hi Oliver,
+>=20
+> On Tue, Apr 30, 2024 at 9:12=E2=80=AFAM Oliver Upton <oliver.upton@linux.=
+dev> wrote:
+> >
+> > Hi Fuad,
+> >
+> > On Tue, Apr 23, 2024 at 04:05:08PM +0100, Fuad Tabba wrote:
+> > > Changes from V3 [0]:
+> > > - Rebased on latest kvmarm/next (dcbf421a8c08)
+> > > - Dropped atomic and locking patches for now, while we rework them
+> > > - Misc fixes (Oliver)
+> > >
+> > > We are getting closer to upstreaming the remaining part of pKVM
+> > > [1]. To make the process easier for us and for our dear
+> > > reviewers, we are sending out this patch series as a preamble to
+> > > the upcoming patches.
+> > >
+> > > This series is based on Linux 6.9-rc3 -- kvmarm/next
+> > > (dcbf421a8c08). Most of the patches in this series are
+> > > self-standing, and can be applied directly. Patches 1 to 13 are
+> > > fixes.
+> >
+> > Thanks for enduring my feedback. I think a lot of this looks good to go.
+> > I'm not convinced that some of the patches moving/refactoring things are
+> > a net positive _on their own_, but am happy to take them when they're
+> > paired with the feature that depends on them.
+>=20
+> Thank you for your reviews! I'll resent these moving patches later
+> with the other ones in that case.
 
-Applied to next, thanks!
+No need, I'll cherry-pick them directly!
 
-[1/1] KVM: arm64: remove duplicated AA64MMFR1_EL1 XNX
-      commit: e8533e58cae02923e8cbffca516d3d821cee1649
-
-Cheers,
+Thanks,
 
 	M.
--- 
+
+--=20
 Without deviation from the norm, progress is not possible.
-
-
