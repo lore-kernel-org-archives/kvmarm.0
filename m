@@ -1,66 +1,66 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 724D2364D2
-	for <kvmarm@lists.linux.dev>; Thu,  2 May 2024 08:23:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56B0F3A8D8
+	for <kvmarm@lists.linux.dev>; Thu,  2 May 2024 08:27:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714638209; cv=none; b=qcLHf2ugcyRbI/qzYk5zN2A20UBPgeqHuzVro/JjZ9PjDlf1pB6+/ZiiEJfIKinz+WNSCgwbktMjNNdkwYt9iNo/tccrP+cpKTEtoKD2FMDqgFrZ9kajHOqOVaowjHGjzf003vbuZyhFgSjWCUsNezhGqWeD4y0+8ceiaZQIDoU=
+	t=1714638440; cv=none; b=Rd7pZZqEFIMbP27oei/AbXov4uUvYdJC2MUF6Xe/c3hzJnO4Bh9NviwkXWO6YzzcsgiIdi3mCsFtwJaDUsNVRoP0LfSyDiEBYmLaOMcojjUeP40eae9/l0wHGqLCGX3XKgtd+E3pVYNA35+SZXzQyDue/8IJevPXKtyxMOiE2sE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714638209; c=relaxed/simple;
-	bh=ZE+ngAnTCcsMSeiqF7e9PkuEtQy1o+nImccEUeE4khQ=;
+	s=arc-20240116; t=1714638440; c=relaxed/simple;
+	bh=FNXL0Woy+SYHpnjVTDLsJudP5ULn+c2OFLWpMeinOBA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rmDxwgwXTt7fzW7+5BUcvTWM3ELs7cvMLQtRk5Zo1BG/Y7VyF8odRMpJ0sKrxnxPiFFF6OgvD4uy69XzHssquXqL4qlcpJCegED7986+P3xGXvkC/LPqhvcjKCwHU+oHW85z09h1aV+cvbHEEIffhVC4YbHnag4jE9WsbIQAABA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SPUwWpr9; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=SDy5XfCL1d7iS/NJaHYuZH0Uz4TGxj9MbjlVM8TGW7wPvSb3imhxcyVyftqd0n2QFujfesRotwmy+Pl5LwlQZj72R+8KME1UrGtdRb6hy9LpAueC1NyF6Tpq1e8g6rsPXsYL6NjpxGeQl/hX2uHV6BN+321vEiMNOhNRbTDDbag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=crU5AZWN; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SPUwWpr9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="crU5AZWN"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714638207;
+	s=mimecast20190719; t=1714638438;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=w5km4/BthBCY3+a3KkxvTt8Ci9HCPSEYsYp2lASqktk=;
-	b=SPUwWpr9Va0kUWv28ib3Lz4l3pGcfPwGOsNo4Q1xN8gbBktcCNFokjQFpDCwgFxvphD4eg
-	OdVuvsurCV7uk6Thb0NY8vpV1PXIRM1WNLN8ofQVq3nZz0vFdneRy6T14qVMKHStb8LIgh
-	DnrILrRmS0EP2DyZSCirpaUbXEmvuOk=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=p7ndgmJ4Q5mTTz6lBU7yUmLHmngiXphC0GSqdbIKWyA=;
+	b=crU5AZWNLHhVAAXcfYljRpMsv/SGnMGDbJDY8b/xY237AGYWOzqnA3D8OxF7JXM79i4588
+	R411twwDWZPf1eWElL0PD83elJe7JZ61Ud1zWi0PsD7QcAdqyiiBsqxCaDHZfpgX314KAX
+	KyVNYyZYN8wC5btvZjxSw/OWoQHy/Is=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-515-k0tBffubOjG0fGh7L9OdTg-1; Thu, 02 May 2024 04:23:25 -0400
-X-MC-Unique: k0tBffubOjG0fGh7L9OdTg-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-41895b0a62cso53814545e9.2
-        for <kvmarm@lists.linux.dev>; Thu, 02 May 2024 01:23:25 -0700 (PDT)
+ us-mta-217-VfNRvmQEPmaCOfd9JM4uUw-1; Thu, 02 May 2024 04:27:14 -0400
+X-MC-Unique: VfNRvmQEPmaCOfd9JM4uUw-1
+Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-43b0a5616ebso40473001cf.3
+        for <kvmarm@lists.linux.dev>; Thu, 02 May 2024 01:27:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714638204; x=1715243004;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=w5km4/BthBCY3+a3KkxvTt8Ci9HCPSEYsYp2lASqktk=;
-        b=ij+R65V+Lj9IMneZj4iLsBG8DTSm945GHCen3B0I1xGv2c8aG8lhDvBQBManyOfGZU
-         SUQIRyGNzfUXkSMOZ0VNAoOYsSerBmBD7OJ4RC0zVhTCutbE35NpAyB26C9J10hBJDSr
-         GHmPhYHRbOXpvlsANRthywnRFAR161O4tR5O/VXXDHEpQ0ppo+jGhC/INSym/8L6M63F
-         wM5DxMvxI/HrW0Tkbja1ue0GwrMEuhFuAZHvBccHFX4s73G8yMpdYEWYt1APujHuiMUr
-         Z8c1gY/z3X6kogmJ0g2KODnEPnRuRhnZhL4Eoz5OVfcncJDtq9Cf9m/Ax6aE+Hvi0rut
-         ZPAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUmivB6xFmhVWjxXCEbQeKsNjJRc9abTCQRcTZz4na3wQtEIvBcVty6vbmfNQFx63CjRE8H5hKkW8PRBWpEgZMx2UvmyB7l
-X-Gm-Message-State: AOJu0YwrQ0saZahrVr20Fjh8uJY2XrBsTrsC6XcmqfcUAyl5qd1XqSpL
-	I5+ApwnE7g7GQBYQZoQaEYl2Kk/qOdUZSz6Ik5PYzuMote04TcjbY2Oj3b24U2bLYEyhXGTyifl
-	NLPQP05w7I6UostyaisAhWJnkHWL7O3GEv4XDftNt0OpdPhC2idUL6g==
-X-Received: by 2002:a05:600c:3d0a:b0:418:e7b6:21de with SMTP id bh10-20020a05600c3d0a00b00418e7b621demr3971468wmb.23.1714638204779;
-        Thu, 02 May 2024 01:23:24 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFPgGlTEo2U9DPytMcpxxfhGvFdTayJOWEviyctdTbnI07tu/xfP/RLwUzgzjLL8wvtBjYeCQ==
-X-Received: by 2002:a05:600c:3d0a:b0:418:e7b6:21de with SMTP id bh10-20020a05600c3d0a00b00418e7b621demr3971445wmb.23.1714638204428;
-        Thu, 02 May 2024 01:23:24 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1714638434; x=1715243234;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=p7ndgmJ4Q5mTTz6lBU7yUmLHmngiXphC0GSqdbIKWyA=;
+        b=RNfje9MP0VGTrPs3hEW8Z8gmXJKsD4+CdYOXz/bttJQicLTI/QLeJJRkCqEd2OnAQM
+         nFwdWpT4LmjXUxMLsFztW8f8xsgBo5s+1Q2hsl/k04ekpdNvFNRNVhbq08qsbET6cTVb
+         I1pvVaLgfErHWuh6+U6NUSoEOK2KD3mz3rUGlgej0NY21DZ1abeVH8dC72OOxMA/bwdZ
+         GeAHFSdLOWhIv9cMQZQCIk+gi9OgRf903eudn14pb9lRl0+w/ZjA/p4NLzKHYI3mpdP7
+         XBG7LD320HzHlXg1UXIbimclC1Cy7AoqQ6KVcRqkIPSBVJJ5dUdm1CPuIkh9UTQFj1k1
+         T2fg==
+X-Forwarded-Encrypted: i=1; AJvYcCWuvifyaqA5gg58LLbVsMb13XELbH/7QcWQTf/H/yXQ+/odS/WA81NtnzO0wGLnftEiPVkzKv02aqDe0Ye/715j5maxTW7X
+X-Gm-Message-State: AOJu0YxYLLdnhxUCh+kv21+QpgDi3IsyiSLgB0PcaKTHlZvFDLK1ymdP
+	73TI7sQV+Wd8gapBxkvyaDGvplkTryxJwHJeGKMIVNeSLLt2ZlKxoFRIoWbgbwavMT8dck82qmF
+	NCGrycCmjaCLikxLlqwGI0BVlmLFSOvDnXfzrf7D9X7ueXcXNDc3djQ==
+X-Received: by 2002:a05:622a:13cd:b0:43b:8bd:6a7a with SMTP id p13-20020a05622a13cd00b0043b08bd6a7amr5098265qtk.2.1714638434278;
+        Thu, 02 May 2024 01:27:14 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHaKNE4eUpMSVylcHqjThnkOpY7zsQJCBrbK4j5VlAKy3wezcr+k4NxglNLjqlgTgYpou2oxg==
+X-Received: by 2002:a05:622a:13cd:b0:43b:8bd:6a7a with SMTP id p13-20020a05622a13cd00b0043b08bd6a7amr5098246qtk.2.1714638433763;
+        Thu, 02 May 2024 01:27:13 -0700 (PDT)
 Received: from [192.168.0.9] (ip-109-43-179-34.web.vodafone.de. [109.43.179.34])
-        by smtp.gmail.com with ESMTPSA id bd13-20020a05600c1f0d00b0041c012ca327sm1083150wmb.45.2024.05.02.01.23.23
+        by smtp.gmail.com with ESMTPSA id bn4-20020a05622a1dc400b004378ec294f9sm261050qtb.72.2024.05.02.01.27.11
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 May 2024 01:23:24 -0700 (PDT)
-Message-ID: <2be99a78-878c-4819-8c42-1b795019af2f@redhat.com>
-Date: Thu, 2 May 2024 10:23:22 +0200
+        Thu, 02 May 2024 01:27:13 -0700 (PDT)
+Message-ID: <bc766ea7-22de-4fc5-9790-1b2d67e39974@redhat.com>
+Date: Thu, 2 May 2024 10:27:09 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -68,22 +68,12 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v3 0/5] add shellcheck support
-To: Nicholas Piggin <npiggin@gmail.com>, Andrew Jones <andrew.jones@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Eric Auger <eric.auger@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, =?UTF-8?Q?Nico_B=C3=B6hr?=
- <nrb@linux.ibm.com>, David Hildenbrand <david@redhat.com>,
- Shaoqin Huang <shahuang@redhat.com>,
- Nikos Nikoleris <nikos.nikoleris@arm.com>,
- David Woodhouse <dwmw@amazon.co.uk>, Ricardo Koller <ricarkol@google.com>,
- rminmin <renmm6@chinaunicom.cn>, Gavin Shan <gshan@redhat.com>,
- Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
- Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org,
- linux-s390@vger.kernel.org
-References: <20240501112938.931452-1-npiggin@gmail.com>
+Subject: Re: [kvm-unit-tests PATCH] runtime: Adjust probe_maxsmp for older
+ QEMU
+To: Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: alexandru.elisei@arm.com, eric.auger@redhat.com, pbonzini@redhat.com
+References: <20240502080934.277507-2-andrew.jones@linux.dev>
 From: Thomas Huth <thuth@redhat.com>
 Autocrypt: addr=thuth@redhat.com; keydata=
  xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
@@ -127,40 +117,42 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20240501112938.931452-1-npiggin@gmail.com>
+In-Reply-To: <20240502080934.277507-2-andrew.jones@linux.dev>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 01/05/2024 13.29, Nicholas Piggin wrote:
-> This is based on upstream directly now, not ahead of the powerpc
-> series.
+On 02/05/2024 10.09, Andrew Jones wrote:
+> probe_maxsmp is really just for Arm and for older QEMU which doesn't
+> default to gicv3. So, even though later QEMU has a new error message
+> format, we want to be able to parse the old error message format in
+> order to use --probe-maxsmp when necessary. Adjust the parsing so it
+> can handle both the old and new formats.
+> 
+> Fixes: 5dd20ec76ea6 ("runtime: Update MAX_SMP probe")
+> Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
+> ---
+>   scripts/runtime.bash | 4 +++-
+>   1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+> index e7af9bda953a..fd16fd4cfa25 100644
+> --- a/scripts/runtime.bash
+> +++ b/scripts/runtime.bash
+> @@ -204,8 +204,10 @@ function probe_maxsmp()
+>   {
+>   	local smp
+>   
+> -	if smp=$($RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP |& grep 'Invalid SMP CPUs'); then
+> +	if smp=$($RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP |& grep 'SMP CPUs'); then
+>   		smp=${smp##* }
+> +		smp=${smp/\(}
+> +		smp=${smp/\)}
+>   		echo "Restricting MAX_SMP from ($MAX_SMP) to the max supported ($smp)" >&2
+>   		MAX_SMP=$smp
+>   	fi
 
-Thanks! ... maybe you could also rebase the powerpc series on this now? (I 
-haven't forgotten about it, just did not find enough spare time for more 
-reviewing yet)
-
-> Since v2:
-> - Rebased to upstream with some patches merged.
-> - Just a few comment typos and small issues (e.g., quoting
->    `make shellcheck` in docs) that people picked up from the
->    last round.
-
-When I now run "make shellcheck", I'm still getting an error:
-
-In config.mak line 16:
-AR=ar
-^-- SC2209 (warning): Use var=$(command) to assign output (or quote to 
-assign string).
-
-Not sure why it's complaining about "ar" but not about the other lines in there?
-
-Also, it only seems to work for in-tree builds. If I run it from an 
-out-of-tree build directory, I get:
-
-*/efi/run: */efi/run: openBinaryFile: does not exist (No such file or directory)
-
-  Thomas
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
