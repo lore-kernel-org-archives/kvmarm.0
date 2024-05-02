@@ -1,32 +1,32 @@
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95C7C1D547
-	for <kvmarm@lists.linux.dev>; Thu,  2 May 2024 23:35:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E94C51CD1B
+	for <kvmarm@lists.linux.dev>; Thu,  2 May 2024 23:35:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714692944; cv=none; b=OCkFxou1vnVDl1tXDIcZNU5EoVCklY05H8+G+qEyARj1Yxu2orHDrkS2aJpSzfVpVni21E2wuawAa5FMwpEkULg+ycqDf9iwmFxT/qLVwEiTAzaLe053PatpTUGm3B2UfPGMTZL5RGK9I0QWJlDphdhkJVpu2MNZslWx/YdS+PI=
+	t=1714692945; cv=none; b=qYOwpX8gCmZvo7sHEX9zWqpyDm+fArVM2OW/z/Nx7osBgsrCSwWV4n+41cH/m80YHZBE73naHGZCbkQ1eYCgpxXBATqbaGokgEOY6Qa1xOjWaXUYmeEmFAQGWyWuEoeOb6YfZbFQHnYIVi8LeLd6zLLtYd+t7BAe/Mr7KGJtOpw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714692944; c=relaxed/simple;
-	bh=NTDcn6T8fLIs6YadbTeN074GujB3V6sBy0oUQNr3oS0=;
+	s=arc-20240116; t=1714692945; c=relaxed/simple;
+	bh=T+6MlZGnDmwBDkq3wh4AZ8NMw06AuWs7p2fcTdOe4Wo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uTONufug9dE3JlxvEviKuFXMBxgVLWXVrWGnUJxZntxEfCQVVolwmNwnzfA0RoDaikyl49SqeaX0TnsdHEegMa19Uv4RG+3sXph44Mm6ZACGqCnd/MBUqkV5NaybPbrGnvLtlvaM02INUFandUTY1NOpfnXj08FvkhJbOmErIeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ybn8L9SM; arc=none smtp.client-ip=95.215.58.172
+	 MIME-Version; b=jqZpmVS8gbcNkPeqnQgQ8MhfeSz5bOCUNlUBi1pyxELd6NmZFUSR11EHOz9Fl2iXMa1Uvk1eJjbocttzDEAKAtlsvtjkY8Fvu8o+w6vxOupPNwLdRaXrZvXlEHNnTAIDvUQudfivXcfuQ2w4leZMs8k26Tng6kxZ00LQEWdsT20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fPfi1x1w; arc=none smtp.client-ip=95.215.58.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ybn8L9SM"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fPfi1x1w"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1714692940;
+	t=1714692942;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=bxXGP+lyjrue2CXapAmnMElc+J1kV8edTpVgML7KvzY=;
-	b=Ybn8L9SMi2R081HLrCyc7qTyzTnHBSDyLlzUUYRdNUng020RluBRxtaaphERlfUzayKyip
-	t2JytY43yq5ivzwh0p+P1jKYqCSse1vDUKO5XWzX9wnuyh9OA1eeejP74Ff4UC2mFQHDmh
-	quQ5fblwAJoHNg5h3iQbDHjKsIuV3r8=
+	bh=veB75kwdO0YqjwsRSUtLUzCAlTO5aFutVh+SLpMe890=;
+	b=fPfi1x1wuZWJ1TRG8LbKJPG+ivq3sW0rKHlk/A5Gej8+EYkM28aqunmp6DLvDo7afx7zBa
+	fQyLcEZSx3IVJMOl6gaGftTHx2puuC5faq6/s11QCobxZhfQD400EyRoKMJjAww2MoHBSD
+	VywBAWL0Iluq+z28cArMSidCKEbXMas=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -35,9 +35,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	kvm@vger.kernel.org,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 1/7] KVM: arm64: Rename is_id_reg() to imply VM scope
-Date: Thu,  2 May 2024 23:35:23 +0000
-Message-ID: <20240502233529.1958459-2-oliver.upton@linux.dev>
+Subject: [PATCH 2/7] KVM: arm64: Reset VM feature ID regs from kvm_reset_sys_regs()
+Date: Thu,  2 May 2024 23:35:24 +0000
+Message-ID: <20240502233529.1958459-3-oliver.upton@linux.dev>
 In-Reply-To: <20240502233529.1958459-1-oliver.upton@linux.dev>
 References: <20240502233529.1958459-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -49,58 +49,76 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-The naming of some of the feature ID checks is ambiguous. Rephrase the
-is_id_reg() helper to make its purpose slightly clearer.
+A subsequent change to KVM will expand the range of feature ID registers
+that get special treatment at reset. Fold the existing ones back in to
+kvm_reset_sys_regs() to avoid the need for an additional table walk.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/sys_regs.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 27 ++++++++++-----------------
+ 1 file changed, 10 insertions(+), 17 deletions(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index c9f4f387155f..51a6f91607e5 100644
+index 51a6f91607e5..bb09ce4bce45 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -1570,9 +1570,10 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu, const struct sys_reg_desc *r
+@@ -3510,26 +3510,16 @@ void kvm_sys_regs_create_debugfs(struct kvm *kvm)
+ 			    &idregs_debug_fops);
+ }
  
- /*
-  * Return true if the register's (Op0, Op1, CRn, CRm, Op2) is
-- * (3, 0, 0, crm, op2), where 1<=crm<8, 0<=op2<8.
-+ * (3, 0, 0, crm, op2), where 1<=crm<8, 0<=op2<8, which is the range of ID
-+ * registers KVM maintains on a per-VM basis.
-  */
--static inline bool is_id_reg(u32 id)
-+static inline bool is_vm_ftr_id_reg(u32 id)
+-static void kvm_reset_id_regs(struct kvm_vcpu *vcpu)
++static void reset_vm_ftr_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *reg)
  {
- 	return (sys_reg_Op0(id) == 3 && sys_reg_Op1(id) == 0 &&
- 		sys_reg_CRn(id) == 0 && sys_reg_CRm(id) >= 1 &&
-@@ -3521,7 +3522,7 @@ static void kvm_reset_id_regs(struct kvm_vcpu *vcpu)
+-	const struct sys_reg_desc *idreg = first_idreg;
+-	u32 id = reg_to_encoding(idreg);
++	u32 id = reg_to_encoding(reg);
+ 	struct kvm *kvm = vcpu->kvm;
+ 
+ 	if (test_bit(KVM_ARCH_FLAG_ID_REGS_INITIALIZED, &kvm->arch.flags))
+ 		return;
+ 
  	lockdep_assert_held(&kvm->arch.config_lock);
+-
+-	/* Initialize all idregs */
+-	while (is_vm_ftr_id_reg(id)) {
+-		IDREG(kvm, id) = idreg->reset(vcpu, idreg);
+-
+-		idreg++;
+-		id = reg_to_encoding(idreg);
+-	}
+-
+-	set_bit(KVM_ARCH_FLAG_ID_REGS_INITIALIZED, &kvm->arch.flags);
++	IDREG(kvm, id) = reg->reset(vcpu, reg);
+ }
  
- 	/* Initialize all idregs */
--	while (is_id_reg(id)) {
-+	while (is_vm_ftr_id_reg(id)) {
- 		IDREG(kvm, id) = idreg->reset(vcpu, idreg);
+ /**
+@@ -3541,19 +3531,22 @@ static void kvm_reset_id_regs(struct kvm_vcpu *vcpu)
+  */
+ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
+ {
++	struct kvm *kvm = vcpu->kvm;
+ 	unsigned long i;
  
- 		idreg++;
-@@ -3547,7 +3548,7 @@ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
+-	kvm_reset_id_regs(vcpu);
+-
  	for (i = 0; i < ARRAY_SIZE(sys_reg_descs); i++) {
  		const struct sys_reg_desc *r = &sys_reg_descs[i];
  
--		if (is_id_reg(reg_to_encoding(r)))
-+		if (is_vm_ftr_id_reg(reg_to_encoding(r)))
+-		if (is_vm_ftr_id_reg(reg_to_encoding(r)))
++		if (!r->reset)
  			continue;
  
- 		if (r->reset)
-@@ -4014,7 +4015,7 @@ int kvm_vm_ioctl_get_reg_writable_masks(struct kvm *kvm, struct reg_mask_range *
- 		 * compliant with a given revision of the architecture, but the
- 		 * RES0/RES1 definitions allow us to do that.
- 		 */
--		if (is_id_reg(encoding)) {
-+		if (is_vm_ftr_id_reg(encoding)) {
- 			if (!reg->val ||
- 			    (is_aa32_id_reg(encoding) && !kvm_supports_32bit_el0()))
- 				continue;
+-		if (r->reset)
++		if (is_vm_ftr_id_reg(reg_to_encoding(r)))
++			reset_vm_ftr_id_reg(vcpu, r);
++		else
+ 			r->reset(vcpu, r);
+ 	}
++
++	set_bit(KVM_ARCH_FLAG_ID_REGS_INITIALIZED, &kvm->arch.flags);
+ }
+ 
+ /**
 -- 
 2.45.0.rc1.225.g2a3ae87e7f-goog
 
