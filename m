@@ -1,254 +1,77 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D050256473;
-	Thu,  2 May 2024 10:17:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A14545732B
+	for <kvmarm@lists.linux.dev>; Thu,  2 May 2024 10:20:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714645022; cv=none; b=RSXEmpGjwzMMLNR9ZYeT44q/6QgMINRohOktHsjJDv5KuNOf3jYkHh8/SHbqIXaZse1p19szdZtNbj7BheTTdO6HsOu8ezkzL3IlqUNU4WsnjFvuiKoAv8u9aWtLe1BNbAO/KP+JkuK/lE36vSv40+DMBNHphHMvzAe6eOanWe4=
+	t=1714645235; cv=none; b=CpID1fhh/vvWeyEpCTpxaEVwfGV5nxCNli4i/qaWUOFjx/XTWufYTNNSDTtZsIXBdJy+AVPhOw/Azji468A5nM4ddD/LzzAb1+LHTk2r1VrNKvThe6rHssu3EYSUtQoTjO32WUkvtCdlnOijye3pGevH8GqVVYO/DgBzQDIlGLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714645022; c=relaxed/simple;
-	bh=s66TcP7sDfUVV9MW/afp3T9duv+GA/uOVOZWsntuYLg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=m+08px5VI07qiI1f/sZci3U9M+l/dMMs6BWVj1yMAGpBHPUAu6jwsh44HdI5IAGg7cIQkFsLJfR/gzBlkJwcvZuyePwX3NkMvoyW44q1KZRZ6ls08aS8Pt6JjFt2g2iKcR0bmXToEkmGmKKqSA1UY5JKCFfCglYbqFWQT6LD9Ys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CC7B62F4;
-	Thu,  2 May 2024 03:17:25 -0700 (PDT)
-Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D8E5F3F793;
-	Thu,  2 May 2024 03:16:57 -0700 (PDT)
-Message-ID: <85a4bbda-4516-4c2a-ae51-5e8f8c451e3a@arm.com>
-Date: Thu, 2 May 2024 11:16:56 +0100
+	s=arc-20240116; t=1714645235; c=relaxed/simple;
+	bh=jCxOm2YUiLkjB71tw5e0np3dEbi94AGDR3wlvMU0wJ8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=caZG/Pg96kllCrtfPfiN3S+NF7USt/QQWr1oUj++0gJ3lAuho5IlNYAJF/cdzMyG4/iX0cxvayAWc7cWW7LIiiho8Bbu5l+k6lg62JL0aMA+qo/HXShdS9kMcHGqw/JF19e2bsUCbtzhEfrzTRUqcp+m4RAZMzxcUn0jlZitdNc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u3qSGhHX; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u3qSGhHX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2ED98C113CC;
+	Thu,  2 May 2024 10:20:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714645235;
+	bh=jCxOm2YUiLkjB71tw5e0np3dEbi94AGDR3wlvMU0wJ8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=u3qSGhHXmjDqsVcJDd9uiA26M9MZnUPUR6WsGn6/9oML2RvqOYYMGnoPKuoQqHJnY
+	 1FAf7bXkpIikz9OJdELUjo/fOZClJUQz+j8H7utJP5SQNDD9ikhtJ7+CNwdgQ7t62F
+	 XFDlME8PSkg/zj+1tWwHBnhHC2pTAo6cobRobDFhR857kSiFL52pRhCSHqIi3OpZWI
+	 kfWEKEL2hDSOkaEMnck1RbYBfx0U0DPHEqIlrOiJSj/O1dLHICO61s3yALbsW6FTJO
+	 yFlzb0h33lbYw/dik4o+zcLOQb6QMx2U5jPfdnPAm2xNvwFKmMPV3vwlh3/cN1VrPr
+	 Jkj59invcW4gQ==
+Date: Thu, 2 May 2024 11:20:30 +0100
+From: Will Deacon <will@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH 1/2] KVM: arm64: Fix hvhe/nvhe early alias parsing
+Message-ID: <20240502102030.GA16965@willie-the-truck>
+References: <20240501163400.15838-1-will@kernel.org>
+ <20240501163400.15838-2-will@kernel.org>
+ <ZjJ_mdsCa_fAy_NT@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 17/43] arm64: RME: Allow VMM to set RIPAS
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-References: <20240412084056.1733704-1-steven.price@arm.com>
- <20240412084309.1733783-1-steven.price@arm.com>
- <20240412084309.1733783-18-steven.price@arm.com>
- <d2957090-fcf0-4dff-901e-d8ea975f2452@arm.com>
- <98ef5e64-2d1e-4fa2-a3da-210ea180f20f@arm.com>
-Content-Language: en-US
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <98ef5e64-2d1e-4fa2-a3da-210ea180f20f@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZjJ_mdsCa_fAy_NT@linux.dev>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On 01/05/2024 16:47, Steven Price wrote:
-> On 19/04/2024 10:34, Suzuki K Poulose wrote:
->> On 12/04/2024 09:42, Steven Price wrote:
->>> Each page within the protected region of the realm guest can be marked
->>> as either RAM or EMPTY. Allow the VMM to control this before the guest
->>> has started and provide the equivalent functions to change this (with
->>> the guest's approval) at runtime.
->>>
->>> When transitioning from RIPAS RAM (1) to RIPAS EMPTY (0) the memory is
->>> unmapped from the guest and undelegated allowing the memory to be reused
->>> by the host. When transitioning to RIPAS RAM the actual population of
->>> the leaf RTTs is done later on stage 2 fault, however it may be
->>> necessary to allocate additional RTTs to represent the range requested.
->>
->> minor nit: To give a bit more context:
->>
->> "however it may be necessary to allocate additional RTTs in order for
->> the RMM to track the RIPAS for the requested range".
+Hey Oliver,
+
+On Wed, May 01, 2024 at 05:44:57PM +0000, Oliver Upton wrote:
+> On Wed, May 01, 2024 at 05:33:59PM +0100, Will Deacon wrote:
+> > Booting a kernel with "arm64_sw.hvhe=1 kvm-arm.mode=nvhe" on the
+> > command-line results in KVM initialising using hVHE, whereas one might
+> > expect the latter option to override the former.
+> > 
+> > Fix this by adding "arm64_sw.hvhe=0" to the alias expansion for
+> > "kvm-arm.mode=nvhe".
 > 
-> That is what I meant - but your wording is probably clearer ;)
-> Technically there's also the case where a RIPAS change will cause a
-> block mapping to be split which isn't just about tracking RIPAS but also
-> about breaking up the block mapping for the pages that remain.
+> Hmm, I wonder if it'd be better to just evaluate the sanitised VH field
+> in hvhe_possible(). Otherwise I worry about keeping aliases in sync when
+> new command line options come along.
 > 
->>>
->>> When freeing a block mapping it is necessary to temporarily unfold the
->>> RTT which requires delegating an extra page to the RMM, this page can
->>> then be recovered once the contents of the block mapping have been
->>> freed. A spare, delegated page (spare_page) is used for this purpose.
->>>
->>> Signed-off-by: Steven Price <steven.price@arm.com>
->>> ---
->>>    arch/arm64/include/asm/kvm_rme.h |  16 ++
->>>    arch/arm64/kvm/mmu.c             |   8 +-
->>>    arch/arm64/kvm/rme.c             | 390 +++++++++++++++++++++++++++++++
->>>    3 files changed, 411 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/arch/arm64/include/asm/kvm_rme.h
->>> b/arch/arm64/include/asm/kvm_rme.h
->>> index 915e76068b00..cc8f81cfc3c0 100644
->>> --- a/arch/arm64/include/asm/kvm_rme.h
->>> +++ b/arch/arm64/include/asm/kvm_rme.h
->>> @@ -96,6 +96,14 @@ void kvm_realm_destroy_rtts(struct kvm *kvm, u32
->>> ia_bits);
->>>    int kvm_create_rec(struct kvm_vcpu *vcpu);
->>>    void kvm_destroy_rec(struct kvm_vcpu *vcpu);
->>>    +void kvm_realm_unmap_range(struct kvm *kvm,
->>> +               unsigned long ipa,
->>> +               u64 size,
->>> +               bool unmap_private);
->>> +int realm_set_ipa_state(struct kvm_vcpu *vcpu,
->>> +            unsigned long addr, unsigned long end,
->>> +            unsigned long ripas);
->>> +
->>>    #define RME_RTT_BLOCK_LEVEL    2
->>>    #define RME_RTT_MAX_LEVEL    3
->>>    @@ -114,4 +122,12 @@ static inline unsigned long
->>> rme_rtt_level_mapsize(int level)
->>>        return (1UL << RME_RTT_LEVEL_SHIFT(level));
->>>    }
->>>    +static inline bool realm_is_addr_protected(struct realm *realm,
->>> +                       unsigned long addr)
->>> +{
->>> +    unsigned int ia_bits = realm->ia_bits;
->>> +
->>> +    return !(addr & ~(BIT(ia_bits - 1) - 1));
->>> +}
->>> +
->>>    #endif
->>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
->>> index 46f0c4e80ace..8a7b5449697f 100644
->>> --- a/arch/arm64/kvm/mmu.c
->>> +++ b/arch/arm64/kvm/mmu.c
->>> @@ -310,6 +310,7 @@ static void invalidate_icache_guest_page(void *va,
->>> size_t size)
->>>     * @start: The intermediate physical base address of the range to unmap
->>>     * @size:  The size of the area to unmap
->>>     * @may_block: Whether or not we are permitted to block
->>> + * @only_shared: If true then protected mappings should not be unmapped
->>>     *
->>>     * Clear a range of stage-2 mappings, lowering the various
->>> ref-counts.  Must
->>>     * be called while holding mmu_lock (unless for freeing the stage2
->>> pgd before
->>> @@ -317,7 +318,7 @@ static void invalidate_icache_guest_page(void *va,
->>> size_t size)
->>>     * with things behind our backs.
->>>     */
->>>    static void __unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t
->>> start, u64 size,
->>> -                 bool may_block)
->>> +                 bool may_block, bool only_shared)
->>>    {
->>>        struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
->>>        phys_addr_t end = start + size;
->>> @@ -330,7 +331,7 @@ static void __unmap_stage2_range(struct kvm_s2_mmu
->>> *mmu, phys_addr_t start, u64
->>>      static void unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t
->>> start, u64 size)
->>>    {
->>> -    __unmap_stage2_range(mmu, start, size, true);
->>> +    __unmap_stage2_range(mmu, start, size, true, false);
->>>    }
->>>      static void stage2_flush_memslot(struct kvm *kvm,
->>> @@ -1771,7 +1772,8 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct
->>> kvm_gfn_range *range)
->>>          __unmap_stage2_range(&kvm->arch.mmu, range->start << PAGE_SHIFT,
->>>                     (range->end - range->start) << PAGE_SHIFT,
->>> -                 range->may_block);
->>> +                 range->may_block,
->>> +                 range->only_shared);
->>>          return false;
->>>    }
->>> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
->>> index 629a095bea61..9e5983c51393 100644
->>> --- a/arch/arm64/kvm/rme.c
->>> +++ b/arch/arm64/kvm/rme.c
->>> @@ -79,6 +79,12 @@ static phys_addr_t __alloc_delegated_page(struct
->>> realm *realm,
->>>        return phys;
->>>    }
->>>    +static phys_addr_t alloc_delegated_page(struct realm *realm,
->>> +                    struct kvm_mmu_memory_cache *mc)
->>> +{
->>> +    return __alloc_delegated_page(realm, mc, GFP_KERNEL);
->>> +}
->>> +
->>>    static void free_delegated_page(struct realm *realm, phys_addr_t phys)
->>>    {
->>>        if (realm->spare_page == PHYS_ADDR_MAX) {
->>> @@ -94,6 +100,151 @@ static void free_delegated_page(struct realm
->>> *realm, phys_addr_t phys)
->>>        free_page((unsigned long)phys_to_virt(phys));
->>>    }
->>>    +static int realm_rtt_create(struct realm *realm,
->>> +                unsigned long addr,
->>> +                int level,
->>> +                phys_addr_t phys)
->>> +{
->>> +    addr = ALIGN_DOWN(addr, rme_rtt_level_mapsize(level - 1));
->>> +    return rmi_rtt_create(virt_to_phys(realm->rd), phys, addr, level);
->>> +}
->>> +
->>> +static int realm_rtt_fold(struct realm *realm,
->>> +              unsigned long addr,
->>> +              int level,
->>> +              phys_addr_t *rtt_granule)
->>> +{
->>> +    unsigned long out_rtt;
->>> +    int ret;
->>> +
->>> +    ret = rmi_rtt_fold(virt_to_phys(realm->rd), addr, level, &out_rtt);
->>> +
->>> +    if (RMI_RETURN_STATUS(ret) == RMI_SUCCESS && rtt_granule)
->>> +        *rtt_granule = out_rtt;
->>> +
->>> +    return ret;
->>> +}
->>> +
->>> +static int realm_destroy_protected(struct realm *realm,
->>> +                   unsigned long ipa,
->>> +                   unsigned long *next_addr)
->>> +{
->>> +    unsigned long rd = virt_to_phys(realm->rd);
->>> +    unsigned long addr;
->>> +    phys_addr_t rtt;
->>> +    int ret;
->>> +
->>> +loop:
->>> +    ret = rmi_data_destroy(rd, ipa, &addr, next_addr);
->>> +    if (RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT) {
->>> +        if (*next_addr > ipa)
->>> +            return 0; /* UNASSIGNED */
->>> +        rtt = alloc_delegated_page(realm, NULL);
->>> +        if (WARN_ON(rtt == PHYS_ADDR_MAX))
->>> +            return -1;
->>> +        /* ASSIGNED - ipa is mapped as a block, so split */
->>> +        ret = realm_rtt_create(realm, ipa,
->>> +                       RMI_RETURN_INDEX(ret) + 1, rtt);
->>
->> Could we not go all the way to L3 (rather than 1 level deeper) and try
->> again ? That way, we are covered for block mappings at L1 (1G).
+> This is similar to what we had before commit 35876f35f482 ("arm64:
+> cpufeature: Add helper to test for CPU feature overrides") w/ the added
+> use of the sanitised reg.
 > 
-> I don't think this situation can happen. The spec states that for
-> RMI_ERROR_RTT either top>ipa (UNASSIGNED, in which case we've bailed out
-> above) or top==ipa (ASSIGNED) in which case RMI_RETURN_INDEX(ret) must
-> equal 2.
+> Thoughts?
 
-It could be 1 as RMM spec allows Block mapping at L1. But if we don't
-fold to that level in KVM, the current code may be fine.
+I think that goes wonky when you have the arguments the other way around:
 
-> 
-> So in this case realm_rtt_create() will always be called with level=3.
-> 
-> I can simplify this by explicitly passing 3 and adding a WARN_ON() for
-> RMI_RETURN_INDEX(ret) != 2.
+	"kvm-arm.mode=nvhe arm64_sw.hvhe=1"
 
-Yes please, if we don't fold all the way up to L1.
+would end up using nVHE.
 
-Thanks
-Suzuki
-
-
+Will
