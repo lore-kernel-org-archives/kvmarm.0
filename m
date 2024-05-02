@@ -1,112 +1,156 @@
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CFE9152E12
-	for <kvmarm@lists.linux.dev>; Thu,  2 May 2024 14:40:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2530D1553B4
+	for <kvmarm@lists.linux.dev>; Thu,  2 May 2024 15:23:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714660860; cv=none; b=H6V9rf+jN/7R8YrLTeblqgMhqiinj/iRhwKZPiBbsF7M0h4Qd6qVPF0fET24ILoMr6sm8aL2Tbra0n3qb6/v4K2yI2EE7/Z3dI+N0+erjaLYYzIT5WEEwPP+DEZW99vuxIZ5Sxh9nu+f7QphtBL05iSsxZBysZy3WKn6NdEhrtw=
+	t=1714663393; cv=none; b=eYcKghDoMRSi9FujR3C28QWiRvrCaBlUQ4LP/biPAN9T8CnjdQNei94RjbWv5egFLOhQZqKDguAdjlP487jgIM21uQRGXAnfG7nOOc6vFVl1I0WrS3lQmPsvKClkrQbOgun+oHPke7J0l9KlLSyismNSi63pHpusJ7XFLYVu8+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714660860; c=relaxed/simple;
-	bh=W7cYrxz5C/2O+2De37Gc0G200thQE/MIJBh0CXKi4ZA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KTtD7MFPwJ+3F8rdEd7FMv7NcOPoTN00O2csuj7vBv991DRbAPW4N0AWsevvoeka4ib8UBUQNwa1Thy8pu/jRPdXtwqGPZHKC2Fe+wSUZPx6w6yfFKan9TxtRwVZEB5Gjvbfk2+Zm7XJxcnnani3tEvE8mVhdvTKYYjgvRffV4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=R/PA3Wk5; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+	s=arc-20240116; t=1714663393; c=relaxed/simple;
+	bh=eApqwL8Yp0/lR4LLZsggGmuCT1LDXoRYWXxby2uNi3g=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=D2NHRmTrxniFXkINuKc/cqv2bO/FalL6S9CBKYAaoUoZxD2eWGapX9p+BOvPwAtdl5abMWw3YP8/bRsSMBoqD1+2TLo4yojsH3IRYPF5wcDfrcLPK7c50mc0A6ULRWb53+fk5UEvqczLYdm0TxJuPpEKD2MbhN7ItZrrCnEw29k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l+f33SuE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="R/PA3Wk5"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=PNPomXF+88NXnOR05FF/hWkfp3ALBA3dcNLoX3C+ZiI=; b=R/PA3Wk5tRgnvnb8thgVz8xSI7
-	L3uurutXSsAt74hyChUoXy9eKjPOf2pzSAILff4hRBQw1enUY3id4OScWEj3aYGcyEvGHMPOXOLqh
-	rZJrvHFVjHtRPcRo3sSo0DxBJjqTuauj0TM7VshnRSnFKju+iKiBoly7MV4nnJJAEx4GZrT12n60J
-	h9aOC5SNEcciXJwVkE38uCOqImYUXNIhGV4U+5jAKDXds6yXbXRUPwQ78HR9T89CAN2GJBLL2/HUu
-	N+peIhRNnet8Y6DOXySaT8V5cfgPaa6H7vdsNzO+D6mdPdL3clEg/oU03JbczVcbqanxcDyduOJqJ
-	frVcZTHA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48122)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1s2Xc0-0007O8-1D;
-	Thu, 02 May 2024 15:40:40 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1s2Xby-0003j5-BY; Thu, 02 May 2024 15:40:38 +0100
-Date: Thu, 2 May 2024 15:40:38 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l+f33SuE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F243AC113CC;
+	Thu,  2 May 2024 15:23:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714663393;
+	bh=eApqwL8Yp0/lR4LLZsggGmuCT1LDXoRYWXxby2uNi3g=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=l+f33SuErm7T3rLAPGQ0qArKYs1YanipY1TRsryk7T5/2D4Vn2WjKkTyfqJ1vpSLt
+	 9RLXRd8pISglbIqPmhrzebjQaS+f5TQPvkVujG8CsdLWBa0pfQc01HD3oTGie1Zdme
+	 mjlst1YrXxm2qnqHko8jTktpyENVKQxcs22YA63nQs7pk8HcFbGIM4Jd8RQJYGyWp/
+	 1pxLeX3Z5cvOzZpiz99KOqTtXBzMSN5/0khOdlT1UTof1l2VrxvP7wGHYpVAkpbACD
+	 4EgZGe8D+BRRuiiHTK4ZDdA+yCZSSq9/q96YNSP/RMst+D/nXYFzRICPtQztu7YvHo
+	 fH6YBYeON0rKA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1s2YH8-00A2NP-IE;
+	Thu, 02 May 2024 16:23:10 +0100
+Date: Thu, 02 May 2024 16:23:10 +0100
+Message-ID: <865xvwqlup.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+	Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
 Subject: Re: [PATCH RFC] KVM: arm64: allow ID_MMFR4_EL1 to be writable
-Message-ID: <ZjOl5hwU7yPXk8gs@shell.armlinux.org.uk>
+In-Reply-To: <ZjNv4l8aGVY3ZupA@shell.armlinux.org.uk>
 References: <E1s2DPv-00AhaA-Ra@rmk-PC.armlinux.org.uk>
- <ZjKCgIyWqNKC6TUu@linux.dev>
- <ZjKFBUXEhwZ7ZmMM@shell.armlinux.org.uk>
- <ZjKRBcAML5T6cm4q@linux.dev>
+	<ZjKCgIyWqNKC6TUu@linux.dev>
+	<ZjKFBUXEhwZ7ZmMM@shell.armlinux.org.uk>
+	<ZjKRBcAML5T6cm4q@linux.dev>
+	<ZjKdM935rsvd+S9/@shell.armlinux.org.uk>
+	<ZjNv4l8aGVY3ZupA@shell.armlinux.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZjKRBcAML5T6cm4q@linux.dev>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: linux@armlinux.org.uk, oliver.upton@linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, May 01, 2024 at 06:59:17PM +0000, Oliver Upton wrote:
-> On Wed, May 01, 2024 at 07:08:05PM +0100, Russell King (Oracle) wrote:
-> > Yes, it did strike me as odd, since the description seems to imply that
-> > XNX affects EL2, which the VM wouldn't have access to. So I'm not sure
-> > why we don't just force it to zero.
+On Thu, 02 May 2024 11:50:10 +0100,
+"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
 > 
-> Probably because we failed to catch it in the first place and setting to
-> 0 now would be even more UAPI breakage. Meh :-/ I don't see any immediate
-> issues with the patch, especially since it is fixing a genuine UAPI
-> breakage in KVM.
+> On Wed, May 01, 2024 at 08:51:15PM +0100, Russell King (Oracle) wrote:
+> > On Wed, May 01, 2024 at 06:59:17PM +0000, Oliver Upton wrote:
+> > > On Wed, May 01, 2024 at 07:08:05PM +0100, Russell King (Oracle) wrote:
+> > > > On Wed, May 01, 2024 at 05:57:20PM +0000, Oliver Upton wrote:
+> > > > > Hi Russell,
+> > > > > 
+> > > > > On Wed, May 01, 2024 at 06:06:51PM +0100, Russell King (Oracle) wrote:
+> > > > > > Between 5.4 and 5.15, the guests view of HPDS, CnP, XNX and AC2
+> > > > > > changed their value on the same Neoverse N1 r3p1 hardware which makes
+> > > > > > migrating between these kernels on the host problematical.
+> > > > > 
+> > > > > It'd be helpful to expand a bit more on how these fields changed, better
+> > > > > yet if we can blame it back to a commit. I'm guessing the only direction
+> > > > > of migration you care about is old -> new then?
+> > > > 
+> > > > Yes. For MMFR4_EL1, we see 0 with our 5.4 based kernel, and 0x21110
+> > > > with our 5.15 kernel. I've been looking at tracking down which commit
+> > > > is responsible but I've come up with nothing that fits.
+> > > > 
+> > > > The only change I can see is the FTR definition for MMFR4, but this
+> > > > always included 4:7 (AC2) which changed 0 -> 1. So... no idea what
+> > > > commit caused the change.
+> > > > 
+> > > > There are a load of other registers that we need sorting, but this
+> > > > is just a test forray into attempting to solve this.
+> > > 
+> > > Got it, let me see if I can find it then. Do share that list of
+> > > problematic registers when you have it, hopefully this isn't the tip of
+> > > the iceberg...
+> > 
+> > There unfortunately is an iceberg, but hopefully it isn't big enough to
+> > sink a ship!
+> > 
+> > Besides ID_MMFR4_EL1, here are the other differences we've identified.
+> > Note that these are Oracle's UEK kernels, so based on stable kernel
+> > branches.
+> > 
+> > Register		Field		5.4.x	5.15.x
+> > ID_PFR0_EL1		CSV2		0	1
+> > ID_ISAR6_EL1		DP		0	1
+> > ID_PFR2_EL1		SSBS		0	1
+> > 			CSV3		0	1
+> > ID_AA64DFR0_EL1		PMSVer		1	0
+> > 			DebugVer	8	6
+> > ID_AA64MMFR1_EL1	XNX		0	1
+> > ID_AA64MMFR2_EL1	EVT		0	1
+> > KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2
+> > 					0x12	0
+> 
+> I'm finding sys_regs.c very unintuitive for working out what we allow
+> to be written, because it's all coded in negative-logic. By that I mean
+> the mask values are all ~(what-we-don't-allow) rather than a positive
+> this-is-what-we-allow. So I've ended up creating a table, looking up
+> the registers and working out what's read-only and what's read-write.
 
-I think the only two ways around this would be to:
+[...]
 
-1) teach QEMU about the contents of these registers, with which fields
-   in these registers can be ignored when reloading a VMs context.
+Using positive or negative logic doesn't really have any impact on the
+result. It often is a matter of concisely expressing what is allowed
+or not.
 
-2) allow userspace to write to the XNX field such that it can be set
-   to values seen with previous kernels (thus allowing at least one-
-   way migration.)
+There is also the fact that a lot of the KVM code now checks for
+"feature downgrade" and enforces it. Construct such as:
 
-(1) has the advantage that reloading a VM state on older vs newer
-kernels can work in either direction, whereas (2) would only work
-for state saved on an older kernel loaded onto a newer kernel.
+	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, OS))
+		kvm->arch.fgu[HFGITR_GROUP] |= (HFGITR_EL2_TLBIRVAALE1OS|
+						HFGITR_EL2_TLBIRVALE1OS	|
+						HFGITR_EL2_TLBIRVAAE1OS	|
+						HFGITR_EL2_TLBIRVAE1OS	|
+						HFGITR_EL2_TLBIVAALE1OS	|
+						HFGITR_EL2_TLBIVALE1OS	|
+						HFGITR_EL2_TLBIVAAE1OS	|
+						HFGITR_EL2_TLBIASIDE1OS	|
+						HFGITR_EL2_TLBIVAE1OS	|
+						HFGITR_EL2_TLBIVMALLE1OS);
 
-I've been bitten before with KVM differences between kernel versions
-in the past - where the number of registers that userspace sees has
-changed despite being on the same hardware. I'm now wondering what
-testing goes on to validate this part of the UAPI across different
-kernel versions on the same hardware.
+use negative logic by expressing what we don't want to enable.
 
-Surely, given the impact of these changing value (a failure of VMs),
-we should be aware whenever any of these registers are different from
-one kernel to another on the same hardware?
+In the end, consistency matters.
 
-It's fine if all one cares about is starting fresh VMs on each host
-kernel reboot, but any use case beyond that seems to be fragile.
-
-I did knock up a test program that dumped the list of registers so
-that one could trivially diff the output between various kernels.
-Maybe I need to extend that to dump the register values themselves,
-and then maybe we need to find a way to get some kind of automated
-testing setup to highlight differences. (something maybe kernelci
-could add?)
+	M.
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Without deviation from the norm, progress is not possible.
