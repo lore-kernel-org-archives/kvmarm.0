@@ -1,48 +1,41 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BC931553BB;
-	Thu,  2 May 2024 18:00:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 320AE1CD1B
+	for <kvmarm@lists.linux.dev>; Thu,  2 May 2024 23:35:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714672825; cv=none; b=CHIb1PRaWIstlNtiKt6Z+0jrofURf6AKkoDpb9VIjc2Sayb0oC2k/RVlUpvb8mTLu0SOAkL4XtKP4H4Ng8NI+APHMNckUQ74jo434wCwWekDEInMZywywMJNkh2shgeqbIRi1cKfhfUpvxEQ2WQWII9g0SwVSuCwr+dKKSNyb6g=
+	t=1714692943; cv=none; b=EliuXCkRZRIfwEtVJqndhO4Lvqln58s10CYW3EM1ZpD2TNK98IdZXAptCfVCm70bG78lKnxJ/OvuvPE+DQxQ94ZFElLpWaXylz4S2YlGePdYPyP2BM7zWbDfIU9RtUEVrNkovWPC8YUF3OV/o7kCQKybpxhV9fpF6ND1spDyc+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714672825; c=relaxed/simple;
-	bh=2ElUwF2ICPzqg1r6ina1TYny/zo1oJOeLgbtQE/BZ90=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=DkGzfs0Leb14CX9Q0euK8SbmvYwAwmcILhXf5HaPX11ikxuyQMM++u5jcbu6rBEoZGerd4J1a3W5o1zGipvmEQYu6Bdhws2LWlpS5gjAQ0tkx+YsgwroHyDv+0bRYnq8QmrdzzgeleR3wYoPAFePw2wMwq8eYrTnSC3hCVFa+1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Eq1s56iN; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1714692943; c=relaxed/simple;
+	bh=o9B/CaH+IezzgMqGhwEE5TyiFXtwI2ooaRwrXgUZBcc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FlnHJdqnUc0RG53Dw/psCkPf8ZJx2tjw2ajuxPDiCfIre5uy2MzbhKzi884dvTYxmzRmCt5mHWzuWpVmCLNrLLmcp5Tqo3Ug+OucK2vvc34cdptRIgPY9b4uK7f50mYXx5+62zCq1AKqXGugcM0pJIgPIJK7y4HI0577SFgiKNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PZrePpas; arc=none smtp.client-ip=95.215.58.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Eq1s56iN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DF9FC116B1;
-	Thu,  2 May 2024 18:00:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714672825;
-	bh=2ElUwF2ICPzqg1r6ina1TYny/zo1oJOeLgbtQE/BZ90=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Eq1s56iN93KlGgj7TsME+Dhgna/x6TQYGutHM2Bnu6yGiqTdS9k9YOcEIha9PMxMc
-	 cBnQPXEWuH+/B6VEcGU4YfTcbr0fin1ycnI6rBUXo6K7Jt45N88YZz3C8WtR5YO5uN
-	 IsO+J6O0dCQNVNkxP9MvY647auZ0sv48r6e30cyaylZpVAu42vH6cOYT0EtsXbbeTe
-	 toCht87/iIZOV5x4jdNLRFyJ0cuSQP18Gm050d4l78vpwwdz/JpVSXdgyuZDayN2XI
-	 wvsE7aX7AX6d5fy51AZcWb3ECEy6jp+9qwSvAdenO5yv9KX485/KQihBOJQLwErOLG
-	 ZU+WPeecAvdQA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1s2ajH-00A53o-HM;
-	Thu, 02 May 2024 19:00:23 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Cc: James Morse <james.morse@arm.com>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PZrePpas"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1714692939;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=0oB1momliCVbkOQmb/RuD42gl5HLFZDtSllD6GuMjRw=;
+	b=PZrePpasNBvyWmfkKfzydDeTyB4iG7+cX7KJmeJlLKH61oggtHiiRaW3jDD6gYHPcAv3Fc
+	oFdT7jH1r+jmSIBoXKdrWaVxhWmUONpgcz9CfVOoIikI17OdK6ahgt0Lof5sdCpQgxauL1
+	epX9wyeBUMN9sTq6aDbzFHgxZYJ1y4A=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH] KVM: arm64: Correct BTYPE/SS in host SMC emulation
-Date: Thu,  2 May 2024 19:00:20 +0100
-Message-Id: <20240502180020.3215547-1-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
+	Zenghui Yu <yuzenghui@huawei.com>,
+	kvm@vger.kernel.org,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH 0/7] KVM: arm64: Don't clobber CLIDR and MPIDR across vCPU reset
+Date: Thu,  2 May 2024 23:35:22 +0000
+Message-ID: <20240502233529.1958459-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -50,42 +43,49 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Migadu-Flow: FLOW_OUT
 
-When taking a trap for an SMC instruction on the host, we must
-stau true to the letter of the architecture and perform all the
-actions that the CPU would otherwise do. Among those are clearing
-the BTYPE and SS bits.
+When I was reviewing Sebastian's CTR_EL0 series it occurred to me that
+our handling of feature ID registers local to a vCPU is quite poor.
 
-Just do that.
+For VM-wide feature ID registers we ensure they get initialized once for
+the lifetime of a VM. On the other hand, vCPU-local feature ID registers
+get re-initialized on every vCPU reset, potentially clobbering the
+values userspace set up.
 
-Fixes: a805e1fb3099 ("KVM: arm64: Add SMC handler in nVHE EL2")
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/hyp/include/hyp/adjust_pc.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+MPIDR_EL1 and CLIDR_EL1 are the only registers in this space that we
+allow userspace to modify for now. Clobbering the value of MPIDR_EL1 has
+some disastrous side effects as the compressed index used by the
+MPIDR-to-vCPU lookup table assumes MPIDR_EL1 is immutable after KVM_RUN.
 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h b/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
-index 4fdfeabefeb4..b1afb7b59a31 100644
---- a/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
-@@ -47,7 +47,13 @@ static inline void __kvm_skip_instr(struct kvm_vcpu *vcpu)
-  */
- static inline void kvm_skip_host_instr(void)
- {
-+	u64 spsr = read_sysreg_el2(SYS_SPSR);
-+
- 	write_sysreg_el2(read_sysreg_el2(SYS_ELR) + 4, SYS_ELR);
-+
-+	spsr &= ~(PSR_BTYPE_MASK | DBG_SPSR_SS);
-+
-+	write_sysreg_el2(spsr, SYS_SPSR);
- }
- 
- #endif
+Series + reproducer test case to address the problem of KVM wiping out
+userspace changes to these registers. Note that there are still some
+differences between VM and vCPU scoped feature ID registers from the
+perspective of userspace. We do not allow the value of VM-scope
+registers to change after KVM_RUN, but vCPU registers remain mutable.
+
+Fixing this is no problem, but given the recent theme of UAPI breakage
+in this area I focused only on the internal issue fo now.
+
+Applies to 6.9-rc3
+
+Oliver Upton (7):
+  KVM: arm64: Rename is_id_reg() to imply VM scope
+  KVM: arm64: Reset VM feature ID regs from kvm_reset_sys_regs()
+  KVM: arm64: Only reset vCPU-scoped feature ID regs once
+  KVM: selftests: Rename helper in set_id_regs to imply VM scope
+  KVM: selftests: Store expected register value in set_id_regs
+  KVM: arm64: Test that feature ID regs survive a reset
+  KVM: selftests: Test vCPU-scoped feature ID registers
+
+ arch/arm64/include/asm/kvm_host.h             |   2 +
+ arch/arm64/kvm/arm.c                          |   5 -
+ arch/arm64/kvm/sys_regs.c                     |  62 +++++----
+ .../selftests/kvm/aarch64/set_id_regs.c       | 123 +++++++++++++++---
+ 4 files changed, 142 insertions(+), 50 deletions(-)
+
+
+base-commit: fec50db7033ea478773b159e0e2efb135270e3b7
 -- 
-2.39.2
+2.45.0.rc1.225.g2a3ae87e7f-goog
 
