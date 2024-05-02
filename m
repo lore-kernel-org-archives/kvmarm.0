@@ -1,156 +1,96 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2530D1553B4
-	for <kvmarm@lists.linux.dev>; Thu,  2 May 2024 15:23:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 314E315B573
+	for <kvmarm@lists.linux.dev>; Thu,  2 May 2024 15:29:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714663393; cv=none; b=eYcKghDoMRSi9FujR3C28QWiRvrCaBlUQ4LP/biPAN9T8CnjdQNei94RjbWv5egFLOhQZqKDguAdjlP487jgIM21uQRGXAnfG7nOOc6vFVl1I0WrS3lQmPsvKClkrQbOgun+oHPke7J0l9KlLSyismNSi63pHpusJ7XFLYVu8+M=
+	t=1714663790; cv=none; b=Wa2op9CdzZ1Xkcf2xIH8ps6rRqDOvYWmXKkEJUb0oOdgRwG6gaetrnfgs4X7/Rj024jc0bFnDMGneZxAwc2aK55hSPBoMFxusIyQItDPgJ4gD/gj+d2bFXwZ+da7mIe4yFV/rEGT+W5/rtiqWOyimyqmhxf0I25LWkrac/RUgII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714663393; c=relaxed/simple;
-	bh=eApqwL8Yp0/lR4LLZsggGmuCT1LDXoRYWXxby2uNi3g=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=D2NHRmTrxniFXkINuKc/cqv2bO/FalL6S9CBKYAaoUoZxD2eWGapX9p+BOvPwAtdl5abMWw3YP8/bRsSMBoqD1+2TLo4yojsH3IRYPF5wcDfrcLPK7c50mc0A6ULRWb53+fk5UEvqczLYdm0TxJuPpEKD2MbhN7ItZrrCnEw29k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l+f33SuE; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1714663790; c=relaxed/simple;
+	bh=BZMZC8Jzm20y40lXNKxXciqNS33KIWCmQgIPI5+ONno=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Sbpqo7ZqukynEpoL9HY3yAJOpSH/RtczAQGLMMGWtuXmMyVhX5tuqiKTuoqm0p9SGmIHt8Q2v5mfVrqzBUWNOesmuGov6kjMqjmgqehEATfsBme15P2D4iRh1OowunM/Afq1rmutkFd2zTA6Fkf7RYj1sGP8Z521/yarqClh920=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TlxvXGN4; arc=none smtp.client-ip=95.215.58.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l+f33SuE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F243AC113CC;
-	Thu,  2 May 2024 15:23:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714663393;
-	bh=eApqwL8Yp0/lR4LLZsggGmuCT1LDXoRYWXxby2uNi3g=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=l+f33SuErm7T3rLAPGQ0qArKYs1YanipY1TRsryk7T5/2D4Vn2WjKkTyfqJ1vpSLt
-	 9RLXRd8pISglbIqPmhrzebjQaS+f5TQPvkVujG8CsdLWBa0pfQc01HD3oTGie1Zdme
-	 mjlst1YrXxm2qnqHko8jTktpyENVKQxcs22YA63nQs7pk8HcFbGIM4Jd8RQJYGyWp/
-	 1pxLeX3Z5cvOzZpiz99KOqTtXBzMSN5/0khOdlT1UTof1l2VrxvP7wGHYpVAkpbACD
-	 4EgZGe8D+BRRuiiHTK4ZDdA+yCZSSq9/q96YNSP/RMst+D/nXYFzRICPtQztu7YvHo
-	 fH6YBYeON0rKA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1s2YH8-00A2NP-IE;
-	Thu, 02 May 2024 16:23:10 +0100
-Date: Thu, 02 May 2024 16:23:10 +0100
-Message-ID: <865xvwqlup.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH RFC] KVM: arm64: allow ID_MMFR4_EL1 to be writable
-In-Reply-To: <ZjNv4l8aGVY3ZupA@shell.armlinux.org.uk>
-References: <E1s2DPv-00AhaA-Ra@rmk-PC.armlinux.org.uk>
-	<ZjKCgIyWqNKC6TUu@linux.dev>
-	<ZjKFBUXEhwZ7ZmMM@shell.armlinux.org.uk>
-	<ZjKRBcAML5T6cm4q@linux.dev>
-	<ZjKdM935rsvd+S9/@shell.armlinux.org.uk>
-	<ZjNv4l8aGVY3ZupA@shell.armlinux.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TlxvXGN4"
+Date: Thu, 2 May 2024 17:29:43 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1714663785;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GS3iKmDnstvUutszTY6edN+4oZSrvSKCfYuxNXIlg0M=;
+	b=TlxvXGN49eADmrArRPba6tcudekgO7BF9AY2YJcsrfgVfpwBASIyFQejalLif7vSa14Ojh
+	DVeHrMgHUws1CGt5YJmSGZtQsQhZ7HFAx2pRX6WBoQxDy1TrgEv6aJ7IqDuhv2HVNodEm5
+	02+qmN1JSidFUkETrvqVsKBbU6nYtKs=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Eric Auger <eric.auger@redhat.com>, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH] arm64: Default to 4K translation granule
+Message-ID: <20240502-5c8299c501529abfbbe1abf3@orel>
+References: <20240502074156.1346049-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: linux@armlinux.org.uk, oliver.upton@linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240502074156.1346049-1-oliver.upton@linux.dev>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, 02 May 2024 11:50:10 +0100,
-"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+On Thu, May 02, 2024 at 07:41:56AM GMT, Oliver Upton wrote:
+> Some arm64 implementations in the wild, like the Apple parts, do not
+> support the 64K translation granule. This can be a bit annoying when
+> running with the defaults on such hardware, as every test fails
+> before getting the MMU turned on.
 > 
-> On Wed, May 01, 2024 at 08:51:15PM +0100, Russell King (Oracle) wrote:
-> > On Wed, May 01, 2024 at 06:59:17PM +0000, Oliver Upton wrote:
-> > > On Wed, May 01, 2024 at 07:08:05PM +0100, Russell King (Oracle) wrote:
-> > > > On Wed, May 01, 2024 at 05:57:20PM +0000, Oliver Upton wrote:
-> > > > > Hi Russell,
-> > > > > 
-> > > > > On Wed, May 01, 2024 at 06:06:51PM +0100, Russell King (Oracle) wrote:
-> > > > > > Between 5.4 and 5.15, the guests view of HPDS, CnP, XNX and AC2
-> > > > > > changed their value on the same Neoverse N1 r3p1 hardware which makes
-> > > > > > migrating between these kernels on the host problematical.
-> > > > > 
-> > > > > It'd be helpful to expand a bit more on how these fields changed, better
-> > > > > yet if we can blame it back to a commit. I'm guessing the only direction
-> > > > > of migration you care about is old -> new then?
-> > > > 
-> > > > Yes. For MMFR4_EL1, we see 0 with our 5.4 based kernel, and 0x21110
-> > > > with our 5.15 kernel. I've been looking at tracking down which commit
-> > > > is responsible but I've come up with nothing that fits.
-> > > > 
-> > > > The only change I can see is the FTR definition for MMFR4, but this
-> > > > always included 4:7 (AC2) which changed 0 -> 1. So... no idea what
-> > > > commit caused the change.
-> > > > 
-> > > > There are a load of other registers that we need sorting, but this
-> > > > is just a test forray into attempting to solve this.
-> > > 
-> > > Got it, let me see if I can find it then. Do share that list of
-> > > problematic registers when you have it, hopefully this isn't the tip of
-> > > the iceberg...
-> > 
-> > There unfortunately is an iceberg, but hopefully it isn't big enough to
-> > sink a ship!
-> > 
-> > Besides ID_MMFR4_EL1, here are the other differences we've identified.
-> > Note that these are Oracle's UEK kernels, so based on stable kernel
-> > branches.
-> > 
-> > Register		Field		5.4.x	5.15.x
-> > ID_PFR0_EL1		CSV2		0	1
-> > ID_ISAR6_EL1		DP		0	1
-> > ID_PFR2_EL1		SSBS		0	1
-> > 			CSV3		0	1
-> > ID_AA64DFR0_EL1		PMSVer		1	0
-> > 			DebugVer	8	6
-> > ID_AA64MMFR1_EL1	XNX		0	1
-> > ID_AA64MMFR2_EL1	EVT		0	1
-> > KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2
-> > 					0x12	0
+> Switch the default page size to 4K with the intention of having the
+> default setting be the most widely applicable one.
 > 
-> I'm finding sys_regs.c very unintuitive for working out what we allow
-> to be written, because it's all coded in negative-logic. By that I mean
-> the mask values are all ~(what-we-don't-allow) rather than a positive
-> this-is-what-we-allow. So I've ended up creating a table, looking up
-> the registers and working out what's read-only and what's read-write.
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  configure | 8 ++------
+>  1 file changed, 2 insertions(+), 6 deletions(-)
+> 
+> diff --git a/configure b/configure
+> index 49f047cb2d7d..4ac2ff3e6106 100755
+> --- a/configure
+> +++ b/configure
+> @@ -75,7 +75,7 @@ usage() {
+>  	                           (s390x only)
+>  	    --page-size=PAGE_SIZE
+>  	                           Specify the page size (translation granule) (4k, 16k or
+> -	                           64k, default is 64k, arm64 only)
+> +	                           64k, default is 4k, arm64 only)
+>  	    --earlycon=EARLYCON
+>  	                           Specify the UART name, type and address (optional, arm and
+>  	                           arm64 only). The specified address will overwrite the UART
+> @@ -243,11 +243,7 @@ if [ "$efi" ] && [ "$arch" = "riscv64" ] && [ -z "$efi_direct" ]; then
+>  fi
+>  
+>  if [ -z "$page_size" ]; then
+> -    if [ "$efi" = 'y' ] && [ "$arch" = "arm64" ]; then
+> -        page_size="4096"
+> -    elif [ "$arch" = "arm64" ]; then
+> -        page_size="65536"
+> -    elif [ "$arch" = "arm" ]; then
+> +    if [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
+>          page_size="4096"
+>      fi
+>  else
+> -- 
+> 2.45.0.rc1.225.g2a3ae87e7f-goog
+>
 
-[...]
+Merged.
 
-Using positive or negative logic doesn't really have any impact on the
-result. It often is a matter of concisely expressing what is allowed
-or not.
-
-There is also the fact that a lot of the KVM code now checks for
-"feature downgrade" and enforces it. Construct such as:
-
-	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, OS))
-		kvm->arch.fgu[HFGITR_GROUP] |= (HFGITR_EL2_TLBIRVAALE1OS|
-						HFGITR_EL2_TLBIRVALE1OS	|
-						HFGITR_EL2_TLBIRVAAE1OS	|
-						HFGITR_EL2_TLBIRVAE1OS	|
-						HFGITR_EL2_TLBIVAALE1OS	|
-						HFGITR_EL2_TLBIVALE1OS	|
-						HFGITR_EL2_TLBIVAAE1OS	|
-						HFGITR_EL2_TLBIASIDE1OS	|
-						HFGITR_EL2_TLBIVAE1OS	|
-						HFGITR_EL2_TLBIVMALLE1OS);
-
-use negative logic by expressing what we don't want to enable.
-
-In the end, consistency matters.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+drew
