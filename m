@@ -1,47 +1,40 @@
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9138847A40
-	for <kvmarm@lists.linux.dev>; Thu,  2 May 2024 08:56:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 484285025A
+	for <kvmarm@lists.linux.dev>; Thu,  2 May 2024 09:05:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714640215; cv=none; b=D9HcdzH0CdIW2GAoHv9uPsWj4Ks0aJsoL8qZVwQcNRnxpQaN/xto42PInp3tBqG4utkcUbgw3x2X55fZaYPF/EBL5TZ4igSIUXX6xDt8ZjX3W4yq/tKGEnfnuqJ7e59ukkm1b5GJ9wU2mGEXp3CHT3Yq0loRfifJZulTw+BiX3g=
+	t=1714640758; cv=none; b=mAxSlniey0IdZZRVjMzIH3qvFStel+aCOKajPgX9Ryh0+a5bkQCoxrNsbqluMGHX5PNVhlgq19B/GsOku08nWjRahkK1cPHq140gXG9qrgwz7EWC12e9AOC0kgfxuuVZQmKeQp/SZWsrMtQc1gjY0TZuCfa9M858U/8NLhCo1k8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714640215; c=relaxed/simple;
-	bh=I6bMyw1jF1AgZCJ2Fg0wDJbU7dp25u9F1kopuE9sFKY=;
+	s=arc-20240116; t=1714640758; c=relaxed/simple;
+	bh=raCWB4wu4X/HydTHJtlHR7UkkQKRzYd+JrrVZKNc5us=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o/z3axwg0OBEVePVaxXbR5UrpFNh3wU/wk+uWZRREapzsF6eVWWFd1VzFSzvq8jGUp3wTR93hYcTbu1XWWBfFt2i+x95mtSJ9Dk/EXU0arKr916AanTmwxVy6ESBLcwKhI6mrFNOrIMzYRlOo5JGyzgoDlAnP92fsZEHHRXWtI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qQtVI3Pp; arc=none smtp.client-ip=91.218.175.178
+	 Content-Type:Content-Disposition:In-Reply-To; b=RAo1hqSLduczGnltxRsejUziYO/g6+osOibqaUyaCh6dQh+6/hMqcc08Q2f+rkaiPrEgxyuCGnMf+iO+VfTUDlDvwlxT1T0K3FR8/N2N0u8T1rIXEIEmuNMCVcpEbF2BWj9xlFmwPvJqwPl1GXfA5hO3lhb2s3ezU+yVqtTUkS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=On4Ul2hr; arc=none smtp.client-ip=95.215.58.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qQtVI3Pp"
-Date: Thu, 2 May 2024 10:56:48 +0200
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="On4Ul2hr"
+Date: Thu, 2 May 2024 11:05:51 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1714640211;
+	t=1714640755;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=b3E99RjdsZuW6QIhdK1veF7oJEr4cvXdyWQVuiOrXTI=;
-	b=qQtVI3PpQ2HmV/+9zZO62OgQ5OLjMqEGLyqwPKn7TiOalOfN+i7Q/qu3NOC/OhoRAPNO9j
-	g8S05KIUkQD7Ojt2ask946ZMBzT/aifKDYNCcFLO2CWGJAN9OaQWZ/bn4gWkEsjTQvlYNZ
-	pEkU1KKu3+OOhH/kDZaSGzm9O21u/E4=
+	bh=4BD7u+E4fo5H0RPACm1/Cr8Sod7384r4iX9H+qoX0LI=;
+	b=On4Ul2hr0EN5cicHAOH5uBgVUp+Yycb6Br0GqaoSvvwLVZff0kK5Pch2aB2Ddn03pKKOqv
+	If4er+mhaaA5DCoHlmAy+Ewv6igc+qVyZr4uaJnjbDwoL9Na6xtoSgHdmeteU45Us3c1Cp
+	2T4yiH/LU6zFox62MYY3byeYzMCvOBM=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Andrew Jones <andrew.jones@linux.dev>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Nicholas Piggin <npiggin@gmail.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Eric Auger <eric.auger@redhat.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Nico =?utf-8?B?QsO2aHI=?= <nrb@linux.ibm.com>, 
-	David Hildenbrand <david@redhat.com>, Shaoqin Huang <shahuang@redhat.com>, 
-	Nikos Nikoleris <nikos.nikoleris@arm.com>, David Woodhouse <dwmw@amazon.co.uk>, 
-	Ricardo Koller <ricarkol@google.com>, rminmin <renmm6@chinaunicom.cn>, Gavin Shan <gshan@redhat.com>, 
-	Nina Schoetterl-Glausch <nsg@linux.ibm.com>, Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v3 0/5] add shellcheck support
-Message-ID: <20240502-d231f770256b3ed812eb4246@orel>
-References: <20240501112938.931452-1-npiggin@gmail.com>
- <2be99a78-878c-4819-8c42-1b795019af2f@redhat.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Eric Auger <eric.auger@redhat.com>, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH] arm64: Default to 4K translation granule
+Message-ID: <20240502-d67a14b9ac3dd606a52af562@orel>
+References: <20240502074156.1346049-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -50,42 +43,58 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2be99a78-878c-4819-8c42-1b795019af2f@redhat.com>
+In-Reply-To: <20240502074156.1346049-1-oliver.upton@linux.dev>
 X-Migadu-Flow: FLOW_OUT
 
-On Thu, May 02, 2024 at 10:23:22AM GMT, Thomas Huth wrote:
-> On 01/05/2024 13.29, Nicholas Piggin wrote:
-> > This is based on upstream directly now, not ahead of the powerpc
-> > series.
+On Thu, May 02, 2024 at 07:41:56AM GMT, Oliver Upton wrote:
+> Some arm64 implementations in the wild, like the Apple parts, do not
+> support the 64K translation granule. This can be a bit annoying when
+> running with the defaults on such hardware, as every test fails
+> before getting the MMU turned on.
 > 
-> Thanks! ... maybe you could also rebase the powerpc series on this now? (I
-> haven't forgotten about it, just did not find enough spare time for more
-> reviewing yet)
-> 
-> > Since v2:
-> > - Rebased to upstream with some patches merged.
-> > - Just a few comment typos and small issues (e.g., quoting
-> >    `make shellcheck` in docs) that people picked up from the
-> >    last round.
-> 
-> When I now run "make shellcheck", I'm still getting an error:
-> 
-> In config.mak line 16:
-> AR=ar
-> ^-- SC2209 (warning): Use var=$(command) to assign output (or quote to
-> assign string).
+> Switch the default page size to 4K with the intention of having the
+> default setting be the most widely applicable one.
 
-I didn't see this one when testing. I have shellcheck version 0.9.0.
-
-> 
-> Not sure why it's complaining about "ar" but not about the other lines in there?
-> 
-> Also, it only seems to work for in-tree builds. If I run it from an
-> out-of-tree build directory, I get:
-> 
-> */efi/run: */efi/run: openBinaryFile: does not exist (No such file or directory)
-
-I'm glad you checked this. I wish I had before merging :-/
+Yeah, this makes sense. The original 64k default didn't have any real
+justification. I only selected it since I had been drinking the "64k
+pages will rule the world" Kool-Aid for too long. The effects of that
+Kool-Aid have already long worn off though, so I'll get this merged.
 
 Thanks,
 drew
+
+> 
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  configure | 8 ++------
+>  1 file changed, 2 insertions(+), 6 deletions(-)
+> 
+> diff --git a/configure b/configure
+> index 49f047cb2d7d..4ac2ff3e6106 100755
+> --- a/configure
+> +++ b/configure
+> @@ -75,7 +75,7 @@ usage() {
+>  	                           (s390x only)
+>  	    --page-size=PAGE_SIZE
+>  	                           Specify the page size (translation granule) (4k, 16k or
+> -	                           64k, default is 64k, arm64 only)
+> +	                           64k, default is 4k, arm64 only)
+>  	    --earlycon=EARLYCON
+>  	                           Specify the UART name, type and address (optional, arm and
+>  	                           arm64 only). The specified address will overwrite the UART
+> @@ -243,11 +243,7 @@ if [ "$efi" ] && [ "$arch" = "riscv64" ] && [ -z "$efi_direct" ]; then
+>  fi
+>  
+>  if [ -z "$page_size" ]; then
+> -    if [ "$efi" = 'y' ] && [ "$arch" = "arm64" ]; then
+> -        page_size="4096"
+> -    elif [ "$arch" = "arm64" ]; then
+> -        page_size="65536"
+> -    elif [ "$arch" = "arm" ]; then
+> +    if [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
+>          page_size="4096"
+>      fi
+>  else
+> -- 
+> 2.45.0.rc1.225.g2a3ae87e7f-goog
+> 
