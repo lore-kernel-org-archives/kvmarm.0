@@ -1,45 +1,46 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59AE66FDC
-	for <kvmarm@lists.linux.dev>; Fri,  3 May 2024 17:10:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A14BE157E62
+	for <kvmarm@lists.linux.dev>; Fri,  3 May 2024 17:27:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714756227; cv=none; b=F0LPhFWjhoNpzqvu+pjp8cxnOV+/CgfBVo6vp/vCjpAQsrZXJwtaMJqcuRda9UIikU/jCVdH2wWxArUdGSM6JdY5u1s7UvfA5gIFvsg7SXXNwxd6yQgG7SM0Tg04Ehjg+xxK3nT+1fmknrDfzBXZC9q1WNojXpTp+LE2youEeX0=
+	t=1714757276; cv=none; b=frFNT/gTLGbaYrLthnEsg1p1CmuVfbJYin2MgVLvPa/1ElpK6rmebkCWaYg0LHAATtEXQWWrMc78Kh0TTkYGV8q5M9/n/FtXm2ioqFTnMipD8UVW5GrgUvt9yS5eOmhmDL0u0ggg4yoUKRCzhBH8L+sH6q5xv/wKQdkNifhR/xM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714756227; c=relaxed/simple;
-	bh=OK2458DTTcUD97r6Dol6JsWgt2qOtHUUfDftniW40Qo=;
+	s=arc-20240116; t=1714757276; c=relaxed/simple;
+	bh=MzVRkJJP4OxlhoqjyGDk0Zxm3Rguu8M4TsLwAGKFTqk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rwQxzNfz0+SBgbBcRQNma8UeAcwdOlsMzqSYzd+KiIVvLRfkXr0guaF/arIXT1ss64uDKttvhoRSjYkoPvmJyJOAYoU9/jbY9+FwPjl6mL8Vq9xCfoHYVvPJzMXqDzxo2LIpDdAy4TUlhBZG5fQqYYjvKjxTSq/eFZL/oK83iJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9BCD713D5;
-	Fri,  3 May 2024 10:10:49 -0700 (PDT)
-Received: from FVFF77S0Q05N (unknown [10.57.34.156])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3ED0E3F793;
-	Fri,  3 May 2024 10:10:18 -0700 (PDT)
-Date: Fri, 3 May 2024 18:10:14 +0100
-From: Mark Rutland <mark.rutland@arm.com>
-To: Liao Chang <liaochang1@huawei.com>
-Cc: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
-	oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, tglx@linutronix.de, ardb@kernel.org,
-	broonie@kernel.org, anshuman.khandual@arm.com,
-	miguel.luis@oracle.com, joey.gouly@arm.com, ryan.roberts@arm.com,
-	jeremy.linton@arm.com, ericchancf@google.com,
-	kristina.martsenko@arm.com, robh@kernel.org,
-	scott@os.amperecomputing.com, songshuaishuai@tinylab.org,
-	shijie@os.amperecomputing.com, akpm@linux-foundation.org,
-	bhe@redhat.com, horms@kernel.org, mhiramat@kernel.org,
-	rmk+kernel@armlinux.org.uk, shahuang@redhat.com,
-	takakura@valinux.co.jp, dianders@chromium.org, swboyd@chromium.org,
-	sumit.garg@linaro.org, frederic@kernel.org, reijiw@google.com,
-	akihiko.odaki@daynix.com, ruanjinjie@huawei.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 0/8] Rework the DAIF mask, unmask and track API
-Message-ID: <ZjUadl2Kbv-KyveZ@FVFF77S0Q05N>
-References: <20240415064758.3250209-1-liaochang1@huawei.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=OqsXcXaVeuRtmkpA4GZ440WpXrqHFmACCtPZ+aOpmUexqCuZPJ0BPYECWoT0YPnOS0KNnaQAFTC7FzGS/FwNASWeDICnsRa7SXnB1onyG2Q+gAOgZjvNrKntAlqU3Qsdp5zOKn35x7GX1qTM9R+oEPK6FLLugw39nU+JQPXY4Mk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mHMQO7jY; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mHMQO7jY"
+Date: Fri, 3 May 2024 10:27:46 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1714757272;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Lkfu3aF+7HSJzFb8vZvf6vy1XzKC3Kd7KishD/IFflc=;
+	b=mHMQO7jYaWPMY18NmrUK8fAqCVXI7qF4CkWacUl9C0Or8849Sy9zAPd3M1EMMYQaI1Y5Wd
+	SeKkHoPnEit66IrkLwSh5a9vSFVOr1k16rIsw93G2F/JFeJ9FQ2A/WDr9XEEMS+gaIUfw1
+	dXM/tFBCitSpWg2X06mM2ERTLPNLGs8=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Sebastian Ott <sebott@redhat.com>, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v2 4/6] KVM: arm64: add emulation for CTR_EL0 register
+Message-ID: <ZjUekqVOwCWMAKdE@linux.dev>
+References: <20240426104950.7382-1-sebott@redhat.com>
+ <20240426104950.7382-5-sebott@redhat.com>
+ <ZjH6DcedmJsAb6vw@linux.dev>
+ <861q6irj2t.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,100 +49,65 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240415064758.3250209-1-liaochang1@huawei.com>
+In-Reply-To: <861q6irj2t.wl-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-Hi,
+On Fri, May 03, 2024 at 04:50:02PM +0100, Marc Zyngier wrote:
+> > Marc, I know this goes against what you had suggested earlier, is there
+> > something in particular that you think warrants the consistency
+> > checks?
+> 
+> The problem is that we have a dependency chain: individual cache
+> levels are validated against CLIDR/CCSIDR, which are themselves
+> validated against CTR_EL0.
+> 
+> Change one, and everything becomes inconsistent. I absolutely don't
+> trust userspace to do a good job on that
 
-On Mon, Apr 15, 2024 at 06:47:50AM +0000, Liao Chang wrote:
-> This patch series reworks the DAIF mask, unmask, and track API for the
-> upcoming FEAT_NMI extension added in Armv8.8.
-> 
-> As platform and virtualization[1] supports for FEAT_NMI is emerging, and
-> Mark Brown's FEAT_NMI patch series[2] highlighted the need for clean up
-> the existing hacking style approach about DAIF management code before
-> adding NMI functionality, furthermore, we discover some subtle bugs
-> during 'perf' and 'ipi_backtrace' transition from PSEUDO_NMI to
-> FEAT_NMI, in summary, all of these emphasize the importance of rework.
-> 
-> This series of reworking patches follows the suggestion from Mark
-> Rutland mentioned in Mark Brown's patchset. In summary, he think the
-> better way for DAIF manangement look likes as following:
-> 
-> (a) Adding entry-specific helpers to manipulate abstract exception masks
->     covering DAIF + PMR + ALLINT. Those need unmask-at-entry and
->     mask-at-exit behaviour, and today only need to manage DAIF + PMR.
-> 
->     It should be possible to do this ahead of ALLINT / NMI support.
-> 
-> (b) Adding new "logical exception mask" helpers that treat DAIF + PMR +
->     ALLINT as separate elements. 
+Violent agreement on this point, heh. 
 
-I've started looking at this in the series. There are some subtleties here, and
-I don't think the helpers in this series are quite right as-is. I will try to
-get back to you next week with a description of those; it'll take a short while
-to write that up correctly and clearly and I don't trust myself to rush that
-last thing on a Friday.
+> and not validating this will result in extremely hard to debug issues
+> in the guest. Which is why CTR_EL0 was an invariant the first place,
+> and everything derived from it.
 
+Sure, but userspace can completely hose the guest in tons of spectacular
+ways, I don't see why feature ID registers require thorough
+cross-checking of relationships between CPU features.
+
+We already fail at this. Just looking at ID_AA64ISAR0_EL1, we do not
+enforce any of the "FEAT_X implies FEAT_Y" relationships between all of
+the crypto extensions. Userspace can also setup ID_AA64MMFR0_EL1 to
+advertise that no translation granule is supported by the MMU.
+
+I agree that KVM needs to sanitize feature ID registers against the
+capabilities of hardware + KVM itself. Beyond that cross-checking
+userspace against itself is difficult to get right, and I'm worried
+about what the tangled mess will look like when we finish up the
+plumbing for the whole feature ID space.
+
+> Take for example CLIDR_EL1.Lo{UU,UIS,C}. Their values depend on
+> CTR_EL0.{IDC,DIC}. SW is free to check one or the other. If you don't
+> have this dependency, you're in for some serious trouble.
+
+Right, we absolutely need to sanitize these against *hardware*, and
+using CTR_EL0 definitely the way to go. Userspace cannot promise a
+stricter cache coherency model than what's offered in hardware.
+
+Making sure userspace's values for CLIDR_EL1 and CTR_EL0 agree with each
+other shouldn't matter if we've determined hardware coherency is at least
+as strict as the model described through these registers.
+
+Without the cross-check, it would be possible for userspace to setup the
+vCPU as:
+
+ - CTR_EL0.{IDC,DIC} = {1, 1}
+ - CLIDR_EL1.Lo{UU,UIS,C} = {1, 1, 1}
+
+But we would only allow this if hardware was {IDC,DIC} = {1,1}. So while
+the values presented to the guest aren't consistent with one another, it
+seems in the worst case the guest will do I$ maintenance where it isn't
+actually necessary.
+
+-- 
 Thanks,
-Mark.
-
-> 
-> This patches cherry-pick a part of Mark Brown' FEAT_NMI series, in order
-> to pass compilation and basic testing, includes perf and ipi_backtrace.
-> 
-> [1] https://lore.kernel.org/all/20240407081733.3231820-1-ruanjinjie@huawei.com/
-> [2] https://lore.kernel.org/linux-arm-kernel/Y4sH5qX5bK9xfEBp@lpieralisi/
-> 
-> v3->v2:
-> 1. Squash two commits that address two minor issues into Mark Brown's
->    origin patch for detecting FEAT_NMI.
-> 2. Add one patch resolves the kprobe reenter panic while testing
->    FEAT_NMI on QEMU.
-> 
-> v2->v1:
-> Add SoB tags following the origin author's SoBs.
-> 
-> Liao Chang (5):
->   arm64: daifflags: Add logical exception masks covering DAIF + PMR +
->     ALLINT
->   arm64: Unify exception masking at entry and exit of exception
->   arm64: Deprecate old local_daif_{mask,save,restore}
->   irqchip/gic-v3: Improve the maintainability of NMI masking in GIC
->     driver
->   arm64: kprobe: Keep NMI maskabled while kprobe is stepping xol
-> 
-> Mark Brown (3):
->   arm64/sysreg: Add definitions for immediate versions of MSR ALLINT
->   arm64/cpufeature: Detect PE support for FEAT_NMI
->   arm64/nmi: Add Kconfig for NMI
-> 
->  arch/arm64/Kconfig                   |  17 ++
->  arch/arm64/include/asm/cpufeature.h  |   6 +
->  arch/arm64/include/asm/daifflags.h   | 298 ++++++++++++++++++++++-----
->  arch/arm64/include/asm/nmi.h         |  27 +++
->  arch/arm64/include/asm/sysreg.h      |   2 +
->  arch/arm64/include/uapi/asm/ptrace.h |   1 +
->  arch/arm64/kernel/acpi.c             |  10 +-
->  arch/arm64/kernel/cpufeature.c       |  58 +++++-
->  arch/arm64/kernel/debug-monitors.c   |   7 +-
->  arch/arm64/kernel/entry-common.c     |  96 +++++----
->  arch/arm64/kernel/entry.S            |   2 -
->  arch/arm64/kernel/hibernate.c        |   6 +-
->  arch/arm64/kernel/irq.c              |   2 +-
->  arch/arm64/kernel/machine_kexec.c    |   2 +-
->  arch/arm64/kernel/probes/kprobes.c   |   4 +-
->  arch/arm64/kernel/setup.c            |   2 +-
->  arch/arm64/kernel/smp.c              |   6 +-
->  arch/arm64/kernel/suspend.c          |   6 +-
->  arch/arm64/kvm/hyp/vgic-v3-sr.c      |   6 +-
->  arch/arm64/kvm/hyp/vhe/switch.c      |   4 +-
->  arch/arm64/mm/mmu.c                  |   6 +-
->  arch/arm64/tools/cpucaps             |   2 +
->  drivers/irqchip/irq-gic-v3.c         |   6 +-
->  23 files changed, 442 insertions(+), 134 deletions(-)
->  create mode 100644 arch/arm64/include/asm/nmi.h
-> 
-> -- 
-> 2.34.1
-> 
-> 
+Oliver
