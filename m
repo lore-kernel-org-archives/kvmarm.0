@@ -1,118 +1,84 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E652153584
-	for <kvmarm@lists.linux.dev>; Fri,  3 May 2024 13:03:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C20B15358C;
+	Fri,  3 May 2024 13:35:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714741413; cv=none; b=cwE8aitnsgGYthD3xb1Vz1zwJh2g59EWFd6idkRBqh+m6sCdTkla5j78xQSRfBCFSGv5bDgOt4qNzLC0NLNiwrNvlGn0QoQo7T+X76pvLAYhqTdIZk+1dBb/9Nc6A40eHKigMiDhueuCMdJ3pQdXplRLKaA8PpBERHdb2qP9Y/k=
+	t=1714743330; cv=none; b=tzo0aq9cW4TM2OzFQk1fqzQ9Z6vBjuMVy3uS0tKjXgAZdGdlgMxr7zuP4Ma2a8hJ7sp6nAnyhhAOC30ltPE2j3weBpEcMO2vkVD2pw3PHwJpC60MxXrwbmX826yaLHG+4GmVw4xl3y4lqBV/CtbeCUz26wP6Ilh9hoIIG+WyE80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714741413; c=relaxed/simple;
-	bh=1X+IqmenYR6uLUoIoQs2eb2y1mb1hBo4pVmia5ZjvLE=;
+	s=arc-20240116; t=1714743330; c=relaxed/simple;
+	bh=1Gj0ji1WJGaVGrQBE5Z164B4WogRDBy3MPOTTBDGUFs=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=lexJlbb2N39v+HJw40yqUC0e8LngnletBmiqGCWR28bi/8kfl4acUrkbSxtwJFVYMPJRv8GHI1mEKXvC67Yl4sJHCCnM4YO9KPF1Dimr5KdPr9YpYdQOexpF8ihZ35vjo0QrNPzAlSv+DOcnN+5f7ATuyo6pw0TevmFhObVedL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EDB5D1764;
-	Fri,  3 May 2024 06:03:56 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9AEB03F73F;
-	Fri,  3 May 2024 06:03:28 -0700 (PDT)
-From: Joey Gouly <joey.gouly@arm.com>
-To: linux-arm-kernel@lists.infradead.org
-Cc: akpm@linux-foundation.org,
-	aneesh.kumar@kernel.org,
-	aneesh.kumar@linux.ibm.com,
-	bp@alien8.de,
-	broonie@kernel.org,
-	catalin.marinas@arm.com,
-	christophe.leroy@csgroup.eu,
-	dave.hansen@linux.intel.com,
-	hpa@zytor.com,
-	joey.gouly@arm.com,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linuxppc-dev@lists.ozlabs.org,
-	maz@kernel.org,
-	mingo@redhat.com,
-	mpe@ellerman.id.au,
-	naveen.n.rao@linux.ibm.com,
-	npiggin@gmail.com,
-	oliver.upton@linux.dev,
-	shuah@kernel.org,
-	szabolcs.nagy@arm.com,
-	tglx@linutronix.de,
-	will@kernel.org,
-	x86@kernel.org,
-	kvmarm@lists.linux.dev
-Subject: [PATCH v4 29/29] KVM: selftests: get-reg-list: add Permission Overlay registers
-Date: Fri,  3 May 2024 14:01:47 +0100
-Message-Id: <20240503130147.1154804-30-joey.gouly@arm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240503130147.1154804-1-joey.gouly@arm.com>
-References: <20240503130147.1154804-1-joey.gouly@arm.com>
+	 MIME-Version:Content-Type; b=W23kJ3Prt/kxa+GQtFHsYCUJusck7bXrL8YgzaSUUHCAQF0RSQEz3aeN/r5hXP9os/xHGnzu3RG5Q8hUF8agSnuMzexpRyftaNH3RDWxgBesZ048EI1oTaQF1qLvHkzn+6812mzs0sKUCd8iG9ofGlyR5JTi0KIGrf9x+TGLiQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Oz2OKeXG; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Oz2OKeXG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11034C116B1;
+	Fri,  3 May 2024 13:35:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714743330;
+	bh=1Gj0ji1WJGaVGrQBE5Z164B4WogRDBy3MPOTTBDGUFs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=Oz2OKeXGbtiOl3WZP8XjJ4oQIV7xNjYFaJCqmHpE3h11eCzqFI6WwvSGt/q3eO9XL
+	 Yy6kFOkZf1ebmXr+3TV+ooP8EDdOi9tLX/Y0h9NUvaortLTNlfMvxRYaJ5qaKlaqDR
+	 ULM8XdDJ6dYrbkAqGG8JODJ5zOO20eDk0WF+Tf1o2kD5Ekg1ZUmMX65SI3DcqNyaTy
+	 N/LdulSJC0SQB//09pf9wTV4yYJUy9lJHqQs+fPyV77JD0CpQSgE2MtTqI9MMwgWE/
+	 pHb+Li5jVvLQGn4kUbSWgX3E6E/M1yRt8zuREGJoyeJA/JD1SUfOzC9utcWDCBl/id
+	 WLBFLCd0eWfrw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1s2t4R-00AKZC-RB;
+	Fri, 03 May 2024 14:35:27 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Marc Zyngier <maz@kernel.org>
+Cc: James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH] KVM: arm64: Convert kvm_mpidr_index() to bitmap_gather()
+Date: Fri,  3 May 2024 14:35:15 +0100
+Message-Id: <171474325427.3225213.7275231723236470580.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240502154247.3012042-1-maz@kernel.org>
+References: <20240502154247.3012042-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add new system registers:
-  - POR_EL1
-  - POR_EL0
+On Thu, 02 May 2024 16:42:47 +0100, Marc Zyngier wrote:
+> Linux 6.9 has introduced new bitmap manipulation helpers, with
+> bitmap_gather() being of special interest, as it does exactly
+> what kvm_mpidr_index() is already doing.
+> 
+> Make the latter a wrapper around the former.
+> 
+> 
+> [...]
 
-Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>
-Cc: Shuah Khan <shuah@kernel.org>
-Reviewed-by: Mark Brown <broonie@kernel.org>
----
- tools/testing/selftests/kvm/aarch64/get-reg-list.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+Applied to next, thanks!
 
-diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-index 709d7d721760..ac661ebf6859 100644
---- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-+++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-@@ -40,6 +40,18 @@ static struct feature_id_reg feat_id_regs[] = {
- 		ARM64_SYS_REG(3, 0, 0, 7, 3),	/* ID_AA64MMFR3_EL1 */
- 		4,
- 		1
-+	},
-+	{
-+		ARM64_SYS_REG(3, 0, 10, 2, 4),	/* POR_EL1 */
-+		ARM64_SYS_REG(3, 0, 0, 7, 3),	/* ID_AA64MMFR3_EL1 */
-+		16,
-+		1
-+	},
-+	{
-+		ARM64_SYS_REG(3, 3, 10, 2, 4),	/* POR_EL0 */
-+		ARM64_SYS_REG(3, 0, 0, 7, 3),	/* ID_AA64MMFR3_EL1 */
-+		16,
-+		1
- 	}
- };
- 
-@@ -468,6 +480,7 @@ static __u64 base_regs[] = {
- 	ARM64_SYS_REG(3, 0, 10, 2, 0),	/* MAIR_EL1 */
- 	ARM64_SYS_REG(3, 0, 10, 2, 2),	/* PIRE0_EL1 */
- 	ARM64_SYS_REG(3, 0, 10, 2, 3),	/* PIR_EL1 */
-+	ARM64_SYS_REG(3, 0, 10, 2, 4),	/* POR_EL1 */
- 	ARM64_SYS_REG(3, 0, 10, 3, 0),	/* AMAIR_EL1 */
- 	ARM64_SYS_REG(3, 0, 12, 0, 0),	/* VBAR_EL1 */
- 	ARM64_SYS_REG(3, 0, 12, 1, 1),	/* DISR_EL1 */
-@@ -475,6 +488,7 @@ static __u64 base_regs[] = {
- 	ARM64_SYS_REG(3, 0, 13, 0, 4),	/* TPIDR_EL1 */
- 	ARM64_SYS_REG(3, 0, 14, 1, 0),	/* CNTKCTL_EL1 */
- 	ARM64_SYS_REG(3, 2, 0, 0, 0),	/* CSSELR_EL1 */
-+	ARM64_SYS_REG(3, 3, 10, 2, 4),	/* POR_EL0 */
- 	ARM64_SYS_REG(3, 3, 13, 0, 2),	/* TPIDR_EL0 */
- 	ARM64_SYS_REG(3, 3, 13, 0, 3),	/* TPIDRRO_EL0 */
- 	ARM64_SYS_REG(3, 3, 14, 0, 1),	/* CNTPCT_EL0 */
+[1/1] KVM: arm64: Convert kvm_mpidr_index() to bitmap_gather()
+      commit: 838d992b84486311e6039170d28b79a7a0633f06
+
+Cheers,
+
+	M.
 -- 
-2.25.1
+Without deviation from the norm, progress is not possible.
+
 
