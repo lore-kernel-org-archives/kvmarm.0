@@ -1,140 +1,132 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 723871BF24;
-	Fri,  3 May 2024 15:01:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94B856FB8
+	for <kvmarm@lists.linux.dev>; Fri,  3 May 2024 15:07:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714748483; cv=none; b=f+n2tIxZ7GMSH/3/m1wE9fv8xrOUnR2Z/mhK7r98SVHO4/Xh0H2Jioc6iPHvznd8rmRWs4xJsU0Q6tvCLg3dUNgEWDLb7jDXRJZL3Bu+nkqp+JoFkNWRocxw2rej0HjGDcE5nO9M7yNm/PGdK8AqD52OJJvnkO5BT4pRHiZkN50=
+	t=1714748825; cv=none; b=L+JhmUOisqhsibOzA7rXMFOwGUR9tREuwC3QLe/xUoLfrroPLBBAaSoZST7+xYrmg/JAL7Pp4EuomLPQKa9R743XSXcUaDEyMJYocQV26UMU27216lRmByBUYOqn0lywtH2QuJb5wlLytMNx3DaJPtxphEeomkqWumJECMF8D9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714748483; c=relaxed/simple;
-	bh=UXXUMTs3xuoh35OPltFV2PaGUabtM91G4z1H+6ANXqc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ucLI/M10a4HdtHkV4BzMUf15WyCYQQJOYnTQXIwj5kfbJD5RjX1vnQg20yALnF2Z/P4L8HoTgECI72rXajLBT1irq1OmMG7Y4pVE5HOQ3EmvO1cdZYD8QMCQB5H39hoEJk6ZTPokf9kBcqzAljZu9ja0fE6x8cT5do2HeQolzoQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RHgsbqhf; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1714748825; c=relaxed/simple;
+	bh=k9s24ntmSBOewn9Zrhb/0BIr0dPxZe+x4zy/XWS4LFU=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=fr6ypIlJVbkVSijbDzL4dQCdST9HlSTtM8oQVWV8wJic3WWkzxwSbUJhxeMEtpDlCFkT1pnotRuZbxJwXFS00PAHV3YiAx1XDhvT8vm6MIrsiHtaJkMVd42KkUo9wCAzoDyizf+BM/H9e1OEmW1F56mN9BwBED4PefvKdJuTzh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cI1CcAOk; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RHgsbqhf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4F87C116B1;
-	Fri,  3 May 2024 15:01:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714748483;
-	bh=UXXUMTs3xuoh35OPltFV2PaGUabtM91G4z1H+6ANXqc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RHgsbqhfhhnWXt7vZEq/n3A1dRZyUltjDpSXa3bsBvFJodtas18PnkKRMEsFBCt5M
-	 pQgCTY7uYcfQ0Yzi5RaIbOTGiOL0p9EQu/8n0JySlanhTSbU13ozsG17wfSfhbpcPl
-	 8dNTB/hv2LdNudWXK5sC8C5iBEFR60B9Bs0+NwUwCucjz+ivfvAanNUvQ6L2+kjiM2
-	 6IpS/xhzto24IeMVWxXP08xWIB7x14R5hUM1aKVnIh1+YDsV5yqgN8mlP4/HbtV2Vc
-	 Bubs2zNjvEG6jcfYFCDUoLrKboifhW8QU45Pi0ER5IFrgGEFhbcN/LeJHNZUsXoR6t
-	 7xOmbYjkcCz6Q==
-Date: Fri, 3 May 2024 16:01:16 +0100
-From: Will Deacon <will@kernel.org>
-To: Sebastian Ene <sebastianene@google.com>
-Cc: catalin.marinas@arm.com, james.morse@arm.com, jean-philippe@linaro.org,
-	maz@kernel.org, oliver.upton@linux.dev, qperret@google.com,
-	qwandor@google.com, sudeep.holla@arm.com, suzuki.poulose@arm.com,
-	tabba@google.com, yuzenghui@huawei.com, lpieralisi@kernel.org,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, kernel-team@android.com
-Subject: Re: [PATCH 2/4] KVM: arm64: Add support for FFA_PARTITION_INFO_GET
-Message-ID: <20240503150114.GB18656@willie-the-truck>
-References: <20240418163025.1193763-2-sebastianene@google.com>
- <20240418163025.1193763-4-sebastianene@google.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cI1CcAOk"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1714748822;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WQPeshu6niEUNuSz35jaYgA/Ulg7rIGCZOHChBJq76g=;
+	b=cI1CcAOkDHqVli3I5HOH1CETjcxOPHKc+djL0NGUGmbVv8WGo/IHPbYwGnlZxalAsIisKz
+	yLqbsHBHzGfvfkP9alTeDMMg5fHh8xFMtjktwLIZgQ8WQ0Xg+FlSG68HFmNKC7uVKIVCBB
+	6jUDS9S4eDK9+eTMW9+fKU0cUH5elDE=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-536-dY9Ls2bBOI6HNf74oKzYtA-1; Fri, 03 May 2024 11:07:01 -0400
+X-MC-Unique: dY9Ls2bBOI6HNf74oKzYtA-1
+Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-6a0e2c337bfso44176786d6.1
+        for <kvmarm@lists.linux.dev>; Fri, 03 May 2024 08:07:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714748820; x=1715353620;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WQPeshu6niEUNuSz35jaYgA/Ulg7rIGCZOHChBJq76g=;
+        b=OttkrlbSqQsmwYiT3jx/TU6AbNluEWDEEpwtmdV3X0WcbjESSF46SjLrrwC6OOKJ0c
+         7Lax7tlUYPXqV3uTRBPQdNuez1UIpgEECp2d6ZLQHHywRbgvxAhOd8HGqda1lEPpgV6K
+         PF7hbG9ccMJRnk3oPQJp33cMlqK7OirNEEq9dGRVAjxP72UJAtf/ZyuMkriUEhkNkgDS
+         Rhu2tM7DAmTGx7hzDr2b2bY32QmFO6dOX2i/2Gg4gtBaqZSwnT4W0PUn4ftX3nxjBkZo
+         JRSoQyPAn+sYm3dP9WjtZcgp7fQGF5R60Jsea/kIM8nsd+LZdea3S3JpkJsOwhTjjanC
+         +Tmg==
+X-Forwarded-Encrypted: i=1; AJvYcCXltHcpR7PbU/bCEGaS6GreHHKtKyXyrAHglGxpheapnQbsdbA+6+Wn0YgjaTgqJwgFnjTBAOGZg+LfrPbf+NovT+wt9r4N
+X-Gm-Message-State: AOJu0Yy4BQ2uEmq+j111XNdl5BIjWtRmrEodTpVtstrAlkQ/DRx2Puin
+	Tr5Ikq1vZ2yI9qoe1KUP6b8dEkupvLfHIfiCKXoq53/TE6+BMYsbmzUwrcNZHYJfgBsUoeAnxkj
+	3BWXFuNZMYw4Z6tjJeqvJ7JSigka5JcZapCzFRYjERNsP/XnvqVgTpg==
+X-Received: by 2002:a05:6214:1d28:b0:6a0:7e1b:94b2 with SMTP id f8-20020a0562141d2800b006a07e1b94b2mr3500203qvd.16.1714748820701;
+        Fri, 03 May 2024 08:07:00 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE58nX1yMSsXx8T4M1bwWkbRW6TndZK2zPSzImpXTW1iQHJ+hiY0QElGI8RXi6FLWzqh7lbjg==
+X-Received: by 2002:a05:6214:1d28:b0:6a0:7e1b:94b2 with SMTP id f8-20020a0562141d2800b006a07e1b94b2mr3500172qvd.16.1714748820323;
+        Fri, 03 May 2024 08:07:00 -0700 (PDT)
+Received: from rh (p200300c93f4cc600a5cdf10de606b5e2.dip0.t-ipconnect.de. [2003:c9:3f4c:c600:a5cd:f10d:e606:b5e2])
+        by smtp.gmail.com with ESMTPSA id f19-20020ac84713000000b00437392f1c20sm1652949qtp.76.2024.05.03.08.06.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 May 2024 08:07:00 -0700 (PDT)
+Date: Fri, 3 May 2024 17:06:54 +0200 (CEST)
+From: Sebastian Ott <sebott@redhat.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+    linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>, 
+    James Morse <james.morse@arm.com>, 
+    Suzuki K Poulose <suzuki.poulose@arm.com>, 
+    Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v2 2/6] KVM: arm64: unify trap setup code
+In-Reply-To: <ZjHmX_O7KTInLuL5@linux.dev>
+Message-ID: <5c17b8e9-9281-f6ef-df71-11821e19b112@redhat.com>
+References: <20240426104950.7382-1-sebott@redhat.com> <20240426104950.7382-3-sebott@redhat.com> <ZjHmX_O7KTInLuL5@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240418163025.1193763-4-sebastianene@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 
-On Thu, Apr 18, 2024 at 04:30:24PM +0000, Sebastian Ene wrote:
-> Handle the FFA_PARTITION_INFO_GET host call inside the pKVM hypervisor
-> and copy the response message back to the host buffers. Save the
-> returned FF-A version as we will need it later to interpret the response
-> from the TEE.
-> 
-> Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> ---
->  arch/arm64/kvm/hyp/nvhe/ffa.c | 46 +++++++++++++++++++++++++++++++++++
->  1 file changed, 46 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> index 023712e8beeb..d53f50c73acb 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> @@ -674,6 +674,49 @@ static void do_ffa_version(struct arm_smccc_res *res,
->  	hyp_spin_unlock(&host_buffers.lock);
->  }
->  
-> +static void do_ffa_part_get(struct arm_smccc_res *res,
-> +			    struct kvm_cpu_context *ctxt)
-> +{
-> +	DECLARE_REG(u32, uuid0, ctxt, 1);
-> +	DECLARE_REG(u32, uuid1, ctxt, 2);
-> +	DECLARE_REG(u32, uuid2, ctxt, 3);
-> +	DECLARE_REG(u32, uuid3, ctxt, 4);
-> +	DECLARE_REG(u32, flags, ctxt, 5);
-> +	u32 off, count, sz, buf_sz;
-> +
-> +	hyp_spin_lock(&host_buffers.lock);
-> +	if (!host_buffers.rx) {
-> +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
+On Wed, 1 May 2024, Oliver Upton wrote:
+> On Fri, Apr 26, 2024 at 12:49:46PM +0200, Sebastian Ott wrote:
+>> There are 2 functions to set up traps via HCR_EL2:
+>
+> nitpick: these functions *calculate* the trap values, but do not
+> actually set them up. HCR_EL2 doesn't get written to until further down
+> the line on KVM_RUN.
+>
+>> +	if (cpus_have_final_cap(ARM64_HAS_STAGE2_FWB)) {
+>> +		vcpu->arch.hcr_el2 |= HCR_FWB;
+>> +	} else {
+>> +		/*
+>> +		 * For non-FWB CPUs, we trap VM ops (HCR_EL2.TVM) until M+C
+>> +		 * get set in SCTLR_EL1 such that we can detect when the guest
+>> +		 * MMU gets turned on and do the necessary cache maintenance
+>> +		 * then.
+>> +		 */
+>> +		vcpu->arch.hcr_el2 |= HCR_TVM;
+>> +	}
+>
+> It seems to me like calling this once for the lifetime of a vCPU will
+> break non-FWB behavior.
+>
+> Like the comment suggests, these traps are needed to catch the moment
+> the S1 MMU is turned on and do cache maintenance to make sure D$ agrees
+> with what the guest was doing before enabling the MMU.
+>
+> KVM_ARM_VCPU_INIT resets SCTLR_EL1, but it seems we'd miss setting
+> HCR_TVM in that case.
 
-This should be FFA_RET_BUSY per the spec.
+Ugh, I didn't think about KVM_ARM_VCPU_INIT being called more than once.
 
-> +		goto out_unlock;
-> +	}
-> +
-> +	arm_smccc_1_1_smc(FFA_PARTITION_INFO_GET, uuid0, uuid1,
-> +			  uuid2, uuid3, flags, 0, 0,
-> +			  res);
-> +
-> +	if (res->a0 != FFA_SUCCESS)
-> +		goto out_unlock;
-> +
-> +	count = res->a2;
-> +	if (!count)
-> +		goto out_unlock;
-> +
-> +	if (host_buffers.ffa_version > FFA_VERSION_1_0) {
+But in that case don't we loose the changes done to hcr_el2 in the current
+code? E.g.:
 
-The spec says that the size field is populated based on the flags
-parameter. Why aren't you checking that instead of the version number?
+void kvm_init_sysreg(struct kvm_vcpu *vcpu)
+{
+...
+ 	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, OS))
+ 		vcpu->arch.hcr_el2 |= HCR_TTLBOS;
+...
+}
 
-> +		buf_sz = sz = res->a3;
-> +		if (sz > sizeof(struct ffa_partition_info))
-> +			buf_sz = sizeof(struct ffa_partition_info);
+static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+{
+ 	vcpu->arch.hcr_el2 = HCR_GUEST_FLAGS;
+...
+}
 
-I don't think this is right, as if the payload really is bigger than
-'struct ffa_partition_info' we'll truncate the data (and you don't
-adjust res->a3 afaict).
+Thanks,
+Sebastian
 
-Can't we just copy the whole thing back to the host? We're not
-interpreting the thing, so we can just treat it like a stream of bytes.
-
-> +	} else {
-> +		/* FFA_VERSION_1_0 lacks the size in the response */
-> +		buf_sz = sz = 8;
-
-Can you define that as a constant in arm_ffa.h, please? It's the size of
-a 1.0 partition info structure.
-
-> +	}
-> +
-> +	WARN_ON((count - 1) * sz + buf_sz > PAGE_SIZE);
-
-We should bounds-check against 'KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE' and
-return an error (FFA_RET_ABORTED) if the size is over that.
-
-> +	for (off = 0; off < count * sz; off += sz)
-> +
-> +		memcpy(host_buffers.rx + off, hyp_buffers.rx + off, buf_sz);
-
-I think this is wrong if bit 0 of 'flags' is set to 1. In that case, I
-think you just get back the number of partitions and that's it, so we
-shouldn't be going near the mailboxes.
-
-Will
