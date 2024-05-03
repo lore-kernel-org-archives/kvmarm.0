@@ -1,107 +1,180 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB0241514F2
-	for <kvmarm@lists.linux.dev>; Fri,  3 May 2024 11:03:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65370152DE9
+	for <kvmarm@lists.linux.dev>; Fri,  3 May 2024 13:01:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714734206; cv=none; b=Cbr8DYS2thzuZGOgxykAU/HJQulSUHnv4pHHvOC2mUGWpmWOPi1fICZN2OrMI6SOS+dbqHICaKd7Vjcpsu6WzjMQ9BjtyGqp9HrAwJnn8SE6P8RZVxx1VK6qr1YLRse//w2SP4R2JaaYZ2VQZlF3V2VYj2WSmD+VIBpW2Z7aEqg=
+	t=1714741318; cv=none; b=QXwuAo0mHyXCcEbVS3PA0WENOFJ0pGfwjiUPjCQRxKxAjVZB0zQWH5cBzQKS/AE0nNTiOS74mRelaJEa5rcY1En+amWoFQH6ZUE3oUQZ0W4/fydvj1QP3ksFZdbe5lvaVe49XCucgG3dnAxhdhq5WOHP6V+tdJlOk9IyF8PuHMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714734206; c=relaxed/simple;
-	bh=U8pbEeU6q3HFr1TucM82IKlHv9be5/rhk+jTB/vMHrQ=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=XeiWVkXARRPI4f9H7oH2feGFyb5ycCAov0pn6bDyQf40JNiVJaWz0Fe33ZrmUouVxqM7RtEYu+eJUGJrswHcM1AhsPGOHdhgAIGzyaP3nLbPJ8KHrd8DPj8MpU6WSl5ix3BhmzchCyq49IvjPKIsr1PheZ8So8qw8MP7be/jLnA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CRDce8aZ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CRDce8aZ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714734203;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=U8pbEeU6q3HFr1TucM82IKlHv9be5/rhk+jTB/vMHrQ=;
-	b=CRDce8aZvls2/hukFKeRFntbNHSnf9VWNK29/N6rIK6EfYSJAvnTHFGswmffKFU9u8Pz7e
-	SMW+H+Y1yeC85KrwLTqsOjLY7pEL50gWvHc0bxw0P7GMKsULZ97gcV7dNvKjIG1U4FHx/g
-	7mYH0dtNlElft3vy0rxf5HcfutApfo8=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-609-fuHzDj2HNSKKzhNSt6kmgQ-1; Fri, 03 May 2024 07:03:21 -0400
-X-MC-Unique: fuHzDj2HNSKKzhNSt6kmgQ-1
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6a0e2c337bfso41761236d6.1
-        for <kvmarm@lists.linux.dev>; Fri, 03 May 2024 04:03:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714734201; x=1715339001;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=U8pbEeU6q3HFr1TucM82IKlHv9be5/rhk+jTB/vMHrQ=;
-        b=Q7VdY3apsg0fmf/OWtSJe3mpPjHUs+zgh5iTiYuYUpEufA150tyGCwHNCgofPFRHch
-         Y6O4HGcFCZX09aJUvNQU2k75Ayb7jvngxhISwIipnbKY1lX+BI7xhywQtXlAod25XXdF
-         wOYPbx4sciEYF+A1yrxTm4hwMLG2kviBwiUL8sYIYiviLrf3hWlqpDAUoSbz7Uo5P+SB
-         Oj8h/lJE/a7tvDIfU42+YjFkxqTKWUHsuFhrNl4MHFL+wWeEwBIekTd4jZuKxCtnoNGc
-         3SZAEseR/BOoASp/eGIuXm34h5duUcqZo3YZxcSfu8Qc8g83UsoKp2TVdcxwrv/FSEWp
-         zntg==
-X-Forwarded-Encrypted: i=1; AJvYcCWJ3sVcILWJGyUPNmQyWCX8RCPiTClAgTDg0g4f3qIn+XHL8/VAdKbI7X5H89h7lAHifbL38X4sHb4SrTsvWx8k60S6rI7q
-X-Gm-Message-State: AOJu0YxsADOeTH+YyKfbSBZJvC/SSSte0qG1aBdoVZCubj6sdVu6KyE5
-	UuoTRzi14CG19+/QMQO+BVnm8zgZbLfYhNeUo/2S3jjOua9vvP9QBrl1tmq1ilr5i/YHeLHodjV
-	w3D9ZoNQn913mO0XInMSi721FUgvNY5diSmauYgXSNHDbNDCh7TlHMQ==
-X-Received: by 2002:a05:6214:20ea:b0:6a0:b507:9be2 with SMTP id 10-20020a05621420ea00b006a0b5079be2mr2172152qvk.38.1714734200719;
-        Fri, 03 May 2024 04:03:20 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE9Y4yhIMgz3JvEeyI3wePqNUPZGn7oPAlntaf8m61AG7y4+NXlBKBUHbSvQZE8Oga+ZVXwcA==
-X-Received: by 2002:a05:6214:20ea:b0:6a0:b507:9be2 with SMTP id 10-20020a05621420ea00b006a0b5079be2mr2172136qvk.38.1714734200390;
-        Fri, 03 May 2024 04:03:20 -0700 (PDT)
-Received: from rh (p200300c93f4cc600a5cdf10de606b5e2.dip0.t-ipconnect.de. [2003:c9:3f4c:c600:a5cd:f10d:e606:b5e2])
-        by smtp.gmail.com with ESMTPSA id m15-20020ad44a0f000000b006a0e0e93aa7sm1107669qvz.57.2024.05.03.04.03.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 May 2024 04:03:20 -0700 (PDT)
-Date: Fri, 3 May 2024 13:03:15 +0200 (CEST)
-From: Sebastian Ott <sebott@redhat.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-    linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>, 
-    James Morse <james.morse@arm.com>, 
-    Suzuki K Poulose <suzuki.poulose@arm.com>, 
-    Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v2 5/6] KVM: arm64: show writable masks for feature
- registers
-In-Reply-To: <ZjHv14-GBafptt-m@linux.dev>
-Message-ID: <eee2b0c4-2245-15d4-b887-122e080813e9@redhat.com>
-References: <20240426104950.7382-1-sebott@redhat.com> <20240426104950.7382-6-sebott@redhat.com> <ZjHv14-GBafptt-m@linux.dev>
+	s=arc-20240116; t=1714741318; c=relaxed/simple;
+	bh=W/lV2Nj3/FREdBkCCTpq9jz8LLf8zh6r/sj6RQTo4kU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=UCiB0uJS0ago078/rzV43qFPFBcrZZ9er3NBdRFAyGB+Ttr8oJF1XEvagHINBOl8jvVSTf5lqzro8MnqQopZMsPMqlH1Ww/w+GwskqeWyVakPkKt81gUfetg/mwD+P7mVToPb8Hx+azFchCKR4Q6G4tgASRtD8wvd5BfyofvxK8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CC3E013D5;
+	Fri,  3 May 2024 06:02:20 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7777C3F73F;
+	Fri,  3 May 2024 06:01:52 -0700 (PDT)
+From: Joey Gouly <joey.gouly@arm.com>
+To: linux-arm-kernel@lists.infradead.org
+Cc: akpm@linux-foundation.org,
+	aneesh.kumar@kernel.org,
+	aneesh.kumar@linux.ibm.com,
+	bp@alien8.de,
+	broonie@kernel.org,
+	catalin.marinas@arm.com,
+	christophe.leroy@csgroup.eu,
+	dave.hansen@linux.intel.com,
+	hpa@zytor.com,
+	joey.gouly@arm.com,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linuxppc-dev@lists.ozlabs.org,
+	maz@kernel.org,
+	mingo@redhat.com,
+	mpe@ellerman.id.au,
+	naveen.n.rao@linux.ibm.com,
+	npiggin@gmail.com,
+	oliver.upton@linux.dev,
+	shuah@kernel.org,
+	szabolcs.nagy@arm.com,
+	tglx@linutronix.de,
+	will@kernel.org,
+	x86@kernel.org,
+	kvmarm@lists.linux.dev
+Subject: [PATCH v4 00/29] arm64: Permission Overlay Extension
+Date: Fri,  3 May 2024 14:01:18 +0100
+Message-Id: <20240503130147.1154804-1-joey.gouly@arm.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, 1 May 2024, Oliver Upton wrote:
+Hi all,
 
-> On Fri, Apr 26, 2024 at 12:49:49PM +0200, Sebastian Ott wrote:
->> Instead of using ~0UL provide the actual writable mask for
->> non-id feature registers in the output of the
->> KVM_ARM_GET_REG_WRITABLE_MASKS ioctl.
->
-> Urgh, yeah in retrospect I think we should've constrained this to the
-> registers KVM considers "id regs" (the space occupied by known registers
-> or otherwise RAZ).
->
->> Explicitely set the mask for CLIDR_EL1 to make sure we present
->> the same value to userspace than before.
->
-> typo: explicitly
->
-> Also, we know the set of mutable bits for CLIDR_EL1 as it is handled in
-> set_clidr(). The mask really should match that, since the UAPI is
-> documented as "allowing userspace to know what fields can be changed for
-> the system register"
+This series implements the Permission Overlay Extension introduced in 2022
+VMSA enhancements [1]. It is based on v6.9-rc5.
 
-Done for the next revision.
+One possible issue with this version, I took the last bit of HWCAP2.
+
+Changes since v3[2]:
+	- Moved Kconfig to nearer the end of the series
+	- Reworked MMU Fault path, to check for POE faults earlier, under the mm lock
+	- Rework VM_FLAGS to use Kconfig option
+	- Don't check POR_EL0 in MTE sync tags function
+	- Reworked KVM to fit into VNCR/VM configuration changes
+	- Use new AT instruction in KVM
+	- Rebase onto v6.9-rc5
+
+The Permission Overlay Extension allows to constrain permissions on memory
+regions. This can be used from userspace (EL0) without a system call or TLB
+invalidation.
+
+POE is used to implement the Memory Protection Keys [3] Linux syscall.
+
+The first few patches add the basic framework, then the PKEYS interface is
+implemented, and then the selftests are made to work on arm64.
+
+I have tested the modified protection_keys test on x86_64, but not PPC.
+I haven't build tested the x86/ppc arch changes.
 
 Thanks,
-Sebastian
+Joey
+
+Joey Gouly (29):
+  powerpc/mm: add ARCH_PKEY_BITS to Kconfig
+  x86/mm: add ARCH_PKEY_BITS to Kconfig
+  mm: use ARCH_PKEY_BITS to define VM_PKEY_BITN
+  arm64: disable trapping of POR_EL0 to EL2
+  arm64: cpufeature: add Permission Overlay Extension cpucap
+  arm64: context switch POR_EL0 register
+  KVM: arm64: Save/restore POE registers
+  KVM: arm64: make kvm_at() take an OP_AT_*
+  KVM: arm64: use `at s1e1a` for POE
+  arm64: enable the Permission Overlay Extension for EL0
+  arm64: re-order MTE VM_ flags
+  arm64: add POIndex defines
+  arm64: convert protection key into vm_flags and pgprot values
+  arm64: mask out POIndex when modifying a PTE
+  arm64: handle PKEY/POE faults
+  arm64: add pte_access_permitted_no_overlay()
+  arm64: implement PKEYS support
+  arm64: add POE signal support
+  arm64: enable PKEY support for CPUs with S1POE
+  arm64: enable POE and PIE to coexist
+  arm64/ptrace: add support for FEAT_POE
+  arm64: add Permission Overlay Extension Kconfig
+  kselftest/arm64: move get_header()
+  selftests: mm: move fpregs printing
+  selftests: mm: make protection_keys test work on arm64
+  kselftest/arm64: add HWCAP test for FEAT_S1POE
+  kselftest/arm64: parse POE_MAGIC in a signal frame
+  kselftest/arm64: Add test case for POR_EL0 signal frame records
+  KVM: selftests: get-reg-list: add Permission Overlay registers
+
+ Documentation/arch/arm64/elf_hwcaps.rst       |   2 +
+ arch/arm64/Kconfig                            |  22 +++
+ arch/arm64/include/asm/cpufeature.h           |   6 +
+ arch/arm64/include/asm/el2_setup.h            |  10 +-
+ arch/arm64/include/asm/hwcap.h                |   1 +
+ arch/arm64/include/asm/kvm_asm.h              |   3 +-
+ arch/arm64/include/asm/kvm_host.h             |   4 +
+ arch/arm64/include/asm/mman.h                 |   8 +-
+ arch/arm64/include/asm/mmu.h                  |   1 +
+ arch/arm64/include/asm/mmu_context.h          |  51 ++++++-
+ arch/arm64/include/asm/pgtable-hwdef.h        |  10 ++
+ arch/arm64/include/asm/pgtable-prot.h         |   8 +-
+ arch/arm64/include/asm/pgtable.h              |  34 ++++-
+ arch/arm64/include/asm/pkeys.h                | 110 ++++++++++++++
+ arch/arm64/include/asm/por.h                  |  33 +++++
+ arch/arm64/include/asm/processor.h            |   1 +
+ arch/arm64/include/asm/sysreg.h               |   3 +
+ arch/arm64/include/asm/traps.h                |   1 +
+ arch/arm64/include/asm/vncr_mapping.h         |   1 +
+ arch/arm64/include/uapi/asm/hwcap.h           |   1 +
+ arch/arm64/include/uapi/asm/sigcontext.h      |   7 +
+ arch/arm64/kernel/cpufeature.c                |  23 +++
+ arch/arm64/kernel/cpuinfo.c                   |   1 +
+ arch/arm64/kernel/process.c                   |  28 ++++
+ arch/arm64/kernel/ptrace.c                    |  46 ++++++
+ arch/arm64/kernel/signal.c                    |  52 +++++++
+ arch/arm64/kernel/traps.c                     |  12 +-
+ arch/arm64/kvm/hyp/include/hyp/fault.h        |   5 +-
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h    |  29 ++++
+ arch/arm64/kvm/sys_regs.c                     |   8 +-
+ arch/arm64/mm/fault.c                         |  56 ++++++-
+ arch/arm64/mm/mmap.c                          |   9 ++
+ arch/arm64/mm/mmu.c                           |  40 +++++
+ arch/arm64/tools/cpucaps                      |   1 +
+ arch/powerpc/Kconfig                          |   4 +
+ arch/x86/Kconfig                              |   4 +
+ fs/proc/task_mmu.c                            |   2 +
+ include/linux/mm.h                            |  20 ++-
+ include/uapi/linux/elf.h                      |   1 +
+ tools/testing/selftests/arm64/abi/hwcap.c     |  14 ++
+ .../testing/selftests/arm64/signal/.gitignore |   1 +
+ .../arm64/signal/testcases/poe_siginfo.c      |  86 +++++++++++
+ .../arm64/signal/testcases/testcases.c        |  27 +---
+ .../arm64/signal/testcases/testcases.h        |  28 +++-
+ .../selftests/kvm/aarch64/get-reg-list.c      |  14 ++
+ tools/testing/selftests/mm/Makefile           |   2 +-
+ tools/testing/selftests/mm/pkey-arm64.h       | 139 ++++++++++++++++++
+ tools/testing/selftests/mm/pkey-helpers.h     |   8 +
+ tools/testing/selftests/mm/pkey-powerpc.h     |   3 +
+ tools/testing/selftests/mm/pkey-x86.h         |   4 +
+ tools/testing/selftests/mm/protection_keys.c  | 109 ++++++++++++--
+ 51 files changed, 1027 insertions(+), 66 deletions(-)
+ create mode 100644 arch/arm64/include/asm/pkeys.h
+ create mode 100644 arch/arm64/include/asm/por.h
+ create mode 100644 tools/testing/selftests/arm64/signal/testcases/poe_siginfo.c
+ create mode 100644 tools/testing/selftests/mm/pkey-arm64.h
+
+-- 
+2.25.1
 
