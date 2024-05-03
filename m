@@ -1,62 +1,62 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86303152788
-	for <kvmarm@lists.linux.dev>; Fri,  3 May 2024 11:01:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB0241514F2
+	for <kvmarm@lists.linux.dev>; Fri,  3 May 2024 11:03:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714734100; cv=none; b=Gy+DIRIR3Z9CVsGwtw2Z4xHfcJdZYTplMTGlsvs5zKRsTZX8gu8yC/+ELjI+wthrwxJ64NfOltZjbnSfyoWC52cXj/0NfgXgcDBnIogCkaKqhv5F0vT+3ZpQ1SvzCAtQkQGumLjvDBtG6CWhU5yAJQXluH+zpUUL8R4Fmlx4NDk=
+	t=1714734206; cv=none; b=Cbr8DYS2thzuZGOgxykAU/HJQulSUHnv4pHHvOC2mUGWpmWOPi1fICZN2OrMI6SOS+dbqHICaKd7Vjcpsu6WzjMQ9BjtyGqp9HrAwJnn8SE6P8RZVxx1VK6qr1YLRse//w2SP4R2JaaYZ2VQZlF3V2VYj2WSmD+VIBpW2Z7aEqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714734100; c=relaxed/simple;
-	bh=UQCloiX3c/KJBlQsBJGrwnc3Ql1oJvoDpAJQP1qJtMc=;
+	s=arc-20240116; t=1714734206; c=relaxed/simple;
+	bh=U8pbEeU6q3HFr1TucM82IKlHv9be5/rhk+jTB/vMHrQ=;
 	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=lDP73fG1iAovhIXr3hma5dc6qnN7JD/DyPtYdkJsaR+CkX5/TzQxJAbwJ1NRhrz5e0G8rfEEJmXbiSO2WXqqj3EAfPnDQjux6TNztu4N/XY1hsWN75w5ZHNCjo/SM1lqDyK/2qilRSC9ocepqBqndgmKCDj70dZcmYuQFqO+Zoc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EtC5xR75; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version:Content-Type; b=XeiWVkXARRPI4f9H7oH2feGFyb5ycCAov0pn6bDyQf40JNiVJaWz0Fe33ZrmUouVxqM7RtEYu+eJUGJrswHcM1AhsPGOHdhgAIGzyaP3nLbPJ8KHrd8DPj8MpU6WSl5ix3BhmzchCyq49IvjPKIsr1PheZ8So8qw8MP7be/jLnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CRDce8aZ; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EtC5xR75"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CRDce8aZ"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714734097;
+	s=mimecast20190719; t=1714734203;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=UQCloiX3c/KJBlQsBJGrwnc3Ql1oJvoDpAJQP1qJtMc=;
-	b=EtC5xR75m+SL09xondwotMqJpgKNEuBTUmX2VMAx0lerPhzaXWqT8t1D2gfeQ9TN729Q8P
-	R3RFkBlpHNaN9JcsD+o7QkmUOOoL50EPBrxlpHtvYvCHfG39kZhkGa33sgPnQdwXSPITJT
-	T9MaVCmlgfhB8TJITH7aScnjDLWZGac=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=U8pbEeU6q3HFr1TucM82IKlHv9be5/rhk+jTB/vMHrQ=;
+	b=CRDce8aZvls2/hukFKeRFntbNHSnf9VWNK29/N6rIK6EfYSJAvnTHFGswmffKFU9u8Pz7e
+	SMW+H+Y1yeC85KrwLTqsOjLY7pEL50gWvHc0bxw0P7GMKsULZ97gcV7dNvKjIG1U4FHx/g
+	7mYH0dtNlElft3vy0rxf5HcfutApfo8=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-647-o5zM16w1NWqt-p99q-rDew-1; Fri, 03 May 2024 07:01:34 -0400
-X-MC-Unique: o5zM16w1NWqt-p99q-rDew-1
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-790c61cdb29so601208085a.3
-        for <kvmarm@lists.linux.dev>; Fri, 03 May 2024 04:01:34 -0700 (PDT)
+ us-mta-609-fuHzDj2HNSKKzhNSt6kmgQ-1; Fri, 03 May 2024 07:03:21 -0400
+X-MC-Unique: fuHzDj2HNSKKzhNSt6kmgQ-1
+Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6a0e2c337bfso41761236d6.1
+        for <kvmarm@lists.linux.dev>; Fri, 03 May 2024 04:03:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714734093; x=1715338893;
+        d=1e100.net; s=20230601; t=1714734201; x=1715339001;
         h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UQCloiX3c/KJBlQsBJGrwnc3Ql1oJvoDpAJQP1qJtMc=;
-        b=ShVROq4MTCFMMxM3QYQ7M0CEB1rhx5UUmHSnVd1Yaj2jEmN7BcNcHLlyAcu4DYKK2L
-         1FdqDNxgUawM2yimAyNfcF9LaXZAWkRk3Ph37IpDPQGN64ZEZPAwSkbfYleOwx8G+lKT
-         pl10mdzmXP4JgfQY9955sddrdKwpc/XlrGbBPTLH+w/O2uiAKkFh2qrbbTQ5lz1nCTj6
-         evcn179RI5zrDH55R0cciX3PNX3l9NjE66F+2IUaPM/WwJXWYH/cBOeq51PMRbt2zyVD
-         vRplF9kCpbuNU/YA9nNNjUD9k0NsmFgCYZdtJzv3bh49gYFytSQXsqcbtrjLNU+TM8D7
-         uQ2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUWI5D0nY1eBo/qbbhdYBdgBvrQ8nOzBSDZIQpSDvAExOwmekkUlTLKMwRJZyfv3na//tW8KD8mBFMee2B8B5W3VuvXEDHa
-X-Gm-Message-State: AOJu0YyG1dqIn+za7GzJnW2NNWbSkM/DU2z32RPw2MLWOp7C4ssy3HNf
-	j+jV+6togpkzzCBqdtJ5R6sSOkxQ71dT8OL/hBdj+R80GYexPpwQ8y7qiYDewGM9ZaRzt7pxLqk
-	kelC9TkYsfS5EGD3cH4D3Tp8hOO+Sa1oiCGaHnQ3UdTNOE4LdoCUo7vWv3KO8ig==
-X-Received: by 2002:a05:620a:4412:b0:78d:6377:33a6 with SMTP id v18-20020a05620a441200b0078d637733a6mr2934062qkp.66.1714734093390;
-        Fri, 03 May 2024 04:01:33 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEO6LE/GI/eMlo7xlWJ52xIvHraHShveurskORqRDPjdGmEWvDY/jklm4FvgSaNXa9nLceCgg==
-X-Received: by 2002:a05:620a:4412:b0:78d:6377:33a6 with SMTP id v18-20020a05620a441200b0078d637733a6mr2934028qkp.66.1714734092998;
-        Fri, 03 May 2024 04:01:32 -0700 (PDT)
+        bh=U8pbEeU6q3HFr1TucM82IKlHv9be5/rhk+jTB/vMHrQ=;
+        b=Q7VdY3apsg0fmf/OWtSJe3mpPjHUs+zgh5iTiYuYUpEufA150tyGCwHNCgofPFRHch
+         Y6O4HGcFCZX09aJUvNQU2k75Ayb7jvngxhISwIipnbKY1lX+BI7xhywQtXlAod25XXdF
+         wOYPbx4sciEYF+A1yrxTm4hwMLG2kviBwiUL8sYIYiviLrf3hWlqpDAUoSbz7Uo5P+SB
+         Oj8h/lJE/a7tvDIfU42+YjFkxqTKWUHsuFhrNl4MHFL+wWeEwBIekTd4jZuKxCtnoNGc
+         3SZAEseR/BOoASp/eGIuXm34h5duUcqZo3YZxcSfu8Qc8g83UsoKp2TVdcxwrv/FSEWp
+         zntg==
+X-Forwarded-Encrypted: i=1; AJvYcCWJ3sVcILWJGyUPNmQyWCX8RCPiTClAgTDg0g4f3qIn+XHL8/VAdKbI7X5H89h7lAHifbL38X4sHb4SrTsvWx8k60S6rI7q
+X-Gm-Message-State: AOJu0YxsADOeTH+YyKfbSBZJvC/SSSte0qG1aBdoVZCubj6sdVu6KyE5
+	UuoTRzi14CG19+/QMQO+BVnm8zgZbLfYhNeUo/2S3jjOua9vvP9QBrl1tmq1ilr5i/YHeLHodjV
+	w3D9ZoNQn913mO0XInMSi721FUgvNY5diSmauYgXSNHDbNDCh7TlHMQ==
+X-Received: by 2002:a05:6214:20ea:b0:6a0:b507:9be2 with SMTP id 10-20020a05621420ea00b006a0b5079be2mr2172152qvk.38.1714734200719;
+        Fri, 03 May 2024 04:03:20 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE9Y4yhIMgz3JvEeyI3wePqNUPZGn7oPAlntaf8m61AG7y4+NXlBKBUHbSvQZE8Oga+ZVXwcA==
+X-Received: by 2002:a05:6214:20ea:b0:6a0:b507:9be2 with SMTP id 10-20020a05621420ea00b006a0b5079be2mr2172136qvk.38.1714734200390;
+        Fri, 03 May 2024 04:03:20 -0700 (PDT)
 Received: from rh (p200300c93f4cc600a5cdf10de606b5e2.dip0.t-ipconnect.de. [2003:c9:3f4c:c600:a5cd:f10d:e606:b5e2])
-        by smtp.gmail.com with ESMTPSA id a7-20020a05620a124700b0078d667d1085sm1128144qkl.84.2024.05.03.04.01.30
+        by smtp.gmail.com with ESMTPSA id m15-20020ad44a0f000000b006a0e0e93aa7sm1107669qvz.57.2024.05.03.04.03.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 May 2024 04:01:32 -0700 (PDT)
-Date: Fri, 3 May 2024 13:01:27 +0200 (CEST)
+        Fri, 03 May 2024 04:03:20 -0700 (PDT)
+Date: Fri, 3 May 2024 13:03:15 +0200 (CEST)
 From: Sebastian Ott <sebott@redhat.com>
 To: Oliver Upton <oliver.upton@linux.dev>
 cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
@@ -64,10 +64,11 @@ cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
     James Morse <james.morse@arm.com>, 
     Suzuki K Poulose <suzuki.poulose@arm.com>, 
     Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v2 0/6] KVM: arm64: emulation for CTR_EL0
-In-Reply-To: <ZjH6mgJa-ilmPu95@linux.dev>
-Message-ID: <c7dad35e-1a7f-74fc-95f9-ffd9cdd53f95@redhat.com>
-References: <20240426104950.7382-1-sebott@redhat.com> <ZjH6mgJa-ilmPu95@linux.dev>
+Subject: Re: [PATCH v2 5/6] KVM: arm64: show writable masks for feature
+ registers
+In-Reply-To: <ZjHv14-GBafptt-m@linux.dev>
+Message-ID: <eee2b0c4-2245-15d4-b887-122e080813e9@redhat.com>
+References: <20240426104950.7382-1-sebott@redhat.com> <20240426104950.7382-6-sebott@redhat.com> <ZjHv14-GBafptt-m@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -78,25 +79,28 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII; format=flowed
 
-Hi Oliver,
-
 On Wed, 1 May 2024, Oliver Upton wrote:
-> On Fri, Apr 26, 2024 at 12:49:44PM +0200, Sebastian Ott wrote:
->> Hej folks,
->>
->> I'm looking into supporting migration between 2 Ampere Altra (Max)
->> machines (using Neoverse-N1). They are almost identical regarding
->> their feature id register state except for CTR_EL0.DIC which is set
->> on one machine but not the other.
->>
->> CTR_EL0 is currently marked as invariant and migrating a VM between
->> those 2 machines using qemu fails.
->
-> I left some feedback on the series, but in addition to that would it be
-> possible to augment the set_id_regs selftest to exercise the CTR_EL0
-> mutability?
 
-Yes, sure!
+> On Fri, Apr 26, 2024 at 12:49:49PM +0200, Sebastian Ott wrote:
+>> Instead of using ~0UL provide the actual writable mask for
+>> non-id feature registers in the output of the
+>> KVM_ARM_GET_REG_WRITABLE_MASKS ioctl.
+>
+> Urgh, yeah in retrospect I think we should've constrained this to the
+> registers KVM considers "id regs" (the space occupied by known registers
+> or otherwise RAZ).
+>
+>> Explicitely set the mask for CLIDR_EL1 to make sure we present
+>> the same value to userspace than before.
+>
+> typo: explicitly
+>
+> Also, we know the set of mutable bits for CLIDR_EL1 as it is handled in
+> set_clidr(). The mask really should match that, since the UAPI is
+> documented as "allowing userspace to know what fields can be changed for
+> the system register"
+
+Done for the next revision.
 
 Thanks,
 Sebastian
