@@ -1,190 +1,103 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6580613957E
-	for <kvmarm@lists.linux.dev>; Fri,  3 May 2024 05:13:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86303152788
+	for <kvmarm@lists.linux.dev>; Fri,  3 May 2024 11:01:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714713232; cv=none; b=o5LqyYvfu3ANAZjjVr+GEvSploHyOxf+OhsFNhg6UQx9CGesOj/+Y3w46Eq8FsCllMIAu0Uyh5WxK8PcKbCuTDGCGWGk3EWbO9gKydEGtJklryUPNoQrpvb7s4brzTu62859hS6JwHRaG9cBgqNcuNYKTMMLijA/OCVRuc8nDmM=
+	t=1714734100; cv=none; b=Gy+DIRIR3Z9CVsGwtw2Z4xHfcJdZYTplMTGlsvs5zKRsTZX8gu8yC/+ELjI+wthrwxJ64NfOltZjbnSfyoWC52cXj/0NfgXgcDBnIogCkaKqhv5F0vT+3ZpQ1SvzCAtQkQGumLjvDBtG6CWhU5yAJQXluH+zpUUL8R4Fmlx4NDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714713232; c=relaxed/simple;
-	bh=RT9/PmKCnW4nOT5ejHyHi2G/78U2RlAU3posvNIoMnQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=baG3/3eyaQyo+xNr+3xclBFSEudfml4E1sFmPCxtYiK1o2LHascZESuxbQ5pMlKezPNP0O2dOhbVYli9qZWwX3JNhqTeoLYMsxrFHlyjMrQIS1SKddQIDFD3CU5iBRNoXo4w+MmY+BGn3gmUxvYmuEgqV52eXLsmbz+Jp2jQil8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MgS1IHrR; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1714734100; c=relaxed/simple;
+	bh=UQCloiX3c/KJBlQsBJGrwnc3Ql1oJvoDpAJQP1qJtMc=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=lDP73fG1iAovhIXr3hma5dc6qnN7JD/DyPtYdkJsaR+CkX5/TzQxJAbwJ1NRhrz5e0G8rfEEJmXbiSO2WXqqj3EAfPnDQjux6TNztu4N/XY1hsWN75w5ZHNCjo/SM1lqDyK/2qilRSC9ocepqBqndgmKCDj70dZcmYuQFqO+Zoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EtC5xR75; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MgS1IHrR"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EtC5xR75"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714713229;
+	s=mimecast20190719; t=1714734097;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=Opojcr/NBDOoIzZkhJbTlqDTHfqUYKezeK7i6rDG2Vg=;
-	b=MgS1IHrRkUWANqZPw+Uu7yS9TrpR4+tUs9CAtRRhMrMgyUJfpQtA9DvSh6yLYwS3wvFkRs
-	61PAGi0OMmOsX1Zkc7g71KlRPMOzkIjRF4IUPwkSF7wMoBj6smiSeWCoDhx6BiVuv7jukw
-	ZbbVqcMIjcl82fkFjyAMJtHkoJVSelY=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+	 in-reply-to:in-reply-to:references:references;
+	bh=UQCloiX3c/KJBlQsBJGrwnc3Ql1oJvoDpAJQP1qJtMc=;
+	b=EtC5xR75m+SL09xondwotMqJpgKNEuBTUmX2VMAx0lerPhzaXWqT8t1D2gfeQ9TN729Q8P
+	R3RFkBlpHNaN9JcsD+o7QkmUOOoL50EPBrxlpHtvYvCHfG39kZhkGa33sgPnQdwXSPITJT
+	T9MaVCmlgfhB8TJITH7aScnjDLWZGac=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-553-TQJKmvQxPG2jjXUpbYOSJg-1; Fri, 03 May 2024 01:13:47 -0400
-X-MC-Unique: TQJKmvQxPG2jjXUpbYOSJg-1
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-790f55f69a7so744669585a.0
-        for <kvmarm@lists.linux.dev>; Thu, 02 May 2024 22:13:47 -0700 (PDT)
+ us-mta-647-o5zM16w1NWqt-p99q-rDew-1; Fri, 03 May 2024 07:01:34 -0400
+X-MC-Unique: o5zM16w1NWqt-p99q-rDew-1
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-790c61cdb29so601208085a.3
+        for <kvmarm@lists.linux.dev>; Fri, 03 May 2024 04:01:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714713227; x=1715318027;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Opojcr/NBDOoIzZkhJbTlqDTHfqUYKezeK7i6rDG2Vg=;
-        b=kRd9HzKfAvmSrxFe9RyajouOHECzJeE9Z6fbikvQNjEwj5LtMLMgS+1P3emIrQCtjU
-         h7+0RNcS5pJGFxHZsPxmWbMWt6phtB+Ic2Usz2NzN3BNExBzMDIBCgJMjuocVDRY8i7F
-         3aj98hJrF0iZMKz3fDJPBLB7nVHS/QbKWd98sUrwBWT9M8Pd/FfiRdyzvOv/m/O8Do72
-         mthK2Dv2RlHdGjLa97sf7eFfEusVkSqUVNVA/98NcvFHLBFRCuRU5+5f2IPEpuJfaPQn
-         PiC0hzc1hdfDfPk7TH0ZLo4a1snWvUq8Lawqya9zRjrhvVsXXCQYwJzeCzP/qJWHbgP/
-         x+mw==
-X-Forwarded-Encrypted: i=1; AJvYcCUTri4CiN+KJzjA8M8RWbg4sOhdatITpe9hvSjqmTXRpccsv64ww+3XMs6WBqFN531uP+CeYUZfn3B3a+wY08UJuiwsNrxL
-X-Gm-Message-State: AOJu0YyeHtH/fD16HHlcobDA+znKoRMSXSRVjCB2sy+evTlEYV/r4Rz7
-	nO+SvKBTCdkYLeNldDKzy+S1Olj+JkFCbaEeflPAHxKjbGeFaJtuHL5ZrecAq7mRG4A7bEGh+D+
-	3G0UGTn4ZinXIuzisF1NZhw9TRVHF+ZkdHeu9e95mApfwRqUqobUsXA==
-X-Received: by 2002:a05:620a:172b:b0:78e:d2e7:3e9e with SMTP id az43-20020a05620a172b00b0078ed2e73e9emr2131187qkb.68.1714713227320;
-        Thu, 02 May 2024 22:13:47 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG9BdZ/K1alGXgb2csMR8tC5uIoyHecq+rjFXh+y2bCp7O4HtpsnfSxnbJvLhK2n50FqDu/8g==
-X-Received: by 2002:a05:620a:172b:b0:78e:d2e7:3e9e with SMTP id az43-20020a05620a172b00b0078ed2e73e9emr2131160qkb.68.1714713226902;
-        Thu, 02 May 2024 22:13:46 -0700 (PDT)
-Received: from [192.168.0.9] (ip-109-43-179-34.web.vodafone.de. [109.43.179.34])
-        by smtp.gmail.com with ESMTPSA id fj15-20020a05622a550f00b00434946547d3sm1183826qtb.53.2024.05.02.22.13.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 May 2024 22:13:46 -0700 (PDT)
-Message-ID: <4b934481-49f9-42e6-87f5-74318f2597db@redhat.com>
-Date: Fri, 3 May 2024 07:13:39 +0200
+        d=1e100.net; s=20230601; t=1714734093; x=1715338893;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UQCloiX3c/KJBlQsBJGrwnc3Ql1oJvoDpAJQP1qJtMc=;
+        b=ShVROq4MTCFMMxM3QYQ7M0CEB1rhx5UUmHSnVd1Yaj2jEmN7BcNcHLlyAcu4DYKK2L
+         1FdqDNxgUawM2yimAyNfcF9LaXZAWkRk3Ph37IpDPQGN64ZEZPAwSkbfYleOwx8G+lKT
+         pl10mdzmXP4JgfQY9955sddrdKwpc/XlrGbBPTLH+w/O2uiAKkFh2qrbbTQ5lz1nCTj6
+         evcn179RI5zrDH55R0cciX3PNX3l9NjE66F+2IUaPM/WwJXWYH/cBOeq51PMRbt2zyVD
+         vRplF9kCpbuNU/YA9nNNjUD9k0NsmFgCYZdtJzv3bh49gYFytSQXsqcbtrjLNU+TM8D7
+         uQ2Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUWI5D0nY1eBo/qbbhdYBdgBvrQ8nOzBSDZIQpSDvAExOwmekkUlTLKMwRJZyfv3na//tW8KD8mBFMee2B8B5W3VuvXEDHa
+X-Gm-Message-State: AOJu0YyG1dqIn+za7GzJnW2NNWbSkM/DU2z32RPw2MLWOp7C4ssy3HNf
+	j+jV+6togpkzzCBqdtJ5R6sSOkxQ71dT8OL/hBdj+R80GYexPpwQ8y7qiYDewGM9ZaRzt7pxLqk
+	kelC9TkYsfS5EGD3cH4D3Tp8hOO+Sa1oiCGaHnQ3UdTNOE4LdoCUo7vWv3KO8ig==
+X-Received: by 2002:a05:620a:4412:b0:78d:6377:33a6 with SMTP id v18-20020a05620a441200b0078d637733a6mr2934062qkp.66.1714734093390;
+        Fri, 03 May 2024 04:01:33 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEO6LE/GI/eMlo7xlWJ52xIvHraHShveurskORqRDPjdGmEWvDY/jklm4FvgSaNXa9nLceCgg==
+X-Received: by 2002:a05:620a:4412:b0:78d:6377:33a6 with SMTP id v18-20020a05620a441200b0078d637733a6mr2934028qkp.66.1714734092998;
+        Fri, 03 May 2024 04:01:32 -0700 (PDT)
+Received: from rh (p200300c93f4cc600a5cdf10de606b5e2.dip0.t-ipconnect.de. [2003:c9:3f4c:c600:a5cd:f10d:e606:b5e2])
+        by smtp.gmail.com with ESMTPSA id a7-20020a05620a124700b0078d667d1085sm1128144qkl.84.2024.05.03.04.01.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 May 2024 04:01:32 -0700 (PDT)
+Date: Fri, 3 May 2024 13:01:27 +0200 (CEST)
+From: Sebastian Ott <sebott@redhat.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+    linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>, 
+    James Morse <james.morse@arm.com>, 
+    Suzuki K Poulose <suzuki.poulose@arm.com>, 
+    Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v2 0/6] KVM: arm64: emulation for CTR_EL0
+In-Reply-To: <ZjH6mgJa-ilmPu95@linux.dev>
+Message-ID: <c7dad35e-1a7f-74fc-95f9-ffd9cdd53f95@redhat.com>
+References: <20240426104950.7382-1-sebott@redhat.com> <ZjH6mgJa-ilmPu95@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v3 0/5] add shellcheck support
-To: Nicholas Piggin <npiggin@gmail.com>, Andrew Jones <andrew.jones@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Eric Auger <eric.auger@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, =?UTF-8?Q?Nico_B=C3=B6hr?=
- <nrb@linux.ibm.com>, David Hildenbrand <david@redhat.com>,
- Shaoqin Huang <shahuang@redhat.com>,
- Nikos Nikoleris <nikos.nikoleris@arm.com>,
- David Woodhouse <dwmw@amazon.co.uk>, Ricardo Koller <ricarkol@google.com>,
- rminmin <renmm6@chinaunicom.cn>, Gavin Shan <gshan@redhat.com>,
- Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
- Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org,
- linux-s390@vger.kernel.org
-References: <20240501112938.931452-1-npiggin@gmail.com>
- <2be99a78-878c-4819-8c42-1b795019af2f@redhat.com>
- <20240502-d231f770256b3ed812eb4246@orel>
- <28975cc5-ef8f-4471-baca-0bb792a62084@redhat.com>
- <D0ZQV7VH839A.3RQVN9RKAGH2N@gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-In-Reply-To: <D0ZQV7VH839A.3RQVN9RKAGH2N@gmail.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 
-On 03/05/2024 07.02, Nicholas Piggin wrote:
-> On Thu May 2, 2024 at 7:34 PM AEST, Thomas Huth wrote:
->> On 02/05/2024 10.56, Andrew Jones wrote:
->>> On Thu, May 02, 2024 at 10:23:22AM GMT, Thomas Huth wrote:
->>>> On 01/05/2024 13.29, Nicholas Piggin wrote:
->>>>> This is based on upstream directly now, not ahead of the powerpc
->>>>> series.
->>>>
->>>> Thanks! ... maybe you could also rebase the powerpc series on this now? (I
->>>> haven't forgotten about it, just did not find enough spare time for more
->>>> reviewing yet)
->>>>
->>>>> Since v2:
->>>>> - Rebased to upstream with some patches merged.
->>>>> - Just a few comment typos and small issues (e.g., quoting
->>>>>      `make shellcheck` in docs) that people picked up from the
->>>>>      last round.
->>>>
->>>> When I now run "make shellcheck", I'm still getting an error:
->>>>
->>>> In config.mak line 16:
->>>> AR=ar
->>>> ^-- SC2209 (warning): Use var=$(command) to assign output (or quote to
->>>> assign string).
->>>
->>> I didn't see this one when testing. I have shellcheck version 0.9.0.
+Hi Oliver,
+
+On Wed, 1 May 2024, Oliver Upton wrote:
+> On Fri, Apr 26, 2024 at 12:49:44PM +0200, Sebastian Ott wrote:
+>> Hej folks,
 >>
->> I'm also using 0.9.0 (from Fedora). Maybe we've got a different default config?
-> 
-> I have 0.10.0 from Debian with no changes to config defaults and no
-> warning.
+>> I'm looking into supporting migration between 2 Ampere Altra (Max)
+>> machines (using Neoverse-N1). They are almost identical regarding
+>> their feature id register state except for CTR_EL0.DIC which is set
+>> on one machine but not the other.
+>>
+>> CTR_EL0 is currently marked as invariant and migrating a VM between
+>> those 2 machines using qemu fails.
+>
+> I left some feedback on the series, but in addition to that would it be
+> possible to augment the set_id_regs selftest to exercise the CTR_EL0
+> mutability?
 
-If I understood it correctly, it warns for AR=ar but it does not warn for 
-AR=powerpc-linux-gnu-ar ... could you try the first term, too, if you 
-haven't done so yet?
+Yes, sure!
 
->> Anyway, I'm in favor of turning this warning of in the config file, it does
->> not seem to be really helpful in my eyes. What do you think?
-> 
-> Maybe it would be useful. I don't mind quoting strings usually, although
-> for this kind of pattern it's a bit pointless and config.mak is also
-> Makefile so that has its own issues. Maybe just disable it for this
-> file?
-
-Yes, either for this file only, or globally ... I don't mind. Could you send 
-a patch, please?
-
-  Thanks,
-   Thomas
+Thanks,
+Sebastian
 
