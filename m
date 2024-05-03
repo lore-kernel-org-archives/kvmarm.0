@@ -1,145 +1,132 @@
-Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 656991CD1B
-	for <kvmarm@lists.linux.dev>; Thu,  2 May 2024 23:35:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C31AC139573
+	for <kvmarm@lists.linux.dev>; Fri,  3 May 2024 05:02:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714692954; cv=none; b=goF8z25I2Ew+Z7pm0cZSlMcwGjZ3GtL8PBOsM9R7J3T7720FatRgRuukktpoHpsYyByDBCrKnH3Y+w1OK1Ya0R/GMxEgnfAInA4E4E38dMckqJvQZ17IyeXDyl/VCKAym2/jicS9docBKjwIjoorGFzTlNvkNVMbUIolupKSYWA=
+	t=1714712557; cv=none; b=r7HtdFWRauIzEKt4wvESe3ArjZusyGMHXyp66eCuDTbAPjniCPm0VRmdIzf+R1BAX55Ncx6UmQFEHVbTCO58AwOqofDmSgECamBil+MOoJPvvB5IjXWD1oJ7ibKHyDQlOjQQR46ijcXH43UcqpAQi1O+aC0n4q+RXaAH2MXEXaU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714692954; c=relaxed/simple;
-	bh=MkTKcsNjpYm67jVJq82wfXVhx/LS9ZXWyVJQ9KtOfQk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sq2oLWB9v6HP0j3J99dqwYOftPCiDRzGYCfwIomB/jallSa3OnMajEtQmMVekKphy4dbTNzBJpP/zmGqnrmItU4TPjhN5oPkx8jz39RZUKSzkf0BtrruxhUzQJqMIjcYTsTAqYVyzDki6Qta1p+Oz+XvrJwwOA3s+CDIVJl6kXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IboQdNhj; arc=none smtp.client-ip=95.215.58.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1714712557; c=relaxed/simple;
+	bh=cBnukY5BlVrNn1vJZEl4M/AF9tgtsErHvbbW5hT/4YE=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=YM1wtMOrfZo/Uig9eLLOw8hqqmH+Yb/Z6Tl6RIB8kZXm+VAoJyPOipOmWBeDNlio3Kd9NvkjxjF1Rr0rGEt3E1qMRnR+WU+RSfi8MbbusWyMD+v5kqJfSi7QL9vTXAIywdXmluJnkOwH3NfdWA0qgYI86PGNbZQTrlDT5hkUOj4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mQvHXQF8; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IboQdNhj"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1714692950;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+Tg7qjCxvhgA3RWWPmq2IOILHp7FltuPh3I+Xqg9cvU=;
-	b=IboQdNhjnEUVyWn4TPkIH9OuLBsUPGSeoccMa844NBi0QPRDtCQXGfNx2FDsRySmiMUlkt
-	N8LiP5qCGeLsSOfmaG+W/J7Th/1MIUEDfqPpm4bw7UYcx2n3MMWtuoIGEc6HD36eRuuUGO
-	ZFpH3EJ8SEZb/9gsVbRlLiCDQf1AhuE=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	kvm@vger.kernel.org,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 7/7] KVM: selftests: Test vCPU-scoped feature ID registers
-Date: Thu,  2 May 2024 23:35:29 +0000
-Message-ID: <20240502233529.1958459-8-oliver.upton@linux.dev>
-In-Reply-To: <20240502233529.1958459-1-oliver.upton@linux.dev>
-References: <20240502233529.1958459-1-oliver.upton@linux.dev>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mQvHXQF8"
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1eab16dcfd8so75817395ad.0
+        for <kvmarm@lists.linux.dev>; Thu, 02 May 2024 22:02:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1714712555; x=1715317355; darn=lists.linux.dev;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rSj/KgnGwyOGI4p8uMj4rCvUcJ//GtBOBEMmF6tDu80=;
+        b=mQvHXQF8AL1FqG71c0b8LK4rGKW+tIIZe/7R+T5HhaEDH2NmdG6TSsXZ3+idwynlCv
+         F1zHNt5nsWGGU+rRFPzgqhgO3RkGlPatIH67nb4ikweihJMHbVMU+j1+bU+QcqILiEFT
+         0Cf3i8JbkiYRsCzdKOHRAajDHPzUpq+So1kzDZR1sn6y7syr7jXLxlOIgeHqNNiQvSvZ
+         WSFbkCgg1kxy2sGpReVtVrYHxnS/TzEaU3cfyz0cRAKZyQxMQ3E4gIOiH6WavKWdgzMp
+         aWmuunepR3EtoGgBvB8tbIv/Src0UxEwY4HZwyt5dsubCax96WBtL+50PaGEOudaEO+R
+         hY8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714712555; x=1715317355;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=rSj/KgnGwyOGI4p8uMj4rCvUcJ//GtBOBEMmF6tDu80=;
+        b=omy+o4533CnCCgjPWmZkVVuNc2oPNd/ccovYXdgVURrOsGGjT+AQS8lTmonDwjIe/m
+         Vv6nearlIGoiuPvTxO7QvTtqV6LmjePg8SPeHdIf5Cz3bl0O6+qYSk7IxzfUnXUEEY5M
+         PrHkvR7AuGGj1MLFXy4ZiDTFfgxPb/xl/wE5ckxFSq53TMvTFsvDzAMYTN7JRArn+t7E
+         491n49kGDlqHRDypNGmP++AHU8CYYynyR0YdRCXEZngJDv9Iiv8B4Zxqrl3+DgPz1roX
+         1KK1d1rL8Wd0fdRjGUnzeI+Q+74x46YIIX98MFYcodTEzWd5Y0K5zix8FgsmOqQYNUeu
+         QsbA==
+X-Forwarded-Encrypted: i=1; AJvYcCWHcX910MRF3p3IQIx142Ic+OlxfQ3KV7R6wqZEcXfmng5nsdyIVu7HGr1jmT4BYsmZbilsyrHhyrwpYZvxaC1v7+PzssNz
+X-Gm-Message-State: AOJu0Yz8ZcvBtWaatTcfU8aZ+DR7+oMzf2SZMAjrbMYa+8SeJC3fucOD
+	C9XLd07vKGzK+bulQzWUP9GLKLDfnfZmaz8oZYXL9ozCG9r3dePz
+X-Google-Smtp-Source: AGHT+IFil96wxl7AFEXpq/OhBznWcb6U94Zimx6qI1nJZL3/eDpQObCrL1s7ZXi943oAIQ3oBq6JcQ==
+X-Received: by 2002:a17:902:efd1:b0:1ec:76a6:ea9 with SMTP id ja17-20020a170902efd100b001ec76a60ea9mr1638628plb.26.1714712555147;
+        Thu, 02 May 2024 22:02:35 -0700 (PDT)
+Received: from localhost ([1.146.23.181])
+        by smtp.gmail.com with ESMTPSA id i11-20020a17090332cb00b001e9685ad053sm2287720plr.248.2024.05.02.22.02.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 02 May 2024 22:02:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 03 May 2024 15:02:23 +1000
+Message-Id: <D0ZQV7VH839A.3RQVN9RKAGH2N@gmail.com>
+Cc: "Paolo Bonzini" <pbonzini@redhat.com>, "Alexandru Elisei"
+ <alexandru.elisei@arm.com>, "Eric Auger" <eric.auger@redhat.com>, "Janosch
+ Frank" <frankja@linux.ibm.com>, "Claudio Imbrenda"
+ <imbrenda@linux.ibm.com>, =?utf-8?q?Nico_B=C3=B6hr?= <nrb@linux.ibm.com>,
+ "David Hildenbrand" <david@redhat.com>, "Shaoqin Huang"
+ <shahuang@redhat.com>, "Nikos Nikoleris" <nikos.nikoleris@arm.com>, "David
+ Woodhouse" <dwmw@amazon.co.uk>, "Ricardo Koller" <ricarkol@google.com>,
+ "rminmin" <renmm6@chinaunicom.cn>, "Gavin Shan" <gshan@redhat.com>, "Nina
+ Schoetterl-Glausch" <nsg@linux.ibm.com>, "Sean Christopherson"
+ <seanjc@google.com>, <kvm@vger.kernel.org>, <kvmarm@lists.linux.dev>,
+ <kvm-riscv@lists.infradead.org>, <linux-s390@vger.kernel.org>
+Subject: Re: [kvm-unit-tests PATCH v3 0/5] add shellcheck support
+From: "Nicholas Piggin" <npiggin@gmail.com>
+To: "Thomas Huth" <thuth@redhat.com>, "Andrew Jones"
+ <andrew.jones@linux.dev>
+X-Mailer: aerc 0.17.0
+References: <20240501112938.931452-1-npiggin@gmail.com>
+ <2be99a78-878c-4819-8c42-1b795019af2f@redhat.com>
+ <20240502-d231f770256b3ed812eb4246@orel>
+ <28975cc5-ef8f-4471-baca-0bb792a62084@redhat.com>
+In-Reply-To: <28975cc5-ef8f-4471-baca-0bb792a62084@redhat.com>
 
-Test that CLIDR_EL1 and MPIDR_EL1 are modifiable from userspace and that
-the values are preserved across a vCPU reset like the other feature ID
-registers.
+On Thu May 2, 2024 at 7:34 PM AEST, Thomas Huth wrote:
+> On 02/05/2024 10.56, Andrew Jones wrote:
+> > On Thu, May 02, 2024 at 10:23:22AM GMT, Thomas Huth wrote:
+> >> On 01/05/2024 13.29, Nicholas Piggin wrote:
+> >>> This is based on upstream directly now, not ahead of the powerpc
+> >>> series.
+> >>
+> >> Thanks! ... maybe you could also rebase the powerpc series on this now=
+? (I
+> >> haven't forgotten about it, just did not find enough spare time for mo=
+re
+> >> reviewing yet)
+> >>
+> >>> Since v2:
+> >>> - Rebased to upstream with some patches merged.
+> >>> - Just a few comment typos and small issues (e.g., quoting
+> >>>     `make shellcheck` in docs) that people picked up from the
+> >>>     last round.
+> >>
+> >> When I now run "make shellcheck", I'm still getting an error:
+> >>
+> >> In config.mak line 16:
+> >> AR=3Dar
+> >> ^-- SC2209 (warning): Use var=3D$(command) to assign output (or quote =
+to
+> >> assign string).
+> >=20
+> > I didn't see this one when testing. I have shellcheck version 0.9.0.
+>
+> I'm also using 0.9.0 (from Fedora). Maybe we've got a different default c=
+onfig?
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- .../selftests/kvm/aarch64/set_id_regs.c       | 53 ++++++++++++++++++-
- 1 file changed, 52 insertions(+), 1 deletion(-)
+I have 0.10.0 from Debian with no changes to config defaults and no
+warning.
 
-diff --git a/tools/testing/selftests/kvm/aarch64/set_id_regs.c b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-index 24b248c78f5d..a7de39fa2a0a 100644
---- a/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-+++ b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-@@ -457,6 +457,53 @@ static void test_guest_reg_read(struct kvm_vcpu *vcpu)
- 	}
- }
- 
-+/* Politely lifted from arch/arm64/include/asm/cache.h */
-+/* Ctypen, bits[3(n - 1) + 2 : 3(n - 1)], for n = 1 to 7 */
-+#define CLIDR_CTYPE_SHIFT(level)	(3 * (level - 1))
-+#define CLIDR_CTYPE_MASK(level)		(7 << CLIDR_CTYPE_SHIFT(level))
-+#define CLIDR_CTYPE(clidr, level)	\
-+	(((clidr) & CLIDR_CTYPE_MASK(level)) >> CLIDR_CTYPE_SHIFT(level))
-+
-+static void test_clidr(struct kvm_vcpu *vcpu)
-+{
-+	uint64_t clidr;
-+	int level;
-+
-+	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_CLIDR_EL1), &clidr);
-+
-+	/* find the first empty level in the cache hierarchy */
-+	for (level = 1; level < 7; level++) {
-+		if (!CLIDR_CTYPE(clidr, level))
-+			break;
-+	}
-+
-+	/*
-+	 * If you have a mind-boggling 7 levels of cache, congratulations, you
-+	 * get to fix this.
-+	 */
-+	TEST_ASSERT(level <= 7, "can't find an empty level in cache hierarchy");
-+
-+	/* stick in a unified cache level */
-+	clidr |= BIT(2) << CLIDR_CTYPE_SHIFT(level);
-+
-+	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_CLIDR_EL1), clidr);
-+	test_reg_vals[encoding_to_range_idx(SYS_CLIDR_EL1)] = clidr;
-+}
-+
-+static void test_vcpu_ftr_id_regs(struct kvm_vcpu *vcpu)
-+{
-+	u64 val;
-+
-+	test_clidr(vcpu);
-+
-+	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_MPIDR_EL1), &val);
-+	val++;
-+	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_MPIDR_EL1), val);
-+
-+	test_reg_vals[encoding_to_range_idx(SYS_MPIDR_EL1)] = val;
-+	ksft_test_result_pass("%s\n", __func__);
-+}
-+
- static void test_assert_id_reg_unchanged(struct kvm_vcpu *vcpu, uint32_t encoding)
- {
- 	size_t idx = encoding_to_range_idx(encoding);
-@@ -477,6 +524,8 @@ static void test_reset_preserves_id_regs(struct kvm_vcpu *vcpu)
- 	for (int i = 0; i < ARRAY_SIZE(test_regs); i++)
- 		test_assert_id_reg_unchanged(vcpu, test_regs[i].reg);
- 
-+	test_assert_id_reg_unchanged(vcpu, SYS_CLIDR_EL1);
-+
- 	ksft_test_result_pass("%s\n", __func__);
- }
- 
-@@ -504,11 +553,13 @@ int main(void)
- 		   ARRAY_SIZE(ftr_id_aa64isar2_el1) + ARRAY_SIZE(ftr_id_aa64pfr0_el1) +
- 		   ARRAY_SIZE(ftr_id_aa64mmfr0_el1) + ARRAY_SIZE(ftr_id_aa64mmfr1_el1) +
- 		   ARRAY_SIZE(ftr_id_aa64mmfr2_el1) + ARRAY_SIZE(ftr_id_aa64zfr0_el1) -
--		   ARRAY_SIZE(test_regs) + 1;
-+		   ARRAY_SIZE(test_regs) + 2;
- 
- 	ksft_set_plan(test_cnt);
- 
- 	test_vm_ftr_id_regs(vcpu, aarch64_only);
-+	test_vcpu_ftr_id_regs(vcpu);
-+
- 	test_guest_reg_read(vcpu);
- 
- 	test_reset_preserves_id_regs(vcpu);
--- 
-2.45.0.rc1.225.g2a3ae87e7f-goog
+> Anyway, I'm in favor of turning this warning of in the config file, it do=
+es=20
+> not seem to be really helpful in my eyes. What do you think?
 
+Maybe it would be useful. I don't mind quoting strings usually, although
+for this kind of pattern it's a bit pointless and config.mak is also
+Makefile so that has its own issues. Maybe just disable it for this
+file?
+
+Thanks,
+Nick
