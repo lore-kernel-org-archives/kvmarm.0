@@ -1,50 +1,50 @@
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C2AE15664E
-	for <kvmarm@lists.linux.dev>; Fri,  3 May 2024 16:40:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 432AE15687B
+	for <kvmarm@lists.linux.dev>; Fri,  3 May 2024 16:42:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714754432; cv=none; b=MujYCx5+X7eJA/efbZMTHvCUfsJn2aXVpNehII1mB7YrkF4zEGRnaU08dbuBXDW3GAwEgli+UJjGnpZFSeTZAYoAnmKFIFtZYhI8v+rDJWHAQW1n2CbJAR9d3Kk2VNYFupQETpd50toSiJspXU62+w52tEoY8vBI8IQczgXRW+U=
+	t=1714754523; cv=none; b=RXoZWPsGYBlVHPBqH8fd60FJzBnRSKeo14JA5fywSMZSs5zdwwzDlyNi1bLq20eAPO4ZKtGhEsrBxNXohLi9Tcv2w30Xo00qit87h/dY3OeA2GGtq/bivYvFTvjft58UqmcnC/45WUSn1NuEYPi/wVOnfEREEezAdT3MEJ3Ljsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714754432; c=relaxed/simple;
-	bh=afuhIcn+KnbmlnxcksoTFD/Eau0u6FHBSn65PM/SyrM=;
+	s=arc-20240116; t=1714754523; c=relaxed/simple;
+	bh=6yaN6Tg5Pi5uYX9aCa0y3OfnrA67rHUXaDA4i8gsLlY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GQyEZKc8npRM+hwmrd1Mk1/J087rS8uLr/ewIksAfCFhzn1DalwLmW5c2DKV+tEiU2wusmuRc0B+PCYzh7roGASSNJGulTWKbk19xfjym9tJEY6UpxB73/wYp4hUioD7AeCK9F973aLkbpPXHTRAIB0cLSemHjcdOLLqQlxJhgU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Xvo3FuOd; arc=none smtp.client-ip=192.198.163.18
+	 In-Reply-To:Content-Type; b=cye86DrstBflidHJHAu/dH/PCIi3r/NN+C72uYT0jq1XddZ3n4Vu3IXj/oLbVPtJTTRXASe+aHlZb35lh4PFmb6spSwvDDy6BZ458VJLlsVYTdcX9WazpjOtRZPb6x9b0bfeONbH/QzAQrju9GiL7w7/71aElXGcoDBY45NvrLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iSPTLegI; arc=none smtp.client-ip=192.198.163.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Xvo3FuOd"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iSPTLegI"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714754431; x=1746290431;
+  t=1714754521; x=1746290521;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=afuhIcn+KnbmlnxcksoTFD/Eau0u6FHBSn65PM/SyrM=;
-  b=Xvo3FuOdPgPP32/xYHSDTfsbZcGeWr2mBGNlyUDu6HR7zJY7mQB1s5T6
-   nUAtd2xPQLm0inLduTb4R5AHHl0piMFY2sIIgGKrUVXzP11QdyCzckNEf
-   uA7t4eVXmyIqktxWh9tvtQuzEhIrc2Odu9UnSxH0B+PaQUMcw79+7gA/m
-   iAlH8s7LBPKIPENA48rqbDLAAc6sbofYd+Z5NMjnbOKnpGwBouPS00wSO
-   U9Uj7dC1ilpHF1++H5OOjRojSk/XQ+4Eyenmv5nnuo8miQoGsfoXHAwXi
-   rMZ2pXdRHBCfzZJy+7AaR88TzjDulzx8jiIsiSh09EwdHKX2o8WZYqcyT
-   w==;
-X-CSE-ConnectionGUID: mHgz9tO7TniK9BKgFPVHSw==
-X-CSE-MsgGUID: 2DYnopSPTSS9nZVmUqGKrg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11063"; a="10415243"
+  bh=6yaN6Tg5Pi5uYX9aCa0y3OfnrA67rHUXaDA4i8gsLlY=;
+  b=iSPTLegIj/6vB0FGLyYwjj0QQCIwKadP9vdNn+tbRtSUIjDuAOGqMmLc
+   P69Zyib99JBdFojmsJ/8dnWInzpHwbGApq6drzaGuOdPyoa/hURUqFfZ0
+   4u8OQjwi2uJEpGRfkQZKm1wqV+BtC4ju4CeS/F5EdmPAeg2oRtnCf2V0m
+   S0C6KqICiLNo9iulSb/c8e4rpi31L/uyIrTCcEGIhTsyY4s9/TbmRTzDd
+   hxpMYVfd8Y7Rp1GrOON8EOzKvdvBSwp1tPD/zTKfXgV85hqJ9nnfWWBrT
+   3WLQLtgTy+fhgZp812ILx2DZ7pCD9PHUqW/BBH+luGssfMkG9BcCOJ5ys
+   g==;
+X-CSE-ConnectionGUID: 08/oui/TSjqMoBLIhbz/Gg==
+X-CSE-MsgGUID: vMV6WxGNR9eSQJiNEIiqYQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11063"; a="10415368"
 X-IronPort-AV: E=Sophos;i="6.07,251,1708416000"; 
-   d="scan'208";a="10415243"
+   d="scan'208";a="10415368"
 Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 May 2024 09:40:30 -0700
-X-CSE-ConnectionGUID: jYQW6nhdQcedFYGCt+rcKw==
-X-CSE-MsgGUID: w/v+uGqARHWwlAUYgs4d1w==
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 May 2024 09:42:00 -0700
+X-CSE-ConnectionGUID: K6Vn7gjMR26u5PtnJMH4hA==
+X-CSE-MsgGUID: 6T7K0AKiRK+99ocJX5AK6w==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,251,1708416000"; 
-   d="scan'208";a="32305593"
+   d="scan'208";a="32305945"
 Received: from zhangche-mobl.amr.corp.intel.com (HELO [10.209.82.31]) ([10.209.82.31])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 May 2024 09:40:29 -0700
-Message-ID: <059eeeef-95ad-460b-9908-441834e3327b@intel.com>
-Date: Fri, 3 May 2024 09:40:29 -0700
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 May 2024 09:41:58 -0700
+Message-ID: <37447227-b478-4751-953f-b7199a6a55d0@intel.com>
+Date: Fri, 3 May 2024 09:41:57 -0700
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -52,7 +52,7 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 02/29] x86/mm: add ARCH_PKEY_BITS to Kconfig
+Subject: Re: [PATCH v4 03/29] mm: use ARCH_PKEY_BITS to define VM_PKEY_BITN
 To: Joey Gouly <joey.gouly@arm.com>, linux-arm-kernel@lists.infradead.org
 Cc: akpm@linux-foundation.org, aneesh.kumar@kernel.org,
  aneesh.kumar@linux.ibm.com, bp@alien8.de, broonie@kernel.org,
@@ -64,7 +64,7 @@ Cc: akpm@linux-foundation.org, aneesh.kumar@kernel.org,
  szabolcs.nagy@arm.com, tglx@linutronix.de, will@kernel.org, x86@kernel.org,
  kvmarm@lists.linux.dev
 References: <20240503130147.1154804-1-joey.gouly@arm.com>
- <20240503130147.1154804-3-joey.gouly@arm.com>
+ <20240503130147.1154804-4-joey.gouly@arm.com>
 From: Dave Hansen <dave.hansen@intel.com>
 Content-Language: en-US
 Autocrypt: addr=dave.hansen@intel.com; keydata=
@@ -110,11 +110,31 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
  hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
  vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <20240503130147.1154804-3-joey.gouly@arm.com>
+In-Reply-To: <20240503130147.1154804-4-joey.gouly@arm.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 5/3/24 06:01, Joey Gouly wrote:
-> The new config option specifies how many bits are in each PKEY.
+>  #ifdef CONFIG_ARCH_HAS_PKEYS
+> -# define VM_PKEY_SHIFT	VM_HIGH_ARCH_BIT_0
+> -# define VM_PKEY_BIT0	VM_HIGH_ARCH_0	/* A protection key is a 4-bit value */
+> -# define VM_PKEY_BIT1	VM_HIGH_ARCH_1	/* on x86 and 5-bit value on ppc64   */
+> -# define VM_PKEY_BIT2	VM_HIGH_ARCH_2
+> -# define VM_PKEY_BIT3	VM_HIGH_ARCH_3
+> -#ifdef CONFIG_PPC
+> +# define VM_PKEY_SHIFT VM_HIGH_ARCH_BIT_0
+> +# define VM_PKEY_BIT0  VM_HIGH_ARCH_0
+> +# define VM_PKEY_BIT1  VM_HIGH_ARCH_1
+> +# define VM_PKEY_BIT2  VM_HIGH_ARCH_2
+> +#if CONFIG_ARCH_PKEY_BITS > 3
+> +# define VM_PKEY_BIT3  VM_HIGH_ARCH_3
+> +#else
+> +# define VM_PKEY_BIT3  0
+> +#endif
+> +#if CONFIG_ARCH_PKEY_BITS > 4
+
+It's certainly not pretty, but it does get the arch #ifdef out of
+generic code.  We might need to rethink this if we get another
+architecture or two, but this seems manageable for now.
 
 Acked-by: Dave Hansen <dave.hansen@linux.intel.com>
