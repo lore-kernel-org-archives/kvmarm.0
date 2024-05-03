@@ -1,130 +1,190 @@
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 079D1139581
-	for <kvmarm@lists.linux.dev>; Fri,  3 May 2024 05:11:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6580613957E
+	for <kvmarm@lists.linux.dev>; Fri,  3 May 2024 05:13:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714713118; cv=none; b=NGVywGXMK0ZlKhWQAF9cqmGhNAMBQ7O8qWVV27zdFGVtmdJ/fNfZSa6PaQmVxgyPawMrOrRBsibiWKcCVUvbUvxdZs5RNzP1mm9UyL2MhBGDe8WOdBfS17zxt75HueNuNSxDZuPRmG1ff1VlevsDTfeWOcUpE6GacDcwNPFiIcM=
+	t=1714713232; cv=none; b=o5LqyYvfu3ANAZjjVr+GEvSploHyOxf+OhsFNhg6UQx9CGesOj/+Y3w46Eq8FsCllMIAu0Uyh5WxK8PcKbCuTDGCGWGk3EWbO9gKydEGtJklryUPNoQrpvb7s4brzTu62859hS6JwHRaG9cBgqNcuNYKTMMLijA/OCVRuc8nDmM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714713118; c=relaxed/simple;
-	bh=2lI+5lKent2K8tEuLFRUnH6ZlkICjJQbZ5of0+WIQ6k=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=SFXb9lk3FFDCwvSPhvQGekVg/G/9qVsh1I/JYBHX4a9O/X2028FtHZ0k7xS6MUgOjoadtapdr/1Dfa1pvhG9WkhDD1Kf7YEfIykAeH5PHIwaifsmEIHqoXTDxQ2uf+HWM8mrwMsj3C3GMRsL0IQyn3qPxi4TKaMa6vD8jl2ogsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f5PG1wCy; arc=none smtp.client-ip=209.85.216.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1714713232; c=relaxed/simple;
+	bh=RT9/PmKCnW4nOT5ejHyHi2G/78U2RlAU3posvNIoMnQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=baG3/3eyaQyo+xNr+3xclBFSEudfml4E1sFmPCxtYiK1o2LHascZESuxbQ5pMlKezPNP0O2dOhbVYli9qZWwX3JNhqTeoLYMsxrFHlyjMrQIS1SKddQIDFD3CU5iBRNoXo4w+MmY+BGn3gmUxvYmuEgqV52eXLsmbz+Jp2jQil8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MgS1IHrR; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f5PG1wCy"
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-2b27c660174so2895178a91.1
-        for <kvmarm@lists.linux.dev>; Thu, 02 May 2024 22:11:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714713116; x=1715317916; darn=lists.linux.dev;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qVJQnrNe19hzb8iS6Qtrjnpbg6L6T8f/09LfWI/32Yk=;
-        b=f5PG1wCyJUtmSXrQUQZtYf6OBWBtobNQ+N9CfajVY8M0rY3qeQ1g65Sj1tV3s04SEb
-         xSG+HU95PapETxccszEshbPWW3oSQ3CgkDVRB7v1nD7g/FgxsB982DDau8JzOGvg33Jd
-         tD/PLmoW9yO3GfQ8QRisI6a6e3P1MSgGJlruYf0hoNd89X1Ze3syAeGi4+Q+V8y9taFg
-         7JYWniHDuoxLv6ioad8ongzopqVVXd05+WaEjCUjJsdwvDI6TU86EBaCQAD+La8TI2aR
-         FFglgmHzSBByY0q5FpcgmMCQYHieHQye17Mz9Q+iFD43gHGXOnLsJiv9CLEnfHB6EoRS
-         wuAw==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MgS1IHrR"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1714713229;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=Opojcr/NBDOoIzZkhJbTlqDTHfqUYKezeK7i6rDG2Vg=;
+	b=MgS1IHrRkUWANqZPw+Uu7yS9TrpR4+tUs9CAtRRhMrMgyUJfpQtA9DvSh6yLYwS3wvFkRs
+	61PAGi0OMmOsX1Zkc7g71KlRPMOzkIjRF4IUPwkSF7wMoBj6smiSeWCoDhx6BiVuv7jukw
+	ZbbVqcMIjcl82fkFjyAMJtHkoJVSelY=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-553-TQJKmvQxPG2jjXUpbYOSJg-1; Fri, 03 May 2024 01:13:47 -0400
+X-MC-Unique: TQJKmvQxPG2jjXUpbYOSJg-1
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-790f55f69a7so744669585a.0
+        for <kvmarm@lists.linux.dev>; Thu, 02 May 2024 22:13:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714713116; x=1715317916;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=qVJQnrNe19hzb8iS6Qtrjnpbg6L6T8f/09LfWI/32Yk=;
-        b=ez69OUn4HDRwgTAvuzlTSOIuGKq3Qye3zQf5ZkCaGlwFQ+8WeNuabC45jB7kIgWF1U
-         bXhXiKEj2mER/Umc508sRnuU5YCNXtneVwXu1iMkQyOTjdozaQ916csZLv/R589Uefxm
-         4ieIzi3e+5pGqFVeo+BWOJU4uEkr37WKzuxtZA9F4emSk+7pswZmj/M0nJPXVzu6GR+n
-         XBkCC4J8oDAQz/QLOYSUoFB9iTpD45Yk+rIz9mZRq7grRvqwXowmbPctGlOrbJGCYQfI
-         jndGtFrC2HqpQjzE6C9o31qklwX509I+wvVg6bx78pmof92j+pufbaHmOtRfvJtFRKdF
-         DObg==
-X-Forwarded-Encrypted: i=1; AJvYcCWpFWgxweCFRL4dD6QXJiUQTKPUOLO7ev5Oy1mQrwJYcAiqpMne7dZrmO7eeNiu5ruLdp0TzKSya0Z67NFI2/yjqgoE6dKn
-X-Gm-Message-State: AOJu0YzPyiOoiey0+sFfzab9pRG0ytG7JMfsarcMstBkXMgeVv/mrRTH
-	7Bk+GJ5t4T0i+kHQ8ObnDnRrUfcdTBmECO988RkKh+POHfpZqPJx
-X-Google-Smtp-Source: AGHT+IHox6xrs93zfziRXboCiLK3uSx/+vq6kzUGkZmLDAOcPgXDcKKDNFmojfiV9iUbmzdN9EOATQ==
-X-Received: by 2002:a17:90a:598b:b0:2b2:142d:5bba with SMTP id l11-20020a17090a598b00b002b2142d5bbamr1776837pji.17.1714713116223;
-        Thu, 02 May 2024 22:11:56 -0700 (PDT)
-Received: from localhost ([1.146.23.181])
-        by smtp.gmail.com with ESMTPSA id q8-20020a17090a178800b002b24c3fce2esm2384255pja.33.2024.05.02.22.11.47
+        d=1e100.net; s=20230601; t=1714713227; x=1715318027;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Opojcr/NBDOoIzZkhJbTlqDTHfqUYKezeK7i6rDG2Vg=;
+        b=kRd9HzKfAvmSrxFe9RyajouOHECzJeE9Z6fbikvQNjEwj5LtMLMgS+1P3emIrQCtjU
+         h7+0RNcS5pJGFxHZsPxmWbMWt6phtB+Ic2Usz2NzN3BNExBzMDIBCgJMjuocVDRY8i7F
+         3aj98hJrF0iZMKz3fDJPBLB7nVHS/QbKWd98sUrwBWT9M8Pd/FfiRdyzvOv/m/O8Do72
+         mthK2Dv2RlHdGjLa97sf7eFfEusVkSqUVNVA/98NcvFHLBFRCuRU5+5f2IPEpuJfaPQn
+         PiC0hzc1hdfDfPk7TH0ZLo4a1snWvUq8Lawqya9zRjrhvVsXXCQYwJzeCzP/qJWHbgP/
+         x+mw==
+X-Forwarded-Encrypted: i=1; AJvYcCUTri4CiN+KJzjA8M8RWbg4sOhdatITpe9hvSjqmTXRpccsv64ww+3XMs6WBqFN531uP+CeYUZfn3B3a+wY08UJuiwsNrxL
+X-Gm-Message-State: AOJu0YyeHtH/fD16HHlcobDA+znKoRMSXSRVjCB2sy+evTlEYV/r4Rz7
+	nO+SvKBTCdkYLeNldDKzy+S1Olj+JkFCbaEeflPAHxKjbGeFaJtuHL5ZrecAq7mRG4A7bEGh+D+
+	3G0UGTn4ZinXIuzisF1NZhw9TRVHF+ZkdHeu9e95mApfwRqUqobUsXA==
+X-Received: by 2002:a05:620a:172b:b0:78e:d2e7:3e9e with SMTP id az43-20020a05620a172b00b0078ed2e73e9emr2131187qkb.68.1714713227320;
+        Thu, 02 May 2024 22:13:47 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG9BdZ/K1alGXgb2csMR8tC5uIoyHecq+rjFXh+y2bCp7O4HtpsnfSxnbJvLhK2n50FqDu/8g==
+X-Received: by 2002:a05:620a:172b:b0:78e:d2e7:3e9e with SMTP id az43-20020a05620a172b00b0078ed2e73e9emr2131160qkb.68.1714713226902;
+        Thu, 02 May 2024 22:13:46 -0700 (PDT)
+Received: from [192.168.0.9] (ip-109-43-179-34.web.vodafone.de. [109.43.179.34])
+        by smtp.gmail.com with ESMTPSA id fj15-20020a05622a550f00b00434946547d3sm1183826qtb.53.2024.05.02.22.13.41
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 May 2024 22:11:55 -0700 (PDT)
+        Thu, 02 May 2024 22:13:46 -0700 (PDT)
+Message-ID: <4b934481-49f9-42e6-87f5-74318f2597db@redhat.com>
+Date: Fri, 3 May 2024 07:13:39 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Fri, 03 May 2024 15:11:44 +1000
-Message-Id: <D0ZR2DC2DZ16.1TSDQF6S4AJWU@gmail.com>
-Cc: "Paolo Bonzini" <pbonzini@redhat.com>, "Alexandru Elisei"
- <alexandru.elisei@arm.com>, "Eric Auger" <eric.auger@redhat.com>, "Janosch
- Frank" <frankja@linux.ibm.com>, "Claudio Imbrenda"
- <imbrenda@linux.ibm.com>, =?utf-8?q?Nico_B=C3=B6hr?= <nrb@linux.ibm.com>,
- "David Hildenbrand" <david@redhat.com>, "Shaoqin Huang"
- <shahuang@redhat.com>, "Nikos Nikoleris" <nikos.nikoleris@arm.com>, "David
- Woodhouse" <dwmw@amazon.co.uk>, "Ricardo Koller" <ricarkol@google.com>,
- "rminmin" <renmm6@chinaunicom.cn>, "Gavin Shan" <gshan@redhat.com>, "Nina
- Schoetterl-Glausch" <nsg@linux.ibm.com>, "Sean Christopherson"
- <seanjc@google.com>, <kvm@vger.kernel.org>, <kvmarm@lists.linux.dev>,
- <kvm-riscv@lists.infradead.org>, <linux-s390@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
 Subject: Re: [kvm-unit-tests PATCH v3 0/5] add shellcheck support
-From: "Nicholas Piggin" <npiggin@gmail.com>
-To: "Andrew Jones" <andrew.jones@linux.dev>, "Thomas Huth"
- <thuth@redhat.com>
-X-Mailer: aerc 0.17.0
+To: Nicholas Piggin <npiggin@gmail.com>, Andrew Jones <andrew.jones@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Eric Auger <eric.auger@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, =?UTF-8?Q?Nico_B=C3=B6hr?=
+ <nrb@linux.ibm.com>, David Hildenbrand <david@redhat.com>,
+ Shaoqin Huang <shahuang@redhat.com>,
+ Nikos Nikoleris <nikos.nikoleris@arm.com>,
+ David Woodhouse <dwmw@amazon.co.uk>, Ricardo Koller <ricarkol@google.com>,
+ rminmin <renmm6@chinaunicom.cn>, Gavin Shan <gshan@redhat.com>,
+ Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+ Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org,
+ linux-s390@vger.kernel.org
 References: <20240501112938.931452-1-npiggin@gmail.com>
  <2be99a78-878c-4819-8c42-1b795019af2f@redhat.com>
  <20240502-d231f770256b3ed812eb4246@orel>
-In-Reply-To: <20240502-d231f770256b3ed812eb4246@orel>
+ <28975cc5-ef8f-4471-baca-0bb792a62084@redhat.com>
+ <D0ZQV7VH839A.3RQVN9RKAGH2N@gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+In-Reply-To: <D0ZQV7VH839A.3RQVN9RKAGH2N@gmail.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu May 2, 2024 at 6:56 PM AEST, Andrew Jones wrote:
-> On Thu, May 02, 2024 at 10:23:22AM GMT, Thomas Huth wrote:
-> > On 01/05/2024 13.29, Nicholas Piggin wrote:
-> > > This is based on upstream directly now, not ahead of the powerpc
-> > > series.
-> >=20
-> > Thanks! ... maybe you could also rebase the powerpc series on this now?=
- (I
-> > haven't forgotten about it, just did not find enough spare time for mor=
-e
-> > reviewing yet)
-> >=20
-> > > Since v2:
-> > > - Rebased to upstream with some patches merged.
-> > > - Just a few comment typos and small issues (e.g., quoting
-> > >    `make shellcheck` in docs) that people picked up from the
-> > >    last round.
-> >=20
-> > When I now run "make shellcheck", I'm still getting an error:
-> >=20
-> > In config.mak line 16:
-> > AR=3Dar
-> > ^-- SC2209 (warning): Use var=3D$(command) to assign output (or quote t=
-o
-> > assign string).
->
-> I didn't see this one when testing. I have shellcheck version 0.9.0.
->
-> >=20
-> > Not sure why it's complaining about "ar" but not about the other lines =
-in there?
-> >=20
-> > Also, it only seems to work for in-tree builds. If I run it from an
-> > out-of-tree build directory, I get:
-> >=20
-> > */efi/run: */efi/run: openBinaryFile: does not exist (No such file or d=
-irectory)
->
-> I'm glad you checked this. I wish I had before merging :-/
+On 03/05/2024 07.02, Nicholas Piggin wrote:
+> On Thu May 2, 2024 at 7:34 PM AEST, Thomas Huth wrote:
+>> On 02/05/2024 10.56, Andrew Jones wrote:
+>>> On Thu, May 02, 2024 at 10:23:22AM GMT, Thomas Huth wrote:
+>>>> On 01/05/2024 13.29, Nicholas Piggin wrote:
+>>>>> This is based on upstream directly now, not ahead of the powerpc
+>>>>> series.
+>>>>
+>>>> Thanks! ... maybe you could also rebase the powerpc series on this now? (I
+>>>> haven't forgotten about it, just did not find enough spare time for more
+>>>> reviewing yet)
+>>>>
+>>>>> Since v2:
+>>>>> - Rebased to upstream with some patches merged.
+>>>>> - Just a few comment typos and small issues (e.g., quoting
+>>>>>      `make shellcheck` in docs) that people picked up from the
+>>>>>      last round.
+>>>>
+>>>> When I now run "make shellcheck", I'm still getting an error:
+>>>>
+>>>> In config.mak line 16:
+>>>> AR=ar
+>>>> ^-- SC2209 (warning): Use var=$(command) to assign output (or quote to
+>>>> assign string).
+>>>
+>>> I didn't see this one when testing. I have shellcheck version 0.9.0.
+>>
+>> I'm also using 0.9.0 (from Fedora). Maybe we've got a different default config?
+> 
+> I have 0.10.0 from Debian with no changes to config defaults and no
+> warning.
 
-I'll send a patch. Possibly some other targets (check-kerneldoc, ctags?)
-may not work out of tree either. I'll fix this one up first though.
+If I understood it correctly, it warns for AR=ar but it does not warn for 
+AR=powerpc-linux-gnu-ar ... could you try the first term, too, if you 
+haven't done so yet?
 
-Thanks,
-Nick
+>> Anyway, I'm in favor of turning this warning of in the config file, it does
+>> not seem to be really helpful in my eyes. What do you think?
+> 
+> Maybe it would be useful. I don't mind quoting strings usually, although
+> for this kind of pattern it's a bit pointless and config.mak is also
+> Makefile so that has its own issues. Maybe just disable it for this
+> file?
+
+Yes, either for this file only, or globally ... I don't mind. Could you send 
+a patch, please?
+
+  Thanks,
+   Thomas
+
