@@ -1,123 +1,197 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D1DA158D76
-	for <kvmarm@lists.linux.dev>; Fri,  3 May 2024 18:17:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F2053771C
+	for <kvmarm@lists.linux.dev>; Sat,  4 May 2024 12:30:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714760267; cv=none; b=hHXuEJLgKObpn2PsH92PL5yZhBKFlPcaz+gI80GyHYBudebCfRcz4EM/R5X896QF0VYqMhmsOPNg2PoLJlqB5MBfZALnHw/C6uPSvZGjqCRyjS5GSi7yC1tiYBG83rwErx9lTTEBXZJ1jvDT1QJRUpKuNHzF3ymnP/LeEqrMO4g=
+	t=1714825844; cv=none; b=giF6Q9toFll/M4e1AEbEfpmCcyt67thQ0FLRhvPsDP2bMy9sABxC1aQ7HOG51j7oNJaO1Ekekq1kuL1r1lpphYJjb6LGgy9wbFQtXrGejrSatm41JdZmKbVnr/CTjH23Ih4k/K4z0jXm12FAakLP/G6Ef3fYrwC/J97BL9O3u/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714760267; c=relaxed/simple;
-	bh=MnH1Wy/qfGLoK8pqY0vb3YbaD+FyQMej5pfO9Kyf6Bw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=RD8iS9ci63Fc/C/WVAvLxIGMDP0rMRJflFLus6rCOsEexF9W9WijuRDYpBo5wOCedcRwpCAu0NRxa6E/xAhNcUjfOhvOhHjZHIW/NhXDQxI148HFWnpPdr5+r3FrbWUrAwVwVdqChbwm/dHp5oqkCwS3RT0v3rriPz6BeOHaf40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tqGXMHtr; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com
+	s=arc-20240116; t=1714825844; c=relaxed/simple;
+	bh=jsNTji5NnHKuzmZV80n+3e06Y8Wp0HEd+qIk+38OFKA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Evc7+AgXFgovN0Yun9kiBTIOm2u6YHDrzvvhA+6tFChFVLXRlsSmIdQGsKPpGEWukHcEe5Ns4LcJh0LRS1qLvKZbUvCwa1OLHN8eeYqChd4JetMExY7c5U7ghVHmyjt0qOJoRMb8BuIAxmUNdNRl1b7i2kuSqPwY9WGUHC01ExM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U5iGME3c; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tqGXMHtr"
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-61b1200cc92so176567147b3.0
-        for <kvmarm@lists.linux.dev>; Fri, 03 May 2024 11:17:44 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U5iGME3c"
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-6f457853950so373182b3a.0
+        for <kvmarm@lists.linux.dev>; Sat, 04 May 2024 05:30:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714760263; x=1715365063; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XCWz5AboezUKY+fKcSkwtkc56yFvTydQOL6+C1uV1TA=;
-        b=tqGXMHtreE8S4BP3RxrJfRJdrllPmr+pdP88DXFRRgDiR4M0pNeBlRNhBX9mVCVAgo
-         zR1d30pMBmQpyeJjsLYNu7U5p0s/4lwbjcoXdepcErgZvPy1NPyqxCovF5CmNwnVrFf3
-         tMG21Z67FY2SAtTomIQsf/BoPAekDqmfFgGc4/keHj9p5NYW/sHIi/TMnBJH8lF9Rpzo
-         IctzPUVwpg0BUy2KpMcx/vS1ewRQJiubZyO3G0vQqhcpdwVkNJH3BF2JwviRVP0yqlu2
-         D2/cCohE0eKw6VymufC00ADD0IYPErxqQFje2ButMjyqjV30+C2SbKR+hIMnRlnrpAfq
-         9rRg==
+        d=gmail.com; s=20230601; t=1714825843; x=1715430643; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5e7S6CmFvKeffkGPyTCOL8jP7a0oCwEqBFa0CpbZAAo=;
+        b=U5iGME3cig1m0RgBhLRxFBpiXDzki33zpNxnyiw/atUeofq/6WbdCa8cV1n/0Ad3ot
+         LFsu0FuUFHKXM0NVFUoQcGu+VbJnF6aZbYmne7ePPdhoLQHaCdmweV4HLloY8kIQNAza
+         Zc2NQxmW0nFNBCvPKVYltX65F7A4JoscgUAUpSGUuASCLN+9C24hO2sFHokVlRUZmg0y
+         CZVAsZ78hnAkcpseYsb1SCQ+Xjn+qzDZlj6RsJ2eQ2NdikIyPk3SR+rEeg2TvVXSoHwQ
+         d5fhugnN0JKuSO7aynhMQz9gSdrFg35RsM5Nz9yXfeNlTEZtpUluZW7X2ivnmd1/y1Cw
+         sitQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714760263; x=1715365063;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XCWz5AboezUKY+fKcSkwtkc56yFvTydQOL6+C1uV1TA=;
-        b=L+4wt7scwAQJyQsbr/IGWj907KTmZi6aIYao7288IG4rTEPI1aHhM4g0VrYGVnp0R4
-         /NcfLvojyx2ixE2oDFY2eIduEApa7m4oI8Y+IcZQwc86PgP3qVNf8FjXFcgK1z0sb7iY
-         ad53GdxhdVbQ0hNcHGupfmmCbAJyVon0hp0ZNKfTRTtoNKrvW3Dce2fSN3XLZqZJ9GlQ
-         gQok9LCipjtmfeVuE6WPO+V0yDys3gA4WcNld1i/LTIH3KmaDJI8Afh5f8r6tViyVkIk
-         WYN/RHx9J6gT7pJa53aEW2Hg+lZWa8OVvttygp7TxB5fRrWfuvZ5c/MUFjuTP9HWGKSD
-         8/XQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXID6zL3JNw1BiMACYe1mpQ5Lz59UHRAt5YBhQH8pOvIoRdH5RzCSB90a5cjS1hKmZqN4ydp4dAUW5PgQ6Ij6HOL+bYYWBU
-X-Gm-Message-State: AOJu0YyYh1WV7Wb63R/KKCqosl2abLTy5dt61UcD9CgwbOh56B5fmF/y
-	HnpvwKzWARVi2YDTgFdGfG8iIqp68EzyX5Lg9jDrMBn+JOfS3gw6FjWYwCcjAdj2y61TXQSbUoB
-	FnfrWWTct/w==
-X-Google-Smtp-Source: AGHT+IG8z91B85kZw12g8ILejBDce9nCeI6uZrPNjYvj7vQXfcVKq57xpnYqIWHHCJ8gvpfpvg4aSbrDSFG7Mg==
-X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a0d:ea05:0:b0:61b:7912:6cad with SMTP id
- t5-20020a0dea05000000b0061b79126cadmr815080ywe.2.1714760263504; Fri, 03 May
- 2024 11:17:43 -0700 (PDT)
-Date: Fri,  3 May 2024 11:17:34 -0700
-In-Reply-To: <20240503181734.1467938-1-dmatlack@google.com>
+        d=1e100.net; s=20230601; t=1714825843; x=1715430643;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5e7S6CmFvKeffkGPyTCOL8jP7a0oCwEqBFa0CpbZAAo=;
+        b=dah477RuBEW87lStSVM/MkBwa0oPeYpzmurclqpyGHDG3rQD1CyrXtkA9rjlqCXBoq
+         KroLBppLH/2y3dvdZlKPSPqh8FGZXOYXmZUdio67NgtYb0D+1j9HGY5uhCyzBaFBGqP1
+         Iy3sCRCiqIQ0k1BsEdb9tuFC0gcnpVqv9DXFEyjd8F/dLVRFHAwfTn5x0hkIFti18aO9
+         SHvREkOMPVFqiucI9BvwhsvlCduQsrVnEx0Ip9BDXybtKCGqv5XpUY6eEVSFL7Mf8oQq
+         RrqANJ7o16HuCwr6rQ2IjYuGjGJOL4Jk4Z0M1t/O5xXNxZ5LTexyvXh8lYQDvf2ZpqVp
+         2/Bw==
+X-Forwarded-Encrypted: i=1; AJvYcCWa+f9nnNj004Sfv4dD76YMcjSHdyKc4yqIO97SZbvunMgLsyp3VZ3kLvdw/FBdakcspwdznHRyy52T5AS4Hq082rbbatdS
+X-Gm-Message-State: AOJu0YyieQ27gDbS20SgpKsm+c0P/v716ZzdGxNI1Yyp26CduC144mnT
+	byzIMJ1buaXgjFUMuo5WjWkBzaHPc3/vkFEDH3QTKB5zfxk7/BNc
+X-Google-Smtp-Source: AGHT+IFPZkfPU8Egb2mh6EBzGgW9QChyXJexPKHvEKB5uBRSLxU0nzgY3U6aLmK8CozI1eiDyMOazA==
+X-Received: by 2002:a05:6a20:8420:b0:1a3:b187:f261 with SMTP id c32-20020a056a20842000b001a3b187f261mr12634372pzd.29.1714825842756;
+        Sat, 04 May 2024 05:30:42 -0700 (PDT)
+Received: from wheely.local0.net (220-245-239-57.tpgi.com.au. [220.245.239.57])
+        by smtp.gmail.com with ESMTPSA id b16-20020a056a000a9000b006f4473daa38sm3480068pfl.128.2024.05.04.05.30.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 04 May 2024 05:30:42 -0700 (PDT)
+From: Nicholas Piggin <npiggin@gmail.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Nicholas Piggin <npiggin@gmail.com>,
+	Laurent Vivier <lvivier@redhat.com>,
+	Andrew Jones <andrew.jones@linux.dev>,
+	linuxppc-dev@lists.ozlabs.org,
+	kvm@vger.kernel.org,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	David Hildenbrand <david@redhat.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	=?UTF-8?q?Nico=20B=C3=B6hr?= <nrb@linux.ibm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	linux-s390@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	kvm-riscv@lists.infradead.org
+Subject: [kvm-unit-tests PATCH v9 28/31] configure: Make arch_libdir a first-class entity
+Date: Sat,  4 May 2024 22:28:34 +1000
+Message-ID: <20240504122841.1177683-29-npiggin@gmail.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240504122841.1177683-1-npiggin@gmail.com>
+References: <20240504122841.1177683-1-npiggin@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20240503181734.1467938-1-dmatlack@google.com>
-X-Mailer: git-send-email 2.45.0.rc1.225.g2a3ae87e7f-goog
-Message-ID: <20240503181734.1467938-4-dmatlack@google.com>
-Subject: [PATCH v3 3/3] KVM: Mark a vCPU as preempted/ready iff it's scheduled
- out while running
-From: David Matlack <dmatlack@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
-	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, David Hildenbrand <david@redhat.com>, 
-	Sean Christopherson <seanjc@google.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	David Matlack <dmatlack@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Mark a vCPU as preempted/ready if-and-only-if it's scheduled out while
-running. i.e. Do not mark a vCPU preempted/ready if it's scheduled out
-during a non-KVM_RUN ioctl() or when userspace is doing KVM_RUN with
-immediate_exit.
+arch_libdir was brought in to improve the heuristic determination of
+the lib/ directory based on arch and testdir names, but it did not
+entirely clean that mess up.
 
-Commit 54aa83c90198 ("KVM: x86: do not set st->preempted when going back
-to user space") stopped marking a vCPU as preempted when returning to
-userspace, but if userspace then invokes a KVM vCPU ioctl() that gets
-preempted, the vCPU will be marked preempted/ready. This is arguably
-incorrect behavior since the vCPU was not actually preempted while the
-guest was running, it was preempted while doing something on behalf of
-userspace.
+Remove the arch_libdir->arch->testdir heuristic and just require
+everybody sets arch_libdir correctly. Fail if the lib/arch or
+lib/arch/asm directories can not be found.
 
-This commit also avoids KVM dirtying guest memory after userspace has
-paused vCPUs, e.g. for Live Migration, which allows userspace to collect
-the final dirty bitmap before or in parallel with saving vCPU state
-without having to worry about saving vCPU state triggering writes to
-guest memory.
-
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: David Matlack <dmatlack@google.com>
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: David Hildenbrand <david@redhat.com>
+Cc: Eric Auger <eric.auger@redhat.com>
+Cc: Janosch Frank <frankja@linux.ibm.com>
+Cc: Laurent Vivier <lvivier@redhat.com>
+Cc: Nico Böhr <nrb@linux.ibm.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>
+Cc: kvm@vger.kernel.org
+Cc: linux-s390@vger.kernel.org
+Cc: kvmarm@lists.linux.dev
+Cc: kvm-riscv@lists.infradead.org
+Cc: linuxppc-dev@lists.ozlabs.org
+Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- virt/kvm/kvm_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ Makefile  |  2 +-
+ configure | 18 +++++++++++++-----
+ 2 files changed, 14 insertions(+), 6 deletions(-)
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 2b29851a90bd..3973e62acc7c 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -6302,7 +6302,7 @@ static void kvm_sched_out(struct preempt_notifier *pn,
- {
- 	struct kvm_vcpu *vcpu = preempt_notifier_to_vcpu(pn);
+diff --git a/Makefile b/Makefile
+index 5b7998b79..7fe93dfd8 100644
+--- a/Makefile
++++ b/Makefile
+@@ -10,7 +10,7 @@ include config.mak
+ VPATH = $(SRCDIR)
  
--	if (current->on_rq) {
-+	if (current->on_rq && vcpu->wants_to_run) {
- 		WRITE_ONCE(vcpu->preempted, true);
- 		WRITE_ONCE(vcpu->ready, true);
- 	}
+ libdirs-get = $(shell [ -d "lib/$(1)" ] && echo "lib/$(1) lib/$(1)/asm")
+-ARCH_LIBDIRS := $(call libdirs-get,$(ARCH_LIBDIR)) $(call libdirs-get,$(TEST_DIR))
++ARCH_LIBDIRS := $(call libdirs-get,$(ARCH_LIBDIR))
+ OBJDIRS := $(ARCH_LIBDIRS)
+ 
+ DESTDIR := $(PREFIX)/share/kvm-unit-tests/
+diff --git a/configure b/configure
+index d744ec4dc..2b788d0c8 100755
+--- a/configure
++++ b/configure
+@@ -216,7 +216,6 @@ fi
+ arch_name=$arch
+ [ "$arch" = "aarch64" ] && arch="arm64"
+ [ "$arch_name" = "arm64" ] && arch_name="aarch64"
+-arch_libdir=$arch
+ 
+ if [ "$arch" = "riscv" ]; then
+     echo "riscv32 or riscv64 must be specified"
+@@ -284,8 +283,10 @@ fi
+ 
+ if [ "$arch" = "i386" ] || [ "$arch" = "x86_64" ]; then
+     testdir=x86
++    arch_libdir=x86
+ elif [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
+     testdir=arm
++    arch_libdir=$arch
+     if [ "$target" = "qemu" ]; then
+         arm_uart_early_addr=0x09000000
+     elif [ "$target" = "kvmtool" ]; then
+@@ -334,6 +335,7 @@ elif [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
+     fi
+ elif [ "$arch" = "ppc64" ]; then
+     testdir=powerpc
++    arch_libdir=ppc64
+     firmware="$testdir/boot_rom.bin"
+     if [ "$endian" != "little" ] && [ "$endian" != "big" ]; then
+         echo "You must provide endianness (big or little)!"
+@@ -344,6 +346,7 @@ elif [ "$arch" = "riscv32" ] || [ "$arch" = "riscv64" ]; then
+     arch_libdir=riscv
+ elif [ "$arch" = "s390x" ]; then
+     testdir=s390x
++    arch_libdir=s390x
+ else
+     echo "arch $arch is not supported!"
+     arch=
+@@ -353,6 +356,10 @@ if [ ! -d "$srcdir/$testdir" ]; then
+     echo "$srcdir/$testdir does not exist!"
+     exit 1
+ fi
++if [ ! -d "$srcdir/lib/$arch_libdir" ]; then
++    echo "$srcdir/lib/$arch_libdir does not exist!"
++    exit 1
++fi
+ 
+ if [ "$efi" = "y" ] && [ -f "$srcdir/$testdir/efi/run" ]; then
+     ln -fs "$srcdir/$testdir/efi/run" $testdir-run
+@@ -415,10 +422,11 @@ fi
+ # link lib/asm for the architecture
+ rm -f lib/asm
+ asm="asm-generic"
+-if [ -d "$srcdir/lib/$arch/asm" ]; then
+-	asm="$srcdir/lib/$arch/asm"
+-elif [ -d "$srcdir/lib/$testdir/asm" ]; then
+-	asm="$srcdir/lib/$testdir/asm"
++if [ -d "$srcdir/lib/$arch_libdir/asm" ]; then
++    asm="$srcdir/lib/$arch_libdir/asm"
++else
++    echo "$srcdir/lib/$arch_libdir/asm does not exist"
++    exit 1
+ fi
+ mkdir -p lib
+ ln -sf "$asm" lib/asm
 -- 
-2.45.0.rc1.225.g2a3ae87e7f-goog
+2.43.0
 
