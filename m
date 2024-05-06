@@ -1,83 +1,94 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD231747F;
-	Sun,  5 May 2024 14:41:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01A8A1422A2
+	for <kvmarm@lists.linux.dev>; Mon,  6 May 2024 08:57:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714920110; cv=none; b=uuIvvUaiXq2hEGC0D0jycru8OTHuQoDo8gbek3rjvkvWDVI8todlEi59vnLbzEXZ+/oq4NMyrmakjlPqhEUYjqds1gQE0yXzl6ASi/Zfm6/MjBoKLzQ4A79GErPYx/G2wpjG7zDmLmT+s2Dg7N+HtxMAwPZGXXFc4dQvGvNNQ+c=
+	t=1714985866; cv=none; b=s+K+5GLT6uLI2ws51qBn9bY8E6SolPMRf19fR10qpjNuk+zq1RuIyP6+2bL2sPRfl5tdvjG8BJhoWgO6963GABDqqPNkyuUpQ+Xz5Z1i0hwbEiC3Cs0qoJAikfWEUS5G16DFzQvyzhzo2PXwZLIdGI9JVWaKQtCUfFidF4ZnGpw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714920110; c=relaxed/simple;
-	bh=/tY7IK1QVTL6FMfA+Ww9aRKIyTlFGPjNOtHtVgAmoKY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VhjY27EYFNZaIUStm8xpkb5qJxFgPFAsRQcL2Vjy1ZqQVVgOba/bZpGf8U/n0bxnz5RWb5YPhOMViHIBqThF/xJUnkmiNXmEhQiG2MK23D7ow6csF66m9ZFiiE9/qygwwEMxHZ3UK40mM05Fex6pvVjx1mfIYm2QZQ09LDR2DB4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RPi6uav5; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1714985866; c=relaxed/simple;
+	bh=3chMsjDBSVl6/YzmBwyDmo8vb4MCwHLCL/FCQilywTo=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=NjPdVw26izND5a8tIrjB/zESOJ8WkmsHk4NDGBlErsF1x1N82WZwqn7I30/TFB02GDUHdEIkmms14dXds+l/CQXhZxTTDlMzxL/1GcpOXaLL0QhYh9D97mSgKlYyEiOna/Y/1yG/7KrdHaMeMzH0bgKVlv+QIhS/O6y3WohClKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b=gS2TAt28; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RPi6uav5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A48ECC113CC;
-	Sun,  5 May 2024 14:41:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714920110;
-	bh=/tY7IK1QVTL6FMfA+Ww9aRKIyTlFGPjNOtHtVgAmoKY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RPi6uav5aYbPQfmfHatxieTjhCQQ4RHhRST8lMJVxqqXA1lvsP2881H8aDI6PohGQ
-	 LeHY5VWkdagoHfKD2NKLD2h/PE+Y42Qhnk2RnVFDnGPdUGZ6mqz2NJCSp9WbokuMd/
-	 gXQZ0f5TIRvmcxHsCK8xTyUTceKjAnZiuv171CcUpOg8lxrdpLoFQ7GGLYtuxOlQyn
-	 9CP9XYcDx9tZdI3y7aQdDIIJAKZTAHeBnf+LSQDkrSTpw6ssx0ZdmzC58ADE3cuJaU
-	 JCoOiMDMUiDYf2JQLz6PzgY/WxQSO8NGTZOMpJy8nMXPSCsv0xL+sHNGrn7iOi0s5f
-	 q8Z086FVh2m/w==
-Date: Sun, 5 May 2024 23:41:46 +0900
-From: Mark Brown <broonie@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
-	aneesh.kumar@kernel.org, aneesh.kumar@linux.ibm.com, bp@alien8.de,
-	catalin.marinas@arm.com, christophe.leroy@csgroup.eu,
-	dave.hansen@linux.intel.com, hpa@zytor.com,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
-	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
-	oliver.upton@linux.dev, shuah@kernel.org, szabolcs.nagy@arm.com,
-	tglx@linutronix.de, will@kernel.org, x86@kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 00/29] arm64: Permission Overlay Extension
-Message-ID: <ZjeaqkJVmNHUBi11@finisterre.sirena.org.uk>
+	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="gS2TAt28"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
+	s=201909; t=1714985861;
+	bh=cckhLARkyb3oh/wDwudJRWGBL6LODBWmZxbKJGkql3o=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=gS2TAt28hdJp0GVGuxc0GqF0HBwJIIE6g865JbTcDlQ4Bq15z5L2lKpDYOEn9r1ww
+	 hsX15AwxZD1CjOwo4xRbYzBcwoiSq0TNZUiTXUub8V24eZGadzhzkvFJHFFu9oZt3H
+	 QAcIpzLF9IzLL8/RJlkwnpXW7MyeKY0uF2NehUEzm9/Bim0CzqfU9w9cwum+5pGQwF
+	 xSI1GAbrHs1469EaFCgMZwVhfD2AiSCW6nWax66+g5qkjilBF79mQZpSQL5OrQSGXu
+	 e5172dSMmCRQxc4I8MOmnYs1NF2QAnG5NjOlhgW4zHUvQ/3D8+TxMr/9S1YopiTt4Z
+	 JS27CStBxNFLw==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4VXwKC2cR3z4x12;
+	Mon,  6 May 2024 18:57:35 +1000 (AEST)
+From: Michael Ellerman <mpe@ellerman.id.au>
+To: Joey Gouly <joey.gouly@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: akpm@linux-foundation.org, aneesh.kumar@kernel.org,
+ aneesh.kumar@linux.ibm.com, bp@alien8.de, broonie@kernel.org,
+ catalin.marinas@arm.com, christophe.leroy@csgroup.eu,
+ dave.hansen@linux.intel.com, hpa@zytor.com, joey.gouly@arm.com,
+ linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+ linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
+ naveen.n.rao@linux.ibm.com, npiggin@gmail.com, oliver.upton@linux.dev,
+ shuah@kernel.org, szabolcs.nagy@arm.com, tglx@linutronix.de,
+ will@kernel.org, x86@kernel.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v4 01/29] powerpc/mm: add ARCH_PKEY_BITS to Kconfig
+In-Reply-To: <20240503130147.1154804-2-joey.gouly@arm.com>
 References: <20240503130147.1154804-1-joey.gouly@arm.com>
+ <20240503130147.1154804-2-joey.gouly@arm.com>
+Date: Mon, 06 May 2024 18:57:32 +1000
+Message-ID: <8734qvnwqr.fsf@mail.lhotse>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="Mvqulcr+gDoxw3xu"
-Content-Disposition: inline
-In-Reply-To: <20240503130147.1154804-1-joey.gouly@arm.com>
-X-Cookie: lisp, v.:
+Content-Type: text/plain
 
+Joey Gouly <joey.gouly@arm.com> writes:
+> The new config option specifies how many bits are in each PKEY.
+>
+> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+> Cc: Michael Ellerman <mpe@ellerman.id.au>
+> Cc: Nicholas Piggin <npiggin@gmail.com>
+> Cc: Christophe Leroy <christophe.leroy@csgroup.eu>
+> Cc: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>
+> Cc: "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>
+> Cc: linuxppc-dev@lists.ozlabs.org
+> ---
+>  arch/powerpc/Kconfig | 4 ++++
+>  1 file changed, 4 insertions(+)
 
---Mvqulcr+gDoxw3xu
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Acked-by: Michael Ellerman <mpe@ellerman.id.au> (powerpc)
 
-On Fri, May 03, 2024 at 02:01:18PM +0100, Joey Gouly wrote:
+cheers
 
-> One possible issue with this version, I took the last bit of HWCAP2.
-
-Fortunately we already have AT_HWCAP[34] defined thanks to PowerPC.
-
---Mvqulcr+gDoxw3xu
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmY3mqoACgkQJNaLcl1U
-h9DyDQf9FoDkCaYHDO5wProKreHZRTnyo5S6VE72gy5he2LZ7cUSiGEdleVivA4u
-8R/kRZXT60g/uhii3EkTh2HOot2Bkbkq79OwjSZN1sS9vmvOFqaNe5v+vSVrHaiI
-X2EXd0YIlKboeQAsL7RI17OmneWdCX3UzfPckF6xsgPEvWZU46DSc/4kff6/cahW
-uAGUC9hcDdU9wrfi26ffmLu2F+V7ro64nLRGotI4jK3klTFRi6uyFE+LAmOii2Cg
-erA+PnNqh1uDmi94V8HXlcg+wX/2JlEei+ATyoi5K22UgdyL/0VUG5yPn06Y6DHJ
-mjHRwI6iO+NclFXmvqfStSh+YfD4BA==
-=cQNP
------END PGP SIGNATURE-----
-
---Mvqulcr+gDoxw3xu--
+> diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
+> index 1c4be3373686..6e33e4726856 100644
+> --- a/arch/powerpc/Kconfig
+> +++ b/arch/powerpc/Kconfig
+> @@ -1020,6 +1020,10 @@ config PPC_MEM_KEYS
+>  
+>  	  If unsure, say y.
+>  
+> +config ARCH_PKEY_BITS
+> +	int
+> +	default 5
+> +
+>  config PPC_SECURE_BOOT
+>  	prompt "Enable secure boot support"
+>  	bool
+> -- 
+> 2.25.1
