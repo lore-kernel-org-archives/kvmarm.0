@@ -1,100 +1,91 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8B0715359F;
-	Mon,  6 May 2024 15:15:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C774157461
+	for <kvmarm@lists.linux.dev>; Mon,  6 May 2024 17:35:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715008510; cv=none; b=BeTor4kjNmR79nTCj1wfM1IS34qeA2egLD1cxh02iieAhZUGZq0qFhPJ98K5aV2mCxedDhtoEc3cFTiyB3XVuarmJ2iGJmglGmRl3Pv0rngtBYs8TvfGZg35gQhQPy8AVG2zgx0Wa39Zzxq9RaJ3e1iPg95Yuz/3GC4neN61FW4=
+	t=1715016949; cv=none; b=l/CHmMNlywbXA/HeZhqiJ52paWI1vCBZyW2vli54t8xrhyb5+5XnZSlPkhFs2ol75HAuUElQfir4T1vEdB2BwxGmI4hEDduvNiRR2nbnPS3e7kceyMy2YQ3otzOqdFUPf8la+aZgZ5eHDbELmJuG8sE6x3+s+qyig757pHG72io=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715008510; c=relaxed/simple;
-	bh=V20s/rP9kfnfxqn8asOQLUse8pw4bK5bvZGq8XmE+YE=;
+	s=arc-20240116; t=1715016949; c=relaxed/simple;
+	bh=I+RW6veN4unpTEFFJXNx4pgzJttst04sYwFP54UO7nQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Js1mogdzLZILfz2H//oX1ZPOjX6uEKT6aTUB0EA4F/Z4dWzPQ2cgvsIkQooWKBsQ1u3SI1Tk0EipWvX8u6IwyxncNjlvThHAloFsBMwGcgj84K2f5vVU5WiScODJd5+tOVGKu535vZ8nxmcJHX46KWgDmib1oZcmlZ11EUAhr3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ufvq1GjI; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=BbCBfZRyxw5BbGtko/Sfel6LoE+juCjIQtlgK1NvMpMQu3dfLkZ0LVEQX+wKCTayXQQZjjMo+GPcfQLTlG7hezNYBp5SNo+P6d+9C43mh7eZyOoEk9BBwZsJEOACWRSLvr1VBjotdhPBGWOUegZhhV1Lv+q7rYkVcboNX8Zoc4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=T/fNKyNO; arc=none smtp.client-ip=91.218.175.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ufvq1GjI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2A3BC116B1;
-	Mon,  6 May 2024 15:15:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715008509;
-	bh=V20s/rP9kfnfxqn8asOQLUse8pw4bK5bvZGq8XmE+YE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ufvq1GjIm0JtpeREOOUMIhIxkcw/9k0sQTGIfqjN5iXg29RcGDLytn91LLxkXBFzy
-	 iepohAi7JG77XjUBMSpVRbS/38XJwhteYmxHVy/TBX22ZhydD1CY5+JrXDCUKYww/M
-	 57s4RqD+wKI2J4Iq/SxpfGSUuJHNOB6ITluWBYWPK7B+OhMpV/exZV5nQnDJfhwrB5
-	 DJhxOmvw/SCV7rECgHYbof6u/6T2TphqPS5IQ+uihHvRbamhZs2tDlArmkKObto2bi
-	 iFlo7U8lEnWMAFjfOecnzsZgFbTfRGrvxG3o1q+uiNCfv/fPusLAYQ3bLpS6phE6fO
-	 BU6msL19Awk5w==
-Date: Tue, 7 May 2024 00:15:06 +0900
-From: Mark Brown <broonie@kernel.org>
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: Liao Chang <liaochang1@huawei.com>, catalin.marinas@arm.com,
-	will@kernel.org, maz@kernel.org, oliver.upton@linux.dev,
-	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	tglx@linutronix.de, ardb@kernel.org, anshuman.khandual@arm.com,
-	miguel.luis@oracle.com, joey.gouly@arm.com, ryan.roberts@arm.com,
-	jeremy.linton@arm.com, ericchancf@google.com,
-	kristina.martsenko@arm.com, robh@kernel.org,
-	scott@os.amperecomputing.com, songshuaishuai@tinylab.org,
-	shijie@os.amperecomputing.com, akpm@linux-foundation.org,
-	bhe@redhat.com, horms@kernel.org, mhiramat@kernel.org,
-	rmk+kernel@armlinux.org.uk, shahuang@redhat.com,
-	takakura@valinux.co.jp, dianders@chromium.org, swboyd@chromium.org,
-	sumit.garg@linaro.org, frederic@kernel.org, reijiw@google.com,
-	akihiko.odaki@daynix.com, ruanjinjie@huawei.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 1/8] arm64/sysreg: Add definitions for immediate
- versions of MSR ALLINT
-Message-ID: <Zjjz-tzLRC2nH51A@finisterre.sirena.org.uk>
-References: <20240415064758.3250209-1-liaochang1@huawei.com>
- <20240415064758.3250209-2-liaochang1@huawei.com>
- <ZjUKMWPknEhLYoK8@FVFF77S0Q05N>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="T/fNKyNO"
+Date: Mon, 6 May 2024 17:35:38 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1715016944;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RgKXusuHKHkq5SgVIZ+1zKT/7zi+FklfTPfVp22pWBQ=;
+	b=T/fNKyNO24FaKcrUIRzbjfH2nva1HAe9HtRGPfJMYqv3481QWFoaZpHSwMwVcy5vWLWPgV
+	A3rF5llZjnPnHNzAiV+CC5KpFoly1UO/rcAV/1qW4o4gQ0Ij76L68+Y9ge3V0MnIEam3HZ
+	IJo+M20Qlvwf43gH6F3Mbci0Oi3xXUg=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Will Deacon <will@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH 1/2] KVM: arm64: Fix hvhe/nvhe early alias parsing
+Message-ID: <ZjkU6qyd2IRcUi2M@linux.dev>
+References: <20240501163400.15838-1-will@kernel.org>
+ <20240501163400.15838-2-will@kernel.org>
+ <ZjJ_mdsCa_fAy_NT@linux.dev>
+ <20240502102030.GA16965@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="AJCRMQbglmQeiqgZ"
-Content-Disposition: inline
-In-Reply-To: <ZjUKMWPknEhLYoK8@FVFF77S0Q05N>
-X-Cookie: lisp, v.:
-
-
---AJCRMQbglmQeiqgZ
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20240502102030.GA16965@willie-the-truck>
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, May 03, 2024 at 05:00:49PM +0100, Mark Rutland wrote:
-> On Mon, Apr 15, 2024 at 06:47:51AM +0000, Liao Chang wrote:
+On Thu, May 02, 2024 at 11:20:30AM +0100, Will Deacon wrote:
+> Hey Oliver,
+> 
+> On Wed, May 01, 2024 at 05:44:57PM +0000, Oliver Upton wrote:
+> > On Wed, May 01, 2024 at 05:33:59PM +0100, Will Deacon wrote:
+> > > Booting a kernel with "arm64_sw.hvhe=1 kvm-arm.mode=nvhe" on the
+> > > command-line results in KVM initialising using hVHE, whereas one might
+> > > expect the latter option to override the former.
+> > > 
+> > > Fix this by adding "arm64_sw.hvhe=0" to the alias expansion for
+> > > "kvm-arm.mode=nvhe".
+> > 
+> > Hmm, I wonder if it'd be better to just evaluate the sanitised VH field
+> > in hvhe_possible(). Otherwise I worry about keeping aliases in sync when
+> > new command line options come along.
+> > 
+> > This is similar to what we had before commit 35876f35f482 ("arm64:
+> > cpufeature: Add helper to test for CPU feature overrides") w/ the added
+> > use of the sanitised reg.
+> > 
+> > Thoughts?
+> 
+> I think that goes wonky when you have the arguments the other way around:
+> 
+> 	"kvm-arm.mode=nvhe arm64_sw.hvhe=1"
+> 
+> would end up using nVHE.
 
-> +#define PSTATE_ALLINT                  pstate_field(1, 0)
+Right... What I was hoping to get at is a simple set of arguments to
+test protected + nVHE, even on systems that support VHE. Although I
+suppose:
 
-> +#define set_pstate_allint(x)           asm volatile(SET_PSTATE_ALLINT(x))
+  "kvm-arm.mode=protected id_aa64mmfr1.vh=0 arm64_sw.hvhe=0"
 
-Hrm, those helpers are not ideally discoverable, partly due to the
-system register description for ALLINT not providing any references to
-this being a general scheme (which is fixable there) and partly due to
-the use of __emit_inst() with a numeric literal - we should probably add
-a comment next to the __emit_inst() saying what instruction we are
-emitting.
+isn't that bad and would preserve precedence of later args. So, FWIW:
 
---AJCRMQbglmQeiqgZ
-Content-Type: application/pgp-signature; name="signature.asc"
+Acked-by: Oliver Upton <oliver.upton@linux.dev>
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmY48/kACgkQJNaLcl1U
-h9DFDgf9Fgw5UkzUrclx6ZUwslgWzoPOBx1IoBt1ouEpv32VHyFUSbHDNh0ajstZ
-1tKqFwGNCSdXpfE09if2stHiiPfY8yxj9O2j+dibQVxKtxmS0RuoApWX/TzEv7Wy
-1ERNBrIbdi3rDAZBRnLmnFw8pSwlDz+asThIgwBPmyW7HfPVZeuU+l7b/V24aTwg
-4YGmRsYUG6f/oTl8DUmQwdAIwLfJrleBpli38lHUWAtnsPtv/d8SoyrG39CqoCIj
-Cx9TXVNB9Vfd6H19q8DF9R3kqadtH5tINEcqLzea3Bh+ccikUa6wow0k5wEgRPVc
-40WlPAXdINuZ4vKrXG00G8so0yfCSQ==
-=4fOc
------END PGP SIGNATURE-----
-
---AJCRMQbglmQeiqgZ--
+-- 
+Thanks,
+Oliver
