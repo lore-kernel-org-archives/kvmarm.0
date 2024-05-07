@@ -1,111 +1,154 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D89797F7CA;
-	Tue,  7 May 2024 22:36:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A7F5134430;
+	Tue,  7 May 2024 23:08:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715121415; cv=none; b=uz113eV/FkiPzKpUk6UOqZrs+X3GSruZ38zVtqzUCq/zzZTh97we+vZ/UE05Bn24UHhB8HzcQ85oDGzZpDp0hXZJSwHZ2/WwLyzzdafZzwwf8yedGEnbfMBqeQULLJKThDWvoUFBQ5/spoUTZzM+7Zl7d2f5LUB1w223vSemBFQ=
+	t=1715123314; cv=none; b=EAe1s3SjL/L0BmefTN659sp4w4Ea1wCM9TMFNiurrPOPieAytdrbuS1koMTczflLaqF9LI8lJ8PQQWBT5eoNOUe41tYAQ5vfmnLAMrCvcyF9W4mWjJrO8wDEeYQe6DHfedE5jYRywnVCgWD55bDwesd5RnfDfg1U2pu78q3qAkQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715121415; c=relaxed/simple;
-	bh=vZu8367hXU7oiXYTGuAa3tCsrA1jmnR/kKUKbwIWO24=;
-	h=Mime-Version:Content-Type:Date:Message-Id:To:Cc:Subject:From:
-	 References:In-Reply-To; b=PhPdAfHK2FTnsGvczKBetztyoR1/knNdJav30M38tg2JjINRNZCSRTOoOL8uEYyowJcVqq76V78B45wIZpOWtB3k6IsMzvEEICTvHDXvz3Vjg8nzHEd/zq54bkPdxwq9PSY9Po5t3HQ/3XqLApkQerGBy8Ne2/4q+VqfoIBKwJ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XEs0nlup; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1715123314; c=relaxed/simple;
+	bh=XdZxsoASaO5IpIo4VCvpiibSkBtatqEOIr6SGp02oOY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=pYYVy3fHc2HBju2IZSZ0YD9wto0iDAUeOMGeQwOAPFfI7BgtQFr/jzKg6fW2mIGHoeflCSBj7VL9pXafM62SVgieZE8NwgqvJfx9VfNgyvqLsHkA/FkdgDhM8rkG7TWxH4Umzbm8UBf/PwdC38MulJmjO9qobzGbSvcl5q3haPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rBAezVF6; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XEs0nlup"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66C46C2BBFC;
-	Tue,  7 May 2024 22:36:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rBAezVF6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26094C4AF17;
+	Tue,  7 May 2024 23:08:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715121414;
-	bh=vZu8367hXU7oiXYTGuAa3tCsrA1jmnR/kKUKbwIWO24=;
-	h=Date:To:Cc:Subject:From:References:In-Reply-To:From;
-	b=XEs0nlupa/YeV6+Z2Gc+n7c3pIBOkGGmDoCoT6KyVsBYgtXLiIdHulLvrs4YEs/4a
-	 bPdoHs+8QRtFMZ/4gzAHp2vZ0me4r7CzqR/hvFNO1xvIqVWhc36VAXCAZWPLsUhnmu
-	 P4pKvBUvUOxuyv/wka2jPIQy0lQGEB6ym4TAHzN/Nghm7jV2qsTTbggxdx1RLCjLZm
-	 PEwPiir/nrivlQ45L+0JuHP+dxk8rfLOJyq24TPvS3+5GqucsW6YLdcPP8OrUDtb08
-	 EqYSgXFs8+vnP+dGERNlOoRnLFhtM1eiU22yUWrF67SuFuyh5tALynyPQtKp1PEzgM
-	 6xKlBBkuDjhWQ==
+	s=k20201202; t=1715123314;
+	bh=XdZxsoASaO5IpIo4VCvpiibSkBtatqEOIr6SGp02oOY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=rBAezVF62e+hIewTejfWdAkjioagQ2g01AscpYKPN0OBe9IKfrDAVsTHmStSgdE+z
+	 AH1V0Zk2js4vMxhRPPFbMXqRG/BpIGJN+r3OVxtnWtp8ee1wDaglE1EA7LowbaVFo/
+	 x3nd6pSBY6jplvmE1N06Bg84qL3uInvMw5pGxLzVC/27tqkdQMoyunCXYow4kMAQrz
+	 jZFbZAyrAp3FgQAzkgZ525qTW30XMzVFKVDUb55zQF8wHfBIwtO3DKFMtSH0VGX7QD
+	 B0HshBE+ush67gj1oRtolTgd5YaDtlQgay8pje/26gQIuxJ1LakC5ZuOPjCllSktRz
+	 LV3eJEKgKaELw==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Marc Zyngier <maz@kernel.org>,
+	Sasha Levin <sashal@kernel.org>,
+	pbonzini@redhat.com,
+	shuah@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.8 18/52] KVM: selftests: Add test for uaccesses to non-existent vgic-v2 CPUIF
+Date: Tue,  7 May 2024 19:06:44 -0400
+Message-ID: <20240507230800.392128-18-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240507230800.392128-1-sashal@kernel.org>
+References: <20240507230800.392128-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Wed, 08 May 2024 01:36:35 +0300
-Message-Id: <D13RSJRDTUQO.UA22FQGU3839@kernel.org>
-To: "Edward Liaw" <edliaw@google.com>, <shuah@kernel.org>, "Mark Brown"
- <broonie@kernel.org>, "Jaroslav Kysela" <perex@perex.cz>, "Takashi Iwai"
- <tiwai@suse.com>, "Catalin Marinas" <catalin.marinas@arm.com>, "Will
- Deacon" <will@kernel.org>, "Nhat Pham" <nphamcs@gmail.com>, "Johannes
- Weiner" <hannes@cmpxchg.org>, "Christian Brauner" <brauner@kernel.org>,
- "Eric Biederman" <ebiederm@xmission.com>, "Kees Cook"
- <keescook@chromium.org>, "OGAWA Hirofumi" <hirofumi@mail.parknet.co.jp>,
- "Thomas Gleixner" <tglx@linutronix.de>, "Ingo Molnar" <mingo@redhat.com>,
- "Peter Zijlstra" <peterz@infradead.org>, "Darren Hart"
- <dvhart@infradead.org>, "Davidlohr Bueso" <dave@stgolabs.net>,
- =?utf-8?q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>, "Jiri Kosina"
- <jikos@kernel.org>, "Benjamin Tissoires" <bentiss@kernel.org>, "Jason
- Gunthorpe" <jgg@ziepe.ca>, "Kevin Tian" <kevin.tian@intel.com>, "Andy
- Lutomirski" <luto@amacapital.net>, "Will Drewry" <wad@chromium.org>, "Marc
- Zyngier" <maz@kernel.org>, "Oliver Upton" <oliver.upton@linux.dev>, "James
- Morse" <james.morse@arm.com>, "Suzuki K Poulose" <suzuki.poulose@arm.com>,
- "Zenghui Yu" <yuzenghui@huawei.com>, "Paolo Bonzini" <pbonzini@redhat.com>,
- "Sean Christopherson" <seanjc@google.com>, "Anup Patel"
- <anup@brainfault.org>, "Atish Patra" <atishp@atishpatra.org>, "Paul
- Walmsley" <paul.walmsley@sifive.com>, "Palmer Dabbelt"
- <palmer@dabbelt.com>, "Albert Ou" <aou@eecs.berkeley.edu>, "Christian
- Borntraeger" <borntraeger@linux.ibm.com>, "Janosch Frank"
- <frankja@linux.ibm.com>, "Claudio Imbrenda" <imbrenda@linux.ibm.com>,
- "David Hildenbrand" <david@redhat.com>,
- =?utf-8?q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>, "Paul Moore"
- <paul@paul-moore.com>, "James Morris" <jmorris@namei.org>, "Serge E.
- Hallyn" <serge@hallyn.com>, "Andrew Morton" <akpm@linux-foundation.org>,
- "Seth Forshee" <sforshee@kernel.org>, "Bongsu Jeon"
- <bongsu.jeon@samsung.com>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, "Steffen Klassert"
- <steffen.klassert@secunet.com>, "Herbert Xu" <herbert@gondor.apana.org.au>,
- =?utf-8?q?Andreas_F=C3=A4rber?= <afaerber@suse.de>, "Manivannan Sadhasivam"
- <manivannan.sadhasivam@linaro.org>, "Matthieu Baerts" <matttbe@kernel.org>,
- "Mat Martineau" <martineau@kernel.org>, "Geliang Tang"
- <geliang@kernel.org>, "Willem de Bruijn" <willemdebruijn.kernel@gmail.com>,
- "Fenghua Yu" <fenghua.yu@intel.com>, "Reinette Chatre"
- <reinette.chatre@intel.com>, "Mathieu Desnoyers"
- <mathieu.desnoyers@efficios.com>, "Paul E. McKenney" <paulmck@kernel.org>,
- "Boqun Feng" <boqun.feng@gmail.com>, "Alexandre Belloni"
- <alexandre.belloni@bootlin.com>, "Dave Hansen"
- <dave.hansen@linux.intel.com>, "Muhammad Usama Anjum"
- <usama.anjum@collabora.com>
-Cc: <linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
- <kernel-team@android.com>, <linux-sound@vger.kernel.org>,
- <linux-arm-kernel@lists.infradead.org>, <linux-mm@kvack.org>,
- <linux-input@vger.kernel.org>, <iommu@lists.linux.dev>,
- <kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
- <kvm-riscv@lists.infradead.org>, <linux-riscv@lists.infradead.org>,
- <linux-security-module@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
- <netdev@vger.kernel.org>, <linux-actions@lists.infradead.org>,
- <mptcp@lists.linux.dev>, <linux-rtc@vger.kernel.org>,
- <linux-sgx@vger.kernel.org>, <bpf@vger.kernel.org>
-Subject: Re: [PATCH v2 3/5] selftests: Include KHDR_INCLUDES in Makefile
-From: "Jarkko Sakkinen" <jarkko@kernel.org>
-X-Mailer: aerc 0.17.0
-References: <20240507214254.2787305-1-edliaw@google.com>
- <20240507214254.2787305-4-edliaw@google.com>
-In-Reply-To: <20240507214254.2787305-4-edliaw@google.com>
+MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.8.9
+Content-Transfer-Encoding: 8bit
 
-On Wed May 8, 2024 at 12:38 AM EEST, Edward Liaw wrote:
-> Add KHDR_INCLUDES to CFLAGS to pull in the kselftest harness
-> dependencies (-D_GNU_SOURCE).
->
-> Fixes: 809216233555 ("selftests/harness: remove use of LINE_MAX")
-> Signed-off-by: Edward Liaw <edliaw@google.com>
+From: Oliver Upton <oliver.upton@linux.dev>
 
-Oops, this is not for this patch but for SGX. Pressed D by mistake
-in aerch, so for SGX one:
+[ Upstream commit 160933e330f4c5a13931d725a4d952a4b9aefa71 ]
 
-Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
+Assert that accesses to a non-existent vgic-v2 CPU interface
+consistently fail across the various KVM device attr ioctls. This also
+serves as a regression test for a bug wherein KVM hits a NULL
+dereference when the CPUID specified in the ioctl is invalid.
 
-BR, Jarkko
+Note that there is no need to print the observed errno, as TEST_ASSERT()
+will take care of it.
+
+Reviewed-by: Marc Zyngier <maz@kernel.org>
+Link: https://lore.kernel.org/r/20240424173959.3776798-3-oliver.upton@linux.dev
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ .../testing/selftests/kvm/aarch64/vgic_init.c | 49 +++++++++++++++++++
+ 1 file changed, 49 insertions(+)
+
+diff --git a/tools/testing/selftests/kvm/aarch64/vgic_init.c b/tools/testing/selftests/kvm/aarch64/vgic_init.c
+index eef816b80993f..ca917c71ff602 100644
+--- a/tools/testing/selftests/kvm/aarch64/vgic_init.c
++++ b/tools/testing/selftests/kvm/aarch64/vgic_init.c
+@@ -84,6 +84,18 @@ static struct vm_gic vm_gic_create_with_vcpus(uint32_t gic_dev_type,
+ 	return v;
+ }
+ 
++static struct vm_gic vm_gic_create_barebones(uint32_t gic_dev_type)
++{
++	struct vm_gic v;
++
++	v.gic_dev_type = gic_dev_type;
++	v.vm = vm_create_barebones();
++	v.gic_fd = kvm_create_device(v.vm, gic_dev_type);
++
++	return v;
++}
++
++
+ static void vm_gic_destroy(struct vm_gic *v)
+ {
+ 	close(v->gic_fd);
+@@ -357,6 +369,40 @@ static void test_vcpus_then_vgic(uint32_t gic_dev_type)
+ 	vm_gic_destroy(&v);
+ }
+ 
++#define KVM_VGIC_V2_ATTR(offset, cpu) \
++	(FIELD_PREP(KVM_DEV_ARM_VGIC_OFFSET_MASK, offset) | \
++	 FIELD_PREP(KVM_DEV_ARM_VGIC_CPUID_MASK, cpu))
++
++#define GIC_CPU_CTRL	0x00
++
++static void test_v2_uaccess_cpuif_no_vcpus(void)
++{
++	struct vm_gic v;
++	u64 val = 0;
++	int ret;
++
++	v = vm_gic_create_barebones(KVM_DEV_TYPE_ARM_VGIC_V2);
++	subtest_dist_rdist(&v);
++
++	ret = __kvm_has_device_attr(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_CPU_REGS,
++				    KVM_VGIC_V2_ATTR(GIC_CPU_CTRL, 0));
++	TEST_ASSERT(ret && errno == EINVAL,
++		    "accessed non-existent CPU interface, want errno: %i",
++		    EINVAL);
++	ret = __kvm_device_attr_get(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_CPU_REGS,
++				    KVM_VGIC_V2_ATTR(GIC_CPU_CTRL, 0), &val);
++	TEST_ASSERT(ret && errno == EINVAL,
++		    "accessed non-existent CPU interface, want errno: %i",
++		    EINVAL);
++	ret = __kvm_device_attr_set(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_CPU_REGS,
++				    KVM_VGIC_V2_ATTR(GIC_CPU_CTRL, 0), &val);
++	TEST_ASSERT(ret && errno == EINVAL,
++		    "accessed non-existent CPU interface, want errno: %i",
++		    EINVAL);
++
++	vm_gic_destroy(&v);
++}
++
+ static void test_v3_new_redist_regions(void)
+ {
+ 	struct kvm_vcpu *vcpus[NR_VCPUS];
+@@ -675,6 +721,9 @@ void run_tests(uint32_t gic_dev_type)
+ 	test_vcpus_then_vgic(gic_dev_type);
+ 	test_vgic_then_vcpus(gic_dev_type);
+ 
++	if (VGIC_DEV_IS_V2(gic_dev_type))
++		test_v2_uaccess_cpuif_no_vcpus();
++
+ 	if (VGIC_DEV_IS_V3(gic_dev_type)) {
+ 		test_v3_new_redist_regions();
+ 		test_v3_typer_accesses();
+-- 
+2.43.0
+
