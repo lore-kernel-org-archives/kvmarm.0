@@ -1,106 +1,90 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB8A7747F;
-	Tue,  7 May 2024 14:57:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEDC916C84A
+	for <kvmarm@lists.linux.dev>; Tue,  7 May 2024 17:38:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715093859; cv=none; b=rkDZ8VYDKPR7vG9OdvNvpKORy8TA+q96k7ypizjUFcemWPqIjeIo2U68QhY+4ByG2YXopWttVs1dHgAz50t2rirnP2/lLEwxA6L5YeC3PZ90opVNkneS0MY4mcr4xlrNnDLCF6H8Pr1VOkNgwfPZgGYhu07yyyTeP0nFiN/bfpc=
+	t=1715103541; cv=none; b=lDaV3A/Ah3Sb14SCBV5szMFAwjH5oRNlPxkLGURth8bil9NLqbe+eyb9mcj6wytQF2VrG0O/RERAqOsdmTjAkCDZCbr+qlQ6o4Tr10slGUE8MezRsQkfbqAPKwrNjyrggeWrHPLGwunCrzoAasUbFI/MbpZe+yokYViVa+mzqdc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715093859; c=relaxed/simple;
-	bh=sOYKJAaNjyz5tc9w5JMsbSZzmPQw/hxRG+nTJcqDj98=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ek/Datuw+lEhmBvRiXCzo7tMhm5zgHNsHrHu9iQx//GJtbr5v81dEPGWfz+dMekkqvuCMFYcl7n6pWmdWkoJLVUnoxxLlLld5OVKCCxfB2AOjwfpXtLCHYpG5becOLKuynfSKbw3wo9g/RIyBRkbiLnQHwwG4uq0vESYluA9AQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LuFx7JZy; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1715103541; c=relaxed/simple;
+	bh=WTjXTy7wqZqLJ2IOdQbN/WBzFAVFvlAg4Ue04sW4qjQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=H+SmNDHFW73IC8jCDsQWCY2gcqicfLyKpWL+jqtAkgL9YtyDkqztZ6pVfE9AnA0in2rPcU881y8bXkY/O7k2MPSk5gptf8OFhFUEeEi57+6D8Yle2IKuwzVId5PUfxZJbJPkEZKg+ykrQUDfZZ0qVypWhiHA7SXcV4wVrJLvCXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TBjMxUdW; arc=none smtp.client-ip=209.85.161.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LuFx7JZy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E94AC2BBFC;
-	Tue,  7 May 2024 14:57:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715093859;
-	bh=sOYKJAaNjyz5tc9w5JMsbSZzmPQw/hxRG+nTJcqDj98=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LuFx7JZyqH5uR3thtGzntatMszyZ3KlB2lRy43ps3A5Vdzmj8iyd2wCAutuGDAT39
-	 406qxn1vyD7yHKbvle4n8eCtgCbDbdmC5LC9Lvf3e9IS3qlOcDNoyumD/XO6dN2VWZ
-	 bMYSHPejOf2/WTHII/NusNWASnqddAwgqTWwlccdZTGvywMkjgCXL97qm6XoPY1dwm
-	 8z4ZBJUtT5fixmkk+62gvjkpkqZaKsX7WHEwRjEwzjCN45OIvf2WBsarF861sIVOXK
-	 pfTzaM4LMyt4Is4CwFRDivBzccGlXC8eJJbjWPAN0Enj1TmhlwOQwjI42lyk/fJOi7
-	 QGyLknVYQtWmQ==
-Date: Tue, 7 May 2024 15:57:34 +0100
-From: Will Deacon <will@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH] KVM: arm64: Correct BTYPE/SS in host SMC emulation
-Message-ID: <20240507145733.GB22453@willie-the-truck>
-References: <20240502180020.3215547-1-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TBjMxUdW"
+Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-5b20c4eda82so1327735eaf.3
+        for <kvmarm@lists.linux.dev>; Tue, 07 May 2024 10:38:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1715103539; x=1715708339; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fAE0qBIGceUphb1OEYQYrxoiW/szPAeOPJX2oKsvSeo=;
+        b=TBjMxUdWQzm3XzfJ0zFVNZ6bl5Mj/3TXmgQq0xacqC6yA40vl02huhBv30ZtIedmIa
+         meO2FTfiLQPJw5kL7L0ttx9U6Du6Mzq70hklrUeMk4CzLyimSDqMkdjJ7jPtIs8i35wA
+         Gfpy3IeSBL+S7wCzBw3XQdTPRIaWoywT8SBe1HK+ELKhvKEhVlFf4i5OaA6049+oXLiX
+         y/foCP5IsFS6H6ZKxV7bgvX9tQYGUirpao9BD1xk7wD/Rq5BOWeT0RhEoSOJwF3WXl43
+         hmzCMl+Hvfib7TIAr48DEytZnZEd+2Xc4NAKeHbWvfILeDOy4VTL8lUHcIhYktILGQj+
+         Gu7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715103539; x=1715708339;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fAE0qBIGceUphb1OEYQYrxoiW/szPAeOPJX2oKsvSeo=;
+        b=djkH3UiUvv3CPfj41nKBqLQgWW6d7hT7MD6oja9XfRhUk4hc1VaZL4bLroHSiAtX45
+         qVRuS2uSWWkXUyRusSy0ovpvmyCWJec49A+Bfimcs47LDsQWq7rVjIjinf7dMDwPxIdg
+         NCOHctOdtdcam3qVPVcbNwi4+BArFYuCtKToY/k1vV6Aeqif4DgPwe0S6pvfpE2egShb
+         NPI0KFTx8lteUN6H37rh98eQ2N22Dqlr6bZwRIV58X0Ijkdypqgx/HsKxyXvJ1xd4bfk
+         K6W3rHbiMLYrrYBVCgQCRpCRQOCM74Bmb5BNgDLrp+wPAgCB18avG78HT1wnsMYGSLTw
+         1pPg==
+X-Forwarded-Encrypted: i=1; AJvYcCUGg9BMYlPZhgn5WKATKd9/iaUadLZfrYdcyueaNXNXCnS2u72y3y3y82yq9umVGNwjz4kFb8RbI3VJto9qUe/z2+lHTTq8
+X-Gm-Message-State: AOJu0YyzjgQyki4MsXULXGGKVyNefZvBYFbqCi+KrbNN3ij4LvKKitM1
+	6S1dWCkmyQbXqlS+4XPCIlGNAWxXtENQ9z/w5Pn+5dqYB3O3vDShFXcuv8ObhSNs634xU6u9VHv
+	JSS8F19ifGW5Y0t29TTYx1E+PQB9LjwwZuHmh
+X-Google-Smtp-Source: AGHT+IGOlj4f7H0eIZnf/AAGA9xhg2BLPoln8xEDIp7mRv/sk45u89q1Eyh+xEgyT8jUF0RWxzhDYUEy7gHdOcN46XA=
+X-Received: by 2002:a4a:9893:0:b0:5b2:1095:a58b with SMTP id
+ 006d021491bc7-5b24d738d30mr139010eaf.8.1715103538716; Tue, 07 May 2024
+ 10:38:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240502180020.3215547-1-maz@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20240215235405.368539-1-amoorthy@google.com> <171270376781.1586271.10159724514702496320.b4-ty@google.com>
+In-Reply-To: <171270376781.1586271.10159724514702496320.b4-ty@google.com>
+From: Anish Moorthy <amoorthy@google.com>
+Date: Tue, 7 May 2024 10:38:23 -0700
+Message-ID: <CAF7b7mqg5J54CjO6bDsRKvLQ49rk2xcerf8GYATXyd8pHanY9w@mail.gmail.com>
+Subject: Re: [PATCH v7 00/14] Improve KVM + userfaultfd performance via
+ KVM_EXIT_MEMORY_FAULTs on stage-2 faults
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, May 02, 2024 at 07:00:20PM +0100, Marc Zyngier wrote:
-> When taking a trap for an SMC instruction on the host, we must
-> stau true to the letter of the architecture and perform all the
+On Tue, Apr 9, 2024 at 5:21=E2=80=AFPM Sean Christopherson <seanjc@google.c=
+om> wrote:
+>
+> I skipped all KVM_CAP_EXIT_ON_MISSING as per our decision to hold off unt=
+il we
+> see the KVM userfault stuff.  I skipped the docs patch because it would r=
+equire
+> more massaging than I wanted to do when applying.  And lastly, I skipped =
+the
+> "Add memslot_flags parameter to memstress_create_vm()" patch because it w=
+ould be
+> dead code without the exit-on-missing usage.
+>
+> Please take a look at the selftests commits in particular, as I did a dec=
+ent
+> amount of massaging when applying.
 
-typo: stay
-
-> actions that the CPU would otherwise do. Among those are clearing
-> the BTYPE and SS bits.
-> 
-> Just do that.
-> 
-> Fixes: a805e1fb3099 ("KVM: arm64: Add SMC handler in nVHE EL2")
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/hyp/include/hyp/adjust_pc.h | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h b/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
-> index 4fdfeabefeb4..b1afb7b59a31 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
-> @@ -47,7 +47,13 @@ static inline void __kvm_skip_instr(struct kvm_vcpu *vcpu)
->   */
->  static inline void kvm_skip_host_instr(void)
->  {
-> +	u64 spsr = read_sysreg_el2(SYS_SPSR);
-> +
->  	write_sysreg_el2(read_sysreg_el2(SYS_ELR) + 4, SYS_ELR);
-> +
-> +	spsr &= ~(PSR_BTYPE_MASK | DBG_SPSR_SS);
-> +
-> +	write_sysreg_el2(spsr, SYS_SPSR);
-
-The handling of SS looks correct to me, but I think the BTYPE
-manipulation could do with a little more commentary as it looks quite
-subtle when the SMC is in a guarded page. Am I right in thinking:
-
-   * If the SMC is in a guarded page, the Branch Target exception is
-     higher priority (12) than the trap to EL2 and so the host will
-     handle it.
-
-   * Therefore if a trapping SMC is in a guarded page, BTYPE must be
-     zero and we don't have to worry about injecting a Branch Target
-     exception.
-
-   * Otherwise, if the SMC is in a non-guarded page, we should clear it
-     to 0 per the architecture (R_YWFHD).
-
-?
-
-Having said that, I can't actually find the priority of an SMC trapped
-to EL2 by HCR_EL2.TSC in the Arm ARM. Trapped HVCs are priority 15 and
-SMCs trapped to EL3 are priority 23.
-
-Will
+Thanks for cleaning the commits, and for all the help along the way. I
+just got around to checking the selftest commits, and they look good
+to me
