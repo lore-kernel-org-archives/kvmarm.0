@@ -1,63 +1,66 @@
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7611178C70
-	for <kvmarm@lists.linux.dev>; Tue,  7 May 2024 21:44:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A298D14B94F
+	for <kvmarm@lists.linux.dev>; Tue,  7 May 2024 21:44:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715118259; cv=none; b=KiAR6l6r21ShJq+qVhsAjJY7Ss29g4nB8T5Khoqfrq8GIvP3747HCuzx7WecGndmjLOBifxSh32BV28tBlHJMLnXmE4smSzcbm6QaFPsvNfd9liDJv5kq8wNhe7lfrGOG3xc3x2HHF3tQqCuDqGe1NkY5Vy795kuiCk6t2IhNSM=
+	t=1715118298; cv=none; b=RK0PqKLPrdX2gieXTu4poGDZMsJ/nOavEYOsfNCGUuBIx/ZQqM1OShstrwUHAX94J3RgWtaFED00Pt1rgRG81QefwPz578L13BS3+G10lXoAkOVKKv3d+cRwc9r1Zf7dIyUKuVJzz1ZaR8GLRxkutaNUBROn2dF9kNdVZXvlsBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715118259; c=relaxed/simple;
-	bh=/hZXDGTVBq72ITacQNgH9USqBScMcZl2RHFGP0aGwTY=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=aBtVk5zwdRPJsZGo3ULz5Cl0D2Dhan6evFoAKYmKzmD2S4aCddHKD5RGhWhP2ZP52qRKJZfv7mJAnS4oqym2NfcyI7inYFD4uT1MaXpfPJt6D0WPGXIXc5AtLNtjL4Pml+z+CSyadi1ZtlZNWGOv8jJARQ+yGuTLqcBzF0bjMbw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edliaw.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=f6UV1d5F; arc=none smtp.client-ip=209.85.215.202
+	s=arc-20240116; t=1715118298; c=relaxed/simple;
+	bh=uNS5SgTdf5Lqki4ZbkJSsqctuLHtwyYyPdiI8DfFaoc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ZkW1DnFifz/F9MCplv+scy4jB2uv9jV6gsXIEEi6Qmz7kTO0Ofr1jfWzJJV6FtlfrB1fGVhncGXKf2lM0UrY873RQBm7f58lWwk572drN3PNBqE+0ugkJ7rmwxpYZhJUfMosTeK/uQEaGxLVi3Gn30KCLQtWwAFslt1WAlyl5gU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edliaw.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dSgq2LgV; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edliaw.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="f6UV1d5F"
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-61eea13e924so4050114a12.0
-        for <kvmarm@lists.linux.dev>; Tue, 07 May 2024 14:44:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dSgq2LgV"
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-61be5d44307so64254007b3.0
+        for <kvmarm@lists.linux.dev>; Tue, 07 May 2024 14:44:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715118256; x=1715723056; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=EqE8unr5Y0tDCis4xdjJK0CstdIHAP3qZAtz/KAFViU=;
-        b=f6UV1d5FGfy7SKnoGnqmJZ1sXnI55pEVKzfWcgMnhRlTgGJaUwnOiJ/IVzwa2T8Knc
-         AsuNxoHvKGQAKADMXd8pVjgDLqa3zHiHBvKPlYD2xe/DXu2kxnLK55MYH+T3zwJTigP4
-         1kZkN9saFqKsleaP0rTCSeddhgwn8o0d5N1qugXmC1RaPB/inRQGV5BAgYIMXrVgBRX2
-         JDRjnNyQ2vZTwj/iHXnyXOzKiVJOZG5dEuUcrFGs5fMZY9I19AjHsUkwCE95bV0cxOLv
-         Nc6YlaDUgRnTYkRBQP4B4D2YDVgRJmFw9bh1d5CaaXBeF2TF3yHK+9AdEyG+uNfTBNaQ
-         wQsA==
+        d=google.com; s=20230601; t=1715118296; x=1715723096; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=FLG6gbZomB6DmPXjYL98l5fNcPQGk+fw1rCWyau0VTc=;
+        b=dSgq2LgVxqs3FeWlDSB5PBQKbyI+citvdQPQjiCj9r7xCAjPr4cqK8VUgt95q4kpmz
+         oY5qmfey44JXF6ZO7LyVJODKTeWTKsrAxHzcUDLR43twj9BFfN3x9gJOoWfACbhWEuIa
+         +WaxnfG6b59oB1yDkI8KUcijA9nz1Fkx2z1UoAYNx+xwb+y1nrSvetP4mdt++sptgW7A
+         ClCvg1So0vugDTNn/5ucmHga8KcnHiCg243hBnOlvpjl/spBtBe1m/G0EWBXMkmO9IF0
+         ljNy6fRpGzCnwHHC7mY1/D/p6rG3UQXMQ0/BRvYSxnOwyuiV3vYksPjxLjhoCwPCWRBY
+         OebA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715118256; x=1715723056;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=EqE8unr5Y0tDCis4xdjJK0CstdIHAP3qZAtz/KAFViU=;
-        b=FvscVM1rH7AfT/It4lnUjjW2cAKSaK0BfvqI/iFzBcJePK+hetgTTI77QJ323nAIkw
-         fiLkmwIiqco0pcyj7owRTT0iNu2dSWIVFNhJWlzJsqiy+7R/6bjN/BZuyLazyoI/wqXO
-         2JAt8rU/vlveZ5eTFwcEqbX+JPDdimFNcvnYLqYl4izZNErZLym/b82EdzkHdQhyxAvT
-         d3RVTjwCNAb4g1OVcbvH6LTze7mT53CM6a79kdHZ4FCKWuQnod6Bxkyjb/uLDxFA4lWA
-         b4DtY8TFGDhLZOQgpT7c9yyMXLDyljb2653JkoTV+Lkvl2Gg57LaAnvEqMxjv6ERxpjU
-         xZsA==
-X-Forwarded-Encrypted: i=1; AJvYcCX8NGtLjwMG3WMv1Fu/l97/NwANZj2Wm82+o6OJnDyFPhKhoEWEqpSA/HQNl/r4hK0F64/B5SBjb/bNFh4jXtcFJfMncmbc
-X-Gm-Message-State: AOJu0Ywzi9B19PoxBFSQTbo35SQhRhq/FMdgmSpYnBFBsbUNeANZ0kNV
-	dhmyLP91Yiqrpdx+j615Mrs19HXXOvBud50vyQro1iLS6LlJorOS9VL8dBs7kEBdJTBgHgAUlwv
-	HhA==
-X-Google-Smtp-Source: AGHT+IFisE4XLh7ZU+8mMwucPbxKUp9BzA2d0YyKj/xpS/Zt0NyK17LSV96dCgkbVAdnpiktJzrlwRA0ARY=
+        d=1e100.net; s=20230601; t=1715118296; x=1715723096;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=FLG6gbZomB6DmPXjYL98l5fNcPQGk+fw1rCWyau0VTc=;
+        b=X0TN9EE7EWXyOCIyIQxaiEeXhEqijTbE5r29S0RlAVmG3c7Fs39S22GAzdaiuLMVHo
+         2KqhgBy2RVPL2Ir0nIqXmQy2M8spAgwtohRXNV60oXfCc1JgcUJ2vDdLl0ckBe1UF6oa
+         K//9JtxofYnRhhHBlr0B6A+AsGDLJazk2p3cIXoSglFP1ogK60sDuIN2m9w+dEe/C5v/
+         6ouoV0qJH7BkRKW97asv1fHK/xHnb0QSOczIcKwSmNWB38B//DykksNS1JG36dfCgdk8
+         9UEFLLGhpnBCARbaLYQiUuE/LogKj3IJcUJmgU0XzzrpGYx7NqSGb2F5YjjqKBQSUD7d
+         Kmyw==
+X-Forwarded-Encrypted: i=1; AJvYcCUMyUIZi2t1com/YF8vcRo3Fg3A68zPzKt1GpWuqipueMI4baB2bY3KTaberErHMQ5VXXMDBbiT1+84MT4FZZcdAQayN7YH
+X-Gm-Message-State: AOJu0Yysl7BrJ/LwktN7/AY0nf68LI723dULed0pHezq4ORUl2JH1fCK
+	QzJ93scU6JeWAS+u5f5M8MXcCp5NN9OlmcENd97pXjoW3SEtwkXMdszdq04ofM0v9q2IUTwMjHM
+	IHg==
+X-Google-Smtp-Source: AGHT+IFDRufPRd20hhB8IsmwhuIIZ1gDaiY3aRkAgAGU63hP6Y69UhIvyGPjEABNQz9R7M3kyPQJ53ZX+tk=
 X-Received: from edliaw.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:305d])
- (user=edliaw job=sendgmr) by 2002:a65:6a93:0:b0:5dc:14c9:64aa with SMTP id
- 41be03b00d2f7-62f1f684fd2mr2704a12.3.1715118255449; Tue, 07 May 2024 14:44:15
- -0700 (PDT)
-Date: Tue,  7 May 2024 21:38:25 +0000
+ (user=edliaw job=sendgmr) by 2002:a81:a189:0:b0:61d:4701:5e65 with SMTP id
+ 00721157ae682-62085c5c5fbmr2405797b3.2.1715118295730; Tue, 07 May 2024
+ 14:44:55 -0700 (PDT)
+Date: Tue,  7 May 2024 21:38:26 +0000
+In-Reply-To: <20240507214254.2787305-1-edliaw@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20240507214254.2787305-1-edliaw@google.com>
 X-Mailer: git-send-email 2.45.0.rc1.225.g2a3ae87e7f-goog
-Message-ID: <20240507214254.2787305-1-edliaw@google.com>
-Subject: [PATCH v2 0/5] Define _GNU_SOURCE for sources using
+Message-ID: <20240507214254.2787305-2-edliaw@google.com>
+Subject: [PATCH v2 1/5] selftests: Compile kselftest headers with -D_GNU_SOURCE
 From: Edward Liaw <edliaw@google.com>
 To: shuah@kernel.org, Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>, 
 	Takashi Iwai <tiwai@suse.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
@@ -99,246 +102,72 @@ Cc: linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
 	linux-riscv@lists.infradead.org, linux-security-module@vger.kernel.org, 
 	linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org, 
 	linux-actions@lists.infradead.org, mptcp@lists.linux.dev, 
-	linux-rtc@vger.kernel.org, linux-sgx@vger.kernel.org, bpf@vger.kernel.org
+	linux-rtc@vger.kernel.org, linux-sgx@vger.kernel.org, bpf@vger.kernel.org, 
+	kernel test robot <oliver.sang@intel.com>
 Content-Type: text/plain; charset="UTF-8"
+
+Add the -D_GNU_SOURCE flag to KHDR_INCLUDES so that it is defined in a
+central location.
 
 809216233555 ("selftests/harness: remove use of LINE_MAX") introduced
 asprintf into kselftest_harness.h, which is a GNU extension and needs
 _GNU_SOURCE to either be defined prior to including headers or with the
 -D_GNU_SOURCE flag passed to the compiler.
 
-v1: https://lore.kernel.org/linux-kselftest/20240430235057.1351993-1-edliaw@google.com/
-v2: add -D_GNU_SOURCE to KHDR_INCLUDES so that it is in a single
-location.  Remove #define _GNU_SOURCE from source code to resolve
-redefinition warnings.
+Fixes: 809216233555 ("selftests/harness: remove use of LINE_MAX")
+Reported-by: kernel test robot <oliver.sang@intel.com>
+Closes: https://lore.kernel.org/oe-lkp/202404301040.3bea5782-oliver.sang@intel.com
+Signed-off-by: Edward Liaw <edliaw@google.com>
+---
+ tools/testing/selftests/Makefile            | 4 ++--
+ tools/testing/selftests/kselftest_harness.h | 2 +-
+ tools/testing/selftests/lib.mk              | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-Edward Liaw (5):
-  selftests: Compile kselftest headers with -D_GNU_SOURCE
-  selftests/sgx: Include KHDR_INCLUDES in Makefile
-  selftests: Include KHDR_INCLUDES in Makefile
-  selftests: Drop define _GNU_SOURCE
-  selftests: Drop duplicate -D_GNU_SOURCE
-
- tools/testing/selftests/Makefile                              | 4 ++--
- tools/testing/selftests/alsa/Makefile                         | 2 +-
- tools/testing/selftests/arm64/signal/Makefile                 | 2 +-
- tools/testing/selftests/cachestat/test_cachestat.c            | 2 --
- tools/testing/selftests/capabilities/test_execve.c            | 2 --
- tools/testing/selftests/clone3/clone3.c                       | 2 --
- .../testing/selftests/clone3/clone3_cap_checkpoint_restore.c  | 2 --
- tools/testing/selftests/clone3/clone3_clear_sighand.c         | 2 --
- tools/testing/selftests/clone3/clone3_selftests.h             | 1 -
- tools/testing/selftests/clone3/clone3_set_tid.c               | 2 --
- tools/testing/selftests/core/close_range_test.c               | 2 --
- tools/testing/selftests/drivers/dma-buf/udmabuf.c             | 1 -
- tools/testing/selftests/exec/Makefile                         | 2 +-
- tools/testing/selftests/fchmodat2/fchmodat2_test.c            | 2 --
- tools/testing/selftests/filesystems/binderfs/binderfs_test.c  | 2 --
- tools/testing/selftests/filesystems/devpts_pts.c              | 1 -
- tools/testing/selftests/filesystems/dnotify_test.c            | 1 -
- tools/testing/selftests/filesystems/epoll/epoll_wakeup_test.c | 2 --
- tools/testing/selftests/filesystems/eventfd/eventfd_test.c    | 2 --
- tools/testing/selftests/filesystems/fat/rename_exchange.c     | 2 --
- tools/testing/selftests/filesystems/overlayfs/Makefile        | 2 +-
- tools/testing/selftests/filesystems/overlayfs/dev_in_maps.c   | 2 --
- .../testing/selftests/filesystems/statmount/statmount_test.c  | 3 ---
- tools/testing/selftests/futex/functional/Makefile             | 2 +-
- tools/testing/selftests/futex/functional/futex_requeue_pi.c   | 3 ---
- tools/testing/selftests/hid/Makefile                          | 2 +-
- tools/testing/selftests/iommu/Makefile                        | 2 --
- tools/testing/selftests/ipc/msgque.c                          | 1 -
- tools/testing/selftests/kcmp/kcmp_test.c                      | 2 --
- tools/testing/selftests/kselftest_harness.h                   | 2 +-
- tools/testing/selftests/kvm/aarch64/arch_timer.c              | 2 --
- tools/testing/selftests/kvm/aarch64/page_fault_test.c         | 1 -
- tools/testing/selftests/kvm/aarch64/psci_test.c               | 3 ---
- tools/testing/selftests/kvm/aarch64/vgic_init.c               | 1 -
- tools/testing/selftests/kvm/arch_timer.c                      | 3 ---
- tools/testing/selftests/kvm/demand_paging_test.c              | 3 ---
- tools/testing/selftests/kvm/dirty_log_test.c                  | 3 ---
- tools/testing/selftests/kvm/guest_memfd_test.c                | 2 --
- tools/testing/selftests/kvm/hardware_disable_test.c           | 3 ---
- tools/testing/selftests/kvm/include/userfaultfd_util.h        | 3 ---
- tools/testing/selftests/kvm/kvm_binary_stats_test.c           | 2 --
- tools/testing/selftests/kvm/kvm_create_max_vcpus.c            | 2 --
- tools/testing/selftests/kvm/kvm_page_table_test.c             | 3 ---
- tools/testing/selftests/kvm/lib/assert.c                      | 3 ---
- tools/testing/selftests/kvm/lib/kvm_util.c                    | 2 --
- tools/testing/selftests/kvm/lib/memstress.c                   | 2 --
- tools/testing/selftests/kvm/lib/test_util.c                   | 2 --
- tools/testing/selftests/kvm/lib/userfaultfd_util.c            | 3 ---
- tools/testing/selftests/kvm/lib/x86_64/sev.c                  | 1 -
- tools/testing/selftests/kvm/max_guest_memory_test.c           | 2 --
- .../testing/selftests/kvm/memslot_modification_stress_test.c  | 3 ---
- tools/testing/selftests/kvm/riscv/arch_timer.c                | 3 ---
- tools/testing/selftests/kvm/rseq_test.c                       | 1 -
- tools/testing/selftests/kvm/s390x/cmma_test.c                 | 2 --
- tools/testing/selftests/kvm/s390x/sync_regs_test.c            | 2 --
- tools/testing/selftests/kvm/set_memory_region_test.c          | 1 -
- tools/testing/selftests/kvm/steal_time.c                      | 1 -
- tools/testing/selftests/kvm/x86_64/amx_test.c                 | 2 --
- .../selftests/kvm/x86_64/exit_on_emulation_failure_test.c     | 3 ---
- tools/testing/selftests/kvm/x86_64/hwcr_msr_test.c            | 2 --
- tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c             | 2 --
- tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c             | 1 -
- tools/testing/selftests/kvm/x86_64/hyperv_ipi.c               | 2 --
- tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c          | 1 -
- tools/testing/selftests/kvm/x86_64/hyperv_tlb_flush.c         | 2 --
- tools/testing/selftests/kvm/x86_64/nested_exceptions_test.c   | 2 --
- tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c       | 3 ---
- tools/testing/selftests/kvm/x86_64/platform_info_test.c       | 2 --
- tools/testing/selftests/kvm/x86_64/pmu_counters_test.c        | 2 --
- tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c    | 3 ---
- .../selftests/kvm/x86_64/private_mem_conversions_test.c       | 1 -
- tools/testing/selftests/kvm/x86_64/set_boot_cpu_id.c          | 1 -
- tools/testing/selftests/kvm/x86_64/set_sregs_test.c           | 1 -
- .../selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c  | 3 ---
- tools/testing/selftests/kvm/x86_64/smm_test.c                 | 1 -
- tools/testing/selftests/kvm/x86_64/state_test.c               | 1 -
- tools/testing/selftests/kvm/x86_64/sync_regs_test.c           | 2 --
- tools/testing/selftests/kvm/x86_64/ucna_injection_test.c      | 2 --
- tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c  | 2 --
- tools/testing/selftests/kvm/x86_64/vmx_dirty_log_test.c       | 3 ---
- tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c        | 1 -
- .../testing/selftests/kvm/x86_64/vmx_preemption_timer_test.c  | 1 -
- tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c           | 2 --
- tools/testing/selftests/kvm/x86_64/xapic_state_test.c         | 1 -
- tools/testing/selftests/kvm/x86_64/xss_msr_test.c             | 2 --
- tools/testing/selftests/landlock/base_test.c                  | 2 --
- tools/testing/selftests/landlock/fs_test.c                    | 2 --
- tools/testing/selftests/landlock/net_test.c                   | 2 --
- tools/testing/selftests/landlock/ptrace_test.c                | 2 --
- tools/testing/selftests/lib.mk                                | 2 +-
- tools/testing/selftests/lsm/common.c                          | 2 --
- tools/testing/selftests/lsm/lsm_get_self_attr_test.c          | 2 --
- tools/testing/selftests/lsm/lsm_list_modules_test.c           | 2 --
- tools/testing/selftests/lsm/lsm_set_self_attr_test.c          | 2 --
- tools/testing/selftests/membarrier/membarrier_test_impl.h     | 1 -
- .../selftests/membarrier/membarrier_test_multi_thread.c       | 1 -
- .../selftests/membarrier/membarrier_test_single_thread.c      | 1 -
- tools/testing/selftests/memfd/common.c                        | 1 -
- tools/testing/selftests/memfd/fuse_test.c                     | 2 --
- tools/testing/selftests/memfd/memfd_test.c                    | 1 -
- tools/testing/selftests/mm/cow.c                              | 1 -
- tools/testing/selftests/mm/gup_longterm.c                     | 1 -
- tools/testing/selftests/mm/hugepage-mmap.c                    | 1 -
- tools/testing/selftests/mm/hugepage-mremap.c                  | 2 --
- tools/testing/selftests/mm/hugetlb-madvise.c                  | 2 --
- tools/testing/selftests/mm/hugetlb-read-hwpoison.c            | 2 --
- tools/testing/selftests/mm/khugepaged.c                       | 1 -
- tools/testing/selftests/mm/ksm_functional_tests.c             | 1 -
- tools/testing/selftests/mm/madv_populate.c                    | 1 -
- tools/testing/selftests/mm/map_populate.c                     | 2 --
- tools/testing/selftests/mm/mdwe_test.c                        | 1 -
- tools/testing/selftests/mm/memfd_secret.c                     | 2 --
- tools/testing/selftests/mm/mlock2-tests.c                     | 1 -
- tools/testing/selftests/mm/mrelease_test.c                    | 1 -
- tools/testing/selftests/mm/mremap_dontunmap.c                 | 1 -
- tools/testing/selftests/mm/mremap_test.c                      | 2 --
- tools/testing/selftests/mm/pagemap_ioctl.c                    | 1 -
- tools/testing/selftests/mm/pkey-helpers.h                     | 1 -
- tools/testing/selftests/mm/protection_keys.c                  | 1 -
- tools/testing/selftests/mm/split_huge_page_test.c             | 2 --
- tools/testing/selftests/mm/thuge-gen.c                        | 2 --
- tools/testing/selftests/mm/uffd-common.h                      | 1 -
- tools/testing/selftests/mount_setattr/mount_setattr_test.c    | 1 -
- .../move_mount_set_group/move_mount_set_group_test.c          | 1 -
- tools/testing/selftests/nci/Makefile                          | 2 +-
- tools/testing/selftests/net/af_unix/diag_uid.c                | 2 --
- tools/testing/selftests/net/af_unix/scm_pidfd.c               | 1 -
- tools/testing/selftests/net/af_unix/unix_connect.c            | 2 --
- tools/testing/selftests/net/csum.c                            | 3 ---
- tools/testing/selftests/net/gro.c                             | 3 ---
- tools/testing/selftests/net/ip_defrag.c                       | 3 ---
- tools/testing/selftests/net/ipsec.c                           | 3 ---
- tools/testing/selftests/net/ipv6_flowlabel.c                  | 3 ---
- tools/testing/selftests/net/ipv6_flowlabel_mgr.c              | 3 ---
- tools/testing/selftests/net/mptcp/mptcp_connect.c             | 3 ---
- tools/testing/selftests/net/mptcp/mptcp_inq.c                 | 3 ---
- tools/testing/selftests/net/mptcp/mptcp_sockopt.c             | 3 ---
- tools/testing/selftests/net/msg_zerocopy.c                    | 3 ---
- tools/testing/selftests/net/nettest.c                         | 2 --
- tools/testing/selftests/net/psock_fanout.c                    | 3 ---
- tools/testing/selftests/net/psock_snd.c                       | 3 ---
- tools/testing/selftests/net/reuseport_addr_any.c              | 3 ---
- tools/testing/selftests/net/reuseport_bpf_cpu.c               | 3 ---
- tools/testing/selftests/net/reuseport_bpf_numa.c              | 3 ---
- tools/testing/selftests/net/reuseport_dualstack.c             | 3 ---
- tools/testing/selftests/net/so_incoming_cpu.c                 | 1 -
- tools/testing/selftests/net/so_netns_cookie.c                 | 1 -
- tools/testing/selftests/net/so_txtime.c                       | 3 ---
- tools/testing/selftests/net/tap.c                             | 3 ---
- tools/testing/selftests/net/tcp_ao/Makefile                   | 2 +-
- tools/testing/selftests/net/tcp_fastopen_backup_key.c         | 1 -
- tools/testing/selftests/net/tcp_inq.c                         | 2 --
- tools/testing/selftests/net/tcp_mmap.c                        | 1 -
- tools/testing/selftests/net/tls.c                             | 3 ---
- tools/testing/selftests/net/toeplitz.c                        | 3 ---
- tools/testing/selftests/net/tun.c                             | 3 ---
- tools/testing/selftests/net/txring_overwrite.c                | 3 ---
- tools/testing/selftests/net/txtimestamp.c                     | 3 ---
- tools/testing/selftests/net/udpgso.c                          | 3 ---
- tools/testing/selftests/net/udpgso_bench_rx.c                 | 3 ---
- tools/testing/selftests/net/udpgso_bench_tx.c                 | 3 ---
- tools/testing/selftests/perf_events/remove_on_exec.c          | 2 --
- tools/testing/selftests/perf_events/sigtrap_threads.c         | 2 --
- tools/testing/selftests/pid_namespace/regression_enomem.c     | 1 -
- tools/testing/selftests/pidfd/pidfd.h                         | 1 -
- tools/testing/selftests/pidfd/pidfd_fdinfo_test.c             | 2 --
- tools/testing/selftests/pidfd/pidfd_getfd_test.c              | 2 --
- tools/testing/selftests/pidfd/pidfd_open_test.c               | 2 --
- tools/testing/selftests/pidfd/pidfd_poll_test.c               | 2 --
- tools/testing/selftests/pidfd/pidfd_setns_test.c              | 2 --
- tools/testing/selftests/pidfd/pidfd_test.c                    | 2 --
- tools/testing/selftests/pidfd/pidfd_wait.c                    | 2 --
- tools/testing/selftests/prctl/Makefile                        | 2 ++
- tools/testing/selftests/proc/Makefile                         | 2 +-
- tools/testing/selftests/ptrace/get_set_sud.c                  | 1 -
- tools/testing/selftests/ptrace/peeksiginfo.c                  | 1 -
- tools/testing/selftests/resctrl/Makefile                      | 2 +-
- tools/testing/selftests/riscv/mm/Makefile                     | 2 +-
- tools/testing/selftests/rseq/basic_percpu_ops_test.c          | 1 -
- tools/testing/selftests/rseq/basic_test.c                     | 2 --
- tools/testing/selftests/rseq/param_test.c                     | 1 -
- tools/testing/selftests/rseq/rseq.c                           | 2 --
- tools/testing/selftests/rtc/Makefile                          | 2 +-
- tools/testing/selftests/seccomp/seccomp_benchmark.c           | 1 -
- tools/testing/selftests/seccomp/seccomp_bpf.c                 | 2 --
- tools/testing/selftests/sgx/Makefile                          | 2 +-
- tools/testing/selftests/sgx/sigstruct.c                       | 1 -
- tools/testing/selftests/tmpfs/Makefile                        | 2 +-
- tools/testing/selftests/user_events/abi_test.c                | 2 --
- tools/testing/selftests/x86/amx.c                             | 2 --
- tools/testing/selftests/x86/check_initial_reg_state.c         | 3 ---
- tools/testing/selftests/x86/corrupt_xstate_header.c           | 3 ---
- tools/testing/selftests/x86/entry_from_vm86.c                 | 3 ---
- tools/testing/selftests/x86/fsgsbase.c                        | 2 --
- tools/testing/selftests/x86/fsgsbase_restore.c                | 2 --
- tools/testing/selftests/x86/ioperm.c                          | 2 --
- tools/testing/selftests/x86/iopl.c                            | 2 --
- tools/testing/selftests/x86/lam.c                             | 1 -
- tools/testing/selftests/x86/ldt_gdt.c                         | 2 --
- tools/testing/selftests/x86/mov_ss_trap.c                     | 2 --
- tools/testing/selftests/x86/nx_stack.c                        | 2 --
- tools/testing/selftests/x86/ptrace_syscall.c                  | 2 --
- tools/testing/selftests/x86/sigaltstack.c                     | 2 --
- tools/testing/selftests/x86/sigreturn.c                       | 3 ---
- tools/testing/selftests/x86/single_step_syscall.c             | 3 ---
- tools/testing/selftests/x86/syscall_arg_fault.c               | 3 ---
- tools/testing/selftests/x86/syscall_numbering.c               | 3 ---
- tools/testing/selftests/x86/sysret_rip.c                      | 3 ---
- tools/testing/selftests/x86/sysret_ss_attrs.c                 | 3 ---
- tools/testing/selftests/x86/test_FCMOV.c                      | 4 ----
- tools/testing/selftests/x86/test_FCOMI.c                      | 4 ----
- tools/testing/selftests/x86/test_FISTTP.c                     | 4 ----
- tools/testing/selftests/x86/test_mremap_vdso.c                | 1 -
- tools/testing/selftests/x86/test_shadow_stack.c               | 3 ---
- tools/testing/selftests/x86/test_syscall_vdso.c               | 4 ----
- tools/testing/selftests/x86/test_vsyscall.c                   | 3 ---
- tools/testing/selftests/x86/unwind_vdso.c                     | 3 ---
- tools/testing/selftests/x86/vdso_restorer.c                   | 3 ---
- 218 files changed, 20 insertions(+), 426 deletions(-)
-
---
+diff --git a/tools/testing/selftests/Makefile b/tools/testing/selftests/Makefile
+index e1504833654d..ed012a7f0786 100644
+--- a/tools/testing/selftests/Makefile
++++ b/tools/testing/selftests/Makefile
+@@ -161,11 +161,11 @@ ifneq ($(KBUILD_OUTPUT),)
+   # $(realpath ...) resolves symlinks
+   abs_objtree := $(realpath $(abs_objtree))
+   BUILD := $(abs_objtree)/kselftest
+-  KHDR_INCLUDES := -isystem ${abs_objtree}/usr/include
++  KHDR_INCLUDES := -D_GNU_SOURCE -isystem ${abs_objtree}/usr/include
+ else
+   BUILD := $(CURDIR)
+   abs_srctree := $(shell cd $(top_srcdir) && pwd)
+-  KHDR_INCLUDES := -isystem ${abs_srctree}/usr/include
++  KHDR_INCLUDES := -D_GNU_SOURCE -isystem ${abs_srctree}/usr/include
+   DEFAULT_INSTALL_HDR_PATH := 1
+ endif
+ 
+diff --git a/tools/testing/selftests/kselftest_harness.h b/tools/testing/selftests/kselftest_harness.h
+index d98702b6955d..b2a1b6343896 100644
+--- a/tools/testing/selftests/kselftest_harness.h
++++ b/tools/testing/selftests/kselftest_harness.h
+@@ -51,7 +51,7 @@
+ #define __KSELFTEST_HARNESS_H
+ 
+ #ifndef _GNU_SOURCE
+-#define _GNU_SOURCE
++static_assert(0, "kselftest harness requires _GNU_SOURCE to be defined");
+ #endif
+ #include <asm/types.h>
+ #include <ctype.h>
+diff --git a/tools/testing/selftests/lib.mk b/tools/testing/selftests/lib.mk
+index da2cade3bab0..2503dc732b4d 100644
+--- a/tools/testing/selftests/lib.mk
++++ b/tools/testing/selftests/lib.mk
+@@ -45,7 +45,7 @@ selfdir = $(realpath $(dir $(filter %/lib.mk,$(MAKEFILE_LIST))))
+ top_srcdir = $(selfdir)/../../..
+ 
+ ifeq ($(KHDR_INCLUDES),)
+-KHDR_INCLUDES := -isystem $(top_srcdir)/usr/include
++KHDR_INCLUDES := -D_GNU_SOURCE -isystem $(top_srcdir)/usr/include
+ endif
+ 
+ # The following are built by lib.mk common compile rules.
+-- 
 2.45.0.rc1.225.g2a3ae87e7f-goog
 
