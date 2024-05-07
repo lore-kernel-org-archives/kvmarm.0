@@ -1,141 +1,175 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 113E016D319;
-	Tue,  7 May 2024 19:05:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98EC24C8A
+	for <kvmarm@lists.linux.dev>; Tue,  7 May 2024 19:29:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715108738; cv=none; b=L/yDg/OXdEts6v5q9nKAFYiiv8pEU706h97xbgTGXKrufZSFwK0S9sQoS1F/1xobMlHugZHCyHROyP3W47JgEgD2irQIo0MJw6+Yx8pQdbdo9ntCjdb21GfHUwbPaJffFr8By3st84/LwPQpq+FOdkQAajL2jOPGrIc/fgisQgA=
+	t=1715110167; cv=none; b=hsY5JejaxzNxUqx7Sda65Nx/IyOFEQ3VlTwo/CNUYk7svKDGDkB1Oy1PBTdKcsenkCnfM/dJ0bajR8e3n06NuEynuPt9aitNaevLehQLuQ34T3QDIx6P2bZFhPsRlC5JMKfcZUhJyUTM1+m/BsbkktJ8p63UcojKp64n+eWKD7w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715108738; c=relaxed/simple;
-	bh=RXjxiKuVIg66+4e4zRGgHnAS0eHWvtxBBhUDFGqspwU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PQrUjJ5/eDBhHxbfXmWSg71Ag+gG+W+tzapDmhGso0RqDwxeKakKsrxnoBZz2BYRMGtMO9FfrTYL7dvLHsqX4TfhJ3tXplOXRhBNMCEZfmdkW7RWVWLmB2PHGPEQacX8TZF0JC3LuFqOyk6xtbiawJoGtJ0hxCllLKABWKjpRj4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AjPMiHJ0; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1715110167; c=relaxed/simple;
+	bh=txIFnBoy/o4pN748oanKt/haW9FuUA4lGNj8s06p2nk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RyylZSSw2Bk8mRSmbjv9whfA+xs7Lu7sSPIqogvgbhaKVZUcJuE989z86ZAgFwjt3/00lt4OeblMFBRU53vQ3xQlIVLdgTqJN5gjwNpzV/6rriqCFxK13NBsAHEDkwvHQLcLt2LkYnqQXzI4ij8WqX81mngdLwkUygnm/EqNoYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jDGg//l1; arc=none smtp.client-ip=95.215.58.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AjPMiHJ0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB0FAC4DDE1;
-	Tue,  7 May 2024 19:05:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715108737;
-	bh=RXjxiKuVIg66+4e4zRGgHnAS0eHWvtxBBhUDFGqspwU=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=AjPMiHJ0Hm2xzIl7Alq1yoV8rbkVe5bNuUm7RDM5BclkgOkJtvitJv2e7bVWYycat
-	 7GaD0KVba/JY9YXF/tjK6GYceA1f5LthmtyHahTlgFKhmk2YPu7aAwYQ7aeRIBWv/5
-	 Mvsk/lcZenuxg5AqQDNx3zr18qhJ316CzqRHbGQbViw+HR4qRqCRaSa24jdsIEtBws
-	 XXJNXAJ82uKlxAr1fxk/9Cz+NxsQPXcEWfcIpGDTdVCquspzfMK6bLQpWlqSDl8MIE
-	 8AzGaw91fcfsop+XTvUZQhTBV96vwhV19nqDBPyNysPdqgGisaHl4Vj//GZP5OR7Sp
-	 eXrTZVflejSog==
-Received: by mail-oo1-f41.google.com with SMTP id 006d021491bc7-5acf5723325so897521eaf.0;
-        Tue, 07 May 2024 12:05:37 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCU7RsGf7DeaADiHIhn33l8ycfdvnPg3bNxBNwdvfLI6HF/deUqQfjZw/73vRH782nHA3rBbyokD1nQLs4T18yjpr75tkJ7qeV5kyycoFBO2YbPlt5Zb+ceFwhpQOS1X8oO3
-X-Gm-Message-State: AOJu0YyYfkINsSlqgjlg6nm8HzQP5XPdjv0vjgG1rLwQD6E4dPIWR5Gf
-	7U7yCuKgFj9x5wq6GSST+ep7GtrG/yNqrH8G6+6kTHIdd60nCQxirj6+JzOtv3j4BscRbfkO/rm
-	yZYbmau6XP6RZ3YLO/OZwIzRzAGQ=
-X-Google-Smtp-Source: AGHT+IF3DM1jvXt28nOSFpZ7axthsouZnF1Q5Tkxbf3eoVMe0Qp8gd2UpGhIK/KgeLsuVQ1JcjFRVflsYxqumunVBys=
-X-Received: by 2002:a05:6820:1f92:b0:5ac:6fc1:c2cb with SMTP id
- 006d021491bc7-5b24caad211mr423157eaf.0.1715108737184; Tue, 07 May 2024
- 12:05:37 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jDGg//l1"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1715110162;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=AW40FyzPX+l6QxtT4X+Nin4Wej9B/R96fVtwK2Rd08E=;
+	b=jDGg//l1B0IwM+JRZy+Wsq2tBI+rcn05jx8RflxUTAgxXZxlVLdvUPiL+J1Dh3cjWnPcgK
+	RNewAs1juNqQtNwbAHVhvSkSI2JlFoLhDf4HbrgZEJx7HoGSgOKRjre/mt6BLHXCjVVPnb
+	RyWTBwyOSqkC3MKy2GcnJORuPO99d7I=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	kvm@vger.kernel.org,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH] KVM: arm64: Destroy mpidr_data for 'late' vCPU creation
+Date: Tue,  7 May 2024 19:29:12 +0000
+Message-ID: <20240507192912.1096658-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20240430142434.10471-1-Jonathan.Cameron@huawei.com> <20240430142434.10471-8-Jonathan.Cameron@huawei.com>
-In-Reply-To: <20240430142434.10471-8-Jonathan.Cameron@huawei.com>
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Tue, 7 May 2024 21:05:26 +0200
-X-Gmail-Original-Message-ID: <CAJZ5v0gBF56XspBYaxZ2CoF0P0idVovJ_=s1Kks3xe4O9LJf9A@mail.gmail.com>
-Message-ID: <CAJZ5v0gBF56XspBYaxZ2CoF0P0idVovJ_=s1Kks3xe4O9LJf9A@mail.gmail.com>
-Subject: Re: [PATCH v9 07/19] ACPI: processor: Add acpi_get_processor_handle() helper
-To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra <peterz@infradead.org>, linux-pm@vger.kernel.org, 
-	loongarch@lists.linux.dev, linux-acpi@vger.kernel.org, 
-	linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, x86@kernel.org, 
-	Russell King <linux@armlinux.org.uk>, "Rafael J . Wysocki" <rafael@kernel.org>, 
-	Miguel Luis <miguel.luis@oracle.com>, James Morse <james.morse@arm.com>, 
-	Salil Mehta <salil.mehta@huawei.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, 
-	Hanjun Guo <guohanjun@huawei.com>, Gavin Shan <gshan@redhat.com>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, linuxarm@huawei.com, 
-	justin.he@arm.com, jianyong.wu@arm.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Apr 30, 2024 at 4:28=E2=80=AFPM Jonathan Cameron
-<Jonathan.Cameron@huawei.com> wrote:
->
-> If CONFIG_ACPI_PROCESSOR provide a helper to retrieve the
-> acpi_handle for a given CPU allowing access to methods
-> in DSDT.
->
-> Tested-by: Miguel Luis <miguel.luis@oracle.com>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+A particularly annoying userspace could create a vCPU after KVM has
+computed mpidr_data for the VM, either by racing against VGIC
+initialization or having a userspace irqchip.
 
-Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+In any case, this means mpidr_data no longer fully describes the VM, and
+attempts to find the new vCPU with kvm_mpidr_to_vcpu() will fail. The
+fix is to discard mpidr_data altogether, as it is only a performance
+optimization and not required for correctness. In all likelihood KVM
+will recompute the mappings when KVM_RUN is called on the new vCPU.
 
->
-> ---
-> v9: Tags
-> ---
->  drivers/acpi/acpi_processor.c | 11 +++++++++++
->  include/linux/acpi.h          |  7 +++++++
->  2 files changed, 18 insertions(+)
->
-> diff --git a/drivers/acpi/acpi_processor.c b/drivers/acpi/acpi_processor.=
-c
-> index 4a79b42d649e..e8cbe0e40dd0 100644
-> --- a/drivers/acpi/acpi_processor.c
-> +++ b/drivers/acpi/acpi_processor.c
-> @@ -35,6 +35,17 @@ EXPORT_PER_CPU_SYMBOL(processors);
->  struct acpi_processor_errata errata __read_mostly;
->  EXPORT_SYMBOL_GPL(errata);
->
-> +acpi_handle acpi_get_processor_handle(int cpu)
-> +{
-> +       struct acpi_processor *pr;
-> +
-> +       pr =3D per_cpu(processors, cpu);
-> +       if (pr)
-> +               return pr->handle;
-> +
-> +       return NULL;
-> +}
-> +
->  static int acpi_processor_errata_piix4(struct pci_dev *dev)
->  {
->         u8 value1 =3D 0;
-> diff --git a/include/linux/acpi.h b/include/linux/acpi.h
-> index 34829f2c517a..9844a3f9c4e5 100644
-> --- a/include/linux/acpi.h
-> +++ b/include/linux/acpi.h
-> @@ -309,6 +309,8 @@ int acpi_map_cpu(acpi_handle handle, phys_cpuid_t phy=
-sid, u32 acpi_id,
->  int acpi_unmap_cpu(int cpu);
->  #endif /* CONFIG_ACPI_HOTPLUG_CPU */
->
-> +acpi_handle acpi_get_processor_handle(int cpu);
-> +
->  #ifdef CONFIG_ACPI_HOTPLUG_IOAPIC
->  int acpi_get_ioapic_id(acpi_handle handle, u32 gsi_base, u64 *phys_addr)=
-;
->  #endif
-> @@ -1077,6 +1079,11 @@ static inline bool acpi_sleep_state_supported(u8 s=
-leep_state)
->         return false;
->  }
->
-> +static inline acpi_handle acpi_get_processor_handle(int cpu)
-> +{
-> +       return NULL;
-> +}
-> +
->  #endif /* !CONFIG_ACPI */
->
->  extern void arch_post_acpi_subsys_init(void);
-> --
-> 2.39.2
->
+Note that reads of mpidr_data are not guarded by a lock; promote to RCU
+to cope with the possibility of mpidr_data being invalidated at runtime.
+
+Fixes: 54a8006d0b49 ("KVM: arm64: Fast-track kvm_mpidr_to_vcpu() when mpidr_data is available")
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+---
+ arch/arm64/kvm/arm.c | 49 ++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 40 insertions(+), 9 deletions(-)
+
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index c4a0a35e02c7..0d845131a0e0 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -195,6 +195,22 @@ void kvm_arch_create_vm_debugfs(struct kvm *kvm)
+ 	kvm_sys_regs_create_debugfs(kvm);
+ }
+ 
++static void kvm_destroy_mpidr_data(struct kvm *kvm)
++{
++	struct kvm_mpidr_data *data;
++
++	mutex_lock(&kvm->arch.config_lock);
++
++	data = rcu_dereference_raw(kvm->arch.mpidr_data);
++	if (data) {
++		rcu_assign_pointer(kvm->arch.mpidr_data, NULL);
++		synchronize_rcu();
++		kfree(data);
++	}
++
++	mutex_unlock(&kvm->arch.config_lock);
++}
++
+ /**
+  * kvm_arch_destroy_vm - destroy the VM data structure
+  * @kvm:	pointer to the KVM struct
+@@ -209,7 +225,8 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+ 	if (is_protected_kvm_enabled())
+ 		pkvm_destroy_hyp_vm(kvm);
+ 
+-	kfree(kvm->arch.mpidr_data);
++	kvm_destroy_mpidr_data(kvm);
++
+ 	kfree(kvm->arch.sysreg_masks);
+ 	kvm_destroy_vcpus(kvm);
+ 
+@@ -395,6 +412,13 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+ 
+ 	vcpu->arch.hw_mmu = &vcpu->kvm->arch.mmu;
+ 
++	/*
++	 * This vCPU may have been created after mpidr_data was initialized.
++	 * Throw out the pre-computed mappings if that is the case which forces
++	 * KVM to fall back to iteratively searching the vCPUs.
++	 */
++	kvm_destroy_mpidr_data(vcpu->kvm);
++
+ 	err = kvm_vgic_vcpu_init(vcpu);
+ 	if (err)
+ 		return err;
+@@ -594,7 +618,8 @@ static void kvm_init_mpidr_data(struct kvm *kvm)
+ 
+ 	mutex_lock(&kvm->arch.config_lock);
+ 
+-	if (kvm->arch.mpidr_data || atomic_read(&kvm->online_vcpus) == 1)
++	if (rcu_access_pointer(kvm->arch.mpidr_data) ||
++	    atomic_read(&kvm->online_vcpus) == 1)
+ 		goto out;
+ 
+ 	kvm_for_each_vcpu(c, vcpu, kvm) {
+@@ -631,7 +656,7 @@ static void kvm_init_mpidr_data(struct kvm *kvm)
+ 		data->cmpidr_to_idx[index] = c;
+ 	}
+ 
+-	kvm->arch.mpidr_data = data;
++	rcu_assign_pointer(kvm->arch.mpidr_data, data);
+ out:
+ 	mutex_unlock(&kvm->arch.config_lock);
+ }
+@@ -2470,21 +2495,27 @@ static int __init init_hyp_mode(void)
+ 
+ struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr)
+ {
+-	struct kvm_vcpu *vcpu;
++	struct kvm_vcpu *vcpu = NULL;
++	struct kvm_mpidr_data *data;
+ 	unsigned long i;
+ 
+ 	mpidr &= MPIDR_HWID_BITMASK;
+ 
+-	if (kvm->arch.mpidr_data) {
+-		u16 idx = kvm_mpidr_index(kvm->arch.mpidr_data, mpidr);
++	rcu_read_lock();
++	data = rcu_dereference(kvm->arch.mpidr_data);
+ 
+-		vcpu = kvm_get_vcpu(kvm,
+-				    kvm->arch.mpidr_data->cmpidr_to_idx[idx]);
++	if (data) {
++		u16 idx = kvm_mpidr_index(data, mpidr);
++
++		vcpu = kvm_get_vcpu(kvm, data->cmpidr_to_idx[idx]);
+ 		if (mpidr != kvm_vcpu_get_mpidr_aff(vcpu))
+ 			vcpu = NULL;
++	}
+ 
++	rcu_read_unlock();
++
++	if (vcpu)
+ 		return vcpu;
+-	}
+ 
+ 	kvm_for_each_vcpu(i, vcpu, kvm) {
+ 		if (mpidr == kvm_vcpu_get_mpidr_aff(vcpu))
+
+base-commit: fec50db7033ea478773b159e0e2efb135270e3b7
+-- 
+2.45.0.rc1.225.g2a3ae87e7f-goog
+
