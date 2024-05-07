@@ -1,55 +1,55 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE469184D;
-	Tue,  7 May 2024 18:55:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A7FE16C84E;
+	Tue,  7 May 2024 18:57:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715108151; cv=none; b=KDAMGhJaHfKQ83d2lJyM+kijfTaZ4TgyPsVp0ixRi/tAOCk8d+K06O6sWWlunqSxA9aU4uVJ5dZZUILsQwz0is77JwT+HxXL5lN/8i1u4ZAH01tdAv0NyRzuqHBnOJXXyBouKye5udew7c54KcBRK5V/lqdaw5+tHKdVrtlJuOI=
+	t=1715108235; cv=none; b=Ysy/dQuC9K5niB01pPvNZf0N1dT6hlWkTPEwPAOoH8kNq8EhB5UGo2KxSgDyOHbSDtW76+ueW0K2Fb528PV+uMRj1VI9wQJqF593GhF+HuhqERllUcbqmZW0vdBy3slZddpnMV1fTe3lDHca1NBn7lB66vrkjJ7h4kfMR8q3VX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715108151; c=relaxed/simple;
-	bh=s9TJ7BUa1nTYfV0K5h3xYN7O2jbjVFFreTldzhRORjA=;
+	s=arc-20240116; t=1715108235; c=relaxed/simple;
+	bh=7MldFMh0WRj0UvMnQBIzOVOdcBxV2CBitHg5VApEhc8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=u2PlQIMnZHtCfR3PdQItNPCeuNPTwaIRZuHLyXgqU0m8n1Ht8+ObYn3nvTvr1nBsXRWJZUjRjUmC1Z7DUfVaPah8h2dtBEwbKC7uMzzgDM4OOFdxHp1kCjvRt/hpjtoigtApGDx+LZjT0mRrdzZdRz3Wm5/xmYUuYlQFV62u6Vs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MYxYpuTJ; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=CrCPIbTxBPDMkC2MWp14jLmaWVdlvTHisWO3d85D3l/zHhtNyE8NoDERyqgDTs+lcGePVxHJ3QhVFfMCBYmdWKBHbPaE/ojrypePKMMiyk7bl9NRuvlQBFeglZchL4FQa0+2H/7VeuD8pFLod8qhsEiy2elVkzdpE7R0Tlv901I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E1PjAJAT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MYxYpuTJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41C90C4DDE5;
-	Tue,  7 May 2024 18:55:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E1PjAJAT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2B0EC4DDE8;
+	Tue,  7 May 2024 18:57:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715108151;
-	bh=s9TJ7BUa1nTYfV0K5h3xYN7O2jbjVFFreTldzhRORjA=;
+	s=k20201202; t=1715108234;
+	bh=7MldFMh0WRj0UvMnQBIzOVOdcBxV2CBitHg5VApEhc8=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=MYxYpuTJ6uS5ozOsUarhVXYgwV4QygLxiV1yGuFjhWlskfh1AY2MgxmNgLc2+qCPA
-	 7oPm45NCbyVbL56RRE2CoL8xaSg4N0uf6NHmzHawqdBeOJbZHhGWYjUs06JNKqerXb
-	 V4kBGr93FecfBYSiQpEyoDKueit4UuWMlPhqDq9Tz6JWnEiQb0J1Zaz70f7gA3DAuV
-	 uO92Tl5SDo4maQTzrQnHEVupT5k7P9Hfu1cbWgrXtl15LG0yN4R1BkEjZ9hrgIx+qu
-	 j/V65VHKYY4o/J7IhsVZcrEQdDG3c2Pc24u3qBd2tmLplh42qTXNU8VM6SWPGy2HL4
-	 M+GASdaIt1nUQ==
-Received: by mail-ot1-f48.google.com with SMTP id 46e09a7af769-6f02ba0713dso379240a34.0;
-        Tue, 07 May 2024 11:55:51 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCV+FLUu02VD66CpIoSpJ0AAhiPdHPQBRLnHeHY7G+ElVesotum3sZMlro/dN1d1B0YnWlNeLCCJg5zWu5OugF/1MM1LssviVtd2ZAUDJUs0r+9sWc5/CYou9n6YCNdD5lxz
-X-Gm-Message-State: AOJu0Yw4eCQ+QaWCX3HwOIVLKorDXuJXZJ0Hcm+qTQSGiZSUPXcFlP7K
-	yqZZJl8P1isQiKt1DTCVs5QpAnQHuARR548KiBYaJOVIr0hZhik400AZETFZqDTISIeJBjoyrtS
-	wdWoynDzBUDB8UXn+2FWXiCGL4VU=
-X-Google-Smtp-Source: AGHT+IGm8eYgszhdxibFF67K/s34HQdmS1A/5rFstggkGk8aCZiZnDuIah8KM0kPCad7VKoxrlD1gBNnD/DaO88MGpo=
-X-Received: by 2002:a4a:3158:0:b0:5b1:ff38:5ee0 with SMTP id
- 006d021491bc7-5b24d470f6fmr320087eaf.1.1715108150335; Tue, 07 May 2024
- 11:55:50 -0700 (PDT)
+	b=E1PjAJATWxldderSnURjfd5HR/y8+qH1w0WIr+8S2MGugZWT4/EHbg5T+2yCdlhPJ
+	 1YZvCtvIRMdL6LDwFx0bHiaF7Vy80YYgIue5irmvWPzuhz9ZbWwRlTuHkuMWHeo7H6
+	 cq0oxGRSif7PjbmWyqU1CAE8zASFCak0QK1lSoZypeJHvgMprLl6/euUz/elG+LWWN
+	 dIgPK0l/fjyywfbs9ErgMueVxpD1uGy0/smS851r1KvY3VLjEZ2GJjWJa8ElcI0ceb
+	 m/ujPN0giZxnajz5d0LixljIgTEHKdTc/L9LQYWjexTXZmBtaVw23NTzjAfRwySQ4T
+	 UhzImpdv2U3SA==
+Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-5b1b03dc01dso829329eaf.3;
+        Tue, 07 May 2024 11:57:14 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCWa4T2ZxLIigAu/3fkowcVHJ/Engfwz6totrz8UoNjE5Sw68GF8/McOHPKeyqwuV6CMukyrITPa0m+P0fPC5/1MW++FdWO4Kw/MUxc15C3bIehu+YSl+X6qAkhE1IY8ID9I
+X-Gm-Message-State: AOJu0YxePa2NAfoC/4iVNFlLUc5sGTb8GUS7vhwHTl6CzFCrO2PdzREI
+	DO/f0B/o2vKFERQAcx6riu0vPFg8uRs1Hm09d9pAHfcG64UEa+www5Oa+9cMuj3HTur3oZA5KoC
+	yMbG5PPsv08L3PvX3jwFzTVpX9BM=
+X-Google-Smtp-Source: AGHT+IEFc40TEOusB0UJmLy29APzgs2yTSEpGQKKhB7KODeTniFYUYTrhBWiV95uhhheO//w8101/x52LKU2Lo07/PI=
+X-Received: by 2002:a05:6820:1f92:b0:5ac:6fc1:c2cb with SMTP id
+ 006d021491bc7-5b24caad211mr401694eaf.0.1715108234007; Tue, 07 May 2024
+ 11:57:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20240430142434.10471-1-Jonathan.Cameron@huawei.com> <20240430142434.10471-5-Jonathan.Cameron@huawei.com>
-In-Reply-To: <20240430142434.10471-5-Jonathan.Cameron@huawei.com>
+References: <20240430142434.10471-1-Jonathan.Cameron@huawei.com> <20240430142434.10471-6-Jonathan.Cameron@huawei.com>
+In-Reply-To: <20240430142434.10471-6-Jonathan.Cameron@huawei.com>
 From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Tue, 7 May 2024 20:55:39 +0200
-X-Gmail-Original-Message-ID: <CAJZ5v0gCgWsbUDmhU2vPiz6dMwefdmRYthyxQoGiEhvPqwDpKw@mail.gmail.com>
-Message-ID: <CAJZ5v0gCgWsbUDmhU2vPiz6dMwefdmRYthyxQoGiEhvPqwDpKw@mail.gmail.com>
-Subject: Re: [PATCH v9 04/19] ACPI: processor: Return an error if
- acpi_processor_get_info() fails in processor_add()
+Date: Tue, 7 May 2024 20:57:02 +0200
+X-Gmail-Original-Message-ID: <CAJZ5v0j3RV-6b8sTv2GoyuSNPX863x1xp4koF7imJDgbOdWXeg@mail.gmail.com>
+Message-ID: <CAJZ5v0j3RV-6b8sTv2GoyuSNPX863x1xp4koF7imJDgbOdWXeg@mail.gmail.com>
+Subject: Re: [PATCH v9 05/19] ACPI: processor: Fix memory leaks in error paths
+ of processor_add()
 To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 Cc: Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra <peterz@infradead.org>, linux-pm@vger.kernel.org, 
 	loongarch@lists.linux.dev, linux-acpi@vger.kernel.org, 
@@ -65,36 +65,35 @@ Cc: Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra <peterz@infradead.org>,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 30, 2024 at 4:26=E2=80=AFPM Jonathan Cameron
+On Tue, Apr 30, 2024 at 4:27=E2=80=AFPM Jonathan Cameron
 <Jonathan.Cameron@huawei.com> wrote:
 >
-> Rafael observed [1] that returning 0 from processor_add() will result in
-> acpi_default_enumeration() being called which will attempt to create a
-> platform device, but that makes little sense when the processor is known
-> to be not available.  So just return the error code from acpi_processor_g=
-et_info()
-> instead.
+> If acpi_processor_get_info() returned an error, pr and the associated
+> pr->throttling.shared_cpu_map were leaked.
 >
-> Link: https://lore.kernel.org/all/CAJZ5v0iKU8ra9jR+EmgxbuNm=3DUwx2m1-8vn_=
-RAZ+aCiUVLe3Pw@mail.gmail.com/ [1]
-> Suggested-by: Rafael J. Wysocki <rafael@kernel.org>
+> The unwind code was in the wrong order wrt to setup, relying on
+> some unwind actions having no affect (clearing variables that were
+> never set etc).  That makes it harder to reason about so reorder
+> and add appropriate labels to only undo what was actually set up
+> in the first place.
+>
 > Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 
 Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
 
 Thank you!
 
+>
 > ---
-> v9: New patch following through from Gavin pointing out a memory leak lat=
-er
->     in the series.
+> v9: New patch in response to Gavin noticing a memory leak later in the
+>     series.
 > ---
->  drivers/acpi/acpi_processor.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  drivers/acpi/acpi_processor.c | 15 ++++++++-------
+>  1 file changed, 8 insertions(+), 7 deletions(-)
 >
 > diff --git a/drivers/acpi/acpi_processor.c b/drivers/acpi/acpi_processor.=
 c
-> index 161c95c9d60a..5f062806ca40 100644
+> index 5f062806ca40..16e36e55a560 100644
 > --- a/drivers/acpi/acpi_processor.c
 > +++ b/drivers/acpi/acpi_processor.c
 > @@ -393,7 +393,7 @@ static int acpi_processor_add(struct acpi_device *dev=
@@ -103,11 +102,55 @@ ice,
 >         result =3D acpi_processor_get_info(device);
 >         if (result) /* Processor is not physically present or unavailable=
  */
-> -               return 0;
-> +               return result;
+> -               return result;
+> +               goto err_clear_driver_data;
 >
 >         BUG_ON(pr->id >=3D nr_cpu_ids);
 >
+> @@ -408,7 +408,7 @@ static int acpi_processor_add(struct acpi_device *dev=
+ice,
+>                         "BIOS reported wrong ACPI id %d for the processor=
+\n",
+>                         pr->id);
+>                 /* Give up, but do not abort the namespace scan. */
+> -               goto err;
+> +               goto err_clear_driver_data;
+>         }
+>         /*
+>          * processor_device_array is not cleared on errors to allow buggy=
+ BIOS
+> @@ -420,12 +420,12 @@ static int acpi_processor_add(struct acpi_device *d=
+evice,
+>         dev =3D get_cpu_device(pr->id);
+>         if (!dev) {
+>                 result =3D -ENODEV;
+> -               goto err;
+> +               goto err_clear_per_cpu;
+>         }
+>
+>         result =3D acpi_bind_one(dev, device);
+>         if (result)
+> -               goto err;
+> +               goto err_clear_per_cpu;
+>
+>         pr->dev =3D dev;
+>
+> @@ -436,10 +436,11 @@ static int acpi_processor_add(struct acpi_device *d=
+evice,
+>         dev_err(dev, "Processor driver could not be attached\n");
+>         acpi_unbind_one(dev);
+>
+> - err:
+> -       free_cpumask_var(pr->throttling.shared_cpu_map);
+> -       device->driver_data =3D NULL;
+> + err_clear_per_cpu:
+>         per_cpu(processors, pr->id) =3D NULL;
+> + err_clear_driver_data:
+> +       device->driver_data =3D NULL;
+> +       free_cpumask_var(pr->throttling.shared_cpu_map);
+>   err_free_pr:
+>         kfree(pr);
+>         return result;
 > --
 > 2.39.2
 >
