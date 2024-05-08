@@ -1,147 +1,137 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98B7F8120C
-	for <kvmarm@lists.linux.dev>; Wed,  8 May 2024 12:06:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56FCA84E14
+	for <kvmarm@lists.linux.dev>; Wed,  8 May 2024 13:47:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715170006; cv=none; b=s5EqMekVXQ6vSp+ccYAx3I3J1dIw3zrGMxxy6Z7mwkN6Tit6L+xEiBpsXytzuu/98flwLYHcv/E8Rqnsd17TFN7VKu8Ixa32IGW1T7fC29msnMLYWIQ7oqSANygbiAzP3dTJ3dYJ0XvnW2Nt0ES7v2eINOzzsPs1l6DtFjZFRhM=
+	t=1715176027; cv=none; b=JxNl6hRHZwxVzakPioYSuUajoGC2o4PwQEgnv/6wMW4LjRjmrqxSI6oPPQlXSPanPlT/8V6SZKLGhiySUyRsbrEVDQ00q/zYdxBP+eXYSCFCT4QIE9VqmTl8ZxWpTzUuNDnKmBiDHC8I599KRgaD9eT2pRKc3c12S1LN/V+1pmM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715170006; c=relaxed/simple;
-	bh=bKyCsGOMVlyNwjcJXiPjFyadd2zRhY9E7O4BYBOl4RE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=YYmI9gXgfSF6R9sTq3sbkd/FPOfdNVHO4mcQQ9QCwcxSQffGXcPdsCFRbjp4SxhpJ13hZiNCf8BcrtyN57gCxjCVBHSGEKVnJ9nimraAEvJguyouqrUKUzajqMB8qBtwrIaFnqw8/VdUQATr1wWGwtNTQi2jpyoO1mUKyVRtWj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RiaXjsP/; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1715176027; c=relaxed/simple;
+	bh=u6EyzHXd27fFGrN9Et656hCo/08PPyT+hT+CjlkxkTU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ilLRk3tfjWXSZ785bdz7ERh0jzlT32LyB3dEWbS5a5NG/D7UmJMyufz4ZlCm9CZDsgbdYTaXE+Xc1J6xeRbkfFTo6oEQ6F2IJ7YyYCF76NpK6On75+k4W7ahv+iiew2RsLKiMFXdKt4nfAs3zAkQfNbDzKlpYQs/g50tY8gdbVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=k1TN47+C; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RiaXjsP/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715170003;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kch4CR6jb0EO3CtRVrd4DZN/+JzXwlHyRHSCeA2eEfY=;
-	b=RiaXjsP/Yo7okPK4tCwS5k5Mywc5Rj4xudC0XfhKArxvVsplJ0ojbU5si87nqixwmDBxlQ
-	4LLVQ69mgo5zqMZXTeWXic1wul1P8YXxnjpvOwI8+5rjDK2ohrOBapi2fu+CzbRfnyJ2+q
-	WNC0GXZS1JI/0E2gFXjJfTG8qjmVXvk=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-624-x3CuWCx9O8KAM64vBGyp9A-1; Wed, 08 May 2024 08:06:39 -0400
-X-MC-Unique: x3CuWCx9O8KAM64vBGyp9A-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7C5BF80021D;
-	Wed,  8 May 2024 12:06:38 +0000 (UTC)
-Received: from localhost (dhcp-192-239.str.redhat.com [10.33.192.239])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id C9B787414;
-	Wed,  8 May 2024 12:06:37 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: Oliver Upton <oliver.upton@linux.dev>, "Russell King (Oracle)"
- <linux@armlinux.org.uk>
-Cc: Marc Zyngier <maz@kernel.org>, Catalin Marinas
- <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, James Morse
- <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui
- Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev
-Subject: Re: [PATCH RFC] KVM: arm64: allow ID_MMFR4_EL1 to be writable
-In-Reply-To: <ZjPDQSeQPE2wgVup@linux.dev>
-Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
- Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
- 153243,
- =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
- Michael O'Neill, Amy
- Ross"
-References: <E1s2DPv-00AhaA-Ra@rmk-PC.armlinux.org.uk>
- <ZjKCgIyWqNKC6TUu@linux.dev> <ZjKFBUXEhwZ7ZmMM@shell.armlinux.org.uk>
- <ZjKRBcAML5T6cm4q@linux.dev> <ZjOl5hwU7yPXk8gs@shell.armlinux.org.uk>
- <ZjPDQSeQPE2wgVup@linux.dev>
-User-Agent: Notmuch/0.38.3 (https://notmuchmail.org)
-Date: Wed, 08 May 2024 14:06:36 +0200
-Message-ID: <87jzk4h5ir.fsf@redhat.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="k1TN47+C"
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2b432dfdcf6so3635770a91.3
+        for <kvmarm@lists.linux.dev>; Wed, 08 May 2024 06:47:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1715176025; x=1715780825; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9Cy96MEbs4JLv+XlnJDrNT2CJ2qEQRDaH5Qu53Pf8ZU=;
+        b=k1TN47+CWOS8ydAKrzn72KQqvnw2Fe6b/gVYwSH7iHJ66G5FezMDWU1b67kwePWpNQ
+         Epo9SSe5IR8V9wOkuw2B4fhqm0mN4gJFO5l8SVQey1Y4gd/Yl+rWYO7ph9U/HY7Uz8mR
+         EUDqDlQH5AWWB7uKaPVPQ0IWjgweVCJH1jvIVjDH1AyFSH1RDaWmedbKuADR90LZtIGG
+         A+1/UZKuLRzp7oA1it89rLiS8cSaJiKXkYfbpcHnLMt3MXZmFodEKDf/pgaC55ALx3vK
+         EdSw+JdBF7sb2BgZy06N74B3ayLT2F7E8DPylSoFh8SLRgaIRZYUmkPoAB6LnsQcj4j2
+         z1TA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715176025; x=1715780825;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9Cy96MEbs4JLv+XlnJDrNT2CJ2qEQRDaH5Qu53Pf8ZU=;
+        b=LRNxLLJSNxyUOO0Wok0XJ5viqqu1wPgz7ZV0TjoytE51bH1abPu6u6KGKb/bM2eo8K
+         FXH9nBXqUtBdolTw3e6iBIOReEgDzQZPuPD3ONEO10+mNnfUpRPDiYh1Xm4jHW9LCGDk
+         O1QcS/FeaO6KhENPv/AuMaAf0NEheJqYdP9oymOgHDzLcjNNLSnD/zqQChWwR5LEsOiJ
+         Yyt0o71J3HngsSMZzmzRtSk/BvgYGNkwVIx+rjeGPchdFrSjhMg16xpu7phkf0xyixC6
+         k/2bU5N+1+aGLX4fCBZqo1JRU5+Iu2OgHnZFgFjdq/0aAUCBnPKLnyMZwvmpjADYRV5G
+         zi/w==
+X-Forwarded-Encrypted: i=1; AJvYcCUHJwFjD0Yjw4B2IMh7j2uxHT4YKVIEOtMk+8iiP0SeI0TxznXfdAdCt/PBZS25qIXWKOtcWXUhSnD+ZcAlPLWPy/Tmdwti
+X-Gm-Message-State: AOJu0YwZ2HG1t7hJsxFsFYM1UWXOpUMpOEeILhnJ5BCJ9WOcw35AUJgz
+	E4UERj7pHHKJJBEcF31EmW72Dlcty95MN2l06oa+UhjMH15Rsn2Eapyi7XAbgsRa66XzCAqK4SW
+	ajA==
+X-Google-Smtp-Source: AGHT+IGkEzt3rrLCYEAc2MIkDJ4rSudkNPJV/ZI7YDr6FjDNwR59XbPWzyPuXmQfxq7n/1Jp45z9S3futCA=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90b:128d:b0:2b4:32ae:483e with SMTP id
+ 98e67ed59e1d1-2b61638c780mr8658a91.2.1715176024465; Wed, 08 May 2024 06:47:04
+ -0700 (PDT)
+Date: Wed, 8 May 2024 06:47:03 -0700
+In-Reply-To: <20240507214254.2787305-1-edliaw@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
+Mime-Version: 1.0
+References: <20240507214254.2787305-1-edliaw@google.com>
+Message-ID: <ZjuA3aY_iHkjP7bQ@google.com>
+Subject: Re: [PATCH v2 0/5] Define _GNU_SOURCE for sources using
+From: Sean Christopherson <seanjc@google.com>
+To: Edward Liaw <edliaw@google.com>
+Cc: shuah@kernel.org, Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>, 
+	Takashi Iwai <tiwai@suse.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Nhat Pham <nphamcs@gmail.com>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Christian Brauner <brauner@kernel.org>, Eric Biederman <ebiederm@xmission.com>, 
+	Kees Cook <keescook@chromium.org>, OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Darren Hart <dvhart@infradead.org>, 
+	Davidlohr Bueso <dave@stgolabs.net>, "=?utf-8?B?QW5kcsOp?= Almeida" <andrealmeid@igalia.com>, 
+	Jiri Kosina <jikos@kernel.org>, Benjamin Tissoires <bentiss@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>, 
+	Kevin Tian <kevin.tian@intel.com>, Andy Lutomirski <luto@amacapital.net>, 
+	Will Drewry <wad@chromium.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+	David Hildenbrand <david@redhat.com>, "=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?=" <mic@digikod.net>, Paul Moore <paul@paul-moore.com>, 
+	James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, Seth Forshee <sforshee@kernel.org>, 
+	Bongsu Jeon <bongsu.jeon@samsung.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"Andreas =?utf-8?Q?F=C3=A4rber?=" <afaerber@suse.de>, Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, 
+	Matthieu Baerts <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>, 
+	Geliang Tang <geliang@kernel.org>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	Fenghua Yu <fenghua.yu@intel.com>, Reinette Chatre <reinette.chatre@intel.com>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, "Paul E. McKenney" <paulmck@kernel.org>, 
+	Boqun Feng <boqun.feng@gmail.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	Muhammad Usama Anjum <usama.anjum@collabora.com>, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, kernel-team@android.com, 
+	linux-sound@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-mm@kvack.org, linux-input@vger.kernel.org, iommu@lists.linux.dev, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-security-module@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-actions@lists.infradead.org, mptcp@lists.linux.dev, 
+	linux-rtc@vger.kernel.org, linux-sgx@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, May 02 2024, Oliver Upton <oliver.upton@linux.dev> wrote:
+On Tue, May 07, 2024, Edward Liaw wrote:
+> 809216233555 ("selftests/harness: remove use of LINE_MAX") introduced
+> asprintf into kselftest_harness.h, which is a GNU extension and needs
+> _GNU_SOURCE to either be defined prior to including headers or with the
+> -D_GNU_SOURCE flag passed to the compiler.
+> 
+> v1: https://lore.kernel.org/linux-kselftest/20240430235057.1351993-1-edliaw@google.com/
+> v2: add -D_GNU_SOURCE to KHDR_INCLUDES so that it is in a single
+> location.  Remove #define _GNU_SOURCE from source code to resolve
+> redefinition warnings.
+> 
+> Edward Liaw (5):
+>   selftests: Compile kselftest headers with -D_GNU_SOURCE
+>   selftests/sgx: Include KHDR_INCLUDES in Makefile
+>   selftests: Include KHDR_INCLUDES in Makefile
+>   selftests: Drop define _GNU_SOURCE
+>   selftests: Drop duplicate -D_GNU_SOURCE
 
-> On Thu, May 02, 2024 at 03:40:38PM +0100, Russell King (Oracle) wrote:
->> On Wed, May 01, 2024 at 06:59:17PM +0000, Oliver Upton wrote:
->> > On Wed, May 01, 2024 at 07:08:05PM +0100, Russell King (Oracle) wrote:
->> > > Yes, it did strike me as odd, since the description seems to imply that
->> > > XNX affects EL2, which the VM wouldn't have access to. So I'm not sure
->> > > why we don't just force it to zero.
->> > 
->> > Probably because we failed to catch it in the first place and setting to
->> > 0 now would be even more UAPI breakage. Meh :-/ I don't see any immediate
->> > issues with the patch, especially since it is fixing a genuine UAPI
->> > breakage in KVM.
->> 
->> I think the only two ways around this would be to:
->> 
->> 1) teach QEMU about the contents of these registers, with which fields
->>    in these registers can be ignored when reloading a VMs context.
->> 
->> 2) allow userspace to write to the XNX field such that it can be set
->>    to values seen with previous kernels (thus allowing at least one-
->>    way migration.)
->> 
->> (1) has the advantage that reloading a VM state on older vs newer
->> kernels can work in either direction, whereas (2) would only work
->> for state saved on an older kernel loaded onto a newer kernel.
->
-> Yeah, so this is something that has affected my employer as well.
->
-> I think (1) should only be expected of VMMs that want rollback safety,
-> i.e. the ability to migrate state back to an older kernel. Our userspace
-> initializes vCPUs from a fixed set of feature ID register values that
-> prevents VMs on new kernels from picking up new CPU features.
->
-> It is quite tedious, but necessary as rollback safety is very much a
-> non-goal of the KVM UAPI.
+Can you rebase this on top of linux-next?  I have a conflicting fix[*] for the
+KVM selftests queued for 6.10, and I would prefer not to drop that commit at
+this stage as it would require a rebase of a pile of other commits.
 
-Depending on your use case, rollback safety might be quite
-important... have we ever stated exactly which guarantees the KVM UAPI
-is giving? IOW, can someone implementing a VMM look at a doc and see
-"oh, if I want to be able to go backwards, I need to be able to deal
-with x, y, and z coming up on the new kernel"?
+And I doubt KVM is the only subsystem that has a targeted fix for the _GNU_SOURCE
+mess.
 
->
-> OTOH, in cases where KVM screws up and breaks UAPI, the kernel needs to
-> do something special to accept the previously-advertised state even if
-> it were nonsensical.
->
-> For example, there was a bug where KVM advertised an IMP DEF PMU to VMs
-> even though the only thing KVM virtualizes is PMUv3. We fixed it in
-> commit f90f9360c3d7 ("KVM: arm64: Rewrite IMPDEF PMU version as NI") by
-> accepting the old value in the ioctl and changing the field to NI
-> internally.
->
-> I dislike these sort of hacks, but when we're caught between upholding
-> UAPI and the architecture it seems to be the best option. I wonder if an
-> approach similar to this would be sufficient to address the SPE change
-> that you noticed.
->
->> I've been bitten before with KVM differences between kernel versions
->> in the past - where the number of registers that userspace sees has
->> changed despite being on the same hardware.
->
-> This is intended behavior, as VMs are initialized to the maximum feature
-> set KVM is able to support. Forward-compatibility for the set of exposed
-> registers is tested, see the get-reg-list selftest.
+If we want/need to get a fix into 6.9, then IMO we should just revert 809216233555
+("selftests/harness: remove use of LINE_MAX"), as that came in quite late in the
+6.9 cycle, and I don't think it's feasible to be 100% confident that globally
+defining _GNU_SOURCE works for all selftests, i.e. we really should have a full
+cycle for folks to test.
 
-I've seen this problem come up as well; if it is clear that this is
-something that KVM expects the VMM to handle if needed, that is fine;
-should we consider "it's tested in a selftest" as a canonical indicator
-of "this is what KVM supports compatibility wise"?
-
+[*] https://github.com/kvm-x86/linux/commit/730cfa45b5f4
