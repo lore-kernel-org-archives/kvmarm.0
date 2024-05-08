@@ -1,66 +1,109 @@
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B0D5182B3
-	for <kvmarm@lists.linux.dev>; Wed,  8 May 2024 06:25:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 447E817730;
+	Wed,  8 May 2024 06:39:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715149547; cv=none; b=LQlhUVuD0QClBbKrH8XjBfmm+AYYOV8xjLAUQb/cLKxioa5HmNjR2QvlXObMKwrq+Y+NSKXxroNsoyjpzFB9bgLcdV36ICn1/c8ROsqYeNfH9XBAmuDtjINs6IC7L7lvktrLXWzSF803RBbVUZ8BxWLQ56hVfOAo7AuPdjEk3LI=
+	t=1715150363; cv=none; b=tS8eGiTNn17VyNbsSnlzwReJD0mSFyMCCmK7TcD1c/7q1rmpAgoh2WIGQJCXb7Evmk69lfsXX22E0qvOYjzmmR1gE69+A0JZP6EsA/z6vc5iBvArno8NE+kL5utpvnfph0R2MmHlIqujCYJHUywpQddUf6g+iuFydyrvXL3BzXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715149547; c=relaxed/simple;
-	bh=0yTnDzRzl6YMEDAYdK4MzUFIs1RryobdwGldopgZgrU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Zp9BSvDDidUUk7aaTCpdSus+LxJR4GC8JzFd7oecxZ8dEJDHnS0lWXylUG+1s2ibx75EukXPVEJudfjQve3KoM9gOF4Oa5wQ/Znvl6/cupynm8HONuK0mnjKdPu0mnldp1ed9fY7tBT315d6LN5cwuFQOjw9kto/En012TO9weo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Vh1PdP00; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1715150363; c=relaxed/simple;
+	bh=WIaSWmeiy1cef8r3CsP+YKgmEtowE4dXK2ALP2FJFio=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=uG99QM+NYaDXeedb6CH6gFt6KnuVkJNVeBBvCOiqnOdMPFqzXcyjdZWrH3O1ptdZg3yekwBh2YGIafk/vGdL7HkLqYv6S8OX8DzPwtFz8jLAZnPF/qSVZRa3iKVvYyRk5UjZnep15M2CyBEGYI+UAVWjztB3sCUmtV4AMYZjJuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m4ZZTlMM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Vh1PdP00"
-Date: Wed, 8 May 2024 06:25:39 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1715149544;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cX9UDFEcMUiOwQWR3+txM6O/c7psSYzDc8seRaVOFUA=;
-	b=Vh1PdP00Hz0dsjoJ8XSe+qAtpu16Gl/4TaRhsPZ3AnqRi04QNU82oEK7OXqFZH7NOcVwXg
-	7Ua/e5i8KWFXYzf9bVHTz+fHUkVvEm217ZgRHX9ISZtqa/oPPeSwyVV/0Sc2h1xdGJSLkt
-	wLnhCNlaP/Y6fwqO9DMHaKu4KWAfCwQ=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Sasha Levin <sashal@kernel.org>
-Cc: linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-	Marc Zyngier <maz@kernel.org>, pbonzini@redhat.com,
-	shuah@kernel.org, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH AUTOSEL 6.8 18/52] KVM: selftests: Add test for uaccesses
- to non-existent vgic-v2 CPUIF
-Message-ID: <Zjsa4yeD_EmV7TgP@linux.dev>
-References: <20240507230800.392128-1-sashal@kernel.org>
- <20240507230800.392128-18-sashal@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m4ZZTlMM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9BECC113CC;
+	Wed,  8 May 2024 06:39:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715150362;
+	bh=WIaSWmeiy1cef8r3CsP+YKgmEtowE4dXK2ALP2FJFio=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=m4ZZTlMMNZynUPi7TZNTSUytnxpv8uJmJY+by6sgylLoq5+Wu168UPUnbHhbwdYZB
+	 NOnirh4m/PD5rIli+HIFrgpk2UYNzuenYz1qNqeuqED2yhyNIu0Y2YgjvSxNciHcDM
+	 w0fTduuYN5KuqUeKdlN8nClLqAqnLiT2kv8iVk3iyvNiRN+C33MLtI4NdD4lQpIadk
+	 p0vChkM++ug46OgkuEIg+7KwNsNiWTkswHHRkwPfZ6X/xny2IJvrqXmnSpGxAwJLy2
+	 Sh+HZhW9w8xIzgSlkxzGvpkdxEllixT0f4DdAhwt0kSzJIDr/RPV8TtaNcKeuolyXT
+	 czaCstPFf0Qew==
+Received: from cpe.ge-3-3-8-100.vbrnqe11.dk.customer.tdc.net ([80.164.103.190] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1s4axU-00BXNh-Tr;
+	Wed, 08 May 2024 07:39:21 +0100
+Date: Wed, 08 May 2024 07:39:20 +0100
+Message-ID: <87h6f8zu1z.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Destroy mpidr_data for 'late' vCPU creation
+In-Reply-To: <20240507192912.1096658-1-oliver.upton@linux.dev>
+References: <20240507192912.1096658-1-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240507230800.392128-18-sashal@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 80.164.103.190
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi,
-
-On Tue, May 07, 2024 at 07:06:44PM -0400, Sasha Levin wrote:
-> From: Oliver Upton <oliver.upton@linux.dev>
+On Tue, 07 May 2024 20:29:12 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> [ Upstream commit 160933e330f4c5a13931d725a4d952a4b9aefa71 ]
+> A particularly annoying userspace could create a vCPU after KVM has
+> computed mpidr_data for the VM, either by racing against VGIC
+> initialization or having a userspace irqchip.
+> 
+> In any case, this means mpidr_data no longer fully describes the VM, and
+> attempts to find the new vCPU with kvm_mpidr_to_vcpu() will fail. The
+> fix is to discard mpidr_data altogether, as it is only a performance
+> optimization and not required for correctness. In all likelihood KVM
+> will recompute the mappings when KVM_RUN is called on the new vCPU.
+> 
+> Note that reads of mpidr_data are not guarded by a lock; promote to RCU
+> to cope with the possibility of mpidr_data being invalidated at runtime.
+> 
+> Fixes: 54a8006d0b49 ("KVM: arm64: Fast-track kvm_mpidr_to_vcpu() when mpidr_data is available")
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/kvm/arm.c | 49 ++++++++++++++++++++++++++++++++++++--------
+>  1 file changed, 40 insertions(+), 9 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index c4a0a35e02c7..0d845131a0e0 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -195,6 +195,22 @@ void kvm_arch_create_vm_debugfs(struct kvm *kvm)
+>  	kvm_sys_regs_create_debugfs(kvm);
+>  }
+>  
+> +static void kvm_destroy_mpidr_data(struct kvm *kvm)
+> +{
+> +	struct kvm_mpidr_data *data;
+> +
+> +	mutex_lock(&kvm->arch.config_lock);
+> +
+> +	data = rcu_dereference_raw(kvm->arch.mpidr_data);
 
-Can you please drop this and pick up the bugfix instead?
+I'm slightly worried by this. Why can't we use the "cooked" version?
+If anything I'd like to see a comment about this, as it is usually
+frowned upon.
 
-6ddb4f372fc6 ("KVM: arm64: vgic-v2: Check for non-NULL vCPU in vgic_v2_parse_attr()")
+Thanks,
+
+	M.
 
 -- 
-Thanks,
-Oliver
+Without deviation from the norm, progress is not possible.
