@@ -1,120 +1,127 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13441633;
-	Wed,  8 May 2024 16:44:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BCE212BF34
+	for <kvmarm@lists.linux.dev>; Wed,  8 May 2024 17:14:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715186700; cv=none; b=RjWEvBLj8kuO7x31YkqGMm1cy/d1/cIKPMvYDEIdJmWH0VUUULuifWcdFVEcG97GU3tSO6XPb0wB8HBYbZtrBCtgo/4L6V8WmxCFI0WiZcHdXrfndlRUQ/TYdsztHZLYA4hHgh08b+HT9cqO5s/IlxEPGeBgEIIxky+VOwMNc6o=
+	t=1715188464; cv=none; b=LxT/4hslfJ6fEoiQkL9BnPYzTNmSDn45O0Q/99oIBxfRI3DQ9lLjDy2xYta0huvgAaLcP6TpN6ml8QItf9OJOW75Yu3Ouu5d5VswCbZkb2bysdynNXOSr0Ze4ASJ6KTCpEKARrNiUMOHC6/oLjI40KtnFlZQohyMJO/91YtxItU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715186700; c=relaxed/simple;
-	bh=0vXy5kTUEu7Jx0jxctDNvQbCc0ApL3aWNbp3Y8Ze7FM=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=U0mN3p+TENNrVE3SV+SQlpiEcgZ7LDr6Iawqp7KVWGb8EnEqpTsNS1AGzc+A7N9JaORPilNxShAbfAO1aw6iz5xTv6lVqOBGW6Yul1eCzLUCteUgz3rMbFvqq/O8zF4Kyi5VltezECJrMaWfkV4O9YVmBVUnpbhUfeYCtyal6OU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r6T4Vx0y; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1715188464; c=relaxed/simple;
+	bh=fuRuf/6hpCcW9619bjGX7+B4WNmLW4fCN4SeY8vzDaw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aHpZ1RIQ4gUNHf8qathaL+f9Gx35raJv9BpQIHw3Vb4agmDpDhTy16KzY4AqmPO6Epwgn1P6H/04/RugzyX/o87/pEe7EDkGOLeEEN3Vattkc5Z5Hil69043j25bZ9zkEhc9kolYCgP6ZqopGhdO4Zti7LG9ftjY4Tp5T4AnCrU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=w07lPKs5; arc=none smtp.client-ip=95.215.58.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r6T4Vx0y"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A392AC113CC;
-	Wed,  8 May 2024 16:44:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715186699;
-	bh=0vXy5kTUEu7Jx0jxctDNvQbCc0ApL3aWNbp3Y8Ze7FM=;
-	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
-	b=r6T4Vx0y4QOnGwpBQOgFUY2eu34NThzwvqE9iWCIEwfBWxfBXLKwMeMXC2MZkCWgE
-	 sSy8eWZ2B09C4cJWuUtyV7pp1xxjYBJcb9dKqRcNcRwWuRWNUhvaX8ZZNACrQ8akj+
-	 fVsf0Qgb7/q7++0jy9wmy9zGxZ08j6Zv4QRrw0dL1nzsSXULP5hHSA299xoBM9AD05
-	 6riemVsfFd1imBZpGu8mE+0OdEWqZvuhuWPeX4o1a5jHgyaeVks/tD4RoFmGk5XVgC
-	 it22dgUxqoUlvZZ7CdgHHzCOiO9So64lLxbdbeLXKuMGmV15xh0wplv/ZWkSBTpDGK
-	 EGKaRAElv3B+A==
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="w07lPKs5"
+Date: Wed, 8 May 2024 12:14:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1715188457;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6IxZhOPdDadbq2l7FGvhIKBCyvx+IxN2FVRGwktrREQ=;
+	b=w07lPKs5zbpy7abTfb8Q0yigvYQbi2GYgcG1djv/eJ+3WV3bdZ5YLw4Ftbf2hNLvM1rEz1
+	JcbgsIQ5+Ksfn4eT5O7OG+TvwpFmtPCzsVCxGBv4k22+EKjsG+OxK4prJFgflXvV9BpGLY
+	71jfnpqFlqC4F/PepdW6fJhFyilGJI8=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Marc Zyngier <maz@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH RFC] KVM: arm64: allow ID_MMFR4_EL1 to be writable
+Message-ID: <Zjuy40shK5a-yp95@linux.dev>
+References: <E1s2DPv-00AhaA-Ra@rmk-PC.armlinux.org.uk>
+ <ZjKCgIyWqNKC6TUu@linux.dev>
+ <ZjKFBUXEhwZ7ZmMM@shell.armlinux.org.uk>
+ <ZjKRBcAML5T6cm4q@linux.dev>
+ <ZjOl5hwU7yPXk8gs@shell.armlinux.org.uk>
+ <ZjPDQSeQPE2wgVup@linux.dev>
+ <87jzk4h5ir.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Wed, 08 May 2024 19:44:40 +0300
-Message-Id: <D14EXNEBOKFY.8SJ7SOCABM01@kernel.org>
-Cc: <linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
- <kernel-team@android.com>, <linux-sound@vger.kernel.org>,
- <linux-arm-kernel@lists.infradead.org>, <linux-mm@kvack.org>,
- <linux-input@vger.kernel.org>, <iommu@lists.linux.dev>,
- <kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
- <kvm-riscv@lists.infradead.org>, <linux-riscv@lists.infradead.org>,
- <linux-security-module@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
- <netdev@vger.kernel.org>, <linux-actions@lists.infradead.org>,
- <mptcp@lists.linux.dev>, <linux-rtc@vger.kernel.org>,
- <linux-sgx@vger.kernel.org>, <bpf@vger.kernel.org>, "kernel test robot"
- <oliver.sang@intel.com>
-Subject: Re: [PATCH v2 2/5] selftests/sgx: Include KHDR_INCLUDES in Makefile
-From: "Jarkko Sakkinen" <jarkko@kernel.org>
-To: "Dave Hansen" <dave.hansen@intel.com>, "Edward Liaw"
- <edliaw@google.com>, <shuah@kernel.org>, "Mark Brown" <broonie@kernel.org>,
- "Jaroslav Kysela" <perex@perex.cz>, "Takashi Iwai" <tiwai@suse.com>,
- "Catalin Marinas" <catalin.marinas@arm.com>, "Will Deacon"
- <will@kernel.org>, "Nhat Pham" <nphamcs@gmail.com>, "Johannes Weiner"
- <hannes@cmpxchg.org>, "Christian Brauner" <brauner@kernel.org>, "Eric
- Biederman" <ebiederm@xmission.com>, "Kees Cook" <keescook@chromium.org>,
- "OGAWA Hirofumi" <hirofumi@mail.parknet.co.jp>, "Thomas Gleixner"
- <tglx@linutronix.de>, "Ingo Molnar" <mingo@redhat.com>, "Peter Zijlstra"
- <peterz@infradead.org>, "Darren Hart" <dvhart@infradead.org>, "Davidlohr
- Bueso" <dave@stgolabs.net>, =?utf-8?q?Andr=C3=A9_Almeida?=
- <andrealmeid@igalia.com>, "Jiri Kosina" <jikos@kernel.org>, "Benjamin
- Tissoires" <bentiss@kernel.org>, "Jason Gunthorpe" <jgg@ziepe.ca>, "Kevin
- Tian" <kevin.tian@intel.com>, "Andy Lutomirski" <luto@amacapital.net>,
- "Will Drewry" <wad@chromium.org>, "Marc Zyngier" <maz@kernel.org>, "Oliver
- Upton" <oliver.upton@linux.dev>, "James Morse" <james.morse@arm.com>,
- "Suzuki K Poulose" <suzuki.poulose@arm.com>, "Zenghui Yu"
- <yuzenghui@huawei.com>, "Paolo Bonzini" <pbonzini@redhat.com>, "Sean
- Christopherson" <seanjc@google.com>, "Anup Patel" <anup@brainfault.org>,
- "Atish Patra" <atishp@atishpatra.org>, "Paul Walmsley"
- <paul.walmsley@sifive.com>, "Palmer Dabbelt" <palmer@dabbelt.com>, "Albert
- Ou" <aou@eecs.berkeley.edu>, "Christian Borntraeger"
- <borntraeger@linux.ibm.com>, "Janosch Frank" <frankja@linux.ibm.com>,
- "Claudio Imbrenda" <imbrenda@linux.ibm.com>, "David Hildenbrand"
- <david@redhat.com>, =?utf-8?q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>,
- "Paul Moore" <paul@paul-moore.com>, "James Morris" <jmorris@namei.org>,
- "Serge E. Hallyn" <serge@hallyn.com>, "Andrew Morton"
- <akpm@linux-foundation.org>, "Seth Forshee" <sforshee@kernel.org>, "Bongsu
- Jeon" <bongsu.jeon@samsung.com>, "David S. Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, "Steffen Klassert"
- <steffen.klassert@secunet.com>, "Herbert Xu" <herbert@gondor.apana.org.au>,
- =?utf-8?q?Andreas_F=C3=A4rber?= <afaerber@suse.de>, "Manivannan Sadhasivam"
- <manivannan.sadhasivam@linaro.org>, "Matthieu Baerts" <matttbe@kernel.org>,
- "Mat Martineau" <martineau@kernel.org>, "Geliang Tang"
- <geliang@kernel.org>, "Willem de Bruijn" <willemdebruijn.kernel@gmail.com>,
- "Fenghua Yu" <fenghua.yu@intel.com>, "Reinette Chatre"
- <reinette.chatre@intel.com>, "Mathieu Desnoyers"
- <mathieu.desnoyers@efficios.com>, "Paul E. McKenney" <paulmck@kernel.org>,
- "Boqun Feng" <boqun.feng@gmail.com>, "Alexandre Belloni"
- <alexandre.belloni@bootlin.com>, "Muhammad Usama Anjum"
- <usama.anjum@collabora.com>
-X-Mailer: aerc 0.17.0
-References: <20240507214254.2787305-1-edliaw@google.com>
- <20240507214254.2787305-3-edliaw@google.com>
- <c3fc5396-bc71-4dee-a3e0-d59dbbc6eda1@intel.com>
-In-Reply-To: <c3fc5396-bc71-4dee-a3e0-d59dbbc6eda1@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87jzk4h5ir.fsf@redhat.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed May 8, 2024 at 6:33 PM EEST, Dave Hansen wrote:
-> On 5/7/24 14:38, Edward Liaw wrote:
-> > Add KHDR_INCLUDES to the CFLAGS to pull in the kselftest harness
-> > dependencies (-D_GNU_SOURCE).
-> >=20
-> > Also, remove redefinitions of _GNU_SOURCE in the source code.
->
-> From an x86 and SGX perspective, looks fine.  I assume Shuah is planning
-> on taking this pile.
->
-> Acked-by: Dave Hansen <dave.hansen@linux.intel.com>
+Hi Cornelia,
 
-Yep,
+On Wed, May 08, 2024 at 02:06:36PM +0200, Cornelia Huck wrote:
+> On Thu, May 02 2024, Oliver Upton <oliver.upton@linux.dev> wrote:
+> > I think (1) should only be expected of VMMs that want rollback safety,
+> > i.e. the ability to migrate state back to an older kernel. Our userspace
+> > initializes vCPUs from a fixed set of feature ID register values that
+> > prevents VMs on new kernels from picking up new CPU features.
+> >
+> > It is quite tedious, but necessary as rollback safety is very much a
+> > non-goal of the KVM UAPI.
+> 
+> Depending on your use case, rollback safety might be quite
+> important... have we ever stated exactly which guarantees the KVM UAPI
+> is giving? IOW, can someone implementing a VMM look at a doc and see
+> "oh, if I want to be able to go backwards, I need to be able to deal
+> with x, y, and z coming up on the new kernel"?
 
-Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
+The behavior of KVM/arm64 has always been that new VMs get the maximum
+set of vCPU features supported by KVM / hardware modulo the ones we
+require explicit opt-in from userspace (e.g. SVE, vPMU). This behavior
+is described in the arm64 vCPU feature documentation [1].
 
-I also quickly tested with NUC7 for what it is worth:
+The biggest benefit of this approach is that new vCPU features can be
+added without a VMM change, as userspace can just treat the registers in
+KVM_GET_REG_LIST as an opaque blob of data that needs to be migrated.
 
-Tested-by: Jarkko Sakkinen <jarkko@kernel.org>
+I'm willing to wager that the set of users who want to migrate state
+from kernel N -> (N - 1) know the exact CPU definition they want to
+expose to the guest, and in that case should be using a static set of
+feature register values matching their intent.
 
-BR, Jarkko
+Beyond the CPU architecture, KVM presents hypercall features to the VM
+which userspace can _opt-out_ of on a per-feature basis using the
+feature bitmap registers described in [2]. Like the feature ID
+registers, we've preallocated a range of indices to be used for
+hypercall bitmaps. So if an unexpected bitmap register appears on a new
+kernel, userspace should write 0 to it to prevent new features from
+silently creeping in.
+
+Prescribing the exact combination of these UAPIs to achieve a
+rollback-safe feature set is beyond the scope of the KVM documentation
+and should be determined based on the minimum kernel version that needs
+to work.
+
+[1]: https://docs.kernel.org/virt/kvm/arm/vcpu-features.html#the-id-registers
+[2]: https://docs.kernel.org/virt/kvm/arm/hypercalls.html
+
+> >> I've been bitten before with KVM differences between kernel versions
+> >> in the past - where the number of registers that userspace sees has
+> >> changed despite being on the same hardware.
+> >
+> > This is intended behavior, as VMs are initialized to the maximum feature
+> > set KVM is able to support. Forward-compatibility for the set of exposed
+> > registers is tested, see the get-reg-list selftest.
+> 
+> I've seen this problem come up as well; if it is clear that this is
+> something that KVM expects the VMM to handle if needed, that is fine;
+> should we consider "it's tested in a selftest" as a canonical indicator
+> of "this is what KVM supports compatibility wise"?
+
+It certainly is the level of compatibility that gets actively tested :)
+
+The canonical reason for this behavior, though, is that KVM/arm64
+defaults to the maximum-possible feature set as discussed above.
+
+-- 
+Thanks,
+Oliver
