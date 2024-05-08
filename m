@@ -1,161 +1,139 @@
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D840F85931
-	for <kvmarm@lists.linux.dev>; Tue,  7 May 2024 23:28:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1C3A8F6C;
+	Wed,  8 May 2024 06:04:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715124537; cv=none; b=QSgs5Mo9ysnoA7RGtdIahU8HvF/5i7NzooHgFrefc8CH57/ofjesBBBm+8Ny+7zq/Ikkn8Hi7784A90/fyaU1w2mCXR60yYz/vKX01fSfhutedsefufZHGe44BYWx8p2HsZc2vJigMDvD15Z4GTW550LGF/6ugVjxlP/yNh14fI=
+	t=1715148283; cv=none; b=J0fVDeGuCMdTPIiUtZUF8gHHpzwYyDDPRz7mpqZZcweO6WeLYk/DZofXuqS8mlqHHvcYKD6xIroUXw3uhK74RK5MInX9lfnfkU3MNwMOcXNY+AiI5xd1tYJs24/qxsbM4ZnwWPn6d9PL3aBgjqw66yS3cjYFT+qmNn2DdQBHbsQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715124537; c=relaxed/simple;
-	bh=JX0XCKXr1thgDPxaTecjtKr6rIsRQAHKTIazy9OBhDc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TGel1zVT2ffXGWiGoSKJPs7W+pBA8lPCqZ/YrYILfyBl25GW94ENXkiTOtH4laUQ4CkoudkfD/bRj5lXnsP7xUd76Sa0qFuShq9mRTx4us4zwCKPYQ0ebJ+7r564KpVGlpuF/0JkMf5N3spsZ1vffbWISQBOk/t0XRsZiHVVTc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=BWFdGDvn; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1715148283; c=relaxed/simple;
+	bh=zR/J/GQwZZOwdR5Vz+cQ0vtwUaYOtxxQWeQiJU7jJl8=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nb1v7kEUgpmYmS/kO1mNRrWMjuOxjVCAO+PilJ/+v4Cil8+FYEcHiQDtYBQmdWoAbbZn8HWC9RWHuax4wRZBzMzDi0KzxmyoX8vzJGB6/MQ1OVO7tYZahaWuB7Hzipxse4nz7eocSjis/BAA+7cdWIylS9K3htVPuzrx5WHHSsM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lEyLfjgH; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="BWFdGDvn"
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-6f47787a0c3so2774658b3a.0
-        for <kvmarm@lists.linux.dev>; Tue, 07 May 2024 16:28:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1715124534; x=1715729334; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Tt8XgRQm+eA+VmBxGqEcvvy66oE9R2AfbLeL3WkCPuU=;
-        b=BWFdGDvn3yKmpoPvhqSNjfqGhfnOhm0OoJJFDdsIhjMdD8Q6I/aC5xEE49u5C0Uyxt
-         A+hjsquwJpgP+zBWERVR1hfzNUoL+b1zTbGOTohRgAjrNZV0euiLRtIB5bU1wBWuDcTz
-         0N/iIVCnL9h3I23UlDrGltQ66n+U7K0lvPkZc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715124534; x=1715729334;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Tt8XgRQm+eA+VmBxGqEcvvy66oE9R2AfbLeL3WkCPuU=;
-        b=Hee9aHSvXbI+rx5LT7xlVASAnqlDaS5ZJFtxOup6pfJPlQyuxGzNTJLL0rGxA1WCGr
-         /vq9H6VCofPmtOlhft1TYKPdhzbFkAvbHBmSaw7kWtSbAzludT/HGQ7nc3TqKxw2jcME
-         lybE+UkCAlJ+AwxTpvYWpxo5a/9Zz7kgbkIl4/yPhpmsMCO5ST11+rmjQcK7m4Um5vTy
-         IMU2jcYuO/0Yv0l47kN0KEgmWUp11EdKEQfvDmorWLvOWozS4qBSBk5udZwmAkMesgty
-         Vxm0irnKkNjR06jU0wMxRqWWcVNjUjPsAeU/7s2TyTlINQBMFwXyyzV/w1CEIzkJKl0k
-         +JoQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXy4nEtdUateo70hy/5AzaSzmf52kwdyJoQ46y5pS2YkxPOAmMbc0Rm8yulhZXuikIwrF4sG84dJWx3Dw06UdpSOghpjsn/
-X-Gm-Message-State: AOJu0YwNgOVN4fy7e209s7bTZKqkB12wFO5n/grLStqDfIoUf49Ft+ht
-	yINraClCperpYmuD8BLYTO28kJ5bwx/NBg8gHv/z/0HiRQ5zfyju7IWbiVsnTA==
-X-Google-Smtp-Source: AGHT+IElkYKkPF9F5WlZiOfJXRbgeCSMUqbJ3Z1JrZ5HzzcuDvdHCUlR3LVeoTae63dQgTdtTlamYA==
-X-Received: by 2002:a05:6a20:9f88:b0:1ad:6c5:4ea1 with SMTP id adf61e73a8af0-1afc8db5479mr1525582637.41.1715124534335;
-        Tue, 07 May 2024 16:28:54 -0700 (PDT)
-Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id 60-20020a17090a09c200b002b624b0161fsm80422pjo.19.2024.05.07.16.28.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 May 2024 16:28:53 -0700 (PDT)
-Date: Tue, 7 May 2024 16:28:53 -0700
-From: Kees Cook <keescook@chromium.org>
-To: Edward Liaw <edliaw@google.com>
-Cc: shuah@kernel.org, Mark Brown <broonie@kernel.org>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Nhat Pham <nphamcs@gmail.com>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Christian Brauner <brauner@kernel.org>,
-	Eric Biederman <ebiederm@xmission.com>,
-	OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Darren Hart <dvhart@infradead.org>,
-	Davidlohr Bueso <dave@stgolabs.net>,
-	=?iso-8859-1?Q?Andr=E9?= Almeida <andrealmeid@igalia.com>,
-	Jiri Kosina <jikos@kernel.org>,
-	Benjamin Tissoires <bentiss@kernel.org>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>,
-	Andy Lutomirski <luto@amacapital.net>,
-	Will Drewry <wad@chromium.org>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lEyLfjgH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17A71C113CC;
+	Wed,  8 May 2024 06:04:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715148283;
+	bh=zR/J/GQwZZOwdR5Vz+cQ0vtwUaYOtxxQWeQiJU7jJl8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=lEyLfjgHyL2A7vdOPnsomxYbOvpKv/cJ3ra/IoyPzYtBJnxcTixj5RH53wrata6eG
+	 k9pgiAw2wVFcwsMT8/1qnRqGyFCtd/mVCB7HrLb4Dy7P5WpP8QskfIS+PLQcjXWzak
+	 x7BwcQkRcMfONWXml58inDjrBpRDwxZ/DvhirZs9SAdEDR3UiltAEK85vgHHNuPEsb
+	 OKLe4bHZItqLk63gWEHjR7R9IoMDYhBKQxjNg2wtnmWeWd62QLnMf+65SvPF/GFOB1
+	 MmHonyjeWu5Uap7LAMjIalcDyE0WZMVgcrF2RT030TIAxEuubH8oraVCQbUcGqN1mB
+	 Tj8PuATo4dXsA==
+Received: from cpe.ge-3-3-8-100.vbrnqe11.dk.customer.tdc.net ([80.164.103.190] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1s4aPw-00BWru-6v;
+	Wed, 08 May 2024 07:04:40 +0100
+Date: Wed, 08 May 2024 07:04:34 +0100
+Message-ID: <87ikzozvnx.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Will Deacon <will@kernel.org>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Anup Patel <anup@brainfault.org>,
-	Atish Patra <atishp@atishpatra.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@redhat.com>,
-	=?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Seth Forshee <sforshee@kernel.org>,
-	Bongsu Jeon <bongsu.jeon@samsung.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Matthieu Baerts <matttbe@kernel.org>,
-	Mat Martineau <martineau@kernel.org>,
-	Geliang Tang <geliang@kernel.org>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Fenghua Yu <fenghua.yu@intel.com>,
-	Reinette Chatre <reinette.chatre@intel.com>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Muhammad Usama Anjum <usama.anjum@collabora.com>,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	kernel-team@android.com, linux-sound@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
-	linux-input@vger.kernel.org, iommu@lists.linux.dev,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-security-module@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-actions@lists.infradead.org, mptcp@lists.linux.dev,
-	linux-rtc@vger.kernel.org, linux-sgx@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: Re: [PATCH v2 0/5] Define _GNU_SOURCE for sources using
-Message-ID: <202405071628.7F8C3EC@keescook>
-References: <20240507214254.2787305-1-edliaw@google.com>
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH] KVM: arm64: Correct BTYPE/SS in host SMC emulation
+In-Reply-To: <20240507145733.GB22453@willie-the-truck>
+References: <20240502180020.3215547-1-maz@kernel.org>
+	<20240507145733.GB22453@willie-the-truck>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240507214254.2787305-1-edliaw@google.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 80.164.103.190
+X-SA-Exim-Rcpt-To: will@kernel.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, May 07, 2024 at 09:38:25PM +0000, Edward Liaw wrote:
-> 809216233555 ("selftests/harness: remove use of LINE_MAX") introduced
-> asprintf into kselftest_harness.h, which is a GNU extension and needs
-> _GNU_SOURCE to either be defined prior to including headers or with the
-> -D_GNU_SOURCE flag passed to the compiler.
+On Tue, 07 May 2024 15:57:34 +0100,
+Will Deacon <will@kernel.org> wrote:
 > 
-> v1: https://lore.kernel.org/linux-kselftest/20240430235057.1351993-1-edliaw@google.com/
-> v2: add -D_GNU_SOURCE to KHDR_INCLUDES so that it is in a single
-> location.  Remove #define _GNU_SOURCE from source code to resolve
-> redefinition warnings.
+> On Thu, May 02, 2024 at 07:00:20PM +0100, Marc Zyngier wrote:
+> > When taking a trap for an SMC instruction on the host, we must
+> > stau true to the letter of the architecture and perform all the
 > 
-> Edward Liaw (5):
->   selftests: Compile kselftest headers with -D_GNU_SOURCE
->   selftests/sgx: Include KHDR_INCLUDES in Makefile
->   selftests: Include KHDR_INCLUDES in Makefile
->   selftests: Drop define _GNU_SOURCE
->   selftests: Drop duplicate -D_GNU_SOURCE
+> typo: stay
+> 
+> > actions that the CPU would otherwise do. Among those are clearing
+> > the BTYPE and SS bits.
+> > 
+> > Just do that.
+> > 
+> > Fixes: a805e1fb3099 ("KVM: arm64: Add SMC handler in nVHE EL2")
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/hyp/include/hyp/adjust_pc.h | 6 ++++++
+> >  1 file changed, 6 insertions(+)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h b/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
+> > index 4fdfeabefeb4..b1afb7b59a31 100644
+> > --- a/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
+> > +++ b/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
+> > @@ -47,7 +47,13 @@ static inline void __kvm_skip_instr(struct kvm_vcpu *vcpu)
+> >   */
+> >  static inline void kvm_skip_host_instr(void)
+> >  {
+> > +	u64 spsr = read_sysreg_el2(SYS_SPSR);
+> > +
+> >  	write_sysreg_el2(read_sysreg_el2(SYS_ELR) + 4, SYS_ELR);
+> > +
+> > +	spsr &= ~(PSR_BTYPE_MASK | DBG_SPSR_SS);
+> > +
+> > +	write_sysreg_el2(spsr, SYS_SPSR);
+> 
+> The handling of SS looks correct to me, but I think the BTYPE
+> manipulation could do with a little more commentary as it looks quite
+> subtle when the SMC is in a guarded page. Am I right in thinking:
+> 
+>    * If the SMC is in a guarded page, the Branch Target exception is
+>      higher priority (12) than the trap to EL2 and so the host will
+>      handle it.
+> 
+>    * Therefore if a trapping SMC is in a guarded page, BTYPE must be
+>      zero and we don't have to worry about injecting a Branch Target
+>      exception.
+> 
+>    * Otherwise, if the SMC is in a non-guarded page, we should clear it
+>      to 0 per the architecture (R_YWFHD).
+> 
+> ?
 
-It's a lot of churn, but I don't see a way to do it differently. :)
+This is all correct. If we get to emulate the SMC by trapping to EL2,
+it is that the instruction already satisfied the more basic execution
+requirements such as having an acceptable BTYPE at that PC.
 
-Reviewed-by: Kees Cook <keescook@chromium.org>
+If that's OK with you, I'll nick that write-up and stick it into the
+next revision of the patch.
+
+> Having said that, I can't actually find the priority of an SMC trapped
+> to EL2 by HCR_EL2.TSC in the Arm ARM. Trapped HVCs are priority 15 and
+> SMCs trapped to EL3 are priority 23.
+
+My understanding is that this falls into the catch-all priority 22 of
+R_ZFGJP ("Other than an exception defined by priorities 4-21
+inclusive, any exception that is the result of a configurable access
+to instructions, where the exception is taken to EL2.").
+
+Thanks,
+
+	M.
 
 -- 
-Kees Cook
+Without deviation from the norm, progress is not possible.
