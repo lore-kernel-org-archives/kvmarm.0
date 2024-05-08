@@ -1,290 +1,229 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 695CA28FF;
-	Wed,  8 May 2024 08:44:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB2CD45024;
+	Wed,  8 May 2024 12:05:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715157866; cv=none; b=b8xCOs874SPc1BG2WNu38nz4XU/cYLuPoK+gkj2AYYmdv0FmzqPEgz6IgaJXPZW4WL8kdCQWGwM7gHZJSFvaHN4LMr5VNbmqAtBP7nGlXkRLwZ/gzVjEH0ZYRc4qnhdihzkvR72HRHyn4fXQP9QMclZc2ICt59Ye6tZLxlcjynM=
+	t=1715169959; cv=none; b=UtoNHioxFfQko1t0MIcVidCXcjiEhUHdML+01Kpthl0xgVEZam7NhFZowgFh1d5PsLkHS1UF8DWwuLzx/odHiypwhKXF2dp68GnakVp2NJZPIrDNQxcWSz6WNoQ4V9hr1Ybr92+Rxo8Tx+Q1i7AXQZfsdlg3X+th3omSH9o7lic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715157866; c=relaxed/simple;
-	bh=T5zecpj4li0OuIWBMVUt5WCfBkgXJbSbJgxIbR51vqs=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=La1w5TDiLltcmAQE43yxxfhXJPAckEpNr+ViF9hOiTk9gRzmZ78dSc82r9S4EjKtuHWSAX6wrawM7J0uJiKvVlpvPI2+zjKWeNwy/Nhp+nBRB3J3mTMlHBUYq+EZLbu01Lal4drbd9mWhz3WCb/c+jLn+4oq+I9cLKBBmk4rWS0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4VZ7sK1b83z6K6Kl;
-	Wed,  8 May 2024 16:41:09 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id 44CD0140B54;
-	Wed,  8 May 2024 16:44:14 +0800 (CST)
-Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Wed, 8 May
- 2024 09:44:13 +0100
-Date: Wed, 8 May 2024 09:44:11 +0100
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: "Rafael J. Wysocki" <rafael@kernel.org>
-CC: Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra
-	<peterz@infradead.org>, <linux-pm@vger.kernel.org>,
-	<loongarch@lists.linux.dev>, <linux-acpi@vger.kernel.org>,
-	<linux-arch@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<x86@kernel.org>, Russell King <linux@armlinux.org.uk>, Miguel Luis
-	<miguel.luis@oracle.com>, James Morse <james.morse@arm.com>, Salil Mehta
-	<salil.mehta@huawei.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
-	Marc Zyngier <maz@kernel.org>, Hanjun Guo <guohanjun@huawei.com>, "Gavin
- Shan" <gshan@redhat.com>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov
-	<bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
-	<linuxarm@huawei.com>, <justin.he@arm.com>, <jianyong.wu@arm.com>
-Subject: Re: [PATCH v9 06/19] ACPI: processor: Move checks and availability
- of acpi_processor earlier
-Message-ID: <20240508094411.00001b92@Huawei.com>
-In-Reply-To: <CAJZ5v0g-Aenoj5H+pNPtoqTgV5U7K5RGNjdOnqobqxkyL5NMVQ@mail.gmail.com>
-References: <20240430142434.10471-1-Jonathan.Cameron@huawei.com>
-	<20240430142434.10471-7-Jonathan.Cameron@huawei.com>
-	<CAJZ5v0g-Aenoj5H+pNPtoqTgV5U7K5RGNjdOnqobqxkyL5NMVQ@mail.gmail.com>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	s=arc-20240116; t=1715169959; c=relaxed/simple;
+	bh=Nyz1qBX4AhSejr40aGAqB++CiOKmtDB7Y/C9c18/WZ8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=n2og/Fi8kG6iXrU125n9a9LtvM09cyg4znz2MZLBfigUG+Ecwd0uny+kCXcw/97MtdD44/07etLiPq3zQStfHq9rpD7gEjYzTiPrViSs/XRIOYpldnQe7WyWwvkSQDSU6AMZpaKghclu7FoZ5ZcUP4DcpSlpnHpohY48H2OvyAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h6b9ritU; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h6b9ritU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E81CBC113CC;
+	Wed,  8 May 2024 12:05:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715169958;
+	bh=Nyz1qBX4AhSejr40aGAqB++CiOKmtDB7Y/C9c18/WZ8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=h6b9ritU4vQNxnTR7eE3vrl7XyG3xhiGCQ3mm6aJQRCCFjPFC/Q1hWuJjhy4l+Qax
+	 oR324+ZD/1B55q8u12dgWy3sRKPw84A6m5/lJMNbU/ZfkzUlIfv9F6M4Qsr74SZluv
+	 Ri6pDOnK4BWwAhDMhF58vTUbpuAZdeUXISMowuweeAt6zvNRRwALQPzA5fLGJ57Wbp
+	 2OEXRdD82ue1m5gsxJCTrctUxqpi5AwOZDXrAU1DFHkyJAlciUx03FDgas2YXkWL4U
+	 Ezxdp3UnYRZZhJByl5oD0Rz2BdBs3ecBvSz1FhVaxAQRSNofS2jvXx6H85WK8jvqHo
+	 58Yjy/AMTsjFA==
+Date: Wed, 8 May 2024 21:05:55 +0900
+From: Mark Brown <broonie@kernel.org>
+To: Edward Liaw <edliaw@google.com>
+Cc: shuah@kernel.org, Jaroslav Kysela <perex@perex.cz>,
+	Takashi Iwai <tiwai@suse.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Nhat Pham <nphamcs@gmail.com>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Christian Brauner <brauner@kernel.org>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Kees Cook <keescook@chromium.org>,
+	OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Darren Hart <dvhart@infradead.org>,
+	Davidlohr Bueso <dave@stgolabs.net>,
+	=?iso-8859-1?Q?Andr=E9?= Almeida <andrealmeid@igalia.com>,
+	Jiri Kosina <jikos@kernel.org>,
+	Benjamin Tissoires <bentiss@kernel.org>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>,
+	Andy Lutomirski <luto@amacapital.net>,
+	Will Drewry <wad@chromium.org>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	David Hildenbrand <david@redhat.com>,
+	=?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>,
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Seth Forshee <sforshee@kernel.org>,
+	Bongsu Jeon <bongsu.jeon@samsung.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+	Matthieu Baerts <matttbe@kernel.org>,
+	Mat Martineau <martineau@kernel.org>,
+	Geliang Tang <geliang@kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Fenghua Yu <fenghua.yu@intel.com>,
+	Reinette Chatre <reinette.chatre@intel.com>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Muhammad Usama Anjum <usama.anjum@collabora.com>,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	kernel-team@android.com, linux-sound@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
+	linux-input@vger.kernel.org, iommu@lists.linux.dev,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+	linux-security-module@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-actions@lists.infradead.org, mptcp@lists.linux.dev,
+	linux-rtc@vger.kernel.org, linux-sgx@vger.kernel.org,
+	bpf@vger.kernel.org, kernel test robot <oliver.sang@intel.com>
+Subject: Re: [PATCH v2 1/5] selftests: Compile kselftest headers with
+ -D_GNU_SOURCE
+Message-ID: <Zjtqo6EFyGmSeREQ@finisterre.sirena.org.uk>
+Mail-Followup-To: Edward Liaw <edliaw@google.com>, shuah@kernel.org,
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Nhat Pham <nphamcs@gmail.com>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Christian Brauner <brauner@kernel.org>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Kees Cook <keescook@chromium.org>,
+	OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Darren Hart <dvhart@infradead.org>,
+	Davidlohr Bueso <dave@stgolabs.net>,
+	=?iso-8859-1?Q?Andr=E9?= Almeida <andrealmeid@igalia.com>,
+	Jiri Kosina <jikos@kernel.org>,
+	Benjamin Tissoires <bentiss@kernel.org>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>,
+	Andy Lutomirski <luto@amacapital.net>,
+	Will Drewry <wad@chromium.org>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	David Hildenbrand <david@redhat.com>,
+	=?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>,
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Seth Forshee <sforshee@kernel.org>,
+	Bongsu Jeon <bongsu.jeon@samsung.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+	Matthieu Baerts <matttbe@kernel.org>,
+	Mat Martineau <martineau@kernel.org>,
+	Geliang Tang <geliang@kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Fenghua Yu <fenghua.yu@intel.com>,
+	Reinette Chatre <reinette.chatre@intel.com>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Muhammad Usama Anjum <usama.anjum@collabora.com>,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	kernel-team@android.com, linux-sound@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
+	linux-input@vger.kernel.org, iommu@lists.linux.dev,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+	linux-security-module@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-actions@lists.infradead.org, mptcp@lists.linux.dev,
+	linux-rtc@vger.kernel.org, linux-sgx@vger.kernel.org,
+	bpf@vger.kernel.org, kernel test robot <oliver.sang@intel.com>
+References: <20240507214254.2787305-1-edliaw@google.com>
+ <20240507214254.2787305-2-edliaw@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="fwllAq8yEacRp/F5"
+Content-Disposition: inline
+In-Reply-To: <20240507214254.2787305-2-edliaw@google.com>
+X-Cookie: Accuracy, n.:
+
+
+--fwllAq8yEacRp/F5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: lhrpeml100001.china.huawei.com (7.191.160.183) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
 
-On Tue, 7 May 2024 21:04:26 +0200
-"Rafael J. Wysocki" <rafael@kernel.org> wrote:
+On Tue, May 07, 2024 at 09:38:26PM +0000, Edward Liaw wrote:
+> Add the -D_GNU_SOURCE flag to KHDR_INCLUDES so that it is defined in a
+> central location.
+>=20
+> 809216233555 ("selftests/harness: remove use of LINE_MAX") introduced
+> asprintf into kselftest_harness.h, which is a GNU extension and needs
+> _GNU_SOURCE to either be defined prior to including headers or with the
+> -D_GNU_SOURCE flag passed to the compiler.
 
-> On Tue, Apr 30, 2024 at 4:27=E2=80=AFPM Jonathan Cameron
-> <Jonathan.Cameron@huawei.com> wrote:
-> >
-> > Make the per_cpu(processors, cpu) entries available earlier so that
-> > they are available in arch_register_cpu() as ARM64 will need access
-> > to the acpi_handle to distinguish between acpi_processor_add()
-> > and earlier registration attempts (which will fail as _STA cannot
-> > be checked).
-> >
-> > Reorder the remove flow to clear this per_cpu() after
-> > arch_unregister_cpu() has completed, allowing it to be used in
-> > there as well.
-> >
-> > Note that on x86 for the CPU hotplug case, the pr->id prior to
-> > acpi_map_cpu() may be invalid. Thus the per_cpu() structures
-> > must be initialized after that call or after checking the ID
-> > is valid (not hotplug path).
-> >
-> > Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com> =20
->=20
-> Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
->=20
-> One nit below.
+Reviewed-by: Mark Brown <broonie@kernel.org>
 
-Thanks.  Given timing, this is looking like 6.11 material.
-I'll tidy this up and post a v10 in a couple of weeks (so around
-rc1 time). Maybe we'll pick up some more tags for the ARM
-specific bits in the meantime.
+This does mean we define _GNU_SOURCE for nolibc (and I guess any other
+libc people use like bionic) but hopefully nobody's using the same
+define with a different meaning so should be fine.
 
-Thanks for all your help!
+--fwllAq8yEacRp/F5
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Jonathan
+-----BEGIN PGP SIGNATURE-----
 
->=20
-> > ---
-> > v9: Add back a blank line accidentally removed in code move.
-> >     Fix up error returns so that the new cleanup in processor_add()
-> >     is triggered on detection of the bios bug.
-> >     Combined with the previous 2 patches, should solve the leak
-> >     that Gavin identified.
-> > ---
-> >  drivers/acpi/acpi_processor.c | 80 +++++++++++++++++++++--------------
-> >  1 file changed, 49 insertions(+), 31 deletions(-)
-> >
-> > diff --git a/drivers/acpi/acpi_processor.c b/drivers/acpi/acpi_processo=
-r.c
-> > index 16e36e55a560..4a79b42d649e 100644
-> > --- a/drivers/acpi/acpi_processor.c
-> > +++ b/drivers/acpi/acpi_processor.c
-> > @@ -183,8 +183,38 @@ static void __init acpi_pcc_cpufreq_init(void) {}
-> >  #endif /* CONFIG_X86 */
-> >
-> >  /* Initialization */
-> > +static DEFINE_PER_CPU(void *, processor_device_array);
-> > +
-> > +static bool acpi_processor_set_per_cpu(struct acpi_processor *pr,
-> > +                                      struct acpi_device *device)
-> > +{
-> > +       BUG_ON(pr->id >=3D nr_cpu_ids);
-> > +
-> > +       /*
-> > +        * Buggy BIOS check.
-> > +        * ACPI id of processors can be reported wrongly by the BIOS.
-> > +        * Don't trust it blindly
-> > +        */
-> > +       if (per_cpu(processor_device_array, pr->id) !=3D NULL &&
-> > +           per_cpu(processor_device_array, pr->id) !=3D device) {
-> > +               dev_warn(&device->dev,
-> > +                        "BIOS reported wrong ACPI id %d for the proces=
-sor\n",
-> > +                        pr->id);
-> > +               return false;
-> > +       }
-> > +       /*
-> > +        * processor_device_array is not cleared on errors to allow bug=
-gy BIOS
-> > +        * checks.
-> > +        */
-> > +       per_cpu(processor_device_array, pr->id) =3D device;
-> > +       per_cpu(processors, pr->id) =3D pr;
-> > +
-> > +       return true;
-> > +}
-> > +
-> >  #ifdef CONFIG_ACPI_HOTPLUG_CPU
-> > -static int acpi_processor_hotadd_init(struct acpi_processor *pr)
-> > +static int acpi_processor_hotadd_init(struct acpi_processor *pr,
-> > +                                     struct acpi_device *device)
-> >  {
-> >         int ret;
-> >
-> > @@ -198,8 +228,16 @@ static int acpi_processor_hotadd_init(struct acpi_=
-processor *pr)
-> >         if (ret)
-> >                 goto out;
-> >
-> > +       if (!acpi_processor_set_per_cpu(pr, device)) {
-> > +               ret =3D -EINVAL;
-> > +               acpi_unmap_cpu(pr->id);
-> > +               goto out;
-> > +       }
-> > +
-> >         ret =3D arch_register_cpu(pr->id);
-> >         if (ret) {
-> > +               /* Leave the processor device array in place to detect =
-buggy bios */
-> > +               per_cpu(processors, pr->id) =3D NULL;
-> >                 acpi_unmap_cpu(pr->id);
-> >                 goto out;
-> >         }
-> > @@ -217,7 +255,8 @@ static int acpi_processor_hotadd_init(struct acpi_p=
-rocessor *pr)
-> >         return ret;
-> >  }
-> >  #else
-> > -static inline int acpi_processor_hotadd_init(struct acpi_processor *pr)
-> > +static inline int acpi_processor_hotadd_init(struct acpi_processor *pr,
-> > +                                            struct acpi_device *device)
-> >  {
-> >         return -ENODEV;
-> >  }
-> > @@ -316,10 +355,13 @@ static int acpi_processor_get_info(struct acpi_de=
-vice *device)
-> >          *  because cpuid <-> apicid mapping is persistent now.
-> >          */
-> >         if (invalid_logical_cpuid(pr->id) || !cpu_present(pr->id)) {
-> > -               int ret =3D acpi_processor_hotadd_init(pr);
-> > +               int ret =3D acpi_processor_hotadd_init(pr, device);
-> >
-> >                 if (ret)
-> >                         return ret;
-> > +       } else {
-> > +               if (!acpi_processor_set_per_cpu(pr, device))
-> > +                       return -EINVAL;
-> >         } =20
->=20
-> This looks a bit odd.
->=20
-> I would make acpi_processor_set_per_cpu() return 0 on success and
-> -EINVAL on failure and the above would become
->=20
-> if (invalid_logical_cpuid(pr->id) || !cpu_present(pr->id))
->          ret =3D acpi_processor_hotadd_init(pr, device);
-> else
->         ret =3D acpi_processor_set_per_cpu(pr, device);
->=20
-> if (ret)
->         return ret;
->=20
-> (and of course ret needs to be defined at the beginning of the function).
->=20
-> >
-> >         /*
-> > @@ -365,8 +407,6 @@ static int acpi_processor_get_info(struct acpi_devi=
-ce *device)
-> >   * (cpu_data(cpu)) values, like CPU feature flags, family, model, etc.
-> >   * Such things have to be put in and set up by the processor driver's =
-.probe().
-> >   */
-> > -static DEFINE_PER_CPU(void *, processor_device_array);
-> > -
-> >  static int acpi_processor_add(struct acpi_device *device,
-> >                                         const struct acpi_device_id *id)
-> >  {
-> > @@ -395,28 +435,6 @@ static int acpi_processor_add(struct acpi_device *=
-device,
-> >         if (result) /* Processor is not physically present or unavailab=
-le */
-> >                 goto err_clear_driver_data;
-> >
-> > -       BUG_ON(pr->id >=3D nr_cpu_ids);
-> > -
-> > -       /*
-> > -        * Buggy BIOS check.
-> > -        * ACPI id of processors can be reported wrongly by the BIOS.
-> > -        * Don't trust it blindly
-> > -        */
-> > -       if (per_cpu(processor_device_array, pr->id) !=3D NULL &&
-> > -           per_cpu(processor_device_array, pr->id) !=3D device) {
-> > -               dev_warn(&device->dev,
-> > -                       "BIOS reported wrong ACPI id %d for the process=
-or\n",
-> > -                       pr->id);
-> > -               /* Give up, but do not abort the namespace scan. */
-> > -               goto err_clear_driver_data;
-> > -       }
-> > -       /*
-> > -        * processor_device_array is not cleared on errors to allow bug=
-gy BIOS
-> > -        * checks.
-> > -        */
-> > -       per_cpu(processor_device_array, pr->id) =3D device;
-> > -       per_cpu(processors, pr->id) =3D pr;
-> > -
-> >         dev =3D get_cpu_device(pr->id);
-> >         if (!dev) {
-> >                 result =3D -ENODEV;
-> > @@ -470,10 +488,6 @@ static void acpi_processor_remove(struct acpi_devi=
-ce *device)
-> >         device_release_driver(pr->dev);
-> >         acpi_unbind_one(pr->dev);
-> >
-> > -       /* Clean up. */
-> > -       per_cpu(processor_device_array, pr->id) =3D NULL;
-> > -       per_cpu(processors, pr->id) =3D NULL;
-> > -
-> >         cpu_maps_update_begin();
-> >         cpus_write_lock();
-> >
-> > @@ -481,6 +495,10 @@ static void acpi_processor_remove(struct acpi_devi=
-ce *device)
-> >         arch_unregister_cpu(pr->id);
-> >         acpi_unmap_cpu(pr->id);
-> >
-> > +       /* Clean up. */
-> > +       per_cpu(processor_device_array, pr->id) =3D NULL;
-> > +       per_cpu(processors, pr->id) =3D NULL;
-> > +
-> >         cpus_write_unlock();
-> >         cpu_maps_update_done();
-> >
-> > --
-> > 2.39.2
-> > =20
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmY7aqIACgkQJNaLcl1U
+h9DCxAf+M+eUS9Sr8Cy7bCTOxGv4sZGiJ7AeEEoR5TzBm5SOC6mKe/M0t4SexFRB
+5nAjL3TO9i8cfMtUMh6LMvciaa5sGVNRFhpTIgljvO7ND7Dv+WKpJyiicl/1DYIK
+DEdpua8OQJ4bz9PQwOZO1kgQzC003JRxY0Gbz9kk8ie58HVAodSSWi7kgNsMc/0t
+mKOumN6X7MhAoslboc7h3A6xymN8AHvHeNga3yP+1E84M8mjiR91sc3btIn4Wa/w
+6LIqTSCun/wuxeQnkz0Rlk1LdA1F0KQPzQAriWxju8K9dqc3prqYkWuDtRVYN+Li
+LJAemrTmdlcOF/7uoi1Z7s4wZajT2A==
+=IlWr
+-----END PGP SIGNATURE-----
 
+--fwllAq8yEacRp/F5--
