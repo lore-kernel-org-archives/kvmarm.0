@@ -1,117 +1,140 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 112CC3EA72
-	for <kvmarm@lists.linux.dev>; Thu,  9 May 2024 08:31:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C7A114A4E7
+	for <kvmarm@lists.linux.dev>; Thu,  9 May 2024 09:05:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715243478; cv=none; b=I0D+tyGBXpaYoFV+BedaTScc/hiSdmRahb7uSPDulPDGuN0VoApo+u9W2SSxkQN9nBm31jQTbUE7kwm5BR1Fg7Ts6Dg5RBKb/NJ+I4vZB8YDZRh81HmcyCzpAjPWmw5gGKv5llP0D0IfSCT6ty1ZcMMlRwaoLsI+OHMP5a/Eaq8=
+	t=1715245558; cv=none; b=Gt3n25hyWazgRYBu+0RobnWqSc+Ej/Wwa1L88tNqRfecifrfJFUgh5WCD7BFEx7cZt6pf+z1RXR/xz230oMDtLConmXG8fe/7Gdjy3lwUaHd9Giwu0/szeaTD8ltfhCdNx4tx8U5fnuCFllJ5SAQTjwoP4qtxC/mmIninmc5TAM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715243478; c=relaxed/simple;
-	bh=7ID1rToGO6FV8Ko6jC9I6odtMEZUtKX4UtvAihm9EJg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Buw/ZalAwxv5egQ4YBnCfMqinkIK5Kp4Ty+f01AtfcmBZrqOUskMPCobA0/4hYVVlLmaAw5pvzIjMOpEG7Pg/sndeto/BNuXlP80vn1+F7uCYao26FN1F3c9fR/zVyg3eTxCE5zKqcumFS3Err3gpf4gLVaDam4Xo05aE8GR+6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TI/I403D; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1715245558; c=relaxed/simple;
+	bh=N/8HFhNvSDAW/Ta7JV8LDnUpRELTyLgm4HkmHBnlI98=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VoNJ99Tq9MptYayES6ekpz2itTMUUXipdChwoH4a0r1ZRBFqwDeBrTycFqbeBVBNK61KieN+Kz3QTmxpB+dfn5I34o92htEfD+9laXeMQbUC2+ST0eiYi2BjDwa/vgCfteiyyQ4YELtcxmn15TfLYIaeHHNh3oiK7u6Lv1GcEFM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZATaodSc; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TI/I403D"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZATaodSc"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715243475;
+	s=mimecast20190719; t=1715245555;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qyLoEsP3k6nAZoTuZVbKVL9pP/BQ583fGCs2TBzayoY=;
-	b=TI/I403Da1rED5cIi1oGuZqEYrexRb3XnOJMj1a53WkEIIlR2YFI+xrLhYLBN4Z/Yct9uC
-	UlWm6Wk0sfG9/WkKqz5ZLAR5u6bu00Pth8F75vXoIeZBMq8ejtXYEgZIh1gdjCLn05sCau
-	+U8KHmp2tR5j4TKWYwKI6iwC2PiCQbk=
-Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
- [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=NVQ1c5a/Gn0sHOszixuPO6X2zUGo2QIz8lY+zhqCbSk=;
+	b=ZATaodScqVityEUEEIvKt5zBOtfjivAZ0D9RwjCrW6Uqrc+GiIxHm26Z0edcWZs3GOd4lL
+	4th5/KLOoOFxq9JXNB0IZh1WnRuQdTbc27ZhJSVa1HxeSZOt4IMCO2+q2ojo3sZE5rqT/c
+	SUNNWYj1AgVxa7mMLRct5Hs6CiSFQXU=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-487-Oew9EiuUOJi0HOnY4SLXLw-1; Thu, 09 May 2024 04:31:14 -0400
-X-MC-Unique: Oew9EiuUOJi0HOnY4SLXLw-1
-Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-1ec7cb6942cso1781745ad.1
-        for <kvmarm@lists.linux.dev>; Thu, 09 May 2024 01:31:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715243473; x=1715848273;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qyLoEsP3k6nAZoTuZVbKVL9pP/BQ583fGCs2TBzayoY=;
-        b=De4Wdpa524GcW3s8AZlIxhFR4Qq8yc3pylKqsyzi9lJ2PyU9bUwy0sdFZMvk5jXRar
-         O7pyvrdV4VMgRJUfSHgDYWAe5I5UZKo0D3DP9OShILE7jAnuvgCWRY5zDzxMrSNHsOEj
-         w4bMOe10eo76KpQKK0jqw6AcXn8freT3sJAkIqf02b1Xi4Wuf388MFw9wVQMMcXTxNFt
-         lUJMtUb83+YvJYNqv5HKBYwWCggUFojmb+N87CXb/A7OyN5XtdHQeYmJRNE3Zuvg6lBq
-         sc0nFWU9nYBL0ojMRioiEav8xr1w6Bsbvbb5VHtaSZjMbMXOaY6wgsMQlADqYmfAUyiu
-         O06A==
-X-Forwarded-Encrypted: i=1; AJvYcCUn7JhFq7qThRsdROfoH6dnAHSi27nufQfwH1tt10rVFr/3v975kdnF9O9VlWeMrv/KkBKoEJsmivnN9UN+XlSOHlcy3+r9
-X-Gm-Message-State: AOJu0YxIu8OsE9xjYNIWTtc+ECFubXU5PyeHBjr53IyHnuxFL4iD/RE+
-	lMnXzMubZ9ILOwgvcW8YuZnjwJk4xbS3TBhckV+d5qiu4boSeaEn9RuStr9Xn/Le7daN+cw+uNX
-	+AO0WzGsFP0SM+dADuDvqgBGS0IOmLgv1X8hqDLYdIbgjYtf3UYH73A==
-X-Received: by 2002:a17:903:32ca:b0:1e0:c91b:b950 with SMTP id d9443c01a7336-1eeb0991088mr55435925ad.5.1715243473447;
-        Thu, 09 May 2024 01:31:13 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHy88S+twFySdt2w58Zlcx8S84DyRgcz60dnvWnGkTIvs8eX96Nen1CTdXmNnwgxjimggZ+9w==
-X-Received: by 2002:a17:903:32ca:b0:1e0:c91b:b950 with SMTP id d9443c01a7336-1eeb0991088mr55435805ad.5.1715243473059;
-        Thu, 09 May 2024 01:31:13 -0700 (PDT)
-Received: from [10.66.61.39] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0bad5f0esm8687155ad.67.2024.05.09.01.31.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 May 2024 01:31:12 -0700 (PDT)
-Message-ID: <201ee016-9b0f-4d4a-ab85-722c3e6a1743@redhat.com>
-Date: Thu, 9 May 2024 16:31:07 +0800
+ us-mta-341-MuTf8LtMNaaRqDme3QHCvw-1; Thu, 09 May 2024 05:05:52 -0400
+X-MC-Unique: MuTf8LtMNaaRqDme3QHCvw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 67C3F101A52C;
+	Thu,  9 May 2024 09:05:51 +0000 (UTC)
+Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 02D2710004EF;
+	Thu,  9 May 2024 09:05:50 +0000 (UTC)
+From: Shaoqin Huang <shahuang@redhat.com>
+To: Oliver Upton <oliver.upton@linux.dev>,
+	Marc Zyngier <maz@kernel.org>,
+	kvmarm@lists.linux.dev
+Cc: Shaoqin Huang <shahuang@redhat.com>,
+	James Morse <james.morse@arm.com>,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH v8 0/3] KVM: selftests: aarch64: Introduce pmu_event_filter_test
+Date: Thu,  9 May 2024 05:05:37 -0400
+Message-Id: <20240509090544.2063429-1-shahuang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 2/3] KVM: selftests: aarch64: Introduce
- pmu_event_filter_test
-To: Oliver Upton <oliver.upton@linux.dev>, Eric Auger <eauger@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
- Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
- James Morse <james.morse@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-References: <20240409030320.182591-1-shahuang@redhat.com>
- <20240409030320.182591-3-shahuang@redhat.com>
- <acbc717e-5f7b-405b-9674-e03d315726cb@redhat.com>
- <Zjo_Yj9_dkZiQIBT@linux.dev>
-From: Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <Zjo_Yj9_dkZiQIBT@linux.dev>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-Hi Oliver,
+The test is inspired by the pmu_event_filter_test which implemented by x86. On
+the arm64 platform, there is the same ability to set the pmu_event_filter
+through the KVM_ARM_VCPU_PMU_V3_FILTER attribute. So add the test for arm64.
 
-On 5/7/24 22:49, Oliver Upton wrote:
-> Hi,
-> 
-> On Tue, May 07, 2024 at 10:45:24AM +0200, Eric Auger wrote:
->> On 4/9/24 05:03, Shaoqin Huang wrote:
->>> +#define GICD_BASE_GPA	0x8000000ULL
->>> +#define GICR_BASE_GPA	0x80A0000ULL
->> in v4 Oliver suggested "Shouldn't a standardized layout of the GIC
->> frames go with the rest of the GIC stuff?"
->>
-> 
-> Just a heads up, commit 1505bc70f80d ("KVM: selftests: Standardise layout
-> of GIC frames") will do exactly this, which is currently on /next.
+The series first create the helper function which can be used
+for the vpmu related tests. Then, it implement the test.
 
-Thanks for pointing this out. After this commit being merged, I can 
-remove those GIC layout staff from my code.
+Changelog:
+----------
+v7->v8:
+  - Rebased to kvm-arm/next.
+  - Deleted the GIC layout related staff.
+  - Fixed the checking logic in the kvm_pmu_support_events.
 
-Thanks,
-Shaoqin
+v6->v7:
+  - Rebased to v6.9-rc3.
 
-> 
+v5->v6:
+  - Rebased to v6.9-rc1.
+  - Collect RB.
+  - Add multiple filter test.
+
+v4->v5:
+  - Rebased to v6.8-rc6.
+  - Refactor the helper function, make it fine-grained and easy to be used.
+  - Namimg improvements.
+  - Use the kvm_device_attr_set() helper.
+  - Make the test descriptor array readable and clean.
+  - Delete the patch which moves the pmu related helper to vpmu.h.
+  - Remove the kvm_supports_pmu_event_filter() function since nobody will run
+  this on a old kernel.
+
+v3->v4:
+  - Rebased to the v6.8-rc2.
+
+v2->v3:
+  - Check the pmceid in guest code instead of pmu event count since different
+  hardware may have different event count result, check pmceid makes it stable
+  on different platform.                        [Eric]
+  - Some typo fixed and commit message improved.
+
+v1->v2:
+  - Improve the commit message.                 [Eric]
+  - Fix the bug in [enable|disable]_counter.    [Raghavendra & Marc]
+  - Add the check if kvm has attr KVM_ARM_VCPU_PMU_V3_FILTER.
+  - Add if host pmu support the test event throught pmceid0.
+  - Split the test_invalid_filter() to another patch. [Eric]
+
+v1: https://lore.kernel.org/all/20231123063750.2176250-1-shahuang@redhat.com/
+v2: https://lore.kernel.org/all/20231129072712.2667337-1-shahuang@redhat.com/
+v3: https://lore.kernel.org/all/20240116060129.55473-1-shahuang@redhat.com/
+v4: https://lore.kernel.org/all/20240202025659.5065-1-shahuang@redhat.com/
+v5: https://lore.kernel.org/all/20240229065625.114207-1-shahuang@redhat.com/
+v6: https://lore.kernel.org/all/20240326033706.117189-1-shahuang@redhat.com/
+v7: https://lore.kernel.org/all/20240409030320.182591-1-shahuang@redhat.com/
+
+Shaoqin Huang (3):
+  KVM: selftests: aarch64: Add helper function for the vpmu vcpu
+    creation
+  KVM: selftests: aarch64: Introduce pmu_event_filter_test
+  KVM: selftests: aarch64: Add invalid filter test in
+    pmu_event_filter_test
+
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../kvm/aarch64/pmu_event_filter_test.c       | 341 ++++++++++++++++++
+ .../kvm/aarch64/vpmu_counter_access.c         |  32 +-
+ .../selftests/kvm/include/aarch64/vpmu.h      |  28 ++
+ 4 files changed, 376 insertions(+), 26 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
+ create mode 100644 tools/testing/selftests/kvm/include/aarch64/vpmu.h
 
 -- 
-Shaoqin
+2.40.1
 
