@@ -1,111 +1,168 @@
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A25015250D
-	for <kvmarm@lists.linux.dev>; Thu,  9 May 2024 14:10:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABCBF1BC4B
+	for <kvmarm@lists.linux.dev>; Thu,  9 May 2024 14:37:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715263813; cv=none; b=D+xuOOsuSeQoGJW6Q1UuD3EM/BuRSFAc6hoqo3ajTw3+HNVphG+QwYDA6s5fTwegxskRinf0CKLzmpAjUSVkKcOMEd0klemI6VcLB3mue3k3yOJ1poDdK680jpVEyJ8RVD1M/W9CmMoXCKsKsMMMD69uQKxU4/Ds8Na4Aeufy6s=
+	t=1715265430; cv=none; b=Jx4Cq7djCDVG2GMFQ43+wvUZE/tj5AHtVYSWxmeOp0OU86N/yXZsMCnG5ubcclJWkQbODPDp7h3X95GeCnxlVhGLo98NipAHAsdu0uh7NwTbtL2Ul6dRzC52pCsh4nLTnYpkxLeVd97lzcVj0/3lrfPUqvnaHdLeUEgNUAqNYig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715263813; c=relaxed/simple;
-	bh=hQ5NVB+/LA6wujAxQ1ov4T3PucGFudV+Bt2WWI/AnlU=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=PcvYitnt/EDboy0u6OYbohHAjOfdJOM8MmLJZwSNYEWNSy+LDoqNpZeYSNOzYg/Xyc+xo1TQt9qyc+BLwPAMrrMIN6UM64uaWQGVH6hLEb4aDvkpq285dNRcEzZAvw95pOpiksbmBZbvaJyLe355yjxr3WcNu+J7vvh/fDPoUww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.254])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4VZv2K3ByJztTYg;
-	Thu,  9 May 2024 22:06:33 +0800 (CST)
-Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
-	by mail.maildlp.com (Postfix) with ESMTPS id C1CDE1800CA;
-	Thu,  9 May 2024 22:10:00 +0800 (CST)
-Received: from [10.174.185.179] (10.174.185.179) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 9 May 2024 22:09:59 +0800
-Subject: Re: [PATCH v4 01/30] KVM: arm64: Initialize the kvm host data's
- fpsimd_state pointer in pKVM
-To: Fuad Tabba <tabba@google.com>
-CC: <kvmarm@lists.linux.dev>, <maz@kernel.org>, <will@kernel.org>,
-	<qperret@google.com>, <seanjc@google.com>, <alexandru.elisei@arm.com>,
-	<catalin.marinas@arm.com>, <philmd@linaro.org>, <james.morse@arm.com>,
-	<suzuki.poulose@arm.com>, <oliver.upton@linux.dev>, <mark.rutland@arm.com>,
-	<broonie@kernel.org>, <joey.gouly@arm.com>, <rananta@google.com>,
-	<smostafa@google.com>
-References: <20240423150538.2103045-1-tabba@google.com>
- <20240423150538.2103045-2-tabba@google.com>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <4ec3be32-476a-14f2-7826-2171df1c9f77@huawei.com>
-Date: Thu, 9 May 2024 22:09:58 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+	s=arc-20240116; t=1715265430; c=relaxed/simple;
+	bh=rX2HhaPr9XjslEz/iELt3o8cY4WdThK1YOL4qhZC7cc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QRAGVXflKo23MXxrT4s0g3rvzk1B1ammXFbwKKf24iKk4djWFb6RQ1RkQm/Hx5xZBCJxiWP5FsBA8xm5FjX43UgC0pcHjJO076wXtGmH7j46arixvQsVKe7FK9HFVd4GPvJeE5Hs7BYwmn0zY5m1Cfa93OjR1mfby0lemdt0JOQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=AnObrFZd; arc=none smtp.client-ip=209.85.166.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="AnObrFZd"
+Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-7d9ef422859so8309239f.0
+        for <kvmarm@lists.linux.dev>; Thu, 09 May 2024 07:37:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linuxfoundation.org; s=google; t=1715265427; x=1715870227; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=qhunxhR/OF2icvm3HmEsNbbwCxzb74IsXbKxDT8qkPs=;
+        b=AnObrFZdnihMy+GVV+gkilBs8A4D8XFbikr6OFq/gCEkO4YoBslet5/30pA7BY1VHl
+         aGP1zU1tOw6JL3GaWVjF8AdSA1FRMKU9u4B3htdIl1EKxlZmPfGVElsT20zYuD9uMqeK
+         U40OPgtVrXWO/tKifbamG+KyH8Y3UEmWZ2b2E=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715265427; x=1715870227;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qhunxhR/OF2icvm3HmEsNbbwCxzb74IsXbKxDT8qkPs=;
+        b=TWD7X5MqFjqYh4/QCgJuBCW88prAtm94NuXDxaUYj1UjHrB/p8VRZb3mEswEaR30rh
+         YdptNgPF3ERzFibsl+YZQYUxgn14AsQ00vSaFkb0g9k47BagO2uJMe4BL/bL7CNv53vA
+         NXicmeAp0mGJsXDr4JNx0OwFnw/jLnUG+X3hCpWgcUVyH2TTHT9HKHtcpRj+1HBiQLlV
+         iXr/zlTpLt2+t/oe+oR0eoIGGhfidCM1uhWdgG1G1QHp44VNbbMGVgPh9WtgEMiIzOHi
+         iknqdwG0QqNteD0Z+2fkLlXfi1LpaGgGb+RLAW+gHgX5Y7kwanPfjQz8FGrLHnRVfd9E
+         jkLw==
+X-Forwarded-Encrypted: i=1; AJvYcCUgmRkjEM1yRsvu0atJySEwgapDjX908D2oD808T0muC/zDjQIEDKbhmmViJhJZYJEWWcZhtEgQH2CEC7/yO/8qw/x8vZPA
+X-Gm-Message-State: AOJu0YyDJP/Y+jN8zh5vkOV4XuRiNFwIGSWsspgR1atbAG9Y047TWCcX
+	/pTAotzjuGEJK1cW4Pc6fMPqqy4vJKTwBTRW6D6G8Ai0p+7iBwhoR4rRaifgFME=
+X-Google-Smtp-Source: AGHT+IFLPV3hTUAqtiZSXFMZ3nZtJrVA8/PdzJcN3v/yjJF832scb22cGE7mYooNXziODVFLnPMOaA==
+X-Received: by 2002:a6b:e618:0:b0:7e1:86e1:cd46 with SMTP id ca18e2360f4ac-7e18fd9a35cmr655432839f.2.1715265426750;
+        Thu, 09 May 2024 07:37:06 -0700 (PDT)
+Received: from [192.168.1.128] ([38.175.170.29])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4893703c0c8sm386684173.48.2024.05.09.07.37.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 09 May 2024 07:37:06 -0700 (PDT)
+Message-ID: <946ae22f-a4af-448a-92e1-60afb6ed9261@linuxfoundation.org>
+Date: Thu, 9 May 2024 08:37:03 -0600
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <20240423150538.2103045-2-tabba@google.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 0/5] Define _GNU_SOURCE for sources using
+To: Edward Liaw <edliaw@google.com>
+Cc: shuah@kernel.org, Mark Brown <broonie@kernel.org>,
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Nhat Pham <nphamcs@gmail.com>, Johannes Weiner <hannes@cmpxchg.org>,
+ Christian Brauner <brauner@kernel.org>,
+ Eric Biederman <ebiederm@xmission.com>, Kees Cook <keescook@chromium.org>,
+ OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Peter Zijlstra <peterz@infradead.org>, Darren Hart <dvhart@infradead.org>,
+ Davidlohr Bueso <dave@stgolabs.net>, =?UTF-8?Q?Andr=C3=A9_Almeida?=
+ <andrealmeid@igalia.com>, Jiri Kosina <jikos@kernel.org>,
+ Benjamin Tissoires <bentiss@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Kevin Tian <kevin.tian@intel.com>, Andy Lutomirski <luto@amacapital.net>,
+ Will Drewry <wad@chromium.org>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Sean Christopherson <seanjc@google.com>, Anup Patel <anup@brainfault.org>,
+ Atish Patra <atishp@atishpatra.org>, Paul Walmsley
+ <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Albert Ou <aou@eecs.berkeley.edu>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?=
+ <mic@digikod.net>, Paul Moore <paul@paul-moore.com>,
+ James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>,
+ Andrew Morton <akpm@linux-foundation.org>, Seth Forshee
+ <sforshee@kernel.org>, Bongsu Jeon <bongsu.jeon@samsung.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Steffen Klassert <steffen.klassert@secunet.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, =?UTF-8?Q?Andreas_F=C3=A4rber?=
+ <afaerber@suse.de>, Manivannan Sadhasivam
+ <manivannan.sadhasivam@linaro.org>, Matthieu Baerts <matttbe@kernel.org>,
+ Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Fenghua Yu <fenghua.yu@intel.com>,
+ Reinette Chatre <reinette.chatre@intel.com>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ "Paul E. McKenney" <paulmck@kernel.org>, Boqun Feng <boqun.feng@gmail.com>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ Jarkko Sakkinen <jarkko@kernel.org>,
+ Dave Hansen <dave.hansen@linux.intel.com>,
+ Muhammad Usama Anjum <usama.anjum@collabora.com>,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ kernel-team@android.com, linux-sound@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
+ linux-input@vger.kernel.org, iommu@lists.linux.dev, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+ linux-riscv@lists.infradead.org, linux-security-module@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-actions@lists.infradead.org, mptcp@lists.linux.dev,
+ linux-rtc@vger.kernel.org, linux-sgx@vger.kernel.org, bpf@vger.kernel.org,
+ Shuah Khan <skhan@linuxfoundation.org>
+References: <20240507214254.2787305-1-edliaw@google.com>
+ <f4e45604-86b0-4be6-9bea-36edf301df33@linuxfoundation.org>
+ <CAG4es9XE2D94BNboRSf607NbJVW7OW4xkVq4jZ8pDZ_AZsb3nQ@mail.gmail.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemm600007.china.huawei.com (7.193.23.208)
+From: Shuah Khan <skhan@linuxfoundation.org>
+In-Reply-To: <CAG4es9XE2D94BNboRSf607NbJVW7OW4xkVq4jZ8pDZ_AZsb3nQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Fuad,
-
-On 2024/4/23 23:05, Fuad Tabba wrote:
-> Since the host_fpsimd_state has been removed from kvm_vcpu_arch,
-> it isn't pointing to the hyp's version of the host fp_regs in
-> protected mode.
+On 5/9/24 00:13, Edward Liaw wrote:
+> On Wed, May 8, 2024 at 4:10 PM Shuah Khan <skhan@linuxfoundation.org> wrote:
+>>
+>> On 5/7/24 15:38, Edward Liaw wrote:
+>>> 809216233555 ("selftests/harness: remove use of LINE_MAX") introduced
+>>> asprintf into kselftest_harness.h, which is a GNU extension and needs
+>>> _GNU_SOURCE to either be defined prior to including headers or with the
+>>> -D_GNU_SOURCE flag passed to the compiler.
+>>>
+>>> v1: https://lore.kernel.org/linux-kselftest/20240430235057.1351993-1-edliaw@google.com/
+>>> v2: add -D_GNU_SOURCE to KHDR_INCLUDES so that it is in a single
+>>> location.  Remove #define _GNU_SOURCE from source code to resolve
+>>> redefinition warnings.
+>>>
+>>> Edward Liaw (5):
+>>>     selftests: Compile kselftest headers with -D_GNU_SOURCE
+>>>     selftests/sgx: Include KHDR_INCLUDES in Makefile
+>>
+>> I appled patches 1/5 and 2.5 - The rest need to be split up.
+>>
+>>>     selftests: Include KHDR_INCLUDES in Makefile
+>>>     selftests: Drop define _GNU_SOURCE
+>>>     selftests: Drop duplicate -D_GNU_SOURCE
+>>>
+>>
+>> Please split these patches pwe test directory. Otherwise it will
+>> cause merge conflicts which can be hard to resolve.
 > 
-> Initialize the host_data fpsimd_state point to the host_data's
-> context fp_regs on pKVM initialization.
-> 
-> Fixes: 51e09b5572d6 ("KVM: arm64: Exclude host_fpsimd_state pointer from kvm_vcpu_arch")
-> Signed-off-by: Fuad Tabba <tabba@google.com>
-> ---
->  arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  1 +
->  arch/arm64/kvm/hyp/nvhe/pkvm.c         | 11 +++++++++++
->  arch/arm64/kvm/hyp/nvhe/setup.c        |  1 +
->  3 files changed, 13 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-> index 82b3d62538a6..20c3f6e13b99 100644
-> --- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-> +++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-> @@ -54,6 +54,7 @@ pkvm_hyp_vcpu_to_hyp_vm(struct pkvm_hyp_vcpu *hyp_vcpu)
->  }
->  
->  void pkvm_hyp_vm_table_init(void *tbl);
-> +void pkvm_host_fpsimd_state_init(void);
->  
->  int __pkvm_init_vm(struct kvm *host_kvm, unsigned long vm_hva,
->  		   unsigned long pgd_hva);
-> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> index 26dd9a20ad6e..492b7fc2c0c7 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> @@ -247,6 +247,17 @@ void pkvm_hyp_vm_table_init(void *tbl)
->  	vm_table = tbl;
->  }
->  
-> +void pkvm_host_fpsimd_state_init(void)
-> +{
-> +	unsigned long i;
-> +
-> +	for (i = 0; i < hyp_nr_cpus; i++) {
-> +		struct kvm_host_data *host_data = per_cpu_ptr(&kvm_host_data, i);
-> +
-> +		host_data->fpsimd_state = &host_data->host_ctxt.fp_regs;
+> Hi Shuah,
+> Sean asked that I rebase the patches on linux-next, and I will need to
+> remove additional _GNU_SOURCE defines.  Should I send an unsplit v3 to
+> be reviewed, then split it afterwards?  I'm concerned that it will be
+> difficult to review with ~70 patches once split.
 
-So we save the host FP/SIMD state in hypervisor's private host_ctxt when
-guest accesses to FP/SIMD. Do we then need to save it into host VCPU's
-process state and (if so,) how does that happen?
+Please send them split - it will be easier to review and apply. You
+might as well wait until the merge window is done. I don't think
+anybody would have time to review now since merge window starts
+next week.
 
-Could you please point me to that piece of code? Sorry I'm really not
-familiar with the protected mode. ;-).
 
-Thanks,
-Zenghui
+thanks,
+-- Shuah
