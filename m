@@ -1,42 +1,44 @@
-Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF8AD4C7D
-	for <kvmarm@lists.linux.dev>; Fri, 10 May 2024 15:23:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E64C17BB1D
+	for <kvmarm@lists.linux.dev>; Fri, 10 May 2024 15:28:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715354630; cv=none; b=gduxE5oQ7IorLWAKuMZ0dik7YKICQ8EFn2l8j+igj5r8xf3MTTlW2vNblatUe783SWfkpMQp1spwwXcPNjcU6Z5x0QOi8FPtzY5NfxHx5kWv4qn18AWEZa3RCWUIizs07C+FTsd7sfRp1sg+fQrGWBGz86U3JyYuxsUQUxqrcAk=
+	t=1715354909; cv=none; b=LjrufXHLBcPC2GZXcTDqj0hUVdL3g451WGwohg6/5VLdzfWOrkhzVoSKjOFd2yKhkb2ysAzHE/h8xCKaGdpLIGCiN1Tr41noxg1r9m7LYNoiPmeIsZduUO9AfeoRPb7jzWDB1liBLPNocSNwwtI/aSyLhUyocJiIk+7qPNtukvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715354630; c=relaxed/simple;
-	bh=ImhhldqhYifhnmrsEXBkHlokCaenUojeDZvoUmMFshc=;
+	s=arc-20240116; t=1715354909; c=relaxed/simple;
+	bh=ws7Iokhl9E1h03uSqTNAIMjmdKKnyVrK2rs70qYdhK0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=db8EvHryO1Z/Wv0Z7gqFoHcW8igmSqwNgMjKDl96AJ7pKPnG4N97YE9t0Zryth97ktfLLNfICWlMsVTGB9a2ep9MCnYm9WY9y+RMv0OthcbAgf7c6J7626mqEIhZKRmzVPkpSVfn7drdGcECtZPIaBwHRA/yPBo6AsXaHPr1yvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dAW3R3rq; arc=none smtp.client-ip=95.215.58.173
+	 Content-Type:Content-Disposition:In-Reply-To; b=M5x7H8HPjuDXUQ+Sdl8Ivpk0FVEqlbKdvca2uYhTIGwnKYTGPpatRmjdmXh57x41LlxNyy1jDbffwmGInUnzfnfgLnEwJYJbbHzBT8fn+ryyTXiwvOTzT39XZeNSoKM8L5rNrBIbpUFJxdpOqawYrnouad3vQ12Zd2JUonMPtwg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jjAbYPIL; arc=none smtp.client-ip=95.215.58.187
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dAW3R3rq"
-Date: Fri, 10 May 2024 17:23:41 +0200
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jjAbYPIL"
+Date: Fri, 10 May 2024 17:28:23 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1715354625;
+	t=1715354905;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ImhhldqhYifhnmrsEXBkHlokCaenUojeDZvoUmMFshc=;
-	b=dAW3R3rqTS0jgPVmtgVcGP86utcH9p1p81VImhTZ9jLlVnjg5xkJg16wM1rXHMYIKMf+ae
-	ivobBGvWNywNCV1X6Gx8/zKRd4iJ6ueT2itcLz3z/31vaHF0fUDolINUF5kPs0z3F9ajP5
-	dTKeS1ikdXY6A+jipxD0M7iTs44yhcM=
+	bh=q7zlmbOxYaCUaA6KiEDvnaYhEN7MXQAn/SNUNpeRloc=;
+	b=jjAbYPILFLqBzFRHxjKGiPy8Euiw86a9SEaZ7kNFRZMn9PyQ9iuRmy6ldKVw1Ld4rYCjpH
+	8UuvEoiQ0KKo6AZD7/YBGAzuJs62TDzGmyYDFyV+to3RrA/bWuRVmcp8Q5CYJZDR5pJJFM
+	yCH5+f9h69klVNudqPOp1WWNVbQ5E3I=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Andrew Jones <andrew.jones@linux.dev>
 To: Suzuki K Poulose <suzuki.poulose@arm.com>
 Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
 	linux-coco@lists.linux.dev, linux-arm-kernel@lists.infradead.org, maz@kernel.org, 
 	alexandru.elisei@arm.com, joey.gouly@arm.com, steven.price@arm.com, james.morse@arm.com, 
-	oliver.upton@linux.dev, yuzenghui@huawei.com, eric.auger@redhat.com
-Subject: Re: [kvm-unit-tests PATCH 00/33] Support for Arm Confidential
- Compute Architecture
-Message-ID: <20240510-c7c63400b20593191a8d8fc3@orel>
+	oliver.upton@linux.dev, yuzenghui@huawei.com, eric.auger@redhat.com, 
+	Subhasish Ghosh <subhasish.ghosh@arm.com>
+Subject: Re: [kvm-unit-tests PATCH 18/33] arm: realm: Add test for FPU/SIMD
+ context save/restore
+Message-ID: <20240510-7e7f794ddf51316b15b57113@orel>
 References: <20240412103408.2706058-1-suzuki.poulose@arm.com>
+ <20240412103408.2706058-19-suzuki.poulose@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -45,20 +47,79 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240412103408.2706058-1-suzuki.poulose@arm.com>
+In-Reply-To: <20240412103408.2706058-19-suzuki.poulose@arm.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Fri, Apr 12, 2024 at 11:33:35AM GMT, Suzuki K Poulose wrote:
-> This series adds support for running the kvm-unit-tests in the Arm CCA reference
-> software architecture.
->
+On Fri, Apr 12, 2024 at 11:33:53AM GMT, Suzuki K Poulose wrote:
+> From: Subhasish Ghosh <subhasish.ghosh@arm.com>
+> 
+> Test that the FPU/SIMD registers are saved and restored correctly when
+> context switching CPUs.
+> 
+> In order to test fpu/simd functionality, we need to make sure that
+> kvm-unit-tests doesn't generate code that uses the fpu registers, as that
+> might interfere with the test results. Thus make sure we compile the tests
+> with -mgeneral-regs-only.
+> 
+> Signed-off-by: Subhasish Ghosh <subhasish.ghosh@arm.com>
+> [ Added SVE register tests ]
+> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> ---
+>  arm/Makefile.arm64        |   9 +
+>  arm/cstart64.S            |   1 +
+>  arm/fpu.c                 | 424 ++++++++++++++++++++++++++++++++++++++
+>  arm/unittests.cfg         |   8 +
+>  lib/arm64/asm/processor.h |  26 +++
+>  lib/arm64/asm/sysreg.h    |   7 +
+>  6 files changed, 475 insertions(+)
+>  create mode 100644 arm/fpu.c
 
-Queued patches 1-3 and 16-18 (modified 18 to drop references to realms
-since it's independent of realms). Also fixed EFI compile errors with
-"arm64: Expand SMCCC arguments and return values" and "arm: Detect FDT overlap
-with uninitialised data"
+When I build and run this test with EFI I get an SVE exception.
 
-https://gitlab.com/jones-drew/kvm-unit-tests/-/commits/arm/queue?ref_type=heads
+./configure --arch=arm64 --cross-prefix=aarch64-linux-gnu- --enable-efi --enable-efi-direct
+qemu-system-aarch64 -nodefaults \
+	-machine virt -accel tcg -cpu max \
+	-display none -serial stdio \
+	-kernel arm/fpu.efi -append fpu.efi \
+	-bios /usr/share/edk2/aarch64/QEMU_EFI.silent.fd \
+	-smp 2 -machine acpi=off
+
+UEFI firmware (version edk2-20230524-3.fc38 built at 00:00:00 on Jun 26 2023)
+...
+
+Address of image is: 0x43cfd000
+PASS: fpu: FPU/SIMD register save/restore mask: 0xffffffff
+PASS: fpu: FPU/SIMD register save/restore mask: 0xffffffff
+Load address: 43cfd000
+PC: 43d0b4e4 PC offset: e4e4
+Unhandled exception ec=0x19 (SVE)
+Vector: 4 (el1h_sync)
+ESR_EL1:         66000000, ec=0x19 (SVE)
+FAR_EL1: 0000000000000000 (not valid)
+Exception frame registers:
+pc : [<0000000043d0b4e4>] lr : [<0000000043d0b4d8>] pstate: 000002c5
+sp : 0000000043d2bec0
+x29: 0000000043d2bec0 x28: 0000000043d2bf58 
+x27: 0000000043d2bf60 x26: 0000000043d2bf68 
+x25: 0000000043d2bf70 x24: 8000000000000002 
+x23: 0000000043d2bf88 x22: 0000000000000000 
+x21: 000000004661b898 x20: 0000000043d2bfa8 
+x19: 0000000043d38e60 x18: 0000000000000000 
+x17: 00000000ffffa6ab x16: 0000000043d07780 
+x15: 0000000000000000 x14: 0000000000000010 
+x13: 0000000043d0d4b0 x12: 000000000000000f 
+x11: 0000000000000004 x10: 0000000000000066 
+x9 : 0000000000000066 x8 : 0000000043d3abf0 
+x7 : 0000000000000080 x6 : 0000000000000040 
+x5 : 0000000000003bce x4 : 0000000000043cfd 
+x3 : 0000000040101000 x2 : 0000000000040105 
+x1 : 0000000000000040 x0 : 1301001120110022 
+
+	STACK: @e4e4 752c 1050
+
+EXIT: STATUS=127
+
 
 Thanks,
 drew
