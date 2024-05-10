@@ -1,329 +1,378 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B05B6171648
-	for <kvmarm@lists.linux.dev>; Fri, 10 May 2024 11:27:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1493812C49A;
+	Fri, 10 May 2024 14:26:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715340469; cv=none; b=bf3BdfQ0vzTxfumv5ZeWFsDBwq4VMvvSPDYump9bZe+hxNNQACq0mWqwamvGe92Eq0TFIAFIJRnBU0jzczPPgNNZjnd7Rc7AXa1wO1KRNwp1pJe8we4mU7lQ+q/NKJVJVEni/rlXWG/esu7DNmHFj/tMIhXqbQM1TPYXpGSU2/0=
+	t=1715351190; cv=none; b=HribT+k0zhzbx9hH6viiTKMk42DWVutzXDoT0/4uogXDbwoUTyU3QFyOb7niD19nBEy4z1SnbqK6JEIyMGjT8P43ebuu4WzUi4NldfrAYA8msLpslwnVo6iMQCR6IJycz8bR9/KZTCCe67rUbQZeN9SoHywQZCgRE8/Jfc6zYn8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715340469; c=relaxed/simple;
-	bh=olch/zFkSndigLQVwr9bYRtHWZEBGl9YaT4pV77/LIY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ItvTUlxVnqdkoinbmPhGkXILS5/2lVkz5RRAFzqpZGvQ3azfySfeCxHB8TWbohEHpULxBxF4Dt8fx6M3sPmqGn+wbqArTu0vx1ig5zsAHrZDBj08lhYbbh1jfjBJqrCxtkYG2WAfcYw/twV9IbDrMzKs8GyC9HE9AY01+eE3uF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ptosi.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Dx6LF60z; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ptosi.bounces.google.com
+	s=arc-20240116; t=1715351190; c=relaxed/simple;
+	bh=UHieGComjeAJShXra8dHb1zZEtS/wf9h9mPlwoie+to=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=u0vbATL7YDPGgQzyBqnOFLGYrRIFi11XGI0ruBRejJdgvU4tvb1yVBJCyjI3jUmTXePJl9QChb0az6JBzBM4bY3LWszwMEOCsALPC5N0Ab9hWP0om0rCiz+Dyx2e31JVr1GYnPDTsDfoIrHRbdGyUvm0YojKifNWULQVNJ/yRs4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bt+PLyPJ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Dx6LF60z"
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6202fd268c1so32294477b3.2
-        for <kvmarm@lists.linux.dev>; Fri, 10 May 2024 04:27:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715340467; x=1715945267; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5CCzdSxscfzeRlLJ5wL+3zQfVKF6xgrgjNCyKCDms4U=;
-        b=Dx6LF60zLe7iwIgoxrh4RpF14iRWPNHya1B55n9bLSnazPOX1bWlp3N/b3M9I+Z42b
-         +Gvv+wv6PobCUjAYxFav/oTAsI8aN53q3asOb+uoanmAdy68HCIEUyiqfeWgRZ2TRCyB
-         m5OgxAi4aY5vDeuFbWoabWFxieyMHlZc0TLT6JgoDVuooITJDOEM1h6yh3brselxhqND
-         1KIFTYCzbRN7kuVx6BeISu0FOf9P5bJa720lZST/06l68hcFsTMEkCBm2glasMP4cx/Q
-         TZ2C36McRv5u7agIbA/F9gOmuJp2zf8UkAZ1z8EPF+UsNa7ODMLtcYOnhSzJZCjkkoVG
-         pg8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715340467; x=1715945267;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=5CCzdSxscfzeRlLJ5wL+3zQfVKF6xgrgjNCyKCDms4U=;
-        b=nIhqTDTtLZR56Y6hGcNFU3n2cE4iqZAahuG603FZOXahg0yNF8NoT0uM8fPqS0VrI+
-         /JjZER+It6/aufFoUV3OOzJdT89IPJNAwuleinYUxsICNpZ/SXz8qlA4VKkh4OKoD9R6
-         fZXha7p7JLtSD8A/Msbx/ZesNg0obCzVPZUEkrzaYiFz3KY+2R+N/lwJjns+TGB2HF8j
-         WsUrjmZbKydB2r13OzxU+XcexJHoIY+fPq6t0voIk5HolCM4qzEQz4PKZoDoqHTmCdPG
-         OA+ELEb0J+j37F4M8DpK7969tDYmRK6kDnyL7OWDe9oVfdLzxgZcEzLGXR/itNXhz4+P
-         uC4A==
-X-Gm-Message-State: AOJu0YynWVzEuub4t+x+FNMnO+7yPPfjxmTjstYUTiVc8n/j8k933EAY
-	HvovZd5PUAgOw59+XkaF1QXKzEW1vFRvpHlJkzlelAW9TxKUmv7jIg1vwQJzoQ+dkkMyrhWyu/3
-	3fcjpomrjjEnwaR4MvS54fBOs11zFbkAiYuzOJfOJrOAoXD4eNQuWb3lu3gK5VsUy1LoZsdp4vw
-	ufrrXYHdoR/nB4LlajNwq6xjrOlr4=
-X-Google-Smtp-Source: AGHT+IHdS3ei2ZFY3/jZi7UOWajuQFEcULFtMW4+dDg7tAnI+MMeD/3xdux6nZQkCMsm0kZ06aqSsHCV0w==
-X-Received: from ptosi.c.googlers.com ([fda3:e722:ac3:cc00:31:98fb:c0a8:11ec])
- (user=ptosi job=sendgmr) by 2002:a05:690c:c9d:b0:618:8e4b:f49d with SMTP id
- 00721157ae682-622aff868c9mr6454537b3.4.1715340466673; Fri, 10 May 2024
- 04:27:46 -0700 (PDT)
-Date: Fri, 10 May 2024 12:26:41 +0100
-In-Reply-To: <20240510112645.3625702-1-ptosi@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bt+PLyPJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83289C113CC;
+	Fri, 10 May 2024 14:26:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715351189;
+	bh=UHieGComjeAJShXra8dHb1zZEtS/wf9h9mPlwoie+to=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=bt+PLyPJL7kM2Fi6ztoKpTBdc0zuDo5S7vQdcVvSvzRfpf38wRvnpLfSDrajdbg9R
+	 oTf6SS5ETUO/mHsdXVtlDLsrix1vm2/DdGPs1woo2X4yYO6qQWaLsQvPRfkHqR4JBF
+	 AJgUxPd5G7Q1juhPg4vPhzWZg28rHpsgdhNw/Sb3jR7peljtpCIh1MoGFF/7xsf8nX
+	 B22PfF4tXf/KkAUZxVOKYJWcB6Pl/MuNB9aCpTP7zLCTHhyIt+TRhLj0WrOWqtLr+9
+	 GkJgC/w1Ocpdb7ym9jL8jdcRYmcXqiSasLThT+J/S0qjT4ddgbjsKyb4d5LDxTes2N
+	 QFoja/GIXVIVQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1s5RCd-00CEXP-62;
+	Fri, 10 May 2024 15:26:27 +0100
+Date: Fri, 10 May 2024 15:26:23 +0100
+Message-ID: <861q69oi9c.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Colton Lewis <coltonlewis@google.com>
+Cc: kvm@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, Oliver
+ Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v5] KVM: arm64: Add early_param to control WFx trapping
+In-Reply-To: <20240430181444.670773-1-coltonlewis@google.com>
+References: <20240430181444.670773-1-coltonlewis@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20240510112645.3625702-1-ptosi@google.com>
-X-Mailer: git-send-email 2.45.0.118.g7fe29c98d7-goog
-Message-ID: <20240510112645.3625702-13-ptosi@google.com>
-Subject: [PATCH v3 12/12] KVM: arm64: Improve CONFIG_CFI_CLANG error message
-From: "=?UTF-8?q?Pierre-Cl=C3=A9ment=20Tosi?=" <ptosi@google.com>
-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	kvm@vger.kernel.org
-Cc: "=?UTF-8?q?Pierre-Cl=C3=A9ment=20Tosi?=" <ptosi@google.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Vincent Donnefort <vdonnefort@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: coltonlewis@google.com, kvm@vger.kernel.org, corbet@lwn.net, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-For kCFI, the compiler encodes in the immediate of the BRK (which the
-CPU places in ESR_ELx) the indices of the two registers it used to hold
-(resp.) the function pointer and expected type. Therefore, the kCFI
-handler must be able to parse the contents of the register file at the
-point where the exception was triggered.
+On Tue, 30 Apr 2024 19:14:44 +0100,
+Colton Lewis <coltonlewis@google.com> wrote:
+> 
+> Add an early_params to control WFI and WFE trapping. This is to
+> control the degree guests can wait for interrupts on their own without
+> being trapped by KVM. Options for each param are trap and notrap. trap
+> enables the trap. notrap disables the trap. Absent an explicitly set
+> policy, default to current behavior: disabling the trap if only a
+> single task is running and enabling otherwise.
+> 
+> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+> ---
+> v5:
+> 
+> * Move trap configuration to vcpu_reset_hcr(). This required moving
+>   kvm_emulate.h:vcpu_reset_hcr() to arm.c:kvm_vcpu_reset_hcr() to avoid needing
+>   to pull scheduler headers and my enums into kvm_emulate.h. I thought the
+>   function looked too bulky for that header anyway.
+> * Delete vcpu_{set,clear}_vfx_traps helpers that are no longer used anywhere.
+> * Remove documentation of explicit option for default behavior to avoid any
+>   implicit suggestion default behavior will stay that way.
+> 
+> v4:
+> https://lore.kernel.org/kvmarm/20240422181716.237284-1-coltonlewis@google.com/
+> 
+> v3:
+> https://lore.kernel.org/kvmarm/20240410175437.793508-1-coltonlewis@google.com/
+> 
+> v2:
+> https://lore.kernel.org/kvmarm/20240319164341.1674863-1-coltonlewis@google.com/
+> 
+> v1:
+> https://lore.kernel.org/kvmarm/20240129213918.3124494-1-coltonlewis@google.com/
+> 
+>  .../admin-guide/kernel-parameters.txt         |  16 +++
+>  arch/arm64/include/asm/kvm_emulate.h          |  53 ---------
+>  arch/arm64/include/asm/kvm_host.h             |   7 ++
+>  arch/arm64/kvm/arm.c                          | 110 +++++++++++++++++-
+>  4 files changed, 127 insertions(+), 59 deletions(-)
+> 
+> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+> index 31b3a25680d0..a4d94d9abbe4 100644
+> --- a/Documentation/admin-guide/kernel-parameters.txt
+> +++ b/Documentation/admin-guide/kernel-parameters.txt
+> @@ -2653,6 +2653,22 @@
+>  			[KVM,ARM] Allow use of GICv4 for direct injection of
+>  			LPIs.
+> 
+> +	kvm-arm.wfe_trap_policy=
+> +			[KVM,ARM] Control when to set WFE instruction trap for
+> +			KVM VMs.
+> +
+> +			trap: set WFE instruction trap
+> +
+> +			notrap: clear WFE instruction trap
+> +
+> +	kvm-arm.wfi_trap_policy=
+> +			[KVM,ARM] Control when to set WFI instruction trap for
+> +			KVM VMs.
+> +
+> +			trap: set WFI instruction trap
+> +
+> +			notrap: clear WFI instruction trap
+> +
 
-To achieve this, introduce a new hypervisor panic path that first stores
-the CPU context in the per-CPU kvm_hyp_ctxt before calling (directly or
-indirectly) hyp_panic() and execute it from all EL2 synchronous
-exception handlers i.e.
+Please make it clear that neither traps are guaranteed. The
+architecture *allows* an implementation to trap when no events (resp.
+interrupts) are pending, but nothing more. An implementation is
+perfectly allowed to ignore these bits.
 
-- call it directly in host_el2_sync_vect (__kvm_hyp_host_vector, EL2t&h)
-- call it directly in el2t_sync_invalid (__kvm_hyp_vector, EL2t)
-- set ELR_EL2 to it in el2_sync (__kvm_hyp_vector, EL2h), which ERETs
+>  	kvm_cma_resv_ratio=n [PPC]
+>  			Reserves given percentage from system memory area for
+>  			contiguous memory allocation for KVM hash pagetable
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index b804fe832184..c2a9a409ebfe 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -67,64 +67,11 @@ static __always_inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
+>  }
+>  #endif
+> 
+> -static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+> -{
+> -	vcpu->arch.hcr_el2 = HCR_GUEST_FLAGS;
+> -	if (has_vhe() || has_hvhe())
+> -		vcpu->arch.hcr_el2 |= HCR_E2H;
+> -	if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN)) {
+> -		/* route synchronous external abort exceptions to EL2 */
+> -		vcpu->arch.hcr_el2 |= HCR_TEA;
+> -		/* trap error record accesses */
+> -		vcpu->arch.hcr_el2 |= HCR_TERR;
+> -	}
+> -
+> -	if (cpus_have_final_cap(ARM64_HAS_STAGE2_FWB)) {
+> -		vcpu->arch.hcr_el2 |= HCR_FWB;
+> -	} else {
+> -		/*
+> -		 * For non-FWB CPUs, we trap VM ops (HCR_EL2.TVM) until M+C
+> -		 * get set in SCTLR_EL1 such that we can detect when the guest
+> -		 * MMU gets turned on and do the necessary cache maintenance
+> -		 * then.
+> -		 */
+> -		vcpu->arch.hcr_el2 |= HCR_TVM;
+> -	}
+> -
+> -	if (cpus_have_final_cap(ARM64_HAS_EVT) &&
+> -	    !cpus_have_final_cap(ARM64_MISMATCHED_CACHE_TYPE))
+> -		vcpu->arch.hcr_el2 |= HCR_TID4;
+> -	else
+> -		vcpu->arch.hcr_el2 |= HCR_TID2;
+> -
+> -	if (vcpu_el1_is_32bit(vcpu))
+> -		vcpu->arch.hcr_el2 &= ~HCR_RW;
+> -
+> -	if (kvm_has_mte(vcpu->kvm))
+> -		vcpu->arch.hcr_el2 |= HCR_ATA;
+> -}
+> -
+>  static inline unsigned long *vcpu_hcr(struct kvm_vcpu *vcpu)
+>  {
+>  	return (unsigned long *)&vcpu->arch.hcr_el2;
+>  }
+> 
+> -static inline void vcpu_clear_wfx_traps(struct kvm_vcpu *vcpu)
+> -{
+> -	vcpu->arch.hcr_el2 &= ~HCR_TWE;
+> -	if (atomic_read(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe.vlpi_count) ||
+> -	    vcpu->kvm->arch.vgic.nassgireq)
+> -		vcpu->arch.hcr_el2 &= ~HCR_TWI;
+> -	else
+> -		vcpu->arch.hcr_el2 |= HCR_TWI;
+> -}
+> -
+> -static inline void vcpu_set_wfx_traps(struct kvm_vcpu *vcpu)
+> -{
+> -	vcpu->arch.hcr_el2 |= HCR_TWE;
+> -	vcpu->arch.hcr_el2 |= HCR_TWI;
+> -}
+> -
+>  static inline void vcpu_ptrauth_enable(struct kvm_vcpu *vcpu)
+>  {
+>  	vcpu->arch.hcr_el2 |= (HCR_API | HCR_APK);
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 21c57b812569..315ee7bfc1cb 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -67,6 +67,13 @@ enum kvm_mode {
+>  	KVM_MODE_NV,
+>  	KVM_MODE_NONE,
+>  };
+> +
+> +enum kvm_wfx_trap_policy {
+> +	KVM_WFX_NOTRAP_SINGLE_TASK, /* Default option */
+> +	KVM_WFX_NOTRAP,
+> +	KVM_WFX_TRAP,
+> +};
 
-Teach hyp_panic() to decode the kCFI ESR and extract the target and type
-from the saved CPU context. In VHE, use that information to panic() with
-a specialized error message. In nVHE, only report it if the host (EL1)
-has access to the saved CPU context i.e. iff CONFIG_NVHE_EL2_DEBUG=3Dy,
-which aligns with the behavior of CONFIG_PROTECTED_NVHE_STACKTRACE.
+Since this is only ever used in arm.c, it really doesn't need to be
+exposed anywhere else.
 
-Signed-off-by: Pierre-Cl=C3=A9ment Tosi <ptosi@google.com>
----
- arch/arm64/kvm/handle_exit.c            | 30 +++++++++++++++++++++++--
- arch/arm64/kvm/hyp/entry.S              | 24 +++++++++++++++++++-
- arch/arm64/kvm/hyp/hyp-entry.S          |  2 +-
- arch/arm64/kvm/hyp/include/hyp/switch.h |  4 ++--
- arch/arm64/kvm/hyp/nvhe/host.S          |  2 +-
- arch/arm64/kvm/hyp/vhe/switch.c         | 26 +++++++++++++++++++--
- 6 files changed, 79 insertions(+), 9 deletions(-)
+> +
+>  #ifdef CONFIG_KVM
+>  enum kvm_mode kvm_get_mode(void);
+>  #else
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index a25265aca432..5ec52333e042 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -46,6 +46,8 @@
+>  #include <kvm/arm_psci.h>
+> 
+>  static enum kvm_mode kvm_mode = KVM_MODE_DEFAULT;
+> +static enum kvm_wfx_trap_policy kvm_wfi_trap_policy = KVM_WFX_NOTRAP_SINGLE_TASK;
+> +static enum kvm_wfx_trap_policy kvm_wfe_trap_policy = KVM_WFX_NOTRAP_SINGLE_TASK;
 
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 0db23a6304ce..d76e41a07df1 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -26,6 +26,8 @@
- #define CREATE_TRACE_POINTS
- #include "trace_handle_exit.h"
-=20
-+DECLARE_KVM_NVHE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
-+
- typedef int (*exit_handle_fn)(struct kvm_vcpu *);
-=20
- static void kvm_handle_guest_serror(struct kvm_vcpu *vcpu, u64 esr)
-@@ -383,11 +385,35 @@ void handle_exit_early(struct kvm_vcpu *vcpu, int exc=
-eption_index)
- 		kvm_handle_guest_serror(vcpu, kvm_vcpu_get_esr(vcpu));
- }
-=20
--static void kvm_nvhe_report_cfi_failure(u64 panic_addr)
-+static void kvm_nvhe_report_cfi_target(struct user_pt_regs *regs, u64 esr,
-+				       u64 hyp_offset)
-+{
-+	u64 va_mask =3D GENMASK_ULL(vabits_actual - 1, 0);
-+	u8 type_idx =3D FIELD_GET(CFI_BRK_IMM_TYPE, esr);
-+	u8 target_idx =3D FIELD_GET(CFI_BRK_IMM_TARGET, esr);
-+	u32 expected_type =3D (u32)regs->regs[type_idx];
-+	u64 target_addr =3D (regs->regs[target_idx] & va_mask) + hyp_offset;
-+
-+	kvm_err(" (target: [<%016llx>] %ps, expected type: 0x%08x)\n",
-+		target_addr, (void *)(target_addr + kaslr_offset()),
-+		expected_type);
-+}
-+
-+static void kvm_nvhe_report_cfi_failure(u64 panic_addr, u64 esr, u64 hyp_o=
-ffset)
- {
-+	struct user_pt_regs *regs =3D NULL;
-+
- 	kvm_err("nVHE hyp CFI failure at: [<%016llx>] %pB!\n", panic_addr,
- 		(void *)(panic_addr + kaslr_offset()));
-=20
-+	if (IS_ENABLED(CONFIG_NVHE_EL2_DEBUG) || !is_protected_kvm_enabled())
-+		regs =3D &this_cpu_ptr_nvhe_sym(kvm_hyp_ctxt)->regs;
-+
-+	if (regs)
-+		kvm_nvhe_report_cfi_target(regs, esr, hyp_offset);
-+	else
-+		kvm_err(" (no target information: !CONFIG_NVHE_EL2_DEBUG)\n");
-+
- 	if (IS_ENABLED(CONFIG_CFI_PERMISSIVE))
- 		kvm_err(" (CONFIG_CFI_PERMISSIVE ignored for hyp failures)\n");
- }
-@@ -423,7 +449,7 @@ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, =
-u64 spsr,
- 			kvm_err("nVHE hyp BUG at: [<%016llx>] %pB!\n", panic_addr,
- 					(void *)(panic_addr + kaslr_offset()));
- 	} else if (IS_ENABLED(CONFIG_CFI_CLANG) && esr_is_cfi_brk(esr)) {
--		kvm_nvhe_report_cfi_failure(panic_addr);
-+		kvm_nvhe_report_cfi_failure(panic_addr, esr, hyp_offset);
- 	} else {
- 		kvm_err("nVHE hyp panic at: [<%016llx>] %pB!\n", panic_addr,
- 				(void *)(panic_addr + kaslr_offset()));
-diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
-index 6a1ce9d21e5b..8838b453b9be 100644
---- a/arch/arm64/kvm/hyp/entry.S
-+++ b/arch/arm64/kvm/hyp/entry.S
-@@ -83,7 +83,7 @@ alternative_else_nop_endif
- 	eret
- 	sb
-=20
--SYM_INNER_LABEL(__hyp_restore_elr_and_panic, SYM_L_GLOBAL)
-+SYM_INNER_LABEL(__hyp_restore_elr_save_context_and_panic, SYM_L_GLOBAL)
- 	// x0-x29,lr: hyp regs
-=20
- 	stp	x0, x1, [sp, #-16]!
-@@ -92,6 +92,28 @@ SYM_INNER_LABEL(__hyp_restore_elr_and_panic, SYM_L_GLOBA=
-L)
- 	msr	elr_el2, x0
- 	ldp	x0, x1, [sp], #16
-=20
-+SYM_INNER_LABEL(__hyp_save_context_and_panic, SYM_L_GLOBAL)
-+	// x0-x29,lr: hyp regs
-+
-+	stp	x0, x1, [sp, #-16]!
-+
-+	adr_this_cpu x0, kvm_hyp_ctxt, x1
-+
-+	stp	x2, x3,   [x0, #CPU_XREG_OFFSET(2)]
-+
-+	ldp	x2, x3, [sp], #16
-+
-+	stp	x2, x3,   [x0, #CPU_XREG_OFFSET(0)]
-+	stp	x4, x5,   [x0, #CPU_XREG_OFFSET(4)]
-+	stp	x6, x7,   [x0, #CPU_XREG_OFFSET(6)]
-+	stp	x8, x9,   [x0, #CPU_XREG_OFFSET(8)]
-+	stp	x10, x11, [x0, #CPU_XREG_OFFSET(10)]
-+	stp	x12, x13, [x0, #CPU_XREG_OFFSET(12)]
-+	stp	x14, x15, [x0, #CPU_XREG_OFFSET(14)]
-+	stp	x16, x17, [x0, #CPU_XREG_OFFSET(16)]
-+
-+	save_callee_saved_regs x0
-+
- SYM_INNER_LABEL(__hyp_panic, SYM_L_GLOBAL)
- 	// x0-x29,lr: vcpu regs
-=20
-diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.=
-S
-index 7e65ef738ec9..d0d90d598338 100644
---- a/arch/arm64/kvm/hyp/hyp-entry.S
-+++ b/arch/arm64/kvm/hyp/hyp-entry.S
-@@ -130,7 +130,7 @@ SYM_CODE_END(\label)
- .endm
-=20
- 	/* None of these should ever happen */
--	invalid_vector	el2t_sync_invalid
-+	invalid_vector	el2t_sync_invalid, __hyp_save_context_and_panic
- 	invalid_vector	el2t_irq_invalid
- 	invalid_vector	el2t_fiq_invalid
- 	invalid_vector	el2t_error_invalid
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/i=
-nclude/hyp/switch.h
-index 9387e3a0b680..f3d8fbc7a77b 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -753,7 +753,7 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *vc=
-pu, u64 *exit_code)
-=20
- static inline void __kvm_unexpected_el2_exception(void)
- {
--	extern char __hyp_restore_elr_and_panic[];
-+	extern char __hyp_restore_elr_save_context_and_panic[];
- 	unsigned long addr, fixup;
- 	struct kvm_exception_table_entry *entry, *end;
- 	unsigned long elr_el2 =3D read_sysreg(elr_el2);
-@@ -776,7 +776,7 @@ static inline void __kvm_unexpected_el2_exception(void)
-=20
- 	/* Trigger a panic after restoring the hyp context. */
- 	this_cpu_ptr(&kvm_hyp_ctxt)->sys_regs[ELR_EL2] =3D elr_el2;
--	write_sysreg(__hyp_restore_elr_and_panic, elr_el2);
-+	write_sysreg(__hyp_restore_elr_save_context_and_panic, elr_el2);
- }
-=20
- #endif /* __ARM64_KVM_HYP_SWITCH_H__ */
-diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.=
-S
-index 0613b6e35137..ec3e4f5c28cc 100644
---- a/arch/arm64/kvm/hyp/nvhe/host.S
-+++ b/arch/arm64/kvm/hyp/nvhe/host.S
-@@ -213,7 +213,7 @@ SYM_FUNC_END(__host_hvc)
- .endm
-=20
- .macro host_el2_sync_vect
--	__host_el2_vect __hyp_panic
-+	__host_el2_vect __hyp_save_context_and_panic
- .endm
-=20
- .macro invalid_host_el1_vect
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switc=
-h.c
-index b3268933b093..17df57580c77 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -18,6 +18,7 @@
-=20
- #include <asm/barrier.h>
- #include <asm/cpufeature.h>
-+#include <asm/esr.h>
- #include <asm/kprobes.h>
- #include <asm/kvm_asm.h>
- #include <asm/kvm_emulate.h>
-@@ -308,7 +309,24 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 	return ret;
- }
-=20
--static void __noreturn __hyp_call_panic(u64 spsr, u64 elr, u64 par)
-+static void __noreturn __hyp_call_panic_for_cfi(u64 elr, u64 esr)
-+{
-+	struct user_pt_regs *regs =3D &this_cpu_ptr(&kvm_hyp_ctxt)->regs;
-+	u8 type_idx =3D FIELD_GET(CFI_BRK_IMM_TYPE, esr);
-+	u8 target_idx =3D FIELD_GET(CFI_BRK_IMM_TARGET, esr);
-+	u32 expected_type =3D (u32)regs->regs[type_idx];
-+	u64 target =3D regs->regs[target_idx];
-+
-+	panic("VHE hyp CFI failure at: [<%016llx>] %pB (target: [<%016llx>] %ps, =
-expected type: 0x%08x)\n"
-+#ifdef CONFIG_CFI_PERMISSIVE
-+	      " (CONFIG_CFI_PERMISSIVE ignored for hyp failures)\n"
-+#endif
-+	      ,
-+	      elr, (void *)elr, target, (void *)target, expected_type);
-+}
-+NOKPROBE_SYMBOL(__hyp_call_panic_for_cfi);
-+
-+static void __noreturn __hyp_call_panic(u64 spsr, u64 elr, u64 par, u64 es=
-r)
- {
- 	struct kvm_cpu_context *host_ctxt;
- 	struct kvm_vcpu *vcpu;
-@@ -319,6 +337,9 @@ static void __noreturn __hyp_call_panic(u64 spsr, u64 e=
-lr, u64 par)
- 	__deactivate_traps(vcpu);
- 	sysreg_restore_host_state_vhe(host_ctxt);
-=20
-+	if (IS_ENABLED(CONFIG_CFI_CLANG) && esr_is_cfi_brk(esr))
-+		__hyp_call_panic_for_cfi(elr, esr);
-+
- 	panic("HYP panic:\nPS:%08llx PC:%016llx ESR:%08llx\nFAR:%016llx HPFAR:%01=
-6llx PAR:%016llx\nVCPU:%p\n",
- 	      spsr, elr,
- 	      read_sysreg_el2(SYS_ESR), read_sysreg_el2(SYS_FAR),
-@@ -331,8 +352,9 @@ void __noreturn hyp_panic(void)
- 	u64 spsr =3D read_sysreg_el2(SYS_SPSR);
- 	u64 elr =3D read_sysreg_el2(SYS_ELR);
- 	u64 par =3D read_sysreg_par();
-+	u64 esr =3D read_sysreg_el2(SYS_ESR);
-=20
--	__hyp_call_panic(spsr, elr, par);
-+	__hyp_call_panic(spsr, elr, par, esr);
- }
-=20
- asmlinkage void kvm_unexpected_el2_exception(void)
---=20
-2.45.0.118.g7fe29c98d7-goog
+It would be worth declaring those as __read_mostly.
 
+>
+>  DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
+> 
+> @@ -456,11 +458,6 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>  	if (kvm_arm_is_pvtime_enabled(&vcpu->arch))
+>  		kvm_make_request(KVM_REQ_RECORD_STEAL, vcpu);
+> 
+> -	if (single_task_running())
+> -		vcpu_clear_wfx_traps(vcpu);
+> -	else
+> -		vcpu_set_wfx_traps(vcpu);
+> -
+>  	if (vcpu_has_ptrauth(vcpu))
+>  		vcpu_ptrauth_disable(vcpu);
+>  	kvm_arch_vcpu_load_debug_state_flags(vcpu);
+> @@ -1391,6 +1388,72 @@ static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
+>  	return 0;
+>  }
+> 
+> +static bool kvm_vcpu_should_clear_twi(struct kvm_vcpu *vcpu)
+> +{
+> +	if (likely(kvm_wfi_trap_policy == KVM_WFX_NOTRAP_SINGLE_TASK))
+> +		return single_task_running() &&
+> +			(atomic_read(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe.vlpi_count) ||
+> +			 vcpu->kvm->arch.vgic.nassgireq);
+
+So you are evaluating a runtime condition (scheduler queue length,
+number of LPIs)...
+
+> +
+> +	return kvm_wfi_trap_policy == KVM_WFX_NOTRAP;
+> +}
+> +
+> +static bool kvm_vcpu_should_clear_twe(struct kvm_vcpu *vcpu)
+> +{
+> +	if (likely(kvm_wfe_trap_policy == KVM_WFX_NOTRAP_SINGLE_TASK))
+> +		return single_task_running();
+> +
+> +	return kvm_wfe_trap_policy == KVM_WFX_NOTRAP;
+> +}
+> +
+> +static inline void kvm_vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+
+Why the inline?
+
+> +{
+> +	vcpu->arch.hcr_el2 = HCR_GUEST_FLAGS;
+> +	if (has_vhe() || has_hvhe())
+> +		vcpu->arch.hcr_el2 |= HCR_E2H;
+> +	if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN)) {
+> +		/* route synchronous external abort exceptions to EL2 */
+> +		vcpu->arch.hcr_el2 |= HCR_TEA;
+> +		/* trap error record accesses */
+> +		vcpu->arch.hcr_el2 |= HCR_TERR;
+> +	}
+> +
+> +	if (cpus_have_final_cap(ARM64_HAS_STAGE2_FWB)) {
+> +		vcpu->arch.hcr_el2 |= HCR_FWB;
+> +	} else {
+> +		/*
+> +		 * For non-FWB CPUs, we trap VM ops (HCR_EL2.TVM) until M+C
+> +		 * get set in SCTLR_EL1 such that we can detect when the guest
+> +		 * MMU gets turned on and do the necessary cache maintenance
+> +		 * then.
+> +		 */
+> +		vcpu->arch.hcr_el2 |= HCR_TVM;
+> +	}
+> +
+> +	if (cpus_have_final_cap(ARM64_HAS_EVT) &&
+> +	    !cpus_have_final_cap(ARM64_MISMATCHED_CACHE_TYPE))
+> +		vcpu->arch.hcr_el2 |= HCR_TID4;
+> +	else
+> +		vcpu->arch.hcr_el2 |= HCR_TID2;
+> +
+> +	if (vcpu_el1_is_32bit(vcpu))
+> +		vcpu->arch.hcr_el2 &= ~HCR_RW;
+> +
+> +	if (kvm_has_mte(vcpu->kvm))
+> +		vcpu->arch.hcr_el2 |= HCR_ATA;
+> +
+> +
+> +	if (kvm_vcpu_should_clear_twe(vcpu))
+> +		vcpu->arch.hcr_el2 &= ~HCR_TWE;
+> +	else
+> +		vcpu->arch.hcr_el2 |= HCR_TWE;
+> +
+> +	if (kvm_vcpu_should_clear_twi(vcpu))
+> +		vcpu->arch.hcr_el2 &= ~HCR_TWI;
+> +	else
+> +		vcpu->arch.hcr_el2 |= HCR_TWI;
+
+... and from the above runtime conditions you make it a forever
+decision, for a vcpu that still hasn't executed a single instruction.
+What could possibly go wrong?
+
+> +}
+> +
+>  static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
+>  					 struct kvm_vcpu_init *init)
+>  {
+> @@ -1427,7 +1490,7 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
+>  			icache_inval_all_pou();
+>  	}
+> 
+> -	vcpu_reset_hcr(vcpu);
+> +	kvm_vcpu_reset_hcr(vcpu);
+>  	vcpu->arch.cptr_el2 = kvm_get_reset_cptr_el2(vcpu);
+> 
+>  	/*
+> @@ -2654,6 +2717,41 @@ static int __init early_kvm_mode_cfg(char *arg)
+>  }
+>  early_param("kvm-arm.mode", early_kvm_mode_cfg);
+> 
+> +static int __init early_kvm_wfx_trap_policy_cfg(char *arg, enum kvm_wfx_trap_policy *p)
+> +{
+> +	if (!arg)
+> +		return -EINVAL;
+> +
+> +	if (strcmp(arg, "trap") == 0) {
+> +		*p = KVM_WFX_TRAP;
+> +		return 0;
+> +	}
+> +
+> +	if (strcmp(arg, "notrap") == 0) {
+> +		*p = KVM_WFX_NOTRAP;
+> +		return 0;
+> +	}
+> +
+> +	if (strcmp(arg, "default") == 0) {
+> +		*p = KVM_WFX_NOTRAP_SINGLE_TASK;
+> +		return 0;
+> +	}
+
+Where is this "default" coming from? It's not documented.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
