@@ -1,106 +1,192 @@
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7017160793
-	for <kvmarm@lists.linux.dev>; Fri, 10 May 2024 10:49:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B535217109E
+	for <kvmarm@lists.linux.dev>; Fri, 10 May 2024 11:27:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715338179; cv=none; b=E2xxcWgxz0baOI69+4McJFHEQ3d89+3KYxqrETrNT/Pln4AhfZhyDT68zgm9lYD+cQr78LJUG7Y51twkyJFOmgM86rodCy51m4nLGRvo+TIWcXIz/TmmvmVoPeVQkV4Tvpq+3XqhiPGmD6kFyCDLeiTRtWBi5lCZLPi/tPMDTPs=
+	t=1715340441; cv=none; b=bvSEwhXn7ikZF7oFQYEpvNGbiC/cWWy3zTsouin3JFIYyoBV/e/BJTMlImDHgc7gpQD0u9sbsrXfS8OtD1/PhO7EwqYpG930MxEiHVWMFMRh+jhpIG9hQtWnWxwM2HTfHDcGDE2IGsgz2CwTF2guMmaFDcxJ+HB2ujTGQJ1dKNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715338179; c=relaxed/simple;
-	bh=BtINqOStDRilCaGDjwEvjvG1MUov81NU+KIxhB/Tg6g=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=V7fg8Jcm2Vsmrej8sqQ61PI9FbZPrlncdaET/vm9uSEagwtzlVRmcbYud4TYhVF0yMeGpR84BGoTCQV+8HEYIJbu39PjmTGQXTdXQz3QegjJhWYKlf2vE6W3K5AMKT+hgQ4VOLiDXnAbk1eOm7ipd1sJxUXB2P8PHfreGi3c6Lk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4VbQbC2QMpz1xrJT;
-	Fri, 10 May 2024 18:48:23 +0800 (CST)
-Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
-	by mail.maildlp.com (Postfix) with ESMTPS id 05FB314038F;
-	Fri, 10 May 2024 18:49:32 +0800 (CST)
-Received: from [10.174.185.179] (10.174.185.179) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Fri, 10 May 2024 18:49:30 +0800
-Subject: Re: [PATCH v4 01/30] KVM: arm64: Initialize the kvm host data's
- fpsimd_state pointer in pKVM
-To: Fuad Tabba <tabba@google.com>, Marc Zyngier <maz@kernel.org>
-CC: <kvmarm@lists.linux.dev>, <will@kernel.org>, <qperret@google.com>,
-	<seanjc@google.com>, <alexandru.elisei@arm.com>, <catalin.marinas@arm.com>,
-	<philmd@linaro.org>, <james.morse@arm.com>, <suzuki.poulose@arm.com>,
-	<oliver.upton@linux.dev>, <mark.rutland@arm.com>, <broonie@kernel.org>,
-	<joey.gouly@arm.com>, <rananta@google.com>, <smostafa@google.com>
-References: <20240423150538.2103045-1-tabba@google.com>
- <20240423150538.2103045-2-tabba@google.com>
- <4ec3be32-476a-14f2-7826-2171df1c9f77@huawei.com>
- <CA+EHjTwPWP1exm_bb_bSKF154W4doZvKxk5=AqFrBkUy_UsvaQ@mail.gmail.com>
- <d1435598-9a4d-1fc0-3355-9db78e6a7e27@huawei.com>
- <CA+EHjTzoD4wXhiG-uQ2xzrZkw5fLqjdOsiE87EdY5Z1qfvF7_g@mail.gmail.com>
- <86ttj6p062.wl-maz@kernel.org>
- <CA+EHjTyFanD2R2QXy005RujcXeT3GTPRw+e4yfS77KfWbxTVRg@mail.gmail.com>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <f00baf9c-bdda-3bab-6f40-14900f96982b@huawei.com>
-Date: Fri, 10 May 2024 18:49:29 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+	s=arc-20240116; t=1715340441; c=relaxed/simple;
+	bh=W1srijuSTb7jeqkogw773MDhdMTTGhTLI4r93emG8so=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=YncGJy82lbYqWf1eBlE7Pd1sjtlrwV+dFyWsUhg4oaO8E+ZBlLgKrqDSgkr8O7wLj7Ul61duBLWQ3BZX4aJoj2gD9P9XBCkwFDOhEUZUYkyHJFkj6DFkwTbpByoLQLZAK7eXsjkdR+sQRrjZGrPSCKTgNUImO6KbzioPREWUtPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ptosi.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=J+NtSIZg; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ptosi.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J+NtSIZg"
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dee5f035dd6so25119276.0
+        for <kvmarm@lists.linux.dev>; Fri, 10 May 2024 04:27:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1715340438; x=1715945238; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=GeTpsY//IUL3F2M4pGNF9LnkrFBIxs/L6CWJHc93UMI=;
+        b=J+NtSIZgCh84Jyb8vX0mvuAPYQjCzUJVqFyWMGSyhgA0+VvgbtMU10PsBszdApk0ie
+         L+QGiqmOSu3zyZYiD7qpWqkozFPbuM39OxrfUV/C5xB63HQ2/yyTX0k5JgQzOtb0zblx
+         c7n4Xge1rH5iDqOT+JwX+GdZpRuPx7w2D3UvzhcYJ0o/t5LQ9lMv46R6d22UWUU2K4pD
+         vKCR9XtFYG9TaQkBYm78lDhH4T1ZRK3yXGJgI+n+XXRjmeQsF3iObHeZSB1rOdIDhxr8
+         zfQ4KRhdYNgRACSwjs308rCk6ETfxfJiGSmmBpdRQLvkuW3TQFrf6TmBwRzTeDuAfZ87
+         HCdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715340438; x=1715945238;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GeTpsY//IUL3F2M4pGNF9LnkrFBIxs/L6CWJHc93UMI=;
+        b=B1wlzV7UIm2Ly/KjBgq9EeTY3crPW3epdh3srDeYNlWqUk3QnqWwyrx/EoZN42DDtK
+         L1apPotUbAkH3H9hW1ZVioDCN0AL01GdM3A/gbdq/Tt9hP0LKnt0XPZHQgKeyacCScah
+         EJwTCLOI+gpYv/6LCs6q1x4W42V8GCKqGsWAzJP3RVhhD2S9DsZv99kKcx8Hl119ElEF
+         GA7g3f+aabrSFuL3/ZkCt2z8Xv9kxYFuYuaWHJF8xA/1wzbaBLZkC9K27H8/gOATcS8e
+         RMAkTySsDampYP7sG5cRNea/A2XtaQdTga4hoWHAC4JTtewLDhDL9WLTN2zHrUoxfAL/
+         Ae/Q==
+X-Gm-Message-State: AOJu0YwcIQtki691ZuDUsh4jDPH2qWbeIl19V/BhTTNxPGLMFYpfDZQw
+	awfiFVgmoSBMjSYcnviTO4oz+ZJ1XdvSsO+kllZZIoq85t+Ijy36Uot0IM+oDYVAlrkEKWVsKNZ
+	hC1wUHc0Mm7wBpZCOHvf131OxXsSsnGaxhtwGaA/ZBFVq+ImHgBR6DCXYDOXX7aNzdM29BxRBYb
+	r9Ri97CLeNLpHbJqMzUljLSjg+k7E=
+X-Google-Smtp-Source: AGHT+IH8LcT7Mlvj6sPM9cJjFdpOx3dU6FNulJiXugTsKM/5ei+quZrDmLQDkQIioDTzRKYsUovHynihLw==
+X-Received: from ptosi.c.googlers.com ([fda3:e722:ac3:cc00:31:98fb:c0a8:11ec])
+ (user=ptosi job=sendgmr) by 2002:a05:6902:100f:b0:dee:5d43:a0f3 with SMTP id
+ 3f1490d57ef6-dee5d43c91fmr54501276.6.1715340437656; Fri, 10 May 2024 04:27:17
+ -0700 (PDT)
+Date: Fri, 10 May 2024 12:26:29 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-In-Reply-To: <CA+EHjTyFanD2R2QXy005RujcXeT3GTPRw+e4yfS77KfWbxTVRg@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemm600007.china.huawei.com (7.193.23.208)
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.0.118.g7fe29c98d7-goog
+Message-ID: <20240510112645.3625702-1-ptosi@google.com>
+Subject: [PATCH v3 00/12] KVM: arm64: Add support for hypervisor kCFI
+From: "=?UTF-8?q?Pierre-Cl=C3=A9ment=20Tosi?=" <ptosi@google.com>
+To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	kvm@vger.kernel.org
+Cc: "=?UTF-8?q?Pierre-Cl=C3=A9ment=20Tosi?=" <ptosi@google.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Vincent Donnefort <vdonnefort@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2024/5/10 16:00, Fuad Tabba wrote:
-> Hi Marc,
-> 
-> On Fri, May 10, 2024 at 8:59 AM Marc Zyngier <maz@kernel.org> wrote:
->>
->> On Fri, 10 May 2024 07:44:42 +0100,
->> Fuad Tabba <tabba@google.com> wrote:
->>>
->>> Hi,
->>>
->>> On Fri, May 10, 2024 at 3:40 AM Zenghui Yu <yuzenghui@huawei.com> wrote:
->>>>
->>>> I asked that in protected mode, how do we save the host state? It looks
->>>> to me that we only save it into EL2's private
->>>> kvm_host_data->host_ctxt.fp_regs which the host kernel isn't aware of.
->>>> How can host kernel restore the state for the current task later (e.g.,
->>>> for host userspace accesses)? What am I missing?
->>>
->>> What I'm going to say applies only to protected VMs in protected mode,
->>> i.e., non-protected VM's in protected mode use the mechanism above
->>> (kvm_arch_vcpu_load_fp()).
->>>
->>> Also, the upstream code for pKVM isn't complete yet as we're still
->>> upstreaming it, so you not being able to find something is our fault
->>> not yours :) You can find my branch of pKVM, based on the latest
->>> kvmarm/next here [1].
+CONFIG_CFI_CLANG ("kernel Control Flow Integrity") makes the compiler injec=
+t
+runtime type checks before any indirect function call. On AArch64, it gener=
+ates
+a BRK instruction to be executed on type mismatch and encodes the indices o=
+f the
+registers holding the branch target and expected type in the immediate of t=
+he
+instruction. As a result, a synchronous exception gets triggered on kCFI fa=
+ilure
+and the fault handler can retrieve the immediate (and indices) from ESR_ELx=
+.
 
-Thanks for sharing the details!
+This feature has been supported at EL1 ("host") since it was introduced by
+b26e484b8bb3 ("arm64: Add CFI error handling"), where cfi_handler() decodes
+ESR_EL1, giving informative panic messages such as
 
->>> For protected VMs, we don't want to lazily save/restore the host's
->>> fpsimd state, because that could leak information to the host that the
->>> protected guest is using fpsimd. Therefore, for protected VMs, the
->>> host fpsimd state is maintained (saved/restored) in hyp (at EL2),
->>> without the host needing to know or do anything about it.
->>
->> But I think that's a regression from the current status. It looks like
->> now that the state is really private to EL2, nothing will restore the
->> FP context on exit, while this was the case before we reworked this.
+  [   21.885179] CFI failure at lkdtm_indirect_call+0x2c/0x44 [lkdtm]
+  (target: lkdtm_increment_int+0x0/0x1c [lkdtm]; expected type: 0x7e0c52a)
+  [   21.886593] Internal error: Oops - CFI: 0 [#1] PREEMPT SMP
 
-My question and concern exactly. Thanks both for confirmation.
+However, it is not or only partially supported at EL2: in nVHE (or pKVM),
+CONFIG_CFI_CLANG gets filtered out at build time, preventing the compiler f=
+rom
+injecting the checks. In VHE, EL2 code gets compiled with the checks but th=
+e
+handlers in VBAR_EL2 are not aware of kCFI and will produce a generic and
+not-so-helpful panic message such as
 
->> It'd be good to plug this in 6.10, as this is a regression.
-> 
-> You're right. I'll send a patch to fix this.
+  [   36.456088][  T200] Kernel panic - not syncing: HYP panic:
+  [   36.456088][  T200] PS:204003c9 PC:ffffffc080092310 ESR:f2008228
+  [   36.456088][  T200] FAR:0000000081a50000 HPFAR:000000000081a500 PAR:1d=
+e7ec7edbadc0de
+  [   36.456088][  T200] VCPU:00000000e189c7cf
 
-Zenghui
+To address this,
+
+- [01/12] fixes an existing bug where the ELR_EL2 was getting clobbered on
+  synchronous exceptions, causing the wrong "PC" to be reported by
+  nvhe_hyp_panic_handler() or __hyp_call_panic(). This is particularly limi=
+ting
+  for kCFI, as it would mask the location of the failed type check.
+- [02/12] & [03/12] (resp.) fix and improve __pkvm_init_switch_pgd for kCFI
+- [04/12] to [06/12] prepare nVHE for CONFIG_CFI_CLANG and [10/12] enables =
+it
+- [12/12] improves kCFI error messages by saving then parsing the CPU conte=
+xt
+- [09/12] adds a kCFI test module for VHE and [11/12] extends it to nVHE & =
+pKVM
+
+As a result, an informative kCFI panic message is printed by or on behalf o=
+f EL2
+giving the expected type and target address (possibly resolved to a symbol)=
+ for
+VHE, nVHE, and pKVM (iff CONFIG_NVHE_EL2_DEBUG=3Dy).
+
+Note that kCFI errors remain fatal at EL2, even when CONFIG_CFI_PERMISSIVE=
+=3Dy.
+
+Change in v3:
+  - Reworked the commit message of [04/12]
+  - (no code changes since v2, questions on v1 remain open)
+
+Changes in v2:
+  - Added 2 commits implementing a test module for hyp kCFI;
+  - For __kvm_hyp_host_vector, dropped changes to the sync EL2t handler and=
+ kept
+    the SP overflow checks;
+  - Used the names __guest_exit_restore_elr_and_panic, esr_brk_comment;
+  - Documented the use of SYM_TYPED_FUNC_START for __pkvm_init_switch_pgd;
+  - Fixed or clarified commit messages.
+
+Pierre-Cl=C3=A9ment Tosi (12):
+  KVM: arm64: Fix clobbered ELR in sync abort/SError
+  KVM: arm64: Fix __pkvm_init_switch_pgd C signature
+  KVM: arm64: Pass pointer to __pkvm_init_switch_pgd
+  KVM: arm64: nVHE: Remove __guest_exit_panic path
+  KVM: arm64: nVHE: Add EL2h sync exception handler
+  KVM: arm64: nVHE: gen-hyprel: Skip R_AARCH64_ABS32
+  KVM: arm64: VHE: Mark __hyp_call_panic __noreturn
+  arm64: Move esr_comment() to <asm/esr.h>
+  KVM: arm64: VHE: Add test module for hyp kCFI
+  KVM: arm64: nVHE: Support CONFIG_CFI_CLANG at EL2
+  KVM: arm64: nVHE: Support test module for hyp kCFI
+  KVM: arm64: Improve CONFIG_CFI_CLANG error message
+
+ arch/arm64/include/asm/esr.h            |  11 ++
+ arch/arm64/include/asm/kvm_asm.h        |   3 +
+ arch/arm64/include/asm/kvm_cfi.h        |  38 +++++++
+ arch/arm64/include/asm/kvm_hyp.h        |   4 +-
+ arch/arm64/kernel/asm-offsets.c         |   1 +
+ arch/arm64/kernel/debug-monitors.c      |   4 +-
+ arch/arm64/kernel/traps.c               |   8 +-
+ arch/arm64/kvm/Kconfig                  |  20 ++++
+ arch/arm64/kvm/Makefile                 |   3 +
+ arch/arm64/kvm/handle_exit.c            |  39 ++++++-
+ arch/arm64/kvm/hyp/cfi.c                |  37 +++++++
+ arch/arm64/kvm/hyp/entry.S              |  43 +++++++-
+ arch/arm64/kvm/hyp/hyp-entry.S          |   4 +-
+ arch/arm64/kvm/hyp/include/hyp/cfi.h    |  47 +++++++++
+ arch/arm64/kvm/hyp/include/hyp/switch.h |   5 +-
+ arch/arm64/kvm/hyp/nvhe/Makefile        |   7 +-
+ arch/arm64/kvm/hyp/nvhe/gen-hyprel.c    |   6 ++
+ arch/arm64/kvm/hyp/nvhe/host.S          |  20 ++--
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S      |  18 +++-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  19 ++++
+ arch/arm64/kvm/hyp/nvhe/setup.c         |   6 +-
+ arch/arm64/kvm/hyp/nvhe/switch.c        |   7 ++
+ arch/arm64/kvm/hyp/vhe/Makefile         |   1 +
+ arch/arm64/kvm/hyp/vhe/switch.c         |  34 +++++-
+ arch/arm64/kvm/hyp_cfi_test.c           |  75 +++++++++++++
+ arch/arm64/kvm/hyp_cfi_test_module.c    | 135 ++++++++++++++++++++++++
+ 26 files changed, 553 insertions(+), 42 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kvm_cfi.h
+ create mode 100644 arch/arm64/kvm/hyp/cfi.c
+ create mode 100644 arch/arm64/kvm/hyp/include/hyp/cfi.h
+ create mode 100644 arch/arm64/kvm/hyp_cfi_test.c
+ create mode 100644 arch/arm64/kvm/hyp_cfi_test_module.c
+
+--=20
+2.45.0.118.g7fe29c98d7-goog
+
