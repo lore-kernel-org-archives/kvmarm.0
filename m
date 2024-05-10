@@ -1,38 +1,37 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8714E17C68;
-	Fri, 10 May 2024 17:35:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F7CD224FD
+	for <kvmarm@lists.linux.dev>; Fri, 10 May 2024 18:09:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715362554; cv=none; b=YpgQHAHmAWQ/fI/7QZ1P+j+Pym7AgGXxvGaA9YbfhhHL8uOrJiWP5qrPsFXNZsHrbYJRqOAfTSVzfjDLAXQoEMCCUmUrYz9YGGod9wAc0zkYY8qLmaZCvwIP21bdSg3Q+3ln9BDPNYXsoAwg6utGR26esbVIOYaAyoU1ZQuk3ts=
+	t=1715364580; cv=none; b=KDq8P0o3Vp88ql4as39NJ35nnWFNJ22cxp9tbwz26rLrPmFQfL9nczOog7v8lyEQMQWf6q38WR3CcOYz3qkSd845QTzW+qsrFjQL9pOFZzracY49e1gdP+Gorkrio57+fWlY19f4xdHfcOYd69XfcJbqG4WQWz4LocoJD+aJEYE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715362554; c=relaxed/simple;
-	bh=/beIqi8bAOLCu4vO/A4YsPuXEwyf7rU71KbEp3qpLE0=;
+	s=arc-20240116; t=1715364580; c=relaxed/simple;
+	bh=qktXfpT7DJT7vb3bkZbzY0J0anO5j1oOyntxnZGeHh4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EbbDQkfpLra8qBLQjF8HZYbqqXOKVP5XjgWnJpabdEuZ2rXKohgmqj7trQCAgyeaft0kW8AGI8pWdZu/YzEA1B4eqQRNDVMer6dZVj2/VfkoNABCwQKfiyGETwQ5Ifg49s4aC48CrzV4LYznvRhbN/4MAEZpSrfWaYtxvYEmEkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BEA9C113CC;
-	Fri, 10 May 2024 17:35:51 +0000 (UTC)
-Date: Fri, 10 May 2024 18:35:48 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: Re: [PATCH v2 02/14] arm64: Detect if in a realm and set RIPAS RAM
-Message-ID: <Zj5a9Kt6r7U9WN5E@arm.com>
-References: <20240412084213.1733764-1-steven.price@arm.com>
- <20240412084213.1733764-3-steven.price@arm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=TIpcCzUuhBlil3ocvhsEvR54dVMGF0olAAGMdkWu6t3PQiPxoDvQ3D32hOLZs9dCu+UhZ4gfRLhhg5bDM6omuCMVz3+sDV4ioKe78lk5jMv4vB+2NBq+XC+zFMx/J4olIHSGE8UG6NU+t5rkvgGkw47AS5cyZqqTpw1SsMSMPYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6B18B150C;
+	Fri, 10 May 2024 11:10:04 -0700 (PDT)
+Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 789A33F6A8;
+	Fri, 10 May 2024 11:09:37 -0700 (PDT)
+Date: Fri, 10 May 2024 19:09:31 +0100
+From: Mark Rutland <mark.rutland@arm.com>
+To: Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
+	catalin.marinas@arm.com, Oliver Upton <oliver.upton@linux.dev>,
+	Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH 1/2] KVM: arm64: Replace custom macros with fields from
+ ID_AA64PFR0_EL1
+Message-ID: <Zj5i2x8Sh95YIfeq@J2N7QTR9R3>
+References: <20240418053804.2573071-1-anshuman.khandual@arm.com>
+ <20240418053804.2573071-2-anshuman.khandual@arm.com>
+ <871q73rufi.wl-maz@kernel.org>
+ <ab6466f2-023e-4b5f-bb60-aadb9eee089a@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -41,212 +40,41 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240412084213.1733764-3-steven.price@arm.com>
+In-Reply-To: <ab6466f2-023e-4b5f-bb60-aadb9eee089a@arm.com>
 
-On Fri, Apr 12, 2024 at 09:42:01AM +0100, Steven Price wrote:
-> diff --git a/arch/arm64/include/asm/rsi.h b/arch/arm64/include/asm/rsi.h
-> new file mode 100644
-> index 000000000000..3b56aac5dc43
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/rsi.h
-> @@ -0,0 +1,46 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Copyright (C) 2023 ARM Ltd.
+On Mon, Apr 29, 2024 at 07:53:14AM +0530, Anshuman Khandual wrote:
+> On 4/18/24 13:09, Marc Zyngier wrote:
+> > On Thu, 18 Apr 2024 06:38:03 +0100,
+> > Anshuman Khandual <anshuman.khandual@arm.com> wrote:
+> >>  #define PVM_ID_AA64PFR0_RESTRICT_UNSIGNED (\
+> >> -	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL0), ID_AA64PFR0_EL1_ELx_64BIT_ONLY) | \
+> >> -	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL1), ID_AA64PFR0_EL1_ELx_64BIT_ONLY) | \
+> >> -	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL2), ID_AA64PFR0_EL1_ELx_64BIT_ONLY) | \
+> >> -	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL3), ID_AA64PFR0_EL1_ELx_64BIT_ONLY) | \
+> >> +	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL0), ID_AA64PFR0_EL1_EL0_IMP) | \
+> >> +	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL1), ID_AA64PFR0_EL1_EL1_IMP) | \
+> >> +	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL2), ID_AA64PFR0_EL1_EL2_IMP) | \
+> >> +	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL3), ID_AA64PFR0_EL1_EL3_IMP) | \
+> > 
+> > If you are going to rework this, can we instead use something less
+> > verbose such as SYS_FIELD_GET()?
+> 
+> Just wondering, is not FIELD_PREP() and SYS_FIELD_GET() does the exact opposite thing.
+> The earlier builds the entire register value from various constituents, where as the
+> later extracts a single register field from a complete register value instead. Or did
+> I just misunderstood something here.
+ 
+He means use one of the SYS_FIELD_*() helpers, e.g. SYS_FIELD_PREP_ENUM(), with
+which this can be:
 
-You may want to update the year ;).
+#define PVM_ID_AA64PFR0_RESTRICT_UNSIGNED (\
+        SYS_FIELD_PREP_ENUM(ID_AA64PFR0_EL1, EL0, IMP) | \
+        SYS_FIELD_PREP_ENUM(ID_AA64PFR0_EL1, EL1, IMP) | \
+        SYS_FIELD_PREP_ENUM(ID_AA64PFR0_EL1, EL2, IMP) | \
+        SYS_FIELD_PREP_ENUM(ID_AA64PFR0_EL1, EL3, IMP) | \
+        SYS_FIELD_PREP_ENUM(ID_AA64PFR0_EL1, RAS, IMP) \
+        )
 
-> + */
-> +
-> +#ifndef __ASM_RSI_H_
-> +#define __ASM_RSI_H_
-> +
-> +#include <linux/jump_label.h>
-> +#include <asm/rsi_cmds.h>
-> +
-> +extern struct static_key_false rsi_present;
+... which is far less verbose, and much easier to read.
 
-Nitpick: we tend to use DECLARE_STATIC_KEY_FALSE(), it pairs with
-DEFINE_STATIC_KEY_FALSE().
-
-> +void arm64_setup_memory(void);
-> +
-> +void __init arm64_rsi_init(void);
-> +static inline bool is_realm_world(void)
-> +{
-> +	return static_branch_unlikely(&rsi_present);
-> +}
-> +
-> +static inline void set_memory_range(phys_addr_t start, phys_addr_t end,
-> +				    enum ripas state)
-> +{
-> +	unsigned long ret;
-> +	phys_addr_t top;
-> +
-> +	while (start != end) {
-> +		ret = rsi_set_addr_range_state(start, end, state, &top);
-> +		BUG_ON(ret);
-> +		BUG_ON(top < start);
-> +		BUG_ON(top > end);
-
-Are these always fatal? BUG_ON() is frowned upon in general. The
-alternative would be returning an error code from the function and maybe
-printing a warning here (it seems that some people don't like WARN_ON
-either but it's better than BUG_ON; could use a pr_err() instead). Also
-if something's wrong with the RSI interface to mess up the return
-values, it will be hard to debug just from those BUG_ON().
-
-If there's no chance of continuing beyond the point, add a comment on
-why we have a BUG_ON().
-
-> diff --git a/arch/arm64/kernel/rsi.c b/arch/arm64/kernel/rsi.c
-> new file mode 100644
-> index 000000000000..1076649ac082
-> --- /dev/null
-> +++ b/arch/arm64/kernel/rsi.c
-> @@ -0,0 +1,58 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (C) 2023 ARM Ltd.
-> + */
-> +
-> +#include <linux/jump_label.h>
-> +#include <linux/memblock.h>
-> +#include <asm/rsi.h>
-> +
-> +DEFINE_STATIC_KEY_FALSE_RO(rsi_present);
-> +EXPORT_SYMBOL(rsi_present);
-
-Does this need to be made available to loadable modules?
-
-> +
-> +static bool rsi_version_matches(void)
-> +{
-> +	unsigned long ver;
-> +	unsigned long ret = rsi_get_version(RSI_ABI_VERSION, &ver, NULL);
-
-I wonder whether rsi_get_version() is the right name (I know it was
-introduced in the previous patch but the usage is here, hence my
-comment). From the RMM spec, this looks more like an
-rsi_request_version() to me.
-
-TBH, the RMM spec around versioning doesn't fully make sense to me ;). I
-assume people working on it had some good reasons around the lower
-revision reporting in case of an error.
-
-> +
-> +	if (ret == SMCCC_RET_NOT_SUPPORTED)
-> +		return false;
-> +
-> +	if (ver != RSI_ABI_VERSION) {
-> +		pr_err("RME: RSI version %lu.%lu not supported\n",
-> +		       RSI_ABI_VERSION_GET_MAJOR(ver),
-> +		       RSI_ABI_VERSION_GET_MINOR(ver));
-> +		return false;
-> +	}
-
-The above check matches what the spec says but wouldn't it be clearer to
-just check for ret == RSI_SUCCESS? It saves one having to read the spec
-to figure out what lower revision actually means in the spec (not the
-actual lowest supported but the highest while still lower than the
-requested one _or_ equal to the higher revision if the lower is higher
-than the requested one - if any of this makes sense to people ;), I'm
-sure I missed some other combinations).
-
-> +
-> +	pr_info("RME: Using RSI version %lu.%lu\n",
-> +		RSI_ABI_VERSION_GET_MAJOR(ver),
-> +		RSI_ABI_VERSION_GET_MINOR(ver));
-> +
-> +	return true;
-> +}
-> +
-> +void arm64_setup_memory(void)
-
-I would give this function a better name, something to resemble the RSI
-setup. Similarly for others like set_memory_range_protected/shared().
-Some of the functions have 'rsi' in the name like arm64_rsi_init() but
-others don't and at a first look they'd seem like some generic memory
-setup on arm64, not RSI-specific.
-
-> +{
-> +	u64 i;
-> +	phys_addr_t start, end;
-> +
-> +	if (!static_branch_unlikely(&rsi_present))
-> +		return;
-
-We have an accessor for rsi_present - is_realm_world(). Why not use
-that?
-
-> +
-> +	/*
-> +	 * Iterate over the available memory ranges
-> +	 * and convert the state to protected memory.
-> +	 */
-> +	for_each_mem_range(i, &start, &end) {
-> +		set_memory_range_protected(start, end);
-> +	}
-> +}
-> +
-> +void __init arm64_rsi_init(void)
-> +{
-> +	if (!rsi_version_matches())
-> +		return;
-> +
-> +	static_branch_enable(&rsi_present);
-> +}
-> diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
-> index 65a052bf741f..a4bd97e74704 100644
-> --- a/arch/arm64/kernel/setup.c
-> +++ b/arch/arm64/kernel/setup.c
-> @@ -43,6 +43,7 @@
->  #include <asm/cpu_ops.h>
->  #include <asm/kasan.h>
->  #include <asm/numa.h>
-> +#include <asm/rsi.h>
->  #include <asm/scs.h>
->  #include <asm/sections.h>
->  #include <asm/setup.h>
-> @@ -293,6 +294,8 @@ void __init __no_sanitize_address setup_arch(char **cmdline_p)
->  	 * cpufeature code and early parameters.
->  	 */
->  	jump_label_init();
-> +	/* Init RSI after jump_labels are active */
-> +	arm64_rsi_init();
->  	parse_early_param();
-
-Does it need to be this early? It's fine for now but I wonder whether we
-may have some early parameter at some point that could influence what we
-do in the arm64_rsi_init(). I'd move it after or maybe even as part of
-the arm64_setup_memory(), though I haven't read the following patches if
-they update this function.
-
->  
->  	dynamic_scs_init();
-> diff --git a/arch/arm64/mm/init.c b/arch/arm64/mm/init.c
-> index 03efd86dce0a..786fd6ce5f17 100644
-> --- a/arch/arm64/mm/init.c
-> +++ b/arch/arm64/mm/init.c
-> @@ -40,6 +40,7 @@
->  #include <asm/kvm_host.h>
->  #include <asm/memory.h>
->  #include <asm/numa.h>
-> +#include <asm/rsi.h>
->  #include <asm/sections.h>
->  #include <asm/setup.h>
->  #include <linux/sizes.h>
-> @@ -313,6 +314,7 @@ void __init arm64_memblock_init(void)
->  	early_init_fdt_scan_reserved_mem();
->  
->  	high_memory = __va(memblock_end_of_DRAM() - 1) + 1;
-> +	arm64_setup_memory();
->  }
-
-This feels like a random placement. This function is about memblock
-initialisation. You might as well put it in paging_init(), it could make
-more sense there. But I'd rather keep it in setup_arch() immediately
-after arm64_memblock_init().
-
--- 
-Catalin
+Mark.
