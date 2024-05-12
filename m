@@ -1,101 +1,129 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f54.google.com (mail-vs1-f54.google.com [209.85.217.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 214A7E556
-	for <kvmarm@lists.linux.dev>; Sun, 12 May 2024 07:16:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3086B28E17
+	for <kvmarm@lists.linux.dev>; Sun, 12 May 2024 15:47:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715498209; cv=none; b=m8ui5ytwI6OEsuGjADjQku60AFptEUMKUJyWs8XT+c+/0U+DDFR9SkRivIJbLTaXEJvSiKuWjDBywhdQxuiY14akL434hxUB9CmjIP3653aIpWQCRLXPdJxnDTxsfG7d8nCJiuPUhkqS1FDUYtqThfRayl2n4Rfzpdr+yEBaKok=
+	t=1715528850; cv=none; b=B4/aPnFT2a+SemKHEt9uH30FWkfav3DMwQ9VkLNZ5x6R7cUqGqtTG4Qy9rZEGJEeWhUjNz2P1FyKn62zk50YKWx+nic4Ud4OKPw+KBL0O3Q2I1BRo64eCTma28msJbtHP8iSrsgTxp6KDATb/4Ln28VTidMOmTs1naxKHti8L94=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715498209; c=relaxed/simple;
-	bh=llPJis9jHxYgJNuKqOaYb6WM18KDn6Zthld3LXdW+rw=;
+	s=arc-20240116; t=1715528850; c=relaxed/simple;
+	bh=1Bj38UuMJi0RjVuLbbbblgBhH3BcEMkeipr+0q2iGg4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lg6/7GCMZHHiD8aM03L56ANDcFgM63AidVwwzRY3HYsAVCsNtIGndTpQiFBCJHRZIkc1/5OIeyDMxCdCfCV7Q7NlbxVlQFN5acETF5Uwm2YOLACqXGkZ/+aVEr0+YwpAH3h1Xo58yiF5UuCqbXDNNzZEic9i7wbP8q2Wg0Zmbk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JQ3SZvxe; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 To:Cc:Content-Type; b=LwTVQMB2KVDZpuf6uviyTDNXEXVQutYyXxSpc44V+sif8y3E6yAYC6o1kxDiQJeNc0qdcyFZIu/zMZvD6WDCTWfl7wOMubDlYdHp0aP8B/kiOmHr/jpxbs6v4bVv5RnPm5fqZsti/20PtlLBm7qOBfVMaAUVcezXnaEgfvuz3Uw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EVNUIkjX; arc=none smtp.client-ip=209.85.217.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JQ3SZvxe"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715498207;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=llPJis9jHxYgJNuKqOaYb6WM18KDn6Zthld3LXdW+rw=;
-	b=JQ3SZvxeVuFA9XmmTIJxALS3BsJc1S9wG6QGECL05KExf1MZr7fWoZ0v+u5U0bd61YIG8B
-	4bRStyhyYSr8F8Sh55cl1y6TvJi5pI85YuysUYDZJ83iGBOxiJCqUz+okNEU25WDIwtbHo
-	JzGUF0qqbfCgyCc54xZdYywTaYQnXrc=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-563-ps-5lkENNnG7p9o6fGZOmQ-1; Sun, 12 May 2024 03:16:43 -0400
-X-MC-Unique: ps-5lkENNnG7p9o6fGZOmQ-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-34d7a7585d7so2234533f8f.2
-        for <kvmarm@lists.linux.dev>; Sun, 12 May 2024 00:16:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EVNUIkjX"
+Received: by mail-vs1-f54.google.com with SMTP id ada2fe7eead31-47eff9b3c23so1028231137.0
+        for <kvmarm@lists.linux.dev>; Sun, 12 May 2024 08:47:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1715528848; x=1716133648; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1Bj38UuMJi0RjVuLbbbblgBhH3BcEMkeipr+0q2iGg4=;
+        b=EVNUIkjXkEpoe+8ERoYzI/gTKGMKcsD7r2FvsZ2WMGUWcwU0X1A8Iy58dikIseQMcK
+         c9AA4GflzLO4olxka8C7hEG7bjFvVKHDKUNk7DIEsrvT1Z91JAbCow89IXfnEFuETBIm
+         kBnjJkjMOThsXLSEGwXTwd5lhDeIc+wSfx9GK9CJjI7NEJjS3Wu5BwEAkRPHkijNmkZx
+         bJe8VPvM9KTkgnu4uuVzJ6sqjfMBFJUYofwBw2uzz/UKbdmqbe2vlkF2OYgge5WcnQY9
+         ByV/oURaeIcwhg9B6UZRukSpXTqTJ2njvQb3EGEAdgqnk7RucfDGaN8ui8PlIRfe4CJP
+         78CQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715498202; x=1716103002;
+        d=1e100.net; s=20230601; t=1715528848; x=1716133648;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=llPJis9jHxYgJNuKqOaYb6WM18KDn6Zthld3LXdW+rw=;
-        b=nwEt5mICRlUqZezRG793iEoF7sQkBsyT7xH92gh6jX2Lm8bkROReyF4G83ItWp1W8G
-         X33sKw+vsNlT9yFPZ/EybrFocDdI40EAvR73y4LHR4O/NizmILFL9OP26lV+Q412+GWV
-         3+C/qhPtNgNnAq/qACapR0xa9ng6jZut7RcIAADF7t2l36/1lh/qpLxE9tAlZj2c2f7s
-         alDribOUxeSMntw35JFlcAvdLh3KqejBwQpe0dcZB7dvtGYpC8Soro6hqx5B1P7Rr0xa
-         VsRLel8fkwkRlTdT9uzBJxlcHMBvikbNjFnaLS65mwc7OjqUOWB7Hj+B//Jdg2enLVKE
-         YPeQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXIqu65LrxBiQiOkPLn4a2yso/SoVSWOp52dDe32BMQ21AYs2ZhA67ZZEV8Q31s7y5GJ8D37HFkNenGz6B4pbHwvcMwPdIu
-X-Gm-Message-State: AOJu0YyV38g28Kw9cHoY9pvexrD5HcsKCow3JPSlibMQ3e8nu988Xgdm
-	t04NBi3Uv2lt0FeB6TAMsSTcZZrGIfRgZ4myjUOtTFooYXNcBGuE9RmNFx5ApKmLrdGBtc3KAEc
-	LgmaAcAUE3urqxjQPoTYXIqW9CVi4ev1IYm0vKf+TM4KM0x828YYFafbBOBorSDzBFUHk8qBPWD
-	A6XyHg6nndQhzQwdIJasqyi0p8haG7
-X-Received: by 2002:a5d:4d43:0:b0:346:92d2:a496 with SMTP id ffacd0b85a97d-3504a7388demr4503667f8f.29.1715498202234;
-        Sun, 12 May 2024 00:16:42 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF6BcSwq6X8dx97vsGDZlMoQs6520j3e4edXNcZL3E4BuTPppqRk6MNDV9SpKfoH0O7ZE891G+pNO3dvQPK+1Q=
-X-Received: by 2002:a5d:4d43:0:b0:346:92d2:a496 with SMTP id
- ffacd0b85a97d-3504a7388demr4503646f8f.29.1715498201833; Sun, 12 May 2024
- 00:16:41 -0700 (PDT)
+        bh=1Bj38UuMJi0RjVuLbbbblgBhH3BcEMkeipr+0q2iGg4=;
+        b=spSdOUTz1SLCFG9lNu2U+FgOfQ7BBp2plebHnGp5iaJHvrs4nYechK156A0z6dNz9f
+         ybLPzC7Wx0bvBdA0q+aR8pidWlKcRnln5lAo7s7WLq68uFyUxfPl8ilsuz58jvSMcym9
+         f/4bcLPz1twY8t0tsw/2OyutOJzczhtzEmH9jPTqa0CdZ0JvpiNnEXNpxVnI3BD6VkpA
+         kAcozuYcieCr5GiFYW/d6Rz09uW/cWvWz1ccLHyOj/8TE02wTUUQLh7nbW2s/CJztyPS
+         oyNh0jlbqKQI4PcowDs3KFky8AXERGMnuiDB/hsoDdMa86Mn95/+ymXbeWTWlbI0tVnD
+         +ubw==
+X-Forwarded-Encrypted: i=1; AJvYcCWAbbWGVHKb0W28M8VsRpzLYBB/j7B8Gb4WQ+Riy5Penw0L8d/njRAES2agu9iPOYSuaVS3AVjVuNDwbVVdzpO3OJe1Fi9w
+X-Gm-Message-State: AOJu0YwVKDsq4Oo7crfIcSv6PSgGuA+Mb3Ak071wKaGYHwJYoxfywol1
+	7tiDvWnjQaVtIv9wl+jv561Owt+1dkLSpBzF+bDFOleO84/o9Bbg94hkJHZwnEv02r50tmJjfjK
+	IydWV+/CCnp4iDy3Vr6am3Rq7F1rusHsH+wW3
+X-Google-Smtp-Source: AGHT+IF5YVQ8bTbMFv2SsIuJDpWG69UyzHxh2J1FtFO/Oa0nCEIkVGVyhlnW21OLh0OeUYr7rPbvAgWjSyHKVPZv0E8=
+X-Received: by 2002:a05:6102:cd3:b0:47e:edef:b986 with SMTP id
+ ada2fe7eead31-48077eaf260mr7392009137.33.1715528848056; Sun, 12 May 2024
+ 08:47:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20240511095237.3993387-1-maz@kernel.org>
-In-Reply-To: <20240511095237.3993387-1-maz@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sun, 12 May 2024 09:16:30 +0200
-Message-ID: <CABgObfaMMb4f75nitSiCgYZvOU=dMoPh0Lrs-fz8WVxyxnOw5A@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM/arm64 updates for 6.10
-To: Marc Zyngier <maz@kernel.org>
-Cc: Arnd Bergmann <arnd@arndb.de>, Colton Lewis <coltonlewis@google.com>, Fuad Tabba <tabba@google.com>, 
-	Joey Gouly <joey.gouly@arm.com>, Mark Brown <broonie@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Quentin Perret <qperret@google.com>, Raghavendra Rao Ananta <rananta@google.com>, 
-	Russell King <rmk+kernel@armlinux.org.uk>, Sean Christopherson <seanjc@google.com>, 
-	Sebastian Ene <sebastianene@google.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Will Deacon <will@kernel.org>, Zenghui Yu <zenghui.yu@linux.dev>, 
-	James Morse <james.morse@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+References: <20240423150538.2103045-1-tabba@google.com> <20240423150538.2103045-2-tabba@google.com>
+ <4ec3be32-476a-14f2-7826-2171df1c9f77@huawei.com> <CA+EHjTwPWP1exm_bb_bSKF154W4doZvKxk5=AqFrBkUy_UsvaQ@mail.gmail.com>
+ <d1435598-9a4d-1fc0-3355-9db78e6a7e27@huawei.com> <CA+EHjTzoD4wXhiG-uQ2xzrZkw5fLqjdOsiE87EdY5Z1qfvF7_g@mail.gmail.com>
+ <86ttj6p062.wl-maz@kernel.org> <CA+EHjTyFanD2R2QXy005RujcXeT3GTPRw+e4yfS77KfWbxTVRg@mail.gmail.com>
+ <Zj-10O_rbwnNadpZ@linux.dev>
+In-Reply-To: <Zj-10O_rbwnNadpZ@linux.dev>
+From: Fuad Tabba <tabba@google.com>
+Date: Sun, 12 May 2024 16:46:51 +0100
+Message-ID: <CA+EHjTw9sBodDrVyJk7SmJLO29N_oYK611=uOHRO7Z9+0bVOEA@mail.gmail.com>
+Subject: Re: [PATCH v4 01/30] KVM: arm64: Initialize the kvm host data's
+ fpsimd_state pointer in pKVM
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
+	will@kernel.org, qperret@google.com, seanjc@google.com, 
+	alexandru.elisei@arm.com, catalin.marinas@arm.com, philmd@linaro.org, 
+	james.morse@arm.com, suzuki.poulose@arm.com, mark.rutland@arm.com, 
+	broonie@kernel.org, joey.gouly@arm.com, rananta@google.com, 
+	smostafa@google.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, May 11, 2024 at 11:52=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrot=
-e:
->
-> Paolo,
->
-> Here's the set of KVM/arm64 updates for 6.10. No new feature exactly,
-> but a lot of internal rework, improvements and bug fixes, However, it
-> is pretty good to see that the Android folks are resuming the
-> upstreaming effort after a long period of silence.
->
-> As usual, details in the tag below.
+Hi Oliver
 
-Pulled, thanks.
+On Sat, May 11, 2024 at 7:15=E2=80=AFPM Oliver Upton <oliver.upton@linux.de=
+v> wrote:
+>
+> On Fri, May 10, 2024 at 09:00:54AM +0100, Fuad Tabba wrote:
+>
+> [...]
+>
+> > > > For protected VMs, we don't want to lazily save/restore the host's
+> > > > fpsimd state, because that could leak information to the host that =
+the
+> > > > protected guest is using fpsimd. Therefore, for protected VMs, the
+> > > > host fpsimd state is maintained (saved/restored) in hyp (at EL2),
+> > > > without the host needing to know or do anything about it.
+>
+> I'm a bit confused by this statement. Isn't pKVM downstream lazily
+> managing fpsimd state on behalf of the host for protected guests? IOW,
+> don't we return to the host with traps enabled at EL2 and load state
+> after the trap?
 
-Paolo
+Sorry, I got my wires crossed between fpsimd and sve. It's the sve
+state that is restored eagerly, rather than rely on the
+TIF_FOREIGN_FPSTATE as in other KVM modes.
 
+> > > But I think that's a regression from the current status. It looks lik=
+e
+> > > now that the state is really private to EL2, nothing will restore the
+> > > FP context on exit, while this was the case before we reworked this.
+> > >
+> > > It'd be good to plug this in 6.10, as this is a regression.
+> >
+> > You're right. I'll send a patch to fix this.
+>
+> I'd be fine with a hack that *eagerly* saves/restores the fpsimd state
+> on every exit in protected mode for the time being. Not great, but
+> obviously correct and its not like protected mode is very useful
+> upstream to begin with.
+
+I think I have a solution that would maintain the existing behavior
+for non-protected VMs in protected mode, i.e., lazy handling. I just
+want to tidy up the code a bit more, run it through a few more fpsimd
+and sve stress tests, and send the patches.
+
+Thanks,
+/fuad
+
+> --
+> Thanks,
+> Oliver
