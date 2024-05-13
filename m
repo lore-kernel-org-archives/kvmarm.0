@@ -1,56 +1,69 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85B6A1EA8F;
-	Mon, 13 May 2024 08:28:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 503E7148823
+	for <kvmarm@lists.linux.dev>; Mon, 13 May 2024 09:51:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715588880; cv=none; b=NB+LMrDbICuZAdaTyCGQziosp7JTr370NO2u8F6dT5RkhHbQAoGCBbc28+HQwgK5aTDoyPfYwSwCTfURVDu/uL1dToYfgq13Ji9MlzJ6+QF0lc1dhVxYbFiq76RvsV4IVPmTPgMhtFj5r5ixNekTpX1BFkKaY/9Aq8UFR1af4Kk=
+	t=1715593896; cv=none; b=OlkEgNtJ7m8pb10rtyWv86bkkey42Hca2VOkZEwmWkbMLyKMapP5CHfCM2LO5AXa/lvkV6ZCEuqjirIdurgguTEXm+h2TDQvQfLCnPsdzwrQFiE5ZCx3mKQAa6sUgwxyCA0ZXyPlUUvCNLNiybXGyL0Q+edMORwMOc3WH6rmqPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715588880; c=relaxed/simple;
-	bh=KvcnjCyjTkeTtXOV8cNt7JFpqH6iplwYmt5RghSUA4E=;
+	s=arc-20240116; t=1715593896; c=relaxed/simple;
+	bh=jpgJyhY9oKsVgEX61QObWfa+d24BL8Mwy+huqVc2Uik=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cIfIL0eAP8jSw3S7BDaYI3Ed9BTGagdf/9587vrZBdx0G3PKxyxMFckqLooJB/d9OUxJ0YbwQAs4vbpXv0paILNmoryn3b5I7hBYhxUWtwvzrKlV00hYXLWkb6SuC/wdgesPbeWiFD1K5bqkPxeWPxFfYBFJuXx+KT+Gaseqbmk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ruLKaRup; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=hxR4xYLd6wBn8ezaso4tFq7yot7HE+Twlr6DFe98i9TNhBcOEXrbRJ3dEIAHrJV3COLhS8fleAQa0lGztug6Imf4wD3QzAacO15+O8XmCJ7B73xLVGqpD1IBSWKXcUbjchP4cYQxltsj+ehqfzkimXBLm71eAPFmx/jMrkWS5m4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q9cu9Fvq; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ruLKaRup"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51D66C113CC;
-	Mon, 13 May 2024 08:28:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q9cu9Fvq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD74CC113CC;
+	Mon, 13 May 2024 09:51:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715588880;
-	bh=KvcnjCyjTkeTtXOV8cNt7JFpqH6iplwYmt5RghSUA4E=;
+	s=k20201202; t=1715593895;
+	bh=jpgJyhY9oKsVgEX61QObWfa+d24BL8Mwy+huqVc2Uik=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ruLKaRup83lDJ1pnNLz4iugrEQJ1No9G22zd9XXPU1JLSc2oa9bTOlyGMyU9bgO9d
-	 /03IrvzoHFAbJmV141tyaUbGkOSPH/kFMKu6xosLfiTIUwH/BRwrKD87ZU9b/1s11k
-	 7jkKt/Ynnwcj25e0Q7sTAqmYjFlo+GoPOZLGxRg9njdOgpjMwAye/+IBz4/QredsCM
-	 aEJKL6TMJlFflcgmtVVVoUxdAqkdOdIC3809gaqZxLE3c+lCZV8MpYxljU5t8DYc9S
-	 tyqJcBs3KZLxz8Qu+0dUxLTEJuKjlPH+LDj2t+q4sF66kfHeYcLsRQpTRb9hODmT1c
-	 WGal839zOIrQg==
+	b=q9cu9FvqXRqSWIUt24VXYkjz+yCX3DWcwSfT3A2IRSZoLICPqZorZkbrPbEEyOLX1
+	 nlBw7cOaPEhrEx7inpb3Xd5LQ2lz5YPuxe63/dpSvxf2NlYlUkZ3i1ju4+z+6B7mwy
+	 37KMdQOwVvXC2QysKgAQ3gh8oJXOl9U/0N4YTQFu+uGlMNomzZrYVetlYodK9HHK5k
+	 BBS9TGd30NiMra5AQcADYoHn+3z0lsV+MLfBgTl2gTjJRKaCyl7eo/Y/qRnKGM0jAV
+	 bcC4IZR7qnysOJ+eda4IJhvYo70SPMvJotRz6EBR+C7EiWRGCsFoNoNYvFlzdup56Z
+	 FEC50zfjmDVdw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1s6R2L-00ClXb-OX;
-	Mon, 13 May 2024 09:27:57 +0100
-Date: Mon, 13 May 2024 09:27:57 +0100
-Message-ID: <86zfsum7zm.wl-maz@kernel.org>
+	id 1s6SLF-00CmdW-Pd;
+	Mon, 13 May 2024 10:51:33 +0100
+Date: Mon, 13 May 2024 10:51:32 +0100
+Message-ID: <86y18em44b.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Pavel Machek <pavel@denx.de>
-Cc: Sasha Levin <sashal@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	Oliver Upton <oliver.upton@linux.dev>,
-	pbonzini@redhat.com,
-	shuah@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
+To: Fuad Tabba <tabba@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
 	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH AUTOSEL 6.1 08/25] KVM: selftests: Add test for uaccesses to non-existent vgic-v2 CPUIF
-In-Reply-To: <ZkHNVtwcrf91k+dR@duo.ucw.cz>
-References: <20240507231231.394219-1-sashal@kernel.org>
-	<20240507231231.394219-8-sashal@kernel.org>
-	<ZkHNVtwcrf91k+dR@duo.ucw.cz>
+	will@kernel.org,
+	qperret@google.com,
+	seanjc@google.com,
+	alexandru.elisei@arm.com,
+	catalin.marinas@arm.com,
+	philmd@linaro.org,
+	james.morse@arm.com,
+	suzuki.poulose@arm.com,
+	mark.rutland@arm.com,
+	broonie@kernel.org,
+	joey.gouly@arm.com,
+	rananta@google.com,
+	smostafa@google.com
+Subject: Re: [PATCH v4 01/30] KVM: arm64: Initialize the kvm host data's fpsimd_state pointer in pKVM
+In-Reply-To: <CA+EHjTw9sBodDrVyJk7SmJLO29N_oYK611=uOHRO7Z9+0bVOEA@mail.gmail.com>
+References: <20240423150538.2103045-1-tabba@google.com>
+	<20240423150538.2103045-2-tabba@google.com>
+	<4ec3be32-476a-14f2-7826-2171df1c9f77@huawei.com>
+	<CA+EHjTwPWP1exm_bb_bSKF154W4doZvKxk5=AqFrBkUy_UsvaQ@mail.gmail.com>
+	<d1435598-9a4d-1fc0-3355-9db78e6a7e27@huawei.com>
+	<CA+EHjTzoD4wXhiG-uQ2xzrZkw5fLqjdOsiE87EdY5Z1qfvF7_g@mail.gmail.com>
+	<86ttj6p062.wl-maz@kernel.org>
+	<CA+EHjTyFanD2R2QXy005RujcXeT3GTPRw+e4yfS77KfWbxTVRg@mail.gmail.com>
+	<Zj-10O_rbwnNadpZ@linux.dev>
+	<CA+EHjTw9sBodDrVyJk7SmJLO29N_oYK611=uOHRO7Z9+0bVOEA@mail.gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -60,32 +73,77 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pavel@denx.de, sashal@kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org, oliver.upton@linux.dev, pbonzini@redhat.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+X-SA-Exim-Rcpt-To: tabba@google.com, oliver.upton@linux.dev, yuzenghui@huawei.com, kvmarm@lists.linux.dev, will@kernel.org, qperret@google.com, seanjc@google.com, alexandru.elisei@arm.com, catalin.marinas@arm.com, philmd@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, mark.rutland@arm.com, broonie@kernel.org, joey.gouly@arm.com, rananta@google.com, smostafa@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 13 May 2024 09:20:38 +0100,
-Pavel Machek <pavel@denx.de> wrote:
-> 
-> Hi!
-> 
-> > Assert that accesses to a non-existent vgic-v2 CPU interface
-> > consistently fail across the various KVM device attr ioctls. This also
-> > serves as a regression test for a bug wherein KVM hits a NULL
-> > dereference when the CPUID specified in the ioctl is invalid.
-> > 
-> > Note that there is no need to print the observed errno, as TEST_ASSERT()
-> > will take care of it.
-> 
-> I don't think this fixes the bug... and thus we should not need it in
-> stable.
+On Sun, 12 May 2024 16:46:51 +0100,
+Fuad Tabba <tabba@google.com> wrote:
+>=20
+> Hi Oliver
+>=20
+> On Sat, May 11, 2024 at 7:15=E2=80=AFPM Oliver Upton <oliver.upton@linux.=
+dev> wrote:
+> >
+> > On Fri, May 10, 2024 at 09:00:54AM +0100, Fuad Tabba wrote:
+> >
+> > [...]
+> >
+> > > > > For protected VMs, we don't want to lazily save/restore the host's
+> > > > > fpsimd state, because that could leak information to the host tha=
+t the
+> > > > > protected guest is using fpsimd. Therefore, for protected VMs, the
+> > > > > host fpsimd state is maintained (saved/restored) in hyp (at EL2),
+> > > > > without the host needing to know or do anything about it.
+> >
+> > I'm a bit confused by this statement. Isn't pKVM downstream lazily
+> > managing fpsimd state on behalf of the host for protected guests? IOW,
+> > don't we return to the host with traps enabled at EL2 and load state
+> > after the trap?
+>=20
+> Sorry, I got my wires crossed between fpsimd and sve. It's the sve
+> state that is restored eagerly, rather than rely on the
+> TIF_FOREIGN_FPSTATE as in other KVM modes.
+>=20
+> > > > But I think that's a regression from the current status. It looks l=
+ike
+> > > > now that the state is really private to EL2, nothing will restore t=
+he
+> > > > FP context on exit, while this was the case before we reworked this.
+> > > >
+> > > > It'd be good to plug this in 6.10, as this is a regression.
+> > >
+> > > You're right. I'll send a patch to fix this.
+> >
+> > I'd be fine with a hack that *eagerly* saves/restores the fpsimd state
+> > on every exit in protected mode for the time being. Not great, but
+> > obviously correct and its not like protected mode is very useful
+> > upstream to begin with.
+>=20
+> I think I have a solution that would maintain the existing behavior
+> for non-protected VMs in protected mode, i.e., lazy handling. I just
+> want to tidy up the code a bit more, run it through a few more fpsimd
+> and sve stress tests, and send the patches.
 
-Given that this goes together with an actually bug fix that was
-backported, it *is*, for once, actually useful to have it in stable.
+For the record, I don't think it is worth special-casing non-protected
+VMs under pKVM. If eager save/restore is what pKVM needs to ensure
+protection, then this should equally apply to non-protected VMs.
+Having a single behaviour for a given host mode is hugely beneficial
+from a maintenance PoV.
+
+What *could* be done as an optimisation is to make the restore lazy
+for *everything* by trapping the host access to the FP state (similar
+to what we do for guests, funnily enough).
+
+But I see this only as an optimisation, not as a functional
+requirement.
+
+Thanks,
 
 	M.
 
--- 
+--=20
 Without deviation from the norm, progress is not possible.
