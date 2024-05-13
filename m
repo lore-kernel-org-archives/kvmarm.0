@@ -1,178 +1,124 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 378621C6BD;
-	Mon, 13 May 2024 17:30:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FCFF8286D
+	for <kvmarm@lists.linux.dev>; Mon, 13 May 2024 21:26:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715621411; cv=none; b=nOghBcD2NKc7Mgk4pr6ADYzUDuC2ZDS4IH8WuDrzun9sQtR3xIKDOc6ZIdF9FeB/7M96N/K3Y48/qyk1fuuNoQUDGnGUczLrAnU4i34rbjv5fVFRJvWXkoHgGHvGycSvhCEQd0bZQ+siCo6HoUGQjsf+5yhKfyzIFn57ZFRBC6k=
+	t=1715635620; cv=none; b=UlbbwPa/1cOj5r1byd2gV1DTYCmgf3HKYd8cAcj2n7jOygnltlgtbkBxu/KXCXm8HBUi/j62wVAFi9nvuGfHRstoYZsOcvyJZj+DABSJevd0Tw6RDeSPwREm6VgmNRjXhGO7jeROePlElhq2rAJEZLeCquKorWjl+NGGAcNyccA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715621411; c=relaxed/simple;
-	bh=DR8jZ69miHfLN6RA278vWtF1Q++hEjEfLoVuHTEHdlU=;
+	s=arc-20240116; t=1715635620; c=relaxed/simple;
+	bh=rc5hMZJSGK5c1xFdPHd7Rb8V6zQm6y0iHDSXPea0qBw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l20JM/WKvTHgc6+3LYnp3p6GBbmEDw/7MCbqN1H6iznOPVZntYsjW0gdJFeUlbeWMbURN3N8NP8RCBxmLGpojsg4qLRQbKCLLYnG5ftMeX1xWxEhfuehZMlWxL6bS3gfNerqBlToKrJoNYXBH7KGXKc1OtHjX2TIKVHdlq5kiF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WyvnryIL; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=Vn7AR95OTeKwq9bN2Di6r+WSuqy0kOehQDdz0Gi40MzC81uJm9gc77XoSidBqtUF6HQRmU5B5ntx/eSMlQb2QwPMqNG1erM9/dRD3hsagoUIDqPwhl80bfv0so6VQHBd17kzmE/jauGfILwwm7TP/6hJucWnyyx9MXz2EwW+6wQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RP24kNmD; arc=none smtp.client-ip=95.215.58.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WyvnryIL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70519C113CC;
-	Mon, 13 May 2024 17:30:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715621411;
-	bh=DR8jZ69miHfLN6RA278vWtF1Q++hEjEfLoVuHTEHdlU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WyvnryILwoH46oQY60Sd0tWHReEVP7XtxcJy9oCodoVoEvlTUGXW/jQh8T9RgFEmc
-	 SiNYJutIB4CR5lxhnhG3Abd6V8o4FuQP24bUHbudJuSMxkvo5hOXGLFoVljXGPGP2Q
-	 75GIfK8EiFZBp3b/lRQ+Qje6iD33uvYHOXzPjbBGZKSxmikKV7mElKl+CO9d4qCIMf
-	 3BdRsXYsdS1IRM8b8wi7+iTrs/s0ILgCH4ODstVjUis+JFfXdshXgwHsM7XhYiLvd6
-	 5MVNf5fdsdyXbRsv0Tp3zK7WXY585wbPITYM6FN0Jp7Ju0/cDKzV7ZibjFOpjHtmnO
-	 W3wWcM9psdfHw==
-Date: Mon, 13 May 2024 18:30:05 +0100
-From: Will Deacon <will@kernel.org>
-To: =?iso-8859-1?Q?Pierre-Cl=E9ment?= Tosi <ptosi@google.com>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RP24kNmD"
+Date: Mon, 13 May 2024 21:26:50 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1715635616;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=i7TDZt0L+IUvLZV757VcMzJBKk2TPSQV4UCOXzYOwuo=;
+	b=RP24kNmDsiGLmdMUkB6uypxYB7086QfZt22D2thzkL+u0UKEh6f8+nAkC9EZAWg69xLW0T
+	lZKthkvV5yUQpUVU7LetNpKw1i+mDLcIzQARiwiP5W3cTjqFYc9yfPXjg9B+ztOiX7i/4U
+	XUTPizGuqgY13ZVTUrUtJWDy69pSKXc=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Marc Zyngier <maz@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Vincent Donnefort <vdonnefort@google.com>
-Subject: Re: [PATCH v3 10/12] KVM: arm64: nVHE: Support CONFIG_CFI_CLANG at
- EL2
-Message-ID: <20240513173005.GB29051@willie-the-truck>
-References: <20240510112645.3625702-1-ptosi@google.com>
- <20240510112645.3625702-11-ptosi@google.com>
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH RFC] KVM: arm64: allow ID_MMFR4_EL1 to be writable
+Message-ID: <ZkKFmvZlFDzJ4Kka@linux.dev>
+References: <E1s2DPv-00AhaA-Ra@rmk-PC.armlinux.org.uk>
+ <ZjKCgIyWqNKC6TUu@linux.dev>
+ <ZjKFBUXEhwZ7ZmMM@shell.armlinux.org.uk>
+ <ZjKRBcAML5T6cm4q@linux.dev>
+ <ZjOl5hwU7yPXk8gs@shell.armlinux.org.uk>
+ <ZjPDQSeQPE2wgVup@linux.dev>
+ <87jzk4h5ir.fsf@redhat.com>
+ <Zjuy40shK5a-yp95@linux.dev>
+ <875xvlhfci.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240510112645.3625702-11-ptosi@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <875xvlhfci.fsf@redhat.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, May 10, 2024 at 12:26:39PM +0100, Pierre-Clément Tosi wrote:
-> The compiler implements kCFI by adding type information (u32) above
-> every function that might be indirectly called and, whenever a function
-> pointer is called, injects a read-and-compare of that u32 against the
-> value corresponding to the expected type. In case of a mismatch, a BRK
-> instruction gets executed. When the hypervisor triggers such an
-> exception in nVHE, it panics and triggers and exception return to EL1.
+On Fri, May 10, 2024 at 05:11:09PM +0200, Cornelia Huck wrote:
+> On Wed, May 08 2024, Oliver Upton <oliver.upton@linux.dev> wrote:
+> > I'm willing to wager that the set of users who want to migrate state
+> > from kernel N -> (N - 1) know the exact CPU definition they want to
+> > expose to the guest, and in that case should be using a static set of
+> > feature register values matching their intent.
 > 
-> Therefore, teach nvhe_hyp_panic_handler() to detect kCFI errors from the
-> ESR and report them. If necessary, remind the user that EL2 kCFI is not
-> affected by CONFIG_CFI_PERMISSIVE.
+> I think the trouble starts when we introduce additional ranges of
+> registers that can be controled via that interface -- old userspace will
+> be able to figure out that there are more ranges available than what it
+> is aware of, but will have no idea how to handle those additional ranges
+> to get into a defined state (what is the actual range, for example?)
+
+Even though the UAPI was designed around supporting multiple ranges, I
+do not see this being an issue for quite some time. We already fully
+describe the Feature ID register range from the architecture.
+
+> >
+> > Beyond the CPU architecture, KVM presents hypercall features to the VM
+> > which userspace can _opt-out_ of on a per-feature basis using the
+> > feature bitmap registers described in [2]. Like the feature ID
+> > registers, we've preallocated a range of indices to be used for
+> > hypercall bitmaps. So if an unexpected bitmap register appears on a new
+> > kernel, userspace should write 0 to it to prevent new features from
+> > silently creeping in.
 > 
-> Pass $(CC_FLAGS_CFI) to the compiler when building the nVHE hyp code.
+> Hm, the doc says: "The features for the registers that are untouched,
+> probably because userspace isnâ€™t aware of them, will be exposed as is to
+> the guest." Seems to indicate that it is not too hard to get this wrong :)
+
+Sure, but keep in mind the full range of possible Feature ID registers is
+already known to userspace. Many of these register encodings are reserved,
+RAZ to allow for future expansion of the architecture [*]. New registers
+will come from one of these RAZ encodings.
+
+If userspace wants to assert complete control over the CPU feature set
+exposed to the VM it should use a pre-baked value for every register in
+the range Op0=3, Op1=0, CRn=0, CRm={1-8}, Op2={0-8}.
+
+[*] DDI0487J.a Table D18-2
+
+> >
+> > The canonical reason for this behavior, though, is that KVM/arm64
+> > defaults to the maximum-possible feature set as discussed above.
 > 
-> Use SYM_TYPED_FUNC_START() for __pkvm_init_switch_pgd, as nVHE can't
-> call it directly and must use a PA function pointer from C (because it
-> is part of the idmap page), which would trigger a kCFI failure if the
-> type ID wasn't present.
+> /me contemplating "reverse" features, but too tired to think this
+> through on a Friday afternoon.
 > 
-> Signed-off-by: Pierre-Clément Tosi <ptosi@google.com>
-> ---
->  arch/arm64/include/asm/esr.h       |  6 ++++++
->  arch/arm64/kvm/handle_exit.c       | 11 +++++++++++
->  arch/arm64/kvm/hyp/nvhe/Makefile   |  6 +++---
->  arch/arm64/kvm/hyp/nvhe/hyp-init.S |  6 +++++-
->  4 files changed, 25 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-> index 2bcf216be376..9eb9e6aa70cf 100644
-> --- a/arch/arm64/include/asm/esr.h
-> +++ b/arch/arm64/include/asm/esr.h
-> @@ -391,6 +391,12 @@ static inline bool esr_is_data_abort(unsigned long esr)
->  	return ec == ESR_ELx_EC_DABT_LOW || ec == ESR_ELx_EC_DABT_CUR;
->  }
->  
-> +static inline bool esr_is_cfi_brk(unsigned long esr)
-> +{
-> +	return ESR_ELx_EC(esr) == ESR_ELx_EC_BRK64 &&
-> +	       (esr_brk_comment(esr) & ~CFI_BRK_IMM_MASK) == CFI_BRK_IMM_BASE;
-> +}
 
-This can now be used by early_brk64().
+Reverse as in a negative / removed feature?
 
->  static inline bool esr_fsc_is_translation_fault(unsigned long esr)
->  {
->  	/* Translation fault, level -1 */
-> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> index 0bcafb3179d6..0db23a6304ce 100644
-> --- a/arch/arm64/kvm/handle_exit.c
-> +++ b/arch/arm64/kvm/handle_exit.c
-> @@ -383,6 +383,15 @@ void handle_exit_early(struct kvm_vcpu *vcpu, int exception_index)
->  		kvm_handle_guest_serror(vcpu, kvm_vcpu_get_esr(vcpu));
->  }
->  
-> +static void kvm_nvhe_report_cfi_failure(u64 panic_addr)
-> +{
-> +	kvm_err("nVHE hyp CFI failure at: [<%016llx>] %pB!\n", panic_addr,
-> +		(void *)(panic_addr + kaslr_offset()));
+These tend to appear as negative ID register fields, to imply that the
+feature set is less than what's provided for with a value of 0x0. KVM
+probably couldn't start deprecating features in the default ID register
+values but userspace could probe for features it can opt-out of using
+the writable mask + trying to write -1 to a field.
 
-Perhaps add a helper for displaying a hyp panic banner so that we remain
-consistent?
+DDI0487J.a D19.1.3 covers this.
 
-> +
-> +	if (IS_ENABLED(CONFIG_CFI_PERMISSIVE))
-> +		kvm_err(" (CONFIG_CFI_PERMISSIVE ignored for hyp failures)\n");
-> +}
-> +
->  void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr,
->  					      u64 elr_virt, u64 elr_phys,
->  					      u64 par, uintptr_t vcpu,
-> @@ -413,6 +422,8 @@ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr,
->  		else
->  			kvm_err("nVHE hyp BUG at: [<%016llx>] %pB!\n", panic_addr,
->  					(void *)(panic_addr + kaslr_offset()));
-> +	} else if (IS_ENABLED(CONFIG_CFI_CLANG) && esr_is_cfi_brk(esr)) {
-> +		kvm_nvhe_report_cfi_failure(panic_addr);
->  	} else {
->  		kvm_err("nVHE hyp panic at: [<%016llx>] %pB!\n", panic_addr,
->  				(void *)(panic_addr + kaslr_offset()));
-> diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-> index 2250253a6429..2eb915d8943f 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/Makefile
-> +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-> @@ -89,9 +89,9 @@ quiet_cmd_hyprel = HYPREL  $@
->  quiet_cmd_hypcopy = HYPCOPY $@
->        cmd_hypcopy = $(OBJCOPY) --prefix-symbols=__kvm_nvhe_ $< $@
->  
-> -# Remove ftrace, Shadow Call Stack, and CFI CFLAGS.
-> -# This is equivalent to the 'notrace', '__noscs', and '__nocfi' annotations.
-> -KBUILD_CFLAGS := $(filter-out $(CC_FLAGS_FTRACE) $(CC_FLAGS_SCS) $(CC_FLAGS_CFI), $(KBUILD_CFLAGS))
-> +# Remove ftrace and Shadow Call Stack CFLAGS.
-> +# This is equivalent to the 'notrace' and '__noscs' annotations.
-> +KBUILD_CFLAGS := $(filter-out $(CC_FLAGS_FTRACE) $(CC_FLAGS_SCS), $(KBUILD_CFLAGS))
->  # Starting from 13.0.0 llvm emits SHT_REL section '.llvm.call-graph-profile'
->  # when profile optimization is applied. gen-hyprel does not support SHT_REL and
->  # causes a build failure. Remove profile optimization flags.
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-> index 5a15737b4233..33fb5732ab83 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-> @@ -5,6 +5,7 @@
->   */
->  
->  #include <linux/arm-smccc.h>
-> +#include <linux/cfi_types.h>
->  #include <linux/linkage.h>
->  
->  #include <asm/alternative.h>
-> @@ -268,8 +269,11 @@ SYM_CODE_END(__kvm_handle_stub_hvc)
->  /*
->   * void __pkvm_init_switch_pgd(struct kvm_nvhe_init_params *params,
->   *                             void (*finalize_fn)(void));
-> + *
-> + * SYM_TYPED_FUNC_START() allows C to call this ID-mapped function indirectly
-> + * using a physical pointer without triggering a kCFI failure.
->   */
-> -SYM_FUNC_START(__pkvm_init_switch_pgd)
-> +SYM_TYPED_FUNC_START(__pkvm_init_switch_pgd)
->  	/* Load the inputs from the VA pointer before turning the MMU off */
->  	ldr	x5, [x0, #NVHE_INIT_PGD_PA]
->  	ldr	x0, [x0, #NVHE_INIT_STACK_HYP_VA]
-
-Unrelated hunk?
-
-Will
+-- 
+Thanks,
+Oliver
