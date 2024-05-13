@@ -1,149 +1,90 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 503E7148823
-	for <kvmarm@lists.linux.dev>; Mon, 13 May 2024 09:51:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 862F4152171
+	for <kvmarm@lists.linux.dev>; Mon, 13 May 2024 13:24:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715593896; cv=none; b=OlkEgNtJ7m8pb10rtyWv86bkkey42Hca2VOkZEwmWkbMLyKMapP5CHfCM2LO5AXa/lvkV6ZCEuqjirIdurgguTEXm+h2TDQvQfLCnPsdzwrQFiE5ZCx3mKQAa6sUgwxyCA0ZXyPlUUvCNLNiybXGyL0Q+edMORwMOc3WH6rmqPo=
+	t=1715606670; cv=none; b=ii3TJyuipIsL6sF9rQ13fK5XT177qGkN+EW5pxUguvxmHZRG7pQSs0/jLGImyacpVI+VVhJXHOJzhxSEaAiJu1IkF07ubsUMqxCE0MKLLi0t6TevaBfSpo6axiR78Z8SMa3WKd3pueh6n1v+HuVWjwkSLjOFuQp8v/hvhIP3iao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715593896; c=relaxed/simple;
-	bh=jpgJyhY9oKsVgEX61QObWfa+d24BL8Mwy+huqVc2Uik=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hxR4xYLd6wBn8ezaso4tFq7yot7HE+Twlr6DFe98i9TNhBcOEXrbRJ3dEIAHrJV3COLhS8fleAQa0lGztug6Imf4wD3QzAacO15+O8XmCJ7B73xLVGqpD1IBSWKXcUbjchP4cYQxltsj+ehqfzkimXBLm71eAPFmx/jMrkWS5m4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q9cu9Fvq; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1715606670; c=relaxed/simple;
+	bh=jWgwDMmhPr51PSrvy3HxwSLmzIln6gb49e+7ScKUKaI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SBgNp9vLzYRjh1GnRr4xpw0UK1efbQdduL+KnJ6Q9jBh97C1HegjRYVyouVPNfr3i7YlHM7FDHEodIc7MfwzS0xCGWsvg0VsIptFHxo/Jf6vGAV/V/RgvA5GfNmLDNOKwLt9DK2QqQ0Kyz8DkPORf52p8dQ2i2WvKQNISLVHOn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LCj8Grjr; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q9cu9Fvq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD74CC113CC;
-	Mon, 13 May 2024 09:51:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715593895;
-	bh=jpgJyhY9oKsVgEX61QObWfa+d24BL8Mwy+huqVc2Uik=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=q9cu9FvqXRqSWIUt24VXYkjz+yCX3DWcwSfT3A2IRSZoLICPqZorZkbrPbEEyOLX1
-	 nlBw7cOaPEhrEx7inpb3Xd5LQ2lz5YPuxe63/dpSvxf2NlYlUkZ3i1ju4+z+6B7mwy
-	 37KMdQOwVvXC2QysKgAQ3gh8oJXOl9U/0N4YTQFu+uGlMNomzZrYVetlYodK9HHK5k
-	 BBS9TGd30NiMra5AQcADYoHn+3z0lsV+MLfBgTl2gTjJRKaCyl7eo/Y/qRnKGM0jAV
-	 bcC4IZR7qnysOJ+eda4IJhvYo70SPMvJotRz6EBR+C7EiWRGCsFoNoNYvFlzdup56Z
-	 FEC50zfjmDVdw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1s6SLF-00CmdW-Pd;
-	Mon, 13 May 2024 10:51:33 +0100
-Date: Mon, 13 May 2024 10:51:32 +0100
-Message-ID: <86y18em44b.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LCj8Grjr"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715606668;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jWgwDMmhPr51PSrvy3HxwSLmzIln6gb49e+7ScKUKaI=;
+	b=LCj8GrjrnycwK7XVL1m5LaDCYKUVBlBzAvhVR1TfoDw69DoydSq2U0XzX/UwWDkdJMaQXs
+	iuMtU5j0fPNIoe41yAW4zk6WphzLhxReQfP5B6PrxpSVEw0dEuh3Lu3ZUZiIgHKa25ltZt
+	8CbtZAYgzUHiKqH4nEt9+aG4j5LMNBY=
+Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com
+ [209.85.167.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-103-UxmmrGBSOOmC5GWxKZlh6A-1; Mon, 13 May 2024 09:24:17 -0400
+X-MC-Unique: UxmmrGBSOOmC5GWxKZlh6A-1
+Received: by mail-oi1-f198.google.com with SMTP id 5614622812f47-3c9af44fdbeso521344b6e.3
+        for <kvmarm@lists.linux.dev>; Mon, 13 May 2024 06:24:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715606656; x=1716211456;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jWgwDMmhPr51PSrvy3HxwSLmzIln6gb49e+7ScKUKaI=;
+        b=QlqJCNqeZwEfsQeNicxBTZXIwRiUH11cUQdosFdDJyjxXaDsfD98w93XggVBHFQWbz
+         oM2FZbeAemwUWSDd8IDMVl8n0xkW7KxTI6IBtqmyWMcnprwFo6atq90p1hlex9aZa+Hc
+         Igs6CIYV0i1vFlYSps1908w9GVlt3d9bE4jDitR+L+NGfw4Z1NcL0hwt60CuqfqOHCxb
+         3AHmTod3zMw5AZz/8CRwPCjzjnD5hxzQS21BB6tCzPvMwmghXXPDiZO4IeEO5S7gbHwF
+         sSW0P57rx58n8QU/mX1FhEVdvDKJzB6VeEUzcYQJ79IZjdSB5h6Us9xBvY7xVxLMreTW
+         Si7Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXbgsM6QYhGae0lugQP9U+ZdizgguTSOPudobcz4pNKYYndoSpDBm5dfwG9U8PVSOn2r+lizPCJDtB1dcU1UwwFATnWdomf
+X-Gm-Message-State: AOJu0Yw0BE8xuKXaRa4sFiGhbPo3RkhyDBK7lLaKMtbgilYxEFLIYzyr
+	mQd6GITYfAhuot7Iwe3u2fJrFhfqLHv1jK40e/Ws8pbdLM2lsV+OuexTKqx3/rW4AwRRl5+5NT7
+	KDssn88bOVc6Yl5WIAJEULm1nButoeAqWEwEYbHPRvQNBmXLwXrBltA==
+X-Received: by 2002:aca:230c:0:b0:3c8:4aff:649b with SMTP id 5614622812f47-3c9970cf848mr12498551b6e.41.1715606655955;
+        Mon, 13 May 2024 06:24:15 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE1SJBjApdI9h30qN1A1Ax9CGL2jjZnJns6O/3RadMVtbnCEbV/aF8/UeID/yOoTqYATTt3Gg==
+X-Received: by 2002:aca:230c:0:b0:3c8:4aff:649b with SMTP id 5614622812f47-3c9970cf848mr12498521b6e.41.1715606655586;
+        Mon, 13 May 2024 06:24:15 -0700 (PDT)
+Received: from rh.redhat.com (p200300c93f4cc600a5cdf10de606b5e2.dip0.t-ipconnect.de. [2003:c9:3f4c:c600:a5cd:f10d:e606:b5e2])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6a15f203e21sm43077366d6.136.2024.05.13.06.24.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 May 2024 06:24:15 -0700 (PDT)
+From: Sebastian Ott <sebott@redhat.com>
+To: oliver.upton@linux.dev
+Cc: james.morse@arm.com,
+	kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev,
-	will@kernel.org,
-	qperret@google.com,
-	seanjc@google.com,
-	alexandru.elisei@arm.com,
-	catalin.marinas@arm.com,
-	philmd@linaro.org,
-	james.morse@arm.com,
+	maz@kernel.org,
 	suzuki.poulose@arm.com,
-	mark.rutland@arm.com,
-	broonie@kernel.org,
-	joey.gouly@arm.com,
-	rananta@google.com,
-	smostafa@google.com
-Subject: Re: [PATCH v4 01/30] KVM: arm64: Initialize the kvm host data's fpsimd_state pointer in pKVM
-In-Reply-To: <CA+EHjTw9sBodDrVyJk7SmJLO29N_oYK611=uOHRO7Z9+0bVOEA@mail.gmail.com>
-References: <20240423150538.2103045-1-tabba@google.com>
-	<20240423150538.2103045-2-tabba@google.com>
-	<4ec3be32-476a-14f2-7826-2171df1c9f77@huawei.com>
-	<CA+EHjTwPWP1exm_bb_bSKF154W4doZvKxk5=AqFrBkUy_UsvaQ@mail.gmail.com>
-	<d1435598-9a4d-1fc0-3355-9db78e6a7e27@huawei.com>
-	<CA+EHjTzoD4wXhiG-uQ2xzrZkw5fLqjdOsiE87EdY5Z1qfvF7_g@mail.gmail.com>
-	<86ttj6p062.wl-maz@kernel.org>
-	<CA+EHjTyFanD2R2QXy005RujcXeT3GTPRw+e4yfS77KfWbxTVRg@mail.gmail.com>
-	<Zj-10O_rbwnNadpZ@linux.dev>
-	<CA+EHjTw9sBodDrVyJk7SmJLO29N_oYK611=uOHRO7Z9+0bVOEA@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	yuzenghui@huawei.com
+Subject: Re: [PATCH 1/7] KVM: arm64: Rename is_id_reg() to imply VM scope
+Date: Mon, 13 May 2024 15:24:11 +0200
+Message-ID: <20240513132411.14102-1-sebott@redhat.com>
+X-Mailer: git-send-email 2.45.0
+In-Reply-To: <20240502233529.1958459-2-oliver.upton@linux.dev>
+References: <20240502233529.1958459-2-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, oliver.upton@linux.dev, yuzenghui@huawei.com, kvmarm@lists.linux.dev, will@kernel.org, qperret@google.com, seanjc@google.com, alexandru.elisei@arm.com, catalin.marinas@arm.com, philmd@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, mark.rutland@arm.com, broonie@kernel.org, joey.gouly@arm.com, rananta@google.com, smostafa@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"; x-default=true
 
-On Sun, 12 May 2024 16:46:51 +0100,
-Fuad Tabba <tabba@google.com> wrote:
->=20
-> Hi Oliver
->=20
-> On Sat, May 11, 2024 at 7:15=E2=80=AFPM Oliver Upton <oliver.upton@linux.=
-dev> wrote:
-> >
-> > On Fri, May 10, 2024 at 09:00:54AM +0100, Fuad Tabba wrote:
-> >
-> > [...]
-> >
-> > > > > For protected VMs, we don't want to lazily save/restore the host's
-> > > > > fpsimd state, because that could leak information to the host tha=
-t the
-> > > > > protected guest is using fpsimd. Therefore, for protected VMs, the
-> > > > > host fpsimd state is maintained (saved/restored) in hyp (at EL2),
-> > > > > without the host needing to know or do anything about it.
-> >
-> > I'm a bit confused by this statement. Isn't pKVM downstream lazily
-> > managing fpsimd state on behalf of the host for protected guests? IOW,
-> > don't we return to the host with traps enabled at EL2 and load state
-> > after the trap?
->=20
-> Sorry, I got my wires crossed between fpsimd and sve. It's the sve
-> state that is restored eagerly, rather than rely on the
-> TIF_FOREIGN_FPSTATE as in other KVM modes.
->=20
-> > > > But I think that's a regression from the current status. It looks l=
-ike
-> > > > now that the state is really private to EL2, nothing will restore t=
-he
-> > > > FP context on exit, while this was the case before we reworked this.
-> > > >
-> > > > It'd be good to plug this in 6.10, as this is a regression.
-> > >
-> > > You're right. I'll send a patch to fix this.
-> >
-> > I'd be fine with a hack that *eagerly* saves/restores the fpsimd state
-> > on every exit in protected mode for the time being. Not great, but
-> > obviously correct and its not like protected mode is very useful
-> > upstream to begin with.
->=20
-> I think I have a solution that would maintain the existing behavior
-> for non-protected VMs in protected mode, i.e., lazy handling. I just
-> want to tidy up the code a bit more, run it through a few more fpsimd
-> and sve stress tests, and send the patches.
+> The naming of some of the feature ID checks is ambiguous. Rephrase the
+> is_id_reg() helper to make its purpose slightly clearer.
 
-For the record, I don't think it is worth special-casing non-protected
-VMs under pKVM. If eager save/restore is what pKVM needs to ensure
-protection, then this should equally apply to non-protected VMs.
-Having a single behaviour for a given host mode is hugely beneficial
-from a maintenance PoV.
+Reviewed-by: Sebastian Ott <sebott@redhat.com>
 
-What *could* be done as an optimisation is to make the restore lazy
-for *everything* by trapping the host access to the FP state (similar
-to what we do for guests, funnily enough).
-
-But I see this only as an optimisation, not as a functional
-requirement.
-
-Thanks,
-
-	M.
-
---=20
-Without deviation from the norm, progress is not possible.
