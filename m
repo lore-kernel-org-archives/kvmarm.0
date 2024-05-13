@@ -1,104 +1,115 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2BD5153515
-	for <kvmarm@lists.linux.dev>; Mon, 13 May 2024 13:31:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D87114EC7A;
+	Mon, 13 May 2024 13:55:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715607074; cv=none; b=g5MPqvzh7g6+7s4fuhtFrbrvoKaPDO1y7eDf394gSqbNJExrNnsLgssDO/XUEZLmEHzT6pyObgJAc41Rc7+VH6YHDd5RDcSHOIgkRu0dSIvbm5d9N22JsGYdI8fQ1/UVSB0/las6+ALNCKakvnJoeArKEX4PD3qyTIsxeLu5fZA=
+	t=1715608548; cv=none; b=EsSwsmV85mKLhWJ9s5Ybbc/SQTGqsWXcppE0hapDC3z8MVklhz+dNCopqHgHo7majWSM5Fuo89CfpDeb7G3O3J1dbHuaBTyqF0VbnDQA4qvd/8ubV97ycU/AydVUxPXlm5ird4UV2fqxb/W31fbxlVKt2jtYILkgFP2DfFgtbak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715607074; c=relaxed/simple;
-	bh=Fqm2Gp4Ea2AnXbueV/ZqoPCx8y1qciRzdl8bP0tCGxA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZajfSHN+ezH4isrHlk8imbtbwa2T24WfbJy80AG/L0/pYibFCNENJqgIzWncGCwojWi1/JG4VJ9o+eX9/bM9tKsnb1OHe60R07bzDeEGf8k39pmiz1LVnIbqAiSLgK/0raNUZm3AZpOAVaoR4uskJ3znxfouYPtIdKIwQIwpA/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eUy5rroE; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1715608548; c=relaxed/simple;
+	bh=+zJygHwJDYYbEHrrcyWnil8v90ICcXTefv5dJxPZ8lI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gaK/zgNVaLN1PfzCEAX8eIl/SDJG5XUiRPtuKlEZBfWmFpfwmYPP4NY9Vfjp7Jg9ntqm4+l/lfsoiHleG4euHrYSqcPGZqFvDJDs8e0rfJBbwHHC6WDJVdfpuYEqQE2nR8iV2sUIKaIRxOHZtdtZSsAgs6Y0d3GfNDjASJrwQYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E21Yv4Cj; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eUy5rroE"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715607071;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oiIb+3nFVswBrkEwxMPkqHn0y0Q1J4bxwK2n9xhUWW8=;
-	b=eUy5rroEeP2jVCknj9Jd58FUGgUS9G4+5pxVqRLcj7tNrDq9tTG40qOEDWbMlL+P2o5ZLb
-	ai0TRZ8uLRVXqZ1Y03Ng/W8MIo1eowk0QZrDTTZv/QYCWKBeyl/CZGB2bGwWyzAIP5OumJ
-	Rx4mPjkCVNK8cx2LOmWUKJkpeGIsjQY=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-581-gA6NzQqpP-eRTgHXNYjkYw-1; Mon, 13 May 2024 09:31:10 -0400
-X-MC-Unique: gA6NzQqpP-eRTgHXNYjkYw-1
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-7928d8217caso564852185a.3
-        for <kvmarm@lists.linux.dev>; Mon, 13 May 2024 06:31:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715607069; x=1716211869;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oiIb+3nFVswBrkEwxMPkqHn0y0Q1J4bxwK2n9xhUWW8=;
-        b=lvCyq/VkOVRTJRWZTCVn7jZmZ/MJu6DMKP5v5YXbb133ZwTNPghezdJjpP5jNFvXyp
-         h3MPxpfPJCjIh7DHdiCQON5yFm92pZrrrj6jo+mq0dZQ0GRAoNsd8l/3jS8pgBAYSSR1
-         UFGDfU8TKf7SFQvZ2C9SxHYBMhdzu+lUYp9cbFMrrIz2g1egiOUUIz27213xOR7N9akB
-         P/7FILBLqVIeUz25Afm2fsAxZFUOcIZJxsvVqhOZuoJusW697fQaUpMgNtq9yB+x46Ut
-         /TRIK7wDV1R0xqp9nWw/HgT6ooTh1HIheRf0u/L6wSfcjYr1vMErf+aqfSUxevK8q8zH
-         GM9w==
-X-Forwarded-Encrypted: i=1; AJvYcCXLCSBmZteNP2oFJ25FnreYUPiYO8XwddgHDoW3coWgzCW92MPwXfch7OSJSQ62LHmkM03dRYkKnk+yNuxgBVxAX+8GEjYB
-X-Gm-Message-State: AOJu0Yx0YaLspcbe/QxObjqgRI+z6ExHEiVt9zYee0wO5IjdRim3llOJ
-	a1uaYG+lPz3FmqNPuBcRumvC3v+sLXthM0FHjCWZ1c6WA32MREiwq6mr82JtkEug8cYaa3DzWgZ
-	51Q8Mq8YjwP4Ht4WtSEoFiXdQeQ7Pp+myJmPHW9n5qZsQkifmqs+H7g==
-X-Received: by 2002:a05:620a:100b:b0:792:c32f:caf0 with SMTP id af79cd13be357-792c7600c34mr1006622985a.70.1715607069077;
-        Mon, 13 May 2024 06:31:09 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGpj8HOhXADrX5aLoJtT9KExs3Lc5Cv2uyawKonMctLWoub/CtUpkqTjUxSYvXa9xO8aQIf7A==
-X-Received: by 2002:a05:620a:100b:b0:792:c32f:caf0 with SMTP id af79cd13be357-792c7600c34mr1006621385a.70.1715607068752;
-        Mon, 13 May 2024 06:31:08 -0700 (PDT)
-Received: from rh.redhat.com (p200300c93f4cc600a5cdf10de606b5e2.dip0.t-ipconnect.de. [2003:c9:3f4c:c600:a5cd:f10d:e606:b5e2])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-792e3a40492sm59551785a.86.2024.05.13.06.31.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 May 2024 06:31:08 -0700 (PDT)
-From: Sebastian Ott <sebott@redhat.com>
-To: oliver.upton@linux.dev
-Cc: james.morse@arm.com,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	maz@kernel.org,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com
-Subject: Re: [PATCH 3/7] KVM: arm64: Only reset vCPU-scoped feature ID regs once
-Date: Mon, 13 May 2024 15:31:04 +0200
-Message-ID: <20240513133104.14444-1-sebott@redhat.com>
-X-Mailer: git-send-email 2.45.0
-In-Reply-To: <20240502233529.1958459-4-oliver.upton@linux.dev>
-References: <20240502233529.1958459-4-oliver.upton@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E21Yv4Cj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A774C113CC;
+	Mon, 13 May 2024 13:55:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715608548;
+	bh=+zJygHwJDYYbEHrrcyWnil8v90ICcXTefv5dJxPZ8lI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=E21Yv4CjfRNH9NPlgkc8u7W1/WiUPP+/YhrSUmG92G6vgADSfsWECEKcpOMhyEfG/
+	 RbpGvEBPmK4qhlTtTRp18c/c2Jrxg3/HEXhg+XtU8DkruSan+t5ct+a5eT+JVNHYwX
+	 zdSNb5naXaJBpBrUHam4L8u7AWMjMWLYLSJgzmwDspv4ZIpr9G3mSLUAyB8hdyj1P0
+	 cnBcw+sEKShIvp4QsrAxO4WElLFWhUjjALm8Y4SHCqARkdqLGA93RFa6KbJLaCKGBD
+	 bz814/nJPG09eFFTbVOMRuUZDnPshBl60b1iZD/ykTEnQTXxJMI5FwPdNoeDAmF+b1
+	 iDbl+22GqOMHA==
+Date: Mon, 13 May 2024 14:55:42 +0100
+From: Will Deacon <will@kernel.org>
+To: =?iso-8859-1?Q?Pierre-Cl=E9ment?= Tosi <ptosi@google.com>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Vincent Donnefort <vdonnefort@google.com>
+Subject: Re: [PATCH v3 01/12] KVM: arm64: Fix clobbered ELR in sync
+ abort/SError
+Message-ID: <20240513135542.GA28749@willie-the-truck>
+References: <20240510112645.3625702-1-ptosi@google.com>
+ <20240510112645.3625702-2-ptosi@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"; x-default=true
+In-Reply-To: <20240510112645.3625702-2-ptosi@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-> The general expecation with feature ID registers is that they're 'reset'
-              ^
-              expectation
+On Fri, May 10, 2024 at 12:26:30PM +0100, Pierre-Clément Tosi wrote:
+> When the hypervisor receives a SError or synchronous exception (EL2h)
+> while running with the __kvm_hyp_vector and if ELR_EL2 doesn't point to
+> an extable entry, it panics indirectly by overwriting ELR with the
+> address of a panic handler in order for the asm routine it returns to to
+> ERET into the handler.
+> 
+> However, this clobbers ELR_EL2 for the handler itself. As a result,
+> hyp_panic(), when retrieving what it believes to be the PC where the
+> exception happened, actually ends up reading the address of the panic
+> handler that called it! This results in an erroneous and confusing panic
+> message where the source of any synchronous exception (e.g. BUG() or
+> kCFI) appears to be __guest_exit_panic, making it hard to locate the
+> actual BRK instruction.
+> 
+> Therefore, store the original ELR_EL2 in the per-CPU kvm_hyp_ctxt and
+> point the sysreg to a routine that first restores it to its previous
+> value before running __guest_exit_panic.
+> 
+> Fixes: 7db21530479f ("KVM: arm64: Restore hyp when panicking in guest context")
+> Signed-off-by: Pierre-Clément Tosi <ptosi@google.com>
+> ---
+>  arch/arm64/kernel/asm-offsets.c         | 1 +
+>  arch/arm64/kvm/hyp/entry.S              | 9 +++++++++
+>  arch/arm64/kvm/hyp/include/hyp/switch.h | 5 +++--
+>  3 files changed, 13 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
+> index 81496083c041..27de1dddb0ab 100644
+> --- a/arch/arm64/kernel/asm-offsets.c
+> +++ b/arch/arm64/kernel/asm-offsets.c
+> @@ -128,6 +128,7 @@ int main(void)
+>    DEFINE(VCPU_FAULT_DISR,	offsetof(struct kvm_vcpu, arch.fault.disr_el1));
+>    DEFINE(VCPU_HCR_EL2,		offsetof(struct kvm_vcpu, arch.hcr_el2));
+>    DEFINE(CPU_USER_PT_REGS,	offsetof(struct kvm_cpu_context, regs));
+> +  DEFINE(CPU_ELR_EL2,		offsetof(struct kvm_cpu_context, sys_regs[ELR_EL2]));
+>    DEFINE(CPU_RGSR_EL1,		offsetof(struct kvm_cpu_context, sys_regs[RGSR_EL1]));
+>    DEFINE(CPU_GCR_EL1,		offsetof(struct kvm_cpu_context, sys_regs[GCR_EL1]));
+>    DEFINE(CPU_APIAKEYLO_EL1,	offsetof(struct kvm_cpu_context, sys_regs[APIAKEYLO_EL1]));
+> diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+> index f3aa7738b477..bcaaf1a11b4e 100644
+> --- a/arch/arm64/kvm/hyp/entry.S
+> +++ b/arch/arm64/kvm/hyp/entry.S
+> @@ -83,6 +83,15 @@ alternative_else_nop_endif
+>  	eret
+>  	sb
+>  
+> +SYM_INNER_LABEL(__guest_exit_restore_elr_and_panic, SYM_L_GLOBAL)
+> +	// x0-x29,lr: hyp regs
+> +
+> +	stp	x0, x1, [sp, #-16]!
+> +	adr_this_cpu x0, kvm_hyp_ctxt, x1
+> +	ldr	x0, [x0, #CPU_ELR_EL2]
+> +	msr	elr_el2, x0
+> +	ldp	x0, x1, [sp], #16
 
-> exactly once by KVM for the lifetime of a vCPU/VM, such that any
-> userspace changes to the CPU features / identity are honored after a
-> vCPU gets reset (e.g. PSCI_ON).
->
-> KVM handles what it calls VM-scoped feature ID registers correctly, but
-> feature ID registers local to a vCPU (CLIDR_EL1, MPIDR_EL1) get wiped
-> after every reset. What's especially concerning is that a
-> potentially-changing MPIDR_EL1 breaks MPIDR compression for indexing
-> mpidr_data, as the mask of useful bits to build the index could change.
->
-> This is absolutely no good. Avoid resetting vCPU feature ID registers
-> more than once.
+Why do you have to preserve x0 and x1 here? afaict, we fall into
+__guest_exit_panic(), which clobbers them both immediately because it's
+going to pull them off the stack (they get saved _very_ early during
+exception entry).
 
-Reviewed-by: Sebastian Ott <sebott@redhat.com>
-
+Will
