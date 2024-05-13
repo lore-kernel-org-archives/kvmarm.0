@@ -1,70 +1,356 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF8D8156863;
-	Mon, 13 May 2024 16:14:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71E3F14D2BF;
+	Mon, 13 May 2024 16:19:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715616851; cv=none; b=BJ/S2XkLQ4P/oi8LRnd8bStrUwowu8VkdDUHEBz91BWQGfut85goQdaiBx2JKRL3yHaKUx62g5uFNqKwc2k9hgDpSxes5KmNPYu7IZG62HkJVgI7K+U+zVfXn6Z1BjOH25J+UbymHgiTPl5R/5/Pvi7gjhg3U7kj5AotjuFdjAY=
+	t=1715617182; cv=none; b=JMyyO6pv1iWu3bcH6yAVZQCsTvfNTVmcuIJRId95dGA6KUVUb/DuDbzO0c7pX/MJgqRCl/n3jqk/DMTORNeM9ipJPMsbLAbFk59NaJPdSt9ft5Qfl69QmBLX/dwEztVkSzpV6gRQ4aQKmXXHo4hAPz/xmHAjFwB64zNNbydKeVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715616851; c=relaxed/simple;
-	bh=tId/JdnTjdfMk77QxFfO67QzK/Kx7mUwVft12OXxf1o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gVNk5W7+raqH0eKWJ0l+q+ALlBGtDu/7x8KhSk9qRvXDtoK5uLMJeXQwn0A7rs7MYR++WxeJ1oc9mtQLsye38H4F5heg1cUvVQYn8q/wQkkg4LheKRugIcSDA1b+LQV6K3I6cb3ZCu4GFRNoXXj91I8KB/Mg2F0bJv6oTZTlNp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3765C2BD11;
-	Mon, 13 May 2024 16:14:07 +0000 (UTC)
-Date: Mon, 13 May 2024 17:14:05 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	s=arc-20240116; t=1715617182; c=relaxed/simple;
+	bh=vD7X+Ao+W12WTcLa+fYbUGGl0ZipNgpNyrh4jIzYIyU=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Bw40sVuG5D+KoJaILKaeG0EbRkgoUOtO3HiYzATL/crsR8AWtiOg+M+RSNGSRR5jfg6GaDH+jXZVZ03yBAc4/hvrwVtJ7aF5H3rBQohvbScfnP40fUWbtUtNhLHMWCmukWtN1zJn80rl61TNZdppFQZ6z80kgamkkp5zrnckKW8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HRWpst6J; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HRWpst6J"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBFDCC113CC;
+	Mon, 13 May 2024 16:19:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715617182;
+	bh=vD7X+Ao+W12WTcLa+fYbUGGl0ZipNgpNyrh4jIzYIyU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=HRWpst6JsD4icBNYc82I3q1S17Jbos8fZuec2eQD6MnU5NoZMPmaDRjUEPHR4qFAL
+	 cS0yl/9Gp/5zkS2lA8WFGf7JFwB/b3l9Xvur/y9mNA2pNhAP9klIob/S0geo3+UgXF
+	 cjxB0CNTslG5rybbaKISxindvIVflX5IyzdW6l49RrgKRooJSP36pGVMV1pEbhOzw7
+	 yAMQnwwHgpNwYPIaGf4RMgHd9/yhGK5fJtFG8IlVI5SVPwpaZAryBH/5jTB6SfGUiR
+	 U/18li5zgV/waVSY3WMQ9+32Txue0e0oXtzy9OPOmt43F3X/XwE3GCnb3HJydlcuCU
+	 JVEdSkjo+F1hQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1s6YOp-00Csg5-JY;
+	Mon, 13 May 2024 17:19:39 +0100
+Date: Mon, 13 May 2024 17:19:39 +0100
+Message-ID: <86wmnxn0pw.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
 	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
 	Joey Gouly <joey.gouly@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: Re: [PATCH v2 06/14] arm64: Override set_fixmap_io
-Message-ID: <ZkI8TZmEKwrEKhe_@arm.com>
-References: <20240412084213.1733764-1-steven.price@arm.com>
- <20240412084213.1733764-7-steven.price@arm.com>
+	Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [PATCH 01/16] KVM: arm64: nv: Support multiple nested Stage-2 mmu structures
+In-Reply-To: <ZjnHaYjgMqcpfxdV@linux.dev>
+References: <20240409175448.3507472-1-maz@kernel.org>
+	<20240409175448.3507472-2-maz@kernel.org>
+	<ZjnHaYjgMqcpfxdV@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240412084213.1733764-7-steven.price@arm.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Apr 12, 2024 at 09:42:05AM +0100, Steven Price wrote:
-> Override the set_fixmap_io to set shared permission for the host
-> in case of a CC guest. For now we mark it shared unconditionally.
-> Future changes could filter the physical address and make the
-> decision accordingly.
+On Tue, 07 May 2024 07:17:13 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> Hey Marc,
+> 
+> On Tue, Apr 09, 2024 at 06:54:33PM +0100, Marc Zyngier wrote:
+> > +static inline bool kvm_s2_mmu_valid(struct kvm_s2_mmu *mmu)
+> > +{
+> > +	return !(mmu->tlb_vttbr & 1);
+> > +}
+> 
+> More readable if you use VTTBR_CNP_BIT here.
+
+Yes, well spotted.
+
 [...]
-> +void set_fixmap_io(enum fixed_addresses idx, phys_addr_t phys)
-> +{
-> +	pgprot_t prot = FIXMAP_PAGE_IO;
-> +
-> +	/*
-> +	 * For now we consider all I/O as non-secure. For future
-> +	 * filter the I/O base for setting appropriate permissions.
-> +	 */
-> +	prot = __pgprot(pgprot_val(prot) | PROT_NS_SHARED);
-> +
-> +	return __set_fixmap(idx, phys, prot);
-> +}
 
-I looked through the patches and could not find any place where this
-function does anything different as per the commit log suggestion. Can
-we just update FIXMAP_PAGE_IO for now until you have a clear use-case?
+> > +int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long type)
+> > +{
+> > +	int cpu, err;
+> > +	struct kvm_pgtable *pgt;
+> > +
+> > +	/*
+> > +	 * If we already have our page tables in place, and that the
+> > +	 * MMU context is the canonical one, we have a bug somewhere,
+> > +	 * as this is only supposed to ever happen once per VM.
+> > +	 *
+> > +	 * Otherwise, we're building nested page tables, and that's
+> > +	 * probably because userspace called KVM_ARM_VCPU_INIT more
+> > +	 * than once on the same vcpu. Since that's actually legal,
+> > +	 * don't kick a fuss and leave gracefully.
+> > +	 */
+> >  	if (mmu->pgt != NULL) {
+> > +		if (&kvm->arch.mmu != mmu)
+> 
+> A helper might be a good idea, I see this repeated several times:
+> 
+> static inline bool kvm_is_nested_s2_mmu(struct kvm_s2_mmu *mmu)
+> {
+> 	return &arch->mmu != mmu;
+> }
+
+Yeah, I can probably fit something like this in a number of spots.
+Just need to be careful as mmu is not initialised at all in some
+contexts.
+
+> 
+> > +			return 0;
+> > +
+> >  		kvm_err("kvm_arch already initialized?\n");
+> >  		return -EINVAL;
+> >  	}
+> >  
+> > +	/*
+> > +	 * We only initialise the IPA range on the canonical MMU, so
+> > +	 * the type is meaningless in all other situations.
+> > +	 */
+> > +	if (&kvm->arch.mmu != mmu)
+> > +		type = kvm_get_pa_bits(kvm);
+> 
+> I'm not sure I follow this comment, because kvm_init_ipa_range() still
+> gets called on nested MMUs. Is this suggesting that the configured IPA
+> limit of the shadow MMUs doesn't matter as they can only ever map things
+> in the canonical IPA space?
+
+Yes, that's exactly what I meant. Just because we limit the IPA space
+to some number of bits doesn't mean we can limit the guest's own S2 to
+the same thing, because they mean different things:
+
+- the canonical IPA space (aka type) is a contract between KVM and
+  userspace on which ranges the MMIO exits are valid
+
+- the nested IPA space is whatever the virtual HW exposes as PARange,
+  and the only constraint is that the *output* of the nested IPA space
+  must be contained in the canonical IPA space
+
+Does this make sense? Happy to rework the comment to clarify this.
+
+> 
+> > +	err = kvm_init_ipa_range(mmu, type);
+> > +	if (err)
+> > +		return err;
+> > +
+> >  	pgt = kzalloc(sizeof(*pgt), GFP_KERNEL_ACCOUNT);
+> >  	if (!pgt)
+> >  		return -ENOMEM;
+> > @@ -925,6 +960,10 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
+> >  
+> >  	mmu->pgt = pgt;
+> >  	mmu->pgd_phys = __pa(pgt->pgd);
+> > +
+> > +	if (&kvm->arch.mmu != mmu)
+> > +		kvm_init_nested_s2_mmu(mmu);
+> > +
+> >  	return 0;
+> >  
+> >  out_destroy_pgtable:
+> > @@ -976,7 +1015,7 @@ static void stage2_unmap_memslot(struct kvm *kvm,
+> >  
+> >  		if (!(vma->vm_flags & VM_PFNMAP)) {
+> >  			gpa_t gpa = addr + (vm_start - memslot->userspace_addr);
+> > -			unmap_stage2_range(&kvm->arch.mmu, gpa, vm_end - vm_start);
+> > +			kvm_unmap_stage2_range(&kvm->arch.mmu, gpa, vm_end - vm_start);
+> >  		}
+> >  		hva = vm_end;
+> >  	} while (hva < reg_end);
+> > @@ -2054,11 +2093,6 @@ void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen)
+> >  {
+> >  }
+> >  
+> > -void kvm_arch_flush_shadow_all(struct kvm *kvm)
+> > -{
+> > -	kvm_uninit_stage2_mmu(kvm);
+> > -}
+> > -
+> >  void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+> >  				   struct kvm_memory_slot *slot)
+> >  {
+> > @@ -2066,7 +2100,7 @@ void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+> >  	phys_addr_t size = slot->npages << PAGE_SHIFT;
+> >  
+> >  	write_lock(&kvm->mmu_lock);
+> > -	unmap_stage2_range(&kvm->arch.mmu, gpa, size);
+> > +	kvm_unmap_stage2_range(&kvm->arch.mmu, gpa, size);
+> >  	write_unlock(&kvm->mmu_lock);
+> >  }
+> >  
+> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> > index ced30c90521a..1f4f80a8c011 100644
+> > --- a/arch/arm64/kvm/nested.c
+> > +++ b/arch/arm64/kvm/nested.c
+> > @@ -7,7 +7,9 @@
+> >  #include <linux/kvm.h>
+> >  #include <linux/kvm_host.h>
+> >  
+> > +#include <asm/kvm_arm.h>
+> >  #include <asm/kvm_emulate.h>
+> > +#include <asm/kvm_mmu.h>
+> >  #include <asm/kvm_nested.h>
+> >  #include <asm/sysreg.h>
+> >  
+> > @@ -16,6 +18,209 @@
+> >  /* Protection against the sysreg repainting madness... */
+> >  #define NV_FTR(r, f)		ID_AA64##r##_EL1_##f
+> >  
+> > +void kvm_init_nested(struct kvm *kvm)
+> > +{
+> > +	kvm->arch.nested_mmus = NULL;
+> > +	kvm->arch.nested_mmus_size = 0;
+> > +}
+> > +
+> > +int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
+> > +{
+> > +	struct kvm *kvm = vcpu->kvm;
+> > +	struct kvm_s2_mmu *tmp;
+> > +	int num_mmus;
+> > +	int ret = -ENOMEM;
+> > +
+> > +	if (!test_bit(KVM_ARM_VCPU_HAS_EL2, vcpu->kvm->arch.vcpu_features))
+> > +		return 0;
+> > +
+> > +	if (!cpus_have_final_cap(ARM64_HAS_NESTED_VIRT))
+> > +		return -EINVAL;
+> 
+> nitpick: maybe guard the call to kvm_vcpu_init_nested() with
+> vcpu_has_nv() and collapse these into
+> 
+> 	if (!vcpu_has_nv(vcpu))
+> 		return -EINVAL;
+
+Indeed, this is definitely old cruft we can get rid off. We don't even
+need to error out, as there is a single call site.
+
+> 
+> > +	/*
+> > +	 * Let's treat memory allocation failures as benign: If we fail to
+> > +	 * allocate anything, return an error and keep the allocated array
+> > +	 * alive. Userspace may try to recover by intializing the vcpu
+> > +	 * again, and there is no reason to affect the whole VM for this.
+> > +	 */
+> 
+> This code feels a bit tricky, and I'm not sure much will be done to
+> recover the VM in practice should this allocation / ioctl fail.
+
+I think this is a question of consistency. We don't break the VM when
+VPCU_INIT fails in any other case. But yeah, I agree that the whole
+fixup code is tricky.
+
+> Is it possible to do this late in kvm_arch_vcpu_run_pid_change() and
+> only have the first vCPU to reach the call do the initialization for the
+> whole VM? We could then dispose of the reallocation / fixup scheme
+> below.
+
+We could, but then the error becomes pretty non-recoverable.
+
+Another thing is that I really should move this over to be vmalloc'd
+rather than kmalloc'd -- there is no benefit in having this physically
+contiguous.
+
+> 
+> If we keep this code...
+> 
+> > +	num_mmus = atomic_read(&kvm->online_vcpus) * 2;
+> > +	tmp = krealloc(kvm->arch.nested_mmus,
+> > +		       num_mmus * sizeof(*kvm->arch.nested_mmus),
+> > +		       GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+> 
+> Just do an early 'return -ENOMEM' here to cut a level of indendation for
+> the rest that follows.
+>
+> > +	if (tmp) {
+> > +		/*
+> > +		 * If we went through a realocation, adjust the MMU
+> > +		 * back-pointers in the previously initialised
+> > +		 * pg_table structures.
+> 
+> nitpick: pgtable or kvm_pgtable structures
+>
+> > +		 */
+> > +		if (kvm->arch.nested_mmus != tmp) {
+> > +			int i;
+> > +
+> > +			for (i = 0; i < num_mmus - 2; i++)
+> > +				tmp[i].pgt->mmu = &tmp[i];
+> > +		}
+> > +
+> > +		if (kvm_init_stage2_mmu(kvm, &tmp[num_mmus - 1], 0) ||
+> > +		    kvm_init_stage2_mmu(kvm, &tmp[num_mmus - 2], 0)) {
+> > +			kvm_free_stage2_pgd(&tmp[num_mmus - 1]);
+> > +			kvm_free_stage2_pgd(&tmp[num_mmus - 2]);
+> > +		} else {
+> > +			kvm->arch.nested_mmus_size = num_mmus;
+> > +			ret = 0;
+> > +		}
+> > +
+> > +		kvm->arch.nested_mmus = tmp;
+> > +	}
+> > +
+> > +	return ret;
+> > +}
+> > +
+> > +struct kvm_s2_mmu *lookup_s2_mmu(struct kvm_vcpu *vcpu)
+> > +{
+> > +	bool nested_stage2_enabled;
+> > +	u64 vttbr, vtcr, hcr;
+> > +	struct kvm *kvm;
+> > +	int i;
+> > +
+> > +	kvm = vcpu->kvm;
+> 
+> nit: just do this when declaring the local.
+> 
+> > +	lockdep_assert_held_write(&kvm->mmu_lock);
+> > +
+> > +	vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
+> > +	vtcr = vcpu_read_sys_reg(vcpu, VTCR_EL2);
+> > +	hcr = vcpu_read_sys_reg(vcpu, HCR_EL2);
+> > +
+> > +	nested_stage2_enabled = hcr & HCR_VM;
+> > +
+> > +	/* Don't consider the CnP bit for the vttbr match */
+> > +	vttbr = vttbr & ~VTTBR_CNP_BIT;
+> 
+> nit: &=
+> 
+> > +	/*
+> > +	 * Two possibilities when looking up a S2 MMU context:
+> > +	 *
+> > +	 * - either S2 is enabled in the guest, and we need a context that is
+> > +         *   S2-enabled and matches the full VTTBR (VMID+BADDR) and VTCR,
+> > +         *   which makes it safe from a TLB conflict perspective (a broken
+> > +         *   guest won't be able to generate them),
+> > +	 *
+> > +	 * - or S2 is disabled, and we need a context that is S2-disabled
+> > +         *   and matches the VMID only, as all TLBs are tagged by VMID even
+> > +         *   if S2 translation is disabled.
+> > +	 */
+> 
+> Looks like some spaces snuck in and got the indendation weird.
+
+
+Ack on all the above.
+
+Thanks for having looked into it!
+
+	M.
 
 -- 
-Catalin
+Without deviation from the norm, progress is not possible.
