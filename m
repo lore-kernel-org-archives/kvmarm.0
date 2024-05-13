@@ -1,20 +1,20 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BA2C208A1;
-	Mon, 13 May 2024 16:38:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 514EE1CD15;
+	Mon, 13 May 2024 16:56:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715618339; cv=none; b=R0H7c09MH9nzalO4YXvQdpsnk0YwSJJ05zZxK3sWanS82DMNNnpdyzFvbLfZJRZGkYL7WCYzzjWFe3RAoCGujq/Y3t5Dd+o84CNVoH32CzF+3zJnGr/zJF/4SOp9hvwi/7ZGxmUDkg0L1sYKkXCP/GwFGE7BgXJV0WtWNfx1Zao=
+	t=1715619379; cv=none; b=hlysFIS6YOKZyEzZkBXUlCRhp5KkNbL4PR0neMfbSnt3cJ8IEtwK4sMKxKBsB+4JmPOI5jSxCJSkucjqPQoZQMnhImpEp73/cwysvLPTc6SPVsxTg1g08WLE50J7qhVh/17Fk4pKpXdbLrtn7otT15Li55w4DYyKxMYg4/a5tE8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715618339; c=relaxed/simple;
-	bh=fhiBDdzgfG8w+pcwYov50xsdrVpjMez9OR8PkWTcBTM=;
+	s=arc-20240116; t=1715619379; c=relaxed/simple;
+	bh=R1yt8VY85saTQsFLGCPH5N9UB7wO5F3GKqnZyj/mioc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LuoaaTXMH+synXiWwM+oPiOq4coGdBvbAsk3sQA/XothX+1Sf2hqde7ez5Sr2/NZLdDLs8kZhE1X0sWMOXYZ13fzSQnye8V/ZAdD25TaOuI9SDQLQ+YHWNQAqGkHOZaFu7AaHZiCnuOxwoXvlIJoWckNFWfosk89oWLxaBpYvGc=
+	 Content-Type:Content-Disposition:In-Reply-To; b=dG6ebOgTG0ObmAZdOgcZyiYED6cWwK9pozKa7Tc02eAypEo2772QxdOuZfYY99bMfkXLTJjK4kAG8Xb6ITG697RCPtwVzr3vonA79fq0EWHeyxqpuV85CeX+R+ZzA+irCxdVorGGMjPguUEXO/jn4pymAKuFOZjkmDNYGFn6g0E=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E331C113CC;
-	Mon, 13 May 2024 16:38:56 +0000 (UTC)
-Date: Mon, 13 May 2024 17:38:53 +0100
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E05AEC113CC;
+	Mon, 13 May 2024 16:56:15 +0000 (UTC)
+Date: Mon, 13 May 2024 17:56:13 +0100
 From: Catalin Marinas <catalin.marinas@arm.com>
 To: Steven Price <steven.price@arm.com>
 Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
@@ -29,10 +29,10 @@ Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
 	Christoffer Dall <christoffer.dall@arm.com>,
 	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
 	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: Re: [PATCH v2 07/14] arm64: Make the PHYS_MASK_SHIFT dynamic
-Message-ID: <ZkJCHcqfXxV1wlB0@arm.com>
+Subject: Re: [PATCH v2 08/14] arm64: Enforce bounce buffers for realm DMA
+Message-ID: <ZkJGLV5FfEPmdoG-@arm.com>
 References: <20240412084213.1733764-1-steven.price@arm.com>
- <20240412084213.1733764-8-steven.price@arm.com>
+ <20240412084213.1733764-9-steven.price@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -41,40 +41,58 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240412084213.1733764-8-steven.price@arm.com>
+In-Reply-To: <20240412084213.1733764-9-steven.price@arm.com>
 
-On Fri, Apr 12, 2024 at 09:42:06AM +0100, Steven Price wrote:
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index e01bb5ca13b7..9944aca348bd 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -398,7 +398,7 @@
->   * bits in PAR are res0.
+On Fri, Apr 12, 2024 at 09:42:07AM +0100, Steven Price wrote:
+> diff --git a/arch/arm64/mm/init.c b/arch/arm64/mm/init.c
+> index 786fd6ce5f17..01a2e3ce6921 100644
+> --- a/arch/arm64/mm/init.c
+> +++ b/arch/arm64/mm/init.c
+> @@ -370,7 +370,9 @@ void __init bootmem_init(void)
 >   */
->  #define PAR_TO_HPFAR(par)		\
-> -	(((par) & GENMASK_ULL(52 - 1, 12)) >> 8)
-> +	(((par) & GENMASK_ULL(MAX_PHYS_MASK_SHIFT - 1, 12)) >> 8)
+>  void __init mem_init(void)
+>  {
+> -	bool swiotlb = max_pfn > PFN_DOWN(arm64_dma_phys_limit);
+> +	bool swiotlb = (max_pfn > PFN_DOWN(arm64_dma_phys_limit));
 
-Why does this need to be changed? It's still a constant not dependent on
-the new dynamic IPA size.
+This series tends to add unnecessary brackets.
 
-> diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
-> index ef207a0d4f0d..90dc292bed5f 100644
-> --- a/arch/arm64/include/asm/pgtable-hwdef.h
-> +++ b/arch/arm64/include/asm/pgtable-hwdef.h
-> @@ -206,8 +206,8 @@
->  /*
->   * Highest possible physical address supported.
->   */
-> -#define PHYS_MASK_SHIFT		(CONFIG_ARM64_PA_BITS)
-> -#define PHYS_MASK		((UL(1) << PHYS_MASK_SHIFT) - 1)
-> +#define MAX_PHYS_MASK_SHIFT	(CONFIG_ARM64_PA_BITS)
-> +#define MAX_PHYS_MASK		((UL(1) << PHYS_MASK_SHIFT) - 1)
+> +
+> +	swiotlb |= is_realm_world();
 
-I prefer to have MAX as suffix in those definitions, it matches other
-places like TASK_SIZE_MAX, PHYS_ADDR_MAX (I know PHYS_MASK_MAX doesn't
-roll off the tongue easily but very few people tend to read the kernel
-aloud ;)).
+I first thought we wouldn't need this, just passing 'true' further down
+but I guess you want to avoid reducing the bounce buffer size when it's
+only needed for kmalloc() bouncing.
+
+>  
+>  	if (IS_ENABLED(CONFIG_DMA_BOUNCE_UNALIGNED_KMALLOC) && !swiotlb) {
+>  		/*
+> @@ -383,7 +385,12 @@ void __init mem_init(void)
+>  		swiotlb = true;
+>  	}
+>  
+> -	swiotlb_init(swiotlb, SWIOTLB_VERBOSE);
+> +	if (is_realm_world()) {
+> +		swiotlb_init(swiotlb, SWIOTLB_VERBOSE | SWIOTLB_FORCE);
+> +		swiotlb_update_mem_attributes();
+> +	} else {
+> +		swiotlb_init(swiotlb, SWIOTLB_VERBOSE);
+> +	}
+
+Just do this higher up and avoid calling is_realm_world() twice:
+
+	unsigned int flags = SWIOTLB_VERBOSE;
+
+	...
+
+	if (is_realm_world()) {
+		swiotlb = true;
+		flags |= SWIOTLB_FORCE;
+	}
+
+	...
+
+	swiotlb_init(swiotlb, flags);
 
 -- 
 Catalin
