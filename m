@@ -1,305 +1,190 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0E815DF3B;
-	Wed, 15 May 2024 15:03:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5A74155749
+	for <kvmarm@lists.linux.dev>; Wed, 15 May 2024 15:40:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715785409; cv=none; b=dIXqDvDdtlvLmdZWSTsWVdqvzR6vLk0Ymsm+ORB3UcXN4lMstj0QDZT26ExsYZWPj44CBOQZuPscf2p7Gnx8hq5rJnRIqo9tF9tBfx0P5trM6I/E6mfhaf1wReEMkLmfxZVw5babl3NXcqSWJnl20brYBL+1lvnkPnQ9NYlSkH0=
+	t=1715787661; cv=none; b=SJjklaFO1n2ZD4KumeoYV2f1jqql5H75Xg9ZLvfI3atfCcFJ/Ijvbedx7HofK04iM90L/fIyK0FVD7zURi+/ggUt/LNPMpZgmuxxPFswCI13RLvw7w5JQTVv97hQ8mP7axfpTm9zAJb9gj8NfccX01mOZM1s+m6zBYUuXpOQFDc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715785409; c=relaxed/simple;
-	bh=bylLm4vBR7uF8DJjgfEFk5Uyg7AOg+1HrxqT9xiN++I=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=HGmg+7n8opSaOZiT9Dhj5qc8wtrNLpWeSh7mYPwBQQq0Yp8r6KQDjxaQEC4IKn0Hu9qsNahfP2AN103P3CwSMtIqwHbq2MpedbV0W0Je3toZdbanCE1eKdjq9bE7fQZbbO0wQUEPLa33PFn4f2Kyjfki+4TEwVwtGXziJZdIqEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9A2311007;
-	Wed, 15 May 2024 08:03:50 -0700 (PDT)
-Received: from [10.57.35.28] (unknown [10.57.35.28])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D06513F7A6;
-	Wed, 15 May 2024 08:03:22 -0700 (PDT)
-Message-ID: <6fef6e77-a173-4c66-bf6c-574c19820dfa@arm.com>
-Date: Wed, 15 May 2024 16:03:25 +0100
+	s=arc-20240116; t=1715787661; c=relaxed/simple;
+	bh=Lf2nT4HegNDNqGDTyxgxTlXmuF0Xo/B3kUCwsMk/AxY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nZUbp6HFvUalpb/ZV+UUeCLQfkvN9mw1+4WmDghGsyNMF7IeSphRxeyamvnWsiGFw/zJi0stzZ6cl8p/MQg6I3YIj2DBh5cM4Q0oCOgdmGGzPe4lIn4f1JjWS2elmcCmFYoV3XEFSpJXjTb9iX8C3NFE2WlHHh3e1lCE1WB4B8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fN/AGTMX; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fN/AGTMX"
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-42012c85e61so285225e9.0
+        for <kvmarm@lists.linux.dev>; Wed, 15 May 2024 08:40:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1715787658; x=1716392458; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vO+JXqkTWjh4IOLAvLgHOUrmin8Jhsgi5Im6h/wkV6k=;
+        b=fN/AGTMXkGI3faVhDsReVo/ey74jDEQgwxqCZOOsTvRpCyyxa1CLaweuW9ln75KxzU
+         0cd16lm0VTzFL0otJx4stc50I09as0FVyazBzXT7iNzpD8w8cKEDvGnxcXNvnOzbgsP4
+         bjUlYJZusX8o36K7VIzgbdavuYQrU8eesOcFZBoXsbJGq1RhT7FfZ+NhQ4/8G7U5faFV
+         ehyGxveISkyDpMcH6iEDAF4pLIrw93UuvuM3e3jVGZ1eAix32V4k+E9em3RTIK/zMPdK
+         0Clk34PTpqG249vbDb2nJSGqC4I6eWW9gapCUPzYiFueknnqD5TKx+fH/aIIRlULE+g4
+         vkTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715787658; x=1716392458;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vO+JXqkTWjh4IOLAvLgHOUrmin8Jhsgi5Im6h/wkV6k=;
+        b=U5xEidH+p3qPRKFTPa1m4D7G3rbiU3i5KMjnRz3DJ4x9yMqbOMtAT9F7V+pfkQ51gT
+         YvQm16cREghLkrBPir4409bqmqN7axP3j4BMB/xLhpVKuBrRPO2UaorJ2MCtNQIGevzp
+         x8PEQl8mzM3z3Q9SCkBnM/5+MUBtWpa9coFjXB/xbo++wS/H6tGmf3MKbH6D2gTpEFSh
+         T7eQCqXJh9wUe02r7b4XhKreSFvgnNgiyIymkOkguluQvs7bx9jTdTx89btkMjblUq1z
+         pHTUlXVm/Yh9P3LK6/QQ9i1qyg9sv/u9jTbw7XZNLF6J+Bn+E4pe9PAVS6VvuOdVxT++
+         PWGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUhoiB9gxXjymykPz3UL5hAEdz+TNIRlzCM9tTa9z0yKuK1jAvC+r/hALA34nAOIAgS/msvVXHToM/JM1HQX381hxZ/cMCI
+X-Gm-Message-State: AOJu0YymvfPrePjjCkjM93HcCiinJPhG71z+JbeAqsQLahDOKyLbTXwT
+	mjmUMZOVgaoLawDSVS0vdd+wqRSreTRZkze1TgGEI34lTwSztsOnuGKpwBSowg==
+X-Google-Smtp-Source: AGHT+IHpV0wJBjkz/uiNnJbApuw4cK0JvcZtxkvSENnR0QDdzmWnFUZlqPQiOoJqXfr/mDKKEF4FGw==
+X-Received: by 2002:a05:600c:5010:b0:41b:4c6a:de6d with SMTP id 5b1f17b1804b1-4200f8b159fmr8618745e9.5.1715787657840;
+        Wed, 15 May 2024 08:40:57 -0700 (PDT)
+Received: from google.com (216.131.76.34.bc.googleusercontent.com. [34.76.131.216])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42014c21260sm125210465e9.3.2024.05.15.08.40.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 May 2024 08:40:57 -0700 (PDT)
+Date: Wed, 15 May 2024 15:40:55 +0000
+From: Sebastian Ene <sebastianene@google.com>
+To: Will Deacon <will@kernel.org>
+Cc: catalin.marinas@arm.com, james.morse@arm.com, jean-philippe@linaro.org,
+	maz@kernel.org, oliver.upton@linux.dev, qperret@google.com,
+	qwandor@google.com, sudeep.holla@arm.com, suzuki.poulose@arm.com,
+	tabba@google.com, yuzenghui@huawei.com, lpieralisi@kernel.org,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, kernel-team@android.com
+Subject: Re: [PATCH 2/4] KVM: arm64: Add support for FFA_PARTITION_INFO_GET
+Message-ID: <ZkTXh_m9F8VA2dds@google.com>
+References: <20240418163025.1193763-2-sebastianene@google.com>
+ <20240418163025.1193763-4-sebastianene@google.com>
+ <20240503150114.GB18656@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Steven Price <steven.price@arm.com>
-Subject: Re: [PATCH v2 02/14] arm64: Detect if in a realm and set RIPAS RAM
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-References: <20240412084213.1733764-1-steven.price@arm.com>
- <20240412084213.1733764-3-steven.price@arm.com> <Zj5a9Kt6r7U9WN5E@arm.com>
-Content-Language: en-GB
-In-Reply-To: <Zj5a9Kt6r7U9WN5E@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240503150114.GB18656@willie-the-truck>
 
-On 10/05/2024 18:35, Catalin Marinas wrote:
-> On Fri, Apr 12, 2024 at 09:42:01AM +0100, Steven Price wrote:
->> diff --git a/arch/arm64/include/asm/rsi.h b/arch/arm64/include/asm/rsi.h
->> new file mode 100644
->> index 000000000000..3b56aac5dc43
->> --- /dev/null
->> +++ b/arch/arm64/include/asm/rsi.h
->> @@ -0,0 +1,46 @@
->> +/* SPDX-License-Identifier: GPL-2.0-only */
->> +/*
->> + * Copyright (C) 2023 ARM Ltd.
+On Fri, May 03, 2024 at 04:01:16PM +0100, Will Deacon wrote:
+> On Thu, Apr 18, 2024 at 04:30:24PM +0000, Sebastian Ene wrote:
+> > Handle the FFA_PARTITION_INFO_GET host call inside the pKVM hypervisor
+> > and copy the response message back to the host buffers. Save the
+> > returned FF-A version as we will need it later to interpret the response
+> > from the TEE.
+> > 
+> > Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> > ---
+> >  arch/arm64/kvm/hyp/nvhe/ffa.c | 46 +++++++++++++++++++++++++++++++++++
+> >  1 file changed, 46 insertions(+)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> > index 023712e8beeb..d53f50c73acb 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> > @@ -674,6 +674,49 @@ static void do_ffa_version(struct arm_smccc_res *res,
+> >  	hyp_spin_unlock(&host_buffers.lock);
+> >  }
+
+Hello Will,
+
+> >  
+> > +static void do_ffa_part_get(struct arm_smccc_res *res,
+> > +			    struct kvm_cpu_context *ctxt)
+> > +{
+> > +	DECLARE_REG(u32, uuid0, ctxt, 1);
+> > +	DECLARE_REG(u32, uuid1, ctxt, 2);
+> > +	DECLARE_REG(u32, uuid2, ctxt, 3);
+> > +	DECLARE_REG(u32, uuid3, ctxt, 4);
+> > +	DECLARE_REG(u32, flags, ctxt, 5);
+> > +	u32 off, count, sz, buf_sz;
+> > +
+> > +	hyp_spin_lock(&host_buffers.lock);
+> > +	if (!host_buffers.rx) {
+> > +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
 > 
-> You may want to update the year ;).
-
-Noted! ;)
-
->> + */
->> +
->> +#ifndef __ASM_RSI_H_
->> +#define __ASM_RSI_H_
->> +
->> +#include <linux/jump_label.h>
->> +#include <asm/rsi_cmds.h>
->> +
->> +extern struct static_key_false rsi_present;
-> 
-> Nitpick: we tend to use DECLARE_STATIC_KEY_FALSE(), it pairs with
-> DEFINE_STATIC_KEY_FALSE().
-
-Makes sense.
-
->> +void arm64_setup_memory(void);
->> +
->> +void __init arm64_rsi_init(void);
->> +static inline bool is_realm_world(void)
->> +{
->> +	return static_branch_unlikely(&rsi_present);
->> +}
->> +
->> +static inline void set_memory_range(phys_addr_t start, phys_addr_t end,
->> +				    enum ripas state)
->> +{
->> +	unsigned long ret;
->> +	phys_addr_t top;
->> +
->> +	while (start != end) {
->> +		ret = rsi_set_addr_range_state(start, end, state, &top);
->> +		BUG_ON(ret);
->> +		BUG_ON(top < start);
->> +		BUG_ON(top > end);
-> 
-> Are these always fatal? BUG_ON() is frowned upon in general. The
-> alternative would be returning an error code from the function and maybe
-> printing a warning here (it seems that some people don't like WARN_ON
-> either but it's better than BUG_ON; could use a pr_err() instead). Also
-> if something's wrong with the RSI interface to mess up the return
-> values, it will be hard to debug just from those BUG_ON().
-> 
-> If there's no chance of continuing beyond the point, add a comment on
-> why we have a BUG_ON().
-
-I think you're right, these shouldn't be (immediately) fatal - if this
-is a change happening at runtime it might be possible to handle it.
-However, at boot time it makes no sense to try to continue (which is
-what I was originally looking at when this was written) as the
-environment isn't what the guest is expecting, and continuing will
-either lead to a later crash, attestation failure, or potential exploit
-if the guest can be somehow be tricked to use the shared mapping rather
-than the protected one.
-
-I'll update the set_memory_range...() functions to return an error code
-and push the boot BUG_ON up the chain (with a comment). But this is
-still in the "should never happen" situation so I'll leave a WARN_ON here.
-
->> diff --git a/arch/arm64/kernel/rsi.c b/arch/arm64/kernel/rsi.c
->> new file mode 100644
->> index 000000000000..1076649ac082
->> --- /dev/null
->> +++ b/arch/arm64/kernel/rsi.c
->> @@ -0,0 +1,58 @@
->> +// SPDX-License-Identifier: GPL-2.0-only
->> +/*
->> + * Copyright (C) 2023 ARM Ltd.
->> + */
->> +
->> +#include <linux/jump_label.h>
->> +#include <linux/memblock.h>
->> +#include <asm/rsi.h>
->> +
->> +DEFINE_STATIC_KEY_FALSE_RO(rsi_present);
->> +EXPORT_SYMBOL(rsi_present);
-> 
-> Does this need to be made available to loadable modules?
-
-It's used by drivers/virt/coco/arm-cca-guest/arm-cca-guest.c (through
-is_realm_world()) which can be built as a module - see patch 14.
-
->> +
->> +static bool rsi_version_matches(void)
->> +{
->> +	unsigned long ver;
->> +	unsigned long ret = rsi_get_version(RSI_ABI_VERSION, &ver, NULL);
-> 
-> I wonder whether rsi_get_version() is the right name (I know it was
-> introduced in the previous patch but the usage is here, hence my
-> comment). From the RMM spec, this looks more like an
-> rsi_request_version() to me.
-> 
-> TBH, the RMM spec around versioning doesn't fully make sense to me ;). I
-> assume people working on it had some good reasons around the lower
-> revision reporting in case of an error.
-
-There's been a fair bit of discussion around versioning. Currently the
-RMM implementation is very much a "get version" function. The issue was
-what happens if in the future there is an incompatible RMM spec (i.e.
-v2.0). The intention is that old OSes will provide the older version
-number and give the RMM the opportunity to 'emulate' it. Equally where
-the OS supports multiple versions then there's a need to negotiate a
-commonly accepted version.
-
-In terms of naming - mostly I've tried to just follow the spec, but the
-naming in the spec isn't great. Calling the function rsi_version() would
-be confusing so a verb is needed, but I'm not hung up on the verb. I'll
-change it to rsi_request_version().
-
->> +
->> +	if (ret == SMCCC_RET_NOT_SUPPORTED)
->> +		return false;
->> +
->> +	if (ver != RSI_ABI_VERSION) {
->> +		pr_err("RME: RSI version %lu.%lu not supported\n",
->> +		       RSI_ABI_VERSION_GET_MAJOR(ver),
->> +		       RSI_ABI_VERSION_GET_MINOR(ver));
->> +		return false;
->> +	}
-> 
-> The above check matches what the spec says but wouldn't it be clearer to
-> just check for ret == RSI_SUCCESS? It saves one having to read the spec
-> to figure out what lower revision actually means in the spec (not the
-> actual lowest supported but the highest while still lower than the
-> requested one _or_ equal to the higher revision if the lower is higher
-> than the requested one - if any of this makes sense to people ;), I'm
-> sure I missed some other combinations).
-
-Indeed - I got similar feedback on the RMI side. The spec evolved and I
-forgot to update it. It should be sufficient (for now) to just look for
-RSI_SUCCESS. Only when we start supporting multiple versions (on the
-Linux side) do we need to look at the returned version numbers.
-
->> +
->> +	pr_info("RME: Using RSI version %lu.%lu\n",
->> +		RSI_ABI_VERSION_GET_MAJOR(ver),
->> +		RSI_ABI_VERSION_GET_MINOR(ver));
->> +
->> +	return true;
->> +}
->> +
->> +void arm64_setup_memory(void)
-> 
-> I would give this function a better name, something to resemble the RSI
-> setup. Similarly for others like set_memory_range_protected/shared().
-> Some of the functions have 'rsi' in the name like arm64_rsi_init() but
-> others don't and at a first look they'd seem like some generic memory
-> setup on arm64, not RSI-specific.
-
-Ack.
-
->> +{
->> +	u64 i;
->> +	phys_addr_t start, end;
->> +
->> +	if (!static_branch_unlikely(&rsi_present))
->> +		return;
-> 
-> We have an accessor for rsi_present - is_realm_world(). Why not use
-> that?
-
-Will change.
-
->> +
->> +	/*
->> +	 * Iterate over the available memory ranges
->> +	 * and convert the state to protected memory.
->> +	 */
->> +	for_each_mem_range(i, &start, &end) {
->> +		set_memory_range_protected(start, end);
->> +	}
->> +}
->> +
->> +void __init arm64_rsi_init(void)
->> +{
->> +	if (!rsi_version_matches())
->> +		return;
->> +
->> +	static_branch_enable(&rsi_present);
->> +}
->> diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
->> index 65a052bf741f..a4bd97e74704 100644
->> --- a/arch/arm64/kernel/setup.c
->> +++ b/arch/arm64/kernel/setup.c
->> @@ -43,6 +43,7 @@
->>  #include <asm/cpu_ops.h>
->>  #include <asm/kasan.h>
->>  #include <asm/numa.h>
->> +#include <asm/rsi.h>
->>  #include <asm/scs.h>
->>  #include <asm/sections.h>
->>  #include <asm/setup.h>
->> @@ -293,6 +294,8 @@ void __init __no_sanitize_address setup_arch(char **cmdline_p)
->>  	 * cpufeature code and early parameters.
->>  	 */
->>  	jump_label_init();
->> +	/* Init RSI after jump_labels are active */
->> +	arm64_rsi_init();
->>  	parse_early_param();
-> 
-> Does it need to be this early? It's fine for now but I wonder whether we
-> may have some early parameter at some point that could influence what we
-> do in the arm64_rsi_init(). I'd move it after or maybe even as part of
-> the arm64_setup_memory(), though I haven't read the following patches if
-> they update this function.
-
-As Suzuki said - it's needed for "earlycon" to work - I'll put a comment
-in explaining.
-
->>  
->>  	dynamic_scs_init();
->> diff --git a/arch/arm64/mm/init.c b/arch/arm64/mm/init.c
->> index 03efd86dce0a..786fd6ce5f17 100644
->> --- a/arch/arm64/mm/init.c
->> +++ b/arch/arm64/mm/init.c
->> @@ -40,6 +40,7 @@
->>  #include <asm/kvm_host.h>
->>  #include <asm/memory.h>
->>  #include <asm/numa.h>
->> +#include <asm/rsi.h>
->>  #include <asm/sections.h>
->>  #include <asm/setup.h>
->>  #include <linux/sizes.h>
->> @@ -313,6 +314,7 @@ void __init arm64_memblock_init(void)
->>  	early_init_fdt_scan_reserved_mem();
->>  
->>  	high_memory = __va(memblock_end_of_DRAM() - 1) + 1;
->> +	arm64_setup_memory();
->>  }
-> 
-> This feels like a random placement. This function is about memblock
-> initialisation. You might as well put it in paging_init(), it could make
-> more sense there. But I'd rather keep it in setup_arch() immediately
-> after arm64_memblock_init().
+> This should be FFA_RET_BUSY per the spec.
 > 
 
-Will move.
+Good catch, thank you ! I am fixing this.
 
-Thanks,
+> > +		goto out_unlock;
+> > +	}
+> > +
+> > +	arm_smccc_1_1_smc(FFA_PARTITION_INFO_GET, uuid0, uuid1,
+> > +			  uuid2, uuid3, flags, 0, 0,
+> > +			  res);
+> > +
+> > +	if (res->a0 != FFA_SUCCESS)
+> > +		goto out_unlock;
+> > +
+> > +	count = res->a2;
+> > +	if (!count)
+> > +		goto out_unlock;
+> > +
+> > +	if (host_buffers.ffa_version > FFA_VERSION_1_0) {
+> 
+> The spec says that the size field is populated based on the flags
+> parameter. Why aren't you checking that instead of the version number?
+>
 
-Steve
+Right but the flags were introduced in the latest version (they were not
+in 1.0). In 1.0 the content of w5 is reserved and this is why I need the
+version check.
+
+> > +		buf_sz = sz = res->a3;
+> > +		if (sz > sizeof(struct ffa_partition_info))
+> > +			buf_sz = sizeof(struct ffa_partition_info);
+> 
+> I don't think this is right, as if the payload really is bigger than
+> 'struct ffa_partition_info' we'll truncate the data (and you don't
+> adjust res->a3 afaict).
+> 
+> Can't we just copy the whole thing back to the host? We're not
+> interpreting the thing, so we can just treat it like a stream of bytes.
+>
+
+Let me rewrite this. You are right, we should treat it like a stream of
+bytes.
+
+> > +	} else {
+> > +		/* FFA_VERSION_1_0 lacks the size in the response */
+> > +		buf_sz = sz = 8;
+> 
+> Can you define that as a constant in arm_ffa.h, please? It's the size of
+> a 1.0 partition info structure.
+> 
+
+Yup, I am adding this.
+
+> > +	}
+> > +
+> > +	WARN_ON((count - 1) * sz + buf_sz > PAGE_SIZE);
+> 
+> We should bounds-check against 'KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE' and
+> return an error (FFA_RET_ABORTED) if the size is over that.
+> 
+
+Thanks, this should work I will do this.
+
+> > +	for (off = 0; off < count * sz; off += sz)
+> > +
+> > +		memcpy(host_buffers.rx + off, hyp_buffers.rx + off, buf_sz);
+> 
+> I think this is wrong if bit 0 of 'flags' is set to 1. In that case, I
+> think you just get back the number of partitions and that's it, so we
+> shouldn't be going near the mailboxes.
+> 
+
+I removed this, thanks for the review !
+
+> Will
