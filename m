@@ -1,20 +1,20 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE9AE1802B6;
-	Tue, 14 May 2024 18:00:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98E7E2AF0E;
+	Wed, 15 May 2024 09:01:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715709618; cv=none; b=J8iVnm0a3BzL6f9dxMR4wbjQWrJ+mcWvTDNk4q1C2TsvUJciJo6Jx+yNrDPJfAJiQ38uEcGGP0L3AeIDRe9uuHqD3h0PutFPvRQLy+fL9h8+26EVbXwF1LGpWYwDDkDlTArmjYDagnbey0H4RaMdsZNjsRCD+W+FFYdZGQycNug=
+	t=1715763685; cv=none; b=byp15qARUjrw1GdOs9gnM1VVnJQCe4hZjvjeBXSIhn9PwCChJahuqC9wPBeJV7MVJ0GTIeCHQSc5JK6vDXM5jXVGpRnvu+dW/YQvzftnFrcUmx7PwSQ8OzEKfcw0i7Dffbs9XzC8ThYmpryQEWSBHxybzag/dQyTrR0D2d0m7f0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715709618; c=relaxed/simple;
-	bh=PGg21Fv5zTdyXu46lFNWZlRUE2G+nr6G9MZPkue/+SI=;
+	s=arc-20240116; t=1715763685; c=relaxed/simple;
+	bh=VYvg12eai6+57lr4OCKIvPizXBy8aVBEYV3yUW48rY8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dwtc+Gt8OC24W5S6RwYCMqKinTQ0lsQmxI2DS89bsyVI80GZy8fVw9nd5kqL/OYu4OTMDkfbc0COvKpfq98QSUrMzCR5S0sL/nQ+Omn9lwi5qnN3P295EOjJkhKSPr0taYZILNi2EFJXQadlKttWcKt9j8HCeSWBwW5gYzkCdsE=
+	 Content-Type:Content-Disposition:In-Reply-To; b=pKWObDykzL13/nVJpq+RaTYU0IC+hz6cLsm6d1zOkE5+8BhgmJYHhFSCTzIFLFYjoqR6wsYRkfFa0KnitBtFC6k3UbDMZbQS2eIkUG/Sp3Ijpm3uwzWIt/pANecKVGOXpn92pGnavT0Am8aDT+w/KZ0G5qJuduNkJXXyZnP+Two=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 235D4C2BD10;
-	Tue, 14 May 2024 18:00:14 +0000 (UTC)
-Date: Tue, 14 May 2024 19:00:12 +0100
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26F46C32781;
+	Wed, 15 May 2024 09:01:21 +0000 (UTC)
+Date: Wed, 15 May 2024 10:01:19 +0100
 From: Catalin Marinas <catalin.marinas@arm.com>
 To: Steven Price <steven.price@arm.com>
 Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
@@ -29,10 +29,11 @@ Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
 	Christoffer Dall <christoffer.dall@arm.com>,
 	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
 	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: Re: [PATCH v2 09/14] arm64: Enable memory encrypt for Realms
-Message-ID: <ZkOmrMIMFCgEKuVw@arm.com>
+Subject: Re: [PATCH v2 10/14] arm64: Force device mappings to be non-secure
+ shared
+Message-ID: <ZkR535Hmh3WkMYai@arm.com>
 References: <20240412084213.1733764-1-steven.price@arm.com>
- <20240412084213.1733764-10-steven.price@arm.com>
+ <20240412084213.1733764-11-steven.price@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -41,84 +42,42 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240412084213.1733764-10-steven.price@arm.com>
+In-Reply-To: <20240412084213.1733764-11-steven.price@arm.com>
 
-On Fri, Apr 12, 2024 at 09:42:08AM +0100, Steven Price wrote:
->  static int change_page_range(pte_t *ptep, unsigned long addr, void *data)
-> @@ -41,6 +45,7 @@ static int change_page_range(pte_t *ptep, unsigned long addr, void *data)
->  	pte = clear_pte_bit(pte, cdata->clear_mask);
->  	pte = set_pte_bit(pte, cdata->set_mask);
->  
-> +	/* TODO: Break before make for PROT_NS_SHARED updates */
->  	__set_pte(ptep, pte);
->  	return 0;
+On Fri, Apr 12, 2024 at 09:42:09AM +0100, Steven Price wrote:
+> From: Suzuki K Poulose <suzuki.poulose@arm.com>
+> 
+> Device mappings (currently) need to be emulated by the VMM so must be
+> mapped shared with the host.
 
-Oh, this TODO is problematic, not sure we can do it safely. There are
-some patches on the list to trap faults from other CPUs if they happen
-to access the page when broken but so far we pushed back as complex and
-at risk of getting the logic wrong.
+You say "currently". What's the plan when the device is not emulated?
+How would the guest distinguish what's emulated and what's not to avoid
+setting the PROT_NS_SHARED bit?
 
-From an architecture perspective, you are changing the output address
-and D8.16.1 requires a break-before-make sequence (FEAT_BBM doesn't
-help). So we either come up with a way to do BMM safely (stop_machine()
-maybe if it's not too expensive or some way to guarantee no accesses to
-this page while being changed) or we get the architecture clarified on
-the possible side-effects here ("unpredictable" doesn't help).
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+>  arch/arm64/include/asm/pgtable.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
+> index f5376bd567a1..db71c564ec21 100644
+> --- a/arch/arm64/include/asm/pgtable.h
+> +++ b/arch/arm64/include/asm/pgtable.h
+> @@ -598,7 +598,7 @@ static inline void set_pud_at(struct mm_struct *mm, unsigned long addr,
+>  #define pgprot_writecombine(prot) \
+>  	__pgprot_modify(prot, PTE_ATTRINDX_MASK, PTE_ATTRINDX(MT_NORMAL_NC) | PTE_PXN | PTE_UXN)
+>  #define pgprot_device(prot) \
+> -	__pgprot_modify(prot, PTE_ATTRINDX_MASK, PTE_ATTRINDX(MT_DEVICE_nGnRE) | PTE_PXN | PTE_UXN)
+> +	__pgprot_modify(prot, PTE_ATTRINDX_MASK, PTE_ATTRINDX(MT_DEVICE_nGnRE) | PTE_PXN | PTE_UXN | PROT_NS_SHARED)
 
->  }
-> @@ -192,6 +197,43 @@ int set_direct_map_default_noflush(struct page *page)
->  				   PAGE_SIZE, change_page_range, &data);
->  }
->  
-> +static int __set_memory_encrypted(unsigned long addr,
-> +				  int numpages,
-> +				  bool encrypt)
-> +{
-> +	unsigned long set_prot = 0, clear_prot = 0;
-> +	phys_addr_t start, end;
-> +
-> +	if (!is_realm_world())
-> +		return 0;
-> +
-> +	WARN_ON(!__is_lm_address(addr));
+This pgprot_device() is not the only one used to map device resources.
+pgprot_writecombine() is another commonly macro. It feels like a hack to
+plug one but not the other and without any way for the guest to figure
+out what's emulated.
 
-Just return from this function if it's not a linear map address. No
-point in corrupting other areas since __virt_to_phys() will get it
-wrong.
-
-> +	start = __virt_to_phys(addr);
-> +	end = start + numpages * PAGE_SIZE;
-> +
-> +	if (encrypt) {
-> +		clear_prot = PROT_NS_SHARED;
-> +		set_memory_range_protected(start, end);
-> +	} else {
-> +		set_prot = PROT_NS_SHARED;
-> +		set_memory_range_shared(start, end);
-> +	}
-> +
-> +	return __change_memory_common(addr, PAGE_SIZE * numpages,
-> +				      __pgprot(set_prot),
-> +				      __pgprot(clear_prot));
-> +}
-
-Can someone summarise what the point of this protection bit is? The IPA
-memory is marked as protected/unprotected already via the RSI call and
-presumably the RMM disables/permits sharing with a non-secure hypervisor
-accordingly irrespective of which alias the realm guest has the linear
-mapping mapped to. What does it do with the top bit of the IPA? Is it
-that the RMM will prevent (via Stage 2) access if the IPA does not match
-the requested protection? IOW, it unmaps one or the other at Stage 2?
-
-Also, the linear map is not the only one that points to this IPA. What
-if this is a buffer mapped in user-space or remapped as non-cacheable
-(upgraded to cacheable via FWB) in the kernel, the code above does not
-(and cannot) change the user mappings.
-
-It needs some digging into dma_direct_alloc() as well, it uses a
-pgprot_decrypted() but that's not implemented by your patches. Not sure
-it helps, it looks like the remap path in this function does not have a
-dma_set_decrypted() call (or maybe I missed it).
+Can the DT actually place those emulated ranges in the higher IPA space
+so that we avoid randomly adding this attribute for devices?
 
 -- 
 Catalin
