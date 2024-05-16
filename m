@@ -1,130 +1,89 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5B79156F5A
-	for <kvmarm@lists.linux.dev>; Wed, 15 May 2024 17:23:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2D1A2EB10;
+	Thu, 16 May 2024 07:48:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715793800; cv=none; b=gozRywQHRr3KCPF77cW2m39BR81SjeEs8bJgHs4cI4l8Cv2tB876fEqLrZquVHDJE8dcwserJjHRCyXNkR9NG/davvNK0p+B1P5k8um2i8z2CboRB8C2KRDaFIi50teTBIgWPJ6chOtDMhAFX4StHu+XutLgJBKJzxiNeK+JUic=
+	t=1715845720; cv=none; b=IM7gPUOG4xioYPH6hmu+naZD3FbvD6sRoqtxb15/D1edwPOA8bClFv/MoR3Nugoe04gFo5fRg4QnbGSWvhoDocqeYyNnD5sGbGG91mxUamv1saf9xZM/KjXwiy585pebNtleQZ+mtbhQFMTmUDUxze/X1bwKfOfk+8YQhpd0ipg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715793800; c=relaxed/simple;
-	bh=Mmpk3cTXYb9Cytx2OXyWdNPcR2iwoJfjJ8SD4AaSDlM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=fq4HwSpYwBDzzyMI+4UXnOV8b+v8wd5nuBflix6cA7tJqE8hN/UMr3Z+Ev8OCeQMx9UE7gC5h/S4HjY/6YqbhQJP23VvVcmyOYTSsvbVkBVUNQAGQJrE9/w/7ltnlYztvUcWuTvU00ooPOyC2IQw0sO37w2mBDfinzVLi2pPveQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rRhsr6bm; arc=none smtp.client-ip=209.85.128.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rRhsr6bm"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-41dc9c831acso38466725e9.0
-        for <kvmarm@lists.linux.dev>; Wed, 15 May 2024 10:23:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715793797; x=1716398597; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9HVNMjO2akSMcTTiBfbdxnnFw0wMMSm8FW4gVmT1QRI=;
-        b=rRhsr6bmaumQKEC/0OdC71bNANnNmkf2gy+LOIU4CjFp1TQpkbY7r6JpbF74fVgRBO
-         q46+paISQKaV+p/+/cpwjfKVWRBRTw53yQVwq88rJpP8Wt+/juTICZfupYGY/xAStbzO
-         LojAmG7asblAIOalmapUiOo/45FrznytqcMpIND81Rt0BxnRdkpOTHMtsrMP11Y4R0we
-         Q/CFNylURa2JmAVMw4dBavltVH9iulatNqKMVuUDMszxXC3+uhpbloHOTHwemXvwIEBg
-         6ykF8nZaC9WDiFIlMmvyQO8QPQKnZ39V37wteEVgZp9e58DgNYVO101tIj0aROyK0kMc
-         ya8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715793797; x=1716398597;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9HVNMjO2akSMcTTiBfbdxnnFw0wMMSm8FW4gVmT1QRI=;
-        b=J7WcHalBgNK0dnClO579A9aEcsV+lMdXigenTvpOn2g0nhmlHy5BX/LQDQC4CF1dul
-         0FR+9qttsaw+KpujEPIB8jzrztW7+xIu7zOzslVB7LUuMUTe0THvc8+78l7PoUXq5gIB
-         4LRYzmY2+ZObowtb4B97Fo6o8w+1Mpix9309+WxcNU8nkMi24S5O2yAf6KFsCGFEgaiO
-         pu+VkAkYDuzoQQ6iKKGR1WXQ0k4uGJkWcHqqhtkURX8XdcZzfvL1ZYWPk363q3cfl+fc
-         oBmiiL7hWhxWZ+zFt+W2vJDngq2FXFBsF9FP7fJkYocYdN9JxgBjw7DHWFfGbdVw6RO5
-         IedA==
-X-Gm-Message-State: AOJu0Yw5rvHEPZyGbgXKmX8yawrZyDHqELmFpcDP7h0IbnKQgwol4B8G
-	AR1hWfN8i6mvBDOvblTUq71m8UABlwoJMNglwmZOPwcN+K19nagvLyzG9o23BuSIyxu/2Z13/y0
-	XxsaM1wsQIJTFWfxjmJs/rNInPA==
-X-Google-Smtp-Source: AGHT+IF2+ZdhABrnKPyUROWJCaWhOUajRbqGLHWL21MZQxT/ip0TW6XIGdVRzaMZh4Ur0gPZC6lIS0u4//WU4M/kut0=
-X-Received: from sebkvm.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:cd5])
- (user=sebastianene job=sendgmr) by 2002:a05:600c:511d:b0:41e:8c00:94a4 with
- SMTP id 5b1f17b1804b1-41fead6accamr2395155e9.3.1715793797270; Wed, 15 May
- 2024 10:23:17 -0700 (PDT)
-Date: Wed, 15 May 2024 17:22:58 +0000
-In-Reply-To: <20240515172258.1680881-1-sebastianene@google.com>
+	s=arc-20240116; t=1715845720; c=relaxed/simple;
+	bh=T4oOZ1LmeWclvKPglpSa/G3iKDDHJ/ls07wv3wVQ2EA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fCfYru8rA1osYyQngV4iyQF1QlOqFJsEl6P1hNu9PIi7Qa3T8qquMgVSewkPU0BgC+FojIdcsYAbrUy2nfhf1DpWWNxupGSTcOZljQx+OWxhdpUfOVKsLuxk8HY9y/voSZDvmYaGGTmCJvV/mJn7LbGRuHWa4TZPSxvrOSJA5I4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F562C113CC;
+	Thu, 16 May 2024 07:48:36 +0000 (UTC)
+Date: Thu, 16 May 2024 08:48:34 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
+	Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: Re: [PATCH v2 09/14] arm64: Enable memory encrypt for Realms
+Message-ID: <ZkW6UgrwJT6G9UN-@arm.com>
+References: <20240412084213.1733764-1-steven.price@arm.com>
+ <20240412084213.1733764-10-steven.price@arm.com>
+ <ZkOmrMIMFCgEKuVw@arm.com>
+ <5b2db977-7f0f-4c3a-b278-f195c7ddbd80@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20240515172258.1680881-1-sebastianene@google.com>
-X-Mailer: git-send-email 2.45.0.rc1.225.g2a3ae87e7f-goog
-Message-ID: <20240515172258.1680881-5-sebastianene@google.com>
-Subject: [PATCH v2 4/4] KVM: arm64: Use FF-A 1.1 with pKVM
-From: Sebastian Ene <sebastianene@google.com>
-To: catalin.marinas@arm.com, james.morse@arm.com, jean-philippe@linaro.org, 
-	maz@kernel.org, oliver.upton@linux.dev, qperret@google.com, 
-	qwandor@google.com, sudeep.holla@arm.com, suzuki.poulose@arm.com, 
-	tabba@google.com, will@kernel.org, yuzenghui@huawei.com, 
-	lpieralisi@kernel.org
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kernel-team@android.com, 
-	Sebastian Ene <sebastianene@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5b2db977-7f0f-4c3a-b278-f195c7ddbd80@arm.com>
 
-Now that the layout of the structures is compatible with 1.1 it is time
-to probe the 1.1 version of the FF-A protocol inside the hypervisor. If
-the TEE doesn't support it, it should return the minimum supported
-version.
+On Wed, May 15, 2024 at 11:47:02AM +0100, Suzuki K Poulose wrote:
+> On 14/05/2024 19:00, Catalin Marinas wrote:
+> > On Fri, Apr 12, 2024 at 09:42:08AM +0100, Steven Price wrote:
+> > Can someone summarise what the point of this protection bit is? The IPA
+> > memory is marked as protected/unprotected already via the RSI call and
+> > presumably the RMM disables/permits sharing with a non-secure hypervisor
+> > accordingly irrespective of which alias the realm guest has the linear
+> > mapping mapped to. What does it do with the top bit of the IPA? Is it
+> > that the RMM will prevent (via Stage 2) access if the IPA does not match
+> > the requested protection? IOW, it unmaps one or the other at Stage 2?
+> 
+> The Realm's IPA space is split in half. The lower half is "protected"
+> and all pages backing the "protected" IPA is in the Realm world and
+> thus cannot be shared with the hypervisor. The upper half IPA is
+> "unprotected" (backed by Non-secure PAS pages) and can be accessed
+> by the Host/hyp.
 
-Signed-off-by: Sebastian Ene <sebastianene@google.com>
----
- arch/arm64/kvm/hyp/nvhe/ffa.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+What about emulated device I/O where there's no backing RAM at an IPA.
+Does it need to have the top bit set?
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-index f9664c4a348e..bdd70eb4114e 100644
---- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-+++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-@@ -458,7 +458,7 @@ static __always_inline void do_ffa_mem_xfer(const u64 func_id,
- 	memcpy(buf, host_buffers.tx, fraglen);
- 
- 	ep_mem_access = (void *)buf +
--			ffa_mem_desc_offset(buf, 0, FFA_VERSION_1_0);
-+			ffa_mem_desc_offset(buf, 0, hyp_ffa_version);
- 	offset = ep_mem_access->composite_off;
- 	if (!offset || buf->ep_count != 1 || buf->sender_id != HOST_FFA_ID) {
- 		ret = FFA_RET_INVALID_PARAMETERS;
-@@ -537,7 +537,7 @@ static void do_ffa_mem_reclaim(struct arm_smccc_res *res,
- 	fraglen = res->a2;
- 
- 	ep_mem_access = (void *)buf +
--			ffa_mem_desc_offset(buf, 0, FFA_VERSION_1_0);
-+			ffa_mem_desc_offset(buf, 0, hyp_ffa_version);
- 	offset = ep_mem_access->composite_off;
- 	/*
- 	 * We can trust the SPMD to get this right, but let's at least
-@@ -846,7 +846,7 @@ int hyp_ffa_init(void *pages)
- 	if (kvm_host_psci_config.smccc_version < ARM_SMCCC_VERSION_1_2)
- 		return 0;
- 
--	arm_smccc_1_1_smc(FFA_VERSION, FFA_VERSION_1_0, 0, 0, 0, 0, 0, 0, &res);
-+	arm_smccc_1_1_smc(FFA_VERSION, FFA_VERSION_1_1, 0, 0, 0, 0, 0, 0, &res);
- 	if (res.a0 == FFA_RET_NOT_SUPPORTED)
- 		return 0;
- 
-@@ -866,7 +866,11 @@ int hyp_ffa_init(void *pages)
- 	if (FFA_MAJOR_VERSION(res.a0) != 1)
- 		return -EOPNOTSUPP;
- 
--	hyp_ffa_version = FFA_VERSION_1_0;
-+	if (FFA_MINOR_VERSION(res.a0) < FFA_MINOR_VERSION(FFA_VERSION_1_1))
-+		hyp_ffa_version = res.a0;
-+	else
-+		hyp_ffa_version = FFA_VERSION_1_1;
-+
- 	tx = pages;
- 	pages += KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE;
- 	rx = pages;
+> The RSI call (RSI_IPA_STATE_SET) doesn't make an IPA unprotected. It
+> simply "invalidates" a (protected) IPA to "EMPTY" implying the Realm doesn't
+> intend to use the "ipa" as RAM anymore and any access to it from
+> the Realm would trigger an SEA into the Realm. The RSI call triggers an exit
+> to the host with the information and is a hint to the hypervisor to reclaim
+> the page backing the IPA.
+> 
+> Now, given we need dynamic "sharing" of pages (instead of a dedicated
+> set of shared pages), "aliasing" of an IPA gives us shared pages.
+> i.e., If OS wants to share a page "x" (protected IPA) with the host,
+> we mark that as EMPTY via RSI call and then access the "x" with top-bit
+> set (aliasing the IPA x). This fault allows the hyp to map the page backing
+> IPA "x" as "unprotected" at ALIAS(x) address.
+
+Does the RMM sanity-checks that the NS hyp mappings are protected or
+unprotected depending on the IPA range?
+
+I assume that's also the case if the NS hyp is the first one to access a
+page before the realm (e.g. inbound virtio transfer; no page allocated
+yet because of a realm access).
+
 -- 
-2.45.0.rc1.225.g2a3ae87e7f-goog
-
+Catalin
