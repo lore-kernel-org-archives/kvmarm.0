@@ -1,118 +1,127 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6C832E40D;
-	Fri, 17 May 2024 09:34:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C168550A6D
+	for <kvmarm@lists.linux.dev>; Fri, 17 May 2024 13:18:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715938446; cv=none; b=tYN99cBesEZ27cDs0XFxVXO65PdPV4UzCo1SbW9G5F6faUsz6UqcUVcO8vOSik3eg9MQBwaVD2rqoMRHOyt4w/NdxPSwb8w00v9hCh46Pjy4aDFzAjS2EErJItvXE1fuVOnf+ZHmtyAiN3mHHZsBtXdSB8WNRSj+eG7SssXutyM=
+	t=1715951899; cv=none; b=fbVNqhtgbQGj2FaSssdzDDonOlL3XWeBx+1c92mUysT0z3suvdBQ2/Xj7qjqx+MvhFrtxf4EJpSjgVqoIUiGIpWgkTf3FjU5IZk9roYq28wTHz3Acgba938tMQD9VBQ7UYdLAwFTkCiRxUdbcGy9npxvtri9DK3UEa2J0zGIVTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715938446; c=relaxed/simple;
-	bh=RJVwbXiVXMNHdFgcxkWovVgZblbHMFIR4uz+RoxIR4w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Kd7ZvDXuaacgXiAM3TlwkI3DV2t02TtpvrN5uWirU21ln41KOgjLIdxfOswXZYA+SiUoEdjxTNlEwCS2bQ9EqzoKw0QtO0k1wgKD9iXfNIi8f9u3jdH44WTwp30P5xdWa2bzv9z07eUfPsUx3den3szWVdOrw4yJS0mLMgfbZWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2945C32786;
-	Fri, 17 May 2024 09:34:02 +0000 (UTC)
-Date: Fri, 17 May 2024 10:34:00 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
-	Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: Re: [PATCH v2 10/14] arm64: Force device mappings to be non-secure
- shared
-Message-ID: <ZkckiCiv1kzM0oCK@arm.com>
-References: <20240412084213.1733764-1-steven.price@arm.com>
- <20240412084213.1733764-11-steven.price@arm.com>
- <ZkR535Hmh3WkMYai@arm.com>
- <4e89f047-ae70-43a8-a459-e375ca05b2c2@arm.com>
+	s=arc-20240116; t=1715951899; c=relaxed/simple;
+	bh=gaLZllqPivKc/AOiKu1jj7N/j0Ex573Jp5GbGT8E3Z0=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ui7GH4GilrXln/6Hwz/cLTJzaWnfcfg/BIsXNJ4QWRNZ15a4A7xxrSMm9/emecjwv2rTgSqjzkBhO8BKR9SnGz1p904j4rpX5TBE2xsRSlJXjfm7ji8IwzBYE0GeXva3Z5StP1nPs+LQEJHzG5rA63DDb55+NVKqGBzaXc50tEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GU8ntl/U; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GU8ntl/U"
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc647f65573so20122458276.2
+        for <kvmarm@lists.linux.dev>; Fri, 17 May 2024 06:18:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1715951897; x=1716556697; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=hl+KMyEDlURK49WZiyYeI4jwx1i7R7dEFUI5TRFvOZQ=;
+        b=GU8ntl/U4c9U/TGlrNpLzuV5TZOKvdtduOUHuo4HAYJe+IED12VVeNkwPEkyBPndBY
+         4nRnUTqEZRfI6X/JZLFPWoidlSyMZTM+VkSZUZSYtpCm8vfE0V0SMcSuMS9K/AoZMFPC
+         Oa0HL2l4WAlVtgEnfiNCI0dDHh2XA+3ErVzmZY8VQt9Nvzr5eyrtA/lXDKTn5oX7+hde
+         EG+iQSl0x/SSBhzw83ARHQVKNChLf7UR/YTT4IDxXlNxLB/kb4oJiibUtIIBk+TMPZSJ
+         Uxtbr2oDmtnTqenqd1Dygu1z0XmDIuXmfhpdUZ+21MGABC+cAHdq0Ed6S6PCA/SVX/Qu
+         B8Gg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715951897; x=1716556697;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=hl+KMyEDlURK49WZiyYeI4jwx1i7R7dEFUI5TRFvOZQ=;
+        b=bqk3TDTnke40sxIW+6eDXqAeKRD4cznn7OnPqus0ElunyZDzuF5g2pdld5n26E2S1K
+         n0WdZfqxEVql8BkLegCFU2zNc7lZnJbLqd7NGSJyk07pMRUKIKzEmtoJtFRWVgUNs0uv
+         f5x0ZJcQ2WCn59vHYiicKbQjNxO6FHK2uA1zEvTIDQtU/et0gxwrl+4+Lxe62QBtFump
+         l9lTwxOGRLKf2ZRuj8FaYprQnGQg1IoJQo764yWhhLKt+7KYgErgfj7X5SEmM1gni1Xd
+         hFJSRBxjCtvnCithheFgazxdQvVqhOGWILuYFsFqm9ngZ0VFDxibfp1W4FFBmW0i86dl
+         J+EA==
+X-Gm-Message-State: AOJu0YyjWVfVrgCwmqA8bdI8Z80nkP35JUxBN+7IT37pYJIJLHipOmVk
+	7tbwSUJgQhnPUUNumsiZe+tP+RF2jwj0YgZjpbtWBcneUv6Xc0VnQYQHi49Ll1tE8qLxOZk2BH+
+	3+Of3xeCngMibXa0yx6/t6Yx5wIrYCIz3hbfSy29WG/XmAXIQgiXlZx5cXdpQUPBhjf6ksh3uqF
+	bqHqspDeEr8v5XpUAcZ4YjA02xNDk=
+X-Google-Smtp-Source: AGHT+IH7UGXrVoY3CtAUX+9LQLBSIuLVl6OXjVWzHmtN6O/3XSCGVNKz67xzQbOzC/zBTcs9Zu4nw5um0A==
+X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
+ (user=tabba job=sendgmr) by 2002:a05:6902:100f:b0:dee:5d43:a0f3 with SMTP id
+ 3f1490d57ef6-dee5d43c91fmr5109647276.6.1715951896719; Fri, 17 May 2024
+ 06:18:16 -0700 (PDT)
+Date: Fri, 17 May 2024 14:18:07 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4e89f047-ae70-43a8-a459-e375ca05b2c2@arm.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.0.rc1.225.g2a3ae87e7f-goog
+Message-ID: <20240517131814.719933-1-tabba@google.com>
+Subject: [PATCH v1 0/7] KVM: arm64: Fix handling of host fpsimd/sve state in
+ protected mode
+From: Fuad Tabba <tabba@google.com>
+To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
+Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com, 
+	seanjc@google.com, alexandru.elisei@arm.com, catalin.marinas@arm.com, 
+	philmd@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, 
+	oliver.upton@linux.dev, mark.rutland@arm.com, broonie@kernel.org, 
+	joey.gouly@arm.com, rananta@google.com, yuzenghui@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, May 15, 2024 at 12:00:49PM +0100, Suzuki K Poulose wrote:
-> On 15/05/2024 10:01, Catalin Marinas wrote:
-> > On Fri, Apr 12, 2024 at 09:42:09AM +0100, Steven Price wrote:
-> > > From: Suzuki K Poulose <suzuki.poulose@arm.com>
-> > > 
-> > > Device mappings (currently) need to be emulated by the VMM so must be
-> > > mapped shared with the host.
-> > 
-> > You say "currently". What's the plan when the device is not emulated?
-> > How would the guest distinguish what's emulated and what's not to avoid
-> > setting the PROT_NS_SHARED bit?
-> 
-> Arm CCA plans to add support for passing through real devices,
-> which support PCI-TDISP protocol. This would involve the Realm
-> authenticating the device and explicitly requesting "protected"
-> mapping *after* the verification (with the help of RMM).
+With the KVM host data rework [1], handling of fpsimd and sve
+state in protected mode is done at hyp. For protected VMs, we
+don't want to leak any guest state to the host, including whether
+a guest has used fpsimd/sve.
 
-I'd have to do some reading, no clue how this works.
+To complete the work started with the host data rework, in
+regards to protected mode, ensure that the host's fpsimd context
+and its sve context are restored on guest exit, since the rework
+has hidden the fpsimd/sve state from the host.
 
-> > > diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
-> > > index f5376bd567a1..db71c564ec21 100644
-> > > --- a/arch/arm64/include/asm/pgtable.h
-> > > +++ b/arch/arm64/include/asm/pgtable.h
-> > > @@ -598,7 +598,7 @@ static inline void set_pud_at(struct mm_struct *mm, unsigned long addr,
-> > >   #define pgprot_writecombine(prot) \
-> > >   	__pgprot_modify(prot, PTE_ATTRINDX_MASK, PTE_ATTRINDX(MT_NORMAL_NC) | PTE_PXN | PTE_UXN)
-> > >   #define pgprot_device(prot) \
-> > > -	__pgprot_modify(prot, PTE_ATTRINDX_MASK, PTE_ATTRINDX(MT_DEVICE_nGnRE) | PTE_PXN | PTE_UXN)
-> > > +	__pgprot_modify(prot, PTE_ATTRINDX_MASK, PTE_ATTRINDX(MT_DEVICE_nGnRE) | PTE_PXN | PTE_UXN | PROT_NS_SHARED)
-> > 
-> > This pgprot_device() is not the only one used to map device resources.
-> > pgprot_writecombine() is another commonly macro. It feels like a hack to
-> > plug one but not the other and without any way for the guest to figure
-> > out what's emulated.
-> 
-> Agree. I have been exploring hooking this into ioremap_prot() where we
-> could apply the attribute accordingly. We will change it in the next
-> version.
+This patch series eagerly restores the host fpsimd/sve state on
+guest exit when running in protected mode, which happens only if
+the guest has used fpsimd/sve. This means that the saving of the
+state is lazy, similar to the behavior of KVM in other modes, but
+the restoration of the host state is eager.
 
-pgprot_* at least has the advantage that it covers other places.
-ioremap_prot() would handle the kernel mappings but you have devices
-mapped in user-space via remap_pfn_range() for example. The protection
-bits may come from dma_pgprot() with either write-combine or cacheable
-attributes. One may map device I/O as well (not sure what DPDK does). We
-could restrict those to protected devices but we need to go through the
-use-cases.
+This series is based on kvmarm-6.10-1 (kvmarm/next). It should
+not have any effect on modes other than protected mode.
 
-All this needs some thinking, especially if at some point we'll have
-protected devices. Just hijacking the low-level pgprot macros doesn't
-feel like a great approach.
+Tested on qemu, with the kernel sve stress tests.
 
-> > Can the DT actually place those emulated ranges in the higher IPA space
-> > so that we avoid randomly adding this attribute for devices?
-> 
-> It can, but then we kind of break the "Realm" view of the IPA space. i.e.,
-> right now it only knows about the "lower IPA" half and uses the top bit as a
-> protection attr to access the IPA as shared.
-> 
-> Expanding IPA size view kind of breaks "sharing memory", where, we
-> must "use a different PA" for a page that is now shared.
+Cheers,
+/fuad
 
-True, I did not realise that the IPA split is transparent to the host.
+[1] https://lore.kernel.org/all/20240322170945.3292593-1-maz@kernel.org/
 
-An option would be additional DT/ACPI attributes for those devices.
-That's not great either though as we can't handle those attributes in
-the arch code only and probably we don't want to change generic drivers.
+Fuad Tabba (7):
+  KVM: arm64: Reintroduce __sve_save_state
+  KVM: arm64: Specialize deactivate fpsimd/sve traps on guest trap
+  KVM: arm64: Specialize handling of host fpsimd state on trap
+  KVM: arm64: Store the maximum sve vector length at hyp
+  KVM: arm64: Allocate memory at hyp for host sve state in pKVM
+  KVM: arm64: Eagerly restore host fpsimd/sve state in pKVM
+  KVM: arm64: Consolidate initializing the host data's fpsimd_state/sve
+    in pKVM
 
-Yet another option would be to query the RMM somehow.
+ arch/arm64/include/asm/kvm_host.h       | 11 +++-
+ arch/arm64/include/asm/kvm_hyp.h        |  2 +
+ arch/arm64/include/asm/kvm_pkvm.h       |  9 +++
+ arch/arm64/include/uapi/asm/ptrace.h    | 14 +++++
+ arch/arm64/kvm/arm.c                    | 75 +++++++++++++++++++++++++
+ arch/arm64/kvm/hyp/fpsimd.S             |  6 ++
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 31 +++++-----
+ arch/arm64/kvm/hyp/include/nvhe/pkvm.h  |  1 -
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c      | 57 ++++++++++++++++++-
+ arch/arm64/kvm/hyp/nvhe/pkvm.c          | 15 ++---
+ arch/arm64/kvm/hyp/nvhe/setup.c         | 25 ++++++++-
+ arch/arm64/kvm/hyp/nvhe/switch.c        | 40 +++++++++++++
+ arch/arm64/kvm/hyp/vhe/switch.c         | 16 ++++++
+ arch/arm64/kvm/reset.c                  |  2 +
+ 14 files changed, 271 insertions(+), 33 deletions(-)
 
+
+base-commit: eaa46a28d59655aa89a8fb885affa6fc0de44376
 -- 
-Catalin
+2.45.0.rc1.225.g2a3ae87e7f-goog
+
