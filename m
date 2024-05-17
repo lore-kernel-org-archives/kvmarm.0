@@ -1,266 +1,118 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9762614D6F9
-	for <kvmarm@lists.linux.dev>; Thu, 16 May 2024 16:02:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6C832E40D;
+	Fri, 17 May 2024 09:34:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715875381; cv=none; b=f4aPH77i8IUkKLKJbcbJcl4KnX7Nq2lGr/p2UOMz9qE9xmQVW+fCR7ubvDJ6W24dhHHHJcv1H2kN8AsRKyHcd1X0fF5Mw5Vuck/Zr98z2seMAdU/fxZBgeYhoiPHQ4guOpc7zcNuMVcehXLYsuYUWqj4mrEOMTAX3AqIWYqF07Y=
+	t=1715938446; cv=none; b=tYN99cBesEZ27cDs0XFxVXO65PdPV4UzCo1SbW9G5F6faUsz6UqcUVcO8vOSik3eg9MQBwaVD2rqoMRHOyt4w/NdxPSwb8w00v9hCh46Pjy4aDFzAjS2EErJItvXE1fuVOnf+ZHmtyAiN3mHHZsBtXdSB8WNRSj+eG7SssXutyM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715875381; c=relaxed/simple;
-	bh=Qvn+eDPV3KjfuRiCHUcxOODBkfjgRSK4kviR/a5h1b0=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=Usfjt/2fEokzrp1KDD1LoEVJcoZluIKU4xZDP342OCquNFBBW+uvu1YLbqhlG/4xRytlQSi/Y2XAWCpm/nmZntyzxOwwtYoIkEAVlGa67Da9hJLWUkGsQZqxBeNmOnV4TYHybPbOhgVCl20JVWG+VZehgOpqdfJSDGEGT4/uL9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Luf3UY6d; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Luf3UY6d"
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dee902341c0so6824072276.3
-        for <kvmarm@lists.linux.dev>; Thu, 16 May 2024 09:02:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715875378; x=1716480178; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=7HpIXuT6tOszn6Sdim+VjymIhcvyFpypZfRE8OZjGxU=;
-        b=Luf3UY6d6EdZvbsUK4iVusgxTZDMqxGeWq/YRSvGohCmTUP0lSoboS5bge9kcQC6X+
-         6V+Y3LwM7IMsULtz2Cr9S7q+zvqyh6vQViVRUIUXcD3CthgA+aQdv00jIftLCLr5lF0l
-         w4Spoan0c3llGYI7X2TBuKezvIRTcM0zIYXjGcRJYehGW0/5dMuWlBfDnOyiZuPrvNJL
-         q2tLIeZug4xaVI8cHkjB7YB1wtzBklB8FaTL478zcCI/JdjPTnAFaqKh6PissdfL9lsg
-         UahzzfA4yVqiOFiA8ZST5ivFBUB0cef2qeNnmQXT5kw6yfkCxpHeq4p+B/tfYiAYlOsT
-         C06g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715875378; x=1716480178;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7HpIXuT6tOszn6Sdim+VjymIhcvyFpypZfRE8OZjGxU=;
-        b=c90p0cpxPVbUcdSoJ5Rf7KNL6Gmk0I/6/gNVSAdeRJeUPZSCxfn1INa8JtnkBAKBoP
-         3Mh6EIksvMx1a5/VpiByUsjNVYkm5IL0Ru7BY/Awb1Pwd5nvyKJq4QVebq6LAQHsNL8W
-         l6m641sJHgBrndy3/AKYHzExr+/H+j7MpbD/PL1x2FU5UoWTnZOd1djUJ19+K8SaZf/L
-         TufDVXkFbxOvd0dY/iRY1TAKgLzX+SvVMbiORfGABLd0svz1uER4ZTr+QXGpkZktj+1U
-         X0WsSy4rqOzRqePPwW+kA8Wz3pd/zKO7BuUyJgLOG/3A5F5vwvL8ZIryc1AYUAIFDxbb
-         ZtFw==
-X-Forwarded-Encrypted: i=1; AJvYcCVlzjL87h50TNuA7tlaz07wJerNK017y02swTtU59p7KU/Qp0umwCBh63dB14qlVlP1mIFJ4wSUF2WQikvoh9+bgqKDTJzd
-X-Gm-Message-State: AOJu0YyzMT8ygLqMUBPlITQE7IRTXsO8aQCZU5ylhdHFszkl3F10MfqZ
-	UjSs+WLA398eO3ubfGa4HjVb4ZRHF7vtT9o4iHsLra9GyOlVlT8kosmUeFNbe1ur90zqUdSWcBx
-	5plH8w6IJ3/Y52UDdvfgwqg==
-X-Google-Smtp-Source: AGHT+IF/VTizL3uRcaPz4FUA6Qw+im1lfzOrpyEK3SLZlU2Rx96wjJQrdDCUaoRmdREzsaN+wgsjcIqTNDS1LM0OIQ==
-X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a05:6902:1201:b0:dee:6f9d:b753 with
- SMTP id 3f1490d57ef6-dee6f9dbdeamr1196625276.6.1715875378456; Thu, 16 May
- 2024 09:02:58 -0700 (PDT)
-Date: Thu, 16 May 2024 16:02:57 +0000
-In-Reply-To: <861q69oi9c.wl-maz@kernel.org> (message from Marc Zyngier on Fri,
- 10 May 2024 15:26:23 +0100)
+	s=arc-20240116; t=1715938446; c=relaxed/simple;
+	bh=RJVwbXiVXMNHdFgcxkWovVgZblbHMFIR4uz+RoxIR4w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Kd7ZvDXuaacgXiAM3TlwkI3DV2t02TtpvrN5uWirU21ln41KOgjLIdxfOswXZYA+SiUoEdjxTNlEwCS2bQ9EqzoKw0QtO0k1wgKD9iXfNIi8f9u3jdH44WTwp30P5xdWa2bzv9z07eUfPsUx3den3szWVdOrw4yJS0mLMgfbZWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2945C32786;
+	Fri, 17 May 2024 09:34:02 +0000 (UTC)
+Date: Fri, 17 May 2024 10:34:00 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
+	Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: Re: [PATCH v2 10/14] arm64: Force device mappings to be non-secure
+ shared
+Message-ID: <ZkckiCiv1kzM0oCK@arm.com>
+References: <20240412084213.1733764-1-steven.price@arm.com>
+ <20240412084213.1733764-11-steven.price@arm.com>
+ <ZkR535Hmh3WkMYai@arm.com>
+ <4e89f047-ae70-43a8-a459-e375ca05b2c2@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-Message-ID: <gsntbk55agni.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH v5] KVM: arm64: Add early_param to control WFx trapping
-From: Colton Lewis <coltonlewis@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, corbet@lwn.net, oliver.upton@linux.dev, 
-	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com, will@kernel.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4e89f047-ae70-43a8-a459-e375ca05b2c2@arm.com>
 
-Hi Marc. Thanks for the review.
+On Wed, May 15, 2024 at 12:00:49PM +0100, Suzuki K Poulose wrote:
+> On 15/05/2024 10:01, Catalin Marinas wrote:
+> > On Fri, Apr 12, 2024 at 09:42:09AM +0100, Steven Price wrote:
+> > > From: Suzuki K Poulose <suzuki.poulose@arm.com>
+> > > 
+> > > Device mappings (currently) need to be emulated by the VMM so must be
+> > > mapped shared with the host.
+> > 
+> > You say "currently". What's the plan when the device is not emulated?
+> > How would the guest distinguish what's emulated and what's not to avoid
+> > setting the PROT_NS_SHARED bit?
+> 
+> Arm CCA plans to add support for passing through real devices,
+> which support PCI-TDISP protocol. This would involve the Realm
+> authenticating the device and explicitly requesting "protected"
+> mapping *after* the verification (with the help of RMM).
 
-Marc Zyngier <maz@kernel.org> writes:
+I'd have to do some reading, no clue how this works.
 
-> On Tue, 30 Apr 2024 19:14:44 +0100,
-> Colton Lewis <coltonlewis@google.com> wrote:
->> diff --git a/Documentation/admin-guide/kernel-parameters.txt  
->> b/Documentation/admin-guide/kernel-parameters.txt
->> index 31b3a25680d0..a4d94d9abbe4 100644
->> --- a/Documentation/admin-guide/kernel-parameters.txt
->> +++ b/Documentation/admin-guide/kernel-parameters.txt
->> @@ -2653,6 +2653,22 @@
->>   			[KVM,ARM] Allow use of GICv4 for direct injection of
->>   			LPIs.
+> > > diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
+> > > index f5376bd567a1..db71c564ec21 100644
+> > > --- a/arch/arm64/include/asm/pgtable.h
+> > > +++ b/arch/arm64/include/asm/pgtable.h
+> > > @@ -598,7 +598,7 @@ static inline void set_pud_at(struct mm_struct *mm, unsigned long addr,
+> > >   #define pgprot_writecombine(prot) \
+> > >   	__pgprot_modify(prot, PTE_ATTRINDX_MASK, PTE_ATTRINDX(MT_NORMAL_NC) | PTE_PXN | PTE_UXN)
+> > >   #define pgprot_device(prot) \
+> > > -	__pgprot_modify(prot, PTE_ATTRINDX_MASK, PTE_ATTRINDX(MT_DEVICE_nGnRE) | PTE_PXN | PTE_UXN)
+> > > +	__pgprot_modify(prot, PTE_ATTRINDX_MASK, PTE_ATTRINDX(MT_DEVICE_nGnRE) | PTE_PXN | PTE_UXN | PROT_NS_SHARED)
+> > 
+> > This pgprot_device() is not the only one used to map device resources.
+> > pgprot_writecombine() is another commonly macro. It feels like a hack to
+> > plug one but not the other and without any way for the guest to figure
+> > out what's emulated.
+> 
+> Agree. I have been exploring hooking this into ioremap_prot() where we
+> could apply the attribute accordingly. We will change it in the next
+> version.
 
->> +	kvm-arm.wfe_trap_policy=
->> +			[KVM,ARM] Control when to set WFE instruction trap for
->> +			KVM VMs.
->> +
->> +			trap: set WFE instruction trap
->> +
->> +			notrap: clear WFE instruction trap
->> +
->> +	kvm-arm.wfi_trap_policy=
->> +			[KVM,ARM] Control when to set WFI instruction trap for
->> +			KVM VMs.
->> +
->> +			trap: set WFI instruction trap
->> +
->> +			notrap: clear WFI instruction trap
->> +
+pgprot_* at least has the advantage that it covers other places.
+ioremap_prot() would handle the kernel mappings but you have devices
+mapped in user-space via remap_pfn_range() for example. The protection
+bits may come from dma_pgprot() with either write-combine or cacheable
+attributes. One may map device I/O as well (not sure what DPDK does). We
+could restrict those to protected devices but we need to go through the
+use-cases.
 
-> Please make it clear that neither traps are guaranteed. The
-> architecture *allows* an implementation to trap when no events (resp.
-> interrupts) are pending, but nothing more. An implementation is
-> perfectly allowed to ignore these bits.
+All this needs some thinking, especially if at some point we'll have
+protected devices. Just hijacking the low-level pgprot macros doesn't
+feel like a great approach.
 
-Will do. I'll just add an additional sentence stating "Traps are allowed
-but not guaranteed by the CPU architecture"
+> > Can the DT actually place those emulated ranges in the higher IPA space
+> > so that we avoid randomly adding this attribute for devices?
+> 
+> It can, but then we kind of break the "Realm" view of the IPA space. i.e.,
+> right now it only knows about the "lower IPA" half and uses the top bit as a
+> protection attr to access the IPA as shared.
+> 
+> Expanding IPA size view kind of breaks "sharing memory", where, we
+> must "use a different PA" for a page that is now shared.
 
->> diff --git a/arch/arm64/include/asm/kvm_host.h  
->> b/arch/arm64/include/asm/kvm_host.h
->> index 21c57b812569..315ee7bfc1cb 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -67,6 +67,13 @@ enum kvm_mode {
->>   	KVM_MODE_NV,
->>   	KVM_MODE_NONE,
->>   };
->> +
->> +enum kvm_wfx_trap_policy {
->> +	KVM_WFX_NOTRAP_SINGLE_TASK, /* Default option */
->> +	KVM_WFX_NOTRAP,
->> +	KVM_WFX_TRAP,
->> +};
+True, I did not realise that the IPA split is transparent to the host.
 
-> Since this is only ever used in arm.c, it really doesn't need to be
-> exposed anywhere else.
+An option would be additional DT/ACPI attributes for those devices.
+That's not great either though as we can't handle those attributes in
+the arch code only and probably we don't want to change generic drivers.
 
-I can move it to there.
+Yet another option would be to query the RMM somehow.
 
->> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index a25265aca432..5ec52333e042 100644
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
->> @@ -46,6 +46,8 @@
->>   #include <kvm/arm_psci.h>
-
->>   static enum kvm_mode kvm_mode = KVM_MODE_DEFAULT;
->> +static enum kvm_wfx_trap_policy kvm_wfi_trap_policy =  
->> KVM_WFX_NOTRAP_SINGLE_TASK;
->> +static enum kvm_wfx_trap_policy kvm_wfe_trap_policy =  
->> KVM_WFX_NOTRAP_SINGLE_TASK;
-
-> It would be worth declaring those as __read_mostly.
-
-Will do.
-
->> +static bool kvm_vcpu_should_clear_twi(struct kvm_vcpu *vcpu)
->> +{
->> +	if (likely(kvm_wfi_trap_policy == KVM_WFX_NOTRAP_SINGLE_TASK))
->> +		return single_task_running() &&
->> +			(atomic_read(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe.vlpi_count) ||
->> +			 vcpu->kvm->arch.vgic.nassgireq);
-
-> So you are evaluating a runtime condition (scheduler queue length,
-> number of LPIs)...
-
-Yes. Only in the case of default behavior when no option is given, which
-should be equivalent to what the code was doing before.
-
->> +
->> +	return kvm_wfi_trap_policy == KVM_WFX_NOTRAP;
->> +}
->> +
->> +static bool kvm_vcpu_should_clear_twe(struct kvm_vcpu *vcpu)
->> +{
->> +	if (likely(kvm_wfe_trap_policy == KVM_WFX_NOTRAP_SINGLE_TASK))
->> +		return single_task_running();
->> +
->> +	return kvm_wfe_trap_policy == KVM_WFX_NOTRAP;
->> +}
->> +
->> +static inline void kvm_vcpu_reset_hcr(struct kvm_vcpu *vcpu)
-
-> Why the inline?
-
-Because I moved it from the kvm_emulate.h header with no
-modification. It doesn't have to be.
-
->> +{
->> +	vcpu->arch.hcr_el2 = HCR_GUEST_FLAGS;
->> +	if (has_vhe() || has_hvhe())
->> +		vcpu->arch.hcr_el2 |= HCR_E2H;
->> +	if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN)) {
->> +		/* route synchronous external abort exceptions to EL2 */
->> +		vcpu->arch.hcr_el2 |= HCR_TEA;
->> +		/* trap error record accesses */
->> +		vcpu->arch.hcr_el2 |= HCR_TERR;
->> +	}
->> +
->> +	if (cpus_have_final_cap(ARM64_HAS_STAGE2_FWB)) {
->> +		vcpu->arch.hcr_el2 |= HCR_FWB;
->> +	} else {
->> +		/*
->> +		 * For non-FWB CPUs, we trap VM ops (HCR_EL2.TVM) until M+C
->> +		 * get set in SCTLR_EL1 such that we can detect when the guest
->> +		 * MMU gets turned on and do the necessary cache maintenance
->> +		 * then.
->> +		 */
->> +		vcpu->arch.hcr_el2 |= HCR_TVM;
->> +	}
->> +
->> +	if (cpus_have_final_cap(ARM64_HAS_EVT) &&
->> +	    !cpus_have_final_cap(ARM64_MISMATCHED_CACHE_TYPE))
->> +		vcpu->arch.hcr_el2 |= HCR_TID4;
->> +	else
->> +		vcpu->arch.hcr_el2 |= HCR_TID2;
->> +
->> +	if (vcpu_el1_is_32bit(vcpu))
->> +		vcpu->arch.hcr_el2 &= ~HCR_RW;
->> +
->> +	if (kvm_has_mte(vcpu->kvm))
->> +		vcpu->arch.hcr_el2 |= HCR_ATA;
->> +
->> +
->> +	if (kvm_vcpu_should_clear_twe(vcpu))
->> +		vcpu->arch.hcr_el2 &= ~HCR_TWE;
->> +	else
->> +		vcpu->arch.hcr_el2 |= HCR_TWE;
->> +
->> +	if (kvm_vcpu_should_clear_twi(vcpu))
->> +		vcpu->arch.hcr_el2 &= ~HCR_TWI;
->> +	else
->> +		vcpu->arch.hcr_el2 |= HCR_TWI;
-
-> ... and from the above runtime conditions you make it a forever
-> decision, for a vcpu that still hasn't executed a single instruction.
-> What could possibly go wrong?
-
-Oh I see. kvm_arch_vcpu_ioctl_vcpu_init only executes once when the vcpu
-is created (makes sense given the name), thereby making the decision
-permanent for the life of the vcpu. I misunderstood that fact before.
-
-I will move the decision back to when the vcpu is loaded as it was in
-earlier versions of this series.
-
->> +static int __init early_kvm_wfx_trap_policy_cfg(char *arg, enum  
->> kvm_wfx_trap_policy *p)
->> +{
->> +	if (!arg)
->> +		return -EINVAL;
->> +
->> +	if (strcmp(arg, "trap") == 0) {
->> +		*p = KVM_WFX_TRAP;
->> +		return 0;
->> +	}
->> +
->> +	if (strcmp(arg, "notrap") == 0) {
->> +		*p = KVM_WFX_NOTRAP;
->> +		return 0;
->> +	}
->> +
->> +	if (strcmp(arg, "default") == 0) {
->> +		*p = KVM_WFX_NOTRAP_SINGLE_TASK;
->> +		return 0;
->> +	}
-
-> Where is this "default" coming from? It's not documented.
-
-It was explicitly documented on earlier patch versions, but then I was
-told we didn't want people to rely on the default behavior so we have
-flexibility to change it in the future.
-
-There isn't much use for it if it isn't documented, so I'll take it out.
+-- 
+Catalin
