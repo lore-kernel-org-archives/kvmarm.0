@@ -1,55 +1,55 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8D334F887
-	for <kvmarm@lists.linux.dev>; Fri, 17 May 2024 13:18:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0E484F887
+	for <kvmarm@lists.linux.dev>; Fri, 17 May 2024 13:18:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715951904; cv=none; b=eqQIyITUah/4IhxpJpoi+iviwd16bqhuMAWoGPNWyCKqsdXbTTX6R8T2kXpVWnHlEMiX9XDZIOTmxNHofnDdRyH3mU7w1qd1/J+VDIZdJyNR6Crv4bvnEdnzoo+sdn6oeK8ZIGnZoHiFzYGDinqE2c+5/QqgXi+BAN9K400roZ0=
+	t=1715951906; cv=none; b=m1Bu8oJgESH3xVorCYZXblPnq0fdXRqJkjGu/lu5BJUjghsea/iGdel/kNFFTD7nov4d6nj4zcihGscGNU7DKUQAiCTccwEebRRhnshxLIsIlRUYgvuSpt/ItwT+k0QTiCS7ZFqmn4+L4oZLJwfXCtdxhRVgHIiWec+6hf9diWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715951904; c=relaxed/simple;
-	bh=b+m+ugr2NNc3dnDzd8ZI73JUUi6/mDtYwupaqwfdMtY=;
+	s=arc-20240116; t=1715951906; c=relaxed/simple;
+	bh=pAv/j+sXdR1HNlBwRupJ7jOFRVOvLsxbHUilHPTw2Pw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=G992tQG0NVAm6KtPI8p0LxcxFJh+NarFXLKYw42G6FcHYnzQHT6PS7taD32kh1Lpwp8wkzBA7dye/fE8dQ/3QPeMBVy1hO1uwRs/0Mi5WowuIpA6EqZ9ZYR2CEhKscuVMKPxF3TToHJrto2nKEHGhBSJnN6uRo+d1w2oYhmNrXE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PKxfgZZy; arc=none smtp.client-ip=209.85.219.201
+	 To:Cc:Content-Type; b=LMaSaAH7cZiMR+Qr4EzqipwNX0ZpW8lc9X23ihjZMBg9MLWqAp2YDKVGuogle6hYkU14CE2XcQxqcyHUWERkyxSqjF5TfIjOV65sXogxgSidXcJc5Z/2NyLXZh3UXn1P2ox1Ey+Pz5PvIoowGclHnqFpG+YzdbQicbHnth8kIg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3z/HsQz+; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PKxfgZZy"
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-ddaf2f115f2so14312120276.3
-        for <kvmarm@lists.linux.dev>; Fri, 17 May 2024 06:18:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3z/HsQz+"
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-61be530d024so162584587b3.2
+        for <kvmarm@lists.linux.dev>; Fri, 17 May 2024 06:18:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715951901; x=1716556701; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1715951904; x=1716556704; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6lwF9WiyA4FWPt94OkN7FXWTtBTob75sC/aITN++qKk=;
-        b=PKxfgZZyETQ99rxYEOs//Ujb8E4nDM4tpc1Xw3J4/dxvJ+EUXyWyy8ldOo9/vf6XXf
-         XIQZRImi44UzV0MzPzt0Sza31V/Zu+4JugFS+zpe/D7u3t6O8NNBUENvkboiiucyQABO
-         tsxQeRHhKw2Zb85o5Y99/HLy7ugnUpgUi9eplSkiMNIpgXtId1GlmxnQFxfY+MAvmn2A
-         Elt85Dt9sxM54noOoPfNV5HwCqzlleeLNBiTa2Sf6W0Az0cVFFfBwk1/dTg9TUm33rlA
-         sHMGhx9YVar6z0CkdQUUBGtsSyewvNBfawIP6hvjKtvfsYgo0wCs0FwcYZBOEW0qClZS
-         +s/w==
+        bh=EyndmrY+kykskyH37vAoPH6S+/WfAXQJJz5aqIGyAn8=;
+        b=3z/HsQz+wwD7I2rRJHU9WADj3jMBDbgWU/ZBbAyLKyDyfo4qRZ0qZX1DPxQ6IqAlRc
+         wg7iJqreeJ5aeSPhRj2FDfCtKQphI1S0CG/GwVxDoZe1vLJNCS7Bx5osFUR55twNlfum
+         /I4BXG1WFJXb9hLWbbgerhShFg0NDxIhoF7PyaRd/X97p4vSoKaTqfwex9i8xZS666XZ
+         R8uwagKtkmbGg0Udw753zjsxexmLkTATPrv2aTw+XsH9QUn9S78DIq/6AR5N6olQB5NO
+         UUBZhVo4MPUkqwaeAP7pHYjqQKmxwEiRKAPAk7DAnXbqinRtDvHrA272TTlm8LE0zjJo
+         BCiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715951901; x=1716556701;
+        d=1e100.net; s=20230601; t=1715951904; x=1716556704;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6lwF9WiyA4FWPt94OkN7FXWTtBTob75sC/aITN++qKk=;
-        b=qN3k/KY2BlonP71j57SKhcoCN3ICYgB0EQ/PSppIkNLX3ErXHL6zZp7nC05shDx0oP
-         renLcJDS5o1kqGqfpGXsetaRpGAF/z9f1JvnAovN5cmnBilYbr6jED6R6fhddGqKAKFt
-         wEqrWX7Az7e2bZHVtmOFPYL+87ZG5sjJj34UlVAiGXYzkVPqDb6MXwKWsmAjQmw/6IJb
-         XeQwT4JKyWN986qtDHQUxJ2zoEC1Sg7U6JY1n0jdSTBTDEgQ+Y3SxYAfF+F3yPjnJjKr
-         +UDYYSVhul1bhpDESpZugRQvJgwXuQLlMMBNvRPwprwNYa3QB3hSPanz51jWotcjZzKn
-         1G5A==
-X-Gm-Message-State: AOJu0Yz7niiIUXE2A7F28uqYk3nRLIjcGfBBUn6iZlIm2LTvO8w2bN1E
-	IrpqfGDVrwP7ZETHYtT6t6xsv5Qcn3HsfnUVAPhDvXzr53cO5GAYMEECRcyDzMf5Cg8mpvgtDoR
-	w15KS/XTeMr1SAPF7uWsqfQi4UBNaUBsEEwPn4mXDRsr1V8Y8VfvfbVoTK/+2NEgw6INk8ai9Jf
-	sPYd7kStHCZxo4FQxouWuiJFweBMA=
-X-Google-Smtp-Source: AGHT+IGTTqNEWDIciV6TBhmNxTXUhrZCJlowt58GdQn66KhhmRipYqpyW7XIWsV31GvymihlrnvTxJIEtQ==
+        bh=EyndmrY+kykskyH37vAoPH6S+/WfAXQJJz5aqIGyAn8=;
+        b=K8PXig4mifFwigVNepWMBQlJII/a5VMlrbcTrpiI8vaBAwkE7kOy8YqXvC0mfB0733
+         8meYlSgIcPVBvOYarAJ5CSTsXM2fchfb3ccZx0bPrVyKjkGPn5D/o0KXeunjVkaTihLB
+         2cpR30+VU7OOraQ9oGdE9gnHHb+UUQvvl1jypH+41QsywnIGVG6yMfPaPaeqNBZUjuhy
+         16PzMXG+LAlh5XPHAvxfbqIQkFRSkUKAYfrf8OvgYzip+BdwVIIWcjrRMfmQy/NuZSlj
+         sVy7JdEuttQEx+KsIQKO792QVzMFx/CzjJkmr32qO4C4rw1c71LWd7WlnJOeJ02kusNO
+         AOJQ==
+X-Gm-Message-State: AOJu0YwZ4I3KztMvfOy450fFQAVAWLoi97zGLoYz50IEUYB2JZFoegw0
+	tOvVS2poVh1EMCpDsT8moWkJcczK7ZYMDsX/Yb4Exu5DE4hfGkivHw+3t4dv3gayenVjanCu2Gn
+	dS6nFEuIkMPNefzCn7EBIImfmrcN1w3LjAGM8KxpFZidwGzjFuYcw3ooRADg6C2WxnvW4s3U7rk
+	yo6TfezPRiPaFZefoYMBrVass5q/Q=
+X-Google-Smtp-Source: AGHT+IEm8tlKnEAg0DLPwscOUvLJVUvPUwKX1dSDxbJCUnPDGFEGHUpfCvo+7UcR0i9xLzE/sD17LINAsw==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:6902:20ca:b0:dd9:2d94:cd8a with SMTP id
- 3f1490d57ef6-dee4f4f51bamr2007079276.9.1715951901586; Fri, 17 May 2024
- 06:18:21 -0700 (PDT)
-Date: Fri, 17 May 2024 14:18:09 +0100
+ (user=tabba job=sendgmr) by 2002:a81:6d53:0:b0:622:befc:2e97 with SMTP id
+ 00721157ae682-622befc2ee6mr41880237b3.4.1715951903959; Fri, 17 May 2024
+ 06:18:23 -0700 (PDT)
+Date: Fri, 17 May 2024 14:18:10 +0100
 In-Reply-To: <20240517131814.719933-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,9 +59,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240517131814.719933-1-tabba@google.com>
 X-Mailer: git-send-email 2.45.0.rc1.225.g2a3ae87e7f-goog
-Message-ID: <20240517131814.719933-3-tabba@google.com>
-Subject: [PATCH v1 2/7] KVM: arm64: Specialize deactivate fpsimd/sve traps on
- guest trap
+Message-ID: <20240517131814.719933-4-tabba@google.com>
+Subject: [PATCH v1 3/7] KVM: arm64: Specialize handling of host fpsimd state
+ on trap
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
 Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com, 
@@ -71,122 +71,72 @@ Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com,
 	joey.gouly@arm.com, rananta@google.com, yuzenghui@huawei.com
 Content-Type: text/plain; charset="UTF-8"
 
-The code for deactivating traps, to be able to update the
-fpsimd/sve registers, is the only code in switch.h that is n/vhe
-specific, i.e., behaves differently whether it's running in
-vhe/nvhe. Move it to specialized functions in switch.c like other
-mode-specific code.
-
-This is needed for subsequent patches, since the logic for
-deciding which traps to enable/disable will diverge between
-n/vhe.
+In subsequent patches, n/vhe will diverge on saving the host
+fpsimd/sve state when taking a guest fpsimd/sve trap. Add a
+specialized helper to handle it.
 
 No functional change intended.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/hyp/include/hyp/switch.h | 18 +++---------------
- arch/arm64/kvm/hyp/nvhe/switch.c        | 21 +++++++++++++++++++++
- arch/arm64/kvm/hyp/vhe/switch.c         | 11 +++++++++++
- 3 files changed, 35 insertions(+), 15 deletions(-)
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 3 ++-
+ arch/arm64/kvm/hyp/nvhe/switch.c        | 5 +++++
+ arch/arm64/kvm/hyp/vhe/switch.c         | 5 +++++
+ 3 files changed, 12 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index a92566f36022..890388c17c3e 100644
+index 890388c17c3e..d15272445db2 100644
 --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
 +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -320,6 +320,8 @@ static inline void __hyp_sve_restore_guest(struct kvm_vcpu *vcpu)
- 	write_sysreg_el1(__vcpu_sys_reg(vcpu, ZCR_EL1), SYS_ZCR);
+@@ -321,6 +321,7 @@ static inline void __hyp_sve_restore_guest(struct kvm_vcpu *vcpu)
  }
  
-+static void __deactivate_fpsimd_sve_traps(struct kvm_vcpu *vcpu);
-+
+ static void __deactivate_fpsimd_sve_traps(struct kvm_vcpu *vcpu);
++static void kvm_hyp_save_fpsimd_host(struct kvm_vcpu *vcpu);
+ 
  /*
   * We trap the first access to the FP/SIMD to save the host context and
-  * restore the guest context lazily.
-@@ -330,7 +332,6 @@ static bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
- {
- 	bool sve_guest;
- 	u8 esr_ec;
--	u64 reg;
- 
- 	if (!system_supports_fpsimd())
- 		return false;
-@@ -353,20 +354,7 @@ static bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
- 	/* Valid trap.  Switch the context: */
- 
- 	/* First disable enough traps to allow us to update the registers */
--	if (has_vhe() || has_hvhe()) {
--		reg = CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN;
--		if (sve_guest)
--			reg |= CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN;
--
--		sysreg_clear_set(cpacr_el1, 0, reg);
--	} else {
--		reg = CPTR_EL2_TFP;
--		if (sve_guest)
--			reg |= CPTR_EL2_TZ;
--
--		sysreg_clear_set(cptr_el2, reg, 0);
--	}
--	isb();
-+	__deactivate_fpsimd_sve_traps(vcpu);
+@@ -358,7 +359,7 @@ static bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
  
  	/* Write out the host state if it's in the registers */
  	if (host_owns_fp_regs())
+-		__fpsimd_save_state(*host_data_ptr(fpsimd_state));
++		kvm_hyp_save_fpsimd_host(vcpu);
+ 
+ 	/* Restore the guest state */
+ 	if (sve_guest)
 diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index 6758cd905570..2b5af10cdf1d 100644
+index 2b5af10cdf1d..935f3db245e9 100644
 --- a/arch/arm64/kvm/hyp/nvhe/switch.c
 +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -112,6 +112,27 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
- 	write_sysreg(__kvm_hyp_host_vector, vbar_el2);
+@@ -203,6 +203,11 @@ static bool kvm_handle_pvm_sys64(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 		kvm_handle_pvm_sysreg(vcpu, exit_code));
  }
  
-+static void __deactivate_fpsimd_sve_traps(struct kvm_vcpu *vcpu)
++static void kvm_hyp_save_fpsimd_host(struct kvm_vcpu *vcpu)
 +{
-+	bool clear_sve_traps = vcpu_has_sve(vcpu);
-+	u64 reg;
-+
-+	if (has_hvhe()) {
-+		reg = CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN;
-+		if (clear_sve_traps)
-+			reg |= CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN;
-+
-+		sysreg_clear_set(cpacr_el1, 0, reg);
-+	} else {
-+		reg = CPTR_EL2_TFP;
-+		if (clear_sve_traps)
-+			reg |= CPTR_EL2_TZ;
-+
-+		sysreg_clear_set(cptr_el2, reg, 0);
-+	}
-+	isb();
++	__fpsimd_save_state(*host_data_ptr(fpsimd_state));
 +}
 +
- /* Save VGICv3 state on non-VHE systems */
- static void __hyp_vgic_save_state(struct kvm_vcpu *vcpu)
- {
+ static const exit_handler_fn hyp_exit_handlers[] = {
+ 	[0 ... ESR_ELx_EC_MAX]		= NULL,
+ 	[ESR_ELx_EC_CP15_32]		= kvm_hyp_handle_cp15_32,
 diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index d7af5f46f22a..740360065d7d 100644
+index 740360065d7d..6a6d69c3c58a 100644
 --- a/arch/arm64/kvm/hyp/vhe/switch.c
 +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -209,6 +209,17 @@ void kvm_vcpu_put_vhe(struct kvm_vcpu *vcpu)
- 	host_data_ptr(host_ctxt)->__hyp_running_vcpu = NULL;
+@@ -273,6 +273,11 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	return true;
  }
  
-+static void __deactivate_fpsimd_sve_traps(struct kvm_vcpu *vcpu)
++static void kvm_hyp_save_fpsimd_host(struct kvm_vcpu *vcpu)
 +{
-+	u64 reg = CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN;
-+
-+	if (vcpu_has_sve(vcpu))
-+		reg |= CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN;
-+
-+	sysreg_clear_set(cpacr_el1, 0, reg);
-+	isb();
++	__fpsimd_save_state(*host_data_ptr(fpsimd_state));
 +}
 +
- static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
- {
- 	u64 esr = kvm_vcpu_get_esr(vcpu);
+ static const exit_handler_fn hyp_exit_handlers[] = {
+ 	[0 ... ESR_ELx_EC_MAX]		= NULL,
+ 	[ESR_ELx_EC_CP15_32]		= kvm_hyp_handle_cp15_32,
 -- 
 2.45.0.rc1.225.g2a3ae87e7f-goog
 
