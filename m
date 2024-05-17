@@ -1,64 +1,66 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C168550A6D
-	for <kvmarm@lists.linux.dev>; Fri, 17 May 2024 13:18:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D3B34F887
+	for <kvmarm@lists.linux.dev>; Fri, 17 May 2024 13:18:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715951899; cv=none; b=fbVNqhtgbQGj2FaSssdzDDonOlL3XWeBx+1c92mUysT0z3suvdBQ2/Xj7qjqx+MvhFrtxf4EJpSjgVqoIUiGIpWgkTf3FjU5IZk9roYq28wTHz3Acgba938tMQD9VBQ7UYdLAwFTkCiRxUdbcGy9npxvtri9DK3UEa2J0zGIVTc=
+	t=1715951901; cv=none; b=O2e0y7qOfMx2Iykfu3nBzcB0Tz7JDsYVFrM8Fj/tjIIzlP1suk+mNt26/kHOHPRShl1EUUITXQGyPqgTI0ozXkUHKy/pQ9sbfchaf3Wzli+V+N0o6FmpD2mHqf+9GTcsicjP4C7nMFFDaeq01wXTEmQzOrncECAEE0LnAP7fbHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715951899; c=relaxed/simple;
-	bh=gaLZllqPivKc/AOiKu1jj7N/j0Ex573Jp5GbGT8E3Z0=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ui7GH4GilrXln/6Hwz/cLTJzaWnfcfg/BIsXNJ4QWRNZ15a4A7xxrSMm9/emecjwv2rTgSqjzkBhO8BKR9SnGz1p904j4rpX5TBE2xsRSlJXjfm7ji8IwzBYE0GeXva3Z5StP1nPs+LQEJHzG5rA63DDb55+NVKqGBzaXc50tEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GU8ntl/U; arc=none smtp.client-ip=209.85.219.202
+	s=arc-20240116; t=1715951901; c=relaxed/simple;
+	bh=USDqnt0C042mDQ85oIzrggWipt4qCVOD7T+Q18fyYKc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=IMaIQwOxj7iJ0KWnpCUxT/M2gjQeCbWyhg+cIPllisc82Ws8SzdlOH9VKgPjxPTHLHMYyJDRMr1VLnqeNDdpnYif4lVbFeusQDfT5Yaxsdid2X+hNBVJdkSfT03v1ugEEWlN/sRaFxiFSsXACu8nZtconCtNy3HDWC/Tgjh03zo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ODpJOqlj; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GU8ntl/U"
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc647f65573so20122458276.2
-        for <kvmarm@lists.linux.dev>; Fri, 17 May 2024 06:18:17 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ODpJOqlj"
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-61be5d44307so149888247b3.0
+        for <kvmarm@lists.linux.dev>; Fri, 17 May 2024 06:18:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715951897; x=1716556697; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=hl+KMyEDlURK49WZiyYeI4jwx1i7R7dEFUI5TRFvOZQ=;
-        b=GU8ntl/U4c9U/TGlrNpLzuV5TZOKvdtduOUHuo4HAYJe+IED12VVeNkwPEkyBPndBY
-         4nRnUTqEZRfI6X/JZLFPWoidlSyMZTM+VkSZUZSYtpCm8vfE0V0SMcSuMS9K/AoZMFPC
-         Oa0HL2l4WAlVtgEnfiNCI0dDHh2XA+3ErVzmZY8VQt9Nvzr5eyrtA/lXDKTn5oX7+hde
-         EG+iQSl0x/SSBhzw83ARHQVKNChLf7UR/YTT4IDxXlNxLB/kb4oJiibUtIIBk+TMPZSJ
-         Uxtbr2oDmtnTqenqd1Dygu1z0XmDIuXmfhpdUZ+21MGABC+cAHdq0Ed6S6PCA/SVX/Qu
-         B8Gg==
+        d=google.com; s=20230601; t=1715951899; x=1716556699; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=qVdEbOXx9MOG+bTq6aQWXhaGPeEByVvBsRBOQaUyERE=;
+        b=ODpJOqljOM4plkG+sUbfS0MNsP8TPkms1EyKEn9AJy4PWyDRmq8hMw/XARnQEkTOH3
+         EnwDhKfxleuFPnDp+gGcr+KPDXhfCwqCUygMJEcbfO8PiOE3odVKB4jAV6uLvo8bFHps
+         cTZGtpd0Ienwn4fU+yzhpG4JC+HImG+VD3dD/P2qE4j8SX9wgu272YVd3cKTUCmK2ADg
+         sQsjwJQqQWP0M9/sAM0g/cPAVjWOcJGhJRWVx/ghNb5ll57DxpWxxFU5Zu50rOXW3roM
+         CGR5shL2qTS9G5lqm7E62yyGXbBKUM5RalTqvF3h3XqumdEUHDjr/wIVENXB/Rj1AaGS
+         A8uA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715951897; x=1716556697;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=hl+KMyEDlURK49WZiyYeI4jwx1i7R7dEFUI5TRFvOZQ=;
-        b=bqk3TDTnke40sxIW+6eDXqAeKRD4cznn7OnPqus0ElunyZDzuF5g2pdld5n26E2S1K
-         n0WdZfqxEVql8BkLegCFU2zNc7lZnJbLqd7NGSJyk07pMRUKIKzEmtoJtFRWVgUNs0uv
-         f5x0ZJcQ2WCn59vHYiicKbQjNxO6FHK2uA1zEvTIDQtU/et0gxwrl+4+Lxe62QBtFump
-         l9lTwxOGRLKf2ZRuj8FaYprQnGQg1IoJQo764yWhhLKt+7KYgErgfj7X5SEmM1gni1Xd
-         hFJSRBxjCtvnCithheFgazxdQvVqhOGWILuYFsFqm9ngZ0VFDxibfp1W4FFBmW0i86dl
-         J+EA==
-X-Gm-Message-State: AOJu0YyjWVfVrgCwmqA8bdI8Z80nkP35JUxBN+7IT37pYJIJLHipOmVk
-	7tbwSUJgQhnPUUNumsiZe+tP+RF2jwj0YgZjpbtWBcneUv6Xc0VnQYQHi49Ll1tE8qLxOZk2BH+
-	3+Of3xeCngMibXa0yx6/t6Yx5wIrYCIz3hbfSy29WG/XmAXIQgiXlZx5cXdpQUPBhjf6ksh3uqF
-	bqHqspDeEr8v5XpUAcZ4YjA02xNDk=
-X-Google-Smtp-Source: AGHT+IH7UGXrVoY3CtAUX+9LQLBSIuLVl6OXjVWzHmtN6O/3XSCGVNKz67xzQbOzC/zBTcs9Zu4nw5um0A==
+        d=1e100.net; s=20230601; t=1715951899; x=1716556699;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qVdEbOXx9MOG+bTq6aQWXhaGPeEByVvBsRBOQaUyERE=;
+        b=e+qhk/dwX28xSxDqCTu54JUysxNWUoDfYIelUva7Yz4Wf5MwYJLFtSAmXjZCRac3Bd
+         SK3IaMcnHXuayPddT3M5pdW+en8eCR2XwCbXT+wuSXVyflJjHRgQWZt5018qPKuuyLPC
+         ZnqPfXqs1+ngBC81g7jk1lYq5X18mMQWasBGxbNPhcOP9gwXlhIn1b2EswS2611iqt1o
+         cbw8A7jlTv5u7vQ70VAk1XVyIhA+Lvm6FxNmzZdGDErUGV2NQgSBXmQrI+xJwItVE1Sg
+         MNvLaRYvPzI0rFCFDyjhSuNJQETJfLx0nz6D9RqguR6pwreCEOsDu+B8LaSdvA1I1XEw
+         HwuQ==
+X-Gm-Message-State: AOJu0Yy8hFM5+klhqxoz+cOLMx8VxdExDz0rvPZPb8ZF8rcas22mNU7Z
+	fukzq90wEZpXRoQntitPY3vAvu2ictDrrJQDIibqrlNtKdwGhDDwHCHcgXSu4AQeq0b4b9YwfXr
+	wmHAjlymt1CDn//EgrX66MeW2QYMXOGuX5XhlAlvZrZ5gg1D4WXxBh7mUubpy4jxCtoAziiEKC3
+	AoEwBW3uN5brLQP4aD9vSoCYLYb28=
+X-Google-Smtp-Source: AGHT+IFu4xWqso28SdQtQi+Z/57nxXVkCa8pGDFm0D3eMy9K8b368o6GYN0EaIVqFVZzIZX6I7aPYxNX3Q==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:6902:100f:b0:dee:5d43:a0f3 with SMTP id
- 3f1490d57ef6-dee5d43c91fmr5109647276.6.1715951896719; Fri, 17 May 2024
- 06:18:16 -0700 (PDT)
-Date: Fri, 17 May 2024 14:18:07 +0100
+ (user=tabba job=sendgmr) by 2002:a05:690c:4d88:b0:61b:ec80:3137 with SMTP id
+ 00721157ae682-622b01491d7mr49443427b3.9.1715951899059; Fri, 17 May 2024
+ 06:18:19 -0700 (PDT)
+Date: Fri, 17 May 2024 14:18:08 +0100
+In-Reply-To: <20240517131814.719933-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20240517131814.719933-1-tabba@google.com>
 X-Mailer: git-send-email 2.45.0.rc1.225.g2a3ae87e7f-goog
-Message-ID: <20240517131814.719933-1-tabba@google.com>
-Subject: [PATCH v1 0/7] KVM: arm64: Fix handling of host fpsimd/sve state in
- protected mode
+Message-ID: <20240517131814.719933-2-tabba@google.com>
+Subject: [PATCH v1 1/7] KVM: arm64: Reintroduce __sve_save_state
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
 Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com, 
@@ -68,60 +70,44 @@ Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com,
 	joey.gouly@arm.com, rananta@google.com, yuzenghui@huawei.com
 Content-Type: text/plain; charset="UTF-8"
 
-With the KVM host data rework [1], handling of fpsimd and sve
-state in protected mode is done at hyp. For protected VMs, we
-don't want to leak any guest state to the host, including whether
-a guest has used fpsimd/sve.
+Now that the hypervisor is handling the host sve state in
+protected mode, it needs to be able to save it.
 
-To complete the work started with the host data rework, in
-regards to protected mode, ensure that the host's fpsimd context
-and its sve context are restored on guest exit, since the rework
-has hidden the fpsimd/sve state from the host.
+This reverts commit e66425fc9ba3 ("KVM: arm64: Remove unused
+__sve_save_state").
 
-This patch series eagerly restores the host fpsimd/sve state on
-guest exit when running in protected mode, which happens only if
-the guest has used fpsimd/sve. This means that the saving of the
-state is lazy, similar to the behavior of KVM in other modes, but
-the restoration of the host state is eager.
+Signed-off-by: Fuad Tabba <tabba@google.com>
+---
+ arch/arm64/include/asm/kvm_hyp.h | 1 +
+ arch/arm64/kvm/hyp/fpsimd.S      | 6 ++++++
+ 2 files changed, 7 insertions(+)
 
-This series is based on kvmarm-6.10-1 (kvmarm/next). It should
-not have any effect on modes other than protected mode.
-
-Tested on qemu, with the kernel sve stress tests.
-
-Cheers,
-/fuad
-
-[1] https://lore.kernel.org/all/20240322170945.3292593-1-maz@kernel.org/
-
-Fuad Tabba (7):
-  KVM: arm64: Reintroduce __sve_save_state
-  KVM: arm64: Specialize deactivate fpsimd/sve traps on guest trap
-  KVM: arm64: Specialize handling of host fpsimd state on trap
-  KVM: arm64: Store the maximum sve vector length at hyp
-  KVM: arm64: Allocate memory at hyp for host sve state in pKVM
-  KVM: arm64: Eagerly restore host fpsimd/sve state in pKVM
-  KVM: arm64: Consolidate initializing the host data's fpsimd_state/sve
-    in pKVM
-
- arch/arm64/include/asm/kvm_host.h       | 11 +++-
- arch/arm64/include/asm/kvm_hyp.h        |  2 +
- arch/arm64/include/asm/kvm_pkvm.h       |  9 +++
- arch/arm64/include/uapi/asm/ptrace.h    | 14 +++++
- arch/arm64/kvm/arm.c                    | 75 +++++++++++++++++++++++++
- arch/arm64/kvm/hyp/fpsimd.S             |  6 ++
- arch/arm64/kvm/hyp/include/hyp/switch.h | 31 +++++-----
- arch/arm64/kvm/hyp/include/nvhe/pkvm.h  |  1 -
- arch/arm64/kvm/hyp/nvhe/hyp-main.c      | 57 ++++++++++++++++++-
- arch/arm64/kvm/hyp/nvhe/pkvm.c          | 15 ++---
- arch/arm64/kvm/hyp/nvhe/setup.c         | 25 ++++++++-
- arch/arm64/kvm/hyp/nvhe/switch.c        | 40 +++++++++++++
- arch/arm64/kvm/hyp/vhe/switch.c         | 16 ++++++
- arch/arm64/kvm/reset.c                  |  2 +
- 14 files changed, 271 insertions(+), 33 deletions(-)
-
-
-base-commit: eaa46a28d59655aa89a8fb885affa6fc0de44376
+diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+index 3e80464f8953..2ab23589339a 100644
+--- a/arch/arm64/include/asm/kvm_hyp.h
++++ b/arch/arm64/include/asm/kvm_hyp.h
+@@ -111,6 +111,7 @@ void __debug_restore_host_buffers_nvhe(struct kvm_vcpu *vcpu);
+ 
+ void __fpsimd_save_state(struct user_fpsimd_state *fp_regs);
+ void __fpsimd_restore_state(struct user_fpsimd_state *fp_regs);
++void __sve_save_state(void *sve_pffr, u32 *fpsr);
+ void __sve_restore_state(void *sve_pffr, u32 *fpsr);
+ 
+ u64 __guest_enter(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm64/kvm/hyp/fpsimd.S b/arch/arm64/kvm/hyp/fpsimd.S
+index 61e6f3ba7b7d..e950875e31ce 100644
+--- a/arch/arm64/kvm/hyp/fpsimd.S
++++ b/arch/arm64/kvm/hyp/fpsimd.S
+@@ -25,3 +25,9 @@ SYM_FUNC_START(__sve_restore_state)
+ 	sve_load 0, x1, x2, 3
+ 	ret
+ SYM_FUNC_END(__sve_restore_state)
++
++SYM_FUNC_START(__sve_save_state)
++	mov	x2, #1
++	sve_save 0, x1, x2, 3
++	ret
++SYM_FUNC_END(__sve_save_state)
 -- 
 2.45.0.rc1.225.g2a3ae87e7f-goog
 
