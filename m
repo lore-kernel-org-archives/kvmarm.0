@@ -1,146 +1,150 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com [209.85.217.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A7EEFC1D
-	for <kvmarm@lists.linux.dev>; Mon, 20 May 2024 08:11:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73848A2D
+	for <kvmarm@lists.linux.dev>; Mon, 20 May 2024 08:54:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716192676; cv=none; b=PORZwUFD9Xg9Ik3nTtDu5ABP4mQWdPJ6/CWW6AT+YAH9MT4AeGTp4uy45Iluud2dsLw930CgJq4Yju5YHcMnumBQrycwSIKweeKELJ4TqwIsV86TfXIxk6ehNbDk1caabfuyVhqUO40YXEZ0dh/rRLm3njXQFpALk4+71CwQo14=
+	t=1716195256; cv=none; b=PF4phg6IQXk6Smr7FOyNSTS09MPgyO1hXUwsXejXeFR3A1YxLyhrlWquj3zT86JXMuy+q+OW0cWOwMHlq+XtpSHLunYcI/PzW1xYTXqV+UNTL+e95i3K0IBfgiUDJF2QPQ3L1EUVLrZE550Y6cfAQxAwarSiSfmARxu3GkPR1as=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716192676; c=relaxed/simple;
-	bh=uPPCsyI8YJiboMyHupS/vpfh1xSOqnBzR4kN1jhF1/8=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jvyUyyHNi6t01E3jekncI1Mx96k8E0sYHgJybZzCmVGfO26pirKSvljHnl9qB6nftUK81VUGbqIqrnxYA41y+oZM2ew0qJUlAAS7DLhn1jfw+/VhOJ3e21/D1DE3zu+J2uslp9B/V0nnG1Ph1UYbk94pLeKALZpKfdhJi72K4Vc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KYENnl1Y; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1716195256; c=relaxed/simple;
+	bh=Hn/bJgs7CoBr9oJgpfWwkpbpVYB9K4Ahi5eFnJ3xiE8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=l1JGeMqQWjeBlcDipzk8moIWc4qliF14IRo6xdvXObsPzFUFmmKMGs5y9/9pnXCJFrsN9o54cvdeSI/p02Bfi6toObC61IGsyDqJyUXRTKv3LsRXeNn4qIkpJodFLQ0/zC/9uPHZGRIR6T6Te7jqvuLJZWVATneZNxAcogBCRAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OPp9aJw/; arc=none smtp.client-ip=209.85.217.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KYENnl1Y"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F032BC2BD10;
-	Mon, 20 May 2024 08:11:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716192676;
-	bh=uPPCsyI8YJiboMyHupS/vpfh1xSOqnBzR4kN1jhF1/8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=KYENnl1YIuSscSWJ96A7LacKNrH/NOeC/G/LSD+3zZ3jDHnk0TwHNztbuO6d/XHh1
-	 xTtUQrwYa3ATxV2rrcCJqFHS1oPyy80o3OliuMXo5VLtzMhH6aJSMQh8xjjqbCfYC+
-	 hUp3jQDbSvSq2BKkEbG4LIAdG5bayWP+tZyuWhdWbvsj0Yu6wqL7OKl6GVgEw01Ok3
-	 06cqHRfh06Gs0cxlXDCejtUq7p3taoXExXy5h2Qfm06HdrH3fYfO0K44kdvqD3AmQI
-	 f7VUbl6+E4My2kkOgqZ4LA/a7YM1xqSlt5O3ayw+HTZnDVfqrdFelPtqOZe8Gr2b6T
-	 Ttnth7HeUm4TQ==
-Received: from [185.143.37.16] (helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1s8y6z-00EQDc-Nd;
-	Mon, 20 May 2024 09:11:13 +0100
-Date: Mon, 20 May 2024 09:11:13 +0100
-Message-ID: <87pltg3ntq.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: Mark Brown <broonie@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	will@kernel.org,
-	qperret@google.com,
-	seanjc@google.com,
-	alexandru.elisei@arm.com,
-	catalin.marinas@arm.com,
-	philmd@linaro.org,
-	james.morse@arm.com,
-	suzuki.poulose@arm.com,
-	mark.rutland@arm.com,
-	joey.gouly@arm.com,
-	rananta@google.com,
-	yuzenghui@huawei.com
-Subject: Re: [PATCH v1 0/7] KVM: arm64: Fix handling of host fpsimd/sve state in protected mode
-In-Reply-To: <CA+EHjTxJe8yjVkhc=2fENJoMZs+MTR=9AZLmYcxZ5HxNnUOaQw@mail.gmail.com>
-References: <20240517131814.719933-1-tabba@google.com>
-	<ZkeUTix0Ojn5eHKP@linux.dev>
-	<b73372b3-e032-4afd-a7cd-e08a687b1d3f@sirena.org.uk>
-	<CA+EHjTxJe8yjVkhc=2fENJoMZs+MTR=9AZLmYcxZ5HxNnUOaQw@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OPp9aJw/"
+Received: by mail-vs1-f51.google.com with SMTP id ada2fe7eead31-47efc592d9fso326628137.0
+        for <kvmarm@lists.linux.dev>; Mon, 20 May 2024 01:54:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1716195254; x=1716800054; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sTmnkZjtCEAiCBviwaLAUM9+vdT6Q87kpPsgV1agRl4=;
+        b=OPp9aJw/XL9wKi0L27roWiRWlaYGO3Uz9pcADCP6NsKk0hH/GAFBZIVkf42HxpoxkI
+         zMZV98jZO91lNL8jj5G4+Kj3EjA0SUE85PT0mJqgbYSOagVUnXihY/ZVG9I71RaJ5sSK
+         RxkHFIP64SA32cug4DTvf3Wz3pgl7NXhK56CTL+g+4qnOhWDeSS+eCk4TV1ywha3Fz6J
+         KCZqhM4+l50wmsfs1j1621CRBlYE96cdqU0vHPJiT9rFw13Eih+GjY8H0HNTW9bYw0QB
+         HOoojYZDyAyCj0/HLe1M8Mi+r6S840giOE8EGXA6vwmvXWrZ32Oty8WF0QV4k4Ty46R9
+         uuKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716195254; x=1716800054;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sTmnkZjtCEAiCBviwaLAUM9+vdT6Q87kpPsgV1agRl4=;
+        b=EFI7pk8yl5gF71g3lO1pGBqDqp0rXGlVERtO6YvZkOCAp9tqLH/NgyoA0mxIfyHIe6
+         N7fxUAUdppt2hz8LJujqUd9TN4n8eYV2DHURrOoiyN79psT9Oo6lc8TXRQV/IgDNy0sk
+         nkOmNjSorYdf/2ExDLvWDHn07oXETXB47AsKf+g/Xm2uv0BSgolYhvJINlpMRx9rqdyo
+         pB+Z30EtYSKIXKQAWHoIjzwB7ri3/nsJ6nzh5sZvEv199PXGUzEqpKkVF13i7NpoyzCY
+         YVLkT5WQ56VQXJoRVAU7BqUY9tGwXLCHuumvC+Uft2iYBVBNYKuu4fSsSAwmu3Htmzv5
+         79Ew==
+X-Forwarded-Encrypted: i=1; AJvYcCXjsv/9C+RR8wX+Wdp/MXDr1vuRHjvANoTd5RW88cOSjGhLPVICIpk3VNKCUNs+86/2wj1f6N+u5U66Fzj84GyoI1XMPjQH
+X-Gm-Message-State: AOJu0Yzsx/Hn/eY7MjTzwIwiqnRnzITkPNCtffnU93qgw1uU84Q5ETzG
+	H5hYPwPzB62EeXQhesTbA75/e1HJYA+tS0rIiSL01YPODT1+6Qv4W98W0ZAG+f+JWywhj9gPGun
+	6HtOr0Ras/IFAmbB0eBRDzU0Hj5TuNdzMBmQB
+X-Google-Smtp-Source: AGHT+IGukY4NCuQ57Jan8rXLAeIEceURgTo7GWVR5qRA1Ghy1D6QSe2qg13Zn1VHhnhlE07pEVBmuaagwNASu4J7NQ4=
+X-Received: by 2002:a05:6102:32c5:b0:47a:42e6:ba69 with SMTP id
+ ada2fe7eead31-48077e43be8mr29498076137.27.1716195254254; Mon, 20 May 2024
+ 01:54:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
+MIME-Version: 1.0
+References: <20240517131814.719933-1-tabba@google.com> <20240517131814.719933-7-tabba@google.com>
+ <ZkePS5jU6yEv6Nhp@linux.dev> <CA+EHjTzFkNiPzH47Y52cEPd+LzNSAmGHD45C0o8p2ejB6LKHKQ@mail.gmail.com>
+ <87r0dw3o35.wl-maz@kernel.org>
+In-Reply-To: <87r0dw3o35.wl-maz@kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Mon, 20 May 2024 09:53:37 +0100
+Message-ID: <CA+EHjTzG1=b+RaaoAjddUX=c13WBHDmngEUas5JgPcyZtgSC7w@mail.gmail.com>
+Subject: Re: [PATCH v1 6/7] KVM: arm64: Eagerly restore host fpsimd/sve state
+ in pKVM
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, will@kernel.org, qperret@google.com, 
+	seanjc@google.com, alexandru.elisei@arm.com, catalin.marinas@arm.com, 
+	philmd@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, 
+	mark.rutland@arm.com, broonie@kernel.org, joey.gouly@arm.com, 
+	rananta@google.com, yuzenghui@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.143.37.16
-X-SA-Exim-Rcpt-To: tabba@google.com, broonie@kernel.org, oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, will@kernel.org, qperret@google.com, seanjc@google.com, alexandru.elisei@arm.com, catalin.marinas@arm.com, philmd@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, mark.rutland@arm.com, joey.gouly@arm.com, rananta@google.com, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 20 May 2024 08:35:47 +0100,
-Fuad Tabba <tabba@google.com> wrote:
->=20
-> Hi Oliver and Mark,
->=20
-> On Fri, May 17, 2024 at 7:19=E2=80=AFPM Mark Brown <broonie@kernel.org> w=
-rote:
-> >
-> > On Fri, May 17, 2024 at 05:30:54PM +0000, Oliver Upton wrote:
-> >
-> > > Hmm... Is there any reason why we need to be concerned about preservi=
-ng
-> > > host SVE state?
-> >
-> > > The syscall ABI has it that only the first 128 bits of the vector
-> > > registers are preserved by the kernel, and I see no reason why we
-> > > couldn't apply a similar restriction to KVM_RUN HVCs into EL2. We'd n=
-eed
-> > > to eagerly flush the vector registers on entry to avoid disclosing gu=
-est
-> > > usage of SVE.
-> >
-> > > What you have is certainly correct, I just wonder if we're going out =
-of
-> > > our way to save/restore 0's for larger VLs.
-> >
-> > Not just larger VLs, there's also the P registers even for 128 bit SVE.
-> >
-> > I think it'd be sensible to discard.  A big part of why the host ABI is
-> > like that is that the AAPCS makes the SVE specific state caller
-> > preserved on function calls, with syscalls mirroring that.  This means
-> > that even if the kernel is using FP the HVC would need to be inline in a
-> > function using SVE in order to get any state that needs to be preserved
-> > in there, or there'd need to be some other non-AAPCS thing going on.  We
-> > already ensure that any EL0 state is saved prior to trying to run a VM,
-> > I've not checked the interaction with pKVM here but if there's any
-> > issues I'd hope it's not too difficult to close them.
->=20
-> The reason for that is that in pKVM we want to avoid leaking any
-> information about protected VM activity to the host, including whether
-> the VM might have performed fpsimd/sve operations. Therefore, we need
-> to ensure that the host SVE state looks the same after a protected
-> guest has run as it did before a protected guest has run.
->=20
-> It would be correct to only save/restore the host's fpsimd state
-> (i.e., first 128 bits of the vector registers), which is what KVM does
-> in other modes. However, unless we always zero out the rest of the
-> state, regardless whether the protected guest has used fpsimd/sve,
-> then the host would be able to find out that the guest has in fact
-> performed fpsimd/sve operations.
->=20
-> This isn't necessary for non-protected VMs, but Marc thought that for
-> now it would be better to simplify things and have pKVM behave the
-> same way for both protected and non-protected VMs. As a future
-> optimization for non-protected VMs, we could have them behave as VMs
-> in other modes.
+Hi Marc,
 
-And I stand by what I said. Having a hybrid mode is a maintenance
-burden, and it will absolutely lead to some sort of horrible bugs (it
-just take a look at the mailing list to see that we have no shortage
-of bugs related to lazy FP/SVE handling).
+On Mon, May 20, 2024 at 9:05=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
+:
+>
+> On Mon, 20 May 2024 08:37:22 +0100,
+> Fuad Tabba <tabba@google.com> wrote:
+> >
+> > Hi Oliver,
+> >
+> > On Fri, May 17, 2024 at 6:09=E2=80=AFPM Oliver Upton <oliver.upton@linu=
+x.dev> wrote:
+> > >
+> > > Hi Fuad,
+> > >
+> > > On Fri, May 17, 2024 at 02:18:13PM +0100, Fuad Tabba wrote:
+> > > >  static void kvm_hyp_save_fpsimd_host(struct kvm_vcpu *vcpu)
+> > > >  {
+> > > > -     __fpsimd_save_state(*host_data_ptr(fpsimd_state));
+> > > > +     /*
+> > > > +      * Non-protected kvm relies on the host restoring its sve sta=
+te.
+> > > > +      * Protected kvm restores the host's sve state as not to reve=
+al that
+> > > > +      * fpsimd was used by a guest nor leak upper sve bits.
+> > > > +      */
+> > > > +     if (unlikely(is_protected_kvm_enabled() && system_supports_sv=
+e())) {
+> > > > +             __hyp_sve_save_host();
+> > > > +
+> > > > +             /* Re-enable SVE traps for guests that do not support=
+ it. */
+> > > > +             if (!vcpu_has_sve(vcpu))
+> > > > +                     sysreg_clear_set(cptr_el2, 0, CPTR_EL2_TZ);
+> > >
+> > > This doesn't account for hVHE. I wonder we'd be better off abstractin=
+g
+> > > CPTR_EL2 behind a helper wherever it gets used in nVHE and translate
+> > > into the VHE-format behind the scenes:
+> >
+> > Right! Too many modes to keep track of :)
+> >
+> > Abstracting cptr_el2 would make things clearer and less error-prone.
+> > I'll do that on the respin.
+>
+> If we're going with the conversion game, then I'd suggest you use the
+> VHE format as the reference, and convert it to nVHE on the flight.
+> That's for a few reasons:
 
-If someone is desperate for lazy handling, then the lazy handling
-should apply to both protected and non-protected VMs so that we can
-actually reason about it.
+Will do.
 
-	M.
+Cheers,
+/fuad
 
---=20
-Without deviation from the norm, progress is not possible.
+
+>
+> - like it or not, nVHE is going the way of the dodo. I love my v8.0
+>   hardware to bits, but it sucks, and nVHE is now optional anyway.
+>
+> - Keeping everything in the VHE format helps drawing a parallel with
+>   what is happening in the kernel (you grep for the same symbols).
+>
+> - One day, I hope to be able to rip any form of SVE/SME support out of
+>   nVHE and only keep it for hVHE, because there is no ARMv8.0
+>   implementations with these extensions (apart from SW models).  One
+>   day...
+>
+> Thanks,
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
