@@ -1,96 +1,121 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F27861CD39;
-	Mon, 20 May 2024 16:53:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4B0DDDDA
+	for <kvmarm@lists.linux.dev>; Mon, 20 May 2024 17:08:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716224024; cv=none; b=IvAyGUeFI/pem6b/RVHQDQ4BOOKZd/JjK47u+vpUkKSWe5cZPzrbtFo+zMgKlHEM5ow45U3TqOK2XkJDgMVJp/Rhryqzgq49YQfSZT/Tn5n3rDBxP2ls8zL62SEcOBhxgME9+IHVJ5Bu3MB9S4eK92Pi5XhS24yf6mxYaw1AyUQ=
+	t=1716224909; cv=none; b=GmW1MZMLUcrP8PAQxMLyb0jkRkTd+/i8N7zritQj9nsulDJKxpV3427f4Hn7x2BHnPBvDLIW/S2aEhs0E+cyBSceUpo59SV9qTXzX/s44M/Hg6Y5c0g34hSu8zXPeJxLcuGs4gxygKN72bOnm0MnY+fZHUiMMQtVG7Vbr3ZhVuY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716224024; c=relaxed/simple;
-	bh=je6uhvv3pMpXo2t4Zi2VWNxun0jFphVijhCZismhTNA=;
+	s=arc-20240116; t=1716224909; c=relaxed/simple;
+	bh=d93WTo0LpqbgFt1JZXtS5WhRHlkUDxRhTRVjR/JhEYM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IB+ms184lA10iBIXOFHYFdWWD+slG53160+Rw9rdrw9vOSGVOffRvMQFmtBlFYNQ6QG3q7x6N/HrqCLVcwg1UZPuQtggbqBFCaqRH/2IJ9lyjpmFRSs/hqnprkkZc8F6LRLQLkMOEwmJjB1/8VaSeJhVGx+2MTrgqZp/ivxmEK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F3A53DA7;
-	Mon, 20 May 2024 09:54:04 -0700 (PDT)
-Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 876AC3F641;
-	Mon, 20 May 2024 09:53:31 -0700 (PDT)
-Date: Mon, 20 May 2024 17:53:25 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
-	Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: Re: [PATCH v2 09/14] arm64: Enable memory encrypt for Realms
-Message-ID: <ZkuABQlGgtbzyQFT@arm.com>
-References: <20240412084213.1733764-1-steven.price@arm.com>
- <20240412084213.1733764-10-steven.price@arm.com>
- <ZkOmrMIMFCgEKuVw@arm.com>
- <5b2db977-7f0f-4c3a-b278-f195c7ddbd80@arm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=qdpp5o+D4tnDaNXAujOKLKES6CyilBO2+LpNPpOfbbmJcxf7jP9t3fEwAG+kTl4CS/76P+ettyaj3fpU9xlu7DliwBGDIuWMyrulagio/L6uZ3xpMcY10a489CMbLSxcaZtf6sUWCgDMhonEfalVU+W2HS18uYgqHZIoO36wW+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KRaXmd5g; arc=none smtp.client-ip=95.215.58.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KRaXmd5g"
+X-Envelope-To: maz@kernel.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1716224906;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5ZxPc1HKEzT5D8SyGOQxoDo+gvVi7ggagC7NtfT2yuw=;
+	b=KRaXmd5giN5F1fquf8EDIkEJBDECWsqnyEHOIMKOLIqPtEuyTS0uyAG5ZYhRGvxkg1VQEG
+	vInwFKnuZEXzqO9qH3FQSskBxMp8PhOslGwTjq3hwwPDEIK/WSOwkIQNOU7kMGz+IBY7L6
+	6tRxyn5f1yONKBeLDEGHgOpRGZPJUgg=
+X-Envelope-To: tabba@google.com
+X-Envelope-To: kvmarm@lists.linux.dev
+X-Envelope-To: linux-arm-kernel@lists.infradead.org
+X-Envelope-To: will@kernel.org
+X-Envelope-To: qperret@google.com
+X-Envelope-To: seanjc@google.com
+X-Envelope-To: alexandru.elisei@arm.com
+X-Envelope-To: catalin.marinas@arm.com
+X-Envelope-To: philmd@linaro.org
+X-Envelope-To: james.morse@arm.com
+X-Envelope-To: suzuki.poulose@arm.com
+X-Envelope-To: mark.rutland@arm.com
+X-Envelope-To: broonie@kernel.org
+X-Envelope-To: joey.gouly@arm.com
+X-Envelope-To: rananta@google.com
+X-Envelope-To: yuzenghui@huawei.com
+Date: Mon, 20 May 2024 17:08:19 +0000
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Fuad Tabba <tabba@google.com>, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, will@kernel.org,
+	qperret@google.com, seanjc@google.com, alexandru.elisei@arm.com,
+	catalin.marinas@arm.com, philmd@linaro.org, james.morse@arm.com,
+	suzuki.poulose@arm.com, mark.rutland@arm.com, broonie@kernel.org,
+	joey.gouly@arm.com, rananta@google.com, yuzenghui@huawei.com
+Subject: Re: [PATCH v1 6/7] KVM: arm64: Eagerly restore host fpsimd/sve state
+ in pKVM
+Message-ID: <ZkuDg4p3o5vL9kUm@linux.dev>
+References: <20240517131814.719933-1-tabba@google.com>
+ <20240517131814.719933-7-tabba@google.com>
+ <ZkePS5jU6yEv6Nhp@linux.dev>
+ <CA+EHjTzFkNiPzH47Y52cEPd+LzNSAmGHD45C0o8p2ejB6LKHKQ@mail.gmail.com>
+ <87r0dw3o35.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <5b2db977-7f0f-4c3a-b278-f195c7ddbd80@arm.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87r0dw3o35.wl-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, May 15, 2024 at 11:47:02AM +0100, Suzuki K Poulose wrote:
-> On 14/05/2024 19:00, Catalin Marinas wrote:
-> > On Fri, Apr 12, 2024 at 09:42:08AM +0100, Steven Price wrote:
-> > >   static int change_page_range(pte_t *ptep, unsigned long addr, void *data)
-> > > @@ -41,6 +45,7 @@ static int change_page_range(pte_t *ptep, unsigned long addr, void *data)
-> > >   	pte = clear_pte_bit(pte, cdata->clear_mask);
-> > >   	pte = set_pte_bit(pte, cdata->set_mask);
-> > > +	/* TODO: Break before make for PROT_NS_SHARED updates */
-> > >   	__set_pte(ptep, pte);
-> > >   	return 0;
+On Mon, May 20, 2024 at 09:05:34AM +0100, Marc Zyngier wrote:
+> On Mon, 20 May 2024 08:37:22 +0100,
+> Fuad Tabba <tabba@google.com> wrote:
 > > 
-> > Oh, this TODO is problematic, not sure we can do it safely. There are
-> > some patches on the list to trap faults from other CPUs if they happen
-> > to access the page when broken but so far we pushed back as complex and
-> > at risk of getting the logic wrong.
+> > Hi Oliver,
 > > 
-> >  From an architecture perspective, you are changing the output address
-> > and D8.16.1 requires a break-before-make sequence (FEAT_BBM doesn't
-> > help). So we either come up with a way to do BMM safely (stop_machine()
-> > maybe if it's not too expensive or some way to guarantee no accesses to
-> > this page while being changed) or we get the architecture clarified on
-> > the possible side-effects here ("unpredictable" doesn't help).
+> > On Fri, May 17, 2024 at 6:09 PM Oliver Upton <oliver.upton@linux.dev> wrote:
+> > >
+> > > Hi Fuad,
+> > >
+> > > On Fri, May 17, 2024 at 02:18:13PM +0100, Fuad Tabba wrote:
+> > > >  static void kvm_hyp_save_fpsimd_host(struct kvm_vcpu *vcpu)
+> > > >  {
+> > > > -     __fpsimd_save_state(*host_data_ptr(fpsimd_state));
+> > > > +     /*
+> > > > +      * Non-protected kvm relies on the host restoring its sve state.
+> > > > +      * Protected kvm restores the host's sve state as not to reveal that
+> > > > +      * fpsimd was used by a guest nor leak upper sve bits.
+> > > > +      */
+> > > > +     if (unlikely(is_protected_kvm_enabled() && system_supports_sve())) {
+> > > > +             __hyp_sve_save_host();
+> > > > +
+> > > > +             /* Re-enable SVE traps for guests that do not support it. */
+> > > > +             if (!vcpu_has_sve(vcpu))
+> > > > +                     sysreg_clear_set(cptr_el2, 0, CPTR_EL2_TZ);
+> > >
+> > > This doesn't account for hVHE. I wonder we'd be better off abstracting
+> > > CPTR_EL2 behind a helper wherever it gets used in nVHE and translate
+> > > into the VHE-format behind the scenes:
+> > 
+> > Right! Too many modes to keep track of :)
+> > 
+> > Abstracting cptr_el2 would make things clearer and less error-prone.
+> > I'll do that on the respin.
 > 
-> Thanks, we need to sort this out.
+> If we're going with the conversion game, then I'd suggest you use the
+> VHE format as the reference, and convert it to nVHE on the flight.
+> That's for a few reasons:
 
-Thanks for the clarification on RIPAS states and behaviour in one of
-your replies. Thinking about this, since the page is marked as
-RIPAS_EMPTY prior to changing the PTE, the address is going to fault
-anyway as SEA if accessed. So actually breaking the PTE, TLBI, setting
-the new PTE would not add any new behaviour. Of course, this assumes
-that set_memory_decrypted() is never called on memory being currently
-accessed (can we guarantee this?).
-
-So, we need to make sure that there is no access to the linear map
-between set_memory_range_shared() and the actual pte update with
-__change_memory_common() in set_memory_decrypted(). At a quick look,
-this seems to be the case (ignoring memory scrubbers, though dummy ones
-just accessing memory are not safe anyway and unlikely to run in a
-guest).
-
-(I did come across the hv_uio_probe() which, if I read correctly, it
-ends up calling set_memory_decrypted() with a vmalloc() address; let's
-pretend this code doesn't exist ;))
+Agreed, I was thinking of hVHE as this 'thing on the side', but really
+it is the direction of the architecture :) So yeah, prefer your
+suggestion.
 
 -- 
-Catalin
+Thanks,
+Oliver
