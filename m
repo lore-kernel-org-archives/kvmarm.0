@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D613D3DB89
-	for <kvmarm@lists.linux.dev>; Tue, 21 May 2024 22:52:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCC5F58AC1
+	for <kvmarm@lists.linux.dev>; Tue, 21 May 2024 22:55:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716331945; cv=none; b=R35EVE+W9naE6xWmvZ7qZN+G8vk2NC7kiob8Ae3uslSTiDQvSO2NLdvS7zytf+gbGodS854ParLjdWKKk3ssdVmm373/wRi5FcI6PpiAPL4/fuQph5L0eWO9Oa46FkP4UVtoUPUwCthskqbkgGYpoUDzBb2855uJr1C88mNTQ/g=
+	t=1716332158; cv=none; b=orMQhiXfB9sUPdjNLRTvjT39fLBhqz8TxeaK8Cd1UJ245bKPtQs6cgkomn4xqW2kVaO2PS4RaSIdjusviU3Suh+tmFPR87qC/2bO+Q5U61NK+OFtRuovrSlvQ7ryHFgErwXxPxV3dT4npq7f+J2xKMhQVb+G37rFSIqXK3cbkIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716331945; c=relaxed/simple;
-	bh=v0Vv5zq7d4TRDM+lN818VW2kqCrPhvgiGE11Ah2/8hk=;
+	s=arc-20240116; t=1716332158; c=relaxed/simple;
+	bh=AiTbcE+29X20WEPWmFk8QjzgFfmySto3RrFAFrXbOFo=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ql+RBXTURN0OpsCudS2Z94z1qzdX2pBqZkqjsxepOjrIZw3yXGgH18M7Jw0SYLnOV0VlrniGKcnUfll/jpTNtttgU7RpSPyuVfzV1LEl6NCjVJpnUPyfPSLwgHMHzqXGH4oTXDvp+E8JAqnkxfG2sgUrmiTTu2rAQNWYTLbVJ0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hdM/qZec; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=JW+5+O8PpwNHaU8CiBLyMtKboYLZj5na8snrSkZf8XUJ2Mhu/SVyjU2XowT+CbI0xnqImWJPJZutOHGlL179wFKGUFy3P13kXQmYMH426xOsPtcwdGeXSU6GC6VFgb1koVbQNlip5soXcHslTMZyH53CtLchHAUKVUqfDNwDQRg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tk3i1jzl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hdM/qZec"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C106C2BD11;
-	Tue, 21 May 2024 22:52:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tk3i1jzl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F7AAC2BD11;
+	Tue, 21 May 2024 22:55:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716331945;
-	bh=v0Vv5zq7d4TRDM+lN818VW2kqCrPhvgiGE11Ah2/8hk=;
+	s=k20201202; t=1716332158;
+	bh=AiTbcE+29X20WEPWmFk8QjzgFfmySto3RrFAFrXbOFo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hdM/qZecuqhnFgS4Sw8ZspzBCv+n9hsir9UrJ4ZYIX484qgO8f/Q5DUn8Qy+nO6oL
-	 8EypYSUwhtmLwcWkWZs/a8IwKHpxyClXbWDmX3YKgNr1M/S3UpjI9/+/BojQy49St+
-	 gWt0JPlb5XXOjPCtAtjQF1pvyyOq6CjjwzzTbchZCE3yfpYVKtvaPy4xP7gEjHBuWF
-	 VCpIDCd3bb9Q4+nGgFyKwU+JXkF3YIHiGwTUxTNkOs5wBBJ7Gtmjc39eAbwk4ZOJD4
-	 VZRcQMCKqHY2cWtmowg6jn6s4tziR8a/GtLmSwWk5DqBiv/UBu1HNrSWsdTfnyX4Mc
-	 X1c73jErm4Ksg==
+	b=tk3i1jzl6Hj7UFXPmRA9QbaAb+iFgIdbZKh6Jffk5+Mfv0oMjwFZnxOSW9QRFhaCm
+	 KBWsiwrvZD71HN4BFWoM/zc6SmtbyaUgRZph6+nmxvqNzfP3D2X2k3PsLyJ11C3kEh
+	 P2tL+AAmaRRxpKjl/KoTQ8Rw7yH2P8gEOpCHZ1OcCoqpRRh1FSCPmRHPFOMfn5j9z8
+	 crURMuuMs5IkecfyfU6ze7rSzCQZsxWgIjFZ0B5B7p+x8xClwy3LpbcU6Ob69TcjFr
+	 Gn9CrtQrv2dS0gyhi45+2zDgjmoBxOjHk95Y/mxwRMAIQ/XJsMcmRiq4sZ5VnlC2uX
+	 QXGzpWeuftfvQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1s9YLG-00Eoi6-L2;
-	Tue, 21 May 2024 23:52:22 +0100
-Date: Tue, 21 May 2024 23:52:21 +0100
-Message-ID: <86o78yn5ga.wl-maz@kernel.org>
+	id 1s9YOh-00EojB-T8;
+	Tue, 21 May 2024 23:55:56 +0100
+Date: Tue, 21 May 2024 23:55:55 +0100
+Message-ID: <86msoin5ac.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Fuad Tabba <tabba@google.com>
 Cc: kvmarm@lists.linux.dev,
@@ -52,10 +52,10 @@ Cc: kvmarm@lists.linux.dev,
 	joey.gouly@arm.com,
 	rananta@google.com,
 	yuzenghui@huawei.com
-Subject: Re: [PATCH v2 6/7] KVM: arm64: Eagerly restore host fpsimd/sve state in pKVM
-In-Reply-To: <20240521163720.3812851-7-tabba@google.com>
+Subject: Re: [PATCH v2 7/7] KVM: arm64: Consolidate initializing the host data's fpsimd_state/sve in pKVM
+In-Reply-To: <20240521163720.3812851-8-tabba@google.com>
 References: <20240521163720.3812851-1-tabba@google.com>
-	<20240521163720.3812851-7-tabba@google.com>
+	<20240521163720.3812851-8-tabba@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -71,207 +71,74 @@ X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@li
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 21 May 2024 17:37:19 +0100,
+On Tue, 21 May 2024 17:37:20 +0100,
 Fuad Tabba <tabba@google.com> wrote:
 > 
-> When running in protected mode we don't want to leak protected
-> guest state to the host, including whether a guest has used
-> fpsimd/sve. Therefore, eagerly restore the host state on guest
-> exit when running in protected mode, which happens only if the
-> guest has used fpsimd/sve.
-> 
-> As a future optimisation, we could go back to lazy restoring
-> state at the host after exiting non-protected guests.
-
-No. This sort of things is way too invasive and would require mapping
-the VHE host data at EL2. If we need to optimise this crap, then we
-apply the same techniques as we use for guests. If that's good enough
-for the guests, that's good enough for the host.
-
+> Now that we have introduced finalize_init_hyp_mode(), lets
+> consolidate the initializing of the host_data fpsimd_state and
+> sve state.
 > 
 > Signed-off-by: Fuad Tabba <tabba@google.com>
 > ---
->  arch/arm64/kvm/hyp/include/hyp/switch.h | 13 +++++-
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c      | 53 +++++++++++++++++++++++--
->  arch/arm64/kvm/hyp/nvhe/pkvm.c          |  2 +
->  arch/arm64/kvm/hyp/nvhe/switch.c        | 16 +++++++-
->  4 files changed, 79 insertions(+), 5 deletions(-)
+>  arch/arm64/include/asm/kvm_host.h      | 10 ++++++++--
+>  arch/arm64/kvm/arm.c                   | 18 ++++++++++++------
+>  arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  1 -
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c         | 11 -----------
+>  arch/arm64/kvm/hyp/nvhe/setup.c        |  1 -
+>  5 files changed, 20 insertions(+), 21 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index 1897b73e635c..2fa29bfec0b6 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -320,6 +320,16 @@ static inline void __hyp_sve_restore_guest(struct kvm_vcpu *vcpu)
->  	write_sysreg_el1(__vcpu_sys_reg(vcpu, ZCR_EL1), SYS_ZCR);
->  }
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 7b3745ef1d73..8a170f314498 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -536,8 +536,14 @@ struct kvm_cpu_context {
+>  struct kvm_host_data {
+>  	struct kvm_cpu_context host_ctxt;
 >  
-> +static inline void __hyp_sve_save_host(void)
-> +{
-> +	struct user_sve_state *sve_state = *host_data_ptr(sve_state);
-> +
-> +	sve_state->zcr_el1 = read_sysreg_el1(SYS_ZCR);
-> +	sve_cond_update_zcr_vq(ZCR_ELx_LEN_MASK, SYS_ZCR_EL2);
-> +	__sve_save_state(sve_state->sve_regs + sve_ffr_offset(kvm_host_sve_max_vl),
-> +			 &sve_state->fpsr);
-> +}
-> +
->  static void kvm_hyp_save_fpsimd_host(struct kvm_vcpu *vcpu);
->  
->  /*
-> @@ -356,7 +366,8 @@ static bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
->  
->  	/* First disable enough traps to allow us to update the registers */
->  	reg = CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN;
-> -	if (sve_guest)
-> +	if (sve_guest ||
-> +	    (is_protected_kvm_enabled() && system_supports_sve()))
-
-This looks really ugly. Why can't we just compute sve_guest to take
-these conditions into account?
-
->  		reg |= CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN;
->  	cpacr_clear_set(0, reg);
->  	isb();
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index b07d44484f42..f79f0f7b2759 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -23,20 +23,66 @@ DEFINE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
->  
->  void __kvm_hyp_host_forward_smc(struct kvm_cpu_context *host_ctxt);
->  
-> +static void __hyp_sve_save_guest(struct kvm_vcpu *vcpu)
-> +{
-> +	__vcpu_sys_reg(vcpu, ZCR_EL1) = read_sysreg_el1(SYS_ZCR);
-> +	sve_cond_update_zcr_vq(vcpu_sve_max_vq(vcpu) - 1, SYS_ZCR_EL2);
-> +	__sve_save_state(vcpu_sve_pffr(vcpu), &vcpu->arch.ctxt.fp_regs.fpsr);
-> +	sve_cond_update_zcr_vq(ZCR_ELx_LEN_MASK, SYS_ZCR_EL2);
-> +}
-> +
-> +static void __hyp_sve_restore_host(void)
-> +{
-> +	struct user_sve_state *sve_state = *host_data_ptr(sve_state);
-> +
-> +	sve_cond_update_zcr_vq(ZCR_ELx_LEN_MASK, SYS_ZCR_EL2);
-> +	__sve_restore_state(sve_state->sve_regs + sve_ffr_offset(kvm_host_sve_max_vl),
-
-This is what I was worried about in a previous patch.
-kvm_host_sve_max_vl represents the max VL across all CPUs. if CPU0
-supports 128bit SVE and CPU1 256bit, the value is 256. but on CPU0,
-ZCR_ELx_LEN_MASK will results in using 128bit accesses, and the offset
-will be wrong. I can't convince myself that anything really goes wrong
-as long as we're consistent between save and restore, but that's at
-best ugly and needs extensive documenting.
-
-On top of that, a conditional update of ZCR_EL2 with ZCR_ELx_LEN_MASK
-is unlikely to be beneficial, since nobody implements 2k vectors. A
-direct write followed by an ISB is likely to be better.
-
-> +			    &sve_state->fpsr);
-> +	write_sysreg_el1(sve_state->zcr_el1, SYS_ZCR);
-> +}
-> +
-> +static void fpsimd_sve_flush(void)
-> +{
-> +	*host_data_ptr(fp_owner) = FP_STATE_HOST_OWNED;
-> +}
-> +
-> +static void fpsimd_sve_sync(struct kvm_vcpu *vcpu)
-> +{
-> +	if (!guest_owns_fp_regs())
-> +		return;
-> +
-> +	cpacr_clear_set(0, (CPACR_EL1_ZEN_EL1EN | CPACR_EL1_ZEN_EL0EN |
-> +			    CPACR_EL1_FPEN_EL1EN | CPACR_EL1_FPEN_EL0EN));
-> +	isb();
-> +
-> +	if (vcpu_has_sve(vcpu))
-> +		__hyp_sve_save_guest(vcpu);
-> +	else
-> +		__fpsimd_save_state(&vcpu->arch.ctxt.fp_regs);
-> +
-> +	if (system_supports_sve())
-> +		__hyp_sve_restore_host();
-> +	else
-> +		__fpsimd_restore_state(*host_data_ptr(fpsimd_state));
-> +
-> +	*host_data_ptr(fp_owner) = FP_STATE_HOST_OWNED;
-> +}
-> +
->  static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
->  {
->  	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
->  
-> +	fpsimd_sve_flush();
-> +
->  	hyp_vcpu->vcpu.arch.ctxt	= host_vcpu->arch.ctxt;
->  
->  	hyp_vcpu->vcpu.arch.sve_state	= kern_hyp_va(host_vcpu->arch.sve_state);
-> -	hyp_vcpu->vcpu.arch.sve_max_vl	= host_vcpu->arch.sve_max_vl;
-> +	hyp_vcpu->vcpu.arch.sve_max_vl	= min(host_vcpu->arch.sve_max_vl, kvm_host_sve_max_vl);
->  
->  	hyp_vcpu->vcpu.arch.hw_mmu	= host_vcpu->arch.hw_mmu;
->  
->  	hyp_vcpu->vcpu.arch.hcr_el2	= host_vcpu->arch.hcr_el2;
->  	hyp_vcpu->vcpu.arch.mdcr_el2	= host_vcpu->arch.mdcr_el2;
-> -	hyp_vcpu->vcpu.arch.cptr_el2	= host_vcpu->arch.cptr_el2;
->  
->  	hyp_vcpu->vcpu.arch.iflags	= host_vcpu->arch.iflags;
->  
-> @@ -54,10 +100,11 @@ static void sync_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
->  	struct vgic_v3_cpu_if *host_cpu_if = &host_vcpu->arch.vgic_cpu.vgic_v3;
->  	unsigned int i;
->  
-> +	fpsimd_sve_sync(&hyp_vcpu->vcpu);
-> +
->  	host_vcpu->arch.ctxt		= hyp_vcpu->vcpu.arch.ctxt;
->  
->  	host_vcpu->arch.hcr_el2		= hyp_vcpu->vcpu.arch.hcr_el2;
-> -	host_vcpu->arch.cptr_el2	= hyp_vcpu->vcpu.arch.cptr_el2;
->  
->  	host_vcpu->arch.fault		= hyp_vcpu->vcpu.arch.fault;
->  
-> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> index 25e9a94f6d76..feb27b4ce459 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> @@ -588,6 +588,8 @@ int __pkvm_init_vcpu(pkvm_handle_t handle, struct kvm_vcpu *host_vcpu,
->  	if (ret)
->  		unmap_donated_memory(hyp_vcpu, sizeof(*hyp_vcpu));
->  
-> +	hyp_vcpu->vcpu.arch.cptr_el2 = kvm_get_reset_cptr_el2(&hyp_vcpu->vcpu);
-> +
-
-Eventually, we need to rename this to cpacr_el2 and make sure we
-consistently use the VHE format everywhere. I'm starting to be worried
-that we mix things badly.
-
->  	return ret;
->  }
->  
-> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-> index 019f863922fa..5bf437682b94 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-> @@ -184,7 +184,21 @@ static bool kvm_handle_pvm_sys64(struct kvm_vcpu *vcpu, u64 *exit_code)
->  
->  static void kvm_hyp_save_fpsimd_host(struct kvm_vcpu *vcpu)
->  {
-> -	__fpsimd_save_state(*host_data_ptr(fpsimd_state));
+> -	struct user_fpsimd_state *fpsimd_state;	/* hyp VA */
+> -	struct user_sve_state *sve_state;	/* hyp VA */
 > +	/*
-> +	 * Non-protected kvm relies on the host restoring its sve state.
-> +	 * Protected kvm restores the host's sve state as not to reveal that
-> +	 * fpsimd was used by a guest nor leak upper sve bits.
+> +	 * All pointers in this union are hyp VA.
+> +	 * sve_state is only used in pKVM and if system_supports_sve().
 > +	 */
-> +	if (unlikely(is_protected_kvm_enabled() && system_supports_sve())) {
-> +		__hyp_sve_save_host();
+> +	union {
+> +		struct user_fpsimd_state *fpsimd_state;
+> +		struct user_sve_state *sve_state;
+> +	};
+>  
+>  	/* Ownership of the FP regs */
+>  	enum {
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index a9b1b0e9c319..a1c7e0ad6951 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -2445,14 +2445,20 @@ static void finalize_init_hyp_mode(void)
+>  {
+>  	int cpu;
+>  
+> -	if (!is_protected_kvm_enabled() || !system_supports_sve())
+> -		return;
+> -
+>  	for_each_possible_cpu(cpu) {
+> -		struct user_sve_state *sve_state;
+> +		if (system_supports_sve() && is_protected_kvm_enabled()) {
+> +			struct user_sve_state *sve_state;
+>  
+> -		sve_state = per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)->sve_state;
+> -		per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)->sve_state = kern_hyp_va(sve_state);
+> +			sve_state = per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)->sve_state;
+> +			per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)->sve_state =
+> +				kern_hyp_va(sve_state);
+> +		} else {
+> +			struct user_fpsimd_state *fpsimd_state;
 > +
-> +		/* Re-enable SVE traps if not supported for the guest vcpu. */
-> +		if (!vcpu_has_sve(vcpu))
-> +			cpacr_clear_set(CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN, 0);
-> +
+> +			fpsimd_state = &per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)->host_ctxt.fp_regs;
+> +			per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)->fpsimd_state =
+> +				kern_hyp_va(fpsimd_state);
+> +		}
 
-nit: spurious new line
+nit: SVE support and protected state do not change on a per CPU basis,
+so checking for these inside the loop is pretty counter intuitive.
 
 Thanks,
 
