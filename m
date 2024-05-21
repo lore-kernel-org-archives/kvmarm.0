@@ -1,124 +1,138 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f53.google.com (mail-vs1-f53.google.com [209.85.217.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C54E71B4F;
-	Tue, 21 May 2024 10:14:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B577A763F0
+	for <kvmarm@lists.linux.dev>; Tue, 21 May 2024 12:28:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716286463; cv=none; b=F11vOt5+3xVEIuLIQFS8WrhfJ6IJDW4nWXXofYp/fa7lk942W9wEe/+GggRw9soAk5SRSzfjaCIACl3MbZobeIr3b7cTSVof/fqD2W4YdnUt46y4+jUFxoJ9EhDXSt/XSHaeH4Jjl+fmmyFJnQ6pWiznWJ3P0Z0esU3Q9l65AG0=
+	t=1716294515; cv=none; b=pWuA7OtU7+NPi3zVnDQOqt0GC+uNtd2PScbflfPvbiv+Kyrm+pnoMqhjrVwj6qA7E1EooJbKFZjq3YOXNVwXWW4aUU4HpAouPc9tnrCcnIdIroxk3KTE2DtyjTKgy4M9LVhhiZ2mrhdYeUZrHpcRD8YSHgrnrdWZL0NwxnP5qkM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716286463; c=relaxed/simple;
-	bh=S+wZXg5uTKAmZeL4zCJdXSkIvMKrrXSNrng1U4wro3c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FzI0gtfirjkzaC6pnJfEOjPMXhTGT3DtJaNKv9sv/Da0mLEmaIT0li7jRj/U7PwYw0umKe3JunIo5eSghSAvZSkE969sk95TqZfaY0L95NdEnyVN1ZQ7RKehX7wYJbjzo36Af6PCXTO25lMvg3LrTTK5zIC8vFAxF9AafOXqAn8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E364EC4AF09;
-	Tue, 21 May 2024 10:14:19 +0000 (UTC)
-Date: Tue, 21 May 2024 11:14:17 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Michael Kelley <mhklinux@outlook.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: Re: [PATCH v2 09/14] arm64: Enable memory encrypt for Realms
-Message-ID: <Zkxz-QfzUM_D0SAm@arm.com>
-References: <20240412084213.1733764-1-steven.price@arm.com>
- <20240412084213.1733764-10-steven.price@arm.com>
- <ZkOmrMIMFCgEKuVw@arm.com>
- <5b2db977-7f0f-4c3a-b278-f195c7ddbd80@arm.com>
- <ZkuABQlGgtbzyQFT@arm.com>
- <SN6PR02MB41578D7BFEDE33BD2E8246EFD4E92@SN6PR02MB4157.namprd02.prod.outlook.com>
+	s=arc-20240116; t=1716294515; c=relaxed/simple;
+	bh=YnKOB5k+cfXFmF1HFPh+ytM6NizBlvxBlwtMrZYFDYk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ttW+bNZZOIT2mRAQJy0V7lvKmIvhlBLeXlYdIaL8UGcxexuiIkK8CSLVgW9hN5wuxJFAqza1gDy1pilhRgvYLSUYA4zH60EoNlAEEW8saBngiKELLKWC3RUhZH3L7EFNNJDR0dqDdY60bNY+lhBJHl9TGpRdDexeFERyDLQW49s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=01+gbIoQ; arc=none smtp.client-ip=209.85.217.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="01+gbIoQ"
+Received: by mail-vs1-f53.google.com with SMTP id ada2fe7eead31-47f008106d0so917289137.2
+        for <kvmarm@lists.linux.dev>; Tue, 21 May 2024 05:28:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1716294512; x=1716899312; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YnKOB5k+cfXFmF1HFPh+ytM6NizBlvxBlwtMrZYFDYk=;
+        b=01+gbIoQjbuJax0jidW2m2OT0HP2qq4t50SYww2mhChitiSj+PziCx9hee/FBr9HgR
+         QxzumTa05aH1cMN95ODn3xUpFXgZUFKc/UotgRzuQGnYxV4kmC7XmeEpsX/QpdZWquOZ
+         1HwoimVgRVHUgeG737YMKURM2PKuUwLHaBBbBfcqm5P8/sI2MTMorNBsUvm3m2eBjxt4
+         2/lBuAqKe7K31+HuJ9QeURrBXjAviZZ+5BOKsspCnMs0Pl6sSjA/8TMxvOLi0zWO8g5o
+         E94KYadiBZ9XXkdT5V4Hu8SPIV5oTyAmTcaR1vruXTo31TRv8fECG0iXVI4r0u8Mjcbr
+         wyWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716294512; x=1716899312;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YnKOB5k+cfXFmF1HFPh+ytM6NizBlvxBlwtMrZYFDYk=;
+        b=Hlk3aJ9M4SsDCyfs6wzgIG+Gz++l5AI+ypEwdPWn2IDOfrPTmahOHfuGMpFmFat+zy
+         20NR6hDG+TOzKr44rINw/SocM/3VDvT+zNjrir66k+RHfv9ifr325PWdZPj8cOPdZa70
+         xdnE/9gKYPOVz7GNyOysCvWXfKISIY9gDzRxx8zlIL7tDr1T913mszSRsnHAcn/IxwpD
+         SidsInUfgmwkhe8tHkyWzLr3l9CddXRcYkOQsw88lgB5G3ZnTF6e2aa2nBf8KwJBqD/1
+         PbA1VmYECQeToR0inavJ7/Xy8vOkG/0IG6UeRDNCN5UQ26yBmbBnNEsQBCUV3y3FctcF
+         3FBw==
+X-Forwarded-Encrypted: i=1; AJvYcCVGQ8UieTXlSHguzssJhsB7vvSRw+CTp9j1ZZ+n9I3j8bwreiXs26a51jywlqD6whmhb/AHrzWIGpwxkMlX2uTQ+zJ/EbmW
+X-Gm-Message-State: AOJu0YwAU9WUWVcF3lYcEUNPlKE+x91IQrrEofMK+YpNgJcMjCugu3/u
+	KXu43jsm+E4FqM/kHoKimbcl2At0XgmoaKRXQM6wUIFW238zWbjz6csEWupgxpSLLJCg+q6zFOk
+	tLWPa64eNd5ARBT4wXXbgXU0ZD8MFELJNjrTl
+X-Google-Smtp-Source: AGHT+IEEepHOVI/q+SM4mTlf22FyuG4U4k2qgjZfkiH3W5hjovRw5bW/NtCygWp/LGwoMstlerAiS7iakgOHAwWjvCU=
+X-Received: by 2002:a05:6102:cd3:b0:47e:2e1:c437 with SMTP id
+ ada2fe7eead31-48077e43290mr32103726137.28.1716294512445; Tue, 21 May 2024
+ 05:28:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <SN6PR02MB41578D7BFEDE33BD2E8246EFD4E92@SN6PR02MB4157.namprd02.prod.outlook.com>
+References: <20240517131814.719933-1-tabba@google.com> <ZkeUTix0Ojn5eHKP@linux.dev>
+ <b73372b3-e032-4afd-a7cd-e08a687b1d3f@sirena.org.uk> <CA+EHjTxJe8yjVkhc=2fENJoMZs+MTR=9AZLmYcxZ5HxNnUOaQw@mail.gmail.com>
+ <87pltg3ntq.wl-maz@kernel.org> <ZkuKYA6-u-eZmBOO@linux.dev>
+ <CA+EHjTyvRU13+LL=vyRTOykj5pbycVPce7dstXK1rpTF98jKFA@mail.gmail.com> <Zku4QF1VtKJqhnGg@linux.dev>
+In-Reply-To: <Zku4QF1VtKJqhnGg@linux.dev>
+From: Fuad Tabba <tabba@google.com>
+Date: Tue, 21 May 2024 13:27:55 +0100
+Message-ID: <CA+EHjTxp-1TUSE6NG7P425KTJ_KmEuwsMqa=sXPP=f-17B-K0A@mail.gmail.com>
+Subject: Re: [PATCH v1 0/7] KVM: arm64: Fix handling of host fpsimd/sve state
+ in protected mode
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Mark Brown <broonie@kernel.org>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, will@kernel.org, qperret@google.com, 
+	seanjc@google.com, alexandru.elisei@arm.com, catalin.marinas@arm.com, 
+	philmd@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, 
+	mark.rutland@arm.com, joey.gouly@arm.com, rananta@google.com, 
+	yuzenghui@huawei.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, May 20, 2024 at 08:32:43PM +0000, Michael Kelley wrote:
-> From: Catalin Marinas <catalin.marinas@arm.com> Sent: Monday, May 20, 2024 9:53 AM
-> > > > On Fri, Apr 12, 2024 at 09:42:08AM +0100, Steven Price wrote:
-> > > > >   static int change_page_range(pte_t *ptep, unsigned long addr, void *data)
-> > > > > @@ -41,6 +45,7 @@ static int change_page_range(pte_t *ptep, unsigned long addr, void *data)
-> > > > >   	pte = clear_pte_bit(pte, cdata->clear_mask);
-> > > > >   	pte = set_pte_bit(pte, cdata->set_mask);
-> > > > > +	/* TODO: Break before make for PROT_NS_SHARED updates */
-> > > > >   	__set_pte(ptep, pte);
-> > > > >   	return 0;
-[...]
-> > Thanks for the clarification on RIPAS states and behaviour in one of
-> > your replies. Thinking about this, since the page is marked as
-> > RIPAS_EMPTY prior to changing the PTE, the address is going to fault
-> > anyway as SEA if accessed. So actually breaking the PTE, TLBI, setting
-> > the new PTE would not add any new behaviour. Of course, this assumes
-> > that set_memory_decrypted() is never called on memory being currently
-> > accessed (can we guarantee this?).
-> 
-> While I worked on CoCo VM support on Hyper-V for x86 -- both AMD
-> SEV-SNP and Intel TDX, I haven't ramped up on the ARM64 CoCo
-> VM architecture yet.  With that caveat in mind, the assumption is that callers
-> of set_memory_decrypted() and set_memory_encrypted() ensure that
-> the target memory isn't currently being accessed.   But there's a big
-> exception:  load_unaligned_zeropad() can generate accesses that the
-> caller can't control.  If load_unaligned_zeropad() touches a page that is
-> in transition between decrypted and encrypted, a SEV-SNP or TDX architectural
-> fault could occur.  On x86, those fault handlers detect this case, and
-> fix things up.  The Hyper-V case requires a different approach, and marks
-> the PTEs as "not present" before initiating a transition between decrypted
-> and encrypted, and marks the PTEs "present" again after the transition.
+Hi Oliver,
 
-Thanks. The load_unaligned_zeropad() case is a good point. I thought
-we'd get away with this on arm64 since accessing such decrypted page
-would trigger a synchronous exception but looking at the code, the
-do_sea() path never calls fixup_exception(), so we just kill the whole
-kernel.
 
-> This approach causes a reference generated by load_unaligned_zeropad() 
-> to take the normal page fault route, and use the page-fault-based fixup for
-> load_unaligned_zeropad(). See commit 0f34d11234868 for the Hyper-V case.
+On Mon, May 20, 2024 at 9:53=E2=80=AFPM Oliver Upton <oliver.upton@linux.de=
+v> wrote:
+>
+> Hey Fuad,
+>
+> On Mon, May 20, 2024 at 06:57:36PM +0100, Fuad Tabba wrote:
+> > Hi Oliver,
+> >
+> > On Mon, May 20, 2024 at 6:37=E2=80=AFPM Oliver Upton <oliver.upton@linu=
+x.dev> wrote:
+> > >
+> > > On Mon, May 20, 2024 at 09:11:13AM +0100, Marc Zyngier wrote:
+> > > > On Mon, 20 May 2024 08:35:47 +0100, Fuad Tabba <tabba@google.com> w=
+rote:
+> > > > > The reason for that is that in pKVM we want to avoid leaking any
+> > > > > information about protected VM activity to the host, including wh=
+ether
+> > > > > the VM might have performed fpsimd/sve operations. Therefore, we =
+need
+> > > > > to ensure that the host SVE state looks the same after a protecte=
+d
+> > > > > guest has run as it did before a protected guest has run.
+> > >
+> > > Wouldn't it be equally valid to just zero the state that will not be
+> > > preserved regardless of whether or not the guest used fpsimd/sve?
+> >
+> > Yes it would. I think I did mention that as an option.
+>
+> Apologies, I probably missed it earlier on then.
+>
+> > However, that would need to be done at every protected guest exit, wher=
+eas
+> > restoring the host SVE state only needs to be done if the guest has use=
+d
+> > fpsimd/sve.
+>
+> Indeed, what I was _hoping_ is that implementations do a decent job of
+> handling a zeroing idiom for SVE and avoid needing to fetch a bunch of
+> state out of memory.
+>
+> > I think the code for the latter (i.e., zeroing out), would be simpler.
+> > I'm happy to do it that way if you and the others think it's better.
+>
+> Right, I have no fundamental objections to fully managing the host SVE
+> state in EL2. Strong preference for something simple + correct in the
+> interim. Anyway, thanks for suffering through my whining and hopefully
+> we can land a fix soon :)
 
-I think for arm64 set_memory_decrypted() (and encrypted) would have to
-first make the PTE invalid, TLBI, set the RIPAS_EMPTY state, set the new
-PTE. Any page fault due to invalid PTE would be handled by the exception
-fixup in load_unaligned_zeropad(). This way we wouldn't get any
-synchronous external abort (SEA) in standard uses. Not sure we need to
-do anything hyper-v specific as in the commit above.
+Thanks for your review and comments, which are very helpful as always.
+I'll respin this within the next couple of days.
 
-> > (I did come across the hv_uio_probe() which, if I read correctly, it
-> > ends up calling set_memory_decrypted() with a vmalloc() address; let's
-> > pretend this code doesn't exist ;))
-> 
-> While the Hyper-V UIO driver is perhaps a bit of an outlier, the Hyper-V
-> netvsc driver also does set_memory_decrypted() on 16 Mbyte vmalloc()
-> allocations, and there's not really a viable way to avoid this. The
-> SEV-SNP and TDX code handles this case.   Support for this case will
-> probably also be needed for CoCo guests on Hyper-V on ARM64.
+Cheers,
+/fuad
 
-Ah, I was hoping we can ignore it. So the arm64 set_memory_*() code will
-have to detect and change both the vmalloc map and the linear map.
-Currently this patchset assumes the latter only.
-
-Such buffers may end up in user space as well but I think at the
-set_memory_decrypted() call there aren't any such mappings and
-subsequent remap_pfn_range() etc. would handle the permissions properly
-through the vma->vm_page_prot attributes (assuming that someone set
-those pgprot attributes).
-
--- 
-Catalin
+> --
+> Best,
+> Oliver
