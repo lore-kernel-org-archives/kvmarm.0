@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1F811EB2F
-	for <kvmarm@lists.linux.dev>; Tue, 21 May 2024 21:21:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3820B2AE6C
+	for <kvmarm@lists.linux.dev>; Tue, 21 May 2024 21:44:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716326497; cv=none; b=M3fuvbrvkUBC9uLxj2el/y0gatDsdKdpBMEvzgap0PMwf36G/DDP2f/kIfwV0ZOmETKIxwe5ocd8/3TLIOfNbxN2Gbfjuweslv3OlzXb1nSFet1Jimyr5vHkbvGf1mN/hRQKL61lAePj9kJD+GmYBgGl3QElgMQxqVrWAbICBxQ=
+	t=1716327896; cv=none; b=RWfOIqSnjGlYl01A1bJh73MNmEF1ODm2e6NaT1qHFWOcGt+fTPJ6B+jjdxrMfX494XxlLR8LbM9zbY/x5M6DKp8YDZdy2edufGSVw6AoeyNBOQQdlmtjB8rvvc+f9QPCymmUAtCEQMdJZgmz/aWic/T/B32NVb9JOk070W8syxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716326497; c=relaxed/simple;
-	bh=nQ1+kno34eRI2CH2p2WJJVVsGQQJyU67WUCjO0bZSl0=;
+	s=arc-20240116; t=1716327896; c=relaxed/simple;
+	bh=OslvGJTX1H4fr1dtw3BAyK2V8BlFIR6fSAE2gHca+2s=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=P6OivbvZJbBY+V/2eW18wk8zqTDOYcE8NNWNYtalMdttvj7JvOdsEHZ34qHefqWZvqFcB/4a5DxtiQBw2Ph5tXqQfyYruwAvOcMtCDfob2VZ04hbI9boF/Q57MD1o7J6ZlPAQwuMjhGX7DPbl5vmtWvTS8Pf7l6Ee/rJBIvSKlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tFMxKqTk; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=ecsYaInEzMkGqhnH5c7va7/aHyiaj5DwRcGmWMBbjGgzYGsdX9BXAqecK/wnHkGL+Ogp3lzKy/dFmhtrLZETvyckoqvckNZhAtZzZm+dMI6QRYjg6RMWR/SwyjwrC+4Ocjdoh/CpOxg4C3eM/xCvXyomCp1hEobvlbnwZyG+diI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hHv0CZUp; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tFMxKqTk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 253D1C2BD11;
-	Tue, 21 May 2024 21:21:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hHv0CZUp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB3E7C2BD11;
+	Tue, 21 May 2024 21:44:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716326497;
-	bh=nQ1+kno34eRI2CH2p2WJJVVsGQQJyU67WUCjO0bZSl0=;
+	s=k20201202; t=1716327895;
+	bh=OslvGJTX1H4fr1dtw3BAyK2V8BlFIR6fSAE2gHca+2s=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tFMxKqTkH0J63NBvzY/8ND0t6Po+mj0NUorz1VwnLfLo3KrLv+D/CeXXmrtSHGhqG
-	 63ugiU3agCp8NaWTqR3GbtgIFmjbFXsP9T/THK3eaAdAnzOJqVlyac+6gyFKrIdot2
-	 GLIFCojpHYKp81v2T0sI6VRX+G2ZCmFHY/ZN0/cXjjiJQ8gUtvmEx13WrO5R1rjBgt
-	 FAuaL+FIMbbbXv08yTAZ7+qa092XeZnzHaCN5Fd1E5p26OVLnntA/5eIV9GD2CjtGO
-	 c4A4ZEG1uPgMBPnixurUE1MeH2mTdSEvl/9KHQc8qN4leiTnvDYBNC6ROR62KEDxEG
-	 O1rTFMRBZ995w==
+	b=hHv0CZUpF+70N7ar7q+AurG+s9p3Kf/qlhAylMEcfTOCSm0oSJxiuzbnTmq392pjI
+	 s8yzEKoYYiV4UG0d+7Jpi0YzXpW82oYFQr6BgkjVn81pjYPpqNJm2vRESvEp0gID60
+	 fiXOCrUcR3QNZv2XiOe6mKZUIxp2Lrrc+6ZxAXdBpDjmOf/iyCR8Pg+LGnP0sr2RNP
+	 PZQg6dDImPXAeCFMlthZ7IwS6lURaxTtVJ3rsVo91OqCCrgjhRA+qYq/rmR9pRbTDf
+	 5AX0Panve60MLxhExu6D2HT6SgxRZAFJNJmg22M6oJviLjnb+Na8/ofp2koqhi0Z+J
+	 QWrur09DSdAJw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1s9WvO-00Eo3U-F5;
-	Tue, 21 May 2024 22:21:34 +0100
-Date: Tue, 21 May 2024 22:21:33 +0100
-Message-ID: <86r0dun9nm.wl-maz@kernel.org>
+	id 1s9XHx-00EoGs-4M;
+	Tue, 21 May 2024 22:44:53 +0100
+Date: Tue, 21 May 2024 22:44:52 +0100
+Message-ID: <86plten8kr.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Fuad Tabba <tabba@google.com>
 Cc: kvmarm@lists.linux.dev,
@@ -52,10 +52,10 @@ Cc: kvmarm@lists.linux.dev,
 	joey.gouly@arm.com,
 	rananta@google.com,
 	yuzenghui@huawei.com
-Subject: Re: [PATCH v2 4/7] KVM: arm64: Store the maximum sve vector length at hyp
-In-Reply-To: <20240521163720.3812851-5-tabba@google.com>
+Subject: Re: [PATCH v2 5/7] KVM: arm64: Allocate memory at hyp for host sve state in pKVM
+In-Reply-To: <20240521163720.3812851-6-tabba@google.com>
 References: <20240521163720.3812851-1-tabba@google.com>
-	<20240521163720.3812851-5-tabba@google.com>
+	<20240521163720.3812851-6-tabba@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -71,94 +71,149 @@ X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@li
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 21 May 2024 17:37:17 +0100,
+On Tue, 21 May 2024 17:37:18 +0100,
 Fuad Tabba <tabba@google.com> wrote:
 > 
-> In subsequent patches, hyp needs to know the maximum sve vector
-> length for the host, without needing the trust the host for that.
-> This is used when allocating memory for the host sve state in the
-> following patch, as well as for allocating and restricting guest
-> sve state in a future patch series.
+> Protected mode needs to maintain (save/restore) the host's sve
+> state, rather than relying on the host kernel to do that. This is
+> to avoid leaking information to the host about guests and the
+> type of operations they are performing.
+> 
+> As a first step towards that, allocate memory at hyp, per cpu, to
+> hold the host sve data. The following patch will use this memory
+> to save/restore the host state.
+
+What I read in the code contradicts this statement. The memory is
+definitely allocated on the *host*.
+
 > 
 > Signed-off-by: Fuad Tabba <tabba@google.com>
 > ---
->  arch/arm64/include/asm/kvm_host.h | 1 +
->  arch/arm64/include/asm/kvm_hyp.h  | 1 +
->  arch/arm64/kvm/arm.c              | 1 +
->  arch/arm64/kvm/hyp/nvhe/pkvm.c    | 2 ++
->  arch/arm64/kvm/reset.c            | 2 ++
->  5 files changed, 7 insertions(+)
+> Note that the last patch in this series will consolidate the
+> setup of the host's fpsimd and sve states, which currently take
+> place in two different locations. Moreover, that last patch will
+> also place the host fpsimd and sve_state pointers in a union.
+> ---
+>  arch/arm64/include/asm/kvm_host.h    |  2 +
+>  arch/arm64/include/asm/kvm_pkvm.h    |  9 ++++
+>  arch/arm64/include/uapi/asm/ptrace.h | 14 ++++++
+>  arch/arm64/kvm/arm.c                 | 68 ++++++++++++++++++++++++++++
+>  arch/arm64/kvm/hyp/nvhe/setup.c      | 24 ++++++++++
+>  5 files changed, 117 insertions(+)
 > 
 > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 8170c04fde91..0a5fceb20f3a 100644
+> index 0a5fceb20f3a..7b3745ef1d73 100644
 > --- a/arch/arm64/include/asm/kvm_host.h
 > +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -76,6 +76,7 @@ static inline enum kvm_mode kvm_get_mode(void) { return KVM_MODE_NONE; };
->  DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
+> @@ -535,7 +535,9 @@ struct kvm_cpu_context {
+>   */
+>  struct kvm_host_data {
+>  	struct kvm_cpu_context host_ctxt;
+> +
+>  	struct user_fpsimd_state *fpsimd_state;	/* hyp VA */
+> +	struct user_sve_state *sve_state;	/* hyp VA */
 >  
->  extern unsigned int __ro_after_init kvm_sve_max_vl;
-> +extern unsigned int __ro_after_init kvm_host_sve_max_vl;
->  int __init kvm_arm_init_sve(void);
->  
->  u32 __attribute_const__ kvm_target_cpu(void);
-> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-> index 2ab23589339a..d313adf53bef 100644
-> --- a/arch/arm64/include/asm/kvm_hyp.h
-> +++ b/arch/arm64/include/asm/kvm_hyp.h
-> @@ -143,5 +143,6 @@ extern u64 kvm_nvhe_sym(id_aa64smfr0_el1_sys_val);
->  
->  extern unsigned long kvm_nvhe_sym(__icache_flags);
->  extern unsigned int kvm_nvhe_sym(kvm_arm_vmid_bits);
-> +extern unsigned int kvm_nvhe_sym(kvm_host_sve_max_vl);
->  
->  #endif /* __ARM64_KVM_HYP_H__ */
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 9996a989b52e..9e565ea3d645 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -2378,6 +2378,7 @@ static void kvm_hyp_init_symbols(void)
->  	kvm_nvhe_sym(id_aa64smfr0_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64SMFR0_EL1);
->  	kvm_nvhe_sym(__icache_flags) = __icache_flags;
->  	kvm_nvhe_sym(kvm_arm_vmid_bits) = kvm_arm_vmid_bits;
-> +	kvm_nvhe_sym(kvm_host_sve_max_vl) = kvm_host_sve_max_vl;
+>  	/* Ownership of the FP regs */
+>  	enum {
+> diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
+> index ad9cfb5c1ff4..b9d12e123efb 100644
+> --- a/arch/arm64/include/asm/kvm_pkvm.h
+> +++ b/arch/arm64/include/asm/kvm_pkvm.h
+> @@ -128,4 +128,13 @@ static inline unsigned long hyp_ffa_proxy_pages(void)
+>  	return (2 * KVM_FFA_MBOX_NR_PAGES) + DIV_ROUND_UP(desc_max, PAGE_SIZE);
 >  }
 >  
->  static int __init kvm_hyp_init_protection(u32 hyp_va_bits)
-> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> index 16aa4875ddb8..25e9a94f6d76 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> @@ -18,6 +18,8 @@ unsigned long __icache_flags;
->  /* Used by kvm_get_vttbr(). */
->  unsigned int kvm_arm_vmid_bits;
->  
-> +unsigned int kvm_host_sve_max_vl;
+> +static inline size_t pkvm_host_sve_state_size(void)
+> +{
+> +	if (!system_supports_sve())
+> +		return 0;
 > +
->  /*
->   * Set trap register values based on features in ID_AA64PFR0.
->   */
-> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> index 1b7b58cb121f..e818727900ec 100644
-> --- a/arch/arm64/kvm/reset.c
-> +++ b/arch/arm64/kvm/reset.c
-> @@ -46,11 +46,13 @@ static u32 __ro_after_init kvm_ipa_limit;
->  				 PSR_AA32_I_BIT | PSR_AA32_F_BIT)
+> +	return size_add(sizeof(struct user_sve_state),
+> +			SVE_SIG_REGS_SIZE(sve_vq_from_vl(kvm_host_sve_max_vl)));
+> +}
+> +
+>  #endif	/* __ARM64_KVM_PKVM_H__ */
+> diff --git a/arch/arm64/include/uapi/asm/ptrace.h b/arch/arm64/include/uapi/asm/ptrace.h
+> index 7fa2f7036aa7..77aabf964071 100644
+> --- a/arch/arm64/include/uapi/asm/ptrace.h
+> +++ b/arch/arm64/include/uapi/asm/ptrace.h
+> @@ -120,6 +120,20 @@ struct user_sve_header {
+>  	__u16 __reserved;
+>  };
 >  
->  unsigned int __ro_after_init kvm_sve_max_vl;
-> +unsigned int __ro_after_init kvm_host_sve_max_vl;
+> +struct user_sve_state {
+> +	__u64 zcr_el1;
+> +
+> +	/*
+> +	 * Ordering is important since __sve_save_state/__sve_restore_state
+> +	 * relies on it.
+> +	 */
+> +	__u32 fpsr;
+> +	__u32 fpcr;
+> +
+> +	/* Must be SVE_VQ_BYTES (128 bit) aligned. */
+> +	__u8 sve_regs[];
+> +};
+> +
+
+Huh, why is this in uapi? Why should userspace even care about this at
+all? From what I can tell, this is purely internal to the kernel, and
+in any case, KVM isn't tied to that format if it doesn't dump stuff in
+the userspace thread context. Given the number of bugs this format has
+generated, I really wouldn't mind moving away from it.
+
+>  /* Definitions for user_sve_header.flags: */
+>  #define SVE_PT_REGS_MASK		(1 << 0)
 >  
->  int __init kvm_arm_init_sve(void)
->  {
->  	if (system_supports_sve()) {
->  		kvm_sve_max_vl = sve_max_virtualisable_vl();
-> +		kvm_host_sve_max_vl = sve_max_vl();
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 9e565ea3d645..a9b1b0e9c319 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1931,6 +1931,11 @@ static unsigned long nvhe_percpu_order(void)
+>  	return size ? get_order(size) : 0;
+>  }
+>  
+> +static size_t pkvm_host_sve_state_order(void)
+> +{
+> +	return get_order(pkvm_host_sve_state_size());
+> +}
+> +
+>  /* A lookup table holding the hypervisor VA for each vector slot */
+>  static void *hyp_spectre_vector_selector[BP_HARDEN_EL2_SLOTS];
+>  
+> @@ -2316,7 +2321,15 @@ static void __init teardown_hyp_mode(void)
+>  	for_each_possible_cpu(cpu) {
+>  		free_page(per_cpu(kvm_arm_hyp_stack_page, cpu));
+>  		free_pages(kvm_nvhe_sym(kvm_arm_hyp_percpu_base)[cpu], nvhe_percpu_order());
+> +
+> +		if (system_supports_sve() && is_protected_kvm_enabled()) {
+> +			struct user_sve_state *sve_state;
+> +
+> +			sve_state = per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)->sve_state;
+> +			free_pages((unsigned long) sve_state, pkvm_host_sve_state_order());
+> +		}
+>  	}
+> +
+>  }
+>  
+>  static int __init do_pkvm_init(u32 hyp_va_bits)
+> @@ -2399,6 +2412,50 @@ static int __init kvm_hyp_init_protection(u32 hyp_va_bits)
+>  	return 0;
+>  }
+>  
+> +static int init_pkvm_host_sve_state(void)
+> +{
+> +	int cpu;
+> +
+> +	if (!system_supports_sve())
+> +		return 0;
+> +
+> +	/* Allocate pages for host sve state in protected mode. */
+> +	for_each_possible_cpu(cpu) {
+> +		struct page *page = alloc_pages(GFP_KERNEL, pkvm_host_sve_state_order());
+> +
 
-Why the intermediate storage?
-
-Setting kvm_nvhe_sym(kvm_host_sve_max_vl) to sve_max_vl() should be
-enough. But it doesn't mean that all the CPUs support the same max VL,
-and I wonder whether we end-up with the wrong in-memory layout in this
-case...
+See? That's definitely not a HYP allocation.
 
 Thanks,
 
