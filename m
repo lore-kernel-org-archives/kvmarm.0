@@ -1,138 +1,235 @@
-Received: from mail-vs1-f53.google.com (mail-vs1-f53.google.com [209.85.217.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B577A763F0
-	for <kvmarm@lists.linux.dev>; Tue, 21 May 2024 12:28:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.53
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA4D67B3EB
+	for <kvmarm@lists.linux.dev>; Tue, 21 May 2024 13:26:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716294515; cv=none; b=pWuA7OtU7+NPi3zVnDQOqt0GC+uNtd2PScbflfPvbiv+Kyrm+pnoMqhjrVwj6qA7E1EooJbKFZjq3YOXNVwXWW4aUU4HpAouPc9tnrCcnIdIroxk3KTE2DtyjTKgy4M9LVhhiZ2mrhdYeUZrHpcRD8YSHgrnrdWZL0NwxnP5qkM=
+	t=1716297986; cv=none; b=PDSysKyk80M32KGYthFUB//iFgkBkoyYp1iEhwotmBtXWZ9pGxi9mQGgQ5gzMgsdDc2LASw3z++YuMoPMNoY9OdkWiEGh74vGj5MWyH/iJAJEXWLdESstHD8rBp2M4gHix4tBetRN0zSqIxFm6JXP0uNwHT3cEqmHllOGoOK/eE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716294515; c=relaxed/simple;
-	bh=YnKOB5k+cfXFmF1HFPh+ytM6NizBlvxBlwtMrZYFDYk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ttW+bNZZOIT2mRAQJy0V7lvKmIvhlBLeXlYdIaL8UGcxexuiIkK8CSLVgW9hN5wuxJFAqza1gDy1pilhRgvYLSUYA4zH60EoNlAEEW8saBngiKELLKWC3RUhZH3L7EFNNJDR0dqDdY60bNY+lhBJHl9TGpRdDexeFERyDLQW49s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=01+gbIoQ; arc=none smtp.client-ip=209.85.217.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="01+gbIoQ"
-Received: by mail-vs1-f53.google.com with SMTP id ada2fe7eead31-47f008106d0so917289137.2
-        for <kvmarm@lists.linux.dev>; Tue, 21 May 2024 05:28:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1716294512; x=1716899312; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YnKOB5k+cfXFmF1HFPh+ytM6NizBlvxBlwtMrZYFDYk=;
-        b=01+gbIoQjbuJax0jidW2m2OT0HP2qq4t50SYww2mhChitiSj+PziCx9hee/FBr9HgR
-         QxzumTa05aH1cMN95ODn3xUpFXgZUFKc/UotgRzuQGnYxV4kmC7XmeEpsX/QpdZWquOZ
-         1HwoimVgRVHUgeG737YMKURM2PKuUwLHaBBbBfcqm5P8/sI2MTMorNBsUvm3m2eBjxt4
-         2/lBuAqKe7K31+HuJ9QeURrBXjAviZZ+5BOKsspCnMs0Pl6sSjA/8TMxvOLi0zWO8g5o
-         E94KYadiBZ9XXkdT5V4Hu8SPIV5oTyAmTcaR1vruXTo31TRv8fECG0iXVI4r0u8Mjcbr
-         wyWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716294512; x=1716899312;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YnKOB5k+cfXFmF1HFPh+ytM6NizBlvxBlwtMrZYFDYk=;
-        b=Hlk3aJ9M4SsDCyfs6wzgIG+Gz++l5AI+ypEwdPWn2IDOfrPTmahOHfuGMpFmFat+zy
-         20NR6hDG+TOzKr44rINw/SocM/3VDvT+zNjrir66k+RHfv9ifr325PWdZPj8cOPdZa70
-         xdnE/9gKYPOVz7GNyOysCvWXfKISIY9gDzRxx8zlIL7tDr1T913mszSRsnHAcn/IxwpD
-         SidsInUfgmwkhe8tHkyWzLr3l9CddXRcYkOQsw88lgB5G3ZnTF6e2aa2nBf8KwJBqD/1
-         PbA1VmYECQeToR0inavJ7/Xy8vOkG/0IG6UeRDNCN5UQ26yBmbBnNEsQBCUV3y3FctcF
-         3FBw==
-X-Forwarded-Encrypted: i=1; AJvYcCVGQ8UieTXlSHguzssJhsB7vvSRw+CTp9j1ZZ+n9I3j8bwreiXs26a51jywlqD6whmhb/AHrzWIGpwxkMlX2uTQ+zJ/EbmW
-X-Gm-Message-State: AOJu0YwAU9WUWVcF3lYcEUNPlKE+x91IQrrEofMK+YpNgJcMjCugu3/u
-	KXu43jsm+E4FqM/kHoKimbcl2At0XgmoaKRXQM6wUIFW238zWbjz6csEWupgxpSLLJCg+q6zFOk
-	tLWPa64eNd5ARBT4wXXbgXU0ZD8MFELJNjrTl
-X-Google-Smtp-Source: AGHT+IEEepHOVI/q+SM4mTlf22FyuG4U4k2qgjZfkiH3W5hjovRw5bW/NtCygWp/LGwoMstlerAiS7iakgOHAwWjvCU=
-X-Received: by 2002:a05:6102:cd3:b0:47e:2e1:c437 with SMTP id
- ada2fe7eead31-48077e43290mr32103726137.28.1716294512445; Tue, 21 May 2024
- 05:28:32 -0700 (PDT)
+	s=arc-20240116; t=1716297986; c=relaxed/simple;
+	bh=LHhgxIdgl6lozhvFk0KRmDgygoZPk6qKY2FTiDtC3W0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ibmpzOVa4rrVDaRlbCWG4t8JgTbcbxljHManl2d+WrErZUOBFHlhiUpHOuMtQjj/voPN8tCFoHDyDZxqYLTwg4NgTaZ3MC7ofhQjC7MhZTDlgbLWdts9QBsRJ4oOzy8UNoIfGVH6zvAJHK2Vkl8qsm39QM1KPw/2zQL0hLlxSYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 31D38DA7;
+	Tue, 21 May 2024 06:26:48 -0700 (PDT)
+Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B52E73F641;
+	Tue, 21 May 2024 06:26:21 -0700 (PDT)
+Date: Tue, 21 May 2024 14:26:19 +0100
+From: Mark Rutland <mark.rutland@arm.com>
+To: Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	will@kernel.org, catalin.marinas@arm.com,
+	Mark Brown <broonie@kernel.org>, James Clark <james.clark@arm.com>,
+	Rob Herring <robh@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	Suzuki Poulose <suzuki.poulose@arm.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	linux-perf-users@vger.kernel.org,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>, kvmarm@lists.linux.dev
+Subject: Re: [PATCH V17 2/9] KVM: arm64: Explicitly handle BRBE traps as
+ UNDEFINED
+Message-ID: <Zkyg-xgJHK5D1zFs@J2N7QTR9R3>
+References: <20240405024639.1179064-1-anshuman.khandual@arm.com>
+ <20240405024639.1179064-3-anshuman.khandual@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20240517131814.719933-1-tabba@google.com> <ZkeUTix0Ojn5eHKP@linux.dev>
- <b73372b3-e032-4afd-a7cd-e08a687b1d3f@sirena.org.uk> <CA+EHjTxJe8yjVkhc=2fENJoMZs+MTR=9AZLmYcxZ5HxNnUOaQw@mail.gmail.com>
- <87pltg3ntq.wl-maz@kernel.org> <ZkuKYA6-u-eZmBOO@linux.dev>
- <CA+EHjTyvRU13+LL=vyRTOykj5pbycVPce7dstXK1rpTF98jKFA@mail.gmail.com> <Zku4QF1VtKJqhnGg@linux.dev>
-In-Reply-To: <Zku4QF1VtKJqhnGg@linux.dev>
-From: Fuad Tabba <tabba@google.com>
-Date: Tue, 21 May 2024 13:27:55 +0100
-Message-ID: <CA+EHjTxp-1TUSE6NG7P425KTJ_KmEuwsMqa=sXPP=f-17B-K0A@mail.gmail.com>
-Subject: Re: [PATCH v1 0/7] KVM: arm64: Fix handling of host fpsimd/sve state
- in protected mode
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, Mark Brown <broonie@kernel.org>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, will@kernel.org, qperret@google.com, 
-	seanjc@google.com, alexandru.elisei@arm.com, catalin.marinas@arm.com, 
-	philmd@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, 
-	mark.rutland@arm.com, joey.gouly@arm.com, rananta@google.com, 
-	yuzenghui@huawei.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240405024639.1179064-3-anshuman.khandual@arm.com>
 
-Hi Oliver,
+Hi Anshuman,
 
+On Fri, Apr 05, 2024 at 08:16:32AM +0530, Anshuman Khandual wrote:
+> The Branch Record Buffer Extension (BRBE) adds a number of system registers
+> and instructions, which we don't currently intend to expose to guests. Our
+> existing logic handles this safely, but this could be improved with some
+> explicit handling of BRBE.
+> 
+> The presence of BRBE is currently hidden from guests as the cpufeature
+> code's ftr_id_aa64dfr0[] table doesn't have an entry for the BRBE field,
+> and so this will be zero in the sanitised value of ID_AA64DFR0 exposed to
+> guests via read_sanitised_id_aa64dfr0_el1(). As the ftr_id_aa64dfr0[] table
+> may gain an entry for the BRBE field in future, for robustness we should
+> explicitly mask out the BRBE field in read_sanitised_id_aa64dfr0_el1().
+> 
+> The BRBE system registers and instructions are currently trapped by the
+> existing configuration of the fine-grained traps. As neither the registers
+> are not described in the sys_reg_descs[] nor the instructions are described
+> in the sys_insn_descs[] table, emulate_sys_reg() will warn that these are
+> unknown before injecting an UNDEFINED exception into the guest.
 
-On Mon, May 20, 2024 at 9:53=E2=80=AFPM Oliver Upton <oliver.upton@linux.de=
-v> wrote:
->
-> Hey Fuad,
->
-> On Mon, May 20, 2024 at 06:57:36PM +0100, Fuad Tabba wrote:
-> > Hi Oliver,
-> >
-> > On Mon, May 20, 2024 at 6:37=E2=80=AFPM Oliver Upton <oliver.upton@linu=
-x.dev> wrote:
-> > >
-> > > On Mon, May 20, 2024 at 09:11:13AM +0100, Marc Zyngier wrote:
-> > > > On Mon, 20 May 2024 08:35:47 +0100, Fuad Tabba <tabba@google.com> w=
-rote:
-> > > > > The reason for that is that in pKVM we want to avoid leaking any
-> > > > > information about protected VM activity to the host, including wh=
-ether
-> > > > > the VM might have performed fpsimd/sve operations. Therefore, we =
-need
-> > > > > to ensure that the host SVE state looks the same after a protecte=
-d
-> > > > > guest has run as it did before a protected guest has run.
-> > >
-> > > Wouldn't it be equally valid to just zero the state that will not be
-> > > preserved regardless of whether or not the guest used fpsimd/sve?
-> >
-> > Yes it would. I think I did mention that as an option.
->
-> Apologies, I probably missed it earlier on then.
->
-> > However, that would need to be done at every protected guest exit, wher=
-eas
-> > restoring the host SVE state only needs to be done if the guest has use=
-d
-> > fpsimd/sve.
->
-> Indeed, what I was _hoping_ is that implementations do a decent job of
-> handling a zeroing idiom for SVE and avoid needing to fetch a bunch of
-> state out of memory.
->
-> > I think the code for the latter (i.e., zeroing out), would be simpler.
-> > I'm happy to do it that way if you and the others think it's better.
->
-> Right, I have no fundamental objections to fully managing the host SVE
-> state in EL2. Strong preference for something simple + correct in the
-> interim. Anyway, thanks for suffering through my whining and hopefully
-> we can land a fix soon :)
+That last sentence doesn't make sense, and I think it has been mangled.
+My suggested text in v16 was:
 
-Thanks for your review and comments, which are very helpful as always.
-I'll respin this within the next couple of days.
+| As the registers and instructions are not described in the
+| sys_reg_descs[] table, emulate_sys_reg() will warn that these are
+| unknown before injecting an UNDEFINED exception into the guest.
 
-Cheers,
-/fuad
+... and I'd be happy with changing that to:
 
-> --
-> Best,
-> Oliver
+| As neither the registers nor the instructions are described in the 
+| sys_reg_descs[] table, emulate_sys_reg() will warn that these are
+| unknown before injecting an UNDEFINED exception into the guest.
+
+> Well-behaved guests shouldn't try to use the registers or instructions, but
+> badly-behaved guests could use these, resulting in unnecessary warnings.
+
+I see that I had mangled this sentence originally -- thanks for
+correcting that; this looks fine to me.
+
+> To avoid those warnings, we should explicitly handle the BRBE
+> registers, and instructions as UNDEFINED.
+
+I think the added comma is unnecessary and makes this hard to read. My
+suggested text in v16 was:
+
+| To avoid those warnings, we should explicitly handle the BRBE
+| registers and instructions as UNDEFINED.
+
+> Address the above by having read_sanitised_id_aa64dfr0_el1() mask out the
+> ID_AA64DFR0.BRBE field, and by adding sys_reg_descs entries for all of the
+> BRBE system registers, also by adding sys_insn_descs entries for all of the
+> BRBE instructions, treating these all as UNDEFINED.
+
+Similarly, I think this was clearer as I originally suggested:
+
+| Address the above by having read_sanitised_id_aa64dfr0_el1() mask out
+| the ID_AA64DFR0.BRBE field, and by adding sys_reg_desc entries for all
+| of the BRBE system registers and instructions, treating these all as
+| UNDEFINED.
+
+... or we can simplify that to:
+
+| Address the above by having read_sanitised_id_aa64dfr0_el1() mask out
+| the ID_AA64DFR0.BRBE field, and explicitly handling all of the BRBE
+| system registers and instructions as UNDEFINED.
+
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Oliver Upton <oliver.upton@linux.dev>
+> Cc: James Morse <james.morse@arm.com>
+> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will@kernel.org>
+> Cc: kvmarm@lists.linux.dev
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: linux-kernel@vger.kernel.org
+> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+> ----
+> Changes in V17:
+> 
+> - Updated the commit message including about sys_insn_descs[]
+> - Changed KVM to use existing SYS_BRBSRC/TGT/INF_EL1(n) format
+> - Moved the BRBE instructions into sys_insn_descs[] array
+
+Aside from my nits on the commit message above, these changes all look
+good to me. So with the commit message cleaned up as above:
+
+Reviewed-by: Mark Rutland <mark.rutland@arm.com>
+
+Mark.
+
+> 
+>  arch/arm64/kvm/sys_regs.c | 56 +++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 56 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index c9f4f387155f..3981aa32c5a3 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1304,6 +1304,11 @@ static int set_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
+>  	return 0;
+>  }
+>  
+> +#define BRB_INF_SRC_TGT_EL1(n)				\
+> +	{ SYS_DESC(SYS_BRBINF_EL1(n)), undef_access },	\
+> +	{ SYS_DESC(SYS_BRBSRC_EL1(n)), undef_access },	\
+> +	{ SYS_DESC(SYS_BRBTGT_EL1(n)), undef_access }	\
+> +
+>  /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
+>  #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
+>  	{ SYS_DESC(SYS_DBGBVRn_EL1(n)),					\
+> @@ -1708,6 +1713,9 @@ static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+>  	/* Hide SPE from guests */
+>  	val &= ~ID_AA64DFR0_EL1_PMSVer_MASK;
+>  
+> +	/* Hide BRBE from guests */
+> +	val &= ~ID_AA64DFR0_EL1_BRBE_MASK;
+> +
+>  	return val;
+>  }
+>  
+> @@ -2226,6 +2234,52 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	{ SYS_DESC(SYS_DBGCLAIMCLR_EL1), trap_raz_wi },
+>  	{ SYS_DESC(SYS_DBGAUTHSTATUS_EL1), trap_dbgauthstatus_el1 },
+>  
+> +	/*
+> +	 * BRBE branch record sysreg address space is interleaved between
+> +	 * corresponding BRBINF<N>_EL1, BRBSRC<N>_EL1, and BRBTGT<N>_EL1.
+> +	 */
+> +	BRB_INF_SRC_TGT_EL1(0),
+> +	BRB_INF_SRC_TGT_EL1(16),
+> +	BRB_INF_SRC_TGT_EL1(1),
+> +	BRB_INF_SRC_TGT_EL1(17),
+> +	BRB_INF_SRC_TGT_EL1(2),
+> +	BRB_INF_SRC_TGT_EL1(18),
+> +	BRB_INF_SRC_TGT_EL1(3),
+> +	BRB_INF_SRC_TGT_EL1(19),
+> +	BRB_INF_SRC_TGT_EL1(4),
+> +	BRB_INF_SRC_TGT_EL1(20),
+> +	BRB_INF_SRC_TGT_EL1(5),
+> +	BRB_INF_SRC_TGT_EL1(21),
+> +	BRB_INF_SRC_TGT_EL1(6),
+> +	BRB_INF_SRC_TGT_EL1(22),
+> +	BRB_INF_SRC_TGT_EL1(7),
+> +	BRB_INF_SRC_TGT_EL1(23),
+> +	BRB_INF_SRC_TGT_EL1(8),
+> +	BRB_INF_SRC_TGT_EL1(24),
+> +	BRB_INF_SRC_TGT_EL1(9),
+> +	BRB_INF_SRC_TGT_EL1(25),
+> +	BRB_INF_SRC_TGT_EL1(10),
+> +	BRB_INF_SRC_TGT_EL1(26),
+> +	BRB_INF_SRC_TGT_EL1(11),
+> +	BRB_INF_SRC_TGT_EL1(27),
+> +	BRB_INF_SRC_TGT_EL1(12),
+> +	BRB_INF_SRC_TGT_EL1(28),
+> +	BRB_INF_SRC_TGT_EL1(13),
+> +	BRB_INF_SRC_TGT_EL1(29),
+> +	BRB_INF_SRC_TGT_EL1(14),
+> +	BRB_INF_SRC_TGT_EL1(30),
+> +	BRB_INF_SRC_TGT_EL1(15),
+> +	BRB_INF_SRC_TGT_EL1(31),
+> +
+> +	/* Remaining BRBE sysreg addresses space */
+> +	{ SYS_DESC(SYS_BRBCR_EL1), undef_access },
+> +	{ SYS_DESC(SYS_BRBFCR_EL1), undef_access },
+> +	{ SYS_DESC(SYS_BRBTS_EL1), undef_access },
+> +	{ SYS_DESC(SYS_BRBINFINJ_EL1), undef_access },
+> +	{ SYS_DESC(SYS_BRBSRCINJ_EL1), undef_access },
+> +	{ SYS_DESC(SYS_BRBTGTINJ_EL1), undef_access },
+> +	{ SYS_DESC(SYS_BRBIDR0_EL1), undef_access },
+> +
+>  	{ SYS_DESC(SYS_MDCCSR_EL0), trap_raz_wi },
+>  	{ SYS_DESC(SYS_DBGDTR_EL0), trap_raz_wi },
+>  	// DBGDTR[TR]X_EL0 share the same encoding
+> @@ -2738,6 +2792,8 @@ static struct sys_reg_desc sys_insn_descs[] = {
+>  	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
+>  	{ SYS_DESC(SYS_DC_CIGSW), access_dcgsw },
+>  	{ SYS_DESC(SYS_DC_CIGDSW), access_dcgsw },
+> +	{ SYS_DESC(OP_BRB_IALL), undef_access },
+> +	{ SYS_DESC(OP_BRB_INJ), undef_access },
+>  };
+>  
+>  static const struct sys_reg_desc *first_idreg;
+> -- 
+> 2.25.1
+> 
