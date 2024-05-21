@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E483F50276
-	for <kvmarm@lists.linux.dev>; Tue, 21 May 2024 21:08:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1F811EB2F
+	for <kvmarm@lists.linux.dev>; Tue, 21 May 2024 21:21:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716325731; cv=none; b=itrTvN1Rv+dzgVVEMDTrT7aLzAX/cr32SIno8Wxzh1dZ0A1zMtWxB9hjJ3i9t8nhU+GQwcO0pnEo+r1ZXkv+FozmXQv46mDSeIRpoYuEkONFdRCHIPy1vnCst9kPD92WNAYsSbEnAn1ixImLfSL2L3UvXEkHLMDPtmrRaFPgYkY=
+	t=1716326497; cv=none; b=M3fuvbrvkUBC9uLxj2el/y0gatDsdKdpBMEvzgap0PMwf36G/DDP2f/kIfwV0ZOmETKIxwe5ocd8/3TLIOfNbxN2Gbfjuweslv3OlzXb1nSFet1Jimyr5vHkbvGf1mN/hRQKL61lAePj9kJD+GmYBgGl3QElgMQxqVrWAbICBxQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716325731; c=relaxed/simple;
-	bh=Q6+t4Wag+AbwutnQpFC+4WXVks6pqEcCpIp21PwqiUU=;
+	s=arc-20240116; t=1716326497; c=relaxed/simple;
+	bh=nQ1+kno34eRI2CH2p2WJJVVsGQQJyU67WUCjO0bZSl0=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NcW3xxr5pBvL0FPVbESThfbyNBHSid7mBTqu8vGkFlDOnAp8wFXWrbIXvJCyeXAen9h8neW04oUxmNyu+DmvqM1Xh9wDNoieAJvfP3zQMDK6KhLqaeGqksJBxNCm9NtljgKq2BD7IWZXP5ZEO7hE1sujFYSTk125VPrlcWZn0hs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D43alZzv; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=P6OivbvZJbBY+V/2eW18wk8zqTDOYcE8NNWNYtalMdttvj7JvOdsEHZ34qHefqWZvqFcB/4a5DxtiQBw2Ph5tXqQfyYruwAvOcMtCDfob2VZ04hbI9boF/Q57MD1o7J6ZlPAQwuMjhGX7DPbl5vmtWvTS8Pf7l6Ee/rJBIvSKlM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tFMxKqTk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D43alZzv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5AF8FC2BD11;
-	Tue, 21 May 2024 21:08:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tFMxKqTk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 253D1C2BD11;
+	Tue, 21 May 2024 21:21:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716325730;
-	bh=Q6+t4Wag+AbwutnQpFC+4WXVks6pqEcCpIp21PwqiUU=;
+	s=k20201202; t=1716326497;
+	bh=nQ1+kno34eRI2CH2p2WJJVVsGQQJyU67WUCjO0bZSl0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=D43alZzvGYPwZoSkfntRkCe/KpgdTG41rxSb44HDLM9XPR5LCswfG56y1EeGAEOhN
-	 AKwi11HCM3lwB9JG9cubkFGaHSEyJ2YYL88PQIXTKUTP/yZwGcud5ojq8R9auTpS70
-	 mbkf9FXg+lPHsL7xvHmYm0GXfHybQJRp97vcHzY0jcI9tZfc2LjjoLEtE886LoFQMP
-	 H9/ICGbnxSYJcbEn9U5EmBinqYHmZtpWQGKUOxdWx9i9DyfzMGXHEVMoSXwrTbjyNb
-	 k/Hfw3+x2N+nj7NYExgBMdfnOtA6xR+IPGEPukmvKzalDtJvtMdgbK6Ji/wiJwkW/j
-	 u4Wa8LLVPdrXA==
+	b=tFMxKqTkH0J63NBvzY/8ND0t6Po+mj0NUorz1VwnLfLo3KrLv+D/CeXXmrtSHGhqG
+	 63ugiU3agCp8NaWTqR3GbtgIFmjbFXsP9T/THK3eaAdAnzOJqVlyac+6gyFKrIdot2
+	 GLIFCojpHYKp81v2T0sI6VRX+G2ZCmFHY/ZN0/cXjjiJQ8gUtvmEx13WrO5R1rjBgt
+	 FAuaL+FIMbbbXv08yTAZ7+qa092XeZnzHaCN5Fd1E5p26OVLnntA/5eIV9GD2CjtGO
+	 c4A4ZEG1uPgMBPnixurUE1MeH2mTdSEvl/9KHQc8qN4leiTnvDYBNC6ROR62KEDxEG
+	 O1rTFMRBZ995w==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1s9Wj1-00Enoa-EH;
-	Tue, 21 May 2024 22:08:47 +0100
-Date: Tue, 21 May 2024 22:08:46 +0100
-Message-ID: <86seyana8x.wl-maz@kernel.org>
+	id 1s9WvO-00Eo3U-F5;
+	Tue, 21 May 2024 22:21:34 +0100
+Date: Tue, 21 May 2024 22:21:33 +0100
+Message-ID: <86r0dun9nm.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Fuad Tabba <tabba@google.com>
 Cc: kvmarm@lists.linux.dev,
@@ -52,10 +52,10 @@ Cc: kvmarm@lists.linux.dev,
 	joey.gouly@arm.com,
 	rananta@google.com,
 	yuzenghui@huawei.com
-Subject: Re: [PATCH v2 2/7] KVM: arm64: Abstract set/clear of CPTR_EL2 bits behind helper
-In-Reply-To: <20240521163720.3812851-3-tabba@google.com>
+Subject: Re: [PATCH v2 4/7] KVM: arm64: Store the maximum sve vector length at hyp
+In-Reply-To: <20240521163720.3812851-5-tabba@google.com>
 References: <20240521163720.3812851-1-tabba@google.com>
-	<20240521163720.3812851-3-tabba@google.com>
+	<20240521163720.3812851-5-tabba@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -71,89 +71,94 @@ X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@li
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 21 May 2024 17:37:15 +0100,
+On Tue, 21 May 2024 17:37:17 +0100,
 Fuad Tabba <tabba@google.com> wrote:
 > 
-> The same traps controlled by CPTR_EL2 or CPACR_EL1 need to be
-> toggled in different parts of the code, but the exact bits and
-> their polarity differ between these two formats and the mode
-> (vhe/nvhe/hvhe).
+> In subsequent patches, hyp needs to know the maximum sve vector
+> length for the host, without needing the trust the host for that.
+> This is used when allocating memory for the host sve state in the
+> following patch, as well as for allocating and restricting guest
+> sve state in a future patch series.
 > 
-> To reduce the amount of duplicated code and the chance of getting
-> the wrong bit/polarity or missing a field, abstract the set/clear
-> of CPTR_EL2 bits behind a helper.
-> 
-> Since (h)VHE is the way of the future, use the CPACR_EL1 format,
-> which is a subset of the VHE CPTR_EL2, as a reference.
-> 
-> No functional change intended.
-> 
-> Suggested-by: Oliver Upton <oliver.upton@linux.dev>
 > Signed-off-by: Fuad Tabba <tabba@google.com>
 > ---
->  arch/arm64/include/asm/kvm_emulate.h    | 34 +++++++++++++++++++++++++
->  arch/arm64/kvm/hyp/include/hyp/switch.h | 17 +++----------
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  6 +----
->  3 files changed, 39 insertions(+), 18 deletions(-)
+>  arch/arm64/include/asm/kvm_host.h | 1 +
+>  arch/arm64/include/asm/kvm_hyp.h  | 1 +
+>  arch/arm64/kvm/arm.c              | 1 +
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c    | 2 ++
+>  arch/arm64/kvm/reset.c            | 2 ++
+>  5 files changed, 7 insertions(+)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index 501e3e019c93..74837d1762e5 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -557,6 +557,40 @@ static __always_inline void kvm_incr_pc(struct kvm_vcpu *vcpu)
->  		vcpu_set_flag((v), e);					\
->  	} while (0)
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 8170c04fde91..0a5fceb20f3a 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -76,6 +76,7 @@ static inline enum kvm_mode kvm_get_mode(void) { return KVM_MODE_NONE; };
+>  DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
 >  
+>  extern unsigned int __ro_after_init kvm_sve_max_vl;
+> +extern unsigned int __ro_after_init kvm_host_sve_max_vl;
+>  int __init kvm_arm_init_sve(void);
+>  
+>  u32 __attribute_const__ kvm_target_cpu(void);
+> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+> index 2ab23589339a..d313adf53bef 100644
+> --- a/arch/arm64/include/asm/kvm_hyp.h
+> +++ b/arch/arm64/include/asm/kvm_hyp.h
+> @@ -143,5 +143,6 @@ extern u64 kvm_nvhe_sym(id_aa64smfr0_el1_sys_val);
+>  
+>  extern unsigned long kvm_nvhe_sym(__icache_flags);
+>  extern unsigned int kvm_nvhe_sym(kvm_arm_vmid_bits);
+> +extern unsigned int kvm_nvhe_sym(kvm_host_sve_max_vl);
+>  
+>  #endif /* __ARM64_KVM_HYP_H__ */
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 9996a989b52e..9e565ea3d645 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -2378,6 +2378,7 @@ static void kvm_hyp_init_symbols(void)
+>  	kvm_nvhe_sym(id_aa64smfr0_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64SMFR0_EL1);
+>  	kvm_nvhe_sym(__icache_flags) = __icache_flags;
+>  	kvm_nvhe_sym(kvm_arm_vmid_bits) = kvm_arm_vmid_bits;
+> +	kvm_nvhe_sym(kvm_host_sve_max_vl) = kvm_host_sve_max_vl;
+>  }
+>  
+>  static int __init kvm_hyp_init_protection(u32 hyp_va_bits)
+> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> index 16aa4875ddb8..25e9a94f6d76 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> @@ -18,6 +18,8 @@ unsigned long __icache_flags;
+>  /* Used by kvm_get_vttbr(). */
+>  unsigned int kvm_arm_vmid_bits;
+>  
+> +unsigned int kvm_host_sve_max_vl;
 > +
-> +static inline void __cptr_clear_set_nvhe(u64 cpacr_clr, u64 cpacr_set)
-> +{
-> +	u64 clr = 0, set = 0;
-> +
-> +	if (cpacr_clr & CPACR_ELx_FPEN)
-> +		set |= CPTR_EL2_TFP;
-> +	if (cpacr_clr & CPACR_ELx_ZEN)
-> +		set |= CPTR_EL2_TZ;
-> +	if (cpacr_clr & CPACR_ELx_SMEN)
+>  /*
+>   * Set trap register values based on features in ID_AA64PFR0.
+>   */
+> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> index 1b7b58cb121f..e818727900ec 100644
+> --- a/arch/arm64/kvm/reset.c
+> +++ b/arch/arm64/kvm/reset.c
+> @@ -46,11 +46,13 @@ static u32 __ro_after_init kvm_ipa_limit;
+>  				 PSR_AA32_I_BIT | PSR_AA32_F_BIT)
+>  
+>  unsigned int __ro_after_init kvm_sve_max_vl;
+> +unsigned int __ro_after_init kvm_host_sve_max_vl;
+>  
+>  int __init kvm_arm_init_sve(void)
+>  {
+>  	if (system_supports_sve()) {
+>  		kvm_sve_max_vl = sve_max_virtualisable_vl();
+> +		kvm_host_sve_max_vl = sve_max_vl();
 
-These 3 fields are actually pairs of bits. Can we have a compile-time
-check that both bits are set?
+Why the intermediate storage?
 
-> +		set |= CPTR_EL2_TSM;
-> +	if (cpacr_clr & CPACR_ELx_TTA)
-> +		clr |= CPTR_EL2_TTA;
-
-How about TCPAC, TAM, and E0POE?
-
-> +
-> +	if (cpacr_set & CPACR_ELx_FPEN)
-> +		clr |= CPTR_EL2_TFP;
-> +	if (cpacr_set & CPACR_ELx_ZEN)
-> +		clr |= CPTR_EL2_TZ;
-> +	if (cpacr_set & CPACR_ELx_SMEN)
-> +		clr |= CPTR_EL2_TSM;
-> +	if (cpacr_set & CPACR_ELx_TTA)
-> +		set |= CPTR_EL2_TTA;
-
-The duplication is pretty unfortunate. Having a single helper that
-translate a register layout into another would be better.
-
-> +
-> +	sysreg_clear_set(cptr_el2, clr, set);
-
-And omit this...
-
-> +}
-> +
-> +static inline void cpacr_clear_set(u64 clr, u64 set)
-> +{
-> +        if (has_vhe() || has_hvhe())
-> +                sysreg_clear_set(cpacr_el1, clr, set);
-> +        else
-> +                __cptr_clear_set_nvhe(clr, set);
-
-So that this could read as:
-
-	sysreg_clear_set(cptr_el2, cpacr_to_cptr(clr), cpacr_to_cptr(set));
+Setting kvm_nvhe_sym(kvm_host_sve_max_vl) to sve_max_vl() should be
+enough. But it doesn't mean that all the CPUs support the same max VL,
+and I wonder whether we end-up with the wrong in-memory layout in this
+case...
 
 Thanks,
 
