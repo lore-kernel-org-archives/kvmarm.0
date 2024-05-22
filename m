@@ -1,57 +1,57 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04D8B17C95
-	for <kvmarm@lists.linux.dev>; Wed, 22 May 2024 01:40:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EC021CAAE
+	for <kvmarm@lists.linux.dev>; Wed, 22 May 2024 01:40:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716342022; cv=none; b=ecmv9NY39O73F5rZkFpCqlGi9kAoNx9hX8Qx7WZ5CXLjoRS3YAoRfT70bGCHXGuEmd5L2LPgCYBshnSDGnHYqSDWGvemSRGzdYfHrm294EMaoytg7+1Ay9JxlxV5WIeEOr8vKPTV/Kis7Ao6OIgBhH3WR+2LlDwsgo0Weia6x2E=
+	t=1716342024; cv=none; b=JO1kJOysdWw+dNPafE382hYuF/HTjQeoZf4uYpKNAbtbjsS+wpX9/G2aLrfhnOTvhze6YLNbrtmT7zdQQtIRB93haByTUPXz/uVkkWvDYpQqkkH4t5FpBq3h8l0TlwXbR3lgcJedEZ6fN8zBxeYdEqNGzJJNSOjPvGPdls+lY30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716342022; c=relaxed/simple;
-	bh=a3/l+BJfoA/G/28RbhkAW1tXtxlUYPuy/d4D+LgwoZ4=;
+	s=arc-20240116; t=1716342024; c=relaxed/simple;
+	bh=SZyLjBDPVAa/D0KwpeqI+MBejZ+xXEeWM4HL4osCdxI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=u4BngfE8ESBpTGVxEWFgncV4HImQ61hUaUkwkgY0Gkf6wyDB4+rvAzoimIxPMGixAVBMkmcfyv0A6fJTrzj58UJo51LZcWOW7HBi/TmL+IpNiyg+2moNKifpkgbZejTC/bM/sP1/oPaf397ybJhLV50vORPP/rNJP3e3oMC5Fm8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nyF+ySJL; arc=none smtp.client-ip=209.85.128.201
+	 To:Cc:Content-Type; b=bmWjoBHFLeyjK7hyugbI5Ndw+72CbbHOUpZXzg8I0VZiWA4cozyEaElKeeWc3Uz2lQZDqE88EEQvhQG89ZoxQHRuVc5gvtxc4lvQCMh1Civ0XmvuL5CIC7erhRGi28V7idf+gGT3+S2aq63zJfMIiaKCiIn/ZiUOFKUox9hUXTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h2tkEdCc; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nyF+ySJL"
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-622ce716ceaso5474487b3.0
-        for <kvmarm@lists.linux.dev>; Tue, 21 May 2024 18:40:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h2tkEdCc"
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-627956be166so90209057b3.0
+        for <kvmarm@lists.linux.dev>; Tue, 21 May 2024 18:40:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1716342020; x=1716946820; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1716342022; x=1716946822; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=RHSd/NUpLA+qEQZ24Usoansq2bi58Ee8oOJzhOJ4pNg=;
-        b=nyF+ySJLX+hU6dbd4NAf2kppi9FEFTH8fQ5RZAdJxuKHtz8m4aqKFd3yM29toojjgK
-         dIWOfZxwa89JXdkkp+ciyTUODVqIiyw0m5zRorB2TpDbOoDxY95t/WQD+7Q50tEYqTcO
-         MxMP2UN1d2vRuGPj8LIIjo238qf/d9pMHC2xbDnRlZ6BeiU+UBLu7xyLVkmprLOjz6xY
-         VXxfPL/N+jC8clA8dhXDWaoO6o77xxq+FjxWu1YseQZhu4BxwXg2CpTZo4KBiViNezmD
-         D/PaCkeeFvBtQv/fNrzCf2Nt4eg0S1Pmr/t68yzpFq5CqrsGeokgRyymj/h+00GSTCvg
-         aU5A==
+        bh=Ky0OyQodlYj1lBm/FQov7vVQOSf0t15DeKBOaNpreRc=;
+        b=h2tkEdCcLV4oefi0eVh7VOPpSLRM1JRpSz/Wkhsbbc1ZnzgLKHz27Ce9g7gfl0yw0d
+         v/7cAel0cjF/mpNLtLUqdwqyVjrtQeXDodxYUgp1eEMr3OBp/lr8d7zgB3C6RydMGbfw
+         ltvfWanh0DZ1o4vmv7VSlvJWdnCcbv75VxME8c76w5lNG3D5o+8kjAyoRTAPRh80DXQ+
+         fmjk8iXy1Hkm1j6S4OZfOOWavqfA6kXHHz8PCun8b3LdHSoS3TtLUNJ4C62S37ZVvWHB
+         15w0IyJHXzUbbHQ8+vDxRqdRRmkVOUx4pqaPIfsG1hb7yfZWpife847neJJBsfwVfm4A
+         bftw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716342020; x=1716946820;
+        d=1e100.net; s=20230601; t=1716342022; x=1716946822;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=RHSd/NUpLA+qEQZ24Usoansq2bi58Ee8oOJzhOJ4pNg=;
-        b=rB35vB/3iOlOwOl265JSua3tJ3ilNm4g/DKK4t4C+T442e/HM8VbNSdNRDj7ezcpOW
-         QqKE4TV1QBxFXp/peenRp0yTWU+gLqEHUOOLRamfgOacNimgibb3ydhSFfo8jwijCwM2
-         qum68uBktZZ26ha8UqrHe/edrStR7/ToGtti9HATdLoKcNBCRu2w5hht2hyyh3CQmTD2
-         yNLXw6wGJPwYeIsw6uqJh3jZsLtWWzQQVeXtIdu5Vwr6ezuCmawvW1z5cDUridyfjr/6
-         ++zOUrJeI4iqYB77IXbTyDwkm1omjRGYxFkMqLjrNJ3zU6c71NLsxUAYXeVZeFX+JGst
-         DTwQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWrMAH/QuSzyVGDjmi9PJW8T462EZwEs8WTYsNRMWaWyjAc1L3opioBe46QYlN66dObw/Kxpvzd6EyfbyZr0hXEoGQpPiMd
-X-Gm-Message-State: AOJu0YxAOg6zUbQx+MRsL4cwjGr7tttjINEgHBQhrVNYKFbPt+v+XF6v
-	f67rzi5ubEKf4TEJlyAmZQ/vOynR/LyuirH798aBGFEBxU/LkI/pQHnMFjUZecnRavtl+hLfi0J
-	sbQ==
-X-Google-Smtp-Source: AGHT+IE9wMBEKwP41aGLYHN5gIBbi7welOi0G93+qj4AotHFqdz8JFE0XRpN5nX1Yz+N7pw0xKG3cBx+pVY=
+        bh=Ky0OyQodlYj1lBm/FQov7vVQOSf0t15DeKBOaNpreRc=;
+        b=TKtWqNIbTu31G4gsiFs2dXWH+BabYFxVn/k4d0SnBCbsBHbEqgigJOyXuMF8/tkv7Y
+         HtyQsYO0c4AfHK2enmvFTGgJO7cSfQtV1F8bL/hEzoh7D8JmzTryaddFxzqeMsfsL1Wb
+         a1PyUxMTd4J4oCrmL1UfZj7XUOyeCXxbhAmZLA8xrIL+BE8m31eD26ShT9loFU6aRVeh
+         9sFlLTqgCcCMknejIkkm4aXo3mIyTbUOmb+571IvCYlyPHC32ko4TLB9nGwa9YtzaV68
+         8aPcyf/RPilxa/3gEVKZdDsiaKkp0SNin4ClXW4DukonxIVX/5ciUz+9xrPUhYZWvUrT
+         XZGg==
+X-Forwarded-Encrypted: i=1; AJvYcCW1GnZ9WoPypZrEyn6NpaPKMCTwuIQKUR8uU7UqjFqZHnLHrkQXyqNM2hpDsQ4TBh8XkikDuLa68SJ3r1nEzyXZtwQwSxyq
+X-Gm-Message-State: AOJu0YzupSub29AfpOLWF/cbOXfH0GB5WsO6/LF7MzNQnMOOLfeyD+40
+	kNiKLTkKOf3CvMa9bU6BCptqP+wovQamFGIus/TT5VMxzGXbXdS7PMQP3d8Env7F/tKKtP5VhsM
+	IRA==
+X-Google-Smtp-Source: AGHT+IH3ylTQdVbQjZOc6EesCmA9Xrxy9wlcjQn2SMB7bi30ktsJ//ZvCxppwijf1/jMZuHd3SCyhhC4bqo=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a0d:ca57:0:b0:61b:e53e:c7ae with SMTP id
- 00721157ae682-627e46aa2e9mr2093257b3.2.1716342019957; Tue, 21 May 2024
- 18:40:19 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:690c:251:b0:61b:1dbf:e3f with SMTP id
+ 00721157ae682-627e46d457amr2201297b3.4.1716342021752; Tue, 21 May 2024
+ 18:40:21 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 21 May 2024 18:40:09 -0700
+Date: Tue, 21 May 2024 18:40:10 -0700
 In-Reply-To: <20240522014013.1672962-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,8 +61,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240522014013.1672962-1-seanjc@google.com>
 X-Mailer: git-send-email 2.45.0.215.g3402c0e53f-goog
-Message-ID: <20240522014013.1672962-3-seanjc@google.com>
-Subject: [PATCH v2 2/6] KVM: VMX: Move PLE grow/shrink helpers above vmx_vcpu_load()
+Message-ID: <20240522014013.1672962-4-seanjc@google.com>
+Subject: [PATCH v2 3/6] KVM: x86: Fold kvm_arch_sched_in() into kvm_arch_vcpu_load()
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
@@ -78,99 +78,173 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Move VMX's {grow,shrink}_ple_window() above vmx_vcpu_load() in preparation
-of moving the sched_in logic, which handles shrinking the PLE window, into
-vmx_vcpu_load().
+Fold the guts of kvm_arch_sched_in() into kvm_arch_vcpu_load(), keying
+off the recently added kvm_vcpu.scheduled_out as appropriate.
 
-No functional change intended.
+Note, there is a very slight functional change, as PLE shrink updates will
+now happen after blasting WBINVD, but that is quite uninteresting as the
+two operations do not interact in any way.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 64 +++++++++++++++++++++---------------------
- 1 file changed, 32 insertions(+), 32 deletions(-)
+ arch/x86/include/asm/kvm-x86-ops.h |  1 -
+ arch/x86/include/asm/kvm_host.h    |  2 --
+ arch/x86/kvm/svm/svm.c             | 11 +++--------
+ arch/x86/kvm/vmx/main.c            |  2 --
+ arch/x86/kvm/vmx/vmx.c             |  9 +++------
+ arch/x86/kvm/vmx/x86_ops.h         |  1 -
+ arch/x86/kvm/x86.c                 | 17 ++++++++++-------
+ 7 files changed, 16 insertions(+), 27 deletions(-)
 
+diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+index 566d19b02483..5a8b74c2e6c4 100644
+--- a/arch/x86/include/asm/kvm-x86-ops.h
++++ b/arch/x86/include/asm/kvm-x86-ops.h
+@@ -103,7 +103,6 @@ KVM_X86_OP(write_tsc_multiplier)
+ KVM_X86_OP(get_exit_info)
+ KVM_X86_OP(check_intercept)
+ KVM_X86_OP(handle_exit_irqoff)
+-KVM_X86_OP(sched_in)
+ KVM_X86_OP_OPTIONAL(update_cpu_dirty_logging)
+ KVM_X86_OP_OPTIONAL(vcpu_blocking)
+ KVM_X86_OP_OPTIONAL(vcpu_unblocking)
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index aabf1648a56a..0df4d14db896 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1750,8 +1750,6 @@ struct kvm_x86_ops {
+ 			       struct x86_exception *exception);
+ 	void (*handle_exit_irqoff)(struct kvm_vcpu *vcpu);
+ 
+-	void (*sched_in)(struct kvm_vcpu *vcpu, int cpu);
+-
+ 	/*
+ 	 * Size of the CPU's dirty log buffer, i.e. VMX's PML buffer.  A zero
+ 	 * value indicates CPU dirty logging is unsupported or disabled.
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 3d0549ca246f..51a5eb31aee5 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -1548,6 +1548,9 @@ static void svm_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 	struct svm_cpu_data *sd = per_cpu_ptr(&svm_data, cpu);
+ 
++	if (vcpu->scheduled_out && !kvm_pause_in_guest(vcpu->kvm))
++		shrink_ple_window(vcpu);
++
+ 	if (sd->current_vmcb != svm->vmcb) {
+ 		sd->current_vmcb = svm->vmcb;
+ 
+@@ -4572,12 +4575,6 @@ static void svm_handle_exit_irqoff(struct kvm_vcpu *vcpu)
+ 		vcpu->arch.at_instruction_boundary = true;
+ }
+ 
+-static void svm_sched_in(struct kvm_vcpu *vcpu, int cpu)
+-{
+-	if (!kvm_pause_in_guest(vcpu->kvm))
+-		shrink_ple_window(vcpu);
+-}
+-
+ static void svm_setup_mce(struct kvm_vcpu *vcpu)
+ {
+ 	/* [63:9] are reserved. */
+@@ -5046,8 +5043,6 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+ 	.check_intercept = svm_check_intercept,
+ 	.handle_exit_irqoff = svm_handle_exit_irqoff,
+ 
+-	.sched_in = svm_sched_in,
+-
+ 	.nested_ops = &svm_nested_ops,
+ 
+ 	.deliver_interrupt = svm_deliver_interrupt,
+diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+index 7c546ad3e4c9..4fee9a8cc5a1 100644
+--- a/arch/x86/kvm/vmx/main.c
++++ b/arch/x86/kvm/vmx/main.c
+@@ -121,8 +121,6 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.check_intercept = vmx_check_intercept,
+ 	.handle_exit_irqoff = vmx_handle_exit_irqoff,
+ 
+-	.sched_in = vmx_sched_in,
+-
+ 	.cpu_dirty_log_size = PML_ENTITY_NUM,
+ 	.update_cpu_dirty_logging = vmx_update_cpu_dirty_logging,
+ 
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 51b2cd13250a..07a4d6a3a43e 100644
+index 07a4d6a3a43e..da2f95385a12 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1410,6 +1410,38 @@ static void vmx_write_guest_kernel_gs_base(struct vcpu_vmx *vmx, u64 data)
+@@ -1517,6 +1517,9 @@ void vmx_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ {
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+ 
++	if (vcpu->scheduled_out && !kvm_pause_in_guest(vcpu->kvm))
++		shrink_ple_window(vcpu);
++
+ 	vmx_vcpu_load_vmcs(vcpu, cpu, NULL);
+ 
+ 	vmx_vcpu_pi_load(vcpu, cpu);
+@@ -8171,12 +8174,6 @@ void vmx_cancel_hv_timer(struct kvm_vcpu *vcpu)
  }
  #endif
  
-+static void grow_ple_window(struct kvm_vcpu *vcpu)
-+{
-+	struct vcpu_vmx *vmx = to_vmx(vcpu);
-+	unsigned int old = vmx->ple_window;
-+
-+	vmx->ple_window = __grow_ple_window(old, ple_window,
-+					    ple_window_grow,
-+					    ple_window_max);
-+
-+	if (vmx->ple_window != old) {
-+		vmx->ple_window_dirty = true;
-+		trace_kvm_ple_window_update(vcpu->vcpu_id,
-+					    vmx->ple_window, old);
-+	}
-+}
-+
-+static void shrink_ple_window(struct kvm_vcpu *vcpu)
-+{
-+	struct vcpu_vmx *vmx = to_vmx(vcpu);
-+	unsigned int old = vmx->ple_window;
-+
-+	vmx->ple_window = __shrink_ple_window(old, ple_window,
-+					      ple_window_shrink,
-+					      ple_window);
-+
-+	if (vmx->ple_window != old) {
-+		vmx->ple_window_dirty = true;
-+		trace_kvm_ple_window_update(vcpu->vcpu_id,
-+					    vmx->ple_window, old);
-+	}
-+}
-+
- void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu,
- 			struct loaded_vmcs *buddy)
+-void vmx_sched_in(struct kvm_vcpu *vcpu, int cpu)
+-{
+-	if (!kvm_pause_in_guest(vcpu->kvm))
+-		shrink_ple_window(vcpu);
+-}
+-
+ void vmx_update_cpu_dirty_logging(struct kvm_vcpu *vcpu)
  {
-@@ -5889,38 +5921,6 @@ int vmx_vcpu_pre_run(struct kvm_vcpu *vcpu)
- 	return 1;
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+index 502704596c83..3cb0be94e779 100644
+--- a/arch/x86/kvm/vmx/x86_ops.h
++++ b/arch/x86/kvm/vmx/x86_ops.h
+@@ -112,7 +112,6 @@ u64 vmx_get_l2_tsc_multiplier(struct kvm_vcpu *vcpu);
+ void vmx_write_tsc_offset(struct kvm_vcpu *vcpu);
+ void vmx_write_tsc_multiplier(struct kvm_vcpu *vcpu);
+ void vmx_request_immediate_exit(struct kvm_vcpu *vcpu);
+-void vmx_sched_in(struct kvm_vcpu *vcpu, int cpu);
+ void vmx_update_cpu_dirty_logging(struct kvm_vcpu *vcpu);
+ #ifdef CONFIG_X86_64
+ int vmx_set_hv_timer(struct kvm_vcpu *vcpu, u64 guest_deadline_tsc,
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index d750546ec934..e924d1c51e31 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -5004,6 +5004,16 @@ static bool need_emulate_wbinvd(struct kvm_vcpu *vcpu)
+ 
+ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ {
++	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
++
++	if (vcpu->scheduled_out) {
++		vcpu->arch.l1tf_flush_l1d = true;
++		if (pmu->version && unlikely(pmu->event_count)) {
++			pmu->need_cleanup = true;
++			kvm_make_request(KVM_REQ_PMU, vcpu);
++		}
++	}
++
+ 	/* Address WBINVD may be executed by guest */
+ 	if (need_emulate_wbinvd(vcpu)) {
+ 		if (static_call(kvm_x86_has_wbinvd_exit)())
+@@ -12578,14 +12588,7 @@ bool kvm_vcpu_is_bsp(struct kvm_vcpu *vcpu)
+ 
+ void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu)
+ {
+-	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+ 
+-	vcpu->arch.l1tf_flush_l1d = true;
+-	if (pmu->version && unlikely(pmu->event_count)) {
+-		pmu->need_cleanup = true;
+-		kvm_make_request(KVM_REQ_PMU, vcpu);
+-	}
+-	static_call(kvm_x86_sched_in)(vcpu, cpu);
  }
  
--static void grow_ple_window(struct kvm_vcpu *vcpu)
--{
--	struct vcpu_vmx *vmx = to_vmx(vcpu);
--	unsigned int old = vmx->ple_window;
--
--	vmx->ple_window = __grow_ple_window(old, ple_window,
--					    ple_window_grow,
--					    ple_window_max);
--
--	if (vmx->ple_window != old) {
--		vmx->ple_window_dirty = true;
--		trace_kvm_ple_window_update(vcpu->vcpu_id,
--					    vmx->ple_window, old);
--	}
--}
--
--static void shrink_ple_window(struct kvm_vcpu *vcpu)
--{
--	struct vcpu_vmx *vmx = to_vmx(vcpu);
--	unsigned int old = vmx->ple_window;
--
--	vmx->ple_window = __shrink_ple_window(old, ple_window,
--					      ple_window_shrink,
--					      ple_window);
--
--	if (vmx->ple_window != old) {
--		vmx->ple_window_dirty = true;
--		trace_kvm_ple_window_update(vcpu->vcpu_id,
--					    vmx->ple_window, old);
--	}
--}
--
- /*
-  * Indicate a busy-waiting vcpu in spinlock. We do not enable the PAUSE
-  * exiting, so only get here on cpu with PAUSE-Loop-Exiting.
+ void kvm_arch_free_vm(struct kvm *kvm)
 -- 
 2.45.0.215.g3402c0e53f-goog
 
