@@ -1,85 +1,73 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 779DA140E23;
-	Wed, 22 May 2024 15:52:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 838C41F17B;
+	Wed, 22 May 2024 17:05:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716393171; cv=none; b=nfzJWQh7ncw6xL2x+Ez1KUyqr3LGXD1GlAsaCKHtDuxcyrBHtLsL8iOIrnYKa1sUiaAjIxT9EzZf2EBxu/Qt5BEeqdoBf6v4ijqBfriu+K+dl1s3UadN4D2k0bjzaHxJ9jYF94zMZEPmobT7+Us/LqW/SyVDBP5b3zhq8dHIkLY=
+	t=1716397537; cv=none; b=dln0lB1/rdve/SuN+eEN3AiE5S9XaIxy/Wf2zg1o4a3iKK0bZibDJg4Fz5A2WQS1JyL8eb3s6dCewpj2Dq2mImex354/MBnyK8KRwtxz3vCuOrPoB04CEcUgLjgGXpWrdIxBLBDyCApOk2b908F/P8AFbBQcuAL0uEEYigEB/yo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716393171; c=relaxed/simple;
-	bh=FNUKhCgH3p/nE748aRJauYt6enORN/xUcsNBXPvhy6k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=s3ZqqC2DS5HVIO10SpkNlMVkxMnzZYlu9L0HGg1odLmy7kIq2Qx2dMCvqhLcw7KwqM9I0gholEfQ9sETh50wQEC67pNrYCWHHWXy5jVF3gVKQ4x9hBe62R0L9SKRtHpg9gZKjdMFpRIDaqPjEuglytwqrXMVfpR+o+vJ1uQGcYs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2005DDA7;
-	Wed, 22 May 2024 08:53:13 -0700 (PDT)
-Received: from [10.57.35.73] (unknown [10.57.35.73])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 750243F766;
-	Wed, 22 May 2024 08:52:45 -0700 (PDT)
-Message-ID: <fe1e3793-a413-42b6-b368-619aae277cb6@arm.com>
-Date: Wed, 22 May 2024 16:52:47 +0100
+	s=arc-20240116; t=1716397537; c=relaxed/simple;
+	bh=mwwMo0Vvvhtk4BnzEWt4A3iCr981iZe9k75eEk/w0xM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UT0zFNwQOh9MJTr6S43dnGpuSfOo9zs3WVhTirWfe0wy1dBEH98mwLyIdEUtGJ9cINuucT6MZhgm7B5BkQz8+qsAouGWVWKJwEYKAQda5939Ngaup5Qj2nKZ6k+6a+j8ZC4v+s0c39CuRTA9FSVieittqqYGudjTSg4n6DaTjes=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34ABEC32789;
+	Wed, 22 May 2024 17:05:34 +0000 (UTC)
+Date: Wed, 22 May 2024 18:05:31 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: Re: [PATCH v2 12/14] arm64: realm: Support nonsecure ITS emulation
+ shared
+Message-ID: <Zk4l2xFBDW_3ImFD@arm.com>
+References: <20240412084213.1733764-1-steven.price@arm.com>
+ <20240412084213.1733764-13-steven.price@arm.com>
+ <ZkSV7Z8QFQYLETzD@arm.com>
+ <74011ac1-34e0-4ee3-a00d-f78ad334fce2@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 13/14] arm64: rsi: Interfaces to query attestation
- token
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Sami Mujawar <sami.mujawar@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-References: <20240412084213.1733764-1-steven.price@arm.com>
- <20240412084213.1733764-14-steven.price@arm.com> <ZkSYCYOWxKSV9t8S@arm.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <ZkSYCYOWxKSV9t8S@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <74011ac1-34e0-4ee3-a00d-f78ad334fce2@arm.com>
 
-On 15/05/2024 12:10, Catalin Marinas wrote:
-> On Fri, Apr 12, 2024 at 09:42:12AM +0100, Steven Price wrote:
->> diff --git a/arch/arm64/include/asm/rsi_cmds.h b/arch/arm64/include/asm/rsi_cmds.h
->> index b4cbeafa2f41..c1850aefe54e 100644
->> --- a/arch/arm64/include/asm/rsi_cmds.h
->> +++ b/arch/arm64/include/asm/rsi_cmds.h
->> @@ -10,6 +10,9 @@
->>  
->>  #include <asm/rsi_smc.h>
->>  
->> +#define GRANULE_SHIFT		12
->> +#define GRANULE_SIZE		(_AC(1, UL) << GRANULE_SHIFT)
+On Wed, May 22, 2024 at 04:52:45PM +0100, Steven Price wrote:
+> On 15/05/2024 12:01, Catalin Marinas wrote:
+> > On Fri, Apr 12, 2024 at 09:42:11AM +0100, Steven Price wrote:
+> >> @@ -3432,7 +3468,16 @@ static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
+> >>  	nr_ites = max(2, nvecs);
+> >>  	sz = nr_ites * (FIELD_GET(GITS_TYPER_ITT_ENTRY_SIZE, its->typer) + 1);
+> >>  	sz = max(sz, ITS_ITT_ALIGN) + ITS_ITT_ALIGN - 1;
+> >> -	itt = kzalloc_node(sz, GFP_KERNEL, its->numa_node);
+> >> +	itt_order = get_order(sz);
+> >> +	page = its_alloc_shared_pages_node(its->numa_node,
+> >> +					   GFP_KERNEL | __GFP_ZERO,
+> >> +					   itt_order);
+> > 
+> > How much do we waste by going for a full page always if this is going to
+> > be used on the host?
 > 
-> The name is too generic and it goes into a header file. Also maybe move
-> it to rsi.h, and use it for other definitions like rsi_config struct
-> size and alignment.
-> 
+> sz is a minimum of ITS_ITT_ALIGN*2-1 - which is 511 bytes. So
+> potentially PAGE_SIZE-512 bytes could be wasted here (minus kmalloc
+> overhead).
 
-The realm config structure although it 'happens to be' granule sized
-isn't really required to be - so I think it would be a bit confusing to
-specify that.
+That I figured out as well but how many times is this path called with a
+size smaller than a page?
 
-There are only two other interfaces that require this:
- * RSI_IPA_STATE_GET - completely unused so far
- * RSI_ATTESTATION_TOKEN_CONTINUE - the buffer has to be contained with
-   a granule, so it affects the maximum length per operation.
-
-I'll rename to RSI_GRANULE_{SHIFT,SIZE}, but I'm not sure it really
-belongs in rsi.h because none of that functionality cares about the
-granule size (indeed the driver in the following patch doesn't include
-rsi.h).
-
-Thanks,
-Steve
+-- 
+Catalin
