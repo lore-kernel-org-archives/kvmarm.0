@@ -1,126 +1,189 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 194AA33993
-	for <kvmarm@lists.linux.dev>; Wed, 22 May 2024 01:40:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B73A8823C3
+	for <kvmarm@lists.linux.dev>; Wed, 22 May 2024 10:14:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716342029; cv=none; b=vB0UKg8ENSCFxoYxLh+WUORr7W1fqkIoDqouNRZutkuVFSDGSLlgEAtd0JfUp7hKTZ+AUzxZGxAekJW+kgS6CNvvI2TfFqD+4pYIEg51MgOeVxU0ZpR7kztaYyQ3KLq0z11geBIWjKfGvKvLDPQ8U/DEqWZ4MSJVKtG8nYEOEOU=
+	t=1716372865; cv=none; b=Uf3FehSQ37YmD7ENXZMqIihb9+rb/cTKlVAyNW0scLLnbZ0APlVuAZ0DLmrTGXETuS5nZjZRBJ4zUILpQ8iTfaMw4q9XAHKJIafkZ3i/L43KoINshaLwB78TdhwtKFQm9QRk7PJl7sLrqK2MeaXU1MecARWRnc5gPPSNT1j0e+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716342029; c=relaxed/simple;
-	bh=FJaY5ZXsWt+iV/k6HY2WFFz74BTaJg/mMtL9qyrhSP8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=UxbrgjWIXe2lp9/1niz3662Bfc9VY7TXcY2cOgeZ8pX/H+Ep4jz+F5jDcncLqgiZUe4L5doSibPppzp7KEV+OEQCzrZ6Tpj5wA3dQ1s2BIRrJXO81g4dMFwi5Zd7gVCpZO964GXEXTwgzajKKD4RSK/aEk9gKCMTxbcqOSj9sTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4HURiaVR; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1716372865; c=relaxed/simple;
+	bh=SY4PoGxkZbY9EB+8q6oKpL4YKpeUpsHiiyG7kK8YPgw=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=fwvWIEgVxjoX27JIJe1wCdUYgLtepW7LfwBFtrhLCC6SQcvIqSFjm8Ro6o5WZ7DFu6HGOMUlHteii8xVEiUbwTe9xYZ8X8n29eK1P0+ZuJIG2/2m4FJIWsvJ7n1b7TVXQXnWKRFWYtKU32BCWsm/u83ZLe8j/NlaGn5442fb7gU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bXc6fDO5; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4HURiaVR"
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-61be4b79115so261182557b3.1
-        for <kvmarm@lists.linux.dev>; Tue, 21 May 2024 18:40:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1716342027; x=1716946827; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=N3tcdNqgpk0g0Qawt6D2SIU8FL4Y9j5vsBcc8xUlRY4=;
-        b=4HURiaVRwEFFSkZ05HhmnwfqImTUD652VFl5uIW9EdEY7qEhBuJy/uMNUP/Nh7oKyg
-         6Kdj5SdaS0fMc+OVDnbBbeM3JGbj1+DkwXotdYjankZWYN8tvaGetHe6wTShuS32b0bV
-         B65Orj6iCSzc4eUWrjkeKae70ulXwZMxTGy6kTtBvIW3o7VmnYeOo0P3j3BAtmcdaE/Q
-         x1aaFXeku8YtCtydLflGHDuehF7Bk6bAhLLqlEaYybk3UVXNeYTMj3C3ZVUboTQnBuUN
-         HfDE0VrxaWLLANREzhpJy9S/maANXp0Tgn1AG8VgBeVuiuJPgUGHxG4c7mRIFCqDrN6i
-         RB1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716342027; x=1716946827;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=N3tcdNqgpk0g0Qawt6D2SIU8FL4Y9j5vsBcc8xUlRY4=;
-        b=kRwaW/BBAQADLBL/2d9BJV8o92R2c5og2z8UMyvVFYHF+oPqAstN/1ndDf27mVGVnD
-         mN26KUhpji7QKVG9cQkUdDUTxf0Xo5tcrpRIeUcATcFMneltt3RwuwSJhBnFUzYkH6FD
-         XvafXmJtIcVoH7ICF2dQEdPXSG0EVTiGf7RW7s56lPJfFI4PNFW2+S72E75RgzWPc+yJ
-         eKGt36Rg5FE/7g3CUdUOxA8LRaNMLMrDCZa2Fk2SYD0jGA2CsEO+8TVFWtUbO8XECuwd
-         e7+3hyw7gNQ6n+vzDHoFpbpWFxYKr/j3Vrn2whgWVkLTtAKe5i7m2OCTCsOFoLYv0BW/
-         IFLg==
-X-Forwarded-Encrypted: i=1; AJvYcCVunObBv6fBpW84ZwXaKFDI2uJO5eT+1VvSoGflEf7+JqokwS5b5LOIJoVR5X219kqDqW55MuF6m46K5hG8LQth3nFg/ehD
-X-Gm-Message-State: AOJu0YyqzXJB08bmm2zEE7VqQ5dWaSL/F72KVKW9CPbyEQwRSH6HocOp
-	/bhtGkMpK/vIooE9qDIOFLoW8239wrhWBQ5MefbyUVqvlQK6aBPavMx7ncyYoLWuoWeBYHIFaK3
-	gNA==
-X-Google-Smtp-Source: AGHT+IFL81/qwy5rtkuJ10qcaRdu2JQbneM9E+pjVdbps1/0e/VA4O7XiaE6CliC0DQxJV6ImSRXVMyGgXw=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:4984:0:b0:61b:e6d8:1c01 with SMTP id
- 00721157ae682-627e487fd2emr1914977b3.10.1716342027243; Tue, 21 May 2024
- 18:40:27 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 21 May 2024 18:40:13 -0700
-In-Reply-To: <20240522014013.1672962-1-seanjc@google.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bXc6fDO5"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1716372859;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3swaZNhAm3tQcBfbWtUrlmE8bOex+h0YEsXyT/7SdNM=;
+	b=bXc6fDO5IuvsPwpRHpXRspRMvn5yM/zn7ZtyZxyfbMgjsa+HlXP+/LhuWyl0rAUUSQb+VX
+	HWC7S+7J8h6K8glkJzsjOs9pq/vEjJPTIxGZ84psmk0PswsizJzQrF+W6WcSdokbQsG4MQ
+	v/IyvOX4BNymsY/td/GX5zlTgSMOvzo=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-339-d5EhlufyMVCqBOFbqorWyQ-1; Wed, 22 May 2024 06:14:09 -0400
+X-MC-Unique: d5EhlufyMVCqBOFbqorWyQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4001B185A78E;
+	Wed, 22 May 2024 10:14:09 +0000 (UTC)
+Received: from localhost (dhcp-192-239.str.redhat.com [10.33.192.239])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 90C3C1C0654B;
+	Wed, 22 May 2024 10:14:08 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, Marc Zyngier
+ <maz@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon
+ <will@kernel.org>, James Morse <james.morse@arm.com>, Suzuki K Poulose
+ <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH RFC] KVM: arm64: allow ID_MMFR4_EL1 to be writable
+In-Reply-To: <ZkKFmvZlFDzJ4Kka@linux.dev>
+Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
+ Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
+ 153243,
+ =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
+ Michael O'Neill, Amy
+ Ross"
+References: <E1s2DPv-00AhaA-Ra@rmk-PC.armlinux.org.uk>
+ <ZjKCgIyWqNKC6TUu@linux.dev> <ZjKFBUXEhwZ7ZmMM@shell.armlinux.org.uk>
+ <ZjKRBcAML5T6cm4q@linux.dev> <ZjOl5hwU7yPXk8gs@shell.armlinux.org.uk>
+ <ZjPDQSeQPE2wgVup@linux.dev> <87jzk4h5ir.fsf@redhat.com>
+ <Zjuy40shK5a-yp95@linux.dev> <875xvlhfci.fsf@redhat.com>
+ <ZkKFmvZlFDzJ4Kka@linux.dev>
+User-Agent: Notmuch/0.38.3 (https://notmuchmail.org)
+Date: Wed, 22 May 2024 12:14:07 +0200
+Message-ID: <87r0du6tn4.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20240522014013.1672962-1-seanjc@google.com>
-X-Mailer: git-send-email 2.45.0.215.g3402c0e53f-goog
-Message-ID: <20240522014013.1672962-7-seanjc@google.com>
-Subject: [PATCH v2 6/6] KVM: x86: Drop now-superflous setting of
- l1tf_flush_l1d in vcpu_run()
-From: Sean Christopherson <seanjc@google.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
-	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Sean Christopherson <seanjc@google.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Now that KVM unconditionally sets l1tf_flush_l1d in kvm_arch_vcpu_load(),
-drop the redundant store from vcpu_run().  The flag is cleared only when
-VM-Enter is imminent, deep below vcpu_run(), i.e. barring a KVM bug, it's
-impossible for l1tf_flush_l1d to be cleared between loading the vCPU and
-calling vcpu_run().
+On Mon, May 13 2024, Oliver Upton <oliver.upton@linux.dev> wrote:
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
+[apologies for the late reply]
+
+> On Fri, May 10, 2024 at 05:11:09PM +0200, Cornelia Huck wrote:
+>> On Wed, May 08 2024, Oliver Upton <oliver.upton@linux.dev> wrote:
+>> > I'm willing to wager that the set of users who want to migrate state
+>> > from kernel N -> (N - 1) know the exact CPU definition they want to
+>> > expose to the guest, and in that case should be using a static set of
+>> > feature register values matching their intent.
+>>=20
+>> I think the trouble starts when we introduce additional ranges of
+>> registers that can be controled via that interface -- old userspace will
+>> be able to figure out that there are more ranges available than what it
+>> is aware of, but will have no idea how to handle those additional ranges
+>> to get into a defined state (what is the actual range, for example?)
+>
+> Even though the UAPI was designed around supporting multiple ranges, I
+> do not see this being an issue for quite some time. We already fully
+> describe the Feature ID register range from the architecture.
+
+Yeah, we're probably fine for the time being, but something to keep in
+mind, I guess.
+
+>
+>> >
+>> > Beyond the CPU architecture, KVM presents hypercall features to the VM
+>> > which userspace can _opt-out_ of on a per-feature basis using the
+>> > feature bitmap registers described in [2]. Like the feature ID
+>> > registers, we've preallocated a range of indices to be used for
+>> > hypercall bitmaps. So if an unexpected bitmap register appears on a ne=
+w
+>> > kernel, userspace should write 0 to it to prevent new features from
+>> > silently creeping in.
+>>=20
+>> Hm, the doc says: "The features for the registers that are untouched,
+>> probably because userspace isn=E2=80=99t aware of them, will be exposed =
+as is to
+>> the guest." Seems to indicate that it is not too hard to get this wrong =
+:)
+>
+> Sure, but keep in mind the full range of possible Feature ID registers is
+> already known to userspace. Many of these register encodings are reserved=
+,
+> RAZ to allow for future expansion of the architecture [*]. New registers
+> will come from one of these RAZ encodings.
+>
+> If userspace wants to assert complete control over the CPU feature set
+> exposed to the VM it should use a pre-baked value for every register in
+> the range Op0=3D3, Op1=3D0, CRn=3D0, CRm=3D{1-8}, Op2=3D{0-8}.
+>
+> [*] DDI0487J.a Table D18-2
+
+Might make sense to spell that out?
+
+From 1d952c816d3192a4c2f3d95339aa96d86d3d0406 Mon Sep 17 00:00:00 2001
+From: Cornelia Huck <cohuck@redhat.com>
+Date: Wed, 22 May 2024 12:01:24 +0200
+Subject: [PATCH] KVM: arm64: provide hint about vCPU feature stability
+
+Give userspace some advice on how to achieve a stable feature set.
+
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 7 ++++---
- arch/x86/kvm/x86.c     | 1 -
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ Documentation/virt/kvm/arm/vcpu-features.rst | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index da2f95385a12..552b6a9887a5 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6672,9 +6672,10 @@ static noinstr void vmx_l1d_flush(struct kvm_vcpu *vcpu)
- 		bool flush_l1d;
- 
- 		/*
--		 * Clear the per-vcpu flush bit, it gets set again
--		 * either from vcpu_run() or from one of the unsafe
--		 * VMEXIT handlers.
-+		 * Clear the per-vcpu flush bit, it gets set again if the vCPU
-+		 * is reloaded, i.e. if the vCPU is scheduled out or if KVM
-+		 * exits to userspace, or if KVM reaches one of the unsafe
-+		 * VMEXIT handlers, e.g. if KVM calls into the emulator.
- 		 */
- 		flush_l1d = vcpu->arch.l1tf_flush_l1d;
- 		vcpu->arch.l1tf_flush_l1d = false;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 60fea297f91f..86ae7392cc59 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -11264,7 +11264,6 @@ static int vcpu_run(struct kvm_vcpu *vcpu)
- 	int r;
- 
- 	vcpu->run->exit_reason = KVM_EXIT_UNKNOWN;
--	vcpu->arch.l1tf_flush_l1d = true;
- 
- 	for (;;) {
- 		/*
--- 
-2.45.0.215.g3402c0e53f-goog
+diff --git a/Documentation/virt/kvm/arm/vcpu-features.rst b/Documentation/v=
+irt/kvm/arm/vcpu-features.rst
+index f7cc6d8d8b74..01973bf8815d 100644
+--- a/Documentation/virt/kvm/arm/vcpu-features.rst
++++ b/Documentation/virt/kvm/arm/vcpu-features.rst
+@@ -40,6 +40,10 @@ outlined by the architecture in DDI0487J.a D19.1.3 'Prin=
+ciples of the ID
+ scheme for fields in ID register'. KVM does not allow ID register values t=
+hat
+ exceed the capabilities of the system.
+=20
++As KVM will enable new features by default, userspace that wants to provid=
+e a
++stable feature set regardless of the kernel version is advised to supply a
++complete set of values for all of the ID registers.
++
+ .. warning::
+    It is **strongly recommended** that userspace modify the ID register va=
+lues
+    before accessing the rest of the vCPU's CPU register state. KVM may use=
+ the
+
+>
+>> >
+>> > The canonical reason for this behavior, though, is that KVM/arm64
+>> > defaults to the maximum-possible feature set as discussed above.
+>>=20
+>> /me contemplating "reverse" features, but too tired to think this
+>> through on a Friday afternoon.
+>>=20
+>
+> Reverse as in a negative / removed feature?
+>
+> These tend to appear as negative ID register fields, to imply that the
+> feature set is less than what's provided for with a value of 0x0. KVM
+> probably couldn't start deprecating features in the default ID register
+> values but userspace could probe for features it can opt-out of using
+> the writable mask + trying to write -1 to a field.
+>
+> DDI0487J.a D19.1.3 covers this.
+
+Yes, that would make the most sense (explicit opt-out from userspace),
+the advice from above would still apply.
 
