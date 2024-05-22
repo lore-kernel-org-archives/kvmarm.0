@@ -1,73 +1,80 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 838C41F17B;
-	Wed, 22 May 2024 17:05:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B7FE14D28E;
+	Wed, 22 May 2024 23:32:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716397537; cv=none; b=dln0lB1/rdve/SuN+eEN3AiE5S9XaIxy/Wf2zg1o4a3iKK0bZibDJg4Fz5A2WQS1JyL8eb3s6dCewpj2Dq2mImex354/MBnyK8KRwtxz3vCuOrPoB04CEcUgLjgGXpWrdIxBLBDyCApOk2b908F/P8AFbBQcuAL0uEEYigEB/yo=
+	t=1716420744; cv=none; b=psLAZIa8wxnewWIRt+MVHcSrR+0vyOv0mThixE0sYKlBiuFZnAcy8MLpvMI5q0IE+vDF1MTcIwVS+j9PG5Smw1qIIyYXUFV6O4xfcg/cemSHqTZqgPvIKGj/tphEsokNNgXEMCZHnx5ndC7Xu1EcKlADUf09XzKDwvdOI8dO3UI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716397537; c=relaxed/simple;
-	bh=mwwMo0Vvvhtk4BnzEWt4A3iCr981iZe9k75eEk/w0xM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UT0zFNwQOh9MJTr6S43dnGpuSfOo9zs3WVhTirWfe0wy1dBEH98mwLyIdEUtGJ9cINuucT6MZhgm7B5BkQz8+qsAouGWVWKJwEYKAQda5939Ngaup5Qj2nKZ6k+6a+j8ZC4v+s0c39CuRTA9FSVieittqqYGudjTSg4n6DaTjes=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34ABEC32789;
-	Wed, 22 May 2024 17:05:34 +0000 (UTC)
-Date: Wed, 22 May 2024 18:05:31 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: Re: [PATCH v2 12/14] arm64: realm: Support nonsecure ITS emulation
- shared
-Message-ID: <Zk4l2xFBDW_3ImFD@arm.com>
-References: <20240412084213.1733764-1-steven.price@arm.com>
- <20240412084213.1733764-13-steven.price@arm.com>
- <ZkSV7Z8QFQYLETzD@arm.com>
- <74011ac1-34e0-4ee3-a00d-f78ad334fce2@arm.com>
+	s=arc-20240116; t=1716420744; c=relaxed/simple;
+	bh=sFivK456BiubdJX56tlNdVWZafvyAwixp16zhXxqH70=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=lPQEtbFzLt3yKP1nhPJUoCg8Hd1dLuGEXIalwCS2QqIyW/Gw25ne1y3QgxD9obgT4M0AnfdWucSVxvmkYAg7kuUsF5Tum22lFRwvnQeJzEbYlt7vLh+hoYvAI1jYaPLxoqubdO39LBU+kJZuI1phcxkTNtEirZYUAxZb4gUeWiY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MvxrjXYy; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MvxrjXYy"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BD809C4AF15;
+	Wed, 22 May 2024 23:32:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716420743;
+	bh=sFivK456BiubdJX56tlNdVWZafvyAwixp16zhXxqH70=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=MvxrjXYyWgudMCjnBPVn9CXPVvpZNtaSUZ1gyq7PTmVmsLPKSp4NYpwhcGJcgtsps
+	 ZQigp0aoMd337dNepQtlG7ONduRS6voeXw8G++uWdKEk6y7kzjYZuq96XJ7/yQN19U
+	 IqJrWt8Rxg0xye2QS6uRQncojNKYhA9QElzTRMJox85W4T2sCbklby0gjCZU9wjUxM
+	 bIKgDpuY3lMTzfOOvE5ZE3aYgr4zJsDNOJcBlqDMfSjVhfax54WnjBVe7xoJmcD286
+	 HTXTNilxLy9lspwts50EVF1udoz+PVsPXjAxFdPOlmfSbHjPLqMQ0/3xuRViW2cwUe
+	 cVQfWD+cD2/eg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AF297C43618;
+	Wed, 22 May 2024 23:32:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <74011ac1-34e0-4ee3-a00d-f78ad334fce2@arm.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] KVM: selftest: Define _GNU_SOURCE for all selftests code
+From: patchwork-bot+linux-riscv@kernel.org
+Message-Id: 
+ <171642074371.9409.16238055569874422523.git-patchwork-notify@kernel.org>
+Date: Wed, 22 May 2024 23:32:23 +0000
+References: <20240423190308.2883084-1-seanjc@google.com>
+In-Reply-To: <20240423190308.2883084-1-seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: linux-riscv@lists.infradead.org, pbonzini@redhat.com, maz@kernel.org,
+ oliver.upton@linux.dev, anup@brainfault.org, paul.walmsley@sifive.com,
+ palmer@dabbelt.com, aou@eecs.berkeley.edu, borntraeger@linux.ibm.com,
+ frankja@linux.ibm.com, imbrenda@linux.ibm.com, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ kvm-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+ usama.anjum@collabora.com
 
-On Wed, May 22, 2024 at 04:52:45PM +0100, Steven Price wrote:
-> On 15/05/2024 12:01, Catalin Marinas wrote:
-> > On Fri, Apr 12, 2024 at 09:42:11AM +0100, Steven Price wrote:
-> >> @@ -3432,7 +3468,16 @@ static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
-> >>  	nr_ites = max(2, nvecs);
-> >>  	sz = nr_ites * (FIELD_GET(GITS_TYPER_ITT_ENTRY_SIZE, its->typer) + 1);
-> >>  	sz = max(sz, ITS_ITT_ALIGN) + ITS_ITT_ALIGN - 1;
-> >> -	itt = kzalloc_node(sz, GFP_KERNEL, its->numa_node);
-> >> +	itt_order = get_order(sz);
-> >> +	page = its_alloc_shared_pages_node(its->numa_node,
-> >> +					   GFP_KERNEL | __GFP_ZERO,
-> >> +					   itt_order);
-> > 
-> > How much do we waste by going for a full page always if this is going to
-> > be used on the host?
+Hello:
+
+This patch was applied to riscv/linux.git (fixes)
+by Sean Christopherson <seanjc@google.com>:
+
+On Tue, 23 Apr 2024 12:03:08 -0700 you wrote:
+> Define _GNU_SOURCE is the base CFLAGS instead of relying on selftests to
+> manually #define _GNU_SOURCE, which is repetitive and error prone.  E.g.
+> kselftest_harness.h requires _GNU_SOURCE for asprintf(), but if a selftest
+> includes kvm_test_harness.h after stdio.h, the include guards result in
+> the effective version of stdio.h consumed by kvm_test_harness.h not
+> defining asprintf():
 > 
-> sz is a minimum of ITS_ITT_ALIGN*2-1 - which is 511 bytes. So
-> potentially PAGE_SIZE-512 bytes could be wasted here (minus kmalloc
-> overhead).
+> [...]
 
-That I figured out as well but how many times is this path called with a
-size smaller than a page?
+Here is the summary with links:
+  - KVM: selftest: Define _GNU_SOURCE for all selftests code
+    https://git.kernel.org/riscv/c/730cfa45b5f4
 
+You are awesome, thank you!
 -- 
-Catalin
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
