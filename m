@@ -1,57 +1,57 @@
 Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 602572940B
-	for <kvmarm@lists.linux.dev>; Wed, 22 May 2024 01:40:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 194AA33993
+	for <kvmarm@lists.linux.dev>; Wed, 22 May 2024 01:40:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716342027; cv=none; b=d7T6mFoeK6XJssV7HhO2AT+xUttILz9boKSSWu+V0b4OiSgkdpJjJZyBaaTrXEh2BEinrzhk6RMVIDL4JgicvJoCnNff006e+BuUkuAz/bo1CUVTCBETcwrv+JtjhcaSBQaGK2rPmK4x1dOFSVigoHtlMtVbMxxxI8LJyIq4BXc=
+	t=1716342029; cv=none; b=vB0UKg8ENSCFxoYxLh+WUORr7W1fqkIoDqouNRZutkuVFSDGSLlgEAtd0JfUp7hKTZ+AUzxZGxAekJW+kgS6CNvvI2TfFqD+4pYIEg51MgOeVxU0ZpR7kztaYyQ3KLq0z11geBIWjKfGvKvLDPQ8U/DEqWZ4MSJVKtG8nYEOEOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716342027; c=relaxed/simple;
-	bh=SxCNJ06vwtbyrQkZd4xB8bnO3JXPErYFa83rg1Usdig=;
+	s=arc-20240116; t=1716342029; c=relaxed/simple;
+	bh=FJaY5ZXsWt+iV/k6HY2WFFz74BTaJg/mMtL9qyrhSP8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=OqRi40h+vSs618E0VBQlxvIWDuc57rky6xkadcHjKLh8Y9p13QmFm0u2P8O8sjczmV71FM+9RrTl4yWjzMv2gBzBgj85aSoJJn7OGFp0n7hJXEY1FMlHJnrP2GSFD8N7p3CKGoYjtRfe75l2lqL8EGL+MisQiTJwYCk6DSX9nA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ucE0zHR4; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=UxbrgjWIXe2lp9/1niz3662Bfc9VY7TXcY2cOgeZ8pX/H+Ep4jz+F5jDcncLqgiZUe4L5doSibPppzp7KEV+OEQCzrZ6Tpj5wA3dQ1s2BIRrJXO81g4dMFwi5Zd7gVCpZO964GXEXTwgzajKKD4RSK/aEk9gKCMTxbcqOSj9sTE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4HURiaVR; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ucE0zHR4"
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-61e0c1f7169so5792087b3.0
-        for <kvmarm@lists.linux.dev>; Tue, 21 May 2024 18:40:26 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4HURiaVR"
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-61be4b79115so261182557b3.1
+        for <kvmarm@lists.linux.dev>; Tue, 21 May 2024 18:40:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1716342025; x=1716946825; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1716342027; x=1716946827; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=9/Jh3NT05cAP4Dr5P4AOID5+N71m8JBqExCgFsAlL8M=;
-        b=ucE0zHR4mokcQP1nZiK5UPzQMWxWtcTM8GybyfUfattJ1069ivqlyIDaEcS3UktLV4
-         1PU+YVWMPnKRd1RBg8bxdZs4Y9an4rRouEqs7ENKo8J2euH2UMRMCq+MU75GBeqU9Drl
-         peI17MGmMSQNGaBucYT4O8MYBRs9AbBh7INsYb94UWXxfpnyfSoBZiC8Lcrh48IP9i8C
-         +B1JqyVP3A3YRJUAwKimuHHg2JkNRCo3T9cPHzJHHfj6eHpCFD/4XRP7fhTaIAbg1TPd
-         XHZ4igwcU6oCe3zKpClzMBChvSokX0EYF+gqgLac5h4878PyapaguZUUMvycUA/za70J
-         vs3w==
+        bh=N3tcdNqgpk0g0Qawt6D2SIU8FL4Y9j5vsBcc8xUlRY4=;
+        b=4HURiaVRwEFFSkZ05HhmnwfqImTUD652VFl5uIW9EdEY7qEhBuJy/uMNUP/Nh7oKyg
+         6Kdj5SdaS0fMc+OVDnbBbeM3JGbj1+DkwXotdYjankZWYN8tvaGetHe6wTShuS32b0bV
+         B65Orj6iCSzc4eUWrjkeKae70ulXwZMxTGy6kTtBvIW3o7VmnYeOo0P3j3BAtmcdaE/Q
+         x1aaFXeku8YtCtydLflGHDuehF7Bk6bAhLLqlEaYybk3UVXNeYTMj3C3ZVUboTQnBuUN
+         HfDE0VrxaWLLANREzhpJy9S/maANXp0Tgn1AG8VgBeVuiuJPgUGHxG4c7mRIFCqDrN6i
+         RB1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716342025; x=1716946825;
+        d=1e100.net; s=20230601; t=1716342027; x=1716946827;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=9/Jh3NT05cAP4Dr5P4AOID5+N71m8JBqExCgFsAlL8M=;
-        b=Kydg2UpZIhElKRBL7DnzORIEefNqW8aA/a+AjvAmDZMeTda3v0pVpch4JZxn4htDEH
-         Y9aWDscFSqnCsgJMA1hIWnULApRpSviMZ9NYWjSVFZsS3yp+oenhCrcR9FyxMFslSozf
-         L29ife4hT6ysIDH4ynZdquJm68LJVDHJhY//9p6rVbU1MMlyqSLrrS7b/Eq1Y3q5sJHY
-         zBGuXaT1m9kGTUy94Q4CqXSRJ2QZJX9z8h4ngcID4Zo4knQOYof5mvLIjia+0OGS/V18
-         JQGhu6O1++PDGrqGy5WP2d8YQ925NrlqYVUy8sxQRidw971uhFYtnybBzE+XBmYr+mWJ
-         CWPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVzmUDCJKyMgf/ME/kTSng2psMutANx285PRDxN5LNe438pqmGND6g1VEq85u3Mkq1TeOeDYagncrUstPzwf73We6TFMfmh
-X-Gm-Message-State: AOJu0YyL+8d8fff9BQ1hcPtim5txys4D9mrI8aCfWGm1CmlE7DsK92j/
-	/utCvhNyjmHu0qt0XmYQzHDCllGyxswpz9lCTsDBIu+v7D3FV8D3Kw8yVuSwzkRRkT62ztqE7rP
-	42Q==
-X-Google-Smtp-Source: AGHT+IFb4ojjFIBjH/g1gqSAZtGdXjScECyPQCKxtonXS1wS1/Q6Sfuh8cMohHl5GHkfuJ7096x7AKNuxdo=
+        bh=N3tcdNqgpk0g0Qawt6D2SIU8FL4Y9j5vsBcc8xUlRY4=;
+        b=kRwaW/BBAQADLBL/2d9BJV8o92R2c5og2z8UMyvVFYHF+oPqAstN/1ndDf27mVGVnD
+         mN26KUhpji7QKVG9cQkUdDUTxf0Xo5tcrpRIeUcATcFMneltt3RwuwSJhBnFUzYkH6FD
+         XvafXmJtIcVoH7ICF2dQEdPXSG0EVTiGf7RW7s56lPJfFI4PNFW2+S72E75RgzWPc+yJ
+         eKGt36Rg5FE/7g3CUdUOxA8LRaNMLMrDCZa2Fk2SYD0jGA2CsEO+8TVFWtUbO8XECuwd
+         e7+3hyw7gNQ6n+vzDHoFpbpWFxYKr/j3Vrn2whgWVkLTtAKe5i7m2OCTCsOFoLYv0BW/
+         IFLg==
+X-Forwarded-Encrypted: i=1; AJvYcCVunObBv6fBpW84ZwXaKFDI2uJO5eT+1VvSoGflEf7+JqokwS5b5LOIJoVR5X219kqDqW55MuF6m46K5hG8LQth3nFg/ehD
+X-Gm-Message-State: AOJu0YyqzXJB08bmm2zEE7VqQ5dWaSL/F72KVKW9CPbyEQwRSH6HocOp
+	/bhtGkMpK/vIooE9qDIOFLoW8239wrhWBQ5MefbyUVqvlQK6aBPavMx7ncyYoLWuoWeBYHIFaK3
+	gNA==
+X-Google-Smtp-Source: AGHT+IFL81/qwy5rtkuJ10qcaRdu2JQbneM9E+pjVdbps1/0e/VA4O7XiaE6CliC0DQxJV6ImSRXVMyGgXw=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:100f:b0:dda:c4ec:7db5 with SMTP id
- 3f1490d57ef6-df4e10405f6mr210549276.4.1716342025422; Tue, 21 May 2024
- 18:40:25 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a81:4984:0:b0:61b:e6d8:1c01 with SMTP id
+ 00721157ae682-627e487fd2emr1914977b3.10.1716342027243; Tue, 21 May 2024
+ 18:40:27 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 21 May 2024 18:40:12 -0700
+Date: Tue, 21 May 2024 18:40:13 -0700
 In-Reply-To: <20240522014013.1672962-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,9 +61,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240522014013.1672962-1-seanjc@google.com>
 X-Mailer: git-send-email 2.45.0.215.g3402c0e53f-goog
-Message-ID: <20240522014013.1672962-6-seanjc@google.com>
-Subject: [PATCH v2 5/6] KVM: x86: Unconditionally set l1tf_flush_l1d during
- vCPU load
+Message-ID: <20240522014013.1672962-7-seanjc@google.com>
+Subject: [PATCH v2 6/6] KVM: x86: Drop now-superflous setting of
+ l1tf_flush_l1d in vcpu_run()
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
@@ -79,40 +79,48 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Always set l1tf_flush_l1d during kvm_arch_vcpu_load() instead of setting
-it only when the vCPU is being scheduled back in.  The flag is processed
-only when VM-Enter is imminent, and KVM obviously needs to load the vCPU
-before VM-Enter, so attempting to precisely set l1tf_flush_l1d provides no
-meaningful value.  I.e. the flag _will_ be set either way, it's simply a
-matter of when.
+Now that KVM unconditionally sets l1tf_flush_l1d in kvm_arch_vcpu_load(),
+drop the redundant store from vcpu_run().  The flag is cleared only when
+VM-Enter is imminent, deep below vcpu_run(), i.e. barring a KVM bug, it's
+impossible for l1tf_flush_l1d to be cleared between loading the vCPU and
+calling vcpu_run().
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/x86.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 7 ++++---
+ arch/x86/kvm/x86.c     | 1 -
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index da2f95385a12..552b6a9887a5 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -6672,9 +6672,10 @@ static noinstr void vmx_l1d_flush(struct kvm_vcpu *vcpu)
+ 		bool flush_l1d;
+ 
+ 		/*
+-		 * Clear the per-vcpu flush bit, it gets set again
+-		 * either from vcpu_run() or from one of the unsafe
+-		 * VMEXIT handlers.
++		 * Clear the per-vcpu flush bit, it gets set again if the vCPU
++		 * is reloaded, i.e. if the vCPU is scheduled out or if KVM
++		 * exits to userspace, or if KVM reaches one of the unsafe
++		 * VMEXIT handlers, e.g. if KVM calls into the emulator.
+ 		 */
+ 		flush_l1d = vcpu->arch.l1tf_flush_l1d;
+ 		vcpu->arch.l1tf_flush_l1d = false;
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 59aa772af755..60fea297f91f 100644
+index 60fea297f91f..86ae7392cc59 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -5006,12 +5006,11 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- {
- 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+@@ -11264,7 +11264,6 @@ static int vcpu_run(struct kvm_vcpu *vcpu)
+ 	int r;
  
--	if (vcpu->scheduled_out) {
--		vcpu->arch.l1tf_flush_l1d = true;
--		if (pmu->version && unlikely(pmu->event_count)) {
--			pmu->need_cleanup = true;
--			kvm_make_request(KVM_REQ_PMU, vcpu);
--		}
-+	vcpu->arch.l1tf_flush_l1d = true;
-+
-+	if (vcpu->scheduled_out && pmu->version && pmu->event_count) {
-+		pmu->need_cleanup = true;
-+		kvm_make_request(KVM_REQ_PMU, vcpu);
- 	}
+ 	vcpu->run->exit_reason = KVM_EXIT_UNKNOWN;
+-	vcpu->arch.l1tf_flush_l1d = true;
  
- 	/* Address WBINVD may be executed by guest */
+ 	for (;;) {
+ 		/*
 -- 
 2.45.0.215.g3402c0e53f-goog
 
