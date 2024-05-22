@@ -1,57 +1,57 @@
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A69D34C89
-	for <kvmarm@lists.linux.dev>; Wed, 22 May 2024 01:40:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04D8B17C95
+	for <kvmarm@lists.linux.dev>; Wed, 22 May 2024 01:40:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716342020; cv=none; b=ISwgSXiJQqg24EqeFdrqH054G3dGHLD9frqwHYCzzK8KXp56o8lzlw1yDpuEHbnYedRQP4fr6dugWPTWYIk9gFuytd67k+t+/co2JfEyrzj43C8LLk5Ovg0zd7kZyVaKCh6d7CNy7hyX1+D0jRhyt/leH8XdWWDoVHePy0i71tQ=
+	t=1716342022; cv=none; b=ecmv9NY39O73F5rZkFpCqlGi9kAoNx9hX8Qx7WZ5CXLjoRS3YAoRfT70bGCHXGuEmd5L2LPgCYBshnSDGnHYqSDWGvemSRGzdYfHrm294EMaoytg7+1Ay9JxlxV5WIeEOr8vKPTV/Kis7Ao6OIgBhH3WR+2LlDwsgo0Weia6x2E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716342020; c=relaxed/simple;
-	bh=8WkgXvFVZEpynasJJ48aoJTH4+LPLoJyE+T2vpEb3+o=;
+	s=arc-20240116; t=1716342022; c=relaxed/simple;
+	bh=a3/l+BJfoA/G/28RbhkAW1tXtxlUYPuy/d4D+LgwoZ4=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=QJrqe4XRzcUCWbV1QZJfxhDuPxry5wnZiwDBRV7ZEecOacz41T8Q4SK2rDmb6mQebMvjmEIEeh9G78zZtBDdq8e6c59PeFwblK4yM4OK05KrFmnHLlhjstTvPqHzFqciWkTAPcwKEqa4wQhFnVqX5r0WNl6WyKWuw1Uw8AaeNQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lO4A1vfh; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=u4BngfE8ESBpTGVxEWFgncV4HImQ61hUaUkwkgY0Gkf6wyDB4+rvAzoimIxPMGixAVBMkmcfyv0A6fJTrzj58UJo51LZcWOW7HBi/TmL+IpNiyg+2moNKifpkgbZejTC/bM/sP1/oPaf397ybJhLV50vORPP/rNJP3e3oMC5Fm8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nyF+ySJL; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lO4A1vfh"
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-5c66a69ec8eso10774992a12.3
-        for <kvmarm@lists.linux.dev>; Tue, 21 May 2024 18:40:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nyF+ySJL"
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-622ce716ceaso5474487b3.0
+        for <kvmarm@lists.linux.dev>; Tue, 21 May 2024 18:40:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1716342018; x=1716946818; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1716342020; x=1716946820; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=ksrstYm4acNB+vq44uyCoC45OYvJ0DDPXjwdxHvKYos=;
-        b=lO4A1vfhwt0qTTTDDIOuKRLrw5mFYnvigdVdYGYRdtFTkc86ekrW7YZMPKTOatdnTq
-         zafmEgDK/N/wSgo/KCKHPcKsFEvxmPGGTrX/wz1gwrE6MH5QS2CfzpWS0w39y0vmtuiN
-         iszfRvDRKxp50+R4FHZVZ9R4IgB5zComHt7jfPGB1GuPAYWkHF9AkTC3Rt5Yil5rRlLd
-         9wVLdmac/JlOjlivQ1Ey8E1c+oK5itTaYQ8oXMTumC9rHHn71+9Id6ybyBoL7WOw/bKM
-         NVgir+uyW3A5dCa6ETWbAumd8PHCvMiUW1+pUzLzaKtLuXkR9oUeNTvcYTz30HYdWrt2
-         hccw==
+        bh=RHSd/NUpLA+qEQZ24Usoansq2bi58Ee8oOJzhOJ4pNg=;
+        b=nyF+ySJLX+hU6dbd4NAf2kppi9FEFTH8fQ5RZAdJxuKHtz8m4aqKFd3yM29toojjgK
+         dIWOfZxwa89JXdkkp+ciyTUODVqIiyw0m5zRorB2TpDbOoDxY95t/WQD+7Q50tEYqTcO
+         MxMP2UN1d2vRuGPj8LIIjo238qf/d9pMHC2xbDnRlZ6BeiU+UBLu7xyLVkmprLOjz6xY
+         VXxfPL/N+jC8clA8dhXDWaoO6o77xxq+FjxWu1YseQZhu4BxwXg2CpTZo4KBiViNezmD
+         D/PaCkeeFvBtQv/fNrzCf2Nt4eg0S1Pmr/t68yzpFq5CqrsGeokgRyymj/h+00GSTCvg
+         aU5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716342018; x=1716946818;
+        d=1e100.net; s=20230601; t=1716342020; x=1716946820;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=ksrstYm4acNB+vq44uyCoC45OYvJ0DDPXjwdxHvKYos=;
-        b=tnByoL6zudCI1im0UxV5WL6qZY9zmLhikZmI6xTkXGfTUAUqGvEXDlefN9bnshJTgt
-         kUhQF90P28/tmNdhpUcvewbGvxz5fyzF7npKp/9g71iTHAZW/6uXOQf3+Ddx7Ss4cAXf
-         aAkQtQ0RdBl30csJBxylkOQVFLgZ4+7M5WtGF3MR5xnWTMHB2vxXHVt6DehUTPRMo0JW
-         T/9rXXMWXakMaLpG429yh1lHmI8hALA4F1hGhDhnNCvzxLjQ58CQ3V7kTEgyjuVglHbI
-         bs7ZM1aU64o+BI8LbqIex+tnNMKlO7Z8fG/CTOilpV9Jr8WpBcYsEdBnw2obdi4pKicb
-         fz1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWSwvM3kM8CGAgM16mp0Hkd1VBcTWuS4+A2IdMKL7TQEEuxw2gp2m9AurOVI8mgRyRc3adTUpUTVjv6Z+lG/uplQozBZ7Mi
-X-Gm-Message-State: AOJu0Yzv8PFZo+Dq81oqxeim+QReWL0Q+lNVslFf7ES6tG4tD4qyL6mb
-	9wy1T+tckVfFy3l0TIPG9brHSagNYOP0WKcjcl3G6jpjX3BHNXm8jZP7c8H8fYIqissdw4Dw/JV
-	g1A==
-X-Google-Smtp-Source: AGHT+IHJLNUzIn6ctcMF+INwxFBaLeFnt3jt+tGT+n5clQV+H1h//pkXMDRUR1aNO5clBwbY0FCScT/OPUo=
+        bh=RHSd/NUpLA+qEQZ24Usoansq2bi58Ee8oOJzhOJ4pNg=;
+        b=rB35vB/3iOlOwOl265JSua3tJ3ilNm4g/DKK4t4C+T442e/HM8VbNSdNRDj7ezcpOW
+         QqKE4TV1QBxFXp/peenRp0yTWU+gLqEHUOOLRamfgOacNimgibb3ydhSFfo8jwijCwM2
+         qum68uBktZZ26ha8UqrHe/edrStR7/ToGtti9HATdLoKcNBCRu2w5hht2hyyh3CQmTD2
+         yNLXw6wGJPwYeIsw6uqJh3jZsLtWWzQQVeXtIdu5Vwr6ezuCmawvW1z5cDUridyfjr/6
+         ++zOUrJeI4iqYB77IXbTyDwkm1omjRGYxFkMqLjrNJ3zU6c71NLsxUAYXeVZeFX+JGst
+         DTwQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWrMAH/QuSzyVGDjmi9PJW8T462EZwEs8WTYsNRMWaWyjAc1L3opioBe46QYlN66dObw/Kxpvzd6EyfbyZr0hXEoGQpPiMd
+X-Gm-Message-State: AOJu0YxAOg6zUbQx+MRsL4cwjGr7tttjINEgHBQhrVNYKFbPt+v+XF6v
+	f67rzi5ubEKf4TEJlyAmZQ/vOynR/LyuirH798aBGFEBxU/LkI/pQHnMFjUZecnRavtl+hLfi0J
+	sbQ==
+X-Google-Smtp-Source: AGHT+IE9wMBEKwP41aGLYHN5gIBbi7welOi0G93+qj4AotHFqdz8JFE0XRpN5nX1Yz+N7pw0xKG3cBx+pVY=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a02:484:b0:5dc:5111:d8b1 with SMTP id
- 41be03b00d2f7-676492dc83emr2297a12.5.1716342017980; Tue, 21 May 2024 18:40:17
- -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a0d:ca57:0:b0:61b:e53e:c7ae with SMTP id
+ 00721157ae682-627e46aa2e9mr2093257b3.2.1716342019957; Tue, 21 May 2024
+ 18:40:19 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 21 May 2024 18:40:08 -0700
+Date: Tue, 21 May 2024 18:40:09 -0700
 In-Reply-To: <20240522014013.1672962-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,8 +61,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240522014013.1672962-1-seanjc@google.com>
 X-Mailer: git-send-email 2.45.0.215.g3402c0e53f-goog
-Message-ID: <20240522014013.1672962-2-seanjc@google.com>
-Subject: [PATCH v2 1/6] KVM: Add a flag to track if a loaded vCPU is scheduled out
+Message-ID: <20240522014013.1672962-3-seanjc@google.com>
+Subject: [PATCH v2 2/6] KVM: VMX: Move PLE grow/shrink helpers above vmx_vcpu_load()
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
@@ -78,70 +78,99 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Add a kvm_vcpu.scheduled_out flag to track if a vCPU is in the process of
-being scheduled out (vCPU put path), or if the vCPU is being reloaded
-after being scheduled out (vCPU load path).  In the short term, this will
-allow dropping kvm_arch_sched_in(), as arch code can query scheduled_out
-during kvm_arch_vcpu_load().
+Move VMX's {grow,shrink}_ple_window() above vmx_vcpu_load() in preparation
+of moving the sched_in logic, which handles shrinking the PLE window, into
+vmx_vcpu_load().
 
-Longer term, scheduled_out opens up other potential optimizations, without
-creating subtle/brittle dependencies.  E.g. it allows KVM to keep guest
-state (that is managed via kvm_arch_vcpu_{load,put}()) loaded across
-kvm_sched_{out,in}(), if KVM knows the state isn't accessed by the host
-kernel.  Forcing arch code to coordinate between kvm_arch_sched_{in,out}()
-and kvm_arch_vcpu_{load,put}() is awkward, not reusable, and relies on the
-exact ordering of calls into arch code.
+No functional change intended.
 
-Adding scheduled_out also obviates the need for a kvm_arch_sched_out()
-hook, e.g. if arch code needs to do something novel when putting vCPU
-state.
-
-And even if KVM never uses scheduled_out for anything beyond dropping
-kvm_arch_sched_in(), just being able to remove all of the arch stubs makes
-it worth adding the flag.
-
-Link: https://lore.kernel.org/all/20240430224431.490139-1-seanjc@google.com
-Cc: Oliver Upton <oliver.upton@linux.dev>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- include/linux/kvm_host.h | 1 +
- virt/kvm/kvm_main.c      | 4 ++++
- 2 files changed, 5 insertions(+)
+ arch/x86/kvm/vmx/vmx.c | 64 +++++++++++++++++++++---------------------
+ 1 file changed, 32 insertions(+), 32 deletions(-)
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 7b57878c8c18..bde69f74b031 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -380,6 +380,7 @@ struct kvm_vcpu {
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 51b2cd13250a..07a4d6a3a43e 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -1410,6 +1410,38 @@ static void vmx_write_guest_kernel_gs_base(struct vcpu_vmx *vmx, u64 data)
+ }
  #endif
- 	bool preempted;
- 	bool ready;
-+	bool scheduled_out;
- 	struct kvm_vcpu_arch arch;
- 	struct kvm_vcpu_stat stat;
- 	char stats_id[KVM_STATS_NAME_SIZE];
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index a1756d5077ee..7ecea573d121 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -6288,6 +6288,8 @@ static void kvm_sched_in(struct preempt_notifier *pn, int cpu)
- 	__this_cpu_write(kvm_running_vcpu, vcpu);
- 	kvm_arch_sched_in(vcpu, cpu);
- 	kvm_arch_vcpu_load(vcpu, cpu);
+ 
++static void grow_ple_window(struct kvm_vcpu *vcpu)
++{
++	struct vcpu_vmx *vmx = to_vmx(vcpu);
++	unsigned int old = vmx->ple_window;
 +
-+	WRITE_ONCE(vcpu->scheduled_out, false);
++	vmx->ple_window = __grow_ple_window(old, ple_window,
++					    ple_window_grow,
++					    ple_window_max);
++
++	if (vmx->ple_window != old) {
++		vmx->ple_window_dirty = true;
++		trace_kvm_ple_window_update(vcpu->vcpu_id,
++					    vmx->ple_window, old);
++	}
++}
++
++static void shrink_ple_window(struct kvm_vcpu *vcpu)
++{
++	struct vcpu_vmx *vmx = to_vmx(vcpu);
++	unsigned int old = vmx->ple_window;
++
++	vmx->ple_window = __shrink_ple_window(old, ple_window,
++					      ple_window_shrink,
++					      ple_window);
++
++	if (vmx->ple_window != old) {
++		vmx->ple_window_dirty = true;
++		trace_kvm_ple_window_update(vcpu->vcpu_id,
++					    vmx->ple_window, old);
++	}
++}
++
+ void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu,
+ 			struct loaded_vmcs *buddy)
+ {
+@@ -5889,38 +5921,6 @@ int vmx_vcpu_pre_run(struct kvm_vcpu *vcpu)
+ 	return 1;
  }
  
- static void kvm_sched_out(struct preempt_notifier *pn,
-@@ -6295,6 +6297,8 @@ static void kvm_sched_out(struct preempt_notifier *pn,
- {
- 	struct kvm_vcpu *vcpu = preempt_notifier_to_vcpu(pn);
- 
-+	WRITE_ONCE(vcpu->scheduled_out, true);
-+
- 	if (current->on_rq) {
- 		WRITE_ONCE(vcpu->preempted, true);
- 		WRITE_ONCE(vcpu->ready, true);
+-static void grow_ple_window(struct kvm_vcpu *vcpu)
+-{
+-	struct vcpu_vmx *vmx = to_vmx(vcpu);
+-	unsigned int old = vmx->ple_window;
+-
+-	vmx->ple_window = __grow_ple_window(old, ple_window,
+-					    ple_window_grow,
+-					    ple_window_max);
+-
+-	if (vmx->ple_window != old) {
+-		vmx->ple_window_dirty = true;
+-		trace_kvm_ple_window_update(vcpu->vcpu_id,
+-					    vmx->ple_window, old);
+-	}
+-}
+-
+-static void shrink_ple_window(struct kvm_vcpu *vcpu)
+-{
+-	struct vcpu_vmx *vmx = to_vmx(vcpu);
+-	unsigned int old = vmx->ple_window;
+-
+-	vmx->ple_window = __shrink_ple_window(old, ple_window,
+-					      ple_window_shrink,
+-					      ple_window);
+-
+-	if (vmx->ple_window != old) {
+-		vmx->ple_window_dirty = true;
+-		trace_kvm_ple_window_update(vcpu->vcpu_id,
+-					    vmx->ple_window, old);
+-	}
+-}
+-
+ /*
+  * Indicate a busy-waiting vcpu in spinlock. We do not enable the PAUSE
+  * exiting, so only get here on cpu with PAUSE-Loop-Exiting.
 -- 
 2.45.0.215.g3402c0e53f-goog
 
