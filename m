@@ -1,148 +1,133 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCC5F58AC1
-	for <kvmarm@lists.linux.dev>; Tue, 21 May 2024 22:55:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54ECB4C6D
+	for <kvmarm@lists.linux.dev>; Wed, 22 May 2024 01:40:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716332158; cv=none; b=orMQhiXfB9sUPdjNLRTvjT39fLBhqz8TxeaK8Cd1UJ245bKPtQs6cgkomn4xqW2kVaO2PS4RaSIdjusviU3Suh+tmFPR87qC/2bO+Q5U61NK+OFtRuovrSlvQ7ryHFgErwXxPxV3dT4npq7f+J2xKMhQVb+G37rFSIqXK3cbkIU=
+	t=1716342018; cv=none; b=uSAl3m4z2J/Dov/PdofcvfMe4gDiZOVmMbEt6n21DlwfTW5p5GS4PGY8LxyASKfLpY4+ryL6ecbE1wvyULnDi3Eg4+EBkG/cQDUltYCKIaYPbfMfML83vK+g+5D1XCbyYsf7sT/phjYv4oLzRBOMrRvcJGoPUXo3Ns2HGjR8ZTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716332158; c=relaxed/simple;
-	bh=AiTbcE+29X20WEPWmFk8QjzgFfmySto3RrFAFrXbOFo=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JW+5+O8PpwNHaU8CiBLyMtKboYLZj5na8snrSkZf8XUJ2Mhu/SVyjU2XowT+CbI0xnqImWJPJZutOHGlL179wFKGUFy3P13kXQmYMH426xOsPtcwdGeXSU6GC6VFgb1koVbQNlip5soXcHslTMZyH53CtLchHAUKVUqfDNwDQRg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tk3i1jzl; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1716342018; c=relaxed/simple;
+	bh=U8u9ZX67H1rnYv/prrk0VhN0vNHEl9qh4LwcmqvwAWs=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=fsqBkV1D+Zd5IM1HCZNoaKA2CNGvgymg8Mxr3sRiQprCP5hzJwGHmgrUjaUdXdmDOUwZQ1YMMHtQ41l8mus4aONwd4TcwNr6lqiO2nc6HkOuR7nQ4GloKr0uuSxM+kOa3ycYPtlN+ayPGZU7sRYssdtdZXEGQYcQ8ybXJfW5cqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jwmVoW8E; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tk3i1jzl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F7AAC2BD11;
-	Tue, 21 May 2024 22:55:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716332158;
-	bh=AiTbcE+29X20WEPWmFk8QjzgFfmySto3RrFAFrXbOFo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tk3i1jzl6Hj7UFXPmRA9QbaAb+iFgIdbZKh6Jffk5+Mfv0oMjwFZnxOSW9QRFhaCm
-	 KBWsiwrvZD71HN4BFWoM/zc6SmtbyaUgRZph6+nmxvqNzfP3D2X2k3PsLyJ11C3kEh
-	 P2tL+AAmaRRxpKjl/KoTQ8Rw7yH2P8gEOpCHZ1OcCoqpRRh1FSCPmRHPFOMfn5j9z8
-	 crURMuuMs5IkecfyfU6ze7rSzCQZsxWgIjFZ0B5B7p+x8xClwy3LpbcU6Ob69TcjFr
-	 Gn9CrtQrv2dS0gyhi45+2zDgjmoBxOjHk95Y/mxwRMAIQ/XJsMcmRiq4sZ5VnlC2uX
-	 QXGzpWeuftfvQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1s9YOh-00EojB-T8;
-	Tue, 21 May 2024 23:55:56 +0100
-Date: Tue, 21 May 2024 23:55:55 +0100
-Message-ID: <86msoin5ac.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	will@kernel.org,
-	qperret@google.com,
-	seanjc@google.com,
-	alexandru.elisei@arm.com,
-	catalin.marinas@arm.com,
-	philmd@linaro.org,
-	james.morse@arm.com,
-	suzuki.poulose@arm.com,
-	oliver.upton@linux.dev,
-	mark.rutland@arm.com,
-	broonie@kernel.org,
-	joey.gouly@arm.com,
-	rananta@google.com,
-	yuzenghui@huawei.com
-Subject: Re: [PATCH v2 7/7] KVM: arm64: Consolidate initializing the host data's fpsimd_state/sve in pKVM
-In-Reply-To: <20240521163720.3812851-8-tabba@google.com>
-References: <20240521163720.3812851-1-tabba@google.com>
-	<20240521163720.3812851-8-tabba@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jwmVoW8E"
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-61be621bd84so217123857b3.1
+        for <kvmarm@lists.linux.dev>; Tue, 21 May 2024 18:40:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1716342016; x=1716946816; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zcj+niLGOsOBGFG/wxz5ssr64Z9mR+IM9s4JveywwVo=;
+        b=jwmVoW8EA0tV6NLmsFFc6C+Yx/JcqaiwTaZZWCXqNi0Iycn5RDNt5K6SDZw7kNj6zU
+         DDJa4h+fzjo7M+smzEjFr9k2ycb+nwDYw9HHGnZQBvp8TkxTZ/p4ej+GZc8UhYZpsZ9c
+         BmLKMAh+8I0FpCYnvfSl9Lb/k8o/NlgCrfOOANzLE7k6YrqdRhZqwppQ6apKWhMa40TY
+         YJdT2ao+tqDPoy2AqJRsooF5majxbsGobbb84qFIyUzg97mWS+5qpZvAwtYcDxGaQTt9
+         1HvyUtcwYldkjtkcqoDGqj1cNNav2CTsNLq4JmeFX1jzZGmdHY57/lBQEhJHJ9EULdrQ
+         8wDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716342016; x=1716946816;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zcj+niLGOsOBGFG/wxz5ssr64Z9mR+IM9s4JveywwVo=;
+        b=qEm8ZZZRegDeM9e4E2Zax7dpZ1oHRg3Ek8ZFTKV/dXFxx6PrKk20VHuUVOvyvVPYhM
+         X5LA/ojM43CO1I7n5C3gi7QsIf03ej0mEeGihng90W3XfVBMsdR7pPn6vehkCPXDS4Jl
+         9AirWl6M9V6WIvUMRPqwXoAOuG2V9OnHxDD1lhOKtStI0SKlnAJ8JYCiV0a9f/jkjnW6
+         zfAr11VsHqj4Pb6TpK82fnQ+/dZuWzoFbWEUph/jEg1nQc4+GZLWSJBFCTlkU3hMH0Q4
+         fS1MyVonTrVHOYG4nSdgDOHc6D7gQDLbMEbXudLkyWRfev4CmIYr3lv82Yz5SCBqSdNq
+         jq9w==
+X-Forwarded-Encrypted: i=1; AJvYcCUcv4CxAc5qKT6mfhOSEXJ3aCgg7ozkUoKjV6xyYfMR0KtwzTYD0vDccfj7dVH8vSsf648rlGUhBH8zYEN73grZjuqeg0ax
+X-Gm-Message-State: AOJu0YwsTJ+OP/6/sXObk3xa09GgsBukcV1PJpRGi0NNyjrFT/OMzE+G
+	YBOAd998uEusI4KOnIj233M3UDm8s7IH0Y5yob15F2p1KFXc36RS5wna0ZdpGvPPpkgGGpRsYpt
+	tnQ==
+X-Google-Smtp-Source: AGHT+IF8tl2Sd1O1Adb/DEG65NrlAsoUAahexLMaCbbpQeSeG4ZOBg+4u/hLB5lJUUIzwhVDdo9qeU1encA=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:20c1:b0:de5:3003:4b64 with SMTP id
+ 3f1490d57ef6-df4e0a80c05mr82582276.1.1716342016391; Tue, 21 May 2024 18:40:16
+ -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Tue, 21 May 2024 18:40:07 -0700
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, will@kernel.org, qperret@google.com, seanjc@google.com, alexandru.elisei@arm.com, catalin.marinas@arm.com, philmd@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, mark.rutland@arm.com, broonie@kernel.org, joey.gouly@arm.com, rananta@google.com, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.0.215.g3402c0e53f-goog
+Message-ID: <20240522014013.1672962-1-seanjc@google.com>
+Subject: [PATCH v2 0/6] KVM: Fold kvm_arch_sched_in() into kvm_arch_vcpu_load()
+From: Sean Christopherson <seanjc@google.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
+	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Sean Christopherson <seanjc@google.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, 21 May 2024 17:37:20 +0100,
-Fuad Tabba <tabba@google.com> wrote:
-> 
-> Now that we have introduced finalize_init_hyp_mode(), lets
-> consolidate the initializing of the host_data fpsimd_state and
-> sve state.
-> 
-> Signed-off-by: Fuad Tabba <tabba@google.com>
-> ---
->  arch/arm64/include/asm/kvm_host.h      | 10 ++++++++--
->  arch/arm64/kvm/arm.c                   | 18 ++++++++++++------
->  arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  1 -
->  arch/arm64/kvm/hyp/nvhe/pkvm.c         | 11 -----------
->  arch/arm64/kvm/hyp/nvhe/setup.c        |  1 -
->  5 files changed, 20 insertions(+), 21 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 7b3745ef1d73..8a170f314498 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -536,8 +536,14 @@ struct kvm_cpu_context {
->  struct kvm_host_data {
->  	struct kvm_cpu_context host_ctxt;
->  
-> -	struct user_fpsimd_state *fpsimd_state;	/* hyp VA */
-> -	struct user_sve_state *sve_state;	/* hyp VA */
-> +	/*
-> +	 * All pointers in this union are hyp VA.
-> +	 * sve_state is only used in pKVM and if system_supports_sve().
-> +	 */
-> +	union {
-> +		struct user_fpsimd_state *fpsimd_state;
-> +		struct user_sve_state *sve_state;
-> +	};
->  
->  	/* Ownership of the FP regs */
->  	enum {
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index a9b1b0e9c319..a1c7e0ad6951 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -2445,14 +2445,20 @@ static void finalize_init_hyp_mode(void)
->  {
->  	int cpu;
->  
-> -	if (!is_protected_kvm_enabled() || !system_supports_sve())
-> -		return;
-> -
->  	for_each_possible_cpu(cpu) {
-> -		struct user_sve_state *sve_state;
-> +		if (system_supports_sve() && is_protected_kvm_enabled()) {
-> +			struct user_sve_state *sve_state;
->  
-> -		sve_state = per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)->sve_state;
-> -		per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)->sve_state = kern_hyp_va(sve_state);
-> +			sve_state = per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)->sve_state;
-> +			per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)->sve_state =
-> +				kern_hyp_va(sve_state);
-> +		} else {
-> +			struct user_fpsimd_state *fpsimd_state;
-> +
-> +			fpsimd_state = &per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)->host_ctxt.fp_regs;
-> +			per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)->fpsimd_state =
-> +				kern_hyp_va(fpsimd_state);
-> +		}
+Drop kvm_arch_sched_in() and instead add and use kvm_vcpu.scheduled_out
+to communicate to kvm_arch_vcpu_load() that the vCPU is being scheduling
+back in.
 
-nit: SVE support and protected state do not change on a per CPU basis,
-so checking for these inside the loop is pretty counter intuitive.
+While fiddling with an idea for optimizing state management on AMD CPUs,
+I wanted to skip re-saving certain host state when a vCPU is scheduled back
+in, as the state (theoretically) shouldn't change for the task while it's
+scheduled out.  Actually doing that was annoying and unnecessarily brittle
+due to having a separate API for the kvm_sched_in() case (the state save
+needed to be in kvm_arch_vcpu_load() for the common path).
 
-Thanks,
+The other motivation for this is to avoid yet another arch hook, and more
+arbitrary ordering, if there's a future need to hook kvm_sched_out() (we've
+come close on the x86 side several times).  E.g. kvm_arch_vcpu_put() can
+simply check kvm_vcpu.scheduled_out if it needs to something specific for
+the vCPU being scheduled out.
 
-	M.
+v2:
+ - Add scheduled_out flag instead of passing a bool to kvm_arch_vcpu_load().
+   [Oliver]
+ - Tack on patches to clean up x86's setting of l1tf_flush_l1d in
+   kvm_arch_sched_load() (the code looked slightly less weird when the flag
+   was being set by kvm_arch_sched_in()).
 
+v1: https://lore.kernel.org/all/20240430193157.419425-1-seanjc@google.com
+
+Sean Christopherson (6):
+  KVM: Add a flag to track if a loaded vCPU is scheduled out
+  KVM: VMX: Move PLE grow/shrink helpers above vmx_vcpu_load()
+  KVM: x86: Fold kvm_arch_sched_in() into kvm_arch_vcpu_load()
+  KVM: Delete the now unused kvm_arch_sched_in()
+  KVM: x86: Unconditionally set l1tf_flush_l1d during vCPU load
+  KVM: x86: Drop now-superflous setting of l1tf_flush_l1d in vcpu_run()
+
+ arch/arm64/include/asm/kvm_host.h     |  1 -
+ arch/loongarch/include/asm/kvm_host.h |  1 -
+ arch/mips/include/asm/kvm_host.h      |  1 -
+ arch/powerpc/include/asm/kvm_host.h   |  1 -
+ arch/riscv/include/asm/kvm_host.h     |  1 -
+ arch/s390/include/asm/kvm_host.h      |  1 -
+ arch/x86/include/asm/kvm-x86-ops.h    |  1 -
+ arch/x86/include/asm/kvm_host.h       |  2 -
+ arch/x86/kvm/pmu.c                    |  6 +-
+ arch/x86/kvm/svm/svm.c                | 11 +---
+ arch/x86/kvm/vmx/main.c               |  2 -
+ arch/x86/kvm/vmx/vmx.c                | 80 +++++++++++++--------------
+ arch/x86/kvm/vmx/x86_ops.h            |  1 -
+ arch/x86/kvm/x86.c                    | 22 +++-----
+ include/linux/kvm_host.h              |  3 +-
+ virt/kvm/kvm_main.c                   |  5 +-
+ 16 files changed, 59 insertions(+), 80 deletions(-)
+
+
+base-commit: 4aad0b1893a141f114ba40ed509066f3c9bc24b0
 -- 
-Without deviation from the norm, progress is not possible.
+2.45.0.215.g3402c0e53f-goog
+
