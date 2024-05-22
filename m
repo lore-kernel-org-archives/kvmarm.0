@@ -1,118 +1,126 @@
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D20B91B815
-	for <kvmarm@lists.linux.dev>; Wed, 22 May 2024 15:16:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE9C5210EC;
+	Wed, 22 May 2024 15:52:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716390982; cv=none; b=uKNnBWec9xHE8DuN1U2T2j4luaH7XET/eA9bRjd2vTkiTz7llPQ6ef+Hb+Rb6JwGGutZ3jIROu6GgimEItk7KYG9DsDnMlnrf4R/s6JVwSw/8rLT+pVNpl2OH6aoz9YNAgKq8RTJFNG2ue8qrat3y+fg+/f5ACGkcuE1lySP+tQ=
+	t=1716393168; cv=none; b=VVXyLGVSaYLWRfCOGMfnEpFk2gIEE5euyaB8HZ00DLA3GHxVmT1rAPDugWSnh/QuhAWP/3FhQXBhhKatg3xN3oZJC5I32BUeaUz6fxVRsshikLc1FRK40kwtP22rXlWbdU8dNbWUTXtkc4CZ9GCkkyfZxp0alO90meyPT8+cXew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716390982; c=relaxed/simple;
-	bh=LBsuxRIt25iSTct1CaOFF4pb8q9+nLplzWcPNkULdk8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p5YhSkKWqejiee7ekEq0w6WzHFDzfu3lzmJKx11i1PMD9gzUzIslBqv2onzQ7A7gB/842jXc0Jrib0LSDUMWv1ABPeZLJLENWGpikZtIWQ4n/QB05S6Gie5oO66LG1qYEREiTU93ei6MGy9usbrgdt9/zP2b2cMmXgTVc/eZ+Hc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MR8HfGt/; arc=none smtp.client-ip=95.215.58.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MR8HfGt/"
-X-Envelope-To: seanjc@google.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1716390977;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qPx5VBeAtVusPub5h8jjoS2Zp/k7LiSDo3T23EUz3Cc=;
-	b=MR8HfGt/7NWj1OeZKFuwxnVF9+ndS7xCoaOY+r1JI2bWBzf2MynLiEMDjC1DrcozAH8hei
-	TUnFiYL5Pyj+E10/+shwWi4h/9LVvu0Mc6mkr1yRH6n++3msAFiuDQVzo86zkrGkaVb0hH
-	6NbyKC1AGLafKPP8z0hv7d6a9IuqBaQ=
-X-Envelope-To: maz@kernel.org
-X-Envelope-To: zhaotianrui@loongson.cn
-X-Envelope-To: maobibo@loongson.cn
-X-Envelope-To: chenhuacai@kernel.org
-X-Envelope-To: mpe@ellerman.id.au
-X-Envelope-To: anup@brainfault.org
-X-Envelope-To: paul.walmsley@sifive.com
-X-Envelope-To: palmer@dabbelt.com
-X-Envelope-To: aou@eecs.berkeley.edu
-X-Envelope-To: borntraeger@linux.ibm.com
-X-Envelope-To: frankja@linux.ibm.com
-X-Envelope-To: imbrenda@linux.ibm.com
-X-Envelope-To: pbonzini@redhat.com
-X-Envelope-To: linux-arm-kernel@lists.infradead.org
-X-Envelope-To: kvmarm@lists.linux.dev
-X-Envelope-To: kvm@vger.kernel.org
-X-Envelope-To: loongarch@lists.linux.dev
-X-Envelope-To: linux-mips@vger.kernel.org
-X-Envelope-To: linuxppc-dev@lists.ozlabs.org
-X-Envelope-To: kvm-riscv@lists.infradead.org
-X-Envelope-To: linux-riscv@lists.infradead.org
-X-Envelope-To: linux-kernel@vger.kernel.org
-Date: Wed, 22 May 2024 08:16:07 -0700
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Tianrui Zhao <zhaotianrui@loongson.cn>,
-	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, loongarch@lists.linux.dev,
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/6] KVM: Add a flag to track if a loaded vCPU is
- scheduled out
-Message-ID: <Zk4MN49212SaW1_z@linux.dev>
-References: <20240522014013.1672962-1-seanjc@google.com>
- <20240522014013.1672962-2-seanjc@google.com>
+	s=arc-20240116; t=1716393168; c=relaxed/simple;
+	bh=qomkeV47ofGNKX2qxIYOG8pKPZ+HtOWd2vxGJO/oq9I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QhOr5kcXS36YSXJmisb7FEB68zDusRC+Q4hMs3llCkpL5rWuliE5PPaNrgKs0ybs03zEsZJWQAmJ4YabxiWJrk8RNIPGbIft9Z8csiw2fT238iSs0A8gY9Q9y/s4gRp1B2XRzcxzL9TDXa/EGp7hWuR3gUV+hPtFhZAgrLpR8lA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0FC60339;
+	Wed, 22 May 2024 08:53:09 -0700 (PDT)
+Received: from [10.57.35.73] (unknown [10.57.35.73])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B985F3F766;
+	Wed, 22 May 2024 08:52:41 -0700 (PDT)
+Message-ID: <74011ac1-34e0-4ee3-a00d-f78ad334fce2@arm.com>
+Date: Wed, 22 May 2024 16:52:45 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240522014013.1672962-2-seanjc@google.com>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 12/14] arm64: realm: Support nonsecure ITS emulation
+ shared
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, Marc Zyngier
+ <maz@kernel.org>, Will Deacon <will@kernel.org>,
+ James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+References: <20240412084213.1733764-1-steven.price@arm.com>
+ <20240412084213.1733764-13-steven.price@arm.com> <ZkSV7Z8QFQYLETzD@arm.com>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <ZkSV7Z8QFQYLETzD@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, May 21, 2024 at 06:40:08PM -0700, Sean Christopherson wrote:
-> Add a kvm_vcpu.scheduled_out flag to track if a vCPU is in the process of
-> being scheduled out (vCPU put path), or if the vCPU is being reloaded
-> after being scheduled out (vCPU load path).  In the short term, this will
-> allow dropping kvm_arch_sched_in(), as arch code can query scheduled_out
-> during kvm_arch_vcpu_load().
+On 15/05/2024 12:01, Catalin Marinas wrote:
+> On Fri, Apr 12, 2024 at 09:42:11AM +0100, Steven Price wrote:
+>> @@ -198,6 +201,33 @@ static DEFINE_IDA(its_vpeid_ida);
+>>  #define gic_data_rdist_rd_base()	(gic_data_rdist()->rd_base)
+>>  #define gic_data_rdist_vlpi_base()	(gic_data_rdist_rd_base() + SZ_128K)
+>>  
+>> +static struct page *its_alloc_shared_pages_node(int node, gfp_t gfp,
+>> +						unsigned int order)
+>> +{
+>> +	struct page *page;
+>> +
+>> +	if (node == NUMA_NO_NODE)
+>> +		page = alloc_pages(gfp, order);
+>> +	else
+>> +		page = alloc_pages_node(node, gfp, order);
 > 
-> Longer term, scheduled_out opens up other potential optimizations, without
-> creating subtle/brittle dependencies.  E.g. it allows KVM to keep guest
-> state (that is managed via kvm_arch_vcpu_{load,put}()) loaded across
-> kvm_sched_{out,in}(), if KVM knows the state isn't accessed by the host
-> kernel.  Forcing arch code to coordinate between kvm_arch_sched_{in,out}()
-> and kvm_arch_vcpu_{load,put}() is awkward, not reusable, and relies on the
-> exact ordering of calls into arch code.
+> I think you can just call alloc_pages_node() in both cases. This
+> function takes care of the NUMA_NO_NODE case itself.
 > 
-> Adding scheduled_out also obviates the need for a kvm_arch_sched_out()
-> hook, e.g. if arch code needs to do something novel when putting vCPU
-> state.
+>> +
+>> +	if (page)
+>> +		set_memory_decrypted((unsigned long)page_address(page),
+>> +				     1 << order);
+>> +	return page;
+>> +}
+>> +
+>> +static struct page *its_alloc_shared_pages(gfp_t gfp, unsigned int order)
+>> +{
+>> +	return its_alloc_shared_pages_node(NUMA_NO_NODE, gfp, order);
+>> +}
+>> +
+>> +static void its_free_shared_pages(void *addr, unsigned int order)
+>> +{
+>> +	set_memory_encrypted((unsigned long)addr, 1 << order);
+>> +	free_pages((unsigned long)addr, order);
+>> +}
 > 
-> And even if KVM never uses scheduled_out for anything beyond dropping
-> kvm_arch_sched_in(), just being able to remove all of the arch stubs makes
-> it worth adding the flag.
-> 
-> Link: https://lore.kernel.org/all/20240430224431.490139-1-seanjc@google.com
-> Cc: Oliver Upton <oliver.upton@linux.dev>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> More of a nitpick on the naming: Are these functions used by the host as
+> well? The 'shared' part of the name does not make much sense, so maybe
+> just call them its_alloc_page() etc.
 
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+Yes, the host is emulating this so the pages need to be in the shared
+region. However this is only for realms, for a normal guest this
+functions obviously aren't "sharing" with anything - so perhaps dropping
+the 'shared' part makes sense.
 
--- 
+>> @@ -3432,7 +3468,16 @@ static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
+>>  	nr_ites = max(2, nvecs);
+>>  	sz = nr_ites * (FIELD_GET(GITS_TYPER_ITT_ENTRY_SIZE, its->typer) + 1);
+>>  	sz = max(sz, ITS_ITT_ALIGN) + ITS_ITT_ALIGN - 1;
+>> -	itt = kzalloc_node(sz, GFP_KERNEL, its->numa_node);
+>> +	itt_order = get_order(sz);
+>> +	page = its_alloc_shared_pages_node(its->numa_node,
+>> +					   GFP_KERNEL | __GFP_ZERO,
+>> +					   itt_order);
+> 
+> How much do we waste by going for a full page always if this is going to
+> be used on the host?
+
+sz is a minimum of ITS_ITT_ALIGN*2-1 - which is 511 bytes. So
+potentially PAGE_SIZE-512 bytes could be wasted here (minus kmalloc
+overhead).
+
+>> +	if (!page)
+>> +		return NULL;
+>> +	itt = (void *)page_address(page);
+> 
+> page_address() has the void * type already.
+> 
+
+Indeed, the cast is pointless. I'll remove.
+
 Thanks,
-Oliver
+
+Steve
+
