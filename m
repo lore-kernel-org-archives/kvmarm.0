@@ -1,80 +1,81 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B7FE14D28E;
-	Wed, 22 May 2024 23:32:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7955C13CFB7;
+	Thu, 23 May 2024 09:57:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716420744; cv=none; b=psLAZIa8wxnewWIRt+MVHcSrR+0vyOv0mThixE0sYKlBiuFZnAcy8MLpvMI5q0IE+vDF1MTcIwVS+j9PG5Smw1qIIyYXUFV6O4xfcg/cemSHqTZqgPvIKGj/tphEsokNNgXEMCZHnx5ndC7Xu1EcKlADUf09XzKDwvdOI8dO3UI=
+	t=1716458267; cv=none; b=EYSQ8e+lytSu33/uF0ci6I7lPD2/VqY8+hQ7UF1+u7oY6a8n8q6MKeke82Xr2R/VigAiMzyVRnmTbdpBubXhbubh6ryF1I0tOJLHoqOZCOdnL9xgFK3EmNVmZSEPHQI6IjufvqaQt2SKWqNhLP3L5s2zo1dO7OKjftEiumhPr+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716420744; c=relaxed/simple;
-	bh=sFivK456BiubdJX56tlNdVWZafvyAwixp16zhXxqH70=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=lPQEtbFzLt3yKP1nhPJUoCg8Hd1dLuGEXIalwCS2QqIyW/Gw25ne1y3QgxD9obgT4M0AnfdWucSVxvmkYAg7kuUsF5Tum22lFRwvnQeJzEbYlt7vLh+hoYvAI1jYaPLxoqubdO39LBU+kJZuI1phcxkTNtEirZYUAxZb4gUeWiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MvxrjXYy; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MvxrjXYy"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BD809C4AF15;
-	Wed, 22 May 2024 23:32:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716420743;
-	bh=sFivK456BiubdJX56tlNdVWZafvyAwixp16zhXxqH70=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=MvxrjXYyWgudMCjnBPVn9CXPVvpZNtaSUZ1gyq7PTmVmsLPKSp4NYpwhcGJcgtsps
-	 ZQigp0aoMd337dNepQtlG7ONduRS6voeXw8G++uWdKEk6y7kzjYZuq96XJ7/yQN19U
-	 IqJrWt8Rxg0xye2QS6uRQncojNKYhA9QElzTRMJox85W4T2sCbklby0gjCZU9wjUxM
-	 bIKgDpuY3lMTzfOOvE5ZE3aYgr4zJsDNOJcBlqDMfSjVhfax54WnjBVe7xoJmcD286
-	 HTXTNilxLy9lspwts50EVF1udoz+PVsPXjAxFdPOlmfSbHjPLqMQ0/3xuRViW2cwUe
-	 cVQfWD+cD2/eg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AF297C43618;
-	Wed, 22 May 2024 23:32:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1716458267; c=relaxed/simple;
+	bh=pJ+B3e29HJAbTyYyZa4HUjzMSv5Rh0HroDPaliFp3ZY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eXFVU5K9KDFkK2uxiLoyfulhGR1yiYYDvuRafnnx86SzK0hL+aiMrrDiFlT2jFUzMUzxoL/NpHx/evNDpH0SqTOBNw3QutqG37TYuZAZhDTLXh5qNkUEaVWpzDx45ZEAYMfaOn4GgQ8B6Od++27yXZtFYbXo0HEGoLW3s/2XxNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9A3C82F4;
+	Thu, 23 May 2024 02:58:06 -0700 (PDT)
+Received: from [10.1.30.34] (e122027.cambridge.arm.com [10.1.30.34])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BF8003F766;
+	Thu, 23 May 2024 02:57:39 -0700 (PDT)
+Message-ID: <c329ae18-2b61-4851-8d6a-9e691a2007c8@arm.com>
+Date: Thu, 23 May 2024 10:57:37 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] KVM: selftest: Define _GNU_SOURCE for all selftests code
-From: patchwork-bot+linux-riscv@kernel.org
-Message-Id: 
- <171642074371.9409.16238055569874422523.git-patchwork-notify@kernel.org>
-Date: Wed, 22 May 2024 23:32:23 +0000
-References: <20240423190308.2883084-1-seanjc@google.com>
-In-Reply-To: <20240423190308.2883084-1-seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: linux-riscv@lists.infradead.org, pbonzini@redhat.com, maz@kernel.org,
- oliver.upton@linux.dev, anup@brainfault.org, paul.walmsley@sifive.com,
- palmer@dabbelt.com, aou@eecs.berkeley.edu, borntraeger@linux.ibm.com,
- frankja@linux.ibm.com, imbrenda@linux.ibm.com, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- kvm-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
- usama.anjum@collabora.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 12/14] arm64: realm: Support nonsecure ITS emulation
+ shared
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, Marc Zyngier
+ <maz@kernel.org>, Will Deacon <will@kernel.org>,
+ James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+References: <20240412084213.1733764-1-steven.price@arm.com>
+ <20240412084213.1733764-13-steven.price@arm.com> <ZkSV7Z8QFQYLETzD@arm.com>
+ <74011ac1-34e0-4ee3-a00d-f78ad334fce2@arm.com> <Zk4l2xFBDW_3ImFD@arm.com>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <Zk4l2xFBDW_3ImFD@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to riscv/linux.git (fixes)
-by Sean Christopherson <seanjc@google.com>:
-
-On Tue, 23 Apr 2024 12:03:08 -0700 you wrote:
-> Define _GNU_SOURCE is the base CFLAGS instead of relying on selftests to
-> manually #define _GNU_SOURCE, which is repetitive and error prone.  E.g.
-> kselftest_harness.h requires _GNU_SOURCE for asprintf(), but if a selftest
-> includes kvm_test_harness.h after stdio.h, the include guards result in
-> the effective version of stdio.h consumed by kvm_test_harness.h not
-> defining asprintf():
+On 22/05/2024 18:05, Catalin Marinas wrote:
+> On Wed, May 22, 2024 at 04:52:45PM +0100, Steven Price wrote:
+>> On 15/05/2024 12:01, Catalin Marinas wrote:
+>>> On Fri, Apr 12, 2024 at 09:42:11AM +0100, Steven Price wrote:
+>>>> @@ -3432,7 +3468,16 @@ static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
+>>>>  	nr_ites = max(2, nvecs);
+>>>>  	sz = nr_ites * (FIELD_GET(GITS_TYPER_ITT_ENTRY_SIZE, its->typer) + 1);
+>>>>  	sz = max(sz, ITS_ITT_ALIGN) + ITS_ITT_ALIGN - 1;
+>>>> -	itt = kzalloc_node(sz, GFP_KERNEL, its->numa_node);
+>>>> +	itt_order = get_order(sz);
+>>>> +	page = its_alloc_shared_pages_node(its->numa_node,
+>>>> +					   GFP_KERNEL | __GFP_ZERO,
+>>>> +					   itt_order);
+>>>
+>>> How much do we waste by going for a full page always if this is going to
+>>> be used on the host?
+>>
+>> sz is a minimum of ITS_ITT_ALIGN*2-1 - which is 511 bytes. So
+>> potentially PAGE_SIZE-512 bytes could be wasted here (minus kmalloc
+>> overhead).
 > 
-> [...]
+> That I figured out as well but how many times is this path called with a
+> size smaller than a page?
+> 
 
-Here is the summary with links:
-  - KVM: selftest: Define _GNU_SOURCE for all selftests code
-    https://git.kernel.org/riscv/c/730cfa45b5f4
+That presumably depends on the number of devices in the guest. For my
+test guest setup (using kvmtool) this is called 3 times each with sz=511.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Steve
 
