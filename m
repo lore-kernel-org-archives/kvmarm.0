@@ -1,87 +1,86 @@
-Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41B2440849
-	for <kvmarm@lists.linux.dev>; Fri, 24 May 2024 19:13:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D8FF107A6
+	for <kvmarm@lists.linux.dev>; Sat, 25 May 2024 15:03:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716578022; cv=none; b=Kn1KR+4dEiT6SALVWm9yrLnPOE5hCOvJhcoPUyD+1cwFpBxlKM1iz52SI5QnCOqeRhu/c0Dcsn2RAhCgMcz5u3W1+uS85N3ZxejezK+m+0FKwH9H8yzEY3EjwHdyTqiBmX8wsO01pXJru2M0fBsH9qcdIIjOY5K3LctWJG+RntE=
+	t=1716649388; cv=none; b=MtJd7quPr7qztccfMrPN9EfRNW+8Mq56eMnyeplR6evkeJf1c3vqtW+EX192V123SldkxrP60Mv9mqh9Orzu6a0eZmxSLjofHbrhQjkotQtXBideQrAyHTJaR53/7q1Bb9OMBzqJh/REWfnhPqgtZB1jXKQCfW9ZLu87A/ibi5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716578022; c=relaxed/simple;
-	bh=vc8o9K8NBRIua7Rfv4KJbf4Bv/uDlTV4rNenfgWdEUY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fKpKio7plt1IjdtEzCIXSfYJw29Mk5MHZRkpQKI/66JNnPC7VXeIjj3+3eupl6pu9NAvZqfEKgW26r5KLkhKSyn15gxRLPGNfKzUxeVB8sRnWEPh9M62v8w+Apmt7l6gon316IZLM/tJHoJe4eJzAFSrtvmsiiMVvaJo9DYLdys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=s6eqr+MU; arc=none smtp.client-ip=95.215.58.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1716649388; c=relaxed/simple;
+	bh=GBoz9hdxZduBQZwXzdDaF3M3aixjjlbw0Nw9YNuuujE=;
+	h=From:Message-ID:Date:MIME-Version:To:Subject:Content-Type; b=MrbgCZnUjGCOw3LOjTiojbqULcjJyEgNKCF7l19+a17fQgFaPYF4xrf7Kj0PD4MezB7AwT7W7gHt9S00rzmp6m/u1IgnpaH1lV34G/AUQ/fQHXVBdBkgxLHTcwV+1xc3k0ZAx93stZo18t+Jp+48DR+JGuFYYcP5V/P9DdtVERM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hOjjPb+y; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="s6eqr+MU"
-X-Envelope-To: maz@kernel.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1716578019;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=e4xsaOPA9gGcOVUExbmRnE5sLYdiYNTU9786Z4HVcqU=;
-	b=s6eqr+MU60pWRFwhNU+4ZWkEJor1/+cwcaF8l4PLRDqBjk7nkjvaHWsWFSiDqnpeB7MqJf
-	6l1/nUfRWNViZ73VEibqQk4J+hKAXs1muec2S8sRvyGI5618GVieyp1iioGQVNX0d1v9e5
-	PNuXDHTmcC5MCsrJv6oaCQOAkIqp69Y=
-X-Envelope-To: t@linux.dev
-X-Envelope-To: kvmarm@lists.linux.dev
-X-Envelope-To: kvm@vger.kernel.org
-X-Envelope-To: linux-arm-kernel@lists.infradead.org
-X-Envelope-To: nsg@linux.ibm.com
-X-Envelope-To: james.morse@arm.com
-X-Envelope-To: suzuki.poulose@arm.com
-X-Envelope-To: yuzenghui@huawei.com
-Date: Fri, 24 May 2024 12:13:34 -0700
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>, t@linux.dev
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 0/3] KVM/arm64 fixes for AArch32 handling
-Message-ID: <ZlDm3m0g9xSeG9TO@linux.dev>
-References: <20240524141956.1450304-1-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hOjjPb+y"
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6f693fb0ab6so4879009b3a.1
+        for <kvmarm@lists.linux.dev>; Sat, 25 May 2024 08:03:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1716649386; x=1717254186; darn=lists.linux.dev;
+        h=content-transfer-encoding:subject:content-language:to:user-agent
+         :mime-version:date:message-id:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5FRi5s/95uKbsco+n9pTPLg51G5wkMGiP7bn/pz2aPc=;
+        b=hOjjPb+y8Pv/BtYULA6gEpoHljGqlhg4WxniTQmP769Lij2wF9rmTBQ9yW6u9DVsph
+         2V5nfpKl42sSq35WaEmndDOpuqPIRiD7SZC4ETq7ID9elliotiRfZZKBon2noHQV9tfQ
+         Wa5XEKOHbRW5eloVBvb1O9YFURYJpGPApAXJ2osxK9iVtirN/HdJzSGLhAqJkrd07uqV
+         XvLs3/AQxf+vOoEC70jFP+xDFlL0fJ8Ly/QtZHNBpiM030ihEr4yC5vL5nEJb6QPqPcT
+         0vmxdi5MfYPku1NOvKkm3ztBqRush0Vbitq2SBQmxDw1fnejORMAHRozVM2nnnakKDKO
+         89UA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716649386; x=1717254186;
+        h=content-transfer-encoding:subject:content-language:to:user-agent
+         :mime-version:date:message-id:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5FRi5s/95uKbsco+n9pTPLg51G5wkMGiP7bn/pz2aPc=;
+        b=BXfQo+jglNDRnSIPpjBh1C9tyJC30V3We7vfIYLHPzbfzVpvRWUUcE3blX0cZ/ffkJ
+         hWEj2YoOeiOs6HD2cIZTkAfnm/8iE5VRNPv3+iN9DvihOKkVY51C1Sntc5C2C7KzZHvq
+         OjKyQqj83CiFmGkgtUqxJjoIDg/hQtMIMKciOkxgIb9Xnwd3S9JMY0Xq5I+9FBkDVor0
+         TlZJB7HTatD5esitV8cmoa/8Mdam8w8tsLWYHmhwKyTkaOZah8TRblB7Ke9GDdXbKTeT
+         g0ObTQ7fIssVMrOhpgI8tRT/yF8xpUbK6ZeydIRR8536aLfGFQ5HynQeqW6N1R+TOZX9
+         wV+A==
+X-Gm-Message-State: AOJu0YzAnRGnzr0RAh++tNel6WWb9QVo2niODHmFzwt4bez3P/AbThhf
+	TT5kFbf+mYbXVmEnH04zZ3T4jMEIiZ/sgQfSLDHZGGzgWpP74OutFm5L5pLWlY8=
+X-Google-Smtp-Source: AGHT+IGcSvgg4fx9MGrEw6amGh0DIwSwkukBWoDxF8nUZ/dhfMKMIl/p7Qm1rTB4Hg42clHYKnFZKA==
+X-Received: by 2002:a05:6a00:8c11:b0:6f6:7bbd:bebf with SMTP id d2e1a72fcca58-6f8f3d67b03mr5359508b3a.24.1716649385679;
+        Sat, 25 May 2024 08:03:05 -0700 (PDT)
+Received: from [192.168.68.108] ([106.51.161.170])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-6f8fc053bd6sm2553688b3a.45.2024.05.25.08.03.04
+        for <kvmarm@lists.linux.dev>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 25 May 2024 08:03:05 -0700 (PDT)
+From: Yuvraj Sakshith <ysakshith@gmail.com>
+X-Google-Original-From: Yuvraj Sakshith <ysakshith@Gmail.com>
+Message-ID: <6a471cff-a355-4740-9885-b35f25c8e318@Gmail.com>
+Date: Sat, 25 May 2024 20:33:03 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240524141956.1450304-1-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+To: kvmarm@lists.linux.dev
+Content-Language: en-US
+Subject: Question: Why does hardware_enable_all() call cpu_hyp_init() again?
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, May 24, 2024 at 03:19:53PM +0100, Marc Zyngier wrote:
-> The (very much unloved) AArch32 handling has recently been found
-> lacking in a number of ways:
-> 
-> - Nina spotted a brown paper-bag quality bug in the register narrowing
->   code when writing one of the core registers (GPRs, PSTATE) from
->   userspace
+Greetings,
 
-Yuck!
 
-> - We never allowed System mode to be restored. Nobody ever complained,
->   but this is wrong nonetheless
-> 
-> - The handling of traps failing their condition check went from dodgy
->   to outright broken when the handling of ESR_EL2 was upgraded from 32
->   to 64 bit (patch already posted).
-> 
-> All these are stable material, and I plan to merge them after -rc1
-> is released.
+I was following the CREATE_VM ioctl and navigating through 
+kvm_dev_ioctl_create_vm(), I found hardware_enable_all(). This calls 
+cpu_hyp_init(NULL) on all CPUs.
 
-Please do!
+But, doesn't kvm_arm_init() call cpu_hyp_init() on all CPUs during 
+init_subsystems()? I am curious why this needs to be done again during 
+every CREATE_VM ioctl.
 
-Acked-by: Oliver Upton <oliver.upton@linux.dev>
 
--- 
-Thanks,
-Oliver
+Regards,
+
+Yuvraj Sakshith
+
