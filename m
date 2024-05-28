@@ -1,177 +1,152 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 465C76A33C
-	for <kvmarm@lists.linux.dev>; Tue, 28 May 2024 11:30:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB58E16D9D8
+	for <kvmarm@lists.linux.dev>; Tue, 28 May 2024 12:59:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716895816; cv=none; b=TP8K9lUed20vJuP26HaUoTjgm1SRgqiosxvniIkfyYGZMjrE+2Sox/g0gN0ewFXq0wTv/+2rMOTv+hxdZiMeYx/aieKKOHNMR/OHLZRKYnyQJo66XeNPQtYf7leU/icVqVr3iQoFa1PD0Lbrw6HTbwJsTzCcIwTQ6WCnFIcEfWc=
+	t=1716901160; cv=none; b=uONSA7yxikzbgnds4krm6S18r1gHZ91y22UI/eC9cMrqATt9+MjDmsHtVOrMpqQAo+MzdWEZx5UR3L/QOk2TWIHpvQZKqH8BU1TPqFfTjBo+ZN/+7XoTGIlQzYmOZMSgaktU/h9pwRfZQR9BlN121EdNCOjaXFburn0q2I7wkSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716895816; c=relaxed/simple;
-	bh=tNzj5MSVMtVZK1ImbyC1fO6YkaN9GMfR5eWEI6xs5oc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D+jUgCSMZAmjIi9weaOamMqVXWey+0ln8493589W3gCbZa+ZUiwdxFNv9Ph4CYMlMReE1/rT1goBYoRJeXoBir29X4cQmJPv5mfkDXEHK59zlRfEVsRSlIOsJ+EsfZ2TvbYLQlj1iHAfg5tfGfzU5GoxOtwCLNwlaLg+nO0bgbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CDA14339;
-	Tue, 28 May 2024 04:30:36 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C08213F762;
-	Tue, 28 May 2024 04:30:09 -0700 (PDT)
-Date: Tue, 28 May 2024 12:30:07 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: linux-arm-kernel@lists.infradead.org
-Cc: akpm@linux-foundation.org, aneesh.kumar@kernel.org,
-	aneesh.kumar@linux.ibm.com, bp@alien8.de, broonie@kernel.org,
-	catalin.marinas@arm.com, christophe.leroy@csgroup.eu,
-	dave.hansen@linux.intel.com, hpa@zytor.com,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
-	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
-	oliver.upton@linux.dev, shuah@kernel.org, szabolcs.nagy@arm.com,
-	tglx@linutronix.de, will@kernel.org, x86@kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 00/29] arm64: Permission Overlay Extension
-Message-ID: <20240528113007.GB1072039@e124191.cambridge.arm.com>
-References: <20240503130147.1154804-1-joey.gouly@arm.com>
+	s=arc-20240116; t=1716901160; c=relaxed/simple;
+	bh=esOXHOnrFh7Yyb166h+tO++Qtyy7VZ51THLP0KkkbgI=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=U3IRTkqnh5Leo/xH8v54H3RCx79TGj7DxVotJxdMnMEYln6/+DlMczXm0aoTxg/h03cDCsw278qMIFvICff2mnEASHHbr7efADO5YvqfLvodgC1RZ8amkmJ2VIhStiqQDNsWJNCg0RluJB+luLa4B73fs9rhF8xhdKIVWmXkgJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oNLUgj+I; arc=none smtp.client-ip=209.85.128.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oNLUgj+I"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-42108822a8eso17420025e9.0
+        for <kvmarm@lists.linux.dev>; Tue, 28 May 2024 05:59:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1716901157; x=1717505957; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=m3nkVC0BZfe7eSiu3kY+AhUkzuWFPIanJCfYHltbpNY=;
+        b=oNLUgj+IO/BFKacVMvBLijCDsG5l2LS/a4QXlEcKKpjPG3Dcc/+7qN6ylH5bgfKaOn
+         mFJam9y6dUFgbi66YCObCr9EYLT4k3yd85sJ7bnrhQ1srBoQRs7LPrL7Hi6+hHcADf8B
+         NLRVgw8VBQBK09K78KQgDPAXcoK+vtoGRbTt/HSMZfLJZEvJ7dkAsh6L+7OEAFAv096z
+         idJGPf8iIdOeT+Z5GgaZVBVrmEyiMME+VnXm7MbyAe/XTi3yMXmxZ5tijdv9QP+in4eT
+         nCJBBy9ijojv5E+7xuTBp0chFCTvdF6Oe0bh5iDCtwEfm7NHXIolxOpVmbUmW6JQ4IzP
+         kDEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716901157; x=1717505957;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=m3nkVC0BZfe7eSiu3kY+AhUkzuWFPIanJCfYHltbpNY=;
+        b=OF+IvCnj6nzrXv++6oZvQsKRsMD6RiPajrgr7QDf9bif/9sVK0Ehbo5TgQbXhkJ8Yn
+         WmqZEAhLP1fj38xzp/8rO1fVWEa7HY96xFc8U3IMZReKmo2Hg5Tt+mAhHg/dqJPX2V+z
+         UCVnwUVz0Sxle+vBCjTmhJ6jbGFqHKWox3nRfPAmB0J/SvkESueK2Xhdxb9jC+BehOWB
+         EFTOCAX73pmE2CeKYjLY0GPV2bcVS/YycKhiA0o+M8TuFOKY3RhF5ND7yRzY6rKTaC5f
+         4BfdMg0WR6wsyoqOthAecxLRzjBjZI0QXOW+8V2DLCGr7KtyO+1ysTLzpeEmUBPxFh5z
+         /4qw==
+X-Gm-Message-State: AOJu0YzjxEqYuZLohjd8ZMcy3sOWeCAgMuhlHoM71VzL/i/5diGKLiVW
+	P8ud2ZBJ6niz1eU/UIg8/RxzDD5HCAq/VPhLi9u+14GY/HHyz35nX7odqwy871DSC0X/jBRXWk0
+	GCMBj/lVMMp4b479405yx/Ht+UIh/rnLReNRcNpcCd3hCg+XDWIfo8eF0egngY2uCOw0SXj1RJp
+	jlqDf2ZgpC2nyRJAoEKV0OaLrATB0=
+X-Google-Smtp-Source: AGHT+IE/n1cPtZtexEi21BLaoq7D28W+Fb3PkBwUY3SJW2LZtL6tmxUkCNGSKyvg7ipDjbFvGKpx9hclxQ==
+X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
+ (user=tabba job=sendgmr) by 2002:a05:600c:4704:b0:41f:41fc:318b with SMTP id
+ 5b1f17b1804b1-42108205095mr2539805e9.4.1716901157057; Tue, 28 May 2024
+ 05:59:17 -0700 (PDT)
+Date: Tue, 28 May 2024 13:59:03 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240503130147.1154804-1-joey.gouly@arm.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.1.288.g0e0cd299f1-goog
+Message-ID: <20240528125914.277057-1-tabba@google.com>
+Subject: [PATCH v3 00/11] KVM: arm64: Fix handling of host fpsimd/sve state in
+ protected mode
+From: Fuad Tabba <tabba@google.com>
+To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
+Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com, 
+	seanjc@google.com, alexandru.elisei@arm.com, catalin.marinas@arm.com, 
+	philmd@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, 
+	oliver.upton@linux.dev, mark.rutland@arm.com, broonie@kernel.org, 
+	joey.gouly@arm.com, rananta@google.com, yuzenghui@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, May 03, 2024 at 02:01:18PM +0100, Joey Gouly wrote:
-> Hi all,
-> 
-> This series implements the Permission Overlay Extension introduced in 2022
-> VMSA enhancements [1]. It is based on v6.9-rc5.
-> 
-> One possible issue with this version, I took the last bit of HWCAP2.
-> 
-> Changes since v3[2]:
-> 	- Moved Kconfig to nearer the end of the series
-> 	- Reworked MMU Fault path, to check for POE faults earlier, under the mm lock
-> 	- Rework VM_FLAGS to use Kconfig option
-> 	- Don't check POR_EL0 in MTE sync tags function
-> 	- Reworked KVM to fit into VNCR/VM configuration changes
-> 	- Use new AT instruction in KVM
-> 	- Rebase onto v6.9-rc5
-> 
-> The Permission Overlay Extension allows to constrain permissions on memory
-> regions. This can be used from userspace (EL0) without a system call or TLB
-> invalidation.
-> 
-> POE is used to implement the Memory Protection Keys [3] Linux syscall.
-> 
-> The first few patches add the basic framework, then the PKEYS interface is
-> implemented, and then the selftests are made to work on arm64.
-> 
-> I have tested the modified protection_keys test on x86_64, but not PPC.
-> I haven't build tested the x86/ppc arch changes.
-> 
-> Thanks,
-> Joey
+Changes since v2 [1]
+- Rebased on Linux 6.10-rc1 (1613e604df0c)
+- Apply suggestions/fixes suggested for V2 (Marc)
+- Add an isb() to __hyp_sve_restore_guest()
+- Squash patch that introduces kvm_host_sve_max_vl with following
+  patch, since it's used there
+- Some refactoring and tidying up
+- Introduce and use sve_cond_update_zcr_vq_isb(), which only does
+  an isb() if ZCR is updated (RFC, next to last patch)
+- Remove sve_cond_update_zcr_vq_*, since it's not likely to help
+  much (RFC, last patch)
 
-I found a silly off by one error, so I will be sending a v5 at some point.
+With the KVM host data rework [2], handling of fpsimd and sve
+state in protected mode is done at hyp. For protected VMs, we
+don't want to leak any guest state to the host, including whether
+a guest has used fpsimd/sve.
 
-> 
-> Joey Gouly (29):
->   powerpc/mm: add ARCH_PKEY_BITS to Kconfig
->   x86/mm: add ARCH_PKEY_BITS to Kconfig
->   mm: use ARCH_PKEY_BITS to define VM_PKEY_BITN
->   arm64: disable trapping of POR_EL0 to EL2
->   arm64: cpufeature: add Permission Overlay Extension cpucap
->   arm64: context switch POR_EL0 register
->   KVM: arm64: Save/restore POE registers
->   KVM: arm64: make kvm_at() take an OP_AT_*
->   KVM: arm64: use `at s1e1a` for POE
->   arm64: enable the Permission Overlay Extension for EL0
->   arm64: re-order MTE VM_ flags
->   arm64: add POIndex defines
->   arm64: convert protection key into vm_flags and pgprot values
->   arm64: mask out POIndex when modifying a PTE
->   arm64: handle PKEY/POE faults
->   arm64: add pte_access_permitted_no_overlay()
->   arm64: implement PKEYS support
->   arm64: add POE signal support
->   arm64: enable PKEY support for CPUs with S1POE
->   arm64: enable POE and PIE to coexist
->   arm64/ptrace: add support for FEAT_POE
->   arm64: add Permission Overlay Extension Kconfig
->   kselftest/arm64: move get_header()
->   selftests: mm: move fpregs printing
->   selftests: mm: make protection_keys test work on arm64
->   kselftest/arm64: add HWCAP test for FEAT_S1POE
->   kselftest/arm64: parse POE_MAGIC in a signal frame
->   kselftest/arm64: Add test case for POR_EL0 signal frame records
->   KVM: selftests: get-reg-list: add Permission Overlay registers
-> 
->  Documentation/arch/arm64/elf_hwcaps.rst       |   2 +
->  arch/arm64/Kconfig                            |  22 +++
->  arch/arm64/include/asm/cpufeature.h           |   6 +
->  arch/arm64/include/asm/el2_setup.h            |  10 +-
->  arch/arm64/include/asm/hwcap.h                |   1 +
->  arch/arm64/include/asm/kvm_asm.h              |   3 +-
->  arch/arm64/include/asm/kvm_host.h             |   4 +
->  arch/arm64/include/asm/mman.h                 |   8 +-
->  arch/arm64/include/asm/mmu.h                  |   1 +
->  arch/arm64/include/asm/mmu_context.h          |  51 ++++++-
->  arch/arm64/include/asm/pgtable-hwdef.h        |  10 ++
->  arch/arm64/include/asm/pgtable-prot.h         |   8 +-
->  arch/arm64/include/asm/pgtable.h              |  34 ++++-
->  arch/arm64/include/asm/pkeys.h                | 110 ++++++++++++++
->  arch/arm64/include/asm/por.h                  |  33 +++++
->  arch/arm64/include/asm/processor.h            |   1 +
->  arch/arm64/include/asm/sysreg.h               |   3 +
->  arch/arm64/include/asm/traps.h                |   1 +
->  arch/arm64/include/asm/vncr_mapping.h         |   1 +
->  arch/arm64/include/uapi/asm/hwcap.h           |   1 +
->  arch/arm64/include/uapi/asm/sigcontext.h      |   7 +
->  arch/arm64/kernel/cpufeature.c                |  23 +++
->  arch/arm64/kernel/cpuinfo.c                   |   1 +
->  arch/arm64/kernel/process.c                   |  28 ++++
->  arch/arm64/kernel/ptrace.c                    |  46 ++++++
->  arch/arm64/kernel/signal.c                    |  52 +++++++
->  arch/arm64/kernel/traps.c                     |  12 +-
->  arch/arm64/kvm/hyp/include/hyp/fault.h        |   5 +-
->  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h    |  29 ++++
->  arch/arm64/kvm/sys_regs.c                     |   8 +-
->  arch/arm64/mm/fault.c                         |  56 ++++++-
->  arch/arm64/mm/mmap.c                          |   9 ++
->  arch/arm64/mm/mmu.c                           |  40 +++++
->  arch/arm64/tools/cpucaps                      |   1 +
->  arch/powerpc/Kconfig                          |   4 +
->  arch/x86/Kconfig                              |   4 +
->  fs/proc/task_mmu.c                            |   2 +
->  include/linux/mm.h                            |  20 ++-
->  include/uapi/linux/elf.h                      |   1 +
->  tools/testing/selftests/arm64/abi/hwcap.c     |  14 ++
->  .../testing/selftests/arm64/signal/.gitignore |   1 +
->  .../arm64/signal/testcases/poe_siginfo.c      |  86 +++++++++++
->  .../arm64/signal/testcases/testcases.c        |  27 +---
->  .../arm64/signal/testcases/testcases.h        |  28 +++-
->  .../selftests/kvm/aarch64/get-reg-list.c      |  14 ++
->  tools/testing/selftests/mm/Makefile           |   2 +-
->  tools/testing/selftests/mm/pkey-arm64.h       | 139 ++++++++++++++++++
->  tools/testing/selftests/mm/pkey-helpers.h     |   8 +
->  tools/testing/selftests/mm/pkey-powerpc.h     |   3 +
->  tools/testing/selftests/mm/pkey-x86.h         |   4 +
->  tools/testing/selftests/mm/protection_keys.c  | 109 ++++++++++++--
->  51 files changed, 1027 insertions(+), 66 deletions(-)
->  create mode 100644 arch/arm64/include/asm/pkeys.h
->  create mode 100644 arch/arm64/include/asm/por.h
->  create mode 100644 tools/testing/selftests/arm64/signal/testcases/poe_siginfo.c
->  create mode 100644 tools/testing/selftests/mm/pkey-arm64.h
-> 
-> -- 
-> 2.25.1
-> 
-> 
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+To complete the work started with the host data rework, in
+regards to protected mode, ensure that the host's fpsimd context
+and its sve context are restored on guest exit, since the rework
+has hidden the fpsimd/sve state from the host.
+
+This patch series eagerly restores the host fpsimd/sve state on
+guest exit when running in protected mode, which happens only if
+the guest has used fpsimd/sve. This means that the saving of the
+state is lazy, similar to the behavior of KVM in other modes, but
+the restoration of the host state is eager.
+
+The last two patches are not essential to this patch series, and
+the last one undoes the next-to-last. Please consider only one
+(or neither) of these two patches for inclusion.
+
+This series is based on Linux 6.10-rc1 (1613e604df0c).
+
+Tested on qemu, with the kernel sve stress tests.
+
+Cheers,
+/fuad
+
+[1] https://lore.kernel.org/all/20240521163720.3812851-1-tabba@google.com/
+[2] https://lore.kernel.org/all/20240322170945.3292593-1-maz@kernel.org/
+
+Fuad Tabba (11):
+  KVM: arm64: Reintroduce __sve_save_state
+  KVM: arm64: Abstract set/clear of CPTR_EL2 bits behind helper
+  KVM: arm64: Specialize handling of host fpsimd state on trap
+  KVM: arm64: Allocate memory mapped at hyp for host sve state in pKVM
+  KVM: arm64: Eagerly restore host fpsimd/sve state in pKVM
+  KVM: arm64: Consolidate initializing the host data's fpsimd_state/sve
+    in pKVM
+  KVM: arm64: Refactor CPACR trap bit setting/clearing to use ELx format
+  KVM: arm64: Add an isb before restoring guest sve state
+  KVM: arm64: Do not use sve_cond_update_zcr updating with
+    ZCR_ELx_LEN_MASK
+  KVM: arm64: Do not perform an isb() if ZCR_EL2 isn't updated
+  KVM: arm64: Drop sve_cond_update_zcr_vq_*
+
+ arch/arm64/include/asm/el2_setup.h      |  6 +-
+ arch/arm64/include/asm/fpsimd.h         | 11 ----
+ arch/arm64/include/asm/kvm_arm.h        |  6 ++
+ arch/arm64/include/asm/kvm_emulate.h    | 71 +++++++++++++++++++++--
+ arch/arm64/include/asm/kvm_host.h       | 25 +++++++-
+ arch/arm64/include/asm/kvm_hyp.h        |  2 +
+ arch/arm64/include/asm/kvm_pkvm.h       |  9 +++
+ arch/arm64/kvm/arm.c                    | 76 +++++++++++++++++++++++++
+ arch/arm64/kvm/fpsimd.c                 |  8 +--
+ arch/arm64/kvm/hyp/fpsimd.S             |  6 ++
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 36 ++++++------
+ arch/arm64/kvm/hyp/include/nvhe/pkvm.h  |  1 -
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c      | 75 +++++++++++++++++++++---
+ arch/arm64/kvm/hyp/nvhe/pkvm.c          | 17 ++----
+ arch/arm64/kvm/hyp/nvhe/setup.c         | 25 +++++++-
+ arch/arm64/kvm/hyp/nvhe/switch.c        | 24 +++++++-
+ arch/arm64/kvm/hyp/vhe/switch.c         | 12 ++--
+ arch/arm64/kvm/reset.c                  |  3 +
+ 18 files changed, 342 insertions(+), 71 deletions(-)
+
+
+base-commit: 1613e604df0cd359cf2a7fbd9be7a0bcfacfabd0
+-- 
+2.45.1.288.g0e0cd299f1-goog
+
