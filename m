@@ -1,110 +1,296 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 265FD1BDD3
-	for <kvmarm@lists.linux.dev>; Tue, 28 May 2024 06:57:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ADA613C801
+	for <kvmarm@lists.linux.dev>; Tue, 28 May 2024 07:58:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716879427; cv=none; b=jByR82TaGfjB+9tal61eMfLHDLbMW542euZia0Wy40Hz1fBMNrIy05EKnUwrj7s0u2PQf0pE38XM7FfvDcqHjNvf0uXsN5ivc006876vwU+EY7kl9MrV+9TqudPfetDA1IurwqOeA1qbA/4hMW8quOkL7sEH6M/Ofbn1kHHNmJ0=
+	t=1716883087; cv=none; b=Mhwt9TjsqaWMRQAXPU8CxMtA5DK9m6kJzH693Smqut6As8aOhwxTLZmomm+blBXNUetmvPSnfodlhVggcaKzv3uEs8I7Cmy8xxr4TscDPAi/3Vr4SoIYRS9W6sXKsAFE0N4TURVwhw6QpVKiax5oNq5wKlfzaPGunbYuBFjFNFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716879427; c=relaxed/simple;
-	bh=x3RnDu7FS0yETf0PyFpTvtyfVJ4/2lY97V3xrfYdUf8=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=NsiWVyBlAgYCpf3a7QzZkdwPPuL9cZZPs6JOCAfe0V0aU4vZkJwk58L526m6MqBPNUaneW+ERmXUiIUDE0VsTefaxW+0Or0shLsol5Hpc9KkEHmgh0D3dCo8U8CtUV5BA2ku9cB6BMpmbDxnDmEA9DXB3QjR7n4/qHVpxt1SoqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B57FF150C;
-	Mon, 27 May 2024 23:57:29 -0700 (PDT)
-Received: from [10.162.40.16] (a077841.arm.com [10.162.40.16])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5B67F3F792;
-	Mon, 27 May 2024 23:56:57 -0700 (PDT)
-Message-ID: <229bd367-466e-4bf9-9627-24d2d0821ff4@arm.com>
-Date: Tue, 28 May 2024 12:26:54 +0530
+	s=arc-20240116; t=1716883087; c=relaxed/simple;
+	bh=rDiboxDdzeGhERGhVAFrCsaWNO2x/FdCE95ENbIFRCg=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=f/T3E/tBnXfNQ9R4Hwl70xug4NrXzF8t5IjFM32C3oRBqbDZWIfRDOQQU+ZS/4zT5fCcTtkdiYMuvef1PqicnvdhTFuTzNn33zhLhUzCYv5jamsK5YDrOXS/lJO+TSEVmRtsberwK4AOh42en78TzcVMgR+WeaRdy7fkC7gEsQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TWfvRLPn; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TWfvRLPn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C113C3277B;
+	Tue, 28 May 2024 07:58:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716883087;
+	bh=rDiboxDdzeGhERGhVAFrCsaWNO2x/FdCE95ENbIFRCg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=TWfvRLPnx2KW+hJs9iigUvWAfGeHRMKNsaXkKPp/COJU6FlXfJ0WZusQlCd0cRIo/
+	 qgHIi/ZI6vuYaezt/BeubrjZA67UA0JmTTWj69MR6W37dMt+KkoO9b++AkVD3vqatd
+	 Lm4r+QuMnHrMc/l/txrTJc4sYFMGD+frG+fiTVCAFUYwlsXLZneYp0ueZgBLJbLCSD
+	 vr8W83VsgcoHP9Oq90cj3XNbz0TuoCdLEyWkHa+jvAYqiHHhDCrS9R4MUbl7+pv2VS
+	 mIoqubGcaeLpyLM54f9MQo+zvHGO2gOkSqj027LElth6rBiqlpwIExnnGxicHsuwlf
+	 dfxw9/9JJpXNQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sBrie-00GDQz-NJ;
+	Tue, 28 May 2024 08:58:04 +0100
+Date: Tue, 28 May 2024 08:58:04 +0100
+Message-ID: <86ikyymkqb.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	will@kernel.org,
+	qperret@google.com,
+	seanjc@google.com,
+	alexandru.elisei@arm.com,
+	catalin.marinas@arm.com,
+	philmd@linaro.org,
+	james.morse@arm.com,
+	suzuki.poulose@arm.com,
+	oliver.upton@linux.dev,
+	mark.rutland@arm.com,
+	broonie@kernel.org,
+	joey.gouly@arm.com,
+	rananta@google.com,
+	yuzenghui@huawei.com
+Subject: Re: [PATCH v2 2/7] KVM: arm64: Abstract set/clear of CPTR_EL2 bits behind helper
+In-Reply-To: <CA+EHjTxyhytsiN93kJ46Hi-OVa1Z4qsH6_RAbm-WKVeDfZ5w8g@mail.gmail.com>
+References: <20240521163720.3812851-1-tabba@google.com>
+	<20240521163720.3812851-3-tabba@google.com>
+	<86seyana8x.wl-maz@kernel.org>
+	<CA+EHjTxyhytsiN93kJ46Hi-OVa1Z4qsH6_RAbm-WKVeDfZ5w8g@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Amit Daniel Kachhap <amitdaniel.kachhap@arm.com>
-Subject: Re: [PATCH v4 18/29] arm64: add POE signal support
-To: Joey Gouly <joey.gouly@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: akpm@linux-foundation.org, aneesh.kumar@kernel.org,
- aneesh.kumar@linux.ibm.com, bp@alien8.de, broonie@kernel.org,
- catalin.marinas@arm.com, christophe.leroy@csgroup.eu,
- dave.hansen@linux.intel.com, hpa@zytor.com, linux-fsdevel@vger.kernel.org,
- linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org, maz@kernel.org,
- mingo@redhat.com, mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com,
- npiggin@gmail.com, oliver.upton@linux.dev, shuah@kernel.org,
- szabolcs.nagy@arm.com, tglx@linutronix.de, will@kernel.org, x86@kernel.org,
- kvmarm@lists.linux.dev
-References: <20240503130147.1154804-1-joey.gouly@arm.com>
- <20240503130147.1154804-19-joey.gouly@arm.com>
-Content-Language: en-US
-In-Reply-To: <20240503130147.1154804-19-joey.gouly@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, will@kernel.org, qperret@google.com, seanjc@google.com, alexandru.elisei@arm.com, catalin.marinas@arm.com, philmd@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, mark.rutland@arm.com, broonie@kernel.org, joey.gouly@arm.com, rananta@google.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Wed, 22 May 2024 14:48:19 +0100,
+Fuad Tabba <tabba@google.com> wrote:
+>=20
+> Hi Marc,
+>=20
+> On Tue, May 21, 2024 at 10:08=E2=80=AFPM Marc Zyngier <maz@kernel.org> wr=
+ote:
+> >
+> > On Tue, 21 May 2024 17:37:15 +0100,
+> > Fuad Tabba <tabba@google.com> wrote:
+> > >
+> > > The same traps controlled by CPTR_EL2 or CPACR_EL1 need to be
+> > > toggled in different parts of the code, but the exact bits and
+> > > their polarity differ between these two formats and the mode
+> > > (vhe/nvhe/hvhe).
+> > >
+> > > To reduce the amount of duplicated code and the chance of getting
+> > > the wrong bit/polarity or missing a field, abstract the set/clear
+> > > of CPTR_EL2 bits behind a helper.
+> > >
+> > > Since (h)VHE is the way of the future, use the CPACR_EL1 format,
+> > > which is a subset of the VHE CPTR_EL2, as a reference.
+> > >
+> > > No functional change intended.
+> > >
+> > > Suggested-by: Oliver Upton <oliver.upton@linux.dev>
+> > > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > > ---
+> > >  arch/arm64/include/asm/kvm_emulate.h    | 34 +++++++++++++++++++++++=
+++
+> > >  arch/arm64/kvm/hyp/include/hyp/switch.h | 17 +++----------
+> > >  arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  6 +----
+> > >  3 files changed, 39 insertions(+), 18 deletions(-)
+> > >
+> > > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/includ=
+e/asm/kvm_emulate.h
+> > > index 501e3e019c93..74837d1762e5 100644
+> > > --- a/arch/arm64/include/asm/kvm_emulate.h
+> > > +++ b/arch/arm64/include/asm/kvm_emulate.h
+> > > @@ -557,6 +557,40 @@ static __always_inline void kvm_incr_pc(struct k=
+vm_vcpu *vcpu)
+> > >               vcpu_set_flag((v), e);                                 =
+ \
+> > >       } while (0)
+> > >
+> > > +
+> > > +static inline void __cptr_clear_set_nvhe(u64 cpacr_clr, u64 cpacr_se=
+t)
+> > > +{
+> > > +     u64 clr =3D 0, set =3D 0;
+> > > +
+> > > +     if (cpacr_clr & CPACR_ELx_FPEN)
+> > > +             set |=3D CPTR_EL2_TFP;
+> > > +     if (cpacr_clr & CPACR_ELx_ZEN)
+> > > +             set |=3D CPTR_EL2_TZ;
+> > > +     if (cpacr_clr & CPACR_ELx_SMEN)
+> >
+> > These 3 fields are actually pairs of bits. Can we have a compile-time
+> > check that both bits are set?
+>=20
+> Yes.
+>=20
+> > > +             set |=3D CPTR_EL2_TSM;
+> > > +     if (cpacr_clr & CPACR_ELx_TTA)
+> > > +             clr |=3D CPTR_EL2_TTA;
+> >
+> > How about TCPAC, TAM, and E0POE?
+>=20
+> CPTR_EL2 (nvhe) doesn't have an equivalent to E0POE. Should I have a
+> compile time check that it's not cleared at all (since it has negative
+> polarity), or a runtime check for that only for nvhe?
 
+You're right, and I ended figuring that out while reworking the NV
+side of CPTR_EL2 handling.
 
-On 5/3/24 18:31, Joey Gouly wrote:
-> Add PKEY support to signals, by saving and restoring POR_EL0 from the stackframe.
-> 
-> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will@kernel.org>
-> Reviewed-by: Mark Brown <broonie@kernel.org>
-> Acked-by: Szabolcs Nagy <szabolcs.nagy@arm.com>
-> ---
->   arch/arm64/include/uapi/asm/sigcontext.h |  7 ++++
->   arch/arm64/kernel/signal.c               | 52 ++++++++++++++++++++++++
->   2 files changed, 59 insertions(+)
-> 
-> diff --git a/arch/arm64/include/uapi/asm/sigcontext.h b/arch/arm64/include/uapi/asm/sigcontext.h
-> index 8a45b7a411e0..e4cba8a6c9a2 100644
-> --- a/arch/arm64/include/uapi/asm/sigcontext.h
-> +++ b/arch/arm64/include/uapi/asm/sigcontext.h
-> @@ -98,6 +98,13 @@ struct esr_context {
->   	__u64 esr;
->   };
->   
-> +#define POE_MAGIC	0x504f4530
+>=20
+> As for TCPAC, TAM, they're not defined under the CPACR bits, but they
+> are in CPTR_EL2, which is what CPACR refers to in VHE. I will handle
+> them, but should I rename cpacr_to_cptr() to cptr_vhe_to_nvhe()?
+
+I think this is clear enough in context, but I don't mind either way.
+
+>=20
+> >
+> > > +
+> > > +     if (cpacr_set & CPACR_ELx_FPEN)
+> > > +             clr |=3D CPTR_EL2_TFP;
+> > > +     if (cpacr_set & CPACR_ELx_ZEN)
+> > > +             clr |=3D CPTR_EL2_TZ;
+> > > +     if (cpacr_set & CPACR_ELx_SMEN)
+> > > +             clr |=3D CPTR_EL2_TSM;
+> > > +     if (cpacr_set & CPACR_ELx_TTA)
+> > > +             set |=3D CPTR_EL2_TTA;
+> >
+> > The duplication is pretty unfortunate. Having a single helper that
+> > translate a register layout into another would be better.
+> > > +
+> > > +     sysreg_clear_set(cptr_el2, clr, set);
+> >
+> > And omit this...
+> >
+> > > +}
+> > > +
+> > > +static inline void cpacr_clear_set(u64 clr, u64 set)
+> > > +{
+> > > +        if (has_vhe() || has_hvhe())
+> > > +                sysreg_clear_set(cpacr_el1, clr, set);
+> > > +        else
+> > > +                __cptr_clear_set_nvhe(clr, set);
+> >
+> > So that this could read as:
+> >
+> >         sysreg_clear_set(cptr_el2, cpacr_to_cptr(clr), cpacr_to_cptr(se=
+t));
+>=20
+> I don't know how this could work with only one function/macro, while
+> covering all the fields. The problem is that the polarity of these
+> bits vary: some have the same polarity between CPACR/CPTR. and others
+> have the opposite polarity. Therefore, the conversion to `clr` is
+> different from the conversion to `set`.
+
+Ah, you're absolutely right. I totally glanced over the fact that the
+polarities are inverted, totally ruining the fun.
+
+>=20
+> Say we need to clear both CPACR_ELx_FPEN and CPACR_ELx_TTA. The
+> problem is that CPACR_ELx_FPEN has the opposite polarity as
+> CPTR_EL2_TFP, whereas CPACR_ELx_TTA has the same polarity as
+> CPTR_EL2_TTA (different position though).
+>=20
+> What would cpacr_to_cptr() return that would work in the code you propose:
+> sysreg_clear_set(cptr_el2,
+> cpacr_to_cptr(CPACR_ELx_FPEN|CPACR_ELx_TTA), cpacr_to_cptr(0));
+>=20
+> Desired result:
+> sysreg_clear_set(cptr_el2, CPTR_EL2_TTA, CPTR_EL2_TFP);
+>=20
+> I can make it work with two functions/macros:
+> __cpacr_to_cptr_clear(clr, set) and __cpacr_to_cptr_set(clr, set) -->
+> sysreg_clear_set(cptr_el2, __cpacr_to_cptr_clear(clr, set),
+> __cpacr_to_cptr_set(clr, set));
+>=20
+> Unfortunately this doesn't get rid of the duplication, but it might be
+> tidier (I converted them to macros to add compile-time checks later):
+>=20
+> +#define __cpacr_to_cptr_clr(clr, set)                                  \
+> +       ({                                                              \
+> +               u64 cptr =3D 0;                                          =
+ \
+> +                                                                       \
+> +               if ((set) & CPACR_ELx_FPEN)                             \
+> +                       cptr |=3D CPTR_EL2_TFP;                          =
+ \
+> +               if ((set) & CPACR_ELx_ZEN)                              \
+> +                       cptr |=3D CPTR_EL2_TZ;                           =
+ \
+> +               if ((set) & CPACR_ELx_SMEN)                             \
+> +                       cptr |=3D CPTR_EL2_TSM;                          =
+ \
+> +               if ((clr) & CPACR_ELx_TTA)                              \
+> +                       cptr |=3D CPTR_EL2_TTA;                          =
+ \
+> +               if ((clr) & CPTR_EL2_TAM)                               \
+> +                       cptr |=3D CPTR_EL2_TAM;                          =
+ \
+> +               if ((clr) & CPTR_EL2_TCPAC)                             \
+> +                       cptr |=3D CPTR_EL2_TCPAC;                        =
+ \
+> +                                                                       \
+> +               cptr;                                                   \
+> +       })
 > +
-> +struct poe_context {
-> +	struct _aarch64_ctx head;
-> +	__u64 por_el0;
-> +};
-
-There is a comment section in the beginning which mentions the size
-of the context frame structure and subsequent reduction in the
-reserved range. So this new context description can be added there.
-Although looks like it is broken for za, zt and fpmr context.
-
+> +#define __cpacr_to_cptr_set(clr, set)                                  \
+> +       ({                                                              \
+> +               u64 cptr =3D 0;                                          =
+ \
+> +                                                                       \
+> +               if ((clr) & CPACR_ELx_FPEN)                             \
+> +                       cptr |=3D CPTR_EL2_TFP;                          =
+ \
+> +               if ((clr) & CPACR_ELx_ZEN)                              \
+> +                       cptr |=3D CPTR_EL2_TZ;                           =
+ \
+> +               if ((clr) & CPACR_ELx_SMEN)                             \
+> +                       cptr |=3D CPTR_EL2_TSM;                          =
+ \
+> +               if ((set) & CPACR_ELx_TTA)                              \
+> +                       cptr |=3D CPTR_EL2_TTA;                          =
+ \
+> +               if ((set) & CPTR_EL2_TAM)                               \
+> +                       cptr |=3D CPTR_EL2_TAM;                          =
+ \
+> +               if ((set) & CPTR_EL2_TCPAC)                             \
+> +                       cptr |=3D CPTR_EL2_TCPAC;                        =
+ \
+> +                                                                       \
+> +               cptr;                                                   \
+> +       })
 > +
->   /*
->    * extra_context: describes extra space in the signal frame for
->    * additional structures that don't fit in sigcontext.__reserved[].
-> diff --git a/arch/arm64/kernel/signal.c b/arch/arm64/kernel/signal.c
-> index 4a77f4976e11..077436a8bc10 100644
-> --- a/arch/arm64/kernel/signal.c
-> +++ b/arch/arm64/kernel/signal.c
-> @@ -63,6 +63,7 @@ struct rt_sigframe_user_layout {
->   	unsigned long fpmr_offset;
->   	unsigned long extra_offset;
->   	unsigned long end_offset;
-> +	unsigned long poe_offset;
+> +#define cpacr_clear_set(clr, set)                                      \
+> +       do {                                                            \
+> +               if (has_vhe() || has_hvhe())                            \
+> +                       sysreg_clear_set(cpacr_el1, clr, set);          \
+> +               else                                                    \
+> +                       sysreg_clear_set(cptr_el2,                      \
+> +                                        __cpacr_to_cptr_clr(clr, set), \
+> +                                        __cpacr_to_cptr_set(clr, set));\
+> +       } while (0)
+>=20
+> What do you think?
 
-For consistency this can be added after fpmr_offset.
+I quite like this. It is a large body of code, but it is easy to read
+and symmetric.
 
 Thanks,
-Amit
 
->   };
->   
->   #define BASE_SIGFRAME_SIZE round_up(sizeof(struct rt_sigframe), 16)
-> @@ -185,6 +186,8 @@ struct user_ctxs {
->   	u32 zt_size;
->   	struct fpmr_context __user *fpmr;
->   	u32 fpmr_size;
-> +	struct poe_context __user *poe;
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
