@@ -1,259 +1,83 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47C9D1DA22
-	for <kvmarm@lists.linux.dev>; Tue, 28 May 2024 08:21:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EE2271743;
+	Tue, 28 May 2024 10:06:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716884512; cv=none; b=VTKuLja7o4WulIKK3JgGZx3wxwRpdR4Wa87Uf5ivKsqdl8qd5a3TfQP4TNQGyu3O9kCk833/pm9CzvhPnNXysBANARJLLJM5CEPdo4EpX6xWM3vwlQakyh6LLUgVORYUT7ehX4sQAHN5kw3qtbZmZ259VFyGOxdQW5aTYf7K7nM=
+	t=1716890809; cv=none; b=kTDhjX2Sb271OAXogw12rkzMG+2Wcp7QnNM/UdjdOxgcn7rQzeRMQtXzX8DF8EkxL8M9nQ5OcVQTjaHpBrZ2qn9dqgb+WsdzD42F65FGM78EXzEOyoGP2g4yF/7vHfOF3xlqP4ATsE8HCAGMhmhmqMcBuEKs2Gzf5Ql0F+16B5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716884512; c=relaxed/simple;
-	bh=T8XtyMXUOxDkPa6rHXsZSS1yEry7dOt9zfp3Po4pmBQ=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cLeRexmwbAQM94+7nExhTaCIcWghYf0Ol4rWu6Aj7gatkHnXtNvsNW+QpzSHy42GstU4P0Fu0YOR3rWqKKlkllTq1YvyQzldiA3zpKey9vLA87t3WL9CM9X/PgHIzra9byymmNcs5E1L5Ee1jBchrIzd3L7oEZyI0Ji4lQMISJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fXsHkLUW; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1716890809; c=relaxed/simple;
+	bh=C0Lc9f035MeY02CMX3n2ZTaZkVQ6TuRa0sQ8hl6Jz1M=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jTsGHYtmLOCaxW704e4il2GunjUWWpae6U51TmnL9+D8wgB1ZUt/cctsfEKTcz1dvgmTQOBnf+pNXygdhh7Q9NSOSHtc8TjQvI4jHIkhDJBBlPPQVfcKK2xTg9qlP1osOhmY0HxB0YwiYR7XVBemsdOGIPQVfk9X990IHvY7HxU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M1XQ+8OY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fXsHkLUW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C0D2C3277B;
-	Tue, 28 May 2024 08:21:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M1XQ+8OY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6529C3277B;
+	Tue, 28 May 2024 10:06:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716884511;
-	bh=T8XtyMXUOxDkPa6rHXsZSS1yEry7dOt9zfp3Po4pmBQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fXsHkLUWh1Mhuv/m/jKVlABU3oaL5MnfGlVlieke4YOA62/GkRa5quNzZVZ7OKl57
-	 vLTeRBQTVXUlO/da3tdAw7YmaK30k7lquhM9or8GMbJ9hMzyAcbu6Bhl1pYk78iuEi
-	 HhvbUL1BvQo9kiprGMb3eR1WGIuLQ0cUbf/j6mPNAAZH5iC0ttHz/kxMwmUuvsZ2Uw
-	 e6c8l3yKWLPNRIdK29mIIhrbxSxvML6MI4q3iA5g26IbB9IZi7qJK2FulHQGb+XObj
-	 ip0br5sIrKOE6fz6M9eg539z4oj/igiAw94o0nRdtNPioHV2d9PS2B10hrZYBb51Ol
-	 IPNoNhFW2HZfw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	s=k20201202; t=1716890808;
+	bh=C0Lc9f035MeY02CMX3n2ZTaZkVQ6TuRa0sQ8hl6Jz1M=;
+	h=From:To:Cc:Subject:Date:From;
+	b=M1XQ+8OYLp9ia8ZBVNx2Lnpxhz/WbcvhIquqEMknhzUgOR7NtikVDLeqNdObyvaC3
+	 mUtzyR/1mKhM/avJ780EWNuTehJp8GkYd2VEiH+vRO5s5yjBxZ6zDvsxJ3L0Oayqth
+	 2GRECXkfFfWNkqH2v//YGzqNg7CcZRcARGCCDfxEWadvh4Uc0Sent1hOW4FhuB3SJX
+	 mQlRW/rRm3ArOculCfc7214ya8eA0mn2eCfzbKVHmhlWHiXYvbi0kPF6R2SI2mpRPa
+	 GbS8nveyT3fOCaEFT5MJx6d7GnmB+4HE3bcAoj30tjJ6xjnFsJ32NiFmnhM5lYfZT9
+	 IQ+Kvcl9IVy8Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sBs5d-00GDw2-Cw;
-	Tue, 28 May 2024 09:21:49 +0100
-Date: Tue, 28 May 2024 09:21:49 +0100
-Message-ID: <86fru2mjmq.wl-maz@kernel.org>
+	id 1sBtjC-00GFdz-S0;
+	Tue, 28 May 2024 11:06:46 +0100
 From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvmarm@lists.linux.dev,
+To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	will@kernel.org,
-	qperret@google.com,
-	seanjc@google.com,
-	alexandru.elisei@arm.com,
-	catalin.marinas@arm.com,
-	philmd@linaro.org,
-	james.morse@arm.com,
-	suzuki.poulose@arm.com,
-	oliver.upton@linux.dev,
-	mark.rutland@arm.com,
-	broonie@kernel.org,
-	joey.gouly@arm.com,
-	rananta@google.com,
-	yuzenghui@huawei.com
-Subject: Re: [PATCH v2 6/7] KVM: arm64: Eagerly restore host fpsimd/sve state in pKVM
-In-Reply-To: <CA+EHjTzUSnFpcTzBYt5fvoDAKAMNnvW4MY_9JQdoJUpwfC=Nuw@mail.gmail.com>
-References: <20240521163720.3812851-1-tabba@google.com>
-	<20240521163720.3812851-7-tabba@google.com>
-	<86o78yn5ga.wl-maz@kernel.org>
-	<CA+EHjTzUSnFpcTzBYt5fvoDAKAMNnvW4MY_9JQdoJUpwfC=Nuw@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	kvm@vger.kernel.org
+Cc: James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Joey Gouly <joey.gouly@arm.com>
+Subject: [PATCH 0/2] KVM/arm64 fixes for NV PAC support
+Date: Tue, 28 May 2024 11:06:30 +0100
+Message-Id: <20240528100632.1831995-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, will@kernel.org, qperret@google.com, seanjc@google.com, alexandru.elisei@arm.com, catalin.marinas@arm.com, philmd@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, mark.rutland@arm.com, broonie@kernel.org, joey.gouly@arm.com, rananta@google.com, yuzenghui@huawei.com
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 22 May 2024 15:48:39 +0100,
-Fuad Tabba <tabba@google.com> wrote:
->=20
-> Hi Marc,
->=20
-> On Tue, May 21, 2024 at 11:52=E2=80=AFPM Marc Zyngier <maz@kernel.org> wr=
-ote:
-> >
-> > On Tue, 21 May 2024 17:37:19 +0100,
-> > Fuad Tabba <tabba@google.com> wrote:
-> > >
-> > > When running in protected mode we don't want to leak protected
-> > > guest state to the host, including whether a guest has used
-> > > fpsimd/sve. Therefore, eagerly restore the host state on guest
-> > > exit when running in protected mode, which happens only if the
-> > > guest has used fpsimd/sve.
-> > >
-> > > As a future optimisation, we could go back to lazy restoring
-> > > state at the host after exiting non-protected guests.
-> >
-> > No. This sort of things is way too invasive and would require mapping
-> > the VHE host data at EL2. If we need to optimise this crap, then we
-> > apply the same techniques as we use for guests. If that's good enough
-> > for the guests, that's good enough for the host.
->=20
-> :D
->=20
-> > >
-> > > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > > ---
-> > >  arch/arm64/kvm/hyp/include/hyp/switch.h | 13 +++++-
-> > >  arch/arm64/kvm/hyp/nvhe/hyp-main.c      | 53 +++++++++++++++++++++++=
---
-> > >  arch/arm64/kvm/hyp/nvhe/pkvm.c          |  2 +
-> > >  arch/arm64/kvm/hyp/nvhe/switch.c        | 16 +++++++-
-> > >  4 files changed, 79 insertions(+), 5 deletions(-)
-> > >
-> > > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm=
-/hyp/include/hyp/switch.h
-> > > index 1897b73e635c..2fa29bfec0b6 100644
-> > > --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > > +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > > @@ -320,6 +320,16 @@ static inline void __hyp_sve_restore_guest(struc=
-t kvm_vcpu *vcpu)
-> > >       write_sysreg_el1(__vcpu_sys_reg(vcpu, ZCR_EL1), SYS_ZCR);
-> > >  }
-> > >
-> > > +static inline void __hyp_sve_save_host(void)
-> > > +{
-> > > +     struct user_sve_state *sve_state =3D *host_data_ptr(sve_state);
-> > > +
-> > > +     sve_state->zcr_el1 =3D read_sysreg_el1(SYS_ZCR);
-> > > +     sve_cond_update_zcr_vq(ZCR_ELx_LEN_MASK, SYS_ZCR_EL2);
-> > > +     __sve_save_state(sve_state->sve_regs + sve_ffr_offset(kvm_host_=
-sve_max_vl),
-> > > +                      &sve_state->fpsr);
-> > > +}
-> > > +
-> > >  static void kvm_hyp_save_fpsimd_host(struct kvm_vcpu *vcpu);
-> > >
-> > >  /*
-> > > @@ -356,7 +366,8 @@ static bool kvm_hyp_handle_fpsimd(struct kvm_vcpu=
- *vcpu, u64 *exit_code)
-> > >
-> > >       /* First disable enough traps to allow us to update the registe=
-rs */
-> > >       reg =3D CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN;
-> > > -     if (sve_guest)
-> > > +     if (sve_guest ||
-> > > +         (is_protected_kvm_enabled() && system_supports_sve()))
-> >
-> > This looks really ugly. Why can't we just compute sve_guest to take
-> > these conditions into account?
->=20
-> Because this is just for disabling the SVE traps, which we would need
-> to do even in the case where the guest doesn't support SVE in order to
-> be able to store the host sve state.
->=20
-> sve_guest is also used later in the function to determine whether we
-> need to restore the guest's sve state, and earlier to determine
-> whether an SVE trap from a non-sve guest should result in injecting an
-> undef instruction.
->=20
-> That said, maybe the following is a bit less ugly?
->=20
->     if (sve_guest || (is_protected_kvm_enabled() && system_supports_sve()=
-))
->         cpacr_clear_set(0, CPACR_ELx_FPEN|CPACR_ELx_ZEN);
->     else
->         cpacr_clear_set(0, CPACR_ELx_FPEN);
+Here's a small series of fixes following the introduction of NV PAuth
+support in 6.10:
 
-Yes, this looks marginally better. Overall, this helper is in dire
-need of a full rewrite...
+- address the relative priorities of Instruction abort, Illegal
+  Execution state, and PAC failure (already posted)
 
-> >
-> > >               reg |=3D CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN;
-> > >       cpacr_clear_set(0, reg);
-> > >       isb();
-> > > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/=
-nvhe/hyp-main.c
-> > > index b07d44484f42..f79f0f7b2759 100644
-> > > --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > > @@ -23,20 +23,66 @@ DEFINE_PER_CPU(struct kvm_nvhe_init_params, kvm_i=
-nit_params);
-> > >
-> > >  void __kvm_hyp_host_forward_smc(struct kvm_cpu_context *host_ctxt);
-> > >
-> > > +static void __hyp_sve_save_guest(struct kvm_vcpu *vcpu)
-> > > +{
-> > > +     __vcpu_sys_reg(vcpu, ZCR_EL1) =3D read_sysreg_el1(SYS_ZCR);
-> > > +     sve_cond_update_zcr_vq(vcpu_sve_max_vq(vcpu) - 1, SYS_ZCR_EL2);
-> > > +     __sve_save_state(vcpu_sve_pffr(vcpu), &vcpu->arch.ctxt.fp_regs.=
-fpsr);
-> > > +     sve_cond_update_zcr_vq(ZCR_ELx_LEN_MASK, SYS_ZCR_EL2);
-> > > +}
-> > > +
-> > > +static void __hyp_sve_restore_host(void)
-> > > +{
-> > > +     struct user_sve_state *sve_state =3D *host_data_ptr(sve_state);
-> > > +
-> > > +     sve_cond_update_zcr_vq(ZCR_ELx_LEN_MASK, SYS_ZCR_EL2);
-> > > +     __sve_restore_state(sve_state->sve_regs + sve_ffr_offset(kvm_ho=
-st_sve_max_vl),
-> >
-> > This is what I was worried about in a previous patch.
-> > kvm_host_sve_max_vl represents the max VL across all CPUs. if CPU0
-> > supports 128bit SVE and CPU1 256bit, the value is 256. but on CPU0,
-> > ZCR_ELx_LEN_MASK will results in using 128bit accesses, and the offset
-> > will be wrong. I can't convince myself that anything really goes wrong
-> > as long as we're consistent between save and restore, but that's at
-> > best ugly and needs extensive documenting.
->=20
-> As I mentioned in my reply to the previous patch, I _think_ that it
-> represents the maximum common VL across CPUs. Since the value comes
-> from vl_info.vq_map, which is calculated by filtering out all the VQs
-> not supported.
->=20
-> In kvm_arch_vcpu_put_fp(), we always assume the maximum VL supported
-> by the guest, regardless of which cpu this happens to be running on.
-> That said, there's a comment there outlining that. I'll add a comment
-> here to document it.
+- Expose BTI to a NV guest now that we have PAC up and running
 
-That'd be helpful, thanks.
-
->=20
-> > On top of that, a conditional update of ZCR_EL2 with ZCR_ELx_LEN_MASK
-> > is unlikely to be beneficial, since nobody implements 2k vectors. A
-> > direct write followed by an ISB is likely to be better.
->=20
-> Will do.
-
-[..]
-
-> > > diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe=
-/pkvm.c
-> > > index 25e9a94f6d76..feb27b4ce459 100644
-> > > --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> > > +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> > > @@ -588,6 +588,8 @@ int __pkvm_init_vcpu(pkvm_handle_t handle, struct=
- kvm_vcpu *host_vcpu,
-> > >       if (ret)
-> > >               unmap_donated_memory(hyp_vcpu, sizeof(*hyp_vcpu));
-> > >
-> > > +     hyp_vcpu->vcpu.arch.cptr_el2 =3D kvm_get_reset_cptr_el2(&hyp_vc=
-pu->vcpu);
-> > > +
-> >
-> > Eventually, we need to rename this to cpacr_el2 and make sure we
-> > consistently use the VHE format everywhere. I'm starting to be worried
-> > that we mix things badly.
->=20
-> Would you like me to do that in this patch series, or should I submit
-> another one after this that does this cleanup?
-
-Later please. Let's focus on getting this series across first.
-
-Thanks,
+Unless someone shouts, I'll take these patches in the next batch of
+fixes.
 
 	M.
 
---=20
-Without deviation from the norm, progress is not possible.
+Marc Zyngier (2):
+  KVM: arm64: nv: Fix relative priorities of exceptions generated by
+    ERETAx
+  KVM: arm64: nv: Expose BTI and CSV_frac to a guest hypervisor
+
+ arch/arm64/kvm/emulate-nested.c | 21 +++++++++++----------
+ arch/arm64/kvm/nested.c         |  6 ++++--
+ 2 files changed, 15 insertions(+), 12 deletions(-)
+
+-- 
+2.39.2
+
