@@ -1,173 +1,176 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2976216EBE2
-	for <kvmarm@lists.linux.dev>; Tue, 28 May 2024 12:59:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EE0117E8F0
+	for <kvmarm@lists.linux.dev>; Tue, 28 May 2024 13:14:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716901185; cv=none; b=OSmofTkz3tvXUATMIaYQXIRm8rLrS9BJodQEhQBCZfixGMG6vesU06ZkGmOOj8kHl9bh/o6Y3exakkmcI3hFe2gRxJlGceQ4GfbgsAoI1BUVaFs3l26Dx/2Zjobq5UNKJ3HC12yPfNpSZ5TKGHitF23Zhdl6CCaZD27uHZjXsG8=
+	t=1716902073; cv=none; b=imKcWHaCLhLcRM2jgnQKzOQRPA8dkMOFkMz4oh1LkVfAD9Z4Lqr6Nek6nS7bwayfEBfpkuWx9x7zDj/H6WT5OLUtKARJetozlAJHqpT2Itn4MQd6B9a8jiwqrYXArEFxv5DA4ByUkanCmp9Q1nJj0Rh0viikk8I8IBnS6BCtqZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716901185; c=relaxed/simple;
-	bh=b93J8VkAlUzexjAir/I5KU+AQpoLiteuuU8SDA5ywYY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=X+YKbfv1LQFy5mLFJR9WXlioaIHljr5MTuHu1xZO3lPhH2InERLaDc5/2K2wIBBTy21xxmsynJNNXtQiA0QqWuGOATKl0moYkWi7IO5/Nar2Z3zlruHSHYQZ2v6mG5Nsq3gy9VbtTHxyDfuCBOMKI39YQFkreGEbmpDM+9bzNdk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=d7nyB3IU; arc=none smtp.client-ip=209.85.219.202
+	s=arc-20240116; t=1716902073; c=relaxed/simple;
+	bh=epG9EF3K6e/qKPmu9qd2urkJjOCa+D4Eyo2op5nCbxQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=A1mrGNjVus3Dp0GJQo23Qd3hTSFQGGJj2yucztHgnI8hesqcP/HDa7RUlbqQ3gfyserA2vG3KJv3bVIhdDU3zjM0Xga4YjFdxCj5Fh+9I5Bf1eoREyEyWIismMOMWhfArszKUI4v+jOkIPoQWiJ1tzZDEHBMQYrK+/0KCUvj56g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DbDbXN4i; arc=none smtp.client-ip=209.85.210.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="d7nyB3IU"
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-df78fddad5dso1429897276.2
-        for <kvmarm@lists.linux.dev>; Tue, 28 May 2024 05:59:44 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DbDbXN4i"
+Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-6f8e287fa3eso436527a34.2
+        for <kvmarm@lists.linux.dev>; Tue, 28 May 2024 06:14:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1716901183; x=1717505983; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=++8ZcPZ7JmSDdoaVdv9H+c7hOtXhBJRAEHQi6Uobc0k=;
-        b=d7nyB3IUl5yImeXETs/D43BvEw9k7UTOqzhYG6O3pRE0tj4Qb70I2Kssx3+AN61nyk
-         uyBzu7IkU6V2+7l9fsPfHttO7Y4rmwKstyqK+eWp9cva9D7AEaDSEY21IofvvzQdSMqM
-         41xQGDWSzSqOAE+GWtokg0qD5c0xHGwakzaCVGOgn84O00uxjjrdLfYMcgDQNtbHcKWe
-         2mVm2nk4cm/zFV4AroDeBmXeUOh/Wo1XqUjTKnNgHHf+FZPFPPnW3VqT6BWeBLBCb2f8
-         2tTPm43gMq2y5F9bgk/56ETUB84xsoe6u6TV6bsyhsg4djZHkhOzE8pErzXHhUIDQmBc
-         LeAQ==
+        d=google.com; s=20230601; t=1716902070; x=1717506870; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FMv6uxFhRlM6GGDjH1s2TgUkooWl+cbY6LhYE+ObOmw=;
+        b=DbDbXN4iZ9iZ1v1l+Jfa65I/uWqvg6s/ikLZN7trUbVbeEullXGzWHwEZlTbQzfruR
+         q8KWGiXPTrqKXnlGcRS5TuBpH05Lh3jtNILilemTFRw80Z2lmWKyYZGQvhngYEe+0YVU
+         e39n0m1fKIgQpP0wJ8dBCL/LgUeQT6flA9ePZ32eYvKlz3pMhUKpYagulLUfjcF2is4t
+         a13vkQ7qjzfFO5JJ6hxPbuK1kJpmpPWV1T+2Rk82tiyC0Zxj5XRAdoj2vo367clLSJ0Y
+         //vWx70Cw7xxEKXkTKE+eMvYKcPVnlvvuORlrwKHW+uBZgKYkKKKs6j/DLjdxzh9Yuu3
+         /3SQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716901183; x=1717505983;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=++8ZcPZ7JmSDdoaVdv9H+c7hOtXhBJRAEHQi6Uobc0k=;
-        b=stVz9AtiO1ebT/riEUgsRHuXJx8kk0GXpjdEqWgFKv9pH4PdqPfqJDodOtS0QDRUAs
-         hRLdyMOEFtZGSX93u8tGW+4yAE5qOfdk64BZiwVXG6cgYxl5zwCtwffVp/j9yGRWmAk7
-         WLQA3EEhq8Ki+RtuYI2diHl5kvXFR5tWA9fgK8gpfXrU7TUmBy1dags4Dfx7gNRRfS8f
-         54e6fuZdbee4Qm8fm3w26wigkz75ba9nm7AkVvkYwF/4HiYk9sL09jF62Tt6rJTpXw9c
-         V0w4gMoJyh0/rljqRQrBSoFPL6DKuZnctKZ601awUZ+QEhih9U7t23Bov8DtxOjlF0vH
-         2lhg==
-X-Gm-Message-State: AOJu0Yz/YlwQQL+88hZXAlqbeboF4dDeV+sA+0ndH6AHf5x20+h00by5
-	0SVezLU5lZJkyQ8BObRKubBgsueRr0mbk84vC45n+Doh4fe7n7BLIwg7qKns05MItki2E7yd44P
-	6uE6q5mZ7tZh9txNNX1k9j12/Og8P3MFTd4nt6+aQzYQgEK/AGZ9sYhZntQI8kyi89kksEhlxc4
-	Ng2VnufVK8NRhN1KJvigJHr3eT0G8=
-X-Google-Smtp-Source: AGHT+IEPAeu+KJVWIW2O5bB77nX8DiOlJ1pK44114PVXZ79vL0TmP/aTXBjIhQZT5mdFAlyljkxztiU/Pw==
-X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:6902:154a:b0:df7:a1b9:c0cb with SMTP id
- 3f1490d57ef6-df7a1b9c281mr1535457276.3.1716901183268; Tue, 28 May 2024
- 05:59:43 -0700 (PDT)
-Date: Tue, 28 May 2024 13:59:14 +0100
-In-Reply-To: <20240528125914.277057-1-tabba@google.com>
+        d=1e100.net; s=20230601; t=1716902070; x=1717506870;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FMv6uxFhRlM6GGDjH1s2TgUkooWl+cbY6LhYE+ObOmw=;
+        b=i8/Y6xKVPTBffpN88aDahskQvt/tOFyl31RgZDEfX+kgKqDreHoODTBCFkVP4vByIN
+         WTP+7i3O37eGQTbghi90bE74rGpxfuTNSFzhDwUkTqK3N+ynCP/wVLhslueXPwn4jOpJ
+         KWwQKp/XMjyyKMQRDV3ACNESdM/a7tjjYOtrnhGttwyZVtjm6ohpjrRvlDziAj9AL5iu
+         5LuO76eR/fqUPyQZ7ZB8IfFIsra+qcBI2oeNgFwL3WKABYELkzmRKVj7xFM7IIqQ7pc6
+         QqLmFs8EDIoum1QgY4GHe3AKEE18/ArdrGAHEVTwbkZwPaRV2ISXO7RC0su5F8XYi/ij
+         7eqA==
+X-Gm-Message-State: AOJu0Yzd+HsVesb/+p10uInmjwAlwPeL0QpUMspcOhOtScuQY8dPXNi/
+	eRc7vX7ZDU09/lQ8JTRSNxYDgtkEX+4kpGVyT+GlNVsQZlNDB6IENSyS1GqpyEHz2pFHKQapxAf
+	d7c4+sJEx4gHG6RKAVr1H6vE1u4embl65UfvaUioll03ie0nqyNYt
+X-Google-Smtp-Source: AGHT+IEz+6e5XtCNTnfFK2Lbjq/41CpB9x2JNCfnI/aO0gIJbIOU27gw1JSZGYZXv7eZjn4kxJTmGhI2frU4lHbas5A=
+X-Received: by 2002:a9d:6a98:0:b0:6f0:e64f:de95 with SMTP id
+ 46e09a7af769-6f8d0a7e035mr13036591a34.2.1716902070294; Tue, 28 May 2024
+ 06:14:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
+MIME-Version: 1.0
 References: <20240528125914.277057-1-tabba@google.com>
-X-Mailer: git-send-email 2.45.1.288.g0e0cd299f1-goog
-Message-ID: <20240528125914.277057-12-tabba@google.com>
-Subject: [PATCH v3 11/11] KVM: arm64: Drop sve_cond_update_zcr_vq_*
+In-Reply-To: <20240528125914.277057-1-tabba@google.com>
 From: Fuad Tabba <tabba@google.com>
+Date: Tue, 28 May 2024 14:13:53 +0100
+Message-ID: <CA+EHjTwaMSBL2XXyAki1qKB6KJRQzL-hx9DFhEiBJdmsi39rJw@mail.gmail.com>
+Subject: Re: [PATCH v3 00/11] KVM: arm64: Fix handling of host fpsimd/sve
+ state in protected mode
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
-Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com, 
-	seanjc@google.com, alexandru.elisei@arm.com, catalin.marinas@arm.com, 
-	philmd@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, 
-	oliver.upton@linux.dev, mark.rutland@arm.com, broonie@kernel.org, 
-	joey.gouly@arm.com, rananta@google.com, yuzenghui@huawei.com
+Cc: maz@kernel.org, will@kernel.org, qperret@google.com, seanjc@google.com, 
+	alexandru.elisei@arm.com, catalin.marinas@arm.com, philmd@linaro.org, 
+	james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, 
+	mark.rutland@arm.com, broonie@kernel.org, joey.gouly@arm.com, 
+	rananta@google.com, yuzenghui@huawei.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The conditional update likely doesn't help performance, but makes
-the code a bit more difficult to read. Remove these macros and
-just write directly to ZCR.
+Hi,
 
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
-This patch is meant as an RFC, and undoes the previous patch.
-Please feel free to accept/drop whichever patches you think make
-sense.
----
- arch/arm64/include/asm/fpsimd.h         | 21 ---------------------
- arch/arm64/kvm/fpsimd.c                 |  4 ++--
- arch/arm64/kvm/hyp/include/hyp/switch.h |  3 ++-
- arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  3 ++-
- 4 files changed, 6 insertions(+), 25 deletions(-)
+On Tue, May 28, 2024 at 1:59=E2=80=AFPM Fuad Tabba <tabba@google.com> wrote=
+:
+>
+> Changes since v2 [1]
+> - Rebased on Linux 6.10-rc1 (1613e604df0c)
+> - Apply suggestions/fixes suggested for V2 (Marc)
+> - Add an isb() to __hyp_sve_restore_guest()
+> - Squash patch that introduces kvm_host_sve_max_vl with following
+>   patch, since it's used there
+> - Some refactoring and tidying up
+> - Introduce and use sve_cond_update_zcr_vq_isb(), which only does
+>   an isb() if ZCR is updated (RFC, next to last patch)
 
-diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
-index 531f805e4643..d5ef1cf34e10 100644
---- a/arch/arm64/include/asm/fpsimd.h
-+++ b/arch/arm64/include/asm/fpsimd.h
-@@ -219,24 +219,6 @@ static inline void sve_user_enable(void)
- 	sysreg_clear_set(cpacr_el1, 0, CPACR_EL1_ZEN_EL0EN);
- }
- 
--#define __sve_cond_update_zcr_vq(val, reg, sync)	\
--	do {						\
--		u64 __zcr = read_sysreg_s((reg));	\
--		u64 __new = __zcr & ~ZCR_ELx_LEN_MASK;	\
--		__new |= (val) & ZCR_ELx_LEN_MASK;	\
--		if (__zcr != __new) {			\
--			write_sysreg_s(__new, (reg));	\
--			if (sync)			\
--				isb();			\
--		}					\
--	} while (0)
--
--#define sve_cond_update_zcr_vq(val, reg)		\
--	__sve_cond_update_zcr_vq(val, reg, false)
--
--#define sve_cond_update_zcr_vq_isb(val, reg)		\
--	__sve_cond_update_zcr_vq(val, reg, true)
--
- /*
-  * Probing and setup functions.
-  * Calls to these functions must be serialised with one another.
-@@ -338,9 +320,6 @@ static inline bool sve_vq_available(unsigned int vq) { return false; }
- static inline void sve_user_disable(void) { BUILD_BUG(); }
- static inline void sve_user_enable(void) { BUILD_BUG(); }
- 
--#define sve_cond_update_zcr_vq(val, reg) do { } while (0)
--#define sve_cond_update_zcr_vq_isb(val, reg) do { } while (0)
--
- static inline void vec_init_vq_map(enum vec_type t) { }
- static inline void vec_update_vq_map(enum vec_type t) { }
- static inline int vec_verify_vq_map(enum vec_type t) { return 0; }
-diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-index eb21f29d91fc..bf8bf9975951 100644
---- a/arch/arm64/kvm/fpsimd.c
-+++ b/arch/arm64/kvm/fpsimd.c
-@@ -187,8 +187,8 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
- 			 * role when doing the save from EL2.
- 			 */
- 			if (!has_vhe())
--				sve_cond_update_zcr_vq(vcpu_sve_max_vq(vcpu) - 1,
--						       SYS_ZCR_EL1);
-+				write_sysreg_s(vcpu_sve_max_vq(vcpu) - 1,
-+					       SYS_ZCR_EL1);
- 		}
- 
- 		/*
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 162a60bcc27d..800dd4e1bcbe 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -314,7 +314,8 @@ static bool kvm_hyp_handle_mops(struct kvm_vcpu *vcpu, u64 *exit_code)
- 
- static inline void __hyp_sve_restore_guest(struct kvm_vcpu *vcpu)
- {
--	sve_cond_update_zcr_vq_isb(vcpu_sve_max_vq(vcpu) - 1, SYS_ZCR_EL2);
-+	write_sysreg_s(vcpu_sve_max_vq(vcpu) - 1, SYS_ZCR_EL2);
-+	isb();
- 	__sve_restore_state(vcpu_sve_pffr(vcpu),
- 			    &vcpu->arch.ctxt.fp_regs.fpsr);
- 	write_sysreg_el1(__vcpu_sys_reg(vcpu, ZCR_EL1), SYS_ZCR);
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index cef51fe80aa8..0feacd13b4c2 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -31,7 +31,8 @@ static void __hyp_sve_save_guest(struct kvm_vcpu *vcpu)
- 	 * the guest. The layout of the data when saving the sve state depends
- 	 * on the VL, so use a consistent (i.e., the maximum) guest VL.
- 	 */
--	sve_cond_update_zcr_vq_isb(vcpu_sve_max_vq(vcpu) - 1, SYS_ZCR_EL2);
-+	write_sysreg_s(vcpu_sve_max_vq(vcpu) - 1, SYS_ZCR_EL2);
-+	isb();
- 	__sve_save_state(vcpu_sve_pffr(vcpu), &vcpu->arch.ctxt.fp_regs.fpsr);
- 	write_sysreg_s(ZCR_ELx_LEN_MASK, SYS_ZCR_EL2);
- }
--- 
-2.45.1.288.g0e0cd299f1-goog
+Just realized that
 
+"An indirect read of ZCR_EL1.LEN appears to occur in program order
+relative to a direct write of the same register, without the need for
+explicit synchronization."
+https://developer.arm.com/documentation/ddi0595/2021-03/AArch64-Registers/Z=
+CR-EL2--SVE-Control-Register--EL2-
+
+I'll wait until I get comments on this series as it is before
+respinning. Apologies for the spam.
+
+Cheers,
+/fuad
+
+> - Remove sve_cond_update_zcr_vq_*, since it's not likely to help
+>   much (RFC, last patch)
+>
+> With the KVM host data rework [2], handling of fpsimd and sve
+> state in protected mode is done at hyp. For protected VMs, we
+> don't want to leak any guest state to the host, including whether
+> a guest has used fpsimd/sve.
+>
+> To complete the work started with the host data rework, in
+> regards to protected mode, ensure that the host's fpsimd context
+> and its sve context are restored on guest exit, since the rework
+> has hidden the fpsimd/sve state from the host.
+>
+> This patch series eagerly restores the host fpsimd/sve state on
+> guest exit when running in protected mode, which happens only if
+> the guest has used fpsimd/sve. This means that the saving of the
+> state is lazy, similar to the behavior of KVM in other modes, but
+> the restoration of the host state is eager.
+>
+> The last two patches are not essential to this patch series, and
+> the last one undoes the next-to-last. Please consider only one
+> (or neither) of these two patches for inclusion.
+>
+> This series is based on Linux 6.10-rc1 (1613e604df0c).
+>
+> Tested on qemu, with the kernel sve stress tests.
+>
+> Cheers,
+> /fuad
+>
+> [1] https://lore.kernel.org/all/20240521163720.3812851-1-tabba@google.com=
+/
+> [2] https://lore.kernel.org/all/20240322170945.3292593-1-maz@kernel.org/
+>
+> Fuad Tabba (11):
+>   KVM: arm64: Reintroduce __sve_save_state
+>   KVM: arm64: Abstract set/clear of CPTR_EL2 bits behind helper
+>   KVM: arm64: Specialize handling of host fpsimd state on trap
+>   KVM: arm64: Allocate memory mapped at hyp for host sve state in pKVM
+>   KVM: arm64: Eagerly restore host fpsimd/sve state in pKVM
+>   KVM: arm64: Consolidate initializing the host data's fpsimd_state/sve
+>     in pKVM
+>   KVM: arm64: Refactor CPACR trap bit setting/clearing to use ELx format
+>   KVM: arm64: Add an isb before restoring guest sve state
+>   KVM: arm64: Do not use sve_cond_update_zcr updating with
+>     ZCR_ELx_LEN_MASK
+>   KVM: arm64: Do not perform an isb() if ZCR_EL2 isn't updated
+>   KVM: arm64: Drop sve_cond_update_zcr_vq_*
+>
+>  arch/arm64/include/asm/el2_setup.h      |  6 +-
+>  arch/arm64/include/asm/fpsimd.h         | 11 ----
+>  arch/arm64/include/asm/kvm_arm.h        |  6 ++
+>  arch/arm64/include/asm/kvm_emulate.h    | 71 +++++++++++++++++++++--
+>  arch/arm64/include/asm/kvm_host.h       | 25 +++++++-
+>  arch/arm64/include/asm/kvm_hyp.h        |  2 +
+>  arch/arm64/include/asm/kvm_pkvm.h       |  9 +++
+>  arch/arm64/kvm/arm.c                    | 76 +++++++++++++++++++++++++
+>  arch/arm64/kvm/fpsimd.c                 |  8 +--
+>  arch/arm64/kvm/hyp/fpsimd.S             |  6 ++
+>  arch/arm64/kvm/hyp/include/hyp/switch.h | 36 ++++++------
+>  arch/arm64/kvm/hyp/include/nvhe/pkvm.h  |  1 -
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c      | 75 +++++++++++++++++++++---
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c          | 17 ++----
+>  arch/arm64/kvm/hyp/nvhe/setup.c         | 25 +++++++-
+>  arch/arm64/kvm/hyp/nvhe/switch.c        | 24 +++++++-
+>  arch/arm64/kvm/hyp/vhe/switch.c         | 12 ++--
+>  arch/arm64/kvm/reset.c                  |  3 +
+>  18 files changed, 342 insertions(+), 71 deletions(-)
+>
+>
+> base-commit: 1613e604df0cd359cf2a7fbd9be7a0bcfacfabd0
+> --
+> 2.45.1.288.g0e0cd299f1-goog
+>
