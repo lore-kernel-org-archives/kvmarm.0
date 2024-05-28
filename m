@@ -1,89 +1,115 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0700C1E4BF;
-	Mon, 27 May 2024 16:48:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D19571BDD3
+	for <kvmarm@lists.linux.dev>; Tue, 28 May 2024 06:55:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716828530; cv=none; b=Qq2ZLZnnaJuHta33Qxk1owt18xo7cbR0VH3SGq1rrBluZTTg0in8mzh8kAf1pCNTaX8+jR25caQ0GH17Erk2gLoSofBSoxNErOxnZvvlIPty14Gb/4wHae7HDc06PPhNupBESOf7P2h6Sl7XhdGJWCmVfoIpacjjVungikGb8OE=
+	t=1716879327; cv=none; b=MqinKHeu/I2VkvBM7jHucAuHYsSdUEejxaQCezdJocTASC91DyZ+18OFFqAISbzu53I701QDw37YKW4YZ/MGxYC0uBiqMD188L8pvj8m/DS/aXTNIg1yvlOYCbYS/L0WOJTzO6xCH2HaAI4D3AEkSMeGVlKDXHhKx/g2l4nZ/RM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716828530; c=relaxed/simple;
-	bh=Vxt4wZu1D8rsoBLveSFL22Ki4caTFHV/R39xu/DzFY0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rHXWzuqR3CxdcBhZr/w92Djaw8YdJOuivq/LhQKDKDJt52jWp74pfF2g2mO233vAdEXicDUHLN6Xtjj9THQdDVc8C7hKv1zBaQ0sslby0Ye49nD8Pz1AT0s0GqGVkP1VVd2WIu1+dovdX67G6D6bItkNP9lsJMuzAvfvFAaoscQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gihk2WUd; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gihk2WUd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AD31C2BBFC;
-	Mon, 27 May 2024 16:48:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716828529;
-	bh=Vxt4wZu1D8rsoBLveSFL22Ki4caTFHV/R39xu/DzFY0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=gihk2WUdbo4BHbXXN22Ub/e8biVwtYDRP8uK4K0r5I762uFUeHkh6B8cjbV6rP1Vm
-	 LulFHUmdC8mWefFqcgMQT+HU6KRWf16Na64Mjm4eZur2bo3hFhKwOrLqeiuphmeW6D
-	 +WM7HE/hQ6AAZ9zaH6YB5RI2AEjhJxlvySzIazkb1w7aM4zYLMTvGg1Xqr3mM1Sli1
-	 0SFeUFpxBm1/lUhba1tHyj8/L+ek9QX0oqjwFYtCjSRNWiU5WKROYfV+7b4jQUvMtJ
-	 S1Z8hT0WjqpFMZK3BJ3WKLd799JXQFdm1kJItLwv5IJLo6ZYOJqZ6ba1DvsYPFSJ/9
-	 04l802U0sGEqQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sBdWh-00FyEn-6j;
-	Mon, 27 May 2024 17:48:47 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Marc Zyngier <maz@kernel.org>
-Cc: Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 0/3] KVM/arm64 fixes for AArch32 handling
-Date: Mon, 27 May 2024 17:48:33 +0100
-Message-Id: <171682850243.1823849.5447352038599596772.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240524141956.1450304-1-maz@kernel.org>
-References: <20240524141956.1450304-1-maz@kernel.org>
+	s=arc-20240116; t=1716879327; c=relaxed/simple;
+	bh=BF2nYbG8XK7M/dOe/WkvEWY8Wc4GRw1KBhYDuTM/0Ns=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=h5BlxuV1eFWTFhP5C1r3zUCZJs7TaqJ8Bo8mbj+yqk1KxGrzi9c1kJJ7UnGqN1yT3HDxTq1g8YRHDZQtL2Lpran75rroMwqY8e5XrTrEvApewDDg+gidmDXQHYEwqrMb+ipcYq4yhJCbm3zrE72LVb6M9xG0oMIGuEhQp9Gn3RU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 88109339;
+	Mon, 27 May 2024 23:55:43 -0700 (PDT)
+Received: from [10.162.40.16] (a077841.arm.com [10.162.40.16])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 77D173F792;
+	Mon, 27 May 2024 23:55:11 -0700 (PDT)
+Message-ID: <4f7d8691-fe19-4e8a-95e5-9f7680c82021@arm.com>
+Date: Tue, 28 May 2024 12:24:57 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, maz@kernel.org, nsg@linux.ibm.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+User-Agent: Mozilla Thunderbird
+From: Amit Daniel Kachhap <amitdaniel.kachhap@arm.com>
+Subject: Re: [PATCH v4 13/29] arm64: convert protection key into vm_flags and
+ pgprot values
+To: Joey Gouly <joey.gouly@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: akpm@linux-foundation.org, aneesh.kumar@kernel.org,
+ aneesh.kumar@linux.ibm.com, bp@alien8.de, broonie@kernel.org,
+ catalin.marinas@arm.com, christophe.leroy@csgroup.eu,
+ dave.hansen@linux.intel.com, hpa@zytor.com, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org, maz@kernel.org,
+ mingo@redhat.com, mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com,
+ npiggin@gmail.com, oliver.upton@linux.dev, shuah@kernel.org,
+ szabolcs.nagy@arm.com, tglx@linutronix.de, will@kernel.org, x86@kernel.org,
+ kvmarm@lists.linux.dev
+References: <20240503130147.1154804-1-joey.gouly@arm.com>
+ <20240503130147.1154804-14-joey.gouly@arm.com>
+Content-Language: en-US
+In-Reply-To: <20240503130147.1154804-14-joey.gouly@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, 24 May 2024 15:19:53 +0100, Marc Zyngier wrote:
-> The (very much unloved) AArch32 handling has recently been found
-> lacking in a number of ways:
+
+
+On 5/3/24 18:31, Joey Gouly wrote:
+> Modify arch_calc_vm_prot_bits() and vm_get_page_prot() such that the pkey
+> value is set in the vm_flags and then into the pgprot value.
 > 
-> - Nina spotted a brown paper-bag quality bug in the register narrowing
->   code when writing one of the core registers (GPRs, PSTATE) from
->   userspace
+> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will@kernel.org>
+> ---
+>   arch/arm64/include/asm/mman.h | 8 +++++++-
+>   arch/arm64/mm/mmap.c          | 9 +++++++++
+>   2 files changed, 16 insertions(+), 1 deletion(-)
 > 
-> [...]
+> diff --git a/arch/arm64/include/asm/mman.h b/arch/arm64/include/asm/mman.h
+> index 5966ee4a6154..ecb2d18dc4d7 100644
+> --- a/arch/arm64/include/asm/mman.h
+> +++ b/arch/arm64/include/asm/mman.h
+> @@ -7,7 +7,7 @@
+>   #include <uapi/asm/mman.h>
+>   
+>   static inline unsigned long arch_calc_vm_prot_bits(unsigned long prot,
+> -	unsigned long pkey __always_unused)
+> +	unsigned long pkey)
+>   {
+>   	unsigned long ret = 0;
+>   
+> @@ -17,6 +17,12 @@ static inline unsigned long arch_calc_vm_prot_bits(unsigned long prot,
+>   	if (system_supports_mte() && (prot & PROT_MTE))
+>   		ret |= VM_MTE;
+>   
+> +#if defined(CONFIG_ARCH_HAS_PKEYS)
 
-Applied to fixes, thanks!
+Should there be system_supports_poe() check like above?
 
-[1/3] KVM: arm64: Fix AArch32 register narrowing on userspace write
-      commit: 947051e361d551e0590777080ffc4926190f62f2
-[2/3] KVM: arm64: Allow AArch32 PSTATE.M to be restored as System mode
-      commit: dfe6d190f38fc5df5ff2614b463a5195a399c885
-[3/3] KVM: arm64: AArch32: Fix spurious trapping of conditional instructions
-      commit: c92e8b9eacebb4060634ebd9395bba1b29aadc68
+Thanks,
+Amit
 
-Cheers,
-
-	M.
--- 
-Without deviation from the norm, progress is not possible.
-
-
+> +	ret |= pkey & 0x1 ? VM_PKEY_BIT0 : 0;
+> +	ret |= pkey & 0x2 ? VM_PKEY_BIT1 : 0;
+> +	ret |= pkey & 0x4 ? VM_PKEY_BIT2 : 0;
+> +#endif
+> +
+>   	return ret;
+>   }
+>   #define arch_calc_vm_prot_bits(prot, pkey) arch_calc_vm_prot_bits(prot, pkey)
+> diff --git a/arch/arm64/mm/mmap.c b/arch/arm64/mm/mmap.c
+> index 642bdf908b22..86eda6bc7893 100644
+> --- a/arch/arm64/mm/mmap.c
+> +++ b/arch/arm64/mm/mmap.c
+> @@ -102,6 +102,15 @@ pgprot_t vm_get_page_prot(unsigned long vm_flags)
+>   	if (vm_flags & VM_MTE)
+>   		prot |= PTE_ATTRINDX(MT_NORMAL_TAGGED);
+>   
+> +#ifdef CONFIG_ARCH_HAS_PKEYS
+> +	if (vm_flags & VM_PKEY_BIT0)
+> +		prot |= PTE_PO_IDX_0;
+> +	if (vm_flags & VM_PKEY_BIT1)
+> +		prot |= PTE_PO_IDX_1;
+> +	if (vm_flags & VM_PKEY_BIT2)
+> +		prot |= PTE_PO_IDX_2;
+> +#endif
+> +
+>   	return __pgprot(prot);
+>   }
+>   EXPORT_SYMBOL(vm_get_page_prot);
