@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ADA613C801
-	for <kvmarm@lists.linux.dev>; Tue, 28 May 2024 07:58:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E67686F079
+	for <kvmarm@lists.linux.dev>; Tue, 28 May 2024 08:16:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716883087; cv=none; b=Mhwt9TjsqaWMRQAXPU8CxMtA5DK9m6kJzH693Smqut6As8aOhwxTLZmomm+blBXNUetmvPSnfodlhVggcaKzv3uEs8I7Cmy8xxr4TscDPAi/3Vr4SoIYRS9W6sXKsAFE0N4TURVwhw6QpVKiax5oNq5wKlfzaPGunbYuBFjFNFA=
+	t=1716884188; cv=none; b=ceYguki5B4t66cKQK6+oaOy/GpkAG29nUoMeEar3y9/sGuL4w8DarZIcGrtmm1cspl9LMkHDGmpYIaz8oFEn8cipxyQFm/DSN7o2m42WOAkI5oaV/fwJNDozAuB14YBcvbZAmnkM36syfSDrJ4QK/z0H1QvlJBtPFW3cG+w8XAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716883087; c=relaxed/simple;
-	bh=rDiboxDdzeGhERGhVAFrCsaWNO2x/FdCE95ENbIFRCg=;
+	s=arc-20240116; t=1716884188; c=relaxed/simple;
+	bh=c/aCl4A92v+AL/YnLF2mG4LjuecMfHezvyygU6RSG+M=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=f/T3E/tBnXfNQ9R4Hwl70xug4NrXzF8t5IjFM32C3oRBqbDZWIfRDOQQU+ZS/4zT5fCcTtkdiYMuvef1PqicnvdhTFuTzNn33zhLhUzCYv5jamsK5YDrOXS/lJO+TSEVmRtsberwK4AOh42en78TzcVMgR+WeaRdy7fkC7gEsQM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TWfvRLPn; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=Ix5m/OmMBl9iADbbgTpDVD065RgE4FjS7q1PuDOQUhLJIaulp88Vbp5Vv2eUkrMEITwETu8Iwn90qnc6Sbfnm2Bguq5myou7Ig8ix0R4f60YJWmNupLZ4B55+yVYN7bLnvhvebJtgrvGamxdc2mXkQ9Xv734KIXlInkNTyZxCYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mu2W787A; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TWfvRLPn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C113C3277B;
-	Tue, 28 May 2024 07:58:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mu2W787A"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61186C3277B;
+	Tue, 28 May 2024 08:16:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716883087;
-	bh=rDiboxDdzeGhERGhVAFrCsaWNO2x/FdCE95ENbIFRCg=;
+	s=k20201202; t=1716884187;
+	bh=c/aCl4A92v+AL/YnLF2mG4LjuecMfHezvyygU6RSG+M=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=TWfvRLPnx2KW+hJs9iigUvWAfGeHRMKNsaXkKPp/COJU6FlXfJ0WZusQlCd0cRIo/
-	 qgHIi/ZI6vuYaezt/BeubrjZA67UA0JmTTWj69MR6W37dMt+KkoO9b++AkVD3vqatd
-	 Lm4r+QuMnHrMc/l/txrTJc4sYFMGD+frG+fiTVCAFUYwlsXLZneYp0ueZgBLJbLCSD
-	 vr8W83VsgcoHP9Oq90cj3XNbz0TuoCdLEyWkHa+jvAYqiHHhDCrS9R4MUbl7+pv2VS
-	 mIoqubGcaeLpyLM54f9MQo+zvHGO2gOkSqj027LElth6rBiqlpwIExnnGxicHsuwlf
-	 dfxw9/9JJpXNQ==
+	b=mu2W787AnI97s0IWOJG4L98V8EMW83U3cOTnVFPXCGszju1OaxR06l48FGPDqzrS+
+	 AGMeAcA4NL8DdvunZOc++mvAuO7k+If4g5VreeYU2ApJFt1PEpy6aoeHNzrHXOeip0
+	 qF2Zvo7yLGZpmZUOZbA9bbZmyjGyyfxOflvbByg6yn1zb5GefJ9axoqx+TMEiZVpAt
+	 TyPkwYKf0QSlKs2md8dzMW7JqTXlnD8TF2EpBhfJrjs6ZLbujl0ITlI9E7o5+HaQix
+	 r2ZKj+TABkymT82n8N6IGf6XrT8ohHfuxxxneGUp6T6hGDjVqnRsGEHq3yyGRZKgqr
+	 0mxVVp6xEjS+Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sBrie-00GDQz-NJ;
-	Tue, 28 May 2024 08:58:04 +0100
-Date: Tue, 28 May 2024 08:58:04 +0100
-Message-ID: <86ikyymkqb.wl-maz@kernel.org>
+	id 1sBs0P-00GDqf-9u;
+	Tue, 28 May 2024 09:16:25 +0100
+Date: Tue, 28 May 2024 09:16:24 +0100
+Message-ID: <86h6eimjvr.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Fuad Tabba <tabba@google.com>
 Cc: kvmarm@lists.linux.dev,
@@ -52,12 +52,12 @@ Cc: kvmarm@lists.linux.dev,
 	joey.gouly@arm.com,
 	rananta@google.com,
 	yuzenghui@huawei.com
-Subject: Re: [PATCH v2 2/7] KVM: arm64: Abstract set/clear of CPTR_EL2 bits behind helper
-In-Reply-To: <CA+EHjTxyhytsiN93kJ46Hi-OVa1Z4qsH6_RAbm-WKVeDfZ5w8g@mail.gmail.com>
+Subject: Re: [PATCH v2 5/7] KVM: arm64: Allocate memory at hyp for host sve state in pKVM
+In-Reply-To: <CA+EHjTwVe0VXPuJ2OnHR40GMtCBAkRyTei=MpOocLWPmgtCaeQ@mail.gmail.com>
 References: <20240521163720.3812851-1-tabba@google.com>
-	<20240521163720.3812851-3-tabba@google.com>
-	<86seyana8x.wl-maz@kernel.org>
-	<CA+EHjTxyhytsiN93kJ46Hi-OVa1Z4qsH6_RAbm-WKVeDfZ5w8g@mail.gmail.com>
+	<20240521163720.3812851-6-tabba@google.com>
+	<86plten8kr.wl-maz@kernel.org>
+	<CA+EHjTwVe0VXPuJ2OnHR40GMtCBAkRyTei=MpOocLWPmgtCaeQ@mail.gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -74,219 +74,123 @@ X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@li
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 22 May 2024 14:48:19 +0100,
+On Wed, 22 May 2024 15:37:53 +0100,
 Fuad Tabba <tabba@google.com> wrote:
 >=20
 > Hi Marc,
 >=20
-> On Tue, May 21, 2024 at 10:08=E2=80=AFPM Marc Zyngier <maz@kernel.org> wr=
+> On Tue, May 21, 2024 at 10:44=E2=80=AFPM Marc Zyngier <maz@kernel.org> wr=
 ote:
 > >
-> > On Tue, 21 May 2024 17:37:15 +0100,
+> > On Tue, 21 May 2024 17:37:18 +0100,
 > > Fuad Tabba <tabba@google.com> wrote:
 > > >
-> > > The same traps controlled by CPTR_EL2 or CPACR_EL1 need to be
-> > > toggled in different parts of the code, but the exact bits and
-> > > their polarity differ between these two formats and the mode
-> > > (vhe/nvhe/hvhe).
+> > > Protected mode needs to maintain (save/restore) the host's sve
+> > > state, rather than relying on the host kernel to do that. This is
+> > > to avoid leaking information to the host about guests and the
+> > > type of operations they are performing.
 > > >
-> > > To reduce the amount of duplicated code and the chance of getting
-> > > the wrong bit/polarity or missing a field, abstract the set/clear
-> > > of CPTR_EL2 bits behind a helper.
+> > > As a first step towards that, allocate memory at hyp, per cpu, to
+> > > hold the host sve data. The following patch will use this memory
+> > > to save/restore the host state.
+> >
+> > What I read in the code contradicts this statement. The memory is
+> > definitely allocated on the *host*.
+>=20
+> You're right. I should say memory mapped at hyp.
+>=20
 > > >
-> > > Since (h)VHE is the way of the future, use the CPACR_EL1 format,
-> > > which is a subset of the VHE CPTR_EL2, as a reference.
-> > >
-> > > No functional change intended.
-> > >
-> > > Suggested-by: Oliver Upton <oliver.upton@linux.dev>
 > > > Signed-off-by: Fuad Tabba <tabba@google.com>
 > > > ---
-> > >  arch/arm64/include/asm/kvm_emulate.h    | 34 +++++++++++++++++++++++=
+> > > Note that the last patch in this series will consolidate the
+> > > setup of the host's fpsimd and sve states, which currently take
+> > > place in two different locations. Moreover, that last patch will
+> > > also place the host fpsimd and sve_state pointers in a union.
+> > > ---
+> > >  arch/arm64/include/asm/kvm_host.h    |  2 +
+> > >  arch/arm64/include/asm/kvm_pkvm.h    |  9 ++++
+> > >  arch/arm64/include/uapi/asm/ptrace.h | 14 ++++++
+> > >  arch/arm64/kvm/arm.c                 | 68 ++++++++++++++++++++++++++=
 ++
-> > >  arch/arm64/kvm/hyp/include/hyp/switch.h | 17 +++----------
-> > >  arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  6 +----
-> > >  3 files changed, 39 insertions(+), 18 deletions(-)
+> > >  arch/arm64/kvm/hyp/nvhe/setup.c      | 24 ++++++++++
+> > >  5 files changed, 117 insertions(+)
 > > >
-> > > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/includ=
-e/asm/kvm_emulate.h
-> > > index 501e3e019c93..74837d1762e5 100644
-> > > --- a/arch/arm64/include/asm/kvm_emulate.h
-> > > +++ b/arch/arm64/include/asm/kvm_emulate.h
-> > > @@ -557,6 +557,40 @@ static __always_inline void kvm_incr_pc(struct k=
-vm_vcpu *vcpu)
-> > >               vcpu_set_flag((v), e);                                 =
- \
-> > >       } while (0)
-> > >
+> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/a=
+sm/kvm_host.h
+> > > index 0a5fceb20f3a..7b3745ef1d73 100644
+> > > --- a/arch/arm64/include/asm/kvm_host.h
+> > > +++ b/arch/arm64/include/asm/kvm_host.h
+> > > @@ -535,7 +535,9 @@ struct kvm_cpu_context {
+> > >   */
+> > >  struct kvm_host_data {
+> > >       struct kvm_cpu_context host_ctxt;
 > > > +
-> > > +static inline void __cptr_clear_set_nvhe(u64 cpacr_clr, u64 cpacr_se=
-t)
+> > >       struct user_fpsimd_state *fpsimd_state; /* hyp VA */
+> > > +     struct user_sve_state *sve_state;       /* hyp VA */
+> > >
+> > >       /* Ownership of the FP regs */
+> > >       enum {
+> > > diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/a=
+sm/kvm_pkvm.h
+> > > index ad9cfb5c1ff4..b9d12e123efb 100644
+> > > --- a/arch/arm64/include/asm/kvm_pkvm.h
+> > > +++ b/arch/arm64/include/asm/kvm_pkvm.h
+> > > @@ -128,4 +128,13 @@ static inline unsigned long hyp_ffa_proxy_pages(=
+void)
+> > >       return (2 * KVM_FFA_MBOX_NR_PAGES) + DIV_ROUND_UP(desc_max, PAG=
+E_SIZE);
+> > >  }
+> > >
+> > > +static inline size_t pkvm_host_sve_state_size(void)
 > > > +{
-> > > +     u64 clr =3D 0, set =3D 0;
+> > > +     if (!system_supports_sve())
+> > > +             return 0;
 > > > +
-> > > +     if (cpacr_clr & CPACR_ELx_FPEN)
-> > > +             set |=3D CPTR_EL2_TFP;
-> > > +     if (cpacr_clr & CPACR_ELx_ZEN)
-> > > +             set |=3D CPTR_EL2_TZ;
-> > > +     if (cpacr_clr & CPACR_ELx_SMEN)
-> >
-> > These 3 fields are actually pairs of bits. Can we have a compile-time
-> > check that both bits are set?
->=20
-> Yes.
->=20
-> > > +             set |=3D CPTR_EL2_TSM;
-> > > +     if (cpacr_clr & CPACR_ELx_TTA)
-> > > +             clr |=3D CPTR_EL2_TTA;
-> >
-> > How about TCPAC, TAM, and E0POE?
->=20
-> CPTR_EL2 (nvhe) doesn't have an equivalent to E0POE. Should I have a
-> compile time check that it's not cleared at all (since it has negative
-> polarity), or a runtime check for that only for nvhe?
-
-You're right, and I ended figuring that out while reworking the NV
-side of CPTR_EL2 handling.
-
->=20
-> As for TCPAC, TAM, they're not defined under the CPACR bits, but they
-> are in CPTR_EL2, which is what CPACR refers to in VHE. I will handle
-> them, but should I rename cpacr_to_cptr() to cptr_vhe_to_nvhe()?
-
-I think this is clear enough in context, but I don't mind either way.
-
->=20
-> >
-> > > +
-> > > +     if (cpacr_set & CPACR_ELx_FPEN)
-> > > +             clr |=3D CPTR_EL2_TFP;
-> > > +     if (cpacr_set & CPACR_ELx_ZEN)
-> > > +             clr |=3D CPTR_EL2_TZ;
-> > > +     if (cpacr_set & CPACR_ELx_SMEN)
-> > > +             clr |=3D CPTR_EL2_TSM;
-> > > +     if (cpacr_set & CPACR_ELx_TTA)
-> > > +             set |=3D CPTR_EL2_TTA;
-> >
-> > The duplication is pretty unfortunate. Having a single helper that
-> > translate a register layout into another would be better.
-> > > +
-> > > +     sysreg_clear_set(cptr_el2, clr, set);
-> >
-> > And omit this...
-> >
+> > > +     return size_add(sizeof(struct user_sve_state),
+> > > +                     SVE_SIG_REGS_SIZE(sve_vq_from_vl(kvm_host_sve_m=
+ax_vl)));
 > > > +}
 > > > +
-> > > +static inline void cpacr_clear_set(u64 clr, u64 set)
-> > > +{
-> > > +        if (has_vhe() || has_hvhe())
-> > > +                sysreg_clear_set(cpacr_el1, clr, set);
-> > > +        else
-> > > +                __cptr_clear_set_nvhe(clr, set);
+> > >  #endif       /* __ARM64_KVM_PKVM_H__ */
+> > > diff --git a/arch/arm64/include/uapi/asm/ptrace.h b/arch/arm64/includ=
+e/uapi/asm/ptrace.h
+> > > index 7fa2f7036aa7..77aabf964071 100644
+> > > --- a/arch/arm64/include/uapi/asm/ptrace.h
+> > > +++ b/arch/arm64/include/uapi/asm/ptrace.h
+> > > @@ -120,6 +120,20 @@ struct user_sve_header {
+> > >       __u16 __reserved;
+> > >  };
+> > >
+> > > +struct user_sve_state {
+> > > +     __u64 zcr_el1;
+> > > +
+> > > +     /*
+> > > +      * Ordering is important since __sve_save_state/__sve_restore_s=
+tate
+> > > +      * relies on it.
+> > > +      */
+> > > +     __u32 fpsr;
+> > > +     __u32 fpcr;
+> > > +
+> > > +     /* Must be SVE_VQ_BYTES (128 bit) aligned. */
+> > > +     __u8 sve_regs[];
+> > > +};
+> > > +
 > >
-> > So that this could read as:
-> >
-> >         sysreg_clear_set(cptr_el2, cpacr_to_cptr(clr), cpacr_to_cptr(se=
-t));
+> > Huh, why is this in uapi? Why should userspace even care about this at
+> > all? From what I can tell, this is purely internal to the kernel, and
+> > in any case, KVM isn't tied to that format if it doesn't dump stuff in
+> > the userspace thread context. Given the number of bugs this format has
+> > generated, I really wouldn't mind moving away from it.
 >=20
-> I don't know how this could work with only one function/macro, while
-> covering all the fields. The problem is that the polarity of these
-> bits vary: some have the same polarity between CPACR/CPTR. and others
-> have the opposite polarity. Therefore, the conversion to `clr` is
-> different from the conversion to `set`.
+> I put it here since the sve_header is here, as well as other similar stru=
+ctures.
+>=20
+> Should I move it to asm/kvm_pkvm.h?
 
-Ah, you're absolutely right. I totally glanced over the fact that the
-polarities are inverted, totally ruining the fun.
-
->=20
-> Say we need to clear both CPACR_ELx_FPEN and CPACR_ELx_TTA. The
-> problem is that CPACR_ELx_FPEN has the opposite polarity as
-> CPTR_EL2_TFP, whereas CPACR_ELx_TTA has the same polarity as
-> CPTR_EL2_TTA (different position though).
->=20
-> What would cpacr_to_cptr() return that would work in the code you propose:
-> sysreg_clear_set(cptr_el2,
-> cpacr_to_cptr(CPACR_ELx_FPEN|CPACR_ELx_TTA), cpacr_to_cptr(0));
->=20
-> Desired result:
-> sysreg_clear_set(cptr_el2, CPTR_EL2_TTA, CPTR_EL2_TFP);
->=20
-> I can make it work with two functions/macros:
-> __cpacr_to_cptr_clear(clr, set) and __cpacr_to_cptr_set(clr, set) -->
-> sysreg_clear_set(cptr_el2, __cpacr_to_cptr_clear(clr, set),
-> __cpacr_to_cptr_set(clr, set));
->=20
-> Unfortunately this doesn't get rid of the duplication, but it might be
-> tidier (I converted them to macros to add compile-time checks later):
->=20
-> +#define __cpacr_to_cptr_clr(clr, set)                                  \
-> +       ({                                                              \
-> +               u64 cptr =3D 0;                                          =
- \
-> +                                                                       \
-> +               if ((set) & CPACR_ELx_FPEN)                             \
-> +                       cptr |=3D CPTR_EL2_TFP;                          =
- \
-> +               if ((set) & CPACR_ELx_ZEN)                              \
-> +                       cptr |=3D CPTR_EL2_TZ;                           =
- \
-> +               if ((set) & CPACR_ELx_SMEN)                             \
-> +                       cptr |=3D CPTR_EL2_TSM;                          =
- \
-> +               if ((clr) & CPACR_ELx_TTA)                              \
-> +                       cptr |=3D CPTR_EL2_TTA;                          =
- \
-> +               if ((clr) & CPTR_EL2_TAM)                               \
-> +                       cptr |=3D CPTR_EL2_TAM;                          =
- \
-> +               if ((clr) & CPTR_EL2_TCPAC)                             \
-> +                       cptr |=3D CPTR_EL2_TCPAC;                        =
- \
-> +                                                                       \
-> +               cptr;                                                   \
-> +       })
-> +
-> +#define __cpacr_to_cptr_set(clr, set)                                  \
-> +       ({                                                              \
-> +               u64 cptr =3D 0;                                          =
- \
-> +                                                                       \
-> +               if ((clr) & CPACR_ELx_FPEN)                             \
-> +                       cptr |=3D CPTR_EL2_TFP;                          =
- \
-> +               if ((clr) & CPACR_ELx_ZEN)                              \
-> +                       cptr |=3D CPTR_EL2_TZ;                           =
- \
-> +               if ((clr) & CPACR_ELx_SMEN)                             \
-> +                       cptr |=3D CPTR_EL2_TSM;                          =
- \
-> +               if ((set) & CPACR_ELx_TTA)                              \
-> +                       cptr |=3D CPTR_EL2_TTA;                          =
- \
-> +               if ((set) & CPTR_EL2_TAM)                               \
-> +                       cptr |=3D CPTR_EL2_TAM;                          =
- \
-> +               if ((set) & CPTR_EL2_TCPAC)                             \
-> +                       cptr |=3D CPTR_EL2_TCPAC;                        =
- \
-> +                                                                       \
-> +               cptr;                                                   \
-> +       })
-> +
-> +#define cpacr_clear_set(clr, set)                                      \
-> +       do {                                                            \
-> +               if (has_vhe() || has_hvhe())                            \
-> +                       sysreg_clear_set(cpacr_el1, clr, set);          \
-> +               else                                                    \
-> +                       sysreg_clear_set(cptr_el2,                      \
-> +                                        __cpacr_to_cptr_clr(clr, set), \
-> +                                        __cpacr_to_cptr_set(clr, set));\
-> +       } while (0)
->=20
-> What do you think?
-
-I quite like this. It is a large body of code, but it is easy to read
-and symmetric.
+kvm_host.h or kvm_types.h seem like the best option (replacing the
+"user" prefix with something else), as this is directly consumed by
+kvm_host.h.
 
 Thanks,
 
