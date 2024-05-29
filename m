@@ -1,57 +1,57 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20927181B82
-	for <kvmarm@lists.linux.dev>; Wed, 29 May 2024 12:14:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5526D181B96
+	for <kvmarm@lists.linux.dev>; Wed, 29 May 2024 12:14:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716984885; cv=none; b=kdgBvU/8VHhI150EsGFx4juF1tSLe9ynIK+Nj8ktjXOpIfWGK5f3vzStRl+V4d8t5e6SqcSLW94izGObMK3ksdqiclnZhhRZqJZU/XvgEpNL/bblM9Zsp7jVw6uvUoN3+YGZiGfNZecC4V4qGbO8W4dC8CA0JuvRn5kLahzzVdk=
+	t=1716984887; cv=none; b=tuuovrIbh3BxJa+UJWXo47FZIlv5Y42VP50MNW9080y712j25hC3+0oHtCaDHKpDRhqf7oSGQg+HRH6XDwnNjxr+E9wKJZ3ljSwgtWKlj89vStA1mHcl+m5inCxcqdzk0yp5Q2n3vGJJuv/gboC7NUd89ru/AjENzKIkQPa9Bs8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716984885; c=relaxed/simple;
-	bh=+cKcneugNDE7L/qpVl91ixp1M6xylMEZ521Xa4hyBQI=;
+	s=arc-20240116; t=1716984887; c=relaxed/simple;
+	bh=oY+YSwPHFqVVY3fzP9ou/E6BfHn7ARC/H1gWBIAm1+g=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Vg+9FPmYeNp/xQBbeQNataBooBc8PuDFBUfTxOxRPSf9ALjYS6G7pmZLsdRtXhM0KYoZIpPyLS4Hylx6F4VYalYtQtPFQDd6AiLChnCSMsmYSGAawcNnCKeBXeGvrPCYIrVwoTpxV8SQW+KDuk+3hUDlYtIjRhvuNTCQLTlzfEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ptosi.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xzI4sTF1; arc=none smtp.client-ip=209.85.128.201
+	 To:Cc:Content-Type; b=ijrFEkoGCH0D2vyCxov2lt1hnE4t4mam0zyLjWI0zLvyA1ibYiGh+vNuYdK2m1+wSj/EJVm+02B+8bYQp93g74aDOUx1To2fP0Euh1N7bflZsSt25scgkAsRSkaouL4c48sgRsGl1Bew0LCXlMj3xRV/2Z2br2hNLiqKisOc1OA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ptosi.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1hHKdXxm; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ptosi.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xzI4sTF1"
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-627e4afa326so31446277b3.2
-        for <kvmarm@lists.linux.dev>; Wed, 29 May 2024 05:14:44 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1hHKdXxm"
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-df76f343b75so2988112276.0
+        for <kvmarm@lists.linux.dev>; Wed, 29 May 2024 05:14:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1716984883; x=1717589683; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1716984885; x=1717589685; darn=lists.linux.dev;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=jFr7qj90it7wD8ycil4shHE/w7boH3XXa9rQ6TceJ7g=;
-        b=xzI4sTF15rkoECameFBoDgrsfRU2oeoUyUUhKamZE2udJ1XULplFcH+OrQI7dLsmT6
-         FcdcKKQQMG8Wfhzk8RRpfgqcdU/qHW+xtBLq4n23Z7+bNl86SFBEEWa1vo3M+DVkUyiH
-         JDAlIeo73LXHxFMsIBVnJ47Ggn3BnUtj2Nbfhe4ruLFvS4mw0SraoeaVW7wu7dYe6cAt
-         xH/umFzxat6hwK529zmcK63au+IEmOM9mqDEs90B35ChfaEON1lH9hPghExaRZN4AFSW
-         MiFBSK9tETGWAMlwzJ/ENkJ4i8B5j5/wHGhWEnC3LBjBdLW2tnX6ASNzNtRfFakSW3Bb
-         lKzQ==
+        bh=8LApYKgBNKEpQOUHCgPJ8rjKQvWvAO0g6PQmvtilIlw=;
+        b=1hHKdXxmLdnIxQt8tvHBzCRug1kWFOsTG7ur77P8adjGYHwI2PuvH9BtYoKcYoEI29
+         D5q11H/JZtCCvkxi+zm0l7Iv54RkOotKE6OVV0unN2TqbpSgV9+SPl7QWzKxttT5x48P
+         kBrFzLbHw6xdUkBjzlShRDozN36dSGpZKPzJe+psTNdF7qz4aGWmiw1pt/WlLPlPDDEW
+         /JdOvsTn2iBXlNfwQIOBMUev/dAVKGuvsYvUMNCPSBH3OPXmtB/PkGwt7OXeRSxjKA6R
+         v6pznr1JWk/ji+VRhxmdRqzqS+zJNMvjI1Ml+YkzfZF7citqZ2/DzJkrfJ5D9rAVhNqR
+         nJ+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716984883; x=1717589683;
+        d=1e100.net; s=20230601; t=1716984885; x=1717589685;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=jFr7qj90it7wD8ycil4shHE/w7boH3XXa9rQ6TceJ7g=;
-        b=lsLYkpqTrwtqQOm7z00gsWT4Ui3+on1sCgpBI7KnANvATnma9aPGvjTV5lkgnNKqlD
-         BvfaT7KzFzkyJGAlnP/lA3fwL4i6zfv/2hpxMotD+NNZfdQEmw+rPIHJMjl5bSGRZmPm
-         sUFIzurTD+dQuOugXvhdGZr9t5i4jjQZzNSIRe1nfoS2l5D4hepRjj871uTST3vNXaXC
-         Gt1Yub33xEE+bNIILFyufzZ+TkwexWKguhsSFGvohCXatsYqUd6plyTEfaF4xHNwGEUu
-         5Fg37UiVR5I9fx+rV3XJU+T0dm25LsCk2t/4DNRti9JNC3a5tIT/FYuubT2XVMpb5m//
-         ObNw==
-X-Gm-Message-State: AOJu0YzoRlFtLpamXRsOAACHtjYvUuVLiHBEgKzvVCywP2M1k+RKqUdq
-	x9PP/yrm4yGngH1WOct6wMNqDMPIJxzgC8sdakukaVcdH/qVHNXIWCPYMnEqvQlaInohAXSb7K5
-	68VB6roTpAUrs2vyUT9yp8LJZiD0MFK9uSENmhBoaOdeGE9vZlWSZkMKPFCLvq0SvLSlaOK8adk
-	1tD1KXpa4yXxBP7vajUqXrYW7QKx8=
-X-Google-Smtp-Source: AGHT+IFkqfeHx8YzJAunywpRdidgNdjLeTtWgg2p4V4vZYTrR/3mutQzX2qxXb5fN2wPSUT3J1iB5pmTTg==
+        bh=8LApYKgBNKEpQOUHCgPJ8rjKQvWvAO0g6PQmvtilIlw=;
+        b=kwkx4cEP48p2GGTgBW6tYNck1skPCiWf8/1quxnxHFJ8xbLMY5T/iHz7s1Xypy/RJa
+         aU799Z9mn8cbchZ54xs5cQTvSdFuHZKIp6ZYfWSZV/gh1+vcjdTNWXB9b4mKxDbR8Yxv
+         sISI7cPJRhxrzP0/HS0A7Fui6Drrp8GcTG3Vqtzk83lQyKQHQBZdeDn3ldJanlcHh9Vs
+         E8H8ds/DBfmwwxztjvgGVmlPTDJJhPCAAUpGEQZWHAq62q9alK/xlxJT2yS2Rx5dWBFf
+         jfndwrvKqD3NA8pefvqe6pBP5wlWqtAqyt60Y93B4wOYWsZIMD+qZrUmXDVArF2EwtwL
+         djPw==
+X-Gm-Message-State: AOJu0YyJF+lzoFc/PFLAzJ2Fp9o5VNquVtG/nrCl2BimmmOgFuVk+L4B
+	Q6dGEoKON7sTmoIuMad52cmQrgKEkXEvFTewwFRgD1Dz0O92zOOiFY9gdP4AvBBAifnA8Y7CuEk
+	TxpPTa5GEY6IZ9WW4a198zDjs7MJiokPNfANuMQ6g74mEOqVqZl1iGq9g9LxBk7NzlhYqlMPW3Q
+	amPV7chPjij8ScFwEcVTC/LJTWc1Y=
+X-Google-Smtp-Source: AGHT+IHSjvv323m46MNf64EsuTBJ/plesPXi5fnjH9bpFqNhZzaJSI42rMp8TuTkGGyShh9t0w2mdhFYDg==
 X-Received: from ptosi.c.googlers.com ([fda3:e722:ac3:cc00:31:98fb:c0a8:11ec])
- (user=ptosi job=sendgmr) by 2002:a81:4c56:0:b0:61a:d0d2:b31 with SMTP id
- 00721157ae682-62a08d9304emr35784307b3.3.1716984883084; Wed, 29 May 2024
- 05:14:43 -0700 (PDT)
-Date: Wed, 29 May 2024 13:12:12 +0100
+ (user=ptosi job=sendgmr) by 2002:a05:6902:1006:b0:df7:8c1b:430a with SMTP id
+ 3f1490d57ef6-df78c1b6af8mr3075741276.3.1716984885370; Wed, 29 May 2024
+ 05:14:45 -0700 (PDT)
+Date: Wed, 29 May 2024 13:12:13 +0100
 In-Reply-To: <20240529121251.1993135-1-ptosi@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,8 +61,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240529121251.1993135-1-ptosi@google.com>
 X-Mailer: git-send-email 2.45.1.288.g0e0cd299f1-goog
-Message-ID: <20240529121251.1993135-7-ptosi@google.com>
-Subject: [PATCH v4 06/13] KVM: arm64: nVHE: gen-hyprel: Skip R_AARCH64_ABS32
+Message-ID: <20240529121251.1993135-8-ptosi@google.com>
+Subject: [PATCH v4 07/13] KVM: arm64: VHE: Mark __hyp_call_panic __noreturn
 From: "=?UTF-8?q?Pierre-Cl=C3=A9ment=20Tosi?=" <ptosi@google.com>
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
 	kvm@vger.kernel.org
@@ -72,44 +72,37 @@ Cc: "=?UTF-8?q?Pierre-Cl=C3=A9ment=20Tosi?=" <ptosi@google.com>, Marc Zyngier <m
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Ignore R_AARCH64_ABS32 relocations, instead of panicking, when emitting
-the relocation table of the hypervisor. The toolchain might produce them
-when generating function calls with kCFI to represent the 32-bit type ID
-which can then be resolved across compilation units at link time.  These
-are NOT actual 32-bit addresses and are therefore not needed in the
-final (runtime) relocation table (which is unlikely to use 32-bit
-absolute addresses for arm64 anyway).
+Given that the sole purpose of __hyp_call_panic() is to call panic(), a
+__noreturn function, give it the __noreturn attribute, removing the need
+for its caller to use unreachable().
 
 Signed-off-by: Pierre-Cl=C3=A9ment Tosi <ptosi@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/gen-hyprel.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ arch/arm64/kvm/hyp/vhe/switch.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/gen-hyprel.c b/arch/arm64/kvm/hyp/nvhe=
-/gen-hyprel.c
-index 6bc88a756cb7..b63f4e1c1033 100644
---- a/arch/arm64/kvm/hyp/nvhe/gen-hyprel.c
-+++ b/arch/arm64/kvm/hyp/nvhe/gen-hyprel.c
-@@ -50,6 +50,9 @@
- #ifndef R_AARCH64_ABS64
- #define R_AARCH64_ABS64			257
- #endif
-+#ifndef R_AARCH64_ABS32
-+#define R_AARCH64_ABS32			258
-+#endif
- #ifndef R_AARCH64_PREL64
- #define R_AARCH64_PREL64		260
- #endif
-@@ -383,6 +386,9 @@ static void emit_rela_section(Elf64_Shdr *sh_rela)
- 		case R_AARCH64_ABS64:
- 			emit_rela_abs64(rela, sh_orig_name);
- 			break;
-+		/* Allow 32-bit absolute relocation, for kCFI type hashes. */
-+		case R_AARCH64_ABS32:
-+			break;
- 		/* Allow position-relative data relocations. */
- 		case R_AARCH64_PREL64:
- 		case R_AARCH64_PREL32:
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switc=
+h.c
+index d7af5f46f22a..0550b9f6317f 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -384,7 +384,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ 	return ret;
+ }
+=20
+-static void __hyp_call_panic(u64 spsr, u64 elr, u64 par)
++static void __noreturn __hyp_call_panic(u64 spsr, u64 elr, u64 par)
+ {
+ 	struct kvm_cpu_context *host_ctxt;
+ 	struct kvm_vcpu *vcpu;
+@@ -409,7 +409,6 @@ void __noreturn hyp_panic(void)
+ 	u64 par =3D read_sysreg_par();
+=20
+ 	__hyp_call_panic(spsr, elr, par);
+-	unreachable();
+ }
+=20
+ asmlinkage void kvm_unexpected_el2_exception(void)
 --=20
 2.45.1.288.g0e0cd299f1-goog
 
