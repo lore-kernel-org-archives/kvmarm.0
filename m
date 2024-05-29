@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69A8917BB33;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0827417F39E;
 	Wed, 29 May 2024 14:56:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716994595; cv=none; b=JfxYumFUdRQPXrsPs1iWOuYZLuVqyKOR8+fEAdn4tFwl1tBfFytT/BYYdBoIxkyXQ63Rbdj9kiGmddEixsAeCZD+tLsNKC4T8CnkdAs8IG6NbiEccaFz5K3oVsciF+DetEpVfZmk+71ajY7rUU95hl2Ws0rzUr3MElsOE+ONu00=
+	t=1716994596; cv=none; b=YakXOEkY++IzWg1BIgk0ehrhlPlDZSyqxpMOdn2Sb/nevYAeCqjxGmJXjaWwozM+9/ajbfXFUlVnMnxeCutYztsLHJiLhg4MKApqB70uta8s4s70Z65Zgi4n9ZxHpHsiOkfsxfV1gp3J6YHx3OkDKWO6Zd1ILfv52hRbheyZJVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716994595; c=relaxed/simple;
-	bh=C5O7gi+Ds3jjZRE81+ci/V63rw/Ieu/EbvicY27jms8=;
+	s=arc-20240116; t=1716994596; c=relaxed/simple;
+	bh=R248gaby0XedPY/sNz9iwnTRy32Bls10nlswI1GHrQY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=fyD8Niajz4slUOqHupnQh2nMBndTwpl46cSU2nXavlr55IavpHfwuZGPnz0Vgy31Sks1Fljl/yol+DzD8etZbzHvBw5VtY8jMu4N6oG89TTa5l++8IYQEYkoj/gWx+SpXP7Gb11SQLjsJJwdkH0/uWnN15W74JTjSsVlWUZEksE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ta6jA3IM; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=gnUEiC8Sh8qyEhhxs26Fo20vC2PuZPxS7aIW4CSHc+wRvlJNta/OpIWeV7gFb7ALurlbhLb6odGL9Njq70sv1UIJIY2idcZpoWH+wY7BNb3oFx+7YEkG61LKmw1FviqdUd516O1Ir55eyR/gKKt0rPuofw2o4uZD9kh9BlV7+Qs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=roNxI5pD; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ta6jA3IM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DE29C4AF08;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="roNxI5pD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7DB8EC113CC;
 	Wed, 29 May 2024 14:56:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1716994595;
-	bh=C5O7gi+Ds3jjZRE81+ci/V63rw/Ieu/EbvicY27jms8=;
+	bh=R248gaby0XedPY/sNz9iwnTRy32Bls10nlswI1GHrQY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Ta6jA3IMWeiZhUkbbt+qxr9hgj97LpJZfsMXVO/TtqGBpsAVr0LX8dEAGxKKGtBOR
-	 ZUrtuQ/Z75ZFhEKX4OfRp1lKw/t3czg8/qjlNfuF+47ph9gty+S5JR8KPKv+wVzR9N
-	 Xndg00qvLgxuY+BxStKYKDvWQSnyaxj2Sx2yE6H07Ttx0Nq6/YsgRemdzFWmaMuW9N
-	 +OlCkMa1heHF4oNVCyw4EaX9n83Jsl7MOzA8pdKf6ra4L2DGJlYpjdR06thQ8mGbC5
-	 g3o3xBkoeJSwJZzv+PIL2hJT7CaZZdAC9AxceNJ/9fLhsYMuwFEL4oz+I2tw8tXdyi
-	 aHWplOfkN2mRA==
+	b=roNxI5pDSWMSsaBRBpiN2WxEJhNqr+c/D6CZ7IVoQ/GKUEtUUt0JwI5+GB548XrMr
+	 wuiudtLpPTjIPsGa8tp+hkg50sUw6mbVxAhnv1piJT8ropXsk8UeI1qnBDlC8SiyRH
+	 8CiFgLkJRENma//i7V6Rzaz+tX5UVZ/Ur2E3rYGRrXrEDCJ5n7YPfpmUbhO40AsK3n
+	 JHsPVrJtnVMb4uaXa7riw+MGFCpuH+I99b7eg0GaCUJqdNtfnjNDPZpK9ozq1FClXr
+	 ZFyvOzrsxdxAS05wPjnbBHvUmQ2y8Qu11LLr+nNlT6raxBMUwyDPw3Qk+8SMUoP0t3
+	 r8q2ICsP2a2zA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sCKjB-00GekF-Cq;
+	id 1sCKjB-00GekF-Pd;
 	Wed, 29 May 2024 15:56:33 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -44,9 +44,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Christoffer Dall <christoffer.dall@arm.com>,
 	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: [PATCH v2 07/16] KVM: arm64: nv: Handle TLB invalidation targeting L2 stage-1
-Date: Wed, 29 May 2024 15:56:19 +0100
-Message-Id: <20240529145628.3272630-8-maz@kernel.org>
+Subject: [PATCH v2 09/16] KVM: arm64: nv: Handle TLBI ALLE1{,IS} operations
+Date: Wed, 29 May 2024 15:56:21 +0100
+Message-Id: <20240529145628.3272630-10-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240529145628.3272630-1-maz@kernel.org>
 References: <20240529145628.3272630-1-maz@kernel.org>
@@ -62,16 +62,10 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-While dealing with TLB invalidation targeting the guest hypervisor's
-own stage-1 was easy, doing the same thing for its own guests is
-a bit more involved.
+TLBI ALLE1* is a pretty big hammer that invalides all S1/S2 TLBs.
 
-Since such an invalidation is scoped by VMID, it needs to apply to
-all s2_mmu contexts that have been tagged by that VMID, irrespective
-of the value of VTTBR_EL2.BADDR.
-
-So for each s2_mmu context matching that VMID, we invalidate the
-corresponding TLBs, each context having its own "physical" VMID.
+This translates into the unmapping of all our shadow S2 PTs, itself
+resulting in the corresponding TLB invalidations.
 
 Co-developed-by: Jintack Lim <jintack.lim@linaro.org>
 Co-developed-by: Christoffer Dall <christoffer.dall@arm.com>
@@ -79,173 +73,53 @@ Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_nested.h |  7 +++
- arch/arm64/kvm/nested.c             | 35 +++++++++++++
- arch/arm64/kvm/sys_regs.c           | 80 +++++++++++++++++++++++++++++
- 3 files changed, 122 insertions(+)
+ arch/arm64/kvm/sys_regs.c | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 76b88c640602..9b7c92ab87cf 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -65,6 +65,13 @@ extern void kvm_init_nested(struct kvm *kvm);
- extern int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu);
- extern void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu);
- extern struct kvm_s2_mmu *lookup_s2_mmu(struct kvm_vcpu *vcpu);
-+
-+union tlbi_info;
-+
-+extern void kvm_s2_mmu_iterate_by_vmid(struct kvm *kvm, u16 vmid,
-+				       const union tlbi_info *info,
-+				       void (*)(struct kvm_s2_mmu *,
-+						const union tlbi_info *));
- extern void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu);
- extern void kvm_vcpu_put_hw_mmu(struct kvm_vcpu *vcpu);
- 
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 43850351f6de..82d2852845de 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -365,6 +365,41 @@ int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
- 	return ret;
- }
- 
-+/*
-+ * We can have multiple *different* MMU contexts with the same VMID:
-+ *
-+ * - S2 being enabled or not, hence differing by the HCR_EL2.VM bit
-+ *
-+ * - Multiple vcpus using private S2s (huh huh...), hence differing by the
-+ *   VBBTR_EL2.BADDR address
-+ *
-+ * - A combination of the above...
-+ *
-+ * We can always identify which MMU context to pick at run-time.  However,
-+ * TLB invalidation involving a VMID must take action on all the TLBs using
-+ * this particular VMID. This translates into applying the same invalidation
-+ * operation to all the contexts that are using this VMID. Moar phun!
-+ */
-+void kvm_s2_mmu_iterate_by_vmid(struct kvm *kvm, u16 vmid,
-+				const union tlbi_info *info,
-+				void (*tlbi_callback)(struct kvm_s2_mmu *,
-+						      const union tlbi_info *))
-+{
-+	write_lock(&kvm->mmu_lock);
-+
-+	for (int i = 0; i < kvm->arch.nested_mmus_size; i++) {
-+		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
-+
-+		if (!kvm_s2_mmu_valid(mmu))
-+			continue;
-+
-+		if (vmid == get_vmid(mmu->tlb_vttbr))
-+			tlbi_callback(mmu, info);
-+	}
-+
-+	write_unlock(&kvm->mmu_lock);
-+}
-+
- struct kvm_s2_mmu *lookup_s2_mmu(struct kvm_vcpu *vcpu)
- {
- 	struct kvm *kvm = vcpu->kvm;
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 22b45a15d068..b22309fca3a7 100644
+index 22a3691ce248..d8d6380b7c66 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -2741,6 +2741,73 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	EL2_REG(SP_EL2, NULL, reset_unknown, 0),
- };
+@@ -2757,6 +2757,29 @@ static bool kvm_supported_tlbi_s12_op(struct kvm_vcpu *vpcu, u32 instr)
+ 	return true;
+ }
  
-+/* Only defined here as this is an internal "abstraction" */
-+union tlbi_info {
-+	struct {
-+		u64	start;
-+		u64	size;
-+	} range;
-+
-+	struct {
-+		u64	addr;
-+	} ipa;
-+
-+	struct {
-+		u64	addr;
-+		u32	encoding;
-+	} va;
-+};
-+
-+static void s2_mmu_tlbi_s1e1(struct kvm_s2_mmu *mmu,
-+			     const union tlbi_info *info)
-+{
-+	WARN_ON(__kvm_tlbi_s1e2(mmu, info->va.addr, info->va.encoding));
-+}
-+
-+static bool handle_tlbi_el1(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-+			    const struct sys_reg_desc *r)
++static bool handle_alle1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
++			   const struct sys_reg_desc *r)
 +{
 +	u32 sys_encoding = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
-+	u64 vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
 +
-+	/*
-+	 * If we're here, this is because we've trapped on a EL1 TLBI
-+	 * instruction that affects the EL1 translation regime while
-+	 * we're running in a context that doesn't allow us to let the
-+	 * HW do its thing (aka vEL2):
-+	 *
-+	 * - HCR_EL2.E2H == 0 : a non-VHE guest
-+	 * - HCR_EL2.{E2H,TGE} == { 1, 0 } : a VHE guest in guest mode
-+	 *
-+	 * We don't expect these helpers to ever be called when running
-+	 * in a vEL1 context.
-+	 */
-+
-+	WARN_ON(!vcpu_is_el2(vcpu));
-+
-+	if (!kvm_supported_tlbi_s1e1_op(vcpu, sys_encoding)) {
++	if (!kvm_supported_tlbi_s12_op(vcpu, sys_encoding)) {
 +		kvm_inject_undefined(vcpu);
 +		return false;
 +	}
 +
-+	kvm_s2_mmu_iterate_by_vmid(vcpu->kvm, get_vmid(vttbr),
-+				   &(union tlbi_info) {
-+					   .va = {
-+						   .addr = p->regval,
-+						   .encoding = sys_encoding,
-+					   },
-+				   },
-+				   s2_mmu_tlbi_s1e1);
++	write_lock(&vcpu->kvm->mmu_lock);
++
++	/*
++	 * Drop all shadow S2s, resulting in S1/S2 TLBIs for each of the
++	 * corresponding VMIDs.
++	 */
++	kvm_nested_s2_unmap(vcpu->kvm);
++
++	write_unlock(&vcpu->kvm->mmu_lock);
 +
 +	return true;
 +}
 +
-+#define SYS_INSN(insn, access_fn)					\
-+	{								\
-+		SYS_DESC(OP_##insn),					\
-+		.access = (access_fn),					\
-+	}
-+
- static struct sys_reg_desc sys_insn_descs[] = {
- 	{ SYS_DESC(SYS_DC_ISW), access_dcsw },
- 	{ SYS_DESC(SYS_DC_IGSW), access_dcgsw },
-@@ -2751,6 +2818,19 @@ static struct sys_reg_desc sys_insn_descs[] = {
- 	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
- 	{ SYS_DESC(SYS_DC_CIGSW), access_dcgsw },
- 	{ SYS_DESC(SYS_DC_CIGDSW), access_dcgsw },
-+
-+	SYS_INSN(TLBI_VMALLE1IS, handle_tlbi_el1),
-+	SYS_INSN(TLBI_VAE1IS, handle_tlbi_el1),
-+	SYS_INSN(TLBI_ASIDE1IS, handle_tlbi_el1),
-+	SYS_INSN(TLBI_VAAE1IS, handle_tlbi_el1),
-+	SYS_INSN(TLBI_VALE1IS, handle_tlbi_el1),
-+	SYS_INSN(TLBI_VAALE1IS, handle_tlbi_el1),
-+	SYS_INSN(TLBI_VMALLE1, handle_tlbi_el1),
-+	SYS_INSN(TLBI_VAE1, handle_tlbi_el1),
-+	SYS_INSN(TLBI_ASIDE1, handle_tlbi_el1),
-+	SYS_INSN(TLBI_VAAE1, handle_tlbi_el1),
-+	SYS_INSN(TLBI_VALE1, handle_tlbi_el1),
-+	SYS_INSN(TLBI_VAALE1, handle_tlbi_el1),
+ /* Only defined here as this is an internal "abstraction" */
+ union tlbi_info {
+ 	struct {
+@@ -2880,7 +2903,9 @@ static struct sys_reg_desc sys_insn_descs[] = {
+ 	SYS_INSN(TLBI_VALE1, handle_tlbi_el1),
+ 	SYS_INSN(TLBI_VAALE1, handle_tlbi_el1),
+ 
++	SYS_INSN(TLBI_ALLE1IS, handle_alle1is),
+ 	SYS_INSN(TLBI_VMALLS12E1IS, handle_vmalls12e1is),
++	SYS_INSN(TLBI_ALLE1, handle_alle1is),
+ 	SYS_INSN(TLBI_VMALLS12E1, handle_vmalls12e1is),
  };
  
- static const struct sys_reg_desc *first_idreg;
 -- 
 2.39.2
 
