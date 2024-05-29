@@ -1,110 +1,85 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 886EC181CF7
-	for <kvmarm@lists.linux.dev>; Wed, 29 May 2024 15:51:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E89FF1836EF;
+	Wed, 29 May 2024 15:51:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716997868; cv=none; b=NfITC0ip4Cq1hMdc0fPVjfrzKJ2bPs0k4dRl5JL46kNpCnw6HCu/18KSeYAB2dB72yS/FT9yipESihfBRsEI7XPJqZ1NGZcGjdIGXWZNMtUBUEeFxkZGceoigp9O4j5pzmAiKC9y6/C137jViSUKy6ywubHF35Ga9ohrQL8F5HU=
+	t=1716997871; cv=none; b=phqPrguycK7FBOaHqlIXYZC1diK7XXMdlqR3erCCwLwy35qfDW2/Uza95sy9Qosy3p8aMiLNgoslY+cXZisk9TkLTdnofC05IqxXq2n5YZjI/AW61dEooncF4LZYbw0YT5wWmKPW9KtbXgIqOtgKWpiclVA8qX3eYMqqz0O+RL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716997868; c=relaxed/simple;
-	bh=nPh/k750oWFllKMqo44WmSkl8MopO1VSvwnk7Titii8=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=ZpU1uv/b3D3ZUpzvzH1KDUy5bFcvi7opyJ0HCmiQl4YYczb1mv5qDBWIxV/Cg5W7ayt/HX7l7gl9dZVCk7b98gtSQDWaeQJoXs4wMmH3tSsskCsrtnFMFTMZRDxO4CED8Q4/lBHfFeojNC11P7FQBgU1D7+1Rg6lVpv6HogafRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YsMm92V+; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1716997871; c=relaxed/simple;
+	bh=yfp/7KVmaD9soBtmKL6q5BZ78PtD4h6vksVq6qycOPU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sTUbVfwvNlkFawVOzSFio3+rHdaCNwIsR2L2oy+QCyD+OC3OknZ5fKo5KZ8kyd0hppsE/IySBEfbi4DaJeedX9CPuPotRyVTygYOr6CXvkNGX8Ta20H4Zr9sA5zh9yS2LKIIr9F0Nf4ejJIfKtYu1xL8ut0dUkM+YvCW1C5j1Ng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GaoQuU+O; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YsMm92V+"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1716997865;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wj1aC4UtCyPUM4QTC8xzhgQZJugAFw5/FZACWc0ZVRo=;
-	b=YsMm92V+hZG3ZXTbisjAsykub4E/PsNiXP7FM4e1N/HLIIj8SaquO2FWHi+7X37+Y/tsL7
-	1WtXIK+J4WTnrDRWVbfJD2wZPEXOfb4Y8LMbQCwPSJRr+goahqRllo3i9G5iYq3er6nHAt
-	I4GrhvMMDQqstSCFZL6/P5HzsrwElg0=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-74-seLG0OtRNx20zpSk8NOYrA-1; Wed, 29 May 2024 11:51:04 -0400
-X-MC-Unique: seLG0OtRNx20zpSk8NOYrA-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-420eed123a2so16678785e9.1
-        for <kvmarm@lists.linux.dev>; Wed, 29 May 2024 08:51:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716997863; x=1717602663;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wj1aC4UtCyPUM4QTC8xzhgQZJugAFw5/FZACWc0ZVRo=;
-        b=EGMe4/bjPz9SVT0pVEsPgn1kt4+glr2gd3WOE8VX4vXPersSHWzRFKi2kkBpGVPYER
-         E/m5BJeK+RkJn9UYkhdUbw1dvK+0f28Jxu1lbS6te+dshrO9y9kKxPXlEOKoOL4bUkc9
-         KaN9WbhSzHvMR2fQ1DFbfhX8YFTTuFXmseMSocfjbiWEfqHxnAMfHBeC0yvbP7KNWB/9
-         4KCvyJd15LXvMFJtBpBsFCjLO4fpyPVLSVVJmgiYq7atqpL/qfzaN0oB0yh9hTitwonS
-         /F+zMMHqHW9Jq7Al30Xf1IoUtcmX8GB1Qn0XOuzFeGucWM+rarC8o3JDI6KjGHnWrjZG
-         sX0A==
-X-Forwarded-Encrypted: i=1; AJvYcCVGu4mG6q8euNz9vfRBQa7RFEuz/sJZt8oBf0iSVo9xKMSCXBwrqnh3x3/0XLlAn16toZlnvqIjMHitSoA21pDfWbqwtpxr
-X-Gm-Message-State: AOJu0Yy7pBBNYdYO/B35XuVoaZPo5NJU4F82N52GnPVVdoIfYH8LjhvU
-	0fO18wvAZAeHVd5s5Us2OT8w433rm4+lPuytxFjmsgra4NLCcJCzNlT6UrCqmyPGXxZ66DSghz1
-	uT+Q+zmEWcN3VnJBpvz4mluipNyTA6xCWUX0PNNRwWnXrTliIdOHRbA==
-X-Received: by 2002:a05:600c:4506:b0:421:205f:52de with SMTP id 5b1f17b1804b1-421205f543bmr41308765e9.26.1716997862737;
-        Wed, 29 May 2024 08:51:02 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHnxWP0k/VdlV2yzLTOufK9dfVKQxMD5gYEbM+NMCUK0CifwlvRGzVwfVWIWgQnenP9G0xAbw==
-X-Received: by 2002:a05:600c:4506:b0:421:205f:52de with SMTP id 5b1f17b1804b1-421205f543bmr41308605e9.26.1716997862342;
-        Wed, 29 May 2024 08:51:02 -0700 (PDT)
-Received: from rh (p200300c93f02d1004c157eb0f018dd01.dip0.t-ipconnect.de. [2003:c9:3f02:d100:4c15:7eb0:f018:dd01])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42100f14436sm216520275e9.17.2024.05.29.08.51.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 May 2024 08:51:02 -0700 (PDT)
-Date: Wed, 29 May 2024 17:51:01 +0200 (CEST)
-From: Sebastian Ott <sebott@redhat.com>
-To: Eric Auger <eauger@redhat.com>
-cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-    linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>, 
-    Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
-    Suzuki K Poulose <suzuki.poulose@arm.com>, 
-    Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v3 2/6] KVM: arm64: maintain per VM value for CTR_EL0
-In-Reply-To: <edbe3039-ed42-432e-8309-5a0a46cc2d5c@redhat.com>
-Message-ID: <90e53cc7-039f-5abc-f94c-cf53a1602a2a@redhat.com>
-References: <20240514072252.5657-1-sebott@redhat.com> <20240514072252.5657-3-sebott@redhat.com> <edbe3039-ed42-432e-8309-5a0a46cc2d5c@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GaoQuU+O"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9C84C32789;
+	Wed, 29 May 2024 15:51:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716997869;
+	bh=yfp/7KVmaD9soBtmKL6q5BZ78PtD4h6vksVq6qycOPU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=GaoQuU+Ob2D3PlaLdueq8ggVFX6iSg+v2w6qHqkuwkS9CIgWTLw5y7rGQ7+5GR4Fg
+	 uANNlFpP1VgfT6if855Wvm9NdJN5hRzQP8OUOXnuwKFyjKE8G12ivBjGrC1LcCD6w/
+	 2CbGLQHQSM6PJj0po0Ffs9ICz8Me24rTqw+GAiNZZ5D95XM1c/Be35pC/WsJGQWlhu
+	 cvJiH6240yh986469ZD5sWVoor/vICC4R7TZnHLH5OlRmYRov3nFNqae7tV2jRXm5t
+	 74bcVyy7YRqfNy5it18K2OpzG2/9T12ylaqtFtRDxi1h/k1btvzJcvqZ8OIz1ZIaEz
+	 EaoL1OtvzQsog==
+Date: Wed, 29 May 2024 16:51:00 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
+	aneesh.kumar@kernel.org, aneesh.kumar@linux.ibm.com, bp@alien8.de,
+	catalin.marinas@arm.com, christophe.leroy@csgroup.eu,
+	dave.hansen@linux.intel.com, hpa@zytor.com,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
+	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
+	oliver.upton@linux.dev, shuah@kernel.org, szabolcs.nagy@arm.com,
+	tglx@linutronix.de, will@kernel.org, x86@kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v4 28/29] kselftest/arm64: Add test case for POR_EL0
+ signal frame records
+Message-ID: <58fb8a27-6c40-4b13-a231-b0db1c16916c@sirena.org.uk>
+References: <20240503130147.1154804-1-joey.gouly@arm.com>
+ <20240503130147.1154804-29-joey.gouly@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="BFkxsI+/n7XbdM1d"
+Content-Disposition: inline
+In-Reply-To: <20240503130147.1154804-29-joey.gouly@arm.com>
+X-Cookie: Everybody gets free BORSCHT!
 
-Hej Eric,
 
-On Wed, 29 May 2024, Eric Auger wrote:
->>  static int set_clidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
->>  		      u64 val)
->>  {
->> -	u64 ctr_el0 = read_sanitised_ftr_reg(SYS_CTR_EL0);
->>  	u64 idc = !CLIDR_LOC(val) || (!CLIDR_LOUIS(val) && !CLIDR_LOUU(val));
->> +	u64 ctr_el0 = vcpu->kvm->arch.ctr_el0;
->>
->>  	if ((val & CLIDR_EL1_RES0) || (!(ctr_el0 & CTR_EL0_IDC) && idc))
->>  		return -EINVAL;
-> nit: you may update the function doc comment which the extra handling of
-> CTR_EL0.
+--BFkxsI+/n7XbdM1d
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Hm, there's no extra handling of CTR_EL0 it just uses the emulated value.
+On Fri, May 03, 2024 at 02:01:46PM +0100, Joey Gouly wrote:
+> Ensure that we get signal context for POR_EL0 if and only if POE is present
+> on the system.
 
->> @@ -3557,6 +3557,13 @@ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
->>  	struct kvm *kvm = vcpu->kvm;
->>  	unsigned long i;
->>
->> +	if (!kvm_vcpu_initialized(vcpu))
-> at this stage of the reading, why is the above check needed?
+Reviewed-by: Mark Brown <broonie@kernel.org>
 
-To make sure that a later call to this function doesn't overwrite
-the value provided by userspace. (See e016333745c "KVM: arm64: Only
-reset vCPU-scoped feature ID regs once").
+--BFkxsI+/n7XbdM1d
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Sebastian
+-----BEGIN PGP SIGNATURE-----
 
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmZXTuQACgkQJNaLcl1U
+h9B5sgf9GRRafV0J2nOmiAXvWZuutE7IagLikzc5FwyU8kvRSUOCwAK+THgPINah
+BKWEKe5a8EKzbzzeOWUu2mhw/twKyx6t92RRQsEc4fzFmotuq+6dET2hiVcbjtyk
+c1ipV82q2LVB1L7pmftHRXKUZ0DHxgT346HzSi6Oz8hl/+FIN2Wi/AnTmIIqnDrn
+VSmKA7dRfJ8aQ7dsRIBk1sbuBHtNHqE0sCsy1CgaRxnh92opgwRwCy/E3g9bl+mw
+hfGE1FluYz3zipMP7rHeVMPXJm95ejVZUENNlNglTFZ97NTPJB7hAYc6BVumdHNx
+FHZxeYLHzVUNbVEs0vYJplYVSegMdg==
+=IfbO
+-----END PGP SIGNATURE-----
+
+--BFkxsI+/n7XbdM1d--
