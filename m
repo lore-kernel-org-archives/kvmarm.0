@@ -1,103 +1,143 @@
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03C3B6FC6
-	for <kvmarm@lists.linux.dev>; Wed, 29 May 2024 12:54:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 449241BC3F
+	for <kvmarm@lists.linux.dev>; Wed, 29 May 2024 13:49:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716987262; cv=none; b=RdqLupSdwjkVv9wC30ydw3WDdrqw3IrgZxdOsb4ymg3MC1m4gmOrRaCFlJpb9pSZzaC8BU2sfGoO9RWotcQ5VwRK/HYcuyyb1ndvIv7ZAKnlEHzW8d4MZkzdh4i0v0YWGTlnztN5GtXQWF3ebpt6bG6U4/eMSuizNnSQB1Yu/+Y=
+	t=1716990576; cv=none; b=BMrAZ7dg2eZ/A/6t9dpssBMnl3DgPmySqiG07xkPno+QsJnP1rGgqgcJlKw7+IOGigX68UIFjq/bMCx4u+eo8/kyXy7QRYHH5o/3p1pHy8bOBuIIn59vwd3Jo6q8pcb+erlu4aPikDiwih8gAWZpIlhgL4GIgLj7BPiBl7feMW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716987262; c=relaxed/simple;
-	bh=7C3Ln9w/sSUWPP+BUdVx+PL58R8HTzOVmDKg36W3xec=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=DBZhJKTGfV5SruF/UbusO4sXB7CC00tN2hbmHsD21y36zJ0QEvNV1ORsqIq22fBmKI01GSEDfMMKv/WGwXdp4wq18a2vMJ6wMSZ8vs7V/vuY0wjpyEKQdJhnb2YiqDzIiC7h9d8bhZ/ouHK4BbvfYlMHuDVCt9p9SFwXV065A9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=27KaI3Ub; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1716990576; c=relaxed/simple;
+	bh=99FqLTNYvbbq89Ah4H9OpzmZV2JtCTkw7gxfM/d8V44=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GWmR9m/wX/v6sWbt1BSXD2uT/sZKaI89nsxbc9qKsTowKC4pRRK1uk7ISJq54hu+9ly2EmiqPk4lltpIiHZ2xTxdMDg+CEGgNQLeMk5wvh6kqmnd7KvjNjt0PEGge4skJErmeGdemDY4wqmWQiFy2CfLsAcmfAb8XMzXbe+BpsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UXiBfzT8; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="27KaI3Ub"
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-6819fd023b9so2194784a12.3
-        for <kvmarm@lists.linux.dev>; Wed, 29 May 2024 05:54:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1716987260; x=1717592060; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1KVQFhVFh80Fdd96OAcePaAYKBvjrIO3JB8q5MbeFQU=;
-        b=27KaI3UbOfCoRhke1cY9+3lF+pC9jfVNcr2V0hD7p3n3lTheNBn5QXNWxog9ZUxnLb
-         Rcu0E0+5bvDtDM/RFrSOTPcPIaravgjkiqKYwc1mpB4+9jZFMC9K2u5CFcqrE4B/PWGv
-         6MyjPQfi8gSkMOrfau1PgcZJZlmvuhtXuuKaCZuiykAQ5G4WNgB7eGjhFZvRyij9H87j
-         58kOtnbfiXjHirahLWVhNrQ7KmxwbffLgp4mhNN3MPBkwdp5QLmgy37J78hnnOSfv4p9
-         XxTn7DV4bbDKYHuP80du6ha9SbBhOc4V0qPTfRHxQNa1H1XkdBUpslNdVIyL+yg5QSgh
-         c65w==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UXiBfzT8"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1716990574;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QRV3+tH1wAxqOXSuvjuNmBXhPCtgpPsBKQx4qXuEunY=;
+	b=UXiBfzT8ZDnvwXNFg1aJnhv8gY+pYE8vtukmkg505NUet7cleSG0g1v0LJLhSxp8uB4gSU
+	CCfnisxWaUuilOd3iaPn4ZA02w9rNywSAyDQ6xv+neDb2obe9cL23lMOfJ6VQrD4ZDarB+
+	iuW0wv5IwzXu42XdV9wMDBdXfXtIH4M=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-581-6P_I5g09OhaxQFRpcz8FEQ-1; Wed, 29 May 2024 09:49:32 -0400
+X-MC-Unique: 6P_I5g09OhaxQFRpcz8FEQ-1
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-6ae00989e7eso103856d6.3
+        for <kvmarm@lists.linux.dev>; Wed, 29 May 2024 06:49:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716987260; x=1717592060;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1KVQFhVFh80Fdd96OAcePaAYKBvjrIO3JB8q5MbeFQU=;
-        b=obssnpNDpL9ScJ4chqyC38fTVQ7qhTTA+CV0MPrRYKw7iR+UK0EZt0eg7lSz0urypA
-         gx65S+LJreGPSTGNpmtewcrTuCXATQ3CZVDvF4lBs088T9c+sQibPT+GwFzsg50yKEt8
-         V427ZCJ/a/N5h8i/csOoi7lHZ9cKfKQ72eMt5tzxvHDvpRv6syyagHZp46QNuNx7OVfw
-         aROKhQyB9PRPI6kBQFuGEhX8AVBWz93wZdJTH1Y8VmciuEwD+6S5Bm51lOEEhGBd/K4i
-         3T81QdNMCtD60nsMXupDmFxAKuGwxcxK2lAJhba5ZG1WDvUpdv3F3VvNit6vesngVhK7
-         qGww==
-X-Forwarded-Encrypted: i=1; AJvYcCV5eJ8O5Kcj09aPB23er/Xyb4nGYxz52WMuaONqwkSBLZhZxieiZ5sj8eCByplxIUM6bPzGwAuQZxVK3iIM4d2jz6BfJwAW
-X-Gm-Message-State: AOJu0YwY+hKIgWJHpidpdl5MBropXVSjAAzuAPC0c76IB7Z1LkAhol3D
-	UUOnu3vkr6NyrAhkRi+IYWSJvaDRj+/fhsWpnaQB+YrbSu6Z47aSUhFwBhK7FXW7fkUS20FQC/a
-	SVg==
-X-Google-Smtp-Source: AGHT+IHBbZP8iE9LJoz88cSwyGPtf4IYoLcqAZBm04Syis1dHtNGwvMpLLvLxNB1S+GJVlzsrbdgQQ4xG0k=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:1421:0:b0:680:1ce8:ba9a with SMTP id
- 41be03b00d2f7-681aea7d0ecmr40830a12.11.1716987260030; Wed, 29 May 2024
- 05:54:20 -0700 (PDT)
-Date: Wed, 29 May 2024 05:54:18 -0700
-In-Reply-To: <2a221116a03f57dca8274b6bc2da7541b21d86bb.camel@intel.com>
+        d=1e100.net; s=20230601; t=1716990572; x=1717595372;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QRV3+tH1wAxqOXSuvjuNmBXhPCtgpPsBKQx4qXuEunY=;
+        b=HrBdtdSCFXp36zoyHDaaF6mGSPR4sLTaVUWFRGFahuzreDa/bIClIfLs6FyhB+SsaA
+         yV/NeTE6FCWFvqfdAecHpJzV2H4jdVL9lJTYqlq/wrGoK8JLTJ9y1VPHQYkYlC6Qk/+M
+         eqEd/VsNHCDgA+1rqYrK6/IsK8G9cZ019TtFS1//IL0w6xQdJSq8NxV2uxVSGbJAdOy/
+         JYTBKEJm0+Iqq4V+nG5o08C0ZeJtfJHaf3e6EIaAAqjqdcuR/hFV4wGYV32/i25qwCcS
+         tpauIOr+7ZVBZHiJEEGj/H8YIuOCmQPMi6cH1J5Hm6dsZTmTNzbrF+rxEf191poN7VZn
+         16ow==
+X-Forwarded-Encrypted: i=1; AJvYcCW+hEPVrYZecOyQehM1TrrpGIvcP8SCeQ4CEaEwIT+XlOXeqskUaYTpl3BQ7pueh3nti14fy57vvqrNEaFDeFvB0ePune/G
+X-Gm-Message-State: AOJu0YygvSDx227rhhVzvi/SmF/7GMue6QFOf7F9BFM4gbskSR0OsR3Y
+	dMfNH1/FSevg+QLvdjCrlG4qWvARgbNm4SLoF2uCBZs5YIACLnfNF61lOhemF9g9MMz7aqfT97J
+	w4/szydBHm8ConwdM2pR53+eLdlLb3+C5QuKRAHvmgNc1PgBkTrfshw==
+X-Received: by 2002:a05:6214:4a86:b0:6aa:1e22:6c7b with SMTP id 6a1803df08f44-6abcd0b49d7mr196373256d6.25.1716990572355;
+        Wed, 29 May 2024 06:49:32 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEk4VCNntSzG+qoXnos2+vChx4ufljIX3WREdFxolPCgJlMDh4sRm/2lcc7Y7hfqXDE+Zek8w==
+X-Received: by 2002:a05:6214:4a86:b0:6aa:1e22:6c7b with SMTP id 6a1803df08f44-6abcd0b49d7mr196372986d6.25.1716990571952;
+        Wed, 29 May 2024 06:49:31 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6ad742b3663sm38929456d6.60.2024.05.29.06.49.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 29 May 2024 06:49:31 -0700 (PDT)
+Message-ID: <6b452b94-e03a-4d99-b196-65d775c1e5ce@redhat.com>
+Date: Wed, 29 May 2024 15:49:28 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20240522014013.1672962-1-seanjc@google.com> <20240522014013.1672962-4-seanjc@google.com>
- <c77f3931-31b2-4695-bd74-c69cba9b96c1@intel.com> <ZlYte16cvQpPGHkx@google.com>
- <2a221116a03f57dca8274b6bc2da7541b21d86bb.camel@intel.com>
-Message-ID: <ZlclevRvntUMYG6O@google.com>
-Subject: Re: [PATCH v2 3/6] KVM: x86: Fold kvm_arch_sched_in() into kvm_arch_vcpu_load()
-From: Sean Christopherson <seanjc@google.com>
-To: Kai Huang <kai.huang@intel.com>
-Cc: "chenhuacai@kernel.org" <chenhuacai@kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"maz@kernel.org" <maz@kernel.org>, "frankja@linux.ibm.com" <frankja@linux.ibm.com>, 
-	"borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>, "mpe@ellerman.id.au" <mpe@ellerman.id.au>, 
-	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, "palmer@dabbelt.com" <palmer@dabbelt.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "maobibo@loongson.cn" <maobibo@loongson.cn>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, 
-	"loongarch@lists.linux.dev" <loongarch@lists.linux.dev>, 
-	"paul.walmsley@sifive.com" <paul.walmsley@sifive.com>, 
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, "imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>, 
-	"kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>, 
-	"zhaotianrui@loongson.cn" <zhaotianrui@loongson.cn>, 
-	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
-	"linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>, "anup@brainfault.org" <anup@brainfault.org>, 
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, 
-	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 4/6] KVM: arm64: show writable masks for feature
+ registers
+To: Sebastian Ott <sebott@redhat.com>, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ James Morse <james.morse@arm.com>, Suzuki K Poulose
+ <suzuki.poulose@arm.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>
+References: <20240514072252.5657-1-sebott@redhat.com>
+ <20240514072252.5657-5-sebott@redhat.com>
+From: Eric Auger <eauger@redhat.com>
+In-Reply-To: <20240514072252.5657-5-sebott@redhat.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, May 29, 2024, Kai Huang wrote:
-> I am not familiar with SVM, but it seems the relevant parts are:
+Hi Sebastian,
+
+On 5/14/24 09:22, Sebastian Ott wrote:
+> Instead of using ~0UL provide the actual writable mask for
+> non-id feature registers in the output of the
+> KVM_ARM_GET_REG_WRITABLE_MASKS ioctl.
 > 
-> 	control->pause_filter_count;
-> 	vmcb_mark_dirty(svm->vmcb, VMCB_INTERCEPTS);
+> This changes the mask for the CTR_EL0 and CLIDR_EL1 registers.
 > 
-> And it seems they are directly related to programming the hardware, i.e.,
-> they got automatically loaded to hardware during VMRUN.
-
-"control" is the control area of the VMCB, i.e. the above pause_filter_count is
-equivalent to a VMCS field.
-
-> They need to be updated in the SVM specific code when @ple_window_dirty is
-> true in the relevant code path.
+> Signed-off-by: Sebastian Ott <sebott@redhat.com>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 19 +++++--------------
+>  1 file changed, 5 insertions(+), 14 deletions(-)
 > 
-> Anyway, even it is feasible and worth to do, we should do in a separate
-> patchset.
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 8e8acf3dd9bd..1b6ab483e21e 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -2562,7 +2562,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  
+>  	{ SYS_DESC(SYS_CCSIDR_EL1), access_ccsidr },
+>  	{ SYS_DESC(SYS_CLIDR_EL1), access_clidr, reset_clidr, CLIDR_EL1,
+> -	  .set_user = set_clidr },
+> +	  .set_user = set_clidr, .val = ~CLIDR_EL1_RES0 },
+>  	{ SYS_DESC(SYS_CCSIDR2_EL1), undef_access },
+>  	{ SYS_DESC(SYS_SMIDR_EL1), undef_access },
+>  	{ SYS_DESC(SYS_CSSELR_EL1), access_csselr, reset_unknown, CSSELR_EL1 },
+> @@ -4121,20 +4121,11 @@ int kvm_vm_ioctl_get_reg_writable_masks(struct kvm *kvm, struct reg_mask_range *
+>  		if (!is_feature_id_reg(encoding) || !reg->set_user)
+>  			continue;
+>  
+> -		/*
+> -		 * For ID registers, we return the writable mask. Other feature
+> -		 * registers return a full 64bit mask. That's not necessary
+> -		 * compliant with a given revision of the architecture, but the
+> -		 * RES0/RES1 definitions allow us to do that.
+> -		 */
+> -		if (is_vm_ftr_id_reg(encoding)) {
+> -			if (!reg->val ||
+> -			    (is_aa32_id_reg(encoding) && !kvm_supports_32bit_el0()))
+> -				continue;
+> -			val = reg->val;
+> -		} else {
+> -			val = ~0UL;
+> +		if (!reg->val ||
+> +		    (is_aa32_id_reg(encoding) && !kvm_supports_32bit_el0())) {
+> +			continue;
+>  		}
+> +		val = reg->val;
+>  
+>  		if (put_user(val, (masks + KVM_ARM_FEATURE_ID_RANGE_INDEX(encoding))))
+>  			return -EFAULT;
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Ya.
+Eric
+
