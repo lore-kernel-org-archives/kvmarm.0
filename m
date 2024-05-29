@@ -1,273 +1,104 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8556C181D0C;
-	Wed, 29 May 2024 14:56:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E8A9181334
+	for <kvmarm@lists.linux.dev>; Wed, 29 May 2024 15:29:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716994597; cv=none; b=GplJjAMs1brCXE9b5YICyzF2By1FTWaCOmOLihLRs15ovyu39KkodxmKAlaH/AFPJljAqWfz9b89wiLTAzyFYAA/ivYutgCsmhw3W8dFywmMPzgGATnjCL6uC1xFn9aLU2AVGIz2PrARgeJG1K6fW4h4pElwJifLCu15/eX/LgI=
+	t=1716996566; cv=none; b=OM6mOZFylE0xowRM8fSQbkA4CNGRPMPLJHXz80ep0pE2GpeBNeVOGXpOtlcZaAYAgIe/sTeBCdDB7tN8+Aw+CrsBmO9S1+Tra1jGeTJaNpMfGDK80WeMfWX51zstoA4lpY2HR9N1wfGFb3yTcwm7D8jRQ888ctTHp2jntqyeCCE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716994597; c=relaxed/simple;
-	bh=cLV4mIW1eIAa0/CdAxkYAY2q2y1j43sKCrnl6h01er4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Kcu2sAdJI/hh6gomKZHAuD3BOd6VKYOrGukhFTW2MlfFArXRxjd0U5LX4ntn3SD+343ONf+Jn8pWwT/NzpY+2sEYKhJcmnxS2lN/lo6A9vc1FZC7mlLRNSQ/rJx4gvt3RLulQZ6MtuLc7/BQu9AJ2Dwy5GXGcvZimRQh8lC5Y7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kbZrmafX; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1716996566; c=relaxed/simple;
+	bh=5EAuE4m6aZKJdT/S8iDYy5RWTfH+qE69UIxaK12MGSw=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=f79zfOvokOesA1gdYD+RyW9rEVYnQIzwmWzUmufS+9RiwPE/x6WduZOnEAOh8PLCL4Li1dAN0zCHlMdT3MKd9A4MKq3oC6JObAEv9o1pLvVgoNdKn1P1ysqVQLxKKWy6MbH1mqbpr889QmBkZG5r6ogeqvXBJbNBjZmraNO/EqU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IK9Sd7eI; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kbZrmafX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE0D0C113CC;
-	Wed, 29 May 2024 14:56:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716994597;
-	bh=cLV4mIW1eIAa0/CdAxkYAY2q2y1j43sKCrnl6h01er4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=kbZrmafXucphUuU+CU4NaBhu5RdxRIVtNNnqqr7OzCChUo1bNOZQVUy7X3+kfdEue
-	 UWcn7UJ1nlLEUU5yLM6quM1WusUGzxou3fCDZJkRBq+6IvsKwY5WNdc+qesvKXjgRM
-	 ZkYeuwcNWcsCROjB+VPe/q8sLqdArMMjSKsoy3neJ2LCfv51D8E9XXDkeZuIUp9a6A
-	 kjtHRgevI74urd8PUX+gKaKVjNeI3yfziiIK9OnavBbljNnel4RHl2qEH2sSiSOzkp
-	 lhdomaMdVateA6f8j+lO7jpON03mjjmrqM6W1OjmD4kqr0FF8T50UynsZNsXi4NUbQ
-	 vSh4FwBPtWbmA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sCKjD-00GekF-0b;
-	Wed, 29 May 2024 15:56:35 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Cc: James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: [PATCH v2 15/16] KVM: arm64: nv: Add handling of range-based TLBI operations
-Date: Wed, 29 May 2024 15:56:27 +0100
-Message-Id: <20240529145628.3272630-16-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240529145628.3272630-1-maz@kernel.org>
-References: <20240529145628.3272630-1-maz@kernel.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IK9Sd7eI"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1716996564;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5EAuE4m6aZKJdT/S8iDYy5RWTfH+qE69UIxaK12MGSw=;
+	b=IK9Sd7eIHCauNVOKbcgW8z2CBclAb5Ky44gSxh1do6Hx+NPlFNdgpINQhDfE9jqKZK13es
+	wJHgCJG7sgfpi1sHTQO8MoeFNsfx5qg/JUaZ+NjHdSfGN1/4KSyXc4RWpZ6LcGH2ENPm8f
+	/zRISdllAAkKRkrxPYKubAsTJn/zzX0=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-672-Zu50P6LOMp-PSABR5aXarA-1; Wed, 29 May 2024 11:29:22 -0400
+X-MC-Unique: Zu50P6LOMp-PSABR5aXarA-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-35559d30617so1767348f8f.2
+        for <kvmarm@lists.linux.dev>; Wed, 29 May 2024 08:29:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716996561; x=1717601361;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5EAuE4m6aZKJdT/S8iDYy5RWTfH+qE69UIxaK12MGSw=;
+        b=lQvQXbiqi+VADko6jPFbXGTAi4RVV3N7unY6yzk7BLKrTs9p9J7lmouYUmfouNdtEH
+         ha/a26Bssedj1C4925+KF7egEc1Jn8j/eQrrwn32AuStcwC7W7ahvh7c6Dz1SkoDBtSb
+         87irVzYsY7Cb//v2OIYG/mrBDtUa8v6e5v8E2d3qoVu7GSrX3gt9Eo7tAXuAwFtAcGOk
+         SsNn2PELxJBDNL+EIW2hpFl1NVBVqNvTTYfgoeutwdTsH7t9/7UK03omEZ2egJ12V2rF
+         fusZcxnZJoMUr1boO/56rZOTDd5ftwFCMjpLCbBEBzmsQrz+uuR5uZRyuc9zTAGgouSV
+         CLjw==
+X-Forwarded-Encrypted: i=1; AJvYcCWsxzCNvoAFemixZSQfTxcAL2FfI6pQstkioDQev+uinsDQ4Ayp879rce3kbDtP8ggeR1VmOxfDozazz99jJM2toU2tZRAS
+X-Gm-Message-State: AOJu0YyO+5h1MbzijPsHW7ygoMfcebY30iabr91PjkgQApOmnGDA1ZSS
+	gpw9ktbEFmoFzSBewJGOb68+ZppNMX9+zV4CYq+4zdpZl9Hmgl0za2mixanBEWwwvmInm6MwSWF
+	/zIn6Uvch5CJpufhn3eL+lZz3ufRE7V6gDiMjXKk6M2EJYlYNIQp39A==
+X-Received: by 2002:a5d:6991:0:b0:354:f286:4f0c with SMTP id ffacd0b85a97d-3552fe029a0mr12407207f8f.51.1716996561617;
+        Wed, 29 May 2024 08:29:21 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHRJjULm6jx6xOHCCpirutvbUnzT/a6jQusAfJO3XKjkkjlSGtoHgavcGj/S/fqDOvU0+uebQ==
+X-Received: by 2002:a5d:6991:0:b0:354:f286:4f0c with SMTP id ffacd0b85a97d-3552fe029a0mr12407190f8f.51.1716996561221;
+        Wed, 29 May 2024 08:29:21 -0700 (PDT)
+Received: from rh (p200300c93f02d1004c157eb0f018dd01.dip0.t-ipconnect.de. [2003:c9:3f02:d100:4c15:7eb0:f018:dd01])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35579d7dd73sm15045365f8f.18.2024.05.29.08.29.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 May 2024 08:29:20 -0700 (PDT)
+Date: Wed, 29 May 2024 17:29:19 +0200 (CEST)
+From: Sebastian Ott <sebott@redhat.com>
+To: Eric Auger <eauger@redhat.com>
+cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+    linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>, 
+    Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
+    Suzuki K Poulose <suzuki.poulose@arm.com>, 
+    Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v3 5/6] KVM: arm64: rename functions for invariant sys
+ regs
+In-Reply-To: <b045f810-eb79-4de6-b149-0d64834d53d4@redhat.com>
+Message-ID: <5a00647d-7d33-81a6-c783-2212ff73ca8b@redhat.com>
+References: <20240514072252.5657-1-sebott@redhat.com> <20240514072252.5657-6-sebott@redhat.com> <b045f810-eb79-4de6-b149-0d64834d53d4@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 
-We already support some form of range operation by handling FEAT_TTL,
-but so far the "arbitrary" range operations are unsupported.
+Hej Eric,
 
-Let's fix that.
+On Wed, 29 May 2024, Eric Auger wrote:
+> On 5/14/24 09:22, Sebastian Ott wrote:
+>> Invariant system id registers are populated with host values
+>> at initialization time using their .reset function cb.
+> get_##reg call read_sysreg(). I don't really understand the above
+> sentence. Please could you elaborate?
+>
 
-For EL2 S1, this is simple enough: we just map both NSH, ISH and OSH
-instructions onto the ISH version for EL1.
+struct sys_reg_desc has 2 function pointers (among others):
+.reset and .get_user . The functions implementing these are
+usually named accordingly. For invariant registers only
+.reset is used but set to functions that are called get_*
+(which is usually used to implement .get_user).
 
-For TLBI instructions affecting EL1 S1, we use the same model as
-their non-range counterpart to invalidate in the context of the
-correct VMID.
+E.g.: invariant_sys_regs[0].reset == get_midr_el1
 
-For TLBI instructions affecting S2, we interpret the data passed
-by the guest to compute the range and use that to tear-down part
-of the shadow S2 range and invalidate the TLBs.
+When trying to figure out this code I was confused by this, hence
+this patch..
 
-Finally, we advertise FEAT_TLBIRANGE if the host supports it.
-
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/hyp/vhe/tlb.c | 26 ++++++++++++
- arch/arm64/kvm/nested.c      |  8 +---
- arch/arm64/kvm/sys_regs.c    | 80 ++++++++++++++++++++++++++++++++++++
- 3 files changed, 108 insertions(+), 6 deletions(-)
-
-diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
-index 85db6ffd9d9d..18e30f03f3f5 100644
---- a/arch/arm64/kvm/hyp/vhe/tlb.c
-+++ b/arch/arm64/kvm/hyp/vhe/tlb.c
-@@ -283,6 +283,32 @@ int __kvm_tlbi_s1e2(struct kvm_s2_mmu *mmu, u64 va, u64 sys_encoding)
- 	case OP_TLBI_VAALE1OS:
- 		__tlbi(vaale1is, va);
- 		break;
-+	case OP_TLBI_RVAE2:
-+	case OP_TLBI_RVAE2IS:
-+	case OP_TLBI_RVAE2OS:
-+	case OP_TLBI_RVAE1:
-+	case OP_TLBI_RVAE1IS:
-+	case OP_TLBI_RVAE1OS:
-+		__tlbi(rvae1is, va);
-+		break;
-+	case OP_TLBI_RVALE2:
-+	case OP_TLBI_RVALE2IS:
-+	case OP_TLBI_RVALE2OS:
-+	case OP_TLBI_RVALE1:
-+	case OP_TLBI_RVALE1IS:
-+	case OP_TLBI_RVALE1OS:
-+		__tlbi(rvale1is, va);
-+		break;
-+	case OP_TLBI_RVAAE1:
-+	case OP_TLBI_RVAAE1IS:
-+	case OP_TLBI_RVAAE1OS:
-+		__tlbi(rvaae1is, va);
-+		break;
-+	case OP_TLBI_RVAALE1:
-+	case OP_TLBI_RVAALE1IS:
-+	case OP_TLBI_RVAALE1OS:
-+		__tlbi(rvaale1is, va);
-+		break;
- 	default:
- 		ret = -EINVAL;
- 	}
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 981c879ba79a..9e237249a3dc 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -804,12 +804,8 @@ static u64 limit_nv_id_reg(u32 id, u64 val)
- 
- 	switch (id) {
- 	case SYS_ID_AA64ISAR0_EL1:
--		/* Support everything but TME and Range TLBIs */
--		tmp = FIELD_GET(NV_FTR(ISAR0, TLB), val);
--		tmp = min(tmp, ID_AA64ISAR0_EL1_TLB_OS);
--		val &= ~(NV_FTR(ISAR0, TLB)		|
--			 NV_FTR(ISAR0, TME));
--		val |= FIELD_PREP(NV_FTR(ISAR0, TLB), tmp);
-+		/* Support everything but TME */
-+		val &= ~NV_FTR(ISAR0, TME);
- 		break;
- 
- 	case SYS_ID_AA64ISAR1_EL1:
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 7dec7da167f6..f6edcb863577 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2854,6 +2854,57 @@ static bool handle_vmalls12e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 	return true;
- }
- 
-+static bool handle_ripas2e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-+			      const struct sys_reg_desc *r)
-+{
-+	u32 sys_encoding = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
-+	u64 vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
-+	u64 base, range, tg, num, scale;
-+	int shift;
-+
-+	if (!kvm_supported_tlbi_ipas2_op(vcpu, sys_encoding)) {
-+		kvm_inject_undefined(vcpu);
-+		return false;
-+	}
-+
-+	/*
-+	 * Because the shadow S2 structure doesn't necessarily reflect that
-+	 * of the guest's S2 (different base granule size, for example), we
-+	 * decide to ignore TTL and only use the described range.
-+	 */
-+	tg	= FIELD_GET(GENMASK(47, 46), p->regval);
-+	scale	= FIELD_GET(GENMASK(45, 44), p->regval);
-+	num	= FIELD_GET(GENMASK(43, 39), p->regval);
-+	base	= p->regval & GENMASK(36, 0);
-+
-+	switch(tg) {
-+	case 1:
-+		shift = 12;
-+		break;
-+	case 2:
-+		shift = 14;
-+		break;
-+	case 3:
-+	default:		/* IMPDEF: handle tg==0 as 64k */
-+		shift = 16;
-+		break;
-+	}
-+
-+	base <<= shift;
-+	range = __TLBI_RANGE_PAGES(num, scale) << shift;
-+
-+	kvm_s2_mmu_iterate_by_vmid(vcpu->kvm, get_vmid(vttbr),
-+				   &(union tlbi_info) {
-+					   .range = {
-+						   .start = base,
-+						   .size = range,
-+					   },
-+				   },
-+				   s2_mmu_unmap_range);
-+
-+	return true;
-+}
-+
- static void s2_mmu_unmap_ipa(struct kvm_s2_mmu *mmu,
- 			     const union tlbi_info *info)
- {
-@@ -2966,12 +3017,28 @@ static struct sys_reg_desc sys_insn_descs[] = {
- 	SYS_INSN(TLBI_VALE1OS, handle_tlbi_el1),
- 	SYS_INSN(TLBI_VAALE1OS, handle_tlbi_el1),
- 
-+	SYS_INSN(TLBI_RVAE1IS, handle_tlbi_el1),
-+	SYS_INSN(TLBI_RVAAE1IS, handle_tlbi_el1),
-+	SYS_INSN(TLBI_RVALE1IS, handle_tlbi_el1),
-+	SYS_INSN(TLBI_RVAALE1IS, handle_tlbi_el1),
-+
- 	SYS_INSN(TLBI_VMALLE1IS, handle_tlbi_el1),
- 	SYS_INSN(TLBI_VAE1IS, handle_tlbi_el1),
- 	SYS_INSN(TLBI_ASIDE1IS, handle_tlbi_el1),
- 	SYS_INSN(TLBI_VAAE1IS, handle_tlbi_el1),
- 	SYS_INSN(TLBI_VALE1IS, handle_tlbi_el1),
- 	SYS_INSN(TLBI_VAALE1IS, handle_tlbi_el1),
-+
-+	SYS_INSN(TLBI_RVAE1OS, handle_tlbi_el1),
-+	SYS_INSN(TLBI_RVAAE1OS, handle_tlbi_el1),
-+	SYS_INSN(TLBI_RVALE1OS, handle_tlbi_el1),
-+	SYS_INSN(TLBI_RVAALE1OS, handle_tlbi_el1),
-+
-+	SYS_INSN(TLBI_RVAE1, handle_tlbi_el1),
-+	SYS_INSN(TLBI_RVAAE1, handle_tlbi_el1),
-+	SYS_INSN(TLBI_RVALE1, handle_tlbi_el1),
-+	SYS_INSN(TLBI_RVAALE1, handle_tlbi_el1),
-+
- 	SYS_INSN(TLBI_VMALLE1, handle_tlbi_el1),
- 	SYS_INSN(TLBI_VAE1, handle_tlbi_el1),
- 	SYS_INSN(TLBI_ASIDE1, handle_tlbi_el1),
-@@ -2980,7 +3047,9 @@ static struct sys_reg_desc sys_insn_descs[] = {
- 	SYS_INSN(TLBI_VAALE1, handle_tlbi_el1),
- 
- 	SYS_INSN(TLBI_IPAS2E1IS, handle_ipas2e1is),
-+	SYS_INSN(TLBI_RIPAS2E1IS, handle_ripas2e1is),
- 	SYS_INSN(TLBI_IPAS2LE1IS, handle_ipas2e1is),
-+	SYS_INSN(TLBI_RIPAS2LE1IS, handle_ripas2e1is),
- 
- 	SYS_INSN(TLBI_ALLE2OS, trap_undef),
- 	SYS_INSN(TLBI_VAE2OS, trap_undef),
-@@ -2988,12 +3057,23 @@ static struct sys_reg_desc sys_insn_descs[] = {
- 	SYS_INSN(TLBI_VALE2OS, trap_undef),
- 	SYS_INSN(TLBI_VMALLS12E1OS, handle_vmalls12e1is),
- 
-+	SYS_INSN(TLBI_RVAE2IS, trap_undef),
-+	SYS_INSN(TLBI_RVALE2IS, trap_undef),
-+
- 	SYS_INSN(TLBI_ALLE1IS, handle_alle1is),
- 	SYS_INSN(TLBI_VMALLS12E1IS, handle_vmalls12e1is),
- 	SYS_INSN(TLBI_IPAS2E1OS, handle_ipas2e1is),
- 	SYS_INSN(TLBI_IPAS2E1, handle_ipas2e1is),
-+	SYS_INSN(TLBI_RIPAS2E1, handle_ripas2e1is),
-+	SYS_INSN(TLBI_RIPAS2E1OS, handle_ripas2e1is),
- 	SYS_INSN(TLBI_IPAS2LE1OS, handle_ipas2e1is),
- 	SYS_INSN(TLBI_IPAS2LE1, handle_ipas2e1is),
-+	SYS_INSN(TLBI_RIPAS2LE1, handle_ripas2e1is),
-+	SYS_INSN(TLBI_RIPAS2LE1OS, handle_ripas2e1is),
-+	SYS_INSN(TLBI_RVAE2OS, trap_undef),
-+	SYS_INSN(TLBI_RVALE2OS, trap_undef),
-+	SYS_INSN(TLBI_RVAE2, trap_undef),
-+	SYS_INSN(TLBI_RVALE2, trap_undef),
- 	SYS_INSN(TLBI_ALLE1, handle_alle1is),
- 	SYS_INSN(TLBI_VMALLS12E1, handle_vmalls12e1is),
- };
--- 
-2.39.2
+Sebastian
 
