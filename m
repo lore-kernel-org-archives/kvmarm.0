@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C0A71386C6;
-	Wed, 29 May 2024 15:46:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5CD015B115;
+	Wed, 29 May 2024 15:50:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716997586; cv=none; b=K2GpBDHK5DZ33YyGUbONGay/rcpqLesF3PjVlyGhM+5lEjOAAxg7euTecWyjnu52jCSsruMdON8sSJcmEz95k2Ygk+1QwmOIj3Lx4+HEjQHxERkykRz1De+StMy7sw/q6AZOj3XN5UwCIkvq+PnyyXVM+ox4n2rxG/xr85vTT2I=
+	t=1716997849; cv=none; b=sIsHQZUcS+w6N1jk/2A2HRMSM4h333KCrGY7KjsHWfBQEdWZkFL0l4nadaaVSKw2XLaFt8yxoGUDB7jr+pw4orDh5scj57XPvZO5AMAKium3gaPSNj+Z17Ph6TLBavX76AnoWYrhJZjxwKDWx2buIK3eRioHwf4DqLCJ0HvwW34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716997586; c=relaxed/simple;
-	bh=5H/9tAGxhCnQIdq/gPNT2uQTCgvD6jAZwCxyBBdjciY=;
+	s=arc-20240116; t=1716997849; c=relaxed/simple;
+	bh=M6v4So8qJJ9yRxrCHyNBpJWbsn6zaiePqJdDikIffcg=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pTXU4Gf0jOK9W6oTvBxsHcb0u0OnVUy7B5Sgr6UPfnRJfAJYSWKGw2oNH2hsXiNX5R9wNTFd0j6RgOOAe6FVoosszNUFLCnRCKUNmxc3buNjvBQEqEcTnWK5xIrHHNj6hm8Xvc/5CZouTA2j5ix+YnWJDRVZXOTO7zc4AaIeOU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b1HcRd4F; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=AnGNRt8fDOsTj5+miIr5q817bTxwYrGewj2BOSm0FQE/ZP1BwcLC7TEttt0Aul5cOMytcgfb3s3SRzRt5wNFSp3Ll5Sev3k6v3eCRbpdmihGWXkyJAezpOe3jP48TF297LfEihQwoBI+e84vPL9+ySsgxBejYcGE4ydqPOmBeGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qWw6eJ+Y; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b1HcRd4F"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBC9CC116B1;
-	Wed, 29 May 2024 15:46:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qWw6eJ+Y"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EEF38C113CC;
+	Wed, 29 May 2024 15:50:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716997585;
-	bh=5H/9tAGxhCnQIdq/gPNT2uQTCgvD6jAZwCxyBBdjciY=;
+	s=k20201202; t=1716997849;
+	bh=M6v4So8qJJ9yRxrCHyNBpJWbsn6zaiePqJdDikIffcg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=b1HcRd4FyRr1Fgr8KI7GaMOYM54DLB/kJz++0sBj9koRiH1ImimLxCkncD3DWiJb4
-	 NDH8P+IaKPe1VLQGZJP5nf9t3/ZSchz0OAJ4mpGWs1V3Apgz6CUNpTj4p22M34KEtD
-	 loH1/x5pPy2LnldfHajuPt15CKIwbllYL7rKylFdmMpIBBgYHlG/x0E6Prqo4VLR5F
-	 BXQc7DRs+e2H+ZvsNZNJqBI82iorAnwgpyaXrvj8xDcNrsvMLpbDse62m0cMekjJFE
-	 qRxhbulfJVSoPdv1Pix0R7Pb3LaMDPnYzIDyrfMx4qLrotZZidXBLndgigIRuAscB0
-	 vdOTG32dAyCcw==
+	b=qWw6eJ+YExFmA+CUVsPa5hU36SjXwo7pr3BiEUL9LJ+67Mqr4Hrd8Lb5wuOzXl0Fm
+	 nI3vNanpRAlmhPs6BppfD9kAAZhjDwpCigABTY5SaKmAqOylHLpQzBfCguH/o4b8S8
+	 YPV9miKGauAOMN9X1G4xOo46q/Yzw93gtZT+WAmAezRXD1RlgfpLkSSoyDFSnU61ty
+	 6aPxG74jhZyUFRj1HhBkmlehlAaxUnrTlDpxqIF4h0eKjAxsv6z1r7TvK+b5uIX2fS
+	 dedMJ7ZJ0jZ4xFgolUqJUwJkCxgxaJwwNZMeATlivPYwbanZDUFYha2eT0G73m5Tr0
+	 nRv3RlWSK8qhg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sCLVP-00Gfog-PN;
-	Wed, 29 May 2024 16:46:23 +0100
-Date: Wed, 29 May 2024 16:46:23 +0100
-Message-ID: <8634q0mxio.wl-maz@kernel.org>
+	id 1sCLZe-00GfsI-V4;
+	Wed, 29 May 2024 16:50:47 +0100
+Date: Wed, 29 May 2024 16:50:46 +0100
+Message-ID: <861q5kmxbd.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Joey Gouly <joey.gouly@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org,
@@ -60,10 +60,10 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	will@kernel.org,
 	x86@kernel.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 08/29] KVM: arm64: make kvm_at() take an OP_AT_*
-In-Reply-To: <20240503130147.1154804-9-joey.gouly@arm.com>
+Subject: Re: [PATCH v4 09/29] KVM: arm64: use `at s1e1a` for POE
+In-Reply-To: <20240503130147.1154804-10-joey.gouly@arm.com>
 References: <20240503130147.1154804-1-joey.gouly@arm.com>
-	<20240503130147.1154804-9-joey.gouly@arm.com>
+	<20240503130147.1154804-10-joey.gouly@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -79,11 +79,17 @@ X-SA-Exim-Rcpt-To: joey.gouly@arm.com, linux-arm-kernel@lists.infradead.org, akp
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 03 May 2024 14:01:26 +0100,
+On Fri, 03 May 2024 14:01:27 +0100,
 Joey Gouly <joey.gouly@arm.com> wrote:
 > 
-> To allow using newer instructions that current assemblers don't know about,
-> replace the `at` instruction with the underlying SYS instruction.
+> FEAT_ATS1E1A introduces a new instruction: `at s1e1a`.
+> This is an address translation, without permission checks.
+> 
+> POE allows read permissions to be removed from S1 by the guest.  This means
+> that an `at` instruction could fail, and not get the IPA.
+> 
+> Switch to using `at s1e1a` so that KVM can get the IPA regardless of S1
+> permissions.
 > 
 > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
 > Cc: Marc Zyngier <maz@kernel.org>
@@ -91,44 +97,29 @@ Joey Gouly <joey.gouly@arm.com> wrote:
 > Cc: Catalin Marinas <catalin.marinas@arm.com>
 > Cc: Will Deacon <will@kernel.org>
 > ---
->  arch/arm64/include/asm/kvm_asm.h       | 3 ++-
->  arch/arm64/kvm/hyp/include/hyp/fault.h | 2 +-
->  2 files changed, 3 insertions(+), 2 deletions(-)
+>  arch/arm64/kvm/hyp/include/hyp/fault.h | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index 24b5e6b23417..ce65fd0f01b0 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -10,6 +10,7 @@
->  #include <asm/hyp_image.h>
->  #include <asm/insn.h>
->  #include <asm/virt.h>
-> +#include <asm/sysreg.h>
-
-nit: include order.
-
->  
->  #define ARM_EXIT_WITH_SERROR_BIT  31
->  #define ARM_EXCEPTION_CODE(x)	  ((x) & ~(1U << ARM_EXIT_WITH_SERROR_BIT))
-> @@ -261,7 +262,7 @@ extern u64 __kvm_get_mdcr_el2(void);
->  	asm volatile(							\
->  	"	mrs	%1, spsr_el2\n"					\
->  	"	mrs	%2, elr_el2\n"					\
-> -	"1:	at	"at_op", %3\n"					\
-> +	"1:	" __msr_s(at_op, "%3") "\n"				\
->  	"	isb\n"							\
->  	"	b	9f\n"						\
->  	"2:	msr	spsr_el2, %1\n"					\
 > diff --git a/arch/arm64/kvm/hyp/include/hyp/fault.h b/arch/arm64/kvm/hyp/include/hyp/fault.h
-> index 9e13c1bc2ad5..487c06099d6f 100644
+> index 487c06099d6f..17df94570f03 100644
 > --- a/arch/arm64/kvm/hyp/include/hyp/fault.h
 > +++ b/arch/arm64/kvm/hyp/include/hyp/fault.h
-> @@ -27,7 +27,7 @@ static inline bool __translate_far_to_hpfar(u64 far, u64 *hpfar)
+> @@ -14,6 +14,7 @@
+>  
+>  static inline bool __translate_far_to_hpfar(u64 far, u64 *hpfar)
+>  {
+> +	int ret;
+>  	u64 par, tmp;
+>  
+>  	/*
+> @@ -27,7 +28,9 @@ static inline bool __translate_far_to_hpfar(u64 far, u64 *hpfar)
 >  	 * saved the guest context yet, and we may return early...
 >  	 */
 >  	par = read_sysreg_par();
-> -	if (!__kvm_at("s1e1r", far))
-> +	if (!__kvm_at(OP_AT_S1E1R, far))
+> -	if (!__kvm_at(OP_AT_S1E1R, far))
+> +	ret = system_supports_poe() ? __kvm_at(OP_AT_S1E1A, far) :
+> +	                              __kvm_at(OP_AT_S1E1R, far);
+> +	if (!ret)
 >  		tmp = read_sysreg_par();
 >  	else
 >  		tmp = SYS_PAR_EL1_F; /* back to the guest */
