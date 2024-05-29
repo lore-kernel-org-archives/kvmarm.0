@@ -1,139 +1,146 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E14F1C6A0
-	for <kvmarm@lists.linux.dev>; Wed, 29 May 2024 13:58:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC1E2156F38
+	for <kvmarm@lists.linux.dev>; Wed, 29 May 2024 14:27:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716991137; cv=none; b=NRIiKorCVDwt6mnQ9GDxyDb3QhT2wsgd+FnVZiUKzvYtaS1r4xYn/fgTATRM+LWHpLWUZSKqcObp+mgx2KG+GlUKwu1J0k8OTOzyu6n0ejC5H3HTkaOKtMVsD5fsD01k+d2r7e2oa80ffs6mQg4zy5zzPXYvlWaqVU/jgaPDzhY=
+	t=1716992856; cv=none; b=CsagKlpAhIrRl4sMc7pX5gKQ6ilR4E9p+SCY8a2lMQ2811406ndPedOTBuBfPMjDFybv9BBRtRWLvUUHd0/bCM8KtxxqJWDLLHQyj8aFxNthbJz8+avju93TQJmy4nkv4k3Db/eQJy5BFEjAeCNJMd7TFOv17N2c5BsinZ853io=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716991137; c=relaxed/simple;
-	bh=NhfLFKimMloJeZdUmF9DWPA/k6EIfjaMNnrCLXzufHs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MXa0pehCQNUsbpyjr3rLeLujYEBveiFg3nzeRXvasNjMDW97zi9isKHy8CxTYnOl8Mzf6yKQGhs/veFg/B2uqdc43z/jJidm/3E8iZGcfQFBOwQuuGJWSFXHYcNPZZkNynesOrxBeAXLsSk7wmIjQsDZh9IRgIZJ2RSj+/uVSfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XNaZYGpc; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XNaZYGpc"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1716991135;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kBUt+81N76m8JjLowWjPyJ/0ry15liDoYiHfRlVMY7c=;
-	b=XNaZYGpcwZF1vGDdqOd1dwmpvEbWapRBeX1aFMkdpyxnidyN5spaMdLLMASqgM82luBQse
-	ASuXXFAZMKv8viexUskViIo81UzmvcB6TOwgHHCsOY/z6P5GY3RS1bFBx9Oriadil7/5+d
-	WaqjD5RDxfiC9+ztMr8aWwSatHqLQ+8=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-361-z6Wf-jidP5iUBQznomUENQ-1; Wed, 29 May 2024 09:58:50 -0400
-X-MC-Unique: z6Wf-jidP5iUBQznomUENQ-1
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-794b5cd9468so267121185a.1
-        for <kvmarm@lists.linux.dev>; Wed, 29 May 2024 06:58:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716991130; x=1717595930;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kBUt+81N76m8JjLowWjPyJ/0ry15liDoYiHfRlVMY7c=;
-        b=evCI/SjxoNQm7gQPo4xvfP6ihPKMFKcy8Z2R3WZBsnc9q/Sphj3KgMTEYObrnwihEW
-         lVzsh67M6AP0OdnPG0wpNPrU8Z3svmH0tVqwX0B3EJu1dQ/nDvoGrBNfGO1YOb9b8kiD
-         t88yaZ1IIOVshswR4b28Oz+k3QAMzLPjR1OaIAMJ+iF8rrXaylz3sR/173GMe8nepgXv
-         8PRwrvHeqOFtruGKdhWDdbVGI/vjCGJ9betXPolz6e4K6TTu+wUDpjSYtRqVpVAV1cQy
-         Vp764xcS6AlAGDOw+006p4hANnDteihyjE93ayS5iaVdMTuJNAIGv+K6oI8j4bvfTnnq
-         jnOA==
-X-Forwarded-Encrypted: i=1; AJvYcCVzFHOjf0q9bN28yhSCxWbrrDnWnGZ/buDoFe4GnzGHwYLDAdZlQmQApTqCzbXbpkeXnnc6mjfDlfoyKQBkXL+uRnK20fzq
-X-Gm-Message-State: AOJu0YxU0YKHGpfSI9PYDQZi1m+3bZm58FKI8TjZtmJvZtTwLiavFw+p
-	5znE+KXHrflllkobftaW0cF4xezlPc2odDB7NE3hd6wfaRVI8uzy9qigJuL3Yhabs9KCvnhpyoC
-	oH7Ly8HyvS7ut+fcKbc2802V2rL2Y9YeEgVFZLGLtt7q+5i4n7CVcOA==
-X-Received: by 2002:a05:6214:4805:b0:6ad:8f41:3ca6 with SMTP id 6a1803df08f44-6ad8f413d86mr70083196d6.12.1716991129977;
-        Wed, 29 May 2024 06:58:49 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEhaIWfEuFup0idzv7CTp9i0M0x4ZOM7kMRhbkvTSCSPbnBelYKtRYZKNIDRnw7041mRgi0jg==
-X-Received: by 2002:a05:6214:4805:b0:6ad:8f41:3ca6 with SMTP id 6a1803df08f44-6ad8f413d86mr70082816d6.12.1716991129499;
-        Wed, 29 May 2024 06:58:49 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6ad5b5da00csm51979476d6.92.2024.05.29.06.58.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 May 2024 06:58:49 -0700 (PDT)
-Message-ID: <b045f810-eb79-4de6-b149-0d64834d53d4@redhat.com>
-Date: Wed, 29 May 2024 15:58:45 +0200
+	s=arc-20240116; t=1716992856; c=relaxed/simple;
+	bh=gBU5dVr+0/Jj8aKS9U89oDbI4Ha0YG4ZLD8ZIgy1+9I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PZXecvRXbJazTRBGkRfu2hS0DCxM9/bckMY7Vk94v8K5PrFPGLNfFKRVnXHaL8/UycfQA6Qp4NR6sjPnKJtRJxXbb9Phab4X65auRGOqMhRLD9npUVstDChU7NM+Jqhu3ERYpRoordawM9Z8kdOa7VbwAon/Y5hRKTotWoVOX4A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 49F9D339;
+	Wed, 29 May 2024 07:27:58 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 07D783F762;
+	Wed, 29 May 2024 07:27:32 -0700 (PDT)
+Date: Wed, 29 May 2024 15:27:27 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 1/2] KVM: arm64: nv: Fix relative priorities of
+ exceptions generated by ERETAx
+Message-ID: <20240529142727.GA1357631@e124191.cambridge.arm.com>
+References: <20240528100632.1831995-1-maz@kernel.org>
+ <20240528100632.1831995-2-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 5/6] KVM: arm64: rename functions for invariant sys
- regs
-To: Sebastian Ott <sebott@redhat.com>, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- James Morse <james.morse@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will@kernel.org>
-References: <20240514072252.5657-1-sebott@redhat.com>
- <20240514072252.5657-6-sebott@redhat.com>
-From: Eric Auger <eauger@redhat.com>
-In-Reply-To: <20240514072252.5657-6-sebott@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240528100632.1831995-2-maz@kernel.org>
 
-Hi Sebastian,
+Hi Marc,
 
-On 5/14/24 09:22, Sebastian Ott wrote:
-> Invariant system id registers are populated with host values
-> at initialization time using their .reset function cb.
-get_##reg call read_sysreg(). I don't really understand the above
-sentence. Please could you elaborate?
+These references are from ARM DDI 0487 J.a.
 
-Thanks
-
-Eric
+On Tue, May 28, 2024 at 11:06:31AM +0100, Marc Zyngier wrote:
+> ERETAx can fail in multiple ways:
 > 
-> These are currently called get_* which is usually used by
-> the functions implementing the .get_user callback.
+> (1) ELR_EL2 points lalaland
+> (2) we get a PAC failure
+> (3) SPSR_EL2 has the wrong mode
 > 
-> Change their function names to reset_* to reflect what they
-> are used for.
+> (1) is easy, as we just let the CPU do its thing and deliver an
+> Instruction Abort. However, (2) and (3) are interesting, because
+> the PAC failure priority is way below that of the Illegal Execution
+> State exception.
 > 
-> Signed-off-by: Sebastian Ott <sebott@redhat.com>
+> Which means that if we have detected a PAC failure (and that we have
+> FPACCOMBINE), we must be careful to give priority to the Illegal
+> Execution State exception, should one be pending.
+
+This is IZFGJP Prioritization of Synchronous exceptions taken to AArch64 state.
+
+> 
+> Solving this involves hoisting the SPSR calculation earlier and
+> testing for the IL bit before injecting the FPAC exception.
+> 
+> In the extreme case of a ERETAx returning to an invalid mode *and*
+> failing its PAC check, we end up with an Instruction Abort (due
+> to the new PC being mangled by the failed Auth) *and* PSTATE.IL
+> being set. Which matches the requirements of the architecture.
+
+And this is IGPPXQ, which says "which causes the next instruction
+to generate an Illegal State exception. The exception return instruction does not generate the exception."
+
+Which matches since Instruction Abort has a higher priority than Illegal Exception.
+
+> 
+> Whilst we're at it, remove a stale comment that states the obvious
+> and only confuses the reader.
+> 
+> Fixes: 213b3d1ea161 ("KVM: arm64: nv: Handle ERETA[AB] instructions")
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  arch/arm64/kvm/sys_regs.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
+>  arch/arm64/kvm/emulate-nested.c | 21 +++++++++++----------
+>  1 file changed, 11 insertions(+), 10 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 1b6ab483e21e..bae72a4ce72b 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -3795,8 +3795,8 @@ id_to_sys_reg_desc(struct kvm_vcpu *vcpu, u64 id,
->   */
+> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+> index 72d733c74a38..54090967a335 100644
+> --- a/arch/arm64/kvm/emulate-nested.c
+> +++ b/arch/arm64/kvm/emulate-nested.c
+> @@ -2181,16 +2181,23 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
+>  	if (forward_traps(vcpu, HCR_NV))
+>  		return;
 >  
->  #define FUNCTION_INVARIANT(reg)						\
-> -	static u64 get_##reg(struct kvm_vcpu *v,			\
-> -			      const struct sys_reg_desc *r)		\
-> +	static u64 reset_##reg(struct kvm_vcpu *v,			\
-> +			       const struct sys_reg_desc *r)		\
->  	{								\
->  		((struct sys_reg_desc *)r)->val = read_sysreg(reg);	\
->  		return ((struct sys_reg_desc *)r)->val;			\
-> @@ -3808,9 +3808,9 @@ FUNCTION_INVARIANT(aidr_el1)
+> +	spsr = vcpu_read_sys_reg(vcpu, SPSR_EL2);
+> +	spsr = kvm_check_illegal_exception_return(vcpu, spsr);
+> +
+>  	/* Check for an ERETAx */
+>  	esr = kvm_vcpu_get_esr(vcpu);
+>  	if (esr_iss_is_eretax(esr) && !kvm_auth_eretax(vcpu, &elr)) {
+>  		/*
+> -		 * Oh no, ERETAx failed to authenticate.  If we have
+> -		 * FPACCOMBINE, deliver an exception right away.  If we
+> -		 * don't, then let the mangled ELR value trickle down the
+> +		 * Oh no, ERETAx failed to authenticate.
+> +		 *
+> +		 * If we have FPACCOMBINE and we don't have a pending
+> +		 * Illegal Execution State exception (which has priority
+> +		 * over FPAC), deliver an exception right away.
+> +		 *
+> +		 * Otherwise, let the mangled ELR value trickle down the
+>  		 * ERET handling, and the guest will have a little surprise.
+>  		 */
+> -		if (kvm_has_pauth(vcpu->kvm, FPACCOMBINE)) {
+> +		if (kvm_has_pauth(vcpu->kvm, FPACCOMBINE) && !(spsr & PSR_IL_BIT)) {
+>  			esr &= ESR_ELx_ERET_ISS_ERETA;
+>  			esr |= FIELD_PREP(ESR_ELx_EC_MASK, ESR_ELx_EC_FPAC);
+>  			kvm_inject_nested_sync(vcpu, esr);
+> @@ -2201,17 +2208,11 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
+>  	preempt_disable();
+>  	kvm_arch_vcpu_put(vcpu);
 >  
->  /* ->val is filled in by kvm_sys_reg_table_init() */
->  static struct sys_reg_desc invariant_sys_regs[] __ro_after_init = {
-> -	{ SYS_DESC(SYS_MIDR_EL1), NULL, get_midr_el1 },
-> -	{ SYS_DESC(SYS_REVIDR_EL1), NULL, get_revidr_el1 },
-> -	{ SYS_DESC(SYS_AIDR_EL1), NULL, get_aidr_el1 },
-> +	{ SYS_DESC(SYS_MIDR_EL1), NULL, reset_midr_el1 },
-> +	{ SYS_DESC(SYS_REVIDR_EL1), NULL, reset_revidr_el1 },
-> +	{ SYS_DESC(SYS_AIDR_EL1), NULL, reset_aidr_el1 },
->  };
+> -	spsr = __vcpu_sys_reg(vcpu, SPSR_EL2);
+> -	spsr = kvm_check_illegal_exception_return(vcpu, spsr);
+>  	if (!esr_iss_is_eretax(esr))
+>  		elr = __vcpu_sys_reg(vcpu, ELR_EL2);
 >  
->  static int get_invariant_sys_reg(u64 id, u64 __user *uaddr)
+>  	trace_kvm_nested_eret(vcpu, elr, spsr);
+>  
+> -	/*
+> -	 * Note that the current exception level is always the virtual EL2,
+> -	 * since we set HCR_EL2.NV bit only when entering the virtual EL2.
+> -	 */
+>  	*vcpu_pc(vcpu) = elr;
+>  	*vcpu_cpsr(vcpu) = spsr;
+>  
 
+Those references were just me checking it, not suggesting you edit the commit message.
+
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+
+Thanks,
+Joey
