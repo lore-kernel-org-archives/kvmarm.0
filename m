@@ -1,140 +1,88 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DB78176ACB
-	for <kvmarm@lists.linux.dev>; Thu, 30 May 2024 13:17:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE4BD1DDCE;
+	Thu, 30 May 2024 16:37:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717075062; cv=none; b=XQYO3lb6B+0uGrB/JAGdEAG748r5j+w5bKYPlzcNxVojw3tlYXBL1lCTAAprF3LFdfRcEugwFlOcINLRoUkCWxKF3MxMvbFTTPfi/b0mkZuQGTL9OWTVFHROZLkbt7s7E0AFGz7XqVPSDRUFCsEqJpiMUu9AeKOkUBfiouE1004=
+	t=1717087035; cv=none; b=hI/JydtFEM/ryi0m2G+Wb0sTL8N4vFUUbeaT1rttPj7d0wKBWjnyl4SNZoojpDAmsdgUQWEFTWlv4+5crfmhg72kUktx/CvyHw3KYWyL8s37am6fBJYpblreQo1rY4NSrl56kMH7g8tbvyPJ/ko2gnEVVi/jxgLkwOT55nZcfxQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717075062; c=relaxed/simple;
-	bh=CxIUN3Lji7DY92hrj/+p0NzGO5O58oa5RSnHgOoDbkM=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=h3SgNyPy1wNSf77TOO+v8osaYsC0NBF36c33gZRC29lMhpaQzMV7xO2NcalIw1xrikB5SzFMDcWD2foBqu+AYuM5tJwE6JS9sywqtrHJRwTm0IAIc82UhJqBIL8IqwHgheaM6wwSDOeBD/I6jf8winR7sluMrMprpC7sEd3ZTd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ylXeD6jB; arc=none smtp.client-ip=209.85.128.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
+	s=arc-20240116; t=1717087035; c=relaxed/simple;
+	bh=tVOp1fA4K9P8NGR19IHhCKyjqE4E/VgIcuRX4CRLiLU=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=shUeg4JZU/lIXYSPuG+Gpj4Wet8EK7c7XQlLQfCuKuX66uY8/F99YBQJr7y6caS9AxdTleCnpgHIONDDA/yTz+4vZgfZURsefTP2hHYBqLqVt7U1RVj9eLQPiycb1/Pl3f3xJ8FJx6IQkJMdeFAhLv1UjMWOoO0SR2z0FFe7n98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YY3J8EvO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ylXeD6jB"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-42128f7b5fbso4574145e9.2
-        for <kvmarm@lists.linux.dev>; Thu, 30 May 2024 06:17:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717075059; x=1717679859; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=A2h19ypI6tOBSYk6uWwSlGYJAlpWcvaEZOfEyoOEcjk=;
-        b=ylXeD6jB++zaCpvMDVYzZjr8YLHAtUzTg+ud+r9eIvAqNwyfn1goDy57UXzS9XlFOy
-         5gg7uMZXMXmIcQATqqi5l/5SbHLturBv6UJ/iYh0DymS/6d/xmjRkfwZMGyzVBIx7tMX
-         qipkWQcCLhSpW/VeY84PacI1um8nkL6jSO91ey+jC9LLGf0kTAYPEsnvg5oLGjXsdPi4
-         W9E7z0RM1rmtNiGQySpKc97dkR6J7Y7WRS0LKGOgQlr7EhVK652NXQSKUw8hemYKhhDE
-         VYc25YvkFIEIarweBF0q6VYbIpziBtBXYMYU0mhlpwaNqi2hI4I9yuTX8hRP7axR/Hq6
-         T8PA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717075059; x=1717679859;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=A2h19ypI6tOBSYk6uWwSlGYJAlpWcvaEZOfEyoOEcjk=;
-        b=LB3O6pSfGxqMXnf1C2Y8Qdct02zCcsJGDexFNj1Qj57SEZgVfIZ+rQc316cChvtU0q
-         rQdk40BDGzLt/jSAmi48S5jee0zUAy4hoWOIQiVcyJ96W5DSAMGpJMtV0B7/DUxtLAEC
-         RprWisMAGkXgXHLaHmxkJCx9rjTkK8sByeGCoRMLiM1k0VUqz7cj706YGV+M20ISFW2l
-         z6DFDqz08SSiuo2gKrfkrJw8NFRklTZjZWeWqV00lKDcx4w6ZlzQzcSnlbHotEfLSqEp
-         j3XN4nBr456eZXsWJdcwEHfjJAf81dzi54VqG1it8Gdj0bBApsZsCQG6Vmn4yYr2nMjU
-         3lDA==
-X-Forwarded-Encrypted: i=1; AJvYcCUJmu0iHFc6Wkasby5vuIosAIeiukrM/XsFPtAIY6LdaFI3iw0rw3cCoOkCReAXTyWFUvEJr5o5HkKzSF+ewZAsozEe0/VG
-X-Gm-Message-State: AOJu0YyOwiYwNXLsYphRt7OXlc/F8MjrsZwyDcfytqoEvUKpz1ZYyE2/
-	S5x0+INwjqmsh1T/PkKEtZjLdHs6M0bsqNXeaeD/Qo50mSR3ypQC8x8lgFnCtLE0BXFlgCcTQ76
-	itLwg0egJB/NUZfqRKw==
-X-Google-Smtp-Source: AGHT+IGh+KPdywzR45ey0MWLtb/lqdkOKtXl9CHjrK7tb6aGcEqLmSXkF7e0XyWNok1bVIvHaiwfYCYKB5tbSO2h
-X-Received: from vdonnefort.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:2eea])
- (user=vdonnefort job=sendgmr) by 2002:a05:600c:3b94:b0:421:29f2:7958 with
- SMTP id 5b1f17b1804b1-42129f27c40mr69125e9.1.1717075058922; Thu, 30 May 2024
- 06:17:38 -0700 (PDT)
-Date: Thu, 30 May 2024 14:17:34 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YY3J8EvO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56510C2BBFC;
+	Thu, 30 May 2024 16:37:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717087035;
+	bh=tVOp1fA4K9P8NGR19IHhCKyjqE4E/VgIcuRX4CRLiLU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=YY3J8EvOimnM/76WmbdUwZdkGoFtZN0j/QpNDQ/oQOKuUwyQTzNJamQEPkGxWhoOI
+	 60b6MjiwGll/Bhll+OdN8/5vOtPuBTVVJ1UOYwFq5DMA8Z5ANJY61TpXPTj5neduwK
+	 D/3enwsBxaLfqKlSKmepVGWcAKfFH+OsQs9u9g+/hLY2EBfNuCbVFYuIEABJx9Peyq
+	 9MF7NUqcWlguUkH5O0ceMG4fvmw+LkTHzrnl5ZetxjRm2feH3mBRlf+K/krKdgvfrm
+	 mHP2XPpEDrtE9RzyF1Hz6iYhEA68iizT4+42pnq+k8E+WCTQbMHRc4fbPEZNH+pN4M
+	 SmhxbFaVQT55w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sCim8-00Gwfa-QF;
+	Thu, 30 May 2024 17:37:12 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Marc Zyngier <maz@kernel.org>
+Cc: James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Joey Gouly <joey.gouly@arm.com>
+Subject: Re: [PATCH 0/2] KVM/arm64 fixes for NV PAC support
+Date: Thu, 30 May 2024 17:37:09 +0100
+Message-Id: <171708699884.3551619.6785501115932256469.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240528100632.1831995-1-maz@kernel.org>
+References: <20240528100632.1831995-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.45.1.288.g0e0cd299f1-goog
-Message-ID: <20240530131734.2724454-1-vdonnefort@google.com>
-Subject: [PATCH] KVM: arm64: FFA: Release hyp rx buffer
-From: Vincent Donnefort <vdonnefort@google.com>
-To: maz@kernel.org, oliver.upton@linux.dev, sudeep.holla@arm.com
-Cc: sebastianene@google.com, will@kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kernel-team@android.com, Vincent Donnefort <vdonnefort@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-According to the FF-A spec (1.2 BET0 7.2.2.4.2), after a producer has
-written into a buffer, it is "full" and now owned by the consumer until
-it is read and "empty". This must be signaled by the consumer with the
-RX_RELEASE invocation.
+On Tue, 28 May 2024 11:06:30 +0100, Marc Zyngier wrote:
+> Here's a small series of fixes following the introduction of NV PAuth
+> support in 6.10:
+> 
+> - address the relative priorities of Instruction abort, Illegal
+>   Execution state, and PAC failure (already posted)
+> 
+> - Expose BTI to a NV guest now that we have PAC up and running
+> 
+> [...]
 
-It is clear from the spec (7.2.2.4.2), that MEM_RETRIEVE_RESP is
-transferring the ownership from producer (in our case SPM) to consumer
-(hypervisor). We must then subsequently invoke RX_RELEASE to transfer
-back the ownership (i.e. to let SPM mark the buffer as "empty").
+Applied to fixes, thanks!
 
-It is less clear though what is happening with MEM_FRAG_TX. But this
-invocation, as a response to MEM_FRAG_RX writes into the same hypervisor
-RX buffer. Also this is matching the TF-A implementation where the RX
-buffer is marked "full" during a MEM_FRAG_RX.
+[1/2] KVM: arm64: nv: Fix relative priorities of exceptions generated by ERETAx
+      commit: 41011e2de3480f9adb6420b35b67628b2d903355
+[2/2] KVM: arm64: nv: Expose BTI and CSV_frac to a guest hypervisor
+      commit: 47eb2d68d10208e6a9e89d10b66018e8d6ca0623
 
-Release the RX hypervisor buffer in those two cases. This will unblock
-later invocations using this buffer which would otherwise fail.
-(RETRIEVE_REQ, MEM_FRAG_RX and PARTITION_INFO_GET).
+Cheers,
 
-Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
-
-diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-index 02746f9d0980..efb053af331c 100644
---- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-+++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-@@ -177,6 +177,14 @@ static void ffa_retrieve_req(struct arm_smccc_res *res, u32 len)
- 			  res);
- }
- 
-+static void ffa_rx_release(struct arm_smccc_res *res)
-+{
-+	arm_smccc_1_1_smc(FFA_RX_RELEASE,
-+			  0, 0,
-+			  0, 0, 0, 0, 0,
-+			  res);
-+}
-+
- static void do_ffa_rxtx_map(struct arm_smccc_res *res,
- 			    struct kvm_cpu_context *ctxt)
- {
-@@ -543,16 +551,19 @@ static void do_ffa_mem_reclaim(struct arm_smccc_res *res,
- 	if (WARN_ON(offset > len ||
- 		    fraglen > KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE)) {
- 		ret = FFA_RET_ABORTED;
-+		ffa_rx_release(res);
- 		goto out_unlock;
- 	}
- 
- 	if (len > ffa_desc_buf.len) {
- 		ret = FFA_RET_NO_MEMORY;
-+		ffa_rx_release(res);
- 		goto out_unlock;
- 	}
- 
- 	buf = ffa_desc_buf.buf;
- 	memcpy(buf, hyp_buffers.rx, fraglen);
-+	ffa_rx_release(res);
- 
- 	for (fragoff = fraglen; fragoff < len; fragoff += fraglen) {
- 		ffa_mem_frag_rx(res, handle_lo, handle_hi, fragoff);
-@@ -563,6 +574,7 @@ static void do_ffa_mem_reclaim(struct arm_smccc_res *res,
- 
- 		fraglen = res->a3;
- 		memcpy((void *)buf + fragoff, hyp_buffers.rx, fraglen);
-+		ffa_rx_release(res);
- 	}
- 
- 	ffa_mem_reclaim(res, handle_lo, handle_hi, flags);
-
-base-commit: 6d69b6c12fce479fde7bc06f686212451688a102
+	M.
 -- 
-2.45.1.288.g0e0cd299f1-goog
+Without deviation from the norm, progress is not possible.
+
 
