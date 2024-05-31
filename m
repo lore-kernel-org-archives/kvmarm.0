@@ -1,32 +1,32 @@
 Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEF2F12F5B6
-	for <kvmarm@lists.linux.dev>; Fri, 31 May 2024 23:14:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A72E012F5B8
+	for <kvmarm@lists.linux.dev>; Fri, 31 May 2024 23:14:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717197264; cv=none; b=X/5DP2WDqGxUXhD7hVhhyikBLjsyI8Y54BXvgTsCPhKgPmMBR1kcAS/W69n/H3xAaXL0ybb4e7DtoQJZe1LBLX6yOckGCJZHRsKyBX6kwZqvwKABbY6mgdU8RyVTjR4pJJRLL5yYYmgW5pk6+PODmRIhfE0jd7yxKAiLJbMud3E=
+	t=1717197267; cv=none; b=TMv96xa+IEnYZ9iO+ULqkQBFSclwPBWLThZLp58nU1zksV1kqJl7DUssWXQambbzQU04LXnlNqZ8JeVEqnoIwd73eOY7PVRg6xt5ohp/ZbzXtfvMlxHt7AA57Kx6pwdaYWtgZ47biWdg7BEdBwYbVhxPcOnWbYZttO45Ct8zZSo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717197264; c=relaxed/simple;
-	bh=6D8D9i3XydQ+ncxh2tn2cwLi/WZrfPVtOsD55yigttk=;
+	s=arc-20240116; t=1717197267; c=relaxed/simple;
+	bh=ZYqCChw0hfWIeJR9KxVug6g2WJ+ytT95ljLL0/noKvg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fUWP51Cd2npUoIwp3xJeLDe/GCc3HgSCyZb+Xj+vE67XCc/hLTayymYedWv08WeNkGHtW6/JzuVsVRtovjLG8zKaYpPsbICD2ApZzlO+DHe10fROMVubwWjVcRshJqYvUzl7JJc0qJPT2rVFoyHlEM+F5GaA4+lbfa3ygFhzhZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=AeGkZ8V6; arc=none smtp.client-ip=91.218.175.185
+	 MIME-Version; b=kwwFWdP+5ABssDi5K+XtBazX6/OCenpARvJknEoVPb1u0dtFwz7p88pp14nM/RA2T3/3S4rUh2ZUFmXhxHfIm/RdhrxFb3eE/Oh6e5icD3pEJvxBvfZg0CmTyonfq3nyuZbWiVLB3PR4ph5ZtsW0mS6+kNUwmoSRSb2HOGUQpUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ghl/Iskz; arc=none smtp.client-ip=91.218.175.185
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="AeGkZ8V6"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ghl/Iskz"
 X-Envelope-To: kvmarm@lists.linux.dev
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1717197260;
+	t=1717197264;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=75vx2xB9G5elNFx0s0w58jNdeKZ7431l9UtTNZ3JoLI=;
-	b=AeGkZ8V6qH123pi/2ON6eEU4ZxQHMkyQSxnpI/nu32ea1Q5IRnUdISmt66aoGphk6RBG/r
-	lmjV99oUot34W+ghks1l7BCoFhsjyr2rLXsA0m4Xg+loSNgJjECqKa2xyHmVlK5b5FOn1a
-	mYqCHO+4Aiw47HUh1eL2RjctdV7O5gc=
+	bh=QihSmQoz0iowSjFRYFy48HKQHNUekF/0Bi4J8iGu+ks=;
+	b=ghl/Iskz6sOklQTuwb1xCLhhyeG62isYKB8zqePtNtgsUh3OXjaj8LhQrQz1QbLDBdCBHB
+	TZJNKRobvDJopV1f+1jCh1tK7598MqG3SVvR0Ocwh6c2bmzSMXIEKLLRrjOCrga8AnJkK8
+	w2ROOHBisH0hrbKsjVkRZkWROjytPbg=
 X-Envelope-To: maz@kernel.org
 X-Envelope-To: james.morse@arm.com
 X-Envelope-To: suzuki.poulose@arm.com
@@ -42,9 +42,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	kvm@vger.kernel.org,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 04/11] KVM: arm64: nv: Load guest hyp's ZCR into EL1 state
-Date: Fri, 31 May 2024 23:13:51 +0000
-Message-ID: <20240531231358.1000039-5-oliver.upton@linux.dev>
+Subject: [PATCH 06/11] KVM: arm64: nv: Save guest's ZCR_EL2 when in hyp context
+Date: Fri, 31 May 2024 23:13:53 +0000
+Message-ID: <20240531231358.1000039-7-oliver.upton@linux.dev>
 In-Reply-To: <20240531231358.1000039-1-oliver.upton@linux.dev>
 References: <20240531231358.1000039-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -56,45 +56,36 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Load the guest hypervisor's ZCR_EL2 into the corresponding EL1 register
-when restoring SVE state, as ZCR_EL2 affects the VL in the hypervisor
-context.
+When running a guest hypervisor, ZCR_EL2 is an alias for the counterpart
+EL1 state.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/include/asm/kvm_host.h       | 4 ++++
- arch/arm64/kvm/hyp/include/hyp/switch.h | 3 ++-
- 2 files changed, 6 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/fpsimd.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 8170c04fde91..e01e6de414f1 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -844,6 +844,10 @@ struct kvm_vcpu_arch {
+diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
+index 1807d3a79a8a..53168bbea8a7 100644
+--- a/arch/arm64/kvm/fpsimd.c
++++ b/arch/arm64/kvm/fpsimd.c
+@@ -173,7 +173,16 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
  
- #define vcpu_sve_max_vq(vcpu)	sve_vq_from_vl((vcpu)->arch.sve_max_vl)
- 
-+#define vcpu_sve_zcr_el1(vcpu)						\
-+	(unlikely(is_hyp_ctxt(vcpu)) ? __vcpu_sys_reg(vcpu, ZCR_EL2) :	\
-+				       __vcpu_sys_reg(vcpu, ZCR_EL1))
+ 	if (guest_owns_fp_regs()) {
+ 		if (vcpu_has_sve(vcpu)) {
+-			__vcpu_sys_reg(vcpu, ZCR_EL1) = read_sysreg_el1(SYS_ZCR);
++			u64 zcr = read_sysreg_el1(SYS_ZCR);
 +
- #define vcpu_sve_state_size(vcpu) ({					\
- 	size_t __size_ret;						\
- 	unsigned int __vcpu_vq;						\
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 5872eaafc7f0..e1e888340739 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -317,7 +317,8 @@ static inline void __hyp_sve_restore_guest(struct kvm_vcpu *vcpu)
- 	sve_cond_update_zcr_vq(vcpu_sve_max_vq(vcpu) - 1, SYS_ZCR_EL2);
- 	__sve_restore_state(vcpu_sve_pffr(vcpu),
- 			    &vcpu->arch.ctxt.fp_regs.fpsr);
--	write_sysreg_el1(__vcpu_sys_reg(vcpu, ZCR_EL1), SYS_ZCR);
-+
-+	write_sysreg_el1(vcpu_sve_zcr_el1(vcpu), SYS_ZCR);
- }
++			/*
++			 * If the vCPU is in the hyp context then ZCR_EL1 is
++			 * loaded with its vEL2 counterpart.
++			 */
++			if (is_hyp_ctxt(vcpu))
++				__vcpu_sys_reg(vcpu, ZCR_EL2) = zcr;
++			else
++				__vcpu_sys_reg(vcpu, ZCR_EL1) = zcr;
  
- /*
+ 			/*
+ 			 * Restore the VL that was saved when bound to the CPU,
 -- 
 2.45.1.288.g0e0cd299f1-goog
 
