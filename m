@@ -1,167 +1,92 @@
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46E8D1CD11
-	for <kvmarm@lists.linux.dev>; Fri, 31 May 2024 07:24:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E590D1581F5
+	for <kvmarm@lists.linux.dev>; Fri, 31 May 2024 12:26:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717140277; cv=none; b=m4TWCeLhbd0zbpAcX6zidjl5un0va+LE3A1ejdDlfKKKJ3LKSsNfkD3k3waVNGfgum1VDNNliGWF2VJczybtdYaS/ToNrgXmsjc3pSX9NgFWGZfnkRF31CRkD9yqa9YIdHXXSpr4b5RESSP9c2svV0svmhqbnwi724TSB+i6288=
+	t=1717158385; cv=none; b=YRqAM8KbjChbHF2qyTeZ38a5tbKZbkGVZAt39VKRAGPVcI4bd7EQ8syO9uua1YqyI/V6zf05nECj3shyPMgbnvY1ste1SULbwR2MUBcfej6841ACJfGg++YpXj/OJzh7ZmGusHqVklRo2P/oQNFvqHlGeVYPCaftcM/po9T5Zgo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717140277; c=relaxed/simple;
-	bh=TCC6im0osMHH/ZsvTuf9nvpEoA9dgsRlPGyvUIj8bLY=;
+	s=arc-20240116; t=1717158385; c=relaxed/simple;
+	bh=xsITk3494Aa7aAKZNbplZMTTjB7yIumXUU2mA3NbW8I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ctl6thucfnDx/TKWXEr7wZMvMY2tql0ZfTqjl8v6lkI7MpaB0NXCkbf+RlfN1q5gV4oI8XYfICexUUajf20AfqhcUwEHowIR6V98yn7t4pYgXYhNbPViumSTz+YMFDNwlgRbOixACSJKplrtWU6BDblwhM5zTZANJa0WEnQ2KD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=r37JI0j7; arc=none smtp.client-ip=91.218.175.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	 Content-Type:Content-Disposition:In-Reply-To; b=f5shbgtdwTNSMttOca133lt54bzgcn3RE57GDKzxHPINHuk0xylAdtIIATfi8O4CpRIUVYID+XM8UuZu7KUv8trjRsCZOESH1QAK/SxdUNYAHKH3vFZKyD9h3lmeDDmTG12dMAg3XrgNPYd2NdZHW1zZV8DLnmYWkBIZwO3eD4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WWAWFLNo; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="r37JI0j7"
-X-Envelope-To: yuzhao@google.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1717140273;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=v6pyP4SRO/9BT5GrT52jbiQuxRO/wk0HtBPD4YgPhLk=;
-	b=r37JI0j7taWeZmoSnTE82903GeLstAD8AcPnN/lPbb+eAAkY0defxPmiJPHwGWnd294WLb
-	FjgHxx1Px9O8RnwjA1f9bxRoJnyH+BVooELFS2MSFgtlTifw+nQzg6kbOK9o4nC/oVDgtV
-	trAyzjYJwoWDB3IsG5rivC2BXJjWLQk=
-X-Envelope-To: jthoughton@google.com
-X-Envelope-To: akpm@linux-foundation.org
-X-Envelope-To: pbonzini@redhat.com
-X-Envelope-To: aou@eecs.berkeley.edu
-X-Envelope-To: ankita@nvidia.com
-X-Envelope-To: anup@brainfault.org
-X-Envelope-To: atishp@atishpatra.org
-X-Envelope-To: axelrasmussen@google.com
-X-Envelope-To: maobibo@loongson.cn
-X-Envelope-To: catalin.marinas@arm.com
-X-Envelope-To: dmatlack@google.com
-X-Envelope-To: rientjes@google.com
-X-Envelope-To: chenhuacai@kernel.org
-X-Envelope-To: james.morse@arm.com
-X-Envelope-To: corbet@lwn.net
-X-Envelope-To: maz@kernel.org
-X-Envelope-To: mpe@ellerman.id.au
-X-Envelope-To: npiggin@gmail.com
-X-Envelope-To: palmer@dabbelt.com
-X-Envelope-To: paul.walmsley@sifive.com
-X-Envelope-To: rananta@google.com
-X-Envelope-To: ryan.roberts@arm.com
-X-Envelope-To: seanjc@google.com
-X-Envelope-To: shahuang@redhat.com
-X-Envelope-To: shuah@kernel.org
-X-Envelope-To: suzuki.poulose@arm.com
-X-Envelope-To: zhaotianrui@loongson.cn
-X-Envelope-To: will@kernel.org
-X-Envelope-To: yuzenghui@huawei.com
-X-Envelope-To: kvm-riscv@lists.infradead.org
-X-Envelope-To: kvm@vger.kernel.org
-X-Envelope-To: kvmarm@lists.linux.dev
-X-Envelope-To: linux-arm-kernel@lists.infradead.org
-X-Envelope-To: linux-doc@vger.kernel.org
-X-Envelope-To: linux-kernel@vger.kernel.org
-X-Envelope-To: linux-kselftest@vger.kernel.org
-X-Envelope-To: linux-mips@vger.kernel.org
-X-Envelope-To: linux-mm@kvack.org
-X-Envelope-To: linux-riscv@lists.infradead.org
-X-Envelope-To: linuxppc-dev@lists.ozlabs.org
-X-Envelope-To: loongarch@lists.linux.dev
-Date: Fri, 31 May 2024 00:24:18 -0700
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Yu Zhao <yuzhao@google.com>
-Cc: James Houghton <jthoughton@google.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Ankit Agrawal <ankita@nvidia.com>, Anup Patel <anup@brainfault.org>,
-	Atish Patra <atishp@atishpatra.org>,
-	Axel Rasmussen <axelrasmussen@google.com>,
-	Bibo Mao <maobibo@loongson.cn>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	David Matlack <dmatlack@google.com>,
-	David Rientjes <rientjes@google.com>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	James Morse <james.morse@arm.com>, Jonathan Corbet <corbet@lwn.net>,
-	Marc Zyngier <maz@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Shaoqin Huang <shahuang@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Tianrui Zhao <zhaotianrui@loongson.cn>,
-	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
-	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-mips@vger.kernel.org,
-	linux-mm@kvack.org, linux-riscv@lists.infradead.org,
-	linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev
-Subject: Re: [PATCH v4 2/7] mm: multi-gen LRU: Have secondary MMUs
- participate in aging
-Message-ID: <Zll7IuGYGG5uI20W@linux.dev>
-References: <20240529180510.2295118-1-jthoughton@google.com>
- <20240529180510.2295118-3-jthoughton@google.com>
- <CAOUHufYFHKLwt1PWp2uS6g174GZYRZURWJAmdUWs5eaKmhEeyQ@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WWAWFLNo"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00A70C116B1;
+	Fri, 31 May 2024 12:26:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717158384;
+	bh=xsITk3494Aa7aAKZNbplZMTTjB7yIumXUU2mA3NbW8I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WWAWFLNoy1DW5Ly9xaXuWi7QVb/30qp4YZtbaP35Xmlf32i37/sOYEY5Hal2U9Fdl
+	 5QurO4vsVlB7Jg4o7OGJnEKL2G+nQG9vAuCtd652yxKZbGo/hfMof9IkV7A++Oud8z
+	 92mH4xr9vJhxG7ecTt5ZaFaMTtvZHTp0K5+T0hgdtqx8dqUvdqy4eIHQVxKy0iUc6R
+	 ZthmSBseEh54O35qG/yMdZHKYcL6CKo6o32fOq8arX/8MMFqemFXHJ6XN3nbktBPgi
+	 hBNsrkt4ijIFOcj0QyFxahp082Ihyx+jyE30ub2AVtphroLAk6WmdWLq/82AVgrU3Q
+	 lGA8UqG14Mz3A==
+Date: Fri, 31 May 2024 13:26:18 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	maz@kernel.org, will@kernel.org, qperret@google.com,
+	seanjc@google.com, alexandru.elisei@arm.com,
+	catalin.marinas@arm.com, philmd@linaro.org, james.morse@arm.com,
+	suzuki.poulose@arm.com, oliver.upton@linux.dev,
+	mark.rutland@arm.com, joey.gouly@arm.com, rananta@google.com,
+	yuzenghui@huawei.com
+Subject: Re: [PATCH v3 01/11] KVM: arm64: Reintroduce __sve_save_state
+Message-ID: <ae1d98b5-d3d4-49f8-9478-2a20f89d8156@sirena.org.uk>
+References: <20240528125914.277057-1-tabba@google.com>
+ <20240528125914.277057-2-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="33ozrVmFmZbLZExw"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAOUHufYFHKLwt1PWp2uS6g174GZYRZURWJAmdUWs5eaKmhEeyQ@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20240528125914.277057-2-tabba@google.com>
+X-Cookie: Serving suggestion.
 
-On Wed, May 29, 2024 at 03:03:21PM -0600, Yu Zhao wrote:
-> On Wed, May 29, 2024 at 12:05 PM James Houghton <jthoughton@google.com> wrote:
-> >
-> > Secondary MMUs are currently consulted for access/age information at
-> > eviction time, but before then, we don't get accurate age information.
-> > That is, pages that are mostly accessed through a secondary MMU (like
-> > guest memory, used by KVM) will always just proceed down to the oldest
-> > generation, and then at eviction time, if KVM reports the page to be
-> > young, the page will be activated/promoted back to the youngest
-> > generation.
-> 
-> Correct, and as I explained offline, this is the only reasonable
-> behavior if we can't locklessly walk secondary MMUs.
-> 
-> Just for the record, the (crude) analogy I used was:
-> Imagine a large room with many bills ($1, $5, $10, ...) on the floor,
-> but you are only allowed to pick up 10 of them (and put them in your
-> pocket). A smart move would be to survey the room *first and then*
-> pick up the largest ones. But if you are carrying a 500 lbs backpack,
-> you would just want to pick up whichever that's in front of you rather
-> than walk the entire room.
-> 
-> MGLRU should only scan (or lookaround) secondary MMUs if it can be
-> done lockless. Otherwise, it should just fall back to the existing
-> approach, which existed in previous versions but is removed in this
-> version.
 
-Grabbing the MMU lock for write to scan sucks, no argument there. But
-can you please be specific about the impact of read lock v. RCU in the
-case of arm64? I had asked about this before and you never replied.
+--33ozrVmFmZbLZExw
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-My concern remains that adding support for software table walkers
-outside of the MMU lock entirely requires more work than just deferring
-the deallocation to an RCU callback. Walkers that previously assumed
-'exclusive' access while holding the MMU lock for write must now cope
-with volatile PTEs.
+On Tue, May 28, 2024 at 01:59:04PM +0100, Fuad Tabba wrote:
 
-Yes, this problem already exists when hardware sets the AF, but the
-lock-free walker implementation needs to be generic so it can be applied
-for other PTE bits.
+> This reverts commit e66425fc9ba3 ("KVM: arm64: Remove unused
+> __sve_save_state").
 
--- 
-Thanks,
-Oliver
+> +void __sve_save_state(void *sve_pffr, u32 *fpsr);
+
+The prototype says this takes 2 arguments...
+
+> +SYM_FUNC_START(__sve_save_state)
+> +	mov	x2, #1
+> +	sve_save 0, x1, x2, 3
+
+...but the macro takes and the function supplies 3 arguments.  This was
+a bug in the code at the time you did the revert (the prototype had been
+missed when adding save_ffr) but we should still fix it.
+
+--33ozrVmFmZbLZExw
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmZZwekACgkQJNaLcl1U
+h9DhKwf/VrJZpClWehasbVl1ahmDa9Ovoy/1wO8OF0uy375t/7xqYTS8o9mlqIqs
+Y8Xr0tby10p7wvc+CBstjyeiLvq/r7vJJAdD2Q+h31JFdHHdTReCKgA3SGDj1dEj
+uyhVJD85SmAHnqaVWCGJVH/LcWMHaSaGLKhEmQfvlYbGjB0WC04CEvWDYt84tU88
+Sy9IlKq7Shc+wPxLwXXlmP27MxBpPdNq3KOEBTQvNV2QaVBM9Zm/iDmN55RGj21F
+tuiI772bWX6xd4NIjoYAh4H06I8mH/ZG78Hw4GchcfrQBnC3AVDgRIW8I3x/mG7r
+isO64axjj30XX7wAk+xZvr56Dkivxg==
+=MwPN
+-----END PGP SIGNATURE-----
+
+--33ozrVmFmZbLZExw--
