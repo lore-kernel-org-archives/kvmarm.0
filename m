@@ -1,112 +1,134 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 317D82B9CE
-	for <kvmarm@lists.linux.dev>; Fri, 31 May 2024 15:21:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9AC957CA7;
+	Fri, 31 May 2024 16:04:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717168909; cv=none; b=JerJHSua33Hhk9F0ZjA/M2njwtW0j5skRuJPT14axGEN2EkYObPbORR+xkbpqkWZfdwiGbryxrArB7UYX2qAynUQIHWKxVBpvD+IrLSskqKrHRWpVinUAWljRLax/ffQ//0O/qKSKY0PpmrFUenJswDKRZlFYvZcZsDV2DER5iM=
+	t=1717171442; cv=none; b=B6gaa13HQmbt1v0U4qHhaS4djNuNMxfm+KdOaBZUu3W/8C2u/sBlu3r+P9WbLL/8VHeCfHut+0X3M/f04n5pBjeXUIfPg55W0SKrMJjlQqI52nUDabChEL6RR2pSt2oud49/uY3Y0OATAcTQITYx8QqzkpWBt0h79pmQGqtefWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717168909; c=relaxed/simple;
-	bh=6tkFTIkMXaIqV5pXYi60ue+41zjgXhfYoh1WY9sqHTw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LjhC+b5tmCMWR+MeJSjbmyiLPsLPj7/NIF8pMIEf7LexRaundkOF1akq0RB55GpEHzGIS3kqfN6NOhEIPGS2EA7AMokbsdESMEutUWlDb8/DKYzLUoUyEPpXXI8HcD0MdAfLvzqWVaS0Fue7o3+Mu5/5gW3l6jEVYT3dAFfbv8Q=
+	s=arc-20240116; t=1717171442; c=relaxed/simple;
+	bh=IFUjXMQpAq5HwdlN0F4Ro/EwDdykkZC4cPHBidBAlvw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OZfMmBduE8GkzDx1D6m1HCUZoZKKl3elO9Foeg5Tq0mVZeesZFus7Sq/zbisTsToXxkyIHa/PpdeAkAmAjcThSz/7zrxyjtnAtmzD3O2Cg6dJoFdUn8baaEC4wAYFGwtwE22/wpCcFSvBNx5msDyQcc3YTTr9K7FwPctA4XUxzs=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8D4BD1424;
-	Fri, 31 May 2024 08:22:11 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 31AA63F641;
-	Fri, 31 May 2024 08:21:44 -0700 (PDT)
-Date: Fri, 31 May 2024 16:21:38 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Szabolcs Nagy <szabolcs.nagy@arm.com>, dave.hansen@linux.intel.com
-Cc: linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
-	aneesh.kumar@kernel.org, aneesh.kumar@linux.ibm.com, bp@alien8.de,
-	broonie@kernel.org, catalin.marinas@arm.com,
-	christophe.leroy@csgroup.eu, dave.hansen@linux.intel.com,
-	hpa@zytor.com, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
-	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
-	oliver.upton@linux.dev, shuah@kernel.org, tglx@linutronix.de,
-	will@kernel.org, x86@kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 17/29] arm64: implement PKEYS support
-Message-ID: <20240531152138.GA1805682@e124191.cambridge.arm.com>
-References: <20240503130147.1154804-1-joey.gouly@arm.com>
- <20240503130147.1154804-18-joey.gouly@arm.com>
- <ZlnlQ/avUAuSum5R@arm.com>
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6A6631424;
+	Fri, 31 May 2024 09:04:24 -0700 (PDT)
+Received: from [10.1.27.19] (e122027.cambridge.arm.com [10.1.27.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7A9A33F792;
+	Fri, 31 May 2024 09:03:56 -0700 (PDT)
+Message-ID: <ab2ac224-ec8f-423a-80ce-0d7b18a7a173@arm.com>
+Date: Fri, 31 May 2024 17:03:54 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZlnlQ/avUAuSum5R@arm.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 21/43] arm64: RME: Runtime faulting of memory
+To: Fuad Tabba <tabba@google.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+References: <20240412084056.1733704-1-steven.price@arm.com>
+ <20240412084309.1733783-1-steven.price@arm.com>
+ <20240412084309.1733783-22-steven.price@arm.com>
+ <CA+EHjTyr1swQ4ONE2oVnWU5uPkcq2WDNYDRA8eK29-4BQDcCLw@mail.gmail.com>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <CA+EHjTyr1swQ4ONE2oVnWU5uPkcq2WDNYDRA8eK29-4BQDcCLw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Szabolcs,
+On 25/04/2024 11:43, Fuad Tabba wrote:
+> Hi,
 
-On Fri, May 31, 2024 at 03:57:07PM +0100, Szabolcs Nagy wrote:
-> The 05/03/2024 14:01, Joey Gouly wrote:
-> > Implement the PKEYS interface, using the Permission Overlay Extension.
-> ...
-> > +#ifdef CONFIG_ARCH_HAS_PKEYS
-> > +int arch_set_user_pkey_access(struct task_struct *tsk, int pkey, unsigned long init_val)
-> > +{
-> > +	u64 new_por = POE_RXW;
-> > +	u64 old_por;
-> > +	u64 pkey_shift;
-> > +
-> > +	if (!arch_pkeys_enabled())
-> > +		return -ENOSPC;
-> > +
-> > +	/*
-> > +	 * This code should only be called with valid 'pkey'
-> > +	 * values originating from in-kernel users.  Complain
-> > +	 * if a bad value is observed.
-> > +	 */
-> > +	if (WARN_ON_ONCE(pkey >= arch_max_pkey()))
-> > +		return -EINVAL;
-> > +
-> > +	/* Set the bits we need in POR:  */
-> > +	if (init_val & PKEY_DISABLE_ACCESS)
-> > +		new_por = POE_X;
-> > +	else if (init_val & PKEY_DISABLE_WRITE)
-> > +		new_por = POE_RX;
-> > +
+Hi,
+
+Thanks for the review. Sorry I didn't respond earlier.
+
+> On Fri, Apr 12, 2024 at 9:44 AM Steven Price <steven.price@arm.com> wrote:
+>>
+<snip>
+>> +static int private_memslot_fault(struct kvm_vcpu *vcpu,
+>> +                                phys_addr_t fault_ipa,
+>> +                                struct kvm_memory_slot *memslot)
+>> +{
+>> +       struct kvm *kvm = vcpu->kvm;
+>> +       gpa_t gpa_stolen_mask = kvm_gpa_stolen_bits(kvm);
+>> +       gfn_t gfn = (fault_ipa & ~gpa_stolen_mask) >> PAGE_SHIFT;
+>> +       bool is_priv_gfn = !((fault_ipa & gpa_stolen_mask) == gpa_stolen_mask);
+>> +       bool priv_exists = kvm_mem_is_private(kvm, gfn);
+>> +       struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
+>> +       int order;
+>> +       kvm_pfn_t pfn;
+>> +       int ret;
+>> +
+>> +       if (priv_exists != is_priv_gfn) {
+>> +               kvm_prepare_memory_fault_exit(vcpu,
+>> +                                             fault_ipa & ~gpa_stolen_mask,
+>> +                                             PAGE_SIZE,
+>> +                                             kvm_is_write_fault(vcpu),
+>> +                                             false, is_priv_gfn);
+>> +
+>> +               return 0;
+>> +       }
+>> +
+>> +       if (!is_priv_gfn) {
+>> +               /* Not a private mapping, handling normally */
+>> +               return -EAGAIN;
+>> +       }
+>> +
+>> +       if (kvm_gmem_get_pfn(kvm, memslot, gfn, &pfn, &order))
+>> +               return 1; /* Retry */
 > 
-> given that the architecture allows r,w,x permissions to be
-> set independently, should we have a 'PKEY_DISABLE_EXEC' or
-> similar api flag?
+> You don't need to pass a variable to hold the order if you don't need
+> it. You can pass NULL.
+
+Ah, good point - that simplifies things.
+
+> I am also confused about the return, why do you return 1 regardless of
+> the reason kvm_gmem_get_pfn() fails?
+
+Thinking about this, I don't think we actually expect kvm_gmem_get_pfn()
+to fail, so it's actually more appropriate to just pass return any error
+value.
+
+>> +       ret = kvm_mmu_topup_memory_cache(memcache,
+>> +                                        kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu));
+>> +       if (ret)
+>> +               return ret;
 > 
-> (on other targets it can be some invalid value that fails)
+> If this fails you should release the page you got earlier (e.g.,
+> kvm_release_pfn_clean()), or you could move it before
+> kvm_gmem_get_pfn().
 
-I didn't think about the best way to do that yet. PowerPC has a PKEY_DISABLE_EXECUTE.
+Good point, however...
 
-We could either make that generic, and X86 has to error if it sees that bit, or
-we add a arch-specific PKEY_DISABLE_EXECUTE like PowerPC.
-
-A user can still set it by interacting with the register directly, but I guess
-we want something for the glibc interface..
-
-Dave, any thoughts here?
-
+>> +       /* FIXME: Should be able to use bigger than PAGE_SIZE mappings */
+>> +       ret = realm_map_ipa(kvm, fault_ipa, pfn, PAGE_SIZE, KVM_PGTABLE_PROT_W,
+>> +                            memcache);
+>> +       if (!ret)
+>> +               return 1; /* Handled */
 > 
-> > +	/* Shift the bits in to the correct place in POR for pkey: */
-> > +	pkey_shift = pkey * POR_BITS_PER_PKEY;
-> > +	new_por <<= pkey_shift;
-> > +
-> > +	/* Get old POR and mask off any old bits in place: */
-> > +	old_por = read_sysreg_s(SYS_POR_EL0);
-> > +	old_por &= ~(POE_MASK << pkey_shift);
-> > +
-> > +	/* Write old part along with new part: */
-> > +	write_sysreg_s(old_por | new_por, SYS_POR_EL0);
-> > +
-> > +	return 0;
-> > +}
-> > +#endif
+> Should also release the page if it fails. Speaking of which,
+> where/when do you eventually release the page?
+
+... I messed this up ;) It seems I'm managing to leak all guestmem
+pages. I'm not sure what I was thinking but I think I'd got it into my
+head guestmem wasn't reference counting the pages. I'll fix this up in
+the next version.
 
 Thanks,
-Joey
+
+Steve
+
