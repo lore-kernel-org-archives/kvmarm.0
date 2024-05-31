@@ -1,107 +1,160 @@
-Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com [209.85.222.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B98128060E
-	for <kvmarm@lists.linux.dev>; Fri, 31 May 2024 06:40:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FA4B80BF2
+	for <kvmarm@lists.linux.dev>; Fri, 31 May 2024 07:03:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717137657; cv=none; b=G/Cb3NCQYbMKt/KH1r6lGL8HaA1kkRsvUa+0yuK4KG4WvMVQByMr35SmmU+Eh5pwfxtjYYfK/ZZkNwyJw8nW1QgXesySmM2pdF9abs662ovfeBZ+/mRuzhVC2LARHwhqJdadpP/4dXRq2bXecfsDA4UTqpElWcO4W334Kd/z5gc=
+	t=1717138994; cv=none; b=Pti5Vc12d/M+c7x697AKCq8JfPot7CwGsBvNp6/48H0iJIlUzXNfewOJmpGRGhdOsvk0hxsBNAkT2F048GPRJEE8E9K1t5XVIuJ4HudAcIAvD+qGgO5HRaBVfl1Ge+S8Wz4m3F8zWosrPvRaRj6zcEeMWxlZ5CFDq0cy7hFquZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717137657; c=relaxed/simple;
-	bh=5uQLCG0W2ZIBO0Q2r0bVx6IHkbXRIx08ZhE6hbnKwb0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jMYrb2kQd/eCBg1Vb7M4tmWaf3JWiABeBDZeGCUKrGzis8mCLPJGs4oUsn54UMzmanJFHpOV4j/YgcwGtkt/ZqN4A7nn1kDrx/OzCHKVHIt+z4vzOYUPKX7yijHqYiAzQ5IaUPbj2KHhTVpnrBBnzHflW0LRMcodsP6/n7dr8MA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vjQEwU1r; arc=none smtp.client-ip=209.85.222.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1717138994; c=relaxed/simple;
+	bh=ci4Dj9A4R7c3SOWLTD2vJUP3/jPFngRAnm03r3E1GYQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Jta8ZffWVG5T5gqDUMWdON2kaMn047cXWMIeWY+/fHMNUjVY+vZJ+ei8ynqtrBzT/8dPSgi1kK5YrZtxaNeuVPojhpVXOVj1DfbL7yT8efPjLK1gp6C8mRzqjlYuVCif4w2dcakYSonSGzlUynVU+aVPfZwutk8BBx2paVOtb8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=o0DHBTng; arc=none smtp.client-ip=95.215.58.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vjQEwU1r"
-Received: by mail-ua1-f50.google.com with SMTP id a1e0cc1a2514c-80acf1bca86so421241241.3
-        for <kvmarm@lists.linux.dev>; Thu, 30 May 2024 23:40:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717137654; x=1717742454; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5uQLCG0W2ZIBO0Q2r0bVx6IHkbXRIx08ZhE6hbnKwb0=;
-        b=vjQEwU1r0gxWJzS6O2Pa/BOUXeDFakTZgnt4rFMEatPNMdj3SY8CGg2BDYlCuhXcNs
-         ufVY4AKI4S0ausVsHY9oLEn4/4uz2MijzDhDz3de0TN1Pa01MEQWTDHqKQmEO112+r4Z
-         13lXW9UoUEk7HVI1bOV+2jQ72kgy6HAR0SQhMaYPnvFBZJP/6cxS2GoC7c8b0fxJXfRZ
-         NYP4SXm7XL+v08jjxYTmpd3Fy9BxnT+efXqwjqed4S1grTxGyuxuFwuWOEI2NB/McMOQ
-         llapCyWKpqwsKx+rdAw+JdZgEK+RBCYqczDz18iTos3zIT8yq1O8Kg/RjpuM0an10Pw9
-         n7HQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717137654; x=1717742454;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5uQLCG0W2ZIBO0Q2r0bVx6IHkbXRIx08ZhE6hbnKwb0=;
-        b=G0HjODdYigRbhPLhRprv5VYDw+nwpfJE4ND0UJW4ttoCH09zr23FF7uzSB2B6gWcIk
-         s3C8JvjKdovguxltZ30nLH/X8srQzhb/cFzw0GLex/c/WODjAp91AZ1JpZ7ZtSDuW4oy
-         IJOfQkcH8qgooxTp71lpBbsOGO7UM+Jdrttyl2MxjXsM3ZlWgWMIoG5W4dhp3Kb3QTpf
-         Qd9EFj/+/YUv84LIIHwKPzFiUhOWY56lBOeqxGBBQwKKqF016BwBrGjh6FTSghFwOXSp
-         sZ44wxdSspJ+xzB7epSWTRMJ1FwwWYoGsnZaqjNDnZbZ+KaTB9PiFQwBxaoxmi/P+cWx
-         /iBw==
-X-Gm-Message-State: AOJu0YyEVpNKmse1a7iLnSMV5yKQMqqcOwOwk5bEIGdMvNsPBJsBF9TP
-	u23p1tOqu57nQrHEz34P1nu8XvJmwwiJyX9d3/UhDBmaT3RiIc+NokzBVuyugG0EorkOAVSia9J
-	u08MOlISlChnL7s3xEWVty6OdRJn3PHjgBob8
-X-Google-Smtp-Source: AGHT+IGFE//Gt8iJAeN/IhQtX4I5PYkSd6XBWVjUZFr6PC7XskUhD3vsfXxjatZ0833jW19IOC86tTVyaeDqmUTLs6Y=
-X-Received: by 2002:a05:6102:5d9:b0:48a:3332:594a with SMTP id
- ada2fe7eead31-48bc22d98ffmr983220137.27.1717137654568; Thu, 30 May 2024
- 23:40:54 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="o0DHBTng"
+X-Envelope-To: yuzhao@google.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1717138989;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=d2FOFsODXea2tbyL8aZD5XgmjgnWiDeEr9B1wNurnWA=;
+	b=o0DHBTng4ZOfOuLPBmuUfGnVx3C/mCiuligouG4hr+A2usMgep5pVaKau5drtUXhfEyIMO
+	t3GiWpR9A6MCmp5eyKFnNs5t3R9y4lyGtWM/ea5I3xB4nMIOdla7XklCl1bqpY8yR0z7s8
+	SKfEnl7I0/BFWAoSHps846Lw14bj3Fs=
+X-Envelope-To: jthoughton@google.com
+X-Envelope-To: seanjc@google.com
+X-Envelope-To: akpm@linux-foundation.org
+X-Envelope-To: pbonzini@redhat.com
+X-Envelope-To: aou@eecs.berkeley.edu
+X-Envelope-To: ankita@nvidia.com
+X-Envelope-To: anup@brainfault.org
+X-Envelope-To: atishp@atishpatra.org
+X-Envelope-To: axelrasmussen@google.com
+X-Envelope-To: maobibo@loongson.cn
+X-Envelope-To: catalin.marinas@arm.com
+X-Envelope-To: dmatlack@google.com
+X-Envelope-To: rientjes@google.com
+X-Envelope-To: chenhuacai@kernel.org
+X-Envelope-To: james.morse@arm.com
+X-Envelope-To: corbet@lwn.net
+X-Envelope-To: maz@kernel.org
+X-Envelope-To: mpe@ellerman.id.au
+X-Envelope-To: npiggin@gmail.com
+X-Envelope-To: palmer@dabbelt.com
+X-Envelope-To: paul.walmsley@sifive.com
+X-Envelope-To: rananta@google.com
+X-Envelope-To: ryan.roberts@arm.com
+X-Envelope-To: shahuang@redhat.com
+X-Envelope-To: shuah@kernel.org
+X-Envelope-To: suzuki.poulose@arm.com
+X-Envelope-To: zhaotianrui@loongson.cn
+X-Envelope-To: will@kernel.org
+X-Envelope-To: yuzenghui@huawei.com
+X-Envelope-To: kvm-riscv@lists.infradead.org
+X-Envelope-To: kvm@vger.kernel.org
+X-Envelope-To: kvmarm@lists.linux.dev
+X-Envelope-To: linux-arm-kernel@lists.infradead.org
+X-Envelope-To: linux-doc@vger.kernel.org
+X-Envelope-To: linux-kernel@vger.kernel.org
+X-Envelope-To: linux-kselftest@vger.kernel.org
+X-Envelope-To: linux-mips@vger.kernel.org
+X-Envelope-To: linux-mm@kvack.org
+X-Envelope-To: linux-riscv@lists.infradead.org
+X-Envelope-To: linuxppc-dev@lists.ozlabs.org
+X-Envelope-To: loongarch@lists.linux.dev
+Date: Fri, 31 May 2024 00:02:56 -0700
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Yu Zhao <yuzhao@google.com>
+Cc: James Houghton <jthoughton@google.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Ankit Agrawal <ankita@nvidia.com>, Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>,
+	Axel Rasmussen <axelrasmussen@google.com>,
+	Bibo Mao <maobibo@loongson.cn>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	David Matlack <dmatlack@google.com>,
+	David Rientjes <rientjes@google.com>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	James Morse <james.morse@arm.com>, Jonathan Corbet <corbet@lwn.net>,
+	Marc Zyngier <maz@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	Shaoqin Huang <shahuang@redhat.com>, Shuah Khan <shuah@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Tianrui Zhao <zhaotianrui@loongson.cn>,
+	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
+	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-mips@vger.kernel.org,
+	linux-mm@kvack.org, linux-riscv@lists.infradead.org,
+	linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev
+Subject: Re: [PATCH v4 2/7] mm: multi-gen LRU: Have secondary MMUs
+ participate in aging
+Message-ID: <Zll2ILUNWE-JPi9U@linux.dev>
+References: <20240529180510.2295118-1-jthoughton@google.com>
+ <20240529180510.2295118-3-jthoughton@google.com>
+ <CAOUHufYFHKLwt1PWp2uS6g174GZYRZURWJAmdUWs5eaKmhEeyQ@mail.gmail.com>
+ <ZlelW93_T6P-ZuSZ@google.com>
+ <CAOUHufZdEpY6ra73SMHA33DegKxKaUM=Os7A7aDBFND6NkbUmQ@mail.gmail.com>
+ <Zley-u_dOlZ-S-a6@google.com>
+ <CADrL8HXHWg_MkApYQTngzmN21NEGNWC6KzJDw_Lm63JHJkR=5A@mail.gmail.com>
+ <CAOUHufZq6DwpStzHtjG+TOiHaQ6FFbkTfHMCe8Yy0n_M9MKdqw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20240528125914.277057-1-tabba@google.com> <20240528125914.277057-12-tabba@google.com>
- <ZljD8pu5Z5ujHny2@linux.dev>
-In-Reply-To: <ZljD8pu5Z5ujHny2@linux.dev>
-From: Fuad Tabba <tabba@google.com>
-Date: Fri, 31 May 2024 07:40:17 +0100
-Message-ID: <CA+EHjTxMXxpWKpgNJmbQQe++zEFtpJ0c7FQCLdrQzPaEYAzUbw@mail.gmail.com>
-Subject: Re: [PATCH v3 11/11] KVM: arm64: Drop sve_cond_update_zcr_vq_*
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, seanjc@google.com, 
-	alexandru.elisei@arm.com, catalin.marinas@arm.com, philmd@linaro.org, 
-	james.morse@arm.com, suzuki.poulose@arm.com, mark.rutland@arm.com, 
-	broonie@kernel.org, joey.gouly@arm.com, rananta@google.com, 
-	yuzenghui@huawei.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAOUHufZq6DwpStzHtjG+TOiHaQ6FFbkTfHMCe8Yy0n_M9MKdqw@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-Hi Oliver,
+On Fri, May 31, 2024 at 12:05:48AM -0600, Yu Zhao wrote:
 
-On Thu, May 30, 2024 at 7:22=E2=80=AFPM Oliver Upton <oliver.upton@linux.de=
-v> wrote:
->
-> Hi,
->
-> On Tue, May 28, 2024 at 01:59:14PM +0100, Fuad Tabba wrote:
-> > The conditional update likely doesn't help performance, but makes
-> > the code a bit more difficult to read. Remove these macros and
-> > just write directly to ZCR.
-> >
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > ---
-> > This patch is meant as an RFC, and undoes the previous patch.
-> > Please feel free to accept/drop whichever patches you think make
-> > sense.
->
-> The motivation behind this helper is to avoid unnecessary synchronizing
-> behavior, since as you note the architecture does not require
-> explicit synchronization for the value to become visible to subsequent
-> instructions.
->
-> Now, that doesn't _necessarily_ imply full blown context synchronization,
-> but it isn't too far fetched to think a conservative implementation does
-> exactly that upon ZCR write.
+[...]
 
-Thanks for the explanation and for the reviews!
-/fuad
+> All optimizations in v2 were measured step by step. Even that bitmap,
+> which might be considered overengineered, brought a readily
+> measuarable 4% improvement in memcached throughput on Altra Max
+> swapping to Optane:
 
-> --
-> Thanks,
-> Oliver
+That's great, but taking an iterative approach to the problem allows
+the reviewers and maintainers to come to their own conclusions about
+each optimization independently. Squashing all of that together and
+posting the result doesn't allow for this.
+
+Even if we were to take the series as-is, the door is wide open to
+subsequent improvements.
+
+> What I don't think is acceptable is simplifying those optimizations
+> out without documenting your justifications (I would even call it a
+> design change, rather than simplification, from v3 to v4).
+
+No, sorry, there's nothing wrong with James' approach here.
+
+The discussion that led to the design of v4 happened on list; you were
+on CC. The general consensus on the KVM side was that the bitmap was
+complicated and lacked independent justification. There was ample
+opportunity to voice your concerns before he spent the time on v4.
+
+You seriously cannot fault a contributor for respinning their work based
+on the provided feedback.
+
+-- 
+Thanks,
+Oliver
