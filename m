@@ -1,105 +1,146 @@
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 761F0134415
-	for <kvmarm@lists.linux.dev>; Fri, 31 May 2024 23:14:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93426450F2;
+	Sat,  1 Jun 2024 09:47:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717197275; cv=none; b=jYvIOSsMjcw/I+s5wcsfj5y1X/bRoQLP8V5mRtBuTy50gGRUrI7pbLBceRG56v28jqNqxsj+mzbawQutDB5j9Ep93P3hYBLknruVrUydDTzVzynAVV42/hQ5EP6b1tNsnrnrUzJg8aA/MdRykuQGMcWnTdxg78PMw3jWOVMDPrY=
+	t=1717235271; cv=none; b=Yc3bHK346LaSbdF+9GZ1opjwGAxvzL6vvK35hvNhIXuvxgUtXS36YCHtvPS89k+zjd8w0BxLxifQvDdYXPpAUwSg2rHglsJ1LEiztn1hkG+wH6rBB0huM0ir9eZ8BM+HyMdKeXDO6jFpbPDBfcjHLquybOIIWCVqSc67p4Kwc5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717197275; c=relaxed/simple;
-	bh=xVzbcaMQmJjiovrIhxVtkqd8ciC0HYlyZIghHEFnsxo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=k2OvzwjD6ahX4WUoUAU3s3NMRU1MMNEpuliALGtnv5/ImVXZtcaaKzAj39imFcaveDg/kQIPrkOTuaujmpHM6mFXFhYs1K/1OCimcKY7Kq6xnmrlKiDoHmvTNUnYIv1+d0nxe3Qc9yKkR9twCJhD2SK1BTOexpyQZ10p3Zp9adg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fO8IQRVT; arc=none smtp.client-ip=91.218.175.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1717235271; c=relaxed/simple;
+	bh=drVh/+lxaskPqg1aE87XG7HZa1lWAJu1imrCeGPPdbM=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cNA9AAMAGSqeiU5IaY4QAkInwPeEHhJ63slA3op2I93RToSGKUQZ7uVMay+vHWrY805+BBnoh0vqIUGOwAFjtL5X3UmYBKbnIooqG320mPrKKXbhp17tXWxt9/+88UnSP4OaP+9z5uA9ZCgFWfuWSb19uWpLhsQuUGiWHdB6vzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ST5NmhQA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fO8IQRVT"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1717197272;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qAM10pWQ70u6GJPYmfygF5x6aknhjdYABForx6XgJMc=;
-	b=fO8IQRVTBbverFD6IykNLabhX6eMQv7une10eTDkY6ajiHGmxUdVsjZAk1/918wIVueVFj
-	Q/UgP3L+UKXnuUl4o7YbJTZdrvxg6b1zYjTTV2zDDTDOoq/X+BdmCvUh+ESw8joir5j7TT
-	sNrn++U1VOyOu2uHCxk7MftDyP8R7G0=
-X-Envelope-To: maz@kernel.org
-X-Envelope-To: james.morse@arm.com
-X-Envelope-To: suzuki.poulose@arm.com
-X-Envelope-To: yuzenghui@huawei.com
-X-Envelope-To: kvm@vger.kernel.org
-X-Envelope-To: oliver.upton@linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ST5NmhQA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 047D3C116B1;
+	Sat,  1 Jun 2024 09:47:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717235271;
+	bh=drVh/+lxaskPqg1aE87XG7HZa1lWAJu1imrCeGPPdbM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ST5NmhQALpCDV8RPRgJ9uChcaS0d17uezFdF5Uja7M2nubaqPOi6qQoqUzl0Vz67k
+	 d283SIrbiHhQ+wtUbjMJWRN87NPjs6be7ecbw65aTcMy5YypXz0ZjmcEMrKBVI/j0v
+	 CowwTXIZMvB0MnygDtv6sQUJil4jz3ICZxFyrS+CAvpYSWpieBdWCEtzcs6YOs2FJO
+	 PA91gExG4K/vaHcTt9+f02a4ApBa/RKKSbrjPLzvCKVBolRNAOISPF0q8ymXCgEmld
+	 AKy59t2occgmol+CAk75dAHim6phPsHSXMNgbDgz1n6dFd989q/+QH7iRkPP+xQ+go
+	 G89mRmQ1hZB4A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sDLL2-00HNlY-MI;
+	Sat, 01 Jun 2024 10:47:48 +0100
+Date: Sat, 01 Jun 2024 10:47:47 +0100
+Message-ID: <87le3p2dvg.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	kvm@vger.kernel.org,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 11/11] KVM: arm64: Allow the use of SVE+NV
-Date: Fri, 31 May 2024 23:13:58 +0000
-Message-ID: <20240531231358.1000039-12-oliver.upton@linux.dev>
-In-Reply-To: <20240531231358.1000039-1-oliver.upton@linux.dev>
+	kvm@vger.kernel.org
+Subject: Re: [PATCH 03/11] KVM: arm64: nv: Load guest FP state for ZCR_EL2 trap
+In-Reply-To: <20240531231358.1000039-4-oliver.upton@linux.dev>
 References: <20240531231358.1000039-1-oliver.upton@linux.dev>
+	<20240531231358.1000039-4-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Allow SVE and NV to mix now that everything is in place to handle it
-correctly.
+On Sat, 01 Jun 2024 00:13:50 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> Round out the ZCR_EL2 gymnastics by loading SVE state in the fast path
+> when the guest hypervisor tries to access SVE state.
+> 
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/kvm/hyp/include/hyp/switch.h | 23 +++++++++++++++++++++++
+>  1 file changed, 23 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index 428ee15dd6ae..5872eaafc7f0 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -345,6 +345,10 @@ static bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  		if (guest_hyp_fpsimd_traps_enabled(vcpu))
+>  			return false;
+>  		break;
+> +	case ESR_ELx_EC_SYS64:
+> +		if (WARN_ON_ONCE(!is_hyp_ctxt(vcpu)))
+> +			return false;
+> +		fallthrough;
+>  	case ESR_ELx_EC_SVE:
+>  		if (!sve_guest)
+>  			return false;
+> @@ -520,6 +524,22 @@ static bool handle_ampere1_tcr(struct kvm_vcpu *vcpu)
+>  	return true;
+>  }
+>  
+> +static bool kvm_hyp_handle_zcr(struct kvm_vcpu *vcpu, u64 *exit_code)
+> +{
+> +	u32 sysreg = esr_sys64_to_sysreg(kvm_vcpu_get_esr(vcpu));
+> +
+> +	if (!vcpu_has_nv(vcpu))
+> +		return false;
+> +
+> +	if (sysreg != SYS_ZCR_EL2)
+> +		return false;
+> +
+> +	if (guest_owns_fp_regs())
+> +		return false;
+> +
+> +	return kvm_hyp_handle_fpsimd(vcpu, exit_code);
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- arch/arm64/kvm/arm.c    | 5 -----
- arch/arm64/kvm/nested.c | 3 +--
- 2 files changed, 1 insertion(+), 7 deletions(-)
+For my own understanding of the flow: let's say the L1 guest accesses
+ZCR_EL2 while the host own the FP regs:
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 9996a989b52e..e2c934728f73 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1419,11 +1419,6 @@ static int kvm_vcpu_init_check_features(struct kvm_vcpu *vcpu,
- 	    test_bit(KVM_ARM_VCPU_PTRAUTH_GENERIC, &features))
- 		return -EINVAL;
- 
--	/* Disallow NV+SVE for the time being */
--	if (test_bit(KVM_ARM_VCPU_HAS_EL2, &features) &&
--	    test_bit(KVM_ARM_VCPU_SVE, &features))
--		return -EINVAL;
--
- 	if (!test_bit(KVM_ARM_VCPU_EL1_32BIT, &features))
- 		return 0;
- 
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 6813c7c7f00a..0aefc3e1b9a7 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -41,13 +41,12 @@ static u64 limit_nv_id_reg(u32 id, u64 val)
- 		break;
- 
- 	case SYS_ID_AA64PFR0_EL1:
--		/* No AMU, MPAM, S-EL2, RAS or SVE */
-+		/* No AMU, MPAM, S-EL2, or RAS */
- 		val &= ~(GENMASK_ULL(55, 52)	|
- 			 NV_FTR(PFR0, AMU)	|
- 			 NV_FTR(PFR0, MPAM)	|
- 			 NV_FTR(PFR0, SEL2)	|
- 			 NV_FTR(PFR0, RAS)	|
--			 NV_FTR(PFR0, SVE)	|
- 			 NV_FTR(PFR0, EL3)	|
- 			 NV_FTR(PFR0, EL2)	|
- 			 NV_FTR(PFR0, EL1));
+- ZCR_EL2 traps
+- we restore the guest's state, enable SVE
+- ZCR_EL2 traps again
+- emulate the access on the slow path
+
+In contrast, the same thing using ZCR_EL1 in L1 results in:
+
+- ZCR_EL1 traps
+- we restore the guest's state, enable SVE
+
+and we're done.
+
+Is that correct? If so, a comment would help... ;-)
+
+> +}
+> +
+>  static bool kvm_hyp_handle_sysreg(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  {
+>  	if (cpus_have_final_cap(ARM64_WORKAROUND_CAVIUM_TX2_219_TVM) &&
+> @@ -537,6 +557,9 @@ static bool kvm_hyp_handle_sysreg(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  	if (kvm_hyp_handle_cntpct(vcpu))
+>  		return true;
+>  
+> +	if (kvm_hyp_handle_zcr(vcpu, exit_code))
+> +		return true;
+> +
+>  	return false;
+>  }
+>  
+
+Thanks,
+
+	M.
+
 -- 
-2.45.1.288.g0e0cd299f1-goog
-
+Without deviation from the norm, progress is not possible.
