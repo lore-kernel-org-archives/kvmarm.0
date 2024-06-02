@@ -1,175 +1,138 @@
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2068.outbound.protection.outlook.com [40.107.220.68])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 885461C680;
-	Sat,  1 Jun 2024 20:40:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.68
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717274457; cv=fail; b=FrihUkoDFK3hD+sXe7pdmm31Q2luEWI57k13jxIAVq1sqYKj1Si2xdCuLATC47wcKIiYdZRHjYjebpBMvVe8qHiWlGiU3nIhDfZe5S390DGztSAg/IZtnk3kAPyW8eIBU8ZNysB5O9j5Kz4IfxF0w5AEbt03VO12gBbk/iJVwxo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717274457; c=relaxed/simple;
-	bh=QQLHFPL9uOsQe3fjyFoHRNLu0qCvjsC0WymP6PzT2xs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=alpOeq8Ealhuwg7R960RLudaAQ7dHqfGzgEctHtpk6H5cYNfpUE3K4gXm8tXNC3XNykJZb2rEFWrKpP49VKqLC9Dcbi/xnFLGXFHJCp6KUIqdNp3eWBuS+2qqwd6nhyz/6m10/p23a3S8gQ0ykNvXnkOZacE3QSlgpPSWAmLcpU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=gdF87KPC; arc=fail smtp.client-ip=40.107.220.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F16D12C684;
+	Sun,  2 Jun 2024 14:28:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717338540; cv=none; b=c+r2Mk37kxiFweIvD8V22GOdUqpH/LXC37vzAomf+7sbWHNunMnuXl6De8hZNQEY1dNChxVrkmTaYi2nsRPtH5T/xj0+X5FCpOqi6jV0MIJNnc/N/qxFaZ/kjjWdoiVh3kuw/lg2+K+wLuE4uzfafkqR7OorUs7+wv1LfzKyzSM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717338540; c=relaxed/simple;
+	bh=Twk0OIW4aPIuat1Dyyqvbm3ZkGFMwoyV7gbfv2DR/Gs=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=C0Tf2uU3y/E6kp6VOUI/6XJckE3ixN/vcurjkhdA6RxlleT3mqyqH16XuYkxWeIduU7CmuVmHORXoUrzwSmS1qi2QKIk/mFmwWCKWQoovKZuIbP2zgoPHEXVzP+uGcJ44bCqqGkMD+r7IApWQmTH7J0ToePAAaAI5IxLcI+A+D4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l3IPs/mC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="gdF87KPC"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kJJo8uoprVsjWxWU74NtmD993ElS4Rss9gN9hsEGjUIbRAliCQlFxbiO5qwxyVM81SFbt6rDN/SSI9HxNP0qVfDvVFbQs2pHP2yNpGpFgvHFJEe6ZXJ9GJxyI5/xsoFHGA+OxpuPFd4KDTOxXf5v9jkiryVqkMN5J4XnJD6qW5PLj849tFcFShh8QivM/Fgl+W6nwWjK71rwldBFSZC0pl5ctmo5Ec4HaXG7aMOPlY+pxUWRYyfgaKDFrXKJLnncpnQpKS9SqgGLJmoDjYsNB1OUfMk9M0kzEh4PBr2X0eJ8Bqkt47xDT0zDIsCi9NMd2Kvz8YLEIv9Q4oMDU0DrsA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QQLHFPL9uOsQe3fjyFoHRNLu0qCvjsC0WymP6PzT2xs=;
- b=PDBVpmETiQRQUMVVjOOlEesMGYrd+uIh9ZfBAHVLuotsgZIe54l0ZlwV8u5DbkCD6atYHEzOnl8YGYkBS49er/WSEsteX4hUvKMEHq/+umQ6Zdtad6qN121slTEMV5cCM2YztrKn9Mb6Iv2PASppovcCUHV9snMdef+s9PHAmp6bFM9GnK84a63ACcbQHCWG2I/t0UWlg8zXsZ7CO0FWYfBL6fCOmvtNzDZNEveiIF6cjYXRi8GrPPogye+hfMw+co/28xEvFp6Kbu3ME3AqK+G6oAO/gkVVXa2yXjNP6omwQcJYkyeQn0TMk70nVqzgE4+dAOXSJNmmTNr+LbiXQQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QQLHFPL9uOsQe3fjyFoHRNLu0qCvjsC0WymP6PzT2xs=;
- b=gdF87KPCPZsKgO0KANl9eU+lfEN3IHA9uuz3873IZ/vZAGZ2GD7DvDhEhMdyi7HgmwveiIqNkWbkp9XH0Mr7MT5RAfcq+5k1pz3PZmvAKNDWDvK1ZG9zC/s6MiPZA03t9uQzGfw0nAS4QXyv24W4cOg0b3++stqYSeNNsw8A2Ak47uMyVjODYn6GVo8O2YvsYFHvTsRiHlrIw3SXLWKtynm7LM9WYHnVkrHFTpUaIftZ9dsGHzl7TEscamI5lGYBSGvnQR5JBLR+Dk38J5lEoNq9pmh03QKlOeCmn+HXtKoErUqrr46SPT5/plxdwLtSvQQi28KegrbLjZxF01w1nw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DM6PR12MB3849.namprd12.prod.outlook.com (2603:10b6:5:1c7::26)
- by SJ2PR12MB8062.namprd12.prod.outlook.com (2603:10b6:a03:4c8::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.21; Sat, 1 Jun
- 2024 20:40:53 +0000
-Received: from DM6PR12MB3849.namprd12.prod.outlook.com
- ([fe80::c296:774b:a5fc:965e]) by DM6PR12MB3849.namprd12.prod.outlook.com
- ([fe80::c296:774b:a5fc:965e%4]) with mapi id 15.20.7633.021; Sat, 1 Jun 2024
- 20:40:51 +0000
-Date: Sat, 1 Jun 2024 17:40:43 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Steven Price <steven.price@arm.com>
-Cc: Itaru Kitayama <itaru.kitayama@linux.dev>, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l3IPs/mC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A9DBC2BBFC;
+	Sun,  2 Jun 2024 14:28:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717338539;
+	bh=Twk0OIW4aPIuat1Dyyqvbm3ZkGFMwoyV7gbfv2DR/Gs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=l3IPs/mCDdpqgZed7VnyEpm1iWftTc+CLOvNJ6S7NEEwlhV9XM+DHXeJeMQrg+ryZ
+	 rhG7oCzoRcfc2TQj/Tal7Fu4RThLp9SUGpiGmLZ6jic4amGn7dtYA36WN3KgEGGnbs
+	 UiFGvqPM73mvf4+WEhvLIo7A9CKwXST7MoS6iW/zct9T1C+h5pPZfocJIArA3eapp1
+	 XlPg9HAZvybMMZQs3GK3F0w1q35wogexsia/QBfD6A6y+8KTutYEsAS+K1s+ZHMIaP
+	 bSLCkasJXN4H/aMq1eAOCsBQBzz3rvkBkyYHiOWwZswljBISQZfsliWRwvvTnK+ubA
+	 9uHdeUDErqk8g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sDmCf-00HZqB-8w;
+	Sun, 02 Jun 2024 15:28:57 +0100
+Date: Sun, 02 Jun 2024 15:28:56 +0100
+Message-ID: <87h6eb2zbr.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
 	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: Re: [v2] Support for Arm CCA VMs on Linux
-Message-ID: <ZluHS9ZAZwzF85jk@nvidia.com>
-References: <20240412084056.1733704-1-steven.price@arm.com>
- <Zhgx1IDhEYo27OAR@vm3>
- <b2accd2c-15cc-44d9-9191-60224b797814@arm.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b2accd2c-15cc-44d9-9191-60224b797814@arm.com>
-X-ClientProxiedBy: BYAPR07CA0096.namprd07.prod.outlook.com
- (2603:10b6:a03:12b::37) To DM6PR12MB3849.namprd12.prod.outlook.com
- (2603:10b6:5:1c7::26)
+	kvm@vger.kernel.org
+Subject: Re: [PATCH 00/11] KVM: arm64: nv: FPSIMD/SVE support
+In-Reply-To: <ZltS-7c4cSBdMqfh@linux.dev>
+References: <20240531231358.1000039-1-oliver.upton@linux.dev>
+	<87jzj92c5q.wl-maz@kernel.org>
+	<ZltS-7c4cSBdMqfh@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3849:EE_|SJ2PR12MB8062:EE_
-X-MS-Office365-Filtering-Correlation-Id: f28d2d23-3c83-4ae0-725b-08dc827b204d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|366007|376005|7416005|1800799015;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?IxIQ3V3XK9zMXHjxTiJIc0nnGXHqU/jJ5CUzqM2fJswBHD09Ii+Zg3G0IsRc?=
- =?us-ascii?Q?HYeJHzguGTJQnkD+kbV+NTlfymtR+58Kjo454IfnRT7zO9hzHAu8+JaMLnx6?=
- =?us-ascii?Q?b1wEmgl+pMkSbOjimG48BRpGDDbh19esKeip+fwsiXpLObRbO1RzhRNwk3JZ?=
- =?us-ascii?Q?btDnxxZVZ6hS1BVFUv/99a6z0XFrccccYMC1bi0m8V4bt4P8eoTEh+FefwnK?=
- =?us-ascii?Q?lh3idSbkP4HFQ93EmYywfWxutbZYmxw6FNA62/KNO+w5zOcQYFedOkt5oCcI?=
- =?us-ascii?Q?zNGbIyLtHW8ZWCXDn9Xg/9bUXePitPechKCdfiLs611mbaroXNNnEW//onRI?=
- =?us-ascii?Q?1EohrDwur+eYhX3aGnoHXXCO8eG1zq00m+TSDTWdDU61JgJv4hclB25U5i5u?=
- =?us-ascii?Q?dWkJx3P06a4bIZEt4ZJJgnricBJHdZVFOcNQ7xBFrUUKd1qrFsAHIbWtAf8r?=
- =?us-ascii?Q?46deqr2iL78RaUMo5lZDf4aRUEWF4E0y6MR7dBwnOA4ffbIh83eswuOzZyur?=
- =?us-ascii?Q?ZffV5kDKvAtn1h+ip1ZuRSUhOhioNHqqIfQsyxxWTcNWJ+ahNTKn4YZp2F/A?=
- =?us-ascii?Q?CMzOiOB6Pg5IrWC6P4qQRn7N5977/ghDjoLVPVh2ypD5L4GfY9mwRfoHlVWc?=
- =?us-ascii?Q?JBonlyID19TShM53JeLHjRljfSXslEVd5Pcl10hXBSPwO7mxu2BLXOBoO5B+?=
- =?us-ascii?Q?GfoPAZr9pOwO9MvVc2JYai+FjGM0mpFtdQr1rGRG1NJ5qTB3EovhPLhEYqdD?=
- =?us-ascii?Q?Lw+Oo6P6D/q0S9j77h4W506P5w3ana+5yJIo3joScQKKXnzqbGWd4jIbLVQy?=
- =?us-ascii?Q?sKUKNCQxLxYIKxjnQ2gF6G/ngd29AW2kNquV5Oih9KHrwKBjr+w8ujMlJwcz?=
- =?us-ascii?Q?dUuIcXgkMwnqOBiPhvhqpE40Xm7TR4b+7lgvgGnjOIxFMLuEB15LPAxoE3p5?=
- =?us-ascii?Q?2D/Fda9+n+5MCNepy9pUCB9R7ZcfPxrVYck+xEc2r1IyBxoMWHVHbS5y51t0?=
- =?us-ascii?Q?mMBe5BZpZLYMRX/VxcCdSQmwEoA23SRzhqhV/nUIQiwlNQwqeaM0xZ5jLC3k?=
- =?us-ascii?Q?KEU1rOFtzpPIzScFBU8SB1ESZZHMPGMyw7aoinhsHZ4Yqbe1N78N5CIwNQ6E?=
- =?us-ascii?Q?WikjWctwtPGTEGv8e6XdNwGaZvN//Gyw5UB6s4d57W9Nuu/nCafD3YKyRXsH?=
- =?us-ascii?Q?FAMKv7YMjUL4Cl0JSBowRlU0i/RlDaEHKryqvUXzAqiGsuIoLpDw+3fRfwIA?=
- =?us-ascii?Q?FU3OXYaAYAyMCsZiQ/RFXMUSsHI9MrtrQPntKP4yHA=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3849.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(7416005)(1800799015);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?Aq/xDarG/7y0ZrXaz4R1xYYHYFHOjpovPSJ5CMIMB0MVeCqcNo34k112aBf9?=
- =?us-ascii?Q?ZGeD6sQP74OHClGai8vWw1+le9GiIirRg9CrJ+VFk+A7CFw8oceVMq9yVe5C?=
- =?us-ascii?Q?UqYXGh6F4Z+dwpY2aUQbjR6v4B/ICUFDoIfIUNAotIFiDo4O+6M9GPOKxwiP?=
- =?us-ascii?Q?H6vNHs8vk/ZMT2fFtG7iM/SkVSuY/6LNbXIcpAAyy9WYLEFSw9Wqv2Qr5Fw+?=
- =?us-ascii?Q?oWlYaVdJguBG+JlpNGnKC9iOJNlCAWdizbpoeVqqzgRP5c9oTiwXAuL5RqEP?=
- =?us-ascii?Q?ANg71jbJAOjY/ZQlCu7hxu4yjOAh4rAcmuh+OUQSdjwyo1QubyJ1ibtvFT/G?=
- =?us-ascii?Q?cv5ZwT8+3ioMvpeUSEmhlTmZJC5OT2EHxv6aOwkf/ZtZlZyArW2VmYlMDgHu?=
- =?us-ascii?Q?WqU3EhjTdWtR/1vz1CMwMSnWa0i2I0rZBn1ZzGoMb2iEfaYM7VVvVu220T76?=
- =?us-ascii?Q?IfHQXZbrGs36yiMggiWK4ubjQivm1bQ6aFxN+X/fw9eRAPZaxNXSVFi+52LP?=
- =?us-ascii?Q?k6u0yyZanKwEPe6ivqCRqIoeS3jT2k4H+76GdqPcD87ReWBdnbCLWLPTdabJ?=
- =?us-ascii?Q?6WQI8xliPa1tQ9hXiQ9hFOFThLA/gb2Cm8q5EeF0xaVd+D8HUMhwKZwa5L/G?=
- =?us-ascii?Q?kWH3kMmrSpFMLPYU9w5/TOBXjaenCPhLzuJnlPY342GQsxiDjGIUI56ew8d9?=
- =?us-ascii?Q?0JzvpKDPfSv5qx0bBO0ciLo2PLeyZvFsM9GzXX00jlbuNJIf1Rsz0dS5+5DR?=
- =?us-ascii?Q?YnHKNOMg1uu7X1YByL65h2x+9bB48uwPeXTG9CEPk8npLNC73zFC6l8JbGD/?=
- =?us-ascii?Q?tP+4tCRdEQdCsaPcuAXAW4r2t1czfMFysMqaATZpnOEbJlHviD5ieyv+WmCm?=
- =?us-ascii?Q?Ji/7F4ZwxWiEIF5Ur5yqAzktj3t59/Jnb9cZiUOonn9tXfTg/4uz3mkEDxYd?=
- =?us-ascii?Q?STvtCncijzEm3EXMKpKK0huDjZ6VZbZhT43xUWOy1Mf7jpfmA4AbI2g/zIuL?=
- =?us-ascii?Q?ZTSCzdFeFJUNRMWrNf+SVcRwH5YAPB93APsb3Gh3fQTBtzx5IZv/rEzQ3vtP?=
- =?us-ascii?Q?BOGSvc6pRY3j5pwtWYinbrbDmfG/PF5NK6ALS2CVyRghA6aXK/kiknUUMb/Z?=
- =?us-ascii?Q?145wSJkLRV7Xn2QW7YIfk8MTXssLjdzWjQMLJB6MPJrAbkcruMQw7HWSoYHv?=
- =?us-ascii?Q?2Iyo6CfXjnJkC5Z1cHEAHAwHjrCRxFEmZ4XTydZ7v/WNlCSe7IO+MrW1oFTW?=
- =?us-ascii?Q?ul6hY8heY5oOr9/Lf9JSPMoZEVkkibJFhRCjHDCHYVJfV65qrDv0x+XfKQ6G?=
- =?us-ascii?Q?NHwnUxQmuc1o5AEasiUG9LA4mNaQP5iCUdg2cypuxM+t7WJnXrIK7pNAFeZm?=
- =?us-ascii?Q?BVfgkpYM7u4E7uUtAYSlC0wTM57Wi6g0qCtZwE1EzSe6eP5k3v/ZDdA9YY9Y?=
- =?us-ascii?Q?q35sMCFG12Q/FWW9QL+wcseA4XHY5XRVWEF/J01ace80XFoiuH2TxD38eJ20?=
- =?us-ascii?Q?r6HRxskrKspaOgkGmSlqnKoojASQRWqMc5/19xKCE6stRFyj4ZQ9esOZTJxg?=
- =?us-ascii?Q?7kNB4gsETPKmpALFQntBANi+dXIANXg8LxlPV0Pc?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f28d2d23-3c83-4ae0-725b-08dc827b204d
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3849.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jun 2024 20:40:51.7226
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: thpu/S0ipIu+Ph+DVcHqdpLvY4U9U3j2ZCHow/4IXebHSJWsJ8tRQFYn2N1qbril
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8062
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Apr 15, 2024 at 09:14:47AM +0100, Steven Price wrote:
+On Sat, 01 Jun 2024 17:57:31 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> On Sat, Jun 01, 2024 at 11:24:49AM +0100, Marc Zyngier wrote:
+> > On Sat, 01 Jun 2024 00:13:47 +0100,
+> > Oliver Upton <oliver.upton@linux.dev> wrote:
+> > > 
+> > > Hey!
+> > > 
+> > > I've decided to start messing around with nested and have SVE support
+> > > working for a nested guest. For the sake of landing a semi-complete
+> > > feature upstream, I've also picked up the FPSIMD patches from the NV
+> > > series Marc is carrying.
+> > > 
+> > > The most annoying part about this series (IMO) is that ZCR_EL2 traps
+> > > behave differently from what needs to be virtualized for the guest when
+> > > HCR_EL2.NV = 1, as it takes a sysreg trap (EC = 0x18) instead of an SVE
+> > > trap (EC = 0x19). So, we need to synthesize the ESR value when
+> > > reflecting back into the guest hypervisor.
+> > 
+> > That's unfortunately not a unique case. The ERETAx emulation already
+> > requires us to synthesise the ESR on PAC check failure, and I'm afraid
+> > ZCR_EL2 might not be the last case.
+> > 
+> > In general, we'll see this problem for any instruction or sysreg that
+> > can generate multiple exception classes.
+> 
+> Right, I didn't have a good feel yet for whether or not we could add
+> some generalized infrastructure for 'remapping' ESR values for the guest
+> hypervisor. Of course, not needed for this, but cooking up an ISS is
+> likely to require a bit of manual intervention.
 
-> The support for running in a guest is (I believe) in a good state
-> and I don't expect to have to iterate much on that before merging -
-> but, as always, that depends on the feedback received.
+So far, it is pretty limited, only takes a couple of lines of code,
+and is likely to always be coupled with some more complicated handling
+(I don't see this being *only* a quick ESR remapping).
 
-All the stuff I've been hearing about CC is that timely guest support
-is a really important thing. Right now the majority of the CC world is
-running on propritary hypervisors, it is the guest enablement that is
-something a wide group of people will be able to actually consume and
-use.
+> > > Otherwise, some care is required to slap the guest hypervisor's ZCR_EL2
+> > > into the right place depending on whether or not the vCPU is in a hyp
+> > > context, since it affects the hyp's usage of SVE in addition to the VM.
+> > > 
+> > > There's more work to be done for honoring the L1's CPTR traps, as this
+> > > series only focuses on getting SVE and FPSIMD traps right. We'll get
+> > > there one day.
+> > 
+> > I have patches for that in my NV series, which would take the place of
+> > patches 9 and 10 in your series (or supplement them, depending on how
+> > we want to slice this).
+> 
+> That'd be great, I just wanted to post something focused on FP/SVE to
+> start but...
+> 
+> > > 
+> > > I tested this using a mix of the fpsimd-test and sve-test selftests
+> > > running at L0, L1, and L2 concurrently on Neoverse V2.
+> > 
+> > Thanks a lot for tackling this. It'd be good to put together a series
+> > that has the EL2 sysreg save/restore patches as a prefix of this, plus
+> > the CPTR_EL2 changes. That way, we'd have something that can be merged
+> > as a consistent set.
+> 
+> I'd be happy to stitch together something like this to round out the
+> feature. I deliberately left out the handling of vEL2 registers because
+> of the CPACR_EL1 v. CPTR_EL2 mess, but we may as well sort that out.
+> 
+> Did you want to post your CPTR bits when you have a chance?
 
-It needs to get into mainline to be able to reach distros about a year
-before anyone offers an ARM CC VM to the public. Various x86 guest
-only parts for CC are already merged.
+Yup, I'll rework that on top of your series and we'll take it from
+there.
 
-The KVM side is absolutely really important as well, but x86 has
-managed for a long time now with KVM being out of tree. The KVM side
-is far more complex at least.
+Thanks,
 
-So I'd split out the guest side and just send it, I saw a few comments
-already, but it looks like it shouldn't be an issue to make it this
-cycle or next? Keep sending guest enablement updates when the spec is
-stable and you have some way to do basic test.
+	M.
 
-Jason
+-- 
+Without deviation from the norm, progress is not possible.
