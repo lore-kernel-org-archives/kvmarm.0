@@ -1,31 +1,31 @@
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05553136E39
-	for <kvmarm@lists.linux.dev>; Mon,  3 Jun 2024 18:05:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB086137939
+	for <kvmarm@lists.linux.dev>; Mon,  3 Jun 2024 18:37:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717437934; cv=none; b=OrOy35uKxGDZhaXnZ+LUIdRtlTvy1HZLdZCCOpH9C0TZmsVzanKxOH1lDIwqH556gyiwl3uSx48iw9RDvmd+qWiT5dL/SnF192mrSHNjNiAXpnTF4fvpR5UDfCOUMPOCWWc9m6EqlI9ylBnESTnmb8XNITB9uirC+353dPEg/oU=
+	t=1717439830; cv=none; b=hF5375mE4tbSg91kBmV5PRXMeitwsKnv7ph4pJ/7wVjTZ1vYQmsRqb63KgUZMmSOd/NUK9aEs3LIesPP3J0ocQkGbQTi1jTCh87Ce3Vr2Oy9I7O3WEelLGrJF1eppgiLsbb2clPj7Se+/7SiYsT3i4RA4p3xo/rH33EZmH9gcRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717437934; c=relaxed/simple;
-	bh=/u6hRm0ypqgZNP68qXtp0fFN8RaXuFVZaRFEGPbF9y4=;
+	s=arc-20240116; t=1717439830; c=relaxed/simple;
+	bh=XZPd0drG7usBUs9fkr8i02c4nUIl4GmoQ6x2gXAT8dY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bqICM7ig/2ioUeSxWJktyDrX4495YjX3Eefbu2Ip1Jy4brXLLcqi027EJgqUe7PaVIJAdIiwIhHh7q2au9IFnfXoalS1TEFJGxsWS316DgmsqEDgCMw5BFDO9T2Se/bUD44nonrYSU5Aq0hAs1d8u1MoAWbzc9fQ+vgbAkebjrk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OuMZ2KIM; arc=none smtp.client-ip=95.215.58.178
+	 Content-Type:Content-Disposition:In-Reply-To; b=TVGwuw+QzWpAGjyr73VMo2MKL6COoc2LIbw46AsTrULHCm4qO01F2XF315O9xq64ul+pAfJdAG0LV6rrdq8hjE8ajEtJA0NhgMi6YNAX8xGZgktPguuj/kHReQBfUPINbpCxOsBybL9D84TuM3CHgbbyAQ99N4+I2OWSqx9fjnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OW9nFfK5; arc=none smtp.client-ip=91.218.175.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OuMZ2KIM"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OW9nFfK5"
 X-Envelope-To: maz@kernel.org
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1717437930;
+	t=1717439823;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=v8c1jmco2IK+JdoaMwMA27Do8TVfUJeGMj6T9ZSs0To=;
-	b=OuMZ2KIMa3bNCwB6yjNMGJ8lhcLV4DZDNpss0MFB5B2M1SLFglh0cBqtBFgAP9R5OEFGG+
-	rkbNpuKMRWR2k5w2b268ZdlpBYesyvY30/Gf8dmfxmHb+GVi+T32KrlqXFzyLkg3Tb5heB
-	lpumwqe0k1+tlfxHHrf7hI/+JxFZ8u0=
+	bh=G9VrFl3J5+mmiYdOP+FesSy3Zzkq9VACbddKbqR04aE=;
+	b=OW9nFfK5n0rco+CSsgAJrL2khaze6NTGVgpt8U+rxDCzq6sMzlWmSDoqoIORUct3e7qF3l
+	nPxaAWpPaS5PZpuMoKuf7KuD9zTVU9OABd8jZ6ClcrmKz7UuWCpt+WxXWaCF7/gYogET8Z
+	K35FnRYjL0ZSc4kGkiuDGelwB2hJCUQ=
 X-Envelope-To: kvmarm@lists.linux.dev
 X-Envelope-To: kvm@vger.kernel.org
 X-Envelope-To: linux-arm-kernel@lists.infradead.org
@@ -36,7 +36,7 @@ X-Envelope-To: joey.gouly@arm.com
 X-Envelope-To: alexandru.elisei@arm.com
 X-Envelope-To: christoffer.dall@arm.com
 X-Envelope-To: gankulkarni@os.amperecomputing.com
-Date: Mon, 3 Jun 2024 18:05:23 +0000
+Date: Mon, 3 Jun 2024 18:36:57 +0000
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Marc Zyngier <maz@kernel.org>
@@ -48,11 +48,11 @@ Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Christoffer Dall <christoffer.dall@arm.com>,
 	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: Re: [PATCH v2 12/16] KVM: arm64: nv: Tag shadow S2 entries with
- guest's leaf S2 level
-Message-ID: <Zl4F45W_FoVr89zl@linux.dev>
+Subject: Re: [PATCH v2 13/16] KVM: arm64: nv: Invalidate TLBs based on shadow
+ S2 TTL-like information
+Message-ID: <Zl4NScV0E_YV7GR2@linux.dev>
 References: <20240529145628.3272630-1-maz@kernel.org>
- <20240529145628.3272630-13-maz@kernel.org>
+ <20240529145628.3272630-14-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -61,75 +61,118 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240529145628.3272630-13-maz@kernel.org>
+In-Reply-To: <20240529145628.3272630-14-maz@kernel.org>
 X-Migadu-Flow: FLOW_OUT
 
-On Wed, May 29, 2024 at 03:56:24PM +0100, Marc Zyngier wrote:
-> Populate bits [56:55] of the leaf entry with the level provided
-> by the guest's S2 translation. This will allow us to better scope
-> the invalidation by remembering the mapping size.
+On Wed, May 29, 2024 at 03:56:25PM +0100, Marc Zyngier wrote:
+> In order to be able to make S2 TLB invalidations more performant on NV,
+> let's use a scheme derived from the FEAT_TTL extension.
 > 
-> Of course, this assume that the guest will issue an invalidation
-> with an address that falls into the same leaf. If the guest doesn't,
-> we'll over-invalidate.
+> If bits [56:55] in the leaf descriptor translating the address in the
+> corresponding shadow S2 are non-zero, they indicate a level which can
+> be used as an invalidation range. This allows further reduction of the
+> systematic over-invalidation that takes place otherwise.
 > 
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  arch/arm64/include/asm/kvm_nested.h |  8 ++++++++
->  arch/arm64/kvm/mmu.c                | 17 +++++++++++++++--
->  2 files changed, 23 insertions(+), 2 deletions(-)
+>  arch/arm64/kvm/nested.c | 83 ++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 82 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-> index fcb0de3a93fe..971dbe533730 100644
-> --- a/arch/arm64/include/asm/kvm_nested.h
-> +++ b/arch/arm64/include/asm/kvm_nested.h
-> @@ -5,6 +5,7 @@
->  #include <linux/bitfield.h>
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 8570b5bd0289..5ab5c43c571b 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -4,6 +4,7 @@
+>   * Author: Jintack Lim <jintack.lim@linaro.org>
+>   */
+>  
+> +#include <linux/bitfield.h>
+>  #include <linux/kvm.h>
 >  #include <linux/kvm_host.h>
->  #include <asm/kvm_emulate.h>
-> +#include <asm/kvm_pgtable.h>
 >  
->  static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
->  {
-> @@ -195,4 +196,11 @@ static inline bool kvm_auth_eretax(struct kvm_vcpu *vcpu, u64 *elr)
+> @@ -421,12 +422,92 @@ static unsigned int ttl_to_size(u8 ttl)
+>  	return max_size;
 >  }
->  #endif
 >  
-> +#define KVM_NV_GUEST_MAP_SZ	(KVM_PGTABLE_PROT_SW1 | KVM_PGTABLE_PROT_SW0)
-> +
-> +static inline u64 kvm_encode_nested_level(struct kvm_s2_trans *trans)
+> +/*
+> + * Compute the equivalent of the TTL field by parsing the shadow PT.  The
+> + * granule size is extracted from the cached VTCR_EL2.TG0 while the level is
+> + * retrieved from first entry carrying the level as a tag.
+> + */
+> +static u8 get_guest_mapping_ttl(struct kvm_s2_mmu *mmu, u64 addr)
 > +{
-> +	return FIELD_PREP(KVM_NV_GUEST_MAP_SZ, trans->level);
-> +}
+
+Can you add a lockdep assertion that the MMU lock is held for write
+here? At least for me this is far enough away from the 'real' page table
+walk that it wasn't clear what locks were held at this point.
+
+> +	u64 tmp, sz = 0, vtcr = mmu->tlb_vtcr;
+> +	kvm_pte_t pte;
+> +	u8 ttl, level;
 > +
+> +	switch (vtcr & VTCR_EL2_TG0_MASK) {
+> +	case VTCR_EL2_TG0_4K:
+> +		ttl = (TLBI_TTL_TG_4K << 2);
+> +		break;
+> +	case VTCR_EL2_TG0_16K:
+> +		ttl = (TLBI_TTL_TG_16K << 2);
+> +		break;
+> +	case VTCR_EL2_TG0_64K:
+> +	default:	    /* IMPDEF: treat any other value as 64k */
+> +		ttl = (TLBI_TTL_TG_64K << 2);
+> +		break;
+> +	}
+> +
+> +	tmp = addr;
+> +
+> +again:
+> +	/* Iteratively compute the block sizes for a particular granule size */
+> +	switch (vtcr & VTCR_EL2_TG0_MASK) {
+> +	case VTCR_EL2_TG0_4K:
+> +		if	(sz < SZ_4K)	sz = SZ_4K;
+> +		else if (sz < SZ_2M)	sz = SZ_2M;
+> +		else if (sz < SZ_1G)	sz = SZ_1G;
+> +		else			sz = 0;
+> +		break;
+> +	case VTCR_EL2_TG0_16K:
+> +		if	(sz < SZ_16K)	sz = SZ_16K;
+> +		else if (sz < SZ_32M)	sz = SZ_32M;
+> +		else			sz = 0;
+> +		break;
+> +	case VTCR_EL2_TG0_64K:
+> +	default:	    /* IMPDEF: treat any other value as 64k */
+> +		if	(sz < SZ_64K)	sz = SZ_64K;
+> +		else if (sz < SZ_512M)	sz = SZ_512M;
+> +		else			sz = 0;
+> +		break;
+> +	}
+> +
+> +	if (sz == 0)
+> +		return 0;
+> +
+> +	tmp &= ~(sz - 1);
+> +	if (kvm_pgtable_get_leaf(mmu->pgt, tmp, &pte, NULL))
+> +		goto again;
 
-It might be nice to keep all of the software fields for (in)valid in
-a central place so we can add some documentation. I fear this is going
-to get rather complicated as more pieces of pKVM land upstream and we
-find new and fun ways to cram data into stage-2.
+Assuming we're virtualizing a larger TG than what's in use at L0 this
+may not actually find a valid leaf that exists within the span of a
+single virtual TLB entry.
 
->  #endif /* __ARM64_KVM_NESTED_H */
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 4ed93a384255..f3a8ec70bd29 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1598,11 +1598,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	 * Potentially reduce shadow S2 permissions to match the guest's own
->  	 * S2. For exec faults, we'd only reach this point if the guest
->  	 * actually allowed it (see kvm_s2_handle_perm_fault).
-> +	 *
-> +	 * Also encode the level of the nested translation in the SW bits of
-> +	 * the PTE/PMD/PUD. This will be retrived on TLB invalidation from
-> +	 * the guest.
+For example, if we're using 4K at L0 and 16K at L1, we could have:
 
-typo: retrieved
+	[ ----- valid 16K entry ------- ]
 
-Also, it might be helpful to add some color here to indicate the encoded
-TTL is used to represent the span of a single virtual TLB entry,
-providing scope to the TLBI by address.
+mapped as:
 
-Before I actually read what was going on, I thought the TTL in the PTE
-was used for matching invalidation scopes that have a valid TTL.
+	[ ----- | ----- | valid | ----- ]
+
+in the shadow S2. kvm_pgtable_get_leaf() will always return the first
+splintered page, which could be invalid.
+
+What I'm getting at is: should this use a bespoke table walker that
+scans for a valid TTL in the range of [addr, addr + sz)? It may make
+sense to back off a bit more aggressively and switch to a conservative,
+unscoped TLBI to avoid visiting too many PTEs.
 
 -- 
 Thanks,
