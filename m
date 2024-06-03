@@ -1,130 +1,117 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39A7212BF3E
-	for <kvmarm@lists.linux.dev>; Mon,  3 Jun 2024 12:29:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E18F964F;
+	Mon,  3 Jun 2024 12:36:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717417757; cv=none; b=bKc38H2Lw1droJs9y8RRT0l/e/bIrndh8YyETvgLsBWkhHVNAyUYw0OfsTQnLxR1uKPO8evz8kK/XHvFSEPpXJQ0QAMKkX+nVGsY4Wnj9NxmOVUaDUskldH5v+xJqbQ8p/gR04XHhDn85MvCgFTLQpxUXLdCnPKyCUCivGZXn+s=
+	t=1717418218; cv=none; b=p6F7IaH/G146Bv8ZoQIuHORQiFVHvtppb/jXyf6AotlEbuI+8/vGDiru7VBzKeSosd6dGDL0CrMsluj6OM2dNoLPmWR7EunAU77E0FI2rLoCd2lXHW1tVSTYuNN82GTHJxpsKwPoFytSj9VezfNRx2wXce+bj1vlgJSF4xXj8hE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717417757; c=relaxed/simple;
-	bh=pkZe/dBEeD9cr2hSeqfchSSK/LMhTJa0qCxPXrSwAls=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=q0JPfpKUZxx1q4wovm5JHom4xoa526Hxb3Pu2o5wFvp/hY6rmo+oMFLmdhE/5wdgqpyVAj5diP8cVPDO0GZhDOYXjbNlH+dxwlVMvVijugnkbLQLoghCEli/ppJYwJ2thcp4qZX4lmJlcthZv7gbKLTlpzLNqlAILoZfTFT9ynI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0f2dBiFt; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
+	s=arc-20240116; t=1717418218; c=relaxed/simple;
+	bh=uegJVi7CtFWNzVgquJOmWjJflTc+4Gwyb5TTiqX2kPE=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Vo5HyKk+3Ac08HvnR/vdkRFCSfoozSHDUwJBDgfVAMlXxEHJDSr7Qm0JcKiq/q7HVrDaJ4IYElYaBiKUpaIGRwyoHnYbmMmpKZXFuOVWEypTcWj9p5Bbq1yZvg/5e9+A9YQzyZwXXjgSAN/WPf1zOkCX9iRKKZAw+wbeFYzstoU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LGRN8NKl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0f2dBiFt"
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-62a088faef7so53929117b3.0
-        for <kvmarm@lists.linux.dev>; Mon, 03 Jun 2024 05:29:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717417755; x=1718022555; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XEXSQwwweXxLdCBcQNv2cOs/GwOHKY5IsjtcWCo7rME=;
-        b=0f2dBiFtFzTuf1hJkbHVDdlfYka705JAeraDMXHCKm7JRdIIdc20iRJiiChrF3OHV0
-         NiL2x7kRliYNbQrSslShZ6DO58lCRaADHxw2KJnO0jKc8lEPXTUYWuK9eT/8Eiv5l3jt
-         ptN40iL/D66vt/wBK9ZbQbOt5Ri+MRL2MHBigkSx8KsAraDTqP/Ae8bRUeZm9swLVSNt
-         IQamTqvyZNHkmhY8fBld6thpMSIYM5q5q/gqHpe6/VhNKS2S3B5HQYaGIMVSlxSZEK5H
-         lumyCjhj9gBR6d+NGSa4lU+3lem5mYtHkKDvUEYwjLTT9PW+1YNFS6DDASII/bSNdvDM
-         Euxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717417755; x=1718022555;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XEXSQwwweXxLdCBcQNv2cOs/GwOHKY5IsjtcWCo7rME=;
-        b=NDWJjuFPPxTDN3yHyvLA8WsmRN38K2ACTH8T+scK3rG6ks7yVP1BASfPSpOj29l9m4
-         xUH/VE64lmbTwW8smKZfd3HJcjOqK0JWVLXPlxXhzSs8e1bNEWNQlzoExqmhRcVEA4pn
-         d15cWlqzBE/EG0UoHoydAh7/ZiQ0axKysGgpxNemzp7bubOrIEAIQ+xdrg8aGMAF3ERI
-         b8DfTsYZgpF/4Wj/uvBMJhlRTvNohJsiBekdTlByDj3Xz2HHNHfBQ5L4pvrbzy2Q6mvg
-         cjT/3g7+PmxFeh9W/sN03UuCwrmZHPmUEhK3Mfz1uX5LD0mYrt4o/ZFzLVwBDbB+W70R
-         Nxag==
-X-Gm-Message-State: AOJu0Ywv4XqWFpLcb3HjvNPMRW01IoRUIMbNOf2Hukeyle7aHnAJE4J9
-	yOJNcsduAez84WBRAZaUsGACXOj17Qq2yl9rH+UJXeDpAgkP0AAHAMXKEWHYvnAMVjQV8PxLzSI
-	ESHKepNTeVNl61shLKa9Y9C3Tc2kDII5PjBxfFsLVBOdBqex+sxgZK+hbFzyZIbwOBNFyyBwYQG
-	zXtB2ECt78dFhUE9VbfNqdc5/e5Oo=
-X-Google-Smtp-Source: AGHT+IFAx9023tmv+pYbfbnXnAZglHsbxs/xEXjYQyjdijOAUgR73xgEHRZ4KLD2OC9BZc3VAmALllD2lg==
-X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:690c:f:b0:611:6f24:62b1 with SMTP id
- 00721157ae682-62c7863ae84mr33711717b3.1.1717417754901; Mon, 03 Jun 2024
- 05:29:14 -0700 (PDT)
-Date: Mon,  3 Jun 2024 13:28:51 +0100
-In-Reply-To: <20240603122852.3923848-1-tabba@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LGRN8NKl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7995BC32789;
+	Mon,  3 Jun 2024 12:36:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717418217;
+	bh=uegJVi7CtFWNzVgquJOmWjJflTc+4Gwyb5TTiqX2kPE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LGRN8NKlA61GOjliX/livySD+0dxoo2oZl9oUw4b4o6ZQ3NsWgBYqGl1wOhyPobGo
+	 orDrahhwHZo98aoTx1S49mse3tCjXIsCe7iSBKNnPSKV4Ahe3iBLhahHN5/cDeBeSk
+	 lU5Mrwd9wb5B1Ji37mGqPVtj19uIO6O4CL3sYg2dtnDBbYy8ldG9r1aAJHaQgoGp8M
+	 it6NtFX1pYxPhbKhK0cf2P7f/LTCkx7OET1q9X8KwdlF7ZNwnGwHNE/uAoHX+g5PaU
+	 aIEonceqe1tEA0OmeUCGl687Q48KUzr7XiZ8IEhpj+5xgFItPiArUmq0h4t7BJ5eqq
+	 9TS7klZoN8xiQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sE6vn-000DuZ-8V;
+	Mon, 03 Jun 2024 13:36:55 +0100
+Date: Mon, 03 Jun 2024 13:36:54 +0100
+Message-ID: <86le3mkxsp.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH 10/11] KVM: arm64: nv: Honor guest hypervisor's FP/SVE traps in CPTR_EL2
+In-Reply-To: <20240531231358.1000039-11-oliver.upton@linux.dev>
+References: <20240531231358.1000039-1-oliver.upton@linux.dev>
+	<20240531231358.1000039-11-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20240603122852.3923848-1-tabba@google.com>
-X-Mailer: git-send-email 2.45.1.288.g0e0cd299f1-goog
-Message-ID: <20240603122852.3923848-10-tabba@google.com>
-Subject: [PATCH v4 9/9] KVM: arm64: Ensure that SME controls are disabled in
- protected mode
-From: Fuad Tabba <tabba@google.com>
-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
-Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com, 
-	seanjc@google.com, alexandru.elisei@arm.com, catalin.marinas@arm.com, 
-	philmd@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, 
-	oliver.upton@linux.dev, mark.rutland@arm.com, broonie@kernel.org, 
-	joey.gouly@arm.com, rananta@google.com, yuzenghui@huawei.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-KVM (and pKVM) do not support SME guests. Therefore KVM ensures
-that the host's SME state is flushed and that SME controls for
-enabling access to ZA storage and for streaming are disabled.
+On Sat, 01 Jun 2024 00:13:57 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> Start folding the guest hypervisor's FP/SVE traps into the value
+> programmed in hardware. Note that as of writing this is dead code, since
+> KVM does a full put() / load() for every nested exception boundary which
+> saves + flushes the FP/SVE state.
+> 
+> However, this will become useful when we can keep the guest's FP/SVE
+> state alive across a nested exception boundary and the host no longer
+> needs to conservatively program traps.
+> 
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/kvm/hyp/vhe/switch.c | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> index 697253673d7b..d07b4f4be5e5 100644
+> --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> @@ -85,6 +85,19 @@ static void __activate_cptr_traps(struct kvm_vcpu *vcpu)
+>  		__activate_traps_fpsimd32(vcpu);
+>  	}
+>  
+> +	/*
+> +	 * Layer the guest hypervisor's trap configuration on top of our own if
+> +	 * we're in a nested context.
+> +	 */
+> +	if (!vcpu_has_nv(vcpu) || is_hyp_ctxt(vcpu))
+> +		goto write;
+> +
+> +	if (guest_hyp_fpsimd_traps_enabled(vcpu))
+> +		val &= ~CPACR_ELx_FPEN;
+> +	if (guest_hyp_sve_traps_enabled(vcpu))
+> +		val &= ~CPACR_ELx_ZEN;
 
-pKVM needs to protect against a buggy/malicious host. Ensure that
-it wouldn't run a guest when protected mode is enabled should any
-of the SME controls be enabled.
+I'm afraid this isn't quite right. You are clearing both FPEN (resp
+ZEN) bits based on any of the two bits being clear, while what we want
+is to actually propagate the 0 bits (and only those).
 
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
- arch/arm64/kvm/fpsimd.c            |  7 +++++++
- arch/arm64/kvm/hyp/nvhe/hyp-main.c | 11 +++++++++++
- 2 files changed, 18 insertions(+)
+What I have in my tree is something along the lines of:
 
-diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-index eb21f29d91fc..521b32868d0d 100644
---- a/arch/arm64/kvm/fpsimd.c
-+++ b/arch/arm64/kvm/fpsimd.c
-@@ -90,6 +90,13 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
- 			fpsimd_save_and_flush_cpu_state();
- 		}
- 	}
-+
-+	/*
-+	 * If normal guests gain SME support, maintain this behavior for pKVM
-+	 * guests, which don't support SME.
-+	 */
-+	WARN_ON(is_protected_kvm_enabled() && system_supports_sme() &&
-+		read_sysreg_s(SYS_SVCR));
- }
- 
- /*
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index bd93b8a9e172..f43d845f3c4e 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -140,6 +140,17 @@ static void handle___kvm_vcpu_run(struct kvm_cpu_context *host_ctxt)
- 		struct pkvm_hyp_vcpu *hyp_vcpu;
- 		struct kvm *host_kvm;
- 
-+		/*
-+		 * KVM (and pKVM) doesn't support SME guests for now, and
-+		 * ensures that SME features aren't enabled in pstate when
-+		 * loading a vcpu. Therefore, if SME features enabled the host
-+		 * is misbehaving.
-+		 */
-+		if (unlikely(system_supports_sme() && read_sysreg_s(SYS_SVCR))) {
-+			ret = -EINVAL;
-+			goto out;
-+		}
-+
- 		host_kvm = kern_hyp_va(host_vcpu->kvm);
- 		hyp_vcpu = pkvm_load_hyp_vcpu(host_kvm->arch.pkvm.handle,
- 					      host_vcpu->vcpu_idx);
+	cptr = vcpu_sanitised_cptr_el2(vcpu);
+	tmp = cptr & (CPACR_ELx_ZEN_MASK | CPACR_ELx_FPEN_MASK);
+	val &= ~(tmp ^ (CPACR_ELx_ZEN_MASK | CPACR_ELx_FPEN_MASK));
+
+which makes sure that we only clear the relevant bits.
+
+Thanks,
+
+	M.
+
 -- 
-2.45.1.288.g0e0cd299f1-goog
-
+Without deviation from the norm, progress is not possible.
