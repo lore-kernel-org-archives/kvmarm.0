@@ -1,55 +1,55 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 235D977118
-	for <kvmarm@lists.linux.dev>; Mon,  3 Jun 2024 12:29:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F8BE77118
+	for <kvmarm@lists.linux.dev>; Mon,  3 Jun 2024 12:29:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717417753; cv=none; b=g7gnZpS8MPMd3PBIHxXw+p5vysaYwRCmQDaQOKsvKyoYv2V/cWPg2LQraNdY1TKJf80SNCiwENmueZK8SkOZiXAwLN9qQRdfqa5SY+eVUEDFU3cDRrmOzOuijB3p/+2RhX6NoFUKtcAeoBA/i8oXOBNQmJekgI28D8+e8JzXhPo=
+	t=1717417756; cv=none; b=lFJYDq4Voorx2zHs9ul2cU0kXjA/5hhZ7Fkeb8+Dd62Ws+ycBt8yKkMQ045/3FhIziHQPRqMRSJDLXvs5sppY2zD18l2dchoTx6TCdoSz4gME8o8i4cRBMPifGwmwvHTkc5OpJnXsn03HGOZ6oV45/pq0BfgejNmplcNOnoLVIg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717417753; c=relaxed/simple;
-	bh=ZobilgW+nIO1t/n5DQN0tBmI9ip8tCFHG2F3WTdbopE=;
+	s=arc-20240116; t=1717417756; c=relaxed/simple;
+	bh=1knDe/yc8ItOiUSldHnx+AYhW4LnmqeoorRUBNdqDKU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=bLZBrl/VlVK3itLMLE9bfc6es06RE81df2ezREnqinKqEWKS7ZcoArhM8F0W0d79AYwRUZSbyVRuUGH2U6F4KsvDQtwYz9CegWJ9Rne7mzV3HXRVTdEVI6513+EeW7gm/Q3YB/b/nuFuKizYj2UihXjSKDnI/Yla7YFZcoPHB6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fJmwFoxw; arc=none smtp.client-ip=209.85.128.74
+	 To:Cc:Content-Type; b=fb55z7NeYnQTwcO4zFBK/9dfgnUckHPftkoY/NVXhf7OfFZYMcllaQwteY1h1b5VfC/6myBgJ4P7F94FepQyRsZgagjqXwN8UNucpHe7sXnOskYUylaaZwXQob6XhPOLI2WKX3ivCM63Tvrcey0JisSbH+G/i0Sqhiior2NHSt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=t+1608AZ; arc=none smtp.client-ip=209.85.221.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fJmwFoxw"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4212a4bb9d7so30361535e9.1
-        for <kvmarm@lists.linux.dev>; Mon, 03 Jun 2024 05:29:11 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="t+1608AZ"
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-35dcb3f1ab3so2279149f8f.0
+        for <kvmarm@lists.linux.dev>; Mon, 03 Jun 2024 05:29:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717417750; x=1718022550; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1717417753; x=1718022553; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=U42arwuWsMiHE66qzXZnxwdOUgD9GbRPo4yP26HiIzg=;
-        b=fJmwFoxwMGKpIv6pUc/rCbcYZEQEP8oKP07y6rkfhpYqN55TIvfAGX5YT9LJynMPAS
-         ebp1B82od2F5onn6gZB53uI1p2oyYM8NwDa2Hs2dzbDfk9J/GXi0TYhwqN5slkpYX0yq
-         CxVyJoo/jXyXnmoPUOpKptct2hOoGzdUXbJLBBVJoCYZu9ELZ+QqsKze96BKuw/S2WSK
-         arKJT+S4kBX89BykQXoKxy9TEu6NfDKgWUs/kZQ3PulH1JZTDYUQh4bhZZ7GUvq0038c
-         yl++mZNxfp3VatMeWc8x0BHd9kOjpUhDcUj95HlXa+s/bYYT7QZEK4QTnrjJIPyDz4+a
-         EWlQ==
+        bh=WtWJBKyFvGQD5szW6F8dKzbbhPp6g7pDAESGBVUK8Gs=;
+        b=t+1608AZOIaHbLCS4eSgR98tgghXKYYdaVPW3sXCjg0GMQStvFaBnzrdXY7udxlZ2q
+         pnMkvNO2h+f5EbMuYX1Km5Q6aiEzPE+Q+t7019nbTVqLZDMbRaepr0/6D3JxP7gS4LbI
+         G6dAzE5gbjHBy9dX9UZbev1GSM8FCCbWrI+9jnzc/YjBLsrXe/jLlybm4YVkfvD7hKC4
+         UuEEsGaU2I9xdIJFmUcs0zvuCV2GdNaYFu0kUOHY/DbBdsoAgguIntqeQZ6lIVq3FE0D
+         9zAp8GGflTaLlsJ73z2shxORFyF7GXvRnGEanttLwckBfu5DgbKxL/JKAWdPM8hq/5SG
+         We4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717417750; x=1718022550;
+        d=1e100.net; s=20230601; t=1717417753; x=1718022553;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=U42arwuWsMiHE66qzXZnxwdOUgD9GbRPo4yP26HiIzg=;
-        b=OCN4Zqlxnw6gOdRmVSONq2cd/WGcUQlEg/spi+InB2+FV5Y6DNumLO/CC+zN3c7QmZ
-         HKHX+qYotJCV5EzzNhXA+JRd7dRrKjopypX+jp5kZFAPk3DXAt8XXSeWj4AQrXWab96S
-         WQEl/a+MogHCw5ILz8bSWscvKU9BVXNWboQ2LkTCspG+toaKX+3+9kQha24sWIeCjF0q
-         MtSWLdrzNguedW5SXdWoJFNGPHzD560pkTPNToQqBYUfdL5KzY5cEAQN2lIsPxbk2pex
-         Xf6qE3x9aByEKB4Zvlxe5yYXIzTWsbKUaL6PUJk6Q9F0dIdVUPFFFKEsrsD0QvqBE0ag
-         Bo4w==
-X-Gm-Message-State: AOJu0YzqPzsP9mxz0qUhMdmlJCXCi8MUL1/uB0qoAozRCvKVAQhdqbrT
-	bAE0v9sIdlXefYiiABi0nM1CxeBsWPosW1qTufL1BC1Ok6hdmimFTQ7t5O1EpS0hRpO79MXgK5E
-	JqrF5e+4hy7+dRO55suPe8HC7WDaY+rOcHTMBz+vNw25tsziPuxW/fVntwZ+FvHFPnnLHTl739T
-	O9Li+U4bKLThDqZzd7I6L6DLl9grg=
-X-Google-Smtp-Source: AGHT+IGO7jTM5E9IKZ1m5EqdbMKWV26ViD5BIiFLPbythaPnVe/itjF5Rf9NW4Q562jRTh229fvP4hKtlA==
+        bh=WtWJBKyFvGQD5szW6F8dKzbbhPp6g7pDAESGBVUK8Gs=;
+        b=gHOGVdnhAeeyrLi7a2Sp/TQ49ogk/KgiczcLOjypVFpb7vYmvqHdk/wzc9hi5G5i4Y
+         ouvQgmzrE2wsuDMtcxoglf2k19uf7sanun047XwQBQpI8AK9MjCMVq6lEaLP5jJ37tcH
+         mL36yrrlaWtXNitByCLyZ/0w+IAy6NuLdMu+5haO8lEAsdQB6XR0KQt7YU8raHNq6ib5
+         milNm6G/vIp82sXfEzZa+aW8Z5Vf7WiDp1/nWekpJZyKtAi9+RPzEQ0wn7vdXtl31rGg
+         Co0c6JfmDfVA5i01OxEZh8NskCRKkUPo93JjzfcpBKjxdfD+4LxZ05CsL7LQ6K2uTeYO
+         IPYg==
+X-Gm-Message-State: AOJu0Yy7FT3PwpMzSXHVFWay/zRGvgxcoSGkS0W5o1JlXel+lGGI4dA6
+	F6KAqjVwsjFf7Dj5zoSBRx9VXO3L1N9gT687gqbbqqOI1e8B5YIWciPK0w8GHAQPJqyjDnAaJKF
+	TmVbth4IvQTe8Uzpz1E+GRnn1Kul21XKBqHP5cxuR4syJnLr3u9/I6GAgXdj5bmqJHUPuWJ8S9r
+	AOhh9407EDVsog6jtmWVgGBnPm/Kk=
+X-Google-Smtp-Source: AGHT+IHfcB5a1lbKfVtUCtqK3R/QQErL+IjhZ9ZMu+RhPRnWwnQ6oByi4b3Q8VEPpjcFOM1UW9AMlgjWpQ==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:600c:1c0a:b0:41e:a0ab:f964 with SMTP id
- 5b1f17b1804b1-4212e0be57amr400775e9.7.1717417750147; Mon, 03 Jun 2024
- 05:29:10 -0700 (PDT)
-Date: Mon,  3 Jun 2024 13:28:49 +0100
+ (user=tabba job=sendgmr) by 2002:a5d:6690:0:b0:354:f145:32a with SMTP id
+ ffacd0b85a97d-35e0f26a36amr17870f8f.6.1717417752516; Mon, 03 Jun 2024
+ 05:29:12 -0700 (PDT)
+Date: Mon,  3 Jun 2024 13:28:50 +0100
 In-Reply-To: <20240603122852.3923848-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,9 +59,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240603122852.3923848-1-tabba@google.com>
 X-Mailer: git-send-email 2.45.1.288.g0e0cd299f1-goog
-Message-ID: <20240603122852.3923848-8-tabba@google.com>
-Subject: [PATCH v4 7/9] KVM: arm64: Consolidate initializing the host data's
- fpsimd_state/sve in pKVM
+Message-ID: <20240603122852.3923848-9-tabba@google.com>
+Subject: [PATCH v4 8/9] KVM: arm64: Refactor CPACR trap bit setting/clearing
+ to use ELx format
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
 Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com, 
@@ -71,120 +71,156 @@ Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com,
 	joey.gouly@arm.com, rananta@google.com, yuzenghui@huawei.com
 Content-Type: text/plain; charset="UTF-8"
 
-Now that we have introduced finalize_init_hyp_mode(), lets
-consolidate the initializing of the host_data fpsimd_state and
-sve state.
+When setting/clearing CPACR bits for EL0 and EL1, use the ELx
+format of the bits, which covers both. This makes the code
+clearer, and reduces the chances of accidentally missing a bit.
+
+No functional change intended.
 
 Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/include/asm/kvm_host.h      | 10 ++++++++--
- arch/arm64/kvm/arm.c                   | 20 ++++++++++++++------
- arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  1 -
- arch/arm64/kvm/hyp/nvhe/pkvm.c         | 11 -----------
- arch/arm64/kvm/hyp/nvhe/setup.c        |  1 -
- 5 files changed, 22 insertions(+), 21 deletions(-)
+ arch/arm64/include/asm/el2_setup.h   | 6 +++---
+ arch/arm64/include/asm/kvm_emulate.h | 9 ++++-----
+ arch/arm64/kvm/fpsimd.c              | 4 +---
+ arch/arm64/kvm/hyp/nvhe/pkvm.c       | 2 +-
+ arch/arm64/kvm/hyp/nvhe/switch.c     | 5 ++---
+ arch/arm64/kvm/hyp/vhe/switch.c      | 7 +++----
+ 6 files changed, 14 insertions(+), 19 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 90df7ccec5f4..36b8e97bf49e 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -550,8 +550,14 @@ struct cpu_sve_state {
- struct kvm_host_data {
- 	struct kvm_cpu_context host_ctxt;
+diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
+index e4546b29dd0c..fd87c4b8f984 100644
+--- a/arch/arm64/include/asm/el2_setup.h
++++ b/arch/arm64/include/asm/el2_setup.h
+@@ -146,7 +146,7 @@
+ /* Coprocessor traps */
+ .macro __init_el2_cptr
+ 	__check_hvhe .LnVHE_\@, x1
+-	mov	x0, #(CPACR_EL1_FPEN_EL1EN | CPACR_EL1_FPEN_EL0EN)
++	mov	x0, #CPACR_ELx_FPEN
+ 	msr	cpacr_el1, x0
+ 	b	.Lskip_set_cptr_\@
+ .LnVHE_\@:
+@@ -277,7 +277,7 @@
  
--	struct user_fpsimd_state *fpsimd_state;	/* hyp VA */
--	struct cpu_sve_state *sve_state;	/* hyp VA */
-+	/*
-+	 * All pointers in this union are hyp VA.
-+	 * sve_state is only used in pKVM and if system_supports_sve().
-+	 */
-+	union {
-+		struct user_fpsimd_state *fpsimd_state;
-+		struct cpu_sve_state *sve_state;
-+	};
+ 	// (h)VHE case
+ 	mrs	x0, cpacr_el1			// Disable SVE traps
+-	orr	x0, x0, #(CPACR_EL1_ZEN_EL1EN | CPACR_EL1_ZEN_EL0EN)
++	orr	x0, x0, #CPACR_ELx_ZEN
+ 	msr	cpacr_el1, x0
+ 	b	.Lskip_set_cptr_\@
  
- 	/* Ownership of the FP regs */
- 	enum {
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 1acf7415e831..59716789fe0f 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -2444,14 +2444,22 @@ static void finalize_init_hyp_mode(void)
- {
- 	int cpu;
+@@ -298,7 +298,7 @@
  
--	if (!is_protected_kvm_enabled() || !system_supports_sve())
--		return;
-+	if (system_supports_sve() && is_protected_kvm_enabled()) {
-+		for_each_possible_cpu(cpu) {
-+			struct cpu_sve_state *sve_state;
+ 	// (h)VHE case
+ 	mrs	x0, cpacr_el1			// Disable SME traps
+-	orr	x0, x0, #(CPACR_EL1_SMEN_EL0EN | CPACR_EL1_SMEN_EL1EN)
++	orr	x0, x0, #CPACR_ELx_SMEN
+ 	msr	cpacr_el1, x0
+ 	b	.Lskip_set_cptr_sme_\@
  
--	for_each_possible_cpu(cpu) {
--		struct cpu_sve_state *sve_state;
-+			sve_state = per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)->sve_state;
-+			per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)->sve_state =
-+				kern_hyp_va(sve_state);
-+		}
-+	} else {
-+		for_each_possible_cpu(cpu) {
-+			struct user_fpsimd_state *fpsimd_state;
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 2d7a0bdf9d03..21650e7924d4 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -632,17 +632,16 @@ static __always_inline u64 kvm_get_reset_cptr_el2(struct kvm_vcpu *vcpu)
+ 	u64 val;
  
--		sve_state = per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)->sve_state;
--		per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)->sve_state = kern_hyp_va(sve_state);
-+			fpsimd_state = &per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)->host_ctxt.fp_regs;
-+			per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)->fpsimd_state =
-+				kern_hyp_va(fpsimd_state);
-+		}
- 	}
- }
+ 	if (has_vhe()) {
+-		val = (CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN |
+-		       CPACR_EL1_ZEN_EL1EN);
++		val = (CPACR_ELx_FPEN | CPACR_EL1_ZEN_EL1EN);
+ 		if (cpus_have_final_cap(ARM64_SME))
+ 			val |= CPACR_EL1_SMEN_EL1EN;
+ 	} else if (has_hvhe()) {
+-		val = (CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN);
++		val = CPACR_ELx_FPEN;
  
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-index 22f374e9f532..24a9a8330d19 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-@@ -59,7 +59,6 @@ static inline bool pkvm_hyp_vcpu_is_protected(struct pkvm_hyp_vcpu *hyp_vcpu)
- }
+ 		if (!vcpu_has_sve(vcpu) || !guest_owns_fp_regs())
+-			val |= CPACR_EL1_ZEN_EL1EN | CPACR_EL1_ZEN_EL0EN;
++			val |= CPACR_ELx_ZEN;
+ 		if (cpus_have_final_cap(ARM64_SME))
+-			val |= CPACR_EL1_SMEN_EL1EN | CPACR_EL1_SMEN_EL0EN;
++			val |= CPACR_ELx_SMEN;
+ 	} else {
+ 		val = CPTR_NVHE_EL2_RES1;
  
- void pkvm_hyp_vm_table_init(void *tbl);
--void pkvm_host_fpsimd_state_init(void);
- 
- int __pkvm_init_vm(struct kvm *host_kvm, unsigned long vm_hva,
- 		   unsigned long pgd_hva);
+diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
+index 1807d3a79a8a..eb21f29d91fc 100644
+--- a/arch/arm64/kvm/fpsimd.c
++++ b/arch/arm64/kvm/fpsimd.c
+@@ -161,9 +161,7 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
+ 	if (has_vhe() && system_supports_sme()) {
+ 		/* Also restore EL0 state seen on entry */
+ 		if (vcpu_get_flag(vcpu, HOST_SME_ENABLED))
+-			sysreg_clear_set(CPACR_EL1, 0,
+-					 CPACR_EL1_SMEN_EL0EN |
+-					 CPACR_EL1_SMEN_EL1EN);
++			sysreg_clear_set(CPACR_EL1, 0, CPACR_ELx_SMEN);
+ 		else
+ 			sysreg_clear_set(CPACR_EL1,
+ 					 CPACR_EL1_SMEN_EL0EN,
 diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index feb27b4ce459..ea67fcbf8376 100644
+index ea67fcbf8376..95cf18574251 100644
 --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
 +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -249,17 +249,6 @@ void pkvm_hyp_vm_table_init(void *tbl)
- 	vm_table = tbl;
- }
+@@ -65,7 +65,7 @@ static void pvm_init_traps_aa64pfr0(struct kvm_vcpu *vcpu)
+ 	/* Trap SVE */
+ 	if (!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_SVE), feature_ids)) {
+ 		if (has_hvhe())
+-			cptr_clear |= CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN;
++			cptr_clear |= CPACR_ELx_ZEN;
+ 		else
+ 			cptr_set |= CPTR_EL2_TZ;
+ 	}
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index bef74de7065b..6af179c6356d 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -48,15 +48,14 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+ 	val |= has_hvhe() ? CPACR_EL1_TTA : CPTR_EL2_TTA;
+ 	if (cpus_have_final_cap(ARM64_SME)) {
+ 		if (has_hvhe())
+-			val &= ~(CPACR_EL1_SMEN_EL1EN | CPACR_EL1_SMEN_EL0EN);
++			val &= ~CPACR_ELx_SMEN;
+ 		else
+ 			val |= CPTR_EL2_TSM;
+ 	}
  
--void pkvm_host_fpsimd_state_init(void)
--{
--	unsigned long i;
--
--	for (i = 0; i < hyp_nr_cpus; i++) {
--		struct kvm_host_data *host_data = per_cpu_ptr(&kvm_host_data, i);
--
--		host_data->fpsimd_state = &host_data->host_ctxt.fp_regs;
--	}
--}
--
- /*
-  * Return the hyp vm structure corresponding to the handle.
-  */
-diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-index 3fae42479598..f4350ba07b0b 100644
---- a/arch/arm64/kvm/hyp/nvhe/setup.c
-+++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-@@ -324,7 +324,6 @@ void __noreturn __pkvm_init_finalise(void)
- 		goto out;
+ 	if (!guest_owns_fp_regs()) {
+ 		if (has_hvhe())
+-			val &= ~(CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN |
+-				 CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN);
++			val &= ~(CPACR_ELx_FPEN | CPACR_ELx_ZEN);
+ 		else
+ 			val |= CPTR_EL2_TFP | CPTR_EL2_TZ;
  
- 	pkvm_hyp_vm_table_init(vm_table_base);
--	pkvm_host_fpsimd_state_init();
- out:
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index 20073579e9f5..8fbb6a2e0559 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -93,8 +93,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+ 
+ 	val = read_sysreg(cpacr_el1);
+ 	val |= CPACR_ELx_TTA;
+-	val &= ~(CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN |
+-		 CPACR_EL1_SMEN_EL0EN | CPACR_EL1_SMEN_EL1EN);
++	val &= ~(CPACR_ELx_ZEN | CPACR_ELx_SMEN);
+ 
  	/*
- 	 * We tail-called to here from handle___pkvm_init() and will not return,
+ 	 * With VHE (HCR.E2H == 1), accesses to CPACR_EL1 are routed to
+@@ -109,9 +108,9 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+ 
+ 	if (guest_owns_fp_regs()) {
+ 		if (vcpu_has_sve(vcpu))
+-			val |= CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN;
++			val |= CPACR_ELx_ZEN;
+ 	} else {
+-		val &= ~(CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN);
++		val &= ~CPACR_ELx_FPEN;
+ 		__activate_traps_fpsimd32(vcpu);
+ 	}
+ 
 -- 
 2.45.1.288.g0e0cd299f1-goog
 
