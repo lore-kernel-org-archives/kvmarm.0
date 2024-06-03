@@ -1,55 +1,55 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F03D77118
-	for <kvmarm@lists.linux.dev>; Mon,  3 Jun 2024 12:28:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BAB312BF1C
+	for <kvmarm@lists.linux.dev>; Mon,  3 Jun 2024 12:29:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717417739; cv=none; b=XuBb96sCJWwK0E5L+QE3GA0bQEdNOfO03Ps+SWtYlAXcbsT7URRL4+dMxMOgkOAQdXIKXDFJYvYl+U1b0nzZsre18X7I9DgkG3jazpLnJSzsjRH3NIjlQnvbWcirNsxHGINUKjmj0TAcvv4yQsyzjOnJ3bc9BAEVN/jtCSotFK8=
+	t=1717417741; cv=none; b=cpcB9JeXApU1M//rE2X3ysCPnRyXHhQ1DuDS7xF/4AIJTbhTkVrgnwyqqJfap9R+Oc/ri5lsCDXtlDd1O2Ku/THCefH95gFLRHG6gWd3O40mxegLBHHk92YPb1VdHFmJrsqo6sZUdDZ6t7z7Q56gfrYYAc8aX94ugkJcxxXNh4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717417739; c=relaxed/simple;
-	bh=x84lbyLAdvxffUIQokclEzOAI8Pjk17cnvn6wlyv/R4=;
+	s=arc-20240116; t=1717417741; c=relaxed/simple;
+	bh=Zmd4z0euKCam2wVCcS076AoUEJGDxp9KtunqsVsxbT0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=nkSBYhdN8VHBX8DRSncbRZO3pdWOlk5JD/Tp1xaN9aLTNf8x0t0IvmWHXZXPBGptJYf3CpIATfE1gqgEXDdcWUNyLFtiUzn1TZLgxbG3RpEHWMeMLK+fPy7uz15hJn/PU3KrRLdwMck454X/j/TvGdsVny8+XGZ6iIQsoAdSCrw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yzFllasd; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=gJUne7sMRVijTlVwm4YoNMBbGWbYcwUdzZGS+hW2IkvoUNNtkEmlpjGTLqXvcEnxcnH9MLqTuG9JSR1i9mNrA9lrV1wiqjqTR9EQwuuOJvPBTUM+TFMfnQvbOt2rOVRqWNsfG6mwLQIUVYoydIX3Hp/fEOu7j//lZNIeKWK80tQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YiDe/FBs; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yzFllasd"
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-62a2aec8521so67568407b3.0
-        for <kvmarm@lists.linux.dev>; Mon, 03 Jun 2024 05:28:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YiDe/FBs"
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dfa8ab88a8cso2618838276.0
+        for <kvmarm@lists.linux.dev>; Mon, 03 Jun 2024 05:29:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717417737; x=1718022537; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1717417739; x=1718022539; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=iJElILGc/DFr0V7MwmCDmwJNbQ0Gt5gen+2yBiM6YFM=;
-        b=yzFllasdm8uRZ6TL0IIdIAQc5Kg2jQPkA0wQSb+ZBPmqCQCsdgBiHnpww3/fTF28t/
-         JWUCboF3NSBom87LnpS1plN1mS1brE9keuZCqmnUPVacpjCY1RYxmr2duSpEFXwYj+u9
-         v3nUzwKBgSsgt7Kbaf24yGgjJgpP3OqZTINTxa4GTMWlIPJ2yhRpXDbtmvotsjif0qSh
-         yx3YcHQEWGf32kfffuGzkiy8TDkfZf7IaE6pJWOfTdjrnngsHKvgef8IpZ2ZpqtEiDts
-         HWTCGBxTXSYZgQfnYlsEQJi1oAlNs2M4mcI9/kxa80US5TLf61YzCanYLpS4nqFZS/ui
-         zRLg==
+        bh=Busb8wZE35tqQHea1drQPQ7SwO3FvWCCFh2pATpAbXc=;
+        b=YiDe/FBs0IFQJTc3HW8Ea0Q8PQG+ixzum73k9gkEuZxapmTdWYxUJc19XnGT1+tJf0
+         Ahu825hjBhZMubCHgWkqjZckZ054z6vrmHIxnoQ8tzz4VnaBQVvfdKFWOtmSOj+F/8f+
+         8S3SwlQ5OVNYvQq1hxEyjbKlSYAmMhqZ+7HETOLcfa2UWZhQduYWOPWOAGeeor2rUF0S
+         jf6GAZ20RAM81+yXRT9i88vHQK3av4cvw2JUxKEliawZj1X1URCDPaXgeYxwsNQgGH7A
+         hgR2ljjqcYdCPwR7GmyRSzsAcv/nxBED1ZoN82kCnsNcgx96io0XUkn7kDlONiuEVEgl
+         c11Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717417737; x=1718022537;
+        d=1e100.net; s=20230601; t=1717417739; x=1718022539;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iJElILGc/DFr0V7MwmCDmwJNbQ0Gt5gen+2yBiM6YFM=;
-        b=F/aUjjGpeRyYCfQLv0g9/VGD3PbL/sQ64SOiOmCnqdRUUtagtpzq7s50fJZqtIOty/
-         VR1rpftReb/mv5BfEVKj0iV22po4kH3j9lti1Q5wpAF3CEq2Uv4gGfQ5Sc+9jHhGn7wb
-         W6b7n+OEtsNdepoekcTmig+kVugIy42YScaeia6E55rAN8E1GRlkD3T4VohXDPXsOmVF
-         1XjjLi0BKZ8qt2ypwd0aOboUiZ1nAaI4Zfq2KRvTcLWYcV4q7yUqtP4kxO+ox0WxZ7Di
-         tpmsKl6n6pzdQ39SGiK4wqblrnXbpjEWdewWgO2UUEzEP869A+pe9IgjqZJBGayqa0HA
-         kadA==
-X-Gm-Message-State: AOJu0YxGIGpG+zEPxJSvCU4TDH/4vjtwLzgvElbtFFrxzq9Da216ZufX
-	bqVqVXuHkFD8i4ozLtN5Wk2VHzAHKIUSDx/qssLYAGe35LLSXJcQU4suoVxMKGFAhXpjuvAa4zh
-	5b6LM/FtsAZaoJZ6+8ty1zOhllEHplJnGQzD7CTOR/+jyOexpHlI9SSEgtvVpzLL1dXSZTvoJhK
-	ewAzp0bSjJnu8hcmKbQyx4Y6oivFs=
-X-Google-Smtp-Source: AGHT+IH9EZr0+cP35eFhh0weNHHYeukIG+afizsQT2UWTA3EwT7k/xipG8LyTSJ/NWUCj+R123OVNcA/bQ==
+        bh=Busb8wZE35tqQHea1drQPQ7SwO3FvWCCFh2pATpAbXc=;
+        b=VVELedTlNhzkyUX8c3NMVlpLdUqRostI8M7e2DcgH4ixbBBTXrr9y2bkOHF7CH9y68
+         VgmB/f7x5CnWFrdyUK0QAUYRA8iwMZmD7vgYJVZFzh80VoLuRU8NVdzIPeGT/gzEtpBk
+         H0K5AIQKwmzD/REfcE+0H6zm5tmhPuYk5mcpdAJshDohCIYHyEEEpuQqIweMi3VqpGyk
+         KUjR/Y39Lncg07RNBOKFVjgVddI9YvMDVQN3N2FAR145+mIyltTAVUI+pxNyxUCkwDNY
+         XikRULa3Quv205Pe7CWhGJvP25WD91u1vV1aDMUqSMoy8fy/2bZ1KazahnII76pHwymg
+         ZlTA==
+X-Gm-Message-State: AOJu0Yyyslrpx+81mi1FGfGUukH4uMn0JiblMOlHvbpKxHp1PNwlb/tP
+	THQTFlOUdtF6OgfogaX/sE6oQD2Y57pppCnz7LaN6vcRbZKWd2xNH1eSKUXHFR9AIHBakPBD2b3
+	2C4GdRGxNfd33Uk+IXKl06SZ1pqUiwvbwXdkJqjKIlL9qVPH40QOXPSv2kEj1QbN5jYE8+R1ivy
+	BgkeDp7d4pouOBlY6M1yf4hBXZ7VI=
+X-Google-Smtp-Source: AGHT+IFjNCBoVuMLP5rmp+nqXCTo9OEnaVWdBHoViIssIdEcBdNlZlICCOUEdrQeOt50djoQcToa5uIMxA==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:690c:39c:b0:627:96bd:b2b with SMTP id
- 00721157ae682-62c797ecc09mr30469737b3.6.1717417736650; Mon, 03 Jun 2024
- 05:28:56 -0700 (PDT)
-Date: Mon,  3 Jun 2024 13:28:43 +0100
+ (user=tabba job=sendgmr) by 2002:a05:6902:2d4a:b0:de5:9e4b:fbb with SMTP id
+ 3f1490d57ef6-dfa73c02d0dmr807955276.6.1717417738728; Mon, 03 Jun 2024
+ 05:28:58 -0700 (PDT)
+Date: Mon,  3 Jun 2024 13:28:44 +0100
 In-Reply-To: <20240603122852.3923848-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240603122852.3923848-1-tabba@google.com>
 X-Mailer: git-send-email 2.45.1.288.g0e0cd299f1-goog
-Message-ID: <20240603122852.3923848-2-tabba@google.com>
-Subject: [PATCH v4 1/9] KVM: arm64: Reintroduce __sve_save_state
+Message-ID: <20240603122852.3923848-3-tabba@google.com>
+Subject: [PATCH v4 2/9] KVM: arm64: Fix prototype for __sve_save_state/__sve_restore_state
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
 Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com, 
@@ -70,45 +70,49 @@ Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com,
 	joey.gouly@arm.com, rananta@google.com, yuzenghui@huawei.com
 Content-Type: text/plain; charset="UTF-8"
 
-Now that the hypervisor is handling the host sve state in
-protected mode, it needs to be able to save it.
+Since the prototypes for __sve_save_state/__sve_restore_state at
+hyp were added, the underlying macro has acquired a third
+parameter for saving/restoring ffr.
 
-This reverts commit e66425fc9ba3 ("KVM: arm64: Remove unused
-__sve_save_state").
+Fix the prototypes to account for the third parameter, and
+restore the ffr for the guest since it is saved.
 
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+Suggested-by: Mark Brown <broonie@kernel.org>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/include/asm/kvm_hyp.h | 1 +
- arch/arm64/kvm/hyp/fpsimd.S      | 6 ++++++
- 2 files changed, 7 insertions(+)
+ arch/arm64/include/asm/kvm_hyp.h        | 4 ++--
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 3 ++-
+ 2 files changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index 3e80464f8953..2ab23589339a 100644
+index 2ab23589339a..686cce7e4e96 100644
 --- a/arch/arm64/include/asm/kvm_hyp.h
 +++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -111,6 +111,7 @@ void __debug_restore_host_buffers_nvhe(struct kvm_vcpu *vcpu);
+@@ -111,8 +111,8 @@ void __debug_restore_host_buffers_nvhe(struct kvm_vcpu *vcpu);
  
  void __fpsimd_save_state(struct user_fpsimd_state *fp_regs);
  void __fpsimd_restore_state(struct user_fpsimd_state *fp_regs);
-+void __sve_save_state(void *sve_pffr, u32 *fpsr);
- void __sve_restore_state(void *sve_pffr, u32 *fpsr);
+-void __sve_save_state(void *sve_pffr, u32 *fpsr);
+-void __sve_restore_state(void *sve_pffr, u32 *fpsr);
++void __sve_save_state(void *sve_pffr, u32 *fpsr, int save_ffr);
++void __sve_restore_state(void *sve_pffr, u32 *fpsr, int restore_ffr);
  
  u64 __guest_enter(struct kvm_vcpu *vcpu);
-diff --git a/arch/arm64/kvm/hyp/fpsimd.S b/arch/arm64/kvm/hyp/fpsimd.S
-index 61e6f3ba7b7d..e950875e31ce 100644
---- a/arch/arm64/kvm/hyp/fpsimd.S
-+++ b/arch/arm64/kvm/hyp/fpsimd.S
-@@ -25,3 +25,9 @@ SYM_FUNC_START(__sve_restore_state)
- 	sve_load 0, x1, x2, 3
- 	ret
- SYM_FUNC_END(__sve_restore_state)
-+
-+SYM_FUNC_START(__sve_save_state)
-+	mov	x2, #1
-+	sve_save 0, x1, x2, 3
-+	ret
-+SYM_FUNC_END(__sve_save_state)
+ 
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index a92566f36022..d58933ae8fd5 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -316,7 +316,8 @@ static inline void __hyp_sve_restore_guest(struct kvm_vcpu *vcpu)
+ {
+ 	sve_cond_update_zcr_vq(vcpu_sve_max_vq(vcpu) - 1, SYS_ZCR_EL2);
+ 	__sve_restore_state(vcpu_sve_pffr(vcpu),
+-			    &vcpu->arch.ctxt.fp_regs.fpsr);
++			    &vcpu->arch.ctxt.fp_regs.fpsr,
++			    true);
+ 	write_sysreg_el1(__vcpu_sys_reg(vcpu, ZCR_EL1), SYS_ZCR);
+ }
+ 
 -- 
 2.45.1.288.g0e0cd299f1-goog
 
