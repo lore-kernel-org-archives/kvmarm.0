@@ -1,49 +1,58 @@
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D0EF137914
-	for <kvmarm@lists.linux.dev>; Mon,  3 Jun 2024 17:29:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05553136E39
+	for <kvmarm@lists.linux.dev>; Mon,  3 Jun 2024 18:05:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717435749; cv=none; b=itIfAgsHBR5tlodxb/ZfOA+fEeZH89n+QqCNv6E2ZFxXwdPcD4bEe6XiPGkADYx3V+Gwy7qB7ShAZfJ3PdpSsR8vNg/xgY7fcAPtOamc/+sBHFXsmmLFjJ+6wWC7xsNbAg9md9EdGteCZWK5S8DcmQN9p1IdRNFivi+1pGerdQw=
+	t=1717437934; cv=none; b=OrOy35uKxGDZhaXnZ+LUIdRtlTvy1HZLdZCCOpH9C0TZmsVzanKxOH1lDIwqH556gyiwl3uSx48iw9RDvmd+qWiT5dL/SnF192mrSHNjNiAXpnTF4fvpR5UDfCOUMPOCWWc9m6EqlI9ylBnESTnmb8XNITB9uirC+353dPEg/oU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717435749; c=relaxed/simple;
-	bh=/xApLLOMk0AoZv2ZOIS0JcBigZIfybAUWCc5Uew4Les=;
+	s=arc-20240116; t=1717437934; c=relaxed/simple;
+	bh=/u6hRm0ypqgZNP68qXtp0fFN8RaXuFVZaRFEGPbF9y4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tRrB6BDfo2dCjlh59Lk/TXj5E9Oxh5q5RiJM7KLYb1sg0fuMDUcb6/APxa7Jn/MOUOQFIn3UIpGfncuJjaL0N4m66c5i54Cjh2Ijb9yPvNzPNExi7FSZOYliJaKGlxOxwzHrdvVwj2UgfrsTEonZzGJ/uZ+ZlnqdtU4RMIQvQ4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=i0OTsqaz; arc=none smtp.client-ip=91.218.175.178
+	 Content-Type:Content-Disposition:In-Reply-To; b=bqICM7ig/2ioUeSxWJktyDrX4495YjX3Eefbu2Ip1Jy4brXLLcqi027EJgqUe7PaVIJAdIiwIhHh7q2au9IFnfXoalS1TEFJGxsWS316DgmsqEDgCMw5BFDO9T2Se/bUD44nonrYSU5Aq0hAs1d8u1MoAWbzc9fQ+vgbAkebjrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OuMZ2KIM; arc=none smtp.client-ip=95.215.58.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="i0OTsqaz"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OuMZ2KIM"
 X-Envelope-To: maz@kernel.org
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1717435743;
+	t=1717437930;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=KXwbtmmqy279NKKcMMAiteNjQJFYfQJ3wusGDC1I9E4=;
-	b=i0OTsqazQTpljpFm/MpIobNd0DIGB0VBtmh82ycc3pfqV1Pgse805NP43id26Nox+ynNJ1
-	8+0hLt9Zi+/t9ymx+X+3fvFITz7luO4MqSzALn9tkQmHvwmxGpXJrM78tSgCeN0eQCJK1h
-	IhG2SoZi5oE7FQr3a7YWFbk9cmItdfw=
+	bh=v8c1jmco2IK+JdoaMwMA27Do8TVfUJeGMj6T9ZSs0To=;
+	b=OuMZ2KIMa3bNCwB6yjNMGJ8lhcLV4DZDNpss0MFB5B2M1SLFglh0cBqtBFgAP9R5OEFGG+
+	rkbNpuKMRWR2k5w2b268ZdlpBYesyvY30/Gf8dmfxmHb+GVi+T32KrlqXFzyLkg3Tb5heB
+	lpumwqe0k1+tlfxHHrf7hI/+JxFZ8u0=
 X-Envelope-To: kvmarm@lists.linux.dev
+X-Envelope-To: kvm@vger.kernel.org
+X-Envelope-To: linux-arm-kernel@lists.infradead.org
 X-Envelope-To: james.morse@arm.com
 X-Envelope-To: suzuki.poulose@arm.com
 X-Envelope-To: yuzenghui@huawei.com
-X-Envelope-To: kvm@vger.kernel.org
-Date: Mon, 3 Jun 2024 17:28:56 +0000
+X-Envelope-To: joey.gouly@arm.com
+X-Envelope-To: alexandru.elisei@arm.com
+X-Envelope-To: christoffer.dall@arm.com
+X-Envelope-To: gankulkarni@os.amperecomputing.com
+Date: Mon, 3 Jun 2024 18:05:23 +0000
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, James Morse <james.morse@arm.com>,
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH 10/11] KVM: arm64: nv: Honor guest hypervisor's FP/SVE
- traps in CPTR_EL2
-Message-ID: <Zl39WCKpyaDmccgY@linux.dev>
-References: <20240531231358.1000039-1-oliver.upton@linux.dev>
- <20240531231358.1000039-11-oliver.upton@linux.dev>
- <86le3mkxsp.wl-maz@kernel.org>
+	Zenghui Yu <yuzenghui@huawei.com>, Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: Re: [PATCH v2 12/16] KVM: arm64: nv: Tag shadow S2 entries with
+ guest's leaf S2 level
+Message-ID: <Zl4F45W_FoVr89zl@linux.dev>
+References: <20240529145628.3272630-1-maz@kernel.org>
+ <20240529145628.3272630-13-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -52,58 +61,75 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <86le3mkxsp.wl-maz@kernel.org>
+In-Reply-To: <20240529145628.3272630-13-maz@kernel.org>
 X-Migadu-Flow: FLOW_OUT
 
-Hey,
-
-On Mon, Jun 03, 2024 at 01:36:54PM +0100, Marc Zyngier wrote:
-
-[...]
-
-> > +	/*
-> > +	 * Layer the guest hypervisor's trap configuration on top of our own if
-> > +	 * we're in a nested context.
-> > +	 */
-> > +	if (!vcpu_has_nv(vcpu) || is_hyp_ctxt(vcpu))
-> > +		goto write;
-> > +
-> > +	if (guest_hyp_fpsimd_traps_enabled(vcpu))
-> > +		val &= ~CPACR_ELx_FPEN;
-> > +	if (guest_hyp_sve_traps_enabled(vcpu))
-> > +		val &= ~CPACR_ELx_ZEN;
+On Wed, May 29, 2024 at 03:56:24PM +0100, Marc Zyngier wrote:
+> Populate bits [56:55] of the leaf entry with the level provided
+> by the guest's S2 translation. This will allow us to better scope
+> the invalidation by remembering the mapping size.
 > 
-> I'm afraid this isn't quite right. You are clearing both FPEN (resp
-> ZEN) bits based on any of the two bits being clear, while what we want
-> is to actually propagate the 0 bits (and only those).
-
-An earlier version of the series I had was effectively doing this,
-applying the L0 trap configuration on top of L1's CPTR_EL2. Unless I'm
-missing something terribly obvious, I think this is still correct, as:
-
- - If we're in a hyp context, vEL2's CPTR_EL2 is loaded into CPACR_EL1.
-   The independent EL0/EL1 enable bits are handled by hardware. All this
-   junk gets skipped and we go directly to writing CPTR_EL2.
-
- - If we are not in a hyp context, vEL2's CPTR_EL2 gets folded into the
-   hardware value for CPTR_EL2. TGE must be 0 in this case, so there is
-   no conditional trap based on what EL the vCPU is in. There's only two
-   functional trap states at this point, hence the all-or-nothing
-   approach.
-
-> What I have in my tree is something along the lines of:
+> Of course, this assume that the guest will issue an invalidation
+> with an address that falls into the same leaf. If the guest doesn't,
+> we'll over-invalidate.
 > 
-> 	cptr = vcpu_sanitised_cptr_el2(vcpu);
-> 	tmp = cptr & (CPACR_ELx_ZEN_MASK | CPACR_ELx_FPEN_MASK);
-> 	val &= ~(tmp ^ (CPACR_ELx_ZEN_MASK | CPACR_ELx_FPEN_MASK));
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_nested.h |  8 ++++++++
+>  arch/arm64/kvm/mmu.c                | 17 +++++++++++++++--
+>  2 files changed, 23 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> index fcb0de3a93fe..971dbe533730 100644
+> --- a/arch/arm64/include/asm/kvm_nested.h
+> +++ b/arch/arm64/include/asm/kvm_nested.h
+> @@ -5,6 +5,7 @@
+>  #include <linux/bitfield.h>
+>  #include <linux/kvm_host.h>
+>  #include <asm/kvm_emulate.h>
+> +#include <asm/kvm_pgtable.h>
+>  
+>  static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
+>  {
+> @@ -195,4 +196,11 @@ static inline bool kvm_auth_eretax(struct kvm_vcpu *vcpu, u64 *elr)
+>  }
+>  #endif
+>  
+> +#define KVM_NV_GUEST_MAP_SZ	(KVM_PGTABLE_PROT_SW1 | KVM_PGTABLE_PROT_SW0)
+> +
+> +static inline u64 kvm_encode_nested_level(struct kvm_s2_trans *trans)
+> +{
+> +	return FIELD_PREP(KVM_NV_GUEST_MAP_SZ, trans->level);
+> +}
+> +
 
-My hesitation with this is it gives the impression that both trap bits
-are significant, but in reality only the LSB is useful. Unless my
-understanding is disastrously wrong, of course :)
+It might be nice to keep all of the software fields for (in)valid in
+a central place so we can add some documentation. I fear this is going
+to get rather complicated as more pieces of pKVM land upstream and we
+find new and fun ways to cram data into stage-2.
 
-Anyway, my _slight_ preference is towards keeping what I have if
-possible, with a giant comment explaining the reasoning behind it. But I
-can take your approach instead too.
+>  #endif /* __ARM64_KVM_NESTED_H */
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 4ed93a384255..f3a8ec70bd29 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1598,11 +1598,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	 * Potentially reduce shadow S2 permissions to match the guest's own
+>  	 * S2. For exec faults, we'd only reach this point if the guest
+>  	 * actually allowed it (see kvm_s2_handle_perm_fault).
+> +	 *
+> +	 * Also encode the level of the nested translation in the SW bits of
+> +	 * the PTE/PMD/PUD. This will be retrived on TLB invalidation from
+> +	 * the guest.
+
+typo: retrieved
+
+Also, it might be helpful to add some color here to indicate the encoded
+TTL is used to represent the span of a single virtual TLB entry,
+providing scope to the TLBI by address.
+
+Before I actually read what was going on, I thought the TTL in the PTE
+was used for matching invalidation scopes that have a valid TTL.
 
 -- 
 Thanks,
