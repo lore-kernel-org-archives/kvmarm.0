@@ -1,55 +1,55 @@
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 689B112BEBE
-	for <kvmarm@lists.linux.dev>; Mon,  3 Jun 2024 12:29:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5920212BEBE
+	for <kvmarm@lists.linux.dev>; Mon,  3 Jun 2024 12:29:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717417745; cv=none; b=pDbtmiguNmFCZnfHgTpmafz0bT7PNMg3Na/tWqZHUSGBxppb6EVW5dgVJ4+JNyeoeQbKH1ASN1z9M2zMTzn8KB3emJqtrRr30tUvu9Nr41E7Qr3QvkmIAUSS7NCUldCo9cE/uRK/f9ceBTne0Sqg42xuVQ6zOJuUCUybRixcVec=
+	t=1717417746; cv=none; b=VWT/0FQIRohf4KAwbfW8Ev1dRD61RALzK9SOHspOIOxOXmCZHZEqg73AG5DnYLzMGdI4W0NXtYkCkgFzfMyUaaLRzWe//qVtA87dUYmFQu9AYExFtTFvyDw3/30erx5PJrzszuDcsVGsbaeBPvK+Wzu1xbATc6bNTQhHTkzbRZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717417745; c=relaxed/simple;
-	bh=jOgggU0psL0RxWwbfhgL9muO3jiSPSY+/2AdeeoxxIA=;
+	s=arc-20240116; t=1717417746; c=relaxed/simple;
+	bh=l8UsS8GCm8foYDVUOasrc4eFIT3M0YJyXdxJtNcxUv4=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=I8adrISRqAqbdTA6cGtggX8hs5XyW11WEwDFyu9MK6+Tv6NykOwPGBaLlxdI9Rhj09Tjp78P+zyiUREj7bdrm4yRnOk6AjkmBIy0KuCsw15blRlBiymNj9odG4haSMwKsnThhBSsKO39OEzfS5C+gHUXuWvbqkJdy2O8+K6IT8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CndXqA8Q; arc=none smtp.client-ip=209.85.221.74
+	 To:Cc:Content-Type; b=DxGskb131qdC4P5hVj0mjy0ecqBxRGBN7V1TR+WYx8mfKKujFj/XvTWBpftyf06BnNvdlRxzvigTmK69gVIIjqX6qw7QCZEvA7uCTgWA3IkLU8dDoMMCUUl3JkABdtYH1/o+NxFbFpcflUEMwBH6al+4Z5yxdYv+MlmVNrbM0XA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0K2EzsDG; arc=none smtp.client-ip=209.85.221.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CndXqA8Q"
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-35e0f8bcc3cso1571481f8f.2
-        for <kvmarm@lists.linux.dev>; Mon, 03 Jun 2024 05:29:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0K2EzsDG"
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-354fa62abd7so2063222f8f.3
+        for <kvmarm@lists.linux.dev>; Mon, 03 Jun 2024 05:29:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717417742; x=1718022542; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1717417744; x=1718022544; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Iic9SadJLy1VA1CEhDIRT1Y/PJahOm/1dLNWZNTFh7s=;
-        b=CndXqA8QvMFB6OsPAR7nFOGvYrR9mmV509HZ02xfOkOCJa1rpRMiJq4+BYyARJWUNE
-         J5qkoNg7LSZIdCGGn74Wv1xy7FH6FtBWFXGligWfwYkvqHSqrxs8739j471PObXAdWeh
-         hr2MLXxANjJbiTtJBDoZb2u5GapVlX4sJlfDhPsNosNT2u7/zQTZmDj5ClyS3/DiIyLr
-         Z+Ti/xzzc2CNN1nyQWRfW7XMNIync91puPqxe6K/mWEUjKJ9I1ib4cp0jJk+QMKrHnT3
-         7Tq8x/ekK63GsCWV11bchgSFXE6E0/K/BqANEkdQUoZ6TtT2ZgIdMlVshyM6M2mIMSER
-         gv/w==
+        bh=6Obs8wQb56SN3ytvB7eYGaaTtKy9MiA5Ct8Vd1I9X58=;
+        b=0K2EzsDGfssKMcv2cjnJKpNwiOb10COYtSFbyNan3NR8GYy+xfs+pQ8hLIgdgAjO4n
+         lSXusZzjkHzp5L5kY9l2fWwdEYLjZeNY8q3TodAd3vCSw7IsCfQUlmqPNIFGQcj+hyFh
+         dEpl3t/bcKI5MLKm9zTGonumNEETHEC0T9NOMfU/H1NQOiWp55U9MZqmp4z+1JzNcZpt
+         kRWz5gCUXhHE5PZCBVt2fFC41eCjDzkKvZ6FeqsEESrnpLB2ECE/5sEqMZOmuXqDywm5
+         FP1A5rt1VD4HnuQW7cAfDgvqGO6KlNF78Hn91gISPvoNpq8oE5mg4URohyQ1S1YXYZGC
+         zvtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717417742; x=1718022542;
+        d=1e100.net; s=20230601; t=1717417744; x=1718022544;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Iic9SadJLy1VA1CEhDIRT1Y/PJahOm/1dLNWZNTFh7s=;
-        b=uVd0SKnFYu04hQujGnb0RZh6SsohRhtXmtM9P+9Crj8tdT7pV0jIi2d+f7t4/2rXea
-         9Ihip/bnmflHr0hbvSGIWNpdJUG5lIZ6QTKwpivabHp1nNb/LYg+FhWXX8qkcBhezpwd
-         5BeLbnvC8ZAN5TqcsgLilO2T5Z1hW262iRlqO3GshrBRyzMEh0Bw+E6hqprC/8CbqbE1
-         Amsp0vRa35z+XCEwteawUVGNdWnc3QEItQw8GTXCoUgg2fnxpAeFlAPArLF0Ce0vDyiA
-         6a/qKar/osGZCbDeOWHTVq8w6L+gchd1SxXuCMPBIEcxogFWZSC5P2ynIY/JsAu/XmwF
-         Kdxg==
-X-Gm-Message-State: AOJu0YzOPYKQIjPYpuVsR45UcGcLtQXzrTsk9+DkgwDXWvCG90VGx2fA
-	Ghla3t1GU2fUx1INwbLgXWqOlo7dCLw3HFjwSFMO3K/RpRj1idnRQFNdhdNbkVnpnQbpIRGaYaR
-	LMjE2bEZdN8NVltW37fErZAKBPeHJM5oRL1d6+I0LxIYSGBdoRUzGx70BtuvDOTBVqCx1o8JZ28
-	cbsyIYqZxdicHHbSlli49jAbgyEPA=
-X-Google-Smtp-Source: AGHT+IFS3J57WBH+i+TvNBNocCH4IlXysxMIphQg3aN14u+C/JFnqvUTYAZ4F31DO8h7LepQHQcwi26Kyg==
+        bh=6Obs8wQb56SN3ytvB7eYGaaTtKy9MiA5Ct8Vd1I9X58=;
+        b=D5c1aFfiHPrHrZs0Q6E21L/BGQT7qy9/fa8kVgGu0iH73TC9ijSDniNIrUjOUlqkLu
+         CQ1QrrVH3LthfMp/rWPhMK09/9iQKI0MqaC5cbb9WO0BSI2iC+zFRS8s1F5EZUSpX9Ix
+         XTjS+Q0IAkKMNfoEB8kWFK9A7wzlqlA30CfBt1L27tFRYwRbBHilEaCXe7iQRKZfeu4v
+         PpB0+TXBU5A77DWAnfgiDPj53fZHg1MTo3GZ6IOi4vry1n0o14rVvkcnceuET3BxWaIP
+         OHM5eEXjVDIv/KYPZdWtVZEnFRT2KHOs9HnF8Wk0gNai3qn7CUExRLEmf31OkgPecuPK
+         /hnw==
+X-Gm-Message-State: AOJu0YyS1xgpt/R6++r+HnhZXxaEJU5s90ypsipw1rvLevD/CjxEhNRc
+	/N78dwegITWAU6bEm3NV+cucVP3NQ+zD2YGstDfFxE/tMDpvf5DjeVnEQIdPPNtmYtt+XuRFITs
+	khAHaYh6rus7qPf+7bxMdqYILhHZgdVl34kx5TrhgKfnDDoQfY1qBIHhG+kv7DTOcveLAs3Tcfh
+	H6YhDxRmbAAMdQzbB2rPEdJkTL0kg=
+X-Google-Smtp-Source: AGHT+IFurd6haRy4TrY/aOhmQai6XtU0ooXEHS9lpiY6OLHdBLWtxLD+Ga6VPY3uWeNVmCdauneRn5NOOw==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:6000:4011:b0:34d:9055:c5de with SMTP id
- ffacd0b85a97d-35e0f258a07mr21482f8f.1.1717417741135; Mon, 03 Jun 2024
- 05:29:01 -0700 (PDT)
-Date: Mon,  3 Jun 2024 13:28:45 +0100
+ (user=tabba job=sendgmr) by 2002:a5d:4941:0:b0:34f:b5b2:2154 with SMTP id
+ ffacd0b85a97d-35e0f26d9e5mr17562f8f.6.1717417743332; Mon, 03 Jun 2024
+ 05:29:03 -0700 (PDT)
+Date: Mon,  3 Jun 2024 13:28:46 +0100
 In-Reply-To: <20240603122852.3923848-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240603122852.3923848-1-tabba@google.com>
 X-Mailer: git-send-email 2.45.1.288.g0e0cd299f1-goog
-Message-ID: <20240603122852.3923848-4-tabba@google.com>
-Subject: [PATCH v4 3/9] KVM: arm64: Abstract set/clear of CPTR_EL2 bits behind helper
+Message-ID: <20240603122852.3923848-5-tabba@google.com>
+Subject: [PATCH v4 4/9] KVM: arm64: Specialize handling of host fpsimd state
+ on trap
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
 Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com, 
@@ -70,173 +71,75 @@ Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com,
 	joey.gouly@arm.com, rananta@google.com, yuzenghui@huawei.com
 Content-Type: text/plain; charset="UTF-8"
 
-The same traps controlled by CPTR_EL2 or CPACR_EL1 need to be
-toggled in different parts of the code, but the exact bits and
-their polarity differ between these two formats and the mode
-(vhe/nvhe/hvhe).
-
-To reduce the amount of duplicated code and the chance of getting
-the wrong bit/polarity or missing a field, abstract the set/clear
-of CPTR_EL2 bits behind a helper.
-
-Since (h)VHE is the way of the future, use the CPACR_EL1 format,
-which is a subset of the VHE CPTR_EL2, as a reference.
+In subsequent patches, n/vhe will diverge on saving the host
+fpsimd/sve state when taking a guest fpsimd/sve trap. Add a
+specialized helper to handle it.
 
 No functional change intended.
 
-Suggested-by: Oliver Upton <oliver.upton@linux.dev>
+Reviewed-by: Mark Brown <broonie@kernel.org>
 Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/include/asm/kvm_arm.h        |  6 +++
- arch/arm64/include/asm/kvm_emulate.h    | 62 +++++++++++++++++++++++++
- arch/arm64/kvm/hyp/include/hyp/switch.h | 18 ++-----
- arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  6 +--
- 4 files changed, 73 insertions(+), 19 deletions(-)
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 4 +++-
+ arch/arm64/kvm/hyp/nvhe/switch.c        | 5 +++++
+ arch/arm64/kvm/hyp/vhe/switch.c         | 5 +++++
+ 3 files changed, 13 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index e01bb5ca13b7..b2adc2c6c82a 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -305,6 +305,12 @@
- 				 GENMASK(19, 14) |	\
- 				 BIT(11))
- 
-+#define CPTR_VHE_EL2_RES0	(GENMASK(63, 32) |	\
-+				 GENMASK(27, 26) |	\
-+				 GENMASK(23, 22) |	\
-+				 GENMASK(19, 18) |	\
-+				 GENMASK(15, 0))
-+
- /* Hyp Debug Configuration Register bits */
- #define MDCR_EL2_E2TB_MASK	(UL(0x3))
- #define MDCR_EL2_E2TB_SHIFT	(UL(24))
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 501e3e019c93..2d7a0bdf9d03 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -557,6 +557,68 @@ static __always_inline void kvm_incr_pc(struct kvm_vcpu *vcpu)
- 		vcpu_set_flag((v), e);					\
- 	} while (0)
- 
-+#define __build_check_all_or_none(r, bits)				\
-+	BUILD_BUG_ON(((r) & (bits)) && ((r) & (bits)) != (bits))
-+
-+#define __cpacr_to_cptr_clr(clr, set)					\
-+	({								\
-+		u64 cptr = 0;						\
-+									\
-+		if ((set) & CPACR_ELx_FPEN)				\
-+			cptr |= CPTR_EL2_TFP;				\
-+		if ((set) & CPACR_ELx_ZEN)				\
-+			cptr |= CPTR_EL2_TZ;				\
-+		if ((set) & CPACR_ELx_SMEN)				\
-+			cptr |= CPTR_EL2_TSM;				\
-+		if ((clr) & CPACR_ELx_TTA)				\
-+			cptr |= CPTR_EL2_TTA;				\
-+		if ((clr) & CPTR_EL2_TAM)				\
-+			cptr |= CPTR_EL2_TAM;				\
-+		if ((clr) & CPTR_EL2_TCPAC)				\
-+			cptr |= CPTR_EL2_TCPAC;				\
-+									\
-+		cptr;							\
-+	})
-+
-+#define __cpacr_to_cptr_set(clr, set)					\
-+	({								\
-+		u64 cptr = 0;						\
-+									\
-+		if ((clr) & CPACR_ELx_FPEN)				\
-+			cptr |= CPTR_EL2_TFP;				\
-+		if ((clr) & CPACR_ELx_ZEN)				\
-+			cptr |= CPTR_EL2_TZ;				\
-+		if ((clr) & CPACR_ELx_SMEN)				\
-+			cptr |= CPTR_EL2_TSM;				\
-+		if ((set) & CPACR_ELx_TTA)				\
-+			cptr |= CPTR_EL2_TTA;				\
-+		if ((set) & CPTR_EL2_TAM)				\
-+			cptr |= CPTR_EL2_TAM;				\
-+		if ((set) & CPTR_EL2_TCPAC)				\
-+			cptr |= CPTR_EL2_TCPAC;				\
-+									\
-+		cptr;							\
-+	})
-+
-+#define cpacr_clear_set(clr, set)					\
-+	do {								\
-+		BUILD_BUG_ON((set) & CPTR_VHE_EL2_RES0);		\
-+		BUILD_BUG_ON((clr) & CPACR_ELx_E0POE);			\
-+		__build_check_all_or_none((clr), CPACR_ELx_FPEN);	\
-+		__build_check_all_or_none((set), CPACR_ELx_FPEN);	\
-+		__build_check_all_or_none((clr), CPACR_ELx_ZEN);	\
-+		__build_check_all_or_none((set), CPACR_ELx_ZEN);	\
-+		__build_check_all_or_none((clr), CPACR_ELx_SMEN);	\
-+		__build_check_all_or_none((set), CPACR_ELx_SMEN);	\
-+									\
-+		if (has_vhe() || has_hvhe())				\
-+			sysreg_clear_set(cpacr_el1, clr, set);		\
-+		else							\
-+			sysreg_clear_set(cptr_el2,			\
-+					 __cpacr_to_cptr_clr(clr, set),	\
-+					 __cpacr_to_cptr_set(clr, set));\
-+	} while (0)
-+
- static __always_inline void kvm_write_cptr_el2(u64 val)
- {
- 	if (has_vhe() || has_hvhe())
 diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index d58933ae8fd5..055d2ca7264e 100644
+index 055d2ca7264e..9b904c858df0 100644
 --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
 +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -331,7 +331,6 @@ static bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
- {
- 	bool sve_guest;
- 	u8 esr_ec;
--	u64 reg;
+@@ -321,6 +321,8 @@ static inline void __hyp_sve_restore_guest(struct kvm_vcpu *vcpu)
+ 	write_sysreg_el1(__vcpu_sys_reg(vcpu, ZCR_EL1), SYS_ZCR);
+ }
  
- 	if (!system_supports_fpsimd())
- 		return false;
-@@ -354,19 +353,10 @@ static bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
- 	/* Valid trap.  Switch the context: */
- 
- 	/* First disable enough traps to allow us to update the registers */
--	if (has_vhe() || has_hvhe()) {
--		reg = CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN;
--		if (sve_guest)
--			reg |= CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN;
--
--		sysreg_clear_set(cpacr_el1, 0, reg);
--	} else {
--		reg = CPTR_EL2_TFP;
--		if (sve_guest)
--			reg |= CPTR_EL2_TZ;
--
--		sysreg_clear_set(cptr_el2, reg, 0);
--	}
-+	if (sve_guest)
-+		cpacr_clear_set(0, CPACR_ELx_FPEN | CPACR_ELx_ZEN);
-+	else
-+		cpacr_clear_set(0, CPACR_ELx_FPEN);
- 	isb();
++static void kvm_hyp_save_fpsimd_host(struct kvm_vcpu *vcpu);
++
+ /*
+  * We trap the first access to the FP/SIMD to save the host context and
+  * restore the guest context lazily.
+@@ -361,7 +363,7 @@ static bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
  
  	/* Write out the host state if it's in the registers */
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index d5c48dc98f67..f71394d0e32a 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -405,11 +405,7 @@ void handle_trap(struct kvm_cpu_context *host_ctxt)
- 		handle_host_smc(host_ctxt);
- 		break;
- 	case ESR_ELx_EC_SVE:
--		if (has_hvhe())
--			sysreg_clear_set(cpacr_el1, 0, (CPACR_EL1_ZEN_EL1EN |
--							CPACR_EL1_ZEN_EL0EN));
--		else
--			sysreg_clear_set(cptr_el2, CPTR_EL2_TZ, 0);
-+		cpacr_clear_set(0, CPACR_ELx_ZEN);
- 		isb();
- 		sve_cond_update_zcr_vq(ZCR_ELx_LEN_MASK, SYS_ZCR_EL2);
- 		break;
+ 	if (host_owns_fp_regs())
+-		__fpsimd_save_state(*host_data_ptr(fpsimd_state));
++		kvm_hyp_save_fpsimd_host(vcpu);
+ 
+ 	/* Restore the guest state */
+ 	if (sve_guest)
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index 6758cd905570..019f863922fa 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -182,6 +182,11 @@ static bool kvm_handle_pvm_sys64(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 		kvm_handle_pvm_sysreg(vcpu, exit_code));
+ }
+ 
++static void kvm_hyp_save_fpsimd_host(struct kvm_vcpu *vcpu)
++{
++	__fpsimd_save_state(*host_data_ptr(fpsimd_state));
++}
++
+ static const exit_handler_fn hyp_exit_handlers[] = {
+ 	[0 ... ESR_ELx_EC_MAX]		= NULL,
+ 	[ESR_ELx_EC_CP15_32]		= kvm_hyp_handle_cp15_32,
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index d7af5f46f22a..20073579e9f5 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -262,6 +262,11 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	return true;
+ }
+ 
++static void kvm_hyp_save_fpsimd_host(struct kvm_vcpu *vcpu)
++{
++	__fpsimd_save_state(*host_data_ptr(fpsimd_state));
++}
++
+ static const exit_handler_fn hyp_exit_handlers[] = {
+ 	[0 ... ESR_ELx_EC_MAX]		= NULL,
+ 	[ESR_ELx_EC_CP15_32]		= kvm_hyp_handle_cp15_32,
 -- 
 2.45.1.288.g0e0cd299f1-goog
 
