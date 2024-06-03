@@ -1,117 +1,324 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E18F964F;
-	Mon,  3 Jun 2024 12:36:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B666D839EA
+	for <kvmarm@lists.linux.dev>; Mon,  3 Jun 2024 12:50:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717418218; cv=none; b=p6F7IaH/G146Bv8ZoQIuHORQiFVHvtppb/jXyf6AotlEbuI+8/vGDiru7VBzKeSosd6dGDL0CrMsluj6OM2dNoLPmWR7EunAU77E0FI2rLoCd2lXHW1tVSTYuNN82GTHJxpsKwPoFytSj9VezfNRx2wXce+bj1vlgJSF4xXj8hE=
+	t=1717419015; cv=none; b=eKeOhYMK+HgWr+b95cPs1TuZmq8WwiZA/oMDM09NrRfUcDm/G6jza9p/VD1WsBvHYjwXjkmrepioy96+Y8p/SKj18mes6UZ/cFIsSWspet0UP8f9gvacawCaKqkfKsWFzy5v7CVNGlCQaUwhIGRjM7/BLOaD4im8mQgCq7PRBIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717418218; c=relaxed/simple;
-	bh=uegJVi7CtFWNzVgquJOmWjJflTc+4Gwyb5TTiqX2kPE=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Vo5HyKk+3Ac08HvnR/vdkRFCSfoozSHDUwJBDgfVAMlXxEHJDSr7Qm0JcKiq/q7HVrDaJ4IYElYaBiKUpaIGRwyoHnYbmMmpKZXFuOVWEypTcWj9p5Bbq1yZvg/5e9+A9YQzyZwXXjgSAN/WPf1zOkCX9iRKKZAw+wbeFYzstoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LGRN8NKl; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1717419015; c=relaxed/simple;
+	bh=VjNeEbnN0FVmtiaDzOSOBuYno++KB0/3wB4rghkte3I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 In-Reply-To:Content-Type:Content-Disposition; b=XJ2UVyk/5BANdYOKOcEb2D9JthN3aplct3jGPlMIZ5fQSZFcb03WpiBTEIvkN10JPHYHQmrahnaue67jX1p2Hlv3dEHG7ZIKX8E/miJ+ZV6fHkwiR2I4z28QmJQ2G/d1M291pgFRvFkQf/78scQo7p7+vo2vn/n6hNcbf3ng++o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DTy8bHql; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LGRN8NKl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7995BC32789;
-	Mon,  3 Jun 2024 12:36:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717418217;
-	bh=uegJVi7CtFWNzVgquJOmWjJflTc+4Gwyb5TTiqX2kPE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LGRN8NKlA61GOjliX/livySD+0dxoo2oZl9oUw4b4o6ZQ3NsWgBYqGl1wOhyPobGo
-	 orDrahhwHZo98aoTx1S49mse3tCjXIsCe7iSBKNnPSKV4Ahe3iBLhahHN5/cDeBeSk
-	 lU5Mrwd9wb5B1Ji37mGqPVtj19uIO6O4CL3sYg2dtnDBbYy8ldG9r1aAJHaQgoGp8M
-	 it6NtFX1pYxPhbKhK0cf2P7f/LTCkx7OET1q9X8KwdlF7ZNwnGwHNE/uAoHX+g5PaU
-	 aIEonceqe1tEA0OmeUCGl687Q48KUzr7XiZ8IEhpj+5xgFItPiArUmq0h4t7BJ5eqq
-	 9TS7klZoN8xiQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sE6vn-000DuZ-8V;
-	Mon, 03 Jun 2024 13:36:55 +0100
-Date: Mon, 03 Jun 2024 13:36:54 +0100
-Message-ID: <86le3mkxsp.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH 10/11] KVM: arm64: nv: Honor guest hypervisor's FP/SVE traps in CPTR_EL2
-In-Reply-To: <20240531231358.1000039-11-oliver.upton@linux.dev>
-References: <20240531231358.1000039-1-oliver.upton@linux.dev>
-	<20240531231358.1000039-11-oliver.upton@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DTy8bHql"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1717419012;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vvVHIigXFPVUayvTKyguWiQDKu5Se4crNY0w/f8to1o=;
+	b=DTy8bHqlHaXkd9zLH371dLSJgNa9XLH4JQvrZbX1lsG7DwaKHYMdhyfbI9xWqob8WaSK/2
+	+YF8Wwh0Y/kkrrGE5OHIpj2WYGy2spzg3VnyEuiyiZbfii4au2NkPPXFUbtY4CVWermeYd
+	yAcWbiAlkp3/4e2A1qq3Zb8z+iyBcz0=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-694-w12Xom5SMwCyaOoS25hrTg-1; Mon, 03 Jun 2024 08:50:11 -0400
+X-MC-Unique: w12Xom5SMwCyaOoS25hrTg-1
+Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2eaa7dfc983so12035501fa.3
+        for <kvmarm@lists.linux.dev>; Mon, 03 Jun 2024 05:50:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717419009; x=1718023809;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vvVHIigXFPVUayvTKyguWiQDKu5Se4crNY0w/f8to1o=;
+        b=u0wSEoEptGp6B6kHbKezVukAt/GZ56elBkTSXe+BkRVSThvn+SPlNy4soRZa8wv505
+         VMQXOnBQuelb+nz4ZwDMDxdYEPDQGaSg82DSoZ6wL3vKHY7ttqgT+aIheccFo9pMCsB7
+         CJTohJzzoTfU1kUoy45LlU2Afw0bkhLjTiizIuc2Hjn5tK+Lkq3xbrrXf6KkFzAzo9tI
+         WvS5unpq4Y2Dh2BWTF1d68fjCTe7BB0HsgdeWpniFw+KIIAKq/wHPC0z61pvxoKxVnbQ
+         v3E/GpFIOJIpCCN4AoHtNAgdzu22zY2O8qRxrPvmGz/ka/ZVfwEU+sI6ieK+fiuY3wM+
+         Ll3A==
+X-Gm-Message-State: AOJu0YydwHwINjlarsLGo7HlzWfl6ZqHOUDn9oBBdSI7b/F1WZnomP0t
+	IPSsN6RNIHhDh+mExhVaoA1KVtBcYfegVkFy9DZiPKUW+8ZiDKY41CBf/91XLeMFComqTU0Idi4
+	JmSzLfgD4gpOYgjXTLkkMAZQiMSl8FzP0ka0sMIPcyn/fGEmVGWeUaw==
+X-Received: by 2002:ac2:4e04:0:b0:52b:9e2b:9e1 with SMTP id 2adb3069b0e04-52b9e2b0a7fmr1162471e87.23.1717419009558;
+        Mon, 03 Jun 2024 05:50:09 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF/4loIAmGneGuSGjjPByhWJ3wNrwgncuMeG06rKtBOo1enZwiQTfx1ktZLyUSK/6jo9r1N4A==
+X-Received: by 2002:ac2:4e04:0:b0:52b:9e2b:9e1 with SMTP id 2adb3069b0e04-52b9e2b0a7fmr1162441e87.23.1717419009014;
+        Mon, 03 Jun 2024 05:50:09 -0700 (PDT)
+Received: from fedora (lmontsouris-659-1-55-176.w193-248.abo.wanadoo.fr. [193.248.58.176])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42134ab5ebasm87037245e9.42.2024.06.03.05.50.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Jun 2024 05:50:08 -0700 (PDT)
+Date: Mon, 3 Jun 2024 14:50:06 +0200
+From: Matias Ezequiel Vara Larsen <mvaralar@redhat.com>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, maz@kernel.org,
+	alexandru.elisei@arm.com, joey.gouly@arm.com, steven.price@arm.com,
+	james.morse@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com,
+	andrew.jones@linux.dev, eric.auger@redhat.com
+Subject: Re: [kvm-unit-tests PATCH 00/33] Support for Arm Confidential
+ Compute Architecture
+Message-ID: <Zl27/vDnqzXan+G1@fedora>
+References: <20240412103408.2706058-1-suzuki.poulose@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+In-Reply-To: <20240412103408.2706058-1-suzuki.poulose@arm.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On Sat, 01 Jun 2024 00:13:57 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+Hello,
+
+I tried this series by using kvmtool[1] and Linux/KVM with series "[v2]
+Support for Arm CCA VMs on Linux". To try it, I ran "run-realm-tests" in
+the FVP model. All tests seem to have passed successfully.
+
+Tested-by: Matias Ezequiel Vara Larsen <mvaralar@redhat.com>
+
+[1] https://gitlab.arm.com/linux-arm/kvmtool-cca cca/v2
+
+On Fri, Apr 12, 2024 at 11:33:35AM +0100, Suzuki K Poulose wrote:
+> This series adds support for running the kvm-unit-tests in the Arm CCA reference
+> software architecture.
 > 
-> Start folding the guest hypervisor's FP/SVE traps into the value
-> programmed in hardware. Note that as of writing this is dead code, since
-> KVM does a full put() / load() for every nested exception boundary which
-> saves + flushes the FP/SVE state.
 > 
-> However, this will become useful when we can keep the guest's FP/SVE
-> state alive across a nested exception boundary and the host no longer
-> needs to conservatively program traps.
+> The changes involve enlightening the boot/setup code with the Realm Service Interface
+> (RSI). The series also includes new test cases that exercise the RSI calls.
 > 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  arch/arm64/kvm/hyp/vhe/switch.c | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
+> Currently we only support "kvmtool" as the VMM for running Realms. There was
+> an attempt to add support for running the test scripts using with kvmtool here [1],
+> which hasn't progressed. It would be good to have that resolved, so that we can
+> run all the tests without manually specifying the commandlines for each run.
 > 
-> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-> index 697253673d7b..d07b4f4be5e5 100644
-> --- a/arch/arm64/kvm/hyp/vhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-> @@ -85,6 +85,19 @@ static void __activate_cptr_traps(struct kvm_vcpu *vcpu)
->  		__activate_traps_fpsimd32(vcpu);
->  	}
->  
-> +	/*
-> +	 * Layer the guest hypervisor's trap configuration on top of our own if
-> +	 * we're in a nested context.
-> +	 */
-> +	if (!vcpu_has_nv(vcpu) || is_hyp_ctxt(vcpu))
-> +		goto write;
-> +
-> +	if (guest_hyp_fpsimd_traps_enabled(vcpu))
-> +		val &= ~CPACR_ELx_FPEN;
-> +	if (guest_hyp_sve_traps_enabled(vcpu))
-> +		val &= ~CPACR_ELx_ZEN;
+> For the purposes of running the Realm specific tests, we have added a "temporary"
+> script "run-realm-tests" until the kvmtool support is added. We do not expect
+> this to be merged.
+> 
+> 
+> Base Realm Support
+> -------------------
+> 
+> Realm IPA Space
+> ---------------
+> When running on in Realm world, the (Guest) Physical Address - aka Intermediate
+> Physical Address (IPA) in Arm terminology - space of the VM is split into two halves,
+> protected (lower half) and un-protected (upper half). A protected IPA will
+> always map pages in the "realm world" and  the contents are not accessible to
+> the host. An unprotected IPA on the other hand can be mapped to page in the
+> "normal world" and thus shared with the host. All host emulated MMIO ranges must
+> be in unprotected IPA space.
+> 
+> Realm can query the Realm Management Monitor for the configuration via RSI call
+> (RSI_REALM_CONFIG) and identify the "boundary" of the "IPA" split.
+> 
+> As far as the hyp/VMM is concerned, there is only one "IPA space" (the lower
+> half) of memory map. The "upper half" is "unprotected alias" of the memory map.
+> 
+> In the guest, this is achieved by "treating the MSB (1 << (IPA_WIDTH - 1))" as
+> a protection attribute (we call it - PTE_NS_SHARED), where the Realm applies this
+> to any address, it thinks is acccessed/managed by host (e.g., MMIO, shared pages).
+> Given that this is runtime variable (but fixed for a given Realm), uses a
+> variable to track the value.
+> 
+> All I/O regions are marked as "shared". Care is taken to ensure I/O access (uart)
+> with MMU off uses the "Unprotected Physical address".
+> 
+> 
+> Realm IPA State
+> ---------------
+> Additionally, each page (4K) in the protected IPA space has a state associated
+> (Realm IPA State - RIPAS) with it. It is either of :
+>    RIPAS_EMPTY
+>    RIPAS_RAM
+> 
+> Any IPA backed by RAM, must be marked as RIPAS_RAM before an access is made to
+> it. The hypervisor/VMM does this for the initial image loaded into the Realm
+> memory before the Realm starts execution. Given the kvm-unit-test flat files do
+> not contain a metadata header (e.g., like the arm64 Linux kernel Image),
+> indicating the "actual image size in memory", the VMM cannot transition the
+> area towards the end of the image (e.g., bss, stack) which are accessed very
+> early during boot. Thus the early boot assembly code will mark the area upto
+> the stack as RAM.
+> 
+> Once we land in the C code, we mark target relocation area for FDT and
+> initrd as RIPAS_RAM. At this point, we can scan the FDT and mark all RAM memory
+> blocks as RIPAS_RAM.
+> 
+> TODO: It would be good to add an image header to the flat files indicating the
+> size, which can take the burden off doing the early assembly boot code RSI calls.
+> 
+> Shared Memory support
+> ---------------------
+> Given the "default" memory of a VM is not accessible to host, we add new page
+> alloc/free routines for "memory shared" with the host. e.g., GICv3-ITS must use
+> shared pages for ITS emulation.
+> 
+> RSI Test suites
+> --------------
+> There are new testcases added to exercise the RSI interfaces and the RMM flows.
+> 
+> Attestation and measurement services related RSI tests require parsing tokens
+> and claims returned by the RMM. This is achieved with the help of QCBOR library
+> [2], which is added as a submodule to the project. We have also added a wrapper
+> library - libtokenverifier - around the QCBOR to parse the tokens according to
+> the RMM specifications.
+> 
+> Running Arm CCA Stack
+> -------------------
+> 
+> See more details on Arm CCA and how to build/run the entire stack here[0]
+> The easiest way to run the Arm CCA stack is using shrinkwrap and the details
+> are available in [0].
+> 
+> 
+> The patches are also available here :
+> 
+>  https://gitlab.arm.com/linux-arm/kvm-unit-tests-cca cca/v1
+> 
+> 
+> Changes since rfc:
+>   [ https://lkml.kernel.org/r/20230127114108.10025-1-joey.gouly@arm.com ]
+>   - Add support for RMM-v1.0-EAC5, changes to RSI ABIs
+>   - Some hardening checks (FDT overlapping the BSS sections)
+>   - Selftest for memory stress
+>   - Enable PMU/SVE tests for Realms
+> 
+>  [0] https://lkml.kernel.org/r/20240412084056.1733704-1-steven.price@arm.com
+>  [1] https://lkml.kernel.org/r/20210702163122.96110-1-alexandru.elisei@arm.com
+>  [2] https://github.com/laurencelundblade/QCBOR
+> 
+> Alexandru Elisei (3):
+>   arm64: Expand SMCCC arguments and return values
+>   arm: selftest: realm: skip pabt test when running in a realm
+>   NOT-FOR-MERGING: add run-realm-tests
+> 
+> Djordje Kovacevic (1):
+>   arm: realm: Add tests for in realm SEA
+> 
+> Gareth Stockwell (1):
+>   arm: realm: add hvc and RSI_HOST_CALL tests
+> 
+> Jean-Philippe Brucker (1):
+>   arm: Move io_init after vm initialization
+> 
+> Joey Gouly (10):
+>   arm: Make physical address mask dynamic
+>   arm64: Introduce NS_SHARED PTE attribute
+>   arm: realm: Add RSI interface header
+>   arm: realm: Make uart available before MMU is enabled
+>   arm: realm: Add RSI version test
+>   arm64: add ESR_ELx EC.SVE
+>   arm64: enable SVE at startup
+>   arm64: selftest: add realm SVE VL test
+>   lib/alloc_page: Add shared page allocation support
+>   arm: Add memtest support
+> 
+> Mate Toth-Pal (2):
+>   arm: Add a library to verify tokens using the QCBOR library
+>   arm: realm: Add Realm attestation tests
+> 
+> Subhasish Ghosh (1):
+>   arm: realm: Add test for FPU/SIMD context save/restore
+> 
+> Suzuki K Poulose (14):
+>   arm: Add necessary header files in asm/pgtable.h
+>   arm: Detect FDT overlap with uninitialised data
+>   arm: realm: Realm initialisation
+>   arm: realm: Add support for changing the state of memory
+>   arm: realm: Set RIPAS state for RAM
+>   arm: realm: Early memory setup
+>   arm: gic-v3-its: Use shared pages wherever needed
+>   arm: realm: Enable memory encryption
+>   qcbor: Add QCBOR as a submodule
+>   arm: Add build steps for QCBOR library
+>   arm: realm: add RSI interface for attestation measurements
+>   arm: realm: Add helpers to decode RSI return codes
+>   arm: realm: Add Realm attestation tests
+>   arm: realm: Add a test for shared memory
+> 
+>  .gitmodules                         |    3 +
+>  arm/Makefile.arm64                  |   25 +-
+>  arm/cstart.S                        |   49 +-
+>  arm/cstart64.S                      |  154 +++-
+>  arm/fpu.c                           |  424 +++++++++
+>  arm/realm-attest.c                  | 1251 +++++++++++++++++++++++++++
+>  arm/realm-ns-memory.c               |   86 ++
+>  arm/realm-rsi.c                     |  159 ++++
+>  arm/realm-sea.c                     |  143 +++
+>  arm/run-realm-tests                 |  112 +++
+>  arm/selftest.c                      |  138 ++-
+>  arm/unittests.cfg                   |   96 +-
+>  lib/alloc_page.c                    |   20 +-
+>  lib/alloc_page.h                    |   24 +
+>  lib/arm/asm/arm-smccc.h             |   44 +
+>  lib/arm/asm/io.h                    |    6 +
+>  lib/arm/asm/pgtable.h               |    9 +
+>  lib/arm/asm/psci.h                  |   13 +-
+>  lib/arm/asm/rsi.h                   |   21 +
+>  lib/arm/asm/sve-vl-test.h           |    9 +
+>  lib/arm/gic-v3.c                    |    6 +-
+>  lib/arm/io.c                        |   24 +-
+>  lib/arm/mmu.c                       |   80 +-
+>  lib/arm/psci.c                      |   19 +-
+>  lib/arm/setup.c                     |   26 +-
+>  lib/arm64/asm/arm-smccc.h           |    6 +
+>  lib/arm64/asm/esr.h                 |    1 +
+>  lib/arm64/asm/io.h                  |    6 +
+>  lib/arm64/asm/pgtable-hwdef.h       |    6 -
+>  lib/arm64/asm/pgtable.h             |   20 +
+>  lib/arm64/asm/processor.h           |   34 +
+>  lib/arm64/asm/rsi.h                 |   89 ++
+>  lib/arm64/asm/smc-rsi.h             |  173 ++++
+>  lib/arm64/asm/sve-vl-test.h         |   28 +
+>  lib/arm64/asm/sysreg.h              |    7 +
+>  lib/arm64/gic-v3-its.c              |    6 +-
+>  lib/arm64/processor.c               |    1 +
+>  lib/arm64/rsi.c                     |  188 ++++
+>  lib/asm-generic/io.h                |   12 +
+>  lib/libcflat.h                      |    1 +
+>  lib/qcbor                           |    1 +
+>  lib/token_verifier/attest_defines.h |   50 ++
+>  lib/token_verifier/token_dumper.c   |  157 ++++
+>  lib/token_verifier/token_dumper.h   |   15 +
+>  lib/token_verifier/token_verifier.c |  591 +++++++++++++
+>  lib/token_verifier/token_verifier.h |   77 ++
+>  46 files changed, 4355 insertions(+), 55 deletions(-)
+>  create mode 100644 .gitmodules
+>  create mode 100644 arm/fpu.c
+>  create mode 100644 arm/realm-attest.c
+>  create mode 100644 arm/realm-ns-memory.c
+>  create mode 100644 arm/realm-rsi.c
+>  create mode 100644 arm/realm-sea.c
+>  create mode 100755 arm/run-realm-tests
+>  create mode 100644 lib/arm/asm/arm-smccc.h
+>  create mode 100644 lib/arm/asm/rsi.h
+>  create mode 100644 lib/arm/asm/sve-vl-test.h
+>  create mode 100644 lib/arm64/asm/arm-smccc.h
+>  create mode 100644 lib/arm64/asm/rsi.h
+>  create mode 100644 lib/arm64/asm/smc-rsi.h
+>  create mode 100644 lib/arm64/asm/sve-vl-test.h
+>  create mode 100644 lib/arm64/rsi.c
+>  create mode 160000 lib/qcbor
+>  create mode 100644 lib/token_verifier/attest_defines.h
+>  create mode 100644 lib/token_verifier/token_dumper.c
+>  create mode 100644 lib/token_verifier/token_dumper.h
+>  create mode 100644 lib/token_verifier/token_verifier.c
+>  create mode 100644 lib/token_verifier/token_verifier.h
+> 
+> -- 
+> 2.34.1
+> 
 
-I'm afraid this isn't quite right. You are clearing both FPEN (resp
-ZEN) bits based on any of the two bits being clear, while what we want
-is to actually propagate the 0 bits (and only those).
-
-What I have in my tree is something along the lines of:
-
-	cptr = vcpu_sanitised_cptr_el2(vcpu);
-	tmp = cptr & (CPACR_ELx_ZEN_MASK | CPACR_ELx_FPEN_MASK);
-	val &= ~(tmp ^ (CPACR_ELx_ZEN_MASK | CPACR_ELx_FPEN_MASK));
-
-which makes sure that we only clear the relevant bits.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
