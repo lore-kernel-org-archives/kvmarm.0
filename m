@@ -1,99 +1,110 @@
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89E041E504
-	for <kvmarm@lists.linux.dev>; Mon,  3 Jun 2024 14:12:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4EE2757E0
+	for <kvmarm@lists.linux.dev>; Mon,  3 Jun 2024 14:15:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717423941; cv=none; b=jjJhCajV3PfF33pLryBZfpr+hD8ipphZPgYKYInl49qAAYQbfzGbbxuHug+88JswEuRfB1k/NXBCeEuwlWKFxIn4DJdkBXg3I4IDNmwoQWTxHsvzU7MATU5eXiwLYFZj3CpIteeJ/JSWCJj1U80TIzU08vQyIoKia/Ek+xiuE1M=
+	t=1717424146; cv=none; b=PlLZC7tpP7qE8casQEybHkYq3YiH1taL5nTWiEiWh/d4Wc7sj6OhjsZ2jLofEQomZYQJpJSI3kLn6gDEmW41E9uF3ano/0qEREnO1Slebu9iNkYd7RgORd6adtO+D0F9pBXTnD0hEZ9xr2VA353Y9Xc1o0SizxvjNym9Zd/3wBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717423941; c=relaxed/simple;
-	bh=TCSdlWH+9BgBZ2YnNJYRxexfppVXXsoDFnpDSVNkxq4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZNrArhc50HGjr2iQpfkMafDpOWBW38vMawThQXYQXjcnxGUtuIuhPEMQ+IP11qL+GzB5MjcIRkASAlfoivcPu31CIT+FjB0DMGCGbgiAaxmgY2jjqPeh2dKjpkvwNHIGCOJztNNyzVivVCh/4+SQoLSDKgg3W7Mjn4k548UN01E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qooH66KP; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1717424146; c=relaxed/simple;
+	bh=Klu/mfViGUNYGuRmc7jcXWtSgDIE4VUDOInXF2ZRXhg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZBwh3h2gZDrY0Ohi8EzKgD64ar1Wg3iP79JXdcnzuma/EVaQVZDpVy6kPZYIlhiKxTT7K5CVvsE6KofpcAV4A7aL13PZXKEnfKvFS/yNBf1lV0pcColSc+l70u6wyYtkHa6wtc4OqC8LFu3MscAJCg6x7pZ7RQ90+RiHEEuhcFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DE392dNm; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qooH66KP"
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-3550134ef25so4126138f8f.1
-        for <kvmarm@lists.linux.dev>; Mon, 03 Jun 2024 07:12:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717423938; x=1718028738; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=259U+kMJsN8fz24hN16dijXIcjtP/ovOa+wMuCYB1KA=;
-        b=qooH66KPPh3Y6nPnskWsKUa+B/tEDAo4p+kOtk7Q/0XEzpJ/F4vyVew7/miD7T//bk
-         93chVvw2Sf4IC2U3LW/1YUvfJYtRLzJmTupS+bzBbWWB37pq6i4fHm+lEIrv3X3KZ8Vc
-         u9ny5Ry5nwUNvIDEYxZGMP+6JDkQMwERTPR4kwv0BPH6SDGjWBn2U9Fvgpyfzv82GebC
-         0UOK7WmSjHWLaFJH+rCi1eKpG3KtdRBh3ksIW5Uo//UiN4TMzt+Wslx+2ZbYWsejsHr1
-         QCszPTKBqBTbFK3bAyQvTrK2PZHEuV9sCLkA8KhEaRpdo0Kgv7UVEn5WT6i1AMf73IUz
-         7ffQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717423938; x=1718028738;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=259U+kMJsN8fz24hN16dijXIcjtP/ovOa+wMuCYB1KA=;
-        b=GeZEiANuS+bIH7j5rZmnM0S8e31d1BdxOvP/F3VhAwPxWZohv5rtO5aSDQoEZ/xM/u
-         T3RS8pdTQa1xh/pCWoWSTsQbyIvclBOqtxg9juf1hYyqejknWRIShZ+sKNbCS/QCC7Tw
-         MpAhD/z17t4t1O2bqo2flYId5IusjdKwK5JY2JX1CoRjPAkGMiwybCe5sVu4yr2ZrBbh
-         pmCQxrqXeUE+oVWWoS3P3pVLg2oZliYt0dcPMq4yxHZDwpC9ApwqMucdEdmpzrLBgayO
-         8a95gfHNfR3BBiOyqyMX5J57gPwwu20jtXPtniKza7yruBPDPUUVadmB005tSqJgW1U0
-         wCpw==
-X-Gm-Message-State: AOJu0YzBKw35KosZaCJEW6cCh5xXa2bauF4v1/dMqJvSOQM0l3thusuj
-	W8nuIWwMCZcu6xQ+c8XWLNIc9exGzzYhegs56oNM0JSqwYKMW9OoJI4JBgonwaR/e2fnd1H5Xh/
-	mnQsnHoTrSqBBeqc5+cnKXJcgytnJJFjC7fze
-X-Google-Smtp-Source: AGHT+IF5meOBHRbtue+7XxdpYDL+/KwZLIBA5VkyHsn/NyAJuOSwmgEqlMlhz6eFIR7/LMyN1KRiIYIE6+HmAQ3UOJM=
-X-Received: by 2002:a5d:4e88:0:b0:356:4cd8:850d with SMTP id
- ffacd0b85a97d-35e0f273f98mr6252849f8f.25.1717423937609; Mon, 03 Jun 2024
- 07:12:17 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DE392dNm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66762C2BD10;
+	Mon,  3 Jun 2024 14:15:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717424146;
+	bh=Klu/mfViGUNYGuRmc7jcXWtSgDIE4VUDOInXF2ZRXhg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DE392dNmGCtI+U9E8V1VnEs5AO+wAvxGSX8bNA3sJ9IjjQCdW0oq3UiYRr419mVOd
+	 Wk67ABd0jlwCosd1Ls8O72PsIJwHtf5y6xc9OWqEpinLh+rY85YZxnCUhZuvqhllL/
+	 LbF8Tuo9CoAXCGRBJmbW+0uyxSngZcm/u4Xu5iv1CM6nRikrNvKQMw0fJw5mtSdvlk
+	 HreSHCfYH9umLnasrqREjyM6Prq5MJrauGTvbJ+Pofap0sNP3ENzNd8SKlFt8IJ/OY
+	 eeEvjVD0BOGpZySqVArVSYVQL7SYzef8AfacgPLKrvmvyd6lzFCc6p7C8YNhxl1Con
+	 4AIVKMhp9oWsQ==
+Date: Mon, 3 Jun 2024 15:15:37 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Fuad Tabba <tabba@google.com>, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, will@kernel.org,
+	qperret@google.com, seanjc@google.com, alexandru.elisei@arm.com,
+	catalin.marinas@arm.com, philmd@linaro.org, james.morse@arm.com,
+	suzuki.poulose@arm.com, oliver.upton@linux.dev,
+	mark.rutland@arm.com, joey.gouly@arm.com, rananta@google.com,
+	yuzenghui@huawei.com
+Subject: Re: [PATCH v3 05/11] KVM: arm64: Eagerly restore host fpsimd/sve
+ state in pKVM
+Message-ID: <382e0746-84a4-4c59-9187-ca9b87f9d265@sirena.org.uk>
+References: <20240528125914.277057-1-tabba@google.com>
+ <20240528125914.277057-6-tabba@google.com>
+ <f205aea1-bc52-41ff-9545-704cda9e23ff@sirena.org.uk>
+ <CA+EHjTz_u2M-wsNnD_f=_R+dJoYwL9gUrBz=YwdqGZbtTT-aaA@mail.gmail.com>
+ <6e473418-dbce-4008-94fe-f60174d3f8fe@sirena.org.uk>
+ <86jzj6kuh4.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20240603122852.3923848-1-tabba@google.com> <20240603122852.3923848-2-tabba@google.com>
- <8d33e86e-893c-45b8-b16c-61a4fb91cc30@sirena.org.uk>
-In-Reply-To: <8d33e86e-893c-45b8-b16c-61a4fb91cc30@sirena.org.uk>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 3 Jun 2024 15:11:38 +0100
-Message-ID: <CA+EHjTytTLK=bzTPa71DL1SKejprYgCbacdu7Z==YNf2TJMijw@mail.gmail.com>
-Subject: Re: [PATCH v4 1/9] KVM: arm64: Reintroduce __sve_save_state
-To: Mark Brown <broonie@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, seanjc@google.com, 
-	alexandru.elisei@arm.com, catalin.marinas@arm.com, philmd@linaro.org, 
-	james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, 
-	mark.rutland@arm.com, joey.gouly@arm.com, rananta@google.com, 
-	yuzenghui@huawei.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="sAQ5DdecvoMn8b2d"
+Content-Disposition: inline
+In-Reply-To: <86jzj6kuh4.wl-maz@kernel.org>
+X-Cookie: Don't let your status become too quo!
 
-Hi Mark,
 
-On Mon, Jun 3, 2024 at 2:55=E2=80=AFPM Mark Brown <broonie@kernel.org> wrot=
-e:
->
-> On Mon, Jun 03, 2024 at 01:28:43PM +0100, Fuad Tabba wrote:
->
-> > +void __sve_save_state(void *sve_pffr, u32 *fpsr);
->
-> > +SYM_FUNC_START(__sve_save_state)
-> > +     mov     x2, #1
-> > +     sve_save 0, x1, x2, 3
-> > +     ret
-> > +SYM_FUNC_END(__sve_save_state)
->
-> This is still trying to use x2 as an argument here?
+--sAQ5DdecvoMn8b2d
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Since __sve_restore_state also has the same problem, I fixed both in
-the following patch:
+On Mon, Jun 03, 2024 at 02:48:39PM +0100, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
+> > On Mon, Jun 03, 2024 at 09:37:16AM +0100, Fuad Tabba wrote:
 
-KVM: arm64: Fix prototype for __sve_save_state/__sve_restore_state
-https://lore.kernel.org/all/20240603122852.3923848-3-tabba@google.com/
+> > > Also, one of the concerns in terms of performance is now with
+> > > nested-virt support being added, and the overhead of doing the
+> > > conditional update when we know that it's unlikely that anyone is
+> > > implementing vectors as big as the max.
 
-Cheers,
-/fuad
+> > I guess there's the option of doing a restore of a value fixed during
+> > initialisation instead?
+
+> And what do we gain from that?
+
+Reducing the number of places that need updating.
+
+> > programming what we think we're using to use to avoid surprises.  For
+> > example in this series we allocate the buffer used to store the host SVE
+> > state based on the probed maximum usable VL for the system but here we
+> > use whatever the PE has as the maximum VL.  This means that in the
+> > (hopefully unlikely) case where the probed value is lower than the PE
+> > value we'll overflow the buffer.
+
+> In that case, we need the *real* maximum across all CPUs, not the
+> maximum usable.
+
+If we stick with setting all the bits then yes, we'd need that.  It'd
+also be more robust than trusting that the host won't set a higher
+length.
+
+--sAQ5DdecvoMn8b2d
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmZd0AgACgkQJNaLcl1U
+h9D8twf+IiLSHg/Bh4jO7gRZoLdQVV/IQXACzvAF+uWdAW6W5biUeyApMExFE6p9
+nQB/Dg9dbushwIIRlwHF1wJm4dpUvjHKayuxmr4gzOA0LzB9xb5XKYDbEDUJxbZo
+x9k+58f+kui4h6LaUDu/qgYxEnvOuFm2ItjI9ONjizDgJpcTVGntNayDe6R/F3t6
+UasqkqDzW/uYoVwNNU/w7vUF7NYANFlyXUBL2YExyQ6oCn2wmb1okfeTdWg/mNGH
+waOJ/FQOwiPm/CjF2VN5vQBimTq0TfTr1dWkJAwHTY5d6chEPGisWIUepFkmWYMu
+DBtkBOiKuZk3LbLrxT5qg5s7r4GUFQ==
+=qgfT
+-----END PGP SIGNATURE-----
+
+--sAQ5DdecvoMn8b2d--
