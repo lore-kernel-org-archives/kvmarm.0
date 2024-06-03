@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 752F6130E40
-	for <kvmarm@lists.linux.dev>; Mon,  3 Jun 2024 15:43:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50BB76F2F2
+	for <kvmarm@lists.linux.dev>; Mon,  3 Jun 2024 15:52:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717429434; cv=none; b=Mk1Rb6ZOtiraVs7qiQtmUzSbwFaeQ+VoFnIXWVtQ4lOAlUjPJfT83IzRHIkk2/v9c4ZIYLzpIPQ/7mNmxYDj9gj6H514W6mfuk8C8lrqPE1D5jCkcL3B+u6UQ3/HSyOzNUUE2g+T2aoEjnPmHuSDCZgYPy6or4+fgG+3yU8pnsQ=
+	t=1717429954; cv=none; b=Q1Cbz2nUbCno95G37Pxfk9QvS+YBjqdoRq/pD9gxaIrnUXK9YTFdqhGqowIOavihmOdI6+nGP3caVv6wDL7AqJerTcOCFH0tRn29B0G7vWW6MTx1g8l2wTfS2XtkS9G1M0MggEiZkahWoKcpmXnKbeo14ifLIFS2f8mYZtxB09M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717429434; c=relaxed/simple;
-	bh=OXG0DxodrsVoUQ85hREj/cOzXgtz4NhwHjGKCSA1GqY=;
+	s=arc-20240116; t=1717429954; c=relaxed/simple;
+	bh=QqQTNj20ySOU2HIOFRbla2Zdycb8bxy0wo6B150r8+g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LTCIkXgrxEwUqh39BydyjGLu9mCI0wlZ52qTmVDnSQMxxIxBnbntvbPd6On7yM+Lyk2UKITZoABFNkgjkPe/EbZL+ZmgIaUM0iUXbgAN0e9OMEvwUekt1tSnsqjVxV8CTtOUPz/ZmwpNJNgRB+HMdp0fq9/BgLAv6CXQVlYzzdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dn7eIdLA; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=eggW5acCMd5YjVm7PGuD5gmrtVZ1dYEDNousJxkkn1+Q/2CKQIlSav5DmLKA5AZ7RBLx5cw+Q+K7x+m7zOeRgL41A2lJFSHL3tiAgBHzzAAVQvLr+VxRBCfxyu0F2z32Bp0Xr4vu+E2/GQEn/pwOsZiLhNGWyNk1FF9jCdKMao0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qINereOD; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dn7eIdLA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D9CEC2BD10;
-	Mon,  3 Jun 2024 15:43:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qINereOD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B639C2BD10;
+	Mon,  3 Jun 2024 15:52:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717429433;
-	bh=OXG0DxodrsVoUQ85hREj/cOzXgtz4NhwHjGKCSA1GqY=;
+	s=k20201202; t=1717429953;
+	bh=QqQTNj20ySOU2HIOFRbla2Zdycb8bxy0wo6B150r8+g=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dn7eIdLAGxBioez56/tyGUZL4zNQbi0QNbDYT/MGfLDeCd0eDwNx8TeZWZESPwme9
-	 0tfPtS4G9/FIarrh1+tkxFl1vucMrW52M32GWGQeDWNppaKJlwKbUAhFbbMJNDCFoE
-	 3MclKreoRyo9EpU81Ywhvw2VR/MvtF5jgapoCkvT0gT2Ce74c1qI+rwSGahA3Tcmaq
-	 yp46nFOmUNIhf7el/XAnZY1X3BA+seDCGNFhZgCulkoSPNb3CfOVZxPv6rH2bljLmT
-	 htQv7W5W2Ex1jYH8uNsZcmb6KcAnvRjS5jmiupLvUG2Z989OtaU1x1OEJqYEVmrtoA
-	 UEEMO7/a/jdwg==
-Date: Mon, 3 Jun 2024 16:43:47 +0100
+	b=qINereOD2P+S11msJum9WI6VYNZrq2303IruAkuDhYMKd3mwNEK3Kf0uGUzhWBVTW
+	 UkkAaSDYRr1cICm932bgGdbTrQyTm1d37dC3BUL+QxjJJ6N2yu3ZfRXOEp+1GqS3e1
+	 YOpzSlIezOUEBiM2h9thG2oRM/GUhhYzYb+9ahGTW3D/4LaQ+kKhiGeKXg89e1mkjF
+	 rdlJKnVNrTdd6Zy9klduRo+Vk+99okjfDAqBZuicsoZw8lUDBrGq2N1Dz7wJAi9/sL
+	 Wl6oJyIf9PU9mECtXHMi1RjDpt0X3uh+G4C4pURzHL75gOPEekWoliQ6kFq7oDH4PZ
+	 hF1hm1xcu/BsA==
+Date: Mon, 3 Jun 2024 16:52:27 +0100
 From: Mark Brown <broonie@kernel.org>
 To: Fuad Tabba <tabba@google.com>
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
@@ -36,11 +36,11 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	suzuki.poulose@arm.com, oliver.upton@linux.dev,
 	mark.rutland@arm.com, joey.gouly@arm.com, rananta@google.com,
 	yuzenghui@huawei.com
-Subject: Re: [PATCH v4 7/9] KVM: arm64: Consolidate initializing the host
- data's fpsimd_state/sve in pKVM
-Message-ID: <60a788a7-aad7-4541-a1af-f9c7461f1880@sirena.org.uk>
+Subject: Re: [PATCH v4 6/9] KVM: arm64: Eagerly restore host fpsimd/sve state
+ in pKVM
+Message-ID: <728c100c-ea38-4802-832d-04521821d169@sirena.org.uk>
 References: <20240603122852.3923848-1-tabba@google.com>
- <20240603122852.3923848-8-tabba@google.com>
+ <20240603122852.3923848-7-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,36 +48,38 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="nQUmR4ecQ1CswPA6"
+	protocol="application/pgp-signature"; boundary="gaoct9zOdsi0v7by"
 Content-Disposition: inline
-In-Reply-To: <20240603122852.3923848-8-tabba@google.com>
+In-Reply-To: <20240603122852.3923848-7-tabba@google.com>
 X-Cookie: Don't let your status become too quo!
 
 
---nQUmR4ecQ1CswPA6
+--gaoct9zOdsi0v7by
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-On Mon, Jun 03, 2024 at 01:28:49PM +0100, Fuad Tabba wrote:
-> Now that we have introduced finalize_init_hyp_mode(), lets
-> consolidate the initializing of the host_data fpsimd_state and
-> sve state.
+On Mon, Jun 03, 2024 at 01:28:48PM +0100, Fuad Tabba wrote:
 
-Reviewed-by: Mark Brown <broonie@kernel.org>
+> +static void fpsimd_sve_flush(void)
+> +{
+> +	*host_data_ptr(fp_owner) = FP_STATE_HOST_OWNED;
+> +}
 
---nQUmR4ecQ1CswPA6
+My previous comments about this being confusing still stand.
+
+--gaoct9zOdsi0v7by
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmZd5LIACgkQJNaLcl1U
-h9CwIgf/YlBUNNGvMuO0ZDJaUjKRsgtRCqFLNsuEXk36gblSH2VdIZHI+ME4tcbc
-nlAQ/hV6MJVUQvsAQVyS0oyLd84fG2dnx0+2tg0YC3qHjAegq3yZ2jxAVGItEdDi
-qzybEg8gInRz4NZ3BrhFfT8l7JMwd49fhMVdXH6aseMTOaFQkljnWxYHccyku8NI
-9TWlf1LYvO5NDyAvJjbjGGcy2WrN29yI2sHK6jBLyzi2AobCAksoZBSvrlpT4vUu
-jGgBi64Jsdgx/f50EZOlecKEiAqhBcORKZAMUr1rC5/azmDVEpJc5NEetpYvM80l
-tCBPrIwI8XJLhR27agCpevePXdq7Pg==
-=wCW1
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmZd5roACgkQJNaLcl1U
+h9CeKQf8CSjO/8LLzHvjMRPqsGUf66ditOlGpYvM3+qQZw5jG1m/Msf318W9Kg5q
+fN5gm3g3EfxdmbZENGGmbmIqXyyXrNRhFTLuJGTO/+yrwhji5mKgsmXxpQ7+swX7
+FJLFli6nex9+XdSvyxzUzv6+czhh0bH3FRN5+VfCLzSWhWugJOT9LrLB46vKdFg5
+cZZrJIhCyDSjbNIH3KMzwi2ctYt3FGYvwrKbGsbhwOHy3czMDuOKzP1evPt+AZ4p
+/yJODzQcMJj7iLfKzn//OqbLU71UkErUeXTcnkWf+I827zrOgc/JMi+j8bKma90m
+bcz4cbet+O8lApXUlNuN9s+Lqsuflg==
+=WsUd
 -----END PGP SIGNATURE-----
 
---nQUmR4ecQ1CswPA6--
+--gaoct9zOdsi0v7by--
