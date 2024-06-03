@@ -1,174 +1,96 @@
-Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com [209.85.221.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2597B74047
-	for <kvmarm@lists.linux.dev>; Mon,  3 Jun 2024 08:37:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.173
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59D696BFA7
+	for <kvmarm@lists.linux.dev>; Mon,  3 Jun 2024 09:21:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717403875; cv=none; b=qHe4QBNIyFp9HsNpVO8lw5YnMJDYrG5o1dH7DzZlqlG1BsVyDIwyGPrKQhQTV1AQf60jO3rHox7hH0oaSGzhiP3/11654+9omLSsaeSsRrsCzzoKeeYPmldSzmVt5rjrS1vRegi5ilObSESSOvuStpuEo3eGHenhrJdXxmWzRG4=
+	t=1717406519; cv=none; b=PjZyXPCKtvfPFLX4tD4fdNi7Hv1KTKqxU9QpXjigd8aXJVArsJlz0rfD7tZqQaOnWxob9bNmoM9e/E7HQzzGNM5QU5QHMoUpU6mhfiwOl8ynTbTiAKv7HxhVDGxQvB8ssgEWPXHvwFE9OZeiRyqFIenAQhmDF6P8aCO2LWdqqfU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717403875; c=relaxed/simple;
-	bh=jxx3pJC2B68XCNNzyBISZy6L7wzF6f+d4Oln3C9A0fU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=F3dTP0hWLBSV0piwgKFbkSo+wbtPRFzWSc1IHXPgj2/EV+tqxn6plZJ9k7M6nrhLohhA26/tZaSlgC/soG3SFW09WjAcfLjYrjg+T9k2P9ANoihN0xVYaDHRyFgw+lT9lQziSWmSTvIg0Y9VMXUfKMdg/utO3P1vJ/M3yDMRXKY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QLNY4Tyg; arc=none smtp.client-ip=209.85.221.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QLNY4Tyg"
-Received: by mail-vk1-f173.google.com with SMTP id 71dfb90a1353d-4e93a260becso1661422e0c.1
-        for <kvmarm@lists.linux.dev>; Mon, 03 Jun 2024 01:37:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717403873; x=1718008673; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XaK2kUFcS8r9yNYKSh8t4ewJQekHf/Vna+ddTszUSIw=;
-        b=QLNY4TygE8u+nGU7gi2xZl3Huvujf7BcSrGUDPcmZ6hqKRKD1dvMFZEFGtyAuuKRXS
-         SM5KWq2t1ATpRqZyNby80UNlMkc0d6oA1Izt0iYorp5B9YyogTXktQUE5em0QrTv7vOv
-         WXrqwtGrh0wTfPyzpUwyuNl8hb6ZznnO3S79TLNvihIvyvkrqyXVCuIdfxdZetKt03Iq
-         PQIYaPA2KeYCnbooE8rM2R4ktNPSNQod9igMZQKA3gv3lXu8I5rGl0CPUHho/VUZquTo
-         810SxT6CO2kYL0LxY3901SZtIp//aN6IvTTzZ/Q5GN1pCncS4L2BLPd5y+C4OmrEZ753
-         K+8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717403873; x=1718008673;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XaK2kUFcS8r9yNYKSh8t4ewJQekHf/Vna+ddTszUSIw=;
-        b=Mm3UKlWvs2w6dIj0vS1XztonX/6OSGrR7SKM6RICSRH40GqTfK7Qh5neXPrhOBSDQx
-         sGeGYANFdrY0SVBUnCRJS1WZDkVhHzjgZ56GxsUjhK5fm3/dmMlK9r1Ifp42EKT76+ex
-         UCo9Cj972uLJtoCn+dfTFoAEhxQj+posafDcuLtMJcUxopY+ewk/wZtX05bK6nNOOvUg
-         ay8qKpcyXK6LOTdIY/0RfBZ2hodYg20VKt7sstFxdzIxxrIhdHW5sv0XXjUqkKNH4DWe
-         RIGJ7ujQin2YNysUzubGe7i0jDBGuK92mThcdRbAty77pFPOEI+2o5uzX2cIUrpv/FgL
-         AtSw==
-X-Gm-Message-State: AOJu0YzvRGCTM56CwkksdGg+hCcgjdHykatplVMX0pL6Yvfeyr1AiV5e
-	VyH7TOHlxDM0zggzM6Ozzj9WSnTEV85IRDkOKus5IJKl3+AZKqAIFj9AwSf9CSFSxbmRMRP5EYi
-	G7tKKmkLUe8DupzwW52fqP6DjsZ2aOGTtwu+w
-X-Google-Smtp-Source: AGHT+IF0kg6GwemTBIcPJqIpW4u992+6OzsYND2OUzTQhWPf/+Zmux4WBskVmRCBmdq1ma/3m3rXngAzfxlWdri8G7k=
-X-Received: by 2002:a67:fdcb:0:b0:48a:325a:e284 with SMTP id
- ada2fe7eead31-48bc20cb26emr7627597137.6.1717403872724; Mon, 03 Jun 2024
- 01:37:52 -0700 (PDT)
+	s=arc-20240116; t=1717406519; c=relaxed/simple;
+	bh=qoK6Vr3POzDChICSFnKDCHg67IUVeSeJ5myh4uqVVis=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tp6hJTTl7McD0aoD12GKATGRm+mrrbY7wLh1K+Kir6BY8cONGQDqeajGSRHf+V3UBpZdgUmcy52cMyUNbpotw+iOs89yxHBg7+R7JByze0BzyRU8+HXScCLtPgHQJaKmrlLusy1M6XZayKU2XO/Xmg6TPO54jLuwGXviGi3cTEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 01C731042;
+	Mon,  3 Jun 2024 02:22:22 -0700 (PDT)
+Received: from [10.162.42.12] (a077841.arm.com [10.162.42.12])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 005CB3F762;
+	Mon,  3 Jun 2024 02:21:49 -0700 (PDT)
+Message-ID: <cf7de572-420a-4d59-a8dd-effaff002e12@arm.com>
+Date: Mon, 3 Jun 2024 14:51:46 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20240528125914.277057-1-tabba@google.com> <20240528125914.277057-6-tabba@google.com>
- <f205aea1-bc52-41ff-9545-704cda9e23ff@sirena.org.uk>
-In-Reply-To: <f205aea1-bc52-41ff-9545-704cda9e23ff@sirena.org.uk>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 3 Jun 2024 09:37:16 +0100
-Message-ID: <CA+EHjTz_u2M-wsNnD_f=_R+dJoYwL9gUrBz=YwdqGZbtTT-aaA@mail.gmail.com>
-Subject: Re: [PATCH v3 05/11] KVM: arm64: Eagerly restore host fpsimd/sve
- state in pKVM
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 18/29] arm64: add POE signal support
 To: Mark Brown <broonie@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, seanjc@google.com, 
-	alexandru.elisei@arm.com, catalin.marinas@arm.com, philmd@linaro.org, 
-	james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, 
-	mark.rutland@arm.com, joey.gouly@arm.com, rananta@google.com, 
-	yuzenghui@huawei.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Cc: Joey Gouly <joey.gouly@arm.com>, linux-arm-kernel@lists.infradead.org,
+ akpm@linux-foundation.org, aneesh.kumar@kernel.org,
+ aneesh.kumar@linux.ibm.com, bp@alien8.de, catalin.marinas@arm.com,
+ christophe.leroy@csgroup.eu, dave.hansen@linux.intel.com, hpa@zytor.com,
+ linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+ linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
+ mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
+ oliver.upton@linux.dev, shuah@kernel.org, szabolcs.nagy@arm.com,
+ tglx@linutronix.de, will@kernel.org, x86@kernel.org, kvmarm@lists.linux.dev
+References: <20240503130147.1154804-1-joey.gouly@arm.com>
+ <20240503130147.1154804-19-joey.gouly@arm.com>
+ <229bd367-466e-4bf9-9627-24d2d0821ff4@arm.com>
+ <7789da64-34e2-49db-b203-84b80e5831d5@sirena.org.uk>
+Content-Language: en-US
+From: Amit Daniel Kachhap <amitdaniel.kachhap@arm.com>
+In-Reply-To: <7789da64-34e2-49db-b203-84b80e5831d5@sirena.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Mark,
 
-On Fri, May 31, 2024 at 3:09=E2=80=AFPM Mark Brown <broonie@kernel.org> wro=
-te:
->
-> On Tue, May 28, 2024 at 01:59:08PM +0100, Fuad Tabba wrote:
->
-> > +static inline void __hyp_sve_save_host(void)
-> > +{
-> > +     struct cpu_sve_state *sve_state =3D *host_data_ptr(sve_state);
-> > +
-> > +     sve_state->zcr_el1 =3D read_sysreg_el1(SYS_ZCR);
-> > +     write_sysreg_s(ZCR_ELx_LEN_MASK, SYS_ZCR_EL2);
->
-> As well as the sync issue Oliver mentioned on the removal of
-> _cond_update() just doing these updates as a blind write creates a
-> surprise if we ever get more control bits in ZCR_EL2.
 
-I'm not sure it does. The other bits are RES0, and this is always
-setting the length. So even if new control bits are added, this
-shouldn't matter.
+On 5/31/24 22:09, Mark Brown wrote:
+> On Tue, May 28, 2024 at 12:26:54PM +0530, Amit Daniel Kachhap wrote:
+>> On 5/3/24 18:31, Joey Gouly wrote:
+> 
+>>> +#define POE_MAGIC	0x504f4530
+> 
+>>> +struct poe_context {
+>>> +	struct _aarch64_ctx head;
+>>> +	__u64 por_el0;
+>>> +};
+> 
+>> There is a comment section in the beginning which mentions the size
+>> of the context frame structure and subsequent reduction in the
+>> reserved range. So this new context description can be added there.
+>> Although looks like it is broken for za, zt and fpmr context.
+> 
+> Could you be more specific about how you think these existing contexts
+> are broken?  The above looks perfectly good and standard and the
+> existing contexts do a reasonable simulation of working.  Note that the
+> ZA and ZT contexts don't generate data payload unless userspace has set
+> PSTATE.ZA.
 
-Also, one of the concerns in terms of performance is now with
-nested-virt support being added, and the overhead of doing the
-conditional update when we know that it's unlikely that anyone is
-implementing vectors as big as the max.
+Sorry for not being clear on this as I was only referring to the
+comments in file arch/arm64/include/uapi/asm/sigcontext.h and no code
+as such is broken.
 
->
-> > +static void __hyp_sve_restore_host(void)
-> > +{
-> > +     struct cpu_sve_state *sve_state =3D *host_data_ptr(sve_state);
-> > +
-> > +     /*
-> > +      * On saving/restoring host sve state, always use the maximum VL =
-for
-> > +      * the host. The layout of the data when saving the sve state dep=
-ends
-> > +      * on the VL, so use a consistent (i.e., the maximum) host VL.
-> > +      *
-> > +      * Setting ZCR_EL2 to ZCR_ELx_LEN_MASK sets the effective length
-> > +      * supported by the system (or limited at EL3).
-> > +      */
-> > +     write_sysreg_s(ZCR_ELx_LEN_MASK, SYS_ZCR_EL2);
->
-> Setting ZCR_ELx_LEN_MASK sets the VL to the maximum supported/configured
-> for the current PE, not the system.  This will hopefully be the same
-> since we really hope implementors continue to build symmetric systems
-> but there is handling for that case in the kernel just in case.  Given
-> that we record the host's maximum VL should we use it?
+  * Allocation of __reserved[]:
+  * (Note: records do not necessarily occur in the order shown here.)
+  *
+  *      size            description
+  *
+  *      0x210           fpsimd_context
+  *       0x10           esr_context
+  *      0x8a0           sve_context (vl <= 64) (optional)
+  *       0x20           extra_context (optional)
+  *       0x10           terminator (null _aarch64_ctx)
+  *
+  *      0x510           (reserved for future allocation)
 
-You're right, but even if the current PE had a different vector
-length, ZCR_ELx_LEN_MASK is the default value for ZCR_EL2 when the
-host is running (this is the existing behavior before this patch
-series). It is also the value this patch series uses when saving the
-host SVE state. So since we are consistent I think this is correct.
+Here I think that optional context like za, zt, fpmr and poe should have
+size mentioned here to make the description consistent.As you said ZA
+and ZT context are enabled by userspace so some extra details can be
+added for them too.
 
-> > +static void fpsimd_sve_flush(void)
-> > +{
-> > +     *host_data_ptr(fp_owner) =3D FP_STATE_HOST_OWNED;
-> > +}
-> > +
->
-> That's not what I'd have expected something called fpsimd_sve_flush() to
-> do, I'd have expected it to save the current state to memory and then
-> mark it as free (that's what fpsimd_flush_cpu_state() does in the host
-> kernel).  Perhaps just inline this into the one user?
->
-> > +static void fpsimd_sve_sync(struct kvm_vcpu *vcpu)
-> > +{
-> > +     if (!guest_owns_fp_regs())
-> > +             return;
-> > +
-> > +     cpacr_clear_set(0, CPACR_ELx_FPEN|CPACR_ELx_ZEN);
-> > +     isb();
->
-> Spaces around |.
-
-Will do.
-
-> >  static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
-> >  {
-> >       struct kvm_vcpu *host_vcpu =3D hyp_vcpu->host_vcpu;
-> >
-> > +     fpsimd_sve_flush();
-> > +
-> >       hyp_vcpu->vcpu.arch.ctxt        =3D host_vcpu->arch.ctxt;
-> >
-> >       hyp_vcpu->vcpu.arch.sve_state   =3D kern_hyp_va(host_vcpu->arch.s=
-ve_state);
-> > -     hyp_vcpu->vcpu.arch.sve_max_vl  =3D host_vcpu->arch.sve_max_vl;
-> > +     hyp_vcpu->vcpu.arch.sve_max_vl  =3D min(host_vcpu->arch.sve_max_v=
-l, kvm_host_sve_max_vl);
->
-> This needs a comment I think.
-
-Will do.
-
-Thanks!
-/fuad
