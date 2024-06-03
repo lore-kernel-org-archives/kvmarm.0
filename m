@@ -1,109 +1,67 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DAB483CCF
-	for <kvmarm@lists.linux.dev>; Mon,  3 Jun 2024 14:31:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B58AF57C9A;
+	Mon,  3 Jun 2024 14:32:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717425097; cv=none; b=MFy7F0ZxhavzTrpx7Iuva719kUSyvJB2VYbkGN4C9q3JYhfCHUXhrsfwklLXd63wGQKBC9evDoBGLYpCBFSaN6E4gV5/lZhufip6o4FNH7PTEimpgC/GqKWX56dCXm+/Xe2UK/tvVCesMK/6BgwnZ9eHg2ZwzuNYwa9xUEvkscY=
+	t=1717425128; cv=none; b=AnU1+IAXuasVtMD+mXDB8EOQq/tFEjTdk00kSGFckmNiydMCyrSCY3QokG7UL0HQrjkDd0SRugYt1/mdUNGkc+AjCnSHs0bubOcncZKkqSLvFppvrh1hG+CKlanOhocYznb7FP3QQfdEdOyLe5E6vO4kKvR/ExLPXVC9ASUvgew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717425097; c=relaxed/simple;
-	bh=t4caGc7B+4DgJF7v+mhlFLGMguPoMzNY2oU43fdODGY=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=k7ErLPHg2wucGmEGnJJjbf0vGADA7KvsxGiInuL7u3Mk5h0NkA/bQuIVE6eU5jo/Sml1M9QXs637fyt6DVCICDG2kt68aOtzCOJ5OhdptlepOx/1AfkhjSV59Oi9ghQP+hSCf1R92GVDSDhF+W9NskkNtOjfN3Yt2B1mXbax0y8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bmlGlhJR; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1717425128; c=relaxed/simple;
+	bh=GNNOWqdkaJW9/A6JU7rKt1d6Jui12hkP5DFzTX8l+EE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=h7zvLsF3xSj1980LNgCNlu+AWCaYaro8w+LRzYTsWTssccxJUaJSBGrD6+V2iZNLGReoKLsXrA8l87vblv9jW0ZgxwwUDU4sWuufPI/ZYQOHforpfwe+PzzWuid2FFJaj211hiXti+LunxomFOrXAjA3jGROlKZi/zhMMDbU6b0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hjtmHgMR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bmlGlhJR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D07FEC2BD10;
-	Mon,  3 Jun 2024 14:31:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hjtmHgMR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B62A7C2BD10;
+	Mon,  3 Jun 2024 14:32:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717425096;
-	bh=t4caGc7B+4DgJF7v+mhlFLGMguPoMzNY2oU43fdODGY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bmlGlhJRlMtGc2f8Jn0zrsi3QBJEHFx7uNaqbWx+KVxn7m8v41UsTjgwv3RhW6IOI
-	 GFkRZDQHfeI5+ErbM4c24zca1Ui6jsEP2U9Qgx9tdZnZJHP/TfMXODAlRnSCyLCaQp
-	 abSUlX1WfmJuOHe6xgNv00mTI2Sv2x4B0KjOFmnXPoeLoOEC1IQj1kaBRvh8OZC/m3
-	 tSO5W7fvp7FX4zKmznKCwd0gY3hwyyg+KTQdU2RLRPnpVQeZiOuSHmLL5/BeQPs671
-	 AzZS6wA/xooq/9oTTV5M+Nn+DziNjXbF/DtP0AhABw/IMeaQ8ZI1ipGtad6V3sXGJ1
-	 T9N9Jx/pTFASg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sE8ik-000GMt-IB;
-	Mon, 03 Jun 2024 15:31:34 +0100
-Date: Mon, 03 Jun 2024 15:31:33 +0100
-Message-ID: <86ikyqkshm.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Fuad Tabba <tabba@google.com>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	will@kernel.org,
-	qperret@google.com,
-	seanjc@google.com,
-	alexandru.elisei@arm.com,
-	catalin.marinas@arm.com,
-	philmd@linaro.org,
-	james.morse@arm.com,
-	suzuki.poulose@arm.com,
-	oliver.upton@linux.dev,
-	mark.rutland@arm.com,
-	joey.gouly@arm.com,
-	rananta@google.com,
-	yuzenghui@huawei.com
-Subject: Re: [PATCH v3 05/11] KVM: arm64: Eagerly restore host fpsimd/sve state in pKVM
-In-Reply-To: <382e0746-84a4-4c59-9187-ca9b87f9d265@sirena.org.uk>
-References: <20240528125914.277057-1-tabba@google.com>
-	<20240528125914.277057-6-tabba@google.com>
-	<f205aea1-bc52-41ff-9545-704cda9e23ff@sirena.org.uk>
-	<CA+EHjTz_u2M-wsNnD_f=_R+dJoYwL9gUrBz=YwdqGZbtTT-aaA@mail.gmail.com>
-	<6e473418-dbce-4008-94fe-f60174d3f8fe@sirena.org.uk>
-	<86jzj6kuh4.wl-maz@kernel.org>
-	<382e0746-84a4-4c59-9187-ca9b87f9d265@sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1717425128;
+	bh=GNNOWqdkaJW9/A6JU7rKt1d6Jui12hkP5DFzTX8l+EE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hjtmHgMRiCv5yA+YuNxrLlFlE7J3eZMUAR1/E8xa7QEW/ZYVl+ed3o9PX61dW/Mu8
+	 rVdxt1JzuypLVSFgG0f9Rb0ao6Bvu4EXs0ZP8nDUP2OesDBylhu+phYGy++lKu+gVT
+	 PTmIN2IMIYaYu732MpczC4hoEbD/bv5hZXR9BOd4vGB/cdqsCpdOwQm5YLR5cQzbDy
+	 QXtnkHWvNvzRszg4YrLIGhGLkiN89/JmO6YPPxTJMC56ymN04kMTOrSB1+37msK2G1
+	 5ANnhm8Uuj+pzV/W4XjDeriy4giRpbgplKwfjKUgoJjcro4frpj+sHPDrK6/OYpsQm
+	 8AKw2YwoKQhVQ==
+Date: Mon, 3 Jun 2024 15:32:03 +0100
+From: Will Deacon <will@kernel.org>
+To: =?iso-8859-1?Q?Pierre-Cl=E9ment?= Tosi <ptosi@google.com>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Vincent Donnefort <vdonnefort@google.com>
+Subject: Re: [PATCH v4 04/13] KVM: arm64: nVHE: Add EL2h sync exception
+ handler
+Message-ID: <20240603143203.GE19151@willie-the-truck>
+References: <20240529121251.1993135-1-ptosi@google.com>
+ <20240529121251.1993135-5-ptosi@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, will@kernel.org, qperret@google.com, seanjc@google.com, alexandru.elisei@arm.com, catalin.marinas@arm.com, philmd@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, mark.rutland@arm.com, joey.gouly@arm.com, rananta@google.com, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240529121251.1993135-5-ptosi@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Mon, 03 Jun 2024 15:15:37 +0100,
-Mark Brown <broonie@kernel.org> wrote:
+On Wed, May 29, 2024 at 01:12:10PM +0100, Pierre-Clément Tosi wrote:
+> Introduce a handler for EL2h synchronous exceptions distinct from
+> handlers for other "invalid" exceptions when running with the nVHE host
+> vector. This will allow a future patch to handle kCFI (synchronous)
+> errors without affecting other classes of exceptions.
 > 
-> On Mon, Jun 03, 2024 at 02:48:39PM +0100, Marc Zyngier wrote:
-> > Mark Brown <broonie@kernel.org> wrote:
-> > > On Mon, Jun 03, 2024 at 09:37:16AM +0100, Fuad Tabba wrote:
-> 
-> > > > Also, one of the concerns in terms of performance is now with
-> > > > nested-virt support being added, and the overhead of doing the
-> > > > conditional update when we know that it's unlikely that anyone is
-> > > > implementing vectors as big as the max.
-> 
-> > > I guess there's the option of doing a restore of a value fixed during
-> > > initialisation instead?
-> 
-> > And what do we gain from that?
-> 
-> Reducing the number of places that need updating.
+> Signed-off-by: Pierre-Clément Tosi <ptosi@google.com>
+> ---
+>  arch/arm64/kvm/hyp/nvhe/host.S | 14 +++++++++++---
+>  1 file changed, 11 insertions(+), 3 deletions(-)
 
-That'd be assuming that the host side value never requires any change
-and will be OK with a fixed value. Given that this highly hypothetical
-change would be likely to be a hierarchical control much like ZCR_ELx
-is today, the fixed value is likely to change on a regular basis.
+Acked-by: Will Deacon <will@kernel.org>
 
-In any case, this is something we can (re)evaluate when we get to it.
-If ever.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Will
