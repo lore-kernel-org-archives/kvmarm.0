@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 744614A1B
-	for <kvmarm@lists.linux.dev>; Mon,  3 Jun 2024 14:50:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 752F6130E40
+	for <kvmarm@lists.linux.dev>; Mon,  3 Jun 2024 15:43:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717426243; cv=none; b=ANhGFlthbWl4SYZByWuK9zmkl2WoVH2Wl4P7QZUwO5f5u2fo0LErvE49mf4tN/lIYeOawsaDZoM16aOyHwAvX5p/+8ruSNli+Am+7IZ2I0sKVucHbJOPlpy6P432LzlkpTHJqqFFX/6bShOKl38WrCJ1lN6sKe8VcoIeLTPOwsM=
+	t=1717429434; cv=none; b=Mk1Rb6ZOtiraVs7qiQtmUzSbwFaeQ+VoFnIXWVtQ4lOAlUjPJfT83IzRHIkk2/v9c4ZIYLzpIPQ/7mNmxYDj9gj6H514W6mfuk8C8lrqPE1D5jCkcL3B+u6UQ3/HSyOzNUUE2g+T2aoEjnPmHuSDCZgYPy6or4+fgG+3yU8pnsQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717426243; c=relaxed/simple;
-	bh=WIPuEc/s/07sHpO/fz8hH4Dcc6H9/p6XEJ7Jfu5gk2E=;
+	s=arc-20240116; t=1717429434; c=relaxed/simple;
+	bh=OXG0DxodrsVoUQ85hREj/cOzXgtz4NhwHjGKCSA1GqY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EaoK7F+z2rH5rgIV1tE+IQHbepz01VJOwVNP4LMRmm/HYR1qc+w044ohmj4vk0UZbRKug3BI0oEGie47+yVNfZcMosNWwhXR/NeJI/GFcOPrdBQxruLEQ8jbHKkJJZorzYJGZFfdC7X9yNYia4qFF8s3np3nrr+HXPS/ph9o9xE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qnqTshmd; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=LTCIkXgrxEwUqh39BydyjGLu9mCI0wlZ52qTmVDnSQMxxIxBnbntvbPd6On7yM+Lyk2UKITZoABFNkgjkPe/EbZL+ZmgIaUM0iUXbgAN0e9OMEvwUekt1tSnsqjVxV8CTtOUPz/ZmwpNJNgRB+HMdp0fq9/BgLAv6CXQVlYzzdg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dn7eIdLA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qnqTshmd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F574C4AF07;
-	Mon,  3 Jun 2024 14:50:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dn7eIdLA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D9CEC2BD10;
+	Mon,  3 Jun 2024 15:43:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717426242;
-	bh=WIPuEc/s/07sHpO/fz8hH4Dcc6H9/p6XEJ7Jfu5gk2E=;
+	s=k20201202; t=1717429433;
+	bh=OXG0DxodrsVoUQ85hREj/cOzXgtz4NhwHjGKCSA1GqY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qnqTshmdQkPXbt0aQmbmSCL5ubDlgUArzk/TtI25GSy6nMACfLnt9Q2MkybBPHON+
-	 pMEEnDZGPcHF24ijA1W/9dFzbC5p2Nz2/8ZzEeiZvmKUxq8snfocOcHP5oubhZrdlD
-	 /nazJ0r7SZIC3wWrHV4W4oV1b2ze13GcU/3R2i+jIgD+ckvAUl6YKmi9lmxC76oezt
-	 9fYtse4CB1Bo/J8dL4jT37s+1nhsdcu9UUquP55EXBjQnYpMTlmq90RjfPJGVcXe7L
-	 WMe25/otppxCq3Lhl+thbRbUnanWnvDmTdXDNOleu8RtDLa0UyfKsHfYt/hfnbUpId
-	 hliiYaCPZrV3Q==
-Date: Mon, 3 Jun 2024 15:50:36 +0100
+	b=dn7eIdLAGxBioez56/tyGUZL4zNQbi0QNbDYT/MGfLDeCd0eDwNx8TeZWZESPwme9
+	 0tfPtS4G9/FIarrh1+tkxFl1vucMrW52M32GWGQeDWNppaKJlwKbUAhFbbMJNDCFoE
+	 3MclKreoRyo9EpU81Ywhvw2VR/MvtF5jgapoCkvT0gT2Ce74c1qI+rwSGahA3Tcmaq
+	 yp46nFOmUNIhf7el/XAnZY1X3BA+seDCGNFhZgCulkoSPNb3CfOVZxPv6rH2bljLmT
+	 htQv7W5W2Ex1jYH8uNsZcmb6KcAnvRjS5jmiupLvUG2Z989OtaU1x1OEJqYEVmrtoA
+	 UEEMO7/a/jdwg==
+Date: Mon, 3 Jun 2024 16:43:47 +0100
 From: Mark Brown <broonie@kernel.org>
 To: Fuad Tabba <tabba@google.com>
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
@@ -36,11 +36,11 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	suzuki.poulose@arm.com, oliver.upton@linux.dev,
 	mark.rutland@arm.com, joey.gouly@arm.com, rananta@google.com,
 	yuzenghui@huawei.com
-Subject: Re: [PATCH v4 5/9] KVM: arm64: Allocate memory mapped at hyp for
- host sve state in pKVM
-Message-ID: <54ceca2b-ca7b-4046-8155-46623f829bf9@sirena.org.uk>
+Subject: Re: [PATCH v4 7/9] KVM: arm64: Consolidate initializing the host
+ data's fpsimd_state/sve in pKVM
+Message-ID: <60a788a7-aad7-4541-a1af-f9c7461f1880@sirena.org.uk>
 References: <20240603122852.3923848-1-tabba@google.com>
- <20240603122852.3923848-6-tabba@google.com>
+ <20240603122852.3923848-8-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,41 +48,36 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="AJWUfdzA6mtlIomT"
+	protocol="application/pgp-signature"; boundary="nQUmR4ecQ1CswPA6"
 Content-Disposition: inline
-In-Reply-To: <20240603122852.3923848-6-tabba@google.com>
+In-Reply-To: <20240603122852.3923848-8-tabba@google.com>
 X-Cookie: Don't let your status become too quo!
 
 
---AJWUfdzA6mtlIomT
+--nQUmR4ecQ1CswPA6
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-On Mon, Jun 03, 2024 at 01:28:47PM +0100, Fuad Tabba wrote:
+On Mon, Jun 03, 2024 at 01:28:49PM +0100, Fuad Tabba wrote:
+> Now that we have introduced finalize_init_hyp_mode(), lets
+> consolidate the initializing of the host_data fpsimd_state and
+> sve state.
 
->  {
->  	if (system_supports_sve()) {
->  		kvm_sve_max_vl = sve_max_virtualisable_vl();
-> +		kvm_host_sve_max_vl = sve_max_vl();
-> +		kvm_nvhe_sym(kvm_host_sve_max_vl) = kvm_host_sve_max_vl;
+Reviewed-by: Mark Brown <broonie@kernel.org>
 
-As discussed on the prior version this either needs to be the maximum
-available physical VL on any individual PE or the hypervisor needs to
-use this VL explicitly when saving/restoring host state.
-
---AJWUfdzA6mtlIomT
+--nQUmR4ecQ1CswPA6
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmZd2DsACgkQJNaLcl1U
-h9AAHgf/aZ+uC/1OFp3jcmQglFpnodQwnj9tMoJD+4jTB72kZJJ+jWEVsbYGh7vR
-ZsAca0RnVtu8iW7EhKupSJ9tkDAgPTknU0AbXFpWT42rhOuiU06Fj1UZdxzX6LWV
-DaS/6kuZlIIcr+/sBPFBf1xQEEBmuQRTPG2ohyJE99oY8SCTmeueCY+3XEn+x9C2
-vnIDaJBs/NPQr4duDt4N/nixA5+5qes+l1ct81ueRBuolVJ43nf4InFCqaXOq+tj
-JBDNhdEPQ/4qoJSn4C53UUmRPPunxaewIjdPsoQ2XtVL1uNPC27D5r2AOlLcS6GZ
-iedJ7e4k/tUYCMtYg/hnrOL+O7stJA==
-=LLJk
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmZd5LIACgkQJNaLcl1U
+h9CwIgf/YlBUNNGvMuO0ZDJaUjKRsgtRCqFLNsuEXk36gblSH2VdIZHI+ME4tcbc
+nlAQ/hV6MJVUQvsAQVyS0oyLd84fG2dnx0+2tg0YC3qHjAegq3yZ2jxAVGItEdDi
+qzybEg8gInRz4NZ3BrhFfT8l7JMwd49fhMVdXH6aseMTOaFQkljnWxYHccyku8NI
+9TWlf1LYvO5NDyAvJjbjGGcy2WrN29yI2sHK6jBLyzi2AobCAksoZBSvrlpT4vUu
+jGgBi64Jsdgx/f50EZOlecKEiAqhBcORKZAMUr1rC5/azmDVEpJc5NEetpYvM80l
+tCBPrIwI8XJLhR27agCpevePXdq7Pg==
+=wCW1
 -----END PGP SIGNATURE-----
 
---AJWUfdzA6mtlIomT--
+--nQUmR4ecQ1CswPA6--
