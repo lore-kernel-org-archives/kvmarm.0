@@ -1,104 +1,109 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 812CF57C9A;
-	Mon,  3 Jun 2024 14:30:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DAB483CCF
+	for <kvmarm@lists.linux.dev>; Mon,  3 Jun 2024 14:31:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717425036; cv=none; b=jSTHXD7MwNTQF7k5dlOAT5LFiEo78WNGkeN8zE1s17oF3ECGYw7kFMxnSxjB/XB2+SoNHsF3XOhlvFgQ5U8Wzg4AGfIQ+J6vqRctqS4ZkNFiNbeiVpLy5ARyEcqIKyYCXtO/+58tIzRlUZ2dVbQXMYYNpWmONK+QOnr6Sqhj9NU=
+	t=1717425097; cv=none; b=MFy7F0ZxhavzTrpx7Iuva719kUSyvJB2VYbkGN4C9q3JYhfCHUXhrsfwklLXd63wGQKBC9evDoBGLYpCBFSaN6E4gV5/lZhufip6o4FNH7PTEimpgC/GqKWX56dCXm+/Xe2UK/tvVCesMK/6BgwnZ9eHg2ZwzuNYwa9xUEvkscY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717425036; c=relaxed/simple;
-	bh=zew+uG4r68QwYLUFKAKzwIzu32pc5sfFcOmdOWTc4V8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JR5/tmW101azAnLdj9tSMrMUcRSHXCpis0b4lhFhCvZ24DSB4KqOeQ55lD1V1NlkNyOv04X1GMFTe3JpM7MX+TEAqhFKguB0AqDDZ+mXVK/AgKY0s4YQomk4Sq7zFX/NJAl1OxX4yU8EqDozr/H9cZyZGv6aZwqsWcOVumjqgvc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fg49YqSE; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1717425097; c=relaxed/simple;
+	bh=t4caGc7B+4DgJF7v+mhlFLGMguPoMzNY2oU43fdODGY=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=k7ErLPHg2wucGmEGnJJjbf0vGADA7KvsxGiInuL7u3Mk5h0NkA/bQuIVE6eU5jo/Sml1M9QXs637fyt6DVCICDG2kt68aOtzCOJ5OhdptlepOx/1AfkhjSV59Oi9ghQP+hSCf1R92GVDSDhF+W9NskkNtOjfN3Yt2B1mXbax0y8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bmlGlhJR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fg49YqSE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6214AC4AF09;
-	Mon,  3 Jun 2024 14:30:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bmlGlhJR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D07FEC2BD10;
+	Mon,  3 Jun 2024 14:31:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717425036;
-	bh=zew+uG4r68QwYLUFKAKzwIzu32pc5sfFcOmdOWTc4V8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Fg49YqSESADLCHTZ8owxyuJbUfacYZM3r8mgmhN8iWK80vEK48+LWPLhqnBDJekrv
-	 NvNtSSfeDBOSsKqdNIU4kJdtC2pTX2z+PYNzzkK/UwF3AXlTdD9PAmROp8EC5nJUMG
-	 TUsh6ruqRtWpD6ECVJLujfnNAuTJl/iVhf1uEwqiEINIWbGejej7Ft/O+arqXaQwD3
-	 Px4AZYeQj9veYg5u712HacUI//gJG0acajSga3m1HELZhp/DhuKrbgVPaOG7G87jll
-	 rh22LBxo/Y7DEILknNRpDSK+BZSvat0BomoClfcWgChgE9EkPyqlkVNb+63esoLjb5
-	 EDbw6l75Cxs+w==
-Date: Mon, 3 Jun 2024 15:30:30 +0100
-From: Will Deacon <will@kernel.org>
-To: =?iso-8859-1?Q?Pierre-Cl=E9ment?= Tosi <ptosi@google.com>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Vincent Donnefort <vdonnefort@google.com>
-Subject: Re: [PATCH v4 03/13] KVM: arm64: nVHE: Simplify __guest_exit_panic
- path
-Message-ID: <20240603143030.GD19151@willie-the-truck>
-References: <20240529121251.1993135-1-ptosi@google.com>
- <20240529121251.1993135-4-ptosi@google.com>
+	s=k20201202; t=1717425096;
+	bh=t4caGc7B+4DgJF7v+mhlFLGMguPoMzNY2oU43fdODGY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=bmlGlhJRlMtGc2f8Jn0zrsi3QBJEHFx7uNaqbWx+KVxn7m8v41UsTjgwv3RhW6IOI
+	 GFkRZDQHfeI5+ErbM4c24zca1Ui6jsEP2U9Qgx9tdZnZJHP/TfMXODAlRnSCyLCaQp
+	 abSUlX1WfmJuOHe6xgNv00mTI2Sv2x4B0KjOFmnXPoeLoOEC1IQj1kaBRvh8OZC/m3
+	 tSO5W7fvp7FX4zKmznKCwd0gY3hwyyg+KTQdU2RLRPnpVQeZiOuSHmLL5/BeQPs671
+	 AzZS6wA/xooq/9oTTV5M+Nn+DziNjXbF/DtP0AhABw/IMeaQ8ZI1ipGtad6V3sXGJ1
+	 T9N9Jx/pTFASg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sE8ik-000GMt-IB;
+	Mon, 03 Jun 2024 15:31:34 +0100
+Date: Mon, 03 Jun 2024 15:31:33 +0100
+Message-ID: <86ikyqkshm.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Fuad Tabba <tabba@google.com>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	will@kernel.org,
+	qperret@google.com,
+	seanjc@google.com,
+	alexandru.elisei@arm.com,
+	catalin.marinas@arm.com,
+	philmd@linaro.org,
+	james.morse@arm.com,
+	suzuki.poulose@arm.com,
+	oliver.upton@linux.dev,
+	mark.rutland@arm.com,
+	joey.gouly@arm.com,
+	rananta@google.com,
+	yuzenghui@huawei.com
+Subject: Re: [PATCH v3 05/11] KVM: arm64: Eagerly restore host fpsimd/sve state in pKVM
+In-Reply-To: <382e0746-84a4-4c59-9187-ca9b87f9d265@sirena.org.uk>
+References: <20240528125914.277057-1-tabba@google.com>
+	<20240528125914.277057-6-tabba@google.com>
+	<f205aea1-bc52-41ff-9545-704cda9e23ff@sirena.org.uk>
+	<CA+EHjTz_u2M-wsNnD_f=_R+dJoYwL9gUrBz=YwdqGZbtTT-aaA@mail.gmail.com>
+	<6e473418-dbce-4008-94fe-f60174d3f8fe@sirena.org.uk>
+	<86jzj6kuh4.wl-maz@kernel.org>
+	<382e0746-84a4-4c59-9187-ca9b87f9d265@sirena.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240529121251.1993135-4-ptosi@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, will@kernel.org, qperret@google.com, seanjc@google.com, alexandru.elisei@arm.com, catalin.marinas@arm.com, philmd@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, mark.rutland@arm.com, joey.gouly@arm.com, rananta@google.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, May 29, 2024 at 01:12:09PM +0100, Pierre-Clément Tosi wrote:
-> In invalid_host_el2_vect (i.e. EL2{t,h} handlers in nVHE guest context),
-
-*guest* context? Are you sure?
-
-> remove the duplicate vCPU context check that __guest_exit_panic also
-> performs, allowing an unconditional branch to it.
+On Mon, 03 Jun 2024 15:15:37 +0100,
+Mark Brown <broonie@kernel.org> wrote:
 > 
-> Signed-off-by: Pierre-Clément Tosi <ptosi@google.com>
-> ---
->  arch/arm64/kvm/hyp/nvhe/host.S | 9 ++-------
->  1 file changed, 2 insertions(+), 7 deletions(-)
+> On Mon, Jun 03, 2024 at 02:48:39PM +0100, Marc Zyngier wrote:
+> > Mark Brown <broonie@kernel.org> wrote:
+> > > On Mon, Jun 03, 2024 at 09:37:16AM +0100, Fuad Tabba wrote:
 > 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
-> index 135cfb294ee5..71fb311b4c0e 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/host.S
-> +++ b/arch/arm64/kvm/hyp/nvhe/host.S
-> @@ -197,18 +197,13 @@ SYM_FUNC_END(__host_hvc)
->  	sub	x0, sp, x0			// x0'' = sp' - x0' = (sp + x0) - sp = x0
->  	sub	sp, sp, x0			// sp'' = sp' - x0 = (sp + x0) - x0 = sp
->  
-> -	/* If a guest is loaded, panic out of it. */
-> -	stp	x0, x1, [sp, #-16]!
-> -	get_loaded_vcpu x0, x1
-> -	cbnz	x0, __guest_exit_panic
-> -	add	sp, sp, #16
+> > > > Also, one of the concerns in terms of performance is now with
+> > > > nested-virt support being added, and the overhead of doing the
+> > > > conditional update when we know that it's unlikely that anyone is
+> > > > implementing vectors as big as the max.
+> 
+> > > I guess there's the option of doing a restore of a value fixed during
+> > > initialisation instead?
+> 
+> > And what do we gain from that?
+> 
+> Reducing the number of places that need updating.
 
-I think this is actually dead code and we should just remove it. AFAICT,
-invalid_host_el2_vect is only used for the host vectors and the loaded
-vCPU will always be NULL, so this is pointless. set_loaded_vcpu() is
-only called by the low-level guest entry/exit code and with the guest
-EL2 vectors installed.
+That'd be assuming that the host side value never requires any change
+and will be OK with a fixed value. Given that this highly hypothetical
+change would be likely to be a hierarchical control much like ZCR_ELx
+is today, the fixed value is likely to change on a regular basis.
 
-> -
->  	/*
->  	 * The panic may not be clean if the exception is taken before the host
->  	 * context has been saved by __host_exit or after the hyp context has
->  	 * been partially clobbered by __host_enter.
->  	 */
-> -	b	hyp_panic
-> +	stp	x0, x1, [sp, #-16]!
-> +	b	__guest_exit_panic
+In any case, this is something we can (re)evaluate when we get to it.
+If ever.
 
-In which case, this should just be:
+	M.
 
-	add	sp, sp, #16
-	b	hyp_panic
-
-Did I miss something?
-
-Will
+-- 
+Without deviation from the norm, progress is not possible.
