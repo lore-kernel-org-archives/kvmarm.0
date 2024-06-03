@@ -1,281 +1,100 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE53218C19
-	for <kvmarm@lists.linux.dev>; Mon,  3 Jun 2024 05:31:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-ua1-f48.google.com (mail-ua1-f48.google.com [209.85.222.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 298505A0FE
+	for <kvmarm@lists.linux.dev>; Mon,  3 Jun 2024 08:29:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717392681; cv=none; b=M1+yzIBLJ5uBJl9CBuLa09iDhBSwtYa/V12ZkQqROKj6ue0EpzPdibXS+GQz5LE+N+WdhD4uOKSAdfd3ZucKyCP7IwcIRL8CpHUmBUkG1C100YdxarfcQ/5sDVuyQzMdHY1OUvSYtLKur3LGi2sHWmzpzcIutsxsF4AM9qdKbRQ=
+	t=1717403351; cv=none; b=uG3HBB40KCjy7OdgWOFppv0zlrLQRKNpgJKYioLqRrP/opWw90kzvcuTHamw4scaWrHdv/fSQUU0rlHBVnIOigxhkccd2rmPmGoDtu6KkY3k03eLON4nP/YXZg6M6uu3yvGbmCeaNu6dwe2/9FiXEleiHE6J5jp3+IlV1QzGAD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717392681; c=relaxed/simple;
-	bh=/g2Gy1tVZ7oXBm4NOKsE0BsVNmAYkBeAS/Ro+GSSyvg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TII/vEHJDWYxtaIvizomOoQW38v34Yk89FH/civH7y5t0UDCRJ4gRCnZrc7R8LmttMjjkyAdKTwgolVHZMg05hmDvQ8al9LXhb0IZRg1267SXlvuWJ+npgwE/osI8icek8qxzQY29LSuL2zLlkEihaprRcC0yX2gJGwkU7KBQbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A46161042;
-	Sun,  2 Jun 2024 22:31:43 -0700 (PDT)
-Received: from [10.162.40.16] (a077893.blr.arm.com [10.162.40.16])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B54D23F762;
-	Sun,  2 Jun 2024 22:31:13 -0700 (PDT)
-Message-ID: <10baf4ee-db5b-4b5f-b618-7daab8aaf741@arm.com>
-Date: Mon, 3 Jun 2024 11:01:10 +0530
+	s=arc-20240116; t=1717403351; c=relaxed/simple;
+	bh=fVlesX4K6cSN+H27FtRqKLsABghCdB70OOUw2vP8InE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ok+JGP70aWah3+cT4mDG+oD/DMfRiEhq9M0yhppLlWZ4++L3zoP0pcDWYlF02fIBYS9oKY84UXRS9p34A6iZmwkbL4BqL6j8SQZW0d667XhrPzmkNe9tfuhryy3QWu3wUgOhqvur395zsnxwPsyQg69v+tKAZ/5T8QwfL+vxtmw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CyvnMdSu; arc=none smtp.client-ip=209.85.222.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CyvnMdSu"
+Received: by mail-ua1-f48.google.com with SMTP id a1e0cc1a2514c-80ad842d3a7so882717241.0
+        for <kvmarm@lists.linux.dev>; Mon, 03 Jun 2024 01:29:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1717403349; x=1718008149; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VsRrbQlTYp4acJ04+n2YT0Gg2I3oGU+nfMgVxL4jWys=;
+        b=CyvnMdSu5tCLk948l6fENkUN1uBui1zjs0FVAPv4uT7+Zdl/XGciwzSgmQdYiD/1iW
+         RYF64NdCL2Vl8AqpNvsE4iub0srY6DvZaxQpFW/aSFhAdxxwGQFVyU5h6zc0X/Nm1uiH
+         Ty5WiQXLONb4rgFuvw0XpHakqbQj7IkMFwQlBTy46vd2Wc7clGmSjkHFLr3kTKuBwXfi
+         7OjFLQZ8FaE8rp03MW2zE+8IpcuwT0y8syeUQM434aIECa/nYokbN5OKdQWrfsIZMA4u
+         Z7cWTZje26NAk5r00oj/CWIA6q627MaKrZ1kxLfKY6xUd5aRtBH6Gmsb7QrH5L3JBPDd
+         Q4Pw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717403349; x=1718008149;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VsRrbQlTYp4acJ04+n2YT0Gg2I3oGU+nfMgVxL4jWys=;
+        b=NJvfsnnr2+6Y7ce6OkVopbpxuEUqT+S4eOTPxtUskxdaXwOXOgrgC+aI5mBigRwxBH
+         qrOFiYDoLWuEq2yZJW75Ow0cFS02tmV0Q1Tk9ZYVNvRPTk0S91zEOePs+iCL6OQQofyw
+         ncD84svBTEPSyi+EQSQYSdZbOgE7CBeG36dpU0SJIeCD8+i4FZyFmCMI3wu63Kp9607l
+         NkuIQsJMsqBs57xTctvIb4oHiM5j0yrD3MGmqFxOPm+iQM1qdIKKPDJliaahOhaFlwf4
+         u4h2vyIquoFB34r/Mzpk1iq6FdhsaTmS/6XSr/Q9C1vi7UASkq4hXPFJgr24PW5JaxlD
+         +Nfw==
+X-Gm-Message-State: AOJu0YxcN5HB2vc9+Lr2o9eNRRKjL6Hu5SfW+PjFY1YX14peVvxc4Uzk
+	IarZN8OJf6czF33PDsrGXayZFFaWSt/jYZqnKZ7O8CCSDfvJ7oZdzsEclrhQ4yuhh9lJEIn2BJY
+	2vuDapUAvsbFhnRqPXixkFuBkf0NAWt1P0F2o
+X-Google-Smtp-Source: AGHT+IHqW2rY46wg+8JcwKXV0j7cagliERoKbJylkW6Bk1dhKJmBfrD6Zr8O7lrCAevYmFsh2fzpp7Jg/3IJKXo9oEw=
+X-Received: by 2002:a67:bc03:0:b0:48b:bc9b:d816 with SMTP id
+ ada2fe7eead31-48bc21b9a2cmr8150064137.19.1717403348400; Mon, 03 Jun 2024
+ 01:29:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V17 2/9] KVM: arm64: Explicitly handle BRBE traps as
- UNDEFINED
-Content-Language: en-US
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- will@kernel.org, catalin.marinas@arm.com, Mark Brown <broonie@kernel.org>,
- James Clark <james.clark@arm.com>, Rob Herring <robh@kernel.org>,
- Marc Zyngier <maz@kernel.org>, Suzuki Poulose <suzuki.poulose@arm.com>,
- Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
- Arnaldo Carvalho de Melo <acme@kernel.org>,
- linux-perf-users@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>,
- James Morse <james.morse@arm.com>, kvmarm@lists.linux.dev
-References: <20240405024639.1179064-1-anshuman.khandual@arm.com>
- <20240405024639.1179064-3-anshuman.khandual@arm.com>
- <Zkyg-xgJHK5D1zFs@J2N7QTR9R3>
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <Zkyg-xgJHK5D1zFs@J2N7QTR9R3>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20240528125914.277057-1-tabba@google.com> <20240528125914.277057-2-tabba@google.com>
+ <ae1d98b5-d3d4-49f8-9478-2a20f89d8156@sirena.org.uk>
+In-Reply-To: <ae1d98b5-d3d4-49f8-9478-2a20f89d8156@sirena.org.uk>
+From: Fuad Tabba <tabba@google.com>
+Date: Mon, 3 Jun 2024 09:28:31 +0100
+Message-ID: <CA+EHjTzPAD9xqnEWU-Yja67L4_Q79ntpTV7E=J-zLKFYaV-9SA@mail.gmail.com>
+Subject: Re: [PATCH v3 01/11] KVM: arm64: Reintroduce __sve_save_state
+To: Mark Brown <broonie@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, seanjc@google.com, 
+	alexandru.elisei@arm.com, catalin.marinas@arm.com, philmd@linaro.org, 
+	james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, 
+	mark.rutland@arm.com, joey.gouly@arm.com, rananta@google.com, 
+	yuzenghui@huawei.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+Hi Mark,
 
+On Fri, May 31, 2024 at 1:26=E2=80=AFPM Mark Brown <broonie@kernel.org> wro=
+te:
+>
+> On Tue, May 28, 2024 at 01:59:04PM +0100, Fuad Tabba wrote:
+>
+> > This reverts commit e66425fc9ba3 ("KVM: arm64: Remove unused
+> > __sve_save_state").
+>
+> > +void __sve_save_state(void *sve_pffr, u32 *fpsr);
+>
+> The prototype says this takes 2 arguments...
+>
+> > +SYM_FUNC_START(__sve_save_state)
+> > +     mov     x2, #1
+> > +     sve_save 0, x1, x2, 3
+>
+> ...but the macro takes and the function supplies 3 arguments.  This was
+> a bug in the code at the time you did the revert (the prototype had been
+> missed when adding save_ffr) but we should still fix it.
 
-On 5/21/24 18:56, Mark Rutland wrote:
-> Hi Anshuman,
-> 
-> On Fri, Apr 05, 2024 at 08:16:32AM +0530, Anshuman Khandual wrote:
->> The Branch Record Buffer Extension (BRBE) adds a number of system registers
->> and instructions, which we don't currently intend to expose to guests. Our
->> existing logic handles this safely, but this could be improved with some
->> explicit handling of BRBE.
->>
->> The presence of BRBE is currently hidden from guests as the cpufeature
->> code's ftr_id_aa64dfr0[] table doesn't have an entry for the BRBE field,
->> and so this will be zero in the sanitised value of ID_AA64DFR0 exposed to
->> guests via read_sanitised_id_aa64dfr0_el1(). As the ftr_id_aa64dfr0[] table
->> may gain an entry for the BRBE field in future, for robustness we should
->> explicitly mask out the BRBE field in read_sanitised_id_aa64dfr0_el1().
->>
->> The BRBE system registers and instructions are currently trapped by the
->> existing configuration of the fine-grained traps. As neither the registers
->> are not described in the sys_reg_descs[] nor the instructions are described
->> in the sys_insn_descs[] table, emulate_sys_reg() will warn that these are
->> unknown before injecting an UNDEFINED exception into the guest.
-> 
-> That last sentence doesn't make sense, and I think it has been mangled.
-> My suggested text in v16 was:
-> 
-> | As the registers and instructions are not described in the
-> | sys_reg_descs[] table, emulate_sys_reg() will warn that these are
-> | unknown before injecting an UNDEFINED exception into the guest.
-> 
-> ... and I'd be happy with changing that to:
-> 
-> | As neither the registers nor the instructions are described in the 
-> | sys_reg_descs[] table, emulate_sys_reg() will warn that these are
-> | unknown before injecting an UNDEFINED exception into the guest.
+Thanks for spotting this! I will fix it on the respin.
 
-Sure, will replace the last sentence as suggested.
-
-> 
->> Well-behaved guests shouldn't try to use the registers or instructions, but
->> badly-behaved guests could use these, resulting in unnecessary warnings.
-> 
-> I see that I had mangled this sentence originally -- thanks for
-> correcting that; this looks fine to me.
-> 
->> To avoid those warnings, we should explicitly handle the BRBE
->> registers, and instructions as UNDEFINED.
-> 
-> I think the added comma is unnecessary and makes this hard to read. My
-> suggested text in v16 was:
-> 
-> | To avoid those warnings, we should explicitly handle the BRBE
-> | registers and instructions as UNDEFINED.
-
-Sure, will change.
-
-> 
->> Address the above by having read_sanitised_id_aa64dfr0_el1() mask out the
->> ID_AA64DFR0.BRBE field, and by adding sys_reg_descs entries for all of the
->> BRBE system registers, also by adding sys_insn_descs entries for all of the
->> BRBE instructions, treating these all as UNDEFINED.
-> 
-> Similarly, I think this was clearer as I originally suggested:
-> 
-> | Address the above by having read_sanitised_id_aa64dfr0_el1() mask out
-> | the ID_AA64DFR0.BRBE field, and by adding sys_reg_desc entries for all
-> | of the BRBE system registers and instructions, treating these all as
-> | UNDEFINED.
-> 
-> ... or we can simplify that to:
-> 
-> | Address the above by having read_sanitised_id_aa64dfr0_el1() mask out
-> | the ID_AA64DFR0.BRBE field, and explicitly handling all of the BRBE
-> | system registers and instructions as UNDEFINED.
-
-Sure, will change the above as suggested.
-
-After all these changes, final commit message looks like the following.
-
-KVM: arm64: Explicitly handle BRBE traps as UNDEFINED
-
-The Branch Record Buffer Extension (BRBE) adds a number of system registers
-and instructions, which we don't currently intend to expose to guests. Our
-existing logic handles this safely, but this could be improved with some
-explicit handling of BRBE.
-
-The presence of BRBE is currently hidden from guests as the cpufeature
-code's ftr_id_aa64dfr0[] table doesn't have an entry for the BRBE field,
-and so this will be zero in the sanitised value of ID_AA64DFR0 exposed to
-guests via read_sanitised_id_aa64dfr0_el1(). As the ftr_id_aa64dfr0[] table
-may gain an entry for the BRBE field in future, for robustness we should
-explicitly mask out the BRBE field in read_sanitised_id_aa64dfr0_el1().
-
-The BRBE system registers and instructions are currently trapped by the
-existing configuration of the fine-grained traps. As neither the registers
-nor the instructions are described in the sys_reg_descs[] table,
-emulate_sys_reg() will warn that these are unknown before injecting an
-UNDEFINED exception into the guest.
-
-Well-behaved guests shouldn't try to use the registers or instructions, but
-badly-behaved guests could use these, resulting in unnecessary warnings. To
-avoid those warnings, we should explicitly handle the BRBE registers and
-instructions as UNDEFINED.
-
-Address the above by having read_sanitised_id_aa64dfr0_el1() mask out the
-ID_AA64DFR0.BRBE field, and explicitly handling all of the BRBE system
-registers and instructions as UNDEFINED.
-
-> 
->> Cc: Marc Zyngier <maz@kernel.org>
->> Cc: Oliver Upton <oliver.upton@linux.dev>
->> Cc: James Morse <james.morse@arm.com>
->> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Cc: Catalin Marinas <catalin.marinas@arm.com>
->> Cc: Will Deacon <will@kernel.org>
->> Cc: kvmarm@lists.linux.dev
->> Cc: linux-arm-kernel@lists.infradead.org
->> Cc: linux-kernel@vger.kernel.org
->> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
->> ----
->> Changes in V17:
->>
->> - Updated the commit message including about sys_insn_descs[]
->> - Changed KVM to use existing SYS_BRBSRC/TGT/INF_EL1(n) format
->> - Moved the BRBE instructions into sys_insn_descs[] array
-> 
-> Aside from my nits on the commit message above, these changes all look
-> good to me. So with the commit message cleaned up as above:
-> 
-> Reviewed-by: Mark Rutland <mark.rutland@arm.com>
-
-Thanks Mark.
-
-> 
-> Mark.
-> 
->>
->>  arch/arm64/kvm/sys_regs.c | 56 +++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 56 insertions(+)
->>
->> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->> index c9f4f387155f..3981aa32c5a3 100644
->> --- a/arch/arm64/kvm/sys_regs.c
->> +++ b/arch/arm64/kvm/sys_regs.c
->> @@ -1304,6 +1304,11 @@ static int set_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
->>  	return 0;
->>  }
->>  
->> +#define BRB_INF_SRC_TGT_EL1(n)				\
->> +	{ SYS_DESC(SYS_BRBINF_EL1(n)), undef_access },	\
->> +	{ SYS_DESC(SYS_BRBSRC_EL1(n)), undef_access },	\
->> +	{ SYS_DESC(SYS_BRBTGT_EL1(n)), undef_access }	\
->> +
->>  /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
->>  #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
->>  	{ SYS_DESC(SYS_DBGBVRn_EL1(n)),					\
->> @@ -1708,6 +1713,9 @@ static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
->>  	/* Hide SPE from guests */
->>  	val &= ~ID_AA64DFR0_EL1_PMSVer_MASK;
->>  
->> +	/* Hide BRBE from guests */
->> +	val &= ~ID_AA64DFR0_EL1_BRBE_MASK;
->> +
->>  	return val;
->>  }
->>  
->> @@ -2226,6 +2234,52 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->>  	{ SYS_DESC(SYS_DBGCLAIMCLR_EL1), trap_raz_wi },
->>  	{ SYS_DESC(SYS_DBGAUTHSTATUS_EL1), trap_dbgauthstatus_el1 },
->>  
->> +	/*
->> +	 * BRBE branch record sysreg address space is interleaved between
->> +	 * corresponding BRBINF<N>_EL1, BRBSRC<N>_EL1, and BRBTGT<N>_EL1.
->> +	 */
->> +	BRB_INF_SRC_TGT_EL1(0),
->> +	BRB_INF_SRC_TGT_EL1(16),
->> +	BRB_INF_SRC_TGT_EL1(1),
->> +	BRB_INF_SRC_TGT_EL1(17),
->> +	BRB_INF_SRC_TGT_EL1(2),
->> +	BRB_INF_SRC_TGT_EL1(18),
->> +	BRB_INF_SRC_TGT_EL1(3),
->> +	BRB_INF_SRC_TGT_EL1(19),
->> +	BRB_INF_SRC_TGT_EL1(4),
->> +	BRB_INF_SRC_TGT_EL1(20),
->> +	BRB_INF_SRC_TGT_EL1(5),
->> +	BRB_INF_SRC_TGT_EL1(21),
->> +	BRB_INF_SRC_TGT_EL1(6),
->> +	BRB_INF_SRC_TGT_EL1(22),
->> +	BRB_INF_SRC_TGT_EL1(7),
->> +	BRB_INF_SRC_TGT_EL1(23),
->> +	BRB_INF_SRC_TGT_EL1(8),
->> +	BRB_INF_SRC_TGT_EL1(24),
->> +	BRB_INF_SRC_TGT_EL1(9),
->> +	BRB_INF_SRC_TGT_EL1(25),
->> +	BRB_INF_SRC_TGT_EL1(10),
->> +	BRB_INF_SRC_TGT_EL1(26),
->> +	BRB_INF_SRC_TGT_EL1(11),
->> +	BRB_INF_SRC_TGT_EL1(27),
->> +	BRB_INF_SRC_TGT_EL1(12),
->> +	BRB_INF_SRC_TGT_EL1(28),
->> +	BRB_INF_SRC_TGT_EL1(13),
->> +	BRB_INF_SRC_TGT_EL1(29),
->> +	BRB_INF_SRC_TGT_EL1(14),
->> +	BRB_INF_SRC_TGT_EL1(30),
->> +	BRB_INF_SRC_TGT_EL1(15),
->> +	BRB_INF_SRC_TGT_EL1(31),
->> +
->> +	/* Remaining BRBE sysreg addresses space */
->> +	{ SYS_DESC(SYS_BRBCR_EL1), undef_access },
->> +	{ SYS_DESC(SYS_BRBFCR_EL1), undef_access },
->> +	{ SYS_DESC(SYS_BRBTS_EL1), undef_access },
->> +	{ SYS_DESC(SYS_BRBINFINJ_EL1), undef_access },
->> +	{ SYS_DESC(SYS_BRBSRCINJ_EL1), undef_access },
->> +	{ SYS_DESC(SYS_BRBTGTINJ_EL1), undef_access },
->> +	{ SYS_DESC(SYS_BRBIDR0_EL1), undef_access },
->> +
->>  	{ SYS_DESC(SYS_MDCCSR_EL0), trap_raz_wi },
->>  	{ SYS_DESC(SYS_DBGDTR_EL0), trap_raz_wi },
->>  	// DBGDTR[TR]X_EL0 share the same encoding
->> @@ -2738,6 +2792,8 @@ static struct sys_reg_desc sys_insn_descs[] = {
->>  	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
->>  	{ SYS_DESC(SYS_DC_CIGSW), access_dcgsw },
->>  	{ SYS_DESC(SYS_DC_CIGDSW), access_dcgsw },
->> +	{ SYS_DESC(OP_BRB_IALL), undef_access },
->> +	{ SYS_DESC(OP_BRB_INJ), undef_access },
->>  };
->>  
->>  static const struct sys_reg_desc *first_idreg;
->> -- 
->> 2.25.1
->>
+Cheers,
+/fuad
