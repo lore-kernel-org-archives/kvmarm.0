@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A92D012E1DC;
-	Mon,  3 Jun 2024 14:22:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 812CF57C9A;
+	Mon,  3 Jun 2024 14:30:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717424545; cv=none; b=jsPTu8E9OiKroHudOpDJJrSmxBqefbKTAFdZezcfCM4YRbJAFL3+x9ODYh77CyJKRn5A2UnJmgJQEJC/pX2BJZubvJSlNo0QndqfRReFIWn/YGvjp/qtUO47YQ98NN5nXDHT2JvrgRQ3mN8qcXWDGOjr2owRl0xL+nH4NtJvQLM=
+	t=1717425036; cv=none; b=jSTHXD7MwNTQF7k5dlOAT5LFiEo78WNGkeN8zE1s17oF3ECGYw7kFMxnSxjB/XB2+SoNHsF3XOhlvFgQ5U8Wzg4AGfIQ+J6vqRctqS4ZkNFiNbeiVpLy5ARyEcqIKyYCXtO/+58tIzRlUZ2dVbQXMYYNpWmONK+QOnr6Sqhj9NU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717424545; c=relaxed/simple;
-	bh=rNTx7AsFjOKV7d+MKpBR6n2Udl3BibGEh30vSmw5BL4=;
+	s=arc-20240116; t=1717425036; c=relaxed/simple;
+	bh=zew+uG4r68QwYLUFKAKzwIzu32pc5sfFcOmdOWTc4V8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IiY6CbdOmohU2R3TzU+N7NJ9bIg99S2QeutE2TURchGn8SRozOFZ2kZ/J4GzKmXBTItfDPSdmmng9+N+jMOAftI4bkGcbzlD6pST6elxhjUDmc3WA8scu4eStP3x2SnPJ6jvZ6iJpgRPz9T4DCRQzWMVu0Ih0u2i3ENMxOsQUhM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mH/bb9ig; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=JR5/tmW101azAnLdj9tSMrMUcRSHXCpis0b4lhFhCvZ24DSB4KqOeQ55lD1V1NlkNyOv04X1GMFTe3JpM7MX+TEAqhFKguB0AqDDZ+mXVK/AgKY0s4YQomk4Sq7zFX/NJAl1OxX4yU8EqDozr/H9cZyZGv6aZwqsWcOVumjqgvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fg49YqSE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mH/bb9ig"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97A85C2BD10;
-	Mon,  3 Jun 2024 14:22:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fg49YqSE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6214AC4AF09;
+	Mon,  3 Jun 2024 14:30:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717424545;
-	bh=rNTx7AsFjOKV7d+MKpBR6n2Udl3BibGEh30vSmw5BL4=;
+	s=k20201202; t=1717425036;
+	bh=zew+uG4r68QwYLUFKAKzwIzu32pc5sfFcOmdOWTc4V8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mH/bb9igXinsiXKQwHP1kb+scyiVgWxfxQG1RbYcRvsH3E/Fwe/IRvxPqk9D9WbJk
-	 NQIN0YFDZv/nSnEtscGAaDzAMSHN+cqKv1yqZz5PA3q5qZo+bxRjnAqP35Et1zQK+Z
-	 XtfRVeXdotx9Hb6inshd2A3KtKr5sgrapzzaVtSr0OzM48NwCbsCltTahyed8ZKqYu
-	 aTJeFS1gkalo/UKuxZWpN4GJa5Ba+/9gLiDOqOQ4ISL+vRgQpG92vyldov5oNOlyKV
-	 k228ImzRGNu0PqT6NNq+L6stHm/4G/yRA7fOdW4GjOCfMU73Lxx8hSk2a8Nb2dMaFJ
-	 sZy4kWDJ5h0Zg==
-Date: Mon, 3 Jun 2024 15:22:20 +0100
+	b=Fg49YqSESADLCHTZ8owxyuJbUfacYZM3r8mgmhN8iWK80vEK48+LWPLhqnBDJekrv
+	 NvNtSSfeDBOSsKqdNIU4kJdtC2pTX2z+PYNzzkK/UwF3AXlTdD9PAmROp8EC5nJUMG
+	 TUsh6ruqRtWpD6ECVJLujfnNAuTJl/iVhf1uEwqiEINIWbGejej7Ft/O+arqXaQwD3
+	 Px4AZYeQj9veYg5u712HacUI//gJG0acajSga3m1HELZhp/DhuKrbgVPaOG7G87jll
+	 rh22LBxo/Y7DEILknNRpDSK+BZSvat0BomoClfcWgChgE9EkPyqlkVNb+63esoLjb5
+	 EDbw6l75Cxs+w==
+Date: Mon, 3 Jun 2024 15:30:30 +0100
 From: Will Deacon <will@kernel.org>
 To: =?iso-8859-1?Q?Pierre-Cl=E9ment?= Tosi <ptosi@google.com>
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
@@ -34,10 +34,11 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Vincent Donnefort <vdonnefort@google.com>
-Subject: Re: [PATCH v4 02/13] KVM: arm64: Fix __pkvm_init_switch_pgd call ABI
-Message-ID: <20240603142220.GC19151@willie-the-truck>
+Subject: Re: [PATCH v4 03/13] KVM: arm64: nVHE: Simplify __guest_exit_panic
+ path
+Message-ID: <20240603143030.GD19151@willie-the-truck>
 References: <20240529121251.1993135-1-ptosi@google.com>
- <20240529121251.1993135-3-ptosi@google.com>
+ <20240529121251.1993135-4-ptosi@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,86 +48,57 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240529121251.1993135-3-ptosi@google.com>
+In-Reply-To: <20240529121251.1993135-4-ptosi@google.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Wed, May 29, 2024 at 01:12:08PM +0100, Pierre-Clément Tosi wrote:
-> Fix the mismatch between the (incorrect) C signature, C call site, and
-> asm implementation by aligning all three on an API passing the
-> parameters (pgd and SP) separately, instead of as a bundled struct.
+On Wed, May 29, 2024 at 01:12:09PM +0100, Pierre-Clément Tosi wrote:
+> In invalid_host_el2_vect (i.e. EL2{t,h} handlers in nVHE guest context),
+
+*guest* context? Are you sure?
+
+> remove the duplicate vCPU context check that __guest_exit_panic also
+> performs, allowing an unconditional branch to it.
 > 
-> Remove the now unnecessary memory accesses while the MMU is off from the
-> asm, which simplifies the C caller (as it does not need to convert a VA
-> struct pointer to PA) and makes the code slightly more robust by
-> offsetting the struct fields from C and properly expressing the call to
-> the C compiler (e.g. type checker and kCFI).
-> 
-> Fixes: f320bc742bc2 ("KVM: arm64: Prepare the creation of s1 mappings at EL2")
 > Signed-off-by: Pierre-Clément Tosi <ptosi@google.com>
 > ---
->  arch/arm64/include/asm/kvm_hyp.h   |  3 +--
->  arch/arm64/kvm/hyp/nvhe/hyp-init.S | 17 +++++++++--------
->  arch/arm64/kvm/hyp/nvhe/setup.c    |  4 ++--
->  3 files changed, 12 insertions(+), 12 deletions(-)
+>  arch/arm64/kvm/hyp/nvhe/host.S | 9 ++-------
+>  1 file changed, 2 insertions(+), 7 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-> index 3e80464f8953..58b5a2b14d88 100644
-> --- a/arch/arm64/include/asm/kvm_hyp.h
-> +++ b/arch/arm64/include/asm/kvm_hyp.h
-> @@ -123,8 +123,7 @@ void __noreturn __hyp_do_panic(struct kvm_cpu_context *host_ctxt, u64 spsr,
->  #endif
+> diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
+> index 135cfb294ee5..71fb311b4c0e 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/host.S
+> +++ b/arch/arm64/kvm/hyp/nvhe/host.S
+> @@ -197,18 +197,13 @@ SYM_FUNC_END(__host_hvc)
+>  	sub	x0, sp, x0			// x0'' = sp' - x0' = (sp + x0) - sp = x0
+>  	sub	sp, sp, x0			// sp'' = sp' - x0 = (sp + x0) - x0 = sp
 >  
->  #ifdef __KVM_NVHE_HYPERVISOR__
-> -void __pkvm_init_switch_pgd(phys_addr_t phys, unsigned long size,
-> -			    phys_addr_t pgd, void *sp, void *cont_fn);
-> +void __pkvm_init_switch_pgd(phys_addr_t pgd, void *sp, void (*fn)(void));
->  int __pkvm_init(phys_addr_t phys, unsigned long size, unsigned long nr_cpus,
->  		unsigned long *per_cpu_base, u32 hyp_va_bits);
->  void __noreturn __host_enter(struct kvm_cpu_context *host_ctxt);
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-> index 2994878d68ea..d859c4de06b6 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-> @@ -265,33 +265,34 @@ alternative_else_nop_endif
->  
->  SYM_CODE_END(__kvm_handle_stub_hvc)
->  
-> +/*
-> + * void __pkvm_init_switch_pgd(phys_addr_t pgd, void *sp, void (*fn)(void));
-> + */
->  SYM_FUNC_START(__pkvm_init_switch_pgd)
->  	/* Turn the MMU off */
->  	pre_disable_mmu_workaround
-> -	mrs	x2, sctlr_el2
-> -	bic	x3, x2, #SCTLR_ELx_M
-> +	mrs	x9, sctlr_el2
-> +	bic	x3, x9, #SCTLR_ELx_M
+> -	/* If a guest is loaded, panic out of it. */
+> -	stp	x0, x1, [sp, #-16]!
+> -	get_loaded_vcpu x0, x1
+> -	cbnz	x0, __guest_exit_panic
+> -	add	sp, sp, #16
 
-This is fine, but there's no need to jump all the way to x9 for the
-register allocation. I think it would be neatest to re-jig the function
-so it uses x4 here for the sctlr and then uses x5 later for the ttbr.
+I think this is actually dead code and we should just remove it. AFAICT,
+invalid_host_el2_vect is only used for the host vectors and the loaded
+vCPU will always be NULL, so this is pointless. set_loaded_vcpu() is
+only called by the low-level guest entry/exit code and with the guest
+EL2 vectors installed.
 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-> index 859f22f754d3..1cbd2c78f7a1 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/setup.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-> @@ -316,7 +316,7 @@ int __pkvm_init(phys_addr_t phys, unsigned long size, unsigned long nr_cpus,
->  {
->  	struct kvm_nvhe_init_params *params;
->  	void *virt = hyp_phys_to_virt(phys);
-> -	void (*fn)(phys_addr_t params_pa, void *finalize_fn_va);
-> +	typeof(__pkvm_init_switch_pgd) *fn;
->  	int ret;
->  
->  	BUG_ON(kvm_check_pvm_sysreg_table());
-> @@ -340,7 +340,7 @@ int __pkvm_init(phys_addr_t phys, unsigned long size, unsigned long nr_cpus,
->  	/* Jump in the idmap page to switch to the new page-tables */
->  	params = this_cpu_ptr(&kvm_init_params);
->  	fn = (typeof(fn))__hyp_pa(__pkvm_init_switch_pgd);
-> -	fn(__hyp_pa(params), __pkvm_init_finalise);
-> +	fn(params->pgd_pa, (void *)params->stack_hyp_va, __pkvm_init_finalise);
+> -
+>  	/*
+>  	 * The panic may not be clean if the exception is taken before the host
+>  	 * context has been saved by __host_exit or after the hyp context has
+>  	 * been partially clobbered by __host_enter.
+>  	 */
+> -	b	hyp_panic
+> +	stp	x0, x1, [sp, #-16]!
+> +	b	__guest_exit_panic
 
-Why not have the prototype of __pkvm_init_switch_pgd() take the SP as
-an 'unsigned long' so that you can avoid this cast altogether?
+In which case, this should just be:
+
+	add	sp, sp, #16
+	b	hyp_panic
+
+Did I miss something?
 
 Will
