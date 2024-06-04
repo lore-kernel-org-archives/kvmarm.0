@@ -1,109 +1,68 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 023AF18028;
-	Tue,  4 Jun 2024 18:47:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64BD318028
+	for <kvmarm@lists.linux.dev>; Tue,  4 Jun 2024 18:49:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717526834; cv=none; b=S200ON/ML27BfkZM7HSzx2T3Qf7tjc+I1s5iTBFtck6pBHdDb7BgRCcP2uRSBD7A5u8dUenpnqfObCdyUaIWAZExVZppqe3cFlv01Lcxoc5je8IzdV+12egUaWP6tryiFcBUGHFcDPTdXt1azEDUVir3l+PIRgCuAATRJJBGLP8=
+	t=1717526976; cv=none; b=bzo8kKtkuErmJayt1FWs9jGmZC1zVqVdzfGSIZ+UFXaNX6vOvk48Uj4wj0JmjxlUiCRglPs+FWKBzCqCHeQasxnDu1zUlhTwRrpuNuJdILuj/aThZ6qNEpirlVXddwFYrQwKExWT/aGU5nDStYJFZiL5+HWqafhFNjLOokU7TiA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717526834; c=relaxed/simple;
-	bh=LtpCYs/rieDxgmWuPZaV8oRq3H8m/uiP7O2FlWkkU6E=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=iKXKMxezkW3DBWXgubGQuInyyO4EWXe5vRzC72zMnkFijwY70JKnpaJ+zXdj/cZQNNdEUkEtUAE/6/9oCEwv840nfT1yHHjhlwVtb1jt7nmmvCJ7NA1LXJCHOX7FHtM3DMG+cXPcuyON/RRA6v+MmA0yeoNDxAMMfzOV2DqnIc8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DL2q++Xn; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1717526976; c=relaxed/simple;
+	bh=ATJWEG+1bxat0pnXmMVZslPvDWRRtqe23y2AyQpUcrM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=r+DFbOqWwhNGlqZi4rECMh8yO4wXerBXed8Yt0cs0Aeq/PuelITwhLeEUEUBJnCv7HoXcnE/6+Je26cPB9JmsIBgE7Oc2qjTO6CglfskB+sI2p8oGc6qsnMSoeTA0uuyK/lkRA3z1yRHFrr4Tksz1uOpoL+r9aiJ5ycA4zOBozw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Xh6Vpswd; arc=none smtp.client-ip=91.218.175.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DL2q++Xn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C923C2BBFC;
-	Tue,  4 Jun 2024 18:47:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717526833;
-	bh=LtpCYs/rieDxgmWuPZaV8oRq3H8m/uiP7O2FlWkkU6E=;
-	h=From:Date:Subject:To:Cc:From;
-	b=DL2q++Xn3d+bxgLo6K2aRBRCcxCLwQNltO2lOGL9hKwwUzicwguMRvUaoX0TayHNL
-	 G6nRBQlDV3qJk19i10u4JEloAutfE1RROgyh6SGF4irMbbg1LEfAdRcEq8lzu4KJAi
-	 LwS0Ey79nf3tA3CK8y0ltfocISMhdToWSOwEwja3hO+S5SPCLCKC8m3ZVRe4fkbdAU
-	 jS5Td28kDvTaPd4KUEGFyslEZsFw0s+JkAO6eiDbe9cHcsKBVRRqMomLieODFRry//
-	 4yF9B4WH3QRrvHMAmqLZylST5+W55BypESDF4FQFV9VkOOwOXU+9PLWCKi3MpTx/DA
-	 41sXRsHyD6gSw==
-From: Mark Brown <broonie@kernel.org>
-Date: Tue, 04 Jun 2024 19:47:01 +0100
-Subject: [PATCH] KVM: arm64: Fix confusion in documentation for pKVM SME
- assert
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Xh6Vpswd"
+X-Envelope-To: maz@kernel.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1717526972;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=U7lKUQvdh3JnvQnC5tJiwKlWv/mRnqA/ehXRG/1b3Ec=;
+	b=Xh6VpswdhlRRUAIYGXwI+gY0MhcIke9swIn8iSvassAWd8no1fcIbsDSFc1uipuiut6IWB
+	7Fy/qq3/Tbgeq1f8XaOeDcaIcFLGu0ytvotWTTCT4JxSDnp0MPB6ms1MbpBr+F8N0t+faV
+	K4k9QlZJSu0poHuoOmDMhVaIvVZaESg=
+X-Envelope-To: kvmarm@lists.linux.dev
+X-Envelope-To: linux-arm-kernel@lists.infradead.org
+X-Envelope-To: james.morse@arm.com
+X-Envelope-To: suzuki.poulose@arm.com
+X-Envelope-To: yuzenghui@huawei.com
+X-Envelope-To: joey.gouly@arm.com
+Date: Tue, 4 Jun 2024 11:49:27 -0700
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, Joey Gouly <joey.gouly@arm.com>
+Subject: Re: [PATCH 0/4] KVM: arm64: nv: Add CPTR_EL2 handling
+Message-ID: <Zl9htwfHBwSixROH@linux.dev>
+References: <20240604130553.199981-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240604-kvm-arm64-sme-assert-v1-1-5d98348d00f8@kernel.org>
-X-B4-Tracking: v=1; b=H4sIACRhX2YC/x3MMQqAMAxA0atIZgNV2ipeRRyCjRqkKo2IIN7d4
- viH9x9QTsIKXfFA4ktU9i1HVRYwLrTNjBJyQ21qa7yxuF4RKUVvUSMjafYnOgqNc8FySx4yPRJ
- Pcv/bfnjfD0wbmHNmAAAA
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
- James Morse <james.morse@arm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
- Fuad Tabba <tabba@google.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
- linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.14-dev-d4707
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1905; i=broonie@kernel.org;
- h=from:subject:message-id; bh=LtpCYs/rieDxgmWuPZaV8oRq3H8m/uiP7O2FlWkkU6E=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBmX2EueYIFwpCK5h2htBWB6yatSlIAm2LAJzZ7L8yK
- BpxQpqiJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZl9hLgAKCRAk1otyXVSH0CKaB/
- 42Yi8pK/Bp81oc/d+6BAigrvOCLOSucaFzmqzhfl5R0/V1istdU2EHYMlu1gGqakjKO0B7mm0H1ZmD
- rZKgYr98vaM/bo3WyLxSGdmKUZNTWXxGKPEI2iPQ6PsoBGId2jE0mOXk/E6/kPnCDXGDxDJkwD+ajC
- 4QeBJiv/+4N9/yVI/KYXF5BpWaO2kIKVXB5LJMUUcn58mMM5wvC+iMvxHiURZ//eUJV/3vhbR7Y3Fs
- 0QVxP3jfqCh8B/eqkyE5oO0yjXIj07jA1oKO1cuBrookuVEsSs65h5AdeD65VRufGv4GgCKUGjEVf8
- 6dY+bDjWndxtQuhcEQIj24SkTpFH6D
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240604130553.199981-1-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-As raised in the review comments for the original patch the assert and
-comment added in afb91f5f8ad7 ("KVM: arm64: Ensure that SME controls are
-disabled in protected mode") are bogus. The comments says that we check
-that we do not have SME enabled for a pKVM guest but the assert actually
-checks to see if the host has anything set in SVCR which is unrelated to
-the guest features or state, regardless of if those guests are protected
-or not.
+On Tue, Jun 04, 2024 at 02:05:49PM +0100, Marc Zyngier wrote:
+> Building on top of Oliver's NV+SVE series[1], I've put together a
+> small set of patches handling CPTR_EL2, as the two are pretty closely
+> related.
 
-What I believe the check is actually intended to validate is that we do
-not enter the pKVM hypervisor with SME enabled since the pKVM hypervisor
-does not yet understand SME and is therefore unable to save or restore
-host state with SME enabled, indeed attempting to save SVE state would
-fault if streaming mode is enabled on a system without FA64 due to FFR.
-Update the comment to reflect this.
+Thanks for posting this, overall looks good. I'll probably pick this up
+and repost a combined series that eliminates some of the incidental
+churn that I've forced upon your patches.
 
-Fixes: afb91f5f8ad7 ("KVM: arm64: Ensure that SME controls are disabled in protected mode")
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- arch/arm64/kvm/fpsimd.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-index 521b32868d0d..f720ba47b85c 100644
---- a/arch/arm64/kvm/fpsimd.c
-+++ b/arch/arm64/kvm/fpsimd.c
-@@ -92,8 +92,9 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
- 	}
- 
- 	/*
--	 * If normal guests gain SME support, maintain this behavior for pKVM
--	 * guests, which don't support SME.
-+	 * The pKVM hypervisor does not yet understand how to save or
-+	 * restore SME state for the host so double check that if we
-+	 * are running with pKVM we have disabled SME.
- 	 */
- 	WARN_ON(is_protected_kvm_enabled() && system_supports_sme() &&
- 		read_sysreg_s(SYS_SVCR));
-
----
-base-commit: afb91f5f8ad7af172d993a34fde1947892408f53
-change-id: 20240604-kvm-arm64-sme-assert-5ad755d4e8a6
-
-Best regards,
 -- 
-Mark Brown <broonie@kernel.org>
-
+Best,
+Oliver
