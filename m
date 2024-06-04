@@ -1,98 +1,157 @@
-Received: from mail-vs1-f50.google.com (mail-vs1-f50.google.com [209.85.217.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9A3D142651
-	for <kvmarm@lists.linux.dev>; Tue,  4 Jun 2024 08:24:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 928B8145326;
+	Tue,  4 Jun 2024 11:14:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717489498; cv=none; b=PE67GKOJ7CehKn94nqmt6ld0hFeWVDeTbqghhBkDMuNc8FgB3JTOj5docDMwi0Y9uFpGDdBoD/mugl5XToqiUBJ0qaPfuvsF/wAcfn89CWy4Cy1FdhgdJagBAAr9Wv8FijZY5vxcXgncz5yWNLktKJaLjSBecP+FPeWlscjpRkk=
+	t=1717499686; cv=none; b=C65gtlfcO2u5UsHTykxDPrsik/VRaiMinWa1nQBPKbuYcwM9JQNW3dq9IQ8JlTSoJDKrRwQQd1s8TPo+zzBVmO6W/ZLDN9EN5nU7+0OlMZA2qadFHTWZO3TkUdhHopyd04azx1ojU6Fm/HJ+23VPl6MFiaGAUGC++6sc3i7UgSc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717489498; c=relaxed/simple;
-	bh=YgG8+8m86PBurAy/qhUvsHtO0+WuMFqkxGT+SNnIwFQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lphArXmDCw2ytEbTE+A+faR3h9+JhZdzRATWuxav+cu6dh+RAwPFURu0INOMUE8G/L1HwylTNO9HkRYZIDiHnbfN9I3BQDI9GKATihz5jf2KA6/3bPPKbb/fs4N/b9ZfwE+xWlnhFiwDLNXWtdEaXXkh6moDKGGAUi1n3yZND7s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zEcptAKb; arc=none smtp.client-ip=209.85.217.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1717499686; c=relaxed/simple;
+	bh=Vv4txNsMXhv+sJ10aOVoCZZU7rO5OvyNAtfI7FRXEwU=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Y63vI+CRj6M2rfsQTQlgiuv0jR+1e5rbakoJSF2otIP6J9Q14wQFWE6olsaomjN2IKrDdrgPLCvji7QzYQWKYjJTbgaQWcE+lzhEQlZNtGCrET2a1AlMo7R8j6cbRT6X4dQJdT9LuLCAcSG8JCDzsk3MkUgkd8KoLUq1gyo1FAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rYkp8xuF; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zEcptAKb"
-Received: by mail-vs1-f50.google.com with SMTP id ada2fe7eead31-48bdd56b454so205909137.0
-        for <kvmarm@lists.linux.dev>; Tue, 04 Jun 2024 01:24:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717489496; x=1718094296; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FwTDeaVvPjkK5Pu4FTYw+/GDejQugGhSaVoW4CU0vdA=;
-        b=zEcptAKbGt4EVwvQ+QufL4Tta8uOZu2TvigGNTAlyPxpPdXB+SQiP7BI6KSzGRx7EN
-         BfuSvJFNBGRHX2e10qJt1gmUjp8RL/CkpD6JMc9rESrDvoK8u411okNJ6nR+cJQt4URM
-         QSWgnYrnWVluLUoaFLTb672Smq+U6PX5vFEYPAZc/hyuhhsmnzeVVg/wcatvxq/P5huo
-         o49z0/Em20f8evOXcRq+FNK7Ec6wDIEiR2qKp+wpDgn3O4OhfXdtjJvpzwc0p6qJ+Mzs
-         97HOKiZAYxtWBZVFExtqQi0rwEsez4pZlD4Y5uUPYogApGjQIC8mrdOjl7KPDp/r6pqi
-         tKAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717489496; x=1718094296;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FwTDeaVvPjkK5Pu4FTYw+/GDejQugGhSaVoW4CU0vdA=;
-        b=PvOXigPlwBQ/PS1ZY2i2b3zlsLdEFPrCONxSCnDUVwrMzPjay0N1VdwHnTO1u06C3E
-         KCGnMdKW7EGKYN4eLFWOwgi/V9jppEsdGNsD22GJE0Dj0nOZc3kdXBi9BEmajQmPVd4p
-         OVslo2YLtWM25zPg1YiztAIu4UK/RD5DFRZgH/Y0+nUFERLyE4TvhEfx2rr1kF8O+KQn
-         46mBKwp/UizDf/DWenHMYFQ0aLlMQerVQ5Y7oRLqVvibFVG7vw5Dgtz6BnxPkyMe9rz0
-         LSgyd2+OLbsi8muiEqV3UA4WArriRUXjB9jJBQFZ4MOrenX9Iu49OAO3XhmP0VqIAmEZ
-         y6hw==
-X-Gm-Message-State: AOJu0YzAzt21Mf9f13uoPneDy3Jf+5wMVnccStPjlxpCDhtLl6lK88xQ
-	np0i9x7FvWzJ8pCzL4B7SubWPPMXZaf2rBAqp2drRxR4RwwBNpxwdubZOmZ4tiedPRZIP+Q8mUm
-	1w6jC16SxsBNYgdjzyNAswlhuXuAZIwz6RVyHv4A08gMmlMdbog==
-X-Google-Smtp-Source: AGHT+IHuY0v9KlwvHnt4oVW8Fkesn9sMKG6dVnOGbgLd61MgXU1s1Qj5vg8JOW/xa+Gp0ouYQzsg6wYhlr0FXSwfW+Y=
-X-Received: by 2002:a05:6102:5125:b0:48b:b2ee:1576 with SMTP id
- ada2fe7eead31-48bc20f349amr12486424137.2.1717489495216; Tue, 04 Jun 2024
- 01:24:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rYkp8xuF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83A5CC2BBFC;
+	Tue,  4 Jun 2024 11:14:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717499685;
+	bh=Vv4txNsMXhv+sJ10aOVoCZZU7rO5OvyNAtfI7FRXEwU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=rYkp8xuF4wH/gm8nhIezTORqNaq6vnDmSw7zIrNqXb0ar8oj2yR0+zZIsEgiLlwsM
+	 EHTJiIZjV3NDjmRyTtfrN+a7/6aSHtQNhPxTWhg6CvHkIpuwtzG6ZLZ/3PPSumygJQ
+	 DuO33iwqwcN19Fgsa4L5HuE64TFzXUxQP1wMWGFrMIa8gtiOqNR8RRgPYSw69K4hgi
+	 nbwx51NG6JiowZkdWQKTm5RPwN6nnzzYGA4qK4AiWwhX4LIr1xdQsKfy12YYMvyKSr
+	 h6Y2CuKnC0fJVNKzLmT+fJC3GtULipbUILxpuMeqc7aoFD3tqri5128JEpRlht2bFg
+	 rPwuwHWL93psg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sES7n-000X68-6U;
+	Tue, 04 Jun 2024 12:14:43 +0100
+Date: Tue, 04 Jun 2024 12:14:42 +0100
+Message-ID: <86frttkli5.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH 10/11] KVM: arm64: nv: Honor guest hypervisor's FP/SVE traps in CPTR_EL2
+In-Reply-To: <Zl39WCKpyaDmccgY@linux.dev>
+References: <20240531231358.1000039-1-oliver.upton@linux.dev>
+	<20240531231358.1000039-11-oliver.upton@linux.dev>
+	<86le3mkxsp.wl-maz@kernel.org>
+	<Zl39WCKpyaDmccgY@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20240603122852.3923848-1-tabba@google.com> <20240603122852.3923848-6-tabba@google.com>
- <54ceca2b-ca7b-4046-8155-46623f829bf9@sirena.org.uk>
-In-Reply-To: <54ceca2b-ca7b-4046-8155-46623f829bf9@sirena.org.uk>
-From: Fuad Tabba <tabba@google.com>
-Date: Tue, 4 Jun 2024 09:24:18 +0100
-Message-ID: <CA+EHjTxdNdquxD=g4OMazCNf_+ZUg8b31PNov1RmVbF=u4YdtA@mail.gmail.com>
-Subject: Re: [PATCH v4 5/9] KVM: arm64: Allocate memory mapped at hyp for host
- sve state in pKVM
-To: Mark Brown <broonie@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, seanjc@google.com, 
-	alexandru.elisei@arm.com, catalin.marinas@arm.com, philmd@linaro.org, 
-	james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, 
-	mark.rutland@arm.com, joey.gouly@arm.com, rananta@google.com, 
-	yuzenghui@huawei.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Mark,
+On Mon, 03 Jun 2024 18:28:56 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> Hey,
+> 
+> On Mon, Jun 03, 2024 at 01:36:54PM +0100, Marc Zyngier wrote:
+> 
+> [...]
+> 
+> > > +	/*
+> > > +	 * Layer the guest hypervisor's trap configuration on top of our own if
+> > > +	 * we're in a nested context.
+> > > +	 */
+> > > +	if (!vcpu_has_nv(vcpu) || is_hyp_ctxt(vcpu))
+> > > +		goto write;
+> > > +
+> > > +	if (guest_hyp_fpsimd_traps_enabled(vcpu))
+> > > +		val &= ~CPACR_ELx_FPEN;
+> > > +	if (guest_hyp_sve_traps_enabled(vcpu))
+> > > +		val &= ~CPACR_ELx_ZEN;
+> > 
+> > I'm afraid this isn't quite right. You are clearing both FPEN (resp
+> > ZEN) bits based on any of the two bits being clear, while what we want
+> > is to actually propagate the 0 bits (and only those).
+> 
+> An earlier version of the series I had was effectively doing this,
+> applying the L0 trap configuration on top of L1's CPTR_EL2. Unless I'm
+> missing something terribly obvious, I think this is still correct, as:
+> 
+>  - If we're in a hyp context, vEL2's CPTR_EL2 is loaded into CPACR_EL1.
+>    The independent EL0/EL1 enable bits are handled by hardware. All this
+>    junk gets skipped and we go directly to writing CPTR_EL2.
 
-On Mon, Jun 3, 2024 at 3:50=E2=80=AFPM Mark Brown <broonie@kernel.org> wrot=
-e:
->
-> On Mon, Jun 03, 2024 at 01:28:47PM +0100, Fuad Tabba wrote:
->
-> >  {
-> >       if (system_supports_sve()) {
-> >               kvm_sve_max_vl =3D sve_max_virtualisable_vl();
-> > +             kvm_host_sve_max_vl =3D sve_max_vl();
-> > +             kvm_nvhe_sym(kvm_host_sve_max_vl) =3D kvm_host_sve_max_vl=
-;
->
-> As discussed on the prior version this either needs to be the maximum
-> available physical VL on any individual PE or the hypervisor needs to
-> use this VL explicitly when saving/restoring host state.
+Yup.
 
-Sorry it took me a while, but I understand what the issue is now. I'll
-send a patch to fix this.
+> 
+>  - If we are not in a hyp context, vEL2's CPTR_EL2 gets folded into the
+>    hardware value for CPTR_EL2. TGE must be 0 in this case, so there is
+>    no conditional trap based on what EL the vCPU is in. There's only two
+>    functional trap states at this point, hence the all-or-nothing
+>    approach.
 
-Thanks for being patient with me,
-/fuad
+Ah, I see it now. Only bit[0] of each 2-bit field matters in that
+case. This thing is giving me a headache.
+
+> 
+> > What I have in my tree is something along the lines of:
+> > 
+> > 	cptr = vcpu_sanitised_cptr_el2(vcpu);
+> > 	tmp = cptr & (CPACR_ELx_ZEN_MASK | CPACR_ELx_FPEN_MASK);
+> > 	val &= ~(tmp ^ (CPACR_ELx_ZEN_MASK | CPACR_ELx_FPEN_MASK));
+> 
+> My hesitation with this is it gives the impression that both trap bits
+> are significant, but in reality only the LSB is useful. Unless my
+> understanding is disastrously wrong, of course :)
+
+No, you are absolutely right. Although you *are* clearing both bits
+anyway ;-).
+
+> 
+> Anyway, my _slight_ preference is towards keeping what I have if
+> possible, with a giant comment explaining the reasoning behind it. But I
+> can take your approach instead too.
+
+I think the only arguments for my own solution are:
+
+- slightly better codegen (no function call or inlining), and a
+  smaller .text section in switch.o, because the helpers are not
+  cheap:
+
+  LLVM:
+
+	0 .text         00003ef8 (guest_hyp_*_traps_enabled)
+	0 .text         00003d48 (bit ops)
+
+  GCC:
+	0 .text         00002624 (guest_hyp_*_traps_enabled)
+	0 .text         000024b4 (bit ops)
+
+
+  Yes, LLVM is an absolute pig because of BTI...
+
+- tracking the guest's bits more precisely may make it easier to debug
+
+but these are pretty weak arguments, and I don't really care either
+way at this precise moment.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
