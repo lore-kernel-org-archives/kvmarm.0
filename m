@@ -1,123 +1,104 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6997C2D6
-	for <kvmarm@lists.linux.dev>; Tue,  4 Jun 2024 13:52:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CA618F6A
+	for <kvmarm@lists.linux.dev>; Tue,  4 Jun 2024 14:07:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717509175; cv=none; b=n3g/MThm1L5P6eq2qkZ6fEJohTRKfltMdLd3bl3oZ0XaXqVadWd8JBDVoaQ4TYlACbervrLpPryf7bgyZRfTnj1YJA1niBfon9lRVJL09scgx936RTbkkaI0acLzYZCWBbiw6UNegv4SfxCf5YSK1COLKq2Anr290JVPwbztqHU=
+	t=1717510045; cv=none; b=iRhF8pnxyGOgEvSb2FTX/0cijGWZhhr2sdVTmf3W7PTtNxQ2Et3Ak6xS6qj7iciJDvSR0dTenn4nBdzCwM+FenIlr1oXSWudqG5go7FCPfELvXTT5DV34DQcYWqFBdShj4SUGbTmj5vbQN866QUWjcIsUnpcTjlstj06X4jdQTM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717509175; c=relaxed/simple;
-	bh=pIU2QOJ5jPTRecXRSzM/ZjIrphPZ5brAhK9qMXCoL+0=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JrM428mHiwZusdS3fYjW3siIZoQWhPp0oddX1jUeBmw7KevbPC0Acj5+6t5ak//8jf3/I1XjYzuindAZdPxS4SyAoZqWRwJqcKcrVZ0O50OoPVulCy5eGw5trfTI+RMuxYojzbIxTwyIdkg3ZB38OSLGsJ3ioz8xpwzVLvqhjQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ifYDZbC3; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1717510045; c=relaxed/simple;
+	bh=ErgkA8r25v12NbiYSZLonWCBbuaJrBuLjZ22rQEhMow=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ln25J8EyH4pIbG6Zp+2sLFmHTaCc0U2Xliu1mBvHXcrM97QSw7hcqPhDNpyckEJ6YtFeIcN0uHuKX6F3eMJM6uz50b5OI1yAM28X3GODoWIlBycnq+QwjpaEYNPErVypVna5sRJqKShRXP3FaUZCgsXTar/PyhrhvCLw5UQpJ+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RqXdxMZV; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ifYDZbC3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59643C32786;
-	Tue,  4 Jun 2024 13:52:55 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RqXdxMZV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FEC9C2BBFC;
+	Tue,  4 Jun 2024 14:07:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717509175;
-	bh=pIU2QOJ5jPTRecXRSzM/ZjIrphPZ5brAhK9qMXCoL+0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ifYDZbC36ijow66QiqYoO67kVAS1cZHGnEA1rpdWMOkb0YdpIVUITJdV3HBpZaGby
-	 /nH+jnTgAZkfjkekMscvsW8MF4w4yr4I63lFxaG7rh27uyzlG2+ErKias0Iivvg4V5
-	 78NwcPsfwkWx9Dt0A9o3XhuC0HE3G02w4JQfpmuMf1dA50M9Fx28pqw+0b31CDt/x6
-	 le7rk/dmVO80UXArDVbHgHTFdE+jAJmKBRCpH5LQTbXLA6FEMRCfvALlzY/UaAXdFP
-	 CUV7/7eE8wUGC7DI3rCVPrYY/eSdKLomuX0BXAlMZwR0whQk495uXVerofHcd4/HDU
-	 5futPVzswtzcw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sEUar-000ax3-5Y;
-	Tue, 04 Jun 2024 14:52:53 +0100
-Date: Tue, 04 Jun 2024 14:52:52 +0100
-Message-ID: <86ed9clsqz.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Fuad Tabba <tabba@google.com>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	will@kernel.org,
-	qperret@google.com,
-	seanjc@google.com,
-	alexandru.elisei@arm.com,
-	catalin.marinas@arm.com,
-	philmd@linaro.org,
-	james.morse@arm.com,
-	suzuki.poulose@arm.com,
-	oliver.upton@linux.dev,
-	mark.rutland@arm.com,
-	joey.gouly@arm.com,
-	rananta@google.com,
+	s=k20201202; t=1717510045;
+	bh=ErgkA8r25v12NbiYSZLonWCBbuaJrBuLjZ22rQEhMow=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RqXdxMZVi0tbWstA6BnDhiaWHv6rnm+E+2+q0PmDmFif1mYCi2F1qZ/p/1MHlDQXm
+	 BEHxDpxxoGbBeqUCajXSg19lltqFpxM4n1+fAdQzOmNa23LsHHIC8cTCHS13OG6Q3W
+	 bz73Xh0CWVqiZK5EaaFgWFLuTA7H3T6U1sAWP/5skQEoNlPptlrYhTtWO4YaU8RfK8
+	 SbIr0xhm2cBsXVxVsiFINA2sNin+EUwtfOCTUnyT32Ra0s+KFKrhhSLYWjws6thKQQ
+	 dywYjqYD4ywp7MCP2cFWloh5MY3btjn5mVhf+xXQdpvJqqyXOIcPp6bYnYwQPjMCd0
+	 Vu4Q1BYs0/UIw==
+Date: Tue, 4 Jun 2024 15:07:18 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Fuad Tabba <tabba@google.com>, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, will@kernel.org,
+	qperret@google.com, seanjc@google.com, alexandru.elisei@arm.com,
+	catalin.marinas@arm.com, philmd@linaro.org, james.morse@arm.com,
+	suzuki.poulose@arm.com, oliver.upton@linux.dev,
+	mark.rutland@arm.com, joey.gouly@arm.com, rananta@google.com,
 	yuzenghui@huawei.com
-Subject: Re: [PATCH v4 6/9] KVM: arm64: Eagerly restore host fpsimd/sve state in pKVM
-In-Reply-To: <e8e7928b-9f79-4015-a144-fade7ac84c6e@sirena.org.uk>
+Subject: Re: [PATCH v4 6/9] KVM: arm64: Eagerly restore host fpsimd/sve state
+ in pKVM
+Message-ID: <5e20596f-b9d3-4b01-ad3c-638dd1fa076b@sirena.org.uk>
 References: <20240603122852.3923848-1-tabba@google.com>
-	<20240603122852.3923848-7-tabba@google.com>
-	<728c100c-ea38-4802-832d-04521821d169@sirena.org.uk>
-	<CA+EHjTw6ybZ8+YuRjmRcpm7rC_aHPn7H1V4cejrN1Zo9njhbGA@mail.gmail.com>
-	<e8e7928b-9f79-4015-a144-fade7ac84c6e@sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <20240603122852.3923848-7-tabba@google.com>
+ <728c100c-ea38-4802-832d-04521821d169@sirena.org.uk>
+ <CA+EHjTw6ybZ8+YuRjmRcpm7rC_aHPn7H1V4cejrN1Zo9njhbGA@mail.gmail.com>
+ <e8e7928b-9f79-4015-a144-fade7ac84c6e@sirena.org.uk>
+ <86ed9clsqz.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, will@kernel.org, qperret@google.com, seanjc@google.com, alexandru.elisei@arm.com, catalin.marinas@arm.com, philmd@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, mark.rutland@arm.com, joey.gouly@arm.com, rananta@google.com, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="0A+LqQROufs2S1wt"
+Content-Disposition: inline
+In-Reply-To: <86ed9clsqz.wl-maz@kernel.org>
+X-Cookie: Is it clean in other dimensions?
 
-On Tue, 04 Jun 2024 14:13:16 +0100,
-Mark Brown <broonie@kernel.org> wrote:
->=20
-> [1  <text/plain; utf-8 (quoted-printable)>]
-> On Tue, Jun 04, 2024 at 01:03:07PM +0100, Fuad Tabba wrote:
-> > On Mon, Jun 3, 2024 at 4:52=E2=80=AFPM Mark Brown <broonie@kernel.org> =
-wrote:
-> > > On Mon, Jun 03, 2024 at 01:28:48PM +0100, Fuad Tabba wrote:
->=20
-> > > > +static void fpsimd_sve_flush(void)
-> > > > +{
-> > > > +     *host_data_ptr(fp_owner) =3D FP_STATE_HOST_OWNED;
-> > > > +}
->=20
-> > > My previous comments about this being confusing still stand.
->=20
-> > Sorry, I missed this in my reply to v3.
->=20
-> > This follows the convention for save/flush in hyp-main.c. Since the
-> > act of flushing the fpsimd/sve state is lazy, i.e., only takes place
-> > if the guest were to use fpsimd/sve, then the only thing that we need
-> > to do to flush is to mark the state as owned by the host.
->=20
-> I think this needs a comment mentioning what's going on here.
->=20
-> > You suggested inlining this, but since this is static, I think the
-> > compiler would do that. Even though it's only one line, it maintains
-> > symmetry with fpsimd_sve_sync().
->=20
-> The reason I was suggesting inlining was that it removes the need to
-> name the function.
 
-You're missing the point.
+--0A+LqQROufs2S1wt
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-The name is important, and the current name is correct. We use *flush
-(resp. *sync) for operations that need to happen before (resp. after)
-the entry into the guest. This is consistent with the rest of the code
-base for most of the subsystems KVM/arm64 deals with.
+On Tue, Jun 04, 2024 at 02:52:52PM +0100, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
+> > On Tue, Jun 04, 2024 at 01:03:07PM +0100, Fuad Tabba wrote:
 
-So the current form of this function, as a standalone function with
-its current name, stays.
+> > > You suggested inlining this, but since this is static, I think the
+> > > compiler would do that. Even though it's only one line, it maintains
+> > > symmetry with fpsimd_sve_sync().
 
-	M.
+> > The reason I was suggesting inlining was that it removes the need to
+> > name the function.
 
---=20
-Without deviation from the norm, progress is not possible.
+> You're missing the point.
+
+I think not.
+
+> The name is important, and the current name is correct. We use *flush
+> (resp. *sync) for operations that need to happen before (resp. after)
+> the entry into the guest. This is consistent with the rest of the code
+> base for most of the subsystems KVM/arm64 deals with.
+
+Hence my suggestion to add documentation to the function to avoid the
+risk of surprises, the above text explains the motivation for the
+suggestion that Faud is responding to.  Either approach would work.
+
+--0A+LqQROufs2S1wt
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmZfH5UACgkQJNaLcl1U
+h9DjyAf/by9Fp1D0zGrrZ/fYO8ZnwI18cF7W1LfDUCGNXYA3BwqB9eeL25TC9Ahg
+QlTfz99nTwiCyU4ToX1pEaeUXZy/yFD6iZAcGSvNwF17oVzG1HMGStqPxoBXm2Fb
+Yj+lITllRDbG/q+C+HOeT8MmnFT4QpbPtoXPwG3AaRLO0Q3cXeuCADBvstMC3Nsi
+onwHFb4s9OKxt08nUNSXIOYveCjWACAsot5TQh6c408xN1P7mSwZsQ9bBTAunRUa
+2VJWlPgbjqN2lcHhVrxilEqXEv+DXaPHSZcHdqcwFL/eP0bJX8TIjn+9Kx2ta/RS
+YZfvA7fhim0mZkHQavoiOaOHhRHglw==
+=jAG7
+-----END PGP SIGNATURE-----
+
+--0A+LqQROufs2S1wt--
