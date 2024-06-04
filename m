@@ -1,157 +1,102 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 928B8145326;
-	Tue,  4 Jun 2024 11:14:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 798E113CF98
+	for <kvmarm@lists.linux.dev>; Tue,  4 Jun 2024 12:03:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717499686; cv=none; b=C65gtlfcO2u5UsHTykxDPrsik/VRaiMinWa1nQBPKbuYcwM9JQNW3dq9IQ8JlTSoJDKrRwQQd1s8TPo+zzBVmO6W/ZLDN9EN5nU7+0OlMZA2qadFHTWZO3TkUdhHopyd04azx1ojU6Fm/HJ+23VPl6MFiaGAUGC++6sc3i7UgSc=
+	t=1717502626; cv=none; b=n7QDnbFfZMEoFBf0XM3HYnerQ3oXSjSTLDrXLvSwcxS7j/fjNbt8D3IsSuWKZP8gX0T2xgAqHzT6pJJsOlDcSbaXN4mJyasxML/1SywT6TQ1WR0i1+m8MdU+Pd1CdZZYVyHjraDHXyfRIVSRTrkdOSgKgDUO5IUDL6whYVBtoGg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717499686; c=relaxed/simple;
-	bh=Vv4txNsMXhv+sJ10aOVoCZZU7rO5OvyNAtfI7FRXEwU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Y63vI+CRj6M2rfsQTQlgiuv0jR+1e5rbakoJSF2otIP6J9Q14wQFWE6olsaomjN2IKrDdrgPLCvji7QzYQWKYjJTbgaQWcE+lzhEQlZNtGCrET2a1AlMo7R8j6cbRT6X4dQJdT9LuLCAcSG8JCDzsk3MkUgkd8KoLUq1gyo1FAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rYkp8xuF; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1717502626; c=relaxed/simple;
+	bh=RTE0lE8ZCwkLpffGnbD9Y5vGiIwsGUm/S/J4xwQfKHY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iOi9j+2Uw/a189j8GO0rvSk+C2cBE9Pr1LO6pYk5/OQrGFd16WdVNH4NZnJI4oHhtUwwYLkTE6DfR/XNJYPHyjk2SgtdU1jE4VvgShX4eFiOoUdP43p2jvNcLoV9jIxdI8HS+HSfLAzTgd9QZg/6tG8V4k4ItmfGwCBwQ2unxck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qgsZps0W; arc=none smtp.client-ip=209.85.167.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rYkp8xuF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83A5CC2BBFC;
-	Tue,  4 Jun 2024 11:14:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717499685;
-	bh=Vv4txNsMXhv+sJ10aOVoCZZU7rO5OvyNAtfI7FRXEwU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rYkp8xuF4wH/gm8nhIezTORqNaq6vnDmSw7zIrNqXb0ar8oj2yR0+zZIsEgiLlwsM
-	 EHTJiIZjV3NDjmRyTtfrN+a7/6aSHtQNhPxTWhg6CvHkIpuwtzG6ZLZ/3PPSumygJQ
-	 DuO33iwqwcN19Fgsa4L5HuE64TFzXUxQP1wMWGFrMIa8gtiOqNR8RRgPYSw69K4hgi
-	 nbwx51NG6JiowZkdWQKTm5RPwN6nnzzYGA4qK4AiWwhX4LIr1xdQsKfy12YYMvyKSr
-	 h6Y2CuKnC0fJVNKzLmT+fJC3GtULipbUILxpuMeqc7aoFD3tqri5128JEpRlht2bFg
-	 rPwuwHWL93psg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sES7n-000X68-6U;
-	Tue, 04 Jun 2024 12:14:43 +0100
-Date: Tue, 04 Jun 2024 12:14:42 +0100
-Message-ID: <86frttkli5.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH 10/11] KVM: arm64: nv: Honor guest hypervisor's FP/SVE traps in CPTR_EL2
-In-Reply-To: <Zl39WCKpyaDmccgY@linux.dev>
-References: <20240531231358.1000039-1-oliver.upton@linux.dev>
-	<20240531231358.1000039-11-oliver.upton@linux.dev>
-	<86le3mkxsp.wl-maz@kernel.org>
-	<Zl39WCKpyaDmccgY@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qgsZps0W"
+Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-3d1fd55081fso399617b6e.2
+        for <kvmarm@lists.linux.dev>; Tue, 04 Jun 2024 05:03:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1717502624; x=1718107424; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XE4VHykk1T34gJY6Lzj5KQ2a2vwgTXrOy+meCtywNXo=;
+        b=qgsZps0Wnz+CCpC+gqiei+iDkjtlBuwSISbWb8KWIj3BtrC6JExWMMj7zm6SWC1lBM
+         tj29eNmFxJZk+LiEOta9x2UP8DAj/AKAWz82ibbrytW1XoCknkKstVi6w11gGBqKOtxm
+         ZevZqDj4pWAi3+GhSrXD1U3WeoDCINWdbenZGZ2FX9QKvThFjjGSdrIr6QeW7u4wcv29
+         gizTAJDpYQIYJcssZL8gu5C3otfUDd/O+oVq0vQRFV7Q+qsHmYpbRWdNzgAarK7RoFeS
+         QHhLiaBmJMYjqTclp4oNn61CIlmJbVvkxdI3PMEwIzQWqRTsg7cDWoewSh137uDuiM7i
+         YOEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717502624; x=1718107424;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XE4VHykk1T34gJY6Lzj5KQ2a2vwgTXrOy+meCtywNXo=;
+        b=ZLUx/ipq0PqweQXYE1cVvAQsNkptkUBi9GyeGEh/mnS3nuzgRThdHCoaMRwU6g/v+/
+         AJTSUq/W8gl5Z6IC7L40biLitFsUimha+Q3d1Be/qiwhYMfQuSJSmE/RA7LopHno3mgR
+         niAGhLtyz1i3Q9zmWNunj2SSuQxfkhILDsjP1CYR3XxHdXAKS5NKvZaHEznsnyYUt/oX
+         xALEIst/UeggJl1UtIsqJCTMxJmAoeVx6Vi3/iQarrtEg9Gh9G0bsWQpCoj1aIqbMBQC
+         RC+SAZnqZiEGTuMlOwhfUWmqV0gXPVCE+x75p+cnxcI+61f3M6DvlzdeBtHAtfWkFjLy
+         7XqA==
+X-Gm-Message-State: AOJu0Yy4EeBDSVn6BLQ4xmghcEtl/T1+T+ZQInzbw+Tks2FGK2nEdAJ6
+	In9hq23J2m6hKnSuXLOKaZhpLqD+acnkMFmidjxQn5ItlJXnExJbLqtpgcYDCY03Jo+G0h78B+r
+	LXv1tyg0nCTVxdN6PoN77rqPxiG+c0WmfLyZG
+X-Google-Smtp-Source: AGHT+IHqrYlR642hs6n2UKb4rdJgc6Q3l3+HnAW7YZ/gG7wQRv9W+MncOD+9T3VearkuHuFmoOBmNGTnCgBwwwcdWxk=
+X-Received: by 2002:a05:6808:2915:b0:3d2:e9:b8f5 with SMTP id
+ 5614622812f47-3d200e9b94cmr652935b6e.41.1717502624244; Tue, 04 Jun 2024
+ 05:03:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20240603122852.3923848-1-tabba@google.com> <20240603122852.3923848-7-tabba@google.com>
+ <728c100c-ea38-4802-832d-04521821d169@sirena.org.uk>
+In-Reply-To: <728c100c-ea38-4802-832d-04521821d169@sirena.org.uk>
+From: Fuad Tabba <tabba@google.com>
+Date: Tue, 4 Jun 2024 13:03:07 +0100
+Message-ID: <CA+EHjTw6ybZ8+YuRjmRcpm7rC_aHPn7H1V4cejrN1Zo9njhbGA@mail.gmail.com>
+Subject: Re: [PATCH v4 6/9] KVM: arm64: Eagerly restore host fpsimd/sve state
+ in pKVM
+To: Mark Brown <broonie@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, seanjc@google.com, 
+	alexandru.elisei@arm.com, catalin.marinas@arm.com, philmd@linaro.org, 
+	james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, 
+	mark.rutland@arm.com, joey.gouly@arm.com, rananta@google.com, 
+	yuzenghui@huawei.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 03 Jun 2024 18:28:56 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> Hey,
-> 
-> On Mon, Jun 03, 2024 at 01:36:54PM +0100, Marc Zyngier wrote:
-> 
-> [...]
-> 
-> > > +	/*
-> > > +	 * Layer the guest hypervisor's trap configuration on top of our own if
-> > > +	 * we're in a nested context.
-> > > +	 */
-> > > +	if (!vcpu_has_nv(vcpu) || is_hyp_ctxt(vcpu))
-> > > +		goto write;
-> > > +
-> > > +	if (guest_hyp_fpsimd_traps_enabled(vcpu))
-> > > +		val &= ~CPACR_ELx_FPEN;
-> > > +	if (guest_hyp_sve_traps_enabled(vcpu))
-> > > +		val &= ~CPACR_ELx_ZEN;
-> > 
-> > I'm afraid this isn't quite right. You are clearing both FPEN (resp
-> > ZEN) bits based on any of the two bits being clear, while what we want
-> > is to actually propagate the 0 bits (and only those).
-> 
-> An earlier version of the series I had was effectively doing this,
-> applying the L0 trap configuration on top of L1's CPTR_EL2. Unless I'm
-> missing something terribly obvious, I think this is still correct, as:
-> 
->  - If we're in a hyp context, vEL2's CPTR_EL2 is loaded into CPACR_EL1.
->    The independent EL0/EL1 enable bits are handled by hardware. All this
->    junk gets skipped and we go directly to writing CPTR_EL2.
+Hi Mark,
 
-Yup.
+On Mon, Jun 3, 2024 at 4:52=E2=80=AFPM Mark Brown <broonie@kernel.org> wrot=
+e:
+>
+> On Mon, Jun 03, 2024 at 01:28:48PM +0100, Fuad Tabba wrote:
+>
+> > +static void fpsimd_sve_flush(void)
+> > +{
+> > +     *host_data_ptr(fp_owner) =3D FP_STATE_HOST_OWNED;
+> > +}
+>
+> My previous comments about this being confusing still stand.
 
-> 
->  - If we are not in a hyp context, vEL2's CPTR_EL2 gets folded into the
->    hardware value for CPTR_EL2. TGE must be 0 in this case, so there is
->    no conditional trap based on what EL the vCPU is in. There's only two
->    functional trap states at this point, hence the all-or-nothing
->    approach.
+Sorry, I missed this in my reply to v3.
 
-Ah, I see it now. Only bit[0] of each 2-bit field matters in that
-case. This thing is giving me a headache.
+This follows the convention for save/flush in hyp-main.c. Since the
+act of flushing the fpsimd/sve state is lazy, i.e., only takes place
+if the guest were to use fpsimd/sve, then the only thing that we need
+to do to flush is to mark the state as owned by the host.
 
-> 
-> > What I have in my tree is something along the lines of:
-> > 
-> > 	cptr = vcpu_sanitised_cptr_el2(vcpu);
-> > 	tmp = cptr & (CPACR_ELx_ZEN_MASK | CPACR_ELx_FPEN_MASK);
-> > 	val &= ~(tmp ^ (CPACR_ELx_ZEN_MASK | CPACR_ELx_FPEN_MASK));
-> 
-> My hesitation with this is it gives the impression that both trap bits
-> are significant, but in reality only the LSB is useful. Unless my
-> understanding is disastrously wrong, of course :)
+You suggested inlining this, but since this is static, I think the
+compiler would do that. Even though it's only one line, it maintains
+symmetry with fpsimd_sve_sync().
 
-No, you are absolutely right. Although you *are* clearing both bits
-anyway ;-).
-
-> 
-> Anyway, my _slight_ preference is towards keeping what I have if
-> possible, with a giant comment explaining the reasoning behind it. But I
-> can take your approach instead too.
-
-I think the only arguments for my own solution are:
-
-- slightly better codegen (no function call or inlining), and a
-  smaller .text section in switch.o, because the helpers are not
-  cheap:
-
-  LLVM:
-
-	0 .text         00003ef8 (guest_hyp_*_traps_enabled)
-	0 .text         00003d48 (bit ops)
-
-  GCC:
-	0 .text         00002624 (guest_hyp_*_traps_enabled)
-	0 .text         000024b4 (bit ops)
-
-
-  Yes, LLVM is an absolute pig because of BTI...
-
-- tracking the guest's bits more precisely may make it easier to debug
-
-but these are pretty weak arguments, and I don't really care either
-way at this precise moment.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Cheers,
+/fuad
