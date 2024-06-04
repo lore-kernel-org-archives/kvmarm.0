@@ -1,112 +1,141 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD45AC13B
-	for <kvmarm@lists.linux.dev>; Tue,  4 Jun 2024 14:30:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 816CE1448DE
+	for <kvmarm@lists.linux.dev>; Tue,  4 Jun 2024 15:48:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717511425; cv=none; b=Xxo+PPdm053JYuc50MoRJfCWKp3WOPs2oCWaIuGyusoxwzMkhvl7Htw2K23hdmkuV3MX6LnyxKbngEF5Oh2J4dMpa73N3tuFcCDtI8XEjhY577v95qFOKA12j0UgD9eT0VK5sHDAb3Pgw8P20iNFDsG3x3HzfUBjNMIDK8hiWsk=
+	t=1717516092; cv=none; b=aNxn0fy826kXduKO48rkbOldG3rrp3obgJS4655ZHaCL7AMq++SnJswfQARHnLYRD8idqZANY5PhOxwZGIlIQUM/LTjs3RwFS/r6hNUd9bY5bGGGAROuvdv4fbeLQWeEj88OzccgA66bM8e+j7XqZesGkK9mfRuflQGyAMUJWFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717511425; c=relaxed/simple;
-	bh=/BkCZcbI3sC5qxo/tqyOt0I23MSl6HquKpA8ewuDTSY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EW8N8H1hgupTU6hhb1UpuGIJJXM98QX3J2naCeI2EhcqXQR+5CNB4ARGSmB2+KMVAJUYdWVkgM/8IAHcV+X6oL8pALtRXZB7kQj21icZgfRZAP6qCjV/fdAEfhktT4StVpJYbq2PCYHu+trGcBf0fuBWQM8HbPeNRIiGoB3HHCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nxsMwC8b; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1717516092; c=relaxed/simple;
+	bh=9jijODcLLa4zmqRhqLOhK+fqQf2gqdWVamK0zwZspgo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kOJNjjKTJZ6UNECZFQY7X/FJn44I0vtZnVQCYABjWnyfu1W8nHmguVy0dHCN49zvwmWy31jHMVbHV70T4I3MyLZfj+y9HDo1/y93MHM9wKD7m1zl3EZ1Jwd0aG7uHPJd7k7Od5yKqcLVxEMSBcR/r3sCxCLCxRhvOT3dZQxmSgg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EPFRkgwR; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nxsMwC8b"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 820DCC4AF08;
-	Tue,  4 Jun 2024 14:30:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717511425;
-	bh=/BkCZcbI3sC5qxo/tqyOt0I23MSl6HquKpA8ewuDTSY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nxsMwC8bInaUoyrBng+Xh7hvRYfmvkJaTtUpw94o7iL2hIMsJ9gzZgsnJNA2dTj5z
-	 FT9PQ4Rot1diHYbDGN1p0kOiVcBvn1iafWCxwLfp3iH3VZkaOh0t1g7PY6UB2aBVx+
-	 +lmdHMjQMYI5n8dAmlELzTxCi3Avi+JCwXr44Ni9fTIclfy/6EBEjzjHuhdBn/urTe
-	 MMQlboSeh96WQg41hKXaLog76/wqmKeLgxZ4zXVfGGX8F0bqqKc//1xX8h5kZZoN3o
-	 ZjlzRqDHMeMLiywDMOl6Ui1TdZ8EFhiVgTPqsigqWfQLi8I3GLEh11xib0yABc5Q72
-	 jhd4WJrFw5lLg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sEVB9-000bjW-2X;
-	Tue, 04 Jun 2024 15:30:23 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Fuad Tabba <tabba@google.com>
-Cc: will@kernel.org,
-	qperret@google.com,
-	seanjc@google.com,
-	alexandru.elisei@arm.com,
-	catalin.marinas@arm.com,
-	philmd@linaro.org,
-	james.morse@arm.com,
-	suzuki.poulose@arm.com,
-	oliver.upton@linux.dev,
-	mark.rutland@arm.com,
-	broonie@kernel.org,
-	joey.gouly@arm.com,
-	rananta@google.com,
-	yuzenghui@huawei.com
-Subject: Re: [PATCH v4 0/9] KVM: arm64: Fix handling of host fpsimd/sve state in protected mode
-Date: Tue,  4 Jun 2024 15:30:19 +0100
-Message-Id: <171751080453.266083.3919022563197793184.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240603122852.3923848-1-tabba@google.com>
-References: <20240603122852.3923848-1-tabba@google.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EPFRkgwR"
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-57a68b0a229so2396881a12.3
+        for <kvmarm@lists.linux.dev>; Tue, 04 Jun 2024 08:48:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1717516088; x=1718120888; darn=lists.linux.dev;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=VI9QUYhV/KkiBFZad3q1F1Q6NWjZ0fGxKdlSAnXosBY=;
+        b=EPFRkgwRa0suqmdTTQtG+VRYGPsydOnfe1ymcXV4IpD1ljimd8GJ//bvomGI53b0r4
+         kI5aCfhRTzBzA6/xnsBFl8AlLpWDaBc31X1X9mdeyNLIgBox6UkKuIPIPgoG0xxLBJa9
+         JBRvRPzWUM5GM32LgAtH5xVsmiyzlRVysu97dPJA4uj0qhVvf7F6STlW5NlMA1M2Aokz
+         g9jl+VKzCbV3UamyjlAp9mQ15fPI5/sYcC+PMxowt3puoasvulow6QkA3u/9R92lu3qw
+         gxGfGxDz7GkKtF5yDLXDDx9iw9ZTDBiQoVNOIg9Hu1DUwAOJstMha2gS69Nh80/y3bmP
+         7eRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717516088; x=1718120888;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VI9QUYhV/KkiBFZad3q1F1Q6NWjZ0fGxKdlSAnXosBY=;
+        b=NmBDtkVUr3IfcKGtgpGPiziJKNft31tcMgEa9TpSt1quL8K9yXM7YoxA14/Z+mV4nb
+         zeB958CF9XeCzZtdjQVfId/jcHPBdvSXtw8+T4sAwfqcWPyxd47jys7E6QXwelhS4ARj
+         oayIDov91kRu2By8BCLoXhLe5gO0lSPfXPcrm78LenPhRVspegsE19G0iJO2WFRRiBCW
+         dwmEMiQkHWxcQzqoYLsxpSdmn/CIhrF2tE4MsaatK9V0mhc8c0D1Pe1w4/Pql/Gyafeh
+         uj6O0Zo6I2NpnnK+rdSbDh0V82eNGMvSJGRmis5Ee+6mAl7A1v9wJC7GAODe1pbDcNgU
+         CmlA==
+X-Gm-Message-State: AOJu0Yy3Em87/N2V+6RGRjQj+KT2xPFCmY9j2nd+2atyy3StB1VTwEEL
+	c/zBKfW8xYtjICSJSKX2kN+JStgPP//yBPoPwbPQUjvrvYCS+MPh60A8jbO4e0C5Ym+ymP5U07Q
+	CWzZn
+X-Google-Smtp-Source: AGHT+IFcdEOYIUvsNwOkrvSmA4o8vKrkPn2u1Z8aKrnP0GmKz+XZvtUMn7cgz/gxbmln8PCFDViBGA==
+X-Received: by 2002:a50:a455:0:b0:578:6c3e:3b8f with SMTP id 4fb4d7f45d1cf-57a8b67c37fmr23084a12.2.1717516087560;
+        Tue, 04 Jun 2024 08:48:07 -0700 (PDT)
+Received: from google.com (64.227.90.34.bc.googleusercontent.com. [34.90.227.64])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57a31be52b5sm7673564a12.49.2024.06.04.08.48.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Jun 2024 08:48:06 -0700 (PDT)
+Date: Tue, 4 Jun 2024 16:48:02 +0100
+From: =?utf-8?Q?Pierre-Cl=C3=A9ment?= Tosi <ptosi@google.com>
+To: Will Deacon <will@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Vincent Donnefort <vdonnefort@google.com>
+Subject: Re: [PATCH v4 03/13] KVM: arm64: nVHE: Simplify __guest_exit_panic
+ path
+Message-ID: <qob5gnca2nte4ggkrnn4uil5mfbkz3p55lmk3egpxstnumixfr@lq7xomrhf6za>
+References: <20240529121251.1993135-1-ptosi@google.com>
+ <20240529121251.1993135-4-ptosi@google.com>
+ <20240603143030.GD19151@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, tabba@google.com, will@kernel.org, qperret@google.com, seanjc@google.com, alexandru.elisei@arm.com, catalin.marinas@arm.com, philmd@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, mark.rutland@arm.com, broonie@kernel.org, joey.gouly@arm.com, rananta@google.com, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+In-Reply-To: <20240603143030.GD19151@willie-the-truck>
 
-On Mon, 03 Jun 2024 13:28:42 +0100, Fuad Tabba wrote:
-> Changes since v3 [1]:
-> - Rebased on Linux 6.10-rc2 (c3f38fa61af7)
-> - Dropped v3 patches 8--11 (Oliver)
-> - Removed unnecessary isb()s (Oliver)
-> - Formatting/comments (Mark)
-> - Fix __sve_save_state()/__sve_restore_state() prototypes (Mark)
-> - Save/restore ffr with the sve state
-> - Added a patch that checks at hyp that SME features aren't
-> enabled on guest entry, to ensure it's not in streaming mode
+Hi Will,
+
+Thanks for the review; I will make sure to Cc you on v5, with your Acked-by.
+
+On Mon, Jun 03, 2024 at 03:30:30PM +0100, Will Deacon wrote:
+> On Wed, May 29, 2024 at 01:12:09PM +0100, Pierre-Clément Tosi wrote:
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
+> > index 135cfb294ee5..71fb311b4c0e 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/host.S
+> > +++ b/arch/arm64/kvm/hyp/nvhe/host.S
+> > @@ -197,18 +197,13 @@ SYM_FUNC_END(__host_hvc)
+> >  	sub	x0, sp, x0			// x0'' = sp' - x0' = (sp + x0) - sp = x0
+> >  	sub	sp, sp, x0			// sp'' = sp' - x0 = (sp + x0) - x0 = sp
+> >  
+> > -	/* If a guest is loaded, panic out of it. */
+> > -	stp	x0, x1, [sp, #-16]!
+> > -	get_loaded_vcpu x0, x1
+> > -	cbnz	x0, __guest_exit_panic
+> > -	add	sp, sp, #16
 > 
-> [...]
+> I think this is actually dead code and we should just remove it. AFAICT,
+> invalid_host_el2_vect is only used for the host vectors and the loaded
+> vCPU will always be NULL, so this is pointless. set_loaded_vcpu() is
+> only called by the low-level guest entry/exit code and with the guest
+> EL2 vectors installed.
 
-Applied to fixes, thanks!
+This is correct.
 
-[1/9] KVM: arm64: Reintroduce __sve_save_state
-      commit: 87bb39ed40bdf1596b8820e800226e24eb642677
-[2/9] KVM: arm64: Fix prototype for __sve_save_state/__sve_restore_state
-      commit: 45f4ea9bcfe909b3461059990b1e232e55dde809
-[3/9] KVM: arm64: Abstract set/clear of CPTR_EL2 bits behind helper
-      commit: 6d8fb3cbf7e06431a607c30c1bc4cd53a62c220a
-[4/9] KVM: arm64: Specialize handling of host fpsimd state on trap
-      commit: e511e08a9f496948b13aac50610f2d17335f56c3
-[5/9] KVM: arm64: Allocate memory mapped at hyp for host sve state in pKVM
-      commit: 66d5b53e20a6e00b7ce3b652a3e2db967f7b33d0
-[6/9] KVM: arm64: Eagerly restore host fpsimd/sve state in pKVM
-      commit: b5b9955617bc0b41546f2fa7c3dbcc048b43dc82
-[7/9] KVM: arm64: Consolidate initializing the host data's fpsimd_state/sve in pKVM
-      commit: 1696fc2174dbab12228ea9ec4c213d6aeea348f8
-[8/9] KVM: arm64: Refactor CPACR trap bit setting/clearing to use ELx format
-      commit: a69283ae1db8dd416870d931caa9e2d3d2c1cd8b
-[9/9] KVM: arm64: Ensure that SME controls are disabled in protected mode
-      commit: afb91f5f8ad7af172d993a34fde1947892408f53
+> > -
+> >  	/*
+> >  	 * The panic may not be clean if the exception is taken before the host
+> >  	 * context has been saved by __host_exit or after the hyp context has
+> >  	 * been partially clobbered by __host_enter.
+> >  	 */
+> > -	b	hyp_panic
+> > +	stp	x0, x1, [sp, #-16]!
+> > +	b	__guest_exit_panic
+> 
+> In which case, this should just be:
+> 
+> 	add	sp, sp, #16
+> 	b	hyp_panic
+> 
+> Did I miss something?
 
-Cheers,
+Jumping to hyp_panic directly makes sense.
 
-	M.
--- 
-Without deviation from the norm, progress is not possible.
+However, this patch keeps jumping to __guest_exit_panic() to prepare for the
+kCFI changes as having a single point where all handlers (from various vectors)
+panicking from assembly end up before branching to C turns out to be very
+convenient for hooking in the kCFI handler (e.g.  when saving the registers, to
+be parsed from C). I also didn't want to modify the same code twice in the
+series and found it easier to limit the scope of this commit to a minimum by
+following the existing code and keeping the same branch target.
 
+With this in mind, please confirm if you still prefer this fix to jump to
+hyp_panic directly (knowing the branch will be modified again in the series).
 
+Also, I don't get why the 'add sp, sp, #16' is needed; what is it undoing?
+
+Thanks,
+
+Pierre
