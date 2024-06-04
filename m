@@ -1,120 +1,141 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 755E717C96;
-	Tue,  4 Jun 2024 20:42:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D70FC146599
+	for <kvmarm@lists.linux.dev>; Tue,  4 Jun 2024 22:20:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717533757; cv=none; b=n/ebQ5E5Mau9bzSfr3esnRfro+PWm9JBB9QltVHY03M2cVF4cSh8FX9cU3Rnz16hhfQx1oj84bxi8qZz8h9SxwGhdHtYLKLNRZ//kp1xxj5nhNVI88+/L4szJ13gJql+oUkgJECfWVcrmmaB3cXvhbN2hlnuCTQ4chN115JOzwU=
+	t=1717539659; cv=none; b=YYP1xMZ5hNz3a5rYkJW3ARGg3tBdMfdWfxnsGDpzWPpOCYKUo1FCSO8e3AeR2AXaf+z2POOKpaMeJVW7kc834Uq0mw6KR+gYZzQ2a2/tie0/a0ygCb1v6IW78UvGdq+Kwimftwl6fV18J8MbXfPwa9MJncPUitauKb7You/5LTE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717533757; c=relaxed/simple;
-	bh=uQLOOzbWqSKTADuADTiMo4MekQ86BWWGFWy1aSoS7xQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Yr0bD/FfU6jjjjdROtDYe3TBYG17JQ+c6p7isdwRWPmRe8L+8751C+Zj3VBF/jNhASsud1W9CfGHMpy4eO2AtRvP4DtmnyQKmypO1RGk9/uoGzOZQMK83vjJE4wzOEAeYeQn2Eo3u/PfN5MUYDY+GYjxoBj78h8/R0Ae/oowJhQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OYUkD4Us; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1717539659; c=relaxed/simple;
+	bh=PEwtsHuB5I4aiO3jiKouMVnFQZ+bv8RQ/fbI3oGiDcE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=N/S56oATL2Nqahp1ACSeQC/x6C8zFh5BCCzGnt3aEj4BgvUKwfmP91DuKsg9BanonWfL+kZo5trzBuLVOOe9PNAmuOg1iDmR3hqyeTqI1IUl0d6eZk5/4fVWmXIjPuq5yHT7NrcqwNqDeWDkt+CZ0fNx12oxfc3Bp820xPFBnEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pUeRih3D; arc=none smtp.client-ip=209.85.160.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OYUkD4Us"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA435C2BBFC;
-	Tue,  4 Jun 2024 20:42:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717533757;
-	bh=uQLOOzbWqSKTADuADTiMo4MekQ86BWWGFWy1aSoS7xQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OYUkD4Usqn60C9R0lp44HfgE+h1mDo/yoEBsBIJcUlLvoY5rom3AxalWO2O5Eqo5Z
-	 5ZJnN4EKNnZvEklMlJhgclPLHS4aGSSJJAE/U6sNUUG0CYnaO+P7pqeHAuPHhZhEwx
-	 nCeZepAhMjTgd5a3yBV7XYXk9R3U02rzSm90Q2QSdKmb0Ls4HocmtluAF/AEjbdRR/
-	 zwWif3NWxk+ZQMRLo0YZgWblL/TBYEbbU23hT1AyeBOcYKGY/SEVp8wuwln5udszDN
-	 8z+Z/jZJuA4ndvxwPaBuhcqvn3QtWBNreVmC9gtC2cAd2x/QB8AI9vvC94Q7BFEXyX
-	 YbAoTwaE8h/Vw==
-Date: Tue, 4 Jun 2024 21:42:31 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: Fix confusion in documentation for pKVM SME
- assert
-Message-ID: <97fab321-21fb-40cd-b90e-daf42b5db62e@sirena.org.uk>
-References: <20240604-kvm-arm64-sme-assert-v1-1-5d98348d00f8@kernel.org>
- <Zl9oVUriFDYbLFW8@linux.dev>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pUeRih3D"
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-43dfe020675so137831cf.0
+        for <kvmarm@lists.linux.dev>; Tue, 04 Jun 2024 15:20:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1717539657; x=1718144457; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AIBmj4SOCWbNZTcEJ36wTOG253WABX8+/zZKq57PG38=;
+        b=pUeRih3Dq96NUD3SN3NFXdePi2ewzeFynOBQ6nl/PngZizGXspPYpOCVBgZTqATIQ2
+         8LxjCCyN2CpGgv9z9jTjygzLkm14pvfFkBESV9iAE1IByPdzrwyHIPE1sp7LW0ZTsK6R
+         Gl1hfy46BicfgRi2xsdyMMJGQjqD9wJOvc92xN+qry/yNpk9H8qbvR+d/m8+ftS+2GQd
+         IGEQww+otlqf4TTqX/MgYvSA7LSdVfvs87k1t5ftRRFtVRwZduPiD8MAjh3RSf+gMn1P
+         XHY7vkU3hherzPDtgPDzBHtbO2JADPi2O2dplEkLndHskhIICxiOS48s9lHDqVdE1NVR
+         jH1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717539657; x=1718144457;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AIBmj4SOCWbNZTcEJ36wTOG253WABX8+/zZKq57PG38=;
+        b=ZbEo5TGbXCPCnjT4tXbU0vOtX4eAbzpKjqkYbykPOkdYBMUDa8ViNYa9JXPE8Qvvdi
+         7sk2sMdYgVl7IaHBU9jlK27eruA3lMgF3by+XOpzYkmG2K+ZreLlfEJya8fMKbojEKeA
+         apDp1VOliO8MmkJ5+enQRjilQug3+qTbBR1nsaDQOe7C8xvBfVInefs1lQ4GDeWMYY1k
+         4WT1CFWKlmx3QO42VOHYBTFfIGmSbbeQ7VtGuknJ2w328kcwaGafaH/DWbOlBeqKg95u
+         tPbHDIerzJfi7PmfeTpvEWGPVBfldpvrrSlANdSauBcA+M/E5ftB8PXcGCpjm7v+vBN7
+         nesQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXfiDM6UQFMXgkQfYBBE6Vrh87uLafZ+QkbroPv9Nptib/CaweYUdVb4Y7+o4zIzBxKYdhtWbg9NM88bI5q9WgZaEuxCbd+
+X-Gm-Message-State: AOJu0Yy0IStE4wXaObUq1zg45/7Jm9jwhANHd+UZRAeJkmwkwuWneb96
+	0mqNHR5APNpOB+um4o7eBkPoDBZsXKTRE51IxsWMg76PEN2OQUKRufuETzhiJ8hVG1+5MX21QYS
+	ZNllz7qVaMo7Lz2/OlARe12d2SvBNTzybj4k6
+X-Google-Smtp-Source: AGHT+IFqQR6wV0ldEWSB61hJVaO5R3FbfhfGJ/jL2Y1RO1QFt4uPcpp04yR87XJA3WIv/pXl4si2o71lLJw9aUuCxfc=
+X-Received: by 2002:a05:622a:5a98:b0:43d:dc3b:518c with SMTP id
+ d75a77b69052e-4402ce13c55mr332451cf.11.1717539656344; Tue, 04 Jun 2024
+ 15:20:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="OssUhU3cRSMRch4o"
-Content-Disposition: inline
-In-Reply-To: <Zl9oVUriFDYbLFW8@linux.dev>
-X-Cookie: Is it clean in other dimensions?
+References: <20240529180510.2295118-1-jthoughton@google.com>
+ <20240529180510.2295118-7-jthoughton@google.com> <Zlog5Yk_Pjq0jQhC@linux.dev> <Zloicw4IU8_-V5Ns@linux.dev>
+In-Reply-To: <Zloicw4IU8_-V5Ns@linux.dev>
+From: James Houghton <jthoughton@google.com>
+Date: Tue, 4 Jun 2024 15:20:20 -0700
+Message-ID: <CADrL8HV4SZ9BEQg1j3ojG-v5umL_d3sa4e1k2vMQCMmBEgeFpQ@mail.gmail.com>
+Subject: Re: [PATCH v4 6/7] KVM: arm64: Relax locking for kvm_test_age_gfn and kvm_age_gfn
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Ankit Agrawal <ankita@nvidia.com>, 
+	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
+	Axel Rasmussen <axelrasmussen@google.com>, Bibo Mao <maobibo@loongson.cn>, 
+	Catalin Marinas <catalin.marinas@arm.com>, David Matlack <dmatlack@google.com>, 
+	David Rientjes <rientjes@google.com>, Huacai Chen <chenhuacai@kernel.org>, 
+	James Morse <james.morse@arm.com>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Raghavendra Rao Ananta <rananta@google.com>, Ryan Roberts <ryan.roberts@arm.com>, 
+	Sean Christopherson <seanjc@google.com>, Shaoqin Huang <shahuang@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
+	Will Deacon <will@kernel.org>, Yu Zhao <yuzhao@google.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-mips@vger.kernel.org, linux-mm@kvack.org, 
+	linux-riscv@lists.infradead.org, linuxppc-dev@lists.ozlabs.org, 
+	loongarch@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, May 31, 2024 at 12:18=E2=80=AFPM Oliver Upton <oliver.upton@linux.d=
+ev> wrote:
+>
+> On Fri, May 31, 2024 at 12:11:33PM -0700, Oliver Upton wrote:
+> > On Wed, May 29, 2024 at 06:05:09PM +0000, James Houghton wrote:
+> >
+> > [...]
+> >
+> > > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtabl=
+e.c
+> > > index 9e2bbee77491..eabb07c66a07 100644
+> > > --- a/arch/arm64/kvm/hyp/pgtable.c
+> > > +++ b/arch/arm64/kvm/hyp/pgtable.c
+> > > @@ -1319,10 +1319,8 @@ static int stage2_age_walker(const struct kvm_=
+pgtable_visit_ctx *ctx,
+> > >     data->young =3D true;
+> > >
+> > >     /*
+> > > -    * stage2_age_walker() is always called while holding the MMU loc=
+k for
+> > > -    * write, so this will always succeed. Nonetheless, this delibera=
+tely
+> > > -    * follows the race detection pattern of the other stage-2 walker=
+s in
+> > > -    * case the locking mechanics of the MMU notifiers is ever change=
+d.
+> > > +    * This walk may not be exclusive; the PTE is permitted to change
+> > > +    * from under us.
+> > >      */
+> > >     if (data->mkold && !stage2_try_set_pte(ctx, new))
+> > >             return -EAGAIN;
+> >
+> > It is probably worth mentioning that if there was a race to update the
+> > PTE then the GFN is most likely young, so failing to clear AF probably
+> > isn't even consequential.
 
---OssUhU3cRSMRch4o
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Thanks Oliver.
 
-On Tue, Jun 04, 2024 at 12:17:41PM -0700, Oliver Upton wrote:
-> On Tue, Jun 04, 2024 at 07:47:01PM +0100, Mark Brown wrote:
+>
+> Oh, and the WARN_ON() in kvm_pgtable_stage2_test_clear_young() is bogus
+> now. Maybe demote it to:
+>
+>   r =3D kvm_pgtable_walk(...);
+>   WARN_ON_ONCE(r && r !=3D -EAGAIN);
 
-> > As raised in the review comments for the original patch the assert and
-> > comment added in afb91f5f8ad7 ("KVM: arm64: Ensure that SME controls are
-> > disabled in protected mode") are bogus. The comments says that we check
-> > that we do not have SME enabled for a pKVM guest but the assert actually
-> > checks to see if the host has anything set in SVCR which is unrelated to
-> > the guest features or state, regardless of if those guests are protected
-> > or not.
+Oh, indeed, thank you. Just to make sure -- does it make sense to
+retry the cmpxchg if it fails? For example, the way I have it now for
+x86[1], we retry the cmpxchg if the spte is still a leaf, otherwise we
+move on to the next one having done nothing. Does something like that
+make sense for arm64?
 
-> > What I believe the check is actually intended to validate is that we do
-> > not enter the pKVM hypervisor with SME enabled since the pKVM hypervisor
-> > does not yet understand SME and is therefore unable to save or restore
-> > host state with SME enabled, indeed attempting to save SVE state would
-> > fault if streaming mode is enabled on a system without FA64 due to FFR.
-> > Update the comment to reflect this.
-
-> The added context likely isn't necessary in what winds up getting
-> applied. Can this just directly state the WARN_ON() exists b/c the
-> protected mode hypervisor doesn't know how to manage SME state?
-
-It could definitely be briefer, I was being super detailed because I was
-guessing between the intent being what the comment says or what the code
-says, or if we want an assert here at all for that matter.  It seemed
-better to be verbose.
-
-> >  	WARN_ON(is_protected_kvm_enabled() && system_supports_sme() &&
-> >  		read_sysreg_s(SYS_SVCR));
-
-> While we're here, this should be WARN_ON_ONCE() or WARN_RATELIMIT() if
-> we _really_ want some spam. But a single WARN ought to be enough.
-
-Good point, and I agree that WARN_ON_ONCE is the better option.
-
-> It'd be a good idea to also document why we're testing for SME state
-> twice on the KVM_RUN path, as any WARN() in the hyp code is currently
-> fatal. I'm guessing Fuad meant to have a non-fatal way of getting some
-> debug information out.
-
-Yes, this was one of the reasons I was unclear if the check or the
-comment was the intention.  Possibly it's due to getting much better
-diagnostics for a warning generated in the host kernel than an error
-returned from the hypervisor when we try to run the guest?
-
---OssUhU3cRSMRch4o
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmZffDcACgkQJNaLcl1U
-h9DSkQf8CCVg3xupmEhXxr52ob2JwQvQsUfHWim7KvttAq/EtITOJlK3tovzZyv1
-cIVLi8HGI0tgfLFUL5GEXj14V47etBLAWBJrMJWYTS6830EWjAr5nPKk3tMkDlke
-9PpdWP4rKZcpD1G6Lw4MUobCOE1tkrLq9AI/y9ZNidpF9iGkB0+gr2NZWZk0uikR
-hoZ06Dr3pNLzFVzBBehURrPVvWIk1ZaZnCQX/XlKrpAItMEiaNn1rNnStzC6hzbe
-K0ap59Tu6icxcgRHjzAVTU8eRKhKa2+0pT95RFZWaJFfFnpkgeUvq61shLeV18Mo
-ICb6001h8LqRoHRV44uEYU9fudLyag==
-=r54Z
------END PGP SIGNATURE-----
-
---OssUhU3cRSMRch4o--
+[1]: https://lore.kernel.org/linux-mm/20240529180510.2295118-6-jthoughton@g=
+oogle.com/
