@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B606146012
-	for <kvmarm@lists.linux.dev>; Tue,  4 Jun 2024 13:05:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 503C7146019
+	for <kvmarm@lists.linux.dev>; Tue,  4 Jun 2024 13:06:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717506360; cv=none; b=dSsopbBlzqrjjcrsgKM7YIk1qEmfheTKazViCH9AcLyFPjKBdUvo2E1G/fuId7+qZRfH8Ol1Z+p3At034F7khRQaW2RZTC8lBtpkSQ9NdXml4soiG8Ri+BP+IX8LSC8eoaha50pigad5BFe74h1bKUelo5PxszwHIhjA6ww2KdE=
+	t=1717506360; cv=none; b=KprOxnJ9kINaNsFeDXEAL0FbstUVYeYn1+AtyGVerjlXYpTyNthzPOJwQc2FfBtmjqiHfYyqMQzlujmOdP+mjsLpDEvvVeh6+dPMxMzWlnmceTIh+0PGkcHwARah6rrknwZXcwXPmEHZE6H/aMS7NiUSTw0EF7lmtz+nFP3kOIw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1717506360; c=relaxed/simple;
-	bh=W4XtQbfKfPiW8qFhBjSSzdUa5W+6VR/bSx7605s9t/k=;
+	bh=dO+XJF3nG67IaCEKh9GyqHtcBuKo4Q0opdhUqxQxqTw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Ks/LqWFOaw3GuhdsZB1U4msbsj6FANgOOCoA5Xb7FG9pu4pBJY8xftmaCNal1oiTJWLeT/cwV6VCQxqDRVpFqemFJcCaXFcmCiiOr26hbQXloywHttQo++YQKqK+3pSp+cHhEn7dYYo8EeaKeenbMybKl4oDTm4OfCtLc2XJw2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=roM4mJEn; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=sDwZNG4lZBBVVmfjdV5kHJ41lF10vDRGPFMPEdnO+/OsXeMWP61CB+UH1dDy+YQVfZUWi4iq7WXHUfK1tkdYObLZnJKrqo3T/HLakhAetZdYX+xtjHa991wiffEOBvRILx4DB1F2kkdhA7lFvpbZWqxzuvVHKG95f8KruJdjKyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UrbEAVI+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="roM4mJEn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2E5CC3277B;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UrbEAVI+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC6A7C4AF09;
 	Tue,  4 Jun 2024 13:05:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1717506359;
-	bh=W4XtQbfKfPiW8qFhBjSSzdUa5W+6VR/bSx7605s9t/k=;
+	bh=dO+XJF3nG67IaCEKh9GyqHtcBuKo4Q0opdhUqxQxqTw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=roM4mJEnLK8KlmFzS2WdPUl6U74GyJJPZa4siHn8vKobsMun3PMTGOVimVRyVSCbD
-	 tBdZvNBDjlanrnChiIdg+JIHpPZJr1TZjIIgN4loyu2/1O+plErxcnuHHPq8ziQTSa
-	 cWNYFkGd5gyEAty8rE3xaISHl/Sc39CB/GTc/4rvUwtDUQxOOMvql3ErJ9aNyRF7ie
-	 e83EZ71LfubI32VY1hw9r1g90o5JVTrFjU/OzyGnNcFdCkxm6NqpMtUOtpKvIUhEmC
-	 EwjxJlMdyJnAxx4nidl4rFCvMl6rBjYxptwKoNGXH1WV5UKwcb69pEEQq9nuPcebDm
-	 S33D8hKkkw2fA==
+	b=UrbEAVI+riz8pCuwSQlERH90z54PEMkp1QGJouQR7aVT70prddRrRa6p8OHoKUt8p
+	 L1KHvLZEgml6UybMWz2ibI2aSnjX4NCRTD6hDe1+CrCFYQ4ucN6DveQgsq38Ft0U4f
+	 6DrCS44Wh95eAuI3ozC6Xf6vq1UygXgdHqrXVosXGIOVmCggEKs4Zw79SSDzlDpBFO
+	 aDYPp1jzjQdgaP1haAPvJcnqFIIB9zxKhUscJFaauLgKbADQdt7KXqTDV3dxGHB2+f
+	 YeFMMC3mpv/eP5KzZ/9bwudXUBttos/8oGSbfHVhICa/m5+vIU/CpCMX2KojnBMXiq
+	 LMrwy9DDqrsAQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sETrS-000ZSS-3k;
+	id 1sETrR-000ZSS-UM;
 	Tue, 04 Jun 2024 14:05:58 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -40,9 +40,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Joey Gouly <joey.gouly@arm.com>
-Subject: [PATCH 4/4] KVM: arm64: nv: Handle CPACR_EL1 traps
-Date: Tue,  4 Jun 2024 14:05:53 +0100
-Message-Id: <20240604130553.199981-5-maz@kernel.org>
+Subject: [PATCH 3/4] KVM: arm64: nv: Add additional trap setup for CPTR_EL2
+Date: Tue,  4 Jun 2024 14:05:52 +0100
+Message-Id: <20240604130553.199981-4-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240604130553.199981-1-maz@kernel.org>
 References: <20240604130553.199981-1-maz@kernel.org>
@@ -58,72 +58,92 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Handle CPACR_EL1 accesses when running a VHE guest. In order to
-limit the cost of the emulation, implement it ass a shallow exit.
+We need to teach KVM a couple of new tricks. CPTR_EL2 and its
+VHE accessor CPACR_EL1 need to be handled specially:
 
-In the other cases:
+- CPACR_EL1 is trapped on VHE so that we can track the TCPAC
+  and TTA bits
 
-- this is a nVHE L1 which will write to memory, and we don't trap
+- CPTR_EL2.{TCPAC,E0POE} are propagated from L1 to L2
 
-- this is a L2 guest:
+As a consequence of CPTR_EL2 being always trapped, we update
+vcpu_sanitised_cptr_el2() so that it doesn't try to read from
+the CPU registers, but from the shadow copy (ensuring that we
+always have up-to-date TCPAC and TTA bits).
 
-  * the L1 has CPTR_EL2.TCPAC==0, and the L2 has direct register
-   access
-
-  * the L1 has CPTR_EL2.TCPAC==1, and the L2 will trap, but the
-    handling is defered to the general handling for forwarding
+This helper will also be used when handling the CPTR_EL1 trap.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/vhe/switch.c | 32 +++++++++++++++++++++++++++++++-
- 1 file changed, 31 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_emulate.h |  2 +-
+ arch/arm64/kvm/hyp/vhe/switch.c      | 23 ++++++++++++++++++++++-
+ 2 files changed, 23 insertions(+), 2 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index e86de04ba1c4..cc5c93b46e6f 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -607,7 +607,7 @@ static __always_inline void kvm_reset_cptr_el2(struct kvm_vcpu *vcpu)
+  */
+ static inline u64 vcpu_sanitised_cptr_el2(const struct kvm_vcpu *vcpu)
+ {
+-	u64 cptr = vcpu_read_sys_reg(vcpu, CPTR_EL2);
++	u64 cptr = __vcpu_sys_reg(vcpu, CPTR_EL2);
+ 
+ 	if (!vcpu_el2_e2h_is_set(vcpu))
+ 		cptr = translate_cptr_el2_to_cpacr_el1(cptr);
 diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index b4ba236526d6..c1711f2b92b8 100644
+index d07b4f4be5e5..b4ba236526d6 100644
 --- a/arch/arm64/kvm/hyp/vhe/switch.c
 +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -295,10 +295,40 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
- 	return true;
- }
+@@ -67,6 +67,8 @@ static u64 __compute_hcr(struct kvm_vcpu *vcpu)
  
-+static bool kvm_hyp_handle_cpacr_el1(struct kvm_vcpu *vcpu, u64 *exit_code)
-+{
-+	u64 esr = kvm_vcpu_get_esr(vcpu);
-+	int rt;
+ static void __activate_cptr_traps(struct kvm_vcpu *vcpu)
+ {
++	u64 cptr;
 +
-+	if (!is_hyp_ctxt(vcpu) || esr_sys64_to_sysreg(esr) != SYS_CPACR_EL1)
-+		return false;
+ 	/*
+ 	 * With VHE (HCR.E2H == 1), accesses to CPACR_EL1 are routed to
+ 	 * CPTR_EL2. In general, CPACR_EL1 has the same layout as CPTR_EL2,
+@@ -85,11 +87,23 @@ static void __activate_cptr_traps(struct kvm_vcpu *vcpu)
+ 		__activate_traps_fpsimd32(vcpu);
+ 	}
+ 
++	if (!vcpu_has_nv(vcpu))
++		goto write;
 +
-+	rt = kvm_vcpu_sys_get_rt(vcpu);
++	/*
++	 * The architecture is a bit crap (what a surprise): an EL2 guest
++	 * writing to CPTR_EL2 via CPACR_EL1 can't set any of TCPAC or TTA,
++	 * as they are RES0 in the guest's view. To work around it, trap the
++	 * sucker using the very same bit it can't set...
++	 */
++	if (vcpu_el2_e2h_is_set(vcpu) && is_hyp_ctxt(vcpu))
++		val |= CPTR_EL2_TCPAC;
 +
-+	if ((esr & ESR_ELx_SYS64_ISS_DIR_MASK) == ESR_ELx_SYS64_ISS_DIR_READ) {
-+		vcpu_set_reg(vcpu, rt, __vcpu_sys_reg(vcpu, CPTR_EL2));
-+	} else {
-+		vcpu_write_sys_reg(vcpu, vcpu_get_reg(vcpu, rt), CPTR_EL2);
-+		__activate_cptr_traps(vcpu);
-+	}
+ 	/*
+ 	 * Layer the guest hypervisor's trap configuration on top of our own if
+ 	 * we're in a nested context.
+ 	 */
+-	if (!vcpu_has_nv(vcpu) || is_hyp_ctxt(vcpu))
++	if (is_hyp_ctxt(vcpu))
+ 		goto write;
+ 
+ 	if (guest_hyp_fpsimd_traps_enabled(vcpu))
+@@ -97,6 +111,13 @@ static void __activate_cptr_traps(struct kvm_vcpu *vcpu)
+ 	if (guest_hyp_sve_traps_enabled(vcpu))
+ 		val &= ~CPACR_ELx_ZEN;
+ 
++	cptr = vcpu_sanitised_cptr_el2(vcpu);
 +
-+	__kvm_skip_instr(vcpu);
++	if (kvm_has_feat(vcpu->kvm, ID_AA64MMFR3_EL1, S2POE, IMP))
++		val |= cptr & CPACR_ELx_E0POE;
 +
-+	return true;
-+}
++	val |= cptr & CPTR_EL2_TCPAC;
 +
-+static bool kvm_hyp_handle_sysreg_vhe(struct kvm_vcpu *vcpu, u64 *exit_code)
-+{
-+	if (kvm_hyp_handle_cpacr_el1(vcpu, exit_code))
-+		return true;
-+
-+	return kvm_hyp_handle_sysreg(vcpu, exit_code);
-+}
-+
- static const exit_handler_fn hyp_exit_handlers[] = {
- 	[0 ... ESR_ELx_EC_MAX]		= NULL,
- 	[ESR_ELx_EC_CP15_32]		= kvm_hyp_handle_cp15_32,
--	[ESR_ELx_EC_SYS64]		= kvm_hyp_handle_sysreg,
-+	[ESR_ELx_EC_SYS64]		= kvm_hyp_handle_sysreg_vhe,
- 	[ESR_ELx_EC_SVE]		= kvm_hyp_handle_fpsimd,
- 	[ESR_ELx_EC_FP_ASIMD]		= kvm_hyp_handle_fpsimd,
- 	[ESR_ELx_EC_IABT_LOW]		= kvm_hyp_handle_iabt_low,
+ write:
+ 	write_sysreg(val, cpacr_el1);
+ }
 -- 
 2.39.2
 
