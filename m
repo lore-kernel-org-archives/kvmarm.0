@@ -1,126 +1,98 @@
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8700663E
-	for <kvmarm@lists.linux.dev>; Tue,  4 Jun 2024 16:06:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2C9514A0A2
+	for <kvmarm@lists.linux.dev>; Tue,  4 Jun 2024 17:44:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717517168; cv=none; b=Rh8xDDIK5dTB+c29XToK3iYjXmzm3TytCR0bLflWGu9Njkk8FEoVD7pFrosFrTMQXDHJMuhK3HrIMGMhn7mdZ2ziFnyj0CyaKknck/ZBr6yf0zjXkcy6vjKXpY2OxS+4SO/Wt4qO6Y/0645CEIKUWp49Shpux+Zbnliq8K1U9cA=
+	t=1717523068; cv=none; b=WBPphxM4agHQ0/W5jsDP4GfEoBXClgbf7F9pfyyrYNITf+e5sTJfCRXl8LRRX/9V32HFXG7FJ1KAt3e4pqcipj7KhQFWkHg3yKdPG7Zr97UzCDsi0tTO2Qi/fzulyLf3K/yGpRl2XAMXTuid2JWdEXNtYunkNdnnUg0c3152r/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717517168; c=relaxed/simple;
-	bh=hM/TP5fuBd2nzlsu3f+H7WQfS62CCwe8Vjt+N5ynidE=;
+	s=arc-20240116; t=1717523068; c=relaxed/simple;
+	bh=jM4mSqy+AI9HpHGZsruR5Kt2mKRgsssuL884tWH9nbo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UB3nnGXd5+fRl6H6tL9uldE2o0/nF8cqSVpdBkmHqVYJPaOZy2Pt2XZd8ml+bNF6W5Xr+qKMsB0D3N8zSTnCaV4CRgcdh5jna4oRsCq7If1Vl9rdEr2M5gyPiZsmnSkYB5MayTTkKJW2vtmqFNm31Vqf7sffcgu9GfVIGVbFwes=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GY6JsTXR; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=FuB8X0f/+y3CA7Agjb1rytmsPpzL5JK8W3Q3LTaYLBUqVe7kNIHvLOOE89bjvDguD8M+g6DJFBAgP/bupxYsUQogozQwj2M/KhIrc5pCl1kPj8QU49UeCnfSAuNza0mA4QzagT9Xd7C231Rw9E/ObyV8oQwmjk6i9rqqmnzKs8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=B4OW+KRt; arc=none smtp.client-ip=91.218.175.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GY6JsTXR"
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-57a5bcfb2d3so1309053a12.3
-        for <kvmarm@lists.linux.dev>; Tue, 04 Jun 2024 09:06:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717517165; x=1718121965; darn=lists.linux.dev;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=O5VQrFzKXcacSK2dpPQ1zSM+Xmxoug7aPj+YM5MTTIM=;
-        b=GY6JsTXR0Q464q80uO2WdLnKnK5lSXXAHH8Q7rTcwhKiRQy2CC6hCzX54K2BhzZUTi
-         +J6XyJEwDa2W88eTxE+qAqFyeqIFht3dKQfxzs1clN0CAx+Nr7FJ28WELUI3um/rn58x
-         Y407ACHdKhO08UdkhWa5og3yhADjue1jwYSVORIqmUahrirEDZADNAccgvVkVzVW2BbJ
-         Xl7/rzORoVveO0K+jpW8q1pN1LoFK3G4wl5F8cOgtWU1Nykgmu51mELqVlfJnUwuDqGV
-         JCI44mRKYR9FV2abeaRUWrU5kQZu/mrfUtQ9eF+HYNgGUcRMrtRWu7NRwq2lUNfn9Ogw
-         mdYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717517165; x=1718121965;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=O5VQrFzKXcacSK2dpPQ1zSM+Xmxoug7aPj+YM5MTTIM=;
-        b=rY6XsTnUtGu50laOwxz/0uEh+hAc6v4vD2k7lMIvSxDwHrQyfh7VWafP4Nt7Oh/TFH
-         DGgSEk88vOzWLbh6X7LfbRrQDfCOQo0YlK4IOiKPG6wJHWzgnXgs0Wvbui67d/wFtsFA
-         3L3msvMPTxlkcI5gTw/bxtr1DMXRMTkLEsCuFoq8jD7OCb3deT/icNpdOuXFug2+7DB/
-         4VG5wLVxZJ7HcblTvTH59q8p3h0ix5XoTrIKEc/m2Utycq/qAatRjWUX1kKfcg//qqNo
-         22w/yGMz7+xHbL61yjDk9ey/0gbIGYafdKcPl35Wkg3NL/Th/VWgyg7j+D5atxincMfr
-         dyIw==
-X-Gm-Message-State: AOJu0Yw5ZFD38/osr/hT1WQBzdg9x2BwzK9vXXZxR1SS5qmbK5L597pg
-	4TL4TqORQgJ5VEvBWGqIcmp4MqCydHawIIswqlsFPkug9uzuP3jXRaOjPcpBhLbyENfV5vbdZoX
-	ofRQS
-X-Google-Smtp-Source: AGHT+IHjTOc77+v/hrh0//KfOPrghR8jLt/wXqgk/viqeRim9KBVvb5lrLhNkC2Y9ObA7kv+S1+hbA==
-X-Received: by 2002:a50:cd9a:0:b0:57a:30fb:576 with SMTP id 4fb4d7f45d1cf-57a8b69704fmr73029a12.8.1717517164535;
-        Tue, 04 Jun 2024 09:06:04 -0700 (PDT)
-Received: from google.com (64.227.90.34.bc.googleusercontent.com. [34.90.227.64])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57a31c6d270sm7488617a12.60.2024.06.04.09.06.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Jun 2024 09:06:03 -0700 (PDT)
-Date: Tue, 4 Jun 2024 17:05:59 +0100
-From: =?utf-8?Q?Pierre-Cl=C3=A9ment?= Tosi <ptosi@google.com>
-To: Will Deacon <will@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Vincent Donnefort <vdonnefort@google.com>
-Subject: Re: [PATCH v4 11/13] KVM: arm64: Improve CONFIG_CFI_CLANG error
- message
-Message-ID: <whzwqltolrms4ct35az5eif5rg25e2km23cztypgikallbcxoj@wtwfckujzcrf>
-References: <20240529121251.1993135-1-ptosi@google.com>
- <20240529121251.1993135-12-ptosi@google.com>
- <20240603144808.GL19151@willie-the-truck>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="B4OW+KRt"
+X-Envelope-To: maz@kernel.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1717523063;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=J14GhY9Slr22lIIhXHm2oSjBsS6w7JOeWjlZlqB2f1M=;
+	b=B4OW+KRtg70XljWt9tcXev1W1QeHjbAA77gEKmB+BiW4/38q2QawKLTsaC/8eymMUpfRsh
+	nQKsdVuGFiCM+qRUZLV85PCkFCwxcIinpaplbK+8WE8P0dGrpZA7wdeJklU7Z6Q7HjzYFC
+	yD0tChAgx3W7ZTGLyM5sjMZrVOEjW40=
+X-Envelope-To: kvmarm@lists.linux.dev
+X-Envelope-To: james.morse@arm.com
+X-Envelope-To: suzuki.poulose@arm.com
+X-Envelope-To: yuzenghui@huawei.com
+X-Envelope-To: kvm@vger.kernel.org
+Date: Tue, 4 Jun 2024 17:44:18 +0000
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH 10/11] KVM: arm64: nv: Honor guest hypervisor's FP/SVE
+ traps in CPTR_EL2
+Message-ID: <Zl9ScqvwNI9MEx3J@linux.dev>
+References: <20240531231358.1000039-1-oliver.upton@linux.dev>
+ <20240531231358.1000039-11-oliver.upton@linux.dev>
+ <86le3mkxsp.wl-maz@kernel.org>
+ <Zl39WCKpyaDmccgY@linux.dev>
+ <86frttkli5.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240603144808.GL19151@willie-the-truck>
+In-Reply-To: <86frttkli5.wl-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Jun 03, 2024 at 03:48:08PM +0100, Will Deacon wrote:
-> On Wed, May 29, 2024 at 01:12:17PM +0100, Pierre-Clément Tosi wrote:
-> > For kCFI, the compiler encodes in the immediate of the BRK (which the
-> > CPU places in ESR_ELx) the indices of the two registers it used to hold
-> > (resp.) the function pointer and expected type. Therefore, the kCFI
-> > handler must be able to parse the contents of the register file at the
-> > point where the exception was triggered.
-> > 
-> > To achieve this, introduce a new hypervisor panic path that first stores
-> > the CPU context in the per-CPU kvm_hyp_ctxt before calling (directly or
-> > indirectly) hyp_panic() and execute it from all EL2 synchronous
-> > exception handlers i.e.
-> > 
-> > - call it directly in host_el2_sync_vect (__kvm_hyp_host_vector, EL2t&h)
-> > - call it directly in el2t_sync_invalid (__kvm_hyp_vector, EL2t)
-> > - set ELR_EL2 to it in el2_sync (__kvm_hyp_vector, EL2h), which ERETs
-> > 
-> > Teach hyp_panic() to decode the kCFI ESR and extract the target and type
-> > from the saved CPU context. In VHE, use that information to panic() with
-> > a specialized error message. In nVHE, only report it if the host (EL1)
-> > has access to the saved CPU context i.e. iff CONFIG_NVHE_EL2_DEBUG=y,
-> > which aligns with the behavior of CONFIG_PROTECTED_NVHE_STACKTRACE.
-> > 
-> > Signed-off-by: Pierre-Clément Tosi <ptosi@google.com>
-> > ---
-> >  arch/arm64/kvm/handle_exit.c            | 30 +++++++++++++++++++++++--
-> >  arch/arm64/kvm/hyp/entry.S              | 24 +++++++++++++++++++-
-> >  arch/arm64/kvm/hyp/hyp-entry.S          |  2 +-
-> >  arch/arm64/kvm/hyp/include/hyp/switch.h |  4 ++--
-> >  arch/arm64/kvm/hyp/nvhe/host.S          |  2 +-
-> >  arch/arm64/kvm/hyp/vhe/switch.c         | 26 +++++++++++++++++++--
-> >  6 files changed, 79 insertions(+), 9 deletions(-)
+On Tue, Jun 04, 2024 at 12:14:42PM +0100, Marc Zyngier wrote:
+> On Mon, 03 Jun 2024 18:28:56 +0100, Oliver Upton <oliver.upton@linux.dev> wrote:
+> > Anyway, my _slight_ preference is towards keeping what I have if
+> > possible, with a giant comment explaining the reasoning behind it. But I
+> > can take your approach instead too.
 > 
-> This quite a lot of work just to print out some opaque type numbers
-> when CONFIG_NVHE_EL2_DEBUG=y. Is it really worth it? How would I use
-> this information to debug an otherwise undebuggable kcfi failure at EL2?
+> I think the only arguments for my own solution are:
+> 
+> - slightly better codegen (no function call or inlining), and a
+>   smaller .text section in switch.o, because the helpers are not
+>   cheap:
+> 
+>   LLVM:
+> 
+> 	0 .text         00003ef8 (guest_hyp_*_traps_enabled)
+> 	0 .text         00003d48 (bit ops)
+> 
+>   GCC:
+> 	0 .text         00002624 (guest_hyp_*_traps_enabled)
+> 	0 .text         000024b4 (bit ops)
+> 
 
-The type ID alone might not be worth it but what about the target?
+Oh, that's spectacular :-)
 
-In my experience, non-malicious kCFI failures are often caused by an issue with
-the callee, not the caller. Without this patch, only the source of the exception
-is reported but, with it, the panic handler also prints the kCFI target (i.e.
-value of the function pointer) as a symbol.
+>   Yes, LLVM is an absolute pig because of BTI...
+> 
+> - tracking the guest's bits more precisely may make it easier to debug
+> 
+> but these are pretty weak arguments, and I don't really care either
+> way at this precise moment.
 
-With the infrastructure for the target in place, it isn't much more work to also
-report the type ID. Although it is rarely informative (as you noted), there are
-some situations where it can still be useful e.g. if reported as zero and/or has
-been corrupted and does not match its value from the ELF.
+Yeah, so I think the right direction here is to combine our approaches,
+and do direct bit manipulation, but only on bit[0]. That way we still
+have an opportunity to document the very intentional simplification of
+trap state too.
+
+-- 
+Thanks,
+Oliver
