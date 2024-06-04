@@ -1,104 +1,112 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CA618F6A
-	for <kvmarm@lists.linux.dev>; Tue,  4 Jun 2024 14:07:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD45AC13B
+	for <kvmarm@lists.linux.dev>; Tue,  4 Jun 2024 14:30:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717510045; cv=none; b=iRhF8pnxyGOgEvSb2FTX/0cijGWZhhr2sdVTmf3W7PTtNxQ2Et3Ak6xS6qj7iciJDvSR0dTenn4nBdzCwM+FenIlr1oXSWudqG5go7FCPfELvXTT5DV34DQcYWqFBdShj4SUGbTmj5vbQN866QUWjcIsUnpcTjlstj06X4jdQTM=
+	t=1717511425; cv=none; b=Xxo+PPdm053JYuc50MoRJfCWKp3WOPs2oCWaIuGyusoxwzMkhvl7Htw2K23hdmkuV3MX6LnyxKbngEF5Oh2J4dMpa73N3tuFcCDtI8XEjhY577v95qFOKA12j0UgD9eT0VK5sHDAb3Pgw8P20iNFDsG3x3HzfUBjNMIDK8hiWsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717510045; c=relaxed/simple;
-	bh=ErgkA8r25v12NbiYSZLonWCBbuaJrBuLjZ22rQEhMow=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ln25J8EyH4pIbG6Zp+2sLFmHTaCc0U2Xliu1mBvHXcrM97QSw7hcqPhDNpyckEJ6YtFeIcN0uHuKX6F3eMJM6uz50b5OI1yAM28X3GODoWIlBycnq+QwjpaEYNPErVypVna5sRJqKShRXP3FaUZCgsXTar/PyhrhvCLw5UQpJ+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RqXdxMZV; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1717511425; c=relaxed/simple;
+	bh=/BkCZcbI3sC5qxo/tqyOt0I23MSl6HquKpA8ewuDTSY=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EW8N8H1hgupTU6hhb1UpuGIJJXM98QX3J2naCeI2EhcqXQR+5CNB4ARGSmB2+KMVAJUYdWVkgM/8IAHcV+X6oL8pALtRXZB7kQj21icZgfRZAP6qCjV/fdAEfhktT4StVpJYbq2PCYHu+trGcBf0fuBWQM8HbPeNRIiGoB3HHCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nxsMwC8b; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RqXdxMZV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FEC9C2BBFC;
-	Tue,  4 Jun 2024 14:07:21 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nxsMwC8b"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 820DCC4AF08;
+	Tue,  4 Jun 2024 14:30:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717510045;
-	bh=ErgkA8r25v12NbiYSZLonWCBbuaJrBuLjZ22rQEhMow=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RqXdxMZVi0tbWstA6BnDhiaWHv6rnm+E+2+q0PmDmFif1mYCi2F1qZ/p/1MHlDQXm
-	 BEHxDpxxoGbBeqUCajXSg19lltqFpxM4n1+fAdQzOmNa23LsHHIC8cTCHS13OG6Q3W
-	 bz73Xh0CWVqiZK5EaaFgWFLuTA7H3T6U1sAWP/5skQEoNlPptlrYhTtWO4YaU8RfK8
-	 SbIr0xhm2cBsXVxVsiFINA2sNin+EUwtfOCTUnyT32Ra0s+KFKrhhSLYWjws6thKQQ
-	 dywYjqYD4ywp7MCP2cFWloh5MY3btjn5mVhf+xXQdpvJqqyXOIcPp6bYnYwQPjMCd0
-	 Vu4Q1BYs0/UIw==
-Date: Tue, 4 Jun 2024 15:07:18 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Fuad Tabba <tabba@google.com>, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, will@kernel.org,
-	qperret@google.com, seanjc@google.com, alexandru.elisei@arm.com,
-	catalin.marinas@arm.com, philmd@linaro.org, james.morse@arm.com,
-	suzuki.poulose@arm.com, oliver.upton@linux.dev,
-	mark.rutland@arm.com, joey.gouly@arm.com, rananta@google.com,
+	s=k20201202; t=1717511425;
+	bh=/BkCZcbI3sC5qxo/tqyOt0I23MSl6HquKpA8ewuDTSY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=nxsMwC8bInaUoyrBng+Xh7hvRYfmvkJaTtUpw94o7iL2hIMsJ9gzZgsnJNA2dTj5z
+	 FT9PQ4Rot1diHYbDGN1p0kOiVcBvn1iafWCxwLfp3iH3VZkaOh0t1g7PY6UB2aBVx+
+	 +lmdHMjQMYI5n8dAmlELzTxCi3Avi+JCwXr44Ni9fTIclfy/6EBEjzjHuhdBn/urTe
+	 MMQlboSeh96WQg41hKXaLog76/wqmKeLgxZ4zXVfGGX8F0bqqKc//1xX8h5kZZoN3o
+	 ZjlzRqDHMeMLiywDMOl6Ui1TdZ8EFhiVgTPqsigqWfQLi8I3GLEh11xib0yABc5Q72
+	 jhd4WJrFw5lLg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sEVB9-000bjW-2X;
+	Tue, 04 Jun 2024 15:30:23 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Fuad Tabba <tabba@google.com>
+Cc: will@kernel.org,
+	qperret@google.com,
+	seanjc@google.com,
+	alexandru.elisei@arm.com,
+	catalin.marinas@arm.com,
+	philmd@linaro.org,
+	james.morse@arm.com,
+	suzuki.poulose@arm.com,
+	oliver.upton@linux.dev,
+	mark.rutland@arm.com,
+	broonie@kernel.org,
+	joey.gouly@arm.com,
+	rananta@google.com,
 	yuzenghui@huawei.com
-Subject: Re: [PATCH v4 6/9] KVM: arm64: Eagerly restore host fpsimd/sve state
- in pKVM
-Message-ID: <5e20596f-b9d3-4b01-ad3c-638dd1fa076b@sirena.org.uk>
+Subject: Re: [PATCH v4 0/9] KVM: arm64: Fix handling of host fpsimd/sve state in protected mode
+Date: Tue,  4 Jun 2024 15:30:19 +0100
+Message-Id: <171751080453.266083.3919022563197793184.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240603122852.3923848-1-tabba@google.com>
 References: <20240603122852.3923848-1-tabba@google.com>
- <20240603122852.3923848-7-tabba@google.com>
- <728c100c-ea38-4802-832d-04521821d169@sirena.org.uk>
- <CA+EHjTw6ybZ8+YuRjmRcpm7rC_aHPn7H1V4cejrN1Zo9njhbGA@mail.gmail.com>
- <e8e7928b-9f79-4015-a144-fade7ac84c6e@sirena.org.uk>
- <86ed9clsqz.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="0A+LqQROufs2S1wt"
-Content-Disposition: inline
-In-Reply-To: <86ed9clsqz.wl-maz@kernel.org>
-X-Cookie: Is it clean in other dimensions?
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, tabba@google.com, will@kernel.org, qperret@google.com, seanjc@google.com, alexandru.elisei@arm.com, catalin.marinas@arm.com, philmd@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, mark.rutland@arm.com, broonie@kernel.org, joey.gouly@arm.com, rananta@google.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+
+On Mon, 03 Jun 2024 13:28:42 +0100, Fuad Tabba wrote:
+> Changes since v3 [1]:
+> - Rebased on Linux 6.10-rc2 (c3f38fa61af7)
+> - Dropped v3 patches 8--11 (Oliver)
+> - Removed unnecessary isb()s (Oliver)
+> - Formatting/comments (Mark)
+> - Fix __sve_save_state()/__sve_restore_state() prototypes (Mark)
+> - Save/restore ffr with the sve state
+> - Added a patch that checks at hyp that SME features aren't
+> enabled on guest entry, to ensure it's not in streaming mode
+> 
+> [...]
+
+Applied to fixes, thanks!
+
+[1/9] KVM: arm64: Reintroduce __sve_save_state
+      commit: 87bb39ed40bdf1596b8820e800226e24eb642677
+[2/9] KVM: arm64: Fix prototype for __sve_save_state/__sve_restore_state
+      commit: 45f4ea9bcfe909b3461059990b1e232e55dde809
+[3/9] KVM: arm64: Abstract set/clear of CPTR_EL2 bits behind helper
+      commit: 6d8fb3cbf7e06431a607c30c1bc4cd53a62c220a
+[4/9] KVM: arm64: Specialize handling of host fpsimd state on trap
+      commit: e511e08a9f496948b13aac50610f2d17335f56c3
+[5/9] KVM: arm64: Allocate memory mapped at hyp for host sve state in pKVM
+      commit: 66d5b53e20a6e00b7ce3b652a3e2db967f7b33d0
+[6/9] KVM: arm64: Eagerly restore host fpsimd/sve state in pKVM
+      commit: b5b9955617bc0b41546f2fa7c3dbcc048b43dc82
+[7/9] KVM: arm64: Consolidate initializing the host data's fpsimd_state/sve in pKVM
+      commit: 1696fc2174dbab12228ea9ec4c213d6aeea348f8
+[8/9] KVM: arm64: Refactor CPACR trap bit setting/clearing to use ELx format
+      commit: a69283ae1db8dd416870d931caa9e2d3d2c1cd8b
+[9/9] KVM: arm64: Ensure that SME controls are disabled in protected mode
+      commit: afb91f5f8ad7af172d993a34fde1947892408f53
+
+Cheers,
+
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
 
 
---0A+LqQROufs2S1wt
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On Tue, Jun 04, 2024 at 02:52:52PM +0100, Marc Zyngier wrote:
-> Mark Brown <broonie@kernel.org> wrote:
-> > On Tue, Jun 04, 2024 at 01:03:07PM +0100, Fuad Tabba wrote:
-
-> > > You suggested inlining this, but since this is static, I think the
-> > > compiler would do that. Even though it's only one line, it maintains
-> > > symmetry with fpsimd_sve_sync().
-
-> > The reason I was suggesting inlining was that it removes the need to
-> > name the function.
-
-> You're missing the point.
-
-I think not.
-
-> The name is important, and the current name is correct. We use *flush
-> (resp. *sync) for operations that need to happen before (resp. after)
-> the entry into the guest. This is consistent with the rest of the code
-> base for most of the subsystems KVM/arm64 deals with.
-
-Hence my suggestion to add documentation to the function to avoid the
-risk of surprises, the above text explains the motivation for the
-suggestion that Faud is responding to.  Either approach would work.
-
---0A+LqQROufs2S1wt
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmZfH5UACgkQJNaLcl1U
-h9DjyAf/by9Fp1D0zGrrZ/fYO8ZnwI18cF7W1LfDUCGNXYA3BwqB9eeL25TC9Ahg
-QlTfz99nTwiCyU4ToX1pEaeUXZy/yFD6iZAcGSvNwF17oVzG1HMGStqPxoBXm2Fb
-Yj+lITllRDbG/q+C+HOeT8MmnFT4QpbPtoXPwG3AaRLO0Q3cXeuCADBvstMC3Nsi
-onwHFb4s9OKxt08nUNSXIOYveCjWACAsot5TQh6c408xN1P7mSwZsQ9bBTAunRUa
-2VJWlPgbjqN2lcHhVrxilEqXEv+DXaPHSZcHdqcwFL/eP0bJX8TIjn+9Kx2ta/RS
-YZfvA7fhim0mZkHQavoiOaOHhRHglw==
-=jAG7
------END PGP SIGNATURE-----
-
---0A+LqQROufs2S1wt--
