@@ -1,116 +1,187 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFDC22119
-	for <kvmarm@lists.linux.dev>; Tue,  4 Jun 2024 00:23:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 236398F4E;
+	Tue,  4 Jun 2024 07:59:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717460590; cv=none; b=Ojm8iDYkF8tEOkqdvWjPJGl8pScR5HL7ljbda9b3c1kgvKC0uBQ9Eh8jGb25w4SNvaYaK7kjhKRW4Ewi8s/WhBTaEtgo0woAcuKtsuZ4PWbWDdTlwjAig/qRGCKcLh1GawztfXUjvTpF3NLUZr8FHGbod92DWrMaCtj+cAOtgSQ=
+	t=1717487996; cv=none; b=cklapmV7UmehUbF7eC+4MegE9Yj6ETOL4Ox/ZFG+x7KfXLOMesuofUAERCAbQPxG4CF7y4Asq4htX9tv5QpFLSDLciiYs7opsqDjIJqEy8RUlHTvTPu+L2cEdt4gFohEO108PGbyjSBUFM3HxOz3QGW/aFgQMiFFG/D28gpIuk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717460590; c=relaxed/simple;
-	bh=ouvtVl7K0PAyNCf/CqS8kHiqugncCwG8s3P79l84eTI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=PYSuFlcShJydTgXpDwo8K4p4mFqMIuCNhNjlZigardY0dOudge8rC4engaM9PI6BtAgnSR3kMir39wbJEuuj51W00JKs/xWmuFD/7mq+NjvpZZcVUK2ctlVET+bLjMbOSfmzL0p9fOk1z0zZIq9Yd8DaW5GExCanYDByTs1lolc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UojUQ2BH; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1717487996; c=relaxed/simple;
+	bh=vdxauOmzSboHFnDF9buP0En7vyb3RHtdFdbq9LJy4mc=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iDaGWdj07DWOXobG3NE0FMmmIVW2UVo+m8+X2VFUlWf4rN+NAPewX0VKt3F6lYojm6OqnTfrYrK4LxBO2UI5QHoPBoCI8nSYXvHvjU+/g8AArCKR+k6hUdGWPoBDidUMTSTKXlY8EbzQzuINuvcrluQX/rQwxeJs0yWWa/qoN44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LtodnuPO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UojUQ2BH"
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-627e9a500faso80793717b3.1
-        for <kvmarm@lists.linux.dev>; Mon, 03 Jun 2024 17:23:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717460588; x=1718065388; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HRuXM8qP8LdDvX6fn1r8scesSI9q9pU2JyFDr4cXXhA=;
-        b=UojUQ2BH9v5rp6hRT9wq3SvE+B0LcgiWW6LvCxc0Ly1+6zwA6VDcDgvV66091vNOKo
-         cZ7mk+4AvWo/STdfaTA+2iBbVfHlrUjnQNvIgOK+Y2SsDdISsj8QlibEVb87lwhoabWC
-         5N7O7p8hF9jWTM63j2+Rbi2OD2AUbz4WJyK0/CgUKLXVQ6sUzV53XnOVkU2XjANDyZ/L
-         BRvhfRxisNIw2RunD0GwWnvLxHKCw3GiRSf77V2vVZmXBFI2/gSEmC7nruh5AAsHzbyg
-         4Jo2ZC3nl8hEZp5kvDFjeJC0+2wJ+lCMp2SxtC033hWZX3dpjTqw0DK99DOPR4Ysmxue
-         Hhmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717460588; x=1718065388;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=HRuXM8qP8LdDvX6fn1r8scesSI9q9pU2JyFDr4cXXhA=;
-        b=kkPWPHsLGc4KymqpJHvsPDDeTGODhR+97NioODmo7GTnzNH/O72riGRpl/h+dmlc0O
-         DQK2W+2Xnu/NhbWlDwu4uyMAuW+6ZV+XJWz4ZaZjcmsQhyZUbIaCZjGA58SrYvSBPd3l
-         lNPrTkaBXxrQWpHBN2ixUlW5FQgW7OnpXNazX6o4Gmxu2leWZRgroYpJ21kge9WZI8Qq
-         T9RHlDEmS6k9HWaRigMyYD1rEQ9Sc2EuISjw/TzkXIx4QCXJLLRY+5sevaJ8i/BJrmhb
-         GNCqj1WCxDxmLiNHJh8ZVxkoyxbMYRm/fimLCJBASc3qnHEf3CG5oClrzfZqIg0CZm+Y
-         SRcw==
-X-Forwarded-Encrypted: i=1; AJvYcCWrvPZGRjQVbHVRqzSxC5XiQQmxSBEnsCYS0esUPJr98yxMvv3jePJPYWnf/dh+eE9FTe9nOKLssCoV+EzJRw95udCfrsSL
-X-Gm-Message-State: AOJu0Ywz23UJM8VQP9hLBS5RbaI1QphQyXyOXogimCwaHiTu5TT12Ocy
-	xkG7GGjoWqjWH8KFzC56R8MYZvPkVybrtgXk0zupPj9JVjt5QhVXDf0ngqrzmaK3E5QikOqOGx4
-	rtQ==
-X-Google-Smtp-Source: AGHT+IEk24C6d/QoiBbCyIExMW7OdPZLjaBEK4ZPTTj/IX3O1NfqjnOFuoealUEhXp84xV+hhBOGjvPTh7s=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:707:b0:dfa:ba40:6f43 with SMTP id
- 3f1490d57ef6-dfaba407295mr112473276.2.1717460587664; Mon, 03 Jun 2024
- 17:23:07 -0700 (PDT)
-Date: Mon, 3 Jun 2024 17:23:06 -0700
-In-Reply-To: <CADrL8HU734C_OQhzszWJWMXEXLN6HkBo4yweN2fX4BbOegXrFA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LtodnuPO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9999FC2BBFC;
+	Tue,  4 Jun 2024 07:59:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717487995;
+	bh=vdxauOmzSboHFnDF9buP0En7vyb3RHtdFdbq9LJy4mc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LtodnuPO2CS14uvj48kFDapRADhNtETdT+ND/y+TtmLXzQn4lPjTT3tm/Q/hKcoKA
+	 CvJ+G7kzzidAN4yghffCb6DJHqrR+YG7a5EHxqkq1DzBg2dljr94xAwmLwWQcHoqx5
+	 hSqo95an3+3BSbOBxJxfCqLGtAE/SKmKXcTVO5nCuQgsqRIO0bwMPB6VtQa0WQDN7n
+	 +pjXqUASWMxrGcjy7DqPVnmz+PmonLjr3src34RmbtqgO66qbMpjvp/1fWWepraxIZ
+	 3kD3m2FfJUr9+f06knLUYKEVlhiKLb9ZNj8znUMXERgeC6HCdtlihLFPEYid8WfdvM
+	 96S/e775jkdTw==
+Received: from 82-132-216-203.dab.02.net ([82.132.216.203] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sEP5E-000Tse-LN;
+	Tue, 04 Jun 2024 08:59:53 +0100
+Date: Tue, 04 Jun 2024 08:59:49 +0100
+Message-ID: <87frtt2l56.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: Re: [PATCH v2 13/16] KVM: arm64: nv: Invalidate TLBs based on shadow S2 TTL-like information
+In-Reply-To: <Zl4NScV0E_YV7GR2@linux.dev>
+References: <20240529145628.3272630-1-maz@kernel.org>
+	<20240529145628.3272630-14-maz@kernel.org>
+	<Zl4NScV0E_YV7GR2@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20240529180510.2295118-3-jthoughton@google.com>
- <CAOUHufYFHKLwt1PWp2uS6g174GZYRZURWJAmdUWs5eaKmhEeyQ@mail.gmail.com>
- <ZlelW93_T6P-ZuSZ@google.com> <CAOUHufZdEpY6ra73SMHA33DegKxKaUM=Os7A7aDBFND6NkbUmQ@mail.gmail.com>
- <Zley-u_dOlZ-S-a6@google.com> <CADrL8HXHWg_MkApYQTngzmN21NEGNWC6KzJDw_Lm63JHJkR=5A@mail.gmail.com>
- <CAOUHufZq6DwpStzHtjG+TOiHaQ6FFbkTfHMCe8Yy0n_M9MKdqw@mail.gmail.com>
- <CADrL8HW44Hx_Ejx_6+FVKt1V17PdgT6rw+sNtKzumqc9UCVDfA@mail.gmail.com>
- <Zl5LqcusZ88QOGQY@google.com> <CADrL8HU734C_OQhzszWJWMXEXLN6HkBo4yweN2fX4BbOegXrFA@mail.gmail.com>
-Message-ID: <Zl5eat0sh7rrspUG@google.com>
-Subject: Re: [PATCH v4 2/7] mm: multi-gen LRU: Have secondary MMUs participate
- in aging
-From: Sean Christopherson <seanjc@google.com>
-To: James Houghton <jthoughton@google.com>
-Cc: Yu Zhao <yuzhao@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Ankit Agrawal <ankita@nvidia.com>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Axel Rasmussen <axelrasmussen@google.com>, 
-	Bibo Mao <maobibo@loongson.cn>, Catalin Marinas <catalin.marinas@arm.com>, 
-	David Matlack <dmatlack@google.com>, David Rientjes <rientjes@google.com>, 
-	Huacai Chen <chenhuacai@kernel.org>, James Morse <james.morse@arm.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Nicholas Piggin <npiggin@gmail.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Raghavendra Rao Ananta <rananta@google.com>, Ryan Roberts <ryan.roberts@arm.com>, 
-	Shaoqin Huang <shahuang@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
-	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, kvm-riscv@lists.infradead.org, 
-	kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-mm@kvack.org, 
-	linux-riscv@lists.infradead.org, linuxppc-dev@lists.ozlabs.org, 
-	loongarch@lists.linux.dev
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 82.132.216.203
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Jun 03, 2024, James Houghton wrote:
-> On Mon, Jun 3, 2024 at 4:03=E2=80=AFPM Sean Christopherson <seanjc@google=
-.com> wrote:
-> > But before we do that, I think we need to perform due dilegence (or pro=
-vide data)
-> > showing that having KVM take mmu_lock for write in the "fast only" API =
-provides
-> > better total behavior.  I.e. that the additional accuracy is indeed wor=
-th the cost.
->=20
-> That sounds good to me. I'll drop the Kconfig. I'm not really sure
-> what to do about the self-test, but that's not really all that
-> important.
+On Mon, 03 Jun 2024 19:36:57 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> On Wed, May 29, 2024 at 03:56:25PM +0100, Marc Zyngier wrote:
 
-Enable it only on architectures+setups that are guaranteed to implement the
-fast-only API?  E.g. on x86, it darn well better be active if the TDP MMU i=
-s
-enabled.  If the test fails because that doesn't hold true, then we _want_ =
-the
-failure.
+[...]
+
+> > +/*
+> > + * Compute the equivalent of the TTL field by parsing the shadow PT.  The
+> > + * granule size is extracted from the cached VTCR_EL2.TG0 while the level is
+> > + * retrieved from first entry carrying the level as a tag.
+> > + */
+> > +static u8 get_guest_mapping_ttl(struct kvm_s2_mmu *mmu, u64 addr)
+> > +{
+> 
+> Can you add a lockdep assertion that the MMU lock is held for write
+> here? At least for me this is far enough away from the 'real' page table
+> walk that it wasn't clear what locks were held at this point.
+
+Sure thing.
+
+> 
+> > +	u64 tmp, sz = 0, vtcr = mmu->tlb_vtcr;
+> > +	kvm_pte_t pte;
+> > +	u8 ttl, level;
+> > +
+> > +	switch (vtcr & VTCR_EL2_TG0_MASK) {
+> > +	case VTCR_EL2_TG0_4K:
+> > +		ttl = (TLBI_TTL_TG_4K << 2);
+> > +		break;
+> > +	case VTCR_EL2_TG0_16K:
+> > +		ttl = (TLBI_TTL_TG_16K << 2);
+> > +		break;
+> > +	case VTCR_EL2_TG0_64K:
+> > +	default:	    /* IMPDEF: treat any other value as 64k */
+> > +		ttl = (TLBI_TTL_TG_64K << 2);
+> > +		break;
+> > +	}
+> > +
+> > +	tmp = addr;
+> > +
+> > +again:
+> > +	/* Iteratively compute the block sizes for a particular granule size */
+> > +	switch (vtcr & VTCR_EL2_TG0_MASK) {
+> > +	case VTCR_EL2_TG0_4K:
+> > +		if	(sz < SZ_4K)	sz = SZ_4K;
+> > +		else if (sz < SZ_2M)	sz = SZ_2M;
+> > +		else if (sz < SZ_1G)	sz = SZ_1G;
+> > +		else			sz = 0;
+> > +		break;
+> > +	case VTCR_EL2_TG0_16K:
+> > +		if	(sz < SZ_16K)	sz = SZ_16K;
+> > +		else if (sz < SZ_32M)	sz = SZ_32M;
+> > +		else			sz = 0;
+> > +		break;
+> > +	case VTCR_EL2_TG0_64K:
+> > +	default:	    /* IMPDEF: treat any other value as 64k */
+> > +		if	(sz < SZ_64K)	sz = SZ_64K;
+> > +		else if (sz < SZ_512M)	sz = SZ_512M;
+> > +		else			sz = 0;
+> > +		break;
+> > +	}
+> > +
+> > +	if (sz == 0)
+> > +		return 0;
+> > +
+> > +	tmp &= ~(sz - 1);
+> > +	if (kvm_pgtable_get_leaf(mmu->pgt, tmp, &pte, NULL))
+> > +		goto again;
+> 
+> Assuming we're virtualizing a larger TG than what's in use at L0 this
+> may not actually find a valid leaf that exists within the span of a
+> single virtual TLB entry.
+> 
+> For example, if we're using 4K at L0 and 16K at L1, we could have:
+> 
+> 	[ ----- valid 16K entry ------- ]
+> 
+> mapped as:
+> 
+> 	[ ----- | ----- | valid | ----- ]
+> 
+> in the shadow S2. kvm_pgtable_get_leaf() will always return the first
+> splintered page, which could be invalid.
+> 
+> What I'm getting at is: should this use a bespoke table walker that
+> scans for a valid TTL in the range of [addr, addr + sz)? It may make
+> sense to back off a bit more aggressively and switch to a conservative,
+> unscoped TLBI to avoid visiting too many PTEs.
+
+I had something along those lines at some point (circa 2019), and
+quickly dropped it as it had a horrible "look-around" behaviour,
+specially if the L1 S2 granule size is much larger than L0's (64k vs
+4k). As you pointed out, it needs heuristics to limit the look-around,
+which I don't find very satisfying.
+
+Which is why the current code limits the search to be in depth only,
+hoping for the head descriptor to be valid, and quickly backs off to
+do a level-0 invalidation.
+
+My preferred option would be to allow the use of non-valid entries to
+cache the level (always using the first L0 entry that would map the L1
+descriptor), but this opens another can of worms: you could end-up
+with page table pages containing only invalid descriptors, except for
+the presence of a level annotation, which screws the refcounting. I'd
+very much like to see this rather than the look-around option.
+
+Now, it is important to consider how useful this is. I expect modern
+hypervisors to use either TTL-hinted (which we emulate even if the HW
+doesn't support it) or Range-based invalidation in the vast majority
+of the cases, so this would only help SW that hasn't got on with the
+program.
+
+Thoughts?
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
