@@ -1,174 +1,335 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFD724D5A0
-	for <kvmarm@lists.linux.dev>; Wed,  5 Jun 2024 15:03:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73B0D45028;
+	Wed,  5 Jun 2024 15:08:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717599797; cv=none; b=M4pGqgn0XUfWDTvxVvrKSDbEBWKkVCG4GkhAS076IYuwKq+LtEaz5tak6jbxO2bzcmT8wd+sWDTYw/1CQSFOl2HHs2x6ReBLbt7Y5KcCvBEux3+dXU9/VtHeA3ULQdaA2IOKEo6g5dUuA9+azDWo8VBQ1/wyJt39w7Uxl2n4ed0=
+	t=1717600132; cv=none; b=JM+cKEiNvFyBNRYRPfo+qI+eCKtC0NI+YEvqHfyJS/SIKYQVYzxSwRdhHXbjgyj9CvYGdfUL2n1K5kmCab73unfofRlD8/1xKhm4hQMpaZ+IKOGKu8zaOYh6dLkaeHm6WpuvcvkYuwgbwSOaFVUDuLadMjxDGZtdmssQMtBF1FA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717599797; c=relaxed/simple;
-	bh=By/T1N0/Ew6fg9IKZko7zNTUNtWD94qCzZxXw5XDSc4=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Usy2hZEf5LqT8jTRL1qt/VUxCid6psNizZ6BSNj+gu6nIDn0Pu/+8SzNT3cxJ9aQnFm/GNSVvHEGJfnG1xTAHCtN+aDCGa7O/X7zRBiXzxjAjRIyL7s+H4pbtqq1lQ81veLACA2zLRFfi3sEP21anuZs6Rojh+CFKHGadWS2Tus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xpV6LBhQ; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xpV6LBhQ"
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-62a1e9807c0so14062137b3.0
-        for <kvmarm@lists.linux.dev>; Wed, 05 Jun 2024 08:03:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717599795; x=1718204595; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=KO8MH7UmY8zG+vK98T7XFrbBCxXrZgBjolcXAlPlLF8=;
-        b=xpV6LBhQRIS/FDFrpC/Sv/2ihu/kYZVEjFTyqLpR8+zWqPRuVoEeS5ZLI9ogMJjaIm
-         4ebZ3dlxeAAXcUttxjuZ9pe3sxwvdCupN6bTFLqg5cYkbg/y8Abk0J3eEqH78yOrR5xY
-         sWaEnIQUbKht2ZaTlWfZ5YGAYfuXqFaaeppdu0vejTnUCj6mME90Vvh1o502Txtuydnw
-         03HXxbzdZz1onbxwdjbfvSmq/LAQhxrU7Z++HLkt3rDhvZrjUOxzTFA4xun793LJpYF+
-         gs7AuLPvX3U5Pwe3PIhksDtmLLiFqwxHqW7DKJdLJfwhBRLNtZ54OJ0WcH5vjrSyQ/eH
-         SGoQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717599795; x=1718204595;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=KO8MH7UmY8zG+vK98T7XFrbBCxXrZgBjolcXAlPlLF8=;
-        b=YzfR65z8ROcSEJCEY5wsTsTZ4ozVZcAv2jhX+5cAMZl9xf1oO/N0QvQnL98bDJQrY8
-         EO5CzAFs/j+FrHYOX2K7R3gJHLQo6WzVDifJfxsizjaHuTwtFbg0v7XKrWoLfFLSdFH8
-         YzanwOwfUO4wABEOVKhHpj3vbPTJ8KF0EDo3evyjHGd+YXDaM0mRGrwpHfM0g7Oz9I0h
-         N09PesMrXAGnSY/ya3xydMyLZolQNMkypnZypSyy+rkkmf0J3KAQCI6uGYWnzUFMVYN5
-         eeAQsw7sp1YHcwd/j8PW1m+7jRsHJtBFoedKBj89/nsjGuMN6YQqbIMaL8PUDHlnR7NI
-         TAQA==
-X-Gm-Message-State: AOJu0YyZsGZDd4BGtyerHbnKwKBIYnb6dWwx9ftAm/0XcBdlAczu5B+T
-	iRVU1x78CCJl5NFncBEfGIHiXnNCKoZckvjvj7ahXmbtRXn390D26fjg725ZPLyS+ij6e4753FV
-	tVQ60i9mkYmsfFJbZ89YypfchwosdIs2we/DCBZjgzSV5lfVxy5dR8kcWYtjJH3Jhu6zZxs9och
-	jyFms0rnhtA1hZLmHpgDCXyqui5Ik=
-X-Google-Smtp-Source: AGHT+IEeAnaR9jSQ+V4+n4UfVSqeVpPLwX2KsXZ2qD/bj5ehSaei1CPViNnfLN7SLX4G8piQoeN2J14URQ==
-X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:690c:10c:b0:618:5009:cb71 with SMTP id
- 00721157ae682-62cba685399mr8509867b3.5.1717599794733; Wed, 05 Jun 2024
- 08:03:14 -0700 (PDT)
-Date: Wed,  5 Jun 2024 16:03:12 +0100
+	s=arc-20240116; t=1717600132; c=relaxed/simple;
+	bh=4aEIt++Ih7LHuORmU/+95bpdtFQCe8Oh7tumk4SKzZY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=t+I+/+zSzwurO6i2o8RPhRionIE+/kQXa/fzDJTCBX9VwBQF9IiVuHaExCG45zcBVhNOydvsJ0D38Csl+2aMcpIWNG0h+ltP7egSvJWFbFvYBNx/YR4kpUNf+bjNX5wLUg+Y5tUncPHprSjibLKDf7DhY17nS7pvn/Yxpyt6bHo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2192B339;
+	Wed,  5 Jun 2024 08:09:14 -0700 (PDT)
+Received: from [10.57.39.129] (unknown [10.57.39.129])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AB6EE3F64C;
+	Wed,  5 Jun 2024 08:08:46 -0700 (PDT)
+Message-ID: <4c363476-e5b5-42ff-9f30-a02a92b6751b@arm.com>
+Date: Wed, 5 Jun 2024 16:08:49 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.45.2.505.gda0bf45e8d-goog
-Message-ID: <20240605150312.3684150-1-tabba@google.com>
-Subject: [PATCH v1] KVM: arm64: Allocate for maximum vector length for pKVM
- host sve state
-From: Fuad Tabba <tabba@google.com>
-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
-Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com, 
-	seanjc@google.com, alexandru.elisei@arm.com, catalin.marinas@arm.com, 
-	philmd@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, 
-	oliver.upton@linux.dev, mark.rutland@arm.com, broonie@kernel.org, 
-	joey.gouly@arm.com, rananta@google.com, yuzenghui@huawei.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 12/14] arm64: realm: Support nonsecure ITS emulation
+ shared
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+References: <20240605093006.145492-1-steven.price@arm.com>
+ <20240605093006.145492-13-steven.price@arm.com>
+ <86a5jzld9g.wl-maz@kernel.org>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <86a5jzld9g.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-In a heterogeneous system, a cpu could have an sve/sme vector
-length that is larger than the rest. Store the value of the
-largest possible vector length in the system. When allocating
-memory for the host sve state in pKVM, allocate for the largest
-possible sve vector length.
+Hi Marc,
 
-Fixes: 66d5b53e20a6 ("KVM: arm64: Allocate memory mapped at hyp for host sve state in pKVM")
-Reported-by: Mark Brown <broonie@kernel.org>
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
-Based on kvmarm/fixes (afb91f5f8ad7)
+On 05/06/2024 14:39, Marc Zyngier wrote:
+> The subject line is... odd. I'd expect something like:
+> 
+> "irqchip/gic-v3-its: Share ITS tables with a non-trusted hypervisor"
+> 
+> because nothing here should be CCA specific.
 
-Mark Brown submitted a patch series that fixes this [1].
-I'm sending this patch since it might be simpler.
+Good point - that's a much better subject.
 
-[1] https://lore.kernel.org/all/20240605-kvm-arm64-fix-pkvm-sve-vl-v1-0-680d6b43b4c1@kernel.org/
----
- arch/arm64/include/asm/fpsimd.h | 13 +++++++++++++
- arch/arm64/kernel/fpsimd.c      |  7 ++++++-
- arch/arm64/kvm/reset.c          |  2 +-
- 3 files changed, 20 insertions(+), 2 deletions(-)
+> On Wed, 05 Jun 2024 10:30:04 +0100,
+> Steven Price <steven.price@arm.com> wrote:
+>>
+>> Within a realm guest the ITS is emulated by the host. This means the
+>> allocations must have been made available to the host by a call to
+>> set_memory_decrypted(). Introduce an allocation function which performs
+>> this extra call.
+> 
+> This doesn't mention that this patch radically changes the allocation
+> of some tables.
 
-diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
-index bc69ac368d73..a72dda932291 100644
---- a/arch/arm64/include/asm/fpsimd.h
-+++ b/arch/arm64/include/asm/fpsimd.h
-@@ -184,6 +184,9 @@ struct vl_info {
- 	int max_vl;
- 	int max_virtualisable_vl;
- 
-+	/* The maximum vl encountered for any cpu in the system. */
-+	int max_system_vl;
-+
- 	/*
- 	 * Set of available vector lengths,
- 	 * where length vq encoded as bit __vq_to_bit(vq):
-@@ -274,6 +277,11 @@ static inline int vec_max_virtualisable_vl(enum vec_type type)
- 	return vl_info[type].max_virtualisable_vl;
- }
- 
-+static inline int vec_max_system_vl(enum vec_type type)
-+{
-+	return vl_info[type].max_system_vl;
-+}
-+
- static inline int sve_max_vl(void)
- {
- 	return vec_max_vl(ARM64_VEC_SVE);
-@@ -284,6 +292,11 @@ static inline int sve_max_virtualisable_vl(void)
- 	return vec_max_virtualisable_vl(ARM64_VEC_SVE);
- }
- 
-+static inline int sve_max_system_vl(void)
-+{
-+	return vec_max_system_vl(ARM64_VEC_SVE);
-+}
-+
- /* Ensure vq >= SVE_VQ_MIN && vq <= SVE_VQ_MAX before calling this function */
- static inline bool vq_available(enum vec_type type, unsigned int vq)
- {
-diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-index 82e8a6017382..e0af4c3c9a40 100644
---- a/arch/arm64/kernel/fpsimd.c
-+++ b/arch/arm64/kernel/fpsimd.c
-@@ -1006,7 +1006,7 @@ int sme_get_current_vl(void)
- static void vec_probe_vqs(struct vl_info *info,
- 			  DECLARE_BITMAP(map, SVE_VQ_MAX))
- {
--	unsigned int vq, vl;
-+	unsigned int vq, vl, max_vl = 0;
- 
- 	bitmap_zero(map, SVE_VQ_MAX);
- 
-@@ -1031,7 +1031,12 @@ static void vec_probe_vqs(struct vl_info *info,
- 
- 		vq = sve_vq_from_vl(vl); /* skip intervening lengths */
- 		set_bit(__vq_to_bit(vq), map);
-+
-+		if (!max_vl)
-+			max_vl = vl;
- 	}
-+
-+	info->max_system_vl = max((int) max_vl, info->max_system_vl);
- }
- 
- /*
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index 3fc8ca164dbe..6236f9d0a0ec 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -52,7 +52,7 @@ int __init kvm_arm_init_sve(void)
- {
- 	if (system_supports_sve()) {
- 		kvm_sve_max_vl = sve_max_virtualisable_vl();
--		kvm_host_sve_max_vl = sve_max_vl();
-+		kvm_host_sve_max_vl = sve_max_system_vl();
- 		kvm_nvhe_sym(kvm_host_sve_max_vl) = kvm_host_sve_max_vl;
- 
- 		/*
+I guess that depends on your definition of radical, see below.
 
-base-commit: afb91f5f8ad7af172d993a34fde1947892408f53
--- 
-2.45.2.505.gda0bf45e8d-goog
+>>
+>> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>> Changes since v2:
+>>  * Drop 'shared' from the new its_xxx function names as they are used
+>>    for non-realm guests too.
+>>  * Don't handle the NUMA_NO_NODE case specially - alloc_pages_node()
+>>    should do the right thing.
+>>  * Drop a pointless (void *) cast.
+>> ---
+>>  drivers/irqchip/irq-gic-v3-its.c | 90 ++++++++++++++++++++++++--------
+>>  1 file changed, 67 insertions(+), 23 deletions(-)
+>>
+>> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+>> index 40ebf1726393..ca72f830f4cc 100644
+>> --- a/drivers/irqchip/irq-gic-v3-its.c
+>> +++ b/drivers/irqchip/irq-gic-v3-its.c
+>> @@ -18,6 +18,7 @@
+>>  #include <linux/irqdomain.h>
+>>  #include <linux/list.h>
+>>  #include <linux/log2.h>
+>> +#include <linux/mem_encrypt.h>
+>>  #include <linux/memblock.h>
+>>  #include <linux/mm.h>
+>>  #include <linux/msi.h>
+>> @@ -27,6 +28,7 @@
+>>  #include <linux/of_pci.h>
+>>  #include <linux/of_platform.h>
+>>  #include <linux/percpu.h>
+>> +#include <linux/set_memory.h>
+>>  #include <linux/slab.h>
+>>  #include <linux/syscore_ops.h>
+>>  
+>> @@ -163,6 +165,7 @@ struct its_device {
+>>  	struct its_node		*its;
+>>  	struct event_lpi_map	event_map;
+>>  	void			*itt;
+>> +	u32			itt_order;
+>>  	u32			nr_ites;
+>>  	u32			device_id;
+>>  	bool			shared;
+>> @@ -198,6 +201,30 @@ static DEFINE_IDA(its_vpeid_ida);
+>>  #define gic_data_rdist_rd_base()	(gic_data_rdist()->rd_base)
+>>  #define gic_data_rdist_vlpi_base()	(gic_data_rdist_rd_base() + SZ_128K)
+>>  
+>> +static struct page *its_alloc_pages_node(int node, gfp_t gfp,
+>> +					 unsigned int order)
+>> +{
+>> +	struct page *page;
+>> +
+>> +	page = alloc_pages_node(node, gfp, order);
+>> +
+>> +	if (page)
+>> +		set_memory_decrypted((unsigned long)page_address(page),
+>> +				     1 << order);
+> 
+> Please use BIT(order).
+
+Sure.
+
+>> +	return page;
+>> +}
+>> +
+>> +static struct page *its_alloc_pages(gfp_t gfp, unsigned int order)
+>> +{
+>> +	return its_alloc_pages_node(NUMA_NO_NODE, gfp, order);
+>> +}
+>> +
+>> +static void its_free_pages(void *addr, unsigned int order)
+>> +{
+>> +	set_memory_encrypted((unsigned long)addr, 1 << order);
+>> +	free_pages((unsigned long)addr, order);
+>> +}
+>> +
+>>  /*
+>>   * Skip ITSs that have no vLPIs mapped, unless we're on GICv4.1, as we
+>>   * always have vSGIs mapped.
+>> @@ -2212,7 +2239,8 @@ static struct page *its_allocate_prop_table(gfp_t gfp_flags)
+>>  {
+>>  	struct page *prop_page;
+>>  
+>> -	prop_page = alloc_pages(gfp_flags, get_order(LPI_PROPBASE_SZ));
+>> +	prop_page = its_alloc_pages(gfp_flags,
+>> +				    get_order(LPI_PROPBASE_SZ));
+>>  	if (!prop_page)
+>>  		return NULL;
+>>  
+>> @@ -2223,8 +2251,8 @@ static struct page *its_allocate_prop_table(gfp_t gfp_flags)
+>>  
+>>  static void its_free_prop_table(struct page *prop_page)
+>>  {
+>> -	free_pages((unsigned long)page_address(prop_page),
+>> -		   get_order(LPI_PROPBASE_SZ));
+>> +	its_free_pages(page_address(prop_page),
+>> +		       get_order(LPI_PROPBASE_SZ));
+>>  }
+>>  
+>>  static bool gic_check_reserved_range(phys_addr_t addr, unsigned long size)
+>> @@ -2346,7 +2374,8 @@ static int its_setup_baser(struct its_node *its, struct its_baser *baser,
+>>  		order = get_order(GITS_BASER_PAGES_MAX * psz);
+>>  	}
+>>  
+>> -	page = alloc_pages_node(its->numa_node, GFP_KERNEL | __GFP_ZERO, order);
+>> +	page = its_alloc_pages_node(its->numa_node,
+>> +				    GFP_KERNEL | __GFP_ZERO, order);
+>>  	if (!page)
+>>  		return -ENOMEM;
+>>  
+>> @@ -2359,7 +2388,7 @@ static int its_setup_baser(struct its_node *its, struct its_baser *baser,
+>>  		/* 52bit PA is supported only when PageSize=64K */
+>>  		if (psz != SZ_64K) {
+>>  			pr_err("ITS: no 52bit PA support when psz=%d\n", psz);
+>> -			free_pages((unsigned long)base, order);
+>> +			its_free_pages(base, order);
+>>  			return -ENXIO;
+>>  		}
+>>  
+>> @@ -2415,7 +2444,7 @@ static int its_setup_baser(struct its_node *its, struct its_baser *baser,
+>>  		pr_err("ITS@%pa: %s doesn't stick: %llx %llx\n",
+>>  		       &its->phys_base, its_base_type_string[type],
+>>  		       val, tmp);
+>> -		free_pages((unsigned long)base, order);
+>> +		its_free_pages(base, order);
+>>  		return -ENXIO;
+>>  	}
+>>  
+>> @@ -2554,8 +2583,8 @@ static void its_free_tables(struct its_node *its)
+>>  
+>>  	for (i = 0; i < GITS_BASER_NR_REGS; i++) {
+>>  		if (its->tables[i].base) {
+>> -			free_pages((unsigned long)its->tables[i].base,
+>> -				   its->tables[i].order);
+>> +			its_free_pages(its->tables[i].base,
+>> +				       its->tables[i].order);
+>>  			its->tables[i].base = NULL;
+>>  		}
+>>  	}
+>> @@ -2821,7 +2850,8 @@ static bool allocate_vpe_l2_table(int cpu, u32 id)
+>>  
+>>  	/* Allocate memory for 2nd level table */
+>>  	if (!table[idx]) {
+>> -		page = alloc_pages(GFP_KERNEL | __GFP_ZERO, get_order(psz));
+>> +		page = its_alloc_pages(GFP_KERNEL | __GFP_ZERO,
+>> +				       get_order(psz));
+>>  		if (!page)
+>>  			return false;
+>>  
+>> @@ -2940,7 +2970,8 @@ static int allocate_vpe_l1_table(void)
+>>  
+>>  	pr_debug("np = %d, npg = %lld, psz = %d, epp = %d, esz = %d\n",
+>>  		 np, npg, psz, epp, esz);
+>> -	page = alloc_pages(GFP_ATOMIC | __GFP_ZERO, get_order(np * PAGE_SIZE));
+>> +	page = its_alloc_pages(GFP_ATOMIC | __GFP_ZERO,
+>> +			       get_order(np * PAGE_SIZE));
+>>  	if (!page)
+>>  		return -ENOMEM;
+>>  
+>> @@ -2986,8 +3017,8 @@ static struct page *its_allocate_pending_table(gfp_t gfp_flags)
+>>  {
+>>  	struct page *pend_page;
+>>  
+>> -	pend_page = alloc_pages(gfp_flags | __GFP_ZERO,
+>> -				get_order(LPI_PENDBASE_SZ));
+>> +	pend_page = its_alloc_pages(gfp_flags | __GFP_ZERO,
+>> +				    get_order(LPI_PENDBASE_SZ));
+>>  	if (!pend_page)
+>>  		return NULL;
+>>  
+>> @@ -2999,7 +3030,7 @@ static struct page *its_allocate_pending_table(gfp_t gfp_flags)
+>>  
+>>  static void its_free_pending_table(struct page *pt)
+>>  {
+>> -	free_pages((unsigned long)page_address(pt), get_order(LPI_PENDBASE_SZ));
+>> +	its_free_pages(page_address(pt), get_order(LPI_PENDBASE_SZ));
+>>  }
+>>  
+>>  /*
+>> @@ -3334,8 +3365,9 @@ static bool its_alloc_table_entry(struct its_node *its,
+>>  
+>>  	/* Allocate memory for 2nd level table */
+>>  	if (!table[idx]) {
+>> -		page = alloc_pages_node(its->numa_node, GFP_KERNEL | __GFP_ZERO,
+>> -					get_order(baser->psz));
+>> +		page = its_alloc_pages_node(its->numa_node,
+>> +					    GFP_KERNEL | __GFP_ZERO,
+>> +					    get_order(baser->psz));
+>>  		if (!page)
+>>  			return false;
+>>  
+>> @@ -3418,7 +3450,9 @@ static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
+>>  	unsigned long *lpi_map = NULL;
+>>  	unsigned long flags;
+>>  	u16 *col_map = NULL;
+>> +	struct page *page;
+>>  	void *itt;
+>> +	int itt_order;
+>>  	int lpi_base;
+>>  	int nr_lpis;
+>>  	int nr_ites;
+>> @@ -3430,7 +3464,6 @@ static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
+>>  	if (WARN_ON(!is_power_of_2(nvecs)))
+>>  		nvecs = roundup_pow_of_two(nvecs);
+>>  
+>> -	dev = kzalloc(sizeof(*dev), GFP_KERNEL);
+>>  	/*
+>>  	 * Even if the device wants a single LPI, the ITT must be
+>>  	 * sized as a power of two (and you need at least one bit...).
+>> @@ -3438,7 +3471,16 @@ static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
+>>  	nr_ites = max(2, nvecs);
+>>  	sz = nr_ites * (FIELD_GET(GITS_TYPER_ITT_ENTRY_SIZE, its->typer) + 1);
+>>  	sz = max(sz, ITS_ITT_ALIGN) + ITS_ITT_ALIGN - 1;
+>> -	itt = kzalloc_node(sz, GFP_KERNEL, its->numa_node);
+>> +	itt_order = get_order(sz);
+>> +	page = its_alloc_pages_node(its->numa_node,
+>> +				    GFP_KERNEL | __GFP_ZERO,
+>> +				    itt_order);
+> 
+> So we go from an allocation that was so far measured in *bytes* to
+> something that is now at least a page. Per device. This seems a bit
+> excessive to me, specially when it isn't conditioned on anything and
+> is now imposed on all platforms, including the non-CCA systems (which
+> are exactly 100% of the machines).
+
+Catalin asked about this in v2:
+https://lore.kernel.org/lkml/c329ae18-2b61-4851-8d6a-9e691a2007c8@arm.com/
+
+To be honest, I don't have a great handle on how much memory is being
+wasted here. Within the realm guest I was testing this is rounding up an
+otherwise 511 byte allocation to a 4k page, and there are 3 of them.
+Which seems reasonable from a realm guest perspective.
+
+I can see two options to improve here:
+
+1. Add a !is_realm_world() check and return to the previous behaviour
+when not running in a realm. It's ugly, and doesn't deal with any other
+potential future memory encryption. cc_platform_has(CC_ATTR_MEM_ENCRYPT)
+might be preferable? But this means no impact to non-realm guests.
+
+2. Use a special (global) memory allocator that does the
+set_memory_decrypted() dance on the pages that it allocates but allows
+packing the allocations. I'm not aware of an existing kernel API for
+this, so it's potentially quite a bit of code. The benefit is that it
+reduces memory consumption in a realm guest, although fragmentation
+still means we're likely to see a (small) growth.
+
+Any thoughts on what you think would be best?
+
+> Another thing is that if we go with page alignment, then the 256 byte
+> alignment can obviously be removed everywhere (hint: MAPD needs to
+> change).
+
+Ah, good point - I'll need to look into that, my GIC-foo isn't quite up
+to speed on that.
+
+Thanks,
+
+Steve
 
