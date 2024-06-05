@@ -1,151 +1,166 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9491E1922D7;
-	Wed,  5 Jun 2024 07:28:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 266AE15E5A2;
+	Wed,  5 Jun 2024 07:56:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717572499; cv=none; b=hp2wt4ulsffSkbqyGcIu++WVDQErkkqR1Cjakm5vN21szzAFRsFgK7BJS+1QVbCYWMLudXs0q49RAI8+eDfmqDqou/5IqnceJd6Ew+iQhkbIqEiGvSqBJx/rylIQHJoSHkfL8++17AneOnU+527qRBzsiOHUdEJgE9WS6MtOF2I=
+	t=1717574200; cv=none; b=hZl+49KvgqFldwIhMNUHp3fUGblS/UwzJjfUSbFh1eKC6CE3Trsufj0jTJYX6diG+l/XxYR+jg6DlYexwwFVYBLcoCN113jG72EvWTLhDo3Hx6XvAyPIBSurbvBDNn5eYg+7GtG+6EWnmqQG7haKN7kVIQif9lHjcAIkNAtYQL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717572499; c=relaxed/simple;
-	bh=VDWaPe6jIhISipwILh3CKrMhwSHXzHUPVWVJ6g5hdkc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=SR3hIkr0RNPce/xbTSm7lyM0Fubq9gnoTMVN7j4jmLdz7wT6lLGt4tza0twJK5qX/eXpU2jI6ERYe1uGV80bkGRrbPZ22TxBly6u7fq6t4DD80WvvREyMRYDSwX7FubEO72UeMgapvNJUbF8ASt0NCX9sW2WEtGijnlkTcnRT6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sWXaXjIa; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1717574200; c=relaxed/simple;
+	bh=SrMwiri/fv5VbxUe1nm98++rbHYD+JdlXdKw90ZRXqU=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=szwTpBlEcvn8shVam0LTTLUrxbs6VNDmGvfG2aKSK2LfEgTxJShYDIPrxNXQT+NZ5KeFlzCakkb2Av8thr4oDCknNXlQg+i1qbxr/NWNtxfhzDnC4IoHSlkoiafmZXeLCMrmMjz61FS7OREq21Iyl+4HHO0DTe1caV2MbQlVaAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BKNsysE+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sWXaXjIa"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D647C3277B;
-	Wed,  5 Jun 2024 07:28:19 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BKNsysE+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F12BFC3277B;
+	Wed,  5 Jun 2024 07:56:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717572499;
-	bh=VDWaPe6jIhISipwILh3CKrMhwSHXzHUPVWVJ6g5hdkc=;
-	h=From:To:Cc:Subject:Date:From;
-	b=sWXaXjIavZKQUqRyDIy89bFWtJnv7GcdkwzYtb5+CacYataVZ8woCrSrU8vy+C74E
-	 KvUHhR2TvbsleAXUENV/QaDSp8n+MaxPr3a/X5SVefn76F1PCE0nr04YdNPtG34ooJ
-	 VPd3gZDVPxR8f5e3m0iMq95vTmRahmT+5JRty3Q7C8QWhx4kHA1SDgGKFMgHS8r0rY
-	 qX3ANPuknB1AnFy01z60ihAucAGh/r2fWMOW0Pb010g+V8rRen6yH4C49zeycSXnbY
-	 pbkfaIlbKfvgDtjkrhZgsLTMPuv7DAtSTcfXNVaMHkooDx1vqChM5Kl2+kTcGBfGrs
-	 WCf+HrYlFmy4g==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	s=k20201202; t=1717574200;
+	bh=SrMwiri/fv5VbxUe1nm98++rbHYD+JdlXdKw90ZRXqU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=BKNsysE+JPMhfwHiglgXg1P2pg4cgyhhcDpjTikJsgvI9MwiyJgEQIQjP+HtbSfW5
+	 XzprlmBIbicEHCa86FUXRCLVu0cDxYF5Gj7r/lK1MwjgXTMRLhBEMwd1bsJ2Syh2rC
+	 iqa1BZyczGT7fZZfeJtMfEpWqRfQAzG5MsOyLXGwYniVhGizK9iJxw3kUKH9nLf/pJ
+	 3VRkAXpnOV5qqdIy0B+nbfMSc1Y8iRROqnf54oA4sH1AcQ2W0NcJ8fFNC9TbESmxY6
+	 neLnaRSCAS1TX0Gv2vf8Hl6XDscT4c7TI/Wb4CJSBSREZBd+vIa8IqIsWjiDtQ/Pnf
+	 wNeJ113H4IAQQ==
+Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sEl4C-000pgW-Ie;
-	Wed, 05 Jun 2024 08:28:16 +0100
+	id 1sElVd-000q4X-Sq;
+	Wed, 05 Jun 2024 08:56:38 +0100
+Date: Wed, 05 Jun 2024 08:56:36 +0100
+Message-ID: <87ed9b3jrf.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Fuad Tabba <tabba@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Mark Brown <broonie@kernel.org>,
-	Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Subject: [GIT PULL] KVM/arm64 fixes for 6.10, take #1
-Date: Wed,  5 Jun 2024 08:28:08 +0100
-Message-Id: <20240605072808.1039636-1-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: Re: [PATCH v2 12/16] KVM: arm64: nv: Tag shadow S2 entries with guest's leaf S2 level
+In-Reply-To: <Zl4F45W_FoVr89zl@linux.dev>
+References: <20240529145628.3272630-1-maz@kernel.org>
+	<20240529145628.3272630-13-maz@kernel.org>
+	<Zl4F45W_FoVr89zl@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, tabba@google.com, joey.gouly@arm.com, broonie@kernel.org, nsg@linux.ibm.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.104.136.29
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Paolo,
+On Mon, 03 Jun 2024 19:05:23 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> On Wed, May 29, 2024 at 03:56:24PM +0100, Marc Zyngier wrote:
+> > Populate bits [56:55] of the leaf entry with the level provided
+> > by the guest's S2 translation. This will allow us to better scope
+> > the invalidation by remembering the mapping size.
+> > 
+> > Of course, this assume that the guest will issue an invalidation
+> > with an address that falls into the same leaf. If the guest doesn't,
+> > we'll over-invalidate.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/kvm_nested.h |  8 ++++++++
+> >  arch/arm64/kvm/mmu.c                | 17 +++++++++++++++--
+> >  2 files changed, 23 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> > index fcb0de3a93fe..971dbe533730 100644
+> > --- a/arch/arm64/include/asm/kvm_nested.h
+> > +++ b/arch/arm64/include/asm/kvm_nested.h
+> > @@ -5,6 +5,7 @@
+> >  #include <linux/bitfield.h>
+> >  #include <linux/kvm_host.h>
+> >  #include <asm/kvm_emulate.h>
+> > +#include <asm/kvm_pgtable.h>
+> >  
+> >  static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
+> >  {
+> > @@ -195,4 +196,11 @@ static inline bool kvm_auth_eretax(struct kvm_vcpu *vcpu, u64 *elr)
+> >  }
+> >  #endif
+> >  
+> > +#define KVM_NV_GUEST_MAP_SZ	(KVM_PGTABLE_PROT_SW1 | KVM_PGTABLE_PROT_SW0)
+> > +
+> > +static inline u64 kvm_encode_nested_level(struct kvm_s2_trans *trans)
+> > +{
+> > +	return FIELD_PREP(KVM_NV_GUEST_MAP_SZ, trans->level);
+> > +}
+> > +
+> 
+> It might be nice to keep all of the software fields for (in)valid in
+> a central place so we can add some documentation. I fear this is going
+> to get rather complicated as more pieces of pKVM land upstream and we
+> find new and fun ways to cram data into stage-2.
 
-Here's a large-ish set of fixes for 6.10, the bulk of it addressing
-the sorry state of pKVM's handling of FP/SVE (kudos to Fuad for sticking
-with it and getting the series in shape).
+I had that at some point, but it then became clear that pKVM and NV
+were pretty much incompatible in their current respective incarnation.
+To get them to play together, you'd need to reinvent the NV wheel
+solely at EL2, something that nobody is looking forward to.
 
-The rest is a more esoteric set of AArch32 and NV fixes, details in the
-tag as usual.
+What I'm aiming at with this digression is that although they use the
+same bits, NV and pKVM are never using them at the same time. If we
+shove them at the same location, we make it less clear what is used
+when (hence pKVM keeping its toys in mem_protect.h).
 
-Please pull,
+But maybe you had a scheme in mind that would avoid this situation?
 
-        M.
+> 
+> >  #endif /* __ARM64_KVM_NESTED_H */
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index 4ed93a384255..f3a8ec70bd29 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -1598,11 +1598,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >  	 * Potentially reduce shadow S2 permissions to match the guest's own
+> >  	 * S2. For exec faults, we'd only reach this point if the guest
+> >  	 * actually allowed it (see kvm_s2_handle_perm_fault).
+> > +	 *
+> > +	 * Also encode the level of the nested translation in the SW bits of
+> > +	 * the PTE/PMD/PUD. This will be retrived on TLB invalidation from
+> > +	 * the guest.
+> 
+> typo: retrieved
+> 
+> Also, it might be helpful to add some color here to indicate the encoded
+> TTL is used to represent the span of a single virtual TLB entry,
+> providing scope to the TLBI by address.
+> 
+> Before I actually read what was going on, I thought the TTL in the PTE
+> was used for matching invalidation scopes that have a valid TTL.
 
-The following changes since commit 1613e604df0cd359cf2a7fbd9be7a0bcfacfabd0:
+How about this:
 
-  Linux 6.10-rc1 (2024-05-26 15:20:12 -0700)
+/*
+ * Also encode the level of the original translation in the SW bits of
+ * the leaf entry as a proxy for the span of that translation. This will
+ * be retrieved on TLB invalidation from the guest and used to limit
+ * the invalidation scope if a TTL hint or a range isn't provided.
+ */
 
-are available in the Git repository at:
+Thanks,
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.10-1
+	M.
 
-for you to fetch changes up to afb91f5f8ad7af172d993a34fde1947892408f53:
-
-  KVM: arm64: Ensure that SME controls are disabled in protected mode (2024-06-04 15:06:33 +0100)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for 6.10, take #1
-
-- Large set of FP/SVE fixes for pKVM, addressing the fallout
-  from the per-CPU data rework and making sure that the host
-  is not involved in the FP/SVE switching any more
-
-- Allow FEAT_BTI to be enabled with NV now that FEAT_PAUTH
-  is copletely supported
-
-- Fix for the respective priorities of Failed PAC, Illegal
-  Execution state and Instruction Abort exceptions
-
-- Fix the handling of AArch32 instruction traps failing their
-  condition code, which was broken by the introduction of
-  ESR_EL2.ISS2
-
-- Allow vpcus running in AArch32 state to be restored in
-  System mode
-
-- Fix AArch32 GPR restore that would lose the 64 bit state
-  under some conditions
-
-----------------------------------------------------------------
-Fuad Tabba (9):
-      KVM: arm64: Reintroduce __sve_save_state
-      KVM: arm64: Fix prototype for __sve_save_state/__sve_restore_state
-      KVM: arm64: Abstract set/clear of CPTR_EL2 bits behind helper
-      KVM: arm64: Specialize handling of host fpsimd state on trap
-      KVM: arm64: Allocate memory mapped at hyp for host sve state in pKVM
-      KVM: arm64: Eagerly restore host fpsimd/sve state in pKVM
-      KVM: arm64: Consolidate initializing the host data's fpsimd_state/sve in pKVM
-      KVM: arm64: Refactor CPACR trap bit setting/clearing to use ELx format
-      KVM: arm64: Ensure that SME controls are disabled in protected mode
-
-Marc Zyngier (5):
-      KVM: arm64: Fix AArch32 register narrowing on userspace write
-      KVM: arm64: Allow AArch32 PSTATE.M to be restored as System mode
-      KVM: arm64: AArch32: Fix spurious trapping of conditional instructions
-      KVM: arm64: nv: Fix relative priorities of exceptions generated by ERETAx
-      KVM: arm64: nv: Expose BTI and CSV_frac to a guest hypervisor
-
- arch/arm64/include/asm/el2_setup.h      |  6 +--
- arch/arm64/include/asm/kvm_arm.h        |  6 +++
- arch/arm64/include/asm/kvm_emulate.h    | 71 ++++++++++++++++++++++++++--
- arch/arm64/include/asm/kvm_host.h       | 25 +++++++++-
- arch/arm64/include/asm/kvm_hyp.h        |  4 +-
- arch/arm64/include/asm/kvm_pkvm.h       |  9 ++++
- arch/arm64/kvm/arm.c                    | 76 +++++++++++++++++++++++++++++
- arch/arm64/kvm/emulate-nested.c         | 21 +++++----
- arch/arm64/kvm/fpsimd.c                 | 11 +++--
- arch/arm64/kvm/guest.c                  |  3 +-
- arch/arm64/kvm/hyp/aarch32.c            | 18 ++++++-
- arch/arm64/kvm/hyp/fpsimd.S             |  6 +++
- arch/arm64/kvm/hyp/include/hyp/switch.h | 36 +++++++-------
- arch/arm64/kvm/hyp/include/nvhe/pkvm.h  |  1 -
- arch/arm64/kvm/hyp/nvhe/hyp-main.c      | 84 +++++++++++++++++++++++++++++----
- arch/arm64/kvm/hyp/nvhe/pkvm.c          | 17 ++-----
- arch/arm64/kvm/hyp/nvhe/setup.c         | 25 +++++++++-
- arch/arm64/kvm/hyp/nvhe/switch.c        | 24 ++++++++--
- arch/arm64/kvm/hyp/vhe/switch.c         | 12 +++--
- arch/arm64/kvm/nested.c                 |  6 ++-
- arch/arm64/kvm/reset.c                  |  3 ++
- 21 files changed, 391 insertions(+), 73 deletions(-)
+-- 
+Without deviation from the norm, progress is not possible.
