@@ -1,35 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DD5D198823;
-	Wed,  5 Jun 2024 11:50:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B06A713791C;
+	Wed,  5 Jun 2024 11:50:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717588213; cv=none; b=oYe8zCcuig7ueut/y0lYFBNuLRFKNeoUEy1XTrUMvvZlwlj/hzJWmv9Cu8pikkGy5cZ+tuZFL+Z+h6Qdmlbu5LVRAy/cgGJssbaWd8IHyUzhdYBnnciCD+Ae3MUfZQtLhsA3fk/fnY86JCYGj4PZD6HoJjwH+uYC6xpb+5IR3E0=
+	t=1717588215; cv=none; b=eFFg/7qbVhU8yBQVimXWlNGalT14z4/KvGR0uhoUjkg3eeHuDsD2JoKuX2fnIPmfR7VbGKG00+D7ZRqAfvBTkJa26sQruB+xQg2wvCdPeVPaAnXwQcwYX0LinoSquxN/lAGhnFVW6f+bcS20poM8XIP53TtCuc+hgZl2kG+BUFM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717588213; c=relaxed/simple;
-	bh=6c1J1xU5lj/uDWDKMELN0USooXuGEwyYBBdoSr9IN5k=;
+	s=arc-20240116; t=1717588215; c=relaxed/simple;
+	bh=I+qiD9f7AIjkeTzE7i3sCyRtTk9/3BCUmNFuB2K/uis=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=AKarUDlZjsxHgEu/KPvvVTrcEan7eX+UmNUEbJb7cm0iJZzXm1rxagIFmpm5QILWNUdHdBx3sLxl5ZAoE4uqxYBz04Mg+FnehT3zqgebYFuzMuTxG9iNIb29SfhoqNZuQ/69y7zAVitR7ZGweFA77tOsjq6D53CrITSiIqv3C4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kpzyHpVZ; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=dilUVyDmKS/u7J+un8PhmewZ3mT+wxs1q+jsO8OKTzeAVPQdZVlDRdxbLoIWWdBFtbwJr6tJ3T4orDZDyXZrkG+CxJUpFgd/IioWurLEyK+TDiCulOIgXG6vosS3sX55dG6HVyojV04QCFmn+Q5OcVSfdFkeWXhk4yzzM788+cA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LAlnpnZY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kpzyHpVZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E766C3277B;
-	Wed,  5 Jun 2024 11:50:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LAlnpnZY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 445BEC4AF08;
+	Wed,  5 Jun 2024 11:50:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717588212;
-	bh=6c1J1xU5lj/uDWDKMELN0USooXuGEwyYBBdoSr9IN5k=;
+	s=k20201202; t=1717588215;
+	bh=I+qiD9f7AIjkeTzE7i3sCyRtTk9/3BCUmNFuB2K/uis=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=kpzyHpVZUc2cTuibhG56v9GllJK173FJzG3r6TeFWkRGAYVtW2e9xDXplXbVGsKVa
-	 92wrW67uFQBubZkx6H6Ix0dnnC+N7VpxYRe6jEBw3l9RfgnNwB/Hnd9GzC6c2sgIll
-	 WGAPzU4yawFn0cUCVfNeVABJv3VvMO4jOR0JvKBb0YSji8iU4U95cEac8CDc75BFUw
-	 ZtZuaZneMOfCi6EZeOtOgiioD7GIV0o6z6O8aQKn60PHUzuLxBtBOd461WGRjM2q7R
-	 Bwtx/ah62/GxMbMe/QMI96UFKb5KQ+WZ+I77Uxb9UrTkasGbhVnBK9ehWx3Rr0flP7
-	 UHEo4IGhJH2fA==
+	b=LAlnpnZYLXMLUpTvG3MQVyE+K6rpEEFqw4vUwMUmPLD5xDfHwoSWshyluK3r9vLSi
+	 Pkm44HYBiFqaMrp7zVwDhsImoH0ogYo56Quk5PxLqo0wbmwHuUgNCNg4pTBVsNHNV6
+	 nn76CiUxAiOa2D8tyHhG9HR3rLSNCvToPBwiTWCYN+BTdfHKk76Jslemkq3As8asPJ
+	 UN2UzbEgOlPfgJorsQQrZktTxjFQ7lOVcdpwMwscEcBOWIHo6mqfIBYX+yDsj7TI3O
+	 IiG4zT7SSzpv2LSo3tIRcShRBwZaLncdu2Mi1iZBO7YzThWu3m1spjTroRC0m8qO60
+	 sBneQuG06drFg==
 From: Mark Brown <broonie@kernel.org>
-Date: Wed, 05 Jun 2024 12:41:29 +0100
-Subject: [PATCH 3/4] KVM: arm64: Fix FFR offset calculation for pKVM host
- state save and restore
+Date: Wed, 05 Jun 2024 12:41:30 +0100
+Subject: [PATCH 4/4] KVM: arm64: Avoid underallocating storage for host SVE
+ state
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -38,7 +38,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240605-kvm-arm64-fix-pkvm-sve-vl-v1-3-680d6b43b4c1@kernel.org>
+Message-Id: <20240605-kvm-arm64-fix-pkvm-sve-vl-v1-4-680d6b43b4c1@kernel.org>
 References: <20240605-kvm-arm64-fix-pkvm-sve-vl-v1-0-680d6b43b4c1@kernel.org>
 In-Reply-To: <20240605-kvm-arm64-fix-pkvm-sve-vl-v1-0-680d6b43b4c1@kernel.org>
 To: Catalin Marinas <catalin.marinas@arm.com>, 
@@ -48,85 +48,127 @@ To: Catalin Marinas <catalin.marinas@arm.com>,
 Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
  kvmarm@lists.linux.dev, Mark Brown <broonie@kernel.org>
 X-Mailer: b4 0.14-dev-d4707
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2968; i=broonie@kernel.org;
- h=from:subject:message-id; bh=6c1J1xU5lj/uDWDKMELN0USooXuGEwyYBBdoSr9IN5k=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBmYFDoS+tQMHD3gju9xsmaBv3OV04ouECGRPwHWpXn
- FW5Cn7OJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZmBQ6AAKCRAk1otyXVSH0JjbB/
- 4wVrMIkRIgpQYuRW+a+2JfCt54xdzClYfx+fQf+SGGIjsHUnHvOEMSO2msR5qAC+tQ1JCEFvIliLWt
- TFjxCf4X8WrQtcqJvT+1ToflMa2Ib9zeEeP2OQ3ETsOdmbWUjZBhq9cBt1SxOkPSEOAGXRdiCPGNBO
- /4qBks58qe38BvrN6HbU0rIoYCOGjSGasUw/j0BCCPrE+kgPjpXgt8attTusyAjhwCMYtWYatoNF1Q
- /MvzeLeVT3eiyCiK5aQxv9YAA8NQynz8pe+SA3T1trQldGnoEtfmS1tlmaIEzoatn5rSJQ30TRmV1Z
- 6zhHdyz+542bvrleMcCzWoVL0dZjiI
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4775; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=I+qiD9f7AIjkeTzE7i3sCyRtTk9/3BCUmNFuB2K/uis=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBmYFDpNLP6xsTXnP4x+K63OmWAJYiakPHrQkrNYpo1
+ ZXtEslWJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZmBQ6QAKCRAk1otyXVSH0K9cB/
+ 49BkO45ApDn9aeWm8mUJ7CZsd+CKe1eEiMHrx3B2uFlNMFMa2p6dYhjR3kVwQJBgSKZNTsBSvfQW/b
+ lTwH0VLX38XW3mnZDcisC9jPnwSe1OXSdaBnrR/DUTEgYr0AHHg3TGVcRFlGADgEBFxK1NUz1M5A/v
+ EtS9jcxTuzkrKolSa7nRDIPjICi0nC1riWydKf5Gy4O9vVWybhQKBoG7cQx+4AmvwkISFmxvU+Kqz6
+ dE58oIqi3KKMKri4kd7H3KWfrX8FI8zcdV/J+NsVvhZ06HCMP1oFWVxun2qOoHHYxlPhxFgVeCcLSk
+ K0XMNgb6L16jUyGCpHiZSmMb3F/z9m
 X-Developer-Key: i=broonie@kernel.org; a=openpgp;
  fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-When saving and restoring the SVE state for the host we configure the
-hardware for the maximum VL it supports, but when calculating offsets in
-memory we use the maximum usable VL for the host. Since these two values
-may not be the same this may result in data corruption.  We can just
-read the current VL from the hardware with an instruction so do that
-instead of a saved value.
+We size the allocation for the host SVE state using the maximum VL
+shared by all CPUs in the host.  As observed during review on an
+asymmetric system this may be less than the maximum VL supported on some
+of the CPUs.  Since the pKVM hypervisor saves and restores the host
+state using the maximum VL for the current CPU this may lead to buffer
+overflows, fix this by changing pKVM to use the maximum VL for any CPU
+to size allocations and limit host configurations.
 
-Fixes: b5b9955617bc ("KVM: arm64: Eagerly restore host fpsimd/sve state in pKVM")
+Fixes: 66d5b53e20a6 ("KVM: arm64: Allocate memory mapped at hyp for host sve state in pKVM")
 Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
- arch/arm64/include/asm/kvm_hyp.h        | 1 +
- arch/arm64/kvm/hyp/fpsimd.S             | 5 +++++
- arch/arm64/kvm/hyp/include/hyp/switch.h | 2 +-
- arch/arm64/kvm/hyp/nvhe/hyp-main.c      | 2 +-
- 4 files changed, 8 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/kvm_host.h  | 2 +-
+ arch/arm64/include/asm/kvm_hyp.h   | 2 +-
+ arch/arm64/include/asm/kvm_pkvm.h  | 2 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c | 4 ++--
+ arch/arm64/kvm/hyp/nvhe/pkvm.c     | 2 +-
+ arch/arm64/kvm/reset.c             | 6 +++---
+ 6 files changed, 9 insertions(+), 9 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 36b8e97bf49e..a28fae10596f 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -76,7 +76,7 @@ static inline enum kvm_mode kvm_get_mode(void) { return KVM_MODE_NONE; };
+ DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
+ 
+ extern unsigned int __ro_after_init kvm_sve_max_vl;
+-extern unsigned int __ro_after_init kvm_host_sve_max_vl;
++extern unsigned int __ro_after_init kvm_host_sve_max_cpu_vl;
+ int __init kvm_arm_init_sve(void);
+ 
+ u32 __attribute_const__ kvm_target_cpu(void);
 diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index b05bceca3385..7510383d78a6 100644
+index 7510383d78a6..47426df69875 100644
 --- a/arch/arm64/include/asm/kvm_hyp.h
 +++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -113,6 +113,7 @@ void __fpsimd_save_state(struct user_fpsimd_state *fp_regs);
- void __fpsimd_restore_state(struct user_fpsimd_state *fp_regs);
- void __sve_save_state(void *sve_pffr, u32 *fpsr, int save_ffr);
- void __sve_restore_state(void *sve_pffr, u32 *fpsr, int restore_ffr);
-+int __sve_get_vl(void);
+@@ -144,6 +144,6 @@ extern u64 kvm_nvhe_sym(id_aa64smfr0_el1_sys_val);
  
- u64 __guest_enter(struct kvm_vcpu *vcpu);
+ extern unsigned long kvm_nvhe_sym(__icache_flags);
+ extern unsigned int kvm_nvhe_sym(kvm_arm_vmid_bits);
+-extern unsigned int kvm_nvhe_sym(kvm_host_sve_max_vl);
++extern unsigned int kvm_nvhe_sym(kvm_host_sve_max_cpu_vl);
  
-diff --git a/arch/arm64/kvm/hyp/fpsimd.S b/arch/arm64/kvm/hyp/fpsimd.S
-index e950875e31ce..d272dbf36da8 100644
---- a/arch/arm64/kvm/hyp/fpsimd.S
-+++ b/arch/arm64/kvm/hyp/fpsimd.S
-@@ -31,3 +31,8 @@ SYM_FUNC_START(__sve_save_state)
- 	sve_save 0, x1, x2, 3
- 	ret
- SYM_FUNC_END(__sve_save_state)
-+
-+SYM_FUNC_START(__sve_get_vl)
-+	_sve_rdvl	0, 1
-+	ret
-+SYM_FUNC_END(__sve_get_vl)
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 0c4de44534b7..06efcca765cc 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -327,7 +327,7 @@ static inline void __hyp_sve_save_host(void)
+ #endif /* __ARM64_KVM_HYP_H__ */
+diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
+index cd56acd9a842..6fc0cf42fca3 100644
+--- a/arch/arm64/include/asm/kvm_pkvm.h
++++ b/arch/arm64/include/asm/kvm_pkvm.h
+@@ -134,7 +134,7 @@ static inline size_t pkvm_host_sve_state_size(void)
+ 		return 0;
  
- 	sve_state->zcr_el1 = read_sysreg_el1(SYS_ZCR);
- 	write_sysreg_s(ZCR_ELx_LEN_MASK, SYS_ZCR_EL2);
--	__sve_save_state(sve_state->sve_regs + sve_ffr_offset(kvm_host_sve_max_vl),
-+	__sve_save_state(sve_state->sve_regs + sve_ffr_offset(__sve_get_vl()),
- 			 &sve_state->fpsr,
- 			 true);
+ 	return size_add(sizeof(struct cpu_sve_state),
+-			SVE_SIG_REGS_SIZE(sve_vq_from_vl(kvm_host_sve_max_vl)));
++			SVE_SIG_REGS_SIZE(sve_vq_from_vl(kvm_host_sve_max_cpu_vl)));
  }
+ 
+ #endif	/* __ARM64_KVM_PKVM_H__ */
 diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index f43d845f3c4e..bd8f671e848c 100644
+index bd8f671e848c..d232775b72c9 100644
 --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
 +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -49,7 +49,7 @@ static void __hyp_sve_restore_host(void)
- 	 * supported by the system (or limited at EL3).
- 	 */
- 	write_sysreg_s(ZCR_ELx_LEN_MASK, SYS_ZCR_EL2);
--	__sve_restore_state(sve_state->sve_regs + sve_ffr_offset(kvm_host_sve_max_vl),
-+	__sve_restore_state(sve_state->sve_regs + sve_ffr_offset(__sve_get_vl()),
- 			    &sve_state->fpsr,
- 			    true);
- 	write_sysreg_el1(sve_state->zcr_el1, SYS_ZCR);
+@@ -90,8 +90,8 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
+ 	hyp_vcpu->vcpu.arch.ctxt	= host_vcpu->arch.ctxt;
+ 
+ 	hyp_vcpu->vcpu.arch.sve_state	= kern_hyp_va(host_vcpu->arch.sve_state);
+-	/* Limit guest vector length to the maximum supported by the host.  */
+-	hyp_vcpu->vcpu.arch.sve_max_vl	= min(host_vcpu->arch.sve_max_vl, kvm_host_sve_max_vl);
++	/* Limit guest vector length to the maximum supported by any CPU.  */
++	hyp_vcpu->vcpu.arch.sve_max_vl	= min(host_vcpu->arch.sve_max_vl, kvm_host_sve_max_cpu_vl);
+ 
+ 	hyp_vcpu->vcpu.arch.hw_mmu	= host_vcpu->arch.hw_mmu;
+ 
+diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+index 95cf18574251..08e825de09d1 100644
+--- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
++++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+@@ -18,7 +18,7 @@ unsigned long __icache_flags;
+ /* Used by kvm_get_vttbr(). */
+ unsigned int kvm_arm_vmid_bits;
+ 
+-unsigned int kvm_host_sve_max_vl;
++unsigned int kvm_host_sve_max_cpu_vl;
+ 
+ /*
+  * Set trap register values based on features in ID_AA64PFR0.
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index 3fc8ca164dbe..59cccb477cf3 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -32,7 +32,7 @@
+ 
+ /* Maximum phys_shift supported for any VM on this host */
+ static u32 __ro_after_init kvm_ipa_limit;
+-unsigned int __ro_after_init kvm_host_sve_max_vl;
++unsigned int __ro_after_init kvm_host_sve_max_cpu_vl;
+ 
+ /*
+  * ARMv8 Reset Values
+@@ -52,8 +52,8 @@ int __init kvm_arm_init_sve(void)
+ {
+ 	if (system_supports_sve()) {
+ 		kvm_sve_max_vl = sve_max_virtualisable_vl();
+-		kvm_host_sve_max_vl = sve_max_vl();
+-		kvm_nvhe_sym(kvm_host_sve_max_vl) = kvm_host_sve_max_vl;
++		kvm_host_sve_max_cpu_vl = sve_max_cpu_vl();
++		kvm_nvhe_sym(kvm_host_sve_max_cpu_vl) = kvm_host_sve_max_cpu_vl;
+ 
+ 		/*
+ 		 * The get_sve_reg()/set_sve_reg() ioctl interface will need
 
 -- 
 2.39.2
