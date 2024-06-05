@@ -1,93 +1,99 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C48C196C9A;
-	Wed,  5 Jun 2024 12:13:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4813D1953A3;
+	Wed,  5 Jun 2024 12:31:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717589604; cv=none; b=Aljp7/RruN75/MjjHoOJV5vVDr+A7J2NrKtTbd7PxNoLBWeHXtpbYgbiDDikuNK3bkYIkGkWb9MelGxlDDy1L30Ijmn8u2vOO/wJ+0S1B/WEQQkAVbNU636wFnaPyAt3+NTgc2buGRxhSRk2eA9JZ8B8Q+QWKxND5pLIqvG4QYw=
+	t=1717590704; cv=none; b=OLMBUNgYZpLUjZs/XxMhS2Gd9FPf/cFSjHnYblOkPVAK3wfpUwVxdWdyl06LiEREaLcdtUh0yHsQGq7HtpXX0a38f8QW2Ru+w6FN0K7iRvfrOrnxrM/8nP9wcNRQVxZ0DDb3dLvu8C6YtPf2ggWMS2Q+XMoYBncCyuMSLHJ83Go=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717589604; c=relaxed/simple;
-	bh=8Qvk4GMBLPewcLA36ipcX0h+jn9RBJObf0Xl8i+W7II=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HVTT6g8Op5XVxWQ4MVMSeud1oWBf04knpIl819P9CgWxWuqGiids45eaX4a3SQwL9niPpTU6zAyWeQO2Z5lQnQIMPU8QmBqvnej9K7H5s4GC4VhQljT7OydT7zoD4BSmo5BW/KdhIhI0v3oC7nsl0osFTmXJ+x+HZmNGMm40vDE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iDw0KfdN; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1717590704; c=relaxed/simple;
+	bh=WqX/iaOAQS6MZ5oQl3ZCdSns0vW4s+x/vrm13fm7laY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZcBNz7EZ0UGm+fK18E4fgM4bw1MvikmP4R8RGCEyNN/hIRX0hPWl4SIpFWF75ss1tnVDZ6BT+G4A9NAyyyYjfjgckzlrpQw4DoaYMU1kHHBse/V+/v11wUhQL3IQ319LI6CgYoJyKKgWq9nO5gxDqPR9dR4FMS9b5VdYn8Gtlx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DIl2tBBZ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iDw0KfdN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12996C32786;
-	Wed,  5 Jun 2024 12:13:24 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DIl2tBBZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE75BC3277B;
+	Wed,  5 Jun 2024 12:31:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717589604;
-	bh=8Qvk4GMBLPewcLA36ipcX0h+jn9RBJObf0Xl8i+W7II=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=iDw0KfdNHkEJXKO88Lo2ognlhfMkF49pM/dIaJ7iKL8jZIbaF/fhxljH90xqLIRzs
-	 yRXNOudnzpNWaqMitLs7IsQCk1I0ndJ0VGJsNjfXvSSklh1gnHqw0qoeAkl3Btivg/
-	 u3gTlJ3OiY/h6QTJoAn5pKuq2478DB1IAnqGwdcAVmZiFKHDDJCeagVamBMxN8MNf5
-	 jTCmf0ixio6BWUWZwMdXPnQJNwu18AV8vhUV8f4cJJIRGLn56RP5Udhd6fdJua6eyD
-	 AGDV+lrzGU7xeJuBYZeISbCDX7zVLRu6rMAN3mfkCNkFFdZF6IqlRPeHRtWT1bj8rW
-	 /6+lUXkWot8UA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sEpW5-000vTV-4f;
-	Wed, 05 Jun 2024 13:13:21 +0100
-Date: Wed, 05 Jun 2024 13:13:20 +0100
-Message-ID: <86bk4flh9b.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
+	s=k20201202; t=1717590703;
+	bh=WqX/iaOAQS6MZ5oQl3ZCdSns0vW4s+x/vrm13fm7laY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DIl2tBBZ6oihhI/f5/7BbeecgSbZ7aK+ZKiHZGsMPZkLUiGDSiY71IFcHbLIN+LHl
+	 /5SklmW8EF3ndFp5BSgUVb7d8wUzYF0kHDfD6BsiU9NVCl3J+Tigjr9gKz5pd0Njhp
+	 3OmzuekhB/C051H6yFE/fEYxeMXHSqSeaKD93UXoZdv8f1LOlZWXacU4kOHUt9FPdv
+	 2DWPxkGGjJLkIiiVeOoDMEiOJb8QLbnsaNQEf2swWOkU03v2EqLJOs/2A54L3S2Yp8
+	 EJVyvCl9xGJ1X49jit06Aepfj7KS0+Gpp4j1nEBvprW8V66jPGicwITi9cpqjoQG0a
+	 VKUQJs+Ta454A==
+Date: Wed, 5 Jun 2024 13:31:38 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
 Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH 2/4] arm64/fpsimd: Discover maximum vector length implemented by any CPU
-In-Reply-To: <20240605-kvm-arm64-fix-pkvm-sve-vl-v1-2-680d6b43b4c1@kernel.org>
+	Fuad Tabba <tabba@google.com>, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH 2/4] arm64/fpsimd: Discover maximum vector length
+ implemented by any CPU
+Message-ID: <1875ba4e-02c7-4331-b9c6-7ab68d2157b3@sirena.org.uk>
 References: <20240605-kvm-arm64-fix-pkvm-sve-vl-v1-0-680d6b43b4c1@kernel.org>
-	<20240605-kvm-arm64-fix-pkvm-sve-vl-v1-2-680d6b43b4c1@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <20240605-kvm-arm64-fix-pkvm-sve-vl-v1-2-680d6b43b4c1@kernel.org>
+ <86bk4flh9b.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, tabba@google.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="ysVZwPn+MwR2sALq"
+Content-Disposition: inline
+In-Reply-To: <86bk4flh9b.wl-maz@kernel.org>
+X-Cookie: Simulated picture.
 
-On Wed, 05 Jun 2024 12:41:28 +0100,
-Mark Brown <broonie@kernel.org> wrote:
-> 
-> @@ -1083,6 +1095,18 @@ int vec_verify_vq_map(enum vec_type type)
->  	if (!IS_ENABLED(CONFIG_KVM) || !is_hyp_mode_available())
->  		return 0;
->  
-> +	/*
-> +	 * pKVM allocates and uses storage for host state based on the
-> +	 * largest per-PE VL, reject new PEs with a larger maximum.
-> +	 */
-> +	if (is_protected_kvm_enabled()) {
-> +		if (max_vl > info->max_cpu_vl) {
-> +			pr_warn("%s: cpu%d: would increase maximum VL\n",
-> +				info->name, smp_processor_id());
-> +			return -EINVAL;
-> +		}
-> +	}
-> +
 
-Once protected mode is enabled, no new CPU can be booted (see
-psci_relay.c::psci_cpu_on()).
+--ysVZwPn+MwR2sALq
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-	M.
+On Wed, Jun 05, 2024 at 01:13:20PM +0100, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
 
--- 
-Without deviation from the norm, progress is not possible.
+> > +	/*
+> > +	 * pKVM allocates and uses storage for host state based on the
+> > +	 * largest per-PE VL, reject new PEs with a larger maximum.
+> > +	 */
+> > +	if (is_protected_kvm_enabled()) {
+> > +		if (max_vl > info->max_cpu_vl) {
+> > +			pr_warn("%s: cpu%d: would increase maximum VL\n",
+> > +				info->name, smp_processor_id());
+> > +			return -EINVAL;
+> > +		}
+> > +	}
+
+> Once protected mode is enabled, no new CPU can be booted (see
+> psci_relay.c::psci_cpu_on()).
+
+Ah, that's a bit easier.  Might still be worth keeping the check just in
+case that changes or we acquire some further use of this value but it's
+not currently needed and the comment could be updated.
+
+--ysVZwPn+MwR2sALq
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmZgWqkACgkQJNaLcl1U
+h9AyJQf+MY+KJBHvUdEZTyWsyWafn1JsdBv59+XpSqS/no1XW//XIGvcCvJvQ9/I
+/d+4iNDJO5KfECkTL2Zsp4w0k5ogpe14dxnNoSAk6coLY1C9O/QlVZveuR96VMEQ
+kFIqT86CC8zZ53FMJkiSPSvh4xCot2/jVaDEIZ7Hc6XTy4iAWZCcmt0NS4TYtIpf
+QtvfMeVCkKft6/Na8pjSWKlKkiNRxPbNxaXFBsKXdeltidzOuXdX/JS4J0QtANjo
+byDIxgwAy453h+6JGn5/9lqtVP/33/ZGAqqakPPhxVZRfg09C8+RuT/GVcs8r6Xz
+SAo4rWVbNS9hGnQxwuEOvSpQnnx/EQ==
+=kQnc
+-----END PGP SIGNATURE-----
+
+--ysVZwPn+MwR2sALq--
