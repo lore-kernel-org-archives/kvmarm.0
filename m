@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60722194A7A;
-	Wed,  5 Jun 2024 09:30:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E5ED195FE7;
+	Wed,  5 Jun 2024 09:31:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717579860; cv=none; b=t/PCuKhNg7jWUmR9NVx797ZNDVMRi/XT4HXkR/y7WsDoB3xX3nJlCm5Un3RO4dbbcqXPx5hy5ZvdaqVpjRPIWgdixwxOJ7yfFl2iG9fGcpypdohRd8cp1vFh7ast+/+sfnMQYYCj9GYUJejI+YaqkOI0Qs9r7Gf7j0+f7ELdsSM=
+	t=1717579864; cv=none; b=EUmbo8+PoGK8NySSt9mrwN58RW4JkmWd5iG1ERnKpFIonRUvoMbhGn9ZLk809DpWale6Rlkuw/BIqWa3U7GJa0fqXh6TSyM0sidflBcxbYyhafaYbgCNM5g33KEZI2TDdriVIDiUBFj9rw8Oj+GiewOxnsRN33Ybn/T+Tnpjw6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717579860; c=relaxed/simple;
-	bh=Q2499N6OdZJ/cJEaYbIq4tcinJZWFqeeGizcFcsU/zY=;
+	s=arc-20240116; t=1717579864; c=relaxed/simple;
+	bh=szWOUfh6Wnhb99hxcGdoM94GZ2H3nOJmLRprWEn9pKw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=M1FI4t5WGCE/k7RSDjvXn2pWnlbFWcUIOtYt/8WZxssrsOUvl1ye7SF1KXKw6DrZrGa65Li/BLrQqcVuX+z20/r6/VNiHz9VZRk7iOidAIhWOu+CdV67WN4Cv4WS+yU1mFItagsX5UuCmKZeFOKHCJ6rK8U4bqVUt+CGbsqf+4M=
+	 MIME-Version; b=q4DQ/5f3YQhROMq8T1VBTxRI2lUgbeom5nkxipfoxRve1Bi8ZByfZIdJ86j0Y2ueRVHhFA/zPY9TAvHfszcA4Sqp4eCn4Zz6SUS9FosME5hnR4P+HDm0ZaKQEVBUMAAx8c1Dne0Y8K3pSS4kZLMVjBkQDIxZAyW87DGcYraXPuA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4CFF2DA7;
-	Wed,  5 Jun 2024 02:31:23 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 905961063;
+	Wed,  5 Jun 2024 02:31:26 -0700 (PDT)
 Received: from e122027.arm.com (unknown [10.57.39.129])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C60533F792;
-	Wed,  5 Jun 2024 02:30:55 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3D38C3F792;
+	Wed,  5 Jun 2024 02:30:59 -0700 (PDT)
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -37,9 +37,9 @@ Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
 	linux-coco@lists.linux.dev,
 	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
 	Steven Price <steven.price@arm.com>
-Subject: [PATCH v3 10/14] arm64: Force device mappings to be non-secure shared
-Date: Wed,  5 Jun 2024 10:30:02 +0100
-Message-Id: <20240605093006.145492-11-steven.price@arm.com>
+Subject: [PATCH v3 11/14] efi: arm64: Map Device with Prot Shared
+Date: Wed,  5 Jun 2024 10:30:03 +0100
+Message-Id: <20240605093006.145492-12-steven.price@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240605093006.145492-1-steven.price@arm.com>
 References: <20240605093006.145492-1-steven.price@arm.com>
@@ -53,28 +53,28 @@ Content-Transfer-Encoding: 8bit
 
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-Device mappings (currently) need to be emulated by the VMM so must be
-mapped shared with the host.
+Device mappings need to be emualted by the VMM so must be mapped shared
+with the host.
 
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
- arch/arm64/include/asm/pgtable.h | 2 +-
+ arch/arm64/kernel/efi.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
-index 11d614d83317..c986fde262c0 100644
---- a/arch/arm64/include/asm/pgtable.h
-+++ b/arch/arm64/include/asm/pgtable.h
-@@ -644,7 +644,7 @@ static inline void set_pud_at(struct mm_struct *mm, unsigned long addr,
- #define pgprot_writecombine(prot) \
- 	__pgprot_modify(prot, PTE_ATTRINDX_MASK, PTE_ATTRINDX(MT_NORMAL_NC) | PTE_PXN | PTE_UXN)
- #define pgprot_device(prot) \
--	__pgprot_modify(prot, PTE_ATTRINDX_MASK, PTE_ATTRINDX(MT_DEVICE_nGnRE) | PTE_PXN | PTE_UXN)
-+	__pgprot_modify(prot, PTE_ATTRINDX_MASK, PTE_ATTRINDX(MT_DEVICE_nGnRE) | PTE_PXN | PTE_UXN | PROT_NS_SHARED)
- #define pgprot_tagged(prot) \
- 	__pgprot_modify(prot, PTE_ATTRINDX_MASK, PTE_ATTRINDX(MT_NORMAL_TAGGED))
- #define pgprot_mhp	pgprot_tagged
+diff --git a/arch/arm64/kernel/efi.c b/arch/arm64/kernel/efi.c
+index 4a92096db34e..ae1ccc8852a4 100644
+--- a/arch/arm64/kernel/efi.c
++++ b/arch/arm64/kernel/efi.c
+@@ -34,7 +34,7 @@ static __init pteval_t create_mapping_protection(efi_memory_desc_t *md)
+ 	u32 type = md->type;
+ 
+ 	if (type == EFI_MEMORY_MAPPED_IO)
+-		return PROT_DEVICE_nGnRE;
++		return PROT_NS_SHARED | PROT_DEVICE_nGnRE;
+ 
+ 	if (region_is_misaligned(md)) {
+ 		static bool __initdata code_is_misaligned;
 -- 
 2.34.1
 
