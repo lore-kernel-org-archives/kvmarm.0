@@ -1,355 +1,116 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E82F190062;
-	Wed,  5 Jun 2024 09:31:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2CF249644
+	for <kvmarm@lists.linux.dev>; Wed,  5 Jun 2024 10:10:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717579875; cv=none; b=Cz5IF3kskmK06evZNAZ0PqtV6O5RbRsEfc3nPXgWAatrw9w3VhzIx3olDovZS6EBh46YnLHd6f58D8TISUcTZF2OyUI8onj1EqsamxNaLdXRWK2sr1d8gZTy8afdmFsHFJu4LQNf53e3ipodrXYJqm7690fYVrTo0lw6nfmC0rA=
+	t=1717582208; cv=none; b=oGTJoHfJLX9xmEZY36ix+r2kCIS5kIS/VI5Xvmd8CRSsDf7exK8XnYAlScWsy6RGzY+NL0w0JxUWvGFF9SXy1PTylFRd8l2CIrjy8lVmUgkI4FoK0fjv93DU6r94Vm8IygJkdYzCAbCSzHaiD8OxgJJi3UyiPjJa5fdEWq1oKNY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717579875; c=relaxed/simple;
-	bh=v6JZGNvu7kMnuCr2dGpEvrSScXvHkXPK36he9SfxXTA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=p+NXeBoIfc4X/lzZaG0jJaF5jdH8sdFVdnmddvJSXfMivQcJWVIa69eKNHI8QQx3QeDM3UDD9NWixTa/KLv8bTVez7gC/I3UV1vEeXRuo+wo/Q667JlSwFVIW03U3Q2p+bTPR6mJ4R5SrNw1Ns9Cmcmn/En8CSwe+aG4K8TVQsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8F40C1474;
-	Wed,  5 Jun 2024 02:31:37 -0700 (PDT)
-Received: from e122027.arm.com (unknown [10.57.39.129])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CCFCA3F792;
-	Wed,  5 Jun 2024 02:31:09 -0700 (PDT)
-From: Steven Price <steven.price@arm.com>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Cc: Sami Mujawar <sami.mujawar@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Steven Price <steven.price@arm.com>
-Subject: [PATCH v3 14/14] virt: arm-cca-guest: TSM_REPORT support for realms
-Date: Wed,  5 Jun 2024 10:30:06 +0100
-Message-Id: <20240605093006.145492-15-steven.price@arm.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240605093006.145492-1-steven.price@arm.com>
-References: <20240605093006.145492-1-steven.price@arm.com>
+	s=arc-20240116; t=1717582208; c=relaxed/simple;
+	bh=3ExLlaLSQ0sVOpTNVr+H4S8gegN+K4KWDZWR+pIud18=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=MhTKZdiPCmB5UWC74jvAyVlTPAaUS3wdWNNcIsCC4giYsiJ6ynaqWtdZ4JkxGR5ZEw4+eCEHf6d3Og6qflq0EY46lALSgnzNJdTgRhuwvpZhO7J73iKxmILa0z20QWFP8WB8YsODp7ZOUqtE3ewO+B5iOPnfgmEDQSs/zjtdBjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4VvN4x6jpPz1xsK9;
+	Wed,  5 Jun 2024 17:50:57 +0800 (CST)
+Received: from kwepemd200013.china.huawei.com (unknown [7.221.188.133])
+	by mail.maildlp.com (Postfix) with ESMTPS id 167121A0188;
+	Wed,  5 Jun 2024 17:52:18 +0800 (CST)
+Received: from [10.67.110.108] (10.67.110.108) by
+ kwepemd200013.china.huawei.com (7.221.188.133) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.34; Wed, 5 Jun 2024 17:52:16 +0800
+Message-ID: <3f9f0ef1-7290-21df-ef01-dc56b34a0195@huawei.com>
+Date: Wed, 5 Jun 2024 17:52:16 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.2
+Subject: Re: [PATCH v3 1/8] arm64/sysreg: Add definitions for immediate
+ versions of MSR ALLINT
+To: Mark Brown <broonie@kernel.org>
+CC: Mark Rutland <mark.rutland@arm.com>, <catalin.marinas@arm.com>,
+	<will@kernel.org>, <maz@kernel.org>, <oliver.upton@linux.dev>,
+	<james.morse@arm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
+	<tglx@linutronix.de>, <ardb@kernel.org>, <anshuman.khandual@arm.com>,
+	<miguel.luis@oracle.com>, <joey.gouly@arm.com>, <ryan.roberts@arm.com>,
+	<jeremy.linton@arm.com>, <ericchancf@google.com>,
+	<kristina.martsenko@arm.com>, <robh@kernel.org>,
+	<scott@os.amperecomputing.com>, <songshuaishuai@tinylab.org>,
+	<shijie@os.amperecomputing.com>, <akpm@linux-foundation.org>,
+	<bhe@redhat.com>, <horms@kernel.org>, <mhiramat@kernel.org>,
+	<rmk+kernel@armlinux.org.uk>, <shahuang@redhat.com>,
+	<takakura@valinux.co.jp>, <dianders@chromium.org>, <swboyd@chromium.org>,
+	<sumit.garg@linaro.org>, <frederic@kernel.org>, <reijiw@google.com>,
+	<akihiko.odaki@daynix.com>, <ruanjinjie@huawei.com>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<kvmarm@lists.linux.dev>
+References: <20240415064758.3250209-1-liaochang1@huawei.com>
+ <20240415064758.3250209-2-liaochang1@huawei.com>
+ <ZjUKMWPknEhLYoK8@FVFF77S0Q05N> <Zjjz-tzLRC2nH51A@finisterre.sirena.org.uk>
+ <cde4d448-dc9d-eaad-4a2d-a6d34bda4449@huawei.com>
+ <ZjpALOdSgu-qhshR@finisterre.sirena.org.uk>
+ <e632a9ed-7659-9336-6e7f-a43c4759a7a3@huawei.com>
+ <9868a5ac-ae23-4481-afe6-ba3cd8dbfa47@sirena.org.uk>
+From: "Liao, Chang" <liaochang1@huawei.com>
+In-Reply-To: <9868a5ac-ae23-4481-afe6-ba3cd8dbfa47@sirena.org.uk>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemd200013.china.huawei.com (7.221.188.133)
 
-From: Sami Mujawar <sami.mujawar@arm.com>
+Hi, Mark
 
-Introduce an arm-cca-guest driver that registers with
-the configfs-tsm module to provide user interfaces for
-retrieving an attestation token.
+在 2024/6/4 21:29, Mark Brown 写道:
+> On Mon, Jun 03, 2024 at 11:26:39AM +0800, Liao, Chang wrote:
+> 
+>> Mark, Is your concern is that the series of pstate related macro name in
+>> sysregs.h are lack of self-explanatory nature, which make it diffuclt to
+>> understand their functionality and purpose? If so, I daft some alternative
+>> macro names in the code below, looking forward to your feedback, or if you
+>> have any proposal for making these helpers discoverable.
+> 
+> ...
+> 
+>> -#define SET_PSTATE(x, r)               __emit_inst(0xd500401f | PSTATE_ ## r | ((!!x) << PSTATE_Imm_shift))
+>> +#define MSR_PSTATE_ENCODE(x, r)                __emit_inst(0xd500401f | PSTATE_ ## r | ((!!x) << PSTATE_Imm_shift))
+> 
+> Possibly, yes?  TBH I was thinking of a comment but that does have "MSR"
+> in it so might come up in greps.  Not sure what others would prefer.
 
-When a new report is requested the arm-cca-guest driver
-invokes the appropriate RSI interfaces to query an
-attestation token.
+I am going to push revision v4 of the interrupt masking patchset, this revision
+involves several improvements based on feedback and further testing:
 
-The steps to retrieve an attestation token are as follows:
-  1. Mount the configfs filesystem if not already mounted
-     mount -t configfs none /sys/kernel/config
-  2. Generate an attestation token
-     report=/sys/kernel/config/tsm/report/report0
-     mkdir $report
-     dd if=/dev/urandom bs=64 count=1 > $report/inblob
-     hexdump -C $report/outblob
-     rmdir $report
+- Addressed feedback comes form Mark Brown.
 
-Signed-off-by: Sami Mujawar <sami.mujawar@arm.com>
-Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-Signed-off-by: Steven Price <steven.price@arm.com>
----
-v3: Minor improvements to comments and adapt to the renaming of
-GRANULE_SIZE to RSI_GRANULE_SIZE.
----
- drivers/virt/coco/Kconfig                     |   2 +
- drivers/virt/coco/Makefile                    |   1 +
- drivers/virt/coco/arm-cca-guest/Kconfig       |  11 +
- drivers/virt/coco/arm-cca-guest/Makefile      |   2 +
- .../virt/coco/arm-cca-guest/arm-cca-guest.c   | 211 ++++++++++++++++++
- 5 files changed, 227 insertions(+)
- create mode 100644 drivers/virt/coco/arm-cca-guest/Kconfig
- create mode 100644 drivers/virt/coco/arm-cca-guest/Makefile
- create mode 100644 drivers/virt/coco/arm-cca-guest/arm-cca-guest.c
+- Enrich the commit messages of patch includes major changes to provide more
+  detailed explanations of the implemenations, purpose and potential result.
+  This aims to improve developer understanding and reviewing efficiency.
 
-diff --git a/drivers/virt/coco/Kconfig b/drivers/virt/coco/Kconfig
-index 87d142c1f932..4fb69804b622 100644
---- a/drivers/virt/coco/Kconfig
-+++ b/drivers/virt/coco/Kconfig
-@@ -12,3 +12,5 @@ source "drivers/virt/coco/efi_secret/Kconfig"
- source "drivers/virt/coco/sev-guest/Kconfig"
- 
- source "drivers/virt/coco/tdx-guest/Kconfig"
-+
-+source "drivers/virt/coco/arm-cca-guest/Kconfig"
-diff --git a/drivers/virt/coco/Makefile b/drivers/virt/coco/Makefile
-index 18c1aba5edb7..a6228a1bf992 100644
---- a/drivers/virt/coco/Makefile
-+++ b/drivers/virt/coco/Makefile
-@@ -6,3 +6,4 @@ obj-$(CONFIG_TSM_REPORTS)	+= tsm.o
- obj-$(CONFIG_EFI_SECRET)	+= efi_secret/
- obj-$(CONFIG_SEV_GUEST)		+= sev-guest/
- obj-$(CONFIG_INTEL_TDX_GUEST)	+= tdx-guest/
-+obj-$(CONFIG_ARM_CCA_GUEST)	+= arm-cca-guest/
-diff --git a/drivers/virt/coco/arm-cca-guest/Kconfig b/drivers/virt/coco/arm-cca-guest/Kconfig
-new file mode 100644
-index 000000000000..9dd27c3ee215
---- /dev/null
-+++ b/drivers/virt/coco/arm-cca-guest/Kconfig
-@@ -0,0 +1,11 @@
-+config ARM_CCA_GUEST
-+	tristate "Arm CCA Guest driver"
-+	depends on ARM64
-+	default m
-+	select TSM_REPORTS
-+	help
-+	  The driver provides userspace interface to request and
-+	  attestation report from the Realm Management Monitor(RMM).
-+
-+	  If you choose 'M' here, this module will be called
-+	  arm-cca-guest.
-diff --git a/drivers/virt/coco/arm-cca-guest/Makefile b/drivers/virt/coco/arm-cca-guest/Makefile
-new file mode 100644
-index 000000000000..69eeba08e98a
---- /dev/null
-+++ b/drivers/virt/coco/arm-cca-guest/Makefile
-@@ -0,0 +1,2 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+obj-$(CONFIG_ARM_CCA_GUEST) += arm-cca-guest.o
-diff --git a/drivers/virt/coco/arm-cca-guest/arm-cca-guest.c b/drivers/virt/coco/arm-cca-guest/arm-cca-guest.c
-new file mode 100644
-index 000000000000..61172730cb90
---- /dev/null
-+++ b/drivers/virt/coco/arm-cca-guest/arm-cca-guest.c
-@@ -0,0 +1,211 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) 2023 ARM Ltd.
-+ */
-+
-+#include <linux/arm-smccc.h>
-+#include <linux/cc_platform.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/smp.h>
-+#include <linux/tsm.h>
-+#include <linux/types.h>
-+
-+#include <asm/rsi.h>
-+
-+/**
-+ * struct arm_cca_token_info - a descriptor for the token buffer.
-+ * @granule:	PA of the page to which the token will be written
-+ * @offset:	Offset within granule to start of buffer in bytes
-+ * @len:	Number of bytes of token data that was retrieved
-+ * @result:	result of rsi_attestation_token_continue operation
-+ */
-+struct arm_cca_token_info {
-+	phys_addr_t     granule;
-+	unsigned long   offset;
-+	int             result;
-+};
-+
-+/**
-+ * arm_cca_attestation_continue - Retrieve the attestation token data.
-+ *
-+ * @param: pointer to the arm_cca_token_info
-+ *
-+ * Attestation token generation is a long running operation and therefore
-+ * the token data may not be retrieved in a single call. Moreover, the
-+ * token retrieval operation must be requested on the same CPU on which the
-+ * attestation token generation was initialised.
-+ * This helper function is therefore scheduled on the same CPU multiple
-+ * times until the entire token data is retrieved.
-+ */
-+static void arm_cca_attestation_continue(void *param)
-+{
-+	unsigned long len;
-+	unsigned long size;
-+	struct arm_cca_token_info *info;
-+
-+	if (!param)
-+		return;
-+
-+	info = (struct arm_cca_token_info *)param;
-+
-+	size = RSI_GRANULE_SIZE - info->offset;
-+	info->result = rsi_attestation_token_continue(info->granule,
-+						      info->offset, size, &len);
-+	info->offset += len;
-+}
-+
-+/**
-+ * arm_cca_report_new - Generate a new attestation token.
-+ *
-+ * @report: pointer to the TSM report context information.
-+ * @data:  pointer to the context specific data for this module.
-+ *
-+ * Initialise the attestation token generation using the challenge data
-+ * passed in the TSM decriptor. Allocate memory for the attestation token
-+ * and schedule calls to retrieve the attestation token on the same CPU
-+ * on which the attestation token generation was initialised.
-+ *
-+ * The challenge data must be at least 32 bytes and no more than 64 bytes. If
-+ * less than 64 bytes are provided it will be zero padded to 64 bytes.
-+ *
-+ * Return:
-+ * * %0        - Attestation token generated successfully.
-+ * * %-EINVAL  - A parameter was not valid.
-+ * * %-ENOMEM  - Out of memory.
-+ * * %-EFAULT  - Failed to get IPA for memory page(s).
-+ * * A negative status code as returned by smp_call_function_single().
-+ */
-+static int arm_cca_report_new(struct tsm_report *report, void *data)
-+{
-+	int ret;
-+	int cpu;
-+	long max_size;
-+	unsigned long token_size;
-+	struct arm_cca_token_info info;
-+	void *buf;
-+	u8 *token __free(kvfree) = NULL;
-+	struct tsm_desc *desc = &report->desc;
-+
-+	if (!report)
-+		return -EINVAL;
-+
-+	if (desc->inblob_len < 32 || desc->inblob_len > 64)
-+		return -EINVAL;
-+
-+	/*
-+	 * Get a CPU on which the attestation token generation will be
-+	 * scheduled and initialise the attestation token generation.
-+	 */
-+	cpu = get_cpu();
-+	max_size = rsi_attestation_token_init(desc->inblob, desc->inblob_len);
-+	put_cpu();
-+
-+	if (max_size <= 0)
-+		return -EINVAL;
-+
-+	/* Allocate outblob */
-+	token = kvzalloc(max_size, GFP_KERNEL);
-+	if (!token)
-+		return -ENOMEM;
-+
-+	/*
-+	 * Since the outblob may not be physically contiguous, use a page
-+	 * to bounce the buffer from RMM.
-+	 */
-+	buf = alloc_pages_exact(RSI_GRANULE_SIZE, GFP_KERNEL);
-+	if (!buf)
-+		return -ENOMEM;
-+
-+	/* Get the PA of the memory page(s) that were allocated. */
-+	info.granule = (unsigned long)virt_to_phys(buf);
-+
-+	token_size = 0;
-+	/* Loop until the token is ready or there is an error. */
-+	do {
-+		/* Retrieve one RSI_GRANULE_SIZE data per loop iteration. */
-+		info.offset = 0;
-+		do {
-+			/*
-+			 * Schedule a call to retrieve a sub-granule chunk
-+			 * of data per loop iteration.
-+			 */
-+			ret = smp_call_function_single(cpu,
-+						       arm_cca_attestation_continue,
-+						       (void *)&info, true);
-+			if (ret != 0) {
-+				token_size = 0;
-+				goto exit_free_granule_page;
-+			}
-+
-+			ret = info.result;
-+		} while ((ret == RSI_INCOMPLETE) &&
-+			 (info.offset < RSI_GRANULE_SIZE));
-+
-+		/*
-+		 * Copy the retrieved token data from the granule
-+		 * to the token buffer, ensuring that the RMM doesn't
-+		 * overflow the buffer.
-+		 */
-+		if (WARN_ON(token_size + info.offset > max_size))
-+			break;
-+		memcpy(&token[token_size], buf, info.offset);
-+		token_size += info.offset;
-+	} while (ret == RSI_INCOMPLETE);
-+
-+	if (ret != RSI_SUCCESS) {
-+		ret = -ENXIO;
-+		token_size = 0;
-+		goto exit_free_granule_page;
-+	}
-+
-+	report->outblob = no_free_ptr(token);
-+exit_free_granule_page:
-+	report->outblob_len = token_size;
-+	free_pages_exact(buf, RSI_GRANULE_SIZE);
-+	return ret;
-+}
-+
-+static const struct tsm_ops arm_cca_tsm_ops = {
-+	.name = KBUILD_MODNAME,
-+	.report_new = arm_cca_report_new,
-+};
-+
-+/**
-+ * arm_cca_guest_init - Register with the Trusted Security Module (TSM)
-+ * interface.
-+ *
-+ * Return:
-+ * * %0        - Registered successfully with the TSM interface.
-+ * * %-ENODEV  - The execution context is not an Arm Realm.
-+ * * %-EINVAL  - A parameter was not valid.
-+ * * %-EBUSY   - Already registered.
-+ */
-+static int __init arm_cca_guest_init(void)
-+{
-+	int ret;
-+
-+	if (!is_realm_world())
-+		return -ENODEV;
-+
-+	ret = tsm_register(&arm_cca_tsm_ops, NULL, &tsm_report_default_type);
-+	if (ret < 0)
-+		pr_err("Failed to register with TSM.\n");
-+
-+	return ret;
-+}
-+module_init(arm_cca_guest_init);
-+
-+/**
-+ * arm_cca_guest_exit - unregister with the Trusted Security Module (TSM)
-+ * interface.
-+ */
-+static void __exit arm_cca_guest_exit(void)
-+{
-+	tsm_unregister(&arm_cca_tsm_ops);
-+}
-+module_exit(arm_cca_guest_exit);
-+
-+MODULE_AUTHOR("Sami Mujawar <sami.mujawar@arm.com>");
-+MODULE_DESCRIPTION("Arm CCA Guest TSM Driver.");
-+MODULE_LICENSE("GPL");
+- Revising the function names of logical interrupt masking to better reflect
+  their purpose.
+
+- Fixed bugs during local testing on platform with FEAT_NMI support.
+
+Additionally, i note you left a feedback as below.
+
+>...I've started looking at this in the series. There are some subtleties here, and
+>I don't think the helpers in this series are quite right as-is. I will try to
+get back to you next week with a description of those; it'll take a short while
+to write that up correctly and clearly...
+
+I appreciate your time and look forward your further feedback at your convenience.
+
+Thanks.
+
 -- 
-2.34.1
-
+BR
+Liao, Chang
