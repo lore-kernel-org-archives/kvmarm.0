@@ -1,285 +1,201 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8871213C676
-	for <kvmarm@lists.linux.dev>; Thu,  6 Jun 2024 09:26:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B873158848;
+	Thu,  6 Jun 2024 10:17:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717665990; cv=none; b=tQ2F1o7YTSJTVKDgPRDZpaWyEXawMvUxY4jBS8AKWF+L9Ez7D6CZaRXSB2BVanKdvrSaI94KMTFbISnHrIKg/P9gWrcct2b5KJfdxWnUl8D5v+NwEfZsWA1wo2WCzGvJLu+W/eafvPtmFFqikQpajfGtyK3t6RNAK+9C0JNrEO0=
+	t=1717669060; cv=none; b=FV3/lPzwqTvHWWXqqSmh51ImAbajYrnBfPn++1ZgUweBk0kuAlf38cknp7PRPQSxHScZ88tEOLgaSW/kNSHDysIudbsTd/pEY10X5n185VXmr4wCvqqSqyDkmvACO5WapIRLzshiAtuenHqFkXbiJqhr70gu5BB/1INEhXOhgQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717665990; c=relaxed/simple;
-	bh=1NPybMBUFXHjin6BuY/vECXanPG9adXIp01Abdo1TTA=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=SmRvMr6Em1HgzewNnZBtwvao33CKjfi4R51qvTjiNIODvqxO2ctCbPCCIu0yadJPpW0/bwcYL9+/P/CNYy7muT4qV6q+co5c0MvZFXrowe0O6+e+XWMpRPLKmZvheUkPh1W8a6s5w4VikQgGXFIYQABO+uj2395U4irBuOiWCGE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xoFncveU; arc=none smtp.client-ip=209.85.128.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
+	s=arc-20240116; t=1717669060; c=relaxed/simple;
+	bh=W9kbQ3pOCWummTxiokP7SZcsLeHBrYY6Qzq/MV72KTU=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ll5e/OPt2kAbbBDKs6l2nqrJiWbc0ASdP7a8Eki37HA2vrxdkiL+Fm0/7lfXRkeePgYbRGY+r3lzZX6OYiaKOE1aqjwzufpgipqPLZzP7pybbmhI/bpvQnW7+ZtbrWhfb5V0xEyE1Jaiczai9LoOXeGK1YzjYMviJEgIUmLhsEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uiEWhhEz; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xoFncveU"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4215a38713eso6506175e9.3
-        for <kvmarm@lists.linux.dev>; Thu, 06 Jun 2024 02:26:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717665987; x=1718270787; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=/dYlIW+E/i99Z+Z5Rl4zqNFgXtFgm3WuqL/JYpJB2Vg=;
-        b=xoFncveU+9y/2rpdtT2TUwXBMNIFB/lTQVZz8sf/LdrzEXTeSPTWKtthm55oDgZipb
-         fKqLhDid6Lx/ObVHdetKGuxUZWGqw+f6StR9LPlHgl1fNfZnlkAHLT/C0h9DTn0+mPWt
-         ukWrQ0YZE8xK8nqvtzQwxoEs41/zqNYxY0eAwkBfEoo6I1BaSsa7ZUWx6xQcKC+m+kGN
-         2sHLhZd6wa1YqUcES77y/AsY9Rni8IKlFOf7CKPRROf9uBInirwCzwo37QKk8GJGzseb
-         FV8LEKuvdn+MlBVE4U7FA0LA0YXlVaRRIrOqpsw3f1ZSyh5vz7MhMt35J0GIHyQH43K6
-         Uo4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717665987; x=1718270787;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/dYlIW+E/i99Z+Z5Rl4zqNFgXtFgm3WuqL/JYpJB2Vg=;
-        b=t2JbjCprJo+Wz8ILfJvCIYxCtp8QXkhABlL9r/bQ7uXf8LkvBCq9EH5cQIdmkUDCDE
-         G6PoWhQe0Bqb/Is/VuSRoN1hSkOltniEKD+pczPDsrr2fpLb8dbhY791w6MrQ6CsDira
-         x4SOIGEuBMICl1w4+ET4n42N+YBF3TslYC9bD3BVs/xyx5m0IMkn2Nd81gTncpUaQmKX
-         Z76bgTZOVKfYWKo/YU7QqouN3Ukr7q10ZLswhdPa4KA0dvzoxrIkt1rLp1he2xl5al4D
-         wGlzG+2CiudNpu60P9N+RtJibduhD75HjFgmiw8SzSYIqGqnU81D2mnZVX0AV9KQqYoE
-         QqTQ==
-X-Gm-Message-State: AOJu0YzvvMwVvws3hz4NKfL/rTWj/nucykoeq1IpwhUjgsyKQvdX0Vev
-	4dhltTztU8pvxlZib9mrIdTswNVFUaVvB7SuTKmgxytjkS4QUv8YGKA+2rOW3HNQUsA+9BTgTQq
-	zlKcKv8/Vp534IP+ws2MO7NzzsWIu9YEsbz0/DFZhS6HxtMD3odKr4iYm6L3BB/5G7nopYLzOEQ
-	Eot3XqWlijQJx2atLQONmBv0LKSR8=
-X-Google-Smtp-Source: AGHT+IGTZsk7QnTA8Zwm9Lo8Koctxa3CRJnXRjXnZPJ5YrG0a/9PJZXRAZssfHhXx6DElBnRJl3ju9ciAg==
-X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:600c:444b:b0:420:355f:1bfa with SMTP id
- 5b1f17b1804b1-42156259babmr288355e9.0.1717665986049; Thu, 06 Jun 2024
- 02:26:26 -0700 (PDT)
-Date: Thu,  6 Jun 2024 10:26:23 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uiEWhhEz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D96D3C32782;
+	Thu,  6 Jun 2024 10:17:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717669059;
+	bh=W9kbQ3pOCWummTxiokP7SZcsLeHBrYY6Qzq/MV72KTU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=uiEWhhEzoZzCIGqYIZyzZELj/haUQGSJYnc/PlYcDgqUSC+04XGE+M+Tzy36Jqpso
+	 I4B8nKfrhcD+XTJPPvcyuINb4gGoyzJipMtkwRp7X0fqGZw7thxFDzT+qaAd6DOc9T
+	 QBvq9FMfIsHUTsjV38OTk1T8r1ewNiaQYBW/7WFHcCJfVMrArKP4FF2eUjYCCgPsA1
+	 6Tjjgrm9HSl+IZVOcW3vsUHWvSXPOXJA894X2JupawEqiGdJ2N8+LVKJqegLeNFow3
+	 7R9xEkjRyNPAxeI84GiTRczFdUBT8YJCJnuGxyakUMHsf4RiuMWtgfuQ+vATZ5VKwV
+	 C39dwBzegKSSQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sFABd-001G9O-CB;
+	Thu, 06 Jun 2024 11:17:37 +0100
+Date: Thu, 06 Jun 2024 11:17:36 +0100
+Message-ID: <867cf2l6in.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu
+ <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: Re: [PATCH v3 12/14] arm64: realm: Support nonsecure ITS emulation shared
+In-Reply-To: <4c363476-e5b5-42ff-9f30-a02a92b6751b@arm.com>
+References: <20240605093006.145492-1-steven.price@arm.com>
+	<20240605093006.145492-13-steven.price@arm.com>
+	<86a5jzld9g.wl-maz@kernel.org>
+	<4c363476-e5b5-42ff-9f30-a02a92b6751b@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.45.1.467.gbab1589fc0-goog
-Message-ID: <20240606092623.2236172-1-tabba@google.com>
-Subject: [PATCH v2] KVM: arm64: Allocate for maximum vector length for pKVM
- host sve state
-From: Fuad Tabba <tabba@google.com>
-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
-Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com, 
-	seanjc@google.com, alexandru.elisei@arm.com, catalin.marinas@arm.com, 
-	philmd@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, 
-	oliver.upton@linux.dev, mark.rutland@arm.com, broonie@kernel.org, 
-	joey.gouly@arm.com, rananta@google.com, yuzenghui@huawei.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-In a heterogeneous system, a cpu could have an sve/sme vector
-length that is larger than the rest. Store the value of the
-largest possible vector length in the system. When allocating
-memory for the host sve state in pKVM, allocate for the largest
-possible sve vector length.
+On Wed, 05 Jun 2024 16:08:49 +0100,
+Steven Price <steven.price@arm.com> wrote:
+> 
+> Hi Marc,
+> 
+> On 05/06/2024 14:39, Marc Zyngier wrote:
+> > The subject line is... odd. I'd expect something like:
+> > 
+> > "irqchip/gic-v3-its: Share ITS tables with a non-trusted hypervisor"
+> > 
+> > because nothing here should be CCA specific.
+> 
+> Good point - that's a much better subject.
+> 
+> > On Wed, 05 Jun 2024 10:30:04 +0100,
+> > Steven Price <steven.price@arm.com> wrote:
+> >>
+> >> Within a realm guest the ITS is emulated by the host. This means the
+> >> allocations must have been made available to the host by a call to
+> >> set_memory_decrypted(). Introduce an allocation function which performs
+> >> this extra call.
+> > 
+> > This doesn't mention that this patch radically changes the allocation
+> > of some tables.
+> 
+> I guess that depends on your definition of radical, see below.
 
-Fixes: 66d5b53e20a6 ("KVM: arm64: Allocate memory mapped at hyp for host sve state in pKVM")
-Reported-by: Mark Brown <broonie@kernel.org>
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
-Based on kvmarm/fixes (afb91f5f8ad7)
+It's election time, I'm all about making bold statements!
 
-Changes from v1:
-- Rename sve_max_system_vl to sve_max_cpu_vl (Mark)
-- Rename kvm_host_sve_max_vl to kvm_sve_max_cpu_vl (Mark)
-- Initialize vl_info[ARM64_VEC_SVE].max_cpu_vl to SVE_VL_MIN
----
- arch/arm64/include/asm/fpsimd.h         | 13 +++++++++++++
- arch/arm64/include/asm/kvm_host.h       |  2 +-
- arch/arm64/include/asm/kvm_hyp.h        |  2 +-
- arch/arm64/include/asm/kvm_pkvm.h       |  2 +-
- arch/arm64/kernel/fpsimd.c              |  8 +++++++-
- arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +-
- arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  4 ++--
- arch/arm64/kvm/hyp/nvhe/pkvm.c          |  2 +-
- arch/arm64/kvm/reset.c                  |  6 +++---
- 9 files changed, 30 insertions(+), 11 deletions(-)
+[...]
 
-diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
-index bc69ac368d73..cc2d6d168862 100644
---- a/arch/arm64/include/asm/fpsimd.h
-+++ b/arch/arm64/include/asm/fpsimd.h
-@@ -184,6 +184,9 @@ struct vl_info {
- 	int max_vl;
- 	int max_virtualisable_vl;
- 
-+	/* The maximum vl encountered for any cpu in the system. */
-+	int max_cpu_vl;
-+
- 	/*
- 	 * Set of available vector lengths,
- 	 * where length vq encoded as bit __vq_to_bit(vq):
-@@ -274,6 +277,11 @@ static inline int vec_max_virtualisable_vl(enum vec_type type)
- 	return vl_info[type].max_virtualisable_vl;
- }
- 
-+static inline int vec_max_cpu_vl(enum vec_type type)
-+{
-+	return vl_info[type].max_cpu_vl;
-+}
-+
- static inline int sve_max_vl(void)
- {
- 	return vec_max_vl(ARM64_VEC_SVE);
-@@ -284,6 +292,11 @@ static inline int sve_max_virtualisable_vl(void)
- 	return vec_max_virtualisable_vl(ARM64_VEC_SVE);
- }
- 
-+static inline int sve_max_cpu_vl(void)
-+{
-+	return vec_max_cpu_vl(ARM64_VEC_SVE);
-+}
-+
- /* Ensure vq >= SVE_VQ_MIN && vq <= SVE_VQ_MAX before calling this function */
- static inline bool vq_available(enum vec_type type, unsigned int vq)
- {
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 36b8e97bf49e..f05ccd4ffd55 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -76,7 +76,7 @@ static inline enum kvm_mode kvm_get_mode(void) { return KVM_MODE_NONE; };
- DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
- 
- extern unsigned int __ro_after_init kvm_sve_max_vl;
--extern unsigned int __ro_after_init kvm_host_sve_max_vl;
-+extern unsigned int __ro_after_init kvm_sve_max_cpu_vl;
- int __init kvm_arm_init_sve(void);
- 
- u32 __attribute_const__ kvm_target_cpu(void);
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index b05bceca3385..107af09d4505 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -143,6 +143,6 @@ extern u64 kvm_nvhe_sym(id_aa64smfr0_el1_sys_val);
- 
- extern unsigned long kvm_nvhe_sym(__icache_flags);
- extern unsigned int kvm_nvhe_sym(kvm_arm_vmid_bits);
--extern unsigned int kvm_nvhe_sym(kvm_host_sve_max_vl);
-+extern unsigned int kvm_nvhe_sym(kvm_sve_max_cpu_vl);
- 
- #endif /* __ARM64_KVM_HYP_H__ */
-diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-index cd56acd9a842..b17904e47a82 100644
---- a/arch/arm64/include/asm/kvm_pkvm.h
-+++ b/arch/arm64/include/asm/kvm_pkvm.h
-@@ -134,7 +134,7 @@ static inline size_t pkvm_host_sve_state_size(void)
- 		return 0;
- 
- 	return size_add(sizeof(struct cpu_sve_state),
--			SVE_SIG_REGS_SIZE(sve_vq_from_vl(kvm_host_sve_max_vl)));
-+			SVE_SIG_REGS_SIZE(sve_vq_from_vl(kvm_sve_max_cpu_vl)));
- }
- 
- #endif	/* __ARM64_KVM_PKVM_H__ */
-diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-index 82e8a6017382..048423e6756b 100644
---- a/arch/arm64/kernel/fpsimd.c
-+++ b/arch/arm64/kernel/fpsimd.c
-@@ -129,6 +129,7 @@ __ro_after_init struct vl_info vl_info[ARM64_VEC_MAX] = {
- 		.min_vl			= SVE_VL_MIN,
- 		.max_vl			= SVE_VL_MIN,
- 		.max_virtualisable_vl	= SVE_VL_MIN,
-+		.max_cpu_vl		= SVE_VL_MIN,
- 	},
- #endif
- #ifdef CONFIG_ARM64_SME
-@@ -1006,7 +1007,7 @@ int sme_get_current_vl(void)
- static void vec_probe_vqs(struct vl_info *info,
- 			  DECLARE_BITMAP(map, SVE_VQ_MAX))
- {
--	unsigned int vq, vl;
-+	unsigned int vq, vl, max_vl = 0;
- 
- 	bitmap_zero(map, SVE_VQ_MAX);
- 
-@@ -1031,7 +1032,12 @@ static void vec_probe_vqs(struct vl_info *info,
- 
- 		vq = sve_vq_from_vl(vl); /* skip intervening lengths */
- 		set_bit(__vq_to_bit(vq), map);
-+
-+		if (!max_vl)
-+			max_vl = vl;
- 	}
-+
-+	info->max_cpu_vl = max((int) max_vl, info->max_cpu_vl);
- }
- 
- /*
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 0c4de44534b7..06b77692fb58 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -327,7 +327,7 @@ static inline void __hyp_sve_save_host(void)
- 
- 	sve_state->zcr_el1 = read_sysreg_el1(SYS_ZCR);
- 	write_sysreg_s(ZCR_ELx_LEN_MASK, SYS_ZCR_EL2);
--	__sve_save_state(sve_state->sve_regs + sve_ffr_offset(kvm_host_sve_max_vl),
-+	__sve_save_state(sve_state->sve_regs + sve_ffr_offset(kvm_sve_max_cpu_vl),
- 			 &sve_state->fpsr,
- 			 true);
- }
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index f43d845f3c4e..2933c9e1b5e5 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -49,7 +49,7 @@ static void __hyp_sve_restore_host(void)
- 	 * supported by the system (or limited at EL3).
- 	 */
- 	write_sysreg_s(ZCR_ELx_LEN_MASK, SYS_ZCR_EL2);
--	__sve_restore_state(sve_state->sve_regs + sve_ffr_offset(kvm_host_sve_max_vl),
-+	__sve_restore_state(sve_state->sve_regs + sve_ffr_offset(kvm_sve_max_cpu_vl),
- 			    &sve_state->fpsr,
- 			    true);
- 	write_sysreg_el1(sve_state->zcr_el1, SYS_ZCR);
-@@ -91,7 +91,7 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
- 
- 	hyp_vcpu->vcpu.arch.sve_state	= kern_hyp_va(host_vcpu->arch.sve_state);
- 	/* Limit guest vector length to the maximum supported by the host.  */
--	hyp_vcpu->vcpu.arch.sve_max_vl	= min(host_vcpu->arch.sve_max_vl, kvm_host_sve_max_vl);
-+	hyp_vcpu->vcpu.arch.sve_max_vl	= min(host_vcpu->arch.sve_max_vl, kvm_sve_max_cpu_vl);
- 
- 	hyp_vcpu->vcpu.arch.hw_mmu	= host_vcpu->arch.hw_mmu;
- 
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index 95cf18574251..22089f481ccc 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -18,7 +18,7 @@ unsigned long __icache_flags;
- /* Used by kvm_get_vttbr(). */
- unsigned int kvm_arm_vmid_bits;
- 
--unsigned int kvm_host_sve_max_vl;
-+unsigned int kvm_sve_max_cpu_vl;
- 
- /*
-  * Set trap register values based on features in ID_AA64PFR0.
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index 3fc8ca164dbe..5d7db4918875 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -32,7 +32,7 @@
- 
- /* Maximum phys_shift supported for any VM on this host */
- static u32 __ro_after_init kvm_ipa_limit;
--unsigned int __ro_after_init kvm_host_sve_max_vl;
-+unsigned int __ro_after_init kvm_sve_max_cpu_vl;
- 
- /*
-  * ARMv8 Reset Values
-@@ -52,8 +52,8 @@ int __init kvm_arm_init_sve(void)
- {
- 	if (system_supports_sve()) {
- 		kvm_sve_max_vl = sve_max_virtualisable_vl();
--		kvm_host_sve_max_vl = sve_max_vl();
--		kvm_nvhe_sym(kvm_host_sve_max_vl) = kvm_host_sve_max_vl;
-+		kvm_sve_max_cpu_vl = sve_max_cpu_vl();
-+		kvm_nvhe_sym(kvm_sve_max_cpu_vl) = kvm_sve_max_cpu_vl;
- 
- 		/*
- 		 * The get_sve_reg()/set_sve_reg() ioctl interface will need
+> >> @@ -3334,8 +3365,9 @@ static bool its_alloc_table_entry(struct its_node *its,
+> >>  
+> >>  	/* Allocate memory for 2nd level table */
+> >>  	if (!table[idx]) {
+> >> -		page = alloc_pages_node(its->numa_node, GFP_KERNEL | __GFP_ZERO,
+> >> -					get_order(baser->psz));
+> >> +		page = its_alloc_pages_node(its->numa_node,
+> >> +					    GFP_KERNEL | __GFP_ZERO,
+> >> +					    get_order(baser->psz));
+> >>  		if (!page)
+> >>  			return false;
+> >>  
+> >> @@ -3418,7 +3450,9 @@ static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
+> >>  	unsigned long *lpi_map = NULL;
+> >>  	unsigned long flags;
+> >>  	u16 *col_map = NULL;
+> >> +	struct page *page;
+> >>  	void *itt;
+> >> +	int itt_order;
+> >>  	int lpi_base;
+> >>  	int nr_lpis;
+> >>  	int nr_ites;
+> >> @@ -3430,7 +3464,6 @@ static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
+> >>  	if (WARN_ON(!is_power_of_2(nvecs)))
+> >>  		nvecs = roundup_pow_of_two(nvecs);
+> >>  
+> >> -	dev = kzalloc(sizeof(*dev), GFP_KERNEL);
+> >>  	/*
+> >>  	 * Even if the device wants a single LPI, the ITT must be
+> >>  	 * sized as a power of two (and you need at least one bit...).
+> >> @@ -3438,7 +3471,16 @@ static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
+> >>  	nr_ites = max(2, nvecs);
+> >>  	sz = nr_ites * (FIELD_GET(GITS_TYPER_ITT_ENTRY_SIZE, its->typer) + 1);
+> >>  	sz = max(sz, ITS_ITT_ALIGN) + ITS_ITT_ALIGN - 1;
+> >> -	itt = kzalloc_node(sz, GFP_KERNEL, its->numa_node);
+> >> +	itt_order = get_order(sz);
+> >> +	page = its_alloc_pages_node(its->numa_node,
+> >> +				    GFP_KERNEL | __GFP_ZERO,
+> >> +				    itt_order);
+> > 
+> > So we go from an allocation that was so far measured in *bytes* to
+> > something that is now at least a page. Per device. This seems a bit
+> > excessive to me, specially when it isn't conditioned on anything and
+> > is now imposed on all platforms, including the non-CCA systems (which
+> > are exactly 100% of the machines).
+> 
+> Catalin asked about this in v2:
+> https://lore.kernel.org/lkml/c329ae18-2b61-4851-8d6a-9e691a2007c8@arm.com/
+> 
+> To be honest, I don't have a great handle on how much memory is being
+> wasted here. Within the realm guest I was testing this is rounding up an
+> otherwise 511 byte allocation to a 4k page, and there are 3 of them.
+> Which seems reasonable from a realm guest perspective.
 
-base-commit: afb91f5f8ad7af172d993a34fde1947892408f53
+And not that reasonable on a smaller system, such as my own router VM
+that has a whole lot of devices and very little memory. Not to mention
+that while CCA is stuck with 4k pages (duh!), the world is moving
+towards larger pages, meaning that this is wasting even more memory.
+
+> 
+> I can see two options to improve here:
+> 
+> 1. Add a !is_realm_world() check and return to the previous behaviour
+> when not running in a realm. It's ugly, and doesn't deal with any other
+> potential future memory encryption. cc_platform_has(CC_ATTR_MEM_ENCRYPT)
+> might be preferable? But this means no impact to non-realm guests.
+
+No, this is way too ugly, and doesn't help with things like pKVM.
+
+> 
+> 2. Use a special (global) memory allocator that does the
+> set_memory_decrypted() dance on the pages that it allocates but allows
+> packing the allocations. I'm not aware of an existing kernel API for
+> this, so it's potentially quite a bit of code. The benefit is that it
+> reduces memory consumption in a realm guest, although fragmentation
+> still means we're likely to see a (small) growth.
+> 
+> Any thoughts on what you think would be best?
+
+I would expect that something similar to kmem_cache could be of help,
+only with the ability to deal with variable object sizes (in this
+case: minimum of 256 bytes, in increments defined by the
+implementation, and with a 256 byte alignment).
+
+I don't think the ITS is particularly special here, and we should come
+up with something that is generic enough to support sharing of
+non-page-sized objects.
+
+Thanks,
+
+	M.
+
 -- 
-2.45.1.467.gbab1589fc0-goog
-
+Without deviation from the norm, progress is not possible.
