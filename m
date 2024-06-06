@@ -1,201 +1,105 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B873158848;
-	Thu,  6 Jun 2024 10:17:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10C2D39FEF
+	for <kvmarm@lists.linux.dev>; Thu,  6 Jun 2024 11:45:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717669060; cv=none; b=FV3/lPzwqTvHWWXqqSmh51ImAbajYrnBfPn++1ZgUweBk0kuAlf38cknp7PRPQSxHScZ88tEOLgaSW/kNSHDysIudbsTd/pEY10X5n185VXmr4wCvqqSqyDkmvACO5WapIRLzshiAtuenHqFkXbiJqhr70gu5BB/1INEhXOhgQk=
+	t=1717674329; cv=none; b=hwl3gQawjfKc06MSmXFfuQBDnHDZDNnWkQwzrskQ1bkfJyd+EmIfoWbF80Cbc2W/+xpHOjj1eAMh86wr9v//w6Km4deAo0Q/DsPFoDenaAslcFWfbCcLD1ErJ2R4pUSdbllOm3qS/z+6kJ69gO0yMkcaT68gXcdITN3j32VU6Rg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717669060; c=relaxed/simple;
-	bh=W9kbQ3pOCWummTxiokP7SZcsLeHBrYY6Qzq/MV72KTU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ll5e/OPt2kAbbBDKs6l2nqrJiWbc0ASdP7a8Eki37HA2vrxdkiL+Fm0/7lfXRkeePgYbRGY+r3lzZX6OYiaKOE1aqjwzufpgipqPLZzP7pybbmhI/bpvQnW7+ZtbrWhfb5V0xEyE1Jaiczai9LoOXeGK1YzjYMviJEgIUmLhsEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uiEWhhEz; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1717674329; c=relaxed/simple;
+	bh=tApQm0jsKmJ03qHiH0VavM2oRC2xKkZ039CGa/1Fwvk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=axDXMvupbQQvmTz8TLnGBBDJm0Ij7jnJLSgDqIan+d0wgk7OXd0PxDy9UrdnaIaBhfCDvLN1kzebzhAtyrEPAcWnhyL1jK93hPKaljGpJOtcOQ+MGk6LHJyUrDTY+Dkzw+V8wx8AzLfkgEkg7z5icuW9CbPYM6FRWRkC7pHGNXE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tjQDsXxt; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uiEWhhEz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D96D3C32782;
-	Thu,  6 Jun 2024 10:17:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tjQDsXxt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04851C4AF13;
+	Thu,  6 Jun 2024 11:45:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717669059;
-	bh=W9kbQ3pOCWummTxiokP7SZcsLeHBrYY6Qzq/MV72KTU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=uiEWhhEzoZzCIGqYIZyzZELj/haUQGSJYnc/PlYcDgqUSC+04XGE+M+Tzy36Jqpso
-	 I4B8nKfrhcD+XTJPPvcyuINb4gGoyzJipMtkwRp7X0fqGZw7thxFDzT+qaAd6DOc9T
-	 QBvq9FMfIsHUTsjV38OTk1T8r1ewNiaQYBW/7WFHcCJfVMrArKP4FF2eUjYCCgPsA1
-	 6Tjjgrm9HSl+IZVOcW3vsUHWvSXPOXJA894X2JupawEqiGdJ2N8+LVKJqegLeNFow3
-	 7R9xEkjRyNPAxeI84GiTRczFdUBT8YJCJnuGxyakUMHsf4RiuMWtgfuQ+vATZ5VKwV
-	 C39dwBzegKSSQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sFABd-001G9O-CB;
-	Thu, 06 Jun 2024 11:17:37 +0100
-Date: Thu, 06 Jun 2024 11:17:36 +0100
-Message-ID: <867cf2l6in.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu
- <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: Re: [PATCH v3 12/14] arm64: realm: Support nonsecure ITS emulation shared
-In-Reply-To: <4c363476-e5b5-42ff-9f30-a02a92b6751b@arm.com>
-References: <20240605093006.145492-1-steven.price@arm.com>
-	<20240605093006.145492-13-steven.price@arm.com>
-	<86a5jzld9g.wl-maz@kernel.org>
-	<4c363476-e5b5-42ff-9f30-a02a92b6751b@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1717674328;
+	bh=tApQm0jsKmJ03qHiH0VavM2oRC2xKkZ039CGa/1Fwvk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=tjQDsXxtVj7iee/Gkrh+o1qk0JrgDm1/giTdPOKYIs8A9fGixSd/0rdYNuY5WkQvX
+	 Cd4O3uCorS+6PyTFuRij/xEwoFK9Cf0SWhVFuV2s3xTUfZ0yD23cKJQ7a+fJRUQ2BP
+	 ceJVWybYVGH853YGW+MYCb9Bjv8ce2hoZmPem/J1R6TaHFec5IstqQRg3f4HX7bazH
+	 v5TT6WcfQTJ8QLJ0CtWniv2YDMBW68DXAx50QyDhzURKxSZaFEui2J5IG6FrVUWS1b
+	 hPXupRuOqPJFhT1OUFruhEa8X5YqZL46yYqUqRznTQn/HxxZEOwpS0MArDiLpmy3IQ
+	 Kf91NKrd4fQEA==
+Date: Thu, 6 Jun 2024 12:45:22 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	maz@kernel.org, will@kernel.org, qperret@google.com,
+	seanjc@google.com, alexandru.elisei@arm.com,
+	catalin.marinas@arm.com, philmd@linaro.org, james.morse@arm.com,
+	suzuki.poulose@arm.com, oliver.upton@linux.dev,
+	mark.rutland@arm.com, joey.gouly@arm.com, rananta@google.com,
+	yuzenghui@huawei.com
+Subject: Re: [PATCH v1] KVM: arm64: Allocate for maximum vector length for
+ pKVM host sve state
+Message-ID: <0e35b68f-8f04-4f92-99ad-7baf60441523@sirena.org.uk>
+References: <20240605150312.3684150-1-tabba@google.com>
+ <cff5b8a1-d837-474e-9b92-b538d7e6caae@sirena.org.uk>
+ <CA+EHjTx1Z5FyKO-YMPS83whX39eDAE5G6BzPJtpa6Z1kVpXgMg@mail.gmail.com>
+ <93b31a5d-28e1-489a-b51d-89fc16ddd0db@sirena.org.uk>
+ <CA+EHjTxn49GxBN0BNL+V7mheuxAUS+LtMxNpb0+TWt9q2T8d8g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="WcAdl2BjmhcwirDE"
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTxn49GxBN0BNL+V7mheuxAUS+LtMxNpb0+TWt9q2T8d8g@mail.gmail.com>
+X-Cookie: Simulated picture.
 
-On Wed, 05 Jun 2024 16:08:49 +0100,
-Steven Price <steven.price@arm.com> wrote:
-> 
-> Hi Marc,
-> 
-> On 05/06/2024 14:39, Marc Zyngier wrote:
-> > The subject line is... odd. I'd expect something like:
-> > 
-> > "irqchip/gic-v3-its: Share ITS tables with a non-trusted hypervisor"
-> > 
-> > because nothing here should be CCA specific.
-> 
-> Good point - that's a much better subject.
-> 
-> > On Wed, 05 Jun 2024 10:30:04 +0100,
-> > Steven Price <steven.price@arm.com> wrote:
-> >>
-> >> Within a realm guest the ITS is emulated by the host. This means the
-> >> allocations must have been made available to the host by a call to
-> >> set_memory_decrypted(). Introduce an allocation function which performs
-> >> this extra call.
-> > 
-> > This doesn't mention that this patch radically changes the allocation
-> > of some tables.
-> 
-> I guess that depends on your definition of radical, see below.
 
-It's election time, I'm all about making bold statements!
+--WcAdl2BjmhcwirDE
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-[...]
+On Thu, Jun 06, 2024 at 10:25:05AM +0100, Fuad Tabba wrote:
+> On Wed, Jun 5, 2024 at 5:52=E2=80=AFPM Mark Brown <broonie@kernel.org> wr=
+ote:
+> > On Wed, Jun 05, 2024 at 05:14:23PM +0100, Fuad Tabba wrote:
 
-> >> @@ -3334,8 +3365,9 @@ static bool its_alloc_table_entry(struct its_node *its,
-> >>  
-> >>  	/* Allocate memory for 2nd level table */
-> >>  	if (!table[idx]) {
-> >> -		page = alloc_pages_node(its->numa_node, GFP_KERNEL | __GFP_ZERO,
-> >> -					get_order(baser->psz));
-> >> +		page = its_alloc_pages_node(its->numa_node,
-> >> +					    GFP_KERNEL | __GFP_ZERO,
-> >> +					    get_order(baser->psz));
-> >>  		if (!page)
-> >>  			return false;
-> >>  
-> >> @@ -3418,7 +3450,9 @@ static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
-> >>  	unsigned long *lpi_map = NULL;
-> >>  	unsigned long flags;
-> >>  	u16 *col_map = NULL;
-> >> +	struct page *page;
-> >>  	void *itt;
-> >> +	int itt_order;
-> >>  	int lpi_base;
-> >>  	int nr_lpis;
-> >>  	int nr_ites;
-> >> @@ -3430,7 +3464,6 @@ static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
-> >>  	if (WARN_ON(!is_power_of_2(nvecs)))
-> >>  		nvecs = roundup_pow_of_two(nvecs);
-> >>  
-> >> -	dev = kzalloc(sizeof(*dev), GFP_KERNEL);
-> >>  	/*
-> >>  	 * Even if the device wants a single LPI, the ITT must be
-> >>  	 * sized as a power of two (and you need at least one bit...).
-> >> @@ -3438,7 +3471,16 @@ static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
-> >>  	nr_ites = max(2, nvecs);
-> >>  	sz = nr_ites * (FIELD_GET(GITS_TYPER_ITT_ENTRY_SIZE, its->typer) + 1);
-> >>  	sz = max(sz, ITS_ITT_ALIGN) + ITS_ITT_ALIGN - 1;
-> >> -	itt = kzalloc_node(sz, GFP_KERNEL, its->numa_node);
-> >> +	itt_order = get_order(sz);
-> >> +	page = its_alloc_pages_node(its->numa_node,
-> >> +				    GFP_KERNEL | __GFP_ZERO,
-> >> +				    itt_order);
-> > 
-> > So we go from an allocation that was so far measured in *bytes* to
-> > something that is now at least a page. Per device. This seems a bit
-> > excessive to me, specially when it isn't conditioned on anything and
-> > is now imposed on all platforms, including the non-CCA systems (which
-> > are exactly 100% of the machines).
-> 
-> Catalin asked about this in v2:
-> https://lore.kernel.org/lkml/c329ae18-2b61-4851-8d6a-9e691a2007c8@arm.com/
-> 
-> To be honest, I don't have a great handle on how much memory is being
-> wasted here. Within the realm guest I was testing this is rounding up an
-> otherwise 511 byte allocation to a 4k page, and there are 3 of them.
-> Which seems reasonable from a realm guest perspective.
+> > That was the start of the thought path that lead me to implement based
+> > on splitting it out of vec_probe_vqs() like the rest of the code does,
+> > the logic doesn't really fit in here for multiple reasons.
 
-And not that reasonable on a smaller system, such as my own router VM
-that has a whole lot of devices and very little memory. Not to mention
-that while CCA is stuck with 4k pages (duh!), the world is moving
-towards larger pages, meaning that this is wasting even more memory.
+> The alternative entails duplicating code in vec_init_vq_map() and
+> vec_update_vq_map().
 
-> 
-> I can see two options to improve here:
-> 
-> 1. Add a !is_realm_world() check and return to the previous behaviour
-> when not running in a realm. It's ugly, and doesn't deal with any other
-> potential future memory encryption. cc_platform_has(CC_ATTR_MEM_ENCRYPT)
-> might be preferable? But this means no impact to non-realm guests.
+> To me at least, it's straightforward to understand how max_vl is
+> computed if we set it as soon as we find it. This as opposed to first
+> having the vq bits set in a map, then in two different functions find
+> the first set bit in the map, which really corresponds to the vq, to
+> then convert it back to a vl.
 
-No, this is way too ugly, and doesn't help with things like pKVM.
+We need handling in multiple places in part because we do actually want
+to treat late CPUs differently to CPUs that come up during normal boot,
+even if we can get away with it for now with pKVM due to it rejecting
+late CPUs entirely.  The bouncing between VQ and VL is I agree a little
+annoying, if you're looking at this code you're familiar with it though.
+TBH not having it is a bit of a "did we miss something?" flag.
 
-> 
-> 2. Use a special (global) memory allocator that does the
-> set_memory_decrypted() dance on the pages that it allocates but allows
-> packing the allocations. I'm not aware of an existing kernel API for
-> this, so it's potentially quite a bit of code. The benefit is that it
-> reduces memory consumption in a realm guest, although fragmentation
-> still means we're likely to see a (small) growth.
-> 
-> Any thoughts on what you think would be best?
+--WcAdl2BjmhcwirDE
+Content-Type: application/pgp-signature; name="signature.asc"
 
-I would expect that something similar to kmem_cache could be of help,
-only with the ability to deal with variable object sizes (in this
-case: minimum of 256 bytes, in increments defined by the
-implementation, and with a 256 byte alignment).
+-----BEGIN PGP SIGNATURE-----
 
-I don't think the ITS is particularly special here, and we should come
-up with something that is generic enough to support sharing of
-non-page-sized objects.
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmZhoVEACgkQJNaLcl1U
+h9CuMAf/TZpxoS4sVJ6dhnFvYTh517AFsy4qta1N7Dj/r4GevQBGAN2pZltMGkaS
+7LPT5mLmmzGMBvx/lnR4wkrS9FADFLQwtrZunzH2wyy5+q6SqPzgBXHMcDQRAodK
+4GgU5o6zGM7tBuj3mnn3pbw4WzibyiZ3x6bWyqH9xxXKMk5ccyRW8cZA9y4tRFdx
+4tq/NdzPUreCNRh5Mwfrdt5jIQcco3B9eLVrjpIdIlHF44Xu95ZM1RCjN22uiB+a
+6tu8j22naALjn5Sncf6A8MTLkj+xECTT2qdMVPGTTsZP/pyG3ONSMRm95Gtw24z2
+C3m+qB9CG8fwWQevFuJoqJWl6IP94w==
+=Dc3a
+-----END PGP SIGNATURE-----
 
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+--WcAdl2BjmhcwirDE--
