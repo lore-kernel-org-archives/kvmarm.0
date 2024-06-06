@@ -1,161 +1,160 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77F0213BACD;
-	Thu,  6 Jun 2024 09:03:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-ua1-f42.google.com (mail-ua1-f42.google.com [209.85.222.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D835213C80B
+	for <kvmarm@lists.linux.dev>; Thu,  6 Jun 2024 09:25:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717664613; cv=none; b=XxfYK52rsm2eVdOJaVus6lFiEjq4K089/5Q218G3gOpc4z5CHj4yoglUUk6kIABkUnbBmmbfMs7S6lQMWZqEbJY/wyEIRDeK3uUL1J3+oBy6da0fmavtI87IhrtKydGXtBirgXsaKfPb+xeBp6wM5wfzmAuEhQFOcvo+Kq68hbY=
+	t=1717665945; cv=none; b=pNY+tRJdSRcnLI5jYOni6FtsezxaZrPnG02hncfZN2EtvQVzgbEvjQzScTtC5x/foNbLugcjxhytV/frY5ABBhWzDTo3HODCoQwovh9gePqJPL14v4TB7gDPUDd2WVmxzQ3L9EQLKisxaOrTlnQ+VuLTX950Pj9eBZtqPHV1AlU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717664613; c=relaxed/simple;
-	bh=zGINutsNe6MmQp12y68+cEwLXsIuxll5jEDC/d7keK4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PtZVjU3ibjWp3EHuQfNEtgoJbjRY3CSkFbbKtTOnd3CwTwkw56OWP3lzG4daXzRRDUDYdOD61mlHYdE0XhKh1dDuBgT6uKzs2blDWvsDosqIeoGkPwHZx2ZmFZS+GWL7YkkmmT3fDlswW5SS49HXVrk4IihWApJokFJ46k51LEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 637B6339;
-	Thu,  6 Jun 2024 02:03:55 -0700 (PDT)
-Received: from [10.1.33.29] (e122027.cambridge.arm.com [10.1.33.29])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9994E3F762;
-	Thu,  6 Jun 2024 02:03:27 -0700 (PDT)
-Message-ID: <c7db4f52-3d14-4d45-8352-d6d9f9e3b286@arm.com>
-Date: Thu, 6 Jun 2024 10:03:25 +0100
+	s=arc-20240116; t=1717665945; c=relaxed/simple;
+	bh=yRgdSjVWaoT9hcpY+cN2FwfyvTZOgWl9TX3kjezpyBM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=q+eCaPEoUhtNn1/BKy7da+Y0ZBWy8QWnVx9FcpMEHfxZ9/EOu4Lt1Lbk48s4wTDvOQBzt/F4fObHFpPyKTd7UyOk+gGbk5qoJ0dnEVS0HbbhZvjo4gsAe5W2SZ5YcqC/Untr84Q9zSHATzucCasW8ATOaCWovrEI4t5BiR8SmPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=W0sh7rdx; arc=none smtp.client-ip=209.85.222.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="W0sh7rdx"
+Received: by mail-ua1-f42.google.com with SMTP id a1e0cc1a2514c-80ac76f1226so1071114241.0
+        for <kvmarm@lists.linux.dev>; Thu, 06 Jun 2024 02:25:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1717665943; x=1718270743; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zm3IpDB6ZLqaoPrWmnW67jAKLpTWfnOETi+K8/H0g3Y=;
+        b=W0sh7rdxO/ewo7twBU6OPPPTts8VuyW5qxCSZ6h6cmVu/7nqvCIow8CnYuoC2IE6pM
+         Im87yqdyc6p/JtaFka6Jmg4PB7F9zoTFqRhfxe74KyX6u43C4rtcIlChT79KNe8C37s2
+         CgdtwzsghZ4CIh6lD4cbH95dXUeKhPvjqeB1AlJjHdekGme7qZuxfJexz3iPKRbvRc6w
+         2qem3RjglwHVPdsarGONWR4yN12I2oDTuf7iT1vODoEo8w2IrNB3EIry5IqrsNikK2Q5
+         WcquN9aHgo5VdaFI4wqF9MtHp1395mZhuXldaiEyWy5i5oXs6K9yhO6xQd00B8IuP9D3
+         VZlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717665943; x=1718270743;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zm3IpDB6ZLqaoPrWmnW67jAKLpTWfnOETi+K8/H0g3Y=;
+        b=q2hWJEorbOZFHDFj4vI269CuMozLDigrYiDG3hqiLenfXU9Y4acTglkIJUUWmkGycr
+         VJ7SEoxa4JjbCPi9uLx0mne1Tst15/hCOabWwasd340BUmAGCIdouR+qN1SVQkEbzXt+
+         iKFtC7nNixDPeVTYrLeyLfdeZpOFvFP0olEPx4tzrqZRXW9qnMeyEnS+aFBMC4KtNBmU
+         1NB2j9r3/JRFgPctzp0SqIRYUOLuReGsj4dASPeYKUh0RCBVmBP+bjw9OfK9hQdINtYo
+         IXzkETwN/OZdpH0O3mQJLjd2jEimafFkChkrsFSoEzNaxbe9lvQi2mljPE/z4YItCYyk
+         uvkg==
+X-Gm-Message-State: AOJu0YxTPgGjuD1+ZLm9RoDSTjlSgfJ+JX4CRl8Fudyagfj+swBHwRbG
+	hZgh3mzLD0kwA5FWv2eRE2PM5P42eMuXeO118yz4YNQIWpJVaDQDoZkD8mQGGSXjL1AEaFDbOZT
+	SUvuSV1YKBCsHJewjdtY3+Rd315RO4BYS5kz+
+X-Google-Smtp-Source: AGHT+IFj5cWMQltvncDHFkg2MtWAORDlyntkaLK6vNbVX2kZoFFFWEkGrKtr5Jy7MNqMoNXkhdRDNQJgrQtLvvq0bbc=
+X-Received: by 2002:a67:f512:0:b0:48b:d977:d72d with SMTP id
+ ada2fe7eead31-48c174fed98mr2261483137.12.1717665942603; Thu, 06 Jun 2024
+ 02:25:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 00/14] arm64: Support for running as a guest in Arm CCA
-To: Itaru Kitayama <itaru.kitayama@linux.dev>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-References: <20240605093006.145492-1-steven.price@arm.com>
- <ZmAj26Q2aHj-U9hw@vm3>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <ZmAj26Q2aHj-U9hw@vm3>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20240605150312.3684150-1-tabba@google.com> <cff5b8a1-d837-474e-9b92-b538d7e6caae@sirena.org.uk>
+ <CA+EHjTx1Z5FyKO-YMPS83whX39eDAE5G6BzPJtpa6Z1kVpXgMg@mail.gmail.com> <93b31a5d-28e1-489a-b51d-89fc16ddd0db@sirena.org.uk>
+In-Reply-To: <93b31a5d-28e1-489a-b51d-89fc16ddd0db@sirena.org.uk>
+From: Fuad Tabba <tabba@google.com>
+Date: Thu, 6 Jun 2024 10:25:05 +0100
+Message-ID: <CA+EHjTxn49GxBN0BNL+V7mheuxAUS+LtMxNpb0+TWt9q2T8d8g@mail.gmail.com>
+Subject: Re: [PATCH v1] KVM: arm64: Allocate for maximum vector length for
+ pKVM host sve state
+To: Mark Brown <broonie@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, seanjc@google.com, 
+	alexandru.elisei@arm.com, catalin.marinas@arm.com, philmd@linaro.org, 
+	james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, 
+	mark.rutland@arm.com, joey.gouly@arm.com, rananta@google.com, 
+	yuzenghui@huawei.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 05/06/2024 09:37, Itaru Kitayama wrote:
-> Hi Steven,
-> On Wed, Jun 05, 2024 at 10:29:52AM +0100, Steven Price wrote:
->> This series adds support for running Linux in a protected VM under the
->> Arm Confidential Compute Architecture (CCA). This has been updated
->> following the feedback from the v2 posting[1]. Thanks for the feedback!
->> Individual patches have a change log for v3.
->>
->> The biggest change from v2 is fixing set_memory_{en,de}crypted() to
->> perform a break-before-make sequence. Note that only the virtual address
->> supplied is flipped between shared and protected, so if e.g. a vmalloc()
->> address is passed the linear map will still point to the (now invalid)
->> previous IPA. Attempts to access the wrong address may trigger a
->> Synchronous External Abort. However any code which attempts to access
->> the 'encrypted' alias after set_memory_decrypted() is already likely to
->> be broken on platforms that implement memory encryption, so I don't
->> expect problems.
->>
->> The ABI to the RMM from a realm (the RSI) is based on the final RMM v1.0
->> (EAC 5) specification[2]. Future RMM specifications will be backwards
->> compatible so a guest using the v1.0 specification (i.e. this series)
->> will be able to run on future versions of the RMM without modification.
->>
->> Arm plans to set up a CI system to perform at a minimum boot testing of
->> Linux as a guest within a realm.
->>
->> This series is based on v6.10-rc1. It is also available as a git
->> repository:
->>
->> https://gitlab.arm.com/linux-arm/linux-cca cca-guest/v3
->>
->> This series (the guest side) should be in a good state so please review
->> with the intention that this could be merged soon. The host side (KVM
->> changes) is likely to require some more iteration and I'll post that as
->> a separate series shortly - note that there is no tie between the series
->> (i.e. you can mix and match v2 and v3 postings of the host and guest).
->>
->> Introduction (unchanged from v2 posting)
->> ============
->> A more general introduction to Arm CCA is available on the Arm
->> website[3], and links to the other components involved are available in
->> the overall cover letter.
->>
->> Arm Confidential Compute Architecture adds two new 'worlds' to the
->> architecture: Root and Realm. A new software component known as the RMM
->> (Realm Management Monitor) runs in Realm EL2 and is trusted by both the
->> Normal World and VMs running within Realms. This enables mutual
->> distrust between the Realm VMs and the Normal World.
->>
->> Virtual machines running within a Realm can decide on a (4k)
->> page-by-page granularity whether to share a page with the (Normal World)
->> host or to keep it private (protected). This protection is provided by
->> the hardware and attempts to access a page which isn't shared by the
->> Normal World will trigger a Granule Protection Fault.
->>
->> Realm VMs can communicate with the RMM via another SMC interface known
->> as RSI (Realm Services Interface). This series adds wrappers for the
->> full set of RSI commands and uses them to manage the Realm IPA State
->> (RIPAS) and to discover the configuration of the realm.
->>
->> The VM running within the Realm needs to ensure that memory that is
->> going to use is marked as 'RIPAS_RAM' (i.e. protected memory accessible
->> only to the guest). This could be provided by the VMM (and subject to
->> measurement to ensure it is setup correctly) or the VM can set it
->> itself.  This series includes a patch which will iterate over all
->> described RAM and set the RIPAS. This is a relatively cheap operation,
->> and doesn't require memory donation from the host. Instead, memory can
->> be dynamically provided by the host on fault. An alternative would be to
->> update booting.rst and state this as a requirement, but this would
->> reduce the flexibility of the VMM to manage the available memory to the
->> guest (as the initial RIPAS state is part of the guest's measurement).
->>
->> Within the Realm the most-significant active bit of the IPA is used to
->> select whether the access is to protected memory or to memory shared
->> with the host. This series treats this bit as if it is attribute bit in
->> the page tables and will modify it when sharing/unsharing memory with
->> the host.
->>
->> This top bit usage also necessitates that the IPA width is made more
->> dynamic in the guest. The VMM will choose a width (and therefore which
->> bit controls the shared flag) and the guest must be able to identify
->> this bit to mask it out when necessary. PHYS_MASK_SHIFT/PHYS_MASK are
->> therefore made dynamic.
->>
->> To allow virtio to communicate with the host the shared buffers must be
->> placed in memory which has this top IPA bit set. This is achieved by
->> implementing the set_memory_{encrypted,decrypted} APIs for arm64 and
->> forcing the use of bounce buffers. For now all device access is
->> considered to required the memory to be shared, at this stage there is
->> no support for real devices to be assigned to a realm guest - obviously
->> if device assignment is added this will have to change.
->>
->> Finally the GIC is (largely) emulated by the (untrusted) host. The RMM
->> provides some management (including register save/restore) but the
->> ITS buffers must be placed into shared memory for the host to emulate.
->> There is likely to be future work to harden the GIC driver against a
->> malicious host (along with any other drivers used within a Realm guest).
->>
->> [1] https://lore.kernel.org/r/20240412084213.1733764-1-steven.price%40arm.com
->> [2] https://developer.arm.com/documentation/den0137/1-0eac5/
->> [3] https://www.arm.com/architecture/security-features/arm-confidential-compute-architecture
->>
-> 
-> The v3 guest built with clang booted fine on FVP backed by v2 host kernel.
-> 
-> Tested-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+Hi Mark,
 
-Thanks for testing!
+On Wed, Jun 5, 2024 at 5:52=E2=80=AFPM Mark Brown <broonie@kernel.org> wrot=
+e:
+>
+> On Wed, Jun 05, 2024 at 05:14:23PM +0100, Fuad Tabba wrote:
+> > On Wed, Jun 5, 2024 at 4:46=E2=80=AFPM Mark Brown <broonie@kernel.org> =
+wrote:
+> > > On Wed, Jun 05, 2024 at 04:03:12PM +0100, Fuad Tabba wrote:
+>
+> > > > +     /* The maximum vl encountered for any cpu in the system. */
+> > > > +     int max_system_vl;
+> > > > +
+>
+> > > As previously mentioned I'd really prefer not to call this _system_ d=
+ue
+> > > to the potential confusion with the maximum VL we're using.  Naming i=
+s
+> > > hard.
+>
+> > I agree :) I have no strong preference really. It's just that for me
+> > max_cpu_vl sounds like it's per cpu. But now I'm just bikeshedding...
+>
+> seen?
+>
+> > > > @@ -1031,7 +1031,12 @@ static void vec_probe_vqs(struct vl_info *in=
+fo,
+> > > >
+> > > >               vq =3D sve_vq_from_vl(vl); /* skip intervening length=
+s */
+> > > >               set_bit(__vq_to_bit(vq), map);
+> > > > +
+> > > > +             if (!max_vl)
+> > > > +                     max_vl =3D vl;
+> > > >       }
+> > > > +
+> > > > +     info->max_system_vl =3D max((int) max_vl, info->max_system_vl=
+);
+>
+> > > It's not clear to me why we stage this in a local variable prior to
+> > > updating the global value, and like I say it does feel cleaner and sa=
+fer
+> > > to keep the current split between enumeration of the PE and integrati=
+on
+> > > of the results.  This should *work* but it doesn't feel consistent wi=
+th
+> > > the rest of the code.
+>
+> > To me it felt more clear like this, but I'm fine with not doing the
+> > staging first.
+>
+> That was the start of the thought path that lead me to implement based
+> on splitting it out of vec_probe_vqs() like the rest of the code does,
+> the logic doesn't really fit in here for multiple reasons.
 
-Steve
+The alternative entails duplicating code in vec_init_vq_map() and
+vec_update_vq_map().
 
+To me at least, it's straightforward to understand how max_vl is
+computed if we set it as soon as we find it. This as opposed to first
+having the vq bits set in a map, then in two different functions find
+the first set bit in the map, which really corresponds to the vq, to
+then convert it back to a vl.
+
+Thanks,
+/fuad
+
+
+
+> >
+> > >
+> > > > -               kvm_host_sve_max_vl =3D sve_max_vl();
+> > > > +               kvm_host_sve_max_vl =3D sve_max_system_vl();
+> > >
+> > > I appreciate that we're adding a host_ on the front of it but it woul=
+d
+> > > feel safer to keep the name of the hypervisor copy of the value
+> > > consistent with where we copied it from, sve_max_vl is a different th=
+ing
+> > > in the host kernel.
+> >
+> > I agree, this should be renamed.
+> >
+> > Thanks!
+> > /fuad
