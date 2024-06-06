@@ -1,119 +1,109 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B43BC1990A1;
-	Thu,  6 Jun 2024 16:22:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E78ED515;
+	Thu,  6 Jun 2024 18:38:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717690955; cv=none; b=boegV0zHhYJRXZS45IWSoph0Ej3hQwWf5R85nHlyDKE/ppDxRA+Q/zypY+Z//MEp1wg+txi0i+yCTdjqV9mVSB5gJHry2medLgJ/wIeptzJDDf/q3eEGjWWA/RVtTOpa9mijOByvyv7mN7q46WLb+8+K5WPK8XfkgcQjjcqXacU=
+	t=1717699095; cv=none; b=f+ecUDygTGAlxer+gzNg3eM51yjJkjjKPxOJBirk5ov0E5LM6Voz8G5hFZCTnM7jd9Tpjlh56r+WdN2AaxmRvDMAy3ovP+s/wphbFjt0x36BUFNS8RmduIGQcEGiztQ46tJEmSWtdAuvIjopTCUPBG/YANBfWLtYMKDzMS38+ck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717690955; c=relaxed/simple;
-	bh=Q+vrgTBGO4uoIOOe7S/ANwtcnFISMpO8zG4tv8qihJs=;
+	s=arc-20240116; t=1717699095; c=relaxed/simple;
+	bh=m4y07AqUVhllB8GdQjGhynxMK/W/hDUwql04aVzrTcI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MFo0xQDRCEtxAz9MWc8UXflYhZgNvRWAA1ZGrKJWRm43ZACVXk/vBgVrmprIBD1JoRRbnszy4lqTigQP2B4fAeW8i6lAejn7FKbGm28A/W9tYHL9UlC9tOrjNL+ZsTn33DhIPK1LkDh4K4ofY4KFKmB9oXA+swCmpy4P6azwkOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RZ0Nhn5w; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RZ0Nhn5w"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9EF7C2BD10;
-	Thu,  6 Jun 2024 16:22:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717690955;
-	bh=Q+vrgTBGO4uoIOOe7S/ANwtcnFISMpO8zG4tv8qihJs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RZ0Nhn5wVlF93tjBwFq8HsyrTnvto9/1TGU4wvK3s1CMwRqNYAVPuPjvFn6e02gYn
-	 PlPJDfj+AIdI4RtXo6A3n+4ROqzf8faGiM6qdPbwrfH7KnDlARvp1KhAEsJ/RYi9DS
-	 np6kEpAn0ky2D44t8U+9G/wVQYvAXxsPC/JKzo4VrYI8dSskEhqM0z9dcBporrJj3m
-	 A3u2Z65TWapU00op5WOU8VDcwy/Kz+nkauRj4tfXf1wTn0aWOlhPo7Tk3FwjItkRAo
-	 hV2xSOQ4FrTDXZby9lFrrX57r1XWOGcIw3Qh4MqWBI7gMqVcZcbl2PxjIe6kGU3GSE
-	 gP0ueFkuunGtQ==
-Date: Thu, 6 Jun 2024 17:22:26 +0100
-From: Will Deacon <will@kernel.org>
-To: =?iso-8859-1?Q?Pierre-Cl=E9ment?= Tosi <ptosi@google.com>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=LNZ8LOZPPYiogAdFfff/+rt/wVdrNWO7Sceb2vkKVtgkUvDRlYn9HWd+IOQNWAaPt2b+dkWZgcgC2IklmwjBo7CnCIHWj//a+fjSwa0r14S8SQ6L8vYrW3E1yE/3udBbDLQtSC9dJZpQgDTRRdLC1H0C34F78X2XE3Cs7tOEiOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F4CBC2BD10;
+	Thu,  6 Jun 2024 18:38:11 +0000 (UTC)
+Date: Thu, 6 Jun 2024 19:38:08 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Vincent Donnefort <vdonnefort@google.com>
-Subject: Re: [PATCH v4 11/13] KVM: arm64: Improve CONFIG_CFI_CLANG error
- message
-Message-ID: <20240606162226.GA23425@willie-the-truck>
-References: <20240529121251.1993135-1-ptosi@google.com>
- <20240529121251.1993135-12-ptosi@google.com>
- <20240603144808.GL19151@willie-the-truck>
- <whzwqltolrms4ct35az5eif5rg25e2km23cztypgikallbcxoj@wtwfckujzcrf>
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: Re: [PATCH v3 12/14] arm64: realm: Support nonsecure ITS emulation
+ shared
+Message-ID: <ZmICEN8JvWM7M9Ch@arm.com>
+References: <20240605093006.145492-1-steven.price@arm.com>
+ <20240605093006.145492-13-steven.price@arm.com>
+ <86a5jzld9g.wl-maz@kernel.org>
+ <4c363476-e5b5-42ff-9f30-a02a92b6751b@arm.com>
+ <867cf2l6in.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <whzwqltolrms4ct35az5eif5rg25e2km23cztypgikallbcxoj@wtwfckujzcrf>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <867cf2l6in.wl-maz@kernel.org>
 
-On Tue, Jun 04, 2024 at 05:05:59PM +0100, Pierre-Clément Tosi wrote:
-> On Mon, Jun 03, 2024 at 03:48:08PM +0100, Will Deacon wrote:
-> > On Wed, May 29, 2024 at 01:12:17PM +0100, Pierre-Clément Tosi wrote:
-> > > For kCFI, the compiler encodes in the immediate of the BRK (which the
-> > > CPU places in ESR_ELx) the indices of the two registers it used to hold
-> > > (resp.) the function pointer and expected type. Therefore, the kCFI
-> > > handler must be able to parse the contents of the register file at the
-> > > point where the exception was triggered.
-> > > 
-> > > To achieve this, introduce a new hypervisor panic path that first stores
-> > > the CPU context in the per-CPU kvm_hyp_ctxt before calling (directly or
-> > > indirectly) hyp_panic() and execute it from all EL2 synchronous
-> > > exception handlers i.e.
-> > > 
-> > > - call it directly in host_el2_sync_vect (__kvm_hyp_host_vector, EL2t&h)
-> > > - call it directly in el2t_sync_invalid (__kvm_hyp_vector, EL2t)
-> > > - set ELR_EL2 to it in el2_sync (__kvm_hyp_vector, EL2h), which ERETs
-> > > 
-> > > Teach hyp_panic() to decode the kCFI ESR and extract the target and type
-> > > from the saved CPU context. In VHE, use that information to panic() with
-> > > a specialized error message. In nVHE, only report it if the host (EL1)
-> > > has access to the saved CPU context i.e. iff CONFIG_NVHE_EL2_DEBUG=y,
-> > > which aligns with the behavior of CONFIG_PROTECTED_NVHE_STACKTRACE.
-> > > 
-> > > Signed-off-by: Pierre-Clément Tosi <ptosi@google.com>
-> > > ---
-> > >  arch/arm64/kvm/handle_exit.c            | 30 +++++++++++++++++++++++--
-> > >  arch/arm64/kvm/hyp/entry.S              | 24 +++++++++++++++++++-
-> > >  arch/arm64/kvm/hyp/hyp-entry.S          |  2 +-
-> > >  arch/arm64/kvm/hyp/include/hyp/switch.h |  4 ++--
-> > >  arch/arm64/kvm/hyp/nvhe/host.S          |  2 +-
-> > >  arch/arm64/kvm/hyp/vhe/switch.c         | 26 +++++++++++++++++++--
-> > >  6 files changed, 79 insertions(+), 9 deletions(-)
+On Thu, Jun 06, 2024 at 11:17:36AM +0100, Marc Zyngier wrote:
+> On Wed, 05 Jun 2024 16:08:49 +0100,
+> Steven Price <steven.price@arm.com> wrote:
+> > 2. Use a special (global) memory allocator that does the
+> > set_memory_decrypted() dance on the pages that it allocates but allows
+> > packing the allocations. I'm not aware of an existing kernel API for
+> > this, so it's potentially quite a bit of code. The benefit is that it
+> > reduces memory consumption in a realm guest, although fragmentation
+> > still means we're likely to see a (small) growth.
 > > 
-> > This quite a lot of work just to print out some opaque type numbers
-> > when CONFIG_NVHE_EL2_DEBUG=y. Is it really worth it? How would I use
-> > this information to debug an otherwise undebuggable kcfi failure at EL2?
+> > Any thoughts on what you think would be best?
 > 
-> The type ID alone might not be worth it but what about the target?
-> 
-> In my experience, non-malicious kCFI failures are often caused by an issue with
-> the callee, not the caller. Without this patch, only the source of the exception
-> is reported but, with it, the panic handler also prints the kCFI target (i.e.
-> value of the function pointer) as a symbol.
+> I would expect that something similar to kmem_cache could be of help,
+> only with the ability to deal with variable object sizes (in this
+> case: minimum of 256 bytes, in increments defined by the
+> implementation, and with a 256 byte alignment).
 
-I think it's less of an issue for EL2, as we don't have tonnes of
-indirections, but I agree that the target is nice to have.
+Hmm, that's doable but not that easy to make generic. We'd need a new
+class of kmalloc-* caches (e.g. kmalloc-decrypted-*) which use only
+decrypted pages together with a GFP_DECRYPTED flag or something to get
+the slab allocator to go for these pages and avoid merging with other
+caches. It would actually be the page allocator parsing this gfp flag,
+probably in post_alloc_hook() to set the page decrypted and re-encrypt
+it in free_pages_prepare(). A slight problem here is that free_pages()
+doesn't get the gfp flag, so we'd need to store some bit in the page
+flags. Maybe the flag is not that bad, do we have something like for
+page_to_phys() to give us the high IPA address for decrypted pages?
 
-> With the infrastructure for the target in place, it isn't much more work to also
-> report the type ID. Although it is rarely informative (as you noted), there are
-> some situations where it can still be useful e.g. if reported as zero and/or has
-> been corrupted and does not match its value from the ELF.
+Similarly if we go for a kmem_cache (or a few for multiple sizes). One
+can specify a constructor which could set the memory decrypted but
+there's no destructor (and also the constructor is per object, not per
+page, so we'd need some refcounting).
 
-So looking at the implementation, I'm not a huge fan of saving off all
-the GPRs and then relying on the stage-2 being disabled so that the host
-can fish out the registers it cares about. I think I'd prefer to provide
-the target as an additional argument to nvhe_hyp_panic_handler(), meaning
-that we could even print the VA when CONFIG_NVHE_EL2_DEBUG is disabled.
+Another approach contained within the driver is to use mempool_create()
+with our own _alloc_fn/_free_fn that sets the memory decrypted/encrypted
+accordingly, though sub-page allocations need additional tracking. Also
+that's fairly similar to kmem_cache, fixed size.
 
-But for now, I suggest we drop this patch along with the testing patches
-because I think the rest of the series is nearly there and it's a useful
-change on its own.
+Yet another option would be to wire it somehow in the DMA API but the
+minimum allocation is already a page size, so we don't gain anything.
 
-Will
+What gets somewhat closer to what we need is gen_pool. It can track
+different sizes, we just need to populate the chunks as needed. I don't
+think this would work as a generic allocator but may be good enough
+within the ITS code.
+
+If there's a need for such generic allocations in other parts of the
+kernel, my preference would be something around kmalloc caches and a new
+GFP flag (first option; subject to the selling it to the mm folk). But
+that's more of a separate prototyping effort that may or may not
+succeed.
+
+Anyway, we could do some hacking around gen_pool as a temporary solution
+(maybe as a set of patches on top of this series to be easier to revert)
+and start investigating a proper decrypted page allocator in parallel.
+We just need to find a victim that has the page allocator fresh in mind
+(Ryan or Alexandru ;)).
+
+-- 
+Catalin
