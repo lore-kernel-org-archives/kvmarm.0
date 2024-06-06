@@ -1,35 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70071197A6A;
-	Thu,  6 Jun 2024 15:32:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D77F197A96;
+	Thu,  6 Jun 2024 15:32:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717687926; cv=none; b=Rzf3IdtfLvZVSpgJJeqBZPUPi5Gq7F+HbOuwCEks+T35EPkQITQRaCmfc7PzIjan9KfFZlH6OIIqrDAq5AnViLHIjgnfeeIcJQEdqqAdGpZqDuI1fLF92k1QZQJyAcyfq6LZaxm8xxleXuKegv43BxQzTCbVpF3vu66Z8oOjKeY=
+	t=1717687929; cv=none; b=AaivA2zZxZUYxxvUsdWyGW1cwDeTl2m23zapu4ag4hG0FjSSAxS/heKDQZsjtdZJ/AmnGTKVtrALJDyLOwnDaopBAfLImcyIY04mQkl8Dx1ZzSH+17nUjoybsayfNIQjGVMLr10zBalBJ50H1CD/G3PN8Bzx/2woqDqA0CY8J4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717687926; c=relaxed/simple;
-	bh=H3jcxvAHXptT4L841OkSY/wbD68Q058k6Wy2910HAmg=;
+	s=arc-20240116; t=1717687929; c=relaxed/simple;
+	bh=uej+Tf8xf9z3hwiLLHmVJLafNhINst5vjRm2ck0g7NI=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=miCqEcLGqZY+UhhpEJG1EM3KLKkkmjNsSGEwLj6Ysqk3v7Q8PPocka3/HhfQbacw3XlIaG0yW2WrHOs6KiLeYDdOaFAP6G0pA9FMfjqv8YXlqE0qEEri7pA/UHq1AsAYfrnGb1s0Mz3+FN2e9fG3aI4KDln5Hmv2Eoc1IQ7DxvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y1ABfoKr; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=Nge7ThiqzvDXbk42LujNEClsjSs5U8iyJJ/B8v+BeaJAWVFKDCj5oHP0iWX7PD8+tRaCtl+tUunlerDGgEeifq34DzOOtv6ltr0XeG7q9hrdPi9Cebc/LTDtx+rO3MymP60Mu4B/uXT8D8SfburFVTbUWDQRxcxCfRMisdZ5FLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g+LjCG5D; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y1ABfoKr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B976DC2BD10;
-	Thu,  6 Jun 2024 15:32:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g+LjCG5D"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8701EC32782;
+	Thu,  6 Jun 2024 15:32:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717687926;
-	bh=H3jcxvAHXptT4L841OkSY/wbD68Q058k6Wy2910HAmg=;
+	s=k20201202; t=1717687928;
+	bh=uej+Tf8xf9z3hwiLLHmVJLafNhINst5vjRm2ck0g7NI=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=Y1ABfoKraIr62CY8JwyBPb7z6fKdniAElsElHbF1eC/TLRRG+mRO1IhFeDSy0cuCv
-	 JMyt1NSw6J2OK2NmVX0wUfOO3grajN6DD4G0MshYmeZuOHJcfpaLenC9SmZH/O4LcS
-	 rWAHBJLdoOHMTFDD23gmILoMj3u782w447FCYumDYslRhYqgJ3qPbR7xVoqI2bg5Mn
-	 jUl8/BnlDtUnpUI+NqWwghBel1DQeqWg8OcAQGaTM5i+H+YzLrObwXG3D5q6xPrYuG
-	 1mmIWeEt2n1GP1gXWRAorkRbR6gaQ0mhftA5rbU5Xp+NbC+31Gj3/NaR+hN7aE5JSG
-	 6kfuXb+cdNLkA==
+	b=g+LjCG5Dckh2ymqVHPJbXOurf4EebD7bdxByAad7JMaf34VU3t5ZktiW32JOaqfg/
+	 0yYaH5smz8iUiMs+iWkQtMMtXvshNLHpFGVEPS6LIVRhQ3nnjS/sW/wTiiqyEi0lld
+	 7gnvSTO/E9YgV+f0unr5p3jFPkXvp1amS2UJLU3co53afuX5JVoHHCzhNADl5+nP/g
+	 H43FGZ2r3FPKkwLA0VqDXQT4CaNMQXzhFa/zvxwzAEmINSHTEapKXrZXTAN2Vr2gS4
+	 pIHxaax2aREy4s1hZ979ZYTLSMNGgvEEDhrLpQPaJM1l+Al9yXhcd6KqxrNaRBVWaS
+	 yACtJB7XGpe7w==
 From: Mark Brown <broonie@kernel.org>
-Date: Thu, 06 Jun 2024 16:21:44 +0100
-Subject: [PATCH v2 2/4] arm64/fpsimd: Discover maximum vector length
- implemented by any CPU
+Date: Thu, 06 Jun 2024 16:21:45 +0100
+Subject: [PATCH v2 3/4] KVM: arm64: Fix FFR offset calculation for pKVM
+ host state save and restore
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -38,7 +38,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240606-kvm-arm64-fix-pkvm-sve-vl-v2-2-c88f4eb4b14b@kernel.org>
+Message-Id: <20240606-kvm-arm64-fix-pkvm-sve-vl-v2-3-c88f4eb4b14b@kernel.org>
 References: <20240606-kvm-arm64-fix-pkvm-sve-vl-v2-0-c88f4eb4b14b@kernel.org>
 In-Reply-To: <20240606-kvm-arm64-fix-pkvm-sve-vl-v2-0-c88f4eb4b14b@kernel.org>
 To: Catalin Marinas <catalin.marinas@arm.com>, 
@@ -48,139 +48,86 @@ To: Catalin Marinas <catalin.marinas@arm.com>,
 Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
  kvmarm@lists.linux.dev, Mark Brown <broonie@kernel.org>
 X-Mailer: b4 0.14-dev-d4707
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4151; i=broonie@kernel.org;
- h=from:subject:message-id; bh=H3jcxvAHXptT4L841OkSY/wbD68Q058k6Wy2910HAmg=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBmYdZrXwyvssj4DZUsq5Oq0pfKbm9b2RzxxDY7A4mX
- rG4EM4SJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZmHWawAKCRAk1otyXVSH0MW7B/
- 4zRzbdQVt988qBR2E0HSNmsQ3ScD6/w8A55zELsnqftkLXWoPyjvYA4oWQdIluke0jF5N7T/6kJgWb
- B7itNqcV5SEgVK/IvQ86Sq/NkJ/bedLgWyqyELlEwHs6z0Fxu062KcZAyrczajDmuMgKeYg/q3n3nB
- MCmA32OMYiWDZ5Nh0xdrrO1pQWacYtiN9mQsRqhFHi8TjzV4n3DBIw8f1j1X3Og3BcwlOalXdF54X/
- Kd68sOpBD89fYBkh0ROlMJ2Yc6Hp3rZfPdasagZo8MY9/RjUrQ3XqcRovWFVFf+tbfQzUI2E3PL4eV
- +LPMypMoA0HM6PfdjDcVXPFMT30j31
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3038; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=uej+Tf8xf9z3hwiLLHmVJLafNhINst5vjRm2ck0g7NI=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBmYdZsz4r7UnVjNwEMykuqo5GUe570WUMT0pqnJdWE
+ gToCCkWJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZmHWbAAKCRAk1otyXVSH0Mw4B/
+ 943uDUyYIEx5pZu40qDu0DfW1U3V+HvNFfCFkiV2wuM9gthMVvxU3mdEKV8ycpgkIFfheiOOxXrdlN
+ L45cC3KEK4JltkArIAf0igt7SRKdcQfhfq30AJwXcRsw+di5RlXoqQL07wQ5oVJAqnb4EbXYcpWfL/
+ WOiBpO7bSj6Jqxy+eWzqiz2gzzUrVCecNYkasdJhvxtHG1UyHfcKBTT9OAL97pVa9KdOzhVIhah4YX
+ 4ccR2jQi1A40+WoQEQO8Uq7Z3HsKcFEQVWg7hYdxQ2GZtQHf1Y17yxigN/3JvEs7lWu9ndaxlp9j53
+ KXRUj+78kTnQLVr7UzqV33uUNcwqVR
 X-Developer-Key: i=broonie@kernel.org; a=openpgp;
  fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-When discovering the vector lengths for SVE and SME we do not currently
-record the maximum VL supported on any individual CPU.  This is expected
-to be the same for all CPUs but the architecture allows asymmetry, if we
-do encounter an asymmetric system then some CPUs may support VLs higher
-than the maximum Linux will use.  Since the pKVM hypervisor needs to
-support saving and restoring anything the host can physically set it
-needs to know the maximum value any CPU could have, add support for
-enumerating it and validation for late CPUs.
+When saving and restoring the SVE state for the host we configure the
+hardware for the maximum VL it supports, but when calculating offsets in
+memory we use the maximum usable VL for the host. Since these two values
+may not be the same this may result in data corruption.  We can just
+read the current VL from the hardware with an instruction so do that
+instead of a saved value, we need to correct the value and this makes
+the consistency obvious.
 
+Fixes: b5b9955617bc ("KVM: arm64: Eagerly restore host fpsimd/sve state in pKVM")
 Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
- arch/arm64/include/asm/fpsimd.h | 13 +++++++++++++
- arch/arm64/kernel/fpsimd.c      | 26 +++++++++++++++++++++++++-
- 2 files changed, 38 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_hyp.h        | 1 +
+ arch/arm64/kvm/hyp/fpsimd.S             | 5 +++++
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 2 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c      | 2 +-
+ 4 files changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
-index 51c21265b4fa..cd19713c9deb 100644
---- a/arch/arm64/include/asm/fpsimd.h
-+++ b/arch/arm64/include/asm/fpsimd.h
-@@ -188,6 +188,9 @@ struct vl_info {
- 	int max_vl;
- 	int max_virtualisable_vl;
+diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+index b05bceca3385..7510383d78a6 100644
+--- a/arch/arm64/include/asm/kvm_hyp.h
++++ b/arch/arm64/include/asm/kvm_hyp.h
+@@ -113,6 +113,7 @@ void __fpsimd_save_state(struct user_fpsimd_state *fp_regs);
+ void __fpsimd_restore_state(struct user_fpsimd_state *fp_regs);
+ void __sve_save_state(void *sve_pffr, u32 *fpsr, int save_ffr);
+ void __sve_restore_state(void *sve_pffr, u32 *fpsr, int restore_ffr);
++int __sve_get_vl(void);
  
-+	/* Maximum vector length observed on any CPU */
-+	int max_cpu_vl;
+ u64 __guest_enter(struct kvm_vcpu *vcpu);
+ 
+diff --git a/arch/arm64/kvm/hyp/fpsimd.S b/arch/arm64/kvm/hyp/fpsimd.S
+index e950875e31ce..d272dbf36da8 100644
+--- a/arch/arm64/kvm/hyp/fpsimd.S
++++ b/arch/arm64/kvm/hyp/fpsimd.S
+@@ -31,3 +31,8 @@ SYM_FUNC_START(__sve_save_state)
+ 	sve_save 0, x1, x2, 3
+ 	ret
+ SYM_FUNC_END(__sve_save_state)
 +
- 	/*
- 	 * Set of available vector lengths,
- 	 * where length vq encoded as bit __vq_to_bit(vq):
-@@ -278,6 +281,11 @@ static inline int vec_max_virtualisable_vl(enum vec_type type)
- 	return vl_info[type].max_virtualisable_vl;
++SYM_FUNC_START(__sve_get_vl)
++	_sve_rdvl	0, 1
++	ret
++SYM_FUNC_END(__sve_get_vl)
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 0c4de44534b7..06efcca765cc 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -327,7 +327,7 @@ static inline void __hyp_sve_save_host(void)
+ 
+ 	sve_state->zcr_el1 = read_sysreg_el1(SYS_ZCR);
+ 	write_sysreg_s(ZCR_ELx_LEN_MASK, SYS_ZCR_EL2);
+-	__sve_save_state(sve_state->sve_regs + sve_ffr_offset(kvm_host_sve_max_vl),
++	__sve_save_state(sve_state->sve_regs + sve_ffr_offset(__sve_get_vl()),
+ 			 &sve_state->fpsr,
+ 			 true);
  }
- 
-+static inline int vec_max_cpu_vl(enum vec_type type)
-+{
-+	return vl_info[type].max_cpu_vl;
-+}
-+
- static inline int sve_max_vl(void)
- {
- 	return vec_max_vl(ARM64_VEC_SVE);
-@@ -288,6 +296,11 @@ static inline int sve_max_virtualisable_vl(void)
- 	return vec_max_virtualisable_vl(ARM64_VEC_SVE);
- }
- 
-+static inline int sve_max_cpu_vl(void)
-+{
-+	return vec_max_cpu_vl(ARM64_VEC_SVE);
-+}
-+
- /* Ensure vq >= SVE_VQ_MIN && vq <= SVE_VQ_MAX before calling this function */
- static inline bool vq_available(enum vec_type type, unsigned int vq)
- {
-diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-index 22542fb81812..ee6fb8c4b16d 100644
---- a/arch/arm64/kernel/fpsimd.c
-+++ b/arch/arm64/kernel/fpsimd.c
-@@ -129,6 +129,7 @@ __ro_after_init struct vl_info vl_info[ARM64_VEC_MAX] = {
- 		.min_vl			= SVE_VL_MIN,
- 		.max_vl			= SVE_VL_MIN,
- 		.max_virtualisable_vl	= SVE_VL_MIN,
-+		.max_cpu_vl		= SVE_VL_MIN,
- 	},
- #endif
- #ifdef CONFIG_ARM64_SME
-@@ -1041,8 +1042,13 @@ static void vec_probe_vqs(struct vl_info *info,
- void __init vec_init_vq_map(enum vec_type type)
- {
- 	struct vl_info *info = &vl_info[type];
-+	unsigned long b;
-+
- 	vec_probe_vqs(info, info->vq_map);
- 	bitmap_copy(info->vq_partial_map, info->vq_map, SVE_VQ_MAX);
-+
-+	b = find_first_bit(info->vq_map, SVE_VQ_MAX);
-+	info->max_cpu_vl = __bit_to_vl(b);
- }
- 
- /*
-@@ -1054,11 +1060,16 @@ void vec_update_vq_map(enum vec_type type)
- {
- 	struct vl_info *info = &vl_info[type];
- 	DECLARE_BITMAP(tmp_map, SVE_VQ_MAX);
-+	unsigned long b;
- 
- 	vec_probe_vqs(info, tmp_map);
- 	bitmap_and(info->vq_map, info->vq_map, tmp_map, SVE_VQ_MAX);
- 	bitmap_or(info->vq_partial_map, info->vq_partial_map, tmp_map,
- 		  SVE_VQ_MAX);
-+
-+	b = find_first_bit(tmp_map, SVE_VQ_MAX);
-+	if (__bit_to_vl(b) > info->max_cpu_vl)
-+		info->max_cpu_vl = __bit_to_vl(b);
- }
- 
- /*
-@@ -1069,10 +1080,23 @@ int vec_verify_vq_map(enum vec_type type)
- {
- 	struct vl_info *info = &vl_info[type];
- 	DECLARE_BITMAP(tmp_map, SVE_VQ_MAX);
--	unsigned long b;
-+	unsigned long b, max_vl;
- 
- 	vec_probe_vqs(info, tmp_map);
- 
-+	/*
-+	 * Currently the maximum VL is only used for pKVM which
-+	 * doesn't allow late CPUs but we don't expect asymmetry and
-+	 * if we encounter any then future users will need handling so
-+	 * warn if we see anything.
-+	 */
-+	max_vl = __bit_to_vl(find_first_bit(tmp_map, SVE_VQ_MAX));
-+	if (max_vl > info->max_cpu_vl) {
-+		pr_warn("%s: cpu%d: increases maximum VL to %u\n",
-+			info->name, smp_processor_id(), max_vl);
-+		info->max_cpu_vl = max_vl;
-+	}
-+
- 	bitmap_complement(tmp_map, tmp_map, SVE_VQ_MAX);
- 	if (bitmap_intersects(tmp_map, info->vq_map, SVE_VQ_MAX)) {
- 		pr_warn("%s: cpu%d: Required vector length(s) missing\n",
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index f43d845f3c4e..bd8f671e848c 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -49,7 +49,7 @@ static void __hyp_sve_restore_host(void)
+ 	 * supported by the system (or limited at EL3).
+ 	 */
+ 	write_sysreg_s(ZCR_ELx_LEN_MASK, SYS_ZCR_EL2);
+-	__sve_restore_state(sve_state->sve_regs + sve_ffr_offset(kvm_host_sve_max_vl),
++	__sve_restore_state(sve_state->sve_regs + sve_ffr_offset(__sve_get_vl()),
+ 			    &sve_state->fpsr,
+ 			    true);
+ 	write_sysreg_el1(sve_state->zcr_el1, SYS_ZCR);
 
 -- 
 2.39.2
