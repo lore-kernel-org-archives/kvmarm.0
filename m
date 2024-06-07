@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 826B31514F9;
-	Fri,  7 Jun 2024 20:32:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F8EB154BFB;
+	Fri,  7 Jun 2024 20:32:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717792324; cv=none; b=e1or98+c395Hk5B3UiU1ENAvtO8sJ8daAW4trsTUQmLgqGqiz+Kn0Tl+QJYIxP73yZxM/47e2grtBVEvZZMZj2dHExagXgUHoCgt4hZJFiAinmDlfUxd6nHT+XJVifGkQJySAiE9TbSnum3YuG4GFaTrC3eJ5nIo4F5cYE7t228=
+	t=1717792326; cv=none; b=bchkU6eFkNYvTyejCaJykS4cQsuKjWQfZVQN/Ug17GjrXTZvchbKFHf1Qe2AD4PL5+66VTXYqvi55OhCm/900gJfhjYrvtAAe66fD9rUmzr06uGCnC5TgOsl594k4XEnkC+1ZLS/EN9peDoqADgmq2KXeUOkx0Jkuw03eVvIW0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717792324; c=relaxed/simple;
-	bh=fgF8NeangU+IYDXxVWYK3CVB9PI5gI3tRv7iErEHfpY=;
+	s=arc-20240116; t=1717792326; c=relaxed/simple;
+	bh=HBZLgS2LXgUqfTn0Nl4TrmtgYXpXNMKYvKyVmoxUwjM=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=L2+X7SZIR5qaPIExc6z6tX5Nezme43/BF276mbjQrFT90lRp/QrJePAV8+uMo2fyymUJZ/NuGvfccTbagqUNHyl067v0vQAfeppf6qbUdLihog8+98/LaV8KHuQygtE6Nvt6zvCgmaVmuCljNE0RmgjIxP3xQztO4Dn3urbcvps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hbCjfBcM; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=V/ebQSj98BtJRTnPiI2xk3MmVRm9hrs3jg/+2i02ByRNjBLYCF/VNeVhCnDFlgw3bIMiCWwb1P4e1q8vVFaxbJs101mgi4Sta4WsKfM/3krg1TAAYgxQnJfGm1QAG1iwDP1Vs02EmPghAirfCHU+x4ZHCKDmK/CmOujvEjwds8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WfNPxBQm; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hbCjfBcM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B66EC2BBFC;
-	Fri,  7 Jun 2024 20:32:04 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WfNPxBQm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9961EC32781;
+	Fri,  7 Jun 2024 20:32:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717792324;
-	bh=fgF8NeangU+IYDXxVWYK3CVB9PI5gI3tRv7iErEHfpY=;
+	s=k20201202; t=1717792325;
+	bh=HBZLgS2LXgUqfTn0Nl4TrmtgYXpXNMKYvKyVmoxUwjM=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=hbCjfBcM3eIR2Mal8CfRaYjzFSXUf6/Q7WYuXt5+rlxCh3OhtrAcB/W7haHwswniR
-	 WPaG6cXPDXUrbnFoYN80MYkqsNEvOC3vAAe61v9eRCaOZEn4xJYKEJ9TnF/T+QbfVA
-	 x+4hoeaAg2vOJ19VydY4g+A6DsCQWzYhBw+TvlDMzWrBvtZpvr+hdQ9kKX9xPgwBev
-	 DvPPIOupbR5mAC5+r4aPHnJnCSXB5zGqBYD6+ciqcHKME26/hL0Xcc9GppC1x2eCwR
-	 X7Wke+Gs5eN6LbU1ZxEOcW4pUEa7kfp2ix1ibcVKLge8q/eneo/QQjJzHdylDmMrUo
-	 CmUsL4H07aPIg==
+	b=WfNPxBQmwRVXcwIST4BC7IJCXp4/rTNUJzAVD1GARUWz+0AQo/etwkM3OsQv8Vo0p
+	 XESZqf74bQPPhqiZOiEcKeRq+UT6ew2fETMERBLxdZ89F8pSL3jTLlSP440aC96oK4
+	 en8jJV05w0ydNPZFs0NiGWMkfCsv/XrQOAM6NP1lJXq7DfwTVisEtKWYT9qrJ/i2fw
+	 2ZBEpyMjbiN1r4JPzUK2JFmDXXJcUijg3kRygcklKYFUZSKfmFpJ2XUC2If3yjbAlp
+	 az42GwH5bBlFdXzTSAs5xeKSP35ihrxkF4QJ0sngzZo4/3Ivh3O6uWZ+BwCCvYyX6b
+	 w+Cq5myiqzu6w==
 From: "Rob Herring (Arm)" <robh@kernel.org>
-Date: Fri, 07 Jun 2024 14:31:26 -0600
-Subject: [PATCH 1/9] perf/arm: Move 32-bit PMU drivers to drivers/perf/
+Date: Fri, 07 Jun 2024 14:31:27 -0600
+Subject: [PATCH 2/9] perf: arm_v6/7_pmu: Drop non-DT probe support
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -37,7 +37,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240607-arm-pmu-3-9-icntr-v1-1-c7bd2dceff3b@kernel.org>
+Message-Id: <20240607-arm-pmu-3-9-icntr-v1-2-c7bd2dceff3b@kernel.org>
 References: <20240607-arm-pmu-3-9-icntr-v1-0-c7bd2dceff3b@kernel.org>
 In-Reply-To: <20240607-arm-pmu-3-9-icntr-v1-0-c7bd2dceff3b@kernel.org>
 To: Russell King <linux@armlinux.org.uk>, 
@@ -56,133 +56,78 @@ Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
  linux-perf-users@vger.kernel.org, kvmarm@lists.linux.dev
 X-Mailer: b4 0.14-dev
 
-It is preferred to put drivers under drivers/ rather than under arch/.
-The PMU drivers also depend on arm_pmu.c, so it's better to place them
-all together.
+There are no non-DT based PMU users for v6 or v7, so drop the custom
+non-DT probe table.
+
+Note that this drops support for arm1156 PMU, but there are no arm1156
+based systems supported in the kernel.
 
 Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
 ---
- arch/arm/kernel/Makefile                                     |  2 --
- drivers/perf/Kconfig                                         | 12 ++++++++++++
- drivers/perf/Makefile                                        |  3 +++
- arch/arm/kernel/perf_event_v6.c => drivers/perf/arm_v6_pmu.c |  3 ---
- arch/arm/kernel/perf_event_v7.c => drivers/perf/arm_v7_pmu.c |  3 ---
- .../perf_event_xscale.c => drivers/perf/arm_xscale_pmu.c     |  3 ---
- 6 files changed, 15 insertions(+), 11 deletions(-)
+ drivers/perf/arm_v6_pmu.c | 17 +----------------
+ drivers/perf/arm_v7_pmu.c | 10 +---------
+ 2 files changed, 2 insertions(+), 25 deletions(-)
 
-diff --git a/arch/arm/kernel/Makefile b/arch/arm/kernel/Makefile
-index 89a77e3f51d2..aaae31b8c4a5 100644
---- a/arch/arm/kernel/Makefile
-+++ b/arch/arm/kernel/Makefile
-@@ -78,8 +78,6 @@ obj-$(CONFIG_CPU_XSC3)		+= xscale-cp0.o
- obj-$(CONFIG_CPU_MOHAWK)	+= xscale-cp0.o
- obj-$(CONFIG_IWMMXT)		+= iwmmxt.o
- obj-$(CONFIG_PERF_EVENTS)	+= perf_regs.o perf_callchain.o
--obj-$(CONFIG_HW_PERF_EVENTS)	+= perf_event_xscale.o perf_event_v6.o \
--				   perf_event_v7.o
- AFLAGS_iwmmxt.o			:= -Wa,-mcpu=iwmmxt
- obj-$(CONFIG_ARM_CPU_TOPOLOGY)  += topology.o
- obj-$(CONFIG_VDSO)		+= vdso.o
-diff --git a/drivers/perf/Kconfig b/drivers/perf/Kconfig
-index 7526a9e714fa..aa9530b4064f 100644
---- a/drivers/perf/Kconfig
-+++ b/drivers/perf/Kconfig
-@@ -56,6 +56,18 @@ config ARM_PMU
- 	  Say y if you want to use CPU performance monitors on ARM-based
- 	  systems.
- 
-+config ARM_V6_PMU
-+	depends on ARM_PMU && (CPU_V6 || CPU_V6K)
-+	def_bool y
-+
-+config ARM_V7_PMU
-+	depends on ARM_PMU && CPU_V7
-+	def_bool y
-+
-+config ARM_XSCALE_PMU
-+	depends on ARM_PMU && CPU_XSCALE
-+	def_bool y
-+
- config RISCV_PMU
- 	depends on RISCV
- 	bool "RISC-V PMU framework"
-diff --git a/drivers/perf/Makefile b/drivers/perf/Makefile
-index 29b1c28203ef..d43df81d52f7 100644
---- a/drivers/perf/Makefile
-+++ b/drivers/perf/Makefile
-@@ -6,6 +6,9 @@ obj-$(CONFIG_ARM_DSU_PMU) += arm_dsu_pmu.o
- obj-$(CONFIG_ARM_PMU) += arm_pmu.o arm_pmu_platform.o
- obj-$(CONFIG_ARM_PMU_ACPI) += arm_pmu_acpi.o
- obj-$(CONFIG_ARM_PMUV3) += arm_pmuv3.o
-+obj-$(CONFIG_ARM_V6_PMU) += arm_v6_pmu.o
-+obj-$(CONFIG_ARM_V7_PMU) += arm_v7_pmu.o
-+obj-$(CONFIG_ARM_XSCALE_PMU) += arm_xscale_pmu.o
- obj-$(CONFIG_ARM_SMMU_V3_PMU) += arm_smmuv3_pmu.o
- obj-$(CONFIG_FSL_IMX8_DDR_PMU) += fsl_imx8_ddr_perf.o
- obj-$(CONFIG_FSL_IMX9_DDR_PMU) += fsl_imx9_ddr_perf.o
-diff --git a/arch/arm/kernel/perf_event_v6.c b/drivers/perf/arm_v6_pmu.c
-similarity index 99%
-rename from arch/arm/kernel/perf_event_v6.c
-rename to drivers/perf/arm_v6_pmu.c
-index d9fd53841591..f7593843bb85 100644
---- a/arch/arm/kernel/perf_event_v6.c
+diff --git a/drivers/perf/arm_v6_pmu.c b/drivers/perf/arm_v6_pmu.c
+index f7593843bb85..0bb685b4bac5 100644
+--- a/drivers/perf/arm_v6_pmu.c
 +++ b/drivers/perf/arm_v6_pmu.c
-@@ -31,8 +31,6 @@
-  * enable the interrupt.
-  */
+@@ -401,13 +401,6 @@ static int armv6_1136_pmu_init(struct arm_pmu *cpu_pmu)
+ 	return 0;
+ }
  
--#if defined(CONFIG_CPU_V6) || defined(CONFIG_CPU_V6K)
+-static int armv6_1156_pmu_init(struct arm_pmu *cpu_pmu)
+-{
+-	armv6pmu_init(cpu_pmu);
+-	cpu_pmu->name		= "armv6_1156";
+-	return 0;
+-}
 -
- #include <asm/cputype.h>
- #include <asm/irq_regs.h>
- 
-@@ -445,4 +443,3 @@ static struct platform_driver armv6_pmu_driver = {
+ static int armv6_1176_pmu_init(struct arm_pmu *cpu_pmu)
+ {
+ 	armv6pmu_init(cpu_pmu);
+@@ -421,17 +414,9 @@ static const struct of_device_id armv6_pmu_of_device_ids[] = {
+ 	{ /* sentinel value */ }
  };
  
- builtin_platform_driver(armv6_pmu_driver);
--#endif	/* CONFIG_CPU_V6 || CONFIG_CPU_V6K */
-diff --git a/arch/arm/kernel/perf_event_v7.c b/drivers/perf/arm_v7_pmu.c
-similarity index 99%
-rename from arch/arm/kernel/perf_event_v7.c
-rename to drivers/perf/arm_v7_pmu.c
-index a3322e2b3ea4..fdd936fbd188 100644
---- a/arch/arm/kernel/perf_event_v7.c
+-static const struct pmu_probe_info armv6_pmu_probe_table[] = {
+-	ARM_PMU_PROBE(ARM_CPU_PART_ARM1136, armv6_1136_pmu_init),
+-	ARM_PMU_PROBE(ARM_CPU_PART_ARM1156, armv6_1156_pmu_init),
+-	ARM_PMU_PROBE(ARM_CPU_PART_ARM1176, armv6_1176_pmu_init),
+-	{ /* sentinel value */ }
+-};
+-
+ static int armv6_pmu_device_probe(struct platform_device *pdev)
+ {
+-	return arm_pmu_device_probe(pdev, armv6_pmu_of_device_ids,
+-				    armv6_pmu_probe_table);
++	return arm_pmu_device_probe(pdev, armv6_pmu_of_device_ids, NULL);
+ }
+ 
+ static struct platform_driver armv6_pmu_driver = {
+diff --git a/drivers/perf/arm_v7_pmu.c b/drivers/perf/arm_v7_pmu.c
+index fdd936fbd188..928ac3d626ed 100644
+--- a/drivers/perf/arm_v7_pmu.c
 +++ b/drivers/perf/arm_v7_pmu.c
-@@ -17,8 +17,6 @@
-  *  counter and all 4 performance counters together can be reset separately.
-  */
- 
--#ifdef CONFIG_CPU_V7
--
- #include <asm/cp15.h>
- #include <asm/cputype.h>
- #include <asm/irq_regs.h>
-@@ -2002,4 +2000,3 @@ static struct platform_driver armv7_pmu_driver = {
+@@ -1977,17 +1977,9 @@ static const struct of_device_id armv7_pmu_of_device_ids[] = {
+ 	{},
  };
  
- builtin_platform_driver(armv7_pmu_driver);
--#endif	/* CONFIG_CPU_V7 */
-diff --git a/arch/arm/kernel/perf_event_xscale.c b/drivers/perf/arm_xscale_pmu.c
-similarity index 99%
-rename from arch/arm/kernel/perf_event_xscale.c
-rename to drivers/perf/arm_xscale_pmu.c
-index 7a2ba1c689a7..3d8b72d6b37f 100644
---- a/arch/arm/kernel/perf_event_xscale.c
-+++ b/drivers/perf/arm_xscale_pmu.c
-@@ -13,8 +13,6 @@
-  * PMU structures.
-  */
- 
--#ifdef CONFIG_CPU_XSCALE
+-static const struct pmu_probe_info armv7_pmu_probe_table[] = {
+-	ARM_PMU_PROBE(ARM_CPU_PART_CORTEX_A8, armv7_a8_pmu_init),
+-	ARM_PMU_PROBE(ARM_CPU_PART_CORTEX_A9, armv7_a9_pmu_init),
+-	{ /* sentinel value */ }
+-};
 -
- #include <asm/cputype.h>
- #include <asm/irq_regs.h>
+-
+ static int armv7_pmu_device_probe(struct platform_device *pdev)
+ {
+-	return arm_pmu_device_probe(pdev, armv7_pmu_of_device_ids,
+-				    armv7_pmu_probe_table);
++	return arm_pmu_device_probe(pdev, armv7_pmu_of_device_ids, NULL);
+ }
  
-@@ -745,4 +743,3 @@ static struct platform_driver xscale_pmu_driver = {
- };
- 
- builtin_platform_driver(xscale_pmu_driver);
--#endif	/* CONFIG_CPU_XSCALE */
+ static struct platform_driver armv7_pmu_driver = {
 
 -- 
 2.43.0
