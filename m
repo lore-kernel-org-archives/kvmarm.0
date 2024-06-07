@@ -1,109 +1,153 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10olkn2027.outbound.protection.outlook.com [40.92.41.27])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E78ED515;
-	Thu,  6 Jun 2024 18:38:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717699095; cv=none; b=f+ecUDygTGAlxer+gzNg3eM51yjJkjjKPxOJBirk5ov0E5LM6Voz8G5hFZCTnM7jd9Tpjlh56r+WdN2AaxmRvDMAy3ovP+s/wphbFjt0x36BUFNS8RmduIGQcEGiztQ46tJEmSWtdAuvIjopTCUPBG/YANBfWLtYMKDzMS38+ck=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717699095; c=relaxed/simple;
-	bh=m4y07AqUVhllB8GdQjGhynxMK/W/hDUwql04aVzrTcI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LNZ8LOZPPYiogAdFfff/+rt/wVdrNWO7Sceb2vkKVtgkUvDRlYn9HWd+IOQNWAaPt2b+dkWZgcgC2IklmwjBo7CnCIHWj//a+fjSwa0r14S8SQ6L8vYrW3E1yE/3udBbDLQtSC9dJZpQgDTRRdLC1H0C34F78X2XE3Cs7tOEiOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F4CBC2BD10;
-	Thu,  6 Jun 2024 18:38:11 +0000 (UTC)
-Date: Thu, 6 Jun 2024 19:38:08 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: Re: [PATCH v3 12/14] arm64: realm: Support nonsecure ITS emulation
- shared
-Message-ID: <ZmICEN8JvWM7M9Ch@arm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 781E911185;
+	Fri,  7 Jun 2024 01:38:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.41.27
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717724300; cv=fail; b=aWc3PaUgu/h2Pu48q0E5QBC2LNEkAooGWUrVXS0eaG/pBGdFyazSLMnEUrC8uFH8B6uYGWFHbWhR+swzJ/XHF6QdqeeKyJsjjyADGZpd5uthqr2ViHFj5m3HdfCg+hfpQ9JpAzKp3BRPYKfVSw1H2zH3nI0a0JsMoWxyA7pAH+8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717724300; c=relaxed/simple;
+	bh=5XpPkbvngXUaPP3NdW8EPhNhmfOtRtSATCoMfb//js4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=A0Xiwh+nfMWHRsrSOn2RJSPUiArBauxSYbtOlZWj90JmOvIcjLYAI+1MLwK6MT3WzMIws0KaG4hTlGDj+1AMWcpKu3ynpyqi0hvwzgWW1YUqv76jk728S9GcWlXQmoe77PRmbuvXzBrnSC2XkuWTlrC8BFuMclOv2VMZuZ1yhBA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=l7LXbRY5; arc=fail smtp.client-ip=40.92.41.27
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="l7LXbRY5"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Ntot2qAoCvUZUDiWNXpgqWBl/jHX58QzQZFoeFnI1bnAGRQlgD19FgmABoEyX0IER3YuVKMEXyo2XKHRT8r30zTlEHfo7fbi6nPIeyuRlmNmLnTtahEkvPy0fWtEhykW7JWGWYRqfEj7D7l+0vXme21IwZThRWg+cGqbd60AG2TI9h+yIa6giDgqRPVfnBIW8ftuh/1NrYNDe7/qZZinz/YlTRuIExlBGVluMSwkhuKNotdc1/aNOxTwSr55xkfWpsmaJAYGmO+hj8zACLBxb2TdEJE4hB+7L7GLtKNuZ1VPY+cswNI1REh1pGHNyhIV6HLsYPZWcy4Eh+vVw2NvXQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=5XpPkbvngXUaPP3NdW8EPhNhmfOtRtSATCoMfb//js4=;
+ b=VNo1uwdvngjG3eqLQVoMOvEQYG+HBsotenfgV4d95VJ56Nfw+O2hlEC5m2XYHpzRyj3lF5wuN2/p/Kd8P5/UGWcxmHjR8EsVQ4rIJzSQ4UkJxNxQ1IMdWj7wRaA+qAqxdcHbsErzL7ySEo/yxgdG+2EBN3gq6r6FW1nom38fHJ+lDSSYJPR3qdn8QqTNeJIkMn2gDGKW/xswz6qmOdZ5eUztFMh3fJFwhVBRkMSlZgMgaOUZHeZFzW5sQbt/j6qFMSiXP+cVoiNm2+8NSu061XLTDxKPijdYKEQJDP43xzyczbq+ghxCIdsyAZjXQ4L9+FNIapGPYkxtJA9E/ofFYg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5XpPkbvngXUaPP3NdW8EPhNhmfOtRtSATCoMfb//js4=;
+ b=l7LXbRY5JOQtaAO60NcHt2Y+aFAtzLWwjdpZBoUmwxW/G936nOSIkFQqcI+eROdX7cxuBeragUK3EcgEuVGb/9EIgOAN4+e+aY3F0/+E+Ntaz1tngUiqpWsFRxk+qnuCzIPmgMmQHYxqE3WZOZB4li77BTccH1xz49sOMpy/CCR3f0+gmF7sJ3SMfr/k3YJJy6Z5rGFaMzh3IAy/0xOwtz6v22sf4uwZn5/Ch3G8OzkFc0TtG0DygkLwRL3cgN0Lrz6ExKtTgLmAa8cE6AQAlwS/u0WSrPpL9LxqLHMgmr9ViE/Oz3xCdjEp7EP45SwltzXpq9c7a/32QgqMrUzDFg==
+Received: from SN6PR02MB4157.namprd02.prod.outlook.com (2603:10b6:805:33::23)
+ by CO1PR02MB8444.namprd02.prod.outlook.com (2603:10b6:303:157::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.34; Fri, 7 Jun
+ 2024 01:38:15 +0000
+Received: from SN6PR02MB4157.namprd02.prod.outlook.com
+ ([fe80::cedd:1e64:8f61:b9df]) by SN6PR02MB4157.namprd02.prod.outlook.com
+ ([fe80::cedd:1e64:8f61:b9df%2]) with mapi id 15.20.7633.033; Fri, 7 Jun 2024
+ 01:38:15 +0000
+From: Michael Kelley <mhklinux@outlook.com>
+To: Steven Price <steven.price@arm.com>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>
+CC: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+	Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>, Oliver
+ Upton <oliver.upton@linux.dev>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, Joey Gouly <joey.gouly@arm.com>, Alexandru
+ Elisei <alexandru.elisei@arm.com>, Christoffer Dall
+	<christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>, Ganapatrao
+ Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: RE: [PATCH v3 00/14] arm64: Support for running as a guest in Arm CCA
+Thread-Topic: [PATCH v3 00/14] arm64: Support for running as a guest in Arm
+ CCA
+Thread-Index: AQHatysPRYaUedD8SEOOWptuNOqVvrG7hVGQ
+Date: Fri, 7 Jun 2024 01:38:15 +0000
+Message-ID:
+ <SN6PR02MB415739D48B10C26D2673F3FED4FB2@SN6PR02MB4157.namprd02.prod.outlook.com>
 References: <20240605093006.145492-1-steven.price@arm.com>
- <20240605093006.145492-13-steven.price@arm.com>
- <86a5jzld9g.wl-maz@kernel.org>
- <4c363476-e5b5-42ff-9f30-a02a92b6751b@arm.com>
- <867cf2l6in.wl-maz@kernel.org>
+In-Reply-To: <20240605093006.145492-1-steven.price@arm.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-tmn: [/7FyMFN+y6wC9bfMlT+Cd92p6p6XTb/g]
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SN6PR02MB4157:EE_|CO1PR02MB8444:EE_
+x-ms-office365-filtering-correlation-id: 22786f91-1838-422e-9d70-08dc86927fff
+x-microsoft-antispam:
+ BCL:0;ARA:14566002|461199019|440099019|102099023|3412199016;
+x-microsoft-antispam-message-info:
+ x/I/eIR+yY3VrxuEnEJw313RHYshF9LluWWy8KY3jwWYFo3GkGqicEvvR7yj9gDtdJvnHYF+GrvDT1K8cUsoO6wxaCDJxlH2rgxWRjHodMx8hf/wYKQsae14V4gB8T66dscsEqrow0tl7jAnd6Zbq5WwaIlaWuHrCDZ8hJ5OXIatdcHHdqisxEmOiLT/6jxBBMe/2h3dodSW5wVXDgmxjxnazSUB+QxUGBk9eWtNqgVsneStb9Ni1y4BHpKhpmBz1U5WqmoPw/n2bCSVF9LL+4h4EdfeMNkVoBg86z6NquXLBJ0i7zHfQKgd++S22SVFcxrfpOgrHNMEyj12MjfPbwA1YLTw5k5EsEdp0CvKVnSfNCUCRjQ2GwWILcig7yIRosVpfzJLtyVXi5qEHEpLOQpVl9yWNv3UvuH6eRZU/ERNOynn1hJHA+dB+f70XLP8BAaD8/LnqHrpJrC2h5Bh4JvGnv3OC+zEdpGt0m/lzIz/TUqqvr3QLT28HEVjwlV+JiwPMI3z/3KQNj/LKesV5kat61LSwVO8uJKf6FJUbqzrbSt6JCXR22bGdHWsz67E
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?b1WVjQngpjHiXVDKPGCvthQx4dWxcjWRnsCSfwDSCgVvR4qRcDCqKNJkqnaz?=
+ =?us-ascii?Q?LsLqwQa7AjeD8lns1CLyxNbYj5GbgYDRWOduoNxwB23bDlGQHqF3eW5bsF8S?=
+ =?us-ascii?Q?5B7XS1CBcz6p38wIEU82JeWoYCxQARc0y7P58C3CjMefp8G98L1xH3Sc3oX6?=
+ =?us-ascii?Q?G8Lp3s/u1l34+1pcEw77mwr2wRbD8xIA/DOB/Ole2akVp445wG7NxZK8621I?=
+ =?us-ascii?Q?pbqW7ONlK2Rg58Uy7h9IuMFWhr/VKftI5aeyylNWBbyhD2WX7PQ+MWL/SVGb?=
+ =?us-ascii?Q?7pbSh7UQdnzjN0Oqa8huOi65KjrH4rUrcNyw2/dHZCMlGFyygKyV+jZ9JGC+?=
+ =?us-ascii?Q?swnU1lNEF1qquTBFNM1bgnrK//nhKkGF6Tt3UOjBE52zhylWHISoklnd38J8?=
+ =?us-ascii?Q?kP5nanAvpWuUiMPv8p7pwWBEP3igRuXnuU9b2YZWJtHQXwc2rcmmITUoEFLd?=
+ =?us-ascii?Q?EoVB/Zm/rF4CnZ86FN+zwVW21ixFHeXaFjnGdN+h/tMEAHY9hg1xjR7ReaJd?=
+ =?us-ascii?Q?J8yHqgm8zazezfiUilZJ3vkIcE5OhAx17v8p1ggxIwQcTGnyCe+x8EwKbCbH?=
+ =?us-ascii?Q?avScC35I2LfvdotwBWBlH2GG/VrYurFvtikLJ+novib1aNoPBrG57RzNaT1t?=
+ =?us-ascii?Q?9TvhTsdyAkW4QnNdoag9YR9HQIitd8DRhIma4PVSn44kPyLHLP0fVC7xDPQS?=
+ =?us-ascii?Q?/QKjU304A7hyxDvqskhulH6g9eJQRrpECWr2N+Sf9EQ0VBjpw0UM0Deh9e5E?=
+ =?us-ascii?Q?1Aorj4GPIHpG+XBUw+GR/mIHDm4MJULbUd/xUFe5KcD8DA0+UnvI9Ola9+ZY?=
+ =?us-ascii?Q?zlpDf/WOrNVpunYqcI5MdLQQgsVCzQ9ibg34/0w2/y/sJA+J/8Y20YuCy7Eh?=
+ =?us-ascii?Q?58vFY32EkelIMxz89FX8D3wOv3MHli/jzZy7YA99F/CIPY9tV2iJiWdRn8Zo?=
+ =?us-ascii?Q?2wFzvfAvvOtuXLX3s2RdS6bPBmpg2k6fC+wCZ1umnxBg01XHqLat6A2WV9BG?=
+ =?us-ascii?Q?18a4U4U5NqW0WME18+FTQ1GR/GwG5B5HFAPLVD0waeie8EQBBsUil9MlYHXx?=
+ =?us-ascii?Q?HM/+afdwmwBXG4nGglkD/6SB8HYM9iJ+LFryRFWbAGib5yqcVByzIjkrA6if?=
+ =?us-ascii?Q?x/dVsEg63Id+Kci8Omd/N/nYnVSYHiMrTzAjBUvhcfhH3V3kqy/6ZhDSl5tF?=
+ =?us-ascii?Q?XfldcyJEQLbnZxfiQF9wNTKC9azoaVIIlDG4dkCLHuN/znY6urlZHxV/MB8?=
+ =?us-ascii?Q?=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <867cf2l6in.wl-maz@kernel.org>
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR02MB4157.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-Network-Message-Id: 22786f91-1838-422e-9d70-08dc86927fff
+X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Jun 2024 01:38:15.0530
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR02MB8444
 
-On Thu, Jun 06, 2024 at 11:17:36AM +0100, Marc Zyngier wrote:
-> On Wed, 05 Jun 2024 16:08:49 +0100,
-> Steven Price <steven.price@arm.com> wrote:
-> > 2. Use a special (global) memory allocator that does the
-> > set_memory_decrypted() dance on the pages that it allocates but allows
-> > packing the allocations. I'm not aware of an existing kernel API for
-> > this, so it's potentially quite a bit of code. The benefit is that it
-> > reduces memory consumption in a realm guest, although fragmentation
-> > still means we're likely to see a (small) growth.
-> > 
-> > Any thoughts on what you think would be best?
-> 
-> I would expect that something similar to kmem_cache could be of help,
-> only with the ability to deal with variable object sizes (in this
-> case: minimum of 256 bytes, in increments defined by the
-> implementation, and with a 256 byte alignment).
+From: Steven Price <steven.price@arm.com> Sent: Wednesday, June 5, 2024 2:3=
+0 AM
+>=20
+> This series adds support for running Linux in a protected VM under the
+> Arm Confidential Compute Architecture (CCA). This has been updated
+> following the feedback from the v2 posting[1]. Thanks for the feedback!
+> Individual patches have a change log for v3.
+>=20
+> The biggest change from v2 is fixing set_memory_{en,de}crypted() to
+> perform a break-before-make sequence. Note that only the virtual address
+> supplied is flipped between shared and protected, so if e.g. a vmalloc()
+> address is passed the linear map will still point to the (now invalid)
+> previous IPA. Attempts to access the wrong address may trigger a
+> Synchronous External Abort. However any code which attempts to access
+> the 'encrypted' alias after set_memory_decrypted() is already likely to
+> be broken on platforms that implement memory encryption, so I don't
+> expect problems.
 
-Hmm, that's doable but not that easy to make generic. We'd need a new
-class of kmalloc-* caches (e.g. kmalloc-decrypted-*) which use only
-decrypted pages together with a GFP_DECRYPTED flag or something to get
-the slab allocator to go for these pages and avoid merging with other
-caches. It would actually be the page allocator parsing this gfp flag,
-probably in post_alloc_hook() to set the page decrypted and re-encrypt
-it in free_pages_prepare(). A slight problem here is that free_pages()
-doesn't get the gfp flag, so we'd need to store some bit in the page
-flags. Maybe the flag is not that bad, do we have something like for
-page_to_phys() to give us the high IPA address for decrypted pages?
+In the case of a vmalloc() address, load_unaligned_zeropad() could still
+make an access to the underlying pages through the linear address. In
+CoCo guests on x86, both the vmalloc PTE and the linear map PTE are
+flipped, so the load_unaligned_zeropad() problem can occur only during
+the transition between decrypted and encrypted. But even then, the
+exception handlers have code to fixup this case and allow everything to
+proceed normally.
 
-Similarly if we go for a kmem_cache (or a few for multiple sizes). One
-can specify a constructor which could set the memory decrypted but
-there's no destructor (and also the constructor is per object, not per
-page, so we'd need some refcounting).
+I haven't looked at the code in your patches, but do you handle that case,
+or somehow prevent it?
 
-Another approach contained within the driver is to use mempool_create()
-with our own _alloc_fn/_free_fn that sets the memory decrypted/encrypted
-accordingly, though sub-page allocations need additional tracking. Also
-that's fairly similar to kmem_cache, fixed size.
+Thanks,
 
-Yet another option would be to wire it somehow in the DMA API but the
-minimum allocation is already a page size, so we don't gain anything.
+Michael
 
-What gets somewhat closer to what we need is gen_pool. It can track
-different sizes, we just need to populate the chunks as needed. I don't
-think this would work as a generic allocator but may be good enough
-within the ITS code.
 
-If there's a need for such generic allocations in other parts of the
-kernel, my preference would be something around kmalloc caches and a new
-GFP flag (first option; subject to the selling it to the mm folk). But
-that's more of a separate prototyping effort that may or may not
-succeed.
-
-Anyway, we could do some hacking around gen_pool as a temporary solution
-(maybe as a set of patches on top of this series to be easier to revert)
-and start investigating a proper decrypted page allocator in parallel.
-We just need to find a victim that has the page allocator fresh in mind
-(Ryan or Alexandru ;)).
-
--- 
-Catalin
