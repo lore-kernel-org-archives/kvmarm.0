@@ -1,153 +1,215 @@
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10olkn2027.outbound.protection.outlook.com [40.92.41.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com [209.85.222.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 781E911185;
-	Fri,  7 Jun 2024 01:38:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.41.27
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717724300; cv=fail; b=aWc3PaUgu/h2Pu48q0E5QBC2LNEkAooGWUrVXS0eaG/pBGdFyazSLMnEUrC8uFH8B6uYGWFHbWhR+swzJ/XHF6QdqeeKyJsjjyADGZpd5uthqr2ViHFj5m3HdfCg+hfpQ9JpAzKp3BRPYKfVSw1H2zH3nI0a0JsMoWxyA7pAH+8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717724300; c=relaxed/simple;
-	bh=5XpPkbvngXUaPP3NdW8EPhNhmfOtRtSATCoMfb//js4=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=A0Xiwh+nfMWHRsrSOn2RJSPUiArBauxSYbtOlZWj90JmOvIcjLYAI+1MLwK6MT3WzMIws0KaG4hTlGDj+1AMWcpKu3ynpyqi0hvwzgWW1YUqv76jk728S9GcWlXQmoe77PRmbuvXzBrnSC2XkuWTlrC8BFuMclOv2VMZuZ1yhBA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=l7LXbRY5; arc=fail smtp.client-ip=40.92.41.27
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFC91B64E
+	for <kvmarm@lists.linux.dev>; Fri,  7 Jun 2024 07:34:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.50
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717745647; cv=none; b=g0YXSJ1FkTYZhxbpHYezYBY3ZOr2v7lxMKC9VWZnaQ40Eer55HDHY4G/AvHC9aJR7x738vzP9BP45Cau6M5URf6WsSKhMe9YerD3GXI9Ahl0Lm0csGEf5dY5kTxtMcEVlc7kgIS8F49fCjzu4RyDyBNfKiOPBqQE/6oJ893IJpU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717745647; c=relaxed/simple;
+	bh=vYYXsEBTb0bzmGXVrvmnqmApDuO+F9CPi3HsvreDUD0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QEJtgAQxN25RMLCRlKoNEFpxisAqWyU3CeS+NRlOcVN0O12PFbmyeEzXzJ4w2/Q/vRdPugjGvYlJQZYoI60/MSCh29Rnr6mdqJ2Jg7O+DOITPhfe2qSn1qqFO5Oc+z0RDUxRjd9Bak94MCHZXDRVGF5Nk8ymnpwFr7pJzeWj8r4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=P1sWu3yI; arc=none smtp.client-ip=209.85.222.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="l7LXbRY5"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ntot2qAoCvUZUDiWNXpgqWBl/jHX58QzQZFoeFnI1bnAGRQlgD19FgmABoEyX0IER3YuVKMEXyo2XKHRT8r30zTlEHfo7fbi6nPIeyuRlmNmLnTtahEkvPy0fWtEhykW7JWGWYRqfEj7D7l+0vXme21IwZThRWg+cGqbd60AG2TI9h+yIa6giDgqRPVfnBIW8ftuh/1NrYNDe7/qZZinz/YlTRuIExlBGVluMSwkhuKNotdc1/aNOxTwSr55xkfWpsmaJAYGmO+hj8zACLBxb2TdEJE4hB+7L7GLtKNuZ1VPY+cswNI1REh1pGHNyhIV6HLsYPZWcy4Eh+vVw2NvXQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5XpPkbvngXUaPP3NdW8EPhNhmfOtRtSATCoMfb//js4=;
- b=VNo1uwdvngjG3eqLQVoMOvEQYG+HBsotenfgV4d95VJ56Nfw+O2hlEC5m2XYHpzRyj3lF5wuN2/p/Kd8P5/UGWcxmHjR8EsVQ4rIJzSQ4UkJxNxQ1IMdWj7wRaA+qAqxdcHbsErzL7ySEo/yxgdG+2EBN3gq6r6FW1nom38fHJ+lDSSYJPR3qdn8QqTNeJIkMn2gDGKW/xswz6qmOdZ5eUztFMh3fJFwhVBRkMSlZgMgaOUZHeZFzW5sQbt/j6qFMSiXP+cVoiNm2+8NSu061XLTDxKPijdYKEQJDP43xzyczbq+ghxCIdsyAZjXQ4L9+FNIapGPYkxtJA9E/ofFYg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5XpPkbvngXUaPP3NdW8EPhNhmfOtRtSATCoMfb//js4=;
- b=l7LXbRY5JOQtaAO60NcHt2Y+aFAtzLWwjdpZBoUmwxW/G936nOSIkFQqcI+eROdX7cxuBeragUK3EcgEuVGb/9EIgOAN4+e+aY3F0/+E+Ntaz1tngUiqpWsFRxk+qnuCzIPmgMmQHYxqE3WZOZB4li77BTccH1xz49sOMpy/CCR3f0+gmF7sJ3SMfr/k3YJJy6Z5rGFaMzh3IAy/0xOwtz6v22sf4uwZn5/Ch3G8OzkFc0TtG0DygkLwRL3cgN0Lrz6ExKtTgLmAa8cE6AQAlwS/u0WSrPpL9LxqLHMgmr9ViE/Oz3xCdjEp7EP45SwltzXpq9c7a/32QgqMrUzDFg==
-Received: from SN6PR02MB4157.namprd02.prod.outlook.com (2603:10b6:805:33::23)
- by CO1PR02MB8444.namprd02.prod.outlook.com (2603:10b6:303:157::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.34; Fri, 7 Jun
- 2024 01:38:15 +0000
-Received: from SN6PR02MB4157.namprd02.prod.outlook.com
- ([fe80::cedd:1e64:8f61:b9df]) by SN6PR02MB4157.namprd02.prod.outlook.com
- ([fe80::cedd:1e64:8f61:b9df%2]) with mapi id 15.20.7633.033; Fri, 7 Jun 2024
- 01:38:15 +0000
-From: Michael Kelley <mhklinux@outlook.com>
-To: Steven Price <steven.price@arm.com>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>
-CC: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
-	Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>, Oliver
- Upton <oliver.upton@linux.dev>, Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, Joey Gouly <joey.gouly@arm.com>, Alexandru
- Elisei <alexandru.elisei@arm.com>, Christoffer Dall
-	<christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
-	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>, Ganapatrao
- Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: RE: [PATCH v3 00/14] arm64: Support for running as a guest in Arm CCA
-Thread-Topic: [PATCH v3 00/14] arm64: Support for running as a guest in Arm
- CCA
-Thread-Index: AQHatysPRYaUedD8SEOOWptuNOqVvrG7hVGQ
-Date: Fri, 7 Jun 2024 01:38:15 +0000
-Message-ID:
- <SN6PR02MB415739D48B10C26D2673F3FED4FB2@SN6PR02MB4157.namprd02.prod.outlook.com>
-References: <20240605093006.145492-1-steven.price@arm.com>
-In-Reply-To: <20240605093006.145492-1-steven.price@arm.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-tmn: [/7FyMFN+y6wC9bfMlT+Cd92p6p6XTb/g]
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SN6PR02MB4157:EE_|CO1PR02MB8444:EE_
-x-ms-office365-filtering-correlation-id: 22786f91-1838-422e-9d70-08dc86927fff
-x-microsoft-antispam:
- BCL:0;ARA:14566002|461199019|440099019|102099023|3412199016;
-x-microsoft-antispam-message-info:
- x/I/eIR+yY3VrxuEnEJw313RHYshF9LluWWy8KY3jwWYFo3GkGqicEvvR7yj9gDtdJvnHYF+GrvDT1K8cUsoO6wxaCDJxlH2rgxWRjHodMx8hf/wYKQsae14V4gB8T66dscsEqrow0tl7jAnd6Zbq5WwaIlaWuHrCDZ8hJ5OXIatdcHHdqisxEmOiLT/6jxBBMe/2h3dodSW5wVXDgmxjxnazSUB+QxUGBk9eWtNqgVsneStb9Ni1y4BHpKhpmBz1U5WqmoPw/n2bCSVF9LL+4h4EdfeMNkVoBg86z6NquXLBJ0i7zHfQKgd++S22SVFcxrfpOgrHNMEyj12MjfPbwA1YLTw5k5EsEdp0CvKVnSfNCUCRjQ2GwWILcig7yIRosVpfzJLtyVXi5qEHEpLOQpVl9yWNv3UvuH6eRZU/ERNOynn1hJHA+dB+f70XLP8BAaD8/LnqHrpJrC2h5Bh4JvGnv3OC+zEdpGt0m/lzIz/TUqqvr3QLT28HEVjwlV+JiwPMI3z/3KQNj/LKesV5kat61LSwVO8uJKf6FJUbqzrbSt6JCXR22bGdHWsz67E
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?b1WVjQngpjHiXVDKPGCvthQx4dWxcjWRnsCSfwDSCgVvR4qRcDCqKNJkqnaz?=
- =?us-ascii?Q?LsLqwQa7AjeD8lns1CLyxNbYj5GbgYDRWOduoNxwB23bDlGQHqF3eW5bsF8S?=
- =?us-ascii?Q?5B7XS1CBcz6p38wIEU82JeWoYCxQARc0y7P58C3CjMefp8G98L1xH3Sc3oX6?=
- =?us-ascii?Q?G8Lp3s/u1l34+1pcEw77mwr2wRbD8xIA/DOB/Ole2akVp445wG7NxZK8621I?=
- =?us-ascii?Q?pbqW7ONlK2Rg58Uy7h9IuMFWhr/VKftI5aeyylNWBbyhD2WX7PQ+MWL/SVGb?=
- =?us-ascii?Q?7pbSh7UQdnzjN0Oqa8huOi65KjrH4rUrcNyw2/dHZCMlGFyygKyV+jZ9JGC+?=
- =?us-ascii?Q?swnU1lNEF1qquTBFNM1bgnrK//nhKkGF6Tt3UOjBE52zhylWHISoklnd38J8?=
- =?us-ascii?Q?kP5nanAvpWuUiMPv8p7pwWBEP3igRuXnuU9b2YZWJtHQXwc2rcmmITUoEFLd?=
- =?us-ascii?Q?EoVB/Zm/rF4CnZ86FN+zwVW21ixFHeXaFjnGdN+h/tMEAHY9hg1xjR7ReaJd?=
- =?us-ascii?Q?J8yHqgm8zazezfiUilZJ3vkIcE5OhAx17v8p1ggxIwQcTGnyCe+x8EwKbCbH?=
- =?us-ascii?Q?avScC35I2LfvdotwBWBlH2GG/VrYurFvtikLJ+novib1aNoPBrG57RzNaT1t?=
- =?us-ascii?Q?9TvhTsdyAkW4QnNdoag9YR9HQIitd8DRhIma4PVSn44kPyLHLP0fVC7xDPQS?=
- =?us-ascii?Q?/QKjU304A7hyxDvqskhulH6g9eJQRrpECWr2N+Sf9EQ0VBjpw0UM0Deh9e5E?=
- =?us-ascii?Q?1Aorj4GPIHpG+XBUw+GR/mIHDm4MJULbUd/xUFe5KcD8DA0+UnvI9Ola9+ZY?=
- =?us-ascii?Q?zlpDf/WOrNVpunYqcI5MdLQQgsVCzQ9ibg34/0w2/y/sJA+J/8Y20YuCy7Eh?=
- =?us-ascii?Q?58vFY32EkelIMxz89FX8D3wOv3MHli/jzZy7YA99F/CIPY9tV2iJiWdRn8Zo?=
- =?us-ascii?Q?2wFzvfAvvOtuXLX3s2RdS6bPBmpg2k6fC+wCZ1umnxBg01XHqLat6A2WV9BG?=
- =?us-ascii?Q?18a4U4U5NqW0WME18+FTQ1GR/GwG5B5HFAPLVD0waeie8EQBBsUil9MlYHXx?=
- =?us-ascii?Q?HM/+afdwmwBXG4nGglkD/6SB8HYM9iJ+LFryRFWbAGib5yqcVByzIjkrA6if?=
- =?us-ascii?Q?x/dVsEg63Id+Kci8Omd/N/nYnVSYHiMrTzAjBUvhcfhH3V3kqy/6ZhDSl5tF?=
- =?us-ascii?Q?XfldcyJEQLbnZxfiQF9wNTKC9azoaVIIlDG4dkCLHuN/znY6urlZHxV/MB8?=
- =?us-ascii?Q?=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="P1sWu3yI"
+Received: by mail-ua1-f50.google.com with SMTP id a1e0cc1a2514c-80b13c93a0eso924906241.0
+        for <kvmarm@lists.linux.dev>; Fri, 07 Jun 2024 00:34:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1717745645; x=1718350445; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TyL/tEXv9q+vrjmq0MkI7TdwwhxQ4pIHED6hCiXm55I=;
+        b=P1sWu3yI31DPt892RRi6E7n77PSuJtPNDriMRJixgaBVNL1YMoZD3m8WF1kiAAUC/3
+         K9jgh/rsBD+/n5Fvecg9gxSTL+QJJcmVnErUt3e1UTEhWmIg/Bf29VJhdKLJHPS03JVS
+         +C4vWeVofrD3ewIbfAZPuVjxEdbPdtgkXwL44REPM9wgafwU3n4itpdGLGfz1JcANlVt
+         fNN/VexUIC7CHs1OR6RQKeG3p70XNJcoFRr+PS1CNvXPQmmS7YBRf67SyuG5QGhOvgE7
+         kBm1ZlZgcB7PV2MXWudqvKWxUhVY/RlWrfs9R4MoD6irYPJgE++GZ475UBLP3hjj1wL8
+         RDaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717745645; x=1718350445;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TyL/tEXv9q+vrjmq0MkI7TdwwhxQ4pIHED6hCiXm55I=;
+        b=bl8AIjR3ItVAUBCS/86FePajIr/xUeccrchvTHPhKJeZt7OsDC+cl45tEiqSL79WfK
+         YPWwiecvuUuhqR6o7kIl8Ou5KZ/STKA4Jw19Don/Ksn8llg7K0Xg5BwadFR3ALVeI5OY
+         Ux5C/iY1lKdPTUhOfNJmMEcsdPWVe2t76LYqOakjdlp1smD9FDkJo7h5P2kD6qeB1q/3
+         QOUO3HzAWVqM3PJ/9sklhvXjPjn5u2qR2y3K+S3vhbuoA+NDtmYuQ/wgK3veYSvWLXIl
+         xMMmCAg7C96rHQeiOVBgCFsS5cupjgUGjcJaYeVgyU7983JlTnV1dOBzMasBBuATbH54
+         1nNg==
+X-Forwarded-Encrypted: i=1; AJvYcCUVyeMQ3ZTPxdPRHHDuPmr6t2LHq1eTtwcVPIIDfh+5jomU4ub5gObcPeEzrgd7iiP/2xLncDCNCPmnG1dJ19Eu3Xr5+BVE
+X-Gm-Message-State: AOJu0Yyu4xS5CCzOe4CsRcmSHZUd/MrUUodQFgLZZ12wiRrRMhLUDCpJ
+	yiljVduVdPZ+tOKNX9k99vEAvG0LUHQpoZ/oczgJC9PsNJqwgZrT0ytLhYfxbz7jf3lJui/u1ZL
+	XAwRqUnaH/HS8xsB415uZ4hFGJAF6pbx214zO
+X-Google-Smtp-Source: AGHT+IHaeNJ1MuvAGR+aV7KvBD3fVvaoUgs7b6DZps3nGdlcGBq99EDHwsn/36ZgdH683W6QJ5rrHAkUVbBp7XVOcDg=
+X-Received: by 2002:a67:f34f:0:b0:48b:c32e:2185 with SMTP id
+ ada2fe7eead31-48c17159270mr5112575137.9.1717745644465; Fri, 07 Jun 2024
+ 00:34:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR02MB4157.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-Network-Message-Id: 22786f91-1838-422e-9d70-08dc86927fff
-X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Jun 2024 01:38:15.0530
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR02MB8444
+References: <20240606-kvm-arm64-fix-pkvm-sve-vl-v2-0-c88f4eb4b14b@kernel.org> <20240606-kvm-arm64-fix-pkvm-sve-vl-v2-2-c88f4eb4b14b@kernel.org>
+In-Reply-To: <20240606-kvm-arm64-fix-pkvm-sve-vl-v2-2-c88f4eb4b14b@kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Fri, 7 Jun 2024 08:33:27 +0100
+Message-ID: <CA+EHjTwBRaCnzPfwdccHGGqsq9hGB5J1tA2aMcJyuRL8yYRZ0Q@mail.gmail.com>
+Subject: Re: [PATCH v2 2/4] arm64/fpsimd: Discover maximum vector length
+ implemented by any CPU
+To: Mark Brown <broonie@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Steven Price <steven.price@arm.com> Sent: Wednesday, June 5, 2024 2:3=
-0 AM
->=20
-> This series adds support for running Linux in a protected VM under the
-> Arm Confidential Compute Architecture (CCA). This has been updated
-> following the feedback from the v2 posting[1]. Thanks for the feedback!
-> Individual patches have a change log for v3.
->=20
-> The biggest change from v2 is fixing set_memory_{en,de}crypted() to
-> perform a break-before-make sequence. Note that only the virtual address
-> supplied is flipped between shared and protected, so if e.g. a vmalloc()
-> address is passed the linear map will still point to the (now invalid)
-> previous IPA. Attempts to access the wrong address may trigger a
-> Synchronous External Abort. However any code which attempts to access
-> the 'encrypted' alias after set_memory_decrypted() is already likely to
-> be broken on platforms that implement memory encryption, so I don't
-> expect problems.
+Hi Mark,
 
-In the case of a vmalloc() address, load_unaligned_zeropad() could still
-make an access to the underlying pages through the linear address. In
-CoCo guests on x86, both the vmalloc PTE and the linear map PTE are
-flipped, so the load_unaligned_zeropad() problem can occur only during
-the transition between decrypted and encrypted. But even then, the
-exception handlers have code to fixup this case and allow everything to
-proceed normally.
+On Thu, Jun 6, 2024 at 4:32=E2=80=AFPM Mark Brown <broonie@kernel.org> wrot=
+e:
+>
+> When discovering the vector lengths for SVE and SME we do not currently
+> record the maximum VL supported on any individual CPU.  This is expected
+> to be the same for all CPUs but the architecture allows asymmetry, if we
+> do encounter an asymmetric system then some CPUs may support VLs higher
+> than the maximum Linux will use.  Since the pKVM hypervisor needs to
+> support saving and restoring anything the host can physically set it
+> needs to know the maximum value any CPU could have, add support for
+> enumerating it and validation for late CPUs.
+>
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> ---
+>  arch/arm64/include/asm/fpsimd.h | 13 +++++++++++++
+>  arch/arm64/kernel/fpsimd.c      | 26 +++++++++++++++++++++++++-
+>  2 files changed, 38 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fps=
+imd.h
+> index 51c21265b4fa..cd19713c9deb 100644
+> --- a/arch/arm64/include/asm/fpsimd.h
+> +++ b/arch/arm64/include/asm/fpsimd.h
+> @@ -188,6 +188,9 @@ struct vl_info {
+>         int max_vl;
+>         int max_virtualisable_vl;
+>
+> +       /* Maximum vector length observed on any CPU */
+> +       int max_cpu_vl;
+> +
+>         /*
+>          * Set of available vector lengths,
+>          * where length vq encoded as bit __vq_to_bit(vq):
+> @@ -278,6 +281,11 @@ static inline int vec_max_virtualisable_vl(enum vec_=
+type type)
+>         return vl_info[type].max_virtualisable_vl;
+>  }
+>
+> +static inline int vec_max_cpu_vl(enum vec_type type)
+> +{
+> +       return vl_info[type].max_cpu_vl;
+> +}
+> +
+>  static inline int sve_max_vl(void)
+>  {
+>         return vec_max_vl(ARM64_VEC_SVE);
+> @@ -288,6 +296,11 @@ static inline int sve_max_virtualisable_vl(void)
+>         return vec_max_virtualisable_vl(ARM64_VEC_SVE);
+>  }
+>
+> +static inline int sve_max_cpu_vl(void)
+> +{
+> +       return vec_max_cpu_vl(ARM64_VEC_SVE);
+> +}
+> +
+>  /* Ensure vq >=3D SVE_VQ_MIN && vq <=3D SVE_VQ_MAX before calling this f=
+unction */
+>  static inline bool vq_available(enum vec_type type, unsigned int vq)
+>  {
+> diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+> index 22542fb81812..ee6fb8c4b16d 100644
+> --- a/arch/arm64/kernel/fpsimd.c
+> +++ b/arch/arm64/kernel/fpsimd.c
+> @@ -129,6 +129,7 @@ __ro_after_init struct vl_info vl_info[ARM64_VEC_MAX]=
+ =3D {
+>                 .min_vl                 =3D SVE_VL_MIN,
+>                 .max_vl                 =3D SVE_VL_MIN,
+>                 .max_virtualisable_vl   =3D SVE_VL_MIN,
+> +               .max_cpu_vl             =3D SVE_VL_MIN,
+>         },
+>  #endif
+>  #ifdef CONFIG_ARM64_SME
+> @@ -1041,8 +1042,13 @@ static void vec_probe_vqs(struct vl_info *info,
+>  void __init vec_init_vq_map(enum vec_type type)
+>  {
+>         struct vl_info *info =3D &vl_info[type];
+> +       unsigned long b;
+> +
+>         vec_probe_vqs(info, info->vq_map);
+>         bitmap_copy(info->vq_partial_map, info->vq_map, SVE_VQ_MAX);
+> +
+> +       b =3D find_first_bit(info->vq_map, SVE_VQ_MAX);
+> +       info->max_cpu_vl =3D __bit_to_vl(b);
+>  }
+>
+>  /*
+> @@ -1054,11 +1060,16 @@ void vec_update_vq_map(enum vec_type type)
+>  {
+>         struct vl_info *info =3D &vl_info[type];
+>         DECLARE_BITMAP(tmp_map, SVE_VQ_MAX);
+> +       unsigned long b;
+>
+>         vec_probe_vqs(info, tmp_map);
+>         bitmap_and(info->vq_map, info->vq_map, tmp_map, SVE_VQ_MAX);
+>         bitmap_or(info->vq_partial_map, info->vq_partial_map, tmp_map,
+>                   SVE_VQ_MAX);
+> +
+> +       b =3D find_first_bit(tmp_map, SVE_VQ_MAX);
+> +       if (__bit_to_vl(b) > info->max_cpu_vl)
+> +               info->max_cpu_vl =3D __bit_to_vl(b);
+>  }
+>
+>  /*
+> @@ -1069,10 +1080,23 @@ int vec_verify_vq_map(enum vec_type type)
+>  {
+>         struct vl_info *info =3D &vl_info[type];
+>         DECLARE_BITMAP(tmp_map, SVE_VQ_MAX);
+> -       unsigned long b;
+> +       unsigned long b, max_vl;
+>
+>         vec_probe_vqs(info, tmp_map);
+>
+> +       /*
+> +        * Currently the maximum VL is only used for pKVM which
+> +        * doesn't allow late CPUs but we don't expect asymmetry and
+> +        * if we encounter any then future users will need handling so
+> +        * warn if we see anything.
+> +        */
+> +       max_vl =3D __bit_to_vl(find_first_bit(tmp_map, SVE_VQ_MAX));
+> +       if (max_vl > info->max_cpu_vl) {
+> +               pr_warn("%s: cpu%d: increases maximum VL to %u\n",
 
-I haven't looked at the code in your patches, but do you handle that case,
-or somehow prevent it?
+This should be %lu since it's an unsigned long. Otherwise it doesn't
+build (clang).
 
-Thanks,
+Cheers,
+/fuad
 
-Michael
-
-
+> +                       info->name, smp_processor_id(), max_vl);
+> +               info->max_cpu_vl =3D max_vl;
+> +       }
+> +
+>         bitmap_complement(tmp_map, tmp_map, SVE_VQ_MAX);
+>         if (bitmap_intersects(tmp_map, info->vq_map, SVE_VQ_MAX)) {
+>                 pr_warn("%s: cpu%d: Required vector length(s) missing\n",
+>
+> --
+> 2.39.2
+>
