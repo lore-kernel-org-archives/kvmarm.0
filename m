@@ -1,393 +1,271 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A2FC15667D;
-	Fri,  7 Jun 2024 20:32:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F32E1C6BE;
+	Sat,  8 Jun 2024 19:38:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717792336; cv=none; b=gOLIXooCsUgT7nZ+cst0QRCxi/KtSMimq/rc4VObyU/ToKJvH2crcdmuH+GQgG2oUmk4VXzMTqqSncUc0R6TEh+5g2tzM3eqQ1BHZNbjYs9uV83F79YJoUBMbJZ6TW7OnWd+PByV78wLm6N6tLK205tIiuExQMk8fxSdL71NN4A=
+	t=1717875507; cv=none; b=Lh9nWFyz/rsozkdtNrTrxM41oQ3OpJEJLfpORfdLIe270ADy0JQf6sNck0qg0NtDiQrJalSaZR/jBnpHXDj2ewmbhMt7SChuodObzSmuIAE41J8jbEbJhy546VCwRz3Lij/R/Tf/5Tm0Voe0/ku9GQ2NQxkznQ595MA8ZvJlXRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717792336; c=relaxed/simple;
-	bh=KgRp/liFFW85v8ZYPjrAlhpw4VYmeoKaJTUjzgMXSH8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=PQG4qWI+DoAwjQDlzIWfwFM5g3K9nfbkxdRqnKDXm3AaqTzumZFJkerst1M+XH8x9zQt+8tJpC8hfYQeGTvkh9MUKUcwgTVKQAxTLZTl9CBWxz1eWOvs87HiYpYyNurqa5kvew0UU71wWRTKhKqqIcoRyE1XtzlgfVJ+LyNvrMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SfEFfAJa; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1717875507; c=relaxed/simple;
+	bh=6+5M3l+iYX0rwNLIVbsCYHIKns4BG4FRt49KUQknk+A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DYoJydw9zh5pXXoHWEo0932NghWq2M+1ea2ku9L3jGH0GH/hCU33c7noYpbDTXwx9rFMyReLfrM2zCpuLxqlGarNqDB+RPlHNPGMj9RBt36RCtNPgfTICpJ/mMyM7dmZcanWwaUKGt0T2M+TkT2G3AVrYGJQBTCTpFS4SNqNHX8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=O5HxE1CM; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SfEFfAJa"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63D92C4AF08;
-	Fri,  7 Jun 2024 20:32:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717792335;
-	bh=KgRp/liFFW85v8ZYPjrAlhpw4VYmeoKaJTUjzgMXSH8=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=SfEFfAJakAM6y716aMbuLsXQ7hiXrXoRRlhuEJzKbSlZ+h/7iR0bxUl85iriTPTVf
-	 x34WZPWhQsUVyIylyXWZCIOTLTBsao46V3fJkG2vuoqgF/XAcpvduTqdaRgbyVpGfm
-	 kgziXenKnVLm0dX1XvZPR+jcJ69/G+/GdhTCycADrMxldsTSB5juejkkcsuoqFX1YR
-	 jI44DspO9vyxgizA1pfpmem3MgeRFS2G2+r1dItJ/qGNTmXbIeTEmuSkBtV/1Cv8xL
-	 IKIA3jXWvxjYA7pRLDQtU+N6HC3p/2PFljYLJ8qDFs6VTR/MfUePvaCJgHf81pSTPV
-	 pNHZJWU3pW/oA==
-From: "Rob Herring (Arm)" <robh@kernel.org>
-Date: Fri, 07 Jun 2024 14:31:34 -0600
-Subject: [PATCH 9/9] perf: arm_pmuv3: Add support for Armv9.4 PMU
- instruction counter
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="O5HxE1CM"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1717875504; x=1749411504;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=6+5M3l+iYX0rwNLIVbsCYHIKns4BG4FRt49KUQknk+A=;
+  b=O5HxE1CMB5QXQuPkWFjMrssk4VbgnSgZBN2nzb0EHPr8ThbD88IL1ayz
+   QSBJumdlQhIBQ41tvnZRlJ68Y+r0JJErE7U1O2eXVzioW6Yf+jFgnJtzq
+   WWSQpor5Brk2Lrs6aXPKl4jGomZimIg9mJ98XT8rLV7Q1r7G2GE2pcK5D
+   1XZ+d9PdGlE3RzBfHsA6SNOgtcsxEoxj+z9CBu47G3Et4kQdKnfkQnRvj
+   iA/CDmRfV3BHsR89Y6r9bmWSj5gINUxgnTzgQGIODJb75Y7lNXvNjlIsm
+   z2aRI7FahJDEwJ6RVXldrDlonR17YCleR27TCxBEpGvhPdeJVWaK2QIyp
+   Q==;
+X-CSE-ConnectionGUID: Yd9aMH3JTVilTg+/w0bs8A==
+X-CSE-MsgGUID: 3GTMiv3cTCCIK2jyK5ygeQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11097"; a="14736012"
+X-IronPort-AV: E=Sophos;i="6.08,224,1712646000"; 
+   d="scan'208";a="14736012"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jun 2024 12:38:24 -0700
+X-CSE-ConnectionGUID: Lo5lv0UQSBecDo1Ex9t5bQ==
+X-CSE-MsgGUID: NpAjYTifTHWNdtdM+slsQQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,224,1712646000"; 
+   d="scan'208";a="43582555"
+Received: from lkp-server01.sh.intel.com (HELO 8967fbab76b3) ([10.239.97.150])
+  by orviesa003.jf.intel.com with ESMTP; 08 Jun 2024 12:38:18 -0700
+Received: from kbuild by 8967fbab76b3 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sG1tI-0000OI-0C;
+	Sat, 08 Jun 2024 19:38:16 +0000
+Date: Sun, 9 Jun 2024 03:37:55 +0800
+From: kernel test robot <lkp@intel.com>
+To: "Rob Herring (Arm)" <robh@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-perf-users@vger.kernel.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH 3/9] perf: arm_pmu: Remove event index to counter
+ remapping
+Message-ID: <202406090349.DaD1utFD-lkp@intel.com>
+References: <20240607-arm-pmu-3-9-icntr-v1-3-c7bd2dceff3b@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240607-arm-pmu-3-9-icntr-v1-9-c7bd2dceff3b@kernel.org>
-References: <20240607-arm-pmu-3-9-icntr-v1-0-c7bd2dceff3b@kernel.org>
-In-Reply-To: <20240607-arm-pmu-3-9-icntr-v1-0-c7bd2dceff3b@kernel.org>
-To: Russell King <linux@armlinux.org.uk>, 
- Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
- Arnaldo Carvalho de Melo <acme@kernel.org>, 
- Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
- Alexander Shishkin <alexander.shishkin@linux.intel.com>, 
- Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>, 
- Adrian Hunter <adrian.hunter@intel.com>, Will Deacon <will@kernel.org>, 
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
- James Morse <james.morse@arm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Zenghui Yu <yuzenghui@huawei.com>, 
- Catalin Marinas <catalin.marinas@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- linux-perf-users@vger.kernel.org, kvmarm@lists.linux.dev
-X-Mailer: b4 0.14-dev
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240607-arm-pmu-3-9-icntr-v1-3-c7bd2dceff3b@kernel.org>
 
-Armv9.4/8.9 PMU adds optional support for a fixed instruction counter
-similar to the fixed cycle counter. Support for the feature is indicated
-in the ID_AA64DFR1_EL1 register PMICNTR field. The counter is not
-accessible in AArch32.
+Hi Rob,
 
-Existing userspace using direct counter access won't know how to handle
-the fixed instruction counter, so we have to avoid using the counter
-when user access is requested.
+kernel test robot noticed the following build errors:
 
-Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
----
- arch/arm/include/asm/arm_pmuv3.h   | 21 +++++++++++++++++++++
- arch/arm64/include/asm/arm_pmuv3.h | 29 +++++++++++++++++++++++++++++
- arch/arm64/kvm/pmu.c               |  8 ++++++--
- arch/arm64/tools/sysreg            | 25 +++++++++++++++++++++++++
- drivers/perf/arm_pmuv3.c           | 28 ++++++++++++++++++++++++++--
- include/linux/perf/arm_pmu.h       |  8 ++++++--
- include/linux/perf/arm_pmuv3.h     |  4 +++-
- 7 files changed, 116 insertions(+), 7 deletions(-)
+[auto build test ERROR on 1613e604df0cd359cf2a7fbd9be7a0bcfacfabd0]
 
-diff --git a/arch/arm/include/asm/arm_pmuv3.h b/arch/arm/include/asm/arm_pmuv3.h
-index ac2cf37b57e3..b836537ddfbf 100644
---- a/arch/arm/include/asm/arm_pmuv3.h
-+++ b/arch/arm/include/asm/arm_pmuv3.h
-@@ -10,6 +10,7 @@
- #include <asm/cputype.h>
- 
- #define ARMV8_PMU_CYCLE_IDX		31
-+#define ARMV8_PMU_INSTR_IDX		32 /* Not accessible from AArch32 */
- 
- #define PMCCNTR			__ACCESS_CP15_64(0, c9)
- 
-@@ -129,6 +130,12 @@ static inline u32 read_pmuver(void)
- 	return (dfr0 >> 24) & 0xf;
- }
- 
-+static inline bool pmuv3_has_icntr(void)
-+{
-+	/* FEAT_PMUv3_ICNTR not accessible for 32-bit */
-+	return false;
-+}
-+
- static inline void write_pmcr(u32 val)
- {
- 	write_sysreg(val, PMCR);
-@@ -154,6 +161,13 @@ static inline u64 read_pmccntr(void)
- 	return read_sysreg(PMCCNTR);
- }
- 
-+static inline void write_pmicntr(u64 val) {}
-+
-+static inline u64 read_pmicntr(void)
-+{
-+	return 0;
-+}
-+
- static inline void write_pmcntenset(u32 val)
- {
- 	write_sysreg(val, PMCNTENSET);
-@@ -179,6 +193,13 @@ static inline void write_pmccfiltr(u32 val)
- 	write_sysreg(val, PMCCFILTR);
- }
- 
-+static inline void write_pmicfiltr(u64 val) {}
-+
-+static inline u64 read_pmicfiltr(void)
-+{
-+	return 0;
-+}
-+
- static inline void write_pmovsclr(u32 val)
- {
- 	write_sysreg(val, PMOVSR);
-diff --git a/arch/arm64/include/asm/arm_pmuv3.h b/arch/arm64/include/asm/arm_pmuv3.h
-index 46930729fb3f..a13a10e97c01 100644
---- a/arch/arm64/include/asm/arm_pmuv3.h
-+++ b/arch/arm64/include/asm/arm_pmuv3.h
-@@ -12,6 +12,7 @@
- #include <asm/sysreg.h>
- 
- #define ARMV8_PMU_CYCLE_IDX		31
-+#define ARMV8_PMU_INSTR_IDX		32
- 
- #define RETURN_READ_PMEVCNTRN(n) \
- 	return read_sysreg(pmevcntr##n##_el0)
-@@ -56,6 +57,14 @@ static inline u32 read_pmuver(void)
- 			ID_AA64DFR0_EL1_PMUVer_SHIFT);
- }
- 
-+static inline bool pmuv3_has_icntr(void)
-+{
-+	u64 dfr1 = read_sysreg(id_aa64dfr1_el1);
-+
-+	return !!cpuid_feature_extract_unsigned_field(dfr1,
-+			ID_AA64DFR1_EL1_PMICNTR_SHIFT);
-+}
-+
- static inline void write_pmcr(u64 val)
- {
- 	write_sysreg(val, pmcr_el0);
-@@ -81,6 +90,16 @@ static inline u64 read_pmccntr(void)
- 	return read_sysreg(pmccntr_el0);
- }
- 
-+static inline void write_pmicntr(u64 val)
-+{
-+	write_sysreg_s(val, SYS_PMICNTR_EL0);
-+}
-+
-+static inline u64 read_pmicntr(void)
-+{
-+	return read_sysreg_s(SYS_PMICNTR_EL0);
-+}
-+
- static inline void write_pmcntenset(u64 val)
- {
- 	write_sysreg(val, pmcntenset_el0);
-@@ -111,6 +130,16 @@ static inline u64 read_pmccfiltr(void)
- 	return read_sysreg(pmccfiltr_el0);
- }
- 
-+static inline void write_pmicfiltr(u64 val)
-+{
-+	write_sysreg_s(val, SYS_PMICFILTR_EL0);
-+}
-+
-+static inline u64 read_pmicfiltr(void)
-+{
-+	return read_sysreg_s(SYS_PMICFILTR_EL0);
-+}
-+
- static inline void write_pmovsclr(u64 val)
- {
- 	write_sysreg(val, pmovsclr_el0);
-diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
-index 7eaf5f7aeae9..9420835cce91 100644
---- a/arch/arm64/kvm/pmu.c
-+++ b/arch/arm64/kvm/pmu.c
-@@ -67,24 +67,28 @@ void kvm_clr_pmu_events(u64 clr)
- 
- /*
-  * Read a value direct from PMEVTYPER<idx> where idx is 0-30
-- * or PMCCFILTR_EL0 where idx is ARMV8_PMU_CYCLE_IDX (31).
-+ * or PMxCFILTR_EL0 where idx is 31-32.
-  */
- static u64 kvm_vcpu_pmu_read_evtype_direct(int idx)
- {
- 	if (idx == ARMV8_PMU_CYCLE_IDX)
- 		return read_pmccfiltr();
-+	else if (idx == ARMV8_PMU_INSTR_IDX)
-+		return read_pmicfiltr();
- 
- 	return read_pmevtypern(idx);
- }
- 
- /*
-  * Write a value direct to PMEVTYPER<idx> where idx is 0-30
-- * or PMCCFILTR_EL0 where idx is ARMV8_PMU_CYCLE_IDX (31).
-+ * or PMxCFILTR_EL0 where idx is 31-32.
-  */
- static void kvm_vcpu_pmu_write_evtype_direct(int idx, u32 val)
- {
- 	if (idx == ARMV8_PMU_CYCLE_IDX)
- 		write_pmccfiltr(val);
-+	else if (idx == ARMV8_PMU_INSTR_IDX)
-+		write_pmicfiltr(val);
- 	else
- 		write_pmevtypern(idx, val);
- }
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index 231817a379b5..8ab6e09871de 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -2029,6 +2029,31 @@ Sysreg	FAR_EL1	3	0	6	0	0
- Field	63:0	ADDR
- EndSysreg
- 
-+Sysreg	PMICNTR_EL0	3	3	9	4	0
-+Field	63:0	ICNT
-+EndSysreg
-+
-+Sysreg	PMICFILTR_EL0	3	3	9	6	0
-+Res0	63:59
-+Field	58	SYNC
-+Field	57:56	VS
-+Res0	55:32
-+Field	31	P
-+Field	30	U
-+Field	29	NSK
-+Field	28	NSU
-+Field	27	NSH
-+Field	26	M
-+Res0	25
-+Field	24	SH
-+Field	23	T
-+Field	22	RLK
-+Field	21	RLU
-+Field	20	RLH
-+Res0	19:16
-+Field	15:0	evtCount
-+EndSysreg
-+
- Sysreg	PMSCR_EL1	3	0	9	9	0
- Res0	63:8
- Field	7:6	PCT
-diff --git a/drivers/perf/arm_pmuv3.c b/drivers/perf/arm_pmuv3.c
-index 468a0a3bbd5a..890efc686e11 100644
---- a/drivers/perf/arm_pmuv3.c
-+++ b/drivers/perf/arm_pmuv3.c
-@@ -479,7 +479,7 @@ static bool armv8pmu_event_is_chained(struct perf_event *event)
- 	return !armv8pmu_event_has_user_read(event) &&
- 	       armv8pmu_event_is_64bit(event) &&
- 	       !armv8pmu_has_long_event(cpu_pmu) &&
--	       (idx != ARMV8_PMU_CYCLE_IDX);
-+	       (idx < ARMV8_PMU_CYCLE_IDX);
- }
- 
- /*
-@@ -538,7 +538,7 @@ static bool armv8pmu_event_needs_bias(struct perf_event *event)
- 		return false;
- 
- 	if (armv8pmu_has_long_event(cpu_pmu) ||
--	    idx == ARMV8_PMU_CYCLE_IDX)
-+	    idx >= ARMV8_PMU_CYCLE_IDX)
- 		return true;
- 
- 	return false;
-@@ -568,6 +568,8 @@ static u64 armv8pmu_read_counter(struct perf_event *event)
- 
- 	if (idx == ARMV8_PMU_CYCLE_IDX)
- 		value = read_pmccntr();
-+	else if (idx == ARMV8_PMU_INSTR_IDX)
-+		value = read_pmicntr();
- 	else
- 		value = armv8pmu_read_hw_counter(event);
- 
-@@ -601,6 +603,8 @@ static void armv8pmu_write_counter(struct perf_event *event, u64 value)
- 
- 	if (idx == ARMV8_PMU_CYCLE_IDX)
- 		write_pmccntr(value);
-+	else if (idx == ARMV8_PMU_INSTR_IDX)
-+		write_pmicntr(value);
- 	else
- 		armv8pmu_write_hw_counter(event, value);
- }
-@@ -638,6 +642,8 @@ static void armv8pmu_write_event_type(struct perf_event *event)
- 	} else {
- 		if (idx == ARMV8_PMU_CYCLE_IDX)
- 			write_pmccfiltr(hwc->config_base);
-+		else if (idx == ARMV8_PMU_INSTR_IDX)
-+			write_pmicfiltr(hwc->config_base);
- 		else
- 			armv8pmu_write_evtype(idx, hwc->config_base);
- 	}
-@@ -765,6 +771,8 @@ static void armv8pmu_enable_user_access(struct arm_pmu *cpu_pmu)
- 	for_each_clear_bit(i, cpuc->used_mask, ARMPMU_MAX_HWEVENTS) {
- 		if (i == ARMV8_PMU_CYCLE_IDX)
- 			write_pmccntr(0);
-+		else if (i == ARMV8_PMU_INSTR_IDX)
-+			write_pmicntr(0);
- 		else
- 			armv8pmu_write_evcntr(i, 0);
- 	}
-@@ -931,6 +939,18 @@ static int armv8pmu_get_event_idx(struct pmu_hw_events *cpuc,
- 				return -EAGAIN;
- 	}
- 
-+	/*
-+	 * Always prefer to place a instruction counter into the instruction counter,
-+	 * but don't expose the instruction counter to userspace access as userspace
-+	 * may not know how to handle it.
-+	 */
-+	if (test_bit(ARMV8_PMU_INSTR_IDX, cpu_pmu->cntr_mask) &&
-+	    (evtype == ARMV8_PMUV3_PERFCTR_INST_RETIRED) &&
-+	    !armv8pmu_event_want_user_access(event)) {
-+		if (!test_and_set_bit(ARMV8_PMU_INSTR_IDX, cpuc->used_mask))
-+			return ARMV8_PMU_INSTR_IDX;
-+	}
-+
- 	/*
- 	 * Otherwise use events counters
- 	 */
-@@ -1188,6 +1208,10 @@ static void __armv8pmu_probe_pmu(void *info)
- 	/* Add the CPU cycles counter */
- 	bitmap_set(cpu_pmu->cntr_mask, ARMV8_PMU_CYCLE_IDX, 1);
- 
-+	/* Add the CPU instructions counter */
-+	if (pmuv3_has_icntr())
-+		bitmap_set(cpu_pmu->cntr_mask, ARMV8_PMU_INSTR_IDX, 1);
-+
- 	pmceid[0] = pmceid_raw[0] = read_pmceid0();
- 	pmceid[1] = pmceid_raw[1] = read_pmceid1();
- 
-diff --git a/include/linux/perf/arm_pmu.h b/include/linux/perf/arm_pmu.h
-index e5d6d204beab..4b5b83677e3f 100644
---- a/include/linux/perf/arm_pmu.h
-+++ b/include/linux/perf/arm_pmu.h
-@@ -17,10 +17,14 @@
- #ifdef CONFIG_ARM_PMU
- 
- /*
-- * The ARMv7 CPU PMU supports up to 32 event counters.
-+ * The Armv7 and Armv8.8 or less CPU PMU supports up to 32 event counters.
-+ * The Armv8.9/9.4 CPU PMU supports up to 33 event counters.
-  */
-+#ifdef CONFIG_ARM
- #define ARMPMU_MAX_HWEVENTS		32
--
-+#else
-+#define ARMPMU_MAX_HWEVENTS		33
-+#endif
- /*
-  * ARM PMU hw_event flags
-  */
-diff --git a/include/linux/perf/arm_pmuv3.h b/include/linux/perf/arm_pmuv3.h
-index c902fe64f070..0472c4270d66 100644
---- a/include/linux/perf/arm_pmuv3.h
-+++ b/include/linux/perf/arm_pmuv3.h
-@@ -224,8 +224,10 @@
-  */
- #define ARMV8_PMU_OVSR_P		GENMASK(30, 0)
- #define ARMV8_PMU_OVSR_C		BIT(31)
-+#define ARMV8_PMU_OVSR_F		BIT_ULL(32) /* arm64 only */
- /* Mask for writable bits is both P and C fields */
--#define ARMV8_PMU_OVERFLOWED_MASK	(ARMV8_PMU_OVSR_P | ARMV8_PMU_OVSR_C)
-+#define ARMV8_PMU_OVERFLOWED_MASK	(ARMV8_PMU_OVSR_P | ARMV8_PMU_OVSR_C | \
-+					ARMV8_PMU_OVSR_F)
- 
- /*
-  * PMXEVTYPER: Event selection reg
+url:    https://github.com/intel-lab-lkp/linux/commits/Rob-Herring-Arm/perf-arm-Move-32-bit-PMU-drivers-to-drivers-perf/20240608-043509
+base:   1613e604df0cd359cf2a7fbd9be7a0bcfacfabd0
+patch link:    https://lore.kernel.org/r/20240607-arm-pmu-3-9-icntr-v1-3-c7bd2dceff3b%40kernel.org
+patch subject: [PATCH 3/9] perf: arm_pmu: Remove event index to counter remapping
+config: arm64-allyesconfig (https://download.01.org/0day-ci/archive/20240609/202406090349.DaD1utFD-lkp@intel.com/config)
+compiler: clang version 19.0.0git (https://github.com/llvm/llvm-project d7d2d4f53fc79b4b58e8d8d08151b577c3699d4a)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240609/202406090349.DaD1utFD-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202406090349.DaD1utFD-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+         |                                           ^~~~~~~~~~
+   drivers/perf/apple_m1_cpu_pmu.c:27:22: note: expanded from macro 'ONLY_2_4_6'
+      27 | #define ONLY_2_4_6                      (BIT(2) | BIT(4) | BIT(6))
+         |                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/perf/apple_m1_cpu_pmu.c:99:32: note: previous initialization is here
+      99 |         [0 ... M1_PMU_PERFCTR_LAST]     = ANY_BUT_0_1,
+         |                                           ^~~~~~~~~~~
+   drivers/perf/apple_m1_cpu_pmu.c:25:23: note: expanded from macro 'ANY_BUT_0_1'
+      25 | #define ANY_BUT_0_1                     GENMASK(9, 2)
+         |                                         ^~~~~~~~~~~~~
+   include/linux/bits.h:35:2: note: expanded from macro 'GENMASK'
+      35 |         (GENMASK_INPUT_CHECK(h, l) + __GENMASK(h, l))
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/perf/apple_m1_cpu_pmu.c:128:32: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
+     128 |         [M1_PMU_PERFCTR_UNKNOWN_f6]     = ONLY_2_4_6,
+         |                                           ^~~~~~~~~~
+   drivers/perf/apple_m1_cpu_pmu.c:27:22: note: expanded from macro 'ONLY_2_4_6'
+      27 | #define ONLY_2_4_6                      (BIT(2) | BIT(4) | BIT(6))
+         |                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/perf/apple_m1_cpu_pmu.c:99:32: note: previous initialization is here
+      99 |         [0 ... M1_PMU_PERFCTR_LAST]     = ANY_BUT_0_1,
+         |                                           ^~~~~~~~~~~
+   drivers/perf/apple_m1_cpu_pmu.c:25:23: note: expanded from macro 'ANY_BUT_0_1'
+      25 | #define ANY_BUT_0_1                     GENMASK(9, 2)
+         |                                         ^~~~~~~~~~~~~
+   include/linux/bits.h:35:2: note: expanded from macro 'GENMASK'
+      35 |         (GENMASK_INPUT_CHECK(h, l) + __GENMASK(h, l))
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/perf/apple_m1_cpu_pmu.c:129:32: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
+     129 |         [M1_PMU_PERFCTR_UNKNOWN_f7]     = ONLY_2_4_6,
+         |                                           ^~~~~~~~~~
+   drivers/perf/apple_m1_cpu_pmu.c:27:22: note: expanded from macro 'ONLY_2_4_6'
+      27 | #define ONLY_2_4_6                      (BIT(2) | BIT(4) | BIT(6))
+         |                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/perf/apple_m1_cpu_pmu.c:99:32: note: previous initialization is here
+      99 |         [0 ... M1_PMU_PERFCTR_LAST]     = ANY_BUT_0_1,
+         |                                           ^~~~~~~~~~~
+   drivers/perf/apple_m1_cpu_pmu.c:25:23: note: expanded from macro 'ANY_BUT_0_1'
+      25 | #define ANY_BUT_0_1                     GENMASK(9, 2)
+         |                                         ^~~~~~~~~~~~~
+   include/linux/bits.h:35:2: note: expanded from macro 'GENMASK'
+      35 |         (GENMASK_INPUT_CHECK(h, l) + __GENMASK(h, l))
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/perf/apple_m1_cpu_pmu.c:130:32: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
+     130 |         [M1_PMU_PERFCTR_UNKNOWN_f8]     = ONLY_2_TO_7,
+         |                                           ^~~~~~~~~~~
+   drivers/perf/apple_m1_cpu_pmu.c:26:23: note: expanded from macro 'ONLY_2_TO_7'
+      26 | #define ONLY_2_TO_7                     GENMASK(7, 2)
+         |                                         ^~~~~~~~~~~~~
+   include/linux/bits.h:35:2: note: expanded from macro 'GENMASK'
+      35 |         (GENMASK_INPUT_CHECK(h, l) + __GENMASK(h, l))
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/perf/apple_m1_cpu_pmu.c:99:32: note: previous initialization is here
+      99 |         [0 ... M1_PMU_PERFCTR_LAST]     = ANY_BUT_0_1,
+         |                                           ^~~~~~~~~~~
+   drivers/perf/apple_m1_cpu_pmu.c:25:23: note: expanded from macro 'ANY_BUT_0_1'
+      25 | #define ANY_BUT_0_1                     GENMASK(9, 2)
+         |                                         ^~~~~~~~~~~~~
+   include/linux/bits.h:35:2: note: expanded from macro 'GENMASK'
+      35 |         (GENMASK_INPUT_CHECK(h, l) + __GENMASK(h, l))
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/perf/apple_m1_cpu_pmu.c:131:32: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
+     131 |         [M1_PMU_PERFCTR_UNKNOWN_fd]     = ONLY_2_4_6,
+         |                                           ^~~~~~~~~~
+   drivers/perf/apple_m1_cpu_pmu.c:27:22: note: expanded from macro 'ONLY_2_4_6'
+      27 | #define ONLY_2_4_6                      (BIT(2) | BIT(4) | BIT(6))
+         |                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/perf/apple_m1_cpu_pmu.c:99:32: note: previous initialization is here
+      99 |         [0 ... M1_PMU_PERFCTR_LAST]     = ANY_BUT_0_1,
+         |                                           ^~~~~~~~~~~
+   drivers/perf/apple_m1_cpu_pmu.c:25:23: note: expanded from macro 'ANY_BUT_0_1'
+      25 | #define ANY_BUT_0_1                     GENMASK(9, 2)
+         |                                         ^~~~~~~~~~~~~
+   include/linux/bits.h:35:2: note: expanded from macro 'GENMASK'
+      35 |         (GENMASK_INPUT_CHECK(h, l) + __GENMASK(h, l))
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/perf/apple_m1_cpu_pmu.c:136:31: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
+     136 |         [PERF_COUNT_HW_CPU_CYCLES]      = M1_PMU_PERFCTR_CPU_CYCLES,
+         |                                           ^~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/perf/apple_m1_cpu_pmu.c:135:2: note: previous initialization is here
+     135 |         PERF_MAP_ALL_UNSUPPORTED,
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmu.h:40:34: note: expanded from macro 'PERF_MAP_ALL_UNSUPPORTED'
+      40 |         [0 ... PERF_COUNT_HW_MAX - 1] = HW_OP_UNSUPPORTED
+         |                                         ^~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmu.h:35:28: note: expanded from macro 'HW_OP_UNSUPPORTED'
+      35 | #define HW_OP_UNSUPPORTED               0xFFFF
+         |                                         ^~~~~~
+   drivers/perf/apple_m1_cpu_pmu.c:137:33: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
+     137 |         [PERF_COUNT_HW_INSTRUCTIONS]    = M1_PMU_PERFCTR_INSTRUCTIONS,
+         |                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/perf/apple_m1_cpu_pmu.c:135:2: note: previous initialization is here
+     135 |         PERF_MAP_ALL_UNSUPPORTED,
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmu.h:40:34: note: expanded from macro 'PERF_MAP_ALL_UNSUPPORTED'
+      40 |         [0 ... PERF_COUNT_HW_MAX - 1] = HW_OP_UNSUPPORTED
+         |                                         ^~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmu.h:35:28: note: expanded from macro 'HW_OP_UNSUPPORTED'
+      35 | #define HW_OP_UNSUPPORTED               0xFFFF
+         |                                         ^~~~~~
+>> drivers/perf/apple_m1_cpu_pmu.c:403:31: error: no member named 'num_events' in 'struct arm_pmu'; did you mean 'hw_events'?
+     403 |         for (idx = 0; idx < cpu_pmu->num_events; idx++) {
+         |                                      ^~~~~~~~~~
+         |                                      hw_events
+   include/linux/perf/arm_pmu.h:106:33: note: 'hw_events' declared here
+     106 |         struct pmu_hw_events    __percpu *hw_events;
+         |                                           ^
+   drivers/perf/apple_m1_cpu_pmu.c:563:11: error: no member named 'num_events' in 'struct arm_pmu'; did you mean 'hw_events'?
+     563 |         cpu_pmu->num_events       = M1_PMU_NR_COUNTERS;
+         |                  ^~~~~~~~~~
+         |                  hw_events
+   include/linux/perf/arm_pmu.h:106:33: note: 'hw_events' declared here
+     106 |         struct pmu_hw_events    __percpu *hw_events;
+         |                                           ^
+   39 warnings and 2 errors generated.
+
+
+vim +403 drivers/perf/apple_m1_cpu_pmu.c
+
+a639027a1be1d6 Marc Zyngier 2022-02-08  381  
+a639027a1be1d6 Marc Zyngier 2022-02-08  382  static irqreturn_t m1_pmu_handle_irq(struct arm_pmu *cpu_pmu)
+a639027a1be1d6 Marc Zyngier 2022-02-08  383  {
+a639027a1be1d6 Marc Zyngier 2022-02-08  384  	struct pmu_hw_events *cpuc = this_cpu_ptr(cpu_pmu->hw_events);
+a639027a1be1d6 Marc Zyngier 2022-02-08  385  	struct pt_regs *regs;
+a639027a1be1d6 Marc Zyngier 2022-02-08  386  	u64 overflow, state;
+a639027a1be1d6 Marc Zyngier 2022-02-08  387  	int idx;
+a639027a1be1d6 Marc Zyngier 2022-02-08  388  
+a639027a1be1d6 Marc Zyngier 2022-02-08  389  	overflow = read_sysreg_s(SYS_IMP_APL_PMSR_EL1);
+a639027a1be1d6 Marc Zyngier 2022-02-08  390  	if (!overflow) {
+a639027a1be1d6 Marc Zyngier 2022-02-08  391  		/* Spurious interrupt? */
+a639027a1be1d6 Marc Zyngier 2022-02-08  392  		state = read_sysreg_s(SYS_IMP_APL_PMCR0_EL1);
+a639027a1be1d6 Marc Zyngier 2022-02-08  393  		state &= ~PMCR0_IACT;
+a639027a1be1d6 Marc Zyngier 2022-02-08  394  		write_sysreg_s(state, SYS_IMP_APL_PMCR0_EL1);
+a639027a1be1d6 Marc Zyngier 2022-02-08  395  		isb();
+a639027a1be1d6 Marc Zyngier 2022-02-08  396  		return IRQ_NONE;
+a639027a1be1d6 Marc Zyngier 2022-02-08  397  	}
+a639027a1be1d6 Marc Zyngier 2022-02-08  398  
+a639027a1be1d6 Marc Zyngier 2022-02-08  399  	cpu_pmu->stop(cpu_pmu);
+a639027a1be1d6 Marc Zyngier 2022-02-08  400  
+a639027a1be1d6 Marc Zyngier 2022-02-08  401  	regs = get_irq_regs();
+a639027a1be1d6 Marc Zyngier 2022-02-08  402  
+a639027a1be1d6 Marc Zyngier 2022-02-08 @403  	for (idx = 0; idx < cpu_pmu->num_events; idx++) {
+a639027a1be1d6 Marc Zyngier 2022-02-08  404  		struct perf_event *event = cpuc->events[idx];
+a639027a1be1d6 Marc Zyngier 2022-02-08  405  		struct perf_sample_data data;
+a639027a1be1d6 Marc Zyngier 2022-02-08  406  
+a639027a1be1d6 Marc Zyngier 2022-02-08  407  		if (!event)
+a639027a1be1d6 Marc Zyngier 2022-02-08  408  			continue;
+a639027a1be1d6 Marc Zyngier 2022-02-08  409  
+a639027a1be1d6 Marc Zyngier 2022-02-08  410  		armpmu_event_update(event);
+a639027a1be1d6 Marc Zyngier 2022-02-08  411  		perf_sample_data_init(&data, 0, event->hw.last_period);
+a639027a1be1d6 Marc Zyngier 2022-02-08  412  		if (!armpmu_event_set_period(event))
+a639027a1be1d6 Marc Zyngier 2022-02-08  413  			continue;
+a639027a1be1d6 Marc Zyngier 2022-02-08  414  
+a639027a1be1d6 Marc Zyngier 2022-02-08  415  		if (perf_event_overflow(event, &data, regs))
+a639027a1be1d6 Marc Zyngier 2022-02-08  416  			m1_pmu_disable_event(event);
+a639027a1be1d6 Marc Zyngier 2022-02-08  417  	}
+a639027a1be1d6 Marc Zyngier 2022-02-08  418  
+a639027a1be1d6 Marc Zyngier 2022-02-08  419  	cpu_pmu->start(cpu_pmu);
+a639027a1be1d6 Marc Zyngier 2022-02-08  420  
+a639027a1be1d6 Marc Zyngier 2022-02-08  421  	return IRQ_HANDLED;
+a639027a1be1d6 Marc Zyngier 2022-02-08  422  }
+a639027a1be1d6 Marc Zyngier 2022-02-08  423  
 
 -- 
-2.43.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
