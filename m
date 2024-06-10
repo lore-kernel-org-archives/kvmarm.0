@@ -1,271 +1,150 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F32E1C6BE;
-	Sat,  8 Jun 2024 19:38:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CB7B10A22
+	for <kvmarm@lists.linux.dev>; Mon, 10 Jun 2024 06:33:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717875507; cv=none; b=Lh9nWFyz/rsozkdtNrTrxM41oQ3OpJEJLfpORfdLIe270ADy0JQf6sNck0qg0NtDiQrJalSaZR/jBnpHXDj2ewmbhMt7SChuodObzSmuIAE41J8jbEbJhy546VCwRz3Lij/R/Tf/5Tm0Voe0/ku9GQ2NQxkznQ595MA8ZvJlXRA=
+	t=1718001184; cv=none; b=Lf+AS3UU3Oc8Qoxsi1IFp1z9tJwminOWhafZxSBkTzTqjamTq2dkm/DK3zlRkLEkrA6n0urmdnWdcmFl8Pkhwk+BEjdoz1nKLnQC+kU4tA8WV68DokppmbiwSi9LGHUEQHZII+w1yFYxw44X7mkuljWuk3fDuoh7zfD4k3NNp54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717875507; c=relaxed/simple;
-	bh=6+5M3l+iYX0rwNLIVbsCYHIKns4BG4FRt49KUQknk+A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DYoJydw9zh5pXXoHWEo0932NghWq2M+1ea2ku9L3jGH0GH/hCU33c7noYpbDTXwx9rFMyReLfrM2zCpuLxqlGarNqDB+RPlHNPGMj9RBt36RCtNPgfTICpJ/mMyM7dmZcanWwaUKGt0T2M+TkT2G3AVrYGJQBTCTpFS4SNqNHX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=O5HxE1CM; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1718001184; c=relaxed/simple;
+	bh=l6jcF5i3o/hkbbqIKOzIl1s31HyokNVDBcYJZK46IiE=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=vAt9nlOthQ6B652VnVHDPj0S2JwBxLdRMzwzguInZuOTLHvEm9k5P8z42zQwLQknWOPa6n4f+tToSFR9KRqT5WrHQ0iZG5SMjD+0Ttd51Nv8rAcSLeLLpSOZrc1lzOPL3HCzjhipj9lcWXK1xm05p2v8f8grtlNxKeJB963KczQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ptosi.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VbzIS7xD; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ptosi.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="O5HxE1CM"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1717875504; x=1749411504;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=6+5M3l+iYX0rwNLIVbsCYHIKns4BG4FRt49KUQknk+A=;
-  b=O5HxE1CMB5QXQuPkWFjMrssk4VbgnSgZBN2nzb0EHPr8ThbD88IL1ayz
-   QSBJumdlQhIBQ41tvnZRlJ68Y+r0JJErE7U1O2eXVzioW6Yf+jFgnJtzq
-   WWSQpor5Brk2Lrs6aXPKl4jGomZimIg9mJ98XT8rLV7Q1r7G2GE2pcK5D
-   1XZ+d9PdGlE3RzBfHsA6SNOgtcsxEoxj+z9CBu47G3Et4kQdKnfkQnRvj
-   iA/CDmRfV3BHsR89Y6r9bmWSj5gINUxgnTzgQGIODJb75Y7lNXvNjlIsm
-   z2aRI7FahJDEwJ6RVXldrDlonR17YCleR27TCxBEpGvhPdeJVWaK2QIyp
-   Q==;
-X-CSE-ConnectionGUID: Yd9aMH3JTVilTg+/w0bs8A==
-X-CSE-MsgGUID: 3GTMiv3cTCCIK2jyK5ygeQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11097"; a="14736012"
-X-IronPort-AV: E=Sophos;i="6.08,224,1712646000"; 
-   d="scan'208";a="14736012"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jun 2024 12:38:24 -0700
-X-CSE-ConnectionGUID: Lo5lv0UQSBecDo1Ex9t5bQ==
-X-CSE-MsgGUID: NpAjYTifTHWNdtdM+slsQQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,224,1712646000"; 
-   d="scan'208";a="43582555"
-Received: from lkp-server01.sh.intel.com (HELO 8967fbab76b3) ([10.239.97.150])
-  by orviesa003.jf.intel.com with ESMTP; 08 Jun 2024 12:38:18 -0700
-Received: from kbuild by 8967fbab76b3 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sG1tI-0000OI-0C;
-	Sat, 08 Jun 2024 19:38:16 +0000
-Date: Sun, 9 Jun 2024 03:37:55 +0800
-From: kernel test robot <lkp@intel.com>
-To: "Rob Herring (Arm)" <robh@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-perf-users@vger.kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH 3/9] perf: arm_pmu: Remove event index to counter
- remapping
-Message-ID: <202406090349.DaD1utFD-lkp@intel.com>
-References: <20240607-arm-pmu-3-9-icntr-v1-3-c7bd2dceff3b@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VbzIS7xD"
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dfa84f6a603so7011374276.3
+        for <kvmarm@lists.linux.dev>; Sun, 09 Jun 2024 23:33:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1718001181; x=1718605981; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=SV3VpUvUuZUDCnIEJtnyIJokYqwm61smGNoJPs2Ev1g=;
+        b=VbzIS7xDELDddCRYUG+IkWXkm9JOtZZrInFk9puWTlWDD02xfuAUsOLNdii+c27Gky
+         r/zdRQsghtYKVAjTQrhboS8pdtyVxk9yMbQ1ltcrBmeL7+t3jbBfdU/7aKC4XgF/6GE3
+         j4/5BrsGg1+RuSqHGC/Y+NBiJx/aOYD2JTiR4aiv26jum3ESTINExeAl+NCpIgG2C0SV
+         rBBNv9WcksN8Vk8vKAKHxwD+6s12HMNXE5CQQvlSHuEUgcUnqGjIm0OOJKj4p4DNNjto
+         wBSuL71+dTWokAFNW2BW/3+FR6jXQydCYhg0DZVnti8m5gNWUVvomkrNcsDrXdwiYDja
+         CR1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718001181; x=1718605981;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SV3VpUvUuZUDCnIEJtnyIJokYqwm61smGNoJPs2Ev1g=;
+        b=Hj/MATOC3vGWxiwWiMIsChUGcRI4ZiXSNiSOuyVSLJjW5JkKNE9dSOxOeXcqy1tQQb
+         IBcv9CFBw7aHAqrvhFVg8yrfIW1r7ejuZAP0d2aUjVHjSGg63flUWiCYUikJYKzTySx6
+         CUoCJBMNOzA0BrZ6zYQXe3v28ubg8OsEqg7Auwb0b2aBuWarfACPqTu+347K5TYs80N4
+         kQXPW/WjZZ+Szg7YI6x+ZeunXuaQKqyAF561rdBLcFxXQBwDqcvC5XexEZFlbLd/m6+W
+         Dt1pfxcJqnksfszvR4zWGkBTv9hQDPn4ojG2chbSn4SIlHLHLrIQfEDvtQ7syI/wDnsC
+         0Oog==
+X-Gm-Message-State: AOJu0YyryHShaWcA2hU3OlLmJVup8PdZ9gPtu5lUrFu+MosoDjYprFXq
+	yMdMASvghrnSOCNpKK9sK8vpAZberya1px1qhv43aKnHn70RAuoo67xIoxoyI2K3obkvwa6A9Bj
+	VwamxUTFE9jeX++B0zhzTSizh4u/oUw6BjGumsMS/BgrX6tU6jVuIDrMnB1EimC7QBiXqQxMNQw
+	EFg+/CZH5knRkiPNh1RiP99tqiu18=
+X-Google-Smtp-Source: AGHT+IE7ukTgtkKT05jf5+K94IJiuvYTmDsAiB90Z4RAIq7icQqVtEUXErqkuzjcjiRo2zRoJ8jUu5/EZw==
+X-Received: from ptosi.c.googlers.com ([fda3:e722:ac3:cc00:31:98fb:c0a8:11ec])
+ (user=ptosi job=sendgmr) by 2002:a05:6902:10c3:b0:dfb:1c1c:ac11 with SMTP id
+ 3f1490d57ef6-dfb1c1cb10emr174664276.13.1718001181056; Sun, 09 Jun 2024
+ 23:33:01 -0700 (PDT)
+Date: Mon, 10 Jun 2024 07:32:29 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240607-arm-pmu-3-9-icntr-v1-3-c7bd2dceff3b@kernel.org>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.2.505.gda0bf45e8d-goog
+Message-ID: <20240610063244.2828978-1-ptosi@google.com>
+Subject: [PATCH v5 0/8] KVM: arm64: Add support for hypervisor kCFI
+From: "=?UTF-8?q?Pierre-Cl=C3=A9ment=20Tosi?=" <ptosi@google.com>
+To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	kvm@vger.kernel.org
+Cc: "=?UTF-8?q?Pierre-Cl=C3=A9ment=20Tosi?=" <ptosi@google.com>, Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Vincent Donnefort <vdonnefort@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Rob,
+CONFIG_CFI_CLANG ("kernel Control Flow Integrity") makes the compiler injec=
+t
+runtime type checks before any indirect function call. On AArch64, it gener=
+ates
+a BRK instruction to be executed on type mismatch and encodes the indices o=
+f the
+registers holding the branch target and expected type in the immediate of t=
+he
+instruction. As a result, a synchronous exception gets triggered on kCFI fa=
+ilure
+and the fault handler can retrieve the immediate (and indices) from ESR_ELx=
+.
 
-kernel test robot noticed the following build errors:
+This feature has been supported at EL1 ("host") since it was introduced by
+b26e484b8bb3 ("arm64: Add CFI error handling"), where cfi_handler() decodes
+ESR_EL1, giving informative panic messages such as
 
-[auto build test ERROR on 1613e604df0cd359cf2a7fbd9be7a0bcfacfabd0]
+  [   21.885179] CFI failure at lkdtm_indirect_call+0x2c/0x44 [lkdtm]
+  (target: lkdtm_increment_int+0x0/0x1c [lkdtm]; expected type: 0x7e0c52a)
+  [   21.886593] Internal error: Oops - CFI: 0 [#1] PREEMPT SMP
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Rob-Herring-Arm/perf-arm-Move-32-bit-PMU-drivers-to-drivers-perf/20240608-043509
-base:   1613e604df0cd359cf2a7fbd9be7a0bcfacfabd0
-patch link:    https://lore.kernel.org/r/20240607-arm-pmu-3-9-icntr-v1-3-c7bd2dceff3b%40kernel.org
-patch subject: [PATCH 3/9] perf: arm_pmu: Remove event index to counter remapping
-config: arm64-allyesconfig (https://download.01.org/0day-ci/archive/20240609/202406090349.DaD1utFD-lkp@intel.com/config)
-compiler: clang version 19.0.0git (https://github.com/llvm/llvm-project d7d2d4f53fc79b4b58e8d8d08151b577c3699d4a)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240609/202406090349.DaD1utFD-lkp@intel.com/reproduce)
+However, it is not supported at EL2 in nVHE (or pKVM), as CONFIG_CFI_CLANG =
+gets
+filtered out at build time, preventing the compiler from injecting the chec=
+ks.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202406090349.DaD1utFD-lkp@intel.com/
+To address this,
 
-All errors (new ones prefixed by >>):
+- [1/8] fixes an existing bug where the ELR_EL2 was getting clobbered on
+  synchronous exceptions, causing the wrong "PC" to be reported by
+  nvhe_hyp_panic_handler() or __hyp_call_panic(). This is particularly limi=
+ting
+  for kCFI, as it would mask the location of the failed type check.
+- [2/8] fixes a minor C/asm ABI mismatch which would trigger a kCFI failure
+- [3/8]-[7/8] prepare nVHE for CONFIG_CFI_CLANG and [8/8] enables it
 
-         |                                           ^~~~~~~~~~
-   drivers/perf/apple_m1_cpu_pmu.c:27:22: note: expanded from macro 'ONLY_2_4_6'
-      27 | #define ONLY_2_4_6                      (BIT(2) | BIT(4) | BIT(6))
-         |                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/perf/apple_m1_cpu_pmu.c:99:32: note: previous initialization is here
-      99 |         [0 ... M1_PMU_PERFCTR_LAST]     = ANY_BUT_0_1,
-         |                                           ^~~~~~~~~~~
-   drivers/perf/apple_m1_cpu_pmu.c:25:23: note: expanded from macro 'ANY_BUT_0_1'
-      25 | #define ANY_BUT_0_1                     GENMASK(9, 2)
-         |                                         ^~~~~~~~~~~~~
-   include/linux/bits.h:35:2: note: expanded from macro 'GENMASK'
-      35 |         (GENMASK_INPUT_CHECK(h, l) + __GENMASK(h, l))
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/perf/apple_m1_cpu_pmu.c:128:32: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
-     128 |         [M1_PMU_PERFCTR_UNKNOWN_f6]     = ONLY_2_4_6,
-         |                                           ^~~~~~~~~~
-   drivers/perf/apple_m1_cpu_pmu.c:27:22: note: expanded from macro 'ONLY_2_4_6'
-      27 | #define ONLY_2_4_6                      (BIT(2) | BIT(4) | BIT(6))
-         |                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/perf/apple_m1_cpu_pmu.c:99:32: note: previous initialization is here
-      99 |         [0 ... M1_PMU_PERFCTR_LAST]     = ANY_BUT_0_1,
-         |                                           ^~~~~~~~~~~
-   drivers/perf/apple_m1_cpu_pmu.c:25:23: note: expanded from macro 'ANY_BUT_0_1'
-      25 | #define ANY_BUT_0_1                     GENMASK(9, 2)
-         |                                         ^~~~~~~~~~~~~
-   include/linux/bits.h:35:2: note: expanded from macro 'GENMASK'
-      35 |         (GENMASK_INPUT_CHECK(h, l) + __GENMASK(h, l))
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/perf/apple_m1_cpu_pmu.c:129:32: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
-     129 |         [M1_PMU_PERFCTR_UNKNOWN_f7]     = ONLY_2_4_6,
-         |                                           ^~~~~~~~~~
-   drivers/perf/apple_m1_cpu_pmu.c:27:22: note: expanded from macro 'ONLY_2_4_6'
-      27 | #define ONLY_2_4_6                      (BIT(2) | BIT(4) | BIT(6))
-         |                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/perf/apple_m1_cpu_pmu.c:99:32: note: previous initialization is here
-      99 |         [0 ... M1_PMU_PERFCTR_LAST]     = ANY_BUT_0_1,
-         |                                           ^~~~~~~~~~~
-   drivers/perf/apple_m1_cpu_pmu.c:25:23: note: expanded from macro 'ANY_BUT_0_1'
-      25 | #define ANY_BUT_0_1                     GENMASK(9, 2)
-         |                                         ^~~~~~~~~~~~~
-   include/linux/bits.h:35:2: note: expanded from macro 'GENMASK'
-      35 |         (GENMASK_INPUT_CHECK(h, l) + __GENMASK(h, l))
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/perf/apple_m1_cpu_pmu.c:130:32: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
-     130 |         [M1_PMU_PERFCTR_UNKNOWN_f8]     = ONLY_2_TO_7,
-         |                                           ^~~~~~~~~~~
-   drivers/perf/apple_m1_cpu_pmu.c:26:23: note: expanded from macro 'ONLY_2_TO_7'
-      26 | #define ONLY_2_TO_7                     GENMASK(7, 2)
-         |                                         ^~~~~~~~~~~~~
-   include/linux/bits.h:35:2: note: expanded from macro 'GENMASK'
-      35 |         (GENMASK_INPUT_CHECK(h, l) + __GENMASK(h, l))
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/perf/apple_m1_cpu_pmu.c:99:32: note: previous initialization is here
-      99 |         [0 ... M1_PMU_PERFCTR_LAST]     = ANY_BUT_0_1,
-         |                                           ^~~~~~~~~~~
-   drivers/perf/apple_m1_cpu_pmu.c:25:23: note: expanded from macro 'ANY_BUT_0_1'
-      25 | #define ANY_BUT_0_1                     GENMASK(9, 2)
-         |                                         ^~~~~~~~~~~~~
-   include/linux/bits.h:35:2: note: expanded from macro 'GENMASK'
-      35 |         (GENMASK_INPUT_CHECK(h, l) + __GENMASK(h, l))
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/perf/apple_m1_cpu_pmu.c:131:32: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
-     131 |         [M1_PMU_PERFCTR_UNKNOWN_fd]     = ONLY_2_4_6,
-         |                                           ^~~~~~~~~~
-   drivers/perf/apple_m1_cpu_pmu.c:27:22: note: expanded from macro 'ONLY_2_4_6'
-      27 | #define ONLY_2_4_6                      (BIT(2) | BIT(4) | BIT(6))
-         |                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/perf/apple_m1_cpu_pmu.c:99:32: note: previous initialization is here
-      99 |         [0 ... M1_PMU_PERFCTR_LAST]     = ANY_BUT_0_1,
-         |                                           ^~~~~~~~~~~
-   drivers/perf/apple_m1_cpu_pmu.c:25:23: note: expanded from macro 'ANY_BUT_0_1'
-      25 | #define ANY_BUT_0_1                     GENMASK(9, 2)
-         |                                         ^~~~~~~~~~~~~
-   include/linux/bits.h:35:2: note: expanded from macro 'GENMASK'
-      35 |         (GENMASK_INPUT_CHECK(h, l) + __GENMASK(h, l))
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/perf/apple_m1_cpu_pmu.c:136:31: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
-     136 |         [PERF_COUNT_HW_CPU_CYCLES]      = M1_PMU_PERFCTR_CPU_CYCLES,
-         |                                           ^~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/perf/apple_m1_cpu_pmu.c:135:2: note: previous initialization is here
-     135 |         PERF_MAP_ALL_UNSUPPORTED,
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmu.h:40:34: note: expanded from macro 'PERF_MAP_ALL_UNSUPPORTED'
-      40 |         [0 ... PERF_COUNT_HW_MAX - 1] = HW_OP_UNSUPPORTED
-         |                                         ^~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmu.h:35:28: note: expanded from macro 'HW_OP_UNSUPPORTED'
-      35 | #define HW_OP_UNSUPPORTED               0xFFFF
-         |                                         ^~~~~~
-   drivers/perf/apple_m1_cpu_pmu.c:137:33: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
-     137 |         [PERF_COUNT_HW_INSTRUCTIONS]    = M1_PMU_PERFCTR_INSTRUCTIONS,
-         |                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/perf/apple_m1_cpu_pmu.c:135:2: note: previous initialization is here
-     135 |         PERF_MAP_ALL_UNSUPPORTED,
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmu.h:40:34: note: expanded from macro 'PERF_MAP_ALL_UNSUPPORTED'
-      40 |         [0 ... PERF_COUNT_HW_MAX - 1] = HW_OP_UNSUPPORTED
-         |                                         ^~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmu.h:35:28: note: expanded from macro 'HW_OP_UNSUPPORTED'
-      35 | #define HW_OP_UNSUPPORTED               0xFFFF
-         |                                         ^~~~~~
->> drivers/perf/apple_m1_cpu_pmu.c:403:31: error: no member named 'num_events' in 'struct arm_pmu'; did you mean 'hw_events'?
-     403 |         for (idx = 0; idx < cpu_pmu->num_events; idx++) {
-         |                                      ^~~~~~~~~~
-         |                                      hw_events
-   include/linux/perf/arm_pmu.h:106:33: note: 'hw_events' declared here
-     106 |         struct pmu_hw_events    __percpu *hw_events;
-         |                                           ^
-   drivers/perf/apple_m1_cpu_pmu.c:563:11: error: no member named 'num_events' in 'struct arm_pmu'; did you mean 'hw_events'?
-     563 |         cpu_pmu->num_events       = M1_PMU_NR_COUNTERS;
-         |                  ^~~~~~~~~~
-         |                  hw_events
-   include/linux/perf/arm_pmu.h:106:33: note: 'hw_events' declared here
-     106 |         struct pmu_hw_events    __percpu *hw_events;
-         |                                           ^
-   39 warnings and 2 errors generated.
+Note that kCFI errors remain fatal at EL2, even when CONFIG_CFI_PERMISSIVE=
+=3Dy.
 
+Changes in v5 (addressed Will's comments on v4):
+  - Dropped the patch making the handlers report the kCFI target & expected=
+ type
+  - Dropped the hypervisor kCFI test module
+  - Dropped the patch introducing handler for EL2h sync exceptions
+  - Dropped the patch renaming __guest_exit_panic
+  - Made invalid_host_el2_vect branch unconditionally to hyp_panic
+  - Changed SP type in __pkvm_init_switch_pgd signature to unsigned long
+  - Changed which registers __pkvm_init_switch_pgd used for intermediates
+  - Fixed typo in commit message about esr_brk_comment()
+  - Fixed mistake in commit message about context of invalid_host_el2_vect
 
-vim +403 drivers/perf/apple_m1_cpu_pmu.c
+Pierre-Cl=C3=A9ment Tosi (8):
+  KVM: arm64: Fix clobbered ELR in sync abort/SError
+  KVM: arm64: Fix __pkvm_init_switch_pgd call ABI
+  KVM: arm64: nVHE: Simplify invalid_host_el2_vect
+  KVM: arm64: nVHE: gen-hyprel: Skip R_AARCH64_ABS32
+  KVM: arm64: VHE: Mark __hyp_call_panic __noreturn
+  arm64: Introduce esr_brk_comment, esr_is_cfi_brk
+  KVM: arm64: Introduce print_nvhe_hyp_panic helper
+  KVM: arm64: nVHE: Support CONFIG_CFI_CLANG at EL2
 
-a639027a1be1d6 Marc Zyngier 2022-02-08  381  
-a639027a1be1d6 Marc Zyngier 2022-02-08  382  static irqreturn_t m1_pmu_handle_irq(struct arm_pmu *cpu_pmu)
-a639027a1be1d6 Marc Zyngier 2022-02-08  383  {
-a639027a1be1d6 Marc Zyngier 2022-02-08  384  	struct pmu_hw_events *cpuc = this_cpu_ptr(cpu_pmu->hw_events);
-a639027a1be1d6 Marc Zyngier 2022-02-08  385  	struct pt_regs *regs;
-a639027a1be1d6 Marc Zyngier 2022-02-08  386  	u64 overflow, state;
-a639027a1be1d6 Marc Zyngier 2022-02-08  387  	int idx;
-a639027a1be1d6 Marc Zyngier 2022-02-08  388  
-a639027a1be1d6 Marc Zyngier 2022-02-08  389  	overflow = read_sysreg_s(SYS_IMP_APL_PMSR_EL1);
-a639027a1be1d6 Marc Zyngier 2022-02-08  390  	if (!overflow) {
-a639027a1be1d6 Marc Zyngier 2022-02-08  391  		/* Spurious interrupt? */
-a639027a1be1d6 Marc Zyngier 2022-02-08  392  		state = read_sysreg_s(SYS_IMP_APL_PMCR0_EL1);
-a639027a1be1d6 Marc Zyngier 2022-02-08  393  		state &= ~PMCR0_IACT;
-a639027a1be1d6 Marc Zyngier 2022-02-08  394  		write_sysreg_s(state, SYS_IMP_APL_PMCR0_EL1);
-a639027a1be1d6 Marc Zyngier 2022-02-08  395  		isb();
-a639027a1be1d6 Marc Zyngier 2022-02-08  396  		return IRQ_NONE;
-a639027a1be1d6 Marc Zyngier 2022-02-08  397  	}
-a639027a1be1d6 Marc Zyngier 2022-02-08  398  
-a639027a1be1d6 Marc Zyngier 2022-02-08  399  	cpu_pmu->stop(cpu_pmu);
-a639027a1be1d6 Marc Zyngier 2022-02-08  400  
-a639027a1be1d6 Marc Zyngier 2022-02-08  401  	regs = get_irq_regs();
-a639027a1be1d6 Marc Zyngier 2022-02-08  402  
-a639027a1be1d6 Marc Zyngier 2022-02-08 @403  	for (idx = 0; idx < cpu_pmu->num_events; idx++) {
-a639027a1be1d6 Marc Zyngier 2022-02-08  404  		struct perf_event *event = cpuc->events[idx];
-a639027a1be1d6 Marc Zyngier 2022-02-08  405  		struct perf_sample_data data;
-a639027a1be1d6 Marc Zyngier 2022-02-08  406  
-a639027a1be1d6 Marc Zyngier 2022-02-08  407  		if (!event)
-a639027a1be1d6 Marc Zyngier 2022-02-08  408  			continue;
-a639027a1be1d6 Marc Zyngier 2022-02-08  409  
-a639027a1be1d6 Marc Zyngier 2022-02-08  410  		armpmu_event_update(event);
-a639027a1be1d6 Marc Zyngier 2022-02-08  411  		perf_sample_data_init(&data, 0, event->hw.last_period);
-a639027a1be1d6 Marc Zyngier 2022-02-08  412  		if (!armpmu_event_set_period(event))
-a639027a1be1d6 Marc Zyngier 2022-02-08  413  			continue;
-a639027a1be1d6 Marc Zyngier 2022-02-08  414  
-a639027a1be1d6 Marc Zyngier 2022-02-08  415  		if (perf_event_overflow(event, &data, regs))
-a639027a1be1d6 Marc Zyngier 2022-02-08  416  			m1_pmu_disable_event(event);
-a639027a1be1d6 Marc Zyngier 2022-02-08  417  	}
-a639027a1be1d6 Marc Zyngier 2022-02-08  418  
-a639027a1be1d6 Marc Zyngier 2022-02-08  419  	cpu_pmu->start(cpu_pmu);
-a639027a1be1d6 Marc Zyngier 2022-02-08  420  
-a639027a1be1d6 Marc Zyngier 2022-02-08  421  	return IRQ_HANDLED;
-a639027a1be1d6 Marc Zyngier 2022-02-08  422  }
-a639027a1be1d6 Marc Zyngier 2022-02-08  423  
+ arch/arm64/include/asm/esr.h            | 11 +++++++++
+ arch/arm64/include/asm/kvm_hyp.h        |  4 ++--
+ arch/arm64/kernel/asm-offsets.c         |  1 +
+ arch/arm64/kernel/debug-monitors.c      |  4 +---
+ arch/arm64/kernel/traps.c               |  8 +++----
+ arch/arm64/kvm/handle_exit.c            | 24 +++++++++++++++-----
+ arch/arm64/kvm/hyp/entry.S              |  8 +++++++
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  5 +++--
+ arch/arm64/kvm/hyp/nvhe/Makefile        |  6 ++---
+ arch/arm64/kvm/hyp/nvhe/gen-hyprel.c    |  6 +++++
+ arch/arm64/kvm/hyp/nvhe/host.S          |  6 -----
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S      | 30 +++++++++++++++----------
+ arch/arm64/kvm/hyp/nvhe/setup.c         |  4 ++--
+ arch/arm64/kvm/hyp/vhe/switch.c         |  3 +--
+ 14 files changed, 78 insertions(+), 42 deletions(-)
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+--=20
+2.45.2.505.gda0bf45e8d-goog
+
