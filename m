@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37FF07E767;
-	Mon, 10 Jun 2024 13:42:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A175136665;
+	Mon, 10 Jun 2024 13:42:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718026948; cv=none; b=K53sj3bP+hBad3VbnD0zavQo+RCI8vmn5eu0MjV0SuXpEwvmfTaCj47zNNZHs5kWk5GQNiuc+fi+U1udURlWYx6ty5P3kF95Bhx5UQyXpDzFaaDrWe3KDYn7rBWp/5CUB2Zo54syltGRj/z5Xq0+aVklBk8fEUwVuAa4LYdWKsg=
+	t=1718026950; cv=none; b=bcSSef/MEONVq4FTp7LEqT3ako/XiuRBBkFpp8DXCstCUp1a77ZBVlKsWF3hEDJ6/nMxJ56LXgVhx/UFKEwz5xIXQy0zjm8jDwhYGdpHh+2FDg90flN1hpuRHqKtRfYik7+fxjsYXh2LcyjGxxwXk/b1C4tw60z2quAekO7jmhI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718026948; c=relaxed/simple;
-	bh=54Ptsmbp6ObfHrpA040MuGlN8qVZzJgfKXDO3oDMwHg=;
+	s=arc-20240116; t=1718026950; c=relaxed/simple;
+	bh=cg3f+qLRqzZnWq6A7OzNru3OJ88gEyjz9P78r775Y/A=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=W0Sdqwt4qCHvqmHBRDkyhNYCxaG8mp5Z0TF4lG/GV7ibrPnG89HQAHeQzJ32y76KE08pE25Z/b2OFXOZ/CJldejAamecTdh7nV4tK2DVWYcBjSGDnaXKyVT/36eCoeRwU9Vzkq9qswIMuDkCkttDyGnbbysFTO/LEFGBQ4/EMmg=
+	 MIME-Version:Content-Type; b=bvhHctLLaaD0pbj84KDYaVM0QQMRkCIUkRxOdUffKtiyf2oSwCWwRGF5QCzclIy7h/wsNxKWvx+lTZsAcqmcMF1s8ZKZAIilQ9+u9/aiAr6W5ZzQGbaVmyFWSjGWNfbG9YwXZuA9vEKYvEogHoeWt3wCl7OP89GZfxI4Ow/PgYI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 293EC1688;
-	Mon, 10 Jun 2024 06:42:50 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6B4F71692;
+	Mon, 10 Jun 2024 06:42:53 -0700 (PDT)
 Received: from e122027.cambridge.arm.com (e122027.cambridge.arm.com [10.1.35.41])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 484AA3F58B;
-	Mon, 10 Jun 2024 06:42:22 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 14B9D3F58B;
+	Mon, 10 Jun 2024 06:42:25 -0700 (PDT)
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -37,9 +37,9 @@ Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
 	linux-coco@lists.linux.dev,
 	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
 	Steven Price <steven.price@arm.com>
-Subject: [PATCH v3 02/43] kvm: arm64: pgtable: Track the number of pages in the entry level
-Date: Mon, 10 Jun 2024 14:41:21 +0100
-Message-Id: <20240610134202.54893-3-steven.price@arm.com>
+Subject: [PATCH v3 03/43] kvm: arm64: Include kvm_emulate.h in kvm/arm_psci.h
+Date: Mon, 10 Jun 2024 14:41:22 +0100
+Message-Id: <20240610134202.54893-4-steven.price@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240610134202.54893-1-steven.price@arm.com>
 References: <20240610134202.54893-1-steven.price@arm.com>
@@ -49,64 +49,40 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-Keep track of the number of pages allocated for the top level PGD,
-rather than computing it everytime (though we need it only twice now).
-This will be used later by Arm CCA KVM changes.
+Fix a potential build error (like below, when asm/kvm_emulate.h gets included after
+the kvm/arm_psci.h) by including the missing header file in kvm/arm_psci.h:
+
+./include/kvm/arm_psci.h: In function ‘kvm_psci_version’:
+./include/kvm/arm_psci.h:29:13: error: implicit declaration of function
+   ‘vcpu_has_feature’; did you mean ‘cpu_have_feature’? [-Werror=implicit-function-declaration]
+   29 |         if (vcpu_has_feature(vcpu, KVM_ARM_VCPU_PSCI_0_2)) {
+	         |             ^~~~~~~~~~~~~~~~
+			       |             cpu_have_feature
 
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
- arch/arm64/include/asm/kvm_pgtable.h | 2 ++
- arch/arm64/kvm/hyp/pgtable.c         | 5 +++--
- 2 files changed, 5 insertions(+), 2 deletions(-)
+ include/kvm/arm_psci.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index 19278dfe7978..0350c08ada7a 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -362,6 +362,7 @@ static inline bool kvm_pgtable_walk_lock_held(void)
-  * struct kvm_pgtable - KVM page-table.
-  * @ia_bits:		Maximum input address size, in bits.
-  * @start_level:	Level at which the page-table walk starts.
-+ * @pgd_pages:		Number of pages in the entry level of the page-table.
-  * @pgd:		Pointer to the first top-level entry of the page-table.
-  * @mm_ops:		Memory management callbacks.
-  * @mmu:		Stage-2 KVM MMU struct. Unused for stage-1 page-tables.
-@@ -372,6 +373,7 @@ static inline bool kvm_pgtable_walk_lock_held(void)
- struct kvm_pgtable {
- 	u32					ia_bits;
- 	s8					start_level;
-+	u8					pgd_pages;
- 	kvm_pteref_t				pgd;
- 	struct kvm_pgtable_mm_ops		*mm_ops;
+diff --git a/include/kvm/arm_psci.h b/include/kvm/arm_psci.h
+index e8fb624013d1..1801c6fd3f10 100644
+--- a/include/kvm/arm_psci.h
++++ b/include/kvm/arm_psci.h
+@@ -10,6 +10,8 @@
+ #include <linux/kvm_host.h>
+ #include <uapi/linux/psci.h>
  
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 9e2bbee77491..fb6675838b65 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -1574,7 +1574,8 @@ int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
- 	u32 sl0 = FIELD_GET(VTCR_EL2_SL0_MASK, vtcr);
- 	s8 start_level = VTCR_EL2_TGRAN_SL0_BASE - sl0;
- 
--	pgd_sz = kvm_pgd_pages(ia_bits, start_level) * PAGE_SIZE;
-+	pgt->pgd_pages = kvm_pgd_pages(ia_bits, start_level);
-+	pgd_sz = pgt->pgd_pages * PAGE_SIZE;
- 	pgt->pgd = (kvm_pteref_t)mm_ops->zalloc_pages_exact(pgd_sz);
- 	if (!pgt->pgd)
- 		return -ENOMEM;
-@@ -1626,7 +1627,7 @@ void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt)
- 	};
- 
- 	WARN_ON(kvm_pgtable_walk(pgt, 0, BIT(pgt->ia_bits), &walker));
--	pgd_sz = kvm_pgd_pages(pgt->ia_bits, pgt->start_level) * PAGE_SIZE;
-+	pgd_sz = pgt->pgd_pages * PAGE_SIZE;
- 	pgt->mm_ops->free_pages_exact(kvm_dereference_pteref(&walker, pgt->pgd), pgd_sz);
- 	pgt->pgd = NULL;
- }
++#include <asm/kvm_emulate.h>
++
+ #define KVM_ARM_PSCI_0_1	PSCI_VERSION(0, 1)
+ #define KVM_ARM_PSCI_0_2	PSCI_VERSION(0, 2)
+ #define KVM_ARM_PSCI_1_0	PSCI_VERSION(1, 0)
 -- 
 2.34.1
 
