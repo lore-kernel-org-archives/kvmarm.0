@@ -1,44 +1,47 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6144278289;
-	Mon, 10 Jun 2024 10:34:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D63AB7E56C
+	for <kvmarm@lists.linux.dev>; Mon, 10 Jun 2024 10:44:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718015658; cv=none; b=YlDBc7IqFCRIYj7c6H+3ShpY0tH8qMka69a03p7REK89msl8ZWcY9XY8AqnaWB03g2CBLlZzWw7bvN1/1g3+klscoYx13Q0Pxa15OwEKMfRQEvS93MGY0EhEQTf42Pg9aGYySNUo9iY2BmkXxwX3OhV63MP0zSYv8xw/G5XeqYU=
+	t=1718016293; cv=none; b=PdCkU1xxKPaH513ErZbCo3MkeSWHQ3wsztxana8gqckRDk7c0te4I6pCJvRWFO67b//liVrK0DqPzxoPcWF0Wpm90yVBrcJvC/pMPdv7AbrwEU7ZqcJPunMM/foD/A7Q+wPNb5j1jRrzbLheP5ZVtmPfhJ6mgWRH9OzXgvQGyK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718015658; c=relaxed/simple;
-	bh=XtWJks2i9IAdE5AHADeeOUmGvpns41q5F8q5JRssxmY=;
+	s=arc-20240116; t=1718016293; c=relaxed/simple;
+	bh=prO2aeYPINExUzVSsDQDEg/EB4ix6UGhkuKRV83YxsA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=daGmnfa7lEr2p1A4q6XQjdJvdn+44Oi3hr/dqBys5/9btDGquJZMUTOPa3ChNxJXTqBon+oldyaWcCM/wvqpPZsW5lLj2VY6/JRofsJLJmocN4WYrNY19MN2CiwRA4quvOiE5FGdeVlcm3MC7rV/gevuMTjUVwxz1nI2GF49Ba4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92C0DC4AF1A;
-	Mon, 10 Jun 2024 10:34:14 +0000 (UTC)
-Date: Mon, 10 Jun 2024 11:34:12 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Michael Kelley <mhklinux@outlook.com>
-Cc: Steven Price <steven.price@arm.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=OFpk8uUCesH8uKryZxTmDj2XHlfEPCakFG13whZ8z4r8xFHRec3Ahxw0A3VaGJJnuYcwsDtD9+27hNgqeN5zb+eXF4qsAtGyUtfc8Ng7vqHtSQarU547WkMIPdK2q/9g5ll1RINo3biiL+QDNjpgz0EW2l4TiTBpsG/xe8CclwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B17B112FC;
+	Mon, 10 Jun 2024 03:45:14 -0700 (PDT)
+Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D641F3F73B;
+	Mon, 10 Jun 2024 03:44:46 -0700 (PDT)
+Date: Mon, 10 Jun 2024 11:44:43 +0100
+From: Mark Rutland <mark.rutland@arm.com>
+To: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: Russell King <linux@armlinux.org.uk>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: Re: [PATCH v3 00/14] arm64: Support for running as a guest in Arm CCA
-Message-ID: <ZmbWpNOc7MiJEjqL@arm.com>
-References: <20240605093006.145492-1-steven.price@arm.com>
- <SN6PR02MB415739D48B10C26D2673F3FED4FB2@SN6PR02MB4157.namprd02.prod.outlook.com>
- <ZmMjam3-L807AFR-@arm.com>
- <SN6PR02MB41571B5C2C9C59B0DF5F4E7ED4FB2@SN6PR02MB4157.namprd02.prod.outlook.com>
+	Catalin Marinas <catalin.marinas@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-perf-users@vger.kernel.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH 3/9] perf: arm_pmu: Remove event index to counter
+ remapping
+Message-ID: <ZmbZG-eaqE4NPcE3@J2N7QTR9R3>
+References: <20240607-arm-pmu-3-9-icntr-v1-0-c7bd2dceff3b@kernel.org>
+ <20240607-arm-pmu-3-9-icntr-v1-3-c7bd2dceff3b@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,83 +50,188 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <SN6PR02MB41571B5C2C9C59B0DF5F4E7ED4FB2@SN6PR02MB4157.namprd02.prod.outlook.com>
+In-Reply-To: <20240607-arm-pmu-3-9-icntr-v1-3-c7bd2dceff3b@kernel.org>
 
-On Fri, Jun 07, 2024 at 04:36:18PM +0000, Michael Kelley wrote:
-> From: Catalin Marinas <catalin.marinas@arm.com> Sent: Friday, June 7, 2024 8:13 AM
-> > On Fri, Jun 07, 2024 at 01:38:15AM +0000, Michael Kelley wrote:
-> > > In the case of a vmalloc() address, load_unaligned_zeropad() could still
-> > > make an access to the underlying pages through the linear address. In
-> > > CoCo guests on x86, both the vmalloc PTE and the linear map PTE are
-> > > flipped, so the load_unaligned_zeropad() problem can occur only during
-> > > the transition between decrypted and encrypted. But even then, the
-> > > exception handlers have code to fixup this case and allow everything to
-> > > proceed normally.
-> > >
-> > > I haven't looked at the code in your patches, but do you handle that case,
-> > > or somehow prevent it?
-> > 
-> > If we can guarantee that only full a vm_struct area is changed at a
-> > time, the vmap guard page would prevent this issue (not sure we can
-> > though). Otherwise I think we either change the set_memory_*() code to
-> > deal with the other mappings or we handle the exception.
+On Fri, Jun 07, 2024 at 02:31:28PM -0600, Rob Herring (Arm) wrote:
+> Xscale and Armv6 PMUs defined the cycle counter at 0 and event counters
+> starting at 1 and had 1:1 event index to counter numbering. On Armv7 and
+> later, this changed the cycle counter to 31 and event counters start at
+> 0. The drivers for Armv7 and PMUv3 kept the old event index numbering
+> and introduced an event index to counter conversion. The conversion uses
+> masking to convert from event index to a counter number. This operation
+> relies on having at most 32 counters so that the cycle counter index 0
+> can be transformed to counter number 31.
 > 
-> I don't think the vmap guard pages help. The vmalloc() memory consists
-> of individual pages that are scattered throughout the direct map. The stray
-> reference from load_unaligned_zeropad() will originate in a kmalloc'ed
-> memory page that precedes one of these scattered individual pages, and
-> will use a direct map kernel vaddr.  So the guard page in vmalloc space don't
-> come into play. At least in the Hyper-V use case, an entire vmalloc allocation
-> *is* flipped as a unit, so the guard pages do prevent a stray reference from
-> load_unaligned_zeropad() that originates in vmalloc space. At one
-> point I looked to see if load_unaligned_zeropad() is ever used on vmalloc
-> addresses.  I think the answer was "no",  making the guard page question
-> moot, but I'm not sure. :-(
-
-My point was about load_unaligned_zeropad() originating in the vmalloc
-space. What I had in mind is changing the underlying linear map via
-set_memory_*() while we have live vmalloc() mappings. But I forgot about
-the case you mentioned in a previous thread: set_memory_*() being called
-on vmalloc()'ed memory directly:
-
-https://lore.kernel.org/r/SN6PR02MB41578D7BFEDE33BD2E8246EFD4E92@SN6PR02MB4157.namprd02.prod.outlook.com/
-
-I wonder whether something like __GFP_DECRYPTED could be used to get
-shared memory from the allocation time and avoid having to change the
-vmalloc() ranges. This way functions like netvsc_init_buf() would get
-decrypted memory from the start and vmbus_establish_gpadl() would not
-need to call set_memory_decrypted() on a vmalloc() address.
-
-> Another thought: The use of load_unaligned_zeropad() is conditional on
-> CONFIG_DCACHE_WORD_ACCESS. There are #ifdef'ed alternate
-> implementations that don't use load_unaligned_zeropad() if it is not
-> enabled. I looked at just disabling it in CoCo VMs, but I don't know the
-> performance impact. I speculated that the benefits were more noticeable
-> in processors from a decade or more ago, and perhaps less so now, but
-> never did any measurements. There was also a snag in that x86-only
-> code has a usage of load_unaligned_zeropad() without an alternate
-> implementation, so I never went fully down that path. But arm64 would
-> probably "just work" if it were disabled.
-
-We shouldn't penalise the performance, especially as I expect a single
-image to run both as a guest or a host. However, I think now the linear
-map is handled correctly since we make the PTE invalid before making the
-page shared and this would force the fault path through the one that
-safely handles load_unaligned_zeropad(). Steven's patches also currently
-reject non-linear-map addresses, I guess this would be a separate
-addition.
-
-> > We also have potential user mappings, do we need to do anything about
-> > them?
+> Armv9.4 adds support for an additional fixed function counter
+> (instructions) which increases possible counters to more than 32, and
+> the conversion won't work anymore as a simple subtract and mask. The
+> primary reason for the translation (other than history) seems to be to
+> have a contiguous mask of counters 0-N. Keeping that would result in
+> more complicated index to counter conversions. Instead, store a mask of
+> available counters rather than just number of events. That provides more
+> information in addition to the number of events.
 > 
-> I'm unclear on the scenario here.  Would memory with a user mapping
-> ever be flipped between decrypted and encrypted while the user mapping
-> existed? 
+> No (intended) functional changes.
+> 
+> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+> ---
+>  arch/arm64/kvm/pmu-emul.c     |  6 ++--
+>  drivers/perf/arm_pmu.c        | 11 ++++---
+>  drivers/perf/arm_pmuv3.c      | 57 ++++++++++----------------------
+>  drivers/perf/arm_v6_pmu.c     |  6 ++--
+>  drivers/perf/arm_v7_pmu.c     | 77 ++++++++++++++++---------------------------
+>  drivers/perf/arm_xscale_pmu.c | 12 ++++---
+>  include/linux/perf/arm_pmu.h  |  2 +-
+>  7 files changed, 69 insertions(+), 102 deletions(-)
 
-Maybe it doesn't matter. Do we expect it the underlying pages to be
-flipped while live mappings other than the linear map exist? I assume
-not, one would first allocate and configure the memory in the kernel
-before some remap_pfn_range() to user with the appropriate pgprot.
+This looks like a nice cleanup!
 
--- 
-Catalin
+As the test robot reports, it looks like this missed
+drivers/perf/apple_m1_cpu_pmu.c, but IIUC that's simple enough to fix
+up.
+
+Otherwise, I have a few minor comments below, 
+
+> diff --git a/drivers/perf/arm_pmuv3.c b/drivers/perf/arm_pmuv3.c
+> index 23fa6c5da82c..80202346fc7a 100644
+> --- a/drivers/perf/arm_pmuv3.c
+> +++ b/drivers/perf/arm_pmuv3.c
+> @@ -451,9 +451,7 @@ static const struct attribute_group armv8_pmuv3_caps_attr_group = {
+>  /*
+>   * Perf Events' indices
+>   */
+> -#define	ARMV8_IDX_CYCLE_COUNTER	0
+> -#define	ARMV8_IDX_COUNTER0	1
+> -#define	ARMV8_IDX_CYCLE_COUNTER_USER	32
+> +#define	ARMV8_IDX_CYCLE_COUNTER	31
+
+I was going to ask whether this affected the ABI, but I see from below
+that armv8pmu_user_event_idx() will now always offset the counter by
+one rather than special-casing the cycle counter, and this gives us the
+same behavior as before.
+
+[...]
+
+> @@ -783,7 +767,7 @@ static void armv8pmu_enable_user_access(struct arm_pmu *cpu_pmu)
+>  	struct pmu_hw_events *cpuc = this_cpu_ptr(cpu_pmu->hw_events);
+>  
+>  	/* Clear any unused counters to avoid leaking their contents */
+> -	for_each_clear_bit(i, cpuc->used_mask, cpu_pmu->num_events) {
+> +	for_each_clear_bit(i, cpuc->used_mask, ARMPMU_MAX_HWEVENTS) {
+>  		if (i == ARMV8_IDX_CYCLE_COUNTER)
+>  			write_pmccntr(0);
+>  		else
+
+IIUC this will now hit all unimplemented counters; e.g. for N counters the body
+will run for counters N..31, and the else case has:
+
+	armv8pmu_write_evcntr(i, 0);
+
+... where the resulting write to PMEVCNTR<n>_EL0 for unimplemented
+counters is CONSTRAINED UNPREDICTABLE and might be UNDEFINED.
+
+We can fix that with for_each_andnot_bit(), e.g.
+
+	for_each_andnot_bit(i, cpu_pmu->cntr_mask, cpuc->used_mask,
+			    ARMPMU_MAX_HWEVENTS) {
+		if (i == ARMV8_IDX_CYCLE_COUNTER)
+			write_pmccntr(0);
+		else
+			 armv8pmu_write_evcntr(i, 0);
+	}
+
+[...]
+
+> @@ -905,7 +889,7 @@ static int armv8pmu_get_single_idx(struct pmu_hw_events *cpuc,
+>  {
+>  	int idx;
+>  
+> -	for (idx = ARMV8_IDX_COUNTER0; idx < cpu_pmu->num_events; idx++) {
+> +	for_each_set_bit(idx, cpu_pmu->cntr_mask, 31) {
+>  		if (!test_and_set_bit(idx, cpuc->used_mask))
+>  			return idx;
+>  	}
+> @@ -921,7 +905,9 @@ static int armv8pmu_get_chain_idx(struct pmu_hw_events *cpuc,
+>  	 * Chaining requires two consecutive event counters, where
+>  	 * the lower idx must be even.
+>  	 */
+> -	for (idx = ARMV8_IDX_COUNTER0 + 1; idx < cpu_pmu->num_events; idx += 2) {
+> +	for_each_set_bit(idx, cpu_pmu->cntr_mask, 31) {
+> +		if (!(idx & 0x1))
+> +			continue;
+>  		if (!test_and_set_bit(idx, cpuc->used_mask)) {
+>  			/* Check if the preceding even counter is available */
+>  			if (!test_and_set_bit(idx - 1, cpuc->used_mask))
+
+It would be nice to replace those instances of '31' with something
+indicating that this was only covering the generic/programmable
+counters, but I wasn't able to come up with a nice mnemonic for that.
+The best I could think of was:
+
+#define ARMV8_MAX_NR_GENERIC_COUNTERS 31
+
+Maybe it makes sense to define that along with ARMV8_IDX_CYCLE_COUNTER.
+
+> @@ -974,15 +960,7 @@ static int armv8pmu_user_event_idx(struct perf_event *event)
+>  	if (!sysctl_perf_user_access || !armv8pmu_event_has_user_read(event))
+>  		return 0;
+>  
+> -	/*
+> -	 * We remap the cycle counter index to 32 to
+> -	 * match the offset applied to the rest of
+> -	 * the counter indices.
+> -	 */
+> -	if (event->hw.idx == ARMV8_IDX_CYCLE_COUNTER)
+> -		return ARMV8_IDX_CYCLE_COUNTER_USER;
+> -
+> -	return event->hw.idx;
+> +	return event->hw.idx + 1;
+>  }
+
+[...]
+
+>  static void armv7_read_num_pmnc_events(void *info)
+>  {
+> -	int *nb_cnt = info;
+> +	int nb_cnt;
+> +	struct arm_pmu *cpu_pmu = info;
+>  
+>  	/* Read the nb of CNTx counters supported from PMNC */
+> -	*nb_cnt = (armv7_pmnc_read() >> ARMV7_PMNC_N_SHIFT) & ARMV7_PMNC_N_MASK;
+> +	nb_cnt = (armv7_pmnc_read() >> ARMV7_PMNC_N_SHIFT) & ARMV7_PMNC_N_MASK;
+> +	bitmap_set(cpu_pmu->cntr_mask, 0, nb_cnt);
+>  
+>  	/* Add the CPU cycles counter */
+> -	*nb_cnt += 1;
+> +	bitmap_set(cpu_pmu->cntr_mask, ARMV7_IDX_CYCLE_COUNTER, 1);
+
+This can be:
+
+	set_bit(cpu_pmu->cntr_mask, ARMV7_IDX_CYCLE_COUNTER);
+
+... and likewise for the PMUv3 version.
+
+[...]
+
+> diff --git a/drivers/perf/arm_xscale_pmu.c b/drivers/perf/arm_xscale_pmu.c
+> index 3d8b72d6b37f..e075df521350 100644
+> --- a/drivers/perf/arm_xscale_pmu.c
+> +++ b/drivers/perf/arm_xscale_pmu.c
+> @@ -52,6 +52,8 @@ enum xscale_counters {
+>  	XSCALE_COUNTER1,
+>  	XSCALE_COUNTER2,
+>  	XSCALE_COUNTER3,
+> +	XSCALE2_NUM_COUNTERS,
+> +	XSCALE_NUM_COUNTERS = 3,
+>  };
+
+Minor nit, but for consistency with other xscale1-only definitions, it'd
+be good to s/XSCALE_NUM_COUNTERS/XSCALE1_NUM_COUNTERS/.
+
+While it'd be different fro mthe other PMU drivers, I reckon it's
+clearer to pull those out as:
+
+#define XSCALE1_NUM_COUNTERS	3
+#define XSCALE2_NUM_COUNTERS	5
+
+Mark.
