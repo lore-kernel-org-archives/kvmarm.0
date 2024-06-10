@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAAC4152DF1;
-	Mon, 10 Jun 2024 13:43:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECC8E153835;
+	Mon, 10 Jun 2024 13:43:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718027013; cv=none; b=EaTzP3UUpNg2jJSq/e/SIVl9rMGmIzk0u/6DVhN7+95pyAzzZ7NO12so6knaptuRwCpw1K3OEMc2fT9/feyGMdx+BHY1Jv+xesqcbqEK5B58Be1NXf6iu7FMbqWdKUGzRPbmkiGDHBgQ4ZamPVUDqK8oD0tjaMqyU7LmNBJRDdQ=
+	t=1718027015; cv=none; b=DYf5/nlw3Ifp16KBnJ+mubaOVTu8uDEMehVMUC5OM9Mmt2pZVtcsjarZBRpGq46E3cZ4Z/GokdQPB66Y9uBO3xUZNm/N7pnKlsDSoqI4V0rp4pw1DSWniz7uOuTYoheqY4X7b5XBlJRj81AbS6TaK0+9nNx27l5wU4C1UwPne+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718027013; c=relaxed/simple;
-	bh=QUl/u0z1+bUgdg7xqFp5aPUhen946YdMdodFhv62kWU=;
+	s=arc-20240116; t=1718027015; c=relaxed/simple;
+	bh=OGx8Cke7tt68Si9FtMTPxKU/niIKsrlKdQBvV4LRVzE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=puDF1NiIWjLs4alo5d5vwViwY/6f00dSrA2Kq+KykEI/LoFW3xw5tbdYZAzgJ0uR6322GodcehsVdxc23rJ9B7TNgmd4KkJgFq8YZqmxAgX7I1RcueVTALZF5Hk517YNSYQsKOwiG7fBLXkEBD6Ep/UaWGyz4OQqqejAKECpeN0=
+	 MIME-Version; b=QRwDqThDb3nunOwU164a0cftJjVhK4KFLSSdkIf2SybiZy6KXsGjfpzTWZxu63BD9NhLehkOeu/qNdSLAHhoyCPgLduE8ufw9xn9Vtiznv3LYqvIhXyXWpAbkGvVtbWgr6araB1+vq9Z/PH43kyjrjK7Hkk/1+IllytpLPIfqy0=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EFD5D1692;
-	Mon, 10 Jun 2024 06:43:54 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 265991688;
+	Mon, 10 Jun 2024 06:43:58 -0700 (PDT)
 Received: from e122027.cambridge.arm.com (e122027.cambridge.arm.com [10.1.35.41])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C7BD53F58B;
-	Mon, 10 Jun 2024 06:43:27 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DCDD33F58B;
+	Mon, 10 Jun 2024 06:43:30 -0700 (PDT)
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -37,9 +37,9 @@ Cc: Steven Price <steven.price@arm.com>,
 	Fuad Tabba <tabba@google.com>,
 	linux-coco@lists.linux.dev,
 	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: [PATCH v3 22/43] KVM: arm64: Handle realm VCPU load
-Date: Mon, 10 Jun 2024 14:41:41 +0100
-Message-Id: <20240610134202.54893-23-steven.price@arm.com>
+Subject: [PATCH v3 23/43] KVM: arm64: Validate register access for a Realm VM
+Date: Mon, 10 Jun 2024 14:41:42 +0100
+Message-Id: <20240610134202.54893-24-steven.price@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240610134202.54893-1-steven.price@arm.com>
 References: <20240610134202.54893-1-steven.price@arm.com>
@@ -51,46 +51,58 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When loading a realm VCPU much of the work is handled by the RMM so only
-some of the actions are required. Rearrange kvm_arch_vcpu_load()
-slightly so we can bail out early for a realm guest.
+The RMM only allows setting the lower GPRS (x0-x7) and PC for a realm
+guest. Check this in kvm_arm_set_reg() so that the VMM can receive a
+suitable error return if other registers are accessed.
 
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
- arch/arm64/kvm/arm.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+ arch/arm64/kvm/guest.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 0b51ea30d679..aa57aa8cab4e 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -630,10 +630,6 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index e2f762d959bb..a035689dc39b 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -782,12 +782,38 @@ int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ 	return kvm_arm_sys_reg_get_reg(vcpu, reg);
+ }
  
- 	kvm_vgic_load(vcpu);
- 	kvm_timer_vcpu_load(vcpu);
--	if (has_vhe())
--		kvm_vcpu_load_vhe(vcpu);
--	kvm_arch_vcpu_load_fp(vcpu);
--	kvm_vcpu_pmu_restore_guest(vcpu);
- 	if (kvm_arm_is_pvtime_enabled(&vcpu->arch))
- 		kvm_make_request(KVM_REQ_RECORD_STEAL, vcpu);
- 
-@@ -644,6 +640,15 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 
- 	vcpu_set_pauth_traps(vcpu);
- 
-+	/* No additional state needs to be loaded on Realmed VMs */
-+	if (vcpu_is_rec(vcpu))
-+		return;
++/*
++ * The RMI ABI only enables setting the lower GPRs (x0-x7) and PC.
++ * All other registers are reset to architectural or otherwise defined reset
++ * values by the RMM, except for a few configuration fields that correspond to
++ * Realm parameters.
++ */
++static bool validate_realm_set_reg(struct kvm_vcpu *vcpu,
++				   const struct kvm_one_reg *reg)
++{
++	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_CORE) {
++		u64 off = core_reg_offset_from_id(reg->id);
 +
-+	if (has_vhe())
-+		kvm_vcpu_load_vhe(vcpu);
-+	kvm_arch_vcpu_load_fp(vcpu);
-+	kvm_vcpu_pmu_restore_guest(vcpu);
++		switch (off) {
++		case KVM_REG_ARM_CORE_REG(regs.regs[0]) ...
++		     KVM_REG_ARM_CORE_REG(regs.regs[7]):
++		case KVM_REG_ARM_CORE_REG(regs.pc):
++			return true;
++		}
++	}
 +
- 	kvm_arch_vcpu_load_debug_state_flags(vcpu);
++	return false;
++}
++
+ int kvm_arm_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ {
+ 	/* We currently use nothing arch-specific in upper 32 bits */
+ 	if ((reg->id & ~KVM_REG_SIZE_MASK) >> 32 != KVM_REG_ARM64 >> 32)
+ 		return -EINVAL;
  
- 	if (!cpumask_test_cpu(cpu, vcpu->kvm->arch.supported_cpus))
++	if (kvm_is_realm(vcpu->kvm) && !validate_realm_set_reg(vcpu, reg))
++		return -EINVAL;
++
+ 	switch (reg->id & KVM_REG_ARM_COPROC_MASK) {
+ 	case KVM_REG_ARM_CORE:	return set_core_reg(vcpu, reg);
+ 	case KVM_REG_ARM_FW:
 -- 
 2.34.1
 
