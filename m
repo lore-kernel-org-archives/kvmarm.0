@@ -1,149 +1,103 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 923023D388
-	for <kvmarm@lists.linux.dev>; Tue, 11 Jun 2024 17:53:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69E81770FB;
+	Tue, 11 Jun 2024 18:48:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718128408; cv=none; b=oY9mztGlWHXyr3h5Ro4PReSQxB1IHi8zAmfUeeYk/96qbSffnSLgxM9GrMWk5T2W6qLLloi2HE0jc3GGLJl4UlyVRrnWtiEtZ+p3reHaT2xhyQ6dmuKIk/iV+R3qGWbIoFNwuVlyK+vL4lWwBAafcEVUllx0sqmkh2R1M1WDOj4=
+	t=1718131725; cv=none; b=tebZ9OnKMWyk1JhTbZXAUVNIz1i/sdnnbhvNS4Y3tX75FCxy1japaO4uF5TnCZ+7tbxyf5dE4n4RO1AoAVqK+KLIpozv6y/F95adYLfWMpZjesRE+Vk/a6MqdJBTdR7JRJ4CIzqGBYN7ZaMkAVtKIlGEYfj6pGvH+1N29UrmJmk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718128408; c=relaxed/simple;
-	bh=dmI95Cul7108EcOi02xjBpwOW8/tKDjJJw9BB7Ft/qo=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=N3A7DgfuuNzpD7pVAubKCLjzDKKxbSZjVfy0BbfIzTITfuZLSktBJe3Nm1elTeT0RuCSdzrE6G5rW1E4PjbwKHrD0LIWEIeQdFxGkKPGaEmgye6aL9azXztlU4NfEAOu35oDsbdwSAM2hyHQfZteHiFPtfATBS+sXSbIPQMOESo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XMyKwQyU; arc=none smtp.client-ip=209.85.128.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
+	s=arc-20240116; t=1718131725; c=relaxed/simple;
+	bh=hRWx5SJxiiKahzoFPUFc8ibQil2+PBpFZC4cpktnZIU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Xji9ZmKRVeGvKTjxMfwz9jpxXBvLNweSTKPwnwA2Z4vbCXgPCLq+9/s8+wnGs8kzPv/0Me2aK6Szeoc+BoV8TDy7QKIYNGa3Wl+AmVnnEi/2aXebZrSp3/01NIs1mXIDfFn/CcmdI9VZ8OAcjQ/t2bCFjG+Pb6HKaZYDAqlNAUY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BTRFtU9P; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XMyKwQyU"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-4212e2a3a1bso44878535e9.3
-        for <kvmarm@lists.linux.dev>; Tue, 11 Jun 2024 10:53:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718128405; x=1718733205; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=jNNUQKkDrCnecnYCTT00rCZOmSlFkAs3089jG7rC2ac=;
-        b=XMyKwQyU4znIH7wMbW8r61UpbpUVRaSjLYO6idX0mZdXL/jRlLYSm23+cZAKyqdpHp
-         5bRTIbkT5C7vuWG/vaps5G+ImkwvHHWC8EMJ2YiWNWQtYnrbpzbpV6eapczlWkgqYfx5
-         Yl76qbrOm4JYBi9JPsSPqK518S1s0ApwYrmxCghAa7h7gRaGEczLnNskaD2iuVueS+BP
-         Zq0CWUJCugitDIaMGnh7qaqeHqxOEYVsNNcIGr4xEs6VIeW2JrjWm+t94IOamspmf9zj
-         +B258IBC2nNjDMRbVV6VVB9VzY3CfSWzvgjwSc5Tk0FFdgcpHiveYVI4VNBqVr8EIG9M
-         nigQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718128405; x=1718733205;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jNNUQKkDrCnecnYCTT00rCZOmSlFkAs3089jG7rC2ac=;
-        b=L79ce2jRyC6g9WeNs4V0CzhpN0rMeHjHljZZ2hZ8KWTrXD2ZB6HMesARUBc4zwntfM
-         8xwSSq2yytSHLbUZvDfeY11HT5xiuUv0qR0ivnoXcWNEzNztSA6EylXUC/zsb//Z/poP
-         YU+woqzPwTmUzp4ulvlMa3JQZUGOpeTtxGD6gjvcm9iZsbedYjs1AJ6NmFzoXJ8mvu6d
-         pO9bmfxlbsDhMUZ1G3gph0UqvHmBGGCYTteUeL6Z9fYQlXGJAbCH2eRf4A90H+HJPUiT
-         0YvxoxxzahXNCSFhhhfAButiXOIxYXZlXXw43pJX9bpSfFwX7/oM/Td3btOBO1EOmYMN
-         qbhA==
-X-Forwarded-Encrypted: i=1; AJvYcCVwzP1bGB24+dzbq8UgsrDNX6UjHLEj+4BejHXC6iBdhoVcCvQuV5veCB/s3JZoYoO4mFi6EvFWiEvTooWEeVbeRrCS/SW3
-X-Gm-Message-State: AOJu0YyoxIBTTD13NGWPHVlHRn1OOcKtR+yU3gVMOq9NlxB06HVoGsQ0
-	cM33UqL+8yKBuj1wX/CA/0iKXNSNXd0+NgnsqcNGAJGMbtiOsUxqk58yWFKWsqbsJUR3wbUcvcm
-	qr1jMnvgMFzLbl81PNg==
-X-Google-Smtp-Source: AGHT+IEdZAfoZ4LDqjGnbpGpQjreFI4VULQxzKYqfTIseY0dz3/8fUXV0eI6QWfpdii1eUzbGB8RM1wSDTdOnXqx
-X-Received: from vdonnefort.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:2eea])
- (user=vdonnefort job=sendgmr) by 2002:a05:600c:1c10:b0:41f:cec2:f853 with
- SMTP id 5b1f17b1804b1-42164a3bdeamr2236685e9.7.1718128404863; Tue, 11 Jun
- 2024 10:53:24 -0700 (PDT)
-Date: Tue, 11 Jun 2024 18:53:17 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BTRFtU9P"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C9E0C2BD10;
+	Tue, 11 Jun 2024 18:48:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718131725;
+	bh=hRWx5SJxiiKahzoFPUFc8ibQil2+PBpFZC4cpktnZIU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=BTRFtU9PIhQyd10OtLBhzOx4BPSdODDJDbIsD4Cp1tb3nXjJqsWSNHEgGdxmXyj1j
+	 7Jc35Z2mndSVXhU60ngwGkTVyis2rfSNPGdRAhvg9skH4LKhmp63gf6UKD8ca71vmP
+	 3qnN5OHUxJSLmTt21aHxscMW/E4zjo4uUVN+PTDvKGu/cIRgMcnfx8rLvzJkR9Fhil
+	 fTAqCIs8tNuH1/kSeGjH7bccBOXUQhcBGcAzQ9zgLrg9MEHkcc7Tv+jA6ZLjGnnnqO
+	 5vsg3gMfanj0HnYTdnzMRBAyWA4tvZM/+OP5hjrGV7vZ/EtCgvGw9n0kE+ERNBKHql
+	 6eYu/EYYhzt0w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sH6Xy-002rzJ-Nv;
+	Tue, 11 Jun 2024 19:48:42 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Alexander Potapenko <glider@google.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Sudeep Holla <sudeep.holla@arm.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org
+Subject: [GIT PULL] KVM/arm64 fixes for 6.10, take #2
+Date: Tue, 11 Jun 2024 19:48:39 +0100
+Message-Id: <20240611184839.2382457-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.45.2.627.g7a2c4fd464-goog
-Message-ID: <20240611175317.1220842-1-vdonnefort@google.com>
-Subject: [PATCH v2] KVM: arm64: FFA: Release hyp rx buffer
-From: Vincent Donnefort <vdonnefort@google.com>
-To: maz@kernel.org, oliver.upton@linux.dev, sudeep.holla@arm.com
-Cc: sebastianene@google.com, will@kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kernel-team@android.com, Vincent Donnefort <vdonnefort@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, glider@google.com, oliver.upton@linux.dev, sudeep.holla@arm.com, vdonnefort@google.com, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-According to the FF-A spec (Buffer states and ownership), after a
-producer has written into a buffer, it is "full" and now owned by the
-consumer. The producer won't be able to use that buffer, until the
-consumer hands it over with an invocation such as RX_RELEASE.
+Paolo,
 
-It is clear in the following paragraph (Transfer of buffer ownership),
-that MEM_RETRIEVE_RESP is transferring the ownership from producer (in
-our case SPM) to consumer (hypervisor). RX_RELEASE is therefore
-mandatory here.
+Here's a smaller set of fixes for 6.10. One vgic fix adressing a UAF,
+and a correctness fix for the pKVM FFA proxy.
 
-It is less clear though what is happening with MEM_FRAG_TX. But this
-invocation, as a response to MEM_FRAG_RX writes into the same hypervisor
-RX buffer (see paragraph "Transmission of transaction descriptor in
-fragments"). Also this is matching the TF-A implementation where the RX
-buffer is marked "full" during a MEM_FRAG_RX.
+Please pull,
 
-Release the RX hypervisor buffer in those two cases. This will unblock
-later invocations using this buffer which would otherwise fail.
-(RETRIEVE_REQ, MEM_FRAG_RX and PARTITION_INFO_GET).
+        M.
 
-Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
-Reviewed-by: Sudeep Holla <sudeep.holla@arm.com>
+The following changes since commit afb91f5f8ad7af172d993a34fde1947892408f53:
 
----
+  KVM: arm64: Ensure that SME controls are disabled in protected mode (2024-06-04 15:06:33 +0100)
 
-v1 -> v2: 
-  * Use FF-A paragraph names instead of numbers
-  * Reword commit 
-  * Collect Reviewed-by 
+are available in the Git repository at:
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-index 02746f9d0980..efb053af331c 100644
---- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-+++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-@@ -177,6 +177,14 @@ static void ffa_retrieve_req(struct arm_smccc_res *res, u32 len)
- 			  res);
- }
- 
-+static void ffa_rx_release(struct arm_smccc_res *res)
-+{
-+	arm_smccc_1_1_smc(FFA_RX_RELEASE,
-+			  0, 0,
-+			  0, 0, 0, 0, 0,
-+			  res);
-+}
-+
- static void do_ffa_rxtx_map(struct arm_smccc_res *res,
- 			    struct kvm_cpu_context *ctxt)
- {
-@@ -543,16 +551,19 @@ static void do_ffa_mem_reclaim(struct arm_smccc_res *res,
- 	if (WARN_ON(offset > len ||
- 		    fraglen > KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE)) {
- 		ret = FFA_RET_ABORTED;
-+		ffa_rx_release(res);
- 		goto out_unlock;
- 	}
- 
- 	if (len > ffa_desc_buf.len) {
- 		ret = FFA_RET_NO_MEMORY;
-+		ffa_rx_release(res);
- 		goto out_unlock;
- 	}
- 
- 	buf = ffa_desc_buf.buf;
- 	memcpy(buf, hyp_buffers.rx, fraglen);
-+	ffa_rx_release(res);
- 
- 	for (fragoff = fraglen; fragoff < len; fragoff += fraglen) {
- 		ffa_mem_frag_rx(res, handle_lo, handle_hi, fragoff);
-@@ -563,6 +574,7 @@ static void do_ffa_mem_reclaim(struct arm_smccc_res *res,
- 
- 		fraglen = res->a3;
- 		memcpy((void *)buf + fragoff, hyp_buffers.rx, fraglen);
-+		ffa_rx_release(res);
- 	}
- 
- 	ffa_mem_reclaim(res, handle_lo, handle_hi, flags);
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.10-2
 
-base-commit: 6d69b6c12fce479fde7bc06f686212451688a102
--- 
-2.45.2.627.g7a2c4fd464-goog
+for you to fetch changes up to d66e50beb91114f387bd798a371384b2a245e8cc:
 
+  KVM: arm64: FFA: Release hyp rx buffer (2024-06-11 19:39:22 +0100)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for 6.10, take #2
+
+- Fix dangling references to a redistributor region if
+  the vgic was prematurely destroyed.
+
+- Properly mark FFA buffers as released, ensuring that
+  both parties can make forward progress.
+
+----------------------------------------------------------------
+Marc Zyngier (1):
+      KVM: arm64: Disassociate vcpus from redistributor region on teardown
+
+Vincent Donnefort (1):
+      KVM: arm64: FFA: Release hyp rx buffer
+
+ arch/arm64/kvm/hyp/nvhe/ffa.c      | 12 ++++++++++++
+ arch/arm64/kvm/vgic/vgic-init.c    |  2 +-
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c | 15 +++++++++++++--
+ arch/arm64/kvm/vgic/vgic.h         |  2 +-
+ 4 files changed, 27 insertions(+), 4 deletions(-)
