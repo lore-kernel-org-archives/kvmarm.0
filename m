@@ -1,110 +1,184 @@
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83733171648
-	for <kvmarm@lists.linux.dev>; Tue, 11 Jun 2024 05:34:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB558170842
+	for <kvmarm@lists.linux.dev>; Tue, 11 Jun 2024 05:58:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718084056; cv=none; b=ouDRaHG0MED1abqg0j1A95Gs1rvuhkLf7q9BeFEE2ZDM88xBDPGUIfvlhMTIYSM3ArVTLCBm5yEvSVthU51IQDxGCX9qDTGK7FpvPa7Cd65kxc02/Gi5ejeSTRFjm5SKVpwl3/Mcy08O0/ArQMYWhuqpKhUgig1g6SShTPt2ofs=
+	t=1718085492; cv=none; b=Ie4IgwmSWEG2Dva4SMZrsVKrbO0NQLZviif7CY3WI43MmNQp8mAr69YK3qp4XaHNLS0fqOg743Ml+cjta/f+URlBMrI5HVJeffXNhYcBfH2cg8NYi9NCtTG2fZDe8ZBgcLgwIGJr1EC1Hw2KLnPmLmA+DwJS4PPiYWYuIx6DZa0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718084056; c=relaxed/simple;
-	bh=fR3uqfswqgPixvWJU+uzJF8SnpIWyc4DS1G+kRb9LI0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=boQ/GaOsEG7SpycY7GqnkwETCf5g39IQQFPrm8eVciKWgZ1vTAlU2dHZtGBr8qHg7vKYRCe0WCpl1yI42OCKvAO+ieTIYjeYcTRG74zU2t4xgOSmB5sfHu0id7tyiaun/CVJT99JpwRB4FpZkaR1c0+a60fxcW72ZK4yzAp6oVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NjWclLCz; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1718085492; c=relaxed/simple;
+	bh=GBB/Uk8+cudk122GvBiogfdSb49xEZ/DJt19Rw07vxE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NTf9lt7I72Ed6d5R7Pu9v5WHe45GnzvbXhUJZv3QbMtiLNsD2OUieqv4meveFysoU9gXGAyk+NbgHnNHfjGSSSKRpIwgxaU0+dYjPlov/jiPpJjyXcdzzFmbn3WYi+NoCcT78O0hkGqBwMcJ+D7SLSD28d/KLWAechqOdLIccqU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cyEhHRmu; arc=none smtp.client-ip=91.218.175.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NjWclLCz"
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-42175bce556so24705e9.1
-        for <kvmarm@lists.linux.dev>; Mon, 10 Jun 2024 22:34:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718084052; x=1718688852; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fR3uqfswqgPixvWJU+uzJF8SnpIWyc4DS1G+kRb9LI0=;
-        b=NjWclLCzQFciemXjWmQhCknhMBz9gfkJ19GHi7CCl34vIEAYXg1EpHIIjZ/wHFZA1z
-         uKNAY9le3pppvndjdCgTHCKnrq6NmOJzAI6IqF9CJpn+UAHmIATt0ESb8dou2e3twsgg
-         FJxjzlbpZvlWq9CTf4uOGmzDmq56EA0dZh20vV3u7/4rbuBNRAAN2fj/ydr/WY0rNCrw
-         NFaT/jQ0GZTQn19/kw0V1R/HDk1hvnIfhab+XIbY2c1Pg1dWh/iPXVvwfi+Bm9/zVm+i
-         VMVoRM9dw9vDWFYk9b36tGar8F/+Vfm7AKuD1vm2yAeWigzYa8EiwP4JpHTKbSO/x0sn
-         4iVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718084052; x=1718688852;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fR3uqfswqgPixvWJU+uzJF8SnpIWyc4DS1G+kRb9LI0=;
-        b=a86o1vuIKvNgLMBIcbCvzaysQDMrhQMUQwGFfgmM/Y1UjL4FczKZ8hPObcf4Q5xheQ
-         0FAkiMn/hm9e4SWsezg2Xc5VPKdFcPqkIzV45IGSuRSlhPhQ+J1xCqEVNtEbhaCHpOZ+
-         gLUCcWWdr0DZyWvQS97FymEK67r6tfq/WlhP8wX5sFP7NSWZxthnQ6U1VEIzJVE210ss
-         ZzQ8OuIOxN3h+N2SsT3Vff7bsgePhjwrwMbWuH5ZQy0VTB/U05XmJ2erdO+bkifhAizg
-         qMxiBmzOrAD/M7F+dArVTr4jWfamIYtjsqFHOiGwq9LrX1MeIZ8R5ViEkZCh+VBQvLO2
-         rPiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUxX37Gj8EI1j55jzHislcA6l0vNYX9593Z4TJ+CFZjkemAoDvak7ckBKWq9PXudBSBDhceQ6JXVGy+aOCoxUopxwFrcsVC
-X-Gm-Message-State: AOJu0YzNyCbOa1JHW/eo4J2M/C40vVQmmD3UuejniUVu4BWU2O7wIpqJ
-	Pn+JLD21KiKzq7nZAni/1tirWvhTCj347gyDBUe3UZ70YWOLqYv4rQj/C5dbng/dPI86N8sDlRL
-	B/2b7I1hllERnrXVvn5BG3X+dJbEHBqGrKlAO
-X-Google-Smtp-Source: AGHT+IHhYq94AypC29YgE3hVmYacjlUkNo/Qo9+rQA77kfA5hlq20npia7gDojAiEDcXg8++4JZWIpCmeIjETKxk4OA=
-X-Received: by 2002:a05:600c:4e49:b0:41c:ab7:f9af with SMTP id
- 5b1f17b1804b1-42251e64c22mr651355e9.3.1718084051642; Mon, 10 Jun 2024
- 22:34:11 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cyEhHRmu"
+X-Envelope-To: jthoughton@google.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1718085486;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=aqiWe39MZdeODszfKFW0wTFxaRO6NFFUSNnRgYQUTLg=;
+	b=cyEhHRmuHeeS06ZjBXNkPufgh3B8leCOaQ+2mkGJsxw/fHVbVvUbyAUlYdvNZ9xfM9HCHm
+	m4wplQ7pMuC8Dp8TGrb57W3hgjukde4F/i3k4080Q2Pj9PRiHNda6b2hjDUS8A2WB9ueZh
+	mwDKUBEjSMLvLDQO1P+3kvVaJ2uaU30=
+X-Envelope-To: akpm@linux-foundation.org
+X-Envelope-To: pbonzini@redhat.com
+X-Envelope-To: ankita@nvidia.com
+X-Envelope-To: axelrasmussen@google.com
+X-Envelope-To: catalin.marinas@arm.com
+X-Envelope-To: dmatlack@google.com
+X-Envelope-To: rientjes@google.com
+X-Envelope-To: james.morse@arm.com
+X-Envelope-To: corbet@lwn.net
+X-Envelope-To: maz@kernel.org
+X-Envelope-To: rananta@google.com
+X-Envelope-To: ryan.roberts@arm.com
+X-Envelope-To: seanjc@google.com
+X-Envelope-To: shahuang@redhat.com
+X-Envelope-To: suzuki.poulose@arm.com
+X-Envelope-To: weixugc@google.com
+X-Envelope-To: will@kernel.org
+X-Envelope-To: yuzhao@google.com
+X-Envelope-To: yuzenghui@huawei.com
+X-Envelope-To: kvmarm@lists.linux.dev
+X-Envelope-To: kvm@vger.kernel.org
+X-Envelope-To: linux-arm-kernel@lists.infradead.org
+X-Envelope-To: linux-doc@vger.kernel.org
+X-Envelope-To: linux-kernel@vger.kernel.org
+X-Envelope-To: linux-mm@kvack.org
+Date: Mon, 10 Jun 2024 22:57:54 -0700
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: James Houghton <jthoughton@google.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Axel Rasmussen <axelrasmussen@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	David Matlack <dmatlack@google.com>,
+	David Rientjes <rientjes@google.com>,
+	James Morse <james.morse@arm.com>, Jonathan Corbet <corbet@lwn.net>,
+	Marc Zyngier <maz@kernel.org>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Shaoqin Huang <shahuang@redhat.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Wei Xu <weixugc@google.com>, Will Deacon <will@kernel.org>,
+	Yu Zhao <yuzhao@google.com>, Zenghui Yu <yuzenghui@huawei.com>,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH v5 3/9] KVM: arm64: Relax locking for kvm_test_age_gfn
+ and kvm_age_gfn
+Message-ID: <ZmfnYnm3K_rHX_VB@linux.dev>
+References: <20240611002145.2078921-1-jthoughton@google.com>
+ <20240611002145.2078921-4-jthoughton@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20240611002145.2078921-1-jthoughton@google.com> <20240611002145.2078921-5-jthoughton@google.com>
-In-Reply-To: <20240611002145.2078921-5-jthoughton@google.com>
-From: Yu Zhao <yuzhao@google.com>
-Date: Mon, 10 Jun 2024 23:33:34 -0600
-Message-ID: <CAOUHufYGqbd45shZkGCpqeTV9wcBDUoo3iw1SKiDeFLmrP0+=w@mail.gmail.com>
-Subject: Re: [PATCH v5 4/9] mm: Add test_clear_young_fast_only MMU notifier
-To: James Houghton <jthoughton@google.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Ankit Agrawal <ankita@nvidia.com>, Axel Rasmussen <axelrasmussen@google.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, David Matlack <dmatlack@google.com>, 
-	David Rientjes <rientjes@google.com>, James Morse <james.morse@arm.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Raghavendra Rao Ananta <rananta@google.com>, Ryan Roberts <ryan.roberts@arm.com>, 
-	Sean Christopherson <seanjc@google.com>, Shaoqin Huang <shahuang@redhat.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Wei Xu <weixugc@google.com>, 
-	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240611002145.2078921-4-jthoughton@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Jun 10, 2024 at 6:22=E2=80=AFPM James Houghton <jthoughton@google.c=
-om> wrote:
->
-> This new notifier is for multi-gen LRU specifically
-
-Let me call it out before others do: we can't be this self-serving.
-
-> as it wants to be
-> able to get and clear age information from secondary MMUs only if it can
-> be done "fast".
->
-> By having this notifier specifically created for MGLRU, what "fast"
-> means comes down to what is "fast" enough to improve MGLRU's ability to
-> reclaim most of the time.
->
+On Tue, Jun 11, 2024 at 12:21:39AM +0000, James Houghton wrote:
+> Replace the MMU write locks (taken in the memslot iteration loop) for
+> read locks.
+> 
+> Grabbing the read lock instead of the write lock is safe because the
+> only requirement we have is that the stage-2 page tables do not get
+> deallocated while we are walking them. The stage2_age_walker() callback
+> is safe to race with itself; update the comment to reflect the
+> synchronization change.
+> 
 > Signed-off-by: James Houghton <jthoughton@google.com>
+> ---
+>  arch/arm64/kvm/Kconfig       |  1 +
+>  arch/arm64/kvm/hyp/pgtable.c | 15 +++++++++------
+>  arch/arm64/kvm/mmu.c         | 26 ++++++++++++++++++++------
+>  3 files changed, 30 insertions(+), 12 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> index 58f09370d17e..7a1af8141c0e 100644
+> --- a/arch/arm64/kvm/Kconfig
+> +++ b/arch/arm64/kvm/Kconfig
+> @@ -22,6 +22,7 @@ menuconfig KVM
+>  	select KVM_COMMON
+>  	select KVM_GENERIC_HARDWARE_ENABLING
+>  	select KVM_GENERIC_MMU_NOTIFIER
+> +	select KVM_MMU_NOTIFIER_YOUNG_LOCKLESS
+>  	select HAVE_KVM_CPU_RELAX_INTERCEPT
+>  	select KVM_MMIO
+>  	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index 9e2bbee77491..b1b0f7148cff 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -1319,10 +1319,10 @@ static int stage2_age_walker(const struct kvm_pgtable_visit_ctx *ctx,
+>  	data->young = true;
+>  
+>  	/*
+> -	 * stage2_age_walker() is always called while holding the MMU lock for
+> -	 * write, so this will always succeed. Nonetheless, this deliberately
+> -	 * follows the race detection pattern of the other stage-2 walkers in
+> -	 * case the locking mechanics of the MMU notifiers is ever changed.
+> +	 * This walk may not be exclusive; the PTE is permitted to change
 
-If we'd like this to pass other MM reviewers, especially the MMU
-notifier maintainers, we'd need to design a generic API that can
-benefit all the *existing* users: idle page tracking [1], DAMON [2]
-and MGLRU.
+s/may not/is not/
 
-Also I personally prefer to extend the existing callbacks by adding
-new parameters, and on top of that, I'd try to consolidate the
-existing callbacks -- it'd be less of a hard sell if my changes result
-in less code, not more.
+> +	 * from under us. If there is a race to update this PTE, then the
+> +	 * GFN is most likely young, so failing to clear the AF is likely
+> +	 * to be inconsequential.
+>  	 */
+>  	if (data->mkold && !stage2_try_set_pte(ctx, new))
+>  		return -EAGAIN;
+> @@ -1345,10 +1345,13 @@ bool kvm_pgtable_stage2_test_clear_young(struct kvm_pgtable *pgt, u64 addr,
+>  	struct kvm_pgtable_walker walker = {
+>  		.cb		= stage2_age_walker,
+>  		.arg		= &data,
+> -		.flags		= KVM_PGTABLE_WALK_LEAF,
+> +		.flags		= KVM_PGTABLE_WALK_LEAF |
+> +				  KVM_PGTABLE_WALK_SHARED,
+>  	};
+> +	int r;
+>  
+> -	WARN_ON(kvm_pgtable_walk(pgt, addr, size, &walker));
+> +	r = kvm_pgtable_walk(pgt, addr, size, &walker);
+> +	WARN_ON(r && r != -EAGAIN);
 
-(v2 did all these, btw.)
+I could've been more explicit last time around, could you please tone
+this down to WARN_ON_ONCE() as well?
 
-[1] https://docs.kernel.org/admin-guide/mm/idle_page_tracking.html
-[2] https://www.kernel.org/doc/html/latest/mm/damon/index.html
+>  	return data.young;
+>  }
+>  
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 8bcab0cc3fe9..a62c27a347ed 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1773,25 +1773,39 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+>  bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+>  {
+>  	u64 size = (range->end - range->start) << PAGE_SHIFT;
+> +	bool young = false;
+> +
+> +	read_lock(&kvm->mmu_lock);
+>  
+>  	if (!kvm->arch.mmu.pgt)
+>  		return false;
+
+I'm guessing you meant to have 'goto out' here, since this early return
+fails to drop the mmu_lock.
+
+-- 
+Thanks,
+Oliver
