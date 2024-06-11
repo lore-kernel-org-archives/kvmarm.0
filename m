@@ -1,72 +1,203 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8AC4147C86;
-	Mon, 10 Jun 2024 17:50:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18CB5816
+	for <kvmarm@lists.linux.dev>; Tue, 11 Jun 2024 00:21:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718041804; cv=none; b=jxmx+MQ/PYTk0t+/qrNKFXNXFk3VvrSOKnGpF95SqNS+wPdp0Jpr63DgXVjZfmzZCl4JA2Y17u1jZ4XJYSSMlsaqu//6/4b6pg1to8DkravVm+kM2godVHu/5FicK4biSKkvteTyI+uA7AFHf0yfnOxn9xNwkKz/Bv2vSKBUAPs=
+	t=1718065321; cv=none; b=PbMm5sdD5vjFgz/9vFGWrPOR5Hqr60V+j6oCy3zsy9QRzRXj95TrSF3dC9Xs9zMq4u5VQIOBlvLk86yhpcBO/OLzipDzTxUC+Ljg6GvjFanLRHQEHC+dvEqg+E5++Wk1VUZW7/DrCjgVPIV/Rctg7p3+qhIjTOQaNJ0kCqfbusY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718041804; c=relaxed/simple;
-	bh=WoVq+0Vo2WUlILwBRL9qEzQohV9M9XZ8hqHTaINtZgs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uMTVtOK6ybkYTccQ8dG5kWS+DWMSVlj9bzoxiXS55HvpnQKSvVClmnNScrayVcLlwE11ilaQzE14gHO0HRaiy7PQp0IykjoQJteU8rB3hm0MJDbjEEFubrMgr1DM03k8ehpVzlKb5m2MMgzQfO8s+tvYNfdnRFwcqet9FmRgvcQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FA17C4AF1A;
-	Mon, 10 Jun 2024 17:50:01 +0000 (UTC)
-Date: Mon, 10 Jun 2024 18:49:59 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: Re: [PATCH v3 06/14] arm64: Override set_fixmap_io
-Message-ID: <Zmc8x3Xvs8uu9zHp@arm.com>
-References: <20240605093006.145492-1-steven.price@arm.com>
- <20240605093006.145492-7-steven.price@arm.com>
+	s=arc-20240116; t=1718065321; c=relaxed/simple;
+	bh=3uniXobaC5MSPEfsx9girsouEiiMtIw1qVVGwDeZOIQ=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=pGEr+G48ZZsRa5KjpNa0DLPStBbCu9nd2dLl7z/nMo4E8XgH06z2TkXIuPHxU6aQfNzSbTwA0Ovb6Die5VdidyYZmkxiD6Kr4iwcSCcXoBybexoAawLwGEEachJFvz23dGzHDeEx7FMlIzHauCv4+OrfJzpcpDnwSCZ6wm1OTVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fBe71ISW; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fBe71ISW"
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-62cf6040b72so48403227b3.1
+        for <kvmarm@lists.linux.dev>; Mon, 10 Jun 2024 17:21:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1718065319; x=1718670119; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=znnebkeVSvsFTLm00akjOWCV2leg9gyqu/Y0G491TkM=;
+        b=fBe71ISWahvU/jXHvPeW9ZUQ52kf1MOhttflYGKbnF1D+C3XNE5IZdfprsVkFPgn37
+         ItEBImmz/isCntBPosep1Ik1+i7qyGvJgAf8vtbK9ae8zz6hbv4+f/fXd+gYfpqITL8v
+         Yq2l6THGQ5BmAypXNljk0XtQ3V7rgdnsjvT36nZ4dvfVnhsi3W0wFawEPy6U6bCzVW6i
+         CQ3O500Kd428X2CoFlxLHwpLxJj4iUl1z709oi+EeWq8yo5HwTe62dZX/m1DHuctOwj8
+         S6XnngD2J2x5O30usYenZkO/WTBgNwiShYvFD7dhvkfCJhCuVbqwPdIwl8lQhJwZY5A8
+         Ql2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718065319; x=1718670119;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=znnebkeVSvsFTLm00akjOWCV2leg9gyqu/Y0G491TkM=;
+        b=Clgi/2MpHBn76nv/zrwtZS/1ICO9cplcX+B+vU9Ru3Noyf/Y8y3xFcWGP4VaiqACEo
+         FNBovNlQN2Bx5c+nTfrWcO2ZuvhiGqWKDAAh3UQ7RbHq8sWl+LKJFWlki6JEPMjS70Xn
+         aqbBzh3b5FiuBE3pMzuItnkn35oQjxyihtD4WDfLepAQgJvpXdHV+FZKGmcLX6odPXYf
+         0EeqxgL1eiSNdUN5fn+a/QAdyH3wVDWBHbLzxqbsqCKgjk4mVP41cGcUPhhr2w+IUKN5
+         ZZsAFJsXJvseKzFQuJwXvrJ2s8wpaajS56Ttm3AfmlaZM45eSM/GB0V39Xtm5a8FJOsb
+         Gidg==
+X-Forwarded-Encrypted: i=1; AJvYcCX4XOod5Ud2JUekVZcuDdc7dlA+w3mpP3VYONGOVeerbu8ckdYi/dq1wJ5RogZnSyCK7RmsmsiC1YWLKi+Zpd5Jy9peSWvc
+X-Gm-Message-State: AOJu0YwUw3sKB+HiYpsk3klrmSsTY2Vm2C/5M13gHDt3PjbwYzL0iv53
+	fA1if/uI3NV6lxZmZ+nDaDshaceZJ87TzdxI/fMVgFxwfAnjWaAf0I28X8P6NBXZWEGn2nqRipt
+	x/L/3d9FVSp3glgNgkg==
+X-Google-Smtp-Source: AGHT+IHAQpzXE/JP1O7Hg4+Kq/h9j2tVw1U1SGU5I2M7dDYM3/uT/d6pwcmk2+n0+ICjilMbsMpRbG4g7tWO2ExY
+X-Received: from jthoughton.c.googlers.com ([fda3:e722:ac3:cc00:14:4d90:c0a8:2a4f])
+ (user=jthoughton job=sendgmr) by 2002:a05:690c:6612:b0:62d:21:3f66 with SMTP
+ id 00721157ae682-62d0021471dmr22261127b3.1.1718065319010; Mon, 10 Jun 2024
+ 17:21:59 -0700 (PDT)
+Date: Tue, 11 Jun 2024 00:21:36 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240605093006.145492-7-steven.price@arm.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.2.505.gda0bf45e8d-goog
+Message-ID: <20240611002145.2078921-1-jthoughton@google.com>
+Subject: [PATCH v5 0/9] mm: multi-gen LRU: Walk secondary MMU page tables
+ while aging
+From: James Houghton <jthoughton@google.com>
+To: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Ankit Agrawal <ankita@nvidia.com>, Axel Rasmussen <axelrasmussen@google.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, David Matlack <dmatlack@google.com>, 
+	David Rientjes <rientjes@google.com>, James Houghton <jthoughton@google.com>, 
+	James Morse <james.morse@arm.com>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Raghavendra Rao Ananta <rananta@google.com>, 
+	Ryan Roberts <ryan.roberts@arm.com>, Sean Christopherson <seanjc@google.com>, 
+	Shaoqin Huang <shahuang@redhat.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Wei Xu <weixugc@google.com>, Will Deacon <will@kernel.org>, Yu Zhao <yuzhao@google.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Jun 05, 2024 at 10:29:58AM +0100, Steven Price wrote:
-> +void set_fixmap_io(enum fixed_addresses idx, phys_addr_t phys)
-> +{
-> +	pgprot_t prot = FIXMAP_PAGE_IO;
-> +
-> +	/*
-> +	 * For now we consider all I/O as non-secure. For future
-> +	 * filter the I/O base for setting appropriate permissions.
-> +	 */
-> +	prot = __pgprot(pgprot_val(prot) | PROT_NS_SHARED);
-> +
-> +	return __set_fixmap(idx, phys, prot);
-> +}
+This patchset makes it possible for MGLRU to consult secondary MMUs
+while doing aging, not just during eviction. This allows for more
+accurate reclaim decisions, which is especially important for proactive
+reclaim.
 
-In v2, Suzuki said that we want to keep this as a function rather than
-just adding PROT_NS_SHARED to FIXMAP_PAGE_IO in case we want to change
-this function in the future to allow protected MMIO.
+This series does the following:
+ 1. Improve locking for the existing test/clear_young notifiers for x86
+    and arm64.
+ 2. Add a new notifier test_clear_young_fast_only(), implemented only by
+    KVM/x86.
+ 3. Incorporate test_clear_young_fast_only() into MGLRU aging.
 
-https://lore.kernel.org/linux-arm-kernel/6ba1fd72-3bad-44ca-810d-572b70050772@arm.com/
+To make aging work for more than just x86, the
+test_clear_young_fast_only() notifier must be implemented by those other
+architectures.
 
-What I don't understand is that all the other MMIO cases just statically
-assume unprotected/shard MMIO. Should we drop this patch here as well,
-adjust FIXMAP_PAGE_IO and think about protected MMIO later when we
-actually have to do device assignment?
+access_tracking_perf_test now has a mode (-p) to check performance of
+MGLRU aging while the VM is faulting memory in. See the v4 cover
+letter[1] for performance data collected with this test.
 
+Previous versions of this series included logic in MGLRU and KVM to
+support batching the updates to secondary page tables. This version
+removes this logic, as it was complex and not necessary to enable
+proactive reclaim. This optimization, as well as the additional
+optimizations for arm64 and powerpc, can be done in a later series.
+
+=== Previous Versions ===
+
+This v5 re-adds a lot of logic that was present in v3 and earlier
+versions of the series. There is an important difference I want to call
+out:
+
+ - should_look_around() can sometimes require two notifiers instead of
+   one. This is necessary if I forbid myself from modifying
+   mmu_notifier_clear_young().
+
+   It may simply be better to do what v2/v3 did have and not have a
+   fast-only notifier, and merge them all. This makes the API slightly
+   more complex. I'm not sure which is better.
+
+Change log:
+
+Since v4[1]:
+ - Removed Kconfig that controlled when aging was enabled. Aging will
+   be done whenever the architecture supports it (thanks Yu).
+ - Added a new MMU notifier, test_clear_young_fast_only(), specifically
+   for MGLRU to use.
+ - Add kvm_fast_{test_,}age_gfn, implemented by x86.
+ - Fix locking for clear_flush_young().
+ - Added KVM_MMU_NOTIFIER_YOUNG_LOCKLESS to clean up locking changes
+   (thanks Sean).
+ - Fix WARN_ON and other cleanup for the arm64 locking changes
+   (thanks Oliver).
+
+Since v3[2]:
+ - Vastly simplified the series (thanks David). Removed mmu notifier
+   batching logic entirely.
+ - Cleaned up how locking is done for mmu_notifier_test/clear_young
+   (thanks David).
+ - Look-around is now only done when there are no secondary MMUs
+   subscribed to MMU notifiers.
+ - CONFIG_LRU_GEN_WALKS_SECONDARY_MMU has been added.
+ - Fixed the lockless implementation of kvm_{test,}age_gfn for x86
+   (thanks David).
+ - Added MGLRU functional and performance tests to
+   access_tracking_perf_test (thanks Axel).
+ - In v3, an mm would be completely ignored (for aging) if there was a
+   secondary MMU but support for secondary MMU walking was missing. Now,
+   missing secondary MMU walking support simply skips the notifier
+   calls (except for eviction).
+ - Added a sanity check for that range->lockless and range->on_lock are
+   never both provided for the memslot walk.
+
+For the changes since v2[3], see v3.
+
+Based on 6.10-rc3.
+
+[1]: https://lore.kernel.org/linux-mm/20240529180510.2295118-1-jthoughton@google.com/
+[2]: https://lore.kernel.org/linux-mm/20240401232946.1837665-1-jthoughton@google.com/
+[3]: https://lore.kernel.org/kvmarm/20230526234435.662652-1-yuzhao@google.com/
+
+James Houghton (8):
+  KVM: Add lockless memslot walk to KVM
+  KVM: x86: Relax locking for kvm_test_age_gfn and kvm_age_gfn
+  KVM: arm64: Relax locking for kvm_test_age_gfn and kvm_age_gfn
+  mm: Add test_clear_young_fast_only MMU notifier
+  KVM: Add kvm_fast_age_gfn and kvm_fast_test_age_gfn
+  KVM: x86: Implement kvm_fast_test_age_gfn and kvm_fast_age_gfn
+  mm: multi-gen LRU: Have secondary MMUs participate in aging
+  KVM: selftests: Add multi-gen LRU aging to access_tracking_perf_test
+
+Yu Zhao (1):
+  KVM: x86: Move tdp_mmu_enabled and shadow_accessed_mask
+
+ Documentation/admin-guide/mm/multigen_lru.rst |   6 +-
+ arch/arm64/kvm/Kconfig                        |   1 +
+ arch/arm64/kvm/hyp/pgtable.c                  |  15 +-
+ arch/arm64/kvm/mmu.c                          |  26 +-
+ arch/x86/include/asm/kvm_host.h               |  14 +
+ arch/x86/kvm/Kconfig                          |   2 +
+ arch/x86/kvm/mmu.h                            |   6 -
+ arch/x86/kvm/mmu/mmu.c                        |  60 ++-
+ arch/x86/kvm/mmu/spte.h                       |   1 -
+ arch/x86/kvm/mmu/tdp_iter.h                   |  27 +-
+ arch/x86/kvm/mmu/tdp_mmu.c                    |  67 ++-
+ include/linux/kvm_host.h                      |   8 +
+ include/linux/mmu_notifier.h                  |  50 +++
+ include/linux/mmzone.h                        |   6 +-
+ include/trace/events/kvm.h                    |  22 +
+ mm/mmu_notifier.c                             |  26 ++
+ mm/rmap.c                                     |   9 +-
+ mm/vmscan.c                                   | 185 +++++++--
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/access_tracking_perf_test.c | 365 ++++++++++++++--
+ .../selftests/kvm/include/lru_gen_util.h      |  55 +++
+ .../testing/selftests/kvm/lib/lru_gen_util.c  | 391 ++++++++++++++++++
+ virt/kvm/Kconfig                              |   7 +
+ virt/kvm/kvm_main.c                           |  73 +++-
+ 24 files changed, 1283 insertions(+), 140 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/include/lru_gen_util.h
+ create mode 100644 tools/testing/selftests/kvm/lib/lru_gen_util.c
+
+
+base-commit: 83a7eefedc9b56fe7bfeff13b6c7356688ffa670
 -- 
-Catalin
+2.45.2.505.gda0bf45e8d-goog
+
