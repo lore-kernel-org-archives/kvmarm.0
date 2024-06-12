@@ -1,197 +1,103 @@
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8575D38FA3
-	for <kvmarm@lists.linux.dev>; Wed, 12 Jun 2024 05:24:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 836A7FBF3
+	for <kvmarm@lists.linux.dev>; Wed, 12 Jun 2024 05:31:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718169849; cv=none; b=fggKk66knOqfqwvEdKfPOBwEPax9NYtsYCxlOXRi6W//8w/RAImnWvxp5YFPduGyDMtC/OuloJ73QOnnJHBlPSI/D39hvbIoQQz+LSOpVzddKzsr458VxWa95hrutM15mw3c7zOfcA3FsAcVOzJLKqGVNzrjD2AP5CMJljYcCYM=
+	t=1718170263; cv=none; b=qedrIl3kTC2Zk5jH6O+c1w7+3+FZ18nvzDeyDNJVSkO2021Agda4JD0LtnB0NcyqCPtdNxYNk6P8i1t51aorzkrWM7HYnDmKt+D+W7lOO/4haNWgnGxMdwGOf1xALpVPHnedTT/Nm5dtLIKQMbCHlK3PldgYHPhQeTVL86x+4Rc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718169849; c=relaxed/simple;
-	bh=RymY7PnAv6b7tpTyJmoUZ0kfNOhoGlBV1AlNrgFlVCk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=K046YaYIAF9KCq7IG/0N4mh5SUQgUXE62iJ3nwfAHB4CNiYLM5NRMrab4rvOrjPdHuM55KhauVuCb20Rgmtswe5+3/9Q00dBfRV8xT16DYp726MhA6ti9i9SlrPsXqgWc5WZg4slSeYwA1mnUtJlFBmIzU4+v1xtB7xu8e/q+k4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jXNSu1vh; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1718170263; c=relaxed/simple;
+	bh=M79FP9xawocEU+lriIXIatL6EDmqJHLQLEu2xZP59cE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=T/CZv8Zt1IajFVrLAuswSELjIytPtSHoHrzwMXUQjs8XfIX2X3an9yq1d8f/H8ZU+OcugLz4Ed63i5jQ7rcFV6CaTBNHkebHkM3bQevenncggec6nxGv643HfgXXyCBZcvMhdyBBxKGVNIbvJllDqrOF0J98riKTHUTB8mq9prE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qXr+DAg8; arc=none smtp.client-ip=91.218.175.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jXNSu1vh"
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1f480624d10so56299025ad.1
-        for <kvmarm@lists.linux.dev>; Tue, 11 Jun 2024 22:24:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718169847; x=1718774647; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cQuI8YGQgLmsUNQvvWuFnLsfcid8kBB0k+CZ86TDvAk=;
-        b=jXNSu1vhnj13e8lgFUrXONeT2qoof1YSK5WPO7//6L5eIUwko3JtCVfURl58vbE/Be
-         JckSKkIrljgCieI8DUruIpxgoHYqunfL3nac3Xz8Kf2TRRs2fHVPI/MVY6tHTMBHIbNC
-         VVb5MMWlDBEoFlFZdqCVdXHWkC9mr3hEEMAKOucpNs6v89bqhc00ir5XPYtEJsGcPsx/
-         hXWcB7WyLJ9L/zT3EPwPDyCZpKRsU0oWji4mgLtGAmAtFumkyNUt+UroDFS8PcQ7bgX8
-         RyBvpUV+jHFltdCoNke6bWy7z+0tOAsEVCtX/i0KmyyQHJLo+92o+BmOcvMPMpjegpGC
-         RMdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718169847; x=1718774647;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cQuI8YGQgLmsUNQvvWuFnLsfcid8kBB0k+CZ86TDvAk=;
-        b=DHv0GQ1cbQxmaxqNZWkFdts9jWF/ufKwwcUeVr9C9+4qzMNHirOSh/W3j0jojbk97r
-         CUMZZK4CdinaEOIf5ZdHKXJz5ZafZZDoXFbkDh64ayVNunNFVOCHFGzKZG9qcDpEE7K7
-         xfxjW2bUnbh/mIxithVYJAI7RipyvOVcc3zV8gznjepV6lyLLUEIuPdHx9JCJpT1rOAE
-         ZWPD8adJHDukeVKcspeE5hoXn+XGy2WZr5vxV5rcN1LQrJI+TqzvFpXMWexSVkbpBHNw
-         UA3QJVAL+Oc0scE26Lna/KlKjETdnaYZM9ihODjok/jlHA8dvWqXUhszfrSVuBcKY9RG
-         MjbA==
-X-Forwarded-Encrypted: i=1; AJvYcCWLhA/Ie/UGhVUwu2sTo7aOtxuQ75O1aJUx2GJmHidUePxdRVD3cGRGk6AnUIdx5cHr2h+i//ZcnCUVq0avw+/+8Y3XDMg6
-X-Gm-Message-State: AOJu0YzhUOQQSGNaULdNIkPGGs+x0bwXA9GDb2lqRBe/VIjS9EvfNWMg
-	XaZzjhv0/7g7RoW9t8T5v74N0tNsQMF0Y/K8vXtcC5ogE7KKr6ex
-X-Google-Smtp-Source: AGHT+IGibBQ31aFbHM2KNIyG3WXGmC6uDThIWGe0iAzdMLifnbTThBiAhC+djmwgDB3YyNkgibzPkg==
-X-Received: by 2002:a17:902:ceca:b0:1f7:969:7e87 with SMTP id d9443c01a7336-1f83b666b52mr10420065ad.35.1718169846856;
-        Tue, 11 Jun 2024 22:24:06 -0700 (PDT)
-Received: from wheely.local0.net (220-235-199-47.tpgi.com.au. [220.235.199.47])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f6bd75f711sm112170705ad.11.2024.06.11.22.24.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Jun 2024 22:24:06 -0700 (PDT)
-From: Nicholas Piggin <npiggin@gmail.com>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Nicholas Piggin <npiggin@gmail.com>,
-	Laurent Vivier <lvivier@redhat.com>,
-	Andrew Jones <andrew.jones@linux.dev>,
-	linuxppc-dev@lists.ozlabs.org,
-	kvm@vger.kernel.org,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@redhat.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	=?UTF-8?q?Nico=20B=C3=B6hr?= <nrb@linux.ibm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	linux-s390@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	kvm-riscv@lists.infradead.org
-Subject: [kvm-unit-tests PATCH v10 09/15] configure: Make arch_libdir a first-class entity
-Date: Wed, 12 Jun 2024 15:23:14 +1000
-Message-ID: <20240612052322.218726-10-npiggin@gmail.com>
-X-Mailer: git-send-email 2.45.1
-In-Reply-To: <20240612052322.218726-1-npiggin@gmail.com>
-References: <20240612052322.218726-1-npiggin@gmail.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qXr+DAg8"
+X-Envelope-To: shahuang@redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1718170259;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/UiRVtVLigMQeE81g8Kpmn0pUJ/eW6cDDy3LoMW/VXc=;
+	b=qXr+DAg8cKacFvDiSUke0+CGHdsYkHAmAXVnXnPbCZTIdT4ICUniQacRM8YvMnGHJsOFdY
+	diLKnRd3TYks2/vlYheRAZEPOKxV2nCgdMwl21BghyUTzHBFWCzo/zfvIUM+oA0YvNQGpT
+	ysoU3sMV2TcI+Fq3yT58ywcIQaau6e8=
+X-Envelope-To: maz@kernel.org
+X-Envelope-To: kvmarm@lists.linux.dev
+X-Envelope-To: eauger@redhat.com
+X-Envelope-To: sebott@redhat.com
+X-Envelope-To: cohuck@redhat.com
+X-Envelope-To: catalin.marinas@arm.com
+X-Envelope-To: james.morse@arm.com
+X-Envelope-To: kvm@vger.kernel.org
+X-Envelope-To: linux-arm-kernel@lists.infradead.org
+X-Envelope-To: linux-kernel@vger.kernel.org
+X-Envelope-To: linux-kselftest@vger.kernel.org
+X-Envelope-To: pbonzini@redhat.com
+X-Envelope-To: shuah@kernel.org
+X-Envelope-To: suzuki.poulose@arm.com
+X-Envelope-To: will@kernel.org
+X-Envelope-To: yuzenghui@huawei.com
+Date: Tue, 11 Jun 2024 22:30:51 -0700
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Shaoqin Huang <shahuang@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+	Eric Auger <eauger@redhat.com>, Sebastian Ott <sebott@redhat.com>,
+	Cornelia Huck <cohuck@redhat.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	James Morse <james.morse@arm.com>, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [RFC PATCH v1 0/2] KVM: arm64: Making BT Field in
+ ID_AA64PFR1_EL1 writable
+Message-ID: <Zmkyi39Pz6Wqll-7@linux.dev>
+References: <20240612023553.127813-1-shahuang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240612023553.127813-1-shahuang@redhat.com>
+X-Migadu-Flow: FLOW_OUT
 
-arch_libdir was brought in to improve the heuristic determination of
-the lib/ directory based on arch and testdir names, but it did not
-entirely clean that mess up.
+Hi Shaoqin,
 
-Remove the arch_libdir->arch->testdir heuristic and just require
-everybody sets arch_libdir correctly. Fail if the lib/arch or
-lib/arch/asm directories can not be found.
+On Tue, Jun 11, 2024 at 10:35:50PM -0400, Shaoqin Huang wrote:
+> Hi guys,
+> 
+> I'm trying to enable migration from MtCollins(Ampere Altra, ARMv8.2+) to
+> AmpereOne(AmpereOne, ARMv8.6+), the migration always fails when migration from
+> MtCollins to AmpereOne due to some register fields differing between the
+> two machines.
+> 
+> In this patch series, we try to make more register fields writable like
+> ID_AA64PFR1_EL1.BT. This is first step towards making the migration possible.
+> Some other hurdles need to be overcome. This is not sufficient to make the
+> migration successful from MtCollins to AmpereOne.
 
-Cc: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: David Hildenbrand <david@redhat.com>
-Cc: Eric Auger <eric.auger@redhat.com>
-Cc: Janosch Frank <frankja@linux.ibm.com>
-Cc: Laurent Vivier <lvivier@redhat.com>
-Cc: Nico Böhr <nrb@linux.ibm.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>
-Cc: kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org
-Cc: kvmarm@lists.linux.dev
-Cc: kvm-riscv@lists.infradead.org
-Cc: linuxppc-dev@lists.ozlabs.org
-Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
----
- Makefile  |  2 +-
- configure | 18 +++++++++++++-----
- 2 files changed, 14 insertions(+), 6 deletions(-)
+It isn't possible to transparently migrate between these systems. The
+former has a cntfrq of 25MHz, and the latter has a cntfrq of 1GHz. There
+isn't a mechanism for scaling the counter frequency, and I have zero
+appetite for a paravirt interface.
 
-diff --git a/Makefile b/Makefile
-index 5b7998b79..7fe93dfd8 100644
---- a/Makefile
-+++ b/Makefile
-@@ -10,7 +10,7 @@ include config.mak
- VPATH = $(SRCDIR)
- 
- libdirs-get = $(shell [ -d "lib/$(1)" ] && echo "lib/$(1) lib/$(1)/asm")
--ARCH_LIBDIRS := $(call libdirs-get,$(ARCH_LIBDIR)) $(call libdirs-get,$(TEST_DIR))
-+ARCH_LIBDIRS := $(call libdirs-get,$(ARCH_LIBDIR))
- OBJDIRS := $(ARCH_LIBDIRS)
- 
- DESTDIR := $(PREFIX)/share/kvm-unit-tests/
-diff --git a/configure b/configure
-index db15e85d6..b93723142 100755
---- a/configure
-+++ b/configure
-@@ -217,7 +217,6 @@ fi
- arch_name=$arch
- [ "$arch" = "aarch64" ] && arch="arm64"
- [ "$arch_name" = "arm64" ] && arch_name="aarch64"
--arch_libdir=$arch
- 
- if [ "$arch" = "riscv" ]; then
-     echo "riscv32 or riscv64 must be specified"
-@@ -285,8 +284,10 @@ fi
- 
- if [ "$arch" = "i386" ] || [ "$arch" = "x86_64" ]; then
-     testdir=x86
-+    arch_libdir=x86
- elif [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
-     testdir=arm
-+    arch_libdir=$arch
-     if [ "$target" = "qemu" ]; then
-         arm_uart_early_addr=0x09000000
-     elif [ "$target" = "kvmtool" ]; then
-@@ -335,6 +336,7 @@ elif [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
-     fi
- elif [ "$arch" = "ppc64" ]; then
-     testdir=powerpc
-+    arch_libdir=ppc64
-     firmware="$testdir/boot_rom.bin"
-     if [ "$endian" != "little" ] && [ "$endian" != "big" ]; then
-         echo "You must provide endianness (big or little)!"
-@@ -345,6 +347,7 @@ elif [ "$arch" = "riscv32" ] || [ "$arch" = "riscv64" ]; then
-     arch_libdir=riscv
- elif [ "$arch" = "s390x" ]; then
-     testdir=s390x
-+    arch_libdir=s390x
- else
-     echo "arch $arch is not supported!"
-     arch=
-@@ -354,6 +357,10 @@ if [ ! -d "$srcdir/$testdir" ]; then
-     echo "$srcdir/$testdir does not exist!"
-     exit 1
- fi
-+if [ ! -d "$srcdir/lib/$arch_libdir" ]; then
-+    echo "$srcdir/lib/$arch_libdir does not exist!"
-+    exit 1
-+fi
- 
- if [ "$efi" = "y" ] && [ -f "$srcdir/$testdir/efi/run" ]; then
-     ln -fs "$srcdir/$testdir/efi/run" $testdir-run
-@@ -416,10 +423,11 @@ fi
- # link lib/asm for the architecture
- rm -f lib/asm
- asm="asm-generic"
--if [ -d "$srcdir/lib/$arch/asm" ]; then
--	asm="$srcdir/lib/$arch/asm"
--elif [ -d "$srcdir/lib/$testdir/asm" ]; then
--	asm="$srcdir/lib/$testdir/asm"
-+if [ -d "$srcdir/lib/$arch_libdir/asm" ]; then
-+    asm="$srcdir/lib/$arch_libdir/asm"
-+else
-+    echo "$srcdir/lib/$arch_libdir/asm does not exist"
-+    exit 1
- fi
- mkdir -p lib
- ln -sf "$asm" lib/asm
+On top of that, erratum AC03_CPU_38 seems to make a migration from
+Neoverse-N1 to AmpereOne quite perilous, unless you hide FEAT_HAFDBS on
+the source.
+
+These issues are separate, though, from any possible changes to the
+writability of ID_AA64PFR1_EL1, which still may be useful to userspace.
+
 -- 
-2.45.1
-
+Thanks,
+Oliver
