@@ -1,105 +1,140 @@
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA632180A77
-	for <kvmarm@lists.linux.dev>; Wed, 12 Jun 2024 16:02:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BDD42868D
+	for <kvmarm@lists.linux.dev>; Wed, 12 Jun 2024 17:00:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718208154; cv=none; b=Vy1HAt3trev4HCir8uIFyRQLhgcLlFi0voB8fo6Lcd/gRAJsIV1BBDYwmNgCkZuc19NCDqYko4w9Iog9QJ6ZGrbwbZOgKBW7fhlUl8KN6CKB0p9xxQCiLpHNSRIqo8/RHoOouDvK6S4a7VNJNDzPbqMudPjNFGqBDS9Cgn+pmfY=
+	t=1718211620; cv=none; b=A5zaeZaWJbG/MMtFJWDpKFkVHJG+JcUfdsyik0v73ZP+vxaWbknLutatBDHIEr14FRbJVp7zhxieCXdtkkj2+Y0xLN+DOX08MV589BsbmS9xSGKSnCg+9GbdGtjBHMgIQQPLXQoPDSmm6QO0y/ibUqxVPexwl/RZ1GbrvbMXYB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718208154; c=relaxed/simple;
-	bh=1TFVrwww23bDZwSiwRJ2jYhuVWiPUIMbmY+tTlCjXjs=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=JdyuqIR8Yhx2DVUcYkxQ+Av/bLzci6jAZO2LgbC10q0vPF25qugXSVhHpFRWnrg7ghUg3k1/rGgu5pPa5pAOX9PLD/S1G3sey66tRpG9U/3qlT9Tx7lJWtm/sCniou0ppYVJm5V6XGUiPYU/awVPMKZRNI50GpAeadCyyxcIxzA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JpQhW0Mi; arc=none smtp.client-ip=209.85.215.202
+	s=arc-20240116; t=1718211620; c=relaxed/simple;
+	bh=lk6GPRb8cDY1Px2newtcG+uxRs8xIZKv4PbSRzkuVfc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=m3hAggDIovBpg36PoAUIfHLFl5xZfMHsExen8MI6Fr4VWSVTmHRV87ywlN13OC90G4X47XZZPcClX0YgJUJuXil/2By0S2a7Cp/50YVUVXoH3LONeo2GUwcDQWDFOW1ct+Iwx5N9A9BUj2v7E09qql/aQzCh6afiOHzRDBcKdPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MJeDdK+1; arc=none smtp.client-ip=209.85.128.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JpQhW0Mi"
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-6e3341c8865so4820820a12.1
-        for <kvmarm@lists.linux.dev>; Wed, 12 Jun 2024 09:02:32 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MJeDdK+1"
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-42175bce556so1555e9.1
+        for <kvmarm@lists.linux.dev>; Wed, 12 Jun 2024 10:00:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718208152; x=1718812952; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=aePX0hruEKIOA1+M6OG+w8QdYVFE2Ff801XPria8pOI=;
-        b=JpQhW0MiB/LNXMYn5dP4WzYVCtqF84OJgHRBllbAjczDkP++as0tU9DhYGRqlhmSyd
-         CytS4A34ejVRQ8NN2hmJSxT1778S0s8ujBMeBT0x2XmzDWulWfArJfE6+gmxIjvc/29t
-         8CMSClX2Yg1PegCH3utT6uWIyeCHIG4rS5ngVPdA8m0U+PyQ7d357mUTSYn0wYWTEk1O
-         nYGL0FtAV90/tL7zv0ml/OfJIsgtTx6DE8kPwirgkzL/kBQxo4lW4Nmvv2pszcgEOhrx
-         HZt2k8G7ZmOWlI5vT4paPTHNxw66jetGfHq2Ul9NquRrkCdejlZE3WDMrhpVKD9jhKzk
-         KX0A==
+        d=google.com; s=20230601; t=1718211617; x=1718816417; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HsvWeW5eyBF6ROygK9LGppgGGqUZLW2+K1PQvnJ6/gk=;
+        b=MJeDdK+12wPn1wpx7i/7JzdRSZIE2ld9Xo31RSfR9UMZUjx6r+7/c5bduRZTrsAHWQ
+         TpnKOcR44nkHeD0QHRF75Vk3NQDj9v4M5TxHpEemEsGJumNzahBsQIKq2VKef1YDutxM
+         wSW0ZaIAgdrel17d0aekvb1AhD4mngmHZQXoqNjhj+ERrqH2gweFABwnjB/4x7GpHAGb
+         sLIrjCO2COCKOlbS63gdf1XTWwyfsKJEwxBQOCBe6B1xFCwoo2j2jaJPEba5lJk8Y//z
+         6vkfKTo1IgvkBn8n+T1aYwrMl2+LPs95kXlC87kfv09wTUr8aB62Jd/J3jrJaGr7N9eR
+         BpSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718208152; x=1718812952;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aePX0hruEKIOA1+M6OG+w8QdYVFE2Ff801XPria8pOI=;
-        b=oO7Rnvh/stQIhfiEJWhafbBMc+yM/y/+RsPmBlrMIQFi1B9nptcgZPcQADkeQ9Y2hB
-         rTHBOgGA/ZuyDksDH3Ip06fMhu1DK7J2Z6wG480fBaUDLtxnB9ozEMjCKhjq1RuESiOc
-         6pN7SoKbsuLHdpEYjcDti3Sr9REss3KKYCJmszmH4ZW4L7JHSwcPkS7eTQAO3MTQLZWq
-         rCz+VcEOEY53E72lAIdR1Ec8Sgk/9ZvBTjjfD4oYpTkSugS/opiJh97ad/tP7QXRyVmL
-         uYC8NkOlDAy+T+8/Q3FK0lwm3HhPu0rtbFprB2Ft0yPUIX7g34a2kpWil2PERrRCg7RS
-         Kzsg==
-X-Forwarded-Encrypted: i=1; AJvYcCVxFBfQRWN2dULCn3FNz3BnkAUDqXKkXamIQby9sQyFQVYaJ93H4/Px9WgfUKqxeT2MtH/KrJCwwuxH58iB4koFkpbvucO4
-X-Gm-Message-State: AOJu0YyvZsH9ZxujiP9Z0Ek9T7nD8Y5afhEsk3nRCSQItBVKDDw7GPXx
-	4hUu+mAIgnv6+8cm2KgmPVb8yKjl1RkONYNnYsAUEewolIwt9i1V8A+IULXx4ySpdFYhHiMHxPo
-	ygg==
-X-Google-Smtp-Source: AGHT+IG0uMYRLBiUhOc770oDRl2hP1hRVk0jGwiyLvB3wm+pqn+z8Eju9Zd1H20tziFvsazDeHJOkFbkr74=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:9503:0:b0:673:9f86:3f23 with SMTP id
- 41be03b00d2f7-6fae0e6eb36mr4827a12.3.1718208151688; Wed, 12 Jun 2024 09:02:31
- -0700 (PDT)
-Date: Wed, 12 Jun 2024 09:02:30 -0700
-In-Reply-To: <20240611002145.2078921-9-jthoughton@google.com>
+        d=1e100.net; s=20230601; t=1718211617; x=1718816417;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HsvWeW5eyBF6ROygK9LGppgGGqUZLW2+K1PQvnJ6/gk=;
+        b=JfAb5ZQJPPjyPeOi/edKcX8RLMATul6QYJuOf5pAGx99CEcabIofOOOS2JEpM2aNYO
+         j7yrPCwbNgDSIQTljcA7BrtiAZ2eoaK40tHqAfMajTrcp9p/uniwCTpFzQrljVw/MLFS
+         pHO9Dlba3MuAFVWttZ22KcI1bHqm0pCMLPPihtrl+eg29Ehwv/1AEroTLv9zUgFwPsiz
+         ksuX52UnpHUjz7mc6VE3GdS5gSTbnJRyvDdVsWC7lR6XsjJEN8jhLyUQTFTIhzUNZm6X
+         m1caf1kHRD3z1ubWVFuh+D0qGeEbUNuB9YU+eXXx2zUDmRNyS5Hv0eidSWhGMsD0SuS9
+         Q1xQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWRfa8RzaLyNhuWDRTxPBSGg3aeeDGqwNDF4RhiMBce/AtOQeYA6FX91FManU2sb460fNmfTJTZKxO33WsdAW4/FVoD0Ae2
+X-Gm-Message-State: AOJu0Yy8y9nzawyJhZWcwma3fcv5FZc56f+TFwCXj6CNYci3RSUlk/Sa
+	ZmeBtpooJ7KLp8qY5Y/Q9Yx2dsgf3ngG/dN3IddnCbdSdNQZiKGIfFGrfaHubnEzj8CQI0l/B+g
+	lH+anzsjAWJr0GSLC5N+2lioUMC6/J4IcbVtg
+X-Google-Smtp-Source: AGHT+IGkC8R6gs8FWiWHpUMtbGyq+bA7RbAETq6ID+j0qnlJP6qfOP8ypwWfjR3KUBqpX/w72oFg8by83yIZWemEZcA=
+X-Received: by 2002:a05:600c:501e:b0:421:7195:43e with SMTP id
+ 5b1f17b1804b1-42280dae244mr2301425e9.0.1718211616345; Wed, 12 Jun 2024
+ 10:00:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20240611002145.2078921-1-jthoughton@google.com> <20240611002145.2078921-9-jthoughton@google.com>
-Message-ID: <ZmnGlpBR91TyI3Lt@google.com>
+MIME-Version: 1.0
+References: <20240611002145.2078921-1-jthoughton@google.com>
+ <20240611002145.2078921-9-jthoughton@google.com> <ZmnGlpBR91TyI3Lt@google.com>
+In-Reply-To: <ZmnGlpBR91TyI3Lt@google.com>
+From: Yu Zhao <yuzhao@google.com>
+Date: Wed, 12 Jun 2024 10:59:38 -0600
+Message-ID: <CAOUHufYCmYNngmS=rOSAQRB0N9ai+mA0aDrB9RopBvPHEK42Ng@mail.gmail.com>
 Subject: Re: [PATCH v5 8/9] mm: multi-gen LRU: Have secondary MMUs participate
  in aging
-From: Sean Christopherson <seanjc@google.com>
-To: James Houghton <jthoughton@google.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Ankit Agrawal <ankita@nvidia.com>, Axel Rasmussen <axelrasmussen@google.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, David Matlack <dmatlack@google.com>, 
-	David Rientjes <rientjes@google.com>, James Morse <james.morse@arm.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Raghavendra Rao Ananta <rananta@google.com>, Ryan Roberts <ryan.roberts@arm.com>, 
-	Shaoqin Huang <shahuang@redhat.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Wei Xu <weixugc@google.com>, Will Deacon <will@kernel.org>, Yu Zhao <yuzhao@google.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="us-ascii"
+To: Sean Christopherson <seanjc@google.com>
+Cc: James Houghton <jthoughton@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Ankit Agrawal <ankita@nvidia.com>, 
+	Axel Rasmussen <axelrasmussen@google.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	David Matlack <dmatlack@google.com>, David Rientjes <rientjes@google.com>, 
+	James Morse <james.morse@arm.com>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Raghavendra Rao Ananta <rananta@google.com>, 
+	Ryan Roberts <ryan.roberts@arm.com>, Shaoqin Huang <shahuang@redhat.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Wei Xu <weixugc@google.com>, 
+	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 11, 2024, James Houghton wrote:
-> diff --git a/mm/rmap.c b/mm/rmap.c
-> index e8fc5ecb59b2..24a3ff639919 100644
-> --- a/mm/rmap.c
-> +++ b/mm/rmap.c
-> @@ -870,13 +870,10 @@ static bool folio_referenced_one(struct folio *folio,
->  			continue;
->  		}
->  
-> -		if (pvmw.pte) {
-> -			if (lru_gen_enabled() &&
-> -			    pte_young(ptep_get(pvmw.pte))) {
-> -				lru_gen_look_around(&pvmw);
-> +		if (lru_gen_enabled() && pvmw.pte) {
-> +			if (lru_gen_look_around(&pvmw))
->  				referenced++;
-> -			}
-> -
-> +		} else if (pvmw.pte) {
->  			if (ptep_clear_flush_young_notify(vma, address,
->  						pvmw.pte))
->  				referenced++;
+On Wed, Jun 12, 2024 at 10:02=E2=80=AFAM Sean Christopherson <seanjc@google=
+.com> wrote:
+>
+> On Tue, Jun 11, 2024, James Houghton wrote:
+> > diff --git a/mm/rmap.c b/mm/rmap.c
+> > index e8fc5ecb59b2..24a3ff639919 100644
+> > --- a/mm/rmap.c
+> > +++ b/mm/rmap.c
+> > @@ -870,13 +870,10 @@ static bool folio_referenced_one(struct folio *fo=
+lio,
+> >                       continue;
+> >               }
+> >
+> > -             if (pvmw.pte) {
+> > -                     if (lru_gen_enabled() &&
+> > -                         pte_young(ptep_get(pvmw.pte))) {
+> > -                             lru_gen_look_around(&pvmw);
+> > +             if (lru_gen_enabled() && pvmw.pte) {
+> > +                     if (lru_gen_look_around(&pvmw))
+> >                               referenced++;
+> > -                     }
+> > -
+> > +             } else if (pvmw.pte) {
+> >                       if (ptep_clear_flush_young_notify(vma, address,
+> >                                               pvmw.pte))
+> >                               referenced++;
+>
+> Random question not really related to KVM/secondary MMU participation.  A=
+FAICT,
+> the MGLRU approach doesn't flush TLBs after aging pages.  How does MGLRU =
+mitigate
+> false negatives on pxx_young() due to the CPU not setting Accessed bits b=
+ecause
+> of stale TLB entries?
 
-Random question not really related to KVM/secondary MMU participation.  AFAICT,
-the MGLRU approach doesn't flush TLBs after aging pages.  How does MGLRU mitigate
-false negatives on pxx_young() due to the CPU not setting Accessed bits because
-of stale TLB entries?
+I do think there can be false negatives but we have not been able to
+measure their practical impacts since we disabled the flush on some
+host MMUs long ago (NOT by MGLRU), e.g., on x86 and ppc,
+ptep_clear_flush_young() is just ptep_test_andclear_young(). The
+theoretical basis is that, given the TLB coverage trend (Figure 1 in
+[1]), when a system is running out of memory, it's unlikely to have
+many long-lived entries in its TLB. IOW, if that system had a stable
+working set (hot memory) that can fit into its TLB, it wouldn't hit
+page reclaim. Again, this is based on the theory (proposition) that
+for most systems, their TLB coverages are much smaller than their
+memory sizes.
+
+If/when the above proposition doesn't hold, the next step in the page
+reclaim path, which is to unmap the PTE, will cause a page fault. The
+fault can be minor or major (requires IO), depending on the race
+between the reclaiming and accessing threads. In this case, the
+tradeoff, in a steady state, is between the PF cost of pages we
+shouldn't reclaim and the flush cost of pages we scan. The PF cost is
+higher than the flush cost per page. But we scan many pages and only
+reclaim a few of them; pages we shouldn't reclaim are a (small)
+portion of the latter.
+
+[1] https://www.usenix.org/legacy/events/osdi02/tech/full_papers/navarro/na=
+varro.pdf
