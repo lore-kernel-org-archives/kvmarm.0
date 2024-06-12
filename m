@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB68316E888;
-	Wed, 12 Jun 2024 10:59:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E67C016F0D0
+	for <kvmarm@lists.linux.dev>; Wed, 12 Jun 2024 11:13:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718189968; cv=none; b=X+0PFSIU1n0UsflWr/eT1qGLnl+XU5YhPnv31ZM+sfjQ47TlzdrViW4PPXPgesba0FEwxtpdlOaAALOpkAykir6dZXCAtbCaaJQGowIeTJL1l+AiPWpsaRpB74JjdNA6yIrUbWqmeDfECC65yqYHR1I7xrLUP2c8AywMzq4p7UU=
+	t=1718190836; cv=none; b=sZsvItRkWKBcvvGp/1okPRuKzRKbtcDhVsVKD8HB4SIfXrvqFBoz6SoVk0q+oygE22bzUQJImhmkyJwWsC5bAFgqbB6BGNjYkTsqDSwqREQvo6KSsOQrX5mD9itNoBPfKxHpIvuyK+0AJzXy9YWW/Tu+q5jxZsuc98jzopPEAaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718189968; c=relaxed/simple;
-	bh=llCwwnVAkDKupqy/WhpTunxBcdTwr9NCz6JQmlN1bNM=;
+	s=arc-20240116; t=1718190836; c=relaxed/simple;
+	bh=tGPupE+j4PNoFUUhCfT2XJ/QhRvNfK0mEe6nInmY/cE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ea8n/QSiDO4p5BGuRkQWqisYRcDj8Onqk3jC93CKL5JCUzitDsg687yGK5NXKOEhHsHVGljT6AeHLHPPMepAGtCP3cJ5jVwf4dxXkrL94xMNgF6LGnk0MJAe6pyCKU/rvd/ov0oj2L7WdxItgozvg52pOf4+Sjs2qS7iJcA+1uo=
+	 In-Reply-To:Content-Type; b=HoXdTQiPoB2m2N7LkEzC9USXe7vSOO/0vzVL7I8cfPTmi0cFyQUFuUQ/O2ObYvFltpAdE1z9ZmI0jPkiSysUBATw2/FSUEKOeZyep7BEhavYvIvxNKpQvlhRCyRAWl3oiQZvTEfeXXTiGNlK4qwqDlZXqTCsA+dacF15HyWXEJU=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9FA281595;
-	Wed, 12 Jun 2024 03:59:50 -0700 (PDT)
-Received: from [10.57.72.20] (unknown [10.57.72.20])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C2D073F73B;
-	Wed, 12 Jun 2024 03:59:23 -0700 (PDT)
-Message-ID: <3301ddd8-f088-48e3-bfac-460891698eac@arm.com>
-Date: Wed, 12 Jun 2024 11:59:22 +0100
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B5F421595;
+	Wed, 12 Jun 2024 04:14:18 -0700 (PDT)
+Received: from [10.162.42.15] (e116581.arm.com [10.162.42.15])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 471543F73B;
+	Wed, 12 Jun 2024 04:13:45 -0700 (PDT)
+Message-ID: <6bd821a3-9dbe-499c-ae17-afce70076299@arm.com>
+Date: Wed, 12 Jun 2024 16:43:41 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,75 +27,103 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 02/14] arm64: Detect if in a realm and set RIPAS RAM
-Content-Language: en-GB
-To: Jean-Philippe Brucker <jean-philippe@linaro.org>,
- Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-References: <20240605093006.145492-1-steven.price@arm.com>
- <20240605093006.145492-3-steven.price@arm.com> <20240612104023.GB4602@myrica>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20240612104023.GB4602@myrica>
+Subject: Re: [PATCH 1/2] selftests: kvm: remove print_skip()
+To: Muhammad Usama Anjum <usama.anjum@collabora.com>,
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ James Morse <james.morse@arm.com>, Suzuki K Poulose
+ <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, Sean Christopherson
+ <seanjc@google.com>, Haibo Xu <haibo1.xu@intel.com>,
+ Anup Patel <anup@brainfault.org>, Andrew Jones <ajones@ventanamicro.com>,
+ Aaron Lewis <aaronlewis@google.com>, Thomas Huth <thuth@redhat.com>,
+ Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: kernel@collabora.com, Shuah Khan <skhan@linuxfoundation.org>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Dev Jain <dev.jain@arm.com>
+References: <20240612104500.425012-1-usama.anjum@collabora.com>
+Content-Language: en-US
+From: Dev Jain <dev.jain@arm.com>
+In-Reply-To: <20240612104500.425012-1-usama.anjum@collabora.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 12/06/2024 11:40, Jean-Philippe Brucker wrote:
-> On Wed, Jun 05, 2024 at 10:29:54AM +0100, Steven Price wrote:
->> From: Suzuki K Poulose <suzuki.poulose@arm.com>
->>
->> Detect that the VM is a realm guest by the presence of the RSI
->> interface.
->>
->> If in a realm then all memory needs to be marked as RIPAS RAM initially,
->> the loader may or may not have done this for us. To be sure iterate over
->> all RAM and mark it as such. Any failure is fatal as that implies the
->> RAM regions passed to Linux are incorrect - which would mean failing
->> later when attempting to access non-existent RAM.
->>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Co-developed-by: Steven Price <steven.price@arm.com>
->> Signed-off-by: Steven Price <steven.price@arm.com>
-> 
->> +static bool rsi_version_matches(void)
->> +{
->> +	unsigned long ver_lower, ver_higher;
->> +	unsigned long ret = rsi_request_version(RSI_ABI_VERSION,
->> +						&ver_lower,
->> +						&ver_higher);
-> 
-> There is a regression on QEMU TCG (in emulation mode, not running under KVM):
-> 
->    qemu-system-aarch64 -M virt -cpu max -kernel Image -nographic
-> 
-> This doesn't implement EL3 or EL2, so SMC is UNDEFINED (DDI0487J.a R_HMXQS),
-> and we end up with an undef instruction exception. So this patch would
-> also break hardware that only implements EL1 (I don't know if it exists).
 
-Thanks for the report,  Could we not check ID_AA64PFR0_EL1.EL3 >= 0 ? I
-think we do this for kvm-unit-tests, we need the same here.
+On 6/12/24 16:14, Muhammad Usama Anjum wrote:
+>
+>
+> diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
+> index 4f5881d4ef66d..695c45635d257 100644
+> --- a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
+> +++ b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
+> @@ -144,10 +144,9 @@ int main(int argc, char *argv[])
+>   	free((void *)hv_cpuid_entries);
+>   
+>   	if (!kvm_cpu_has(X86_FEATURE_VMX) ||
+> -	    !kvm_has_cap(KVM_CAP_HYPERV_ENLIGHTENED_VMCS)) {
+> -		print_skip("Enlightened VMCS is unsupported");
+> -		goto do_sys;
+> -	}
+> +	    !kvm_has_cap(KVM_CAP_HYPERV_ENLIGHTENED_VMCS))
+> +		ksft_exit_skip("Enlightened VMCS is unsupported\n");
+> +
+
+Isn't it incorrect to delete 'goto do_sys'? ksft_exit_skip() will exit and the
+program will never jump to that label. At other places too you have deleted the 'goto'.
 
 
-Suzuki
-
-> 
-> The easiest fix is to detect the SMC conduit through the PSCI node in DT.
-> SMCCC helpers already do this, but we can't use them this early in the
-> boot. I tested adding an early probe to the PSCI driver to check this, see
-> attached patches.
-> 
-> Note that we do need to test the conduit after finding a PSCI node,
-> because even though it doesn't implement EL2 in this configuration, QEMU
-> still accepts PSCI HVCs in order to support SMP.
-> 
-> Thanks,
-> Jean
-> 
-
+>   	vcpu_enable_evmcs(vcpu);
+>   	hv_cpuid_entries = vcpu_get_supported_hv_cpuid(vcpu);
+>   	test_hv_cpuid(hv_cpuid_entries, true);
+> @@ -155,10 +154,8 @@ int main(int argc, char *argv[])
+>   
+>   do_sys:
+>   	/* Test system ioctl version */
+> -	if (!kvm_has_cap(KVM_CAP_SYS_HYPERV_CPUID)) {
+> -		print_skip("KVM_CAP_SYS_HYPERV_CPUID not supported");
+> -		goto out;
+> -	}
+> +	if (!kvm_has_cap(KVM_CAP_SYS_HYPERV_CPUID))
+> +		ksft_exit_skip("KVM_CAP_SYS_HYPERV_CPUID not supported\n");
+>   
+>   	test_hv_cpuid_e2big(vm, NULL);
+>   
+> diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c b/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c
+> index 949e08e98f315..d37212a27990b 100644
+> --- a/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c
+> +++ b/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c
+> @@ -47,10 +47,8 @@ int main(void)
+>   
+>   	/* Verify if extended hypercalls are supported */
+>   	if (!kvm_cpuid_has(kvm_get_supported_hv_cpuid(),
+> -			   HV_ENABLE_EXTENDED_HYPERCALLS)) {
+> -		print_skip("Extended calls not supported by the kernel");
+> -		exit(KSFT_SKIP);
+> -	}
+> +			   HV_ENABLE_EXTENDED_HYPERCALLS))
+> +		ksft_exit_skip("Extended calls not supported by the kernel\n");
+>   
+>   	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+>   	run = vcpu->run;
+> diff --git a/tools/testing/selftests/kvm/x86_64/ucna_injection_test.c b/tools/testing/selftests/kvm/x86_64/ucna_injection_test.c
+> index 57f157c06b393..1dcb37a1f0be9 100644
+> --- a/tools/testing/selftests/kvm/x86_64/ucna_injection_test.c
+> +++ b/tools/testing/selftests/kvm/x86_64/ucna_injection_test.c
+> @@ -273,10 +273,8 @@ int main(int argc, char *argv[])
+>   	kvm_ioctl(vm->kvm_fd, KVM_X86_GET_MCE_CAP_SUPPORTED,
+>   		  &supported_mcg_caps);
+>   
+> -	if (!(supported_mcg_caps & MCG_CMCI_P)) {
+> -		print_skip("MCG_CMCI_P is not supported");
+> -		exit(KSFT_SKIP);
+> -	}
+> +	if (!(supported_mcg_caps & MCG_CMCI_P))
+> +		ksft_exit_skip("MCG_CMCI_P is not supported\n");
+>   
+>   	ucna_vcpu = create_vcpu_with_mce_cap(vm, 0, true, ucna_injection_guest_code);
+>   	cmcidis_vcpu = create_vcpu_with_mce_cap(vm, 1, false, cmci_disabled_guest_code);
