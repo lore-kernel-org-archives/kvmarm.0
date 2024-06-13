@@ -1,179 +1,132 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 065091384B9
-	for <kvmarm@lists.linux.dev>; Thu, 13 Jun 2024 06:18:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from out-184.mta1.migadu.com (out-184.mta1.migadu.com [95.215.58.184])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3D86137758
+	for <kvmarm@lists.linux.dev>; Thu, 13 Jun 2024 06:49:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718259508; cv=none; b=qiPzhzkoJ326etHpMz+3YRpIMaFyDjXC5rYPCeOFt3j1mnr561oqte8fzJI7O02eVxVJtCUQ+mD3OqJOXgkx+jXY0sVu+TMQQXkAlGPr4FG3IZXi4P69iOQJDmVvHF9SpHB4ggPTzal7aM8iMOJBoGe2+cPk/kWZsrJIwNcE9kU=
+	t=1718261397; cv=none; b=fKQq3EAwfToYsh36CvE4Nw2ZFTx3m/jBEi/Vrz40oKo48/5dFxNcyB5BNDEp0NBDcr6yh81KG1OhYf0rxqurjivQ1dLNPo5Qermmwotx5NyDRnUWgQNTTqzAY0XGNMnEz66myJOp5SY37MNCqSS5uWcdqyF+iMTs9aX9nwt6B+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718259508; c=relaxed/simple;
-	bh=Ayximh36XHEjtq/+N5q+7aSkB3R77KaSLxol4rkOPEE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=F0NNVkDxeVbIuA7Jwow+e5Kr9Vsh5BSMiYiwejIePmuentGup4wUKjVqFIkD1qO+hFQM4bN1Ae+qmGvcxpElMFzj7WaD1Y9TJDm5P7+HgpV/tbw6U004sisom4c+rXGLWpR+JjPZNc9hhY+1k16p8/33sZeNNodQeGZbPJNgSwI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 10B071477;
-	Wed, 12 Jun 2024 23:18:50 -0700 (PDT)
-Received: from a077893.arm.com (unknown [10.163.44.128])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 5760A3F5A1;
-	Wed, 12 Jun 2024 23:18:18 -0700 (PDT)
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-To: linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	will@kernel.org,
-	catalin.marinas@arm.com,
-	mark.rutland@arm.com
-Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
-	Mark Brown <broonie@kernel.org>,
-	James Clark <james.clark@arm.com>,
-	Rob Herring <robh@kernel.org>,
+	s=arc-20240116; t=1718261397; c=relaxed/simple;
+	bh=Q9ytFUaZFqi/5BMymYxqCA95wvqaeZhoarb+e5F9yPI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UFstLM5ocnbK9winfJ/q0HaWlPWCMsElKT9zLXFFwfnK7Ch5Q9VMf/id7eYIBzcL+4zMG06Xr+cjDA19hEjgSP7DzVoiKrfJC5fN1yPEFyqQJghSBUfVGJ1S2NKlK/t++wOikiISRZzfcs3BkM+hSGgY244XLuX0XBzKRdxfeaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=M9CSiT8d; arc=none smtp.client-ip=95.215.58.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="M9CSiT8d"
+X-Envelope-To: seanjc@google.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1718261393;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dUgr+f5/S1BYrMzUIzzHoZq+nuXyyf5V0WdYC25Cd8s=;
+	b=M9CSiT8dKaHTw3piv1V6oTj1KqOQyfs8CvaI3RQ5vdJYFt99RH8vNd3LFbE9PIVk8OwVas
+	XLz0PROCqSuYLAzNwIijJmurJ/2zA913Ie50WmEJwiiEM6WIAqspuiwNr8jfX+PHrPS0PA
+	FrxV+3EAzC1TIsW+x5UmXdQ/vywRTBQ=
+X-Envelope-To: yuzhao@google.com
+X-Envelope-To: jthoughton@google.com
+X-Envelope-To: akpm@linux-foundation.org
+X-Envelope-To: pbonzini@redhat.com
+X-Envelope-To: ankita@nvidia.com
+X-Envelope-To: axelrasmussen@google.com
+X-Envelope-To: catalin.marinas@arm.com
+X-Envelope-To: dmatlack@google.com
+X-Envelope-To: rientjes@google.com
+X-Envelope-To: james.morse@arm.com
+X-Envelope-To: corbet@lwn.net
+X-Envelope-To: maz@kernel.org
+X-Envelope-To: rananta@google.com
+X-Envelope-To: ryan.roberts@arm.com
+X-Envelope-To: shahuang@redhat.com
+X-Envelope-To: suzuki.poulose@arm.com
+X-Envelope-To: weixugc@google.com
+X-Envelope-To: will@kernel.org
+X-Envelope-To: yuzenghui@huawei.com
+X-Envelope-To: kvmarm@lists.linux.dev
+X-Envelope-To: kvm@vger.kernel.org
+X-Envelope-To: linux-arm-kernel@lists.infradead.org
+X-Envelope-To: linux-doc@vger.kernel.org
+X-Envelope-To: linux-kernel@vger.kernel.org
+X-Envelope-To: linux-mm@kvack.org
+Date: Wed, 12 Jun 2024 23:49:43 -0700
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Yu Zhao <yuzhao@google.com>, James Houghton <jthoughton@google.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Axel Rasmussen <axelrasmussen@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	David Matlack <dmatlack@google.com>,
+	David Rientjes <rientjes@google.com>,
+	James Morse <james.morse@arm.com>, Jonathan Corbet <corbet@lwn.net>,
 	Marc Zyngier <maz@kernel.org>,
-	Suzuki Poulose <suzuki.poulose@arm.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	linux-perf-users@vger.kernel.org,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	kvmarm@lists.linux.dev
-Subject: [PATCH V18 6/9] KVM: arm64: nvhe: Disable branch generation in nVHE guests
-Date: Thu, 13 Jun 2024 11:47:28 +0530
-Message-Id: <20240613061731.3109448-7-anshuman.khandual@arm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240613061731.3109448-1-anshuman.khandual@arm.com>
-References: <20240613061731.3109448-1-anshuman.khandual@arm.com>
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	Shaoqin Huang <shahuang@redhat.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Wei Xu <weixugc@google.com>, Will Deacon <will@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org
+Subject: Re: [PATCH v5 8/9] mm: multi-gen LRU: Have secondary MMUs
+ participate in aging
+Message-ID: <ZmqWhw3eKzwwWUHN@linux.dev>
+References: <20240611002145.2078921-1-jthoughton@google.com>
+ <20240611002145.2078921-9-jthoughton@google.com>
+ <ZmnGlpBR91TyI3Lt@google.com>
+ <CAOUHufYCmYNngmS=rOSAQRB0N9ai+mA0aDrB9RopBvPHEK42Ng@mail.gmail.com>
+ <ZmnZmj8iVmcLf8fo@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZmnZmj8iVmcLf8fo@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-Disable the BRBE before we enter the guest, saving the status and enable it
-back once we get out of the guest. This avoids capturing branch records in
-the guest kernel or userspace, which would be confusing the host samples.
+On Wed, Jun 12, 2024 at 10:23:38AM -0700, Sean Christopherson wrote:
+> On Wed, Jun 12, 2024, Yu Zhao wrote:
+> > I do think there can be false negatives but we have not been able to
+> > measure their practical impacts since we disabled the flush on some
+> > host MMUs long ago (NOT by MGLRU), e.g., on x86 and ppc,
+> > ptep_clear_flush_young() is just ptep_test_andclear_young().
+> 
+> Aha!  That's what I was missing, I somehow didn't see x86's ptep_clear_flush_young().
 
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>
-Cc: James Morse <james.morse@arm.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will@kernel.org>
-Cc: kvmarm@lists.linux.dev
-Cc: linux-arm-kernel@lists.infradead.org
-CC: linux-kernel@vger.kernel.org
-Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
-----
-Changes in V18:
+Heh, well the helper name isn't exactly giving any hints...
 
-- Used host_data_ptr() to access host_debug_state.brbcr_el1 register
-- Changed DEBUG_STATE_SAVE_BRBE to use BIT(7)
-- Reverted back iflags as u8
+> That begs the question, why does KVM flush TLBs on architectures that don't need
+> to?  And since kvm_mmu_notifier_clear_young() explicitly doesn't flush, are there
+> even any KVM-supported architectures for which the flush is mandatory?
+> 
+> Skipping the flush on KVM x86 seems like a complete no-brainer.
+> 
+> Will, Marc and/or Oliver, what are arm64's requirements in this area?  E.g. I see
+> that arm64's version of __ptep_clear_flush_young() does TLBI but not DSB.  Should
+> KVM be doing something similar?  Can KVM safely skip even the TBLI?
 
- arch/arm64/include/asm/kvm_host.h  |  3 +++
- arch/arm64/kvm/debug.c             |  5 +++++
- arch/arm64/kvm/hyp/nvhe/debug-sr.c | 31 ++++++++++++++++++++++++++++++
- 3 files changed, 39 insertions(+)
+Short answer, yes, KVM can elide TLBIs when clearing AF.
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 36b8e97bf49e..db922c10bd2a 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -579,6 +579,7 @@ struct kvm_host_data {
- 		u64 trfcr_el1;
- 		/* Values of trap registers for the host before guest entry. */
- 		u64 mdcr_el2;
-+		u64 brbcr_el1;
- 	} host_debug_state;
- };
- 
-@@ -842,6 +843,8 @@ struct kvm_vcpu_arch {
- #define DEBUG_STATE_SAVE_SPE	__vcpu_single_flag(iflags, BIT(5))
- /* Save TRBE context if active  */
- #define DEBUG_STATE_SAVE_TRBE	__vcpu_single_flag(iflags, BIT(6))
-+/* Save BRBE context if active  */
-+#define DEBUG_STATE_SAVE_BRBE	__vcpu_single_flag(iflags, BIT(7))
- 
- /* SVE enabled for host EL0 */
- #define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
-diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-index ce8886122ed3..8fa648943f0f 100644
---- a/arch/arm64/kvm/debug.c
-+++ b/arch/arm64/kvm/debug.c
-@@ -336,10 +336,15 @@ void kvm_arch_vcpu_load_debug_state_flags(struct kvm_vcpu *vcpu)
- 	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_TraceBuffer_SHIFT) &&
- 	    !(read_sysreg_s(SYS_TRBIDR_EL1) & TRBIDR_EL1_P))
- 		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
-+
-+	/* Check if we have BRBE implemented and available at the host */
-+	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_BRBE_SHIFT))
-+		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_BRBE);
- }
- 
- void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu)
- {
- 	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_SPE);
- 	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
-+	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_BRBE);
- }
-diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-index 53efda0235cf..97e861df1b45 100644
---- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-+++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-@@ -79,6 +79,32 @@ static void __debug_restore_trace(u64 trfcr_el1)
- 	write_sysreg_el1(trfcr_el1, SYS_TRFCR);
- }
- 
-+static void __debug_save_brbe(u64 *brbcr_el1)
-+{
-+	*brbcr_el1 = 0;
-+
-+	/* Check if the BRBE is enabled */
-+	if (!(read_sysreg_el1(SYS_BRBCR) & (BRBCR_ELx_E0BRE | BRBCR_ELx_ExBRE)))
-+		return;
-+
-+	/*
-+	 * Prohibit branch record generation while we are in guest.
-+	 * Since access to BRBCR_EL1 is trapped, the guest can't
-+	 * modify the filtering set by the host.
-+	 */
-+	*brbcr_el1 = read_sysreg_el1(SYS_BRBCR);
-+	write_sysreg_el1(0, SYS_BRBCR);
-+}
-+
-+static void __debug_restore_brbe(u64 brbcr_el1)
-+{
-+	if (!brbcr_el1)
-+		return;
-+
-+	/* Restore BRBE controls */
-+	write_sysreg_el1(brbcr_el1, SYS_BRBCR);
-+}
-+
- void __debug_save_host_buffers_nvhe(struct kvm_vcpu *vcpu)
- {
- 	/* Disable and flush SPE data generation */
-@@ -87,6 +113,9 @@ void __debug_save_host_buffers_nvhe(struct kvm_vcpu *vcpu)
- 	/* Disable and flush Self-Hosted Trace generation */
- 	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_TRBE))
- 		__debug_save_trace(host_data_ptr(host_debug_state.trfcr_el1));
-+	/* Disable BRBE branch records */
-+	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_BRBE))
-+		__debug_save_brbe(host_data_ptr(host_debug_state.brbcr_el1));
- }
- 
- void __debug_switch_to_guest(struct kvm_vcpu *vcpu)
-@@ -100,6 +129,8 @@ void __debug_restore_host_buffers_nvhe(struct kvm_vcpu *vcpu)
- 		__debug_restore_spe(*host_data_ptr(host_debug_state.pmscr_el1));
- 	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_TRBE))
- 		__debug_restore_trace(*host_data_ptr(host_debug_state.trfcr_el1));
-+	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_BRBE))
-+		__debug_restore_brbe(*host_data_ptr(host_debug_state.brbcr_el1));
- }
- 
- void __debug_switch_to_host(struct kvm_vcpu *vcpu)
+Long answer: Software needs to be extremely careful to ensure that TLBI
+elision doesn't lead to a failure to uphold break-before-make requirements,
+if we're only concerned with architecture-specific requirements. IOW, the AF
+cannot be used as a hint for the presence of TLB entries for a given PTE.
+
+There's the obvious failure of skipping TLBIs for old pages when
+unmapping, but that isn't an architecture-specific issue.
+
+So, since KVM/arm64 doesn't play any games with the AF at stage-2, leaving
+out a TLBI when aging ought to be fine.
+
 -- 
-2.25.1
-
+Thanks,
+Oliver
