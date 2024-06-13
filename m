@@ -1,94 +1,102 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FA7543144;
-	Thu, 13 Jun 2024 08:42:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42E3113D608
+	for <kvmarm@lists.linux.dev>; Thu, 13 Jun 2024 09:38:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718268136; cv=none; b=nuU0oXaSJzxnwC62DrfZoPCSa1VHvwQToI+7Aj/B9Gc+HiwKL9TwXy9RFJc44PdvIT1VCbAoom13jV4CJX5ZhPq++Lj9FplUxP5aaGw7Ce/+kaILO23CbZ0JxRZePHk10o9moSyc5KY6F4xw9xrKhVEvTLVtRL+dgdxlvW6gxBQ=
+	t=1718271524; cv=none; b=t+nqnRMg3bUZ9ggkdUWT+tA71IkZ9Wt1N1hqOvF25ckv+8imwi+RlB0adK/JsnIQJDJp3j8vamUa0x1yvlgf0xqIGTtWs9WbemVqzI52DoKHed8I1PqxPT/S29OiebaaeqgGnoAKsWcrkC80JFHS7wyydc1MZ7hBHoHF8reZ9Os=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718268136; c=relaxed/simple;
-	bh=4DwpPwkA6d/p4ccA/BSLWy4Hrj0gghbBTVqHDH0Z++Q=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Wg0gu7hN0JAJlPfGBhyXM5l6Bur5zQjSJXltYs8lAt4pkzJKUbx0S+RjM4mSAuAsnjgo7SJ6HrZjNKpjj56FBR468Xdwc27aTQqEE7WYUM14LXIrML0nbIBiKrx6JXj1Ovj+yH0PkPmN/GyanZrDXWdqZ0dC0Rpt87P4rBuiG94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GsEmIpuS; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GsEmIpuS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 078A6C2BBFC;
-	Thu, 13 Jun 2024 08:42:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718268136;
-	bh=4DwpPwkA6d/p4ccA/BSLWy4Hrj0gghbBTVqHDH0Z++Q=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=GsEmIpuSpzvHxJjmq/ZuB0OjgbYPlf+U7Auma22lPgAsd1ViTHQZIa3XYkeUqURrM
-	 f2LnudOXXDNv15BFUFdWeXjgxjptS7NWx0lP5MslfZ1WxK+KBpJ1SoKovz1EiP0QSe
-	 4FbcVEsd+CQCaoKjx1CuneKkQJ/xrpeDh/5JEgxwac2T2srqM+RqGP8X1693Sp41Z+
-	 1phlJf5D/vj2EU8DFCSSthmofK+r9Q8aEw8Ggy+o8apNcovNvBNi7r17+EQ4EwQTNI
-	 Ez+YB2pwNDIpAaQSwczIZLkk4jWD+/pyblk2Wa3ZIOkIqi9oHA1jorvObl3f3dUdOv
-	 Vtp/IMZfd4LPA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sHg29-003Tbn-Hm;
-	Thu, 13 Jun 2024 09:42:13 +0100
-Date: Thu, 13 Jun 2024 09:42:13 +0100
-Message-ID: <86zfrpjkt6.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Shaoqin Huang <shahuang@redhat.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	kvmarm@lists.linux.dev,
-	Eric Auger <eauger@redhat.com>,
-	Sebastian Ott <sebott@redhat.com>,
-	Cornelia Huck <cohuck@redhat.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	James Morse
- <james.morse@arm.com>,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [RFC PATCH v1 0/2] KVM: arm64: Making BT Field in ID_AA64PFR1_EL1 writable
-In-Reply-To: <7f1ca739-42f5-4e3a-a0c9-b1eac4522a97@redhat.com>
-References: <20240612023553.127813-1-shahuang@redhat.com>
-	<Zmkyi39Pz6Wqll-7@linux.dev>
-	<8634pilbja.wl-maz@kernel.org>
-	<7f1ca739-42f5-4e3a-a0c9-b1eac4522a97@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1718271524; c=relaxed/simple;
+	bh=8M7rrCgkHxYdpgHkP4hx2BYeaaFXqvYRM0G1TYekg8E=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=sLjff7AY2ktO3GxX3E8Fmu2S+lIs9DKSlL7WQ8QSR7alJvRxIFFZwtewQhAIFo4EMXRnM1P8uC/3goA6WxdYz+23tLkVnuHb2YaDeGHQ76ChIMSJCkOoMb2E5bkGdYOg/lVkADdobM4FWjqQx3IzLKaT2210sAMUj+Eb5dKgpVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4W0HLC1JZzzxT3C;
+	Thu, 13 Jun 2024 17:34:27 +0800 (CST)
+Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
+	by mail.maildlp.com (Postfix) with ESMTPS id A1D72140447;
+	Thu, 13 Jun 2024 17:38:32 +0800 (CST)
+Received: from DESKTOP-6NKE0BC.china.huawei.com (10.174.185.210) by
+ kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 13 Jun 2024 17:38:31 +0800
+From: Kunkun Jiang <jiangkunkun@huawei.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Randy Dunlap <rdunlap@infradead.org>
+CC: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<wanghaibin.wang@huawei.com>, Kunkun Jiang <jiangkunkun@huawei.com>,
+	<lishusen2@huawei.com>
+Subject: [PATCH] KVM: arm64: vgic-its: clear dte when mapd unmaps a device
+Date: Thu, 13 Jun 2024 17:38:11 +0800
+Message-ID: <20240613093811.710-1-jiangkunkun@huawei.com>
+X-Mailer: git-send-email 2.26.2.windows.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: shahuang@redhat.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, eauger@redhat.com, sebott@redhat.com, cohuck@redhat.com, catalin.marinas@arm.com, james.morse@arm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, pbonzini@redhat.com, shuah@kernel.org, suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemm600007.china.huawei.com (7.193.23.208)
 
-On Thu, 13 Jun 2024 09:31:45 +0100,
-Shaoqin Huang <shahuang@redhat.com> wrote:
-> 
-> If we don't care about the FEAT_CNTSC right now. Could I fix the
-> compile issue and respin this again without the background of enabling
-> migration between MtCollins and AmpereOne, and just keep the
-> information of the different BT field between different machine?
+vgic_its_save_device_tables will traverse its->device_list to
+save dte for each device. vgic_its_restore_device_tables will
+traverse each entry of device table and check if it is valid.
+Restore if valid.
 
-As I said, I think this patch is valuable. But maybe you should
-consider tackling the full register, rather than only addressing a
-single field.
+But when mapd unmaps a devices, we do not invalidate the
+corresponding dte. In the scenario of continuous save
+and restore, there may be a situation where a device's dte
+is not saved but is restored. This is unreasonable and may
+cause restore to fail. This patch clears the corresponding
+dte when mapd unmaps a device.
 
-Thanks,
+Singed-off-by: Shusen Li <lishusen2@huawei.com>
+Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
+---
+ arch/arm64/kvm/vgic/vgic-its.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-	M.
-
+diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+index 40bb43f20bf3..dd5fba1e8ba3 100644
+--- a/arch/arm64/kvm/vgic/vgic-its.c
++++ b/arch/arm64/kvm/vgic/vgic-its.c
+@@ -1140,8 +1140,12 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
+ 	u8 num_eventid_bits = its_cmd_get_size(its_cmd);
+ 	gpa_t itt_addr = its_cmd_get_ittaddr(its_cmd);
+ 	struct its_device *device;
++	gpa_t gpa;
++	const struct vgic_its_abi *abi;
++	int dte_esz;
++	u64 val;
+ 
+-	if (!vgic_its_check_id(its, its->baser_device_table, device_id, NULL))
++	if (!vgic_its_check_id(its, its->baser_device_table, device_id, &gpa))
+ 		return E_ITS_MAPD_DEVICE_OOR;
+ 
+ 	if (valid && num_eventid_bits > VITS_TYPER_IDBITS)
+@@ -1161,8 +1165,13 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
+ 	 * The spec does not say whether unmapping a not-mapped device
+ 	 * is an error, so we are done in any case.
+ 	 */
+-	if (!valid)
++	if (!valid) {
++		abi = vgic_its_get_abi(its);
++		dte_esz = abi->dte_esz;
++		val = cpu_to_le64(0);
++		vgic_write_guest_lock(kvm, gpa, &val, dte_esz);
+ 		return 0;
++	}
+ 
+ 	device = vgic_its_alloc_device(its, device_id, itt_addr,
+ 				       num_eventid_bits);
 -- 
-Without deviation from the norm, progress is not possible.
+2.33.0
+
