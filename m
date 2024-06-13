@@ -1,155 +1,119 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E086145FE4
-	for <kvmarm@lists.linux.dev>; Thu, 13 Jun 2024 14:44:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49FA582C67
+	for <kvmarm@lists.linux.dev>; Thu, 13 Jun 2024 20:18:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718289850; cv=none; b=S+TMQ6lOwDrFfB5jUmmDG2esdycAuhWItCtFM0DJA0XveXhz+hz4vHLwFdzLW6lsrRj5ajANqz7ZJOZNTW0afZtIfFdfRclfGLYuLRtQdA+L87xgmqwgeQI2Y/3bjTdOzc0LUDCQJx5D4HfGIEV2Jryn3dwpxWgeuRSJhgpunhg=
+	t=1718309913; cv=none; b=ES73Fn+u5G87s8ddIBe1sd5FVrbgfMYrHu0bM6kXXtmttPi/3NnfKZpdmlFQZDZwjK8HugbdQFnP30E47lIefgU7oXZOgmmPsNpOlf8Yr8vAiIM5J1ORXGVN5db6PSJik6bK3Gl0CuLMzONvG1IzUCNu3NpldZTLDj50mrmrsRk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718289850; c=relaxed/simple;
-	bh=CQgcUN37V00aFSaArAlD/UsaQMLBynNNZwRe1t2wcog=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SqBUCeqxt2lrUC5Ht+gbdfYRkb0wY5Fi8jKIpruZT4tTHym28Rq9f2ZePVzVRR65B4RNiEjTIUmsRkH1RoWS6uhGgOHOltpXHf5Lsn4f1d5LcE0xkAwRLzLQAu6LcslK/UrPo2uihOykx1owhTkTpTFlXYktK+hXiKyIlKipjBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YfJyOtgR; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1718309913; c=relaxed/simple;
+	bh=aUA6GkBCXlHEKjTMOAarYKrx5UDdpgklYNaD5KhUVyE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YFlrbEkiaR1IjI052bTQ9U2wGKhKKj21Xt0aLoqsouZCPhIxR2uHg/yLhOUN4wVBQnuUbNeReP1mjpYUv2RXDG1vcOAwkMsjjEyKjJTfExQT6KtLfDDn1WJtfdCK+nCSZaL2CFDErUpt4YoKUqcQAhaLo/B0DD3qUr5wZG6lbfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=szt4UVsU; arc=none smtp.client-ip=95.215.58.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YfJyOtgR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5E51C2BBFC;
-	Thu, 13 Jun 2024 14:44:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718289849;
-	bh=CQgcUN37V00aFSaArAlD/UsaQMLBynNNZwRe1t2wcog=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=YfJyOtgRWgtTMT8vumFIaG/ieV0Yga113xw6owxq4vgc8mvWhFYHE62X8aF/bsWvD
-	 IyFOSI/clfkT51A+kPFxFcfr7I+ZorEviStc4tDE4gZfPh6hnvJilIOdMeYZ4In0GP
-	 Nip3vFJlRylgIE9oCa16oZ5NhgoiIjp71de0wZqJ4TWy+UmhdJ7ytQT8P337tzsHCt
-	 SMYQVm5tIrk51Lj6SVSFpJUymmjVnf4Aq7pdgNha6mbRdorRKbSF6XLiRYXjTHIpgf
-	 ge9TSwKQbKXWZy8pzPTN5cNXCAP9AOhYqWPfksXkxbADxCK4bc8K8o2NSAdjbKRvvW
-	 yL9LaPf0k1bNA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sHlgN-003arf-Ea;
-	Thu, 13 Jun 2024 15:44:07 +0100
-Date: Thu, 13 Jun 2024 15:44:06 +0100
-Message-ID: <86v82ckimh.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Kunkun Jiang <jiangkunkun@huawei.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="szt4UVsU"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1718309909;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=J7UqqLkx9Att1F5lKMFuTx4t69pmgAIBy2UA9BMWSDw=;
+	b=szt4UVsUMH/5/VuPyv3qqfhfjASDQmJDe5YqBNYrITMy7AhJNmoN7t3G9R09/2Ov2Gd7F5
+	GbWejjsRxP87SC9W2uO4XCRWRZa0V4BS4UmDdWjYfZtS9fJjY3EEcyN7ww+uJoNcEBpuBm
+	fGC3AYtz+sbRe+I/m+6SFtMcQqahkKQ=
+X-Envelope-To: maz@kernel.org
+X-Envelope-To: james.morse@arm.com
+X-Envelope-To: suzuki.poulose@arm.com
+X-Envelope-To: yuzenghui@huawei.com
+X-Envelope-To: kvm@vger.kernel.org
+X-Envelope-To: tabba@google.com
+X-Envelope-To: oliver.upton@linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	<linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>,
-	<wanghaibin.wang@huawei.com>,
-	<lishusen2@huawei.com>, Eric Auger <eauger@redhat.com>
-Subject: Re: [PATCH] KVM: arm64: vgic-its: clear dte when mapd unmaps a device
-In-Reply-To: <20240613093811.710-1-jiangkunkun@huawei.com>
-References: <20240613093811.710-1-jiangkunkun@huawei.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	kvm@vger.kernel.org,
+	Fuad Tabba <tabba@google.com>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH v2 00/15] KVM: arm64: nv: FPSIMD/SVE, plus some other CPTR goodies
+Date: Thu, 13 Jun 2024 20:17:41 +0000
+Message-ID: <20240613201756.3258227-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: jiangkunkun@huawei.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, rdunlap@infradead.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, wanghaibin.wang@huawei.com, lishusen2@huawei.com, eauger@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, 13 Jun 2024 10:38:11 +0100,
-Kunkun Jiang <jiangkunkun@huawei.com> wrote:
-> 
-> vgic_its_save_device_tables will traverse its->device_list to
-> save dte for each device. vgic_its_restore_device_tables will
-> traverse each entry of device table and check if it is valid.
-> Restore if valid.
-> 
-> But when mapd unmaps a devices, we do not invalidate the
-> corresponding dte. In the scenario of continuous save
-> and restore, there may be a situation where a device's dte
-> is not saved but is restored. This is unreasonable and may
-> cause restore to fail. This patch clears the corresponding
-> dte when mapd unmaps a device.
-> 
-> Singed-off-by: Shusen Li <lishusen2@huawei.com>
+As discussed, here's the combined series of Marc + I's patches that
+implement all the trap forwarding / merging logic required to observe
+the L1 CPTR configuration when running an L2 guest.
 
-  ^^^^^^^^^^^^^ This isn't a valid tag!
+Like before, this was tested on Neoverse-V2 with L0, L1, and L2 running
+fpsimd-test and sve-test on top of one another.
 
-> Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
+v1 [1] -> v2:
+ - Grab Marc's CPTR trap patches [2]
+ - Avoid taking two traps when L1 accesses ZCR_EL2 while the host owns
+   FP regs. The fast path will now load the FP regs and forward the
+   sysreg trap to the slow path for complete handling.
+ - Add a comment describing the above behavior (Marc)
+ - Avoid the use of guest_hyp_*_traps_enabled() in
+   __activate_cptr_traps() for better codegen (Marc)
+ - Document the reason for only testing bit[0] of CPTR_EL2.xEN when
+   folding L1 traps into the hardware CPTR value.
+ - Add a helper for synthesizing SVE traps, rather than open-coding the
+   ESR value in access_zcr_el2()
 
-Something is wrong. Either Shusen Li is the author and you are merely
-posting it, in which case there should be a 'From' line in the commit
-message, or you are co-authors and there should be a 'Co-developed-by'
-right after Shusen Li's SoB.
+[1]: https://lore.kernel.org/kvmarm/20240531231358.1000039-1-oliver.upton@linux.dev/
+[2]: https://lore.kernel.org/kvmarm/20240604130553.199981-1-maz@kernel.org/
 
-Please read Documentation/process/submitting-patches.rst for the
-details.
+Jintack Lim (1):
+  KVM: arm64: nv: Forward FP/ASIMD traps to guest hypervisor
 
-> ---
->  arch/arm64/kvm/vgic/vgic-its.c | 13 +++++++++++--
->  1 file changed, 11 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-> index 40bb43f20bf3..dd5fba1e8ba3 100644
-> --- a/arch/arm64/kvm/vgic/vgic-its.c
-> +++ b/arch/arm64/kvm/vgic/vgic-its.c
-> @@ -1140,8 +1140,12 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
->  	u8 num_eventid_bits = its_cmd_get_size(its_cmd);
->  	gpa_t itt_addr = its_cmd_get_ittaddr(its_cmd);
->  	struct its_device *device;
-> +	gpa_t gpa;
-> +	const struct vgic_its_abi *abi;
-> +	int dte_esz;
-> +	u64 val;
+Marc Zyngier (4):
+  KVM: arm64: nv: Handle CPACR_EL1 traps
+  KVM: arm64: nv: Add TCPAC/TTA to CPTR->CPACR conversion helper
+  KVM: arm64: nv: Add trap description for CPTR_EL2
+  KVM: arm64: nv: Add additional trap setup for CPTR_EL2
 
-Aside from 'gpa', all the extra variables should be moved into the
-!valid block. And it would be nicer if this variable was called
-something more descriptive.
+Oliver Upton (10):
+  KVM: arm64: nv: Forward SVE traps to guest hypervisor
+  KVM: arm64: nv: Load guest FP state for ZCR_EL2 trap
+  KVM: arm64: nv: Load guest hyp's ZCR into EL1 state
+  KVM: arm64: nv: Handle ZCR_EL2 traps
+  KVM: arm64: nv: Save guest's ZCR_EL2 when in hyp context
+  KVM: arm64: nv: Use guest hypervisor's max VL when running nested
+    guest
+  KVM: arm64: nv: Ensure correct VL is loaded before saving SVE state
+  KVM: arm64: Spin off helper for programming CPTR traps
+  KVM: arm64: nv: Honor guest hypervisor's FP/SVE traps in CPTR_EL2
+  KVM: arm64: Allow the use of SVE+NV
 
->  
-> -	if (!vgic_its_check_id(its, its->baser_device_table, device_id, NULL))
-> +	if (!vgic_its_check_id(its, its->baser_device_table, device_id, &gpa))
->  		return E_ITS_MAPD_DEVICE_OOR;
->  
->  	if (valid && num_eventid_bits > VITS_TYPER_IDBITS)
-> @@ -1161,8 +1165,13 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
->  	 * The spec does not say whether unmapping a not-mapped device
->  	 * is an error, so we are done in any case.
->  	 */
-> -	if (!valid)
-> +	if (!valid) {
-> +		abi = vgic_its_get_abi(its);
-> +		dte_esz = abi->dte_esz;
-> +		val = cpu_to_le64(0);
-> +		vgic_write_guest_lock(kvm, gpa, &val, dte_esz);
+ arch/arm64/include/asm/kvm_emulate.h    |  55 +++++++++
+ arch/arm64/include/asm/kvm_host.h       |   7 ++
+ arch/arm64/include/asm/kvm_nested.h     |   5 +-
+ arch/arm64/kvm/arm.c                    |   5 -
+ arch/arm64/kvm/emulate-nested.c         |  91 ++++++++++++++
+ arch/arm64/kvm/fpsimd.c                 |  22 +++-
+ arch/arm64/kvm/handle_exit.c            |  19 ++-
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  24 +++-
+ arch/arm64/kvm/hyp/vhe/switch.c         | 156 ++++++++++++++++++++----
+ arch/arm64/kvm/nested.c                 |   3 +-
+ arch/arm64/kvm/sys_regs.c               |  38 ++++++
+ 11 files changed, 380 insertions(+), 45 deletions(-)
 
-This is just a bit wrong:
 
-- you store 0 in a u64 after having (pointlessly) converted it to le64
-
-- you write 'dte_esz' bytes into guest memory, but you don't have any
-  check whether this is *larger* than the u64 you have passed
-
-Similar issue exists in all the vgic_its_save_*() functions, calling
-for a generic fix, as we're just lucky to never have needed a new ABI
-so far. At the very least a check that we deal with data that is
-exactly 8 bytes.
-
-Also, is the device table the only one that is subject to this
-'reload' problem? How about the Collection table?
-
-Thanks,
-
-	M.
-
+base-commit: c3f38fa61af77b49866b006939479069cd451173
 -- 
-Without deviation from the norm, progress is not possible.
+2.45.2.627.g7a2c4fd464-goog
+
