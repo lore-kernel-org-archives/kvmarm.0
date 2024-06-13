@@ -1,132 +1,155 @@
-Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D2E6145345
-	for <kvmarm@lists.linux.dev>; Thu, 13 Jun 2024 13:21:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E086145FE4
+	for <kvmarm@lists.linux.dev>; Thu, 13 Jun 2024 14:44:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718284865; cv=none; b=gUlGrd79P20eIerExxuPu6FYLNr01grkw5lRh1eM863WHnrxvjDciuWZfw0ptHsEh8EJ7FC54/RWqC+If5iELvLNNyAxOSG1JN0fDrL5py04CMrtxDwi7CRFbS5c5nmlu2iCupwyTJGUlX+i4Jlo4GUehMULCiqP8JHpGyr/ZCY=
+	t=1718289850; cv=none; b=S+TMQ6lOwDrFfB5jUmmDG2esdycAuhWItCtFM0DJA0XveXhz+hz4vHLwFdzLW6lsrRj5ajANqz7ZJOZNTW0afZtIfFdfRclfGLYuLRtQdA+L87xgmqwgeQI2Y/3bjTdOzc0LUDCQJx5D4HfGIEV2Jryn3dwpxWgeuRSJhgpunhg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718284865; c=relaxed/simple;
-	bh=kxJ6yca6FhrEdaeRJHlyh47eGEiERJamoE3DlUAPJas=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=pxur2o03zWc1wUGaT0pLrKGyqMr39JPzshPmG4/iG7znQmhuHUxD5Qv56cWdfOUTWtcwSiUdr00w0O1V4GRtVg7UuZFrYOfPHXum5mQ0o+Tx8siHxYPOcr/GJRTv+kE7F3jgyl6Q1i5lSorW7Z5JICXJJenHmbH/uDfo9pZ2YHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RfHD42v/; arc=none smtp.client-ip=209.85.221.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com
+	s=arc-20240116; t=1718289850; c=relaxed/simple;
+	bh=CQgcUN37V00aFSaArAlD/UsaQMLBynNNZwRe1t2wcog=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SqBUCeqxt2lrUC5Ht+gbdfYRkb0wY5Fi8jKIpruZT4tTHym28Rq9f2ZePVzVRR65B4RNiEjTIUmsRkH1RoWS6uhGgOHOltpXHf5Lsn4f1d5LcE0xkAwRLzLQAu6LcslK/UrPo2uihOykx1owhTkTpTFlXYktK+hXiKyIlKipjBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YfJyOtgR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RfHD42v/"
-Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-35f2760ab86so772236f8f.0
-        for <kvmarm@lists.linux.dev>; Thu, 13 Jun 2024 06:21:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718284862; x=1718889662; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=85ojJxkNYXxh97Mo9k1gfrYfK0JeNvYJnaS4+QvvHCA=;
-        b=RfHD42v/Xl2ozuTsHL4M01g4nZxj+792Y+ACa8Yo1bS2cYoqxlxrbmUOn/GuZZ4avK
-         dlBrn68YKTVQlcPpVW77Fy342cw351HWD9OzM9LQJ2OgohOqJpEMjbErWgMnFHeBBMnt
-         fATF1sjLEyo1BVceuqtYBr2PRk61v7G8+E10G55E+lFWM3tWHaHPA7Q6RBwBXIyMOTYV
-         qC/yfL3Ogby/a8NoJYheoYpS74Ab9mgYm/6jtsm+fJz6syQqrMMRVSv8IDFxyMjXf3mq
-         IgSFqJ7VGmZPE/nHG342KgAZLpmTfR0aPPZrNYLqYSLGf/vXIEHm1o0oTwuG5JyPGzdG
-         lfvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718284862; x=1718889662;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=85ojJxkNYXxh97Mo9k1gfrYfK0JeNvYJnaS4+QvvHCA=;
-        b=Lhbk3fqb7+NdTT/FtHtG9Y6c6EsOWrzGQA7R3d1quEdvx/Pzk3uIJXIPygBXkzc+rC
-         VgaPADPYEq9KCFv9JO2G2YFG/5vokiXpjk74IIDvG+iiiuk9FWJRAPuS7hiK3LxvC7GV
-         VAkB5sSwf9usQyEY26Pzwlh4mliCMR41zP3br01JKD2OwzUq5hclyVVbK7oj9y9uFyGa
-         +VAf77IOXZ78okhbxS6fLG6qOu+8SvlQd2qbpYC1a8nfBg9MoZi/UzngWhqbV/M5V0ps
-         0zKDlzNqjy23vM8RiMSOrEOJu8oZf3a30KQAxsO8Ff55cSyiqDZJEc74yD70mbPhNINr
-         gtFA==
-X-Gm-Message-State: AOJu0Yz4h8KcRExeKSgblpF68+d2JW1p67ph9Np0chq6+2iAe0A94G1m
-	hhMWB4vd2EdwgJ0c+qYLBDZ+H/p9Vhy5t/Sf6g+pCJPsMYTvzmG7h7IPAvZ7FVB8LCsc9rDH705
-	tSPgKUEoti0wCgDw6pFIrnplE3g==
-X-Google-Smtp-Source: AGHT+IEGmcAxjB2wRcZVPwbydQye9U+Lfxf52+t870ONm/t/2enRlN5yWNU9fxSxYfGOvDAZatwr0XKHsQNvtwSMq2I=
-X-Received: from sebkvm.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:cd5])
- (user=sebastianene job=sendgmr) by 2002:a5d:4e09:0:b0:354:f4a4:6d35 with SMTP
- id ffacd0b85a97d-35fe8928988mr10512f8f.13.1718284862437; Thu, 13 Jun 2024
- 06:21:02 -0700 (PDT)
-Date: Thu, 13 Jun 2024 13:20:35 +0000
-In-Reply-To: <20240613132035.1070360-1-sebastianene@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YfJyOtgR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5E51C2BBFC;
+	Thu, 13 Jun 2024 14:44:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718289849;
+	bh=CQgcUN37V00aFSaArAlD/UsaQMLBynNNZwRe1t2wcog=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=YfJyOtgRWgtTMT8vumFIaG/ieV0Yga113xw6owxq4vgc8mvWhFYHE62X8aF/bsWvD
+	 IyFOSI/clfkT51A+kPFxFcfr7I+ZorEviStc4tDE4gZfPh6hnvJilIOdMeYZ4In0GP
+	 Nip3vFJlRylgIE9oCa16oZ5NhgoiIjp71de0wZqJ4TWy+UmhdJ7ytQT8P337tzsHCt
+	 SMYQVm5tIrk51Lj6SVSFpJUymmjVnf4Aq7pdgNha6mbRdorRKbSF6XLiRYXjTHIpgf
+	 ge9TSwKQbKXWZy8pzPTN5cNXCAP9AOhYqWPfksXkxbADxCK4bc8K8o2NSAdjbKRvvW
+	 yL9LaPf0k1bNA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sHlgN-003arf-Ea;
+	Thu, 13 Jun 2024 15:44:07 +0100
+Date: Thu, 13 Jun 2024 15:44:06 +0100
+Message-ID: <86v82ckimh.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Kunkun Jiang <jiangkunkun@huawei.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	<linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>,
+	<wanghaibin.wang@huawei.com>,
+	<lishusen2@huawei.com>, Eric Auger <eauger@redhat.com>
+Subject: Re: [PATCH] KVM: arm64: vgic-its: clear dte when mapd unmaps a device
+In-Reply-To: <20240613093811.710-1-jiangkunkun@huawei.com>
+References: <20240613093811.710-1-jiangkunkun@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20240613132035.1070360-1-sebastianene@google.com>
-X-Mailer: git-send-email 2.45.2.505.gda0bf45e8d-goog
-Message-ID: <20240613132035.1070360-5-sebastianene@google.com>
-Subject: [PATCH v3 4/4] KVM: arm64: Use FF-A 1.1 with pKVM
-From: Sebastian Ene <sebastianene@google.com>
-To: catalin.marinas@arm.com, james.morse@arm.com, jean-philippe@linaro.org, 
-	maz@kernel.org, oliver.upton@linux.dev, qperret@google.com, 
-	qwandor@google.com, sudeep.holla@arm.com, suzuki.poulose@arm.com, 
-	tabba@google.com, will@kernel.org, yuzenghui@huawei.com, 
-	lpieralisi@kernel.org
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kernel-team@android.com, 
-	Sebastian Ene <sebastianene@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: jiangkunkun@huawei.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, rdunlap@infradead.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, wanghaibin.wang@huawei.com, lishusen2@huawei.com, eauger@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Now that the layout of the structures is compatible with 1.1 it is time
-to probe the 1.1 version of the FF-A protocol inside the hypervisor. If
-the TEE doesn't support it, it should return the minimum supported
-version.
+On Thu, 13 Jun 2024 10:38:11 +0100,
+Kunkun Jiang <jiangkunkun@huawei.com> wrote:
+> 
+> vgic_its_save_device_tables will traverse its->device_list to
+> save dte for each device. vgic_its_restore_device_tables will
+> traverse each entry of device table and check if it is valid.
+> Restore if valid.
+> 
+> But when mapd unmaps a devices, we do not invalidate the
+> corresponding dte. In the scenario of continuous save
+> and restore, there may be a situation where a device's dte
+> is not saved but is restored. This is unreasonable and may
+> cause restore to fail. This patch clears the corresponding
+> dte when mapd unmaps a device.
+> 
+> Singed-off-by: Shusen Li <lishusen2@huawei.com>
 
-Signed-off-by: Sebastian Ene <sebastianene@google.com>
-Reviewed-by: Sudeep Holla <sudeep.holla@arm.com>
-Tested-by: Sudeep Holla <sudeep.holla@arm.com>
----
- arch/arm64/kvm/hyp/nvhe/ffa.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+  ^^^^^^^^^^^^^ This isn't a valid tag!
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-index 4eaef673e98d..fdb63b7857ec 100644
---- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-+++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-@@ -457,7 +457,7 @@ static __always_inline void do_ffa_mem_xfer(const u64 func_id,
- 	memcpy(buf, host_buffers.tx, fraglen);
- 
- 	ep_mem_access = (void *)buf +
--			ffa_mem_desc_offset(buf, 0, FFA_VERSION_1_0);
-+			ffa_mem_desc_offset(buf, 0, hyp_ffa_version);
- 	offset = ep_mem_access->composite_off;
- 	if (!offset || buf->ep_count != 1 || buf->sender_id != HOST_FFA_ID) {
- 		ret = FFA_RET_INVALID_PARAMETERS;
-@@ -536,7 +536,7 @@ static void do_ffa_mem_reclaim(struct arm_smccc_res *res,
- 	fraglen = res->a2;
- 
- 	ep_mem_access = (void *)buf +
--			ffa_mem_desc_offset(buf, 0, FFA_VERSION_1_0);
-+			ffa_mem_desc_offset(buf, 0, hyp_ffa_version);
- 	offset = ep_mem_access->composite_off;
- 	/*
- 	 * We can trust the SPMD to get this right, but let's at least
-@@ -844,7 +844,7 @@ int hyp_ffa_init(void *pages)
- 	if (kvm_host_psci_config.smccc_version < ARM_SMCCC_VERSION_1_2)
- 		return 0;
- 
--	arm_smccc_1_1_smc(FFA_VERSION, FFA_VERSION_1_0, 0, 0, 0, 0, 0, 0, &res);
-+	arm_smccc_1_1_smc(FFA_VERSION, FFA_VERSION_1_1, 0, 0, 0, 0, 0, 0, &res);
- 	if (res.a0 == FFA_RET_NOT_SUPPORTED)
- 		return 0;
- 
-@@ -864,7 +864,11 @@ int hyp_ffa_init(void *pages)
- 	if (FFA_MAJOR_VERSION(res.a0) != 1)
- 		return -EOPNOTSUPP;
- 
--	hyp_ffa_version = FFA_VERSION_1_0;
-+	if (FFA_MINOR_VERSION(res.a0) < FFA_MINOR_VERSION(FFA_VERSION_1_1))
-+		hyp_ffa_version = res.a0;
-+	else
-+		hyp_ffa_version = FFA_VERSION_1_1;
-+
- 	tx = pages;
- 	pages += KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE;
- 	rx = pages;
+> Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
+
+Something is wrong. Either Shusen Li is the author and you are merely
+posting it, in which case there should be a 'From' line in the commit
+message, or you are co-authors and there should be a 'Co-developed-by'
+right after Shusen Li's SoB.
+
+Please read Documentation/process/submitting-patches.rst for the
+details.
+
+> ---
+>  arch/arm64/kvm/vgic/vgic-its.c | 13 +++++++++++--
+>  1 file changed, 11 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> index 40bb43f20bf3..dd5fba1e8ba3 100644
+> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> @@ -1140,8 +1140,12 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
+>  	u8 num_eventid_bits = its_cmd_get_size(its_cmd);
+>  	gpa_t itt_addr = its_cmd_get_ittaddr(its_cmd);
+>  	struct its_device *device;
+> +	gpa_t gpa;
+> +	const struct vgic_its_abi *abi;
+> +	int dte_esz;
+> +	u64 val;
+
+Aside from 'gpa', all the extra variables should be moved into the
+!valid block. And it would be nicer if this variable was called
+something more descriptive.
+
+>  
+> -	if (!vgic_its_check_id(its, its->baser_device_table, device_id, NULL))
+> +	if (!vgic_its_check_id(its, its->baser_device_table, device_id, &gpa))
+>  		return E_ITS_MAPD_DEVICE_OOR;
+>  
+>  	if (valid && num_eventid_bits > VITS_TYPER_IDBITS)
+> @@ -1161,8 +1165,13 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
+>  	 * The spec does not say whether unmapping a not-mapped device
+>  	 * is an error, so we are done in any case.
+>  	 */
+> -	if (!valid)
+> +	if (!valid) {
+> +		abi = vgic_its_get_abi(its);
+> +		dte_esz = abi->dte_esz;
+> +		val = cpu_to_le64(0);
+> +		vgic_write_guest_lock(kvm, gpa, &val, dte_esz);
+
+This is just a bit wrong:
+
+- you store 0 in a u64 after having (pointlessly) converted it to le64
+
+- you write 'dte_esz' bytes into guest memory, but you don't have any
+  check whether this is *larger* than the u64 you have passed
+
+Similar issue exists in all the vgic_its_save_*() functions, calling
+for a generic fix, as we're just lucky to never have needed a new ABI
+so far. At the very least a check that we deal with data that is
+exactly 8 bytes.
+
+Also, is the device table the only one that is subject to this
+'reload' problem? How about the Collection table?
+
+Thanks,
+
+	M.
+
 -- 
-2.45.2.505.gda0bf45e8d-goog
-
+Without deviation from the norm, progress is not possible.
