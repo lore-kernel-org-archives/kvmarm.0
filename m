@@ -1,57 +1,57 @@
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C0FD137914
-	for <kvmarm@lists.linux.dev>; Thu, 13 Jun 2024 12:29:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBF1A441D
+	for <kvmarm@lists.linux.dev>; Thu, 13 Jun 2024 12:37:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718281747; cv=none; b=Rb56yT70MprSYOy9YiTKcRsmXHg7YkJ97lDpteUiHmCx0RBfP/Dv7ZHeKxIrfdozc6YmulfhcYWhyKIUjJu1ZjYjCexrIivzGNElK4Iln28b8+aw59f+hd6KKOn9TMYBBLafwRJ6XlY42pEe0A9qTjXJzXJZYNJCnm+jl+aSNeU=
+	t=1718282236; cv=none; b=Tp1ek5+hdyBZmCcKfWkL/vzWsLvuXdEy15uQdCx56qLncCAP7M7jzN+DKW1+li7VrVqEQeZIpwemenNfoGJyiiQuYYCVT1fYvGfjHPYxAtPUsInRzKS3JwTsBGmxv/WsnrTluJ8ehVs+vkuEq17nNggSy822hAHdYNvipLn2vMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718281747; c=relaxed/simple;
-	bh=ZQr1/K4f23/ybKQFINkZ4Mvh9i6Y52jFysbDIWiMqSw=;
+	s=arc-20240116; t=1718282236; c=relaxed/simple;
+	bh=/13ngaRTyPeB4vBu9MQ8WJijEgAX5lH/Z0IZ+QKcV+w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=emI3iF/vUYRpBp8gxS2jL8nA6UPNdjWrxWctt64V0WF7a54Iio338cJHVGTYHyIGGrEwkTfFP2Qz8esenNb78dR+/UxbgNq9ROAJavntN6i6pOcALPPToCIfQ70EreuKSQxHgAilYn8qtIZUSJrGOGoXmglnUTocpieI4w4m6R8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WK/a/jGw; arc=none smtp.client-ip=209.85.128.51
+	 Content-Type:Content-Disposition:In-Reply-To; b=KXVFGGAMJ+jNxSwoS9Leh1e4lnfCxmfOEvEp+pNPP6Bsa8PvO7LGKpN+lm+mreKP9y3hlhKSJoy52yabHmvH5AdMY8v0g9McHqJ/wCaPfaWOXLKcZgH/uBLOFkE2TsS/GfWapBoQchyxmfsQc361UZgksBkoDWK+1RKSHrT2NHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Xg4rB3J+; arc=none smtp.client-ip=209.85.208.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WK/a/jGw"
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-422954bbe29so58655e9.1
-        for <kvmarm@lists.linux.dev>; Thu, 13 Jun 2024 05:29:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Xg4rB3J+"
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-57c6cb1a76fso11000a12.1
+        for <kvmarm@lists.linux.dev>; Thu, 13 Jun 2024 05:37:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718281744; x=1718886544; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1718282233; x=1718887033; darn=lists.linux.dev;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=J0fEuFqzalyC11tgCJL2olWAZeSZgE1wRxfqpcISgXM=;
-        b=WK/a/jGwbJUs1FRR5ohUSC7JMje77Xf4OLI/vYQNqM9cjDDYEatxGallpVGPoBhx0r
-         BUmi+E2bZRAXMLOCmlXoumPAgDUnNu97/i8kl9+xN3oxqtUjo4Rwzl4QY0JHjnMIG4V5
-         KJrRTTizR4S+Rfdy6AXN3oAphl8hwOhAtVMtHtpoJ3X4tm+twont5VXcmUHwIOzj0AXh
-         vx96FZNXKkTlCD+jpO97wVYyMK+h12xbyHpEB58rWI+LKiLl9IWcib+IvJxcjJyKjTm7
-         Lymq8Yf6L9j98fwbpm1/LPjqEd4UBN0uwuURYDlEMCB95fgWTyBHWHMKlZ63PO/nhEwH
-         0tAQ==
+        bh=MznSC12yYzkye/+ENgqiPXuQSrlPFjsWMKgcvI0Z2PU=;
+        b=Xg4rB3J+td0pq0TSe+sUl1vA2mDGeRVLcjvbMNifYQXLhT/j7e1mXA3/6lvyss0ACW
+         V3ZbXX8XaVLXvfb5ZYh4Y6/BqXaWvSHM4YmHCX2WHj8DYc4EGWR2t0qQiP0N71ctLvqr
+         y+GU3er2a/EkYKFy8NRFOWOC2H5KPbJW1UwGcqmduu1mdN3mbqsYPnymjcjAK8u83o0/
+         mtE22++211bZq6fRLY8RphvD7uzttKPu0fCxt0BrVn1+zHUaJYYFRedE1FgZmmEmp73V
+         PB4lCvdMsqJ5beXmdqKL0q7pW8qjvWqlHJ1Z9K/SwH8sv3QeKt1tqxf/o/uEWHYzYoAN
+         iM+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718281744; x=1718886544;
+        d=1e100.net; s=20230601; t=1718282233; x=1718887033;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=J0fEuFqzalyC11tgCJL2olWAZeSZgE1wRxfqpcISgXM=;
-        b=VUdnasIzI7PS+VCUof18nwyzR39EpFe303URbA1pGE2ZeJbmbH+0dwe6RKfu6IDgol
-         w1mHx8/7ErBmzCVYWZFMcIr8dFkcMTInJZT20SdbMp5x+lON6Kwrg2yLJLx5hhRpoRDZ
-         GwKpA+zJjJcDGr0bLLxJOX4OsSVvy3/znD4ggyK0XKvhEzY1A9WQAqEjapxQY5FpNlNh
-         xQHNtBKB9ySaWgdnaVP3tQ4wvMa4AB4/EBUU+2VPODONn/JfmP4anM8kyvTez9Ny3sNC
-         d6LTn4fY4Q/aX65jb41oYXccVuzb1H+F3cpYLjpAyXeppsC/VqcjowZliH+DDsnIaVMg
-         BM9g==
-X-Forwarded-Encrypted: i=1; AJvYcCUJKGj9K5mDtgZcB4axfU1rkxSa4L5UwoiTzjUrHM5hQ0gvbKLjGNvbjeXLELhsOrK630lW692QZWlUCTsptg9v9O8QIxO3
-X-Gm-Message-State: AOJu0Yy2PHorwVRHYHmX4i+QSioQ+kYQQLlf5zMC7xIKLIwjYtZgB0IQ
-	Sz1ML5UmNhDI6Y4XnsODUqRZx+BXxkoXIFUhlnzdzKQc1ffUuXSt0f0sxutq/w==
-X-Google-Smtp-Source: AGHT+IEYwF3dbYa8WWBR2FOETBShap+ZaRRBpIecfX014Bk1dlr42J+E8CnlmGuDyWnxRW8ohwrAxQ==
-X-Received: by 2002:a05:600c:1e1c:b0:41b:4c6a:de7a with SMTP id 5b1f17b1804b1-422f2aba180mr1330895e9.3.1718281743540;
-        Thu, 13 Jun 2024 05:29:03 -0700 (PDT)
+        bh=MznSC12yYzkye/+ENgqiPXuQSrlPFjsWMKgcvI0Z2PU=;
+        b=VrjGBysVM46FpG+totQnzl/CwqDjOJHOO3NyeC+Yuwby4a+YOsRlJLGmt9nrFkXFRX
+         xZu5UPB3a0Cou5rzy8jhJ9EmxCmJks43TAiw8bGT2bs3Q/hwQVbwhg8R7YQ/gh6Th10h
+         or3Z9xQi/MpsExp1ufCD2IADZ4SQIrqmlnu3EhI3MAIvZb/nQzdO5RgFa3yw9t3j+GI8
+         PaqxqJo8p7PXS/dCSSpODUwaoIfLa+vE/zuCnlJU4ph1iAlkNOC8mp6HPyazq+SVoPbG
+         yfJp2PEU4/xtuxmzKTQNE4j9x74vLhSHTFd721FLQ2LL/tBfI7Yz1iKQgRZ31WMDLvkz
+         765A==
+X-Forwarded-Encrypted: i=1; AJvYcCUggdCnZJZHN5jDfI64DBAMcdQDhtOb2LuOSBLNpSdFGmsg7hdaOSCzAoY43SAUzXz+jQDkZiXefjmNvkjXXnJ5JH7lBupY
+X-Gm-Message-State: AOJu0YxpCZO3wWHIatMR6AXN5G+1I3d+hixNYtACEnpXVRe5NCJUd1M7
+	FUIpRNECOPm24tvwQZ9VllacpBPXsMbAeqsuksxe1d793oz5kurbbKlKMaRwuQ==
+X-Google-Smtp-Source: AGHT+IFP8djsGWBB5M7AJLJBWEREHC1E9615rPjaCU+riDmr7PzZ+qpZx22Wb8eUXNrKQ7Be+vXNdg==
+X-Received: by 2002:a05:6402:524f:b0:57c:b799:2527 with SMTP id 4fb4d7f45d1cf-57cb7992890mr126050a12.7.1718282232985;
+        Thu, 13 Jun 2024 05:37:12 -0700 (PDT)
 Received: from google.com (216.131.76.34.bc.googleusercontent.com. [34.76.131.216])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-52ca390b493sm133521e87.161.2024.06.13.05.29.01
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3607509c890sm1628667f8f.28.2024.06.13.05.37.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Jun 2024 05:29:02 -0700 (PDT)
-Date: Thu, 13 Jun 2024 12:29:00 +0000
+        Thu, 13 Jun 2024 05:37:12 -0700 (PDT)
+Date: Thu, 13 Jun 2024 12:37:10 +0000
 From: Sebastian Ene <sebastianene@google.com>
 To: Sudeep Holla <sudeep.holla@arm.com>
 Cc: catalin.marinas@arm.com, james.morse@arm.com, jean-philippe@linaro.org,
@@ -60,11 +60,12 @@ Cc: catalin.marinas@arm.com, james.morse@arm.com, jean-philippe@linaro.org,
 	will@kernel.org, yuzenghui@huawei.com, lpieralisi@kernel.org,
 	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org, kernel-team@android.com
-Subject: Re: [PATCH v2 2/4] KVM: arm64: Add support for FFA_PARTITION_INFO_GET
-Message-ID: <ZmrmDHEoZoOXmSd4@google.com>
+Subject: Re: [PATCH v2 3/4] KVM: arm64: Fix the identification range for the
+ FF-A smcs
+Message-ID: <Zmrn9u8pJ0nduxfQ@google.com>
 References: <20240515172258.1680881-1-sebastianene@google.com>
- <20240515172258.1680881-3-sebastianene@google.com>
- <ZmmxBWIerq5Durve@bogus>
+ <20240515172258.1680881-4-sebastianene@google.com>
+ <Zmmy4pmgLFZNhXqp@bogus>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -73,30 +74,35 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZmmxBWIerq5Durve@bogus>
+In-Reply-To: <Zmmy4pmgLFZNhXqp@bogus>
 
-On Wed, Jun 12, 2024 at 03:30:29PM +0100, Sudeep Holla wrote:
-> On Wed, May 15, 2024 at 05:22:56PM +0000, Sebastian Ene wrote:
-> > Handle the FFA_PARTITION_INFO_GET host call inside the pKVM hypervisor
-> > and copy the response message back to the host buffers.
+On Wed, Jun 12, 2024 at 03:38:26PM +0100, Sudeep Holla wrote:
+> On Wed, May 15, 2024 at 05:22:57PM +0000, Sebastian Ene wrote:
+> > The FF-A spec 1.2 reserves the following ranges for identifying FF-A
+> > calls:
+> > 0x84000060-0x840000FF: FF-A 32-bit calls
+> > 0xC4000060-0xC40000FF: FF-A 64-bit calls.
 > >
-> > Save the returned FF-A version as we will need it later to interpret the
-> > response from the TEE.
+> > Use the range identification according to the spec and allow calls that
+> > are currently out of the range(eg. FFA_MSG_SEND_DIRECT_REQ2) to be
+> > identified correctly.
 > >
-> I don't understand the context of the above statement and this patch.
-> Did you mean use the saved version to take apt action/decision within
-> FFA_PARTITION_INFO_GET handler. Or is it just missed cleanup ?
-
-This is a missed cleanup I will drop this part from the commit message.
-
-Thanks,
-Seb
-
-> 
-> The change itself looks good.
 > 
 > Reviewed-by: Sudeep Holla <sudeep.holla@arm.com>
+> 
+> Not sure if this needs to be fixes though. With addition of notifications
+> in the FF-A driver(since v6.7), host can send FF-A messages beyond 0x7F.
+> But since the pKVM FF-A proxy support is not yet updated to v1.1, so I
+> don't think it needs to be tagged as fix. Just thought I will mention it
+> here anyways.
+
+Yes, good point. I will rewrite the title of the commit to remove the
+fixes tag.
+
 > 
 > --
 > Regards,
 > Sudeep
+
+Thanks,
+Seb
