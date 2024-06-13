@@ -1,124 +1,136 @@
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D531137901
-	for <kvmarm@lists.linux.dev>; Thu, 13 Jun 2024 06:53:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6622F13DDBA
+	for <kvmarm@lists.linux.dev>; Thu, 13 Jun 2024 08:24:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718261586; cv=none; b=IIzV/zw3BVe8HJZufVKIIQA3y8rvqk94k1zc4G7i1yvQmbf9CmqvYS5nkM9u/eHhT7AAQRMGQd8n6GkjSO/TSidMpPO7nOVZvRXCsjw9oaoUpIWPVspxTeTyVGvfA74OLecPqP/ONQLA/q7LeLZsthJ5/fYAiKROrRkou2ZSTuM=
+	t=1718267043; cv=none; b=JDNrYY7I1tvdmGdtKALTz6GkTKFypkqoNmKAiW6eeGRWGTEtt0VzYBIqHLvKpHzQ6ojVwQcqDQ1U1224KXEHWhupmEGTnJ1+Ci8ck+yxhtELZutl8/WBNtHVeJYp7K2flKmPmAYsmVKaCZ2j0kALhtqMZi1Hd1qzVDclamY2l3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718261586; c=relaxed/simple;
-	bh=yraTjogu4eOqUCyxiyu0hsjap40zvHzUuM2vZuXA884=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lfEqcQnX8QeKa1sYOnNi6ZICyoO+aob98z/r7ZncLO9EqUGc6nhK4FcbV3osfaf9nlH8o835Rp0hBSrQdzR+wTmZn7gXeIU5KqLaAc9ZlDNSJeeFeX28rIR/RIUCIzVdSwXY/h+arkn28z3+EwA8aBO2JRruiBriSLNfoHYJlTA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=E2YkpHhg; arc=none smtp.client-ip=95.215.58.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1718267043; c=relaxed/simple;
+	bh=lvZJNz+i9EDaQCjhUC22E8ddQlH97BuhqNxoVVu5sHQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=beA07lcOD/XzbRbnL5Aw9UzfKpvznZhVNaEhUjPWhTbrbzXTBSdsQGEH/Pn+kf1nJ4gnadtniycTu7qy8ESaG3ZjR07myGahPc3ogwS5HKlkZNurHaNJgGS8Ew8zNK2G+4BKU3xKPzMZmf5HZWscNQkovjrUlUkj5sOOjkVsY0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=C8SM2elN; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="E2YkpHhg"
-X-Envelope-To: seanjc@google.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1718261582;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C8SM2elN"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718267039;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Pob+bbjOFf7h6fV5Z73fEIqJzbiI/6j+uQH9c0cAzHg=;
-	b=E2YkpHhg9Fmt6ybwKMqAQ8YYVGNLeh+hnNDYUUgtnxXsZt8FPeY8y4asORfx9UtpBGDdgW
-	f89IxPl8BPGmssOaYtFNoF4Ne/Nort9q7LMc+MCYF/csuZLtAUXsUTYi9NWg2lq3NtdWXS
-	n7jRAHCQzaqnHvPxkt9oahMQUtNWoPk=
-X-Envelope-To: jthoughton@google.com
-X-Envelope-To: yuzhao@google.com
-X-Envelope-To: akpm@linux-foundation.org
-X-Envelope-To: pbonzini@redhat.com
-X-Envelope-To: ankita@nvidia.com
-X-Envelope-To: axelrasmussen@google.com
-X-Envelope-To: catalin.marinas@arm.com
-X-Envelope-To: dmatlack@google.com
-X-Envelope-To: rientjes@google.com
-X-Envelope-To: james.morse@arm.com
-X-Envelope-To: corbet@lwn.net
-X-Envelope-To: maz@kernel.org
-X-Envelope-To: rananta@google.com
-X-Envelope-To: ryan.roberts@arm.com
-X-Envelope-To: shahuang@redhat.com
-X-Envelope-To: suzuki.poulose@arm.com
-X-Envelope-To: weixugc@google.com
-X-Envelope-To: will@kernel.org
-X-Envelope-To: yuzenghui@huawei.com
-X-Envelope-To: kvmarm@lists.linux.dev
-X-Envelope-To: kvm@vger.kernel.org
-X-Envelope-To: linux-arm-kernel@lists.infradead.org
-X-Envelope-To: linux-doc@vger.kernel.org
-X-Envelope-To: linux-kernel@vger.kernel.org
-X-Envelope-To: linux-mm@kvack.org
-Date: Wed, 12 Jun 2024 23:52:54 -0700
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: James Houghton <jthoughton@google.com>, Yu Zhao <yuzhao@google.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Ankit Agrawal <ankita@nvidia.com>,
-	Axel Rasmussen <axelrasmussen@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	David Matlack <dmatlack@google.com>,
-	David Rientjes <rientjes@google.com>,
-	James Morse <james.morse@arm.com>, Jonathan Corbet <corbet@lwn.net>,
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=NaPbyJRxJ7+BuxaunDSaKOHKTF/69OqVmW3jjFNQASA=;
+	b=C8SM2elNnKwTcwcpXBJNlADvtf28iwVBXiniH48cb5812D9y9knsYSzMWLFgLXdG18f8PY
+	nY/CTq4RNCijl2aEFcQJe4ZwXSkC7wxPspeBjTVXM9jdXkuUFKcu4zg/wq1EO4KTOy6hes
+	I3zw1plGhfR+E2++Xf/P2MZHJJrlOtQ=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-464-QHU8lVdbMei7qJ-e2UhoyA-1; Thu,
+ 13 Jun 2024 04:23:53 -0400
+X-MC-Unique: QHU8lVdbMei7qJ-e2UhoyA-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 90AB019560B4;
+	Thu, 13 Jun 2024 08:23:51 +0000 (UTC)
+Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 798A519560BF;
+	Thu, 13 Jun 2024 08:23:49 +0000 (UTC)
+From: Shaoqin Huang <shahuang@redhat.com>
+To: Oliver Upton <oliver.upton@linux.dev>,
 	Marc Zyngier <maz@kernel.org>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	Shaoqin Huang <shahuang@redhat.com>,
+	kvmarm@lists.linux.dev
+Cc: Shaoqin Huang <shahuang@redhat.com>,
+	James Morse <james.morse@arm.com>,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Wei Xu <weixugc@google.com>, Will Deacon <will@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org
-Subject: Re: [PATCH v5 4/9] mm: Add test_clear_young_fast_only MMU notifier
-Message-ID: <ZmqXRhFSoE38foh6@linux.dev>
-References: <20240611002145.2078921-1-jthoughton@google.com>
- <20240611002145.2078921-5-jthoughton@google.com>
- <CAOUHufYGqbd45shZkGCpqeTV9wcBDUoo3iw1SKiDeFLmrP0+=w@mail.gmail.com>
- <CADrL8HVHcKSW3hiHzKTit07gzo36jtCZCnM9ZpueyifgNdGggw@mail.gmail.com>
- <ZmidYAWKU1HANKU6@linux.dev>
- <ZmiqXUwMXtUGanQc@google.com>
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH v9 0/3] KVM: selftests: aarch64: Introduce pmu_event_filter_test
+Date: Thu, 13 Jun 2024 04:23:38 -0400
+Message-Id: <20240613082345.132336-1-shahuang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZmiqXUwMXtUGanQc@google.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Tue, Jun 11, 2024 at 12:49:49PM -0700, Sean Christopherson wrote:
-> On Tue, Jun 11, 2024, Oliver Upton wrote:
-> > On Tue, Jun 11, 2024 at 09:49:59AM -0700, James Houghton wrote:
-> > > I think consolidating the callbacks is cleanest, like you had it in
-> > > v2. I really wasn't sure about this change honestly, but it was my
-> > > attempt to incorporate feedback like this[3] from v4. I'll consolidate
-> > > the callbacks like you had in v2.
-> > 
-> > My strong preference is to have the callers expectations of the
-> > secondary MMU be explicit. Having ->${BLAH}_fast_only() makes this
-> > abundantly clear both at the callsite and in the implementation.
-> 
-> Partially agreed.  We don't need a dedicated mmu_notifier API to achieve that
-> for the callsites, e.g. ptep_clear_young_notify() passes fast_only=false, and a
-> new ptep_clear_young_notify_fast_only() does the obvious.
-> 
-> On the back end, odds are very good KVM is going to squish the "fast" and "slow"
-> paths back into a common helper, so IMO having dedicated fast_only() APIs for the
-> mmu_notifier hooks doesn't add much value in the end.
-> 
-> I'm not opposed to dedicated hooks, but I after poking around a bit, I suspect
-> that passing a fast_only flag will end up being less cleaner for all parties.
+The test is inspired by the pmu_event_filter_test which implemented by x86. On
+the arm64 platform, there is the same ability to set the pmu_event_filter
+through the KVM_ARM_VCPU_PMU_V3_FILTER attribute. So add the test for arm64.
 
-Yeah, I think I'm headed in the same direction after actually reading
-the MM side of this, heh.
+The series first create the helper function which can be used
+for the vpmu related tests. Then, it implement the test.
+
+Changelog:
+----------
+v8->v9:
+  - Rebased to latest kvm-arm/next.
+
+v7->v8:
+  - Rebased to kvm-arm/next.
+  - Deleted the GIC layout related staff.
+  - Fixed the checking logic in the kvm_pmu_support_events.
+
+v6->v7:
+  - Rebased to v6.9-rc3.
+
+v5->v6:
+  - Rebased to v6.9-rc1.
+  - Collect RB.
+  - Add multiple filter test.
+
+v4->v5:
+  - Rebased to v6.8-rc6.
+  - Refactor the helper function, make it fine-grained and easy to be used.
+  - Namimg improvements.
+  - Use the kvm_device_attr_set() helper.
+  - Make the test descriptor array readable and clean.
+  - Delete the patch which moves the pmu related helper to vpmu.h.
+  - Remove the kvm_supports_pmu_event_filter() function since nobody will run
+  this on a old kernel.
+
+v3->v4:
+  - Rebased to the v6.8-rc2.
+
+v2->v3:
+  - Check the pmceid in guest code instead of pmu event count since different
+  hardware may have different event count result, check pmceid makes it stable
+  on different platform.                        [Eric]
+  - Some typo fixed and commit message improved.
+
+v1->v2:
+  - Improve the commit message.                 [Eric]
+  - Fix the bug in [enable|disable]_counter.    [Raghavendra & Marc]
+  - Add the check if kvm has attr KVM_ARM_VCPU_PMU_V3_FILTER.
+  - Add if host pmu support the test event throught pmceid0.
+  - Split the test_invalid_filter() to another patch. [Eric]
+
+Shaoqin Huang (3):
+  KVM: selftests: aarch64: Add helper function for the vpmu vcpu
+    creation
+  KVM: selftests: aarch64: Introduce pmu_event_filter_test
+  KVM: selftests: aarch64: Add invalid filter test in
+    pmu_event_filter_test
+
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../kvm/aarch64/pmu_event_filter_test.c       | 340 ++++++++++++++++++
+ .../kvm/aarch64/vpmu_counter_access.c         |  32 +-
+ .../selftests/kvm/include/aarch64/vpmu.h      |  28 ++
+ 4 files changed, 375 insertions(+), 26 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
+ create mode 100644 tools/testing/selftests/kvm/include/aarch64/vpmu.h
 
 -- 
-Thanks,
-Oliver
+2.40.1
+
