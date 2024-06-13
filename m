@@ -1,116 +1,159 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B6E11422D1
-	for <kvmarm@lists.linux.dev>; Thu, 13 Jun 2024 10:27:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C5D814262B
+	for <kvmarm@lists.linux.dev>; Thu, 13 Jun 2024 10:50:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718274448; cv=none; b=C75Hut0Dfbr88NTc301SKQ6mm9oi1XCFVOFzrS8F+2FOu8K+2fA67Rbb39c+olSV8LeYsd9Oji2YPtGJ0YGA99u2j/sXqMTW0pmfRNQ1Ug/aeTh71zQ4OlJDxrWtpW71lYBsU4s6IgE+MhyPQcpFhDk1giH9RrYBw2hNbTwZC4w=
+	t=1718275855; cv=none; b=qu7EYqstFmCzwZzvkwVDJt2J52O6juBSnCRFQEAYPRr3CJh6/UzAMpfsM7Wdf/AtlkxdPvAJIKrnRviE93zB0TRNA3f8bEeLEcYb+9Ywpblyf5gKNruvuE6R3JEVu4cgHtfzrZwQJ1dyAIfQuQdqo22bzO0awYpcWc+ik5Nd2pE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718274448; c=relaxed/simple;
-	bh=dTKmwEKAj9gD/2+0/9oNTSzv1cgKOsCjl/Z5hSuHaqU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=G4b7GGE5SA1/PU6U13TxUSFny7TkaX7KdXTR1DY0YxLz1Gjsy3No5pQftFZL2Y34xlVjLz+/g2u6BA9PDrYaAw/tGxZfGHD1cjgUbcLSHCxkKkEQ/pR2nnOi46YjoqbQPzjSaQCHbs1H7eNwPgI/PiyrWCrofuCGikUKbJpIcms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2F1AE1063;
-	Thu, 13 Jun 2024 03:27:49 -0700 (PDT)
-Received: from a077893.arm.com (unknown [10.163.44.128])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id E8B033F5A1;
-	Thu, 13 Jun 2024 03:27:20 -0700 (PDT)
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-To: linux-arm-kernel@lists.infradead.org
-Cc: mark.rutland@arm.com,
-	ryan.roberts@arm.com,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Marc Zyngier <maz@kernel.org>,
+	s=arc-20240116; t=1718275855; c=relaxed/simple;
+	bh=UgyBUaw5Cfb+8mR7p+p9qMbx6BdW9rHq+TZllqNkmHo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FjqFJCJSkupfBYJQvvDBe961yX2v7PvE+lFppW8itD8xuTYvJQrnbr80N/VK3U/k1S4XpSXDhg7hCJkYyXX6wRFec8UL/bveyAQz+Elx+aHt9M6O1A4C+xyg7zARGh9GyEL8qZpyqscj5QG9kFqQBN6dFCJWop3/47UPU0wak3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=r6GkdD8Z; arc=none smtp.client-ip=209.85.208.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="r6GkdD8Z"
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2ebed33cbadso7925691fa.0
+        for <kvmarm@lists.linux.dev>; Thu, 13 Jun 2024 03:50:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1718275852; x=1718880652; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=P8BVG4kRdfLOofP57LybYLwKmto1z7Z4ok3Ssg9M2l0=;
+        b=r6GkdD8ZZiDElRtxKLLusDjEYVUAjxKb68iWmIQSypkiTK7PFu+/poi/bBMCjGdWYQ
+         753ECo5O6mh73Yl93/nzNL8Bd0q4PyUQ0m4E85Bg5RFEknDcFyJJK0jBwhvGB00Dgd7i
+         fkAUJ8M/TFQJyk7iVJObEokkbKNX6OCLtM3WKohIWclFgLtnjsCdqjU+HfmD0JZ9Uqxh
+         xFKF/PpnykJ6jQzl1LY2pwlndFoGiF56q6VnCfm4NJiOS+4dmahIMVzGahutPXjuPnBk
+         nJJCf444QEFQRVbiktChIpMeWwuOAtB8EW8GxN9BQo1OaWgIGdCVrEvSKkOGsehKuXiG
+         GNHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718275852; x=1718880652;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=P8BVG4kRdfLOofP57LybYLwKmto1z7Z4ok3Ssg9M2l0=;
+        b=keHj649GY67mQe/mBbuLjIxbrwBxHmVncObksjsI7ck+rmLCu1Xa1NTZYmQ1SQyxjQ
+         npFTVpE+oyzGdePVwmz248mBkPUAenDZsjT8rJIFvR8qFatHsLlZDgaktc3dz5+s7/fK
+         PJlaik0/nLGGM+TIYXm6Ov3pT8s04bltbxbGCTwajCOCNeJIhqY6kKHHkxjHRezaw81v
+         +htthyfx7AFGmgU30Lp/fTl738uhlOitDO4IKmkLnCPiaU+B7jjOYG0wR0VyufnoPzK/
+         S/eCheKE84d3eqwE5atArqzen/gsCFaR/QPVJZ0xgqjJeCDJubCndi/GXzfavdFlPeoi
+         0Ohw==
+X-Forwarded-Encrypted: i=1; AJvYcCW841J4livgyAPYb9p9+XRVcbZflmfnQhcd/VN7TBDO68uh9sAiNK67MsT1BShXiaph4Fs420+zHSbLadHcEEWhfL2OoE2d
+X-Gm-Message-State: AOJu0Yz3xBZKmZPtM1Q/jPBvjFGvJceeJqN7VfwWaL96u0YinuBdjsb3
+	px1gF0R13OsWqhS7xhy5GRavSvpSZfQb9/j9K04mqjisUr0+bVVDBheEybtvPig=
+X-Google-Smtp-Source: AGHT+IFHavbOr+OgWlX2a5b/dvGpv+Y/52aYQqWXG4No5o2I0ST7yMd4AjYSJZeNAegwsKQiKBFEvA==
+X-Received: by 2002:a2e:681a:0:b0:2eb:db25:a68f with SMTP id 38308e7fff4ca-2ebfc9abdf4mr25206351fa.52.1718275852267;
+        Thu, 13 Jun 2024 03:50:52 -0700 (PDT)
+Received: from myrica ([2.221.137.100])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57cb72ea3b2sm763316a12.55.2024.06.13.03.50.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Jun 2024 03:50:51 -0700 (PDT)
+Date: Thu, 13 Jun 2024 11:51:07 +0100
+From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH V2 1/2] KVM: arm64: Replace custom macros with fields from ID_AA64PFR0_EL1
-Date: Thu, 13 Jun 2024 15:57:09 +0530
-Message-Id: <20240613102710.3295108-2-anshuman.khandual@arm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240613102710.3295108-1-anshuman.khandual@arm.com>
-References: <20240613102710.3295108-1-anshuman.khandual@arm.com>
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	peter.maydell@linaro.org
+Subject: Re: [PATCH v3 02/14] arm64: Detect if in a realm and set RIPAS RAM
+Message-ID: <20240613105107.GC417776@myrica>
+References: <20240605093006.145492-1-steven.price@arm.com>
+ <20240605093006.145492-3-steven.price@arm.com>
+ <20240612104023.GB4602@myrica>
+ <3301ddd8-f088-48e3-bfac-460891698eac@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3301ddd8-f088-48e3-bfac-460891698eac@arm.com>
 
-This replaces custom macros usage (i.e ID_AA64PFR0_EL1_ELx_64BIT_ONLY and
-ID_AA64PFR0_EL1_ELx_32BIT_64BIT) and instead directly uses register fields
-from ID_AA64PFR0_EL1 sysreg definition.
+On Wed, Jun 12, 2024 at 11:59:22AM +0100, Suzuki K Poulose wrote:
+> On 12/06/2024 11:40, Jean-Philippe Brucker wrote:
+> > On Wed, Jun 05, 2024 at 10:29:54AM +0100, Steven Price wrote:
+> > > From: Suzuki K Poulose <suzuki.poulose@arm.com>
+> > > 
+> > > Detect that the VM is a realm guest by the presence of the RSI
+> > > interface.
+> > > 
+> > > If in a realm then all memory needs to be marked as RIPAS RAM initially,
+> > > the loader may or may not have done this for us. To be sure iterate over
+> > > all RAM and mark it as such. Any failure is fatal as that implies the
+> > > RAM regions passed to Linux are incorrect - which would mean failing
+> > > later when attempting to access non-existent RAM.
+> > > 
+> > > Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> > > Co-developed-by: Steven Price <steven.price@arm.com>
+> > > Signed-off-by: Steven Price <steven.price@arm.com>
+> > 
+> > > +static bool rsi_version_matches(void)
+> > > +{
+> > > +	unsigned long ver_lower, ver_higher;
+> > > +	unsigned long ret = rsi_request_version(RSI_ABI_VERSION,
+> > > +						&ver_lower,
+> > > +						&ver_higher);
+> > 
+> > There is a regression on QEMU TCG (in emulation mode, not running under KVM):
+> > 
+> >    qemu-system-aarch64 -M virt -cpu max -kernel Image -nographic
+> > 
+> > This doesn't implement EL3 or EL2, so SMC is UNDEFINED (DDI0487J.a R_HMXQS),
+> > and we end up with an undef instruction exception. So this patch would
+> > also break hardware that only implements EL1 (I don't know if it exists).
+> 
+> Thanks for the report,  Could we not check ID_AA64PFR0_EL1.EL3 >= 0 ? I
+> think we do this for kvm-unit-tests, we need the same here.
 
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org
-Cc: kvmarm@lists.linux.dev
-Cc: linux-kernel@vger.kernel.org
-Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
----
- arch/arm64/kvm/hyp/include/nvhe/fixed_config.h | 10 +++++-----
- arch/arm64/kvm/hyp/nvhe/pkvm.c                 |  4 ++--
- arch/arm64/kvm/hyp/nvhe/sys_regs.c             |  2 +-
- 3 files changed, 8 insertions(+), 8 deletions(-)
+Good point, it also fixes this case and is simpler. It assumes RMM doesn't
+hide this field, but I can't think of a reason it would.
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/fixed_config.h b/arch/arm64/kvm/hyp/include/nvhe/fixed_config.h
-index 51f043649146..f957890c7e38 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/fixed_config.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/fixed_config.h
-@@ -52,11 +52,11 @@
-  *	Supported by KVM
-  */
- #define PVM_ID_AA64PFR0_RESTRICT_UNSIGNED (\
--	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL0), ID_AA64PFR0_EL1_ELx_64BIT_ONLY) | \
--	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL1), ID_AA64PFR0_EL1_ELx_64BIT_ONLY) | \
--	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL2), ID_AA64PFR0_EL1_ELx_64BIT_ONLY) | \
--	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL3), ID_AA64PFR0_EL1_ELx_64BIT_ONLY) | \
--	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_RAS), ID_AA64PFR0_EL1_RAS_IMP) \
-+	SYS_FIELD_PREP_ENUM(ID_AA64PFR0_EL1, EL0, IMP) | \
-+	SYS_FIELD_PREP_ENUM(ID_AA64PFR0_EL1, EL1, IMP) | \
-+	SYS_FIELD_PREP_ENUM(ID_AA64PFR0_EL1, EL2, IMP) | \
-+	SYS_FIELD_PREP_ENUM(ID_AA64PFR0_EL1, EL3, IMP) | \
-+	SYS_FIELD_PREP_ENUM(ID_AA64PFR0_EL1, RAS, IMP) \
- 	)
- 
- /*
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index 26dd9a20ad6e..58da2fec89b2 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -31,9 +31,9 @@ static void pvm_init_traps_aa64pfr0(struct kvm_vcpu *vcpu)
- 
- 	/* Protected KVM does not support AArch32 guests. */
- 	BUILD_BUG_ON(FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL0),
--		PVM_ID_AA64PFR0_RESTRICT_UNSIGNED) != ID_AA64PFR0_EL1_ELx_64BIT_ONLY);
-+		PVM_ID_AA64PFR0_RESTRICT_UNSIGNED) != ID_AA64PFR0_EL1_EL0_IMP);
- 	BUILD_BUG_ON(FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL1),
--		PVM_ID_AA64PFR0_RESTRICT_UNSIGNED) != ID_AA64PFR0_EL1_ELx_64BIT_ONLY);
-+		PVM_ID_AA64PFR0_RESTRICT_UNSIGNED) != ID_AA64PFR0_EL1_EL1_IMP);
- 
- 	/*
- 	 * Linux guests assume support for floating-point and Advanced SIMD. Do
-diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-index edd969a1f36b..2860548d4250 100644
---- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-+++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-@@ -276,7 +276,7 @@ static bool pvm_access_id_aarch32(struct kvm_vcpu *vcpu,
- 	 * of AArch32 feature id registers.
- 	 */
- 	BUILD_BUG_ON(FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL1),
--		     PVM_ID_AA64PFR0_RESTRICT_UNSIGNED) > ID_AA64PFR0_EL1_ELx_64BIT_ONLY);
-+		     PVM_ID_AA64PFR0_RESTRICT_UNSIGNED) > ID_AA64PFR0_EL1_EL1_IMP);
- 
- 	return pvm_access_raz_wi(vcpu, p, r);
- }
--- 
-2.30.2
+This command won't work anymore:
 
+  qemu-system-aarch64 -M virt,secure=on -cpu max -kernel Image -nographic
+
+implements EL3 and SMC still treated as undef. QEMU has a special case for
+starting at EL2 in this case, but I couldn't find what this is for.
+
+Treating SMC as undef is correct because SCR_EL3.SMD resets to an
+architectutally UNKNOWN value. But the architecture requires that the CPU
+resets to the highest implemented exception level (DDI0487J.a R_JYLQV). So
+in my opinion we can use the ID_AA64PFR0_EL1.EL3 field here, and breaking
+this particular configuration is not a problem: users shouldn't expect
+Linux to boot when EL3 is implemented and doesn't run a firmware.
+
+Thanks,
+Jean
+
+> 
+> 
+> Suzuki
+> 
+> > 
+> > The easiest fix is to detect the SMC conduit through the PSCI node in DT.
+> > SMCCC helpers already do this, but we can't use them this early in the
+> > boot. I tested adding an early probe to the PSCI driver to check this, see
+> > attached patches.
+> > 
+> > Note that we do need to test the conduit after finding a PSCI node,
+> > because even though it doesn't implement EL2 in this configuration, QEMU
+> > still accepts PSCI HVCs in order to support SMP.
+> > 
+> > Thanks,
+> > Jean
+> > 
+> 
