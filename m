@@ -1,50 +1,60 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 648B84A21;
-	Fri, 14 Jun 2024 13:36:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D0B94C96;
+	Fri, 14 Jun 2024 13:51:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718372176; cv=none; b=h92SGEkOPhgZ+pR0B+VxE1SlT0n5jjQU7F50P3ORpLJv0a9e4EFi1+ns+zmz3/M/emXM7kLQ3KL6G+Ebjwik0USbWLFTmXgsDIFoVOL/PQBhQ0Gb2fir+qZXajgbg5stF3S6Xcdf5MX1mC1QhMLXM+QaXfJswIcnAMJG6EXrzOg=
+	t=1718373107; cv=none; b=fOzl3vTAV8ouo0F/55uiebvTI40rDw2aYKa04M1s8a5xPujCgrXoacPYUbvCkzd9MTGpfvAOGxkwN9GqYyAJM5RF9Rzns0CmAyiDUjyHiAy3VrWmUALFALFB38wx4nNa47AovNv9MpGWQSUa0mooAvURmiJA8CaXlfJeU9v2cIg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718372176; c=relaxed/simple;
-	bh=1Cb5XCPsA6GzlGbkW+3Zjoi9MFe4fDK9bmWQBJhBgCk=;
+	s=arc-20240116; t=1718373107; c=relaxed/simple;
+	bh=IwA+nRpW3jBSAzmNE65SNenXWpawXrOy17dsMyzMFzs=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IPoDRNGKG/UjumFMLrzTYmWUsv4LuxQLhjBDkYrp08WGwLSzz4flQcheyOtkvaGPxRNkbzRL432liajX3gIBKoWoP+QA4o6anpmpVInYsuf1b2EyrmdY86pCRgbecK+kTrzz5JY/poAlwuWSwHjPe5zqE2R3PXBv2xin06U+K/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RD+4bbL5; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=TwTjb8b2H3w1ZUeB7hT0Xcur/WQceY0i5SkKht/rAz2SyRfi/J3Kv5/N2n5jWsbEulkMPRRlDxSuJxf5pInRijZoxyYJutOqngyA/cncThVxBABRQF99r5lSM0tN29PjaqVy2ApLHZZ3aAm6sycBP4512RmyHQtf1fYXu/e0U3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Py5qaGQT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RD+4bbL5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00E1FC4AF52;
-	Fri, 14 Jun 2024 13:36:15 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Py5qaGQT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE47DC2BD10;
+	Fri, 14 Jun 2024 13:51:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718372176;
-	bh=1Cb5XCPsA6GzlGbkW+3Zjoi9MFe4fDK9bmWQBJhBgCk=;
+	s=k20201202; t=1718373106;
+	bh=IwA+nRpW3jBSAzmNE65SNenXWpawXrOy17dsMyzMFzs=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=RD+4bbL52OwBaB6JH5tWt/l3/XF0JRO65hj6iRScYmR2kmpeNFPUYpPib2f/YaAnT
-	 GOBbaan5hut741UbfjdmraVYhROJ9JjfDppoVIHct6MCuHpCGmaq0Jo3kiLm81TspG
-	 39R+w8SWBZrgsgTztTei+SJLunI8mdIJz7yan0iFXEwvHDwTornCoh9R/WFXWpW1Kj
-	 1G+bHbCu5m5/UleUfZHr4W/QGsN28ZeVsshOtVJ+MDDE/fDuWN6f8RvnMIYCKJhIhE
-	 Kt7MfzlQQXNglhUm71YfpNSnKENOfr72Q2yEYg2c2lkL3+XnNga2N7uK6irW/l2a7X
-	 pxQLObEjyVFVA==
+	b=Py5qaGQT2Qdyws4LOn1wqQPEZyN7pTTtC/irde5GED1n020PSRGCR7otLCPlfA8Yj
+	 WkoMOyTZ3rCF2AcZrNppcskTwlHOtnoxx53r7arw/iAnT9xhX9uLPrzEwPpzZEwKLD
+	 zAk68eknRRZ9n/JcVNl5CMRCzYTVOwHuqrNZkQQ2mQgs2BY0CvOm2F1NVEv7TERsWP
+	 URuHA8XbGUEmpHXgRbj5PViOqqL+Ez08+ArjA5j/nmwzZAnj2R5TkY2liWNkaBl0WP
+	 cuzvLr7sgwXBlRQ5SsBZ4celz97PM/gW7KaLLCA1kF8rEEGUDmfG0ocWgwcKXXDnnj
+	 FndaD24rWK8iA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sI76D-003vZ2-To;
-	Fri, 14 Jun 2024 14:36:14 +0100
-Date: Fri, 14 Jun 2024 14:36:13 +0100
-Message-ID: <86o783k5o2.wl-maz@kernel.org>
+	id 1sI7LE-003vmz-RI;
+	Fri, 14 Jun 2024 14:51:44 +0100
+Date: Fri, 14 Jun 2024 14:51:44 +0100
+Message-ID: <86msnnk4y7.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	kvm@vger.kernel.org,
-	Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH v2 00/15] KVM: arm64: nv: FPSIMD/SVE, plus some other CPTR goodies
-In-Reply-To: <20240613201756.3258227-1-oliver.upton@linux.dev>
-References: <20240613201756.3258227-1-oliver.upton@linux.dev>
+To: Sebastian Ene <sebastianene@google.com>
+Cc: catalin.marinas@arm.com,
+	james.morse@arm.com,
+	jean-philippe@linaro.org,
+	oliver.upton@linux.dev,
+	qperret@google.com,
+	qwandor@google.com,
+	sudeep.holla@arm.com,
+	suzuki.poulose@arm.com,
+	tabba@google.com,
+	will@kernel.org,
+	yuzenghui@huawei.com,
+	lpieralisi@kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kernel-team@android.com
+Subject: Re: [PATCH v3 0/4] KVM: arm64: pKVM host proxy FF-A fixes
+In-Reply-To: <20240613132035.1070360-1-sebastianene@google.com>
+References: <20240613132035.1070360-1-sebastianene@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -56,77 +66,76 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvm@vger.kernel.org, tabba@google.com
+X-SA-Exim-Rcpt-To: sebastianene@google.com, catalin.marinas@arm.com, james.morse@arm.com, jean-philippe@linaro.org, oliver.upton@linux.dev, qperret@google.com, qwandor@google.com, sudeep.holla@arm.com, suzuki.poulose@arm.com, tabba@google.com, will@kernel.org, yuzenghui@huawei.com, lpieralisi@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 13 Jun 2024 21:17:41 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On Thu, 13 Jun 2024 14:20:31 +0100,
+Sebastian Ene <sebastianene@google.com> wrote:
 > 
-> As discussed, here's the combined series of Marc + I's patches that
-> implement all the trap forwarding / merging logic required to observe
-> the L1 CPTR configuration when running an L2 guest.
+> Hello,
 > 
-> Like before, this was tested on Neoverse-V2 with L0, L1, and L2 running
-> fpsimd-test and sve-test on top of one another.
 > 
-> v1 [1] -> v2:
->  - Grab Marc's CPTR trap patches [2]
->  - Avoid taking two traps when L1 accesses ZCR_EL2 while the host owns
->    FP regs. The fast path will now load the FP regs and forward the
->    sysreg trap to the slow path for complete handling.
->  - Add a comment describing the above behavior (Marc)
->  - Avoid the use of guest_hyp_*_traps_enabled() in
->    __activate_cptr_traps() for better codegen (Marc)
->  - Document the reason for only testing bit[0] of CPTR_EL2.xEN when
->    folding L1 traps into the hardware CPTR value.
->  - Add a helper for synthesizing SVE traps, rather than open-coding the
->    ESR value in access_zcr_el2()
+> This series contains some small fixes for the host pKVM proxy code. I included
+> some of the patches that I already sent on the list as part of this series
+> to make it easier to keep track of them.
 > 
-> [1]: https://lore.kernel.org/kvmarm/20240531231358.1000039-1-oliver.upton@linux.dev/
-> [2]: https://lore.kernel.org/kvmarm/20240604130553.199981-1-maz@kernel.org/
+> I verified the functionality with OPTEE as a TEE-OS.
 > 
-> Jintack Lim (1):
->   KVM: arm64: nv: Forward FP/ASIMD traps to guest hypervisor
+> Changelog:
 > 
-> Marc Zyngier (4):
->   KVM: arm64: nv: Handle CPACR_EL1 traps
->   KVM: arm64: nv: Add TCPAC/TTA to CPTR->CPACR conversion helper
->   KVM: arm64: nv: Add trap description for CPTR_EL2
->   KVM: arm64: nv: Add additional trap setup for CPTR_EL2
+> v2 -> v3:
 > 
-> Oliver Upton (10):
->   KVM: arm64: nv: Forward SVE traps to guest hypervisor
->   KVM: arm64: nv: Load guest FP state for ZCR_EL2 trap
->   KVM: arm64: nv: Load guest hyp's ZCR into EL1 state
->   KVM: arm64: nv: Handle ZCR_EL2 traps
->   KVM: arm64: nv: Save guest's ZCR_EL2 when in hyp context
->   KVM: arm64: nv: Use guest hypervisor's max VL when running nested
->     guest
->   KVM: arm64: nv: Ensure correct VL is loaded before saving SVE state
->   KVM: arm64: Spin off helper for programming CPTR traps
->   KVM: arm64: nv: Honor guest hypervisor's FP/SVE traps in CPTR_EL2
->   KVM: arm64: Allow the use of SVE+NV
+> * small fixes on the commit messages
+> * applied the Review-by tags from Sudeep. Thank you Sudeep !
+>  
+> v1 -> v2:
 > 
->  arch/arm64/include/asm/kvm_emulate.h    |  55 +++++++++
->  arch/arm64/include/asm/kvm_host.h       |   7 ++
->  arch/arm64/include/asm/kvm_nested.h     |   5 +-
->  arch/arm64/kvm/arm.c                    |   5 -
->  arch/arm64/kvm/emulate-nested.c         |  91 ++++++++++++++
->  arch/arm64/kvm/fpsimd.c                 |  22 +++-
->  arch/arm64/kvm/handle_exit.c            |  19 ++-
->  arch/arm64/kvm/hyp/include/hyp/switch.h |  24 +++-
->  arch/arm64/kvm/hyp/vhe/switch.c         | 156 ++++++++++++++++++++----
->  arch/arm64/kvm/nested.c                 |   3 +-
->  arch/arm64/kvm/sys_regs.c               |  38 ++++++
->  11 files changed, 380 insertions(+), 45 deletions(-)
+> * applied the feedback received from Will on the FFA_VERSION patch:
+>   The spec requires that no other calls to be issued prior to the FFA
+>   version negotiation and the current change reflects this. After the
+>   version negotiation phase is complete with Trustzone we will just
+>   return the hypervisor version.
+> 
+> * corrected some mistakes on the FFA_PARTITION_INFO_GET patch:
+>   - don't trim the number of bytes copied from the hypervisor buffer
+>   - introduce FFA_1_0_PARTITON_INFO_SZ definition
+>   - simplify the logic when the input flag is specified 
+> 
+> * collected the Ack from Will and embbeded it in the commit - Thanks Will ! 
+> 
+> 
+> v2:
+> https://lore.kernel.org/all/20240515172258.1680881-1-sebastianene@google.com/
+> 
+> v1:
+> 
+> * previously posted FFA_PARTITION_INFO_GET patch here:
+> https://lore.kernel.org/kvmarm/20240411133249.2134696-1-sebastianene@google.com/
+>  -> minor changes from the previous version, look for the current
+>     ffa_version in the host_buffer structure
+> 
+> * previously posted "Fix the identification range for the FF-A smcs" here:
+> https://lore.kernel.org/kvmarm/20240322124303.309423-1-sebastianene@google.com/
+> 
+> Thank you,
+> Sebastian
+> 
+> Sebastian Ene (4):
+>   KVM: arm64: Trap FFA_VERSION host call in pKVM
+>   KVM: arm64: Add support for FFA_PARTITION_INFO_GET
+>   KVM: arm64: Update the identification range for the FF-A smcs
+>   KVM: arm64: Use FF-A 1.1 with pKVM
+> 
+>  arch/arm64/kvm/hyp/include/nvhe/ffa.h |   2 +-
+>  arch/arm64/kvm/hyp/nvhe/ffa.c         | 180 +++++++++++++++++++++-----
+>  include/linux/arm_ffa.h               |   3 +
+>  3 files changed, 152 insertions(+), 33 deletions(-)
 
-Patches 1,5,7 may require some very minor rework, but they are
-functionally correct AFAICT. Patches 3,12-14 do not warrant my RB.
+Although these are labelled as fixes, I don't think they warrant being
+taken into 6.10. So assuming Oliver will take them into 6.11:
 
-For patches 1-2,4-11,15, and with the bisection issue fixed:
-
-Reviewed-by: Marc Zyngier <maz@kernel.org>
+Acked-by: Marc Zyngier <maz@kernel.org>
 
 	M.
 
