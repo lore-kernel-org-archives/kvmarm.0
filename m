@@ -1,54 +1,64 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BA2712EBCC;
-	Fri, 14 Jun 2024 11:14:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E031A14D29B;
+	Fri, 14 Jun 2024 12:33:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718363674; cv=none; b=Wq6cuPjHHBOEGvM8mPe8kk7gXhkEaihI8PD2cP1QTNM6b9cVpGLM8VNnzTxUYXRH+EEHTPle5UvJ5Zeqdgiu9f8NdNIIwAyTkZ84vpB3XcDLZCuq39023gmJDUREwIyxfrColGhNxvnXmnnz2kbz0Nl5kiSXvc62L7nCB4ftUbw=
+	t=1718368420; cv=none; b=bj496EQ0uqQfhpuMF3LH8EquAjZfaL48fREU57feuPWuC/lx8ROPVDlcgnkDurTYJsHIpot6roCJtNHDGjad0TiNtBt9U1lq6B45zzptqI1cgS3Ae1uH4a/eKY5GuKz8VF+E4ckFhKQ6nS+LPU1uH/5gdOTifhw7b8K87kY1eYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718363674; c=relaxed/simple;
-	bh=lhlmxNTzACpYsFyN2wyOKSAxA0zRyk6hLY+uw6e/V1U=;
+	s=arc-20240116; t=1718368420; c=relaxed/simple;
+	bh=GLgMoYqQYcCbuXGoGXD8j9JN7q1v3yKblwBp8qWBNDg=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jQ0jw/+CrMLf+IF1zKqjW1y7DzxA6jSS+4xgFKDB43L3X2hI2KnYpFIlRMwgiWLdf7vnPe6G42fl9UKjHK2C9NfxuVeNktuFQYPvs/N45xrkuOQzhU8ahHtb67NHjnxFESojQA6t+ojdZXUGipRx1NGLcw4ebZRfNovAwU1Rn2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GRKlFEPu; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=SfsyXCtVV+KOCKAGXa8kcY4BxE/9lbmtG4EAie1ic9X0REKthLFmWaSZ6BPo4H+jFOmPCPkj6tPgdcI6Ra4T3ahnaAD6js9IlA9gyA8PuK4hrAAX9fNBT1V3mfOKQI9tezjyMieNQJmkm2wUim+yFSXpO4IRT4+pJP3N8ZS5HNU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rcvHrAOq; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GRKlFEPu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0677FC2BD10;
-	Fri, 14 Jun 2024 11:14:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rcvHrAOq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A45EC2BD10;
+	Fri, 14 Jun 2024 12:33:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718363674;
-	bh=lhlmxNTzACpYsFyN2wyOKSAxA0zRyk6hLY+uw6e/V1U=;
+	s=k20201202; t=1718368419;
+	bh=GLgMoYqQYcCbuXGoGXD8j9JN7q1v3yKblwBp8qWBNDg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=GRKlFEPu082dCB2u64JN73iI+mUjbqdENos+zhhF/FO+WPiauqQ84mBPWoMq2ytzq
-	 gpCrcJcqzbQ+TxhbuHozw3TisyzqmX/KjGt6C0R0SA9VcazRGi11L28Lt9AM5N3ats
-	 qkbe/qPCwXqS7MidpYZJFnKP61ejouJ2I4IHVXSPCuRCsAA1BJqOdxRW6XJzZTy+Lx
-	 mk5PXI1yu/iWEL7z6pGWeO/r8IFz9KpPnjJfsrHySZhu7ExTl2oLDf377UEg89uPOn
-	 /CJo6CuXLlCYdg8PmBUgEJCBTapU42yoOphePJvkFIkOwS/TkGMgPcP9ttkfsmmHfI
-	 yPup4ilFHnVyA==
-Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
+	b=rcvHrAOqi7cmNK2hFeCL7mbpMGmgqrkr6N49QVPhLOWr5S8WjJFX0GYBoPBV7trxu
+	 ZRB+kKsmsKVpgZ7ZVgACEy4v7DwvXhTnNrQpv0hIuM+v/+dvM/xVzIMEZ3kNHzJ7mR
+	 R3ZcuDSWDGVvCK2+iAwsF1BNEtdYTuJV7uqSVtfHvu+4x97PDKoPsHkq9kuqycwzVx
+	 SbYBqbpFZA4IUdxaKRBi7ukGp0Tr65TZhdZk/fl8ZrUASGKm0rBS4QFLgaDdW5F37B
+	 au5NprFajJ/GHL6J7ArBL1doaJfhrQEPKSKs4VBA9HGJU8SXZURILQtPHDlwaBRBjn
+	 VkzcRoq0YscPQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sI4t5-003tna-OH;
-	Fri, 14 Jun 2024 12:14:31 +0100
-Date: Fri, 14 Jun 2024 12:14:30 +0100
-Message-ID: <87a5jn3hex.wl-maz@kernel.org>
+	id 1sI67d-003upH-Cb;
+	Fri, 14 Jun 2024 13:33:37 +0100
+Date: Fri, 14 Jun 2024 13:33:37 +0100
+Message-ID: <86sexfk8ke.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
+To: Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	will@kernel.org,
+	catalin.marinas@arm.com,
+	mark.rutland@arm.com,
+	Mark Brown <broonie@kernel.org>,
+	James Clark <james.clark@arm.com>,
+	Rob Herring <robh@kernel.org>,
+	Suzuki Poulose <suzuki.poulose@arm.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	linux-perf-users@vger.kernel.org,
+	Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	kvm@vger.kernel.org,
-	Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH v2 05/15] KVM: arm64: nv: Load guest hyp's ZCR into EL1 state
-In-Reply-To: <20240613201756.3258227-6-oliver.upton@linux.dev>
-References: <20240613201756.3258227-1-oliver.upton@linux.dev>
-	<20240613201756.3258227-6-oliver.upton@linux.dev>
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH V18 2/9] KVM: arm64: Explicitly handle BRBE traps as UNDEFINED
+In-Reply-To: <20240613061731.3109448-3-anshuman.khandual@arm.com>
+References: <20240613061731.3109448-1-anshuman.khandual@arm.com>
+	<20240613061731.3109448-3-anshuman.khandual@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -56,113 +66,176 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.104.136.29
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvm@vger.kernel.org, tabba@google.com
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: anshuman.khandual@arm.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com, broonie@kernel.org, james.clark@arm.com, robh@kernel.org, suzuki.poulose@arm.com, peterz@infradead.org, mingo@redhat.com, acme@kernel.org, linux-perf-users@vger.kernel.org, oliver.upton@linux.dev, james.morse@arm.com, kvmarm@lists.linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 13 Jun 2024 21:17:46 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On Thu, 13 Jun 2024 07:17:24 +0100,
+Anshuman Khandual <anshuman.khandual@arm.com> wrote:
 > 
-> Load the guest hypervisor's ZCR_EL2 into the corresponding EL1 register
-> when restoring SVE state, as ZCR_EL2 affects the VL in the hypervisor
-> context.
+> The Branch Record Buffer Extension (BRBE) adds a number of system registers
+> and instructions, which we don't currently intend to expose to guests. Our
+> existing logic handles this safely, but this could be improved with some
+> explicit handling of BRBE.
 > 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> The presence of BRBE is currently hidden from guests as the cpufeature
+> code's ftr_id_aa64dfr0[] table doesn't have an entry for the BRBE field,
+> and so this will be zero in the sanitised value of ID_AA64DFR0 exposed to
+> guests via read_sanitised_id_aa64dfr0_el1(). As the ftr_id_aa64dfr0[] table
+> may gain an entry for the BRBE field in future, for robustness we should
+> explicitly mask out the BRBE field in read_sanitised_id_aa64dfr0_el1().
+> 
+> The BRBE system registers and instructions are currently trapped by the
+> existing configuration of the fine-grained traps. As neither the registers
+> nor the instructions are described in the sys_reg_descs[] table,
+> emulate_sys_reg() will warn that these are unknown before injecting an
+> UNDEFINED exception into the guest.
+> 
+> Well-behaved guests shouldn't try to use the registers or instructions, but
+> badly-behaved guests could use these, resulting in unnecessary warnings. To
+> avoid those warnings, we should explicitly handle the BRBE registers and
+> instructions as UNDEFINED.
+> 
+> Address the above by having read_sanitised_id_aa64dfr0_el1() mask out the
+> ID_AA64DFR0.BRBE field, and explicitly handling all of the BRBE system
+> registers and instructions as UNDEFINED.
+> 
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Oliver Upton <oliver.upton@linux.dev>
+> Cc: James Morse <james.morse@arm.com>
+> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will@kernel.org>
+> Cc: kvmarm@lists.linux.dev
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: linux-kernel@vger.kernel.org
+> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+> ----
+> Changes in V18:
+> 
+> - Updated the commit message
+> 
+>  arch/arm64/kvm/sys_regs.c | 56 +++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 56 insertions(+)
+> Reviewed-by: Mark Rutland <mark.rutland@arm.com>
 > ---
->  arch/arm64/include/asm/kvm_host.h       | 4 ++++
->  arch/arm64/kvm/hyp/include/hyp/switch.h | 3 ++-
->  2 files changed, 6 insertions(+), 1 deletion(-)
+>  arch/arm64/kvm/sys_regs.c | 56 +++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 56 insertions(+)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 8170c04fde91..e01e6de414f1 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -844,6 +844,10 @@ struct kvm_vcpu_arch {
->  
->  #define vcpu_sve_max_vq(vcpu)	sve_vq_from_vl((vcpu)->arch.sve_max_vl)
->  
-> +#define vcpu_sve_zcr_el1(vcpu)						\
-> +	(unlikely(is_hyp_ctxt(vcpu)) ? __vcpu_sys_reg(vcpu, ZCR_EL2) :	\
-> +				       __vcpu_sys_reg(vcpu, ZCR_EL1))
-> +
-
-I have the feeling this abstracts the access at the wrong level. It's
-not that it gives the wrong result, but it hides the register and is
-only concerned with the *value*.
-
-In turn, it makes the helper unusable with the *write* side, as shown
-in patch 7.
-
->  #define vcpu_sve_state_size(vcpu) ({					\
->  	size_t __size_ret;						\
->  	unsigned int __vcpu_vq;						\
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index 5ecd2600d9df..71a93e336a0c 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -317,7 +317,8 @@ static inline void __hyp_sve_restore_guest(struct kvm_vcpu *vcpu)
->  	sve_cond_update_zcr_vq(vcpu_sve_max_vq(vcpu) - 1, SYS_ZCR_EL2);
->  	__sve_restore_state(vcpu_sve_pffr(vcpu),
->  			    &vcpu->arch.ctxt.fp_regs.fpsr);
-> -	write_sysreg_el1(__vcpu_sys_reg(vcpu, ZCR_EL1), SYS_ZCR);
-> +
-> +	write_sysreg_el1(vcpu_sve_zcr_el1(vcpu), SYS_ZCR);
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 22b45a15d068..3d4686abe5ee 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1304,6 +1304,11 @@ static int set_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
+>  	return 0;
 >  }
 >  
->  /*
+> +#define BRB_INF_SRC_TGT_EL1(n)				\
+> +	{ SYS_DESC(SYS_BRBINF_EL1(n)), undef_access },	\
+> +	{ SYS_DESC(SYS_BRBSRC_EL1(n)), undef_access },	\
+> +	{ SYS_DESC(SYS_BRBTGT_EL1(n)), undef_access }	\
+> +
+>  /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
+>  #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
+>  	{ SYS_DESC(SYS_DBGBVRn_EL1(n)),					\
+> @@ -1722,6 +1727,9 @@ static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+>  	/* Hide SPE from guests */
+>  	val &= ~ID_AA64DFR0_EL1_PMSVer_MASK;
+>  
+> +	/* Hide BRBE from guests */
+> +	val &= ~ID_AA64DFR0_EL1_BRBE_MASK;
+> +
+>  	return val;
+>  }
+>  
+> @@ -2240,6 +2248,52 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	{ SYS_DESC(SYS_DBGCLAIMCLR_EL1), trap_raz_wi },
+>  	{ SYS_DESC(SYS_DBGAUTHSTATUS_EL1), trap_dbgauthstatus_el1 },
+>  
+> +	/*
+> +	 * BRBE branch record sysreg address space is interleaved between
+> +	 * corresponding BRBINF<N>_EL1, BRBSRC<N>_EL1, and BRBTGT<N>_EL1.
+> +	 */
+> +	BRB_INF_SRC_TGT_EL1(0),
+> +	BRB_INF_SRC_TGT_EL1(16),
+> +	BRB_INF_SRC_TGT_EL1(1),
+> +	BRB_INF_SRC_TGT_EL1(17),
+> +	BRB_INF_SRC_TGT_EL1(2),
+> +	BRB_INF_SRC_TGT_EL1(18),
+> +	BRB_INF_SRC_TGT_EL1(3),
+> +	BRB_INF_SRC_TGT_EL1(19),
+> +	BRB_INF_SRC_TGT_EL1(4),
+> +	BRB_INF_SRC_TGT_EL1(20),
+> +	BRB_INF_SRC_TGT_EL1(5),
+> +	BRB_INF_SRC_TGT_EL1(21),
+> +	BRB_INF_SRC_TGT_EL1(6),
+> +	BRB_INF_SRC_TGT_EL1(22),
+> +	BRB_INF_SRC_TGT_EL1(7),
+> +	BRB_INF_SRC_TGT_EL1(23),
+> +	BRB_INF_SRC_TGT_EL1(8),
+> +	BRB_INF_SRC_TGT_EL1(24),
+> +	BRB_INF_SRC_TGT_EL1(9),
+> +	BRB_INF_SRC_TGT_EL1(25),
+> +	BRB_INF_SRC_TGT_EL1(10),
+> +	BRB_INF_SRC_TGT_EL1(26),
+> +	BRB_INF_SRC_TGT_EL1(11),
+> +	BRB_INF_SRC_TGT_EL1(27),
+> +	BRB_INF_SRC_TGT_EL1(12),
+> +	BRB_INF_SRC_TGT_EL1(28),
+> +	BRB_INF_SRC_TGT_EL1(13),
+> +	BRB_INF_SRC_TGT_EL1(29),
+> +	BRB_INF_SRC_TGT_EL1(14),
+> +	BRB_INF_SRC_TGT_EL1(30),
+> +	BRB_INF_SRC_TGT_EL1(15),
+> +	BRB_INF_SRC_TGT_EL1(31),
+> +
+> +	/* Remaining BRBE sysreg addresses space */
+> +	{ SYS_DESC(SYS_BRBCR_EL1), undef_access },
+> +	{ SYS_DESC(SYS_BRBFCR_EL1), undef_access },
+> +	{ SYS_DESC(SYS_BRBTS_EL1), undef_access },
+> +	{ SYS_DESC(SYS_BRBINFINJ_EL1), undef_access },
+> +	{ SYS_DESC(SYS_BRBSRCINJ_EL1), undef_access },
+> +	{ SYS_DESC(SYS_BRBTGTINJ_EL1), undef_access },
+> +	{ SYS_DESC(SYS_BRBIDR0_EL1), undef_access },
+> +
+>  	{ SYS_DESC(SYS_MDCCSR_EL0), trap_raz_wi },
+>  	{ SYS_DESC(SYS_DBGDTR_EL0), trap_raz_wi },
+>  	// DBGDTR[TR]X_EL0 share the same encoding
+> @@ -2751,6 +2805,8 @@ static struct sys_reg_desc sys_insn_descs[] = {
+>  	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
+>  	{ SYS_DESC(SYS_DC_CIGSW), access_dcgsw },
+>  	{ SYS_DESC(SYS_DC_CIGDSW), access_dcgsw },
+> +	{ SYS_DESC(OP_BRB_IALL), undef_access },
+> +	{ SYS_DESC(OP_BRB_INJ), undef_access },
+>  };
+>  
+>  static const struct sys_reg_desc *first_idreg;
 
-I would instead propose the following:
+I don't think we need any update to the sys_reg table to handle
+this. Instead, we should make use of the FGU infrastructure that has
+been in since 6.9 to make this stuff UNDEF unconditionally.
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index aeb1c567dfad..2c3eff0031eb 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -845,9 +845,8 @@ struct kvm_vcpu_arch {
- 
- #define vcpu_sve_max_vq(vcpu)	sve_vq_from_vl((vcpu)->arch.sve_max_vl)
- 
--#define vcpu_sve_zcr_el1(vcpu)						\
--	(unlikely(is_hyp_ctxt(vcpu)) ? __vcpu_sys_reg(vcpu, ZCR_EL2) :	\
--				       __vcpu_sys_reg(vcpu, ZCR_EL1))
-+#define vcpu_sve_zcr_elx(vcpu)						\
-+	(unlikely(is_hyp_ctxt(vcpu)) ? ZCR_EL2 : ZCR_EL1)
- 
- #define vcpu_sve_state_size(vcpu) ({					\
- 	size_t __size_ret;						\
-diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-index bb2ef3166c63..947486a111e1 100644
---- a/arch/arm64/kvm/fpsimd.c
-+++ b/arch/arm64/kvm/fpsimd.c
-@@ -179,10 +179,7 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
- 			 * If the vCPU is in the hyp context then ZCR_EL1 is
- 			 * loaded with its vEL2 counterpart.
- 			 */
--			if (is_hyp_ctxt(vcpu))
--				__vcpu_sys_reg(vcpu, ZCR_EL2) = zcr;
--			else
--				__vcpu_sys_reg(vcpu, ZCR_EL1) = zcr;
-+			__vcpu_sys_reg(vcpu, vcpu_sve_zcr_elx(vcpu)) = zcr;
- 
- 			/*
- 			 * Restore the VL that was saved when bound to the CPU,
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 0a6935a18490..ad8dec0b450b 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -330,7 +330,7 @@ static inline void __hyp_sve_restore_guest(struct kvm_vcpu *vcpu)
- 	if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu))
- 		sve_cond_update_zcr_vq(__vcpu_sys_reg(vcpu, ZCR_EL2), SYS_ZCR_EL2);
- 
--	write_sysreg_el1(vcpu_sve_zcr_el1(vcpu), SYS_ZCR);
-+	write_sysreg_el1(__vcpu_sys_reg(vcpu, vcpu_sve_zcr_elx(vcpu)), SYS_ZCR);
- }
- 
- /*
+It should be as simple as:
 
-which makes the helper select the correct guest register for the
-context, and only that. In turn, the write side is much cleaner and
-symmetry is restored.
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index ee33f5467ce5..7cafe3f72c01 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -4964,6 +4964,11 @@ void kvm_init_sysreg(struct kvm_vcpu *vcpu)
+ 		kvm->arch.fgu[HAFGRTR_GROUP] |= ~(HAFGRTR_EL2_RES0 |
+ 						  HAFGRTR_EL2_RES1);
+ 
++	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, BRBE, IMP))
++		kvm->arch.fgu[HDFGRTR_GROUP] |= (HDFGRTR_nBRBDATA |
++						 HDFGRTR_nBRBCTL  |
++						 HDFGRTR_nBRBIDR);
++
+ 	set_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags);
+ out:
+ 	mutex_unlock(&kvm->arch.config_lock);
+
+which is of course untested, but that I expect to be correct.
 
 Thanks,
 
