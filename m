@@ -1,156 +1,324 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E5CA15A85B
-	for <kvmarm@lists.linux.dev>; Fri, 14 Jun 2024 15:31:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84F0415F418
+	for <kvmarm@lists.linux.dev>; Fri, 14 Jun 2024 16:13:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718379108; cv=none; b=KwIH5t2KHELVq4CxRypK2ImKnKzpfhbt3d3ZzQQImW2PoHBlENDZ2QD5B/WfTGTCLUvgUKBJFElxGzsnQ5TSe0LEjMrKh0cUkETfBarf+3fLc9ZsqEIRIhqSpWlOc6RtZ2h6NxyNbtmXCYMZH+CTucjhjVSVHDMOvNTvXZWoN6g=
+	t=1718381583; cv=none; b=Pmonxwj21eZ5fXd3oPUtwE6zasBwofqrwWg1MemosCDMYhCLMH3agJ/uSOt4Uc38WQ8ReRm+/rIFfTIsl/SkwWnSgEdsYDpmvqISMb93ZOPP18kiX5sQz3gCWpkeqRP+jIU5wVJ/gSRglf8TjwEgJzmb14/P22hQ32aUV5cUX+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718379108; c=relaxed/simple;
-	bh=hSgZmiAS+svIYqQDF8KSPSvHB4W5pXbLYGkhdqqsXJI=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=hbPwBND1WzY1s2Iu34vzbGcI0SzQUkRlCJMu/xzfO7j4oe49c3m0FAC49GE50cQP788ora8Kz8Zk9LPcgv1OAQ2Iezma480CDZ2n1qlCFYRsErckfnPBXTIquzt/3YtOxTXTR2aqOX0r9X7uYLBT9W1cvtuRj4kxLh/hzRtVdOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=C3xheYXO; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1718381583; c=relaxed/simple;
+	bh=LgYcFufJoudAo/kd1BCZymlGqrmupX//kefrk1Xqs/8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=NdpEYxEg1mPB80tA6Uqr7YQDqZ3boJPh7e89ER4MQcG61U+QH2pG3OmnBmaX8knYFUlVLLSb7UOqCnLIRAfT6nZ1r93TA0qpirGupaq6SnMk4cyi25joDMxyRPX2DyLvmdl9yRXTHSRvKsEzBi8PF+rHU1nR8QI6IR4FZKC4haA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=m1+PMHgW; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C3xheYXO"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718379105;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zw5mxcQ5wldSbOobj9exImYqdyspUnQRuccECHVHSQU=;
-	b=C3xheYXOxKtMzJY3qvxjBfL4VG6ulFGmPdzc/kRN8suoMaUl16pIGFZpeYD3IOJFDECKW5
-	rIWpkCgnymF9y7th1PCHvuLU5+SRmH/Aty+InifhJSFsMBuubzu8dTMp3fEgZyOxQtFJSu
-	7KPqBcT27tVYGsmIpw1xUnM9/EYhE+g=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-677-k9_fVN19O4mwMeXBcpSAMw-1; Fri, 14 Jun 2024 11:31:42 -0400
-X-MC-Unique: k9_fVN19O4mwMeXBcpSAMw-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-35f1f8d48b3so1354154f8f.0
-        for <kvmarm@lists.linux.dev>; Fri, 14 Jun 2024 08:31:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m1+PMHgW"
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2c2fe3c4133so2164890a91.3
+        for <kvmarm@lists.linux.dev>; Fri, 14 Jun 2024 09:13:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1718381581; x=1718986381; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7gUwZpSkwFU+FWUT8qGAdEg7M+9bZN02qOvPWnijOmA=;
+        b=m1+PMHgWAlYJkaSGCC1di592GXjfEb/fYcJdWqAbTySLl+w2InGT5xVTkoOwxRSP56
+         zGyJHUDIQK/zvb3v8CHIk2IDhsjle4qoGDubgBBiJxDFz5zXlJF37v3y7RtEl13ggMf5
+         whh+3zNiTgJHKcnRCofS3KL1v150ZKkE69f+glBVnegkJJuJnDv4jRd27BQ82gqKNSJL
+         IFwADvDuRD6WHL8YsXx3gsfQc9AN9G3Qpp+HMp32Y93BPuJQhKSIF21J7YiMYPpfe4Bg
+         dd+mcpn9doF7ame/+ayk3qytAdLeAFVKCU1TxNv74HPVcel6d3mYpkUdMIYf8S2BB2Jo
+         W62Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718379101; x=1718983901;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zw5mxcQ5wldSbOobj9exImYqdyspUnQRuccECHVHSQU=;
-        b=pmKO2y3PtKfVoPp+ztknQgej3f1QlFgsTg4qcQZRfjIOdJ3gRaw+dJLzWP17dN3YX3
-         DSuaTifKngBKqxY2Dv0KVDQjjR00w7DQdUdggFmR35ZWx4YkPiPLuvVgjwVSymuIRUFt
-         //bd4Z4h/4tkn5yA16EvcNnDLZfnR3dBiMZk8TEHbkwptL9TdgW4CtJ6rbnWd23CznAV
-         2hl2LjxXdEyhCm2+7ZpiSaYeTPpO/1p7n6FD8rrEh/sG16CivuhEsnNaCGgW9Zs9LLW7
-         pd1Rj9O4H6LtJ9jE9oRWz41vLkrfQTVIr2vzgtHwGerKJ1rhweTeB64KWsvwSILCoYTt
-         YJoA==
-X-Forwarded-Encrypted: i=1; AJvYcCW9NuFpzPyLP4LEZP8mYK15YqBY4oKWqWlqJ8TBiRAuTcXboagEK+K3RZvkFpz/dOeWGFetIZA9pHv/XS9JVgKyN3T1I13z
-X-Gm-Message-State: AOJu0Yx9kjq/0zfJyBG1dYPH4A6yZ8EftWvb+kja+VNkMNkn7Z6PLRfL
-	yaacloa01uzwnI+2Wk+waUJdwaR0abLeuB0KhV2Mzs7AZN7/UjOWqlYy2f91WOFypV0QjB2u7w9
-	eSU9utEycMvaYgJbxCTcKMujpWgLdBQHlc8tV5pZwiY02crMgYd8EHA==
-X-Received: by 2002:a5d:6306:0:b0:35f:f58:38fc with SMTP id ffacd0b85a97d-3607a764d63mr1976967f8f.26.1718379100948;
-        Fri, 14 Jun 2024 08:31:40 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFysnn8yQfXYEELPiEMpb7qalQGUfkEF5dvkN1fWbdzkeZrNdNu860UPxNqrvm/1llrzek+jg==
-X-Received: by 2002:a5d:6306:0:b0:35f:f58:38fc with SMTP id ffacd0b85a97d-3607a764d63mr1976956f8f.26.1718379100569;
-        Fri, 14 Jun 2024 08:31:40 -0700 (PDT)
-Received: from rh (p200300c93f02d1004c157eb0f018dd01.dip0.t-ipconnect.de. [2003:c9:3f02:d100:4c15:7eb0:f018:dd01])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3607509c8fbsm4690652f8f.43.2024.06.14.08.31.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Jun 2024 08:31:40 -0700 (PDT)
-Date: Fri, 14 Jun 2024 17:31:37 +0200 (CEST)
-From: Sebastian Ott <sebott@redhat.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-    linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>, 
-    James Morse <james.morse@arm.com>, 
-    Suzuki K Poulose <suzuki.poulose@arm.com>, 
-    Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-    Shaoqin Huang <shahuang@redhat.com>, Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v4 3/6] KVM: arm64: add emulation for CTR_EL0 register
-In-Reply-To: <Zmty99X4hnYwtRS4@linux.dev>
-Message-ID: <0b148e21-1714-f4f7-bc77-2a12b990572d@redhat.com>
-References: <20240603130507.17597-1-sebott@redhat.com> <20240603130507.17597-4-sebott@redhat.com> <ZmtwjLbP283ra0Xq@linux.dev> <Zmty99X4hnYwtRS4@linux.dev>
+        d=1e100.net; s=20230601; t=1718381581; x=1718986381;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=7gUwZpSkwFU+FWUT8qGAdEg7M+9bZN02qOvPWnijOmA=;
+        b=Idj5aQtSEZFtFoH7TMKIk2ukLa+Mlqg34YQ1spcb+pr1/zb33peWZFKiHvcwCePjC8
+         bx0fqZHtNQMICfJIt34hes9LQaatPaMFTkHWi4o0S+hmcG5kdVbr0X0axKiz94fUFUUL
+         z3fQakqpldyjQk7IlQjilCUR1xSkX63y8SDey2yN5o0JHWU8GHcfztWgpLvNqQ7JypDR
+         CHAeFVjIeBDKxW4TcOfIal4Im4c5fG10Vcap4RB1BLplpdg06I4PNdvBn3fMwcCo9EtV
+         P07lQW882h0ZhI25JcpXsDjGPHnXbPzQa1MUAW39cjqbpK5Sf7fXlAvyBeMrAu6yOYru
+         JRyA==
+X-Forwarded-Encrypted: i=1; AJvYcCUy84AswGO+MVBGZPdGoSP9oYkjA4DXTNuAk4FyfkJE5hCaj46WMVeMLeVblPl2KD6wVm0npMGFl7RdpO0jXr2NTjRJ1lIU
+X-Gm-Message-State: AOJu0YwXmwvbRh2tHByc2JNaLMArvgP/URPXBiVRSsCGQAYtqymOC1Eq
+	KaWlNTbXwq2jAZT+rn4mcYzv+kaAg3mj5qqye5GpoIZHlI9WFffUjpPrV2EdawZxby+J7osz1Gs
+	7aw==
+X-Google-Smtp-Source: AGHT+IGlVfs98G7fCfwtsxB7s1pHGkpT0a32/JmIPXufrERUYhHEg26qK2yxEIeC4poHP/k7VOCg4R/uWRE=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90a:4294:b0:2c2:c6fa:c05d with SMTP id
+ 98e67ed59e1d1-2c4dbf336famr123419a91.9.1718381580584; Fri, 14 Jun 2024
+ 09:13:00 -0700 (PDT)
+Date: Fri, 14 Jun 2024 09:12:59 -0700
+In-Reply-To: <CADrL8HUW2q79F0FsEjhGW0ujij6+FfCqas5UpQp27Epfjc94Nw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+Mime-Version: 1.0
+References: <20240611002145.2078921-1-jthoughton@google.com>
+ <20240611002145.2078921-5-jthoughton@google.com> <CAOUHufYGqbd45shZkGCpqeTV9wcBDUoo3iw1SKiDeFLmrP0+=w@mail.gmail.com>
+ <CADrL8HVHcKSW3hiHzKTit07gzo36jtCZCnM9ZpueyifgNdGggw@mail.gmail.com>
+ <ZmioedgEBptNoz91@google.com> <CADrL8HU_FKHTz_6d=xhVLZFDQ_zQo-zdB2rqdpa2CKusa1uo+A@mail.gmail.com>
+ <ZmjtEBH42u7NUWRc@google.com> <CADrL8HUW2q79F0FsEjhGW0ujij6+FfCqas5UpQp27Epfjc94Nw@mail.gmail.com>
+Message-ID: <ZmxsCwu4uP1lGsWz@google.com>
+Subject: Re: [PATCH v5 4/9] mm: Add test_clear_young_fast_only MMU notifier
+From: Sean Christopherson <seanjc@google.com>
+To: James Houghton <jthoughton@google.com>
+Cc: Yu Zhao <yuzhao@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Ankit Agrawal <ankita@nvidia.com>, 
+	Axel Rasmussen <axelrasmussen@google.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	David Matlack <dmatlack@google.com>, David Rientjes <rientjes@google.com>, 
+	James Morse <james.morse@arm.com>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Raghavendra Rao Ananta <rananta@google.com>, 
+	Ryan Roberts <ryan.roberts@arm.com>, Shaoqin Huang <shahuang@redhat.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Wei Xu <weixugc@google.com>, 
+	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Oliver,
+On Thu, Jun 13, 2024, James Houghton wrote:
+> On Tue, Jun 11, 2024 at 5:34=E2=80=AFPM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> > A flag would also avoid an indirect call and thus a RETPOLINE when CONF=
+IG_RETPOLINE=3Dy,
+> > i.e. would be a minor optimization when KVM doesn't suppport fast aging=
+.  But that's
+> > probably a pretty unlikely combination, so it's probably not a valid ar=
+gument.
+> >
+> > So, I guess I don't have a strong opinion?
+>=20
+> (Sorry for the somewhat delayed response... spent some time actually
+> writing what this would look like.)
+>=20
+> I see what you mean, thanks! So has_fast_aging might be set by KVM if
+> the architecture sets a Kconfig saying that it understands the concept
+> of fast aging, basically what the presence of this v5's
+> test_clear_young_fast_only() indicates.
 
-On Thu, 13 Jun 2024, Oliver Upton wrote:
-> On Thu, Jun 13, 2024 at 10:19:56PM +0000, Oliver Upton wrote:
->> On Mon, Jun 03, 2024 at 03:05:04PM +0200, Sebastian Ott wrote:
->>> +static int validate_cache_topology(struct kvm_vcpu *vcpu, u64 ctr_el0)
->>> +{
->>> +	const struct sys_reg_desc *clidr_el1;
->>> +	unsigned int i;
->>> +	int ret;
->>> +
->>> +	clidr_el1 = get_sys_reg_desc(SYS_CLIDR_EL1);
->>> +	if (!clidr_el1)
->>> +		return -ENOENT;
->>
->> This doesn't actually matter if we agree on dropping the cross-checking,
->> but if this lookup fails it is 100% a KVM bug. Returning ENOENT isn't
->> exactly right here, since it gives userspace the impression that the
->> sysreg index it tried to access does not exist.
->>
->> So in the future it'd be good to return EINVAL in places where the
->> kernel did something stupid, probably with a warning for good measure.
+It would need to be a runtime setting, because KVM x86-64 with tdp_mmu_enab=
+led=3Dfalse
+doesn't support fast aging (uses the shadow MMU even for TDP).
 
-OK.
+> > I don't understand where the "must check shadow MMU" in #4 comes from. =
+ I also
+> > don't think it's necessary; see below.
+>=20
+> I just meant `kvm_has_shadow_mmu_sptes()` or
+> `kvm_memslots_have_rmaps()`. I like the logic you suggest below. :)
+>=20
+> > > Some of this reordering (and maybe a change from
+> > > kvm_shadow_root_allocated() to checking indirect_shadow_pages or
+> > > something else) can be done in its own patch.
+>=20
+> So just to be clear, for test_young(), I intend to have a patch in v6
+> to elide the shadow MMU check if the TDP MMU indicates Accessed. Seems
+> like a pure win; no reason not to include it if we're making logic
+> changes here anyway.
 
->>> +static int set_ctr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
->>> +		   u64 val)
->>> +{
->>> +	u64 ctr, writable_mask = rd->val;
->>> +	int ret = 0;
->>> +
->>> +	mutex_lock(&vcpu->kvm->arch.config_lock);
->>> +	ctr  = vcpu->kvm->arch.ctr_el0;
->>> +	if (val == ctr)
->>> +		goto out_unlock;
->>> +
->>> +	ret = -EBUSY;
->>> +	if (kvm_vm_has_ran_once(vcpu->kvm))
->>> +		goto out_unlock;
->>> +
->>> +	ret = -EINVAL;
->>> +	if ((ctr & ~writable_mask) != (val & ~writable_mask))
->>> +		goto out_unlock;
->>> +
->>> +	if (((ctr & CTR_EL0_DIC_MASK) < (val & CTR_EL0_DIC_MASK)) ||
->>> +	    ((ctr & CTR_EL0_IDC_MASK) < (val & CTR_EL0_IDC_MASK)) ||
->>> +	    ((ctr & CTR_EL0_DminLine_MASK) < (val & CTR_EL0_DminLine_MASK)) ||
->>> +	    ((ctr & CTR_EL0_IminLine_MASK) < (val & CTR_EL0_IminLine_MASK))) {
->>> +		goto out_unlock;
->>
->> I'd prefer if we addressed the issue w/ arm64_check_features() by making
->> CTR_EL0 behave like the other registers in the ID space instead of
->> open-coding these sorts of checks.
->>
->> I believe that can be accomplished by using kvm_read_sanitised_id_reg()
->> as the ::reset() function in the descriptor and initializing
->> kvm->arch.ctr_el0 in kvm_reset_id_regs().
->
-> Durr, I got rid of kvm_reset_id_regs() in commit 44cbe80b7616 ("KVM: arm64:
-> Reset VM feature ID regs from kvm_reset_sys_regs()"), I should engage
-> brain before responding.
->
-> Adding a check for encoding == CTR_EL0 to is_vm_ftr_id_reg() seems to be
-> the best way out.
+I don't think that's correct.  The initial fast_only=3Dfalse aging should p=
+rocess
+shadow MMUs (nested TDP) and TDP MMUs, otherwise a future fast_only=3Dfalse=
+ would
+get a false positive on young due to failing to clear the Accessed bit in t=
+he
+shadow MMU.  E.g. if page X is accessed by both L1 and L2, then aged, and n=
+ever
+accessed again, the Accessed bit would still be set in the page tables for =
+L2.
 
-Hm, but in that case we'd use reset_vm_ftr_id_reg() meaning we would have
-to make IDREG() work for this reg. Either by adding special handling to
-that macro or by increasing kvm->arch.id_regs[] a lot - both options don't
-sound very appealing.
+My thought for MMU_NOTIFY_WAS_FAST below (which again is a bad name) is to
+communicate to MGLRU that the page was found to be young in an MMU that sup=
+ports
+fast aging, i.e. that looking around at other SPTEs is worth doing.
 
-I'll think of smth to make arm64_check_features() work for this.
+> > > > So rather than failing the fast aging, I think what we want is to k=
+now if an
+> > > > mmu_notifier found a young SPTE during a fast lookup.  E.g. somethi=
+ng like this
+> > > > in KVM, where using kvm_has_shadow_mmu_sptes() instead of kvm_memsl=
+ots_have_rmaps()
+> > > > is an optional optimization to avoid taking mmu_lock for write in p=
+aths where a
+> > > > (very rare) false negative is acceptable.
+> > > >
+> > > >   static bool kvm_has_shadow_mmu_sptes(struct kvm *kvm)
+> > > >   {
+> > > >         return !tdp_mmu_enabled || READ_ONCE(kvm->arch.indirect_sha=
+dow_pages);
+> > > >   }
+> > > >
+> > > >   static int __kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *r=
+ange,
+> > > >                          bool fast_only)
+> > > >   {
+> > > >         int young =3D 0;
+> > > >
+> > > >         if (!fast_only && kvm_has_shadow_mmu_sptes(kvm)) {
+> > > >                 write_lock(&kvm->mmu_lock);
+> > > >                 young =3D kvm_handle_gfn_range(kvm, range, kvm_age_=
+rmap);
+> > > >                 write_unlock(&kvm->mmu_lock);
+> > > >         }
+> > > >
+> > > >         if (tdp_mmu_enabled && kvm_tdp_mmu_age_gfn_range(kvm, range=
+))
+> > > >                 young =3D 1 | MMU_NOTIFY_WAS_FAST;
+>=20
+> The most straightforward way (IMHO) to return something like `1 |
+> MMU_NOTIFY_WAS_FAST` up to the MMU notifier itself is to make
+> gfn_handler_t return int instead of bool.
 
-Thanks,
-Sebastian
+Hrm, all the options are unpleasant.  Modifying gfn_handler_t to return an =
+int
+will require an absurd amount of churn (all implementations in all archictu=
+res),
+and I don't love that the APIs that return true/false to indicate "flush" w=
+ould
+lose their boolean-ness.
 
+One idea would be to add kvm_mmu_notifier_arg.aging_was_fast or so, and the=
+n
+refactor kvm_handle_hva_range_no_flush() into a dedicated aging helper, and=
+ have
+it morph the KVM-internal flag into an MMU_NOTIFIER flag.  It's not perect =
+either,
+but it requires far less churn and keeps some of the KVM<=3D>mmu_notifer de=
+tails in
+common KVM code.
+
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 7b9d2633a931..c11a359b6ff5 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -258,6 +258,7 @@ int kvm_async_pf_wakeup_all(struct kvm_vcpu *vcpu);
+ #ifdef CONFIG_KVM_GENERIC_MMU_NOTIFIER
+ union kvm_mmu_notifier_arg {
+        unsigned long attributes;
++       bool aging_was_fast;
+ };
+=20
+ struct kvm_gfn_range {
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 436ca41f61e5..a936f6bedd97 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -685,10 +685,10 @@ static __always_inline int kvm_handle_hva_range(struc=
+t mmu_notifier *mn,
+        return __kvm_handle_hva_range(kvm, &range).ret;
+ }
+=20
+-static __always_inline int kvm_handle_hva_range_no_flush(struct mmu_notifi=
+er *mn,
+-                                                        unsigned long star=
+t,
+-                                                        unsigned long end,
+-                                                        gfn_handler_t hand=
+ler)
++static __always_inline int kvm_age_hva_range(struct mmu_notifier *mn,
++                                            unsigned long start,
++                                            unsigned long end,
++                                            bool flush_if_young)
+ {
+        struct kvm *kvm =3D mmu_notifier_to_kvm(mn);
+        const struct kvm_mmu_notifier_range range =3D {
+@@ -696,11 +696,14 @@ static __always_inline int kvm_handle_hva_range_no_fl=
+ush(struct mmu_notifier *mn
+                .end            =3D end,
+                .handler        =3D handler,
+                .on_lock        =3D (void *)kvm_null_fn,
+-               .flush_on_ret   =3D false,
++               .flush_on_ret   =3D flush_if_young,
+                .may_block      =3D false,
++               .aging_was_fast =3D false,
+        };
+=20
+-       return __kvm_handle_hva_range(kvm, &range).ret;
++       bool young =3D __kvm_handle_hva_range(kvm, &range).ret;
++
++       return (int)young | (range.aging_was_fast ? MMU_NOTIFIER_FAST_AGING=
+ : 0);
+ }
+=20
+ void kvm_mmu_invalidate_begin(struct kvm *kvm)
+@@ -865,7 +868,7 @@ static int kvm_mmu_notifier_clear_flush_young(struct mm=
+u_notifier *mn,
+ {
+        trace_kvm_age_hva(start, end);
+=20
+-       return kvm_handle_hva_range(mn, start, end, kvm_age_gfn);
++       return kvm_age_hva_range(mn, start, end, true);
+ }
+=20
+ static int kvm_mmu_notifier_clear_young(struct mmu_notifier *mn,
+@@ -875,20 +878,7 @@ static int kvm_mmu_notifier_clear_young(struct mmu_not=
+ifier *mn,
+ {
+        trace_kvm_age_hva(start, end);
+=20
+-       /*
+-        * Even though we do not flush TLB, this will still adversely
+-        * affect performance on pre-Haswell Intel EPT, where there is
+-        * no EPT Access Bit to clear so that we have to tear down EPT
+-        * tables instead. If we find this unacceptable, we can always
+-        * add a parameter to kvm_age_hva so that it effectively doesn't
+-        * do anything on clear_young.
+-        *
+-        * Also note that currently we never issue secondary TLB flushes
+-        * from clear_young, leaving this job up to the regular system
+-        * cadence. If we find this inaccurate, we might come up with a
+-        * more sophisticated heuristic later.
+-        */
+-       return kvm_handle_hva_range_no_flush(mn, start, end, kvm_age_gfn);
++       return kvm_age_hva_range(mn, start, end, false);
+ }
+=20
+ static int kvm_mmu_notifier_test_young(struct mmu_notifier *mn,
+@@ -897,8 +887,7 @@ static int kvm_mmu_notifier_test_young(struct mmu_notif=
+ier *mn,
+ {
+        trace_kvm_test_age_hva(address);
+=20
+-       return kvm_handle_hva_range_no_flush(mn, address, address + 1,
+-                                            kvm_test_age_gfn);
++       return kvm_age_hva_range(mn, address, address + 1, false);
+ }
+=20
+ static void kvm_mmu_notifier_release(struct mmu_notifier *mn,
+
+
+> > The change, relative to v5, that I am proposing is that MGLRU looks aro=
+und if
+> > the page was young in _a_ "fast" secondary MMU, whereas v5 looks around=
+ if and
+> > only if _all_ secondary MMUs are fast.
+> >
+> > In other words, if a fast MMU had a young SPTE, look around _that_ MMU,=
+ via the
+> > fast_only flag.
+>=20
+> Oh, yeah, that's a lot more intelligent than what I had. I think I
+> fully understand your suggestion; I guess we'll see in v6. :)
+>=20
+> I wonder if this still makes sense if whether or not an MMU is "fast"
+> is determined by how contended some lock(s) are at the time.
+
+No.  Just because a lock wasn't contended on the initial aging doesn't mean=
+ it
+won't be contended on the next round.  E.g. when using KVM x86's shadow MMU=
+, which
+takes mmu_lock for write for all operations, an aging operation could get l=
+ucky
+and sneak in while mmu_lock happened to be free, but then get stuck behind =
+a large
+queue of operations.
+
+The fast-ness needs to be predictable and all but guaranteed, i.e. lockless=
+ or in
+an MMU that takes mmu_lock for read in all but the most rare paths.
