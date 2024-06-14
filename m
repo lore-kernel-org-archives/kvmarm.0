@@ -1,136 +1,281 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0556514884C
-	for <kvmarm@lists.linux.dev>; Fri, 14 Jun 2024 12:59:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CACA26ACA;
+	Fri, 14 Jun 2024 13:09:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718369944; cv=none; b=oGYz8sPviNn6p43MWFoAz5hd05WQU9xwX2CPNAl7Tver/VPl3LAt3g/3Q0GUFEtcj+I/txB8l5Ycc7tfjdftZ+pMOK+tA9KPvZpsdk19WNWBLn+cgeQmMXtvv5sjgLuO0NfmZ0cyqmWdAyNirJHzKRPaK/ezhs1RHvN9PgUpcdY=
+	t=1718370582; cv=none; b=prVjWTB5x6SH27a2GMKLTpLKLKsG2PXmBk/8osjXouWRFyMi7qtfPwpFzjLo/Lx7gA+k/DMo3neLzLKaVKMsq3jBF8uFjv+qpGc6YgojfvlRmtIGiqDngUtrfXn/sbMVucJzSaG7uuHc5As5wtp0kLNYCM+fBK6kw1v+2hgD6lo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718369944; c=relaxed/simple;
-	bh=wA8k1cwbW4STWF0u1Fo4FBrcTbS31tLjN9PXmbqjgFg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ix2gwU2wBDfBPqfDok8vvb/M7IhmZo0P9bCD1cwevDnFtxrWaXMec2HRx/9XNoQwx6nb1DnClGmbz02T/y1Jd6rjLdJFnArcF9i0pmXsc2zv/LA78QFbVrpDBHrSjOzhAOFH+FJCA/A7ouSJy+jIpAdpjj75O+jOvEUNaFh57b0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VfJMVOQj; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1718370582; c=relaxed/simple;
+	bh=e6kELu63/VjfYReNnjC+nzRVVQndtg244gQ0BkXtEas=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JQTA2k8nWiNhz0rIaQ5U9fMhBIH74UhNLXq1LXPw5UheJyuAzG9wVBVap5VKI4HAH04T54z5cPW9RrEao4Dz7KH9zk8JcFI7aHGNAD+cWOmm1+Q6udFyOlMU/INj3+UrRh1CXWVnWE0yHw8LuSn0rdxukuq27DsfJEMQAeMgrFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GMdkC05s; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VfJMVOQj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94BA3C2BD10;
-	Fri, 14 Jun 2024 12:59:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GMdkC05s"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DA75C2BD10;
+	Fri, 14 Jun 2024 13:09:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718369943;
-	bh=wA8k1cwbW4STWF0u1Fo4FBrcTbS31tLjN9PXmbqjgFg=;
-	h=From:To:Cc:Subject:Date:From;
-	b=VfJMVOQjVwAmW5g4YeL3vg6ZJRgxWiup5OytuvAWVFt3yyZQoHWLhxlVq1Td4q/eM
-	 0/A7Y9ap0gs1JiWEm90cRr038fzWaItVEk+g940GO/5CaoNqDro+9A1CqF1SpZ8djX
-	 1PphwRPiLPMkOmjxgwDwu3uim4XBAuhsZDQcJOeA8OXFsiC3AYZTptdCmic77SSRRH
-	 wo8SApesW0CIfoewS4yQSgnBQcLvLw+yQ2vBGsK3SvwriXQ+rBvzO2iRyMToGi2O6b
-	 37X3WSf44/1uN5tYgq+/AgFjcBXl2mYIEcz9qJxjjaDYBO9dCwknoQID5ocZQiDyHk
-	 jWy3qgXRsmU7Q==
-Received: from [104.132.45.100] (helo=wait-a-minute.lon.corp.google.com)
+	s=k20201202; t=1718370581;
+	bh=e6kELu63/VjfYReNnjC+nzRVVQndtg244gQ0BkXtEas=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=GMdkC05sdOfXAbzWVw0x4cllrfBOw1WbwFkTaZEPbGHlTbCEV8CdBnTOTAfbqtV81
+	 L/dc5s0btl5IxUF5kDlDfPylNBSwg3XrdCLfwSZ6ofWioZqGGKC6LqLU/chSlmVnFc
+	 r07SteGAipSte7fIC4OHHpBFdCdw4rSkyAD++A1aSWu9QgJfJEOIpUUJ0cvVZ/75Gl
+	 iZMq94ZyrhE2eDTbvZpGt+0H/KV7vD9oaz91xb1HLDnV0a0F9GFEMLmV6iSi+3xlJ5
+	 OJLf03OciKF0H67qiS6ng98tIuGQwMLW741PPu1XMIpwgPSaCBk8EJYhktskfGhhMP
+	 VmW6eYg2DXWoQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sI6WD-003v9v-KW;
-	Fri, 14 Jun 2024 13:59:01 +0100
+	id 1sI6gV-003vHX-96;
+	Fri, 14 Jun 2024 14:09:39 +0100
+Date: Fri, 14 Jun 2024 14:09:38 +0100
+Message-ID: <86r0czk6wd.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org
-Cc: James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
+To: Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	will@kernel.org,
+	catalin.marinas@arm.com,
+	mark.rutland@arm.com,
+	Mark Brown <broonie@kernel.org>,
+	James Clark <james.clark@arm.com>,
+	Rob Herring <robh@kernel.org>,
+	Suzuki Poulose <suzuki.poulose@arm.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	linux-perf-users@vger.kernel.org,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Joey Gouly <joey.gouly@arm.com>
-Subject: [PATCH] KVM: arm64: nv: Fix RESx behaviour of disabled FGTs with negative polarity
-Date: Fri, 14 Jun 2024 13:58:58 +0100
-Message-Id: <20240614125858.78361-1-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
+	James Morse <james.morse@arm.com>,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH V18 2/9] KVM: arm64: Explicitly handle BRBE traps as UNDEFINED
+In-Reply-To: <86sexfk8ke.wl-maz@kernel.org>
+References: <20240613061731.3109448-1-anshuman.khandual@arm.com>
+	<20240613061731.3109448-3-anshuman.khandual@arm.com>
+	<86sexfk8ke.wl-maz@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 104.132.45.100
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: anshuman.khandual@arm.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com, broonie@kernel.org, james.clark@arm.com, robh@kernel.org, suzuki.poulose@arm.com, peterz@infradead.org, mingo@redhat.com, acme@kernel.org, linux-perf-users@vger.kernel.org, oliver.upton@linux.dev, james.morse@arm.com, kvmarm@lists.linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-The Fine Grained Trap extension is pretty messy as it doesn't
-consistently use the same polarity for all trap bits. A bunch
-of them, added later in the life of the architecture, have a
-*negative* priority.
+On Fri, 14 Jun 2024 13:33:37 +0100,
+Marc Zyngier <maz@kernel.org> wrote:
+> 
+> On Thu, 13 Jun 2024 07:17:24 +0100,
+> Anshuman Khandual <anshuman.khandual@arm.com> wrote:
+> > 
+> > The Branch Record Buffer Extension (BRBE) adds a number of system registers
+> > and instructions, which we don't currently intend to expose to guests. Our
+> > existing logic handles this safely, but this could be improved with some
+> > explicit handling of BRBE.
+> > 
+> > The presence of BRBE is currently hidden from guests as the cpufeature
+> > code's ftr_id_aa64dfr0[] table doesn't have an entry for the BRBE field,
+> > and so this will be zero in the sanitised value of ID_AA64DFR0 exposed to
+> > guests via read_sanitised_id_aa64dfr0_el1(). As the ftr_id_aa64dfr0[] table
+> > may gain an entry for the BRBE field in future, for robustness we should
+> > explicitly mask out the BRBE field in read_sanitised_id_aa64dfr0_el1().
+> > 
+> > The BRBE system registers and instructions are currently trapped by the
+> > existing configuration of the fine-grained traps. As neither the registers
+> > nor the instructions are described in the sys_reg_descs[] table,
+> > emulate_sys_reg() will warn that these are unknown before injecting an
+> > UNDEFINED exception into the guest.
+> > 
+> > Well-behaved guests shouldn't try to use the registers or instructions, but
+> > badly-behaved guests could use these, resulting in unnecessary warnings. To
+> > avoid those warnings, we should explicitly handle the BRBE registers and
+> > instructions as UNDEFINED.
+> > 
+> > Address the above by having read_sanitised_id_aa64dfr0_el1() mask out the
+> > ID_AA64DFR0.BRBE field, and explicitly handling all of the BRBE system
+> > registers and instructions as UNDEFINED.
+> > 
+> > Cc: Marc Zyngier <maz@kernel.org>
+> > Cc: Oliver Upton <oliver.upton@linux.dev>
+> > Cc: James Morse <james.morse@arm.com>
+> > Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+> > Cc: Catalin Marinas <catalin.marinas@arm.com>
+> > Cc: Will Deacon <will@kernel.org>
+> > Cc: kvmarm@lists.linux.dev
+> > Cc: linux-arm-kernel@lists.infradead.org
+> > Cc: linux-kernel@vger.kernel.org
+> > Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+> > ----
+> > Changes in V18:
+> > 
+> > - Updated the commit message
+> > 
+> >  arch/arm64/kvm/sys_regs.c | 56 +++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 56 insertions(+)
+> > Reviewed-by: Mark Rutland <mark.rutland@arm.com>
+> > ---
+> >  arch/arm64/kvm/sys_regs.c | 56 +++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 56 insertions(+)
+> > 
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index 22b45a15d068..3d4686abe5ee 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -1304,6 +1304,11 @@ static int set_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
+> >  	return 0;
+> >  }
+> >  
+> > +#define BRB_INF_SRC_TGT_EL1(n)				\
+> > +	{ SYS_DESC(SYS_BRBINF_EL1(n)), undef_access },	\
+> > +	{ SYS_DESC(SYS_BRBSRC_EL1(n)), undef_access },	\
+> > +	{ SYS_DESC(SYS_BRBTGT_EL1(n)), undef_access }	\
+> > +
+> >  /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
+> >  #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
+> >  	{ SYS_DESC(SYS_DBGBVRn_EL1(n)),					\
+> > @@ -1722,6 +1727,9 @@ static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+> >  	/* Hide SPE from guests */
+> >  	val &= ~ID_AA64DFR0_EL1_PMSVer_MASK;
+> >  
+> > +	/* Hide BRBE from guests */
+> > +	val &= ~ID_AA64DFR0_EL1_BRBE_MASK;
+> > +
+> >  	return val;
+> >  }
+> >  
+> > @@ -2240,6 +2248,52 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+> >  	{ SYS_DESC(SYS_DBGCLAIMCLR_EL1), trap_raz_wi },
+> >  	{ SYS_DESC(SYS_DBGAUTHSTATUS_EL1), trap_dbgauthstatus_el1 },
+> >  
+> > +	/*
+> > +	 * BRBE branch record sysreg address space is interleaved between
+> > +	 * corresponding BRBINF<N>_EL1, BRBSRC<N>_EL1, and BRBTGT<N>_EL1.
+> > +	 */
+> > +	BRB_INF_SRC_TGT_EL1(0),
+> > +	BRB_INF_SRC_TGT_EL1(16),
+> > +	BRB_INF_SRC_TGT_EL1(1),
+> > +	BRB_INF_SRC_TGT_EL1(17),
+> > +	BRB_INF_SRC_TGT_EL1(2),
+> > +	BRB_INF_SRC_TGT_EL1(18),
+> > +	BRB_INF_SRC_TGT_EL1(3),
+> > +	BRB_INF_SRC_TGT_EL1(19),
+> > +	BRB_INF_SRC_TGT_EL1(4),
+> > +	BRB_INF_SRC_TGT_EL1(20),
+> > +	BRB_INF_SRC_TGT_EL1(5),
+> > +	BRB_INF_SRC_TGT_EL1(21),
+> > +	BRB_INF_SRC_TGT_EL1(6),
+> > +	BRB_INF_SRC_TGT_EL1(22),
+> > +	BRB_INF_SRC_TGT_EL1(7),
+> > +	BRB_INF_SRC_TGT_EL1(23),
+> > +	BRB_INF_SRC_TGT_EL1(8),
+> > +	BRB_INF_SRC_TGT_EL1(24),
+> > +	BRB_INF_SRC_TGT_EL1(9),
+> > +	BRB_INF_SRC_TGT_EL1(25),
+> > +	BRB_INF_SRC_TGT_EL1(10),
+> > +	BRB_INF_SRC_TGT_EL1(26),
+> > +	BRB_INF_SRC_TGT_EL1(11),
+> > +	BRB_INF_SRC_TGT_EL1(27),
+> > +	BRB_INF_SRC_TGT_EL1(12),
+> > +	BRB_INF_SRC_TGT_EL1(28),
+> > +	BRB_INF_SRC_TGT_EL1(13),
+> > +	BRB_INF_SRC_TGT_EL1(29),
+> > +	BRB_INF_SRC_TGT_EL1(14),
+> > +	BRB_INF_SRC_TGT_EL1(30),
+> > +	BRB_INF_SRC_TGT_EL1(15),
+> > +	BRB_INF_SRC_TGT_EL1(31),
+> > +
+> > +	/* Remaining BRBE sysreg addresses space */
+> > +	{ SYS_DESC(SYS_BRBCR_EL1), undef_access },
+> > +	{ SYS_DESC(SYS_BRBFCR_EL1), undef_access },
+> > +	{ SYS_DESC(SYS_BRBTS_EL1), undef_access },
+> > +	{ SYS_DESC(SYS_BRBINFINJ_EL1), undef_access },
+> > +	{ SYS_DESC(SYS_BRBSRCINJ_EL1), undef_access },
+> > +	{ SYS_DESC(SYS_BRBTGTINJ_EL1), undef_access },
+> > +	{ SYS_DESC(SYS_BRBIDR0_EL1), undef_access },
+> > +
+> >  	{ SYS_DESC(SYS_MDCCSR_EL0), trap_raz_wi },
+> >  	{ SYS_DESC(SYS_DBGDTR_EL0), trap_raz_wi },
+> >  	// DBGDTR[TR]X_EL0 share the same encoding
+> > @@ -2751,6 +2805,8 @@ static struct sys_reg_desc sys_insn_descs[] = {
+> >  	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
+> >  	{ SYS_DESC(SYS_DC_CIGSW), access_dcgsw },
+> >  	{ SYS_DESC(SYS_DC_CIGDSW), access_dcgsw },
+> > +	{ SYS_DESC(OP_BRB_IALL), undef_access },
+> > +	{ SYS_DESC(OP_BRB_INJ), undef_access },
+> >  };
+> >  
+> >  static const struct sys_reg_desc *first_idreg;
+> 
+> I don't think we need any update to the sys_reg table to handle
+> this. Instead, we should make use of the FGU infrastructure that has
+> been in since 6.9 to make this stuff UNDEF unconditionally.
+> 
+> It should be as simple as:
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index ee33f5467ce5..7cafe3f72c01 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -4964,6 +4964,11 @@ void kvm_init_sysreg(struct kvm_vcpu *vcpu)
+>  		kvm->arch.fgu[HAFGRTR_GROUP] |= ~(HAFGRTR_EL2_RES0 |
+>  						  HAFGRTR_EL2_RES1);
+>  
+> +	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, BRBE, IMP))
+> +		kvm->arch.fgu[HDFGRTR_GROUP] |= (HDFGRTR_nBRBDATA |
+> +						 HDFGRTR_nBRBCTL  |
+> +						 HDFGRTR_nBRBIDR);
+> +
+>  	set_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags);
+>  out:
+>  	mutex_unlock(&kvm->arch.config_lock);
+> 
+> which is of course untested, but that I expect to be correct.
 
-So if these bits are disabled, they must be RES1 and not RES0.
-But that's not what the code implements, making the traps for
-these negative trap bits being always on instead of disabled.
+Actually, to disable the *instructions*, a similar hack must be
+applied to HFGITR_EL2. The resulting patch should be something like:
 
-Fix the relevant bits, and stick a brown paper bag on my head
-for the rest of the day...
-
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/nested.c | 24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
-
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index bae8536cbf00..0acb60273482 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -328,21 +328,21 @@ int kvm_init_nv_sysregs(struct kvm *kvm)
- 			 HFGxTR_EL2_ERXPFGF_EL1 | HFGxTR_EL2_ERXPFGCTL_EL1 |
- 			 HFGxTR_EL2_ERXPFGCDN_EL1 | HFGxTR_EL2_ERXADDR_EL1);
- 	if (!kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_ACCDATA))
--		res0 |= HFGxTR_EL2_nACCDATA_EL1;
-+		res1 |= HFGxTR_EL2_nACCDATA_EL1;
- 	if (!kvm_has_feat(kvm, ID_AA64PFR1_EL1, GCS, IMP))
--		res0 |= (HFGxTR_EL2_nGCS_EL0 | HFGxTR_EL2_nGCS_EL1);
-+		res1 |= (HFGxTR_EL2_nGCS_EL0 | HFGxTR_EL2_nGCS_EL1);
- 	if (!kvm_has_feat(kvm, ID_AA64PFR1_EL1, SME, IMP))
--		res0 |= (HFGxTR_EL2_nSMPRI_EL1 | HFGxTR_EL2_nTPIDR2_EL0);
-+		res1 |= (HFGxTR_EL2_nSMPRI_EL1 | HFGxTR_EL2_nTPIDR2_EL0);
- 	if (!kvm_has_feat(kvm, ID_AA64PFR1_EL1, THE, IMP))
--		res0 |= HFGxTR_EL2_nRCWMASK_EL1;
-+		res1 |= HFGxTR_EL2_nRCWMASK_EL1;
- 	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, S1PIE, IMP))
--		res0 |= (HFGxTR_EL2_nPIRE0_EL1 | HFGxTR_EL2_nPIR_EL1);
-+		res1 |= (HFGxTR_EL2_nPIRE0_EL1 | HFGxTR_EL2_nPIR_EL1);
- 	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, S1POE, IMP))
--		res0 |= (HFGxTR_EL2_nPOR_EL0 | HFGxTR_EL2_nPOR_EL1);
-+		res1 |= (HFGxTR_EL2_nPOR_EL0 | HFGxTR_EL2_nPOR_EL1);
- 	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, S2POE, IMP))
--		res0 |= HFGxTR_EL2_nS2POR_EL1;
-+		res1 |= HFGxTR_EL2_nS2POR_EL1;
- 	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, AIE, IMP))
--		res0 |= (HFGxTR_EL2_nMAIR2_EL1 | HFGxTR_EL2_nAMAIR2_EL1);
-+		res1 |= (HFGxTR_EL2_nMAIR2_EL1 | HFGxTR_EL2_nAMAIR2_EL1);
- 	set_sysreg_masks(kvm, HFGRTR_EL2, res0 | __HFGRTR_EL2_RES0, res1);
- 	set_sysreg_masks(kvm, HFGWTR_EL2, res0 | __HFGWTR_EL2_RES0, res1);
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index ee33f5467ce5..49d86dae8d80 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -4964,6 +4964,15 @@ void kvm_init_sysreg(struct kvm_vcpu *vcpu)
+ 		kvm->arch.fgu[HAFGRTR_GROUP] |= ~(HAFGRTR_EL2_RES0 |
+ 						  HAFGRTR_EL2_RES1);
  
-@@ -378,10 +378,10 @@ int kvm_init_nv_sysregs(struct kvm *kvm)
- 			 HDFGRTR_EL2_TRBPTR_EL1 | HDFGRTR_EL2_TRBSR_EL1 |
- 			 HDFGRTR_EL2_TRBTRG_EL1);
- 	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, BRBE, IMP))
--		res0 |= (HDFGRTR_EL2_nBRBIDR | HDFGRTR_EL2_nBRBCTL |
-+		res1 |= (HDFGRTR_EL2_nBRBIDR | HDFGRTR_EL2_nBRBCTL |
- 			 HDFGRTR_EL2_nBRBDATA);
- 	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMSVer, V1P2))
--		res0 |= HDFGRTR_EL2_nPMSNEVFR_EL1;
-+		res1 |= HDFGRTR_EL2_nPMSNEVFR_EL1;
- 	set_sysreg_masks(kvm, HDFGRTR_EL2, res0 | HDFGRTR_EL2_RES0, res1);
- 
- 	/* Reuse the bits from the read-side and add the write-specific stuff */
-@@ -417,9 +417,9 @@ int kvm_init_nv_sysregs(struct kvm *kvm)
- 		res0 |= (HFGITR_EL2_CFPRCTX | HFGITR_EL2_DVPRCTX |
- 			 HFGITR_EL2_CPPRCTX);
- 	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, BRBE, IMP))
--		res0 |= (HFGITR_EL2_nBRBINJ | HFGITR_EL2_nBRBIALL);
-+		res1 |= (HFGITR_EL2_nBRBINJ | HFGITR_EL2_nBRBIALL);
- 	if (!kvm_has_feat(kvm, ID_AA64PFR1_EL1, GCS, IMP))
--		res0 |= (HFGITR_EL2_nGCSPUSHM_EL1 | HFGITR_EL2_nGCSSTR_EL1 |
-+		res1 |= (HFGITR_EL2_nGCSPUSHM_EL1 | HFGITR_EL2_nGCSSTR_EL1 |
- 			 HFGITR_EL2_nGCSEPP);
- 	if (!kvm_has_feat(kvm, ID_AA64ISAR1_EL1, SPECRES, COSP_RCTX))
- 		res0 |= HFGITR_EL2_COSPRCTX;
++	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, BRBE, IMP)) {
++		kvm->arch.fgu[HDFGRTR_GROUP] |= (HDFGRTR_nBRBDATA  |
++						 HDFGRTR_nBRBCTL   |
++						 HDFGRTR_nBRBIDR);
++		kvm->arch.fgu[HFGITR_GROUP] |= (HFGITR_EL2_nBRBINJ |
++						HFGITR_EL2_nBRBIALL);
++	}
++
++
+ 	set_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags);
+ out:
+ 	mutex_unlock(&kvm->arch.config_lock);
+
+The implicit dependency here is that FGT is always present on a system
+that implements BRBE. The architecture supports this assertion:
+
+- BRBE is not available before ARMv9.1
+- FGT is mandatory from ARMv8.6
+
+Given that v9.1 is congruent to v8.6, we have the required overlap.
+
+Thanks,
+
+	M.
+
 -- 
-2.39.2
-
+Without deviation from the norm, progress is not possible.
