@@ -1,133 +1,175 @@
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 859C98614D
-	for <kvmarm@lists.linux.dev>; Fri, 14 Jun 2024 08:39:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DC2A1922C1;
+	Fri, 14 Jun 2024 10:56:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718354343; cv=none; b=LavoaO7uAdJEuRtXylaSTz8KMLfmSv3t8bwp6Vhms+oVm7okoDYgpgHuQfsNlqT0eEdtCGe7lesNS48ENltvWkH4nmcQnCu8xIKzTWbtmP92MXoF2FmstlOa7J3Odu6K16qTyO3EnAEsXN4ZgVf8GBCORg+qvwXomr+f0Ev3V+o=
+	t=1718362584; cv=none; b=Q5owF8s4f1gpgeLxsyKVQdPGsq5W/QygRSAWO4hvBRcirFcDakd58fP3Af+YjawzVgAyO3HTUdqmgN5peytSmiaegkoG0PkTAROEyCbVL9NFVL+1Q85hBVjijFx2fCw5TStO2tJTQ9cWzgfwBxA2WS7LW29uNAtCyEiBJabXdX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718354343; c=relaxed/simple;
-	bh=RVJ3HNfS/LTVgt0bhHVJerIJHiZbdVxp4/zR+A9dP3w=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=LRQ3zaL5bpF8ANDTqgKGHFrJ1qTDWpE/uEGBTplqqoFbLySDmh2M1tAUBgv2EhqF58XGxTyb51D3yu+Ax8wtUpzYIZZmZ1cH3iEksZ6624+KTlJZOd5KKdJ4h43NtXBz3Xb0yD1NJ7ONkUUhgmQGL4ZCc6LP9EN03ZZpRoV3WXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T9JT58FQ; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1718362584; c=relaxed/simple;
+	bh=5r7N6D6dt9wZFpML6W5hQT17FrsvSr8pDDgZbtyQJxI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nixCPYxz5OQxDf9L0qnMXX9IY7Jr1vtpuK+hxqhdT8u+hWYegaZYvWe1crjb6dtBFOPIxlW9MxwTsb/kpDJSKYwc3slqftGa76KtYTxbQTpJ7dJFQ1WjAp0Np2Q07RpDnBcSmhyHqRM6W6VUQO8TJhVXe3WbJ/XR+QER4RRvf/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DV10GltX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T9JT58FQ"
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-6f8ec7e054dso1292932b3a.2
-        for <kvmarm@lists.linux.dev>; Fri, 14 Jun 2024 01:39:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718354342; x=1718959142; darn=lists.linux.dev;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NGy8Qk7vHjHfh3JaIY/2KaWeJmy159LbqRE46FH8bXg=;
-        b=T9JT58FQk4bSjf/ho0fC8tzGpiXhY5+t7IMh2HpLs7lpRsL4IKnkk9BysmB+Gqwx2s
-         OONROINFW8meJJb1qDwEQD4aVA4gREzXqAfZnU+33fpba9+TU760hQduPqc5UN+VdMH6
-         l+lqNt9jPWBuKmjhpN6YJyABLFG/gbpm5msv8VO5zdAxKcg9zkNRVSIvwh1zrTCQxqwG
-         LpbBmfcAJ+LwjG0eaPaS6krx+FCQqX1MYa60jIQVp76G/seMjU8yqqjvNxEUCA5iMg5f
-         b3arVZ+HmCXsey8T8vq6AkpR3obkJeoZQVJCBzBFERw1OvOThjPdp1+AK49Wph/Hy+GV
-         f20g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718354342; x=1718959142;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=NGy8Qk7vHjHfh3JaIY/2KaWeJmy159LbqRE46FH8bXg=;
-        b=i5F6GBIoXQdx/Y/drddCYcpqNn8I/VXzf7dfm9ObFI5psa/v3NIDbKl8o3wmIPIpec
-         B4oIVPpLAoZq7OeyGJudHCbFjYplAaIlRKiDkJtvjmgdxAWUVQDxG9X5UDWF/TkwH7gA
-         9WErj05MH8fmIkVHwHOMuLgCXly5R/+f1V+RBxjRS/KQJa+ovpZR72UWCyHBB7dTTkV6
-         d7CCr4m/ALZ/gf/IymNpMIKN9xIU7TNbsjCCzIezI2spcij1SneL30CxZL0bboOP4J5G
-         LgdD6P2sG5dlR7JtBMmMJswnui6VP+vLIkla5JMVWCJljTExNL5ZdRVnpvpp4Rd4w2e9
-         D41Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXce7SlL7+zSTv894ScekBjsduUQQ7pE7wT0CeE9pKTss6gN5vIAoMHEllkhTZaS2V/wTHrLVs7RZkDjTdeutZxzT9DOrlc
-X-Gm-Message-State: AOJu0YwqYCc+srLIQeWHhcgcgRuHrylwsrCKANtz9p+GuevZOu2Vh7dH
-	ckB8nAFYjyf6/4mjCsoljgW4J8OsAF1nYyevAtVqxWGv5zv8KgpL
-X-Google-Smtp-Source: AGHT+IE6pXW+ie68+vtXwkMfCghwPmHr4/AQacJLhgnTEyIreahfjP48hPsxIsT9zufhQ8cyfHE9eg==
-X-Received: by 2002:a05:6a21:81a9:b0:1b5:69cd:87c with SMTP id adf61e73a8af0-1bae7e88366mr2104777637.27.1718354341640;
-        Fri, 14 Jun 2024 01:39:01 -0700 (PDT)
-Received: from localhost (220-235-199-47.tpgi.com.au. [220.235.199.47])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c4a769beb8sm5500935a91.41.2024.06.14.01.38.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 14 Jun 2024 01:39:01 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DV10GltX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11F2BC2BD10;
+	Fri, 14 Jun 2024 10:56:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718362584;
+	bh=5r7N6D6dt9wZFpML6W5hQT17FrsvSr8pDDgZbtyQJxI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=DV10GltXSd/EIg2rB7Xf04cuZUoSGGDbDmEeqtS6kxNYDGhg1cEoCDfPfLWCnlUeL
+	 d+Ejjeik53bWFr9AfuKnu0a1L113gROx/xUkYhZR4c818nr9/G+ZcPigmzI+xBXuF8
+	 7rRBob3FzU28w1ffsqp7tbGwCpsDL41eb9SB1Fz32NUmq1/Lqe/5+gSQDeukqw88U3
+	 M4X1kn5/6eD5eutV3wcGXTDGBAVTxpWOfninRuhTrsgv5vWCLT5cxg84F7vrIrpyhT
+	 JkEiQlKSx9HF5UWKNKmTH6iGtWbXhtAnFgg5NZkmMdVwQPsKwvRjAfJjCRe/tNPo2e
+	 K5sM0PRixkBgA==
+Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sI4bV-003tck-Q4;
+	Fri, 14 Jun 2024 11:56:21 +0100
+Date: Fri, 14 Jun 2024 11:56:20 +0100
+Message-ID: <87bk433i97.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	kvm@vger.kernel.org,
+	Fuad Tabba <tabba@google.com>,
+	Jintack Lim <jintack.lim@linaro.org>,
+	Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [PATCH v2 01/15] KVM: arm64: nv: Forward FP/ASIMD traps to guest hypervisor
+In-Reply-To: <20240613201756.3258227-2-oliver.upton@linux.dev>
+References: <20240613201756.3258227-1-oliver.upton@linux.dev>
+	<20240613201756.3258227-2-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Fri, 14 Jun 2024 18:38:54 +1000
-Message-Id: <D1ZLRVNGPWTV.5H76A3E8DJCV@gmail.com>
-Cc: "Thomas Huth" <thuth@redhat.com>, <kvm@vger.kernel.org>,
- <linux-s390@vger.kernel.org>, "Andrew Jones" <andrew.jones@linux.dev>,
- "Marc Hartmayer" <mhartmay@linux.ibm.com>, <kvm-riscv@lists.infradead.org>,
- <kvmarm@lists.linux.dev>, <linuxppc-dev@lists.ozlabs.org>
-Subject: Re: [kvm-unit-tests PATCH] build: retain intermediate .aux.o
- targets
-From: "Nicholas Piggin" <npiggin@gmail.com>
-To: "Segher Boessenkool" <segher@kernel.crashing.org>
-X-Mailer: aerc 0.17.0
-References: <20240612044234.212156-1-npiggin@gmail.com>
- <20240612082847.GG19790@gate.crashing.org>
- <D1ZBO021MLHV.3C7E4V3WOHO8V@gmail.com>
- <20240614010856.GK19790@gate.crashing.org>
-In-Reply-To: <20240614010856.GK19790@gate.crashing.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.104.136.29
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvm@vger.kernel.org, tabba@google.com, jintack.lim@linaro.org, christoffer.dall@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri Jun 14, 2024 at 11:08 AM AEST, Segher Boessenkool wrote:
-> On Fri, Jun 14, 2024 at 10:43:39AM +1000, Nicholas Piggin wrote:
-> > On Wed Jun 12, 2024 at 6:28 PM AEST, Segher Boessenkool wrote:
-> > > On Wed, Jun 12, 2024 at 02:42:32PM +1000, Nicholas Piggin wrote:
-> > > > arm, powerpc, riscv, build .aux.o targets with implicit pattern rul=
-es
-> > > > in dependency chains that cause them to be made as intermediate fil=
-es,
-> > > > which get removed when make finishes. This results in unnecessary
-> > > > partial rebuilds. If make is run again, this time the .aux.o target=
-s
-> > > > are not intermediate, possibly due to being made via different
-> > > > dependencies.
-> > > >=20
-> > > > Adding .aux.o files to .PRECIOUS prevents them being removed and so=
-lves
-> > > > the rebuild problem.
-> > > >=20
-> > > > s390x does not have the problem because .SECONDARY prevents dependa=
-ncies
-> > > > from being built as intermediate. However the same change is made f=
-or
-> > > > s390x, for consistency.
-> > >
-> > > This is exactly what .SECONDARY is for, as its documentation says,
-> > > even.  Wouldn't it be better to just add a .SECONDARY to the other
-> > > targets as well?
-> >=20
-> > Yeah we were debating that and agreed .PRECIOUS may not be the
-> > cleanest fix but since we already use that it's okay for a
-> > minimal fix.
->
-> But why add it to s390x then?  It is not a fix there at all!
+On Thu, 13 Jun 2024 21:17:42 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> From: Jintack Lim <jintack.lim@linaro.org>
+> 
+> Give precedence to the guest hypervisor's trap configuration when
+> routing an FP/ASIMD trap taken to EL2. Take advantage of the
+> infrastructure for translating CPTR_EL2 into the VHE (i.e. EL1) format
+> and base the trap decision solely on the VHE view of the register. The
+> in-memory value of CPTR_EL2 will always be up to date for the guest
+> hypervisor (more on that later), so just read it directly from memory.
+> 
+> Bury all of this behind a macro keyed off of the CPTR bitfield in
+> anticipation of supporting other traps (e.g. SVE).
+> 
+> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> [maz: account for HCR_EL2.E2H when testing for TFP/FPEN, with
+>  all the hard work actually being done by Chase Conklin]
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> [ oliver: translate nVHE->VHE format for testing traps; macro for reuse
+>  in other CPTR_EL2.xEN fields ]
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/include/asm/kvm_emulate.h    | 43 +++++++++++++++++++++++++
+>  arch/arm64/include/asm/kvm_nested.h     |  1 -
+>  arch/arm64/kvm/handle_exit.c            | 16 ++++++---
+>  arch/arm64/kvm/hyp/include/hyp/switch.h |  3 ++
+>  4 files changed, 58 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index 501e3e019c93..c3c5a5999ed7 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -11,6 +11,7 @@
+>  #ifndef __ARM64_KVM_EMULATE_H__
+>  #define __ARM64_KVM_EMULATE_H__
+>  
+> +#include <linux/bitfield.h>
+>  #include <linux/kvm_host.h>
+>  
+>  #include <asm/debug-monitors.h>
+> @@ -599,4 +600,46 @@ static __always_inline void kvm_reset_cptr_el2(struct kvm_vcpu *vcpu)
+>  
+>  	kvm_write_cptr_el2(val);
+>  }
+> +
+> +/*
+> + * Returns a 'sanitised' view of CPTR_EL2, translating from nVHE to the VHE
+> + * format if E2H isn't set.
+> + */
+> +static inline u64 vcpu_sanitised_cptr_el2(const struct kvm_vcpu *vcpu)
+> +{
+> +	u64 cptr = __vcpu_sys_reg(vcpu, CPTR_EL2);
+> +
+> +	if (!vcpu_el2_e2h_is_set(vcpu))
+> +		cptr = translate_cptr_el2_to_cpacr_el1(cptr);
+> +
+> +	return cptr;
+> +}
+> +
+> +static inline bool ____cptr_xen_trap_enabled(const struct kvm_vcpu *vcpu,
+> +					     unsigned int xen)
+> +{
+> +	switch (xen) {
+> +	case 0b00:
+> +	case 0b10:
+> +		return true;
+> +	case 0b01:
+> +		return vcpu_el2_tge_is_set(vcpu) && !vcpu_is_el2(vcpu);
+> +	case 0b11:
+> +	default:
+> +		return false;
+> +	}
+> +}
+> +
+> +#define __guest_hyp_cptr_xen_trap_enabled(vcpu, xen)				\
+> +	(!vcpu_has_nv(vcpu) ? false :						\
+> +	 ____cptr_xen_trap_enabled(vcpu,					\
+> +				   SYS_FIELD_GET(CPACR_ELx, xen,		\
+> +						 vcpu_sanitised_cptr_el2(vcpu))))
+> +
+> +static inline bool guest_hyp_fpsimd_traps_enabled(const struct kvm_vcpu *vcpu)
+> +{
+> +	return __guest_hyp_cptr_xen_trap_enabled(vcpu, FPEN);
+> +}
+> +
+> +
+>  #endif /* __ARM64_KVM_EMULATE_H__ */
+> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> index 5e0ab0596246..5d55f76254c3 100644
+> --- a/arch/arm64/include/asm/kvm_nested.h
+> +++ b/arch/arm64/include/asm/kvm_nested.h
+> @@ -75,5 +75,4 @@ static inline bool kvm_auth_eretax(struct kvm_vcpu *vcpu, u64 *elr)
+>  	return false;
+>  }
+>  #endif
+> -
+>  #endif /* __ARM64_KVM_NESTED_H */
 
-Eh, not a big deal. I mentioned that in the changelog it doesn't seem to
-pracicaly fix something. And I rather the makefiles converge as much as
-possible rather than diverge more.
+nit: spurious change.
 
-.SECONDARY was added independently and not to fix this problem in
-s390x. And s390x has .SECONDARY slightly wrong AFAIKS. It mentions
-.SECONDARY: twice in a way that looks like it was meant to depend on
-specific targets, it actually gives it no dependencies and the
-resulting semantics are that all intermediate files in the build are
-treated as secondary. So somethig there should be cleaned up. If the
-.SECONDARY was changed to only depend on the .gobj and .hdr.obj then
-suddenly that would break .aux.o if I don't make the change.
+Aside from that:
 
-So I'm meaning to work out what to do with all that, i.e., whether to
-add blanket .SECONDARY for all and trim or remove the .PRECIOUS files,
-or remove s390x's secondary, or make it more specific, or something
-else. But it takes a while for me to do makefile work.
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
-Thanks,
-Nick
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
