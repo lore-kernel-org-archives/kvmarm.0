@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CE2EBA3F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 988583A260;
 	Fri, 14 Jun 2024 14:46:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718376377; cv=none; b=fXWdKC98UbmK5rQGA76Be9+hgcfC17NaPvHI4a/HNQQbwfTtZamrLYX/mwyOJSflCY+7GYqljWEr+kqs2WK3Lta9USa9lSJxcGEiaL4iOrdBh7vlfdlXZdAARORNTkO2vBYqXwN/T6pUmE1fOg8F8ycrTgc18YfzCC6ac4+YzlA=
+	t=1718376377; cv=none; b=J/st8BdPdoUIoNsq+RCDE4vvtI6qy/3MSmzaICh/juoqgXEu6q0uOhwawSvjUetjGtq1TJfXeKhFLPv9/7e6VDqaRn4WjtEA6/XcNxbxBOv0gPi4oFpQ7opBkuSxcEhfNF1R5Fc/3iFUUE8XvazeGl83HFm4ycfMrR7FPGLatQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1718376377; c=relaxed/simple;
-	bh=zThmFMxqyRGTd2EyTdXNaJlwBgk404JIryLF4a688iA=;
+	bh=4IZXzu3rQAVEda6waRiG3BsL6vwsphd7VFNvseeZWxY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=l3XwLQFRTEH/d9nu+w9x9NCQ/3mIpX2CM/xus7S2BpqqK5GhMo3Tdhp0gcbgTFMufi8Qh8Qj231e7PcmVk9DaaZZRqDfhexfoGgtnyXogvn7FlaN+IfvVb+AQ8xPj7xZb8Q+5MQSvrxPmKTOKx5+XetzE6ORQnBSx9W4X89OnoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b6gDwd/g; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=KkQfWabVn35623Nlu+GmB/HTkJJ6B/sZjZoMQB2KA39UC10uO3gjqUlHBeNBvST8o7ciWvcGRCszEKNfA0tfHIh9cA1O1+yVN/5K2Rd9xmlcPSdkxCX6IXL6O5zfJptxPwibFpir/HlH6mPDSeHswhv2CKC1UjTzfnapuwekKoI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tq+E5LMb; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b6gDwd/g"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E4ADC4AF1A;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tq+E5LMb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B12EC3277B;
 	Fri, 14 Jun 2024 14:46:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1718376377;
-	bh=zThmFMxqyRGTd2EyTdXNaJlwBgk404JIryLF4a688iA=;
+	bh=4IZXzu3rQAVEda6waRiG3BsL6vwsphd7VFNvseeZWxY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=b6gDwd/gsZypF8m6crYkMgknBQ9wgibHe5ScvlmV3/lqdlpS4bAH4eqr05PzIrN2Q
-	 WNcS1Mh1wOs4GfcBSRkMb15LuCxZ8zRwj3P5rocI+tISX4Nz6L0e6u+rJCSmlTMLE4
-	 VxBo+GreRru7R2903d9cglYvgRMnp4kTON/M4auwGwVfsOhrSv9Q51HNt9iGV5rtPK
-	 8jV9yiaJTWZBLChj3QzflNulSkOT1RxotkFT5wcmJgoSSaB4Y2fdaTttCAeSMeaXdn
-	 Z3EK6o9bXdFHjAGtMh+PnM5bLmfzXRgXNSLiyOWRsibU6cN5C0PcJUpVVRXObI8RfS
-	 sH9iZO+8ESuEg==
+	b=Tq+E5LMb3lriwTRlWdQDhtNOEQqR1bfACTZ3gJsokZwe5IY0Yz1wNTj8xb0Oiy7fx
+	 HXrG4C4jT4BcSaEb2OxYcZPp2EP5wjqI0ReXmYOtK5x4enSd8A83ZbMEIjeGjONcrn
+	 26p6hcIddWzeIIowU2ch5CbifFV7lwPIShHeN+Cev2s5YpRD7AoZ7SYdPTk1Kk0wi1
+	 pHE3b9bAMLd8w4/H772S1/93DmXL1KQl60bX1ORmeQjPNEEEshvOsIzuCZX096kTBl
+	 KljCPNtx8HVPob5t7ak24kTvkWbhZhbyuEYegH8LF7AF75fPis1IHej6mZW3RSN6ml
+	 BuKQKSzt/vyvw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sI8Bz-003wb4-BT;
+	id 1sI8Bz-003wb4-Oo;
 	Fri, 14 Jun 2024 15:46:15 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -44,9 +44,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Christoffer Dall <christoffer.dall@arm.com>,
 	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: [PATCH v3 08/16] KVM: arm64: nv: Handle TLBI VMALLS12E1{,IS} operations
-Date: Fri, 14 Jun 2024 15:45:44 +0100
-Message-Id: <20240614144552.2773592-9-maz@kernel.org>
+Subject: [PATCH v3 10/16] KVM: arm64: nv: Handle TLBI IPAS2E1{,IS} operations
+Date: Fri, 14 Jun 2024 15:45:46 +0100
+Message-Id: <20240614144552.2773592-11-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240614144552.2773592-1-maz@kernel.org>
 References: <20240614144552.2773592-1-maz@kernel.org>
@@ -62,14 +62,14 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Emulating TLBI VMALLS12E1* results in tearing down all the shadow
-S2 PTs that match the current VMID, since our shadow S2s are just
-some form of SW-managed TLBs. That teardown itself results in a
-full TLB invalidation for both S1 and S2.
+TLBI IPAS2E1* are the last class of TLBI instructions we need
+to handle. For each matching S2 MMU context, we invalidate a
+range corresponding to the largest possible mapping for that
+context.
 
-This can result in over-invalidation if two vcpus use the same VMID
-to tag private S2 PTs, but this is still correct from an architecture
-perspective.
+At this stage, we don't handle TTL, which means we are likely
+over-invalidating. Further patches will aim at making this
+a bit better.
 
 Co-developed-by: Jintack Lim <jintack.lim@linaro.org>
 Co-developed-by: Christoffer Dall <christoffer.dall@arm.com>
@@ -77,28 +77,37 @@ Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 51 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 51 insertions(+)
+ arch/arm64/kvm/sys_regs.c | 96 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 96 insertions(+)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index b22309fca3a7..22a3691ce248 100644
+index d8d6380b7c66..06963f1d206e 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -2741,6 +2741,22 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	EL2_REG(SP_EL2, NULL, reset_unknown, 0),
- };
+@@ -2780,6 +2780,31 @@ static bool handle_alle1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 	return true;
+ }
  
-+static bool kvm_supported_tlbi_s12_op(struct kvm_vcpu *vpcu, u32 instr)
++static bool kvm_supported_tlbi_ipas2_op(struct kvm_vcpu *vpcu, u32 instr)
 +{
 +	struct kvm *kvm = vpcu->kvm;
 +	u8 CRm = sys_reg_CRm(instr);
++	u8 Op2 = sys_reg_Op2(instr);
 +
 +	if (sys_reg_CRn(instr) == TLBI_CRn_nXS &&
 +	    !kvm_has_feat(kvm, ID_AA64ISAR1_EL1, XS, IMP))
 +		return false;
 +
-+	if (CRm == TLBI_CRm_nROS &&
++	if (CRm == TLBI_CRm_IPAIS && (Op2 == 2 || Op2 == 6) &&
++	    !kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, RANGE))
++		return false;
++
++	if (CRm == TLBI_CRm_IPAONS && (Op2 == 0 || Op2 == 4) &&
 +	    !kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, OS))
++		return false;
++
++	if (CRm == TLBI_CRm_IPAONS && (Op2 == 3 || Op2 == 7) &&
++	    !kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, RANGE))
 +		return false;
 +
 +	return true;
@@ -107,38 +116,72 @@ index b22309fca3a7..22a3691ce248 100644
  /* Only defined here as this is an internal "abstraction" */
  union tlbi_info {
  	struct {
-@@ -2758,6 +2774,38 @@ union tlbi_info {
- 	} va;
- };
+@@ -2829,6 +2854,72 @@ static bool handle_vmalls12e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 	return true;
+ }
  
-+static void s2_mmu_unmap_range(struct kvm_s2_mmu *mmu,
-+			       const union tlbi_info *info)
++static void s2_mmu_unmap_ipa(struct kvm_s2_mmu *mmu,
++			     const union tlbi_info *info)
 +{
-+	kvm_stage2_unmap_range(mmu, info->range.start, info->range.size);
++	unsigned long max_size;
++	u64 base_addr;
++
++	/*
++	 * We drop a number of things from the supplied value:
++	 *
++	 * - NS bit: we're non-secure only.
++	 *
++	 * - TTL field: We already have the granule size from the
++	 *   VTCR_EL2.TG0 field, and the level is only relevant to the
++	 *   guest's S2PT.
++	 *
++	 * - IPA[51:48]: We don't support 52bit IPA just yet...
++	 *
++	 * And of course, adjust the IPA to be on an actual address.
++	 */
++	base_addr = (info->ipa.addr & GENMASK_ULL(35, 0)) << 12;
++
++	/* Compute the maximum extent of the invalidation */
++	switch (mmu->tlb_vtcr & VTCR_EL2_TG0_MASK) {
++	case VTCR_EL2_TG0_4K:
++		max_size = SZ_1G;
++		break;
++	case VTCR_EL2_TG0_16K:
++		max_size = SZ_32M;
++		break;
++	case VTCR_EL2_TG0_64K:
++	default:	    /* IMPDEF: treat any other value as 64k */
++		/*
++		 * No, we do not support 52bit IPA in nested yet. Once
++		 * we do, this should be 4TB.
++		 */
++		max_size = SZ_512M;
++		break;
++	}
++
++	base_addr &= ~(max_size - 1);
++
++	kvm_stage2_unmap_range(mmu, base_addr, max_size);
 +}
 +
-+static bool handle_vmalls12e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-+				const struct sys_reg_desc *r)
++static bool handle_ipas2e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
++			     const struct sys_reg_desc *r)
 +{
 +	u32 sys_encoding = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
-+	u64 limit, vttbr;
++	u64 vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
 +
-+	if (!kvm_supported_tlbi_s12_op(vcpu, sys_encoding)) {
++	if (!kvm_supported_tlbi_ipas2_op(vcpu, sys_encoding)) {
 +		kvm_inject_undefined(vcpu);
 +		return false;
 +	}
 +
-+	vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
-+	limit = BIT_ULL(kvm_get_pa_bits(vcpu->kvm));
-+
 +	kvm_s2_mmu_iterate_by_vmid(vcpu->kvm, get_vmid(vttbr),
 +				   &(union tlbi_info) {
-+					   .range = {
-+						   .start = 0,
-+						   .size = limit,
++					   .ipa = {
++						   .addr = p->regval,
 +					   },
 +				   },
-+				   s2_mmu_unmap_range);
++				   s2_mmu_unmap_ipa);
 +
 +	return true;
 +}
@@ -146,16 +189,20 @@ index b22309fca3a7..22a3691ce248 100644
  static void s2_mmu_tlbi_s1e1(struct kvm_s2_mmu *mmu,
  			     const union tlbi_info *info)
  {
-@@ -2831,6 +2879,9 @@ static struct sys_reg_desc sys_insn_descs[] = {
- 	SYS_INSN(TLBI_VAAE1, handle_tlbi_el1),
+@@ -2903,8 +2994,13 @@ static struct sys_reg_desc sys_insn_descs[] = {
  	SYS_INSN(TLBI_VALE1, handle_tlbi_el1),
  	SYS_INSN(TLBI_VAALE1, handle_tlbi_el1),
-+
-+	SYS_INSN(TLBI_VMALLS12E1IS, handle_vmalls12e1is),
-+	SYS_INSN(TLBI_VMALLS12E1, handle_vmalls12e1is),
- };
  
- static const struct sys_reg_desc *first_idreg;
++	SYS_INSN(TLBI_IPAS2E1IS, handle_ipas2e1is),
++	SYS_INSN(TLBI_IPAS2LE1IS, handle_ipas2e1is),
++
+ 	SYS_INSN(TLBI_ALLE1IS, handle_alle1is),
+ 	SYS_INSN(TLBI_VMALLS12E1IS, handle_vmalls12e1is),
++	SYS_INSN(TLBI_IPAS2E1, handle_ipas2e1is),
++	SYS_INSN(TLBI_IPAS2LE1, handle_ipas2e1is),
+ 	SYS_INSN(TLBI_ALLE1, handle_alle1is),
+ 	SYS_INSN(TLBI_VMALLS12E1, handle_vmalls12e1is),
+ };
 -- 
 2.39.2
 
