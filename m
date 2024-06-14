@@ -1,186 +1,451 @@
-Received: from out-176.mta0.migadu.com (out-176.mta0.migadu.com [91.218.175.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DD3F1474C5
-	for <kvmarm@lists.linux.dev>; Fri, 14 Jun 2024 18:32:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.176
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A179614659F;
+	Fri, 14 Jun 2024 18:57:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718389968; cv=none; b=mgxx+XybML9znXhSq1W94snFLz0JwqOzGSDIiQ/aTatlJYfVx4KwAMXbYNACHwSz0EDf3wRMapT+L8QH4PnFTseNj0birVgAMb1SqanO37VXlsEs0x8DwwzIEE5W3mgp0uWsUWjxt+Pv08H98RuCxAFukKbJ8sYj2FaCiXxFh5s=
+	t=1718391441; cv=none; b=JKfPOJzJo+ls1IwCiXMxq17PyXygo93B1ceIZvcfk6itFZf5AjuOCU0x+z78yykFZ2gH7T9rhZ8lyRhvvg4WKCCuF2sQlcn4jTNlZJevpa402USsmGgIAZ9x34CZxSueNo0wA0uvExJTrNN+IdQVKcZjUL2srZDKpFthmTUcPSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718389968; c=relaxed/simple;
-	bh=kWHXfiW/eWv847hDdyNDPfVjaGDkYdtb8A2LHmGvu2c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=um0AJagkNk8861a003L7yI0wwJg5beKzbMtKl6wClP8W527XhqipP1A4QB5bLFgD85raKZ0qPV8DzkWZO37qNyBJ4zxR+0YOi8JviZmHK2d+ht+QgMAt+DybSL8VjGtgUue/VIJu5k9wQrMxtJQ116q7O0YrOjSDpzI8KlItTMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TbWo6WoK; arc=none smtp.client-ip=91.218.175.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TbWo6WoK"
-X-Envelope-To: sebott@redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1718389963;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bfjAgyWtBbRxONbdiKFFSvpzW16ct8ELGbCI1RgaYDo=;
-	b=TbWo6WoK1irRzuNAiIl8Od4+Hy08BlCQJoKsWrUFVp96WCEIXacnZGW5V8snVx167JFiyo
-	LoH7xl7Os41ZevbeY/1nDDIpa04sLSc500zOFXzatRhoCrqVGfXtvXY0j9PYgxdnRgbiNT
-	iQjWcGIV0uhvq4anf8OpW6dOY1sTdE4=
-X-Envelope-To: linux-arm-kernel@lists.infradead.org
-X-Envelope-To: kvmarm@lists.linux.dev
-X-Envelope-To: linux-kernel@vger.kernel.org
-X-Envelope-To: maz@kernel.org
-X-Envelope-To: james.morse@arm.com
-X-Envelope-To: suzuki.poulose@arm.com
-X-Envelope-To: catalin.marinas@arm.com
-X-Envelope-To: will@kernel.org
-X-Envelope-To: shahuang@redhat.com
-X-Envelope-To: eric.auger@redhat.com
-Date: Fri, 14 Jun 2024 18:32:37 +0000
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Sebastian Ott <sebott@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Shaoqin Huang <shahuang@redhat.com>,
-	Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v4 3/6] KVM: arm64: add emulation for CTR_EL0 register
-Message-ID: <ZmyMxRoKN5VhUW7J@linux.dev>
-References: <20240603130507.17597-1-sebott@redhat.com>
- <20240603130507.17597-4-sebott@redhat.com>
- <ZmtwjLbP283ra0Xq@linux.dev>
- <Zmty99X4hnYwtRS4@linux.dev>
- <0b148e21-1714-f4f7-bc77-2a12b990572d@redhat.com>
+	s=arc-20240116; t=1718391441; c=relaxed/simple;
+	bh=iDPcJaA7xeFloUdvPGvsZvDIj62pzgEpRyrRvAp9jk0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qIvIRxeXannMRbJjmVMVbiApjlq0cYZdXaJHaeCnLKx798yDv424hGk3Vb7a2myOz0QrsbQNqUWd68nEr7KwHuUQIeouzX6GskKVANkfoJehrb/UZDQJMoVUBHiasBgXbicBnN1iT8SyiHBcfeatxlybzsIIUCuP7yuiYmmx6do=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4D1D9FEC;
+	Fri, 14 Jun 2024 11:57:42 -0700 (PDT)
+Received: from [10.57.72.20] (unknown [10.57.72.20])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E3BEE3F73B;
+	Fri, 14 Jun 2024 11:57:14 -0700 (PDT)
+Message-ID: <6bdb0ff9-dba0-408c-9472-ef03339bfa7a@arm.com>
+Date: Fri, 14 Jun 2024 19:57:13 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0b148e21-1714-f4f7-bc77-2a12b990572d@redhat.com>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 02/14] arm64: Detect if in a realm and set RIPAS RAM
+Content-Language: en-GB
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>
+References: <20240605093006.145492-1-steven.price@arm.com>
+ <20240605093006.145492-3-steven.price@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20240605093006.145492-3-steven.price@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jun 14, 2024 at 05:31:37PM +0200, Sebastian Ott wrote:
+Hi Steven
 
-[...]
+On 05/06/2024 10:29, Steven Price wrote:
+> From: Suzuki K Poulose <suzuki.poulose@arm.com>
+> 
+> Detect that the VM is a realm guest by the presence of the RSI
+> interface.
+> 
+> If in a realm then all memory needs to be marked as RIPAS RAM initially,
+> the loader may or may not have done this for us. To be sure iterate over
+> all RAM and mark it as such. Any failure is fatal as that implies the
+> RAM regions passed to Linux are incorrect - which would mean failing
+> later when attempting to access non-existent RAM.
+> 
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Co-developed-by: Steven Price <steven.price@arm.com>
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+> Changes since v2:
+>   * Use DECLARE_STATIC_KEY_FALSE rather than "extern struct
+>     static_key_false".
+>   * Rename set_memory_range() to rsi_set_memory_range().
+>   * Downgrade some BUG()s to WARN()s and handle the condition by
+>     propagating up the stack. Comment the remaining case that ends in a
+>     BUG() to explain why.
+>   * Rely on the return from rsi_request_version() rather than checking
+>     the version the RMM claims to support.
+>   * Rename the generic sounding arm64_setup_memory() to
+>     arm64_rsi_setup_memory() and move the call site to setup_arch().
+> ---
+>   arch/arm64/include/asm/rsi.h      | 48 +++++++++++++++++++++
+>   arch/arm64/include/asm/rsi_cmds.h | 22 ++++++++++
+>   arch/arm64/kernel/Makefile        |  3 +-
+>   arch/arm64/kernel/rsi.c           | 69 +++++++++++++++++++++++++++++++
+>   arch/arm64/kernel/setup.c         |  8 ++++
+>   arch/arm64/mm/init.c              |  1 +
+>   6 files changed, 150 insertions(+), 1 deletion(-)
+>   create mode 100644 arch/arm64/include/asm/rsi.h
+>   create mode 100644 arch/arm64/kernel/rsi.c
+> 
+> diff --git a/arch/arm64/include/asm/rsi.h b/arch/arm64/include/asm/rsi.h
+> new file mode 100644
+> index 000000000000..ce2cdb501d84
+> --- /dev/null
+> +++ b/arch/arm64/include/asm/rsi.h
+> @@ -0,0 +1,48 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Copyright (C) 2024 ARM Ltd.
+> + */
+> +
+> +#ifndef __ASM_RSI_H_
+> +#define __ASM_RSI_H_
+> +
+> +#include <linux/jump_label.h>
+> +#include <asm/rsi_cmds.h>
+> +
+> +DECLARE_STATIC_KEY_FALSE(rsi_present);
+> +
+> +void __init arm64_rsi_init(void);
+> +void __init arm64_rsi_setup_memory(void);
+> +static inline bool is_realm_world(void)
+> +{
+> +	return static_branch_unlikely(&rsi_present);
+> +}
+> +
+> +static inline int rsi_set_memory_range(phys_addr_t start, phys_addr_t end,
+> +				       enum ripas state)
+> +{
+> +	unsigned long ret;
+> +	phys_addr_t top;
+> +
+> +	while (start != end) {
+> +		ret = rsi_set_addr_range_state(start, end, state, &top);
+> +		if (WARN_ON(ret || top < start || top > end))
+> +			return -EINVAL;
+> +		start = top;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static inline int rsi_set_memory_range_protected(phys_addr_t start,
+> +						 phys_addr_t end)
+> +{
+> +	return rsi_set_memory_range(start, end, RSI_RIPAS_RAM);
+> +}
+> +
+> +static inline int rsi_set_memory_range_shared(phys_addr_t start,
+> +					      phys_addr_t end)
+> +{
+> +	return rsi_set_memory_range(start, end, RSI_RIPAS_EMPTY);
+> +}
+> +#endif
+> diff --git a/arch/arm64/include/asm/rsi_cmds.h b/arch/arm64/include/asm/rsi_cmds.h
+> index ad425c5d6f1b..ab8ad435f10e 100644
+> --- a/arch/arm64/include/asm/rsi_cmds.h
+> +++ b/arch/arm64/include/asm/rsi_cmds.h
+> @@ -10,6 +10,11 @@
+>   
+>   #include <asm/rsi_smc.h>
+>   
+> +enum ripas {
+> +	RSI_RIPAS_EMPTY,
+> +	RSI_RIPAS_RAM,
+> +};
+> +
+>   static inline void invoke_rsi_fn_smc_with_res(unsigned long function_id,
+>   					      unsigned long arg0,
+>   					      unsigned long arg1,
+> @@ -44,4 +49,21 @@ static inline unsigned long rsi_get_realm_config(struct realm_config *cfg)
+>   	return res.a0;
+>   }
+>   
+> +static inline unsigned long rsi_set_addr_range_state(phys_addr_t start,
+> +						     phys_addr_t end,
+> +						     enum ripas state,
+> +						     phys_addr_t *top)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	invoke_rsi_fn_smc_with_res(SMC_RSI_IPA_STATE_SET,
+> +				   start, end, state, RSI_NO_CHANGE_DESTROYED,
 
-> Hm, but in that case we'd use reset_vm_ftr_id_reg() meaning we would have
-> to make IDREG() work for this reg. Either by adding special handling to
-> that macro or by increasing kvm->arch.id_regs[] a lot - both options don't
-> sound very appealing.
+Though this is fine from the KVM as NS Host perspective, it may be 
+unnecessarily restrictive in general for a Host implementation. We only
+need that RSI_NO_CHANGE_DESTROYED flag for "init all DRAM range as RAM"
+(where we want to prevent a host from "destroying pages" that were
+populated before activation, without consent). But in all other cases
+where we do not rely on the content of the "newly" encrypted page,
+we could drop the flag.
 
-Hiding some of the ugly details behind IDREG() isn't the worst thing,
-IMO. The feature ID registers are not laid out contiguously in the
-architecture, so it'd make sense that the corresponding KVM code not be
-brittle to this.
+I think we need could have variants of this helper one which allows 
+"DESTROYED" granules to be converted, which must be only used while 
+"transitioning" a page to encrypted, where we don't rely on the contents 
+of the page.
 
-The other benefit is we initialize kvm->arch.ctr_el0 exactly once, just
-like the other ID registers. I believe there's a quirk with this patch
-where an initialization that happens after a KVM_SET_ONE_REG on CTR_EL0
-will clobber the userspace value.
+Something like :
 
-So, here's where I'm at locally, I'll work it a bit more and try to
-densely pack CTR_EL0 into the id_regs array. I also have some (untested)
-changes to get CTR_EL0 to show up in the debugfs interface we now have.
+rsi_set_memory_range_protected_safe() : Do not allow DESTROYED contents 
+to be converted.
 
-Mind if I post what I have afterwards?
+rsi_set_memory_range_protected().
 
-commit 6bf81bd50dc16309a627863948d49cfeeb00897e
-Author: Sebastian Ott <sebott@redhat.com>
-Date:   Mon Jun 3 15:05:03 2024 +0200
+Something like:
 
-    KVM: arm64: Treat CTR_EL0 as a VM feature ID register
-    
-    Signed-off-by: Sebastian Ott <sebott@redhat.com>
-    Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
-    Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+---8>---
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 212ae77eefaf..e5b8cdd70914 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -327,10 +327,20 @@ struct kvm_arch {
- 	 */
- #define IDREG_IDX(id)		(((sys_reg_CRm(id) - 1) << 3) | sys_reg_Op2(id))
- #define IDX_IDREG(idx)		sys_reg(3, 0, 0, ((idx) >> 3) + 1, (idx) & Op2_mask)
--#define IDREG(kvm, id)		((kvm)->arch.id_regs[IDREG_IDX(id)])
-+#define IDREG(kvm, id)								\
-+(*({										\
-+	u64 *__reg;								\
-+	if ((id) == SYS_CTR_EL0)						\
-+		__reg = &(kvm)->arch.ctr_el0;					\
-+	else									\
-+		__reg = &((kvm)->arch.id_regs[IDREG_IDX(id)]);			\
-+	__reg;									\
-+}))
- #define KVM_ARM_ID_REG_NUM	(IDREG_IDX(sys_reg(3, 0, 0, 7, 7)) + 1)
- 	u64 id_regs[KVM_ARM_ID_REG_NUM];
- 
-+	u64 ctr_el0;
+diff --git a/arch/arm64/include/asm/rsi.h b/arch/arm64/include/asm/rsi.h
+index ce2cdb501d84..dea2ed99f6d1 100644
+--- a/arch/arm64/include/asm/rsi.h
++++ b/arch/arm64/include/asm/rsi.h
+@@ -19,13 +19,13 @@ static inline bool is_realm_world(void)
+  }
+
+  static inline int rsi_set_memory_range(phys_addr_t start, phys_addr_t end,
+-				       enum ripas state)
++				       enum ripas state, unsigned long flags)
+  {
+  	unsigned long ret;
+  	phys_addr_t top;
+
+  	while (start != end) {
+-		ret = rsi_set_addr_range_state(start, end, state, &top);
++		ret = rsi_set_addr_range_state(start, end, state, flags, &top);
+  		if (WARN_ON(ret || top < start || top > end))
+  			return -EINVAL;
+  		start = top;
+@@ -34,15 +34,29 @@ static inline int rsi_set_memory_range(phys_addr_t 
+start, phys_addr_t end,
+  	return 0;
+  }
+
++/*
++ * Convert the specified range to RAM. Do not use this if you rely on 
+the contents
++ * of a page that may already be in RAM state.
++ */
+  static inline int rsi_set_memory_range_protected(phys_addr_t start,
+  						 phys_addr_t end)
+  {
+-	return rsi_set_memory_range(start, end, RSI_RIPAS_RAM);
++	return rsi_set_memory_range(start, end, RSI_RIPAS_RAM, 0);
++}
 +
- 	/* Masks for VNCR-baked sysregs */
- 	struct kvm_sysreg_masks	*sysreg_masks;
- 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index dfabf7aec2c7..1ab2cbbc7a76 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1583,6 +1583,9 @@ static bool is_feature_id_reg(u32 encoding)
-  */
- static inline bool is_vm_ftr_id_reg(u32 id)
- {
-+	if (id == SYS_CTR_EL0)
-+		return true;
-+
- 	return (sys_reg_Op0(id) == 3 && sys_reg_Op1(id) == 0 &&
- 		sys_reg_CRn(id) == 0 && sys_reg_CRm(id) >= 1 &&
- 		sys_reg_CRm(id) < 8);
-@@ -1886,7 +1889,7 @@ static bool access_ctr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 	if (p->is_write)
- 		return write_to_read_only(vcpu, p, r);
- 
--	p->regval = read_sanitised_ftr_reg(SYS_CTR_EL0);
-+	p->regval = IDREG(vcpu->kvm, SYS_CTR_EL0);
- 	return true;
- }
- 
-@@ -2475,7 +2478,10 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_CCSIDR2_EL1), undef_access },
- 	{ SYS_DESC(SYS_SMIDR_EL1), undef_access },
- 	{ SYS_DESC(SYS_CSSELR_EL1), access_csselr, reset_unknown, CSSELR_EL1 },
--	{ SYS_DESC(SYS_CTR_EL0), access_ctr },
-+	ID_WRITABLE(CTR_EL0, CTR_EL0_DIC_MASK |
-+			     CTR_EL0_IDC_MASK |
-+			     CTR_EL0_DminLine_MASK |
-+			     CTR_EL0_IminLine_MASK),
- 	{ SYS_DESC(SYS_SVCR), undef_access },
- 
- 	{ PMU_SYS_REG(PMCR_EL0), .access = access_pmcr, .reset = reset_pmcr,
-@@ -3714,18 +3720,11 @@ FUNCTION_INVARIANT(midr_el1)
- FUNCTION_INVARIANT(revidr_el1)
- FUNCTION_INVARIANT(aidr_el1)
- 
--static u64 get_ctr_el0(struct kvm_vcpu *v, const struct sys_reg_desc *r)
--{
--	((struct sys_reg_desc *)r)->val = read_sanitised_ftr_reg(SYS_CTR_EL0);
--	return ((struct sys_reg_desc *)r)->val;
--}
--
- /* ->val is filled in by kvm_sys_reg_table_init() */
- static struct sys_reg_desc invariant_sys_regs[] __ro_after_init = {
- 	{ SYS_DESC(SYS_MIDR_EL1), NULL, get_midr_el1 },
- 	{ SYS_DESC(SYS_REVIDR_EL1), NULL, get_revidr_el1 },
- 	{ SYS_DESC(SYS_AIDR_EL1), NULL, get_aidr_el1 },
--	{ SYS_DESC(SYS_CTR_EL0), NULL, get_ctr_el0 },
- };
- 
- static int get_invariant_sys_reg(u64 id, u64 __user *uaddr)
++/*
++ * Convert the specified range to RAM. Do not convert any pages that 
+may have
++ * been DESTROYED, without our permission.
++ */
++static inline int rsi_set_memory_range_protected_safe(phys_addr_t start,
++						      phys_addr_t end)
++{
++	return rsi_set_memory_range(start, end, RSI_RIPAS_RAM, 
+RSI_NO_CHANGE_DESTROYED);
+  }
 
--- 
-Thanks,
-Oliver
+  static inline int rsi_set_memory_range_shared(phys_addr_t start,
+  					      phys_addr_t end)
+  {
+-	return rsi_set_memory_range(start, end, RSI_RIPAS_EMPTY);
++	return rsi_set_memory_range(start, end, RSI_RIPAS_EMPTY, 0);
+  }
+  #endif
+diff --git a/arch/arm64/include/asm/rsi_cmds.h 
+b/arch/arm64/include/asm/rsi_cmds.h
+index ab8ad435f10e..466615ff90de 100644
+--- a/arch/arm64/include/asm/rsi_cmds.h
++++ b/arch/arm64/include/asm/rsi_cmds.h
+@@ -52,12 +52,13 @@ static inline unsigned long 
+rsi_get_realm_config(struct realm_config *cfg)
+  static inline unsigned long rsi_set_addr_range_state(phys_addr_t start,
+  						     phys_addr_t end,
+  						     enum ripas state,
++						     unsigned long flags,
+  						     phys_addr_t *top)
+  {
+  	struct arm_smccc_res res;
+
+  	invoke_rsi_fn_smc_with_res(SMC_RSI_IPA_STATE_SET,
+-				   start, end, state, RSI_NO_CHANGE_DESTROYED,
++				   start, end, state, flags,
+  				   &res);
+
+  	if (top)
+diff --git a/arch/arm64/kernel/rsi.c b/arch/arm64/kernel/rsi.c
+index 3a992bdfd6bb..e6a6681524a0 100644
+--- a/arch/arm64/kernel/rsi.c
++++ b/arch/arm64/kernel/rsi.c
+@@ -46,8 +46,9 @@ void __init arm64_rsi_setup_memory(void)
+  		return;
+
+  	/*
+-	 * Iterate over the available memory ranges
+-	 * and convert the state to protected memory.
++	 * Iterate over the available memory ranges and convert the state to
++	 * protected memory. We should take extra care to ensure that we DO NOT
++	 * permit any "DESTROYED" pages to be converted to "RAM".
+  	 *
+  	 * BUG_ON is used because if the attempt to switch the memory to
+  	 * protected has failed here, then future accesses to the memory are
+@@ -55,7 +56,7 @@ void __init arm64_rsi_setup_memory(void)
+  	 * Bailing out early prevents the guest limping on and dieing later.
+  	 */
+  	for_each_mem_range(i, &start, &end) {
+-		BUG_ON(rsi_set_memory_range_protected(start, end));
++		BUG_ON(rsi_set_memory_range_protected_safe(start, end));
+  	}
+  }
+
+
+
+Kind regards
+
+
+Suzuki
+
+
+> +				   &res);
+> +
+> +	if (top)
+> +		*top = res.a1;
+> +
+> +	return res.a0;
+> +}
+> +
+>   #endif
+> diff --git a/arch/arm64/kernel/Makefile b/arch/arm64/kernel/Makefile
+> index 763824963ed1..a483b916ed11 100644
+> --- a/arch/arm64/kernel/Makefile
+> +++ b/arch/arm64/kernel/Makefile
+> @@ -33,7 +33,8 @@ obj-y			:= debug-monitors.o entry.o irq.o fpsimd.o		\
+>   			   return_address.o cpuinfo.o cpu_errata.o		\
+>   			   cpufeature.o alternative.o cacheinfo.o		\
+>   			   smp.o smp_spin_table.o topology.o smccc-call.o	\
+> -			   syscall.o proton-pack.o idle.o patching.o pi/
+> +			   syscall.o proton-pack.o idle.o patching.o pi/	\
+> +			   rsi.o
+>   
+>   obj-$(CONFIG_COMPAT)			+= sys32.o signal32.o			\
+>   					   sys_compat.o
+> diff --git a/arch/arm64/kernel/rsi.c b/arch/arm64/kernel/rsi.c
+> new file mode 100644
+> index 000000000000..3a992bdfd6bb
+> --- /dev/null
+> +++ b/arch/arm64/kernel/rsi.c
+> @@ -0,0 +1,69 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (C) 2023 ARM Ltd.
+> + */
+> +
+> +#include <linux/jump_label.h>
+> +#include <linux/memblock.h>
+> +#include <asm/rsi.h>
+> +
+> +DEFINE_STATIC_KEY_FALSE_RO(rsi_present);
+> +EXPORT_SYMBOL(rsi_present);
+> +
+> +static bool rsi_version_matches(void)
+> +{
+> +	unsigned long ver_lower, ver_higher;
+> +	unsigned long ret = rsi_request_version(RSI_ABI_VERSION,
+> +						&ver_lower,
+> +						&ver_higher);
+> +
+> +	if (ret == SMCCC_RET_NOT_SUPPORTED)
+> +		return false;
+> +
+> +	if (ret != RSI_SUCCESS) {
+> +		pr_err("RME: RMM doesn't support RSI version %u.%u. Supported range: %lu.%lu-%lu.%lu\n",
+> +		       RSI_ABI_VERSION_MAJOR, RSI_ABI_VERSION_MINOR,
+> +		       RSI_ABI_VERSION_GET_MAJOR(ver_lower),
+> +		       RSI_ABI_VERSION_GET_MINOR(ver_lower),
+> +		       RSI_ABI_VERSION_GET_MAJOR(ver_higher),
+> +		       RSI_ABI_VERSION_GET_MINOR(ver_higher));
+> +		return false;
+> +	}
+> +
+> +	pr_info("RME: Using RSI version %lu.%lu\n",
+> +		RSI_ABI_VERSION_GET_MAJOR(ver_lower),
+> +		RSI_ABI_VERSION_GET_MINOR(ver_lower));
+> +
+> +	return true;
+> +}
+> +
+> +void __init arm64_rsi_setup_memory(void)
+> +{
+> +	u64 i;
+> +	phys_addr_t start, end;
+> +
+> +	if (!is_realm_world())
+> +		return;
+> +
+> +	/*
+> +	 * Iterate over the available memory ranges
+> +	 * and convert the state to protected memory.
+> +	 *
+> +	 * BUG_ON is used because if the attempt to switch the memory to
+> +	 * protected has failed here, then future accesses to the memory are
+> +	 * simply going to be reflected as a fault which we can't handle.
+> +	 * Bailing out early prevents the guest limping on and dieing later.
+> +	 */
+> +	for_each_mem_range(i, &start, &end) {
+> +		BUG_ON(rsi_set_memory_range_protected(start, end));
+> +	}
+> +}
+> +
+> +void __init arm64_rsi_init(void)
+> +{
+> +	if (!rsi_version_matches())
+> +		return;
+> +
+> +	static_branch_enable(&rsi_present);
+> +}
+> +
+> diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
+> index a096e2451044..143f87615af0 100644
+> --- a/arch/arm64/kernel/setup.c
+> +++ b/arch/arm64/kernel/setup.c
+> @@ -43,6 +43,7 @@
+>   #include <asm/cpu_ops.h>
+>   #include <asm/kasan.h>
+>   #include <asm/numa.h>
+> +#include <asm/rsi.h>
+>   #include <asm/scs.h>
+>   #include <asm/sections.h>
+>   #include <asm/setup.h>
+> @@ -293,6 +294,11 @@ void __init __no_sanitize_address setup_arch(char **cmdline_p)
+>   	 * cpufeature code and early parameters.
+>   	 */
+>   	jump_label_init();
+> +	/*
+> +	 * Init RSI before early param so that "earlycon" console uses the
+> +	 * shared alias when in a realm
+> +	 */
+> +	arm64_rsi_init();
+>   	parse_early_param();
+>   
+>   	dynamic_scs_init();
+> @@ -328,6 +334,8 @@ void __init __no_sanitize_address setup_arch(char **cmdline_p)
+>   
+>   	arm64_memblock_init();
+>   
+> +	arm64_rsi_setup_memory();
+> +
+>   	paging_init();
+>   
+>   	acpi_table_upgrade();
+> diff --git a/arch/arm64/mm/init.c b/arch/arm64/mm/init.c
+> index 9b5ab6818f7f..9d8d38e3bee2 100644
+> --- a/arch/arm64/mm/init.c
+> +++ b/arch/arm64/mm/init.c
+> @@ -41,6 +41,7 @@
+>   #include <asm/kvm_host.h>
+>   #include <asm/memory.h>
+>   #include <asm/numa.h>
+> +#include <asm/rsi.h>
+>   #include <asm/sections.h>
+>   #include <asm/setup.h>
+>   #include <linux/sizes.h>
+
