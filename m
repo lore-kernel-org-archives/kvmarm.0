@@ -1,143 +1,124 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D0B94C96;
-	Fri, 14 Jun 2024 13:51:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB73817BA9;
+	Fri, 14 Jun 2024 14:46:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718373107; cv=none; b=fOzl3vTAV8ouo0F/55uiebvTI40rDw2aYKa04M1s8a5xPujCgrXoacPYUbvCkzd9MTGpfvAOGxkwN9GqYyAJM5RF9Rzns0CmAyiDUjyHiAy3VrWmUALFALFB38wx4nNa47AovNv9MpGWQSUa0mooAvURmiJA8CaXlfJeU9v2cIg=
+	t=1718376375; cv=none; b=OolhDto/ssMwZx7cN689U3xjVGcEpCbDfu+eoE65diiJhJof0NabQKgOd8ww5LaS5iAeHhouTtoZoCCBYngimEXhDgPBysGdMVkfjPePkM9eYbdrsUbkp4OvIV3usj8vEgH1ghddqfLAYd4sevSPKV16eoixjw0bHi7eXNww20I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718373107; c=relaxed/simple;
-	bh=IwA+nRpW3jBSAzmNE65SNenXWpawXrOy17dsMyzMFzs=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TwTjb8b2H3w1ZUeB7hT0Xcur/WQceY0i5SkKht/rAz2SyRfi/J3Kv5/N2n5jWsbEulkMPRRlDxSuJxf5pInRijZoxyYJutOqngyA/cncThVxBABRQF99r5lSM0tN29PjaqVy2ApLHZZ3aAm6sycBP4512RmyHQtf1fYXu/e0U3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Py5qaGQT; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1718376375; c=relaxed/simple;
+	bh=xsQtZpEJDOrdnBJYSovlHe1ZmVqfDD6Gyi/ImZOHD20=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=aUB7647sZRL6FX0JYJ/rA8lWk24KaLr16thdP7k2+JpBpYQC78T2VdAbWj7qSDCiJXhwJnb9nO08e5CN2c+12szxkANSl/PhZ5BhY/9Xo/Vp736MNwnqiVGLeQd5zj7kq5sG38zuQegyNNasQJelTyU6UNNzZe8aDKv3x80QS6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e64ZmcbP; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Py5qaGQT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE47DC2BD10;
-	Fri, 14 Jun 2024 13:51:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e64ZmcbP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4F1AC3277B;
+	Fri, 14 Jun 2024 14:46:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718373106;
-	bh=IwA+nRpW3jBSAzmNE65SNenXWpawXrOy17dsMyzMFzs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Py5qaGQT2Qdyws4LOn1wqQPEZyN7pTTtC/irde5GED1n020PSRGCR7otLCPlfA8Yj
-	 WkoMOyTZ3rCF2AcZrNppcskTwlHOtnoxx53r7arw/iAnT9xhX9uLPrzEwPpzZEwKLD
-	 zAk68eknRRZ9n/JcVNl5CMRCzYTVOwHuqrNZkQQ2mQgs2BY0CvOm2F1NVEv7TERsWP
-	 URuHA8XbGUEmpHXgRbj5PViOqqL+Ez08+ArjA5j/nmwzZAnj2R5TkY2liWNkaBl0WP
-	 cuzvLr7sgwXBlRQ5SsBZ4celz97PM/gW7KaLLCA1kF8rEEGUDmfG0ocWgwcKXXDnnj
-	 FndaD24rWK8iA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	s=k20201202; t=1718376375;
+	bh=xsQtZpEJDOrdnBJYSovlHe1ZmVqfDD6Gyi/ImZOHD20=;
+	h=From:To:Cc:Subject:Date:From;
+	b=e64ZmcbPRiWGq5dZFHfjnqmZ+BZioQz3KH6FzSLQua8M3NgX8rugnxCWxrwcUGaF3
+	 hjG3/56JxF7Mk3iLhh93E1S/ZPp1Ubi8Wi1nBtDPaER06Q8LSx3nHMJj6l3D7z1lo7
+	 fjeYmlEO/S2LtBPteRK3rO2wmOysYypWGVgMYS9Ec7m7eLPWF2Ubq+waw/TV/kjEfV
+	 rVyFFwC/ZbhBMaSoo8NIcr27UCKX0DcotO1n5fIavBBMJz9oqdVxhWdFwLOJ68HYf1
+	 MQtudKTk5RmtipyE6yk8K5EhpwJmXQs9C47iT8JextNFCsg5wxUIYeQeIurJDeL8mP
+	 5WbxKHVYS79oQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sI7LE-003vmz-RI;
-	Fri, 14 Jun 2024 14:51:44 +0100
-Date: Fri, 14 Jun 2024 14:51:44 +0100
-Message-ID: <86msnnk4y7.wl-maz@kernel.org>
+	id 1sI8Bx-003wb4-MV;
+	Fri, 14 Jun 2024 15:46:13 +0100
 From: Marc Zyngier <maz@kernel.org>
-To: Sebastian Ene <sebastianene@google.com>
-Cc: catalin.marinas@arm.com,
-	james.morse@arm.com,
-	jean-philippe@linaro.org,
-	oliver.upton@linux.dev,
-	qperret@google.com,
-	qwandor@google.com,
-	sudeep.holla@arm.com,
-	suzuki.poulose@arm.com,
-	tabba@google.com,
-	will@kernel.org,
-	yuzenghui@huawei.com,
-	lpieralisi@kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	kernel-team@android.com
-Subject: Re: [PATCH v3 0/4] KVM: arm64: pKVM host proxy FF-A fixes
-In-Reply-To: <20240613132035.1070360-1-sebastianene@google.com>
-References: <20240613132035.1070360-1-sebastianene@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+To: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Cc: James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: [PATCH v3 00/16] KVM: arm64: nv: Shadow stage-2 page table handling
+Date: Fri, 14 Jun 2024 15:45:36 +0100
+Message-Id: <20240614144552.2773592-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sebastianene@google.com, catalin.marinas@arm.com, james.morse@arm.com, jean-philippe@linaro.org, oliver.upton@linux.dev, qperret@google.com, qwandor@google.com, sudeep.holla@arm.com, suzuki.poulose@arm.com, tabba@google.com, will@kernel.org, yuzenghui@huawei.com, lpieralisi@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kernel-team@android.com
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 13 Jun 2024 14:20:31 +0100,
-Sebastian Ene <sebastianene@google.com> wrote:
-> 
-> Hello,
-> 
-> 
-> This series contains some small fixes for the host pKVM proxy code. I included
-> some of the patches that I already sent on the list as part of this series
-> to make it easier to keep track of them.
-> 
-> I verified the functionality with OPTEE as a TEE-OS.
-> 
-> Changelog:
-> 
-> v2 -> v3:
-> 
-> * small fixes on the commit messages
-> * applied the Review-by tags from Sudeep. Thank you Sudeep !
->  
-> v1 -> v2:
-> 
-> * applied the feedback received from Will on the FFA_VERSION patch:
->   The spec requires that no other calls to be issued prior to the FFA
->   version negotiation and the current change reflects this. After the
->   version negotiation phase is complete with Trustzone we will just
->   return the hypervisor version.
-> 
-> * corrected some mistakes on the FFA_PARTITION_INFO_GET patch:
->   - don't trim the number of bytes copied from the hypervisor buffer
->   - introduce FFA_1_0_PARTITON_INFO_SZ definition
->   - simplify the logic when the input flag is specified 
-> 
-> * collected the Ack from Will and embbeded it in the commit - Thanks Will ! 
-> 
-> 
-> v2:
-> https://lore.kernel.org/all/20240515172258.1680881-1-sebastianene@google.com/
-> 
-> v1:
-> 
-> * previously posted FFA_PARTITION_INFO_GET patch here:
-> https://lore.kernel.org/kvmarm/20240411133249.2134696-1-sebastianene@google.com/
->  -> minor changes from the previous version, look for the current
->     ffa_version in the host_buffer structure
-> 
-> * previously posted "Fix the identification range for the FF-A smcs" here:
-> https://lore.kernel.org/kvmarm/20240322124303.309423-1-sebastianene@google.com/
-> 
-> Thank you,
-> Sebastian
-> 
-> Sebastian Ene (4):
->   KVM: arm64: Trap FFA_VERSION host call in pKVM
->   KVM: arm64: Add support for FFA_PARTITION_INFO_GET
->   KVM: arm64: Update the identification range for the FF-A smcs
->   KVM: arm64: Use FF-A 1.1 with pKVM
-> 
->  arch/arm64/kvm/hyp/include/nvhe/ffa.h |   2 +-
->  arch/arm64/kvm/hyp/nvhe/ffa.c         | 180 +++++++++++++++++++++-----
->  include/linux/arm_ffa.h               |   3 +
->  3 files changed, 152 insertions(+), 33 deletions(-)
+Here's the thurd version of the shadow stage-2 handling for NV
+support on arm64.
 
-Although these are labelled as fixes, I don't think they warrant being
-taken into 6.10. So assuming Oliver will take them into 6.11:
+* From v2 [2]
 
-Acked-by: Marc Zyngier <maz@kernel.org>
+  - Simplified the S2 walker by dropping a bunch of redundant
+    fields from the walker info structure
 
-	M.
+  - Added some more lockdep assertions (Oliver)
+
+  - Added more precise comments for the TTL-like annotations
+    in the shadow S2 (Oliver)
+
+* From v1 [1]
+
+  - Reworked the allocation of shadow S2 structures at init time to be
+    slightly clearer
+
+  - Lots of small cleanups
+
+  - Rebased on v6.10-rc1
+
+[1] https://lore.kernel.org/r/20240409175448.3507472-1-maz@kernel.org
+
+Christoffer Dall (2):
+  KVM: arm64: nv: Implement nested Stage-2 page table walk logic
+  KVM: arm64: nv: Unmap/flush shadow stage 2 page tables
+
+Marc Zyngier (14):
+  KVM: arm64: nv: Support multiple nested Stage-2 mmu structures
+  KVM: arm64: nv: Handle shadow stage 2 page faults
+  KVM: arm64: nv: Add Stage-1 EL2 invalidation primitives
+  KVM: arm64: nv: Handle EL2 Stage-1 TLB invalidation
+  KVM: arm64: nv: Handle TLB invalidation targeting L2 stage-1
+  KVM: arm64: nv: Handle TLBI VMALLS12E1{,IS} operations
+  KVM: arm64: nv: Handle TLBI ALLE1{,IS} operations
+  KVM: arm64: nv: Handle TLBI IPAS2E1{,IS} operations
+  KVM: arm64: nv: Handle FEAT_TTL hinted TLB operations
+  KVM: arm64: nv: Tag shadow S2 entries with guest's leaf S2 level
+  KVM: arm64: nv: Invalidate TLBs based on shadow S2 TTL-like
+    information
+  KVM: arm64: nv: Add handling of outer-shareable TLBI operations
+  KVM: arm64: nv: Add handling of range-based TLBI operations
+  KVM: arm64: nv: Add handling of NXS-flavoured TLBI operations
+
+ arch/arm64/include/asm/esr.h        |   1 +
+ arch/arm64/include/asm/kvm_asm.h    |   2 +
+ arch/arm64/include/asm/kvm_host.h   |  36 ++
+ arch/arm64/include/asm/kvm_mmu.h    |  26 +
+ arch/arm64/include/asm/kvm_nested.h | 127 +++++
+ arch/arm64/include/asm/sysreg.h     |  17 +
+ arch/arm64/kvm/arm.c                |  11 +
+ arch/arm64/kvm/hyp/vhe/switch.c     |  51 +-
+ arch/arm64/kvm/hyp/vhe/tlb.c        | 147 ++++++
+ arch/arm64/kvm/mmu.c                | 213 ++++++--
+ arch/arm64/kvm/nested.c             | 781 +++++++++++++++++++++++++++-
+ arch/arm64/kvm/reset.c              |   6 +
+ arch/arm64/kvm/sys_regs.c           | 398 ++++++++++++++
+ 13 files changed, 1775 insertions(+), 41 deletions(-)
 
 -- 
-Without deviation from the norm, progress is not possible.
+2.39.2
+
