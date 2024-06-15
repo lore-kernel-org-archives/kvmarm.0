@@ -1,399 +1,252 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D96A2188CB6
-	for <kvmarm@lists.linux.dev>; Fri, 14 Jun 2024 23:17:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718407077; cv=none; b=LEhtI1kZp2Z9gYsWIRaMXu/cL4N2EHARtHAk9CHAGlzWN4Pn2h/OK2Fjcb6zi98944uDMZoFhJryze9jAN3XWHbW9uHhslC3vcz/fh4+oUmCHYCdRb+BahDgGFKRormebZWxwSoPF1C9zOxF8dXQ5J/LafruP3P0gPe5xltljb8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718407077; c=relaxed/simple;
-	bh=GxPpqWMg7Qw+KH+laN3j9zDFH85/MQwodFiM32k6C2Q=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=XDtf3zXdo8Ufrrtpl0jCRprKzCu3vir2MBD+Yp9yZ8sE2PWUSs86y+QRSR39zpusvOL/Ioi8/BxxUFQLiNoidqd7l0t/uKUHxSSi9zSViSCywQrKYPNoqRoaJqLobKORkOIuw8Cm5nWhoaILX0ql/oaetn2EG7WX0fasR2wddxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vg8W7K3v; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B94A644C87;
+	Sat, 15 Jun 2024 13:02:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718456533; cv=fail; b=TIJ+tSEZoGrkUW9olCpwrEbKrG9eePwvwg4MtNSGMYr0WClVs6QNtJachH0xhS9ssH2y+idn8l1QeSYhaiYgL3/yLjF1rM8B/dvQm/L7u2iZ8PtEvS5AfjPpExlChkAK27PMQFhAy3shZef+EOs4shV0JoPdKj1AdNTgZB01k/k=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718456533; c=relaxed/simple;
+	bh=F8szjrvwKFEwxui00wxl5AWabaOhlDex39BLONG1MqU=;
+	h=Date:From:To:CC:Subject:Message-ID:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=TdAJkGG9aJaORETicZXwKNwXkrAdRorz/f48mIFMvbGgioSEBBk1ryvjUDn7Ts121ZzwQNDHgQtdZnYyG4LhJsSytsUQCGw20NJrjnSRDYlnkDEsQudxCP9sTmgq5Cv0kCJ/0qxt4pYgSQ2IiT2sGthTy5/Zaae1+aj69V7hEm8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GH4Ts1WW; arc=fail smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vg8W7K3v"
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-62fb36d7f5fso48977937b3.1
-        for <kvmarm@lists.linux.dev>; Fri, 14 Jun 2024 16:17:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718407075; x=1719011875; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Of1/APUBbAKdtL3qvNUh6RP4QfUxQKIPvJrZrNb83Wo=;
-        b=vg8W7K3vJLpXklO7LsTThdXt6z5iKc0LMQNDh0zDQ/WttwEfbMTy1Sl00oIObNR90r
-         YYqx8jRSPC0qxDglUrTtF7YgWYwGqPrmbr183YufvDgBdad7XEAZioJylpMEpEdIZaz0
-         ZKj1v5/RCn1iL2O+wrPZx/+PlVKKvIr24zD48P6tGC0zjVwOndY9pLpbPS25xBoZosbT
-         eR6BjRaC94o6nra4D1ds1w0z94BFuXHUe5mb8VwR/2GgvWS1V5hAvI6ZQMyTIv5s9Cki
-         Gs56WOr4Nx/E77vEuMURbqf7QvTSO5Vvwsq6ghClarQgm8lu74BdzDwAbnN+GfRD8TXA
-         RTjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718407075; x=1719011875;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Of1/APUBbAKdtL3qvNUh6RP4QfUxQKIPvJrZrNb83Wo=;
-        b=BbxtIsiCVVL75KWYEhn1jRhCQ6oBn2jPPXLbTfwynHxf9Nmtm3T6cGxcKEBlR+BQls
-         qvZWyPufIq6qMCvbeEyXNA+zAyLZjsR0kHr6VJbjqjP21Hhfg21+v3hZwNKXLkALqPsv
-         2TbYaovuOFQSQpDzlKIeplKFQ6x7CPLxfTvmQEYC6A1hLNNFLzYggMggz/qIWLUEuW3r
-         5ns+ByQ2HLhqsjYJsb1OuUxYJMSHI9Nj7vqgIkS2IlhZCRg7KnYEDB4kPFQRdK0Ap7w9
-         mlNkm+4qhDhN3pObjHuhHtOZJvqlFL1alk2uyfJwhorcKSxy/sN67w3Lm/AP+GrZz5Rg
-         KPog==
-X-Forwarded-Encrypted: i=1; AJvYcCXtfjGlmKTvjR8rt3zgda717tqEnf/yjrALHrfl1txNEkWt0i7LTxDDvz4xrO8cA2sem8LFbctH0Y5LYeYGbVKs518n2AFj
-X-Gm-Message-State: AOJu0YzdptleYb8/I0J4x3X4o+46PY+9Ry7mMt1Z6ct/YjhMxiJ8VWW5
-	PMb/BVRwhAP1Md6hyYdJeTO+RHgS19LRednIXV0KlHa2cxq/cNs4r/Ij409jRzvzff1Kz+F45oO
-	BoQ==
-X-Google-Smtp-Source: AGHT+IFf04V+NzFpQ2I3NWK+rQ7QUB1fuzeDCHCZBIuJOjTEyb5oX0HI/aAQHZ5FG+/pVHLQj8M1yQSGuys=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:700e:b0:627:a962:4252 with SMTP id
- 00721157ae682-63224613c12mr8916887b3.7.1718407074918; Fri, 14 Jun 2024
- 16:17:54 -0700 (PDT)
-Date: Fri, 14 Jun 2024 16:17:53 -0700
-In-Reply-To: <CADrL8HVDZ+m_-jUCaXf_DWJ92N30oqS=_9wNZwRvoSp5fo7asg@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GH4Ts1WW"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718456531; x=1749992531;
+  h=date:from:to:cc:subject:message-id:in-reply-to:
+   mime-version;
+  bh=F8szjrvwKFEwxui00wxl5AWabaOhlDex39BLONG1MqU=;
+  b=GH4Ts1WW8Eu1LIwnxkzS/u7Zyi9uxJtN+ZN02bjWR/+xo/Wl0GFeNVOr
+   QUpo0Ma1zUNTFVOLD6Q7oLTe6UWv31FnLUFX8kFKDpnjnUFBypy1CgGx9
+   lP/sAIgA3VppxMt12n+EYJo1b/UQhs6k4irzs8n8NeZGsqJ0WJ/W1H9Is
+   JGe4Qk8v0JdWfxtjG9iIIBJJs+fUrTWQwHXV3Jh+4nNfw/0ZFYs530i9o
+   5d8ZaOF2hbnFX+muCbS21TIJp3rbelLKrbI1LlRs0fzh8fv6a1+1omJCY
+   zJbM+/nL5M4vim3ldfSX1hmgZ/RlcCKXsU0+xbQ9ztKWV+4VmoVhF4vII
+   g==;
+X-CSE-ConnectionGUID: RtDa72+oSimuF/FVlRa0kA==
+X-CSE-MsgGUID: N+9Sn19tQsKZvlhNExjBHA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11104"; a="15500217"
+X-IronPort-AV: E=Sophos;i="6.08,240,1712646000"; 
+   d="scan'208";a="15500217"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jun 2024 06:02:11 -0700
+X-CSE-ConnectionGUID: G61X0edvTCyHPsP8LW0vOg==
+X-CSE-MsgGUID: /EzuA4qHTUCEGjtOFEf16g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,240,1712646000"; 
+   d="scan'208";a="40876320"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmviesa009.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 15 Jun 2024 06:02:10 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Sat, 15 Jun 2024 06:02:09 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Sat, 15 Jun 2024 06:02:09 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.101)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Sat, 15 Jun 2024 06:02:09 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SM1WQTrFaUhO75JVWvvEv2i9tjQZ7Ay0lPY5ubynS/UjEQyfvTvWrY+Vl0GPjPNTRUu2KLVflHIVABeTJTPe+tbEY4pYl4NzH4pLFX2aUPKG8xqLYaioY6NtCwbDLQp0UTgU3RNZkzLVahobhdNHFhsPwpmxzbxmvJ4557PU73MsI86xPjbjyPHmc3flpNm+RJVQAqXmnTS0jNcvKDloKMHB+GkbPqMEYTPMN/eq4HbWXwvpNRnZB1mV3L4kHwtjdc4N5Q/ls57DJj8hKWa7LzDFXgv7lBuHPgY7kHlEghkYlNdD+MhIXXGCyPKGjD4Qy++P8fsdrbOpXNOV48/EAQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=RwZrqMhF3fMhPTaNalWexbs81z2Dq2jdaaXH8Z4hzcc=;
+ b=Zp2Nt+9/gE5aWUft8gVYicfVTQvdybLBrf3qCyx9bTz8MYaPFG8lyjQ4/xQg5dU0UFnsGuW+UIUdxcblGh5/Y5TJsgRple6OTLvBHzhXt3DUpoPNOhMWKLgAXvPQc3oA/82CSfgwbdDKHF5uPfoIraYsKjDnsSu5CBIT1gz6ZVYCh+wbpPaak3jiHVj0nrJ+T6m8bQOEwyCCrfDF39N7z3aIsdHUxwygtBy9TlzkpdsI0dmRMxqOYxoJjSP3p7E6ISUm3Ycs36DSy/x2LxD1uCDVBs/T+xHm1Ca+A88VzBKpgTLXNqloMyv3F882RxfPQy0CkE6lbnvPnFlp2gabkA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SN6PR11MB3230.namprd11.prod.outlook.com (2603:10b6:805:b8::29)
+ by SA0PR11MB4768.namprd11.prod.outlook.com (2603:10b6:806:71::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.37; Sat, 15 Jun
+ 2024 13:02:07 +0000
+Received: from SN6PR11MB3230.namprd11.prod.outlook.com
+ ([fe80::c2dd:7cf8:6008:b690]) by SN6PR11MB3230.namprd11.prod.outlook.com
+ ([fe80::c2dd:7cf8:6008:b690%5]) with mapi id 15.20.7677.027; Sat, 15 Jun 2024
+ 13:02:07 +0000
+Date: Sat, 15 Jun 2024 21:01:52 +0800
+From: kernel test robot <lkp@intel.com>
+To: Muhammad Usama Anjum <usama.anjum@collabora.com>, Marc Zyngier
+	<maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, James Morse
+	<james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+	<yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan
+	<skhan@linuxfoundation.org>, Christian Borntraeger
+	<borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, "Claudio
+ Imbrenda" <imbrenda@linux.ibm.com>, David Hildenbrand <david@redhat.com>,
+	"Sean Christopherson" <seanjc@google.com>, Haibo Xu <haibo1.xu@intel.com>,
+	"Anup Patel" <anup@brainfault.org>, Andrew Jones <ajones@ventanamicro.com>,
+	"Aaron Lewis" <aaronlewis@google.com>, Thomas Huth <thuth@redhat.com>,
+	"Maciej Wieczor-Retman" <maciej.wieczor-retman@intel.com>, Vitaly Kuznetsov
+	<vkuznets@redhat.com>
+CC: <oe-kbuild-all@lists.linux.dev>, <kernel@collabora.com>,
+	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 1/2] selftests: kvm: remove print_skip()
+Message-ID: <Zm2QwNoJM2/GHy7Q@rli9-mobl>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240612104500.425012-1-usama.anjum@collabora.com>
+X-ClientProxiedBy: SG2PR04CA0172.apcprd04.prod.outlook.com (2603:1096:4::34)
+ To SN6PR11MB3230.namprd11.prod.outlook.com (2603:10b6:805:b8::29)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20240611002145.2078921-1-jthoughton@google.com>
- <20240611002145.2078921-5-jthoughton@google.com> <CAOUHufYGqbd45shZkGCpqeTV9wcBDUoo3iw1SKiDeFLmrP0+=w@mail.gmail.com>
- <CADrL8HVHcKSW3hiHzKTit07gzo36jtCZCnM9ZpueyifgNdGggw@mail.gmail.com>
- <ZmioedgEBptNoz91@google.com> <CADrL8HU_FKHTz_6d=xhVLZFDQ_zQo-zdB2rqdpa2CKusa1uo+A@mail.gmail.com>
- <ZmjtEBH42u7NUWRc@google.com> <CADrL8HUW2q79F0FsEjhGW0ujij6+FfCqas5UpQp27Epfjc94Nw@mail.gmail.com>
- <ZmxsCwu4uP1lGsWz@google.com> <CADrL8HVDZ+m_-jUCaXf_DWJ92N30oqS=_9wNZwRvoSp5fo7asg@mail.gmail.com>
-Message-ID: <ZmzPoW7K5GIitQ8B@google.com>
-Subject: Re: [PATCH v5 4/9] mm: Add test_clear_young_fast_only MMU notifier
-From: Sean Christopherson <seanjc@google.com>
-To: James Houghton <jthoughton@google.com>
-Cc: Yu Zhao <yuzhao@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Ankit Agrawal <ankita@nvidia.com>, 
-	Axel Rasmussen <axelrasmussen@google.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	David Matlack <dmatlack@google.com>, David Rientjes <rientjes@google.com>, 
-	James Morse <james.morse@arm.com>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Raghavendra Rao Ananta <rananta@google.com>, 
-	Ryan Roberts <ryan.roberts@arm.com>, Shaoqin Huang <shahuang@redhat.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Wei Xu <weixugc@google.com>, 
-	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN6PR11MB3230:EE_|SA0PR11MB4768:EE_
+X-MS-Office365-Filtering-Correlation-Id: c900d1b5-aca9-4c0c-4f52-08dc8d3b5c80
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230037|366013|376011|7416011|1800799021|921017;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?V1XjfHpi9cR89MtvLFIN0+/wumeth6Si0bdKuqYZmeAwUlP8169qarHIgjtj?=
+ =?us-ascii?Q?9kbKMFSqHjwvSXQe3mcstuH29YRkOnc3V4+7190YzkR0O0yRjxLWKl7BFbyH?=
+ =?us-ascii?Q?UHqBYv1Tp6rvqpT6VbkvwGZBpRqskbOAk3qK5DLJwn2urVMwlOT4p1roXG8C?=
+ =?us-ascii?Q?SH6DlGF81O+HwSlwMswq6kywIr5edLZIfSTbH0IpHq5/BY7pwU64aD+58cxD?=
+ =?us-ascii?Q?4DO0rdAPQ6zvjLVa62QkNO38VA3i7SzPva/Pdj7vsmBjKoWM5ozzEg3VgXPR?=
+ =?us-ascii?Q?CKqZL31X+xOaWBjl7UW8U2XB3GaixiqqWwLWbDZbF5qM8zSYcvx1LgAhuSeO?=
+ =?us-ascii?Q?gHQ8Yg3sHW2HexhLtohWkl0j/P0ONIkQkWLgxMmtv9boqCKI/7Aca2UhjykZ?=
+ =?us-ascii?Q?Zu3OjcbN5ykmkzIk1pQy1CLTn+Ear+hj/pXKh60vjfuX+R1iilvgO0DsK0VE?=
+ =?us-ascii?Q?wzwODTybIUsADiMgZJJFxx9kyOGq20XyUGy32y2WZQ2F5UrV3Y4umaCX3/CG?=
+ =?us-ascii?Q?USFnofcce3H2gxCsAdq0TBwg2cPH+re8QY/kovRq2p0eNgm1hf5WwD+eLAuo?=
+ =?us-ascii?Q?4bKv5DYdH+Huf7Xzl8TdyiFrXglmTOE9jMepbq8UdLVp1W2lJu17Iec5z252?=
+ =?us-ascii?Q?Izaubg7ow42V0fdWB9htUXmH/TMYHVB8pWTKI1I4XJOCgnKtgUEfSWvUEJYW?=
+ =?us-ascii?Q?DgFyxocIDmAQPYL+1ztz073S2YuAemweApyChIaJdZ7c6AUVLnnGVxBfusqX?=
+ =?us-ascii?Q?bvgCXlVaLONgFaepQFZ80RjZAA/ICbuY3IvnM+DAEhsPiAoqAy3wTJs8BV9q?=
+ =?us-ascii?Q?0PSivbLQt5nKcSIzWbNHlJGXgE19a+LqnVRDjkXOSK/jLDdpNRLBCNzOjFPf?=
+ =?us-ascii?Q?yIGiYl/rNXwgUpa+4GNVk9MQ/PPAE6t55WWNoKQseBqzRyTC9MQk1bd2w7dr?=
+ =?us-ascii?Q?Ve8Kw3b27NG/U7J47JmpssjG7C/MaNM/o4k0NCEvjUE8bMLo4tjfnJkVxdW2?=
+ =?us-ascii?Q?ExUkRtBvyXRuO1bvZAHYhx2cubU9GBnWAc1SN6f/FIKe3ZzuBBemuY1M/PjD?=
+ =?us-ascii?Q?AbecG1qH+hx/yMay1N5xOkhgbnNR3CQcmhKXFpB3RtB5YZ1LP5v8sKDdz7mi?=
+ =?us-ascii?Q?7L1PNrOorBaLHnPyIDmK1FGvWbiYnDKfr4sA/iFkKcCCYxnGqxRIi58wpcZ7?=
+ =?us-ascii?Q?9g21m+0mS5e5omnc4pcXPKrWzGXvJFZNK96nSrPK49pqsGBcPsont+COdoiH?=
+ =?us-ascii?Q?tFcPA3NMKKdth9aen5h9+jlPry8Hc+h4fXH8CZ8vVxqwwcR2Wg043Xatt+Ib?=
+ =?us-ascii?Q?3Q0F8+Wiw6F1WcwgGJhSJplO?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR11MB3230.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230037)(366013)(376011)(7416011)(1800799021)(921017);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Yy5PkxEuVyOMy31uucok2iB+KJYbAEDDKnR6zvLBUxDosnl1ni3/tOYjcCWC?=
+ =?us-ascii?Q?ZmJeVNacH5f7JPEVRLNYYN7Vvu4TLR1H91cJkwlilhlzhFeTgCDTkO77Ujrw?=
+ =?us-ascii?Q?rZBD+inHsiPvLCCyczpJweJ0GiVZ3MKsVgvS+6z7dPNoHE5le8Xn1ikLpw6l?=
+ =?us-ascii?Q?okpdSNArxPgpK6WL65qoxHwGxo1VIf0tCHMA0rQskdbLNgG+clCRRIDF44Sn?=
+ =?us-ascii?Q?EaPTFcfOxq2rCUPr56RJyt+vzFrxRpM6BF7ZQOZQI33ytrCXwvsTGl/Q0ekf?=
+ =?us-ascii?Q?1y5+cETM1PBxhoAeBHK+kJ4cybbYBoIklEbigkiCf+5jaAbC7ipcMZg+UmqI?=
+ =?us-ascii?Q?18H11SJNYLQvFQltHgTUTJLbY6GaJmRGYFZvbOs4BHMGQeoUyLiSyG1xxjEG?=
+ =?us-ascii?Q?NKAgczpfsuSIkNjTLEz8duyUS8SnyF7jRsw62vJvVIsoR5pbjt67Izh0RGBb?=
+ =?us-ascii?Q?OvL4uFsWrRNXbjatVHrzKIaugrpIzGzpRa9hB4PqfXH85mVqHZbcnjy+LCcQ?=
+ =?us-ascii?Q?4rYfF2d8Tm+1Rz30MN+umMt9Uo2U7FMiYYlXDLSmszuqwJ/YQ2rIakP0U7a7?=
+ =?us-ascii?Q?/0s8yV2MlC0cTvcLNXURvTwwnF1c2ZjuJihmVRyDI6/V9SbNhq5kLO93TqTj?=
+ =?us-ascii?Q?mByT4vJMri5k4KcabdHOjPcmdynmfkQCvZTvhVAy6mmAUd79KEe9z3rEdMDE?=
+ =?us-ascii?Q?R5kpnTgLi1Pe0ZdIfBKxUaJbT3qNzoOTcg/jGJ+VmZ697w6Ma/P0aAzoVA5w?=
+ =?us-ascii?Q?ud0oyblbprful2u8KcBp1O6IeoXU+MGkKNI3mk7XD7SVhx56xSSTnthi//jS?=
+ =?us-ascii?Q?FVS5uVhlVN88uSqWR+56iTf5rMPHO3+54pZ425L2KwmW1FVeZr4ogu+K67zV?=
+ =?us-ascii?Q?9JCEoAIBIMv0vFl+RZFokZzGXm8pAg/YuSmnWRXIpaXSn/4WM5fVV69K2YsF?=
+ =?us-ascii?Q?ylb5837eXDYfeqhA/j7TuXzumpNOWysPQWOvgceY1kl9g4+sLJtOLPuxB2+L?=
+ =?us-ascii?Q?8PHEPQx+8iWIwO+g9nPTCJsxDt1RYcOdg8vb3vKfE34vKVf7HIH0iN/ikKwT?=
+ =?us-ascii?Q?w2fR1WXpCjlssBW1e/4+/1HKxN4F2MYIjfeDJ6OveuftVnE4o5Im493jj5Az?=
+ =?us-ascii?Q?Fl6/dV7qzKVJH6/pH4N4hBmfvop8/1JAQibuNt+SwUCA8tLF/zx/jDSXMDPO?=
+ =?us-ascii?Q?fIuoLF38XwaHzoqZATBWXQgLz+wNmnZYfOjhsUwANUx6bqC3AJs69MY78wO1?=
+ =?us-ascii?Q?vC0ObPZJ8v5kPTemxTuDpVIUlxE731NNFq6x4qhX+5jC09jvhgjNtPiAIt0J?=
+ =?us-ascii?Q?aKVwZOwk4KMoHpArLcHMoLXP569POZ6PxhGhJZfP3huwXeShCHoppC/Elp7W?=
+ =?us-ascii?Q?RL0YwlriD0sy6tfqUGfDVvOA6XcGjpZfvglwgmTj92HVPhg1CNZiKiMdq3/n?=
+ =?us-ascii?Q?D8F8xAq+ufAMorsm6Pk7R2zIgJzf8nzfP1n3Ca4ACyoWSbcpi8U3XqwidCDg?=
+ =?us-ascii?Q?79cxJ1N/UzQw95ylnJBWSJitXbcXerwriL6QQUuEPl3wb1SF3vVzFjM9oExI?=
+ =?us-ascii?Q?MZYRtGe+YIKHQWaTD3d7HRjCkIU7ApPOWXLB1MkmyxzQc1WuXu3O7dTqnrHB?=
+ =?us-ascii?Q?4g=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: c900d1b5-aca9-4c0c-4f52-08dc8d3b5c80
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR11MB3230.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jun 2024 13:02:07.8854
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: iX2tMA3dqpV6q4stj5dkAos96UcgAOdmwrkxz+l4r1hN7NdgVZLh/ewl96qN3kLlLak6zgj91973PjTeePxMMg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR11MB4768
+X-OriginatorOrg: intel.com
 
-On Fri, Jun 14, 2024, James Houghton wrote:
-> On Fri, Jun 14, 2024 at 9:13=E2=80=AFAM Sean Christopherson <seanjc@googl=
-e.com> wrote:
-> >
-> > On Thu, Jun 13, 2024, James Houghton wrote:
-> > > On Tue, Jun 11, 2024 at 5:34=E2=80=AFPM Sean Christopherson <seanjc@g=
-oogle.com> wrote:
-> > > > A flag would also avoid an indirect call and thus a RETPOLINE when =
-CONFIG_RETPOLINE=3Dy,
-> > > > i.e. would be a minor optimization when KVM doesn't suppport fast a=
-ging.  But that's
-> > > > probably a pretty unlikely combination, so it's probably not a vali=
-d argument.
-> > > >
-> > > > So, I guess I don't have a strong opinion?
-> > >
-> > > (Sorry for the somewhat delayed response... spent some time actually
-> > > writing what this would look like.)
-> > >
-> > > I see what you mean, thanks! So has_fast_aging might be set by KVM if
-> > > the architecture sets a Kconfig saying that it understands the concep=
-t
-> > > of fast aging, basically what the presence of this v5's
-> > > test_clear_young_fast_only() indicates.
-> >
-> > It would need to be a runtime setting, because KVM x86-64 with tdp_mmu_=
-enabled=3Dfalse
-> > doesn't support fast aging (uses the shadow MMU even for TDP).
->=20
-> I see. I'm not sure if it makes sense to put this in `ops` as you
-> originally had it then (it seems like a bit of a pain anyway). I could
-> just make it a member of `struct mmu_notifier` itself.
+Hi Muhammad,
 
-Ah, right, because the ops are const.  Yeah, losing the const just to set a=
- flag
-would be unfortunate.
+kernel test robot noticed the following build warnings:
 
-> > > So just to be clear, for test_young(), I intend to have a patch in v6
-> > > to elide the shadow MMU check if the TDP MMU indicates Accessed. Seem=
-s
-> > > like a pure win; no reason not to include it if we're making logic
-> > > changes here anyway.
-> >
-> > I don't think that's correct.  The initial fast_only=3Dfalse aging shou=
-ld process
-> > shadow MMUs (nested TDP) and TDP MMUs, otherwise a future fast_only=3Df=
-alse would
-> > get a false positive on young due to failing to clear the Accessed bit =
-in the
-> > shadow MMU.  E.g. if page X is accessed by both L1 and L2, then aged, a=
-nd never
-> > accessed again, the Accessed bit would still be set in the page tables =
-for L2.
->=20
-> For clear_young(fast_only=3Dfalse), yeah we need to check and clear
-> Accessed for both MMUs. But for test_young(fast_only=3Dfalse), I don't
-> see why we couldn't just return early if the TDP MMU reports young.
+[auto build test WARNING on kvm/queue]
+[also build test WARNING on kvmarm/next kvms390/next linus/master v6.10-rc3 next-20240613]
+[cannot apply to kvm/linux-next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Ooh, good point.
+url:    https://github.com/intel-lab-lkp/linux/commits/Muhammad-Usama-Anjum/selftests-kvm-replace-exit-with-ksft_exit_fail_msg/20240612-184820
+base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
+patch link:    https://lore.kernel.org/r/20240612104500.425012-1-usama.anjum%40collabora.com
+patch subject: [PATCH 1/2] selftests: kvm: remove print_skip()
+:::::: branch date: 3 days ago
+:::::: commit date: 3 days ago
+compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240615/202406151641.BjqL765q-lkp@intel.com/reproduce)
 
-> > > Oh, yeah, that's a lot more intelligent than what I had. I think I
-> > > fully understand your suggestion; I guess we'll see in v6. :)
-> > >
-> > > I wonder if this still makes sense if whether or not an MMU is "fast"
-> > > is determined by how contended some lock(s) are at the time.
-> >
-> > No.  Just because a lock wasn't contended on the initial aging doesn't =
-mean it
-> > won't be contended on the next round.  E.g. when using KVM x86's shadow=
- MMU, which
-> > takes mmu_lock for write for all operations, an aging operation could g=
-et lucky
-> > and sneak in while mmu_lock happened to be free, but then get stuck beh=
-ind a large
-> > queue of operations.
-> >
-> > The fast-ness needs to be predictable and all but guaranteed, i.e. lock=
-less or in
-> > an MMU that takes mmu_lock for read in all but the most rare paths.
->=20
-> Aging and look-around themselves only use the fast-only notifiers, so
-> they won't ever wait on a lock (well... provided KVM is written like
-> that, which I think is a given).
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/r/202406151641.BjqL765q-lkp@intel.com/
 
-Regarding aging, is that actually the behavior that we want?  I thought the=
- plan
-is to have the initial test look at all MMUs, i.e. be potentially slow, but=
- only
-do the lookaround if it can be fast.  IIUC, that was Yu's intent (and peeki=
-ng back
-at v2, that is indeed the case, unless I'm misreading the code).
+All warnings (new ones prefixed by >>):
 
-If KVM _never_ consults shadow (nested TDP) MMUs, then a VM running an L2 w=
-ill
-end up with hot pages (used by L2) swapped out.
+>> x86_64/hyperv_cpuid.c:155:1: warning: unused label 'do_sys' [-Wunused-label]
+     155 | do_sys:
+         | ^~~~~~~
+>> x86_64/hyperv_cpuid.c:165:1: warning: unused label 'out' [-Wunused-label]
+     165 | out:
+         | ^~~~
+   2 warnings generated.
 
-Or are you saying that the "test" could be slow, but not "clear"?  That's a=
-lso
-suboptimal, because any pages accessed by L2 will always appear hot.
 
-> should_look_around() will use the slow notifier because it (despite its n=
-ame)
-> is responsible for accurately determining if a page is young lest we evic=
-t a
-> young page.
->=20
-> So in this case where "fast" means "lock not contended for now",
+vim +/do_sys +155 tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
 
-No.  In KVM, "fast" needs to be a property of the MMU, not a reflection of =
-system
-state at some random snapshot in time.
+7edcb73433276d Vitaly Kuznetsov     2018-12-10  128  
+7edcb73433276d Vitaly Kuznetsov     2018-12-10  129  int main(int argc, char *argv[])
+7edcb73433276d Vitaly Kuznetsov     2018-12-10  130  {
+7edcb73433276d Vitaly Kuznetsov     2018-12-10  131  	struct kvm_vm *vm;
+813e38cd6d7b42 Sean Christopherson  2022-06-14  132  	const struct kvm_cpuid2 *hv_cpuid_entries;
+5c6e31b3bc4b52 Sean Christopherson  2022-02-15  133  	struct kvm_vcpu *vcpu;
+7edcb73433276d Vitaly Kuznetsov     2018-12-10  134  
+7ed397d107d461 Sean Christopherson  2022-05-27  135  	TEST_REQUIRE(kvm_has_cap(KVM_CAP_HYPERV_CPUID));
+7edcb73433276d Vitaly Kuznetsov     2018-12-10  136  
+5c6e31b3bc4b52 Sean Christopherson  2022-02-15  137  	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+8b460692fee46a Vitaly Kuznetsov     2020-09-29  138  
+8b460692fee46a Vitaly Kuznetsov     2020-09-29  139  	/* Test vCPU ioctl version */
+5c6e31b3bc4b52 Sean Christopherson  2022-02-15  140  	test_hv_cpuid_e2big(vm, vcpu);
+8b460692fee46a Vitaly Kuznetsov     2020-09-29  141  
+768e9a61856b75 Sean Christopherson  2022-06-02  142  	hv_cpuid_entries = vcpu_get_supported_hv_cpuid(vcpu);
+8b460692fee46a Vitaly Kuznetsov     2020-09-29  143  	test_hv_cpuid(hv_cpuid_entries, false);
+813e38cd6d7b42 Sean Christopherson  2022-06-14  144  	free((void *)hv_cpuid_entries);
+8b460692fee46a Vitaly Kuznetsov     2020-09-29  145  
+1ecbb337fa107c Sean Christopherson  2022-06-14  146  	if (!kvm_cpu_has(X86_FEATURE_VMX) ||
+a9af8b5d3d419a Muhammad Usama Anjum 2024-06-12  147  	    !kvm_has_cap(KVM_CAP_HYPERV_ENLIGHTENED_VMCS))
+a9af8b5d3d419a Muhammad Usama Anjum 2024-06-12  148  		ksft_exit_skip("Enlightened VMCS is unsupported\n");
+a9af8b5d3d419a Muhammad Usama Anjum 2024-06-12  149  
+768e9a61856b75 Sean Christopherson  2022-06-02  150  	vcpu_enable_evmcs(vcpu);
+768e9a61856b75 Sean Christopherson  2022-06-02  151  	hv_cpuid_entries = vcpu_get_supported_hv_cpuid(vcpu);
+8b460692fee46a Vitaly Kuznetsov     2020-09-29  152  	test_hv_cpuid(hv_cpuid_entries, true);
+813e38cd6d7b42 Sean Christopherson  2022-06-14  153  	free((void *)hv_cpuid_entries);
+8b460692fee46a Vitaly Kuznetsov     2020-09-29  154  
+8b460692fee46a Vitaly Kuznetsov     2020-09-29 @155  do_sys:
 
-> I don't think it's necessarily wrong for MGLRU to attempt to find young
-> pages, even if sometimes it will bail out because a lock is contended/hel=
-d
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
-lru_gen_look_around() skips lookaround if something else is waiting on the =
-page
-table lock, but that is a far cry from what KVM would be doing.  (a) the PT=
-L is
-already held, and (b) it is scoped precisely to the range being processed. =
- Not
-looking around makes sense because there's a high probability of the PTEs i=
-n
-question being modified by a different task, i.e. of the look around being =
-a
-waste of time.
-
-In KVM, mmu_lock is not yet held, so KVM would need to use try-lock to avoi=
-d
-waiting, and would need to bail from the middle of the aging walk if a diff=
-erent
-task contends mmu_lock.
-
-I agree that's not "wrong", but in part because mmu_lock is scoped to the e=
-ntire
-VM, it risks ending up with semi-random, hard to debug behavior.  E.g. a us=
-er
-could see intermittent "failures" that come and go based on seemingly unrel=
-ated
-behavior in KVM.  And implementing the "bail" behavior in the shadow MMU wo=
-uld
-require non-trivial changes.
-
-In other words, I would very strongly prefer that the shadow MMU be all or =
-nothing,
-i.e. is either part of look-around or isn't.  And if nested TDP doesn't fai=
-r well
-with MGLRU, then we (or whoever cares) can spend the time+effort to make it=
- work
-with fast-aging.
-
-Ooh!  Actually, after fiddling a bit to see how feasible fast-aging in the =
-shadow
-MMU would be, I'm pretty sure we can do straight there for nested TDP.  Or =
-rather,
-I suspect/hope we can get close enough for an initial merge, which would al=
-low
-aging_is_fast to be a property of the mmu_notifier, i.e. would simplify thi=
-ngs
-because KVM wouldn't need to communicate MMU_NOTIFY_WAS_FAST for each notif=
-ication.
-
-Walking KVM's rmaps requires mmu_lock because adding/removing rmap entries =
-is done
-in such a way that a lockless walk would be painfully complex.  But if ther=
-e is
-exactly _one_ rmap entry for a gfn, then slot->arch.rmap[...] points direct=
-ly at
-that one SPTE.  And with nested TDP, unless L1 is doing something uncommon,=
- e.g.
-mapping the same page into multiple L2s, that overwhelming vast majority of=
- rmaps
-have only one entry.  That's not the case for legacy shadow paging because =
-kernels
-almost always map a pfn using multiple virtual addresses, e.g. Linux's dire=
-ct map
-along with any userspace mappings.
-
-E.g. with a QEMU+KVM setup running Linux as L2, in my setup, only one gfn h=
-as
-multiple rmap entries (IIRC, it's from QEMU remapping BIOS into low memory =
-during
-boot).
-
-So, if we bifurcate aging behavior based on whether or not the TDP MMU is e=
-nabled,
-then whether or not aging is fast is constant (after KVM loads).  Rougly, t=
-he KVM
-side of things would be the below, plus a bunch of conversions to WRITE_ONC=
-E() to
-ensure a stable rmap value (KVM already plays nice with lockless accesses t=
-o SPTEs,
-thanks to the fast page fault path).
-
-If KVM adds an rmap entry after the READ_ONCE(), then functionally all is s=
-till
-well because the original SPTE pointer is still valid.  If the rmap entry i=
-s
-removed, then KVM just needs to ensure the owning page table isn't freed.  =
-That
-could be done either with a cmpxchg() (KVM zaps leafs SPTE before freeing p=
-age
-tables, and the rmap stuff doesn't actually walk upper level entries), or b=
-y
-enhancing the shadow MMU's lockless walk logic to allow lockless walks from
-non-vCPU tasks.
-
-And in the (hopefully) unlikely scenario someone has a use case where L1 ma=
-ps a
-gfn into multiple L2s (or aliases in bizarre ways), then we can tackle maki=
-ng the
-nested TDP shadow MMU rmap walks always lockless.
-
-E.g. again very roughly, if we went with the latter:
-
-@@ -1629,22 +1629,45 @@ static void rmap_add(struct kvm_vcpu *vcpu, const s=
-truct kvm_memory_slot *slot,
-        __rmap_add(vcpu->kvm, cache, slot, spte, gfn, access);
- }
-=20
-+static __always_inline bool kvm_handle_gfn_range_lockless(struct kvm *kvm,
-+                                                         struct kvm_gfn_ra=
-nge *range,
-+                                                         typedefme handler=
-)
-+{
-+       gfn_t gfn;
-+       int level;
-+       u64 *spte;
-+       bool ret;
-+
-+       walk_shadow_page_lockless_begin(???);
-+
-+       for (gfn =3D range->start; gfn < range->end; gfn++) {
-+               for (level =3D PG_LEVEL_4K; level <=3D KVM_MAX_HUGEPAGE_LEV=
-EL; level++) {
-+                       spte =3D (void *)READ_ONCE(gfn_to_rmap(gfn, level, =
-range->slot)->val);
-+
-+                       /* Skip the gfn if there are multiple SPTEs. */
-+                       if ((unsigned long)spte & 1)
-+                               continue;
-+
-+                       ret |=3D handler(spte);
-+               }
-+       }
-+
-+       walk_shadow_page_lockless_end(???);
-+}
-+
- static int __kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range,
-                         bool fast_only)
- {
-        bool young =3D false;
-=20
--       if (kvm_memslots_have_rmaps(kvm)) {
--               if (fast_only)
--                       return -1;
--
--               write_lock(&kvm->mmu_lock);
--               young =3D kvm_handle_gfn_range(kvm, range, kvm_age_rmap);
--               write_unlock(&kvm->mmu_lock);
--       }
--
--       if (tdp_mmu_enabled)
-+       if (tdp_mmu_enabled) {
-                young |=3D kvm_tdp_mmu_age_gfn_range(kvm, range);
-+               young |=3D kvm_handle_gfn_range_lockless(kvm, range, kvm_ag=
-e_rmap_fast);
-+       } else if (!fast_only) {
-+               write_lock(&kvm->mmu_lock);
-+               young =3D kvm_handle_gfn_range(kvm, range, kvm_age_rmap);
-+               write_unlock(&kvm->mmu_lock);
-+       }
-=20
-        return (int)young;
- }
-
-> for a few or even a majority of the pages. Not doing look-around is the s=
-ame
-> as doing look-around and finding that no pages are young.
-
-No, because the former is deterministic and predictable, the latter is not.
-
-> Anyway, I don't think this bit is really all that important unless we
-> can demonstrate that KVM participating like this actually results in a
-> measurable win.
-
-Participating like what?  You've lost me a bit.  Are we talking past each o=
-ther?
-
-What I am saying is that we do this (note that this is slightly different t=
-han
-an earlier sketch; I botched the ordering of spin_is_contend() in that one,=
- and
-didn't account for the page being young in the primary MMU).
-
-	if (pte_young(ptep_get(pte)))
-		young =3D 1 | MMU_NOTIFY_WAS_FAST;
-
-        young |=3D ptep_clear_young_notify(vma, addr, pte);
-        if (!young)
-                return false;
-
-        if (!(young & MMU_NOTIFY_WAS_FAST))
-                return true;
-
-        if (spin_is_contended(pvmw->ptl))
-                return false;
-
-        /* exclude special VMAs containing anon pages from COW */
-        if (vma->vm_flags & VM_SPECIAL)
-                return false;
