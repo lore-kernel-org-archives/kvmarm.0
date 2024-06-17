@@ -1,90 +1,81 @@
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 682421891B9
-	for <kvmarm@lists.linux.dev>; Mon, 17 Jun 2024 17:40:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A938A18FC6F
+	for <kvmarm@lists.linux.dev>; Mon, 17 Jun 2024 18:10:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718646045; cv=none; b=EEI7Cp5CXZ3epHnLcM94JraYDlIptOYP1sdrntQhYtZHbrDAlaFTH9TZ0VvtBzyaMw/4CuQDuXveQtCSb8o5bZOvNPaLyXPrbpUYQwhYP12Ibr/LIpvVeAgIeufR5WU1HPP4Yo4hdb74WkslVVEm1FsbBs8O79dXzgpdTweVIHI=
+	t=1718647835; cv=none; b=svP4XWL1rvBiaxa643/y/yPxJ4O12HJi40wQ0lb+JL1a2MHqw5Ke9k8mT0rjpmKbu9/UdFrE0jxdQQdcPYaA4iqT08HlzKstlXbyHj+zndSa3FrYc2RxPNXt6B7vnMf5L8ba2Z3dgBdOUg24xvzPnS41hKmBn3gnJ8R8YRiSOvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718646045; c=relaxed/simple;
-	bh=O44bg5IN3bpweFi97y7tt8VcamC1B+cu2qGxErr7ez8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WtAF1CNPZgJkPkcm6J0Q4uJdSUFX25m79S8c5w5KWNeOl+9HKFWpikKJGbrHIDysu+suMukprLrs6O4O190Bq1TSYoGF0t+cO9oGIhkatVMdJnPST9dXvcgYCqTuyR/095a6GHRqX0MiDu10C/+OQKhwxnl3UULHjzTlYN1pMM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ZZS2E4bo; arc=none smtp.client-ip=95.215.58.186
+	s=arc-20240116; t=1718647835; c=relaxed/simple;
+	bh=RpX8yRpzR64qaR5ym4hHlRfv1gHFV8mRtWBTwGFYeyQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ArOfLBX+aNMFwkzcIrmrVU1nIbD1zm1q6LUPuWbjwBo5VK4Dd+DA/rgeNomCz4xOcyQ9jONmkdvzq7avvROrXMHlpKEqdSkw+8f7i8omE2fB+yfvuzIRpK8ZZAlLHiaQFNC7ZIJbP3A8EO4jzfwB4cyZ29+r9lsMAUVbHmcSfog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qcQzDKJj; arc=none smtp.client-ip=91.218.175.184
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ZZS2E4bo"
-X-Envelope-To: shahuang@redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1718646042;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=okv/SBVT+t/mscY2NbGXxvwNhjZy/ckRAi7DnSHOqKA=;
-	b=ZZS2E4bouTntLdhRdKDBwzqHEL50a8ctu3G8V36RUt1ypOp+M+UED4Hve02PlfU857ISH9
-	+2z7zqvoPPesAU+CJb5hrVqJLOOec7PeOFz2fNoIuEuztzqoQCLxUP8QmVYYZegmLfJLQS
-	qSyw/Mt5PuufQBHEqPeIIYO+5J3HuoU=
-X-Envelope-To: maz@kernel.org
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qcQzDKJj"
 X-Envelope-To: kvmarm@lists.linux.dev
-X-Envelope-To: catalin.marinas@arm.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1718647831;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=i1dzTNX7kiPkv9BnTsw0udSTtNCRCGpYIySxS5nAnT4=;
+	b=qcQzDKJjWPX5XPqR34+8tWqxRR7ZcN54OqrTsL5T0FYu8KaUvQYSpXUIEAzwenk1zMjIqp
+	e3UE7/2rmCbvGozFxo/5JSld6raRCRaXJswU8BwGTzAedAc+jp2YL3yxb4h4m2yutEe6Wp
+	3WxIll+sWODEieN1vCm9PReh0unYVGQ=
+X-Envelope-To: maz@kernel.org
 X-Envelope-To: james.morse@arm.com
-X-Envelope-To: kvm@vger.kernel.org
-X-Envelope-To: linux-arm-kernel@lists.infradead.org
-X-Envelope-To: linux-kernel@vger.kernel.org
-X-Envelope-To: linux-kselftest@vger.kernel.org
-X-Envelope-To: pbonzini@redhat.com
-X-Envelope-To: shuah@kernel.org
 X-Envelope-To: suzuki.poulose@arm.com
-X-Envelope-To: will@kernel.org
 X-Envelope-To: yuzenghui@huawei.com
-Date: Mon, 17 Jun 2024 17:40:36 +0000
+X-Envelope-To: kvm@vger.kernel.org
+X-Envelope-To: oliver.upton@linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Shaoqin Huang <shahuang@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	James Morse <james.morse@arm.com>, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+To: kvmarm@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v1 0/2] KVM: arm64: Making BT Field in ID_AA64PFR1_EL1
- writable
-Message-ID: <ZnB1FPw3Eg8-61mL@linux.dev>
-References: <20240617075131.1006173-1-shahuang@redhat.com>
+	Zenghui Yu <yuzenghui@huawei.com>,
+	kvm@vger.kernel.org,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH] KVM: arm64: nv: Use GFP_KERNEL_ACCOUNT for sysreg_masks allocation
+Date: Mon, 17 Jun 2024 18:10:18 +0000
+Message-ID: <20240617181018.2054332-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240617075131.1006173-1-shahuang@redhat.com>
+Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-On Mon, Jun 17, 2024 at 03:51:29AM -0400, Shaoqin Huang wrote:
-> In this patch series, we try to make more register fields writable like
-> ID_AA64PFR1_EL1.BT since this can benifit the migration between some of the
-> machines which have different BT values.
-> 
-> Changelog:
-> ----------
-> RFCv1 -> v1:
->   * Fix the compilation error.
->   * Delete the machine specific information and make the description more
->     generable.
+Of course, userspace is in the driver's seat for struct kvm and
+associated allocations. Make sure the sysreg_masks allocation
+participates in kmem accounting.
 
-Can you please address Marc's feedback?
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+---
+ arch/arm64/kvm/nested.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-If we only make things writable a field at a time it's going to take
-forever to catch up w/ the architecture.
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 6813c7c7f00a..57e3fb3eb334 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -196,7 +196,7 @@ int kvm_init_nv_sysregs(struct kvm *kvm)
+ 		goto out;
+ 
+ 	kvm->arch.sysreg_masks = kzalloc(sizeof(*(kvm->arch.sysreg_masks)),
+-					 GFP_KERNEL);
++					 GFP_KERNEL_ACCOUNT);
+ 	if (!kvm->arch.sysreg_masks) {
+ 		ret = -ENOMEM;
+ 		goto out;
 
-https://lore.kernel.org/kvmarm/86zfrpjkt6.wl-maz@kernel.org/
-
+base-commit: 1613e604df0cd359cf2a7fbd9be7a0bcfacfabd0
 -- 
-Thanks,
-Oliver
+2.45.2.627.g7a2c4fd464-goog
+
