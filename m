@@ -1,135 +1,93 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 239E31862B0;
-	Mon, 17 Jun 2024 07:41:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08B4438396
+	for <kvmarm@lists.linux.dev>; Mon, 17 Jun 2024 07:51:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718610070; cv=none; b=OC+GejGietqShjNzCa1VgJX5SRPj0WMr2W8eu1q8FbnB4LKi8YQMkPQ426hiw4FdGL4gEfLMTl+x7WP2ByhcALzbWz0X6ndoIjJHv11rT1J52VRLr1pyFaGuApN80nFCMYcRbvxIfOMfaSxbi4JtO/3jjifI96AC5e8xOCVoon8=
+	t=1718610709; cv=none; b=fb3ZRMw/dzaMzAAIJBsNm0GHSMs75mfygQbdr8wYRwIYJTQxkm6mR/t438fmoioYkHLFxzu+kp6h9Z1u8fQhJiVXlg6BoYa2vVPsqex5VBjf+jkdvPKAd3lqCymKHFwqbxJHEoBO2lTE6pi4ZYN16opjE7nRdU9JLA4kHkSYX4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718610070; c=relaxed/simple;
-	bh=6fjH5+2JhBPufwYdBrMxQDSsZf/nxe3KJGcBk5Ezhkc=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aJYvIihCDIMu+x0ds61MRgKTWPRBxu899GFB09geug3cZt8sFT7C+mFSLha9ibsNZP7GQtRJjya6/kSn5byY0f7+2/JnglBUCAyaS1dJ4nwdnWSsUHew5X6UR8dMmaoy0jtDhsvcBMkY/eUc8qQFxBGF0jMRXCvcrZfV1AFsK4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nsv0LF/G; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1718610709; c=relaxed/simple;
+	bh=mproEs7n+ddFpkKXDlP2Smw07PE40yTNGmUf0E6+5Zs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=CNPiJx2Wy2xgNd1009JJC/GdGRpGODgQoQKmoJSgyTn7XXlThbGK1dqK3j9VK0XrACtif7vkw6p2Vom/8Hsj2KihLV6HgLtADqGExMa1CDmr9vC4nPaarKdVf2L9JvkteIN8Hmve4ABLXh+jM2rDOFHIiV/lTFiefgjZ8FS42iI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gvcpbp1L; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nsv0LF/G"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6A7EC2BD10;
-	Mon, 17 Jun 2024 07:41:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718610069;
-	bh=6fjH5+2JhBPufwYdBrMxQDSsZf/nxe3KJGcBk5Ezhkc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nsv0LF/GFpgY/pRBcbkxLmyR1g1fwMIdIGJaLsL2g8c+CfHSj69vnY4zknfKNxe3l
-	 U14QXZsflSOVucEVMbM4yftigMouJHfSxgqjPplx9g2E28FvTn79fU3AEPRwmvExm+
-	 ArEzC08FlVwZcNkgEdO6YVkOzdLT1jbZE/Z/mW1lGL6CdjPnd/G4V0cqFpaXMAt+gt
-	 xCSGbV0Q0iwaaLuEjv/nxT4f2Wj6/az/JFG4vdbuj2+IvOCHRyO5Z8rIvKDcjsDMXr
-	 kK1CpArdycQRz1yDT8H47XiWhT0fPbhTzCopNinn1VBwfkaqMH8G0KBw5uW/XHG1ky
-	 NYQLWsVFROEhQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sJ6zD-004VaC-4P;
-	Mon, 17 Jun 2024 08:41:07 +0100
-Date: Mon, 17 Jun 2024 08:41:06 +0100
-Message-ID: <86jzioj9t9.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	will@kernel.org,
-	catalin.marinas@arm.com,
-	mark.rutland@arm.com,
-	Mark Brown <broonie@kernel.org>,
-	James Clark <james.clark@arm.com>,
-	Rob Herring <robh@kernel.org>,
-	Suzuki Poulose <suzuki.poulose@arm.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	linux-perf-users@vger.kernel.org,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gvcpbp1L"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718610706;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=BW4VAsHAD5rQXt1LXI/66mtVgyz0sOVi0R128fdor2M=;
+	b=gvcpbp1LUJaNLQCzE81irxggspYWBZGQ01p7IR70ovc5Pl2MEwS6y28wLlLSH2agxASml3
+	8yItOs94+rX8zIKrYCg7PMbmKbH/7stg8AjCLtr5vfcuqH4931GMga3ZstJ3HI+bNqX5WN
+	DM4hPhKBCMOd3liqSiEv2Bqti613dHA=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-595-eYIEDCG1OhSnxDpFyTq0Ag-1; Mon,
+ 17 Jun 2024 03:51:43 -0400
+X-MC-Unique: eYIEDCG1OhSnxDpFyTq0Ag-1
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E941019560AF;
+	Mon, 17 Jun 2024 07:51:40 +0000 (UTC)
+Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A91481956087;
+	Mon, 17 Jun 2024 07:51:36 +0000 (UTC)
+From: Shaoqin Huang <shahuang@redhat.com>
+To: Oliver Upton <oliver.upton@linux.dev>,
+	Marc Zyngier <maz@kernel.org>,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH V18 2/9] KVM: arm64: Explicitly handle BRBE traps as UNDEFINED
-In-Reply-To: <df348434-85af-4bae-a31a-4a4a93c3cf49@arm.com>
-References: <20240613061731.3109448-1-anshuman.khandual@arm.com>
-	<20240613061731.3109448-3-anshuman.khandual@arm.com>
-	<86sexfk8ke.wl-maz@kernel.org>
-	<86r0czk6wd.wl-maz@kernel.org>
-	<df348434-85af-4bae-a31a-4a4a93c3cf49@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+Cc: Shaoqin Huang <shahuang@redhat.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	James Morse <james.morse@arm.com>,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH v1 0/2] KVM: arm64: Making BT Field in ID_AA64PFR1_EL1 writable
+Date: Mon, 17 Jun 2024 03:51:29 -0400
+Message-Id: <20240617075131.1006173-1-shahuang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: anshuman.khandual@arm.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com, broonie@kernel.org, james.clark@arm.com, robh@kernel.org, suzuki.poulose@arm.com, peterz@infradead.org, mingo@redhat.com, acme@kernel.org, linux-perf-users@vger.kernel.org, oliver.upton@linux.dev, james.morse@arm.com, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On Mon, 17 Jun 2024 07:27:13 +0100,
-Anshuman Khandual <anshuman.khandual@arm.com> wrote:
-> On 6/14/24 18:39, Marc Zyngier wrote:
-> > On Fri, 14 Jun 2024 13:33:37 +0100,
-> >
-> > Actually, to disable the *instructions*, a similar hack must be
-> > applied to HFGITR_EL2. The resulting patch should be something like:
-> > 
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index ee33f5467ce5..49d86dae8d80 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -4964,6 +4964,15 @@ void kvm_init_sysreg(struct kvm_vcpu *vcpu)
-> >  		kvm->arch.fgu[HAFGRTR_GROUP] |= ~(HAFGRTR_EL2_RES0 |
-> >  						  HAFGRTR_EL2_RES1);
-> >  
-> > +	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, BRBE, IMP)) {
-> > +		kvm->arch.fgu[HDFGRTR_GROUP] |= (HDFGRTR_nBRBDATA  |
-> > +						 HDFGRTR_nBRBCTL   |
-> > +						 HDFGRTR_nBRBIDR);
+In this patch series, we try to make more register fields writable like
+ID_AA64PFR1_EL1.BT since this can benifit the migration between some of the
+machines which have different BT values.
 
-Obviously, this needs to be spelled HDFGRTR_EL2_nBRB* so that it
-actually compiles.
+Changelog:
+----------
+RFCv1 -> v1:
+  * Fix the compilation error.
+  * Delete the machine specific information and make the description more
+    generable.
 
-> > +		kvm->arch.fgu[HFGITR_GROUP] |= (HFGITR_EL2_nBRBINJ |
-> > +						HFGITR_EL2_nBRBIALL);
-> > +	}
-> > +
-> > +
-> >  	set_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags);
-> >  out:
-> >  	mutex_unlock(&kvm->arch.config_lock);
-> 
-> This makes sense, will remove all the changes to sys_reg table and
-> instead fold the above suggestion into the patch.
-> 
-> > 
-> > The implicit dependency here is that FGT is always present on a system
-> > that implements BRBE. The architecture supports this assertion:
-> > 
-> > - BRBE is not available before ARMv9.1
-> > - FGT is mandatory from ARMv8.6
-> > 
-> > Given that v9.1 is congruent to v8.6, we have the required overlap.
-> 
-> So this overlap need not be asserted in software again ?
+RFCv1: https://lore.kernel.org/all/20240612023553.127813-1-shahuang@redhat.com/
 
-I don't think there's a need for that.
+Shaoqin Huang (2):
+  KVM: arm64: Allow BT field in ID_AA64PFR1_EL1 writable
+  KVM: selftests: aarch64: Add writable test for ID_AA64PFR1_EL1
 
-We went through the same thing with SME (which has the exact same
-dependency), and concluded that there was no need to paper over broken
-implementations at the moment (only QEMU was affected, and that was
-quickly fixed). If we find an implementation in the wild that didn't
-get the memo, we can add a workaround at that time.
-
-	M.
+ arch/arm64/kvm/sys_regs.c                         | 2 +-
+ tools/testing/selftests/kvm/aarch64/set_id_regs.c | 6 ++++++
+ 2 files changed, 7 insertions(+), 1 deletion(-)
 
 -- 
-Without deviation from the norm, progress is not possible.
+2.40.1
+
