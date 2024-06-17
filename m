@@ -1,105 +1,215 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B99C1190489
-	for <kvmarm@lists.linux.dev>; Mon, 17 Jun 2024 07:51:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0F12194A6D
+	for <kvmarm@lists.linux.dev>; Mon, 17 Jun 2024 09:39:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718610715; cv=none; b=XoHe61zl7IhKrTiY4QG6e2ZFXhw+ByNDA5/jpM1eDR8F8ccBMgrcPsbFBesXT3TMpPfxxTVRLM/qSx1V7utaVGPGHSos7Sac/mi6ndr45cTduafhOrJxVeWsXmtooruDvkcORxEQZFT8BHEn78WEgsW7EuuLdZlyPGu4LeGc8Uo=
+	t=1718617182; cv=none; b=jdkGsM6B7Dy1l+2wyJ+PgK6cki9qB7AmCjPh0hrY06WrYgK9nIENG5Xn5LF/kWC/vlsLyr+Yv+hF+qb/GL7cTLSzGXkE7ZOwKJAK3J7/0R5VsoP5ly3A8pc4ZOOm4cDWR/USXKDZ+0QxBcrJKMB6rDOmUNgWPQpuYWQmoqrI7a8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718610715; c=relaxed/simple;
-	bh=+C9CpexBYFfnMpqRsSGyPaSylMt0LZhxG8Bqf4uE1vc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=HG8Pelw8QQPk+po7cmgtxn42Sz+t9ZfqV00ZW6M181TArkNhrZLUQ2lOVXCpgyCfMF/mBGmrpNlvZRxALaQScI+ln0JCo6WnuTgW1rUVdIrYkMTIkotHcOkzj+65r36GIA3YcGKBaQybcyrFLNcuQYHFScA9J57tLYkg3F6qcfg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iU2nwMa1; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iU2nwMa1"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718610712;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ARgZIxE+11qj8ADHfG2c1X50fN5kwjd0+5g/sQvCIdY=;
-	b=iU2nwMa1upjYABR6HEH4wkhh7t3d9QzJGQ7n/eUMv/Y8jV1tByaB2fZX1nGTWReB5rgLEQ
-	cVNyRxsxr/Oefv+d4QMkf/C6IjZThqRNM/8OTEAr6QkNzetmMgyUKtcW0p7HU95NhtbqBP
-	wS0vC25rGmox9Yt68JxHSVldlsU60Q0=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-172-EvbxRgEbPD6jpdHMnAQEew-1; Mon,
- 17 Jun 2024 03:51:47 -0400
-X-MC-Unique: EvbxRgEbPD6jpdHMnAQEew-1
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A045019560B3;
-	Mon, 17 Jun 2024 07:51:45 +0000 (UTC)
-Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id AAF4F1956087;
-	Mon, 17 Jun 2024 07:51:43 +0000 (UTC)
-From: Shaoqin Huang <shahuang@redhat.com>
-To: Oliver Upton <oliver.upton@linux.dev>,
-	Marc Zyngier <maz@kernel.org>,
-	kvmarm@lists.linux.dev
-Cc: Shaoqin Huang <shahuang@redhat.com>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v1 2/2] KVM: selftests: aarch64: Add writable test for ID_AA64PFR1_EL1
-Date: Mon, 17 Jun 2024 03:51:31 -0400
-Message-Id: <20240617075131.1006173-3-shahuang@redhat.com>
-In-Reply-To: <20240617075131.1006173-1-shahuang@redhat.com>
-References: <20240617075131.1006173-1-shahuang@redhat.com>
+	s=arc-20240116; t=1718617182; c=relaxed/simple;
+	bh=82Kgz56fEOBwI0Oe2j7E2biK3+jLx5BWv7jf30JXV/8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ttMlLX3W6mEVCsd8wmnHyE4W6lr7JnLCM3RTFpBxLK0votSGKfgvuwUBloWLRAT+dXoG6uutM84VOCVSSIv8LVnkWeMYwVqBOJv3jjVjKA4FAhp0s04RY3IJR4ly50hTxdI61sOzWgn565T5eZSHG5ov0q46OhFeahFRSO9xTxo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BF7BEDA7;
+	Mon, 17 Jun 2024 02:40:03 -0700 (PDT)
+Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BEC6D3F64C;
+	Mon, 17 Jun 2024 02:39:36 -0700 (PDT)
+Date: Mon, 17 Jun 2024 10:39:34 +0100
+From: Mark Rutland <mark.rutland@arm.com>
+To: Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	will@kernel.org, catalin.marinas@arm.com,
+	Mark Brown <broonie@kernel.org>, James Clark <james.clark@arm.com>,
+	Rob Herring <robh@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	Suzuki Poulose <suzuki.poulose@arm.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	linux-perf-users@vger.kernel.org,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>, kvmarm@lists.linux.dev
+Subject: Re: [PATCH V18 6/9] KVM: arm64: nvhe: Disable branch generation in
+ nVHE guests
+Message-ID: <ZnAEVlVZFR3DLHHb@J2N7QTR9R3>
+References: <20240613061731.3109448-1-anshuman.khandual@arm.com>
+ <20240613061731.3109448-7-anshuman.khandual@arm.com>
+ <ZmxgZqxXWnRqwbDC@J2N7QTR9R3.cambridge.arm.com>
+ <774a63cb-21e6-4ef2-b2ab-0ff8937523b2@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <774a63cb-21e6-4ef2-b2ab-0ff8937523b2@arm.com>
 
-Add test for the BT field in the ID_AA64PFR1_EL1 register.
+On Mon, Jun 17, 2024 at 12:15:15PM +0530, Anshuman Khandual wrote:
+> 
+> 
+> On 6/14/24 20:53, Mark Rutland wrote:
+> > On Thu, Jun 13, 2024 at 11:47:28AM +0530, Anshuman Khandual wrote:
+> >> Disable the BRBE before we enter the guest, saving the status and enable it
+> >> back once we get out of the guest. This avoids capturing branch records in
+> >> the guest kernel or userspace, which would be confusing the host samples.
+> > 
+> > It'd be good to explain why we need to do this for nVHE, but not for
+> > VHE. I *think* that you're relying on BRBCR_EL2.EL0HBRE being ignored
+> > when HCR_EL2.TGE == 0, and BRBCR_EL1.E{1,0}BRE being initialized to 0
+> > out-of-reset.
+> 
+> That's right, there is no possibility for the host and guest BRBE config
+> to overlap.
+> 
+> > What should a user do if they *want* samples from a guest? Is that
+> 
+> That is not supported currently. But in order to enable capturing guest
+> branch samples from inside the host - BRBCR_EL2 configs need to migrate
+> into BRBCR_EL1 when the guest runs on the cpu.
+> 
+> > possible to do on other architectures, or do is that always prevented?
+> 
+> I am not sure about other architectures, but for now this falls within
+> guest support which might be looked into later. But is not the proposed
+> patch complete in itself without any further guest support ?
 
-Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
----
- tools/testing/selftests/kvm/aarch64/set_id_regs.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+My concern here is ABI rather than actual support.
 
-diff --git a/tools/testing/selftests/kvm/aarch64/set_id_regs.c b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-index 16e2338686c1..5381b8ec5562 100644
---- a/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-+++ b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-@@ -133,6 +133,11 @@ static const struct reg_ftr_bits ftr_id_aa64pfr0_el1[] = {
- 	REG_FTR_END,
- };
- 
-+static const struct reg_ftr_bits ftr_id_aa64pfr1_el1[] = {
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR1_EL1, BT, 0),
-+	REG_FTR_END,
-+};
-+
- static const struct reg_ftr_bits ftr_id_aa64mmfr0_el1[] = {
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, ECV, 0),
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, EXS, 0),
-@@ -199,6 +204,7 @@ static struct test_feature_reg test_regs[] = {
- 	TEST_REG(SYS_ID_AA64ISAR1_EL1, ftr_id_aa64isar1_el1),
- 	TEST_REG(SYS_ID_AA64ISAR2_EL1, ftr_id_aa64isar2_el1),
- 	TEST_REG(SYS_ID_AA64PFR0_EL1, ftr_id_aa64pfr0_el1),
-+	TEST_REG(SYS_ID_AA64PFR1_EL1, ftr_id_aa64pfr1_el1),
- 	TEST_REG(SYS_ID_AA64MMFR0_EL1, ftr_id_aa64mmfr0_el1),
- 	TEST_REG(SYS_ID_AA64MMFR1_EL1, ftr_id_aa64mmfr1_el1),
- 	TEST_REG(SYS_ID_AA64MMFR2_EL1, ftr_id_aa64mmfr2_el1),
--- 
-2.40.1
+It's not clear to me how this works across architectures, and we should
+have some idea of how this would work (e.g. if we're going to require
+new ABI or not), so that we don't have to break ABI later on.
 
+Mark.
+
+> 
+> > 
+> > Mark.
+> > 
+> >>
+> >> Cc: Marc Zyngier <maz@kernel.org>
+> >> Cc: Oliver Upton <oliver.upton@linux.dev>
+> >> Cc: James Morse <james.morse@arm.com>
+> >> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+> >> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> >> Cc: Will Deacon <will@kernel.org>
+> >> Cc: kvmarm@lists.linux.dev
+> >> Cc: linux-arm-kernel@lists.infradead.org
+> >> CC: linux-kernel@vger.kernel.org
+> >> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+> >> ----
+> >> Changes in V18:
+> >>
+> >> - Used host_data_ptr() to access host_debug_state.brbcr_el1 register
+> >> - Changed DEBUG_STATE_SAVE_BRBE to use BIT(7)
+> >> - Reverted back iflags as u8
+> >>
+> >>  arch/arm64/include/asm/kvm_host.h  |  3 +++
+> >>  arch/arm64/kvm/debug.c             |  5 +++++
+> >>  arch/arm64/kvm/hyp/nvhe/debug-sr.c | 31 ++++++++++++++++++++++++++++++
+> >>  3 files changed, 39 insertions(+)
+> >>
+> >> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> >> index 36b8e97bf49e..db922c10bd2a 100644
+> >> --- a/arch/arm64/include/asm/kvm_host.h
+> >> +++ b/arch/arm64/include/asm/kvm_host.h
+> >> @@ -579,6 +579,7 @@ struct kvm_host_data {
+> >>  		u64 trfcr_el1;
+> >>  		/* Values of trap registers for the host before guest entry. */
+> >>  		u64 mdcr_el2;
+> >> +		u64 brbcr_el1;
+> >>  	} host_debug_state;
+> >>  };
+> >>  
+> >> @@ -842,6 +843,8 @@ struct kvm_vcpu_arch {
+> >>  #define DEBUG_STATE_SAVE_SPE	__vcpu_single_flag(iflags, BIT(5))
+> >>  /* Save TRBE context if active  */
+> >>  #define DEBUG_STATE_SAVE_TRBE	__vcpu_single_flag(iflags, BIT(6))
+> >> +/* Save BRBE context if active  */
+> >> +#define DEBUG_STATE_SAVE_BRBE	__vcpu_single_flag(iflags, BIT(7))
+> >>  
+> >>  /* SVE enabled for host EL0 */
+> >>  #define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
+> >> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+> >> index ce8886122ed3..8fa648943f0f 100644
+> >> --- a/arch/arm64/kvm/debug.c
+> >> +++ b/arch/arm64/kvm/debug.c
+> >> @@ -336,10 +336,15 @@ void kvm_arch_vcpu_load_debug_state_flags(struct kvm_vcpu *vcpu)
+> >>  	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_TraceBuffer_SHIFT) &&
+> >>  	    !(read_sysreg_s(SYS_TRBIDR_EL1) & TRBIDR_EL1_P))
+> >>  		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
+> >> +
+> >> +	/* Check if we have BRBE implemented and available at the host */
+> >> +	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_BRBE_SHIFT))
+> >> +		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_BRBE);
+> >>  }
+> >>  
+> >>  void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu)
+> >>  {
+> >>  	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_SPE);
+> >>  	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
+> >> +	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_BRBE);
+> >>  }
+> >> diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> >> index 53efda0235cf..97e861df1b45 100644
+> >> --- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> >> +++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> >> @@ -79,6 +79,32 @@ static void __debug_restore_trace(u64 trfcr_el1)
+> >>  	write_sysreg_el1(trfcr_el1, SYS_TRFCR);
+> >>  }
+> >>  
+> >> +static void __debug_save_brbe(u64 *brbcr_el1)
+> >> +{
+> >> +	*brbcr_el1 = 0;
+> >> +
+> >> +	/* Check if the BRBE is enabled */
+> >> +	if (!(read_sysreg_el1(SYS_BRBCR) & (BRBCR_ELx_E0BRE | BRBCR_ELx_ExBRE)))
+> >> +		return;
+> >> +
+> >> +	/*
+> >> +	 * Prohibit branch record generation while we are in guest.
+> >> +	 * Since access to BRBCR_EL1 is trapped, the guest can't
+> >> +	 * modify the filtering set by the host.
+> >> +	 */
+> >> +	*brbcr_el1 = read_sysreg_el1(SYS_BRBCR);
+> >> +	write_sysreg_el1(0, SYS_BRBCR);
+> >> +}
+> >> +
+> >> +static void __debug_restore_brbe(u64 brbcr_el1)
+> >> +{
+> >> +	if (!brbcr_el1)
+> >> +		return;
+> >> +
+> >> +	/* Restore BRBE controls */
+> >> +	write_sysreg_el1(brbcr_el1, SYS_BRBCR);
+> >> +}
+> >> +
+> >>  void __debug_save_host_buffers_nvhe(struct kvm_vcpu *vcpu)
+> >>  {
+> >>  	/* Disable and flush SPE data generation */
+> >> @@ -87,6 +113,9 @@ void __debug_save_host_buffers_nvhe(struct kvm_vcpu *vcpu)
+> >>  	/* Disable and flush Self-Hosted Trace generation */
+> >>  	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_TRBE))
+> >>  		__debug_save_trace(host_data_ptr(host_debug_state.trfcr_el1));
+> >> +	/* Disable BRBE branch records */
+> >> +	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_BRBE))
+> >> +		__debug_save_brbe(host_data_ptr(host_debug_state.brbcr_el1));
+> >>  }
+> >>  
+> >>  void __debug_switch_to_guest(struct kvm_vcpu *vcpu)
+> >> @@ -100,6 +129,8 @@ void __debug_restore_host_buffers_nvhe(struct kvm_vcpu *vcpu)
+> >>  		__debug_restore_spe(*host_data_ptr(host_debug_state.pmscr_el1));
+> >>  	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_TRBE))
+> >>  		__debug_restore_trace(*host_data_ptr(host_debug_state.trfcr_el1));
+> >> +	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_BRBE))
+> >> +		__debug_restore_brbe(*host_data_ptr(host_debug_state.brbcr_el1));
+> >>  }
+> >>  
+> >>  void __debug_switch_to_host(struct kvm_vcpu *vcpu)
+> >> -- 
+> >> 2.25.1
+> >>
