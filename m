@@ -1,217 +1,258 @@
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11olkn2106.outbound.protection.outlook.com [40.92.18.106])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A372433B3;
-	Mon, 17 Jun 2024 04:06:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.18.106
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718597180; cv=fail; b=fxjcJcbwyt6DrB2JJ0UOdtDsPIxCfABDmPP3bGqKMTEq5V9vDoLKVbh+uLyaMJBmP3nltQHcJSsP6j/gkQl6qYEp5uRNhWl5QTrIkFKy7ce8Mk23K2kFPxeZ6lZ4Fd96zQ1cja/8fyZWzpKUlrPFO/Gyh7eu7/2Fv1qdAsJvmhc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718597180; c=relaxed/simple;
-	bh=3DYu666y+uW2udMQ1LH8sT2CcS93AJtgJeLsggLXJIY=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=r5KsY16+EQRpU5o7wdE1Y8PFjH8wXSWLGSPHvMmQqrwga34X45PLR7xWzkJY+jaOGuio1+XKKGwG0FFfK2mfZ8AbEuOcf0Y+Lx8GaF7NCe2cXxi6mxmQjog6FQ4u/n+PYiwa0GC5yLkC3zlHX85NSx/IuNe25nlanDsa7TOjVvA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=VZ/v6+RV; arc=fail smtp.client-ip=40.92.18.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="VZ/v6+RV"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GQ2edO/7vnIs7yG9Qem+Ga08jaVWDrU1Ib843iu+DrQjoIsJBdeJFD6ZMMDErsgKL3InUOtRDbjro1lzUdtZymn22BZ1JbBHayMhEK/zKV6W78CAxXjIR+ZSs/JcXzU2oHmcRKJY3660ho80yYfQ8tXj1Hdf6mSRs3+ode2etBH66ugT2saXxZAhQERAWC/BofDNZIImG9CC2YYm7xFbek1o4ZwcVbfvoXbRBVrtMWW8azxyfk+hhRUOC3NXbgUWO8wQmZezm3w1yBOr16DvcH48YC8E2CYplurm2n5G2cvaWhlK/NYk+yQfMVwYcqLogrOyRTOUsiX9hFcOxR6Mpw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/zI7G52kAvmPQ+ebPAQUKDO8+uZrUG2Pk1M6l1K3GgU=;
- b=fJ4ScllnXgLR+nNCIKNiKbeC84zJHFb8a2Bo0BYmwbOPo9TrT2QgkjxB3bYh5RN1t8ttsoLc1aLKY4pKJGTvx3LBqFDeVLvqgly9rrEVYr4qMulPLP7NE5AlyyPKlDZ559l1nW1pPrehDnnmkNeiBWgi+bp8jVdSabHgPp9Ecj2vX722YTBCneWYDggbH+jMQVvJOizfwMzyX+bz0hDE0lTE4e5uMufJaC4EZcE1yyrRx3iifmXIr3BUL2rvHRa17wTvRYDg8b/KwNwEUzTGTEaCXDq3YFJQM1s2kj5QZWLxr82lr4ROVkTnElRYPTrTNt2XRNff5a7zjqThoA+J3w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/zI7G52kAvmPQ+ebPAQUKDO8+uZrUG2Pk1M6l1K3GgU=;
- b=VZ/v6+RVj6G8aiXWN09dG/iJ8FB5XIx+Ii17r6seLqnd+fGZ3yucvXXfcNAmJNJuxqeLX7Jx2Y/fO6jaLEnDfgY6OGPqyziBP3l60OAG2dvP5nPt89u1q9osSUqSckjTHxzyhYr0a/A+MrE59aGpBgfXMhdrCa9lu/X9XztNRd/uMp/j+hcyk0FNlFgWr859UMWBG+DAkRZ0PCeTdQFEOXIwLAq49U+7yt2Y5ia0CnVylQVfN3mKvyajZMqjejJxvHi78x81ch69pb0omUyTfLRn9um6aqZ0/iC5R6x4mhFcEUxMnc4/HMIR3vN5g4Unr1kJGOVO1H4h+RcQ6vmqHA==
-Received: from SN6PR02MB4157.namprd02.prod.outlook.com (2603:10b6:805:33::23)
- by SJ0PR02MB7645.namprd02.prod.outlook.com (2603:10b6:a03:329::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.30; Mon, 17 Jun
- 2024 04:06:15 +0000
-Received: from SN6PR02MB4157.namprd02.prod.outlook.com
- ([fe80::cedd:1e64:8f61:b9df]) by SN6PR02MB4157.namprd02.prod.outlook.com
- ([fe80::cedd:1e64:8f61:b9df%2]) with mapi id 15.20.7677.024; Mon, 17 Jun 2024
- 04:06:15 +0000
-From: Michael Kelley <mhklinux@outlook.com>
-To: Catalin Marinas <catalin.marinas@arm.com>
-CC: Steven Price <steven.price@arm.com>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, James Morse
-	<james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>, Suzuki K
- Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, Joey Gouly <joey.gouly@arm.com>, Alexandru
- Elisei <alexandru.elisei@arm.com>, Christoffer Dall
-	<christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
-	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>, Ganapatrao
- Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: RE: [PATCH v3 00/14] arm64: Support for running as a guest in Arm CCA
-Thread-Topic: [PATCH v3 00/14] arm64: Support for running as a guest in Arm
- CCA
-Thread-Index:
- AQHatysPRYaUedD8SEOOWptuNOqVvrG7hVGQgADmoQCAAA8XwIAEWhgAgABd+QCAABqzAIAKGFwQ
-Date: Mon, 17 Jun 2024 04:06:15 +0000
-Message-ID:
- <SN6PR02MB4157B95E74A3865C44F6132ED4CD2@SN6PR02MB4157.namprd02.prod.outlook.com>
-References: <20240605093006.145492-1-steven.price@arm.com>
- <SN6PR02MB415739D48B10C26D2673F3FED4FB2@SN6PR02MB4157.namprd02.prod.outlook.com>
- <ZmMjam3-L807AFR-@arm.com>
- <SN6PR02MB41571B5C2C9C59B0DF5F4E7ED4FB2@SN6PR02MB4157.namprd02.prod.outlook.com>
- <ZmbWpNOc7MiJEjqL@arm.com>
- <SN6PR02MB4157E83EAFA5EBEF5C5889BFD4C62@SN6PR02MB4157.namprd02.prod.outlook.com>
- <Zmc73jAL2XdLU49P@arm.com>
-In-Reply-To: <Zmc73jAL2XdLU49P@arm.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-tmn: [o1v+mIqT5cE6fPVXe6lez/pjj9e6s2cc]
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SN6PR02MB4157:EE_|SJ0PR02MB7645:EE_
-x-ms-office365-filtering-correlation-id: d9b524dc-9896-43a4-eb53-08dc8e82d550
-x-microsoft-antispam:
- BCL:0;ARA:14566002|461199025|1602099009|440099025|4302099010|3412199022|102099029;
-x-microsoft-antispam-message-info:
- 5H/M3KBLlSN0ivzLZk+2yUgRgnrNX70F8NByob0nZ4Rb9ILB/K43ZTrbtpYlbmZvjPY54G0Sg67fvj4DXLpccpUbfhloBiu086gduFvHZQ/oA5dCM0LCk7KV+OLfT1oCglNSdwOnpPtxCiHbKf0kiZvpxSv6VpqkASoFhHM2bkSThwgkj+h18TSMWbu1/N+LGUmUvh/qAXaaODJ4+siJBq5LOG8JwMqmVL3PYmrV1BHZEenrg2KcRWEAqwMBz/pBQj85VdPyaBKEqmFQaH9I66t/gmN0xUB3uR38Lb0UzOr1CZW5jO5Omh+WT0qqeisXsKFJGHPOCiVQnyACKMw9VWhrlPJUcks/7H4YOOHjpc+RpmPGWr79vsA7GpoM52ojcNwhZVyLKoCinGgUXeu+NdBAFDpp/Ks3sS4x/aK8HYib3jzR3H7HIW8DOGRJjRrsf9ecJxMv5ZwdCxc+I7wClXoh71An7/7AIUp0tWuZ+dFr3XiQt23s3Vudtn1zv7GFstUCSvsWNspWmLk1QJ3nSNUTHQbbD0e16/9HWQ+KLWUA1fJEy59jmjaWOcsxkqEzVHYSsXfboxZlJ2B6sN8h6GTkhUCFynFz8L+rOroVIDZBjQp4Av4ggpkMwe1nGUvgtOKw/d1rmnarLN2akuef3c9JvxTqrQaLkGwgZzdK0SOMRKH0hTkxhYtaYydqRII5
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?RxrpkyEIR1HTnG/HHZENwjdTjzoTYwes/hThO/xlISbUI/2Bc2piZICiSOyq?=
- =?us-ascii?Q?MjlAOVR8w0VTVM7TUIwOXA18ha7/Jdre9IR0jcG4rqCh3KcFJAuuBXieHUEQ?=
- =?us-ascii?Q?5zIDSpphFTz27GFWlXnWwf0t9i1JQW/UEUkI6BqeRJVTCAkCywLBOtgMdacR?=
- =?us-ascii?Q?GwkGWPspwmhEGKh1szS8LrpZ5v2lO4OSGbO4O3mb51uQGKBPfnCdisEj1dz1?=
- =?us-ascii?Q?ONLCYFo6kjdX+w1H4j9PivVbxYKLGUJ+ycMdxpoK+IS+uQsigS45wt1UY3KF?=
- =?us-ascii?Q?cFUQUu+i7T/ULWV+SzoHIEJiyV1vAKDfNDfkbL/N35YIFlFlF0Mkz8d5Hsve?=
- =?us-ascii?Q?lKkEN2k557QHmrPaUpYXCHu9XsaiqwhxTpXA5b+HCwdJ4hLTxn4CmvY4fE/2?=
- =?us-ascii?Q?eofWeZg6H2bqZKoJsCAcCm1PEOGPcgCNEhDG4z3oTb4XvE1mwUbNF9H7ZZaf?=
- =?us-ascii?Q?vFqD+UrlfBthln48xXmIi3E5X+ujWCXBVGTQlsKXvhDts11Mck0OZXB+6zwQ?=
- =?us-ascii?Q?yj9uMnHC7+EJYjXf8En21NtIZpIrhGV1qymzR/LVGKYsmSGMADT4gXsIEIwN?=
- =?us-ascii?Q?McDJ3UZROCiEbe+FuN+yPjuqWMaeM4o2ZYySl00lkl7tiRWcGRgA6GnUCCHs?=
- =?us-ascii?Q?GVQHDY5u6lx7dKRw7HUEn0/0R3uZg9vFicIrROM+ihAbS1wt5WN6YuYxGVfK?=
- =?us-ascii?Q?FHeAHmS+XGv3E/TtNVyLYHhtSEFUqffi74dqxmkOB+P94kjJ2f3nJu+riMMi?=
- =?us-ascii?Q?kXxM6Kp5PKg4xvIM3+fvX88aYsyNjmIk3J1NkgCZ5dWTZyuaAHHyqcXPrKjr?=
- =?us-ascii?Q?O+U+ic+qSfNxAgC1+pVrc2z2ntNFaKrpKxwOloKs9W4YF3JUOq7TFHccthz7?=
- =?us-ascii?Q?8iZ5St19xtl8AgnW5wvpjqOw0/wYZ+U5lMq8AgqFGUp6jwJSax6Aeq6Xt1AF?=
- =?us-ascii?Q?Z4gsCkWWFR4OFPsOFkuAGlzfsgcDVUL0vSXJCHTLUDJ4wGzEbSbMZaPzCn2T?=
- =?us-ascii?Q?elLFH+8O0J4LYAZEDjfgGq05vZNRsBbHXRTzYsnenucVcFE6xyt8cxW4lM+U?=
- =?us-ascii?Q?OS4TFOtS2uXvL9iT70UkNOZ8kkM0bZ+pN4cfhdheaiCqwpm/SIhLiH1hOICG?=
- =?us-ascii?Q?+1SOP1LxTIVPMLDLP6ZWU1W5BKaG01nns70PEwmdJW9dkTsYgFL/KzSdNx9o?=
- =?us-ascii?Q?55m373M1qfbstE8X9j4k30m+oGAOhVjgr81my1ZKHW8cx9qYTOKN4i2BWwY?=
- =?us-ascii?Q?=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13FF922089
+	for <kvmarm@lists.linux.dev>; Mon, 17 Jun 2024 06:27:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718605645; cv=none; b=LFzhOcX5f+LzSk7EBicV3xJGkTs7dQfYqJ7sxJ/UtU6dYDhY2MiOmjTb/oUUatVQ2yeutCEpjMwLwPZfx6HDa8VG4tL5KoqgxpfLc+EEJPve4BPhlWnt04Z0tFELqb80vGOyWQ1ekxIHCdneC3DdOl4rFk1m9o2VTGO50CdAvDU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718605645; c=relaxed/simple;
+	bh=K8+24yKI7+m3hynQfWl4kgiw2Ley3iKSoefTvT71/qY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qFiLIuDhKUfumlVgbt3bhime0f7c11y8o3VlzA5iXziZHRcM21/wRuXHFfPBlq54OHd6NO4OfV8VlcC/eO5uvbZDSlRefPVmlFIzn0TsdfB9IUuQi+eVUWEcAp/dceDwhQ38Cdjz63891PjH0XMLrqD1T8U0XemWVj7vDB6kiE0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AB591DA7;
+	Sun, 16 Jun 2024 23:27:45 -0700 (PDT)
+Received: from [10.162.16.42] (a077893.blr.arm.com [10.162.16.42])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6D33F3F73B;
+	Sun, 16 Jun 2024 23:27:16 -0700 (PDT)
+Message-ID: <df348434-85af-4bae-a31a-4a4a93c3cf49@arm.com>
+Date: Mon, 17 Jun 2024 11:57:13 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR02MB4157.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-Network-Message-Id: d9b524dc-9896-43a4-eb53-08dc8e82d550
-X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jun 2024 04:06:15.5251
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR02MB7645
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V18 2/9] KVM: arm64: Explicitly handle BRBE traps as
+ UNDEFINED
+Content-Language: en-US
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com,
+ Mark Brown <broonie@kernel.org>, James Clark <james.clark@arm.com>,
+ Rob Herring <robh@kernel.org>, Suzuki Poulose <suzuki.poulose@arm.com>,
+ Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>,
+ linux-perf-users@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>,
+ James Morse <james.morse@arm.com>, kvmarm@lists.linux.dev
+References: <20240613061731.3109448-1-anshuman.khandual@arm.com>
+ <20240613061731.3109448-3-anshuman.khandual@arm.com>
+ <86sexfk8ke.wl-maz@kernel.org> <86r0czk6wd.wl-maz@kernel.org>
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+In-Reply-To: <86r0czk6wd.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Catalin Marinas <catalin.marinas@arm.com> Sent: Monday, June 10, 2024=
- 10:46 AM
->=20
-> On Mon, Jun 10, 2024 at 05:03:44PM +0000, Michael Kelley wrote:
-> > From: Catalin Marinas <catalin.marinas@arm.com> Sent: Monday, June 10, =
-2024 3:34 AM
-> > > I wonder whether something like __GFP_DECRYPTED could be used to get
-> > > shared memory from the allocation time and avoid having to change the
-> > > vmalloc() ranges. This way functions like netvsc_init_buf() would get
-> > > decrypted memory from the start and vmbus_establish_gpadl() would not
-> > > need to call set_memory_decrypted() on a vmalloc() address.
-> >
-> > I would not have any conceptual objections to such an approach. But I'm
-> > certainly not an expert in that area so I'm not sure what it would take
-> > to make that work for vmalloc(). I presume that __GFP_DECRYPTED
-> > should also work for kmalloc()?
-> >
-> > I've seen the separate discussion about a designated pool of decrypted
-> > memory, to avoid always allocating a new page and decrypting when a
-> > smaller allocation is sufficient. If such a pool could also work for pa=
-ge size
-> > or larger allocations, it would have the additional benefit of concentr=
-ating
-> > decrypted allocations in fewer 2 Meg large pages vs. scattering whereve=
-r
-> > and forcing the break-up of more large page mappings in the direct map.
->=20
-> Yeah, my quick, not fully tested hack here:
->=20
-> https://lore.kernel.org/linux-arm-kernel/ZmNJdSxSz-sYpVgI@arm.com/=20
->=20
-> It's the underlying page allocator that gives back decrypted pages when
-> the flag is passed, so it should work for alloc_pages() and friends. The
-> kmalloc() changes only ensure that we have separate caches for this
-> memory and they are not merged. It needs some more work on kmem_cache,
-> maybe introducing a SLAB_DECRYPTED flag as well as not to rely on the
-> GFP flag.
->=20
-> For vmalloc(), we'd need a pgprot_decrypted() macro to ensure the
-> decrypted pages are marked with the appropriate attributes (arch
-> specific), otherwise it's fairly easy to wire up if alloc_pages() gives
-> back decrypted memory.
->=20
-> > I'll note that netvsc devices can be added or removed from a running VM=
-.
-> > The vmalloc() memory allocated by netvsc_init_buf() can be freed, and/o=
-r
-> > additional calls to netvsc_init_buf() can be made at any time -- they a=
-ren't
-> > limited to initial Linux boot.  So the mechanism for getting decrypted
-> > memory at allocation time must be reasonably dynamic.
->=20
-> I think the above should work. But, of course, we'd have to get this
-> past the mm maintainers, it's likely that I missed something.
 
-Having thought about this a few days, I like the model of telling the
-memory allocators to decrypt/re-encrypt the memory, instead of the
-caller having to explicitly do set_memory_decrypted()/encrypted().
-I'll add some further comments to the thread with your initial
-implementation.
 
->=20
-> > Rejecting vmalloc() addresses may work for the moment -- I don't know
-> > when CCA guests might be tried on Hyper-V.  The original SEV-SNP and TD=
-X
-> > work started that way as well. :-) Handling the vmalloc() case was adde=
-d
-> > later, though I think on x86 the machinery to also flip all the alias P=
-TEs was
-> > already mostly or completely in place, probably for other reasons. So
-> > fixing the vmalloc() case was more about not assuming that the underlyi=
-ng
-> > physical address range is contiguous. Instead, each page must be proces=
-sed
-> > independently, which was straightforward.
->=20
-> There may be a slight performance impact but I guess that's not on a
-> critical path. Walking the page tables and changing the vmalloc ptes
-> should be fine but for each page, we'd have to break the linear map,
-> flush the TLBs, re-create the linear map. Those TLBs may become a
-> bottleneck, especially on hardware with lots of CPUs and the
-> microarchitecture. Note that even with a __GFP_DECRYPTED attribute, we'd
-> still need to go for individual pages in the linear map.
+On 6/14/24 18:39, Marc Zyngier wrote:
+> On Fri, 14 Jun 2024 13:33:37 +0100,
+> Marc Zyngier <maz@kernel.org> wrote:
+>>
+>> On Thu, 13 Jun 2024 07:17:24 +0100,
+>> Anshuman Khandual <anshuman.khandual@arm.com> wrote:
+>>>
+>>> The Branch Record Buffer Extension (BRBE) adds a number of system registers
+>>> and instructions, which we don't currently intend to expose to guests. Our
+>>> existing logic handles this safely, but this could be improved with some
+>>> explicit handling of BRBE.
+>>>
+>>> The presence of BRBE is currently hidden from guests as the cpufeature
+>>> code's ftr_id_aa64dfr0[] table doesn't have an entry for the BRBE field,
+>>> and so this will be zero in the sanitised value of ID_AA64DFR0 exposed to
+>>> guests via read_sanitised_id_aa64dfr0_el1(). As the ftr_id_aa64dfr0[] table
+>>> may gain an entry for the BRBE field in future, for robustness we should
+>>> explicitly mask out the BRBE field in read_sanitised_id_aa64dfr0_el1().
+>>>
+>>> The BRBE system registers and instructions are currently trapped by the
+>>> existing configuration of the fine-grained traps. As neither the registers
+>>> nor the instructions are described in the sys_reg_descs[] table,
+>>> emulate_sys_reg() will warn that these are unknown before injecting an
+>>> UNDEFINED exception into the guest.
+>>>
+>>> Well-behaved guests shouldn't try to use the registers or instructions, but
+>>> badly-behaved guests could use these, resulting in unnecessary warnings. To
+>>> avoid those warnings, we should explicitly handle the BRBE registers and
+>>> instructions as UNDEFINED.
+>>>
+>>> Address the above by having read_sanitised_id_aa64dfr0_el1() mask out the
+>>> ID_AA64DFR0.BRBE field, and explicitly handling all of the BRBE system
+>>> registers and instructions as UNDEFINED.
+>>>
+>>> Cc: Marc Zyngier <maz@kernel.org>
+>>> Cc: Oliver Upton <oliver.upton@linux.dev>
+>>> Cc: James Morse <james.morse@arm.com>
+>>> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>> Cc: Catalin Marinas <catalin.marinas@arm.com>
+>>> Cc: Will Deacon <will@kernel.org>
+>>> Cc: kvmarm@lists.linux.dev
+>>> Cc: linux-arm-kernel@lists.infradead.org
+>>> Cc: linux-kernel@vger.kernel.org
+>>> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+>>> ----
+>>> Changes in V18:
+>>>
+>>> - Updated the commit message
+>>>
+>>>  arch/arm64/kvm/sys_regs.c | 56 +++++++++++++++++++++++++++++++++++++++
+>>>  1 file changed, 56 insertions(+)
+>>> Reviewed-by: Mark Rutland <mark.rutland@arm.com>
+>>> ---
+>>>  arch/arm64/kvm/sys_regs.c | 56 +++++++++++++++++++++++++++++++++++++++
+>>>  1 file changed, 56 insertions(+)
+>>>
+>>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+>>> index 22b45a15d068..3d4686abe5ee 100644
+>>> --- a/arch/arm64/kvm/sys_regs.c
+>>> +++ b/arch/arm64/kvm/sys_regs.c
+>>> @@ -1304,6 +1304,11 @@ static int set_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
+>>>  	return 0;
+>>>  }
+>>>  
+>>> +#define BRB_INF_SRC_TGT_EL1(n)				\
+>>> +	{ SYS_DESC(SYS_BRBINF_EL1(n)), undef_access },	\
+>>> +	{ SYS_DESC(SYS_BRBSRC_EL1(n)), undef_access },	\
+>>> +	{ SYS_DESC(SYS_BRBTGT_EL1(n)), undef_access }	\
+>>> +
+>>>  /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
+>>>  #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
+>>>  	{ SYS_DESC(SYS_DBGBVRn_EL1(n)),					\
+>>> @@ -1722,6 +1727,9 @@ static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+>>>  	/* Hide SPE from guests */
+>>>  	val &= ~ID_AA64DFR0_EL1_PMSVer_MASK;
+>>>  
+>>> +	/* Hide BRBE from guests */
+>>> +	val &= ~ID_AA64DFR0_EL1_BRBE_MASK;
+>>> +
+>>>  	return val;
+>>>  }
+>>>  
+>>> @@ -2240,6 +2248,52 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>>>  	{ SYS_DESC(SYS_DBGCLAIMCLR_EL1), trap_raz_wi },
+>>>  	{ SYS_DESC(SYS_DBGAUTHSTATUS_EL1), trap_dbgauthstatus_el1 },
+>>>  
+>>> +	/*
+>>> +	 * BRBE branch record sysreg address space is interleaved between
+>>> +	 * corresponding BRBINF<N>_EL1, BRBSRC<N>_EL1, and BRBTGT<N>_EL1.
+>>> +	 */
+>>> +	BRB_INF_SRC_TGT_EL1(0),
+>>> +	BRB_INF_SRC_TGT_EL1(16),
+>>> +	BRB_INF_SRC_TGT_EL1(1),
+>>> +	BRB_INF_SRC_TGT_EL1(17),
+>>> +	BRB_INF_SRC_TGT_EL1(2),
+>>> +	BRB_INF_SRC_TGT_EL1(18),
+>>> +	BRB_INF_SRC_TGT_EL1(3),
+>>> +	BRB_INF_SRC_TGT_EL1(19),
+>>> +	BRB_INF_SRC_TGT_EL1(4),
+>>> +	BRB_INF_SRC_TGT_EL1(20),
+>>> +	BRB_INF_SRC_TGT_EL1(5),
+>>> +	BRB_INF_SRC_TGT_EL1(21),
+>>> +	BRB_INF_SRC_TGT_EL1(6),
+>>> +	BRB_INF_SRC_TGT_EL1(22),
+>>> +	BRB_INF_SRC_TGT_EL1(7),
+>>> +	BRB_INF_SRC_TGT_EL1(23),
+>>> +	BRB_INF_SRC_TGT_EL1(8),
+>>> +	BRB_INF_SRC_TGT_EL1(24),
+>>> +	BRB_INF_SRC_TGT_EL1(9),
+>>> +	BRB_INF_SRC_TGT_EL1(25),
+>>> +	BRB_INF_SRC_TGT_EL1(10),
+>>> +	BRB_INF_SRC_TGT_EL1(26),
+>>> +	BRB_INF_SRC_TGT_EL1(11),
+>>> +	BRB_INF_SRC_TGT_EL1(27),
+>>> +	BRB_INF_SRC_TGT_EL1(12),
+>>> +	BRB_INF_SRC_TGT_EL1(28),
+>>> +	BRB_INF_SRC_TGT_EL1(13),
+>>> +	BRB_INF_SRC_TGT_EL1(29),
+>>> +	BRB_INF_SRC_TGT_EL1(14),
+>>> +	BRB_INF_SRC_TGT_EL1(30),
+>>> +	BRB_INF_SRC_TGT_EL1(15),
+>>> +	BRB_INF_SRC_TGT_EL1(31),
+>>> +
+>>> +	/* Remaining BRBE sysreg addresses space */
+>>> +	{ SYS_DESC(SYS_BRBCR_EL1), undef_access },
+>>> +	{ SYS_DESC(SYS_BRBFCR_EL1), undef_access },
+>>> +	{ SYS_DESC(SYS_BRBTS_EL1), undef_access },
+>>> +	{ SYS_DESC(SYS_BRBINFINJ_EL1), undef_access },
+>>> +	{ SYS_DESC(SYS_BRBSRCINJ_EL1), undef_access },
+>>> +	{ SYS_DESC(SYS_BRBTGTINJ_EL1), undef_access },
+>>> +	{ SYS_DESC(SYS_BRBIDR0_EL1), undef_access },
+>>> +
+>>>  	{ SYS_DESC(SYS_MDCCSR_EL0), trap_raz_wi },
+>>>  	{ SYS_DESC(SYS_DBGDTR_EL0), trap_raz_wi },
+>>>  	// DBGDTR[TR]X_EL0 share the same encoding
+>>> @@ -2751,6 +2805,8 @@ static struct sys_reg_desc sys_insn_descs[] = {
+>>>  	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
+>>>  	{ SYS_DESC(SYS_DC_CIGSW), access_dcgsw },
+>>>  	{ SYS_DESC(SYS_DC_CIGDSW), access_dcgsw },
+>>> +	{ SYS_DESC(OP_BRB_IALL), undef_access },
+>>> +	{ SYS_DESC(OP_BRB_INJ), undef_access },
+>>>  };
+>>>  
+>>>  static const struct sys_reg_desc *first_idreg;
+>>
+>> I don't think we need any update to the sys_reg table to handle
+>> this. Instead, we should make use of the FGU infrastructure that has
+>> been in since 6.9 to make this stuff UNDEF unconditionally.
+>>
+>> It should be as simple as:
+>>
+>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+>> index ee33f5467ce5..7cafe3f72c01 100644
+>> --- a/arch/arm64/kvm/sys_regs.c
+>> +++ b/arch/arm64/kvm/sys_regs.c
+>> @@ -4964,6 +4964,11 @@ void kvm_init_sysreg(struct kvm_vcpu *vcpu)
+>>  		kvm->arch.fgu[HAFGRTR_GROUP] |= ~(HAFGRTR_EL2_RES0 |
+>>  						  HAFGRTR_EL2_RES1);
+>>  
+>> +	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, BRBE, IMP))
+>> +		kvm->arch.fgu[HDFGRTR_GROUP] |= (HDFGRTR_nBRBDATA |
+>> +						 HDFGRTR_nBRBCTL  |
+>> +						 HDFGRTR_nBRBIDR);
+>> +
+>>  	set_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags);
+>>  out:
+>>  	mutex_unlock(&kvm->arch.config_lock);
+>>
+>> which is of course untested, but that I expect to be correct.
+> 
+> Actually, to disable the *instructions*, a similar hack must be
+> applied to HFGITR_EL2. The resulting patch should be something like:
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index ee33f5467ce5..49d86dae8d80 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -4964,6 +4964,15 @@ void kvm_init_sysreg(struct kvm_vcpu *vcpu)
+>  		kvm->arch.fgu[HAFGRTR_GROUP] |= ~(HAFGRTR_EL2_RES0 |
+>  						  HAFGRTR_EL2_RES1);
+>  
+> +	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, BRBE, IMP)) {
+> +		kvm->arch.fgu[HDFGRTR_GROUP] |= (HDFGRTR_nBRBDATA  |
+> +						 HDFGRTR_nBRBCTL   |
+> +						 HDFGRTR_nBRBIDR);
+> +		kvm->arch.fgu[HFGITR_GROUP] |= (HFGITR_EL2_nBRBINJ |
+> +						HFGITR_EL2_nBRBIALL);
+> +	}
+> +
+> +
+>  	set_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags);
+>  out:
+>  	mutex_unlock(&kvm->arch.config_lock);
 
-Agreed. While synthetic devices can come-and-go anytime, it's pretty
-rare in the grand scheme of things. I guess we would have to try it on
-a system with high CPU count, but even if the code needed to "pace
-itself" to avoid hammering the TLBs too hard, that would be OK.
+This makes sense, will remove all the changes to sys_reg table and
+instead fold the above suggestion into the patch.
 
-Michael
+> 
+> The implicit dependency here is that FGT is always present on a system
+> that implements BRBE. The architecture supports this assertion:
+> 
+> - BRBE is not available before ARMv9.1
+> - FGT is mandatory from ARMv8.6
+> 
+> Given that v9.1 is congruent to v8.6, we have the required overlap.
+
+So this overlap need not be asserted in software again ?
