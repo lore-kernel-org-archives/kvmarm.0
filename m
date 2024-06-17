@@ -1,211 +1,168 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A8231862AF
-	for <kvmarm@lists.linux.dev>; Mon, 17 Jun 2024 10:45:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DFEE194A6C
+	for <kvmarm@lists.linux.dev>; Mon, 17 Jun 2024 11:23:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718621128; cv=none; b=KWlH4Vtlxfhqb3P5SKfgKGJ1F6rmdw2cZIZuzHaIMIBhuzU6Czm33rM3tU2M2B5FZbkdm9clzTnlxxemivHz1RNXhVdCiL26zmQmG4oD0aKHUEqKvMtNJaLvXMWrogHCWhOnD8fyOc5cMvy73wpihj8uv8a2IAow6FsCEoUbU90=
+	t=1718623395; cv=none; b=DcHK8aAVyI9VKsRwD+VoViZmEmFLLWi0vWsIFlB6o2l5FwdLYycswi5udxs1gYjLmu6xune6u3i/sDaJSw/RPbQsIWaM9avYafwIQlqZFHz6SnmEhMLucgz/NYOu2UnWMsPzfoi1MQdw29DuIdSsfzT/CxHyUAz7C8XkR5jfHDU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718621128; c=relaxed/simple;
-	bh=vuQcy+KVm29pLB+XSdlOguyYKB5bJJLBLEcIzo669oA=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=IEMTNM1fMif5fnx2/p74mCd33rI3kWXlUTrcFnaXl5wx6ZH2g+pG/nkJX1gDu7EZTTptfYyXTicURHRKWGGJgzFxbq/cZBidNs/PhrDb/UgjNo0brGoVH/zGkFvmF3bywD3QBUKMVmNfAiXcZrwQUn0W1UJ50K5yqzc4lURo0Cc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Wfx43mjW; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1718623395; c=relaxed/simple;
+	bh=StZPGP5/i6bU5Xn6N3H5JCPZRkydWn4sCNBBZMzJ8cs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=INQlw9DkFxCLLcUL5QYQ5g1yQBLpOzvL8fCkKQu4aivcYgDyctCnmocqvmzTUl0g+UNuCSr4dRaJVBWLMir+Qyn1tqM6V9hH4q4Ii1DJGZ4iqdsD9uItGXaL3zlQrogNjMblFAkLSX6zfvolZx8t4XvrSSps+dMknxUe+PIaTS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=g+WH21i7; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wfx43mjW"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718621126;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NRJxfdPnVe61FMxCcvDTR6bA2bGURPuEq5h0b2zz8Mw=;
-	b=Wfx43mjWb6fj6tQphyWdeFkWio8JcM4Tutm8u35C5gJrL9Vb65q8VZUKWL+yTja83L+iRo
-	Bs5NhOd/jhnGMrX/L3ECiuI1Gb34mmqYtusHAsEtv6nvF+9yLQC7PvxSECv49QwlTdrHKm
-	AvoLDTkuFLOBs/3uIss4xUjM0MXTGSs=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-623-cXPMlX6OMqyS_Vb_kziBIw-1; Mon, 17 Jun 2024 06:45:24 -0400
-X-MC-Unique: cXPMlX6OMqyS_Vb_kziBIw-1
-Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-57a460247f3so2550177a12.3
-        for <kvmarm@lists.linux.dev>; Mon, 17 Jun 2024 03:45:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="g+WH21i7"
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-35f0aeff7a8so3497260f8f.2
+        for <kvmarm@lists.linux.dev>; Mon, 17 Jun 2024 04:23:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1718623391; x=1719228191; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=sM9D3IqfgB50OxP9LSaIkbOJs5yF44MMVnRSPz65e9Q=;
+        b=g+WH21i7gyFr9N0PtL8AM736hM1Iq1TuJi0yysyOORooMt8u16VWHCeExVO/6CtUMP
+         FaVuUYlhBIGVt6lNk/tPglG8pIZyJkYaOySZmBj61kPDq/S/n9QE+H+xNZoUTpWTbqeN
+         FIEW3JH6tpKMANPWzmGKqxN8zhH15znNKaN9eb0hrnYQoT6jK5a6njIQybQU/E0Vo+YO
+         aOojniGcoSrjjSy0oBWDGF97/4TBvLb1o22qkWhn3hsUTLgEcVxYN7Ja5jNySW5ylclH
+         ckk5bN8YPbQcreytmkiWJXmn/ll/0cu0hZnJGhM2uoblPWvLBPsABpYt4//RxRTrW5lq
+         fsdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718621123; x=1719225923;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NRJxfdPnVe61FMxCcvDTR6bA2bGURPuEq5h0b2zz8Mw=;
-        b=VELIG6doSosv4aQJikMKA1/Ylsy0EyY+yI0VGbXZuT5jv1oLcXfCUCmHcVZfkMDO18
-         M6U9z8ZDcdmAwTOucIGE9Zp6UbgK7RTzBy0HVbN1izEcQ2vziKLEK5yiiqtkKiz7g88A
-         77M01cA+JRnVKuqRJNERaiVJ9C2z6nWQgGYgQoovAISivFxi9mmFWr17huMalnlEAfOL
-         qpD8x68TUGONsVbYWQBHQTztXFIfBMb2iSgLOhg3gwF80DGLfCZeVVwuME+WYjthIw2v
-         692fdEELRxQeDoUliq5cqcCS5HE8lTWxj3yu79cwtGOphhyQwS66KZivjC/E+zE6HziZ
-         mGVA==
-X-Forwarded-Encrypted: i=1; AJvYcCULSDPKnGfL+ioVYiDF27/yJZkk4Zl079I0jiKsL4kTq5xG9q+gnmbRuClpQE8DKokiVLgIAhPusV7+CzPIiPMW4lfpGogk
-X-Gm-Message-State: AOJu0YyhVbLWMqB+/eamG7/UMglbVw0xAaxE6pzYgQndW64XX2UhA5ot
-	AL7fd2mskIyVL0c8ngsyvb4HJNspXLMZn1JTw4HXFlP2KtGd33vpqM2DzmxUs7FiojKBBR9uM1M
-	2G1zjpl+qZGXxATv43KC+54bYvtFPJ7u871P40vMw2uDdt6Q+SQj94A==
-X-Received: by 2002:a05:6402:17d9:b0:57c:c712:a3c7 with SMTP id 4fb4d7f45d1cf-57cc712a42emr4992939a12.36.1718621123507;
-        Mon, 17 Jun 2024 03:45:23 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEw1dOfO65idOI5S5hHYI2dR8VfPt3UB6du2RlcOyEDzhJXF4pRAG6lh6hyi8RsfiJwinPS0Q==
-X-Received: by 2002:a05:6402:17d9:b0:57c:c712:a3c7 with SMTP id 4fb4d7f45d1cf-57cc712a42emr4992914a12.36.1718621123073;
-        Mon, 17 Jun 2024 03:45:23 -0700 (PDT)
-Received: from rh (p200300c93f02d1004c157eb0f018dd01.dip0.t-ipconnect.de. [2003:c9:3f02:d100:4c15:7eb0:f018:dd01])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57cb72e992dsm6225534a12.48.2024.06.17.03.45.22
+        d=1e100.net; s=20230601; t=1718623391; x=1719228191;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sM9D3IqfgB50OxP9LSaIkbOJs5yF44MMVnRSPz65e9Q=;
+        b=mwWd1xy7yoTPN4vToRsSwBGNRIEtNaCjdANpgoYRUMob99UP4GUUlwGDCDsqlYKETy
+         bh1ftEWZ/Gt77T0MjXvgboFU+u4iboTwgaqmu92zXvxRQZX/zme659U02ziSzIubIcU+
+         iXHvdhbdfNM74JqQU551LPkqSHwdjN/ZBxeWY9VSWsUrQrSIoL6X5WqHhEWbKoj05+XF
+         eWzwjEHBnDolPpoTy+qgBbv/+ZXKCedwU9iT9foSxFQp4nUTmbjGL0buyQDXzz2VieTU
+         xMlM47O4Rp1mBTaPigjk+w06THGHatqTzVzHkONdytXNkiFu4YifgDxQ5qBO6ZSMRapC
+         UsUA==
+X-Forwarded-Encrypted: i=1; AJvYcCWsGRM1eruQOYa0IALDutU6kkSvDwyCNkxa7Cp8O74OYRi/CJT7LdEc0d0jfmx55J1metCMC0dSiWIojntLHFJ9FQgNMMz1
+X-Gm-Message-State: AOJu0Yxi495RsGebybd6sEvtP4Dnk0q0HYb1O3aD4wsRMZRIryvS7Ty8
+	e20/W5XAC2fqOgm5RCpHyCya8AMKeIg0UpoDQCvUpEaFyGmr4N39GSq9ZVtQT4Q=
+X-Google-Smtp-Source: AGHT+IETE+Maao3JAp1ZfgvsbcmTneajMGOq/KKGP7BvZAyqnGu9qO6mLUlHKQfEume52Ehz/Rt4gQ==
+X-Received: by 2002:adf:f902:0:b0:360:727b:8b47 with SMTP id ffacd0b85a97d-3607a7e7c15mr8074845f8f.63.1718623390738;
+        Mon, 17 Jun 2024 04:23:10 -0700 (PDT)
+Received: from myrica ([2.221.137.100])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-360750acf32sm11673653f8f.49.2024.06.17.04.23.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Jun 2024 03:45:22 -0700 (PDT)
-Date: Mon, 17 Jun 2024 12:45:21 +0200 (CEST)
-From: Sebastian Ott <sebott@redhat.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-    linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>, 
-    James Morse <james.morse@arm.com>, 
-    Suzuki K Poulose <suzuki.poulose@arm.com>, 
-    Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-    Shaoqin Huang <shahuang@redhat.com>, Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v4 3/6] KVM: arm64: add emulation for CTR_EL0 register
-In-Reply-To: <ZmyMxRoKN5VhUW7J@linux.dev>
-Message-ID: <393a1898-504c-c6a6-3c94-4b67b3f4c573@redhat.com>
-References: <20240603130507.17597-1-sebott@redhat.com> <20240603130507.17597-4-sebott@redhat.com> <ZmtwjLbP283ra0Xq@linux.dev> <Zmty99X4hnYwtRS4@linux.dev> <0b148e21-1714-f4f7-bc77-2a12b990572d@redhat.com> <ZmyMxRoKN5VhUW7J@linux.dev>
+        Mon, 17 Jun 2024 04:23:10 -0700 (PDT)
+Date: Mon, 17 Jun 2024 12:23:26 +0100
+From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	fvogt@suse.de
+Subject: Re: [PATCH v3 02/14] arm64: Detect if in a realm and set RIPAS RAM
+Message-ID: <20240617112326.GA1193@myrica>
+References: <20240605093006.145492-1-steven.price@arm.com>
+ <20240605093006.145492-3-steven.price@arm.com>
+ <20240612104023.GB4602@myrica>
+ <3301ddd8-f088-48e3-bfac-460891698eac@arm.com>
+ <20240613105107.GC417776@myrica>
+ <CAFEAcA99bPtEr2OpE45wCgfSArZdtz4tu9rggLNb+=Rujh0ZvQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA99bPtEr2OpE45wCgfSArZdtz4tu9rggLNb+=Rujh0ZvQ@mail.gmail.com>
 
-On Fri, 14 Jun 2024, Oliver Upton wrote:
-> On Fri, Jun 14, 2024 at 05:31:37PM +0200, Sebastian Ott wrote:
->
-> [...]
->
->> Hm, but in that case we'd use reset_vm_ftr_id_reg() meaning we would have
->> to make IDREG() work for this reg. Either by adding special handling to
->> that macro or by increasing kvm->arch.id_regs[] a lot - both options don't
->> sound very appealing.
->
-> Hiding some of the ugly details behind IDREG() isn't the worst thing,
-> IMO. The feature ID registers are not laid out contiguously in the
-> architecture, so it'd make sense that the corresponding KVM code not be
-> brittle to this.
->
-> The other benefit is we initialize kvm->arch.ctr_el0 exactly once, just
-> like the other ID registers. I believe there's a quirk with this patch
-> where an initialization that happens after a KVM_SET_ONE_REG on CTR_EL0
-> will clobber the userspace value.
->
-> So, here's where I'm at locally, I'll work it a bit more and try to
-> densely pack CTR_EL0 into the id_regs array. I also have some (untested)
-> changes to get CTR_EL0 to show up in the debugfs interface we now have.
->
-> Mind if I post what I have afterwards?
+On Mon, Jun 17, 2024 at 11:27:31AM +0100, Peter Maydell wrote:
+> On Thu, 13 Jun 2024 at 11:50, Jean-Philippe Brucker
+> <jean-philippe@linaro.org> wrote:
+> >
+> > On Wed, Jun 12, 2024 at 11:59:22AM +0100, Suzuki K Poulose wrote:
+> > > On 12/06/2024 11:40, Jean-Philippe Brucker wrote:
+> > > > On Wed, Jun 05, 2024 at 10:29:54AM +0100, Steven Price wrote:
+> > > > > From: Suzuki K Poulose <suzuki.poulose@arm.com>
+> > > > >
+> > > > > Detect that the VM is a realm guest by the presence of the RSI
+> > > > > interface.
+> > > > >
+> > > > > If in a realm then all memory needs to be marked as RIPAS RAM initially,
+> > > > > the loader may or may not have done this for us. To be sure iterate over
+> > > > > all RAM and mark it as such. Any failure is fatal as that implies the
+> > > > > RAM regions passed to Linux are incorrect - which would mean failing
+> > > > > later when attempting to access non-existent RAM.
+> > > > >
+> > > > > Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> > > > > Co-developed-by: Steven Price <steven.price@arm.com>
+> > > > > Signed-off-by: Steven Price <steven.price@arm.com>
+> > > >
+> > > > > +static bool rsi_version_matches(void)
+> > > > > +{
+> > > > > + unsigned long ver_lower, ver_higher;
+> > > > > + unsigned long ret = rsi_request_version(RSI_ABI_VERSION,
+> > > > > +                                         &ver_lower,
+> > > > > +                                         &ver_higher);
+> > > >
+> > > > There is a regression on QEMU TCG (in emulation mode, not running under KVM):
+> > > >
+> > > >    qemu-system-aarch64 -M virt -cpu max -kernel Image -nographic
+> > > >
+> > > > This doesn't implement EL3 or EL2, so SMC is UNDEFINED (DDI0487J.a R_HMXQS),
+> > > > and we end up with an undef instruction exception. So this patch would
+> > > > also break hardware that only implements EL1 (I don't know if it exists).
+> > >
+> > > Thanks for the report,  Could we not check ID_AA64PFR0_EL1.EL3 >= 0 ? I
+> > > think we do this for kvm-unit-tests, we need the same here.
+> >
+> > Good point, it also fixes this case and is simpler. It assumes RMM doesn't
+> > hide this field, but I can't think of a reason it would.
+> >
+> > This command won't work anymore:
+> >
+> >   qemu-system-aarch64 -M virt,secure=on -cpu max -kernel Image -nographic
+> >
+> > implements EL3 and SMC still treated as undef. QEMU has a special case for
+> > starting at EL2 in this case, but I couldn't find what this is for.
+> 
+> That's a bit of an odd config, because it says "emulate EL3 but
+> never use it". QEMU's boot loader starts the kernel at EL2 because
+> the kernel boot protocol requires that (this is more relevant on
+> boards other than virt where EL3 is not command-line disableable).
+> I have a feeling we've occasionally found that somebody's had some
+> corner case reason to use it, though. (eg
+> https://gitlab.com/qemu-project/qemu/-/issues/1899
+> is from somebody who says they use this when booting Windows 11 because
+> it asserts at boot time that EL3 is present and won't boot otherwise.)
 
-Sure go ahead.
+Thanks for the pointer. In this case it looks like Linux was used as
+reproducer and not the main use-case, though I wonder if some CIs
+regularly boot this particular configuration.
+
+> 
+> Your underlying problem here seems to be that you don't have
+> a way for the firmware to say "hey, SMC works, you can use it" ?
+
+We do: SMCCC recommends to look at the PSCI conduit declared in DT/ACPI.
+Given that RMM mandates using the SMC conduit for both PSCI and RSI calls,
+we could use this discovery mechanism here. The problem is that we have to
+discover it very early at boot, before the DT infrastructure is ready,
+so the implementation is a little awkward. I did post one earlier in this
+thread but it doesn't yet account for ACPI-only boot, which will need
+something similar. Testing ID_AA64PFR0_EL1.EL3 would be much simpler, but
+it would break this config.
 
 Thanks,
-Sebastian
-
-
->
-> commit 6bf81bd50dc16309a627863948d49cfeeb00897e
-> Author: Sebastian Ott <sebott@redhat.com>
-> Date:   Mon Jun 3 15:05:03 2024 +0200
->
->    KVM: arm64: Treat CTR_EL0 as a VM feature ID register
->
->    Signed-off-by: Sebastian Ott <sebott@redhat.com>
->    Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
->    Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
->
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 212ae77eefaf..e5b8cdd70914 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -327,10 +327,20 @@ struct kvm_arch {
-> 	 */
-> #define IDREG_IDX(id)		(((sys_reg_CRm(id) - 1) << 3) | sys_reg_Op2(id))
-> #define IDX_IDREG(idx)		sys_reg(3, 0, 0, ((idx) >> 3) + 1, (idx) & Op2_mask)
-> -#define IDREG(kvm, id)		((kvm)->arch.id_regs[IDREG_IDX(id)])
-> +#define IDREG(kvm, id)								\
-> +(*({										\
-> +	u64 *__reg;								\
-> +	if ((id) == SYS_CTR_EL0)						\
-> +		__reg = &(kvm)->arch.ctr_el0;					\
-> +	else									\
-> +		__reg = &((kvm)->arch.id_regs[IDREG_IDX(id)]);			\
-> +	__reg;									\
-> +}))
-> #define KVM_ARM_ID_REG_NUM	(IDREG_IDX(sys_reg(3, 0, 0, 7, 7)) + 1)
-> 	u64 id_regs[KVM_ARM_ID_REG_NUM];
->
-> +	u64 ctr_el0;
-> +
-> 	/* Masks for VNCR-baked sysregs */
-> 	struct kvm_sysreg_masks	*sysreg_masks;
->
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index dfabf7aec2c7..1ab2cbbc7a76 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1583,6 +1583,9 @@ static bool is_feature_id_reg(u32 encoding)
->  */
-> static inline bool is_vm_ftr_id_reg(u32 id)
-> {
-> +	if (id == SYS_CTR_EL0)
-> +		return true;
-> +
-> 	return (sys_reg_Op0(id) == 3 && sys_reg_Op1(id) == 0 &&
-> 		sys_reg_CRn(id) == 0 && sys_reg_CRm(id) >= 1 &&
-> 		sys_reg_CRm(id) < 8);
-> @@ -1886,7 +1889,7 @@ static bool access_ctr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> 	if (p->is_write)
-> 		return write_to_read_only(vcpu, p, r);
->
-> -	p->regval = read_sanitised_ftr_reg(SYS_CTR_EL0);
-> +	p->regval = IDREG(vcpu->kvm, SYS_CTR_EL0);
-> 	return true;
-> }
->
-> @@ -2475,7 +2478,10 @@ static const struct sys_reg_desc sys_reg_descs[] = {
-> 	{ SYS_DESC(SYS_CCSIDR2_EL1), undef_access },
-> 	{ SYS_DESC(SYS_SMIDR_EL1), undef_access },
-> 	{ SYS_DESC(SYS_CSSELR_EL1), access_csselr, reset_unknown, CSSELR_EL1 },
-> -	{ SYS_DESC(SYS_CTR_EL0), access_ctr },
-> +	ID_WRITABLE(CTR_EL0, CTR_EL0_DIC_MASK |
-> +			     CTR_EL0_IDC_MASK |
-> +			     CTR_EL0_DminLine_MASK |
-> +			     CTR_EL0_IminLine_MASK),
-> 	{ SYS_DESC(SYS_SVCR), undef_access },
->
-> 	{ PMU_SYS_REG(PMCR_EL0), .access = access_pmcr, .reset = reset_pmcr,
-> @@ -3714,18 +3720,11 @@ FUNCTION_INVARIANT(midr_el1)
-> FUNCTION_INVARIANT(revidr_el1)
-> FUNCTION_INVARIANT(aidr_el1)
->
-> -static u64 get_ctr_el0(struct kvm_vcpu *v, const struct sys_reg_desc *r)
-> -{
-> -	((struct sys_reg_desc *)r)->val = read_sanitised_ftr_reg(SYS_CTR_EL0);
-> -	return ((struct sys_reg_desc *)r)->val;
-> -}
-> -
-> /* ->val is filled in by kvm_sys_reg_table_init() */
-> static struct sys_reg_desc invariant_sys_regs[] __ro_after_init = {
-> 	{ SYS_DESC(SYS_MIDR_EL1), NULL, get_midr_el1 },
-> 	{ SYS_DESC(SYS_REVIDR_EL1), NULL, get_revidr_el1 },
-> 	{ SYS_DESC(SYS_AIDR_EL1), NULL, get_aidr_el1 },
-> -	{ SYS_DESC(SYS_CTR_EL0), NULL, get_ctr_el0 },
-> };
->
-> static int get_invariant_sys_reg(u64 id, u64 __user *uaddr)
->
-> -- 
-> Thanks,
-> Oliver
->
->
+Jean
 
