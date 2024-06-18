@@ -1,226 +1,208 @@
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A216195381
-	for <kvmarm@lists.linux.dev>; Mon, 17 Jun 2024 18:37:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E05AB10A16
+	for <kvmarm@lists.linux.dev>; Tue, 18 Jun 2024 00:01:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718649457; cv=none; b=E5BNl2NN40kYq5l/z41t9zQyn/1/2HEkogJCJP8aw4GZ6mQWwddICYsLxkLvitEf1mwV40NJnmX74V5XyuyR00EPYIPaWsQd3ds1t/xRIki1257BpeZTOr/OkEnpaDGoICWplP7xg6D0izYkxpCtwJPQAO/CpX3YgHmE/6uTt3s=
+	t=1718668879; cv=none; b=eSCfvJIOHCuMBLuYSZrWYmbNkXpS2vgrgDAbEZ7FCrh1zJMcJioIeY51MjGxCRVGXhZqjGFedL9d8gmcLDdj3mRgGKDoZCDQ4dmQBPlh0NqRmYF86ny+OiGBC6Tb832YbnA83B+OGdPJi5X5h72vS3uAylku81AGDFTItO/PYz4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718649457; c=relaxed/simple;
-	bh=fyrpp2yF4aIYKTN8cDgvs3STrDN8prieilqUnx09/SI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=sL6BjLqwPJZ4mDH660V4EWD/F+ioDEOhQOQJtDOH32N8PQQpg8TDR1cgLvgnrgCWQAGE1LZycuMPkLK0Qll+d5UdJaF0tcO6rZklnFOaKkYghG6aBxGVT54/YpXfSixNjgxUKHbNmFY2IbruFvwOM+ngjpASi6OpzfUJsPDcEHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vR+/+WiP; arc=none smtp.client-ip=209.85.216.73
+	s=arc-20240116; t=1718668879; c=relaxed/simple;
+	bh=e/6DXxfSmYa3PcUmKtpMGJIGbMO7nKFl8LeS2R3DEGw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Su2ZzimMgMyvn84EVB7Rhkk0Ej8w9WKUMMQHRuhGuBp5Mb76nUuz6FkCGy2nLu/rdsH0k8MuCM1RvcqGZS3TTCOiPqKl0Ccy2VoZimRAzc79nyzg6FuF/hMOe7IXlSNjQGweKy2AQTj4TTLsSoYofnlHdld0RYQ+4PadDZqRH+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Cqe3OH28; arc=none smtp.client-ip=209.85.160.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vR+/+WiP"
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2c2dd8026dbso4517503a91.0
-        for <kvmarm@lists.linux.dev>; Mon, 17 Jun 2024 11:37:35 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Cqe3OH28"
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-443580f290dso67231cf.1
+        for <kvmarm@lists.linux.dev>; Mon, 17 Jun 2024 17:01:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718649455; x=1719254255; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=VVb9bJW/yXgkQj+PV0cMLcdHxyPeYBELQ67LgqP0P74=;
-        b=vR+/+WiPBWAX5CwhbmashRXN4Av/BX9sUvbpWm7rh2zhfx9MUde4IHe0sKyQGr/k0t
-         ScIt4izzvaklX08ZQT2l1fRUVuYu9JFY1PRVhCLdvMDDuos0+C0gA5cJWdWPNaB1B0QR
-         FKElqutLJ8ofriSYC1UzT7005vvWqosaja9bl3hlBnFvZPhsaEXa+jB9s88ZoPJE2qGN
-         GuWPblvpIhla1BAFsJCGUwsbipUwxBznUiLdFYg2B8wyljOjoPOzHDicU2fLh5g/C7+3
-         cOwspQDph3rCp+wxRTSm55dPnGL/q4UbNv89yhghZQHRLeiMvpMN4QOG6HYWn+mV4UaM
-         oF7g==
+        d=google.com; s=20230601; t=1718668877; x=1719273677; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WYJUxDNTjiWQv0Dn1lpauSNYmPE3A/rHJsXpHH3eFP8=;
+        b=Cqe3OH28gyS+vL0FkjXh+Vce+M7p8avLMJHrsbUtW+rdoABQfQcM6hJLhgBXZauZ0g
+         hLEx+NuWLHms/5bgkF6cuSIH7LsRwbhtCmLhM6v0TgHfQ4L822ya5GzPQbd/E3vnoElf
+         BZrt9svOyWccgM2PMsLniqWKR2nkVlcZ5LyI9aHwGMLHx2I83UEQHrm5hsiAgh5SlvJp
+         2aZ2xWBfhO1aQOSKJRjIH01zsUtZmLwVcuT5C4rDUsyIsK/RMzi9gu0JoIzcmd1A2+ed
+         v0yQzyCyYo7bIyMf6Ze7+EruM8axBLDvMTB4hQYhHaHU+h7yBILSrMHeUYYRMS/xsl52
+         XLlQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718649455; x=1719254255;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=VVb9bJW/yXgkQj+PV0cMLcdHxyPeYBELQ67LgqP0P74=;
-        b=Qj3AJB6eRxrPFXh8rslHHazumedmaY8/XDQB2EyApqdRZ/A6Nmf1SvCoYiDLDFqOx9
-         999+yba36ItrmReRvidXl5YKiRjWh6TPouMhKreCO9hWausgRHRiYX/FzDAOm4gwL1k7
-         vqGKcgWkDnjItWJcYrjemVIgeJuTcvz59dpEBowECY9SvYMit5e6OocmCtw18E7vwijU
-         BN2gkWyY7XJoIeADs59OWW45lhsnOOkSETUa6kUhOyfw9SmtPn03bOHcNnDWX2DwRorW
-         WNOlU+0TuRKbIgOehj/EcJuUY88oH7VZXHULZUM024XgosJK1KUSB7KqSI1wPDsTXyYX
-         Yifw==
-X-Forwarded-Encrypted: i=1; AJvYcCVAtAmIM4MhZu30cJtHt8cEd1CQacRa8yhzsUADHtmhOPf7bfCBc0/xSvO7nbDJR+YGYWYdKHQvJWqFUdygkm33wmUL+Kx5
-X-Gm-Message-State: AOJu0YyzH3tGLBwi9gK4j+p17V+k3Km5eSX6wIydDNHn/Nxtf3KXrY5D
-	0nDuS/vxfH33k/590hKViDb/4VPzDgH4rFtv6Ovo+o6TWryAewbR54nViAj0ByTHe3Bov4dCEuN
-	cpA==
-X-Google-Smtp-Source: AGHT+IF3ovJSiOKecScB3AmrwPx3A35/rUgMT/905FvA0ZGLjFKkhGdKFyVMw2sGINH1wDrN4Gap7jytJ8g=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:9cb:b0:2c4:e074:de83 with SMTP id
- 98e67ed59e1d1-2c6c9221593mr1951a91.2.1718649455060; Mon, 17 Jun 2024 11:37:35
- -0700 (PDT)
-Date: Mon, 17 Jun 2024 11:37:27 -0700
-In-Reply-To: <CADrL8HW3rZ5xgbyGa+FXk50QQzF4B1=sYL8zhBepj6tg0EiHYA@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1718668877; x=1719273677;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WYJUxDNTjiWQv0Dn1lpauSNYmPE3A/rHJsXpHH3eFP8=;
+        b=Yg5U7GuwRulzF6lRb337yHw2ZdBvFtvqyVHgRzvxnHffjRwgxTVpqpKHHcSjw9SA36
+         5iSGw9DEvyQtVldVYDk98ljF1/4HNfcm5cyKazA8U3aSZnNbfhi/athWmSpQd1WXPu5U
+         8FmAsaZuGz0eNVTSyjxlhJbJBa79zk8BAGeWezevGTvsZPA0dobSaxUfszJOgOfrgaht
+         QINJ9rTk0woEo6MYtbB226ga+l6K08infcK1IKD+G8VqHcVtIhgzS9lSW+GB2/FfTVDM
+         xrketXKsqylhAxoGccG6DMdY6m+/rUD5NFIGwU/epcGxfoRykj7/Izw+QXkpVM04MQsH
+         ii0w==
+X-Forwarded-Encrypted: i=1; AJvYcCX723Gqtj51iq2bXlSpt6d94JLXxtHbchL6lTBYgMpcfOPU+pTiO6Hu6YYBK3bs8kApz3MIPzxXOQTLJdxtPJt4jMkpo7N0
+X-Gm-Message-State: AOJu0YxvdxqEty6PVa4rVFBLtGqwRWT/Lzo+6+Ip5hRGTsIyqTlS117x
+	oF3GOIkNiFD+GkKpp3loiGLNrngjRPO9OmKbAlXus778Ivd4+O2fhjRdoyHO8pPZxoQcK1v0IZ/
+	IYueyFgmvs72WxukmqML/uMrqKo7/w++hfB1A
+X-Google-Smtp-Source: AGHT+IHL1VOVBEEYIsDFmk7aYzMKo8+wU/oagSvanZsj7KqgaXrEPucAwYquOmDWm0/JC3eqHJ8+6hozxzfwg6DHtB4=
+X-Received: by 2002:a05:622a:4e96:b0:444:a09e:c60e with SMTP id
+ d75a77b69052e-444a09ed740mr85851cf.24.1718668876650; Mon, 17 Jun 2024
+ 17:01:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <CAOUHufYGqbd45shZkGCpqeTV9wcBDUoo3iw1SKiDeFLmrP0+=w@mail.gmail.com>
- <CADrL8HVHcKSW3hiHzKTit07gzo36jtCZCnM9ZpueyifgNdGggw@mail.gmail.com>
- <ZmioedgEBptNoz91@google.com> <CADrL8HU_FKHTz_6d=xhVLZFDQ_zQo-zdB2rqdpa2CKusa1uo+A@mail.gmail.com>
- <ZmjtEBH42u7NUWRc@google.com> <CADrL8HUW2q79F0FsEjhGW0ujij6+FfCqas5UpQp27Epfjc94Nw@mail.gmail.com>
- <ZmxsCwu4uP1lGsWz@google.com> <CADrL8HVDZ+m_-jUCaXf_DWJ92N30oqS=_9wNZwRvoSp5fo7asg@mail.gmail.com>
- <ZmzPoW7K5GIitQ8B@google.com> <CADrL8HW3rZ5xgbyGa+FXk50QQzF4B1=sYL8zhBepj6tg0EiHYA@mail.gmail.com>
-Message-ID: <ZnCCZ5gQnA3zMQtv@google.com>
-Subject: Re: [PATCH v5 4/9] mm: Add test_clear_young_fast_only MMU notifier
-From: Sean Christopherson <seanjc@google.com>
-To: James Houghton <jthoughton@google.com>
-Cc: Yu Zhao <yuzhao@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Ankit Agrawal <ankita@nvidia.com>, 
-	Axel Rasmussen <axelrasmussen@google.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	David Matlack <dmatlack@google.com>, David Rientjes <rientjes@google.com>, 
-	James Morse <james.morse@arm.com>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Raghavendra Rao Ananta <rananta@google.com>, 
-	Ryan Roberts <ryan.roberts@arm.com>, Shaoqin Huang <shahuang@redhat.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Wei Xu <weixugc@google.com>, 
-	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+References: <20240613082345.132336-1-shahuang@redhat.com> <20240613082345.132336-3-shahuang@redhat.com>
+In-Reply-To: <20240613082345.132336-3-shahuang@redhat.com>
+From: Raghavendra Rao Ananta <rananta@google.com>
+Date: Mon, 17 Jun 2024 17:01:02 -0700
+Message-ID: <CAJHc60y67Be=XcJuy__2RN43WyN6YgukSAb0=T6TGwYHw+YpHg@mail.gmail.com>
+Subject: Re: [PATCH v9 2/3] KVM: selftests: aarch64: Introduce pmu_event_filter_test
+To: Shaoqin Huang <shahuang@redhat.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, 
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jun 17, 2024, James Houghton wrote:
-> On Fri, Jun 14, 2024 at 4:17=E2=80=AFPM Sean Christopherson <seanjc@googl=
-e.com> wrote:
-> >
-> > On Fri, Jun 14, 2024, James Houghton wrote:
-> > > On Fri, Jun 14, 2024 at 9:13=E2=80=AFAM Sean Christopherson <seanjc@g=
-oogle.com> wrote:
-> > > >
-> > > > On Thu, Jun 13, 2024, James Houghton wrote:
-> > > > > I wonder if this still makes sense if whether or not an MMU is "f=
-ast"
-> > > > > is determined by how contended some lock(s) are at the time.
-> > > >
-> > > > No.  Just because a lock wasn't contended on the initial aging does=
-n't mean it
-> > > > won't be contended on the next round.  E.g. when using KVM x86's sh=
-adow MMU, which
-> > > > takes mmu_lock for write for all operations, an aging operation cou=
-ld get lucky
-> > > > and sneak in while mmu_lock happened to be free, but then get stuck=
- behind a large
-> > > > queue of operations.
-> > > >
-> > > > The fast-ness needs to be predictable and all but guaranteed, i.e. =
-lockless or in
-> > > > an MMU that takes mmu_lock for read in all but the most rare paths.
-> > >
-> > > Aging and look-around themselves only use the fast-only notifiers, so
-> > > they won't ever wait on a lock (well... provided KVM is written like
-> > > that, which I think is a given).
-> >
-> > Regarding aging, is that actually the behavior that we want?  I thought=
- the plan
-> > is to have the initial test look at all MMUs, i.e. be potentially slow,=
- but only
-> > do the lookaround if it can be fast.  IIUC, that was Yu's intent (and p=
-eeking back
-> > at v2, that is indeed the case, unless I'm misreading the code).
->=20
-> I believe what I said is correct. There are three separate things going o=
-n here:
->=20
-> 1. Aging (when we hit the low watermark, scan PTEs to find young pages)
-> 2. Eviction (pick a page to evict; if it is definitely not young, evict i=
-t)
-> 3. Look-around (upon finding a page is young upon attempted eviction,
-> check adjacent pages if they are young too)
+Hi Shaoqin
 
-Ah, I now see the difference between #1 and #2, and your responses make a l=
-ot more
-sense.  Thanks!
 
-> > If KVM _never_ consults shadow (nested TDP) MMUs, then a VM running an =
-L2 will
-> > end up with hot pages (used by L2) swapped out.
->=20
-> The shadow MMU is consulted at eviction time -- only at eviction time.
-> So pages used by L2 won't be swapped out unless they're still cold at
-> eviction time.
->=20
-> In my (and Yu's) head, not being able to do aging for nested TDP is ok
-> because running nested VMs is much more rare than running non-nested
-> VMs. And in the non-nested case, being able to do aging is a strict
-> improvement over what we have now.
+On Thu, Jun 13, 2024 at 1:28=E2=80=AFAM Shaoqin Huang <shahuang@redhat.com>=
+ wrote:
 
-Yes and no.  Running nested VMs is indeed rare when viewing them as a perce=
-ntage
-of all VMs in the fleet, but for many use cases, the primary workload of a =
-VM is
-to run nested VMs.  E.g. say x% of VMs in the fleet run nested VMs, where '=
-x' is
-likely very small, but for those x% VMs, they run nested VMs 99% of the tim=
-e
-(completely made up number).
+> +static void prepare_expected_pmce(struct kvm_pmu_event_filter *filter)
+> +{
+> +       struct pmu_common_event_ids pmce_mask =3D { ~0, ~0 };
+> +       bool first_filter =3D true;
+> +       int i;
+> +
+> +       while (filter && filter->nevents !=3D 0) {
+Do you also want to add a check to ensure we aren't running over
+FILTER_NR (I'd expect a compiler warning/error though)?
 
-So yes, I completely agree that aging for non-nested VMs is a strict improv=
-ement,
-but I also think don't think we should completely dismiss nested VMs as a p=
-roblem
-not worth solving.
+> +               if (first_filter) {
+> +                       if (filter->action =3D=3D KVM_PMU_EVENT_ALLOW)
+> +                               memset(&pmce_mask, 0, sizeof(pmce_mask));
+> +                       first_filter =3D false;
+> +               }
+nit: Probably we can make the 'first_filter' part a little cleaner by
+checking this outside the loop.
 
-> We could look into being able to do aging with the shadow MMU, but I
-> don't think that should necessarily block this series.
+if (filter && filter->action =3D=3D KVM_PMU_EVENT_ALLOW)
+        memset(&pmce_mask, 0, sizeof(pmce_mask));
 
-...
+while (filter && filter->nevents !=3D 0) {
+    ...
+}
 
-> > Ooh!  Actually, after fiddling a bit to see how feasible fast-aging in =
-the shadow
-> > MMU would be, I'm pretty sure we can do straight there for nested TDP. =
- Or rather,
-> > I suspect/hope we can get close enough for an initial merge, which woul=
-d allow
-> > aging_is_fast to be a property of the mmu_notifier, i.e. would simplify=
- things
-> > because KVM wouldn't need to communicate MMU_NOTIFY_WAS_FAST for each n=
-otification.
-> >
-> > Walking KVM's rmaps requires mmu_lock because adding/removing rmap entr=
-ies is done
-> > in such a way that a lockless walk would be painfully complex.  But if =
-there is
-> > exactly _one_ rmap entry for a gfn, then slot->arch.rmap[...] points di=
-rectly at
-> > that one SPTE.  And with nested TDP, unless L1 is doing something uncom=
-mon, e.g.
-> > mapping the same page into multiple L2s, that overwhelming vast majorit=
-y of rmaps
-> > have only one entry.  That's not the case for legacy shadow paging beca=
-use kernels
-> > almost always map a pfn using multiple virtual addresses, e.g. Linux's =
-direct map
-> > along with any userspace mappings.
-=20
-...
+> +static struct test_desc tests[] =3D {
+> +       {
+> +               .name =3D "without_filter",
+> +               .filter =3D {
+> +                       { 0 }
+> +               },
+> +       },
+> +       {
+> +               .name =3D "member_allow_filter",
+> +               .filter =3D {
+> +                       DEFINE_FILTER(ARMV8_PMUV3_PERFCTR_SW_INCR, 0),
+In terms of readability, do you think it's better to use
+KVM_PMU_EVENT_{ALLOW|DENY}, instead of 0 and 1?
 
-> Hmm, interesting. I need to spend a little bit more time digesting this.
->=20
-> Would you like to see this included in v6? (It'd be nice to avoid the
-> WAS_FAST stuff....) Should we leave it for a later series? I haven't
-> formed my own opinion yet.
+Or, if that's coming out to be too long, may be create another wrapper
+over DEFINE_FILTER, and simply use that in the array:
 
-I would say it depends on the viability and complexity of my idea.  E.g. if=
- it
-pans out more or less like my rough sketch, then it's probably worth taking=
- on
-the extra code+complexity in KVM to avoid the whole WAS_FAST goo.
+#define EVENT_ALLOW(event) DEFINE_FILTER(event, KVM_PMU_EVENT_ALLOW)
+#define EVENT_DENY(event) DEFINE_FILTER(event, KVM_PMU_EVENT_DENY)
 
-Note, if we do go this route, the implementation would need to be tweaked t=
-o
-handle the difference in behavior between aging and last-minute checks for =
-eviction,
-which I obviously didn't understand when I threw together that hack-a-patch=
-.
+.filter =3D {
+    EVENT_ALLOW(ARMV8_PMUV3_PERFCTR_SW_INCR),
 
-I need to think more about how best to handle that though, e.g. skipping GF=
-Ns with
-multiple mappings is probably the worst possible behavior, as we'd risk evi=
-cting
-hot pages.  But falling back to taking mmu_lock for write isn't all that de=
-sirable
-either.
+> +                       DEFINE_FILTER(ARMV8_PMUV3_PERFCTR_INST_RETIRED, 0=
+),
+> +                       DEFINE_FILTER(ARMV8_PMUV3_PERFCTR_BR_RETIRED, 0),
+> +                       { 0 },
+> +               },
+> +       },
+
+> +       {
+> +               .name =3D "cancel_filter",
+> +               .filter =3D {
+> +                       DEFINE_FILTER(ARMV8_PMUV3_PERFCTR_CPU_CYCLES, 0),
+> +                       DEFINE_FILTER(ARMV8_PMUV3_PERFCTR_CPU_CYCLES, 1),
+> +               },
+Since the initial filter map depends on the event being allowed or
+denied, do you think another "cancel_filter" case to first deny and
+then allow would also be better?
+
+> +       },
+> +       {
+> +               .name =3D "multiple_filter",
+> +               .filter =3D {
+> +                       __DEFINE_FILTER(0x0, 0x10, 0),
+> +                       __DEFINE_FILTER(0x6, 0x3, 1),
+> +               },
+> +       },
+> +       { 0 }
+> +};
+> +
+> +static void run_tests(void)
+> +{
+> +       struct test_desc *t;
+> +
+> +       for (t =3D &tests[0]; t->name; t++)
+> +               run_test(t);
+> +}
+> +
+> +int used_pmu_events[] =3D {
+nit: static int used_pmu_events[] =3D {
+
+Thank you.
+Raghavendra
+
+
+> +       ARMV8_PMUV3_PERFCTR_BR_RETIRED,
+> +       ARMV8_PMUV3_PERFCTR_INST_RETIRED,
+> +       ARMV8_PMUV3_PERFCTR_CHAIN,
+> +};
+> +
+> +static bool kvm_pmu_support_events(void)
+> +{
+> +       struct pmu_common_event_ids used_pmce =3D { 0, 0 };
+> +
+> +       create_vpmu_vm(guest_get_pmceid);
+> +
+> +       memset(&max_pmce, 0, sizeof(max_pmce));
+> +       sync_global_to_guest(vpmu_vm.vm, max_pmce);
+> +       run_vcpu(vpmu_vm.vcpu);
+> +       sync_global_from_guest(vpmu_vm.vm, max_pmce);
+> +       destroy_vpmu_vm();
+> +
+> +       for (int i =3D 0; i < ARRAY_SIZE(used_pmu_events); i++)
+> +               set_pmce(&used_pmce, KVM_PMU_EVENT_ALLOW, used_pmu_events=
+[i]);
+> +
+> +       return ((max_pmce.pmceid0 & used_pmce.pmceid0) =3D=3D used_pmce.p=
+mceid0) &&
+> +              ((max_pmce.pmceid1 & used_pmce.pmceid1) =3D=3D used_pmce.p=
+mceid1);
+> +}
+> +
+> +int main(void)
+> +{
+> +       TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_PMU_V3));
+> +       TEST_REQUIRE(kvm_pmu_support_events());
+> +
+> +       run_tests();
+> +}
+> --
+> 2.40.1
+>
+>
