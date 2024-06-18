@@ -1,530 +1,188 @@
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11olkn2109.outbound.protection.outlook.com [40.92.18.109])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7280D46B80;
-	Tue, 18 Jun 2024 16:04:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.18.109
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718726663; cv=fail; b=ZwjRY7QrfGpla02CskMhJyekPOVf2QwQJUnEF+RYPY6mHrViWrcBY2Jhe2hLcXE/wxoWzMw2pFzvCMLCnuOncnCX0xHOyvGTW0iB8L0mkK4DoeSkR7ECo3/WjlPc0u1qPfctBju0ifnxTzRM6qfXcqqi7v0M51Jmh8raz1ALWww=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718726663; c=relaxed/simple;
-	bh=XL3P/Y0I08GB369aM6D/nUeIb+67GtVCUERYOTWm/tk=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=eE2F3HlgTMi6hjDfzviAS0tDSowKSXIK5+hJr/j0HQKwj+84oM1sB8FF+LZli4H6E6srrxyGchmlGiEeXly0KxP0txJvffucY1Xj/zot9KIQN17Qu/GfMWbB2ScEm7ucRA5q7De+iewsO8cDlXxSTxOEHq9QOS0vrtgHOwVnVds=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=KpJIKUBW; arc=fail smtp.client-ip=40.92.18.109
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D82122626
+	for <kvmarm@lists.linux.dev>; Tue, 18 Jun 2024 17:18:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718731099; cv=none; b=TTTwgYzIkdgX0JQk96BIyV3gAohIJa37gpv+BN75ZQEa2WftNC/RBSvegVh2tMZR3udWRMuUD7DZ/FT8yhNzooyL9wl3VE86OVqz4ywlixFoZf+p8adfGtqpmbkEmeLCv7rp/StwPn4+oP5qj30J5nvpQjqqBkuMPIluYwY17KQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718731099; c=relaxed/simple;
+	bh=E88BmaAsDqYTdfzwzSxjDe2vL9VlXR7afjBpCMNDWnk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=o4hX9k/EAXSNLsbfbIzEoMrlJ56kBOY4N6XMx0hNViirmIQh96ZOxv4hFVT1tuvu/rqK2/VFW1c62rAuMOMHK6UoTX9eBptcuGnDgbSPukLhyyJcsZ+GxPseZeAO9B3iES5Q0Pe75/HXIcxONagrgW4kapHUM3QEkNp4F3Fb62I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=N7L8x5fb; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="KpJIKUBW"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IUXQsMfehpQvwuiiuM7OQPgJHPPNkQbthTOMNNyuKk43zrIez5Okw3qFUTG3hERgDoZwawtITputlvC9QBY9XpH2eq8G/ZM2RfRDFiNx/IQvqfv7blrK6fnHKWVCZPUJ1iYp1L8xFS89ioTEhWXNdLAw/KHiUGEmtbrtBVbJ3ZH8Yv02Q43P2qZe8jdW+Afw4B25yW3ufAxeWUKcHIODBcSivbVh6rHTaKWbY368Rv6nS9SYXxkN+wp0uNADcC429jUHkMhPCx3NOJ0WoRw/rJ8C0CHbILOLgjoMbiV8uO4ihYyBNVGuhcBlwGXtyGcKq+BYMxfmGyx8QJDLH9O6Cg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jNJk2+KK43abrJhB/hhsNJh/iy0DqltHo+5M4eNm2MM=;
- b=PV4OHt1PtMdZt5YSftsGN8KiCjRcDS5CmbCduKwSlQGkfFW1fpPu5ATR4XO0dt5yIWoM+RaRNhs0k2pTGoZC2QNOKBMWpRspD43X/kbHsSAu325uazfA54RowJCnYNkozPYUWlof2n0QGsU7SdmCX+quWGC7yaUI0buk6gYfEbd10h+2CQGws/oI/GKQcETn59bB+lQdYYyClRgI4Yuq5xHyC2gTRZUd90FhP5Qw/JeQFWoVDIL9XWbKoxPY+ZT0W+Zl05GhVVRda+h1OzdQX0UulbpEkq2gClNowGcsdj7gG4oBQlacZaOxa3HYqDE3n/0TZ4uWOOft4FsPYJKqIA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jNJk2+KK43abrJhB/hhsNJh/iy0DqltHo+5M4eNm2MM=;
- b=KpJIKUBWE9C3PpP3mDSty5aHxcnGCMBc9apoKWbtTg7kX+WzsoZ3LE1p17XxYnUXXWzCy1/RSEgliBQ0lFaNTK1rBl+g9S/OKGZZfftbbQlx4NNbPM6xRYStuhjKKOCJufdIIiYgBwWR6S33gl9PK28ZLUGcmxMKQypJPelGGvL1sSoovVf/oHU1jRGy5i4YveZeHcdkfRQPwT8fxZ7JOKPvCNDJdc5UXdbpbVU55yL7bP+sA2DW6ZnlX2Nirs0ZOaCoGi4KTROJPkNISEXzSaLzkqogA0VWWPOJIf7cY1UHIPvcQySPJp7w/RI4LcLXGoqtn8BYVFDwsZkKKOnNCA==
-Received: from SN6PR02MB4157.namprd02.prod.outlook.com (2603:10b6:805:33::23)
- by CY8PR02MB9450.namprd02.prod.outlook.com (2603:10b6:930:73::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.31; Tue, 18 Jun
- 2024 16:04:18 +0000
-Received: from SN6PR02MB4157.namprd02.prod.outlook.com
- ([fe80::cedd:1e64:8f61:b9df]) by SN6PR02MB4157.namprd02.prod.outlook.com
- ([fe80::cedd:1e64:8f61:b9df%2]) with mapi id 15.20.7677.024; Tue, 18 Jun 2024
- 16:04:18 +0000
-From: Michael Kelley <mhklinux@outlook.com>
-To: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>
-CC: Steven Price <steven.price@arm.com>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>, Oliver
- Upton <oliver.upton@linux.dev>, Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, Joey Gouly <joey.gouly@arm.com>, Alexandru
- Elisei <alexandru.elisei@arm.com>, Christoffer Dall
-	<christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
-	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>, Ganapatrao
- Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: RE: [PATCH v3 12/14] arm64: realm: Support nonsecure ITS emulation
- shared
-Thread-Topic: [PATCH v3 12/14] arm64: realm: Support nonsecure ITS emulation
- shared
-Thread-Index:
- AQHatyvDpGLInPLe1k+KxuF+HFPQEbG5LUiAgAAY6oCAAUD3AIAAi9kAgAGGSYCAESO6QA==
-Date: Tue, 18 Jun 2024 16:04:17 +0000
-Message-ID:
- <SN6PR02MB41578FDF4DD1013FEF690069D4CE2@SN6PR02MB4157.namprd02.prod.outlook.com>
-References: <20240605093006.145492-1-steven.price@arm.com>
- <20240605093006.145492-13-steven.price@arm.com>
- <86a5jzld9g.wl-maz@kernel.org> <4c363476-e5b5-42ff-9f30-a02a92b6751b@arm.com>
- <867cf2l6in.wl-maz@kernel.org> <ZmICEN8JvWM7M9Ch@arm.com>
- <ZmNJdSxSz-sYpVgI@arm.com>
-In-Reply-To: <ZmNJdSxSz-sYpVgI@arm.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-tmn: [JM09eADDQR+3PcmA6opUM767Zvhcms9H]
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SN6PR02MB4157:EE_|CY8PR02MB9450:EE_
-x-ms-office365-filtering-correlation-id: 1d43d9ea-3167-40c9-0ad2-08dc8fb04ed9
-x-microsoft-antispam:
- BCL:0;ARA:14566002|461199025|3412199022|440099025|102099029|56899030;
-x-microsoft-antispam-message-info:
- epJOZL+/4bIK25OBUoJ/rK7F7zAdf0iZnjMY0bY5lRKW7MvQrawu9uwmd0UZNGtpUNVn99JUNLCC3L2yoOIVq4uklxcJ1k5vvkvHtCgE0QPDiw25Ll5gyL6CaBIeM4KY/3oPK7mrTFStLu88paByzRGFNdpKxr2IdaH4lHFntNNM4Iq6tPifIWIWhbukU51ZWOFG/xVMi16wuyqDX1hIvPJGKWi488gkU7cpeL8sm07izpfHffYpu3E7+QYJnOKjYpcQgG6Pja35eWM7COrVudjPPYA0a90b5bngImpNgIyw62HDdXw+rD82ctw9Go1vNO1v4HIkgMU0wyLpxIGkAAqUTvtm2EOwaePf0MdyCFvSwPnfr1bCTCW0lZT+tHU+Z411kcGUnY/7k6iGOoG3TcJSs4GFSDil5LgG0AbhYrgWYAgq4pkPahO1d6EQQ1epWcy0HGwaYkDbEWWaIUHdEOiiWKk5T5oQa0E2khSp8fGWUpZ59KB+Hd2MBnTcmbEnHun1HlxCl2wwMevg20gDx9kXrBLckHqYUUxh0EULuKl3H4FFbowiG+6sVqvxQr9i
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?Jhut+P2Gbr+TclKmy+g50YW+NgXK5lWadgaRMU3EjSd6+xlFiTkUh9soDRwK?=
- =?us-ascii?Q?QJqMx1gjMMifqgA7bSGCzD9iK4859rPgx4UyjCQdF4m/9g7lq0h0uWfTVxgx?=
- =?us-ascii?Q?9pWmB/o8UYZyK0X8hF7SDaP8J7iaeGwFTN7r3JYuSuOfStMRW4cld9M62pfD?=
- =?us-ascii?Q?oDTucecOFUMNOcxdETDtk5S3YJ3cCSoNNyhuTPA8TrriZDV5Vya1VWQS4zK3?=
- =?us-ascii?Q?y3/lN/ay3lJ8UNyiFeKkuHPh0Q7hopzW1CbkGey5ZcQxAygaUBzw+IdBy3Hy?=
- =?us-ascii?Q?brFDWkFZRPT1YFFLol2o/7JM5Gf8RMdThgPX337p8Mi10h3OBkNDjiqx1WUF?=
- =?us-ascii?Q?k7Ppulgw4/JTvaFvhBylAm5cZdApbbUilyXFltiuVpK6eKBDyGrDnCaQimmg?=
- =?us-ascii?Q?GRNm6dwmloYqkEMVV/hkLCskb2vAbA+laMLuFMyhEPy1nsyiLSc+pDW9Xr+4?=
- =?us-ascii?Q?UPvvXYrDOJMX9wTqJQBpFcYP7SK+Bc3fCxRIyra56lXGdr4PxdNSFTSe8nyQ?=
- =?us-ascii?Q?+dUujJBrz1ZxteMzLiiUM2DCGCEbpYcFAY7MrzAVGu3ZiCVGw+uUx2Hx6fNl?=
- =?us-ascii?Q?kuI7jJ0A8F0aVEval35kGd7ndttbbipQqMfDzftVJTyRhhMlikpNJq0nNbSf?=
- =?us-ascii?Q?ly1B1wEQ9uri4Xp6mmtSD5XOON2ggIPIReOwqwF6BQfx0twCxB2tUZ0TREcD?=
- =?us-ascii?Q?ftSMFDXpzTEyRCTO7/uFkJsDoy3L88RC43X04zSc5CnhUT9cooC53PE7M/Re?=
- =?us-ascii?Q?JO5LhiHaAJv88jNhlGemuP0zBKA9NrmEU/tpnCmQgmeeaL3kL50Z0v9eQSFc?=
- =?us-ascii?Q?6Mxm1MIYCih25CwgQuruTTxfkoiTgG8KHEcVAcFy8j8sN1KVfGzRKXq2gzqw?=
- =?us-ascii?Q?f+/Vu3ODOhjVi8frI6XgmQFz78VX1RJ/PPvxCx8v195+1vCGynajx+MAx1l5?=
- =?us-ascii?Q?lGmJDyLFe0uUSQzk3VD+EQnalIlwiK9JoAAzMiZcPiuF9ogcBidVu/vcd53J?=
- =?us-ascii?Q?435cRoBIwczXblvAu7vkFQWu/dFfvd40j/xgnjEsjbqfr8IF48Jz24k/vhoI?=
- =?us-ascii?Q?c1ig45mt2ztLY/RabOgHTP2STniLUgMIanMmQMM8WFUijErni0jF9Qd1nZN8?=
- =?us-ascii?Q?uJuThRWIho+9wDMTngOoxRcK1qbL7ySSurpqOnH8KuhsAD4cuZxj92LSnmua?=
- =?us-ascii?Q?sYECQ+DPfdkvlguBXSyIhPvc3ztWL6ULhwv/Nuw6RQbpMNV4iYGog6XijK4?=
- =?us-ascii?Q?=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N7L8x5fb"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718731096;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OfA3LwMbE/DUvF/p13i3FzTY1dQr+PSeG8moXb5mK1s=;
+	b=N7L8x5fbAVOoDnc2xmXqk8fMtcmQA7GSCwgx/ZlOFi+RubzPlbxX3qEmBMrzi3be0dUu24
+	BDmAtYuyrc+LGQuV60tLH/IEtUjj1axKcP81r5pJuSA39naeSA0glACZbmr4ZnMoEUeR7g
+	tbDUpBVCwVuvPT8616wJXHNUCfp6tpA=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-528-3ALzVm5YNHq6pY3v5Nhwkw-1; Tue, 18 Jun 2024 13:18:14 -0400
+X-MC-Unique: 3ALzVm5YNHq6pY3v5Nhwkw-1
+Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6b06812d93bso71510506d6.3
+        for <kvmarm@lists.linux.dev>; Tue, 18 Jun 2024 10:18:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718731094; x=1719335894;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OfA3LwMbE/DUvF/p13i3FzTY1dQr+PSeG8moXb5mK1s=;
+        b=QFZcEbhgAMLA05jtqAJFnJiO+EsC8GFJHxmxj00OSj2lTmZPr14m+AkDS7HUknk73s
+         FGpl5nu+jZswqIOdcIjLZ6JCSARQ5g4GpzQKyinm2nCeGRR2O4IUwPM+tZE0BgFqIY34
+         6FX71sLMc9bmzMXyfCyiixmxKZ6LtSAR9k8xkbikDZOx+z6D1CvwADrbeiUuNoZxI1Wf
+         zvfMvhzOU55wjNTQF0sNf47Bw4OchBT/YZlW+gqU2whBEbzytSrM6Ratn43IeURo1Oex
+         kLLDyFKn5o3T6sJedEdPM4ZykEkWyZ7KwdohoN5bmCULQhRFNhUD5U/G94jKsg67rbNm
+         iwcg==
+X-Forwarded-Encrypted: i=1; AJvYcCVKIDMHufkpbwTwlr2IM43sSzfpnMawpO4VmmCvWi6yHoYfdUgveOu8Sf1sLdGgi/VqmhAlwy3Mmg3wnMxuJqcHvBASYs4t
+X-Gm-Message-State: AOJu0YybuoqnAAf0dl6Q+q6ey/049v3INTnXyOHG43Z7F8wYRrIADHQe
+	MYIZrAHlEu7s67r0iyibu8sVUKIkpeSFixRzYaZsSX0H5yOEb+CGKFPi7/afynZKgk189KoM8hw
+	1vl71hC4eDcyhoXct1RXZBqObLZ/pKCZ+xhLJYbApqe/ukITcWZ0l0g==
+X-Received: by 2002:ad4:5508:0:b0:6b2:9e65:2246 with SMTP id 6a1803df08f44-6b501e0a68emr4186136d6.1.1718731094105;
+        Tue, 18 Jun 2024 10:18:14 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGnOWYZtT+CrBMBJyfraQd9XFFGxxruwbtn92rRH2IHusIXYoHSyCpTlIommLhnHzvRVdf/nA==
+X-Received: by 2002:ad4:5508:0:b0:6b2:9e65:2246 with SMTP id 6a1803df08f44-6b501e0a68emr4185246d6.1.1718731092764;
+        Tue, 18 Jun 2024 10:18:12 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b2a5c18209sm68915006d6.42.2024.06.18.10.18.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 18 Jun 2024 10:18:12 -0700 (PDT)
+Message-ID: <8f9d74fc-f9d9-43ac-a387-91ff804cfaf1@redhat.com>
+Date: Tue, 18 Jun 2024 19:18:08 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR02MB4157.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1d43d9ea-3167-40c9-0ad2-08dc8fb04ed9
-X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Jun 2024 16:04:17.9320
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR02MB9450
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: arm64: vgic-its: clear dte when mapd unmaps a device
+To: Marc Zyngier <maz@kernel.org>, Kunkun Jiang <jiangkunkun@huawei.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, Randy Dunlap <rdunlap@infradead.org>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ wanghaibin.wang@huawei.com, lishusen2@huawei.com
+References: <20240613093811.710-1-jiangkunkun@huawei.com>
+ <86v82ckimh.wl-maz@kernel.org>
+From: Eric Auger <eauger@redhat.com>
+In-Reply-To: <86v82ckimh.wl-maz@kernel.org>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Catalin Marinas <catalin.marinas@arm.com> Sent: Friday, June 7, 2024 =
-10:55 AM
->=20
-> On Thu, Jun 06, 2024 at 07:38:08PM +0100, Catalin Marinas wrote:
-> > On Thu, Jun 06, 2024 at 11:17:36AM +0100, Marc Zyngier wrote:
-> > > On Wed, 05 Jun 2024 16:08:49 +0100,
-> > > Steven Price <steven.price@arm.com> wrote:
-> > > > 2. Use a special (global) memory allocator that does the
-> > > > set_memory_decrypted() dance on the pages that it allocates but all=
-ows
-> > > > packing the allocations. I'm not aware of an existing kernel API fo=
-r
-> > > > this, so it's potentially quite a bit of code. The benefit is that =
-it
-> > > > reduces memory consumption in a realm guest, although fragmentation
-> > > > still means we're likely to see a (small) growth.
-> > > >
-> > > > Any thoughts on what you think would be best?
-> > >
-> > > I would expect that something similar to kmem_cache could be of help,
-> > > only with the ability to deal with variable object sizes (in this
-> > > case: minimum of 256 bytes, in increments defined by the
-> > > implementation, and with a 256 byte alignment).
-> >
-> > Hmm, that's doable but not that easy to make generic. We'd need a new
-> > class of kmalloc-* caches (e.g. kmalloc-decrypted-*) which use only
-> > decrypted pages together with a GFP_DECRYPTED flag or something to get
-> > the slab allocator to go for these pages and avoid merging with other
-> > caches. It would actually be the page allocator parsing this gfp flag,
-> > probably in post_alloc_hook() to set the page decrypted and re-encrypt
-> > it in free_pages_prepare(). A slight problem here is that free_pages()
-> > doesn't get the gfp flag, so we'd need to store some bit in the page
-> > flags. Maybe the flag is not that bad, do we have something like for
-> > page_to_phys() to give us the high IPA address for decrypted pages?
->=20
-> I had a go at this generic approach, Friday afternoon fun. Not tested
-> with the CCA patches, just my own fake set_memory_*() functionality on
-> top of 6.10-rc2. I also mindlessly added __GFP_DECRYPTED to the ITS code
-> following the changes in this patch. I noticed that
-> allocate_vpe_l2_table() doesn't use shared pages (I either missed it or
-> it's not needed).
->=20
-> If we want to go this way, I can tidy up the diff below, split it into a
-> proper series and add what's missing. What I can't tell is how a driver
-> writer knows when to pass __GFP_DECRYPTED. There's also a theoretical
-> overlap with __GFP_DMA, it can't handle both. The DMA flag takes
-> priority currently but I realised it probably needs to be the other way
-> around, we wouldn't have dma mask restrictions for emulated devices.
+Hi,
 
-As someone who has spent time in Linux code on the x86 side that
-manages memory shared between the guest and host, a GFP_DECRYPTED
-flag on the memory allocation calls seems very useful. Here are my
-general comments, some of which are probably obvious, but I thought
-I'd write them down anyway.
+On 6/13/24 16:44, Marc Zyngier wrote:
+> On Thu, 13 Jun 2024 10:38:11 +0100,
+> Kunkun Jiang <jiangkunkun@huawei.com> wrote:
+>>
+>> vgic_its_save_device_tables will traverse its->device_list to
+>> save dte for each device. vgic_its_restore_device_tables will
+>> traverse each entry of device table and check if it is valid.
+>> Restore if valid.
+>>
+>> But when mapd unmaps a devices, we do not invalidate the
+>> corresponding dte. In the scenario of continuous save
+>> and restore, there may be a situation where a device's dte
+>> is not saved but is restored. This is unreasonable and may
+>> cause restore to fail. This patch clears the corresponding
+>> dte when mapd unmaps a device.
+>>
+>> Singed-off-by: Shusen Li <lishusen2@huawei.com>
+> 
+>   ^^^^^^^^^^^^^ This isn't a valid tag!
+> 
+>> Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
+> 
+> Something is wrong. Either Shusen Li is the author and you are merely
+> posting it, in which case there should be a 'From' line in the commit
+> message, or you are co-authors and there should be a 'Co-developed-by'
+> right after Shusen Li's SoB.
+> 
+> Please read Documentation/process/submitting-patches.rst for the
+> details.
+> 
+>> ---
+>>  arch/arm64/kvm/vgic/vgic-its.c | 13 +++++++++++--
+>>  1 file changed, 11 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+>> index 40bb43f20bf3..dd5fba1e8ba3 100644
+>> --- a/arch/arm64/kvm/vgic/vgic-its.c
+>> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+>> @@ -1140,8 +1140,12 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
+>>  	u8 num_eventid_bits = its_cmd_get_size(its_cmd);
+>>  	gpa_t itt_addr = its_cmd_get_ittaddr(its_cmd);
+>>  	struct its_device *device;
+>> +	gpa_t gpa;
+>> +	const struct vgic_its_abi *abi;
+>> +	int dte_esz;
+>> +	u64 val;
+> 
+> Aside from 'gpa', all the extra variables should be moved into the
+> !valid block. And it would be nicer if this variable was called
+> something more descriptive.
+> 
+>>  
+>> -	if (!vgic_its_check_id(its, its->baser_device_table, device_id, NULL))
+>> +	if (!vgic_its_check_id(its, its->baser_device_table, device_id, &gpa))
+>>  		return E_ITS_MAPD_DEVICE_OOR;
+>>  
+>>  	if (valid && num_eventid_bits > VITS_TYPER_IDBITS)
+>> @@ -1161,8 +1165,13 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
+>>  	 * The spec does not say whether unmapping a not-mapped device
+>>  	 * is an error, so we are done in any case.
+>>  	 */
+>> -	if (!valid)
+>> +	if (!valid) {
+>> +		abi = vgic_its_get_abi(its);
+>> +		dte_esz = abi->dte_esz;
+>> +		val = cpu_to_le64(0);
+>> +		vgic_write_guest_lock(kvm, gpa, &val, dte_esz);
+> 
+> This is just a bit wrong:
+> 
+> - you store 0 in a u64 after having (pointlessly) converted it to le64
+> 
+> - you write 'dte_esz' bytes into guest memory, but you don't have any
+>   check whether this is *larger* than the u64 you have passed
+> 
+> Similar issue exists in all the vgic_its_save_*() functions, calling
+> for a generic fix, as we're just lucky to never have needed a new ABI
+> so far. At the very least a check that we deal with data that is
+> exactly 8 bytes.
+> 
+> Also, is the device table the only one that is subject to this
+> 'reload' problem? How about the Collection table?
+The collection table is not indexed by the collection ID and when saving
+we end up writing an invalid dummy entry to close the recording. So I
+don't think we have the same problem there.
 
-1)  The impetus in this case is to efficiently allow sub-page allocations.
-But on x86, there's also an issue in that the x86 direct map uses large
-page mappings, which must be split if any 4K page in the large page
-is decrypted. Ideally, we could cluster such decrypted pages into the
-same large page(s) vs. just grabbing any 4K page, and reduce the
-number of splits. I haven't looked at how feasible that is to implement
-in the context of the existing allocator code, so this is aspirational.
+For ITT I think we have the same issue on restore because the restore
+scans the table until it gets a first valid entry and then chain on next
+item. If we have stale entries this looks like the same issue.
 
-2) GFP_DECRYPTED should work for the three memory allocation
-interfaces and their variants: alloc_pages(), kmalloc(), and vmalloc().
+Thanks
 
-3) The current paradigm is to allocate memory and call
-set_memory_decrypted(). Then do the reverse when freeing memory.
-Using GFP_DECRYPTED on the allocation, and having the re-encryption
-done automatically when freeing certainly simplifies the call sites.
-The error handling at the call sites is additional messiness that gets
-much simpler.
-
-4) GFP_DECRYPTED should be silently ignored when not running
-in a CoCo VM. Drivers that need decrypted memory in a CoCo VM
-always set this flag, and work normally as if the flag isn't set when
-not in a CoCo VM. This is how set_memory_decrypted()/encrypted()
-work today. Drivers call them in all cases, and they are no-ops
-when not in a CoCo VM.
-
-5) The implementation of GFP_DECRYPTED must correctly handle
-errors from set_memory_decrypted()/encrypted() as I've described
-separately on this thread.
-
-Michael
-
->=20
-> --------------------8<----------------------------------
-> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v=
-3-its.c
-> index 40ebf1726393..b6627e839e62 100644
-> --- a/drivers/irqchip/irq-gic-v3-its.c
-> +++ b/drivers/irqchip/irq-gic-v3-its.c
-> @@ -2212,7 +2212,8 @@ static struct page *its_allocate_prop_table(gfp_t g=
-fp_flags)
->  {
->  	struct page *prop_page;
->=20
-> -	prop_page =3D alloc_pages(gfp_flags, get_order(LPI_PROPBASE_SZ));
-> +	prop_page =3D alloc_pages(gfp_flags | __GFP_DECRYPTED,
-> +				get_order(LPI_PROPBASE_SZ));
->  	if (!prop_page)
->  		return NULL;
->=20
-> @@ -2346,7 +2347,8 @@ static int its_setup_baser(struct its_node *its, st=
-ruct
-> its_baser *baser,
->  		order =3D get_order(GITS_BASER_PAGES_MAX * psz);
->  	}
->=20
-> -	page =3D alloc_pages_node(its->numa_node, GFP_KERNEL | __GFP_ZERO, orde=
-r);
-> +	page =3D alloc_pages_node(its->numa_node, GFP_KERNEL | __GFP_ZERO |
-> +				__GFP_DECRYPTED, order);
->  	if (!page)
->  		return -ENOMEM;
->=20
-> @@ -2940,7 +2942,8 @@ static int allocate_vpe_l1_table(void)
->=20
->  	pr_debug("np =3D %d, npg =3D %lld, psz =3D %d, epp =3D %d, esz =3D %d\n=
-",
->  		 np, npg, psz, epp, esz);
-> -	page =3D alloc_pages(GFP_ATOMIC | __GFP_ZERO, get_order(np * PAGE_SIZE)=
-);
-> +	page =3D alloc_pages(GFP_ATOMIC | __GFP_ZERO | __GFP_DECRYPTED,
-> +			   get_order(np * PAGE_SIZE));
->  	if (!page)
->  		return -ENOMEM;
->=20
-> @@ -2986,7 +2989,7 @@ static struct page *its_allocate_pending_table(gfp_=
-t
-> gfp_flags)
->  {
->  	struct page *pend_page;
->=20
-> -	pend_page =3D alloc_pages(gfp_flags | __GFP_ZERO,
-> +	pend_page =3D alloc_pages(gfp_flags | __GFP_ZERO | __GFP_DECRYPTED,
->  				get_order(LPI_PENDBASE_SZ));
->  	if (!pend_page)
->  		return NULL;
-> @@ -3334,7 +3337,8 @@ static bool its_alloc_table_entry(struct its_node *=
-its,
->=20
->  	/* Allocate memory for 2nd level table */
->  	if (!table[idx]) {
-> -		page =3D alloc_pages_node(its->numa_node, GFP_KERNEL | __GFP_ZERO,
-> +		page =3D alloc_pages_node(its->numa_node, GFP_KERNEL |
-> +					__GFP_ZERO | __GFP_DECRYPTED,
->  					get_order(baser->psz));
->  		if (!page)
->  			return false;
-> @@ -3438,7 +3442,7 @@ static struct its_device *its_create_device(struct =
-its_node
-> *its, u32 dev_id,
->  	nr_ites =3D max(2, nvecs);
->  	sz =3D nr_ites * (FIELD_GET(GITS_TYPER_ITT_ENTRY_SIZE, its->typer) + 1)=
-;
->  	sz =3D max(sz, ITS_ITT_ALIGN) + ITS_ITT_ALIGN - 1;
-> -	itt =3D kzalloc_node(sz, GFP_KERNEL, its->numa_node);
-> +	itt =3D kzalloc_node(sz, GFP_KERNEL | __GFP_DECRYPTED, its->numa_node);
->  	if (alloc_lpis) {
->  		lpi_map =3D its_lpi_alloc(nvecs, &lpi_base, &nr_lpis);
->  		if (lpi_map)
-> @@ -5131,8 +5135,8 @@ static int __init its_probe_one(struct its_node *it=
-s)
->  		}
->  	}
->=20
-> -	page =3D alloc_pages_node(its->numa_node, GFP_KERNEL | __GFP_ZERO,
-> -				get_order(ITS_CMD_QUEUE_SZ));
-> +	page =3D alloc_pages_node(its->numa_node, GFP_KERNEL | __GFP_ZERO |
-> +				__GFP_DECRYPTED, get_order(ITS_CMD_QUEUE_SZ));
->  	if (!page) {
->  		err =3D -ENOMEM;
->  		goto out_unmap_sgir;
-> diff --git a/include/linux/gfp_types.h b/include/linux/gfp_types.h
-> index 313be4ad79fd..573989664639 100644
-> --- a/include/linux/gfp_types.h
-> +++ b/include/linux/gfp_types.h
-> @@ -57,6 +57,9 @@ enum {
->  #endif
->  #ifdef CONFIG_SLAB_OBJ_EXT
->  	___GFP_NO_OBJ_EXT_BIT,
-> +#endif
-> +#ifdef CONFIG_ARCH_HAS_MEM_ENCRYPT
-> +	___GFP_DECRYPTED_BIT,
->  #endif
->  	___GFP_LAST_BIT
->  };
-> @@ -103,6 +106,11 @@ enum {
->  #else
->  #define ___GFP_NO_OBJ_EXT       0
->  #endif
-> +#ifdef CONFIG_ARCH_HAS_MEM_ENCRYPT
-> +#define ___GFP_DECRYPTED	BIT(___GFP_DECRYPTED_BIT)
-> +#else
-> +#define ___GFP_DECRYPTED	0
-> +#endif
->=20
->  /*
->   * Physical address zone modifiers (see linux/mmzone.h - low four bits)
-> @@ -117,6 +125,8 @@ enum {
->  #define __GFP_MOVABLE	((__force gfp_t)___GFP_MOVABLE)  /*
-> ZONE_MOVABLE allowed */
->  #define GFP_ZONEMASK
-> 	(__GFP_DMA|__GFP_HIGHMEM|__GFP_DMA32|__GFP_MOVABLE)
->=20
-> +#define __GFP_DECRYPTED	((__force gfp_t)___GFP_DECRYPTED)
-> +
->  /**
->   * DOC: Page mobility and placement hints
->   *
-> diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
-> index 104078afe0b1..705707052274 100644
-> --- a/include/linux/page-flags.h
-> +++ b/include/linux/page-flags.h
-> @@ -127,6 +127,9 @@ enum pageflags {
->  #ifdef CONFIG_MEMORY_FAILURE
->  	PG_hwpoison,		/* hardware poisoned page. Don't touch */
->  #endif
-> +#ifdef CONFIG_ARCH_HAS_MEM_ENCRYPT
-> +	PG_decrypted,
-> +#endif
->  #if defined(CONFIG_PAGE_IDLE_FLAG) && defined(CONFIG_64BIT)
->  	PG_young,
->  	PG_idle,
-> @@ -626,6 +629,15 @@ PAGEFLAG_FALSE(HWPoison, hwpoison)
->  #define __PG_HWPOISON 0
->  #endif
->=20
-> +#ifdef CONFIG_ARCH_HAS_MEM_ENCRYPT
-> +PAGEFLAG(Decrypted, decrypted, PF_HEAD)
-> +#define __PG_DECRYPTED	(1UL << PG_decrypted)
-> +#else
-> +PAGEFLAG_FALSE(Decrypted, decrypted)
-> +#define __PG_DECRYPTED	0
-> +#endif
-> +
-> +
->  #ifdef CONFIG_PAGE_IDLE_FLAG
->  #ifdef CONFIG_64BIT
->  FOLIO_TEST_FLAG(young, FOLIO_HEAD_PAGE)
-> diff --git a/include/linux/slab.h b/include/linux/slab.h
-> index 7247e217e21b..f7a2cf624c35 100644
-> --- a/include/linux/slab.h
-> +++ b/include/linux/slab.h
-> @@ -422,6 +422,9 @@ enum kmalloc_cache_type {
->  #endif
->  #ifdef CONFIG_MEMCG_KMEM
->  	KMALLOC_CGROUP,
-> +#endif
-> +#ifdef CONFIG_ARCH_HAS_MEM_ENCRYPT
-> +	KMALLOC_DECRYPTED,
->  #endif
->  	NR_KMALLOC_TYPES
->  };
-> @@ -433,7 +436,7 @@ kmalloc_caches[NR_KMALLOC_TYPES][KMALLOC_SHIFT_HIGH
-> + 1];
->   * Define gfp bits that should not be set for KMALLOC_NORMAL.
->   */
->  #define KMALLOC_NOT_NORMAL_BITS					\
-> -	(__GFP_RECLAIMABLE |					\
-> +	(__GFP_RECLAIMABLE | __GFP_DECRYPTED |			\
->  	(IS_ENABLED(CONFIG_ZONE_DMA)   ? __GFP_DMA : 0) |	\
->  	(IS_ENABLED(CONFIG_MEMCG_KMEM) ? __GFP_ACCOUNT : 0))
->=20
-> @@ -458,11 +461,14 @@ static __always_inline enum kmalloc_cache_type
-> kmalloc_type(gfp_t flags, unsigne
->  	 * At least one of the flags has to be set. Their priorities in
->  	 * decreasing order are:
->  	 *  1) __GFP_DMA
-> -	 *  2) __GFP_RECLAIMABLE
-> -	 *  3) __GFP_ACCOUNT
-> +	 *  2) __GFP_DECRYPTED
-> +	 *  3) __GFP_RECLAIMABLE
-> +	 *  4) __GFP_ACCOUNT
->  	 */
->  	if (IS_ENABLED(CONFIG_ZONE_DMA) && (flags & __GFP_DMA))
->  		return KMALLOC_DMA;
-> +	if (IS_ENABLED(CONFIG_ARCH_HAS_MEM_ENCRYPT) && (flags &
-> __GFP_DECRYPTED))
-> +		return KMALLOC_DECRYPTED;
->  	if (!IS_ENABLED(CONFIG_MEMCG_KMEM) || (flags & __GFP_RECLAIMABLE))
->  		return KMALLOC_RECLAIM;
->  	else
-> diff --git a/include/trace/events/mmflags.h b/include/trace/events/mmflag=
-s.h
-> index e46d6e82765e..a0879155f892 100644
-> --- a/include/trace/events/mmflags.h
-> +++ b/include/trace/events/mmflags.h
-> @@ -83,6 +83,12 @@
->  #define IF_HAVE_PG_HWPOISON(_name)
->  #endif
->=20
-> +#ifdef CONFIG_ARCH_HAS_MEM_ENCRYPT
-> +#define IF_HAVE_PG_DECRYPTED(_name) ,{1UL << PG_##_name, __stringify(_na=
-me)}
-> +#else
-> +#define IF_HAVE_PG_DECRYPTED(_name)
-> +#endif
-> +
->  #if defined(CONFIG_PAGE_IDLE_FLAG) && defined(CONFIG_64BIT)
->  #define IF_HAVE_PG_IDLE(_name) ,{1UL << PG_##_name, __stringify(_name)}
->  #else
-> @@ -121,6 +127,7 @@
->  IF_HAVE_PG_MLOCK(mlocked)						\
->  IF_HAVE_PG_UNCACHED(uncached)						\
->  IF_HAVE_PG_HWPOISON(hwpoison)						\
-> +IF_HAVE_PG_DECRYPTED(decrypted)						\
->  IF_HAVE_PG_IDLE(idle)							\
->  IF_HAVE_PG_IDLE(young)							\
->  IF_HAVE_PG_ARCH_X(arch_2)						\
-> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-> index 2e22ce5675ca..c93ae50ec402 100644
-> --- a/mm/page_alloc.c
-> +++ b/mm/page_alloc.c
-> @@ -47,6 +47,7 @@
->  #include <linux/sched/mm.h>
->  #include <linux/page_owner.h>
->  #include <linux/page_table_check.h>
-> +#include <linux/set_memory.h>
->  #include <linux/memcontrol.h>
->  #include <linux/ftrace.h>
->  #include <linux/lockdep.h>
-> @@ -1051,6 +1052,12 @@ __always_inline bool free_pages_prepare(struct pag=
-e
-> *page,
->  		return false;
->  	}
->=20
-> +	if (unlikely(PageDecrypted(page))) {
-> +		set_memory_encrypted((unsigned long)page_address(page),
-> +				     1 << order);
-> +		ClearPageDecrypted(page);
-> +	}
-> +
->  	VM_BUG_ON_PAGE(compound && compound_order(page) !=3D order, page);
->=20
->  	/*
-> @@ -1415,6 +1422,7 @@ inline void post_alloc_hook(struct page *page, unsi=
-gned int
-> order,
->  	bool init =3D !want_init_on_free() && want_init_on_alloc(gfp_flags) &&
->  			!should_skip_init(gfp_flags);
->  	bool zero_tags =3D init && (gfp_flags & __GFP_ZEROTAGS);
-> +	bool decrypted =3D true; //gfp_flags & __GFP_DECRYPTED;
->  	int i;
->=20
->  	set_page_private(page, 0);
-> @@ -1465,6 +1473,12 @@ inline void post_alloc_hook(struct page *page, uns=
-igned int
-> order,
->  	if (init)
->  		kernel_init_pages(page, 1 << order);
->=20
-> +	if (decrypted) {
-> +		set_memory_decrypted((unsigned long)page_address(page),
-> +				     1 << order);
-> +		SetPageDecrypted(page);
-> +	}
-> +
->  	set_page_owner(page, order, gfp_flags);
->  	page_table_check_alloc(page, order);
->  	pgalloc_tag_add(page, current, 1 << order);
-> diff --git a/mm/slab_common.c b/mm/slab_common.c
-> index 1560a1546bb1..de9c8c674aa1 100644
-> --- a/mm/slab_common.c
-> +++ b/mm/slab_common.c
-> @@ -737,6 +737,12 @@ EXPORT_SYMBOL(kmalloc_size_roundup);
->  #define KMALLOC_RCL_NAME(sz)
->  #endif
->=20
-> +#ifdef CONFIG_ARCH_HAS_MEM_ENCRYPT
-> +#define KMALLOC_DECRYPTED_NAME(sz)	.name[KMALLOC_DECRYPTED] =3D
-> "kmalloc-decrypted-" #sz,
-> +#else
-> +#define KMALLOC_DECRYPTED_NAME(sz)
-> +#endif
-> +
->  #ifdef CONFIG_RANDOM_KMALLOC_CACHES
->  #define __KMALLOC_RANDOM_CONCAT(a, b) a ## b
->  #define KMALLOC_RANDOM_NAME(N, sz)
-> __KMALLOC_RANDOM_CONCAT(KMA_RAND_, N)(sz)
-> @@ -765,6 +771,7 @@ EXPORT_SYMBOL(kmalloc_size_roundup);
->  	KMALLOC_RCL_NAME(__short_size)				\
->  	KMALLOC_CGROUP_NAME(__short_size)			\
->  	KMALLOC_DMA_NAME(__short_size)				\
-> +	KMALLOC_DECRYPTED_NAME(__short_size)			\
->  	KMALLOC_RANDOM_NAME(RANDOM_KMALLOC_CACHES_NR, __short_size)
-> 	\
->  	.size =3D __size,						\
->  }
-> @@ -889,6 +896,9 @@ new_kmalloc_cache(int idx, enum kmalloc_cache_type ty=
-pe)
->  	if (IS_ENABLED(CONFIG_MEMCG_KMEM) && (type =3D=3D KMALLOC_NORMAL))
->  		flags |=3D SLAB_NO_MERGE;
->=20
-> +	if (IS_ENABLED(CONFIG_ARCH_HAS_MEM_ENCRYPT) && (type =3D=3D
-> KMALLOC_DECRYPTED))
-> +		flags |=3D SLAB_NO_MERGE;
-> +
->  	if (minalign > ARCH_KMALLOC_MINALIGN) {
->  		aligned_size =3D ALIGN(aligned_size, minalign);
->  		aligned_idx =3D __kmalloc_index(aligned_size, false);
+Eric
+> 
+> Thanks,
+> 
+> 	M.
+> 
 
