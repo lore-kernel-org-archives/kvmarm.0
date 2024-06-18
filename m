@@ -1,181 +1,121 @@
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03D994D8C6
-	for <kvmarm@lists.linux.dev>; Tue, 18 Jun 2024 00:01:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A3B91F176
+	for <kvmarm@lists.linux.dev>; Tue, 18 Jun 2024 05:55:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718668910; cv=none; b=bxUNEoY1ojGgwJmnOwU/1C4l4mP/bQcyxDa/m8qUAHxhdNX/7Qj4yarjRJbBev+u2Fon0DBm7WYPA+jmIQ7hhgqI23du7gkb7R0YXJ3NvAbtkM/m4mKCNEFEdqgwPjazRuEMzhZqHBpC0npQ1//Qq1q/tNB+zHXZg6qy4c/gpmQ=
+	t=1718690140; cv=none; b=evuzkRayzDY+req65HVui+SLRTaWQ6qKHZHnxNkUrPsllVf1vi9ox942ZmDFa7CfkKRGpMgMwnYaZvg5bp7weR1WqPjcWOrH9W8rzj1Pji44gVNvwIg62ZBmUrWNVHl4717vHnnFkUnFvJmXNf1ciI3EcK8mmjVPU7VQJKK0SDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718668910; c=relaxed/simple;
-	bh=WsXnkl7kVUYze+FeKGmExkt9GJ8bPzG9K5cBRVrE94Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CYKe5ZaU5gKjb9jMDbkoC6Tp5l1pAJ4vN2XlZeYYqtsc4jyEd3IZ6qsI40AsydmGCLV2EVnReO9ta3OMEhgtT1KjOUjbmONV6KURWP3XLeCgwv/nJFuv2TVSKqfXDZ5oZVANQfuMlRgpE071afL1KIJSCOu6k90bK/Ts1IsSzqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=S6FhCOsR; arc=none smtp.client-ip=209.85.160.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1718690140; c=relaxed/simple;
+	bh=7RiwnKT2I1MFdE03Yi9OQNr5nfwBkB7Vzra8koLRLqc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ktBO/X2vweUW/Kz31J0f4H13Wm3bclf/4lvpHBrbNLnSoxcMTit2VCNuZFY8KpgSOuBZjfY+k5/tLlulezG4GeXeRwYmPz1HK19iFjBJLWQDOrib2yJ/vtK+nTNXqEQpkgTm9B6/W4KhV+GXEpphMAuw8XOQ3axu9k9AMPlU+xc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DrzxiCPL; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="S6FhCOsR"
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-443580f290dso67561cf.1
-        for <kvmarm@lists.linux.dev>; Mon, 17 Jun 2024 17:01:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718668908; x=1719273708; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=szeTbx+n4i/RQE7ZeuWhiCumzoRR7Ut1YseLs3KbJhQ=;
-        b=S6FhCOsRKZMt8FnFZmAjYUllzOw343kdexG8SJsrnqjA3L0YMq3ajUmvqLfwnInxbZ
-         jMzq5Icwqjt7hHUn8nAv90qxbF+4hU9k2+tnPBE763WHq40ybIEo2FLBJbqKoXoeO+97
-         9wT5yskrkX2shWyTbHRfkZy9+fbaYKeVmXzwEVBsjDgbL+b6SNekvxt6fKpLUzGR7tJG
-         tWzQDruD2cJzYoTIeY2xMu90CREKSIG8Jh6SvgqHFOAzn4Onp75vFcnpd0eUWhsrYIFf
-         9OLxKldGNGhLnB3kESoNm02JA5zSMD3/0tXoNTtlU9IiPnJbWyGft7AqXpnYJw4GDut4
-         GhwQ==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DrzxiCPL"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718690138;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hWu/voSZi4FQiwHW6WOBcFhupKmk2O/NDijOpbvubbo=;
+	b=DrzxiCPLWRmGgQSAFDiNNQKaozwSgiAmJvuZvvT2fhHviuWwfDbfvjj3biWJWawJWEQQsg
+	dKyZv4qXTWKEG+PetZ5S65+JLhGBFaFk0VR05TIxCaCF/qSYbpzdAq5H0sh1Ala7ikEZJ4
+	XERuvl78HfPRf8dC35q++MAsASu6nCw=
+Received: from mail-oa1-f69.google.com (mail-oa1-f69.google.com
+ [209.85.160.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-662-HmSUD_jmM4q7111P6PYamA-1; Tue, 18 Jun 2024 01:55:28 -0400
+X-MC-Unique: HmSUD_jmM4q7111P6PYamA-1
+Received: by mail-oa1-f69.google.com with SMTP id 586e51a60fabf-2502a80477bso92099fac.1
+        for <kvmarm@lists.linux.dev>; Mon, 17 Jun 2024 22:55:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718668908; x=1719273708;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=szeTbx+n4i/RQE7ZeuWhiCumzoRR7Ut1YseLs3KbJhQ=;
-        b=K0TlYJW8l55iRpiKPK932N5hMBXm2BsxBgol4/afA/Cgml592gER2SBVgNMgGNwoXM
-         qpBHp29PndOu2ndRWz/ZaNW/B03eEjCyGjUk5J8hm884d6r7H27jXNUTxWzS+TuBeds5
-         wyp5WUZfCTR04CUEnXBqn7kdyvAHspmn5BlI6SRdwP+8dxvUUryxDJgn+CZv8cq6JutY
-         OQhQV7ZyQGv8DE8bYb2M6JbQdARJlk8IoxNgS1IGjwJ3qqteE+vr0r4OBnnGLCYqNdxt
-         F88+O/h9p7Ls02eSCI2evvxPlqO7lep2q+lXlIpxsqNvfvlilKghOMXCMIo1edXrk6US
-         nk3A==
-X-Forwarded-Encrypted: i=1; AJvYcCWTU037hIJ73JGe6MEIuW6qDGROqxK1XWKBgPZMbckLJ+tJUK96heyKAFuyx+jYqVeALOhgclXSUDBLLq+VRqHZjac4Snpm
-X-Gm-Message-State: AOJu0YxLCDt4iiy+uZR9oo2AVXp9P4GhK/aQzNkIoWWlPBAds5jyevIK
-	rU9yMl36O56YvkrCTvYz7m+MuQMk6MJrCX2txBUfCsTyxHaHoImjKWjwvZ4++pEmlc7G/AyQ7l3
-	RV+Ln7h3ukRtgCiSaXoKxOF1KIxQFANM0uoQQ
-X-Google-Smtp-Source: AGHT+IGHzkobBDc6M3yopcf16QeXn++VzvN+NTr0crpz0Mygnf9RbsKFdcd1bMRE+npFHMvEgbm3YMfrR8FegyixQZ4=
-X-Received: by 2002:a05:622a:1309:b0:43f:bba6:3759 with SMTP id
- d75a77b69052e-4449c68d727mr1309401cf.10.1718668907696; Mon, 17 Jun 2024
- 17:01:47 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1718690128; x=1719294928;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hWu/voSZi4FQiwHW6WOBcFhupKmk2O/NDijOpbvubbo=;
+        b=CdI1ruDEkrqV8SBJd7s2wjmmxA9LIqcDBnntx0tufEvu/h4ai0GjCFakd3+FVYsGDY
+         aTqODMYl5urfq6N94iThjYtU4BePlA9vsyK3JLLUhlyUbwj1HYl1VvlnVxR8L41qKkfy
+         3DOatXpNr3yXq6V4jSsE3cyPkqdE1v5h8C5Q7sgHMeVruo+VhXBIQt84jX4GeFAxSsri
+         JHl+VJHHB1xWB2RduNheIUU9/HdW1GxTItONuXj1ka7G7LWmrG+tzo59gXacwUBAb5ca
+         4yiU8aHE8tZ+hQFpBMOROvwKZZiNg+mJADpB+OjQZ5MrPjvjez9F1CjW/LTLU0AgJ89g
+         EwsA==
+X-Forwarded-Encrypted: i=1; AJvYcCWHAbXjBGSjKdR1ih+INGLfmGAsScEHJuThvyq8FrMcj++sc2xFn+Twa9ffzYuNlzoj4Gm4KT9pJCI8knTdItiZ+ZM7GtvA
+X-Gm-Message-State: AOJu0YzMCJoaJZt72UU3c0rc8iudrgru5iXEqtl8oVxW6JjcBfTPXdSR
+	3FJQywcPuc2vwkxqNYRcTvhtXE6Iehm+86N6zWOlj8FY64WP2EDIYg3oBqTypz/TKdcCfEmNtnL
+	Q+KI5eofGqY8FRSYq9yDQkj8Hk3tvIiKLR707jtVkI96PvFXckSawWw==
+X-Received: by 2002:a05:6358:8a6:b0:19f:4cd0:aad1 with SMTP id e5c5f4694b2df-19fb4eb049cmr1247884855d.2.1718690128087;
+        Mon, 17 Jun 2024 22:55:28 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGmf7CqoB5qG+f+SoSDNog9sHPlb0eZ/k8nda7B9rivFb2/iFdvUu6nxAvxJ5wxsEEdjtvYqg==
+X-Received: by 2002:a05:6358:8a6:b0:19f:4cd0:aad1 with SMTP id e5c5f4694b2df-19fb4eb049cmr1247882755d.2.1718690127611;
+        Mon, 17 Jun 2024 22:55:27 -0700 (PDT)
+Received: from [10.66.61.39] ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-6fedf592f0csm7512541a12.54.2024.06.17.22.55.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 17 Jun 2024 22:55:27 -0700 (PDT)
+Message-ID: <8fd7e58d-1d87-430d-a974-47ee05bc72de@redhat.com>
+Date: Tue, 18 Jun 2024 13:55:22 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20240613082345.132336-1-shahuang@redhat.com> <20240613082345.132336-4-shahuang@redhat.com>
-In-Reply-To: <20240613082345.132336-4-shahuang@redhat.com>
-From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Mon, 17 Jun 2024 17:01:36 -0700
-Message-ID: <CAJHc60xpGAA1pmz0ad_Fq3a5M-pQMiyxQ4hdNhc6vQrgpSjGww@mail.gmail.com>
-Subject: Re: [PATCH v9 3/3] KVM: selftests: aarch64: Add invalid filter test
- in pmu_event_filter_test
-To: Shaoqin Huang <shahuang@redhat.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, 
-	Eric Auger <eric.auger@redhat.com>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 0/2] KVM: arm64: Making BT Field in ID_AA64PFR1_EL1
+ writable
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, James Morse
+ <james.morse@arm.com>, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Shuah Khan <shuah@kernel.org>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
+References: <20240617075131.1006173-1-shahuang@redhat.com>
+ <ZnB1FPw3Eg8-61mL@linux.dev>
+From: Shaoqin Huang <shahuang@redhat.com>
+In-Reply-To: <ZnB1FPw3Eg8-61mL@linux.dev>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Shaoqin,
+Hi Oliver,
 
-On Thu, Jun 13, 2024 at 1:27=E2=80=AFAM Shaoqin Huang <shahuang@redhat.com>=
- wrote:
->
-> Add the invalid filter test which sets the filter beyond the event
-> space and sets the invalid action to double check if the
-> KVM_ARM_VCPU_PMU_V3_FILTER will return the expected error.
->
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
-> ---
->  .../kvm/aarch64/pmu_event_filter_test.c       | 37 +++++++++++++++++++
->  1 file changed, 37 insertions(+)
->
-> diff --git a/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c =
-b/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
-> index fb0fde1ed436..13b2f354c39b 100644
-> --- a/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
-> +++ b/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
-> @@ -8,6 +8,7 @@
->   * This test checks if the guest only see the limited pmu event that use=
-rspace
->   * sets, if the guest can use those events which user allow, and if the =
-guest
->   * can't use those events which user deny.
-> + * It also checks that setting invalid filter ranges return the expected=
- error.
->   * This test runs only when KVM_CAP_ARM_PMU_V3, KVM_ARM_VCPU_PMU_V3_FILT=
-ER
->   * is supported on the host.
->   */
-> @@ -178,6 +179,40 @@ static void destroy_vpmu_vm(void)
->         kvm_vm_free(vpmu_vm.vm);
->  }
->
-> +static void test_invalid_filter(void)
-> +{
-> +       struct kvm_pmu_event_filter invalid;
-> +       int ret;
-> +
-> +       pr_info("Test: test_invalid_filter\n");
-> +
-> +       memset(&vpmu_vm, 0, sizeof(vpmu_vm));
-> +
-> +       vpmu_vm.vm =3D vm_create(1);
-> +       vpmu_vm.vcpu =3D vm_vcpu_add_with_vpmu(vpmu_vm.vm, 0, guest_code)=
-;
-> +       vpmu_vm.gic_fd =3D vgic_v3_setup(vpmu_vm.vm, 1, 64);
-> +       __TEST_REQUIRE(vpmu_vm.gic_fd >=3D 0,
-> +                      "Failed to create vgic-v3, skipping");
-> +
-> +       /* The max event number is (1 << 16), set a range largeer than it=
-. */
-nit: s/largeer/larger
+On 6/18/24 01:40, Oliver Upton wrote:
+> On Mon, Jun 17, 2024 at 03:51:29AM -0400, Shaoqin Huang wrote:
+>> In this patch series, we try to make more register fields writable like
+>> ID_AA64PFR1_EL1.BT since this can benifit the migration between some of the
+>> machines which have different BT values.
+>>
+>> Changelog:
+>> ----------
+>> RFCv1 -> v1:
+>>    * Fix the compilation error.
+>>    * Delete the machine specific information and make the description more
+>>      generable.
+> 
+> Can you please address Marc's feedback?
+> 
+> If we only make things writable a field at a time it's going to take
+> forever to catch up w/ the architecture.
+> 
+> https://lore.kernel.org/kvmarm/86zfrpjkt6.wl-maz@kernel.org/
 
-Also, perhaps not in this series, but we can also check for -EBUSY
-situations such as setting a (valid) filter after
-KVM_ARM_VCPU_PMU_V3_INIT and after the vCPUs have started.
+Ok. I will update the patch series again with tackling the full register.
 
-Besides that, Reviewed-by: Raghavendra Rao Ananta <rananta@google.com>
+Thanks,
+Shaoqin
 
-- Raghavendra
+> 
 
+-- 
+Shaoqin
 
-
-> +       invalid =3D __DEFINE_FILTER(BIT(15), BIT(15) + 1, 0);
-> +       ret =3D __kvm_device_attr_set(vpmu_vm.vcpu->fd, KVM_ARM_VCPU_PMU_=
-V3_CTRL,
-> +                                   KVM_ARM_VCPU_PMU_V3_FILTER, &invalid)=
-;
-> +       TEST_ASSERT(ret && errno =3D=3D EINVAL, "Set Invalid filter range=
- "
-> +                   "ret =3D %d, errno =3D %d (expected ret =3D -1, errno=
- =3D EINVAL)",
-> +                   ret, errno);
-> +
-> +       /* Set the Invalid action. */
-> +       invalid =3D __DEFINE_FILTER(0, 1, 3);
-> +       ret =3D __kvm_device_attr_set(vpmu_vm.vcpu->fd, KVM_ARM_VCPU_PMU_=
-V3_CTRL,
-> +                                   KVM_ARM_VCPU_PMU_V3_FILTER, &invalid)=
-;
-> +       TEST_ASSERT(ret && errno =3D=3D EINVAL, "Set Invalid filter actio=
-n "
-> +                   "ret =3D %d, errno =3D %d (expected ret =3D -1, errno=
- =3D EINVAL)",
-> +                   ret, errno);
-> +
-> +       destroy_vpmu_vm();
-> +}
-> +
->  static void run_test(struct test_desc *t)
->  {
->         pr_info("Test: %s\n", t->name);
-> @@ -300,4 +335,6 @@ int main(void)
->         TEST_REQUIRE(kvm_pmu_support_events());
->
->         run_tests();
-> +
-> +       test_invalid_filter();
->  }
-> --
-> 2.40.1
->
->
