@@ -1,207 +1,180 @@
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E05AB10A16
-	for <kvmarm@lists.linux.dev>; Tue, 18 Jun 2024 00:01:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03D994D8C6
+	for <kvmarm@lists.linux.dev>; Tue, 18 Jun 2024 00:01:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718668879; cv=none; b=eSCfvJIOHCuMBLuYSZrWYmbNkXpS2vgrgDAbEZ7FCrh1zJMcJioIeY51MjGxCRVGXhZqjGFedL9d8gmcLDdj3mRgGKDoZCDQ4dmQBPlh0NqRmYF86ny+OiGBC6Tb832YbnA83B+OGdPJi5X5h72vS3uAylku81AGDFTItO/PYz4=
+	t=1718668910; cv=none; b=bxUNEoY1ojGgwJmnOwU/1C4l4mP/bQcyxDa/m8qUAHxhdNX/7Qj4yarjRJbBev+u2Fon0DBm7WYPA+jmIQ7hhgqI23du7gkb7R0YXJ3NvAbtkM/m4mKCNEFEdqgwPjazRuEMzhZqHBpC0npQ1//Qq1q/tNB+zHXZg6qy4c/gpmQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718668879; c=relaxed/simple;
-	bh=e/6DXxfSmYa3PcUmKtpMGJIGbMO7nKFl8LeS2R3DEGw=;
+	s=arc-20240116; t=1718668910; c=relaxed/simple;
+	bh=WsXnkl7kVUYze+FeKGmExkt9GJ8bPzG9K5cBRVrE94Q=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Su2ZzimMgMyvn84EVB7Rhkk0Ej8w9WKUMMQHRuhGuBp5Mb76nUuz6FkCGy2nLu/rdsH0k8MuCM1RvcqGZS3TTCOiPqKl0Ccy2VoZimRAzc79nyzg6FuF/hMOe7IXlSNjQGweKy2AQTj4TTLsSoYofnlHdld0RYQ+4PadDZqRH+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Cqe3OH28; arc=none smtp.client-ip=209.85.160.175
+	 To:Cc:Content-Type; b=CYKe5ZaU5gKjb9jMDbkoC6Tp5l1pAJ4vN2XlZeYYqtsc4jyEd3IZ6qsI40AsydmGCLV2EVnReO9ta3OMEhgtT1KjOUjbmONV6KURWP3XLeCgwv/nJFuv2TVSKqfXDZ5oZVANQfuMlRgpE071afL1KIJSCOu6k90bK/Ts1IsSzqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=S6FhCOsR; arc=none smtp.client-ip=209.85.160.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Cqe3OH28"
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-443580f290dso67231cf.1
-        for <kvmarm@lists.linux.dev>; Mon, 17 Jun 2024 17:01:17 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="S6FhCOsR"
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-443580f290dso67561cf.1
+        for <kvmarm@lists.linux.dev>; Mon, 17 Jun 2024 17:01:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718668877; x=1719273677; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1718668908; x=1719273708; darn=lists.linux.dev;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WYJUxDNTjiWQv0Dn1lpauSNYmPE3A/rHJsXpHH3eFP8=;
-        b=Cqe3OH28gyS+vL0FkjXh+Vce+M7p8avLMJHrsbUtW+rdoABQfQcM6hJLhgBXZauZ0g
-         hLEx+NuWLHms/5bgkF6cuSIH7LsRwbhtCmLhM6v0TgHfQ4L822ya5GzPQbd/E3vnoElf
-         BZrt9svOyWccgM2PMsLniqWKR2nkVlcZ5LyI9aHwGMLHx2I83UEQHrm5hsiAgh5SlvJp
-         2aZ2xWBfhO1aQOSKJRjIH01zsUtZmLwVcuT5C4rDUsyIsK/RMzi9gu0JoIzcmd1A2+ed
-         v0yQzyCyYo7bIyMf6Ze7+EruM8axBLDvMTB4hQYhHaHU+h7yBILSrMHeUYYRMS/xsl52
-         XLlQ==
+        bh=szeTbx+n4i/RQE7ZeuWhiCumzoRR7Ut1YseLs3KbJhQ=;
+        b=S6FhCOsRKZMt8FnFZmAjYUllzOw343kdexG8SJsrnqjA3L0YMq3ajUmvqLfwnInxbZ
+         jMzq5Icwqjt7hHUn8nAv90qxbF+4hU9k2+tnPBE763WHq40ybIEo2FLBJbqKoXoeO+97
+         9wT5yskrkX2shWyTbHRfkZy9+fbaYKeVmXzwEVBsjDgbL+b6SNekvxt6fKpLUzGR7tJG
+         tWzQDruD2cJzYoTIeY2xMu90CREKSIG8Jh6SvgqHFOAzn4Onp75vFcnpd0eUWhsrYIFf
+         9OLxKldGNGhLnB3kESoNm02JA5zSMD3/0tXoNTtlU9IiPnJbWyGft7AqXpnYJw4GDut4
+         GhwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718668877; x=1719273677;
+        d=1e100.net; s=20230601; t=1718668908; x=1719273708;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=WYJUxDNTjiWQv0Dn1lpauSNYmPE3A/rHJsXpHH3eFP8=;
-        b=Yg5U7GuwRulzF6lRb337yHw2ZdBvFtvqyVHgRzvxnHffjRwgxTVpqpKHHcSjw9SA36
-         5iSGw9DEvyQtVldVYDk98ljF1/4HNfcm5cyKazA8U3aSZnNbfhi/athWmSpQd1WXPu5U
-         8FmAsaZuGz0eNVTSyjxlhJbJBa79zk8BAGeWezevGTvsZPA0dobSaxUfszJOgOfrgaht
-         QINJ9rTk0woEo6MYtbB226ga+l6K08infcK1IKD+G8VqHcVtIhgzS9lSW+GB2/FfTVDM
-         xrketXKsqylhAxoGccG6DMdY6m+/rUD5NFIGwU/epcGxfoRykj7/Izw+QXkpVM04MQsH
-         ii0w==
-X-Forwarded-Encrypted: i=1; AJvYcCX723Gqtj51iq2bXlSpt6d94JLXxtHbchL6lTBYgMpcfOPU+pTiO6Hu6YYBK3bs8kApz3MIPzxXOQTLJdxtPJt4jMkpo7N0
-X-Gm-Message-State: AOJu0YxvdxqEty6PVa4rVFBLtGqwRWT/Lzo+6+Ip5hRGTsIyqTlS117x
-	oF3GOIkNiFD+GkKpp3loiGLNrngjRPO9OmKbAlXus778Ivd4+O2fhjRdoyHO8pPZxoQcK1v0IZ/
-	IYueyFgmvs72WxukmqML/uMrqKo7/w++hfB1A
-X-Google-Smtp-Source: AGHT+IHL1VOVBEEYIsDFmk7aYzMKo8+wU/oagSvanZsj7KqgaXrEPucAwYquOmDWm0/JC3eqHJ8+6hozxzfwg6DHtB4=
-X-Received: by 2002:a05:622a:4e96:b0:444:a09e:c60e with SMTP id
- d75a77b69052e-444a09ed740mr85851cf.24.1718668876650; Mon, 17 Jun 2024
- 17:01:16 -0700 (PDT)
+        bh=szeTbx+n4i/RQE7ZeuWhiCumzoRR7Ut1YseLs3KbJhQ=;
+        b=K0TlYJW8l55iRpiKPK932N5hMBXm2BsxBgol4/afA/Cgml592gER2SBVgNMgGNwoXM
+         qpBHp29PndOu2ndRWz/ZaNW/B03eEjCyGjUk5J8hm884d6r7H27jXNUTxWzS+TuBeds5
+         wyp5WUZfCTR04CUEnXBqn7kdyvAHspmn5BlI6SRdwP+8dxvUUryxDJgn+CZv8cq6JutY
+         OQhQV7ZyQGv8DE8bYb2M6JbQdARJlk8IoxNgS1IGjwJ3qqteE+vr0r4OBnnGLCYqNdxt
+         F88+O/h9p7Ls02eSCI2evvxPlqO7lep2q+lXlIpxsqNvfvlilKghOMXCMIo1edXrk6US
+         nk3A==
+X-Forwarded-Encrypted: i=1; AJvYcCWTU037hIJ73JGe6MEIuW6qDGROqxK1XWKBgPZMbckLJ+tJUK96heyKAFuyx+jYqVeALOhgclXSUDBLLq+VRqHZjac4Snpm
+X-Gm-Message-State: AOJu0YxLCDt4iiy+uZR9oo2AVXp9P4GhK/aQzNkIoWWlPBAds5jyevIK
+	rU9yMl36O56YvkrCTvYz7m+MuQMk6MJrCX2txBUfCsTyxHaHoImjKWjwvZ4++pEmlc7G/AyQ7l3
+	RV+Ln7h3ukRtgCiSaXoKxOF1KIxQFANM0uoQQ
+X-Google-Smtp-Source: AGHT+IGHzkobBDc6M3yopcf16QeXn++VzvN+NTr0crpz0Mygnf9RbsKFdcd1bMRE+npFHMvEgbm3YMfrR8FegyixQZ4=
+X-Received: by 2002:a05:622a:1309:b0:43f:bba6:3759 with SMTP id
+ d75a77b69052e-4449c68d727mr1309401cf.10.1718668907696; Mon, 17 Jun 2024
+ 17:01:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20240613082345.132336-1-shahuang@redhat.com> <20240613082345.132336-3-shahuang@redhat.com>
-In-Reply-To: <20240613082345.132336-3-shahuang@redhat.com>
+References: <20240613082345.132336-1-shahuang@redhat.com> <20240613082345.132336-4-shahuang@redhat.com>
+In-Reply-To: <20240613082345.132336-4-shahuang@redhat.com>
 From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Mon, 17 Jun 2024 17:01:02 -0700
-Message-ID: <CAJHc60y67Be=XcJuy__2RN43WyN6YgukSAb0=T6TGwYHw+YpHg@mail.gmail.com>
-Subject: Re: [PATCH v9 2/3] KVM: selftests: aarch64: Introduce pmu_event_filter_test
+Date: Mon, 17 Jun 2024 17:01:36 -0700
+Message-ID: <CAJHc60xpGAA1pmz0ad_Fq3a5M-pQMiyxQ4hdNhc6vQrgpSjGww@mail.gmail.com>
+Subject: Re: [PATCH v9 3/3] KVM: selftests: aarch64: Add invalid filter test
+ in pmu_event_filter_test
 To: Shaoqin Huang <shahuang@redhat.com>
 Cc: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, 
+	Eric Auger <eric.auger@redhat.com>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
 	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Shaoqin
+Hi Shaoqin,
 
-
-On Thu, Jun 13, 2024 at 1:28=E2=80=AFAM Shaoqin Huang <shahuang@redhat.com>=
+On Thu, Jun 13, 2024 at 1:27=E2=80=AFAM Shaoqin Huang <shahuang@redhat.com>=
  wrote:
-
-> +static void prepare_expected_pmce(struct kvm_pmu_event_filter *filter)
+>
+> Add the invalid filter test which sets the filter beyond the event
+> space and sets the invalid action to double check if the
+> KVM_ARM_VCPU_PMU_V3_FILTER will return the expected error.
+>
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
+> ---
+>  .../kvm/aarch64/pmu_event_filter_test.c       | 37 +++++++++++++++++++
+>  1 file changed, 37 insertions(+)
+>
+> diff --git a/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c =
+b/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
+> index fb0fde1ed436..13b2f354c39b 100644
+> --- a/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
+> +++ b/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
+> @@ -8,6 +8,7 @@
+>   * This test checks if the guest only see the limited pmu event that use=
+rspace
+>   * sets, if the guest can use those events which user allow, and if the =
+guest
+>   * can't use those events which user deny.
+> + * It also checks that setting invalid filter ranges return the expected=
+ error.
+>   * This test runs only when KVM_CAP_ARM_PMU_V3, KVM_ARM_VCPU_PMU_V3_FILT=
+ER
+>   * is supported on the host.
+>   */
+> @@ -178,6 +179,40 @@ static void destroy_vpmu_vm(void)
+>         kvm_vm_free(vpmu_vm.vm);
+>  }
+>
+> +static void test_invalid_filter(void)
 > +{
-> +       struct pmu_common_event_ids pmce_mask =3D { ~0, ~0 };
-> +       bool first_filter =3D true;
-> +       int i;
+> +       struct kvm_pmu_event_filter invalid;
+> +       int ret;
 > +
-> +       while (filter && filter->nevents !=3D 0) {
-Do you also want to add a check to ensure we aren't running over
-FILTER_NR (I'd expect a compiler warning/error though)?
-
-> +               if (first_filter) {
-> +                       if (filter->action =3D=3D KVM_PMU_EVENT_ALLOW)
-> +                               memset(&pmce_mask, 0, sizeof(pmce_mask));
-> +                       first_filter =3D false;
-> +               }
-nit: Probably we can make the 'first_filter' part a little cleaner by
-checking this outside the loop.
-
-if (filter && filter->action =3D=3D KVM_PMU_EVENT_ALLOW)
-        memset(&pmce_mask, 0, sizeof(pmce_mask));
-
-while (filter && filter->nevents !=3D 0) {
-    ...
-}
-
-> +static struct test_desc tests[] =3D {
-> +       {
-> +               .name =3D "without_filter",
-> +               .filter =3D {
-> +                       { 0 }
-> +               },
-> +       },
-> +       {
-> +               .name =3D "member_allow_filter",
-> +               .filter =3D {
-> +                       DEFINE_FILTER(ARMV8_PMUV3_PERFCTR_SW_INCR, 0),
-In terms of readability, do you think it's better to use
-KVM_PMU_EVENT_{ALLOW|DENY}, instead of 0 and 1?
-
-Or, if that's coming out to be too long, may be create another wrapper
-over DEFINE_FILTER, and simply use that in the array:
-
-#define EVENT_ALLOW(event) DEFINE_FILTER(event, KVM_PMU_EVENT_ALLOW)
-#define EVENT_DENY(event) DEFINE_FILTER(event, KVM_PMU_EVENT_DENY)
-
-.filter =3D {
-    EVENT_ALLOW(ARMV8_PMUV3_PERFCTR_SW_INCR),
-
-> +                       DEFINE_FILTER(ARMV8_PMUV3_PERFCTR_INST_RETIRED, 0=
-),
-> +                       DEFINE_FILTER(ARMV8_PMUV3_PERFCTR_BR_RETIRED, 0),
-> +                       { 0 },
-> +               },
-> +       },
-
-> +       {
-> +               .name =3D "cancel_filter",
-> +               .filter =3D {
-> +                       DEFINE_FILTER(ARMV8_PMUV3_PERFCTR_CPU_CYCLES, 0),
-> +                       DEFINE_FILTER(ARMV8_PMUV3_PERFCTR_CPU_CYCLES, 1),
-> +               },
-Since the initial filter map depends on the event being allowed or
-denied, do you think another "cancel_filter" case to first deny and
-then allow would also be better?
-
-> +       },
-> +       {
-> +               .name =3D "multiple_filter",
-> +               .filter =3D {
-> +                       __DEFINE_FILTER(0x0, 0x10, 0),
-> +                       __DEFINE_FILTER(0x6, 0x3, 1),
-> +               },
-> +       },
-> +       { 0 }
-> +};
+> +       pr_info("Test: test_invalid_filter\n");
 > +
-> +static void run_tests(void)
-> +{
-> +       struct test_desc *t;
+> +       memset(&vpmu_vm, 0, sizeof(vpmu_vm));
 > +
-> +       for (t =3D &tests[0]; t->name; t++)
-> +               run_test(t);
-> +}
+> +       vpmu_vm.vm =3D vm_create(1);
+> +       vpmu_vm.vcpu =3D vm_vcpu_add_with_vpmu(vpmu_vm.vm, 0, guest_code)=
+;
+> +       vpmu_vm.gic_fd =3D vgic_v3_setup(vpmu_vm.vm, 1, 64);
+> +       __TEST_REQUIRE(vpmu_vm.gic_fd >=3D 0,
+> +                      "Failed to create vgic-v3, skipping");
 > +
-> +int used_pmu_events[] =3D {
-nit: static int used_pmu_events[] =3D {
+> +       /* The max event number is (1 << 16), set a range largeer than it=
+. */
+nit: s/largeer/larger
 
-Thank you.
-Raghavendra
+Also, perhaps not in this series, but we can also check for -EBUSY
+situations such as setting a (valid) filter after
+KVM_ARM_VCPU_PMU_V3_INIT and after the vCPUs have started.
+
+Besides that, Reviewed-by: Raghavendra Rao Ananta <rananta@google.com>
+
+- Raghavendra
 
 
-> +       ARMV8_PMUV3_PERFCTR_BR_RETIRED,
-> +       ARMV8_PMUV3_PERFCTR_INST_RETIRED,
-> +       ARMV8_PMUV3_PERFCTR_CHAIN,
-> +};
+
+> +       invalid =3D __DEFINE_FILTER(BIT(15), BIT(15) + 1, 0);
+> +       ret =3D __kvm_device_attr_set(vpmu_vm.vcpu->fd, KVM_ARM_VCPU_PMU_=
+V3_CTRL,
+> +                                   KVM_ARM_VCPU_PMU_V3_FILTER, &invalid)=
+;
+> +       TEST_ASSERT(ret && errno =3D=3D EINVAL, "Set Invalid filter range=
+ "
+> +                   "ret =3D %d, errno =3D %d (expected ret =3D -1, errno=
+ =3D EINVAL)",
+> +                   ret, errno);
 > +
-> +static bool kvm_pmu_support_events(void)
-> +{
-> +       struct pmu_common_event_ids used_pmce =3D { 0, 0 };
+> +       /* Set the Invalid action. */
+> +       invalid =3D __DEFINE_FILTER(0, 1, 3);
+> +       ret =3D __kvm_device_attr_set(vpmu_vm.vcpu->fd, KVM_ARM_VCPU_PMU_=
+V3_CTRL,
+> +                                   KVM_ARM_VCPU_PMU_V3_FILTER, &invalid)=
+;
+> +       TEST_ASSERT(ret && errno =3D=3D EINVAL, "Set Invalid filter actio=
+n "
+> +                   "ret =3D %d, errno =3D %d (expected ret =3D -1, errno=
+ =3D EINVAL)",
+> +                   ret, errno);
 > +
-> +       create_vpmu_vm(guest_get_pmceid);
-> +
-> +       memset(&max_pmce, 0, sizeof(max_pmce));
-> +       sync_global_to_guest(vpmu_vm.vm, max_pmce);
-> +       run_vcpu(vpmu_vm.vcpu);
-> +       sync_global_from_guest(vpmu_vm.vm, max_pmce);
 > +       destroy_vpmu_vm();
-> +
-> +       for (int i =3D 0; i < ARRAY_SIZE(used_pmu_events); i++)
-> +               set_pmce(&used_pmce, KVM_PMU_EVENT_ALLOW, used_pmu_events=
-[i]);
-> +
-> +       return ((max_pmce.pmceid0 & used_pmce.pmceid0) =3D=3D used_pmce.p=
-mceid0) &&
-> +              ((max_pmce.pmceid1 & used_pmce.pmceid1) =3D=3D used_pmce.p=
-mceid1);
 > +}
 > +
-> +int main(void)
-> +{
-> +       TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_PMU_V3));
-> +       TEST_REQUIRE(kvm_pmu_support_events());
+>  static void run_test(struct test_desc *t)
+>  {
+>         pr_info("Test: %s\n", t->name);
+> @@ -300,4 +335,6 @@ int main(void)
+>         TEST_REQUIRE(kvm_pmu_support_events());
+>
+>         run_tests();
 > +
-> +       run_tests();
-> +}
+> +       test_invalid_filter();
+>  }
 > --
 > 2.40.1
 >
