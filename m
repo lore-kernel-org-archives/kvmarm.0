@@ -1,121 +1,94 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A3B91F176
-	for <kvmarm@lists.linux.dev>; Tue, 18 Jun 2024 05:55:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2751A4DA08
+	for <kvmarm@lists.linux.dev>; Tue, 18 Jun 2024 06:38:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718690140; cv=none; b=evuzkRayzDY+req65HVui+SLRTaWQ6qKHZHnxNkUrPsllVf1vi9ox942ZmDFa7CfkKRGpMgMwnYaZvg5bp7weR1WqPjcWOrH9W8rzj1Pji44gVNvwIg62ZBmUrWNVHl4717vHnnFkUnFvJmXNf1ciI3EcK8mmjVPU7VQJKK0SDI=
+	t=1718692705; cv=none; b=DKLK5fAbDIpKGtvtOezSoalY5CH5OansANgXf8AWz/3DKzv8gS4JKlVuQ+/iYFCXFICe2JZ8jLAZpOJJaXOs+eCH5m3rGYIuS3+dwtNUdYq4O8aqZPb2ajMH9pyuGTWD5v28VUmkln6QYZ5EkYUf2ZYL1A/WfHqZziewadnpOnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718690140; c=relaxed/simple;
-	bh=7RiwnKT2I1MFdE03Yi9OQNr5nfwBkB7Vzra8koLRLqc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ktBO/X2vweUW/Kz31J0f4H13Wm3bclf/4lvpHBrbNLnSoxcMTit2VCNuZFY8KpgSOuBZjfY+k5/tLlulezG4GeXeRwYmPz1HK19iFjBJLWQDOrib2yJ/vtK+nTNXqEQpkgTm9B6/W4KhV+GXEpphMAuw8XOQ3axu9k9AMPlU+xc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DrzxiCPL; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1718692705; c=relaxed/simple;
+	bh=gr/1SwPJAVw0cJI2ym1vviBSRlIVKgVhxz//Y+b5Aok=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=eDMKVJcmG19uo8KHDgmi1RBjBRuIONNHZleBtVfuZC2AIGUDCvRdPa2MoBEyVk24MaXr89xYHKN35FzDOA0SC/v4OynYASTHHq8g7G788V2K/Wqz/3LbpYEbVuWcQ3JX+lXRCTA3SmfakHehQRUwTxstuEiTY3QHT0feXeI+Bok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=g89KtPx/; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DrzxiCPL"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g89KtPx/"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718690138;
+	s=mimecast20190719; t=1718692703;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=hWu/voSZi4FQiwHW6WOBcFhupKmk2O/NDijOpbvubbo=;
-	b=DrzxiCPLWRmGgQSAFDiNNQKaozwSgiAmJvuZvvT2fhHviuWwfDbfvjj3biWJWawJWEQQsg
-	dKyZv4qXTWKEG+PetZ5S65+JLhGBFaFk0VR05TIxCaCF/qSYbpzdAq5H0sh1Ala7ikEZJ4
-	XERuvl78HfPRf8dC35q++MAsASu6nCw=
-Received: from mail-oa1-f69.google.com (mail-oa1-f69.google.com
- [209.85.160.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-662-HmSUD_jmM4q7111P6PYamA-1; Tue, 18 Jun 2024 01:55:28 -0400
-X-MC-Unique: HmSUD_jmM4q7111P6PYamA-1
-Received: by mail-oa1-f69.google.com with SMTP id 586e51a60fabf-2502a80477bso92099fac.1
-        for <kvmarm@lists.linux.dev>; Mon, 17 Jun 2024 22:55:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718690128; x=1719294928;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hWu/voSZi4FQiwHW6WOBcFhupKmk2O/NDijOpbvubbo=;
-        b=CdI1ruDEkrqV8SBJd7s2wjmmxA9LIqcDBnntx0tufEvu/h4ai0GjCFakd3+FVYsGDY
-         aTqODMYl5urfq6N94iThjYtU4BePlA9vsyK3JLLUhlyUbwj1HYl1VvlnVxR8L41qKkfy
-         3DOatXpNr3yXq6V4jSsE3cyPkqdE1v5h8C5Q7sgHMeVruo+VhXBIQt84jX4GeFAxSsri
-         JHl+VJHHB1xWB2RduNheIUU9/HdW1GxTItONuXj1ka7G7LWmrG+tzo59gXacwUBAb5ca
-         4yiU8aHE8tZ+hQFpBMOROvwKZZiNg+mJADpB+OjQZ5MrPjvjez9F1CjW/LTLU0AgJ89g
-         EwsA==
-X-Forwarded-Encrypted: i=1; AJvYcCWHAbXjBGSjKdR1ih+INGLfmGAsScEHJuThvyq8FrMcj++sc2xFn+Twa9ffzYuNlzoj4Gm4KT9pJCI8knTdItiZ+ZM7GtvA
-X-Gm-Message-State: AOJu0YzMCJoaJZt72UU3c0rc8iudrgru5iXEqtl8oVxW6JjcBfTPXdSR
-	3FJQywcPuc2vwkxqNYRcTvhtXE6Iehm+86N6zWOlj8FY64WP2EDIYg3oBqTypz/TKdcCfEmNtnL
-	Q+KI5eofGqY8FRSYq9yDQkj8Hk3tvIiKLR707jtVkI96PvFXckSawWw==
-X-Received: by 2002:a05:6358:8a6:b0:19f:4cd0:aad1 with SMTP id e5c5f4694b2df-19fb4eb049cmr1247884855d.2.1718690128087;
-        Mon, 17 Jun 2024 22:55:28 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGmf7CqoB5qG+f+SoSDNog9sHPlb0eZ/k8nda7B9rivFb2/iFdvUu6nxAvxJ5wxsEEdjtvYqg==
-X-Received: by 2002:a05:6358:8a6:b0:19f:4cd0:aad1 with SMTP id e5c5f4694b2df-19fb4eb049cmr1247882755d.2.1718690127611;
-        Mon, 17 Jun 2024 22:55:27 -0700 (PDT)
-Received: from [10.66.61.39] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-6fedf592f0csm7512541a12.54.2024.06.17.22.55.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 17 Jun 2024 22:55:27 -0700 (PDT)
-Message-ID: <8fd7e58d-1d87-430d-a974-47ee05bc72de@redhat.com>
-Date: Tue, 18 Jun 2024 13:55:22 +0800
+	bh=alVkXy29B6lCCtrvfQsOKPf61sX9EkJJRVUtXFrupoY=;
+	b=g89KtPx/HSSR742PQI1PWvA9sJhl9PnaS43eqgd6q/vUJyST7946ZBAs4vInSOOsfsOOga
+	lUttjYJmONVQWNhIkKLOk0rHiJi1RgKz0APqRvzpdhg46yk5EIO7pg2ujw62gYcJ6Xjoch
+	pTth6FqZTl7Hid7BGniz1RVVVYs3ii0=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-467-H7SqDQxRMM23ukg-vVGD_g-1; Tue,
+ 18 Jun 2024 02:38:19 -0400
+X-MC-Unique: H7SqDQxRMM23ukg-vVGD_g-1
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 671A919560B0;
+	Tue, 18 Jun 2024 06:38:17 +0000 (UTC)
+Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A4F811956055;
+	Tue, 18 Jun 2024 06:38:14 +0000 (UTC)
+From: Shaoqin Huang <shahuang@redhat.com>
+To: Oliver Upton <oliver.upton@linux.dev>,
+	Marc Zyngier <maz@kernel.org>,
+	kvmarm@lists.linux.dev
+Cc: Shaoqin Huang <shahuang@redhat.com>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 1/2] KVM: arm64: Allow userspace to change ID_AA64PFR1_EL1
+Date: Tue, 18 Jun 2024 02:38:06 -0400
+Message-Id: <20240618063808.1040085-2-shahuang@redhat.com>
+In-Reply-To: <20240618063808.1040085-1-shahuang@redhat.com>
+References: <20240618063808.1040085-1-shahuang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 0/2] KVM: arm64: Making BT Field in ID_AA64PFR1_EL1
- writable
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, James Morse
- <james.morse@arm.com>, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
- Shuah Khan <shuah@kernel.org>, Suzuki K Poulose <suzuki.poulose@arm.com>,
- Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
-References: <20240617075131.1006173-1-shahuang@redhat.com>
- <ZnB1FPw3Eg8-61mL@linux.dev>
-From: Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <ZnB1FPw3Eg8-61mL@linux.dev>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Hi Oliver,
+Allow userspace to change the guest-visible value of the register with
+some severe limitation:
 
-On 6/18/24 01:40, Oliver Upton wrote:
-> On Mon, Jun 17, 2024 at 03:51:29AM -0400, Shaoqin Huang wrote:
->> In this patch series, we try to make more register fields writable like
->> ID_AA64PFR1_EL1.BT since this can benifit the migration between some of the
->> machines which have different BT values.
->>
->> Changelog:
->> ----------
->> RFCv1 -> v1:
->>    * Fix the compilation error.
->>    * Delete the machine specific information and make the description more
->>      generable.
-> 
-> Can you please address Marc's feedback?
-> 
-> If we only make things writable a field at a time it's going to take
-> forever to catch up w/ the architecture.
-> 
-> https://lore.kernel.org/kvmarm/86zfrpjkt6.wl-maz@kernel.org/
+  - No changes to features not virtualized by KVM (MPAM_frac, RAS_frac)
+---
+ arch/arm64/kvm/sys_regs.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Ok. I will update the patch series again with tackling the full register.
-
-Thanks,
-Shaoqin
-
-> 
-
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 22b45a15d068..bead81867bce 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2306,7 +2306,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 		   ID_AA64PFR0_EL1_GIC |
+ 		   ID_AA64PFR0_EL1_AdvSIMD |
+ 		   ID_AA64PFR0_EL1_FP), },
+-	ID_SANITISED(ID_AA64PFR1_EL1),
++	ID_WRITABLE(ID_AA64PFR1_EL1, ~(ID_AA64PFR1_EL1_RAS_frac |
++				       ID_AA64PFR1_EL1_MPAM_frac)),
+ 	ID_UNALLOCATED(4,2),
+ 	ID_UNALLOCATED(4,3),
+ 	ID_WRITABLE(ID_AA64ZFR0_EL1, ~ID_AA64ZFR0_EL1_RES0),
 -- 
-Shaoqin
+2.40.1
 
