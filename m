@@ -1,62 +1,52 @@
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DA387A705
-	for <kvmarm@lists.linux.dev>; Wed, 19 Jun 2024 08:41:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22FD07D40E
+	for <kvmarm@lists.linux.dev>; Wed, 19 Jun 2024 08:44:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718786522; cv=none; b=l93/9TH/TU66QWiEnZdjBi/6itFTVFgdNjLgZ6uTS13xmriyWaaedkrjQzVuZt9khPhwCBWdIrMeKPvDeHQ3w+gS4b7bsBZ3vHX+j4YPSNuh7EaQhmiLEIkWN/tMuV6RhzArpLtqMBl5H7wxgJVuBoVLqKbLxu6OeUY4UkKX/JE=
+	t=1718786678; cv=none; b=RPrzmn4+6fZ2Hzhj8EVLOceG/2G7BcNOrylyoU1acB3DuBy/y8rV/kqBNYwUBkD/u64/b/7tLCv1w1OWMbm8N/LfxlqbGPnEcYMbL/Dj4p7O2goVj67z0cHjWjGw8ah1aQ64NrCDd4Thr0O7aCSkfw+HCuPIihRXTnBJOA5bqls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718786522; c=relaxed/simple;
-	bh=HtjdXg9ZU+akgiCSMtHxSFxQ2HPFeYkojWZkkjhztbw=;
+	s=arc-20240116; t=1718786678; c=relaxed/simple;
+	bh=5aCPh77Ldx8FTswghU8WkSj+lO4LfEdFUS6n8x5JdU0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SQHx1w1q4zSK+DnOOwUkkmOZpuEId080H7l9BWXP4Ohn9PvuIs5UzyBcmGcptm/Of3wkLYyyi222H2ppf0ADHny+FP6zOccC0Ta8L1rZzYslZqqit4x2O2KGoLJIIrQ9c89ueZGNz2RKyj1BrNGF2tRVN0teXQnJaWAmL1TtpoQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jg2kJ3wA; arc=none smtp.client-ip=91.218.175.178
+	 MIME-Version:Content-Type; b=ftg1ba9FOCMyLSg7h921TEi0prpPyFE+4fO+fEWLdXV2WF8HRW/d9VIjOTaY9OmZ5ybgjbrxoYBLuDwnhu315jObqoCc//c0UYcbryMIYkQEQusOblDpAxU3n5n3GAofjP18K92VarCLWoikDycQ78YSMk21P/VPhXMz0ot56pQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Vjxk5zuK; arc=none smtp.client-ip=95.215.58.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jg2kJ3wA"
-X-Envelope-To: kvm@vger.kernel.org
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Vjxk5zuK"
+X-Envelope-To: kvmarm@lists.linux.dev
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1718786517;
+	t=1718786675;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=EJVO7AfMHkPi8E140K5GfFbeAJzLQ61z8H0562UabYQ=;
-	b=jg2kJ3wAtcctxn4PlxIB06Lslr6GcwVnYSxnBhmqqxLBdeDXpgnFWZvw7uWV+JyXQtDWwi
-	bTUGfgYN7c5njFzuk/m3BYeldosXoxgYc67eFQ9K4+sT9ULLapmjL+sUUmSVKaa7T+F02j
-	ohsfD9v7+ZUmQ49jeStqP4b9EBMnGJ0=
-X-Envelope-To: maz@kernel.org
-X-Envelope-To: kvmarm@lists.linux.dev
-X-Envelope-To: linux-arm-kernel@lists.infradead.org
+	bh=wEXaKHJtfpcG478YA2q4EITe1Z4seqreYLJOQ6rw9gg=;
+	b=Vjxk5zuKQ2UcS2p9UR8OCa7u7zF/n0n0lyRqtyV/LOyIj8fOKIwTxzRXUXYXr0AbimLRaw
+	WJsQAIGDG7wXxbO8TkEOX8TOxkmOiTKUYbHCp7IvGe82CLNVqpnXngIrjqdzNAw0/DHP6b
+	OUPnF59XoE72HWbffe1m1N2cld/FwsA=
 X-Envelope-To: oliver.upton@linux.dev
-X-Envelope-To: christoffer.dall@arm.com
-X-Envelope-To: suzuki.poulose@arm.com
-X-Envelope-To: alexandru.elisei@arm.com
-X-Envelope-To: james.morse@arm.com
-X-Envelope-To: joey.gouly@arm.com
-X-Envelope-To: gankulkarni@os.amperecomputing.com
 X-Envelope-To: yuzenghui@huawei.com
+X-Envelope-To: kvm@vger.kernel.org
+X-Envelope-To: suzuki.poulose@arm.com
+X-Envelope-To: james.morse@arm.com
+X-Envelope-To: maz@kernel.org
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: kvm@vger.kernel.org,
-	Marc Zyngier <maz@kernel.org>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Christoffer Dall <christoffer.dall@arm.com>,
+To: kvmarm@lists.linux.dev,
+	Oliver Upton <oliver.upton@linux.dev>
+Cc: Zenghui Yu <yuzenghui@huawei.com>,
+	kvm@vger.kernel.org,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
 	James Morse <james.morse@arm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v3 00/16] KVM: arm64: nv: Shadow stage-2 page table handling
-Date: Wed, 19 Jun 2024 08:41:44 +0000
-Message-ID: <171878647493.242213.9111337124987897859.b4-ty@linux.dev>
-In-Reply-To: <20240614144552.2773592-1-maz@kernel.org>
-References: <20240614144552.2773592-1-maz@kernel.org>
+	Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH] KVM: arm64: nv: Use GFP_KERNEL_ACCOUNT for sysreg_masks allocation
+Date: Wed, 19 Jun 2024 08:44:25 +0000
+Message-ID: <171878665214.244284.3784152770789758409.b4-ty@linux.dev>
+In-Reply-To: <20240617181018.2054332-1-oliver.upton@linux.dev>
+References: <20240617181018.2054332-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -67,51 +57,17 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-On Fri, 14 Jun 2024 15:45:36 +0100, Marc Zyngier wrote:
-> Here's the thurd version of the shadow stage-2 handling for NV
-> support on arm64.
+On Mon, 17 Jun 2024 18:10:18 +0000, Oliver Upton wrote:
+> Of course, userspace is in the driver's seat for struct kvm and
+> associated allocations. Make sure the sysreg_masks allocation
+> participates in kmem accounting.
 > 
-> * From v2 [2]
 > 
->   - Simplified the S2 walker by dropping a bunch of redundant
->     fields from the walker info structure
-> 
-> [...]
 
 Applied to kvmarm/next, thanks!
 
-[01/16] KVM: arm64: nv: Support multiple nested Stage-2 mmu structures
-        https://git.kernel.org/kvmarm/kvmarm/c/4f128f8e1aaa
-[02/16] KVM: arm64: nv: Implement nested Stage-2 page table walk logic
-        https://git.kernel.org/kvmarm/kvmarm/c/61e30b9eef7f
-[03/16] KVM: arm64: nv: Handle shadow stage 2 page faults
-        https://git.kernel.org/kvmarm/kvmarm/c/fd276e71d1e7
-[04/16] KVM: arm64: nv: Unmap/flush shadow stage 2 page tables
-        https://git.kernel.org/kvmarm/kvmarm/c/ec14c272408a
-[05/16] KVM: arm64: nv: Add Stage-1 EL2 invalidation primitives
-        https://git.kernel.org/kvmarm/kvmarm/c/82e86326ec58
-[06/16] KVM: arm64: nv: Handle EL2 Stage-1 TLB invalidation
-        https://git.kernel.org/kvmarm/kvmarm/c/67fda56e76da
-[07/16] KVM: arm64: nv: Handle TLB invalidation targeting L2 stage-1
-        https://git.kernel.org/kvmarm/kvmarm/c/8e236efa4cd2
-[08/16] KVM: arm64: nv: Handle TLBI VMALLS12E1{,IS} operations
-        https://git.kernel.org/kvmarm/kvmarm/c/e6c9a3015ff2
-[09/16] KVM: arm64: nv: Handle TLBI ALLE1{,IS} operations
-        https://git.kernel.org/kvmarm/kvmarm/c/5cfb6cec62f2
-[10/16] KVM: arm64: nv: Handle TLBI IPAS2E1{,IS} operations
-        https://git.kernel.org/kvmarm/kvmarm/c/70109bcd701e
-[11/16] KVM: arm64: nv: Handle FEAT_TTL hinted TLB operations
-        https://git.kernel.org/kvmarm/kvmarm/c/d1de1576dc21
-[12/16] KVM: arm64: nv: Tag shadow S2 entries with guest's leaf S2 level
-        https://git.kernel.org/kvmarm/kvmarm/c/b1a3a94812b9
-[13/16] KVM: arm64: nv: Invalidate TLBs based on shadow S2 TTL-like information
-        https://git.kernel.org/kvmarm/kvmarm/c/809b2e6013a5
-[14/16] KVM: arm64: nv: Add handling of outer-shareable TLBI operations
-        https://git.kernel.org/kvmarm/kvmarm/c/0cb8aae22676
-[15/16] KVM: arm64: nv: Add handling of range-based TLBI operations
-        https://git.kernel.org/kvmarm/kvmarm/c/5d476ca57d7d
-[16/16] KVM: arm64: nv: Add handling of NXS-flavoured TLBI operations
-        https://git.kernel.org/kvmarm/kvmarm/c/0feec7769a63
+[1/1] KVM: arm64: nv: Use GFP_KERNEL_ACCOUNT for sysreg_masks allocation
+      https://git.kernel.org/kvmarm/kvmarm/c/3dc14eefa504
 
 --
 Best,
