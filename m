@@ -1,74 +1,79 @@
-Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22FD07D40E
-	for <kvmarm@lists.linux.dev>; Wed, 19 Jun 2024 08:44:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 225DF2262B;
+	Wed, 19 Jun 2024 16:45:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718786678; cv=none; b=RPrzmn4+6fZ2Hzhj8EVLOceG/2G7BcNOrylyoU1acB3DuBy/y8rV/kqBNYwUBkD/u64/b/7tLCv1w1OWMbm8N/LfxlqbGPnEcYMbL/Dj4p7O2goVj67z0cHjWjGw8ah1aQ64NrCDd4Thr0O7aCSkfw+HCuPIihRXTnBJOA5bqls=
+	t=1718815537; cv=none; b=jOkOv5qgQDWvjSYAL8TzI/otorPIeLdz7bH6XaiJe9N50v7o2jrulFdEJDDm9GJpSpVi2rDbHbZc4REddberCOUNFELsvX704FRCNm+aDtRAeelprP2yo+4WW2wUtTNBCXu6I7Ty9dEGRKGO1tesZP2iS1nkayBngMz9GOuLc5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718786678; c=relaxed/simple;
-	bh=5aCPh77Ldx8FTswghU8WkSj+lO4LfEdFUS6n8x5JdU0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ftg1ba9FOCMyLSg7h921TEi0prpPyFE+4fO+fEWLdXV2WF8HRW/d9VIjOTaY9OmZ5ybgjbrxoYBLuDwnhu315jObqoCc//c0UYcbryMIYkQEQusOblDpAxU3n5n3GAofjP18K92VarCLWoikDycQ78YSMk21P/VPhXMz0ot56pQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Vjxk5zuK; arc=none smtp.client-ip=95.215.58.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Vjxk5zuK"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1718786675;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wEXaKHJtfpcG478YA2q4EITe1Z4seqreYLJOQ6rw9gg=;
-	b=Vjxk5zuKQ2UcS2p9UR8OCa7u7zF/n0n0lyRqtyV/LOyIj8fOKIwTxzRXUXYXr0AbimLRaw
-	WJsQAIGDG7wXxbO8TkEOX8TOxkmOiTKUYbHCp7IvGe82CLNVqpnXngIrjqdzNAw0/DHP6b
-	OUPnF59XoE72HWbffe1m1N2cld/FwsA=
-X-Envelope-To: oliver.upton@linux.dev
-X-Envelope-To: yuzenghui@huawei.com
-X-Envelope-To: kvm@vger.kernel.org
-X-Envelope-To: suzuki.poulose@arm.com
-X-Envelope-To: james.morse@arm.com
-X-Envelope-To: maz@kernel.org
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev,
-	Oliver Upton <oliver.upton@linux.dev>
-Cc: Zenghui Yu <yuzenghui@huawei.com>,
-	kvm@vger.kernel.org,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	James Morse <james.morse@arm.com>,
-	Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH] KVM: arm64: nv: Use GFP_KERNEL_ACCOUNT for sysreg_masks allocation
-Date: Wed, 19 Jun 2024 08:44:25 +0000
-Message-ID: <171878665214.244284.3784152770789758409.b4-ty@linux.dev>
-In-Reply-To: <20240617181018.2054332-1-oliver.upton@linux.dev>
-References: <20240617181018.2054332-1-oliver.upton@linux.dev>
+	s=arc-20240116; t=1718815537; c=relaxed/simple;
+	bh=P2oWftT14YMia0FjGGbhP1AWG3nlhxxm36t98Fii8Hg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cxFhaZe0b7SecrbyPdDRj5aHAp87i+4m9ewuhG5l9q5S0rmTpP9mVtCN8LLDyx2PMzUKSapnelGwvEL/t5/g2rTH3FxxPZ++cZcSAb+8OWkXZA0ZJrrjnfOwRhMmJiILYrek19/uSxRWHDSJ1Lc5XPVE9CGiinow/DgqUWMZqJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47094C2BBFC;
+	Wed, 19 Jun 2024 16:45:32 +0000 (UTC)
+Date: Wed, 19 Jun 2024 17:45:29 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Amit Daniel Kachhap <amitdaniel.kachhap@arm.com>
+Cc: Joey Gouly <joey.gouly@arm.com>, linux-arm-kernel@lists.infradead.org,
+	akpm@linux-foundation.org, aneesh.kumar@kernel.org,
+	aneesh.kumar@linux.ibm.com, bp@alien8.de, broonie@kernel.org,
+	christophe.leroy@csgroup.eu, dave.hansen@linux.intel.com,
+	hpa@zytor.com, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
+	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
+	oliver.upton@linux.dev, shuah@kernel.org, szabolcs.nagy@arm.com,
+	tglx@linutronix.de, will@kernel.org, x86@kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v4 13/29] arm64: convert protection key into vm_flags and
+ pgprot values
+Message-ID: <ZnMLKb_gWsbLgMf3@arm.com>
+References: <20240503130147.1154804-1-joey.gouly@arm.com>
+ <20240503130147.1154804-14-joey.gouly@arm.com>
+ <4f7d8691-fe19-4e8a-95e5-9f7680c82021@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4f7d8691-fe19-4e8a-95e5-9f7680c82021@arm.com>
 
-On Mon, 17 Jun 2024 18:10:18 +0000, Oliver Upton wrote:
-> Of course, userspace is in the driver's seat for struct kvm and
-> associated allocations. Make sure the sysreg_masks allocation
-> participates in kmem accounting.
+On Tue, May 28, 2024 at 12:24:57PM +0530, Amit Daniel Kachhap wrote:
+> On 5/3/24 18:31, Joey Gouly wrote:
+> > diff --git a/arch/arm64/include/asm/mman.h b/arch/arm64/include/asm/mman.h
+> > index 5966ee4a6154..ecb2d18dc4d7 100644
+> > --- a/arch/arm64/include/asm/mman.h
+> > +++ b/arch/arm64/include/asm/mman.h
+> > @@ -7,7 +7,7 @@
+> >   #include <uapi/asm/mman.h>
+> >   static inline unsigned long arch_calc_vm_prot_bits(unsigned long prot,
+> > -	unsigned long pkey __always_unused)
+> > +	unsigned long pkey)
+> >   {
+> >   	unsigned long ret = 0;
+> > @@ -17,6 +17,12 @@ static inline unsigned long arch_calc_vm_prot_bits(unsigned long prot,
+> >   	if (system_supports_mte() && (prot & PROT_MTE))
+> >   		ret |= VM_MTE;
+> > +#if defined(CONFIG_ARCH_HAS_PKEYS)
 > 
-> 
+> Should there be system_supports_poe() check like above?
 
-Applied to kvmarm/next, thanks!
+I think it should, otherwise we end up with these bits in the pte even
+when POE is not supported.
 
-[1/1] KVM: arm64: nv: Use GFP_KERNEL_ACCOUNT for sysreg_masks allocation
-      https://git.kernel.org/kvmarm/kvmarm/c/3dc14eefa504
+> > +	ret |= pkey & 0x1 ? VM_PKEY_BIT0 : 0;
+> > +	ret |= pkey & 0x2 ? VM_PKEY_BIT1 : 0;
+> > +	ret |= pkey & 0x4 ? VM_PKEY_BIT2 : 0;
+> > +#endif
+> > +
+> >   	return ret;
+> >   }
+> >   #define arch_calc_vm_prot_bits(prot, pkey) arch_calc_vm_prot_bits(prot, pkey)
 
---
-Best,
-Oliver
+-- 
+Catalin
