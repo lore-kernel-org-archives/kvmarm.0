@@ -1,30 +1,32 @@
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EE3D1848
-	for <kvmarm@lists.linux.dev>; Wed, 19 Jun 2024 17:40:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB72E154C16
+	for <kvmarm@lists.linux.dev>; Wed, 19 Jun 2024 17:40:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718818852; cv=none; b=gNLT5sgEHmo5kEhZ0lxEpKDy+i7z3Rtzc68D7BZhB2y3S+OB6Ro4UMCBKUTrRZPttsZDF1YLSnW6H/1dyacWj63UjTZAsyaunwRxz4IRHOJCwEcMalyEX6YlKMNJsQtkU1CYgao6298srGfaVQngxJJjPWnhuP0QN2UIGd+BETs=
+	t=1718818854; cv=none; b=i7VW4qbIQxzrOnotQzZ2252ShgbHMdZV2DHf8+a1gZ8XP5KLtf3y4DyVNtyooiH0XLYifYp9RjKwxL2OnEIjx8OJZ1ryqzJ3IGQyd+oqG7Aa26jNMzmOpZ+EHSJ6V0B4rst5nGY3zNNDahayxAlo8wHt2YcW4YHxqbrDVtxcwpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718818852; c=relaxed/simple;
-	bh=6ZpQQhOBVU+C76jBiSGWWOfkxXfgx/HvuP/83NJOZXU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ds+nJiAjt69llbg1IB/ThQmkuLRjdXB7MDuDu7u5MRM1i5BmsS39Na2Az87zOqJsgEZQN//c57AQ2xZiLgrNccKe1qKXXj5NcgQgj3V9fYV4u/ttvwmp6D38OiocnMCJ+/TSpDFvg9/tQ2rS1W9dhKmBnW6hortckcslb/jE0dU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=iKjIRTgG; arc=none smtp.client-ip=91.218.175.186
+	s=arc-20240116; t=1718818854; c=relaxed/simple;
+	bh=ah2Ud0Emqs7MiYPhZsk+yzVqKpBYMG4icdhsrogIPWg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=HxpRzoaWHidhZcpop+U4RBvBzU3CAwmrAH72VSmQJTrHaUWa8kNAP6bI0g+dxpoViCiYzoMsy7EBFEXfmzHYsFyI0yX1LmE0N11kfLIm+DcZJrMh+AXstm3PlNcKm+YalWi5Lb17lqDqkHzZfEcI+WNHwrTFI7oT2C94VDWXTjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=E2wk9mJa; arc=none smtp.client-ip=91.218.175.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="iKjIRTgG"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="E2wk9mJa"
 X-Envelope-To: kvmarm@lists.linux.dev
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1718818847;
+	t=1718818849;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Us4fqCI5z6GkVlgltQOu7uUui4bViYbesL5BeljsKdk=;
-	b=iKjIRTgGVE82arVtDJ3yPBYpvXzDju3MbDNvWFF5dstkkoAOQPzasJLZ4WWicIRPa7Ykt3
-	9og8Ec2cQajrdW4eEgzwyyLdx9qWEAQsQqJWhhwEgjOfjFKvrFvZdLU/uSkYKP22dFKxZO
-	9FO2ZXL/LzMEXjS+jEUDYy1EFCP5xoM=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=inCZB7yLoO8sOkHWR/qe7HFeOgCtGBU9Y06+qtJ8a1w=;
+	b=E2wk9mJartlgHjQG5Lz8NOa9RvZliF3k78pJWbY8PtuX5PRQi+USeZZKE17KnDEMYF0Qw8
+	2mwVO95tdQRBoPGEkThRlfrbWedWG4EnH8ofgpHQ90slJumAOHPUEf+tHZc7fefDdWhEsf
+	PdQudafzoIX97SWcEXNLOY4c81mrGR0=
 X-Envelope-To: maz@kernel.org
 X-Envelope-To: james.morse@arm.com
 X-Envelope-To: suzuki.poulose@arm.com
@@ -46,9 +48,11 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Shaoqin Huang <shahuang@redhat.com>,
 	Eric Auger <eric.auger@redhat.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v5 00/10] KVM: arm64: Allow userspace to modify CTR_EL0
-Date: Wed, 19 Jun 2024 17:40:26 +0000
-Message-ID: <20240619174036.483943-1-oliver.upton@linux.dev>
+Subject: [PATCH v5 01/10] KVM: arm64: Get sys_reg encoding from descriptor in idregs_debug_show()
+Date: Wed, 19 Jun 2024 17:40:27 +0000
+Message-ID: <20240619174036.483943-2-oliver.upton@linux.dev>
+In-Reply-To: <20240619174036.483943-1-oliver.upton@linux.dev>
+References: <20240619174036.483943-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -58,52 +62,30 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-As I'd mentioned on the list, here is my rework of Sebastian's CTR_EL0
-series. Changes this time around:
+KVM is about to add support for more VM-scoped feature ID regs that
+live outside of the id_regs[] array, which means the index of the
+debugfs iterator may not actually be an index into the array.
 
- - Drop the cross-validation of the guest's CTR_EL0 with CLIDR_EL1 and
-   the CCSIDR_EL1 hierarchy, instead independently checking these
-   registers against the system's CTR_EL0 value.
+Prepare by getting the sys_reg encoding from the descriptor itself.
 
- - Rework the idregs debugfs interface to print all VM scoped feature ID
-   registers, which now includes CTR_EL0.
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+---
+ arch/arm64/kvm/sys_regs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- - Only reset the VM scoped value of CTR_EL0 once for a VM
-
- - Make feature ID register accesses go through read / write helpers,
-   with the intention of abstracting the layout of the registers +
-   adding sanity checks to writers.
-
-What I didn't do after all is come up with a better generic way to store
-ID registers at the VM scope, but the hope is that the accessors will
-make that trivial to change in the future.
-
-Oliver Upton (5):
-  KVM: arm64: Get sys_reg encoding from descriptor in
-    idregs_debug_show()
-  KVM: arm64: Make idregs debugfs iterator search sysreg table directly
-  KVM: arm64: Use read-only helper for reading VM ID registers
-  KVM: arm64: Add helper for writing ID regs
-  KVM: arm64: nv: Use accessors for modifying ID registers
-
-Sebastian Ott (5):
-  KVM: arm64: unify code to prepare traps
-  KVM: arm64: Treat CTR_EL0 as a VM feature ID register
-  KVM: arm64: show writable masks for feature registers
-  KVM: arm64: rename functions for invariant sys regs
-  KVM: selftests: arm64: Test writes to CTR_EL0
-
- arch/arm64/include/asm/kvm_emulate.h          |  40 +--
- arch/arm64/include/asm/kvm_host.h             |  26 +-
- arch/arm64/kvm/arm.c                          |   2 +-
- arch/arm64/kvm/nested.c                       | 256 +++++++++---------
- arch/arm64/kvm/pmu-emul.c                     |   2 +-
- arch/arm64/kvm/sys_regs.c                     | 140 ++++++----
- .../selftests/kvm/aarch64/set_id_regs.c       |  16 ++
- 7 files changed, 262 insertions(+), 220 deletions(-)
-
-
-base-commit: 1613e604df0cd359cf2a7fbd9be7a0bcfacfabd0
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 22b45a15d068..ad453c7ad6cc 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -3502,7 +3502,7 @@ static int idregs_debug_show(struct seq_file *s, void *v)
+ 		return 0;
+ 
+ 	seq_printf(s, "%20s:\t%016llx\n",
+-		   desc->name, IDREG(kvm, IDX_IDREG(kvm->arch.idreg_debugfs_iter)));
++		   desc->name, IDREG(kvm, reg_to_encoding(desc)));
+ 
+ 	return 0;
+ }
 -- 
 2.45.2.627.g7a2c4fd464-goog
 
