@@ -1,32 +1,32 @@
-Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C444157E88
-	for <kvmarm@lists.linux.dev>; Wed, 19 Jun 2024 17:41:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EE5E1581FC
+	for <kvmarm@lists.linux.dev>; Wed, 19 Jun 2024 17:41:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718818872; cv=none; b=tuaHYiyHFvsBq/qBUk6BYUPwdOrT8+734/hAknzZLLU/U/x8gfTSHw1FHkreB9Uf0c9eAX6oon85qqGinnodjZIcpQr3XiypehfPmHn8HVd3Ge9xoU50Tws2+U7Y4p5sMrzVcpdnXqwvk1JUjl7iR6nPewbZJm7gIg0GCSkNOYY=
+	t=1718818873; cv=none; b=Sq3cUi3pRN7W+NuyZqjrr8p2s9BzuXlTlR9GmDSBbm5683f/mv3deOWA5+l1Rhd3f3XTpur1Bt2wCjxyir0qI+wYu0BT2vbs2bulw46rBBEx5c2JI65dif27TF0SkL0ywGApR4HPkzt5ROkRs2ieUdNlNBRxAmFqGh6pp4vQcGE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718818872; c=relaxed/simple;
-	bh=qEE62H2HxrwyCPCdSlCshlrRlfwxiypo/Fr5nmHt2uw=;
+	s=arc-20240116; t=1718818873; c=relaxed/simple;
+	bh=QdkSxu8RWXYAe3d4ZOF2/aNp2IqZy+O8nOdjJwYWIQA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XiNyI0pu3QtXM/esUWZxqC/RkzFhVIMe3xU7CJo7wqpwZwOtjEQXL3MkzlGk3d+Ftvb4S798+QHt9fvSCMp1aFveq17ijdfuHpfMnvNwhapGqeQl6JgOokR0wsu55IZgRzC/8BcL9wwNdJ1jux4KbsSDi6sEuTTJxmfqfaamdCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TtwsZTr4; arc=none smtp.client-ip=91.218.175.174
+	 MIME-Version; b=FlGoMtB6jzC0ybf7m4HTUkMM740E9ybC52CInJZF5CMeiE/EkxrF1KhFGCUAFIWM0jjyzqQ4TV0+j6LdA84RjbrItS/ZSdG4lYsqiOnu5e04I0ipUjaZRKufPbojwiVBC+e+Ja3cunVM+3UXUJRrU5yezoLqpl2YmwBoKYQ9fvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pMSD5DNL; arc=none smtp.client-ip=91.218.175.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TtwsZTr4"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pMSD5DNL"
 X-Envelope-To: kvmarm@lists.linux.dev
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1718818868;
+	t=1718818870;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=sX8qpen1KxCpCteXFkrqjE8myujo22x82+dwXsifNig=;
-	b=TtwsZTr4W4Sf7knpQ7JW8ftiej1Sg4qtEJCruMiXkCuCzJQGi1DzSR3grBDdcBY39QqSnE
-	xdRWFwYnckphzCtlZJYxkD933Vme1s25Cehk+t5g6NMMVVFXJ85cUWkulVfiTxezK+Fv1Q
-	aUNAaFbfGj00D9YJJwnII7U3DHO1hMw=
+	bh=0r3LHAfIdQgocAIW5eYByrh9rwZzcWsyVJwKWHfsoaA=;
+	b=pMSD5DNLD0mckbTeX47jCn95koa+zPl2fp86ZMig+g61kSVwOuvAMbdnDJHLtDwUrzcC9M
+	U7tNtmpo5pGUyz+zfFyhWslQ60KVUSKiM7ty1IzPIPblxJglpaCkkRdVtSmZwVLR9WcHPW
+	+4qeDRL+utMyAefQzY34g1GNWK38QOM=
 X-Envelope-To: maz@kernel.org
 X-Envelope-To: james.morse@arm.com
 X-Envelope-To: suzuki.poulose@arm.com
@@ -48,9 +48,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Shaoqin Huang <shahuang@redhat.com>,
 	Eric Auger <eric.auger@redhat.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v5 09/10] KVM: arm64: rename functions for invariant sys regs
-Date: Wed, 19 Jun 2024 17:40:35 +0000
-Message-ID: <20240619174036.483943-10-oliver.upton@linux.dev>
+Subject: [PATCH v5 10/10] KVM: selftests: arm64: Test writes to CTR_EL0
+Date: Wed, 19 Jun 2024 17:40:36 +0000
+Message-ID: <20240619174036.483943-11-oliver.upton@linux.dev>
 In-Reply-To: <20240619174036.483943-1-oliver.upton@linux.dev>
 References: <20240619174036.483943-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -64,50 +64,62 @@ X-Migadu-Flow: FLOW_OUT
 
 From: Sebastian Ott <sebott@redhat.com>
 
-Invariant system id registers are populated with host values
-at initialization time using their .reset function cb.
-
-These are currently called get_* which is usually used by
-the functions implementing the .get_user callback.
-
-Change their function names to reset_* to reflect what they
-are used for.
+Test that CTR_EL0 is modifiable from userspace, that changes are
+visible to guests, and that they are preserved across a vCPU reset.
 
 Signed-off-by: Sebastian Ott <sebott@redhat.com>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/sys_regs.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ .../testing/selftests/kvm/aarch64/set_id_regs.c  | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index d8d2a7880576..71a4ed58f94b 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -3720,8 +3720,8 @@ id_to_sys_reg_desc(struct kvm_vcpu *vcpu, u64 id,
-  */
+diff --git a/tools/testing/selftests/kvm/aarch64/set_id_regs.c b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
+index a7de39fa2a0a..9583c04f1228 100644
+--- a/tools/testing/selftests/kvm/aarch64/set_id_regs.c
++++ b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
+@@ -219,6 +219,7 @@ static void guest_code(void)
+ 	GUEST_REG_SYNC(SYS_ID_AA64MMFR1_EL1);
+ 	GUEST_REG_SYNC(SYS_ID_AA64MMFR2_EL1);
+ 	GUEST_REG_SYNC(SYS_ID_AA64ZFR0_EL1);
++	GUEST_REG_SYNC(SYS_CTR_EL0);
  
- #define FUNCTION_INVARIANT(reg)						\
--	static u64 get_##reg(struct kvm_vcpu *v,			\
--			      const struct sys_reg_desc *r)		\
-+	static u64 reset_##reg(struct kvm_vcpu *v,			\
-+			       const struct sys_reg_desc *r)		\
- 	{								\
- 		((struct sys_reg_desc *)r)->val = read_sysreg(reg);	\
- 		return ((struct sys_reg_desc *)r)->val;			\
-@@ -3733,9 +3733,9 @@ FUNCTION_INVARIANT(aidr_el1)
+ 	GUEST_DONE();
+ }
+@@ -490,11 +491,25 @@ static void test_clidr(struct kvm_vcpu *vcpu)
+ 	test_reg_vals[encoding_to_range_idx(SYS_CLIDR_EL1)] = clidr;
+ }
  
- /* ->val is filled in by kvm_sys_reg_table_init() */
- static struct sys_reg_desc invariant_sys_regs[] __ro_after_init = {
--	{ SYS_DESC(SYS_MIDR_EL1), NULL, get_midr_el1 },
--	{ SYS_DESC(SYS_REVIDR_EL1), NULL, get_revidr_el1 },
--	{ SYS_DESC(SYS_AIDR_EL1), NULL, get_aidr_el1 },
-+	{ SYS_DESC(SYS_MIDR_EL1), NULL, reset_midr_el1 },
-+	{ SYS_DESC(SYS_REVIDR_EL1), NULL, reset_revidr_el1 },
-+	{ SYS_DESC(SYS_AIDR_EL1), NULL, reset_aidr_el1 },
- };
++static void test_ctr(struct kvm_vcpu *vcpu)
++{
++	u64 ctr;
++
++	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_CTR_EL0), &ctr);
++	ctr &= ~CTR_EL0_DIC_MASK;
++	if (ctr & CTR_EL0_IminLine_MASK)
++		ctr--;
++
++	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_CTR_EL0), ctr);
++	test_reg_vals[encoding_to_range_idx(SYS_CTR_EL0)] = ctr;
++}
++
+ static void test_vcpu_ftr_id_regs(struct kvm_vcpu *vcpu)
+ {
+ 	u64 val;
  
- static int get_invariant_sys_reg(u64 id, u64 __user *uaddr)
+ 	test_clidr(vcpu);
++	test_ctr(vcpu);
+ 
+ 	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_MPIDR_EL1), &val);
+ 	val++;
+@@ -525,6 +540,7 @@ static void test_reset_preserves_id_regs(struct kvm_vcpu *vcpu)
+ 		test_assert_id_reg_unchanged(vcpu, test_regs[i].reg);
+ 
+ 	test_assert_id_reg_unchanged(vcpu, SYS_CLIDR_EL1);
++	test_assert_id_reg_unchanged(vcpu, SYS_CTR_EL0);
+ 
+ 	ksft_test_result_pass("%s\n", __func__);
+ }
 -- 
 2.45.2.627.g7a2c4fd464-goog
 
