@@ -1,155 +1,118 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DB188002A
-	for <kvmarm@lists.linux.dev>; Wed, 19 Jun 2024 08:32:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DA387A705
+	for <kvmarm@lists.linux.dev>; Wed, 19 Jun 2024 08:41:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718785949; cv=none; b=n4Zbs31WeFqlN/XGbAfcR44SEyH1pp6Xryc5TeaOgWVetaGLaPTpkb89p70re8uON0T6nW7G6tAZsRRr0fR7lX8Btnx6j8VOsBtCnDKPK2p9Fr0k7fFQQVru3aZCaHNLfQTbpDlPwAYtIvbhAkRusVs9SEuifyBfBk65ZX0CNUQ=
+	t=1718786522; cv=none; b=l93/9TH/TU66QWiEnZdjBi/6itFTVFgdNjLgZ6uTS13xmriyWaaedkrjQzVuZt9khPhwCBWdIrMeKPvDeHQ3w+gS4b7bsBZ3vHX+j4YPSNuh7EaQhmiLEIkWN/tMuV6RhzArpLtqMBl5H7wxgJVuBoVLqKbLxu6OeUY4UkKX/JE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718785949; c=relaxed/simple;
-	bh=I96RkC4xfGimI+iZ2geT9XHUh0BU0vYjRgveulZ7u5M=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ZNY2qEIyWATvndIv6wYUHTJRBshqugouicyetZD7I0mNF9PN1cYn51qD3Ix6dnEeZtfZzWIXpCgRoenp8Jtn/gQxvp3i0ib7rRzNyKEE1HteUOJO2AazfgMQD9K3kFKrl+2jNwrMAa1mvTcaqtT/Leo1JwuSXJVBdfMtDPnZhBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PrMykd+R; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1718786522; c=relaxed/simple;
+	bh=HtjdXg9ZU+akgiCSMtHxSFxQ2HPFeYkojWZkkjhztbw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SQHx1w1q4zSK+DnOOwUkkmOZpuEId080H7l9BWXP4Ohn9PvuIs5UzyBcmGcptm/Of3wkLYyyi222H2ppf0ADHny+FP6zOccC0Ta8L1rZzYslZqqit4x2O2KGoLJIIrQ9c89ueZGNz2RKyj1BrNGF2tRVN0teXQnJaWAmL1TtpoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jg2kJ3wA; arc=none smtp.client-ip=91.218.175.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PrMykd+R"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718785946;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jg2kJ3wA"
+X-Envelope-To: kvm@vger.kernel.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1718786517;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=YOUVrsFqTcI6hNO1ofc9efuSDWP7z/I3VahfSx2CWU4=;
-	b=PrMykd+R2Hh4JyFNbo7f/Tr7f1L6/wg015tjRxv9VSA2/RH/sD8rHgTwpHaXSxsQdjBhTq
-	IxC969dw1hptxnD2m+HyGhxbVo5/aJxNGACnTMGrOi60rzEoyBKba32MahdwFHIHAegT9L
-	/K61ZF4CbNcjQzc43txkFC594bRfjbM=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-482-bwNdooy7PYmIH39rXBvjfw-1; Wed,
- 19 Jun 2024 04:32:21 -0400
-X-MC-Unique: bwNdooy7PYmIH39rXBvjfw-1
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AA4ED195609E;
-	Wed, 19 Jun 2024 08:32:19 +0000 (UTC)
-Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4D43C19560AF;
-	Wed, 19 Jun 2024 08:32:17 +0000 (UTC)
-From: Shaoqin Huang <shahuang@redhat.com>
-To: Oliver Upton <oliver.upton@linux.dev>,
+	bh=EJVO7AfMHkPi8E140K5GfFbeAJzLQ61z8H0562UabYQ=;
+	b=jg2kJ3wAtcctxn4PlxIB06Lslr6GcwVnYSxnBhmqqxLBdeDXpgnFWZvw7uWV+JyXQtDWwi
+	bTUGfgYN7c5njFzuk/m3BYeldosXoxgYc67eFQ9K4+sT9ULLapmjL+sUUmSVKaa7T+F02j
+	ohsfD9v7+ZUmQ49jeStqP4b9EBMnGJ0=
+X-Envelope-To: maz@kernel.org
+X-Envelope-To: kvmarm@lists.linux.dev
+X-Envelope-To: linux-arm-kernel@lists.infradead.org
+X-Envelope-To: oliver.upton@linux.dev
+X-Envelope-To: christoffer.dall@arm.com
+X-Envelope-To: suzuki.poulose@arm.com
+X-Envelope-To: alexandru.elisei@arm.com
+X-Envelope-To: james.morse@arm.com
+X-Envelope-To: joey.gouly@arm.com
+X-Envelope-To: gankulkarni@os.amperecomputing.com
+X-Envelope-To: yuzenghui@huawei.com
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvm@vger.kernel.org,
 	Marc Zyngier <maz@kernel.org>,
-	kvmarm@lists.linux.dev
-Cc: Shaoqin Huang <shahuang@redhat.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	James Morse <james.morse@arm.com>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Christoffer Dall <christoffer.dall@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v10 3/3] KVM: selftests: aarch64: Add invalid filter test in pmu_event_filter_test
-Date: Wed, 19 Jun 2024 04:31:56 -0400
-Message-Id: <20240619083200.1047073-4-shahuang@redhat.com>
-In-Reply-To: <20240619083200.1047073-1-shahuang@redhat.com>
-References: <20240619083200.1047073-1-shahuang@redhat.com>
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	James Morse <james.morse@arm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v3 00/16] KVM: arm64: nv: Shadow stage-2 page table handling
+Date: Wed, 19 Jun 2024 08:41:44 +0000
+Message-ID: <171878647493.242213.9111337124987897859.b4-ty@linux.dev>
+In-Reply-To: <20240614144552.2773592-1-maz@kernel.org>
+References: <20240614144552.2773592-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+X-Migadu-Flow: FLOW_OUT
 
-Add the invalid filter test which sets the filter beyond the event
-space and sets the invalid action to double check if the
-KVM_ARM_VCPU_PMU_V3_FILTER will return the expected error.
+On Fri, 14 Jun 2024 15:45:36 +0100, Marc Zyngier wrote:
+> Here's the thurd version of the shadow stage-2 handling for NV
+> support on arm64.
+> 
+> * From v2 [2]
+> 
+>   - Simplified the S2 walker by dropping a bunch of redundant
+>     fields from the walker info structure
+> 
+> [...]
 
-Reviewed-by: Raghavendra Rao Ananta <rananta@google.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
----
- .../kvm/aarch64/pmu_event_filter_test.c       | 38 +++++++++++++++++++
- 1 file changed, 38 insertions(+)
+Applied to kvmarm/next, thanks!
 
-diff --git a/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c b/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
-index 308b8677e08e..1abbe6d8deb2 100644
---- a/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
-+++ b/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
-@@ -8,6 +8,7 @@
-  * This test checks if the guest only see the limited pmu event that userspace
-  * sets, if the guest can use those events which user allow, and if the guest
-  * can't use those events which user deny.
-+ * It also checks that setting invalid filter ranges return the expected error.
-  * This test runs only when KVM_CAP_ARM_PMU_V3, KVM_ARM_VCPU_PMU_V3_FILTER
-  * is supported on the host.
-  */
-@@ -31,6 +32,7 @@ struct vpmu_vm {
- 
- static struct vpmu_vm vpmu_vm;
- 
-+#define KVM_PMU_EVENT_INVALID 3
- #define FILTER_NR 10
- 
- struct test_desc {
-@@ -181,6 +183,40 @@ static void destroy_vpmu_vm(void)
- 	kvm_vm_free(vpmu_vm.vm);
- }
- 
-+static void test_invalid_filter(void)
-+{
-+	struct kvm_pmu_event_filter invalid;
-+	int ret;
-+
-+	pr_info("Test: test_invalid_filter\n");
-+
-+	memset(&vpmu_vm, 0, sizeof(vpmu_vm));
-+
-+	vpmu_vm.vm = vm_create(1);
-+	vpmu_vm.vcpu = vm_vcpu_add_with_vpmu(vpmu_vm.vm, 0, guest_code);
-+	vpmu_vm.gic_fd = vgic_v3_setup(vpmu_vm.vm, 1, 64);
-+	__TEST_REQUIRE(vpmu_vm.gic_fd >= 0,
-+		       "Failed to create vgic-v3, skipping");
-+
-+	/* The max event number is (1 << 16), set a range largeer than it. */
-+	invalid = __DEFINE_FILTER(BIT(15), BIT(15) + 1, KVM_PMU_EVENT_ALLOW);
-+	ret = __kvm_device_attr_set(vpmu_vm.vcpu->fd, KVM_ARM_VCPU_PMU_V3_CTRL,
-+				    KVM_ARM_VCPU_PMU_V3_FILTER, &invalid);
-+	TEST_ASSERT(ret && errno == EINVAL, "Set Invalid filter range "
-+		    "ret = %d, errno = %d (expected ret = -1, errno = EINVAL)",
-+		    ret, errno);
-+
-+	/* Set the Invalid action. */
-+	invalid = __DEFINE_FILTER(0, 1, KVM_PMU_EVENT_INVALID);
-+	ret = __kvm_device_attr_set(vpmu_vm.vcpu->fd, KVM_ARM_VCPU_PMU_V3_CTRL,
-+				    KVM_ARM_VCPU_PMU_V3_FILTER, &invalid);
-+	TEST_ASSERT(ret && errno == EINVAL, "Set Invalid filter action "
-+		    "ret = %d, errno = %d (expected ret = -1, errno = EINVAL)",
-+		    ret, errno);
-+
-+	destroy_vpmu_vm();
-+}
-+
- static void run_test(struct test_desc *t)
- {
- 	pr_info("Test: %s\n", t->name);
-@@ -311,4 +347,6 @@ int main(void)
- 	TEST_REQUIRE(kvm_pmu_support_events());
- 
- 	run_tests();
-+
-+	test_invalid_filter();
- }
--- 
-2.40.1
+[01/16] KVM: arm64: nv: Support multiple nested Stage-2 mmu structures
+        https://git.kernel.org/kvmarm/kvmarm/c/4f128f8e1aaa
+[02/16] KVM: arm64: nv: Implement nested Stage-2 page table walk logic
+        https://git.kernel.org/kvmarm/kvmarm/c/61e30b9eef7f
+[03/16] KVM: arm64: nv: Handle shadow stage 2 page faults
+        https://git.kernel.org/kvmarm/kvmarm/c/fd276e71d1e7
+[04/16] KVM: arm64: nv: Unmap/flush shadow stage 2 page tables
+        https://git.kernel.org/kvmarm/kvmarm/c/ec14c272408a
+[05/16] KVM: arm64: nv: Add Stage-1 EL2 invalidation primitives
+        https://git.kernel.org/kvmarm/kvmarm/c/82e86326ec58
+[06/16] KVM: arm64: nv: Handle EL2 Stage-1 TLB invalidation
+        https://git.kernel.org/kvmarm/kvmarm/c/67fda56e76da
+[07/16] KVM: arm64: nv: Handle TLB invalidation targeting L2 stage-1
+        https://git.kernel.org/kvmarm/kvmarm/c/8e236efa4cd2
+[08/16] KVM: arm64: nv: Handle TLBI VMALLS12E1{,IS} operations
+        https://git.kernel.org/kvmarm/kvmarm/c/e6c9a3015ff2
+[09/16] KVM: arm64: nv: Handle TLBI ALLE1{,IS} operations
+        https://git.kernel.org/kvmarm/kvmarm/c/5cfb6cec62f2
+[10/16] KVM: arm64: nv: Handle TLBI IPAS2E1{,IS} operations
+        https://git.kernel.org/kvmarm/kvmarm/c/70109bcd701e
+[11/16] KVM: arm64: nv: Handle FEAT_TTL hinted TLB operations
+        https://git.kernel.org/kvmarm/kvmarm/c/d1de1576dc21
+[12/16] KVM: arm64: nv: Tag shadow S2 entries with guest's leaf S2 level
+        https://git.kernel.org/kvmarm/kvmarm/c/b1a3a94812b9
+[13/16] KVM: arm64: nv: Invalidate TLBs based on shadow S2 TTL-like information
+        https://git.kernel.org/kvmarm/kvmarm/c/809b2e6013a5
+[14/16] KVM: arm64: nv: Add handling of outer-shareable TLBI operations
+        https://git.kernel.org/kvmarm/kvmarm/c/0cb8aae22676
+[15/16] KVM: arm64: nv: Add handling of range-based TLBI operations
+        https://git.kernel.org/kvmarm/kvmarm/c/5d476ca57d7d
+[16/16] KVM: arm64: nv: Add handling of NXS-flavoured TLBI operations
+        https://git.kernel.org/kvmarm/kvmarm/c/0feec7769a63
 
+--
+Best,
+Oliver
