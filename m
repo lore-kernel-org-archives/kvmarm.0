@@ -1,29 +1,29 @@
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77E311ABCD1
-	for <kvmarm@lists.linux.dev>; Thu, 20 Jun 2024 13:07:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 842841AB34A
+	for <kvmarm@lists.linux.dev>; Thu, 20 Jun 2024 13:07:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718888839; cv=none; b=lx+oRRYZf11uZhsHWn9o+/zauRaIBxIAythRA0iM5O/TmL4OO5CvfzjNoaSG9jQJ+Ynm9jFF1QXOca8M1Re2uz/vbJhFxDH9WIdapMkJ685HDwbNxkH8f58e+ZcMQp+apL7Kwa6pHVTWuihDlMAwasv5XGR+ryeJ8zyCWVNApIM=
+	t=1718888842; cv=none; b=JMF0DYDOFRA1F2p76J7/+4CzVJVrGU10BolY3rp5T/c3HEovAzYdJYwJYDNvy8XkCdJ8Vy2Pivvd1eEYJSzMZZzzcCWHegmpku+CAPYBXmueCTMgA/rgYYMFjfT3gJLUudHhXBh1mM0p9PukFNB8JBJC29J0ZX8MjzEwl+DT6q8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718888839; c=relaxed/simple;
-	bh=qXgg4YnFscdDfM5Mc1C396w0pRm+/d+r1MBxx7Xl75c=;
+	s=arc-20240116; t=1718888842; c=relaxed/simple;
+	bh=uTOnmFKGBe+ENXecNJrs8a/MI+HBrKpS9PjMKGzeiXc=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=f6aApygG2CDDD1n5HrPEvZwyv4dJfpMbwzLR4QqToiOX5OcvL4POvDcjg355EX8cKea/cotU+3ZFjZrPnN4ONQDmIn6vMOIXxwuSS2V0SFYkBdIVVkE48oWLHt2f6l2OdPYrYhvhUVLCzzCEB9LdshexWBTnIBoqGiRrDiZ1mdc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+	 MIME-Version:Content-Type; b=nR8xQYyxFOpxP3SJlAi+6qG0NMa7hFynd4gPqpnLVdcn1vg1AwrQNiVAkDsCBHQFotNWlbKL7m4ArnE7krOzRY8mCFDf5M4Rf9Q2TMP4AG7mDQnWTusFOP/99X6YcHONkMRD29W9DtAXCeY+5RigRo3/ZbFNDY6xqAlkFU+b2Hk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4W4gdX3y3MzwTtF;
-	Thu, 20 Jun 2024 21:02:56 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4W4gfP4bL6z1ytV1;
+	Thu, 20 Jun 2024 21:03:41 +0800 (CST)
 Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
-	by mail.maildlp.com (Postfix) with ESMTPS id 08B2C18007E;
-	Thu, 20 Jun 2024 21:07:13 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 264821A016C;
+	Thu, 20 Jun 2024 21:07:15 +0800 (CST)
 Received: from DESKTOP-6NKE0BC.china.huawei.com (10.174.185.210) by
  kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 20 Jun 2024 21:07:11 +0800
+ 15.1.2507.39; Thu, 20 Jun 2024 21:07:13 +0800
 From: Kunkun Jiang <jiangkunkun@huawei.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
@@ -33,9 +33,9 @@ To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
 CC: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
 	<wanghaibin.wang@huawei.com>, Kunkun Jiang <jiangkunkun@huawei.com>,
 	<lishusen2@huawei.com>
-Subject: [PATCH 1/3] KVM: arm64: vgic-its: Add a data length check in vgic_its_save_*
-Date: Thu, 20 Jun 2024 21:06:48 +0800
-Message-ID: <20240620130650.1279-2-jiangkunkun@huawei.com>
+Subject: [PATCH 3/3] KVM: arm64: vgic-its: Clear ite when discard frees an ite
+Date: Thu, 20 Jun 2024 21:06:50 +0800
+Message-ID: <20240620130650.1279-4-jiangkunkun@huawei.com>
 X-Mailer: git-send-email 2.26.2.windows.1
 In-Reply-To: <20240620130650.1279-1-jiangkunkun@huawei.com>
 References: <20240620130650.1279-1-jiangkunkun@huawei.com>
@@ -50,43 +50,43 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
  kwepemm600007.china.huawei.com (7.193.23.208)
 
-In all the vgic_its_save_*() functinos, it does not check
-whether the data length is larger than 8 bytes before
-calling vgic_write_guest_lock. This patch add the check.
+When discard frees an ite, we do not invalidate the
+corresponding ite. In the scenario of continuous save and
+restore, there may be a situation where an ite is not saved
+but is restored. This is unreasonable and may cause restore
+to fail. This patch clears the corresponding ite when discard
+frees a ite.
 
-Link: https://lore.kernel.org/kvmarm/86v82ckimh.wl-maz@kernel.org/
+Link: https://lore.kernel.org/kvmarm/8f9d74fc-f9d9-43ac-a387-91ff804cfaf1@redhat.com/
 Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
 ---
- arch/arm64/kvm/vgic/vgic-its.c | 3 +++
- 1 file changed, 3 insertions(+)
+ arch/arm64/kvm/vgic/vgic-its.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 40bb43f20bf3..060605fba3b6 100644
+index 8e11859ff803..a10516ff760a 100644
 --- a/arch/arm64/kvm/vgic/vgic-its.c
 +++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -2094,6 +2094,7 @@ static int vgic_its_save_ite(struct vgic_its *its, struct its_device *dev,
- 	       ((u64)ite->irq->intid << KVM_ITS_ITE_PINTID_SHIFT) |
- 		ite->collection->collection_id;
- 	val = cpu_to_le64(val);
-+	BUG_ON(ite_esz > sizeof(val));
- 	return vgic_write_guest_lock(kvm, gpa, &val, ite_esz);
- }
+@@ -782,6 +782,10 @@ static int vgic_its_cmd_handle_discard(struct kvm *kvm, struct vgic_its *its,
  
-@@ -2246,6 +2247,7 @@ static int vgic_its_save_dte(struct vgic_its *its, struct its_device *dev,
- 	       (itt_addr_field << KVM_ITS_DTE_ITTADDR_SHIFT) |
- 		(dev->num_eventid_bits - 1));
- 	val = cpu_to_le64(val);
-+	BUG_ON(dte_esz > sizeof(dte_esz));
- 	return vgic_write_guest_lock(kvm, ptr, &val, dte_esz);
- }
+ 	ite = find_ite(its, device_id, event_id);
+ 	if (ite && its_is_collection_mapped(ite->collection)) {
++		struct its_device *device = find_its_device(its, device_id);
++		int ite_esz = vgic_its_get_abi(its)->ite_esz;
++		gpa_t gpa = device->itt_addr + ite->event_id * ite_esz;
++		u64 val = 0;
+ 		/*
+ 		 * Though the spec talks about removing the pending state, we
+ 		 * don't bother here since we clear the ITTE anyway and the
+@@ -790,6 +794,9 @@ static int vgic_its_cmd_handle_discard(struct kvm *kvm, struct vgic_its *its,
+ 		vgic_its_invalidate_cache(its);
  
-@@ -2433,6 +2435,7 @@ static int vgic_its_save_cte(struct vgic_its *its,
- 	       ((u64)collection->target_addr << KVM_ITS_CTE_RDBASE_SHIFT) |
- 	       collection->collection_id);
- 	val = cpu_to_le64(val);
-+	BUG_ON(esz > sizeof(val));
- 	return vgic_write_guest_lock(its->dev->kvm, gpa, &val, esz);
- }
+ 		its_free_ite(kvm, ite);
++
++		BUG_ON(ite_esz > sizeof(val));
++		vgic_write_guest_lock(kvm, gpa, &val, ite_esz);
+ 		return 0;
+ 	}
  
 -- 
 2.33.0
