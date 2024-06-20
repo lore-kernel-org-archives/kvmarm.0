@@ -1,30 +1,32 @@
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+Received: from out-184.mta1.migadu.com (out-184.mta1.migadu.com [95.215.58.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EADB61B372F
-	for <kvmarm@lists.linux.dev>; Thu, 20 Jun 2024 16:47:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18D4E1B29A8
+	for <kvmarm@lists.linux.dev>; Thu, 20 Jun 2024 16:47:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718902030; cv=none; b=P4hqFFPpcYwvx11DlSXFWl/R/ler0+g6ydmS1huEL9EF16yFnkZbubt6cfZeNrZj738whYwGFFpXaUDoKBOIQrNxRw8ImzgfoKjG4+0B1Ym7IdRccSlWEoRXjYhZZYh1nYjagvWLoY9ZpdJyDzNGhuOfmqrbayDaVK9a+xhmntU=
+	t=1718902031; cv=none; b=k8c/krMfyhuRthOR5ZT8b4AXtk8P9Nu0/BbQCM4yYZYyHtO+LZmZmTuU+tT4R1yxfDk1TwihGH/8pNObZe3nZTgReO/tFu1js0xwR+p21fQZ5QzG8hS3y29kx29S0mH5ULqSEV6rP9X7oBs0GwWyYY4q85gIjb4lbqONihMSroE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718902030; c=relaxed/simple;
-	bh=RnCOOp7IFdwfmtZ+upmhDazSohqvNm8iTeQSUYvd/c0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=S+c9XpPBnQMg/hkVBffhVxNkqg3yCq0WjFGh9+yr/bFW5keyK3JwGpdXfMhEFXA1E/OUj02bgY3aJdRMX45GudVFVFH4W+wEGWrtyLYSyPVacHMI1syw3e7Qo3nAdhxMQ0UuAFr3DxSakORtD9/OvDy3q+6nJaDlb6KaLLE8NC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cAhph4ut; arc=none smtp.client-ip=95.215.58.178
+	s=arc-20240116; t=1718902031; c=relaxed/simple;
+	bh=ETX0LQ7kYSg7RqI/4kAd77n7iye+m5txnswDWv+x1iI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=i6kJiTZSpwMPU7eC8TWgA4GaIdS6qShPhsBAfYCCktf295XAf8xQoBCCkcYXV4aa9rGsynkpbsNCNlsDduMkASorK9c2uwlp9+esS5R6XT/LAmIPb86gHnGO99bL1x5m/Ssw0VZY+CmAjIU8UUBaUQ5V6ScOlgN/APRFAHfHGB8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lcnSzIhx; arc=none smtp.client-ip=95.215.58.184
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cAhph4ut"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lcnSzIhx"
 X-Envelope-To: kvmarm@lists.linux.dev
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1718902022;
+	t=1718902026;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=JznYArgtRf/uSrUvrG9m9fcDQH+e12uEyuDMKGlj2ME=;
-	b=cAhph4utm8Fv2NMjgZmn/G2fe8p3h1RnexWobyvZ6x6LvRJ9990/KRWRJM+Zmok3c0a0Zj
-	DVrVwXPr00N6dcS3ttAkYleM3vXvN6I3Igz1YGdbzcqnYJZw+iDCRyG3BGcgX97LIvh4+Q
-	kr+GE5HArFtBZTaeCGB69i+7QYaFZ0U=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=H05WUL/HhblgxcxQS07XCyaa2Ay55FYE9vwptiKKacE=;
+	b=lcnSzIhxLamBw3LAgU4LdacXsVx2zETov7WpP36KoPfoeZh2NHgOtCXK6tSSIk/B9zTxtm
+	lT2DBf6zX9yTYS3b3n4GvTk2KJ8vUNFcqNbx99K4dDAuWmYWi7NFiRBFJmrsvA29StLHLj
+	gBQ1rd10TnXC29zOCTwkxF63Cyfdz7U=
 X-Envelope-To: maz@kernel.org
 X-Envelope-To: james.morse@arm.com
 X-Envelope-To: suzuki.poulose@arm.com
@@ -42,9 +44,11 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	kvm@vger.kernel.org,
 	Fuad Tabba <tabba@google.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v3 00/15] KVM: arm64: nv: FPSIMD/SVE, plus some other CPTR goodies
-Date: Thu, 20 Jun 2024 16:46:37 +0000
-Message-ID: <20240620164653.1130714-1-oliver.upton@linux.dev>
+Subject: [PATCH v3 02/15] KVM: arm64: nv: Forward SVE traps to guest hypervisor
+Date: Thu, 20 Jun 2024 16:46:39 +0000
+Message-ID: <20240620164653.1130714-3-oliver.upton@linux.dev>
+In-Reply-To: <20240620164653.1130714-1-oliver.upton@linux.dev>
+References: <20240620164653.1130714-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -54,50 +58,60 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-v2 -> v3:
- - Reorder patches to fix bisection (Marc)
- - Use helper that returns ZCR_ELx offset, so it can be used to handle
-   reads and writes (Marc)
+Similar to FPSIMD traps, don't load SVE state if the guest hypervisor
+has SVE traps enabled and forward the trap instead. Note that ZCR_EL2
+will require some special handling, as it takes a sysreg trap to EL2
+when HCR_EL2.NV = 1.
 
-v2: https://lore.kernel.org/kvmarm/20240613201756.3258227-1-oliver.upton@linux.dev/
+Reviewed-by: Marc Zyngier <maz@kernel.org>
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+---
+ arch/arm64/include/asm/kvm_emulate.h    | 4 ++++
+ arch/arm64/kvm/handle_exit.c            | 3 +++
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 2 ++
+ 3 files changed, 9 insertions(+)
 
-Jintack Lim (1):
-  KVM: arm64: nv: Forward FP/ASIMD traps to guest hypervisor
-
-Marc Zyngier (4):
-  KVM: arm64: nv: Handle CPACR_EL1 traps
-  KVM: arm64: nv: Add TCPAC/TTA to CPTR->CPACR conversion helper
-  KVM: arm64: nv: Add trap description for CPTR_EL2
-  KVM: arm64: nv: Add additional trap setup for CPTR_EL2
-
-Oliver Upton (10):
-  KVM: arm64: nv: Forward SVE traps to guest hypervisor
-  KVM: arm64: nv: Handle ZCR_EL2 traps
-  KVM: arm64: nv: Load guest hyp's ZCR into EL1 state
-  KVM: arm64: nv: Save guest's ZCR_EL2 when in hyp context
-  KVM: arm64: nv: Use guest hypervisor's max VL when running nested
-    guest
-  KVM: arm64: nv: Ensure correct VL is loaded before saving SVE state
-  KVM: arm64: Spin off helper for programming CPTR traps
-  KVM: arm64: nv: Load guest FP state for ZCR_EL2 trap
-  KVM: arm64: nv: Honor guest hypervisor's FP/SVE traps in CPTR_EL2
-  KVM: arm64: Allow the use of SVE+NV
-
- arch/arm64/include/asm/kvm_emulate.h    |  55 +++++++++
- arch/arm64/include/asm/kvm_host.h       |   6 +
- arch/arm64/include/asm/kvm_nested.h     |   4 +-
- arch/arm64/kvm/arm.c                    |   5 -
- arch/arm64/kvm/emulate-nested.c         |  91 ++++++++++++++
- arch/arm64/kvm/fpsimd.c                 |  19 ++-
- arch/arm64/kvm/handle_exit.c            |  19 ++-
- arch/arm64/kvm/hyp/include/hyp/switch.h |  24 +++-
- arch/arm64/kvm/hyp/vhe/switch.c         | 156 ++++++++++++++++++++----
- arch/arm64/kvm/nested.c                 |   3 +-
- arch/arm64/kvm/sys_regs.c               |  38 ++++++
- 11 files changed, 376 insertions(+), 44 deletions(-)
-
-
-base-commit: 1613e604df0cd359cf2a7fbd9be7a0bcfacfabd0
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index c3c5a5999ed7..cc5c93b46e6f 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -641,5 +641,9 @@ static inline bool guest_hyp_fpsimd_traps_enabled(const struct kvm_vcpu *vcpu)
+ 	return __guest_hyp_cptr_xen_trap_enabled(vcpu, FPEN);
+ }
+ 
++static inline bool guest_hyp_sve_traps_enabled(const struct kvm_vcpu *vcpu)
++{
++	return __guest_hyp_cptr_xen_trap_enabled(vcpu, ZEN);
++}
+ 
+ #endif /* __ARM64_KVM_EMULATE_H__ */
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index 59fe9b10a87a..e4f74699f360 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -217,6 +217,9 @@ static int kvm_handle_unknown_ec(struct kvm_vcpu *vcpu)
+  */
+ static int handle_sve(struct kvm_vcpu *vcpu)
+ {
++	if (guest_hyp_sve_traps_enabled(vcpu))
++		return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
++
+ 	kvm_inject_undefined(vcpu);
+ 	return 1;
+ }
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index b302d32f8326..428ee15dd6ae 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -348,6 +348,8 @@ static bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	case ESR_ELx_EC_SVE:
+ 		if (!sve_guest)
+ 			return false;
++		if (guest_hyp_sve_traps_enabled(vcpu))
++			return false;
+ 		break;
+ 	default:
+ 		return false;
 -- 
 2.45.2.741.gdbec12cfda-goog
 
