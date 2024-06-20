@@ -1,195 +1,101 @@
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+Received: from out-175.mta0.migadu.com (out-175.mta0.migadu.com [91.218.175.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9227C1B3723
-	for <kvmarm@lists.linux.dev>; Thu, 20 Jun 2024 16:59:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A21E1B5813
+	for <kvmarm@lists.linux.dev>; Thu, 20 Jun 2024 17:39:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718902754; cv=none; b=sYQIuUweblkREev+WpaN01aXjwLHlkZ2JaNIYIBPjpQHO8m7hnpm5xlK1ig5vxNv4BzY5IIyw5d9mixZvae+kxhrtTR8yxjTUfCxA/3nWz4eREy1lYNsVvViD5+CMDfqYtJcT7/+plYNXYlQgvUrInT6AEyoUNooqHBghN+tQgQ=
+	t=1718905184; cv=none; b=XaQj4fxEoe3pjwCxEDiB1Qw1bsuS7fHZwmmlouB5NOXxC7GPPgcD7BEy1E4CBYqc9QVgmVtgGPjrVdwAPwoSaRRCImvUQYVZ2MYFJnhCMwelfbEtgHPs4t9C2IfSJa1jwgjDzVpeyNmlvniHdzg/fVf3T0eYRHrZTSlUFC3xVTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718902754; c=relaxed/simple;
-	bh=9ihLzQ88GtvNOexb/fP1B2IZi3zffR9a5V+ezYsNm3U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=m1RJLIbzKGbJwHxBx5vbWlbIOC2lzaDw7goLMj0t93ylMgGP5gWk2ueC4DjhEZfbbudr3cjwGXIhRV2Thngrma8QpJlzcdo2b7mpRcFWDTIbDRmtUrW0fJWnDedtrNMd8P2YcWoZAhAmc/xZOiHM1zubZBJ0JBmp5ZLE40wmsxM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rPHlLmJB; arc=none smtp.client-ip=91.218.175.188
+	s=arc-20240116; t=1718905184; c=relaxed/simple;
+	bh=oMDPZXkOqyWUCpkLJroHMS8cDvMBn2+L37sdHRJkzsg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nfZErNiBqfdMJ2Ur75ZzehZC8cFeeYyFvI4MCHRB/eKFS8mtEdJGMi5mn7rY9S/+bHqkm/hTdag8uJFLmWJrj/W6vcRZWsDKaKII1jihmDZDF+CoXjwKue2vPVpIlJX7ydDwYDyXg7Uhral+QT0ApbvopGW4cbF7PS+Sdlvhs9Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bnk/m78c; arc=none smtp.client-ip=91.218.175.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rPHlLmJB"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="bnk/m78c"
 X-Envelope-To: kvmarm@lists.linux.dev
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1718902750;
+	t=1718905180;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=c5d0W1pusnuf6Ixn+Dj1BS1msyFMZSKZn9rIr5tZMFk=;
-	b=rPHlLmJBf8hGA/QTiBl2NXaJ4MtyJ7H4e5bYWKynKsSU8fuxly/IpzJ+B6MxEih4RtEFim
-	B82hNB3w5ey/CJnKTWvMm7Q1+q0bxpWAQRCJK8m+x5mvzHPX0g/RCT4b3id0N3EGuytpM+
-	x24cAYoOTlBgq9iKlhrKKBA9n4MECBA=
-X-Envelope-To: maz@kernel.org
-X-Envelope-To: kvm@vger.kernel.org
-X-Envelope-To: tabba@google.com
-X-Envelope-To: will@kernel.org
-X-Envelope-To: julien.thierry.kdev@gmail.com
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=E5k/mqyQHSNQbgC0Oj9mNxKhD7o2n/7C/7pyjSDJcjo=;
+	b=bnk/m78cQ7+qKvef1ORSH7n1oW/DPak+UQEoTlZI8AuTnEKRyHLYrdNl4zIO+hImRm8l/J
+	R9t91rYGnzZHH8pX0CtaKlHvtVo2yo7fNjLGNF6CApJ8gHCrBOqGTUKL+dH//SYQRxQWho
+	GbzIeflrANCLTJoZAfnF32RzTyGPRD4=
 X-Envelope-To: oliver.upton@linux.dev
+X-Envelope-To: suzuki.poulose@arm.com
+X-Envelope-To: james.morse@arm.com
+X-Envelope-To: eric.auger@redhat.com
+X-Envelope-To: sebott@redhat.com
+X-Envelope-To: kvm@vger.kernel.org
+X-Envelope-To: yuzenghui@huawei.com
+X-Envelope-To: shahuang@redhat.com
+X-Envelope-To: maz@kernel.org
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
-	kvm@vger.kernel.org,
-	Fuad Tabba <tabba@google.com>,
-	Will Deacon <will@kernel.org>,
-	Julien Thierry <julien.thierry.kdev@gmail.com>,
+To: kvmarm@lists.linux.dev,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH kvmtool] arm64: Allow the user to select the max SVE vector length
-Date: Thu, 20 Jun 2024 16:57:03 +0000
-Message-ID: <20240620165702.1134918-2-oliver.upton@linux.dev>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
+	James Morse <james.morse@arm.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Sebastian Ott <sebott@redhat.com>,
+	kvm@vger.kernel.org,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Shaoqin Huang <shahuang@redhat.com>,
+	Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v5 00/10] KVM: arm64: Allow userspace to modify CTR_EL0
+Date: Thu, 20 Jun 2024 17:39:29 +0000
+Message-ID: <171890515830.1223590.8660930452290685977.b4-ty@linux.dev>
+In-Reply-To: <20240619174036.483943-1-oliver.upton@linux.dev>
+References: <20240619174036.483943-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Add a new flag, --sve-max-vl, which allows the user to specify an SVE
-vector length for the VM. Just zero out unsupported VLs from what KVM
-supports rather than cooking up the bitmap from scratch.
+On Wed, 19 Jun 2024 17:40:26 +0000, Oliver Upton wrote:
+> As I'd mentioned on the list, here is my rework of Sebastian's CTR_EL0
+> series. Changes this time around:
+> 
+>  - Drop the cross-validation of the guest's CTR_EL0 with CLIDR_EL1 and
+>    the CCSIDR_EL1 hierarchy, instead independently checking these
+>    registers against the system's CTR_EL0 value.
+> 
+> [...]
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- arm/aarch64/include/kvm/kvm-config-arch.h |  6 ++-
- arm/aarch64/kvm-cpu.c                     | 65 ++++++++++++++++++++---
- arm/include/arm-common/kvm-config-arch.h  |  3 +-
- 3 files changed, 65 insertions(+), 9 deletions(-)
+Applied to kvmarm/next, thanks!
 
-diff --git a/arm/aarch64/include/kvm/kvm-config-arch.h b/arm/aarch64/include/kvm/kvm-config-arch.h
-index eae8080d3fd9..642fe672d833 100644
---- a/arm/aarch64/include/kvm/kvm-config-arch.h
-+++ b/arm/aarch64/include/kvm/kvm-config-arch.h
-@@ -2,6 +2,7 @@
- #define KVM__KVM_CONFIG_ARCH_H
- 
- int vcpu_affinity_parser(const struct option *opt, const char *arg, int unset);
-+int sve_vl_parser(const struct option *opt, const char *arg, int unset);
- 
- #define ARM_OPT_ARCH_RUN(cfg)						\
- 	OPT_BOOLEAN('\0', "aarch32", &(cfg)->aarch32_guest,		\
-@@ -19,7 +20,10 @@ int vcpu_affinity_parser(const struct option *opt, const char *arg, int unset);
- 			"Specify random seed for Kernel Address Space "	\
- 			"Layout Randomization (KASLR)"),		\
- 	OPT_BOOLEAN('\0', "no-pvtime", &(cfg)->no_pvtime, "Disable"	\
--			" stolen time"),
-+			" stolen time"),				\
-+	OPT_CALLBACK('\0', "sve-max-vl", NULL, "vector length",		\
-+		     "Specify the max SVE vector length (in bits) for "	\
-+		     "all vCPUs", sve_vl_parser, kvm),
- #include "arm-common/kvm-config-arch.h"
- 
- #endif /* KVM__KVM_CONFIG_ARCH_H */
-diff --git a/arm/aarch64/kvm-cpu.c b/arm/aarch64/kvm-cpu.c
-index c8be10b3ca94..7b6061af00e6 100644
---- a/arm/aarch64/kvm-cpu.c
-+++ b/arm/aarch64/kvm-cpu.c
-@@ -3,6 +3,7 @@
- #include "kvm/virtio.h"
- 
- #include <asm/ptrace.h>
-+#include <linux/bitops.h>
- 
- #define COMPAT_PSR_F_BIT	0x00000040
- #define COMPAT_PSR_I_BIT	0x00000080
-@@ -154,17 +155,67 @@ void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init)
- 		init->features[0] |= 1UL << KVM_ARM_VCPU_SVE;
- }
- 
--int kvm_cpu__configure_features(struct kvm_cpu *vcpu)
-+int sve_vl_parser(const struct option *opt, const char *arg, int unset)
- {
--	if (kvm__supports_extension(vcpu->kvm, KVM_CAP_ARM_SVE)) {
--		int feature = KVM_ARM_VCPU_SVE;
-+	struct kvm *kvm = opt->ptr;
-+	unsigned long val;
-+	unsigned int vq;
-+
-+	errno = 0;
-+	val = strtoull(arg, NULL, 10);
-+	if (errno == ERANGE)
-+		die("SVE vector length too large: %s", arg);
-+
-+	if (!val || (val & (val - 1)))
-+		die("SVE vector length isn't power of 2: %s", arg);
-+
-+	vq = val / 128;
-+	if (vq > KVM_ARM64_SVE_VQ_MAX || vq < KVM_ARM64_SVE_VQ_MIN)
-+		die("SVE vector length out of range: %s", arg);
-+
-+	kvm->cfg.arch.sve_max_vq = vq;
-+	return 0;
-+}
-+
-+static int vcpu_configure_sve(struct kvm_cpu *vcpu)
-+{
-+	unsigned int max_vq = vcpu->kvm->cfg.arch.sve_max_vq;
-+	int feature = KVM_ARM_VCPU_SVE;
-+
-+	if (max_vq) {
-+		unsigned long vls[KVM_ARM64_SVE_VLS_WORDS];
-+		struct kvm_one_reg reg = {
-+			.id	= KVM_REG_ARM64_SVE_VLS,
-+			.addr	= (u64)&vls,
-+		};
-+		unsigned int vq;
-+
-+		if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg))
-+			die_perror("KVM_GET_ONE_REG failed (KVM_ARM64_SVE_VLS)");
- 
--		if (ioctl(vcpu->vcpu_fd, KVM_ARM_VCPU_FINALIZE, &feature)) {
--			pr_err("KVM_ARM_VCPU_FINALIZE: %s", strerror(errno));
--			return -1;
--		}
-+		if (!test_bit(max_vq - KVM_ARM64_SVE_VQ_MIN, vls))
-+			die("SVE vector length (%u) not supported", max_vq * 128);
-+
-+		for (vq = KVM_ARM64_SVE_VQ_MAX; vq > max_vq; vq--)
-+			clear_bit(vq - KVM_ARM64_SVE_VQ_MIN, vls);
-+
-+		if (ioctl(vcpu->vcpu_fd, KVM_SET_ONE_REG, &reg))
-+			die_perror("KVM_SET_ONE_REG failed (KVM_ARM64_SVE_VLS)");
- 	}
- 
-+	if (ioctl(vcpu->vcpu_fd, KVM_ARM_VCPU_FINALIZE, &feature)) {
-+		pr_err("KVM_ARM_VCPU_FINALIZE: %s", strerror(errno));
-+		return -1;
-+	}
-+
-+	return 0;
-+}
-+
-+int kvm_cpu__configure_features(struct kvm_cpu *vcpu)
-+{
-+	if (kvm__supports_extension(vcpu->kvm, KVM_CAP_ARM_SVE))
-+		return vcpu_configure_sve(vcpu);
-+
- 	return 0;
- }
- 
-diff --git a/arm/include/arm-common/kvm-config-arch.h b/arm/include/arm-common/kvm-config-arch.h
-index 23a74867a474..4722d8f8acf7 100644
---- a/arm/include/arm-common/kvm-config-arch.h
-+++ b/arm/include/arm-common/kvm-config-arch.h
-@@ -13,7 +13,8 @@ struct kvm_config_arch {
- 	u64		kaslr_seed;
- 	enum irqchip_type irqchip;
- 	u64		fw_addr;
--	bool no_pvtime;
-+	unsigned int	sve_max_vq;
-+	bool		no_pvtime;
- };
- 
- int irqchip_parser(const struct option *opt, const char *arg, int unset);
+[01/10] KVM: arm64: Get sys_reg encoding from descriptor in idregs_debug_show()
+        https://git.kernel.org/kvmarm/kvmarm/c/4e8ff73eb7ae
+[02/10] KVM: arm64: Make idregs debugfs iterator search sysreg table directly
+        https://git.kernel.org/kvmarm/kvmarm/c/410db103f6eb
+[03/10] KVM: arm64: Use read-only helper for reading VM ID registers
+        https://git.kernel.org/kvmarm/kvmarm/c/97ca3fcc15cc
+[04/10] KVM: arm64: Add helper for writing ID regs
+        https://git.kernel.org/kvmarm/kvmarm/c/d7508d27dd88
+[05/10] KVM: arm64: nv: Use accessors for modifying ID registers
+        https://git.kernel.org/kvmarm/kvmarm/c/44241f34fac9
+[06/10] KVM: arm64: unify code to prepare traps
+        https://git.kernel.org/kvmarm/kvmarm/c/f1ff3fc5209a
+[07/10] KVM: arm64: Treat CTR_EL0 as a VM feature ID register
+        https://git.kernel.org/kvmarm/kvmarm/c/2843cae26644
+[08/10] KVM: arm64: show writable masks for feature registers
+        https://git.kernel.org/kvmarm/kvmarm/c/bb4fa769dcdd
+[09/10] KVM: arm64: rename functions for invariant sys regs
+        https://git.kernel.org/kvmarm/kvmarm/c/76d36012276a
+[10/10] KVM: selftests: arm64: Test writes to CTR_EL0
+        https://git.kernel.org/kvmarm/kvmarm/c/11a31be88fb6
 
-base-commit: da4cfc3e540341b84c4bbad705b5a15865bc1f80
--- 
-2.45.2.741.gdbec12cfda-goog
-
+--
+Best,
+Oliver
