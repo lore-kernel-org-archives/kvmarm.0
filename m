@@ -1,32 +1,32 @@
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21D671B47A5
-	for <kvmarm@lists.linux.dev>; Thu, 20 Jun 2024 16:47:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E65461B47B8
+	for <kvmarm@lists.linux.dev>; Thu, 20 Jun 2024 16:47:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718902038; cv=none; b=dDL8qVMNkHEssiC4Lb/NpJgWmpy3FTUXCwtvfifiKzNU7DqzVxBrR+d2ota/Jkf/jSpTVm4M9PmgFPsEs54f6cG7TN1qhK3N48mlSg+h44FQ29AoB8oguDmu695PNoZCetKXxAdDTExpWZCgg5+jAK+QMM5N93TwU+zjURTwklM=
+	t=1718902040; cv=none; b=aoBDNovMOCI+zrUWNW6PfEtGxq73itacKleAtSQ8UZyTHXFd/BBQ2S/GAoD34z524xvW5BdK/ZKGe5Dbq5mwDMKF20F0SwsSHlW5cmcZj4eDgqFnLGTvIpTyn3pHQ0MX+L2cYnPTZnEfjUWxJoMiqWYtTMS0yAItx+z3wMTgjbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718902038; c=relaxed/simple;
-	bh=MNEsSbek93dEnKdVXcnjLptk0/WvLnHiuamXW0WR44Y=;
+	s=arc-20240116; t=1718902040; c=relaxed/simple;
+	bh=eHFcSnx/FrqvvY+4VU8ze04GVmd2fbF4l7dDs6USX/U=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Lldtu1zkoj9LLRBOuOnqju1BZWDiNcMVGdP/KxFRYi7rIKSYo9OpWhmBxGudlE/9hWLTNTaO5avE9aTzywI6rmbHoCJEieHj/zW3tMm4Atvm9PoHVt3h6IdZq06m2Hrw302F8vQvEwmpKbIpT5imPdbgn7jUikEuYUd90kqyeWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rsK+rQQ+; arc=none smtp.client-ip=95.215.58.189
+	 MIME-Version; b=kjI58B2WSNpzO0sPuZ4t2a1PXCy88bKp6qiom73cbByxsP4nXGOskprZTt1exVYfIr99M2GmjPKR7tQWKgBbb9Czbb0gYVqfLoFeEwtvSdymL9NC0/4K+m3EK8lGeOYi+NbILrIBcGXVbTVZNK3yh9kfhUuuKhL0OCFQCgYfwxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xNNpJcci; arc=none smtp.client-ip=95.215.58.188
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rsK+rQQ+"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xNNpJcci"
 X-Envelope-To: kvmarm@lists.linux.dev
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1718902035;
+	t=1718902037;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=OrPYUpaXTuyZ913QZ9yyjlNewzvBDOPiUFlx9T7Nkio=;
-	b=rsK+rQQ+9aA/3JKjxRutx3Pi7Aun4Y0Akv0UNklkxhdcuKVFgZjGzKCsO00McNlrT+/4xZ
-	0SON5H7smqXy31KH8a3mAcVSDz+JJ1osKXrW2/fENUzd1WLOvx8GfJasygRMsv7l2DAKBA
-	wdIWNT8+x3Ewn3g2O5RSVLXTchla9mU=
+	bh=cStQMLZGUlCbmuI60XeY0OY25KBZNZcrijUKFbj3MYQ=;
+	b=xNNpJcci+IX/dKs2+h8LpwC8LyofKfTBiVRoLC0USlzPbHawItPjiRUAmyBNcwiOaz1SDt
+	PRKwlY4AQMYs7DcF0S7Xg4eUt6hJEl+zkXrajRewuJ8m234VLszNqc6Lp7oDXiKdx1GePQ
+	1qNIX14kE/2+3pWBH6kjhI1uZOYI+aw=
 X-Envelope-To: maz@kernel.org
 X-Envelope-To: james.morse@arm.com
 X-Envelope-To: suzuki.poulose@arm.com
@@ -44,9 +44,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	kvm@vger.kernel.org,
 	Fuad Tabba <tabba@google.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v3 07/15] KVM: arm64: nv: Ensure correct VL is loaded before saving SVE state
-Date: Thu, 20 Jun 2024 16:46:44 +0000
-Message-ID: <20240620164653.1130714-8-oliver.upton@linux.dev>
+Subject: [PATCH v3 08/15] KVM: arm64: Spin off helper for programming CPTR traps
+Date: Thu, 20 Jun 2024 16:46:45 +0000
+Message-ID: <20240620164653.1130714-9-oliver.upton@linux.dev>
 In-Reply-To: <20240620164653.1130714-1-oliver.upton@linux.dev>
 References: <20240620164653.1130714-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -58,42 +58,86 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-It is possible that the guest hypervisor has selected a smaller VL than
-the maximum for its nested guest. As such, ZCR_EL2 may be configured for
-a different VL when exiting a nested guest.
+A subsequent change to KVM will add preliminary support for merging a
+guest hypervisor's CPTR traps with that of KVM. Prepare by spinning off
+a new helper for managing CPTR traps.
 
-Set ZCR_EL2 (via the EL1 alias) to the maximum VL for the VM before
-saving SVE state as the SVE save area is dimensioned by the max VL.
+Avoid reading CPACR_EL1 for the baseline trap config, and start off with
+the most restrictive set of traps that is subsequently relaxed.
 
 Reviewed-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/fpsimd.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+ arch/arm64/kvm/hyp/vhe/switch.c | 49 ++++++++++++++++-----------------
+ 1 file changed, 24 insertions(+), 25 deletions(-)
 
-diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-index d948f1c684ca..947486a111e1 100644
---- a/arch/arm64/kvm/fpsimd.c
-+++ b/arch/arm64/kvm/fpsimd.c
-@@ -190,11 +190,14 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
- 			 * Note that this means that at guest exit ZCR_EL1 is
- 			 * not necessarily the same as on guest entry.
- 			 *
--			 * Restoring the VL isn't needed in VHE mode since
--			 * ZCR_EL2 (accessed via ZCR_EL1) would fulfill the same
--			 * role when doing the save from EL2.
-+			 * ZCR_EL2 holds the guest hypervisor's VL when running
-+			 * a nested guest, which could be smaller than the
-+			 * max for the vCPU. Similar to above, we first need to
-+			 * switch to a VL consistent with the layout of the
-+			 * vCPU's SVE state. KVM support for NV implies VHE, so
-+			 * using the ZCR_EL1 alias is safe.
- 			 */
--			if (!has_vhe())
-+			if (!has_vhe() || (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu)))
- 				sve_cond_update_zcr_vq(vcpu_sve_max_vq(vcpu) - 1,
- 						       SYS_ZCR_EL1);
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index d7af5f46f22a..697253673d7b 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -65,6 +65,29 @@ static u64 __compute_hcr(struct kvm_vcpu *vcpu)
+ 	return hcr | (__vcpu_sys_reg(vcpu, HCR_EL2) & ~NV_HCR_GUEST_EXCLUDE);
+ }
+ 
++static void __activate_cptr_traps(struct kvm_vcpu *vcpu)
++{
++	/*
++	 * With VHE (HCR.E2H == 1), accesses to CPACR_EL1 are routed to
++	 * CPTR_EL2. In general, CPACR_EL1 has the same layout as CPTR_EL2,
++	 * except for some missing controls, such as TAM.
++	 * In this case, CPTR_EL2.TAM has the same position with or without
++	 * VHE (HCR.E2H == 1) which allows us to use here the CPTR_EL2.TAM
++	 * shift value for trapping the AMU accesses.
++	 */
++	u64 val = CPACR_ELx_TTA | CPTR_EL2_TAM;
++
++	if (guest_owns_fp_regs()) {
++		val |= CPACR_ELx_FPEN;
++		if (vcpu_has_sve(vcpu))
++			val |= CPACR_ELx_ZEN;
++	} else {
++		__activate_traps_fpsimd32(vcpu);
++	}
++
++	write_sysreg(val, cpacr_el1);
++}
++
+ static void __activate_traps(struct kvm_vcpu *vcpu)
+ {
+ 	u64 val;
+@@ -91,31 +114,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
  		}
+ 	}
+ 
+-	val = read_sysreg(cpacr_el1);
+-	val |= CPACR_ELx_TTA;
+-	val &= ~(CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN |
+-		 CPACR_EL1_SMEN_EL0EN | CPACR_EL1_SMEN_EL1EN);
+-
+-	/*
+-	 * With VHE (HCR.E2H == 1), accesses to CPACR_EL1 are routed to
+-	 * CPTR_EL2. In general, CPACR_EL1 has the same layout as CPTR_EL2,
+-	 * except for some missing controls, such as TAM.
+-	 * In this case, CPTR_EL2.TAM has the same position with or without
+-	 * VHE (HCR.E2H == 1) which allows us to use here the CPTR_EL2.TAM
+-	 * shift value for trapping the AMU accesses.
+-	 */
+-
+-	val |= CPTR_EL2_TAM;
+-
+-	if (guest_owns_fp_regs()) {
+-		if (vcpu_has_sve(vcpu))
+-			val |= CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN;
+-	} else {
+-		val &= ~(CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN);
+-		__activate_traps_fpsimd32(vcpu);
+-	}
+-
+-	write_sysreg(val, cpacr_el1);
++	__activate_cptr_traps(vcpu);
+ 
+ 	write_sysreg(__this_cpu_read(kvm_hyp_vector), vbar_el1);
+ }
 -- 
 2.45.2.741.gdbec12cfda-goog
 
