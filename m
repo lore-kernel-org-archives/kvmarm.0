@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 371C247F5D
-	for <kvmarm@lists.linux.dev>; Thu, 20 Jun 2024 06:58:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1E6E4AEE0
+	for <kvmarm@lists.linux.dev>; Thu, 20 Jun 2024 06:59:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718866739; cv=none; b=sToLkz15pYQ+kVU4ob4z/9xdmcAPXAjgLeWr0QO7c3eAMiR/W4N4jGqpDnXO3AqErLvpwZritBfuv4uE0lk7DRWTwe+XQWK6dxYRpAmtCo1H8nwEnNRl1eUhv42w6EMd4tziX3ZqbzMxI9R9fdqpMBps7fqvutswTk8xtAPPL9I=
+	t=1718866744; cv=none; b=UyqVn4jQ15Jqj3ji/6yboHHEjyCEW7VVMq1Sok7MT6H80LvdNieWdMGj7nPrl9wk/SupF8i3Av5rSNNDU3CGgcOn0VJGIqelImkB5feZS3NVx7SVhAtvnv0SxAx2taZEill2qyTYOYrSeT7FMFsyuY9d94JzkgZCNWLnIZ1JwuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718866739; c=relaxed/simple;
-	bh=QIuJ7eHArijbgqvnVwOF+HA0Sai02Q5aBta+a0jbVjY=;
+	s=arc-20240116; t=1718866744; c=relaxed/simple;
+	bh=8EpJb52t53rNdx7QuGDxDh+upklfkbthTHecW7nbrbA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=GWJrGKSEeqokV5V4Am6oeeak5cTTEaoP0IU28iIjWVv7BB89LVNTibG8OJXURnaoGSJy5AMH5pR5UQUR5cOJt6n14l35Kv32oUcbKMrTNzML1RHyBTbLyfve2XNR7dx8QinqaqnSodqCJ0tgpFS9udYVo8+oFjibS9g6+1GTXXU=
+	 MIME-Version; b=ptjhvzo+i+R9TckEbeeczpfi3H7VGewpxFVPlOnbIv9/JzZHmBjp73ww7X+1maT9b3uEgOSkszQEdOuL0oVxSP6rCW8Y3oGxh5e37jFROr/pgSzTzoaNW+RqNJCyBF56a8rirB/vOQxCl7y6dthkBGzQUCPOmZzXZGSKAssbCjo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8FAC6DA7;
-	Wed, 19 Jun 2024 23:59:22 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C8A2ADA7;
+	Wed, 19 Jun 2024 23:59:26 -0700 (PDT)
 Received: from a077893.arm.com (unknown [10.163.46.59])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id BEF963F73B;
-	Wed, 19 Jun 2024 23:58:52 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 64DBD3F73B;
+	Wed, 19 Jun 2024 23:58:58 -0700 (PDT)
 From: Anshuman Khandual <anshuman.khandual@arm.com>
 To: linux-arm-kernel@lists.infradead.org,
 	maz@kernel.org
@@ -30,9 +30,9 @@ Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
 	Mark Brown <broonie@kernel.org>,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: [RFC 08/10] arm64/sysreg: Add register fields for TRBIDR_EL1
-Date: Thu, 20 Jun 2024 12:28:05 +0530
-Message-Id: <20240620065807.151540-9-anshuman.khandual@arm.com>
+Subject: [RFC 09/10] KVM: arm64: nv: Enable HDFGRTR2_EL2 & HDFGWTR2_EL2 access from virtual EL2
+Date: Thu, 20 Jun 2024 12:28:06 +0530
+Message-Id: <20240620065807.151540-10-anshuman.khandual@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240620065807.151540-1-anshuman.khandual@arm.com>
 References: <20240620065807.151540-1-anshuman.khandual@arm.com>
@@ -44,37 +44,63 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This adds register fields for TRBIDR_EL1 as per the definitions based
-on DDI0601 2024-03.
+This adds VNCR-capable HDFGRTR2_EL2 and HDFGWTR2_EL2 registers into enum
+vcpu_sysreg and also enables their access from virtual EL2 environment.
 
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will@kernel.org>
-Cc: Mark Brown <broonie@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>
+Cc: James Morse <james.morse@arm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org
+Cc: kvmarm@lists.linux.dev
 Cc: linux-kernel@vger.kernel.org
 Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
 ---
- arch/arm64/tools/sysreg | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_host.h     | 3 +++
+ arch/arm64/include/asm/vncr_mapping.h | 2 ++
+ arch/arm64/kvm/sys_regs.c             | 2 ++
+ 3 files changed, 7 insertions(+)
 
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index ee2038f6f3a3..d057e57d74e7 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -3098,7 +3098,12 @@ Field	31:0	TRG
- EndSysreg
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 36b8e97bf49e..7b44e96e7270 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -488,6 +488,9 @@ enum vcpu_sysreg {
+ 	VNCR(HDFGWTR_EL2),
+ 	VNCR(HAFGRTR_EL2),
  
- Sysreg	TRBIDR_EL1	3	0	9	11	7
--Res0	63:12
-+Res0	63:16
-+UnsignedEnum	15:12	MPAM
-+	0b0000	NI
-+	0b0001	PMG
-+	0b0010	IMP
-+EndEnum
- Enum	11:8	EA
- 	0b0000	NON_DESC
- 	0b0001	IGNORE
++	VNCR(HDFGRTR2_EL2),
++	VNCR(HDFGWTR2_EL2),
++
+ 	VNCR(CNTVOFF_EL2),
+ 	VNCR(CNTV_CVAL_EL0),
+ 	VNCR(CNTV_CTL_EL0),
+diff --git a/arch/arm64/include/asm/vncr_mapping.h b/arch/arm64/include/asm/vncr_mapping.h
+index df2c47c55972..de9288bc2b84 100644
+--- a/arch/arm64/include/asm/vncr_mapping.h
++++ b/arch/arm64/include/asm/vncr_mapping.h
+@@ -38,6 +38,8 @@
+ #define VNCR_HFGRTR_EL2		0x1B8
+ #define VNCR_HFGWTR_EL2		0x1C0
+ #define VNCR_HFGITR_EL2		0x1C8
++#define VNCR_HDFGRTR2_EL2	0x1A0
++#define VNCR_HDFGWTR2_EL2	0x1B0
+ #define VNCR_HDFGRTR_EL2	0x1D0
+ #define VNCR_HDFGWTR_EL2	0x1D8
+ #define VNCR_ZCR_EL1            0x1E0
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 22b45a15d068..f921af014d0c 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2697,6 +2697,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	EL2_REG_VNCR(VTCR_EL2, reset_val, 0),
+ 
+ 	{ SYS_DESC(SYS_DACR32_EL2), trap_undef, reset_unknown, DACR32_EL2 },
++	EL2_REG_VNCR(HDFGRTR2_EL2, reset_val, 0),
++	EL2_REG_VNCR(HDFGWTR2_EL2, reset_val, 0),
+ 	EL2_REG_VNCR(HDFGRTR_EL2, reset_val, 0),
+ 	EL2_REG_VNCR(HDFGWTR_EL2, reset_val, 0),
+ 	EL2_REG_VNCR(HAFGRTR_EL2, reset_val, 0),
 -- 
 2.25.1
 
