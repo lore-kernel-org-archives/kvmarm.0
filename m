@@ -1,22 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7503219EEC8
-	for <kvmarm@lists.linux.dev>; Thu, 20 Jun 2024 09:26:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BE941A3BD6
+	for <kvmarm@lists.linux.dev>; Thu, 20 Jun 2024 09:26:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718875584; cv=none; b=IppfwvD5r+wi3Q9UuTmjRVX6uuEcV0ACgjQ3u5ksY9Z8HpxFsnzL576s83uNtKI5p4GtwfMshaNfIZ0azhaQVfnE19w1j+NYMT8AeXLj0ZyVJn0kMkFVIuceV0VifmOaitOu4AvysFQj1LI+0cfUUHHilhyb/oa4TXYkkoxCGgA=
+	t=1718875589; cv=none; b=puW84N1NhoabYX3bNmHyL0SnjCxYkqRSoQsAY9dU4vrEks0Q+YQULMpCxfNPmCP5DM4nzehzPbyB0l2LhVfATwD0mx2RSglStVzHhBVqyaW0/SDsSd4grJHJFz7qc7SnAgbJt6+15DihKpDuhEBIpp3A1bs1H4AOmVh/COdCeu0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718875584; c=relaxed/simple;
-	bh=48SVrCSUrZdq+6+Y/Csf0a6W2s3XYlZRFFSqMJ52VNs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=IYh8DCKmW5mrlwNZk2lUWUXlvn/6tD+QQTdroRSC922noS1sA3suPXLNQV7hd3ci8SQ2Xq8egPonvDkumtSyah0mL040rWykV1H8yrYD9RJ5K+rG7YdmyiSGa6DvV3hTlKgPJFyRHREA1ti1JsnYf0/qRq3lAWQ/jStMmlOuwJo=
+	s=arc-20240116; t=1718875589; c=relaxed/simple;
+	bh=RWYaooaJ/9WsoqAc7TXG1VEdx/cdTjG07FP3Xl7S7DM=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=lzedm3qZtxX+QjgcZfp7ThHGa3JXt7KfqBdosWWAJrrL0tOSx7EItGBvYxBat3+ajHallnGZMU5HVhuJByTw1RO0OERTXN7KIrTbszRaBDD5xYEYnvlNfGFaNhxTrbJZ3SLkj80TGE8a/vkKqJT0zkj0LXy3ghIkOh3IZfTCo48=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4C01DDA7;
-	Thu, 20 Jun 2024 02:26:41 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8581BDA7;
+	Thu, 20 Jun 2024 02:26:51 -0700 (PDT)
 Received: from a077893.arm.com (unknown [10.163.46.59])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 389883F6A8;
-	Thu, 20 Jun 2024 02:26:11 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 1DA173F6A8;
+	Thu, 20 Jun 2024 02:26:21 -0700 (PDT)
 From: Anshuman Khandual <anshuman.khandual@arm.com>
 To: linux-arm-kernel@lists.infradead.org
 Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
@@ -30,11 +31,14 @@ Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
 	Mark Brown <broonie@kernel.org>,
 	Mark Rutland <mark.rutland@arm.com>,
 	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: [RFC V2 0/3] arm64/hw_breakpoint: Enable FEAT_Debugv8p9
-Date: Thu, 20 Jun 2024 14:56:04 +0530
-Message-Id: <20240620092607.267132-1-anshuman.khandual@arm.com>
+	linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Subject: [RFC V2 2/3] arm64/boot: Enable EL2 requirements for FEAT_Debugv8p9
+Date: Thu, 20 Jun 2024 14:56:06 +0530
+Message-Id: <20240620092607.267132-3-anshuman.khandual@arm.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20240620092607.267132-1-anshuman.khandual@arm.com>
+References: <20240620092607.267132-1-anshuman.khandual@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -43,54 +47,134 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series enables FEAT_Debugv8p9 thus extending breakpoint and watchpoint
-support upto 64. This has been lightly tested and still work is in progress
-but would like to get some early feedback on the approach.
+Fine grained trap control for MDSELR_EL1 register needs to be configured in
+HDFGRTR2_EL2, and HDFGWTR2_EL2 registers when kernel enters at EL1, but EL2
+is also present. This adds a new helper __init_el2_fgt2() initializing this
+new FEAT_FGT2 based fine grained registers.
 
-Possible impact of context switches while tracing kernel addresses needs to
-be evaluated regarding MDSELR_EL1 access. This series is based on v6.10-rc4
-after applying the MDSELR_EL1 KVM series.
+MDCR_EL2.EBWE needs to be enabled for additional (beyond 16) breakpoint and
+watchpoint exceptions when kernel enters at EL1, but EL2 is also present.
+This updates __init_el2_debug() as required for FEAT_Debugv8p9.
 
-https://lore.kernel.org/all/20240620065807.151540-1-anshuman.khandual@arm.com/
+While here, also update booting.rst with MDCR_EL3 and SCR_EL3 requirements.
 
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will@kernel.org>
 Cc: Jonathan Corbet <corbet@lwn.net>
 Cc: Marc Zyngier <maz@kernel.org>
 Cc: Oliver Upton <oliver.upton@linux.dev>
-Cc: James Morse <james.morse@arm.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will@kernel.org>
-Cc: Mark Brown <broonie@kernel.org>
-Cc: Mark Rutland <mark.rutland@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org
-Cc: kvmarm@lists.linux.dev
+Cc: linux-doc@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
+Cc: kvmarm@lists.linux.dev
+Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+---
+ Documentation/arch/arm64/booting.rst | 19 +++++++++++++++++++
+ arch/arm64/include/asm/el2_setup.h   | 27 +++++++++++++++++++++++++++
+ arch/arm64/include/asm/kvm_arm.h     |  1 +
+ 3 files changed, 47 insertions(+)
 
-Changes in RFC V2:
-
-- This series has been split from RFC V1 dealing only with arm64 breakpoints
-- Restored back DBG_MDSCR_MASK definition (unrelated change)
-- Added preempt_disable()/enable() blocks between selecting banks and registers
-
-Changes in RFC:
-
-https://lore.kernel.org/all/20240405080008.1225223-1-anshuman.khandual@arm.com/
-
-Anshuman Khandual (3):
-  arm64/cpufeature: Add field details for ID_AA64DFR1_EL1 register
-  arm64/boot: Enable EL2 requirements for FEAT_Debugv8p9
-  arm64/hw_breakpoint: Enable FEAT_Debugv8p9
-
- Documentation/arch/arm64/booting.rst    | 19 ++++++++++
- arch/arm64/include/asm/debug-monitors.h |  1 +
- arch/arm64/include/asm/el2_setup.h      | 27 +++++++++++++
- arch/arm64/include/asm/hw_breakpoint.h  | 50 ++++++++++++++++++++-----
- arch/arm64/include/asm/kvm_arm.h        |  1 +
- arch/arm64/kernel/cpufeature.c          | 21 ++++++++---
- arch/arm64/kernel/debug-monitors.c      | 16 ++++++--
- arch/arm64/kernel/hw_breakpoint.c       | 33 ++++++++++++++++
- 8 files changed, 149 insertions(+), 19 deletions(-)
-
+diff --git a/Documentation/arch/arm64/booting.rst b/Documentation/arch/arm64/booting.rst
+index b57776a68f15..e69d972018cf 100644
+--- a/Documentation/arch/arm64/booting.rst
++++ b/Documentation/arch/arm64/booting.rst
+@@ -285,6 +285,12 @@ Before jumping into the kernel, the following conditions must be met:
+ 
+     - SCR_EL3.FGTEn (bit 27) must be initialised to 0b1.
+ 
++  For CPUs with the Fine Grained Traps (FEAT_FGT2) extension present:
++
++  - If EL3 is present and the kernel is entered at EL2:
++
++    - SCR_EL3.FGTEn2 (bit 59) must be initialised to 0b1.
++
+   For CPUs with support for HCRX_EL2 (FEAT_HCX) present:
+ 
+   - If EL3 is present and the kernel is entered at EL2:
+@@ -319,6 +325,19 @@ Before jumping into the kernel, the following conditions must be met:
+     - ZCR_EL2.LEN must be initialised to the same value for all CPUs the
+       kernel will execute on.
+ 
++  For CPUs with FEAT_Debugv8p9 extension present:
++
++  - If the kernel is entered at EL1 and EL2 is present:
++
++    - HDFGRTR2_EL2.nMDSELR_EL1 (bit 5) must be initialized to 0b1
++    - HDFGWTR2_EL2.nMDSELR_EL1 (bit 5) must be initialized to 0b1
++    - MDCR_EL2.EBWE (bit 43) must be initialized to 0b1
++
++  - If EL3 is present:
++
++    - MDCR_EL3.TDA (bit 9) must be initialized to 0b0
++    - MDCR_EL3.EBWE (bit 43) must be initialized to 0b1
++
+   For CPUs with the Scalable Matrix Extension (FEAT_SME):
+ 
+   - If EL3 is present:
+diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
+index fd87c4b8f984..0cb26a9f34c3 100644
+--- a/arch/arm64/include/asm/el2_setup.h
++++ b/arch/arm64/include/asm/el2_setup.h
+@@ -97,6 +97,14 @@
+ 						// to own it.
+ 
+ .Lskip_trace_\@:
++	mrs	x1, id_aa64dfr0_el1
++	ubfx	x1, x1, #ID_AA64DFR0_EL1_DebugVer_SHIFT, #4
++	cmp	x1, #ID_AA64DFR0_EL1_DebugVer_V8P9
++	b.lt	.Lskip_dbg_v8p9_\@
++
++	mov	x0, #MDCR_EL2_EBWE
++	orr	x2, x2, x0
++.Lskip_dbg_v8p9_\@:
+ 	msr	mdcr_el2, x2			// Configure debug traps
+ .endm
+ 
+@@ -204,6 +212,24 @@
+ .Lskip_fgt_\@:
+ .endm
+ 
++.macro __init_el2_fgt2
++	mrs	x1, id_aa64mmfr0_el1
++	ubfx	x1, x1, #ID_AA64MMFR0_EL1_FGT_SHIFT, #4
++	cmp	x1, #ID_AA64MMFR0_EL1_FGT_FGT2
++	b.lt	.Lskip_fgt2_\@
++
++	mrs	x1, id_aa64dfr0_el1
++	ubfx	x1, x1, #ID_AA64DFR0_EL1_DebugVer_SHIFT, #4
++	cmp	x1, #ID_AA64DFR0_EL1_DebugVer_V8P9
++	b.lt	.Lskip_dbg_v8p9_\@
++
++	mov_q   x0, HDFGWTR2_EL2_nMDSELR_EL1
++	msr_s	SYS_HDFGWTR2_EL2, x0
++	msr_s	SYS_HDFGRTR2_EL2, x0
++.Lskip_dbg_v8p9_\@:
++.Lskip_fgt2_\@:
++.endm
++
+ .macro __init_el2_nvhe_prepare_eret
+ 	mov	x0, #INIT_PSTATE_EL1
+ 	msr	spsr_el2, x0
+@@ -229,6 +255,7 @@
+ 	__init_el2_nvhe_idregs
+ 	__init_el2_cptr
+ 	__init_el2_fgt
++	__init_el2_fgt2
+ .endm
+ 
+ #ifndef __KVM_NVHE_HYPERVISOR__
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index b3fb368bcadb..8621a278ce25 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -312,6 +312,7 @@
+ 				 GENMASK(15, 0))
+ 
+ /* Hyp Debug Configuration Register bits */
++#define MDCR_EL2_EBWE		(UL(1) << 43)
+ #define MDCR_EL2_E2TB_MASK	(UL(0x3))
+ #define MDCR_EL2_E2TB_SHIFT	(UL(24))
+ #define MDCR_EL2_HPMFZS		(UL(1) << 36)
 -- 
 2.25.1
 
