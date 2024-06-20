@@ -1,125 +1,84 @@
-Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EE5E1581FC
-	for <kvmarm@lists.linux.dev>; Wed, 19 Jun 2024 17:41:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56DEA2139C7
+	for <kvmarm@lists.linux.dev>; Thu, 20 Jun 2024 03:24:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718818873; cv=none; b=Sq3cUi3pRN7W+NuyZqjrr8p2s9BzuXlTlR9GmDSBbm5683f/mv3deOWA5+l1Rhd3f3XTpur1Bt2wCjxyir0qI+wYu0BT2vbs2bulw46rBBEx5c2JI65dif27TF0SkL0ywGApR4HPkzt5ROkRs2ieUdNlNBRxAmFqGh6pp4vQcGE=
+	t=1718853870; cv=none; b=VI2xFpIr6KR3XckDSPt/HnDCUYLSG46hygRD6e4+iYFEPJjJ1Djf07pCNgqqG6nOQI6efL8Pb/3T7dYXPUEeGKCPwRgU/Hs+V5DKky++2N4dXxjs5lKanAd8+d5yJBONuRSIIbpykjpD8wUEFBZph0Wcm0nde/xuRnXCEndf9RA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718818873; c=relaxed/simple;
-	bh=QdkSxu8RWXYAe3d4ZOF2/aNp2IqZy+O8nOdjJwYWIQA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FlGoMtB6jzC0ybf7m4HTUkMM740E9ybC52CInJZF5CMeiE/EkxrF1KhFGCUAFIWM0jjyzqQ4TV0+j6LdA84RjbrItS/ZSdG4lYsqiOnu5e04I0ipUjaZRKufPbojwiVBC+e+Ja3cunVM+3UXUJRrU5yezoLqpl2YmwBoKYQ9fvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pMSD5DNL; arc=none smtp.client-ip=91.218.175.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pMSD5DNL"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1718818870;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0r3LHAfIdQgocAIW5eYByrh9rwZzcWsyVJwKWHfsoaA=;
-	b=pMSD5DNLD0mckbTeX47jCn95koa+zPl2fp86ZMig+g61kSVwOuvAMbdnDJHLtDwUrzcC9M
-	U7tNtmpo5pGUyz+zfFyhWslQ60KVUSKiM7ty1IzPIPblxJglpaCkkRdVtSmZwVLR9WcHPW
-	+4qeDRL+utMyAefQzY34g1GNWK38QOM=
-X-Envelope-To: maz@kernel.org
-X-Envelope-To: james.morse@arm.com
-X-Envelope-To: suzuki.poulose@arm.com
-X-Envelope-To: yuzenghui@huawei.com
-X-Envelope-To: kvm@vger.kernel.org
-X-Envelope-To: sebott@redhat.com
-X-Envelope-To: shahuang@redhat.com
-X-Envelope-To: eric.auger@redhat.com
-X-Envelope-To: oliver.upton@linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	kvm@vger.kernel.org,
-	Sebastian Ott <sebott@redhat.com>,
-	Shaoqin Huang <shahuang@redhat.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v5 10/10] KVM: selftests: arm64: Test writes to CTR_EL0
-Date: Wed, 19 Jun 2024 17:40:36 +0000
-Message-ID: <20240619174036.483943-11-oliver.upton@linux.dev>
-In-Reply-To: <20240619174036.483943-1-oliver.upton@linux.dev>
-References: <20240619174036.483943-1-oliver.upton@linux.dev>
+	s=arc-20240116; t=1718853870; c=relaxed/simple;
+	bh=zfUyu0pm2IYmWh5JGWUKNrA0MqEBSl7VlMju18XAaGo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rgOGQ7FxnTX155o7ivAP+vqOCmV+rZaTpKKTNAiLwD0pf4YbFatltHfon8NqIB0mX6nSk4ea75NZdSBk7ijMa7rzGTxFtsDajmLQarOQtEg9zssdmruTz9CRotW9xxgN1BPDk11CUwYVXHhgjNuZ9sCdjuQPmF6jhYVjfrd7KhI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 231F2DA7;
+	Wed, 19 Jun 2024 20:24:50 -0700 (PDT)
+Received: from [10.163.46.59] (unknown [10.163.46.59])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 150443F73B;
+	Wed, 19 Jun 2024 20:24:21 -0700 (PDT)
+Message-ID: <ba9b51db-5e8a-4e89-ad6a-046133dfc657@arm.com>
+Date: Thu, 20 Jun 2024 08:54:20 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V2 0/2] arm64: Drop
+ ID_AA64PFR0_EL1_ELx_[64BIT_ONLY|32BIT_64BIT]
+Content-Language: en-US
+To: linux-arm-kernel@lists.infradead.org
+Cc: mark.rutland@arm.com, ryan.roberts@arm.com, Marc Zyngier
+ <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Mark Brown <broonie@kernel.org>, kvmarm@lists.linux.dev,
+ linux-kernel@vger.kernel.org
+References: <20240613102710.3295108-1-anshuman.khandual@arm.com>
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+In-Reply-To: <20240613102710.3295108-1-anshuman.khandual@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Sebastian Ott <sebott@redhat.com>
 
-Test that CTR_EL0 is modifiable from userspace, that changes are
-visible to guests, and that they are preserved across a vCPU reset.
 
-Signed-off-by: Sebastian Ott <sebott@redhat.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- .../testing/selftests/kvm/aarch64/set_id_regs.c  | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+On 6/13/24 15:57, Anshuman Khandual wrote:
+> This series replaces custom macros usage for ID_AA64PFR0_EL1_ELx_64BIT_ONLY
+> and ID_AA64PFR0_EL1_ELx_32BIT_64BIT fields, thus finally just dropping them
+> off completely. This series applies on v6.10-rc3
+> 
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Oliver Upton <oliver.upton@linux.dev>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will@kernel.org>
+> Cc: Mark Rutland <mark.rutland@arm.com>
+> Cc: Mark Brown <broonie@kernel.org>
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: kvmarm@lists.linux.dev
+> Cc: linux-kernel@vger.kernel.org
+> 
+> Changes in V2:
+> 
+> - Replaced FIELD_PREP() with SYS_FIELD_PREP_ENUM() as per Marc
 
-diff --git a/tools/testing/selftests/kvm/aarch64/set_id_regs.c b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-index a7de39fa2a0a..9583c04f1228 100644
---- a/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-+++ b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-@@ -219,6 +219,7 @@ static void guest_code(void)
- 	GUEST_REG_SYNC(SYS_ID_AA64MMFR1_EL1);
- 	GUEST_REG_SYNC(SYS_ID_AA64MMFR2_EL1);
- 	GUEST_REG_SYNC(SYS_ID_AA64ZFR0_EL1);
-+	GUEST_REG_SYNC(SYS_CTR_EL0);
- 
- 	GUEST_DONE();
- }
-@@ -490,11 +491,25 @@ static void test_clidr(struct kvm_vcpu *vcpu)
- 	test_reg_vals[encoding_to_range_idx(SYS_CLIDR_EL1)] = clidr;
- }
- 
-+static void test_ctr(struct kvm_vcpu *vcpu)
-+{
-+	u64 ctr;
-+
-+	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_CTR_EL0), &ctr);
-+	ctr &= ~CTR_EL0_DIC_MASK;
-+	if (ctr & CTR_EL0_IminLine_MASK)
-+		ctr--;
-+
-+	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_CTR_EL0), ctr);
-+	test_reg_vals[encoding_to_range_idx(SYS_CTR_EL0)] = ctr;
-+}
-+
- static void test_vcpu_ftr_id_regs(struct kvm_vcpu *vcpu)
- {
- 	u64 val;
- 
- 	test_clidr(vcpu);
-+	test_ctr(vcpu);
- 
- 	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_MPIDR_EL1), &val);
- 	val++;
-@@ -525,6 +540,7 @@ static void test_reset_preserves_id_regs(struct kvm_vcpu *vcpu)
- 		test_assert_id_reg_unchanged(vcpu, test_regs[i].reg);
- 
- 	test_assert_id_reg_unchanged(vcpu, SYS_CLIDR_EL1);
-+	test_assert_id_reg_unchanged(vcpu, SYS_CTR_EL0);
- 
- 	ksft_test_result_pass("%s\n", __func__);
- }
--- 
-2.45.2.627.g7a2c4fd464-goog
+Gentle ping, any updates for this series ?
 
+> 
+> Changes in V1:
+> 
+> https://lore.kernel.org/all/20240418053804.2573071-1-anshuman.khandual@arm.com/
+> 
+> Anshuman Khandual (2):
+>   KVM: arm64: Replace custom macros with fields from ID_AA64PFR0_EL1
+>   arm64/cpufeature: Replace custom macros with fields from ID_AA64PFR0_EL1
+> 
+>  arch/arm64/include/asm/cpufeature.h            |  4 ++--
+>  arch/arm64/include/asm/sysreg.h                |  4 ----
+>  arch/arm64/kernel/cpufeature.c                 |  4 ++--
+>  arch/arm64/kvm/hyp/include/nvhe/fixed_config.h | 10 +++++-----
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c                 |  4 ++--
+>  arch/arm64/kvm/hyp/nvhe/sys_regs.c             |  2 +-
+>  6 files changed, 12 insertions(+), 16 deletions(-)
+> 
