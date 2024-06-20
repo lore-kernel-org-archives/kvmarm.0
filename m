@@ -1,32 +1,32 @@
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E9F61B4C25
-	for <kvmarm@lists.linux.dev>; Thu, 20 Jun 2024 16:47:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DF171B3738
+	for <kvmarm@lists.linux.dev>; Thu, 20 Jun 2024 16:47:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718902048; cv=none; b=alr3tm0k2SoVAjpCHD7ZypYifDEJcuFWb3zMkZp+Pj+zPnB2QwgN9deHQYS3/KkGnB3heUU9fVPuOl9VhnMReO5n+bpC5xvuGOYKYIiiPb5sjW6Cd/1YVAl0qXziNiu/gN2bneGMUfuXDrD7pvIMkTni1Dkdp03U5JOZN/ialQM=
+	t=1718902050; cv=none; b=C2g/OUS84KYhty8vsdbR9jsjUmykIOA6TtJS8gFo7hkPnBV7qH0x/hF4NH+UsAOoMPORxNCtLn3+ITIaDW/tJNfuPLH9m/qVzRkTo5Axf5GQE4UiQpNNtBI1cdjmFVZW6FYQmVAjVyye3FRaGFKa9almPFZxGW6YCtnpxZ7/ef4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718902048; c=relaxed/simple;
-	bh=C5LEmrBiHT1xTeApGrYyneEYQCpGBT/Ty7lSjeiHStA=;
+	s=arc-20240116; t=1718902050; c=relaxed/simple;
+	bh=1yg5AYELubECKlo6Eo+bOKuSCabL7JbyyNuiHWaHuKs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=p8Eo9hXv/DJ9vZB1NcXa0mW3uBuZykywWS7bEWV6lsIUCneSFWK1/99vfkxu5RS5uw66p8cskegbx7Gr3o5JKlu34shnqTTAwDnO0NiIogokSphKY9KRuykjjlpFhRauC5BHq5yDylckA354fFidHVjmvLJNY6y/fo77VOU12x4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=alz0b7Wp; arc=none smtp.client-ip=95.215.58.170
+	 MIME-Version; b=oynqt1Wt64f/KAmoRSz0HxdvOwslDKG4gCjoszy4/q7A2zGaoIt+F5l1zPf8LUxTjmY0iXk20DI+9rZOjFWRBEwj10NL/81VDwhIE6xXFkKuEm4BH9ly4kfvRy3mrId+DzYPian3QeNy3XBAhTFy0FfQ1LNM6HJCuFYynXVtDuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KxgRQBMW; arc=none smtp.client-ip=95.215.58.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="alz0b7Wp"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KxgRQBMW"
 X-Envelope-To: kvmarm@lists.linux.dev
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1718902042;
+	t=1718902046;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=sHh2kb1Z2Qr4oSw9MwaKbtA4JNckM/+p9o6iCRwIjxg=;
-	b=alz0b7WpkSSpddQOfhfzSGKS499wvF8Z7tQOLbIx1gKByOgmXA9Z6REO1oDwnpjcs/Uf2j
-	EuEMumEnZRREdD+hJqOKp8NJhRsh/OckI2lFcCNi4Au4fb4Sz5Kt2sUT2NHlwB+/03aIG6
-	xkv1KZUD9bGtm5BnpveWuFQb8YLXwq0=
+	bh=pmtAAR+VAB2Y/FTza7jwIQlFzzrt1sW9kGZMKbx09nI=;
+	b=KxgRQBMW5FNtkE0N7vAipJ+aFRuNn/hNERbLuTOyH3eyQ3m7nn0Lu/EN/LfhGCgu5CW7U5
+	aDrXklfGs8abRzRUbqttsoyNSy1EIaBcVRXx3qeNacOJDtq5iRM/u/DOgc6UNMnwdaz21p
+	SXFBKMLVH1m6TynaTSmgaHiDymEO9kM=
 X-Envelope-To: maz@kernel.org
 X-Envelope-To: james.morse@arm.com
 X-Envelope-To: suzuki.poulose@arm.com
@@ -44,9 +44,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	kvm@vger.kernel.org,
 	Fuad Tabba <tabba@google.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v3 11/15] KVM: arm64: nv: Honor guest hypervisor's FP/SVE traps in CPTR_EL2
-Date: Thu, 20 Jun 2024 16:46:48 +0000
-Message-ID: <20240620164653.1130714-12-oliver.upton@linux.dev>
+Subject: [PATCH v3 13/15] KVM: arm64: nv: Add trap description for CPTR_EL2
+Date: Thu, 20 Jun 2024 16:46:50 +0000
+Message-ID: <20240620164653.1130714-14-oliver.upton@linux.dev>
 In-Reply-To: <20240620164653.1130714-1-oliver.upton@linux.dev>
 References: <20240620164653.1130714-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -58,70 +58,155 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Start folding the guest hypervisor's FP/SVE traps into the value
-programmed in hardware. Note that as of writing this is dead code, since
-KVM does a full put() / load() for every nested exception boundary which
-saves + flushes the FP/SVE state.
+From: Marc Zyngier <maz@kernel.org>
 
-However, this will become useful when we can keep the guest's FP/SVE
-state alive across a nested exception boundary and the host no longer
-needs to conservatively program traps.
+Add trap description for CPTR_EL2.{TCPAC,TAM,E0POE,TTA}.
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
+TTA is a bit annoying as it changes location depending on E2H.
+This forces us to add yet another "complex" trap condition.
+
+Signed-off-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/hyp/vhe/switch.c | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+ arch/arm64/kvm/emulate-nested.c | 91 +++++++++++++++++++++++++++++++++
+ 1 file changed, 91 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index 925de4b4efd2..b0b1935a3626 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -67,6 +67,8 @@ static u64 __compute_hcr(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index 72d733c74a38..61e6b97c3e25 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -79,6 +79,10 @@ enum cgt_group_id {
+ 	CGT_MDCR_E2TB,
+ 	CGT_MDCR_TDCC,
  
- static void __activate_cptr_traps(struct kvm_vcpu *vcpu)
- {
-+	u64 cptr;
++	CGT_CPACR_E0POE,
++	CGT_CPTR_TAM,
++	CGT_CPTR_TCPAC,
 +
  	/*
- 	 * With VHE (HCR.E2H == 1), accesses to CPACR_EL1 are routed to
- 	 * CPTR_EL2. In general, CPACR_EL1 has the same layout as CPTR_EL2,
-@@ -85,6 +87,35 @@ static void __activate_cptr_traps(struct kvm_vcpu *vcpu)
- 		__activate_traps_fpsimd32(vcpu);
- 	}
+ 	 * Anything after this point is a combination of coarse trap
+ 	 * controls, which must all be evaluated to decide what to do.
+@@ -106,6 +110,8 @@ enum cgt_group_id {
+ 	CGT_CNTHCTL_EL1PCTEN = __COMPLEX_CONDITIONS__,
+ 	CGT_CNTHCTL_EL1PTEN,
  
-+	/*
-+	 * Layer the guest hypervisor's trap configuration on top of our own if
-+	 * we're in a nested context.
-+	 */
-+	if (!vcpu_has_nv(vcpu) || is_hyp_ctxt(vcpu))
-+		goto write;
++	CGT_CPTR_TTA,
 +
-+	cptr = vcpu_sanitised_cptr_el2(vcpu);
-+
-+	/*
-+	 * Pay attention, there's some interesting detail here.
-+	 *
-+	 * The CPTR_EL2.xEN fields are 2 bits wide, although there are only two
-+	 * meaningful trap states when HCR_EL2.TGE = 0 (running a nested guest):
-+	 *
-+	 *  - CPTR_EL2.xEN = x0, traps are enabled
-+	 *  - CPTR_EL2.xEN = x1, traps are disabled
-+	 *
-+	 * In other words, bit[0] determines if guest accesses trap or not. In
-+	 * the interest of simplicity, clear the entire field if the guest
-+	 * hypervisor has traps enabled to dispel any illusion of something more
-+	 * complicated taking place.
-+	 */
-+	if (!(SYS_FIELD_GET(CPACR_ELx, FPEN, cptr) & BIT(0)))
-+		val &= ~CPACR_ELx_FPEN;
-+	if (!(SYS_FIELD_GET(CPACR_ELx, ZEN, cptr) & BIT(0)))
-+		val &= ~CPACR_ELx_ZEN;
-+
-+write:
- 	write_sysreg(val, cpacr_el1);
+ 	/* Must be last */
+ 	__NR_CGT_GROUP_IDS__
+ };
+@@ -345,6 +351,24 @@ static const struct trap_bits coarse_trap_bits[] = {
+ 		.mask		= MDCR_EL2_TDCC,
+ 		.behaviour	= BEHAVE_FORWARD_ANY,
+ 	},
++	[CGT_CPACR_E0POE] = {
++		.index		= CPTR_EL2,
++		.value		= CPACR_ELx_E0POE,
++		.mask		= CPACR_ELx_E0POE,
++		.behaviour	= BEHAVE_FORWARD_ANY,
++	},
++	[CGT_CPTR_TAM] = {
++		.index		= CPTR_EL2,
++		.value		= CPTR_EL2_TAM,
++		.mask		= CPTR_EL2_TAM,
++		.behaviour	= BEHAVE_FORWARD_ANY,
++	},
++	[CGT_CPTR_TCPAC] = {
++		.index		= CPTR_EL2,
++		.value		= CPTR_EL2_TCPAC,
++		.mask		= CPTR_EL2_TCPAC,
++		.behaviour	= BEHAVE_FORWARD_ANY,
++	},
+ };
+ 
+ #define MCB(id, ...)						\
+@@ -410,12 +434,26 @@ static enum trap_behaviour check_cnthctl_el1pten(struct kvm_vcpu *vcpu)
+ 	return BEHAVE_FORWARD_ANY;
  }
  
++static enum trap_behaviour check_cptr_tta(struct kvm_vcpu *vcpu)
++{
++	u64 val = __vcpu_sys_reg(vcpu, CPTR_EL2);
++
++	if (!vcpu_el2_e2h_is_set(vcpu))
++		val = translate_cptr_el2_to_cpacr_el1(val);
++
++	if (val & CPACR_ELx_TTA)
++		return BEHAVE_FORWARD_ANY;
++
++	return BEHAVE_HANDLE_LOCALLY;
++}
++
+ #define CCC(id, fn)				\
+ 	[id - __COMPLEX_CONDITIONS__] = fn
+ 
+ static const complex_condition_check ccc[] = {
+ 	CCC(CGT_CNTHCTL_EL1PCTEN, check_cnthctl_el1pcten),
+ 	CCC(CGT_CNTHCTL_EL1PTEN, check_cnthctl_el1pten),
++	CCC(CGT_CPTR_TTA, check_cptr_tta),
+ };
+ 
+ /*
+@@ -1000,6 +1038,59 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
+ 	SR_TRAP(SYS_TRBPTR_EL1, 	CGT_MDCR_E2TB),
+ 	SR_TRAP(SYS_TRBSR_EL1, 		CGT_MDCR_E2TB),
+ 	SR_TRAP(SYS_TRBTRG_EL1,		CGT_MDCR_E2TB),
++	SR_TRAP(SYS_CPACR_EL1,		CGT_CPTR_TCPAC),
++	SR_TRAP(SYS_AMUSERENR_EL0,	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMCFGR_EL0,		CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMCGCR_EL0,		CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMCNTENCLR0_EL0,	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMCNTENCLR1_EL0,	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMCNTENSET0_EL0,	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMCNTENSET1_EL0,	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMCR_EL0,		CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVCNTR0_EL0(0),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVCNTR0_EL0(1),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVCNTR0_EL0(2),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVCNTR0_EL0(3),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVCNTR1_EL0(0),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVCNTR1_EL0(1),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVCNTR1_EL0(2),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVCNTR1_EL0(3),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVCNTR1_EL0(4),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVCNTR1_EL0(5),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVCNTR1_EL0(6),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVCNTR1_EL0(7),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVCNTR1_EL0(8),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVCNTR1_EL0(9),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVCNTR1_EL0(10),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVCNTR1_EL0(11),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVCNTR1_EL0(12),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVCNTR1_EL0(13),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVCNTR1_EL0(14),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVCNTR1_EL0(15),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVTYPER0_EL0(0),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVTYPER0_EL0(1),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVTYPER0_EL0(2),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVTYPER0_EL0(3),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVTYPER1_EL0(0),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVTYPER1_EL0(1),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVTYPER1_EL0(2),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVTYPER1_EL0(3),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVTYPER1_EL0(4),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVTYPER1_EL0(5),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVTYPER1_EL0(6),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVTYPER1_EL0(7),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVTYPER1_EL0(8),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVTYPER1_EL0(9),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVTYPER1_EL0(10),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVTYPER1_EL0(11),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVTYPER1_EL0(12),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVTYPER1_EL0(13),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVTYPER1_EL0(14),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_AMEVTYPER1_EL0(15),	CGT_CPTR_TAM),
++	SR_TRAP(SYS_POR_EL0,		CGT_CPACR_E0POE),
++	/* op0=2, op1=1, and CRn<0b1000 */
++	SR_RANGE_TRAP(sys_reg(2, 1, 0, 0, 0),
++		      sys_reg(2, 1, 7, 15, 7), CGT_CPTR_TTA),
+ 	SR_TRAP(SYS_CNTP_TVAL_EL0,	CGT_CNTHCTL_EL1PTEN),
+ 	SR_TRAP(SYS_CNTP_CVAL_EL0,	CGT_CNTHCTL_EL1PTEN),
+ 	SR_TRAP(SYS_CNTP_CTL_EL0,	CGT_CNTHCTL_EL1PTEN),
 -- 
 2.45.2.741.gdbec12cfda-goog
 
