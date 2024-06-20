@@ -1,74 +1,64 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C9101ABCD5;
-	Thu, 20 Jun 2024 11:37:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 446491A8C1B
+	for <kvmarm@lists.linux.dev>; Thu, 20 Jun 2024 13:07:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718883461; cv=none; b=BoDd5TuqMo7o+6IFtgTkCRf56OGqimlrtwwtRkzEYwkv8NJfQOwcRlK1TA1MCGZzMJd+djxPRJ7h7ueE+azYZJ/jXQGgzbeoJnCma7Zxh7NzMjTsJu0IQzCVUI3eBIQ0k278SSlXE1MKla28YBSbWr5RGL7Zh2XjhxrYOXKT56Q=
+	t=1718888835; cv=none; b=FWs527Mxa2jaGOMRO8mzuXFNifn3O053nAoScj5TflGyuei+i2CIXOYTcznUzfBw4oWyKPW0VrlBf4R+0YIGY6D1SFdUmUxcoCXYtw3ZOR/b6dmrrR4S2g6cFEsMQ2STH07VM7IIbDUjYCA6gv5LjlSIpVBZBn3zZ22LkZYQSdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718883461; c=relaxed/simple;
-	bh=7Bq8zOBLE3RaLVh77HyqeG7aK9VtXXSgvxiQB9pjHmU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iJL/ibNP9brCzR/QuCn6V/1cq26anJnuj0NFfxnkCsg4HgkUeejH497f5YuxoZE8Jfb2Wm+LGymBoh+SaqETfB6FuqMmlGOXsXwqy0l5mc31JHU15iDTGBTCuberSnoLDYE0x5QdUi98DSEIfEocto4DM8fQ6cqSOQosp0DTBcQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kg5ms+NU; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kg5ms+NU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BB5BC32781;
-	Thu, 20 Jun 2024 11:37:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718883460;
-	bh=7Bq8zOBLE3RaLVh77HyqeG7aK9VtXXSgvxiQB9pjHmU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Kg5ms+NUfHJmWjOtFBau4YwLhhjITB2a31C9s4oU4VOaIvuOPaeoMqhtOmhBpHzdm
-	 zWWy/+RCxVJAy5NviLAtoIFxYlgcSnHxsOenCkivlE2HOsDRPx65NfVqwyCDxVE8vy
-	 1dB67DxvP6SoNz8uYsjwYvwqItplx5al8Zt2/oQDiwCyAgpA9xUB+X5aNfze+Mlaxf
-	 fF4ZPgBH+in4af75Xp156y2ZWnwRZwokqk+CGW28dMJBZw+nlO8BceCMIva5aeX2Lq
-	 jA+jfi/tbcthdXhEWD4xbjj0QPOYIFXqAITX4X/eEuP4hpjBOXlxYML93xLrXAcxDG
-	 W48jJFod54E0w==
-Date: Thu, 20 Jun 2024 12:37:35 +0100
-From: Will Deacon <will@kernel.org>
-To: =?iso-8859-1?Q?Pierre-Cl=E9ment?= Tosi <ptosi@google.com>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Vincent Donnefort <vdonnefort@google.com>
-Subject: Re: [PATCH v5 2/8] KVM: arm64: Fix __pkvm_init_switch_pgd call ABI
-Message-ID: <20240620113735.GB4625@willie-the-truck>
-References: <20240610063244.2828978-1-ptosi@google.com>
- <20240610063244.2828978-3-ptosi@google.com>
+	s=arc-20240116; t=1718888835; c=relaxed/simple;
+	bh=yU+NK/hGkNIL5mdmNjeIBzA2t0+seLswRXbJo9rHSg4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=PiJbpJKnpuBoJIdnD6msmoQvBPSKTHK3aNuTaSj4Z72KrXU1tNGXusixsms1r+SUhOqnbjYNW3wjXsgGdQUGP5QZr8ABzeW9gW/mfK6KcYSfN3S5YjBoiawlk+0MgnP6QxT7TAEwpIlsL7fK2G/4nIfr0wKz46gC/UOig2300m8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4W4gdR05q0z1N8Pj;
+	Thu, 20 Jun 2024 21:02:51 +0800 (CST)
+Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
+	by mail.maildlp.com (Postfix) with ESMTPS id 4FFDE18007E;
+	Thu, 20 Jun 2024 21:07:07 +0800 (CST)
+Received: from DESKTOP-6NKE0BC.china.huawei.com (10.174.185.210) by
+ kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 20 Jun 2024 21:07:06 +0800
+From: Kunkun Jiang <jiangkunkun@huawei.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Eric
+ Auger <eauger@redhat.com>
+CC: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<wanghaibin.wang@huawei.com>, Kunkun Jiang <jiangkunkun@huawei.com>,
+	<lishusen2@huawei.com>
+Subject: [PATCH 0/3] KVM: arm64: vgic-its: Some fixes about vgic-its
+Date: Thu, 20 Jun 2024 21:06:47 +0800
+Message-ID: <20240620130650.1279-1-jiangkunkun@huawei.com>
+X-Mailer: git-send-email 2.26.2.windows.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240610063244.2828978-3-ptosi@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemm600007.china.huawei.com (7.193.23.208)
 
-On Mon, Jun 10, 2024 at 07:32:31AM +0100, Pierre-Clément Tosi wrote:
-> Fix the mismatch between the (incorrect) C signature, C call site, and
-> asm implementation by aligning all three on an API passing the
-> parameters (pgd and SP) separately, instead of as a bundled struct.
-> 
-> Remove the now unnecessary memory accesses while the MMU is off from the
-> asm, which simplifies the C caller (as it does not need to convert a VA
-> struct pointer to PA) and makes the code slightly more robust by
-> offsetting the struct fields from C and properly expressing the call to
-> the C compiler (e.g. type checker and kCFI).
-> 
-> Fixes: f320bc742bc2 ("KVM: arm64: Prepare the creation of s1 mappings at EL2")
-> Signed-off-by: Pierre-Clément Tosi <ptosi@google.com>
-> ---
->  arch/arm64/include/asm/kvm_hyp.h   |  4 ++--
->  arch/arm64/kvm/hyp/nvhe/hyp-init.S | 24 +++++++++++++-----------
->  arch/arm64/kvm/hyp/nvhe/setup.c    |  4 ++--
->  3 files changed, 17 insertions(+), 15 deletions(-)
+There are three fixes about vgic-its:
+Patch 1: A data length check is added in vgic_its_save_*
+Patch 2-3: Fix two bugs in the scenario of continuous save and restore
 
-Acked-by: Will Deacon <will@kernel.org>
+Kunkun Jiang (3):
+  KVM: arm64: vgic-its: Add a data length check in vgic_its_save_*
+  KVM: arm64: vgic-its: Clear dte when mapd unmaps a device
+  KVM: arm64: vgic-its: Clear ite when discard frees an ite
 
-Will
+ arch/arm64/kvm/vgic/vgic-its.c | 21 +++++++++++++++++++--
+ 1 file changed, 19 insertions(+), 2 deletions(-)
+
+-- 
+2.33.0
+
