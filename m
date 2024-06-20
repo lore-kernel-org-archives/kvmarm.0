@@ -1,92 +1,91 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5860C30358
-	for <kvmarm@lists.linux.dev>; Thu, 20 Jun 2024 13:58:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF4231B010F
+	for <kvmarm@lists.linux.dev>; Thu, 20 Jun 2024 15:39:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718891919; cv=none; b=gomU/EuaqopeDjR01R3AuzZfHiOmWsO07II6g4uTmPiWPE4I2Tag116fazGc3hXfh6KzfP7//weC5EmxIOsWHD0CLkbHEHq1vmEYNgtGrJQf1Mmlk4CwS14Fe2RRoBy1p9q+Gzk3KabIzJVQolyIBXCl77xqZ492gf8EnKFM6K0=
+	t=1718897948; cv=none; b=QKD3fK8L7sqcQXdAf/M6LpXOT0ueZSECEK7CZWCzMr1wLxUWfBrCqmd2r7FJ5axF+zfSCp0qiFC5zv+HwS6hKnYGwFXmJY0dhxx+sBe3L+Z2CDbtmoF0m/pDhoqD71QaMFLqmYVHWbpqmHJyChgdu6Svt8Y7u5LWINE7Ig/5S5E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718891919; c=relaxed/simple;
-	bh=SNkfXN9EHxOurTVP8o9P7xWfSSS6g0y6JzMJDEU+R9k=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RtoWu6UoYbgfdJgSoXSBvJxnakRPQu6OgbRrNFUAnGTIGe+BhjvTljj1LakF24yzSehw/BhAhg1qLk+TlE1YqZ7bHRutP24A8twWNr+GIIfRwV27gC89o98DiSvBdI7ZlISDiPSC1Pr/Qx+A+Y59w3alz2igjwFODAwV/iwStEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U7oZIgJh; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1718897948; c=relaxed/simple;
+	bh=7MB1I1UVOTEXCsm5pjN83xKIVZzA23rlgdy0g9R1YFw=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=YlOcZpKzG8ej5JRxWKhfsvG5Uo0ezcWrqPRXHMmJt3y+bcsYhABgtHnlWoWMDuXCRVftCyone1lwRfd0v2rjgAWN3SJqCnwIjEujJCiH8Mm5+HPH2lwjXU72X1wodlpDTw31wvzY7RS5muKJ79dtBgucpMrCdzVZLsuyqZzAS0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dLqbJstC; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U7oZIgJh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5B82C32786;
-	Thu, 20 Jun 2024 13:58:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718891918;
-	bh=SNkfXN9EHxOurTVP8o9P7xWfSSS6g0y6JzMJDEU+R9k=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=U7oZIgJh9SPx+C86rjj8OfSfvQuxg2madsG6kR2v87l/FmUDuLVQNwoH2CRhPA2lP
-	 fELK9fcrsadDFgbzmjgONy2lUkA55D8j6Htd8eyaJDBbFuQBZZn5gtdLoAXdlSth4R
-	 bL+qPThu0EFlG+fLSpFwK5Vd2drwNHvhlB47Ham3K/l/9i52xlBm9k/RqqbvpudI6r
-	 JNWSYhB1f1vF0wOJlJ8vB3+FmZ/XIN0YLtwN4++Pj9/+Ngjkhsm41gJqoZh3Bm6yfE
-	 OOdY6tNF/3l23DOFKPldU+i5AoZBB9RMlq0fKzBbIn5xmWrTA2Zh7RIhdLB8DEymqK
-	 sxGy0vv+AJMfA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sKIJA-005nE8-Fo;
-	Thu, 20 Jun 2024 14:58:36 +0100
-Date: Thu, 20 Jun 2024 14:58:35 +0100
-Message-ID: <864j9nk96c.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Kunkun Jiang <jiangkunkun@huawei.com>
-Cc: Eric Auger <eauger@redhat.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	<linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>,
-	<wanghaibin.wang@huawei.com>,
-	<lishusen2@huawei.com>
-Subject: Re: [PATCH] KVM: arm64: vgic-its: clear dte when mapd unmaps a device
-In-Reply-To: <480900e7-4894-4fc9-5671-f29523f2672a@huawei.com>
-References: <20240613093811.710-1-jiangkunkun@huawei.com>
-	<86v82ckimh.wl-maz@kernel.org>
-	<8f9d74fc-f9d9-43ac-a387-91ff804cfaf1@redhat.com>
-	<480900e7-4894-4fc9-5671-f29523f2672a@huawei.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dLqbJstC"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718897945;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7MB1I1UVOTEXCsm5pjN83xKIVZzA23rlgdy0g9R1YFw=;
+	b=dLqbJstCm7J07jGo6Ud/YwN8AKbkB0A+w0Qzvln926csWXOHttkNazw8jZrMouw5AG6SK3
+	jrFVVWNSHd1pMg661RJihxmzNx5E7azig3W1ozjT/5TB2wJSgoJg/aReOVtkYPefH8EWG4
+	g0KYF3nWKCnvVCzESwwE7TSmbD3NzCg=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-186-tur7tHEfMVy5uT7ma-kOtQ-1; Thu, 20 Jun 2024 11:39:02 -0400
+X-MC-Unique: tur7tHEfMVy5uT7ma-kOtQ-1
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-797d167a402so116511085a.2
+        for <kvmarm@lists.linux.dev>; Thu, 20 Jun 2024 08:39:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718897941; x=1719502741;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7MB1I1UVOTEXCsm5pjN83xKIVZzA23rlgdy0g9R1YFw=;
+        b=TO/9ljeyS294T5FG6E+tO0NWZoZg/d7pToKIze8mnro+Ya7KdT5hkmI4mG6sUPI6Ua
+         scJj0xH5HaGs6F/74yv8N0wzMqZHtgQE+aoBlRUslhSBdNvGrPQvzz/mh4iCxlGrEIhV
+         qX2VfA3lgwZ0iU0SDzK5qT8iDn6vQI6gxER3ZbZVdj4ADjvqiLVY+L3gZ6uGDyvtjxyz
+         o3hJcl5olYhNfkRRwrFfcbgVNNPfwgHAKVo21tU0pEBznpO8uWiXmKhvL68WlmbmAXbu
+         PRCXjJbUXBOGasYfoE0XHmAI3GMup/2eI2VTF+aoXNyeE22p12pwGZJY+7v9ZUbTUQS8
+         iTPQ==
+X-Gm-Message-State: AOJu0Yx+LPWNx7TyFcK+YCOauikDKDrjjXAnrYqPlDDcHxyxxJjLFsR0
+	KYMDTJ/KM8Xu+xuho8JewzCnOrbUEKKp2ecxkpc4xn0NhCQ8qIrPH6cweWYbfkTrX8lY3HpRI6l
+	ywHSL5sj5eIH3Y3WMelJ4lom/iRIqV6Z2NCSOdbH3qG7dV5GTDcdIcw==
+X-Received: by 2002:a05:620a:4109:b0:796:842c:77ef with SMTP id af79cd13be357-79bb3e1178fmr615652185a.10.1718897941548;
+        Thu, 20 Jun 2024 08:39:01 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHvwSPJpjWm/tOIuX081oVCD2HT9fyPjYjPX7yKJ9jzORjE/DVs3ALW+IJEPIHcnQvKKzPyyg==
+X-Received: by 2002:a05:620a:4109:b0:796:842c:77ef with SMTP id af79cd13be357-79bb3e1178fmr615649785a.10.1718897941256;
+        Thu, 20 Jun 2024 08:39:01 -0700 (PDT)
+Received: from rh (p200300c93f02d1004c157eb0f018dd01.dip0.t-ipconnect.de. [2003:c9:3f02:d100:4c15:7eb0:f018:dd01])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-798aacc5267sm705627685a.18.2024.06.20.08.38.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Jun 2024 08:39:00 -0700 (PDT)
+Date: Thu, 20 Jun 2024 17:38:55 +0200 (CEST)
+From: Sebastian Ott <sebott@redhat.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>, 
+    James Morse <james.morse@arm.com>, 
+    Suzuki K Poulose <suzuki.poulose@arm.com>, 
+    Zenghui Yu <yuzenghui@huawei.com>, kvm@vger.kernel.org, 
+    Shaoqin Huang <shahuang@redhat.com>, Eric Auger <eric.auger@redhat.com>
+Subject: Re: [PATCH v5 01/10] KVM: arm64: Get sys_reg encoding from descriptor
+ in idregs_debug_show()
+In-Reply-To: <20240619174036.483943-2-oliver.upton@linux.dev>
+Message-ID: <4474548f-f30c-5369-d058-6871caf04d67@redhat.com>
+References: <20240619174036.483943-1-oliver.upton@linux.dev> <20240619174036.483943-2-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: jiangkunkun@huawei.com, eauger@redhat.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, rdunlap@infradead.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, wanghaibin.wang@huawei.com, lishusen2@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 
-On Thu, 20 Jun 2024 14:32:20 +0100,
-Kunkun Jiang <jiangkunkun@huawei.com> wrote:
-> 
-> Hi Eric,
-> 
-> On 2024/6/19 1:18, Eric Auger wrote:
-> >> Also, is the device table the only one that is subject to this
-> >> 'reload' problem? How about the Collection table?
-> > The collection table is not indexed by the collection ID and when saving
-> > we end up writing an invalid dummy entry to close the recording. So I
-> > don't think we have the same problem there.
-> I'm a little confused here. In the current Linux, there is no implementation
-> of mapc unmaps a cte. But should this scenario be considered in
-> vgic-its?
+On Wed, 19 Jun 2024, Oliver Upton wrote:
+> KVM is about to add support for more VM-scoped feature ID regs that
+> live outside of the id_regs[] array, which means the index of the
+> debugfs iterator may not actually be an index into the array.
+>
+> Prepare by getting the sys_reg encoding from the descriptor itself.
+>
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 
-We implement the "HW", not what Linux does.
+Reviewed-by: Sebastian Ott <sebott@redhat.com>
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
