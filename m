@@ -1,162 +1,348 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F02CF1A4F2B
-	for <kvmarm@lists.linux.dev>; Thu, 20 Jun 2024 10:11:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DFC11A8C2E;
+	Thu, 20 Jun 2024 11:06:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718878265; cv=none; b=EVTVQ6kLO4ooEbJzawqCCmx1Wn2ktabRYC9qEyKyNVjDvczsmKYyFCFccb+8jT4yThTYrSWU3y7qF+ugVpQgDDgc5Xh+90na+v9XrwsRGaD2RE4BTBgrQElID3v98XmQTKHQKeXgs4ddZDuvd2bA4alW2pMy+iEhPirhmPKtwMo=
+	t=1718881607; cv=none; b=iU3sWDLOQJrS7HgXV/YWncs4gIrrYsa9hYlvhb/dTs90fqg8cNPA9BtsALkaXKFPl+w1F5QA46zGxOjOLUrJCq/e2KRU2f3iqdevZHoBGf09/Tqy+SYwZC7EL8dcOek1xvv2j5Dzu8jB/y3WQRqXep9yorS11feE6RQ5mD/c4CU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718878265; c=relaxed/simple;
-	bh=P4nGO6WoNahjKeS7KnCYubElsszhtWZMVWf8oaNq4AY=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=cyyzFSxzDtSebbjGzFfXJPGj2DfBdFxqiX6EXduV4rJ46zTUxuScI0lkL0vHPvL8v0ZG5qt1CJK58Tf6IWVflKDTtmhX7P6DMOYxMCxivfxlPG1eGx5Ztgzb2yk72myuWlozTQwdNHyEp3OTvh5zTa8kcteX0gWC+Gj493bbly4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4W4bnL6HGMz6K99B;
-	Thu, 20 Jun 2024 18:09:26 +0800 (CST)
-Received: from lhrpeml500006.china.huawei.com (unknown [7.191.161.198])
-	by mail.maildlp.com (Postfix) with ESMTPS id EEE0314058E;
-	Thu, 20 Jun 2024 18:10:59 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
- lhrpeml500006.china.huawei.com (7.191.161.198) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 20 Jun 2024 11:10:59 +0100
-Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
- lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.039;
- Thu, 20 Jun 2024 11:10:59 +0100
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: Sean Christopherson <seanjc@google.com>, Catalin Marinas
-	<catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Marc Zyngier
-	<maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, Huacai Chen
-	<chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, Anup Patel
-	<anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, "Palmer
- Dabbelt" <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, "Heiko
- Carstens" <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, "Alexander
- Gordeev" <agordeev@linux.ibm.com>, Christian Borntraeger
-	<borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, "Claudio
- Imbrenda" <imbrenda@linux.ibm.com>, Thomas Gleixner <tglx@linutronix.de>,
-	"Ingo Molnar" <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
-	<dave.hansen@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>, "Peter
- Zijlstra" <peterz@infradead.org>, Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>, Tony Krowiak <akrowiak@linux.ibm.com>,
-	Halil Pasic <pasic@linux.ibm.com>, Jason Herne <jjherne@linux.ibm.com>,
-	Harald Freudenberger <freude@linux.ibm.com>, Alex Williamson
-	<alex.williamson@redhat.com>, Andy Lutomirski <luto@kernel.org>
-CC: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "linux-mips@vger.kernel.org"
-	<linux-mips@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-	"kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
-	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-	"linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-perf-users@vger.kernel.org" <linux-perf-users@vger.kernel.org>, "Anish
- Ghulati" <aghulati@google.com>, Venkatesh Srinivas <venkateshs@chromium.org>,
-	Andrew Thornton <andrewth@google.com>
-Subject: RE: [PATCH 00/26] KVM: vfio: Hide KVM internals from others
-Thread-Topic: [PATCH 00/26] KVM: vfio: Hide KVM internals from others
-Thread-Index: AQHZ6DUkZqOCX4TQLUabDzpapjtX9LHSHHZQ
-Date: Thu, 20 Jun 2024 10:10:59 +0000
-Message-ID: <504fa0a7264d4762afda2f13c3525ce5@huawei.com>
-References: <20230916003118.2540661-1-seanjc@google.com>
-In-Reply-To: <20230916003118.2540661-1-seanjc@google.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1718881607; c=relaxed/simple;
+	bh=E0X4v2xdXd711tKCoPMzebTZfL+S/2gfBWVlEOfhkD8=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=eUeD2NRyKAkzG9p4NIo97tA1tlfIm+E1xxf5Jrie2c2iiA3HijDgw2zQsTRIqbRJahjbY3A/ef8TaWj632AeGGx690ieJmCsRgW1olZmEcenZllqIthTGJsQM8tHAcYr+u2+op5dvQGHPcs9KXTQCMVaf9fAVtgtIQ8WqiICKxU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rfCXzqB3; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rfCXzqB3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DDDFC2BD10;
+	Thu, 20 Jun 2024 11:06:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718881607;
+	bh=E0X4v2xdXd711tKCoPMzebTZfL+S/2gfBWVlEOfhkD8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=rfCXzqB3iCO594F3ngygsZXiNfdGfDTMOWJaC+rzgHE7eJm4c09Mo4XMzz86rOE5l
+	 hFpX5jkctxOdy3cuizb9E24qh8qkOMRXx4ehmLP92PiZWekL4HL4oK4ST7e2cQxYep
+	 3d1Z/nAyb8gI4Hr+qni3hA7sES6RQLJJHdxaR1wcVf6ZW0piHLKBnHlQpUexvh9zGE
+	 +CWy8YVWWQyAm97QQsnAIaUBJP1ADoQJVLZSAvF4X4jGT7jtww5yO6Z2ih/5RAfsSR
+	 kWiSngtOiTCKDYBbce3WKgqIsvw3VjmTuDXdGGnrShzxlUzBeeU0T//ZNdLlqEQjL3
+	 wm+9mQEmib9kg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sKFcq-005jpu-Tc;
+	Thu, 20 Jun 2024 12:06:45 +0100
+Date: Thu, 20 Jun 2024 12:06:44 +0100
+Message-ID: <865xu3kh4r.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Brown <broonie@kernel.org>,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC 10/10] KVM: arm64: nv: Add new HDFGRTR2_GROUP & HDFGRTR2_GROUP based FGU handling
+In-Reply-To: <20240620065807.151540-11-anshuman.khandual@arm.com>
+References: <20240620065807.151540-1-anshuman.khandual@arm.com>
+	<20240620065807.151540-11-anshuman.khandual@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: anshuman.khandual@arm.com, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, broonie@kernel.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogU2VhbiBDaHJpc3RvcGhl
-cnNvbiA8c2VhbmpjQGdvb2dsZS5jb20+DQo+IFNlbnQ6IFNhdHVyZGF5LCBTZXB0ZW1iZXIgMTYs
-IDIwMjMgMTozMSBBTQ0KPiBUbzogQ2F0YWxpbiBNYXJpbmFzIDxjYXRhbGluLm1hcmluYXNAYXJt
-LmNvbT47IFdpbGwgRGVhY29uDQo+IDx3aWxsQGtlcm5lbC5vcmc+OyBNYXJjIFp5bmdpZXIgPG1h
-ekBrZXJuZWwub3JnPjsgT2xpdmVyIFVwdG9uDQo+IDxvbGl2ZXIudXB0b25AbGludXguZGV2Pjsg
-SHVhY2FpIENoZW4gPGNoZW5odWFjYWlAa2VybmVsLm9yZz47IE1pY2hhZWwNCj4gRWxsZXJtYW4g
-PG1wZUBlbGxlcm1hbi5pZC5hdT47IEFudXAgUGF0ZWwgPGFudXBAYnJhaW5mYXVsdC5vcmc+OyBQ
-YXVsDQo+IFdhbG1zbGV5IDxwYXVsLndhbG1zbGV5QHNpZml2ZS5jb20+OyBQYWxtZXIgRGFiYmVs
-dA0KPiA8cGFsbWVyQGRhYmJlbHQuY29tPjsgQWxiZXJ0IE91IDxhb3VAZWVjcy5iZXJrZWxleS5l
-ZHU+OyBIZWlrbw0KPiBDYXJzdGVucyA8aGNhQGxpbnV4LmlibS5jb20+OyBWYXNpbHkgR29yYmlr
-IDxnb3JAbGludXguaWJtLmNvbT47DQo+IEFsZXhhbmRlciBHb3JkZWV2IDxhZ29yZGVldkBsaW51
-eC5pYm0uY29tPjsgQ2hyaXN0aWFuIEJvcm50cmFlZ2VyDQo+IDxib3JudHJhZWdlckBsaW51eC5p
-Ym0uY29tPjsgSmFub3NjaCBGcmFuayA8ZnJhbmtqYUBsaW51eC5pYm0uY29tPjsNCj4gQ2xhdWRp
-byBJbWJyZW5kYSA8aW1icmVuZGFAbGludXguaWJtLmNvbT47IFRob21hcyBHbGVpeG5lcg0KPiA8
-dGdseEBsaW51dHJvbml4LmRlPjsgSW5nbyBNb2xuYXIgPG1pbmdvQHJlZGhhdC5jb20+OyBCb3Jp
-c2xhdiBQZXRrb3YNCj4gPGJwQGFsaWVuOC5kZT47IERhdmUgSGFuc2VuIDxkYXZlLmhhbnNlbkBs
-aW51eC5pbnRlbC5jb20+Ow0KPiB4ODZAa2VybmVsLm9yZzsgUGV0ZXIgWmlqbHN0cmEgPHBldGVy
-ekBpbmZyYWRlYWQub3JnPjsgQXJuYWxkbyBDYXJ2YWxobyBkZQ0KPiBNZWxvIDxhY21lQGtlcm5l
-bC5vcmc+OyBTZWFuIENocmlzdG9waGVyc29uIDxzZWFuamNAZ29vZ2xlLmNvbT47DQo+IFBhb2xv
-IEJvbnppbmkgPHBib256aW5pQHJlZGhhdC5jb20+OyBUb255IEtyb3dpYWsNCj4gPGFrcm93aWFr
-QGxpbnV4LmlibS5jb20+OyBIYWxpbCBQYXNpYyA8cGFzaWNAbGludXguaWJtLmNvbT47IEphc29u
-IEhlcm5lDQo+IDxqamhlcm5lQGxpbnV4LmlibS5jb20+OyBIYXJhbGQgRnJldWRlbmJlcmdlciA8
-ZnJldWRlQGxpbnV4LmlibS5jb20+Ow0KPiBBbGV4IFdpbGxpYW1zb24gPGFsZXgud2lsbGlhbXNv
-bkByZWRoYXQuY29tPjsgQW5keSBMdXRvbWlyc2tpDQo+IDxsdXRvQGtlcm5lbC5vcmc+DQo+IENj
-OiBsaW51eC1hcm0ta2VybmVsQGxpc3RzLmluZnJhZGVhZC5vcmc7IGt2bWFybUBsaXN0cy5saW51
-eC5kZXY7IGxpbnV4LQ0KPiBtaXBzQHZnZXIua2VybmVsLm9yZzsga3ZtQHZnZXIua2VybmVsLm9y
-ZzsgbGludXhwcGMtZGV2QGxpc3RzLm96bGFicy5vcmc7DQo+IGt2bS1yaXNjdkBsaXN0cy5pbmZy
-YWRlYWQub3JnOyBsaW51eC1yaXNjdkBsaXN0cy5pbmZyYWRlYWQub3JnOyBsaW51eC0NCj4gczM5
-MEB2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LXBl
-cmYtDQo+IHVzZXJzQHZnZXIua2VybmVsLm9yZzsgQW5pc2ggR2h1bGF0aSA8YWdodWxhdGlAZ29v
-Z2xlLmNvbT47IFZlbmthdGVzaA0KPiBTcmluaXZhcyA8dmVua2F0ZXNoc0BjaHJvbWl1bS5vcmc+
-OyBBbmRyZXcgVGhvcm50b24NCj4gPGFuZHJld3RoQGdvb2dsZS5jb20+DQo+IFN1YmplY3Q6IFtQ
-QVRDSCAwMC8yNl0gS1ZNOiB2ZmlvOiBIaWRlIEtWTSBpbnRlcm5hbHMgZnJvbSBvdGhlcnMNCj4g
-DQo+IFRoaXMgaXMgYSBib3JkZXJsaW5lIFJGQyBzZXJpZXMgdG8gaGlkZSBLVk0ncyBpbnRlcm5h
-bHMgZnJvbSB0aGUgcmVzdCBvZg0KPiB0aGUga2VybmVsLCB3aGVyZSAiaW50ZXJuYWxzIiBtZWFu
-cyBkYXRhIHN0cnVjdHVyZXMsIGVudW1zLCAjZGVmaW5lcywNCj4gQVBJcywgZXRjLiB0aGF0IGFy
-ZSBpbnRlbmRlZCB0byBiZSBLVk0tb25seSwgYnV0IGFyZSBleHBvc2VkIGV2ZXJ5d2hlcmUNCj4g
-ZHVlIHRvIGt2bV9ob3N0LmggKGFuZCBvdGhlciBoZWFkZXJzKSBsaXZpbmcgaW4gdGhlIGdsb2Jh
-bCBpbmNsdWRlIHBhdGhzLg0KPiANCj4gVGhlIG1vdGl2aWF0aW9uIGZvciBoaWRpbmcgS1ZNJ3Mg
-aW50ZXJuYWxzIGlzIHRvIGFsbG93ICpzYWZlbHkqIGxvYWRpbmcgYQ0KPiAibmV3IiBLVk0gbW9k
-dWxlIHdpdGhvdXQgaGF2aW5nIHRvIHJlYm9vdCB0aGUgaG9zdC4gIFdoZXJlICJuZXciIGRvZXNu
-J3QNCj4gaGF2ZSB0byBiZSBzdHJpY3RseSBuZXdlciwganVzdCBhIGRpZmZlcmVudCBpbmNhcm5h
-dGlvbiBvZiBLVk0uICBIaWRpbmcNCj4gS1ZNJ3MgaW50ZXJuYWxzIG1lYW5zIHRob3NlIGFzc2V0
-cyBjYW4gY2hhbmdlIGFjcm9zcyBLVk0gaW5zdGFuY2VzDQo+IHdpdGhvdXQNCj4gYnJlYWtpbmcg
-dGhpbmdzLCBlLmcuIHdvdWxkIGFsbG93IG1vZGlmeWluZyB0aGUgbGF5b3V0IG9mIHN0cnVjdCBr
-dm1fdmNwdQ0KPiB0byBpbnRyb2R1Y2UgbmV3IGZpZWxkcyByZWxhdGVkIHRvIGEgbmV3IGZlYXR1
-cmUgb3IgbWl0aWdhdGlvbiBmb3IgaGFyZHdhcmUNCj4gYnVncy4NCj4gDQo+IFRoZSBlbmQgZ29h
-bCBmb3IgYWxsIG9mIHRoaXMgaXMgdG8gYWxsb3cgbG9hZGluZyBhbmQgcnVubmluZyBtdWx0aXBs
-ZQ0KPiBpbnN0YW5jZXMgb2YgS1ZNICh0aGUgbW9kdWxlKSBzaW11bHRhbmVvdXNseSBvbiBhIHNp
-bmdsZSBob3N0LCBlLmcuIHRvDQo+IGRlcGxveSBmaXhlcywgbWl0aWdhdGlvbnMsIGFuZC9vciBu
-ZXcgZmVhdHVyZXMgd2l0aG91dCBoYXZpbmcgdG8gZHJhaW4NCj4gYWxsIFZNcyBmcm9tIHRoZSBo
-b3N0Lg0KPiANCj4gRm9yIG5vdywgdGhlIGltbWVkaWF0ZSBnb2FsIGlzIHRvIGdldCBLVk0gdG8g
-YSBzdGF0ZSB3aGVyZSBLVk0geDg2IGRvZXNuJ3QNCj4gZXhwb3NlIGFueXRoaW5nIHRvIHRoZSBi
-cm9hZGVyIHdvcmxkIHRoYXQgaXNuJ3QgaW50ZW5kZWQgZm9yIGV4dGVybmFsDQo+IGNvbnN1bXB0
-aW9uLCBlLmcuIHRoZSBwYWdlIHdyaXRlLXRyYWNraW5nIEFQSXMgdXNlZCBieSBLVk0tR1QuDQo+
-IA0KPiBJIHNheSB0aGlzIGlzIGJvcmRlcmxpbmUgUkZDIGJlY2F1c2UgSSBkb24ndCB0aGluayBJ
-J3ZlICJmb3JtYWxseSIgcHJvcG9zZWQNCj4gdGhlIGlkZWEgb2YgaGlkaW5nIEtWTSBpbnRlcm5h
-bHMgYmVmb3JlIG5vdy4gIEkgZGVjaWRlZCBub3QgdG8gdGFnIHRoaXMgUkZDDQo+IGJlY2F1c2Ug
-dGhlIGNoYW5nZXMgZW5kZWQgdXAgYmVpbmcgbm90IF90aGF0XyBpbnZhc2l2ZSwgYW5kIGV2ZXJ5
-dGhpbmcNCj4gYmVmb3JlIHRoZSBsYXN0IHNpeCBwYXRjaGVzIGlzIHdvcnRod2hpbGUgZXZlbiBp
-ZiBoaWRpbmcgaW50ZXJuYWxzIGlzDQo+IHVsdGltYXRlbHkgcmVqZWN0ZWQgKElNTykuDQo+IA0K
-PiBUaGlzIHdvdWxkIGlkZWFsbHkgYmUgfjUgc2VwYXJhdGUgc2VyaWVzLCBhbmQgSSBjZXJ0YWlu
-bHkgaGF2ZSBubyBvYmplY3Rpb24NCj4gaWYgdGhhdCdzIGhvdyB3ZSB3YW50IHRvIGdldCB0aGlz
-IHN0dWZmIG1lcmdlZC4gIEUuZy4gKDEpIFZGSU8gY2xlYW51cHMsDQo+ICgyKSBkcm9wIEhBVkVf
-S1ZNLCAoMykgY2xlYW4gdXAgbWFrZWZpbGVzLCAoNCkgeDg2IHBlcmYgY2xlYW51cCwgYW5kDQo+
-ICg1KSBmaW5hbCBwdXNoIGZvciBoaWRpbmcgc3RhdGUuICBUaGUgSEFWRV9LVk0gYW5kIHZpcnQv
-a3ZtIGluY2x1ZGUgc3R1ZmYNCj4gaXNuJ3Qgc3RyaWN0bHkgbmVjZXNzYXJ5LCBidXQgSSBpbmNs
-dWRlZCB0aGVtIGhlcmUgYmVjYXVzZSB0aGV5J3JlDQo+IHJlbGF0aXZlbHkgbWlub3IgKGluIHRo
-ZSBncmFuZCBzY2hlbWUpLg0KDQpIaSBTZWFuLA0KDQpKdXN0IHRob3VnaHQgb2YgY2hlY2tpbmcg
-d2l0aCB5b3Ugb24gdGhpcyBzZXJpZXMuIERvIHlvdSBoYXZlIHBsYW5zIHRvIHJldml2ZSB0aGlz
-DQpzZXJpZXM/IFRoZSByZWFzb24gSSBhbSBhc2tpbmcgaXMsIG9uIEFSTTY0L0tWTSBzaWRlIHdl
-IGRvIGhhdmUgYSByZXF1aXJlbWVudA0KdG8gc2hhcmUgdGhlIEtWTSBWTUlEIHdpdGggU01NVVYz
-LiBQbGVhc2Ugc2VlIHRoZSBSRkMgSSBzZW50IG91dCBlYXJsaWVyIHRoaXMNCnllYXJbMV0uIFRo
-ZSBzZXJpZXMgYmFzaWNhbGx5IHByb3ZpZGVzIGEgd2F5IGZvciBLVk0gdG8gcGluIGEgVk1JRCBh
-bmQgYWxzbw0KYXNzb2NpYXRlcyBhbiBpb21tdWZkIGN0eCB3aXRoIGEgc3RydWN0IGt2bSAqIHRv
-IHJldHJpZXZlIHRoYXQgVk1JRC4gDQoNCkFzIG1lbnRpb25lZCBhYm92ZSwgc29tZSBvZiB0aGUg
-cGF0Y2hlcyBpbiB0aGlzIHNlcmllcyhlc3BlY2lhbGx5IDEtNCAmIDYpIHRoYXQNCmRvZXMgdGhl
-IFZGSU8gY2xlYW51cHMgYW5kIGRyb3BwaW5nIENPTkZJR19LVk1fVkZJTyBsb29rcyB2ZXJ5IHN0
-cmFpZ2h0Zm9yd2FyZA0KYW5kIHVzZWZ1bC4gSSBhbSB0aGlua2luZyBvZiBpbmNsdWRpbmcgdGhv
-c2Ugd2hlbiBJIHJlLXNwaW4gbXkgUkZDIHNlcmllcywgaWYgdGhhdOKAmXMgb2suDQoNClBsZWFz
-ZSBsZXQgbWUga25vdyB5b3VyIHRob3VnaHRzLg0KDQpUaGFua3MsDQpTaGFtZWVyDQoNClsxXS4g
-aHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcvbGludXgtaW9tbXUvMjAyNDAyMDkxMTU4MjQuR0EyOTIy
-NDQ2QG15cmljYS8NCg0K
+On Thu, 20 Jun 2024 07:58:07 +0100,
+Anshuman Khandual <anshuman.khandual@arm.com> wrote:
+> 
+> This adds new HDFGRTR2_GROUP and HDFGWTR2_GROUP groups in enum fgt_group_id
+> for FGU handling managed with HDFGRTR2_EL2 and HDFGWTR2_EL2 registers.
+> 
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Oliver Upton <oliver.upton@linux.dev>
+> Cc: James Morse <james.morse@arm.com>
+> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: kvmarm@lists.linux.dev
+> Cc: linux-kernel@vger.kernel.org
+> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+> ---
+>  arch/arm64/include/asm/kvm_arm.h        |  8 +++++
+>  arch/arm64/include/asm/kvm_host.h       |  2 ++
+>  arch/arm64/kvm/emulate-nested.c         | 14 ++++++++
+>  arch/arm64/kvm/hyp/include/hyp/switch.h | 10 ++++++
+>  arch/arm64/kvm/nested.c                 | 36 ++++++++++++++++++++
+>  arch/arm64/kvm/sys_regs.c               | 45 +++++++++++++++++++++++++
+>  6 files changed, 115 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index b2adc2c6c82a..b3fb368bcadb 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -354,6 +354,14 @@
+>  #define __HFGRTR_EL2_MASK	GENMASK(49, 0)
+>  #define __HFGRTR_EL2_nMASK	~(__HFGRTR_EL2_RES0 | __HFGRTR_EL2_MASK)
+>  
+> +#define __HDFGRTR2_EL2_RES0	HDFGRTR2_EL2_RES0
+> +#define __HDFGRTR2_EL2_MASK	(GENMASK(22, 22) | GENMASK(20, 0))
+
+How about bit 23? How comes you are considering all these bits as positive?
+
+> +#define __HDFGRTR2_EL2_nMASK	~(__HDFGRTR2_EL2_RES0 | __HDFGRTR2_EL2_MASK)
+
+Note the *nMASK* here. 'n' is for *negative*. Just look at how
+__HDFGRTR_EL2_MASK and __HDFGRTR_EL2_nMASK are written.
+
+> +
+> +#define __HDFGWTR2_EL2_RES0	HDFGWTR2_EL2_RES0
+> +#define __HDFGWTR2_EL2_MASK	(GENMASK(22, 19) | GENMASK(16, 7) | GENMASK(5, 0))
+
+Again, how about bit 23? Same remark for the polarity.
+
+> +#define __HDFGWTR2_EL2_nMASK	~(__HDFGWTR2_EL2_RES0 | __HDFGWTR2_EL2_MASK)
+> +
+>  /*
+>   * The HFGWTR bits are a subset of HFGRTR bits. To ensure we don't miss any
+>   * future additions, define __HFGWTR* macros relative to __HFGRTR* ones.
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 7b44e96e7270..d6fbd6ebc32d 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -239,6 +239,8 @@ enum fgt_group_id {
+>  	HDFGWTR_GROUP = HDFGRTR_GROUP,
+>  	HFGITR_GROUP,
+>  	HAFGRTR_GROUP,
+> +	HDFGRTR2_GROUP,
+> +	HDFGWTR2_GROUP = HDFGRTR2_GROUP,
+>  
+>  	/* Must be last */
+>  	__NR_FGT_GROUP_IDS__
+> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+> index 54090967a335..bc5ea1e60a0a 100644
+> --- a/arch/arm64/kvm/emulate-nested.c
+> +++ b/arch/arm64/kvm/emulate-nested.c
+> @@ -1724,6 +1724,9 @@ static const struct encoding_to_trap_config encoding_to_fgt[] __initconst = {
+>  	SR_FGT(SYS_AMEVCNTR0_EL0(2),	HAFGRTR, AMEVCNTR02_EL0, 1),
+>  	SR_FGT(SYS_AMEVCNTR0_EL0(1),	HAFGRTR, AMEVCNTR01_EL0, 1),
+>  	SR_FGT(SYS_AMEVCNTR0_EL0(0),	HAFGRTR, AMEVCNTR00_EL0, 1),
+> +
+> +	/* HDFGRTR2_EL2 */
+> +	SR_FGT(SYS_MDSELR_EL1,		HDFGRTR2, nMDSELR_EL1, 1),
+
+No. See the 'n' prefix on this bit?
+
+Also, where are all the other bits for the HDFRxTR2 registers?
+
+>  };
+>  
+>  static union trap_config get_trap_config(u32 sysreg)
+> @@ -1979,6 +1982,10 @@ static bool check_fgt_bit(struct kvm *kvm, bool is_read,
+>  		sr = is_read ? HDFGRTR_EL2 : HDFGWTR_EL2;
+>  		break;
+>  
+> +	case HDFGRTR2_GROUP:
+> +		sr = is_read ? HDFGRTR2_EL2 : HDFGWTR2_EL2;
+> +		break;
+> +
+>  	case HAFGRTR_GROUP:
+>  		sr = HAFGRTR_EL2;
+>  		break;
+> @@ -2053,6 +2060,13 @@ bool triage_sysreg_trap(struct kvm_vcpu *vcpu, int *sr_index)
+>  			val = __vcpu_sys_reg(vcpu, HDFGWTR_EL2);
+>  		break;
+>  
+> +	case HDFGRTR2_GROUP:
+> +		if (is_read)
+> +			val = __vcpu_sys_reg(vcpu, HDFGRTR2_EL2);
+> +		else
+> +			val = __vcpu_sys_reg(vcpu, HDFGWTR2_EL2);
+> +		break;
+> +
+>  	case HAFGRTR_GROUP:
+>  		val = __vcpu_sys_reg(vcpu, HAFGRTR_EL2);
+>  		break;
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index 0c4de44534b7..b5944aa6d9c8 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -89,6 +89,10 @@ static inline void __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
+>  		case HDFGWTR_EL2:					\
+>  			id = HDFGRTR_GROUP;				\
+>  			break;						\
+> +		case HDFGRTR2_EL2:					\
+> +		case HDFGWTR2_EL2:					\
+> +			id = HDFGRTR2_GROUP;				\
+> +			break;						\
+>  		case HAFGRTR_EL2:					\
+>  			id = HAFGRTR_GROUP;				\
+>  			break;						\
+> @@ -160,6 +164,8 @@ static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+>  	CHECK_FGT_MASKS(HDFGWTR_EL2);
+>  	CHECK_FGT_MASKS(HAFGRTR_EL2);
+>  	CHECK_FGT_MASKS(HCRX_EL2);
+> +	CHECK_FGT_MASKS(HDFGRTR2_EL2);
+> +	CHECK_FGT_MASKS(HDFGWTR2_EL2);
+>  
+>  	if (!cpus_have_final_cap(ARM64_HAS_FGT))
+>  		return;
+> @@ -171,6 +177,8 @@ static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+>  	update_fgt_traps(hctxt, vcpu, kvm, HFGITR_EL2);
+>  	update_fgt_traps(hctxt, vcpu, kvm, HDFGRTR_EL2);
+>  	update_fgt_traps(hctxt, vcpu, kvm, HDFGWTR_EL2);
+> +	update_fgt_traps(hctxt, vcpu, kvm, HDFGRTR2_EL2);
+> +	update_fgt_traps(hctxt, vcpu, kvm, HDFGWTR2_EL2);
+>  
+>  	if (cpu_has_amu())
+>  		update_fgt_traps(hctxt, vcpu, kvm, HAFGRTR_EL2);
+> @@ -200,6 +208,8 @@ static inline void __deactivate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+>  	__deactivate_fgt(hctxt, vcpu, kvm, HFGITR_EL2);
+>  	__deactivate_fgt(hctxt, vcpu, kvm, HDFGRTR_EL2);
+>  	__deactivate_fgt(hctxt, vcpu, kvm, HDFGWTR_EL2);
+> +	__deactivate_fgt(hctxt, vcpu, kvm, HDFGRTR2_EL2);
+> +	__deactivate_fgt(hctxt, vcpu, kvm, HDFGWTR2_EL2);
+>  
+>  	if (cpu_has_amu())
+>  		__deactivate_fgt(hctxt, vcpu, kvm, HAFGRTR_EL2);
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index bae8536cbf00..ebe4e3972fed 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -384,6 +384,42 @@ int kvm_init_nv_sysregs(struct kvm *kvm)
+>  		res0 |= HDFGRTR_EL2_nPMSNEVFR_EL1;
+>  	set_sysreg_masks(kvm, HDFGRTR_EL2, res0 | HDFGRTR_EL2_RES0, res1);
+>  
+> +	/* HDFG[RW]TR2_EL2 */
+> +	res0 = res1 = 0;
+> +
+> +	/* FEAT_TRBE_MPAM is not exposed to the guest */
+> +	res0 |= HDFGRTR2_EL2_nTRBMPAM_EL1;
+
+No. We are moving away from hard-coded features, so you have to
+explicitly check it.
+
+> +
+> +	/* FEAT_SPE_FDS is not exposed to the guest */
+> +	res0 |= HDFGRTR2_EL2_nPMSDSFR_EL1;
+
+Same thing.
+
+> +
+> +	if (!kvm_has_feat_enum(kvm, ID_AA64DFR2_EL1, STEP, IMP))
+> +		res0 |= HDFGRTR2_EL2_nMDSTEPOP_EL1;
+> +	if (!kvm_has_feat(kvm, ID_AA64DFR1_EL1, ITE, IMP))
+> +		res0 |= HDFGRTR2_EL2_nTRCITECR_EL1;
+> +	if (!kvm_has_feat(kvm, ID_AA64DFR1_EL1, SPMU, IMP))
+> +		res0 |= (HDFGRTR2_EL2_nSPMDEVAFF_EL1 | HDFGRTR2_EL2_nSPMID |
+> +			 HDFGRTR2_EL2_nSPMSCR_EL1 | HDFGRTR2_EL2_nSPMACCESSR_EL1 |
+> +			 HDFGRTR2_EL2_nSPMCR_EL0 | HDFGRTR2_EL2_nSPMOVS |
+> +			 HDFGRTR2_EL2_nSPMINTEN | HDFGRTR2_EL2_nSPMSELR_EL0 |
+> +			 HDFGRTR2_EL2_nSPMEVTYPERn_EL0 | HDFGRTR2_EL2_nSPMEVCNTRn_EL0 |
+> +			 HDFGRTR2_EL2_nPMSSCR_EL1 | HDFGRTR2_EL2_nPMSSDATA);
+> +	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, DebugVer, V8P9))
+> +		res0 |= HDFGRTR2_EL2_nMDSELR_EL1;
+> +	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMUVer, V3P9))
+> +		res0 |= HDFGRTR2_EL2_nPMUACR_EL1;
+> +	if (!kvm_has_feat(kvm, ID_AA64DFR1_EL1, PMICNTR, IMP))
+> +		res0 |= HDFGRTR2_EL2_nPMICFILTR_EL0;
+> +	if (!kvm_has_feat(kvm, ID_AA64DFR1_EL1, PMICNTR, IMP))
+> +		res0 |= HDFGRTR2_EL2_nPMICNTR_EL0;
+> +	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, SEBEP, IMP))
+> +		res0 |= HDFGRTR2_EL2_nPMIAR_EL1;
+> +	if (!kvm_has_feat(kvm, ID_AA64DFR1_EL1, EBEP, IMP) &&
+> +	    !kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMSS, IMP))
+> +		res0 |= HDFGRTR2_EL2_nPMECR_EL1;
+
+And all of that suffers from the same issue as in
+https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git/commit/?h=next&id=eb9d53d4a949c6d6d7c9f130e537f6b5687fedf9
+
+
+> +	set_sysreg_masks(kvm, HDFGRTR2_EL2, res0 | HDFGRTR2_EL2_RES0, res1);
+> +	set_sysreg_masks(kvm, HDFGWTR2_EL2, res0 | HDFGWTR2_EL2_RES0, res1);
+
+How about the HDFGxTR2_EL2_RES1 bits?
+
+> +
+>  	/* Reuse the bits from the read-side and add the write-specific stuff */
+>  	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMUVer, IMP))
+>  		res0 |= (HDFGWTR_EL2_PMCR_EL0 | HDFGWTR_EL2_PMSWINC_EL0);
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index f921af014d0c..8029f408855d 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -4110,6 +4110,51 @@ void kvm_init_sysreg(struct kvm_vcpu *vcpu)
+>  		kvm->arch.fgu[HAFGRTR_GROUP] |= ~(HAFGRTR_EL2_RES0 |
+>  						  HAFGRTR_EL2_RES1);
+>  
+> +	/* FEAT_TRBE_MPAM is not exposed to the guest */
+> +	kvm->arch.fgu[HDFGRTR2_GROUP] |= ~(HDFGRTR2_EL2_nTRBMPAM_EL1);
+
+Same thing about dynamic configuration.
+
+But more importantly, you are disabling anything *but* MPAM.  Does it
+seem right to you?
+
+> +
+> +	/* FEAT_SPE_FDS is not exposed to the guest */
+> +	kvm->arch.fgu[HDFGRTR2_GROUP] |= ~(HDFGRTR2_EL2_nPMSDSFR_EL1);
+
+Same thing.
+
+> +
+> +	if (!kvm_has_feat_enum(kvm, ID_AA64DFR2_EL1, STEP, IMP))
+> +		kvm->arch.fgu[HDFGRTR2_GROUP] |= ~(HDFGRTR2_EL2_nMDSTEPOP_EL1);
+> +
+> +	if (!kvm_has_feat(kvm, ID_AA64DFR1_EL1, ITE, IMP))
+> +		kvm->arch.fgu[HDFGRTR2_GROUP] |= ~(HDFGRTR2_EL2_nTRCITECR_EL1);
+> +
+> +	if (!kvm_has_feat(kvm, ID_AA64DFR1_EL1, SPMU, IMP))
+> +		kvm->arch.fgu[HDFGRTR2_GROUP] |= ~(HDFGRTR2_EL2_nSPMDEVAFF_EL1		|
+> +						   HDFGRTR2_EL2_nSPMID			|
+> +						   HDFGRTR2_EL2_nSPMSCR_EL1		|
+> +						   HDFGRTR2_EL2_nSPMACCESSR_EL1		|
+> +						   HDFGRTR2_EL2_nSPMCR_EL0		|
+> +						   HDFGRTR2_EL2_nSPMOVS			|
+> +						   HDFGRTR2_EL2_nSPMINTEN		|
+> +						   HDFGRTR2_EL2_nSPMSELR_EL0		|
+> +						   HDFGRTR2_EL2_nSPMEVTYPERn_EL0	|
+> +						   HDFGRTR2_EL2_nSPMEVCNTRn_EL0		|
+> +						   HDFGRTR2_EL2_nPMSSCR_EL1		|
+> +						   HDFGRTR2_EL2_nPMSSDATA);
+> +
+> +	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, DebugVer, V8P9))
+> +		kvm->arch.fgu[HDFGRTR2_GROUP] |= ~(HDFGRTR2_EL2_nMDSELR_EL1);
+> +
+> +	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMUVer, V3P9))
+> +		kvm->arch.fgu[HDFGRTR2_GROUP] |= ~(HDFGRTR2_EL2_nPMUACR_EL1);
+> +
+> +	if (!kvm_has_feat(kvm, ID_AA64DFR1_EL1, PMICNTR, IMP))
+> +		kvm->arch.fgu[HDFGRTR2_GROUP] |= ~(HDFGRTR2_EL2_nPMICFILTR_EL0);
+> +
+> +	if (!kvm_has_feat(kvm, ID_AA64DFR1_EL1, PMICNTR, IMP))
+> +		kvm->arch.fgu[HDFGRTR2_GROUP] |= ~(HDFGRTR2_EL2_nPMICNTR_EL0);
+> +
+> +	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, SEBEP, IMP))
+> +		kvm->arch.fgu[HDFGRTR2_GROUP] |= ~(HDFGRTR2_EL2_nPMIAR_EL1);
+> +
+> +	if (!kvm_has_feat(kvm, ID_AA64DFR1_EL1, EBEP, IMP) &&
+> +	    !kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMSS, IMP))
+> +		kvm->arch.fgu[HDFGRTR2_GROUP] |= ~(HDFGRTR2_EL2_nPMECR_EL1);
+> +
+
+Overall, this looks completely broken.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
