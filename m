@@ -1,73 +1,92 @@
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F8911AC230
-	for <kvmarm@lists.linux.dev>; Thu, 20 Jun 2024 13:32:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5860C30358
+	for <kvmarm@lists.linux.dev>; Thu, 20 Jun 2024 13:58:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718890359; cv=none; b=Zt6xrI3ywm92DcqOgSV5x0CWD+7cFULJ2qKp0djaGPvD/RBzlRRZTwxi9b71Ah/QkaF5Wj4gRW4f98+NErYn+RLqWLnOGs19WLPx4dwZHfx+GFuvoBBhehffxRj88dj1Jqe/zxuZ2ibfPVUxe2iwUFBhKAWMlTIzkl1iDnlNZV4=
+	t=1718891919; cv=none; b=gomU/EuaqopeDjR01R3AuzZfHiOmWsO07II6g4uTmPiWPE4I2Tag116fazGc3hXfh6KzfP7//weC5EmxIOsWHD0CLkbHEHq1vmEYNgtGrJQf1Mmlk4CwS14Fe2RRoBy1p9q+Gzk3KabIzJVQolyIBXCl77xqZ492gf8EnKFM6K0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718890359; c=relaxed/simple;
-	bh=7w0hWpjx910CIu7mERo9lzB+qj3IfVuDqIkUujkGc2w=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=BPZ8DO9xeZCfHZTUYhGldw+gKEbrj59ejmw3hUuBzlaiuZ2snsPQkplg4mKl5u/mgiC+eLGGqhhl5/77e5q7VZSdn8v3QHN69C5EaBCC5n4obOJ2JnW4vHushmbbOp2MUsukIhkMiqvcdcTKn2N4rOnPcvUL723vE1A+ds//vvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4W4hBn2TTkz1N8NV;
-	Thu, 20 Jun 2024 21:28:17 +0800 (CST)
-Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
-	by mail.maildlp.com (Postfix) with ESMTPS id A9F11180064;
-	Thu, 20 Jun 2024 21:32:33 +0800 (CST)
-Received: from [10.174.185.210] (10.174.185.210) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 20 Jun 2024 21:32:32 +0800
-Subject: Re: [PATCH] KVM: arm64: vgic-its: clear dte when mapd unmaps a device
-To: Eric Auger <eauger@redhat.com>, Marc Zyngier <maz@kernel.org>
-CC: Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
-	Randy Dunlap <rdunlap@infradead.org>, <linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>, <wanghaibin.wang@huawei.com>,
+	s=arc-20240116; t=1718891919; c=relaxed/simple;
+	bh=SNkfXN9EHxOurTVP8o9P7xWfSSS6g0y6JzMJDEU+R9k=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RtoWu6UoYbgfdJgSoXSBvJxnakRPQu6OgbRrNFUAnGTIGe+BhjvTljj1LakF24yzSehw/BhAhg1qLk+TlE1YqZ7bHRutP24A8twWNr+GIIfRwV27gC89o98DiSvBdI7ZlISDiPSC1Pr/Qx+A+Y59w3alz2igjwFODAwV/iwStEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U7oZIgJh; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U7oZIgJh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5B82C32786;
+	Thu, 20 Jun 2024 13:58:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718891918;
+	bh=SNkfXN9EHxOurTVP8o9P7xWfSSS6g0y6JzMJDEU+R9k=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=U7oZIgJh9SPx+C86rjj8OfSfvQuxg2madsG6kR2v87l/FmUDuLVQNwoH2CRhPA2lP
+	 fELK9fcrsadDFgbzmjgONy2lUkA55D8j6Htd8eyaJDBbFuQBZZn5gtdLoAXdlSth4R
+	 bL+qPThu0EFlG+fLSpFwK5Vd2drwNHvhlB47Ham3K/l/9i52xlBm9k/RqqbvpudI6r
+	 JNWSYhB1f1vF0wOJlJ8vB3+FmZ/XIN0YLtwN4++Pj9/+Ngjkhsm41gJqoZh3Bm6yfE
+	 OOdY6tNF/3l23DOFKPldU+i5AoZBB9RMlq0fKzBbIn5xmWrTA2Zh7RIhdLB8DEymqK
+	 sxGy0vv+AJMfA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sKIJA-005nE8-Fo;
+	Thu, 20 Jun 2024 14:58:36 +0100
+Date: Thu, 20 Jun 2024 14:58:35 +0100
+Message-ID: <864j9nk96c.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Kunkun Jiang <jiangkunkun@huawei.com>
+Cc: Eric Auger <eauger@redhat.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	<linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>,
+	<wanghaibin.wang@huawei.com>,
 	<lishusen2@huawei.com>
+Subject: Re: [PATCH] KVM: arm64: vgic-its: clear dte when mapd unmaps a device
+In-Reply-To: <480900e7-4894-4fc9-5671-f29523f2672a@huawei.com>
 References: <20240613093811.710-1-jiangkunkun@huawei.com>
- <86v82ckimh.wl-maz@kernel.org>
- <8f9d74fc-f9d9-43ac-a387-91ff804cfaf1@redhat.com>
-From: Kunkun Jiang <jiangkunkun@huawei.com>
-Message-ID: <480900e7-4894-4fc9-5671-f29523f2672a@huawei.com>
-Date: Thu, 20 Jun 2024 21:32:20 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+	<86v82ckimh.wl-maz@kernel.org>
+	<8f9d74fc-f9d9-43ac-a387-91ff804cfaf1@redhat.com>
+	<480900e7-4894-4fc9-5671-f29523f2672a@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-In-Reply-To: <8f9d74fc-f9d9-43ac-a387-91ff804cfaf1@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm600007.china.huawei.com (7.193.23.208)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: jiangkunkun@huawei.com, eauger@redhat.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, rdunlap@infradead.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, wanghaibin.wang@huawei.com, lishusen2@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Eric,
+On Thu, 20 Jun 2024 14:32:20 +0100,
+Kunkun Jiang <jiangkunkun@huawei.com> wrote:
+> 
+> Hi Eric,
+> 
+> On 2024/6/19 1:18, Eric Auger wrote:
+> >> Also, is the device table the only one that is subject to this
+> >> 'reload' problem? How about the Collection table?
+> > The collection table is not indexed by the collection ID and when saving
+> > we end up writing an invalid dummy entry to close the recording. So I
+> > don't think we have the same problem there.
+> I'm a little confused here. In the current Linux, there is no implementation
+> of mapc unmaps a cte. But should this scenario be considered in
+> vgic-its?
 
-On 2024/6/19 1:18, Eric Auger wrote:
->> Also, is the device table the only one that is subject to this
->> 'reload' problem? How about the Collection table?
-> The collection table is not indexed by the collection ID and when saving
-> we end up writing an invalid dummy entry to close the recording. So I
-> don't think we have the same problem there.
-I'm a little confused here. In the current Linux, there is no implementation
-of mapc unmaps a cte. But should this scenario be considered in vgic-its?
-> For ITT I think we have the same issue on restore because the restore
-> scans the table until it gets a first valid entry and then chain on next
-> item. If we have stale entries this looks like the same issue.
-Thanks for your reply. I added a patch to fix it.
-https://lore.kernel.org/kvmarm/20240620130650.1279-4-jiangkunkun@huawei.com/
+We implement the "HW", not what Linux does.
 
-Thanks,
-Kunkun Jiang
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
