@@ -1,116 +1,121 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 613287470
-	for <kvmarm@lists.linux.dev>; Thu, 20 Jun 2024 04:22:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EF1740862
+	for <kvmarm@lists.linux.dev>; Thu, 20 Jun 2024 06:58:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718857337; cv=none; b=qTASlxFf94YeQswDV3NFO6R/NEfH9FIkawzMCAkFQREA7+ryCUUaJ7jioE41aMtQa9NrNdTTrv51nRYu4Zuspw6NvFdn9eczgtK3jtoTthS9v+7llFaJc72YSWswHQDXWwcel+u9/+tWSgyCg4FMWIz7xtE9GkqDmejya56NHIc=
+	t=1718866701; cv=none; b=cmnUwc444p11imkpUw2zteHRptoAAvji+QAwvodU0XTeiLk7ZUB5ic+Ze6uGHhxlDYdT4NvZS5I1lCwlvl3n6r/r8BUqSEdJI5yhJgo/JetRVBSu0QB9l9pZpwN3VhKBznLKX7ta9vLnfcgCCgUqQGvm+rTJwSlzO4T9z0oCpgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718857337; c=relaxed/simple;
-	bh=QAdSu372sRUEYjNOdGuHPm3EQh6YcNhJYHxcXC6ObeU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=M1wHZx5O3VJO4GVH352TLce56bFOGWYVh/y5gw15bmVFZSIJV+0TBcNWlsxZp2hynIc//P4PJE+CYEImQGeePuRosCHLNzGYhiJOGb68T/vX/gCbMTcGltfbO3VfbmST/MEzvktil5Qf5UktFi9o0tCAbFvBUKIQ22IXAoevf2U=
+	s=arc-20240116; t=1718866701; c=relaxed/simple;
+	bh=1rR+8QkTlT15Poze9vyELDpz5YZygGThR/Hy7mySGVU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Mm/ZAE0nzmQg1sYLi+2z8qWv/bQfp5sBcD3RpGv1mn5CyiDe3WguA64Z+Hns7j+dvEnOs/kbIb8bYZP21UCBDPdWTH5ze2PrP7aZLhyQBcPZ4RKodsYh28Ka7HUY8I9CqhArZKm4TS/Wr7GqgQqdgONeNoxeZLNpMUXNE/25w6Y=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6AFB6DA7;
-	Wed, 19 Jun 2024 21:22:39 -0700 (PDT)
-Received: from [10.163.46.59] (unknown [10.163.46.59])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6B3D13F64C;
-	Wed, 19 Jun 2024 21:22:08 -0700 (PDT)
-Message-ID: <ccfc2b96-acf3-4511-920a-2633305f940d@arm.com>
-Date: Thu, 20 Jun 2024 09:52:05 +0530
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DB1D4DA7;
+	Wed, 19 Jun 2024 23:58:42 -0700 (PDT)
+Received: from a077893.arm.com (unknown [10.163.46.59])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 761973F73B;
+	Wed, 19 Jun 2024 23:58:14 -0700 (PDT)
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+To: linux-arm-kernel@lists.infradead.org,
+	maz@kernel.org
+Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Brown <broonie@kernel.org>,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: [RFC 00/10] KVM: arm64: Enable fine grained undefined for MDSELR_EL1
+Date: Thu, 20 Jun 2024 12:27:57 +0530
+Message-Id: <20240620065807.151540-1-anshuman.khandual@arm.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V18 6/9] KVM: arm64: nvhe: Disable branch generation in
- nVHE guests
-Content-Language: en-US
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- will@kernel.org, catalin.marinas@arm.com, Mark Brown <broonie@kernel.org>,
- James Clark <james.clark@arm.com>, Rob Herring <robh@kernel.org>,
- Marc Zyngier <maz@kernel.org>, Suzuki Poulose <suzuki.poulose@arm.com>,
- Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
- Arnaldo Carvalho de Melo <acme@kernel.org>,
- linux-perf-users@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>,
- James Morse <james.morse@arm.com>, kvmarm@lists.linux.dev
-References: <20240613061731.3109448-1-anshuman.khandual@arm.com>
- <20240613061731.3109448-7-anshuman.khandual@arm.com>
- <ZmxgZqxXWnRqwbDC@J2N7QTR9R3.cambridge.arm.com>
- <774a63cb-21e6-4ef2-b2ab-0ff8937523b2@arm.com> <ZnAEVlVZFR3DLHHb@J2N7QTR9R3>
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <ZnAEVlVZFR3DLHHb@J2N7QTR9R3>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+MDSELR_EL1 register access is essential while enabling latest HW breakpoint
+via the arch feature FEAT_DebugV8P9. During our previous discussion on this
+[1], it was also observed that MDSELR_EL1 access needs to be managed across
+various KVM host-guest code paths via the new fine grained trap based UNDEF
+mechanism. Besides MDSELR_EL1 access is managed via FEAT_FGT2 based fine
+grained registers.
 
+This series has been carved out from the original breakpoint series just to
+enable MSELR_EL1 access via fine grained trap control.
 
-On 6/17/24 15:09, Mark Rutland wrote:
-> On Mon, Jun 17, 2024 at 12:15:15PM +0530, Anshuman Khandual wrote:
->>
->>
->> On 6/14/24 20:53, Mark Rutland wrote:
->>> On Thu, Jun 13, 2024 at 11:47:28AM +0530, Anshuman Khandual wrote:
->>>> Disable the BRBE before we enter the guest, saving the status and enable it
->>>> back once we get out of the guest. This avoids capturing branch records in
->>>> the guest kernel or userspace, which would be confusing the host samples.
->>>
->>> It'd be good to explain why we need to do this for nVHE, but not for
->>> VHE. I *think* that you're relying on BRBCR_EL2.EL0HBRE being ignored
->>> when HCR_EL2.TGE == 0, and BRBCR_EL1.E{1,0}BRE being initialized to 0
->>> out-of-reset.
->>
->> That's right, there is no possibility for the host and guest BRBE config
->> to overlap.
->>
->>> What should a user do if they *want* samples from a guest? Is that
->>
->> That is not supported currently. But in order to enable capturing guest
->> branch samples from inside the host - BRBCR_EL2 configs need to migrate
->> into BRBCR_EL1 when the guest runs on the cpu.
->>
->>> possible to do on other architectures, or do is that always prevented?
->>
->> I am not sure about other architectures, but for now this falls within
->> guest support which might be looked into later. But is not the proposed
->> patch complete in itself without any further guest support ?
-> 
-> My concern here is ABI rather than actual support.
-I am trying to understand how this is an ABI problem. Because perf debug
-tools could be described as - a best effort based sample collection. All
-samples that could be collected for a given perf_event_attr request might
-change if the underlying assumptions change later on. AFAICT semantics of
-expectations for a given attribute request is not a hard ABI requirement.
+All the initial sysreg updates or additions are required while configuring
+HDFGRTR2_EL2 and HDFGWTR2_EL2 registers in the last two patches.
 
-> 
-> It's not clear to me how this works across architectures, and we should
-> have some idea of how this would work (e.g. if we're going to require
-> new ABI or not), so that we don't have to break ABI later on.
+This series has been very lightly tested - boots with KVM without warnings
+or errors. I am not entirely sure how these fine grained bits would behave
+in various paths. The idea is to get the series into discussion, learn and
+change as required. All reviews, feedbacks and pointers really appreciated.
 
-BRBE HW does not have any guest filter in itself, unless BRBCR_EL2 gets
-migrated across BRBCR_EL1 during guest transition, guest branch records
-would not be captured.
+Questions and Challenges:
 
-event->attr.exclude_guest = 0 could have been denied during armpmu_add()
-for preventing events with guest branch sample requests being scheduled
-on the PMU. But it turns out to be not a very reliable parameter in that
-sense as well.
+- TRBIDR_EL1.MPAM needs to be probed for setting HDFGRTR2_EL2_nTRBMPAM_EL1
+  but kvm_has_feat() does not operate a non-ID register which causes build
+  warnings. The same problem exists for probing PMSIDR_EL1.FDS which is
+  needed for setting HDFGRTR2_EL2_nPMSDSFR_EL1 as well. Currently both the
+  bits mentioned earlier are set, assuming the features are not present in
+  nested virtualization. Do we need some new helpers to probe these non-ID
+  registers as well ?
 
-event->attr.exclude_guest = 0 remains clear even for a standard session.
+- At present both HDFGRTR2_EL2 and HDFGWTR2_EL2 based accesses are enabled
+  (MDSELR_E1 was dependent on them) but then there are some more FEAT_FGT2
+  registers such HFGRTR2_EL2, HFGWTR2_EL2 and HFGITR2_EL2. Should those be
+  handled in this series as well ?
 
-./perf record -e instructions:k -j any_call,save_type ls
+- Probably an entry is needed for SYS_MDSELR_EL1 in encoding_to_fgt[] table
+  inside the file arch/arm64/kvm/emulate-nested.c, but while trying to test
+  features for all individual bits in HDFGRTR2_EL2, it seemed a lot of new
+  register definitions from various features need to be added as well, thus
+  expanding the scope further. Should all required new system registers be
+  added for completeness ?
 
-perf tools will need some changes in order to avoid the above scenarios
-as a default behaviour which would not be desirable as well.
+[1] https://lore.kernel.org/all/20240405080008.1225223-1-anshuman.khandual@arm.com/
 
-These semantics could be worked out later on when BRBE guest support gets
-included, and the current proposal would not prevent any potential future
-changes in this regard.
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>
+Cc: James Morse <james.morse@arm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will@kernel.org>
+Cc: Mark Brown <broonie@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: kvmarm@lists.linux.dev
+Cc: linux-kernel@vger.kernel.org
 
-> 
-> Mark.
+Anshuman Khandual (10):
+  arm64/sysreg: Update ID_AA64MMFR0_EL1 register
+  arm64/sysreg: Update ID_AA64DFR0_EL1 register
+  arm64/sysreg: Add register fields for ID_AA64DFR2_EL1
+  arm64/sysreg: Add register fields for HDFGRTR2_EL2
+  arm64/sysreg: Add register fields for HDFGWTR2_EL2
+  arm64/sysreg: Add register fields for MDSELR_EL1
+  arm64/sysreg: Add register fields for PMSID_EL1
+  arm64/sysreg: Add register fields for TRBIDR_EL1
+  KVM: arm64: nv: Enable HDFGRTR2_EL2 & HDFGWTR2_EL2 access from virtual EL2
+  KVM: arm64: nv: Add new HDFGRTR2_GROUP & HDFGRTR2_GROUP based FGU handling
+
+ arch/arm64/include/asm/kvm_arm.h        |   8 ++
+ arch/arm64/include/asm/kvm_host.h       |   5 ++
+ arch/arm64/include/asm/vncr_mapping.h   |   2 +
+ arch/arm64/kvm/emulate-nested.c         |  14 +++
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  10 +++
+ arch/arm64/kvm/nested.c                 |  36 ++++++++
+ arch/arm64/kvm/sys_regs.c               |  47 ++++++++++
+ arch/arm64/tools/sysreg                 | 115 ++++++++++++++++++++++--
+ 8 files changed, 232 insertions(+), 5 deletions(-)
+
+-- 
+2.25.1
+
