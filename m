@@ -1,118 +1,130 @@
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2A1326AD5
-	for <kvmarm@lists.linux.dev>; Fri, 21 Jun 2024 06:39:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0AB017083C;
+	Fri, 21 Jun 2024 07:53:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718951976; cv=none; b=IcOxdWWzuiV/tep949z7XslZdNY80PszS9CUh9BqYdJFDix/uHzb2thxh2d27XdXG5IZOxLdetBX368JvPyOmVUfomjM747baFpWukUD1EpvoY7+pm59qTaGh+o7lSoyj0dNbz2h9trykyKrcPShTERwbl/su1LtRY4ArrvT3Dk=
+	t=1718956416; cv=none; b=GrGNv9mP0EEUAh/seIGaB4WQikZMvcOaEQ5MsG+rAGEEEdWj9ruFnV5cU6tQT9ejQq05EwCgBydoYy6y/FYix+KmZPg0SsBXKFCmcylsmlZPLATwJc5Yeavjwl4NE1y+GsSZRij0V9dFo8PQ3nnBw9WJQnx8wtTOWgqo6B18Rr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718951976; c=relaxed/simple;
-	bh=Rp2PfkHlqQlKsw+0QvH8Cch/MT+BEXRe2hgJqjgeP8U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MTtZXYm1VS7r2msKLzBdC45kkPLQhIfwoKRjf/Temv6J6qHyy9Tf+TeJbrcPGGxKkwECAbAQF2bnA01yP2XUR7LGJlvEBH0Ac1kR4imxiZ76av2nfuY90iooO2iPaZ5CnQGs+pKJav4eB3xE8f1wiubn69z8GCjcoY5sablGAQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uz//xHny; arc=none smtp.client-ip=91.218.175.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1718956416; c=relaxed/simple;
+	bh=eWeBwZ8/Lk6nImbfjWKt6XAuHYSDXDTd7xgQ3zt0uuA=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Prtw/Druw+j04/ONvRy7ym2bbT8g6EWOeioh7ey42lwcKN5xHeUWp3Q/g4ZGVYx0/MB+/zE03/OwMwpfLG0IPyoBIIomUwFM4qDIWbHiJaRt2+Lw4eo5d2xqTcKmNGij+NK/bihxx0IO17Rsxhwhj5VtVXRwFtYn+tDwZDa9rW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tVJlnJCG; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uz//xHny"
-X-Envelope-To: jiangkunkun@huawei.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1718951970;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=i/rGr0WknPRR6M1jYoCS1tGH+uD6OvxVso60P4Qdv+c=;
-	b=uz//xHnyvplYyjijHTY6adMHi+pCmk9Jy8g9YToZ8QvYqkm6/bid8DjFvEQTGGor7bt1D0
-	LakgR05jXzpmTSobKau3KnS/tn2NOa0hHf88A2d50iCpgPbon1ufY5IqWYyLXk1OwLebBw
-	IVF1PIhmwHKFCmg1En29Fid8gAiUI6A=
-X-Envelope-To: maz@kernel.org
-X-Envelope-To: james.morse@arm.com
-X-Envelope-To: suzuki.poulose@arm.com
-X-Envelope-To: yuzenghui@huawei.com
-X-Envelope-To: catalin.marinas@arm.com
-X-Envelope-To: will@kernel.org
-X-Envelope-To: rdunlap@infradead.org
-X-Envelope-To: eauger@redhat.com
-X-Envelope-To: linux-arm-kernel@lists.infradead.org
-X-Envelope-To: kvmarm@lists.linux.dev
-X-Envelope-To: wanghaibin.wang@huawei.com
-X-Envelope-To: lishusen2@huawei.com
-Date: Fri, 21 Jun 2024 06:39:25 +0000
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Kunkun Jiang <jiangkunkun@huawei.com>
-Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tVJlnJCG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79671C2BBFC;
+	Fri, 21 Jun 2024 07:53:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718956415;
+	bh=eWeBwZ8/Lk6nImbfjWKt6XAuHYSDXDTd7xgQ3zt0uuA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=tVJlnJCGU3Ze6y91aA9mNXAeaKUrXYNa2sVodHGKsiRh4ebOIw1qfrUjg1SqtmC7V
+	 Bb6ECx/rwVvmajkN/+95vkWcjK5DDb0Qf03sBEEYO14PYePRkjb4FRV2BqQvIYA3Wc
+	 y+/jIbcCr0d7hU3OTrZYEoXzuEhQywVCHr0Ks0MlYSYje9ufuEM0J6LylY9RxgZPb2
+	 a7dUPFSwffA4Yu6406bblU23YZcuYwkgS95qvQ88rZuGyziJ9V/ahHxPv2s2c9BNYO
+	 ETQwhiHXSXH+ClJG5vttCBYf4kOm3BvHBOHxN2y0GUk4VLaOeHjSRq3d9ZB97ymNC7
+	 jmhYrDCmkg8Kw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sKZ5R-0062nT-7i;
+	Fri, 21 Jun 2024 08:53:33 +0100
+Date: Fri, 21 Jun 2024 08:53:32 +0100
+Message-ID: <861q4qk9z7.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Shaoqin Huang <shahuang@redhat.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	kvmarm@lists.linux.dev,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose
+ <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Randy Dunlap <rdunlap@infradead.org>,
-	Eric Auger <eauger@redhat.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	wanghaibin.wang@huawei.com, lishusen2@huawei.com
-Subject: Re: [PATCH 1/3] KVM: arm64: vgic-its: Add a data length check in
- vgic_its_save_*
-Message-ID: <ZnUgHVCewM4CS09w@linux.dev>
-References: <20240620130650.1279-1-jiangkunkun@huawei.com>
- <20240620130650.1279-2-jiangkunkun@huawei.com>
- <ZnSsPmfBXMGRYPmL@linux.dev>
- <50f18621-96a4-cf6e-9fc0-a4e69f77054c@huawei.com>
+	Will Deacon <will@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] KVM: arm64: Allow userspace to change ID_AA64PFR1_EL1
+In-Reply-To: <f73cabc6-8c48-4c12-9d60-269e50df41f3@redhat.com>
+References: <20240618063808.1040085-1-shahuang@redhat.com>
+	<20240618063808.1040085-2-shahuang@redhat.com>
+	<86ed8uk8cr.wl-maz@kernel.org>
+	<f73cabc6-8c48-4c12-9d60-269e50df41f3@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <50f18621-96a4-cf6e-9fc0-a4e69f77054c@huawei.com>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: shahuang@redhat.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Jun 21, 2024 at 09:43:05AM +0800, Kunkun Jiang wrote:
-> > static int vgic_its_restore_cte(struct vgic_its *its, gpa_t gpa, int esz)
-> > {
-> >         struct its_collection *collection;
-> >         struct kvm *kvm = its->dev->kvm;
-> >         u32 target_addr, coll_id;
-> >         u64 val;
-> >         int ret;
+On Fri, 21 Jun 2024 07:17:57 +0100,
+Shaoqin Huang <shahuang@redhat.com> wrote:
+> 
+> Hi Marc,
+> 
+> On 6/18/24 15:39, Marc Zyngier wrote:
+> > On Tue, 18 Jun 2024 07:38:06 +0100,
+> > Shaoqin Huang <shahuang@redhat.com> wrote:
+> >> 
+> >> Allow userspace to change the guest-visible value of the register with
+> >> some severe limitation:
+> >> 
+> >>    - No changes to features not virtualized by KVM (MPAM_frac, RAS_frac)
+> >> ---
+> >>   arch/arm64/kvm/sys_regs.c | 3 ++-
+> >>   1 file changed, 2 insertions(+), 1 deletion(-)
+> >> 
+> >> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> >> index 22b45a15d068..bead81867bce 100644
+> >> --- a/arch/arm64/kvm/sys_regs.c
+> >> +++ b/arch/arm64/kvm/sys_regs.c
+> >> @@ -2306,7 +2306,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+> >>   		   ID_AA64PFR0_EL1_GIC |
+> >>   		   ID_AA64PFR0_EL1_AdvSIMD |
+> >>   		   ID_AA64PFR0_EL1_FP), },
+> >> -	ID_SANITISED(ID_AA64PFR1_EL1),
+> >> +	ID_WRITABLE(ID_AA64PFR1_EL1, ~(ID_AA64PFR1_EL1_RAS_frac |
+> >> +				       ID_AA64PFR1_EL1_MPAM_frac)),
+> >>   	ID_UNALLOCATED(4,2),
+> >>   	ID_UNALLOCATED(4,3),
+> >>   	ID_WRITABLE(ID_AA64ZFR0_EL1, ~ID_AA64ZFR0_EL1_RES0),
 > > 
-> >         BUG_ON(esz > sizeof(val));
-> >         ret = kvm_read_guest_lock(kvm, gpa, &val, esz);
-> It should also be modified synchronously, right?
-
-Do you mean replacing the other BUG_ON()'s in the ITS code with the
-pattern I'd recommended earlier?
-
-That'd be great if you could do that.
-
-> > >   	return vgic_write_guest_lock(kvm, gpa, &val, ite_esz);
-> > >   }
-> > > @@ -2246,6 +2247,7 @@ static int vgic_its_save_dte(struct vgic_its *its, struct its_device *dev,
-> > >   	       (itt_addr_field << KVM_ITS_DTE_ITTADDR_SHIFT) |
-> > >   		(dev->num_eventid_bits - 1));
-> > >   	val = cpu_to_le64(val);
-> > > +	BUG_ON(dte_esz > sizeof(dte_esz));
-> > Did you even test this? A bit of substitution arrives at:
+> > This isn't a valid patch.
 > > 
-> > 	BUG_ON(8 > sizeof(unsigned int));
+> > Furthermore, how about all the other features that may or may not be
+> > currently handled by KVM? Please see [1] and make sure that all
+> > existing fields have a known behaviour (a combination of masked,
+> > preserved, capped, writable or read-only).
 > > 
-> > See the issue?
+> > I can at least see problems with MTE_frac and MTEX, plus all the other
+> > things that KVM doesn't know how to save/restore (THE, GCS, NMI...).
 > > 
-> > Please do not test these sort of untested patches on the list, it is a
-> > waste of everyone's time.
-> Sorry, there is a problem here. I will pay attention to it in the future.
-> Thank you for your correction.
+> > What I asked you to handle the whole register, I really meant it.
+> 
+> I currently only found the BT and SSBS fields can be written without
+> any unknown behavior.
 
-Apologies for being firm on this, but outside of RFCs the expectation is
-that the author test changes before posting to the list.
+I can only assume you haven't looked hard enough.
 
-In that spirit, a reproducer for the issue you observe in KVM selftests
-would be great. We have some minimal support for dealing with an ITS
-over there now.
+> 
+> All other fields in the ID_AA64PFR1_EL1 are either not supported by
+> KVM or the field involved with other register and KVM don't know how
+> to handle them.
+
+Why can't CSV2_frac be writable? Why can't most of the other fields be
+hidden depending on the VM configuration, as pointed out above?
+
+	M.
 
 -- 
-Thanks,
-Oliver
+Without deviation from the norm, progress is not possible.
