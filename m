@@ -1,95 +1,132 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4207374CB
-	for <kvmarm@lists.linux.dev>; Fri, 21 Jun 2024 12:55:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C684D1552EF
+	for <kvmarm@lists.linux.dev>; Fri, 21 Jun 2024 13:12:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718974541; cv=none; b=GprN+K/Gt6W7oq3dC7hq1g4KBEJeJQSP6Rl/eY8psd5aWbFTES48GainKqVI/8nK5sK9wh36HAvyFWunkqU4FnGUQOty5IUmqaEgu2v6gLAznSkbNYknr03G+giudGQ75Q5VHowIA3mnOQoqrdmkWpHuswakkTwQg2+DPb0EDzE=
+	t=1718975576; cv=none; b=qz/vXySd0rZTXvPzGj0DK0+HtDlPoJ/dgl+UnLVlCn2QCc9Iu0KZiTPKgeK/Qk7Xss6Y6D4/NEtrTX5Ob8ay3p/0Of+o/D1qOWh8znrPZZgicSf1RtDs7ObCcpz3mhTHxsn/RI9alhPmImZ3xopClkN7in5e95vjJv/H54Ef2rU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718974541; c=relaxed/simple;
-	bh=WO5X9rdCDOaQUclCdQ5IwzctuaRt5w4su9JfUjNIAtU=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=tQAhWC7aKkz6v4BZG9U2MBBrYI+ke4Ns4RJEq3HQLLV2eGr5jtzitklXJJcBoeDIvQt/eudNRp8rp/uSoJ8zC8Gl3xzpcNgGmhGbpb1e4DpGYGKyrYcPRo9jmGIkpkFlbh3zRNfVxqAusAEtmQEq1RiL6ADFrJRhUwsI6VpcTWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eAKdxUKk; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eAKdxUKk"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718974538;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qvyso1coD/Ch+E1k1+dQ8v7aJZZwA2hNY2CehO6gBTc=;
-	b=eAKdxUKkmEA2Pkaj2QYF/MeGTNX/U6tUxEMGqcbYbXlnzILBEI67768n47auAV546WPCn2
-	1UQnSEBjNPExYQ3aCMUNg9JArHDnqGAEl0xO3VRBozQW9oav0d0jPg4aSJiKq3l0PS9HMi
-	/Vo8jmfTvPUzwf9A1VVB3+rTZdgKIh0=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-553-I1sOWWRdP9yVO-vsevBrEg-1; Fri, 21 Jun 2024 08:55:36 -0400
-X-MC-Unique: I1sOWWRdP9yVO-vsevBrEg-1
-Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6b4febeeb1bso23772106d6.1
-        for <kvmarm@lists.linux.dev>; Fri, 21 Jun 2024 05:55:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718974536; x=1719579336;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qvyso1coD/Ch+E1k1+dQ8v7aJZZwA2hNY2CehO6gBTc=;
-        b=sOl0m4RuXqj4W1pGbNv68RsCfqpfoC6ouzfw17J7qecYsqNYTOq1PbQObPVjSx0O6W
-         TJhK2JlIeirhc5sRTEQN/uQpoN5To9c9kVsl02xruJZY48t7V8dEoTb3jHbsyUdq+pS6
-         PGveLZwD+hsKtGsZkbgwRw6qyRZO0QLXsvKCgbza3eyy7DrzrVE/iPe9+oGUQ8JTJIr6
-         f//BJtlbUGD43xKE8m1KR2a7RNuX5QDogvEa6CbItro+RmNxf+TpmBPUJGjbAUuYPicx
-         dY3cnOfKEzEdQ+AOllayBmqitKhxzKjDaB9MhDk6TfX+ll5dgJIMkAfTL0wuFqyqpthP
-         XpGw==
-X-Gm-Message-State: AOJu0YypuZ1fud3IAawfw9lrat8xMrU+7c/2kkNmPurNjd07nhQhRLeJ
-	V2HW0ET4QG7Vkf3pXxKS3HagEjSwE+2bmUW+99X+GILJ0ampeo2iWVARQ6QhpWorVU+mbgBkhJ1
-	X0VtczSxjD5OojSwU+iS+NOJ8qX01PIo0TugdHUDckO5aw3V17GlFzw==
-X-Received: by 2002:a05:6214:caa:b0:6b4:dd2a:aa44 with SMTP id 6a1803df08f44-6b501e3ca5dmr137927246d6.37.1718974535766;
-        Fri, 21 Jun 2024 05:55:35 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFQKfszEYeuIrPEQCSgtqiyccBoeK+6p0epedPO7UJVfwJ8/ib5x4aYN83RsU7kGBTVQbJc4g==
-X-Received: by 2002:a05:6214:caa:b0:6b4:dd2a:aa44 with SMTP id 6a1803df08f44-6b501e3ca5dmr137927086d6.37.1718974535390;
-        Fri, 21 Jun 2024 05:55:35 -0700 (PDT)
-Received: from rh (p200300c93f02d1004c157eb0f018dd01.dip0.t-ipconnect.de. [2003:c9:3f02:d100:4c15:7eb0:f018:dd01])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b51ef30d30sm8608716d6.93.2024.06.21.05.55.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Jun 2024 05:55:35 -0700 (PDT)
-Date: Fri, 21 Jun 2024 14:55:31 +0200 (CEST)
-From: Sebastian Ott <sebott@redhat.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-cc: kvmarm@lists.linux.dev, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-    James Morse <james.morse@arm.com>, Eric Auger <eric.auger@redhat.com>, 
-    kvm@vger.kernel.org, Zenghui Yu <yuzenghui@huawei.com>, 
-    Shaoqin Huang <shahuang@redhat.com>, Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v5 00/10] KVM: arm64: Allow userspace to modify CTR_EL0
-In-Reply-To: <171890515830.1223590.8660930452290685977.b4-ty@linux.dev>
-Message-ID: <ef9b7e06-a609-c961-2a19-f6c40f7e9bfe@redhat.com>
-References: <20240619174036.483943-1-oliver.upton@linux.dev> <171890515830.1223590.8660930452290685977.b4-ty@linux.dev>
+	s=arc-20240116; t=1718975576; c=relaxed/simple;
+	bh=9AkTqDX/NnbWAxlw4BdQztKH+iaRpYlS0M/PcBbMIMI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mczwGJZQnQ8udfPru3uXE/6ncMy50eFidHmd7TkdkUwM0/ib7G7rt/hFkyMbI3k5Mpf+pZIoUlqsQt8J57/4CApqHEF1YjsX5faVhxmGVrfdcgG9dR7tO7pJitYnp+hrAWcGZsuhU2Hgt8IZd36ptFltvf1bJpEMk/60woEuAZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B1F56DA7;
+	Fri, 21 Jun 2024 06:13:18 -0700 (PDT)
+Received: from J2N7QTR9R3.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C68C53F73B;
+	Fri, 21 Jun 2024 06:12:51 -0700 (PDT)
+Date: Fri, 21 Jun 2024 14:12:49 +0100
+From: Mark Rutland <mark.rutland@arm.com>
+To: Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	will@kernel.org, catalin.marinas@arm.com,
+	Mark Brown <broonie@kernel.org>, James Clark <james.clark@arm.com>,
+	Rob Herring <robh@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	Suzuki Poulose <suzuki.poulose@arm.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	linux-perf-users@vger.kernel.org,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>, kvmarm@lists.linux.dev
+Subject: Re: [PATCH V18 6/9] KVM: arm64: nvhe: Disable branch generation in
+ nVHE guests
+Message-ID: <ZnV8UWIolF2ZI_9y@J2N7QTR9R3.cambridge.arm.com>
+References: <20240613061731.3109448-1-anshuman.khandual@arm.com>
+ <20240613061731.3109448-7-anshuman.khandual@arm.com>
+ <ZmxgZqxXWnRqwbDC@J2N7QTR9R3.cambridge.arm.com>
+ <774a63cb-21e6-4ef2-b2ab-0ff8937523b2@arm.com>
+ <ZnAEVlVZFR3DLHHb@J2N7QTR9R3>
+ <ccfc2b96-acf3-4511-920a-2633305f940d@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ccfc2b96-acf3-4511-920a-2633305f940d@arm.com>
 
-On Thu, 20 Jun 2024, Oliver Upton wrote:
-> On Wed, 19 Jun 2024 17:40:26 +0000, Oliver Upton wrote:
->> As I'd mentioned on the list, here is my rework of Sebastian's CTR_EL0
->> series. Changes this time around:
->>
->>  - Drop the cross-validation of the guest's CTR_EL0 with CLIDR_EL1 and
->>    the CCSIDR_EL1 hierarchy, instead independently checking these
->>    registers against the system's CTR_EL0 value.
->>
->> [...]
->
-> Applied to kvmarm/next, thanks!
+On Thu, Jun 20, 2024 at 09:52:05AM +0530, Anshuman Khandual wrote:
+> On 6/17/24 15:09, Mark Rutland wrote:
+> > On Mon, Jun 17, 2024 at 12:15:15PM +0530, Anshuman Khandual wrote:
+> >> On 6/14/24 20:53, Mark Rutland wrote:
+> >>> On Thu, Jun 13, 2024 at 11:47:28AM +0530, Anshuman Khandual wrote:
+> >>>> Disable the BRBE before we enter the guest, saving the status and enable it
+> >>>> back once we get out of the guest. This avoids capturing branch records in
+> >>>> the guest kernel or userspace, which would be confusing the host samples.
+> >>>
+> >>> It'd be good to explain why we need to do this for nVHE, but not for
+> >>> VHE. I *think* that you're relying on BRBCR_EL2.EL0HBRE being ignored
+> >>> when HCR_EL2.TGE == 0, and BRBCR_EL1.E{1,0}BRE being initialized to 0
+> >>> out-of-reset.
+> >>
+> >> That's right, there is no possibility for the host and guest BRBE config
+> >> to overlap.
+> >>
+> >>> What should a user do if they *want* samples from a guest? Is that
+> >>
+> >> That is not supported currently. But in order to enable capturing guest
+> >> branch samples from inside the host - BRBCR_EL2 configs need to migrate
+> >> into BRBCR_EL1 when the guest runs on the cpu.
+> >>
+> >>> possible to do on other architectures, or do is that always prevented?
+> >>
+> >> I am not sure about other architectures, but for now this falls within
+> >> guest support which might be looked into later. But is not the proposed
+> >> patch complete in itself without any further guest support ?
+> > 
+> > My concern here is ABI rather than actual support.
+> I am trying to understand how this is an ABI problem. Because perf debug
+> tools could be described as - a best effort based sample collection. All
+> samples that could be collected for a given perf_event_attr request might
+> change if the underlying assumptions change later on. AFAICT semantics of
+> expectations for a given attribute request is not a hard ABI requirement.
 
-Great, thanks a lot!
+The ABI requirements are certainly unclear, but people get *very* upset
+when behaviour changes, so I think we need to have some certainty that
+we're not backing ourselves into a corner where we have to make
+substantial behavioural changes later.
 
-Sebastian
+Surely we can figure out how this works on other architectures today?
 
+There's a substantial argument for aligning with x86, so can we figure
+out under which conditions x86 would provide guest samples? e.g. is that
+always, never, or when certain attr options are configured?
+
+> > It's not clear to me how this works across architectures, and we should
+> > have some idea of how this would work (e.g. if we're going to require
+> > new ABI or not), so that we don't have to break ABI later on.
+> 
+> BRBE HW does not have any guest filter in itself, unless BRBCR_EL2 gets
+> migrated across BRBCR_EL1 during guest transition, guest branch records
+> would not be captured.
+> 
+> event->attr.exclude_guest = 0 could have been denied during armpmu_add()
+> for preventing events with guest branch sample requests being scheduled
+> on the PMU. But it turns out to be not a very reliable parameter in that
+> sense as well.
+> 
+> event->attr.exclude_guest = 0 remains clear even for a standard session.
+> 
+> ./perf record -e instructions:k -j any_call,save_type ls
+> 
+> perf tools will need some changes in order to avoid the above scenarios
+> as a default behaviour which would not be desirable as well.
+
+If we're liable to need perf tool changes, then we *definitely* need to
+understand this better.
+
+> These semantics could be worked out later on when BRBE guest support gets
+> included, and the current proposal would not prevent any potential future
+> changes in this regard.
+
+That depends entirely on what changes we'd expect would be necessary in
+the perf tools. We need to be certain that we don't enable some use case
+that subseuqent changes break.
+
+Mark.
