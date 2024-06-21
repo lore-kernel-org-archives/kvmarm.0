@@ -1,20 +1,20 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14E8D20314;
-	Fri, 21 Jun 2024 17:07:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94A9D3EA66;
+	Fri, 21 Jun 2024 17:16:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718989661; cv=none; b=sBxCCh298fQpKHUNz+mM+ZwedFvABn6Q3QU29WnIXf961cewHi3rKM/eIkMA1nOTmGdDHZCX0P3UGE96dm/Lq8ZMAt8niHOMFyJ92YCInP5gHfy1MigoDX9vfd6rjk9Cp6+6TsYIMG9gQPjCDgWJsN04JyT9Qo8EgWYFgunKHyU=
+	t=1718990160; cv=none; b=lMJ0xtWDyekMk1H/XNFHVda/yrrAMdpSKKLgvGKq2gks8JsH1rbgOQ5Nv2amvI00Xl07+bYm+PZ9euMpZWi7ZUDu6KNnOkgeJ3KodzPl3rSQswNQWSsTdH1QHtr+XSBJWae+IOgOcRL5hCO00zzAeSNqip4vpT9MRvtRPy6R5L0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718989661; c=relaxed/simple;
-	bh=X+jc+6nTJUN9R7eBEkca2bkre1ujOjmzla1sbAkxzng=;
+	s=arc-20240116; t=1718990160; c=relaxed/simple;
+	bh=pBfUXzmpeYWnnxlVdF2pvrod1hAudHmhO1lCmGe2tSM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fDlaoAqo+98BtlP5lCZnf6tMMVz4nJ2FOAOLUhJ8jcNmplz18fH78pwa78r3vcMyycxSjvwzLvhObubF/jzrPT7kwi2IwSJ3d/myDEN3JaLE6OYTnbk6liS3Xe0NrpeNlmK2LKuM2zSNw3SS7kBT61Jv2X1SVm5Z2LLd8nwgbY0=
+	 Content-Type:Content-Disposition:In-Reply-To; b=ByXfMK9V0W/I2pmdOPvt+ldwPquDZl7sMM2OGjmVWraa2YJMVc2k309VdBV1MzfUwjd9c3eOAtb7/BJiAYuJXqKeQLMYMLhj2nMWsEw/5tlfUoj6mopZgKTxiBQHfCkmCUGRi4CN+Y2RZNxKAF+4BTZfWm5ZnsPGfJ1hFp8Hxf8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9058C3277B;
-	Fri, 21 Jun 2024 17:07:36 +0000 (UTC)
-Date: Fri, 21 Jun 2024 18:07:34 +0100
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE3ADC2BBFC;
+	Fri, 21 Jun 2024 17:15:55 +0000 (UTC)
+Date: Fri, 21 Jun 2024 18:15:53 +0100
 From: Catalin Marinas <catalin.marinas@arm.com>
 To: Joey Gouly <joey.gouly@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
@@ -27,10 +27,10 @@ Cc: linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
 	oliver.upton@linux.dev, shuah@kernel.org, szabolcs.nagy@arm.com,
 	tglx@linutronix.de, will@kernel.org, x86@kernel.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 06/29] arm64: context switch POR_EL0 register
-Message-ID: <ZnWzVnbDMqH_-Sk6@arm.com>
+Subject: Re: [PATCH v4 16/29] arm64: add pte_access_permitted_no_overlay()
+Message-ID: <ZnW1SWwXzhBY9Goc@arm.com>
 References: <20240503130147.1154804-1-joey.gouly@arm.com>
- <20240503130147.1154804-7-joey.gouly@arm.com>
+ <20240503130147.1154804-17-joey.gouly@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -39,18 +39,13 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240503130147.1154804-7-joey.gouly@arm.com>
+In-Reply-To: <20240503130147.1154804-17-joey.gouly@arm.com>
 
-On Fri, May 03, 2024 at 02:01:24PM +0100, Joey Gouly wrote:
-> +static void flush_poe(void)
-> +{
-> +	if (!system_supports_poe())
-> +		return;
-> +
-> +	write_sysreg_s(POR_EL0_INIT, SYS_POR_EL0);
-> +	/* ISB required for kernel uaccess routines when chaning POR_EL0 */
+On Fri, May 03, 2024 at 02:01:34PM +0100, Joey Gouly wrote:
+> We do not want take POE into account when clearing the MTE tags.
+> 
+> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will@kernel.org>
 
-Nit: s/chaning/changing/
-
--- 
-Catalin
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
