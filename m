@@ -1,82 +1,91 @@
-Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3946715D1
-	for <kvmarm@lists.linux.dev>; Fri, 21 Jun 2024 22:50:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3801F79DF;
+	Sat, 22 Jun 2024 08:35:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719010257; cv=none; b=JV8EYKx1huIvymbTCGqa2UqhA7s1Puc8f/bLCjBPpYtpS0pc97+5T+3mMfn/opgZVZ+pb/yziskATMfp/r+jzZMO8vALdmt8A6GteyiFBDW44u4sGnUVSY7Amo/PFLgyhOgua1OxACLa2sphwc662hkUc1H6xUck+VMRyIAMYDM=
+	t=1719045306; cv=none; b=aZiTbiB90RvSFRvPkKwAJYW4dID+HrdeuPKQMNUHfjhO7hlUlnbp3nddn7BfFN4NrXXWEYorLm/JkTdIqsPL8vWQFmbICgAS7ytKlCQLUdHgeFP6evD3w76a/1AF3uJ2VrLFuTrXf53sr1OpI76q30f1sn8OLatVLoKy4whvg0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719010257; c=relaxed/simple;
-	bh=WssRw6bC7c07l+/R+5V1RUQ2OSX4YBQrO5UhnBe2Q0A=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HjkYKClngrWe/8eubrsQImocXRT5EZAya1JmhFFh2UD9RU3qKt0TskCoFqz1eXS5ciXAZ5XHlypUMMd7fvOWC5bSS0GcvJshG2b05kv3u5oCoyLNm6QhcJsno3Vp08iR9OkAHeDBFjdvqp36EIP7Fq0uKDClnM09QKwVMnV9Kgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kHjtPmSC; arc=none smtp.client-ip=95.215.58.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1719045306; c=relaxed/simple;
+	bh=8jlN+9cmsrdbwvuoH5q2v8dvcPqa2p/E5So6Wqd8YDo=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hZ6zu2G5PGHS9UxMTBfUOQ8gMx9rgBO3iW6TmLwpd4A+WXSreyPcKvV7QaDkJOR7gOvX+DJn5O3UZ/1g3aOQR2CJLJl3Wls+KvHPzM4d2hsh/sVjKD/flFGjYwglF8cK1gt/Jf6dBdwS/FISLJxW5EcSVfFUSeELD0iy5IeN2sU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IkzXs6VI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kHjtPmSC"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1719010253;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Cq5jbSXcKuwxHk9WCWHT1kVsa3LmunE883tOEVCVOW4=;
-	b=kHjtPmSCDvYLEXVfxpWeNNj7FllsWcQV+KWv5d1eHQuEegjJCkzKpZv6yUvWazLG1dQj5q
-	XJKzDvTkIMKhfTCLkVEuWo+vUl593peesl8fsC7ec3bzzq5d3rCX8gyfdjVonPJxf8bApw
-	84EXaQh2csplk9jDNynY9ULozkGa+zs=
-X-Envelope-To: maz@kernel.org
-X-Envelope-To: james.morse@arm.com
-X-Envelope-To: suzuki.poulose@arm.com
-X-Envelope-To: yuzenghui@huawei.com
-X-Envelope-To: kvm@vger.kernel.org
-X-Envelope-To: oliver.upton@linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IkzXs6VI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFD62C32781;
+	Sat, 22 Jun 2024 08:35:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719045305;
+	bh=8jlN+9cmsrdbwvuoH5q2v8dvcPqa2p/E5So6Wqd8YDo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=IkzXs6VIWffYvSMZ0DNf8czJo/DwdBBEUzxUGM3rYPmsHVnfWaOlOBQxi8Q4iZ1jr
+	 wZ0utq7FzngXFZRVDhcpqWYbdn0+5C9meJTYE8oGM1NhQMiXcMOO/W+2+kW5lYsj82
+	 H8I/nu8995oDQCoagnhANfmyyJ2v1Kt2c+sCGdToCms9zmFSGOMyeqoRWE9MbgwERw
+	 6slA7pZAHcN6WbaPWjDi18lztPSxGtEuotBJOIR3clgIjtytgXZnM/IfsUpieEMtco
+	 ftp3th7thIezv4Fbx+5zaw/V8GuqbZhU9hSQgd7ezdQQoggjrb6BaToC4IOiGlek/z
+	 o8BTN3+40AK7Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sKwD9-006LNv-IJ;
+	Sat, 22 Jun 2024 09:35:03 +0100
+Date: Sat, 22 Jun 2024 09:35:02 +0100
+Message-ID: <86zfrdide1.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	kvm@vger.kernel.org,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH] KVM: selftests: Assert that MPIDR_EL1 is unchanged across vCPU reset
-Date: Fri, 21 Jun 2024 22:50:45 +0000
-Message-ID: <20240621225045.2472090-1-oliver.upton@linux.dev>
+	kvm@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: nv: Unfudge ID_AA64PFR0_EL1 masking
+In-Reply-To: <20240621224044.2465901-1-oliver.upton@linux.dev>
+References: <20240621224044.2465901-1-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-commit 606af8293cd8 ("KVM: selftests: arm64: Test vCPU-scoped feature ID
-registers") intended to test that MPIDR_EL1 is unchanged across vCPU
-reset but failed at actually doing so.
+On Fri, 21 Jun 2024 23:40:44 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> Marc reports that L1 VMs aren't booting with the NV series applied to
+> today's kvmarm/next. After bisecting the issue, it appears that
+> 44241f34fac9 ("KVM: arm64: nv: Use accessors for modifying ID
+> registers") is to blame.
+> 
+> Poking around at the issue a bit further, it'd appear that the value for
+> ID_AA64PFR0_EL1 is complete garbage, as 'val' still contains the value
+> we set ID_AA64ISAR1_EL1 to.
+> 
+> Fix the read-modify-write pattern to actually use ID_AA64PFR0_EL1 as the
+> starting point. Excuse me as I return to my shame cube.
+> 
+> Reported-by: Marc Zyngier <maz@kernel.org>
+> Fixes: 44241f34fac9 ("KVM: arm64: nv: Use accessors for modifying ID registers")
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 
-Add the missing assertion.
+Confirmed, we're back in business.
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- tools/testing/selftests/kvm/aarch64/set_id_regs.c | 1 +
- 1 file changed, 1 insertion(+)
+Acked-by: Marc Zyngier <maz@kernel.org>
+Tested-by: Marc Zyngier <maz@kernel.org>
 
-diff --git a/tools/testing/selftests/kvm/aarch64/set_id_regs.c b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-index 9583c04f1228..d20981663831 100644
---- a/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-+++ b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-@@ -539,6 +539,7 @@ static void test_reset_preserves_id_regs(struct kvm_vcpu *vcpu)
- 	for (int i = 0; i < ARRAY_SIZE(test_regs); i++)
- 		test_assert_id_reg_unchanged(vcpu, test_regs[i].reg);
- 
-+	test_assert_id_reg_unchanged(vcpu, SYS_MPIDR_EL1);
- 	test_assert_id_reg_unchanged(vcpu, SYS_CLIDR_EL1);
- 	test_assert_id_reg_unchanged(vcpu, SYS_CTR_EL0);
- 
+Thanks,
 
-base-commit: a9e3d7734719d5b58f260edc15dce3ea4dc3d313
+	M.
+
 -- 
-2.45.2.741.gdbec12cfda-goog
-
+Without deviation from the norm, progress is not possible.
