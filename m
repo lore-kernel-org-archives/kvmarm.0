@@ -1,140 +1,168 @@
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 464A619B59D
-	for <kvmarm@lists.linux.dev>; Mon, 24 Jun 2024 15:32:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B522D13D628
+	for <kvmarm@lists.linux.dev>; Mon, 24 Jun 2024 15:48:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719243141; cv=none; b=EgMCVmXQSonA6DPBiaL9A0ktRS0N17LpQ9j3IcrMxkiQQ0nTZPc8KNTgyCCNOLS8crT7tbCoTQH1wSJN/DRDbko4fb/xSGR69ztBtupK5jBecj12z9kDFvEMvhwDgzD+RcV0fJuAzBt9WYa/7KyHRyxYXn1nRqKWsWMNTAqx2MY=
+	t=1719244138; cv=none; b=TE8O1X2GxumNppvsVGeG2dkkP5Qy//KeyKYnY+9OI1F/PqcR3NRJOzr+81MgY4uN/rLdgrhwZqJn0UAQGTtBvXpmQvwulO1tXrc5s6h1+w35fpR1EDVyGEkR0B/PQRXqBNbvTOx/K07Y29BuBahmYGIjrabRIn82GXH44hzMKXQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719243141; c=relaxed/simple;
-	bh=WawAVsLJ2wrVp06E1yLAnPzm2a05JueYQ9ExxNigc3k=;
+	s=arc-20240116; t=1719244138; c=relaxed/simple;
+	bh=GqaP3vGD7gvrzGgNXX4qO07+i06y1ReV6MZ9SSpLyZk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Ogl3zIZu4G8khwkYMZcjZfpORzx8DlsaizXnm+uXglf6q2pf0yFUOD2LDUDTtTWXuqqM84qvZpUBYcCURK7dZ0DV0s7G+WZlY+ij9gb2O8AUULjC4mU5JewMfl1HdgIuWCZb+inxFClPUcs+P/Am0BO77V8K8YMBGcS8vIkqgoc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=v1eCKeAM; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=LBMhPp1hBKTUBZZKUwUhy9XE7g2NMY1O9fZY0sRATmaJXfQrAVUH8yCsi1KhJQRgudKSkWxiyYi05r5Hq5AZRVnkZ6BAbDzjOPF5OaB83Z40aOxyTRBKUQuRNafSODc3w5HS5pxVNaZ/t7j28vrDOqQ/TuxrNNdSeNNZ9cY7D3s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HtCxv0vb; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="v1eCKeAM"
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2c8066074b5so2847274a91.1
-        for <kvmarm@lists.linux.dev>; Mon, 24 Jun 2024 08:32:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HtCxv0vb"
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-df771b5e942so8320937276.2
+        for <kvmarm@lists.linux.dev>; Mon, 24 Jun 2024 08:48:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1719243140; x=1719847940; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WawAVsLJ2wrVp06E1yLAnPzm2a05JueYQ9ExxNigc3k=;
-        b=v1eCKeAMNDuWsaJTzRGUpkLXeiHp+BIWMC8FE9rGM+7HsWwZ82VQzhL4UeQIvIMP/q
-         sKf5OJo6oevA0gRiuZ52unFCyQnq6DNDB0xxYKP4eHWG3++fn3Y+IDc00HorKMQ3Cj4o
-         PMwNizsxEcoTvJ7eVKWX+rZ24NJA/3VIHXOHq6us+a8xZFgBF6q0EaOh6SoTaPWWSG/v
-         1V3LCj+8VxMZUlKQkTw0VwbrTucZ3JO0RDI2tRePWLZ/py/hbt7/qyVxyyOkot+pcdeL
-         90ZQx0K9LQN9kv2hPF1wkymK7dBOFMq8HhxqqLuuzuuBiz16bfPIYuI9ME3K7mbrVEvV
-         hm6Q==
+        d=google.com; s=20230601; t=1719244136; x=1719848936; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=w0TfFi1A5eAUOELglH+ORGjDb5xIqjGuRnaKSa2m3Gs=;
+        b=HtCxv0vbBmY2+9yHlwyieFyCkaAmqt2tbYogLDk8re7kiKFsyQ3BXCdCqrnkaq8wDc
+         E/ELxBH6x7+TC6aGQeTh1eyZO0SRrQN5kxSa25v2QsAOhml4dyMJLcd9oU5PSJMFubvL
+         yp3+o++UUNWn+gyFlYIBL3MfkJfcAxstrU0HFfewfM6/TpD3gGyJIZNqL4mEzh31Wmi6
+         buWAqJoDAxA6sSDuEy+BXLuO43Ou5z8Wfc9TJTKmjhbsvI4pLk1/tEehdequ6XkkmnJ3
+         YMxlFmFx/FzzIqyNMH3Ue1Md+yiUWpV+isZ8Bhpi1QBYZU0Qsx5RpnZpEUvCM4jTb+ca
+         D2mQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719243140; x=1719847940;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=WawAVsLJ2wrVp06E1yLAnPzm2a05JueYQ9ExxNigc3k=;
-        b=RlYfjucPpmHz6Vy2QWtHgxFu4KUKXwpkQkFSTpWL1DMYVhXTy4dt5eAC+cISRkLA3p
-         MeAbg6aRgEVlbtAu+mirydKHOZHNBpH/LoXRFe75RMQIgSH/oA8I/WVA0FTdqns2ydd7
-         s65g7qlt6CHKIuPbNDbQBK8F3SNBcYEeV88/+JX2zWtJchQYAb4EbJF6+L4v21jTY2ck
-         8iy9wl31NZXVGiDbepauQrycNwCZ2mS+0p9jLbqdF0HK7jnwb1ubhOWYauYvv6ihiQwd
-         d6kVWtXHg8k2e9spJNSVIwlfcryhjQOo0fVy1wIlYYxHoAlJFBfwh/C//yWFw/vgIZRK
-         DLSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUzgB43K2/isGX3EMVLStcuMMJesHRAMqLOe7ctRYsdP6w28ffJ4+oZwRVY3QD6T077nJ3NY1kOgmQOHKEGGixwMD+JtGCF
-X-Gm-Message-State: AOJu0YwAtOXE+iTtED44EhTpQoilOMpwlmmZC5LZGkQmVHs6tZqjw6f+
-	8z1UVqCfG4YMhp9YmlGd458tJFnekQ5JRi9Wg2lOhHm6HK631zd66LLL6EjThUJ21Y/jRbVmfDq
-	isA==
-X-Google-Smtp-Source: AGHT+IEtazAEW7Z9YwGGcKXL++Dckd0kAEwC6pBQKn1v/nxqOqzOdwWoLb56caKLmrQdFmUesETPkh89cIs=
+        d=1e100.net; s=20230601; t=1719244136; x=1719848936;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=w0TfFi1A5eAUOELglH+ORGjDb5xIqjGuRnaKSa2m3Gs=;
+        b=oMc7dnJP40rXrfap+SvOU1vanQOxtX6ipc1sv/g638kYVF6hydyufVrtr7Yf+6QrFo
+         sH4lWJUX/eLwDkeHPabCuxf8DY1Mst05JkAd/8xMQhtHAJhZGzuiRE/umWfhQ3Ji3Ccy
+         BQS4SWSmSgXVxyDH3rRvSJc96bPSSbLHnXFvWFdauLwERMKuT/vjKI3JQnQttTQgJb6I
+         glaHZ86m6vrYraZc+iMPGGBCraM8OjaN8FNtnbbdo8a9sXYC0rNnvOLkvby7Nt2a9q7I
+         SdGyLmN5Iv5539SJSQ3ogYVL5tlnQ2MroYg9ad6vPRk6KG4ePG6l4e1TeiuRrmuc+q4D
+         Ss8g==
+X-Gm-Message-State: AOJu0YxylNlBDUPM1DWvL5TyyoaHsO3h9u3HBdv1+BohZHySqOcf3hcY
+	gyq5161k1eCcn6H6bmcOiUI8wCCbWoD1npG67VAneKSs6navfjZ8mmtKlmKGJNCYNzYIp5R7p28
+	4nA==
+X-Google-Smtp-Source: AGHT+IF8kv5cg7jBtfLj5KChqQb0E4AVt+N3NAFysUC46dBIyhEpZe/ChMcBWGfHF7p7NpzSNPuuniqMZ0A=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:2ecc:b0:2c6:d13f:3f9e with SMTP id
- 98e67ed59e1d1-2c8489b9ed7mr123696a91.1.1719243139430; Mon, 24 Jun 2024
- 08:32:19 -0700 (PDT)
-Date: Mon, 24 Jun 2024 08:32:18 -0700
-In-Reply-To: <504fa0a7264d4762afda2f13c3525ce5@huawei.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:705:b0:df4:8ecb:ae57 with SMTP id
+ 3f1490d57ef6-e030108f81cmr16300276.10.1719244135814; Mon, 24 Jun 2024
+ 08:48:55 -0700 (PDT)
+Date: Mon, 24 Jun 2024 08:48:54 -0700
+In-Reply-To: <20240208151837.35068-2-shameerali.kolothum.thodi@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20230916003118.2540661-1-seanjc@google.com> <504fa0a7264d4762afda2f13c3525ce5@huawei.com>
-Message-ID: <ZnmRgqD6FmXNNzzI@google.com>
-Subject: Re: [PATCH 00/26] KVM: vfio: Hide KVM internals from others
+References: <20240208151837.35068-1-shameerali.kolothum.thodi@huawei.com> <20240208151837.35068-2-shameerali.kolothum.thodi@huawei.com>
+Message-ID: <ZnmVZo8awnuFdQjz@google.com>
+Subject: Re: [RFC PATCH v2 1/7] KVM: Add generic infrastructure to support
+ pinned VMIDs
 From: Sean Christopherson <seanjc@google.com>
-To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
-	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>, 
-	Peter Zijlstra <peterz@infradead.org>, Arnaldo Carvalho de Melo <acme@kernel.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Tony Krowiak <akrowiak@linux.ibm.com>, 
-	Halil Pasic <pasic@linux.ibm.com>, Jason Herne <jjherne@linux.ibm.com>, 
-	Harald Freudenberger <freude@linux.ibm.com>, Alex Williamson <alex.williamson@redhat.com>, 
-	Andy Lutomirski <luto@kernel.org>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
-	"linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>, 
-	"kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>, 
-	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>, 
-	"linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"linux-perf-users@vger.kernel.org" <linux-perf-users@vger.kernel.org>, Anish Ghulati <aghulati@google.com>, 
-	Venkatesh Srinivas <venkateshs@chromium.org>, Andrew Thornton <andrewth@google.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Cc: kvmarm@lists.linux.dev, iommu@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linuxarm@huawei.com, 
+	kevin.tian@intel.com, jgg@ziepe.ca, alex.williamson@redhat.com, 
+	maz@kernel.org, oliver.upton@linux.dev, will@kernel.org, robin.murphy@arm.com, 
+	jean-philippe@linaro.org, jonathan.cameron@huawei.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Jun 20, 2024, Shameerali Kolothum Thodi wrote:
-> > This is a borderline RFC series to hide KVM's internals from the rest o=
-f
-> > the kernel, where "internals" means data structures, enums, #defines,
-> > APIs, etc. that are intended to be KVM-only, but are exposed everywhere
-> > due to kvm_host.h (and other headers) living in the global include path=
-s.
->
-> Hi Sean,
->=20
-> Just thought of checking with you on this series. Do you have plans to re=
-vive this
-> series?
+On Thu, Feb 08, 2024, Shameer Kolothum wrote:
+> Provide generic helper functions to get/put pinned VMIDs if the arch
+> supports it.
 
-Yep!
+IMO, this has no business being in generic KVM.  Multiple architectures have
+constructs that are _similar_ ARM's VMID, but AFAICT the exact semantics are very
+ARM specific.  I.e. odds are very good that the only thing that can actually use
+kvm_pinned_vmid_get() is the SMMU, because the concept won't fit any other
+architecture.
 
-> The reason I am asking is, on ARM64/KVM side we do have a requirement
-> to share the KVM VMID with SMMUV3. Please see the RFC I sent out earlier =
-this
-> year[1]. The series basically provides a way for KVM to pin a VMID and al=
-so
-> associates an iommufd ctx with a struct kvm * to retrieve that VMID.=20
->=20
-> As mentioned above, some of the patches in this series(especially 1-4 & 6=
-) that
-> does the VFIO cleanups and dropping CONFIG_KVM_VFIO looks very straightfo=
-rward
-> and useful. I am thinking of including those when I re-spin my RFC series=
-, if
-> that=E2=80=99s ok.
+The other issue is that other architectures support building KVM as a module,
+which makes it much more difficult to guarantee the safety of these hooks.
 
-Please don't include them, as the patch they build towards (patch 5) is bug=
-gy[*],
-and I am fairly certain that at least some of the patches will change signi=
-ficantly.
-
-I expect to re-start working on the series in ~2 weeks, and am planning on =
-actively
-pushing the series (i.e. not ignoring it for months on end).
-
-[*] https://lore.kernel.org/all/ZWp_q1w01NCZi8KX@google.com
-
-> Please let me know your thoughts.
->
-> [1]. https://lore.kernel.org/linux-iommu/20240209115824.GA2922446@myrica=
-=20
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> ---
+>  include/linux/kvm_host.h | 18 ++++++++++++++++++
+>  virt/kvm/Kconfig         |  3 +++
+>  virt/kvm/kvm_main.c      | 23 +++++++++++++++++++++++
+>  3 files changed, 44 insertions(+)
+> 
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 7e7fd25b09b3..610e239bea46 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -2311,6 +2311,24 @@ static inline void kvm_handle_signal_exit(struct kvm_vcpu *vcpu)
+>  }
+>  #endif /* CONFIG_KVM_XFER_TO_GUEST_WORK */
+>  
+> +#ifdef CONFIG_HAVE_KVM_PINNED_VMID
+> +int kvm_arch_pinned_vmid_get(struct kvm *kvm);
+> +void kvm_arch_pinned_vmid_put(struct kvm *kvm);
+> +#endif
+> +
+> +#ifdef CONFIG_HAVE_KVM_PINNED_VMID
+> +int kvm_pinned_vmid_get(struct kvm *kvm);
+> +void kvm_pinned_vmid_put(struct kvm *kvm);
+> +#else
+> +static inline int kvm_pinned_vmid_get(struct kvm *kvm)
+> +{
+> +	return -EINVAL;
+> +}
+> +
+> +static inline void kvm_pinned_vmid_put(struct kvm *kvm)
+> +{
+> +}
+> +#endif
+>  /*
+>   * If more than one page is being (un)accounted, @virt must be the address of
+>   * the first page of a block of pages what were allocated together (i.e
+> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+> index 184dab4ee871..a3052c8e3ac4 100644
+> --- a/virt/kvm/Kconfig
+> +++ b/virt/kvm/Kconfig
+> @@ -108,3 +108,6 @@ config KVM_GENERIC_PRIVATE_MEM
+>         select KVM_GENERIC_MEMORY_ATTRIBUTES
+>         select KVM_PRIVATE_MEM
+>         bool
+> +
+> +config HAVE_KVM_PINNED_VMID
+> +       bool
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 10bfc88a69f7..f84d6da5f464 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -3918,6 +3918,29 @@ bool kvm_vcpu_wake_up(struct kvm_vcpu *vcpu)
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_vcpu_wake_up);
+>  
+> +#ifdef CONFIG_HAVE_KVM_PINNED_VMID
+> +int kvm_pinned_vmid_get(struct kvm *kvm)
+> +{
+> +	int ret;
+> +
+> +	if (!kvm_get_kvm_safe(kvm))
+> +		return -ENOENT;
+> +	ret  = kvm_arch_pinned_vmid_get(kvm);
+> +	if (ret < 0)
+> +		kvm_put_kvm(kvm);
+> +
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_pinned_vmid_get);
+> +
+> +void kvm_pinned_vmid_put(struct kvm *kvm)
+> +{
+> +	kvm_arch_pinned_vmid_put(kvm);
+> +	kvm_put_kvm(kvm);
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_pinned_vmid_put);
+> +#endif
+> +
+>  #ifndef CONFIG_S390
+>  /*
+>   * Kick a sleeping VCPU, or a guest VCPU in guest mode, into host kernel mode.
+> -- 
+> 2.34.1
+> 
