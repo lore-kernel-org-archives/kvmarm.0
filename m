@@ -1,174 +1,129 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 045C41A01CD;
-	Mon, 24 Jun 2024 19:34:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B6A013D610
+	for <kvmarm@lists.linux.dev>; Mon, 24 Jun 2024 19:51:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719257688; cv=none; b=iOzAJkZt64MAUn8PcBMGw8AGYVIWLuL3KvPTf4ciCWj2SXmlfFmYiFTIUhNz15Sc6gYEWf2xc/xsZF6QHo6nHtXGfPKwxOVyCppqPuj9VXqmUREeEey5No/LcshqXg4OW50i3gtzEseDCJgb/rDOEIYwdvv//PsMh4DHusLx+/c=
+	t=1719258706; cv=none; b=VVSPkFh29mTGGWzSToqjxoIJDgGvWcgYDpEmg5/JLPWZrmmGSaVMFjoj51l3/cVFgcZPb60H51vkuug6kgsIuUttOBYP1GRQO1Ro31r26o7/DD3WuDMrePNGj9vme4nZgr77VjmtNADLirhmSaVEJgZORvaIvJtibOxaCDQ6MTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719257688; c=relaxed/simple;
-	bh=8t9uR2Qp4QcE+tK7B/+CSTZzS6eAQ5JnRtkOeSYjS8s=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=qDh4hRREBfHtuw0o/OpxuSeWUM7oWIVfYH1F8sgcvHDliDGcbk7IDjLDwsynfQfE0JNb1oRahLeofEhXZV8DLQ+2KFpX66pBRPCDeuP/LgT4O4FDC5iPNvjp0A+EwV7A99RWQFkEVPNmBGx71W4k/SC+1Qm1SrLBeez+NE7kvW4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.216])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4W7J5p6Cd9z6K9gr;
-	Tue, 25 Jun 2024 03:33:02 +0800 (CST)
-Received: from lhrpeml500006.china.huawei.com (unknown [7.191.161.198])
-	by mail.maildlp.com (Postfix) with ESMTPS id B89FF140519;
-	Tue, 25 Jun 2024 03:34:42 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
- lhrpeml500006.china.huawei.com (7.191.161.198) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 24 Jun 2024 20:34:42 +0100
-Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
- lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.039;
- Mon, 24 Jun 2024 20:34:42 +0100
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-CC: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, "iommu@lists.linux.dev"
-	<iommu@lists.linux.dev>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, Linuxarm <linuxarm@huawei.com>,
-	"kevin.tian@intel.com" <kevin.tian@intel.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>, "maz@kernel.org"
-	<maz@kernel.org>, "will@kernel.org" <will@kernel.org>, "robin.murphy@arm.com"
-	<robin.murphy@arm.com>, "jean-philippe@linaro.org"
-	<jean-philippe@linaro.org>, Jonathan Cameron <jonathan.cameron@huawei.com>
-Subject: RE: [RFC PATCH v2 2/7] KVM: arm64: Introduce support to pin VMIDs
-Thread-Topic: [RFC PATCH v2 2/7] KVM: arm64: Introduce support to pin VMIDs
-Thread-Index: AQHaWqKYmx5fQRdWqUK/xtfkrTETwbHYEaEAgAARp0A=
-Date: Mon, 24 Jun 2024 19:34:42 +0000
-Message-ID: <99b822b154504531b490055bc0f4006c@huawei.com>
+	s=arc-20240116; t=1719258706; c=relaxed/simple;
+	bh=q2WBJnhH06ouZm8Yf9leo2iRfs5owP0mh5zgEjl6mAM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mMpY2KEhhu1znMw1NpDGImdlf7Mus3G5OczfO01oxMXjJlVA5aB7IrXe1uo/BSGy3XqY1exEAb4sGKKLAsAp/nPe7hUSm2s4mHdhNAGvs1GVxC0HaVo6JS6J3nODZ7mvy6YHStR4JzWRzZq+PZQld5PPZ09WzmDMmjZ9EmoMw0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qGYwucPW; arc=none smtp.client-ip=91.218.175.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qGYwucPW"
+X-Envelope-To: seanjc@google.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1719258702;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=a/ily8zf1tNre6lVxEBeVHCfF/n+Ja8rvulfaJ3WRUQ=;
+	b=qGYwucPWKDCqh/dFigzwobI4DeD5oo95P6PExM/FKc4f+duoEbiRNtqreNlECzap2I3xCQ
+	v4hlHuuNz9//plF3i1SFKohXnx5n9xIscUujSCTA6QwZjdLjqMsspRotEF3v9geC6VSRHY
+	T6fucsBfDelkh6doVRdWKflCAggG9nk=
+X-Envelope-To: jgg@ziepe.ca
+X-Envelope-To: shameerali.kolothum.thodi@huawei.com
+X-Envelope-To: kvmarm@lists.linux.dev
+X-Envelope-To: iommu@lists.linux.dev
+X-Envelope-To: linux-arm-kernel@lists.infradead.org
+X-Envelope-To: linuxarm@huawei.com
+X-Envelope-To: kevin.tian@intel.com
+X-Envelope-To: alex.williamson@redhat.com
+X-Envelope-To: maz@kernel.org
+X-Envelope-To: will@kernel.org
+X-Envelope-To: robin.murphy@arm.com
+X-Envelope-To: jean-philippe@linaro.org
+X-Envelope-To: jonathan.cameron@huawei.com
+Date: Mon, 24 Jun 2024 12:51:34 -0700
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	kvmarm@lists.linux.dev, iommu@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linuxarm@huawei.com,
+	kevin.tian@intel.com, alex.williamson@redhat.com, maz@kernel.org,
+	will@kernel.org, robin.murphy@arm.com, jean-philippe@linaro.org,
+	jonathan.cameron@huawei.com
+Subject: Re: [RFC PATCH v2 4/7] iommufd: Associate kvm pointer to iommufd ctx
+Message-ID: <ZnnORmCHrEI0KkGz@linux.dev>
 References: <20240208151837.35068-1-shameerali.kolothum.thodi@huawei.com>
- <20240208151837.35068-3-shameerali.kolothum.thodi@huawei.com>
- <ZnnHbM0p8amCqkeJ@linux.dev>
-In-Reply-To: <ZnnHbM0p8amCqkeJ@linux.dev>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ <20240208151837.35068-5-shameerali.kolothum.thodi@huawei.com>
+ <20240208154210.GP31743@ziepe.ca>
+ <ZnmkbOfWBJHrO2sx@google.com>
+ <20240624170747.GA1515249@ziepe.ca>
+ <Znmy3QPAUIX9SnGx@google.com>
+ <20240624180148.GV791043@ziepe.ca>
+ <ZnnFML-P1dzHdraI@linux.dev>
+ <ZnnJA3ueCXsDtyB7@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZnnJA3ueCXsDtyB7@google.com>
+X-Migadu-Flow: FLOW_OUT
 
+On Mon, Jun 24, 2024 at 12:29:07PM -0700, Sean Christopherson wrote:
+> On Mon, Jun 24, 2024, Oliver Upton wrote:
+> > On Mon, Jun 24, 2024 at 03:01:48PM -0300, Jason Gunthorpe wrote:
+> > > If KVM can change VMID on the fly then that is a further complication
+> > > :\
+> 
+> Ya, as written today, KVM doesn't assign a VMID when the VM is created, and instead
+> allocates VMIDs on-demand when a vCPU is run.
+> 
+> The KVM changes in this series allow "pinning" the currently assigned VMID, i.e.
+> tries to address that further complication.  But because of the on-demand
+> allocation, there might not be a currently assigned VMID for VM, or the VMID might
+> be stale, i.e. re-assigned to a different VM.
+> 
+> Thus, kvm_arm_pinned_vmid_get() can effectively trigger VMID allocations, and
+> thus cgroup charging and failure.
+> 
+> If I'm reading the ARM code correctly, the intent is to cycle through VMIDs as  
+> necessary so that it's possible for every actively running VM to have a VMID.
+> And maybe also to also minimize the number of TLB + I$ invalidations?
 
+The commentary about TLBIs + I$ invalidations is in relation to how
+rollover is handled. The kernel's ASID allocator does some deferred
+invalidation, the VMID allocator does some eager invalidation at rollover
+because it is believed to be a rarer occurrence.
 
-> -----Original Message-----
-> From: Oliver Upton <oliver.upton@linux.dev>
-> Sent: Monday, June 24, 2024 8:22 PM
-> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-> Cc: kvmarm@lists.linux.dev; iommu@lists.linux.dev; linux-arm-
-> kernel@lists.infradead.org; Linuxarm <linuxarm@huawei.com>;
-> kevin.tian@intel.com; jgg@ziepe.ca; alex.williamson@redhat.com;
-> maz@kernel.org; will@kernel.org; robin.murphy@arm.com; jean-
-> philippe@linaro.org; Jonathan Cameron <jonathan.cameron@huawei.com>
-> Subject: Re: [RFC PATCH v2 2/7] KVM: arm64: Introduce support to pin
-> VMIDs
->=20
-> Hi Shameer,
->=20
-> On Thu, Feb 08, 2024 at 03:18:32PM +0000, Shameer Kolothum wrote:
->=20
-> [...]
->=20
-> > +unsigned long kvm_arm_pinned_vmid_get(struct kvm_vmid *kvm_vmid)
-> > +{
-> > +	unsigned long flags;
-> > +	u64 vmid;
-> > +
-> > +	if (!pinned_vmid_map)
-> > +		return 0;
->=20
-> Like I'd mentioned over in the other thread, returning 0 for error
-> conditions is rather confusing unless one is staring at the VMID
-> allocator code.
+But generally speaking, it's what you expect, we have some structures in
+hardware that use VMID to form a tag, and we wnat to avoid blasting them
+if at all possible.
 
-Agree. It gives the impression VMID 0 is valid.
+> > > 
+> > > > Hmm, kvm_arm_pinned_vmid_get() doesn't fail, it just falls back to VMID=0.  Which
+> > > > seems odd.
+> > 
+> > This is bleeding a bit of implementation detail where VMID=0 is known to
+> > be reserved (thus invalid), it'd probably be better if the
+> > implementation actually just returned an error.
+> 
+> Oof, I assumed using VMID=0 just caused a loss of performance, but this makes
+> it sound like the IOMMU mappings will fault?
 
->=20
-> Can you rework this to return an actual error (e.g. -EINVAL) on failure?
+Bit worse than that :)
 
-Ok.
+Having the SMMU participate in broadcast TLB maintenance means TLBI
+instructions on the CPU invalidate translations in the SMMU, which is
+useful for SVA usecases. However, if the host is using different VMIDs
+for the CPU and SMMU, then guest TLBIs no longer match the guest's SMMU
+context...
 
->=20
-> > +	raw_spin_lock_irqsave(&cpu_vmid_lock, flags);
-> > +
-> > +	vmid =3D atomic64_read(&kvm_vmid->id);
-> > +
-> > +	if (refcount_inc_not_zero(&kvm_vmid->pinned))
-> > +		goto out_unlock;
-> > +
-> > +	if (nr_pinned_vmids >=3D max_pinned_vmids) {
-> > +		vmid =3D 0;
-> > +		goto out_unlock;
-> > +	}
->=20
-> You need to decrement the refcount in this error path.
+Pinning / sharing the VMID between CPU and SMMU is a hard requirement if
+you advertise BTM support to the guest.
 
-Hmm..do we? We are here means refcount is zero, right?
-
->=20
-> > +
-> > +	/*
-> > +	 * If we went through one or more rollover since that VMID was
-> > +	 * used, make sure it is still valid, or generate a new one.
-> > +	 */
-> > +	if (!vmid_gen_match(vmid))
-> > +		vmid =3D new_vmid(kvm_vmid);
-> > +
-> > +	nr_pinned_vmids++;
-> > +	__set_bit(vmid2idx(vmid), pinned_vmid_map);
-> > +	refcount_set(&kvm_vmid->pinned, 1);
-> > +
-> > +out_unlock:
-> > +	raw_spin_unlock_irqrestore(&cpu_vmid_lock, flags);
-> > +
-> > +	vmid &=3D ~VMID_MASK;
-> > +
-> > +	return vmid;
-> > +}
-> > +
-> > +void kvm_arm_pinned_vmid_put(struct kvm_vmid *kvm_vmid)
-> > +{
-> > +	unsigned long flags;
-> > +	u64 vmid =3D atomic64_read(&kvm_vmid->id);
-> > +
-> > +	if (!pinned_vmid_map)
-> > +		return;
-> > +
-> > +	raw_spin_lock_irqsave(&cpu_vmid_lock, flags);
-> > +
-> > +	if (refcount_dec_and_test(&kvm_vmid->pinned)) {
-> > +		__clear_bit(vmid2idx(vmid), pinned_vmid_map);
-> > +		nr_pinned_vmids--;
-> > +	}
-> > +
-> > +	raw_spin_unlock_irqrestore(&cpu_vmid_lock, flags);
-> > +}
-> > +
-> >  /*
-> >   * Initialize the VMID allocator
-> >   */
-> > @@ -191,10 +263,20 @@ int __init kvm_arm_vmid_alloc_init(void)
-> >  	if (!vmid_map)
-> >  		return -ENOMEM;
-> >
-> > +	pinned_vmid_map =3D bitmap_zalloc(NUM_USER_VMIDS,
-> GFP_KERNEL);
-> > +	nr_pinned_vmids =3D 0;
-> > +
-> > +	/*
-> > +	 * Ensure we have at least one emty slot available after rollover
->=20
-> typo: empty
-
+-- 
 Thanks,
-Shameer
+Oliver
