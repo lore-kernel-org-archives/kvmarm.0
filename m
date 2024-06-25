@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F17916C684;
-	Tue, 25 Jun 2024 13:35:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD6FB16E879;
+	Tue, 25 Jun 2024 13:35:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719322525; cv=none; b=M2vRN0C4jL0H3PNTiSQgUdFz10KjxhPuEfR27j4M3FaKkoqFS5ee7zO7w6v1QAGYpw0FLsyPsdOwgkAVmdtXoK6kDV8BmQ91SA8HGgM9lp5DyWgctU/nFICOSU6f45fF/H14ozAbeO7jvNGBqfbdWt5nb2EZiJlvGqn46qMmi0g=
+	t=1719322525; cv=none; b=p6AaR1eSERnRRM0nxZGq1PiMJHvipXgf8FVWloaIVjZBGYs2iIuSGymhrmqIMDoXSbEa9fJFn/BuOkODee1GtV8x0KGx7ygmL4pbewsB6lB9C19uZVRpUi3/y2TfmjgXQAeyOVTopS1jTED8Hd/aZ28IQoyx2WTRTOPfL19/AY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1719322525; c=relaxed/simple;
-	bh=de5Lj1pevoVMn753FTewXOjvi0z3RxqGLbk+fPFuegw=;
+	bh=O2khzE1fdyGIte4KZD309c05XGX8LSqpr8bp0t6E7fg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Ro51co2Gqw/V3WJnFwzY7RE0oARCX5M1Oo+ZmCItYLDik29XW18jHCZOgKGmdYt94YWlLcmddSsGfOemAp08fRVU1vMeGf2RQrw0HFnhmAMriovcXOWJKEnezJEqGnnYaO4h1dGTgL+JxG85cjfzL8zi5Nfx1xWDADmFa7kVXZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pHy0NuGp; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=aYnsP876qEhP4kI5YeoWR4LWMDKdf1IsTa4cZPy1oO5goFBEhci4nNRhNXmPuM3dyit4x7PE7Ti+GEktUhnDbk2DEFkqY+I1rPkIUcUMSK/ecGlZsvYs6DLj0i1cwNQn8AD8zyPWPBu+QU2gfo0VLn7VikcztsXFoaPCnLWFKhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lLX+nqOH; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pHy0NuGp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20F82C4AF12;
-	Tue, 25 Jun 2024 13:35:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lLX+nqOH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CE0CC32781;
+	Tue, 25 Jun 2024 13:35:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719322525;
-	bh=de5Lj1pevoVMn753FTewXOjvi0z3RxqGLbk+fPFuegw=;
+	s=k20201202; t=1719322524;
+	bh=O2khzE1fdyGIte4KZD309c05XGX8LSqpr8bp0t6E7fg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pHy0NuGpJIYywB8F5GPKsPikRNpJ+kQLbRP9XVsB8251LDsBZdwqKr7xQ2B7azBil
-	 FSgoyJWEDaku94x+lOfa3wZH/Z0s40MseiN6Zu2fp8KlbxmAdNPueaFgLxT6RdV1ni
-	 mRTwiUyum5lKrx8WY2zLtzvmOv6dxprMKMjGUddg1p/44yJDGT63+5a7/XYmJyjFPO
-	 IzLqRGtTT4JeQNdz9l0D9nJ/BC4Qb4o0Xwqxf6pnFErJacPq4o2aFTQVhhuoQIT320
-	 JLeelokZLCADVFBLWDGBA0oJwBea/h3IOFTEaXP79mxMBVb4O0YG8w4bKzqJgWXc14
-	 DMfb1zfqHwC5A==
+	b=lLX+nqOHNTx8D/kGeB8eYVf0gddOZM7yDKUgumJ/Y+vK102AnxX16Y909cO5qVgG2
+	 d/nC8/ievD3Ub4VpqW1u7IKU8PSSJ9D9qW9//T9s3waeq53+yZr84akLWXBGrrUKp7
+	 tI/gg0Fy+vUD3AicZsKY+eGD3RPB5J+bF1if+yx0qPpxykMD6TK8JqJdkMRC/Zlx2y
+	 zZYE8W+yXJrd/6khoRakP+xS0+gUXaxZADp5RQVCaPM4mlxUN/jvfKsxmHfsuZQLbv
+	 7ZRI7yLTnPgmxw1EG5ljztSTyrjl+25sIex3uLMrCfjYNqZ6AOKzSHL0lHxSNzuP2g
+	 Rm+dyyzkaWvag==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sM6KR-007A6l-DZ;
-	Tue, 25 Jun 2024 14:35:23 +0100
+	id 1sM6KQ-007A6l-No;
+	Tue, 25 Jun 2024 14:35:22 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -41,9 +41,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Joey Gouly <joey.gouly@arm.com>
-Subject: [PATCH 09/12] KVM: arm64: nv: Make ps_to_output_size() generally available
-Date: Tue, 25 Jun 2024 14:35:08 +0100
-Message-Id: <20240625133508.259829-10-maz@kernel.org>
+Subject: [PATCH 05/12] KVM: arm64: make kvm_at() take an OP_AT_*
+Date: Tue, 25 Jun 2024 14:35:04 +0100
+Message-Id: <20240625133508.259829-6-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240625133508.259829-1-maz@kernel.org>
 References: <20240625133508.259829-1-maz@kernel.org>
@@ -59,62 +59,57 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Make this helper visible to at.c, we are going to need it.
+From: Joey Gouly <joey.gouly@arm.com>
 
+To allow using newer instructions that current assemblers don't know about,
+replace the `at` instruction with the underlying SYS instruction.
+
+Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will@kernel.org>
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_nested.h | 14 ++++++++++++++
- arch/arm64/kvm/nested.c             | 14 --------------
- 2 files changed, 14 insertions(+), 14 deletions(-)
+ arch/arm64/include/asm/kvm_asm.h       | 3 ++-
+ arch/arm64/kvm/hyp/include/hyp/fault.h | 2 +-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index b2fe759964d83..c7adbddbab33a 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -205,4 +205,18 @@ static inline u64 kvm_encode_nested_level(struct kvm_s2_trans *trans)
- 	return FIELD_PREP(KVM_NV_GUEST_MAP_SZ, trans->level);
- }
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index 2181a11b9d925..25f49f5fc4a63 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -10,6 +10,7 @@
+ #include <asm/hyp_image.h>
+ #include <asm/insn.h>
+ #include <asm/virt.h>
++#include <asm/sysreg.h>
  
-+static inline unsigned int ps_to_output_size(unsigned int ps)
-+{
-+	switch (ps) {
-+	case 0: return 32;
-+	case 1: return 36;
-+	case 2: return 40;
-+	case 3: return 42;
-+	case 4: return 44;
-+	case 5:
-+	default:
-+		return 48;
-+	}
-+}
-+
- #endif /* __ARM64_KVM_NESTED_H */
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 73544e0e64dcb..a77b3181cd65d 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -103,20 +103,6 @@ struct s2_walk_info {
- 	bool	     be;
- };
- 
--static unsigned int ps_to_output_size(unsigned int ps)
--{
--	switch (ps) {
--	case 0: return 32;
--	case 1: return 36;
--	case 2: return 40;
--	case 3: return 42;
--	case 4: return 44;
--	case 5:
--	default:
--		return 48;
--	}
--}
--
- static u32 compute_fsc(int level, u32 fsc)
- {
- 	return fsc | (level & 0x3);
+ #define ARM_EXIT_WITH_SERROR_BIT  31
+ #define ARM_EXCEPTION_CODE(x)	  ((x) & ~(1U << ARM_EXIT_WITH_SERROR_BIT))
+@@ -259,7 +260,7 @@ extern u64 __kvm_get_mdcr_el2(void);
+ 	asm volatile(							\
+ 	"	mrs	%1, spsr_el2\n"					\
+ 	"	mrs	%2, elr_el2\n"					\
+-	"1:	at	"at_op", %3\n"					\
++	"1:	" __msr_s(at_op, "%3") "\n"				\
+ 	"	isb\n"							\
+ 	"	b	9f\n"						\
+ 	"2:	msr	spsr_el2, %1\n"					\
+diff --git a/arch/arm64/kvm/hyp/include/hyp/fault.h b/arch/arm64/kvm/hyp/include/hyp/fault.h
+index 9e13c1bc2ad54..487c06099d6fc 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/fault.h
++++ b/arch/arm64/kvm/hyp/include/hyp/fault.h
+@@ -27,7 +27,7 @@ static inline bool __translate_far_to_hpfar(u64 far, u64 *hpfar)
+ 	 * saved the guest context yet, and we may return early...
+ 	 */
+ 	par = read_sysreg_par();
+-	if (!__kvm_at("s1e1r", far))
++	if (!__kvm_at(OP_AT_S1E1R, far))
+ 		tmp = read_sysreg_par();
+ 	else
+ 		tmp = SYS_PAR_EL1_F; /* back to the guest */
 -- 
 2.39.2
 
