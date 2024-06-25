@@ -1,35 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 980A114A60D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 980651DFC5;
 	Tue, 25 Jun 2024 13:00:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719320449; cv=none; b=nG6h6mxZRW/k1OB1qTBB8/R+f/9DmQJgyLhjca6s6YLA5OUNqUJ3I0vXYikB3W9j8Z7BV6YEUAWudqtv0W95tIGXV+vEjQanvck/AtEbmkyomdzfzQBGguIHk/Yi0Ax0+CvZmlF7frBh079Fndc2yDM4eSTQ4Cy+vijc9ZZxuHo=
+	t=1719320449; cv=none; b=PbTt9ScTuOPicVATuhGjDX2WMdeFIHtb/3YIHd8oyxOLSSMTy0r6RpaZvOtFEAkmjbhixCHuUMtTZQuTfNKpdq3webbWVMWwSjEG8mZzkAeXhMeWsLNJfC3kJjhdYvZO66YFtalivR2fLaiqehxmf0IIk1gKojrVvmgBjl6jMdQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1719320449; c=relaxed/simple;
-	bh=tW2UPTksFmsVW9kguIKpPtXZeO0+Rs1arm33m9xPMWA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=SFmrakSWwU4zHSeA7iLpQvRowmvXl5Fj5chRYoHjQPYABTP6lmmIQln2ghGSkeVxmLEMu3jRoGfKt8rLTuZ4YZ6Alxl5YvfLbE2cs+HTvuIxRz+fvsxArk7zqVSY44MrovbrZReUP9wRkrUDB1qvt19vQhMkNj9A9v75U7IE02w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eUZSAp+y; arc=none smtp.client-ip=10.30.226.201
+	bh=LULpueO0jZsesKVwJsPjTXcMFrz6B1Z4uMKe90FdyLY=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=Zcjj2HQK/eTkeIrrWRUPyJG8mhv2MZArNmjiThx/6yYWYfuQO9T/T1UXgYYnUrGwOe+EgstkrJKPWSGE5wf5GCSbZBc+CRRyT2KUeWV3TnM31jmVRFyQPATBM9yoVGZWDFEHRCPR3Oc2xvhKaVTQYiSFlimJs0oLAPM2IIGKMcg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cXOQh/+I; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eUZSAp+y"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38FAAC32786;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cXOQh/+I"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B591C4AF09;
 	Tue, 25 Jun 2024 13:00:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1719320449;
-	bh=tW2UPTksFmsVW9kguIKpPtXZeO0+Rs1arm33m9xPMWA=;
-	h=From:To:Cc:Subject:Date:From;
-	b=eUZSAp+ycRnGJMiDSYC0XoN1/IsgOs4Lj+pSvlfTpwIAJlvi/qxaRInxcttaOafqN
-	 +ZkrRaFosyg7DLlrFDF4gWjprTa4LgKJPMUBvpx5zfLPnzdYVXUBphyruZGVxFEEMR
-	 r65FHUoJ50mOMrtC2EqFR5uYKCZq1b0P01lM/sJhI0NAJ1fG0m8Zm/Y4Bmhwu8MMhe
-	 1KHEd2BfrPOx1Sv4Ie7wxtGfYwpWe7yG/qf4x6L5Z+eSqLoX3GN5GLDoIkQdZw3zPh
-	 0iW+zzZgHDh9ySab04f3wxH4KLWBMyw/wXkA9hkK+o9Q0Vvceog92y7Bs3XQS30QmO
-	 bbyKAyaxTUc6A==
+	bh=LULpueO0jZsesKVwJsPjTXcMFrz6B1Z4uMKe90FdyLY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=cXOQh/+IUA9MXLB270T1KWLZGkZp1tFr8+N90RNOcYoqfu8WZ8vZzAEOrjhX+YUq7
+	 2Xb3JuWSd+/KIsW3bONJK1XFcmFDe8Z4csStJGz7KVDFaYqGIANrhsaNXX8eDhEOES
+	 HJglvSFLyvprzQOh0bXg9HOIEQJttgLTCudDc3xe/3WAxtQtHmyEvhos5cOGKN70Bq
+	 LGTLe4biTbIFOT9SN3BUr6Z61tvqGN7g6xXk4iJQwhXHE3br+dfqSwAyXR5dE45g7R
+	 sGl8SrujFeRtl35LtSkYPGxSvl2bCTjx7actRE7KMuH1u1VzDdGstFkJ3lnVLr7/X4
+	 p7snbLuc+Nbtw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sM5mw-0079X4-SF;
+	id 1sM5mx-0079X4-E3;
 	Tue, 25 Jun 2024 14:00:47 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -40,10 +41,12 @@ Cc: James Morse <james.morse@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Joey Gouly <joey.gouly@arm.com>
-Subject: [PATCH 0/5] KVM: arm64: Fix handling of TCR2_EL1
-Date: Tue, 25 Jun 2024 14:00:36 +0100
-Message-Id: <20240625130042.259175-1-maz@kernel.org>
+Subject: [PATCH 2/5] KVM: arm64: Get rid of HCRX_GUEST_FLAGS
+Date: Tue, 25 Jun 2024 14:00:38 +0100
+Message-Id: <20240625130042.259175-3-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240625130042.259175-1-maz@kernel.org>
+References: <20240625130042.259175-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -56,34 +59,53 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-As I'm inching towards supporting FEAT_S1PIE in a NV guest (oh, the
-fun I'm having!), it has become obvious that we're missing the basics
-when it comes to:
+HCRX_GUEST_FLAGS gives random KVM hackers the impression that
+they can stuff bits in this macro and unconditionally enable
+features in the guest.
 
-- VM configuration: HCRX_EL2.TCR2En is forced to 1, and we blindly
-  save/restore stuff.
+In general, this is wrong (we have been there with FEAT_MOPS,
+and again with FEAT_TCRX).
 
-- trap bit description and routing: none, obviously, since we make a
-  point in not trapping.
+Document that HCRX_EL2.SMPME is an exception rather than the rule,
+and get rid of HCRX_GUEST_FLAGS.
 
-Given that these are prerequisites for the NV work and that we should
-have had that from the beginning, I would like to plug them before
-piling more patches on top.
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/include/asm/kvm_arm.h | 1 -
+ arch/arm64/kvm/sys_regs.c        | 8 +++++++-
+ 2 files changed, 7 insertions(+), 2 deletions(-)
 
-
-Marc Zyngier (5):
-  KVM: arm64: Correctly honor the presence of FEAT_TCRX
-  KVM: arm64: Get rid of HCRX_GUEST_FLAGS
-  KVM: arm64: Make TCR2_EL1 save/restore dependent on the VM features
-  KVM: arm64: Make PIR{,E0}_EL1 save/restore conditional on FEAT_TCRX
-  KVM: arm64: Honor trap routing for TCR2_EL1
-
- arch/arm64/include/asm/kvm_arm.h           |  1 -
- arch/arm64/kvm/emulate-nested.c            | 13 ++++++++
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 35 +++++++++++++++-------
- arch/arm64/kvm/sys_regs.c                  | 17 ++++++++++-
- 4 files changed, 54 insertions(+), 12 deletions(-)
-
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index e6682a3ace5af..d81cc746e0ebd 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -102,7 +102,6 @@
+ #define HCR_HOST_NVHE_PROTECTED_FLAGS (HCR_HOST_NVHE_FLAGS | HCR_TSC)
+ #define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
+ 
+-#define HCRX_GUEST_FLAGS (HCRX_EL2_SMPME)
+ #define HCRX_HOST_FLAGS (HCRX_EL2_MSCEn | HCRX_EL2_TCR2En | HCRX_EL2_EnFPM)
+ 
+ /* TCR_EL2 Registers bits */
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 71996d36f3751..8e22232c4b0f4 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -4062,7 +4062,13 @@ void kvm_init_sysreg(struct kvm_vcpu *vcpu)
+ 		vcpu->arch.hcr_el2 |= HCR_TTLBOS;
+ 
+ 	if (cpus_have_final_cap(ARM64_HAS_HCX)) {
+-		vcpu->arch.hcrx_el2 = HCRX_GUEST_FLAGS;
++		/*
++		 * In general, all HCRX_EL2 bits are gated by a feature.
++		 * The only reason we can set SMPME without checking any
++		 * feature is that its effects are not directly observable
++		 * from the guest.
++		 */
++		vcpu->arch.hcrx_el2 = HCRX_EL2_SMPME;
+ 
+ 		if (kvm_has_feat(kvm, ID_AA64ISAR2_EL1, MOPS, IMP))
+ 			vcpu->arch.hcrx_el2 |= (HCRX_EL2_MSCEn | HCRX_EL2_MCE2);
 -- 
 2.39.2
 
