@@ -1,115 +1,272 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD6FB16E879;
-	Tue, 25 Jun 2024 13:35:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61C1F16ABF3;
+	Tue, 25 Jun 2024 13:58:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719322525; cv=none; b=p6AaR1eSERnRRM0nxZGq1PiMJHvipXgf8FVWloaIVjZBGYs2iIuSGymhrmqIMDoXSbEa9fJFn/BuOkODee1GtV8x0KGx7ygmL4pbewsB6lB9C19uZVRpUi3/y2TfmjgXQAeyOVTopS1jTED8Hd/aZ28IQoyx2WTRTOPfL19/AY8=
+	t=1719323939; cv=none; b=bE/9uFwT2KOGWzmaRN7RB67GwwX79jqL6VBThiuSJqPm5CAhUCh9KioPJesp/1nqlyPMOG5XRJvtLW3xwQ0HHxs3JS97yC1nkgR2T/vgJTufyaoBEMTUTowy/piAC74mgI7fx0jl/bvSiX4bENBeVYY4iYro+m011ECtYMUkvdk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719322525; c=relaxed/simple;
-	bh=O2khzE1fdyGIte4KZD309c05XGX8LSqpr8bp0t6E7fg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=aYnsP876qEhP4kI5YeoWR4LWMDKdf1IsTa4cZPy1oO5goFBEhci4nNRhNXmPuM3dyit4x7PE7Ti+GEktUhnDbk2DEFkqY+I1rPkIUcUMSK/ecGlZsvYs6DLj0i1cwNQn8AD8zyPWPBu+QU2gfo0VLn7VikcztsXFoaPCnLWFKhc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lLX+nqOH; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1719323939; c=relaxed/simple;
+	bh=LhJ6xSwgC+isVyrfMS2bZZDUrhNmtanpSDGFTa+w9j4=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=uLQ+HYGPgo8n4y+WXaIu7j1kwBEuinv9J7H0GxQC9DytrDWRVot+0lbve00XjAscHehldjfmTvVL8v2O8ljdGc98vRc9JjWlXzCnS8lPDRvvhLaAF8bwMTEWENbit9A8GASSmg6KFP7s1MxEgiudYma2jNp6qOrOBjkB68V1CYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N35Cg0yE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lLX+nqOH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CE0CC32781;
-	Tue, 25 Jun 2024 13:35:24 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N35Cg0yE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABB89C32781;
+	Tue, 25 Jun 2024 13:58:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719322524;
-	bh=O2khzE1fdyGIte4KZD309c05XGX8LSqpr8bp0t6E7fg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=lLX+nqOHNTx8D/kGeB8eYVf0gddOZM7yDKUgumJ/Y+vK102AnxX16Y909cO5qVgG2
-	 d/nC8/ievD3Ub4VpqW1u7IKU8PSSJ9D9qW9//T9s3waeq53+yZr84akLWXBGrrUKp7
-	 tI/gg0Fy+vUD3AicZsKY+eGD3RPB5J+bF1if+yx0qPpxykMD6TK8JqJdkMRC/Zlx2y
-	 zZYE8W+yXJrd/6khoRakP+xS0+gUXaxZADp5RQVCaPM4mlxUN/jvfKsxmHfsuZQLbv
-	 7ZRI7yLTnPgmxw1EG5ljztSTyrjl+25sIex3uLMrCfjYNqZ6AOKzSHL0lHxSNzuP2g
-	 Rm+dyyzkaWvag==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	s=k20201202; t=1719323938;
+	bh=LhJ6xSwgC+isVyrfMS2bZZDUrhNmtanpSDGFTa+w9j4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=N35Cg0yEDqVFCfMV6szY8nhMfh79bTCP/px23OE7C9stj06oDaKbhuIt22ksAwZuu
+	 JgJCScKrwe+tIhWnwrMPN5Nw5LghZySS0cnaYQKhUzYGHjVV8S4huZ9JfaokXKCmK1
+	 lbK9ooaHJvmMhFwtaFhQwXIXxUQuHaOs9rDUeXuLCmINnEaSWkI3/eYKJ6k2pdfHYa
+	 ssSWh2C1/soVuaPn1gKKmCrb0ot0B07kXa/5vIgyO++9PAdc2eQpFu3tAXW4/vj8YC
+	 O7lK7uQsKadpdIrIgRaXML1EdM5FqEq7s/gFvVCBe368Rk+9jl+z8F/YKlLd9Fv3m+
+	 y4TPvWjIZlsMg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sM6KQ-007A6l-No;
-	Tue, 25 Jun 2024 14:35:22 +0100
+	id 1sM6hE-007Amz-Gb;
+	Tue, 25 Jun 2024 14:58:56 +0100
+Date: Tue, 25 Jun 2024 14:58:56 +0100
+Message-ID: <86tthhi0nz.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
+To: Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Joey Gouly <joey.gouly@arm.com>
-Subject: [PATCH 05/12] KVM: arm64: make kvm_at() take an OP_AT_*
-Date: Tue, 25 Jun 2024 14:35:04 +0100
-Message-Id: <20240625133508.259829-6-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240625133508.259829-1-maz@kernel.org>
-References: <20240625133508.259829-1-maz@kernel.org>
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Brown <broonie@kernel.org>,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC 10/10] KVM: arm64: nv: Add new HDFGRTR2_GROUP & HDFGRTR2_GROUP based FGU handling
+In-Reply-To: <47dc4299-52cc-4f98-929b-fb86bd9757ae@arm.com>
+References: <20240620065807.151540-1-anshuman.khandual@arm.com>
+	<20240620065807.151540-11-anshuman.khandual@arm.com>
+	<865xu3kh4r.wl-maz@kernel.org>
+	<4d256df7-1ec7-4300-b5c8-355f46c0e869@arm.com>
+	<878qyy35e5.wl-maz@kernel.org>
+	<47dc4299-52cc-4f98-929b-fb86bd9757ae@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com
+X-SA-Exim-Rcpt-To: anshuman.khandual@arm.com, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, broonie@kernel.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-From: Joey Gouly <joey.gouly@arm.com>
+On Tue, 25 Jun 2024 10:03:29 +0100,
+Anshuman Khandual <anshuman.khandual@arm.com> wrote:
+>=20
+> >>>> +#define __HDFGRTR2_EL2_nMASK	~(__HDFGRTR2_EL2_RES0 | __HDFGRTR2_EL2=
+_MASK)
+> >>>
+> >>> Note the *nMASK* here. 'n' is for *negative*. Just look at how
+> >>> __HDFGRTR_EL2_MASK and __HDFGRTR_EL2_nMASK are written.
+> >>
+> >> Still trying to understand what does these three masks represent
+> >> for a given FGT register XXXX
+> >>
+> >> 	- __XXXX_RES0
+> >=20
+> > RES0 bits.
+> >=20
+> >> 	- __XXXX_MASK
+> >=20
+> > Positive trap bits.
+> >=20
+> >> 	- __XXXX_nMASK
+> >=20
+> > Negative trap bits.
+>=20
+> Right, figured that eventually but these were not very clear at
+> first.
 
-To allow using newer instructions that current assemblers don't know about,
-replace the `at` instruction with the underlying SYS instruction.
+I keep hearing I'm not clear. But at this stage, I don't know what to
+do to make it (or myself) clearer.
 
-Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will@kernel.org>
-Reviewed-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/kvm_asm.h       | 3 ++-
- arch/arm64/kvm/hyp/include/hyp/fault.h | 2 +-
- 2 files changed, 3 insertions(+), 2 deletions(-)
+>=20
+> >=20
+> >>
+> >> But from the mentioned example for HDFGRTR_EL2.
+> >>
+> >> #define __HDFGRTR_EL2_RES0      HDFGRTR_EL2_RES0
+> >> #define __HDFGRTR_EL2_MASK      (BIT(63) | GENMASK(58, 50) | GENMASK(4=
+8, 43) | \
+> >>                                  GENMASK(41, 40) | GENMASK(37, 22) | \
+> >>                                  GENMASK(19, 9) | GENMASK(7, 0))
+> >> #define __HDFGRTR_EL2_nMASK     ~(__HDFGRTR_EL2_RES0 | __HDFGRTR_EL2_M=
+ASK)
+> >>
+> >> Looking at HDFGRTR_EL2 definition inside arch/arm64/tools/sysreg
+> >>
+> >> HDFGRTR_EL2_RES0 =3D BIT(49) | GENMASK(39, 38) | GENMASK(21, 20) | BIT=
+(8)
+> >>
+> >> is representing the entire mask in the register which are RES0. But th=
+en what
+> >> does __HDFGRTR_EL2_MASK signify ? Positive trap bits mask ?
+> >>
+> >> The following bits belong in __HDFGRTR_EL2_MASK
+> >>
+> >> HDFGRTR_EL2.PMBIDR_EL1    (63)
+> >> HDFGRTR_EL2.PMCEIDn_EL0   (58)
+> >>
+> >> Where as the following bits belong in __HDFGRTR_EL2_nMASK
+> >>
+> >> HDFGRTR_EL2.nPMSNEVFR_EL1 (61)
+> >> HDFGRTR_EL2.nBRBCTL	  (60)=20
+> >>
+> >> Reworking proposed HDFGRTR2_EL2 and HDFGWTR2_EL2.=20
+> >>
+> >> #define __HDFGRTR2_EL2_RES0     HDFGRTR2_EL2_RES0
+> >> #define __HDFGRTR2_EL2_MASK     0
+> >> #define __HDFGRTR2_EL2_nMASK    ~(__HDFGRTR2_EL2_RES0 | __HDFGRTR2_EL2=
+_MASK)
+> >>
+> >> #define __HDFGWTR2_EL2_RES0     HDFGWTR2_EL2_RES0
+> >> #define __HDFGWTR2_EL2_MASK     0
+> >> #define __HDFGWTR2_EL2_nMASK    ~(__HDFGWTR2_EL2_RES0 | __HDFGWTR2_EL2=
+_MASK)
+> >>
+> >> Please note that all trap bits in both these registers are negative on=
+es
+> >> hence __HDFGRTR2_EL2_MASK/__HDFGWTR2_EL2_MASK should be 0.
+> >=20
+> > That's because you're looking at the XML, and not the ARM ARM this was
+> > written against.
+>=20
+> Did not follow that. Both in ddi0601/2024-03 XML and ARM ARM DDI 0487K.a
+> there are no positive trap bits, either in HDFGRTR2_EL2 or HDFGWTR2_EL2.
+> OR did I miss something here.
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 2181a11b9d925..25f49f5fc4a63 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -10,6 +10,7 @@
- #include <asm/hyp_image.h>
- #include <asm/insn.h>
- #include <asm/virt.h>
-+#include <asm/sysreg.h>
- 
- #define ARM_EXIT_WITH_SERROR_BIT  31
- #define ARM_EXCEPTION_CODE(x)	  ((x) & ~(1U << ARM_EXIT_WITH_SERROR_BIT))
-@@ -259,7 +260,7 @@ extern u64 __kvm_get_mdcr_el2(void);
- 	asm volatile(							\
- 	"	mrs	%1, spsr_el2\n"					\
- 	"	mrs	%2, elr_el2\n"					\
--	"1:	at	"at_op", %3\n"					\
-+	"1:	" __msr_s(at_op, "%3") "\n"				\
- 	"	isb\n"							\
- 	"	b	9f\n"						\
- 	"2:	msr	spsr_el2, %1\n"					\
-diff --git a/arch/arm64/kvm/hyp/include/hyp/fault.h b/arch/arm64/kvm/hyp/include/hyp/fault.h
-index 9e13c1bc2ad54..487c06099d6fc 100644
---- a/arch/arm64/kvm/hyp/include/hyp/fault.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/fault.h
-@@ -27,7 +27,7 @@ static inline bool __translate_far_to_hpfar(u64 far, u64 *hpfar)
- 	 * saved the guest context yet, and we may return early...
- 	 */
- 	par = read_sysreg_par();
--	if (!__kvm_at("s1e1r", far))
-+	if (!__kvm_at(OP_AT_S1E1R, far))
- 		tmp = read_sysreg_par();
- 	else
- 		tmp = SYS_PAR_EL1_F; /* back to the guest */
--- 
-2.39.2
+=46rom this very file:
 
+<quote>
+/*
+ * FGT register definitions
+ *
+ * RES0 and polarity masks as of DDI0487J.a, to be updated as needed.
+ * We're not using the generated masks as they are usually ahead of
+ * the published ARM ARM, which we use as a reference.
+ *
+ * Once we get to a point where the two describe the same thing, we'll
+ * merge the definitions. One day.
+ */
+</quote>
+
+In case it wasn't written *CLEARLY* enough.
+
+> Sure, will add the following new registers in arch/arm64/tools/sysreg for=
+mat
+> except for the ones that require a formula based enumeration. Those will =
+be
+> added into arch/arm64/include/asm/sysreg.h directly e.g
+>=20
+> +#define SYS_SPMEVCNTR_EL0(m)           sys_reg(2, 3, 14, (0 | (m >> 3)),=
+ (m & 7))
+> +#define SYS_SPMEVTYPER_EL0(m)          sys_reg(2, 3, 14, (2 | (m >> 3)),=
+ (m & 7))
+> +#define SYS_SPMEVFILTR_EL0(m)          sys_reg(2, 3, 14, (4 | (m >> 3)),=
+ (m & 7))
+> +#define SYS_SPMEVFILT2R_EL0(m)         sys_reg(2, 3, 14, (6 | (m >> 3)),=
+ (m & 7))
+>=20
+> 9d93fc432f1a arm64/sysreg: Add remaining debug registers affected by HDFG=
+xTR2_EL2
+> 56b8830f0a5e arm64/sysreg: Add register fields for SPMCGCR1_EL1
+> ad674ae52178 arm64/sysreg: Add register fields for SPMCGCR0_EL1
+> 8538a282d208 arm64/sysreg: Add register fields for PMZR_EL0
+> c88f0b8d898e arm64/sysreg: Add register fields for PMSSCR_EL1
+> 8788ad49b7b6 arm64/sysreg: Add register fields for SPMCFGR_EL1
+> 142de2bc3d7b arm64/sysreg: Add register fields for SPMDEVARCH_EL1
+> 3d903ba35e8c arm64/sysreg: Add register fields for SPMIIDR_EL1
+> 1a4db0b8b100 arm64/sysreg: Add register fields for PMICNTSVR_EL1
+> 6bee8f139ba5 arm64/sysreg: Add register fields for SPMSELR_EL0
+> b208ab4cd54d arm64/sysreg: Add register fields for SPMCNTENSET_EL0
+> 644abf522c8a arm64/sysreg: Add register fields for SPMCNTENCLR_EL0
+> fad9b7751359 arm64/sysreg: Add register fields for SPMINTENSET_EL1
+> c28299b8df76 arm64/sysreg: Add register fields for SPMINTENCLR_EL1
+> b9c283b27980 arm64/sysreg: Add register fields for SPMOVSSET_EL0
+> 03dd01a26c46 arm64/sysreg: Add register fields for SPMOVSCLR_EL0
+> c8a2f1b688de arm64/sysreg: Add register fields for SPMCR_EL0
+> 422ca4026aa7 arm64/sysreg: Add register fields for SPMACCESSR_EL1
+> d790b2570461 arm64/sysreg: Add register fields for SPMSCR_EL1
+> c2cdd0fecdcb arm64/sysreg: Add register fields for PMCCNTSVR_EL1
+> 3b793f3f07b8 arm64/sysreg: Add register fields for PMUACR_EL1
+> a1804742ee8c arm64/sysreg: Add register fields for PMICFILTR_EL0
+> c88476b9c52c arm64/sysreg: Add register fields for PMICNTR_EL0
+> 6d1520f3477b arm64/sysreg: Add register fields for PMECR_EL1
+> 257ea3ec7950 arm64/sysreg: Add register fields for PMIAR_EL1
+> a29f787102f0 arm64/sysreg: Add register fields for SPMDEVAFF_EL1
+> 3b7c4d4cf0eb arm64/sysreg: Add register fields for PMSDSFR_EL1
+> 2a14e5dc1903 arm64/sysreg: Add register fields for TRBMPAM_EL1
+
+Have you done this by hand? Or have you used an automated generator
+that parses the XML?  If it's the former, please do the latter and
+compare the results.
+
+[...]
+
+> >
+> >>>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> >>>> index f921af014d0c..8029f408855d 100644
+> >>>> --- a/arch/arm64/kvm/sys_regs.c
+> >>>> +++ b/arch/arm64/kvm/sys_regs.c
+> >>>> @@ -4110,6 +4110,51 @@ void kvm_init_sysreg(struct kvm_vcpu *vcpu)
+> >>>>  		kvm->arch.fgu[HAFGRTR_GROUP] |=3D ~(HAFGRTR_EL2_RES0 |
+> >>>>  						  HAFGRTR_EL2_RES1);
+> >>>> =20
+> >>>> +	/* FEAT_TRBE_MPAM is not exposed to the guest */
+> >>>> +	kvm->arch.fgu[HDFGRTR2_GROUP] |=3D ~(HDFGRTR2_EL2_nTRBMPAM_EL1);
+> >>>
+> >>> Same thing about dynamic configuration.
+> >>>
+> >>> But more importantly, you are disabling anything *but* MPAM.  Does it
+> >>> seem right to you?
+> >>
+> >> Did not get that, should the inverse ~ be dropped here and also for all
+> >> other negative trap bits across the register ?
+> >=20
+> > Look at the way FGU works. A bit set to 1 means that if we have
+> > trapped because of this bit (as per the FGT table), we inject an
+> > UNDEF.
+>=20
+> Seems like positive and negative trap bits do not make any difference
+> here, while setting respective bits in kvm->arch.fgu[HDFGRTR2_GROUP].=20
+> In this case the inverse should be dropped for all bits.
+
+Yup, that's what "A bit set to 1" means here. We don't need to follow
+the convolutions of the HW here.
+
+>=20
+> Should the lone trap bit (nPMZR_EL0) which is present in HDFGWTR2_EL2
+> but not in HDFGRTR2_EL2, be set in kvm->arch.fgu[HDFGWTR2_GROUP] as
+> well ?
+>=20
+> if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMUVer, V3P9)) {
+> 	kvm->arch.fgu[HDFGRTR2_GROUP] |=3D HDFGRTR2_EL2_nPMUACR_EL1;
+> 	kvm->arch.fgu[HDFGWTR2_GROUP] |=3D HDFGWTR2_EL2_nPMZR_EL0;
+> }
+
+Possibly. At the time this code was written, ARMv8.9 wasn't in the ARM
+ARM.
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
