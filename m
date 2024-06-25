@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EADA4158D75;
-	Tue, 25 Jun 2024 13:00:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A55315E5B8;
+	Tue, 25 Jun 2024 13:00:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719320450; cv=none; b=kIJGOm8UzAbcAtetAinDZAUT7Zro5mFQAPjxuinemfgYZERL/847eHReo6GmwdYvEqXUV/cje1CKJYzLCIlgj2RR6kxhgMb3C6NJyWFd+7fvT4Hrz2vdqDh1jt5kYFIV4N8LVmXr11E6nlsxS7MHlxdgDY0Am/wMvP3zAGcjemY=
+	t=1719320450; cv=none; b=T4lwTdEXT2UvOP/3kAkSLgDSqNRSgfFr6PLz1keCfqF7fR+om2KSssXJKChgKhjSg7otazlRSHeegFajtM6hiXemNZMHE2NWIOLlcdzdFnaQ11Q6w4vI+zIQ/oz1grh7TJ9zbRXwmI3ao6sh9Ty22YMHYLyhFrNOcQAuXky0PqU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1719320450; c=relaxed/simple;
 	bh=ADorFG0VRvlOjHCobfWLs0ZsG4Mia8Zf6GgI3pzbQLY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=rpJ48iX2D1vXcjE4gdKb8dM/UDMOT4H0lz4/YXsaPuxRDSOGjCJL3COuDJD9xlBF86oNisZ/rTQhjKSvgVKhZCIa8xXZFLp9hM/n4EaANsp4xdrpwam2mxt5zEwS8CH1IrXD81nW1RTp5lFR2leuxQZGoFBzYZWMGDPSA3ceaI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EFNN+Mr6; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=MRQ28q31pQyT0ry0F8Yp4u7S5/DN5rMcJTD518ROi/QGVIXpLQTEbmX9OWqQMSZnIN/AOXDWV9ppxdPPNKxR1eVEwdWrKG3oGyknGvn5PUdDLuhWKRgYkbVYcA3gNxfGs5M51TUvv9jqHbao8cg5zDTYBLUd+ov5OcRZYxlBm7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=asaxG/sF; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EFNN+Mr6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4FF0C4AF0C;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="asaxG/sF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D768EC4AF07;
 	Tue, 25 Jun 2024 13:00:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1719320449;
 	bh=ADorFG0VRvlOjHCobfWLs0ZsG4Mia8Zf6GgI3pzbQLY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=EFNN+Mr6to0YXIDLuypSKUrr6IJbAkbp+Zo/YFbY6Vni1l1tvRQ/dOxmOEm+hWkrL
-	 OnXt0K8EcI2YGwpYwBUo554wn/kk7wRTjodcJNDUi+QOxfXy/2EKbZXR61BR0XcV1a
-	 AIwN31InUjMYAwixWf2NTIAxblqWfjBpMy0YO+498O/KVzVqkqRaSI5tXdO03P8uV2
-	 xftjatGfl87jhtgyXJsYP/ugfuxn9MFc/PmcXiBNCIMFFW+Fyq/3SBpZ87IZGseK9d
-	 JACbYS+dwxKiTCJN0Emye7trqZHxmoD1vGAeIYfE4eIXsFPHlFP3UrLaPxLvxcAcVQ
-	 LO49pfVVlnOXA==
+	b=asaxG/sFUo0nPmnOePobXI3ZOcabYJywNkSfwKLkAPLcyy96s6uh/n1EF52Rd/iBz
+	 uUwCHquUNqtznnOr2sFWw/RHI/JL+uVKcG2v2NjVWwO7puIXAMR+Q+MwiLgUYf/4Xi
+	 UNLkPSY/CnBxZKVJbUrCaZjhS2AeHVFBOBjAvh2hZwmHnzPxkMm+B9kcz48QL8sMB6
+	 x8FAp39tRv9woSjJKs6/tQOZbzKFB1VnwvA3jLIwZ1SLqTdMz39j15WKmCPsjrraW3
+	 /N+2LkuOZQK8ZlPHKI+oSWX3+Z1VxWCptl1jW6gdwYnIog7zm1GGH9b2Oic7pkW4gE
+	 lxU2zRgFm0txQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sM5mx-0079X4-Ow;
-	Tue, 25 Jun 2024 14:00:47 +0100
+	id 1sM5my-0079X4-3S;
+	Tue, 25 Jun 2024 14:00:48 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -41,9 +41,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Joey Gouly <joey.gouly@arm.com>
-Subject: [PATCH 4/4] KVM: arm64: Honor trap routing for TCR2_EL1
-Date: Tue, 25 Jun 2024 14:00:40 +0100
-Message-Id: <20240625130042.259175-5-maz@kernel.org>
+Subject: [PATCH 5/5] KVM: arm64: Honor trap routing for TCR2_EL1
+Date: Tue, 25 Jun 2024 14:00:42 +0100
+Message-Id: <20240625130042.259175-7-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240625130042.259175-1-maz@kernel.org>
 References: <20240625130042.259175-1-maz@kernel.org>
