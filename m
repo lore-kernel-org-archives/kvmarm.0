@@ -1,35 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8B3C168483;
-	Wed, 26 Jun 2024 22:32:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0611F194081;
+	Wed, 26 Jun 2024 22:32:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719441157; cv=none; b=dFNoZyGdyW0wS/2J5frnJ9ZSgtcYdSyqB1mYnus17lF4J0zDm04VUP9k9tPA7X6TFoBjyqgyw/kq8z9++TK+Y48fsw6serfS/FQIKcUcR96C5tu1Vb6Cs/S1lm+qbgYZrQTSUln/SZfFNzN3H7WgXD4ItcIbwcHlBkNiNvh9iq4=
+	t=1719441159; cv=none; b=n78nwW2EROvQIjONGTDvpLHUTUWYa61TNBYkERggZkcesQlxl27ZVuOOZOpJxbS2bf1/VBnIYW+xtCYdTBYp1463BlErn/Ia43zFmkN1j326U/Z5l0WfrvkGbHVXEDkt05ddm8mRoNSrNaDpsZ1Uu7i7MqJ05S2XG5G/P7RL1BM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719441157; c=relaxed/simple;
-	bh=kk9N8S/9pjJldXV6CMVRpAD3Z0nGrY99ofJV3fvXtDg=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=klwskcUDOMgYLdXm1Zm9fVSHd1HgThvF1lHqUa+pHK0FZB2ojfAswwaN3f/El9ktZMxBAV/8ULPpZIRLH3Npc48t2hUANQmUOxF3YmFSCsa96dyoza5liRoHbm6SrwLBl8nPOmAe/Xm0EbqkscwYdtlvHfjQ3d0Yk7Tes2KsrfI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LenWavY3; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1719441159; c=relaxed/simple;
+	bh=acEqJRld4aaAwF/FQV6CD2Di0ENXDKGblEFIRkrSSxI=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=ErEqfrKGZSh82hRPxN3OCq5+AVMPQyYVCQOVIU66l2+AuWIbWpjGMLu+GoiIz1q8E50S/uKrpvJg5ErRIGdlmGz3XUzel8HGB/dvkH1edOvZYLYX/w7Mm/DzWIEejHCDZ8kCkLzhTcTN4Ughtc2B47wvdUqToaaWERoaeYZwoog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=udeLf8lZ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LenWavY3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C10BFC116B1;
-	Wed, 26 Jun 2024 22:32:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="udeLf8lZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 702F4C32789;
+	Wed, 26 Jun 2024 22:32:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719441157;
-	bh=kk9N8S/9pjJldXV6CMVRpAD3Z0nGrY99ofJV3fvXtDg=;
-	h=From:Subject:Date:To:Cc:From;
-	b=LenWavY3RR1u7fsla77j3LoWys7mobMCJ868xPwsHHjVhhrGa2zkR8FfKufAQNyKW
-	 8Halrva5mTGE0v3uBo3PXs0ytVoM3tJaJ9nzH07p+MGQUuHminXLoJ3nMecRe9P1tq
-	 Z5RQ6jskfaq08g133uVl2FlVocD8raPacTpI3CZR5AfoA7i61foKrpSGRVE2SswBnf
-	 ltRutt1pcygewz0dduJXRGFRj8ZyZhH8gnGnbnU/L7+X3/qO5C2Xl1NAU6YxJjz7Om
-	 w2TuGRS556hg2TtDOLNRj4+3oEssYXiSDCBT9Zz1X8jx3DtZvoLYfFfD3tnJUrocot
-	 /ag5Jm/ExjRFA==
+	s=k20201202; t=1719441158;
+	bh=acEqJRld4aaAwF/FQV6CD2Di0ENXDKGblEFIRkrSSxI=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=udeLf8lZU5JtyXeXK3aJgJ5ZFbKUGK3E/HBlBD7PSQwzvahYPQlr0gAA478XGid05
+	 JWAJD0UfpyT8nburYYBEQciFf1rYIA+QhkiBKD9eV7hTAwVoQxYL5eEhDQu/DNvTAg
+	 uh9MHE9SqAQWPA0D+5Nf5N0MZviQKrlEst0s2XiSmnCPboiDDgUpy7YHDOlz2MQgBO
+	 vfJEAICL6wB1WayJxlq4aMXAawaoomlm0U658P88UTmkgzX/SXspLQTF/qOxdaY73p
+	 UKkS5yC/yez+ltLDgSRYCn9MMe+RrUsbTUiHzmREIgxYcGyQlyXq7C+8j8Cug7MtRW
+	 9AOZf8kYYRyJg==
 From: "Rob Herring (Arm)" <robh@kernel.org>
-Subject: [PATCH v2 00/12] arm64: Add support for Armv9.4 PMU fixed
- instruction counter
-Date: Wed, 26 Jun 2024 16:32:24 -0600
-Message-Id: <20240626-arm-pmu-3-9-icntr-v2-0-c9784b4f4065@kernel.org>
+Date: Wed, 26 Jun 2024 16:32:25 -0600
+Subject: [PATCH v2 01/12] perf: arm_pmuv3: Avoid assigning fixed cycle
+ counter with threshold
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -38,9 +38,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAPiWfGYC/32NQQ6CQAxFr0K6tqYMKMrKexgWMFOgUQbSQaIh3
- N2RA7h8L/nvrxBYhQOUyQrKiwQZfQRzSMD2te8YxUUGQyanMxVY64DT8MIMryjWz4qUZ8XJOUd
- 0MRB3k3Ir7715ryL3EuZRP/vFkv7sv9qSIqEtGmec5bbNmtuD1fPzOGoH1bZtX5matbyzAAAA
+Message-Id: <20240626-arm-pmu-3-9-icntr-v2-1-c9784b4f4065@kernel.org>
+References: <20240626-arm-pmu-3-9-icntr-v2-0-c9784b4f4065@kernel.org>
+In-Reply-To: <20240626-arm-pmu-3-9-icntr-v2-0-c9784b4f4065@kernel.org>
 To: Russell King <linux@armlinux.org.uk>, 
  Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
  Arnaldo Carvalho de Melo <acme@kernel.org>, 
@@ -58,92 +58,64 @@ Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
  linux-perf-users@vger.kernel.org, kvmarm@lists.linux.dev
 X-Mailer: b4 0.14-dev
 
-This series adds support for the optional fixed instruction counter 
-added in Armv9.4 PMU. Most of the series is a refactoring to remove the 
-index to counter number conversion which dates back to the Armv7 PMU 
-driver. Removing it is necessary in order to support more than 32 
-counters without a bunch of conditional code further complicating the 
-conversion.
+If the user has requested a counting threshold for the CPU cycles event,
+then the fixed cycle counter can't be assigned as it lacks threshold
+support. Currently, the thresholds will work or not randomly depending
+on which counter the event is assigned.
 
-Patches 1-2 are a fix and cleanup for the threshold support. Patch 1 is 
-a dependency of patch 12.
+While using thresholds for CPU cycles doesn't make much sense, it can be
+useful for testing purposes.
 
-Patches 3-4 move the 32-bit Arm PMU drivers into drivers/perf/ and drop 
-non-DT probe support. These can be taken first if there's no comments on 
-them.
-
-Patch 5 is new to v2 and implements the common pattern of the linux/ 
-header including the asm/ header of the same name.
-
-Patch 6 changes struct arm_pmu.num_events to a bitmap of events, and 
-updates all the users. This removes the index to counter conversion 
-on the PMUv3 and Armv7 drivers.
-
-Patch 7 updates various register accessors to use 64-bit values matching 
-the register size.
-
-Patches 8-9 update KVM PMU register accesses to use shared accessors 
-from asm/arm_pmuv3.h.
-
-Patches 10-11 rework KVM and perf PMU defines for counter indexes and 
-number of counters.
-
-Patch 12 finally adds support for the fixed instruction counter.
-
-I tested this on FVP with VHE host and a guest. I tested the Armv7 PMU 
-changes with QEMU.
-
+Fixes: 816c26754447 ("arm64: perf: Add support for event counting threshold")
 Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
 ---
-Changes in v2:
-- Include threshold fix patches and account for threshold support in 
-  counter assignment.
-- Add patch including asm/arm_pmuv3.h from linux/perf/arm_pmuv3.h
-- Fix compile error for Apple PMU
-- Minor review comments detailed in individual patches
-- Link to v1: https://lore.kernel.org/r/20240607-arm-pmu-3-9-icntr-v1-0-c7bd2dceff3b@kernel.org
+This should go to 6.10 and stable. It is also a dependency for ICNTR
+support.
 
+v2:
+ - Add and use armv8pmu_event_get_threshold() helper.
+
+v1: https://lore.kernel.org/all/20240611155012.2286044-1-robh@kernel.org/
 ---
-Rob Herring (Arm) (12):
-      perf: arm_pmuv3: Avoid assigning fixed cycle counter with threshold
-      perf: arm_pmuv3: Drop unnecessary IS_ENABLED(CONFIG_ARM64) check
-      perf/arm: Move 32-bit PMU drivers to drivers/perf/
-      perf: arm_v6/7_pmu: Drop non-DT probe support
-      perf: arm_pmuv3: Include asm/arm_pmuv3.h from linux/perf/arm_pmuv3.h
-      perf: arm_pmu: Remove event index to counter remapping
-      perf: arm_pmuv3: Prepare for more than 32 counters
-      KVM: arm64: pmu: Use arm_pmuv3.h register accessors
-      KVM: arm64: pmu: Use generated define for PMSELR_EL0.SEL access
-      arm64: perf/kvm: Use a common PMU cycle counter define
-      KVM: arm64: Refine PMU defines for number of counters
-      perf: arm_pmuv3: Add support for Armv9.4 PMU instruction counter
+ drivers/perf/arm_pmuv3.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
- arch/arm/include/asm/arm_pmuv3.h                   |  20 +++
- arch/arm/kernel/Makefile                           |   2 -
- arch/arm64/include/asm/arm_pmuv3.h                 |  55 +++++++-
- arch/arm64/include/asm/kvm_host.h                  |   8 +-
- arch/arm64/include/asm/sysreg.h                    |   1 -
- arch/arm64/kvm/pmu-emul.c                          |  15 +-
- arch/arm64/kvm/pmu.c                               |  87 +++---------
- arch/arm64/kvm/sys_regs.c                          |  11 +-
- arch/arm64/tools/sysreg                            |  30 ++++
- drivers/perf/Kconfig                               |  12 ++
- drivers/perf/Makefile                              |   3 +
- drivers/perf/apple_m1_cpu_pmu.c                    |   4 +-
- drivers/perf/arm_pmu.c                             |  11 +-
- drivers/perf/arm_pmuv3.c                           | 154 +++++++++++----------
- .../perf_event_v6.c => drivers/perf/arm_v6_pmu.c   |  26 +---
- .../perf_event_v7.c => drivers/perf/arm_v7_pmu.c   |  90 ++++--------
- .../perf/arm_xscale_pmu.c                          |  15 +-
- include/kvm/arm_pmu.h                              |   8 +-
- include/linux/perf/arm_pmu.h                       |  10 +-
- include/linux/perf/arm_pmuv3.h                     |  11 +-
- 20 files changed, 301 insertions(+), 272 deletions(-)
----
-base-commit: 1613e604df0cd359cf2a7fbd9be7a0bcfacfabd0
-change-id: 20240607-arm-pmu-3-9-icntr-04375ddd0082
+diff --git a/drivers/perf/arm_pmuv3.c b/drivers/perf/arm_pmuv3.c
+index 23fa6c5da82c..8ed5c3358920 100644
+--- a/drivers/perf/arm_pmuv3.c
++++ b/drivers/perf/arm_pmuv3.c
+@@ -338,6 +338,11 @@ static bool armv8pmu_event_want_user_access(struct perf_event *event)
+ 	return ATTR_CFG_GET_FLD(&event->attr, rdpmc);
+ }
+ 
++static u32 armv8pmu_event_get_threshold(struct perf_event_attr *attr)
++{
++	return ATTR_CFG_GET_FLD(attr, threshold);
++}
++
+ static u8 armv8pmu_event_threshold_control(struct perf_event_attr *attr)
+ {
+ 	u8 th_compare = ATTR_CFG_GET_FLD(attr, threshold_compare);
+@@ -941,7 +946,8 @@ static int armv8pmu_get_event_idx(struct pmu_hw_events *cpuc,
+ 	unsigned long evtype = hwc->config_base & ARMV8_PMU_EVTYPE_EVENT;
+ 
+ 	/* Always prefer to place a cycle counter into the cycle counter. */
+-	if (evtype == ARMV8_PMUV3_PERFCTR_CPU_CYCLES) {
++	if ((evtype == ARMV8_PMUV3_PERFCTR_CPU_CYCLES) &&
++	    !armv8pmu_event_get_threshold(&event->attr)) {
+ 		if (!test_and_set_bit(ARMV8_IDX_CYCLE_COUNTER, cpuc->used_mask))
+ 			return ARMV8_IDX_CYCLE_COUNTER;
+ 		else if (armv8pmu_event_is_64bit(event) &&
+@@ -1033,7 +1039,7 @@ static int armv8pmu_set_event_filter(struct hw_perf_event *event,
+ 	 * If FEAT_PMUv3_TH isn't implemented, then THWIDTH (threshold_max) will
+ 	 * be 0 and will also trigger this check, preventing it from being used.
+ 	 */
+-	th = ATTR_CFG_GET_FLD(attr, threshold);
++	th = armv8pmu_event_get_threshold(attr);
+ 	if (th > threshold_max(cpu_pmu)) {
+ 		pr_debug("PMU event threshold exceeds max value\n");
+ 		return -EINVAL;
 
-Best regards,
 -- 
-Rob Herring (Arm) <robh@kernel.org>
+2.43.0
 
