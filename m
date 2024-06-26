@@ -1,65 +1,25 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F11013AD11
-	for <kvmarm@lists.linux.dev>; Wed, 26 Jun 2024 09:01:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26508D27A;
+	Wed, 26 Jun 2024 13:39:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719392509; cv=none; b=KCFTZfvrrx3leNW/vDLXCcV084xeswOgzx01AO1VnOR2GpTMwp3ftsT6QM+yO7jnAsOAUVHjKhYzpyx2KiplbKp78ZzSoQ70DtYLOcWZKghIOHkH41RCWUsCtaglxWJn/m5V8wQ/18YtGejAu8CkXGk8b8ZWE2sV6TMdz3wm83k=
+	t=1719409177; cv=none; b=RLCVZoa90FLyouR6YnmEu0X80w7lyFooMJstSjxnDgrK+e5//dlgh8Yrba8Lo36tGjLllboKkM5A2xCNqnI7KGqAOXRglr5H7SjpdAGMTFm5zD0+45z37KkzU4m/rVyQgTqwtCuPSgROHN6NFOCkWH75T7RhfQn8npwYFLi1FHo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719392509; c=relaxed/simple;
-	bh=2ciIN+SpmSpfnglqOXEBiKHd1ccbS1FEXjS9vxowFKg=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=uFnberrV9n5B3D+sL8hfYrYYATzJnU/fk2ltMxx8SG/F3cf8BGWlFWgKrlMgiVlSIIN/cmSPyiLW8ZEhM8QIu0rBPuXZvLtcb7B6hLQngSRhwdbmVh0WrAZZGttQllvsIhMdN+cM0hm2v/0Hf3GPieMqwxVXtUrYOzIeySuGfoQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=I7y7FzKE; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I7y7FzKE"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1719392505;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=p1oadlD53pCQIFec/zKp7mDa0vRATXxlFgTZ1DCZKpA=;
-	b=I7y7FzKEHcK2QNPoYa4kRsPB70p+JGDSV6YuwzrsvaO7bzqOe8KsxI63SNq3AT5jH+6Fku
-	gzW4nIw0v8SCj2AcqNh5v8wswnqTb4ouGmwEwSJScn9EGUdBizkvKme5PSp0ZtFjUrIMbK
-	E6PWZJvG6wixSiBIxgXSY7ufGmfnjP0=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-627-Gt__KpgyNr2-JjznU89ISg-1; Wed, 26 Jun 2024 05:01:43 -0400
-X-MC-Unique: Gt__KpgyNr2-JjznU89ISg-1
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2c7b3b67b8eso1629453a91.0
-        for <kvmarm@lists.linux.dev>; Wed, 26 Jun 2024 02:01:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719392502; x=1719997302;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=p1oadlD53pCQIFec/zKp7mDa0vRATXxlFgTZ1DCZKpA=;
-        b=LxcjKrfIcOkerE2SdJ2B/APr+bAU8Vy0O0BrAPN2emDlVsiNlIvBsLH6B0oZ4vhVb2
-         k2yL//lz5EKu1zjfsnblzbN3bXtcJGjsvyo/Zs/uqnyZcdMBkmenntupCwBD7SDcXYPz
-         wEx4Lplk0hfR3t/Zqd7F96Qdm6zDosT3nyuY+rhsEq+Tz8RPslaRjMHnY0WRS2dDVWrI
-         F/pCmYf5BPZxnkWdCRcEmTaKwa9ufJaIcfv225qDkQtlG9G3EUxJJDQJW1ANQmonyJrP
-         LmTU4AkKirgfSdFe4GIxrtrY3gIiO4Nu42K8WOGLehFwMNnO5LktehUPbnMHw6O4dZOo
-         w/Sw==
-X-Forwarded-Encrypted: i=1; AJvYcCUO8f/aFqS1JEbaGnPA5CWy53mjQ4CQPmHru1EQGrGJbf4dBKZwbEH+RQfW0EotPBghO9yoVH8iYihpImAoKpMIIbU2R9sk
-X-Gm-Message-State: AOJu0Yz8fCrgl+VmqAS/ic5nPEe1wyA4+2jgMhCczQpVs3Jrmv3sq2mn
-	FFb1NUuIB9LaLO1RlvGgtnvC1MMfdcqjV5hh2Nj8MiMnK34llljH4Gg1nJ8nkcQ4NaLkwj2yrh9
-	el+qhvtSENc2QV3fpljf0ahRSP/bd1jmJUIatCGib7sKIL/n4WkxeLQ==
-X-Received: by 2002:a17:90a:8c9:b0:2c4:d63b:cde with SMTP id 98e67ed59e1d1-2c8459a1666mr10209373a91.1.1719392502407;
-        Wed, 26 Jun 2024 02:01:42 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG6fec9cHWNZyNFNAaBU5CpBsvoyabkVfAUSxogFAm8SfcX7v6bhEwGYG4eMaAqENJK+DiniQ==
-X-Received: by 2002:a17:90a:8c9:b0:2c4:d63b:cde with SMTP id 98e67ed59e1d1-2c8459a1666mr10209350a91.1.1719392502002;
-        Wed, 26 Jun 2024 02:01:42 -0700 (PDT)
-Received: from [10.72.116.72] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c8d8094371sm1115742a91.54.2024.06.26.02.01.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Jun 2024 02:01:41 -0700 (PDT)
-Message-ID: <d0077254-94ef-43cb-8d2b-f45bd8851a47@redhat.com>
-Date: Wed, 26 Jun 2024 17:01:37 +0800
+	s=arc-20240116; t=1719409177; c=relaxed/simple;
+	bh=izszFIllttZq4LwxAkxcg7+OUWyz/ebLgffeWP5hLKk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Yv5nNsYcF/UcMUKJz44GLDAFiCy9ZugdCMB58EErMhdu68ioptROdTEOzeq0EaoTNv+0ZNjk1l01eh2l7O4QRLKSDwPvCRj6O0W0aNAty7A69hDQZTMdgXhA2SospxIEux6TdRSZOhmsXzPH9wQUXdCjEORozxMy5sYQY4QtoZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8295B339;
+	Wed, 26 Jun 2024 06:39:58 -0700 (PDT)
+Received: from [10.57.42.86] (unknown [10.57.42.86])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B14803F73B;
+	Wed, 26 Jun 2024 06:39:29 -0700 (PDT)
+Message-ID: <c6b49c81-58ba-40fc-9e17-892fdd79431d@arm.com>
+Date: Wed, 26 Jun 2024 14:39:27 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -67,140 +27,175 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/2] KVM: arm64: Allow userspace to change
- ID_AA64PFR1_EL1
-From: Shaoqin Huang <shahuang@redhat.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
- James Morse <james.morse@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20240618063808.1040085-1-shahuang@redhat.com>
- <20240618063808.1040085-2-shahuang@redhat.com> <86ed8uk8cr.wl-maz@kernel.org>
- <f73cabc6-8c48-4c12-9d60-269e50df41f3@redhat.com>
- <861q4qk9z7.wl-maz@kernel.org>
- <6935be08-f29e-4dd1-9fe7-3d51d3f97509@redhat.com>
-In-Reply-To: <6935be08-f29e-4dd1-9fe7-3d51d3f97509@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Subject: Re: [v2] Support for Arm CCA VMs on Linux
+To: Itaru Kitayama <itaru.kitayama@linux.dev>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+References: <20240412084056.1733704-1-steven.price@arm.com>
+ <ZnkOfTVAaCJ_-_bG@vm3>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <ZnkOfTVAaCJ_-_bG@vm3>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-
-
-On 6/26/24 15:33, Shaoqin Huang wrote:
-> Hi Marc,
+On 24/06/2024 07:13, Itaru Kitayama wrote:
+> Hi Steven,
+> On Fri, Apr 12, 2024 at 09:40:56AM +0100, Steven Price wrote:
+>> We are happy to announce the second version of the Arm Confidential
+>> Compute Architecture (CCA) support for the Linux stack. The intention is
+>> to seek early feedback in the following areas:
+>>  * KVM integration of the Arm CCA;
+>>  * KVM UABI for managing the Realms, seeking to generalise the
+>>    operations where possible with other Confidential Compute solutions;
+>>  * Linux Guest support for Realms.
+>>
+>> See the previous RFC[1] for a more detailed overview of Arm's CCA
+>> solution, or visible the Arm CCA Landing page[2].
+>>
+>> This series is based on the final RMM v1.0 (EAC5) specification[3].
+>>
+>> Quick-start guide
+>> =================
+>>
+>> The easiest way of getting started with the stack is by using
+>> Shrinkwrap[4]. Currently Shrinkwrap has a configuration for the initial
+>> v1.0-EAC5 release[5], so the following overlay needs to be applied to
+>> the standard 'cca-3world.yaml' file. Note that the 'rmm' component needs
+>> updating to 'main' because there are fixes that are needed and are not
+>> yet in a tagged release. The following will create an overlay file and
+>> build a working environment:
+>>
+>> cat<<EOT >cca-v2.yaml
+>> build:
+>>   linux:
+>>     repo:
+>>       revision: cca-full/v2
+>>   kvmtool:
+>>     repo:
+>>       kvmtool:
+>>         revision: cca/v2
+>>   rmm:
+>>     repo:
+>>       revision: main
+>>   kvm-unit-tests:
+>>     repo:
+>>       revision: cca/v2
+>> EOT
+>>
+>> shrinkwrap build cca-3world.yaml --overlay buildroot.yaml --btvar GUEST_ROOTFS='${artifact:BUILDROOT}' --overlay cca-v2.yaml
+>>
+>> You will then want to modify the 'guest-disk.img' to include the files
+>> necessary for the realm guest (see the documentation in cca-3world.yaml
+>> for details of other options):
+>>
+>>   cd ~/.shrinkwrap/package/cca-3world
+>>   /sbin/e2fsck -fp rootfs.ext2 
+>>   /sbin/resize2fs rootfs.ext2 256M
+>>   mkdir mnt
+>>   sudo mount rootfs.ext2 mnt/
+>>   sudo mkdir mnt/cca
+>>   sudo cp guest-disk.img KVMTOOL_EFI.fd lkvm Image mnt/cca/
+>>   sudo umount mnt 
+>>   rmdir mnt/
+>>
+>> Finally you can run the FVP with the host:
+>>
+>>   shrinkwrap run cca-3world.yaml --rtvar ROOTFS=$HOME/.shrinkwrap/package/cca-3world/rootfs.ext2
+>>
+>> And once the host kernel has booted, login (user name 'root') and start
+>> a realm guest:
+>>
+>>   cd /cca
+>>   ./lkvm run --realm --restricted_mem -c 2 -m 256 -k Image -p earlycon
+>>
+>> Be patient and you should end up in a realm guest with the host's
+>> filesystem mounted via p9.
+>>
+>> It's also possible to use EFI within the realm guest, again see
+>> cca-3world.yaml within Shrinkwrap for more details.
 > 
-> On 6/21/24 15:53, Marc Zyngier wrote:
->> On Fri, 21 Jun 2024 07:17:57 +0100,
->> Shaoqin Huang <shahuang@redhat.com> wrote:
->>>
->>> Hi Marc,
->>>
->>> On 6/18/24 15:39, Marc Zyngier wrote:
->>>> On Tue, 18 Jun 2024 07:38:06 +0100,
->>>> Shaoqin Huang <shahuang@redhat.com> wrote:
->>>>>
->>>>> Allow userspace to change the guest-visible value of the register with
->>>>> some severe limitation:
->>>>>
->>>>>     - No changes to features not virtualized by KVM (MPAM_frac, 
->>>>> RAS_frac)
->>>>> ---
->>>>>    arch/arm64/kvm/sys_regs.c | 3 ++-
->>>>>    1 file changed, 2 insertions(+), 1 deletion(-)
->>>>>
->>>>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->>>>> index 22b45a15d068..bead81867bce 100644
->>>>> --- a/arch/arm64/kvm/sys_regs.c
->>>>> +++ b/arch/arm64/kvm/sys_regs.c
->>>>> @@ -2306,7 +2306,8 @@ static const struct sys_reg_desc 
->>>>> sys_reg_descs[] = {
->>>>>               ID_AA64PFR0_EL1_GIC |
->>>>>               ID_AA64PFR0_EL1_AdvSIMD |
->>>>>               ID_AA64PFR0_EL1_FP), },
->>>>> -    ID_SANITISED(ID_AA64PFR1_EL1),
->>>>> +    ID_WRITABLE(ID_AA64PFR1_EL1, ~(ID_AA64PFR1_EL1_RAS_frac |
->>>>> +                       ID_AA64PFR1_EL1_MPAM_frac)),
->>>>>        ID_UNALLOCATED(4,2),
->>>>>        ID_UNALLOCATED(4,3),
->>>>>        ID_WRITABLE(ID_AA64ZFR0_EL1, ~ID_AA64ZFR0_EL1_RES0),
->>>>
->>>> This isn't a valid patch.
->>>>
->>>> Furthermore, how about all the other features that may or may not be
->>>> currently handled by KVM? Please see [1] and make sure that all
->>>> existing fields have a known behaviour (a combination of masked,
->>>> preserved, capped, writable or read-only).
->>>>
->>>> I can at least see problems with MTE_frac and MTEX, plus all the other
->>>> things that KVM doesn't know how to save/restore (THE, GCS, NMI...).
->>>>
->>>> What I asked you to handle the whole register, I really meant it.
->>>
->>> I currently only found the BT and SSBS fields can be written without
->>> any unknown behavior.
->>
->> I can only assume you haven't looked hard enough.
->>
->>>
->>> All other fields in the ID_AA64PFR1_EL1 are either not supported by
->>> KVM or the field involved with other register and KVM don't know how
->>> to handle them.
->>
->> Why can't CSV2_frac be writable? Why can't most of the other fields be
->> hidden depending on the VM configuration, as pointed out above?
+> I am trying to see if libvirt can work with the CCA-aware KVM with minimal Ubuntu22.10 filesystem, however virt-install triggers a system failure:
 > 
-> I looked at the "struct arm64_ftr_bits ftr_id_aa64pfr1[]" in the 
-> kernel/cpufeature.c, I don't see the CSV2_frac has been supported on ARM 
-> bare-mental. In this situation, can we first support it in KVM? If so, 
-> how can we do that, I don't understand that, could you give me some 
-> hints about that.
+> $ sudo virt-install -v --name f39 --ram 4096        --disk path=fedora40.img,cache=none --nographics --os-variant fedora38         --import --arch aarch64 --vcpus 4
+> [sudo] password for realm:
+> [ 3694.176579] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000e00
+> [ 3694.176687] Mem abort info:
+> [ 3694.176745]   ESR = 0x0000000096000004
+> [ 3694.176817]   EC = 0x25: DABT (current EL), IL = 32 bits
+> [ 3694.176907]   SET = 0, FnV = 0
+> [ 3694.176978]   EA = 0, S1PTW = 0
+> [ 3694.177049]   FSC = 0x04: level 0 translation fault
+> [ 3694.177132] Data abort info:
+> [ 3694.177189]   ISV = 0, ISS = 0x00000004, ISS2 = 0x00000000
+> [ 3694.177276]   CM = 0, WnR = 0, TnD = 0, TagAccess = 0
+> [ 3694.177370]   GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
+> [ 3694.177544] user pgtable: 4k pages, 48-bit VAs, pgdp=0000000880f6e000
+> [ 3694.177649] [0000000000000e00] pgd=0000000000000000, p4d=0000000000000000
+> [ 3694.177788] Internal error: Oops: 0000000096000004 [#1] PREEMPT SMP
+> [ 3694.177887] Modules linked in:
+> [ 3694.177966] CPU: 2 PID: 540 Comm: qemu-system-aar Not tainted 6.10.0-rc1-00058-gd901c27a1783 #149
+> [ 3694.178105] Hardware name: FVP Base RevC (DT)
+> [ 3694.178180] pstate: 61400009 (nZCv daif +PAN -UAO -TCO +DIT -SSBS BTYPE=--)
+> [ 3694.178315] pc : kvm_vm_ioctl_check_extension+0x1fc/0x3c4
+> [ 3694.178447] lr : kvm_vm_ioctl_check_extension_generic+0x34/0x12c
+> [ 3694.178587] sp : ffff800081523cb0
+> [ 3694.178657] x29: ffff800081523cb0 x28: 0000000000000051 x27: 0000000000000000
+> [ 3694.178840] x26: 0000000000000000 x25: 0000000000000000 x24: 0000000000000000
+> [ 3694.179019] x23: 000000000000000a x22: 0000000000000051 x21: ffff000801075f00
+> [ 3694.179200] x20: ffff000801075f01 x19: 000000000000ae03 x18: 0000000000000000
+> [ 3694.179383] x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000000
+> [ 3694.179565] x14: 0000000000000000 x13: 0000000000000000 x12: 0000000000000000
+> [ 3694.179745] x11: 0000000000000000 x10: 0000000000000000 x9 : 0000000000000000
+> [ 3694.179923] x8 : 0000000000000000 x7 : ffff000801075f18 x6 : 00000000401c5820
+> [ 3694.180106] x5 : 000000000000000a x4 : 0000000000000800 x3 : 0000000000000000
+> [ 3694.180285] x2 : 000000000000000b x1 : 0000000100061001 x0 : 0000000000000001
+> [ 3694.180465] Call trace:
+> [ 3694.180523]  kvm_vm_ioctl_check_extension+0x1fc/0x3c4
+> [ 3694.180656]  kvm_vm_ioctl_check_extension_generic+0x34/0x12c
+> [ 3694.180794]  kvm_dev_ioctl+0x3c8/0x8b8
+> [ 3694.180938]  __arm64_sys_ioctl+0xac/0xf0
+> [ 3694.181079]  invoke_syscall+0x48/0x114
+> [ 3694.181220]  el0_svc_common.constprop.0+0x40/0xe0
+> [ 3694.181367]  do_el0_svc+0x1c/0x28
+> [ 3694.181507]  el0_svc+0x34/0xd8
+> [ 3694.181608]  el0t_64_sync_handler+0x120/0x12c
+> [ 3694.181723]  el0t_64_sync+0x190/0x194
+> [ 3694.181865] Code: 17ffffbd 97fffc9d 12001c00 17ffff91 (39780060)
+> [ 3694.181955] ---[ end trace 0000000000000000 ]---
+> 
+> I'd appreciate it if you could take a look at it.
 
-More description about the CSV2_frac.
+Thanks for the bug report. I believe this is because 
+kvm_vm_ioctl_check_extension() is being called with kvm==NULL and I've 
+missed some checks. I believe the following should get things working - 
+and it's probably better than attempting to remember to check with the 
+NULL kvm at each call site.
 
-static const struct arm64_ftr_bits ftr_id_aa64pfr1[] = {
-	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_SME),
-		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR1_EL1_SME_SHIFT, 4, 0),
-	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, 
-ID_AA64PFR1_EL1_MPAM_frac_SHIFT, 4, 0),
-	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, 
-ID_AA64PFR1_EL1_RAS_frac_SHIFT, 4, 0),
-	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_MTE),
-		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR1_EL1_MTE_SHIFT, 4, 
-ID_AA64PFR1_EL1_MTE_NI),
-	ARM64_FTR_BITS(FTR_VISIBLE, FTR_NONSTRICT, FTR_LOWER_SAFE, 
-ID_AA64PFR1_EL1_SSBS_SHIFT, 4, ID_AA64PFR1_EL1_SSBS_NI),
-	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_BTI),
-				    FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR1_EL1_BT_SHIFT, 4, 0),
-	ARM64_FTR_END,
-};
-
-If we make the CSV2_frac writable, there isn't definition about 
-CSV2_frac in the ftr_id_aa64pfr1. And the KVM really depends on the 
-ftr_id_aa64pfr1 in the arm64_check_features() function. We're missing 
-the CSV2_frac.
-
-So the arm64_check_features() will not check the CSV2_frac if it's 
-writable, and the user can write any value into it.
+---8<----
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 27c58bbdf50b..c85e5f566506 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -602,7 +602,7 @@ static __always_inline void kvm_reset_cptr_el2(struct kvm_vcpu *vcpu)
+ 
+ static inline bool kvm_is_realm(struct kvm *kvm)
+ {
+-       if (static_branch_unlikely(&kvm_rme_is_available))
++       if (static_branch_unlikely(&kvm_rme_is_available) && kvm)
+                return kvm->arch.is_realm;
+        return false;
+ }
+---8<----
 
 Thanks,
-Shaoqin
-
-> 
-> Other fields are same with CSV2_frac I think. The KVM don't know the 
-> configuration about them. Why we should allow them writable and hidden 
-> them right now? Instead of just make them still unwrittable? >
-> Thanks,
-> Shaoqin
-> 
->>
->>     M.
->>
-> 
-
--- 
-Shaoqin
-
+Steve
