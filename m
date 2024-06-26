@@ -1,35 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75FC4194C8E;
-	Wed, 26 Jun 2024 22:32:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A59C1953BB;
+	Wed, 26 Jun 2024 22:32:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719441172; cv=none; b=YMYnWqghZNzqc1K5WikGrW3tARIkbSl7smywdogGKHDmD7tnJb3xFZH/CTxQq4Oohgrp0VeXvx/I7VUQtS6SfPjGQ9b2Ijvyz7fU4JgyLdvakLjMAahYIiXBaTjU9U3pO5RKPQpg3wX8QhOwLKpZ1NCRV/fbtV6fWgzImc7whjA=
+	t=1719441174; cv=none; b=KAlSpjEOlhhUCPmEWgnOgLlsbg8g07jUY85Fcqz3ZV+1FoaJ+4bxpB+XoHMdSAiqTgGPFCnFW3FBGrJ/Las39vvJGDCMKBcmIXzoQW+pa586rytfpnqCNxeQMk7dZ0Qg5mGH56zhrOwFm3V44fzQohc7MW4sXGl5PbIO6K9xLHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719441172; c=relaxed/simple;
-	bh=tyMiWNvWYQkimPKJefEkwj8BKVWrUeWAWKDVG4Kh28E=;
+	s=arc-20240116; t=1719441174; c=relaxed/simple;
+	bh=Dwd/duDp/vRwBOdI65Z0JGJma+8NpgU/zSDmEoeuinE=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=dyA0YsYwoKX75x6AZr115Em/3++djOLxqDLXqDA0o1u8BCQ6lmCQPLT9Ry5DtcBslBPSYG/7pP5DoCK2tX2Iu9BHxibchI3QZVH3Z2XHJJxcBxDPdVIwvIJkKYnOW/ct1IZRIW1KDXvjBI0mPLCDeH1G6VVjHX4qkoDyhBxfT5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=McJYzcYH; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=iSzW9rsjNhJsKREEKmxxLxgig/FdDjuNFfBk0qBuWxN6SGezrLuGU5wWFcgDG2L3NfXfLnYpugNqG8SALX/BHYFTpxbcOT/+LLcOTWAkiL6bG9pF8aUPOMcz2B5xosm5/eoKvKNz6Cc+n+LgfmxheY5CtDyud5OL8GVixF7wfVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c9fvPWR0; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="McJYzcYH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1070C116B1;
-	Wed, 26 Jun 2024 22:32:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c9fvPWR0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6057C2BD10;
+	Wed, 26 Jun 2024 22:32:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719441172;
-	bh=tyMiWNvWYQkimPKJefEkwj8BKVWrUeWAWKDVG4Kh28E=;
+	s=k20201202; t=1719441174;
+	bh=Dwd/duDp/vRwBOdI65Z0JGJma+8NpgU/zSDmEoeuinE=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=McJYzcYHno8/yujVw3yyS0hJzkucjbYYyDpL6lsFwJX7VBRlQ/ggzBXVivoFGkJNS
-	 gtXv+p/KWZs8ydSxA/VOOG7vFac5FW63KFiVEHZ5n1C9BuMcLtJrOnWsFRr3bDrFI2
-	 VbAClZmkZAlUhI7xuQRe6i1UE5aAs8AySdOrD1Q83WpNisaZbi6+GomsqofRqPH8Bx
-	 rVXQHfA09FQt9v7BPQxPCb3/6LZQfJ4GvCon1ZuOxsj8HBJr8TpPJBjvDS7TTTUZa4
-	 CHWHOy/wGY8i4oE/nuCeiT/SaI1Sb+MQ2jW4v0l6m2HaYI5oyd+GXOEIFhjjBq5A/E
-	 JGM+J00WHMeXg==
+	b=c9fvPWR08MtFyK/Su5Mf5KDcU9K6/gWQm6nYiLD7Fp6N1PPnIZEwRud855C6lXpRb
+	 j4xFu1QmJiSaV8YZLUf2crtWykcvAvI1tYw9dn32206d0TRYrmhqR7cLiehLkSEXEC
+	 uiAT5eYuXwQO2Pp15VaOkN7hO4TeLm1a/B3nTPw1TfZWc0uTG748qczxUckbPoLfIZ
+	 SWbDUIyWSIFifdqV4NRGWpb3PTZZZN6cqNg5h6HIrvQ+4R3KMnRv92YrL9hGi1mS4l
+	 A9qTFp8Dp/d1MkhCu02wfAGdWthwwINjfv9v+KfY+BDbeEf0/0GAy/N+OXe79z1fQ0
+	 pNG99ayPnnBBA==
 From: "Rob Herring (Arm)" <robh@kernel.org>
-Date: Wed, 26 Jun 2024 16:32:33 -0600
-Subject: [PATCH v2 09/12] KVM: arm64: pmu: Use generated define for
- PMSELR_EL0.SEL access
+Date: Wed, 26 Jun 2024 16:32:34 -0600
+Subject: [PATCH v2 10/12] arm64: perf/kvm: Use a common PMU cycle counter
+ define
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -38,7 +38,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240626-arm-pmu-3-9-icntr-v2-9-c9784b4f4065@kernel.org>
+Message-Id: <20240626-arm-pmu-3-9-icntr-v2-10-c9784b4f4065@kernel.org>
 References: <20240626-arm-pmu-3-9-icntr-v2-0-c9784b4f4065@kernel.org>
 In-Reply-To: <20240626-arm-pmu-3-9-icntr-v2-0-c9784b4f4065@kernel.org>
 To: Russell King <linux@armlinux.org.uk>, 
@@ -58,102 +58,131 @@ Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
  linux-perf-users@vger.kernel.org, kvmarm@lists.linux.dev
 X-Mailer: b4 0.14-dev
 
-ARMV8_PMU_COUNTER_MASK is really a mask for the PMSELR_EL0.SEL register
-field. Make that clear by adding a standard sysreg definition for the
-register, and using it instead.
+The PMUv3 and KVM code each have a define for the PMU cycle counter
+index. Move KVM's define to a shared location and use it for PMUv3
+driver.
 
-Reviewed-by: Mark Rutland <mark.rutland@arm.com>
-Acked-by: Mark Rutland <mark.rutland@arm.com>
 Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
 ---
- arch/arm64/include/asm/sysreg.h |  1 -
- arch/arm64/kvm/sys_regs.c       | 10 +++++-----
- arch/arm64/tools/sysreg         |  5 +++++
- include/linux/perf/arm_pmuv3.h  |  1 -
- 4 files changed, 10 insertions(+), 7 deletions(-)
+v2:
+ - Move ARMV8_PMU_CYCLE_IDX to linux/perf/arm_pmuv3.h
+---
+ arch/arm64/kvm/sys_regs.c      |  1 +
+ drivers/perf/arm_pmuv3.c       | 19 +++++++------------
+ include/kvm/arm_pmu.h          |  1 -
+ include/linux/perf/arm_pmuv3.h |  3 +++
+ 4 files changed, 11 insertions(+), 13 deletions(-)
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index af3b206fa423..b0d6c33f9ecc 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -403,7 +403,6 @@
- #define SYS_PMCNTENCLR_EL0		sys_reg(3, 3, 9, 12, 2)
- #define SYS_PMOVSCLR_EL0		sys_reg(3, 3, 9, 12, 3)
- #define SYS_PMSWINC_EL0			sys_reg(3, 3, 9, 12, 4)
--#define SYS_PMSELR_EL0			sys_reg(3, 3, 9, 12, 5)
- #define SYS_PMCEID0_EL0			sys_reg(3, 3, 9, 12, 6)
- #define SYS_PMCEID1_EL0			sys_reg(3, 3, 9, 12, 7)
- #define SYS_PMCCNTR_EL0			sys_reg(3, 3, 9, 13, 0)
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 22b45a15d068..f8b5db48ea8a 100644
+index f8b5db48ea8a..22393ae7ce14 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -880,7 +880,7 @@ static u64 reset_pmevtyper(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
- static u64 reset_pmselr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
- {
- 	reset_unknown(vcpu, r);
--	__vcpu_sys_reg(vcpu, r->reg) &= ARMV8_PMU_COUNTER_MASK;
-+	__vcpu_sys_reg(vcpu, r->reg) &= PMSELR_EL0_SEL_MASK;
+@@ -18,6 +18,7 @@
+ #include <linux/printk.h>
+ #include <linux/uaccess.h>
  
- 	return __vcpu_sys_reg(vcpu, r->reg);
- }
-@@ -972,7 +972,7 @@ static bool access_pmselr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
++#include <asm/arm_pmuv3.h>
+ #include <asm/cacheflush.h>
+ #include <asm/cputype.h>
+ #include <asm/debug-monitors.h>
+diff --git a/drivers/perf/arm_pmuv3.c b/drivers/perf/arm_pmuv3.c
+index f771242168f1..f58dff49ea7d 100644
+--- a/drivers/perf/arm_pmuv3.c
++++ b/drivers/perf/arm_pmuv3.c
+@@ -451,11 +451,6 @@ static const struct attribute_group armv8_pmuv3_caps_attr_group = {
+ 	.attrs = armv8_pmuv3_caps_attrs,
+ };
+ 
+-/*
+- * Perf Events' indices
+- */
+-#define	ARMV8_IDX_CYCLE_COUNTER	31
+-
+ /*
+  * We unconditionally enable ARMv8.5-PMU long event counter support
+  * (64-bit events) where supported. Indicate if this arm_pmu has long
+@@ -574,7 +569,7 @@ static u64 armv8pmu_read_counter(struct perf_event *event)
+ 	int idx = hwc->idx;
+ 	u64 value;
+ 
+-	if (idx == ARMV8_IDX_CYCLE_COUNTER)
++	if (idx == ARMV8_PMU_CYCLE_IDX)
+ 		value = read_pmccntr();
  	else
- 		/* return PMSELR.SEL field */
- 		p->regval = __vcpu_sys_reg(vcpu, PMSELR_EL0)
--			    & ARMV8_PMU_COUNTER_MASK;
-+			    & PMSELR_EL0_SEL_MASK;
+ 		value = armv8pmu_read_hw_counter(event);
+@@ -607,7 +602,7 @@ static void armv8pmu_write_counter(struct perf_event *event, u64 value)
  
- 	return true;
- }
-@@ -1040,8 +1040,8 @@ static bool access_pmu_evcntr(struct kvm_vcpu *vcpu,
- 			if (pmu_access_event_counter_el0_disabled(vcpu))
- 				return false;
+ 	value = armv8pmu_bias_long_counter(event, value);
  
--			idx = __vcpu_sys_reg(vcpu, PMSELR_EL0)
--			      & ARMV8_PMU_COUNTER_MASK;
-+			idx = SYS_FIELD_GET(PMSELR_EL0, SEL,
-+					    __vcpu_sys_reg(vcpu, PMSELR_EL0));
- 		} else if (r->Op2 == 0) {
- 			/* PMCCNTR_EL0 */
- 			if (pmu_access_cycle_counter_el0_disabled(vcpu))
-@@ -1091,7 +1091,7 @@ static bool access_pmu_evtyper(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+-	if (idx == ARMV8_IDX_CYCLE_COUNTER)
++	if (idx == ARMV8_PMU_CYCLE_IDX)
+ 		write_pmccntr(value);
+ 	else
+ 		armv8pmu_write_hw_counter(event, value);
+@@ -644,7 +639,7 @@ static void armv8pmu_write_event_type(struct perf_event *event)
+ 		armv8pmu_write_evtype(idx - 1, hwc->config_base);
+ 		armv8pmu_write_evtype(idx, chain_evt);
+ 	} else {
+-		if (idx == ARMV8_IDX_CYCLE_COUNTER)
++		if (idx == ARMV8_PMU_CYCLE_IDX)
+ 			write_pmccfiltr(hwc->config_base);
+ 		else
+ 			armv8pmu_write_evtype(idx, hwc->config_base);
+@@ -772,7 +767,7 @@ static void armv8pmu_enable_user_access(struct arm_pmu *cpu_pmu)
+ 	/* Clear any unused counters to avoid leaking their contents */
+ 	for_each_andnot_bit(i, cpu_pmu->cntr_mask, cpuc->used_mask,
+ 			    ARMPMU_MAX_HWEVENTS) {
+-		if (i == ARMV8_IDX_CYCLE_COUNTER)
++		if (i == ARMV8_PMU_CYCLE_IDX)
+ 			write_pmccntr(0);
+ 		else
+ 			armv8pmu_write_evcntr(i, 0);
+@@ -933,8 +928,8 @@ static int armv8pmu_get_event_idx(struct pmu_hw_events *cpuc,
+ 	/* Always prefer to place a cycle counter into the cycle counter. */
+ 	if ((evtype == ARMV8_PMUV3_PERFCTR_CPU_CYCLES) &&
+ 	    !armv8pmu_event_get_threshold(&event->attr)) {
+-		if (!test_and_set_bit(ARMV8_IDX_CYCLE_COUNTER, cpuc->used_mask))
+-			return ARMV8_IDX_CYCLE_COUNTER;
++		if (!test_and_set_bit(ARMV8_PMU_CYCLE_IDX, cpuc->used_mask))
++			return ARMV8_PMU_CYCLE_IDX;
+ 		else if (armv8pmu_event_is_64bit(event) &&
+ 			   armv8pmu_event_want_user_access(event) &&
+ 			   !armv8pmu_has_long_event(cpu_pmu))
+@@ -1196,7 +1191,7 @@ static void __armv8pmu_probe_pmu(void *info)
+ 		   0, FIELD_GET(ARMV8_PMU_PMCR_N, armv8pmu_pmcr_read()));
  
- 	if (r->CRn == 9 && r->CRm == 13 && r->Op2 == 1) {
- 		/* PMXEVTYPER_EL0 */
--		idx = __vcpu_sys_reg(vcpu, PMSELR_EL0) & ARMV8_PMU_COUNTER_MASK;
-+		idx = SYS_FIELD_GET(PMSELR_EL0, SEL, __vcpu_sys_reg(vcpu, PMSELR_EL0));
- 		reg = PMEVTYPER0_EL0 + idx;
- 	} else if (r->CRn == 14 && (r->CRm & 12) == 12) {
- 		idx = ((r->CRm & 3) << 3) | (r->Op2 & 7);
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index a4c1dd4741a4..231817a379b5 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -2153,6 +2153,11 @@ Field	4	P
- Field	3:0	ALIGN
- EndSysreg
+ 	/* Add the CPU cycles counter */
+-	set_bit(ARMV8_IDX_CYCLE_COUNTER, cpu_pmu->cntr_mask);
++	set_bit(ARMV8_PMU_CYCLE_IDX, cpu_pmu->cntr_mask);
  
-+Sysreg	PMSELR_EL0	3	3	9	12	5
-+Res0	63:5
-+Field	4:0	SEL
-+EndSysreg
-+
- SysregFields	CONTEXTIDR_ELx
- Res0	63:32
- Field	31:0	PROCID
+ 	pmceid[0] = pmceid_raw[0] = read_pmceid0();
+ 	pmceid[1] = pmceid_raw[1] = read_pmceid1();
+diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+index 334d7c5503cf..871067fb2616 100644
+--- a/include/kvm/arm_pmu.h
++++ b/include/kvm/arm_pmu.h
+@@ -10,7 +10,6 @@
+ #include <linux/perf_event.h>
+ #include <linux/perf/arm_pmuv3.h>
+ 
+-#define ARMV8_PMU_CYCLE_IDX		(ARMV8_PMU_MAX_COUNTERS - 1)
+ 
+ #if IS_ENABLED(CONFIG_HW_PERF_EVENTS) && IS_ENABLED(CONFIG_KVM)
+ struct kvm_pmc {
 diff --git a/include/linux/perf/arm_pmuv3.h b/include/linux/perf/arm_pmuv3.h
-index eccbdd8eb98f..792b8e10b72a 100644
+index 792b8e10b72a..f4ec76f725a3 100644
 --- a/include/linux/perf/arm_pmuv3.h
 +++ b/include/linux/perf/arm_pmuv3.h
-@@ -8,7 +8,6 @@
- 
+@@ -9,6 +9,9 @@
  #define ARMV8_PMU_MAX_GENERAL_COUNTERS	31
  #define ARMV8_PMU_MAX_COUNTERS	32
--#define ARMV8_PMU_COUNTER_MASK	(ARMV8_PMU_MAX_COUNTERS - 1)
  
++#define ARMV8_PMU_CYCLE_IDX		31
++
++
  /*
   * Common architectural and microarchitectural event numbers.
+  */
 
 -- 
 2.43.0
