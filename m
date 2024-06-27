@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2C85142E80;
-	Thu, 27 Jun 2024 10:47:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0EC513E3F5;
+	Thu, 27 Jun 2024 10:47:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719485235; cv=none; b=kZQJDA4+bAvW8IIyPVrvB/DKKLbOXqGllelt15SLxK+W//vOxokhAmbBfUw1F8xnQ5rkrgXE4nhjoseeKKPy6dPAcRHGOW8O7wwHp+SyDelBvIDpvu4vwWSuUhVX1AXSg3rhZqJVJ0r0CzVa7NImD8UF/BwCmhfe6LF3JFBgl1Q=
+	t=1719485251; cv=none; b=caMh+5hm7Qd4ct9OmrL8fqx5w7B5jDIgHXRIUo9W1PMP3WIZkd/tKZWaXSyvTd72uwAOQltveUnXPj4wpsNxejXBo0saKGBXtjjpgqfvd/iyT5hmNyn8fX+P+SPkB2xtOt1Pp0+6n5xD8sSYCMn8gIKIt6sJSLHDlCZlU1KcVAI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719485235; c=relaxed/simple;
-	bh=VB0LnRPt4YAFrWiQjhVLB3LXIJjdTd/+u0cXv26F+T0=;
+	s=arc-20240116; t=1719485251; c=relaxed/simple;
+	bh=ewpHgq5zQa60endoYAAmDa6XwLGcgcm3aHIr+4yVLdE=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JNPYuOQVfkPVW9mVhA4kMGUWZXLubvI5txzr1T/js1Hyfezi1cJPon99rZaVrOAjSq+nrD98v6BhyTrAS5oLb5iv9MPtgodythmhYDNmvDCBQwNnulXtZXQuTsBBQ2mzpOSUjSeEfYn0K+a/c7e82j/ZGFfdUx5KkgP4l+1zUhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dZaPUjD+; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=iOHcxcBDtebA4HV9cEUi3vvEViEUE3raMC7QaIvQ7rzGsOa7E+jese4kiRG/05wq1HZxoEFS9LSdtSXTuiP3MG9x0slExAw4dACYa+uWq8gZK+3jY8UeFB0vW5TLls7/xhTR0mJHGkYK2itof4ybhLveoelOTICBRA8Qs5hN/p4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kkg4r1pQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dZaPUjD+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75221C2BBFC;
-	Thu, 27 Jun 2024 10:47:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kkg4r1pQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 636D8C2BBFC;
+	Thu, 27 Jun 2024 10:47:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719485234;
-	bh=VB0LnRPt4YAFrWiQjhVLB3LXIJjdTd/+u0cXv26F+T0=;
+	s=k20201202; t=1719485251;
+	bh=ewpHgq5zQa60endoYAAmDa6XwLGcgcm3aHIr+4yVLdE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dZaPUjD+AFzGLhx20otBU0UKM/Me6ZHfy5CHl4ylB6Mri64CSmp6i3kDZnh8irduR
-	 XjTUNt4gxlgj2WDbAxMlzsgOIvOrC67z42nNaKkCkUrqYkrlBzTfMb+fiPSgX5KfP7
-	 bNCTf6E5oU55+IPkmi2g+y7fl/c7yThpj2fkJiQsYXkzotDBQQO/Cay/3IqProUJ6z
-	 RdM77L4scv+UnJCSiu56Q+Vu7vBIMSNRRfVxYKGQ22f3Xc7fMjL7P7KhpvN9Xsbqmx
-	 Q5A/BvJnoMkNZuErKi0AsUkGQbuXxIumtM1jY5Se5ob0KQ78h9cdWrNVN45QA3IFxx
-	 kkltlKVvW0Cyg==
+	b=kkg4r1pQNiRJgFOoVL5WgIYPNc9vFFhzanX4a7+xEQQ1KQ+0mRoqVH9shvwtg1/XD
+	 NLYMle5TfNPxJWw94Sdjj/PBf+yiTzGPQvBNj9KTIY5egffkrYiwWyvPGAe8+BVSCP
+	 f1PM8Gb1d14ySleAdRu6eexDk/IfhSE49SI0XIL/RzkbxqcVR+PJ3bJq+7dYqLOZ55
+	 qxjVIR39UyJjaWO+o7FIM8zwC5jiRP0QZXkrqlwVt9tzldIPPJiZaCbXW2OBbATME5
+	 5D4LPh7YWnt8+2wqvESQYr+IrviQEmfS1mSBYWpVYJtcuG5VANQ1BtyhHLhS/k04Ui
+	 cupkKQPKATGRw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sMmem-007lqE-Ah;
-	Thu, 27 Jun 2024 11:47:12 +0100
-Date: Thu, 27 Jun 2024 11:47:11 +0100
-Message-ID: <86o77mirww.wl-maz@kernel.org>
+	id 1sMmf3-007lqn-8u;
+	Thu, 27 Jun 2024 11:47:29 +0100
+Date: Thu, 27 Jun 2024 11:47:28 +0100
+Message-ID: <86msn6irwf.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: "Rob Herring (Arm)" <robh@kernel.org>
 Cc: Russell King <linux@armlinux.org.uk>,
@@ -57,10 +57,10 @@ Cc: Russell King <linux@armlinux.org.uk>,
 	linux-kernel@vger.kernel.org,
 	linux-perf-users@vger.kernel.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 08/12] KVM: arm64: pmu: Use arm_pmuv3.h register accessors
-In-Reply-To: <20240626-arm-pmu-3-9-icntr-v2-8-c9784b4f4065@kernel.org>
+Subject: Re: [PATCH v2 09/12] KVM: arm64: pmu: Use generated define for PMSELR_EL0.SEL access
+In-Reply-To: <20240626-arm-pmu-3-9-icntr-v2-9-c9784b4f4065@kernel.org>
 References: <20240626-arm-pmu-3-9-icntr-v2-0-c9784b4f4065@kernel.org>
-	<20240626-arm-pmu-3-9-icntr-v2-8-c9784b4f4065@kernel.org>
+	<20240626-arm-pmu-3-9-icntr-v2-9-c9784b4f4065@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -76,14 +76,14 @@ X-SA-Exim-Rcpt-To: robh@kernel.org, linux@armlinux.org.uk, peterz@infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 26 Jun 2024 23:32:32 +0100,
+On Wed, 26 Jun 2024 23:32:33 +0100,
 "Rob Herring (Arm)" <robh@kernel.org> wrote:
 > 
-> Commit df29ddf4f04b ("arm64: perf: Abstract system register accesses
-> away") split off PMU register accessor functions to a standalone header.
-> Let's use it for KVM PMU code and get rid one copy of the ugly switch
-> macro.
+> ARMV8_PMU_COUNTER_MASK is really a mask for the PMSELR_EL0.SEL register
+> field. Make that clear by adding a standard sysreg definition for the
+> register, and using it instead.
 > 
+> Reviewed-by: Mark Rutland <mark.rutland@arm.com>
 > Acked-by: Mark Rutland <mark.rutland@arm.com>
 > Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
 
