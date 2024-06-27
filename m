@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30AC713D888;
-	Thu, 27 Jun 2024 10:54:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3F57143C7D;
+	Thu, 27 Jun 2024 11:05:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719485662; cv=none; b=NDwKb2oEAOjMdWRUlQDZNlOz42uQATcUzh/ecoiVuGOYDtnbUKeOSBWEivLHT1UZAe3K8bizKqKDxbYLIaL+jYBeNAk9gxNjan1j4KPC4QuAaF3bhNbaNVbBktZzHy74bMlPYn90uNOTnddbuhej/0UHo8xT2DOwSCsLF8UkjjE=
+	t=1719486327; cv=none; b=oQM0hCZ1khoFBeeFH15QnXfNL00fys91qm3IQ0w3xsTuKlXhaMOjmAWVSXFH9dm2K2wC/Q6I7Endu9NBbFcbkqVt+pEKw8+SIUTMu0rW64Rb+/f3M1v17ICNg7h3+kKfb2Ks0ZyzHVBpMGUdRV2qg8lGy96eFPj8AJagErsI/bk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719485662; c=relaxed/simple;
-	bh=+VUe2Wa8SKE7wFSRDeywu7uI2jNt/A1olYtxZ+S+j7k=;
+	s=arc-20240116; t=1719486327; c=relaxed/simple;
+	bh=c7jsOFQzV36u+51vLMvJodzB3phULjcBajRLyloChBo=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=p4KJlYDnyx1+AOCI3/d1IP4amI7bEGykq96hUXZ5+aBjs4QOdBTd78WS2KcmJAIAuDF/l/MUBg+5OmRh6GtCWZAkJ6dDdvsU9OpVPTBcm29Hx9acAkrTf/zbYrm2TLSIJSq+pKosaZUKbdY8ZT9F282YHf8CEdp7Ojie4Nm6RWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QIwDX/NW; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=V5FhubBeZ4NTDcfovnGSNoUKDwBUXwUgGTtlpuhp8V94/INZnee5evIWoiqyELVrKCRVib/tkHAN7x9wfj7txmq/VTgpZjLs0kZ8GZ9sr1PyatH7YOca80qPSYLFewRXuE8jY4LnkJL0W0IhrIq6/M12hMPNrbn88A8p1ZzNXLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tZ7xDtsV; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QIwDX/NW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 992B7C2BBFC;
-	Thu, 27 Jun 2024 10:54:21 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tZ7xDtsV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD3BEC2BBFC;
+	Thu, 27 Jun 2024 11:05:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719485661;
-	bh=+VUe2Wa8SKE7wFSRDeywu7uI2jNt/A1olYtxZ+S+j7k=;
+	s=k20201202; t=1719486326;
+	bh=c7jsOFQzV36u+51vLMvJodzB3phULjcBajRLyloChBo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QIwDX/NWLGHl6ChidC2hBQ6FY7nFCM1ZWVZUP4PWuWckgVsjIpnmCv7nAheI6HE0F
-	 rgrPdV+fqVQmGVkqL8exY4V7vuk+8aRj+CeRlew1fIrFS76w7xQ3NY5DSdijz0f93m
-	 2Jb/bo9YFrgaRXtapsYhY/uNBFG4vCaMmJDmhnrp/+72fLp9uqenmi2W2GyZUW/gbQ
-	 YDCJoRtFcTImef3P71EbG2iFwYfFD5qi9JJfdU5mcWVo5Xq0AgZm/zxK8wBFphb/fC
-	 R97l0vNtyUhY4nDTqUeFv5FXiPBUbnDtwzBCX7/JIAFC27lseefxcZUtIOnrKx3nNk
-	 HGH2gBvyf8jyg==
+	b=tZ7xDtsVrNzkC6mNmdFJLLHzTclq8PEkWrF1/7N/s7MForbXDvB+2yeHIbhCij9tf
+	 tJ+oIjOqkY/XCns5uv1YYyA3GiFjCiZiHFQAX7sqgb/WbY5bhOGD0MoN5Z+N5RyzCV
+	 MtMDq0iC3s1UldQXBi4SVqQ0OXyeeOiZ9DHeGl3PST1lSzLqaCnvPaGAfJFHBWS306
+	 g+Xc+8PTn55qHIKi+g6CfEM/ymLGaM1AKygSGy22vUKJ79tTt3hXeKY1A0WjIpW1E9
+	 TiLWXk1ceKrtDUE+ikMJr2y8uJ61GsjJ+NTtJV2KYh8XqUL3Ebf1kyw+i3RM+rns5g
+	 oFiTj7HFwqXuw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sMmlf-007lyJ-Fx;
-	Thu, 27 Jun 2024 11:54:19 +0100
-Date: Thu, 27 Jun 2024 11:54:18 +0100
-Message-ID: <86jziairl1.wl-maz@kernel.org>
+	id 1sMmwO-007m6d-DN;
+	Thu, 27 Jun 2024 12:05:24 +0100
+Date: Thu, 27 Jun 2024 12:05:23 +0100
+Message-ID: <86ikxuir2k.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: "Rob Herring (Arm)" <robh@kernel.org>
 Cc: Russell King <linux@armlinux.org.uk>,
@@ -57,10 +57,10 @@ Cc: Russell King <linux@armlinux.org.uk>,
 	linux-kernel@vger.kernel.org,
 	linux-perf-users@vger.kernel.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 11/12] KVM: arm64: Refine PMU defines for number of counters
-In-Reply-To: <20240626-arm-pmu-3-9-icntr-v2-11-c9784b4f4065@kernel.org>
+Subject: Re: [PATCH v2 06/12] perf: arm_pmu: Remove event index to counter remapping
+In-Reply-To: <20240626-arm-pmu-3-9-icntr-v2-6-c9784b4f4065@kernel.org>
 References: <20240626-arm-pmu-3-9-icntr-v2-0-c9784b4f4065@kernel.org>
-	<20240626-arm-pmu-3-9-icntr-v2-11-c9784b4f4065@kernel.org>
+	<20240626-arm-pmu-3-9-icntr-v2-6-c9784b4f4065@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -76,24 +76,54 @@ X-SA-Exim-Rcpt-To: robh@kernel.org, linux@armlinux.org.uk, peterz@infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 26 Jun 2024 23:32:35 +0100,
+On Wed, 26 Jun 2024 23:32:30 +0100,
 "Rob Herring (Arm)" <robh@kernel.org> wrote:
 > 
-> There are 2 defines for the number of PMU counters:
-> ARMV8_PMU_MAX_COUNTERS and ARMPMU_MAX_HWEVENTS. Both are the same
-> currently, but Armv9.4/8.9 increases the number of possible counters
-> from 32 to 33. With this change, the maximum number of counters will
-> differ for KVM's PMU emulation which is PMUv3.4. Give KVM PMU emulation
-> its own define to decouple it from the rest of the kernel's number PMU
-> counters.
+> Xscale and Armv6 PMUs defined the cycle counter at 0 and event counters
+> starting at 1 and had 1:1 event index to counter numbering. On Armv7 and
+> later, this changed the cycle counter to 31 and event counters start at
+> 0. The drivers for Armv7 and PMUv3 kept the old event index numbering
+> and introduced an event index to counter conversion. The conversion uses
+> masking to convert from event index to a counter number. This operation
+> relies on having at most 32 counters so that the cycle counter index 0
+> can be transformed to counter number 31.
 > 
-> The VHE PMU code needs to match the PMU driver, so switch it to use
-> ARMPMU_MAX_HWEVENTS instead.
->
-> Acked-by: Mark Rutland <mark.rutland@arm.com>
+> Armv9.4 adds support for an additional fixed function counter
+> (instructions) which increases possible counters to more than 32, and
+> the conversion won't work anymore as a simple subtract and mask. The
+> primary reason for the translation (other than history) seems to be to
+> have a contiguous mask of counters 0-N. Keeping that would result in
+> more complicated index to counter conversions. Instead, store a mask of
+> available counters rather than just number of events. That provides more
+> information in addition to the number of events.
+> 
+> No (intended) functional changes.
+> 
 > Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
+[...]
+
+> diff --git a/include/linux/perf/arm_pmu.h b/include/linux/perf/arm_pmu.h
+> index b3b34f6670cf..e5d6d204beab 100644
+> --- a/include/linux/perf/arm_pmu.h
+> +++ b/include/linux/perf/arm_pmu.h
+> @@ -96,7 +96,7 @@ struct arm_pmu {
+>  	void		(*stop)(struct arm_pmu *);
+>  	void		(*reset)(void *);
+>  	int		(*map_event)(struct perf_event *event);
+> -	int		num_events;
+> +	DECLARE_BITMAP(cntr_mask, ARMPMU_MAX_HWEVENTS);
+
+I'm slightly worried by this, as this size is never used, let alone
+checked by the individual drivers. I can perfectly picture some new
+(non-architectural) PMU driver having more counters than that, and
+blindly setting bits outside of the allowed range.
+
+One way to make it a bit safer would be to add a helper replacing the
+various bitmap_set() calls, and enforcing that we never overflow this
+bitmap.
+
+Thanks,
 
 	M.
 
