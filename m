@@ -1,131 +1,81 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3F57143C7D;
-	Thu, 27 Jun 2024 11:05:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7117E1946BB;
+	Thu, 27 Jun 2024 13:56:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719486327; cv=none; b=oQM0hCZ1khoFBeeFH15QnXfNL00fys91qm3IQ0w3xsTuKlXhaMOjmAWVSXFH9dm2K2wC/Q6I7Endu9NBbFcbkqVt+pEKw8+SIUTMu0rW64Rb+/f3M1v17ICNg7h3+kKfb2Ks0ZyzHVBpMGUdRV2qg8lGy96eFPj8AJagErsI/bk=
+	t=1719496590; cv=none; b=NCs3eSpXCfgGvO6EtfIFOiN4tvnONS+MBP98I8CSBQFmsYQ85sUegQCVX0JmWQ66UmE8kLpEMqpn9DW4/Kzm/HD6pCNHNzGUypBBzSpXpwnWUR0kLeHRjfH0E6j+u0Zg3HWp21kmU6FVmtg3aRyMkbTBy6eyK+Oa119pgFU9zoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719486327; c=relaxed/simple;
-	bh=c7jsOFQzV36u+51vLMvJodzB3phULjcBajRLyloChBo=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=V5FhubBeZ4NTDcfovnGSNoUKDwBUXwUgGTtlpuhp8V94/INZnee5evIWoiqyELVrKCRVib/tkHAN7x9wfj7txmq/VTgpZjLs0kZ8GZ9sr1PyatH7YOca80qPSYLFewRXuE8jY4LnkJL0W0IhrIq6/M12hMPNrbn88A8p1ZzNXLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tZ7xDtsV; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tZ7xDtsV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD3BEC2BBFC;
-	Thu, 27 Jun 2024 11:05:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719486326;
-	bh=c7jsOFQzV36u+51vLMvJodzB3phULjcBajRLyloChBo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tZ7xDtsVrNzkC6mNmdFJLLHzTclq8PEkWrF1/7N/s7MForbXDvB+2yeHIbhCij9tf
-	 tJ+oIjOqkY/XCns5uv1YYyA3GiFjCiZiHFQAX7sqgb/WbY5bhOGD0MoN5Z+N5RyzCV
-	 MtMDq0iC3s1UldQXBi4SVqQ0OXyeeOiZ9DHeGl3PST1lSzLqaCnvPaGAfJFHBWS306
-	 g+Xc+8PTn55qHIKi+g6CfEM/ymLGaM1AKygSGy22vUKJ79tTt3hXeKY1A0WjIpW1E9
-	 TiLWXk1ceKrtDUE+ikMJr2y8uJ61GsjJ+NTtJV2KYh8XqUL3Ebf1kyw+i3RM+rns5g
-	 oFiTj7HFwqXuw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sMmwO-007m6d-DN;
-	Thu, 27 Jun 2024 12:05:24 +0100
-Date: Thu, 27 Jun 2024 12:05:23 +0100
-Message-ID: <86ikxuir2k.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: Russell King <linux@armlinux.org.uk>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Ian Rogers <irogers@google.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	James Clark <james.clark@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-perf-users@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 06/12] perf: arm_pmu: Remove event index to counter remapping
-In-Reply-To: <20240626-arm-pmu-3-9-icntr-v2-6-c9784b4f4065@kernel.org>
-References: <20240626-arm-pmu-3-9-icntr-v2-0-c9784b4f4065@kernel.org>
-	<20240626-arm-pmu-3-9-icntr-v2-6-c9784b4f4065@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1719496590; c=relaxed/simple;
+	bh=kYrvsf0uqKm88ZvZcePkZ49uLkndvFg7AwD2JBZhy68=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hPw6ffowuRaqCu4BDXQ8k7jIVpr5rm4Zoa+VilzQhXqksvHX6Sjc8VutytmnqWZ5XR0+fcfri9iyY4XEmarrgaeIVtsCHOscUGZTlcZy4U5tEzOhkVpmcggLLmCeBEBrYbmd7KK5V2wEn5x1RxbshxJcm2VdcdsUcu3lF5BaOTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ABD27367;
+	Thu, 27 Jun 2024 06:56:52 -0700 (PDT)
+Received: from [10.1.30.72] (e122027.cambridge.arm.com [10.1.30.72])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8FB513F73B;
+	Thu, 27 Jun 2024 06:56:23 -0700 (PDT)
+Message-ID: <b611bb5f-b6f8-44a4-9b33-a92862974363@arm.com>
+Date: Thu, 27 Jun 2024 14:56:21 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: robh@kernel.org, linux@armlinux.org.uk, peterz@infradead.org, mingo@redhat.com, acme@kernel.org, namhyung@kernel.org, mark.rutland@arm.com, alexander.shishkin@linux.intel.com, jolsa@kernel.org, irogers@google.com, adrian.hunter@intel.com, will@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, james.clark@arm.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 06/14] arm64: Override set_fixmap_io
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+References: <20240605093006.145492-1-steven.price@arm.com>
+ <20240605093006.145492-7-steven.price@arm.com> <Zmc8x3Xvs8uu9zHp@arm.com>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <Zmc8x3Xvs8uu9zHp@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, 26 Jun 2024 23:32:30 +0100,
-"Rob Herring (Arm)" <robh@kernel.org> wrote:
+On 10/06/2024 18:49, Catalin Marinas wrote:
+> On Wed, Jun 05, 2024 at 10:29:58AM +0100, Steven Price wrote:
+>> +void set_fixmap_io(enum fixed_addresses idx, phys_addr_t phys)
+>> +{
+>> +	pgprot_t prot = FIXMAP_PAGE_IO;
+>> +
+>> +	/*
+>> +	 * For now we consider all I/O as non-secure. For future
+>> +	 * filter the I/O base for setting appropriate permissions.
+>> +	 */
+>> +	prot = __pgprot(pgprot_val(prot) | PROT_NS_SHARED);
+>> +
+>> +	return __set_fixmap(idx, phys, prot);
+>> +}
 > 
-> Xscale and Armv6 PMUs defined the cycle counter at 0 and event counters
-> starting at 1 and had 1:1 event index to counter numbering. On Armv7 and
-> later, this changed the cycle counter to 31 and event counters start at
-> 0. The drivers for Armv7 and PMUv3 kept the old event index numbering
-> and introduced an event index to counter conversion. The conversion uses
-> masking to convert from event index to a counter number. This operation
-> relies on having at most 32 counters so that the cycle counter index 0
-> can be transformed to counter number 31.
+> In v2, Suzuki said that we want to keep this as a function rather than
+> just adding PROT_NS_SHARED to FIXMAP_PAGE_IO in case we want to change
+> this function in the future to allow protected MMIO.
 > 
-> Armv9.4 adds support for an additional fixed function counter
-> (instructions) which increases possible counters to more than 32, and
-> the conversion won't work anymore as a simple subtract and mask. The
-> primary reason for the translation (other than history) seems to be to
-> have a contiguous mask of counters 0-N. Keeping that would result in
-> more complicated index to counter conversions. Instead, store a mask of
-> available counters rather than just number of events. That provides more
-> information in addition to the number of events.
+> https://lore.kernel.org/linux-arm-kernel/6ba1fd72-3bad-44ca-810d-572b70050772@arm.com/
 > 
-> No (intended) functional changes.
-> 
-> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+> What I don't understand is that all the other MMIO cases just statically
+> assume unprotected/shard MMIO. Should we drop this patch here as well,
+> adjust FIXMAP_PAGE_IO and think about protected MMIO later when we
+> actually have to do device assignment?
 
-[...]
-
-> diff --git a/include/linux/perf/arm_pmu.h b/include/linux/perf/arm_pmu.h
-> index b3b34f6670cf..e5d6d204beab 100644
-> --- a/include/linux/perf/arm_pmu.h
-> +++ b/include/linux/perf/arm_pmu.h
-> @@ -96,7 +96,7 @@ struct arm_pmu {
->  	void		(*stop)(struct arm_pmu *);
->  	void		(*reset)(void *);
->  	int		(*map_event)(struct perf_event *event);
-> -	int		num_events;
-> +	DECLARE_BITMAP(cntr_mask, ARMPMU_MAX_HWEVENTS);
-
-I'm slightly worried by this, as this size is never used, let alone
-checked by the individual drivers. I can perfectly picture some new
-(non-architectural) PMU driver having more counters than that, and
-blindly setting bits outside of the allowed range.
-
-One way to make it a bit safer would be to add a helper replacing the
-various bitmap_set() calls, and enforcing that we never overflow this
-bitmap.
+I agree, there's not much point in this patch as it stands. I'll drop it
+(and the previous one) for the next version of the series. We can add it
+back if needed when protected MMIO is a thing.
 
 Thanks,
+Steve
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
