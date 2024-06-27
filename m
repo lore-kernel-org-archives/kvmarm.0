@@ -1,119 +1,91 @@
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 236DE194147
-	for <kvmarm@lists.linux.dev>; Wed, 26 Jun 2024 23:55:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F8CC2376A
+	for <kvmarm@lists.linux.dev>; Thu, 27 Jun 2024 05:53:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719446139; cv=none; b=Jn04MwvyFfgGjCHW/fYGUciQvGdiLtOVm2BD5pD2KP4kM/JBdPy0VI5lQzrWzQSCLHs+ezcTekLTwqZvDLWmEHhKSzY9paUVTmBMzF5ROiZ6ViVbhyciFJlW5vxRc1bN0hq4gFktW33ViKeVgWp59LHz41tFSJNWl6tBrEmRzFA=
+	t=1719467594; cv=none; b=TFADzw0MN0c2KEVHwyZOtWmh55JXhF23OlGhPcWlVEL8kKb+sU2JypkNTewMgLvO6+zpzXdcTnuRWNXe7sx1YMmydcUJ22PeL6MT8HMz7+8v3BUBfWgWb87+V3UCcHzQ4GAQKhyQkEBqJ+W5vypIlKHut0Oa2604/Rl2O4ox/HE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719446139; c=relaxed/simple;
-	bh=DChNOV7eKFR74vjJV7cooi/IxTjttEFhGUmfC06vs50=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gmQqOJnz8HSapwrqnLPpdB02gt2zwWFEkDa8FJbKrOXpJDaXC+EHSAiaS6Qz7cf/pMzHWf2u01ofYqXNK1fpDJj13u8FxeyVU71kIP/PwbYGDEvx4X9fJWlv5Kc6s+iYae4zQQ3k2i+Fife/BDBxb4m7EridVJqlaIK67V5KpGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BI8cmKs7; arc=none smtp.client-ip=91.218.175.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BI8cmKs7"
-X-Envelope-To: maz@kernel.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1719446133;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TGfl0vQIVVIIo5O6ugRFyaaCUBEAQaTPfBkSo6iTFPo=;
-	b=BI8cmKs7KEPRTFEE1djUAEi6xujzVRypiyOGttiIlzUZYx4l5JImLDXcfFyqj+96hKuTxZ
-	V/empXYqbyyTbXQk3YNlI2zzn2nUyAp0OkHB7PystjPgi8dK/I18Bo41wW/aPdRK0YS5LP
-	GrGxJw6IBZ2qJyaNqGrQvVvOPPAokG4=
-X-Envelope-To: joey.gouly@arm.com
-X-Envelope-To: kvmarm@lists.linux.dev
-X-Envelope-To: linux-arm-kernel@lists.infradead.org
-X-Envelope-To: kvm@vger.kernel.org
-X-Envelope-To: james.morse@arm.com
-X-Envelope-To: suzuki.poulose@arm.com
-X-Envelope-To: yuzenghui@huawei.com
-Date: Wed, 26 Jun 2024 23:55:28 +0000
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Joey Gouly <joey.gouly@arm.com>, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 1/5] KVM: arm64: Correctly honor the presence of FEAT_TCRX
-Message-ID: <ZnyqcMPGyZs07N6B@linux.dev>
-References: <20240625130042.259175-1-maz@kernel.org>
- <20240625130042.259175-2-maz@kernel.org>
- <20240625143734.GA1517668@e124191.cambridge.arm.com>
- <86r0ckj30i.wl-maz@kernel.org>
+	s=arc-20240116; t=1719467594; c=relaxed/simple;
+	bh=LtfJVn/zBNB45Oqgv6+R9DcVS1Ch7Szo9+0AZ9ig5GU=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=h8wfT5mPxwFd19muXr7TC7o3NVDqYV7IFTaeRCBa8AvilOoOBj07DwnPHx80Myocj94gqbC/UT4H2EUZaec0UlSaYxrz3PjZkohibyCkc42gUwMzkKFz4jk1EWgzS0mc7nK0tn8rv9PH9omMz4DYDJ8d4Wl+7JLQdsz69uyZcXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8A21E367;
+	Wed, 26 Jun 2024 22:53:36 -0700 (PDT)
+Received: from [10.163.47.90] (unknown [10.163.47.90])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3B5E03F6A8;
+	Wed, 26 Jun 2024 22:53:07 -0700 (PDT)
+Message-ID: <1259a298-f038-4b29-99ea-9158d2f26cfd@arm.com>
+Date: Thu, 27 Jun 2024 11:23:04 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86r0ckj30i.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V2 0/2] arm64: Drop
+ ID_AA64PFR0_EL1_ELx_[64BIT_ONLY|32BIT_64BIT]
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+To: linux-arm-kernel@lists.infradead.org
+Cc: mark.rutland@arm.com, ryan.roberts@arm.com, Marc Zyngier
+ <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Mark Brown <broonie@kernel.org>, kvmarm@lists.linux.dev,
+ linux-kernel@vger.kernel.org
+References: <20240613102710.3295108-1-anshuman.khandual@arm.com>
+ <ba9b51db-5e8a-4e89-ad6a-046133dfc657@arm.com>
+Content-Language: en-US
+In-Reply-To: <ba9b51db-5e8a-4e89-ad6a-046133dfc657@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jun 25, 2024 at 07:22:53PM +0100, Marc Zyngier wrote:
-> On Tue, 25 Jun 2024 15:37:34 +0100,
-> Joey Gouly <joey.gouly@arm.com> wrote:
-> > 
-> > On Tue, Jun 25, 2024 at 02:00:37PM +0100, Marc Zyngier wrote:
-> > > We currently blindly enable TCR2_EL1 use in a guest, irrespective
-> > > of the feature set. This is obviously wrong, and we should actually
-> > > honor the guest configuration and handle the possible trap resulting
-> > > from the guest being buggy.
-> > > 
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > ---
-> > >  arch/arm64/include/asm/kvm_arm.h | 2 +-
-> > >  arch/arm64/kvm/sys_regs.c        | 9 +++++++++
-> > >  2 files changed, 10 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> > > index b2adc2c6c82a5..e6682a3ace5af 100644
-> > > --- a/arch/arm64/include/asm/kvm_arm.h
-> > > +++ b/arch/arm64/include/asm/kvm_arm.h
-> > > @@ -102,7 +102,7 @@
-> > >  #define HCR_HOST_NVHE_PROTECTED_FLAGS (HCR_HOST_NVHE_FLAGS | HCR_TSC)
-> > >  #define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
-> > >  
-> > > -#define HCRX_GUEST_FLAGS (HCRX_EL2_SMPME | HCRX_EL2_TCR2En)
-> > > +#define HCRX_GUEST_FLAGS (HCRX_EL2_SMPME)
-> > >  #define HCRX_HOST_FLAGS (HCRX_EL2_MSCEn | HCRX_EL2_TCR2En | HCRX_EL2_EnFPM)
-> > >  
-> > >  /* TCR_EL2 Registers bits */
-> > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > > index 22b45a15d0688..71996d36f3751 100644
-> > > --- a/arch/arm64/kvm/sys_regs.c
-> > > +++ b/arch/arm64/kvm/sys_regs.c
-> > > @@ -383,6 +383,12 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
-> > >  	bool was_enabled = vcpu_has_cache_enabled(vcpu);
-> > >  	u64 val, mask, shift;
-> > >  
-> > > +	if (reg_to_encoding(r) == SYS_TCR2_EL1 &&
-> > > +	    !kvm_has_feat(vcpu->kvm, ID_AA64MMFR3_EL1, TCRX, IMP)) {
-> > > +		kvm_inject_undefined(vcpu);
-> > > +		return false;
-> > > +	}
-> > > +
-> > 
-> > If we need to start doing this with more vm(sa) registers, it might make sense
-> > to think of a way to do this without putting a big if/else in here.  For now
-> > this is seems fine.
+
+On 6/20/24 08:54, Anshuman Khandual wrote:
 > 
-> One possible solution would be to mimic the FGU behaviour and have a
-> shadow version of HCRX_EL2 that only indicates the trap routing code
-> that something trapped through that bit needs to UNDEF.
+> 
+> On 6/13/24 15:57, Anshuman Khandual wrote:
+>> This series replaces custom macros usage for ID_AA64PFR0_EL1_ELx_64BIT_ONLY
+>> and ID_AA64PFR0_EL1_ELx_32BIT_64BIT fields, thus finally just dropping them
+>> off completely. This series applies on v6.10-rc3
+>>
+>> Cc: Marc Zyngier <maz@kernel.org>
+>> Cc: Oliver Upton <oliver.upton@linux.dev>
+>> Cc: Catalin Marinas <catalin.marinas@arm.com>
+>> Cc: Will Deacon <will@kernel.org>
+>> Cc: Mark Rutland <mark.rutland@arm.com>
+>> Cc: Mark Brown <broonie@kernel.org>
+>> Cc: linux-arm-kernel@lists.infradead.org
+>> Cc: kvmarm@lists.linux.dev
+>> Cc: linux-kernel@vger.kernel.org
+>>
+>> Changes in V2:
+>>
+>> - Replaced FIELD_PREP() with SYS_FIELD_PREP_ENUM() as per Marc
+> 
+> Gentle ping, any updates for this series ?
 
-Seems reasonable, but that'll be the problem for the _next_ person to
-add an affected register ;-)
+Gentle ping again, any updates on this ?
 
--- 
-Thanks,
-Oliver
+> 
+>>
+>> Changes in V1:
+>>
+>> https://lore.kernel.org/all/20240418053804.2573071-1-anshuman.khandual@arm.com/
+>>
+>> Anshuman Khandual (2):
+>>   KVM: arm64: Replace custom macros with fields from ID_AA64PFR0_EL1
+>>   arm64/cpufeature: Replace custom macros with fields from ID_AA64PFR0_EL1
+>>
+>>  arch/arm64/include/asm/cpufeature.h            |  4 ++--
+>>  arch/arm64/include/asm/sysreg.h                |  4 ----
+>>  arch/arm64/kernel/cpufeature.c                 |  4 ++--
+>>  arch/arm64/kvm/hyp/include/nvhe/fixed_config.h | 10 +++++-----
+>>  arch/arm64/kvm/hyp/nvhe/pkvm.c                 |  4 ++--
+>>  arch/arm64/kvm/hyp/nvhe/sys_regs.c             |  2 +-
+>>  6 files changed, 12 insertions(+), 16 deletions(-)
+>>
+> 
