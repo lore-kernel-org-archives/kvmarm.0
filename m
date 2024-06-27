@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 228A113D281;
-	Thu, 27 Jun 2024 10:48:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30AC713D888;
+	Thu, 27 Jun 2024 10:54:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719485340; cv=none; b=irPvjO9TJ5lidWZgy+JbYWElJDdJj5r+dvDZK1wTsbuqI9Myk1DdwF5AncZZOGHEQIMPcZjeZSK+IHGFy6tqHFg4InuzgJ7+WFpTanQcsHnPN8DKlAach5NJflNVuY2TfezS94f2DDKmtYh1sQOsz9R24VhhYcVl9xPjCbU4m20=
+	t=1719485662; cv=none; b=NDwKb2oEAOjMdWRUlQDZNlOz42uQATcUzh/ecoiVuGOYDtnbUKeOSBWEivLHT1UZAe3K8bizKqKDxbYLIaL+jYBeNAk9gxNjan1j4KPC4QuAaF3bhNbaNVbBktZzHy74bMlPYn90uNOTnddbuhej/0UHo8xT2DOwSCsLF8UkjjE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719485340; c=relaxed/simple;
-	bh=Xfsaq40K4Qm0ljsSuW3funrZbBL/rKVegLPUHgltXNw=;
+	s=arc-20240116; t=1719485662; c=relaxed/simple;
+	bh=+VUe2Wa8SKE7wFSRDeywu7uI2jNt/A1olYtxZ+S+j7k=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=c5NVobvJHMnTVhBKE7+MwZTIWJqEamszxz/sONno3o+Dmj6znMdnbC238z8GlHuFGT4ZwK5aJXlfoyCkxvuls0tCkcUUwWeSd+X80rnHfX2d2RzQesqag7iUi23pogLr824fQaua36YbYjOuOMmeFKS1hXyKfK74vr1KDXde/r4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BMuNnQ/K; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=p4KJlYDnyx1+AOCI3/d1IP4amI7bEGykq96hUXZ5+aBjs4QOdBTd78WS2KcmJAIAuDF/l/MUBg+5OmRh6GtCWZAkJ6dDdvsU9OpVPTBcm29Hx9acAkrTf/zbYrm2TLSIJSq+pKosaZUKbdY8ZT9F282YHf8CEdp7Ojie4Nm6RWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QIwDX/NW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BMuNnQ/K"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AB91C2BBFC;
-	Thu, 27 Jun 2024 10:48:59 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QIwDX/NW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 992B7C2BBFC;
+	Thu, 27 Jun 2024 10:54:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719485339;
-	bh=Xfsaq40K4Qm0ljsSuW3funrZbBL/rKVegLPUHgltXNw=;
+	s=k20201202; t=1719485661;
+	bh=+VUe2Wa8SKE7wFSRDeywu7uI2jNt/A1olYtxZ+S+j7k=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=BMuNnQ/Ka2s3kAuh/4rwdN19j0gtikF+LjMwDlQNnzHpAkty2VQgd5X7ReW7BqTQ5
-	 1+cAgyO+jaLvvtEfvY/vjRqOA6XRQh5qoyf7zQUrReBa/mIAiEhnvRhS6U7ixkOwwM
-	 VSDOFX9AOpa8x16cOWbs43JaC2w9VF2wdTPnj9tVN2b/aR5yUrn6KRuXSuTodG9tFt
-	 P02KBrH/+kjzFEqixZE/cukh0CM8YxZNFTZPP2O+lm7fmYQ5A87Y5M2F+85dS7xOwV
-	 M2oJq18M8ntIhXbTttk7zRRdLk5AqkUNUC04RV48qo729pIpsrohhplQ5eZRJOSQE9
-	 RAkMiDSlY+xHQ==
+	b=QIwDX/NWLGHl6ChidC2hBQ6FY7nFCM1ZWVZUP4PWuWckgVsjIpnmCv7nAheI6HE0F
+	 rgrPdV+fqVQmGVkqL8exY4V7vuk+8aRj+CeRlew1fIrFS76w7xQ3NY5DSdijz0f93m
+	 2Jb/bo9YFrgaRXtapsYhY/uNBFG4vCaMmJDmhnrp/+72fLp9uqenmi2W2GyZUW/gbQ
+	 YDCJoRtFcTImef3P71EbG2iFwYfFD5qi9JJfdU5mcWVo5Xq0AgZm/zxK8wBFphb/fC
+	 R97l0vNtyUhY4nDTqUeFv5FXiPBUbnDtwzBCX7/JIAFC27lseefxcZUtIOnrKx3nNk
+	 HGH2gBvyf8jyg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sMmgT-007lsq-5w;
-	Thu, 27 Jun 2024 11:48:57 +0100
-Date: Thu, 27 Jun 2024 11:48:56 +0100
-Message-ID: <86le2qirtz.wl-maz@kernel.org>
+	id 1sMmlf-007lyJ-Fx;
+	Thu, 27 Jun 2024 11:54:19 +0100
+Date: Thu, 27 Jun 2024 11:54:18 +0100
+Message-ID: <86jziairl1.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: "Rob Herring (Arm)" <robh@kernel.org>
 Cc: Russell King <linux@armlinux.org.uk>,
@@ -57,10 +57,10 @@ Cc: Russell King <linux@armlinux.org.uk>,
 	linux-kernel@vger.kernel.org,
 	linux-perf-users@vger.kernel.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 10/12] arm64: perf/kvm: Use a common PMU cycle counter define
-In-Reply-To: <20240626-arm-pmu-3-9-icntr-v2-10-c9784b4f4065@kernel.org>
+Subject: Re: [PATCH v2 11/12] KVM: arm64: Refine PMU defines for number of counters
+In-Reply-To: <20240626-arm-pmu-3-9-icntr-v2-11-c9784b4f4065@kernel.org>
 References: <20240626-arm-pmu-3-9-icntr-v2-0-c9784b4f4065@kernel.org>
-	<20240626-arm-pmu-3-9-icntr-v2-10-c9784b4f4065@kernel.org>
+	<20240626-arm-pmu-3-9-icntr-v2-11-c9784b4f4065@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -76,13 +76,21 @@ X-SA-Exim-Rcpt-To: robh@kernel.org, linux@armlinux.org.uk, peterz@infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 26 Jun 2024 23:32:34 +0100,
+On Wed, 26 Jun 2024 23:32:35 +0100,
 "Rob Herring (Arm)" <robh@kernel.org> wrote:
 > 
-> The PMUv3 and KVM code each have a define for the PMU cycle counter
-> index. Move KVM's define to a shared location and use it for PMUv3
-> driver.
+> There are 2 defines for the number of PMU counters:
+> ARMV8_PMU_MAX_COUNTERS and ARMPMU_MAX_HWEVENTS. Both are the same
+> currently, but Armv9.4/8.9 increases the number of possible counters
+> from 32 to 33. With this change, the maximum number of counters will
+> differ for KVM's PMU emulation which is PMUv3.4. Give KVM PMU emulation
+> its own define to decouple it from the rest of the kernel's number PMU
+> counters.
 > 
+> The VHE PMU code needs to match the PMU driver, so switch it to use
+> ARMPMU_MAX_HWEVENTS instead.
+>
+> Acked-by: Mark Rutland <mark.rutland@arm.com>
 > Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
 
 Reviewed-by: Marc Zyngier <maz@kernel.org>
