@@ -1,91 +1,95 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F8CC2376A
-	for <kvmarm@lists.linux.dev>; Thu, 27 Jun 2024 05:53:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2C85142E80;
+	Thu, 27 Jun 2024 10:47:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719467594; cv=none; b=TFADzw0MN0c2KEVHwyZOtWmh55JXhF23OlGhPcWlVEL8kKb+sU2JypkNTewMgLvO6+zpzXdcTnuRWNXe7sx1YMmydcUJ22PeL6MT8HMz7+8v3BUBfWgWb87+V3UCcHzQ4GAQKhyQkEBqJ+W5vypIlKHut0Oa2604/Rl2O4ox/HE=
+	t=1719485235; cv=none; b=kZQJDA4+bAvW8IIyPVrvB/DKKLbOXqGllelt15SLxK+W//vOxokhAmbBfUw1F8xnQ5rkrgXE4nhjoseeKKPy6dPAcRHGOW8O7wwHp+SyDelBvIDpvu4vwWSuUhVX1AXSg3rhZqJVJ0r0CzVa7NImD8UF/BwCmhfe6LF3JFBgl1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719467594; c=relaxed/simple;
-	bh=LtfJVn/zBNB45Oqgv6+R9DcVS1Ch7Szo9+0AZ9ig5GU=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=h8wfT5mPxwFd19muXr7TC7o3NVDqYV7IFTaeRCBa8AvilOoOBj07DwnPHx80Myocj94gqbC/UT4H2EUZaec0UlSaYxrz3PjZkohibyCkc42gUwMzkKFz4jk1EWgzS0mc7nK0tn8rv9PH9omMz4DYDJ8d4Wl+7JLQdsz69uyZcXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8A21E367;
-	Wed, 26 Jun 2024 22:53:36 -0700 (PDT)
-Received: from [10.163.47.90] (unknown [10.163.47.90])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3B5E03F6A8;
-	Wed, 26 Jun 2024 22:53:07 -0700 (PDT)
-Message-ID: <1259a298-f038-4b29-99ea-9158d2f26cfd@arm.com>
-Date: Thu, 27 Jun 2024 11:23:04 +0530
+	s=arc-20240116; t=1719485235; c=relaxed/simple;
+	bh=VB0LnRPt4YAFrWiQjhVLB3LXIJjdTd/+u0cXv26F+T0=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JNPYuOQVfkPVW9mVhA4kMGUWZXLubvI5txzr1T/js1Hyfezi1cJPon99rZaVrOAjSq+nrD98v6BhyTrAS5oLb5iv9MPtgodythmhYDNmvDCBQwNnulXtZXQuTsBBQ2mzpOSUjSeEfYn0K+a/c7e82j/ZGFfdUx5KkgP4l+1zUhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dZaPUjD+; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dZaPUjD+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75221C2BBFC;
+	Thu, 27 Jun 2024 10:47:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719485234;
+	bh=VB0LnRPt4YAFrWiQjhVLB3LXIJjdTd/+u0cXv26F+T0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=dZaPUjD+AFzGLhx20otBU0UKM/Me6ZHfy5CHl4ylB6Mri64CSmp6i3kDZnh8irduR
+	 XjTUNt4gxlgj2WDbAxMlzsgOIvOrC67z42nNaKkCkUrqYkrlBzTfMb+fiPSgX5KfP7
+	 bNCTf6E5oU55+IPkmi2g+y7fl/c7yThpj2fkJiQsYXkzotDBQQO/Cay/3IqProUJ6z
+	 RdM77L4scv+UnJCSiu56Q+Vu7vBIMSNRRfVxYKGQ22f3Xc7fMjL7P7KhpvN9Xsbqmx
+	 Q5A/BvJnoMkNZuErKi0AsUkGQbuXxIumtM1jY5Se5ob0KQ78h9cdWrNVN45QA3IFxx
+	 kkltlKVvW0Cyg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sMmem-007lqE-Ah;
+	Thu, 27 Jun 2024 11:47:12 +0100
+Date: Thu, 27 Jun 2024 11:47:11 +0100
+Message-ID: <86o77mirww.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: Russell King <linux@armlinux.org.uk>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Ian Rogers <irogers@google.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Will Deacon <will@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	James Clark <james.clark@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-perf-users@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v2 08/12] KVM: arm64: pmu: Use arm_pmuv3.h register accessors
+In-Reply-To: <20240626-arm-pmu-3-9-icntr-v2-8-c9784b4f4065@kernel.org>
+References: <20240626-arm-pmu-3-9-icntr-v2-0-c9784b4f4065@kernel.org>
+	<20240626-arm-pmu-3-9-icntr-v2-8-c9784b4f4065@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V2 0/2] arm64: Drop
- ID_AA64PFR0_EL1_ELx_[64BIT_ONLY|32BIT_64BIT]
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-To: linux-arm-kernel@lists.infradead.org
-Cc: mark.rutland@arm.com, ryan.roberts@arm.com, Marc Zyngier
- <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Mark Brown <broonie@kernel.org>, kvmarm@lists.linux.dev,
- linux-kernel@vger.kernel.org
-References: <20240613102710.3295108-1-anshuman.khandual@arm.com>
- <ba9b51db-5e8a-4e89-ad6a-046133dfc657@arm.com>
-Content-Language: en-US
-In-Reply-To: <ba9b51db-5e8a-4e89-ad6a-046133dfc657@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: robh@kernel.org, linux@armlinux.org.uk, peterz@infradead.org, mingo@redhat.com, acme@kernel.org, namhyung@kernel.org, mark.rutland@arm.com, alexander.shishkin@linux.intel.com, jolsa@kernel.org, irogers@google.com, adrian.hunter@intel.com, will@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, james.clark@arm.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Wed, 26 Jun 2024 23:32:32 +0100,
+"Rob Herring (Arm)" <robh@kernel.org> wrote:
+> 
+> Commit df29ddf4f04b ("arm64: perf: Abstract system register accesses
+> away") split off PMU register accessor functions to a standalone header.
+> Let's use it for KVM PMU code and get rid one copy of the ugly switch
+> macro.
+> 
+> Acked-by: Mark Rutland <mark.rutland@arm.com>
+> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
 
-On 6/20/24 08:54, Anshuman Khandual wrote:
-> 
-> 
-> On 6/13/24 15:57, Anshuman Khandual wrote:
->> This series replaces custom macros usage for ID_AA64PFR0_EL1_ELx_64BIT_ONLY
->> and ID_AA64PFR0_EL1_ELx_32BIT_64BIT fields, thus finally just dropping them
->> off completely. This series applies on v6.10-rc3
->>
->> Cc: Marc Zyngier <maz@kernel.org>
->> Cc: Oliver Upton <oliver.upton@linux.dev>
->> Cc: Catalin Marinas <catalin.marinas@arm.com>
->> Cc: Will Deacon <will@kernel.org>
->> Cc: Mark Rutland <mark.rutland@arm.com>
->> Cc: Mark Brown <broonie@kernel.org>
->> Cc: linux-arm-kernel@lists.infradead.org
->> Cc: kvmarm@lists.linux.dev
->> Cc: linux-kernel@vger.kernel.org
->>
->> Changes in V2:
->>
->> - Replaced FIELD_PREP() with SYS_FIELD_PREP_ENUM() as per Marc
-> 
-> Gentle ping, any updates for this series ?
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
-Gentle ping again, any updates on this ?
+	M.
 
-> 
->>
->> Changes in V1:
->>
->> https://lore.kernel.org/all/20240418053804.2573071-1-anshuman.khandual@arm.com/
->>
->> Anshuman Khandual (2):
->>   KVM: arm64: Replace custom macros with fields from ID_AA64PFR0_EL1
->>   arm64/cpufeature: Replace custom macros with fields from ID_AA64PFR0_EL1
->>
->>  arch/arm64/include/asm/cpufeature.h            |  4 ++--
->>  arch/arm64/include/asm/sysreg.h                |  4 ----
->>  arch/arm64/kernel/cpufeature.c                 |  4 ++--
->>  arch/arm64/kvm/hyp/include/nvhe/fixed_config.h | 10 +++++-----
->>  arch/arm64/kvm/hyp/nvhe/pkvm.c                 |  4 ++--
->>  arch/arm64/kvm/hyp/nvhe/sys_regs.c             |  2 +-
->>  6 files changed, 12 insertions(+), 16 deletions(-)
->>
-> 
+-- 
+Without deviation from the norm, progress is not possible.
