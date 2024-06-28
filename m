@@ -1,31 +1,31 @@
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2BB5768EC
-	for <kvmarm@lists.linux.dev>; Fri, 28 Jun 2024 21:18:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A7B75C89
+	for <kvmarm@lists.linux.dev>; Fri, 28 Jun 2024 21:25:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719609507; cv=none; b=DbY8+Ya0jjNzFKrUoM7BbXmQuqJQBDnvQNSPnppWp0HxkWp7y2RsjjiJ8J+/WFyCKWza2MhX1sDfwYYK62MGoZ+7E/dE4ryRGAUKPmya/5dxh23xHNZKoBwTgTR5jjGiuwawLCDFfCmlO6q64icr3qRmtgInr3NKPLUY5HjX51c=
+	t=1719609937; cv=none; b=iB5Smvqo/bT0RRvS66Mj20OJA9jI3jzudhCMQClcAFb7jWcqSM4zYbkJFJRZIMUfK6PQcK8TMcmjLnWKS3a3bC2bkg78iVU1QtYHhUXj1SNN4TPvNWy0iouX6jmL+uSp81eC5cOPRtTmKmCWEdlHhpnK/4UBfYUxOL/PxRr0zwo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719609507; c=relaxed/simple;
-	bh=BoFZDuqPzGP40r4KEUuGHvfn6bb2wtaddf0wdcA3lzM=;
+	s=arc-20240116; t=1719609937; c=relaxed/simple;
+	bh=N59WPI9EfXkR5vuxEptNjnh5hJvs9LbGDPVgOAO2bAU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LTtTt90LG2UAnjZhJumtL4dKIh1HprsDetkciP8LmTxcDghQ5/C3o4+q27tKFceSvS7pEmQPKqm5fdp/m1SVhTCZ6q3mHnACM9qWF5UShVsd9P2t8SeZ8GA2vM8dmFTna7N2aXa2TBzHK3iguqaI6Fol8LggpVpCfbfvJWPzX0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YVmM27N0; arc=none smtp.client-ip=95.215.58.188
+	 Content-Type:Content-Disposition:In-Reply-To; b=lrkq3w9bfj6Q5qgO3M6xiBiLlQrGa8Jd8cmwkVN8Cw8aCmFLxm8fHG6NgIq4ZOBqf9FFky6iL2fwfJL5eQuHxMQKxcZncFwoAFL1aU6HxV2WtTDtAPK3ActjuNYK0X3eIySImWl0AMCOPbfDzNN+y1L+WR0vPwCVEmJlUOkxMAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=LH7nadvX; arc=none smtp.client-ip=95.215.58.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YVmM27N0"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LH7nadvX"
 X-Envelope-To: sebastianene@google.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1719609503;
+	t=1719609932;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=BLFP/6n6TmQFjaJH2t9PIEjVSqPuh54BsTLyCUC8RSI=;
-	b=YVmM27N0679cDACz5KF6MA8iFPbbDxxnz/WCFjirVh5/zUhCa9y9hhyCJkhv0aHLRtdfOm
-	Pp2Aa2N/di7yC62YGCgTIABkcS0wCBsjouiG9qaP9iPZjBuJcb3qFtzE0YogBYJLdcEAcA
-	uV4dwgERknKjnetYQlbk1QX+YEVdoDo=
+	bh=+SRbUosfVTkOw3kLArjDnU2h9hEgZUxBiqMVhNqRDys=;
+	b=LH7nadvXqIuuqk0lM4p4sxQ/AmvOKkgPEw4U1fe4zocK/uC2bah9H33DSR4ImZO9NmDCOu
+	xWo0aOtzi4TeDg6zlw35ODVqUjNrGH5s7XrP5e9p3NCCAwIVtyUCpHR1Hldw6PWIDcEQ1J
+	o+nJQG/89u5U+fl6hgZNLNUp/9MKff8=
 X-Envelope-To: akpm@linux-foundation.org
 X-Envelope-To: alexghiti@rivosinc.com
 X-Envelope-To: ankita@nvidia.com
@@ -46,7 +46,7 @@ X-Envelope-To: kvmarm@lists.linux.dev
 X-Envelope-To: linux-arm-kernel@lists.infradead.org
 X-Envelope-To: linux-kernel@vger.kernel.org
 X-Envelope-To: kernel-team@android.com
-Date: Fri, 28 Jun 2024 21:18:16 +0000
+Date: Fri, 28 Jun 2024 21:25:26 +0000
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Sebastian Ene <sebastianene@google.com>
@@ -58,11 +58,9 @@ Cc: akpm@linux-foundation.org, alexghiti@rivosinc.com, ankita@nvidia.com,
 	suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com,
 	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org, kernel-team@android.com
-Subject: Re: [PATCH v7 5/6] KVM: arm64: Initialize the ptdump parser with
- stage-2 attributes
-Message-ID: <Zn8omLmCSIHun1uq@linux.dev>
+Subject: Re: [PATCH v7 0/6] arm64: ptdump: View the second stage page-tables
+Message-ID: <Zn8qRqf8VZCk0KmP@linux.dev>
 References: <20240621123230.1085265-1-sebastianene@google.com>
- <20240621123230.1085265-6-sebastianene@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -71,181 +69,157 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240621123230.1085265-6-sebastianene@google.com>
+In-Reply-To: <20240621123230.1085265-1-sebastianene@google.com>
 X-Migadu-Flow: FLOW_OUT
 
 Hi Seb,
 
-On Fri, Jun 21, 2024 at 12:32:29PM +0000, Sebastian Ene wrote:
-> Define a set of attributes used by the ptdump parser to display the
-> properties of a guest memory region covered by a pagetable descriptor.
-> Build a description of the pagetable levels and initialize the parser
-> with this configuration.
-> 
-> Signed-off-by: Sebastian Ene <sebastianene@google.com>
+I think we're getting closer on this series, thanks for reposting it. In
+addition to polishing up the KVM side of things, I'd like to have acks
+on the ptdump changes (patches 2-3).
 
-This patch should come *before* patch 4, no point in exposing the
-debugfs file if we aren't ready to handle it yet.
-
-> ---
->  arch/arm64/kvm/ptdump.c | 143 ++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 137 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
-> index 36dc7662729f..cc1d4fdddc6e 100644
-> --- a/arch/arm64/kvm/ptdump.c
-> +++ b/arch/arm64/kvm/ptdump.c
-> @@ -14,6 +14,61 @@
->  #include <kvm_ptdump.h>
->  
->  
-> +#define MARKERS_LEN		(2)
-> +#define KVM_PGTABLE_MAX_LEVELS	(KVM_PGTABLE_LAST_LEVEL + 1)
-> +
-> +struct kvm_ptdump_guest_state {
-> +	struct kvm		*kvm;
-> +	struct pg_state		parser_state;
-> +	struct addr_marker	ipa_marker[MARKERS_LEN];
-> +	struct pg_level		level[KVM_PGTABLE_MAX_LEVELS];
-> +	struct ptdump_range	range[MARKERS_LEN];
-> +};
-> +
-> +static const struct prot_bits stage2_pte_bits[] = {
-> +	{
-> +		.mask	= PTE_VALID,
-> +		.val	= PTE_VALID,
-> +		.set	= " ",
-> +		.clear	= "F",
-> +	}, {
-> +		.mask	= KVM_PTE_LEAF_ATTR_HI_S2_XN | PTE_VALID,
-> +		.val	= KVM_PTE_LEAF_ATTR_HI_S2_XN | PTE_VALID,
-> +		.set	= "XN",
-> +		.clear	= "  ",
-> +	}, {
-> +		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | PTE_VALID,
-> +		.val	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | PTE_VALID,
-> +		.set	= "R",
-> +		.clear	= " ",
-> +	}, {
-> +		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W | PTE_VALID,
-> +		.val	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W | PTE_VALID,
-> +		.set	= "W",
-> +		.clear	= " ",
-> +	}, {
-> +		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_AF | PTE_VALID,
-> +		.val	= KVM_PTE_LEAF_ATTR_LO_S2_AF | PTE_VALID,
-> +		.set	= "AF",
-> +		.clear	= "  ",
-
-<snip>
-
-> +	}, {
-> +		.mask	= PTE_NG,
-> +		.val	= PTE_NG,
-> +		.set	= "FnXS",
-> +		.clear	= "  ",
-> +	}, {
-> +		.mask	= PTE_CONT | PTE_VALID,
-> +		.val	= PTE_CONT | PTE_VALID,
-> +		.set	= "CON",
-> +		.clear	= "   ",
-> +	}, {
-
-</snip>
-
-Neither of these bits are used at stage-2, why have descriptors for
-them?
-
-> +static int kvm_ptdump_build_levels(struct pg_level *level, u32 start_lvl)
-> +{
-> +	static const char * const level_names[] = {"PGD", "PUD", "PMD", "PTE"};
-> +	u32 i = 0;
-> +	u64 mask = 0;
-> +
-> +	if (start_lvl > 2) {
-> +		pr_err("invalid start_lvl %u\n", start_lvl);
-> +		return -EINVAL;
-> +	}
-
-	if (WARN_ON_ONCE(start_lvl >= KVM_PGTABLE_LAST_LEVEL))
-		return -EINVAL;
-
-> +	for (i = 0; i < ARRAY_SIZE(stage2_pte_bits); i++)
-> +		mask |= stage2_pte_bits[i].mask;
-> +
-> +	for (i = start_lvl; i < KVM_PGTABLE_MAX_LEVELS; i++) {
-> +		strscpy(level[i].name, level_names[i], sizeof(level[i].name));
-> +
-> +		level[i].num	= ARRAY_SIZE(stage2_pte_bits);
-> +		level[i].bits	= stage2_pte_bits;
-> +		level[i].mask	= mask;
-> +	}
-> +
-> +	if (start_lvl > 0)
-> +		strscpy(level[start_lvl].name, level_names[0], sizeof(level_names[0]));
-
-This should pass the size of @dst, not the source. This becomes slightly
-more self-documenting if you use a literal for "PGD" here too.
-
-		strscpy(level[start_lvl].name, "PGD", sizeof(level[start_lvl].name));
-
-> +	return 0;
-> +}
-> +
-> +static struct kvm_ptdump_guest_state
-> +*kvm_ptdump_parser_init(struct kvm *kvm)
-> +{
-> +	struct kvm_ptdump_guest_state *st;
-> +	struct kvm_s2_mmu *mmu = &kvm->arch.mmu;
-> +	struct kvm_pgtable *pgtable = mmu->pgt;
-> +	int ret;
-> +
-> +	st = kzalloc(sizeof(struct kvm_ptdump_guest_state), GFP_KERNEL_ACCOUNT);
-> +	if (!st)
-> +		return NULL;
-> +
-> +	ret = kvm_ptdump_build_levels(&st->level[0], pgtable->start_level);
-> +	if (ret)
-> +		goto free_with_state;
-
-I don't see any value in the use of goto here, as there isn't any sort
-of cascading initialization / cleanup. This also presents an opportunity
-to get an error back out to the caller.
-
-	if (ret) {
-		kfree(st);
-		return ERR_PTR(ret);
-	}
-
-> @@ -57,22 +176,34 @@ static int kvm_ptdump_guest_show(struct seq_file *m, void *unused)
->  static int kvm_ptdump_guest_open(struct inode *m, struct file *file)
->  {
->  	struct kvm *kvm = m->i_private;
-> +	struct kvm_ptdump_guest_state *st;
->  	int ret;
->  
->  	if (!kvm_get_kvm_safe(kvm))
->  		return -ENOENT;
->  
-> -	ret = single_open(file, kvm_ptdump_guest_show, m->i_private);
-> -	if (ret < 0)
-> -		kvm_put_kvm(kvm);
-> +	st = kvm_ptdump_parser_init(kvm);
-> +	if (!st) {
-> +		ret = -ENOMEM;
-> +		goto free_with_kvm_ref;
-> +	}
-
-(with the earlier suggestion)
-
-	st = kvm_ptdump_parser_init(kvm);
-	if (IS_ERR(st)) {
-		ret = PTR_ERR(st);
-		goto free_with_kvm_ref;
-	}
-
-Otherwise genuine KVM bugs (-EINVAL) are getting lumped into ENOMEM.
+Will + Catalin, any concerns?
 
 -- 
 Thanks,
 Oliver
+
+On Fri, Jun 21, 2024 at 12:32:24PM +0000, Sebastian Ene wrote:
+> Hi,
+> 
+> 
+> This series extends the ptdump support to allow dumping the guest
+> stage-2 pagetables. When CONFIG_PTDUMP_STAGE2_DEBUGFS is enabled, ptdump
+> registers '/sys/debug/kvm/<guest_id>/stage2_page_tables' entry with debugfs
+> upon guest creation. This allows userspace tools (eg. cat) to dump the
+> stage-2 pagetables by reading the registered file.
+> 
+> Reading the debugfs file shows stage-2 memory ranges in following format:
+> <IPA range> <size> <descriptor type> <access permissions> <mem_attributes>
+> 
+> Below is the output of a guest stage-2 pagetable dump running under Qemu:
+> 
+> ---[ IPA bits 33 start lvl 2 ]---
+> 0x0000000000000000-0x0000000080000000           2G PGD
+> 0x0000000080000000-0x0000000080c00000          12M PGD      R W AF        BLK
+> 0x0000000080c00000-0x0000000080e00000           2M PGD   XN R W AF        BLK
+> 0x0000000080e00000-0x0000000081000000           2M PGD      R W AF        BLK
+> 0x0000000081000000-0x0000000081400000           4M PGD   XN R W AF        BLK
+> 0x0000000081400000-0x000000008fe00000         234M PGD
+> 0x000000008fe00000-0x0000000090000000           2M PGD   XN R W AF        BLK
+> 0x0000000090000000-0x00000000fa000000        1696M PGD
+> 0x00000000fa000000-0x00000000fe000000          64M PGD   XN R W AF        BLK
+> 0x00000000fe000000-0x0000000100000000          32M PGD
+> 0x0000000100000000-0x0000000101c00000          28M PGD   XN R W AF        BLK
+> 0x0000000101c00000-0x0000000102000000           4M PGD
+> 0x0000000102000000-0x0000000102200000           2M PGD   XN R W AF        BLK
+> 0x0000000102200000-0x000000017b000000        1934M PGD
+> 0x000000017b000000-0x0000000180000000          80M PGD   XN R W AF        BLK
+> 
+> Link to v6:
+> https://lore.kernel.org/all/20240220151035.327199-1-sebastianene@google.com/
+> 
+> Link to v5:
+> https://lore.kernel.org/all/20240207144832.1017815-2-sebastianene@google.com/
+> 
+> Link to v4:
+> https://lore.kernel.org/all/20231218135859.2513568-2-sebastianene@google.com/
+> 
+> Link to v3:
+> https://lore.kernel.org/all/20231115171639.2852644-2-sebastianene@google.com/
+> 
+> Changelog:
+>  v6 -> v7:
+>  * Reworded commit for this patch : [PATCH v6 2/6] arm64: ptdump: Expose
+>    the attribute parsing functionality
+>  * fixed minor conflicts in the struct pg_state definition
+>  * moved the kvm_ptdump_guest_registration in the
+>  * kvm_arch_create_vm_debugfs
+>  * reset the parse state before walking the pagetables
+>  * copy the level name to the pg_level buffer
+> 
+> 
+>  v5 -> v6:
+>  * don't return an error if the kvm_arch_create_vm_debugfs fails to
+>    initialize (ref.
+> https://lore.kernel.org/all/20240216155941.2029458-1-oliver.upton@linux.dev/)  
+>  * fix use-after-free suggested by getting a reference to the
+>    KVM struct while manipulating the debugfs files
+>    and put the reference on the file close.
+>  * do all the allocations at once for the ptdump parser state tracking
+>    and simplify the initialization.
+>  * move the ptdump parser state initialization as part of the file_open
+>  * create separate files for printing the guest stage-2 pagetable
+>    configuration such as: the start level of the pagetable walk and the
+>    number of bits used for the IPA space representation.
+>  * fixed the wrong header format for the newly added file
+>  * include missing patch which hasn't been posted on the v5:
+>    "KVM-arm64-Move-pagetable-definitions-to-common-heade.patch" 
+> 
+> 
+>  v4 -> v5:
+>  * refactorization: split the series into two parts as per the feedback
+>    received from Oliver. Introduce the base support which allows dumping
+>    of the guest stage-2 pagetables.
+>  * removed the *ops* struct wrapper built on top of the file_ops and
+>    simplify the ptdump interface access.
+>  * keep the page table walker away from the ptdump specific code
+> 
+>   v3 -> current_version:
+>   * refactorization: moved all the **KVM** specific components under
+>     kvm/ as suggested by Oliver. Introduced a new file
+>     arm64/kvm/ptdump.c which handled the second stage translation.
+>     re-used only the display portion from mm/ptdump.c
+>   * pagetable snapshot creation now uses memory donated from the host.
+>     The memory is no longer shared with the host as this can pose a security
+>     risk if the host has access to manipulate the pagetable copy while
+>     the hypervisor iterates it.
+>   * fixed a memory leak: while memory was used from the memcache for
+>     building the snapshot pagetable, it was no longer giving back the
+>     pages to the host for freeing. A separate array was introduced to
+>     keep track of the pages allocated from the memcache.
+> 
+> 
+>   v2 -> v3:
+>   * register the stage-2 debugfs entry for the host under
+>     /sys/debug/kvm/host_stage2_page_tables and in
+>     /sys/debug/kvm/<guest_id>/stage2_page_tables for guests.
+>   * don't use a static array for parsing the attributes description,
+>     generate it dynamically based on the number of pagetable levels
+>   * remove the lock that was guarding the seq_file private inode data,
+>     and keep the data private to the open file session.
+>   * minor fixes & renaming of CONFIG_NVHE_EL2_PTDUMP_DEBUGFS to
+>     CONFIG_PTDUMP_STAGE2_DEBUGFS
+> 
+> 
+>   v1 -> v2:
+>   * use the stage-2 pagetable walker for dumping descriptors instead of
+>     the one provided by ptdump.
+>   * support for guests pagetables dumping under VHE/nVHE non-protected
+> 
+> Thanks,
+> 
+> Sebastian Ene (6):
+>   KVM: arm64: Move pagetable definitions to common header
+>   arm64: ptdump: Expose the attribute parsing functionality
+>   arm64: ptdump: Use the mask from the state structure
+>   KVM: arm64: Register ptdump with debugfs on guest creation
+>   KVM: arm64: Initialize the ptdump parser with stage-2 attributes
+>   KVM: arm64: Expose guest stage-2 pagetable config to debugfs
+> 
+>  arch/arm64/include/asm/kvm_pgtable.h |  42 +++++
+>  arch/arm64/include/asm/ptdump.h      |  42 ++++-
+>  arch/arm64/kvm/Kconfig               |  14 ++
+>  arch/arm64/kvm/Makefile              |   1 +
+>  arch/arm64/kvm/arm.c                 |   2 +
+>  arch/arm64/kvm/hyp/pgtable.c         |  42 -----
+>  arch/arm64/kvm/kvm_ptdump.h          |  20 ++
+>  arch/arm64/kvm/ptdump.c              | 272 +++++++++++++++++++++++++++
+>  arch/arm64/mm/ptdump.c               |  50 +----
+>  9 files changed, 402 insertions(+), 83 deletions(-)
+>  create mode 100644 arch/arm64/kvm/kvm_ptdump.h
+>  create mode 100644 arch/arm64/kvm/ptdump.c
+> 
+> -- 
+> 2.45.2.741.gdbec12cfda-goog
+> 
