@@ -1,107 +1,161 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F3F358210
-	for <kvmarm@lists.linux.dev>; Fri, 28 Jun 2024 06:05:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C3EB4436A
+	for <kvmarm@lists.linux.dev>; Fri, 28 Jun 2024 08:10:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719554723; cv=none; b=Egwjs11Bdm3sIgw039m2yvPeOwVMROZom6Dn4PiQ+JtcV6ZxI/+OrWes5kZdFhAS1rBkJ1F5xfHJSxp2RSKbfri3Jstoht38nJq+HQCfmaU63FNdjdbcixKOKRSUMVdF9utp/euy5PZJF42XOrlU+W0t6UhFmDLdr7J3nXf62b0=
+	t=1719562246; cv=none; b=PzM6hPbAA7W7QmtMYYNvxmuZYbDbH5rmE+bXVUUpGDkekK+rTXxblHpXQsf35TvAzydNYEDfoNFLeNIeKl71wkDDspWGMOkQOK1gfO78ptO4RzOC3hpNmsc+taKQ/XBfwDKsVTg7sFU43JCGHTNJuvP2XpUKXHmeZbY8nMe0lBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719554723; c=relaxed/simple;
-	bh=xSiJ5L74EeCZilqppN+5V8jJKnnXkvFKwD8VAftCPj4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=E2RBtRN1Gh+1V+yxlYxUILmrGXO6kY+naiP4uWTfwtVQnAHw4gMOOGN3wWCuuNV7eKsCu5y60uh/+jHXOcwSNIF3hVZctGIRXyB69tezeuqf/g/vrhlaAH9MQzl6t5UqnWHxKcF6AgyGD5Bq7UbPt7Si66z1i6ruo/N3t3WvFGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=d6WQsR9k; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d6WQsR9k"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1719554720;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=82yWG8Vl+Le/9WjBwfHlK8sLf94k5LjwViXN1KBGyHs=;
-	b=d6WQsR9k9m7QZHi3qpB5A56mVqeQYDuxoC0eINzd1DeF1p7OYRPwjsxj9xwMuRUM8u1D9+
-	heNmzwiL4+xs2uI3NFw8s0MJclUOJYLUpkFU4WyH4zz3+6ezIcouAIE9SCZuc5JwhO/sA1
-	qB1sZQVfb0NCEBDqWSsGknbB+iHA+Ec=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-44-V4jOVgGQNcScVriSkjyevw-1; Fri,
- 28 Jun 2024 02:05:10 -0400
-X-MC-Unique: V4jOVgGQNcScVriSkjyevw-1
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1AB001955DA6;
-	Fri, 28 Jun 2024 06:05:08 +0000 (UTC)
-Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 32E2F1945CB1;
-	Fri, 28 Jun 2024 06:05:06 +0000 (UTC)
-From: Shaoqin Huang <shahuang@redhat.com>
-To: Oliver Upton <oliver.upton@linux.dev>,
-	Marc Zyngier <maz@kernel.org>,
-	kvmarm@lists.linux.dev
-Cc: Shaoqin Huang <shahuang@redhat.com>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 2/2] KVM: selftests: aarch64: Add writable test for ID_AA64PFR1_EL1
-Date: Fri, 28 Jun 2024 02:04:52 -0400
-Message-Id: <20240628060454.1936886-3-shahuang@redhat.com>
-In-Reply-To: <20240628060454.1936886-1-shahuang@redhat.com>
-References: <20240628060454.1936886-1-shahuang@redhat.com>
+	s=arc-20240116; t=1719562246; c=relaxed/simple;
+	bh=Yt5vNGVix0yKmXCbLIw92RFLblnVAHd1sqawgxijrx4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Pifbay2vdmN1/SsZKZVVG0aNA+1vdmpXX3yflSmENAgwiJoU1EQ7TSsrEig8QC1/nPc38m7wdicVjSNOTgHbnBgVap+X2uqljt3zXu3f8GBXJR7RXBTpncyTYBHWwsk6gRqM/utMZlE3vmP+y4B8pEIg6O/eGkm5frwYhABdzZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4W9Skg4fR8zdfPf;
+	Fri, 28 Jun 2024 16:08:59 +0800 (CST)
+Received: from kwepemd500012.china.huawei.com (unknown [7.221.188.25])
+	by mail.maildlp.com (Postfix) with ESMTPS id 6860218009B;
+	Fri, 28 Jun 2024 16:10:34 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
+ kwepemd500012.china.huawei.com (7.221.188.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.34; Fri, 28 Jun 2024 16:10:33 +0800
+Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
+ lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.039;
+ Fri, 28 Jun 2024 09:10:31 +0100
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To: James Morse <james.morse@arm.com>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>
+CC: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>, yuzenghui <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+	Jing Zhang <jingzhangos@google.com>, "Wangzhou (B)" <wangzhou1@hisilicon.com>
+Subject: RE: [PATCH v3 4/6] KVM: arm64: Disable MPAM visibility by default and
+ ignore VMM writes
+Thread-Topic: [PATCH v3 4/6] KVM: arm64: Disable MPAM visibility by default
+ and ignore VMM writes
+Thread-Index: AQHae7EcWBfUhFLWfESLuHqxbBJIrbHdahYA
+Date: Fri, 28 Jun 2024 08:10:31 +0000
+Message-ID: <e22f30c045b64f3da68fb0aa6c0b4e2c@huawei.com>
+References: <20240321165728.31907-1-james.morse@arm.com>
+ <20240321165728.31907-5-james.morse@arm.com>
+In-Reply-To: <20240321165728.31907-5-james.morse@arm.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Add writable test for the ID_AA64PFR1_EL1 register.
+Hi James,
 
-Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
----
- tools/testing/selftests/kvm/aarch64/set_id_regs.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+> -----Original Message-----
+> From: linux-arm-kernel <linux-arm-kernel-bounces@lists.infradead.org> On
+> Behalf Of James Morse
+> Sent: Thursday, March 21, 2024 4:57 PM
+> To: linux-arm-kernel@lists.infradead.org; kvmarm@lists.linux.dev
+> Cc: Marc Zyngier <maz@kernel.org>; Oliver Upton <oliver.upton@linux.dev>;
+> Suzuki K Poulose <suzuki.poulose@arm.com>; yuzenghui
+> <yuzenghui@huawei.com>; Catalin Marinas <catalin.marinas@arm.com>; Will
+> Deacon <will@kernel.org>; Jing Zhang <jingzhangos@google.com>; James
+> Morse <james.morse@arm.com>
+> Subject: [PATCH v3 4/6] KVM: arm64: Disable MPAM visibility by default an=
+d
+> ignore VMM writes
+>=20
+> commit 011e5f5bf529f ("arm64/cpufeature: Add remaining feature bits in
+> ID_AA64PFR0 register") exposed the MPAM field of AA64PFR0_EL1 to guests,
+> but didn't add trap handling. A previous patch supplied the missing trap
+> handling.
+>=20
+> Existing VMs that have the MPAM field of ID_AA64PFR0_EL1 set need to
+> be migratable, but there is little point enabling the MPAM CPU
+> interface on new VMs until there is something a guest can do with it.
+>=20
+> Clear the MPAM field from the guest's ID_AA64PFR0_EL1 and on hardware
+> that supports MPAM, politely ignore the VMMs attempts to set this bit.
+>=20
+> Guests expossed to this bug have the sanitised value of the MPAM field,
+> so only the correct value needs to be ignored. This means the field
+> can continue to be used to block migration to incompatible hardware
+> (between MPAM=3D1 and MPAM=3D5), and the VMM can't rely on the field
+> being ignored.
+>=20
+> Signed-off-by: James Morse <james.morse@arm.com>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 32 +++++++++++++++++++++++++++++++-
+>  1 file changed, 31 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index d6afb21849de..56d70a90c965 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1685,6 +1685,13 @@ static u64 read_sanitised_id_aa64pfr0_el1(struct
+> kvm_vcpu *vcpu,
+>=20
+>  	val &=3D ~ID_AA64PFR0_EL1_AMU_MASK;
+>=20
+> +	/*
+> +	 * MPAM is disabled by default as KVM also needs a set of PARTID to
+> +	 * program the MPAMVPMx_EL2 PARTID remapping registers with. But
+> some
+> +	 * older kernels let the guest see the ID bit.
+> +	 */
+> +	val &=3D ~ID_AA64PFR0_EL1_MPAM_MASK;
+> +
+>  	return val;
+>  }
+>=20
+> @@ -1795,6 +1802,29 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
+>  	return set_id_reg(vcpu, rd, val);
+>  }
+>=20
+> +static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+> +			       const struct sys_reg_desc *rd, u64 user_val)
+> +{
+> +	u64 hw_val =3D read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
+> +	u64 mpam_mask =3D ID_AA64PFR0_EL1_MPAM_MASK;
+> +
+> +	/*
+> +	 * Commit 011e5f5bf529f ("arm64/cpufeature: Add remaining feature
+> bits
+> +	 * in ID_AA64PFR0 register") exposed the MPAM field of AA64PFR0_EL1
+> to
+> +	 * guests, but didn't add trap handling. KVM doesn't support MPAM and
+> +	 * always returns an UNDEF for these registers. The guest must see 0
+> +	 * for this field.
+> +	 *
+> +	 * But KVM must also accept values from user-space that were provided
+> +	 * by KVM. On CPUs that support MPAM, permit user-space to write
+> +	 * the santisied value to ID_AA64PFR0_EL1.MPAM, but ignore this field.
+> +	 */
+> +	if ((hw_val & mpam_mask) =3D=3D (user_val & mpam_mask))
+> +		user_val &=3D ~ID_AA64PFR0_EL1_MPAM_MASK;
+> +
+> +	return set_id_reg(vcpu, rd, user_val);
+> +}
 
-diff --git a/tools/testing/selftests/kvm/aarch64/set_id_regs.c b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-index a7de39fa2a0a..7fd4d6f26456 100644
---- a/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-+++ b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-@@ -133,6 +133,13 @@ static const struct reg_ftr_bits ftr_id_aa64pfr0_el1[] = {
- 	REG_FTR_END,
- };
- 
-+static const struct reg_ftr_bits ftr_id_aa64pfr1_el1[] = {
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR1_EL1, MTE, ID_AA64PFR1_EL1_MTE_NI),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR1_EL1, SSBS, ID_AA64PFR1_EL1_SSBS_NI),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR1_EL1, BT, 0),
-+	REG_FTR_END,
-+};
-+
- static const struct reg_ftr_bits ftr_id_aa64mmfr0_el1[] = {
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, ECV, 0),
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, EXS, 0),
-@@ -199,6 +206,7 @@ static struct test_feature_reg test_regs[] = {
- 	TEST_REG(SYS_ID_AA64ISAR1_EL1, ftr_id_aa64isar1_el1),
- 	TEST_REG(SYS_ID_AA64ISAR2_EL1, ftr_id_aa64isar2_el1),
- 	TEST_REG(SYS_ID_AA64PFR0_EL1, ftr_id_aa64pfr0_el1),
-+	TEST_REG(SYS_ID_AA64PFR1_EL1, ftr_id_aa64pfr1_el1),
- 	TEST_REG(SYS_ID_AA64MMFR0_EL1, ftr_id_aa64mmfr0_el1),
- 	TEST_REG(SYS_ID_AA64MMFR1_EL1, ftr_id_aa64mmfr1_el1),
- 	TEST_REG(SYS_ID_AA64MMFR2_EL1, ftr_id_aa64mmfr2_el1),
--- 
-2.40.1
+Commit 14e270fa5c4c(arm64/cpufeature: Add remaining feature bits in ID_AA64=
+PFR1 register")
+exposes the MPAMFRAC filed in in AA64PFR1_EL1. Don't we need a similar hand=
+ling for that=20
+as well to handle the FEAT_MPAMv0p1 case?=20
+
+Also any chance you plan to respin this series soon? We do have hardware th=
+at benefits from this
+series.
+
+Thanks,
+Shameer
 
