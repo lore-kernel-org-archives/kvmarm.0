@@ -1,46 +1,46 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34E864D8A4
-	for <kvmarm@lists.linux.dev>; Fri, 28 Jun 2024 06:05:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F3F358210
+	for <kvmarm@lists.linux.dev>; Fri, 28 Jun 2024 06:05:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719554714; cv=none; b=d4HRhnxyyhZdg4Amht9NlkEaytCNq0kyEf0AW2rgYDi5iS0bOK6ztcfZikQckzmZFwG5JdpB2bzMhmAfI9ODq8hQ9DjZuRHNjYtCfzqBEuaoLUzk+ECYKcqdbUwqEH8ywkgr2Ttj74Qk8O9+a70HN9Typ++6lBZre7/R2+Nm/Qg=
+	t=1719554723; cv=none; b=Egwjs11Bdm3sIgw039m2yvPeOwVMROZom6Dn4PiQ+JtcV6ZxI/+OrWes5kZdFhAS1rBkJ1F5xfHJSxp2RSKbfri3Jstoht38nJq+HQCfmaU63FNdjdbcixKOKRSUMVdF9utp/euy5PZJF42XOrlU+W0t6UhFmDLdr7J3nXf62b0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719554714; c=relaxed/simple;
-	bh=/pX3wzIxmrkatm6Atvy4eoQxDAwEynsnsnpazri5KBk=;
+	s=arc-20240116; t=1719554723; c=relaxed/simple;
+	bh=xSiJ5L74EeCZilqppN+5V8jJKnnXkvFKwD8VAftCPj4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=hHG7rR8BSawNEZLfIlgARRwQE8i+BgtmxCS2Rb/GifqxXXnx1KXfAp1w45TmfX/LHOWQsOGSvKEePWI23op2SXSXFt573yKrEOos56s3M1aC09A4m+K72YgUme9x7Yv7ccQSCDNgo/N3yOK/c/HqTfbuwnwj+3wduM2aldB3Y1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RQCyomvj; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=E2RBtRN1Gh+1V+yxlYxUILmrGXO6kY+naiP4uWTfwtVQnAHw4gMOOGN3wWCuuNV7eKsCu5y60uh/+jHXOcwSNIF3hVZctGIRXyB69tezeuqf/g/vrhlaAH9MQzl6t5UqnWHxKcF6AgyGD5Bq7UbPt7Si66z1i6ruo/N3t3WvFGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=d6WQsR9k; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RQCyomvj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d6WQsR9k"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1719554712;
+	s=mimecast20190719; t=1719554720;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=I9zn2i4ef/uuSlInb0x78J+Hjt4S8lkHLb69/zw01pU=;
-	b=RQCyomvjsuzKa3zbJGtnL/SR7AkK5PDQsYaF0hLuWa1MlrlTnjDvbp+n0xCtgWJpa26T68
-	HUIjaKq9T8AcaOo/21NgpPQn85wl1cKorPtYuspTvTNQ9f/eadUMzKDdB+wTGYrXfGo/3u
-	S+kX0tOR0zrQ03ncxzFhKxJDCakUtVg=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+	bh=82yWG8Vl+Le/9WjBwfHlK8sLf94k5LjwViXN1KBGyHs=;
+	b=d6WQsR9k9m7QZHi3qpB5A56mVqeQYDuxoC0eINzd1DeF1p7OYRPwjsxj9xwMuRUM8u1D9+
+	heNmzwiL4+xs2uI3NFw8s0MJclUOJYLUpkFU4WyH4zz3+6ezIcouAIE9SCZuc5JwhO/sA1
+	qB1sZQVfb0NCEBDqWSsGknbB+iHA+Ec=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-85-vNQFQkwvPM233aWf-atBog-1; Fri,
- 28 Jun 2024 02:05:07 -0400
-X-MC-Unique: vNQFQkwvPM233aWf-atBog-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-44-V4jOVgGQNcScVriSkjyevw-1; Fri,
+ 28 Jun 2024 02:05:10 -0400
+X-MC-Unique: V4jOVgGQNcScVriSkjyevw-1
 Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B601119560B1;
-	Fri, 28 Jun 2024 06:05:05 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1AB001955DA6;
+	Fri, 28 Jun 2024 06:05:08 +0000 (UTC)
 Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C26321945CB1;
-	Fri, 28 Jun 2024 06:05:03 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 32E2F1945CB1;
+	Fri, 28 Jun 2024 06:05:06 +0000 (UTC)
 From: Shaoqin Huang <shahuang@redhat.com>
 To: Oliver Upton <oliver.upton@linux.dev>,
 	Marc Zyngier <maz@kernel.org>,
@@ -49,13 +49,15 @@ Cc: Shaoqin Huang <shahuang@redhat.com>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
 	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 1/2] KVM: arm64: Allow userspace to change ID_AA64PFR1_EL1
-Date: Fri, 28 Jun 2024 02:04:51 -0400
-Message-Id: <20240628060454.1936886-2-shahuang@redhat.com>
+Subject: [PATCH v3 2/2] KVM: selftests: aarch64: Add writable test for ID_AA64PFR1_EL1
+Date: Fri, 28 Jun 2024 02:04:52 -0400
+Message-Id: <20240628060454.1936886-3-shahuang@redhat.com>
 In-Reply-To: <20240628060454.1936886-1-shahuang@redhat.com>
 References: <20240628060454.1936886-1-shahuang@redhat.com>
 Precedence: bulk
@@ -67,37 +69,39 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Allow userspace to change the guest-visible value of the register with
-some severe limitation:
+Add writable test for the ID_AA64PFR1_EL1 register.
 
-  - No changes to features not virtualized by KVM (MPAM_frac, RAS_frac,
-    SME, RNDP_trap).
-
-  - No changes to features (CSV2_frac, NMI, MTE_frac, GCS, THE, MTEX,
-    DF2, PFAR) which haven't been added into the ftr_id_aa64pfr1[].
-    Because the struct arm64_ftr_bits definition for each feature in the
-    ftr_id_aa64pfr1[] is used by arm64_check_features. If they're not
-    existing in the ftr_id_aa64pfr1[], the for loop won't check the if
-    the new_val is safe for those features.
+Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
 ---
- arch/arm64/kvm/sys_regs.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ tools/testing/selftests/kvm/aarch64/set_id_regs.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 22b45a15d068..159cded22357 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2306,7 +2306,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 		   ID_AA64PFR0_EL1_GIC |
- 		   ID_AA64PFR0_EL1_AdvSIMD |
- 		   ID_AA64PFR0_EL1_FP), },
--	ID_SANITISED(ID_AA64PFR1_EL1),
-+	ID_WRITABLE(ID_AA64PFR1_EL1, ID_AA64PFR1_EL1_MTE |
-+				     ID_AA64PFR1_EL1_SSBS |
-+				     ID_AA64PFR1_EL1_BT),
- 	ID_UNALLOCATED(4,2),
- 	ID_UNALLOCATED(4,3),
- 	ID_WRITABLE(ID_AA64ZFR0_EL1, ~ID_AA64ZFR0_EL1_RES0),
+diff --git a/tools/testing/selftests/kvm/aarch64/set_id_regs.c b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
+index a7de39fa2a0a..7fd4d6f26456 100644
+--- a/tools/testing/selftests/kvm/aarch64/set_id_regs.c
++++ b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
+@@ -133,6 +133,13 @@ static const struct reg_ftr_bits ftr_id_aa64pfr0_el1[] = {
+ 	REG_FTR_END,
+ };
+ 
++static const struct reg_ftr_bits ftr_id_aa64pfr1_el1[] = {
++	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR1_EL1, MTE, ID_AA64PFR1_EL1_MTE_NI),
++	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR1_EL1, SSBS, ID_AA64PFR1_EL1_SSBS_NI),
++	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR1_EL1, BT, 0),
++	REG_FTR_END,
++};
++
+ static const struct reg_ftr_bits ftr_id_aa64mmfr0_el1[] = {
+ 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, ECV, 0),
+ 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, EXS, 0),
+@@ -199,6 +206,7 @@ static struct test_feature_reg test_regs[] = {
+ 	TEST_REG(SYS_ID_AA64ISAR1_EL1, ftr_id_aa64isar1_el1),
+ 	TEST_REG(SYS_ID_AA64ISAR2_EL1, ftr_id_aa64isar2_el1),
+ 	TEST_REG(SYS_ID_AA64PFR0_EL1, ftr_id_aa64pfr0_el1),
++	TEST_REG(SYS_ID_AA64PFR1_EL1, ftr_id_aa64pfr1_el1),
+ 	TEST_REG(SYS_ID_AA64MMFR0_EL1, ftr_id_aa64mmfr0_el1),
+ 	TEST_REG(SYS_ID_AA64MMFR1_EL1, ftr_id_aa64mmfr1_el1),
+ 	TEST_REG(SYS_ID_AA64MMFR2_EL1, ftr_id_aa64mmfr2_el1),
 -- 
 2.40.1
 
