@@ -1,161 +1,89 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1C791509B3;
-	Fri, 28 Jun 2024 09:59:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFB9D4D9EA
+	for <kvmarm@lists.linux.dev>; Fri, 28 Jun 2024 19:13:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719568775; cv=none; b=C0uaRr9kAQRVUYKxBQcNaLqTTNqT+xCqzkjEvnHTcruhl+XlCekYsIaisdzKhLv+nOOfBSe2VmWj7WEwq8H543w6wxMHdJcvngiYDAe9cE6fxLWpoY82//mMwV5IZashH2a9mmAMv67lqkj0rR5AgOCaWzTZ9R6rdpKtS8+zbt8=
+	t=1719602007; cv=none; b=uXnzJsplol1rD6l+guxMS1Mh5ot6SG+X1GzvBZQnTUI7x0eMJXmOHfMLlbN2EjQJQe7MMq6/QoGurjXUULrprDPRXAJY8RxrvNvu5ooD9HA5i6Pke0yze1gWjHm+U4teQIO7Ik+SlWg74iESwRQrtAnQyN7CjKqSRMGesy6CXEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719568775; c=relaxed/simple;
-	bh=apYPCiCCBhhW47PGckaJryPnErPTII7yZQmGkZShW+g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VosF7l3cn+3eW5Gy19no9Vql6CuK3olOrkZPh9CxUyp39djg3xYoFqbHLl0lU4unDINbGsj7qZtan+H/58g3bnXeFmBKU3RLF1Q7t9CY/NJk27rlD5utn66HOaYhqw25UCIo3SvZkxK/UDlCLcqS4CrgquEVWhQXm7Mx7E6/jiE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E4C1B106F;
-	Fri, 28 Jun 2024 02:59:56 -0700 (PDT)
-Received: from [10.1.29.17] (e122027.cambridge.arm.com [10.1.29.17])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 571CF3F6A8;
-	Fri, 28 Jun 2024 02:59:28 -0700 (PDT)
-Message-ID: <01b48dc0-8f69-435c-86c5-bc22ea148e3a@arm.com>
-Date: Fri, 28 Jun 2024 10:59:26 +0100
+	s=arc-20240116; t=1719602007; c=relaxed/simple;
+	bh=m1LYgoHUiAKogGB26x5jAdpPt4ZQkpx9bPnSIFjUZ9A=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kSS2lbLU3X9bxt1+9iUzeHsFaQ7vxsISfZ+bLojI9Dhz8p8hJE6XtbH/gBg1hhyG4RBnihIJfCiNTUCOPxW9ZmHx17577vbICTDGdWSqswzgg2lGOTPUSIMngi8P3U7QW8rsCbbwVm6YCCGu9lPlPr8McAGeNpBHLTVWKjzgVbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tOp5Wkkk; arc=none smtp.client-ip=95.215.58.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tOp5Wkkk"
+X-Envelope-To: kvm@vger.kernel.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1719602002;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=E/9JYhYdnMggNZ1TxzECvRq0Hc0vaHqAODdO4MPdDjI=;
+	b=tOp5WkkkcWWJQbF/XYRgDP6FEaIHFTF0m2MZLdQSweYi0il1/ajthqPTkQ3sHs6Sa9XICW
+	IjM8GAMuYuXnU850OqaYAzFpXZ8QRb9IHsvjyHVfM5SS96/M1pgcQzG+HCddR98588NSIE
+	Z9GaLqhvRLjYs28d7ZmCRUD1L1CRvw8=
+X-Envelope-To: linux-arm-kernel@lists.infradead.org
+X-Envelope-To: kvmarm@lists.linux.dev
+X-Envelope-To: maz@kernel.org
+X-Envelope-To: oliver.upton@linux.dev
+X-Envelope-To: james.morse@arm.com
+X-Envelope-To: suzuki.poulose@arm.com
+X-Envelope-To: yuzenghui@huawei.com
+X-Envelope-To: joey.gouly@arm.com
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Joey Gouly <joey.gouly@arm.com>
+Subject: Re: [PATCH 0/5] KVM: arm64: Fix handling of TCR2_EL1
+Date: Fri, 28 Jun 2024 19:13:13 +0000
+Message-ID: <171960186741.2925817.15322021924972289887.b4-ty@linux.dev>
+In-Reply-To: <20240625130042.259175-1-maz@kernel.org>
+References: <20240625130042.259175-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 12/14] arm64: realm: Support nonsecure ITS emulation
- shared
-To: Michael Kelley <mhklinux@outlook.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>,
- "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-References: <20240605093006.145492-1-steven.price@arm.com>
- <20240605093006.145492-13-steven.price@arm.com>
- <SN6PR02MB415702A53E8516F1BEEC7EDAD4CD2@SN6PR02MB4157.namprd02.prod.outlook.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <SN6PR02MB415702A53E8516F1BEEC7EDAD4CD2@SN6PR02MB4157.namprd02.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On 17/06/2024 04:54, Michael Kelley wrote:
-> From: Steven Price <steven.price@arm.com> Sent: Wednesday, June 5, 2024 2:30 AM
->>
->> Within a realm guest the ITS is emulated by the host. This means the
->> allocations must have been made available to the host by a call to
->> set_memory_decrypted(). Introduce an allocation function which performs
->> this extra call.
->>
->> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->> Changes since v2:
->>  * Drop 'shared' from the new its_xxx function names as they are used
->>    for non-realm guests too.
->>  * Don't handle the NUMA_NO_NODE case specially - alloc_pages_node()
->>    should do the right thing.
->>  * Drop a pointless (void *) cast.
->> ---
->>  drivers/irqchip/irq-gic-v3-its.c | 90 ++++++++++++++++++++++++--------
->>  1 file changed, 67 insertions(+), 23 deletions(-)
->>
->> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
->> index 40ebf1726393..ca72f830f4cc 100644
->> --- a/drivers/irqchip/irq-gic-v3-its.c
->> +++ b/drivers/irqchip/irq-gic-v3-its.c
->> @@ -18,6 +18,7 @@
->>  #include <linux/irqdomain.h>
->>  #include <linux/list.h>
->>  #include <linux/log2.h>
->> +#include <linux/mem_encrypt.h>
->>  #include <linux/memblock.h>
->>  #include <linux/mm.h>
->>  #include <linux/msi.h>
->> @@ -27,6 +28,7 @@
->>  #include <linux/of_pci.h>
->>  #include <linux/of_platform.h>
->>  #include <linux/percpu.h>
->> +#include <linux/set_memory.h>
->>  #include <linux/slab.h>
->>  #include <linux/syscore_ops.h>
->>
->> @@ -163,6 +165,7 @@ struct its_device {
->>  	struct its_node		*its;
->>  	struct event_lpi_map	event_map;
->>  	void			*itt;
->> +	u32			itt_order;
->>  	u32			nr_ites;
->>  	u32			device_id;
->>  	bool			shared;
->> @@ -198,6 +201,30 @@ static DEFINE_IDA(its_vpeid_ida);
->>  #define gic_data_rdist_rd_base()	(gic_data_rdist()->rd_base)
->>  #define gic_data_rdist_vlpi_base()	(gic_data_rdist_rd_base() + SZ_128K)
->>
->> +static struct page *its_alloc_pages_node(int node, gfp_t gfp,
->> +					 unsigned int order)
->> +{
->> +	struct page *page;
->> +
->> +	page = alloc_pages_node(node, gfp, order);
->> +
->> +	if (page)
->> +		set_memory_decrypted((unsigned long)page_address(page),
->> +				     1 << order);
+On Tue, 25 Jun 2024 14:00:36 +0100, Marc Zyngier wrote:
+> As I'm inching towards supporting FEAT_S1PIE in a NV guest (oh, the
+> fun I'm having!), it has become obvious that we're missing the basics
+> when it comes to:
 > 
-> There's been considerable discussion on the x86 side about
-> what to do when set_memory_decrypted() or set_memory_encrypted()
-> fails. The conclusions are:
+> - VM configuration: HCRX_EL2.TCR2En is forced to 1, and we blindly
+>   save/restore stuff.
 > 
-> 1) set_memory_decrypted()/encrypted() *could* fail due to a
-> compromised/malicious host, due to a bug somewhere in the
-> software stack, or due to resource constraints (x86 might need to
-> split a large page mapping, and need to allocate additional page
-> table pages, which could fail).
-> 
-> 2) The guest memory that was the target of such a failed call could
-> be left in an indeterminate state that the guest could not reliably
-> undo or correct. The guest's view of the page's decrypted/encrypted
-> state might not match the host's view. Therefore, any such guest
-> memory must be leaked rather than being used or put back on the
-> free list.
-> 
-> 3) After some discussion, we decided not to panic in such a case.
-> Instead, set_memory_decrypted()/encrypted() generates a WARN,
-> as well as returns a failure result. The most security conscious
-> users could set panic_on_warn=1 in their VMs, and thereby stop
-> further operation if there any indication that the transition between
-> encrypted and decrypt is suspect. The caller of these functions
-> also can take explicit action in the case of a failure.
-> 
-> It seems like the same guidelines should apply here. On the x86
-> side we've also cleaned up cases where the return value isn't
-> checked, like here and the use of set_memory_encrypted() below.
+> [...]
 
-Very good points - this code was lacking error handling. I think you are
-also right that the correct situation when set_memory_{en,de}crypted()
-fails is to WARN() and leak the page. It's something that shouldn't
-happen with a well behaving host and it's unclear how to safely recover
-the page - so leaking the page is the safest result. And the WARN()
-approach gives the user the option as to whether this is fatal via
-panic_on_warn.
+Applied to kvmarm/next, thanks!
 
-Thanks,
-Steve
+[1/5] KVM: arm64: Correctly honor the presence of FEAT_TCRX
+      https://git.kernel.org/kvmarm/kvmarm/c/9b58e665d6b2
+[2/5] KVM: arm64: Get rid of HCRX_GUEST_FLAGS
+      https://git.kernel.org/kvmarm/kvmarm/c/a3ee9ce88ba3
+[3/5] KVM: arm64: Make TCR2_EL1 save/restore dependent on the VM features
+      https://git.kernel.org/kvmarm/kvmarm/c/1b04fd40275e
+[4/5] KVM: arm64: Make PIR{,E0}_EL1 save/restore conditional on FEAT_TCRX
+      https://git.kernel.org/kvmarm/kvmarm/c/663abf04ee4d
+[5/5] KVM: arm64: Honor trap routing for TCR2_EL1
+      https://git.kernel.org/kvmarm/kvmarm/c/91e9cc70b775
 
+--
+Best,
+Oliver
