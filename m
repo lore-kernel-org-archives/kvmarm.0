@@ -1,124 +1,121 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDA504C6D;
-	Thu, 27 Jun 2024 14:34:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70DA447796
+	for <kvmarm@lists.linux.dev>; Fri, 28 Jun 2024 06:05:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719498863; cv=none; b=OYRebVG2BmaJJZvl0ecFSzwx5eybuN4SRocV2bNDcTF0/1/og6h39R69DNx3ORPOgKjGhWS1N2GtVgfXg0G44jV3qYT9sViSb3mOqig3XH+qUVoKVA6inF58jAGmxs6947+N7D2B/cB76d5iSsvaLH4Ak2kL9/vfQ0j7KxyigIo=
+	t=1719554714; cv=none; b=ZkK1jjOLEOrXmTSefk9XqYBzOrDFlT0uL2liKucs02eXhhaIyGZTNuRbnaxbru7hGCy9jKZHB+7Ks0TId5VcgQWo6nNDNEBWGBMz8gFiMUICtoZl3CEmSKHcUO4qMqYy/3xO8EKCx97Jo22gn+YyDC12PY9Bz1Gb+BzXyDXUbbA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719498863; c=relaxed/simple;
-	bh=SNPLIFy25DnsBocLv7ze4vOuSndICqg9Fn7HH+IoD7k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hHwUPlqh6AIVUmaOEzzMYxjzAf2zpiR54BEoG6VYio/zgxQzfE1ZHlOom1jyEg5QtdJwheROP//ps7F2UE6cdb4BNga3eEq3j5eN0DGt0BzTrSOcRmcUPeCpzebte0yqf0M/tQ3rkajoDIWO3Y7UaNMBT89f8IkBWgOMaF/BgRo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0DD6E367;
-	Thu, 27 Jun 2024 07:34:46 -0700 (PDT)
-Received: from [10.1.30.72] (e122027.cambridge.arm.com [10.1.30.72])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 95F9A3F73B;
-	Thu, 27 Jun 2024 07:34:17 -0700 (PDT)
-Message-ID: <e55c8490-4342-4ef4-9d18-23c3dc3a526f@arm.com>
-Date: Thu, 27 Jun 2024 15:34:15 +0100
+	s=arc-20240116; t=1719554714; c=relaxed/simple;
+	bh=lU1XvXjiFFxsti9Je9vlciruaCZtXmC+z+HqWsgjafU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VF6j9WQHZqF52CNVJI2lNnN7H9pQeeerGoJ3A8gEXQxrvnqploaJb6wNEztVSaT1f0pk2Bqng2t/U37yb5n2+OISnDfMZwP4AiMSwxYvb+T8GP/3UoMBCysKYkvnz3L2kZipxlj+s7mwH5+CkDXesw7aCEZgwURsAEw/5RW77hs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D+4uv7n3; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D+4uv7n3"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1719554711;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ajvn4ITctkTMolN6abYxpt2/qWjVElb6xUSFcHxU6sg=;
+	b=D+4uv7n3illz6+/cM2CvTiShGSmTA3gWGhJnDu/LGW/gDlxAe/TmJlhESpKD76IGVc5Cs1
+	NNlgs4Ag3lZG7IfRlcNSYxIZh2whG4krGqknaZyNogBYXoJuoHe8RF2/3GsNCUf6Q/8BYM
+	weow9/vYZBldYp/RduQLdFVxNUxU69Q=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-554-Uu0m_sE3NF6Jx4ije6529w-1; Fri,
+ 28 Jun 2024 02:05:05 -0400
+X-MC-Unique: Uu0m_sE3NF6Jx4ije6529w-1
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5C1E91955DA6;
+	Fri, 28 Jun 2024 06:05:03 +0000 (UTC)
+Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0819419560A3;
+	Fri, 28 Jun 2024 06:04:59 +0000 (UTC)
+From: Shaoqin Huang <shahuang@redhat.com>
+To: Oliver Upton <oliver.upton@linux.dev>,
+	Marc Zyngier <maz@kernel.org>,
+	kvmarm@lists.linux.dev
+Cc: Shaoqin Huang <shahuang@redhat.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	James Morse <james.morse@arm.com>,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH v3 0/2] Allow userspace to change ID_AA64PFR1_EL1
+Date: Fri, 28 Jun 2024 02:04:50 -0400
+Message-Id: <20240628060454.1936886-1-shahuang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 09/14] arm64: Enable memory encrypt for Realms
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-References: <20240605093006.145492-1-steven.price@arm.com>
- <20240605093006.145492-10-steven.price@arm.com> <Zmc3euO2YGh-g9Th@arm.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <Zmc3euO2YGh-g9Th@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On 10/06/2024 18:27, Catalin Marinas wrote:
-> On Wed, Jun 05, 2024 at 10:30:01AM +0100, Steven Price wrote:
->> +static int __set_memory_encrypted(unsigned long addr,
->> +				  int numpages,
->> +				  bool encrypt)
->> +{
->> +	unsigned long set_prot = 0, clear_prot = 0;
->> +	phys_addr_t start, end;
->> +	int ret;
->> +
->> +	if (!is_realm_world())
->> +		return 0;
->> +
->> +	if (!__is_lm_address(addr))
->> +		return -EINVAL;
->> +
->> +	start = __virt_to_phys(addr);
->> +	end = start + numpages * PAGE_SIZE;
->> +
->> +	/*
->> +	 * Break the mapping before we make any changes to avoid stale TLB
->> +	 * entries or Synchronous External Aborts caused by RIPAS_EMPTY
->> +	 */
->> +	ret = __change_memory_common(addr, PAGE_SIZE * numpages,
->> +				     __pgprot(0),
->> +				     __pgprot(PTE_VALID));
->> +
->> +	if (encrypt) {
->> +		clear_prot = PROT_NS_SHARED;
->> +		ret = rsi_set_memory_range_protected(start, end);
->> +	} else {
->> +		set_prot = PROT_NS_SHARED;
->> +		ret = rsi_set_memory_range_shared(start, end);
->> +	}
->> +
->> +	if (ret)
->> +		return ret;
->> +
->> +	set_prot |= PTE_VALID;
->> +
->> +	return __change_memory_common(addr, PAGE_SIZE * numpages,
->> +				      __pgprot(set_prot),
->> +				      __pgprot(clear_prot));
->> +}
-> 
-> This works, does break-before-make and also rejects vmalloc() ranges
-> (for the time being).
-> 
-> One particular aspect I don't like is doing the TLBI twice. It's
-> sufficient to do it when you first make the pte invalid. We could guess
-> this in __change_memory_common() if set_mask has PTE_VALID. The call
-> sites are restricted to this file, just add a comment. An alternative
-> would be to add a bool flush argument to this function.
-> 
+Allow userspace to change the guest-visible value of the register with
+some severe limitation:
 
-I'm always a bit scared of changing this sort of thing, but AFAICT the 
-below should be safe:
+  - No changes to features not virtualized by KVM (MPAM_frac, RAS_frac,
+    SME, RNDP_trap).
 
--       flush_tlb_kernel_range(start, start + size);
-+       /*
-+        * If the memory is being made valid without changing any other bits
-+        * then a TLBI isn't required as a non-valid entry cannot be cached in
-+        * the TLB.
-+        */
-+       if (set_mask != PTE_VALID || clear_mask)
-+               flush_tlb_kernel_range(start, start + size);
+  - No changes to features (CSV2_frac, NMI, MTE_frac, GCS, THE, MTEX,
+    DF2, PFAR) which haven't been added into the ftr_id_aa64pfr1[].
+    Because the struct arm64_ftr_bits definition for each feature in the
+    ftr_id_aa64pfr1[] is used by arm64_check_features. If they're not
+    existing in the ftr_id_aa64pfr1[], the for loop won't check the if
+    the new_val is safe for those features.
 
-It will affect users of set_memory_valid() by removing the TLBI when 
-marking memory as valid.
+For the question why can't those fields be hidden depending on the VM
+configuration? I don't find there is the related VM configuration, maybe we
+should add the new VM configuration?
 
-I'll add this change as a separate patch so it can be reverted easily
-if there's something I've overlooked.
+I'm not sure I'm right, so if there're any problems please help to point out and
+I will fix them.
 
-Thanks,
-Steve
+Also add the selftest for it.
+
+Changelog:
+----------
+v2 -> v3:
+  * Give more description about why only part of the fields can be writable.
+  * Updated the writable mask by referring the latest ARM spec.
+
+v1 -> v2:
+  * Tackling the full register instead of single field.
+  * Changing the patch title and commit message.
+
+RFCv1 -> v1:
+  * Fix the compilation error.
+  * Delete the machine specific information and make the description more
+    generable.
+
+RFCv1: https://lore.kernel.org/all/20240612023553.127813-1-shahuang@redhat.com/
+v1: https://lore.kernel.org/all/20240617075131.1006173-1-shahuang@redhat.com/
+v2: https://lore.kernel.org/all/20240618063808.1040085-1-shahuang@redhat.com/
+
+Shaoqin Huang (2):
+  KVM: arm64: Allow userspace to change ID_AA64PFR1_EL1
+  KVM: selftests: aarch64: Add writable test for ID_AA64PFR1_EL1
+
+ arch/arm64/kvm/sys_regs.c                         | 4 +++-
+ tools/testing/selftests/kvm/aarch64/set_id_regs.c | 8 ++++++++
+ 2 files changed, 11 insertions(+), 1 deletion(-)
+
+-- 
+2.40.1
 
