@@ -1,125 +1,161 @@
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDA67145334
-	for <kvmarm@lists.linux.dev>; Fri, 28 Jun 2024 08:23:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1C791509B3;
+	Fri, 28 Jun 2024 09:59:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719563032; cv=none; b=ZDclcFUlklCdJG8epBD8EEtwZGpfDPZPJ+WpblypeQRmIwwIb2UAj0in1issi9fDVB852yWC/0BV8AjYiynjjaKsk0rzzT68uv2dvhwxrGFK9yrLwc2l07l7ePWM65CJd73FNF4KiTZ1L/JKaCEJUfepP+OPPpNj/PIH0Dz9gs0=
+	t=1719568775; cv=none; b=C0uaRr9kAQRVUYKxBQcNaLqTTNqT+xCqzkjEvnHTcruhl+XlCekYsIaisdzKhLv+nOOfBSe2VmWj7WEwq8H543w6wxMHdJcvngiYDAe9cE6fxLWpoY82//mMwV5IZashH2a9mmAMv67lqkj0rR5AgOCaWzTZ9R6rdpKtS8+zbt8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719563032; c=relaxed/simple;
-	bh=q5qxoQbok8NLcAy7qNuLyz67EJN4COtEkjW7zZ4HwYc=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Osc0+sKmgLbihQVvYIdaIOGNTfc/joDX0w+/LvSQHdrBMxoA63kycWfl84feDZ/8kYhJ52kce+jyZc6otdA2vrONtJorUZs/U42Lk+nuoxtqz80QfX7Neh7rdTAGRpvydTFkxdepEl3zVtEaf8YqExJsG4Kf/S0H6+Y6ziLBEiA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4W9T3W6c9GznY0p;
-	Fri, 28 Jun 2024 16:23:35 +0800 (CST)
-Received: from kwepemd100011.china.huawei.com (unknown [7.221.188.204])
-	by mail.maildlp.com (Postfix) with ESMTPS id 061CC14037B;
-	Fri, 28 Jun 2024 16:23:45 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
- kwepemd100011.china.huawei.com (7.221.188.204) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Fri, 28 Jun 2024 16:23:44 +0800
-Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
- lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.039;
- Fri, 28 Jun 2024 09:23:42 +0100
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: James Morse <james.morse@arm.com>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>
-CC: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>, yuzenghui <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
-	Jing Zhang <jingzhangos@google.com>, "Wangzhou (B)" <wangzhou1@hisilicon.com>
-Subject: RE: [PATCH v3 2/6] arm64: cpufeature: discover CPU support for MPAM
-Thread-Topic: [PATCH v3 2/6] arm64: cpufeature: discover CPU support for MPAM
-Thread-Index: AQHae7EdUanKGVVahEKqsfZWh2WHurHdb8Pg
-Date: Fri, 28 Jun 2024 08:23:42 +0000
-Message-ID: <b61717873ad84b5d874a5b0b502208a9@huawei.com>
-References: <20240321165728.31907-1-james.morse@arm.com>
- <20240321165728.31907-3-james.morse@arm.com>
-In-Reply-To: <20240321165728.31907-3-james.morse@arm.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1719568775; c=relaxed/simple;
+	bh=apYPCiCCBhhW47PGckaJryPnErPTII7yZQmGkZShW+g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VosF7l3cn+3eW5Gy19no9Vql6CuK3olOrkZPh9CxUyp39djg3xYoFqbHLl0lU4unDINbGsj7qZtan+H/58g3bnXeFmBKU3RLF1Q7t9CY/NJk27rlD5utn66HOaYhqw25UCIo3SvZkxK/UDlCLcqS4CrgquEVWhQXm7Mx7E6/jiE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E4C1B106F;
+	Fri, 28 Jun 2024 02:59:56 -0700 (PDT)
+Received: from [10.1.29.17] (e122027.cambridge.arm.com [10.1.29.17])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 571CF3F6A8;
+	Fri, 28 Jun 2024 02:59:28 -0700 (PDT)
+Message-ID: <01b48dc0-8f69-435c-86c5-bc22ea148e3a@arm.com>
+Date: Fri, 28 Jun 2024 10:59:26 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 12/14] arm64: realm: Support nonsecure ITS emulation
+ shared
+To: Michael Kelley <mhklinux@outlook.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>,
+ "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+References: <20240605093006.145492-1-steven.price@arm.com>
+ <20240605093006.145492-13-steven.price@arm.com>
+ <SN6PR02MB415702A53E8516F1BEEC7EDAD4CD2@SN6PR02MB4157.namprd02.prod.outlook.com>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <SN6PR02MB415702A53E8516F1BEEC7EDAD4CD2@SN6PR02MB4157.namprd02.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 17/06/2024 04:54, Michael Kelley wrote:
+> From: Steven Price <steven.price@arm.com> Sent: Wednesday, June 5, 2024 2:30 AM
+>>
+>> Within a realm guest the ITS is emulated by the host. This means the
+>> allocations must have been made available to the host by a call to
+>> set_memory_decrypted(). Introduce an allocation function which performs
+>> this extra call.
+>>
+>> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>> Changes since v2:
+>>  * Drop 'shared' from the new its_xxx function names as they are used
+>>    for non-realm guests too.
+>>  * Don't handle the NUMA_NO_NODE case specially - alloc_pages_node()
+>>    should do the right thing.
+>>  * Drop a pointless (void *) cast.
+>> ---
+>>  drivers/irqchip/irq-gic-v3-its.c | 90 ++++++++++++++++++++++++--------
+>>  1 file changed, 67 insertions(+), 23 deletions(-)
+>>
+>> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+>> index 40ebf1726393..ca72f830f4cc 100644
+>> --- a/drivers/irqchip/irq-gic-v3-its.c
+>> +++ b/drivers/irqchip/irq-gic-v3-its.c
+>> @@ -18,6 +18,7 @@
+>>  #include <linux/irqdomain.h>
+>>  #include <linux/list.h>
+>>  #include <linux/log2.h>
+>> +#include <linux/mem_encrypt.h>
+>>  #include <linux/memblock.h>
+>>  #include <linux/mm.h>
+>>  #include <linux/msi.h>
+>> @@ -27,6 +28,7 @@
+>>  #include <linux/of_pci.h>
+>>  #include <linux/of_platform.h>
+>>  #include <linux/percpu.h>
+>> +#include <linux/set_memory.h>
+>>  #include <linux/slab.h>
+>>  #include <linux/syscore_ops.h>
+>>
+>> @@ -163,6 +165,7 @@ struct its_device {
+>>  	struct its_node		*its;
+>>  	struct event_lpi_map	event_map;
+>>  	void			*itt;
+>> +	u32			itt_order;
+>>  	u32			nr_ites;
+>>  	u32			device_id;
+>>  	bool			shared;
+>> @@ -198,6 +201,30 @@ static DEFINE_IDA(its_vpeid_ida);
+>>  #define gic_data_rdist_rd_base()	(gic_data_rdist()->rd_base)
+>>  #define gic_data_rdist_vlpi_base()	(gic_data_rdist_rd_base() + SZ_128K)
+>>
+>> +static struct page *its_alloc_pages_node(int node, gfp_t gfp,
+>> +					 unsigned int order)
+>> +{
+>> +	struct page *page;
+>> +
+>> +	page = alloc_pages_node(node, gfp, order);
+>> +
+>> +	if (page)
+>> +		set_memory_decrypted((unsigned long)page_address(page),
+>> +				     1 << order);
+> 
+> There's been considerable discussion on the x86 side about
+> what to do when set_memory_decrypted() or set_memory_encrypted()
+> fails. The conclusions are:
+> 
+> 1) set_memory_decrypted()/encrypted() *could* fail due to a
+> compromised/malicious host, due to a bug somewhere in the
+> software stack, or due to resource constraints (x86 might need to
+> split a large page mapping, and need to allocate additional page
+> table pages, which could fail).
+> 
+> 2) The guest memory that was the target of such a failed call could
+> be left in an indeterminate state that the guest could not reliably
+> undo or correct. The guest's view of the page's decrypted/encrypted
+> state might not match the host's view. Therefore, any such guest
+> memory must be leaked rather than being used or put back on the
+> free list.
+> 
+> 3) After some discussion, we decided not to panic in such a case.
+> Instead, set_memory_decrypted()/encrypted() generates a WARN,
+> as well as returns a failure result. The most security conscious
+> users could set panic_on_warn=1 in their VMs, and thereby stop
+> further operation if there any indication that the transition between
+> encrypted and decrypt is suspect. The caller of these functions
+> also can take explicit action in the case of a failure.
+> 
+> It seems like the same guidelines should apply here. On the x86
+> side we've also cleaned up cases where the return value isn't
+> checked, like here and the use of set_memory_encrypted() below.
 
-
-> -----Original Message-----
-> From: linux-arm-kernel <linux-arm-kernel-bounces@lists.infradead.org> On
-> Behalf Of James Morse
-> Sent: Thursday, March 21, 2024 4:57 PM
-> To: linux-arm-kernel@lists.infradead.org; kvmarm@lists.linux.dev
-> Cc: Marc Zyngier <maz@kernel.org>; Oliver Upton <oliver.upton@linux.dev>;
-> Suzuki K Poulose <suzuki.poulose@arm.com>; yuzenghui
-> <yuzenghui@huawei.com>; Catalin Marinas <catalin.marinas@arm.com>; Will
-> Deacon <will@kernel.org>; Jing Zhang <jingzhangos@google.com>; James
-> Morse <james.morse@arm.com>
-> Subject: [PATCH v3 2/6] arm64: cpufeature: discover CPU support for MPAM
->=20
-> ARMv8.4 adds support for 'Memory Partitioning And Monitoring' (MPAM)
-> which describes an interface to cache and bandwidth controls wherever
-> they appear in the system.
->=20
-> Add support to detect MPAM. Like SVE, MPAM has an extra id register that
-> describes some more properties, including the virtualisation support,
-> which is optional. Detect this separately so we can detect
-> mismatched/insane systems, but still use MPAM on the host even if the
-> virtualisation support is missing.
->=20
-> MPAM needs enabling at the highest implemented exception level, otherwise
-> the register accesses trap. The 'enabled' flag is accessible to lower
-> exception levels, but its in a register that traps when MPAM isn't enable=
-d.
-> The cpufeature 'matches' hook is extended to test this on one of the
-> CPUs, so that firmware can emulate MPAM as disabled if it is reserved
-> for use by secure world.
->=20
-> Secondary CPUs that appear late could trip cpufeature's 'lower safe'
-> behaviour after the MPAM properties have been advertised to user-space.
-> Add a verify call to ensure late secondaries match the existing CPUs.
->=20
-> (If you have a boot failure that bisects here its likely your CPUs
-> advertise MPAM in the id registers, but firmware failed to either enable
-> or MPAM, or emulate the trap as if it were disabled)
->=20
-> Signed-off-by: James Morse <james.morse@arm.com>
-> ---
-
-
-> @@ -2852,6 +2912,15 @@ static const struct arm64_cpu_capabilities
-> arm64_features[] =3D {
->  		ARM64_CPUID_FIELDS(ID_AA64MMFR0_EL1, TGRAN16,
-> 52_BIT)
->  #endif
->  #endif
-> +#endif
-> +#ifdef CONFIG_ARM64_MPAM
-> +	{
-> +		.desc =3D "Memory Partitioning And Monitoring",
-> +		.type =3D ARM64_CPUCAP_SYSTEM_FEATURE,
-> +		.capability =3D ARM64_MPAM,
-> +		.matches =3D test_has_mpam,
-> +		.cpu_enable =3D cpu_enable_mpam,
-> +		ARM64_CPUID_FIELDS(ID_AA64PFR0_EL1, MPAM, 1)
->  	},
->  #endif
-
-This one gives me a compile error as seems to miss the" }," for the above
-ARM64_VA_BITS_52. Please check.
+Very good points - this code was lacking error handling. I think you are
+also right that the correct situation when set_memory_{en,de}crypted()
+fails is to WARN() and leak the page. It's something that shouldn't
+happen with a well behaving host and it's unclear how to safely recover
+the page - so leaking the page is the safest result. And the WARN()
+approach gives the user the option as to whether this is fatal via
+panic_on_warn.
 
 Thanks,
-Shameer
+Steve
+
