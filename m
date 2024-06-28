@@ -1,79 +1,308 @@
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 883F67CF16
-	for <kvmarm@lists.linux.dev>; Fri, 28 Jun 2024 22:22:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CAC078B50
+	for <kvmarm@lists.linux.dev>; Fri, 28 Jun 2024 23:39:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719613325; cv=none; b=ImZLfUvleNPzsnZ/1/Y0WvtVKpvcFpKVq7xxWl38LrbJxdgKQZfuuvgU2VYsAQO6BekYhE71ytXG83sg7hd/hZaJ6j1pWopNMGE49OIqZw7oG4g7gFLIq3ugsGWV4t89tfjM1YCkYrsO92NCwDmHvFxUF85oIqI98/4OhThZS9Q=
+	t=1719617979; cv=none; b=NOpAernCLJ5cfKPKXWE2UzCS6jV9d8YI6PUVhVf7Eu3rWTVosqrVgeH1pnNnQ6RZ6wqbu590BwnXyn+/azzVijTgW8DaWwN5AqnwMbOC6/sB4j6bpYTC4kHIzVY7vpQUgl4x8WcSQjNK4KmVz6oAGirH2auzyFEoNL5OlsvCu3o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719613325; c=relaxed/simple;
-	bh=8BgVqLuGIJtALnVWUOdgeF3NA6D/bD9RMe0EMj7PrUI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ObcNrDMI3SmgjoWGzKPOf5Hd12Yhsp23sEZa+nEcwDeRX7TzoEp/yqVcT0agx2IMeCMuFr9070lN2evggnY2Q/EKpTMZmnauC51dMz84KPSz7WaiF5/eLZ1Gv83eKUofyn6qNvqA8v6plEFajkA6lMaHD3zKotX1bLFv7R+GEQ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=iz3DG4S8; arc=none smtp.client-ip=95.215.58.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1719617979; c=relaxed/simple;
+	bh=gFGn9wBfLc25cpluTcfGbu57LjjE9VgM7fY2JHTU37Y=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qWNt46euAxEMJ7W8ncg3CvfNvLx5OAtzVh9GIgXlA84BwbGwBlvhg2xmCWbulYed+MCLDm4o79XTMgdhmNwglh35oIAAwX9ArOywNYxm81idKQoKk3g5/GUGvz7E1b42oYFllUJF73CeM09+QQcjiyNf2BON1Xarb64VTvzJZ68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KIpRwuQl; arc=none smtp.client-ip=209.85.160.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="iz3DG4S8"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1719613320;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=RDLjJ/QL1pzRW/LPtpuWNILzc0CwDsylZyQWWeEqcyw=;
-	b=iz3DG4S8He/WrLynQ8XZYsqzGmYL4y3b4bn0zE3jmXDEhVlj5a3/5SwzKOllbcqroMcvM3
-	wBuQf74AmoS3WJdXu1KoZb4GVooFV21n3mQ3oB8Mto5Bn5JkG8VuZyKpqJYG1V/xDN3ubm
-	rNt5jBvvGU+5cwJ5Xc3XGHSkMgnS+DA=
-X-Envelope-To: maz@kernel.org
-X-Envelope-To: james.morse@arm.com
-X-Envelope-To: suzuki.poulose@arm.com
-X-Envelope-To: yuzenghui@huawei.com
-X-Envelope-To: kvm@vger.kernel.org
-X-Envelope-To: pbonzini@redhat.com
-X-Envelope-To: oliver.upton@linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	kvm@vger.kernel.org,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH] MAINTAINERS: Include documentation in KVM/arm64 entry
-Date: Fri, 28 Jun 2024 22:21:47 +0000
-Message-ID: <20240628222147.3153682-1-oliver.upton@linux.dev>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KIpRwuQl"
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-444fe7e9f11so68541cf.0
+        for <kvmarm@lists.linux.dev>; Fri, 28 Jun 2024 16:39:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1719617975; x=1720222775; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=7Ca0DA4OYtmu5vjHp6DDkTi8s1JKrMVKIGk5L1tKfRw=;
+        b=KIpRwuQlZgnkvqU8EvevBxqw2ZIDvu+NX0SWrtYogdrexz6PuOQNX1Bl8faxuB/pAH
+         hZ+BJ/e+mgEMarGAYd3rfSJ2yHCmz8JsoyHpLLhAJTT9JHdMXzVQwjfzGtL+oEeEdtZN
+         C8NGa9pGnVq4T8QWqs6XHE91u4rbywAMmDxXCZmSYQlDtqApftjENA+K/DwP7o5ebEDJ
+         1LFhogj0KXX7cVjSEeV4Mcw0hiHN65yGuXsli0OTT7FZgPs5skLwEXHxoXoYmfmQjF3r
+         DCeGCe68cFv5iwFnfDozAgdb+/c3rmGgaIh3Gn3cfLRNyxF/SFScIkUJi5FJShgDEaiL
+         Lc6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719617975; x=1720222775;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7Ca0DA4OYtmu5vjHp6DDkTi8s1JKrMVKIGk5L1tKfRw=;
+        b=riOzO0dyrI/6j1SVQ4Ab47EiD/i5Cad1m6fjcbE1kPeUs9NHUWf23CxeBuQFqiLFfz
+         FGFSvuafeGWbM9K20GS5APiu5HjGpnoN9w1gg1cz4gTSlSzPK80QRmU0fV1z30aJhCz6
+         LcI4Q7dj6XyH1a0MjMuD+rY7xYqTLr0IsEmOPYqvk1+W1jB9Wy75OjM9MHvfTjWOMht2
+         sAerG9Gkx7sgXjO8B4oDZEt1P2tFZRrd/13Cq7tSHNESZsSIRgpUaSqfUpP2EWA+P0vH
+         OXe7K02leSOHcKaGR90nLUHM7NpDGlt0Poya/HUBDTV9UlQ1Mi3PF6HgUgnKuKic+3MN
+         mDUg==
+X-Forwarded-Encrypted: i=1; AJvYcCVmsRRMXQ4xAv9QBha33HLG8PjSN4SwDwF9Psx9mM0t0Ye4EmGLHw9pykZBmzlp66vcvnHAFFn7n+t9E2M1uFunwTdne0nJ
+X-Gm-Message-State: AOJu0YxLSbuuOPTnBdx8HhZfM2FlxLyg3JSbpu/ZUZF8wtsNc0vSg86k
+	746WMLmfJUTXAHdnbkKvcgtzAKIs9V77Ier8P9v3AZxwdb7rvCgiNJ1N2tk2Xmjuccai/6nawbU
+	Br6zHSsiw4kEx35ew6jl1BCUVERTSv9XBCllM
+X-Google-Smtp-Source: AGHT+IHKkpUk+WD6bTey5Z/OEgEg1zX4EupEIZF89/wKvvk+qrClQWspsS+52Ps7BfIHqkzp7QfwKpYEDXC+Usvf3S0=
+X-Received: by 2002:a05:622a:4709:b0:444:e9b9:708f with SMTP id
+ d75a77b69052e-4465df8c326mr435621cf.21.1719617974492; Fri, 28 Jun 2024
+ 16:39:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <CAOUHufYGqbd45shZkGCpqeTV9wcBDUoo3iw1SKiDeFLmrP0+=w@mail.gmail.com>
+ <CADrL8HVHcKSW3hiHzKTit07gzo36jtCZCnM9ZpueyifgNdGggw@mail.gmail.com>
+ <ZmioedgEBptNoz91@google.com> <CADrL8HU_FKHTz_6d=xhVLZFDQ_zQo-zdB2rqdpa2CKusa1uo+A@mail.gmail.com>
+ <ZmjtEBH42u7NUWRc@google.com> <CADrL8HUW2q79F0FsEjhGW0ujij6+FfCqas5UpQp27Epfjc94Nw@mail.gmail.com>
+ <ZmxsCwu4uP1lGsWz@google.com> <CADrL8HVDZ+m_-jUCaXf_DWJ92N30oqS=_9wNZwRvoSp5fo7asg@mail.gmail.com>
+ <ZmzPoW7K5GIitQ8B@google.com> <CADrL8HW3rZ5xgbyGa+FXk50QQzF4B1=sYL8zhBepj6tg0EiHYA@mail.gmail.com>
+ <ZnCCZ5gQnA3zMQtv@google.com>
+In-Reply-To: <ZnCCZ5gQnA3zMQtv@google.com>
+From: James Houghton <jthoughton@google.com>
+Date: Fri, 28 Jun 2024 16:38:57 -0700
+Message-ID: <CADrL8HW=kCLoWBwoiSOCd8WHFvBdWaguZ2ureo4eFy9D67+owg@mail.gmail.com>
+Subject: Re: [PATCH v5 4/9] mm: Add test_clear_young_fast_only MMU notifier
+To: Sean Christopherson <seanjc@google.com>
+Cc: Yu Zhao <yuzhao@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Ankit Agrawal <ankita@nvidia.com>, 
+	Axel Rasmussen <axelrasmussen@google.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	David Matlack <dmatlack@google.com>, David Rientjes <rientjes@google.com>, 
+	James Morse <james.morse@arm.com>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Raghavendra Rao Ananta <rananta@google.com>, 
+	Ryan Roberts <ryan.roberts@arm.com>, Shaoqin Huang <shahuang@redhat.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Wei Xu <weixugc@google.com>, 
+	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Content-Type: multipart/mixed; boundary="00000000000085f40d061bfbc2cf"
 
-Ensure updates to the KVM/arm64 documentation get sent to the right
-place.
+--00000000000085f40d061bfbc2cf
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
+On Mon, Jun 17, 2024 at 11:37=E2=80=AFAM Sean Christopherson <seanjc@google=
+.com> wrote:
+>
+> On Mon, Jun 17, 2024, James Houghton wrote:
+> > On Fri, Jun 14, 2024 at 4:17=E2=80=AFPM Sean Christopherson <seanjc@goo=
+gle.com> wrote:
+> > > Ooh!  Actually, after fiddling a bit to see how feasible fast-aging i=
+n the shadow
+> > > MMU would be, I'm pretty sure we can do straight there for nested TDP=
+.  Or rather,
+> > > I suspect/hope we can get close enough for an initial merge, which wo=
+uld allow
+> > > aging_is_fast to be a property of the mmu_notifier, i.e. would simpli=
+fy things
+> > > because KVM wouldn't need to communicate MMU_NOTIFY_WAS_FAST for each=
+ notification.
+> > >
+> > > Walking KVM's rmaps requires mmu_lock because adding/removing rmap en=
+tries is done
+> > > in such a way that a lockless walk would be painfully complex.  But i=
+f there is
+> > > exactly _one_ rmap entry for a gfn, then slot->arch.rmap[...] points =
+directly at
+> > > that one SPTE.  And with nested TDP, unless L1 is doing something unc=
+ommon, e.g.
+> > > mapping the same page into multiple L2s, that overwhelming vast major=
+ity of rmaps
+> > > have only one entry.  That's not the case for legacy shadow paging be=
+cause kernels
+> > > almost always map a pfn using multiple virtual addresses, e.g. Linux'=
+s direct map
+> > > along with any userspace mappings.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index aacccb376c28..05d71b852857 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -12078,6 +12078,7 @@ L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
- L:	kvmarm@lists.linux.dev
- S:	Maintained
- T:	git git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git
-+F:	Documentation/virt/kvm/arm/
- F:	arch/arm64/include/asm/kvm*
- F:	arch/arm64/include/uapi/asm/kvm*
- F:	arch/arm64/kvm/
--- 
-2.45.2.803.g4e1b14247a-goog
+Hi Sean, sorry for taking so long to get back to you.
 
+So just to make sure I have this right: if L1 is using TDP, the gfns
+in L0 will usually only be mapped by a single spte. If L1 is not using
+TDP, then all bets are off. Is that true?
+
+If that is true, given that we don't really have control over whether
+or not L1 decides to use TDP, the lockless shadow MMU walk will work,
+but, if L1 is not using TDP, it will often return false negatives
+(says "old" for an actually-young gfn). So then I don't really
+understand conditioning the lockless shadow MMU walk on us (L0) using
+the TDP MMU[1]. We care about L1, right?
+
+(Maybe you're saying that, when the TDP MMU is enabled, the only cases
+where the shadow MMU is used are cases where gfns are practically
+always mapped by a single shadow PTE. This isn't how I understood your
+mail, but this is what your hack-a-patch[1] makes me think.)
+
+[1] https://lore.kernel.org/linux-mm/ZmzPoW7K5GIitQ8B@google.com/
+
+>
+> ...
+>
+> > Hmm, interesting. I need to spend a little bit more time digesting this=
+.
+> >
+> > Would you like to see this included in v6? (It'd be nice to avoid the
+> > WAS_FAST stuff....) Should we leave it for a later series? I haven't
+> > formed my own opinion yet.
+>
+> I would say it depends on the viability and complexity of my idea.  E.g. =
+if it
+> pans out more or less like my rough sketch, then it's probably worth taki=
+ng on
+> the extra code+complexity in KVM to avoid the whole WAS_FAST goo.
+>
+> Note, if we do go this route, the implementation would need to be tweaked=
+ to
+> handle the difference in behavior between aging and last-minute checks fo=
+r eviction,
+> which I obviously didn't understand when I threw together that hack-a-pat=
+ch.
+>
+> I need to think more about how best to handle that though, e.g. skipping =
+GFNs with
+> multiple mappings is probably the worst possible behavior, as we'd risk e=
+victing
+> hot pages.  But falling back to taking mmu_lock for write isn't all that =
+desirable
+> either.
+
+I think falling back to the write lock is more desirable than evicting
+a young page.
+
+I've attached what I think could work, a diff on top of this series.
+It builds at least. It uses rcu_read_lock/unlock() for
+walk_shadow_page_lockless_begin/end(NULL), and it puts a
+synchronize_rcu() in kvm_mmu_commit_zap_page().
+
+It doesn't get rid of the WAS_FAST things because it doesn't do
+exactly what [1] does. It basically makes three calls now: lockless
+TDP MMU, lockless shadow MMU, locked shadow MMU. It only calls the
+locked shadow MMU bits if the lockless bits say !young (instead of
+being conditioned on tdp_mmu_enabled). My choice is definitely
+questionable for the clear path.
+
+Thanks!
+
+--00000000000085f40d061bfbc2cf
+Content-Type: text/x-patch; charset="US-ASCII"; name="shadow-mmu-patch.diff"
+Content-Disposition: attachment; filename="shadow-mmu-patch.diff"
+Content-Transfer-Encoding: base64
+Content-ID: <f_lxzbr9zx0>
+X-Attachment-Id: f_lxzbr9zx0
+
+ZGlmZiAtLWdpdCBhL2FyY2gveDg2L2t2bS9tbXUvbW11LmMgYi9hcmNoL3g4Ni9rdm0vbW11L21t
+dS5jCmluZGV4IDg0MWNlZTNmMzQ2ZC4uNTQ4ZDFlNDgwZGU5IDEwMDY0NAotLS0gYS9hcmNoL3g4
+Ni9rdm0vbW11L21tdS5jCisrKyBiL2FyY2gveDg2L2t2bS9tbXUvbW11LmMKQEAgLTY0MCw2ICs2
+NDAsMzcgQEAgc3RhdGljIGJvb2wgbW11X3NwdGVfYWdlKHU2NCAqc3B0ZXApCiAJcmV0dXJuIHRy
+dWU7CiB9CiAKKy8qCisgKiBTaW1pbGFyIHRvIG1tdV9zcHRlX2FnZSgpLCBidXQgdGhpcyBvbmUg
+c2hvdWxkIGJlIHVzZWQgZm9yIGxvY2tsZXNzIHNoYWRvdworICogcGFnZSB0YWJsZSB3YWxrcy4K
+KyAqLworc3RhdGljIGJvb2wgbW11X3NwdGVfYWdlX2xvY2tsZXNzKHU2NCAqc3B0ZXApCit7CisJ
+dTY0IG9sZF9zcHRlID0gbW11X3NwdGVfZ2V0X2xvY2tsZXNzKHNwdGVwKTsKKwl1NjQgbmV3X3Nw
+dGU7CisKKwlpZiAoIWlzX2FjY2Vzc2VkX3NwdGUob2xkX3NwdGUpKQorCQlyZXR1cm4gZmFsc2U7
+CisKKwlpZiAoc3B0ZV9hZF9lbmFibGVkKG9sZF9zcHRlKSkKKwkJY2xlYXJfYml0KChmZnMoc2hh
+ZG93X2FjY2Vzc2VkX21hc2spIC0gMSksCisJCQkgICh1bnNpZ25lZCBsb25nICopc3B0ZXApOwor
+CWVsc2UgeworCQluZXdfc3B0ZSA9IG1hcmtfc3B0ZV9mb3JfYWNjZXNzX3RyYWNrKG9sZF9zcHRl
+KTsKKwkJaWYgKCF0cnlfY21weGNoZzY0KHNwdGVwLCAmb2xkX3NwdGUsIG5ld19zcHRlKSkKKwkJ
+CS8qCisJCQkgKiBJZiB0aGUgc3B0ZSBjaGFuZ2VkLCBpdCdzIGxpa2VseSB0aGF0IHRoZSBnZm4K
+KwkJCSAqIGlzIHlvdW5nLgorCQkJICovCisJCQlyZXR1cm4gdHJ1ZTsKKworCQlpZiAoaXNfd3Jp
+dGFibGVfcHRlKG9sZF9zcHRlKSkKKwkJCWt2bV9zZXRfcGZuX2RpcnR5KHNwdGVfdG9fcGZuKG9s
+ZF9zcHRlKSk7CisJfQorCisJcmV0dXJuIHRydWU7Cit9CisKIHN0YXRpYyBpbmxpbmUgYm9vbCBp
+c190ZHBfbW11X2FjdGl2ZShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCiB7CiAJcmV0dXJuIHRkcF9t
+bXVfZW5hYmxlZCAmJiB2Y3B1LT5hcmNoLm1tdS0+cm9vdF9yb2xlLmRpcmVjdDsKQEAgLTY0Nyw2
+ICs2NzgsMTEgQEAgc3RhdGljIGlubGluZSBib29sIGlzX3RkcF9tbXVfYWN0aXZlKHN0cnVjdCBr
+dm1fdmNwdSAqdmNwdSkKIAogc3RhdGljIHZvaWQgd2Fsa19zaGFkb3dfcGFnZV9sb2NrbGVzc19i
+ZWdpbihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCiB7CisJaWYgKCF2Y3B1KSB7CisJCXJjdV9yZWFk
+X2xvY2soKTsKKwkJcmV0dXJuOworCX0KKwogCWlmIChpc190ZHBfbW11X2FjdGl2ZSh2Y3B1KSkg
+ewogCQlrdm1fdGRwX21tdV93YWxrX2xvY2tsZXNzX2JlZ2luKCk7CiAJfSBlbHNlIHsKQEAgLTY2
+Niw2ICs3MDIsMTEgQEAgc3RhdGljIHZvaWQgd2Fsa19zaGFkb3dfcGFnZV9sb2NrbGVzc19iZWdp
+bihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCiAKIHN0YXRpYyB2b2lkIHdhbGtfc2hhZG93X3BhZ2Vf
+bG9ja2xlc3NfZW5kKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKIHsKKwlpZiAoIXZjcHUpIHsKKwkJ
+cmN1X3JlYWRfdW5sb2NrKCk7CisJCXJldHVybjsKKwl9CisKIAlpZiAoaXNfdGRwX21tdV9hY3Rp
+dmUodmNwdSkpIHsKIAkJa3ZtX3RkcF9tbXVfd2Fsa19sb2NrbGVzc19lbmQoKTsKIAl9IGVsc2Ug
+ewpAQCAtOTQ5LDE0ICs5OTAsMTQgQEAgc3RhdGljIGludCBwdGVfbGlzdF9hZGQoc3RydWN0IGt2
+bV9tbXVfbWVtb3J5X2NhY2hlICpjYWNoZSwgdTY0ICpzcHRlLAogCWludCBjb3VudCA9IDA7CiAK
+IAlpZiAoIXJtYXBfaGVhZC0+dmFsKSB7Ci0JCXJtYXBfaGVhZC0+dmFsID0gKHVuc2lnbmVkIGxv
+bmcpc3B0ZTsKKwkJV1JJVEVfT05DRSgmcm1hcF9oZWFkLT52YWwsICh1bnNpZ25lZCBsb25nKXNw
+dGUpOwogCX0gZWxzZSBpZiAoIShybWFwX2hlYWQtPnZhbCAmIDEpKSB7CiAJCWRlc2MgPSBrdm1f
+bW11X21lbW9yeV9jYWNoZV9hbGxvYyhjYWNoZSk7CiAJCWRlc2MtPnNwdGVzWzBdID0gKHU2NCAq
+KXJtYXBfaGVhZC0+dmFsOwogCQlkZXNjLT5zcHRlc1sxXSA9IHNwdGU7CiAJCWRlc2MtPnNwdGVf
+Y291bnQgPSAyOwogCQlkZXNjLT50YWlsX2NvdW50ID0gMDsKLQkJcm1hcF9oZWFkLT52YWwgPSAo
+dW5zaWduZWQgbG9uZylkZXNjIHwgMTsKKwkJV1JJVEVfT05DRSgmcm1hcF9oZWFkLT52YWwsICh1
+bnNpZ25lZCBsb25nKWRlc2MgfCAxKTsKIAkJKytjb3VudDsKIAl9IGVsc2UgewogCQlkZXNjID0g
+KHN0cnVjdCBwdGVfbGlzdF9kZXNjICopKHJtYXBfaGVhZC0+dmFsICYgfjF1bCk7CkBAIC05NzEs
+NyArMTAxMiw3IEBAIHN0YXRpYyBpbnQgcHRlX2xpc3RfYWRkKHN0cnVjdCBrdm1fbW11X21lbW9y
+eV9jYWNoZSAqY2FjaGUsIHU2NCAqc3B0ZSwKIAkJCWRlc2MtPm1vcmUgPSAoc3RydWN0IHB0ZV9s
+aXN0X2Rlc2MgKikocm1hcF9oZWFkLT52YWwgJiB+MXVsKTsKIAkJCWRlc2MtPnNwdGVfY291bnQg
+PSAwOwogCQkJZGVzYy0+dGFpbF9jb3VudCA9IGNvdW50OwotCQkJcm1hcF9oZWFkLT52YWwgPSAo
+dW5zaWduZWQgbG9uZylkZXNjIHwgMTsKKwkJCVdSSVRFX09OQ0UoJnJtYXBfaGVhZC0+dmFsLCAo
+dW5zaWduZWQgbG9uZylkZXNjIHwgMSk7CiAJCX0KIAkJZGVzYy0+c3B0ZXNbZGVzYy0+c3B0ZV9j
+b3VudCsrXSA9IHNwdGU7CiAJfQpAQCAtMTAwOSw5ICsxMDUwLDEwIEBAIHN0YXRpYyB2b2lkIHB0
+ZV9saXN0X2Rlc2NfcmVtb3ZlX2VudHJ5KHN0cnVjdCBrdm0gKmt2bSwKIAkgKiBoZWFkIGF0IHRo
+ZSBuZXh0IGRlc2NyaXB0b3IsIGkuZS4gdGhlIG5ldyBoZWFkLgogCSAqLwogCWlmICghaGVhZF9k
+ZXNjLT5tb3JlKQotCQlybWFwX2hlYWQtPnZhbCA9IDA7CisJCVdSSVRFX09OQ0UoJnJtYXBfaGVh
+ZC0+dmFsLCAwKTsKIAllbHNlCi0JCXJtYXBfaGVhZC0+dmFsID0gKHVuc2lnbmVkIGxvbmcpaGVh
+ZF9kZXNjLT5tb3JlIHwgMTsKKwkJV1JJVEVfT05DRSgmcm1hcF9oZWFkLT52YWwsCisJCQkJKHVu
+c2lnbmVkIGxvbmcpaGVhZF9kZXNjLT5tb3JlIHwgMSk7CiAJbW11X2ZyZWVfcHRlX2xpc3RfZGVz
+YyhoZWFkX2Rlc2MpOwogfQogCkBAIC0xMDI4LDcgKzEwNzAsNyBAQCBzdGF0aWMgdm9pZCBwdGVf
+bGlzdF9yZW1vdmUoc3RydWN0IGt2bSAqa3ZtLCB1NjQgKnNwdGUsCiAJCWlmIChLVk1fQlVHX09O
+X0RBVEFfQ09SUlVQVElPTigodTY0ICopcm1hcF9oZWFkLT52YWwgIT0gc3B0ZSwga3ZtKSkKIAkJ
+CXJldHVybjsKIAotCQlybWFwX2hlYWQtPnZhbCA9IDA7CisJCVdSSVRFX09OQ0UoJnJtYXBfaGVh
+ZC0+dmFsLCAwKTsKIAl9IGVsc2UgewogCQlkZXNjID0gKHN0cnVjdCBwdGVfbGlzdF9kZXNjICop
+KHJtYXBfaGVhZC0+dmFsICYgfjF1bCk7CiAJCXdoaWxlIChkZXNjKSB7CkBAIC0xMDc4LDcgKzEx
+MjAsNyBAQCBzdGF0aWMgYm9vbCBrdm1femFwX2FsbF9ybWFwX3NwdGVzKHN0cnVjdCBrdm0gKmt2
+bSwKIAl9CiBvdXQ6CiAJLyogcm1hcF9oZWFkIGlzIG1lYW5pbmdsZXNzIG5vdywgcmVtZW1iZXIg
+dG8gcmVzZXQgaXQgKi8KLQlybWFwX2hlYWQtPnZhbCA9IDA7CisJV1JJVEVfT05DRSgmcm1hcF9o
+ZWFkLT52YWwsIDApOwogCXJldHVybiB0cnVlOwogfQogCkBAIC0xNjM0LDE3ICsxNjc2LDY0IEBA
+IHN0YXRpYyBib29sIGt2bV9oYXNfc2hhZG93X21tdV9zcHRlcyhzdHJ1Y3Qga3ZtICprdm0pCiAJ
+cmV0dXJuICF0ZHBfbW11X2VuYWJsZWQgfHwgUkVBRF9PTkNFKGt2bS0+YXJjaC5pbmRpcmVjdF9z
+aGFkb3dfcGFnZXMpOwogfQogCitzdGF0aWMgYm9vbCBrdm1fYWdlX3JtYXBfZmFzdCh1NjQgKnNw
+dGVwKQoreworCXJldHVybiBtbXVfc3B0ZV9hZ2VfbG9ja2xlc3Moc3B0ZXApOworfQorCitzdGF0
+aWMgYm9vbCBrdm1fdGVzdF9hZ2Vfcm1hcF9mYXN0KHU2NCAqc3B0ZXApCit7CisJcmV0dXJuIGlz
+X2FjY2Vzc2VkX3NwdGUoUkVBRF9PTkNFKCpzcHRlcCkpOworfQorCit0eXBlZGVmIGJvb2wgKCpy
+bWFwX2xvY2tsZXNzX2hhbmRsZXJfdCkodTY0ICpzcHRlcCk7CisKK3N0YXRpYyBfX2Fsd2F5c19p
+bmxpbmUgYm9vbCBrdm1faGFuZGxlX2dmbl9yYW5nZV9sb2NrbGVzcygKKwkJc3RydWN0IGt2bSAq
+a3ZtLCBzdHJ1Y3Qga3ZtX2dmbl9yYW5nZSAqcmFuZ2UsCisJCXJtYXBfbG9ja2xlc3NfaGFuZGxl
+cl90IGhhbmRsZXIpCit7CisJc3RydWN0IGt2bV9ybWFwX2hlYWQgKnJtYXA7CisJdTY0ICpzcHRl
+cDsKKwlnZm5fdCBnZm47CisJaW50IGxldmVsOworCWJvb2wgcmV0ID0gZmFsc2U7CisKKwl3YWxr
+X3NoYWRvd19wYWdlX2xvY2tsZXNzX2JlZ2luKE5VTEwpOworCisJZm9yIChnZm4gPSByYW5nZS0+
+c3RhcnQ7IGdmbiA8IHJhbmdlLT5lbmQ7IGdmbisrKSB7CisJCWZvciAobGV2ZWwgPSBQR19MRVZF
+TF80SzsgbGV2ZWwgPD0gS1ZNX01BWF9IVUdFUEFHRV9MRVZFTDsKKwkJICAgICBsZXZlbCsrKSB7
+CisJCQlybWFwID0gZ2ZuX3RvX3JtYXAoZ2ZuLCBsZXZlbCwgcmFuZ2UtPnNsb3QpOworCQkJc3B0
+ZXAgPSAodm9pZCAqKVJFQURfT05DRShybWFwLT52YWwpOworCisJCQkvKiBTa2lwIHRoaXMgZ2Zu
+IGlmIG11bHRpcGxlIFNQVEVzIG1hcHBpbmcgaXQgKi8KKwkJCWlmICgodW5zaWduZWQgbG9uZylz
+cHRlcCAmIDEpCisJCQkJY29udGludWU7CisKKwkJCXJldCB8PSBoYW5kbGVyKHNwdGVwKTsKKwkJ
+fQorCX0KKworCXdhbGtfc2hhZG93X3BhZ2VfbG9ja2xlc3NfZW5kKE5VTEwpOworCisJcmV0dXJu
+IHJldDsKK30KKwogYm9vbCBrdm1fYWdlX2dmbihzdHJ1Y3Qga3ZtICprdm0sIHN0cnVjdCBrdm1f
+Z2ZuX3JhbmdlICpyYW5nZSkKIHsKLQlib29sIHlvdW5nID0gZmFsc2U7CisJYm9vbCB5b3VuZyA9
+IGZhbHNlLCBzaGFkb3dfeW91bmcgPSBmYWxzZTsKIAotCWlmICh0ZHBfbW11X2VuYWJsZWQpIHsK
+KwlpZiAodGRwX21tdV9lbmFibGVkKQogCQl5b3VuZyB8PSBrdm1fdGRwX21tdV9hZ2VfZ2ZuX3Jh
+bmdlKGt2bSwgcmFuZ2UpOwotCQlpZiAoeW91bmcpCi0JCQlyYW5nZS0+YXJnLnJlcG9ydF9mYXN0
+ID0gdHJ1ZTsKLQl9CiAKLQlpZiAoIXJhbmdlLT5hcmcuZmFzdF9vbmx5ICYmIGt2bV9oYXNfc2hh
+ZG93X21tdV9zcHRlcyhrdm0pKSB7CisJc2hhZG93X3lvdW5nID0ga3ZtX2hhbmRsZV9nZm5fcmFu
+Z2VfbG9ja2xlc3Moa3ZtLCByYW5nZSwKKwkJCQkJICAgICAgIGt2bV9hZ2Vfcm1hcF9mYXN0KTsK
+Kwl5b3VuZyB8PSBzaGFkb3dfeW91bmc7CisJaWYgKHlvdW5nKQorCQlyYW5nZS0+YXJnLnJlcG9y
+dF9mYXN0ID0gdHJ1ZTsKKworCWVsc2UgaWYgKCFzaGFkb3dfeW91bmcgJiYgIXJhbmdlLT5hcmcu
+ZmFzdF9vbmx5ICYmCisJCSBrdm1faGFzX3NoYWRvd19tbXVfc3B0ZXMoa3ZtKSkgewogCQl3cml0
+ZV9sb2NrKCZrdm0tPm1tdV9sb2NrKTsKIAkJeW91bmcgPSBrdm1faGFuZGxlX2dmbl9yYW5nZShr
+dm0sIHJhbmdlLCBrdm1fYWdlX3JtYXApOwogCQl3cml0ZV91bmxvY2soJmt2bS0+bW11X2xvY2sp
+OwpAQCAtMTY1NywxMSArMTc0NiwxNSBAQCBib29sIGt2bV90ZXN0X2FnZV9nZm4oc3RydWN0IGt2
+bSAqa3ZtLCBzdHJ1Y3Qga3ZtX2dmbl9yYW5nZSAqcmFuZ2UpCiB7CiAJYm9vbCB5b3VuZyA9IGZh
+bHNlOwogCi0JaWYgKHRkcF9tbXVfZW5hYmxlZCkgeworCWlmICh0ZHBfbW11X2VuYWJsZWQpCiAJ
+CXlvdW5nIHw9IGt2bV90ZHBfbW11X3Rlc3RfYWdlX2dmbihrdm0sIHJhbmdlKTsKLQkJaWYgKHlv
+dW5nKQotCQkJcmFuZ2UtPmFyZy5yZXBvcnRfZmFzdCA9IHRydWU7Ci0JfQorCisJaWYgKCF5b3Vu
+ZykKKwkJeW91bmcgfD0ga3ZtX2hhbmRsZV9nZm5fcmFuZ2VfbG9ja2xlc3Moa3ZtLCByYW5nZSwK
+KwkJCQkJCSAgICAgICBrdm1fdGVzdF9hZ2Vfcm1hcF9mYXN0KTsKKworCWlmICh5b3VuZykKKwkJ
+cmFuZ2UtPmFyZy5yZXBvcnRfZmFzdCA9IHRydWU7CiAKIAlpZiAoIXlvdW5nICYmICFyYW5nZS0+
+YXJnLmZhc3Rfb25seSAmJiBrdm1faGFzX3NoYWRvd19tbXVfc3B0ZXMoa3ZtKSkgewogCQl3cml0
+ZV9sb2NrKCZrdm0tPm1tdV9sb2NrKTsKQEAgLTI2MzYsNiArMjcyOSwxMiBAQCBzdGF0aWMgdm9p
+ZCBrdm1fbW11X2NvbW1pdF96YXBfcGFnZShzdHJ1Y3Qga3ZtICprdm0sCiAJICovCiAJa3ZtX2Zs
+dXNoX3JlbW90ZV90bGJzKGt2bSk7CiAKKwkvKgorCSAqIFdhaXQgZm9yIGFueSBub24tdkNQVSBs
+b2NrbGVzcyBzaGFkb3cgcGFnZSB0YWJsZSB3YWxrZXJzIHRvIHN0b3AKKwkgKiB1c2luZyB0aGUg
+c2hhZG93IHBhZ2VzIHdlJ3JlIGFib3V0IHRvIGZyZWUuCisJICovCisJc3luY2hyb25pemVfcmN1
+KCk7CisKIAlsaXN0X2Zvcl9lYWNoX2VudHJ5X3NhZmUoc3AsIG5zcCwgaW52YWxpZF9saXN0LCBs
+aW5rKSB7CiAJCVdBUk5fT05fT05DRSghc3AtPnJvbGUuaW52YWxpZCB8fCBzcC0+cm9vdF9jb3Vu
+dCk7CiAJCWt2bV9tbXVfZnJlZV9zaGFkb3dfcGFnZShzcCk7Cg==
+--00000000000085f40d061bfbc2cf--
