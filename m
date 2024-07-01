@@ -1,24 +1,24 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B57616DED5
-	for <kvmarm@lists.linux.dev>; Mon,  1 Jul 2024 17:07:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A863A16E884
+	for <kvmarm@lists.linux.dev>; Mon,  1 Jul 2024 17:09:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719853637; cv=none; b=eUrbTcWNnLkvuXz7qCsNNAUGrSTydkAxw5BunKkxkUY7TOKjr0nczcK6+3OhHg/qacj12b6JY6CuTUrgl1Sh7L5tL7BSwnEOP2iYpSPN7lCRtOT0QfUnxL4D0FuaByDpKqV72JhvnVhW23yRNoAvrMoudfgMrv4d5qTTeHHwg6w=
+	t=1719853783; cv=none; b=ONHapKgixoJMXXhkaxehQoN6vqF+/10nHcNWLiQPrr7QJonyFDZkjIYQ2yT0+/kUNWSGOdy+2tpPr0WyDfkOOYz9abC7O+usG89XPdWeo2GBM2VfV7tHsrOiCnsBvb+YTNYWbMOyBGASXuuYAlSUcRTfJGsh+PLCnJy4/uXLjFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719853637; c=relaxed/simple;
-	bh=DN/KxO3dGV/2vXtnLWfIBRZu9oosw0hZsA3V8O/408w=;
+	s=arc-20240116; t=1719853783; c=relaxed/simple;
+	bh=/0P36xAcbDr1Y49JaZRQ1aDkbz3B2ByND+s9thhdz6o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t8ugyzcp+db+yLcRxNtliQv9zkLoKnlGxbpTneISXM7x2artsB0TegYDQBFfJH8SljaaaBHsppkdQcyV8CpH3qYX5kjq86EJXL6mfcz0l0V1mY5s37av9SBRD5yMYxmm7U9meWvOJVjjfnCaZzH0WXs2Ldv/sLqbG0NYeS+L3yw=
+	 Content-Type:Content-Disposition:In-Reply-To; b=orwQdTs4co9AT/ggE083ofTiUSuMWAqExrtAuBeG/bXEd/UE3+pZRrmX358tJqbV1w+neZhW9D4TfGidFgJdY4zn6WEcD8ULXSf+1iwtnkSGpzTc9D3zYcfAkbwe0G8Z08kZ9YFdtRc8GouCbhyFOk2sZBF5arTAsFAksxH6h4g=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B6209339;
-	Mon,  1 Jul 2024 10:07:39 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 13A7C339;
+	Mon,  1 Jul 2024 10:10:06 -0700 (PDT)
 Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 846AD3F766;
-	Mon,  1 Jul 2024 10:07:11 -0700 (PDT)
-Date: Mon, 1 Jul 2024 18:07:09 +0100
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0F5003F766;
+	Mon,  1 Jul 2024 10:09:37 -0700 (PDT)
+Date: Mon, 1 Jul 2024 18:09:35 +0100
 From: Mark Rutland <mark.rutland@arm.com>
 To: "Rob Herring (Arm)" <robh@kernel.org>
 Cc: Russell King <linux@armlinux.org.uk>,
@@ -38,11 +38,11 @@ Cc: Russell King <linux@armlinux.org.uk>,
 	James Clark <james.clark@arm.com>,
 	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
 	linux-perf-users@vger.kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 10/12] arm64: perf/kvm: Use a common PMU cycle counter
- define
-Message-ID: <ZoLiPaTi3b52nCKh@J2N7QTR9R3>
+Subject: Re: [PATCH v2 01/12] perf: arm_pmuv3: Avoid assigning fixed cycle
+ counter with threshold
+Message-ID: <ZoLiz5FoPsd89p5E@J2N7QTR9R3>
 References: <20240626-arm-pmu-3-9-icntr-v2-0-c9784b4f4065@kernel.org>
- <20240626-arm-pmu-3-9-icntr-v2-10-c9784b4f4065@kernel.org>
+ <20240626-arm-pmu-3-9-icntr-v2-1-c9784b4f4065@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -51,139 +51,71 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240626-arm-pmu-3-9-icntr-v2-10-c9784b4f4065@kernel.org>
+In-Reply-To: <20240626-arm-pmu-3-9-icntr-v2-1-c9784b4f4065@kernel.org>
 
-On Wed, Jun 26, 2024 at 04:32:34PM -0600, Rob Herring (Arm) wrote:
-> The PMUv3 and KVM code each have a define for the PMU cycle counter
-> index. Move KVM's define to a shared location and use it for PMUv3
-> driver.
+On Wed, Jun 26, 2024 at 04:32:25PM -0600, Rob Herring (Arm) wrote:
+> If the user has requested a counting threshold for the CPU cycles event,
+> then the fixed cycle counter can't be assigned as it lacks threshold
+> support. Currently, the thresholds will work or not randomly depending
+> on which counter the event is assigned.
 > 
+> While using thresholds for CPU cycles doesn't make much sense, it can be
+> useful for testing purposes.
+> 
+> Fixes: 816c26754447 ("arm64: perf: Add support for event counting threshold")
 > Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
-> ---
-> v2:
->  - Move ARMV8_PMU_CYCLE_IDX to linux/perf/arm_pmuv3.h
-> ---
->  arch/arm64/kvm/sys_regs.c      |  1 +
->  drivers/perf/arm_pmuv3.c       | 19 +++++++------------
->  include/kvm/arm_pmu.h          |  1 -
->  include/linux/perf/arm_pmuv3.h |  3 +++
->  4 files changed, 11 insertions(+), 13 deletions(-)
 
 Acked-by: Mark Rutland <mark.rutland@arm.com>
 
 Mark.
 
+> ---
+> This should go to 6.10 and stable. It is also a dependency for ICNTR
+> support.
 > 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index f8b5db48ea8a..22393ae7ce14 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -18,6 +18,7 @@
->  #include <linux/printk.h>
->  #include <linux/uaccess.h>
->  
-> +#include <asm/arm_pmuv3.h>
->  #include <asm/cacheflush.h>
->  #include <asm/cputype.h>
->  #include <asm/debug-monitors.h>
+> v2:
+>  - Add and use armv8pmu_event_get_threshold() helper.
+> 
+> v1: https://lore.kernel.org/all/20240611155012.2286044-1-robh@kernel.org/
+> ---
+>  drivers/perf/arm_pmuv3.c | 10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
+> 
 > diff --git a/drivers/perf/arm_pmuv3.c b/drivers/perf/arm_pmuv3.c
-> index f771242168f1..f58dff49ea7d 100644
+> index 23fa6c5da82c..8ed5c3358920 100644
 > --- a/drivers/perf/arm_pmuv3.c
 > +++ b/drivers/perf/arm_pmuv3.c
-> @@ -451,11 +451,6 @@ static const struct attribute_group armv8_pmuv3_caps_attr_group = {
->  	.attrs = armv8_pmuv3_caps_attrs,
->  };
+> @@ -338,6 +338,11 @@ static bool armv8pmu_event_want_user_access(struct perf_event *event)
+>  	return ATTR_CFG_GET_FLD(&event->attr, rdpmc);
+>  }
 >  
-> -/*
-> - * Perf Events' indices
-> - */
-> -#define	ARMV8_IDX_CYCLE_COUNTER	31
-> -
->  /*
->   * We unconditionally enable ARMv8.5-PMU long event counter support
->   * (64-bit events) where supported. Indicate if this arm_pmu has long
-> @@ -574,7 +569,7 @@ static u64 armv8pmu_read_counter(struct perf_event *event)
->  	int idx = hwc->idx;
->  	u64 value;
+> +static u32 armv8pmu_event_get_threshold(struct perf_event_attr *attr)
+> +{
+> +	return ATTR_CFG_GET_FLD(attr, threshold);
+> +}
+> +
+>  static u8 armv8pmu_event_threshold_control(struct perf_event_attr *attr)
+>  {
+>  	u8 th_compare = ATTR_CFG_GET_FLD(attr, threshold_compare);
+> @@ -941,7 +946,8 @@ static int armv8pmu_get_event_idx(struct pmu_hw_events *cpuc,
+>  	unsigned long evtype = hwc->config_base & ARMV8_PMU_EVTYPE_EVENT;
 >  
-> -	if (idx == ARMV8_IDX_CYCLE_COUNTER)
-> +	if (idx == ARMV8_PMU_CYCLE_IDX)
->  		value = read_pmccntr();
->  	else
->  		value = armv8pmu_read_hw_counter(event);
-> @@ -607,7 +602,7 @@ static void armv8pmu_write_counter(struct perf_event *event, u64 value)
->  
->  	value = armv8pmu_bias_long_counter(event, value);
->  
-> -	if (idx == ARMV8_IDX_CYCLE_COUNTER)
-> +	if (idx == ARMV8_PMU_CYCLE_IDX)
->  		write_pmccntr(value);
->  	else
->  		armv8pmu_write_hw_counter(event, value);
-> @@ -644,7 +639,7 @@ static void armv8pmu_write_event_type(struct perf_event *event)
->  		armv8pmu_write_evtype(idx - 1, hwc->config_base);
->  		armv8pmu_write_evtype(idx, chain_evt);
->  	} else {
-> -		if (idx == ARMV8_IDX_CYCLE_COUNTER)
-> +		if (idx == ARMV8_PMU_CYCLE_IDX)
->  			write_pmccfiltr(hwc->config_base);
->  		else
->  			armv8pmu_write_evtype(idx, hwc->config_base);
-> @@ -772,7 +767,7 @@ static void armv8pmu_enable_user_access(struct arm_pmu *cpu_pmu)
->  	/* Clear any unused counters to avoid leaking their contents */
->  	for_each_andnot_bit(i, cpu_pmu->cntr_mask, cpuc->used_mask,
->  			    ARMPMU_MAX_HWEVENTS) {
-> -		if (i == ARMV8_IDX_CYCLE_COUNTER)
-> +		if (i == ARMV8_PMU_CYCLE_IDX)
->  			write_pmccntr(0);
->  		else
->  			armv8pmu_write_evcntr(i, 0);
-> @@ -933,8 +928,8 @@ static int armv8pmu_get_event_idx(struct pmu_hw_events *cpuc,
 >  	/* Always prefer to place a cycle counter into the cycle counter. */
->  	if ((evtype == ARMV8_PMUV3_PERFCTR_CPU_CYCLES) &&
->  	    !armv8pmu_event_get_threshold(&event->attr)) {
-> -		if (!test_and_set_bit(ARMV8_IDX_CYCLE_COUNTER, cpuc->used_mask))
-> -			return ARMV8_IDX_CYCLE_COUNTER;
-> +		if (!test_and_set_bit(ARMV8_PMU_CYCLE_IDX, cpuc->used_mask))
-> +			return ARMV8_PMU_CYCLE_IDX;
+> -	if (evtype == ARMV8_PMUV3_PERFCTR_CPU_CYCLES) {
+> +	if ((evtype == ARMV8_PMUV3_PERFCTR_CPU_CYCLES) &&
+> +	    !armv8pmu_event_get_threshold(&event->attr)) {
+>  		if (!test_and_set_bit(ARMV8_IDX_CYCLE_COUNTER, cpuc->used_mask))
+>  			return ARMV8_IDX_CYCLE_COUNTER;
 >  		else if (armv8pmu_event_is_64bit(event) &&
->  			   armv8pmu_event_want_user_access(event) &&
->  			   !armv8pmu_has_long_event(cpu_pmu))
-> @@ -1196,7 +1191,7 @@ static void __armv8pmu_probe_pmu(void *info)
->  		   0, FIELD_GET(ARMV8_PMU_PMCR_N, armv8pmu_pmcr_read()));
->  
->  	/* Add the CPU cycles counter */
-> -	set_bit(ARMV8_IDX_CYCLE_COUNTER, cpu_pmu->cntr_mask);
-> +	set_bit(ARMV8_PMU_CYCLE_IDX, cpu_pmu->cntr_mask);
->  
->  	pmceid[0] = pmceid_raw[0] = read_pmceid0();
->  	pmceid[1] = pmceid_raw[1] = read_pmceid1();
-> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-> index 334d7c5503cf..871067fb2616 100644
-> --- a/include/kvm/arm_pmu.h
-> +++ b/include/kvm/arm_pmu.h
-> @@ -10,7 +10,6 @@
->  #include <linux/perf_event.h>
->  #include <linux/perf/arm_pmuv3.h>
->  
-> -#define ARMV8_PMU_CYCLE_IDX		(ARMV8_PMU_MAX_COUNTERS - 1)
->  
->  #if IS_ENABLED(CONFIG_HW_PERF_EVENTS) && IS_ENABLED(CONFIG_KVM)
->  struct kvm_pmc {
-> diff --git a/include/linux/perf/arm_pmuv3.h b/include/linux/perf/arm_pmuv3.h
-> index 792b8e10b72a..f4ec76f725a3 100644
-> --- a/include/linux/perf/arm_pmuv3.h
-> +++ b/include/linux/perf/arm_pmuv3.h
-> @@ -9,6 +9,9 @@
->  #define ARMV8_PMU_MAX_GENERAL_COUNTERS	31
->  #define ARMV8_PMU_MAX_COUNTERS	32
->  
-> +#define ARMV8_PMU_CYCLE_IDX		31
-> +
-> +
->  /*
->   * Common architectural and microarchitectural event numbers.
->   */
+> @@ -1033,7 +1039,7 @@ static int armv8pmu_set_event_filter(struct hw_perf_event *event,
+>  	 * If FEAT_PMUv3_TH isn't implemented, then THWIDTH (threshold_max) will
+>  	 * be 0 and will also trigger this check, preventing it from being used.
+>  	 */
+> -	th = ATTR_CFG_GET_FLD(attr, threshold);
+> +	th = armv8pmu_event_get_threshold(attr);
+>  	if (th > threshold_max(cpu_pmu)) {
+>  		pr_debug("PMU event threshold exceeds max value\n");
+>  		return -EINVAL;
 > 
 > -- 
 > 2.43.0
