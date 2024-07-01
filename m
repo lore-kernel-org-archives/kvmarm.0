@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89C3B14A098;
-	Mon,  1 Jul 2024 09:55:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAF8A14B088;
+	Mon,  1 Jul 2024 09:55:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719827736; cv=none; b=XnyE5DTfnZb5bsxSYvE/WU1X36A53wc82xnt9M6zLLbhwRwgdJZIRnYCzR0yAr6bI48Fb3eMExxOoXnDEyLR8MOk4BCeUe76sE8pQpPmBNpL0VBOwM7hY8rJ57d3ho0Knfiv8mQA1vOtLb8CZXqBPex0UEop9/g0iUI1wSYh6b4=
+	t=1719827740; cv=none; b=MTpuZ8V3faPF0AE/EnZdBWmvuI6d2X3oik3Di1tu18lAXHMCMlHNUB9PaVJi8R0Ww1/SNCGSiGSzvLg0359dei/itAwuuv/7C8eGRkgNIcVueAKz8XP5xMTmyiMrCbu45Pj6CdTcOU0t3AIE4sDVCUmkLOF5VpemklpdYFp+1V4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719827736; c=relaxed/simple;
-	bh=kUKXTAeQbkxgHtXF2NzhvFWMftSlRuwr+7oklYke8rU=;
+	s=arc-20240116; t=1719827740; c=relaxed/simple;
+	bh=RAqGUwS0iK/gH+i0sGvqhzftUnWb9y7/X+RSKXJBDns=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=POOsMeeoqSoLDdYumsoMMqwQUa6kNJxby7ZnJ9Wsvi4XiN6aszFnpwZY9oibmh5bAPhTcRRnoWnfQPxQ7duvqomOz5Rt2mmVl85BQFh4Q1l1z22aOeV6b6vMt/Fw/2MdX8+kJftsM6oovNxUZlm9sGQcpRKCF4E0rjlR+iYioOM=
+	 MIME-Version; b=kCxerV/v//RUPP6W3WS51R2WT+xUvwtf8RLNUFoSNqFQ8Dbq6zeXsyircVSHjv3bSvJbCamYglhnCIrZA2RySmadVDVLXQOPenswY57PKk2oS3ejPA8qCcr302wKKep5X3aum3LfOaXcpiJMjhJnHEe6Cdhdz1JAik9bVutRp8c=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 33A1115A1;
-	Mon,  1 Jul 2024 02:56:00 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 23DBA367;
+	Mon,  1 Jul 2024 02:56:03 -0700 (PDT)
 Received: from e122027.arm.com (unknown [10.57.44.170])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 381333F762;
-	Mon,  1 Jul 2024 02:55:32 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7D05B3F762;
+	Mon,  1 Jul 2024 02:55:35 -0700 (PDT)
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -37,9 +37,9 @@ Cc: Steven Price <steven.price@arm.com>,
 	Fuad Tabba <tabba@google.com>,
 	linux-coco@lists.linux.dev,
 	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: [PATCH v4 05/15] arm64: Mark all I/O as non-secure shared
-Date: Mon,  1 Jul 2024 10:54:55 +0100
-Message-Id: <20240701095505.165383-6-steven.price@arm.com>
+Subject: [PATCH v4 06/15] arm64: Make the PHYS_MASK_SHIFT dynamic
+Date: Mon,  1 Jul 2024 10:54:56 +0100
+Message-Id: <20240701095505.165383-7-steven.price@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240701095505.165383-1-steven.price@arm.com>
 References: <20240701095505.165383-1-steven.price@arm.com>
@@ -51,64 +51,84 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-All I/O is by default considered non-secure for realms. As such
-mark them as shared with the host.
+Make the PHYS_MASK_SHIFT dynamic for Realms. This is only is required
+for masking the PFN from a pte entry. For a realm phys_mask_shift is
+reduced if the RMM reports a smaller configured size for the guest.
+
+The realm configuration splits the address space into two with the top
+half being memory shared with the host, and the bottom half being
+protected memory. We treat the bit which controls this split as an
+attribute bit and hence exclude it (and any higher bits) from the mask.
 
 Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Steven Price <steven.price@arm.com>
----
-Changes since v3:
- * Add PROT_NS_SHARED to FIXMAP_PAGE_IO rather than overriding
-   set_fixmap_io() with a custom function.
- * Modify ioreamp_cache() to specify PROT_NS_SHARED too.
----
- arch/arm64/include/asm/fixmap.h | 2 +-
- arch/arm64/include/asm/io.h     | 8 ++++----
- 2 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/include/asm/fixmap.h b/arch/arm64/include/asm/fixmap.h
-index 87e307804b99..f2c5e653562e 100644
---- a/arch/arm64/include/asm/fixmap.h
-+++ b/arch/arm64/include/asm/fixmap.h
-@@ -98,7 +98,7 @@ enum fixed_addresses {
- #define FIXADDR_TOT_SIZE	(__end_of_fixed_addresses << PAGE_SHIFT)
- #define FIXADDR_TOT_START	(FIXADDR_TOP - FIXADDR_TOT_SIZE)
+---
+v3: Drop the MAX_PHYS_MASK{,_SHIFT} definitions as they are no longer
+needed.
+---
+ arch/arm64/include/asm/pgtable-hwdef.h | 6 ------
+ arch/arm64/include/asm/pgtable.h       | 5 +++++
+ arch/arm64/kernel/rsi.c                | 5 +++++
+ 3 files changed, 10 insertions(+), 6 deletions(-)
+
+diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
+index 9943ff0af4c9..2e3af0693bd8 100644
+--- a/arch/arm64/include/asm/pgtable-hwdef.h
++++ b/arch/arm64/include/asm/pgtable-hwdef.h
+@@ -203,12 +203,6 @@
+  */
+ #define PTE_S2_MEMATTR(t)	(_AT(pteval_t, (t)) << 2)
  
--#define FIXMAP_PAGE_IO     __pgprot(PROT_DEVICE_nGnRE)
-+#define FIXMAP_PAGE_IO     __pgprot(PROT_DEVICE_nGnRE | PROT_NS_SHARED)
- 
- void __init early_fixmap_init(void);
- 
-diff --git a/arch/arm64/include/asm/io.h b/arch/arm64/include/asm/io.h
-index 4ff0ae3f6d66..07fc1801c6ad 100644
---- a/arch/arm64/include/asm/io.h
-+++ b/arch/arm64/include/asm/io.h
-@@ -277,12 +277,12 @@ static inline void __const_iowrite64_copy(void __iomem *to, const void *from,
- 
- #define ioremap_prot ioremap_prot
- 
--#define _PAGE_IOREMAP PROT_DEVICE_nGnRE
-+#define _PAGE_IOREMAP (PROT_DEVICE_nGnRE | PROT_NS_SHARED)
- 
- #define ioremap_wc(addr, size)	\
--	ioremap_prot((addr), (size), PROT_NORMAL_NC)
-+	ioremap_prot((addr), (size), (PROT_NORMAL_NC | PROT_NS_SHARED))
- #define ioremap_np(addr, size)	\
--	ioremap_prot((addr), (size), PROT_DEVICE_nGnRnE)
-+	ioremap_prot((addr), (size), (PROT_DEVICE_nGnRnE | PROT_NS_SHARED))
+-/*
+- * Highest possible physical address supported.
+- */
+-#define PHYS_MASK_SHIFT		(CONFIG_ARM64_PA_BITS)
+-#define PHYS_MASK		((UL(1) << PHYS_MASK_SHIFT) - 1)
+-
+ #define TTBR_CNP_BIT		(UL(1) << 0)
  
  /*
-  * io{read,write}{16,32,64}be() macros
-@@ -303,7 +303,7 @@ static inline void __iomem *ioremap_cache(phys_addr_t addr, size_t size)
- 	if (pfn_is_map_memory(__phys_to_pfn(addr)))
- 		return (void __iomem *)__phys_to_virt(addr);
+diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
+index f8efbc128446..11d614d83317 100644
+--- a/arch/arm64/include/asm/pgtable.h
++++ b/arch/arm64/include/asm/pgtable.h
+@@ -39,6 +39,11 @@
+ #include <linux/sched.h>
+ #include <linux/page_table_check.h>
  
--	return ioremap_prot(addr, size, PROT_NORMAL);
-+	return ioremap_prot(addr, size, PROT_NORMAL | PROT_NS_SHARED);
++extern unsigned int phys_mask_shift;
++
++#define PHYS_MASK_SHIFT		(phys_mask_shift)
++#define PHYS_MASK		((1UL << PHYS_MASK_SHIFT) - 1)
++
+ #ifdef CONFIG_TRANSPARENT_HUGEPAGE
+ #define __HAVE_ARCH_FLUSH_PMD_TLB_RANGE
+ 
+diff --git a/arch/arm64/kernel/rsi.c b/arch/arm64/kernel/rsi.c
+index 231c1a3ecdeb..7ac5fc4a27d0 100644
+--- a/arch/arm64/kernel/rsi.c
++++ b/arch/arm64/kernel/rsi.c
+@@ -13,6 +13,8 @@ struct realm_config config;
+ unsigned long prot_ns_shared;
+ EXPORT_SYMBOL(prot_ns_shared);
+ 
++unsigned int phys_mask_shift = CONFIG_ARM64_PA_BITS;
++
+ DEFINE_STATIC_KEY_FALSE_RO(rsi_present);
+ EXPORT_SYMBOL(rsi_present);
+ 
+@@ -80,6 +82,9 @@ void __init arm64_rsi_init(void)
+ 		return;
+ 	prot_ns_shared = BIT(config.ipa_bits - 1);
+ 
++	if (config.ipa_bits - 1 < phys_mask_shift)
++		phys_mask_shift = config.ipa_bits - 1;
++
+ 	static_branch_enable(&rsi_present);
  }
  
- /*
 -- 
 2.34.1
 
