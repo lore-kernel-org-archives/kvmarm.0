@@ -1,175 +1,218 @@
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6E948289C
-	for <kvmarm@lists.linux.dev>; Mon,  1 Jul 2024 08:42:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DDD92C859;
+	Mon,  1 Jul 2024 09:55:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719823372; cv=none; b=FVjMYeDeLLDAUrQ6PIEKT2b5v5wlxia2uU9WCu+7KlbfBicxhm6cX7a22tPSP/izHfZUnvUEpjZehKJl/5OxGeXHaOQLPgrUcQn8PzKtKEimtmZYxTVVok3toPL8if5H5n66DpjOd/QzNxuA+ad1Gz5oIJIJ012WNbnvSwTSc9I=
+	t=1719827722; cv=none; b=TQlln4LiYdPffPsoCPlAguacH4Bp0dJVZEeTjXBUSO7uVqhsNH0q7x3ewwz01mF/8/qrPM33HGHPltHVu3t+mWvkSYld1aqu9cSrc22gy2JKcOLoBOTlKtRpfsxzavffirfD1Dqgxj7wE61KdMtNDLgp1CuPJEfg64KRMUrH6LE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719823372; c=relaxed/simple;
-	bh=cHDjUygFlHEkZ3a+qAPDtVYOmwRuT3EA86PTUwtLgpM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OgF62GgNxxpeLUZdnUcq2X3h1JgW8FjDM9C8QotxZm7quzbYQkTXCju+Eh/jnj4HjDVeBcBE02ig+CDJrfphu+1KDExGGt4ICytzyFG/7LGKWm0q5WlHJzcdI/1Illyvqg1A5cYCul8dX2uS7TtV/jP9FElB4E+XBlHx0cZxwIk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FGej1oo8; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FGej1oo8"
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-424acfff613so24705735e9.0
-        for <kvmarm@lists.linux.dev>; Mon, 01 Jul 2024 01:42:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1719823368; x=1720428168; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yEsoWTLxyHIlDQCb/ASp+ooXvx9TSwnTA36CC8StcRU=;
-        b=FGej1oo8UAhovwKzpVNKhRzgWx3ceP44/sHCp79vRI/xg6rpGXrXK1BD8n3ysgVYfe
-         Am3Pzs6p5vg2tCZb86zG0r/uPILQxuPZ9D8pkodb2K1uJPRN21wnj4sQHqtDcFtrEpDJ
-         jZqPGKaxDVI/rZ93nosvPWZUdyV2Mj2gEytTEaj+2IktMkycWQ7g7/m8aDRpW7+O+iLj
-         7D1utbChiyanOmQfekn0Rl/iHYOqJaj/dYw5iG0TQRfuUT+GLmtBFizhEgfKqXPxLAl0
-         zPfl4BzgrAmMogJw8XUPaebrhIL1ksFfQkgq9Aui3bkg6eN9wiAEPOhLZB1JUGKZ2SW5
-         uJxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719823368; x=1720428168;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yEsoWTLxyHIlDQCb/ASp+ooXvx9TSwnTA36CC8StcRU=;
-        b=CY9KUN8dg4nQ6Ds0+mr7YC3p4hqlbEyrrx13oYEYdQB3AhgCA4uVS8+zQUje4nCiKA
-         HujBT4DWJO6LAzIgra3qiZveV4HfwfrGR2+EDfdFuQp3LRqWVu/iudDwb1PVjwjYylgl
-         VWJcj9y35PWN7pauiUc4x1mDAlMyW6L6P/DwLhP0o5haZt5w3g3qAz44lLfNn4dgAv6x
-         XIPDZAAWoXi2QJLTcPYc1uGw7G9Hj/fNBiJlcw51Y0rx6ZdLFv9PLhEdKL291WJl7D1k
-         HCKcqA9Bf3cOVBOlGC9p6L3pOkxizIglwe7N9BP0XxWFdi+ySW2jAdPp8UjNnYvTkvAd
-         y2TA==
-X-Forwarded-Encrypted: i=1; AJvYcCWW10ZbTYGq4OqXpE3Is6Ts4AGgYDUNkvKm/p34wECZ6FlKqh2aRLSKmyIRwfesa8b+q9MeUT2ylLZskTo18831i2BP7lV1
-X-Gm-Message-State: AOJu0YynoGC0vlvkGhtfcIcotq5J5Anmi+KEsMhoQ7CUzh/HlBSvLByh
-	f/50WFpk1DuV0DkIKQYkCFkDrQw4k3Y0sowYIOk9gBuCNg846fT+9VXqxxovlQ==
-X-Google-Smtp-Source: AGHT+IGawId0kUmiFiVE/6VBOwuMv0FSUu1ZKqIQ07gLRwDyzzNe0v1kfMUd7cCTWmMSeLhyZCJCRQ==
-X-Received: by 2002:a05:6000:18a7:b0:367:4d9d:56a1 with SMTP id ffacd0b85a97d-3677572496bmr3944444f8f.45.1719823367880;
-        Mon, 01 Jul 2024 01:42:47 -0700 (PDT)
-Received: from google.com (247.165.79.34.bc.googleusercontent.com. [34.79.165.247])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3675a0cd778sm9536657f8f.5.2024.07.01.01.42.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Jul 2024 01:42:47 -0700 (PDT)
-Date: Mon, 1 Jul 2024 09:42:43 +0100
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Sebastian Ene <sebastianene@google.com>
-Cc: akpm@linux-foundation.org, alexghiti@rivosinc.com, ankita@nvidia.com,
-	ardb@kernel.org, catalin.marinas@arm.com,
-	christophe.leroy@csgroup.eu, james.morse@arm.com,
-	mark.rutland@arm.com, maz@kernel.org, oliver.upton@linux.dev,
-	rananta@google.com, ryan.roberts@arm.com, shahuang@redhat.com,
-	suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, kernel-team@android.com
-Subject: Re: [PATCH v7 5/6] KVM: arm64: Initialize the ptdump parser with
- stage-2 attributes
-Message-ID: <ZoJsAyrmtge4mXJY@google.com>
-References: <20240621123230.1085265-1-sebastianene@google.com>
- <20240621123230.1085265-6-sebastianene@google.com>
+	s=arc-20240116; t=1719827722; c=relaxed/simple;
+	bh=OggWIOikETqCuIyJ9gVeBHTVrbKuXcdJ+5yR+9XEoSs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TpiMcTKxPmd4i0y1bB3Ti0GCwLEW3k7Rs1Ry92ZWQRHqhDCuCmFUu8gFaLc8ekGIL0IcuWgeKL9c0iekdRnfxNTQn3pTv2yIqGRPXxiKVNAbSHYHK7iv9LM/6oErflS/GSB1y2cXkSbeEHpC8B1n92PhbjyTivzyJfW7rS98QPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6C585339;
+	Mon,  1 Jul 2024 02:55:43 -0700 (PDT)
+Received: from e122027.arm.com (unknown [10.57.44.170])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 08CAC3F762;
+	Mon,  1 Jul 2024 02:55:14 -0700 (PDT)
+From: Steven Price <steven.price@arm.com>
+To: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Cc: Steven Price <steven.price@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: [PATCH v4 00/15] arm64: Support for running as a guest in Arm CCA
+Date: Mon,  1 Jul 2024 10:54:50 +0100
+Message-Id: <20240701095505.165383-1-steven.price@arm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240621123230.1085265-6-sebastianene@google.com>
+Content-Transfer-Encoding: 8bit
 
-O Fri, Jun 21, 2024 at 12:32:29PM +0000, 'Sebastian Ene' via kernel-team wrote:
-> Define a set of attributes used by the ptdump parser to display the
-> properties of a guest memory region covered by a pagetable descriptor.
-> Build a description of the pagetable levels and initialize the parser
-> with this configuration.
-> 
-> Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> ---
->  arch/arm64/kvm/ptdump.c | 143 ++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 137 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
-> index 36dc7662729f..cc1d4fdddc6e 100644
-> --- a/arch/arm64/kvm/ptdump.c
-> +++ b/arch/arm64/kvm/ptdump.c
-> @@ -14,6 +14,61 @@
->  #include <kvm_ptdump.h>
->  
->  
-> +#define MARKERS_LEN		(2)
-> +#define KVM_PGTABLE_MAX_LEVELS	(KVM_PGTABLE_LAST_LEVEL + 1)
-> +
-> +struct kvm_ptdump_guest_state {
-> +	struct kvm		*kvm;
-> +	struct pg_state		parser_state;
-> +	struct addr_marker	ipa_marker[MARKERS_LEN];
-> +	struct pg_level		level[KVM_PGTABLE_MAX_LEVELS];
-> +	struct ptdump_range	range[MARKERS_LEN];
-> +};
-> +
-> +static const struct prot_bits stage2_pte_bits[] = {
-> +	{
-> +		.mask	= PTE_VALID,
-> +		.val	= PTE_VALID,
-> +		.set	= " ",
-> +		.clear	= "F",
-> +	}, {
-> +		.mask	= KVM_PTE_LEAF_ATTR_HI_S2_XN | PTE_VALID,
-> +		.val	= KVM_PTE_LEAF_ATTR_HI_S2_XN | PTE_VALID,
-> +		.set	= "XN",
-> +		.clear	= "  ",
-> +	}, {
-> +		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | PTE_VALID,
-> +		.val	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | PTE_VALID,
-> +		.set	= "R",
-> +		.clear	= " ",
-> +	}, {
-> +		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W | PTE_VALID,
-> +		.val	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W | PTE_VALID,
-> +		.set	= "W",
-> +		.clear	= " ",
-> +	}, {
-> +		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_AF | PTE_VALID,
-> +		.val	= KVM_PTE_LEAF_ATTR_LO_S2_AF | PTE_VALID,
-> +		.set	= "AF",
-> +		.clear	= "  ",
-> +	}, {
-> +		.mask	= PTE_NG,
-> +		.val	= PTE_NG,
-> +		.set	= "FnXS",
-> +		.clear	= "  ",
-> +	}, {
-> +		.mask	= PTE_CONT | PTE_VALID,
-> +		.val	= PTE_CONT | PTE_VALID,
-> +		.set	= "CON",
-> +		.clear	= "   ",
-> +	}, {
-> +		.mask	= PTE_TABLE_BIT,
->
-> +		.val	= PTE_TABLE_BIT,
-> +		.set	= "   ",
-> +		.clear	= "BLK",
-> +	},
+This series adds support for running Linux in a protected VM under the
+Arm Confidential Compute Architecture (CCA). This has been updated
+following the feedback from the v3 posting[1]. Thanks for the feedback!
+Individual patches have a change log. But things to highlight:
 
-When doing a kvm_pgtable_stage2_set_owner(), the walker will init a leaf which
-has both the table-bit and the valid-bit unset. I believe this would lead to
-spurious BLK annotations here.
+ * a new patch ("firmware/psci: Add psci_early_test_conduit()") to
+   prevent SMC calls being made on systems which don't support them -
+   i.e. systems without EL2/EL3 - thanks Jean-Philippe!
 
-The following should fix this problem:
+ * two patches dropped (overriding set_fixmap_io). Instead
+   FIXMAP_PAGE_IO is modified to include PROT_NS_SHARED. When support
+   for assigning hardware devices to a realm guest is added this will
+   need to be brought back in some form. But for now it's just adding
+   complixity and confusion for no gain.
 
-  .mask		= PTE_TABLE_BIT | PTE_VALID,
-  .val		= PTE_VALID,
-  .set		= "BLK",
-  .clear	= "   ",
+ * a new patch ("arm64: mm: Avoid TLBI when marking pages as valid")
+   which avoids doing an extra TLBI when doing the break-before-make.
+   Note that this changes the behaviour in other cases when making
+   memory valid. This should be safe (and saves a TLBI for those cases),
+   but it's a separate patch in case of regressions.
 
-> +};
-> +
->  static int kvm_ptdump_visitor(const struct kvm_pgtable_visit_ctx *ctx,
->  			      enum kvm_pgtable_walk_flags visit)
->  {
-> @@ -40,15 +95,79 @@ static int kvm_ptdump_show_common(struct seq_file *m,
->  	return kvm_pgtable_walk(pgtable, 0, BIT(pgtable->ia_bits), &walker);
->  }
->
+ * GIC ITT allocation now uses a custom genpool-based allocator. I
+   expect this will be replaced with a generic way of allocating
+   decrypted memory (see [4]), but for now this gets things working
+   without wasting too much memory.
 
-[...]
+The ABI to the RMM from a realm (the RSI) is based on the final RMM v1.0
+(EAC 5) specification[2]. Future RMM specifications will be backwards
+compatible so a guest using the v1.0 specification (i.e. this series)
+will be able to run on future versions of the RMM without modification.
+
+This series is based on v6.10-rc1. It is also available as a git
+repository:
+
+https://gitlab.arm.com/linux-arm/linux-cca cca-guest/v4
+
+This series (the guest side) should be in a good state so please review
+with the intention that this could be merged soon. The host side will
+require more iteration so the versioning of the series will diverge -
+so for now continue to use v3 for the host support.
+
+Introduction (unchanged from v2 posting)
+============
+A more general introduction to Arm CCA is available on the Arm
+website[3], and links to the other components involved are available in
+the overall cover letter.
+
+Arm Confidential Compute Architecture adds two new 'worlds' to the
+architecture: Root and Realm. A new software component known as the RMM
+(Realm Management Monitor) runs in Realm EL2 and is trusted by both the
+Normal World and VMs running within Realms. This enables mutual
+distrust between the Realm VMs and the Normal World.
+
+Virtual machines running within a Realm can decide on a (4k)
+page-by-page granularity whether to share a page with the (Normal World)
+host or to keep it private (protected). This protection is provided by
+the hardware and attempts to access a page which isn't shared by the
+Normal World will trigger a Granule Protection Fault.
+
+Realm VMs can communicate with the RMM via another SMC interface known
+as RSI (Realm Services Interface). This series adds wrappers for the
+full set of RSI commands and uses them to manage the Realm IPA State
+(RIPAS) and to discover the configuration of the realm.
+
+The VM running within the Realm needs to ensure that memory that is
+going to use is marked as 'RIPAS_RAM' (i.e. protected memory accessible
+only to the guest). This could be provided by the VMM (and subject to
+measurement to ensure it is setup correctly) or the VM can set it
+itself.  This series includes a patch which will iterate over all
+described RAM and set the RIPAS. This is a relatively cheap operation,
+and doesn't require memory donation from the host. Instead, memory can
+be dynamically provided by the host on fault. An alternative would be to
+update booting.rst and state this as a requirement, but this would
+reduce the flexibility of the VMM to manage the available memory to the
+guest (as the initial RIPAS state is part of the guest's measurement).
+
+Within the Realm the most-significant active bit of the IPA is used to
+select whether the access is to protected memory or to memory shared
+with the host. This series treats this bit as if it is attribute bit in
+the page tables and will modify it when sharing/unsharing memory with
+the host.
+
+This top bit usage also necessitates that the IPA width is made more
+dynamic in the guest. The VMM will choose a width (and therefore which
+bit controls the shared flag) and the guest must be able to identify
+this bit to mask it out when necessary. PHYS_MASK_SHIFT/PHYS_MASK are
+therefore made dynamic.
+
+To allow virtio to communicate with the host the shared buffers must be
+placed in memory which has this top IPA bit set. This is achieved by
+implementing the set_memory_{encrypted,decrypted} APIs for arm64 and
+forcing the use of bounce buffers. For now all device access is
+considered to required the memory to be shared, at this stage there is
+no support for real devices to be assigned to a realm guest - obviously
+if device assignment is added this will have to change.
+
+Finally the GIC is (largely) emulated by the (untrusted) host. The RMM
+provides some management (including register save/restore) but the
+ITS buffers must be placed into shared memory for the host to emulate.
+There is likely to be future work to harden the GIC driver against a
+malicious host (along with any other drivers used within a Realm guest).
+
+[1] https://lore.kernel.org/lkml/20240605093006.145492-1-steven.price%40arm.com
+[2] https://developer.arm.com/documentation/den0137/1-0eac5/
+[3] https://www.arm.com/architecture/security-features/arm-confidential-compute-architecture
+[4] https://lore.kernel.org/lkml/ZmNJdSxSz-sYpVgI%40arm.com
+
+Jean-Philippe Brucker (1):
+  firmware/psci: Add psci_early_test_conduit()
+
+Sami Mujawar (2):
+  arm64: rsi: Interfaces to query attestation token
+  virt: arm-cca-guest: TSM_REPORT support for realms
+
+Steven Price (7):
+  arm64: realm: Query IPA size from the RMM
+  arm64: Mark all I/O as non-secure shared
+  arm64: Make the PHYS_MASK_SHIFT dynamic
+  arm64: Enforce bounce buffers for realm DMA
+  arm64: mm: Avoid TLBI when marking pages as valid
+  irqchip/gic-v3-its: Share ITS tables with a non-trusted hypervisor
+  irqchip/gic-v3-its: Rely on genpool alignment
+
+Suzuki K Poulose (5):
+  arm64: rsi: Add RSI definitions
+  arm64: Detect if in a realm and set RIPAS RAM
+  arm64: Enable memory encrypt for Realms
+  arm64: Force device mappings to be non-secure shared
+  efi: arm64: Map Device with Prot Shared
+
+ arch/arm64/Kconfig                            |   3 +
+ arch/arm64/include/asm/fixmap.h               |   2 +-
+ arch/arm64/include/asm/io.h                   |   8 +-
+ arch/arm64/include/asm/mem_encrypt.h          |  17 ++
+ arch/arm64/include/asm/pgtable-hwdef.h        |   6 -
+ arch/arm64/include/asm/pgtable-prot.h         |   3 +
+ arch/arm64/include/asm/pgtable.h              |  13 +-
+ arch/arm64/include/asm/rsi.h                  |  64 ++++++
+ arch/arm64/include/asm/rsi_cmds.h             | 134 +++++++++++
+ arch/arm64/include/asm/rsi_smc.h              | 142 ++++++++++++
+ arch/arm64/include/asm/set_memory.h           |   3 +
+ arch/arm64/kernel/Makefile                    |   3 +-
+ arch/arm64/kernel/efi.c                       |   2 +-
+ arch/arm64/kernel/rsi.c                       | 104 +++++++++
+ arch/arm64/kernel/setup.c                     |   8 +
+ arch/arm64/mm/init.c                          |  10 +-
+ arch/arm64/mm/pageattr.c                      |  76 ++++++-
+ drivers/firmware/psci/psci.c                  |  25 +++
+ drivers/irqchip/irq-gic-v3-its.c              | 142 +++++++++---
+ drivers/virt/coco/Kconfig                     |   2 +
+ drivers/virt/coco/Makefile                    |   1 +
+ drivers/virt/coco/arm-cca-guest/Kconfig       |  11 +
+ drivers/virt/coco/arm-cca-guest/Makefile      |   2 +
+ .../virt/coco/arm-cca-guest/arm-cca-guest.c   | 211 ++++++++++++++++++
+ include/linux/psci.h                          |   5 +
+ 25 files changed, 953 insertions(+), 44 deletions(-)
+ create mode 100644 arch/arm64/include/asm/mem_encrypt.h
+ create mode 100644 arch/arm64/include/asm/rsi.h
+ create mode 100644 arch/arm64/include/asm/rsi_cmds.h
+ create mode 100644 arch/arm64/include/asm/rsi_smc.h
+ create mode 100644 arch/arm64/kernel/rsi.c
+ create mode 100644 drivers/virt/coco/arm-cca-guest/Kconfig
+ create mode 100644 drivers/virt/coco/arm-cca-guest/Makefile
+ create mode 100644 drivers/virt/coco/arm-cca-guest/arm-cca-guest.c
+
+-- 
+2.34.1
+
