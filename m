@@ -1,124 +1,149 @@
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A58316EB71
-	for <kvmarm@lists.linux.dev>; Mon,  1 Jul 2024 17:52:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBF561BBBD7;
+	Tue,  2 Jul 2024 16:19:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719856344; cv=none; b=dr6rhmJrsf38b+Y9HKLnOpm0xbhj3ze9bLPa3EdgsN6TR+P3KB64va0tMpaDGlLN94AnL7faxYEVaR4VTyGa5INc+DV4FgLD8ZpsfflyBYJtCdN7Wt3Ljbiyn2L2lTihvff7EeP2Iz7LKmCp+VQzgs38rt1G3iAJdTrhzT7bRRk=
+	t=1719937188; cv=none; b=qJ4en0Sm/zhM1Qbiqk/0q6li55/n+vWS4/rQXdMmtX3ji4X1VpX4Fd+mO/cvLhl50JqxEnBwo5Ea5ivvoGFuiy1BaeU+ihO9tMMMlwUENKTA/8phbrionapytjSLXgJbxCNwpxMJ+dXa85F88YXdytOEz1uJYn0b5Ixk3UfqHac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719856344; c=relaxed/simple;
-	bh=wS5TzTy89GmwCCZj/N1TGJuuGTXmLGauqI7XlpF5kjo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ntSJ1wW1KG9KmsMIqi4bG9rrfpvekyNrPHbt6Qvn9rLocnKyA0dUKg6q/iOYivHjb9tL032ENMtfSZsIXDmNLWECH5mh1ba/eYqTVpSlOs2Zl2d5wM4iewuepICyjMGoZPyn/2KwKWEeUCmPRfwYldN76oFCATXXAZSdmkAuFPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eyHA/hvE; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1719937188; c=relaxed/simple;
+	bh=lVQmHI+LCB+7I2btTVAeudIE1E/R0zerK0QF7WkCDJg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ozOtPu5sbNM21XrUUesTwAmOqjvwCYiE/7lP3qAhYlwdAd+A8cOzVq0GY811QOCiOcn8n8v6jh9WE+hK4aTDZAUwnbg5h5Oa4tDDe2zH41DAfviCMV9+7MYVtLlsVJOJKIQIV+jsIsBnc5LPy6hZq7XWSHEABxW2FfVT7VxqYXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KFZN/teI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eyHA/hvE"
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-361785bfa71so2377887f8f.2
-        for <kvmarm@lists.linux.dev>; Mon, 01 Jul 2024 10:52:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1719856341; x=1720461141; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=n1/3Mqv5bU7Lm+/6Z/xl/QjEG/rO3YJRZuHHrfT9XMs=;
-        b=eyHA/hvEwuSd80i4zsPUUIg1hPa6U75bLaDlGJXwTq+LdRTCr+cX3ax5zZlaPuX8eL
-         0FY4eH/1W3ucg/cuYKb37/OefO6lcpBzQ6e827Pyxx+QgG5kJ88UO+BTtB9sLx0+eaJk
-         gcVBEkJQymIEaEIIzoHTwS7gwc8CqMemRjvqIwM4BXSwcFEbSYmUoetaE62yz1xW6VvG
-         oZBhw24wm8o8S7zQmU+hkyw+AevVBWZnZkGY49Mjm9ZlkxLiUj23owkyzJfvgR9KNizS
-         gweoIbbUPmtIhUj4JTuetJcq329DvHEeb2ok5aKaI3Qd5tQ50rNt+qlXuPqllIWHMSKy
-         /8oQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719856341; x=1720461141;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=n1/3Mqv5bU7Lm+/6Z/xl/QjEG/rO3YJRZuHHrfT9XMs=;
-        b=VJAPnyly/613+Uv5HHLVp7JV57a6jWqb6LcYe5vmV5hl73w610J+69Tr4awC1OJvrm
-         Wvv3bUUT7xPLH1YGYMLU5UwRel214Pke33nSKLfZm6CsshwtzAA5qbSafXobbxCTZVIC
-         WHKfkBIK+9Xohc/KEVAiuj240AE7Xwd/4kfW011TTnpdiBMi/GV3mzwHTfIhK3zwxlrT
-         V7bAniH3U7yK8Xk7YqypWNKohoGAsxja9PQcVxWzKrNxY74Ijtt9UbEIUgKX9B4g5bKq
-         N6gBkSJmK55sVjU88toc0l13IU8uWIgklE43oGBk2FDDkmDlbDICvHhHnhG5ueS5brXB
-         xCTA==
-X-Forwarded-Encrypted: i=1; AJvYcCXaSJIQn6dyiY4ZRnlgya6I0ixYGSglHVJlimEC4wq21Ej1GTqqi+dpVjaGnOl2TMOuvp2iCXNktt//ycTKZ0wDg/1/dQtT
-X-Gm-Message-State: AOJu0Yz12QmV6Ovs3PvqTSDw0eobTubZl6PZpECBuB+JC7DlhAosPbcD
-	rEnuIN+ZwaX9NZw0Qm5H/RXIx0IVpoEmmfyJO7lUZAuJUxZmPiscV7MSqHjmtPgXssVcsQEuaNT
-	yOt1dqhsDhTRYGL2TzbMd+CkeCEF0HzFmfXhN
-X-Google-Smtp-Source: AGHT+IG7kANdMixnrRX/w/wCL06WRJILCv9aR81l3eU1ucu2os0oVGFSDzYlK6U+a1azCoA3WAsnnYnMeJC+/F+ecm0=
-X-Received: by 2002:a5d:49cc:0:b0:366:eade:bfbb with SMTP id
- ffacd0b85a97d-367757200admr5266366f8f.46.1719856341379; Mon, 01 Jul 2024
- 10:52:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KFZN/teI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6965C116B1;
+	Tue,  2 Jul 2024 16:19:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719937187;
+	bh=lVQmHI+LCB+7I2btTVAeudIE1E/R0zerK0QF7WkCDJg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KFZN/teI9CkmW0iOWqSmXr/ZYdGvy+z/jP2qp+ujTEwwY4xzOjGY3b15+KbrRXlQ4
+	 +Cxy33ZcFI90gE+8LtOphor/Iqn3TU6pCQ7ojazeBHMFkhxWasd2Bts5Ty7i75LSnu
+	 +1LfDYpniU+5H+dDLj14xL+K26hfYqjNgipBlMEOoOFfdg01Cv8+ORHoDGs4+Pm1dg
+	 cC2P+1KG5KIgkezBQLiR98sJ15yvnPB7hgK92wvYXZItkgfsYvNuYz7RAZH9XP4UdK
+	 HjCRxp4GoLEGcnaZM2GrSN3SWHBQfkqAxEF8EhVitwV4QocRoS9UukgANWfn0m7eA0
+	 hKssnf0roWL6g==
+Date: Tue, 2 Jul 2024 17:19:40 +0100
+From: Will Deacon <will@kernel.org>
+To: Rob Herring <robh@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Russell King <linux@armlinux.org.uk>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	James Clark <james.clark@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-perf-users@vger.kernel.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v2 06/12] perf: arm_pmu: Remove event index to counter
+ remapping
+Message-ID: <20240702161940.GA4460@willie-the-truck>
+References: <20240626-arm-pmu-3-9-icntr-v2-0-c9784b4f4065@kernel.org>
+ <20240626-arm-pmu-3-9-icntr-v2-6-c9784b4f4065@kernel.org>
+ <86ikxuir2k.wl-maz@kernel.org>
+ <20240701135216.GD2250@willie-the-truck>
+ <CAL_JsqKYstLZQy_VQTvg-285jj1mpH+4d9CVJ_1_iAus5_rTRA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20240503181734.1467938-1-dmatlack@google.com> <171874683295.1901599.10170158200177384059.b4-ty@google.com>
-In-Reply-To: <171874683295.1901599.10170158200177384059.b4-ty@google.com>
-From: David Matlack <dmatlack@google.com>
-Date: Mon, 1 Jul 2024 10:51:53 -0700
-Message-ID: <CALzav=cwu3M2nLHwZLCTF=eGWx2Nq+=TuHMuGTfZCNa27mLs1A@mail.gmail.com>
-Subject: Re: [PATCH v3 0/3] KVM: Set vcpu->preempted/ready iff scheduled out
- while running
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
-	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Nicholas Piggin <npiggin@gmail.com>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, David Hildenbrand <david@redhat.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAL_JsqKYstLZQy_VQTvg-285jj1mpH+4d9CVJ_1_iAus5_rTRA@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Tue, Jun 18, 2024 at 2:41=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> On Fri, 03 May 2024 11:17:31 -0700, David Matlack wrote:
-> > This series changes KVM to mark a vCPU as preempted/ready if-and-only-i=
-f
-> > it's scheduled out while running. i.e. Do not mark a vCPU
-> > preempted/ready if it's scheduled out during a non-KVM_RUN ioctl() or
-> > when userspace is doing KVM_RUN with immediate_exit=3Dtrue.
+On Mon, Jul 01, 2024 at 09:49:29AM -0600, Rob Herring wrote:
+> On Mon, Jul 1, 2024 at 7:52 AM Will Deacon <will@kernel.org> wrote:
 > >
-> > This is a logical extension of commit 54aa83c90198 ("KVM: x86: do not
-> > set st->preempted when going back to user space"), which  stopped
-> > marking a vCPU as preempted when returning to userspace. But if userspa=
-ce
-> > invokes a KVM vCPU ioctl() that gets preempted, the vCPU will be marked
-> > preempted/ready. This is arguably incorrect behavior since the vCPU was
-> > not actually preempted while the guest was running, it was preempted
-> > while doing something on behalf of userspace.
+> > On Thu, Jun 27, 2024 at 12:05:23PM +0100, Marc Zyngier wrote:
+> > > On Wed, 26 Jun 2024 23:32:30 +0100,
+> > > "Rob Herring (Arm)" <robh@kernel.org> wrote:
+> > > >
+> > > > Xscale and Armv6 PMUs defined the cycle counter at 0 and event counters
+> > > > starting at 1 and had 1:1 event index to counter numbering. On Armv7 and
+> > > > later, this changed the cycle counter to 31 and event counters start at
+> > > > 0. The drivers for Armv7 and PMUv3 kept the old event index numbering
+> > > > and introduced an event index to counter conversion. The conversion uses
+> > > > masking to convert from event index to a counter number. This operation
+> > > > relies on having at most 32 counters so that the cycle counter index 0
+> > > > can be transformed to counter number 31.
+> > > >
+> > > > Armv9.4 adds support for an additional fixed function counter
+> > > > (instructions) which increases possible counters to more than 32, and
+> > > > the conversion won't work anymore as a simple subtract and mask. The
+> > > > primary reason for the translation (other than history) seems to be to
+> > > > have a contiguous mask of counters 0-N. Keeping that would result in
+> > > > more complicated index to counter conversions. Instead, store a mask of
+> > > > available counters rather than just number of events. That provides more
+> > > > information in addition to the number of events.
+> > > >
+> > > > No (intended) functional changes.
+> > > >
+> > > > Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+> > >
+> > > [...]
+> > >
+> > > > diff --git a/include/linux/perf/arm_pmu.h b/include/linux/perf/arm_pmu.h
+> > > > index b3b34f6670cf..e5d6d204beab 100644
+> > > > --- a/include/linux/perf/arm_pmu.h
+> > > > +++ b/include/linux/perf/arm_pmu.h
+> > > > @@ -96,7 +96,7 @@ struct arm_pmu {
+> > > >     void            (*stop)(struct arm_pmu *);
+> > > >     void            (*reset)(void *);
+> > > >     int             (*map_event)(struct perf_event *event);
+> > > > -   int             num_events;
+> > > > +   DECLARE_BITMAP(cntr_mask, ARMPMU_MAX_HWEVENTS);
+> > >
+> > > I'm slightly worried by this, as this size is never used, let alone
+> > > checked by the individual drivers. I can perfectly picture some new
+> > > (non-architectural) PMU driver having more counters than that, and
+> > > blindly setting bits outside of the allowed range.
 > >
-> > [...]
->
-> Applied to kvm-x86 generic, with minor changelog tweaks (me thinks you've=
- been
-> away from upstream too long ;-) ).  Thanks!
+> > I tend to agree.
+> >
+> > > One way to make it a bit safer would be to add a helper replacing the
+> > > various bitmap_set() calls, and enforcing that we never overflow this
+> > > bitmap.
+> >
+> > Or perhaps wd could leave the 'num_events' field intact and allocate the
+> > new bitmap dynamically?
+> >
+> > Rob -- what do you prefer? I think the rest of the series is ready to go.
+> 
+> I think the list of places we're initializing cntr_mask is short
+> enough to check and additions to arm_pmu users are rare enough I would
+> not be too worried about it.
+> 
+> If anything, I think the issue is with the bitmap API in that it has
+> no bounds checking. I'm sure it will get on someone's radar to fix at
+> some point.
+> 
+> But if we want to have something check, this is what I have:
+> 
+> static inline void armpmu_set_counter_mask(struct arm_pmu *pmu,
+>                                           unsigned int start, unsigned int nr)
+> {
+>        if (WARN_ON(start + nr > ARMPMU_MAX_HWEVENTS))
+>                return;
+>        bitmap_set(pmu->cntr_mask, start, nr);
+> }
 
-Thanks for the cleanups. Looks like you replaced "[Tt]his commit"
-throughout. Anything else (so I can avoid the same mistakes in the
-future)?
+Fair enough, for the sake of consistency, let's leave the series as-is
+and we can add helpers for all the counter-bound structures later, if we
+want to.
 
->
-> [1/3] KVM: Introduce vcpu->wants_to_run
->       https://github.com/kvm-x86/linux/commit/a6816314af57
-> [2/3] KVM: Ensure new code that references immediate_exit gets extra scru=
-tiny
->       https://github.com/kvm-x86/linux/commit/4b23e0c199b2
-> [3/3] KVM: Mark a vCPU as preempted/ready iff it's scheduled out while ru=
-nning
->       https://github.com/kvm-x86/linux/commit/118964562969
->
-> --
-> https://github.com/kvm-x86/linux/tree/next
+Will
