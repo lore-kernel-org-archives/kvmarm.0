@@ -1,149 +1,127 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBF561BBBD7;
-	Tue,  2 Jul 2024 16:19:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 661F91BD01E
+	for <kvmarm@lists.linux.dev>; Tue,  2 Jul 2024 16:35:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719937188; cv=none; b=qJ4en0Sm/zhM1Qbiqk/0q6li55/n+vWS4/rQXdMmtX3ji4X1VpX4Fd+mO/cvLhl50JqxEnBwo5Ea5ivvoGFuiy1BaeU+ihO9tMMMlwUENKTA/8phbrionapytjSLXgJbxCNwpxMJ+dXa85F88YXdytOEz1uJYn0b5Ixk3UfqHac=
+	t=1719938122; cv=none; b=lm0CDXgW3GMp1COqLW0qx50y4ga1GKsxqPDVwQ/lwCXz1gQbn2TMUl2mr6JermyMPos9Ux6dAfRIREMtrP/l6+NM0X6OMywdfTnSQ7pj59t5gXcKmJuD81HpiijgzGqL4eTFtyRUqhf1TidsnI3gm4B1xle21BdSu5+Bs7hrgsQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719937188; c=relaxed/simple;
-	bh=lVQmHI+LCB+7I2btTVAeudIE1E/R0zerK0QF7WkCDJg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ozOtPu5sbNM21XrUUesTwAmOqjvwCYiE/7lP3qAhYlwdAd+A8cOzVq0GY811QOCiOcn8n8v6jh9WE+hK4aTDZAUwnbg5h5Oa4tDDe2zH41DAfviCMV9+7MYVtLlsVJOJKIQIV+jsIsBnc5LPy6hZq7XWSHEABxW2FfVT7VxqYXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KFZN/teI; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1719938122; c=relaxed/simple;
+	bh=lygSVGqEW/V5wPZ/noOw52DNAd5cGOkDdbbjhHZVY1E=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=uxPikSPEu8ZUXGctbH6JuAPiFK9GL2y+w+ZqFabBEZwLAK/wOztNoXfeeI+u0Tm33wZiVMITGFfHG4YSr/SZWUMcwqpsbtcZm5kuYoLOup1KZ46yZx1WrbCieC6rmN8EQofaSgFp0tY5N3X9YX73wijSTQqjWAVFu/rn8Spzyeg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=OW5v+0fK; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KFZN/teI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6965C116B1;
-	Tue,  2 Jul 2024 16:19:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719937187;
-	bh=lVQmHI+LCB+7I2btTVAeudIE1E/R0zerK0QF7WkCDJg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KFZN/teI9CkmW0iOWqSmXr/ZYdGvy+z/jP2qp+ujTEwwY4xzOjGY3b15+KbrRXlQ4
-	 +Cxy33ZcFI90gE+8LtOphor/Iqn3TU6pCQ7ojazeBHMFkhxWasd2Bts5Ty7i75LSnu
-	 +1LfDYpniU+5H+dDLj14xL+K26hfYqjNgipBlMEOoOFfdg01Cv8+ORHoDGs4+Pm1dg
-	 cC2P+1KG5KIgkezBQLiR98sJ15yvnPB7hgK92wvYXZItkgfsYvNuYz7RAZH9XP4UdK
-	 HjCRxp4GoLEGcnaZM2GrSN3SWHBQfkqAxEF8EhVitwV4QocRoS9UukgANWfn0m7eA0
-	 hKssnf0roWL6g==
-Date: Tue, 2 Jul 2024 17:19:40 +0100
-From: Will Deacon <will@kernel.org>
-To: Rob Herring <robh@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, Russell King <linux@armlinux.org.uk>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	James Clark <james.clark@arm.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-perf-users@vger.kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 06/12] perf: arm_pmu: Remove event index to counter
- remapping
-Message-ID: <20240702161940.GA4460@willie-the-truck>
-References: <20240626-arm-pmu-3-9-icntr-v2-0-c9784b4f4065@kernel.org>
- <20240626-arm-pmu-3-9-icntr-v2-6-c9784b4f4065@kernel.org>
- <86ikxuir2k.wl-maz@kernel.org>
- <20240701135216.GD2250@willie-the-truck>
- <CAL_JsqKYstLZQy_VQTvg-285jj1mpH+4d9CVJ_1_iAus5_rTRA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OW5v+0fK"
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-57ccd1111b0so1229201a12.3
+        for <kvmarm@lists.linux.dev>; Tue, 02 Jul 2024 09:35:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1719938118; x=1720542918; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=26ibk6G5TBJ3+G8dW2FBwDssd+gYK6j25tet2PWM190=;
+        b=OW5v+0fKVjuNZfUwH75Eb8g3UV0a1wJbClcFTD0xlqePoZioVK2Uxg+3Kr9U9T6cTK
+         1PLTZ5XmW7qMoPwuIkBLppZ5Whf2UPDUAo1WbKG3hklIeAMS6tG2LNbXouyBQ/GDUfK3
+         jhfOn/cEPz5wOVDCPuS5DGgX3mr36Ma1AM4EJOIPyLdEGauiyXlJ7hmbXIsDKvVbtpY1
+         Q/46BZXpwI+//ILNbAHzMUbCCjvrSp25NoVZzNql7YfN/LDQTq+Piy2ZKiELKgjcR/zP
+         Ke7XFo8gOtKVrHRkHCco/4DlQtHXCMy6H4AONrv6/R0iDN489/UqEg/3mkiQKLL6iaf/
+         veIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719938118; x=1720542918;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=26ibk6G5TBJ3+G8dW2FBwDssd+gYK6j25tet2PWM190=;
+        b=k+bVG+zZ9cPUvlTzLenGvVCNMoElpEAbDvKKGdfEXk0P/CAkUppbs5JWblUxMowKr7
+         gnAM5lZRJ470r4n6b9B7ddP6E4uaTxIjFa0UWrShWZHR8Q/JXzQpkbhoZM9+VChIr/FW
+         U+/36uCOjjTuT0uXJKTLtMRebl3tFtbXtq1Olk8TwgFdHbNoaSIvotwci/fpJBKRnayd
+         9tNT1sxcE6ugMRj90HHytiGhGV/xYNzffqO9HEiQemR0UX64rokwgJe4qo7C2KLtYPVH
+         MdnP3FYgad1+U43vrMv3nV7qG28p1154hMkaO2ZCmlX8g2HA2+7CwnVO+ZQKKu4QNOKP
+         tOCA==
+X-Forwarded-Encrypted: i=1; AJvYcCVmur3r9gDAAJMzt20VgrvpGOEYpkVn3CJDTnXbXDzWpZyBoD0hRU6fdvDowYVjeJkCt52SAknLU/vOyWk8CI0K9BVPjLj6
+X-Gm-Message-State: AOJu0YzaK615NtxU+nQlvR4CvrUvtjGvofDbR29GAMNdFiyoYTZOLqlv
+	v/XLXooBPBic/sGLlCytfEjN4BwkaGzUrp5FjAw5pfBRVxxq+ZM00i9wZ8D3jc8=
+X-Google-Smtp-Source: AGHT+IHBhfNB7jsgIlUoHE4OPYBRUkv0au3wXdb9DmRC6/b+bjRYvNJ2M/3/OHm9YVxoyt5+KFsgIg==
+X-Received: by 2002:a05:6402:5203:b0:57d:1696:fd14 with SMTP id 4fb4d7f45d1cf-5879ede2704mr8832949a12.8.1719938117526;
+        Tue, 02 Jul 2024 09:35:17 -0700 (PDT)
+Received: from draig.lan ([85.9.250.243])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-58614f3d3f1sm5874972a12.94.2024.07.02.09.35.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jul 2024 09:35:16 -0700 (PDT)
+Received: from draig.lan (localhost [IPv6:::1])
+	by draig.lan (Postfix) with ESMTP id B60F55F8D1;
+	Tue,  2 Jul 2024 17:35:15 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: pbonzini@redhat.com,
+	drjones@redhat.com,
+	thuth@redhat.com
+Cc: kvm@vger.kernel.org,
+	qemu-arm@nongnu.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.cs.columbia.edu,
+	christoffer.dall@arm.com,
+	maz@kernel.org,
+	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	Anders Roxell <anders.roxell@linaro.org>,
+	Andrew Jones <andrew.jones@linux.dev>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	kvmarm@lists.linux.dev (open list:ARM)
+Subject: [kvm-unit-tests PATCH v1 1/2] arm/pmu: skip the PMU introspection test if missing
+Date: Tue,  2 Jul 2024 17:35:14 +0100
+Message-Id: <20240702163515.1964784-2-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240702163515.1964784-1-alex.bennee@linaro.org>
+References: <20240702163515.1964784-1-alex.bennee@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAL_JsqKYstLZQy_VQTvg-285jj1mpH+4d9CVJ_1_iAus5_rTRA@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Mon, Jul 01, 2024 at 09:49:29AM -0600, Rob Herring wrote:
-> On Mon, Jul 1, 2024 at 7:52 AM Will Deacon <will@kernel.org> wrote:
-> >
-> > On Thu, Jun 27, 2024 at 12:05:23PM +0100, Marc Zyngier wrote:
-> > > On Wed, 26 Jun 2024 23:32:30 +0100,
-> > > "Rob Herring (Arm)" <robh@kernel.org> wrote:
-> > > >
-> > > > Xscale and Armv6 PMUs defined the cycle counter at 0 and event counters
-> > > > starting at 1 and had 1:1 event index to counter numbering. On Armv7 and
-> > > > later, this changed the cycle counter to 31 and event counters start at
-> > > > 0. The drivers for Armv7 and PMUv3 kept the old event index numbering
-> > > > and introduced an event index to counter conversion. The conversion uses
-> > > > masking to convert from event index to a counter number. This operation
-> > > > relies on having at most 32 counters so that the cycle counter index 0
-> > > > can be transformed to counter number 31.
-> > > >
-> > > > Armv9.4 adds support for an additional fixed function counter
-> > > > (instructions) which increases possible counters to more than 32, and
-> > > > the conversion won't work anymore as a simple subtract and mask. The
-> > > > primary reason for the translation (other than history) seems to be to
-> > > > have a contiguous mask of counters 0-N. Keeping that would result in
-> > > > more complicated index to counter conversions. Instead, store a mask of
-> > > > available counters rather than just number of events. That provides more
-> > > > information in addition to the number of events.
-> > > >
-> > > > No (intended) functional changes.
-> > > >
-> > > > Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
-> > >
-> > > [...]
-> > >
-> > > > diff --git a/include/linux/perf/arm_pmu.h b/include/linux/perf/arm_pmu.h
-> > > > index b3b34f6670cf..e5d6d204beab 100644
-> > > > --- a/include/linux/perf/arm_pmu.h
-> > > > +++ b/include/linux/perf/arm_pmu.h
-> > > > @@ -96,7 +96,7 @@ struct arm_pmu {
-> > > >     void            (*stop)(struct arm_pmu *);
-> > > >     void            (*reset)(void *);
-> > > >     int             (*map_event)(struct perf_event *event);
-> > > > -   int             num_events;
-> > > > +   DECLARE_BITMAP(cntr_mask, ARMPMU_MAX_HWEVENTS);
-> > >
-> > > I'm slightly worried by this, as this size is never used, let alone
-> > > checked by the individual drivers. I can perfectly picture some new
-> > > (non-architectural) PMU driver having more counters than that, and
-> > > blindly setting bits outside of the allowed range.
-> >
-> > I tend to agree.
-> >
-> > > One way to make it a bit safer would be to add a helper replacing the
-> > > various bitmap_set() calls, and enforcing that we never overflow this
-> > > bitmap.
-> >
-> > Or perhaps wd could leave the 'num_events' field intact and allocate the
-> > new bitmap dynamically?
-> >
-> > Rob -- what do you prefer? I think the rest of the series is ready to go.
-> 
-> I think the list of places we're initializing cntr_mask is short
-> enough to check and additions to arm_pmu users are rare enough I would
-> not be too worried about it.
-> 
-> If anything, I think the issue is with the bitmap API in that it has
-> no bounds checking. I'm sure it will get on someone's radar to fix at
-> some point.
-> 
-> But if we want to have something check, this is what I have:
-> 
-> static inline void armpmu_set_counter_mask(struct arm_pmu *pmu,
->                                           unsigned int start, unsigned int nr)
-> {
->        if (WARN_ON(start + nr > ARMPMU_MAX_HWEVENTS))
->                return;
->        bitmap_set(pmu->cntr_mask, start, nr);
-> }
+The test for number of events is not a substitute for properly
+checking the feature register. Fix the define and skip if PMUv3 is not
+available on the system. This includes emulator such as QEMU which
+don't implement PMU counters as a matter of policy.
 
-Fair enough, for the sake of consistency, let's leave the series as-is
-and we can add helpers for all the counter-bound structures later, if we
-want to.
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Cc: Anders Roxell <anders.roxell@linaro.org>
+---
+ arm/pmu.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-Will
+diff --git a/arm/pmu.c b/arm/pmu.c
+index 9ff7a301..66163a40 100644
+--- a/arm/pmu.c
++++ b/arm/pmu.c
+@@ -200,7 +200,7 @@ static void test_overflow_interrupt(bool overflow_at_64bits) {}
+ #define ID_AA64DFR0_PERFMON_MASK  0xf
+ 
+ #define ID_DFR0_PMU_NOTIMPL	0b0000
+-#define ID_DFR0_PMU_V3		0b0001
++#define ID_DFR0_PMU_V3		0b0011
+ #define ID_DFR0_PMU_V3_8_1	0b0100
+ #define ID_DFR0_PMU_V3_8_4	0b0101
+ #define ID_DFR0_PMU_V3_8_5	0b0110
+@@ -286,6 +286,11 @@ static void test_event_introspection(void)
+ 		return;
+ 	}
+ 
++	if (pmu.version < ID_DFR0_PMU_V3) {
++		report_skip("PMUv3 extensions not supported, skip ...");
++		return;
++	}
++
+ 	/* PMUv3 requires an implementation includes some common events */
+ 	required_events = is_event_supported(SW_INCR, true) &&
+ 			  is_event_supported(CPU_CYCLES, true) &&
+-- 
+2.39.2
+
