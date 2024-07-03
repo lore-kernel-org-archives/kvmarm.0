@@ -1,106 +1,112 @@
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA26A53A7
-	for <kvmarm@lists.linux.dev>; Wed,  3 Jul 2024 13:34:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DC3017BB0D;
+	Wed,  3 Jul 2024 14:38:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720013677; cv=none; b=L8GXbUhxUDKC3VlVnk5IsDsCGGzsjojyg1Otg0BGDVGoKD5NzFbrEPy315ifNqZR+DLFh3WLZbP9dq5di2fy08zKmCB0hIKMqSzojzolOOiQsufWVgZBe64GawJoksk/PajExkZxvHiRQl8HcTvAaGxInisO4aaVys2SquR0saY=
+	t=1720017533; cv=none; b=fGxvocfrJvAk16pOY6njXvWfT1eY7XwkIKduxgt3+wM1XvONjnQw6qyIVxWv0JlQkNn7/MATTI1f7i+HPnWe675TPa6+LZKCYUnDKcsYzCcMDsCx9YHozbgxp9r+fo8celfdKVOdGrw+L037DSvkTwQOmeVU5KY2eYs/kY/OSyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720013677; c=relaxed/simple;
-	bh=SKoc1LSqvq1gRLT5j4Z9rzcwc5E+BErt9c5EOhhnE+0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PKXBW/6UDgT/r15PQoiR/jDhL+kZnq68JIC1SjKTRsIYLixmFgLyjx69SIZAe7RM0Svj6Oht1+KW+q5LaNzMRHUqeYl9pjz4cQDYPtoVaD2+5EA5B+40ZTGnwnePkh/Dx/W6GAdEEh2AHH5+YebZaC2tYx636qC97qmiMEmyicU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kXOm1Kdc; arc=none smtp.client-ip=91.218.175.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1720017533; c=relaxed/simple;
+	bh=MLzXW0zmt8TQcHGK5nYiqQdxT5V+dSydfz7v2Sdsn+Y=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IZoIUSUXLB0WtXRL6Ehmrbq2zZzki8HIyYM+42UWUUAJsm9Y88l+s/gpZGs0CC7rzrgF6HGp35cRlNV9OiC9H8YM/y3uc6M6cUz1pZK8+HWY72pqZvv5bE0dWzTcTYFK9v8r2TXw8yXafBlc2HOkqdOd2Bs+J1FC3K+O3+Wx/14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UvzXEd+O; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kXOm1Kdc"
-X-Envelope-To: yuzenghui@huawei.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1720013672;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mfZjrBnjQAc2g3737Msklio3dXfCX7+a7lHHtBciKYY=;
-	b=kXOm1Kdck0wb6gfJ1SjCEZ99lovuT69IkQG6pCczWL/ENrNSQ21LTZhSou5Uq+5XxmqCPY
-	haa/1oM3ox334IEZe67f7Azug9Bg9i0pEFqIxcTIdplzTrl800C/p9bZrI7EOTNS+KgFCj
-	+YokTjQm0wIG/0vkpcSzuZ6llQwIg64=
-X-Envelope-To: alex.bennee@linaro.org
-X-Envelope-To: pbonzini@redhat.com
-X-Envelope-To: drjones@redhat.com
-X-Envelope-To: thuth@redhat.com
-X-Envelope-To: kvm@vger.kernel.org
-X-Envelope-To: qemu-arm@nongnu.org
-X-Envelope-To: linux-arm-kernel@lists.infradead.org
-X-Envelope-To: christoffer.dall@arm.com
-X-Envelope-To: maz@kernel.org
-X-Envelope-To: anders.roxell@linaro.org
-X-Envelope-To: alexandru.elisei@arm.com
-X-Envelope-To: eric.auger@redhat.com
-X-Envelope-To: kvmarm@lists.linux.dev
-Date: Wed, 3 Jul 2024 08:34:27 -0500
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Zenghui Yu <yuzenghui@huawei.com>
-Cc: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, 
-	pbonzini@redhat.com, drjones@redhat.com, thuth@redhat.com, kvm@vger.kernel.org, 
-	qemu-arm@nongnu.org, linux-arm-kernel@lists.infradead.org, christoffer.dall@arm.com, 
-	maz@kernel.org, Anders Roxell <anders.roxell@linaro.org>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Eric Auger <eric.auger@redhat.com>, 
-	"open list:ARM" <kvmarm@lists.linux.dev>
-Subject: Re: [kvm-unit-tests PATCH v1 2/2] arm/mmu: widen the page size check
- to account for LPA2
-Message-ID: <20240703-09f98f39f0aa78a0beb48696@orel>
-References: <20240702163515.1964784-1-alex.bennee@linaro.org>
- <20240702163515.1964784-3-alex.bennee@linaro.org>
- <28936f0c-5745-14b3-1ecf-ae1e01c5b28f@huawei.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UvzXEd+O"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0E6AC2BD10;
+	Wed,  3 Jul 2024 14:38:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720017532;
+	bh=MLzXW0zmt8TQcHGK5nYiqQdxT5V+dSydfz7v2Sdsn+Y=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=UvzXEd+OvZE0GLMzyCnlChXUeaWhWzEJj3t77gcq+UEcXMBtRoDIphusBsCr6EWNK
+	 cb6ncbDUbZ8yHOyZ1ge01dmAPU4OSt0ItHtzAlU18+IIYgDmn21DivLA65n8M8hSXZ
+	 4mAd0279LkOIYcnzbu7cxmzpNPZb5n+Ug0yVV++BH5+DxmgS+NUkXPCKL5Fs+cxutr
+	 +LvJsAIDn9ruMwtdpXAN1u2eO/8Mt6HJAQ6Yj0a4YrQQmnD+8ZHh7kkEBnGGIDFuB0
+	 dfxJEqm3lzV0s9vcNfBtfAD+IaUCmE5S42Puaf2B0VK3HhupOxtVWkunkRKjlZvLtW
+	 GqGKYB49MONug==
+From: Will Deacon <will@kernel.org>
+To: Russell King <linux@armlinux.org.uk>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Ian Rogers <irogers@google.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	James Clark <james.clark@arm.com>,
+	"Rob Herring (Arm)" <robh@kernel.org>
+Cc: kernel-team@android.com,
+	Will Deacon <will@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-perf-users@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v2 00/12] arm64: Add support for Armv9.4 PMU fixed instruction counter
+Date: Wed,  3 Jul 2024 15:38:44 +0100
+Message-Id: <172001203729.3396033.17013529444643308853.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20240626-arm-pmu-3-9-icntr-v2-0-c9784b4f4065@kernel.org>
+References: <20240626-arm-pmu-3-9-icntr-v2-0-c9784b4f4065@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <28936f0c-5745-14b3-1ecf-ae1e01c5b28f@huawei.com>
-X-Migadu-Flow: FLOW_OUT
 
-On Wed, Jul 03, 2024 at 11:52:05AM GMT, Zenghui Yu wrote:
-> Hi Alex,
+On Wed, 26 Jun 2024 16:32:24 -0600, Rob Herring (Arm) wrote:
+> This series adds support for the optional fixed instruction counter
+> added in Armv9.4 PMU. Most of the series is a refactoring to remove the
+> index to counter number conversion which dates back to the Armv7 PMU
+> driver. Removing it is necessary in order to support more than 32
+> counters without a bunch of conditional code further complicating the
+> conversion.
 > 
-> [ Please don't send patches to the old kvmarm@lists.cs.columbia.edu as
-> it had been dropped since early 2023. [1] ]
-> 
-> On 2024/7/3 0:35, Alex Bennée wrote:
-> > If FEAT_LPA2 is enabled there are different valid TGran values
-> > possible to indicate the granule is supported for 52 bit addressing.
-> > This will cause most tests to abort on QEMU's -cpu max with the error:
-> > 
-> >   lib/arm/mmu.c:216: assert failed: system_supports_granule(PAGE_SIZE): Unsupported translation granule 4096
-> > 
-> > Expand the test to tale this into account.
-> > 
-> > Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> > Cc: Anders Roxell <anders.roxell@linaro.org>
-> 
-> There's a similar patch on the list [2], haven't been merged in master
-> though.
+> [...]
 
-Drat, I queued that, and several other patches, and then, for whatever
-reason, I delayed the merge (I was probably just waiting for the gitlab
-pipeline to finish...) and then forgot to actually merge... I've merged
-now.
+Applied to will (for-next/perf), thanks!
 
-Please don't hesitate to ping me on patches that linger too long. I
-sometimes need that interrupt to trigger my context switch!
+[01/12] perf: arm_pmuv3: Avoid assigning fixed cycle counter with threshold
+        https://git.kernel.org/will/c/81e15ca3e523
+[02/12] perf: arm_pmuv3: Drop unnecessary IS_ENABLED(CONFIG_ARM64) check
+        https://git.kernel.org/will/c/598c1a2d9f4b
+[03/12] perf/arm: Move 32-bit PMU drivers to drivers/perf/
+        https://git.kernel.org/will/c/8d75537bebfa
+[04/12] perf: arm_v6/7_pmu: Drop non-DT probe support
+        https://git.kernel.org/will/c/12f051c987dc
+[05/12] perf: arm_pmuv3: Include asm/arm_pmuv3.h from linux/perf/arm_pmuv3.h
+        https://git.kernel.org/will/c/d688ffa26942
+[06/12] perf: arm_pmu: Remove event index to counter remapping
+        https://git.kernel.org/will/c/b7e89b0f5bd7
+[07/12] perf: arm_pmuv3: Prepare for more than 32 counters
+        https://git.kernel.org/will/c/12fef9fb7179
+[08/12] KVM: arm64: pmu: Use arm_pmuv3.h register accessors
+        https://git.kernel.org/will/c/6ef2846c17a3
+[09/12] KVM: arm64: pmu: Use generated define for PMSELR_EL0.SEL access
+        https://git.kernel.org/will/c/558fdd12c069
+[10/12] arm64: perf/kvm: Use a common PMU cycle counter define
+        https://git.kernel.org/will/c/323bc9e17c01
+[11/12] KVM: arm64: Refine PMU defines for number of counters
+        https://git.kernel.org/will/c/be884dd62461
+[12/12] perf: arm_pmuv3: Add support for Armv9.4 PMU instruction counter
+        https://git.kernel.org/will/c/dc4c33f753ca
 
-Thanks,
-drew
+Cheers,
+-- 
+Will
 
-> 
-> [1] https://git.kernel.org/torvalds/c/960c3028a1d5
-> [2]
-> https://lore.kernel.org/all/20240402132739.201939-6-andrew.jones@linux.dev
+https://fixes.arm64.dev
+https://next.arm64.dev
+https://will.arm64.dev
