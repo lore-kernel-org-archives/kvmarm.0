@@ -1,106 +1,106 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12FDA134415;
-	Wed,  3 Jul 2024 07:23:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA26A53A7
+	for <kvmarm@lists.linux.dev>; Wed,  3 Jul 2024 13:34:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719991420; cv=none; b=CJ/6Bzt9FtZ+05OSMGCc2vUKTs19co2cCI1KuZBH/D8KmB1fS/cRh9t6j8QYnCHy0wltM3WXsInGSbNw0E8aMbdF0DSd/cNqKXGznSBzmBc0rNxnaaFiqE12DY3TLm6E9b8j2eGxxyzMnLuTeKwHIGhK7AivBGSk9rgq+qO/hrM=
+	t=1720013677; cv=none; b=L8GXbUhxUDKC3VlVnk5IsDsCGGzsjojyg1Otg0BGDVGoKD5NzFbrEPy315ifNqZR+DLFh3WLZbP9dq5di2fy08zKmCB0hIKMqSzojzolOOiQsufWVgZBe64GawJoksk/PajExkZxvHiRQl8HcTvAaGxInisO4aaVys2SquR0saY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719991420; c=relaxed/simple;
-	bh=bU/2YsOmK16v0fOdsJ38br5N/4af3GRgBNGqmZiO8vI=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=RqRR9YeZXXAqyWkY6grM0byCG/WlCANfdio4HCl7qAxEf7aFDYWFAmpTKnu98hm/3uC/BUCP2O7nRW8f+3lPH57ZdYUE8RLR4xNiykNhQmoNXfYyUNPzdCgmVZL7ZFWxO+uHQMIZEaNRCOsYCxnGJOp+3IQSabhtg5gGDuAlkM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nmY77SKa; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1720013677; c=relaxed/simple;
+	bh=SKoc1LSqvq1gRLT5j4Z9rzcwc5E+BErt9c5EOhhnE+0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PKXBW/6UDgT/r15PQoiR/jDhL+kZnq68JIC1SjKTRsIYLixmFgLyjx69SIZAe7RM0Svj6Oht1+KW+q5LaNzMRHUqeYl9pjz4cQDYPtoVaD2+5EA5B+40ZTGnwnePkh/Dx/W6GAdEEh2AHH5+YebZaC2tYx636qC97qmiMEmyicU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kXOm1Kdc; arc=none smtp.client-ip=91.218.175.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nmY77SKa"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78E01C2BD10;
-	Wed,  3 Jul 2024 07:23:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719991419;
-	bh=bU/2YsOmK16v0fOdsJ38br5N/4af3GRgBNGqmZiO8vI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nmY77SKan33oVV7BCDgh9UdHHeEJg95y4e4aq46WP/By1OUdh7ymaLPuAOzwyeFcI
-	 Azyn1U4InRUI9MjEX5g/LTA0xXPJkqXiVDiOpGz8dHwi/xbKzJnx4gIle3yrlH93Kt
-	 jiyWwpSA3KLs0M7+Gwkh7zGQhSD8KRVVp4LMbjhjJF9VgZR5TYA3x+nSZC8Ri41siP
-	 Rdp3GQGCbzd1d0/ZM8Hw0WjEIcO60VqN7IJySppYsew1BFzWGKCP67U5plxEY/RfRw
-	 ZBpiFTblyfea6k0wvlxGPNNMkOSSCu+rWQXSuwSmJZsDHaB4z+R5rceCeJQO1ZRER5
-	 QI+MaDADhNu8A==
-Received: from disco-boy.misterjones.org ([217.182.43.188] helo=www.loen.fr)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sOuL3-009LsO-75;
-	Wed, 03 Jul 2024 08:23:37 +0100
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kXOm1Kdc"
+X-Envelope-To: yuzenghui@huawei.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1720013672;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mfZjrBnjQAc2g3737Msklio3dXfCX7+a7lHHtBciKYY=;
+	b=kXOm1Kdck0wb6gfJ1SjCEZ99lovuT69IkQG6pCczWL/ENrNSQ21LTZhSou5Uq+5XxmqCPY
+	haa/1oM3ox334IEZe67f7Azug9Bg9i0pEFqIxcTIdplzTrl800C/p9bZrI7EOTNS+KgFCj
+	+YokTjQm0wIG/0vkpcSzuZ6llQwIg64=
+X-Envelope-To: alex.bennee@linaro.org
+X-Envelope-To: pbonzini@redhat.com
+X-Envelope-To: drjones@redhat.com
+X-Envelope-To: thuth@redhat.com
+X-Envelope-To: kvm@vger.kernel.org
+X-Envelope-To: qemu-arm@nongnu.org
+X-Envelope-To: linux-arm-kernel@lists.infradead.org
+X-Envelope-To: christoffer.dall@arm.com
+X-Envelope-To: maz@kernel.org
+X-Envelope-To: anders.roxell@linaro.org
+X-Envelope-To: alexandru.elisei@arm.com
+X-Envelope-To: eric.auger@redhat.com
+X-Envelope-To: kvmarm@lists.linux.dev
+Date: Wed, 3 Jul 2024 08:34:27 -0500
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Zenghui Yu <yuzenghui@huawei.com>
+Cc: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, 
+	pbonzini@redhat.com, drjones@redhat.com, thuth@redhat.com, kvm@vger.kernel.org, 
+	qemu-arm@nongnu.org, linux-arm-kernel@lists.infradead.org, christoffer.dall@arm.com, 
+	maz@kernel.org, Anders Roxell <anders.roxell@linaro.org>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Eric Auger <eric.auger@redhat.com>, 
+	"open list:ARM" <kvmarm@lists.linux.dev>
+Subject: Re: [kvm-unit-tests PATCH v1 2/2] arm/mmu: widen the page size check
+ to account for LPA2
+Message-ID: <20240703-09f98f39f0aa78a0beb48696@orel>
+References: <20240702163515.1964784-1-alex.bennee@linaro.org>
+ <20240702163515.1964784-3-alex.bennee@linaro.org>
+ <28936f0c-5745-14b3-1ecf-ae1e01c5b28f@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Date: Wed, 03 Jul 2024 08:23:37 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Zenghui Yu <yuzenghui@huawei.com>
-Cc: =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
- pbonzini@redhat.com, thuth@redhat.com, kvm@vger.kernel.org,
- qemu-arm@nongnu.org, linux-arm-kernel@lists.infradead.org,
- christoffer.dall@arm.com, Anders Roxell <anders.roxell@linaro.org>, Andrew
- Jones <andrew.jones@linux.dev>, Alexandru Elisei <alexandru.elisei@arm.com>,
- Eric Auger <eric.auger@redhat.com>, "open list:ARM" <kvmarm@lists.linux.dev>
-Subject: Re: [kvm-unit-tests PATCH v1 1/2] arm/pmu: skip the PMU introspection
- test if missing
-In-Reply-To: <8c11996c-b36d-e560-cdeb-e543ee478a54@huawei.com>
-References: <20240702163515.1964784-1-alex.bennee@linaro.org>
- <20240702163515.1964784-2-alex.bennee@linaro.org>
- <8c11996c-b36d-e560-cdeb-e543ee478a54@huawei.com>
-User-Agent: Roundcube Webmail/1.4.15
-Message-ID: <74e184afbc4b58fba984b91964915a9e@kernel.org>
-X-Sender: maz@kernel.org
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 217.182.43.188
-X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, alex.bennee@linaro.org, pbonzini@redhat.com, thuth@redhat.com, kvm@vger.kernel.org, qemu-arm@nongnu.org, linux-arm-kernel@lists.infradead.org, christoffer.dall@arm.com, anders.roxell@linaro.org, andrew.jones@linux.dev, alexandru.elisei@arm.com, eric.auger@redhat.com, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+In-Reply-To: <28936f0c-5745-14b3-1ecf-ae1e01c5b28f@huawei.com>
+X-Migadu-Flow: FLOW_OUT
 
-On 2024-07-03 08:09, Zenghui Yu wrote:
-> On 2024/7/3 0:35, Alex BennÃ©e wrote:
->> The test for number of events is not a substitute for properly
->> checking the feature register. Fix the define and skip if PMUv3 is not
->> available on the system. This includes emulator such as QEMU which
->> don't implement PMU counters as a matter of policy.
->> 
->> Signed-off-by: Alex BennÃ©e <alex.bennee@linaro.org>
->> Cc: Anders Roxell <anders.roxell@linaro.org>
->> ---
->>  arm/pmu.c | 7 ++++++-
->>  1 file changed, 6 insertions(+), 1 deletion(-)
->> 
->> diff --git a/arm/pmu.c b/arm/pmu.c
->> index 9ff7a301..66163a40 100644
->> --- a/arm/pmu.c
->> +++ b/arm/pmu.c
->> @@ -200,7 +200,7 @@ static void test_overflow_interrupt(bool 
->> overflow_at_64bits) {}
->>  #define ID_AA64DFR0_PERFMON_MASK  0xf
->>   #define ID_DFR0_PMU_NOTIMPL	0b0000
->> -#define ID_DFR0_PMU_V3		0b0001
->> +#define ID_DFR0_PMU_V3		0b0011
+On Wed, Jul 03, 2024 at 11:52:05AM GMT, Zenghui Yu wrote:
+> Hi Alex,
 > 
-> Why? This is a macro used for AArch64 and DDI0487J.a (D19.2.59, the
-> description of the PMUVer field) says that
+> [ Please don't send patches to the old kvmarm@lists.cs.columbia.edu as
+> it had been dropped since early 2023. [1] ]
 > 
-> "0b0001	Performance Monitors Extension, PMUv3 implemented."
+> On 2024/7/3 0:35, Alex Bennée wrote:
+> > If FEAT_LPA2 is enabled there are different valid TGran values
+> > possible to indicate the granule is supported for 52 bit addressing.
+> > This will cause most tests to abort on QEMU's -cpu max with the error:
+> > 
+> >   lib/arm/mmu.c:216: assert failed: system_supports_granule(PAGE_SIZE): Unsupported translation granule 4096
+> > 
+> > Expand the test to tale this into account.
+> > 
+> > Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> > Cc: Anders Roxell <anders.roxell@linaro.org>
 > 
-> while 0b0011 is a reserved value.
+> There's a similar patch on the list [2], haven't been merged in master
+> though.
 
-I think this is a mix of 32bit and 64bit views (ID_DFR0_EL1.PerfMon
-instead of ID_AA64DFR0_EL1.PMUVer), and the whole thing is a mess
-(ID_AA64DFR0_PERFMON_MASK is clearly confused...).
+Drat, I queued that, and several other patches, and then, for whatever
+reason, I delayed the merge (I was probably just waiting for the gitlab
+pipeline to finish...) and then forgot to actually merge... I've merged
+now.
 
-I haven't looked at how this patch fits in the rest of the code though.
+Please don't hesitate to ping me on patches that linger too long. I
+sometimes need that interrupt to trigger my context switch!
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+Thanks,
+drew
+
+> 
+> [1] https://git.kernel.org/torvalds/c/960c3028a1d5
+> [2]
+> https://lore.kernel.org/all/20240402132739.201939-6-andrew.jones@linux.dev
