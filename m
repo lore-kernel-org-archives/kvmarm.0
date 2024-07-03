@@ -1,87 +1,117 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68059173336;
-	Wed,  3 Jul 2024 15:47:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E2B317556B
+	for <kvmarm@lists.linux.dev>; Wed,  3 Jul 2024 17:35:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720021674; cv=none; b=FjF3zH/3qEoXaMbkMFvr+YSn2bVVn1zgNB1YihDjzG1gCjueUEd5nCc2QJndiHfszqPrfLwH9iAxYTQ1zFh72Kf7ZnL3EqtTV/RDdTeOjonZdZ9T8W1Ug6J59rzh7LZAum50sj0WNXaUsQFXwhf/vPppvEn7Radgez7zrawgd/k=
+	t=1720028106; cv=none; b=iz4fG7ycTxZDWJSZu7TQIJFgKkOK3Fi1q0qh49oDfyJk1NBMmEUmB5EeQZfrVZkMshSzn1lZcr4zi08juc+gho8GQEe03331tAcHs54+8Q454SIWBkhklo6F6LY/uPI2orNhHtOonApl0hM8fnK0OxfLUJ/tvSqtsnzwcCJcjWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720021674; c=relaxed/simple;
-	bh=xVi9E4QQ7Ky8LoYasCK2VdMivLv1/qqg53/SZnL6ZHg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QYT4/k0Jd50LWlludemqAxs+GOLDobP8HTtkPplIHVvBWXaYZ2+m4M59wZaZQdVn4hBbDyou/OK9gMVeSzN+ZhqfWlUOP5fWbLA5uc/Hy7iXBDaIAm7HsAWjbZzHZH1w9xnjLLhxhBq901qLQr/D0Xh7uxDtFKT9hnwFO3bYq5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OHWG6Lho; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1720028106; c=relaxed/simple;
+	bh=l06SvAx10y5w/WW2XMiTPjF51PJgC3s5dbBuT2H9W1U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=B8aKNGxuf2iIs8U31AzmbgEjRHwq7zklO31nN6PXLdfIAK2RIPwfzrcLiWqNF/Q4us8RRTIY8+6PqWaFYjiGhZIICRD1Yj71TD4TFzV6KKc09dmvQOr2eQrl9fFnZfX1FzZvIo0e2Ll1TUUmhkjmXdgjGh3V4VkOyfmThppmBFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=bUtwtLOZ; arc=none smtp.client-ip=52.119.213.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OHWG6Lho"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F14FEC2BD10;
-	Wed,  3 Jul 2024 15:47:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720021674;
-	bh=xVi9E4QQ7Ky8LoYasCK2VdMivLv1/qqg53/SZnL6ZHg=;
-	h=From:To:Cc:Subject:Date:From;
-	b=OHWG6LhouNPAcWCL7cidRjn4i+wELfViRrIopsZRrwK/sMVHEghk4ZrH8qnHB5xWS
-	 kroT6Pi/jj4A2a+b8s6M9QzhGt2W6sTBOjI1redKn+Y5dURZtsTgPkuaRjo8Rp3Ri8
-	 OtrnmZwgmuYYocSNyhyMa3rN4asQ5fs4GQZVFp66tZvAwqAWxHAA26n68SvYzjHbar
-	 p0qlBIjOZzgNYxRV3rLy2SWGloUHeBtXXEkO0WhIOeNYXGfx/vQ/BqnXyXxR6b8VC5
-	 +Zg8XkepunccVSKbQ41EGJD/792DapCEo0qwdgsUiZxo1GXqCaNeMffvTViv1zNrKd
-	 SDHDNyCNPIo+g==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sP2D1-009V00-P0;
-	Wed, 03 Jul 2024 16:47:51 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH] KVM: arm64: nv: Truely enable nXS TLBI operations
-Date: Wed,  3 Jul 2024 16:47:43 +0100
-Message-Id: <20240703154743.824824-1-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="bUtwtLOZ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1720028105; x=1751564105;
+  h=message-id:date:mime-version:reply-to:subject:to:cc:
+   references:from:in-reply-to:content-transfer-encoding;
+  bh=b9HAF+WS9MkSfOWQwYRmuQh0tn+3sT67Es33DhKyTRg=;
+  b=bUtwtLOZsnMbs7XPx6/zsTXyui/G1xhE0+EbsRSsZy17vKekQN9Am9mF
+   qwiS0TmUOy6+bqrXHYyW0le+91U+cjIU2sfIPlUbYo9ClSyKKsG4XziBe
+   r5v8CyJWTDSMuvABG1x9aKQ6w+7OnGleh38Rv7PJ+//YM3tk42ErNOQ6d
+   I=;
+X-IronPort-AV: E=Sophos;i="6.09,182,1716249600"; 
+   d="scan'208";a="643425421"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2024 17:35:02 +0000
+Received: from EX19MTAEUC001.ant.amazon.com [10.0.10.100:28952]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.19.28:2525] with esmtp (Farcaster)
+ id c1c9f286-5528-40e7-9d33-3101ee09a74d; Wed, 3 Jul 2024 17:35:00 +0000 (UTC)
+X-Farcaster-Flow-ID: c1c9f286-5528-40e7-9d33-3101ee09a74d
+Received: from EX19D022EUC002.ant.amazon.com (10.252.51.137) by
+ EX19MTAEUC001.ant.amazon.com (10.252.51.155) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Wed, 3 Jul 2024 17:35:00 +0000
+Received: from [192.168.6.66] (10.106.82.27) by EX19D022EUC002.ant.amazon.com
+ (10.252.51.137) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34; Wed, 3 Jul 2024
+ 17:34:59 +0000
+Message-ID: <923126dd-5f23-4f99-8327-9e8738540efb@amazon.com>
+Date: Wed, 3 Jul 2024 18:34:58 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Reply-To: <kalyazin@amazon.com>
+Subject: Re: [PATCH v7 06/14] KVM: Add memslot flag to let userspace force an
+ exit on missing hva mappings
+To: David Matlack <dmatlack@google.com>
+CC: Sean Christopherson <seanjc@google.com>, Anish Moorthy
+	<amoorthy@google.com>, <maz@kernel.org>, <kvm@vger.kernel.org>,
+	<kvmarm@lists.linux.dev>, <robert.hoo.linux@gmail.com>,
+	<jthoughton@google.com>, <axelrasmussen@google.com>, <peterx@redhat.com>,
+	<nadav.amit@gmail.com>, <isaku.yamahata@gmail.com>,
+	<kconsul@linux.vnet.ibm.com>, Oliver Upton <oliver.upton@linux.dev>,
+	<roypat@amazon.co.uk>, <kalyazin@amazon.com>
+References: <20240215235405.368539-1-amoorthy@google.com>
+ <20240215235405.368539-7-amoorthy@google.com> <ZeuMEdQTFADDSFkX@google.com>
+ <ZeuxaHlZzI4qnnFq@google.com> <Ze6Md/RF8Lbg38Rf@thinky-boi>
+ <CALzav=cMrt8jhCKZSJL+76L=PUZLBH7D=Uo-5Cd1vBOoEja0Nw@mail.gmail.com>
+Content-Language: en-US
+From: Nikita Kalyazin <kalyazin@amazon.com>
+Autocrypt: addr=kalyazin@amazon.com; keydata=
+ xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
+ JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
+ BjLQwD9FsK+SyiCpmmTzBQJj5ki9BQkDwmcAAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
+ IKmaZPOR1wD/UTcn4GbLC39QIwJuWXW0DeLoikxFBYkbhYyZ5CbtrtAA/2/rnR/zKZmyXqJ6
+ ULlSE8eWA3ywAIOH8jIETF2fCaUCzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
+ ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
+ ZPMFAmPmSL0FCQPCZwACGwwACgkQr5LKIKmaZPNCxAEAxwnrmyqSC63nf6hoCFCfJYQapghC
+ abLV0+PWemntlwEA/RYx8qCWD6zOEn4eYhQAucEwtg6h1PBbeGK94khVMooF
+In-Reply-To: <CALzav=cMrt8jhCKZSJL+76L=PUZLBH7D=Uo-5Cd1vBOoEja0Nw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-ClientProxiedBy: EX19D009EUA002.ant.amazon.com (10.252.50.88) To
+ EX19D022EUC002.ant.amazon.com (10.252.51.137)
 
-Although we now have support for nXS-flavoured TLBI instructions,
-we still don't expose the feature to the guest thanks to a mixture
-of misleading comment and use of a bunch of magic values.
+Hi David,
 
-Fix the comment and correctly express the masking of LS64, which
-is enough to expose nXS to the world. Not that anyone cares...
+On 11/03/2024 16:20, David Matlack wrote:
+> On Sun, Mar 10, 2024 at 9:46 PM Oliver Upton <oliver.upton@linux.dev> wrote:
+>>>>
+>>>>    2. What is your best guess as to when KVM userfault patches will be available,
+>>>>       even if only in RFC form?
+>>>
+>>> We're aiming for the end of April for RFC with KVM/ARM support.
+>>
+>> Just to make sure everyone is read in on what this entails -- is this
+>> the implementation that only worries about vCPUs touching non-present
+>> memory, leaving the question of other UAPIs that consume guest memory
+>> (e.g. GIC/ITS table save/restore) up for further discussion?
+> 
+> Yes. The initial version will only support returning to userspace on
+> invalid vCPU accesses with KVM_EXIT_MEMORY_FAULT. Non-vCPU accesses to
+> invalid pages (e.g. GIC/ITS table save/restore) will trigger an error
+> return from __gfn_to_hva_many() (which will cause the corresponding
+> ioctl to fail). It will be userspace's responsibility to clear the
+> invalid attribute before invoking those ioctls.
+> 
+> For x86 we may need an blocking kernel-to-userspace notification
+> mechanism for code paths in the emulator, but we'd like to investigate
+> and discuss if there are any other cleaner alternatives before going
+> too far down that route.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/nested.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+I wasn't able to locate any follow-ups on the LKML about this topic.
+May I know if you are still working on or planning to work on this?
 
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 81e0374a4a45b..b3c8d8e04a547 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -810,8 +810,8 @@ static u64 limit_nv_id_reg(u32 id, u64 val)
- 		break;
- 
- 	case SYS_ID_AA64ISAR1_EL1:
--		/* Support everything but Spec Invalidation */
--		val &= ~(GENMASK_ULL(63, 56)	|
-+		/* Support everything but Spec Invalidation and LS64 */
-+		val &= ~(NV_FTR(ISAR1, LS64)	|
- 			 NV_FTR(ISAR1, SPECRES));
- 		break;
- 
--- 
-2.39.2
-
+Thanks,
+Nikita
