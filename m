@@ -1,20 +1,20 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 838E7D2F5;
-	Thu,  4 Jul 2024 14:17:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B3441ABC25;
+	Thu,  4 Jul 2024 14:19:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720102663; cv=none; b=ISNPn+t5Pdq+w09dJidiwQOYxB2oxxDLCiYC1lWaIG1fKwPF9TD7FRS5dC+H+WSbHxpEbU732p6KZGug3VCRbhbmgUBZyCR6iNPsc6Lk6nD/gLGDH37kI7Opmlkn4NpFdzQgPLeQ6BdgANrO9+Zsgwdh0/AE3N3n+yNVTBO+uhk=
+	t=1720102741; cv=none; b=WX+bnHIuf5EkFdvyhvJdfyr8UUydcNMzBvs1UnHsxixoOoHzMZKGN8Wbb3GierGgZ/y1brpy2NRhm3Tu0b7gdapqWfKDhj4NJIMiHgenSRq2q2djySNOV6z52Cjxl1hQnv/pAeQj30ZfG9cVfo7uREjXMqC3LD5VY8qPacp/NFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720102663; c=relaxed/simple;
-	bh=/FzwEx3tCt36dcbi4qSsUug+QZ2Kkb6h8ii4ExQhMxM=;
+	s=arc-20240116; t=1720102741; c=relaxed/simple;
+	bh=ye510cXC3aVwECKsVGygh7Jks+sL52CExzDAGCpTe58=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HE7Z5OAvoZuBAG1wuwXqak8mjPCaK29vVNyYTLYus6y2ns4uo54+Nlri8faWcrcdu37eA679TBZdXNYZgGTclG8gPCsWFyrqRejvkYNhH/K9qWPQfljM8aNQ7HwHRH181vyvekDAkGCvlKfz8jbz/bOwpvTT0mFS1M6Qr2Tbrjo=
+	 Content-Type:Content-Disposition:In-Reply-To; b=Fk9yyrHEhVtf3MQbgky2SvKW1kCv3bc+b4K9oEZEOykTJEvBoMKcMqNe1hEvNANSkFBZ6kmChDeKSrq/uCiB360lxB++aFSIFCCNFS9LEUIl5hs/E+pi+iyHsWKoFJWP2qhpyZvMgDmgTnEx5S3AQe4870aNcAnuoSdd2C5z5BU=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23C1EC4AF07;
-	Thu,  4 Jul 2024 14:17:40 +0000 (UTC)
-Date: Thu, 4 Jul 2024 15:17:39 +0100
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8585C3277B;
+	Thu,  4 Jul 2024 14:18:58 +0000 (UTC)
+Date: Thu, 4 Jul 2024 15:18:56 +0100
 From: Catalin Marinas <catalin.marinas@arm.com>
 To: Mark Brown <broonie@kernel.org>
 Cc: Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
@@ -23,10 +23,11 @@ Cc: Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Fuad Tabba <tabba@google.com>, linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 1/4] arm64/fpsimd: Introduce __bit_to_vl() helper
-Message-ID: <ZoavA2rMK2P4qTDm@arm.com>
+Subject: Re: [PATCH v2 2/4] arm64/fpsimd: Discover maximum vector length
+ implemented by any CPU
+Message-ID: <ZoavUGcYLULHpVfg@arm.com>
 References: <20240606-kvm-arm64-fix-pkvm-sve-vl-v2-0-c88f4eb4b14b@kernel.org>
- <20240606-kvm-arm64-fix-pkvm-sve-vl-v2-1-c88f4eb4b14b@kernel.org>
+ <20240606-kvm-arm64-fix-pkvm-sve-vl-v2-2-c88f4eb4b14b@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -35,13 +36,20 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240606-kvm-arm64-fix-pkvm-sve-vl-v2-1-c88f4eb4b14b@kernel.org>
+In-Reply-To: <20240606-kvm-arm64-fix-pkvm-sve-vl-v2-2-c88f4eb4b14b@kernel.org>
 
-On Thu, Jun 06, 2024 at 04:21:43PM +0100, Mark Brown wrote:
-> In all cases where we use the existing __bit_to_vq() helper we immediately
-> convert the result into a VL. Provide and use __bit_to_vl() doing this
-> directly.
+On Thu, Jun 06, 2024 at 04:21:44PM +0100, Mark Brown wrote:
+> When discovering the vector lengths for SVE and SME we do not currently
+> record the maximum VL supported on any individual CPU.  This is expected
+> to be the same for all CPUs but the architecture allows asymmetry, if we
+> do encounter an asymmetric system then some CPUs may support VLs higher
+> than the maximum Linux will use.  Since the pKVM hypervisor needs to
+> support saving and restoring anything the host can physically set it
+> needs to know the maximum value any CPU could have, add support for
+> enumerating it and validation for late CPUs.
 > 
 > Signed-off-by: Mark Brown <broonie@kernel.org>
 
 Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+
+I guess the %lu suggested by Fuad can be done when applying the patch.
