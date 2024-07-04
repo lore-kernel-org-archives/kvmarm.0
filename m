@@ -1,94 +1,88 @@
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50DAC1AEFF4
-	for <kvmarm@lists.linux.dev>; Thu,  4 Jul 2024 14:23:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65AC01AE0A2;
+	Thu,  4 Jul 2024 15:12:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720103030; cv=none; b=JPmntNtIJAs1TR6MV4r/MIxUt60/JV+a1FrGwCmZ0KD+K3PlAmgZbBix9sWXC7/s+jNfd/QcjRFRlq2Ic6S3M2CekyPi2xPCA+BxohBMyhF7+cWuAbBXqOBDfauwk4Qpsz9AghwHpr8jYImOXn9snjtBH709p6hzKpe7BjCjSFk=
+	t=1720105952; cv=none; b=R5bR93ks03QE1FnemW7V2+xxwLiNcvVhojWRawWvVLsI9kH6WJaJyOfddtnLnnPn/k+oQ+7LC4dGj8wJbGXtv4/i9Zv1POoFU8t+Blxd3nwlQ9+daBAP82PAl9dArJW7s7IyzoNCOPqXKGd34maA0Cx+UXtRPw1ztZn02KDH5oA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720103030; c=relaxed/simple;
-	bh=5PKFjruDuVwJuNWQ6tWjZ4FAvFp1KwoELGzScdgv70Y=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lt1b8qZ9hUNG0VuMKX6iJ/fG6sOiEjvkC40wu4fGi+Iqp4leDge52FA7Q0LS4nz4vBY3Xpdl7Ng3dybwjTC9hrs0mbbbXonSYxNhAqYeoQPVbKkLCvF1AwCWZNfwpp5v+syjVhnQz34GGDMGmLD0iwphMPYIRTX9kVRoxYqfQQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4WFJg20c8Rz1T571;
-	Thu,  4 Jul 2024 22:19:10 +0800 (CST)
-Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
-	by mail.maildlp.com (Postfix) with ESMTPS id E1875180A9C;
-	Thu,  4 Jul 2024 22:23:44 +0800 (CST)
-Received: from DESKTOP-6NKE0BC.china.huawei.com (10.174.185.210) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 4 Jul 2024 22:23:43 +0800
-From: Kunkun Jiang <jiangkunkun@huawei.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Eric
- Auger <eauger@redhat.com>
-CC: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<wanghaibin.wang@huawei.com>, Kunkun Jiang <jiangkunkun@huawei.com>,
-	<lishusen2@huawei.com>, <tangnianyao@huawei.com>
-Subject: [PATCH v2 3/3] KVM: arm64: vgic-its: Clear ite when discard frees an ite
-Date: Thu, 4 Jul 2024 22:23:19 +0800
-Message-ID: <20240704142319.728-4-jiangkunkun@huawei.com>
-X-Mailer: git-send-email 2.26.2.windows.1
-In-Reply-To: <20240704142319.728-1-jiangkunkun@huawei.com>
-References: <20240704142319.728-1-jiangkunkun@huawei.com>
+	s=arc-20240116; t=1720105952; c=relaxed/simple;
+	bh=M4HwyuMAPXcyVU3UeaZFM94yR3yCo7oz/R2J2IW8NfU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pwfJ44gjVh56nmBwB9MhKruQJlbyyf6eDY1L01KgU2fb4PQWMEqQ7tuTdL3RDonHgnfBafN5kuLyzM3CsP6mBN6/xOaumlGjaAtMZgFosin3cLRs/UfCKZpuUzbRgfR1xjCq2gh+wwBai+QRFba2c3Wc5xFuwM6lX4TioHdZQ8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=izIqCzof; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="izIqCzof"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBB34C3277B;
+	Thu,  4 Jul 2024 15:12:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720105951;
+	bh=M4HwyuMAPXcyVU3UeaZFM94yR3yCo7oz/R2J2IW8NfU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=izIqCzofrGwmVzybepKyB4tDZ9DfyCB3xZA+GCrxemC4tkfgeVe0DavVNrIV20ilO
+	 djHcEJsfjY69+7yHXCSgTCuxXIlQN92xiurpVlA0LORW1cGdwaAUWmo1pQwnHS4bhE
+	 /FenURnRQoc3yr5EcfJ2jyx61c6uIqBYS5GjLUTyKn7QXQBIfhPTIQQG95epGjpK1k
+	 TfuIVFH1bD+GzfhNnGSl1V8XUz0juAGFAtwZbxf55XunNz4xiWcSZ0mgxr8cQ4tA54
+	 lyOswH8T1paOaWBvrjhV8qSVQp0Nd06r9UAakWoyuEMQmLArktAjIgNJoFlXgv8Npv
+	 FTRi/WEXshImw==
+Date: Thu, 4 Jul 2024 16:12:26 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Fuad Tabba <tabba@google.com>, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v2 2/4] arm64/fpsimd: Discover maximum vector length
+ implemented by any CPU
+Message-ID: <25198c5a-6e23-481a-86fd-11158734615a@sirena.org.uk>
+References: <20240606-kvm-arm64-fix-pkvm-sve-vl-v2-0-c88f4eb4b14b@kernel.org>
+ <20240606-kvm-arm64-fix-pkvm-sve-vl-v2-2-c88f4eb4b14b@kernel.org>
+ <ZoavUGcYLULHpVfg@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm600007.china.huawei.com (7.193.23.208)
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="gJkKdYVuZpq+zndj"
+Content-Disposition: inline
+In-Reply-To: <ZoavUGcYLULHpVfg@arm.com>
+X-Cookie: Today is what happened to yesterday.
 
-When discard frees an ite, we do not invalidate the
-corresponding ite. In the scenario of continuous save and
-restore, there may be a situation where an ite is not saved
-but is restored. This is unreasonable and may cause restore
-to fail. This patch clears the corresponding ite when discard
-frees a ite.
 
-Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
----
- arch/arm64/kvm/vgic/vgic-its.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+--gJkKdYVuZpq+zndj
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 223a5f1d6a3d..cf4a85a29504 100644
---- a/arch/arm64/kvm/vgic/vgic-its.c
-+++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -782,6 +782,10 @@ static int vgic_its_cmd_handle_discard(struct kvm *kvm, struct vgic_its *its,
- 
- 	ite = find_ite(its, device_id, event_id);
- 	if (ite && its_is_collection_mapped(ite->collection)) {
-+		struct its_device *device = find_its_device(its, device_id);
-+		int ite_esz = vgic_its_get_abi(its)->ite_esz;
-+		gpa_t gpa = device->itt_addr + ite->event_id * ite_esz;
-+		u64 val = 0;
- 		/*
- 		 * Though the spec talks about removing the pending state, we
- 		 * don't bother here since we clear the ITTE anyway and the
-@@ -790,6 +794,11 @@ static int vgic_its_cmd_handle_discard(struct kvm *kvm, struct vgic_its *its,
- 		vgic_its_invalidate_cache(its);
- 
- 		its_free_ite(kvm, ite);
-+
-+		if (KVM_BUG_ON(ite_esz != sizeof(val), kvm))
-+			return -EINVAL;
-+
-+		vgic_write_guest_lock(kvm, gpa, &val, ite_esz);
- 		return 0;
- 	}
- 
--- 
-2.27.0
+On Thu, Jul 04, 2024 at 03:18:56PM +0100, Catalin Marinas wrote:
 
+> I guess the %lu suggested by Fuad can be done when applying the patch.
+
+There was a v3 that did that:
+
+   https://lore.kernel.org/r/20240607-kvm-arm64-fix-pkvm-sve-vl-v3-0-59e781706d65@kernel.org
+
+although now I try to follow that link it looks like it somehow went
+AWOL, though my local git/b4 has everything that shows it was actually
+sent.  I've no idea what went wrong there.
+
+--gJkKdYVuZpq+zndj
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmaGu9oACgkQJNaLcl1U
+h9DGIQf/SX2vuuYz+P+2Qj7jWv+vg/Ez/XoGfni0tH+qD2dJz7agdKGn8+4AqOmA
+ISo/dqla0QL13z06NG9YszHi4B84G71QzJi/UneHDv2pyvCPJ/xN+sWp0WELKE2Y
+omVNXR29tfawy7O/zeZbLkFoG19KRBpqpLgBB3ZpeZiGWv+0Uw1JrTXhhDn58Jzm
+S3Nm5GTv37MTN0LFT5hQ+UjInUTIXWxqSh3wouceYaQgPlVf+o31CN+xJRDZ5i5l
+6F+dQWx0ppX5qu8WRLfaACNkCY24jqL+RpPA47+00HXdatDjl+s2mpnUyrSRuHVk
+6xRct5lDlozeR0Y2wF2EGY6wAKXcxw==
+=NLwO
+-----END PGP SIGNATURE-----
+
+--gJkKdYVuZpq+zndj--
