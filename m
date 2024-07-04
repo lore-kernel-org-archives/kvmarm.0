@@ -1,127 +1,94 @@
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71F991A38EE
-	for <kvmarm@lists.linux.dev>; Thu,  4 Jul 2024 10:32:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0695526289
+	for <kvmarm@lists.linux.dev>; Thu,  4 Jul 2024 12:47:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720089149; cv=none; b=MahOwiQ+8GixnbJFspEzRxZpCwCqvQ3KY4+iPGCuQey+Mz+akByVsvd/O1bRhJRHwp+yT2KvfzfquFauTQGQYiZV6JhXM5aoT1EH0q3UtCARM+XP0PklfA35zROj+AWGdsyLJK+HTuT6R4xJZHoNwxVjEFw7Ejr4tEXS8jJWe2U=
+	t=1720097236; cv=none; b=WEXhW4QIoK81TWozE4AF1PPwrC2B1owTsnXQDmX4Pi6cr5zFAFZ7XL+YH1B+ZxTMN6q9Mn5kElHoA8I6lBiqfIaKpxRVDmjhebEzq3NNclHTu6zE5vJ518QXrxUedNga7gJM+tf32VKd+AQUhyAUPLAtgTXHKLQmmljed2Thktg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720089149; c=relaxed/simple;
-	bh=vS/lSm/su/NLbW7XDF2l6nH3EvMeNhzVg69/SMovFb8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=QoHUcGf1A7Gu8LfJ/0/2AKuu0GkJc2upjK0TcDVAuLwJLHAH/Rrk3jlcaSNps9bFCBsgr+IIPWVj1ROvQcynaY6uDc953E8yuQgS+lsRTUARLqmQZqvk74AXabQ3Z9syVc4O3n4PQxkjQ+YaAQ/cg9dOrXP+I+RRCrkqdJFqzxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=fr9HYxzt; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fr9HYxzt"
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a77b4387302so61057966b.1
-        for <kvmarm@lists.linux.dev>; Thu, 04 Jul 2024 03:32:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1720089146; x=1720693946; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Ll1789K3RZMo075IXKmdTE4mfwiU9AkaVkKOsPwli5c=;
-        b=fr9HYxzt4R4rYtR+8I06Bymh5n7CO0i0yCNnpV03fxJUWHOP6l+J84y2jWfxo6J5Ay
-         ZW9smi59CbfWnRUBv3DAMx3Dbp+TSfIHk78QAUJqoqFHHfA1BCLfyjZvQ77iIx1gowVD
-         at7Igx6RzgnvMfH66U761UBANfQ8gTcaZqScMlOc1AdGjmrgewP9fBTX5Fay+c3h/0GF
-         K9bJtqMle+Kay61d8nDKtFWG6Pdf/rjxINYFCzA0rTqeOIihviWHeVs66vsLJ3WQNqQG
-         Lc8c4F1UX573zFJxXCHctkESSnVjQ9q3DlY7DxMaEy4syN8BGF9RrJDNH1wQetnQ8DpP
-         5XWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720089146; x=1720693946;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Ll1789K3RZMo075IXKmdTE4mfwiU9AkaVkKOsPwli5c=;
-        b=V/ojW4myG3p7f/o2YR4fnJqySO2Zycca+MytwMhSjg8lPqYFz9Zk9RAt3rmBYHOgC9
-         Pok/0kN5cP5tWST9EBoaOuOqfx6zQXLZ1hMmvP75drkhn952iw/eIT6PtNqa3tScMSWe
-         frpEBtMKv/pdFao3Y1kHrEjJ2EMiK37PL8Uid+hyo2QcuGHqgWCeuSKR6r2ao9zaQlP0
-         SikcRrShkGr7VD0pVnWbAEqNeXXhAihv191FijQ6UIKAfia3v+HLsJxu1TT+GBbs1NfW
-         EDFtb54QWv9ZDXQMK/V46L2EQ8w65nUnpRcR5DI/fM7a1gf7TqVbsCnDMUR9t2OtTzha
-         Xo9A==
-X-Forwarded-Encrypted: i=1; AJvYcCWkVQJi1mP5Gbg2W1/uW9NQfn3MjVntNxcf7TYzyjVYMEkO1ookGKJMu4+TgdpSk/s8a5dt2OolH0yDfz/J2QC1XeITL2k1
-X-Gm-Message-State: AOJu0YzRuRAO770vwVnOjEy5lgYzigq07XAofDWb9WT9k/JTYn51w+zx
-	uihrhuedszIF2QCmhRKelfDlQRQQGmEQCo7aL6F0oVn29lmgVpUoxl2rczIB4f4=
-X-Google-Smtp-Source: AGHT+IEUr/k4wsuFFI1HpUUBu37YY6nVBx+aUz1aY2C4uipNzYsojCSOZ6mn0U5wAAIP7oQlfcyt0g==
-X-Received: by 2002:a17:907:c25:b0:a6f:51b3:cbbd with SMTP id a640c23a62f3a-a77ba45568amr98177066b.4.1720089145286;
-        Thu, 04 Jul 2024 03:32:25 -0700 (PDT)
-Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a77ba8dab57sm35135566b.55.2024.07.04.03.32.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jul 2024 03:32:24 -0700 (PDT)
-Received: from draig (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id D11015F839;
-	Thu,  4 Jul 2024 11:32:23 +0100 (BST)
-From: =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Zenghui Yu <yuzenghui@huawei.com>,  pbonzini@redhat.com,
-  thuth@redhat.com,  kvm@vger.kernel.org,  qemu-arm@nongnu.org,
-  linux-arm-kernel@lists.infradead.org,  christoffer.dall@arm.com,  Anders
- Roxell <anders.roxell@linaro.org>,  Andrew Jones <andrew.jones@linux.dev>,
-  Alexandru Elisei <alexandru.elisei@arm.com>,  Eric Auger
- <eric.auger@redhat.com>,  "open list:ARM" <kvmarm@lists.linux.dev>
-Subject: Re: [kvm-unit-tests PATCH v1 1/2] arm/pmu: skip the PMU
- introspection test if missing
-In-Reply-To: <74e184afbc4b58fba984b91964915a9e@kernel.org> (Marc Zyngier's
-	message of "Wed, 03 Jul 2024 08:23:37 +0100")
-References: <20240702163515.1964784-1-alex.bennee@linaro.org>
-	<20240702163515.1964784-2-alex.bennee@linaro.org>
-	<8c11996c-b36d-e560-cdeb-e543ee478a54@huawei.com>
-	<74e184afbc4b58fba984b91964915a9e@kernel.org>
-Date: Thu, 04 Jul 2024 11:32:23 +0100
-Message-ID: <87ed89o3bc.fsf@draig.linaro.org>
+	s=arc-20240116; t=1720097236; c=relaxed/simple;
+	bh=CkfWZCKITynqRfS7TMnTh8xeNwILNPLBc2I97gVJAbQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=m37Uq/s90GjBahPvKUGCkZt1O7nmxTMWvMp0HPiHRCwRBEFfw46n86enH7znu/2KtS1PmySAl4N4Q4o3rQ7t5mX+igUNoWpWdPBI1uIp12l8WyXcz5eydJtjinjzmlZk1ZTC81mRw8nk5o4vHup3mGTKSPo2F20yLEu+BUJ5RHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3AE77367;
+	Thu,  4 Jul 2024 05:47:38 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A177D3F762;
+	Thu,  4 Jul 2024 05:47:09 -0700 (PDT)
+Date: Thu, 4 Jul 2024 13:47:04 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Amit Daniel Kachhap <amitdaniel.kachhap@arm.com>,
+	linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
+	aneesh.kumar@kernel.org, aneesh.kumar@linux.ibm.com, bp@alien8.de,
+	broonie@kernel.org, christophe.leroy@csgroup.eu,
+	dave.hansen@linux.intel.com, hpa@zytor.com,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
+	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
+	oliver.upton@linux.dev, shuah@kernel.org, szabolcs.nagy@arm.com,
+	tglx@linutronix.de, will@kernel.org, x86@kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v4 13/29] arm64: convert protection key into vm_flags and
+ pgprot values
+Message-ID: <20240704124704.GA3548388@e124191.cambridge.arm.com>
+References: <20240503130147.1154804-1-joey.gouly@arm.com>
+ <20240503130147.1154804-14-joey.gouly@arm.com>
+ <4f7d8691-fe19-4e8a-95e5-9f7680c82021@arm.com>
+ <ZnMLKb_gWsbLgMf3@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZnMLKb_gWsbLgMf3@arm.com>
 
-Marc Zyngier <maz@kernel.org> writes:
+Hi,
 
-> On 2024-07-03 08:09, Zenghui Yu wrote:
->> On 2024/7/3 0:35, Alex Benn=C3=A9e wrote:
->>> The test for number of events is not a substitute for properly
->>> checking the feature register. Fix the define and skip if PMUv3 is not
->>> available on the system. This includes emulator such as QEMU which
->>> don't implement PMU counters as a matter of policy.
->>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->>> Cc: Anders Roxell <anders.roxell@linaro.org>
->>> ---
->>>  arm/pmu.c | 7 ++++++-
->>>  1 file changed, 6 insertions(+), 1 deletion(-)
->>> diff --git a/arm/pmu.c b/arm/pmu.c
->>> index 9ff7a301..66163a40 100644
->>> --- a/arm/pmu.c
->>> +++ b/arm/pmu.c
->>> @@ -200,7 +200,7 @@ static void test_overflow_interrupt(bool
->>> overflow_at_64bits) {}
->>>  #define ID_AA64DFR0_PERFMON_MASK  0xf
->>>   #define ID_DFR0_PMU_NOTIMPL	0b0000
->>> -#define ID_DFR0_PMU_V3		0b0001
->>> +#define ID_DFR0_PMU_V3		0b0011
->> Why? This is a macro used for AArch64 and DDI0487J.a (D19.2.59, the
->> description of the PMUVer field) says that
->> "0b0001	Performance Monitors Extension, PMUv3 implemented."
->> while 0b0011 is a reserved value.
->
-> I think this is a mix of 32bit and 64bit views (ID_DFR0_EL1.PerfMon
-> instead of ID_AA64DFR0_EL1.PMUVer), and the whole thing is a mess
-> (ID_AA64DFR0_PERFMON_MASK is clearly confused...).
->
-> I haven't looked at how this patch fits in the rest of the code
-> though.
+On Wed, Jun 19, 2024 at 05:45:29PM +0100, Catalin Marinas wrote:
+> On Tue, May 28, 2024 at 12:24:57PM +0530, Amit Daniel Kachhap wrote:
+> > On 5/3/24 18:31, Joey Gouly wrote:
+> > > diff --git a/arch/arm64/include/asm/mman.h b/arch/arm64/include/asm/mman.h
+> > > index 5966ee4a6154..ecb2d18dc4d7 100644
+> > > --- a/arch/arm64/include/asm/mman.h
+> > > +++ b/arch/arm64/include/asm/mman.h
+> > > @@ -7,7 +7,7 @@
+> > >   #include <uapi/asm/mman.h>
+> > >   static inline unsigned long arch_calc_vm_prot_bits(unsigned long prot,
+> > > -	unsigned long pkey __always_unused)
+> > > +	unsigned long pkey)
+> > >   {
+> > >   	unsigned long ret = 0;
+> > > @@ -17,6 +17,12 @@ static inline unsigned long arch_calc_vm_prot_bits(unsigned long prot,
+> > >   	if (system_supports_mte() && (prot & PROT_MTE))
+> > >   		ret |= VM_MTE;
+> > > +#if defined(CONFIG_ARCH_HAS_PKEYS)
+> > 
+> > Should there be system_supports_poe() check like above?
+> 
+> I think it should, otherwise we end up with these bits in the pte even
+> when POE is not supported.
 
-Doh - yes different set of values for 32 bit.
+I think it can't get here due to the flow of the code, but I will add it to be
+defensive (since it's just an alternative that gets patched).
+I still need the defined(CONFIG_ARCH_HAS_PKEYS) check, since the VM_PKEY_BIT*
+are only defined then.
 
->
->         M.
+> 
+> > > +	ret |= pkey & 0x1 ? VM_PKEY_BIT0 : 0;
+> > > +	ret |= pkey & 0x2 ? VM_PKEY_BIT1 : 0;
+> > > +	ret |= pkey & 0x4 ? VM_PKEY_BIT2 : 0;
+> > > +#endif
+> > > +
+> > >   	return ret;
+> > >   }
+> > >   #define arch_calc_vm_prot_bits(prot, pkey) arch_calc_vm_prot_bits(prot, pkey)
 
---=20
-Alex Benn=C3=A9e
-Virtualisation Tech Lead @ Linaro
+Thanks,
+Joey
