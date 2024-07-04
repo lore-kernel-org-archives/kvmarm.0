@@ -1,34 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E235813C9A1;
-	Thu,  4 Jul 2024 17:28:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 801F713D2B8;
+	Thu,  4 Jul 2024 17:28:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720114126; cv=none; b=ndfqC+6I4u76C4HOXkEg35JNbMRTLJFGgYM7VuwVSPUzG3J+1vSuu8b225DbjYQxW7GG/GiS9kE8bYEg93xmsJPp/zcLqUtDVQ5CYRr0OJVrwnXTRSYdJZ5jxt33vNYZtGT/fRS2gK2GVou9EqkxOLjMneXXeBuIKntLrGoxiec=
+	t=1720114128; cv=none; b=cA/LcXYKvws7NNvrkpl2Amn56T4zTm4eex9ryg7brTZTrxmbbGq4dP2TRyhxNwcI3zNH1fFyqtyPOyMwa+Vk66cZflE/tA0ccd1NDFwGlYsN680lnxL4lijA3B+49sHdQIqUl2uvIN8jjKdCyi+KBZ37g2WRna5DNv60Z6l+Uzw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720114126; c=relaxed/simple;
-	bh=hZLMZ8MyT6kMtoPFEmNPK6rAznf1lF+TnbSpYE4U9Gw=;
+	s=arc-20240116; t=1720114128; c=relaxed/simple;
+	bh=qYUCz/GnFjAVns0VEq9hJ3jJLihZ2D7gvH2hjVtPvmE=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=d5up8EHD0Zr/23V3dcUH0ONXxiED1+zYS7B6jnWDDLIVTSuVOmuUgAQUCW8ti+bE9GMAP06Qwg9MOunmOtc9SHmkMMTIHjVdtRhuGyBEow5JTvlxKewW9woe5QpNoUPTtFuxhzeg1vFUKabJXMi41P/pu329b6Rkq/+JRi5QiZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=czq7fVvf; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=UZ1AqmhpZZ6SfFk1RB1279F9KsFb3MTipucahzOBmGZAcBdkWAglxXqNWIKIvIQhUJyCRdeOcbQwq1Z9krNbVyyWkKhD0ZLnyxyB+lWP94nQEWWEN0Uzx/Ypwfw5ZomNhHwmtm/kPRjSRKc9UnRN4rrq0FTjTAFhsmkmqLNIpAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HrFhL8ow; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="czq7fVvf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54163C4AF0A;
-	Thu,  4 Jul 2024 17:28:43 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HrFhL8ow"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC483C3277B;
+	Thu,  4 Jul 2024 17:28:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720114125;
-	bh=hZLMZ8MyT6kMtoPFEmNPK6rAznf1lF+TnbSpYE4U9Gw=;
+	s=k20201202; t=1720114128;
+	bh=qYUCz/GnFjAVns0VEq9hJ3jJLihZ2D7gvH2hjVtPvmE=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=czq7fVvfpw8zZ9PDpBBuOELWM23B9djKCrim22XAI5fmUIN8QOucWyYZe3144UcOk
-	 /Kk5oa+UvNcHYK/24TZZjwKpkkOMwmG6/ugf+Oyq+goVadm2v9Vs70Its8M9d6t07Q
-	 t/KyuJ49x5qKjggMfrelShf+DEQ3LNf3nAp2OLjVQCKZmdiDhjsyICOzYYPL2i3YZ+
-	 oY60zGybNcrgw3502h0+WOZ1iD3FxBV49x8+9ZjdHnnGPs8uYZf1geyoaGbxgI1uxE
-	 OgO/EzxTTCPJweyQqe8TKF6tj80KsuwjzaJNwkbsEAKnPN8ezdmANRWdw9RVmYVabJ
-	 g/nhuZmJiAJog==
+	b=HrFhL8ow/k7gBBjT+WBHhdu1OjFM4fEi1FE5VOYblB+u5q2HhldLB+ryIbPjVj3/W
+	 5wA+led0bsdiLSc+wBRKJ9xCimdnZlrkq/G78VE4tGL93MxMaduyz/1qm6m1pLywNW
+	 k6k1XeEJe7hkItRDQBKirmOTLkO4d9MfARvinY1A5Vfz8PWwI1hrAQFRzKnfWEvT81
+	 R9kEhUiWhLLiiH325CNLYgAtQQb+Dn9osN2MT1f/7OwrqgMMqhBylNoE8ASEVOKKRb
+	 4n7t5LSReJirKR5Y/nkNHxkvBSH/W6yBBdr8fRyEvVGT//+9Uc/1YYtnIRfMWloJnP
+	 rDaqWHcnPC91A==
 From: Mark Brown <broonie@kernel.org>
-Date: Thu, 04 Jul 2024 18:28:16 +0100
-Subject: [PATCH v4 1/4] arm64/fpsimd: Introduce __bit_to_vl() helper
+Date: Thu, 04 Jul 2024 18:28:17 +0100
+Subject: [PATCH v4 2/4] arm64/fpsimd: Discover maximum vector length
+ implemented by any CPU
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -37,7 +38,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240704-kvm-arm64-fix-pkvm-sve-vl-v4-1-b6898ab23dc4@kernel.org>
+Message-Id: <20240704-kvm-arm64-fix-pkvm-sve-vl-v4-2-b6898ab23dc4@kernel.org>
 References: <20240704-kvm-arm64-fix-pkvm-sve-vl-v4-0-b6898ab23dc4@kernel.org>
 In-Reply-To: <20240704-kvm-arm64-fix-pkvm-sve-vl-v4-0-b6898ab23dc4@kernel.org>
 To: Catalin Marinas <catalin.marinas@arm.com>, 
@@ -47,97 +48,140 @@ To: Catalin Marinas <catalin.marinas@arm.com>,
 Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
  kvmarm@lists.linux.dev, Mark Brown <broonie@kernel.org>
 X-Mailer: b4 0.14-dev-d4707
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3064; i=broonie@kernel.org;
- h=from:subject:message-id; bh=hZLMZ8MyT6kMtoPFEmNPK6rAznf1lF+TnbSpYE4U9Gw=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBmhtvFK7ynTjDA3VBW5+3nCTmmSgV+pDygMv8Pa5of
- tovF3L2JATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZobbxQAKCRAk1otyXVSH0NjzB/
- 9wAyCRckkz1EF1KyO3aLbh6rTu90S/RI2qugJgleo/PlnfJsFd0CP4Jhk6M1hPpm6EyqjwD47VRihf
- 1dvghkKGzVEbbk9UNzGROESbYg5fq8g8V+CZZnF5CCI9iSpdwHRnkERVuzwWVG7T35vlRf2fKrJ5ru
- xGRteEn1YU9i4c2txqKYLHuwV2KmOSXcan0h3hfV5N3SThCpBzJ6X5/Wy7AiYAtTeRZzy6Wycxobxj
- zf/5/zXZ/82T/8W0WC4IWJ6rmolkkDK/39Zz6pfvc8KdYYzPCrwyT4luLwp9PU5TqOG2z/firzEwFR
- 0s8nhJ/IZhIdnIqp4SStA7Qj0TcTWG
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4205; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=qYUCz/GnFjAVns0VEq9hJ3jJLihZ2D7gvH2hjVtPvmE=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBmhtvGwTqR0Qpu0QyOIQAR3ZrqTal/2x8TbIx+X5rI
+ KKrfOgyJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZobbxgAKCRAk1otyXVSH0G1CB/
+ 0bgImdVDSPC86pbzqA6/g+5XP7ZhZ1dNI59aVX9jSvOgJzbZoTdKC5sqLeX6P8sQ8t7RF0LXg/ODcR
+ nDPI1LtcjYZW3/fnsNdeFMvK8CEvayZy5wSiRtWxz7NIFA6EA52MkhgsPzEWoEZe8zZ6daMbd+FOQO
+ ORuKi/dskT1qKPGcQuLP1fKFd4mhe4ftDnTqVuq9XRGu2HBQrcIsK6Hf47r/Iix9n1zl4Zwerjp1PO
+ CvBSkKbYVQglNoz8By8uaLHLzJNOD6HIr/jOqIb9PNW08dR3o6rof2k2S5o9BH+VOJdOf1QB/60/DQ
+ eFmPMmJsSMPLWnnFa2V3FhsmLgmIW3
 X-Developer-Key: i=broonie@kernel.org; a=openpgp;
  fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-In all cases where we use the existing __bit_to_vq() helper we immediately
-convert the result into a VL. Provide and use __bit_to_vl() doing this
-directly.
+When discovering the vector lengths for SVE and SME we do not currently
+record the maximum VL supported on any individual CPU.  This is expected
+to be the same for all CPUs but the architecture allows asymmetry, if we
+do encounter an asymmetric system then some CPUs may support VLs higher
+than the maximum Linux will use.  Since the pKVM hypervisor needs to
+support saving and restoring anything the host can physically set it
+needs to know the maximum value any CPU could have, add support for
+enumerating it and validation for late CPUs.
 
 Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
- arch/arm64/include/asm/fpsimd.h |  4 ++++
- arch/arm64/kernel/fpsimd.c      | 12 ++++++------
- 2 files changed, 10 insertions(+), 6 deletions(-)
+ arch/arm64/include/asm/fpsimd.h | 13 +++++++++++++
+ arch/arm64/kernel/fpsimd.c      | 26 +++++++++++++++++++++++++-
+ 2 files changed, 38 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
-index bc69ac368d73..51c21265b4fa 100644
+index 51c21265b4fa..cd19713c9deb 100644
 --- a/arch/arm64/include/asm/fpsimd.h
 +++ b/arch/arm64/include/asm/fpsimd.h
-@@ -172,6 +172,10 @@ static inline unsigned int __bit_to_vq(unsigned int bit)
- 	return SVE_VQ_MAX - bit;
+@@ -188,6 +188,9 @@ struct vl_info {
+ 	int max_vl;
+ 	int max_virtualisable_vl;
+ 
++	/* Maximum vector length observed on any CPU */
++	int max_cpu_vl;
++
+ 	/*
+ 	 * Set of available vector lengths,
+ 	 * where length vq encoded as bit __vq_to_bit(vq):
+@@ -278,6 +281,11 @@ static inline int vec_max_virtualisable_vl(enum vec_type type)
+ 	return vl_info[type].max_virtualisable_vl;
  }
  
-+static inline unsigned int __bit_to_vl(unsigned int bit)
++static inline int vec_max_cpu_vl(enum vec_type type)
 +{
-+	return sve_vl_from_vq(__bit_to_vq(bit));
++	return vl_info[type].max_cpu_vl;
 +}
++
+ static inline int sve_max_vl(void)
+ {
+ 	return vec_max_vl(ARM64_VEC_SVE);
+@@ -288,6 +296,11 @@ static inline int sve_max_virtualisable_vl(void)
+ 	return vec_max_virtualisable_vl(ARM64_VEC_SVE);
+ }
  
- struct vl_info {
- 	enum vec_type type;
++static inline int sve_max_cpu_vl(void)
++{
++	return vec_max_cpu_vl(ARM64_VEC_SVE);
++}
++
+ /* Ensure vq >= SVE_VQ_MIN && vq <= SVE_VQ_MAX before calling this function */
+ static inline bool vq_available(enum vec_type type, unsigned int vq)
+ {
 diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-index 82e8a6017382..22542fb81812 100644
+index 22542fb81812..83984cb3f21a 100644
 --- a/arch/arm64/kernel/fpsimd.c
 +++ b/arch/arm64/kernel/fpsimd.c
-@@ -530,7 +530,7 @@ static unsigned int find_supported_vector_length(enum vec_type type,
- 
- 	bit = find_next_bit(info->vq_map, SVE_VQ_MAX,
- 			    __vq_to_bit(sve_vq_from_vl(vl)));
--	return sve_vl_from_vq(__bit_to_vq(bit));
-+	return __bit_to_vl(bit);
+@@ -129,6 +129,7 @@ __ro_after_init struct vl_info vl_info[ARM64_VEC_MAX] = {
+ 		.min_vl			= SVE_VL_MIN,
+ 		.max_vl			= SVE_VL_MIN,
+ 		.max_virtualisable_vl	= SVE_VL_MIN,
++		.max_cpu_vl		= SVE_VL_MIN,
+ 	},
+ #endif
+ #ifdef CONFIG_ARM64_SME
+@@ -1041,8 +1042,13 @@ static void vec_probe_vqs(struct vl_info *info,
+ void __init vec_init_vq_map(enum vec_type type)
+ {
+ 	struct vl_info *info = &vl_info[type];
++	unsigned long b;
++
+ 	vec_probe_vqs(info, info->vq_map);
+ 	bitmap_copy(info->vq_partial_map, info->vq_map, SVE_VQ_MAX);
++
++	b = find_first_bit(info->vq_map, SVE_VQ_MAX);
++	info->max_cpu_vl = __bit_to_vl(b);
  }
  
- #if defined(CONFIG_ARM64_SVE) && defined(CONFIG_SYSCTL)
-@@ -1103,7 +1103,7 @@ int vec_verify_vq_map(enum vec_type type)
- 	 * Mismatches above sve_max_virtualisable_vl are fine, since
- 	 * no guest is allowed to configure ZCR_EL2.LEN to exceed this:
- 	 */
--	if (sve_vl_from_vq(__bit_to_vq(b)) <= info->max_virtualisable_vl) {
-+	if (__bit_to_vl(b) <= info->max_virtualisable_vl) {
- 		pr_warn("%s: cpu%d: Unsupported vector length(s) present\n",
- 			info->name, smp_processor_id());
- 		return -EINVAL;
-@@ -1169,7 +1169,7 @@ void __init sve_setup(void)
- 		set_bit(__vq_to_bit(SVE_VQ_MIN), info->vq_map);
+ /*
+@@ -1054,11 +1060,16 @@ void vec_update_vq_map(enum vec_type type)
+ {
+ 	struct vl_info *info = &vl_info[type];
+ 	DECLARE_BITMAP(tmp_map, SVE_VQ_MAX);
++	unsigned long b;
  
- 	max_bit = find_first_bit(info->vq_map, SVE_VQ_MAX);
--	info->max_vl = sve_vl_from_vq(__bit_to_vq(max_bit));
-+	info->max_vl = __bit_to_vl(max_bit);
+ 	vec_probe_vqs(info, tmp_map);
+ 	bitmap_and(info->vq_map, info->vq_map, tmp_map, SVE_VQ_MAX);
+ 	bitmap_or(info->vq_partial_map, info->vq_partial_map, tmp_map,
+ 		  SVE_VQ_MAX);
++
++	b = find_first_bit(tmp_map, SVE_VQ_MAX);
++	if (__bit_to_vl(b) > info->max_cpu_vl)
++		info->max_cpu_vl = __bit_to_vl(b);
+ }
  
- 	/*
- 	 * For the default VL, pick the maximum supported value <= 64.
-@@ -1188,7 +1188,7 @@ void __init sve_setup(void)
- 		/* No virtualisable VLs?  This is architecturally forbidden. */
- 		info->max_virtualisable_vl = SVE_VQ_MIN;
- 	else /* b + 1 < SVE_VQ_MAX */
--		info->max_virtualisable_vl = sve_vl_from_vq(__bit_to_vq(b + 1));
-+		info->max_virtualisable_vl = __bit_to_vl(b + 1);
+ /*
+@@ -1069,10 +1080,23 @@ int vec_verify_vq_map(enum vec_type type)
+ {
+ 	struct vl_info *info = &vl_info[type];
+ 	DECLARE_BITMAP(tmp_map, SVE_VQ_MAX);
+-	unsigned long b;
++	unsigned long b, max_vl;
  
- 	if (info->max_virtualisable_vl > info->max_vl)
- 		info->max_virtualisable_vl = info->max_vl;
-@@ -1305,10 +1305,10 @@ void __init sme_setup(void)
- 	WARN_ON(bitmap_empty(info->vq_map, SVE_VQ_MAX));
+ 	vec_probe_vqs(info, tmp_map);
  
- 	min_bit = find_last_bit(info->vq_map, SVE_VQ_MAX);
--	info->min_vl = sve_vl_from_vq(__bit_to_vq(min_bit));
-+	info->min_vl = __bit_to_vl(min_bit);
- 
- 	max_bit = find_first_bit(info->vq_map, SVE_VQ_MAX);
--	info->max_vl = sve_vl_from_vq(__bit_to_vq(max_bit));
-+	info->max_vl = __bit_to_vl(max_bit);
- 
- 	WARN_ON(info->min_vl > info->max_vl);
- 
++	/*
++	 * Currently the maximum VL is only used for pKVM which
++	 * doesn't allow late CPUs but we don't expect asymmetry and
++	 * if we encounter any then future users will need handling so
++	 * warn if we see anything.
++	 */
++	max_vl = __bit_to_vl(find_first_bit(tmp_map, SVE_VQ_MAX));
++	if (max_vl > info->max_cpu_vl) {
++		pr_warn("%s: cpu%d: increases maximum VL to %lu\n",
++			info->name, smp_processor_id(), max_vl);
++		info->max_cpu_vl = max_vl;
++	}
++
+ 	bitmap_complement(tmp_map, tmp_map, SVE_VQ_MAX);
+ 	if (bitmap_intersects(tmp_map, info->vq_map, SVE_VQ_MAX)) {
+ 		pr_warn("%s: cpu%d: Required vector length(s) missing\n",
 
 -- 
 2.39.2
