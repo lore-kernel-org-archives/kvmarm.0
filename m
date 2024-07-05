@@ -1,152 +1,61 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68BC3146D7E;
-	Fri,  5 Jul 2024 13:27:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 411272B9B9
+	for <kvmarm@lists.linux.dev>; Fri,  5 Jul 2024 17:00:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720186025; cv=none; b=RGjnZyKHa6i6hQ5dLBRbUgth/ETcHukBfU5il8qsSJklFStZcQRZJKPCbGNQKjgHyNanS+jWMH9cl31O5JFxuLl8eE5im8tB2xNMxAZKTfmkFaZ7iHzmPUoeWb6fziIRm5PtGkpQJQfLvGO/AuAcJvtUFQLvyAG1HL0XzXcPLs4=
+	t=1720198804; cv=none; b=cFX4qS//A5hVPAbJlMY2ys3Xcl72qKWBUVs0rEMHvkad5/Y/Fn8cwMLkyusEVOEFdWmhQUAdmZOXl7FzqN28Zu/ZX5dMaWXkkehyk/YOTAUJ9YYcVi3xB6zwStaPvy60f6UH+tkanpn/+X2zShOn/tc1I3yc44M60KXupBlS+k8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720186025; c=relaxed/simple;
-	bh=ru5P37lngQupBugJph3iDkDpO+qTwdsGIFKM9qjfHQ8=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hcPoimJZrFyQI3J7Ma7ZkLPNW1mz4ken756c05AqgUfsU0SesLZAhIFyVQcqtw0fS7VQS7SOQCDdL8kGgkLgNjtHJWCAp9TU2XEOCKwdhrZU8pD6XgdxlTIXjugn7z729SFgGSjK4jdAYN3mbvet3vYRuFi07boJB3Juz+DuTAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aSBPhYIH; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aSBPhYIH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9DF6C116B1;
-	Fri,  5 Jul 2024 13:27:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720186024;
-	bh=ru5P37lngQupBugJph3iDkDpO+qTwdsGIFKM9qjfHQ8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=aSBPhYIHehQFlP8X/q5YuMtFK8Q4e1FR684Nf+HPiwyAnKVMbvfk91UOXWcWQPD1I
-	 jmbhCFLSKlmv/br+opPe3bgnPN/8NbZLkYsYm3XpZE/xARydvSHBRDdB/bbzVhAXMS
-	 Cxjb+mVgPqPdfMRAUlWXA+SNDLj+eypijFhGbjhSGOG5LuNLl9sgtHM1A4gAMLcn70
-	 oj0B+x18C7xnvSs0HW+mK8TiFHHKCYEgXmYExVjF3Vbw28TyoqZV2aKojNFKSe0EE4
-	 0ey7bBjUc97IzrxV/kZsnFsRifWFU+W5xIvgmWAcJJwoFTXbMQcPCdXqF4NkSaTxbi
-	 1Sk/n5WD5dRVg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sPixq-00A3wi-BU;
-	Fri, 05 Jul 2024 14:27:02 +0100
-Date: Fri, 05 Jul 2024 14:27:01 +0100
-Message-ID: <868qyg3r6i.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
+	s=arc-20240116; t=1720198804; c=relaxed/simple;
+	bh=k+tehCjGizrZ3p48OloAFBbe/VVxgMIyazVIufLISBY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EbaDQm0a/otVpwe5sJRDQeoAlOIWqTrPdZZsDlR2YhkI0tpTUvmZE7h+27Fz5WzwvANLdx7huHgxa8cHPa0qmiEUZYM8TrWHVXKrYd8GzlVuXNUVe1G7SQfA4IxD/b7pSE+bn6PDk6y7VTf0YS3Xuui617z1Tvg08qxP/1MMS5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AEF3FDA7;
+	Fri,  5 Jul 2024 10:00:26 -0700 (PDT)
+Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D9D913F762;
+	Fri,  5 Jul 2024 09:59:57 -0700 (PDT)
+Date: Fri, 5 Jul 2024 17:59:55 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
+	aneesh.kumar@kernel.org, aneesh.kumar@linux.ibm.com, bp@alien8.de,
+	broonie@kernel.org, christophe.leroy@csgroup.eu,
+	dave.hansen@linux.intel.com, hpa@zytor.com,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
+	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
+	oliver.upton@linux.dev, shuah@kernel.org, szabolcs.nagy@arm.com,
+	tglx@linutronix.de, will@kernel.org, x86@kernel.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 3/4] KVM: arm64: Fix FFR offset calculation for pKVM host state save and restore
-In-Reply-To: <20240704-kvm-arm64-fix-pkvm-sve-vl-v4-3-b6898ab23dc4@kernel.org>
-References: <20240704-kvm-arm64-fix-pkvm-sve-vl-v4-0-b6898ab23dc4@kernel.org>
-	<20240704-kvm-arm64-fix-pkvm-sve-vl-v4-3-b6898ab23dc4@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.3
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+Subject: Re: [PATCH v4 17/29] arm64: implement PKEYS support
+Message-ID: <Zogmi1AogxHWlWWR@arm.com>
+References: <20240503130147.1154804-1-joey.gouly@arm.com>
+ <20240503130147.1154804-18-joey.gouly@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, tabba@google.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240503130147.1154804-18-joey.gouly@arm.com>
 
-On Thu, 04 Jul 2024 18:28:18 +0100,
-Mark Brown <broonie@kernel.org> wrote:
-> 
-> When saving and restoring the SVE state for the host we configure the
-> hardware for the maximum VL it supports, but when calculating offsets in
-> memory we use the maximum usable VL for the host. Since these two values
-> may not be the same this may result in data corruption.  We can just
-> read the current VL from the hardware with an instruction so do that
-> instead of a saved value, we need to correct the value and this makes
-> the consistency obvious.
+On Fri, May 03, 2024 at 02:01:35PM +0100, Joey Gouly wrote:
+> @@ -163,7 +182,8 @@ static inline pteval_t __phys_to_pte_val(phys_addr_t phys)
+>  #define pte_access_permitted_no_overlay(pte, write) \
+>  	(((pte_val(pte) & (PTE_VALID | PTE_USER)) == (PTE_VALID | PTE_USER)) && (!(write) || pte_write(pte)))
+>  #define pte_access_permitted(pte, write) \
+> -	pte_access_permitted_no_overlay(pte, write)
+> +	(pte_access_permitted_no_overlay(pte, write) && \
+> +	por_el0_allows_pkey(FIELD_GET(PTE_PO_IDX_MASK, pte_val(pte)), write, false))
 
-Which value are we correcting?
+I'm still not entirely convinced on checking the keys during fast GUP
+but that's what x86 and powerpc do already, so I guess we'll follow the
+same ABI.
 
-> 
-> Fixes: b5b9955617bc ("KVM: arm64: Eagerly restore host fpsimd/sve state in pKVM")
-> Signed-off-by: Mark Brown <broonie@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_hyp.h        | 1 +
->  arch/arm64/kvm/hyp/fpsimd.S             | 5 +++++
->  arch/arm64/kvm/hyp/include/hyp/switch.h | 2 +-
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c      | 2 +-
->  4 files changed, 8 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-> index b05bceca3385..7510383d78a6 100644
-> --- a/arch/arm64/include/asm/kvm_hyp.h
-> +++ b/arch/arm64/include/asm/kvm_hyp.h
-> @@ -113,6 +113,7 @@ void __fpsimd_save_state(struct user_fpsimd_state *fp_regs);
->  void __fpsimd_restore_state(struct user_fpsimd_state *fp_regs);
->  void __sve_save_state(void *sve_pffr, u32 *fpsr, int save_ffr);
->  void __sve_restore_state(void *sve_pffr, u32 *fpsr, int restore_ffr);
-> +int __sve_get_vl(void);
-
-Is there any case where you'd consider returning a signed value? Given
-the multiplier of '1', I don't see it likely to happen.
-
->  
->  u64 __guest_enter(struct kvm_vcpu *vcpu);
->  
-> diff --git a/arch/arm64/kvm/hyp/fpsimd.S b/arch/arm64/kvm/hyp/fpsimd.S
-> index e950875e31ce..d272dbf36da8 100644
-> --- a/arch/arm64/kvm/hyp/fpsimd.S
-> +++ b/arch/arm64/kvm/hyp/fpsimd.S
-> @@ -31,3 +31,8 @@ SYM_FUNC_START(__sve_save_state)
->  	sve_save 0, x1, x2, 3
->  	ret
->  SYM_FUNC_END(__sve_save_state)
-> +
-> +SYM_FUNC_START(__sve_get_vl)
-> +	_sve_rdvl	0, 1
-> +	ret
-> +SYM_FUNC_END(__sve_get_vl)
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index 0c4de44534b7..06efcca765cc 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -327,7 +327,7 @@ static inline void __hyp_sve_save_host(void)
->  
->  	sve_state->zcr_el1 = read_sysreg_el1(SYS_ZCR);
->  	write_sysreg_s(ZCR_ELx_LEN_MASK, SYS_ZCR_EL2);
-> -	__sve_save_state(sve_state->sve_regs + sve_ffr_offset(kvm_host_sve_max_vl),
-> +	__sve_save_state(sve_state->sve_regs + sve_ffr_offset(__sve_get_vl()),
->  			 &sve_state->fpsr,
->  			 true);
->  }
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index f43d845f3c4e..bd8f671e848c 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -49,7 +49,7 @@ static void __hyp_sve_restore_host(void)
->  	 * supported by the system (or limited at EL3).
->  	 */
->  	write_sysreg_s(ZCR_ELx_LEN_MASK, SYS_ZCR_EL2);
-> -	__sve_restore_state(sve_state->sve_regs + sve_ffr_offset(kvm_host_sve_max_vl),
-> +	__sve_restore_state(sve_state->sve_regs + sve_ffr_offset(__sve_get_vl()),
->  			    &sve_state->fpsr,
->  			    true);
->  	write_sysreg_el1(sve_state->zcr_el1, SYS_ZCR);
-> 
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
