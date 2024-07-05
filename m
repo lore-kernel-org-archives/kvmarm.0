@@ -1,72 +1,122 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FF3C148853;
-	Fri,  5 Jul 2024 10:54:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7096413665A;
+	Fri,  5 Jul 2024 11:07:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720176870; cv=none; b=UdM7fcw+5HyVLY1GObipwC9fobJTdeoeweZGWVrIKIOK0b1ZOdBCwj7Uv3P/gWC1EP+rFQlcxRIp7XyxsXn03py4Htb1d5GSBgejUoEFE4Pa+MH2uyRvVnS2MX3n6nFpzDiUAAw/CyFvaS99etP/B9pgng8Ky8C9EAe0mBGwJRM=
+	t=1720177675; cv=none; b=osySNTGG4v9w1GVy3sWKulDBix5T4lsbnysBWtsGwVQ3gdcXOL50Up0/DDZZtRRFW9GvbO9utPMJPdYZkupnOQc35tAkSnGol0IWjKbjVSFxBJ3VdpSra9b3++cXrqBJ/cBaMXwXdS+W6U5C+gbZ8MwlGEh6nNQaNCBEVJU+otQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720176870; c=relaxed/simple;
-	bh=LwFcWS6a0T11fX+OPNLcDiC797vYG5zuq6mIL0BRjgo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uC5uqoi4mdDdorSGBhRxC7T9OuHhkG3VhXReABptrJNo2vqwpIU5KFVcQZFpA4QwUGIW3V5LssA/02azijz4YkmdnQrxdYkhA+vcBIK2QOelCAjHPxJUiP2qCyEfbrqU02nhuH1V7FhFjxNsf0NoNPAyBWQ1JhxP/NnyIr0i3E8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ah0ECE6U; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1720177675; c=relaxed/simple;
+	bh=sBt65f4Hf0k3TzKERrmMvOBm6cmevdehMYOf8Ymnjj8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hL+7su8eaD0EaItj3ZYzpUig6/KU6dbeITo+j/3WtaD/ZmtQmMzvS38aHZvCd4k/c+KO81UvBYrN8iXhpY+3nRsyQlg7oz5vlbFlchQMYcAfxflRNSQgU/2AH8/XYhHzPmkiapnKI6GvlcvbJPyjiXXq8sVJYIcJ9oQSyySGai4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uhbsqzDg; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ah0ECE6U"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CA47C32781;
-	Fri,  5 Jul 2024 10:54:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uhbsqzDg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B950C116B1;
+	Fri,  5 Jul 2024 11:07:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720176870;
-	bh=LwFcWS6a0T11fX+OPNLcDiC797vYG5zuq6mIL0BRjgo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Ah0ECE6UIFbNSOGG9+gFfYVTwFm3fmkJYAsXJueTumbQZkPehLLBYVbRKbdGHIauk
-	 kOGhtocZCACL00SjSoxDcqohtBiTRzMJ3vJ8SXU1I0J6mgMmqFXpdEEGAHAd+R8ZC8
-	 HlsqA6KFijyg8WK+uToeshCt5NnqCqV97w9jU0keIzO0g0/YPWHzpRb+OKMARsoM38
-	 tzkdwTv59Wjn5rKbSP8sm9QE5f+Yn5un5EcvmJEcvP7PABR3ERs0jQ4ljQK2ejEpjj
-	 n6PwwSkLUXvZunB406XTkbgKooNtbuBsKqoF46hG6OAls5LJWEbDBieMcf9Jxim3Ui
-	 Z2OhiRxrF0VuA==
+	s=k20201202; t=1720177675;
+	bh=sBt65f4Hf0k3TzKERrmMvOBm6cmevdehMYOf8Ymnjj8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uhbsqzDgem2RIW9aYbV1FncW+hT3pY4I9ae35c5JZ8rqQvthK6ponowFvhIEjT6j2
+	 W0hPPpxVvi6UIAsjzdaVI66+EFUMkd5XTAYXYOgnzuGy3pMq7lWzcayyVqtrpsbByO
+	 vdbPwRlgCs40xVds7OAdapU+D3VqMu4/SUPmF0Xjb0q2cuPi8NFbon6AcFDv96UZRq
+	 l2nv5TSU/uHXjKaq4+PAAfGIxVSJNWSbWAkwN2fbpJyznvtnVtynU6jgFhouiUy+hg
+	 9dk0BSSazPD1a4TKh5WVZrHYBWz5fBW8jgZ/TeYUAw5VkPdOhnnezu5MYcOuB1jfXv
+	 sP/sTzwauNKew==
+Date: Fri, 5 Jul 2024 12:07:48 +0100
 From: Will Deacon <will@kernel.org>
-To: kvmarm@lists.linux.dev,
-	Oliver Upton <oliver.upton@linux.dev>
-Cc: catalin.marinas@arm.com,
-	kernel-team@android.com,
-	Will Deacon <will@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	kvm@vger.kernel.org,
-	Fuad Tabba <tabba@google.com>,
-	Julien Thierry <julien.thierry.kdev@gmail.com>
-Subject: Re: [PATCH kvmtool] arm64: Allow the user to select the max SVE vector length
-Date: Fri,  5 Jul 2024 11:54:17 +0100
-Message-Id: <172017597959.498066.14103615138386317117.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20240620165702.1134918-2-oliver.upton@linux.dev>
-References: <20240620165702.1134918-2-oliver.upton@linux.dev>
+To: Sebastian Ene <sebastianene@google.com>
+Cc: akpm@linux-foundation.org, alexghiti@rivosinc.com, ankita@nvidia.com,
+	ardb@kernel.org, catalin.marinas@arm.com,
+	christophe.leroy@csgroup.eu, james.morse@arm.com,
+	vdonnefort@google.com, mark.rutland@arm.com, maz@kernel.org,
+	oliver.upton@linux.dev, rananta@google.com, ryan.roberts@arm.com,
+	shahuang@redhat.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, kernel-team@android.com
+Subject: Re: [PATCH v7 2/6] arm64: ptdump: Expose the attribute parsing
+ functionality
+Message-ID: <20240705110747.GA9231@willie-the-truck>
+References: <20240621123230.1085265-1-sebastianene@google.com>
+ <20240621123230.1085265-3-sebastianene@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240621123230.1085265-3-sebastianene@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Thu, 20 Jun 2024 16:57:03 +0000, Oliver Upton wrote:
-> Add a new flag, --sve-max-vl, which allows the user to specify an SVE
-> vector length for the VM. Just zero out unsupported VLs from what KVM
-> supports rather than cooking up the bitmap from scratch.
+On Fri, Jun 21, 2024 at 12:32:26PM +0000, Sebastian Ene wrote:
+> Reuse the descriptor parsing functionality to keep the same output format
+> as the original ptdump code. In order for this to happen, move the state
+> tracking objects into a common header.
 > 
+> Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> ---
+>  arch/arm64/include/asm/ptdump.h | 41 ++++++++++++++++++++++++++++++++-
+>  arch/arm64/mm/ptdump.c          | 37 ++---------------------------
+>  2 files changed, 42 insertions(+), 36 deletions(-)
 > 
+> diff --git a/arch/arm64/include/asm/ptdump.h b/arch/arm64/include/asm/ptdump.h
+> index 5b1701c76d1c..c550b2afcab7 100644
+> --- a/arch/arm64/include/asm/ptdump.h
+> +++ b/arch/arm64/include/asm/ptdump.h
+> @@ -9,6 +9,7 @@
+>  
+>  #include <linux/mm_types.h>
+>  #include <linux/seq_file.h>
+> +#include <linux/ptdump.h>
+>  
+>  struct addr_marker {
+>  	unsigned long start_address;
+> @@ -21,14 +22,52 @@ struct ptdump_info {
+>  	unsigned long			base_addr;
+>  };
+>  
+> +struct prot_bits {
+> +	u64		mask;
+> +	u64		val;
+> +	const char	*set;
+> +	const char	*clear;
+> +};
+> +
+> +struct pg_level {
+> +	const struct prot_bits *bits;
+> +	char name[4];
+> +	int num;
+> +	u64 mask;
+> +};
+> +
+> +/*
+> + * The page dumper groups page table entries of the same type into a single
+> + * description. It uses pg_state to track the range information while
+> + * iterating over the pte entries. When the continuity is broken it then
+> + * dumps out a description of the range.
+> + */
+> +struct pg_state {
+> +	struct ptdump_state ptdump;
+> +	struct seq_file *seq;
+> +	const struct addr_marker *marker;
+> +	const struct mm_struct *mm;
+> +	unsigned long start_address;
+> +	int level;
+> +	u64 current_prot;
+> +	bool check_wx;
+> +	unsigned long wx_pages;
+> +	unsigned long uxn_pages;
+> +};
 
-Applied to kvmtool (master), thanks!
+Minor nit, but if we're moving these structure definitions into the
+header then I'd be inclined to give them some more specific names (e.g.
+prefix them with 'ptdump_'). Granted, this header isn't used widely, but
+it's included by arch/arm64/mm/mmu.c and claiming 'struct prot_bits' is
+a bit over-reaching imo!
 
-[1/1] arm64: Allow the user to select the max SVE vector length
-      https://git.kernel.org/will/kvmtool/c/ca31abf5d9c3
-
-Cheers,
--- 
 Will
-
-https://fixes.arm64.dev
-https://next.arm64.dev
-https://will.arm64.dev
