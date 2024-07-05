@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7F0C1DFF4;
-	Fri,  5 Jul 2024 13:20:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68BC3146D7E;
+	Fri,  5 Jul 2024 13:27:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720185608; cv=none; b=FcocbNzFD2J/xm4sLZtVVHA0/F1KLxRF2i7JJrI/GiWdpsZVdH9b/9Bhr0lwaajmB2gcn1XBp3YaxGd3onkc12qSlRlOq9q+qFLpb8IKN/hz4Akrw+2ZCL7t9HVuPdHDYsgAllqeijQfzNWqIs4Ufj2FTYO+syYQ4opLg6BHwD8=
+	t=1720186025; cv=none; b=RGjnZyKHa6i6hQ5dLBRbUgth/ETcHukBfU5il8qsSJklFStZcQRZJKPCbGNQKjgHyNanS+jWMH9cl31O5JFxuLl8eE5im8tB2xNMxAZKTfmkFaZ7iHzmPUoeWb6fziIRm5PtGkpQJQfLvGO/AuAcJvtUFQLvyAG1HL0XzXcPLs4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720185608; c=relaxed/simple;
-	bh=QUhCNAgTuGB0igzzCmZLsmZgPcifJMCXGxFbVnHj46c=;
+	s=arc-20240116; t=1720186025; c=relaxed/simple;
+	bh=ru5P37lngQupBugJph3iDkDpO+qTwdsGIFKM9qjfHQ8=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ivyIbdKHk5EO84Eb66xOnT0u96u1EzNf/2WdmNdaE152KCAEXdg2FPrFRkS6D8Lf/HPjAStugxDDsWgTs5dxzUiosOm16WAwTsVBL4Gaf3Ceyk9VbBsLQnlyLNSmZ8iK8b6VxNDjcBS9FnebOMAnds+OkijemHE4Mg90/BX720A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tYQfSzME; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=hcPoimJZrFyQI3J7Ma7ZkLPNW1mz4ken756c05AqgUfsU0SesLZAhIFyVQcqtw0fS7VQS7SOQCDdL8kGgkLgNjtHJWCAp9TU2XEOCKwdhrZU8pD6XgdxlTIXjugn7z729SFgGSjK4jdAYN3mbvet3vYRuFi07boJB3Juz+DuTAg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aSBPhYIH; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tYQfSzME"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79A50C116B1;
-	Fri,  5 Jul 2024 13:20:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aSBPhYIH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9DF6C116B1;
+	Fri,  5 Jul 2024 13:27:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720185608;
-	bh=QUhCNAgTuGB0igzzCmZLsmZgPcifJMCXGxFbVnHj46c=;
+	s=k20201202; t=1720186024;
+	bh=ru5P37lngQupBugJph3iDkDpO+qTwdsGIFKM9qjfHQ8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tYQfSzMECZKoy7nvUbsYVAKaJud5oS/FlrY4bgTU9EeYbfc5d3dSkOJvy0qNdJRzQ
-	 /rmKievPsI/lyYvKoeF8EMCe28RXbKxIU954Tz0uQY9zYdv9Pfzer6Xwcms3gDmjKI
-	 2Kp6rLI9YIkWGHuLbsDtg3YV3VvVAT4sKf1BUDS0ypDHKXk7EHboOu2ERFlui1NJcB
-	 bSPgM+iEFdkSXVQajXtJVtk1S+phI1cVSbyvcB0+cZhw+pRWEmf9bqhxIlvWARz75a
-	 lB+nUzeNi9w1OSImDcbjcvACMDHTijfU7xGR3ep/vm/RTHk/FT6aG4+j7LlXDsMF4U
-	 r7OXQ+2HNQraw==
+	b=aSBPhYIHehQFlP8X/q5YuMtFK8Q4e1FR684Nf+HPiwyAnKVMbvfk91UOXWcWQPD1I
+	 jmbhCFLSKlmv/br+opPe3bgnPN/8NbZLkYsYm3XpZE/xARydvSHBRDdB/bbzVhAXMS
+	 Cxjb+mVgPqPdfMRAUlWXA+SNDLj+eypijFhGbjhSGOG5LuNLl9sgtHM1A4gAMLcn70
+	 oj0B+x18C7xnvSs0HW+mK8TiFHHKCYEgXmYExVjF3Vbw28TyoqZV2aKojNFKSe0EE4
+	 0ey7bBjUc97IzrxV/kZsnFsRifWFU+W5xIvgmWAcJJwoFTXbMQcPCdXqF4NkSaTxbi
+	 1Sk/n5WD5dRVg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sPir8-00A3qu-Gl;
-	Fri, 05 Jul 2024 14:20:06 +0100
-Date: Fri, 05 Jul 2024 14:20:05 +0100
-Message-ID: <86a5iw3ri2.wl-maz@kernel.org>
+	id 1sPixq-00A3wi-BU;
+	Fri, 05 Jul 2024 14:27:02 +0100
+Date: Fri, 05 Jul 2024 14:27:01 +0100
+Message-ID: <868qyg3r6i.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Mark Brown <broonie@kernel.org>
 Cc: Catalin Marinas <catalin.marinas@arm.com>,
@@ -45,9 +45,10 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 0/4] KVM: arm64: Fix underallocation of storage for SVE state
-In-Reply-To: <20240704-kvm-arm64-fix-pkvm-sve-vl-v4-0-b6898ab23dc4@kernel.org>
+Subject: Re: [PATCH v4 3/4] KVM: arm64: Fix FFR offset calculation for pKVM host state save and restore
+In-Reply-To: <20240704-kvm-arm64-fix-pkvm-sve-vl-v4-3-b6898ab23dc4@kernel.org>
 References: <20240704-kvm-arm64-fix-pkvm-sve-vl-v4-0-b6898ab23dc4@kernel.org>
+	<20240704-kvm-arm64-fix-pkvm-sve-vl-v4-3-b6898ab23dc4@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.3
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -63,26 +64,89 @@ X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 04 Jul 2024 18:28:15 +0100,
+On Thu, 04 Jul 2024 18:28:18 +0100,
 Mark Brown <broonie@kernel.org> wrote:
 > 
-> As observed during review the pKVM support for saving host SVE state is
-> broken if an asymmetric system has VLs larger than the maximum shared
-> VL, fix this by discovering then using the maximum VL for allocations
-> and using RDVL during the save/restore process.
+> When saving and restoring the SVE state for the host we configure the
+> hardware for the maximum VL it supports, but when calculating offsets in
+> memory we use the maximum usable VL for the host. Since these two values
+> may not be the same this may result in data corruption.  We can just
+> read the current VL from the hardware with an instruction so do that
+> instead of a saved value, we need to correct the value and this makes
+> the consistency obvious.
 
-I really don't see why we need such complexity here.
+Which value are we correcting?
 
-Fuad did post something[1] that did the trick with a far less invasive
-change, and it really feels like we are putting the complexity at the
-wrong place.
+> 
+> Fixes: b5b9955617bc ("KVM: arm64: Eagerly restore host fpsimd/sve state in pKVM")
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_hyp.h        | 1 +
+>  arch/arm64/kvm/hyp/fpsimd.S             | 5 +++++
+>  arch/arm64/kvm/hyp/include/hyp/switch.h | 2 +-
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c      | 2 +-
+>  4 files changed, 8 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+> index b05bceca3385..7510383d78a6 100644
+> --- a/arch/arm64/include/asm/kvm_hyp.h
+> +++ b/arch/arm64/include/asm/kvm_hyp.h
+> @@ -113,6 +113,7 @@ void __fpsimd_save_state(struct user_fpsimd_state *fp_regs);
+>  void __fpsimd_restore_state(struct user_fpsimd_state *fp_regs);
+>  void __sve_save_state(void *sve_pffr, u32 *fpsr, int save_ffr);
+>  void __sve_restore_state(void *sve_pffr, u32 *fpsr, int restore_ffr);
+> +int __sve_get_vl(void);
 
-So what's wrong with that approach? I get that you want to shout about
-secondary CPUs, but that's an orthogonal problem.
+Is there any case where you'd consider returning a signed value? Given
+the multiplier of '1', I don't see it likely to happen.
+
+>  
+>  u64 __guest_enter(struct kvm_vcpu *vcpu);
+>  
+> diff --git a/arch/arm64/kvm/hyp/fpsimd.S b/arch/arm64/kvm/hyp/fpsimd.S
+> index e950875e31ce..d272dbf36da8 100644
+> --- a/arch/arm64/kvm/hyp/fpsimd.S
+> +++ b/arch/arm64/kvm/hyp/fpsimd.S
+> @@ -31,3 +31,8 @@ SYM_FUNC_START(__sve_save_state)
+>  	sve_save 0, x1, x2, 3
+>  	ret
+>  SYM_FUNC_END(__sve_save_state)
+> +
+> +SYM_FUNC_START(__sve_get_vl)
+> +	_sve_rdvl	0, 1
+> +	ret
+> +SYM_FUNC_END(__sve_get_vl)
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index 0c4de44534b7..06efcca765cc 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -327,7 +327,7 @@ static inline void __hyp_sve_save_host(void)
+>  
+>  	sve_state->zcr_el1 = read_sysreg_el1(SYS_ZCR);
+>  	write_sysreg_s(ZCR_ELx_LEN_MASK, SYS_ZCR_EL2);
+> -	__sve_save_state(sve_state->sve_regs + sve_ffr_offset(kvm_host_sve_max_vl),
+> +	__sve_save_state(sve_state->sve_regs + sve_ffr_offset(__sve_get_vl()),
+>  			 &sve_state->fpsr,
+>  			 true);
+>  }
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> index f43d845f3c4e..bd8f671e848c 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> @@ -49,7 +49,7 @@ static void __hyp_sve_restore_host(void)
+>  	 * supported by the system (or limited at EL3).
+>  	 */
+>  	write_sysreg_s(ZCR_ELx_LEN_MASK, SYS_ZCR_EL2);
+> -	__sve_restore_state(sve_state->sve_regs + sve_ffr_offset(kvm_host_sve_max_vl),
+> +	__sve_restore_state(sve_state->sve_regs + sve_ffr_offset(__sve_get_vl()),
+>  			    &sve_state->fpsr,
+>  			    true);
+>  	write_sysreg_el1(sve_state->zcr_el1, SYS_ZCR);
+> 
+
+Thanks,
 
 	M.
-
-[1] https://lore.kernel.org/r/20240606092623.2236172-1-tabba@google.com
 
 -- 
 Without deviation from the norm, progress is not possible.
