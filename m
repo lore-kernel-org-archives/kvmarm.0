@@ -1,52 +1,53 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0171D145B0F
-	for <kvmarm@lists.linux.dev>; Fri,  5 Jul 2024 12:08:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7F0C1DFF4;
+	Fri,  5 Jul 2024 13:20:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720181335; cv=none; b=Ia9UKkLf/9NavUi1pD9es4PqW9Ply8DrMbH0YC+I76BGaXHDCpBnSwXcMCwg+gVTTtbWx/W6Af4QeI0LLGGhmSHoIvt94i9hoz4JqAkeRxwheQcQ/jyXjtVhh/7va2iI7YR9LBlT9YZC1ueAfKtPT8N0QQ/4m1KA4Vd+S12bwKc=
+	t=1720185608; cv=none; b=FcocbNzFD2J/xm4sLZtVVHA0/F1KLxRF2i7JJrI/GiWdpsZVdH9b/9Bhr0lwaajmB2gcn1XBp3YaxGd3onkc12qSlRlOq9q+qFLpb8IKN/hz4Akrw+2ZCL7t9HVuPdHDYsgAllqeijQfzNWqIs4Ufj2FTYO+syYQ4opLg6BHwD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720181335; c=relaxed/simple;
-	bh=0V6C9qkhhtx70gyUjFPxOUyTBxZUI1Z54qiQ6pL9Avc=;
+	s=arc-20240116; t=1720185608; c=relaxed/simple;
+	bh=QUhCNAgTuGB0igzzCmZLsmZgPcifJMCXGxFbVnHj46c=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EMqERAQBcBj6THqIGP48BWvUU5g5FIarADfNqABEDevydy+6tVCuxw0x1tE/kg1OGjS4vP4VvQM0hNE5w7w7n3EggBreViqcL4/xi09jrwsTOupPhEcihRqVRteYf2k1+lwc0KFvaqQkjR3BI06i9IGQDArw1T7KwkekNLR4EP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SVtgr4AX; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=ivyIbdKHk5EO84Eb66xOnT0u96u1EzNf/2WdmNdaE152KCAEXdg2FPrFRkS6D8Lf/HPjAStugxDDsWgTs5dxzUiosOm16WAwTsVBL4Gaf3Ceyk9VbBsLQnlyLNSmZ8iK8b6VxNDjcBS9FnebOMAnds+OkijemHE4Mg90/BX720A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tYQfSzME; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SVtgr4AX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73AFBC116B1;
-	Fri,  5 Jul 2024 12:08:54 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tYQfSzME"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79A50C116B1;
+	Fri,  5 Jul 2024 13:20:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720181334;
-	bh=0V6C9qkhhtx70gyUjFPxOUyTBxZUI1Z54qiQ6pL9Avc=;
+	s=k20201202; t=1720185608;
+	bh=QUhCNAgTuGB0igzzCmZLsmZgPcifJMCXGxFbVnHj46c=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=SVtgr4AXv7n3jLj0YRiVeHfS+iM1S7k7SABfgjEpOv5v7XdFItzacLo8FpO0dgBFH
-	 5mDkTUR06xAWoSOohOT/MqQV4CIE+WmdXTHPvMMP30SIHWtH6lG3gXui0/OgXHqO+z
-	 ZK0notQJGE3+ooL03hq8GS5QzjUC2kqfOD2oUwMkSRuKAU7xUHvf72wxWiLgOMZyQA
-	 n2CuO7SQXTbksQ/6zqbJOiFqDKSAzEz8Ch/8oWIvULw2zMQ6Jivj2ZgY1sb8aM7ih7
-	 bMhNBwDKKUeJXib9MMdJzgNMAHZlxroTaVP+UDSU+l3MAGHDPp+vFMSCFpUYi8gXQ8
-	 RC7tm560jdl7A==
+	b=tYQfSzMECZKoy7nvUbsYVAKaJud5oS/FlrY4bgTU9EeYbfc5d3dSkOJvy0qNdJRzQ
+	 /rmKievPsI/lyYvKoeF8EMCe28RXbKxIU954Tz0uQY9zYdv9Pfzer6Xwcms3gDmjKI
+	 2Kp6rLI9YIkWGHuLbsDtg3YV3VvVAT4sKf1BUDS0ypDHKXk7EHboOu2ERFlui1NJcB
+	 bSPgM+iEFdkSXVQajXtJVtk1S+phI1cVSbyvcB0+cZhw+pRWEmf9bqhxIlvWARz75a
+	 lB+nUzeNi9w1OSImDcbjcvACMDHTijfU7xGR3ep/vm/RTHk/FT6aG4+j7LlXDsMF4U
+	 r7OXQ+2HNQraw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sPhkC-00A31j-3f;
-	Fri, 05 Jul 2024 13:08:52 +0100
-Date: Fri, 05 Jul 2024 13:08:51 +0100
-Message-ID: <86bk3c3uss.wl-maz@kernel.org>
+	id 1sPir8-00A3qu-Gl;
+	Fri, 05 Jul 2024 14:20:06 +0100
+Date: Fri, 05 Jul 2024 14:20:05 +0100
+Message-ID: <86a5iw3ri2.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Joey Gouly <joey.gouly@arm.com>,
+To: Mark Brown <broonie@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>
-Subject: Re: [PATCH] KVM: arm64: nv: Fix RESx behaviour of disabled FGTs with negative polarity
-In-Reply-To: <171839668434.686757.6430070893119235107.b4-ty@linux.dev>
-References: <20240614125858.78361-1-maz@kernel.org>
-	<171839668434.686757.6430070893119235107.b4-ty@linux.dev>
+	Fuad Tabba <tabba@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v4 0/4] KVM: arm64: Fix underallocation of storage for SVE state
+In-Reply-To: <20240704-kvm-arm64-fix-pkvm-sve-vl-v4-0-b6898ab23dc4@kernel.org>
+References: <20240704-kvm-arm64-fix-pkvm-sve-vl-v4-0-b6898ab23dc4@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.3
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -58,64 +59,30 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, james.morse@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, anshuman.khandual@arm.com
+X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, tabba@google.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 14 Jun 2024 21:24:51 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On Thu, 04 Jul 2024 18:28:15 +0100,
+Mark Brown <broonie@kernel.org> wrote:
 > 
-> On Fri, 14 Jun 2024 13:58:58 +0100, Marc Zyngier wrote:
-> > The Fine Grained Trap extension is pretty messy as it doesn't
-> > consistently use the same polarity for all trap bits. A bunch
-> > of them, added later in the life of the architecture, have a
-> > *negative* priority.
-> > 
-> > So if these bits are disabled, they must be RES1 and not RES0.
-> > But that's not what the code implements, making the traps for
-> > these negative trap bits being always on instead of disabled.
-> > 
-> > [...]
-> 
-> Applied to kvmarm/next, thanks!
-> 
-> [1/1] KVM: arm64: nv: Fix RESx behaviour of disabled FGTs with negative polarity
->       https://git.kernel.org/kvmarm/kvmarm/c/eb9d53d4a949
+> As observed during review the pKVM support for saving host SVE state is
+> broken if an asymmetric system has VLs larger than the maximum shared
+> VL, fix this by discovering then using the maximum VL for allocations
+> and using RDVL during the save/restore process.
 
-[+ Anshuman, as I've pointed him to this patch in the past]
+I really don't see why we need such complexity here.
 
-OK, I think I have come to my senses, and came to the conclusion that:
+Fuad did post something[1] that did the trick with a far less invasive
+change, and it really feels like we are putting the complexity at the
+wrong place.
 
-- I am officially losing the plot (blame the political climate)
-
-- this "fix" is total b*ll*cks and must be dropped/reverted
-
-Let remember how this whole thing works. A "negative" trap bit has two
-essential properties:
-
-- it is writable
-
-- it has an effect when set to 0
-
-If the bit isn't implemented, it is RES0. Only RES0. Not RES1, which
-this patch enforces. None of the FGT bits are ever RES1. So at least
-on this front, this patch is broken and results in observable nonsense
-on the guest side.
-
-But there is more! We are already capable of distinguishing a bit that
-traps because it is set to 0 from a bit that is RES0. check_fgt_bit()
-already has all the logic, which is evaluated on any trap.
-
-So we already have the proper filtering in place (a RES0 bit won't
-result in a trap forwarded to a nested guest), the original code was
-correct, and forcing FGT bits to RES1 is just a stupid regression.
-
-Oliver, can you please drop or revert this patch from the kvmarm/next
-branch please?
-
-Thanks and sorry for the noise.
+So what's wrong with that approach? I get that you want to shout about
+secondary CPUs, but that's an orthogonal problem.
 
 	M.
+
+[1] https://lore.kernel.org/r/20240606092623.2236172-1-tabba@google.com
 
 -- 
 Without deviation from the norm, progress is not possible.
