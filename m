@@ -1,122 +1,209 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87DD6146016
-	for <kvmarm@lists.linux.dev>; Mon,  8 Jul 2024 16:28:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58914145A08
+	for <kvmarm@lists.linux.dev>; Mon,  8 Jul 2024 16:51:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720456099; cv=none; b=NP1nTNTlklqwXJGcmJPjaLXbMeV8hH/0Nvd+iY08IcOEqFYfbXIE18HOO8SjddLhRl+LyQN5DMc1m8Fi3SLVr8UJjOKVnnzM2hunXzN+gvuvCI8rSVzMIDXWvZlMC/whGuMf9veIOuzrjmyOG10WNI708IGNft0mV8LycR2nFQU=
+	t=1720457490; cv=none; b=E0lzlnGiffiaWmf4M3muKS0KNqmFrK3Ww5OwlZ8ipS84ibbXOW/gsx6tKfqBAItLr9Je3GwG/Bghqh83F+QOdcLfyK9x0IRhyJPjbWRKtT1O8PpRNUnNY9+G0KISw/NEnc6xJbeYHQ4hD8vGNL1dHnHCMlcOYMQ9xA4BNXeyVrc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720456099; c=relaxed/simple;
-	bh=JHTA5erMNEhfc4CBy7in9bn/seuATamqgPxt4vY6faA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TbyrhPxTj3AfZg7PjVSccLArr9MsAh2DphIi8XuwzhYKAOrA+PPKgN/BB9qYkiSbY7WXlYt0g6HE+3CvoiF+QTfNcpt4LTPyvNsby0I89ijBaL53P5/DTWUVJA5Rb0hv7b2Vb1eHWfybY9HqFOvVCEm1oMfmXnn423qHT0lmmjU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 14C3A1042;
-	Mon,  8 Jul 2024 09:28:41 -0700 (PDT)
-Received: from arm.com (e121798.manchester.arm.com [10.32.101.22])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 77F323F641;
-	Mon,  8 Jul 2024 09:28:14 -0700 (PDT)
-Date: Mon, 8 Jul 2024 17:28:11 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>, Joey Gouly <joey.gouly@arm.com>
-Subject: Re: [PATCH 00/12] KVM: arm64: nv: Add support for address
- translation instructions
-Message-ID: <ZowTm99y4fp9xWL7@arm.com>
-References: <20240625133508.259829-1-maz@kernel.org>
+	s=arc-20240116; t=1720457490; c=relaxed/simple;
+	bh=bT7f63TQT0nCVI2e044tDWWSBtyBG+UKBLYM/Q2ACJ8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pRnwQ0/WwYuaE/PR/XIb/l1A7YWtY3yGlbTSdJZnWgKTufttTMkvk0iJxPPCXe7bEbaYWgly1WOdt//0LOJ4wkhSxt/dkQxWa3adPmNsk/ovMjA0M0TF7evagzDAMWErp0hKuUr7PYpMSxyl5IYHGEwW9k2RFqDGzpQvX3/2rYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eHJgFtME; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eHJgFtME"
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1f70ec6ff8bso6265ad.0
+        for <kvmarm@lists.linux.dev>; Mon, 08 Jul 2024 09:51:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1720457488; x=1721062288; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZTLNn4LGmic6uz3SST2MPov4JwAtgFvBXVkhyUNj6Ls=;
+        b=eHJgFtMETjFI7aCqyBB8i7FcQp+z7HihkCKfCP0Z27Dr4j7LmxlbrTQpl5VjeSLLWJ
+         0PupJFKSPWWLuq0qLpf5EsKhig9qBlreX0z125kT5S1AXA0+wvP/du6ue6zE8n4na9J/
+         TnfZiEac+65b/5QsYFsvodxdVe5xWKZ2tQqkayeWCPIXhukvCwfyWSwSTVrXWjkwBdOW
+         U+KGo5p0NLN5UQQM/c3DtiUMp5d/246D9uD09QVYx/uglEC5KMbBVuNdQRGxJKKNSwoJ
+         VHhkWkvpFvpvm0XxDwuxuWi+eBvhlMaJNZMYEOT6CY8UxjS9+DDyqKKvrDXWV2t+pFfu
+         IUXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720457488; x=1721062288;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZTLNn4LGmic6uz3SST2MPov4JwAtgFvBXVkhyUNj6Ls=;
+        b=HpZClm0N3L8kpp8kt18a59x/7Op8urCR4mIxktJiE9O87JYvG3FYH+rdkh8365/KBE
+         QfEEKLgoWZ+R6koz6sEV7d5AcCJokhwG2rvonq4w1j/oHm+LXECMMG1IFp6mUhZc/3DG
+         xWklLXhjmqTtHwDF1HQr0710jfmXdjNnbZVUFsyDgLxsTbrIYZLBcvHCk4sG2r5iB3hv
+         OKNuGhgthjV4v2Tc8MrdQ/JOOVE9nUCbSG2wx5usrBQELCj03Xj7GAsPUKX2h8ali4QC
+         IKomasLMAKKd8ayVMbdTJmFEw/g+pD83h3LtRoOu4iDqzLhhSQ0JAEV7P2WzSiEfZpOK
+         p3OA==
+X-Forwarded-Encrypted: i=1; AJvYcCU1C0NIqJoOXzSFyrvVmFttE/Io9/A/h3jsIbib2fGtummUvEmsI4cdKWGY8El2uonaAeQCdLVWZqtbpouUYsFMOl2DqdnR
+X-Gm-Message-State: AOJu0Yx/AvrZXp5fpZgzPL2M9OOgyppCi3WAt3fV6SmFsNgm52g9Y/J3
+	FcvYhJKf9mFodnELGGGQbwNPGQ9dAq1jeC/XREcb08BZVPj10pi4r5h0SCnM3ZRlUsy/aKWYfVn
+	l/oKAlTu5c+yca9CyxS71bJe9GBJuIPaoirb3
+X-Google-Smtp-Source: AGHT+IGMZBuODG5Qg+BsiQ0JMRrEsApbDVZodAf/W97JpFbZBYOVdGRDLcd2wERkfLVJkW8bcAp1r3ymFzBf2tplW5Q=
+X-Received: by 2002:a17:903:6d0:b0:1fa:cd15:985e with SMTP id
+ d9443c01a7336-1fb30b895c8mr9496525ad.6.1720457488179; Mon, 08 Jul 2024
+ 09:51:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240625133508.259829-1-maz@kernel.org>
+References: <CAOUHufYGqbd45shZkGCpqeTV9wcBDUoo3iw1SKiDeFLmrP0+=w@mail.gmail.com>
+ <CADrL8HVHcKSW3hiHzKTit07gzo36jtCZCnM9ZpueyifgNdGggw@mail.gmail.com>
+ <ZmioedgEBptNoz91@google.com> <CADrL8HU_FKHTz_6d=xhVLZFDQ_zQo-zdB2rqdpa2CKusa1uo+A@mail.gmail.com>
+ <ZmjtEBH42u7NUWRc@google.com> <CADrL8HUW2q79F0FsEjhGW0ujij6+FfCqas5UpQp27Epfjc94Nw@mail.gmail.com>
+ <ZmxsCwu4uP1lGsWz@google.com> <CADrL8HVDZ+m_-jUCaXf_DWJ92N30oqS=_9wNZwRvoSp5fo7asg@mail.gmail.com>
+ <ZmzPoW7K5GIitQ8B@google.com> <CADrL8HW3rZ5xgbyGa+FXk50QQzF4B1=sYL8zhBepj6tg0EiHYA@mail.gmail.com>
+ <ZnCCZ5gQnA3zMQtv@google.com> <CADrL8HW=kCLoWBwoiSOCd8WHFvBdWaguZ2ureo4eFy9D67+owg@mail.gmail.com>
+In-Reply-To: <CADrL8HW=kCLoWBwoiSOCd8WHFvBdWaguZ2ureo4eFy9D67+owg@mail.gmail.com>
+From: James Houghton <jthoughton@google.com>
+Date: Mon, 8 Jul 2024 09:50:51 -0700
+Message-ID: <CADrL8HUv6T4baOi=VTFV6ZA=Oyn3dEc6Hp9rXXH0imeYkwUhew@mail.gmail.com>
+Subject: Re: [PATCH v5 4/9] mm: Add test_clear_young_fast_only MMU notifier
+To: Sean Christopherson <seanjc@google.com>
+Cc: Yu Zhao <yuzhao@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Ankit Agrawal <ankita@nvidia.com>, 
+	Axel Rasmussen <axelrasmussen@google.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	David Matlack <dmatlack@google.com>, David Rientjes <rientjes@google.com>, 
+	James Morse <james.morse@arm.com>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Raghavendra Rao Ananta <rananta@google.com>, 
+	Ryan Roberts <ryan.roberts@arm.com>, Shaoqin Huang <shahuang@redhat.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Wei Xu <weixugc@google.com>, 
+	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Marc,
+On Fri, Jun 28, 2024 at 7:38=E2=80=AFPM James Houghton <jthoughton@google.c=
+om> wrote:
+>
+> On Mon, Jun 17, 2024 at 11:37=E2=80=AFAM Sean Christopherson <seanjc@goog=
+le.com> wrote:
+> >
+> > On Mon, Jun 17, 2024, James Houghton wrote:
+> > > On Fri, Jun 14, 2024 at 4:17=E2=80=AFPM Sean Christopherson <seanjc@g=
+oogle.com> wrote:
+> > > > Ooh!  Actually, after fiddling a bit to see how feasible fast-aging=
+ in the shadow
+> > > > MMU would be, I'm pretty sure we can do straight there for nested T=
+DP.  Or rather,
+> > > > I suspect/hope we can get close enough for an initial merge, which =
+would allow
+> > > > aging_is_fast to be a property of the mmu_notifier, i.e. would simp=
+lify things
+> > > > because KVM wouldn't need to communicate MMU_NOTIFY_WAS_FAST for ea=
+ch notification.
+> > > >
+> > > > Walking KVM's rmaps requires mmu_lock because adding/removing rmap =
+entries is done
+> > > > in such a way that a lockless walk would be painfully complex.  But=
+ if there is
+> > > > exactly _one_ rmap entry for a gfn, then slot->arch.rmap[...] point=
+s directly at
+> > > > that one SPTE.  And with nested TDP, unless L1 is doing something u=
+ncommon, e.g.
+> > > > mapping the same page into multiple L2s, that overwhelming vast maj=
+ority of rmaps
+> > > > have only one entry.  That's not the case for legacy shadow paging =
+because kernels
+> > > > almost always map a pfn using multiple virtual addresses, e.g. Linu=
+x's direct map
+> > > > along with any userspace mappings.
+>
+> Hi Sean, sorry for taking so long to get back to you.
+>
+> So just to make sure I have this right: if L1 is using TDP, the gfns
+> in L0 will usually only be mapped by a single spte. If L1 is not using
+> TDP, then all bets are off. Is that true?
+>
+> If that is true, given that we don't really have control over whether
+> or not L1 decides to use TDP, the lockless shadow MMU walk will work,
+> but, if L1 is not using TDP, it will often return false negatives
+> (says "old" for an actually-young gfn). So then I don't really
+> understand conditioning the lockless shadow MMU walk on us (L0) using
+> the TDP MMU[1]. We care about L1, right?
 
-On Tue, Jun 25, 2024 at 02:34:59PM +0100, Marc Zyngier wrote:
-> Another task that a hypervisor supporting NV on arm64 has to deal with
-> is to emulate the AT instruction, because we multiplex all the S1
-> translations on a single set of registers, and the guest S2 is never
-> truly resident on the CPU.
-> 
-> So given that we lie about page tables, we also have to lie about
-> translation instructions, hence the emulation. Things are made
-> complicated by the fact that guest S1 page tables can be swapped out,
-> and that our shadow S2 is likely to be incomplete. So while using AT
-> to emulate AT is tempting (and useful), it is not going to always
-> work, and we thus need a fallback in the shape of a SW S1 walker.
-> 
-> This series is built in 4 basic blocks:
-> 
-> - Add missing definition and basic reworking
-> 
-> - Dumb emulation of all relevant AT instructions using AT instructions
-> 
-> - Add a SW S1 walker that is using our S2 walker
+Ok I think I understand now. If L1 is using shadow paging, L2 is
+accessing memory the same way L1 would, so we use the TDP MMU at L0
+for this case (if tdp_mmu_enabled). If L1 is using TDP, then we must
+use the shadow MMU, so that's the interesting case.
 
-I wanted to have a look at the S1 walker, and in my inbox I only have
-patches #1 to #9 ("KVM: arm64: nv: Make ps_to_output_size() generally
-available"). Checked on the kvm mailing list archive [1], same thing; a
-google search for the string "KVM: arm64: nv: Add SW walker for AT S1
-emulation" (quotes included) turns up the cover letter.
+> (Maybe you're saying that, when the TDP MMU is enabled, the only cases
+> where the shadow MMU is used are cases where gfns are practically
+> always mapped by a single shadow PTE. This isn't how I understood your
+> mail, but this is what your hack-a-patch[1] makes me think.)
 
-Am I looking in the wrong places?
+So it appears that this interpretation is actually what you meant.
 
-[1] https://www.spinics.net/lists/kvm/msg351826.html
+>
+> [1] https://lore.kernel.org/linux-mm/ZmzPoW7K5GIitQ8B@google.com/
+>
+> >
+> > ...
+> >
+> > > Hmm, interesting. I need to spend a little bit more time digesting th=
+is.
+> > >
+> > > Would you like to see this included in v6? (It'd be nice to avoid the
+> > > WAS_FAST stuff....) Should we leave it for a later series? I haven't
+> > > formed my own opinion yet.
+> >
+> > I would say it depends on the viability and complexity of my idea.  E.g=
+. if it
+> > pans out more or less like my rough sketch, then it's probably worth ta=
+king on
+> > the extra code+complexity in KVM to avoid the whole WAS_FAST goo.
+> >
+> > Note, if we do go this route, the implementation would need to be tweak=
+ed to
+> > handle the difference in behavior between aging and last-minute checks =
+for eviction,
+> > which I obviously didn't understand when I threw together that hack-a-p=
+atch.
+> >
+> > I need to think more about how best to handle that though, e.g. skippin=
+g GFNs with
+> > multiple mappings is probably the worst possible behavior, as we'd risk=
+ evicting
+> > hot pages.  But falling back to taking mmu_lock for write isn't all tha=
+t desirable
+> > either.
+>
+> I think falling back to the write lock is more desirable than evicting
+> a young page.
+>
+> I've attached what I think could work, a diff on top of this series.
+> It builds at least. It uses rcu_read_lock/unlock() for
+> walk_shadow_page_lockless_begin/end(NULL), and it puts a
+> synchronize_rcu() in kvm_mmu_commit_zap_page().
+>
+> It doesn't get rid of the WAS_FAST things because it doesn't do
+> exactly what [1] does. It basically makes three calls now: lockless
+> TDP MMU, lockless shadow MMU, locked shadow MMU. It only calls the
+> locked shadow MMU bits if the lockless bits say !young (instead of
+> being conditioned on tdp_mmu_enabled). My choice is definitely
+> questionable for the clear path.
 
-Thanks,
-Alex
+I still don't think we should get rid of the WAS_FAST stuff.
 
-> 
-> - Add FEAT_ATS1A support, which is almost trivial
-> 
-> This has been tested by comparing the output of a HW walker with the
-> output of the SW one. Obviously, this isn't bullet proof, and I'm
-> pretty sure there are some nasties in there.
-> 
-> In a departure from my usual habit, this series is on top of
-> kvmarm/next, as it depends on the NV S2 shadow code.
-> 
-> Joey Gouly (1):
->   KVM: arm64: make kvm_at() take an OP_AT_*
-> 
-> Marc Zyngier (11):
->   arm64: Add missing APTable and TCR_ELx.HPD masks
->   arm64: Add PAR_EL1 field description
->   KVM: arm64: nv: Turn upper_attr for S2 walk into the full descriptor
->   KVM: arm64: nv: Honor absence of FEAT_PAN2
->   KVM: arm64: nv: Add basic emulation of AT S1E{0,1}{R,W}[P]
->   KVM: arm64: nv: Add basic emulation of AT S1E2{R,W}
->   KVM: arm64: nv: Add emulation of AT S12E{0,1}{R,W}
->   KVM: arm64: nv: Make ps_to_output_size() generally available
->   KVM: arm64: nv: Add SW walker for AT S1 emulation
->   KVM: arm64: nv: Plumb handling of AT S1* traps from EL2
->   KVM: arm64: nv: Add support for FEAT_ATS1A
-> 
->  arch/arm64/include/asm/kvm_arm.h       |    1 +
->  arch/arm64/include/asm/kvm_asm.h       |    6 +-
->  arch/arm64/include/asm/kvm_nested.h    |   18 +-
->  arch/arm64/include/asm/pgtable-hwdef.h |    7 +
->  arch/arm64/include/asm/sysreg.h        |   19 +
->  arch/arm64/kvm/Makefile                |    2 +-
->  arch/arm64/kvm/at.c                    | 1007 ++++++++++++++++++++++++
->  arch/arm64/kvm/emulate-nested.c        |    2 +
->  arch/arm64/kvm/hyp/include/hyp/fault.h |    2 +-
->  arch/arm64/kvm/nested.c                |   26 +-
->  arch/arm64/kvm/sys_regs.c              |   60 ++
->  11 files changed, 1125 insertions(+), 25 deletions(-)
->  create mode 100644 arch/arm64/kvm/at.c
-> 
-> -- 
-> 2.39.2
-> 
-> 
+The assumption that the L1 VM will almost never share pages between L2
+VMs is questionable. The real question becomes: do we care to have
+accurate age information for this case? I think so.
+
+It's not completely trivial to get the lockless walking of the shadow
+MMU rmaps correct either (please see the patch I attached here[1]).
+And the WAS_FAST functionality isn't even that complex to begin with.
+
+Thanks for your patience.
+
+[1]: https://lore.kernel.org/linux-mm/CADrL8HW=3DkCLoWBwoiSOCd8WHFvBdWaguZ2=
+ureo4eFy9D67+owg@mail.gmail.com/
