@@ -1,209 +1,702 @@
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58914145A08
-	for <kvmarm@lists.linux.dev>; Mon,  8 Jul 2024 16:51:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30F23147C82;
+	Mon,  8 Jul 2024 16:58:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720457490; cv=none; b=E0lzlnGiffiaWmf4M3muKS0KNqmFrK3Ww5OwlZ8ipS84ibbXOW/gsx6tKfqBAItLr9Je3GwG/Bghqh83F+QOdcLfyK9x0IRhyJPjbWRKtT1O8PpRNUnNY9+G0KISw/NEnc6xJbeYHQ4hD8vGNL1dHnHCMlcOYMQ9xA4BNXeyVrc=
+	t=1720457890; cv=none; b=plRkWEKgvyp54m8tnhT8Luoc9jzBItzaKfynIrhHD0P6ZjioaDdFg55pZHKaxrLtsyxz9AzYWLkuntAAdo0PnaiHsWYrILAgzSPII+mK8xz27fxLofK/81vCWU3+cNzC+q6eurq0XO0co1r4ECItPM0wwzlhTtGNuV7snuntqCI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720457490; c=relaxed/simple;
-	bh=bT7f63TQT0nCVI2e044tDWWSBtyBG+UKBLYM/Q2ACJ8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pRnwQ0/WwYuaE/PR/XIb/l1A7YWtY3yGlbTSdJZnWgKTufttTMkvk0iJxPPCXe7bEbaYWgly1WOdt//0LOJ4wkhSxt/dkQxWa3adPmNsk/ovMjA0M0TF7evagzDAMWErp0hKuUr7PYpMSxyl5IYHGEwW9k2RFqDGzpQvX3/2rYw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eHJgFtME; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1720457890; c=relaxed/simple;
+	bh=/TykIOsi0c427lagmyC8xWzajxZQOo1+fEc6oZtgjFY=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=iBopqzYvFyZ9xX89YLXydW5w1juUNLjNBZltI4sEtSfoIPKggRGRgnqOwmyXOrgVyKA5hsgLkesadcsRLMx0c4d7XBQM9nMNm4S4NM600S9qzXfmg/8W9OoBnhD1C/Zwzm8rOCrByYD+jVwsuWv1qONT1bL+wZb9ey4qiDYXMnQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DY0GYHMe; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eHJgFtME"
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1f70ec6ff8bso6265ad.0
-        for <kvmarm@lists.linux.dev>; Mon, 08 Jul 2024 09:51:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1720457488; x=1721062288; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZTLNn4LGmic6uz3SST2MPov4JwAtgFvBXVkhyUNj6Ls=;
-        b=eHJgFtMETjFI7aCqyBB8i7FcQp+z7HihkCKfCP0Z27Dr4j7LmxlbrTQpl5VjeSLLWJ
-         0PupJFKSPWWLuq0qLpf5EsKhig9qBlreX0z125kT5S1AXA0+wvP/du6ue6zE8n4na9J/
-         TnfZiEac+65b/5QsYFsvodxdVe5xWKZ2tQqkayeWCPIXhukvCwfyWSwSTVrXWjkwBdOW
-         U+KGo5p0NLN5UQQM/c3DtiUMp5d/246D9uD09QVYx/uglEC5KMbBVuNdQRGxJKKNSwoJ
-         VHhkWkvpFvpvm0XxDwuxuWi+eBvhlMaJNZMYEOT6CY8UxjS9+DDyqKKvrDXWV2t+pFfu
-         IUXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720457488; x=1721062288;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZTLNn4LGmic6uz3SST2MPov4JwAtgFvBXVkhyUNj6Ls=;
-        b=HpZClm0N3L8kpp8kt18a59x/7Op8urCR4mIxktJiE9O87JYvG3FYH+rdkh8365/KBE
-         QfEEKLgoWZ+R6koz6sEV7d5AcCJokhwG2rvonq4w1j/oHm+LXECMMG1IFp6mUhZc/3DG
-         xWklLXhjmqTtHwDF1HQr0710jfmXdjNnbZVUFsyDgLxsTbrIYZLBcvHCk4sG2r5iB3hv
-         OKNuGhgthjV4v2Tc8MrdQ/JOOVE9nUCbSG2wx5usrBQELCj03Xj7GAsPUKX2h8ali4QC
-         IKomasLMAKKd8ayVMbdTJmFEw/g+pD83h3LtRoOu4iDqzLhhSQ0JAEV7P2WzSiEfZpOK
-         p3OA==
-X-Forwarded-Encrypted: i=1; AJvYcCU1C0NIqJoOXzSFyrvVmFttE/Io9/A/h3jsIbib2fGtummUvEmsI4cdKWGY8El2uonaAeQCdLVWZqtbpouUYsFMOl2DqdnR
-X-Gm-Message-State: AOJu0Yx/AvrZXp5fpZgzPL2M9OOgyppCi3WAt3fV6SmFsNgm52g9Y/J3
-	FcvYhJKf9mFodnELGGGQbwNPGQ9dAq1jeC/XREcb08BZVPj10pi4r5h0SCnM3ZRlUsy/aKWYfVn
-	l/oKAlTu5c+yca9CyxS71bJe9GBJuIPaoirb3
-X-Google-Smtp-Source: AGHT+IGMZBuODG5Qg+BsiQ0JMRrEsApbDVZodAf/W97JpFbZBYOVdGRDLcd2wERkfLVJkW8bcAp1r3ymFzBf2tplW5Q=
-X-Received: by 2002:a17:903:6d0:b0:1fa:cd15:985e with SMTP id
- d9443c01a7336-1fb30b895c8mr9496525ad.6.1720457488179; Mon, 08 Jul 2024
- 09:51:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DY0GYHMe"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C307CC116B1;
+	Mon,  8 Jul 2024 16:58:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720457890;
+	bh=/TykIOsi0c427lagmyC8xWzajxZQOo1+fEc6oZtgjFY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=DY0GYHMeofNJjrLdQ0tkV1vuO/ogNEtKPlfdcfiREd9+vPWOom6DJ4TUD6p3Xfw+r
+	 U3zbmdMOaCIoqMhwRTHWVzgJhtE5MDrdH8QPAopqQcq0SbHQiWPkZfVwDT/8omFTBQ
+	 4FUjeMoRqS3THkNvMls+yx8F2TgQXJ4nvT39h4pYGvxtJlknrFA4Ve8Zd9lK0Yji51
+	 KrwQb7SoZuX57LXN6p100Zcsk0C6qqZxMEc0nu1mH+ZJ2G8rYoraGxQ1tclpgm8yJj
+	 znufjDou2qoAu8qXOG7H1rub7490Alx2F9NmsPvBqV52n/sfVC2QYGXODTf2Lc5847
+	 RRJ9MbUt85FUQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sQrgl-00AfMX-KV;
+	Mon, 08 Jul 2024 17:58:07 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Joey Gouly <joey.gouly@arm.com>
+Subject: [PATCH 10/12] KVM: arm64: nv: Add SW walker for AT S1 emulation
+Date: Mon,  8 Jul 2024 17:57:58 +0100
+Message-Id: <20240708165800.1220065-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240625133508.259829-1-maz@kernel.org>
+References: <20240625133508.259829-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <CAOUHufYGqbd45shZkGCpqeTV9wcBDUoo3iw1SKiDeFLmrP0+=w@mail.gmail.com>
- <CADrL8HVHcKSW3hiHzKTit07gzo36jtCZCnM9ZpueyifgNdGggw@mail.gmail.com>
- <ZmioedgEBptNoz91@google.com> <CADrL8HU_FKHTz_6d=xhVLZFDQ_zQo-zdB2rqdpa2CKusa1uo+A@mail.gmail.com>
- <ZmjtEBH42u7NUWRc@google.com> <CADrL8HUW2q79F0FsEjhGW0ujij6+FfCqas5UpQp27Epfjc94Nw@mail.gmail.com>
- <ZmxsCwu4uP1lGsWz@google.com> <CADrL8HVDZ+m_-jUCaXf_DWJ92N30oqS=_9wNZwRvoSp5fo7asg@mail.gmail.com>
- <ZmzPoW7K5GIitQ8B@google.com> <CADrL8HW3rZ5xgbyGa+FXk50QQzF4B1=sYL8zhBepj6tg0EiHYA@mail.gmail.com>
- <ZnCCZ5gQnA3zMQtv@google.com> <CADrL8HW=kCLoWBwoiSOCd8WHFvBdWaguZ2ureo4eFy9D67+owg@mail.gmail.com>
-In-Reply-To: <CADrL8HW=kCLoWBwoiSOCd8WHFvBdWaguZ2ureo4eFy9D67+owg@mail.gmail.com>
-From: James Houghton <jthoughton@google.com>
-Date: Mon, 8 Jul 2024 09:50:51 -0700
-Message-ID: <CADrL8HUv6T4baOi=VTFV6ZA=Oyn3dEc6Hp9rXXH0imeYkwUhew@mail.gmail.com>
-Subject: Re: [PATCH v5 4/9] mm: Add test_clear_young_fast_only MMU notifier
-To: Sean Christopherson <seanjc@google.com>
-Cc: Yu Zhao <yuzhao@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Ankit Agrawal <ankita@nvidia.com>, 
-	Axel Rasmussen <axelrasmussen@google.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	David Matlack <dmatlack@google.com>, David Rientjes <rientjes@google.com>, 
-	James Morse <james.morse@arm.com>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Raghavendra Rao Ananta <rananta@google.com>, 
-	Ryan Roberts <ryan.roberts@arm.com>, Shaoqin Huang <shahuang@redhat.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Wei Xu <weixugc@google.com>, 
-	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Jun 28, 2024 at 7:38=E2=80=AFPM James Houghton <jthoughton@google.c=
-om> wrote:
->
-> On Mon, Jun 17, 2024 at 11:37=E2=80=AFAM Sean Christopherson <seanjc@goog=
-le.com> wrote:
-> >
-> > On Mon, Jun 17, 2024, James Houghton wrote:
-> > > On Fri, Jun 14, 2024 at 4:17=E2=80=AFPM Sean Christopherson <seanjc@g=
-oogle.com> wrote:
-> > > > Ooh!  Actually, after fiddling a bit to see how feasible fast-aging=
- in the shadow
-> > > > MMU would be, I'm pretty sure we can do straight there for nested T=
-DP.  Or rather,
-> > > > I suspect/hope we can get close enough for an initial merge, which =
-would allow
-> > > > aging_is_fast to be a property of the mmu_notifier, i.e. would simp=
-lify things
-> > > > because KVM wouldn't need to communicate MMU_NOTIFY_WAS_FAST for ea=
-ch notification.
-> > > >
-> > > > Walking KVM's rmaps requires mmu_lock because adding/removing rmap =
-entries is done
-> > > > in such a way that a lockless walk would be painfully complex.  But=
- if there is
-> > > > exactly _one_ rmap entry for a gfn, then slot->arch.rmap[...] point=
-s directly at
-> > > > that one SPTE.  And with nested TDP, unless L1 is doing something u=
-ncommon, e.g.
-> > > > mapping the same page into multiple L2s, that overwhelming vast maj=
-ority of rmaps
-> > > > have only one entry.  That's not the case for legacy shadow paging =
-because kernels
-> > > > almost always map a pfn using multiple virtual addresses, e.g. Linu=
-x's direct map
-> > > > along with any userspace mappings.
->
-> Hi Sean, sorry for taking so long to get back to you.
->
-> So just to make sure I have this right: if L1 is using TDP, the gfns
-> in L0 will usually only be mapped by a single spte. If L1 is not using
-> TDP, then all bets are off. Is that true?
->
-> If that is true, given that we don't really have control over whether
-> or not L1 decides to use TDP, the lockless shadow MMU walk will work,
-> but, if L1 is not using TDP, it will often return false negatives
-> (says "old" for an actually-young gfn). So then I don't really
-> understand conditioning the lockless shadow MMU walk on us (L0) using
-> the TDP MMU[1]. We care about L1, right?
+In order to plug the brokenness of our current AT implementation,
+we need a SW walker that is going to... err.. walk the S1 tables
+and tell us what it finds.
 
-Ok I think I understand now. If L1 is using shadow paging, L2 is
-accessing memory the same way L1 would, so we use the TDP MMU at L0
-for this case (if tdp_mmu_enabled). If L1 is using TDP, then we must
-use the shadow MMU, so that's the interesting case.
+Of course, it builds on top of our S2 walker, and share similar
+concepts. The beauty of it is that since it uses kvm_read_guest(),
+it is able to bring back pages that have been otherwise evicted.
 
-> (Maybe you're saying that, when the TDP MMU is enabled, the only cases
-> where the shadow MMU is used are cases where gfns are practically
-> always mapped by a single shadow PTE. This isn't how I understood your
-> mail, but this is what your hack-a-patch[1] makes me think.)
+This is then plugged in the two AT S1 emulation functions as
+a "slow path" fallback. I'm not sure it is that slow, but hey.
 
-So it appears that this interpretation is actually what you meant.
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/at.c | 538 ++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 520 insertions(+), 18 deletions(-)
 
->
-> [1] https://lore.kernel.org/linux-mm/ZmzPoW7K5GIitQ8B@google.com/
->
-> >
-> > ...
-> >
-> > > Hmm, interesting. I need to spend a little bit more time digesting th=
-is.
-> > >
-> > > Would you like to see this included in v6? (It'd be nice to avoid the
-> > > WAS_FAST stuff....) Should we leave it for a later series? I haven't
-> > > formed my own opinion yet.
-> >
-> > I would say it depends on the viability and complexity of my idea.  E.g=
-. if it
-> > pans out more or less like my rough sketch, then it's probably worth ta=
-king on
-> > the extra code+complexity in KVM to avoid the whole WAS_FAST goo.
-> >
-> > Note, if we do go this route, the implementation would need to be tweak=
-ed to
-> > handle the difference in behavior between aging and last-minute checks =
-for eviction,
-> > which I obviously didn't understand when I threw together that hack-a-p=
-atch.
-> >
-> > I need to think more about how best to handle that though, e.g. skippin=
-g GFNs with
-> > multiple mappings is probably the worst possible behavior, as we'd risk=
- evicting
-> > hot pages.  But falling back to taking mmu_lock for write isn't all tha=
-t desirable
-> > either.
->
-> I think falling back to the write lock is more desirable than evicting
-> a young page.
->
-> I've attached what I think could work, a diff on top of this series.
-> It builds at least. It uses rcu_read_lock/unlock() for
-> walk_shadow_page_lockless_begin/end(NULL), and it puts a
-> synchronize_rcu() in kvm_mmu_commit_zap_page().
->
-> It doesn't get rid of the WAS_FAST things because it doesn't do
-> exactly what [1] does. It basically makes three calls now: lockless
-> TDP MMU, lockless shadow MMU, locked shadow MMU. It only calls the
-> locked shadow MMU bits if the lockless bits say !young (instead of
-> being conditioned on tdp_mmu_enabled). My choice is definitely
-> questionable for the clear path.
+diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+index 71e3390b43b4c..8452273cbff6d 100644
+--- a/arch/arm64/kvm/at.c
++++ b/arch/arm64/kvm/at.c
+@@ -4,9 +4,305 @@
+  * Author: Jintack Lim <jintack.lim@linaro.org>
+  */
+ 
++#include <linux/kvm_host.h>
++
++#include <asm/esr.h>
+ #include <asm/kvm_hyp.h>
+ #include <asm/kvm_mmu.h>
+ 
++struct s1_walk_info {
++	u64	     baddr;
++	unsigned int max_oa_bits;
++	unsigned int pgshift;
++	unsigned int txsz;
++	int 	     sl;
++	bool	     hpd;
++	bool	     be;
++	bool	     nvhe;
++	bool	     s2;
++};
++
++struct s1_walk_result {
++	union {
++		struct {
++			u64	desc;
++			u64	pa;
++			s8	level;
++			u8	APTable;
++			bool	UXNTable;
++			bool	PXNTable;
++		};
++		struct {
++			u8	fst;
++			bool	ptw;
++			bool	s2;
++		};
++	};
++	bool	failed;
++};
++
++static void fail_s1_walk(struct s1_walk_result *wr, u8 fst, bool ptw, bool s2)
++{
++	wr->fst		= fst;
++	wr->ptw		= ptw;
++	wr->s2		= s2;
++	wr->failed	= true;
++}
++
++#define S1_MMU_DISABLED		(-127)
++
++static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
++			 struct s1_walk_result *wr, const u64 va, const int el)
++{
++	u64 sctlr, tcr, tg, ps, ia_bits, ttbr;
++	unsigned int stride, x;
++	bool va55, tbi;
++
++	wi->nvhe = el == 2 && !vcpu_el2_e2h_is_set(vcpu);
++
++	va55 = va & BIT(55);
++
++	if (wi->nvhe && va55)
++		goto addrsz;
++
++	wi->s2 = el < 2 && (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_VM);
++
++	switch (el) {
++	case 1:
++		sctlr	= vcpu_read_sys_reg(vcpu, SCTLR_EL1);
++		tcr	= vcpu_read_sys_reg(vcpu, TCR_EL1);
++		ttbr	= (va55 ?
++			   vcpu_read_sys_reg(vcpu, TTBR1_EL1) :
++			   vcpu_read_sys_reg(vcpu, TTBR0_EL1));
++		break;
++	case 2:
++		sctlr	= vcpu_read_sys_reg(vcpu, SCTLR_EL2);
++		tcr	= vcpu_read_sys_reg(vcpu, TCR_EL2);
++		ttbr	= (va55 ?
++			   vcpu_read_sys_reg(vcpu, TTBR1_EL2) :
++			   vcpu_read_sys_reg(vcpu, TTBR0_EL2));
++		break;
++	default:
++		BUG();
++	}
++
++	/* Let's put the MMU disabled case aside immediately */
++	if (!(sctlr & SCTLR_ELx_M) ||
++	    (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_DC)) {
++		if (va >= BIT(kvm_get_pa_bits(vcpu->kvm)))
++			goto addrsz;
++
++		wr->level = S1_MMU_DISABLED;
++		wr->desc = va;
++		return 0;
++	}
++
++	wi->be = sctlr & SCTLR_ELx_EE;
++
++	wi->hpd  = kvm_has_feat(vcpu->kvm, ID_AA64MMFR1_EL1, HPDS, IMP);
++	wi->hpd &= (wi->nvhe ?
++		    FIELD_GET(TCR_EL2_HPD, tcr) :
++		    (va55 ?
++		     FIELD_GET(TCR_HPD1, tcr) :
++		     FIELD_GET(TCR_HPD0, tcr)));
++
++	tbi = (wi->nvhe ?
++	       FIELD_GET(TCR_EL2_TBI, tcr) :
++	       (va55 ?
++		FIELD_GET(TCR_TBI1, tcr) :
++		FIELD_GET(TCR_TBI0, tcr)));
++
++	if (!tbi && sign_extend64(va, 55) != (s64)va)
++		goto addrsz;
++
++	/* Someone was silly enough to encode TG0/TG1 differently */
++	if (va55) {
++		wi->txsz = FIELD_GET(TCR_T1SZ_MASK, tcr);
++		tg = FIELD_GET(TCR_TG1_MASK, tcr);
++
++		switch (tg << TCR_TG1_SHIFT) {
++		case TCR_TG1_4K:
++			wi->pgshift = 12;	 break;
++		case TCR_TG1_16K:
++			wi->pgshift = 14;	 break;
++		case TCR_TG1_64K:
++		default:	    /* IMPDEF: treat any other value as 64k */
++			wi->pgshift = 16;	 break;
++		}
++	} else {
++		wi->txsz = FIELD_GET(TCR_T0SZ_MASK, tcr);
++		tg = FIELD_GET(TCR_TG0_MASK, tcr);
++
++		switch (tg << TCR_TG0_SHIFT) {
++		case TCR_TG0_4K:
++			wi->pgshift = 12;	 break;
++		case TCR_TG0_16K:
++			wi->pgshift = 14;	 break;
++		case TCR_TG0_64K:
++		default:	    /* IMPDEF: treat any other value as 64k */
++			wi->pgshift = 16;	 break;
++		}
++	}
++
++	ia_bits = 64 - wi->txsz;
++
++	/* AArch64.S1StartLevel() */
++	stride = wi->pgshift - 3;
++	wi->sl = 3 - (((ia_bits - 1) - wi->pgshift) / stride);
++
++	/* Check for SL mandating LPA2 (which we don't support yet) */
++	switch (BIT(wi->pgshift)) {
++	case SZ_4K:
++		if (wi->sl == -1 &&
++		    !kvm_has_feat(vcpu->kvm, ID_AA64MMFR0_EL1, TGRAN4, 52_BIT))
++			goto addrsz;
++		break;
++	case SZ_16K:
++		if (wi->sl == 0 &&
++		    !kvm_has_feat(vcpu->kvm, ID_AA64MMFR0_EL1, TGRAN16, 52_BIT))
++			goto addrsz;
++		break;
++	}
++
++	ps = (wi->nvhe ?
++	      FIELD_GET(TCR_EL2_PS_MASK, tcr) : FIELD_GET(TCR_IPS_MASK, tcr));
++
++	wi->max_oa_bits = min(get_kvm_ipa_limit(), ps_to_output_size(ps));
++
++	/* Compute minimal alignment */
++	x = 3 + ia_bits - ((3 - wi->sl) * stride + wi->pgshift);
++
++	wi->baddr = ttbr & TTBRx_EL1_BADDR;
++	wi->baddr &= GENMASK_ULL(wi->max_oa_bits - 1, x);
++
++	return 0;
++
++addrsz:	/* Address Size Fault level 0 */
++	fail_s1_walk(wr, ESR_ELx_FSC_ADDRSZ, false, false);
++
++	return -EFAULT;
++}
++
++static int get_ia_size(struct s1_walk_info *wi)
++{
++	return 64 - wi->txsz;
++}
++
++static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
++		   struct s1_walk_result *wr, u64 va)
++{
++	u64 va_top, va_bottom, baddr, desc;
++	int level, stride, ret;
++
++	level = wi->sl;
++	stride = wi->pgshift - 3;
++	baddr = wi->baddr;
++
++	va_top = get_ia_size(wi) - 1;
++
++	while (1) {
++		u64 index, ipa;
++
++		va_bottom = (3 - level) * stride + wi->pgshift;
++		index = (va & GENMASK_ULL(va_top, va_bottom)) >> (va_bottom - 3);
++
++		ipa = baddr | index;
++
++		if (wi->s2) {
++			struct kvm_s2_trans s2_trans = {};
++
++			ret = kvm_walk_nested_s2(vcpu, ipa, &s2_trans);
++			if (ret) {
++				fail_s1_walk(wr,
++					     (s2_trans.esr & ~ESR_ELx_FSC_LEVEL) | level,
++					     true, true);
++				return ret;
++			}
++
++			if (!kvm_s2_trans_readable(&s2_trans)) {
++				fail_s1_walk(wr, ESR_ELx_FSC_PERM | level,
++					     true, true);
++
++				return -EPERM;
++			}
++
++			ipa = kvm_s2_trans_output(&s2_trans);
++		}
++
++		ret = kvm_read_guest(vcpu->kvm, ipa, &desc, sizeof(desc));
++		if (ret) {
++			fail_s1_walk(wr, ESR_ELx_FSC_SEA_TTW(level),
++				     true, false);
++			return ret;
++		}
++
++		if (wi->be)
++			desc = be64_to_cpu((__force __be64)desc);
++		else
++			desc = le64_to_cpu((__force __le64)desc);
++
++		if (!(desc & 1) || ((desc & 3) == 1 && level == 3)) {
++			fail_s1_walk(wr, ESR_ELx_FSC_FAULT | level,
++				     true, false);
++			return -ENOENT;
++		}
++
++		/* We found a leaf, handle that */
++		if ((desc & 3) == 1 || level == 3)
++			break;
++
++		if (!wi->hpd) {
++			wr->APTable  |= FIELD_GET(PMD_TABLE_AP, desc);
++			wr->UXNTable |= FIELD_GET(PMD_TABLE_UXN, desc);
++			wr->PXNTable |= FIELD_GET(PMD_TABLE_PXN, desc);
++		}
++
++		baddr = GENMASK_ULL(47, wi->pgshift);
++
++		/* Check for out-of-range OA */
++		if (wi->max_oa_bits < 48 &&
++		    (baddr & GENMASK_ULL(47, wi->max_oa_bits))) {
++			fail_s1_walk(wr, ESR_ELx_FSC_ADDRSZ | level,
++				     true, false);
++			return -EINVAL;
++		}
++
++		/* Prepare for next round */
++		va_top = va_bottom - 1;
++		level++;
++	}
++
++	/* Block mapping, check the validity of the level */
++	if (!(desc & BIT(1))) {
++		bool valid_block = false;
++
++		switch (BIT(wi->pgshift)) {
++		case SZ_4K:
++			valid_block = level == 1 || level == 2;
++			break;
++		case SZ_16K:
++		case SZ_64K:
++			valid_block = level == 2;
++			break;
++		}
++
++		if (!valid_block) {
++			fail_s1_walk(wr, ESR_ELx_FSC_FAULT | level,
++				     true, false);
++			return -EINVAL;
++		}
++	}
++
++	wr->failed = false;
++	wr->level = level;
++	wr->desc = desc;
++	wr->pa = desc & GENMASK(47, va_bottom);
++	if (va_bottom > 12)
++		wr->pa |= va & GENMASK_ULL(va_bottom - 1, 12);
++
++	return 0;
++}
++
+ struct mmu_config {
+ 	u64	ttbr0;
+ 	u64	ttbr1;
+@@ -234,6 +530,177 @@ static u64 compute_par_s12(struct kvm_vcpu *vcpu, u64 s1_par,
+ 	return par;
+ }
+ 
++static u64 compute_par_s1(struct kvm_vcpu *vcpu, struct s1_walk_result *wr)
++{
++	u64 par;
++
++	if (wr->failed) {
++		par = SYS_PAR_EL1_RES1;
++		par |= SYS_PAR_EL1_F;
++		par |= FIELD_PREP(SYS_PAR_EL1_FST, wr->fst);
++		par |= wr->ptw ? SYS_PAR_EL1_PTW : 0;
++		par |= wr->s2 ? SYS_PAR_EL1_S : 0;
++	} else if (wr->level == S1_MMU_DISABLED) {
++		/* MMU off or HCR_EL2.DC == 1 */
++		par = wr->pa & GENMASK_ULL(47, 12);
++
++		if (!(__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_DC)) {
++			par |= FIELD_PREP(SYS_PAR_EL1_ATTR, 0); /* nGnRnE */
++			par |= FIELD_PREP(SYS_PAR_EL1_SH, 0b10); /* OS */
++		} else {
++			par |= FIELD_PREP(SYS_PAR_EL1_ATTR,
++					  MEMATTR(WbRaWa, WbRaWa));
++			par |= FIELD_PREP(SYS_PAR_EL1_SH, 0b00); /* NS */
++		}
++	} else {
++		u64 mair, sctlr;
++		int el;
++		u8 sh;
++
++		el = (vcpu_el2_e2h_is_set(vcpu) &&
++		      vcpu_el2_tge_is_set(vcpu)) ? 2 : 1;
++
++		mair = ((el == 2) ?
++			vcpu_read_sys_reg(vcpu, MAIR_EL2) :
++			vcpu_read_sys_reg(vcpu, MAIR_EL1));
++
++		mair >>= FIELD_GET(PTE_ATTRINDX_MASK, wr->desc) * 8;
++		mair &= 0xff;
++
++		sctlr = ((el == 2) ?
++			vcpu_read_sys_reg(vcpu, SCTLR_EL2) :
++			vcpu_read_sys_reg(vcpu, SCTLR_EL1));
++
++		/* Force NC for memory if SCTLR_ELx.C is clear */
++		if (!(sctlr & SCTLR_EL1_C) && !MEMATTR_IS_DEVICE(mair))
++			mair = MEMATTR(NC, NC);
++
++		par  = FIELD_PREP(SYS_PAR_EL1_ATTR, mair);
++		par |= wr->pa & GENMASK_ULL(47, 12);
++
++		sh = compute_sh(mair, wr->desc);
++		par |= FIELD_PREP(SYS_PAR_EL1_SH, sh);
++	}
++
++	return par;
++}
++
++static u64 handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
++{
++	bool perm_fail, ur, uw, ux, pr, pw, pan;
++	struct s1_walk_result wr = {};
++	struct s1_walk_info wi = {};
++	int ret, idx, el;
++
++	/*
++	 * We only get here from guest EL2, so the translation regime
++	 * AT applies to is solely defined by {E2H,TGE}.
++	 */
++	el = (vcpu_el2_e2h_is_set(vcpu) &&
++	      vcpu_el2_tge_is_set(vcpu)) ? 2 : 1;
++
++	ret = setup_s1_walk(vcpu, &wi, &wr, vaddr, el);
++	if (ret)
++		goto compute_par;
++
++	if (wr.level == S1_MMU_DISABLED)
++		goto compute_par;
++
++	idx = srcu_read_lock(&vcpu->kvm->srcu);
++
++	ret = walk_s1(vcpu, &wi, &wr, vaddr);
++
++	srcu_read_unlock(&vcpu->kvm->srcu, idx);
++
++	if (ret)
++		goto compute_par;
++
++	/* FIXME: revisit when adding indirect permission support */
++	if (kvm_has_feat(vcpu->kvm, ID_AA64MMFR1_EL1, PAN, PAN3) &&
++	    !wi.nvhe) {
++		u64 sctlr;
++
++		if (el == 1)
++			sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL1);
++		else
++			sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL2);
++
++		ux = (sctlr & SCTLR_EL1_EPAN) && !(wr.desc & PTE_UXN);
++	} else {
++		ux = false;
++	}
++
++	pw = !(wr.desc & PTE_RDONLY);
++
++	if (wi.nvhe) {
++		ur = uw = false;
++		pr = true;
++	} else {
++		if (wr.desc & PTE_USER) {
++			ur = pr = true;
++			uw = pw;
++		} else {
++			ur = uw = false;
++			pr = true;
++		}
++	}
++
++	/* Apply the Hierarchical Permission madness */
++	if (wi.nvhe) {
++		wr.APTable &= BIT(1);
++		wr.PXNTable = wr.UXNTable;
++	}
++
++	ur &= !(wr.APTable & BIT(0));
++	uw &= !(wr.APTable != 0);
++	ux &= !wr.UXNTable;
++
++	pw &= !(wr.APTable & BIT(1));
++
++	pan = *vcpu_cpsr(vcpu) & PSR_PAN_BIT;
++
++	perm_fail = false;
++
++	switch (op) {
++	case OP_AT_S1E1RP:
++		perm_fail |= pan && (ur || uw || ux);
++		fallthrough;
++	case OP_AT_S1E1R:
++	case OP_AT_S1E2R:
++		perm_fail |= !pr;
++		break;
++	case OP_AT_S1E1WP:
++		perm_fail |= pan && (ur || uw || ux);
++		fallthrough;
++	case OP_AT_S1E1W:
++	case OP_AT_S1E2W:
++		perm_fail |= !pw;
++		break;
++	case OP_AT_S1E0R:
++		perm_fail |= !ur;
++		break;
++	case OP_AT_S1E0W:
++		perm_fail |= !uw;
++		break;
++	default:
++		BUG();
++	}
++
++	if (perm_fail) {
++		struct s1_walk_result tmp;
++
++		tmp.failed = true;
++		tmp.fst = ESR_ELx_FSC_PERM | wr.level;
++		tmp.s2 = false;
++		tmp.ptw = false;
++
++		wr = tmp;
++	}
++
++compute_par:
++	return compute_par_s1(vcpu, &wr);
++}
++
+ static bool check_at_pan(struct kvm_vcpu *vcpu, u64 vaddr, u64 *res)
+ {
+ 	u64 par_e0;
+@@ -266,9 +733,11 @@ void __kvm_at_s1e01(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+ 	struct mmu_config config;
+ 	struct kvm_s2_mmu *mmu;
+ 	unsigned long flags;
+-	bool fail;
++	bool fail, retry_slow;
+ 	u64 par;
+ 
++	retry_slow = false;
++
+ 	write_lock(&vcpu->kvm->mmu_lock);
+ 
+ 	/*
+@@ -288,14 +757,15 @@ void __kvm_at_s1e01(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+ 		goto skip_mmu_switch;
+ 
+ 	/*
+-	 * FIXME: Obtaining the S2 MMU for a L2 is horribly racy, and
+-	 * we may not find it (recycled by another vcpu, for example).
+-	 * See the other FIXME comment below about the need for a SW
+-	 * PTW in this case.
++	 * Obtaining the S2 MMU for a L2 is horribly racy, and we may not
++	 * find it (recycled by another vcpu, for example). When this
++	 * happens, use the SW (slow) path.
+ 	 */
+ 	mmu = lookup_s2_mmu(vcpu);
+-	if (WARN_ON(!mmu))
++	if (!mmu) {
++		retry_slow = true;
+ 		goto out;
++	}
+ 
+ 	write_sysreg_el1(vcpu_read_sys_reg(vcpu, TTBR0_EL1),	SYS_TTBR0);
+ 	write_sysreg_el1(vcpu_read_sys_reg(vcpu, TTBR1_EL1),	SYS_TTBR1);
+@@ -331,18 +801,17 @@ void __kvm_at_s1e01(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+ 	}
+ 
+ 	if (!fail)
+-		par = read_sysreg(par_el1);
++		par = read_sysreg_par();
+ 	else
+ 		par = SYS_PAR_EL1_F;
+ 
++	retry_slow = !fail;
++
+ 	vcpu_write_sys_reg(vcpu, par, PAR_EL1);
+ 
+ 	/*
+-	 * Failed? let's leave the building now.
+-	 *
+-	 * FIXME: how about a failed translation because the shadow S2
+-	 * wasn't populated? We may need to perform a SW PTW,
+-	 * populating our shadow S2 and retry the instruction.
++	 * Failed? let's leave the building now, unless we retry on
++	 * the slow path.
+ 	 */
+ 	if (par & SYS_PAR_EL1_F)
+ 		goto nopan;
+@@ -354,29 +823,58 @@ void __kvm_at_s1e01(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+ 	switch (op) {
+ 	case OP_AT_S1E1RP:
+ 	case OP_AT_S1E1WP:
++		retry_slow = false;
+ 		fail = check_at_pan(vcpu, vaddr, &par);
+ 		break;
+ 	default:
+ 		goto nopan;
+ 	}
+ 
++	if (fail) {
++		vcpu_write_sys_reg(vcpu, SYS_PAR_EL1_F, PAR_EL1);
++		goto nopan;
++	}
++
+ 	/*
+ 	 * If the EL0 translation has succeeded, we need to pretend
+ 	 * the AT operation has failed, as the PAN setting forbids
+ 	 * such a translation.
+-	 *
+-	 * FIXME: we hardcode a Level-3 permission fault. We really
+-	 * should return the real fault level.
+ 	 */
+-	if (fail || !(par & SYS_PAR_EL1_F))
+-		vcpu_write_sys_reg(vcpu, (0xf << 1) | SYS_PAR_EL1_F, PAR_EL1);
+-
++	if (par & SYS_PAR_EL1_F) {
++		u8 fst = FIELD_GET(SYS_PAR_EL1_FST, par);
++
++		/*
++		 * If we get something other than a permission fault, we
++		 * need to retry, as we're likely to have missed in the PTs.
++		 */
++		if ((fst & ESR_ELx_FSC_TYPE) != ESR_ELx_FSC_PERM)
++			retry_slow = true;
++	} else {
++		/*
++		 * The EL0 access succeded, but we don't have the full
++		 * syndrom information to synthetize the failure. Go slow.
++		 */
++		retry_slow = true;
++	}
+ nopan:
+ 	__mmu_config_restore(&config);
+ out:
+ 	local_irq_restore(flags);
+ 
+ 	write_unlock(&vcpu->kvm->mmu_lock);
++
++	/*
++	 * If retry_slow is true, then we either are missing shadow S2
++	 * entries, have paged out guest S1, or something is inconsistent.
++	 *
++	 * Either way, we need to walk the PTs by hand so that we can either
++	 * fault things back, in or record accurate fault information along
++	 * the way.
++	 */
++	if (retry_slow) {
++		par = handle_at_slow(vcpu, op, vaddr);
++		vcpu_write_sys_reg(vcpu, par, PAR_EL1);
++	}
+ }
+ 
+ void __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+@@ -433,6 +931,10 @@ void __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+ 
+ 	write_unlock(&vcpu->kvm->mmu_lock);
+ 
++	/* We failed the translation, let's replay it in slow motion */
++	if (!fail && (par & SYS_PAR_EL1_F))
++		par = handle_at_slow(vcpu, op, vaddr);
++
+ 	vcpu_write_sys_reg(vcpu, par, PAR_EL1);
+ }
+ 
+-- 
+2.39.2
 
-I still don't think we should get rid of the WAS_FAST stuff.
-
-The assumption that the L1 VM will almost never share pages between L2
-VMs is questionable. The real question becomes: do we care to have
-accurate age information for this case? I think so.
-
-It's not completely trivial to get the lockless walking of the shadow
-MMU rmaps correct either (please see the patch I attached here[1]).
-And the WAS_FAST functionality isn't even that complex to begin with.
-
-Thanks for your patience.
-
-[1]: https://lore.kernel.org/linux-mm/CADrL8HW=3DkCLoWBwoiSOCd8WHFvBdWaguZ2=
-ureo4eFy9D67+owg@mail.gmail.com/
