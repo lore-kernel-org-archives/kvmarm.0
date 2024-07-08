@@ -1,36 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 012AD1422CA;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 012F8142E8D;
 	Mon,  8 Jul 2024 15:44:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720453495; cv=none; b=A9Pn8/Bh5zLN6VLzsj//hYIuUyp2hEnT4+sjVlKdiy/GJU1DOcf8cEfbNY69+CRG7dgp+AwTiJCjs1wzrT5dLCSQq0nxbVoeKF2hndlx4i0cg3FFyfCqALr4duaR6PQkqmiszk62eo6Uy4v6bY4syv5FyXzCSVUX4u6mXPEeL3s=
+	t=1720453495; cv=none; b=RwnvpQKwaRil/hDSHBCdwu6jZVpbh1GAIu/XHlz21M90+dhAyov15HqAXe/4wNWWKJ3O/4a/6y+vFMD4dGNPruhbcQswuX/FVl4gjGtKFYuRo5/PrnTlUtBZ5bVGBPaV5GoYNkq3n3WYiNmziXgKSz9HhRjxmthxirqnwlw6Kvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1720453495; c=relaxed/simple;
-	bh=iFWcrgnnLVyozv323EWmLqXVQmcY+xMWCYUY9LRYxjs=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=BP80wbYNyPD/kW3J1PXf+jfzj3b7XNHgJAQdL9oJW+DLHvlXW2Xadu4vFGWIZ+FsGpv1Q4o4CPbpsRqgffTovb/vpD4q2uYPtDWlu2BwpiFf3Z7NN+c4TCezdX8hxWLy4ymVhfEiK6spEEfHIxjv02UvOS/VcRoSUt4shx36Vdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XKz2zPN+; arc=none smtp.client-ip=10.30.226.201
+	bh=Xfz4WXL/9Lt0RTxagOQrxxUD5NaqarQygvSwbXyzrnc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=B+4p+NEOPdoBwTR3Fuv72y+RmyWQnD9C7gMW+5rMPtaSpNldSSnozKTz3g3OaGECj9d2p6l9z/s1UumOYszDQyWW6NItlabl0vX2Jjex/JHsZzi94+Zm2OWYm2ylFPgBQqMM2GPx/xLNqheBT6B/C5fw2IgfWonZFLobiFnNUmA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jsZU4Eyg; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XKz2zPN+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A56CC32786;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jsZU4Eyg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E66CC4AF0C;
 	Mon,  8 Jul 2024 15:44:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1720453494;
-	bh=iFWcrgnnLVyozv323EWmLqXVQmcY+xMWCYUY9LRYxjs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XKz2zPN+vPcCH67ovDxSFL6OpG2f86/OM9Xo5c3U6TJzZwtEgfAOX83JVRGXqI2ky
-	 wh3DicfoZwDxI+ziJQnB1oJUU7gg/OVjeLLSPrqfauo2REzOfdOf7KaUWqjMqirWIV
-	 S6DG54LTYqfEeT49tm9G2Fm6CRvFazsKMsU9LRN82GnAtRcnqvyKaJuFc8XVm0Fa5y
-	 5ZFzeN00V/H+My/dd63QRJioSoE51bAXLYLPbk0udH+QUAbc3nR44ZILKHS/Q7LlRt
-	 naJmtkvzvyHRqL+CKywml44rJ/prl5NEk4fnI+kYc8+GNyGdw6DvasShABpiV8EuIm
-	 IinGCKI8l5+WQ==
+	bh=Xfz4WXL/9Lt0RTxagOQrxxUD5NaqarQygvSwbXyzrnc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=jsZU4EygvkG5gLEDEydCqSiyu9ovGBrAxcpBEmuUKGd/3gTF8BRFsm+AEXz5gc9a2
+	 kBHVRlDKnZqL4zcqpkTn6ugbSqxwvn1neS8B2z7lfRMs/v3gjwNBHPm225gc05p3G3
+	 0LBkLSey8BAdw1jFyvt385KQLrbEp3fbo2rbJ6DNcXaA/vcFwOXYH2PqENKOgKIrIS
+	 XQLhRSBOmtahuWy/kuklY0GTShg1bETKVPsTz5ncVvdQ9MlKIO01Mwcg2gX/bfLUUx
+	 hIbYCA+W7TY9kzhD6K2DmMiTvOYCUi9M4drw2MgJhEKC9dnN+l5KjFeQM5VK6x6ZT2
+	 qorsYJJngX2kg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sQqXs-00Ae1P-QA;
+	id 1sQqXs-00Ae1P-8W;
 	Mon, 08 Jul 2024 16:44:52 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -43,12 +42,10 @@ Cc: James Morse <james.morse@arm.com>,
 	Fuad Tabba <tabba@google.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH 2/7] KVM: arm64: Move FPMR into the sysreg array
-Date: Mon,  8 Jul 2024 16:44:33 +0100
-Message-Id: <20240708154438.1218186-3-maz@kernel.org>
+Subject: [PATCH 0/7] KVM: arm64: Add support for FP8
+Date: Mon,  8 Jul 2024 16:44:31 +0100
+Message-Id: <20240708154438.1218186-1-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240708154438.1218186-1-maz@kernel.org>
-References: <20240708154438.1218186-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -61,78 +58,42 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Just like SVCR, FPMR is currently stored at the wrong location.
+Although FP8 support was merged in 6.9, the KVM side was dropped, with
+no sign of it being picked up again. Given that its absence is getting
+in the way of NV upstreaming (HCRX_EL2 needs fleshing out), here's a
+small series addressing it.
 
-Let's move it where it belongs.
+The support is following the save/restore model established for the
+rest of the FP code, with FPMR being tied to it. The sole additions
+are the handling of traps in a nested context, and the corresponding
+ID registers being made writable. As an extra cleanup, SVCR and FPMR
+are moved into the sysreg array.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/kvm_host.h |  2 +-
- arch/arm64/kvm/fpsimd.c           |  2 +-
- arch/arm64/kvm/sys_regs.c         | 10 ++++++++++
- 3 files changed, 12 insertions(+), 2 deletions(-)
+Patches are on top of kvmarm/next, as this would otherwise majorly
+conflict. Note that this is compile-tested only, as I have no access
+to FP8 HW or model (and running NV in a model is not something I wish
+to entertain ever again).
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 0b3d7697ca0a7..a14c18e8b173a 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -448,6 +448,7 @@ enum vcpu_sysreg {
- 
- 	/* FP/SIMD/SVE */
- 	SVCR,
-+	FPMR,
- 
- 	/* 32bit specific registers. */
- 	DACR32_EL2,	/* Domain Access Control Register */
-@@ -667,7 +668,6 @@ struct kvm_vcpu_arch {
- 	void *sve_state;
- 	enum fp_type fp_type;
- 	unsigned int sve_max_vl;
--	u64 fpmr;
- 
- 	/* Stage 2 paging state used by the hardware on next switch */
- 	struct kvm_s2_mmu *hw_mmu;
-diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-index e6425414d301f..4cb8ad5d69a80 100644
---- a/arch/arm64/kvm/fpsimd.c
-+++ b/arch/arm64/kvm/fpsimd.c
-@@ -135,7 +135,7 @@ void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu)
- 		fp_state.sve_vl = vcpu->arch.sve_max_vl;
- 		fp_state.sme_state = NULL;
- 		fp_state.svcr = &__vcpu_sys_reg(vcpu, SVCR);
--		fp_state.fpmr = &vcpu->arch.fpmr;
-+		fp_state.fpmr = &__vcpu_sys_reg(vcpu, FPMR);
- 		fp_state.fp_type = &vcpu->arch.fp_type;
- 
- 		if (vcpu_has_sve(vcpu))
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 2dc6cab43b2f8..326262abc2ff4 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1678,6 +1678,15 @@ static unsigned int sme_visibility(const struct kvm_vcpu *vcpu,
- 	return REG_HIDDEN;
- }
- 
-+static unsigned int fp8_visibility(const struct kvm_vcpu *vcpu,
-+				   const struct sys_reg_desc *rd)
-+{
-+	if (kvm_has_feat(vcpu->kvm, ID_AA64PFR2_EL1, FPMR, IMP))
-+		return 0;
-+
-+	return REG_HIDDEN;
-+}
-+
- static u64 read_sanitised_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
- 					  const struct sys_reg_desc *rd)
- {
-@@ -2545,6 +2554,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 			     CTR_EL0_DminLine_MASK |
- 			     CTR_EL0_IminLine_MASK),
- 	{ SYS_DESC(SYS_SVCR), undef_access, reset_val, SVCR, 0, .visibility = sme_visibility  },
-+	{ SYS_DESC(SYS_FPMR), undef_access, reset_val, FPMR, 0, .visibility = fp8_visibility },
- 
- 	{ PMU_SYS_REG(PMCR_EL0), .access = access_pmcr, .reset = reset_pmcr,
- 	  .reg = PMCR_EL0, .get_user = get_pmcr, .set_user = set_pmcr },
+Also, this is *not* 6.11 material. 6.12 if we're lucky.
+
+Marc Zyngier (7):
+  KVM: arm64: Move SVCR into the sysreg array
+  KVM: arm64: Move FPMR into the sysreg array
+  KVM: arm64: Add save/restore support for FPMR
+  KVM: arm64: Honor trap routing for FPMR
+  KVM: arm64: Expose ID_AA64FPFR0_EL1 as a writable ID reg
+  KVM: arm64: Enable FP8 support when available and configured
+  KVM: arm64: Expose ID_AA64PFR2_EL1 to userspace and guests
+
+ arch/arm64/include/asm/kvm_host.h  | 16 ++++++++++--
+ arch/arm64/kvm/emulate-nested.c    |  8 ++++++
+ arch/arm64/kvm/fpsimd.c            |  5 ++--
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c |  4 +++
+ arch/arm64/kvm/hyp/nvhe/switch.c   | 10 +++++++
+ arch/arm64/kvm/hyp/vhe/switch.c    |  4 +++
+ arch/arm64/kvm/sys_regs.c          | 42 +++++++++++++++++++++++++++---
+ 7 files changed, 82 insertions(+), 7 deletions(-)
+
 -- 
 2.39.2
 
