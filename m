@@ -1,117 +1,87 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0BCCAD59;
-	Mon,  8 Jul 2024 17:00:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85E63AD55;
+	Mon,  8 Jul 2024 17:22:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720458012; cv=none; b=a2iiVzHNRB/NUTa4HkakmXCYwvwIOHIUUZTPlyZ7RzXoILdFHzOcQAw2dqBmXzoEy6jLZgzcAILzkhYnXY+UlMkexZWz0Um/Qd4WqWtyqjekGX80oGQdIl4+b1aAxRcPLUi86CdR4g7KIG45/8jVLIp6BeUGBf8Db7HLxV/UzaQ=
+	t=1720459349; cv=none; b=ubBgDj/Qb/2y3xNQhpYTXZs0/nNOTPa2TD8PBYtHuMjJRNu6Ot54p+2rWTNedN5tThLpVn1z885go44K6/oNQR0+3arBSs/mchz5lLYTh8FfIQ1IGp76hRaA81+Cj3K5zPaPW449Ss6gO5kY4kLy+SJVBO9hxr2DBO4QD4uOz78=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720458012; c=relaxed/simple;
-	bh=TJXRiPQGbDDadYQlPjM5Ngjt6PZe8+vDuvb31W9v/2M=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Yub/IuJZu7fjMO/14r7aXtfs0RHVM/LlJ/4kRK0I2i73WXxe/UMZ4BUmGsp8Kh9kNnxnKxD3cXQYXqy0ipsgASGk57m25wC9kSdYKRh9YIWmeFqtyr4XC931/VCQJFCNXuJNJZz3SZKbCtyWgEMIjbEYHkcuFqqUEUm1rvfdQ+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OfWubp0V; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OfWubp0V"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90D00C116B1;
-	Mon,  8 Jul 2024 17:00:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720458012;
-	bh=TJXRiPQGbDDadYQlPjM5Ngjt6PZe8+vDuvb31W9v/2M=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OfWubp0VahP6zI0SnnwH/MTPzr073H9EmTOxJqHzoO4AyWc+PaG9ov+g5ckG1LhoH
-	 rlR87KN4uIvcUqrzEnznPTE0/Jfdltf77SZjHmEb+oZTvh9SJIuvBvddK2yh3kJw4k
-	 klDD3CeMYhD46Vhp3/9ky6FoWSz/bGnL6Wla0naOt1E766HlWD3D81Y2BDppH5VKKF
-	 kV8Ib3qyWQ9B8OS7jVqmC/f1xnDWkGrtI6KVwbmzOeLfP/7r8stlhVMub8iE0nATda
-	 0k1yrvJn1ZTwKL4kqIScsUNDt8Fn2Jz7UCsgux75ahgaRwgFgChIfAv9AduiXpL3Pj
-	 cOFZUVobTTCYw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sQrik-00AfQi-Gh;
-	Mon, 08 Jul 2024 18:00:10 +0100
-Date: Mon, 08 Jul 2024 18:00:09 +0100
-Message-ID: <867cdv4y5i.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Joey Gouly <joey.gouly@arm.com>
-Subject: Re: [PATCH 00/12] KVM: arm64: nv: Add support for address translation instructions
-In-Reply-To: <ZowTm99y4fp9xWL7@arm.com>
-References: <20240625133508.259829-1-maz@kernel.org>
-	<ZowTm99y4fp9xWL7@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.3
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1720459349; c=relaxed/simple;
+	bh=egCPeI3Ur+czV6GQo2A5wIsjxu5dg2eZAfku3PDOLeE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GwJmCByTkJk7n+BGSMkJ5/6zlxWpaSvp9i7NQWo20BDd+8XafuonWhmAi9OdlK2L7IdHKoccipfqud/tq+MVFY/CbKdXuYZddPVZ7MKPlSRYu7BZThn9gN+cJHuGaV8gW18fCm1aOQ7LM4xPRu6NPFqAYXLrb18QG5gXjvIfyoA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6469C116B1;
+	Mon,  8 Jul 2024 17:22:24 +0000 (UTC)
+Date: Mon, 8 Jul 2024 18:22:22 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: Amit Daniel Kachhap <amitdaniel.kachhap@arm.com>,
+	linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
+	aneesh.kumar@kernel.org, aneesh.kumar@linux.ibm.com, bp@alien8.de,
+	broonie@kernel.org, christophe.leroy@csgroup.eu,
+	dave.hansen@linux.intel.com, hpa@zytor.com,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
+	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
+	oliver.upton@linux.dev, shuah@kernel.org, szabolcs.nagy@arm.com,
+	tglx@linutronix.de, will@kernel.org, x86@kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v4 13/29] arm64: convert protection key into vm_flags and
+ pgprot values
+Message-ID: <ZowgTnjFi4rA3pHE@arm.com>
+References: <20240503130147.1154804-1-joey.gouly@arm.com>
+ <20240503130147.1154804-14-joey.gouly@arm.com>
+ <4f7d8691-fe19-4e8a-95e5-9f7680c82021@arm.com>
+ <ZnMLKb_gWsbLgMf3@arm.com>
+ <20240704124704.GA3548388@e124191.cambridge.arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240704124704.GA3548388@e124191.cambridge.arm.com>
 
-Hi Alex,
-
-On Mon, 08 Jul 2024 17:28:11 +0100,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> 
-> Hi Marc,
-> 
-> On Tue, Jun 25, 2024 at 02:34:59PM +0100, Marc Zyngier wrote:
-> > Another task that a hypervisor supporting NV on arm64 has to deal with
-> > is to emulate the AT instruction, because we multiplex all the S1
-> > translations on a single set of registers, and the guest S2 is never
-> > truly resident on the CPU.
+On Thu, Jul 04, 2024 at 01:47:04PM +0100, Joey Gouly wrote:
+> On Wed, Jun 19, 2024 at 05:45:29PM +0100, Catalin Marinas wrote:
+> > On Tue, May 28, 2024 at 12:24:57PM +0530, Amit Daniel Kachhap wrote:
+> > > On 5/3/24 18:31, Joey Gouly wrote:
+> > > > diff --git a/arch/arm64/include/asm/mman.h b/arch/arm64/include/asm/mman.h
+> > > > index 5966ee4a6154..ecb2d18dc4d7 100644
+> > > > --- a/arch/arm64/include/asm/mman.h
+> > > > +++ b/arch/arm64/include/asm/mman.h
+> > > > @@ -7,7 +7,7 @@
+> > > >   #include <uapi/asm/mman.h>
+> > > >   static inline unsigned long arch_calc_vm_prot_bits(unsigned long prot,
+> > > > -	unsigned long pkey __always_unused)
+> > > > +	unsigned long pkey)
+> > > >   {
+> > > >   	unsigned long ret = 0;
+> > > > @@ -17,6 +17,12 @@ static inline unsigned long arch_calc_vm_prot_bits(unsigned long prot,
+> > > >   	if (system_supports_mte() && (prot & PROT_MTE))
+> > > >   		ret |= VM_MTE;
+> > > > +#if defined(CONFIG_ARCH_HAS_PKEYS)
+> > > 
+> > > Should there be system_supports_poe() check like above?
 > > 
-> > So given that we lie about page tables, we also have to lie about
-> > translation instructions, hence the emulation. Things are made
-> > complicated by the fact that guest S1 page tables can be swapped out,
-> > and that our shadow S2 is likely to be incomplete. So while using AT
-> > to emulate AT is tempting (and useful), it is not going to always
-> > work, and we thus need a fallback in the shape of a SW S1 walker.
-> > 
-> > This series is built in 4 basic blocks:
-> > 
-> > - Add missing definition and basic reworking
-> > 
-> > - Dumb emulation of all relevant AT instructions using AT instructions
-> > 
-> > - Add a SW S1 walker that is using our S2 walker
+> > I think it should, otherwise we end up with these bits in the pte even
+> > when POE is not supported.
 > 
-> I wanted to have a look at the S1 walker, and in my inbox I only have
-> patches #1 to #9 ("KVM: arm64: nv: Make ps_to_output_size() generally
-> available"). Checked on the kvm mailing list archive [1], same thing; a
-> google search for the string "KVM: arm64: nv: Add SW walker for AT S1
-> emulation" (quotes included) turns up the cover letter.
-> 
-> Am I looking in the wrong places?
-> 
-> [1] https://www.spinics.net/lists/kvm/msg351826.html
+> I think it can't get here due to the flow of the code, but I will add it to be
+> defensive (since it's just an alternative that gets patched).
 
-This is very odd. I probably have sent them by specifying 000*patch
-instead of 00*patch, hence the truncation to 9 patches.
+You are probably right, the mprotect_pkey() will reject the call if we
+don't support POE. So you could add a comment instead (but a
+system_supports_poe() check seems safer).
 
-Let me try and send the delta. With a bit of luck, it won't make a
-mess in the archive[1].
+> I still need the defined(CONFIG_ARCH_HAS_PKEYS) check, since the VM_PKEY_BIT*
+> are only defined then.
 
-Thanks for the heads up,
-
-	M.
-
-[1] https://lore.kernel.org/all/20240625133508.259829-1-maz@kernel.or
+Yes, the ifdef will stay.
 
 -- 
-Without deviation from the norm, progress is not possible.
+Catalin
