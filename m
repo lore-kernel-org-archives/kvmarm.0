@@ -1,93 +1,113 @@
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 200FC1879
-	for <kvmarm@lists.linux.dev>; Mon,  8 Jul 2024 02:02:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AB8C25745;
+	Mon,  8 Jul 2024 14:21:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720404133; cv=none; b=eLVdQfIjiMAtTyCD61p48wYJiYhq02Rldlzw3CASaB6YGlKxxWtTBQ6Seqa1J+hYkl3L/rdFqJOwQkO9ApIrnQKlarW9kp3NtPvtFs5r+IZ1g0khGcA9wbLts3i+noa0BXfPo0hYK3L4Y1vUbyW/H+bKWvh89wVSuEk/bsuPJo0=
+	t=1720448469; cv=none; b=RKjqNK+B9knfxc/GvE127SBSf3jqOSP3OsmYkYZccxhLpjxiR6qnnwNcRM81kUgMi5FdIw7W3RA1AXrMU9PUAfEYo9aS2sLDbOXva1Nc3lA+JR059YygG2UTjx/Eh6ya0OE4wNZZwiOlWZj95XcPN3/DvmK+EIwvKZ7/huDPurc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720404133; c=relaxed/simple;
-	bh=UZDZrlSP7/QdDQHoliOTVBazrZJQYxlDlAH1qse8axQ=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=Yz1eHHm1JZoJ5gMCpHqWEmGmJywt1W2tznqsT6se/1WLNb7fzRA2zuuDMBWAduEItZL6DEUtrdL2++aWXYOACOEjBfoRavj9EaLGNPilB/9H+Lhry6PysDVoBT32Lc5mKMPXGIGaCgw+oKVnFM51XFElknm75cwdDQchR6Yd30o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4WHS294lFQzQkl2;
-	Mon,  8 Jul 2024 09:58:09 +0800 (CST)
-Received: from kwepemd500014.china.huawei.com (unknown [7.221.188.63])
-	by mail.maildlp.com (Postfix) with ESMTPS id D85AB18006C;
-	Mon,  8 Jul 2024 10:02:02 +0800 (CST)
-Received: from [10.67.146.137] (10.67.146.137) by
- kwepemd500014.china.huawei.com (7.221.188.63) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Mon, 8 Jul 2024 10:02:02 +0800
-Subject: Re: [PATCH 0/3] irqchip/gic-v4: Fix VMAPP/VMOVP races
-To: Marc Zyngier <maz@kernel.org>, <kvmarm@lists.linux.dev>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-CC: Thomas Gleixner <tglx@linutronix.de>, "guoyang (C)" <guoyang2@huawei.com>,
-	jiangkunkun <jiangkunkun@huawei.com>, wangwudi <wangwudi@hisilicon.com>
-References: <20240705093155.871070-1-maz@kernel.org>
-From: Tangnianyao <tangnianyao@huawei.com>
-Message-ID: <ce1c797f-1b00-2f14-de1d-b3524acf3c1f@huawei.com>
-Date: Mon, 8 Jul 2024 10:02:01 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.1
+	s=arc-20240116; t=1720448469; c=relaxed/simple;
+	bh=AS//5zgMCQN/h1qCnz0G1cBSnKG6FpnCnY7qDhGUZuE=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=gbQD86iNWzeNcZaSWg/n5NDlf4UY1T/m7Fk88T6dziCb14kAWKsWcg7oO7CaPI6grgcQfjy85Fnuf36vbfUKmaGyJBImug+xdGFVc0EzeoF6aCgLxwczb1rLpsUwCfztQmjp8ZEejNsANfYJ74M17vBPKRfyv5RP4BVF6Vyo+oY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dnq/5zEj; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dnq/5zEj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47E50C116B1;
+	Mon,  8 Jul 2024 14:21:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720448468;
+	bh=AS//5zgMCQN/h1qCnz0G1cBSnKG6FpnCnY7qDhGUZuE=;
+	h=From:Subject:Date:To:Cc:From;
+	b=Dnq/5zEjN2yOZE4iZG9mtW07zJP+fMvDtYuso1bL6rGikEeD0lCTzGd6Q1nDw2u4e
+	 xXsr+N/InzfML8PECmci+pssxMxQP8XV471auGR0hnC5EvfYkkP9vfZxvm4Fl77zed
+	 CS1L9HHWC0Y1l75NRCoRE/B6RgxJnnHfp0X2ncSTok6exHe+Sdu2qQypP8aGcffluF
+	 kmTGow6mvyTy2lS+NqtV4udy6v0GXmECRklxdLK1Zon27VXDY2spbYQBedJ1ZoJwN+
+	 /ELM9ldefmo1dEJrM2bQIlYlBwHToPb69RuJtNbDkFhcxzxcRfSeuczsG1tl7jwlkC
+	 ZoVUhqVjyU+uw==
+From: Mark Brown <broonie@kernel.org>
+Subject: [PATCH v5 0/4] KVM: arm64: Fix underallocation of storage for SVE
+ state
+Date: Mon, 08 Jul 2024 15:19:12 +0100
+Message-Id: <20240708-kvm-arm64-fix-pkvm-sve-vl-v5-0-d2175738456b@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <20240705093155.871070-1-maz@kernel.org>
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemd500014.china.huawei.com (7.221.188.63)
+X-B4-Tracking: v=1; b=H4sIAGH1i2YC/33QzYrCMBDA8VeRnB3JxzSJnnwP2UOTTDWobUkku
+ EjffVNhURF6/A+Z30AeLFOKlNlu9WCJSsxx6Gs06xXzp7Y/EsRQm0kukWuOcC5XaNNVI3TxDuO
+ cuRCUCwjlgxFdMMFxVvfHRPXJ0z781D7FfBvS7/NUkfP0X9ULapHAwVvbITl0At3+TKmny2ZIR
+ zazRbxTzRIlKqUtD9qhcujFF6XeKbNEqUo1WzJWGK6Dbr4ofFFm8dsKVsppu7Wtkyp4/KCmafo
+ DlX/GUqQBAAA=
+To: Catalin Marinas <catalin.marinas@arm.com>, 
+ Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+ Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Fuad Tabba <tabba@google.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ kvmarm@lists.linux.dev, Mark Brown <broonie@kernel.org>
+X-Mailer: b4 0.14-dev-d4707
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2069; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=AS//5zgMCQN/h1qCnz0G1cBSnKG6FpnCnY7qDhGUZuE=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBmi/XJsOHfwdNXbXkCWTEMGhwVLSVC2tlTEcQYF4is
+ 6q7AEWqJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZov1yQAKCRAk1otyXVSH0IAyB/
+ 9Lsqizk8r96lkyMqZtxNGsCwlbxxTf0t6UUi03eVRoXykw24Qli5z8PvHw0SjJtJujr+vDSUk1/xdq
+ pLIym0hJCTcTgzXVAj9mdv3cKBS5Y3f62PY8yP/FXjX+w7YUeQDsYvOYfjaVM+hdIhMfizdIoLVo+l
+ cJSqxKasaNksxBQqkG9IB1/Iu4fRh4eG6co2SJRmBNOcKGqUwFvWNRTtWnYV5Puv4/kys0LGvvJNno
+ OJMB73bBOQdMrmSkpiG5zS70z1mf4PE8VdQ4inStSyIpqO6mb/QC/apq9frCIpfUco0xoVug9ghy+X
+ 9vRBjNll+DPI67eKkU4BPg8Vo3yGkZ
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
+As observed during review the pKVM support for saving host SVE state is
+broken if an asymmetric system has VLs larger than the maximum shared
+VL, fix this by discovering then using the maximum VL for allocations
+and using RDVL during the save/restore process.
 
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+Changes in v5:
+- Clarify commit message on patch 3.
+- Link to v4: https://lore.kernel.org/r/20240704-kvm-arm64-fix-pkvm-sve-vl-v4-0-b6898ab23dc4@kernel.org
 
-On 7/5/2024 17:31, Marc Zyngier wrote:
-> In 20240701072305.4129823-1-tangnianyao@huawei.com, Nianyao reports
-> a number of possible races that can trigger on GICv4 implementations
-> using the ITSList feature.
->
-> These races involve concurrent VMOVP and VMAPP, the former happening
-> on vcpu load, while the latter is triggered on the first device being
-> MAPTI'd on a given ITS for this particular guest.
->
-> The main issue is that we want to establish the affinity at VMAPP time,
-> while vcpu_load wants to set the affinity where the vcpu actually runs.
-> Lock ordering constraints mean that we can't lock the VPE on VMAPP,
-> so things are modified without any lock. What could possibly go wrong?
->
-> THe fix is a bit involved, and relies on 3 things:
->
-> - Making sure that the initial affinity of a VPE is fixed at activate
->   time, which is done early in the life of the vcpup, before it can run.
->
-> - Add a per-VM lock that can be taken instead of the global vmovp_lock,
->   paving the way for a more manageable lock order.
->
-> - Take the per-VPE lock whenever modifying the VPE affinity, as expected
->   everywhere else in the code.
->
-> With that, VMAPP and VMOVP can now run concurrently and still lead to
-> sensible results.
->
-> Marc Zyngier (3):
->   irqchip/gic-v4: Always configure affinity on VPE activation
->   irqchip/gic-v4: Substitute vmovp_lock for a per-VM lock
->   irqchip/gic-v4: Make sure a VPE is locked when VMAPP is issued
->
->  drivers/irqchip/irq-gic-v3-its.c   | 48 ++++++++++++++----------------
->  include/linux/irqchip/arm-gic-v4.h |  8 +++++
->  2 files changed, 30 insertions(+), 26 deletions(-)
->
+Changes in v4:
+- Roll in Catalin's acks.
+- Link to v3: https://lore.kernel.org/r/20240607-kvm-arm64-fix-pkvm-sve-vl-v3-0-59e781706d65@kernel.org
 
-I've tested this patch series. It works.
+Changes in v3:
+- Replace %u with %lu in late CPU error message.
+Changes in v2:
+- Downgrade check for a late CPU increasing maximum VL to a warning only
+  but do it unconditionally since pKVM prevents late CPUs anyway.
+- Commit log tweaks.
+- Link to v1: https://lore.kernel.org/r/20240605-kvm-arm64-fix-pkvm-sve-vl-v1-0-680d6b43b4c1@kernel.org
 
-Tested-by: Nianyao Tang <tangnianyao@huawei.com>
+---
+Mark Brown (4):
+      arm64/fpsimd: Introduce __bit_to_vl() helper
+      arm64/fpsimd: Discover maximum vector length implemented by any CPU
+      KVM: arm64: Fix FFR offset calculation for pKVM host state save and restore
+      KVM: arm64: Avoid underallocating storage for host SVE state
+
+ arch/arm64/include/asm/fpsimd.h         | 17 +++++++++++++++
+ arch/arm64/include/asm/kvm_host.h       |  2 +-
+ arch/arm64/include/asm/kvm_hyp.h        |  3 ++-
+ arch/arm64/include/asm/kvm_pkvm.h       |  2 +-
+ arch/arm64/kernel/fpsimd.c              | 38 +++++++++++++++++++++++++++------
+ arch/arm64/kvm/hyp/fpsimd.S             |  5 +++++
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  6 +++---
+ arch/arm64/kvm/hyp/nvhe/pkvm.c          |  2 +-
+ arch/arm64/kvm/reset.c                  |  6 +++---
+ 10 files changed, 65 insertions(+), 18 deletions(-)
+---
+base-commit: afb91f5f8ad7af172d993a34fde1947892408f53
+change-id: 20240604-kvm-arm64-fix-pkvm-sve-vl-13cd71fd7db0
+
+Best regards,
+-- 
+Mark Brown <broonie@kernel.org>
+
