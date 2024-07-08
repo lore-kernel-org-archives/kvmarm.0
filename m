@@ -1,114 +1,146 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DC0614D28B;
-	Mon,  8 Jul 2024 17:53:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BEA51482F5;
+	Mon,  8 Jul 2024 17:53:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720461205; cv=none; b=sj8ytUYxLgZ3h8CziwofGksd/N+dI3BHZGf7Py/pWI+EwJ2CJq5V0rCAwUFfm0n3WIyyO97T2gg3vpYEBQFCehejhbW+b48etMYxiiR6MjJuEh1CQ/lN2HQFJtsOkk8fgfezVcVQlbn2cHtRYpxjOgGyu6ZBAz5ZX/DYNJbzlUY=
+	t=1720461222; cv=none; b=cNR9ci0mcnItMMXQ8Blc+yUUkHsPh8TNKJUi1BOdKBZB0q3wpTKoJL8oWdqpqQO2ekPiFVyRkdIOPQRSxK/gZv9LPf9XK3foA8dWhzVGWVAOKCInFU6lkUFcu9ICiJWMWbfmRE4lX91UPYZ4MWhvimBYuB3Z1TA4D3I3LRuQCAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720461205; c=relaxed/simple;
-	bh=NrAuU7/qwUsU2CR3H2Sdo7BSKytY/z+C5vPmWZWycK0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pe0W6Umx9vhfl4TR1QzGm3sEeNVEq0rCeqwk1yMKVL655xnMQbiKgwLGs8S/rH+v+PuU4M1YkiETzaojpKMv3oIvn5nHkMkPJaCuJssMh2dsTLA0gZKiu8bZSZgkH+ymlQnOmV1Bf9B8J0Owdtj2DG3LPK+nfVgVqEImKPL8bjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AD02C116B1;
-	Mon,  8 Jul 2024 17:53:20 +0000 (UTC)
-Date: Mon, 8 Jul 2024 18:53:18 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Szabolcs Nagy <szabolcs.nagy@arm.com>
-Cc: Florian Weimer <fweimer@redhat.com>, Joey Gouly <joey.gouly@arm.com>,
-	dave.hansen@linux.intel.com, linux-arm-kernel@lists.infradead.org,
-	akpm@linux-foundation.org, aneesh.kumar@kernel.org,
-	aneesh.kumar@linux.ibm.com, bp@alien8.de, broonie@kernel.org,
-	christophe.leroy@csgroup.eu, hpa@zytor.com,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
-	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
-	oliver.upton@linux.dev, shuah@kernel.org, tglx@linutronix.de,
-	will@kernel.org, x86@kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 17/29] arm64: implement PKEYS support
-Message-ID: <ZownjvHbPI1anfpM@arm.com>
-References: <20240503130147.1154804-1-joey.gouly@arm.com>
- <20240503130147.1154804-18-joey.gouly@arm.com>
- <ZlnlQ/avUAuSum5R@arm.com>
- <20240531152138.GA1805682@e124191.cambridge.arm.com>
- <Zln6ckvyktar8r0n@arm.com>
- <87a5jj4rhw.fsf@oldenburg.str.redhat.com>
- <ZnBNd51hVlaPTvn8@arm.com>
+	s=arc-20240116; t=1720461222; c=relaxed/simple;
+	bh=dLMjjZFXvk4TV7oN+/f5Ke6QToQU5488NgstOod12WY=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qrGxwHZqrTQsImUy+P+a4BhpjA20pB2QA4Wg9exvTIFxGQDVhaOanvRj1x8aN4D5Ao540eDGl2lVwwih+Hr91SId+Ti2CA7uXHkRMZZoLzW3lWEtZ9nGZWQCg7+B7UnFTITNEGOQy9g8TKH6h105Qu+w/I/fzP4kGOxf5EZMSvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YL7n9MvZ; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YL7n9MvZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F14EC116B1;
+	Mon,  8 Jul 2024 17:53:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720461222;
+	bh=dLMjjZFXvk4TV7oN+/f5Ke6QToQU5488NgstOod12WY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=YL7n9MvZxrgUEOp7rcf0Tb3iEPrTfsRroAsivqkdJfnX1oItfGMByW+0Ym8IBbuMU
+	 uERyLcLMz4pyb3ROJJSg7Abnh5hWrsXqy2DrCtfEZ4Udtp6r12qM0iLdDvkmfMPd2y
+	 cjkWsHSB3p+SXqJHhUySB9OAbjo4Cqo7tACTT38sxF5ZOTaB34FR2I8y1FRc5cOmOx
+	 Z2QzSaj/6IUaExySKt2aoGGM/xCuOiopnPJQ58Cd547AwCQOVKlgSkuKM4sfCm1t0A
+	 q8odnyL3ofF2eYX7W3uCv4ueYFo9S+Ad+8y514rCuPat9ObnM699AZNG0X0rIgz+4u
+	 VuqWAw8NPkqPw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sQsYW-00AgF9-5M;
+	Mon, 08 Jul 2024 18:53:40 +0100
+Date: Mon, 08 Jul 2024 18:53:39 +0100
+Message-ID: <8634oj4voc.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>
+Subject: Re: [PATCH 3/7] KVM: arm64: Add save/restore support for FPMR
+In-Reply-To: <864j8z4vy6.wl-maz@kernel.org>
+References: <20240708154438.1218186-1-maz@kernel.org>
+	<20240708154438.1218186-4-maz@kernel.org>
+	<b44b29f0-b4c5-43a2-a5f6-b4fd84f77192@sirena.org.uk>
+	<864j8z4vy6.wl-maz@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.3
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZnBNd51hVlaPTvn8@arm.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, tabba@google.com, joey.gouly@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Szabolcs,
-
-On Mon, Jun 17, 2024 at 03:51:35PM +0100, Szabolcs Nagy wrote:
-> The 06/17/2024 15:40, Florian Weimer wrote:
-> > >> A user can still set it by interacting with the register directly, but I guess
-> > >> we want something for the glibc interface..
-> > >> 
-> > >> Dave, any thoughts here?
-> > >
-> > > adding Florian too, since i found an old thread of his that tried
-> > > to add separate PKEY_DISABLE_READ and PKEY_DISABLE_EXECUTE, but
-> > > it did not seem to end up upstream. (this makes more sense to me
-> > > as libc api than the weird disable access semantics)
+On Mon, 08 Jul 2024 18:47:45 +0100,
+Marc Zyngier <maz@kernel.org> wrote:
+> 
+> On Mon, 08 Jul 2024 18:34:36 +0100,
+> Mark Brown <broonie@kernel.org> wrote:
 > > 
-> > I still think it makes sense to have a full complenent of PKEY_* flags
-> > complementing the PROT_* flags, in a somewhat abstract fashion for
-> > pkey_alloc only.  The internal protection mask register encoding will
-> > differ from architecture to architecture, but the abstract glibc
-> > functions pkey_set and pkey_get could use them (if we are a bit
-> > careful).
+> > [1  <text/plain; us-ascii (7bit)>]
+> > On Mon, Jul 08, 2024 at 04:44:34PM +0100, Marc Zyngier wrote:
+> > > Just like the rest of the FP/SIMD state, FPMR needs to be context
+> > > switched.
+> > 
+> > > The only interesting thing here is that we need to treat the pKVM
+> > > part a bit differently, as the host FP state is never written back
+> > > to the vcpu thread, but instead stored locally and eagerly restored.
+> > 
+> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > > ---
+> > >  arch/arm64/include/asm/kvm_host.h  | 10 ++++++++++
+> > >  arch/arm64/kvm/fpsimd.c            |  1 +
+> > >  arch/arm64/kvm/hyp/nvhe/hyp-main.c |  4 ++++
+> > >  arch/arm64/kvm/hyp/nvhe/switch.c   | 10 ++++++++++
+> > >  arch/arm64/kvm/hyp/vhe/switch.c    |  4 ++++
+> > >  5 files changed, 29 insertions(+)
+> > 
+> > I'm possibly missing something here but I'm not seeing where we load the
+> > state for the guest, especially in the VHE case.  I would expect to see
+> > a change in kvm_hyp_handle_fpsimd() to load FPMR for guests with the
+> > feature (it needs to be in there to keep in sync with the ownership
+> > tracking for the rest of the FP state, and to avoid loading needlessly
+> > in cases where the guest never touches FP).
+> > 
+> > Saving for the guest was handled in the previous patch.
+> > 
+> > > diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> > > index 77010b76c150f..a307c1d5ac874 100644
+> > > --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> > > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> > > @@ -312,6 +312,10 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
+> > >  static void kvm_hyp_save_fpsimd_host(struct kvm_vcpu *vcpu)
+> > >  {
+> > >  	__fpsimd_save_state(*host_data_ptr(fpsimd_state));
+> > > +
+> > > +	if (system_supports_fpmr() &&
+> > > +	    kvm_has_feat(vcpu->kvm, ID_AA64PFR2_EL1, FPMR, IMP))
+> > > +		**host_data_ptr(fpmr_ptr) = read_sysreg_s(SYS_FPMR);
+> > >  }
+> > 
+> > That's only saving the host state, it doesn't load the guest state.
 > 
-> to me it makes sense to have abstract
+> Ah, I forgot to cherry-pick the fixes. Fsck knows what else I forgot.
+> Thanks for reminding me.
 > 
-> PKEY_DISABLE_READ
-> PKEY_DISABLE_WRITE
-> PKEY_DISABLE_EXECUTE
-> PKEY_DISABLE_ACCESS
+> 	M.
 > 
-> where access is handled like
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index f59ccfe11ab9a..52c7dc8446f16 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -404,6 +404,10 @@ static bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  	else
+>  		__fpsimd_restore_state(&vcpu->arch.ctxt.fp_regs);
+>  
+> +	if (system_supports_fpmr() &&
+> +	    kvm_has_feat(kern_hyp_va(vcpu->kvm), ID_AA64PFR2_EL1, FPMR, IMP))
+> +		write_sysreg_s(__vcpu_sys_reg(vcpu, FPMR), SYS_FPMR);
+> +
+>  	/* Skip restoring fpexc32 for AArch64 guests */
+>  	if (!(read_sysreg(hcr_el2) & HCR_RW))
+>  		write_sysreg(__vcpu_sys_reg(vcpu, FPEXC32_EL2), fpexc32_el2);
 > 
-> if (flags&PKEY_DISABLE_ACCESS)
-> 	flags |= PKEY_DISABLE_READ|PKEY_DISABLE_WRITE;
-> disable_read = flags&PKEY_DISABLE_READ;
-> disable_write = flags&PKEY_DISABLE_WRITE;
-> disable_exec = flags&PKEY_DISABLE_EXECUTE;
-> 
-> if there are unsupported combinations like
-> disable_read&&!disable_write then those are rejected
-> by pkey_alloc and pkey_set.
-> 
-> this allows portable use of pkey apis.
-> (the flags could be target specific, but don't have to be)
 
-On powerpc, PKEY_DISABLE_ACCESS also disables execution. AFAICT, the
-kernel doesn't define a PKEY_DISABLE_READ, only PKEY_DISABLE_ACCESS so
-for powerpc there's no way to to set an execute-only permission via this
-interface. I wouldn't like to diverge from powerpc.
+And thinking of it, that's not enough. I'm missing the pKVM angle that
+needs to be special cased. Drat.
 
-However, does it matter much? That's only for the initial setup, the
-user can then change the permissions directly via the sysreg. So maybe
-we don't need all those combinations upfront. A PKEY_DISABLE_EXECUTE
-together with the full PKEY_DISABLE_ACCESS would probably suffice.
-
-Give that on x86 the PKEY_ACCESS_MASK will have to stay as
-PKEY_DISABLE_ACCESS|PKEY_DISABLE_WRITE, we'll probably do the same as
-powerpc and define an arm64 specific PKEY_DISABLE_EXECUTE with the
-corresponding PKEY_ACCESS_MASK including it. We can generalise the masks
-with some ARCH_HAS_PKEY_DISABLE_EXECUTE but it's probably more hassle
-than just defining the arm64 PKEY_DISABLE_EXECUTE.
-
-I assume you'd like PKEY_DISABLE_EXECUTE to be part of this series,
-otherwise changing PKEY_ACCESS_MASK later will cause potential ABI
-issues.
+	M.
 
 -- 
-Catalin
+Without deviation from the norm, progress is not possible.
