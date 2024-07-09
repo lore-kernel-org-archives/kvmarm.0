@@ -1,181 +1,138 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1253153503;
-	Tue,  9 Jul 2024 09:06:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA09F136657
+	for <kvmarm@lists.linux.dev>; Tue,  9 Jul 2024 09:33:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720515969; cv=none; b=XQMlIijM7F2vJiA1AfpAATdILbTzl4xnfB4oMWwYjFDG5KamYsxfULGk9ag3JaZyYwmqMTjx9RylsklYUvAvuSXXl8XTtpwhCUtJ7SdmIYYsG+fsIrALzWRiCts+wy6nygNPG8BUVGNvaA75Hp3kmfT94hHxEvPN+5Ir3/XPBWc=
+	t=1720517623; cv=none; b=rSQXw4yAV75ki/GQ1AHGdFkcs7++Y3eXtiScM5qaPsh2pnkeuNb9udsX6x+cGLrElrDnRJBLiRd9js3BK6oko/CGETFlLdLGz4Yx/SQN9UCboHEGgG6+kDsfNRN4EVibD3uNRPlKiJRSN8nLksf4Hjj0Z29Xs2H3fasbzKzF1/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720515969; c=relaxed/simple;
-	bh=fP0OEw/ZFO/81qUtm8MyMZigpasdzFqbY3cL/G2T5zQ=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Tgo8vEdYsU14DS1LEjDYqnzkD9YLyQTKMLkFfSpTUmVxa2iHXkvizFUEwNmqeshj1nhgFVrC15coi1W1ShT9fs5y3nxOJoE9Fa29Hk1kfBeUzwVzxmJxu2D6LfMzt+R5kBSbshBmQPWHbXOOLvvCrLpZ+DN+layn2KG40McddIk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hcXi39/9; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1720517623; c=relaxed/simple;
+	bh=+xcr8lVk5DQWKm02mR2wuHFeFqcIGe7Zvl7Mk7cd9H8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=R1rpwbwBAIiD5b77OSCIaTMCtGLKOeOrPaFd7rQ3Ru9/QKfOz7e7g5PhB1WkaC5UGWvcxPt0uh1hyJXRJW8Dps+wO7cTQ691U1poYpaF/ZEL03IWJ+ynDZrpTr5b/2PYntkisSp2263COSRYIBpi9qPeMZ/S+3loo/AfnGwWDJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=wXHdydFF; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hcXi39/9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98C62C3277B;
-	Tue,  9 Jul 2024 09:06:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720515969;
-	bh=fP0OEw/ZFO/81qUtm8MyMZigpasdzFqbY3cL/G2T5zQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hcXi39/9tMDMiA1U1AT1FSO3EwOqRCDWNMOdl48N+6EIgCNfRmctdfaH0tKprLtW/
-	 OKNKEhgMFJyOYDVTv+FUzCLw5TA4gjyMLqDWo9QIvF0ZL7P2XASyrUBSuYHMGakgfn
-	 Qz0nCffNe/qX1qcWS0VMLPhxdBtUWzgWIRS8u0JRWLeXO5cQ+v1RZflY/9PFPx08kE
-	 xkaASi1H0dzPpcLxw5YfxBRqfmcqRJl15nYBVKn0b3+bNlnyr8kjVDgp5V2N/BbYZJ
-	 zjc3wpeoyzIJYx2juhtLv3D1glzxCk3N08uEt0ZR9MhB8lPZ9q5e9aY4fd1vn0ZJA0
-	 oFXD6mbJTkUxw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sR6nX-00AqR3-9m;
-	Tue, 09 Jul 2024 10:06:07 +0100
-Date: Tue, 09 Jul 2024 10:06:06 +0100
-Message-ID: <861q433pfl.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Fuad Tabba <tabba@google.com>,
-	Joey Gouly <joey.gouly@arm.com>
-Subject: Re: [PATCH 3/7] KVM: arm64: Add save/restore support for FPMR
-In-Reply-To: <8634oj4voc.wl-maz@kernel.org>
-References: <20240708154438.1218186-1-maz@kernel.org>
-	<20240708154438.1218186-4-maz@kernel.org>
-	<b44b29f0-b4c5-43a2-a5f6-b4fd84f77192@sirena.org.uk>
-	<864j8z4vy6.wl-maz@kernel.org>
-	<8634oj4voc.wl-maz@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.3
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wXHdydFF"
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-58b966b4166so5842516a12.1
+        for <kvmarm@lists.linux.dev>; Tue, 09 Jul 2024 02:33:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1720517620; x=1721122420; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bbVjctvLXXyMcZGPi8Rzn/blROwKULMdZPgFn3B+fF0=;
+        b=wXHdydFFUB80TviqvwZORexu4+wLruHqwBkLdsMvd0hyijrGFsqeN1n84uQyejL3q/
+         0ewmOwYSlyMFnX3m3f/ndVrwBQJx2pxYClyTCsj+4IMJ2Q9cTPqMAzXsigJyZyoliHRm
+         2RBHYgqlHRcAqxQtZ+4iYf5Iz3iWw0QHEUVtWJthccYU4Fw5E00PmBlXNkfmvQMfv1+x
+         V/MWyyNV7R8uAeMAxec+rVVuClAWbSZj1LcHgii76OJkQbEVFpdC6AgqYBNb4pR/TJVC
+         MNcuXmUijSWb3dQFllxpQRwwwlOlATKzYGcJCGucbF5eKfUtSZPCQFa/gIoXHRLqYepP
+         guzg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720517620; x=1721122420;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bbVjctvLXXyMcZGPi8Rzn/blROwKULMdZPgFn3B+fF0=;
+        b=rfHDcBs8zqUttNIrs32xvYbofXI8B9V21xwyk8XP7dVOPVxo24GVro5x0iR9pDym0a
+         oMjgO0H2w6p2Lg/1LrMtjHCHNPzHPWNIsxAesvDDW5c75ah3A48YdbySxtDBJt/XUE7q
+         729F7sZ3RzZgtrB/foFtDYce5FfXS619tL6Spxji1AIcio4nWkcDfpmy8ufIQnr3QOnD
+         aSOLl12051/cb0w5+QO0xyxE/E572+TEb6SZq9XJQLoy/q6CjV4fizpzh1zD1FysFY3F
+         46mhah6VswOitMcLWDUJ/dJECjqBw8xIg3lPxkVDTr/9dimKmrKYaVEV0+5gMRR6HuTf
+         a1pw==
+X-Forwarded-Encrypted: i=1; AJvYcCV75IjXTHzmCoBOgm+PyTI05pG0ohaSoAPu7Fc/TaQndrscjhWH5C7Myg/jC2M8irkAJ9XDDXfidcRlxY4b3V5b6piLy9Ye
+X-Gm-Message-State: AOJu0YznYr1p3IYAPWOtTehxTN4dpWQhB/ZiD++zNI4C9kDxisNvVgXO
+	b81IzLGKsYKEODc3eEWl6tUEcQrwFvUNhKIqHCI16/2tLAXW8u8VuRMt62T/MiuDa/jn1ATigCv
+	2rJxhjXl0AIr5OW+BCleJUvW4kF5wvobubHtl5A==
+X-Google-Smtp-Source: AGHT+IEqljXx2JIG3odC0TZPvGH0S1XjoUQIcTmvsx8pPi2YJJHZXULcFmWZ4T2QD5eT6hnsCNvPIpRKmpFQApbwFJc=
+X-Received: by 2002:a05:6402:b19:b0:58d:842:6272 with SMTP id
+ 4fb4d7f45d1cf-594bb67e9demr1055765a12.25.1720517620131; Tue, 09 Jul 2024
+ 02:33:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, tabba@google.com, joey.gouly@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20240702163515.1964784-1-alex.bennee@linaro.org>
+ <20240702163515.1964784-2-alex.bennee@linaro.org> <Zoz7sQNoC9ePXH7w@arm.com>
+In-Reply-To: <Zoz7sQNoC9ePXH7w@arm.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 9 Jul 2024 10:33:28 +0100
+Message-ID: <CAFEAcA-LFtAi0DkFGc0Q3TYR_+X3TUWQru8crhbKun4EHctcdQ@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH v1 1/2] arm/pmu: skip the PMU introspection
+ test if missing
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, pbonzini@redhat.com, 
+	drjones@redhat.com, thuth@redhat.com, kvm@vger.kernel.org, 
+	qemu-arm@nongnu.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.cs.columbia.edu, christoffer.dall@arm.com, maz@kernel.org, 
+	Anders Roxell <anders.roxell@linaro.org>, Andrew Jones <andrew.jones@linux.dev>, 
+	Eric Auger <eric.auger@redhat.com>, "open list:ARM" <kvmarm@lists.linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 08 Jul 2024 18:53:39 +0100,
-Marc Zyngier <maz@kernel.org> wrote:
-> 
-> On Mon, 08 Jul 2024 18:47:45 +0100,
-> Marc Zyngier <maz@kernel.org> wrote:
-> > 
-> > On Mon, 08 Jul 2024 18:34:36 +0100,
-> > Mark Brown <broonie@kernel.org> wrote:
-> > > 
-> > > [1  <text/plain; us-ascii (7bit)>]
-> > > On Mon, Jul 08, 2024 at 04:44:34PM +0100, Marc Zyngier wrote:
-> > > > Just like the rest of the FP/SIMD state, FPMR needs to be context
-> > > > switched.
-> > > 
-> > > > The only interesting thing here is that we need to treat the pKVM
-> > > > part a bit differently, as the host FP state is never written back
-> > > > to the vcpu thread, but instead stored locally and eagerly restored.
-> > > 
-> > > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > > ---
-> > > >  arch/arm64/include/asm/kvm_host.h  | 10 ++++++++++
-> > > >  arch/arm64/kvm/fpsimd.c            |  1 +
-> > > >  arch/arm64/kvm/hyp/nvhe/hyp-main.c |  4 ++++
-> > > >  arch/arm64/kvm/hyp/nvhe/switch.c   | 10 ++++++++++
-> > > >  arch/arm64/kvm/hyp/vhe/switch.c    |  4 ++++
-> > > >  5 files changed, 29 insertions(+)
-> > > 
-> > > I'm possibly missing something here but I'm not seeing where we load the
-> > > state for the guest, especially in the VHE case.  I would expect to see
-> > > a change in kvm_hyp_handle_fpsimd() to load FPMR for guests with the
-> > > feature (it needs to be in there to keep in sync with the ownership
-> > > tracking for the rest of the FP state, and to avoid loading needlessly
-> > > in cases where the guest never touches FP).
-> > > 
-> > > Saving for the guest was handled in the previous patch.
-> > > 
-> > > > diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-> > > > index 77010b76c150f..a307c1d5ac874 100644
-> > > > --- a/arch/arm64/kvm/hyp/vhe/switch.c
-> > > > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-> > > > @@ -312,6 +312,10 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
-> > > >  static void kvm_hyp_save_fpsimd_host(struct kvm_vcpu *vcpu)
-> > > >  {
-> > > >  	__fpsimd_save_state(*host_data_ptr(fpsimd_state));
-> > > > +
-> > > > +	if (system_supports_fpmr() &&
-> > > > +	    kvm_has_feat(vcpu->kvm, ID_AA64PFR2_EL1, FPMR, IMP))
-> > > > +		**host_data_ptr(fpmr_ptr) = read_sysreg_s(SYS_FPMR);
-> > > >  }
-> > > 
-> > > That's only saving the host state, it doesn't load the guest
-> > > state.
+On Tue, 9 Jul 2024 at 09:58, Alexandru Elisei <alexandru.elisei@arm.com> wr=
+ote:
+>
+> Hi,
+>
+> On Tue, Jul 02, 2024 at 05:35:14PM +0100, Alex Benn=C3=A9e wrote:
+> > The test for number of events is not a substitute for properly
+> > checking the feature register. Fix the define and skip if PMUv3 is not
+> > available on the system. This includes emulator such as QEMU which
+> > don't implement PMU counters as a matter of policy.
+> >
+> > Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> > Cc: Anders Roxell <anders.roxell@linaro.org>
+> > ---
+> >  arm/pmu.c | 7 ++++++-
+> >  1 file changed, 6 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/arm/pmu.c b/arm/pmu.c
+> > index 9ff7a301..66163a40 100644
+> > --- a/arm/pmu.c
+> > +++ b/arm/pmu.c
+> > @@ -200,7 +200,7 @@ static void test_overflow_interrupt(bool overflow_a=
+t_64bits) {}
+> >  #define ID_AA64DFR0_PERFMON_MASK  0xf
+> >
+> >  #define ID_DFR0_PMU_NOTIMPL  0b0000
+> > -#define ID_DFR0_PMU_V3               0b0001
+> > +#define ID_DFR0_PMU_V3               0b0011
+> >  #define ID_DFR0_PMU_V3_8_1   0b0100
+> >  #define ID_DFR0_PMU_V3_8_4   0b0101
+> >  #define ID_DFR0_PMU_V3_8_5   0b0110
+> > @@ -286,6 +286,11 @@ static void test_event_introspection(void)
+> >               return;
+> >       }
+> >
+> > +     if (pmu.version < ID_DFR0_PMU_V3) {
+> > +             report_skip("PMUv3 extensions not supported, skip ...");
+> > +             return;
+> > +     }
+> > +
+>
+> I don't get this patch - test_event_introspection() is only run on 64bit.=
+ On
+> arm64, if there is a PMU present, that PMU is a PMUv3.  A prerequisite to
+> running any PMU tests is for pmu_probe() to succeed, and pmu_probe() fail=
+s if
+> there is no PMU implemented (PMUVer is either 0, or 0b1111). As a result,=
+ if
+> test_event_introspection() is executed, then a PMUv3 is present.
+>
+> When does QEMU advertise FEAT_PMUv3*, but no event counters (other than t=
+he cycle
+> counter)?
 
-So after cherry-picking my own fixes and realising that I had left
-pKVM in the lurch, this is what I have added to this patch, which
-hopefully does the right thing.
+When we're using TCG but not icount mode we present only the SW_INCR,
+CPU_CYCLES, STALL_FRONTEND, STALL_BACKEND and STALL events.
+If we aren't counting instructions we can't present an INST_RETIRED
+event, because we don't have the information. (The STALL events
+always return a zero count.)
 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index f59ccfe11ab9a..52c7dc8446f16 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -404,6 +404,10 @@ static bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
- 	else
- 		__fpsimd_restore_state(&vcpu->arch.ctxt.fp_regs);
- 
-+	if (system_supports_fpmr() &&
-+	    kvm_has_feat(kern_hyp_va(vcpu->kvm), ID_AA64PFR2_EL1, FPMR, IMP))
-+		write_sysreg_s(__vcpu_sys_reg(vcpu, FPMR), SYS_FPMR);
-+
- 	/* Skip restoring fpexc32 for AArch64 guests */
- 	if (!(read_sysreg(hcr_el2) & HCR_RW))
- 		write_sysreg(__vcpu_sys_reg(vcpu, FPEXC32_EL2), fpexc32_el2);
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 6b14a2c13e287..97fc6ae123a03 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -62,6 +62,8 @@ static void fpsimd_sve_flush(void)
- 
- static void fpsimd_sve_sync(struct kvm_vcpu *vcpu)
- {
-+	bool has_fpmr;
-+
- 	if (!guest_owns_fp_regs())
- 		return;
- 
-@@ -73,13 +75,17 @@ static void fpsimd_sve_sync(struct kvm_vcpu *vcpu)
- 	else
- 		__fpsimd_save_state(&vcpu->arch.ctxt.fp_regs);
- 
-+	has_fpmr = (system_supports_fpmr() &&
-+		    kvm_has_feat(kern_hyp_va(vcpu->kvm), ID_AA64PFR2_EL1, FPMR, IMP));
-+	if (has_fpmr)
-+		__vcpu_sys_reg(vcpu, FPMR) = read_sysreg_s(SYS_FPMR);
-+
- 	if (system_supports_sve())
- 		__hyp_sve_restore_host();
- 	else
- 		__fpsimd_restore_state(*host_data_ptr(fpsimd_state));
- 
--	if (system_supports_fpmr() &&
--	    kvm_has_feat(kern_hyp_va(vcpu->kvm), ID_AA64PFR2_EL1, FPMR, IMP))
-+	if (has_fpmr)
- 		write_sysreg_s(*host_data_ptr(fpmr), SYS_FPMR);
- 
- 	*host_data_ptr(fp_owner) = FP_STATE_HOST_OWNED;
-
-I'll repost the series after -rc1.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+thanks
+-- PMM
