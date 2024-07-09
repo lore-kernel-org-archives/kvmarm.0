@@ -1,269 +1,158 @@
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEAA974077
-	for <kvmarm@lists.linux.dev>; Mon,  8 Jul 2024 23:42:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A649620
+	for <kvmarm@lists.linux.dev>; Tue,  9 Jul 2024 05:19:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720482151; cv=none; b=rOoNZJkIniMhFiyJtCCd5xX0Hjc7viekpbTYHc7PW59SFuNTAY6DXysutm8L24ubwSoRPPQjT5TtstGZg2Rd5vU7n7/CUGhC0raY582MXHIbCfEJ6SwVUHrMHrPQzB7x3LV3tKuFM7ZzVnun4UTZPXjjP8H83tAo3SH8nYuFgIA=
+	t=1720502358; cv=none; b=DRYZEp07AlU2Hi4W9d1rxGcEpuu4wBvjkzlkh1YRUIWLZlpm6QNRERC5MWtRUStPhT1jyiXe6wNzio2jkwrtG9aUHbqGdIBRkmzmLcfsIal305DqfjDTrR1W2TtAn0xAa6YvxGQvFHoddiwh2k2WCKDVjE2GoIqWQnKnpOQ1Zfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720482151; c=relaxed/simple;
-	bh=fXFkuGwJtPDomAOLHssxdyjY3IJRo5Ot7cYvZXhXmlo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JJla39kZoHEJpoEjc3ndDaHUhPfLeiL813Ynd/0/WufDw6HTEWshdcRAXiiW6cBJ/oZA+nvseVIDfRdHMoygl18zbhTmyvh1+jpSB0V5nV0f55f4jrlKPsbckX1V8nIkZcBiapJ51uq0EKp2EC33b0U5dqHK00E+xeeOPsqP68M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ylM6xbbX; arc=none smtp.client-ip=209.85.160.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1720502358; c=relaxed/simple;
+	bh=kxxZ4GZi+K29+wA/0D4vq8njOFzYZ2ku8FWTAgcRy2E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=q275aBjrQNIR3uOead3qSAtbp8BeRedpjh0IOtpKbkcquODoX01z41d9QEAwrVE6adaReIDXEA/ILbf3bYGs1Vr2aQYWoC/20b9tvTvCNVQ9BAIBUObFyMziYrAfOG+BlbO1tjzh0qPaBu22ZrLCwKFnTXUc6nmtKZRNfbI80pY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fyTOuwZY; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ylM6xbbX"
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-447f8aa87bfso165641cf.0
-        for <kvmarm@lists.linux.dev>; Mon, 08 Jul 2024 16:42:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1720482148; x=1721086948; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nM7n3F0up3r61YyqcXWbM5R0i4/2z/TwS0sdB2eyKMU=;
-        b=ylM6xbbXEbgIzprag+G2zOG8xLzrCbweBvUArvaWeastHEIUBpk3isL7rLhwillaJ1
-         gQYbIZ8F63EO3/aXnywz3Su2uIbZVEHtEqT31OAM+mPb9t4BfqdJBVX+lKZCfTjjf1eW
-         aETehFQO1fStuK3Pig41rNlOUsVqj4S3wcGpGbDK6cF2CiNwBQSmTmZTkYheHMrSdxhA
-         phpXSKNUucpxbOLucaNR9RymvITvtFZqQyU9/opLBUoVIECsckOgJT3xOZWHp498Jiqd
-         yubW6/79RgJl0X3QaEMkHgwoXLSazRKqyyItT9RBhQJerW6qHz3vELTUBxDTeazzIuiI
-         WpEg==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fyTOuwZY"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1720502355;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1NO3dhCc2LGOp3hm3fp51cTnn6RCFGh5hrEz11I777E=;
+	b=fyTOuwZY/QM/JV9upN6Hw3tabojJJMZAzJtk9/JcZAUFhjbx6NNTJP5QUcyjAMeZTWUx9E
+	IMjl8XJpJ72FcQ7AyRWToqR/j0/625fhG+0uoUJYqHNXMyV+6SCTxg0gfAFNm2xb4050Jf
+	XP/+w97y212tK0EZc74GoGendNjRM5w=
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
+ [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-645-ukYJmcIzMDWWWUSqYVvz6g-1; Tue, 09 Jul 2024 01:19:14 -0400
+X-MC-Unique: ukYJmcIzMDWWWUSqYVvz6g-1
+Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-1fb4e7cc5d5so16557565ad.0
+        for <kvmarm@lists.linux.dev>; Mon, 08 Jul 2024 22:19:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720482148; x=1721086948;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nM7n3F0up3r61YyqcXWbM5R0i4/2z/TwS0sdB2eyKMU=;
-        b=qHA3GnrZDvYYalETGxR+zEym65G8+upFpNHJNNFlCfy3/HGtXQ1P1XCNyVRcLE7Rwe
-         R3pJaLDDL1HMtvY9laWaAD+iWAh5/0nkuFqLmXPkukWY5ECR5+XTzPn2WTrXZQd2ob0z
-         N3w0WTJS7VBxbbKPuXjMxVerQqnLyjXqzjzzVCNQOlR67ZtriG4WkhbeHB5vc+GKYuUJ
-         grC5e9++XT1zflq6z7gfdYzHyYDmqa0acVbSOtRzYSDWyBTEAMYzu1rsWDlHVFRcDwZw
-         KU+jxWXjiVBBU9qunMDhsNpBCj0eft7Jq0m5E1Ssn6zwoRmiqkBJ1xDdSGTtLTsVm+96
-         vlCA==
-X-Forwarded-Encrypted: i=1; AJvYcCXPXgKt/NIlPJIJvH4qWT/qSlMI6QRShw07yMS2gdm/Vj6sQW1595FB1RlCqS6gr2CA34ZpjLrfr/Zcv2xw4wL8FsHDAxfu
-X-Gm-Message-State: AOJu0YxRdszvfEXaI/QqiLite6cRGFvLHlAXtAZk+p53f/lZpHWR9pXB
-	6u3I0BAN00yxHypOd65S4zlAbnX0aax8/Fz4mmVlNGAdMEJ2P3PXDek211pNAUw705XJAZXJkWt
-	P/onXDz/9m8qx/jlg6XoDh6i0NxR3fKQO+aUG
-X-Google-Smtp-Source: AGHT+IF5waWqD1+AOGNDtNFnA/E3lGLbDiFUJIIuSfBZaHyKwMMyMoyshkPlNYgy3P4wdxcBdGual2ZDEbwUTDImpqE=
-X-Received: by 2002:ac8:6742:0:b0:447:e4cb:bf50 with SMTP id
- d75a77b69052e-447fb2f6c08mr1579121cf.8.1720482148269; Mon, 08 Jul 2024
- 16:42:28 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1720502353; x=1721107153;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1NO3dhCc2LGOp3hm3fp51cTnn6RCFGh5hrEz11I777E=;
+        b=AmJoylV8zRJZwcfExF1lbmh6J3LH0p7gazUsYulTUOIzwIaZIw/IrgXKZXomA9ID5k
+         3h+OGzBF9TyoWkpz5qGoxINssrrTzs8CwMQtG7DVgXluKdkKQEbUvN9qy6IkozKGc5Cq
+         uePP9JWbs5m+rbdCtxh2j4nRNdxpxdMopofCbEp5iMSdvfOsxb2km29lz9HA/GuaJTPA
+         iGEzOj+gKQb9Av22z24DUSG84Hw1gsjynRmf5e+lQWyvFqLk3TQNXrU1m9Qo2XSNCKF1
+         QpiDbTlqNdmfeWp8gRjUC8IW5sCjdgq9N2wnuTAmbFhISx2bWKofTWHxi/REvnLsTcJS
+         oV2A==
+X-Forwarded-Encrypted: i=1; AJvYcCVNzBO/k7aDxiJ8BrVFwKuyqHCXXaLBQ60s2TDTii5myYkuwDwJ5lmCw5Pvk5lciv5RuscXdhZrbkvfPihBfcIbbQuaSElg
+X-Gm-Message-State: AOJu0Yw+UobFLmTsF/pMIwkBWzyy96UiDx7rf42SR15SqkGh5UUnzm8c
+	r+670eW6wU1kTG2/6OS00HYQpZ75xxesVQKm0bmIL1vtndS/kKFk0vtPlVO/M8UjavFUqNkBLCc
+	Ti9QODmuzXQfWXtcJWl2bRHv2ghMWzYD1+2M0dRvRBbeuo4vLCoxWig==
+X-Received: by 2002:a17:902:ced2:b0:1fb:6ea1:4c with SMTP id d9443c01a7336-1fbb6d3d631mr11099535ad.23.1720502352947;
+        Mon, 08 Jul 2024 22:19:12 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFnVXcKv//QUkd2zalk0KVeKlO2V4LMxD2AA7tVtpYgxucEKRW687wZfsonrs0t+riLdK1vzA==
+X-Received: by 2002:a17:902:ced2:b0:1fb:6ea1:4c with SMTP id d9443c01a7336-1fbb6d3d631mr11099335ad.23.1720502352511;
+        Mon, 08 Jul 2024 22:19:12 -0700 (PDT)
+Received: from [192.168.68.54] ([103.210.27.92])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fbb6a28f83sm7276275ad.72.2024.07.08.22.19.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Jul 2024 22:19:11 -0700 (PDT)
+Message-ID: <3b1c8387-f40f-4841-b2b3-9e4dc1e35efc@redhat.com>
+Date: Tue, 9 Jul 2024 15:19:03 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20240611002145.2078921-1-jthoughton@google.com>
- <20240611002145.2078921-9-jthoughton@google.com> <CAOUHufb2f_EwHY5LQ59k7Nh7aS1-ZbOKtkoysb8BtxRNRFMypQ@mail.gmail.com>
- <CADrL8HUJaG=O+jBVvXGVjJOriev9vxkZ6n27ekc5Pxv5D+fbcg@mail.gmail.com>
-In-Reply-To: <CADrL8HUJaG=O+jBVvXGVjJOriev9vxkZ6n27ekc5Pxv5D+fbcg@mail.gmail.com>
-From: Yu Zhao <yuzhao@google.com>
-Date: Mon, 8 Jul 2024 17:41:49 -0600
-Message-ID: <CAOUHufZ2Vd+Ea5vka20+SCVB446LZEA0mWy=RScN=7AChd869w@mail.gmail.com>
-Subject: Re: [PATCH v5 8/9] mm: multi-gen LRU: Have secondary MMUs participate
- in aging
-To: James Houghton <jthoughton@google.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Ankit Agrawal <ankita@nvidia.com>, Axel Rasmussen <axelrasmussen@google.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, David Matlack <dmatlack@google.com>, 
-	David Rientjes <rientjes@google.com>, James Morse <james.morse@arm.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Raghavendra Rao Ananta <rananta@google.com>, Ryan Roberts <ryan.roberts@arm.com>, 
-	Sean Christopherson <seanjc@google.com>, Shaoqin Huang <shahuang@redhat.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Wei Xu <weixugc@google.com>, 
-	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 01/15] arm64: rsi: Add RSI definitions
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+References: <20240701095505.165383-1-steven.price@arm.com>
+ <20240701095505.165383-2-steven.price@arm.com>
+From: Gavin Shan <gshan@redhat.com>
+In-Reply-To: <20240701095505.165383-2-steven.price@arm.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jul 8, 2024 at 11:31=E2=80=AFAM James Houghton <jthoughton@google.c=
-om> wrote:
->
-> On Fri, Jul 5, 2024 at 11:36=E2=80=AFAM Yu Zhao <yuzhao@google.com> wrote=
-:
-> >
-> > On Mon, Jun 10, 2024 at 6:22=E2=80=AFPM James Houghton <jthoughton@goog=
-le.com> wrote:
-> > >
-> > > Secondary MMUs are currently consulted for access/age information at
-> > > eviction time, but before then, we don't get accurate age information=
-.
-> > > That is, pages that are mostly accessed through a secondary MMU (like
-> > > guest memory, used by KVM) will always just proceed down to the oldes=
-t
-> > > generation, and then at eviction time, if KVM reports the page to be
-> > > young, the page will be activated/promoted back to the youngest
-> > > generation.
-> > >
-> > > The added feature bit (0x8), if disabled, will make MGLRU behave as i=
-f
-> > > there are no secondary MMUs subscribed to MMU notifiers except at
-> > > eviction time.
-> > >
-> > > Implement aging with the new mmu_notifier_test_clear_young_fast_only(=
-)
-> > > notifier. For architectures that do not support this notifier, this
-> > > becomes a no-op. For architectures that do implement it, it should be
-> > > fast enough to make aging worth it.
-> > >
-> > > Suggested-by: Yu Zhao <yuzhao@google.com>
-> > > Signed-off-by: James Houghton <jthoughton@google.com>
-> > > ---
-> > >
-> > > Notes:
-> > >     should_look_around() can sometimes use two notifiers now instead =
-of one.
-> > >
-> > >     This simply comes from restricting myself from not changing
-> > >     mmu_notifier_clear_young() to return more than just "young or not=
-".
-> > >
-> > >     I could change mmu_notifier_clear_young() (and
-> > >     mmu_notifier_test_young()) to return if it was fast or not. At th=
-at
-> > >     point, I could just as well combine all the notifiers into one no=
-tifier,
-> > >     like what was in v2 and v3.
-> > >
-> > >  Documentation/admin-guide/mm/multigen_lru.rst |   6 +-
-> > >  include/linux/mmzone.h                        |   6 +-
-> > >  mm/rmap.c                                     |   9 +-
-> > >  mm/vmscan.c                                   | 185 ++++++++++++++--=
---
-> > >  4 files changed, 164 insertions(+), 42 deletions(-)
-> >
-> > ...
-> >
-> > >  static bool walk_pte_range(pmd_t *pmd, unsigned long start, unsigned=
- long end,
-> > >                            struct mm_walk *args)
-> > >  {
-> > > @@ -3357,8 +3416,9 @@ static bool walk_pte_range(pmd_t *pmd, unsigned=
- long start, unsigned long end,
-> > >         struct pglist_data *pgdat =3D lruvec_pgdat(walk->lruvec);
-> > >         DEFINE_MAX_SEQ(walk->lruvec);
-> > >         int old_gen, new_gen =3D lru_gen_from_seq(max_seq);
-> > > +       struct mm_struct *mm =3D args->mm;
-> > >
-> > > -       pte =3D pte_offset_map_nolock(args->mm, pmd, start & PMD_MASK=
-, &ptl);
-> > > +       pte =3D pte_offset_map_nolock(mm, pmd, start & PMD_MASK, &ptl=
-);
-> > >         if (!pte)
-> > >                 return false;
-> > >         if (!spin_trylock(ptl)) {
-> > > @@ -3376,11 +3436,12 @@ static bool walk_pte_range(pmd_t *pmd, unsign=
-ed long start, unsigned long end,
-> > >                 total++;
-> > >                 walk->mm_stats[MM_LEAF_TOTAL]++;
-> > >
-> > > -               pfn =3D get_pte_pfn(ptent, args->vma, addr);
-> > > +               pfn =3D get_pte_pfn(ptent, args->vma, addr, pgdat);
-> > >                 if (pfn =3D=3D -1)
-> > >                         continue;
-> > >
-> > > -               if (!pte_young(ptent)) {
-> > > +               if (!pte_young(ptent) &&
-> > > +                   !lru_gen_notifier_test_young(mm, addr)) {
-> > >                         walk->mm_stats[MM_LEAF_OLD]++;
-> > >                         continue;
-> > >                 }
-> > > @@ -3389,8 +3450,9 @@ static bool walk_pte_range(pmd_t *pmd, unsigned=
- long start, unsigned long end,
-> > >                 if (!folio)
-> > >                         continue;
-> > >
-> > > -               if (!ptep_test_and_clear_young(args->vma, addr, pte +=
- i))
-> > > -                       VM_WARN_ON_ONCE(true);
-> > > +               lru_gen_notifier_clear_young(mm, addr, addr + PAGE_SI=
-ZE);
-> > > +               if (pte_young(ptent))
-> > > +                       ptep_test_and_clear_young(args->vma, addr, pt=
-e + i);
-> > >
-> > >                 young++;
-> > >                 walk->mm_stats[MM_LEAF_YOUNG]++;
-> >
-> >
-> > There are two ways to structure the test conditions in walk_pte_range()=
-:
-> > 1. a single pass into the MMU notifier (combine test/clear) which
-> > causes a cache miss from get_pfn_page() if the page is NOT young.
-> > 2. two passes into the MMU notifier (separate test/clear) if the page
-> > is young, which does NOT cause a cache miss if the page is NOT young.
-> >
-> > v2 can batch up to 64 PTEs, i.e., it only goes into the MMU notifier
-> > twice every 64 PTEs, and therefore the second option is a clear win.
-> >
-> > But you are doing twice per PTE. So what's the rationale behind going
-> > with the second option? Was the first option considered?
->
-> Hi Yu,
->
-> I didn't consider changing this from your v2[1]. Thanks for bringing it u=
-p.
->
-> The only real change I have made is that I reordered the
-> (!test_spte_young() && !pte_young()) to what it is now (!pte_young()
-> && !lru_gen_notifier_test_young()) because pte_young() can be
-> evaluated much faster.
->
-> I am happy to change the initial test_young() notifier to a
-> clear_young() (and drop the later clear_young(). In fact, I think I
-> should. Making the condition (!pte_young() &&
-> !lru_gen_notifier_clear_young()) makes sense to me. This returns the
-> same result as if it were !lru_gen_notifier_test_young() instead,
-> there is no need for a second clear_young(), and we don't call
-> get_pfn_folio() on pages that are not young.
+On 7/1/24 7:54 PM, Steven Price wrote:
+> From: Suzuki K Poulose <suzuki.poulose@arm.com>
+> 
+> The RMM (Realm Management Monitor) provides functionality that can be
+> accessed by a realm guest through SMC (Realm Services Interface) calls.
+> 
+> The SMC definitions are based on DEN0137[1] version A-eac5.
+> 
+> [1] https://developer.arm.com/documentation/den0137/latest
+> 
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+> Changes since v3:
+>   * Drop invoke_rsi_fn_smc_with_res() function and call arm_smccc_smc()
+>     directly instead.
+>   * Rename header guard in rsi_smc.h to be consistent.
+> Changes since v2:
+>   * Rename rsi_get_version() to rsi_request_version()
+>   * Fix size/alignment of struct realm_config
+> ---
+>   arch/arm64/include/asm/rsi_cmds.h |  38 ++++++++
+>   arch/arm64/include/asm/rsi_smc.h  | 142 ++++++++++++++++++++++++++++++
+>   2 files changed, 180 insertions(+)
+>   create mode 100644 arch/arm64/include/asm/rsi_cmds.h
+>   create mode 100644 arch/arm64/include/asm/rsi_smc.h
+> 
 
-We don't want to do that because we would lose the A-bit for a folio
-that's beyond the current reclaim scope, i.e., the cases where
-get_pfn_folio() returns NULL (a folio from another memcg, e.g.).
+[...]
 
-> WDYT? Have I misunderstood your comment?
+> --- /dev/null
+> +++ b/arch/arm64/include/asm/rsi_smc.h
+> @@ -0,0 +1,142 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Copyright (C) 2023 ARM Ltd.
+> + */
+> +
+> +#ifndef __ASM_RSI_SMC_H_
+> +#define __ASM_RSI_SMC_H_
+> +
+> +/*
+> + * This file describes the Realm Services Interface (RSI) Application Binary
+> + * Interface (ABI) for SMC calls made from within the Realm to the RMM and
+> + * serviced by the RMM.
+> + */
+> +
+> +#define SMC_RSI_CALL_BASE		0xC4000000
+> +
 
-I hope this is clear enough:
+These fields have been defined in include/linux/arm-smccc.h. Those definitions
+can be reused. Otherwise, it's not obvious to reader what does 0xC4000000 represent.
 
-@@ -3395,7 +3395,7 @@ static bool walk_pte_range(pmd_t *pmd, unsigned
-long start, unsigned long end,
-                if (pfn =3D=3D -1)
-                        continue;
+#define SMC_RSI_CALL_BASE	((ARM_SMCCC_FAST_CALL << ARM_SMCCC_TYPE_SHIFT)   | \
+                                  (ARM_SMCCC_SMC_64 << ARM_SMCCC_CALL_CONV_SHIFT) | \
+                                  (ARM_SMCCC_OWNER_STANDARD << ARM_SMCCC_OWNER_SHIFT))
 
--               if (!pte_young(ptent)) {
-+               if (!pte_young(ptent) && !mm_has_notifiers(args->mm)) {
-                        walk->mm_stats[MM_LEAF_OLD]++;
-                        continue;
-                }
-@@ -3404,8 +3404,8 @@ static bool walk_pte_range(pmd_t *pmd, unsigned
-long start, unsigned long end,
-                if (!folio)
-                        continue;
+or
 
--               if (!ptep_test_and_clear_young(args->vma, addr, pte + i))
--                       VM_WARN_ON_ONCE(true);
-+               if (!ptep_clear_young_notify(args->vma, addr, pte + i))
-+                       continue;
+#define SMC_RSI_CALL_BASE       ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,            \
+                                                    ARM_SMCCC_SMC_64,               \
+                                                    ARM_SMCCC_OWNER_STANDARD,       \
+                                                    0)
 
-                young++;
-                walk->mm_stats[MM_LEAF_YOUNG]++;
+Thanks,
+Gavin
 
-> Also, I take it your comment was not just about walk_pte_range() but
-> about the similar bits in lru_gen_look_around() as well, so I'll make
-> whatever changes we agree on there too (or maybe factor out the common
-> bits).
->
-> [1]: https://lore.kernel.org/kvmarm/20230526234435.662652-11-yuzhao@googl=
-e.com/
->
-> > In addition, what about the non-lockless cases? Would this change make
-> > them worse by grabbing the MMU lock twice per PTE?
->
-> That's a good point. Yes I think calling the notifier twice here would
-> indeed exacerbate problems with a non-lockless notifier.
-
-I think so too, but I haven't verified it. Please do?
