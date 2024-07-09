@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A2FA15699E;
-	Tue,  9 Jul 2024 12:55:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CE6C15699E
+	for <kvmarm@lists.linux.dev>; Tue,  9 Jul 2024 13:03:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720529745; cv=none; b=F9cDi3PpHgJfZMQ3IDR36tBuyiYov3JG3kFM6iyw/co2suf0ZAKzxsIDEmxxW+yPXZf6eiXIZoEnlp9YKoG/6l2KOLr40qa2Qp188HghlavWYPvl8tnHlgBUM+ZxYBMZ8BfArc2tQPdX3J9o8xqsp1dQB2QorZuKddp/gnwuX/0=
+	t=1720530235; cv=none; b=JIlfkJe3jFFCmjQqkq+MufWVd7rZt6aS/bVJcwBOcMlswFjG//2NQCQo7CTBAru4MrQk4om4YfM4OJ9eyh5B36GA3IJLOM1tqYpqkz+TpdqSj+zpsoJ4p/UDJM8kBznmCPEOZmNxKCqFYQN15+llMOqAnnb8ddJ26ukegEqkpd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720529745; c=relaxed/simple;
-	bh=1ib2rI8TcyevmjxG6XPjGlEk7kHNo3stbGZC8yibLFw=;
+	s=arc-20240116; t=1720530235; c=relaxed/simple;
+	bh=mwrASpw49AnYCbba3OfzUIrmgYAxUK7NmbfuMokRRyk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=scWsyEcdxjOkvo0rWMSdBKZQly5UmfMilsJJuVh+3H3MzcdARh4qpamDR/o6DmJMmN1wt5WOHOjk+J51hgnuRhBSkgQMbhgBn/Arb3AxKcVbj+KPUxk0nyisxys3QgGxTR2oJK1cTnslLPOHpzLNFBdHBzKQcxp8TEmp3KXfi54=
+	 In-Reply-To:Content-Type; b=lXTI9xdG1JNrRy33MFzSsa8K8FED2Y7k4964K6GSMUuxJjm4W1RL0SJBJ+Umf+hIQqtm2VVhh6LNUSv3unPy968nouTidjGU1SIKS5jdyVTdTEcnE/SCgz7SO4JydMCe0shxmKoB7c31liDUIH2RYngEhXM58SPwL0UqwbGQgZ0=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4B1E6153B;
-	Tue,  9 Jul 2024 05:56:08 -0700 (PDT)
-Received: from [10.57.74.191] (unknown [10.57.74.191])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 30AFF3F766;
-	Tue,  9 Jul 2024 05:55:40 -0700 (PDT)
-Message-ID: <1ce456b5-0652-4522-98ea-b32d96c1adf4@arm.com>
-Date: Tue, 9 Jul 2024 13:55:38 +0100
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E083B153B;
+	Tue,  9 Jul 2024 06:04:17 -0700 (PDT)
+Received: from [10.44.160.75] (e126510-lin.lund.arm.com [10.44.160.75])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 58E303F766;
+	Tue,  9 Jul 2024 06:03:45 -0700 (PDT)
+Message-ID: <d41e8660-e081-4a60-a901-94eb2f72a643@arm.com>
+Date: Tue, 9 Jul 2024 15:03:41 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,97 +27,90 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 06/15] arm64: Make the PHYS_MASK_SHIFT dynamic
+Subject: Re: [PATCH v4 15/29] arm64: handle PKEY/POE faults
+To: Joey Gouly <joey.gouly@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: akpm@linux-foundation.org, aneesh.kumar@kernel.org,
+ aneesh.kumar@linux.ibm.com, bp@alien8.de, broonie@kernel.org,
+ catalin.marinas@arm.com, christophe.leroy@csgroup.eu,
+ dave.hansen@linux.intel.com, hpa@zytor.com, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org, maz@kernel.org,
+ mingo@redhat.com, mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com,
+ npiggin@gmail.com, oliver.upton@linux.dev, shuah@kernel.org,
+ szabolcs.nagy@arm.com, tglx@linutronix.de, will@kernel.org, x86@kernel.org,
+ kvmarm@lists.linux.dev
+References: <20240503130147.1154804-1-joey.gouly@arm.com>
+ <20240503130147.1154804-16-joey.gouly@arm.com>
 Content-Language: en-GB
-To: Will Deacon <will@kernel.org>, Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
- Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-References: <20240701095505.165383-1-steven.price@arm.com>
- <20240701095505.165383-7-steven.price@arm.com>
- <20240709114337.GB13242@willie-the-truck>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20240709114337.GB13242@willie-the-truck>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Kevin Brodsky <kevin.brodsky@arm.com>
+In-Reply-To: <20240503130147.1154804-16-joey.gouly@arm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 09/07/2024 12:43, Will Deacon wrote:
-> On Mon, Jul 01, 2024 at 10:54:56AM +0100, Steven Price wrote:
->> Make the PHYS_MASK_SHIFT dynamic for Realms. This is only is required
->> for masking the PFN from a pte entry. For a realm phys_mask_shift is
->> reduced if the RMM reports a smaller configured size for the guest.
->>
->> The realm configuration splits the address space into two with the top
->> half being memory shared with the host, and the bottom half being
->> protected memory. We treat the bit which controls this split as an
->> attribute bit and hence exclude it (and any higher bits) from the mask.
->>
->> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->>
->> ---
->> v3: Drop the MAX_PHYS_MASK{,_SHIFT} definitions as they are no longer
->> needed.
->> ---
->>   arch/arm64/include/asm/pgtable-hwdef.h | 6 ------
->>   arch/arm64/include/asm/pgtable.h       | 5 +++++
->>   arch/arm64/kernel/rsi.c                | 5 +++++
->>   3 files changed, 10 insertions(+), 6 deletions(-)
->>
->> diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
->> index 9943ff0af4c9..2e3af0693bd8 100644
->> --- a/arch/arm64/include/asm/pgtable-hwdef.h
->> +++ b/arch/arm64/include/asm/pgtable-hwdef.h
->> @@ -203,12 +203,6 @@
->>    */
->>   #define PTE_S2_MEMATTR(t)	(_AT(pteval_t, (t)) << 2)
->>   
->> -/*
->> - * Highest possible physical address supported.
->> - */
->> -#define PHYS_MASK_SHIFT		(CONFIG_ARM64_PA_BITS)
->> -#define PHYS_MASK		((UL(1) << PHYS_MASK_SHIFT) - 1)
->> -
->>   #define TTBR_CNP_BIT		(UL(1) << 0)
->>   
->>   /*
->> diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
->> index f8efbc128446..11d614d83317 100644
->> --- a/arch/arm64/include/asm/pgtable.h
->> +++ b/arch/arm64/include/asm/pgtable.h
->> @@ -39,6 +39,11 @@
->>   #include <linux/sched.h>
->>   #include <linux/page_table_check.h>
->>   
->> +extern unsigned int phys_mask_shift;
->> +
->> +#define PHYS_MASK_SHIFT		(phys_mask_shift)
->> +#define PHYS_MASK		((1UL << PHYS_MASK_SHIFT) - 1)
-> 
-> I tried to figure out where this is actually used so I could understand
-> your comment in the commit message:
-> 
->   > This is only is required for masking the PFN from a pte entry
-> 
-> The closest thing I could find is in arch/arm64/mm/mmap.c, where the
-> mask is used as part of valid_mmap_phys_addr_range() which exists purely
-> to filter accesses to /dev/mem. That's pretty niche, so why not just
-> inline the RSI-specific stuff in there behind a static key instead of
-> changing these definitions?
-> 
-> Or did I miss a subtle user somewhere else?
+On 03/05/2024 15:01, Joey Gouly wrote:
+> [...]
+>
+> +static bool fault_from_pkey(unsigned long esr, struct vm_area_struct *vma,
+> +			unsigned int mm_flags)
+> +{
+> +	unsigned long iss2 = ESR_ELx_ISS2(esr);
+> +
+> +	if (!arch_pkeys_enabled())
+> +		return false;
+> +
+> +	if (iss2 & ESR_ELx_Overlay)
+> +		return true;
+> +
+> +	return !arch_vma_access_permitted(vma,
+> +			mm_flags & FAULT_FLAG_WRITE,
+> +			mm_flags & FAULT_FLAG_INSTRUCTION,
+> +			mm_flags & FAULT_FLAG_REMOTE);
 
-We need to prevent ioremap() of addresses beyond that limit too.
+This function is only called from do_page_fault(), so the access cannot
+be remote. The equivalent x86 function (access_error()) always sets
+foreign to false.
 
-Suzuki
+> +}
+> +
+>  static vm_fault_t __do_page_fault(struct mm_struct *mm,
+>  				  struct vm_area_struct *vma, unsigned long addr,
+>  				  unsigned int mm_flags, unsigned long vm_flags,
+> @@ -529,6 +547,8 @@ static int __kprobes do_page_fault(unsigned long far, unsigned long esr,
+>  	unsigned int mm_flags = FAULT_FLAG_DEFAULT;
+>  	unsigned long addr = untagged_addr(far);
+>  	struct vm_area_struct *vma;
+> +	bool pkey_fault = false;
+> +	int pkey = -1;
+>  
+>  	if (kprobe_page_fault(regs, esr))
+>  		return 0;
+> @@ -590,6 +610,12 @@ static int __kprobes do_page_fault(unsigned long far, unsigned long esr,
+>  		vma_end_read(vma);
+>  		goto lock_mmap;
+>  	}
+> +
+> +	if (fault_from_pkey(esr, vma, mm_flags)) {
+> +		vma_end_read(vma);
+> +		goto lock_mmap;
+> +	}
+> +
+>  	fault = handle_mm_fault(vma, addr, mm_flags | FAULT_FLAG_VMA_LOCK, regs);
+>  	if (!(fault & (VM_FAULT_RETRY | VM_FAULT_COMPLETED)))
+>  		vma_end_read(vma);
+> @@ -617,6 +643,11 @@ static int __kprobes do_page_fault(unsigned long far, unsigned long esr,
+>  		goto done;
+>  	}
+>  
+> +	if (fault_from_pkey(esr, vma, mm_flags)) {
+> +		pkey_fault = true;
+> +		pkey = vma_pkey(vma);
+> +	}
+> +
+>  	fault = __do_page_fault(mm, vma, addr, mm_flags, vm_flags, regs);
 
-> 
-> Will
+We don't actually need to call __do_page_fault()/handle_mm_fault() if
+the fault was caused by POE. It still works since it checks
+arch_vma_access_permitted() early, but we might as well skip it
+altogether (like on x86). On 6.10-rcX, we could handle it like a missing
+vm_flags (goto bad_area).
 
+Kevin
