@@ -1,55 +1,55 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-vs1-f74.google.com (mail-vs1-f74.google.com [209.85.217.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 883B2156F2E
-	for <kvmarm@lists.linux.dev>; Wed, 10 Jul 2024 23:42:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 109F1158D8D
+	for <kvmarm@lists.linux.dev>; Wed, 10 Jul 2024 23:42:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720654961; cv=none; b=O5iSmDWsTcpjklJHPGT1XrmzaHvQoaD/i6+98HxxftZorBl65MnXlL0X+d7HOJ4zlllJWwVGdH5wsebTBKfedmIEN+qJ9k86jDICE083hsrrWp2+ro5jY5AsiZjh36ckNxkv8B5Ut6oPo7+te8NDIR5343zDJIjuWz9rjnDTmWY=
+	t=1720654962; cv=none; b=t7bJ63qntEoNA8nrpstPbS+gPN5ANwOUX98xk30sv0MhIgAFt05ImvUqxUSyA+F+dtMZerwWdwqZ4QqI3T2XGkOLQpkuJEIarxbTxVifmcGxVR/kwXqP8tQAX+SLV43VgD+WhF6qqyOiEo+Q+pBDmz7PFG/DFgv6xz/9nFDpY00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720654961; c=relaxed/simple;
-	bh=xxkhVIBeGXY8pX54WQHQVUoU/lEQy1GRiLeaV2vAb5k=;
+	s=arc-20240116; t=1720654962; c=relaxed/simple;
+	bh=fMhhiLsPFRJdblFtX9Nm1DkhL+INhnd2gLXtlR8Pjcg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=XeYlo7Tdfr88uYNlqz+1P5dsLhw8xBaNRh40tCMNolkvmakTV5Ye3tDxxT1JZwKenfmP7NpvWtRAQHksCzbKoX6HIysFZpq2HeSI/vpGQUvzaYoM603sf8PWlMbqhKO9o9E504e7jqT5JojoukCy2VIApb6Cagi3SaHHQc5IxEM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aMjMUGfG; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=Zs7Fjnz6prTpDSlUAuIMYJBhHd8sU8j1v8L5Np45d2tKpYbGN67r5mcgQTW2Y/6Y8dNStmN9kMpm1aTt1IHr0wxCzxIc/95Kbp8KZbLt8nyAfDNzx76vKd+tiOstufJqyXT3tKR0IhZkZNb1uXACZlOvy9oM5W9nCh+ISwa0h4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=l273QEfp; arc=none smtp.client-ip=209.85.217.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aMjMUGfG"
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-652c6e92147so5070177b3.3
-        for <kvmarm@lists.linux.dev>; Wed, 10 Jul 2024 16:42:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="l273QEfp"
+Received: by mail-vs1-f74.google.com with SMTP id ada2fe7eead31-49001cee850so91006137.0
+        for <kvmarm@lists.linux.dev>; Wed, 10 Jul 2024 16:42:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1720654958; x=1721259758; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1720654960; x=1721259760; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/kOa+bY4z73FQuKac3t3a5fniJTGUgyq//kzfHQQRXg=;
-        b=aMjMUGfGeeOKdMZ324oEZI/54gyeDbuj+2IpsOrBGUzKhSzuenTOowvwi2eVJkGFNm
-         HbtK1UbDv9RbvK4bsla1ZrDWpwuHo6wGOODB6OmQJQ2t83KHKUNQowkgQ4M6NOPXkrQh
-         xyJyrNvf7PWNaDydloZtXK7ap/o5mWsgg17CFDCPJg980zker5h+pmforJxd32b63Pje
-         S/FUzbe00w2wdGdfnaLTcoyjZEWXs327DglbevPZLRpaxiTopFT2eooUafLxR0ZFBH8U
-         q3H6XNIFX1oJgeNN/1muBf8e1swrVn/qjY4Y/RpwruxsijtoSR1lmVcpv7nXOhRCt/gQ
-         nUjg==
+        bh=HCYoX0wE5GpicSTYT42iy6iZfDY9W+9PX613SFW91R8=;
+        b=l273QEfpBHCdgkpX+Y9Gy2jhSEhZjGPRTI7lf4fdafOxGAQ1QMRzAyBGcBBABbwAa9
+         HvnTukHwhYOd3XeI19qrwbh0yRitr2qlo/YCc+09iayNhI+Jg1X5t+ZGtRCSJHZfxCSs
+         aAs1cHg3k9Gel0S/Cb3ZqEC+IgH6wI6jy9ExeP05nkeiyP6C8S1j8kZVmDyFMOQILhUc
+         ayrgKClGDRLIu207wf2qK5+wsyn1cR7LhKKNAMma7iJkH+LTC7SCt7vAdiiPM69/ozJ/
+         msz+OrOKgODuX8LlblJZ+fUG4BpLkonHEASpRIZ3FZuQX1T2JRMADFrleYE3er8SPRZO
+         U9Hg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720654958; x=1721259758;
+        d=1e100.net; s=20230601; t=1720654960; x=1721259760;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/kOa+bY4z73FQuKac3t3a5fniJTGUgyq//kzfHQQRXg=;
-        b=L/IrrwTNoyYpr/K1bKEw5iheuR3YKmYkJBNpElPmmwpk74SA+/+0sKtcFN6SwjtxPH
-         XLd0hE18PvgYXbo/EHzC58vzHejQUHe4bcXxa/1TIfEl0EOKMkn7rQsNEr9J4ZxMgIyK
-         KR+g4BCqc1Ro8aLcRKQV4BvI5wFLFLLp20cvGviqyvGOIwEoJGRZOLSV9oNSd3w+fj2C
-         XMP3twG9JaR3lAyUMd0SCmCFKlhTusJeXwmjDgtL3nuU411p4Nzx9WAkVezV7aCrGFun
-         amU4Dtp5hVa199T9/+f5wOU07RaqTnAZqSmfm9HN1MGe5UoyUYnU/Z1pbLksMDVMe1HF
-         RfKw==
-X-Forwarded-Encrypted: i=1; AJvYcCUhCdCY2Kpi9C7v41GuVWP+rFexPFQE8rJ3kZOdGW4hzY8Kf+7N1Y0g1uPBo6RbsTmpel06vI1zMJjyWdTuZ2wpP1I2e8e1
-X-Gm-Message-State: AOJu0Ywz0qLwrcX5dDRKKZrdoTQvfiSvgh7ctPCNENbKd6/p8mXwKJ64
-	hyUElG/39OJZsruQsfavGu8VBlbe9euj7wPLD0Fc06iX6+Q7ZFxxOKy4C8V32v2EklHmQqSpNHo
-	JAH5e9jPORL358Nj+qQ==
-X-Google-Smtp-Source: AGHT+IEQILe/Q46nVYjT6VvqMQTMH6KcT24WPu+37xvorf2J37tSktUkMizR+hLJi1VSG+Olb8BNJuoCHzqVyuyh
+        bh=HCYoX0wE5GpicSTYT42iy6iZfDY9W+9PX613SFW91R8=;
+        b=OsOlvruuhibS29ZclNnl3aTbyFxdsh3v3bGtfMdRExkl9AiSnsxxJ+Nqe7jYMsCTPv
+         Y8sDGN2T5vZvjRIFtrYHHcUx0NJuzcLRDCaVEuMxNBHLeiizNNV+G2pUN6OTTgmaK1Cz
+         E9kVHZ/ijNcgOVYXHKfoPvfgIGpfWvSj+VOpl3+A1cP7KsFith8D8FrYH7GOURqPzrJw
+         Kc1HyF1SfaV0vTQotFmCkhRjol0GRmIIkVVVdCBIOYEmMWEfCxv06/QumpfHVXQCApDQ
+         IZIztQoang4NNkRg5GLTvFlSPBHHiAODsVTcD2VL+GUJJm5C4/S0pes3uoNmyrJd7btW
+         VXPA==
+X-Forwarded-Encrypted: i=1; AJvYcCX1Mswc/14GFZ5OIw8EBu6XptmEeU20e74RB9BGTOMDz7B0h9SI2Yberk8/ixUMPmZjlgndt7EPK277KXjDekSA7j7tIeVD
+X-Gm-Message-State: AOJu0YxfAPMYTLyZDmgPuggzA1B2X0YoSiosbcRuZ5i+2eBONbGJssUv
+	pXaT+aock1YNpCyAWJIQAWXCg+XkVWXr7IroMbskFE5uW2xHww7Pt+E0/JV15ZgFkfAbzLf/fpF
+	+IL5tPmE2+LCMS5hipw==
+X-Google-Smtp-Source: AGHT+IG6wA2gw3HKgkdoyUxrFHR7N0Dl00lUttDnuqK5Ufpq56dpOwAB+SOcWAyxOYR+FLktKLLLdIod/BQqZoEF
 X-Received: from jthoughton.c.googlers.com ([fda3:e722:ac3:cc00:14:4d90:c0a8:2a4f])
- (user=jthoughton job=sendgmr) by 2002:a05:6902:161a:b0:e02:6dcf:e9ab with
- SMTP id 3f1490d57ef6-e041b0688b2mr15353276.6.1720654958570; Wed, 10 Jul 2024
- 16:42:38 -0700 (PDT)
-Date: Wed, 10 Jul 2024 23:42:05 +0000
+ (user=jthoughton job=sendgmr) by 2002:a05:6102:38cd:b0:48b:e1a1:e57 with SMTP
+ id ada2fe7eead31-49031dbef0emr134053137.0.1720654959859; Wed, 10 Jul 2024
+ 16:42:39 -0700 (PDT)
+Date: Wed, 10 Jul 2024 23:42:06 +0000
 In-Reply-To: <20240710234222.2333120-1-jthoughton@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240710234222.2333120-1-jthoughton@google.com>
 X-Mailer: git-send-email 2.45.2.993.g49e7a77208-goog
-Message-ID: <20240710234222.2333120-2-jthoughton@google.com>
-Subject: [RFC PATCH 01/18] KVM: Add KVM_USERFAULT build option
+Message-ID: <20240710234222.2333120-3-jthoughton@google.com>
+Subject: [RFC PATCH 02/18] KVM: Add KVM_CAP_USERFAULT and KVM_MEMORY_ATTRIBUTE_USERFAULT
 From: James Houghton <jthoughton@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
@@ -72,26 +72,245 @@ Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
 
-Some architectures will not support KVM_USERFAULT, so we need to have a
-build option to avoid including it for those architectures.
+Add the ability to enable and disable KVM Userfault, and add
+KVM_MEMORY_ATTRIBUTE_USERFAULT to control whether or not pages should
+trigger userfaults.
+
+The presence of a kvm_userfault_ctx in the struct kvm is what signifies
+whether KVM Userfault is enabled or not. To make sure that this struct
+is non-empty, include a struct eventfd_ctx pointer, although it is not
+used in this patch.
 
 Signed-off-by: James Houghton <jthoughton@google.com>
 ---
- virt/kvm/Kconfig | 4 ++++
- 1 file changed, 4 insertions(+)
+ Documentation/virt/kvm/api.rst | 23 ++++++++
+ include/linux/kvm_host.h       | 14 +++++
+ include/uapi/linux/kvm.h       |  5 ++
+ virt/kvm/kvm_main.c            | 96 +++++++++++++++++++++++++++++++++-
+ 4 files changed, 136 insertions(+), 2 deletions(-)
 
-diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-index 754c6c923427..f1b660d593e4 100644
---- a/virt/kvm/Kconfig
-+++ b/virt/kvm/Kconfig
-@@ -117,3 +117,7 @@ config HAVE_KVM_GMEM_PREPARE
- config HAVE_KVM_GMEM_INVALIDATE
-        bool
-        depends on KVM_PRIVATE_MEM
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index a71d91978d9e..26a98fea718c 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -8070,6 +8070,29 @@ error/annotated fault.
+ 
+ See KVM_EXIT_MEMORY_FAULT for more information.
+ 
++7.35 KVM_CAP_USERFAULT
++------------------------------
 +
-+config KVM_USERFAULT
-+	select KVM_GENERIC_MEMORY_ATTRIBUTES
-+	bool
++:Architectures: none
++:Parameters: args[0] - whether or not to enable KVM Userfault. To enable,
++                       pass KVM_USERFAULT_ENABLE, and to disable pass
++                       KVM_USERFAULT_DISABLE.
++             args[1] - the eventfd to be notified when asynchronous userfaults
++                       occur.
++
++:Returns: 0 on success, -EINVAL if args[0] is not KVM_USERFAULT_ENABLE
++          or KVM_USERFAULT_DISABLE, or if KVM Userfault is not supported.
++
++This capability, if enabled with KVM_ENABLE_CAP, allows userspace to mark
++regions of memory as KVM_MEMORY_ATTRIBUTE_USERFAULT, in which case, attempted
++accesses to these regions of memory by KVM_RUN will fail with
++KVM_EXIT_MEMORY_FAULT. Attempted accesses by other ioctls will fail with
++EFAULT.
++
++Enabling this capability will cause all future faults to create
++small-page-sized sptes. Collapsing these sptes back into their optimal size
++is done with KVM_COLLAPSE_PAGE_TABLES.
++
+ 8. Other capabilities.
+ ======================
+ 
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 7b57878c8c18..f0d4db2d64af 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -730,6 +730,10 @@ struct kvm_memslots {
+ 	int node_idx;
+ };
+ 
++struct kvm_userfault_ctx {
++	struct eventfd_ctx *ev_fd;
++};
++
+ struct kvm {
+ #ifdef KVM_HAVE_MMU_RWLOCK
+ 	rwlock_t mmu_lock;
+@@ -831,6 +835,7 @@ struct kvm {
+ 	bool dirty_ring_with_bitmap;
+ 	bool vm_bugged;
+ 	bool vm_dead;
++	struct kvm_userfault_ctx __rcu *userfault_ctx;
+ 
+ #ifdef CONFIG_HAVE_KVM_PM_NOTIFIER
+ 	struct notifier_block pm_notifier;
+@@ -2477,4 +2482,13 @@ long kvm_gmem_populate(struct kvm *kvm, gfn_t gfn, void __user *src, long npages
+ void kvm_arch_gmem_invalidate(kvm_pfn_t start, kvm_pfn_t end);
+ #endif
+ 
++static inline bool kvm_userfault_enabled(struct kvm *kvm)
++{
++#ifdef CONFIG_KVM_USERFAULT
++	return !!rcu_access_pointer(kvm->userfault_ctx);
++#else
++	return false;
++#endif
++}
++
+ #endif
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index d03842abae57..c84c24a9678e 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -917,6 +917,7 @@ struct kvm_enable_cap {
+ #define KVM_CAP_MEMORY_ATTRIBUTES 233
+ #define KVM_CAP_GUEST_MEMFD 234
+ #define KVM_CAP_VM_TYPES 235
++#define KVM_CAP_USERFAULT 236
+ 
+ struct kvm_irq_routing_irqchip {
+ 	__u32 irqchip;
+@@ -1539,6 +1540,7 @@ struct kvm_memory_attributes {
+ };
+ 
+ #define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
++#define KVM_MEMORY_ATTRIBUTE_USERFAULT         (1ULL << 4)
+ 
+ #define KVM_CREATE_GUEST_MEMFD	_IOWR(KVMIO,  0xd4, struct kvm_create_guest_memfd)
+ 
+@@ -1548,4 +1550,7 @@ struct kvm_create_guest_memfd {
+ 	__u64 reserved[6];
+ };
+ 
++#define KVM_USERFAULT_ENABLE		(1ULL << 0)
++#define KVM_USERFAULT_DISABLE		(1ULL << 1)
++
+ #endif /* __LINUX_KVM_H */
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 8e422c2c9450..fb7972e61439 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -2430,10 +2430,16 @@ bool kvm_range_has_memory_attributes(struct kvm *kvm, gfn_t start, gfn_t end,
+ 
+ static u64 kvm_supported_mem_attributes(struct kvm *kvm)
+ {
++	u64 attributes = 0;
+ 	if (!kvm || kvm_arch_has_private_mem(kvm))
+-		return KVM_MEMORY_ATTRIBUTE_PRIVATE;
++		attributes |= KVM_MEMORY_ATTRIBUTE_PRIVATE;
+ 
+-	return 0;
++#ifdef CONFIG_KVM_USERFAULT
++	if (!kvm || kvm_userfault_enabled(kvm))
++		attributes |= KVM_MEMORY_ATTRIBUTE_USERFAULT;
++#endif
++
++	return attributes;
+ }
+ 
+ static __always_inline void kvm_handle_gfn_range(struct kvm *kvm,
+@@ -4946,6 +4952,84 @@ bool kvm_are_all_memslots_empty(struct kvm *kvm)
+ }
+ EXPORT_SYMBOL_GPL(kvm_are_all_memslots_empty);
+ 
++#ifdef CONFIG_KVM_USERFAULT
++static int kvm_disable_userfault(struct kvm *kvm)
++{
++	struct kvm_userfault_ctx *ctx;
++
++	mutex_lock(&kvm->slots_lock);
++
++	ctx = rcu_replace_pointer(kvm->userfault_ctx, NULL,
++				  mutex_is_locked(&kvm->slots_lock));
++
++	mutex_unlock(&kvm->slots_lock);
++
++	if (!ctx)
++		return 0;
++
++	/* Wait for everyone to stop using userfault. */
++	synchronize_srcu(&kvm->srcu);
++
++	eventfd_ctx_put(ctx->ev_fd);
++	kfree(ctx);
++	return 0;
++}
++
++static int kvm_enable_userfault(struct kvm *kvm, int event_fd)
++{
++	struct kvm_userfault_ctx *userfault_ctx;
++	struct eventfd_ctx *ev_fd;
++	int ret;
++
++	mutex_lock(&kvm->slots_lock);
++
++	ret = -EEXIST;
++	if (kvm_userfault_enabled(kvm))
++		goto out;
++
++	ret = -ENOMEM;
++	userfault_ctx = kmalloc(sizeof(*userfault_ctx), GFP_KERNEL);
++	if (!userfault_ctx)
++		goto out;
++
++	ev_fd = eventfd_ctx_fdget(event_fd);
++	if (IS_ERR(ev_fd)) {
++		ret = PTR_ERR(ev_fd);
++		kfree(userfault_ctx);
++		goto out;
++	}
++
++	ret = 0;
++	userfault_ctx->ev_fd = ev_fd;
++
++	rcu_assign_pointer(kvm->userfault_ctx, userfault_ctx);
++out:
++	mutex_unlock(&kvm->slots_lock);
++	return ret;
++}
++
++static int kvm_vm_ioctl_enable_userfault(struct kvm *kvm, int options,
++					 int event_fd)
++{
++	u64 allowed_options = KVM_USERFAULT_ENABLE |
++			      KVM_USERFAULT_DISABLE;
++	bool enable;
++
++	if (options & ~allowed_options)
++		return -EINVAL;
++	/* Exactly one of ENABLE or DISABLE must be set. */
++	if (options == allowed_options || !options)
++		return -EINVAL;
++
++	enable = options & KVM_USERFAULT_ENABLE;
++
++	if (enable)
++		return kvm_enable_userfault(kvm, event_fd);
++	else
++		return kvm_disable_userfault(kvm);
++}
++#endif
++
+ static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
+ 					   struct kvm_enable_cap *cap)
+ {
+@@ -5009,6 +5093,14 @@ static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
+ 
+ 		return r;
+ 	}
++#ifdef CONFIG_KVM_USERFAULT
++	case KVM_CAP_USERFAULT:
++		if (cap->flags)
++			return -EINVAL;
++
++		return kvm_vm_ioctl_enable_userfault(kvm, cap->args[0],
++						     cap->args[1]);
++#endif
+ 	default:
+ 		return kvm_vm_ioctl_enable_cap(kvm, cap);
+ 	}
 -- 
 2.45.2.993.g49e7a77208-goog
 
