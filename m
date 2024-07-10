@@ -1,120 +1,110 @@
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6027819247B
-	for <kvmarm@lists.linux.dev>; Wed, 10 Jul 2024 15:51:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 792CE1946AD;
+	Wed, 10 Jul 2024 16:04:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720626714; cv=none; b=cjUhe9gTrgK600aflZE9xhpyxf1n350qqHhGtRYUybc38GGLfo6AJDktSrreB9EOS+uBFemuxk+DKZe2uKjjUm/RXEtQoIvCv5ulUEz8x+xUZ/lNkj26id40lvVs+hb2r/otcZPwONOlfB3aXXPnNng4gSxQ9//LCwDNSnnaHws=
+	t=1720627496; cv=none; b=Wiv8XFhZUuh9yxARPK4hCGcdrMBXzxTYjAElatL5eO4HyV5vfynKcKuwVVLdWBqxmlvtxn8e6XuPGfCvCKEaEhEVW1zN6a9bNh9dT169RKPse1+jKEOycXSW5CISL4B4HgXOCYFRifLG2ZSG19nygicI0Y0gDZnXn1y9yIh+Z0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720626714; c=relaxed/simple;
-	bh=Yd7wN4MEwb/4Ych5ZfYI8ZDswiwmmeax1EQOB34ZhJk=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=OV6NMkMByKFIPNVh782CbD/9pkAG6o1Eji9yibVCkSNyc/cT0+7iObukijC+U44XRvhvzzBRruiA6ftwbeHWXGqAonLHNrBeZHnJos9O/tE06OqVaaaiRDfYe9wpOJLfuZ5hBh+r2KehSIDuiTIPrSbelcmtvQiSo6lPX++yVTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nrY2OV1f; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nrY2OV1f"
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1fb05b9e222so40944555ad.0
-        for <kvmarm@lists.linux.dev>; Wed, 10 Jul 2024 08:51:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1720626713; x=1721231513; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2S/Ws8T8aRzTnaLMwEZxjsu7iN6mSUkQ05y/iw/B/rc=;
-        b=nrY2OV1f4B1QrhCC4yfz+AAoyCQbsGoMdvUysaL/4eSab2vMnj0mWIwljviUfsHxao
-         4L4+oYe58RODhfjxnV6AxmNHASreVc9dlLG5N7r7ZTHg8XbzKU7z1L+CpsnvKAcjKjYT
-         SmCcTRReyX7j452THMaOjDIyXebivsKBbTTjYlgj4Zf/HNTrR+AfG7AdRy7Sq9xUyoZA
-         ES3rTh2KlfG6sx22HxfZlDtWP2iNZLs8LTdcXkLGAqU2Q0ShTlVSsTkWKhyeN9MCLqUl
-         BTwWA54vDwldv1jBuQl722i0fdx5BZWDQRzTpFpO/2uUuYkAhTu3OkbqrjAZWHExr5t9
-         Z7Cw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720626713; x=1721231513;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=2S/Ws8T8aRzTnaLMwEZxjsu7iN6mSUkQ05y/iw/B/rc=;
-        b=QtRYwmfE+J1pxbf7vAMylcW8qPkGPRBljwIJV8IcpgYTiaSvnmWnwWw7LWLCBdW88Q
-         Z6NbgotxKaXJSnnwTj/V3YFMq0F9/qz3gzMNt+j92XFXBUtGSeoeodZDnib9w5y9ygo1
-         E4ab4Y2vP9R+M4E6L6zokEX0vQ1zSle4jMnv6Y+62WfRtjEHTqlxRyUMS4mg4tcXRXYt
-         MFMJR1SKclV39L9OPcquf+GzwSzhL7pIeddkqQbWj7BPVSLe8Hd5dspeCyLX/bL7rbWJ
-         4LmAAoTJ9qaF9bzCjUTEBbw+Ev0u0qCd+0jPMNB5KC++brHmpfnL34ljEX4A5xl0+j57
-         JegQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWombaN8/5vnemzQSyDbM3tCYrY9CCSoKahc+x7YFvibfvbn0lUwxDOvQ18IGMQxqKqKed0ECKKggzls2ZjUX/YGdVW905y
-X-Gm-Message-State: AOJu0YzR2Q5Wp4E8GU8ZHthEKCi3nz8ESQg0Dnj6vAseudc0+unKm7M5
-	f2PLTjG3exhoC8+Rwa3ADGLaHWggmBTBxgknlh5wOQfJixRIe1jQ+Wa8tVX04AXJPJ1GcG3Dind
-	T1A==
-X-Google-Smtp-Source: AGHT+IGFDWyL4oVIv+kd3eR4ozKAgHx5u/arXUHJsTVnFMVwi1+9LesGIr7Enb4S0IMxOwQQwYsx6SyO0KU=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:dad2:b0:1f7:175a:69ab with SMTP id
- d9443c01a7336-1fbb6ce3e7dmr4023085ad.4.1720626712651; Wed, 10 Jul 2024
- 08:51:52 -0700 (PDT)
-Date: Wed, 10 Jul 2024 08:51:51 -0700
-In-Reply-To: <CALzav=cwu3M2nLHwZLCTF=eGWx2Nq+=TuHMuGTfZCNa27mLs1A@mail.gmail.com>
+	s=arc-20240116; t=1720627496; c=relaxed/simple;
+	bh=ZT+vmHSzj0V3TRaEXdahnczrOE+RLfpcX61gANIuHEQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IxcNcdAnSCtceHY2gAYfnagUoA590x5O05KBCS+7RhD3CoSeSQBIeKJTvkyqJR6UQ6+7gS6MGm+flLFXXQ/f7Mxq/J3n2mlOUY65odc2BSf1qhCHgGa65uMYFDfpXX5r2y3PVOHFTzidHg6KaWqPgQvcnBp/h88y8I6E4aiSG8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1C43A367;
+	Wed, 10 Jul 2024 09:05:19 -0700 (PDT)
+Received: from [10.57.8.115] (unknown [10.57.8.115])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 548B43F762;
+	Wed, 10 Jul 2024 09:04:50 -0700 (PDT)
+Message-ID: <862c600c-6803-4c25-8234-c8d056e94f23@arm.com>
+Date: Wed, 10 Jul 2024 17:04:48 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20240503181734.1467938-1-dmatlack@google.com> <171874683295.1901599.10170158200177384059.b4-ty@google.com>
- <CALzav=cwu3M2nLHwZLCTF=eGWx2Nq+=TuHMuGTfZCNa27mLs1A@mail.gmail.com>
-Message-ID: <Zo6uFz187FBYnQiY@google.com>
-Subject: Re: [PATCH v3 0/3] KVM: Set vcpu->preempted/ready iff scheduled out
- while running
-From: Sean Christopherson <seanjc@google.com>
-To: David Matlack <dmatlack@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
-	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Nicholas Piggin <npiggin@gmail.com>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, David Hildenbrand <david@redhat.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 08/15] arm64: mm: Avoid TLBI when marking pages as
+ valid
+To: Will Deacon <will@kernel.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+References: <20240701095505.165383-1-steven.price@arm.com>
+ <20240701095505.165383-9-steven.price@arm.com>
+ <20240709115754.GD13242@willie-the-truck>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <20240709115754.GD13242@willie-the-truck>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jul 01, 2024, David Matlack wrote:
-> On Tue, Jun 18, 2024 at 2:41=E2=80=AFPM Sean Christopherson <seanjc@googl=
-e.com> wrote:
-> >
-> > On Fri, 03 May 2024 11:17:31 -0700, David Matlack wrote:
-> > > This series changes KVM to mark a vCPU as preempted/ready if-and-only=
--if
-> > > it's scheduled out while running. i.e. Do not mark a vCPU
-> > > preempted/ready if it's scheduled out during a non-KVM_RUN ioctl() or
-> > > when userspace is doing KVM_RUN with immediate_exit=3Dtrue.
-> > >
-> > > This is a logical extension of commit 54aa83c90198 ("KVM: x86: do not
-> > > set st->preempted when going back to user space"), which  stopped
-> > > marking a vCPU as preempted when returning to userspace. But if users=
-pace
-> > > invokes a KVM vCPU ioctl() that gets preempted, the vCPU will be mark=
-ed
-> > > preempted/ready. This is arguably incorrect behavior since the vCPU w=
-as
-> > > not actually preempted while the guest was running, it was preempted
-> > > while doing something on behalf of userspace.
-> > >
-> > > [...]
-> >
-> > Applied to kvm-x86 generic, with minor changelog tweaks (me thinks you'=
-ve been
-> > away from upstream too long ;-) ).  Thanks!
->=20
-> Thanks for the cleanups. Looks like you replaced "[Tt]his commit"
-> throughout. Anything else (so I can avoid the same mistakes in the
-> future)?
+On 09/07/2024 12:57, Will Deacon wrote:
+> On Mon, Jul 01, 2024 at 10:54:58AM +0100, Steven Price wrote:
+>> When __change_memory_common() is purely setting the valid bit on a PTE
+>> (e.g. via the set_memory_valid() call) there is no need for a TLBI as
+>> either the entry isn't changing (the valid bit was already set) or the
+>> entry was invalid and so should not have been cached in the TLB.
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>> v4: New patch
+>> ---
+>>  arch/arm64/mm/pageattr.c | 8 +++++++-
+>>  1 file changed, 7 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/arm64/mm/pageattr.c b/arch/arm64/mm/pageattr.c
+>> index 0e270a1c51e6..547a9e0b46c2 100644
+>> --- a/arch/arm64/mm/pageattr.c
+>> +++ b/arch/arm64/mm/pageattr.c
+>> @@ -60,7 +60,13 @@ static int __change_memory_common(unsigned long start, unsigned long size,
+>>  	ret = apply_to_page_range(&init_mm, start, size, change_page_range,
+>>  					&data);
+>>  
+>> -	flush_tlb_kernel_range(start, start + size);
+>> +	/*
+>> +	 * If the memory is being made valid without changing any other bits
+>> +	 * then a TLBI isn't required as a non-valid entry cannot be cached in
+>> +	 * the TLB.
+>> +	 */
+>> +	if (pgprot_val(set_mask) != PTE_VALID || pgprot_val(clear_mask))
+>> +		flush_tlb_kernel_range(start, start + size);
+>>  	return ret;
+> 
+> Can you elaborate on when this actually happens, please? It feels like a
+> case of "Doctor, it hurts when I do this" rather than something we should
+> be trying to short-circuit in the low-level code.
 
-I don't think so?  The "This commit" stuff is the only thing that I remembe=
-r, so
-any other tweaks can't be that important :-)
+This is for the benefit of the following patch. When transitioning a
+page between shared and private we need to change the IPA (to set/clear
+the top bit). This requires a break-before-make - see
+__set_memory_enc_dec() in the following patch.
+
+The easiest way of implementing the code was to just call
+__change_memory_common() twice - once to make the entry invalid and then
+again to make it valid with the new IPA. But that led to a double TLBI
+which Catalin didn't like[1].
+
+So this patch removes the unnecessary second TLBI by detecting that
+we're just making the entry valid. Or at least it would if I hadn't
+screwed up...
+
+I should have changed the following patch to ensure that the second call
+to __change_memory_common was only setting the PTE_VALID bit and not
+changing anything else (so that the TLBI could be skipped) and forgot to
+do that. So thanks for making me take a look at this again!
+
+Thanks,
+Steve
+
+[1] https://lore.kernel.org/lkml/Zmc3euO2YGh-g9Th@arm.com/
