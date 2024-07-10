@@ -1,101 +1,77 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA47B176FCE;
-	Wed, 10 Jul 2024 08:51:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3716817B41C
+	for <kvmarm@lists.linux.dev>; Wed, 10 Jul 2024 08:54:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720601487; cv=none; b=s2Y+K4oBj6A11nVBSNQsdl0XFZfwZ83DeJn68Azt5DuyLYkJk5eZbqt0PokGulp9iH9nb2+ZS6iQmnhF0dv9zP5lpBIl0/zBv+7BBExccT2m9phj7mTbUrVU0/lIPJChw0C07aZSDE7GGVoNYgPksYWdjfmoZyFJT3jG9hZeFC0=
+	t=1720601676; cv=none; b=QwCpOU3X6rr9+HNKh61Y6xDthpCpeZsN/zuiAwkDQ8UAoYn78wlpsPfR9nFt1wrF1NBvxZemvFYhimfPu99ho58k4odM8IlpeK5uzhyXrqTDANpOvHGBlBfDHmuVIcpDBSNDt9hkMmyGcA293DhYeFiZZyfsO5rp5v2pC3BpmmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720601487; c=relaxed/simple;
-	bh=dnAQkPxYtxbaIwh+/jYCb8bb1Ou4HEWUt8N3rsbRkVI=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=C/IWcxME47XY3ko4Mgi7IhpWH7yhT9b0VNJSrGBM/jR5IQbOAUFGoMxHBDjR1PcM6MdOjIZfGRhyO8pejpnRkkxifwyse8DYZNuvSby5lc6iTeJr56+Ci14VCdzXMLNZEK4ROhxTTpQs+6SN7iOvFLt9RsJC7PMJKN4JuFa6q+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=llpc7gc1; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="llpc7gc1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45D82C32781;
-	Wed, 10 Jul 2024 08:51:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720601487;
-	bh=dnAQkPxYtxbaIwh+/jYCb8bb1Ou4HEWUt8N3rsbRkVI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=llpc7gc1DVf6Ls9Mp8WWZKfbbl4lDFsoGRMl8ruvGncvzGLFdXsVl7bj404rPtlbF
-	 3fUzoHX/fdmFy0ZkeER+uxGNItYekQpT2s0flHwrode59lobwdq4vrEqcUsa3FN57k
-	 mEFOz1pr5wQ8+n7WAO8rF/LfRIFbWmaOfP7HTJgezQlvkHVpLlfaPLD7AqUg/MtgEc
-	 Ocy7fuK5R1DA8z1G6EIe5YFVVy3HFbtCPZoK72fi1XxwzQ+5utbV0gBfDnf3IFEvDi
-	 Qz1DjryY9hls1Txh6KMER80o/NvwWA8CwrJpdO39opqnsbwePaiQPRDg4qFzckc+1+
-	 ONxFn5h+z0JUg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sRT2q-00BA9w-S0;
-	Wed, 10 Jul 2024 09:51:24 +0100
-Date: Wed, 10 Jul 2024 09:51:24 +0100
-Message-ID: <86zfqp3a0j.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Tangnianyao <tangnianyao@huawei.com>
-Cc: <kvmarm@lists.linux.dev>,
-	<kvm@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose
-	<suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu
-	<yuzenghui@huawei.com>,
-	Quentin Perret <qperret@google.com>,
-	Will Deacon
-	<will@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
-	"guoyang (C)"
-	<guoyang2@huawei.com>
-Subject: Re: [PATCH v3 00/17] KVM: arm64: Allow using VHE in the nVHE hypervisor
-In-Reply-To: <5ab07210-ad44-616c-cd15-0ac954453fcf@huawei.com>
-References: <20230609162200.2024064-1-maz@kernel.org>
-	<5ab07210-ad44-616c-cd15-0ac954453fcf@huawei.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.3
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1720601676; c=relaxed/simple;
+	bh=JmHBrpDMagDavRXtU8xMvlEwi3yUfLh3jZjd30bdrW8=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=CbU8dmFRqNbYlFSygNy+07FTCZHm8CzAx1SZ7Xse73GNePZgjj2sX+RtKsZv0M+LGAf7th1kwnkynvzPs7Nw+xZqhybqRYordKfqFEnrFyChWSv1A98DbXd5zUkXx0rLSrqkFDcM2mCfoJE3oX0d3yuj7wCd66QPzfYy+vFhYFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4WJs462k8BzwWY0;
+	Wed, 10 Jul 2024 16:49:42 +0800 (CST)
+Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
+	by mail.maildlp.com (Postfix) with ESMTPS id F0803140257;
+	Wed, 10 Jul 2024 16:54:24 +0800 (CST)
+Received: from [10.174.185.179] (10.174.185.179) by
+ kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Wed, 10 Jul 2024 16:54:23 +0800
+Subject: Re: [PATCH v2 2/3] KVM: arm64: vgic-its: Clear dte when mapd unmaps a
+ device
+To: Kunkun Jiang <jiangkunkun@huawei.com>
+CC: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+	Randy Dunlap <rdunlap@infradead.org>, Eric Auger <eauger@redhat.com>,
+	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<wanghaibin.wang@huawei.com>, <lishusen2@huawei.com>,
+	<tangnianyao@huawei.com>
+References: <20240704142319.728-1-jiangkunkun@huawei.com>
+ <20240704142319.728-3-jiangkunkun@huawei.com>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <9714cd31-f72b-ddb6-4443-6244c44c0d96@huawei.com>
+Date: Wed, 10 Jul 2024 16:54:23 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tangnianyao@huawei.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, qperret@google.com, will@kernel.org, tabba@google.com, guoyang2@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+In-Reply-To: <20240704142319.728-3-jiangkunkun@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemm600007.china.huawei.com (7.193.23.208)
 
-On Wed, 10 Jul 2024 07:45:52 +0100,
-Tangnianyao <tangnianyao@huawei.com> wrote:
+On 2024/7/4 22:23, Kunkun Jiang wrote:
+> vgic_its_save_device_tables will traverse its->device_list to
+> save dte for each device. vgic_its_restore_device_tables will
+> traverse each entry of device table and check if it is valid.
+> Restore if valid.
 > 
-> Hi Marz,
+> But when mapd unmaps a devices, we do not invalidate the
+> corresponding dte. In the scenario of continuous save
+> and restore, there may be a situation where a device's dte
+> is not saved but is restored. This is unreasonable and may
+> cause restore to fail. This patch clears the corresponding
+> dte when mapd unmaps a device.
 > 
-> I'm trying to learn pKVM and have a question.
-> 
-> Why pKVM developed on E2H=0 firstly? It tried to avoid host access
-> guest memory with stage2 translation, and it seems not necessarily
-> rely on HCR_EL2.E2H=0.
+> Co-developed-by: Shusen Li <lishusen2@huawei.com>
+> Singed-off-by: Shusen Li <lishusen2@huawei.com>
+  ^^^^^^
 
-Because we don't want to leave ARMv8.0 systems behind. They are still
-a large portion of the arm64 HW running Linux.
+Please do fix the tag. checkpatch.pl should have complained about it
+already if you run it.
 
-> Is hVHE an alternative plan of pKVM ? To allow pKVM run on E2H res1 system ?
-
-Supporting E2H RES1 implementations is indeed one of the motivations.
-But there is a lot more to it, such as being able to use the two TTBRs
-to perform address space isolation inside the hypervisor.
-
-I presented this[1] at KVM Forum two years ago, which explains what we
-could do (some of which is already in progress).
-
-	M.
-
-[1] https://static.sched.com/hosted_files/kvmforum2022/b4/NYSM-NYD-KVM-2022.pdf
-
--- 
-Without deviation from the norm, progress is not possible.
+Zenghui
