@@ -1,244 +1,239 @@
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 608BA1487C5
-	for <kvmarm@lists.linux.dev>; Wed, 10 Jul 2024 23:11:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98CC413D503
+	for <kvmarm@lists.linux.dev>; Wed, 10 Jul 2024 23:42:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720653070; cv=none; b=dztrA/NHUlJg2MhMhJwCKu3Sa2uZS+nmnMhcpoxQXiUO5Ci0fSsQ9NvXZd7O32XdVqRfQsDjhA94r9vOLYdTWZu7Gfsta3YAUX9cVuFysiKvA7mhwL/zFFg59UY7AYklG3JNQJ8/3y3PeAdRIdpZO4IWY98BN3Ds21KNSNNnXss=
+	t=1720654960; cv=none; b=IVcuFLMMimcnapk/NvEsbzwiHP4icOaEOguTYAD0BegvflF5OcLdewiX3tX9/s0kpXMjgfaUyMy10cJwXejUjuj3QD0eSXlb2uARCeRKtJNBEsaOowD6URejmh1+CiMMaILe1p7BFRdzt1RYLXYGUd0U52UYquuar+A54VPqsl4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720653070; c=relaxed/simple;
-	bh=Pz0I0ZuPQJNsCVP+7BMKlxh3Arp7J6K1rlyeZNl314U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HlBmcPEzgEjFhCdoDa44TmM5P6nj3CmaOTyc7bx3NwtSic+tSycGAXkEewFRM10ayui/EEE/IVMni27KwC56HBo1FIegRgbFq//j7CQJmVFD/l3TBrv9XB4kY/QvIVQzl1OBB8sy7tCI/atQ4NmDY7T0Kgez1mnJ3g68JtDCkso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wocwT4dV; arc=none smtp.client-ip=209.85.160.181
+	s=arc-20240116; t=1720654960; c=relaxed/simple;
+	bh=+d7MHnXvG9ckN0TU9hoPWKFT9fXHe0SQp2A+udSuB7E=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=tJSODwn00J9g6gzZ44JzLq/H3YPhcwaxOZKEg8PA5LdvWqzCpPsA+NKHmGvX7fDz/DhyA23F0EW+MlWUfc8kC8Qv6RkMYgC2woMaYksd/PN9mUy2mnPirpYKuxlTEO7ljebfP1YA57sBdgE5bZ1mBFw+y9JqSIbrSD7HoWLGJHg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BvCCPa93; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wocwT4dV"
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-44664ad946eso51721cf.1
-        for <kvmarm@lists.linux.dev>; Wed, 10 Jul 2024 16:11:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BvCCPa93"
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-64b9800b377so17459017b3.0
+        for <kvmarm@lists.linux.dev>; Wed, 10 Jul 2024 16:42:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1720653067; x=1721257867; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MJTeSm6eMBTbHXnqICN2W1jCeLI7nzO2Ktbu8vr4Dfo=;
-        b=wocwT4dVZoBr3SxXKzZqs3qwPjfWELFYf4f/i1M4RweNxb2nYSTrH1u3XcK8kKiT6E
-         zkxfzrCf4EswCPPkW0ogciYwSdW50lMNZJq3dW7oUwLhKNQNZq9VracYLpnqxfUBHwWi
-         +i0Iwbrw2WuVjDhiYw2ZZDxA5WgkzexenZXYy90bJKZnqhAiBaktuuKfH3sQkjWpwnah
-         BBnnYazVqaQeoDzs4bpvBiOTn1gGUTu/eqt5XDSNPR4PfJ07uNlQkG2jpr4BI/y5pGRT
-         ILnUrgGPJxBSu6JxrZHt7AsCdfc+ol2StsZzRHM67pdBXoNuUUzJ3iSYbXx4NaoEO7+f
-         p0Dg==
+        d=google.com; s=20230601; t=1720654958; x=1721259758; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=i4DifozVZ/fDrEjgZQtvTFkudk1JzJtOjKWrKpGAYuU=;
+        b=BvCCPa93mDhpnkVSPkMhHgM9VwL6pR4KuQ0U2MLHyxlVQLkiNDxHWKfEqcHmb11L0A
+         AsAvobXLAkCxkN1dEjhklVTl3sOzIt8NhcdKVp+njFi9vCG//fCZCOJ6CJM7ZdBJFf09
+         3Bcc3XQE4oiyRqK0kFmtusdCMtp59jYB8PigjurGxT6ZY1iXJwANCOhFPzC318YZXeGo
+         gyrsWUDCakMdm/5HahArB/oQ/4aUEi+Q5ybRNvgRXDtoVUW5Q2ti3ehLoxJ6IkDzGXqr
+         f3FuoPoTwXyDouNzmrY7leq1AMj/ZWS10tHqCq1IsnjzGIhqzQokAX25rCA2zqa0z3aT
+         M0XQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720653067; x=1721257867;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MJTeSm6eMBTbHXnqICN2W1jCeLI7nzO2Ktbu8vr4Dfo=;
-        b=Pa3nImZ2jBFrbF9SWywY7dbQ1TehhorE8f2gQlsmAIUW73rO5Gn9EKAZdTsJZCeOOD
-         yzVFAy6qQ68dnwYDD1vGbaDUzHKSAxMNUpMCB1iIvFCu2so1jNNseu7t3ux7+4fKlQCv
-         Cer0odyM5Qd9A/yOrF9IM91rhfzIxUI5Ub9JuO7r+5S3QUMQh+7ROQ5xC5bhqkJP4BTI
-         Tk5QbIam3+F3rF3UbRdm7NMuI5GKPyKOyNtS3Qtux8oErSHcU50JWlhJgqqKAurxZ6pK
-         FRcwlRZ4kjufMO7x8QQ4im6jlz0lwEQnFcv8eRdFZJGvYDp/V4HGnwXtl1uiS47yHQGT
-         Vhgw==
-X-Forwarded-Encrypted: i=1; AJvYcCUzJkSaETz9oIKVLTsmnGPcSVimz6i0u+oyaUewz++Gbqo+oKopEp/nRtf7KfzUfxD/okPZhl/c655iOQ5dQd4XP0r0vlUX
-X-Gm-Message-State: AOJu0YwTR/Pqco4HvktJIage/Y3xipN2McXJcnbTxsRNDL0bEvKDWIXy
-	B+GlxAcMApWl/YG7Jo4HGwQ3zTrBZ8NOMycdOJi3nOl15KH4BrpwrNh3OLhM8W4ive9P5zMwJ3g
-	uy5kt4ScZG2j2KQUA72Sbx4ea5uNPkGNqDfSI
-X-Google-Smtp-Source: AGHT+IGzszVF+IxKrY/ClY51Y2kjfgE37Xj8trnZtH5JYTor6nkkszob6If5ud2bc91ZsUHmQ4RjHdSOlc0bNNlnZxM=
-X-Received: by 2002:ac8:7cba:0:b0:447:f958:ab83 with SMTP id
- d75a77b69052e-44d35b2b31emr557951cf.21.1720653067221; Wed, 10 Jul 2024
- 16:11:07 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1720654958; x=1721259758;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=i4DifozVZ/fDrEjgZQtvTFkudk1JzJtOjKWrKpGAYuU=;
+        b=L3Z3qnfc/k7TRZzsAo8oKIbugY83NT0ADyRG2L2wW0KliU+9bFtkiq0wWYm1hn+//x
+         2kkUvMIM70Vbvx0neK+8SfF9KJAciLJlVKtfJv/ebWrTb7WHVwHTzL0GK2mmaqN40X3z
+         gKVQ0HbdQzvX0xxfIdZ7q0nhxDb/xh7wWnNm9U6RuNz9WWaSI0yoOoPXMtby7kaWjNEh
+         WAExmWNioyWFoSIvx842WNbSzChzQW0Mtrv69q8pyD2oNe570Jh/7fab7hJ6bKfLS4Ar
+         0/BULmQYqGjuT2tUZmQNiN+ESHSnO+Lh7kkVpdjNiEOJ7z3gJ9xk9beCijKrE7dttr5r
+         0ClA==
+X-Forwarded-Encrypted: i=1; AJvYcCXwBhYpTzrMt1i0r52eJ0ZK77PidnF444Y8qoSzbtyMg1RIp0H524KOaXr1jFwjVNeu3KGQeRstVYRBlmBYY5le8/kPZUG9
+X-Gm-Message-State: AOJu0Yygedr+poN9QscqWVk5YjANnXecq8dQWwAH1R5TdfJPuk35y4Do
+	nnJDv7sNPs1pVLmR1TF8r3+7tR7JNiEJXJacPeGjrFFH7f5yQc61axsUWoOF9XnNbtHJe5QJJ+u
+	JQKIDVTKLCsZS5Ceuxw==
+X-Google-Smtp-Source: AGHT+IGleZxYUt4mvQCru8lvqfwiOY5k61Gmu5l5Nxb9Gfvqk177LFIz9ZNpte5dLHg976OYyY0/0Rk5LPFmcxhb
+X-Received: from jthoughton.c.googlers.com ([fda3:e722:ac3:cc00:14:4d90:c0a8:2a4f])
+ (user=jthoughton job=sendgmr) by 2002:a05:6902:32a6:b0:e03:61bb:6032 with
+ SMTP id 3f1490d57ef6-e0577fa164amr19023276.1.1720654957517; Wed, 10 Jul 2024
+ 16:42:37 -0700 (PDT)
+Date: Wed, 10 Jul 2024 23:42:04 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <CADrL8HU_FKHTz_6d=xhVLZFDQ_zQo-zdB2rqdpa2CKusa1uo+A@mail.gmail.com>
- <ZmjtEBH42u7NUWRc@google.com> <CADrL8HUW2q79F0FsEjhGW0ujij6+FfCqas5UpQp27Epfjc94Nw@mail.gmail.com>
- <ZmxsCwu4uP1lGsWz@google.com> <CADrL8HVDZ+m_-jUCaXf_DWJ92N30oqS=_9wNZwRvoSp5fo7asg@mail.gmail.com>
- <ZmzPoW7K5GIitQ8B@google.com> <CADrL8HW3rZ5xgbyGa+FXk50QQzF4B1=sYL8zhBepj6tg0EiHYA@mail.gmail.com>
- <ZnCCZ5gQnA3zMQtv@google.com> <CADrL8HW=kCLoWBwoiSOCd8WHFvBdWaguZ2ureo4eFy9D67+owg@mail.gmail.com>
- <CADrL8HUv6T4baOi=VTFV6ZA=Oyn3dEc6Hp9rXXH0imeYkwUhew@mail.gmail.com> <Zo137P7BFSxAutL2@google.com>
-In-Reply-To: <Zo137P7BFSxAutL2@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.2.993.g49e7a77208-goog
+Message-ID: <20240710234222.2333120-1-jthoughton@google.com>
+Subject: [RFC PATCH 00/18] KVM: Post-copy live migration for guest_memfd
 From: James Houghton <jthoughton@google.com>
-Date: Wed, 10 Jul 2024 16:10:29 -0700
-Message-ID: <CADrL8HW4PLTeC9Gq3Fd43-idjzOw8mXOzzG_RP1TYVoGp1_g+g@mail.gmail.com>
-Subject: Re: [PATCH v5 4/9] mm: Add test_clear_young_fast_only MMU notifier
-To: Sean Christopherson <seanjc@google.com>
-Cc: Yu Zhao <yuzhao@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Ankit Agrawal <ankita@nvidia.com>, 
-	Axel Rasmussen <axelrasmussen@google.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	David Matlack <dmatlack@google.com>, David Rientjes <rientjes@google.com>, 
-	James Morse <james.morse@arm.com>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Raghavendra Rao Ananta <rananta@google.com>, 
-	Ryan Roberts <ryan.roberts@arm.com>, Shaoqin Huang <shahuang@redhat.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Wei Xu <weixugc@google.com>, 
-	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Sean Christopherson <seanjc@google.com>, Shuah Khan <shuah@kernel.org>, 
+	Peter Xu <peterx@redhat.org>, Axel Rasmussen <axelrasmussen@google.com>, 
+	David Matlack <dmatlack@google.com>, James Houghton <jthoughton@google.com>, kvm@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 9, 2024 at 10:49=E2=80=AFAM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> On Mon, Jul 08, 2024, James Houghton wrote:
-> > On Fri, Jun 28, 2024 at 7:38=E2=80=AFPM James Houghton <jthoughton@goog=
-le.com> wrote:
-> > >
-> > > On Mon, Jun 17, 2024 at 11:37=E2=80=AFAM Sean Christopherson <seanjc@=
-google.com> wrote:
-> > I still don't think we should get rid of the WAS_FAST stuff.
->
-> I do :-)
->
-> > The assumption that the L1 VM will almost never share pages between L2
-> > VMs is questionable. The real question becomes: do we care to have
-> > accurate age information for this case? I think so.
->
-> I think you're conflating two different things.  WAS_FAST isn't about acc=
-uracy,
-> it's about supporting lookaround in conditionally fast secondary MMUs.
->
-> Accuracy only comes into play when we're talking about the last-minute ch=
-eck,
-> which, IIUC, has nothing to do with WAS_FAST because any potential lookar=
-ound has
-> already been performed.
+This patch series implements the KVM-based demand paging system that was
+first introduced back in November[1] by David Matlack.
 
-Sorry, I thought you meant: have the MMU notifier only ever be
-lockless (when tdp_mmu_enabled), and just return a potentially wrong
-result in the unlikely case that L1 is sharing pages between L2s.
+The working name for this new system is KVM Userfault, but that name is
+very confusing so it will not be the final name.
 
-I think it's totally fine to just drop WAS_FAST. So then we can either
-do look-around (1) always, or (2) only when there is a secondary MMU
-with has_fast_aging. (2) is pretty simple, I'll just do that.
+Problem: post-copy with guest_memfd
+===================================
 
-We can add some shadow MMU lockless support later to make the
-look-around not as useless for the nested TDP case.
+Post-copy live migration makes it possible to migrate VMs from one host
+to another no matter how fast they are writing to memory while keeping
+the VM paused for a minimal amount of time. For post-copy to work, we
+need:
+ 1. to be able to prevent KVM from being able to access particular pages
+    of guest memory until we have populated it
+ 2. for userspace to know when KVM is trying to access a particular
+    page.
+ 3. a way to allow the access to proceed.
 
-> > It's not completely trivial to get the lockless walking of the shadow
-> > MMU rmaps correct either (please see the patch I attached here[1]).
->
-> Heh, it's not correct.  Invoking synchronize_rcu() in kvm_mmu_commit_zap_=
-page()
-> is illegal, as mmu_lock (rwlock) is held and synchronize_rcu() might_slee=
-p().
->
-> For kvm_test_age_rmap_fast(), KVM can blindly read READ_ONCE(*sptep).  KV=
-M might
-> read garbage, but that would be an _extremely_ rare scenario, and reporti=
-ng a
-> zapped page as being young is acceptable in that 1 in a billion situation=
-.
->
-> For kvm_age_rmap_fast(), i.e. where KVM needs to write, I'm pretty sure K=
-VM can
-> handle that by rechecking the rmap and using CMPXCHG to write the SPTE.  =
-If the
-> rmap is unchanged, then the old SPTE value is guaranteed to be valid, in =
-the sense
-> that its value most definitely came from a KVM shadow page table.  Ah, dr=
-at, that
-> won't work, because very theoretically, the page table could be freed, re=
-allocated,
-> and rewritten with the exact same value by something other than KVM.  Hrm=
-.
->
-> Looking more closely, I think we can go straight to supporting rmap walks=
- outside
-> of mmu_lock.  There will still be a "lock", but it will be a *very* rudim=
-entary
-> lock, akin to the TDP MMU's REMOVED_SPTE approach.  Bit 0 of rmap_head->v=
-al is
-> used to indicate "many", while bits 63:3/31:2 on 64-bit/32-bit KVM hold t=
-he
-> pointer (to a SPTE or a list).  That means bit 1 is available for shenani=
-gans.
->
-> If we use bit 1 to lock the rmap, then the fast mmu_notifier can safely w=
-alk the
-> entire rmap chain.  And with a reader/write scheme, the rmap walks that a=
-re
-> performed under mmu_lock don't need to lock the rmap, which means flows l=
-ike
-> kvm_mmu_zap_collapsible_spte() don't need to be modified to avoid recursi=
-ve
-> self-deadlock.  Lastly, the locking can be conditioned on the rmap being =
-valid,
-> i.e. having at least one SPTE.  That way the common case of a gfn not hav=
-ing any
-> rmaps is a glorified nop.
->
-> Adding the locking isn't actually all that difficult, with the *huge* cav=
-eat that
-> the below patch is compile-tested only.  The vast majority of the churn i=
-s to make
-> it so existing code ignores the new KVM_RMAP_LOCKED bit.
+Traditionally, post-copy live migration is implemented using
+userfaultfd, which hooks into the main mm fault path. KVM hits this path
+when it is doing HVA -> PFN translations (with GUP) or when it itself
+attempts to access guest memory. Userfaultfd sends a page fault
+notification to userspace, and KVM goes to sleep.
 
-This is very interesting, thanks for laying out how this could be
-done. I don't want to hold this series up on getting the details of
-the shadow MMU lockless walk exactly right. :)
+Userfaultfd works well, as it is not specific to KVM; everyone who
+attempts to access guest memory will block the same way.
 
-> I don't know that we should pursue such an approach in this series unless=
- we have
-> to.  E.g. if we can avoid WAS_FAST or don't have to carry too much interm=
-ediate
-> complexity, then it'd probably be better to land the TDP MMU support firs=
-t and
-> then add nested TDP support later.
+However, with guest_memfd, we do not use GUP to translate from GFN to
+HPA (nor is there an intermediate HVA).
 
-Agreed!
+So userfaultfd in its current form cannot be used to support post-copy
+live migration with guest_memfd-backed VMs.
 
-> At the very least, it does make me more confident that a fast walk of the=
- rmaps
-> is very doable (at least for nested TDP), i.e. makes me even more steadfa=
-st
-> against adding WAS_FAST.
->
-> > And the WAS_FAST functionality isn't even that complex to begin with.
->
-> I agree the raw code isn't terribly complex, but it's not trivial either.=
-  And the
-> concept and *behavior* is complex, which is just as much of a maintenance=
- burden
-> as the code itself.  E.g. it requires knowing that KVM has multiple MMUs =
-buried
-> behind a single mmu_notifier, and that a "hit" on the fast MMU will trigg=
-er
-> lookaround on the fast MMU, but not the slow MMU.  Understanding and desc=
-ribing
-> the implications of that behavior isn't easy.  E.g. if GFN=3DX is young i=
-n the TDP
-> MMU, but X+1..X+N are young only in the shadow MMU, is doing lookaround a=
-nd making
-> decisions based purely on the TDP MMU state the "right" behavior?
->
-> I also really don't like bleeding KVM details into the mmu_nofitier APIs.=
-  The
-> need for WAS_FAST is 100% a KVM limitation.  AFAIK, no other secondary MM=
-U has
-> multiple MMU implementations active behind a single notifier, and other t=
-han lack
-> of support, nothing fundamentally prevents a fast query in the shadow MMU=
-.
+Solution: hook into the gfn -> pfn translation
+==============================================
 
-Makes sense.
+The only way to implement post-copy with a non-KVM-specific
+userfaultfd-like system would be to introduce the concept of a
+file-userfault[2] to intercept faults on a guest_memfd.
 
-So in v6, I will make the following changes:
+Instead, we take the simpler approach of adding a KVM-specific API, and
+we hook into the GFN -> HVA or GFN -> PFN translation steps (for
+traditional memslots and for guest_memfd respectively).
 
-1. Drop the WAS_FAST complexity.
-2. Add a function like mm_has_fast_aging_notifiers(), use that to
-determine if we should be doing look-around.
-3. Maybe change the notifier calls slightly[1], still need to check perform=
-ance.
+I have intentionally added support for traditional memslots, as the
+complexity that it adds is minimal, and it is useful for some VMMs, as
+it can be used to fully implement post-copy live migration.
 
-Does that sound good to you?
+Implementation Details
+======================
+
+Let's break down how KVM implements each of the three core requirements
+for implementing post-copy as laid out above:
+
+--- Preventing access: KVM_MEMORY_ATTRIBUTE_USERFAULT ---
+
+The most straightforward way to inform KVM of userfault-enabled pages is
+to use a new memory attribute, say KVM_MEMORY_ATTRIBUTE_USERFAULT.
+
+There is already infrastructure in place for modifying and checking
+memory attributes. Using this interface is slightly challenging, as there
+is no UAPI for setting/clearing particular attributes; we must set the
+exact attributes we want.
+
+The synchronization that is in place for updating memory attributes is
+not suitable for post-copy live migration either, which will require
+updating memory attributes (from userfault to no-userfault) very
+frequently.
+
+Another potential interface could be to use something akin to a dirty
+bitmap, where a bitmap describes which pages within a memslot (or VM)
+should trigger userfaults. This way, it is straightforward to make
+updates to the userfault status of a page cheap.
+
+When KVM Userfault is enabled, we need to be careful not to map a
+userfault page in response to a fault on a non-userfault page. In this
+RFC, I've taken the simplest approach: force new PTEs to be PAGE_SIZE.
+
+--- Page fault notifications ---
+
+For page faults generated by vCPUs running in guest mode, if the page
+the vCPU is trying to access is a userfault-enabled page, we use
+KVM_EXIT_MEMORY_FAULT with a new flag: KVM_MEMORY_EXIT_FLAG_USERFAULT.
+
+For arm64, I believe this is actually all we need, provided we handle
+steal_time properly.
+
+For x86, where returning from deep within the instruction emulator (or
+other non-trivial execution paths) is infeasible, being able to pause
+execution while userspace fetches the page, just as userfaultfd would
+do, is necessary. Let's call these "asynchronous userfaults."
+
+A new ioctl, KVM_READ_USERFAULT, has been added to read asynchronous
+userfaults, and an eventfd is used to signal that new faults are
+available for reading.
+
+Today, we busy-wait for a gfn to have userfault disabled. This will
+change in the future.
+
+--- Fault resolution ---
+
+Resolving userfaults today is as simple as removing the USERFAULT memory
+attribute on the faulting gfn. This will change if we do not end up
+using memory attributes for KVM Userfault. Having a range-based wake-up
+like userfaultfd (see UFFDIO_WAKE) might also be helpful for
+performance.
+
+Problems with this series
+=========================
+- This cannot be named KVM Userfault! Perhaps "KVM missing pages"?
+- Memory attribute modification doesn't scale well.
+- We busy-wait for pages to not be userfault-enabled.
+- gfn_to_hva and gfn_to_pfn caches are not invalidated.
+- Page tables are not collapsed when KVM Userfault is disabled.
+- There is no self-test for asynchronous userfaults.
+- Asynchronous page faults can be dropped if KVM_READ_USERFAULT fails.
+- Supports only x86 and arm64.
+- Probably many more!
 
 Thanks!
 
-[1]: https://lore.kernel.org/linux-mm/CAOUHufb2f_EwHY5LQ59k7Nh7aS1-ZbOKtkoy=
-sb8BtxRNRFMypQ@mail.gmail.com/
+[1]: https://lore.kernel.org/kvm/CALzav=d23P5uE=oYqMpjFohvn0CASMJxXB_XEOEi-jtqWcFTDA@mail.gmail.com/
+[2]: https://lore.kernel.org/kvm/CADrL8HVwBjLpWDM9i9Co1puFWmJshZOKVu727fMPJUAbD+XX5g@mail.gmail.com/
+
+James Houghton (18):
+  KVM: Add KVM_USERFAULT build option
+  KVM: Add KVM_CAP_USERFAULT and KVM_MEMORY_ATTRIBUTE_USERFAULT
+  KVM: Put struct kvm pointer in memslot
+  KVM: Fail __gfn_to_hva_many for userfault gfns.
+  KVM: Add KVM_PFN_ERR_USERFAULT
+  KVM: Add KVM_MEMORY_EXIT_FLAG_USERFAULT
+  KVM: Provide attributes to kvm_arch_pre_set_memory_attributes
+  KVM: x86: Add KVM Userfault support
+  KVM: x86: Add vCPU fault fast-path for Userfault
+  KVM: arm64: Add KVM Userfault support
+  KVM: arm64: Add vCPU memory fault fast-path for Userfault
+  KVM: arm64: Add userfault support for steal-time
+  KVM: Add atomic parameter to __gfn_to_hva_many
+  KVM: Add asynchronous userfaults, KVM_READ_USERFAULT
+  KVM: guest_memfd: Add KVM Userfault support
+  KVM: Advertise KVM_CAP_USERFAULT in KVM_CHECK_EXTENSION
+  KVM: selftests: Add KVM Userfault mode to demand_paging_test
+  KVM: selftests: Remove restriction in vm_set_memory_attributes
+
+ Documentation/virt/kvm/api.rst                |  23 ++
+ arch/arm64/include/asm/kvm_host.h             |   2 +-
+ arch/arm64/kvm/Kconfig                        |   1 +
+ arch/arm64/kvm/arm.c                          |   8 +-
+ arch/arm64/kvm/mmu.c                          |  45 +++-
+ arch/arm64/kvm/pvtime.c                       |  11 +-
+ arch/x86/kvm/Kconfig                          |   1 +
+ arch/x86/kvm/mmu/mmu.c                        |  67 +++++-
+ arch/x86/kvm/mmu/mmu_internal.h               |   3 +-
+ include/linux/kvm_host.h                      |  41 +++-
+ include/uapi/linux/kvm.h                      |  13 ++
+ .../selftests/kvm/demand_paging_test.c        |  46 +++-
+ .../testing/selftests/kvm/include/kvm_util.h  |   7 -
+ virt/kvm/Kconfig                              |   4 +
+ virt/kvm/guest_memfd.c                        |  16 +-
+ virt/kvm/kvm_main.c                           | 213 +++++++++++++++++-
+ 16 files changed, 457 insertions(+), 44 deletions(-)
+
+
+base-commit: 02b0d3b9d4dd1ef76b3e8c63175f1ae9ff392313
+-- 
+2.45.2.993.g49e7a77208-goog
+
