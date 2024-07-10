@@ -1,196 +1,244 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B4F213D2A2;
-	Wed, 10 Jul 2024 22:05:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 608BA1487C5
+	for <kvmarm@lists.linux.dev>; Wed, 10 Jul 2024 23:11:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720649132; cv=none; b=iBsJF3xiKk2wcpdKjFO8/u3h8tDeK4q5PJQx5U4bHhgHHwd0453Wcbzf2w0BfrT1uQk180kyrQqGYPEh7YiUTSKckb1KOWEF9q4WdLwK2MXuohvorwTmZ5OyE7crZmaer0reY0jVBf6sz7rvTUWn84plF6rjXHWxS0EfsC7LIik=
+	t=1720653070; cv=none; b=dztrA/NHUlJg2MhMhJwCKu3Sa2uZS+nmnMhcpoxQXiUO5Ci0fSsQ9NvXZd7O32XdVqRfQsDjhA94r9vOLYdTWZu7Gfsta3YAUX9cVuFysiKvA7mhwL/zFFg59UY7AYklG3JNQJ8/3y3PeAdRIdpZO4IWY98BN3Ds21KNSNNnXss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720649132; c=relaxed/simple;
-	bh=Eu93rMUzk399cQ8hiVO2KE52oaiSsroTl8ghLIzLkfA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qDX1XLXLKIvthlc2OdDkw93yO9oRhjaSJSW1i7gcYkCzPQwT+x6baLem3xjmMf8QsNAapOiZuusWROPbHJFNBUCPngxCc0RFj6pp4E2tRbiHkcpo4O4fP5hAbun3T3+pdzbJZc+3FP01Sla4MI5TCTEVYYgyPOC7CWP++hA8UZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OkQtx0Ys; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1720653070; c=relaxed/simple;
+	bh=Pz0I0ZuPQJNsCVP+7BMKlxh3Arp7J6K1rlyeZNl314U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HlBmcPEzgEjFhCdoDa44TmM5P6nj3CmaOTyc7bx3NwtSic+tSycGAXkEewFRM10ayui/EEE/IVMni27KwC56HBo1FIegRgbFq//j7CQJmVFD/l3TBrv9XB4kY/QvIVQzl1OBB8sy7tCI/atQ4NmDY7T0Kgez1mnJ3g68JtDCkso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wocwT4dV; arc=none smtp.client-ip=209.85.160.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OkQtx0Ys"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46743C32781;
-	Wed, 10 Jul 2024 22:05:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720649131;
-	bh=Eu93rMUzk399cQ8hiVO2KE52oaiSsroTl8ghLIzLkfA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OkQtx0YsVpapXk8nKor0mFxxgG/Sel10dpQi8Mi+udNtmWFH8kMBqVYpOwh4Hd57o
-	 Fn1cjYbf21Au8EwCTMMoXlhwsSTLYn9lzqr1pgKMQ4gaNcRJRXZZQMHBu8LiVGWHGI
-	 8nKQyBhir7wgr8l2dDteEUogPPp+0XXyFf9mRBsSGqCQ6BPAyGy9zpjKLrN23CPLjz
-	 mrGlihLofkSTNkc0FSEniv9n+1JYFQuL2/0tzx7Hqx4md9CGzF26Kf5jWSEY7Ty7MQ
-	 ZvhnAixRihlPWHfw+rBcJOiDFE38cp3xk6DMExk6qWoBPLPQdf09GcyH4+EeLUbq2+
-	 2gzPUqbO088Tw==
-Date: Wed, 10 Jul 2024 23:05:28 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Florian Weimer <fweimer@redhat.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
-	Ross Burton <ross.burton@arm.com>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v9 13/39] KVM: arm64: Manage GCS registers for guests
-Message-ID: <Zo8FqFKQkuTv1r2M@finisterre.sirena.org.uk>
-References: <20240625-arm64-gcs-v9-0-0f634469b8f0@kernel.org>
- <20240625-arm64-gcs-v9-13-0f634469b8f0@kernel.org>
- <86v81d2s5t.wl-maz@kernel.org>
- <Zo7B_sRyUyxv7xmO@finisterre.sirena.org.uk>
- <86ttgx2jba.wl-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wocwT4dV"
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-44664ad946eso51721cf.1
+        for <kvmarm@lists.linux.dev>; Wed, 10 Jul 2024 16:11:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1720653067; x=1721257867; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MJTeSm6eMBTbHXnqICN2W1jCeLI7nzO2Ktbu8vr4Dfo=;
+        b=wocwT4dVZoBr3SxXKzZqs3qwPjfWELFYf4f/i1M4RweNxb2nYSTrH1u3XcK8kKiT6E
+         zkxfzrCf4EswCPPkW0ogciYwSdW50lMNZJq3dW7oUwLhKNQNZq9VracYLpnqxfUBHwWi
+         +i0Iwbrw2WuVjDhiYw2ZZDxA5WgkzexenZXYy90bJKZnqhAiBaktuuKfH3sQkjWpwnah
+         BBnnYazVqaQeoDzs4bpvBiOTn1gGUTu/eqt5XDSNPR4PfJ07uNlQkG2jpr4BI/y5pGRT
+         ILnUrgGPJxBSu6JxrZHt7AsCdfc+ol2StsZzRHM67pdBXoNuUUzJ3iSYbXx4NaoEO7+f
+         p0Dg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720653067; x=1721257867;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MJTeSm6eMBTbHXnqICN2W1jCeLI7nzO2Ktbu8vr4Dfo=;
+        b=Pa3nImZ2jBFrbF9SWywY7dbQ1TehhorE8f2gQlsmAIUW73rO5Gn9EKAZdTsJZCeOOD
+         yzVFAy6qQ68dnwYDD1vGbaDUzHKSAxMNUpMCB1iIvFCu2so1jNNseu7t3ux7+4fKlQCv
+         Cer0odyM5Qd9A/yOrF9IM91rhfzIxUI5Ub9JuO7r+5S3QUMQh+7ROQ5xC5bhqkJP4BTI
+         Tk5QbIam3+F3rF3UbRdm7NMuI5GKPyKOyNtS3Qtux8oErSHcU50JWlhJgqqKAurxZ6pK
+         FRcwlRZ4kjufMO7x8QQ4im6jlz0lwEQnFcv8eRdFZJGvYDp/V4HGnwXtl1uiS47yHQGT
+         Vhgw==
+X-Forwarded-Encrypted: i=1; AJvYcCUzJkSaETz9oIKVLTsmnGPcSVimz6i0u+oyaUewz++Gbqo+oKopEp/nRtf7KfzUfxD/okPZhl/c655iOQ5dQd4XP0r0vlUX
+X-Gm-Message-State: AOJu0YwTR/Pqco4HvktJIage/Y3xipN2McXJcnbTxsRNDL0bEvKDWIXy
+	B+GlxAcMApWl/YG7Jo4HGwQ3zTrBZ8NOMycdOJi3nOl15KH4BrpwrNh3OLhM8W4ive9P5zMwJ3g
+	uy5kt4ScZG2j2KQUA72Sbx4ea5uNPkGNqDfSI
+X-Google-Smtp-Source: AGHT+IGzszVF+IxKrY/ClY51Y2kjfgE37Xj8trnZtH5JYTor6nkkszob6If5ud2bc91ZsUHmQ4RjHdSOlc0bNNlnZxM=
+X-Received: by 2002:ac8:7cba:0:b0:447:f958:ab83 with SMTP id
+ d75a77b69052e-44d35b2b31emr557951cf.21.1720653067221; Wed, 10 Jul 2024
+ 16:11:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="O0du0pkUMxnEy6Qh"
-Content-Disposition: inline
-In-Reply-To: <86ttgx2jba.wl-maz@kernel.org>
-X-Cookie: Your love life will be... interesting.
+References: <CADrL8HU_FKHTz_6d=xhVLZFDQ_zQo-zdB2rqdpa2CKusa1uo+A@mail.gmail.com>
+ <ZmjtEBH42u7NUWRc@google.com> <CADrL8HUW2q79F0FsEjhGW0ujij6+FfCqas5UpQp27Epfjc94Nw@mail.gmail.com>
+ <ZmxsCwu4uP1lGsWz@google.com> <CADrL8HVDZ+m_-jUCaXf_DWJ92N30oqS=_9wNZwRvoSp5fo7asg@mail.gmail.com>
+ <ZmzPoW7K5GIitQ8B@google.com> <CADrL8HW3rZ5xgbyGa+FXk50QQzF4B1=sYL8zhBepj6tg0EiHYA@mail.gmail.com>
+ <ZnCCZ5gQnA3zMQtv@google.com> <CADrL8HW=kCLoWBwoiSOCd8WHFvBdWaguZ2ureo4eFy9D67+owg@mail.gmail.com>
+ <CADrL8HUv6T4baOi=VTFV6ZA=Oyn3dEc6Hp9rXXH0imeYkwUhew@mail.gmail.com> <Zo137P7BFSxAutL2@google.com>
+In-Reply-To: <Zo137P7BFSxAutL2@google.com>
+From: James Houghton <jthoughton@google.com>
+Date: Wed, 10 Jul 2024 16:10:29 -0700
+Message-ID: <CADrL8HW4PLTeC9Gq3Fd43-idjzOw8mXOzzG_RP1TYVoGp1_g+g@mail.gmail.com>
+Subject: Re: [PATCH v5 4/9] mm: Add test_clear_young_fast_only MMU notifier
+To: Sean Christopherson <seanjc@google.com>
+Cc: Yu Zhao <yuzhao@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Ankit Agrawal <ankita@nvidia.com>, 
+	Axel Rasmussen <axelrasmussen@google.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	David Matlack <dmatlack@google.com>, David Rientjes <rientjes@google.com>, 
+	James Morse <james.morse@arm.com>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Raghavendra Rao Ananta <rananta@google.com>, 
+	Ryan Roberts <ryan.roberts@arm.com>, Shaoqin Huang <shahuang@redhat.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Wei Xu <weixugc@google.com>, 
+	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Jul 9, 2024 at 10:49=E2=80=AFAM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> On Mon, Jul 08, 2024, James Houghton wrote:
+> > On Fri, Jun 28, 2024 at 7:38=E2=80=AFPM James Houghton <jthoughton@goog=
+le.com> wrote:
+> > >
+> > > On Mon, Jun 17, 2024 at 11:37=E2=80=AFAM Sean Christopherson <seanjc@=
+google.com> wrote:
+> > I still don't think we should get rid of the WAS_FAST stuff.
+>
+> I do :-)
+>
+> > The assumption that the L1 VM will almost never share pages between L2
+> > VMs is questionable. The real question becomes: do we care to have
+> > accurate age information for this case? I think so.
+>
+> I think you're conflating two different things.  WAS_FAST isn't about acc=
+uracy,
+> it's about supporting lookaround in conditionally fast secondary MMUs.
+>
+> Accuracy only comes into play when we're talking about the last-minute ch=
+eck,
+> which, IIUC, has nothing to do with WAS_FAST because any potential lookar=
+ound has
+> already been performed.
 
---O0du0pkUMxnEy6Qh
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Sorry, I thought you meant: have the MMU notifier only ever be
+lockless (when tdp_mmu_enabled), and just return a potentially wrong
+result in the unlikely case that L1 is sharing pages between L2s.
 
-On Wed, Jul 10, 2024 at 07:28:09PM +0100, Marc Zyngier wrote:
-> Mark Brown <broonie@kernel.org> wrote:
-> > On Wed, Jul 10, 2024 at 04:17:02PM +0100, Marc Zyngier wrote:
+I think it's totally fine to just drop WAS_FAST. So then we can either
+do look-around (1) always, or (2) only when there is a secondary MMU
+with has_fast_aging. (2) is pretty simple, I'll just do that.
 
-> > > > +	if (ctxt_has_gcs(ctxt)) {
+We can add some shadow MMU lockless support later to make the
+look-around not as useless for the nested TDP case.
 
-> > > Since this is conditioned on S1PIE, it should be only be evaluated
-> > > when PIE is enabled in the guest.
+> > It's not completely trivial to get the lockless walking of the shadow
+> > MMU rmaps correct either (please see the patch I attached here[1]).
+>
+> Heh, it's not correct.  Invoking synchronize_rcu() in kvm_mmu_commit_zap_=
+page()
+> is illegal, as mmu_lock (rwlock) is held and synchronize_rcu() might_slee=
+p().
+>
+> For kvm_test_age_rmap_fast(), KVM can blindly read READ_ONCE(*sptep).  KV=
+M might
+> read garbage, but that would be an _extremely_ rare scenario, and reporti=
+ng a
+> zapped page as being young is acceptable in that 1 in a billion situation=
+.
+>
+> For kvm_age_rmap_fast(), i.e. where KVM needs to write, I'm pretty sure K=
+VM can
+> handle that by rechecking the rmap and using CMPXCHG to write the SPTE.  =
+If the
+> rmap is unchanged, then the old SPTE value is guaranteed to be valid, in =
+the sense
+> that its value most definitely came from a KVM shadow page table.  Ah, dr=
+at, that
+> won't work, because very theoretically, the page table could be freed, re=
+allocated,
+> and rewritten with the exact same value by something other than KVM.  Hrm=
+.
+>
+> Looking more closely, I think we can go straight to supporting rmap walks=
+ outside
+> of mmu_lock.  There will still be a "lock", but it will be a *very* rudim=
+entary
+> lock, akin to the TDP MMU's REMOVED_SPTE approach.  Bit 0 of rmap_head->v=
+al is
+> used to indicate "many", while bits 63:3/31:2 on 64-bit/32-bit KVM hold t=
+he
+> pointer (to a SPTE or a list).  That means bit 1 is available for shenani=
+gans.
+>
+> If we use bit 1 to lock the rmap, then the fast mmu_notifier can safely w=
+alk the
+> entire rmap chain.  And with a reader/write scheme, the rmap walks that a=
+re
+> performed under mmu_lock don't need to lock the rmap, which means flows l=
+ike
+> kvm_mmu_zap_collapsible_spte() don't need to be modified to avoid recursi=
+ve
+> self-deadlock.  Lastly, the locking can be conditioned on the rmap being =
+valid,
+> i.e. having at least one SPTE.  That way the common case of a gfn not hav=
+ing any
+> rmaps is a glorified nop.
+>
+> Adding the locking isn't actually all that difficult, with the *huge* cav=
+eat that
+> the below patch is compile-tested only.  The vast majority of the churn i=
+s to make
+> it so existing code ignores the new KVM_RMAP_LOCKED bit.
 
-> > So make ctxt_has_gcs() embed a check of ctxt_has_s1pie()?
+This is very interesting, thanks for laying out how this could be
+done. I don't want to hold this series up on getting the details of
+the shadow MMU lockless walk exactly right. :)
 
-> No. I mean nest the whole thing *under* the check for S1PIE.
+> I don't know that we should pursue such an approach in this series unless=
+ we have
+> to.  E.g. if we can avoid WAS_FAST or don't have to carry too much interm=
+ediate
+> complexity, then it'd probably be better to land the TDP MMU support firs=
+t and
+> then add nested TDP support later.
 
-OK, increasing the level of nesting.  Got it.  Does that just apply for
-the EL1 registers given that there's no _user S1PIE registers so no
-existing check there?
+Agreed!
 
-Should we also be doing a similar thing for features that depend on TCR2
-- currently that's just PIE but it'll grow?  Probably only when we get
-more features rather than now since we don't currently check if the
-guest has TCR2, just the system.
+> At the very least, it does make me more confident that a fast walk of the=
+ rmaps
+> is very doable (at least for nested TDP), i.e. makes me even more steadfa=
+st
+> against adding WAS_FAST.
+>
+> > And the WAS_FAST functionality isn't even that complex to begin with.
+>
+> I agree the raw code isn't terribly complex, but it's not trivial either.=
+  And the
+> concept and *behavior* is complex, which is just as much of a maintenance=
+ burden
+> as the code itself.  E.g. it requires knowing that KVM has multiple MMUs =
+buried
+> behind a single mmu_notifier, and that a "hit" on the fast MMU will trigg=
+er
+> lookaround on the fast MMU, but not the slow MMU.  Understanding and desc=
+ribing
+> the implications of that behavior isn't easy.  E.g. if GFN=3DX is young i=
+n the TDP
+> MMU, but X+1..X+N are young only in the shadow MMU, is doing lookaround a=
+nd making
+> decisions based purely on the TDP MMU state the "right" behavior?
+>
+> I also really don't like bleeding KVM details into the mmu_nofitier APIs.=
+  The
+> need for WAS_FAST is 100% a KVM limitation.  AFAIK, no other secondary MM=
+U has
+> multiple MMU implementations active behind a single notifier, and other t=
+han lack
+> of support, nothing fundamentally prevents a fast query in the shadow MMU=
+.
 
-> > GCSCRE0_EL1 is for EL0 though, it ended up here mainly because it's an
-> > _EL1 register and we are already context switching PIRE0_EL1 in the EL1
-> > functions so it seemed consistent to follow the same approach for GCS.
-> > The _el1 and _user save/restore functions are called from the same place
-> > for both VHE and nVHE so the practical impact of the placement should be
-> > minimal AFAICT.  Unlike PIRE0_EL1 GCSCRE0_EL1 only has an impact for
-> > code runnning at EL0 so I can move it to the _user functions.
+Makes sense.
 
-> Exactly. That's where it belongs, because we never execute EL0 while a
-> vcpu is loaded. On the contrary, we can make use of a uaccess helper
-> while a vcpu is loaded, and that makes a hell of a difference.
+So in v6, I will make the following changes:
 
-OK, to be clear here "it" is GCSCRE0_EL1, not GCSPR_EL1 and GCSCR_EL1
-which are for EL1?
+1. Drop the WAS_FAST complexity.
+2. Add a function like mm_has_fast_aging_notifiers(), use that to
+determine if we should be doing look-around.
+3. Maybe change the notifier calls slightly[1], still need to check perform=
+ance.
 
-> And it makes a difference because it would allow the loading of
-> EL0-specific context differently. We had this at some point, and it
-> was a reasonable optimisation that we lost. I'm keen on bringing it
-> back.
+Does that sound good to you?
 
-Ah, that'd be good - not only for the optimistation but also since at
-the minute it's a bit unclear why there are separate EL0/1 functions.
+Thanks!
 
-> > > you want to make this register writable, here's the shopping list:
-
-> > > https://lore.kernel.org/all/87ikxsi0v9.wl-maz@kernel.org/
-
-> > In the linked mail you say you want to see all fields explicitly
-> > handled, could you be more direct about what such explicit handling
-
-> This emails enumerate, point after point, everything that needs to be
-> done. I really cannot be clearer or more direct. This email is the
-> clearer I can be, short of writing the code myself. And I have decided
-> not to do it for once, unless I really need to. And as it turns out, I
-> don't.
-
-See below, to be clear the only bit I was querying here was:
-
-| - you *must* handle *all* the fields described in that register. There
-|   are 15 valid fields there, and I want to see all 15 fields being
-|   explicitly dealt with.
-
-TBH it'd probably good to have that whole list in the kernel somewhere.
-
-> > would look like?  I see a number of examples in the existing code like:
-
-> > 	ID_WRITABLE(ID_AA64ZFR0_EL1, ~ID_AA64ZFR0_EL1_RES0),
-
-> This is clear: Everything is writable, and there are no bits here that
-> are otherwise conditional or unsupported.
-
-Ah, I think I see.  I would not have interpreted this as making
-everything explicit, to me this makes all the writeable fields writeable
-implicitly through them just not being mentioned.  For everything to be
-explicit I would expect to see a direct, visible reference in the code
-to every single field rather than something like we have here where some
-of the fields are not mentioned directly.  The end result is an explicit
-value but that's true for any use of ID_WRITABLE().
-
-If my understanding is correct then were I writing the bit I quoted
-above I'd probably just drop the "explicitly" from that bullet point due
-to the handling of simple writable fields with ID_WRITABLE(), the key
-point being that every field needs to be handled with the other points
-enumerating the specific options for how each field might be handled.
-Does my understanding sound correct?
-
-> > which look to my eye very similar to the above, they do not visibliy
-> > explictly enumerate every field in the registers and given that there's
-> > a single mask specified it's not clear how that would look.  If
-> > ID_WRITABLE() took separate read/write masks and combined them it'd be
-> > more obvious but it's just not written that way.
-
-> I don't really see what it would buy us, but never mind.
-
-That was me trying to reconcile my understanding of you asking to make
-everything explicit with the code as it is.  I suppose the advantage
-would be documentation.
-
---O0du0pkUMxnEy6Qh
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmaPBaQACgkQJNaLcl1U
-h9CfDgf9Hj4ORu0MQYC7C/o1bJG7/23dWcLbsWEReQjsF9FESFNxn/VmnbesRcD1
-BShn5gjVprcOQokU/+w2py8ce3cKIl9K/238nc9ny+GvVPxoL3/F8o9GyrDGyXso
-IeRw+jjwiYEIoc3ZF8b5foSxZkw+6043h5ELnTLLv78IlSM1E+E7lv8QysM8JjOX
-zJc/G4s7mHk4Ohf9gjL7E13ni2Gy5Fhs7/Afkrz4IReeDNYeEhP4iiI0Ljg2E9XF
-kr8rC5XenFN80dsZ5e5uhqg8SBzzHXk1kR69UpZnBM7jjhskJfy9xtzQbTkEjhL3
-gA4J5POSV8LP8kFeG1MQkVwNU+a1Vg==
-=mJl2
------END PGP SIGNATURE-----
-
---O0du0pkUMxnEy6Qh--
+[1]: https://lore.kernel.org/linux-mm/CAOUHufb2f_EwHY5LQ59k7Nh7aS1-ZbOKtkoy=
+sb8BtxRNRFMypQ@mail.gmail.com/
