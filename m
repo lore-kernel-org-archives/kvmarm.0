@@ -1,58 +1,51 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9071C128369;
-	Wed, 10 Jul 2024 12:36:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA2E61DDC5;
+	Wed, 10 Jul 2024 13:17:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720614988; cv=none; b=TabFeX7vFH8ZEN8niyy5oqqRcKMSrM6dJ+rwFL0F1p1pRw/YnkrZX4Igdi9TK0BT8O6Rv4XM1M2WRQ9sarfOYYKMeCwTddRJj7jwpiaYNmNhyyELI+XCvkex4kGvREg4e2tLfiN7CZz5/8EulL3X97slVwxyEHn4YVuX/7aqtTc=
+	t=1720617460; cv=none; b=iPu+uD7cZ+MTY7UIXJ+VRNNVLidu0fHKHA3VWfs9RXgZoeP0N9m24lXIoX6WQZjTziz8om4TAIkagU2bD71kPrEczqdAh++I5GQ0oiJianOgfdLRfbOwqWs6TLqn2qP2pg8Wxst7B69fmVRdNITexQPRSmZfYvN/ciOsm/6xmO4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720614988; c=relaxed/simple;
-	bh=Y4Al+y2W175lU4nuPuJc7qg78aq+qmDqDJ0XFPiR0qg=;
+	s=arc-20240116; t=1720617460; c=relaxed/simple;
+	bh=VmKKD27z2aOVSa1CLMwiPu6poVOxX6juNUr5X9b0taU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MLwJ5BE7Ijwr3s72HxcIbigUtTwj2MsHZA4595/57mX+If5qiqxi6fUq0shgAqRvxdBojcMCk0wlZBWDcW7tkWI3YbXnLvWVtHhztUukPHyu5Unv6mCw8Gf/k+hOC0HgwbgELegMw79K1ORptv7KoGL42Ei/jB89cWjIobe1VGc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PXFxNTcz; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=XToNS+q9bHy52JNzo71Bo5ZfixsO2FRxVnnwvfqLslMwqJchmnvSio95AAuzJuv9hBupIKyyGYggHWIoSsHK9qyDxf/btv5lNpFBR5ZZLGRDapHKDwlSDUAKGexaWqZKqosLULIK6xX5CaN523ZbUqKcxloz9C5jHRJoYwMTJJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HTTNBMZf; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PXFxNTcz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46AFEC32781;
-	Wed, 10 Jul 2024 12:36:24 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HTTNBMZf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BE85C32781;
+	Wed, 10 Jul 2024 13:17:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720614988;
-	bh=Y4Al+y2W175lU4nuPuJc7qg78aq+qmDqDJ0XFPiR0qg=;
+	s=k20201202; t=1720617459;
+	bh=VmKKD27z2aOVSa1CLMwiPu6poVOxX6juNUr5X9b0taU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PXFxNTczHjo8Pn6CMsxF5GxaFs9FIwMXtAf9rKkX5vEHvZMdgBDUy5SpN1ZW/kgil
-	 ZCZkCPmDFjBmxoJbx35WGsbyBW2zAFTy31a5aVBxKdA69vvx1FbDgTdgoapZXIgmS6
-	 bIDWvflWRo0Boa/8X/b/VqvEw7K0nnLCsjDe1EnMQ4JPF5GcdlhlKpscNgrwXsGxdn
-	 0fBI6Qe7mh++WOIB/T7uGFKiaS9/bNGcw9vnCTpaXQZIeQ2uGSOBFlH6/gI5CrMBN+
-	 uIeU5MV1K69500Mia8cyCigJNxEKOZFc6tpprU4tz45iFABhgEv0jU6/xxlIQVnYGO
-	 VS3IdlNlBb8mQ==
-Date: Wed, 10 Jul 2024 13:36:20 +0100
+	b=HTTNBMZfK6jQPbUQiR+ZQNJTyFKIzXUwDwG3CxLvDtdvvXlvNs0XOATi7iVLKYn9e
+	 m8JNnSn7CylHOU7YGDW76bP/SAGy2NPMth/avv3ywV2QgxDJ3HYi0/ZA8Nebs6IWI1
+	 8QETJa+mDNGc9DYlKRosmz0ZtQeqClTY4YmXtwmSxa2fmRewamQ2bks755KtcJLf+k
+	 wX2zku7GU1H0KfM6grraBzhxffOcWHGPpTxG8UXhFQ4y2ywXNzBDcKGd4s7yGON3Ia
+	 dHePDZM2Oskj6DKewi5UXiyHXthxYRPUUpDccMQ9/TP1nB4g4Kx9YUrc2YexMe741q
+	 zacACTAkKZAiQ==
+Date: Wed, 10 Jul 2024 14:17:33 +0100
 From: Will Deacon <will@kernel.org>
-To: Russell King <linux@armlinux.org.uk>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Marc Zyngier <maz@kernel.org>,
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	James Clark <james.clark@arm.com>,
-	"Rob Herring (Arm)" <robh@kernel.org>
-Cc: kernel-team@android.com, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 00/12] arm64: Add support for Armv9.4 PMU fixed
- instruction counter
-Message-ID: <20240710123620.GA14423@willie-the-truck>
-References: <20240626-arm-pmu-3-9-icntr-v2-0-c9784b4f4065@kernel.org>
- <172001203729.3396033.17013529444643308853.b4-ty@kernel.org>
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: Re: [PATCH v4 12/15] irqchip/gic-v3-its: Share ITS tables with a
+ non-trusted hypervisor
+Message-ID: <20240710131732.GA14582@willie-the-truck>
+References: <20240701095505.165383-1-steven.price@arm.com>
+ <20240701095505.165383-13-steven.price@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -61,40 +54,45 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <172001203729.3396033.17013529444643308853.b4-ty@kernel.org>
+In-Reply-To: <20240701095505.165383-13-steven.price@arm.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Wed, Jul 03, 2024 at 03:38:44PM +0100, Will Deacon wrote:
-> On Wed, 26 Jun 2024 16:32:24 -0600, Rob Herring (Arm) wrote:
-> > This series adds support for the optional fixed instruction counter
-> > added in Armv9.4 PMU. Most of the series is a refactoring to remove the
-> > index to counter number conversion which dates back to the Armv7 PMU
-> > driver. Removing it is necessary in order to support more than 32
-> > counters without a bunch of conditional code further complicating the
-> > conversion.
-> > 
-> > [...]
+On Mon, Jul 01, 2024 at 10:55:02AM +0100, Steven Price wrote:
+> Within a realm guest the ITS is emulated by the host. This means the
+> allocations must have been made available to the host by a call to
+> set_memory_decrypted(). Introduce an allocation function which performs
+> this extra call.
 > 
-> Applied to will (for-next/perf), thanks!
+> For the ITT use a custom genpool-based allocator that calls
+> set_memory_decrypted() for each page allocated, but then suballocates
+> the size needed for each ITT. Note that there is no mechanism
+> implemented to return pages from the genpool, but it is unlikely the
+> peak number of devices will so much larger than the normal level - so
+> this isn't expected to be an issue.
 > 
-> [01/12] perf: arm_pmuv3: Avoid assigning fixed cycle counter with threshold
->         https://git.kernel.org/will/c/81e15ca3e523
-> [02/12] perf: arm_pmuv3: Drop unnecessary IS_ENABLED(CONFIG_ARM64) check
->         https://git.kernel.org/will/c/598c1a2d9f4b
-> [03/12] perf/arm: Move 32-bit PMU drivers to drivers/perf/
->         https://git.kernel.org/will/c/8d75537bebfa
-> [04/12] perf: arm_v6/7_pmu: Drop non-DT probe support
->         https://git.kernel.org/will/c/12f051c987dc
-> [05/12] perf: arm_pmuv3: Include asm/arm_pmuv3.h from linux/perf/arm_pmuv3.h
->         https://git.kernel.org/will/c/d688ffa26942
+> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+> Changes since v3:
+>  * Use BIT() macro.
+>  * Use a genpool based allocator in its_create_device() to avoid
+>    allocating a full page.
+>  * Fix subject to drop "realm" and use gic-v3-its.
+>  * Add error handling to ITS alloc/free.
+> Changes since v2:
+>  * Drop 'shared' from the new its_xxx function names as they are used
+>    for non-realm guests too.
+>  * Don't handle the NUMA_NO_NODE case specially - alloc_pages_node()
+>    should do the right thing.
+>  * Drop a pointless (void *) cast.
+> ---
+>  drivers/irqchip/irq-gic-v3-its.c | 139 ++++++++++++++++++++++++++-----
+>  1 file changed, 116 insertions(+), 23 deletions(-)
 
-I've had an off-list report that this series causes a kernel crash under
-KVM unit tests (panic in write_pmevtypern()).
+I gave this (and the following patch) a spin in a protected guest under
+pKVM and was able to use MSIs for my virtio devices, so:
 
-Given that I don't have enough information to repro/debug and Catalin is
-tagging the arm64 branch for 6.11 today, I've dropped patches 6-12 for
-now. Please can you send a fixed version after the merge window?
-
-Cheers,
+Tested-by: Will Deacon <will@kernel.org>
 
 Will
