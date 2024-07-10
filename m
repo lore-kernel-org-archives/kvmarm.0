@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0826813AD07;
-	Wed, 10 Jul 2024 15:34:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72CA6194A5E;
+	Wed, 10 Jul 2024 15:34:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720625657; cv=none; b=couKRjDhNK7f1i9mUdNjZ7XcQjbSqI3x8lBADa785hNTTPfcdISNAubreAerQ2yiePOUvedUhvVTyyxY1UwcTvZMKGAxjPKe9hD7o/RmH/NBFHfc+9oDo34Uf3FGUqq4qh27KQCqh/DB9oxSHE0i0dn90C0DF8hWYCKluQIg3lU=
+	t=1720625663; cv=none; b=Hq+QXh5Qz+j2xXPbykz8gZ4884AD8fbxxso/eZupmBtZW+P9uAcKuu5mDsVOwGquMCtoxwZ8hupeWe0fRSQ1B03AlikNFMvXyPXeeNWzfMoa/Q/L59ZQhsKmPot0oqH2Tc7qZP8HlUQ7zXyPT4zpdTsUu5AWPhOvZgPje3gNJNU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720625657; c=relaxed/simple;
-	bh=GVLn699zjrPxFqNk3Km0TnxRhpbFIGD+c620ROQtoF8=;
+	s=arc-20240116; t=1720625663; c=relaxed/simple;
+	bh=/QJtzxMrG869X7Mr3TxWX75XthbFhEwegQXEjkb58Oc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nnvZvXJ1ySuxkLxcZ58aaUpgmg4I85HtFx6JBZVI+rNzLAhwvaL+cAFWesYe/YE6vPkV87cz/FCpbaYOy/4IRAn7tprnfFje0Xwf1otDpcffIgu0WY6OrkHg+tBUDu+AIPIbxHDMM5dakd0hwqtkDvFZu7R49VzzijY0aKzrpo0=
+	 In-Reply-To:Content-Type; b=YqmpV3s6W9zcjvdYC/aVXwa8B7Jg/loqMNm6a6dYdnIpmz3jLq81Xza92HKqt6UH25gvj8qB24kD5ny+O5S3L6I3cwKpkKGYfLnNutkwnu5L91o6oatjEjn9KxEYP60CBINzxRpdB/SsOC7OiejvuyNaim49Nf6FmO1EBeTwg6E=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 33A21106F;
-	Wed, 10 Jul 2024 08:34:40 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0510B113E;
+	Wed, 10 Jul 2024 08:34:46 -0700 (PDT)
 Received: from [10.57.8.115] (unknown [10.57.8.115])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6A60F3F766;
-	Wed, 10 Jul 2024 08:34:11 -0700 (PDT)
-Message-ID: <3b2ddd79-c7f0-4d41-8795-13d1305e3d08@arm.com>
-Date: Wed, 10 Jul 2024 16:34:09 +0100
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8CC303F766;
+	Wed, 10 Jul 2024 08:34:15 -0700 (PDT)
+Message-ID: <e28ea56b-112d-4b15-bac1-71536113bbc6@arm.com>
+Date: Wed, 10 Jul 2024 16:34:12 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,96 +27,120 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 01/15] arm64: rsi: Add RSI definitions
-To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
+Subject: Re: [PATCH v4 02/15] firmware/psci: Add psci_early_test_conduit()
+To: Will Deacon <will@kernel.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Jean-Philippe Brucker <jean-philippe@linaro.org>,
  Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
  Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
 References: <20240701095505.165383-1-steven.price@arm.com>
- <20240701095505.165383-2-steven.price@arm.com>
- <3b1c8387-f40f-4841-b2b3-9e4dc1e35efc@redhat.com>
+ <20240701095505.165383-3-steven.price@arm.com>
+ <20240709104851.GE12978@willie-the-truck>
 From: Steven Price <steven.price@arm.com>
 Content-Language: en-GB
-In-Reply-To: <3b1c8387-f40f-4841-b2b3-9e4dc1e35efc@redhat.com>
+In-Reply-To: <20240709104851.GE12978@willie-the-truck>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 09/07/2024 06:19, Gavin Shan wrote:
-> On 7/1/24 7:54 PM, Steven Price wrote:
->> From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Hi Will!
+
+On 09/07/2024 11:48, Will Deacon wrote:
+> On Mon, Jul 01, 2024 at 10:54:52AM +0100, Steven Price wrote:
+>> From: Jean-Philippe Brucker <jean-philippe@linaro.org>
 >>
->> The RMM (Realm Management Monitor) provides functionality that can be
->> accessed by a realm guest through SMC (Realm Services Interface) calls.
+>> Add a function to test early if PSCI is present and what conduit it
+>> uses. Because the PSCI conduit corresponds to the SMCCC one, this will
+>> let the kernel know whether it can use SMC instructions to discuss with
+>> the Realm Management Monitor (RMM), early enough to enable RAM and
+>> serial access when running in a Realm.
 >>
->> The SMC definitions are based on DEN0137[1] version A-eac5.
->>
->> [1] https://developer.arm.com/documentation/den0137/latest
->>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
 >> Signed-off-by: Steven Price <steven.price@arm.com>
 >> ---
->> Changes since v3:
->>   * Drop invoke_rsi_fn_smc_with_res() function and call arm_smccc_smc()
->>     directly instead.
->>   * Rename header guard in rsi_smc.h to be consistent.
->> Changes since v2:
->>   * Rename rsi_get_version() to rsi_request_version()
->>   * Fix size/alignment of struct realm_config
+>> v4: New patch
 >> ---
->>   arch/arm64/include/asm/rsi_cmds.h |  38 ++++++++
->>   arch/arm64/include/asm/rsi_smc.h  | 142 ++++++++++++++++++++++++++++++
->>   2 files changed, 180 insertions(+)
->>   create mode 100644 arch/arm64/include/asm/rsi_cmds.h
->>   create mode 100644 arch/arm64/include/asm/rsi_smc.h
+>>  drivers/firmware/psci/psci.c | 25 +++++++++++++++++++++++++
+>>  include/linux/psci.h         |  5 +++++
+>>  2 files changed, 30 insertions(+)
 >>
-> 
-> [...]
-> 
->> --- /dev/null
->> +++ b/arch/arm64/include/asm/rsi_smc.h
->> @@ -0,0 +1,142 @@
->> +/* SPDX-License-Identifier: GPL-2.0-only */
+>> diff --git a/drivers/firmware/psci/psci.c b/drivers/firmware/psci/psci.c
+>> index d9629ff87861..a40dcaf17822 100644
+>> --- a/drivers/firmware/psci/psci.c
+>> +++ b/drivers/firmware/psci/psci.c
+>> @@ -13,6 +13,7 @@
+>>  #include <linux/errno.h>
+>>  #include <linux/linkage.h>
+>>  #include <linux/of.h>
+>> +#include <linux/of_fdt.h>
+>>  #include <linux/pm.h>
+>>  #include <linux/printk.h>
+>>  #include <linux/psci.h>
+>> @@ -767,6 +768,30 @@ int __init psci_dt_init(void)
+>>  	return ret;
+>>  }
+>>  
 >> +/*
->> + * Copyright (C) 2023 ARM Ltd.
+>> + * Test early if PSCI is supported, and if its conduit matches @conduit
 >> + */
+>> +bool __init psci_early_test_conduit(enum arm_smccc_conduit conduit)
+>> +{
+>> +	int len;
+>> +	int psci_node;
+>> +	const char *method;
+>> +	unsigned long dt_root;
 >> +
->> +#ifndef __ASM_RSI_SMC_H_
->> +#define __ASM_RSI_SMC_H_
+>> +	/* DT hasn't been unflattened yet, we have to work with the flat blob */
+>> +	dt_root = of_get_flat_dt_root();
+>> +	psci_node = of_get_flat_dt_subnode_by_name(dt_root, "psci");
+>> +	if (psci_node <= 0)
+>> +		return false;
 >> +
->> +/*
->> + * This file describes the Realm Services Interface (RSI) Application
->> Binary
->> + * Interface (ABI) for SMC calls made from within the Realm to the
->> RMM and
->> + * serviced by the RMM.
->> + */
+>> +	method = of_get_flat_dt_prop(psci_node, "method", &len);
+>> +	if (!method)
+>> +		return false;
 >> +
->> +#define SMC_RSI_CALL_BASE        0xC4000000
->> +
+>> +	return  (conduit == SMCCC_CONDUIT_SMC && strncmp(method, "smc", len) == 0) ||
+>> +		(conduit == SMCCC_CONDUIT_HVC && strncmp(method, "hvc", len) == 0);
+>> +}
 > 
-> These fields have been defined in include/linux/arm-smccc.h. Those definitions
-> can be reused. Otherwise, it's not obvious to reader what does 0xC4000000 represent.
+> Hmm, I don't think this is sufficient to check for SMCCC reliably.
+> Instead, I think you need to do something more involved:
 > 
-> #define SMC_RSI_CALL_BASE    ((ARM_SMCCC_FAST_CALL << ARM_SMCCC_TYPE_SHIFT)   | \
->                                  (ARM_SMCCC_SMC_64 << ARM_SMCCC_CALL_CONV_SHIFT) | \
->                                  (ARM_SMCCC_OWNER_STANDARD << ARM_SMCCC_OWNER_SHIFT))
+> 1. Check for PSCI in the DT
+> 2. Check that the PSCI major version is >= 1
+> 3. Use PSCI_FEATURES to check that you have SMCCC
+> 4. Use SMCCC_VERSION to find out which version of SMCCC you have
 > 
-> or
-> 
-> #define SMC_RSI_CALL_BASE       ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,            \
->                                                    ARM_SMCCC_SMC_64,               \
->                                                    ARM_SMCCC_OWNER_STANDARD,       \
->                                                    0)
+> That's roughly what the PSCI driver does, so we should avoid duplicating
+> that logic.
 
-Good point, even better is actually to just drop SMC_RSI_CALL_BASE and
-just redefine SMC_RSI_FID() in terms of ARM_SMCCC_CALL_VAL().
+Hmm, you have a point. This was an improvement over the previous (assume
+that making an SMC call is going to work well enough to return at error
+for non-realms), but I guess it's technically possible for a system to
+have PSCI but not implement enough of SMCCC to reliably get an error
+code back.
 
-Thanks,
+Do you have any pointers on how pKVM detects it is a guest? Currently we
+have a couple of things we have to do very early as a realm guest:
+
+ * Mark memory as RIPAS_RAM. My preference would be to punt this problem
+to the VMM (or UEFI) and make it a boot requirement. But it gets in the
+way for attestation purposes as you can't have the same attestation
+report for VMs which differ only by available RAM in that case.
+
+ * earlycon - we need to know if the serial device is in unprotected
+MMIO as that needs mapping with the top IPA bit set.
+
+(I think that's all that's really early - everything else I can think of
+should be after the usual PSCI probe should have happened)
+
+Thanks for taking a look!
+
 Steve
-
