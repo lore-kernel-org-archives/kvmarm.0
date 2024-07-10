@@ -1,110 +1,172 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 792CE1946AD;
-	Wed, 10 Jul 2024 16:04:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AE4034545;
+	Wed, 10 Jul 2024 17:16:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720627496; cv=none; b=Wiv8XFhZUuh9yxARPK4hCGcdrMBXzxTYjAElatL5eO4HyV5vfynKcKuwVVLdWBqxmlvtxn8e6XuPGfCvCKEaEhEVW1zN6a9bNh9dT169RKPse1+jKEOycXSW5CISL4B4HgXOCYFRifLG2ZSG19nygicI0Y0gDZnXn1y9yIh+Z0Q=
+	t=1720631810; cv=none; b=VuVwc6igdi9i+bvt3kv1ciM0o0aAZQ/OZ16V7u8PUfYyNGFKqxpFhvZHKsorQsbQZ3YnqDziJuFugDiydgk1cqZP+2L1wI0K5fFfR8T9YmSuaM3bJHjU9QDOS6uk3BH4BT8dpIqiynzzXGG64QqlACvgvH8L+I7sNGa3IIi/J9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720627496; c=relaxed/simple;
-	bh=ZT+vmHSzj0V3TRaEXdahnczrOE+RLfpcX61gANIuHEQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IxcNcdAnSCtceHY2gAYfnagUoA590x5O05KBCS+7RhD3CoSeSQBIeKJTvkyqJR6UQ6+7gS6MGm+flLFXXQ/f7Mxq/J3n2mlOUY65odc2BSf1qhCHgGa65uMYFDfpXX5r2y3PVOHFTzidHg6KaWqPgQvcnBp/h88y8I6E4aiSG8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1C43A367;
-	Wed, 10 Jul 2024 09:05:19 -0700 (PDT)
-Received: from [10.57.8.115] (unknown [10.57.8.115])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 548B43F762;
-	Wed, 10 Jul 2024 09:04:50 -0700 (PDT)
-Message-ID: <862c600c-6803-4c25-8234-c8d056e94f23@arm.com>
-Date: Wed, 10 Jul 2024 17:04:48 +0100
+	s=arc-20240116; t=1720631810; c=relaxed/simple;
+	bh=gbQbaUuiVBZ3rY0fazMfEsDsmp1EJvBByE9rwhcqv1M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=g3ylZxPg4GPLoSzOw7X9M18OOsyb6YINupmHzIyb2sE0rspVZfMKhrMRgQUSnjkh1+48pobcTUiQ6yFsPWAp/Aq/9YXCsfR8dfLeVzNRRaej9ZBgVed2ruPPztG7O4RASCCeyfDOtSJAeLJXCYYBFOUteWlwpW7e4j7CmkiS6g4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gj3wTGeG; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gj3wTGeG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67AEFC32781;
+	Wed, 10 Jul 2024 17:16:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720631810;
+	bh=gbQbaUuiVBZ3rY0fazMfEsDsmp1EJvBByE9rwhcqv1M=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gj3wTGeGvkQA66hJtscYz2CdurW/XaWmXT1LUad7xHcQlV6bJlMPYB6BYkarkGJzM
+	 qb1fJH/GWYe++EsAN1YPqxKxmTx70mi2pArTryxpc+tBbCuVT8RugoF5J51N45APGN
+	 x+ezB+0+cMxlPHdLjUWzayfTJu8mxxY70OY7vRayQ0pqy+eEScxUw5lPNBlw9PM4pl
+	 gHRJ2FF3NJhmef1/MM9944Z03bUSEMfjwNa8lSQVOBXi6SLTpzX79Nj4r2tZ5j+E5e
+	 PNrecmTOcerZ2rr+jDaPAfXGPZUcWnJiE7MQ+AaJcdd8y8iMm1ukZWkjVH5FmwuAtd
+	 4eGDODAKNmXiA==
+Date: Wed, 10 Jul 2024 18:16:46 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Florian Weimer <fweimer@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
+	Ross Burton <ross.burton@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v9 13/39] KVM: arm64: Manage GCS registers for guests
+Message-ID: <Zo7B_sRyUyxv7xmO@finisterre.sirena.org.uk>
+References: <20240625-arm64-gcs-v9-0-0f634469b8f0@kernel.org>
+ <20240625-arm64-gcs-v9-13-0f634469b8f0@kernel.org>
+ <86v81d2s5t.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 08/15] arm64: mm: Avoid TLBI when marking pages as
- valid
-To: Will Deacon <will@kernel.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-References: <20240701095505.165383-1-steven.price@arm.com>
- <20240701095505.165383-9-steven.price@arm.com>
- <20240709115754.GD13242@willie-the-truck>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <20240709115754.GD13242@willie-the-truck>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="tsBiN+tG2JsDrdFj"
+Content-Disposition: inline
+In-Reply-To: <86v81d2s5t.wl-maz@kernel.org>
+X-Cookie: Your love life will be... interesting.
 
-On 09/07/2024 12:57, Will Deacon wrote:
-> On Mon, Jul 01, 2024 at 10:54:58AM +0100, Steven Price wrote:
->> When __change_memory_common() is purely setting the valid bit on a PTE
->> (e.g. via the set_memory_valid() call) there is no need for a TLBI as
->> either the entry isn't changing (the valid bit was already set) or the
->> entry was invalid and so should not have been cached in the TLB.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->> v4: New patch
->> ---
->>  arch/arm64/mm/pageattr.c | 8 +++++++-
->>  1 file changed, 7 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/arm64/mm/pageattr.c b/arch/arm64/mm/pageattr.c
->> index 0e270a1c51e6..547a9e0b46c2 100644
->> --- a/arch/arm64/mm/pageattr.c
->> +++ b/arch/arm64/mm/pageattr.c
->> @@ -60,7 +60,13 @@ static int __change_memory_common(unsigned long start, unsigned long size,
->>  	ret = apply_to_page_range(&init_mm, start, size, change_page_range,
->>  					&data);
->>  
->> -	flush_tlb_kernel_range(start, start + size);
->> +	/*
->> +	 * If the memory is being made valid without changing any other bits
->> +	 * then a TLBI isn't required as a non-valid entry cannot be cached in
->> +	 * the TLB.
->> +	 */
->> +	if (pgprot_val(set_mask) != PTE_VALID || pgprot_val(clear_mask))
->> +		flush_tlb_kernel_range(start, start + size);
->>  	return ret;
-> 
-> Can you elaborate on when this actually happens, please? It feels like a
-> case of "Doctor, it hurts when I do this" rather than something we should
-> be trying to short-circuit in the low-level code.
 
-This is for the benefit of the following patch. When transitioning a
-page between shared and private we need to change the IPA (to set/clear
-the top bit). This requires a break-before-make - see
-__set_memory_enc_dec() in the following patch.
+--tsBiN+tG2JsDrdFj
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-The easiest way of implementing the code was to just call
-__change_memory_common() twice - once to make the entry invalid and then
-again to make it valid with the new IPA. But that led to a double TLBI
-which Catalin didn't like[1].
+On Wed, Jul 10, 2024 at 04:17:02PM +0100, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
 
-So this patch removes the unnecessary second TLBI by detecting that
-we're just making the entry valid. Or at least it would if I hadn't
-screwed up...
+> > +	if (ctxt_has_gcs(ctxt)) {
 
-I should have changed the following patch to ensure that the second call
-to __change_memory_common was only setting the PTE_VALID bit and not
-changing anything else (so that the TLBI could be skipped) and forgot to
-do that. So thanks for making me take a look at this again!
+> Since this is conditioned on S1PIE, it should be only be evaluated
+> when PIE is enabled in the guest.
 
-Thanks,
-Steve
+So make ctxt_has_gcs() embed a check of ctxt_has_s1pie()?
 
-[1] https://lore.kernel.org/lkml/Zmc3euO2YGh-g9Th@arm.com/
+> > +		ctxt_sys_reg(ctxt, GCSPR_EL1)	= read_sysreg_el1(SYS_GCSPR);
+> > +		ctxt_sys_reg(ctxt, GCSCR_EL1)	= read_sysreg_el1(SYS_GCSCR);
+> > +		ctxt_sys_reg(ctxt, GCSCRE0_EL1)	= read_sysreg_s(SYS_GCSCRE0_EL1);
+
+> Why is this part of the EL1 context? It clearly only matters to EL0
+> execution, so it could be switched in load/put on nVHE as well. And
+> actually, given that the whole thing is strictly for userspace, why do
+> we switch *anything* eagerly at all?
+
+GCS can also be used independently at EL1 (and EL2 for that matter),
+it's not purely for userspace even though this series only implements
+use in userspace.  GCSPR_EL1 and GCSCR_EL1 control the use of GCS at
+EL1, not EL0, and the guest might be using GCS at EL1 even if the host
+doesn't.
+
+GCSCRE0_EL1 is for EL0 though, it ended up here mainly because it's an
+_EL1 register and we are already context switching PIRE0_EL1 in the EL1
+functions so it seemed consistent to follow the same approach for GCS.
+The _el1 and _user save/restore functions are called from the same place
+for both VHE and nVHE so the practical impact of the placement should be
+minimal AFAICT.  Unlike PIRE0_EL1 GCSCRE0_EL1 only has an impact for
+code runnning at EL0 so I can move it to the _user functions.
+
+TBH I'm not following your comments about switching eagerly too here at
+all, where would you expect to see the switching done?  You've said
+something along these lines before which prompted me to send a patch to
+only save the S1PIE registers if they'd been written to which you were
+quite reasonably not happy with given the extra traps it would cause:
+
+   https://lore.kernel.org/r/20240301-kvm-arm64-defer-regs-v1-1-401e3de92e97@kernel.org
+
+but I'm at a loss as to how to make things less eager otherwise.
+
+> > @@ -2306,7 +2323,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+> >  		   ID_AA64PFR0_EL1_GIC |
+> >  		   ID_AA64PFR0_EL1_AdvSIMD |
+> >  		   ID_AA64PFR0_EL1_FP), },
+> > -	ID_SANITISED(ID_AA64PFR1_EL1),
+> > +	ID_WRITABLE(ID_AA64PFR1_EL1, ~(ID_AA64PFR1_EL1_RES0 |
+> > +				       ID_AA64PFR1_EL1_BT)),
+
+> I don't know what you're trying to do here, but that's not right. If
+> you want to make this register writable, here's the shopping list:
+
+> https://lore.kernel.org/all/87ikxsi0v9.wl-maz@kernel.org/
+
+Yes, trying to make things writable.  I do see we need to exclude more
+bits there and I'm not clear why I excluded BTI, looks like I forgot to
+add a TODO comment at some point and finish that off.  Sorry about that.
+
+In the linked mail you say you want to see all fields explicitly
+handled, could you be more direct about what such explicit handling
+would look like?  I see a number of examples in the existing code like:
+
+	ID_WRITABLE(ID_AA64ZFR0_EL1, ~ID_AA64ZFR0_EL1_RES0),
+
+	ID_WRITABLE(ID_AA64ISAR0_EL1, ~ID_AA64ISAR0_EL1_RES0),
+	ID_WRITABLE(ID_AA64ISAR1_EL1, ~(ID_AA64ISAR1_EL1_GPI |
+					ID_AA64ISAR1_EL1_GPA |
+					ID_AA64ISAR1_EL1_API |
+					ID_AA64ISAR1_EL1_APA)),
+
+which look to my eye very similar to the above, they do not visibliy
+explictly enumerate every field in the registers and given that there's
+a single mask specified it's not clear how that would look.  If
+ID_WRITABLE() took separate read/write masks and combined them it'd be
+more obvious but it's just not written that way.
+
+--tsBiN+tG2JsDrdFj
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmaOwf0ACgkQJNaLcl1U
+h9BiTwgAhG9qd8c+aLOWRDYY+jgC3wxTF25VtO52AztM2Y4fyGfPMHg+GgALH/zW
+kZPNqJcbu5fDOfkUg3obwE/dUqdlZDlbmmJBnaP1E9p3sXWuQ9sedlO17lyf3w8h
+mzzFxLDCS0j01M5YNj4ql9LmC4sTOWyuzvzKDzDnLfM93Jdj6nhT4S0si+iQdBB8
+PFhjdtH6qVUmQNG3ik40q/IPe+nA4u0mgs7XpKj8PuPtVDxe4SNhB8cZ8R+pEJBZ
+f3EHvbndiotEBkFARu84AC/F3XfNhGNYlaZg/fwr2yfpfpFV/1Cz0LABhH9WojA0
+z7VzLkWe/+pqYeMUNAJY6H+YDudaLA==
+=InCr
+-----END PGP SIGNATURE-----
+
+--tsBiN+tG2JsDrdFj--
