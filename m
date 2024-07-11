@@ -1,198 +1,182 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7231014B095;
-	Thu, 11 Jul 2024 08:05:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 175E114C583
+	for <kvmarm@lists.linux.dev>; Thu, 11 Jul 2024 09:50:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720685113; cv=none; b=JhUOrVDBZ7SZRBdDiA25JwsY0o9VUMdpghHKEpPduJ7aGFx//Wkld5aiNcH71hSXkCox8IvId/zuffZDAnRS3jmu3ZAHjv6P5JElNLfHP1SPqpGyQF1UDiMvVllQsEiMlizJBXRQLqBopqHsqP7ST4GAleoB22DAu6F6jhX9750=
+	t=1720691411; cv=none; b=eIiaUfH8SAR8KMDrxgC4Nz1cjucX7MSnnP8V9Iqti0aimcm+dhCC9FMKBIX7V0/oMqVy6L9+iQ/Ed9J3xg+upJj9H4Ec2n+/XlKZSDrIzKZhWOoq69FujXzjgaM/iM6md9W+ple/8LIot1snJ88OcXZf6CY5Oj5O4VMeKsd5sCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720685113; c=relaxed/simple;
-	bh=sbqi0Hg1n6WstEJ+OFGkFj8Pi72kzoWmZTENgIKOA5g=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QMBA0sQkeupT5Xtg9FG7nxGhhuKZWySaWEoMX8vr5rBzlrMeCJ4moNH93a93wO2hjytqja87iETrQn0cM4jnbWjZp6NYCyw7kKbCrv9R4StKDlDihGWanJl/hyhILqHDb2eMJED65v6zEjhLepJHxrT/9XDBgSsuQ7bWi3UKuPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ldUams3T; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ldUams3T"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0A8DC116B1;
-	Thu, 11 Jul 2024 08:05:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720685112;
-	bh=sbqi0Hg1n6WstEJ+OFGkFj8Pi72kzoWmZTENgIKOA5g=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ldUams3TQMAlTgIHz9toaJcGVejfS3b4qtDHZMCrKqcFiZMhI0lltswmtauLH+bcs
-	 hGNRZWHrmtoUI7rK4s5UdSkK2onkKiUQ13Z1UhvopI+lZhVbGRxZ/BNvmJTh0Fc1JL
-	 yYqNHvscssQkge6EJzMGdLDADsauou9BYfxZ8DNoCBIf6F2YfZZ+XudT5uh8ecWu+d
-	 YkJtR72akE9KVS7E/JOmE+t89FAFqKRKRNK/nG/cojaBbvbW8b83sgoEr9IZwzQfAD
-	 TE/M2g+K6QSlz8l/1LtUR4eO/fnUo4+WxR6SANZkgbc9Ff+VuSvFz+6GsMZLGHS26U
-	 5G+T6wCEO4ttw==
-Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sRone-00BSER-8W;
-	Thu, 11 Jul 2024 09:05:10 +0100
-Date: Thu, 11 Jul 2024 09:05:02 +0100
-Message-ID: <875xtcpd5d.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Joey Gouly <joey.gouly@arm.com>
-Subject: Re: [PATCH 10/12] KVM: arm64: nv: Add SW walker for AT S1 emulation
-In-Reply-To: <Zo6k9WkuXFGLAQFv@arm.com>
-References: <20240625133508.259829-1-maz@kernel.org>
-	<20240708165800.1220065-1-maz@kernel.org>
-	<Zo6k9WkuXFGLAQFv@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1720691411; c=relaxed/simple;
+	bh=r1qpYydr0BGPkQefncp3es6El+dIrgCQVX+Px2Hl380=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=c6Gp/a0cEB26hzXW1MTEt8cpdmDfkmZCbe712RGywE9qgvm5pQaMQehS180x13pugjrmivEsGXNJwIqXqeiYkFsTQIDm3ljimtpxdiPne6EB9nSgMDn0iOKqOqLP9x/XPQrCRsUdETZRPojaPiSltjsW+i8Z2zAMWl+gt5qVlS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4621C1007;
+	Thu, 11 Jul 2024 02:50:33 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1B87B3F766;
+	Thu, 11 Jul 2024 02:50:05 -0700 (PDT)
+Date: Thu, 11 Jul 2024 10:50:00 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Szabolcs Nagy <szabolcs.nagy@arm.com>,
+	Florian Weimer <fweimer@redhat.com>, dave.hansen@linux.intel.com,
+	linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
+	aneesh.kumar@kernel.org, aneesh.kumar@linux.ibm.com, bp@alien8.de,
+	broonie@kernel.org, christophe.leroy@csgroup.eu, hpa@zytor.com,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
+	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
+	oliver.upton@linux.dev, shuah@kernel.org, tglx@linutronix.de,
+	will@kernel.org, x86@kernel.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v4 17/29] arm64: implement PKEYS support
+Message-ID: <20240711095000.GA488602@e124191.cambridge.arm.com>
+References: <20240503130147.1154804-1-joey.gouly@arm.com>
+ <20240503130147.1154804-18-joey.gouly@arm.com>
+ <ZlnlQ/avUAuSum5R@arm.com>
+ <20240531152138.GA1805682@e124191.cambridge.arm.com>
+ <Zln6ckvyktar8r0n@arm.com>
+ <87a5jj4rhw.fsf@oldenburg.str.redhat.com>
+ <ZnBNd51hVlaPTvn8@arm.com>
+ <ZownjvHbPI1anfpM@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.104.136.29
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZownjvHbPI1anfpM@arm.com>
 
-On Wed, 10 Jul 2024 16:12:53 +0100,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+On Mon, Jul 08, 2024 at 06:53:18PM +0100, Catalin Marinas wrote:
+> Hi Szabolcs,
 > 
-> Hi Marc,
-> 
-> On Mon, Jul 08, 2024 at 05:57:58PM +0100, Marc Zyngier wrote:
-> > In order to plug the brokenness of our current AT implementation,
-> > we need a SW walker that is going to... err.. walk the S1 tables
-> > and tell us what it finds.
+> On Mon, Jun 17, 2024 at 03:51:35PM +0100, Szabolcs Nagy wrote:
+> > The 06/17/2024 15:40, Florian Weimer wrote:
+> > > >> A user can still set it by interacting with the register directly, but I guess
+> > > >> we want something for the glibc interface..
+> > > >> 
+> > > >> Dave, any thoughts here?
+> > > >
+> > > > adding Florian too, since i found an old thread of his that tried
+> > > > to add separate PKEY_DISABLE_READ and PKEY_DISABLE_EXECUTE, but
+> > > > it did not seem to end up upstream. (this makes more sense to me
+> > > > as libc api than the weird disable access semantics)
+> > > 
+> > > I still think it makes sense to have a full complenent of PKEY_* flags
+> > > complementing the PROT_* flags, in a somewhat abstract fashion for
+> > > pkey_alloc only.  The internal protection mask register encoding will
+> > > differ from architecture to architecture, but the abstract glibc
+> > > functions pkey_set and pkey_get could use them (if we are a bit
+> > > careful).
 > > 
-> > Of course, it builds on top of our S2 walker, and share similar
-> > concepts. The beauty of it is that since it uses kvm_read_guest(),
-> > it is able to bring back pages that have been otherwise evicted.
+> > to me it makes sense to have abstract
 > > 
-> > This is then plugged in the two AT S1 emulation functions as
-> > a "slow path" fallback. I'm not sure it is that slow, but hey.
+> > PKEY_DISABLE_READ
+> > PKEY_DISABLE_WRITE
+> > PKEY_DISABLE_EXECUTE
+> > PKEY_DISABLE_ACCESS
 > > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > [..]
-> > @@ -331,18 +801,17 @@ void __kvm_at_s1e01(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
-> >  	}
-> >  
-> >  	if (!fail)
-> > -		par = read_sysreg(par_el1);
-> > +		par = read_sysreg_par();
-> >  	else
-> >  		par = SYS_PAR_EL1_F;
-> >  
-> > +	retry_slow = !fail;
-> > +
-> >  	vcpu_write_sys_reg(vcpu, par, PAR_EL1);
-> >  
-> >  	/*
-> > -	 * Failed? let's leave the building now.
-> > -	 *
-> > -	 * FIXME: how about a failed translation because the shadow S2
-> > -	 * wasn't populated? We may need to perform a SW PTW,
-> > -	 * populating our shadow S2 and retry the instruction.
-> > +	 * Failed? let's leave the building now, unless we retry on
-> > +	 * the slow path.
-> >  	 */
-> >  	if (par & SYS_PAR_EL1_F)
-> >  		goto nopan;
+> > where access is handled like
+> > 
+> > if (flags&PKEY_DISABLE_ACCESS)
+> > 	flags |= PKEY_DISABLE_READ|PKEY_DISABLE_WRITE;
+> > disable_read = flags&PKEY_DISABLE_READ;
+> > disable_write = flags&PKEY_DISABLE_WRITE;
+> > disable_exec = flags&PKEY_DISABLE_EXECUTE;
+> > 
+> > if there are unsupported combinations like
+> > disable_read&&!disable_write then those are rejected
+> > by pkey_alloc and pkey_set.
+> > 
+> > this allows portable use of pkey apis.
+> > (the flags could be target specific, but don't have to be)
 > 
-> This is what follows after the 'if' statement above, and before the 'switch'
-> below:
-> 
->         /* No PAN? No problem. */
->         if (!(*vcpu_cpsr(vcpu) & PSR_PAN_BIT))
->                 goto nopan;
-> 
-> When KVM is executing this statement, the following is true:
-> 
-> 1. SYS_PAR_EL1_F is clear => the hardware translation table walk was successful.
-> 2. retry_slow = true;
->
-> Then if the PAN bit is not set, the function jumps to the nopan label, and
-> performs a software translation table walk, even though the hardware walk
-> performed by AT was successful.
+> On powerpc, PKEY_DISABLE_ACCESS also disables execution. AFAICT, the
+> kernel doesn't define a PKEY_DISABLE_READ, only PKEY_DISABLE_ACCESS so
+> for powerpc there's no way to to set an execute-only permission via this
+> interface. I wouldn't like to diverge from powerpc.
 
-Hmmm. Are you being polite and trying to avoid saying that this code
-is broken and that I should look for a retirement home instead?
-There, I've said it for you! ;-)
+I think this is wrong, look at this code from powerpc:
 
-The more I stare at this code, the more I hate it. Trying to
-interleave the replay condition with the many potential failure modes
-of the HW walker feels completely wrong, and I feel that I'd better
-split the whole thing in two:
+arch/powerpc/mm/book3s64/pkeys.c: __arch_set_user_pkey_access
 
-void __kvm_at_s1e01(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
-{
-	__kvm_at_s1e01_hw(vcpu, vaddr);
-	if (vcpu_read_sys_reg(vcpu, PAR_EL1) & SYS_PAR_F)
-		__kvm_at_s1e01_sw(vcpu, vaddr);
-}
+        if (init_val & PKEY_DISABLE_EXECUTE) {
+                if (!pkey_execute_disable_supported)
+                        return -EINVAL;
+                new_iamr_bits |= IAMR_EX_BIT;
+        }
+        init_iamr(pkey, new_iamr_bits);
 
-and completely stop messing with things. This is AT S1 we're talking
-about, not something that has any sort of high-frequency. Apart for
-Xen. But as Butch said: "Xen's dead, baby. Xen's dead.".
+        /* Set the bits we need in AMR: */
+        if (init_val & PKEY_DISABLE_ACCESS)
+                new_amr_bits |= AMR_RD_BIT | AMR_WR_BIT;
+        else if (init_val & PKEY_DISABLE_WRITE)
+                new_amr_bits |= AMR_WR_BIT;
 
-> 
-> > @@ -354,29 +823,58 @@ void __kvm_at_s1e01(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
-> >  	switch (op) {
-> >  	case OP_AT_S1E1RP:
-> >  	case OP_AT_S1E1WP:
-> > +		retry_slow = false;
-> >  		fail = check_at_pan(vcpu, vaddr, &par);
-> >  		break;
-> >  	default:
-> >  		goto nopan;
-> >  	}
-> >  
-> > +	if (fail) {
-> > +		vcpu_write_sys_reg(vcpu, SYS_PAR_EL1_F, PAR_EL1);
-> > +		goto nopan;
-> > +	}
-> > +
-> >  	/*
-> >  	 * If the EL0 translation has succeeded, we need to pretend
-> >  	 * the AT operation has failed, as the PAN setting forbids
-> >  	 * such a translation.
-> > -	 *
-> > -	 * FIXME: we hardcode a Level-3 permission fault. We really
-> > -	 * should return the real fault level.
-> >  	 */
-> > -	if (fail || !(par & SYS_PAR_EL1_F))
-> > -		vcpu_write_sys_reg(vcpu, (0xf << 1) | SYS_PAR_EL1_F, PAR_EL1);
-> > -
-> > +	if (par & SYS_PAR_EL1_F) {
-> > +		u8 fst = FIELD_GET(SYS_PAR_EL1_FST, par);
-> > +
-> > +		/*
-> > +		 * If we get something other than a permission fault, we
-> > +		 * need to retry, as we're likely to have missed in the PTs.
-> > +		 */
-> > +		if ((fst & ESR_ELx_FSC_TYPE) != ESR_ELx_FSC_PERM)
-> > +			retry_slow = true;
-> 
-> Shouldn't VCPU's PAR_EL1 register be updated here? As far as I can tell, at this
-> point the VCPU PAR_EL1 register has the result from the successful walk
-> performed by AT S1E1R or AT S1E1W in the first 'switch' statement.
+        init_amr(pkey, new_amr_bits);
 
-Yup, yet another sign that this flow is broken. I'll apply my last few
-grey cells to it, and hopefully the next iteration will be a bit
-better.
+Seems to me that PKEY_DISABLE_ACCESS leaves exec permissions as-is.
 
-Thanks a lot for having a look!
+Here is the patch I am planning to include in the next version of the series.
+This should support all PKEY_DISABLE_* combinations. Any comments? 
 
-	M.
+commit ba51371a544f6b0a4a0f03df62ad894d53f5039b
+Author: Joey Gouly <joey.gouly@arm.com>
+Date:   Thu Jul 4 11:29:20 2024 +0100
 
--- 
-Without deviation from the norm, progress is not possible.
+    arm64: add PKEY_DISABLE_READ and PKEY_DISABLE_EXEC
+    
+    TODO
+    
+    Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+
+diff --git arch/arm64/include/uapi/asm/mman.h arch/arm64/include/uapi/asm/mman.h
+index 1e6482a838e1..e7e0c8216243 100644
+--- arch/arm64/include/uapi/asm/mman.h
++++ arch/arm64/include/uapi/asm/mman.h
+@@ -7,4 +7,13 @@
+ #define PROT_BTI       0x10            /* BTI guarded page */
+ #define PROT_MTE       0x20            /* Normal Tagged mapping */
+ 
++/* Override any generic PKEY permission defines */
++#define PKEY_DISABLE_EXECUTE   0x4
++#define PKEY_DISABLE_READ      0x8
++#undef PKEY_ACCESS_MASK
++#define PKEY_ACCESS_MASK       (PKEY_DISABLE_ACCESS |\
++                               PKEY_DISABLE_WRITE  |\
++                               PKEY_DISABLE_READ   |\
++                               PKEY_DISABLE_EXECUTE)
++
+ #endif /* ! _UAPI__ASM_MMAN_H */
+diff --git arch/arm64/mm/mmu.c arch/arm64/mm/mmu.c
+index 68afe5fc3071..ce4cc6bdee4e 100644
+--- arch/arm64/mm/mmu.c
++++ arch/arm64/mm/mmu.c
+@@ -1570,10 +1570,15 @@ int arch_set_user_pkey_access(struct task_struct *tsk, int pkey, unsigned long i
+                return -EINVAL;
+ 
+        /* Set the bits we need in POR:  */
++       new_por = POE_RXW;
++       if (init_val & PKEY_DISABLE_WRITE)
++               new_por &= ~POE_W;
+        if (init_val & PKEY_DISABLE_ACCESS)
+-               new_por = POE_X;
+-       else if (init_val & PKEY_DISABLE_WRITE)
+-               new_por = POE_RX;
++               new_por &= ~POE_RW;
++       if (init_val & PKEY_DISABLE_READ)
++               new_por &= ~POE_R;
++       if (init_val & PKEY_DISABLE_EXECUTE)
++               new_por &= ~POE_X;
+ 
+        /* Shift the bits in to the correct place in POR for pkey: */
+        pkey_shift = pkey * POR_BITS_PER_PKEY;
+
+
+
+Thanks,
+Joey
