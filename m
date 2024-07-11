@@ -1,208 +1,112 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C40A1B809;
-	Thu, 11 Jul 2024 12:16:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3825D16C426
+	for <kvmarm@lists.linux.dev>; Thu, 11 Jul 2024 17:55:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720700209; cv=none; b=nHOq9TNM/ETvjrlogbjLKHtJQGRtFZal4nIDkiLHyQ0MeoGbMnOYmrzbUFQ2yXRI2usbEweRE6gzEPdi/AVXX/4NpPdJIJWnSrCGb2HxtU86XpjuvbxeExWVyj/oSnSaRnGu3p4qz6wSkteoot3RwbvccgcVS+ZHsG3WfVQTsA8=
+	t=1720720508; cv=none; b=uwzZLNvKL1yigTjWIQDmctAr2o3575hO5XSZBxQxMGLRTmmfFn71e5KgrhmntJ+tLZ2Wbff0LWVWctBO7AEADeNbeqU71NWw65dE7rQjtyGblCdcqryskJusfYTg0XuHaRA958yKkgHAHgiYXr7dn79t555LiPd7jpBqCyaybIw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720700209; c=relaxed/simple;
-	bh=GB4T7FOIIOTbjv1qOuDM1/CMDCe80el9SuVOKkULX+E=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=T2xbMsB0OzbYyXGwQJdR1MA9BYskLWseR7QWYNAxl602ZQ7hMHqe+KEbesFx4M2KkaSwRikIGf7Ajxpec0DAgYQC/nt/XuoUT5dAnemIOxqWT+IBxFtPFYTrLJnil+q6uSNj+i8/M0ZQdiq5B6Mgp740VydwO9zkaOyS8npFcAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hfhtIdM4; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1720720508; c=relaxed/simple;
+	bh=Q2jGwB5t17HqynNj9nfvA8d60yx74p0B3SdLkap6ocU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=W6Wvg51Ww4FjIsErbCD2QJeLgR6PM3cVgx4dh44IEWYfLrbztDRdS/n1PzzuOEnXhYlxW8cb75KsNHjznTKNwkgD7b51ykHE3KWCBveusdOiRMUKeIDX3FW5EJ4TK3knRx8O2xeR/K1F7X7qrpGO+T6BMyEcqI23N4K1iwMylJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=etCTPAH9; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hfhtIdM4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98D0FC116B1;
-	Thu, 11 Jul 2024 12:16:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720700208;
-	bh=GB4T7FOIIOTbjv1qOuDM1/CMDCe80el9SuVOKkULX+E=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hfhtIdM4XWdU67JnzcjXBWj2UgktY0iXuIKhQ0qQfMW1cEd7Q5I/ZVk7jAob+6yCN
-	 l5TN97Rtz39EvjE1oZziE02fok8okg2ClhSvo8LXV2jh953g2ymG3/tq+pcdFnBbdJ
-	 HHqzpZkkxcwVIyZvQQEOGwvqeP919udEADMGbuxKKfehVp4boI4dNlrp78QFI6aE5I
-	 Mald2KbTfHjLDE8L1AalvrX5f4N4kPMDE9uFVGOcBHM/tzTpaEYbpivzML07SAU3db
-	 477ThI0rz6+eYUe+PY2kSRqD8QmhQ88oet5EcIMz4/ibscUdZohx+AhdETIu985/ge
-	 Zju9YM+3jxivQ==
-Received: from [185.201.63.253] (helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sRsj7-00BWSd-RY;
-	Thu, 11 Jul 2024 13:16:46 +0100
-Date: Thu, 11 Jul 2024 13:16:42 +0100
-Message-ID: <874j8wp1hx.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Joey Gouly <joey.gouly@arm.com>
-Subject: Re: [PATCH 10/12] KVM: arm64: nv: Add SW walker for AT S1 emulation
-In-Reply-To: <Zo+6TYIP3FNssR/b@arm.com>
-References: <20240625133508.259829-1-maz@kernel.org>
-	<20240708165800.1220065-1-maz@kernel.org>
-	<Zo+6TYIP3FNssR/b@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="etCTPAH9"
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1fb67f59805so10625ad.1
+        for <kvmarm@lists.linux.dev>; Thu, 11 Jul 2024 10:55:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1720720506; x=1721325306; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Q2jGwB5t17HqynNj9nfvA8d60yx74p0B3SdLkap6ocU=;
+        b=etCTPAH9ix/zFz4v/rBrFdIVRI23lYuBYdS6weE3NcJXgSNjmk7StXyYbt/LAUIB1Q
+         XnwR4tM55ueWOkEXOFx+x2R3Y69s+woRE/0SpScFratmjFkYBBK1mQmMkZh3tyYYElXN
+         N/WNbFz0TXKtJa9S4gb8/4XdDhakIYuUCTgfLDQjsetkFf/wwiUbsk199RwTCoIGltuP
+         3z+cvPDpe01tFm3KtDj6V2FOw+Kk5ZMWi38tVoZz0SYPHsMUWnBOE8cY/i/5IHpU0e1b
+         koKm/eeCLrp3Q9Ig8CwUNmdR+hK6C+CJ9FafVnHBuQWoq6KzGueWIXSWSSRJV27B1tX0
+         y/ig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720720506; x=1721325306;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Q2jGwB5t17HqynNj9nfvA8d60yx74p0B3SdLkap6ocU=;
+        b=rZcj2DcU8COIDh2ivmsiAtWHFFuZosppGdAv0bZpIgV7mQSRbwdL+1L4/nMr6Un4N5
+         GspRfuM0hb1PXI3o9Xs47qvAqmtMmYAGgnCEeXNeVd0O3AZKGWcwunuEFHnJmsumP2iP
+         5u+kjHt+9EZCbx00wX7ZV5xfZWFY+ZF6xaR5bfVLoB0z2nWvugurLRSLMzvL8iS6BVfE
+         cBe6ovuOxf4YuAS+eWwpPfpzuOfK330SPKWJ72jdBSQaucMve1TusMFgbAmaJdIVXt/D
+         S7V/T6FlXM8o/QFUfI08Yww2vYfQBK2Eu+H6+Y/03YjPp3r2762s6f3M73AAb5/Q19fe
+         C9oA==
+X-Forwarded-Encrypted: i=1; AJvYcCWybrbay8boZaqWM0M2WKsQhr1K1ODv/2huwLx9C1iOFpdt8CSLYN92kmEjfwcmAHV6XpTbYQqBCf7ySWZFjB8O7z4BrZyr
+X-Gm-Message-State: AOJu0YyqGWZJAJgShYwevf/pKNhrNh14gSJBSEDT/m0uFNMRNmSFctXy
+	2Qz7LpIuXpvYWoADfaVzxxMHh/YJNcuoN0y4D8GTaEOk7xd/BnM+Z8u3WAZBck20IjG//YIAB+w
+	z7K8F2e0Srx02M0VPAy5s62dJN8mXpisRBn2J
+X-Google-Smtp-Source: AGHT+IHPl0hMtGzIful8PbEv97szuh+yMniIwD4UrUN5WZPWkOFkV7tC3++A18niRRomq2oAuqh7wl6DUv9+EvJrdGI=
+X-Received: by 2002:a17:903:32c4:b0:1f7:3764:1e19 with SMTP id
+ d9443c01a7336-1fbf24ced64mr106635ad.20.1720720506068; Thu, 11 Jul 2024
+ 10:55:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.201.63.253
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20240710234222.2333120-1-jthoughton@google.com>
+In-Reply-To: <20240710234222.2333120-1-jthoughton@google.com>
+From: James Houghton <jthoughton@google.com>
+Date: Thu, 11 Jul 2024 10:54:29 -0700
+Message-ID: <CADrL8HVFARsLq0Tyw8XF3PR02gELQhbYM8ZDdWNx0eD_jyDW8w@mail.gmail.com>
+Subject: Re: [RFC PATCH 00/18] KVM: Post-copy live migration for guest_memfd
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Sean Christopherson <seanjc@google.com>, Shuah Khan <shuah@kernel.org>, 
+	Axel Rasmussen <axelrasmussen@google.com>, David Matlack <dmatlack@google.com>, kvm@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	Peter Xu <peterx@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 11 Jul 2024 11:56:13 +0100,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> 
-> Hi,
-> 
-> On Mon, Jul 08, 2024 at 05:57:58PM +0100, Marc Zyngier wrote:
-> > In order to plug the brokenness of our current AT implementation,
-> > we need a SW walker that is going to... err.. walk the S1 tables
-> > and tell us what it finds.
-> > 
-> > Of course, it builds on top of our S2 walker, and share similar
-> > concepts. The beauty of it is that since it uses kvm_read_guest(),
-> > it is able to bring back pages that have been otherwise evicted.
-> > 
-> > This is then plugged in the two AT S1 emulation functions as
-> > a "slow path" fallback. I'm not sure it is that slow, but hey.
-> > [..]
-> >  	switch (op) {
-> >  	case OP_AT_S1E1RP:
-> >  	case OP_AT_S1E1WP:
-> > +		retry_slow = false;
-> >  		fail = check_at_pan(vcpu, vaddr, &par);
-> >  		break;
-> >  	default:
-> >  		goto nopan;
-> >  	}
-> 
-> For context, this is what check_at_pan() does:
-> 
-> static int check_at_pan(struct kvm_vcpu *vcpu, u64 vaddr, u64 *res)
-> {
->         u64 par_e0;
->         int error;
-> 
->         /*
->          * For PAN-involved AT operations, perform the same translation,
->          * using EL0 this time. Twice. Much fun.
->          */
->         error = __kvm_at(OP_AT_S1E0R, vaddr);
->         if (error)
->                 return error;
-> 
->         par_e0 = read_sysreg_par();
->         if (!(par_e0 & SYS_PAR_EL1_F))
->                 goto out;
-> 
->         error = __kvm_at(OP_AT_S1E0W, vaddr);
->         if (error)
->                 return error;
-> 
->         par_e0 = read_sysreg_par();
-> out:
->         *res = par_e0;
->         return 0;
-> }
-> 
-> I'm having a hard time understanding why KVM is doing both AT S1E0R and AT S1E0W
-> regardless of the type of the access (read/write) in the PAN-aware AT
-> instruction. Would you mind elaborating on that?
+On Wed, Jul 10, 2024 at 4:42=E2=80=AFPM James Houghton <jthoughton@google.c=
+om> wrote:
+> Solution: hook into the gfn -> pfn translation
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+> The only way to implement post-copy with a non-KVM-specific
+> userfaultfd-like system would be to introduce the concept of a
+> file-userfault[2] to intercept faults on a guest_memfd.
+>
+> Instead, we take the simpler approach of adding a KVM-specific API, and
+> we hook into the GFN -> HVA or GFN -> PFN translation steps (for
+> traditional memslots and for guest_memfd respectively).
+>
+> I have intentionally added support for traditional memslots, as the
+> complexity that it adds is minimal, and it is useful for some VMMs, as
+> it can be used to fully implement post-copy live migration.
 
-Because that's the very definition of an AT S1E1{W,R}P instruction
-when PAN is set. If *any* EL0 permission is set, then the translation
-must equally fail. Just like a load or a store from EL1 would fail if
-any EL0 permission is set when PSTATE.PAN is set.
+I want to clarify this sentence a little.
 
-Since we cannot check for both permissions at once, we do it twice.
-It is worth noting that we don't quite handle the PAN3 case correctly
-(because we can't retrieve the *execution* property using AT). I'll
-add that to the list of stuff to fix.
+Today, because guest_memfd is only accessed by vCPUs (and is only ever
+used for guest-private memory), the concept of "asynchronous
+userfaults" isn't exactly necessary. However, when guest_memfd
+supports shared memory and KVM is itself able to access it,
+asynchronous userfaults become useful in the same way that they are
+useful for the non-guest_memfd case.
 
-> 
-> > +	if (fail) {
-> > +		vcpu_write_sys_reg(vcpu, SYS_PAR_EL1_F, PAR_EL1);
-> > +		goto nopan;
-> > +	}
-> > [..]
-> > +	if (par & SYS_PAR_EL1_F) {
-> > +		u8 fst = FIELD_GET(SYS_PAR_EL1_FST, par);
-> > +
-> > +		/*
-> > +		 * If we get something other than a permission fault, we
-> > +		 * need to retry, as we're likely to have missed in the PTs.
-> > +		 */
-> > +		if ((fst & ESR_ELx_FSC_TYPE) != ESR_ELx_FSC_PERM)
-> > +			retry_slow = true;
-> > +	} else {
-> > +		/*
-> > +		 * The EL0 access succeded, but we don't have the full
-> > +		 * syndrom information to synthetize the failure. Go slow.
-> > +		 */
-> > +		retry_slow = true;
-> > +	}
-> 
-> This is what PSTATE.PAN controls:
-> 
-> If the Effective value of PSTATE.PAN is 1, then a privileged data access from
-> any of the following Exception levels to a virtual memory address that is
-> accessible to data accesses at EL0 generates a stage 1 Permission fault:
-> 
-> - A privileged data access from EL1.
-> - If HCR_EL2.E2H is 1, then a privileged data access from EL2.
-> 
-> With that in mind, I am really struggling to understand the logic.
+In a world where guest_memfd requires asynchronous userfaults, adding
+support for traditional memslots on top of that is quite simple, and
+it somewhat simplies the UAPI.
 
-I don't quite see what you don't understand, you'll have to be more
-precise. Are you worried about the page tables we're looking at, the
-value of PSTATE.PAN, the permission fault, or something else?
+And for why it is useful for userspace to be able to use KVM Userfault
+to implement post-copy live migration, David mentioned this in his
+initial RFC[1].
 
-It also doesn't help that you're looking at the patch that contains
-the integration with the slow-path, which is pretty hard to read (I
-have a reworked version that's a bit better). You probably want to
-look at the "fast" path alone.
-
-> 
-> If AT S1E0{R,W} (from check_at_pan()) failed, doesn't that mean that the virtual
-> memory address is not accessible to EL0? Add that to the fact that the AT
-> S1E1{R,W} (from the beginning of __kvm_at_s1e01()) succeeded, doesn't that mean
-> that AT S1E1{R,W}P should succeed, and furthermore the PAR_EL1 value should be
-> the one KVM got from AT S1E1{R,W}?
-
-There are plenty of ways for AT S1E0 to fail when AT S1E1 succeeded:
-
-- no EL0 permission: that's the best case, and the PAR_EL1 obtained
-  from the AT S1E1 is the correct one. That's what we return.
-
-- The EL0 access failed, but for another reason than a permission
-  fault. This contradicts the EL1 walk, and is a sure sign that
-  someone is playing behind our back. We fail.
-
-- exception from AT S1E0: something went wrong (again the guest
-  playing with the PTs behind our back). We fail as well.
-
-Do you at least agree with these as goals? If you do, what in
-the implementation does not satisfy these goals? If you don't, what in
-these goals seem improper to you?
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+[1]: https://lore.kernel.org/kvm/CALzav=3Dd23P5uE=3DoYqMpjFohvn0CASMJxXB_XE=
+OEi-jtqWcFTDA@mail.gmail.com/#t
