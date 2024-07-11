@@ -1,46 +1,35 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 175E114C583
-	for <kvmarm@lists.linux.dev>; Thu, 11 Jul 2024 09:50:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B6F0156962
+	for <kvmarm@lists.linux.dev>; Thu, 11 Jul 2024 10:56:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720691411; cv=none; b=eIiaUfH8SAR8KMDrxgC4Nz1cjucX7MSnnP8V9Iqti0aimcm+dhCC9FMKBIX7V0/oMqVy6L9+iQ/Ed9J3xg+upJj9H4Ec2n+/XlKZSDrIzKZhWOoq69FujXzjgaM/iM6md9W+ple/8LIot1snJ88OcXZf6CY5Oj5O4VMeKsd5sCk=
+	t=1720695382; cv=none; b=qvIFFxHZcvZgP/PoS8MfH4nRe1z3SgdwMt5n2/wInlol+QqBVeKZWn9/VfM2S1osCg5N1rwiY9urPh7MYK9DLZbxRom1W4t3PAKbcAMiIzk/oh/IWDQYBfoiJpDhF0poRiW2c0havYavT49tskYA/Y4x4eRea8KEL+3WgMNbOeY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720691411; c=relaxed/simple;
-	bh=r1qpYydr0BGPkQefncp3es6El+dIrgCQVX+Px2Hl380=;
+	s=arc-20240116; t=1720695382; c=relaxed/simple;
+	bh=DIBuYb4gqtVfXndiTDycUcqF9WPL156MVLpoUiXj0VI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c6Gp/a0cEB26hzXW1MTEt8cpdmDfkmZCbe712RGywE9qgvm5pQaMQehS180x13pugjrmivEsGXNJwIqXqeiYkFsTQIDm3ljimtpxdiPne6EB9nSgMDn0iOKqOqLP9x/XPQrCRsUdETZRPojaPiSltjsW+i8Z2zAMWl+gt5qVlS0=
+	 Content-Type:Content-Disposition:In-Reply-To; b=IDULrYxuvkOXkEctbemOWHkhrV89NPgcYHWWpx0p/rFvWq6gCnnW3be2Ml09HDolOR2dvzLs5ImoB/lptopVIi/6aor3+4ATRWduYiG7+F8o0kW9spM5/43sEo1I2GkWLhBDCioVpCicOD1gaDiNsNUAptrNKnuthu74J728k4g=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4621C1007;
-	Thu, 11 Jul 2024 02:50:33 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1B87B3F766;
-	Thu, 11 Jul 2024 02:50:05 -0700 (PDT)
-Date: Thu, 11 Jul 2024 10:50:00 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Szabolcs Nagy <szabolcs.nagy@arm.com>,
-	Florian Weimer <fweimer@redhat.com>, dave.hansen@linux.intel.com,
-	linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
-	aneesh.kumar@kernel.org, aneesh.kumar@linux.ibm.com, bp@alien8.de,
-	broonie@kernel.org, christophe.leroy@csgroup.eu, hpa@zytor.com,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
-	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
-	oliver.upton@linux.dev, shuah@kernel.org, tglx@linutronix.de,
-	will@kernel.org, x86@kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 17/29] arm64: implement PKEYS support
-Message-ID: <20240711095000.GA488602@e124191.cambridge.arm.com>
-References: <20240503130147.1154804-1-joey.gouly@arm.com>
- <20240503130147.1154804-18-joey.gouly@arm.com>
- <ZlnlQ/avUAuSum5R@arm.com>
- <20240531152138.GA1805682@e124191.cambridge.arm.com>
- <Zln6ckvyktar8r0n@arm.com>
- <87a5jj4rhw.fsf@oldenburg.str.redhat.com>
- <ZnBNd51hVlaPTvn8@arm.com>
- <ZownjvHbPI1anfpM@arm.com>
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D2A7C1007;
+	Thu, 11 Jul 2024 03:56:42 -0700 (PDT)
+Received: from arm.com (e121798.manchester.arm.com [10.32.101.22])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 350073F762;
+	Thu, 11 Jul 2024 03:56:16 -0700 (PDT)
+Date: Thu, 11 Jul 2024 11:56:13 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>, Joey Gouly <joey.gouly@arm.com>
+Subject: Re: [PATCH 10/12] KVM: arm64: nv: Add SW walker for AT S1 emulation
+Message-ID: <Zo+6TYIP3FNssR/b@arm.com>
+References: <20240625133508.259829-1-maz@kernel.org>
+ <20240708165800.1220065-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -49,134 +38,141 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZownjvHbPI1anfpM@arm.com>
+In-Reply-To: <20240708165800.1220065-1-maz@kernel.org>
 
-On Mon, Jul 08, 2024 at 06:53:18PM +0100, Catalin Marinas wrote:
-> Hi Szabolcs,
+Hi,
+
+On Mon, Jul 08, 2024 at 05:57:58PM +0100, Marc Zyngier wrote:
+> In order to plug the brokenness of our current AT implementation,
+> we need a SW walker that is going to... err.. walk the S1 tables
+> and tell us what it finds.
 > 
-> On Mon, Jun 17, 2024 at 03:51:35PM +0100, Szabolcs Nagy wrote:
-> > The 06/17/2024 15:40, Florian Weimer wrote:
-> > > >> A user can still set it by interacting with the register directly, but I guess
-> > > >> we want something for the glibc interface..
-> > > >> 
-> > > >> Dave, any thoughts here?
-> > > >
-> > > > adding Florian too, since i found an old thread of his that tried
-> > > > to add separate PKEY_DISABLE_READ and PKEY_DISABLE_EXECUTE, but
-> > > > it did not seem to end up upstream. (this makes more sense to me
-> > > > as libc api than the weird disable access semantics)
-> > > 
-> > > I still think it makes sense to have a full complenent of PKEY_* flags
-> > > complementing the PROT_* flags, in a somewhat abstract fashion for
-> > > pkey_alloc only.  The internal protection mask register encoding will
-> > > differ from architecture to architecture, but the abstract glibc
-> > > functions pkey_set and pkey_get could use them (if we are a bit
-> > > careful).
-> > 
-> > to me it makes sense to have abstract
-> > 
-> > PKEY_DISABLE_READ
-> > PKEY_DISABLE_WRITE
-> > PKEY_DISABLE_EXECUTE
-> > PKEY_DISABLE_ACCESS
-> > 
-> > where access is handled like
-> > 
-> > if (flags&PKEY_DISABLE_ACCESS)
-> > 	flags |= PKEY_DISABLE_READ|PKEY_DISABLE_WRITE;
-> > disable_read = flags&PKEY_DISABLE_READ;
-> > disable_write = flags&PKEY_DISABLE_WRITE;
-> > disable_exec = flags&PKEY_DISABLE_EXECUTE;
-> > 
-> > if there are unsupported combinations like
-> > disable_read&&!disable_write then those are rejected
-> > by pkey_alloc and pkey_set.
-> > 
-> > this allows portable use of pkey apis.
-> > (the flags could be target specific, but don't have to be)
+> Of course, it builds on top of our S2 walker, and share similar
+> concepts. The beauty of it is that since it uses kvm_read_guest(),
+> it is able to bring back pages that have been otherwise evicted.
 > 
-> On powerpc, PKEY_DISABLE_ACCESS also disables execution. AFAICT, the
-> kernel doesn't define a PKEY_DISABLE_READ, only PKEY_DISABLE_ACCESS so
-> for powerpc there's no way to to set an execute-only permission via this
-> interface. I wouldn't like to diverge from powerpc.
+> This is then plugged in the two AT S1 emulation functions as
+> a "slow path" fallback. I'm not sure it is that slow, but hey.
+> [..]
+>  	switch (op) {
+>  	case OP_AT_S1E1RP:
+>  	case OP_AT_S1E1WP:
+> +		retry_slow = false;
+>  		fail = check_at_pan(vcpu, vaddr, &par);
+>  		break;
+>  	default:
+>  		goto nopan;
+>  	}
 
-I think this is wrong, look at this code from powerpc:
+For context, this is what check_at_pan() does:
 
-arch/powerpc/mm/book3s64/pkeys.c: __arch_set_user_pkey_access
+static int check_at_pan(struct kvm_vcpu *vcpu, u64 vaddr, u64 *res)
+{
+        u64 par_e0;
+        int error;
 
-        if (init_val & PKEY_DISABLE_EXECUTE) {
-                if (!pkey_execute_disable_supported)
-                        return -EINVAL;
-                new_iamr_bits |= IAMR_EX_BIT;
-        }
-        init_iamr(pkey, new_iamr_bits);
+        /*
+         * For PAN-involved AT operations, perform the same translation,
+         * using EL0 this time. Twice. Much fun.
+         */
+        error = __kvm_at(OP_AT_S1E0R, vaddr);
+        if (error)
+                return error;
 
-        /* Set the bits we need in AMR: */
-        if (init_val & PKEY_DISABLE_ACCESS)
-                new_amr_bits |= AMR_RD_BIT | AMR_WR_BIT;
-        else if (init_val & PKEY_DISABLE_WRITE)
-                new_amr_bits |= AMR_WR_BIT;
+        par_e0 = read_sysreg_par();
+        if (!(par_e0 & SYS_PAR_EL1_F))
+                goto out;
 
-        init_amr(pkey, new_amr_bits);
+        error = __kvm_at(OP_AT_S1E0W, vaddr);
+        if (error)
+                return error;
 
-Seems to me that PKEY_DISABLE_ACCESS leaves exec permissions as-is.
+        par_e0 = read_sysreg_par();
+out:
+        *res = par_e0;
+        return 0;
+}
 
-Here is the patch I am planning to include in the next version of the series.
-This should support all PKEY_DISABLE_* combinations. Any comments? 
+I'm having a hard time understanding why KVM is doing both AT S1E0R and AT S1E0W
+regardless of the type of the access (read/write) in the PAN-aware AT
+instruction. Would you mind elaborating on that?
 
-commit ba51371a544f6b0a4a0f03df62ad894d53f5039b
-Author: Joey Gouly <joey.gouly@arm.com>
-Date:   Thu Jul 4 11:29:20 2024 +0100
+> +	if (fail) {
+> +		vcpu_write_sys_reg(vcpu, SYS_PAR_EL1_F, PAR_EL1);
+> +		goto nopan;
+> +	}
+> [..]
+> +	if (par & SYS_PAR_EL1_F) {
+> +		u8 fst = FIELD_GET(SYS_PAR_EL1_FST, par);
+> +
+> +		/*
+> +		 * If we get something other than a permission fault, we
+> +		 * need to retry, as we're likely to have missed in the PTs.
+> +		 */
+> +		if ((fst & ESR_ELx_FSC_TYPE) != ESR_ELx_FSC_PERM)
+> +			retry_slow = true;
+> +	} else {
+> +		/*
+> +		 * The EL0 access succeded, but we don't have the full
+> +		 * syndrom information to synthetize the failure. Go slow.
+> +		 */
+> +		retry_slow = true;
+> +	}
 
-    arm64: add PKEY_DISABLE_READ and PKEY_DISABLE_EXEC
-    
-    TODO
-    
-    Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+This is what PSTATE.PAN controls:
 
-diff --git arch/arm64/include/uapi/asm/mman.h arch/arm64/include/uapi/asm/mman.h
-index 1e6482a838e1..e7e0c8216243 100644
---- arch/arm64/include/uapi/asm/mman.h
-+++ arch/arm64/include/uapi/asm/mman.h
-@@ -7,4 +7,13 @@
- #define PROT_BTI       0x10            /* BTI guarded page */
- #define PROT_MTE       0x20            /* Normal Tagged mapping */
- 
-+/* Override any generic PKEY permission defines */
-+#define PKEY_DISABLE_EXECUTE   0x4
-+#define PKEY_DISABLE_READ      0x8
-+#undef PKEY_ACCESS_MASK
-+#define PKEY_ACCESS_MASK       (PKEY_DISABLE_ACCESS |\
-+                               PKEY_DISABLE_WRITE  |\
-+                               PKEY_DISABLE_READ   |\
-+                               PKEY_DISABLE_EXECUTE)
-+
- #endif /* ! _UAPI__ASM_MMAN_H */
-diff --git arch/arm64/mm/mmu.c arch/arm64/mm/mmu.c
-index 68afe5fc3071..ce4cc6bdee4e 100644
---- arch/arm64/mm/mmu.c
-+++ arch/arm64/mm/mmu.c
-@@ -1570,10 +1570,15 @@ int arch_set_user_pkey_access(struct task_struct *tsk, int pkey, unsigned long i
-                return -EINVAL;
- 
-        /* Set the bits we need in POR:  */
-+       new_por = POE_RXW;
-+       if (init_val & PKEY_DISABLE_WRITE)
-+               new_por &= ~POE_W;
-        if (init_val & PKEY_DISABLE_ACCESS)
--               new_por = POE_X;
--       else if (init_val & PKEY_DISABLE_WRITE)
--               new_por = POE_RX;
-+               new_por &= ~POE_RW;
-+       if (init_val & PKEY_DISABLE_READ)
-+               new_por &= ~POE_R;
-+       if (init_val & PKEY_DISABLE_EXECUTE)
-+               new_por &= ~POE_X;
- 
-        /* Shift the bits in to the correct place in POR for pkey: */
-        pkey_shift = pkey * POR_BITS_PER_PKEY;
+If the Effective value of PSTATE.PAN is 1, then a privileged data access from
+any of the following Exception levels to a virtual memory address that is
+accessible to data accesses at EL0 generates a stage 1 Permission fault:
 
+- A privileged data access from EL1.
+- If HCR_EL2.E2H is 1, then a privileged data access from EL2.
 
+With that in mind, I am really struggling to understand the logic.
+
+If AT S1E0{R,W} (from check_at_pan()) failed, doesn't that mean that the virtual
+memory address is not accessible to EL0? Add that to the fact that the AT
+S1E1{R,W} (from the beginning of __kvm_at_s1e01()) succeeded, doesn't that mean
+that AT S1E1{R,W}P should succeed, and furthermore the PAR_EL1 value should be
+the one KVM got from AT S1E1{R,W}?
 
 Thanks,
-Joey
+Alex
+
+>  nopan:
+>  	__mmu_config_restore(&config);
+>  out:
+>  	local_irq_restore(flags);
+>  
+>  	write_unlock(&vcpu->kvm->mmu_lock);
+> +
+> +	/*
+> +	 * If retry_slow is true, then we either are missing shadow S2
+> +	 * entries, have paged out guest S1, or something is inconsistent.
+> +	 *
+> +	 * Either way, we need to walk the PTs by hand so that we can either
+> +	 * fault things back, in or record accurate fault information along
+> +	 * the way.
+> +	 */
+> +	if (retry_slow) {
+> +		par = handle_at_slow(vcpu, op, vaddr);
+> +		vcpu_write_sys_reg(vcpu, par, PAR_EL1);
+> +	}
+>  }
+>  
+>  void __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+> @@ -433,6 +931,10 @@ void __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+>  
+>  	write_unlock(&vcpu->kvm->mmu_lock);
+>  
+> +	/* We failed the translation, let's replay it in slow motion */
+> +	if (!fail && (par & SYS_PAR_EL1_F))
+> +		par = handle_at_slow(vcpu, op, vaddr);
+> +
+>  	vcpu_write_sys_reg(vcpu, par, PAR_EL1);
+>  }
+>  
+> -- 
+> 2.39.2
+> 
+> 
