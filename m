@@ -1,88 +1,135 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E618E17085D;
-	Fri, 12 Jul 2024 15:28:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 452F845024;
+	Fri, 12 Jul 2024 21:55:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720798093; cv=none; b=MWKk+aqjZXVTpXtOHexqeM1rCIdybEede1feutKipa4UWwIwxh4hD44Wom7QXfquD7k0t8pRzGeGnyy8PwiOseUpS8pO3z2D9Ap5Yu5j0IhyC9bxLSRMRtnewJ6KMOk8QbsPqCj2DLTldcAkjqiKqdGHuYMa+uOwk9YB3xOfljY=
+	t=1720821320; cv=none; b=Q0aPdff0Pk3u/h8xDM0k4xHz7fFds6YdHPC+92G7Y5f4qCQ5up1SzXgt9BhKTUINZywLkoXdw4gh1WfgKX4a0ZeJoWyUGN55GQqOHSfyCXh4F9x3AgBvJ+VqPN8UVmxLurwWSlpOf0HCdFzgsrKXEHa1hxHlO+RXFmZNajkg5rU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720798093; c=relaxed/simple;
-	bh=Zb5kv2QXTh+sNV8ZQ9sP9rL7n6zW1PcQIE0L82HpVt8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ua8OC+5B0DSHSJzGq0T+jXoUHBNmiiL3feKqb3wAPm5Hr1G7WA+n8z02pQMRj30v6r8XGx//uBkOKSZjQ+57s8FPYZwB8OrNLQmyNIUD9V8wx9Wmj20NEzgXeL8mStv3XprPxQnOT2V9tMyGCbfOxa2iSA8L7mN71WAXSmTmSEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EDkU4R6G; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1720821320; c=relaxed/simple;
+	bh=hHPoaV7UEU4AsfewMnxxIEnFJZjwwHobfKZXCH2J90Y=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=spehhIeZbZ6FVcQQkxxpCGg+L4/MWV1ZvO2EXtqwHyY3F1VAG/7cdMRIuYODzQ1aYHiqLGSDUqKvkjEMt9Qe4U1A/e8DZsjnF/94zbncGeW4Juq3Lx9o3AbYE3Y7mDgBY6VOAVKatLyvBKqL4hyuohWICpCxWs3Bp9dYD74Am9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jhQvDJIe; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EDkU4R6G"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EE1FC32782;
-	Fri, 12 Jul 2024 15:28:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jhQvDJIe"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA5F3C32782;
+	Fri, 12 Jul 2024 21:55:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720798092;
-	bh=Zb5kv2QXTh+sNV8ZQ9sP9rL7n6zW1PcQIE0L82HpVt8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EDkU4R6G7RgUPFJ1TDD4o3ZjvAdRRc3ajxoKOVGOn1fTHdQ7clFgMM+dUgBEd8UAV
-	 uz3/dqrQeDNKrCLvcpSx99vl2icC7b2SeTyfQUqIEkqLEz16XZ7gJZEfQc5d3GFwkj
-	 YNvM27Hl7nfxXaS0TOT/gae0FrNKOmK9beHsZmRGFc434pc6CAw/bKQ8nmZWXsWfEO
-	 ErITVVZZH8+fuDuZfv0cCcvJ397aoUg/SelvrJKGtgVdSQU3pqqVoYwcxVWIXVF/43
-	 ufUNYdsR7nbjrUQSWJBTEOdPld5hdISP2M4wb8s6tCz9QZXlo7B/lddEiRhzgZkmtf
-	 W5vzYUneOcpSA==
-Date: Fri, 12 Jul 2024 16:28:07 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	s=k20201202; t=1720821319;
+	bh=hHPoaV7UEU4AsfewMnxxIEnFJZjwwHobfKZXCH2J90Y=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=jhQvDJIeW17sOq8mFwHrZgi+NRfn6Qrp/j75Sy5u5OT51wzAz1XZCKd/Y1KnhUCZ4
+	 mlIYlGw/DT3tBwd32oBBkLvk4D2ZlLagxnP9jbR1VRObmt+I3cdnZ631F+65Qp6XOX
+	 9GeSIuzJfNsKktf3f2PNHuWY1jzMro78JYKM9xaSgLCSLgrSSrDH+16xOraQu3p/nA
+	 yLJTwymEjTHOAMsrdWJamaK+Z2LPeh5JnSFMAv01xo+6crjCRB4zfu2N7fgQFTBkam
+	 RFnZkWigE6E7NGDF15y0Gtpa86RNp66oZK0Q6TGhMxC6uZ8hDj7AXvifSiA1Fy47cV
+	 62a6eczgs+CdA==
+Received: from [213.208.208.122] (helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sSOEX-00Byls-FJ;
+	Fri, 12 Jul 2024 22:55:17 +0100
+Date: Fri, 12 Jul 2024 22:55:16 +0100
+Message-ID: <8734oep96j.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sebastian Ott <sebott@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>, Fuad Tabba <tabba@google.com>,
-	Joey Gouly <joey.gouly@arm.com>
-Subject: Re: [PATCH 3/7] KVM: arm64: Add save/restore support for FPMR
-Message-ID: <c8860282-250a-4ef4-af93-894977de1b1f@sirena.org.uk>
-References: <20240708154438.1218186-1-maz@kernel.org>
- <20240708154438.1218186-4-maz@kernel.org>
- <b44b29f0-b4c5-43a2-a5f6-b4fd84f77192@sirena.org.uk>
- <864j8z4vy6.wl-maz@kernel.org>
- <8634oj4voc.wl-maz@kernel.org>
- <861q433pfl.wl-maz@kernel.org>
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 1/3] KVM: arm64: fix override-init warnings in W=1 builds
+In-Reply-To: <20240712110332.10970-2-sebott@redhat.com>
+References: <20240712110332.10970-1-sebott@redhat.com>
+	<20240712110332.10970-2-sebott@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="TOTkxYnYS4823nOn"
-Content-Disposition: inline
-In-Reply-To: <861q433pfl.wl-maz@kernel.org>
-X-Cookie: Individualists unite!
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 213.208.208.122
+X-SA-Exim-Rcpt-To: sebott@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Fri, 12 Jul 2024 12:03:30 +0100,
+Sebastian Ott <sebott@redhat.com> wrote:
+> 
+> Remove double initializations in cases where that's easily possible
+> - like extra NULL initialization in static global structures. In the
+> other cases just silence -Woverride-init.
+> 
+> To fix warnings like the following:
+> arch/arm64/kvm/hyp/vhe/switch.c:271:43: warning: initialized field overwritten [-Woverride-init]
+>   271 |         [ESR_ELx_EC_CP15_32]            = kvm_hyp_handle_cp15_32,
+>       |                                           ^~~~~~~~~~~~~~~~~~~~~~
+> 
+> Signed-off-by: Sebastian Ott <sebott@redhat.com>
+> ---
+>  arch/arm64/kvm/handle_exit.c     | 5 +++++
+>  arch/arm64/kvm/hyp/nvhe/switch.c | 6 ++----
+>  arch/arm64/kvm/hyp/vhe/switch.c  | 3 +--
+>  arch/arm64/kvm/sys_regs.c        | 5 +++++
+>  4 files changed, 13 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> index d7c2990e7c9e..2c049746657c 100644
+> --- a/arch/arm64/kvm/handle_exit.c
+> +++ b/arch/arm64/kvm/handle_exit.c
+> @@ -291,6 +291,9 @@ static int handle_svc(struct kvm_vcpu *vcpu)
+>  	return 1;
+>  }
+>  
+> +__diag_push();
+> +__diag_ignore_all("-Woverride-init", "Allow field overrides in exit_handlers");
 
---TOTkxYnYS4823nOn
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+The wording you are looking for is "Silence stupid warning". I really
+mean it. There is really nothing wrong with this code, and if the
+compiler doesn't understand the purpose of a default initialiser, then
+*maybe* it should be fixed rather than polluting the kernel with this
+stuff.
 
-On Tue, Jul 09, 2024 at 10:06:06AM +0100, Marc Zyngier wrote:
+> +
+>  static exit_handle_fn arm_exit_handlers[] = {
+>  	[0 ... ESR_ELx_EC_MAX]	= kvm_handle_unknown_ec,
+>  	[ESR_ELx_EC_WFx]	= kvm_handle_wfx,
+> @@ -319,6 +322,8 @@ static exit_handle_fn arm_exit_handlers[] = {
+>  	[ESR_ELx_EC_PAC]	= kvm_handle_ptrauth,
+>  };
+>  
+> +__diag_pop();
+> +
+>  static exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu)
+>  {
+>  	u64 esr = kvm_vcpu_get_esr(vcpu);
+> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+> index 6af179c6356d..bf49afc01542 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+> @@ -200,8 +200,7 @@ static void kvm_hyp_save_fpsimd_host(struct kvm_vcpu *vcpu)
+>  	}
+>  }
+>  
+> -static const exit_handler_fn hyp_exit_handlers[] = {
+> -	[0 ... ESR_ELx_EC_MAX]		= NULL,
+> +static const exit_handler_fn hyp_exit_handlers[ESR_ELx_EC_MAX + 1] = {
 
-> So after cherry-picking my own fixes and realising that I had left
-> pKVM in the lurch, this is what I have added to this patch, which
-> hopefully does the right thing.
+Is this really any better? I don't think so. It makes the intent
+disappear instead of making it explicit. Intent matters *a lot*.
 
-My IT issues were resolved so I've kicked the tires on this and it all
-seems to be working, I'll go through again a bit more thorougly when you
-repost but I'd be surprised if there were any issues.
+	M.
 
---TOTkxYnYS4823nOn
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmaRS4cACgkQJNaLcl1U
-h9DYRgf+KKKLA3PHDOPfYARs15+wmAVWgJL+DfyLCVa+yQdgioDPlUCdCfLyLg59
-6tw3G9WFA0zKdWbDq3qI6jo/a1SP9Zs60xCunIFHIDacZlg+fuy0qEz7ufNRoyRc
-LtXaIhRgO7zT9+jTkKysLP31PFjYVmmZqR2cHxvta7m4n/QEi/b64qSfjrWEns5n
-SJmYlvzEPPKVSjVoSQ3oOEX2Se0vQo60WD9gXklrwlSRG7mvoF8STwKsES3wMdDR
-MjDbRIsTmOsO1qaWtN6ppdtKVmPBFvW7eoP6W526u9T6cDswz7rwSfR3wq1t++kh
-3j5p4AjIBaDtoX7FVqiNiY3941LqfQ==
-=V2Eu
------END PGP SIGNATURE-----
-
---TOTkxYnYS4823nOn--
+-- 
+Without deviation from the norm, progress is not possible.
