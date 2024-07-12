@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53A4613D882
-	for <kvmarm@lists.linux.dev>; Fri, 12 Jul 2024 07:06:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7183227702
+	for <kvmarm@lists.linux.dev>; Fri, 12 Jul 2024 08:32:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720768000; cv=none; b=KsnfwQcdiSUXSUkJtIcBRSEpvXwkE7MzelzmVfr3SiZguMohbpkEHUgWIm5OOThjHi1LwTXWz2varTawYQYr7zUQ4SgF5epJ4T9lPYubeUpBVGrgTBbqog4lE6QIf1irwO6MrBjX9SAV/dZHzqRE3TZfksVLDdRxKxdI1VlsTkk=
+	t=1720773139; cv=none; b=owthq+Zp6gHaYDgDpAUW4Bl4XYbT6/fiaUI5euU9jqEeNdZFJ5t872uAxiXy1/R5YxuMffqSG29auSelKCzoRSgS4nYEAM4Jjpg79QZLNe5/LpmfFgpvsPsDryYUJTAa4pcs531F4wOAJyPfA+ds4Ya/KVgqpYPz+wb7wHCXZYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720768000; c=relaxed/simple;
-	bh=cbQ/K9djjTwY3qgVFPWEXaW7CSFSQKqggIw+V+y5YLE=;
+	s=arc-20240116; t=1720773139; c=relaxed/simple;
+	bh=8/xHC05DGQhKEy1hFf/44u7o5nCu4eJYz+7BZesPMWo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uOteM27O+NNYXZyL2IkgX9tgkcEDPjZ+aS5YNDlnAcQm57Ra3lzn0qV9dF87/Nff7V1qNAyCU6rEW+cwEm+1nRpXKx9eJhWYuWafRnEdSjzneecpdSivpX0FVt2zStn3VzTmm4CCEoqakAidTOfFelv+YU1POmnQ2sGijGbRo6k=
+	 In-Reply-To:Content-Type; b=EZg56bzwQy2mhhWpD1By3XJd/1S4jcrG2a2QF3KmdMGVXa6DL6IggQXdvBuFkMpzoyG8Sv8RM4QkmDvEQMrb9agnR7e9HQiqsYakDlWTgJD/7VjE3m1KwuhZkwykA3Dafx+ar8EtBDassag/apWjf4eDSdeSHdJbJclLgcfqZsg=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AE0461007;
-	Fri, 12 Jul 2024 00:07:02 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EA7D81007;
+	Fri, 12 Jul 2024 01:32:42 -0700 (PDT)
 Received: from [10.162.16.42] (a077893.blr.arm.com [10.162.16.42])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CBED73F762;
-	Fri, 12 Jul 2024 00:06:34 -0700 (PDT)
-Message-ID: <b9b8775f-8dc1-4a9d-a884-7103f18d68f1@arm.com>
-Date: Fri, 12 Jul 2024 12:36:31 +0530
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F021B3F762;
+	Fri, 12 Jul 2024 01:32:14 -0700 (PDT)
+Message-ID: <3fc8eccd-21a7-40d8-9851-24941c8414da@arm.com>
+Date: Fri, 12 Jul 2024 14:02:12 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,7 +27,7 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 02/12] arm64: Add PAR_EL1 field description
+Subject: Re: [PATCH 01/12] arm64: Add missing APTable and TCR_ELx.HPD masks
 To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
  linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 Cc: James Morse <james.morse@arm.com>,
@@ -35,69 +35,71 @@ Cc: James Morse <james.morse@arm.com>,
  Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
  Joey Gouly <joey.gouly@arm.com>
 References: <20240625133508.259829-1-maz@kernel.org>
- <20240625133508.259829-3-maz@kernel.org>
+ <20240625133508.259829-2-maz@kernel.org>
 Content-Language: en-US
 From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <20240625133508.259829-3-maz@kernel.org>
+In-Reply-To: <20240625133508.259829-2-maz@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 
 
 On 6/25/24 19:05, Marc Zyngier wrote:
-> As KVM is about to grow a full emulation for the AT instructions,
-> add the layout of the PAR_EL1 register in its non-D128 configuration.
-
-Right, there are two variants for PAR_EL1 i.e D128 and non-D128. Probably it makes
-sense to define all these PAR_EL1 fields in arch/arm64/include/asm/sysreg.h, until
-arch/arm64/tools/sysreg evolves to accommodate different bit field layouts for the
-same register.
-
+> Although Linux doesn't make use of hierarchical permissions (TFFT!),
+> KVM needs to know where the various bits related to this feature
+> live in the TCR_ELx registers as well as in the page tables.
 > 
-> Note that the constants are a bit ugly, as the register has two
-> layouts, based on the state of the F bit.
-
-Just wondering if it would be better to append 'VALID/INVALID' suffix
-for the fields to differentiate between when F = 0 and when F = 1 ?
-
-s/SYS_PAR_EL1_FST/SYS_PAR_INVALID_FST_EL1
-s/SYS_PAR_EL1_SH/SYS_PAR_VALID_SH_EL1
-
-Or something similar.
-
+> Add the missing bits.
 > 
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  arch/arm64/include/asm/sysreg.h | 18 ++++++++++++++++++
->  1 file changed, 18 insertions(+)
+>  arch/arm64/include/asm/kvm_arm.h       | 1 +
+>  arch/arm64/include/asm/pgtable-hwdef.h | 7 +++++++
+>  2 files changed, 8 insertions(+)
 > 
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index be41528194569..15c073359c9e9 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -325,7 +325,25 @@
->  #define SYS_PAR_EL1			sys_reg(3, 0, 7, 4, 0)
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index b2adc2c6c82a5..c93ee1036cb09 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -108,6 +108,7 @@
+>  /* TCR_EL2 Registers bits */
+>  #define TCR_EL2_DS		(1UL << 32)
+>  #define TCR_EL2_RES1		((1U << 31) | (1 << 23))
+> +#define TCR_EL2_HPD		(1 << 24)
+>  #define TCR_EL2_TBI		(1 << 20)
+>  #define TCR_EL2_PS_SHIFT	16
+>  #define TCR_EL2_PS_MASK		(7 << TCR_EL2_PS_SHIFT)
+> diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
+> index 9943ff0af4c96..f75c9a7e6bd68 100644
+> --- a/arch/arm64/include/asm/pgtable-hwdef.h
+> +++ b/arch/arm64/include/asm/pgtable-hwdef.h
+> @@ -146,6 +146,7 @@
+>  #define PMD_SECT_UXN		(_AT(pmdval_t, 1) << 54)
+>  #define PMD_TABLE_PXN		(_AT(pmdval_t, 1) << 59)
+>  #define PMD_TABLE_UXN		(_AT(pmdval_t, 1) << 60)
+> +#define PMD_TABLE_AP		(_AT(pmdval_t, 3) << 61)
+
+APTable bits are also present in all table descriptors at each non-L3
+level. Should not corresponding corresponding macros i.e PUD_TABLE_AP,
+P4D_TABLE_AP, and PGD_TABLE_AP be added as well ?
+
 >  
->  #define SYS_PAR_EL1_F			BIT(0)
-> +/* When PAR_EL1.F == 1 */
->  #define SYS_PAR_EL1_FST			GENMASK(6, 1)
-> +#define SYS_PAR_EL1_PTW			BIT(8)
-> +#define SYS_PAR_EL1_S			BIT(9)
-> +#define SYS_PAR_EL1_AssuredOnly		BIT(12)
-> +#define SYS_PAR_EL1_TopLevel		BIT(13)
-> +#define SYS_PAR_EL1_Overlay		BIT(14)
-> +#define SYS_PAR_EL1_DirtyBit		BIT(15)
-> +#define SYS_PAR_EL1_F1_IMPDEF		GENMASK_ULL(63, 48)
-> +#define SYS_PAR_EL1_F1_RES0		(BIT(7) | BIT(10) | GENMASK_ULL(47, 16))
-> +#define SYS_PAR_EL1_RES1		BIT(11)
-> +/* When PAR_EL1.F == 0 */
-> +#define SYS_PAR_EL1_SH			GENMASK_ULL(8, 7)
-> +#define SYS_PAR_EL1_NS			BIT(9)
-> +#define SYS_PAR_EL1_F0_IMPDEF		BIT(10)
-> +#define SYS_PAR_EL1_NSE			BIT(11)
-> +#define SYS_PAR_EL1_PA			GENMASK_ULL(51, 12)
-> +#define SYS_PAR_EL1_ATTR		GENMASK_ULL(63, 56)
-> +#define SYS_PAR_EL1_F0_RES0		(GENMASK_ULL(6, 1) | GENMASK_ULL(55, 52))
+>  /*
+>   * AttrIndx[2:0] encoding (mapping attributes defined in the MAIR* registers).
+> @@ -307,6 +308,12 @@
+>  #define TCR_TCMA1		(UL(1) << 58)
+>  #define TCR_DS			(UL(1) << 59)
 >  
->  /*** Statistical Profiling Extension ***/
->  #define PMSEVFR_EL1_RES0_IMP	\
+> +#define TCR_HPD0_SHIFT		41
+> +#define TCR_HPD0		BIT(TCR_HPD0_SHIFT)
+> +
+> +#define TCR_HPD1_SHIFT		42
+> +#define TCR_HPD1		BIT(TCR_HPD1_SHIFT)
+
+Should not these new register fields follow the current ascending bit
+order in the listing i.e get added after TCR_HD (bit 40).
+
+> +
+>  /*
+>   * TTBR.
+>   */
