@@ -1,54 +1,54 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 452F845024;
-	Fri, 12 Jul 2024 21:55:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B23891BDD3;
+	Sat, 13 Jul 2024 07:56:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720821320; cv=none; b=Q0aPdff0Pk3u/h8xDM0k4xHz7fFds6YdHPC+92G7Y5f4qCQ5up1SzXgt9BhKTUINZywLkoXdw4gh1WfgKX4a0ZeJoWyUGN55GQqOHSfyCXh4F9x3AgBvJ+VqPN8UVmxLurwWSlpOf0HCdFzgsrKXEHa1hxHlO+RXFmZNajkg5rU=
+	t=1720857406; cv=none; b=I0DLnf12xzE2p4mxZj/XX6vMwNigf8xWjtK9pzkm3ciiZRYsD+svqYw/dzUpAGgnUwfBRLhsF7U2dopVD6o7plMmKReRugYjOno30W6rtPzURdD/X8vzIycOcE91kgPqr/9ietEHBnJzNbEPHxDN9TMxI85iyOV65vL/Px60CTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720821320; c=relaxed/simple;
-	bh=hHPoaV7UEU4AsfewMnxxIEnFJZjwwHobfKZXCH2J90Y=;
+	s=arc-20240116; t=1720857406; c=relaxed/simple;
+	bh=A/PyRr7IsD9YlgrQVbFDHE8HJAaoidtlMiLz27gfT3w=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=spehhIeZbZ6FVcQQkxxpCGg+L4/MWV1ZvO2EXtqwHyY3F1VAG/7cdMRIuYODzQ1aYHiqLGSDUqKvkjEMt9Qe4U1A/e8DZsjnF/94zbncGeW4Juq3Lx9o3AbYE3Y7mDgBY6VOAVKatLyvBKqL4hyuohWICpCxWs3Bp9dYD74Am9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jhQvDJIe; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=k07ayLjZtfNFiiqXpw8OvN1DYExvnLTqdCxqJtqCBbNKKIM0XORU+mV9kThu3p6qYgo1C6CQbWovKDVrtKEwSsOO00fmIQqOLWZdmGztTMZZySo4GGDz/9YU8Yq0S+ImZWOQIKu4bN0MwB1RRjILIVTbJwMjdwVY3WN7YCjCNXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TE8BzzH9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jhQvDJIe"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA5F3C32782;
-	Fri, 12 Jul 2024 21:55:19 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TE8BzzH9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC5F4C32781;
+	Sat, 13 Jul 2024 07:56:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720821319;
-	bh=hHPoaV7UEU4AsfewMnxxIEnFJZjwwHobfKZXCH2J90Y=;
+	s=k20201202; t=1720857405;
+	bh=A/PyRr7IsD9YlgrQVbFDHE8HJAaoidtlMiLz27gfT3w=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jhQvDJIeW17sOq8mFwHrZgi+NRfn6Qrp/j75Sy5u5OT51wzAz1XZCKd/Y1KnhUCZ4
-	 mlIYlGw/DT3tBwd32oBBkLvk4D2ZlLagxnP9jbR1VRObmt+I3cdnZ631F+65Qp6XOX
-	 9GeSIuzJfNsKktf3f2PNHuWY1jzMro78JYKM9xaSgLCSLgrSSrDH+16xOraQu3p/nA
-	 yLJTwymEjTHOAMsrdWJamaK+Z2LPeh5JnSFMAv01xo+6crjCRB4zfu2N7fgQFTBkam
-	 RFnZkWigE6E7NGDF15y0Gtpa86RNp66oZK0Q6TGhMxC6uZ8hDj7AXvifSiA1Fy47cV
-	 62a6eczgs+CdA==
+	b=TE8BzzH98yOf23UKI3yK1WsDIDrepjSUtLADIviQpm0eZkaddnr26ZEgHtyQsX/Cu
+	 9SRCDkeLtCs0Vp8kKnkI+bYhL07mdbI9jHIl65AwoVomnO95Bm5wKECZbhTgiG05uM
+	 L5ZqSGYiXGY/CWzf4BfrIFUvOQi8fKPCU10nZm6WTY4H+If7QW5M9Nl9T81dnbmlFi
+	 WQnaWJ/gq+XWKL9H6+84hVjS/pxGBRatOzvgr3x/gGl4dvodcN1jtVVo7ZuKIS/4gk
+	 QaB2Bp2AZMET0LC/hM85idH28uSHFGYS2zQDM+e7DjSmUxmM6rOkA1NTtepbuOXAFG
+	 yzn/DIX/UCieg==
 Received: from [213.208.208.122] (helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sSOEX-00Byls-FJ;
-	Fri, 12 Jul 2024 22:55:17 +0100
-Date: Fri, 12 Jul 2024 22:55:16 +0100
-Message-ID: <8734oep96j.wl-maz@kernel.org>
+	id 1sSXcZ-00C3go-AU;
+	Sat, 13 Jul 2024 08:56:43 +0100
+Date: Sat, 13 Jul 2024 08:56:42 +0100
+Message-ID: <871q3xpvwl.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Sebastian Ott <sebott@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Oliver Upton <oliver.upton@linux.dev>,
+To: Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 1/3] KVM: arm64: fix override-init warnings in W=1 builds
-In-Reply-To: <20240712110332.10970-2-sebott@redhat.com>
-References: <20240712110332.10970-1-sebott@redhat.com>
-	<20240712110332.10970-2-sebott@redhat.com>
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Joey Gouly <joey.gouly@arm.com>
+Subject: Re: [PATCH 02/12] arm64: Add PAR_EL1 field description
+In-Reply-To: <b9b8775f-8dc1-4a9d-a884-7103f18d68f1@arm.com>
+References: <20240625133508.259829-1-maz@kernel.org>
+	<20240625133508.259829-3-maz@kernel.org>
+	<b9b8775f-8dc1-4a9d-a884-7103f18d68f1@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -60,74 +60,66 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 213.208.208.122
-X-SA-Exim-Rcpt-To: sebott@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, yuzenghui@huawei.com
+X-SA-Exim-Rcpt-To: anshuman.khandual@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 12 Jul 2024 12:03:30 +0100,
-Sebastian Ott <sebott@redhat.com> wrote:
+On Fri, 12 Jul 2024 08:06:31 +0100,
+Anshuman Khandual <anshuman.khandual@arm.com> wrote:
 > 
-> Remove double initializations in cases where that's easily possible
-> - like extra NULL initialization in static global structures. In the
-> other cases just silence -Woverride-init.
 > 
-> To fix warnings like the following:
-> arch/arm64/kvm/hyp/vhe/switch.c:271:43: warning: initialized field overwritten [-Woverride-init]
->   271 |         [ESR_ELx_EC_CP15_32]            = kvm_hyp_handle_cp15_32,
->       |                                           ^~~~~~~~~~~~~~~~~~~~~~
 > 
-> Signed-off-by: Sebastian Ott <sebott@redhat.com>
-> ---
->  arch/arm64/kvm/handle_exit.c     | 5 +++++
->  arch/arm64/kvm/hyp/nvhe/switch.c | 6 ++----
->  arch/arm64/kvm/hyp/vhe/switch.c  | 3 +--
->  arch/arm64/kvm/sys_regs.c        | 5 +++++
->  4 files changed, 13 insertions(+), 6 deletions(-)
+> On 6/25/24 19:05, Marc Zyngier wrote:
+> > As KVM is about to grow a full emulation for the AT instructions,
+> > add the layout of the PAR_EL1 register in its non-D128 configuration.
 > 
-> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> index d7c2990e7c9e..2c049746657c 100644
-> --- a/arch/arm64/kvm/handle_exit.c
-> +++ b/arch/arm64/kvm/handle_exit.c
-> @@ -291,6 +291,9 @@ static int handle_svc(struct kvm_vcpu *vcpu)
->  	return 1;
->  }
->  
-> +__diag_push();
-> +__diag_ignore_all("-Woverride-init", "Allow field overrides in exit_handlers");
+> Right, there are two variants for PAR_EL1 i.e D128 and non-D128. Probably it makes
+> sense to define all these PAR_EL1 fields in arch/arm64/include/asm/sysreg.h, until
+> arch/arm64/tools/sysreg evolves to accommodate different bit field layouts for the
+> same register.
 
-The wording you are looking for is "Silence stupid warning". I really
-mean it. There is really nothing wrong with this code, and if the
-compiler doesn't understand the purpose of a default initialiser, then
-*maybe* it should be fixed rather than polluting the kernel with this
-stuff.
+This is really sorely needed, because we can't describe any of the
+registers that changes layout depending on another control bit. Take
+for example any of the EL2 registers affected by HCR_EL2.E2H.
 
-> +
->  static exit_handle_fn arm_exit_handlers[] = {
->  	[0 ... ESR_ELx_EC_MAX]	= kvm_handle_unknown_ec,
->  	[ESR_ELx_EC_WFx]	= kvm_handle_wfx,
-> @@ -319,6 +322,8 @@ static exit_handle_fn arm_exit_handlers[] = {
->  	[ESR_ELx_EC_PAC]	= kvm_handle_ptrauth,
->  };
->  
-> +__diag_pop();
-> +
->  static exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu)
->  {
->  	u64 esr = kvm_vcpu_get_esr(vcpu);
-> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-> index 6af179c6356d..bf49afc01542 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-> @@ -200,8 +200,7 @@ static void kvm_hyp_save_fpsimd_host(struct kvm_vcpu *vcpu)
->  	}
->  }
->  
-> -static const exit_handler_fn hyp_exit_handlers[] = {
-> -	[0 ... ESR_ELx_EC_MAX]		= NULL,
-> +static const exit_handler_fn hyp_exit_handlers[ESR_ELx_EC_MAX + 1] = {
+However, I have no interest in defining *any* D128 format. I take it
+that whoever will eventually add D128 support to the kernel (and KVM)
+will take care of that.
 
-Is this really any better? I don't think so. It makes the intent
-disappear instead of making it explicit. Intent matters *a lot*.
+> 
+> > 
+> > Note that the constants are a bit ugly, as the register has two
+> > layouts, based on the state of the F bit.
+> 
+> Just wondering if it would be better to append 'VALID/INVALID' suffix
+> for the fields to differentiate between when F = 0 and when F = 1 ?
+> 
+> s/SYS_PAR_EL1_FST/SYS_PAR_INVALID_FST_EL1
+> s/SYS_PAR_EL1_SH/SYS_PAR_VALID_SH_EL1
+> 
+> Or something similar.
+
+I find it pretty horrible.
+
+If anything, because "VALID/INVALID" doesn't say anything of *what* is
+invalid. Also, there is no "VALID" definition in the register, and an
+aborted translation does not make the register invalid, quite the
+opposite -- it is full of crucial information.
+
+Which is why I used the F0/F1 prefixes, making it clear (at least in
+my view) that the description is tied to a particular value of the
+PAR_EL1.F bit.
+
+Finally, most of the bit layouts are unambiguous: a field of any given
+name only exists in a given layout of the register. This means we can
+safely have names that match the ARM ARM description without any
+visual pollution.
+
+The only ambiguities are with generic names such as RES0 and IMPDEF.
+Given that we almost never use these bits for anything, I don't think
+the use of a F-specific prefix is a problem.
+
+But yeah, naming is hard.
 
 	M.
 
