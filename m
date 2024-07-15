@@ -1,104 +1,110 @@
-Received: from mail-ot1-f54.google.com (mail-ot1-f54.google.com [209.85.210.54])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BB0826AF5
-	for <kvmarm@lists.linux.dev>; Mon, 15 Jul 2024 21:37:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FF1013CFAD
+	for <kvmarm@lists.linux.dev>; Mon, 15 Jul 2024 23:15:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721079480; cv=none; b=ESs+WjlvN0D5ZMUGJCVFF/FUQTjiEYDtAgkX2FHVnS1TXrxVJjpJdapFkZpEo2pCX7XJ6ifEaNM4ZWZZ41u6vsOo1ZlZkDExuOrKxxbEUji4EjLm7mLXUcdGuxkAStAf0qlLMY3epvZdG7udVsdOPu4UEP1+4aKVDMSJJTcOS08=
+	t=1721085346; cv=none; b=j/TsOyTxvTPpMz/Iq4+WOzPtjSZ5OkfytU1VmGvoGJiAUVqSjDnkgxqS7cyT+FRYVUz49F8GqssDYXeFO4z4lxMZ95vUG7BtY1F4tfIf7+CWLcOjNEIlLSvVHsffFzWewpHybrQy9AeiQl9pfKo+O6Pn3B0P8+Emv+XBFT5GbD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721079480; c=relaxed/simple;
-	bh=XdO7wIyX46Gc6A4zpOoYKHrIE5C8ZCiQW+adQqLkIOM=;
+	s=arc-20240116; t=1721085346; c=relaxed/simple;
+	bh=Q98GzkXhuy8Mqk8ABLLqoDEDauT65uD8JlHGR1iepyI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IfSlyGj2KuZmnzKny1jrKF61AH7tI/oZrFHPN3WAzwZWZ/JMRInCS9QH4Uw4i12CZIu8L8xh8gORUIMU0axkkSx2mb3+xYFiiI+zUe+LJFSwAvf7SNNsqvzl1Msc1iGYXNUttbjKsrRu38O6YQYxuu6z9sRgfoENnFW8y5h4OWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hURHwXxp; arc=none smtp.client-ip=209.85.210.54
+	 To:Cc:Content-Type; b=PV1mx/LbQ4RC4ewR027N1B1xfBwheqbTUJoXwHrC/GobCSiKTvc94RzEhtflVkaQXSfK8iZfZUVYCKu//HoWY0akeSixm9SdPl1nrTFH4mg3neTJ7yPhHmlphKOqQ/3yz7vlUvW3LX5bO/YqiEZDtaaWONbbgFRWxMHdxmdBzLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sXeBAqmS; arc=none smtp.client-ip=209.85.214.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hURHwXxp"
-Received: by mail-ot1-f54.google.com with SMTP id 46e09a7af769-708adad61f8so2573250a34.1
-        for <kvmarm@lists.linux.dev>; Mon, 15 Jul 2024 14:37:59 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sXeBAqmS"
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1fb2936c4ccso88075ad.0
+        for <kvmarm@lists.linux.dev>; Mon, 15 Jul 2024 16:15:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1721079478; x=1721684278; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1721085344; x=1721690144; darn=lists.linux.dev;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=tYT7RZte+jpSY6YDB1OuEYOLCT1GQosdmk1JeVvIqQo=;
-        b=hURHwXxp48JwVT+XcMmVHTCfJSNdKNcEP8bIgtGktEjFDeW44FxyVv6hNJ+gTfuaNN
-         tOau/k5XSWk7Z/XPz1AmzZXHauQIzQprsvwmhPThZPRL1w/urqwoRr//CjUTA65gDBYI
-         3srt1CZXjVjv7IVvPBk6p5EYDXkBPFpZBOdIBx2JcmKMfHpWIs8r6CIy2k3CUXOl2N4t
-         D7lyNSsTXrR0kyRBuUMZKdze1trQ91a3z0ajsmI8w+LG+YgjTNceOeH62Kdu4UH71UVW
-         sxwimlg37ogNS6Podaglj81RLXRCvFETMCtyPdExhF5LnINUZ9i5OO+Ar2QIzeOMDieg
-         1bzQ==
+        bh=exEH9iPNcIg3KpVyQ+q3mCt+4C/Fcr8/ESkE/4SO1o8=;
+        b=sXeBAqmSNfE2JtmoKtzIyxhFwu2dZaFr5IMfzNAokhKi7zMyBL3umc+1VYxZfxzmuW
+         mzQUZTpWlv0dnharUCZLY5waKQZvPauh6jyAMohvyq3hcs6Vk17djrlBeAwu1K3UAVCy
+         JNzRjPi92jsvX1MzdIJr7htAv96xbZLKQ/REEqVxdhk6TGGM7vTjMqqr24Kz77f/SYyN
+         TsuJKvigSgY4m6Um+nbPfq/7lkNwO+jShXesa8/Ifl5v3bBUrQTZBzk4wEF7mF1eSdMx
+         tCKz/wNJpZMMW6E6fH8URu1NNSmOzZLx69Gnkr1nG6j95ECrnHEn92RQproK6qMHVmhh
+         d8iw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721079478; x=1721684278;
+        d=1e100.net; s=20230601; t=1721085344; x=1721690144;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=tYT7RZte+jpSY6YDB1OuEYOLCT1GQosdmk1JeVvIqQo=;
-        b=Y09taCr2c/9dkOL1fW69QJ0rBDZeuHzby8MqXAI+ejybmrt4mzyUe98o8cKwxcmfuA
-         KXa0g4rKUqkg7YxtwSXvowH8PxXymMen8th4EKnXn/zD7bM19CtCFYsUQY5DL33s7EhF
-         eCpJ4sfKPof8WICYIfNDx+4FErj0c3VxZ4b7zqNhfcGcStWeuThUEPAHZrih1UaHLuMh
-         oW6bL0A9QIUm4B9kaMDoFUOztnqK+4X/W8mE0bZtUSIJbortJiUjwDZeUYmjPz8vPdm7
-         9q3hWGSXNwb/aUUa5q+PFNm0xm7Ze6sw25/DuWDyIRb4qgTa7kwfX/5/oM9dh3bWLfVm
-         B46w==
-X-Forwarded-Encrypted: i=1; AJvYcCUxbEqE0V4E9RJL6HAp98u/GZERDH/oKz840RKIDlN9N0V8QM6dZn17Vsdxm79mwAPNQKM/dz7jeD1ZBZAYa8PY7a+Aj6uF
-X-Gm-Message-State: AOJu0YxYP9zC4oBsd70wl7hbK17xuKSQSGh/FNxUNbKm0d7JJZUUZ2bm
-	3HzyPAVNEVRYX4pPw1URr7lfdud/xGMsPxYq1KYMKngJOR7oscwAdd+x+vBpjOXftj1veNQreTs
-	ZV3COOUn6DfQKgijixHwm4xp5wRc9aXpDuKrI
-X-Google-Smtp-Source: AGHT+IFo5Jg9Iet8BbL/iNTVTBM9bSolkTbUgSvwA/5qBUXi+M06ocwSdrUcSEL7avW0kur1t8VRn6Y+Ut7Wj828r/M=
-X-Received: by 2002:a05:6870:390a:b0:25e:bdf7:2883 with SMTP id
- 586e51a60fabf-260bde68931mr39462fac.25.1721079478153; Mon, 15 Jul 2024
- 14:37:58 -0700 (PDT)
+        bh=exEH9iPNcIg3KpVyQ+q3mCt+4C/Fcr8/ESkE/4SO1o8=;
+        b=UcbPyDA69FUamjeXLcsIwys0CvA8LTYXr4t12DHrfzlmbocmERiSzuijuFaPZL+27I
+         S7ZIpVmkF547bNIVyn414L/gQM+MzanDR+Jf0AUeOqeDxbGrINuzSQXu2ptjYFf7ikDO
+         ydszKOVhOgDQZt19ORQcT/wBD7KOFRMz3iUl341xfkT8Mv7FJb5s/wsOwKDNIpXJoWsO
+         PlSHdRxesyFvCA/iW4sFEw4L9xKu/7hTofAE8Jc9Y1skfSeNusXB+g+avegMyy7MORJZ
+         yahgMJzM4GcSS10zNKpTrq6WI/kG6mqXEDbey0THs9RASm8zJbZ62KdtI1YqWgfXIIZc
+         m+qg==
+X-Forwarded-Encrypted: i=1; AJvYcCVNWZrnm6kAmc7yS/2RZq8jy5KHV6wWdaWfZy6N9A2xKWxJUQKbzrjxm9QcVBIS04XQ9x4HctYvD9041n6cP+aQES8mU8gt
+X-Gm-Message-State: AOJu0Yyia0Etd+JgHbmHdeAnvjFqaVI/TZI3apa1XF2Vk5NPzS/76ZeM
+	Zlxk7sDfXYlj+Assp1SxBrp4y5y8HczzmESjhwCGsKyblRtKhtMAVRl/Zmiazk4t4UR/+8xJmjN
+	RT8XvA8xegPUw4gFkjDA4kRlqn/XvelW7v79r
+X-Google-Smtp-Source: AGHT+IF37bptgINSCLE9dDjInkdJLhm19J5sk44W8p8j4cV76p1iCJXBcZEjJTiahXiPn4ncuCw2O5xLUjXDk1VNB9o=
+X-Received: by 2002:a17:902:f688:b0:1fb:2924:5c7e with SMTP id
+ d9443c01a7336-1fc3d7698a7mr591975ad.11.1721085344002; Mon, 15 Jul 2024
+ 16:15:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20240710234222.2333120-1-jthoughton@google.com> <20240710234222.2333120-3-jthoughton@google.com>
-In-Reply-To: <20240710234222.2333120-3-jthoughton@google.com>
-From: Anish Moorthy <amoorthy@google.com>
-Date: Mon, 15 Jul 2024 14:37:22 -0700
-Message-ID: <CAF7b7moeOeJEv+zPQ-VQrP8M+O7r8Ru3GZjfrAKj25Hc0pQGnw@mail.gmail.com>
-Subject: Re: [RFC PATCH 02/18] KVM: Add KVM_CAP_USERFAULT and KVM_MEMORY_ATTRIBUTE_USERFAULT
-To: James Houghton <jthoughton@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Sean Christopherson <seanjc@google.com>, Shuah Khan <shuah@kernel.org>, Peter Xu <peterx@redhat.org>, 
-	Axel Rasmussen <axelrasmussen@google.com>, David Matlack <dmatlack@google.com>, kvm@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+References: <CADrL8HUW2q79F0FsEjhGW0ujij6+FfCqas5UpQp27Epfjc94Nw@mail.gmail.com>
+ <ZmxsCwu4uP1lGsWz@google.com> <CADrL8HVDZ+m_-jUCaXf_DWJ92N30oqS=_9wNZwRvoSp5fo7asg@mail.gmail.com>
+ <ZmzPoW7K5GIitQ8B@google.com> <CADrL8HW3rZ5xgbyGa+FXk50QQzF4B1=sYL8zhBepj6tg0EiHYA@mail.gmail.com>
+ <ZnCCZ5gQnA3zMQtv@google.com> <CADrL8HW=kCLoWBwoiSOCd8WHFvBdWaguZ2ureo4eFy9D67+owg@mail.gmail.com>
+ <CADrL8HUv6T4baOi=VTFV6ZA=Oyn3dEc6Hp9rXXH0imeYkwUhew@mail.gmail.com>
+ <Zo137P7BFSxAutL2@google.com> <CADrL8HW4PLTeC9Gq3Fd43-idjzOw8mXOzzG_RP1TYVoGp1_g+g@mail.gmail.com>
+ <ZpFGYvCAQWhldWJZ@google.com>
+In-Reply-To: <ZpFGYvCAQWhldWJZ@google.com>
+From: James Houghton <jthoughton@google.com>
+Date: Mon, 15 Jul 2024 16:15:06 -0700
+Message-ID: <CADrL8HXLGj-V0Qd8U3xRXnJeMTKOJqB-TsyLTOo8j0sGo2byBw@mail.gmail.com>
+Subject: Re: [PATCH v5 4/9] mm: Add test_clear_young_fast_only MMU notifier
+To: Sean Christopherson <seanjc@google.com>
+Cc: Yu Zhao <yuzhao@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Ankit Agrawal <ankita@nvidia.com>, 
+	Axel Rasmussen <axelrasmussen@google.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	David Matlack <dmatlack@google.com>, David Rientjes <rientjes@google.com>, 
+	James Morse <james.morse@arm.com>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Raghavendra Rao Ananta <rananta@google.com>, 
+	Ryan Roberts <ryan.roberts@arm.com>, Shaoqin Huang <shahuang@redhat.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Wei Xu <weixugc@google.com>, 
+	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Not to nitpick an RFC, but since the stuff in this patch seems less
-likely to change I think you should avoid using #ifdefs
+On Fri, Jul 12, 2024 at 8:06=E2=80=AFAM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> On Wed, Jul 10, 2024, James Houghton wrote:
+> > 1. Drop the WAS_FAST complexity.
+> > 2. Add a function like mm_has_fast_aging_notifiers(), use that to
+> > determine if we should be doing look-around.
+>
+> I would prefer a flag over a function.  Long-term, if my pseudo-lockless =
+rmap
+> idea pans out, KVM can set the flag during VM creation.  Until then, KVM =
+can set
+> the flag during creation and then toggle it in (un)account_shadowed().  R=
+aces
+> will be possible, but they should be extremely rare and quite benign, all=
+ things
+> considered.
 
-For instance
+So I think you're talking about .has_fast_aging bool on struct
+mmu_notifier, and we would do look-around if that is set, right? So
+we'd need to have something like mm_has_fast_aging_notifiers() to
+check if any of the subscribed mmu notifiers have .has_fast_aging.
 
-On Wed, Jul 10, 2024 at 4:43=E2=80=AFPM James Houghton <jthoughton@google.c=
-om> wrote:
-> +static inline bool kvm_userfault_enabled(struct kvm *kvm)
-> +{
-> +#ifdef CONFIG_KVM_USERFAULT
-> +       return !!rcu_access_pointer(kvm->userfault_ctx);
-> +#else
-> +       return false;
-> +#endif
-> +}
-
-can be
-
-> +static inline bool kvm_userfault_enabled(struct kvm *kvm)
-> +{
-> +    if (IS_ENABLED(CONFIG_KVM_USERFAULT)) {
-> +       return !!rcu_access_pointer(kvm->userfault_ctx);
-> +    } else {
-> +       return false;
-> +   }
-> +}
-
-(however kernel style tells you to write that :), the cap-supported
-check can be moved into kvm_vm_ioctl_enable_userfault(), etc
+We could toggle it in (un)account_shadowed(), but I think I'd need to
+demonstrate some performance win to justify it.
