@@ -1,220 +1,86 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0F991D699
-	for <kvmarm@lists.linux.dev>; Mon, 15 Jul 2024 15:30:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 511A42AF1E;
+	Mon, 15 Jul 2024 20:17:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721057427; cv=none; b=LS+Re9TNmhzHkUfturY715uAbbgsznwXolbPVX7G00adWODQ1nkKRBtgmzL3/SAs61VHHgV5BPI2m3HzVRTfeAeZmWliifI8+47WpJLS2PwqFJHilvwAmoKrLtBG5ctzMcMOcF8mMpFyTdj50YKrZa2PKD/pqHJ9V4qQDxArkAI=
+	t=1721074665; cv=none; b=UAv0XorOHeu0/uVHZmC0iYHeVgv4afkbHi6QNmpLSAMafhzY3BuoKAL79ElJRZOVTcOxndnp3mkf3jb524BpcwA8O4uGq8b3/u+gD7Oz1I9GWb/W+t6da7INbO8da8fkeo7rtGfja9aYspC3h4CzP0zkMqxGyWBF7f81x2IBUEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721057427; c=relaxed/simple;
-	bh=Ua0TixMisYOMP+2/kcGneZ3sAe3B3FbBT/ElZNVEyH4=;
+	s=arc-20240116; t=1721074665; c=relaxed/simple;
+	bh=nV0pV7geh3E0Gng/hveSYWznkIUJ2IUGHcX8dzFXWOY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JMdz0q44JfaOFTE0+FcSUFMFLaGGxRdQWeDt+8/JTO7g7Muu5+A5KVdoUvXrbANL8cuMacz2vImCcslchluZT66jzXD5KHl86X4c7yOnPagFuw2dgKIWPB8CzQ75FqmMdpsV7+PYcAG5ipAyvVKKAle9dKZecvvyAJUtvptrZzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 49991FEC;
-	Mon, 15 Jul 2024 08:30:49 -0700 (PDT)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 89C843F766;
-	Mon, 15 Jul 2024 08:30:22 -0700 (PDT)
-Date: Mon, 15 Jul 2024 16:30:19 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>, Joey Gouly <joey.gouly@arm.com>
-Subject: Re: [PATCH 10/12] KVM: arm64: nv: Add SW walker for AT S1 emulation
-Message-ID: <ZpVAi3dqOOysMMnE@raptor>
-References: <20240625133508.259829-1-maz@kernel.org>
- <20240708165800.1220065-1-maz@kernel.org>
- <Zo+6TYIP3FNssR/b@arm.com>
- <874j8wp1hx.wl-maz@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=s2nhhdy+XIhsICo6mxHxDLpzefesJKDcVWc59dFfR7w9KcGxdaeJ0rKOZZMeAAXkLnneDYqGbaSBO+oZ1Q1GadLxIeZ1HNvkTT68pSNO3zg2UOaq3k6Yxf9CA82FmKhEjqX3DR5CxGcEiJ1PSLLU1G7AMpg2+wSD5QVF7SZwa98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TuGYsfLc; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TuGYsfLc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10193C32782;
+	Mon, 15 Jul 2024 20:16:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721074664;
+	bh=nV0pV7geh3E0Gng/hveSYWznkIUJ2IUGHcX8dzFXWOY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=TuGYsfLcx4GspKL86Eh/mosMZut+5IR33yPnktkxhHSsLtJLwoG7R+PTdsfJaGNGv
+	 EEsBgrMTB/d9+P3pG00k5CpvXUlXXAUp06SkyRUyXzXG5Gg1QfUVaAwFJnEDA81Eve
+	 XCiLvlIQNT3XrJ79nV1CWO/lkeMB4onsXrzbIfzKukWEVI5fcH5gd1lG8G0Sa67wNg
+	 SgOOQzlTIfTSa1WWFAGegf9V1reI0i3t/93fD1W8pVcDHtiv3ZHiQoI5/uSe4cmJY9
+	 NbZlWOo3IIm1W58H9bQP5k72fSzsTKG5TnnyM/uiLPOVNFWGsyHwa2tFqGd8P45cDq
+	 ZBFIDVDbN9n2w==
+Date: Mon, 15 Jul 2024 21:16:44 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
+	aneesh.kumar@kernel.org, aneesh.kumar@linux.ibm.com, bp@alien8.de,
+	catalin.marinas@arm.com, christophe.leroy@csgroup.eu,
+	dave.hansen@linux.intel.com, hpa@zytor.com,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
+	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
+	oliver.upton@linux.dev, shuah@kernel.org, szabolcs.nagy@arm.com,
+	tglx@linutronix.de, will@kernel.org, x86@kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v4 10/29] arm64: enable the Permission Overlay Extension
+ for EL0
+Message-ID: <a867d629-270f-4f34-90a6-4bc346e5c018@sirena.org.uk>
+References: <20240503130147.1154804-1-joey.gouly@arm.com>
+ <20240503130147.1154804-11-joey.gouly@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="Q58zRk7wvnj6jGJn"
+Content-Disposition: inline
+In-Reply-To: <20240503130147.1154804-11-joey.gouly@arm.com>
+X-Cookie: You'll be sorry...
+
+
+--Q58zRk7wvnj6jGJn
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <874j8wp1hx.wl-maz@kernel.org>
 
-Hi Marc,
+On Fri, May 03, 2024 at 02:01:28PM +0100, Joey Gouly wrote:
 
-On Thu, Jul 11, 2024 at 01:16:42PM +0100, Marc Zyngier wrote:
-> On Thu, 11 Jul 2024 11:56:13 +0100,
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> > 
-> > Hi,
-> > 
-> > On Mon, Jul 08, 2024 at 05:57:58PM +0100, Marc Zyngier wrote:
-> > > In order to plug the brokenness of our current AT implementation,
-> > > we need a SW walker that is going to... err.. walk the S1 tables
-> > > and tell us what it finds.
-> > > 
-> > > Of course, it builds on top of our S2 walker, and share similar
-> > > concepts. The beauty of it is that since it uses kvm_read_guest(),
-> > > it is able to bring back pages that have been otherwise evicted.
-> > > 
-> > > This is then plugged in the two AT S1 emulation functions as
-> > > a "slow path" fallback. I'm not sure it is that slow, but hey.
-> > > [..]
-> > >  	switch (op) {
-> > >  	case OP_AT_S1E1RP:
-> > >  	case OP_AT_S1E1WP:
-> > > +		retry_slow = false;
-> > >  		fail = check_at_pan(vcpu, vaddr, &par);
-> > >  		break;
-> > >  	default:
-> > >  		goto nopan;
-> > >  	}
-> > 
-> > For context, this is what check_at_pan() does:
-> > 
-> > static int check_at_pan(struct kvm_vcpu *vcpu, u64 vaddr, u64 *res)
-> > {
-> >         u64 par_e0;
-> >         int error;
-> > 
-> >         /*
-> >          * For PAN-involved AT operations, perform the same translation,
-> >          * using EL0 this time. Twice. Much fun.
-> >          */
-> >         error = __kvm_at(OP_AT_S1E0R, vaddr);
-> >         if (error)
-> >                 return error;
-> > 
-> >         par_e0 = read_sysreg_par();
-> >         if (!(par_e0 & SYS_PAR_EL1_F))
-> >                 goto out;
-> > 
-> >         error = __kvm_at(OP_AT_S1E0W, vaddr);
-> >         if (error)
-> >                 return error;
-> > 
-> >         par_e0 = read_sysreg_par();
-> > out:
-> >         *res = par_e0;
-> >         return 0;
-> > }
-> > 
-> > I'm having a hard time understanding why KVM is doing both AT S1E0R and AT S1E0W
-> > regardless of the type of the access (read/write) in the PAN-aware AT
-> > instruction. Would you mind elaborating on that?
-> 
-> Because that's the very definition of an AT S1E1{W,R}P instruction
-> when PAN is set. If *any* EL0 permission is set, then the translation
-> must equally fail. Just like a load or a store from EL1 would fail if
-> any EL0 permission is set when PSTATE.PAN is set.
-> 
-> Since we cannot check for both permissions at once, we do it twice.
-> It is worth noting that we don't quite handle the PAN3 case correctly
-> (because we can't retrieve the *execution* property using AT). I'll
-> add that to the list of stuff to fix.
-> 
-> > 
-> > > +	if (fail) {
-> > > +		vcpu_write_sys_reg(vcpu, SYS_PAR_EL1_F, PAR_EL1);
-> > > +		goto nopan;
-> > > +	}
-> > > [..]
-> > > +	if (par & SYS_PAR_EL1_F) {
-> > > +		u8 fst = FIELD_GET(SYS_PAR_EL1_FST, par);
-> > > +
-> > > +		/*
-> > > +		 * If we get something other than a permission fault, we
-> > > +		 * need to retry, as we're likely to have missed in the PTs.
-> > > +		 */
-> > > +		if ((fst & ESR_ELx_FSC_TYPE) != ESR_ELx_FSC_PERM)
-> > > +			retry_slow = true;
-> > > +	} else {
-> > > +		/*
-> > > +		 * The EL0 access succeded, but we don't have the full
-> > > +		 * syndrom information to synthetize the failure. Go slow.
-> > > +		 */
-> > > +		retry_slow = true;
-> > > +	}
-> > 
-> > This is what PSTATE.PAN controls:
-> > 
-> > If the Effective value of PSTATE.PAN is 1, then a privileged data access from
-> > any of the following Exception levels to a virtual memory address that is
-> > accessible to data accesses at EL0 generates a stage 1 Permission fault:
-> > 
-> > - A privileged data access from EL1.
-> > - If HCR_EL2.E2H is 1, then a privileged data access from EL2.
-> > 
-> > With that in mind, I am really struggling to understand the logic.
-> 
-> I don't quite see what you don't understand, you'll have to be more
-> precise. Are you worried about the page tables we're looking at, the
-> value of PSTATE.PAN, the permission fault, or something else?
-> 
-> It also doesn't help that you're looking at the patch that contains
-> the integration with the slow-path, which is pretty hard to read (I
-> have a reworked version that's a bit better). You probably want to
-> look at the "fast" path alone.
+> This takes the last bit of HWCAP2, is this fine? What can we do about
+> more features in the future?
 
-I was referring to checking both unprivileged read and write permissions.
+HWCAP3 has already been allocated so we could just start using that.
 
-And you are right, sorry, I managed to get myself terribly confused. For
-completeness sake, this matches AArch64.S1DirectBasePermissions(), where if PAN
-&& (UnprivRead || UnprivWrite) then PrivRead = False and PrivWrite = False. So
-you need to check that both UnprivRead and UnprivWrite are false for the PAN
-variants of AT to succeed.
+--Q58zRk7wvnj6jGJn
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> 
-> > 
-> > If AT S1E0{R,W} (from check_at_pan()) failed, doesn't that mean that the virtual
-> > memory address is not accessible to EL0? Add that to the fact that the AT
-> > S1E1{R,W} (from the beginning of __kvm_at_s1e01()) succeeded, doesn't that mean
-> > that AT S1E1{R,W}P should succeed, and furthermore the PAR_EL1 value should be
-> > the one KVM got from AT S1E1{R,W}?
-> 
-> There are plenty of ways for AT S1E0 to fail when AT S1E1 succeeded:
-> 
-> - no EL0 permission: that's the best case, and the PAR_EL1 obtained
->   from the AT S1E1 is the correct one. That's what we return.
+-----BEGIN PGP SIGNATURE-----
 
-Yes, that is correct, the place where VCPUs PAR_EL1 register is set is far
-enough from this code that I didn't make the connection.
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmaVg6sACgkQJNaLcl1U
+h9AW9Af+JYOKBw8IlU3TJ8USeMzNKhlTsIR9EXmjyh8mC+eUbN+xIrb5A7B4dG6m
+dk6iLPP5/E8GCiVOKSmrN2D8WF4fcCTkl1cwLojd2EkthrMhOX1qgJTkzNosR76D
+aVo2JL7YvyiEpKMaZv74UnaxL9zipPWHMwX8tyakt+3F75Jho3fjo/pkNleV8jxl
+bALzynA7fKtt7p2R57PbLXPhTLG4IxG/8gH2ODuDwMj6o46ng4BmOfZXlgaqOgsT
+RxnODCG0OpXODiw+QlMS/JBrbg21d3Rc3CHVUsz4INNeI0WRL1yv35HFKWdfhuIQ
+v1DA+hOMClSlNNEQ+qWr3JYq7W6eqw==
+=sIpQ
+-----END PGP SIGNATURE-----
 
-> 
-> - The EL0 access failed, but for another reason than a permission
->   fault. This contradicts the EL1 walk, and is a sure sign that
->   someone is playing behind our back. We fail.
-> 
-> - exception from AT S1E0: something went wrong (again the guest
->   playing with the PTs behind our back). We fail as well.
-> 
-> Do you at least agree with these as goals? If you do, what in
-> the implementation does not satisfy these goals? If you don't, what in
-> these goals seem improper to you?
-
-I agree with the goals.
-
-In this patch, if I'm reading the code right (and I'm starting to doubt myself)
-if PAR_EL1.F is set and PAR_EL1 doesn't indicate a permissions fault, then KVM
-falls back to walking the S1 tables:
-
-        if (par & SYS_PAR_EL1_F) {
-                u8 fst = FIELD_GET(SYS_PAR_EL1_FST, par);
-
-                /*
-                 * If we get something other than a permission fault, we
-                 * need to retry, as we're likely to have missed in the PTs.
-                 */
-                if ((fst & ESR_ELx_FSC_TYPE) != ESR_ELx_FSC_PERM)
-                        retry_slow = true;
-	}
-
-I suppose that's because KVM cannot distinguish between two very different
-reasons for AT failing: 1, because of something being wrong with the stage 1
-tables when the AT S1E0* instruction was executed and 2, because of missing
-entries at stage 2, as per the comment. Is that correct?
-
-Thanks,
-Alex
+--Q58zRk7wvnj6jGJn--
