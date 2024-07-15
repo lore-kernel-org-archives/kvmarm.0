@@ -1,86 +1,104 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f54.google.com (mail-ot1-f54.google.com [209.85.210.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 511A42AF1E;
-	Mon, 15 Jul 2024 20:17:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BB0826AF5
+	for <kvmarm@lists.linux.dev>; Mon, 15 Jul 2024 21:37:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721074665; cv=none; b=UAv0XorOHeu0/uVHZmC0iYHeVgv4afkbHi6QNmpLSAMafhzY3BuoKAL79ElJRZOVTcOxndnp3mkf3jb524BpcwA8O4uGq8b3/u+gD7Oz1I9GWb/W+t6da7INbO8da8fkeo7rtGfja9aYspC3h4CzP0zkMqxGyWBF7f81x2IBUEk=
+	t=1721079480; cv=none; b=ESs+WjlvN0D5ZMUGJCVFF/FUQTjiEYDtAgkX2FHVnS1TXrxVJjpJdapFkZpEo2pCX7XJ6ifEaNM4ZWZZ41u6vsOo1ZlZkDExuOrKxxbEUji4EjLm7mLXUcdGuxkAStAf0qlLMY3epvZdG7udVsdOPu4UEP1+4aKVDMSJJTcOS08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721074665; c=relaxed/simple;
-	bh=nV0pV7geh3E0Gng/hveSYWznkIUJ2IUGHcX8dzFXWOY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s2nhhdy+XIhsICo6mxHxDLpzefesJKDcVWc59dFfR7w9KcGxdaeJ0rKOZZMeAAXkLnneDYqGbaSBO+oZ1Q1GadLxIeZ1HNvkTT68pSNO3zg2UOaq3k6Yxf9CA82FmKhEjqX3DR5CxGcEiJ1PSLLU1G7AMpg2+wSD5QVF7SZwa98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TuGYsfLc; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1721079480; c=relaxed/simple;
+	bh=XdO7wIyX46Gc6A4zpOoYKHrIE5C8ZCiQW+adQqLkIOM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IfSlyGj2KuZmnzKny1jrKF61AH7tI/oZrFHPN3WAzwZWZ/JMRInCS9QH4Uw4i12CZIu8L8xh8gORUIMU0axkkSx2mb3+xYFiiI+zUe+LJFSwAvf7SNNsqvzl1Msc1iGYXNUttbjKsrRu38O6YQYxuu6z9sRgfoENnFW8y5h4OWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hURHwXxp; arc=none smtp.client-ip=209.85.210.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TuGYsfLc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10193C32782;
-	Mon, 15 Jul 2024 20:16:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721074664;
-	bh=nV0pV7geh3E0Gng/hveSYWznkIUJ2IUGHcX8dzFXWOY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TuGYsfLcx4GspKL86Eh/mosMZut+5IR33yPnktkxhHSsLtJLwoG7R+PTdsfJaGNGv
-	 EEsBgrMTB/d9+P3pG00k5CpvXUlXXAUp06SkyRUyXzXG5Gg1QfUVaAwFJnEDA81Eve
-	 XCiLvlIQNT3XrJ79nV1CWO/lkeMB4onsXrzbIfzKukWEVI5fcH5gd1lG8G0Sa67wNg
-	 SgOOQzlTIfTSa1WWFAGegf9V1reI0i3t/93fD1W8pVcDHtiv3ZHiQoI5/uSe4cmJY9
-	 NbZlWOo3IIm1W58H9bQP5k72fSzsTKG5TnnyM/uiLPOVNFWGsyHwa2tFqGd8P45cDq
-	 ZBFIDVDbN9n2w==
-Date: Mon, 15 Jul 2024 21:16:44 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
-	aneesh.kumar@kernel.org, aneesh.kumar@linux.ibm.com, bp@alien8.de,
-	catalin.marinas@arm.com, christophe.leroy@csgroup.eu,
-	dave.hansen@linux.intel.com, hpa@zytor.com,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
-	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
-	oliver.upton@linux.dev, shuah@kernel.org, szabolcs.nagy@arm.com,
-	tglx@linutronix.de, will@kernel.org, x86@kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 10/29] arm64: enable the Permission Overlay Extension
- for EL0
-Message-ID: <a867d629-270f-4f34-90a6-4bc346e5c018@sirena.org.uk>
-References: <20240503130147.1154804-1-joey.gouly@arm.com>
- <20240503130147.1154804-11-joey.gouly@arm.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hURHwXxp"
+Received: by mail-ot1-f54.google.com with SMTP id 46e09a7af769-708adad61f8so2573250a34.1
+        for <kvmarm@lists.linux.dev>; Mon, 15 Jul 2024 14:37:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1721079478; x=1721684278; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tYT7RZte+jpSY6YDB1OuEYOLCT1GQosdmk1JeVvIqQo=;
+        b=hURHwXxp48JwVT+XcMmVHTCfJSNdKNcEP8bIgtGktEjFDeW44FxyVv6hNJ+gTfuaNN
+         tOau/k5XSWk7Z/XPz1AmzZXHauQIzQprsvwmhPThZPRL1w/urqwoRr//CjUTA65gDBYI
+         3srt1CZXjVjv7IVvPBk6p5EYDXkBPFpZBOdIBx2JcmKMfHpWIs8r6CIy2k3CUXOl2N4t
+         D7lyNSsTXrR0kyRBuUMZKdze1trQ91a3z0ajsmI8w+LG+YgjTNceOeH62Kdu4UH71UVW
+         sxwimlg37ogNS6Podaglj81RLXRCvFETMCtyPdExhF5LnINUZ9i5OO+Ar2QIzeOMDieg
+         1bzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721079478; x=1721684278;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tYT7RZte+jpSY6YDB1OuEYOLCT1GQosdmk1JeVvIqQo=;
+        b=Y09taCr2c/9dkOL1fW69QJ0rBDZeuHzby8MqXAI+ejybmrt4mzyUe98o8cKwxcmfuA
+         KXa0g4rKUqkg7YxtwSXvowH8PxXymMen8th4EKnXn/zD7bM19CtCFYsUQY5DL33s7EhF
+         eCpJ4sfKPof8WICYIfNDx+4FErj0c3VxZ4b7zqNhfcGcStWeuThUEPAHZrih1UaHLuMh
+         oW6bL0A9QIUm4B9kaMDoFUOztnqK+4X/W8mE0bZtUSIJbortJiUjwDZeUYmjPz8vPdm7
+         9q3hWGSXNwb/aUUa5q+PFNm0xm7Ze6sw25/DuWDyIRb4qgTa7kwfX/5/oM9dh3bWLfVm
+         B46w==
+X-Forwarded-Encrypted: i=1; AJvYcCUxbEqE0V4E9RJL6HAp98u/GZERDH/oKz840RKIDlN9N0V8QM6dZn17Vsdxm79mwAPNQKM/dz7jeD1ZBZAYa8PY7a+Aj6uF
+X-Gm-Message-State: AOJu0YxYP9zC4oBsd70wl7hbK17xuKSQSGh/FNxUNbKm0d7JJZUUZ2bm
+	3HzyPAVNEVRYX4pPw1URr7lfdud/xGMsPxYq1KYMKngJOR7oscwAdd+x+vBpjOXftj1veNQreTs
+	ZV3COOUn6DfQKgijixHwm4xp5wRc9aXpDuKrI
+X-Google-Smtp-Source: AGHT+IFo5Jg9Iet8BbL/iNTVTBM9bSolkTbUgSvwA/5qBUXi+M06ocwSdrUcSEL7avW0kur1t8VRn6Y+Ut7Wj828r/M=
+X-Received: by 2002:a05:6870:390a:b0:25e:bdf7:2883 with SMTP id
+ 586e51a60fabf-260bde68931mr39462fac.25.1721079478153; Mon, 15 Jul 2024
+ 14:37:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="Q58zRk7wvnj6jGJn"
-Content-Disposition: inline
-In-Reply-To: <20240503130147.1154804-11-joey.gouly@arm.com>
-X-Cookie: You'll be sorry...
+References: <20240710234222.2333120-1-jthoughton@google.com> <20240710234222.2333120-3-jthoughton@google.com>
+In-Reply-To: <20240710234222.2333120-3-jthoughton@google.com>
+From: Anish Moorthy <amoorthy@google.com>
+Date: Mon, 15 Jul 2024 14:37:22 -0700
+Message-ID: <CAF7b7moeOeJEv+zPQ-VQrP8M+O7r8Ru3GZjfrAKj25Hc0pQGnw@mail.gmail.com>
+Subject: Re: [RFC PATCH 02/18] KVM: Add KVM_CAP_USERFAULT and KVM_MEMORY_ATTRIBUTE_USERFAULT
+To: James Houghton <jthoughton@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Sean Christopherson <seanjc@google.com>, Shuah Khan <shuah@kernel.org>, Peter Xu <peterx@redhat.org>, 
+	Axel Rasmussen <axelrasmussen@google.com>, David Matlack <dmatlack@google.com>, kvm@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+Not to nitpick an RFC, but since the stuff in this patch seems less
+likely to change I think you should avoid using #ifdefs
 
---Q58zRk7wvnj6jGJn
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+For instance
 
-On Fri, May 03, 2024 at 02:01:28PM +0100, Joey Gouly wrote:
+On Wed, Jul 10, 2024 at 4:43=E2=80=AFPM James Houghton <jthoughton@google.c=
+om> wrote:
+> +static inline bool kvm_userfault_enabled(struct kvm *kvm)
+> +{
+> +#ifdef CONFIG_KVM_USERFAULT
+> +       return !!rcu_access_pointer(kvm->userfault_ctx);
+> +#else
+> +       return false;
+> +#endif
+> +}
 
-> This takes the last bit of HWCAP2, is this fine? What can we do about
-> more features in the future?
+can be
 
-HWCAP3 has already been allocated so we could just start using that.
+> +static inline bool kvm_userfault_enabled(struct kvm *kvm)
+> +{
+> +    if (IS_ENABLED(CONFIG_KVM_USERFAULT)) {
+> +       return !!rcu_access_pointer(kvm->userfault_ctx);
+> +    } else {
+> +       return false;
+> +   }
+> +}
 
---Q58zRk7wvnj6jGJn
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmaVg6sACgkQJNaLcl1U
-h9AW9Af+JYOKBw8IlU3TJ8USeMzNKhlTsIR9EXmjyh8mC+eUbN+xIrb5A7B4dG6m
-dk6iLPP5/E8GCiVOKSmrN2D8WF4fcCTkl1cwLojd2EkthrMhOX1qgJTkzNosR76D
-aVo2JL7YvyiEpKMaZv74UnaxL9zipPWHMwX8tyakt+3F75Jho3fjo/pkNleV8jxl
-bALzynA7fKtt7p2R57PbLXPhTLG4IxG/8gH2ODuDwMj6o46ng4BmOfZXlgaqOgsT
-RxnODCG0OpXODiw+QlMS/JBrbg21d3Rc3CHVUsz4INNeI0WRL1yv35HFKWdfhuIQ
-v1DA+hOMClSlNNEQ+qWr3JYq7W6eqw==
-=sIpQ
------END PGP SIGNATURE-----
-
---Q58zRk7wvnj6jGJn--
+(however kernel style tells you to write that :), the cap-supported
+check can be moved into kvm_vm_ioctl_enable_userfault(), etc
