@@ -1,142 +1,254 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EF8F1FB4;
-	Sat, 13 Jul 2024 08:04:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 529C64C62
+	for <kvmarm@lists.linux.dev>; Mon, 15 Jul 2024 06:57:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720857874; cv=none; b=akn3rQlT+nw0hSwWwoi43u52x+Vvs29wIkmvNzEeaG6zv6yWAo6hgL0vRGiXxh9D2ef/xyF1ochSsPz5vkSBIDykHdsFTxRZ7+orZOK05aXjaR/Ewr+qqrI1p1cfEScSEjat9wPRpjPqgS5BihWtKpCobtQZYMJWExA428LVXkY=
+	t=1721026669; cv=none; b=XnD2VYTM+58mUVcv9t6siX57YnQm8pG6Iz1UhT0yIUKUfcszmylUh8xODCrH/A/VXhBWWdauaGdPQRUdRMLilYr2pBfOAm8XxdPccokHdkqfVax7qRf2oHNGjbo+kAvjCEajIQeLS62my3eGPENgbX/PS5KGmPY5e6u1C7MMpMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720857874; c=relaxed/simple;
-	bh=nE2mhPrr3YyGaYn+mzlgQmFx15z5pUfHCBByh86gxOk=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Mz0TvpnNVHbHUwzo7sC0obA0CKDLxY6KOSaasWBQHvM2B9a5F625KvIhIuYuaALFwOAPeUvooXXjJvEbZZfmC5q4ooV3hERvyb4E7p+W/vbvU9fTmQwWTegkhKf1kU7Ewun1AuRsukozQbhDOwdbXcT+841tLnVFZLX85rOPJLc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OX0Jmdnk; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1721026669; c=relaxed/simple;
+	bh=qyqKKupY9E0y841tj2VpyAitxQfjQX8p7N6ZTPi2nfA=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=YQB5k4S/HzSpqwGUVk/UhyEBM2QyTIVsR53lctsYKGBnn7mCWOmctAcBgNBW8w1RSfRHaUgMKfyDFFWU60MhfDC9eaq92zoXxcCZnDlfjUgHn3Prs31c9NoB5CBHjA5oZDm4TOwfpKLXbchnL/fBp5p7UMQXWOiMJUQNS0hA/tw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VvXVNYYa; arc=none smtp.client-ip=95.215.58.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OX0Jmdnk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DAB3C32781;
-	Sat, 13 Jul 2024 08:04:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720857874;
-	bh=nE2mhPrr3YyGaYn+mzlgQmFx15z5pUfHCBByh86gxOk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OX0JmdnkJFAa+BQKjT0NqWPU5cIoM74Fgg+QN1RahO5zV6AaScHeun3TJiJJQ0gyP
-	 4HLq145Jy6oGUBX3rqnW4SUWX8J5KlU8KKLxVGpWUNvtgvz2EixtVyq2YqrFnbzLgZ
-	 B5Cb+g5sudZyXrHw2NRKN1sr65Im9VWBWO9fOV9OLptz9dr9UxHFtNH6To2bfkI5F4
-	 QLG39dwikya+iJqSFcBkSnLzdgQlGMiy+kUg3dCS9cH4QL8mWiSRT24uYwH6MMGncl
-	 Fdx8OQG3nxWwFYBfCVKCe3TLCp4AbBObkvBgbK1yYMwR5Ie/EqyDb+cwk7KUP8gmiQ
-	 TliyR2l+YFrAA==
-Received: from [213.208.208.122] (helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sSXk7-00C3ly-SZ;
-	Sat, 13 Jul 2024 09:04:32 +0100
-Date: Sat, 13 Jul 2024 09:04:31 +0100
-Message-ID: <87zfqlogz4.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VvXVNYYa"
+X-Envelope-To: pbonzini@redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1721026664;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=0PtvZMxfAKvLK0Mt+7cMdpr/W/nx3zmCRU8SuscmP3Q=;
+	b=VvXVNYYal8ZcAyemIgJOD6SceR91tOfTgfXkHu4LdKJSJwoEQCFFSlvgOBWDDRN0Nnl9Uo
+	SrLG8FvbPgfqxkNAFkzj9UJLybkz+4Dxq2ssGakH6K1Z4puPGIbFgSqQAWhc7uRQgPfwqa
+	xigT5aCPRlbfieVUvYdNqM53+aBERjM=
+X-Envelope-To: maz@kernel.org
+X-Envelope-To: ptosi@google.com
+X-Envelope-To: sebott@redhat.com
+X-Envelope-To: sebastianene@google.com
+X-Envelope-To: changyuanl@google.com
+X-Envelope-To: coltonlewis@google.com
+X-Envelope-To: jintack.lim@linaro.org
+X-Envelope-To: kvm@vger.kernel.org
+X-Envelope-To: kvmarm@lists.linux.dev
+X-Envelope-To: james.morse@arm.com
+X-Envelope-To: suzuki.poulose@arm.com
+X-Envelope-To: yuzenghui@huawei.com
+Date: Sun, 14 Jul 2024 23:57:36 -0700
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>,
+	=?iso-8859-1?Q?Pierre-Cl=E9ment?= Tosi <ptosi@google.com>,
+	Sebastian Ott <sebott@redhat.com>,
+	Sebastian Ene <sebastianene@google.com>,
+	Changyuan Lyu <changyuanl@google.com>,
+	Colton Lewis <coltonlewis@google.com>,
+	Jintack Lim <jintack.lim@linaro.org>, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Joey Gouly <joey.gouly@arm.com>
-Subject: Re: [PATCH 01/12] arm64: Add missing APTable and TCR_ELx.HPD masks
-In-Reply-To: <3fc8eccd-21a7-40d8-9851-24941c8414da@arm.com>
-References: <20240625133508.259829-1-maz@kernel.org>
-	<20240625133508.259829-2-maz@kernel.org>
-	<3fc8eccd-21a7-40d8-9851-24941c8414da@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [GIT PULL] KVM/arm64 updates for 6.11
+Message-ID: <ZpTIYCFIgvKogfE4@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 213.208.208.122
-X-SA-Exim-Rcpt-To: anshuman.khandual@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, 12 Jul 2024 09:32:12 +0100,
-Anshuman Khandual <anshuman.khandual@arm.com> wrote:
-> 
-> 
-> 
-> On 6/25/24 19:05, Marc Zyngier wrote:
-> > Although Linux doesn't make use of hierarchical permissions (TFFT!),
-> > KVM needs to know where the various bits related to this feature
-> > live in the TCR_ELx registers as well as in the page tables.
-> > 
-> > Add the missing bits.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/kvm_arm.h       | 1 +
-> >  arch/arm64/include/asm/pgtable-hwdef.h | 7 +++++++
-> >  2 files changed, 8 insertions(+)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> > index b2adc2c6c82a5..c93ee1036cb09 100644
-> > --- a/arch/arm64/include/asm/kvm_arm.h
-> > +++ b/arch/arm64/include/asm/kvm_arm.h
-> > @@ -108,6 +108,7 @@
-> >  /* TCR_EL2 Registers bits */
-> >  #define TCR_EL2_DS		(1UL << 32)
-> >  #define TCR_EL2_RES1		((1U << 31) | (1 << 23))
-> > +#define TCR_EL2_HPD		(1 << 24)
-> >  #define TCR_EL2_TBI		(1 << 20)
-> >  #define TCR_EL2_PS_SHIFT	16
-> >  #define TCR_EL2_PS_MASK		(7 << TCR_EL2_PS_SHIFT)
-> > diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
-> > index 9943ff0af4c96..f75c9a7e6bd68 100644
-> > --- a/arch/arm64/include/asm/pgtable-hwdef.h
-> > +++ b/arch/arm64/include/asm/pgtable-hwdef.h
-> > @@ -146,6 +146,7 @@
-> >  #define PMD_SECT_UXN		(_AT(pmdval_t, 1) << 54)
-> >  #define PMD_TABLE_PXN		(_AT(pmdval_t, 1) << 59)
-> >  #define PMD_TABLE_UXN		(_AT(pmdval_t, 1) << 60)
-> > +#define PMD_TABLE_AP		(_AT(pmdval_t, 3) << 61)
-> 
-> APTable bits are also present in all table descriptors at each non-L3
-> level. Should not corresponding corresponding macros i.e PUD_TABLE_AP,
-> P4D_TABLE_AP, and PGD_TABLE_AP be added as well ?
+Hi Paolo,
 
-My problem with that is that it doesn't make much sense from an
-architecture perspective. It doesn't define any of these, because
-these names make no sense.
+Apologies for sending this later than usual, I took some vacation at the
+end of last week and didn't have the time to send out before.
 
-Maybe I should just drop the PMD prefix and write it as S1_TABLE_AP,
-so that it can be reused if we ever need the P*D names.
+Details can be found in the tag. Nothing significant to note, though
+Catalin reports a trivial conflict in arch/arm64/include/asm/esr.h
+between our trees [*].
 
-> 
-> >  
-> >  /*
-> >   * AttrIndx[2:0] encoding (mapping attributes defined in the MAIR* registers).
-> > @@ -307,6 +308,12 @@
-> >  #define TCR_TCMA1		(UL(1) << 58)
-> >  #define TCR_DS			(UL(1) << 59)
-> >  
-> > +#define TCR_HPD0_SHIFT		41
-> > +#define TCR_HPD0		BIT(TCR_HPD0_SHIFT)
-> > +
-> > +#define TCR_HPD1_SHIFT		42
-> > +#define TCR_HPD1		BIT(TCR_HPD1_SHIFT)
-> 
-> Should not these new register fields follow the current ascending bit
-> order in the listing i.e get added after TCR_HD (bit 40).
-
-Yup, I'll move them up.
+Please pull.
 
 Thanks,
+Oliver
 
-	M.
+[*] https://lore.kernel.org/linux-arm-kernel/20240711190353.3248426-1-catalin.marinas@arm.com/
 
--- 
-Without deviation from the norm, progress is not possible.
+The following changes since commit 83a7eefedc9b56fe7bfeff13b6c7356688ffa670:
+
+  Linux 6.10-rc3 (2024-06-09 14:19:43 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-6.11
+
+for you to fetch changes up to bb032b2352c33be374136889789103d724f1b613:
+
+  Merge branch kvm-arm64/docs into kvmarm/next (2024-07-14 00:28:57 +0000)
+
+----------------------------------------------------------------
+KVM/arm64 changes for 6.11
+
+ - Initial infrastructure for shadow stage-2 MMUs, as part of nested
+   virtualization enablement
+
+ - Support for userspace changes to the guest CTR_EL0 value, enabling
+   (in part) migration of VMs between heterogenous hardware
+
+ - Fixes + improvements to pKVM's FF-A proxy, adding support for v1.1 of
+   the protocol
+
+ - FPSIMD/SVE support for nested, including merged trap configuration
+   and exception routing
+
+ - New command-line parameter to control the WFx trap behavior under KVM
+
+ - Introduce kCFI hardening in the EL2 hypervisor
+
+ - Fixes + cleanups for handling presence/absence of FEAT_TCRX
+
+ - Miscellaneous fixes + documentation updates
+
+----------------------------------------------------------------
+Changyuan Lyu (3):
+      KVM: Documentation: Fix typo `BFD`
+      KVM: Documentation: Enumerate allowed value macros of `irq_type`
+      KVM: Documentation: Correct the VGIC V2 CPU interface addr space size
+
+Christoffer Dall (2):
+      KVM: arm64: nv: Implement nested Stage-2 page table walk logic
+      KVM: arm64: nv: Unmap/flush shadow stage 2 page tables
+
+Colton Lewis (1):
+      KVM: arm64: Add early_param to control WFx trapping
+
+Jintack Lim (1):
+      KVM: arm64: nv: Forward FP/ASIMD traps to guest hypervisor
+
+Marc Zyngier (25):
+      KVM: arm64: nv: Fix RESx behaviour of disabled FGTs with negative polarity
+      KVM: arm64: nv: Support multiple nested Stage-2 mmu structures
+      KVM: arm64: nv: Handle shadow stage 2 page faults
+      KVM: arm64: nv: Add Stage-1 EL2 invalidation primitives
+      KVM: arm64: nv: Handle EL2 Stage-1 TLB invalidation
+      KVM: arm64: nv: Handle TLB invalidation targeting L2 stage-1
+      KVM: arm64: nv: Handle TLBI VMALLS12E1{,IS} operations
+      KVM: arm64: nv: Handle TLBI ALLE1{,IS} operations
+      KVM: arm64: nv: Handle TLBI IPAS2E1{,IS} operations
+      KVM: arm64: nv: Handle FEAT_TTL hinted TLB operations
+      KVM: arm64: nv: Tag shadow S2 entries with guest's leaf S2 level
+      KVM: arm64: nv: Invalidate TLBs based on shadow S2 TTL-like information
+      KVM: arm64: nv: Add handling of outer-shareable TLBI operations
+      KVM: arm64: nv: Add handling of range-based TLBI operations
+      KVM: arm64: nv: Add handling of NXS-flavoured TLBI operations
+      KVM: arm64: nv: Handle CPACR_EL1 traps
+      KVM: arm64: nv: Add TCPAC/TTA to CPTR->CPACR conversion helper
+      KVM: arm64: nv: Add trap description for CPTR_EL2
+      KVM: arm64: nv: Add additional trap setup for CPTR_EL2
+      KVM: arm64: Correctly honor the presence of FEAT_TCRX
+      KVM: arm64: Get rid of HCRX_GUEST_FLAGS
+      KVM: arm64: Make TCR2_EL1 save/restore dependent on the VM features
+      KVM: arm64: Make PIR{,E0}_EL1 save/restore conditional on FEAT_TCRX
+      KVM: arm64: Honor trap routing for TCR2_EL1
+      KVM: arm64: nv: Truely enable nXS TLBI operations
+
+Oliver Upton (28):
+      KVM: arm64: nv: Use GFP_KERNEL_ACCOUNT for sysreg_masks allocation
+      KVM: arm64: Get sys_reg encoding from descriptor in idregs_debug_show()
+      KVM: arm64: Make idregs debugfs iterator search sysreg table directly
+      KVM: arm64: Use read-only helper for reading VM ID registers
+      KVM: arm64: Add helper for writing ID regs
+      KVM: arm64: nv: Use accessors for modifying ID registers
+      KVM: arm64: nv: Forward SVE traps to guest hypervisor
+      KVM: arm64: nv: Handle ZCR_EL2 traps
+      KVM: arm64: nv: Load guest hyp's ZCR into EL1 state
+      KVM: arm64: nv: Save guest's ZCR_EL2 when in hyp context
+      KVM: arm64: nv: Use guest hypervisor's max VL when running nested guest
+      KVM: arm64: nv: Ensure correct VL is loaded before saving SVE state
+      KVM: arm64: Spin off helper for programming CPTR traps
+      KVM: arm64: nv: Load guest FP state for ZCR_EL2 trap
+      KVM: arm64: nv: Honor guest hypervisor's FP/SVE traps in CPTR_EL2
+      KVM: arm64: Allow the use of SVE+NV
+      KVM: arm64: nv: Unfudge ID_AA64PFR0_EL1 masking
+      KVM: selftests: Assert that MPIDR_EL1 is unchanged across vCPU reset
+      MAINTAINERS: Include documentation in KVM/arm64 entry
+      Revert "KVM: arm64: nv: Fix RESx behaviour of disabled FGTs with negative polarity"
+      Merge branch kvm-arm64/misc into kvmarm/next
+      Merge branch kvm-arm64/ffa-1p1 into kvmarm/next
+      Merge branch kvm-arm64/shadow-mmu into kvmarm/next
+      Merge branch kvm-arm64/ctr-el0 into kvmarm/next
+      Merge branch kvm-arm64/el2-kcfi into kvmarm/next
+      Merge branch kvm-arm64/nv-sve into kvmarm/next
+      Merge branch kvm-arm64/nv-tcr2 into kvmarm/next
+      Merge branch kvm-arm64/docs into kvmarm/next
+
+Pierre-Clément Tosi (8):
+      KVM: arm64: Fix clobbered ELR in sync abort/SError
+      KVM: arm64: Fix __pkvm_init_switch_pgd call ABI
+      KVM: arm64: nVHE: Simplify invalid_host_el2_vect
+      KVM: arm64: nVHE: gen-hyprel: Skip R_AARCH64_ABS32
+      KVM: arm64: VHE: Mark __hyp_call_panic __noreturn
+      arm64: Introduce esr_brk_comment, esr_is_cfi_brk
+      KVM: arm64: Introduce print_nvhe_hyp_panic helper
+      KVM: arm64: nVHE: Support CONFIG_CFI_CLANG at EL2
+
+Sebastian Ene (4):
+      KVM: arm64: Trap FFA_VERSION host call in pKVM
+      KVM: arm64: Add support for FFA_PARTITION_INFO_GET
+      KVM: arm64: Update the identification range for the FF-A smcs
+      KVM: arm64: Use FF-A 1.1 with pKVM
+
+Sebastian Ott (5):
+      KVM: arm64: unify code to prepare traps
+      KVM: arm64: Treat CTR_EL0 as a VM feature ID register
+      KVM: arm64: show writable masks for feature registers
+      KVM: arm64: rename functions for invariant sys regs
+      KVM: selftests: arm64: Test writes to CTR_EL0
+
+ Documentation/admin-guide/kernel-parameters.txt   |   18 +
+ Documentation/virt/kvm/api.rst                    |   10 +-
+ Documentation/virt/kvm/devices/arm-vgic.rst       |    2 +-
+ MAINTAINERS                                       |    2 +
+ arch/arm64/include/asm/esr.h                      |   12 +
+ arch/arm64/include/asm/kvm_arm.h                  |    1 -
+ arch/arm64/include/asm/kvm_asm.h                  |    2 +
+ arch/arm64/include/asm/kvm_emulate.h              |   95 +-
+ arch/arm64/include/asm/kvm_host.h                 |   68 +-
+ arch/arm64/include/asm/kvm_hyp.h                  |    4 +-
+ arch/arm64/include/asm/kvm_mmu.h                  |   26 +
+ arch/arm64/include/asm/kvm_nested.h               |  131 ++-
+ arch/arm64/include/asm/sysreg.h                   |   17 +
+ arch/arm64/kernel/asm-offsets.c                   |    1 +
+ arch/arm64/kernel/debug-monitors.c                |    4 +-
+ arch/arm64/kernel/traps.c                         |    8 +-
+ arch/arm64/kvm/arm.c                              |   86 +-
+ arch/arm64/kvm/emulate-nested.c                   |  104 +++
+ arch/arm64/kvm/fpsimd.c                           |   19 +-
+ arch/arm64/kvm/handle_exit.c                      |   43 +-
+ arch/arm64/kvm/hyp/entry.S                        |    8 +
+ arch/arm64/kvm/hyp/include/hyp/switch.h           |   29 +-
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h        |   35 +-
+ arch/arm64/kvm/hyp/include/nvhe/ffa.h             |    2 +-
+ arch/arm64/kvm/hyp/nvhe/Makefile                  |    6 +-
+ arch/arm64/kvm/hyp/nvhe/ffa.c                     |  180 +++-
+ arch/arm64/kvm/hyp/nvhe/gen-hyprel.c              |    6 +
+ arch/arm64/kvm/hyp/nvhe/host.S                    |    6 -
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S                |   30 +-
+ arch/arm64/kvm/hyp/nvhe/setup.c                   |    4 +-
+ arch/arm64/kvm/hyp/vhe/switch.c                   |  202 ++++-
+ arch/arm64/kvm/hyp/vhe/tlb.c                      |  147 +++
+ arch/arm64/kvm/mmu.c                              |  213 ++++-
+ arch/arm64/kvm/nested.c                           | 1002 ++++++++++++++++++---
+ arch/arm64/kvm/pmu-emul.c                         |    2 +-
+ arch/arm64/kvm/reset.c                            |    6 +
+ arch/arm64/kvm/sys_regs.c                         |  593 +++++++++++-
+ include/linux/arm_ffa.h                           |    3 +
+ tools/testing/selftests/kvm/aarch64/set_id_regs.c |   17 +
+ 39 files changed, 2764 insertions(+), 380 deletions(-)
