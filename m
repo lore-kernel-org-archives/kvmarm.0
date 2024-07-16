@@ -1,78 +1,93 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52E3315491
-	for <kvmarm@lists.linux.dev>; Tue, 16 Jul 2024 11:41:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86114199E91;
+	Tue, 16 Jul 2024 13:21:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721130068; cv=none; b=QkCkTXM3vIBtC5Xn1RwtCrsiF4/F4aNwSFwPHlJjmKN2iGh1BKZf7RJXjkTtwQuMbWSk5I9SdhVTgQ5rRRJjZ+zRQLHlOEJdYFGpIVSrrdS38t+El0HLXSzjEdXQdyv5LRN1Ls9iaSjlW6BoCKDf+fMwrLxUJlMrT/vmEqfnsZc=
+	t=1721136094; cv=none; b=dsMORF1CQpzD9hEr+S/W6b1USZl1C5xjUNQ/nkNAgYBBSDXu8qX1hVcirwddgHjEqxJ18adiJkYenKwl8LQXSbN1o+SLl83R9wLlovc7mpSyB6q1wTrxsF4uvdLMKs8P3DY6W1NssVDQzyBMwrfe+o0O0c3TWMQkPfS2VvyDxJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721130068; c=relaxed/simple;
-	bh=cPqUIIzgMa1VyzU8Q0SG76h08e/UGrYGch/lA75gQqc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NyGywW3vDTM3cArenp2Jn/Ey25ZNgc/na8jUomu5n+SpbOISRIKgbelshujnjUbfhTobezE/of6zQGXI1SDojWiZ0PvWAL7h5h/1lVLgmqXQB+VHGOUAKdTUSl0GkCYxZOQRG8EtwJQtUIsQ+d+18NT5oThJeMiwjwfmfPq9HWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B19091063;
-	Tue, 16 Jul 2024 04:41:30 -0700 (PDT)
-Received: from [10.163.52.225] (unknown [10.163.52.225])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BB35A3F766;
-	Tue, 16 Jul 2024 04:40:54 -0700 (PDT)
-Message-ID: <c6812a96-4a29-40de-8ed7-e98b193121a0@arm.com>
-Date: Tue, 16 Jul 2024 17:10:50 +0530
+	s=arc-20240116; t=1721136094; c=relaxed/simple;
+	bh=MDYDDMId9Vq5nWSoKcWFrH/nU7E7vtMo3ZqG+CSN320=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YrgTaNT9pLxhrdJW0GgO8c/1zsX9Dgy2Z1HHgTZUT8jG4pIW5T1ry15H6vAPenuC4coqRXunX0Ol++CTCx+ILtwQiCqBeB7VaQk6zVgfOPbUMt2WQm4Holrn3JEjwk19mJr3OYcszvESRFUYdGTGxngqSCgjA17JVF3S6GDnMMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bEcc3cof; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bEcc3cof"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E65C3C116B1;
+	Tue, 16 Jul 2024 13:21:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721136094;
+	bh=MDYDDMId9Vq5nWSoKcWFrH/nU7E7vtMo3ZqG+CSN320=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bEcc3cofO5RnyXn9FufGyGU2WpkjaGtJrPT8aBi+b0H30Mo62bFcyv7BR5vjOzAWl
+	 uZrJURdKoed8pFvaMONdv+jp+73wl6MZHY8lDrbhzA4r0k9MZJwwbEVAPTLUca374n
+	 MKXWh/SA9A+WMrYqrLM47uuFxtJv4bwCU6gu9M/AMrrCd93cOOAIo80yksddlZ2XGX
+	 HV8m+g1I5NmH04HdZstHzkTovWOIl4Tv9+QV2lJyJ5PaFFz/k2utvqCm0MEovL8kn7
+	 TiQtP+tWgjgVZ+uzbvYTDozgVzwXtJdOIPyPXDVtGte3ugmBPAQmLKeTuEclvh1MpB
+	 yNyt/Qcv/YbWg==
+Date: Tue, 16 Jul 2024 14:21:25 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: Joey Gouly <joey.gouly@arm.com>, linux-arm-kernel@lists.infradead.org,
+	akpm@linux-foundation.org, aneesh.kumar@kernel.org,
+	aneesh.kumar@linux.ibm.com, bp@alien8.de, catalin.marinas@arm.com,
+	christophe.leroy@csgroup.eu, dave.hansen@linux.intel.com,
+	hpa@zytor.com, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
+	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
+	oliver.upton@linux.dev, shuah@kernel.org, szabolcs.nagy@arm.com,
+	tglx@linutronix.de, will@kernel.org, x86@kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v4 06/29] arm64: context switch POR_EL0 register
+Message-ID: <91862b79-b29a-49c2-8a0d-653bb87d3d9b@sirena.org.uk>
+References: <20240503130147.1154804-1-joey.gouly@arm.com>
+ <20240503130147.1154804-7-joey.gouly@arm.com>
+ <3c655663-3407-4602-a958-c5382a6b3133@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 17/29] arm64: implement PKEYS support
-To: Kevin Brodsky <kevin.brodsky@arm.com>, Joey Gouly <joey.gouly@arm.com>,
- linux-arm-kernel@lists.infradead.org
-Cc: akpm@linux-foundation.org, aneesh.kumar@kernel.org,
- aneesh.kumar@linux.ibm.com, bp@alien8.de, broonie@kernel.org,
- catalin.marinas@arm.com, christophe.leroy@csgroup.eu,
- dave.hansen@linux.intel.com, hpa@zytor.com, linux-fsdevel@vger.kernel.org,
- linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org, maz@kernel.org,
- mingo@redhat.com, mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com,
- npiggin@gmail.com, oliver.upton@linux.dev, shuah@kernel.org,
- szabolcs.nagy@arm.com, tglx@linutronix.de, will@kernel.org, x86@kernel.org,
- kvmarm@lists.linux.dev
-References: <20240503130147.1154804-1-joey.gouly@arm.com>
- <20240503130147.1154804-18-joey.gouly@arm.com>
- <18aee949-7e07-45e1-85c8-c990f017f305@arm.com>
-Content-Language: en-US
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <18aee949-7e07-45e1-85c8-c990f017f305@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="o+3mIAah6T0Lu29l"
+Content-Disposition: inline
+In-Reply-To: <3c655663-3407-4602-a958-c5382a6b3133@arm.com>
+X-Cookie: Think honk if you're a telepath.
 
 
+--o+3mIAah6T0Lu29l
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On 7/9/24 18:37, Kevin Brodsky wrote:
-> On 03/05/2024 15:01, Joey Gouly wrote:
->> @@ -267,6 +294,28 @@ static inline unsigned long mm_untag_mask(struct mm_struct *mm)
->>  	return -1UL >> 8;
->>  }
->>  
->> +/*
->> + * We only want to enforce protection keys on the current process
->> + * because we effectively have no access to POR_EL0 for other
->> + * processes or any way to tell *which * POR_EL0 in a threaded
->> + * process we could use.
-> 
-> I see that this comment is essentially copied from x86, but to me it
-> misses the main point. Even with only one thread in the target process
-> and a way to obtain its POR_EL0, it still wouldn't make sense to check
-> that value. If we take the case of a debugger accessing an inferior via
-> ptrace(), for instance, the kernel is asked to access some memory in
-> another mm. However, the debugger's POR_EL0 is tied to its own address
-> space, and the target's POR_EL0 is relevant to its own execution flow
-> only. In such situations, there is essentially no user context for the
-> access, so It fundamentally does not make sense to make checks based on
-> pkey/POE or similar restrictions to memory accesses (e.g. MTE).
+On Mon, Jul 15, 2024 at 01:57:10PM +0530, Anshuman Khandual wrote:
+> On 5/3/24 18:31, Joey Gouly wrote:
 
-Indeed this makes more sense. There is no memory context even if there is
-access to another POR_EL0. The comment above could be improved describing
-this limitation.
+> > +static inline bool system_supports_poe(void)
+> > +{
+> > +	return IS_ENABLED(CONFIG_ARM64_POE) &&
+
+> CONFIG_ARM64_POE has not been defined/added until now ?
+
+That's a common pattern when adding a new feature over a multi-patch
+series - add sections guarded with the Kconfig option for the new
+feature but which can't be enabled until the last patch of the series
+which adds the Kconfig option after the support is complete.
+
+--o+3mIAah6T0Lu29l
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmaWc9UACgkQJNaLcl1U
+h9AE/Qf+Mp0vA/IFkYbl4mm5ponXV9Jh6x5rZSfeflZF96wTd3pBu5Y1PK36VG4R
+hDFz7jcBPMBxn7afJA/mlfBPGWQXajmqTcK9TRVaWEG9rj54IZ7XCSiRItv2TwgJ
+tGmxIj+O7pyTiDPz0cHxfxAlZ+Yz+RCe8YfKhbPXDxg51hu6UIWxYZ/v9aJtxC4V
+tkXEFL+purD/K9Hp6wFTK3VAQFbsNyYcc8ulWXf3qGOHILnb8hznV4ei4BbqHKGk
+TsqLVYHBT9RwW4q6RB2O9JeLOm5U7I17+YmBqEvZY/LIZzBtvZ/xYBsh4UCPt/6s
+kNbCozOSV32r4nb/Z+kpJqbf9lA7ug==
+=cS6P
+-----END PGP SIGNATURE-----
+
+--o+3mIAah6T0Lu29l--
