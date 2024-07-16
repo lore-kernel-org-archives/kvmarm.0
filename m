@@ -1,42 +1,74 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9567F17CA1D
-	for <kvmarm@lists.linux.dev>; Tue, 16 Jul 2024 09:35:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2B882AE6A
+	for <kvmarm@lists.linux.dev>; Tue, 16 Jul 2024 09:59:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721122509; cv=none; b=iWKUWZFn0uhRYZISiLTsqIoY80Z3ACzvL6/W+NCnTG2sCSyO3XSn6wJQpUwWVU3Thvxkx2hfjWKXIl+x2HhTkflb307HKqpDg6Cl/geAZyJHD1dFRwD9yLu8o+Q6ZRo89nu8BdlVrFH/34I0no/DJHbI1w5nVAlceUVChb/V0UY=
+	t=1721123989; cv=none; b=Fp8HyemT6LKR5PmqS6ltfB3tP5TQqBX8MGI22/pJ3KgCdG8/L+/hXhkRfIDGdfS+4TgzN6CY+f0jVXplFe4mjxnzFEZdO6S7OPCMGXYA0W3pjNcqXO1dFrmptxof0fMBIjKv8ZgRX5dbbCZibxEJWQdmWgwB7kquI8HdfHOpFrE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721122509; c=relaxed/simple;
-	bh=JqrE0WuGColQwOXQZhycWi4iyP5ZQb7TwrwlVioCsyg=;
+	s=arc-20240116; t=1721123989; c=relaxed/simple;
+	bh=t8aLSjzjauG7Ud/wMgIkxjFDcS/pCbqDGOTsvtDGzbc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Js/0ZWsKDEao6LpLPuIyXHzXBtjrK/zqcN4/k2t6Lo1NIuxaVDyhc58wacXUOMvIZnQv4cymcasLwPeRIxEI25gJQtYOwM9hu/SNH+AqMhk3NLZ47TxNd5hNu72rYWtohWT7UOqKAVhyMqfI7WpjELf58psWojTWfDWeQpl5zls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2B7EA1063;
-	Tue, 16 Jul 2024 02:35:31 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DB77D3F762;
-	Tue, 16 Jul 2024 02:35:02 -0700 (PDT)
-Date: Tue, 16 Jul 2024 10:34:57 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
-	aneesh.kumar@kernel.org, aneesh.kumar@linux.ibm.com, bp@alien8.de,
-	broonie@kernel.org, catalin.marinas@arm.com,
-	christophe.leroy@csgroup.eu, dave.hansen@linux.intel.com,
-	hpa@zytor.com, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
-	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
-	oliver.upton@linux.dev, shuah@kernel.org, szabolcs.nagy@arm.com,
-	tglx@linutronix.de, will@kernel.org, x86@kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 13/29] arm64: convert protection key into vm_flags and
- pgprot values
-Message-ID: <20240716093457.GA1542300@e124191.cambridge.arm.com>
-References: <20240503130147.1154804-1-joey.gouly@arm.com>
- <20240503130147.1154804-14-joey.gouly@arm.com>
- <0f87e51e-f790-4302-896f-9b9a74ed7495@arm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=SPbYzuspNgxAhoo5T6EnZU+tNjpOzF+G+czZA+A9/BdRKHVBBTtixLX2xSJiGi0hyq3e3BVk5h/3yQcJGubzPDx+Evmu/9WokQSGUKGSMHte0EXbKhTfQ74WyLnruwsf0xDG6aG/rnkMU5XLE4LlGdQ48r95uCk9oVAHu8UeLkk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Kur4lAc/; arc=none smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Kur4lAc/"
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-368255de9ebso338701f8f.1
+        for <kvmarm@lists.linux.dev>; Tue, 16 Jul 2024 02:59:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1721123986; x=1721728786; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=UB06lOjeb/uE3iisxwCP6Tm1CK/MivC/LclbamO9xAM=;
+        b=Kur4lAc/kd2GxeTRAM4R6TXv8E4eTDB3E3NNhC0BobfDJlhxPG+FP7qVIQf9lPZmPN
+         YXa2xraq2Sr2Jv6X51ZsvtPrpG3I2pGuGWPsrQyK2FKnrveJcmDLavG74d9jFaWNp4xc
+         mt3TGn8sXUgjrFkIyIYSTHvw+Jz3i3jR6pqdqg5hPSMK5s7X+BzQ6OkdR9K60N6qqSBM
+         JhyNAGKOe77op7oS6a1fxLnLofVRpEFbLFAiRnmWeLtixWgyWPgrXd9PdkmsD4fOb5Os
+         SyGWmkIB1moWBrbkMBYUPR96ObOdizTKc8h2fnfGjlUZhb+RNDqQz8NJO29QCBqAGZcn
+         UWpw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721123986; x=1721728786;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UB06lOjeb/uE3iisxwCP6Tm1CK/MivC/LclbamO9xAM=;
+        b=KE3Hm/gwPHEDP6WSmtcII66pTfdnGIRxzu5BwM13YmoMlFcVXEjGP4L2JGRDBW50TG
+         DQueaRnSnSdyQLObakO6qcTqQlvKs1Xn80NB2990uSVrdBHRXWJGuCykZYfJ5AnGsOsq
+         j+W4+whbZ72uFZ0se2aNdtCucFoT3L3NVuaYoW1KNnWVskZYQW+wcQ/FmTiBBY5jrQ5h
+         Pv/TI06fxLt/v6i8i5XJ3klqHeUGZK7zTH1FkyTOj7qmxkPPRfYPsXgmLTRgsd34Mhch
+         t3aQEe89BrubpXJvbDbBUNXQvSwp8gEmXIp4EPfGDMLRmlK0OC6Rww8iZNTGmm4okmuz
+         hbHg==
+X-Forwarded-Encrypted: i=1; AJvYcCXmiquly046JI2S+2J7+boHanfu2TbZmNnAeBM3TjWtYenk30DgiMhkeavv33wUQW7KuEFMxHS5xvC+BPDDoaRtm56/se7T
+X-Gm-Message-State: AOJu0YxiIo4T3NIgkSyaQdP9499b340iOfID0JqegtVo1ycAktdD7uqQ
+	XkL4ul9pxdD0JLjDaiZHkVVfiVIqqzPMABTkmyfwEddALUTlR70hQRwdRfpklg==
+X-Google-Smtp-Source: AGHT+IF69v24Yzf9m7VOZnyEAWiFMAW/hbg7ZrSdOQ+vI1WyHZxOGGlPFzoPDdIVKnZQD4NsWWgIYA==
+X-Received: by 2002:a05:6000:1e4e:b0:362:69b3:8e4d with SMTP id ffacd0b85a97d-36827498d65mr1116597f8f.25.1721123985921;
+        Tue, 16 Jul 2024 02:59:45 -0700 (PDT)
+Received: from google.com (203.75.199.104.bc.googleusercontent.com. [104.199.75.203])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3680dafbe9esm8515847f8f.78.2024.07.16.02.59.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Jul 2024 02:59:45 -0700 (PDT)
+Date: Tue, 16 Jul 2024 10:59:41 +0100
+From: Vincent Donnefort <vdonnefort@google.com>
+To: Sebastian Ene <sebastianene@google.com>
+Cc: akpm@linux-foundation.org, alexghiti@rivosinc.com, ankita@nvidia.com,
+	ardb@kernel.org, catalin.marinas@arm.com,
+	christophe.leroy@csgroup.eu, james.morse@arm.com,
+	mark.rutland@arm.com, maz@kernel.org, oliver.upton@linux.dev,
+	rananta@google.com, ryan.roberts@arm.com, shahuang@redhat.com,
+	suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, kernel-team@android.com
+Subject: Re: [PATCH v7 5/6] KVM: arm64: Initialize the ptdump parser with
+ stage-2 attributes
+Message-ID: <ZpZEjW1m2LypTHjF@google.com>
+References: <20240621123230.1085265-1-sebastianene@google.com>
+ <20240621123230.1085265-6-sebastianene@google.com>
+ <ZoJsAyrmtge4mXJY@google.com>
+ <ZoK6v2_pJnc57LHM@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -45,86 +77,67 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <0f87e51e-f790-4302-896f-9b9a74ed7495@arm.com>
+In-Reply-To: <ZoK6v2_pJnc57LHM@google.com>
 
-On Tue, Jul 16, 2024 at 02:35:48PM +0530, Anshuman Khandual wrote:
-> 
-> 
-> On 5/3/24 18:31, Joey Gouly wrote:
-> > Modify arch_calc_vm_prot_bits() and vm_get_page_prot() such that the pkey
-> > value is set in the vm_flags and then into the pgprot value.
-> > 
-> > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-> > Cc: Catalin Marinas <catalin.marinas@arm.com>
-> > Cc: Will Deacon <will@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/mman.h | 8 +++++++-
-> >  arch/arm64/mm/mmap.c          | 9 +++++++++
-> >  2 files changed, 16 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/mman.h b/arch/arm64/include/asm/mman.h
-> > index 5966ee4a6154..ecb2d18dc4d7 100644
-> > --- a/arch/arm64/include/asm/mman.h
-> > +++ b/arch/arm64/include/asm/mman.h
-> > @@ -7,7 +7,7 @@
-> >  #include <uapi/asm/mman.h>
-> >  
-> >  static inline unsigned long arch_calc_vm_prot_bits(unsigned long prot,
-> > -	unsigned long pkey __always_unused)
-> > +	unsigned long pkey)
-> >  {
-> >  	unsigned long ret = 0;
-> >  
-> > @@ -17,6 +17,12 @@ static inline unsigned long arch_calc_vm_prot_bits(unsigned long prot,
-> >  	if (system_supports_mte() && (prot & PROT_MTE))
-> >  		ret |= VM_MTE;
-> >  
-> > +#if defined(CONFIG_ARCH_HAS_PKEYS)
-> > +	ret |= pkey & 0x1 ? VM_PKEY_BIT0 : 0;
-> > +	ret |= pkey & 0x2 ? VM_PKEY_BIT1 : 0;
-> > +	ret |= pkey & 0x4 ? VM_PKEY_BIT2 : 0;
-> 
-> 0x1, 0x2, 0x4 here are standard bit positions for their corresponding
-> VM_KEY_XXX based protection values ? Although this is similar to what
-> x86 is doing currently, hence just trying to understand if these bit
-> positions here are related to the user visible ABI, which should be
-> standardized ?
+On Mon, Jul 01, 2024 at 02:18:39PM +0000, Sebastian Ene wrote:
+> On Mon, Jul 01, 2024 at 09:42:43AM +0100, Vincent Donnefort wrote:
+> > O Fri, Jun 21, 2024 at 12:32:29PM +0000, 'Sebastian Ene' via kernel-team wrote:
+> > > Define a set of attributes used by the ptdump parser to display the
+> > > properties of a guest memory region covered by a pagetable descriptor.
+> > > Build a description of the pagetable levels and initialize the parser
+> > > with this configuration.
+> > > 
+> > > Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> > > ---
+> > >  arch/arm64/kvm/ptdump.c | 143 ++++++++++++++++++++++++++++++++++++++--
+> > >  1 file changed, 137 insertions(+), 6 deletions(-)
+> > > 
+> > > diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
+> > > index 36dc7662729f..cc1d4fdddc6e 100644
+> > > --- a/arch/arm64/kvm/ptdump.c
+> > > +++ b/arch/arm64/kvm/ptdump.c
+> > > @@ -14,6 +14,61 @@
+> > >  #include <kvm_ptdump.h>
+> > >  
+> > >  
+> > > +#define MARKERS_LEN		(2)
+> > > +#define KVM_PGTABLE_MAX_LEVELS	(KVM_PGTABLE_LAST_LEVEL + 1)
+> > > +
+> > > +struct kvm_ptdump_guest_state {
+> > > +	struct kvm		*kvm;
+> > > +	struct pg_state		parser_state;
+> > > +	struct addr_marker	ipa_marker[MARKERS_LEN];
+> > > +	struct pg_level		level[KVM_PGTABLE_MAX_LEVELS];
+> > > +	struct ptdump_range	range[MARKERS_LEN];
+> > > +};
+> > > +
+> > > +static const struct prot_bits stage2_pte_bits[] = {
+> > > +	{
+> > > +		.mask	= PTE_VALID,
+> > > +		.val	= PTE_VALID,
+> > > +		.set	= " ",
+> > > +		.clear	= "F",
+> > > +	}, {
+> > > +		.mask	= KVM_PTE_LEAF_ATTR_HI_S2_XN | PTE_VALID,
+> > > +		.val	= KVM_PTE_LEAF_ATTR_HI_S2_XN | PTE_VALID,
 
-The bit positions of VM_PKEY_BIT* aren't user visible. This is converting the
-value of the `pkey` that was passed to the mprotect, into the internal flags.
+KVM_PTE_LEAF_ATTR_HI_S2_XN is actually a mask covering 
 
-I might replace those hex values with BIT(0), BIT(1), BIT(2), might be clearer.
+KVM_PTE_LEAF_ATTR_HI_S2_XN_XN, KVM_PTE_LEAF_ATTR_HI_S2_XN_PXN and
+KVM_PTE_LEAF_ATTR_HI_S2_XN_UXN. 
 
-> 
-> Agree with previous comments about the need for system_supports_poe()
-> based additional check for the above code block.
-> 
-> > +#endif
-> > +
-> >  	return ret;
-> >  }
-> >  #define arch_calc_vm_prot_bits(prot, pkey) arch_calc_vm_prot_bits(prot, pkey)
-> > diff --git a/arch/arm64/mm/mmap.c b/arch/arm64/mm/mmap.c
-> > index 642bdf908b22..86eda6bc7893 100644
-> > --- a/arch/arm64/mm/mmap.c
-> > +++ b/arch/arm64/mm/mmap.c
-> > @@ -102,6 +102,15 @@ pgprot_t vm_get_page_prot(unsigned long vm_flags)
-> >  	if (vm_flags & VM_MTE)
-> >  		prot |= PTE_ATTRINDX(MT_NORMAL_TAGGED);
-> >  
-> > +#ifdef CONFIG_ARCH_HAS_PKEYS
-> > +	if (vm_flags & VM_PKEY_BIT0)
-> > +		prot |= PTE_PO_IDX_0;
-> > +	if (vm_flags & VM_PKEY_BIT1)
-> > +		prot |= PTE_PO_IDX_1;
-> > +	if (vm_flags & VM_PKEY_BIT2)
-> > +		prot |= PTE_PO_IDX_2;
-> > +#endif
-> > +
-> >  	return __pgprot(prot);
-> >  }
-> >  EXPORT_SYMBOL(vm_get_page_prot);
-> 
+I believe here what we should do is something like?
 
-Thanks,
-Joey
+.val = FIELD_PREP_CONST(KVM_PTE_LEAF_ATTR_HI_S2_XN,
+			KVM_PTE_LEAF_ATTR_HI_S2_XN_XN) | PTE_VALID
+
+> > > +		.set	= "XN",
+> > > +		.clear	= "  ",
+> > > +	}, {
+> > > +		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | PTE_VALID,
+> > > +		.val	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | PTE_VALID,
+> > > +		.set	= "R",
+> > > +		.clear	= " ",
+> > > +	}, {
+
+[...]
