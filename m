@@ -1,294 +1,304 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 312A219AD93
-	for <kvmarm@lists.linux.dev>; Tue, 16 Jul 2024 13:51:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE1BC19AD72
+	for <kvmarm@lists.linux.dev>; Tue, 16 Jul 2024 17:11:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721137883; cv=none; b=LAbELRMdmQ5vu00g2y6W8d3bcv2QO2uDJVB+XYxjG9iNL6jVhBzDpuNIjbrXNwzJkDyMOHRYP1Q/4G7pfWXXm7j4iqGC+pJXMADV+XQW/MwljrDJhNVcB163wmz++QKSCFdYd6uUqKTnbjx/G1qpHcKyu5Q0VeFVSg1Y4VKSmrc=
+	t=1721149868; cv=none; b=qdFiQzJcA2R1G6bsfxv1MMVsVlyviLHtabf8SUdqf3vCywdmCiNt+HKEcGs9PhbjrizD+ign0wxR8k0lCxtpn8rCHTb8pk3vQYOv0Cm5C9CZj+q8Zfo23kZ5obO13Nj6+W36pfpBZL5CZTlywVBxZPzC80bxmHesb24mysU53EE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721137883; c=relaxed/simple;
-	bh=6YIpoHpCO/c0TX0CzEhE7vyNjwowoCD8tiIzAS2HJ9Y=;
+	s=arc-20240116; t=1721149868; c=relaxed/simple;
+	bh=d9Y3PppBIVaDeA7OUV7QSIfz7XlMBytja2woDfy2rK4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Bvz8jyjAn09/lS4qCi4Stozw3hSG5oevvWb8+qWWwMfL6+DlrJ6eFInYXRyropksMmdBcInAvo+EKjIhAs923YO+RLxgEy1gQhXHwP6DlW8rmgX+bYjuaEa0ZGMbS7ahMrkYBL3wxC/1PqHDIL6kk5TjP34j6WZAZdmA8jjJPoc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WlqE8lKm; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 To:Cc:Content-Type; b=LvLzv3R07YVPFF4NP0xyRH46Lbjp0CQ+G0itiSrEmcc1sSm9GhbCvfmgk1cpY4LcHf0aNgq3ztlOhZCCxWKrVFnityIv7pnF9SKh2pwqYT1UnwdtK/jX10TEuN87fVYP5dSj73S7R9atfbWBt91EzjGkWeZcrrTbwiq8Hsj6TxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=X6y9YC3d; arc=none smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WlqE8lKm"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721137880;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eajIdwDOBvD6JI+kztTRBgAUPohirWWSrOTsDLywyyg=;
-	b=WlqE8lKmKopbQmCjmjqiWtaNh2aGva/8KfSVhraPDIM/JWDu/F/p/zmk6L5Ilp+OldSr6K
-	6KyU5/JI2l8pLO8Bgfr6IX9Ht0/68WEZDOGUxaOihc+lfD4C7/RphfjsOFpQ2wCcRQb/6l
-	U+oL2uiusUH13ZZMNaAS0PUApTy+ZF0=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-675-MHtmDtd5OGqVOPYah-FNdg-1; Tue, 16 Jul 2024 09:51:18 -0400
-X-MC-Unique: MHtmDtd5OGqVOPYah-FNdg-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-367879e8395so3408150f8f.0
-        for <kvmarm@lists.linux.dev>; Tue, 16 Jul 2024 06:51:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X6y9YC3d"
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-44a8b140a1bso18821cf.0
+        for <kvmarm@lists.linux.dev>; Tue, 16 Jul 2024 10:11:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1721149866; x=1721754666; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DV9GhdKZyJ6M+6gQqAdxuqd09DQjKmEarDGs4L0SsCI=;
+        b=X6y9YC3dbTZeiRheUbC/uSiODZ4fs6jGSTvVZblxtUjsqoMqBo2cfky8tWAyPc3Dmy
+         w782nNeVcH3px/NcXtBVIfCosIbvB8Tv0aP4Nie2B3SPem71OoNIqJ7HetOIV544T4Hm
+         3JA6dQOLbWat65XVctqnBVU8L2Onf6zdjWb7dVBY41/KkeMqdyFZL1sy0LyUBsLGD+QM
+         shAbJ+YmTbAMbKdPXLa7lKwqYgBArR0iR45S0FiMIX7L+ngHQRj076kWQvp3Zv3hgXZ+
+         g09e4317qnnpmhInSYi6sDzDCCXSidYUbfWBoswB2K+ZsNRNo292na9aX9FKrL4j8lFp
+         xpvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721137877; x=1721742677;
+        d=1e100.net; s=20230601; t=1721149866; x=1721754666;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=eajIdwDOBvD6JI+kztTRBgAUPohirWWSrOTsDLywyyg=;
-        b=WN5r3z0twbCzlrvEL9/Rm00yNZ+tCtaxwbB+bBQP/t37H8+NY0zRDf7ibG8hHo0usT
-         ncLgHBZWXuwgmC9P4u9sAPTLJRCBGqS7/YLYuurOzpK8rBOeuQ1KF1j/C+Q/bcj5x4+L
-         pYPsWj7AKGC6gXCpWijuiyVzaZ/DYw/iPV8AK7k55/KRkyljGDK+I1vYs0b0XasqX3Pr
-         7tL/cTRv1Z48TB8tmP72/cjTu8/YUceZDq0m9TNt4a1h+FNy/AuA3uYtNtRS7wEX39Qv
-         vHlgNQzYeasJr5ioVZeAP7LVI6YT9t04sXrwIbPSqUa8eFqq9nm+vDUvosDSCCTdkTAj
-         37NQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVCmaEffJZ6IqQoh5TeUcKj3hOMAs8os48L8d9xDJtZLdLwB95vq0RVt/TXsVL7IkbSVqgbc0pPLbjhcdG87HgJBvPFFY3/
-X-Gm-Message-State: AOJu0Yxh2AZypY1y3ouMKTLKfrbuHgtYsar2xIAEr5ghT1TN2J6IcdIX
-	dSz4AsaDZiT3xJ69U4czfExKCb14TFN2AkVc8Dp3u3heFgUo2v94lCbSGWC30N599blecbmiEPc
-	6jOYE3VoAuG9lofCKqDrwOEY1M6SYJOCRPEQKH9AY5NZgYOreg2kP66xP/iDrcNTcDC3BTAc2TA
-	n/Co1+od2SF0OwZ30EWj5kJwRSd7+q
-X-Received: by 2002:a05:6000:1fa8:b0:367:434f:caa2 with SMTP id ffacd0b85a97d-36825ce1d1fmr1664248f8f.0.1721137877590;
-        Tue, 16 Jul 2024 06:51:17 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGN3pshprrdSits0mGK+qv8WN/ikP9lOW25YYwsa4Pm53v/JhwVGtJE+P+u1g4WqyamVk7paK+y92Mnhsqfe+k=
-X-Received: by 2002:a05:6000:1fa8:b0:367:434f:caa2 with SMTP id
- ffacd0b85a97d-36825ce1d1fmr1664222f8f.0.1721137877179; Tue, 16 Jul 2024
- 06:51:17 -0700 (PDT)
+        bh=DV9GhdKZyJ6M+6gQqAdxuqd09DQjKmEarDGs4L0SsCI=;
+        b=nwqcrPDQtSf2a+nK5eBlCJUJ2cgsctm1KttFowRmmJFEOPsBCZJrFL8nYTe2jcegbY
+         bBNmkp+UVqBp9ZhVhbDllO+5Q38wLQXohowTcDWnfAzLvOw/ts8Nsv7Qpr92zaQnUQfX
+         LgRcmIxJJfegaa2CyBm5LeQgmzUsM4TkKsYeH++LhvJqUuEYRb5ZLoyZ7qFPIVY/R+dV
+         19qanYjoXzEuByd3qLW3+kHV7ERkSEFEA+FQ9z0GcoEElWN1T/V0icQVtgsU6cBK2kuw
+         RRprE+yRwY8cozTMV/LZfnQnY8RxHiBgqOQto5wcLrGnEHNsn7kH7LxStWzgOkMRaUoF
+         hHbA==
+X-Forwarded-Encrypted: i=1; AJvYcCU8kenbqEPN2cmuvIvQ5QpdurBrgiynkaF+IJnWNKBy9Ndb/a6e2UZurSqYYGQhJ7NWQ3FsBYkC9shkE/pZrrcgaGayZmcD
+X-Gm-Message-State: AOJu0YzrKtu0SyPRzl0LnFsA1wJxFwrUsns5xRoyNNXjCNkPSr6elJwr
+	8x6BJWQuauEUWjar+XRiJ2dxpO6Sa+fO0Pqi8TWsqqxpUStl3b0aiDFs1XkxQUa9WxEJbwI5Z/v
+	NGw5EAdCvMcJS/kFLcc99pko4U6IuwK4Tc2Sk
+X-Google-Smtp-Source: AGHT+IFaV9/2Z7WSL/mHSXyBRuqYSsif3Jd7vrRf+CGU9hcp7x64cONNeb1r2bfZCOcTK8Iuat3cjGzcxnXcLyg9ASI=
+X-Received: by 2002:a05:622a:2a0f:b0:444:dc9a:8e95 with SMTP id
+ d75a77b69052e-44f7b927bc1mr3465511cf.15.1721149865452; Tue, 16 Jul 2024
+ 10:11:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <ZpTIYCFIgvKogfE4@linux.dev>
-In-Reply-To: <ZpTIYCFIgvKogfE4@linux.dev>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 16 Jul 2024 15:51:04 +0200
-Message-ID: <CABgObfaWBW5o9kC554AQ4QzTUE7eJ=NGusjBUScp+rjGF1CqHA@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM/arm64 updates for 6.11
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, =?UTF-8?Q?Pierre=2DCl=C3=A9ment_Tosi?= <ptosi@google.com>, 
-	Sebastian Ott <sebott@redhat.com>, Sebastian Ene <sebastianene@google.com>, 
-	Changyuan Lyu <changyuanl@google.com>, Colton Lewis <coltonlewis@google.com>, 
-	Jintack Lim <jintack.lim@linaro.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+References: <20240710234222.2333120-1-jthoughton@google.com> <DS0PR11MB637397059B5DAE2AA7B819BCDCA12@DS0PR11MB6373.namprd11.prod.outlook.com>
+In-Reply-To: <DS0PR11MB637397059B5DAE2AA7B819BCDCA12@DS0PR11MB6373.namprd11.prod.outlook.com>
+From: James Houghton <jthoughton@google.com>
+Date: Tue, 16 Jul 2024 10:10:27 -0700
+Message-ID: <CADrL8HUv+RvazbOyx+NJ1oNd8FdMGd_T61Kjtia1cqJsN=WiOA@mail.gmail.com>
+Subject: Re: [RFC PATCH 00/18] KVM: Post-copy live migration for guest_memfd
+To: "Wang, Wei W" <wei.w.wang@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Sean Christopherson <seanjc@google.com>, Shuah Khan <shuah@kernel.org>, 
+	Axel Rasmussen <axelrasmussen@google.com>, David Matlack <dmatlack@google.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, Peter Xu <peterx@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 15, 2024 at 8:57=E2=80=AFAM Oliver Upton <oliver.upton@linux.de=
-v> wrote:
+On Mon, Jul 15, 2024 at 8:28=E2=80=AFAM Wang, Wei W <wei.w.wang@intel.com> =
+wrote:
 >
-> Hi Paolo,
->
-> Apologies for sending this later than usual, I took some vacation at the
-> end of last week and didn't have the time to send out before.
->
-> Details can be found in the tag. Nothing significant to note, though
-> Catalin reports a trivial conflict in arch/arm64/include/asm/esr.h
-> between our trees [*].
+> On Thursday, July 11, 2024 7:42 AM, James Houghton wrote:
+> > This patch series implements the KVM-based demand paging system that wa=
+s
+> > first introduced back in November[1] by David Matlack.
+> >
+> > The working name for this new system is KVM Userfault, but that name is=
+ very
+> > confusing so it will not be the final name.
+> >
+> Hi James,
+> I had implemented a similar approach for TDX post-copy migration, there a=
+re quite
+> some differences though. Got some questions about your design below.
 
-All good, pulled.
-
-Thanks,
-
-Paolo
+Thanks for the feedback!!
 
 >
-> Please pull.
+> > Problem: post-copy with guest_memfd
+> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >
+> > Post-copy live migration makes it possible to migrate VMs from one host=
+ to
+> > another no matter how fast they are writing to memory while keeping the=
+ VM
+> > paused for a minimal amount of time. For post-copy to work, we
+> > need:
+> >  1. to be able to prevent KVM from being able to access particular page=
+s
+> >     of guest memory until we have populated it  2. for userspace to kno=
+w when
+> > KVM is trying to access a particular
+> >     page.
+> >  3. a way to allow the access to proceed.
+> >
+> > Traditionally, post-copy live migration is implemented using userfaultf=
+d, which
+> > hooks into the main mm fault path. KVM hits this path when it is doing =
+HVA ->
+> > PFN translations (with GUP) or when it itself attempts to access guest =
+memory.
+> > Userfaultfd sends a page fault notification to userspace, and KVM goes =
+to sleep.
+> >
+> > Userfaultfd works well, as it is not specific to KVM; everyone who atte=
+mpts to
+> > access guest memory will block the same way.
+> >
+> > However, with guest_memfd, we do not use GUP to translate from GFN to H=
+PA
+> > (nor is there an intermediate HVA).
+> >
+> > So userfaultfd in its current form cannot be used to support post-copy =
+live
+> > migration with guest_memfd-backed VMs.
+> >
+> > Solution: hook into the gfn -> pfn translation
+> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >
+> > The only way to implement post-copy with a non-KVM-specific userfaultfd=
+-like
+> > system would be to introduce the concept of a file-userfault[2] to inte=
+rcept
+> > faults on a guest_memfd.
+> >
+> > Instead, we take the simpler approach of adding a KVM-specific API, and=
+ we
+> > hook into the GFN -> HVA or GFN -> PFN translation steps (for tradition=
+al
+> > memslots and for guest_memfd respectively).
 >
-> Thanks,
-> Oliver
 >
-> [*] https://lore.kernel.org/linux-arm-kernel/20240711190353.3248426-1-cat=
-alin.marinas@arm.com/
->
-> The following changes since commit 83a7eefedc9b56fe7bfeff13b6c7356688ffa6=
-70:
->
->   Linux 6.10-rc3 (2024-06-09 14:19:43 -0700)
->
-> are available in the Git repository at:
->
->   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kv=
-marm-6.11
->
-> for you to fetch changes up to bb032b2352c33be374136889789103d724f1b613:
->
->   Merge branch kvm-arm64/docs into kvmarm/next (2024-07-14 00:28:57 +0000=
-)
->
-> ----------------------------------------------------------------
-> KVM/arm64 changes for 6.11
->
->  - Initial infrastructure for shadow stage-2 MMUs, as part of nested
->    virtualization enablement
->
->  - Support for userspace changes to the guest CTR_EL0 value, enabling
->    (in part) migration of VMs between heterogenous hardware
->
->  - Fixes + improvements to pKVM's FF-A proxy, adding support for v1.1 of
->    the protocol
->
->  - FPSIMD/SVE support for nested, including merged trap configuration
->    and exception routing
->
->  - New command-line parameter to control the WFx trap behavior under KVM
->
->  - Introduce kCFI hardening in the EL2 hypervisor
->
->  - Fixes + cleanups for handling presence/absence of FEAT_TCRX
->
->  - Miscellaneous fixes + documentation updates
->
-> ----------------------------------------------------------------
-> Changyuan Lyu (3):
->       KVM: Documentation: Fix typo `BFD`
->       KVM: Documentation: Enumerate allowed value macros of `irq_type`
->       KVM: Documentation: Correct the VGIC V2 CPU interface addr space si=
-ze
->
-> Christoffer Dall (2):
->       KVM: arm64: nv: Implement nested Stage-2 page table walk logic
->       KVM: arm64: nv: Unmap/flush shadow stage 2 page tables
->
-> Colton Lewis (1):
->       KVM: arm64: Add early_param to control WFx trapping
->
-> Jintack Lim (1):
->       KVM: arm64: nv: Forward FP/ASIMD traps to guest hypervisor
->
-> Marc Zyngier (25):
->       KVM: arm64: nv: Fix RESx behaviour of disabled FGTs with negative p=
-olarity
->       KVM: arm64: nv: Support multiple nested Stage-2 mmu structures
->       KVM: arm64: nv: Handle shadow stage 2 page faults
->       KVM: arm64: nv: Add Stage-1 EL2 invalidation primitives
->       KVM: arm64: nv: Handle EL2 Stage-1 TLB invalidation
->       KVM: arm64: nv: Handle TLB invalidation targeting L2 stage-1
->       KVM: arm64: nv: Handle TLBI VMALLS12E1{,IS} operations
->       KVM: arm64: nv: Handle TLBI ALLE1{,IS} operations
->       KVM: arm64: nv: Handle TLBI IPAS2E1{,IS} operations
->       KVM: arm64: nv: Handle FEAT_TTL hinted TLB operations
->       KVM: arm64: nv: Tag shadow S2 entries with guest's leaf S2 level
->       KVM: arm64: nv: Invalidate TLBs based on shadow S2 TTL-like informa=
-tion
->       KVM: arm64: nv: Add handling of outer-shareable TLBI operations
->       KVM: arm64: nv: Add handling of range-based TLBI operations
->       KVM: arm64: nv: Add handling of NXS-flavoured TLBI operations
->       KVM: arm64: nv: Handle CPACR_EL1 traps
->       KVM: arm64: nv: Add TCPAC/TTA to CPTR->CPACR conversion helper
->       KVM: arm64: nv: Add trap description for CPTR_EL2
->       KVM: arm64: nv: Add additional trap setup for CPTR_EL2
->       KVM: arm64: Correctly honor the presence of FEAT_TCRX
->       KVM: arm64: Get rid of HCRX_GUEST_FLAGS
->       KVM: arm64: Make TCR2_EL1 save/restore dependent on the VM features
->       KVM: arm64: Make PIR{,E0}_EL1 save/restore conditional on FEAT_TCRX
->       KVM: arm64: Honor trap routing for TCR2_EL1
->       KVM: arm64: nv: Truely enable nXS TLBI operations
->
-> Oliver Upton (28):
->       KVM: arm64: nv: Use GFP_KERNEL_ACCOUNT for sysreg_masks allocation
->       KVM: arm64: Get sys_reg encoding from descriptor in idregs_debug_sh=
-ow()
->       KVM: arm64: Make idregs debugfs iterator search sysreg table direct=
-ly
->       KVM: arm64: Use read-only helper for reading VM ID registers
->       KVM: arm64: Add helper for writing ID regs
->       KVM: arm64: nv: Use accessors for modifying ID registers
->       KVM: arm64: nv: Forward SVE traps to guest hypervisor
->       KVM: arm64: nv: Handle ZCR_EL2 traps
->       KVM: arm64: nv: Load guest hyp's ZCR into EL1 state
->       KVM: arm64: nv: Save guest's ZCR_EL2 when in hyp context
->       KVM: arm64: nv: Use guest hypervisor's max VL when running nested g=
-uest
->       KVM: arm64: nv: Ensure correct VL is loaded before saving SVE state
->       KVM: arm64: Spin off helper for programming CPTR traps
->       KVM: arm64: nv: Load guest FP state for ZCR_EL2 trap
->       KVM: arm64: nv: Honor guest hypervisor's FP/SVE traps in CPTR_EL2
->       KVM: arm64: Allow the use of SVE+NV
->       KVM: arm64: nv: Unfudge ID_AA64PFR0_EL1 masking
->       KVM: selftests: Assert that MPIDR_EL1 is unchanged across vCPU rese=
-t
->       MAINTAINERS: Include documentation in KVM/arm64 entry
->       Revert "KVM: arm64: nv: Fix RESx behaviour of disabled FGTs with ne=
-gative polarity"
->       Merge branch kvm-arm64/misc into kvmarm/next
->       Merge branch kvm-arm64/ffa-1p1 into kvmarm/next
->       Merge branch kvm-arm64/shadow-mmu into kvmarm/next
->       Merge branch kvm-arm64/ctr-el0 into kvmarm/next
->       Merge branch kvm-arm64/el2-kcfi into kvmarm/next
->       Merge branch kvm-arm64/nv-sve into kvmarm/next
->       Merge branch kvm-arm64/nv-tcr2 into kvmarm/next
->       Merge branch kvm-arm64/docs into kvmarm/next
->
-> Pierre-Cl=C3=A9ment Tosi (8):
->       KVM: arm64: Fix clobbered ELR in sync abort/SError
->       KVM: arm64: Fix __pkvm_init_switch_pgd call ABI
->       KVM: arm64: nVHE: Simplify invalid_host_el2_vect
->       KVM: arm64: nVHE: gen-hyprel: Skip R_AARCH64_ABS32
->       KVM: arm64: VHE: Mark __hyp_call_panic __noreturn
->       arm64: Introduce esr_brk_comment, esr_is_cfi_brk
->       KVM: arm64: Introduce print_nvhe_hyp_panic helper
->       KVM: arm64: nVHE: Support CONFIG_CFI_CLANG at EL2
->
-> Sebastian Ene (4):
->       KVM: arm64: Trap FFA_VERSION host call in pKVM
->       KVM: arm64: Add support for FFA_PARTITION_INFO_GET
->       KVM: arm64: Update the identification range for the FF-A smcs
->       KVM: arm64: Use FF-A 1.1 with pKVM
->
-> Sebastian Ott (5):
->       KVM: arm64: unify code to prepare traps
->       KVM: arm64: Treat CTR_EL0 as a VM feature ID register
->       KVM: arm64: show writable masks for feature registers
->       KVM: arm64: rename functions for invariant sys regs
->       KVM: selftests: arm64: Test writes to CTR_EL0
->
->  Documentation/admin-guide/kernel-parameters.txt   |   18 +
->  Documentation/virt/kvm/api.rst                    |   10 +-
->  Documentation/virt/kvm/devices/arm-vgic.rst       |    2 +-
->  MAINTAINERS                                       |    2 +
->  arch/arm64/include/asm/esr.h                      |   12 +
->  arch/arm64/include/asm/kvm_arm.h                  |    1 -
->  arch/arm64/include/asm/kvm_asm.h                  |    2 +
->  arch/arm64/include/asm/kvm_emulate.h              |   95 +-
->  arch/arm64/include/asm/kvm_host.h                 |   68 +-
->  arch/arm64/include/asm/kvm_hyp.h                  |    4 +-
->  arch/arm64/include/asm/kvm_mmu.h                  |   26 +
->  arch/arm64/include/asm/kvm_nested.h               |  131 ++-
->  arch/arm64/include/asm/sysreg.h                   |   17 +
->  arch/arm64/kernel/asm-offsets.c                   |    1 +
->  arch/arm64/kernel/debug-monitors.c                |    4 +-
->  arch/arm64/kernel/traps.c                         |    8 +-
->  arch/arm64/kvm/arm.c                              |   86 +-
->  arch/arm64/kvm/emulate-nested.c                   |  104 +++
->  arch/arm64/kvm/fpsimd.c                           |   19 +-
->  arch/arm64/kvm/handle_exit.c                      |   43 +-
->  arch/arm64/kvm/hyp/entry.S                        |    8 +
->  arch/arm64/kvm/hyp/include/hyp/switch.h           |   29 +-
->  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h        |   35 +-
->  arch/arm64/kvm/hyp/include/nvhe/ffa.h             |    2 +-
->  arch/arm64/kvm/hyp/nvhe/Makefile                  |    6 +-
->  arch/arm64/kvm/hyp/nvhe/ffa.c                     |  180 +++-
->  arch/arm64/kvm/hyp/nvhe/gen-hyprel.c              |    6 +
->  arch/arm64/kvm/hyp/nvhe/host.S                    |    6 -
->  arch/arm64/kvm/hyp/nvhe/hyp-init.S                |   30 +-
->  arch/arm64/kvm/hyp/nvhe/setup.c                   |    4 +-
->  arch/arm64/kvm/hyp/vhe/switch.c                   |  202 ++++-
->  arch/arm64/kvm/hyp/vhe/tlb.c                      |  147 +++
->  arch/arm64/kvm/mmu.c                              |  213 ++++-
->  arch/arm64/kvm/nested.c                           | 1002 +++++++++++++++=
-+++---
->  arch/arm64/kvm/pmu-emul.c                         |    2 +-
->  arch/arm64/kvm/reset.c                            |    6 +
->  arch/arm64/kvm/sys_regs.c                         |  593 +++++++++++-
->  include/linux/arm_ffa.h                           |    3 +
->  tools/testing/selftests/kvm/aarch64/set_id_regs.c |   17 +
->  39 files changed, 2764 insertions(+), 380 deletions(-)
->
+> Why taking KVM_EXIT_MEMORY_FAULT faults for the traditional shared
+> pages (i.e. GFN -> HVA)?
+> It seems simpler if we use KVM_EXIT_MEMORY_FAULT for private pages only, =
+leaving
+> shared pages to go through the existing userfaultfd mechanism:
+> - The need for =E2=80=9Casynchronous userfaults,=E2=80=9D introduced by p=
+atch 14, could be eliminated.
+> - The additional support (e.g., KVM_MEMORY_EXIT_FLAG_USERFAULT) for priva=
+te page
+>   faults exiting to userspace for postcopy might not be necessary, becaus=
+e all pages on the
+>   destination side are initially =E2=80=9Cshared,=E2=80=9D and the guest=
+=E2=80=99s first access will always cause an
+>   exit to userspace for shared->private conversion. So VMM is able to lev=
+erage the exit to
+>   fetch the page data from the source (VMM can know if a page data has be=
+en fetched
+>   from the source or not).
 
+You're right that, today, including support for guest-private memory
+*only* indeed simplifies things (no async userfaults). I think your
+strategy for implementing post-copy would work (so, shared->private
+conversion faults for vCPU accesses to private memory, and userfaultfd
+for everything else).
+
+I'm not 100% sure what should happen in the case of a non-vCPU access
+to should-be-private memory; today it seems like KVM just provides the
+shared version of the page, so conventional use of userfaultfd
+shouldn't break anything.
+
+But eventually guest_memfd itself will support "shared" memory, and
+(IIUC) it won't use VMAs, so userfaultfd won't be usable (without
+changes anyway). For a non-confidential VM, all memory will be
+"shared", so shared->private conversions can't help us there either.
+Starting everything as private almost works (so using private->shared
+conversions as a notification mechanism), but if the first time KVM
+attempts to use a page is not from a vCPU (and is from a place where
+we cannot easily return to userspace), the need for "async userfaults"
+comes back.
+
+For this use case, it seems cleaner to have a new interface. (And, as
+far as I can tell, we would at least need some kind of "async
+userfault"-like mechanism.)
+
+Another reason why, today, KVM Userfault is helpful is that
+userfaultfd has a couple drawbacks. Userfaultfd migration with
+HugeTLB-1G is basically unusable, as HugeTLB pages cannot be mapped at
+PAGE_SIZE. Some discussion here[1][2].
+
+Moving the implementation of post-copy to KVM means that, throughout
+post-copy, we can avoid changes to the main mm page tables, and we
+only need to modify the second stage page tables. This saves the
+memory needed to store the extra set of shattered page tables, and we
+save the performance overhead of the page table modifications and
+accounting that mm does.
+
+There's some more discussion about these points in David's RFC[3].
+
+[1]: https://lore.kernel.org/linux-mm/20230218002819.1486479-1-jthoughton@g=
+oogle.com/
+[2]: https://lore.kernel.org/linux-mm/ZdcKwK7CXgEsm-Co@x1n/
+[3]: https://lore.kernel.org/kvm/CALzav=3Dd23P5uE=3DoYqMpjFohvn0CASMJxXB_XE=
+OEi-jtqWcFTDA@mail.gmail.com/
+
+>
+> >
+
+> > I have intentionally added support for traditional memslots, as the com=
+plexity
+> > that it adds is minimal, and it is useful for some VMMs, as it can be u=
+sed to
+> > fully implement post-copy live migration.
+> >
+> > Implementation Details
+> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >
+> > Let's break down how KVM implements each of the three core requirements
+> > for implementing post-copy as laid out above:
+> >
+> > --- Preventing access: KVM_MEMORY_ATTRIBUTE_USERFAULT ---
+> >
+> > The most straightforward way to inform KVM of userfault-enabled pages i=
+s to
+> > use a new memory attribute, say KVM_MEMORY_ATTRIBUTE_USERFAULT.
+> >
+> > There is already infrastructure in place for modifying and checking mem=
+ory
+> > attributes. Using this interface is slightly challenging, as there is n=
+o UAPI for
+> > setting/clearing particular attributes; we must set the exact attribute=
+s we want.
+> >
+> > The synchronization that is in place for updating memory attributes is =
+not
+> > suitable for post-copy live migration either, which will require updati=
+ng
+> > memory attributes (from userfault to no-userfault) very frequently.
+> >
+> > Another potential interface could be to use something akin to a dirty b=
+itmap,
+> > where a bitmap describes which pages within a memslot (or VM) should tr=
+igger
+> > userfaults. This way, it is straightforward to make updates to the user=
+fault
+> > status of a page cheap.
+> >
+> > When KVM Userfault is enabled, we need to be careful not to map a userf=
+ault
+> > page in response to a fault on a non-userfault page. In this RFC, I've =
+taken the
+> > simplest approach: force new PTEs to be PAGE_SIZE.
+> >
+> > --- Page fault notifications ---
+> >
+> > For page faults generated by vCPUs running in guest mode, if the page t=
+he
+> > vCPU is trying to access is a userfault-enabled page, we use
+>
+> Why is it necessary to add the per-page control (with uAPIs for VMM to se=
+t/clear)?
+> Any functional issues if we just have all the page faults exit to userspa=
+ce during the
+> post-copy period?
+> - As also mentioned above, userspace can easily know if a page needs to b=
+e
+>   fetched from the source or not, so upon a fault exit to userspace, VMM =
+can
+>   decide to block the faulting vcpu thread or return back to KVM immediat=
+ely.
+> - If improvement is really needed (would need profiling first) to reduce =
+number
+>   of exits to userspace, a  KVM internal status (bitmap or xarray) seems =
+sufficient.
+>   Each page only needs to exit to userspace once for the purpose of fetch=
+ing its data
+>   from the source in postcopy. It doesn't seem to need userspace to enabl=
+e the exit
+>   again for the page (via a new uAPI), right?
+
+We don't necessarily need a way to go from no-fault -> fault for a
+page, that's right[4]. But we do need a way for KVM to be able to
+allow the access to proceed (i.e., go from fault -> no-fault). IOW, if
+we get a fault and come out to userspace, we need a way to tell KVM
+not to do that again. In the case of shared->private conversions, that
+mechanism is toggling the memory attributes for a gfn. For
+conventional userfaultfd, that's using UFFDIO_COPY/CONTINUE/POISON.
+Maybe I'm misunderstanding your question.
+
+[4]: It is helpful for poison emulation for HugeTLB-backed VMs today,
+but this is not important.
