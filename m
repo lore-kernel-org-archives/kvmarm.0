@@ -1,104 +1,105 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6E726BFA3
-	for <kvmarm@lists.linux.dev>; Thu, 18 Jul 2024 21:55:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5591145346
+	for <kvmarm@lists.linux.dev>; Thu, 18 Jul 2024 22:28:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721339739; cv=none; b=gGjx6Hy96jdpenmJ0pnLKeGXCoiNpR6TQWLLHyrFPHXby/qOfDjY/4eaZq2zmjrbjNvtwxo2wxNwVxRvJQGCAOmlVyBwkr1ho7ELD6a9MM89q3Vtrg0QGFQ39PVBzc/UOpgbkW8qGbMxhAwvq0KmCVo9yTNxgL4MHz8OiquLH4Q=
+	t=1721341717; cv=none; b=u4IY8WjnQdZKi7jb3jfwqKjOZHklHkmWgRSmurnbbenYr3/Z9Wtuc0Nl+UXRb4JrFMFStydYnKWn5IqUepUfUJkDP7VrOnZFJ9S1Bvrh5B9sTPGnzNXF73wP74G+RfielRtn6qvjqOL1Xj1G8rY/KPKvnh3s6wYd6Z2RvlL4W90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721339739; c=relaxed/simple;
-	bh=oy+xhyLxOF6scskKrZGttBuTtQp9Z+cIPmP+Qd92V1g=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=qvPHRR2Lnn9Mc+fJzmyHmdMJ9HP02CtOYAlLlERocKEvrJ19YzX6iNktN4ER6WU3oczIEfN9EZvCFzryx8Tj4aRLYjiKcRa1vvanaQGAUFd4iti85ne4ZAeHfdL3Hux/KKHz4cl0EU11W0wYJTzmOtOPZu2smvsvggriOgHhKDs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ukUdXmbj; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com
+	s=arc-20240116; t=1721341717; c=relaxed/simple;
+	bh=/dgDQ63gkEhY3dFzZwulJGUglg5Uq6j9k84TZuMsK6g=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=bw52PZxiiZreyGAlv80DUK6XxTQcgDLj3Qd+9wRe8uGjlbVIND23LD9I4r5sUDxHfl1KaPHnnkXm6i/u3wSN3nY+HnHnhEaLmfAzWYtezJuI57G1qPcTb7dxTuCWIsUcYRsV1wxvhhgNO+9vBtfM+zaA17Dk8E+3YIivEznSukc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=MfTv70lY; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ukUdXmbj"
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6688b5b40faso24004557b3.2
-        for <kvmarm@lists.linux.dev>; Thu, 18 Jul 2024 14:55:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MfTv70lY"
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1fc424901dbso13093635ad.1
+        for <kvmarm@lists.linux.dev>; Thu, 18 Jul 2024 15:28:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1721339737; x=1721944537; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=EypkathlExzRF6s7Pw1Va6Kut8AWRhF2PFYDjZMhs2I=;
-        b=ukUdXmbj8NhIJ6zaiQpsL2yKffKQ/GK011kPZq5HS9yYExHQvz8mhS9qLsXiP2Qws0
-         wBjh/FQXBjmaz7LEEbosJXMlaGO3oeNC1GhAd2/T3y4sUOpiogl08g8SoSsWXmtxP1yF
-         6265oYmsAqoQHZISbLZ/fOvvxTD8+OlmN76hhYC9MLCKOx2JskADPf+dU/H7oASJRYmo
-         OG4kq0+MPgbUEIvG8ORZfrwZ0Ni+4bfzm7/BDC9oO59NrPnhYM0T9jBhzJ3eVQBQ2DQb
-         yuzwnAs68Q9Le6EMN+q1Kv/+v4fG97P50SjtYV7fK35MqSw9tIwLpVvhEgm2mIwqxrxX
-         yxJQ==
+        d=linaro.org; s=google; t=1721341715; x=1721946515; darn=lists.linux.dev;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=mAFp8cCYrsuMTkT1FWDyABYg4XKo158nqIj+Kj0+oyk=;
+        b=MfTv70lYhDb+AroRM3FQYFHM+KofD07Vty9Q/qTKS8UbBGSp/jyOueB6D52KZkotOT
+         /60/rjR0DxhON5T/DLoYcQKhAwXH9qxNtnrJpaGWDreIqoLPCD4B+VeeAQ+nKDayecnN
+         r2KfT1Vvm4Qw6YBXh8FpbezvGdTyR9dSESbW0VZaD9fUzJ2JXOxLrPPQMp4pXsOwU2+w
+         k0s3nt+rF41ZanGbI6fLHhKnjG+Trab9h77ye85bTXmRQvZCdIW0nio12Tg0TlPRoe90
+         48jnDZ4unsPP17zakYpg22BPJLoZujnATbVlK7/aJWjQFkKbzU06Rrjd4+n5H+GGzNB8
+         K9sg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721339737; x=1721944537;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=EypkathlExzRF6s7Pw1Va6Kut8AWRhF2PFYDjZMhs2I=;
-        b=WMYo45w1ASa7jmlVRdgnonyfdm4jbgFb9LrlDgS+hKHwzGU+i+cPa4Or2p3U+rxjaf
-         QNURHhu2exZH9CvY4KqApSxWJEJNsShybXJSn7rsml+8jKHjz/svhGUGV/h7X+B87hDv
-         aIFQ+oEJinDSYzaxJVCRKEEWzUR3QmiIzRXXRGkXyFooJkprnma2pEPJpDAruBlXZIfb
-         3CHA8KtC0JOUs5X6P77hCNCRiU5hFPItrPM6FKxJsrPVt6ewtwA947gtsENfCD28xDE8
-         C6UXPly0Ww+CD5aj9rs6BHjvfmVvSlq3I5UH6KNcX5lKBKnQeKJ2kxd3ufmLsgLoXN+C
-         9Vkg==
-X-Forwarded-Encrypted: i=1; AJvYcCVJv8H3SUDD14iQOBJoLMoL7nvKugIjKLtc5w+OiAEtlkhbcZiZFpw9AhS9Yfi//Idy2t6wVS+opVuGQ3nXrfQ3FJSJk5Y2
-X-Gm-Message-State: AOJu0YxBATyPjvc1gtgxmfnAdUeHseWMGhsTEGc9Ydrlqk9zZigs4XBi
-	Qf8SJoiI5iRv4IU7xF95ugwjB490DXYL1DqivXHPN4sJZExaJ6eO1mTY7Rymm0//tQsqcNdvK7R
-	Sec1N7A==
-X-Google-Smtp-Source: AGHT+IFixUR+r//SSF50MMiOX3++HyGfKjJb2WSupKJ5Es5CNqnpttrvuhfPOedVV7rtWVwhpror9bgKMQQv
-X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:20a1])
- (user=rananta job=sendgmr) by 2002:a05:6902:180c:b0:e03:5144:1d48 with SMTP
- id 3f1490d57ef6-e05fec1f9d9mr6383276.11.1721339736356; Thu, 18 Jul 2024
- 14:55:36 -0700 (PDT)
-Date: Thu, 18 Jul 2024 21:55:32 +0000
+        d=1e100.net; s=20230601; t=1721341715; x=1721946515;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mAFp8cCYrsuMTkT1FWDyABYg4XKo158nqIj+Kj0+oyk=;
+        b=AmOw5x/vtPYD6o1hsh2MSNI0oOcg25DguFVya5xafJxJaqCozp824eVUi9VxkfK4hX
+         nd4JrcS7VK737bOn5Ki6Djbrjb8T9KB4A/H/OFMm/X2fENZO0LW3sTRcdacK6BVDCLXc
+         5MEbjrrbI0RSlwp9W9iQOr6/u+1dOagskNp+EDnwSEKhBOStZXQJLnugcaeJJ+w2JNwg
+         0CtCR8fgHfLm+XlcJG16amcTB4/+Lt1/HWtMrRbgeeI7EnbA1+HNOqQy+InBg+VRoIfz
+         SCkW2aGZ1hJii2CI1Xu4mp75NaedVt9mmoQYJdo+7zMzjrVp114VkBHUH9PKEgcrz8wv
+         o7MQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVfyQR5ORP7ait8C35f1MDXCrcooQgnIwlOCtSR27o5BDn4h2tjASCqtKXH79aEOnhk2yjKTlNi7jSqJnRQCnrkoqgv2qvC
+X-Gm-Message-State: AOJu0YzkBfjdJcb5HH3CiOu30kuDj7YOpe+bmLME3czm3pMi2PirSX3s
+	R/MfZKIStG/hD0kHe84VGtQKdtJVKSJm6do6DEMXJO+DI5znv2tYwEGACctYAhM=
+X-Google-Smtp-Source: AGHT+IF+55vW6JaqSjwGQi3R1yuf8ZxKtUymaiTTvyr4EyfBefOjisnvw3P8CACe6QPfDEnW0zUgIw==
+X-Received: by 2002:a17:902:f707:b0:1fb:37fa:fedb with SMTP id d9443c01a7336-1fc4e154856mr54520445ad.10.1721341714980;
+        Thu, 18 Jul 2024 15:28:34 -0700 (PDT)
+Received: from localhost ([2804:14d:7e39:8470:15c8:3512:f33c:2f80])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fd64b51aebsm849435ad.27.2024.07.18.15.28.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Jul 2024 15:28:34 -0700 (PDT)
+From: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,  Will Deacon
+ <will@kernel.org>,  Jonathan Corbet <corbet@lwn.net>,  Andrew Morton
+ <akpm@linux-foundation.org>,  Marc Zyngier <maz@kernel.org>,  Oliver Upton
+ <oliver.upton@linux.dev>,  James Morse <james.morse@arm.com>,  Suzuki K
+ Poulose <suzuki.poulose@arm.com>,  Arnd Bergmann <arnd@arndb.de>,  Oleg
+ Nesterov <oleg@redhat.com>,  Eric Biederman <ebiederm@xmission.com>,
+  Shuah Khan <shuah@kernel.org>,  "Rick P. Edgecombe"
+ <rick.p.edgecombe@intel.com>,  Deepak Gupta <debug@rivosinc.com>,  Ard
+ Biesheuvel <ardb@kernel.org>,  Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
+  Kees Cook <kees@kernel.org>,  "H.J. Lu" <hjl.tools@gmail.com>,  Paul
+ Walmsley <paul.walmsley@sifive.com>,  Palmer Dabbelt <palmer@dabbelt.com>,
+  Albert Ou <aou@eecs.berkeley.edu>,  Florian Weimer <fweimer@redhat.com>,
+  Christian Brauner <brauner@kernel.org>,  Ross Burton
+ <ross.burton@arm.com>,  linux-arm-kernel@lists.infradead.org,
+  linux-doc@vger.kernel.org,  kvmarm@lists.linux.dev,
+  linux-fsdevel@vger.kernel.org,  linux-arch@vger.kernel.org,
+  linux-mm@kvack.org,  linux-kselftest@vger.kernel.org,
+  linux-kernel@vger.kernel.org,  linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v9 35/39] kselftest/arm64: Add a GCS test program built
+ with the system libc
+In-Reply-To: <a1ee93ab-2168-4228-a4e8-eab02c046bd3@sirena.org.uk> (Mark
+	Brown's message of "Thu, 18 Jul 2024 17:16:39 +0100")
+References: <20240625-arm64-gcs-v9-0-0f634469b8f0@kernel.org>
+	<20240625-arm64-gcs-v9-35-0f634469b8f0@kernel.org>
+	<87plray8we.fsf@linaro.org>
+	<a1ee93ab-2168-4228-a4e8-eab02c046bd3@sirena.org.uk>
+Date: Thu, 18 Jul 2024 19:28:32 -0300
+Message-ID: <87ed7qxrlb.fsf@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.45.2.1089.g2a221341d9-goog
-Message-ID: <20240718215532.616447-1-rananta@google.com>
-Subject: [PATCH] arm64/sysreg: Correct the values for GICv4.1
-From: Raghavendra Rao Ananta <rananta@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Mark Brown <broonie@kernel.org>
-Cc: Raghavendra Rao Anata <rananta@google.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain
 
-Currently, sysreg has value as 0b0010 for the presence of GICv4.1 in
-ID_PFR1_EL1 and ID_AA64PFR0_EL1, instead of 0b0011 as per ARM ARM.
-Hence, correct them to reflect ARM ARM.
+Mark Brown <broonie@kernel.org> writes:
 
-Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
----
- arch/arm64/tools/sysreg | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> On Thu, Jul 18, 2024 at 01:14:41PM -0300, Thiago Jung Bauermann wrote:
+>
+>> In my FVP VM, this test gets a GCS SIGSEGV before running the first test:
+>
+> Do you have THP enabled?  That still doesn't work (I'm expecting it to
+> be fixed with -rc1).
 
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index a4c1dd4741a47..7ceaa1e0b4bc2 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -149,7 +149,7 @@ Res0	63:32
- UnsignedEnum	31:28	GIC
- 	0b0000	NI
- 	0b0001	GICv3
--	0b0010	GICv4p1
-+	0b0011	GICv4p1
- EndEnum
- UnsignedEnum	27:24	Virt_frac
- 	0b0000	NI
-@@ -903,7 +903,7 @@ EndEnum
- UnsignedEnum	27:24	GIC
- 	0b0000	NI
- 	0b0001	IMP
--	0b0010	V4P1
-+	0b0011	V4P1
- EndEnum
- SignedEnum	23:20	AdvSIMD
- 	0b0000	IMP
+I did have it enabled. After turning it off in the kernel config, the
+test does pass. But I see 30 lines of "INVALID GCS" in dmesg while
+running it. Is it expected?
 
-base-commit: 0c3836482481200ead7b416ca80c68a29cfdaabd
 -- 
-2.45.2.1089.g2a221341d9-goog
-
+Thiago
