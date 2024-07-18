@@ -1,122 +1,196 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FA17839E4;
-	Thu, 18 Jul 2024 11:37:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B00041E535
+	for <kvmarm@lists.linux.dev>; Thu, 18 Jul 2024 14:16:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721302672; cv=none; b=fgtUeOLsxzhdn3W12/mz79un4mmxye9TmA54KSbuoNI3vhcIt8VDPgkVAdmfsJ/eZOjrDuxZwK952941bPhB858N9/9M5Z0mZk+ZzHipckFr5WuqejG+gVYkkSLIwunOEpUZP9f1V3lgpsc4NjeX5w3B+Rl87oOb8Yx+BLkRt/0=
+	t=1721312205; cv=none; b=BdsU+XtnZb/GHWAELHoDKbXcz0YjO0kc/s5KkGA+Nv2ZYm4IPkhNOkaxWLQXcxCo13R+ijwxMJJs4bAYNzTuQX1hTAoU8Bbfb8vAxWpgaLoSN7ExR3MeUUaABsycT9qRk1EojeA/5To+2Bt+slhkT8agOOZCQBe53oZ674Z4MSE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721302672; c=relaxed/simple;
-	bh=JTdVhHa8K8Oj9vWfltL+Kcl+giEACbBSmFqRmJsRqik=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KZm9RAoiyL0ySziJSa9mHskTgDEKXZ3Aqi3uTGtbKk9oMCl1oubbOefv3uX0CCb8OQM839Bo4GQbyj+MY9pU50Thz5PttOdm5mgyxf1Ewp89oS5nM12gghDqZKXVzDCuoXUomQBl9p/bkLn7ppHYP/y5C+58pUMVhnupCk9Vkl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AMFa9J87; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AMFa9J87"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAE5FC116B1;
-	Thu, 18 Jul 2024 11:37:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721302671;
-	bh=JTdVhHa8K8Oj9vWfltL+Kcl+giEACbBSmFqRmJsRqik=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=AMFa9J87Gi8RHYPHz8GZpa+zIVfUwtnGKw4QWBgJ7eRG5RKdN3XIbqEgB3dAA69xL
-	 zAv51c3H8tRE1RfsQ7dwymm89G7WduNX+zh8T+Neh+mwwP9FMaWUgswa5CfQwP+X1E
-	 jRmvn9zURoLeatMiMgUOoieJpdql7x83Qpx/P4CVQgOa2KAeEIILNBG2u0frCQYn+h
-	 z0Q8RbeqT/Z4aNxOBlIuGE7WW37vXehPRJJCyY9x1O8Vp5ny3F+63WHjM1ZtP01UnF
-	 /o9Fpv7OubkkzA5sCyApkELgrYVAxQdTnv9/l8vFdgrBxUUhSpGy8HuBd5IkVKQSBl
-	 66HXHp4bcUkhA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sUPSH-00DQvm-Gy;
-	Thu, 18 Jul 2024 12:37:49 +0100
-Date: Thu, 18 Jul 2024 12:37:49 +0100
-Message-ID: <87a5if53si.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Joey Gouly <joey.gouly@arm.com>
-Subject: Re: [PATCH 10/12] KVM: arm64: nv: Add SW walker for AT S1 emulation
-In-Reply-To: <ZpVAi3dqOOysMMnE@raptor>
-References: <20240625133508.259829-1-maz@kernel.org>
-	<20240708165800.1220065-1-maz@kernel.org>
-	<Zo+6TYIP3FNssR/b@arm.com>
-	<874j8wp1hx.wl-maz@kernel.org>
-	<ZpVAi3dqOOysMMnE@raptor>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1721312205; c=relaxed/simple;
+	bh=YLxFpBD7+iiuYF7hj6tJoc9aPtEN0q4fkiIoWyui4aY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Kn8BhZnRppa1aK2EUWxEj44FWE9lemYvajO4UQx40iyNFFbmD8aKwZtfKXNq/+WR5M/6D9APPosCC21vOIeF4pKcowNyMv744rLEm+GSAH63p6mcgTaVmvijfOmXikORDo7sIAt0VNoqdn6yO0H/y4CiWB7N5RjVfRHfbJ32j7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 251621063;
+	Thu, 18 Jul 2024 07:17:06 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C88F33F762;
+	Thu, 18 Jul 2024 07:16:37 -0700 (PDT)
+Date: Thu, 18 Jul 2024 15:16:33 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
+	aneesh.kumar@kernel.org, aneesh.kumar@linux.ibm.com, bp@alien8.de,
+	broonie@kernel.org, catalin.marinas@arm.com,
+	christophe.leroy@csgroup.eu, dave.hansen@linux.intel.com,
+	hpa@zytor.com, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
+	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
+	oliver.upton@linux.dev, shuah@kernel.org, szabolcs.nagy@arm.com,
+	tglx@linutronix.de, will@kernel.org, x86@kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v4 06/29] arm64: context switch POR_EL0 register
+Message-ID: <20240718141633.GA2229466@e124191.cambridge.arm.com>
+References: <20240503130147.1154804-1-joey.gouly@arm.com>
+ <20240503130147.1154804-7-joey.gouly@arm.com>
+ <3c655663-3407-4602-a958-c5382a6b3133@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3c655663-3407-4602-a958-c5382a6b3133@arm.com>
 
-Hi Alex,
-
-On Mon, 15 Jul 2024 16:30:19 +0100,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+On Mon, Jul 15, 2024 at 01:57:10PM +0530, Anshuman Khandual wrote:
 > 
-> In this patch, if I'm reading the code right (and I'm starting to doubt myself)
-> if PAR_EL1.F is set and PAR_EL1 doesn't indicate a permissions fault, then KVM
-> falls back to walking the S1 tables:
 > 
->         if (par & SYS_PAR_EL1_F) {
->                 u8 fst = FIELD_GET(SYS_PAR_EL1_FST, par);
+> On 5/3/24 18:31, Joey Gouly wrote:
+> > POR_EL0 is a register that can be modified by userspace directly,
+> > so it must be context switched.
+> > 
+> > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+> > Cc: Catalin Marinas <catalin.marinas@arm.com>
+> > Cc: Will Deacon <will@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/cpufeature.h |  6 ++++++
+> >  arch/arm64/include/asm/processor.h  |  1 +
+> >  arch/arm64/include/asm/sysreg.h     |  3 +++
+> >  arch/arm64/kernel/process.c         | 28 ++++++++++++++++++++++++++++
+> >  4 files changed, 38 insertions(+)
+> > 
+> > diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+> > index 8b904a757bd3..d46aab23e06e 100644
+> > --- a/arch/arm64/include/asm/cpufeature.h
+> > +++ b/arch/arm64/include/asm/cpufeature.h
+> > @@ -832,6 +832,12 @@ static inline bool system_supports_lpa2(void)
+> >  	return cpus_have_final_cap(ARM64_HAS_LPA2);
+> >  }
+> >  
+> > +static inline bool system_supports_poe(void)
+> > +{
+> > +	return IS_ENABLED(CONFIG_ARM64_POE) &&
 > 
->                 /*
->                  * If we get something other than a permission fault, we
->                  * need to retry, as we're likely to have missed in the PTs.
->                  */
->                 if ((fst & ESR_ELx_FSC_TYPE) != ESR_ELx_FSC_PERM)
->                         retry_slow = true;
-> 	}
+> CONFIG_ARM64_POE has not been defined/added until now ?
 > 
-> I suppose that's because KVM cannot distinguish between two very different
-> reasons for AT failing: 1, because of something being wrong with the stage 1
-> tables when the AT S1E0* instruction was executed and 2, because of missing
-> entries at stage 2, as per the comment. Is that correct?
+> > +		alternative_has_cap_unlikely(ARM64_HAS_S1POE);
+> > +}
+> > +
+> >  int do_emulate_mrs(struct pt_regs *regs, u32 sys_reg, u32 rt);
+> >  bool try_emulate_mrs(struct pt_regs *regs, u32 isn);
+> >  
+> > diff --git a/arch/arm64/include/asm/processor.h b/arch/arm64/include/asm/processor.h
+> > index f77371232d8c..e6376f979273 100644
+> > --- a/arch/arm64/include/asm/processor.h
+> > +++ b/arch/arm64/include/asm/processor.h
+> > @@ -184,6 +184,7 @@ struct thread_struct {
+> >  	u64			sctlr_user;
+> >  	u64			svcr;
+> >  	u64			tpidr2_el0;
+> > +	u64			por_el0;
+> >  };
+> 
+> As there going to be a new config i.e CONFIG_ARM64_POE, should not this
+> register be wrapped up with #ifdef CONFIG_ARM64_POE as well ? Similarly
+> access into p->thread.por_el0 should also be conditional on that config.
 
-Exactly. It doesn't help that I'm using 3 AT instructions to implement
-a single one, and that makes the window of opportunity for things to
-go wrong rather large.
+It seems like we're a bit inconsistent here, for example tpidr2_el0 from
+FEAT_SME is not guarded.  Not guarding means that we can have left #ifdef's in
+the C files and since system_supports_poe() checks if CONFIG_ARM64_POE is
+enabled, most of the code should be optimised away anyway. So unless there's a
+good reason I think it makes sense to stay this way.
 
-Now, I've been thinking about this some more, and I came to the
-conclusion that we can actually implement the FEAT_PAN2 instructions
-using the PAN2 instructions themselves, which would greatly simplify
-the code. We just need to switch PSTATE.PAN so that it reflects the
-guest's state around the AT instruction.
+> 
+> >  
+> >  static inline unsigned int thread_get_vl(struct thread_struct *thread,
+> > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> > index 9e8999592f3a..62c399811dbf 100644
+> > --- a/arch/arm64/include/asm/sysreg.h
+> > +++ b/arch/arm64/include/asm/sysreg.h
+> > @@ -1064,6 +1064,9 @@
+> >  #define POE_RXW		UL(0x7)
+> >  #define POE_MASK	UL(0xf)
+> >  
+> > +/* Initial value for Permission Overlay Extension for EL0 */
+> > +#define POR_EL0_INIT	POE_RXW
+> 
+> The idea behind POE_RXW as the init value is to be all permissive ?
 
-With that scheme, the process becomes slightly clearer (and applies to
-all AT instructions except for FEAT_ATS1A):
+Yup, the default index 0, needs to allow everything.
 
-- either we have a successful translation and all is good
-
-- or we have a failure for permission fault: all is good as well, as
-  this is simply a "normal" failure
-
-- or we have a failure for any other reason, and we must fall back to
-  a SW walk to work things out properly.
-
-I'll try to capture this reasoning as a comment in the next version.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+> 
+> > +
+> >  #define ARM64_FEATURE_FIELD_BITS	4
+> >  
+> >  /* Defined for compatibility only, do not add new users. */
+> > diff --git a/arch/arm64/kernel/process.c b/arch/arm64/kernel/process.c
+> > index 4ae31b7af6c3..0ffaca98bed6 100644
+> > --- a/arch/arm64/kernel/process.c
+> > +++ b/arch/arm64/kernel/process.c
+> > @@ -271,12 +271,23 @@ static void flush_tagged_addr_state(void)
+> >  		clear_thread_flag(TIF_TAGGED_ADDR);
+> >  }
+> >  
+> > +static void flush_poe(void)
+> > +{
+> > +	if (!system_supports_poe())
+> > +		return;
+> > +
+> > +	write_sysreg_s(POR_EL0_INIT, SYS_POR_EL0);
+> > +	/* ISB required for kernel uaccess routines when chaning POR_EL0 */
+> > +	isb();
+> > +}
+> > +
+> >  void flush_thread(void)
+> >  {
+> >  	fpsimd_flush_thread();
+> >  	tls_thread_flush();
+> >  	flush_ptrace_hw_breakpoint(current);
+> >  	flush_tagged_addr_state();
+> > +	flush_poe();
+> >  }
+> >  
+> >  void arch_release_task_struct(struct task_struct *tsk)
+> > @@ -371,6 +382,9 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
+> >  		if (system_supports_tpidr2())
+> >  			p->thread.tpidr2_el0 = read_sysreg_s(SYS_TPIDR2_EL0);
+> >  
+> > +		if (system_supports_poe())
+> > +			p->thread.por_el0 = read_sysreg_s(SYS_POR_EL0);
+> > +
+> >  		if (stack_start) {
+> >  			if (is_compat_thread(task_thread_info(p)))
+> >  				childregs->compat_sp = stack_start;
+> > @@ -495,6 +509,19 @@ static void erratum_1418040_new_exec(void)
+> >  	preempt_enable();
+> >  }
+> >  
+> > +static void permission_overlay_switch(struct task_struct *next)
+> > +{
+> > +	if (!system_supports_poe())
+> > +		return;
+> > +
+> > +	current->thread.por_el0 = read_sysreg_s(SYS_POR_EL0);
+> > +	if (current->thread.por_el0 != next->thread.por_el0) {
+> > +		write_sysreg_s(next->thread.por_el0, SYS_POR_EL0);
+> > +		/* ISB required for kernel uaccess routines when chaning POR_EL0 */
+> > +		isb();
+> > +	}
+> > +}
+> > +
+> >  /*
+> >   * __switch_to() checks current->thread.sctlr_user as an optimisation. Therefore
+> >   * this function must be called with preemption disabled and the update to
+> > @@ -530,6 +557,7 @@ struct task_struct *__switch_to(struct task_struct *prev,
+> >  	ssbs_thread_switch(next);
+> >  	erratum_1418040_thread_switch(next);
+> >  	ptrauth_thread_switch_user(next);
+> > +	permission_overlay_switch(next);
+> >  
+> >  	/*
+> >  	 * Complete any pending TLB or cache maintenance on this CPU in case
+> 
