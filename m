@@ -1,55 +1,57 @@
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8611144D35
-	for <kvmarm@lists.linux.dev>; Thu, 18 Jul 2024 23:03:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC6F5145FE3
+	for <kvmarm@lists.linux.dev>; Thu, 18 Jul 2024 23:34:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721343828; cv=none; b=Nr51QPeTHHHtsYZmrd/BCUssVyxkKuUTT2z0DRdxEL1olT+nCwnhraBAL0DH/9JEDtLjSKtYBSscIkgLOezsunCFX1BNB0k5znCh/6q0gcLmqRBg3T/50keXkzINQfyWKxYkYPt1qvQE4HQF6KYdlKFLArPcP8YALg/YtcFS+g4=
+	t=1721345663; cv=none; b=l74sibV7KZ70p/xb7sJXiVG6r5oq5GTEcc2UfCUFn2uLutnBtJsFFz/a0cv2J7V7fU7Z+ZEjBwkvkMWJF6WM4VKWL5zZCT3yfEBtv0h8uxT++zdJxXPODYQxPMkKb1uN6IDTgg4Iujm5EqMefgXYP9dEn/TlyYqEIEgToxdtuyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721343828; c=relaxed/simple;
-	bh=ZlxohWJiVwAqoT9g5IouKqA+eC9Q/GshbQdY1r9is2Q=;
+	s=arc-20240116; t=1721345663; c=relaxed/simple;
+	bh=Uy508/sq/1r69twOonqkXxOzsVEWpYS/wUjciXNylJA=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=ofxU+28ud704jjFehsuC2aQw9m/BJfCvaAiOlV1yOVHi23lnJaHLBYL2eeF5LtbSSanb8fDbIR/aMc7rOwvXbgnQL2XBpJ0peSBvtgj3UmAmTp/TV56g2sIjM/UzymxRBheePSdzy2mI/Y6B0V6r6qYxnizqAku4j7KGUTKXYnU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=oIL7nUib; arc=none smtp.client-ip=209.85.214.171
+	 MIME-Version:Content-Type; b=YK3wOOLY8yTMw94s3iHcynLB2oN3NUqFu5YppoMfrfLRrRDbMEHre1x7n7geX3EvbwLHEvjBNC7j1DCNUYeLkhIfUllljLxdI8P1K+RQ39zhr3GeL4htfw9ucyAprKsDUYTmmTfHIsvUFfHJJFdEaKdLpN4lGUy4Wjrv7pw2nLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=rtG+Fk7z; arc=none smtp.client-ip=209.85.215.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oIL7nUib"
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1fa9ecfb321so11714785ad.0
-        for <kvmarm@lists.linux.dev>; Thu, 18 Jul 2024 16:03:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rtG+Fk7z"
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-71871d5e087so1007253a12.1
+        for <kvmarm@lists.linux.dev>; Thu, 18 Jul 2024 16:34:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1721343825; x=1721948625; darn=lists.linux.dev;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=pz/gqH3g6k+Tlg5PlSG754DQsZEyo/RAObvbOwwmn1M=;
-        b=oIL7nUibxlBgriyDbY4y6LJU5fr4zPwRlgVAUhBw2UdGC7mnc/C5CqY16tLVFphTdn
-         ouLDLLxPS7Sd3QYWmj/aeOd9F6fikCWz2LdSQquh57v3+x6V7GIwrecvy0DPWF6tnP5j
-         jK1nva+pJ9ZZ43QELEUEtBnkx7vg+9DifEeW5q4qQzzaS7c3yrSxKeAhchSfSkdthLeS
-         hEUe/zNvf0xcvR5i857dLgN3psm71n9p6TP+jivoRk8aUyPmFDD6npdo4f/DdVh5tqjZ
-         R773UM7IcfbjDmK3H89GBJKLI0djE/ABwfjZT8CuWBkQsDW4zKLBO6N14FZa4usPwUyw
-         TIUQ==
+        d=linaro.org; s=google; t=1721345661; x=1721950461; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/qF+1IDJjtH4yt3+dIXZUb/sL6BCvMKOBa4IWo3wL00=;
+        b=rtG+Fk7zJQfu+TjnC4IwK/ftBtVFGxy1yDQuhWb8Ak3e9QOJQksq4hlWxLxLO4ExYP
+         NqRQeful6HGVatnKTN7b7sW2xDXWbPo6A/wmpKytxfXXkgBA6/BJlR+7U7LKnWL199jk
+         086EGgBY9BUw8nnLDBAJsghB+BkGFtQOgND2iR45QiOGJi7AzQKAW2ERpj752/B9+zuQ
+         UlZ2mervip+j0w8WWphHZ7wRrpn5fQLa//IplLrOQ/k3rBbSGsVEsbG0v55/D55deYao
+         KRuX3ClR/MGUCfdZLTBPIqWerUgdefek9zgfF9haUvGfCWpCQdoXnrYoIlcHhaMH6GRP
+         FGzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721343825; x=1721948625;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pz/gqH3g6k+Tlg5PlSG754DQsZEyo/RAObvbOwwmn1M=;
-        b=H+YJTo2gPt3jvjhLT6q/AyAybwD7NsouceZ7ZIOyjIL6SVY0UPYgDNbbvEQBN80vRD
-         qzdaxREDkRQlIOk9W8IBL3ndcrJn1uwkoMmh9Aa5Mn9GvUX09/RIT4ltBKpnmH6lPJ+j
-         /dTLyQ0Z8JPgqlIejggfLDRbLY4Xh6BDBmAQgI+l+h9qnOFk08Wx+AgYu7WKzPT4ScYh
-         OOEE/X9aUqwhLHVbVjwLPXPCRFouazcz4r95cH/TWHF906Z+HGgYZq9rt3tGR3A09AR1
-         PciBuiNjoDtWpDojJ+KW9VNjeibPewtIXUsyq90Vrw4Ax+nNQA1IPG8fEJEyML3JY6pI
-         kxHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU/i2qQkN4TorRgnme5BthzlUypfAZlvW6o/w/d+aKEKdNcDpSDxMH5TrnqGyCa+MRflrK3bT9S5Wx0KY3qaeFSsR7XqeNJ
-X-Gm-Message-State: AOJu0YxoXngmPiPlu+p6EYCCabih0XZFn7VF/f570W8uWC6BrCORbMRw
-	Oqj8+4kqNQYxhwfE9EiswibJRQMbbcmmC6RkEMBGmtscWveLnyIST2pGMi0M6ZQ=
-X-Google-Smtp-Source: AGHT+IF1+3P0pRgwkXsR0FAWIIytKywrIML3Fqxwpp1fn6IdRgXx4TsuO6HiuiBf9bLph6vSY6g+qA==
-X-Received: by 2002:a17:902:d48d:b0:1fb:24ea:fe02 with SMTP id d9443c01a7336-1fc4e16ab7emr52140735ad.18.1721343825147;
-        Thu, 18 Jul 2024 16:03:45 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1721345661; x=1721950461;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/qF+1IDJjtH4yt3+dIXZUb/sL6BCvMKOBa4IWo3wL00=;
+        b=FE4+irJjiMHCuMyAOJ353wN9eqSEM0c5ZJEl4jBPRQVa1HMfzkCHMavAc7sKzYk6Yn
+         wD/8g5aFTwGgSZe9QC3vH5PkLD1if5iHTPr/cg/bwEsmRg7g4EfDSTT2k2TSO28tLYrR
+         BoMzuz5f/We9mIHRGRBt+AtCnUeJ0qvxk9zTlJn7a6FdGRbMESwHf5ilED/3rVs3m/n+
+         F4hAvbkA7f+ZB2YOSc+r+XALUOrsLnATNSxJgl+2sgYuC4ndELphzw9AB1A87SB/1GZx
+         +qKcUZJuq9+8vXxYrxAD6h6X7eVBTVfnKmXUzv7sLkt0Y8Rtbf4lcwnljnYtBYkiajOw
+         CoRg==
+X-Forwarded-Encrypted: i=1; AJvYcCV5PYlw2yg3pUCwVhBodCkpqbItiTXHgKYewFtyrvgm8qjxIAq188uwC2BWtBQ4l3RdMp2qfOn0My6q40FXxEL83Mbznm6Z
+X-Gm-Message-State: AOJu0Yxq9wqToRsVh6Q0JxOxJ1g8lpkne9uyGDNYpIpwLDFSHbBYGbpg
+	heS4I4U2GPsT/tl29b+3sr57rcsNXblUoFoIeAbcHTnJzM3KM25TLviui1zja6w=
+X-Google-Smtp-Source: AGHT+IEKbX/FsbhFnIw71MBLVcrzrP5T77uZDA6cQicktN0+nhvg+Wct/m4wkCJiaiaT9dRkb2DrPg==
+X-Received: by 2002:a05:6a20:918c:b0:1c3:a411:dc45 with SMTP id adf61e73a8af0-1c3fdd6b4e7mr7804327637.39.1721345661197;
+        Thu, 18 Jul 2024 16:34:21 -0700 (PDT)
 Received: from localhost ([2804:14d:7e39:8470:15c8:3512:f33c:2f80])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fd64b8693asm1105435ad.72.2024.07.18.16.03.43
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ccf7c72075sm199845a91.28.2024.07.18.16.34.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Jul 2024 16:03:44 -0700 (PDT)
+        Thu, 18 Jul 2024 16:34:20 -0700 (PDT)
 From: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
 To: Mark Brown <broonie@kernel.org>
 Cc: Catalin Marinas <catalin.marinas@arm.com>,  Will Deacon
@@ -70,58 +72,100 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,  Will Deacon
   linux-fsdevel@vger.kernel.org,  linux-arch@vger.kernel.org,
   linux-mm@kvack.org,  linux-kselftest@vger.kernel.org,
   linux-kernel@vger.kernel.org,  linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v9 37/39] kselftest/arm64: Add GCS signal tests
-In-Reply-To: <20240625-arm64-gcs-v9-37-0f634469b8f0@kernel.org> (Mark Brown's
-	message of "Tue, 25 Jun 2024 15:58:05 +0100")
+Subject: Re: [PATCH v9 38/39] kselftest/arm64: Add a GCS stress test
+In-Reply-To: <20240625-arm64-gcs-v9-38-0f634469b8f0@kernel.org> (Mark Brown's
+	message of "Tue, 25 Jun 2024 15:58:06 +0100")
 References: <20240625-arm64-gcs-v9-0-0f634469b8f0@kernel.org>
-	<20240625-arm64-gcs-v9-37-0f634469b8f0@kernel.org>
-Date: Thu, 18 Jul 2024 20:03:41 -0300
-Message-ID: <87a5iexpyq.fsf@linaro.org>
+	<20240625-arm64-gcs-v9-38-0f634469b8f0@kernel.org>
+Date: Thu, 18 Jul 2024 20:34:18 -0300
+Message-ID: <875xt2xojp.fsf@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
 Mark Brown <broonie@kernel.org> writes:
 
-> Do some testing of the signal handling for GCS, checking that a GCS
-> frame has the expected information in it and that the expected signals
-> are delivered with invalid operations.
+> Add a stress test which runs one more process than we have CPUs spinning
+> through a very recursive function with frequent syscalls immediately prior
+> to return and signals being injected every 100ms. The goal is to flag up
+> any scheduling related issues, for example failure to ensure that barriers
+> are inserted when moving a GCS using task to another CPU. The test runs f=
+or
+> a configurable amount of time, defaulting to 10 seconds.
 >
 > Reviewed-by: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
 > Signed-off-by: Mark Brown <broonie@kernel.org>
 > ---
->  tools/testing/selftests/arm64/signal/.gitignore    |  1 +
->  .../selftests/arm64/signal/test_signals_utils.h    | 10 +++
->  .../arm64/signal/testcases/gcs_exception_fault.c   | 62 +++++++++++++++
->  .../selftests/arm64/signal/testcases/gcs_frame.c   | 88 ++++++++++++++++++++++
->  .../arm64/signal/testcases/gcs_write_fault.c       | 67 ++++++++++++++++
->  5 files changed, 228 insertions(+)
+>  tools/testing/selftests/arm64/gcs/.gitignore       |   2 +
+>  tools/testing/selftests/arm64/gcs/Makefile         |   6 +-
+>  tools/testing/selftests/arm64/gcs/asm-offsets.h    |   0
+>  .../selftests/arm64/gcs/gcs-stress-thread.S        | 311 ++++++++++++
+>  tools/testing/selftests/arm64/gcs/gcs-stress.c     | 532 +++++++++++++++=
+++++++
+>  5 files changed, 850 insertions(+), 1 deletion(-)
 
-The gcs_write_fault test fails for me, even without THP:
+This test fails for me, even without THP:
 
-$ sudo ./run_kselftest.sh -t arm64:gcs_write_fault
+$ sudo ./run_kselftest.sh -t arm64:gcs-stress
 TAP version 13
 1..1
 # timeout set to 45
-# selftests: arm64: gcs_write_fault
-# # GCS write fault :: Normal writes to a GCS segfault
-# Registered handlers for all signals.
-# Detected MINSTKSIGSZ:4720
-# Required Features: [ GCS ] supported
-# Incompatible Features: [] absent
-# Testcase initialized.
-# Read value 0x0
-# SIG_OK -- SP:0xFFFFCF1292D0  si_addr@:0xffffba645000  si_code:10  token@:(nil)  offset:-281473808879616
-# si_code != SEGV_ACCERR...test is probably broken!
-# -- RX UNEXPECTED SIGNAL: 6 code -6 address 0xf76
-# ==>> completed. FAIL(0)
-not ok 1 selftests: arm64: gcs_write_fault # exit=1
+# selftests: arm64: gcs-stress
+# TAP version 13
+# 1..9
+# # 8 CPUs, 9 GCS threads
+# # Will run for 10s
+# # Started Thread-4030
+# # Started Thread-4031
+# # Started Thread-4032
+# # Started Thread-4033
+# # Started Thread-4034
+# # Started Thread-4035
+# # Started Thread-4036
+# # Started Thread-4037
+# # Started Thread-4038
+# # Waiting for 9 children
+# # Waiting for 9 children
+# # Thread-4030: Failed to enable GCS
+# # Thread-4031: Failed to enable GCS
+# # Thread-4032: Failed to enable GCS
+# # Thread-4033: Failed to enable GCS
+# # Thread-4034: Failed to enable GCS
+# # Thread-4035: Failed to enable GCS
+# # Thread-4036: Failed to enable GCS
+# # Thread-4038: Failed to enable GCS
+# # Thread-4037: Failed to enable GCS
+# # Sending signals, timeout remaining: 10000ms
+# # Sending signals, timeout remaining: 9900ms
+    =E2=8B=AE
+# # Sending signals, timeout remaining: 200ms
+# # Sending signals, timeout remaining: 100ms
+# # Finishing up...
+# # Thread-4030 exited with error code 255
+# not ok 1 Thread-4030
+# # Thread-4031 exited with error code 255
+# not ok 2 Thread-4031
+# # Thread-4032 exited with error code 255
+# not ok 3 Thread-4032
+# # Thread-4033 exited with error code 255
+# not ok 4 Thread-4033
+# # Thread-4034 exited with error code 255
+# not ok 5 Thread-4034
+# # Thread-4035 exited with error code 255
+# not ok 6 Thread-4035
+# # Thread-4036 exited with error code 255
+# not ok 7 Thread-4036
+# # Thread-4037 exited with error code 255
+# not ok 8 Thread-4037
+# # Thread-4038 exited with error code 255
+# not ok 9 Thread-4038
+# # Totals: pass:0 fail:9 xfail:0 xpass:0 skip:0 error:0
+ok 1 selftests: arm64: gcs-stress
 
-It also generates an "INVALID GCS" line in dmesg.
-
--- 
+--=20
 Thiago
