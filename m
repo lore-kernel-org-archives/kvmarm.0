@@ -1,617 +1,206 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFEF813C66F
-	for <kvmarm@lists.linux.dev>; Thu, 18 Jul 2024 15:16:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACAF8143C59
+	for <kvmarm@lists.linux.dev>; Thu, 18 Jul 2024 16:14:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721315787; cv=none; b=U5zFa5NXqu7PqQ4SqNBbewsyWcbKIlRxcbdTwruLPCE5rPDD2sLpgZ2D6t3E/UOx3mV12so8SMVzVWYh6gU3vJSYYaa/O1gjdPBMiaBKKZJhGh5Z+Ym69E/tl2c5Zo7e+rMyYrqa24rCQlKAgJkcoj+1ObVT7ZhxsqFVHppk2Kg=
+	t=1721319288; cv=none; b=HMJMHNo2UH4y3riIxHGM9rHCMoAdMCYBMtBaXAcBlEwLH++JruaRaoQ+Hq/Lr2SuOijSf4oGsKuODM9Nu8oEiLn6Nfpo7KMvQYoQwzycvGO1sF9bi9s4QfUyHyy0XNVWd3gw5TUi92DWihOKpd/4FuH70vLBFNKd5pfVybaf2I8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721315787; c=relaxed/simple;
-	bh=U3rE4Sp7SGik9cHkHsDIin7o4vRUrE/r3JNFDVG7+hs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nRBER80mBqwXQ2iTcX1Z+dNLv4GNob9sp8xCBfEvkfW8/KoY0AlBhbvZBIf18wMPZCB+KgFI5UrB0yVh3BaunNQ7zs4kT3N4oNr4JT1lOkmVsHuwC964pJd+u9z4IXpEdSrv33iM/kl0tWMCNArEcN5jXJ4cnBibEI7PrBpHewU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 284681063;
-	Thu, 18 Jul 2024 08:16:49 -0700 (PDT)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 68FF73F762;
-	Thu, 18 Jul 2024 08:16:22 -0700 (PDT)
-Date: Thu, 18 Jul 2024 16:16:19 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>, Joey Gouly <joey.gouly@arm.com>
-Subject: Re: [PATCH 10/12] KVM: arm64: nv: Add SW walker for AT S1 emulation
-Message-ID: <Zpkxw8pW2Mm4wMAm@raptor>
-References: <20240625133508.259829-1-maz@kernel.org>
- <20240708165800.1220065-1-maz@kernel.org>
+	s=arc-20240116; t=1721319288; c=relaxed/simple;
+	bh=Igl5C4XQG84DDkmNlndYaVvzyi1zpEMAcWa5IkHXl5o=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=cqjbAFD38AnS6ovsO3nphHATPgtSOuYmXbjjXl5U7Ta9GqSZJFvqFc1jMxJvCfJPeThiVDINgzWmP/3mRpW0vEuTmKNXxqm82uQ0Jng6sSZzdKEkB1uBcxN5Ob0CyohRIkZ7vRV1H9PnT97nepA9eqpYzu7/bKIqIm3wz6uF1t8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=hSX69WVF; arc=none smtp.client-ip=209.85.166.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hSX69WVF"
+Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-7f97e794f34so37297139f.3
+        for <kvmarm@lists.linux.dev>; Thu, 18 Jul 2024 09:14:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1721319285; x=1721924085; darn=lists.linux.dev;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=cKUm2Sno0VCM0sKj4rcn5Z8Kw9gJMdGTQrF0ZDE8JgQ=;
+        b=hSX69WVFXkqBimkb0eGvBuPqE2g+gM1sKu1cDk2fg/Q1+le0wziGVbmpd765nR0+RM
+         Xo10AtfubBj4cCQR+1KISw05gOniRrTwFHallOLQJQgZtsi4AfwnwSObh8EhcSd65rRg
+         Ti+k0H7snlBJJu3f9MUF1VVY6q4AAo6l9u6Wy3N8ouIp0GuypMCqjGM3hBjU13J+6T7N
+         CfF9LpUTY0xaye2b41Cp83iOcqPXejJlw1Rs+Mblx0tFVyrrQParfnmCZP/FIwxkQaRP
+         ttF0sTcl8LIeKJzuqc4EyrOqzvEGyp99lILmnpHV2/0z1FiURMQkfGiBFGOJZ1P5ZrUE
+         ET3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721319285; x=1721924085;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cKUm2Sno0VCM0sKj4rcn5Z8Kw9gJMdGTQrF0ZDE8JgQ=;
+        b=JCcQW/HrntUqbzakI4ZbxSbDi1BIohOOFqycbj3u3gQ0jZgFW8fzprnQ6J6B5kfngw
+         MOWIApMIZHmooBcCuNVJtYGcWx52MHLcYcTLHZciZ7jxnFp8uIN5gT5yWwTZWCZiVM3i
+         slrGqq0qK60sz5cJdUKp0QcnzQsnkWZZWq8PSIYxK6rOsPHH3314vuOytmvR0x73pEKq
+         JnKtNsaEz8OoXpoC7jgsefp0Hge4Za4/pPZI/aoiCAOE4BKsCjuBOWMxgXdW2NWl/aDY
+         quOo3x8R3hZwGcgWVWHQa4zAd/5zGWurvxjc9a/m2hvAeNDOIY1XERukzQ8YHfzMqfTT
+         5fjQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVt6CSiNLfvkNBkoS6lfuNgnJScGgB3eGtSxJNFaI9FF7dz9yR+n3kzJfkagwIi8bDo/oMdU6xruhPJg5so+62cjarnwEa3
+X-Gm-Message-State: AOJu0YyygkgqLUbPPuXM3JIiBE20bXLBjZ2zni/TBRFddOThfO50K91S
+	aBN06rwhIEw84wmofYQNvlC2vKBYXmfjdxDAPGxG9cLOluWG8OR6/9D5WYPN4Js=
+X-Google-Smtp-Source: AGHT+IGBl5SUOSetZ7hpvAsBcsY+3Cb2iftUEXypwidAC9j+tfeb4FVk4PWmNhC4HY+kt6K5hLBh4A==
+X-Received: by 2002:a05:6602:3fcc:b0:804:657d:92fc with SMTP id ca18e2360f4ac-817123e1bb4mr642950839f.18.1721319284795;
+        Thu, 18 Jul 2024 09:14:44 -0700 (PDT)
+Received: from localhost ([2804:14d:7e39:8470:49aa:ec5c:43c8:2afb])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-78e34d2c7e2sm7993415a12.54.2024.07.18.09.14.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Jul 2024 09:14:44 -0700 (PDT)
+From: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,  Will Deacon
+ <will@kernel.org>,  Jonathan Corbet <corbet@lwn.net>,  Andrew Morton
+ <akpm@linux-foundation.org>,  Marc Zyngier <maz@kernel.org>,  Oliver Upton
+ <oliver.upton@linux.dev>,  James Morse <james.morse@arm.com>,  Suzuki K
+ Poulose <suzuki.poulose@arm.com>,  Arnd Bergmann <arnd@arndb.de>,  Oleg
+ Nesterov <oleg@redhat.com>,  Eric Biederman <ebiederm@xmission.com>,
+  Shuah Khan <shuah@kernel.org>,  "Rick P. Edgecombe"
+ <rick.p.edgecombe@intel.com>,  Deepak Gupta <debug@rivosinc.com>,  Ard
+ Biesheuvel <ardb@kernel.org>,  Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
+  Kees Cook <kees@kernel.org>,  "H.J. Lu" <hjl.tools@gmail.com>,  Paul
+ Walmsley <paul.walmsley@sifive.com>,  Palmer Dabbelt <palmer@dabbelt.com>,
+  Albert Ou <aou@eecs.berkeley.edu>,  Florian Weimer <fweimer@redhat.com>,
+  Christian Brauner <brauner@kernel.org>,  Ross Burton
+ <ross.burton@arm.com>,  linux-arm-kernel@lists.infradead.org,
+  linux-doc@vger.kernel.org,  kvmarm@lists.linux.dev,
+  linux-fsdevel@vger.kernel.org,  linux-arch@vger.kernel.org,
+  linux-mm@kvack.org,  linux-kselftest@vger.kernel.org,
+  linux-kernel@vger.kernel.org,  linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v9 35/39] kselftest/arm64: Add a GCS test program built
+ with the system libc
+In-Reply-To: <20240625-arm64-gcs-v9-35-0f634469b8f0@kernel.org> (Mark Brown's
+	message of "Tue, 25 Jun 2024 15:58:03 +0100")
+References: <20240625-arm64-gcs-v9-0-0f634469b8f0@kernel.org>
+	<20240625-arm64-gcs-v9-35-0f634469b8f0@kernel.org>
+Date: Thu, 18 Jul 2024 13:14:41 -0300
+Message-ID: <87plray8we.fsf@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240708165800.1220065-1-maz@kernel.org>
+Content-Type: text/plain
 
-Hi,
+Mark Brown <broonie@kernel.org> writes:
 
-Managed to have a look at AT handling for stage 1, I've been comparing it with
-AArch64.AT().
-
-On Mon, Jul 08, 2024 at 05:57:58PM +0100, Marc Zyngier wrote:
-> In order to plug the brokenness of our current AT implementation,
-> we need a SW walker that is going to... err.. walk the S1 tables
-> and tell us what it finds.
-> 
-> Of course, it builds on top of our S2 walker, and share similar
-> concepts. The beauty of it is that since it uses kvm_read_guest(),
-> it is able to bring back pages that have been otherwise evicted.
-> 
-> This is then plugged in the two AT S1 emulation functions as
-> a "slow path" fallback. I'm not sure it is that slow, but hey.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> There are things like threads which nolibc struggles with which we want
+> to add coverage for, and the ABI allows us to test most of these even if
+> libc itself does not understand GCS so add a test application built
+> using the system libc.
+>
+> Reviewed-by: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
+> Signed-off-by: Mark Brown <broonie@kernel.org>
 > ---
->  arch/arm64/kvm/at.c | 538 ++++++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 520 insertions(+), 18 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-> index 71e3390b43b4c..8452273cbff6d 100644
-> --- a/arch/arm64/kvm/at.c
-> +++ b/arch/arm64/kvm/at.c
-> @@ -4,9 +4,305 @@
->   * Author: Jintack Lim <jintack.lim@linaro.org>
->   */
->  
-> +#include <linux/kvm_host.h>
-> +
-> +#include <asm/esr.h>
->  #include <asm/kvm_hyp.h>
->  #include <asm/kvm_mmu.h>
->  
-> +struct s1_walk_info {
-> +	u64	     baddr;
-> +	unsigned int max_oa_bits;
-> +	unsigned int pgshift;
-> +	unsigned int txsz;
-> +	int 	     sl;
-> +	bool	     hpd;
-> +	bool	     be;
-> +	bool	     nvhe;
-> +	bool	     s2;
-> +};
-> +
-> +struct s1_walk_result {
-> +	union {
-> +		struct {
-> +			u64	desc;
-> +			u64	pa;
-> +			s8	level;
-> +			u8	APTable;
-> +			bool	UXNTable;
-> +			bool	PXNTable;
-> +		};
-> +		struct {
-> +			u8	fst;
-> +			bool	ptw;
-> +			bool	s2;
-> +		};
-> +	};
-> +	bool	failed;
-> +};
-> +
-> +static void fail_s1_walk(struct s1_walk_result *wr, u8 fst, bool ptw, bool s2)
-> +{
-> +	wr->fst		= fst;
-> +	wr->ptw		= ptw;
-> +	wr->s2		= s2;
-> +	wr->failed	= true;
-> +}
-> +
-> +#define S1_MMU_DISABLED		(-127)
-> +
-> +static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
-> +			 struct s1_walk_result *wr, const u64 va, const int el)
-> +{
-> +	u64 sctlr, tcr, tg, ps, ia_bits, ttbr;
-> +	unsigned int stride, x;
-> +	bool va55, tbi;
-> +
-> +	wi->nvhe = el == 2 && !vcpu_el2_e2h_is_set(vcpu);
-> +
-> +	va55 = va & BIT(55);
-> +
-> +	if (wi->nvhe && va55)
-> +		goto addrsz;
-> +
-> +	wi->s2 = el < 2 && (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_VM);
-> +
-> +	switch (el) {
-> +	case 1:
-> +		sctlr	= vcpu_read_sys_reg(vcpu, SCTLR_EL1);
-> +		tcr	= vcpu_read_sys_reg(vcpu, TCR_EL1);
-> +		ttbr	= (va55 ?
-> +			   vcpu_read_sys_reg(vcpu, TTBR1_EL1) :
-> +			   vcpu_read_sys_reg(vcpu, TTBR0_EL1));
-> +		break;
-> +	case 2:
-> +		sctlr	= vcpu_read_sys_reg(vcpu, SCTLR_EL2);
-> +		tcr	= vcpu_read_sys_reg(vcpu, TCR_EL2);
-> +		ttbr	= (va55 ?
-> +			   vcpu_read_sys_reg(vcpu, TTBR1_EL2) :
-> +			   vcpu_read_sys_reg(vcpu, TTBR0_EL2));
-> +		break;
-> +	default:
-> +		BUG();
-> +	}
-> +
-> +	/* Let's put the MMU disabled case aside immediately */
-> +	if (!(sctlr & SCTLR_ELx_M) ||
-> +	    (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_DC)) {
-> +		if (va >= BIT(kvm_get_pa_bits(vcpu->kvm)))
-> +			goto addrsz;
-> +
-> +		wr->level = S1_MMU_DISABLED;
-> +		wr->desc = va;
-> +		return 0;
-> +	}
-> +
-> +	wi->be = sctlr & SCTLR_ELx_EE;
-> +
-> +	wi->hpd  = kvm_has_feat(vcpu->kvm, ID_AA64MMFR1_EL1, HPDS, IMP);
-> +	wi->hpd &= (wi->nvhe ?
-> +		    FIELD_GET(TCR_EL2_HPD, tcr) :
-> +		    (va55 ?
-> +		     FIELD_GET(TCR_HPD1, tcr) :
-> +		     FIELD_GET(TCR_HPD0, tcr)));
-> +
-> +	tbi = (wi->nvhe ?
-> +	       FIELD_GET(TCR_EL2_TBI, tcr) :
-> +	       (va55 ?
-> +		FIELD_GET(TCR_TBI1, tcr) :
-> +		FIELD_GET(TCR_TBI0, tcr)));
-> +
-> +	if (!tbi && sign_extend64(va, 55) != (s64)va)
-> +		goto addrsz;
-> +
-> +	/* Someone was silly enough to encode TG0/TG1 differently */
-> +	if (va55) {
-> +		wi->txsz = FIELD_GET(TCR_T1SZ_MASK, tcr);
-> +		tg = FIELD_GET(TCR_TG1_MASK, tcr);
-> +
-> +		switch (tg << TCR_TG1_SHIFT) {
-> +		case TCR_TG1_4K:
-> +			wi->pgshift = 12;	 break;
-> +		case TCR_TG1_16K:
-> +			wi->pgshift = 14;	 break;
-> +		case TCR_TG1_64K:
-> +		default:	    /* IMPDEF: treat any other value as 64k */
-> +			wi->pgshift = 16;	 break;
-> +		}
-> +	} else {
-> +		wi->txsz = FIELD_GET(TCR_T0SZ_MASK, tcr);
-> +		tg = FIELD_GET(TCR_TG0_MASK, tcr);
-> +
-> +		switch (tg << TCR_TG0_SHIFT) {
-> +		case TCR_TG0_4K:
-> +			wi->pgshift = 12;	 break;
-> +		case TCR_TG0_16K:
-> +			wi->pgshift = 14;	 break;
-> +		case TCR_TG0_64K:
-> +		default:	    /* IMPDEF: treat any other value as 64k */
-> +			wi->pgshift = 16;	 break;
-> +		}
-> +	}
-> +
-> +	ia_bits = 64 - wi->txsz;
+>  tools/testing/selftests/arm64/gcs/.gitignore |   1 +
+>  tools/testing/selftests/arm64/gcs/Makefile   |   4 +-
+>  tools/testing/selftests/arm64/gcs/gcs-util.h |  10 +
+>  tools/testing/selftests/arm64/gcs/libc-gcs.c | 736 +++++++++++++++++++++++++++
+>  4 files changed, 750 insertions(+), 1 deletion(-)
 
-get_ia_size()?
+In my FVP VM, this test gets a GCS SIGSEGV before running the first test:
 
-> +
-> +	/* AArch64.S1StartLevel() */
-> +	stride = wi->pgshift - 3;
-> +	wi->sl = 3 - (((ia_bits - 1) - wi->pgshift) / stride);
-> +
-> +	/* Check for SL mandating LPA2 (which we don't support yet) */
-> +	switch (BIT(wi->pgshift)) {
-> +	case SZ_4K:
-> +		if (wi->sl == -1 &&
-> +		    !kvm_has_feat(vcpu->kvm, ID_AA64MMFR0_EL1, TGRAN4, 52_BIT))
-> +			goto addrsz;
-> +		break;
-> +	case SZ_16K:
-> +		if (wi->sl == 0 &&
-> +		    !kvm_has_feat(vcpu->kvm, ID_AA64MMFR0_EL1, TGRAN16, 52_BIT))
-> +			goto addrsz;
-> +		break;
-> +	}
-> +
-> +	ps = (wi->nvhe ?
-> +	      FIELD_GET(TCR_EL2_PS_MASK, tcr) : FIELD_GET(TCR_IPS_MASK, tcr));
-> +
-> +	wi->max_oa_bits = min(get_kvm_ipa_limit(), ps_to_output_size(ps));
-> +
-> +	/* Compute minimal alignment */
-> +	x = 3 + ia_bits - ((3 - wi->sl) * stride + wi->pgshift);
-> +
-> +	wi->baddr = ttbr & TTBRx_EL1_BADDR;
-> +	wi->baddr &= GENMASK_ULL(wi->max_oa_bits - 1, x);
-> +
-> +	return 0;
-> +
-> +addrsz:	/* Address Size Fault level 0 */
-> +	fail_s1_walk(wr, ESR_ELx_FSC_ADDRSZ, false, false);
-> +
-> +	return -EFAULT;
-> +}
+$ sudo ./run_kselftest.sh -t arm64:libc-gcs
+[sudo] password for bauermann:
+TAP version 13
+1..1
+# timeout set to 45
+# selftests: arm64: libc-gcs
+# TAP version 13
+# 1..118
+# # Starting 118 tests from 32 test cases.
+# #  RUN           global.can_call_function ...
+# Segmentation fault
+not ok 1 selftests: arm64: libc-gcs # exit=139
+$ 
 
-The function seems to be missing checks for:
+It happens when returning from the syscall() glibc function that does
+the clone3 syscall in kselftest_harness.h:
 
-- valid TxSZ
-- VA is not larger than the maximum input size, as defined by TxSZ
-- EPD{0,1}
+$ /var/tmp/gdb-gcs/bin/gdb -q arm64/libc-gcs
+Reading symbols from arm64/libc-gcs...
+(gdb) r
+Starting program: /var/tmp/selftests-v9/arm64/libc-gcs
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/aarch64-linux-gnu/libthread_db.so.1".
+TAP version 13
+1..118
+# Starting 118 tests from 32 test cases.
+#  RUN           global.can_call_function ...
+[Detaching after vfork from child process 823]
 
-> +
-> +static int get_ia_size(struct s1_walk_info *wi)
-> +{
-> +	return 64 - wi->txsz;
-> +}
+Program received signal SIGSEGV, Segmentation fault
+Guarded Control Stack error.
+syscall () at ../sysdeps/unix/sysv/linux/aarch64/syscall.S:41 [GCS error]
+warning: 41     ../sysdeps/unix/sysv/linux/aarch64/syscall.S: No such file or directory
+(gdb) p $_siginfo.si_signo
+$1 = 11
+(gdb) p $_siginfo.si_code
+$2 = 10
+(gdb) p $_siginfo._sifields._sigfault.si_addr
+$3 = (void *) 0xfffff7ed96b0 <syscall+48>
+(gdb) disassemble
+Dump of assembler code for function syscall:
+   0x0000fffff7ed9680 <+0>:     nop
+   0x0000fffff7ed9684 <+4>:     mov     w8, w0
+   0x0000fffff7ed9688 <+8>:     mov     x0, x1
+   0x0000fffff7ed968c <+12>:    mov     x1, x2
+   0x0000fffff7ed9690 <+16>:    mov     x2, x3
+   0x0000fffff7ed9694 <+20>:    mov     x3, x4
+   0x0000fffff7ed9698 <+24>:    mov     x4, x5
+   0x0000fffff7ed969c <+28>:    mov     x5, x6
+   0x0000fffff7ed96a0 <+32>:    mov     x6, x7
+   0x0000fffff7ed96a4 <+36>:    svc     #0x0
+   0x0000fffff7ed96a8 <+40>:    cmn     x0, #0xfff
+   0x0000fffff7ed96ac <+44>:    b.cs    0xfffff7ed96b4 <syscall+52>  // b.hs, b.nlast
+=> 0x0000fffff7ed96b0 <+48>:    ret
+   0x0000fffff7ed96b4 <+52>:    b       0xfffff7e18660 <__GI___syscall_error>
+   0x0000fffff7ed96b8 <+56>:    b       0xfffff7e18660 <__GI___syscall_error>
+End of assembler dump.
+(gdb) bt
+#0  syscall () at ../sysdeps/unix/sysv/linux/aarch64/syscall.S:41 [GCS error]
+#1  0x0000aaaaaaaa4acc in clone3_vfork ()
+    at /home/bauermann/src/linux/tools/testing/selftests/kselftest_harness.h:93
+#2  __run_test (f=f@entry=0xaaaaaaac0b88 <_fixture_global>, variant=variant@entry=0xffffffffee00,
+    t=t@entry=0xaaaaaaac0018 <_can_call_function_object>)
+    at /home/bauermann/src/linux/tools/testing/selftests/kselftest_harness.h:1239 [GCS error]
+#3  0x0000aaaaaaaa2c40 in test_harness_run (argv=0xfffffffff008, argc=1)
+    at /home/bauermann/src/linux/tools/testing/selftests/kselftest_harness.h:1314
+#4  main (argc=1, argv=0xfffffffff008) at libc-gcs.c:735 [GCS error]
+(gdb) 
 
-This looks a lot like get_ia_size() from nested.c.
+And indeed, the svc call in the disassemble above corrupts the GCS.
+This is the GCS and lr values right before the svc call:
 
-> +
-> +static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
-> +		   struct s1_walk_result *wr, u64 va)
-> +{
-> +	u64 va_top, va_bottom, baddr, desc;
-> +	int level, stride, ret;
-> +
-> +	level = wi->sl;
-> +	stride = wi->pgshift - 3;
-> +	baddr = wi->baddr;
+(gdb) x/i $pc
+=> 0xfffff7ed96a4 <syscall+36>: svc     #0x0
+(gdb) p/x $lr
+$3 = 0xaaaaaaaa4acc
+(gdb) p/x $gcspr
+$4 = 0xfffff7bfffe8
+(gdb) x/g $gcspr
+0xfffff7bfffe8: 0x0000aaaaaaaa4acc
 
-AArch64.S1Walk() also checks that baddr is not larger than the OA size.
-check_output_size() from nested.c looks almost like what you want here.
+So far so good, the tip of the GCS matches $lr. But then:
 
-> +
-> +	va_top = get_ia_size(wi) - 1;
-> +
-> +	while (1) {
-> +		u64 index, ipa;
-> +
-> +		va_bottom = (3 - level) * stride + wi->pgshift;
-> +		index = (va & GENMASK_ULL(va_top, va_bottom)) >> (va_bottom - 3);
-> +
-> +		ipa = baddr | index;
-> +
-> +		if (wi->s2) {
-> +			struct kvm_s2_trans s2_trans = {};
-> +
-> +			ret = kvm_walk_nested_s2(vcpu, ipa, &s2_trans);
-> +			if (ret) {
-> +				fail_s1_walk(wr,
-> +					     (s2_trans.esr & ~ESR_ELx_FSC_LEVEL) | level,
-> +					     true, true);
-> +				return ret;
-> +			}
-> +
-> +			if (!kvm_s2_trans_readable(&s2_trans)) {
-> +				fail_s1_walk(wr, ESR_ELx_FSC_PERM | level,
-> +					     true, true);
-> +
-> +				return -EPERM;
-> +			}
-> +
-> +			ipa = kvm_s2_trans_output(&s2_trans);
-> +		}
-> +
-> +		ret = kvm_read_guest(vcpu->kvm, ipa, &desc, sizeof(desc));
-> +		if (ret) {
-> +			fail_s1_walk(wr, ESR_ELx_FSC_SEA_TTW(level),
-> +				     true, false);
-> +			return ret;
-> +		}
-> +
-> +		if (wi->be)
-> +			desc = be64_to_cpu((__force __be64)desc);
-> +		else
-> +			desc = le64_to_cpu((__force __le64)desc);
-> +
-> +		if (!(desc & 1) || ((desc & 3) == 1 && level == 3)) {
-> +			fail_s1_walk(wr, ESR_ELx_FSC_FAULT | level,
-> +				     true, false);
-> +			return -ENOENT;
-> +		}
-> +
-> +		/* We found a leaf, handle that */
-> +		if ((desc & 3) == 1 || level == 3)
-> +			break;
-> +
-> +		if (!wi->hpd) {
-> +			wr->APTable  |= FIELD_GET(PMD_TABLE_AP, desc);
-> +			wr->UXNTable |= FIELD_GET(PMD_TABLE_UXN, desc);
-> +			wr->PXNTable |= FIELD_GET(PMD_TABLE_PXN, desc);
-> +		}
-> +
-> +		baddr = GENMASK_ULL(47, wi->pgshift);
+(gdb) stepi
+[Detaching after vfork from child process 2491]
+39      in ../sysdeps/unix/sysv/linux/aarch64/syscall.S
+(gdb) x/i $pc
+=> 0xfffff7ed96a8 <syscall+40>: cmn     x0, #0xfff
+(gdb) p/x $gcspr
+$5 = 0xfffff7bfffe8
+(gdb) x/g $gcspr
+0xfffff7bfffe8: 0x0000aaaaaaaa4c04
+(gdb) p/x $lr
+$6 = 0xaaaaaaaa4acc
 
-Where is baddr updated with the value read from the descriptor? Am I missing
-something obvious here?
+So, right after svc returns, the tip of the GCS is corrupted and will
+cause the GCS error.
 
-> +
-> +		/* Check for out-of-range OA */
-> +		if (wi->max_oa_bits < 48 &&
-> +		    (baddr & GENMASK_ULL(47, wi->max_oa_bits))) {
-> +			fail_s1_walk(wr, ESR_ELx_FSC_ADDRSZ | level,
-> +				     true, false);
-> +			return -EINVAL;
-> +		}
-
-This looks very much like check_output_size() from nested.c.
-
-> +
-> +		/* Prepare for next round */
-> +		va_top = va_bottom - 1;
-> +		level++;
-> +	}
-> +
-> +	/* Block mapping, check the validity of the level */
-> +	if (!(desc & BIT(1))) {
-> +		bool valid_block = false;
-> +
-> +		switch (BIT(wi->pgshift)) {
-> +		case SZ_4K:
-> +			valid_block = level == 1 || level == 2;
-> +			break;
-> +		case SZ_16K:
-> +		case SZ_64K:
-> +			valid_block = level == 2;
-> +			break;
-> +		}
-> +
-> +		if (!valid_block) {
-> +			fail_s1_walk(wr, ESR_ELx_FSC_FAULT | level,
-> +				     true, false);
-> +			return -EINVAL;
-> +		}
-> +	}
-
-Matches AArch64.BlockDescSupported(), with the caveat that the walker currently
-doesn't support 52 bit PAs.
-
-> +
-> +	wr->failed = false;
-> +	wr->level = level;
-> +	wr->desc = desc;
-> +	wr->pa = desc & GENMASK(47, va_bottom);
-
-No output size check for final PA.
-
-> +	if (va_bottom > 12)
-> +		wr->pa |= va & GENMASK_ULL(va_bottom - 1, 12);
-> +
-> +	return 0;
-> +}
-> +
->  struct mmu_config {
->  	u64	ttbr0;
->  	u64	ttbr1;
-> @@ -234,6 +530,177 @@ static u64 compute_par_s12(struct kvm_vcpu *vcpu, u64 s1_par,
->  	return par;
->  }
->  
-> +static u64 compute_par_s1(struct kvm_vcpu *vcpu, struct s1_walk_result *wr)
-> +{
-> +	u64 par;
-> +
-> +	if (wr->failed) {
-> +		par = SYS_PAR_EL1_RES1;
-> +		par |= SYS_PAR_EL1_F;
-> +		par |= FIELD_PREP(SYS_PAR_EL1_FST, wr->fst);
-> +		par |= wr->ptw ? SYS_PAR_EL1_PTW : 0;
-> +		par |= wr->s2 ? SYS_PAR_EL1_S : 0;
-> +	} else if (wr->level == S1_MMU_DISABLED) {
-> +		/* MMU off or HCR_EL2.DC == 1 */
-> +		par = wr->pa & GENMASK_ULL(47, 12);
-
-That's interesting, setup_s1_walk() sets wr->desc = va and leaves wr->pa
-unchanged (it's 0 from initialization in handle_at_slow()).
-
-> +
-> +		if (!(__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_DC)) {
-> +			par |= FIELD_PREP(SYS_PAR_EL1_ATTR, 0); /* nGnRnE */
-> +			par |= FIELD_PREP(SYS_PAR_EL1_SH, 0b10); /* OS */
-> +		} else {
-> +			par |= FIELD_PREP(SYS_PAR_EL1_ATTR,
-> +					  MEMATTR(WbRaWa, WbRaWa));
-> +			par |= FIELD_PREP(SYS_PAR_EL1_SH, 0b00); /* NS */
-> +		}
-
-This matches AArch64.S1DisabledOutput().
-
-> +	} else {
-> +		u64 mair, sctlr;
-> +		int el;
-> +		u8 sh;
-> +
-> +		el = (vcpu_el2_e2h_is_set(vcpu) &&
-> +		      vcpu_el2_tge_is_set(vcpu)) ? 2 : 1;
-> +
-> +		mair = ((el == 2) ?
-> +			vcpu_read_sys_reg(vcpu, MAIR_EL2) :
-> +			vcpu_read_sys_reg(vcpu, MAIR_EL1));
-> +
-> +		mair >>= FIELD_GET(PTE_ATTRINDX_MASK, wr->desc) * 8;
-> +		mair &= 0xff;
-> +
-> +		sctlr = ((el == 2) ?
-> +			vcpu_read_sys_reg(vcpu, SCTLR_EL2) :
-> +			vcpu_read_sys_reg(vcpu, SCTLR_EL1));
-> +
-> +		/* Force NC for memory if SCTLR_ELx.C is clear */
-> +		if (!(sctlr & SCTLR_EL1_C) && !MEMATTR_IS_DEVICE(mair))
-> +			mair = MEMATTR(NC, NC);
-
-This matches the compute memory attributes part of AArch64.S1Translate().
-
-> +
-> +		par  = FIELD_PREP(SYS_PAR_EL1_ATTR, mair);
-> +		par |= wr->pa & GENMASK_ULL(47, 12);
-> +
-> +		sh = compute_sh(mair, wr->desc);
-> +		par |= FIELD_PREP(SYS_PAR_EL1_SH, sh);
-> +	}
-> +
-> +	return par;
-> +}
-> +
-> +static u64 handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
-> +{
-> +	bool perm_fail, ur, uw, ux, pr, pw, pan;
-> +	struct s1_walk_result wr = {};
-> +	struct s1_walk_info wi = {};
-> +	int ret, idx, el;
-> +
-> +	/*
-> +	 * We only get here from guest EL2, so the translation regime
-> +	 * AT applies to is solely defined by {E2H,TGE}.
-> +	 */
-> +	el = (vcpu_el2_e2h_is_set(vcpu) &&
-> +	      vcpu_el2_tge_is_set(vcpu)) ? 2 : 1;
-> +
-> +	ret = setup_s1_walk(vcpu, &wi, &wr, vaddr, el);
-> +	if (ret)
-> +		goto compute_par;
-> +
-> +	if (wr.level == S1_MMU_DISABLED)
-> +		goto compute_par;
-> +
-> +	idx = srcu_read_lock(&vcpu->kvm->srcu);
-> +
-> +	ret = walk_s1(vcpu, &wi, &wr, vaddr);
-> +
-> +	srcu_read_unlock(&vcpu->kvm->srcu, idx);
-> +
-> +	if (ret)
-> +		goto compute_par;
-> +
-> +	/* FIXME: revisit when adding indirect permission support */
-> +	if (kvm_has_feat(vcpu->kvm, ID_AA64MMFR1_EL1, PAN, PAN3) &&
-> +	    !wi.nvhe) {
-
-Just FYI, the 'if' statement fits on one line without going over the old 80
-character limit.
-
-> +		u64 sctlr;
-> +
-> +		if (el == 1)
-> +			sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL1);
-> +		else
-> +			sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL2);
-> +
-> +		ux = (sctlr & SCTLR_EL1_EPAN) && !(wr.desc & PTE_UXN);
-
-I don't understand this. UnprivExecute is true for the memory location if and
-only if **SCTLR_ELx.EPAN** && !UXN?
-
-> +	} else {
-> +		ux = false;
-> +	}
-> +
-> +	pw = !(wr.desc & PTE_RDONLY);
-> +
-> +	if (wi.nvhe) {
-> +		ur = uw = false;
-> +		pr = true;
-> +	} else {
-> +		if (wr.desc & PTE_USER) {
-> +			ur = pr = true;
-> +			uw = pw;
-> +		} else {
-> +			ur = uw = false;
-> +			pr = true;
-> +		}
-> +	}
-> +
-> +	/* Apply the Hierarchical Permission madness */
-> +	if (wi.nvhe) {
-> +		wr.APTable &= BIT(1);
-> +		wr.PXNTable = wr.UXNTable;
-> +	}
-> +
-> +	ur &= !(wr.APTable & BIT(0));
-> +	uw &= !(wr.APTable != 0);
-> +	ux &= !wr.UXNTable;
-> +
-> +	pw &= !(wr.APTable & BIT(1));
-
-Would it make sense here to compute the resulting permisisons like in
-AArch64.S1DirectBasePermissions()? I.e, look at the AP bits first, have
-a switch statement for all 4 values (also makes it very easy to cross-reference
-with Table D8-60), then apply hierarchical permissions/pan/epan. I do admit
-that I have a very selfish reason to propose this - it makes reviewing easier.
-
-> +
-> +	pan = *vcpu_cpsr(vcpu) & PSR_PAN_BIT;
-> +
-> +	perm_fail = false;
-> +
-> +	switch (op) {
-> +	case OP_AT_S1E1RP:
-> +		perm_fail |= pan && (ur || uw || ux);
-
-I had a very hard time understanding what the code is trying to do here.  How
-about rewriting it to something like the pseudocode below:
-
-  // ux = !(desc and UXN) and !UXNTable
-  perm_fail |= pan && (ur || uw || ((sctlr & SCTLR_EL1_EPAN) && ux));
-
-... which maps more closely to AArch64.S1DirectBasePermissions().
-
-Thanks,
-Alex
-
-> +		fallthrough;
-> +	case OP_AT_S1E1R:
-> +	case OP_AT_S1E2R:
-> +		perm_fail |= !pr;
-> +		break;
-> +	case OP_AT_S1E1WP:
-> +		perm_fail |= pan && (ur || uw || ux);
-> +		fallthrough;
-> +	case OP_AT_S1E1W:
-> +	case OP_AT_S1E2W:
-> +		perm_fail |= !pw;
-> +		break;
-> +	case OP_AT_S1E0R:
-> +		perm_fail |= !ur;
-> +		break;
-> +	case OP_AT_S1E0W:
-> +		perm_fail |= !uw;
-> +		break;
-> +	default:
-> +		BUG();
-> +	}
-> +
-> +	if (perm_fail) {
-> +		struct s1_walk_result tmp;
-> +
-> +		tmp.failed = true;
-> +		tmp.fst = ESR_ELx_FSC_PERM | wr.level;
-> +		tmp.s2 = false;
-> +		tmp.ptw = false;
-> +
-> +		wr = tmp;
-> +	}
-> +
-> +compute_par:
-> +	return compute_par_s1(vcpu, &wr);
-> +}
-> [..]
+-- 
+Thiago
