@@ -1,166 +1,122 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0594B770E4
-	for <kvmarm@lists.linux.dev>; Thu, 18 Jul 2024 08:21:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FA17839E4;
+	Thu, 18 Jul 2024 11:37:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721290915; cv=none; b=Dl1rUmQmg8gwJnyWXqYYIuDnvHYFSujPG2shDkXo+cMRjtVawYBT+Mjj3zVqZmIOsj3TrQ87IerMs9CAITILknqCGUu/x/TKR10KjASmw615NUXZ5Pa96L3oesPw2l1mo5fipkBL9R//Wgcp2OJX84F4/tytZuNGyibHtI+Y0Qw=
+	t=1721302672; cv=none; b=fgtUeOLsxzhdn3W12/mz79un4mmxye9TmA54KSbuoNI3vhcIt8VDPgkVAdmfsJ/eZOjrDuxZwK952941bPhB858N9/9M5Z0mZk+ZzHipckFr5WuqejG+gVYkkSLIwunOEpUZP9f1V3lgpsc4NjeX5w3B+Rl87oOb8Yx+BLkRt/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721290915; c=relaxed/simple;
-	bh=s8LaxNAYfmh3IeeZ0xeQdL3fh6VK7F/6mJqBXqfB5sw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hq5019Tyevn9R4MrgwQb5xTw6iWuWAbNaheocQVW8kJMotTAlagwNwbIb6ZAvHniy4Mn8ys29QW67D8WEUm5Cw4sZ4VH71nCG8sfZHNEbMj+ozRJ0Bo2HKD5ceOBz8nR4cyEWoT49Xu/YKYF6NpYoYXrOZhpZVBYbP4DF7oEgTQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Si3gtV6B; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1721302672; c=relaxed/simple;
+	bh=JTdVhHa8K8Oj9vWfltL+Kcl+giEACbBSmFqRmJsRqik=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KZm9RAoiyL0ySziJSa9mHskTgDEKXZ3Aqi3uTGtbKk9oMCl1oubbOefv3uX0CCb8OQM839Bo4GQbyj+MY9pU50Thz5PttOdm5mgyxf1Ewp89oS5nM12gghDqZKXVzDCuoXUomQBl9p/bkLn7ppHYP/y5C+58pUMVhnupCk9Vkl8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AMFa9J87; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Si3gtV6B"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721290913;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EG5X2jNXo44yPLi4gfIK72Jy2eQX46mdLlCCJwEgEGw=;
-	b=Si3gtV6BFrNnQBMk+VbYy/lyJahA/hZCxXl7nhTVRAkMCskrUmZ9PLGV1xx3XXGnIwEj7e
-	1OaZqRBTAEknlrbDDTpzdkXnvCsRh6fvaO8SpfEzw2zJiX3qwPxdqIrYgVP6dzuYY5WDHM
-	TQX85faPl86qrgzLBFSU02hrCdUBPEY=
-Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
- [209.85.215.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-549-K6N3pAJ6PLix5CN631gUaA-1; Thu, 18 Jul 2024 04:21:49 -0400
-X-MC-Unique: K6N3pAJ6PLix5CN631gUaA-1
-Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-71ab8fb396dso93268a12.2
-        for <kvmarm@lists.linux.dev>; Thu, 18 Jul 2024 01:21:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721290908; x=1721895708;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EG5X2jNXo44yPLi4gfIK72Jy2eQX46mdLlCCJwEgEGw=;
-        b=GVaKlLqSTjAVUhfO7CW3DXP4SKrR6aHD26IMWRfStRR4zwXj1E5es9gwDHY8yBzAgt
-         2yT+5y0xVv4z8ZCVYKI/D+/ULQ/Mkzu4uX616jrshqKh1YOtjYcCA4WjIiYFfitOswCG
-         ElViCKtkzEJOZ1xU7OFcU21fFAHp8wh5tLwjCE11xEZXLhwKWk7DOx2K+VVr+88zrn1N
-         8xfkpLOO6lvWw56giAN1gAPO+ILBK8c6yEHKbaWGbDGitLjXCYPo59dmOqCD1+yyMuRs
-         AjsfVcIEmvWq678SXHMDLIvlvGAKR9kV/yPEpDFKP01ZhK8Q4anYZLxe5Ep1HI/8pVIz
-         SaMg==
-X-Forwarded-Encrypted: i=1; AJvYcCWDmBRvIwamUsY1ZNrXomNZtuqAqSA9iqHKIcrmcc+0FNk7072isXQlKmQAeXBBtn+2xvi/asliaQlB6AOMMkGeXJKcrMFh
-X-Gm-Message-State: AOJu0YxVd9ctfBqPeBk9tiFKfh9pa8F6kijm6bqPv96GIa7hfjoBX8M8
-	TsTWt5cF97Xo33dAP/mblWNsTZ7Mnu7VqQOR5o28ssm7Bm0EI/26US+OB6aM2kXaFj7HULagp3t
-	B1qSWzjWxGtX8Zgox0GOWOH5pUcW7BF2ttga5rH8FX5UnOu1/V7obaQ==
-X-Received: by 2002:a17:902:db06:b0:1fc:6028:b028 with SMTP id d9443c01a7336-1fc6028b1f4mr7517895ad.9.1721290908082;
-        Thu, 18 Jul 2024 01:21:48 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEVCsM1BT5kQcMnEYC3j/H0GU4TuMnoheFVj1xqeFGH2ijUZ24HklGKePCFjzvCcGO+Wj2ItQ==
-X-Received: by 2002:a17:902:db06:b0:1fc:6028:b028 with SMTP id d9443c01a7336-1fc6028b1f4mr7517745ad.9.1721290907686;
-        Thu, 18 Jul 2024 01:21:47 -0700 (PDT)
-Received: from [10.72.116.35] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fc0bc2712csm87732395ad.176.2024.07.18.01.21.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 18 Jul 2024 01:21:47 -0700 (PDT)
-Message-ID: <c8fd114a-1b9d-402a-b883-bfa1952d91fd@redhat.com>
-Date: Thu, 18 Jul 2024 16:21:42 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AMFa9J87"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAE5FC116B1;
+	Thu, 18 Jul 2024 11:37:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721302671;
+	bh=JTdVhHa8K8Oj9vWfltL+Kcl+giEACbBSmFqRmJsRqik=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=AMFa9J87Gi8RHYPHz8GZpa+zIVfUwtnGKw4QWBgJ7eRG5RKdN3XIbqEgB3dAA69xL
+	 zAv51c3H8tRE1RfsQ7dwymm89G7WduNX+zh8T+Neh+mwwP9FMaWUgswa5CfQwP+X1E
+	 jRmvn9zURoLeatMiMgUOoieJpdql7x83Qpx/P4CVQgOa2KAeEIILNBG2u0frCQYn+h
+	 z0Q8RbeqT/Z4aNxOBlIuGE7WW37vXehPRJJCyY9x1O8Vp5ny3F+63WHjM1ZtP01UnF
+	 /o9Fpv7OubkkzA5sCyApkELgrYVAxQdTnv9/l8vFdgrBxUUhSpGy8HuBd5IkVKQSBl
+	 66HXHp4bcUkhA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sUPSH-00DQvm-Gy;
+	Thu, 18 Jul 2024 12:37:49 +0100
+Date: Thu, 18 Jul 2024 12:37:49 +0100
+Message-ID: <87a5if53si.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Joey Gouly <joey.gouly@arm.com>
+Subject: Re: [PATCH 10/12] KVM: arm64: nv: Add SW walker for AT S1 emulation
+In-Reply-To: <ZpVAi3dqOOysMMnE@raptor>
+References: <20240625133508.259829-1-maz@kernel.org>
+	<20240708165800.1220065-1-maz@kernel.org>
+	<Zo+6TYIP3FNssR/b@arm.com>
+	<874j8wp1hx.wl-maz@kernel.org>
+	<ZpVAi3dqOOysMMnE@raptor>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 2/3] KVM: arm64: Allow userspace to change
- ID_AA64PFR1_EL1
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
- Mark Brown <broonie@kernel.org>, Eric Auger <eauger@redhat.com>,
- Sebastian Ott <sebott@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- James Morse <james.morse@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20240718035017.434996-1-shahuang@redhat.com>
- <20240718035017.434996-3-shahuang@redhat.com> <Zpi3vjxLQ37Q_8OV@linux.dev>
-From: Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <Zpi3vjxLQ37Q_8OV@linux.dev>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Oliver,
+Hi Alex,
 
-On 7/18/24 14:35, Oliver Upton wrote:
-> On Wed, Jul 17, 2024 at 11:50:15PM -0400, Shaoqin Huang wrote:
->> Allow userspace to change the guest-visible value of the register with
->> different way of handling:
->>
->>    - Since the RAS and MPAM is not writable in the ID_AA64PFR0_EL1
->>      register, RAS_frac and MPAM_frac are also not writable in the
->>      ID_AA64PFR1_EL1 register.
->>
->>    - The MTE is controlled by an internal flag (KVM_ARCH_FLAG_MTE_ENABLED),
->>      so it's not writable.
+On Mon, 15 Jul 2024 16:30:19 +0100,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
-> The flag isn't the relevant part, what's important about MTE is that it
-> already has a separate UAPI for controlling it (KVM_CAP_ARM_MTE).
-
-I'm not quite understand why KVM_ARCH_FLAG_MTE_ENABLED isn't the 
-relevant part. I see this capability, when enable the KVM_CAP_ARM_MTE, 
-it set the KVM_ARCH_FLAG_MTE_ENABLED in the kvm->arch.flags.
-
-And do you mean we should update it like "The MTE is controlled by a 
-UAPI (KVM_CAP_ARM_MTE)"?
-
+> In this patch, if I'm reading the code right (and I'm starting to doubt myself)
+> if PAR_EL1.F is set and PAR_EL1 doesn't indicate a permissions fault, then KVM
+> falls back to walking the S1 tables:
 > 
->>    - For those fields which KVM doesn't know how to handle, they have
->>      are not exposed to the guest (being disabled in the register read
->>      accessor), those fields value will always be 0. Allow those fields
->>      writable is fine, since the userspace can only write 0 into those
->>      fields. Maybe in the future KVM know how to handle some of the
->>      fields, then they can be written into other value.
->>      So let them writable.
->>      Those fields include SME, RNDR_trap, NMI, GCS, THE, DF2, PFAR,
->>      MTE_frac, MTEX.
+>         if (par & SYS_PAR_EL1_F) {
+>                 u8 fst = FIELD_GET(SYS_PAR_EL1_FST, par);
 > 
-> This doesn't seem right. We're committing to a UAPI behavior the moment
-> these fields are advertised to userspace, which is rather difficult to
-> do for features that we don't even implement.
+>                 /*
+>                  * If we get something other than a permission fault, we
+>                  * need to retry, as we're likely to have missed in the PTs.
+>                  */
+>                 if ((fst & ESR_ELx_FSC_TYPE) != ESR_ELx_FSC_PERM)
+>                         retry_slow = true;
+> 	}
 > 
-> Please only advertise the fields known to KVM and leave the others
-> unadvertised.
+> I suppose that's because KVM cannot distinguish between two very different
+> reasons for AT failing: 1, because of something being wrong with the stage 1
+> tables when the AT S1E0* instruction was executed and 2, because of missing
+> entries at stage 2, as per the comment. Is that correct?
 
-Thanks a lot for pointing this out. Now I get the point, for those not 
-implemented feature, they should not writable, so they're not advertised 
-to userspace.
+Exactly. It doesn't help that I'm using 3 AT instructions to implement
+a single one, and that makes the window of opportunity for things to
+go wrong rather large.
 
-> 
->>    - The BT, SSBS, CSV2_frac don't introduce any new registers which KVM
->>      doesn't know how to handle, they can be written without ill effect.
->>      So let them writable.
-> 
-> I think the handling of ARM_SMCCC_ARCH_WORKAROUND_2 needs to be updated
-> to consider the presence of FEAT_SSBS in the guest's ID registers.
-> Otherwise we'll wind up returning NOT_SUPPORTED and the guest will
-> conclude it is in a vulnerable state.
+Now, I've been thinking about this some more, and I came to the
+conclusion that we can actually implement the FEAT_PAN2 instructions
+using the PAN2 instructions themselves, which would greatly simplify
+the code. We just need to switch PSTATE.PAN so that it reflects the
+guest's state around the AT instruction.
 
-I see that line of code, in the case ARM_SMCCC_ARCH_WORKAROUND_2:
+With that scheme, the process becomes slightly clearer (and applies to
+all AT instructions except for FEAT_ATS1A):
 
-if (cpus_have_final_cap(ARM64_SSBS))
-	break;
+- either we have a successful translation and all is good
 
-I guess we should update it with something like
+- or we have a failure for permission fault: all is good as well, as
+  this is simply a "normal" failure
 
-if (SYS_FIELD_GET(ID_AA64PFR1_EL1, SSBS, IDREG(kvm,
-     SYS_ID_AA64PFR1_EL1)) != 0)
+- or we have a failure for any other reason, and we must fall back to
+  a SW walk to work things out properly.
 
-Oliver, Is there any proper function or macro implement the checking 
-like above? I don't find the similar checking in the code.
+I'll try to capture this reasoning as a comment in the next version.
 
 Thanks,
-Shaoqin
 
-> 
+	M.
 
 -- 
-Shaoqin
-
+Without deviation from the norm, progress is not possible.
