@@ -1,103 +1,180 @@
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3D7980046
-	for <kvmarm@lists.linux.dev>; Fri, 19 Jul 2024 09:42:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3010225757;
+	Fri, 19 Jul 2024 11:31:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721382131; cv=none; b=jYDEXIMVQIZy4Bcc6ZO1PF0yuFmaWUyKmwHTzsG9gaRuC263hj+9wzV8hhQFLa4UmOfgLzwnhaXuHWxX6nWpCDBYPYm5TuazmVEZXlQTjgkGyZzgc2vnwR3B1UGQzBhtBMBnTVZ4pigZ2/+/afmAACA7XdAWx8SKUnVI395n7Xs=
+	t=1721388680; cv=none; b=KHE2ww3UmXep/Q2C2ma9nC7r39ARAZ8a8lHbFiO2o4WtIJSuBeLoDq5v8uJCAOh1I4UwlpfdufhmXrIRfQmr0uovbwd3tepMIvsD2tP2LMDKtk6XFTGJqkx9Xu4DTcPZOJav0xK2wmTAMCdkuadTyAOWVRiR4tGJmE9eCo+Ji08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721382131; c=relaxed/simple;
-	bh=qGopGABQSOZ4WINzP7qpGeg325G03koAFu5o3JX1uP8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=G5+/BL+4B4an/EHBrU0bmrR7jDfsp2VUFx76AyvDy7txwAA0kjIfI3/BCzG3NvYn1Z6qdWqx71bEJ0pUWzCRp548158gsWSWDCLeAvDV4LtW1SWGSTZJHwtyqT2vu0CX0p6M7Ko9L6jIYXZI/UMYF6TqHASk9tiUo3nl2mFAfLQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=45.249.212.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hisilicon.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4WQPjf1ZT0zQmGy;
-	Fri, 19 Jul 2024 17:37:58 +0800 (CST)
-Received: from kwepemd200012.china.huawei.com (unknown [7.221.188.145])
-	by mail.maildlp.com (Postfix) with ESMTPS id D4E9418007C;
-	Fri, 19 Jul 2024 17:42:03 +0800 (CST)
-Received: from [10.67.121.115] (10.67.121.115) by
- kwepemd200012.china.huawei.com (7.221.188.145) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Fri, 19 Jul 2024 17:42:03 +0800
-Message-ID: <2c9489cc-d276-7c52-5d52-7f234fdc726e@hisilicon.com>
-Date: Fri, 19 Jul 2024 17:42:02 +0800
+	s=arc-20240116; t=1721388680; c=relaxed/simple;
+	bh=ne2vWVxA6XUsX7661bKyLku1qh3orhzjZVHmWu5iO00=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MhKHFxWNTmHmAMPMRv7pdi83ppNasyxKSml1rZFQAHLG1+sYeQZK1yN7v7z+bvx6HzD98ccN+MRZM7ogPK8THsHsaLrgJhqgHVRyU6ZtKEJxi6ZOBo88mR0s0ZJS65cjBR76ZUJbyUYPpU/orvBWmh9To6oW8bOBqyI9gq+Wqwc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YgcG2BDg; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YgcG2BDg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB50AC32782;
+	Fri, 19 Jul 2024 11:31:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721388679;
+	bh=ne2vWVxA6XUsX7661bKyLku1qh3orhzjZVHmWu5iO00=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=YgcG2BDgxGyhS2lmc7Ln0lqa1etFOIoSGXNQ0DHorLazK48QRWYlEH0JDeE+LYiD2
+	 GpyM8RRWSnCn3UHq1tPDjjnthppLbbZrttL90tKAUG85MDjHesujbCtCrfBils5VMG
+	 beHlv0uqQ3ra1nvwEo2b6Aw82qx+3l2Y+8NVVjtnkN8nY6yUD+Y9QwfEYAntchqIHG
+	 H/RiNilXycbqpXBYb6CBLEyzrhyRy73suBGBDFqByEgQ/7x9UZEACpXDBHEdxios8M
+	 Op3Tjs5NhNdzYFTVA6jBog/3imaYTp+EjXjma3ttMV5K4DbbEGP5UdYOHhg9ZNdJmv
+	 epsM/2XfanPzQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sUlpV-00DhVs-3n;
+	Fri, 19 Jul 2024 12:31:17 +0100
+Date: Fri, 19 Jul 2024 12:31:16 +0100
+Message-ID: <86h6cl39ff.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Zhou Wang <wangzhou1@hisilicon.com>
+Cc: <kvmarm@lists.linux.dev>,
+	<linux-arm-kernel@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Nianyao Tang
+	<tangnianyao@huawei.com>
+Subject: Re: [PATCH 3/3] irqchip/gic-v4: Make sure a VPE is locked when VMAPP is issued
+In-Reply-To: <2c9489cc-d276-7c52-5d52-7f234fdc726e@hisilicon.com>
+References: <20240705093155.871070-1-maz@kernel.org>
+	<20240705093155.871070-4-maz@kernel.org>
+	<2c9489cc-d276-7c52-5d52-7f234fdc726e@hisilicon.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.3
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH 3/3] irqchip/gic-v4: Make sure a VPE is locked when VMAPP
- is issued
-Content-Language: en-US
-To: Marc Zyngier <maz@kernel.org>, <kvmarm@lists.linux.dev>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-CC: Thomas Gleixner <tglx@linutronix.de>, Nianyao Tang
-	<tangnianyao@huawei.com>
-References: <20240705093155.871070-1-maz@kernel.org>
- <20240705093155.871070-4-maz@kernel.org>
-From: Zhou Wang <wangzhou1@hisilicon.com>
-In-Reply-To: <20240705093155.871070-4-maz@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemd200012.china.huawei.com (7.221.188.145)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: wangzhou1@hisilicon.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, tglx@linutronix.de, tangnianyao@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 2024/7/5 17:31, Marc Zyngier wrote:
-> In order to make sure that vpe->col_idx is correctly sampled
-> when a VMAPP command is issued, we must hold the lock for the
-> VPE. This is now possible since the introduction of the per-VM
-> vmapp_lock, which can be taken before vpe_lock in the locking
-> order.
+On Fri, 19 Jul 2024 10:42:02 +0100,
+Zhou Wang <wangzhou1@hisilicon.com> wrote:
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  drivers/irqchip/irq-gic-v3-its.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
+> On 2024/7/5 17:31, Marc Zyngier wrote:
+> > In order to make sure that vpe->col_idx is correctly sampled
+> > when a VMAPP command is issued, we must hold the lock for the
+> > VPE. This is now possible since the introduction of the per-VM
+> > vmapp_lock, which can be taken before vpe_lock in the locking
+> > order.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  drivers/irqchip/irq-gic-v3-its.c | 8 ++++++--
+> >  1 file changed, 6 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+> > index b52d60097cad5..951ec140bcea2 100644
+> > --- a/drivers/irqchip/irq-gic-v3-its.c
+> > +++ b/drivers/irqchip/irq-gic-v3-its.c
+> > @@ -1810,7 +1810,9 @@ static void its_map_vm(struct its_node *its, struct its_vm *vm)
+> >  		for (i = 0; i < vm->nr_vpes; i++) {
+> >  			struct its_vpe *vpe = vm->vpes[i];
+> >  
+> > -			its_send_vmapp(its, vpe, true);
+> > +			scoped_guard(raw_spinlock, &vpe->vpe_lock)
+> > +				its_send_vmapp(its, vpe, true);
+> > +
+> >  			its_send_vinvall(its, vpe);
+> >  		}
+> >  	}
+> > @@ -1827,8 +1829,10 @@ static void its_unmap_vm(struct its_node *its, struct its_vm *vm)
+> >  	if (!--vm->vlpi_count[its->list_nr]) {
+> >  		int i;
+> >  
+> > -		for (i = 0; i < vm->nr_vpes; i++)
+> > +		for (i = 0; i < vm->nr_vpes; i++) {
+> > +			guard(raw_spinlock)(&vm->vpes[i]->vpe_lock);
+> >  			its_send_vmapp(its, vm->vpes[i], false);
+> > +		}
+> >  	}
+> >  }
+> >  
 > 
-> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-> index b52d60097cad5..951ec140bcea2 100644
-> --- a/drivers/irqchip/irq-gic-v3-its.c
-> +++ b/drivers/irqchip/irq-gic-v3-its.c
-> @@ -1810,7 +1810,9 @@ static void its_map_vm(struct its_node *its, struct its_vm *vm)
->  		for (i = 0; i < vm->nr_vpes; i++) {
->  			struct its_vpe *vpe = vm->vpes[i];
->  
-> -			its_send_vmapp(its, vpe, true);
-> +			scoped_guard(raw_spinlock, &vpe->vpe_lock)
-> +				its_send_vmapp(its, vpe, true);
-> +
->  			its_send_vinvall(its, vpe);
->  		}
->  	}
-> @@ -1827,8 +1829,10 @@ static void its_unmap_vm(struct its_node *its, struct its_vm *vm)
->  	if (!--vm->vlpi_count[its->list_nr]) {
->  		int i;
->  
-> -		for (i = 0; i < vm->nr_vpes; i++)
-> +		for (i = 0; i < vm->nr_vpes; i++) {
-> +			guard(raw_spinlock)(&vm->vpes[i]->vpe_lock);
->  			its_send_vmapp(its, vm->vpes[i], false);
-> +		}
->  	}
->  }
->  
+> Hi Marc,
+> 
+> It looks like there is ABBA deadlock after applying this series:
+> 
+> In its_map_vm: vmapp_lock -> vpe_lock
+> In its_vpe_set_affinity: vpe_to_cpuid_lock(vpe_lock) -> its_send_vmovp(vmapp_lock)
+> 
+> Any idea about this?
 
-Hi Marc,
+Hmmm, well spotted. That's an annoying one.
 
-It looks like there is ABBA deadlock after applying this series:
+Can you give the below hack a go? I've only lightly tested it, as my
+D05 box is on its last leg (it is literally falling apart) and I don't
+have any other GICv4.x box to test on.
 
-In its_map_vm: vmapp_lock -> vpe_lock
-In its_vpe_set_affinity: vpe_to_cpuid_lock(vpe_lock) -> its_send_vmovp(vmapp_lock)
+Thanks,
 
-Any idea about this?
+	M.
 
-Best,
-Zhou
+diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+index 951ec140bcea2..b88c6011c8771 100644
+--- a/drivers/irqchip/irq-gic-v3-its.c
++++ b/drivers/irqchip/irq-gic-v3-its.c
+@@ -1328,12 +1328,6 @@ static void its_send_vmovp(struct its_vpe *vpe)
+ 		return;
+ 	}
+ 
+-	/*
+-	 * Protect against concurrent updates of the mapping state on
+-	 * individual VMs.
+-	 */
+-	guard(raw_spinlock_irqsave)(&vpe->its_vm->vmapp_lock);
+-
+ 	/*
+ 	 * Yet another marvel of the architecture. If using the
+ 	 * its_list "feature", we need to make sure that all ITSs
+@@ -3808,7 +3802,7 @@ static int its_vpe_set_affinity(struct irq_data *d,
+ 	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
+ 	unsigned int from, cpu = nr_cpu_ids;
+ 	struct cpumask *table_mask;
+-	unsigned long flags;
++	unsigned long flags, vmapp_flags;
+ 
+ 	/*
+ 	 * Changing affinity is mega expensive, so let's be as lazy as
+@@ -3822,7 +3816,14 @@ static int its_vpe_set_affinity(struct irq_data *d,
+ 	 * protect us, and that we must ensure nobody samples vpe->col_idx
+ 	 * during the update, hence the lock below which must also be
+ 	 * taken on any vLPI handling path that evaluates vpe->col_idx.
++	 *
++	 * Finally, we must protect ourselves against concurrent
++	 * updates of the mapping state on this VM should the ITS list
++	 * be in use.
+ 	 */
++	if (its_list_map)
++		raw_spin_lock_irqsave(&vpe->its_vm->vmapp_lock, vmapp_flags);
++
+ 	from = vpe_to_cpuid_lock(vpe, &flags);
+ 	table_mask = gic_data_rdist_cpu(from)->vpe_table_mask;
+ 
+@@ -3852,6 +3853,9 @@ static int its_vpe_set_affinity(struct irq_data *d,
+ 	irq_data_update_effective_affinity(d, cpumask_of(cpu));
+ 	vpe_to_cpuid_unlock(vpe, flags);
+ 
++	if (its_list_map)
++		raw_spin_unlock_irqrestore(&vpe->its_vm->vmapp_lock, vmapp_flags);
++
+ 	return IRQ_SET_MASK_OK_DONE;
+ }
+ 
+
+-- 
+Without deviation from the norm, progress is not possible.
