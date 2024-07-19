@@ -1,180 +1,156 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3010225757;
-	Fri, 19 Jul 2024 11:31:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B730639FF3
+	for <kvmarm@lists.linux.dev>; Fri, 19 Jul 2024 11:44:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721388680; cv=none; b=KHE2ww3UmXep/Q2C2ma9nC7r39ARAZ8a8lHbFiO2o4WtIJSuBeLoDq5v8uJCAOh1I4UwlpfdufhmXrIRfQmr0uovbwd3tepMIvsD2tP2LMDKtk6XFTGJqkx9Xu4DTcPZOJav0xK2wmTAMCdkuadTyAOWVRiR4tGJmE9eCo+Ji08=
+	t=1721389488; cv=none; b=V33ZDAb+oPvODUtCpnytJukA6cgjB/gcNAnWOIkS6hM2Vi9eYeCIuWnfdiMyz/AnWgT93qgCYeM3oV6u32ywHD0q3Q0MT3Xoacjg3eF5xhpFEA+w7OkLCEpiEJW1pclhR5BI4FQvBlKICClq7j99P0XxaiK8N9Ve65ot/ibRDXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721388680; c=relaxed/simple;
-	bh=ne2vWVxA6XUsX7661bKyLku1qh3orhzjZVHmWu5iO00=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MhKHFxWNTmHmAMPMRv7pdi83ppNasyxKSml1rZFQAHLG1+sYeQZK1yN7v7z+bvx6HzD98ccN+MRZM7ogPK8THsHsaLrgJhqgHVRyU6ZtKEJxi6ZOBo88mR0s0ZJS65cjBR76ZUJbyUYPpU/orvBWmh9To6oW8bOBqyI9gq+Wqwc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YgcG2BDg; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1721389488; c=relaxed/simple;
+	bh=kgKTLoK6aEF7j5uUJdbhIC+g+jKuvnbnfAisvztFBcs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FR9RbOCDA4Nw+a7Ta/k5rc/knND/A1D3VNaCjGxSbglT6xqBYykExG863O4SEjpfLeobMJAoDe1BgIkrBA9h27E4kn+PYOxy0EJCiL58qgNnZya9VtX/JFnR6gQcK4prW7vXWRwE8SKa9sVWv7wcl/ngXQ4Hngbo7x+bqzBJo3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wWBPvO47; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YgcG2BDg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB50AC32782;
-	Fri, 19 Jul 2024 11:31:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721388679;
-	bh=ne2vWVxA6XUsX7661bKyLku1qh3orhzjZVHmWu5iO00=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=YgcG2BDgxGyhS2lmc7Ln0lqa1etFOIoSGXNQ0DHorLazK48QRWYlEH0JDeE+LYiD2
-	 GpyM8RRWSnCn3UHq1tPDjjnthppLbbZrttL90tKAUG85MDjHesujbCtCrfBils5VMG
-	 beHlv0uqQ3ra1nvwEo2b6Aw82qx+3l2Y+8NVVjtnkN8nY6yUD+Y9QwfEYAntchqIHG
-	 H/RiNilXycbqpXBYb6CBLEyzrhyRy73suBGBDFqByEgQ/7x9UZEACpXDBHEdxios8M
-	 Op3Tjs5NhNdzYFTVA6jBog/3imaYTp+EjXjma3ttMV5K4DbbEGP5UdYOHhg9ZNdJmv
-	 epsM/2XfanPzQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sUlpV-00DhVs-3n;
-	Fri, 19 Jul 2024 12:31:17 +0100
-Date: Fri, 19 Jul 2024 12:31:16 +0100
-Message-ID: <86h6cl39ff.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Zhou Wang <wangzhou1@hisilicon.com>
-Cc: <kvmarm@lists.linux.dev>,
-	<linux-arm-kernel@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Nianyao Tang
-	<tangnianyao@huawei.com>
-Subject: Re: [PATCH 3/3] irqchip/gic-v4: Make sure a VPE is locked when VMAPP is issued
-In-Reply-To: <2c9489cc-d276-7c52-5d52-7f234fdc726e@hisilicon.com>
-References: <20240705093155.871070-1-maz@kernel.org>
-	<20240705093155.871070-4-maz@kernel.org>
-	<2c9489cc-d276-7c52-5d52-7f234fdc726e@hisilicon.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.3
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wWBPvO47"
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4266edcc54cso40235e9.0
+        for <kvmarm@lists.linux.dev>; Fri, 19 Jul 2024 04:44:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1721389485; x=1721994285; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=PqiXhGjOSYu1xQZgH96GVDYB8na0EBhm6a6MmbmS/gs=;
+        b=wWBPvO47Or0taxHB9LoIjiJvTsExiddCWKWWj3eSfeNZ6Mnf1ipLMKzAoUsYfnjzRW
+         wwqR2/4dnuyoWRr7viXIILnsLTJq36ugCIUIWXNegnc2V4hNZAzzTXb6wuNX3eYMCJCU
+         zRf4gefP1YxNx6djEqRqNzpVci1sHSv4bgMOLLe5dglL0PC10FyvdD0NMlbLY2Im3OaF
+         1KgdWSdXNQrCMNLGpbm6++5IMHAXwDjpcXo8brFEv3dtBVq5NA0HWBoG5BQqAB3DNFwc
+         0/TdVkLa7n0C9wZlw71P0GmIeVqYnP6WjUaBhv5/6/g4gqmezYzfa/FUAzoCMuxAhqpE
+         ozFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721389485; x=1721994285;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PqiXhGjOSYu1xQZgH96GVDYB8na0EBhm6a6MmbmS/gs=;
+        b=GHWqZN4WfoH5STzXC+p3lDNgTyuqoQT+584ZA+8AfftCxAyunc/hBC/Hm6jcFz5GWM
+         N7eBPFY6FpQb2Me/KLGwfq5PNeA6GIjQ7F4B4zCgl2paVUqxBzkiUdL2qbD+dyuO1pCC
+         tqpaT+titAo+yvznFuiqsbtbKY/yBfb4pU3ikxIE0RRBLj8jxPR5OIXeoOEiIpVHMQOR
+         QLMqapLla1rMwCuf70mKufaOUDDT8P46/64Shfa5C+7s09QgvBCTC3X7v+R3O5QlogxZ
+         dt9EGYuyn55d1A+bQ7+clzZZ9kXbG2tgBpKd30BgeIqzTnMU3Ld8hHzktpL1FVjcxXXe
+         2FqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW2apv8kG64hXTYUNJJanoNrZ98uOxlwtzfuQsWZSxjQZzi+zl4D2uI6zFr5Qwl9OzSePjd/BvJQKvvujNwf+pX6TgnGMb6
+X-Gm-Message-State: AOJu0YxoCwukdO93MLsDX4IMwL8PYLKb2IcTtqoAcLAYfIYJmi/Sm+6Z
+	9O0q424MDOdJXfuUWhu3C5fKUsyx89hNLVUAiKZw3qRILNACdvSg3NJvKEYkjw==
+X-Google-Smtp-Source: AGHT+IFU0Zkx2Sq301T9KLS1Qev+gl2hXlS+YMiIjix2LoeRgr3gvV/t6LaUnZWd6GxnVJkmx3HXGQ==
+X-Received: by 2002:a05:600c:511e:b0:426:5ef2:cd97 with SMTP id 5b1f17b1804b1-427d5812246mr1214575e9.2.1721389484609;
+        Fri, 19 Jul 2024 04:44:44 -0700 (PDT)
+Received: from google.com (49.222.77.34.bc.googleusercontent.com. [34.77.222.49])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-427d2a95099sm47533645e9.48.2024.07.19.04.44.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Jul 2024 04:44:44 -0700 (PDT)
+Date: Fri, 19 Jul 2024 11:44:42 +0000
+From: Sebastian Ene <sebastianene@google.com>
+To: Will Deacon <will@kernel.org>
+Cc: akpm@linux-foundation.org, alexghiti@rivosinc.com, ankita@nvidia.com,
+	ardb@kernel.org, catalin.marinas@arm.com,
+	christophe.leroy@csgroup.eu, james.morse@arm.com,
+	vdonnefort@google.com, mark.rutland@arm.com, maz@kernel.org,
+	oliver.upton@linux.dev, rananta@google.com, ryan.roberts@arm.com,
+	shahuang@redhat.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, kernel-team@android.com
+Subject: Re: [PATCH v7 2/6] arm64: ptdump: Expose the attribute parsing
+ functionality
+Message-ID: <ZppRqmuL2ORp2uNC@google.com>
+References: <20240621123230.1085265-1-sebastianene@google.com>
+ <20240621123230.1085265-3-sebastianene@google.com>
+ <20240705110747.GA9231@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: wangzhou1@hisilicon.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, tglx@linutronix.de, tangnianyao@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240705110747.GA9231@willie-the-truck>
 
-On Fri, 19 Jul 2024 10:42:02 +0100,
-Zhou Wang <wangzhou1@hisilicon.com> wrote:
-> 
-> On 2024/7/5 17:31, Marc Zyngier wrote:
-> > In order to make sure that vpe->col_idx is correctly sampled
-> > when a VMAPP command is issued, we must hold the lock for the
-> > VPE. This is now possible since the introduction of the per-VM
-> > vmapp_lock, which can be taken before vpe_lock in the locking
-> > order.
+On Fri, Jul 05, 2024 at 12:07:48PM +0100, Will Deacon wrote:
+> On Fri, Jun 21, 2024 at 12:32:26PM +0000, Sebastian Ene wrote:
+> > Reuse the descriptor parsing functionality to keep the same output format
+> > as the original ptdump code. In order for this to happen, move the state
+> > tracking objects into a common header.
 > > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > Signed-off-by: Sebastian Ene <sebastianene@google.com>
 > > ---
-> >  drivers/irqchip/irq-gic-v3-its.c | 8 ++++++--
-> >  1 file changed, 6 insertions(+), 2 deletions(-)
+> >  arch/arm64/include/asm/ptdump.h | 41 ++++++++++++++++++++++++++++++++-
+> >  arch/arm64/mm/ptdump.c          | 37 ++---------------------------
+> >  2 files changed, 42 insertions(+), 36 deletions(-)
 > > 
-> > diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-> > index b52d60097cad5..951ec140bcea2 100644
-> > --- a/drivers/irqchip/irq-gic-v3-its.c
-> > +++ b/drivers/irqchip/irq-gic-v3-its.c
-> > @@ -1810,7 +1810,9 @@ static void its_map_vm(struct its_node *its, struct its_vm *vm)
-> >  		for (i = 0; i < vm->nr_vpes; i++) {
-> >  			struct its_vpe *vpe = vm->vpes[i];
+> > diff --git a/arch/arm64/include/asm/ptdump.h b/arch/arm64/include/asm/ptdump.h
+> > index 5b1701c76d1c..c550b2afcab7 100644
+> > --- a/arch/arm64/include/asm/ptdump.h
+> > +++ b/arch/arm64/include/asm/ptdump.h
+> > @@ -9,6 +9,7 @@
 > >  
-> > -			its_send_vmapp(its, vpe, true);
-> > +			scoped_guard(raw_spinlock, &vpe->vpe_lock)
-> > +				its_send_vmapp(its, vpe, true);
+> >  #include <linux/mm_types.h>
+> >  #include <linux/seq_file.h>
+> > +#include <linux/ptdump.h>
+> >  
+> >  struct addr_marker {
+> >  	unsigned long start_address;
+> > @@ -21,14 +22,52 @@ struct ptdump_info {
+> >  	unsigned long			base_addr;
+> >  };
+> >  
+> > +struct prot_bits {
+> > +	u64		mask;
+> > +	u64		val;
+> > +	const char	*set;
+> > +	const char	*clear;
+> > +};
 > > +
-> >  			its_send_vinvall(its, vpe);
-> >  		}
-> >  	}
-> > @@ -1827,8 +1829,10 @@ static void its_unmap_vm(struct its_node *its, struct its_vm *vm)
-> >  	if (!--vm->vlpi_count[its->list_nr]) {
-> >  		int i;
-> >  
-> > -		for (i = 0; i < vm->nr_vpes; i++)
-> > +		for (i = 0; i < vm->nr_vpes; i++) {
-> > +			guard(raw_spinlock)(&vm->vpes[i]->vpe_lock);
-> >  			its_send_vmapp(its, vm->vpes[i], false);
-> > +		}
-> >  	}
-> >  }
-> >  
+> > +struct pg_level {
+> > +	const struct prot_bits *bits;
+> > +	char name[4];
+> > +	int num;
+> > +	u64 mask;
+> > +};
+> > +
+> > +/*
+> > + * The page dumper groups page table entries of the same type into a single
+> > + * description. It uses pg_state to track the range information while
+> > + * iterating over the pte entries. When the continuity is broken it then
+> > + * dumps out a description of the range.
+> > + */
+> > +struct pg_state {
+> > +	struct ptdump_state ptdump;
+> > +	struct seq_file *seq;
+> > +	const struct addr_marker *marker;
+> > +	const struct mm_struct *mm;
+> > +	unsigned long start_address;
+> > +	int level;
+> > +	u64 current_prot;
+> > +	bool check_wx;
+> > +	unsigned long wx_pages;
+> > +	unsigned long uxn_pages;
+> > +};
+
+Hello Will,
+
 > 
-> Hi Marc,
+> Minor nit, but if we're moving these structure definitions into the
+> header then I'd be inclined to give them some more specific names (e.g.
+> prefix them with 'ptdump_'). Granted, this header isn't used widely, but
+> it's included by arch/arm64/mm/mmu.c and claiming 'struct prot_bits' is
+> a bit over-reaching imo!
 > 
-> It looks like there is ABBA deadlock after applying this series:
-> 
-> In its_map_vm: vmapp_lock -> vpe_lock
-> In its_vpe_set_affinity: vpe_to_cpuid_lock(vpe_lock) -> its_send_vmovp(vmapp_lock)
-> 
-> Any idea about this?
+> Will
 
-Hmmm, well spotted. That's an annoying one.
+Thanks for having a look. I applied the prefix.
 
-Can you give the below hack a go? I've only lightly tested it, as my
-D05 box is on its last leg (it is literally falling apart) and I don't
-have any other GICv4.x box to test on.
-
-Thanks,
-
-	M.
-
-diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index 951ec140bcea2..b88c6011c8771 100644
---- a/drivers/irqchip/irq-gic-v3-its.c
-+++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -1328,12 +1328,6 @@ static void its_send_vmovp(struct its_vpe *vpe)
- 		return;
- 	}
- 
--	/*
--	 * Protect against concurrent updates of the mapping state on
--	 * individual VMs.
--	 */
--	guard(raw_spinlock_irqsave)(&vpe->its_vm->vmapp_lock);
--
- 	/*
- 	 * Yet another marvel of the architecture. If using the
- 	 * its_list "feature", we need to make sure that all ITSs
-@@ -3808,7 +3802,7 @@ static int its_vpe_set_affinity(struct irq_data *d,
- 	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
- 	unsigned int from, cpu = nr_cpu_ids;
- 	struct cpumask *table_mask;
--	unsigned long flags;
-+	unsigned long flags, vmapp_flags;
- 
- 	/*
- 	 * Changing affinity is mega expensive, so let's be as lazy as
-@@ -3822,7 +3816,14 @@ static int its_vpe_set_affinity(struct irq_data *d,
- 	 * protect us, and that we must ensure nobody samples vpe->col_idx
- 	 * during the update, hence the lock below which must also be
- 	 * taken on any vLPI handling path that evaluates vpe->col_idx.
-+	 *
-+	 * Finally, we must protect ourselves against concurrent
-+	 * updates of the mapping state on this VM should the ITS list
-+	 * be in use.
- 	 */
-+	if (its_list_map)
-+		raw_spin_lock_irqsave(&vpe->its_vm->vmapp_lock, vmapp_flags);
-+
- 	from = vpe_to_cpuid_lock(vpe, &flags);
- 	table_mask = gic_data_rdist_cpu(from)->vpe_table_mask;
- 
-@@ -3852,6 +3853,9 @@ static int its_vpe_set_affinity(struct irq_data *d,
- 	irq_data_update_effective_affinity(d, cpumask_of(cpu));
- 	vpe_to_cpuid_unlock(vpe, flags);
- 
-+	if (its_list_map)
-+		raw_spin_unlock_irqrestore(&vpe->its_vm->vmapp_lock, vmapp_flags);
-+
- 	return IRQ_SET_MASK_OK_DONE;
- }
- 
-
--- 
-Without deviation from the norm, progress is not possible.
+Cheers,
+Seb
