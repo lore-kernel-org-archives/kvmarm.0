@@ -1,116 +1,103 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 749892C80;
-	Fri, 19 Jul 2024 07:55:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3D7980046
+	for <kvmarm@lists.linux.dev>; Fri, 19 Jul 2024 09:42:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721375740; cv=none; b=Ai5SlMf+cuOcU+i4/d1Olax4KO4JSJZ2CDewcrqF6RxPkpy7YQQT1HGBGx5wY5MXwyVpSLbfGxIXewz7rEtI7Fjjts8GnPbf7M5OPVtP2H32+eZqiBH7XsaKEY+69vAuERCFVaz7J28QiJl6rKL4dBbaMoZO7r0xKGkmAIf7MKs=
+	t=1721382131; cv=none; b=jYDEXIMVQIZy4Bcc6ZO1PF0yuFmaWUyKmwHTzsG9gaRuC263hj+9wzV8hhQFLa4UmOfgLzwnhaXuHWxX6nWpCDBYPYm5TuazmVEZXlQTjgkGyZzgc2vnwR3B1UGQzBhtBMBnTVZ4pigZ2/+/afmAACA7XdAWx8SKUnVI395n7Xs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721375740; c=relaxed/simple;
-	bh=6Ay4p6jJCBni9LRzuGT1socEKkaxV4GanP/ZK2W/s/k=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sP6L3RGIPn2BlqZgH5WvjqlK5Z2XXbB7Be7IBUE1awwTjWECCxnUBExjtHxEA8JuO2d2zszQxPrIy0Mc0qpANA39WxdJ+0CxVBGXKPqyx0yewtDDYxevqMIVimbrsD9qIm5MeXtRwoR9zn+DJpYXTcPRjiZh0BR5PpWa/LrWxDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mD9d6Un5; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mD9d6Un5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1038C32782;
-	Fri, 19 Jul 2024 07:55:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721375740;
-	bh=6Ay4p6jJCBni9LRzuGT1socEKkaxV4GanP/ZK2W/s/k=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mD9d6Un588NMRY1s1nwglMIEvLYOQdfQuvFjOLyw+e3BbuDaEHoznlFOY8BTFG9x+
-	 XlrNqf6L7MPwF1P0I2qHmWWn2to9Nd8NIalDngtAfJv8YBomn04yaJYclcjfDqXbY5
-	 LzFSu3pEZlnDUaXHSrO61rxhk6qEBmPcrQxwn70+UV4li4O4Hu0Bbf9mdUA9cOvvwx
-	 q2RYEdBmApwd+rUdqSrW9NnCh9q60H/3qbRWI4z/k1oGzOhcEVRMKHYXgdRPmxXdBK
-	 /tp1QQmT2AF0QQsjI96XB074W12Nuwy/k1r1/4oQB/2Fkudye/bdOzMuBpOQMFYpoN
-	 UYc27cbUrUMhw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sUiSn-00De84-D8;
-	Fri, 19 Jul 2024 08:55:37 +0100
-Date: Fri, 19 Jul 2024 08:55:37 +0100
-Message-ID: <86ikx13jeu.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Raghavendra Rao Ananta <rananta@google.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Brown <broonie@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH] arm64/sysreg: Correct the values for GICv4.1
-In-Reply-To: <20240718215532.616447-1-rananta@google.com>
-References: <20240718215532.616447-1-rananta@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.3
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1721382131; c=relaxed/simple;
+	bh=qGopGABQSOZ4WINzP7qpGeg325G03koAFu5o3JX1uP8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=G5+/BL+4B4an/EHBrU0bmrR7jDfsp2VUFx76AyvDy7txwAA0kjIfI3/BCzG3NvYn1Z6qdWqx71bEJ0pUWzCRp548158gsWSWDCLeAvDV4LtW1SWGSTZJHwtyqT2vu0CX0p6M7Ko9L6jIYXZI/UMYF6TqHASk9tiUo3nl2mFAfLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=45.249.212.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hisilicon.com
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4WQPjf1ZT0zQmGy;
+	Fri, 19 Jul 2024 17:37:58 +0800 (CST)
+Received: from kwepemd200012.china.huawei.com (unknown [7.221.188.145])
+	by mail.maildlp.com (Postfix) with ESMTPS id D4E9418007C;
+	Fri, 19 Jul 2024 17:42:03 +0800 (CST)
+Received: from [10.67.121.115] (10.67.121.115) by
+ kwepemd200012.china.huawei.com (7.221.188.145) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.34; Fri, 19 Jul 2024 17:42:03 +0800
+Message-ID: <2c9489cc-d276-7c52-5d52-7f234fdc726e@hisilicon.com>
+Date: Fri, 19 Jul 2024 17:42:02 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: rananta@google.com, oliver.upton@linux.dev, catalin.marinas@arm.com, will@kernel.org, broonie@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH 3/3] irqchip/gic-v4: Make sure a VPE is locked when VMAPP
+ is issued
+Content-Language: en-US
+To: Marc Zyngier <maz@kernel.org>, <kvmarm@lists.linux.dev>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+CC: Thomas Gleixner <tglx@linutronix.de>, Nianyao Tang
+	<tangnianyao@huawei.com>
+References: <20240705093155.871070-1-maz@kernel.org>
+ <20240705093155.871070-4-maz@kernel.org>
+From: Zhou Wang <wangzhou1@hisilicon.com>
+In-Reply-To: <20240705093155.871070-4-maz@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemd200012.china.huawei.com (7.221.188.145)
 
-On Thu, 18 Jul 2024 22:55:32 +0100,
-Raghavendra Rao Ananta <rananta@google.com> wrote:
+On 2024/7/5 17:31, Marc Zyngier wrote:
+> In order to make sure that vpe->col_idx is correctly sampled
+> when a VMAPP command is issued, we must hold the lock for the
+> VPE. This is now possible since the introduction of the per-VM
+> vmapp_lock, which can be taken before vpe_lock in the locking
+> order.
 > 
-> Currently, sysreg has value as 0b0010 for the presence of GICv4.1 in
-> ID_PFR1_EL1 and ID_AA64PFR0_EL1, instead of 0b0011 as per ARM ARM.
-> Hence, correct them to reflect ARM ARM.
-> 
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  arch/arm64/tools/sysreg | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  drivers/irqchip/irq-gic-v3-its.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> index a4c1dd4741a47..7ceaa1e0b4bc2 100644
-> --- a/arch/arm64/tools/sysreg
-> +++ b/arch/arm64/tools/sysreg
-> @@ -149,7 +149,7 @@ Res0	63:32
->  UnsignedEnum	31:28	GIC
->  	0b0000	NI
->  	0b0001	GICv3
-> -	0b0010	GICv4p1
-> +	0b0011	GICv4p1
->  EndEnum
->  UnsignedEnum	27:24	Virt_frac
->  	0b0000	NI
-> @@ -903,7 +903,7 @@ EndEnum
->  UnsignedEnum	27:24	GIC
->  	0b0000	NI
->  	0b0001	IMP
-> -	0b0010	V4P1
-> +	0b0011	V4P1
+> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+> index b52d60097cad5..951ec140bcea2 100644
+> --- a/drivers/irqchip/irq-gic-v3-its.c
+> +++ b/drivers/irqchip/irq-gic-v3-its.c
+> @@ -1810,7 +1810,9 @@ static void its_map_vm(struct its_node *its, struct its_vm *vm)
+>  		for (i = 0; i < vm->nr_vpes; i++) {
+>  			struct its_vpe *vpe = vm->vpes[i];
+>  
+> -			its_send_vmapp(its, vpe, true);
+> +			scoped_guard(raw_spinlock, &vpe->vpe_lock)
+> +				its_send_vmapp(its, vpe, true);
+> +
+>  			its_send_vinvall(its, vpe);
+>  		}
+>  	}
+> @@ -1827,8 +1829,10 @@ static void its_unmap_vm(struct its_node *its, struct its_vm *vm)
+>  	if (!--vm->vlpi_count[its->list_nr]) {
+>  		int i;
+>  
+> -		for (i = 0; i < vm->nr_vpes; i++)
+> +		for (i = 0; i < vm->nr_vpes; i++) {
+> +			guard(raw_spinlock)(&vm->vpes[i]->vpe_lock);
+>  			its_send_vmapp(its, vm->vpes[i], false);
+> +		}
+>  	}
+>  }
+>  
 
-I wonder why we have different naming schemes for the same feature...
+Hi Marc,
 
->  EndEnum
->  SignedEnum	23:20	AdvSIMD
->  	0b0000	IMP
-> 
+It looks like there is ABBA deadlock after applying this series:
 
-Yup, this looks correct and checks out against revision H.b of the GICv3
-spec, revision K.a of the ARM ARM, and even I.a (which the original
-patches were referencing).
+In its_map_vm: vmapp_lock -> vpe_lock
+In its_vpe_set_affinity: vpe_to_cpuid_lock(vpe_lock) -> its_send_vmovp(vmapp_lock)
 
-Once more, it shows that these dumps should be automatically generated
-from the XML instead of (creatively) hand-written.
+Any idea about this?
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Best,
+Zhou
