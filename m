@@ -1,164 +1,164 @@
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F4442AF12
-	for <kvmarm@lists.linux.dev>; Fri, 19 Jul 2024 16:27:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4036E29A2;
+	Sat, 20 Jul 2024 09:49:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721406451; cv=none; b=lxEdcc82K7060chLiu2lDi2YCuvP17cVn4Mvp2EZjqTCPMP4uqvIDjkjyMYgN1bC077tLGVXjht5agHsFnPSLw58u6Na4wrY93wy4eYQmMibw9doCF+KPQSALeZ/2WUmdVuAB+ODJVlLLUeM8QtqMOT4TawrjVXkeka549I5mh0=
+	t=1721468973; cv=none; b=e9wJGS+wmPvvDMMDXh6EXNYr2xmcXH68hzdo7y77hpcf9BcGaHgNMFm7jMHvNIa6aE+Z/97uFv/4+KB9G9L/RIRYTqNNngo+0LGy2Hh3V0Zkg3tWf3E/Cc2ajihhNYzNMNvnNOF8DJCAHTlTMlJktRsqmPwh62R+NuZPeOyPnBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721406451; c=relaxed/simple;
-	bh=1dmbpNdF8tQ+ese8igkpCby0IKOV/lsKj0bq8yiRx3g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fLSrlcIJOb+ythyVyrf9K9fNIUhQu7ITPbXNVG43u9H1et2pDzrdhcg5BWxbJc570TQ1vICmYTNnjm5INO2Hjn2CxO9TUpkPke+suv296OXFwhgnbkJ8ehmZbf/ggZBLT/Rdf9TDCsW3dUaSkVjdwsHl0xWcpoJ77ybQjn4WoKI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZS46L56h; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1721468973; c=relaxed/simple;
+	bh=Fabkemm15d9bvyMMdzbPwEmfBhmRHwNU94q62xcaQfs=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JtqHswOlydg2T6HNW5cVfrBgqVKjak0xhj1SOWIR1DJd+7/utcf/AxlafgnW8bfA97k+9wH6Fl4qvDXaRb+suAvmnxP0oU2BWvFVLPbESR+gb4mkcaa1sXdb2tJwR4HkpcqfafpKxo6K2ICxBr8RrFeDgWokbA9m4uIH3iOrnKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nr4cr50O; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZS46L56h"
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5a18a5dbb23so15198a12.1
-        for <kvmarm@lists.linux.dev>; Fri, 19 Jul 2024 09:27:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1721406448; x=1722011248; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qGU8cW7/Khkrbfb/2lGIxZ/ZxfwEJyBEaz42JmsrIJk=;
-        b=ZS46L56hUYFOAVoa02M/idw0UJAvsGBnBMtYFxibPwKsv6SVAGpGHCc9seKp0nYJJ6
-         aAXC2YZ7WLR03PaWTkHcMiVpF3tyXeHImaoPOrrD5i572sBl1yhdZdvAJ7XrFhYIPny7
-         /ji597iMK8VTABDnQUPj84IBOQuRWYZ4strWYOVyKjQ7V7op2BQ/QYBhSAB7GH/0RU9Z
-         s4fz0qZK6Xxm9fWZVyKkzK4+oOw/BYwzFhnCPbIZ4CXXObz3MkI7cTwXuRbctHUHW+az
-         X0UD2THQjbeUwizp6X5V75guGcXO83N8sCGTOK8RzLYCfBdaYSqLqTD9KfJ9/ezBbpID
-         LP7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721406448; x=1722011248;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qGU8cW7/Khkrbfb/2lGIxZ/ZxfwEJyBEaz42JmsrIJk=;
-        b=FVB2GnjsRO2ecEiEH2xJ32N0VawvVfL0NzHszusIuOTwTzjaARMcXxcQHY8ha+5yI1
-         ud6TYe+k0VDorjtOwbUoaRtGElXwPvFbuyF99oROPoY9baMm0S2CH3wRne0ROLyY14Ah
-         jPb9gTbArJbjVIAGk/za1NJPQbCO2LMINtF9NTCIpnYDeYhZuZsWjrez/oM8jYwhS3Jq
-         gd/izGbyql0ODTEYrlYix1VFX4ncsesuhLZ/zbQcwEVSMmiL1RsJSoFwjQ58ljQlyVeJ
-         /ANTjxGENWADZDUBbUwRhqdwkXGhXOVGE0VRKOpFsIQpOrkklOucdkVoe4JYf8ikJYx7
-         s14Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVbLxeJiGFem5FV78/D6FV3/BKcVmM7TsuB8WMGOAnhkAoS6CRKuAMvLxAJJvcrRZXVyVdnkXxeGGHpsyoFQrrYigIc4r3d
-X-Gm-Message-State: AOJu0YwBV1pWbYIyjPT/1fPgWkm16bd7kRMpuxBcR0k2vDt38TDMfJzE
-	Cj3J9sVWpvPq9LHxuooEqZQFelDLwNKHSs9tjx2mzqS9ygbab1ZsCSJM2MU3fA==
-X-Google-Smtp-Source: AGHT+IF72w7nkWrKqo33SiqqgvDUo7jNwSKOMGsRU7zBoVw32YikfiO+r/b2VLJAOhl5RiyEVCCe1A==
-X-Received: by 2002:a05:6402:5204:b0:5a0:d4ce:59a6 with SMTP id 4fb4d7f45d1cf-5a2c888c3d0mr284589a12.2.1721406447882;
-        Fri, 19 Jul 2024 09:27:27 -0700 (PDT)
-Received: from google.com (49.222.77.34.bc.googleusercontent.com. [34.77.222.49])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3687868bc21sm2007071f8f.39.2024.07.19.09.27.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Jul 2024 09:27:27 -0700 (PDT)
-Date: Fri, 19 Jul 2024 16:27:26 +0000
-From: Sebastian Ene <sebastianene@google.com>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: akpm@linux-foundation.org, alexghiti@rivosinc.com, ankita@nvidia.com,
-	ardb@kernel.org, catalin.marinas@arm.com,
-	christophe.leroy@csgroup.eu, james.morse@arm.com,
-	mark.rutland@arm.com, maz@kernel.org, oliver.upton@linux.dev,
-	rananta@google.com, ryan.roberts@arm.com, shahuang@redhat.com,
-	suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, kernel-team@android.com
-Subject: Re: [PATCH v7 5/6] KVM: arm64: Initialize the ptdump parser with
- stage-2 attributes
-Message-ID: <ZpqT7raWOhb3xQ12@google.com>
-References: <20240621123230.1085265-1-sebastianene@google.com>
- <20240621123230.1085265-6-sebastianene@google.com>
- <ZoJsAyrmtge4mXJY@google.com>
- <ZoK6v2_pJnc57LHM@google.com>
- <ZpZEjW1m2LypTHjF@google.com>
- <Zppzj1oIDivlAFpP@google.com>
- <Zpp51BYWYFnZHVW1@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nr4cr50O"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFD29C2BD10;
+	Sat, 20 Jul 2024 09:49:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721468972;
+	bh=Fabkemm15d9bvyMMdzbPwEmfBhmRHwNU94q62xcaQfs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=nr4cr50ORl9NgCybFuvIypLJ61NrnhHyoeI4ZNI0ykz7OP1wiOaYHimSIUbWbOfEM
+	 SpQmSnu65Pd7ADtJevbNw3EflKszAOViU2dwcOrHWXqEEyg4QdKvC4ztm1cnfn2psR
+	 7rV78Qaj2vDMA8jmE5samKyVNQWFWJpyG/+M36JACNKb/KOYLrxfrXKs2xLKDgGLcP
+	 LYB/2Ml7I+fuJbU7u/ZxJhoX/7a1pndggvsMSKx2Pjhs9n1oYziy9/S35/aMLjugcg
+	 UbGuu8ZcvNsM9Ffln5FPpXSsr6nQpHXDaVQD9yOUHtTpdHRMuCbJadDvtGRAU1RxsI
+	 syVLgH3dgNbPg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sV6iY-00DuaU-HH;
+	Sat, 20 Jul 2024 10:49:30 +0100
+Date: Sat, 20 Jul 2024 10:49:29 +0100
+Message-ID: <878qxw5r6e.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Joey Gouly <joey.gouly@arm.com>
+Subject: Re: [PATCH 08/12] KVM: arm64: nv: Add emulation of AT S12E{0,1}{R,W}
+In-Reply-To: <ZpkwXFrhcFB1x0nD@raptor>
+References: <20240625133508.259829-1-maz@kernel.org>
+	<20240625133508.259829-9-maz@kernel.org>
+	<ZpkwXFrhcFB1x0nD@raptor>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zpp51BYWYFnZHVW1@google.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Jul 19, 2024 at 03:36:04PM +0100, 'Vincent Donnefort' via kernel-team wrote:
-> On Fri, Jul 19, 2024 at 02:09:19PM +0000, Sebastian Ene wrote:
-> > On Tue, Jul 16, 2024 at 10:59:41AM +0100, Vincent Donnefort wrote:
-> > > On Mon, Jul 01, 2024 at 02:18:39PM +0000, Sebastian Ene wrote:
-> > > > On Mon, Jul 01, 2024 at 09:42:43AM +0100, Vincent Donnefort wrote:
-> > > > > O Fri, Jun 21, 2024 at 12:32:29PM +0000, 'Sebastian Ene' via kernel-team wrote:
-> > > > > > Define a set of attributes used by the ptdump parser to display the
-> > > > > > properties of a guest memory region covered by a pagetable descriptor.
-> > > > > > Build a description of the pagetable levels and initialize the parser
-> > > > > > with this configuration.
-> > > > > > 
-> > > > > > Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> > > > > > ---
-> > > > > >  arch/arm64/kvm/ptdump.c | 143 ++++++++++++++++++++++++++++++++++++++--
-> > > > > >  1 file changed, 137 insertions(+), 6 deletions(-)
-> > > > > > 
-> > > > > > diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
-> > > > > > index 36dc7662729f..cc1d4fdddc6e 100644
-> > > > > > --- a/arch/arm64/kvm/ptdump.c
-> > > > > > +++ b/arch/arm64/kvm/ptdump.c
-> > > > > > @@ -14,6 +14,61 @@
-> > > > > >  #include <kvm_ptdump.h>
-> > > > > >  
-> > > > > >  
-> > > > > > +#define MARKERS_LEN		(2)
-> > > > > > +#define KVM_PGTABLE_MAX_LEVELS	(KVM_PGTABLE_LAST_LEVEL + 1)
-> > > > > > +
-> > > > > > +struct kvm_ptdump_guest_state {
-> > > > > > +	struct kvm		*kvm;
-> > > > > > +	struct pg_state		parser_state;
-> > > > > > +	struct addr_marker	ipa_marker[MARKERS_LEN];
-> > > > > > +	struct pg_level		level[KVM_PGTABLE_MAX_LEVELS];
-> > > > > > +	struct ptdump_range	range[MARKERS_LEN];
-> > > > > > +};
-> > > > > > +
-> > > > > > +static const struct prot_bits stage2_pte_bits[] = {
-> > > > > > +	{
-> > > > > > +		.mask	= PTE_VALID,
-> > > > > > +		.val	= PTE_VALID,
-> > > > > > +		.set	= " ",
-> > > > > > +		.clear	= "F",
-> > > > > > +	}, {
-> > > > > > +		.mask	= KVM_PTE_LEAF_ATTR_HI_S2_XN | PTE_VALID,
-> > > > > > +		.val	= KVM_PTE_LEAF_ATTR_HI_S2_XN | PTE_VALID,
-> > > 
-> > > KVM_PTE_LEAF_ATTR_HI_S2_XN is actually a mask covering 
+On Thu, 18 Jul 2024 16:10:20 +0100,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> Hi,
+> 
+> On Tue, Jun 25, 2024 at 02:35:07PM +0100, Marc Zyngier wrote:
+> > On the face of it, AT S12E{0,1}{R,W} is pretty simple. It is the
+> > combination of AT S1E{0,1}{R,W}, followed by an extra S2 walk.
 > > 
-> > It is not a mask covering here but in the ACK kernel.
-> 
-> You're right, I should have double-checked upstream.
-> 
-> That said, how about we move this __after__ RW ? and just use "X" on .clear
-> so we can have something R W X ?
-> 
-
-Yes that's a good ideea to improve output format, let me move it.
-
+> > However, there is a great deal of complexity coming from combining
+> > the S1 and S2 attributes to report something consistent in PAR_EL1.
 > > 
-> > > 
-> > > KVM_PTE_LEAF_ATTR_HI_S2_XN_XN, KVM_PTE_LEAF_ATTR_HI_S2_XN_PXN and
-> > > KVM_PTE_LEAF_ATTR_HI_S2_XN_UXN. 
-> > > 
-> > > I believe here what we should do is something like?
-> > > 
-> > > .val = FIELD_PREP_CONST(KVM_PTE_LEAF_ATTR_HI_S2_XN,
-> > > 			KVM_PTE_LEAF_ATTR_HI_S2_XN_XN) | PTE_VALID
-> > > 
-> > > > > > +		.set	= "XN",
-> > > > > > +		.clear	= "  ",
-> > > > > > +	}, {
-> > > > > > +		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | PTE_VALID,
-> > > > > > +		.val	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | PTE_VALID,
-> > > > > > +		.set	= "R",
-> > > > > > +		.clear	= " ",
-> > > > > > +	}, {
-> > > 
-> > > [...]
+> > This is an absolute mine field, and I have a splitting headache.
+> > 
+> > [..]
+> > +static u8 compute_sh(u8 attr, u64 desc)
+> > +{
+> > +	/* Any form of device, as well as NC has SH[1:0]=0b10 */
+> > +	if (MEMATTR_IS_DEVICE(attr) || attr == MEMATTR(NC, NC))
+> > +		return 0b10;
+> > +
+> > +	return FIELD_GET(PTE_SHARED, desc) == 0b11 ? 0b11 : 0b10;
 > 
-> To unsubscribe from this group and stop receiving emails from it, send an email to kernel-team+unsubscribe@android.com.
+> If shareability is 0b00 (non-shareable), the PAR_EL1.SH field will be 0b10
+> (outer-shareable), which seems to be contradicting PAREncodeShareability().
+
+Yup, well caught.
+
+> > +	par |= FIELD_PREP(SYS_PAR_EL1_SH,
+> > +			  compute_sh(final_attr, tr->desc));
+> > +
+> > +	return par;
+> >
 > 
+> It seems that the code doesn't combine shareability attributes, as per rule
+> RGDTNP and S2CombineS1MemAttrs() or S2ApplyFWBMemAttrs(), which both end up
+> calling S2CombineS1Shareability().
+
+That as well. See below what I'm stashing on top.
+
+Thanks,
+
+	M.
+
+diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+index e66c97fc1fd3..28c4344d1c34 100644
+--- a/arch/arm64/kvm/at.c
++++ b/arch/arm64/kvm/at.c
+@@ -459,13 +459,34 @@ static u8 combine_s1_s2_attr(u8 s1, u8 s2)
+ 	return final;
+ }
+ 
++#define ATTR_NSH	0b00
++#define ATTR_RSV	0b01
++#define ATTR_OSH	0b10
++#define ATTR_ISH	0b11
++
+ static u8 compute_sh(u8 attr, u64 desc)
+ {
++	u8 sh;
++
+ 	/* Any form of device, as well as NC has SH[1:0]=0b10 */
+ 	if (MEMATTR_IS_DEVICE(attr) || attr == MEMATTR(NC, NC))
+-		return 0b10;
++		return ATTR_OSH;
++
++	sh = FIELD_GET(PTE_SHARED, desc);
++	if (sh == ATTR_RSV)		/* Reserved, mapped to NSH */
++		sh = ATTR_NSH;
++
++	return sh;
++}
++
++static u8 combine_sh(u8 s1_sh, u8 s2_sh)
++{
++	if (s1_sh == ATTR_OSH || s2_sh == ATTR_OSH)
++		return ATTR_OSH;
++	if (s1_sh == ATTR_ISH || s2_sh == ATTR_ISH)
++		return ATTR_ISH;
+ 
+-	return FIELD_GET(PTE_SHARED, desc) == 0b11 ? 0b11 : 0b10;
++	return ATTR_NSH;
+ }
+ 
+ static u64 compute_par_s12(struct kvm_vcpu *vcpu, u64 s1_par,
+@@ -540,7 +561,8 @@ static u64 compute_par_s12(struct kvm_vcpu *vcpu, u64 s1_par,
+ 	par  = FIELD_PREP(SYS_PAR_EL1_ATTR, final_attr);
+ 	par |= tr->output & GENMASK(47, 12);
+ 	par |= FIELD_PREP(SYS_PAR_EL1_SH,
+-			  compute_sh(final_attr, tr->desc));
++			  combine_sh(FIELD_GET(SYS_PAR_EL1_SH, s1_par),
++				     compute_sh(final_attr, tr->desc)));
+ 
+ 	return par;
+ }
+
+-- 
+Without deviation from the norm, progress is not possible.
