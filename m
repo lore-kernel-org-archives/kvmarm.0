@@ -1,103 +1,131 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D542E8F70;
-	Mon, 22 Jul 2024 14:31:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDE551428F1
+	for <kvmarm@lists.linux.dev>; Mon, 22 Jul 2024 15:09:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721658694; cv=none; b=mi2zRqTLwgPmi0cSEbhw96S17RzGjdQZSpYPL3klM9w1oYL8OzfAPKHN+1JazF0JY9q7BqJeRYS0VQKWnD1KONlA9b3z6v2chQGK+3/u07mTrwJdn9M8Ujbb1SkwZA82lAUjUmi2YCDRhpE2enPDBKnRNA6fBEk9k779Ho+C94k=
+	t=1721660959; cv=none; b=VquYT40Kg71r5WCOM9bmnB8y96duBkRiP+9nmRDqZVVJwoxJzFdnM94FlHZnM+Im1uQY5pC16SzWT1OAV94XTICv+deH6M/WYWIRNDna4a0I+Ta1lgh7CDhFGjzlWjC89SwQdouInzfPX1SBQbZU5qxG/t72AX4eBnr64wXNxXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721658694; c=relaxed/simple;
-	bh=19lbAMuG8/46S2vgOQ57EZ7eAEiw5QZgfuSPqQZDrsA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n2z2wjoXmnLpYkBpeA+5vmNE1ET12mSsNohMdue1lW2dOpQ8DsnbCL+6TibuoOUXEejP3C2CKMj2vDNuSInxzpQFP+27S3n3GSOtV7x5Mzg71oaSdJpICW5zXMmeevPLAdJUxiAV/kJmu8U5TjV3eiXHEZrCtaMyHrnfWJts7Ls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rjmEXCND; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1721660959; c=relaxed/simple;
+	bh=dsHoPEaaTsIjOj602RwpjV7y5Z9bXv+NriZAgKOWTQA=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RLA9qEOde3Bd7qmhi5nDrDmskrcqnZ8tPPvPN0/r+jh4VGks/JYio4zo6zMbbGvUC2fVySiZzOBl46QtZKgQqcgF2UGkYtCe9zx7oPuGU0/sEUneWYlWhJLVAXSOBflm4iK0Hs8aQGgWtMy/wLNU7NLXDRJnADgj29/wrISjP7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HZ41v3TC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rjmEXCND"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6A25C4AF0B;
-	Mon, 22 Jul 2024 14:31:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HZ41v3TC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33379C116B1;
+	Mon, 22 Jul 2024 15:09:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721658693;
-	bh=19lbAMuG8/46S2vgOQ57EZ7eAEiw5QZgfuSPqQZDrsA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rjmEXCNDKBFkXhGlJsIiF/YiOAsxKiiVQ1yy0ea0mM7am81QSF76gClDv9enAtAlY
-	 k5zMblh91dP2iCOQWwD6UXBINMw2SURV0D5VkPmSTcCj+7qrLkiTc9H5X2ZXYxh7QX
-	 /ztn3FxVCqDdZwqpFFWuHB/egHyBWfmfrmpKrYkCGpLDHUdnmnfjb/anl9IGvbPEnH
-	 XugwdYQn62/PfBmN2Sx/MlckvPbNVxoeQqCGdrWIx9EJAnA97fRcl1FAgUYZvFPWh/
-	 St8tz1MT7X7blLPvAvrsbs+/p6oIUcWDkcQJuST7wIJtoLExPii3xtAVeQFrVH08LG
-	 pTi8SManLPJQA==
-Date: Mon, 22 Jul 2024 15:31:24 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Florian Weimer <fweimer@redhat.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Ross Burton <ross.burton@arm.com>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v9 38/39] kselftest/arm64: Add a GCS stress test
-Message-ID: <19c8a2eb-1c52-43aa-a329-3dc245c966e6@sirena.org.uk>
-References: <20240625-arm64-gcs-v9-0-0f634469b8f0@kernel.org>
- <20240625-arm64-gcs-v9-38-0f634469b8f0@kernel.org>
- <875xt2xojp.fsf@linaro.org>
+	s=k20201202; t=1721660959;
+	bh=dsHoPEaaTsIjOj602RwpjV7y5Z9bXv+NriZAgKOWTQA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=HZ41v3TCJiW5H9nvR5ze9l04OBQTvOo5xAluvJHEfzP5ad2uOFeDSLb9xPamqVEWj
+	 DHhHB0ZxLIMDQnZ6pYi/WNB5mBiTFuHq/nlCOCeQpMt/UKdguO3ATBXy4Gxj6Y6UFG
+	 talnrRvaO3W4AAygjBh0zUAROtY/aUXoFrE1SOwnYDlE4S0ocGEaXvmWWxLa6wEYUN
+	 7mds2p6zX0JG9Il8zwVntEnRyT+uXvkwtI6jAEl9qHCxBwYls7QcgsCI9fHuw7AuSs
+	 PJ/KID3m/z4na6B7GYtI3jnuPn1zHImk1h05deUOCrBKQ9DtPIYY70mZN9moibuZ6C
+	 5bmDJaN06fJWQ==
+Received: from [205.220.129.29] (helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sVuf5-00ES1X-CB;
+	Mon, 22 Jul 2024 16:09:17 +0100
+Date: Mon, 22 Jul 2024 16:08:50 +0100
+Message-ID: <875xsx5urh.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	james.morse@arm.com,
+	suzuki.poulose@arm.com,
+	oliver.upton@linux.dev,
+	yuzenghui@huawei.com,
+	joey.gouly@arm.com,
+	smostafa@google.com,
+	will@kernel.org,
+	catalin.marinas@arm.com
+Subject: Re: [PATCH v1] KVM: arm64: Tidying up PAuth code in KVM
+In-Reply-To: <20240722123740.674846-1-tabba@google.com>
+References: <20240722123740.674846-1-tabba@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="fZmP/tHPENLmAEIV"
-Content-Disposition: inline
-In-Reply-To: <875xt2xojp.fsf@linaro.org>
-X-Cookie: Everything you know is wrong!
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 205.220.129.29
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com, smostafa@google.com, will@kernel.org, catalin.marinas@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+Hi Fuad,
 
---fZmP/tHPENLmAEIV
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+On Mon, 22 Jul 2024 13:37:40 +0100,
+Fuad Tabba <tabba@google.com> wrote:
+> 
+> Tidy up some of the PAuth trapping code to clear up some comments
+> and avoid clang/checkpatch warnings. Also, do not bother setting
+> the PAuth HCR_EL2 bits for protected VMs in pKVM, since that is
+> handled by the hypervisor.
+>
+> Fixes: 814ad8f96e92 ("KVM: arm64: Drop trapping of PAuth instructions/keys")
 
-On Thu, Jul 18, 2024 at 08:34:18PM -0300, Thiago Jung Bauermann wrote:
-> Mark Brown <broonie@kernel.org> writes:
+nit: AFAICT, this doesn't really fix anything. It has no material
+impact on the guest or the hypervisor.
 
-> # # Waiting for 9 children
-> # # Thread-4030: Failed to enable GCS
-> # # Thread-4031: Failed to enable GCS
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_ptrauth.h    | 2 +-
+>  arch/arm64/kvm/arm.c                    | 7 ++++---
+>  arch/arm64/kvm/hyp/include/hyp/switch.h | 1 -
+>  arch/arm64/kvm/hyp/nvhe/switch.c        | 5 ++---
+>  4 files changed, 7 insertions(+), 8 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_ptrauth.h b/arch/arm64/include/asm/kvm_ptrauth.h
+> index d81bac256abc..6199c9f7ec6e 100644
+> --- a/arch/arm64/include/asm/kvm_ptrauth.h
+> +++ b/arch/arm64/include/asm/kvm_ptrauth.h
+> @@ -104,7 +104,7 @@ alternative_else_nop_endif
+>  
+>  #define __ptrauth_save_key(ctxt, key)					\
+>  	do {								\
+> -		u64 __val;                                              \
+> +		u64 __val;						\
+>  		__val = read_sysreg_s(SYS_ ## key ## KEYLO_EL1);	\
+>  		ctxt_sys_reg(ctxt, key ## KEYLO_EL1) = __val;		\
+>  		__val = read_sysreg_s(SYS_ ## key ## KEYHI_EL1);	\
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 59716789fe0f..6516348024ba 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -510,10 +510,10 @@ void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
+>  
+>  static void vcpu_set_pauth_traps(struct kvm_vcpu *vcpu)
+>  {
+> -	if (vcpu_has_ptrauth(vcpu)) {
+> +	if (vcpu_has_ptrauth(vcpu) && !vcpu_is_protected(vcpu)) {
 
-This is already fixed locally, just rebasing bitrot.
+I think this isn't quite correct.
 
---fZmP/tHPENLmAEIV
-Content-Type: application/pgp-signature; name="signature.asc"
+Non-protected VMs in protected mode are still subjected to pKVM's own
+handling of the HCR_EL2 configuration, and the whole thing should be
+skipped altogether in that case, irrespective of the pauth status of
+the vcpu.
 
------BEGIN PGP SIGNATURE-----
+What pKVM should evaluate is that status and decide for itself whether
+it must enable it or not. You can then hoist the check for protected
+mode early and skip the whole function unconditionally, irrespective
+of the protected status of the vcpu.
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmaebTsACgkQJNaLcl1U
-h9A1BAf/U0ze5vCUOiRu38u3xvKe2wO4c/NxU38BnN6U5lriKaPwnoC8WAtlYPBJ
-67+s8YadLJLRgDMtuUHW85HuikmcDmVUs5SUM7HwwVd6qMVx9FYmMls8aA9Powqn
-u0Y4vFhfQwlvL0aSBnYPBF2vjCXMYzN8EVHJaJhPJlB5HsZstADQQM77apbd9U2V
-BD0gJukw9LhNPPTmNyuuBnF9jXXCAUXEpEosdsWYl4f6+msBc5abKIt1agzRJhFE
-yYalLzSD/wqZOZGLXf/Cx/DzdJLC8/ahN8cI5MqCUDDQFLFnhV/vS2yld0/Cu0sw
-qwhjMxP9NPq+uiruBXIU7nGO40rudg==
-=Kw0J
------END PGP SIGNATURE-----
+Thanks,
 
---fZmP/tHPENLmAEIV--
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
