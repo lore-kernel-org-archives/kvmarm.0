@@ -1,151 +1,106 @@
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 330351F954
-	for <kvmarm@lists.linux.dev>; Mon, 22 Jul 2024 15:23:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 009D516DEB2;
+	Mon, 22 Jul 2024 15:25:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721661803; cv=none; b=MT4CSK9dV8tRtNx0ynY0uQweGnFWl7cYjHsimY7knXnzIjfYhI+yhUtfJ73vyiJ4eSwmfO0wwP2/XCLCy/hflkhjwk2+8WFyc11QHyTE6EUyN18xlwaT4EZlwQN9ivsb0jjBjGRl64C7lT8oPL8WTUxpzatjxeT3h7apmoTkvQM=
+	t=1721661927; cv=none; b=OnZEk5mb239xqDibHQq/Nf85F7YIgBkVlcPXHgJPrmL5HR1RY8FSSFR4gwHipFR+Pg12xE7Dw3ArNkbbUhLkrw+OK4ko3c00efLc2UyvfVl5svtrsz0/cUH5yOIJvpV5hQe257di/5logpR4xUgazu5WqVImDsy2jv06edjUeBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721661803; c=relaxed/simple;
-	bh=PI/hDamnrGghtva7pPimLdPYhVHqP9gxIUe0D0tidQo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=e45ULGH26sns3bqjZckT/UgT5/hR8c7bJc2mDRrXn/008WkeRj1AsZSRFqXdP2qzDFoLdBXrVlFtOAInhclc4/OO6oWOuUL+ar9IjoTRcWR5F6Kg5ZK+6I8c7Q2+wJyCdtTjqDbqLU4W86Ko39pxIUHbRC4YAvAR/AXcGCoQW3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0rw5nY/6; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1721661927; c=relaxed/simple;
+	bh=Hzdm4kti2rG9sVqN2RPmvDKFKxNXuq1xCFgjQYFj3W8=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=d8xHploAttbLlNKh3hK0z7eEyN/0WFmaDx9ztCWA1Op4+LAIrsJGvG1LJyBsgoKIEVBaZ7BnjGkE4DkTRGVSPPX/khetfjk1Xt46zSaf26qSB1oO1AHnOD/MTvnpeLgeFGvHaK973VRRk63gURCD/4861DxHZrQBNhBd9N2hAWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UTiVvf2G; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0rw5nY/6"
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3686b285969so1932145f8f.0
-        for <kvmarm@lists.linux.dev>; Mon, 22 Jul 2024 08:23:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1721661800; x=1722266600; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=EXPHJGidSnujefQDTvxoJc3NFdvhsw8IMZ9onXe+MGg=;
-        b=0rw5nY/6TZ62oD4CAmRQ96W7hcInotJ6wQzdqFgzxSGdZsfn122MGFoNfgt9bUkUmB
-         QgE9aONbemoOnmQNiff6wXGN7UP1WnSw3TTQWKIXHf8ait8NsVE80rXb6jqIqcW22iyg
-         Vo7U/yIx264zT9g7NPKJN5Sf3g56E438LXPTcknPX1/UgYQhOLHZxpFrFWQwv5iGU9nt
-         WVvL7FPWf/h0kT5qasEiBWrepTzV68FVeqFHD/WxdW+ghfdl+LD5XLHRapyXp3hMaAg6
-         muNy2AIgUsoDgdZBew/f+TrNg6M5lJRhPzP7pNKwpvzpyyKA4j3Qnd+vFJpe82KMrqAY
-         xGbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721661800; x=1722266600;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=EXPHJGidSnujefQDTvxoJc3NFdvhsw8IMZ9onXe+MGg=;
-        b=tUZfdkf1HovGgoVEH+OwzllipBHiMDF/auipP0j7mx8slyXVX0FInJe6VaDVIgSti+
-         yx1mEEn9Offo5oOMBHGsiLqBFrhKs43A8QuIHrbaEeWWP7FAfbN8RxodbyfRZ6Ce35p/
-         sAIwso3Xg3LmJlfU4mqPRue38uja4jQjPLGrquVgBWn+w/UTJ1uOnF7jQHdEjfFtiELv
-         4pjTrQO0bh7fsESZNjWudLUP5PoKrS5dtfHoLeDTqd1dkQbIfDH34NQX8Sw9qKB/STc2
-         5SwTkETHP+hrgoke9NDO8gaNkBx1466QfKO8y2CyV4DGCMnlIm28nCRF4BC62Euyfp1k
-         19dw==
-X-Gm-Message-State: AOJu0Yyl42Accfr882Pc7KdR6M25vBOVoXNrkvamN982gl6WWnasPL6C
-	KfvntHyRUM4PRlqy3wwKCC4NtQNSt8oqQXh/4/O1q2JwzSj+mxtm4+bayV8zBuHD1xsBxVtkdxw
-	2/HtREhxEN/WY/tXSGVhd2puehaga7oyE+E9r
-X-Google-Smtp-Source: AGHT+IGGpmRh+TlBmozuQCza4t8G0WAluuthA5scuV+swJhYNufFUUOX0VR4vcckd9M0voOa8FU+qqp4HZU8OInG16Q=
-X-Received: by 2002:adf:b31d:0:b0:367:8a72:b8b4 with SMTP id
- ffacd0b85a97d-369bae46a5fmr4062042f8f.33.1721661800276; Mon, 22 Jul 2024
- 08:23:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UTiVvf2G"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 804DEC116B1;
+	Mon, 22 Jul 2024 15:25:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721661926;
+	bh=Hzdm4kti2rG9sVqN2RPmvDKFKxNXuq1xCFgjQYFj3W8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=UTiVvf2GSoMJmKKQS1VYzkrBGynJ5eHThoROQvgkfcmy2c3TjsJf4ZIWWAar07/VA
+	 Riez3zNfPBEx4YQU13RmWeHA44HiZkSL0legRb+kFk5t3PJJeUdSA1AT6hTvDEkWH7
+	 kV4ld6j28p4R4HeI4tgf+UZekwgh9zylMO0bQeVfXrBHQZdarIrVQ3q0U8lKkUQp0n
+	 4Z44/g5rvF21rRCH5i3MoXkJp/njZJFX1XvV6GeYdYZpcTDXFk+0uVnCuP979fhmPs
+	 T50FWm0FMjQ2KP4uDZqZtxqrgBj1NI0eF7D/Pfj9RNiE8VQ56F4jXu2UONPJCX2qTY
+	 /b/MKKF3a+q8g==
+Received: from [205.220.129.28] (helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sVuug-00ESJ9-0n;
+	Mon, 22 Jul 2024 16:25:24 +0100
+Date: Mon, 22 Jul 2024 16:25:00 +0100
+Message-ID: <874j8h5u0j.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Joey Gouly <joey.gouly@arm.com>
+Subject: Re: [PATCH 10/12] KVM: arm64: nv: Add SW walker for AT S1 emulation
+In-Reply-To: <Zp46GUJJ9xBWsJsQ@raptor>
+References: <20240625133508.259829-1-maz@kernel.org>
+	<20240708165800.1220065-1-maz@kernel.org>
+	<Zp46GUJJ9xBWsJsQ@raptor>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20240722123740.674846-1-tabba@google.com> <875xsx5urh.wl-maz@kernel.org>
-In-Reply-To: <875xsx5urh.wl-maz@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 22 Jul 2024 16:22:43 +0100
-Message-ID: <CA+EHjTxBdx5PKExMLf96_RvpU5QFeW2mFD-87M-H1xff_4gs5g@mail.gmail.com>
-Subject: Re: [PATCH v1] KVM: arm64: Tidying up PAuth code in KVM
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, 
-	yuzenghui@huawei.com, joey.gouly@arm.com, smostafa@google.com, 
-	will@kernel.org, catalin.marinas@arm.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 205.220.129.28
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Marc,
+Hi Alex,
 
-On Mon, 22 Jul 2024 at 16:09, Marc Zyngier <maz@kernel.org> wrote:
->
-> Hi Fuad,
->
-> On Mon, 22 Jul 2024 13:37:40 +0100,
-> Fuad Tabba <tabba@google.com> wrote:
-> >
-> > Tidy up some of the PAuth trapping code to clear up some comments
-> > and avoid clang/checkpatch warnings. Also, do not bother setting
-> > the PAuth HCR_EL2 bits for protected VMs in pKVM, since that is
-> > handled by the hypervisor.
-> >
-> > Fixes: 814ad8f96e92 ("KVM: arm64: Drop trapping of PAuth instructions/keys")
->
-> nit: AFAICT, this doesn't really fix anything. It has no material
-> impact on the guest or the hypervisor.
+On Mon, 22 Jul 2024 11:53:13 +0100,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> Hi Marc,
+> 
+> I would like to use the S1 walker for KVM SPE, and I was planning to move it to
+> a separate file, where it would be shared between nested KVM and SPE. I think
+> this is also good for NV, since the walker would get more testing.
+> 
+> Do you think moving it to a shared location is a good approach? Or do you have
+> something else in mind?
 
-Got it.
+I'm definitely open to moving it somewhere else if that helps, though
+the location doesn't matter much, TBH, and it is the boundary of the
+interface I'm more interested in. It may need some work though, as the
+current design is solely written with AT in mind.
 
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_ptrauth.h    | 2 +-
-> >  arch/arm64/kvm/arm.c                    | 7 ++++---
-> >  arch/arm64/kvm/hyp/include/hyp/switch.h | 1 -
-> >  arch/arm64/kvm/hyp/nvhe/switch.c        | 5 ++---
-> >  4 files changed, 7 insertions(+), 8 deletions(-)
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_ptrauth.h b/arch/arm64/include/asm/kvm_ptrauth.h
-> > index d81bac256abc..6199c9f7ec6e 100644
-> > --- a/arch/arm64/include/asm/kvm_ptrauth.h
-> > +++ b/arch/arm64/include/asm/kvm_ptrauth.h
-> > @@ -104,7 +104,7 @@ alternative_else_nop_endif
-> >
-> >  #define __ptrauth_save_key(ctxt, key)                                        \
-> >       do {                                                            \
-> > -             u64 __val;                                              \
-> > +             u64 __val;                                              \
-> >               __val = read_sysreg_s(SYS_ ## key ## KEYLO_EL1);        \
-> >               ctxt_sys_reg(ctxt, key ## KEYLO_EL1) = __val;           \
-> >               __val = read_sysreg_s(SYS_ ## key ## KEYHI_EL1);        \
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index 59716789fe0f..6516348024ba 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -510,10 +510,10 @@ void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
-> >
-> >  static void vcpu_set_pauth_traps(struct kvm_vcpu *vcpu)
-> >  {
-> > -     if (vcpu_has_ptrauth(vcpu)) {
-> > +     if (vcpu_has_ptrauth(vcpu) && !vcpu_is_protected(vcpu)) {
->
-> I think this isn't quite correct.
->
-> Non-protected VMs in protected mode are still subjected to pKVM's own
-> handling of the HCR_EL2 configuration, and the whole thing should be
-> skipped altogether in that case, irrespective of the pauth status of
-> the vcpu.
->
-> What pKVM should evaluate is that status and decide for itself whether
-> it must enable it or not. You can then hoist the check for protected
-> mode early and skip the whole function unconditionally, irrespective
-> of the protected status of the vcpu.
+> Also, do you know where you'll be able to send an updated version of this
+> series? I'm asking because I want to decide between using this code (with fixes
+> on top) or wait for the next iteration. Please don't feel that you need to send
+> the next iteration too soon.
 
-What pKVM does right now is use the host value of hcr_el2 as a base,
-and ensure that the HCR_GUEST_FLAGS are also set. That said, it
-doesn't do that for MDCR_EL2 nor for CPTR_EL2. Thinking about it, I
-think it makes more sense for HCR_EL2 in pKVM to be initialized
-completely at EL2, and hoist the check, like you're suggesting.
+The current state of the branch is at [1], which I plan to send once
+-rc1 is out. Note that this isn't a stable branch, so things can
+change without any warning!
 
-I'll fix that (in this patch and in pKVM), and resend.
+> And please CC me on the series, so I don't miss it by mistake :)
 
-Thanks!
-/fuad
+Of course!
 
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+Thanks,
+
+	M.
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/nv-at-pan-WIP
+
+-- 
+Without deviation from the norm, progress is not possible.
