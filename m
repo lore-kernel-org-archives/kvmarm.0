@@ -1,203 +1,106 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EB2C14B945
-	for <kvmarm@lists.linux.dev>; Mon, 22 Jul 2024 09:16:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66E5216C6BA;
+	Mon, 22 Jul 2024 10:08:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721639784; cv=none; b=WWmP9QOgX3gqavyPkqlum21ZY+qTesSZjDKuh6+Yn24cU7DJtOROXv/wNeMF5XiVyY5SfXS/XE6wQ+7hN1fAhqJ2Q6DiUeNQBtwilfi29IDxEVFgkrOm5edOihdfGV20zre2vTjAUjo/UnF06RAg3MwC2Smck1k2/MjSYr3JipM=
+	t=1721642936; cv=none; b=FPTo9/1KexsFYXc+TrSQOJlwXGfjP+DXJ8lg/MirdFuH2KYz137PTTgw/9SxvdZimaf5OUstFUituCK5JBHBq77EUxTuTMUu4ieH30FnuW4yFQZnipPtae5c3EgjRZI1ogVwyP+5UJ8m5dP6nnEapTtnHhTGjfFvCDhJzpT8Dfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721639784; c=relaxed/simple;
-	bh=7C/drCaoNFVEaUE441qDvzta0bNUQ/yAp+86vRAao00=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pNzgqpPrcUJx49NRF3vrooR/iolLTeNV2BzjL3MSEUG7AQU28M13RuRugfKqQwNoYwuJX3JvEzwcE59exMtzJPrww2YQE4oaq3aX+rvzOSjwwWJpxLotccSKH+0AeiG6rCSddHHl1KKUSuklIJCTe0IylE27ZZVGp6fSrgHC+SQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CF5ADFEC;
-	Mon, 22 Jul 2024 02:16:45 -0700 (PDT)
-Received: from [10.162.41.8] (a077893.blr.arm.com [10.162.41.8])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 71F823F766;
-	Mon, 22 Jul 2024 02:16:12 -0700 (PDT)
-Message-ID: <3c385faa-bfe9-4731-8fdc-fa786f2160df@arm.com>
-Date: Mon, 22 Jul 2024 14:46:09 +0530
+	s=arc-20240116; t=1721642936; c=relaxed/simple;
+	bh=7h5Kr+YpdYtQ4+7prp0Efe9cyc7VuT34aSYyd6+RWOc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=r6vwXO+f8gQ7NSk+gLWCQ3o2/dqtA/1lLHeXbTv2u0Jv3kPGmzlMHmGirrEL1723weDjPVDTu/srCzpaTV540l/5pShx7tRjwZq/HOHMG20votxa9fGLgkHpmv8PgeUs5afxWeDe1wMMh8GnBoL4Dr9wvb/qU1xzH5EFlc251YQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fNcTvEEN; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fNcTvEEN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 921B0C116B1;
+	Mon, 22 Jul 2024 10:08:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721642935;
+	bh=7h5Kr+YpdYtQ4+7prp0Efe9cyc7VuT34aSYyd6+RWOc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fNcTvEENz+fFubHxaCVUTSqYq1ITDfo0ptFNNyhZiJtkY03TadBS1i+ZhqHLfVGJh
+	 wejLfRGO7/MXoIRjPmgVOznu/m8as04rC7MuUcV6ZUI86ATnFB/wd9trpSHBjpMIJe
+	 1zP6D6J4UnP/C2ivTwawSleVhDsGeYcY8f3s+xp8ATTVohoch6BbiYzMzCYthbAZSo
+	 Ju4lBHrZm7WycGEE++o52rHSPjU2WPyxwG9PV6SYXLz5E6v92bSrMIBCRBl79m4ZZz
+	 UbOhxWSEIT/Q1c55byiM2Jo3LnSq0IoSgxoIde6Xxp0OyfH8W75BVC3lhxcNX8Kqeg
+	 0Slz4wCmQVXnA==
+Date: Mon, 22 Jul 2024 11:08:46 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Florian Weimer <fweimer@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Ross Burton <ross.burton@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v9 38/39] kselftest/arm64: Add a GCS stress test
+Message-ID: <53c98e88-b12a-40e4-8b01-d7a4394c2471@sirena.org.uk>
+References: <20240625-arm64-gcs-v9-0-0f634469b8f0@kernel.org>
+ <20240625-arm64-gcs-v9-38-0f634469b8f0@kernel.org>
+ <875xt2xojp.fsf@linaro.org>
+ <871q3qxnx6.fsf@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 18/29] arm64: add POE signal support
-To: Joey Gouly <joey.gouly@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: akpm@linux-foundation.org, aneesh.kumar@kernel.org,
- aneesh.kumar@linux.ibm.com, bp@alien8.de, broonie@kernel.org,
- catalin.marinas@arm.com, christophe.leroy@csgroup.eu,
- dave.hansen@linux.intel.com, hpa@zytor.com, linux-fsdevel@vger.kernel.org,
- linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org, maz@kernel.org,
- mingo@redhat.com, mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com,
- npiggin@gmail.com, oliver.upton@linux.dev, shuah@kernel.org,
- szabolcs.nagy@arm.com, tglx@linutronix.de, will@kernel.org, x86@kernel.org,
- kvmarm@lists.linux.dev
-References: <20240503130147.1154804-1-joey.gouly@arm.com>
- <20240503130147.1154804-19-joey.gouly@arm.com>
-Content-Language: en-US
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <20240503130147.1154804-19-joey.gouly@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="d44XRLGyLTUTZna7"
+Content-Disposition: inline
+In-Reply-To: <871q3qxnx6.fsf@linaro.org>
+X-Cookie: Everything you know is wrong!
 
 
+--d44XRLGyLTUTZna7
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On 5/3/24 18:31, Joey Gouly wrote:
-> Add PKEY support to signals, by saving and restoring POR_EL0 from the stackframe.
-> 
-> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will@kernel.org>
-> Reviewed-by: Mark Brown <broonie@kernel.org>
-> Acked-by: Szabolcs Nagy <szabolcs.nagy@arm.com>
+On Thu, Jul 18, 2024 at 08:47:49PM -0300, Thiago Jung Bauermann wrote:
+> Thiago Jung Bauermann <thiago.bauermann@linaro.org> writes:
 
-Reviewed-by: Anshuman Khandual <anshuman.khandual@arm.com>
+> > # # Totals: pass:0 fail:9 xfail:0 xpass:0 skip:0 error:0
+> > ok 1 selftests: arm64: gcs-stress
 
-> ---
->  arch/arm64/include/uapi/asm/sigcontext.h |  7 ++++
->  arch/arm64/kernel/signal.c               | 52 ++++++++++++++++++++++++
->  2 files changed, 59 insertions(+)
-> 
-> diff --git a/arch/arm64/include/uapi/asm/sigcontext.h b/arch/arm64/include/uapi/asm/sigcontext.h
-> index 8a45b7a411e0..e4cba8a6c9a2 100644
-> --- a/arch/arm64/include/uapi/asm/sigcontext.h
-> +++ b/arch/arm64/include/uapi/asm/sigcontext.h
-> @@ -98,6 +98,13 @@ struct esr_context {
->  	__u64 esr;
->  };
->  
-> +#define POE_MAGIC	0x504f4530
-> +
-> +struct poe_context {
-> +	struct _aarch64_ctx head;
-> +	__u64 por_el0;
-> +};
-> +
->  /*
->   * extra_context: describes extra space in the signal frame for
->   * additional structures that don't fit in sigcontext.__reserved[].
-> diff --git a/arch/arm64/kernel/signal.c b/arch/arm64/kernel/signal.c
-> index 4a77f4976e11..077436a8bc10 100644
-> --- a/arch/arm64/kernel/signal.c
-> +++ b/arch/arm64/kernel/signal.c
-> @@ -63,6 +63,7 @@ struct rt_sigframe_user_layout {
->  	unsigned long fpmr_offset;
->  	unsigned long extra_offset;
->  	unsigned long end_offset;
-> +	unsigned long poe_offset;
->  };
->  
->  #define BASE_SIGFRAME_SIZE round_up(sizeof(struct rt_sigframe), 16)
-> @@ -185,6 +186,8 @@ struct user_ctxs {
->  	u32 zt_size;
->  	struct fpmr_context __user *fpmr;
->  	u32 fpmr_size;
-> +	struct poe_context __user *poe;
-> +	u32 poe_size;
->  };
->  
->  static int preserve_fpsimd_context(struct fpsimd_context __user *ctx)
-> @@ -258,6 +261,21 @@ static int restore_fpmr_context(struct user_ctxs *user)
->  	return err;
->  }
->  
-> +static int restore_poe_context(struct user_ctxs *user)
-> +{
-> +	u64 por_el0;
-> +	int err = 0;
-> +
-> +	if (user->poe_size != sizeof(*user->poe))
-> +		return -EINVAL;
-> +
-> +	__get_user_error(por_el0, &(user->poe->por_el0), err);
-> +	if (!err)
-> +		write_sysreg_s(por_el0, SYS_POR_EL0);
-> +
-> +	return err;
-> +}
-> +
->  #ifdef CONFIG_ARM64_SVE
->  
->  static int preserve_sve_context(struct sve_context __user *ctx)
-> @@ -621,6 +639,7 @@ static int parse_user_sigframe(struct user_ctxs *user,
->  	user->za = NULL;
->  	user->zt = NULL;
->  	user->fpmr = NULL;
-> +	user->poe = NULL;
->  
->  	if (!IS_ALIGNED((unsigned long)base, 16))
->  		goto invalid;
-> @@ -671,6 +690,17 @@ static int parse_user_sigframe(struct user_ctxs *user,
->  			/* ignore */
->  			break;
->  
-> +		case POE_MAGIC:
-> +			if (!system_supports_poe())
-> +				goto invalid;
-> +
-> +			if (user->poe)
-> +				goto invalid;
-> +
-> +			user->poe = (struct poe_context __user *)head;
-> +			user->poe_size = size;
-> +			break;
-> +
->  		case SVE_MAGIC:
->  			if (!system_supports_sve() && !system_supports_sme())
->  				goto invalid;
-> @@ -857,6 +887,9 @@ static int restore_sigframe(struct pt_regs *regs,
->  	if (err == 0 && system_supports_sme2() && user.zt)
->  		err = restore_zt_context(&user);
->  
-> +	if (err == 0 && system_supports_poe() && user.poe)
-> +		err = restore_poe_context(&user);
-> +
->  	return err;
->  }
->  
-> @@ -980,6 +1013,13 @@ static int setup_sigframe_layout(struct rt_sigframe_user_layout *user,
->  			return err;
->  	}
->  
-> +	if (system_supports_poe()) {
-> +		err = sigframe_alloc(user, &user->poe_offset,
-> +				     sizeof(struct poe_context));
-> +		if (err)
-> +			return err;
-> +	}
-> +
->  	return sigframe_alloc_end(user);
->  }
->  
-> @@ -1020,6 +1060,15 @@ static int setup_sigframe(struct rt_sigframe_user_layout *user,
->  		__put_user_error(current->thread.fault_code, &esr_ctx->esr, err);
->  	}
->  
-> +	if (system_supports_poe() && err == 0 && user->poe_offset) {
-> +		struct poe_context __user *poe_ctx =
-> +			apply_user_offset(user, user->poe_offset);
-> +
-> +		__put_user_error(POE_MAGIC, &poe_ctx->head.magic, err);
-> +		__put_user_error(sizeof(*poe_ctx), &poe_ctx->head.size, err);
-> +		__put_user_error(read_sysreg_s(SYS_POR_EL0), &poe_ctx->por_el0, err);
-> +	}
-> +
->  	/* Scalable Vector Extension state (including streaming), if present */
->  	if ((system_supports_sve() || system_supports_sme()) &&
->  	    err == 0 && user->sve_offset) {
-> @@ -1178,6 +1227,9 @@ static void setup_return(struct pt_regs *regs, struct k_sigaction *ka,
->  		sme_smstop();
->  	}
->  
-> +	if (system_supports_poe())
-> +		write_sysreg_s(POR_EL0_INIT, SYS_POR_EL0);
-> +
->  	if (ka->sa.sa_flags & SA_RESTORER)
->  		sigtramp = ka->sa.sa_restorer;
->  	else
+> Also, Shouldn't the test report "not ok" at the end considering that
+> there were fails?
+
+It doesn't really matter either way, the per test results are captured.
+
+--d44XRLGyLTUTZna7
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmaeL64ACgkQJNaLcl1U
+h9DdSwf+OKUfn8laXp+yxRv2lSbOzqFMeeL5M5MmJtaH4D5q5G9SwlMCVx3e+7BW
+utABRB30/1ASkvtYLdYwvPw6y+Jn9P2xtdttvx7+U/aggTBaWWW0fa6cB9YTKO+a
+aRyNaxotBkWFmPUl7qa4kpMWb5FDtxX3iLlCw0GicotYaWJKGHEUQ6AFxGjmQaM5
+O1eXLhARUQ8l2+k8A6a0WXVZvZJdhyLouFkswNGmAKdnfd6mYvY9DIBejxtsBJlH
+M7xvo9iPSz/18Y/x4HdPAjjwGHYNRkuhYT8QMhZG5TzTpNMXwEXpKbkkKETAklkz
+289HaQ9+gTL4ZnRsy1VMxkkxoqQ83g==
+=SALv
+-----END PGP SIGNATURE-----
+
+--d44XRLGyLTUTZna7--
