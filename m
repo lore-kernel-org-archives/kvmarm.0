@@ -1,89 +1,108 @@
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5522C8C7
-	for <kvmarm@lists.linux.dev>; Sun, 21 Jul 2024 09:30:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 480DB18E1F
+	for <kvmarm@lists.linux.dev>; Mon, 22 Jul 2024 08:00:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721554214; cv=none; b=b27pVxXiPzPzErBodyG7mL9bw7uR+VHucksntimBgFBHyjk35XoV/3zHl3TI10jL5o/PJFoP3HQVRxH1us+jzEMlkBXnMO14vrz9dQ81nDqhcoeWgTRG2Foqkk+lGOH3Y4iAEF0QS0kkaRb7K3+4loNUXruJYthzFsA/g46Hs4M=
+	t=1721635242; cv=none; b=jL5xsAfuvZEcpeGYGz0cwy8DBw3TRWrbU3Q+5eMFgJH7DilvGGAxWAx6Fxds954Dz43fi+R8sDJpmDnsGp5PpsYQUXk0D4Bays7+fq+qSOUdc7bELNug6tlgrKSyXhbo7BpBLQFe1smjaybvpqn7/Q6YrLqpWhqJa4/Kn3xbm5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721554214; c=relaxed/simple;
-	bh=P9Dm/KqDUiaARIJA0JEaJstefwjo3CXgis2kj6FDLjQ=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=WZyUFuc1X+c05h9SsnVG+9vsY0UdTWr0UGzpK8zKnqRob3D7qN2OyBBVcc0ZrLropAt3B4XVK4/wTZwoFkqp8PhJ5/7wlwSHxGGPQ2MjIFwv7OKBwHglDjTLi6B5NqCZ+gxaAFEs6RsUg9LS03xYv3bYDNCEO8HJyLosyJcBmhU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4WRdPY6Nw5zdjZr;
-	Sun, 21 Jul 2024 17:28:17 +0800 (CST)
-Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
-	by mail.maildlp.com (Postfix) with ESMTPS id 8682A180064;
-	Sun, 21 Jul 2024 17:30:03 +0800 (CST)
-Received: from [10.174.178.219] (10.174.178.219) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Sun, 21 Jul 2024 17:30:02 +0800
-Subject: Re: [PATCH] arm64/sysreg: Correct the values for GICv4.1
-To: Raghavendra Rao Ananta <rananta@google.com>
-CC: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
-	Mark Brown <broonie@kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
-	<kvm@vger.kernel.org>
-References: <20240718215532.616447-1-rananta@google.com>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <ab66968b-3d56-caec-cfe1-b509307caf94@huawei.com>
-Date: Sun, 21 Jul 2024 17:29:57 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
+	s=arc-20240116; t=1721635242; c=relaxed/simple;
+	bh=zJcfuhn0DuH1uG0pDznMSXqnvuHQG9yPxqhYft8CvAQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TD3unEBlbS9kpYifEixqK9qeYnRLROWUScq/bxBwXmCQZb7uLnfKYbmNxdKbjiwaIhftCBsOUB/5lYOKLANvtSFgMe+RImAVUhr+GVOUCdVv8/QrFkB+lSt+yYy0Sb/J7u05X0g1rqdVoMIPoTtff1btUhdHFAfyikKfgdA0O9Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BE3EB367;
+	Mon, 22 Jul 2024 01:01:05 -0700 (PDT)
+Received: from [10.162.41.8] (a077893.blr.arm.com [10.162.41.8])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 02BB83F73F;
+	Mon, 22 Jul 2024 01:00:36 -0700 (PDT)
+Message-ID: <4db40b5b-bcc7-4370-a70d-57c1cd83682f@arm.com>
+Date: Mon, 22 Jul 2024 13:30:33 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <20240718215532.616447-1-rananta@google.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] arm64/sysreg: Correct the values for GICv4.1
+To: Marc Zyngier <maz@kernel.org>, Raghavendra Rao Ananta <rananta@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Mark Brown <broonie@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20240718215532.616447-1-rananta@google.com>
+ <86ikx13jeu.wl-maz@kernel.org>
 Content-Language: en-US
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+In-Reply-To: <86ikx13jeu.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemm600007.china.huawei.com (7.193.23.208)
 
-On 2024/7/19 5:55, Raghavendra Rao Ananta wrote:
-> Currently, sysreg has value as 0b0010 for the presence of GICv4.1 in
-> ID_PFR1_EL1 and ID_AA64PFR0_EL1, instead of 0b0011 as per ARM ARM.
-> Hence, correct them to reflect ARM ARM.
+
+
+On 7/19/24 13:25, Marc Zyngier wrote:
+> On Thu, 18 Jul 2024 22:55:32 +0100,
+> Raghavendra Rao Ananta <rananta@google.com> wrote:
+>>
+>> Currently, sysreg has value as 0b0010 for the presence of GICv4.1 in
+>> ID_PFR1_EL1 and ID_AA64PFR0_EL1, instead of 0b0011 as per ARM ARM.
+>> Hence, correct them to reflect ARM ARM.
+>>
+>> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+>> ---
+>>  arch/arm64/tools/sysreg | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+>> index a4c1dd4741a47..7ceaa1e0b4bc2 100644
+>> --- a/arch/arm64/tools/sysreg
+>> +++ b/arch/arm64/tools/sysreg
+>> @@ -149,7 +149,7 @@ Res0	63:32
+>>  UnsignedEnum	31:28	GIC
+>>  	0b0000	NI
+>>  	0b0001	GICv3
+>> -	0b0010	GICv4p1
+>> +	0b0011	GICv4p1
+>>  EndEnum
+>>  UnsignedEnum	27:24	Virt_frac
+>>  	0b0000	NI
+>> @@ -903,7 +903,7 @@ EndEnum
+>>  UnsignedEnum	27:24	GIC
+>>  	0b0000	NI
+>>  	0b0001	IMP
+>> -	0b0010	V4P1
+>> +	0b0011	V4P1
 > 
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> ---
->  arch/arm64/tools/sysreg | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> I wonder why we have different naming schemes for the same feature...
+
+Both definitions were added via different commits and different developers who
+might just have interpreted the following common description bit differently.
+
+"System register interface to version 4.1 of the GIC CPU interface is supported"
+
+1224308075f1 ("arm64/sysreg: Convert ID_PFR1_EL1 to automatic generation")
+cea08f2bf406 ("arm64/sysreg: Convert ID_AA64PFR0_EL1 to automatic generation")
+
+But I agree that same fields should be named exactly the same both in their 32
+bit and 64 bit variants.
+
 > 
-> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> index a4c1dd4741a47..7ceaa1e0b4bc2 100644
-> --- a/arch/arm64/tools/sysreg
-> +++ b/arch/arm64/tools/sysreg
-> @@ -149,7 +149,7 @@ Res0	63:32
->  UnsignedEnum	31:28	GIC
->  	0b0000	NI
->  	0b0001	GICv3
-> -	0b0010	GICv4p1
-> +	0b0011	GICv4p1
->  EndEnum
->  UnsignedEnum	27:24	Virt_frac
->  	0b0000	NI
-> @@ -903,7 +903,7 @@ EndEnum
->  UnsignedEnum	27:24	GIC
->  	0b0000	NI
->  	0b0001	IMP
-> -	0b0010	V4P1
-> +	0b0011	V4P1
->  EndEnum
->  SignedEnum	23:20	AdvSIMD
->  	0b0000	IMP
-
-Fortunately there is no user for this bit inside kernel. We had checked
-against the correct hard-coded value (0x3) in gic_cpuif_has_vsgi().
-
-Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
+>>  EndEnum
+>>  SignedEnum	23:20	AdvSIMD
+>>  	0b0000	IMP
+>>
+> 
+> Yup, this looks correct and checks out against revision H.b of the GICv3
+> spec, revision K.a of the ARM ARM, and even I.a (which the original
+> patches were referencing).
+> 
+> Once more, it shows that these dumps should be automatically generated
+> from the XML instead of (creatively) hand-written.
+> 
+> Reviewed-by: Marc Zyngier <maz@kernel.org>
+> 
+> 	M.
+> 
