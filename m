@@ -1,154 +1,106 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6229916D4EF
-	for <kvmarm@lists.linux.dev>; Mon, 22 Jul 2024 12:37:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74FDD16938C
+	for <kvmarm@lists.linux.dev>; Mon, 22 Jul 2024 13:40:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721651865; cv=none; b=UQavGt1alDZCWGnFG2gAqRSLJqoqDWAhAyj5QcmJmCAw9IPC8h1rVyC5sC5uzEUPzuwsdJnXGDmD50hzKLuygSLRTPURAnJYItrDVLOpIeXAZmZK6LKnfu3we/YXI+9hBfCqCOyia/Lzix3YwJbboCksKEaD9N++HdlMY4+IS2Y=
+	t=1721655606; cv=none; b=IRIuAeTFrMegno6XjC2VKBvxPoMHoGHlYKe2QEo8Gz4j2TaHs+1JdCLmVf6NQpJ5MchrpWhoByCsBJwMRoleyD32FB0Bu591dWj3Skkaw/6KfHi+2s4yjmZEu4xNY5PeQYCDuQTjNV2Gf255QmyiGEXfVwYEyh8nyfcOt6noRV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721651865; c=relaxed/simple;
-	bh=iWDaUkwWEWBgB57H5sIikhsnqjm73XvcLtj7fAkFRiM=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=R95TWTJxNfSwhIkGlmV0wY0urIaLgYYbwIUfS0fCaXg7CWEvSS9IO4gPxD9HY18vKkSiCDuIoA4kzKBInY6w2qpzNGaZwOhCQMEP8T6vh6T4loJek50mwVBsZC/kz6/V9lveLW8qTUxVKGMN5uD6IiJKKZfjKTyBgRbrykhpEt0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YfHukt5G; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YfHukt5G"
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e08904584edso2044482276.3
-        for <kvmarm@lists.linux.dev>; Mon, 22 Jul 2024 05:37:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1721651863; x=1722256663; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=tB0NBb54ZJvMBtbd+5lg40R+dR/caZ0zF1MlN7F1oWs=;
-        b=YfHukt5GaYxa4GsRVcEGzMolglgjqzuzDkLxQZ6gG+14aW3sxr+5cw76+++3RjqqAz
-         zgodXrv3pik33/hd7VOiJLZH/7lPK8nG0BSeloV6iXksLV1g9Y4xVbYojeqKv8emkUE7
-         r/LPIyCLsOB4dojttAhJ6ue+3si5fbc8KLRnzPGNtofdSyf1h+8WiTW9ON1IDe5THUqT
-         KvFWoVE9RzcKyQ/MFSlf25ZhCaiu8J/bHunpOfeIiUHeuMDElxTvz8rqFknuSxXJKhFp
-         QhPgqwy2ha48+vhgkgy/FMh5xxoL7tm+TZIWCxxu453aEO7ugDFIGeDPhoifm/2RtEgN
-         XXhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721651863; x=1722256663;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tB0NBb54ZJvMBtbd+5lg40R+dR/caZ0zF1MlN7F1oWs=;
-        b=MCecnn0JHeY51BtZXlZArwtVek/OAe5TbRkEF8/DJODr/WsDWFuN95Qdjt2mIodL//
-         9OmFrjWrMmlHRuH1k7QxcPyRFeFLpCs+pV+d2n4L+GgpK05+vTOmHom36iMWo76egWQN
-         +ZQPGuL0ORo8zHTjFeuue5YACunZpY0uHit9t+K2bJkvMcdIoU7qrXTNbcyoRi2acxrw
-         QHb0C3SFVAulPugsLWHObEifV6XUEGfPESoqRHtyfLZzPAK1hdZdoYWLhqwKmzzdRbCX
-         bA1cE7RGRoowGcqhBd2gmQY0+MQFfk2bEl8dboba2ZAaEwGnmY/U7cqO8yTlhjq8GUkT
-         njqA==
-X-Gm-Message-State: AOJu0YwcRH/XDfDfvx7e4ryz84hBOPAPbuFcLcOU428W7hirS6xAw6X0
-	BhSJFw0Apwv75Bi+x7EDOC97Cnjy4GLeQwwtyFGw3Y4zmhFgtFd6rfiy6thhLsFNs1i2DqSyEoS
-	3cHf9AKWUdgH53U0sDdbNz9XluILdELS1zmfN5cduHxPQ3WBOVv60/Fg0GX6B4CYwEAlofQVtJ3
-	iSD5qPWFE+hNMk+GLTF1npbJmzzfk=
-X-Google-Smtp-Source: AGHT+IHxDaFJnCYoXUDvj1FrOKOitFCOMc2UhqbKkIVKqpb/bUB8p8/AAoaip/ok7we/mQYGn8fM8CH/OQ==
-X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:6902:70c:b0:e05:e3ce:cfaf with SMTP id
- 3f1490d57ef6-e086fcb78d8mr15866276.0.1721651862734; Mon, 22 Jul 2024 05:37:42
- -0700 (PDT)
-Date: Mon, 22 Jul 2024 13:37:40 +0100
+	s=arc-20240116; t=1721655606; c=relaxed/simple;
+	bh=qNZ6+wPpE4b0eb6JiOYhozAXjOaNH5Iw9Fy9vPIlntE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VadOTOwFEAzIaQDz1d2TzKfD4nT/MQTAQDOACtQQC4YbxcU2D4G97HoLwVm20067cwM1MDNCsybyQX0ZPqzp27zVovJLS22F5b1nmkoD6QjTElqOK6bNrhZaOLe+A5KAj+iESBUM266VT/Yojx3gq0/hn4v2QvVq1dXV/2W+oYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E204CFEC;
+	Mon, 22 Jul 2024 06:40:27 -0700 (PDT)
+Received: from [10.44.160.75] (e126510-lin.lund.arm.com [10.44.160.75])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E99F23F766;
+	Mon, 22 Jul 2024 06:39:56 -0700 (PDT)
+Message-ID: <b4f8b351-4c83-43b4-bfbe-8f67f3f56fb9@arm.com>
+Date: Mon, 22 Jul 2024 15:39:54 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.45.2.1089.g2a221341d9-goog
-Message-ID: <20240722123740.674846-1-tabba@google.com>
-Subject: [PATCH v1] KVM: arm64: Tidying up PAuth code in KVM
-From: Fuad Tabba <tabba@google.com>
-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
-Cc: maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, 
-	oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com, 
-	smostafa@google.com, will@kernel.org, catalin.marinas@arm.com, 
-	tabba@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 17/29] arm64: implement PKEYS support
+To: Catalin Marinas <catalin.marinas@arm.com>, Joey Gouly <joey.gouly@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
+ aneesh.kumar@kernel.org, aneesh.kumar@linux.ibm.com, bp@alien8.de,
+ broonie@kernel.org, christophe.leroy@csgroup.eu,
+ dave.hansen@linux.intel.com, hpa@zytor.com, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org, maz@kernel.org,
+ mingo@redhat.com, mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com,
+ npiggin@gmail.com, oliver.upton@linux.dev, shuah@kernel.org,
+ szabolcs.nagy@arm.com, tglx@linutronix.de, will@kernel.org, x86@kernel.org,
+ kvmarm@lists.linux.dev
+References: <20240503130147.1154804-1-joey.gouly@arm.com>
+ <20240503130147.1154804-18-joey.gouly@arm.com> <Zogmi1AogxHWlWWR@arm.com>
+Content-Language: en-GB
+From: Kevin Brodsky <kevin.brodsky@arm.com>
+In-Reply-To: <Zogmi1AogxHWlWWR@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Tidy up some of the PAuth trapping code to clear up some comments
-and avoid clang/checkpatch warnings. Also, do not bother setting
-the PAuth HCR_EL2 bits for protected VMs in pKVM, since that is
-handled by the hypervisor.
+On 05/07/2024 18:59, Catalin Marinas wrote:
+> On Fri, May 03, 2024 at 02:01:35PM +0100, Joey Gouly wrote:
+>> @@ -163,7 +182,8 @@ static inline pteval_t __phys_to_pte_val(phys_addr_t phys)
+>>  #define pte_access_permitted_no_overlay(pte, write) \
+>>  	(((pte_val(pte) & (PTE_VALID | PTE_USER)) == (PTE_VALID | PTE_USER)) && (!(write) || pte_write(pte)))
+>>  #define pte_access_permitted(pte, write) \
+>> -	pte_access_permitted_no_overlay(pte, write)
+>> +	(pte_access_permitted_no_overlay(pte, write) && \
+>> +	por_el0_allows_pkey(FIELD_GET(PTE_PO_IDX_MASK, pte_val(pte)), write, false))
+> I'm still not entirely convinced on checking the keys during fast GUP
+> but that's what x86 and powerpc do already, so I guess we'll follow the
+> same ABI.
 
-Fixes: 814ad8f96e92 ("KVM: arm64: Drop trapping of PAuth instructions/keys")
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
- arch/arm64/include/asm/kvm_ptrauth.h    | 2 +-
- arch/arm64/kvm/arm.c                    | 7 ++++---
- arch/arm64/kvm/hyp/include/hyp/switch.h | 1 -
- arch/arm64/kvm/hyp/nvhe/switch.c        | 5 ++---
- 4 files changed, 7 insertions(+), 8 deletions(-)
+I've thought about this some more. In summary I don't think adding this
+check to pte_access_permitted() is controversial, but we should decide
+how POR_EL0 is set for kernel threads.
 
-diff --git a/arch/arm64/include/asm/kvm_ptrauth.h b/arch/arm64/include/asm/kvm_ptrauth.h
-index d81bac256abc..6199c9f7ec6e 100644
---- a/arch/arm64/include/asm/kvm_ptrauth.h
-+++ b/arch/arm64/include/asm/kvm_ptrauth.h
-@@ -104,7 +104,7 @@ alternative_else_nop_endif
- 
- #define __ptrauth_save_key(ctxt, key)					\
- 	do {								\
--		u64 __val;                                              \
-+		u64 __val;						\
- 		__val = read_sysreg_s(SYS_ ## key ## KEYLO_EL1);	\
- 		ctxt_sys_reg(ctxt, key ## KEYLO_EL1) = __val;		\
- 		__val = read_sysreg_s(SYS_ ## key ## KEYHI_EL1);	\
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 59716789fe0f..6516348024ba 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -510,10 +510,10 @@ void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
- 
- static void vcpu_set_pauth_traps(struct kvm_vcpu *vcpu)
- {
--	if (vcpu_has_ptrauth(vcpu)) {
-+	if (vcpu_has_ptrauth(vcpu) && !vcpu_is_protected(vcpu)) {
- 		/*
--		 * Either we're running running an L2 guest, and the API/APK
--		 * bits come from L1's HCR_EL2, or API/APK are both set.
-+		 * Either we're running an L2 guest, and the API/APK bits come
-+		 * from L1's HCR_EL2, or API/APK are both set.
- 		 */
- 		if (unlikely(vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu))) {
- 			u64 val;
-@@ -540,6 +540,7 @@ static void vcpu_set_pauth_traps(struct kvm_vcpu *vcpu)
- 
- 		if (vcpu->arch.hcr_el2 & (HCR_API | HCR_APK)) {
- 			struct kvm_cpu_context *ctxt;
-+
- 			ctxt = this_cpu_ptr_hyp_sym(kvm_hyp_ctxt);
- 			ptrauth_save_keys(ctxt);
- 		}
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 0c4de44534b7..9eb68c0dd727 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -27,7 +27,6 @@
- #include <asm/kvm_hyp.h>
- #include <asm/kvm_mmu.h>
- #include <asm/kvm_nested.h>
--#include <asm/kvm_ptrauth.h>
- #include <asm/fpsimd.h>
- #include <asm/debug-monitors.h>
- #include <asm/processor.h>
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index 6af179c6356d..8f5c56d5b1cd 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -173,9 +173,8 @@ static void __pmu_switch_to_host(struct kvm_vcpu *vcpu)
- static bool kvm_handle_pvm_sys64(struct kvm_vcpu *vcpu, u64 *exit_code)
- {
- 	/*
--	 * Make sure we handle the exit for workarounds and ptrauth
--	 * before the pKVM handling, as the latter could decide to
--	 * UNDEF.
-+	 * Make sure we handle the exit for workarounds before the pKVM
-+	 * handling, as the latter could decide to UNDEF.
- 	 */
- 	return (kvm_hyp_handle_sysreg(vcpu, exit_code) ||
- 		kvm_handle_pvm_sysreg(vcpu, exit_code));
+This change essentially means that fast GUP behaves like uaccess for
+pages that are already present: in both cases POR_EL0 will be looked up
+based on the POIndex of the page being accessed (by the hardware in the
+uaccess case, and explicitly in the fast GUP case). Fast GUP always
+operates on current->mm, so to me checking POR_EL0 in
+pte_access_permitted() should be no more restrictive than a uaccess
+check from a user perspective. In other words, POR_EL0 is checked when
+the kernel accesses user memory on the user's behalf, whether through
+uaccess or GUP.
 
-base-commit: 0c3836482481200ead7b416ca80c68a29cfdaabd
--- 
-2.45.2.1089.g2a221341d9-goog
+It's also worth noting that the "slow" GUP path (which
+get_user_pages_fast() falls back to if a page is missing) also checks
+POR_EL0 by virtue of calling handle_mm_fault(), which in turn calls
+arch_vma_access_permitted(). It would be pretty inconsistent for the
+slow GUP path to do a pkey check but not the fast path. (That said, the
+slow GUP path does not call arch_vma_access_permitted() if a page is
+already present, so callers of get_user_pages() and similar will get
+inconsistent checking. Not great, that may be worth fixing - but that's
+clearly beyond the scope of this series.)
 
+Now an interesting question is what happens with kernel threads that
+access user memory, as is the case for the optional io_uring kernel
+thread (IORING_SETUP_SQPOLL). The discussion above holds regardless of
+the type of thread, so the sqpoll thread will have its POR_EL0 checked
+when processing commands that involve uaccess or GUP. AFAICT, this
+series does not have special handling for kernel threads w.r.t. POR_EL0,
+which means that it is left unchanged when a new kernel thread is cloned
+(create_io_thread() in the IORING_SETUP_SQPOLL case). The sqpoll thread
+will therefore inherit POR_EL0 from the (user) thread that calls
+io_uring_setup(). In other words, the sqpoll thread ends up with the
+same view of user memory as that user thread - for instance if its
+POR_EL0 prevents access to POIndex 1, then any I/O that the sqpoll
+thread attempts on mappings with POIndex/pkey 1 will fail.
+
+This behaviour seems potentially useful to me, as the io_uring SQ could
+easily become a way to bypass POE without some restriction. However, it
+feels like this should be documented, as one should keep it in mind when
+using pkeys, and there may well be other cases where kernel threads are
+impacted by POR_EL0. I am also unsure how x86/ppc handle this.
+
+Kevin
