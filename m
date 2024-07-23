@@ -1,356 +1,152 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4978613B599
-	for <kvmarm@lists.linux.dev>; Tue, 23 Jul 2024 06:22:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6352A13D245
+	for <kvmarm@lists.linux.dev>; Tue, 23 Jul 2024 07:20:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721715780; cv=none; b=H4aGekr0UPyqJ4Czk1F+9CZzvKzXUa1Enfb2rcuOQsLpkx7Ex8PMm/pkmAHtTOuGOiNc2NJJkrh+ljomlX4b9QP4b5fe3jLDRSFDUNA0xB4bPzsTCdA/fiiP8nfWYlBuFSsoP7hXZwUw24rfk/xjEnykS/f9AkXW4EZ3Ys8ckbQ=
+	t=1721719224; cv=none; b=MJWvRGRoN9zjZTxqoIyq20QOs+3+2MIDCEsCauulYSUwG8eNZTl9vJx8/XrNAJGRaJJLzMgECEJLPxxGAkeK+7Jgq291QKiDwxqg1PLQ/Lais/1OtJW81UzQJ/qMC3p1A9R5us+PMfVw15SdMFJAOxE/K+ZfaiwdkXwaZ5OzuTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721715780; c=relaxed/simple;
-	bh=P92MH8B5c9jvC2bnTPtRev2aH6tP4Y8mmGyv/5o49CY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=R7P8fs4ng8FnDub2giB74tvmCloQLsqo+poY+V4PNUz7uQdjkTGJA2VMDJ+v9vFAQBDWvlxfTsxDavZdi3IKKjzSVI/RoHHsiio633m4KL+elAuLAWx1XcF3nNTbrb146t6It/IIB0SmBPIsQRAoQATfjRSX2KB0/45uZaeHwjo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ITRf2ckN; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1721719224; c=relaxed/simple;
+	bh=ZXzGO5dmDeidd3BRiSnDakFqMveADiJcUiUiaXY7wX8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=PD+gRsuXzi1rM5yadwt4iTcsujVgL5RnV+5HbyhRrGae+icDkVq61geKap/HKqdedUKY8jemK1gBbH3xPon1KLsDkCCUFiU7rTp79EqyU/9/2Q4wgHfz8D/sT621GT0srUzKLAxILEZkayYn+/gH+BYVP7rDT3hV9a4d6nOR0lE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NmE5h9ck; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ITRf2ckN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NmE5h9ck"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721715777;
+	s=mimecast20190719; t=1721719220;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hcTfow7Oo6i9Jk5NtqEjESkJCNqoSWX8VZs+T25c+9Y=;
-	b=ITRf2ckNV1dCCHxL7Ho7PYG886JN2kYSJ7wmy8EFv5ApgJ4njEYwDExxVBTLGKZtJnVBw/
-	ZnjMviRT3lVlVcR+mF9kECceTZevwYa04rUtWytxmVV00NygsqdRhzgjIK4PkO0KDMoXRS
-	b8cws2Kj/SGAw5mHdXJ32d+USPHnCAA=
-Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
- [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-249-jhIN4FtQP-yR-pUKUbzzMQ-1; Tue, 23 Jul 2024 02:22:55 -0400
-X-MC-Unique: jhIN4FtQP-yR-pUKUbzzMQ-1
-Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-1fc58790766so3773755ad.3
-        for <kvmarm@lists.linux.dev>; Mon, 22 Jul 2024 23:22:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721715774; x=1722320574;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hcTfow7Oo6i9Jk5NtqEjESkJCNqoSWX8VZs+T25c+9Y=;
-        b=JaGw54L3+PQXQBSilNIPMLRQ38whzmnmzQ8YIrVeLS4MgwxavL93cMwZK0/DJ6pSOp
-         LGAltM77OSqH79vjjQj3bMYjgXFvEcnUp04nPQo6ilX0Ka63ZXpz5Kl1PjPH+kXe82dl
-         Hj3ZyqKFCoyEqiYe4H9D8NKE9V/pP0KY6xhXOKeRp5iKc/QVWiuaY1PDyfZbHp6l2sGD
-         /fkvjQYenyMX//LpJorAO/r2JPcVFMUQllODDUThlJtI7nsrI3SD+M6hr4vykKnLcJ5B
-         lS30qw6o9w20/sVbYozpKyi+QLdKJGQNf/3KLFfVD2TnYPE8Mi9vR3IZ544yFNEPrlKu
-         7njQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUC+7Cur28RJwL10c4vLu+7OeDhvoYznvOmW1WHuYdjA10A4WVhn2/qk4Vl7o4hA80hRdVlJXI7fu8e6paTFLTtPb2vdhRz
-X-Gm-Message-State: AOJu0YzW98zblYQ+Az8mPUMFFCrFY7ts7rJRUOMugTK8kaG8JsfVGWqP
-	FRAA5kPlNVA6WOHHhC/jCjU1LjFsfgiVtJuWclVb0QfFycCFroC4esYKJ1McCU2T5/eaSr+OUnl
-	vfd1LYOcrgoVPl+DuQubhhUP/hCH5Y4it4izVTDiuXSndCmws+2nBcQ==
-X-Received: by 2002:a17:902:d50e:b0:1fd:9420:1044 with SMTP id d9443c01a7336-1fdb5f68d70mr21438595ad.16.1721715774006;
-        Mon, 22 Jul 2024 23:22:54 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFPgJ2CXE7hNWQ1PFo9WoFtLesM4oKaP8B9Rc3wrzBKg8598MOU00D8FtaHIQZCy0PyD/104Q==
-X-Received: by 2002:a17:902:d50e:b0:1fd:9420:1044 with SMTP id d9443c01a7336-1fdb5f68d70mr21438325ad.16.1721715773498;
-        Mon, 22 Jul 2024 23:22:53 -0700 (PDT)
-Received: from [192.168.68.54] ([43.252.112.134])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fd6f484267sm65736445ad.278.2024.07.22.23.22.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Jul 2024 23:22:53 -0700 (PDT)
-Message-ID: <a119ad47-11b7-42e5-a1e2-2706660c93d9@redhat.com>
-Date: Tue, 23 Jul 2024 16:22:44 +1000
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=kxeEIWgw+QlKqllfZg7rnP4x9/FSOChR4+aHAj39Qi8=;
+	b=NmE5h9ckgQ71wGjXYeyrD5ppHll0PwuzSI/cJZS1NXulD58aBomiIS0jSr/slPzOZ/fkfw
+	5PQVSLmQrnLAAaz84qzz1o9nKbvVQ3Pnnir7E50WdDUY7oilFzZ33et5x386DdxNo+hX1b
+	WQR99URmFRegklC6dkpgAl9MRhCxM5A=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-455-4Nz8a46_NGWSK468nJ3Teg-1; Tue,
+ 23 Jul 2024 03:20:16 -0400
+X-MC-Unique: 4Nz8a46_NGWSK468nJ3Teg-1
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DD7C519560A2;
+	Tue, 23 Jul 2024 07:20:13 +0000 (UTC)
+Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C54881955F40;
+	Tue, 23 Jul 2024 07:20:09 +0000 (UTC)
+From: Shaoqin Huang <shahuang@redhat.com>
+To: Oliver Upton <oliver.upton@linux.dev>,
+	Marc Zyngier <maz@kernel.org>,
+	kvmarm@lists.linux.dev,
+	Mark Brown <broonie@kernel.org>
+Cc: Eric Auger <eauger@redhat.com>,
+	Sebastian Ott <sebott@redhat.com>,
+	Cornelia Huck <cohuck@redhat.com>,
+	Shaoqin Huang <shahuang@redhat.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	James Morse <james.morse@arm.com>,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH v5 0/4] Allow userspace to change ID_AA64PFR1_EL1
+Date: Tue, 23 Jul 2024 03:19:59 -0400
+Message-Id: <20240723072004.1470688-1-shahuang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 01/15] arm64: rsi: Add RSI definitions
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-References: <20240701095505.165383-1-steven.price@arm.com>
- <20240701095505.165383-2-steven.price@arm.com>
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20240701095505.165383-2-steven.price@arm.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On 7/1/24 7:54 PM, Steven Price wrote:
-> From: Suzuki K Poulose <suzuki.poulose@arm.com>
-> 
-> The RMM (Realm Management Monitor) provides functionality that can be
-> accessed by a realm guest through SMC (Realm Services Interface) calls.
-> 
-> The SMC definitions are based on DEN0137[1] version A-eac5.
-> 
-> [1] https://developer.arm.com/documentation/den0137/latest
-> 
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Changes since v3:
->   * Drop invoke_rsi_fn_smc_with_res() function and call arm_smccc_smc()
->     directly instead.
->   * Rename header guard in rsi_smc.h to be consistent.
-> Changes since v2:
->   * Rename rsi_get_version() to rsi_request_version()
->   * Fix size/alignment of struct realm_config
-> ---
->   arch/arm64/include/asm/rsi_cmds.h |  38 ++++++++
->   arch/arm64/include/asm/rsi_smc.h  | 142 ++++++++++++++++++++++++++++++
->   2 files changed, 180 insertions(+)
->   create mode 100644 arch/arm64/include/asm/rsi_cmds.h
->   create mode 100644 arch/arm64/include/asm/rsi_smc.h
-> 
+Hi guys,
 
-Some nits and questions like below.
+This is another try to allow userspace to change ID_AA64PFR1_EL1, and we want to
+give userspace the ability to control the visible feature set for a VM, which
+could be used by userspace in such a way to transparently migrate VMs.
 
-> diff --git a/arch/arm64/include/asm/rsi_cmds.h b/arch/arm64/include/asm/rsi_cmds.h
-> new file mode 100644
-> index 000000000000..89e907f3af0c
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/rsi_cmds.h
-> @@ -0,0 +1,38 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Copyright (C) 2023 ARM Ltd.
-> + */
-> +
-> +#ifndef __ASM_RSI_CMDS_H
-> +#define __ASM_RSI_CMDS_H
-> +
-> +#include <linux/arm-smccc.h>
-> +
-> +#include <asm/rsi_smc.h>
-> +
-> +static inline unsigned long rsi_request_version(unsigned long req,
-> +						unsigned long *out_lower,
-> +						unsigned long *out_higher)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_smc(SMC_RSI_ABI_VERSION, req, 0, 0, 0, 0, 0, 0, &res);
-> +
-> +	if (out_lower)
-> +		*out_lower = res.a1;
-> +	if (out_higher)
-> +		*out_higher = res.a2;
-> +
-> +	return res.a0;
-> +}
-> +
-> +static inline unsigned long rsi_get_realm_config(struct realm_config *cfg)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_smc(SMC_RSI_REALM_CONFIG, virt_to_phys(cfg),
-> +		      0, 0, 0, 0, 0, 0, &res);
-> +	return res.a0;
-> +}
-> +
-> +#endif
+The patch series have four part:
 
-#endif /* __ASM_RSI_CMDS_H */
+The first patch disable those fields which KVM doesn't know how to handle, so
+KVM will only expose value 0 of those fields to the guest.
 
-> diff --git a/arch/arm64/include/asm/rsi_smc.h b/arch/arm64/include/asm/rsi_smc.h
-> new file mode 100644
-> index 000000000000..b3b3aff88f71
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/rsi_smc.h
-> @@ -0,0 +1,142 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Copyright (C) 2023 ARM Ltd.
-> + */
-> +
-> +#ifndef __ASM_RSI_SMC_H_
-> +#define __ASM_RSI_SMC_H_
-> +
-> +/*
-> + * This file describes the Realm Services Interface (RSI) Application Binary
-> + * Interface (ABI) for SMC calls made from within the Realm to the RMM and
-> + * serviced by the RMM.
-> + */
-> +
-> +#define SMC_RSI_CALL_BASE		0xC4000000
-> +
-> +/*
-> + * The major version number of the RSI implementation.  Increase this whenever
-> + * the binary format or semantics of the SMC calls change.
-> + */
-> +#define RSI_ABI_VERSION_MAJOR		1
-> +
-> +/*
-> + * The minor version number of the RSI implementation.  Increase this when
-> + * a bug is fixed, or a feature is added without breaking binary compatibility.
-> + */
-> +#define RSI_ABI_VERSION_MINOR		0
-> +
-> +#define RSI_ABI_VERSION			((RSI_ABI_VERSION_MAJOR << 16) | \
-> +					 RSI_ABI_VERSION_MINOR)
-> +
-> +#define RSI_ABI_VERSION_GET_MAJOR(_version) ((_version) >> 16)
-> +#define RSI_ABI_VERSION_GET_MINOR(_version) ((_version) & 0xFFFF)
-> +
-> +#define RSI_SUCCESS			0
-> +#define RSI_ERROR_INPUT			1
-> +#define RSI_ERROR_STATE			2
-> +#define RSI_INCOMPLETE			3
-> +
+The second patch check the FEAT_SSBS in guest IDREG instead of the cpu
+capability.
 
-I think these return values are copied from tf-rmm/lib/smc/include/smc-rsi.h, but
-UL() prefix has been missed. It's still probably worthy to have it to indicate the
-width of the return values. Besides, it seems that RSI_ERROR_COUNT is also missed
-here.
+The third patch allow userspace to change ID_AA64PFR1_EL1, it only advertise the
+fields known to KVM and leave others unadvertise.
 
+The fourth patch adds the kselftest to test if userspace can change the
+ID_AA64PFR1_EL1.
 
-> +#define SMC_RSI_FID(_x)			(SMC_RSI_CALL_BASE + (_x))
-> +
-> +#define SMC_RSI_ABI_VERSION			SMC_RSI_FID(0x190)
-> +
-> +/*
-> + * arg1 == Challenge value, bytes:  0 -  7
-> + * arg2 == Challenge value, bytes:  7 - 15
-> + * arg3 == Challenge value, bytes: 16 - 23
-> + * arg4 == Challenge value, bytes: 24 - 31
-> + * arg5 == Challenge value, bytes: 32 - 39
-> + * arg6 == Challenge value, bytes: 40 - 47
-> + * arg7 == Challenge value, bytes: 48 - 55
-> + * arg8 == Challenge value, bytes: 56 - 63
-> + * ret0 == Status / error
-> + * ret1 == Upper bound of token size in bytes
-> + */
-> +#define SMC_RSI_ATTESTATION_TOKEN_INIT		SMC_RSI_FID(0x194)
-> +
+Besides, I also noticed there is another patch [1] which try to make the
+ID_AA64PFR1_EL1 writable. This patch [1] is try to enable GCS on baremental, and
+add GCS support for the guest. What I understand is if we have GCS support on
+baremental, it will be clear to how to handle them in KVM. And same for other
+fields like NMI, THE, DF2, MTEX.. At that time, they can be writable.
 
-In tf-rmm/lib/smc/include/smc-rsi.h, it is SMC_RSI_ATTEST_TOKEN_INIT instead
-of SMC_RSI_ATTESTATION_TOKEN_INIT. The short description for all SMC calls have
-been dropped and I think they're worthy to be kept. At least, it helps readers
-to understand what the SMC call does. For this particular SMC call, the short
-description is something like below:
+[1] [PATCH v9 13/39] KVM: arm64: Manage GCS registers for guests
+    https://lore.kernel.org/all/20240625-arm64-gcs-v9-13-0f634469b8f0@kernel.org/
 
-/*
-  * Initialize the operation to retrieve an attestation token.
-  * :
-  */
+Changelog:
+----------
+v4 -> v5:
+  * Only advertise fields which KVM know how to handle to userspace, leave
+    others unadvertised.
+  * Add a new patch to check FEAT_SSBS in IDREG instead of cpu capability.
+  * Tweak the kselftest writable fields.
+  * Improve the commit message.
 
-> +/*
-> + * arg1 == The IPA of token buffer
-> + * arg2 == Offset within the granule of the token buffer
-> + * arg3 == Size of the granule buffer
-> + * ret0 == Status / error
-> + * ret1 == Length of token bytes copied to the granule buffer
-> + */
-> +#define SMC_RSI_ATTESTATION_TOKEN_CONTINUE	SMC_RSI_FID(0x195)
-> +
+v3 -> v4:
+  * Add a new patch to disable some feature which KVM doesn't know how to
+    handle in the register accessor.
+  * Handle all the fields in the register.
+  * Fixes a small cnt issue in kselftest.
 
-SMC_RSI_ATTEST_TOKEN_CONTINUE as defined in tf-rmm.
+v2 -> v3:
+  * Give more description about why only part of the fields can be writable.
+  * Updated the writable mask by referring the latest ARM spec.
 
-> +/*
-> + * arg1  == Index, which measurements slot to extend
-> + * arg2  == Size of realm measurement in bytes, max 64 bytes
-> + * arg3  == Measurement value, bytes:  0 -  7
-> + * arg4  == Measurement value, bytes:  7 - 15
-> + * arg5  == Measurement value, bytes: 16 - 23
-> + * arg6  == Measurement value, bytes: 24 - 31
-> + * arg7  == Measurement value, bytes: 32 - 39
-> + * arg8  == Measurement value, bytes: 40 - 47
-> + * arg9  == Measurement value, bytes: 48 - 55
-> + * arg10 == Measurement value, bytes: 56 - 63
-> + * ret0  == Status / error
-> + */
-> +#define SMC_RSI_MEASUREMENT_EXTEND		SMC_RSI_FID(0x193)
-> +
-> +/*
-> + * arg1 == Index, which measurements slot to read
-> + * ret0 == Status / error
-> + * ret1 == Measurement value, bytes:  0 -  7
-> + * ret2 == Measurement value, bytes:  7 - 15
-> + * ret3 == Measurement value, bytes: 16 - 23
-> + * ret4 == Measurement value, bytes: 24 - 31
-> + * ret5 == Measurement value, bytes: 32 - 39
-> + * ret6 == Measurement value, bytes: 40 - 47
-> + * ret7 == Measurement value, bytes: 48 - 55
-> + * ret8 == Measurement value, bytes: 56 - 63
-> + */
-> +#define SMC_RSI_MEASUREMENT_READ		SMC_RSI_FID(0x192)
-> +
+v1 -> v2:
+  * Tackling the full register instead of single field.
+  * Changing the patch title and commit message.
 
-The order of these SMC call definitions are sorted based on their corresponding
-function IDs. For example, SMC_RSI_MEASUREMENT_READ would be appearing prior to
-SMC_RSI_MEASUREMENT_EXTEND.
+RFCv1 -> v1:
+  * Fix the compilation error.
+  * Delete the machine specific information and make the description more
+    generable.
 
-> +#ifndef __ASSEMBLY__
-> +
-> +struct realm_config {
-> +	union {
-> +		struct {
-> +			unsigned long ipa_bits; /* Width of IPA in bits */
-> +			unsigned long hash_algo; /* Hash algorithm */
-> +		};
-> +		u8 pad[0x1000];
-> +	};
-> +} __aligned(0x1000);
-> +
+RFCv1: https://lore.kernel.org/all/20240612023553.127813-1-shahuang@redhat.com/
+v1: https://lore.kernel.org/all/20240617075131.1006173-1-shahuang@redhat.com/
+v2: https://lore.kernel.org/all/20240618063808.1040085-1-shahuang@redhat.com/
+v3: https://lore.kernel.org/all/20240628060454.1936886-2-shahuang@redhat.com/
+v4: https://lore.kernel.org/all/20240718035017.434996-1-shahuang@redhat.com/
 
-This describes the argument to SMC call RSI_REALM_CONFIG and its address needs to
-be aligned to 0x1000. Otherwise, RSI_ERROR_INPUT is returned. This maybe worthy
-a comment to explain it why we need 0x1000 alignment here.
+Shaoqin Huang (4):
+  KVM: arm64: Disable fields that KVM doesn't know how to handle in
+    ID_AA64PFR1_EL1
+  KVM: arm64: Use kvm_has_feat() to check if FEAT_SSBS is advertised to
+    the guest
+  KVM: arm64: Allow userspace to change ID_AA64PFR1_EL1
+  KVM: selftests: aarch64: Add writable test for ID_AA64PFR1_EL1
 
-It seems the only 4KB page size (GRANULE_SIZE) is supported by tf-rmm at present.
-The fixed alignment (0x1000) becomes broken if tf-rmm is extended to support
-64KB in future. Maybe tf-rmm was designed to work with the minimal page size (4KB).
+ arch/arm64/kvm/hypercalls.c                   | 12 +++++-----
+ arch/arm64/kvm/sys_regs.c                     | 22 ++++++++++++++++++-
+ .../selftests/kvm/aarch64/set_id_regs.c       | 14 +++++++++---
+ 3 files changed, 38 insertions(+), 10 deletions(-)
 
-> +#endif /* __ASSEMBLY__ */
-> +
-> +/*
-> + * arg1 == struct realm_config addr
-> + * ret0 == Status / error
-> + */
-> +#define SMC_RSI_REALM_CONFIG			SMC_RSI_FID(0x196)
-> +
-> +/*
-> + * arg1 == Base IPA address of target region
-> + * arg2 == Top of the region
-> + * arg3 == RIPAS value
-> + * arg4 == flags
-> + * ret0 == Status / error
-> + * ret1 == Top of modified IPA range
-> + */
-> +#define SMC_RSI_IPA_STATE_SET			SMC_RSI_FID(0x197)
-> +
-> +#define RSI_NO_CHANGE_DESTROYED			0
-> +#define RSI_CHANGE_DESTROYED			1
-> +
-> +/*
-> + * arg1 == IPA of target page
-> + * ret0 == Status / error
-> + * ret1 == RIPAS value
-> + */
-> +#define SMC_RSI_IPA_STATE_GET			SMC_RSI_FID(0x198)
-> +
-> +/*
-> + * arg1 == IPA of host call structure
-> + * ret0 == Status / error
-> + */
-> +#define SMC_RSI_HOST_CALL			SMC_RSI_FID(0x199)
-> +
-> +#endif /* __ASM_RSI_SMC_H_ */
-
-Thanks,
-Gavin
+-- 
+2.40.1
 
