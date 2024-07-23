@@ -1,54 +1,54 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF6A8157E61;
-	Tue, 23 Jul 2024 17:04:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C5AF381B1;
+	Tue, 23 Jul 2024 17:56:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721754277; cv=none; b=oKoBvjxcljIxptTSPvJlECzvFYbB1B6an2yB7hE64cy5Mm9tc+xQqIt9wKAondWTNLv9qcdmLY/BZwSm9qBT4Lf46kUFoYu/pLWNSz/p+SOfDpsk4BfbIahrTz8vflBNhdYYoZvMIGZ9ZUnz5D68lnqwnyAaBiEmuHq7JXm7NFs=
+	t=1721757386; cv=none; b=PFZmLbxJS+qzUfJuxl6rZjAGyuUt4CN2gIAE4XfuO3PhAN0l6YXzEZBS/MDbnlnjmFsSnr1/AzteUrvBaqvC/nojvfpGVB3+FNI7lOmx+q2Tz4kkTku3I/qy9J+l0DTS0eoengNMt1MtqHN3YpY9RTZK6c2b3arUpzXsqW72A3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721754277; c=relaxed/simple;
-	bh=MxN/WLnGKf7av7xKNhhUY8LWbs931XIEUtFb3naxcy8=;
+	s=arc-20240116; t=1721757386; c=relaxed/simple;
+	bh=lI27AGHSNiEg23GogeEx/hdKprk9OzcyxtP42lFjVLo=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Lr4U7dp0U2t4huiOJjbmHUZFySYBv1cUGq4jyHFNCFS5a5lGgL+acvOU2iWK6B2GOYw3WwBTkUmdfgrF/e6EdGG/vP85dvmf2O8R51fuxKxDYfOB+LKl+j0KEupgHmlkWUbzB1NOXvhnKmIsUD/sCSYsM/N2dGcX0kHb3EyDHJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uj7m7qOu; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=mbuqyEsgmBU/QrBmi5sxXMhdPzKNDsSW86We3GO+fkKzZFJew2FbA+3TvFtWs2q3EtA0YYonaT3aSv2sQ30j3gsLoYdSpv0MUALX1PJZFc+Ec7Z5pCZBjTyac24xgBDpHWfBP0EJSflpVsjbRhtrprX+iUX7rnJAfhATrXKTrFM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HthFAbE2; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uj7m7qOu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAC6AC4AF0C;
-	Tue, 23 Jul 2024 17:04:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HthFAbE2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3560BC4AF0A;
+	Tue, 23 Jul 2024 17:56:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721754276;
-	bh=MxN/WLnGKf7av7xKNhhUY8LWbs931XIEUtFb3naxcy8=;
+	s=k20201202; t=1721757386;
+	bh=lI27AGHSNiEg23GogeEx/hdKprk9OzcyxtP42lFjVLo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=uj7m7qOu4xOj8Dmv+70XOg6djEehnR/RzmwEBzrwoNA3f+V/k4hNZZMENVxjd5PyE
-	 EeshgK0umyb1rblPa5oL9TiUoo//GKKSmqZTlgiJfWm5Vw3ZhBbNZidjweLwQYXnoL
-	 F/UidCtbQHgbMsjqvCClQrl7lrZZNXImAL6VPiXz8MvZfrI8P0gmMgYkUVxKIoOhu5
-	 4CKcjbJMXhThtVUVyEg2l/9RkdWcHbiYPmI6QPILgLuF39WWNQG70ovt6m+kjoqENw
-	 aPjvtHxY232ky5BOkqa7JxXrrArZdAnV08N7gRKlAkDk8m10C2fsfVeAa/8pyTsnY9
-	 hdzPHX8HKXbjg==
+	b=HthFAbE2P6nQ5UjgNk9WHNTD0AtXThl8hFI9mD2GZamcjuPfM4cf8/fEFNyNsuxOM
+	 Poh3AiihsfS4mplFeVaIWwiLosMsVc2IxojQjR1z4snu2puIOcKVHEvI6ZyIhTJ0Za
+	 3rPsProkPmncJJxysOVvHhkpxZC98bKXdossZB3rroW2/ewWpuxTpaz/HVXUeFrNqb
+	 Ttk3a+62SFuaxoEVOnUU7y11RwzKNHQRXFGZ85IWb6iJh6hWzx4yYBWzg55mSgNRnW
+	 P7qMNXLBVYD5S4I8wcBeCAYtE6Ui8c+4LcoiBfiIBrd33eVp6fhePs6IWl29+j/+ag
+	 eY5JbKjwO9/9w==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sWIwE-00Emgx-Bf;
-	Tue, 23 Jul 2024 18:04:34 +0100
-Date: Tue, 23 Jul 2024 18:04:34 +0100
-Message-ID: <86cyn42g65.wl-maz@kernel.org>
+	id 1sWJkO-00Enco-6b;
+	Tue, 23 Jul 2024 18:56:24 +0100
+Date: Tue, 23 Jul 2024 18:56:23 +0100
+Message-ID: <86bk2o2drs.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Sebastian Ott <sebott@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH v2 0/3] KVM: arm64: fix warnings in W=1 build
-In-Reply-To: <20240723101204.7356-1-sebott@redhat.com>
-References: <20240723101204.7356-1-sebott@redhat.com>
+To: Zhou Wang <wangzhou1@hisilicon.com>
+Cc: <kvmarm@lists.linux.dev>,
+	<linux-arm-kernel@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Nianyao
+ Tang <tangnianyao@huawei.com>
+Subject: Re: [PATCH 3/3] irqchip/gic-v4: Make sure a VPE is locked when VMAPP is issued
+In-Reply-To: <4b05e4fe-0906-102f-5697-eec7ee222bef@hisilicon.com>
+References: <20240705093155.871070-1-maz@kernel.org>
+	<20240705093155.871070-4-maz@kernel.org>
+	<2c9489cc-d276-7c52-5d52-7f234fdc726e@hisilicon.com>
+	<86h6cl39ff.wl-maz@kernel.org>
+	<4b05e4fe-0906-102f-5697-eec7ee222bef@hisilicon.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.3
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -58,48 +58,152 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sebott@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, yuzenghui@huawei.com, mark.rutland@arm.com
+X-SA-Exim-Rcpt-To: wangzhou1@hisilicon.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, tglx@linutronix.de, tangnianyao@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 23 Jul 2024 11:12:01 +0100,
-Sebastian Ott <sebott@redhat.com> wrote:
-> 
-> Building arch/arm64/kvm/ with W=1 spills out a lot of warnings. When
-> changing stuff I try to use as much tooling as possible to make sure
-> that I don't screw up - having a clean baseline imho helps with that.
-> 
-> With the first 2 patches applied make W=1 arch/arm64/kvm/ runs without
-> warnings for me (fedora userspace, upstream linux after kvm merge).
-> Patch 3 gets rid of sparse lock warnings in arch/arm64/kvm/vgic/.
-> 
-> Patch 1 now just adds -Wno-override-init to the cflags of the affected
-> files. Alternatives would be to add this to the whole subdir or
-> reintroduce the flag for higher warn levels..
-> 
-> Sebastian Ott (3):
->   KVM: arm64: fix override-init warnings in W=1 builds
->   KVM: arm64: fix kdoc warnings in W=1 builds
->   KVM: arm64: vgic: fix unexpected unlock sparse warnings
-> 
->  arch/arm64/kvm/Makefile          |  3 +++
->  arch/arm64/kvm/arm.c             |  1 +
->  arch/arm64/kvm/hyp/nvhe/Makefile |  2 ++
->  arch/arm64/kvm/hyp/vhe/Makefile  |  2 ++
->  arch/arm64/kvm/vgic/vgic-irqfd.c |  7 ++++---
->  arch/arm64/kvm/vgic/vgic-its.c   | 18 +++++++++++-------
->  arch/arm64/kvm/vgic/vgic-v3.c    |  2 +-
->  arch/arm64/kvm/vgic/vgic.c       |  2 +-
->  arch/arm64/kvm/vgic/vgic.h       |  2 +-
->  9 files changed, 26 insertions(+), 13 deletions(-)
+On Tue, 23 Jul 2024 02:51:32 +0100,
+Zhou Wang <wangzhou1@hisilicon.com> wrote:
+>=20
+> On 2024/7/19 19:31, Marc Zyngier wrote:
+> > On Fri, 19 Jul 2024 10:42:02 +0100,
+> > Zhou Wang <wangzhou1@hisilicon.com> wrote:
+> >>
+> >> On 2024/7/5 17:31, Marc Zyngier wrote:
+> >>> In order to make sure that vpe->col_idx is correctly sampled
+> >>> when a VMAPP command is issued, we must hold the lock for the
+> >>> VPE. This is now possible since the introduction of the per-VM
+> >>> vmapp_lock, which can be taken before vpe_lock in the locking
+> >>> order.
+> >>>
+> >>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> >>> ---
+> >>>  drivers/irqchip/irq-gic-v3-its.c | 8 ++++++--
+> >>>  1 file changed, 6 insertions(+), 2 deletions(-)
+> >>>
+> >>> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-g=
+ic-v3-its.c
+> >>> index b52d60097cad5..951ec140bcea2 100644
+> >>> --- a/drivers/irqchip/irq-gic-v3-its.c
+> >>> +++ b/drivers/irqchip/irq-gic-v3-its.c
+> >>> @@ -1810,7 +1810,9 @@ static void its_map_vm(struct its_node *its, st=
+ruct its_vm *vm)
+> >>>  		for (i =3D 0; i < vm->nr_vpes; i++) {
+> >>>  			struct its_vpe *vpe =3D vm->vpes[i];
+> >>> =20
+> >>> -			its_send_vmapp(its, vpe, true);
+> >>> +			scoped_guard(raw_spinlock, &vpe->vpe_lock)
+> >>> +				its_send_vmapp(its, vpe, true);
+> >>> +
+> >>>  			its_send_vinvall(its, vpe);
+> >>>  		}
+> >>>  	}
+> >>> @@ -1827,8 +1829,10 @@ static void its_unmap_vm(struct its_node *its,=
+ struct its_vm *vm)
+> >>>  	if (!--vm->vlpi_count[its->list_nr]) {
+> >>>  		int i;
+> >>> =20
+> >>> -		for (i =3D 0; i < vm->nr_vpes; i++)
+> >>> +		for (i =3D 0; i < vm->nr_vpes; i++) {
+> >>> +			guard(raw_spinlock)(&vm->vpes[i]->vpe_lock);
+> >>>  			its_send_vmapp(its, vm->vpes[i], false);
+> >>> +		}
+> >>>  	}
+> >>>  }
+> >>> =20
+> >>
+> >> Hi Marc,
+> >>
+> >> It looks like there is ABBA deadlock after applying this series:
+> >>
+> >> In its_map_vm: vmapp_lock -> vpe_lock
+> >> In its_vpe_set_affinity: vpe_to_cpuid_lock(vpe_lock) -> its_send_vmovp=
+(vmapp_lock)
+> >>
+> >> Any idea about this?
+> >=20
+> > Hmmm, well spotted. That's an annoying one.
+> >=20
+> > Can you give the below hack a go? I've only lightly tested it, as my
+> > D05 box is on its last leg (it is literally falling apart) and I don't
+> > have any other GICv4.x box to test on.
+> >=20
+> > Thanks,
+> >=20
+> > 	M.
+> >=20
+> > diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic=
+-v3-its.c
+> > index 951ec140bcea2..b88c6011c8771 100644
+> > --- a/drivers/irqchip/irq-gic-v3-its.c
+> > +++ b/drivers/irqchip/irq-gic-v3-its.c
+> > @@ -1328,12 +1328,6 @@ static void its_send_vmovp(struct its_vpe *vpe)
+> >  		return;
+> >  	}
+> > =20
+> > -	/*
+> > -	 * Protect against concurrent updates of the mapping state on
+> > -	 * individual VMs.
+> > -	 */
+> > -	guard(raw_spinlock_irqsave)(&vpe->its_vm->vmapp_lock);
+> > -
+> >  	/*
+> >  	 * Yet another marvel of the architecture. If using the
+> >  	 * its_list "feature", we need to make sure that all ITSs
+> > @@ -3808,7 +3802,7 @@ static int its_vpe_set_affinity(struct irq_data *=
+d,
+> >  	struct its_vpe *vpe =3D irq_data_get_irq_chip_data(d);
+> >  	unsigned int from, cpu =3D nr_cpu_ids;
+> >  	struct cpumask *table_mask;
+> > -	unsigned long flags;
+> > +	unsigned long flags, vmapp_flags;
+> > =20
+> >  	/*
+> >  	 * Changing affinity is mega expensive, so let's be as lazy as
+> > @@ -3822,7 +3816,14 @@ static int its_vpe_set_affinity(struct irq_data =
+*d,
+> >  	 * protect us, and that we must ensure nobody samples vpe->col_idx
+> >  	 * during the update, hence the lock below which must also be
+> >  	 * taken on any vLPI handling path that evaluates vpe->col_idx.
+> > +	 *
+> > +	 * Finally, we must protect ourselves against concurrent
+> > +	 * updates of the mapping state on this VM should the ITS list
+> > +	 * be in use.
+> >  	 */
+> > +	if (its_list_map)
+> > +		raw_spin_lock_irqsave(&vpe->its_vm->vmapp_lock, vmapp_flags);
+> > +
+> >  	from =3D vpe_to_cpuid_lock(vpe, &flags);
+> >  	table_mask =3D gic_data_rdist_cpu(from)->vpe_table_mask;
+> > =20
+> > @@ -3852,6 +3853,9 @@ static int its_vpe_set_affinity(struct irq_data *=
+d,
+> >  	irq_data_update_effective_affinity(d, cpumask_of(cpu));
+> >  	vpe_to_cpuid_unlock(vpe, flags);
+> > =20
+> > +	if (its_list_map)
+> > +		raw_spin_unlock_irqrestore(&vpe->its_vm->vmapp_lock, vmapp_flags);
+> > +
+> >  	return IRQ_SET_MASK_OK_DONE;
+> >  }
+> >
+>=20
+> Hi Marc=EF=BC=8C
+>=20
+> We add above code to do test again. Now it is OK.
 
-For the series, and assuming we take this in 6.11::
+Great, thanks for giving it a go. I have just posted an actual patch
+(with the exact same change) at [1]. It would be good if you could
+give it a Tested-by: tag.
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
+Thanks,
 
 	M.
 
--- 
+[1] https://lore.kernel.org/r/20240723175203.3193882-1-maz@kernel.org
+
+--=20
 Without deviation from the norm, progress is not possible.
