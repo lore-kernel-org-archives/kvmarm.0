@@ -1,96 +1,116 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68E6F1429A
-	for <kvmarm@lists.linux.dev>; Tue, 23 Jul 2024 08:57:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57EC914E2F4
+	for <kvmarm@lists.linux.dev>; Tue, 23 Jul 2024 10:12:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721725051; cv=none; b=rkpu/4n7+xLakoOsVdgUS/UbOBvahq+Pv8kiEr6h9Blgb5+RNAYQPdlnqBrCYe+Czco7AQsOpFvlhCwgg5F0t6zQ1eYCsAvvbAk8pT+H01VZjypN0QGhwKrZbAJu2PAAAIpV3xOljPoKCjgygWqi00aPEw1qbEBohC3u5rC7rNc=
+	t=1721729535; cv=none; b=pMzGLVCngxu3kbu8SY+n9qpS/rp1xMosDgniJGI9SFL1x1TYnBKwpmoV0pWFW8jZMOxmaYQqJbUG+ZMubfNej0xAtGcjzerGOEtopIcz40hGCSUQs7mcWf6GTgftG8/i1T4w0ttDWHn+itgTjUCzva36e1Y5BcGcjQXOx+M1ZKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721725051; c=relaxed/simple;
-	bh=gvpFIsIWSjCkgJeJVwYZD0Ypa7vJ5HnFOsuayUaovc0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eH1Y9S/Wqvor6MJh8UqvNKym0dp+abpRbvDPQMfKddrCKkkotkulujwXAmBtxiAn+IfDdPvOOW9D3JVY+6KoBpRoK2vHIPp/0rZ/TkVbRx5X1Y0dnQ5TN/X994TLYKKBqCBQQbLQfubK9o4o0fJeEMJb4dFV5yvV9yatZEZHF9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 49D87139F;
-	Tue, 23 Jul 2024 01:57:53 -0700 (PDT)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2F0673F766;
-	Tue, 23 Jul 2024 01:57:26 -0700 (PDT)
-Date: Tue, 23 Jul 2024 09:57:23 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	s=arc-20240116; t=1721729535; c=relaxed/simple;
+	bh=tIH8+pIIMMdAuQFVddSnwAJv1MQB2deGmxLg6GqUWmg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KR3oxwB9gMXw8SlmexESPH6ZUNNWD0+741FuZIWKEMKIaWhAG9fvQu8uJpzPp4o+PDy03hnoay5MNLWN0Z7y9Kj6lxypYum3vMAp+yCHgMB/AtkgqMamaUgSr3Din6wL68gEh35bzdOIE6Z1ncmEE/6RzK8b0T5HrAa25CxJYzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Pd94vRuv; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pd94vRuv"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1721729532;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=8cUp6hq8Rf9yICEw+ij+wA/0ySScqHZkH2/Mn4b/iJI=;
+	b=Pd94vRuvNvPkmMzGgB08j+Ns1jh6yEQzHZ9FtPqhNXl1N3l3tRh0rp3mhIphVoMF0Zu9Bb
+	jlcn/GXqngZ4FJTOBSbHanL66pIgAL6icD0Yxi3/Ss/H0tOdgZcKtj+cO/0lbheG3mAN5C
+	do7znY493edCNlAVP6tCmLYK9CiSr3Q=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-281-lsgEKo1VO16Jnm-UA6jlDg-1; Tue, 23 Jul 2024 06:12:10 -0400
+X-MC-Unique: lsgEKo1VO16Jnm-UA6jlDg-1
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-79f0a17bb2aso705635585a.1
+        for <kvmarm@lists.linux.dev>; Tue, 23 Jul 2024 03:12:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721729530; x=1722334330;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8cUp6hq8Rf9yICEw+ij+wA/0ySScqHZkH2/Mn4b/iJI=;
+        b=HvzRiuo0048szKi84Tf6Lq9lwvFWDMF8zYEs8aI+GD6/hAQLMv5QenuqS2aE+kJzJL
+         FHjlNh2BncN+hMIVIkATqDzSfhpwdqfdC+/As0+kKXJe4aC1+XJpnJsJ1380yVG9zWyH
+         wkXyuyZWbNv+R+GHd4LiJAdm9YBaHy/Dxq0yxS9QIkXOI1/2Ap05HZSjle4auHsLwdap
+         zCPA87CjqeehID1OOy/JuZcaHzvA7m6+BSob+7Z7qGxW7sQaycUgWUtRccGrUZ3uDuil
+         OLxpf+mRj8G1XFLjC13PRLpBXaVdp7BmglD7LecqaQ6jra8FKdUu5l2Zto5vFhSFcgPW
+         nMsg==
+X-Forwarded-Encrypted: i=1; AJvYcCX/95AZ9jrVy/j/en597vNiIzT4F//zjUHvXfieQ/5jELbk5zDd5rdc6wemB1dDcSgQSGtNdEsJbPdQstLOaJ2LJK+nYzyD
+X-Gm-Message-State: AOJu0YyM0TW+rQqF6RYOUX87CZ/gpNBpNu1fl17cPrMqno65kJrS7Tuk
+	EoZCobSYu/ydweii86MoqP/KhW8EZk1p32JltTVEGKE6sBlqRxk/eoiFBYmw9q32HB9ZrA36qhS
+	DRQPo1Oq38uJM9mNtn+uqK2rm9gncecJa0oLNzrnHr6rk8siIhjPLhT1dor+rqw==
+X-Received: by 2002:a05:620a:29d5:b0:79e:ff47:3307 with SMTP id af79cd13be357-7a1a130a702mr1465270685a.8.1721729530135;
+        Tue, 23 Jul 2024 03:12:10 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFyt0QS1IKTLLjiIiYvN5IywSbQLXxQfkNLU8SejKutptyLr0Xnp/x8tl4jKx3X5B48LdDkqQ==
+X-Received: by 2002:a05:620a:29d5:b0:79e:ff47:3307 with SMTP id af79cd13be357-7a1a130a702mr1465268685a.8.1721729529791;
+        Tue, 23 Jul 2024 03:12:09 -0700 (PDT)
+Received: from rh.redhat.com (p200300c93f45e50062e5f8c654844c9a.dip0.t-ipconnect.de. [2003:c9:3f45:e500:62e5:f8c6:5484:4c9a])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a1990063f2sm463780085a.64.2024.07.23.03.12.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Jul 2024 03:12:09 -0700 (PDT)
+From: Sebastian Ott <sebott@redhat.com>
+To: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Cc: Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>, Joey Gouly <joey.gouly@arm.com>
-Subject: Re: [PATCH 10/12] KVM: arm64: nv: Add SW walker for AT S1 emulation
-Message-ID: <Zp9wc6PS9m6TMrHA@raptor>
-References: <20240625133508.259829-1-maz@kernel.org>
- <20240708165800.1220065-1-maz@kernel.org>
- <Zp46GUJJ9xBWsJsQ@raptor>
- <874j8h5u0j.wl-maz@kernel.org>
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Mark Rutland <mark.rutland@arm.com>
+Subject: [PATCH v2 0/3] KVM: arm64: fix warnings in W=1 build
+Date: Tue, 23 Jul 2024 12:12:01 +0200
+Message-ID: <20240723101204.7356-1-sebott@redhat.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <874j8h5u0j.wl-maz@kernel.org>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"; x-default=true
 
-Hi Marc,
+Building arch/arm64/kvm/ with W=1 spills out a lot of warnings. When
+changing stuff I try to use as much tooling as possible to make sure
+that I don't screw up - having a clean baseline imho helps with that.
 
-On Mon, Jul 22, 2024 at 04:25:00PM +0100, Marc Zyngier wrote:
-> Hi Alex,
-> 
-> On Mon, 22 Jul 2024 11:53:13 +0100,
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> > 
-> > Hi Marc,
-> > 
-> > I would like to use the S1 walker for KVM SPE, and I was planning to move it to
-> > a separate file, where it would be shared between nested KVM and SPE. I think
-> > this is also good for NV, since the walker would get more testing.
-> > 
-> > Do you think moving it to a shared location is a good approach? Or do you have
-> > something else in mind?
-> 
-> I'm definitely open to moving it somewhere else if that helps, though
-> the location doesn't matter much, TBH, and it is the boundary of the
-> interface I'm more interested in. It may need some work though, as the
-> current design is solely written with AT in mind.
+With the first 2 patches applied make W=1 arch/arm64/kvm/ runs without
+warnings for me (fedora userspace, upstream linux after kvm merge).
+Patch 3 gets rid of sparse lock warnings in arch/arm64/kvm/vgic/.
 
-Looks that way to me too.
+Patch 1 now just adds -Wno-override-init to the cflags of the affected
+files. Alternatives would be to add this to the whole subdir or
+reintroduce the flag for higher warn levels..
 
-> 
-> > Also, do you know where you'll be able to send an updated version of this
-> > series? I'm asking because I want to decide between using this code (with fixes
-> > on top) or wait for the next iteration. Please don't feel that you need to send
-> > the next iteration too soon.
-> 
-> The current state of the branch is at [1], which I plan to send once
-> -rc1 is out. Note that this isn't a stable branch, so things can
-> change without any warning!
-> 
-> > And please CC me on the series, so I don't miss it by mistake :)
-> 
-> Of course!
+Sebastian Ott (3):
+  KVM: arm64: fix override-init warnings in W=1 builds
+  KVM: arm64: fix kdoc warnings in W=1 builds
+  KVM: arm64: vgic: fix unexpected unlock sparse warnings
 
-Sounds great, thanks!
+ arch/arm64/kvm/Makefile          |  3 +++
+ arch/arm64/kvm/arm.c             |  1 +
+ arch/arm64/kvm/hyp/nvhe/Makefile |  2 ++
+ arch/arm64/kvm/hyp/vhe/Makefile  |  2 ++
+ arch/arm64/kvm/vgic/vgic-irqfd.c |  7 ++++---
+ arch/arm64/kvm/vgic/vgic-its.c   | 18 +++++++++++-------
+ arch/arm64/kvm/vgic/vgic-v3.c    |  2 +-
+ arch/arm64/kvm/vgic/vgic.c       |  2 +-
+ arch/arm64/kvm/vgic/vgic.h       |  2 +-
+ 9 files changed, 26 insertions(+), 13 deletions(-)
 
-Alex
+-- 
+2.42.0
 
-> 
-> Thanks,
-> 
-> 	M.
-> 
-> [1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/nv-at-pan-WIP
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
-> 
