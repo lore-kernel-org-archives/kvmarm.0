@@ -1,79 +1,101 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 768A014A4E7;
-	Tue, 23 Jul 2024 14:22:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F330C154BE8;
+	Tue, 23 Jul 2024 15:00:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721744531; cv=none; b=qJ6XRJb3HiY8ztMsFN4J3bwHMRNlYEKQI7bwNYzqEt1oRUlcJzobF3JZixc1pPP/+14QDN7QDYusxBVB8GGAbs6GAmnrG1qdV3b0xIE8Yw6FnEE1Th0RFcBz1hbnc52LLWMuapq4vPaOHRylUwcwGoQXuk3t6ujYgvA/gKCy+0U=
+	t=1721746808; cv=none; b=u1+ZdlSIP5bcCm5mK0Ks7oL3NM0U0Ecbaa9JvLEx1H+cJxMB5QPyiQ0gDxHvaWElQNL6m8pgZQchi7YDSeGa+p2g0r5RSH53TvYcdhGSotVbktW+O4VnZiX4K8QOkiICa6kDLBhkQT8VxnBvjnOtIqGypufw4jczss7iqEchxTU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721744531; c=relaxed/simple;
-	bh=TIjiGfjzkpS2+OrsvnfRb0ZLD4KZZ+C4Xk4CqNc0b+A=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=t4s6WtYRV4KWJFJpnxn1nAcN/hx2MGU/xxcV2TN7U2dDYIN2SmCbHy+9bkDzk3pvIqcYaOVYBrTGiEwozsmKqhZrtwVA86uQnnGadyqv/tlc8h0odepJQzx1mLa6qwTkPAJABnATqMztxy13EIQQieYVURBiul/RxyYndhHuPik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nUBMasV2; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1721746808; c=relaxed/simple;
+	bh=4DA2XWj/UrCTxITuQswP8CQ61smzRnN3hRrP34Z4cjY=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SlkXdCaL7wTAfCUHQSJU3qMjdxSazP33ISmw/3hLUWUYsPHO52IOypLISR5VIqoYOlEMUD6VLSWRZThUcmEaBbX0AjtSRAg3wr1avQVbXtetK2ksLcH7lmlGuwwmUGba5cuv/1HZvlAtO8EPGI6Hcx0NVggQw97XM+HIqRJi0SQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DS8tyUU7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nUBMasV2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F7ADC4AF0C;
-	Tue, 23 Jul 2024 14:22:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DS8tyUU7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 807DCC4AF0A;
+	Tue, 23 Jul 2024 15:00:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721744531;
-	bh=TIjiGfjzkpS2+OrsvnfRb0ZLD4KZZ+C4Xk4CqNc0b+A=;
-	h=From:To:Cc:Subject:Date:From;
-	b=nUBMasV2jzP+8/5uuYJuvFFMcd6vYWtjY4JSV6jqJIU7eKmkj7YIexEZYM23I+F5p
-	 iNpiD5U5iy2VfukW7OuK7+3SEzcDJTSPypcbGlj65J7w8e3qpnBBcexqKGUKDs1fNW
-	 m1ncSMatPpfQ3zR8Sm+XjJeYm8auz8UuNJnXMXxuD6Dz+k+2sIftRZFaGe9xtQj3/U
-	 bbUx3e6lLkAUH27HUKW2/oSL/BfEoUYmN9N5haoeWJegwuP5Ux+eRKaVbGJwd9q9yk
-	 0BVYEBpw+f25gMig5UhSqumOPnzjQ5TuX+XamoS1dOhhBA1bjRYZui5nwrWbhhHEmK
-	 eNnJZQIdWbx9A==
-From: Danilo Krummrich <dakr@kernel.org>
-To: maz@kernel.org,
-	oliver.upton@linux.dev,
+	s=k20201202; t=1721746807;
+	bh=4DA2XWj/UrCTxITuQswP8CQ61smzRnN3hRrP34Z4cjY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=DS8tyUU7ud8/42wIElau7PNvNstxx1rBpQJsMWYVk7f2lSjpmVbhmFHPe9+c9hfpk
+	 VBgE9UrvxsFvKSDG48exXBpp+gG0xG3iIqp8BeUD5EMT5Bv0JGKtL/K6V25AlRdK4h
+	 Q3P1v6REJ9KW1lClfN4IWnqikeciltd3NRDbMjJ8XsGBBmtWdB8OHGjBXeMvbW8KuN
+	 cn1UX3iiCtpCunQS1t0Wru+kjo3MnEzmyIDzLgwvaEZRoJFXe9F4OpviPJ3IfEgS5J
+	 Go1GsLGygzVNXIXo5qbEXwbKxWmLDnSFoU2Tzfm6McroBfpgC9mvo2lE2ZYhM7kQ8l
+	 ViH3XDspvDiQw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sWGzl-00Ekd3-3P;
+	Tue, 23 Jul 2024 16:00:05 +0100
+Date: Tue, 23 Jul 2024 16:00:04 +0100
+Message-ID: <86ed7k2lxn.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Danilo Krummrich <dakr@kernel.org>
+Cc: oliver.upton@linux.dev,
 	james.morse@arm.com,
 	suzuki.poulose@arm.com,
 	yuzenghui@huawei.com,
 	catalin.marinas@arm.com,
 	will@kernel.org,
-	christoffer.dall@arm.com
-Cc: linux-arm-kernel@lists.infradead.org,
+	christoffer.dall@arm.com,
+	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Danilo Krummrich <dakr@kernel.org>
-Subject: [PATCH] KVM: arm64: free kvm->arch.nested_mmus with kvfree()
-Date: Tue, 23 Jul 2024 16:20:52 +0200
-Message-ID: <20240723142204.758796-1-dakr@kernel.org>
-X-Mailer: git-send-email 2.45.2
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: free kvm->arch.nested_mmus with kvfree()
+In-Reply-To: <20240723142204.758796-1-dakr@kernel.org>
+References: <20240723142204.758796-1-dakr@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.3
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: dakr@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, christoffer.dall@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-kvm->arch.nested_mmus is allocated with kvrealloc(), hence free it with
-kvfree() instead of kfree().
+On Tue, 23 Jul 2024 15:20:52 +0100,
+Danilo Krummrich <dakr@kernel.org> wrote:
+> 
+> kvm->arch.nested_mmus is allocated with kvrealloc(), hence free it with
+> kvfree() instead of kfree().
+> 
+> Fixes: 4f128f8e1aaa ("KVM: arm64: nv: Support multiple nested Stage-2 mmu structures")
+> Signed-off-by: Danilo Krummrich <dakr@kernel.org>
+> ---
+>  arch/arm64/kvm/nested.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index de789e0f1ae9..bab27f9d8cc6 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -786,7 +786,7 @@ void kvm_arch_flush_shadow_all(struct kvm *kvm)
+>  		if (!WARN_ON(atomic_read(&mmu->refcnt)))
+>  			kvm_free_stage2_pgd(mmu);
+>  	}
+> -	kfree(kvm->arch.nested_mmus);
+> +	kvfree(kvm->arch.nested_mmus);
+>  	kvm->arch.nested_mmus = NULL;
+>  	kvm->arch.nested_mmus_size = 0;
+>  	kvm_uninit_stage2_mmu(kvm);
+> 
 
-Fixes: 4f128f8e1aaa ("KVM: arm64: nv: Support multiple nested Stage-2 mmu structures")
-Signed-off-by: Danilo Krummrich <dakr@kernel.org>
----
- arch/arm64/kvm/nested.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Ah, nice catch. Thanks for fixing it.
 
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index de789e0f1ae9..bab27f9d8cc6 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -786,7 +786,7 @@ void kvm_arch_flush_shadow_all(struct kvm *kvm)
- 		if (!WARN_ON(atomic_read(&mmu->refcnt)))
- 			kvm_free_stage2_pgd(mmu);
- 	}
--	kfree(kvm->arch.nested_mmus);
-+	kvfree(kvm->arch.nested_mmus);
- 	kvm->arch.nested_mmus = NULL;
- 	kvm->arch.nested_mmus_size = 0;
- 	kvm_uninit_stage2_mmu(kvm);
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
-base-commit: 66ebbdfdeb093e097399b1883390079cd4c3022b
+	M.
+
 -- 
-2.45.2
-
+Without deviation from the norm, progress is not possible.
