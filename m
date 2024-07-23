@@ -1,63 +1,63 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3249B14F114
-	for <kvmarm@lists.linux.dev>; Tue, 23 Jul 2024 10:12:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C281214F11C
+	for <kvmarm@lists.linux.dev>; Tue, 23 Jul 2024 10:12:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721729541; cv=none; b=RTjmUhG0UgO8wEBNuZdFiqnHm6USnCJ0pPCmO5hTXVWFvtsHHlZNR52TwOjFf6qatAG3cQYeWn8FchW3vsd55pHyZTUIxhtBdqLgr8pqYkIeWIHZANEIotmbbZrCkZ1pTabUjX0FaqwxNWok4IKpoRt5Ah7xZ+fmjeQQNZQaCT0=
+	t=1721729544; cv=none; b=PmB1vWWc/A5sq4xMCvyyMoZTreOAi+6elOUC7lsK8mob+seToMfSGiddUnUlG3FuFT3HL2jOmfLNVx/zHfoDWAvO/kOJ4C+NPoEEYu7D6iruSMLFqGteNyz4ZrvE4ylal/kI8wib2xy3L0EETjW3DquLwWfjG4jTs8EMDgGaomA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721729541; c=relaxed/simple;
-	bh=AYfOsTim18mKk3f/6TIR5xq65kd3Yt1GDi3RAW/TNkk=;
+	s=arc-20240116; t=1721729544; c=relaxed/simple;
+	bh=rTkj/gLNEoKH1Qi6UhwNBuSC4NJP/u445SQy5IWYwE4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=F2TpbtHZ+vR143wBIuO90qLoEv0AIJMiCzTRcoQwc235n2KO+jCdCL9QVe8ndQl66vB6H7ti8/k5XHtDKwe1keMNgSozHtXlpny8pphNT2KnbUdjTccHA7Sjnx//WD4dgEFb62cNUuSGb0so4i2J6C5tYYysX8Yne16tdwzShlw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RFTZnM47; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version:Content-Type; b=S9r07j7IxP1wyujQSKN7BHaXUKsa7li8Pt89D/wE6M28siYijHpiu619snNcpzIJPksVzHYkfqAs0clw6UWzrC3weAg/rnxaMCIPn2N6KonyavQ2dTvKjMtT7le2iHidVdXXvPwv0oLyLeyt8PyWSelGlvR6Md9RxLEhbKcLpDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gdVi975J; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RFTZnM47"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gdVi975J"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721729538;
+	s=mimecast20190719; t=1721729541;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=eYU79afplONI6yVx+AGbEJT6iE6q/eJtdNUT3lyaw3g=;
-	b=RFTZnM47HS+5suk9wrSHLAoUGti69M76bB2AMpOIpr1ba6GJgEhnchki4Rcvv7oPnen2tN
-	ISh4lQ5JSyQWpHHXqo2xCZxl9kLmAq5C5glqKf9DdAVPfcIyPpOimYmGzqpKtxYsxe5eQo
-	wcJC8aJadu7YAHTSWnWLdK6m5GNrVjE=
+	bh=QS7Q6moReX0ytgpoj7OMDTRK1GZLav9EGBrr2p1MFoI=;
+	b=gdVi975JW0gftFiFUVDjvNWq9WPPkhnDUkocixHD+6e1f8/RLV/6LYKY0l+nS8Qixqhkz5
+	vquuvYzcDsr1lP3u7tLoN2zIfaYH44+AwNghsJH0tiwxY8WUjzgEPGUWc7wDVuPIUxxayq
+	bxaBd4reWVuI7lR3JbiQdIuYR+yjNh4=
 Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
  [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-339-MfZjfQ6UMMmq27KGDfFKYQ-1; Tue, 23 Jul 2024 06:12:17 -0400
-X-MC-Unique: MfZjfQ6UMMmq27KGDfFKYQ-1
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7a1985748dcso626788885a.3
-        for <kvmarm@lists.linux.dev>; Tue, 23 Jul 2024 03:12:17 -0700 (PDT)
+ us-mta-493-W1zjPlEfPb2OTNMNfgUSHg-1; Tue, 23 Jul 2024 06:12:20 -0400
+X-MC-Unique: W1zjPlEfPb2OTNMNfgUSHg-1
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-79efd11a9faso615168585a.3
+        for <kvmarm@lists.linux.dev>; Tue, 23 Jul 2024 03:12:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721729536; x=1722334336;
+        d=1e100.net; s=20230601; t=1721729540; x=1722334340;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=eYU79afplONI6yVx+AGbEJT6iE6q/eJtdNUT3lyaw3g=;
-        b=QFfTJCADYjwA+DK/M79pOaz28VzGePG1tBWxVVVqYPxrJSgLMP69CniWlX2z0GOef3
-         5IX7ExSQ+9F8w3c3X3JxJnwFvZeh8flPlGb+WtSh1hOgsYmkHVhhEMHPw419mvXmuxnR
-         TbLrbZTpeMQeDrQKSX3wyDYNdgazBcqBYihsnv/3iNp23id7oQBcxvEUeqm+/hu1kKSN
-         v/4EQSKA9lsNNxGSZNuHUAP1x67MTDaaCsCsBpF0b3dmLgudSsvv1itsLOgUrZ++UgYE
-         rCGuT34Ks9C4bIlVHRxRWHxroQH28bAjEAvKuYfN6SmdwwtlJJ+0rlQx17m2BvQ6lfyM
-         2Liw==
-X-Forwarded-Encrypted: i=1; AJvYcCW1GXuD6UGbSJql/2A5WUlv2Bbm9NLydBrACECZHUXhoFDFC86x0+FcCWvAqCQh10Hzbulb7w6T58OERfYTVcdQY7aXA/V7
-X-Gm-Message-State: AOJu0YwZcyj1dA4tdEI4YvCy/uJvo3Cv+LltEsbIf/qvErdqnmLjzJsY
-	T4axBVkiR+s6yyTWDWaLaFZHS/BoK2phcRjAj0bXzOj4/WlmUxNSpvNhdM/9Dhl/iErsblH8Xpq
-	/gRsgpxz3dniiNhc4qxX9y+f91OFdcw+y4wTW50oja4TzM0Llv6SY3w==
-X-Received: by 2002:a05:620a:2889:b0:79f:186e:40ae with SMTP id af79cd13be357-7a1a66656edmr1162831985a.53.1721729536482;
-        Tue, 23 Jul 2024 03:12:16 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFLHZv1++yvDs2k3NZSaNv8PP8WkhYN1uecWcb93Utq4aaTWS6WbOltpz2JXXEdPG07aFrkHg==
-X-Received: by 2002:a05:620a:2889:b0:79f:186e:40ae with SMTP id af79cd13be357-7a1a66656edmr1162829385a.53.1721729536084;
-        Tue, 23 Jul 2024 03:12:16 -0700 (PDT)
+        bh=QS7Q6moReX0ytgpoj7OMDTRK1GZLav9EGBrr2p1MFoI=;
+        b=nxSvKVeK//0hDQ0nbNmmdPbTxMyigo8i86Sic4GnWvbDf9M7AyVbhkYdc4TSAAB6rp
+         dPqDpG5Y7FdRvUS0YFJHHyHUdbdr2fOKTZpFkwiP2FpyZOyu+bTYaIt+5D2DEATXX8GI
+         A0x7kvNx8GCR3IBGGgX41NngXEnXpTmGn8c04Y5LdxlNTlKoExJcTwGzqlGZkWYhu/ee
+         rO7N7CCTZRWWzi04lQGu7/YBFg5wlhxVgjdDo8TZEpkCwc88ojjS9WAn+u9QWXci6Yrv
+         HYtEZc4vkXWZ7sxcb04B2NXw6DglB/uDZzUYCn3m7PPtHO69If2ZJFQE6hvqiZHjVxlT
+         JJLw==
+X-Forwarded-Encrypted: i=1; AJvYcCUhhIpsXJfxUGGEkXX/jrWNaxFNCWoM41G4/7c3yjMEgdBV08BgLrgVXPwcseREH9WhyExdmCZO/MnbQOKzwzs7ydqX2//T
+X-Gm-Message-State: AOJu0Yw/VeWaVcIvCWV7n/Ng4HejzsJSGm23a2z5rL/IQOr5DTIwww3B
+	Rb3JbJUqDCZtaBt38dovoyFEkH/xMBnGewmo4/8N5gtMC1T0CZSSE00uiAk4LSrEgFWf0hzW/3Z
+	pys7bexgLW3yWGGlbw2eI61E/TOzDfiqBACII2D+UEhCFpdeLfr9qlQ==
+X-Received: by 2002:a05:620a:244d:b0:79d:569a:699f with SMTP id af79cd13be357-7a1a654db8cmr1283855085a.39.1721729539868;
+        Tue, 23 Jul 2024 03:12:19 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF2wFZtBagU/E46pV0uxTwzvChsAR2Dj7XVxuoFQCCKIFbTAHgkyz2V/BD0RPFoS8SnlRhwYw==
+X-Received: by 2002:a05:620a:244d:b0:79d:569a:699f with SMTP id af79cd13be357-7a1a654db8cmr1283853185a.39.1721729539500;
+        Tue, 23 Jul 2024 03:12:19 -0700 (PDT)
 Received: from rh.redhat.com (p200300c93f45e50062e5f8c654844c9a.dip0.t-ipconnect.de. [2003:c9:3f45:e500:62e5:f8c6:5484:4c9a])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a1990063f2sm463780085a.64.2024.07.23.03.12.13
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a1990063f2sm463780085a.64.2024.07.23.03.12.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jul 2024 03:12:15 -0700 (PDT)
+        Tue, 23 Jul 2024 03:12:19 -0700 (PDT)
 From: Sebastian Ott <sebott@redhat.com>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
@@ -70,9 +70,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Will Deacon <will@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Mark Rutland <mark.rutland@arm.com>
-Subject: [PATCH v2 2/3] KVM: arm64: fix kdoc warnings in W=1 builds
-Date: Tue, 23 Jul 2024 12:12:03 +0200
-Message-ID: <20240723101204.7356-3-sebott@redhat.com>
+Subject: [PATCH v2 3/3] KVM: arm64: vgic: fix unexpected unlock sparse warnings
+Date: Tue, 23 Jul 2024 12:12:04 +0200
+Message-ID: <20240723101204.7356-4-sebott@redhat.com>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20240723101204.7356-1-sebott@redhat.com>
 References: <20240723101204.7356-1-sebott@redhat.com>
@@ -87,166 +87,44 @@ X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="US-ASCII"; x-default=true
 
-Fix kdoc warnings by adding missing function parameter
-descriptions or by conversion to a normal comment.
+Get rid of unexpected unlock sparse warnings in vgic code
+by adding an annotation to vgic_queue_irq_unlock().
+
+arch/arm64/kvm/vgic/vgic.c:334:17: warning: context imbalance in 'vgic_queue_irq_unlock' - unexpected unlock
+arch/arm64/kvm/vgic/vgic.c:419:5: warning: context imbalance in 'kvm_vgic_inject_irq' - different lock contexts for basic block
 
 Signed-off-by: Sebastian Ott <sebott@redhat.com>
 ---
- arch/arm64/kvm/arm.c             |  1 +
- arch/arm64/kvm/vgic/vgic-irqfd.c |  7 ++++---
- arch/arm64/kvm/vgic/vgic-its.c   | 18 +++++++++++-------
- arch/arm64/kvm/vgic/vgic-v3.c    |  2 +-
- 4 files changed, 17 insertions(+), 11 deletions(-)
+ arch/arm64/kvm/vgic/vgic.c | 2 +-
+ arch/arm64/kvm/vgic/vgic.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index a7ca776b51ec..23e1fa56c02d 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -164,6 +164,7 @@ static int kvm_arm_default_max_vcpus(void)
- /**
-  * kvm_arch_init_vm - initializes a VM data structure
-  * @kvm:	pointer to the KVM struct
-+ * @type:	kvm device type
+diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+index f07b3ddff7d4..974849ea7101 100644
+--- a/arch/arm64/kvm/vgic/vgic.c
++++ b/arch/arm64/kvm/vgic/vgic.c
+@@ -313,7 +313,7 @@ static bool vgic_validate_injection(struct vgic_irq *irq, bool level, void *owne
+  * with all locks dropped.
   */
- int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
+-			   unsigned long flags)
++			   unsigned long flags) __releases(&irq->irq_lock)
  {
-diff --git a/arch/arm64/kvm/vgic/vgic-irqfd.c b/arch/arm64/kvm/vgic/vgic-irqfd.c
-index 8c711deb25aa..c314c016659a 100644
---- a/arch/arm64/kvm/vgic/vgic-irqfd.c
-+++ b/arch/arm64/kvm/vgic/vgic-irqfd.c
-@@ -9,7 +9,7 @@
- #include <kvm/arm_vgic.h>
- #include "vgic.h"
+ 	struct kvm_vcpu *vcpu;
  
--/**
-+/*
-  * vgic_irqfd_set_irq: inject the IRQ corresponding to the
-  * irqchip routing entry
-  *
-@@ -75,7 +75,8 @@ static void kvm_populate_msi(struct kvm_kernel_irq_routing_entry *e,
- 	msi->flags = e->msi.flags;
- 	msi->devid = e->msi.devid;
- }
--/**
-+
-+/*
-  * kvm_set_msi: inject the MSI corresponding to the
-  * MSI routing entry
-  *
-@@ -98,7 +99,7 @@ int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
- 	return vgic_its_inject_msi(kvm, &msi);
- }
- 
--/**
-+/*
-  * kvm_arch_set_irq_inatomic: fast-path for irqfd injection
-  */
- int kvm_arch_set_irq_inatomic(struct kvm_kernel_irq_routing_entry *e,
-diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 40bb43f20bf3..ba945ba78cc7 100644
---- a/arch/arm64/kvm/vgic/vgic-its.c
-+++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -2040,6 +2040,7 @@ typedef int (*entry_fn_t)(struct vgic_its *its, u32 id, void *entry,
-  * @start_id: the ID of the first entry in the table
-  * (non zero for 2d level tables)
-  * @fn: function to apply on each entry
-+ * @opaque: pointer to opaque data
-  *
-  * Return: < 0 on error, 0 if last element was identified, 1 otherwise
-  * (the last element may not be found on second level tables)
-@@ -2079,7 +2080,7 @@ static int scan_its_table(struct vgic_its *its, gpa_t base, int size, u32 esz,
- 	return 1;
- }
- 
--/**
-+/*
-  * vgic_its_save_ite - Save an interrupt translation entry at @gpa
-  */
- static int vgic_its_save_ite(struct vgic_its *its, struct its_device *dev,
-@@ -2099,6 +2100,8 @@ static int vgic_its_save_ite(struct vgic_its *its, struct its_device *dev,
- 
- /**
-  * vgic_its_restore_ite - restore an interrupt translation entry
-+ *
-+ * @its: its handle
-  * @event_id: id used for indexing
-  * @ptr: pointer to the ITE entry
-  * @opaque: pointer to the its_device
-@@ -2231,6 +2234,7 @@ static int vgic_its_restore_itt(struct vgic_its *its, struct its_device *dev)
-  * @its: ITS handle
-  * @dev: ITS device
-  * @ptr: GPA
-+ * @dte_esz: device table entry size
-  */
- static int vgic_its_save_dte(struct vgic_its *its, struct its_device *dev,
- 			     gpa_t ptr, int dte_esz)
-@@ -2313,7 +2317,7 @@ static int vgic_its_device_cmp(void *priv, const struct list_head *a,
- 		return 1;
- }
- 
--/**
-+/*
-  * vgic_its_save_device_tables - Save the device table and all ITT
-  * into guest RAM
-  *
-@@ -2386,7 +2390,7 @@ static int handle_l1_dte(struct vgic_its *its, u32 id, void *addr,
- 	return ret;
- }
- 
--/**
-+/*
-  * vgic_its_restore_device_tables - Restore the device table and all ITT
-  * from guest RAM to internal data structs
-  */
-@@ -2478,7 +2482,7 @@ static int vgic_its_restore_cte(struct vgic_its *its, gpa_t gpa, int esz)
- 	return 1;
- }
- 
--/**
-+/*
-  * vgic_its_save_collection_table - Save the collection table into
-  * guest RAM
-  */
-@@ -2518,7 +2522,7 @@ static int vgic_its_save_collection_table(struct vgic_its *its)
- 	return ret;
- }
- 
--/**
-+/*
-  * vgic_its_restore_collection_table - reads the collection table
-  * in guest memory and restores the ITS internal state. Requires the
-  * BASER registers to be restored before.
-@@ -2556,7 +2560,7 @@ static int vgic_its_restore_collection_table(struct vgic_its *its)
- 	return ret;
- }
- 
--/**
-+/*
-  * vgic_its_save_tables_v0 - Save the ITS tables into guest ARM
-  * according to v0 ABI
-  */
-@@ -2571,7 +2575,7 @@ static int vgic_its_save_tables_v0(struct vgic_its *its)
- 	return vgic_its_save_collection_table(its);
- }
- 
--/**
-+/*
-  * vgic_its_restore_tables_v0 - Restore the ITS tables from guest RAM
-  * to internal data structs according to V0 ABI
-  *
-diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-index ed6e412cd74b..3eecdd2f4b8f 100644
---- a/arch/arm64/kvm/vgic/vgic-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3.c
-@@ -370,7 +370,7 @@ static void map_all_vpes(struct kvm *kvm)
- 						dist->its_vm.vpes[i]->irq));
- }
- 
--/**
-+/*
-  * vgic_v3_save_pending_tables - Save the pending tables into guest RAM
-  * kvm lock and all vcpu lock must be held
-  */
+diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+index 03d356a12377..ba8f790431bd 100644
+--- a/arch/arm64/kvm/vgic/vgic.h
++++ b/arch/arm64/kvm/vgic/vgic.h
+@@ -186,7 +186,7 @@ bool vgic_get_phys_line_level(struct vgic_irq *irq);
+ void vgic_irq_set_phys_pending(struct vgic_irq *irq, bool pending);
+ void vgic_irq_set_phys_active(struct vgic_irq *irq, bool active);
+ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
+-			   unsigned long flags);
++			   unsigned long flags) __releases(&irq->irq_lock);
+ void vgic_kick_vcpus(struct kvm *kvm);
+ void vgic_irq_handle_resampling(struct vgic_irq *irq,
+ 				bool lr_deactivated, bool lr_pending);
 -- 
 2.42.0
 
