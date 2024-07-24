@@ -1,55 +1,55 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-ua1-f74.google.com (mail-ua1-f74.google.com [209.85.222.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EACAA5695
-	for <kvmarm@lists.linux.dev>; Wed, 24 Jul 2024 01:11:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0A5EA95E
+	for <kvmarm@lists.linux.dev>; Wed, 24 Jul 2024 01:11:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721783477; cv=none; b=Gx4fNMAopkaY7xhNzmOKNi9UxKrPCuDxtcaC0ZcLAaeLSZuVD2i4bNI4WMFQ/qLDDoQDw0PlVEwBy0hQ92+B4FDD8DWodjWLr5xO0yFvlMMKJ54uYbjhhfz30Ktd/9GclVxs0ym7nCAuaegfTOeRX4gDZlhhzyCpXfsGlxfcmhY=
+	t=1721783478; cv=none; b=uIQTtiPcXVYx7uHApEOACSbLEFRkE+wZB28Ixm9ax8WULgvZbm6cBVGVBhPAIgs9ymsEY2eL/EqYzi0vFOHiEZQfKlj6NjIYuxBaJIC9qVSFZWBirQ9naIhNRRcUeBy7XGT8kPAziiaPaRUrQfYA7zfIHA1ZGOGOGsYAPwOS1nI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721783477; c=relaxed/simple;
-	bh=/2kdFrEbCqHGO5LP5EvePqfjzDFLCHiFO1sO9p5KwPk=;
+	s=arc-20240116; t=1721783478; c=relaxed/simple;
+	bh=1NEDLMlAcgA+MMNk6fOt7BsCAxzszK5ZEjRx8pLHX9Y=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=AYwzfqFoATMsSKqzq3sk3gALkwgKpaZwVrIYJK6DuGJarOF4+yNDAX/GUNFXxcmcQef5cgd5HdkZ8MinznFfMmGjAS7kLXZ2O+x2W1XS9MHC8GVghGpnjVsxjRWSRn+GPXAjcZ+jzvjzuAzXMmD6S+lb/tkjMfTA2qc1uSwVTS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OYt1onqV; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=Lerz7oBhs4/EQlM7NoXa4MU0jThwKTcBOfxosy57AGsmBba8RBZp2cf8bKpDQrBFzwpt6PsCohMOzM1SzGqIgNS6or8GF813dA/Pw/OKUN8MIWrwvBSBjRhBk/taiUJ2b9xU7I0W3W6Yy/kvOWD1Am8V4/qHm4gTYsAkWNXkEwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oYf95BS6; arc=none smtp.client-ip=209.85.222.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OYt1onqV"
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-666010fb35cso8220927b3.0
-        for <kvmarm@lists.linux.dev>; Tue, 23 Jul 2024 18:11:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oYf95BS6"
+Received: by mail-ua1-f74.google.com with SMTP id a1e0cc1a2514c-8204c69327fso1960221241.2
+        for <kvmarm@lists.linux.dev>; Tue, 23 Jul 2024 18:11:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1721783475; x=1722388275; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1721783476; x=1722388276; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wYE88dZwxum6KV/GhN2JgnjTuhwRm296Ss1xDF2ZSzg=;
-        b=OYt1onqV4NgMhRJlyJZrvcaxWyDQLKe5AStmTOz6t6Ik7qafjCUMAKewWlFbyr9RA9
-         jwOxNoa3FoL72AmufbhSXd0H+dOYsRVDQ0a806D67BeSHFGYgVSkRk4tayNroLM/CP9C
-         g9y7DLXirTx70GvIgrBCPaSem0w2quLjKSrxroJI16diVty1SwFA7F30BCdModlhvMSJ
-         Fs+ibobuK4LAWfK/P0fQmwZB2/Dj1fJ96X8V4mPv55zI6FT5ehc+4K6snBF/z+2Rd2iQ
-         G1iGk1n0iEeHCmABdN5ZMxeLeasu6LJIBSao/N7I3Gx1Q5NQ6HgHfgSvh6dRWaGu//u4
-         eiog==
+        bh=lX17S5nNca5CiBEi8R7tHh84KKPLmRWb0mcnxRYOK88=;
+        b=oYf95BS6lYxqRDAssumWCr1s0CjPgXL56vmX+fwCzQqifGdiO6pNuZqBn9TlIwh0i3
+         lLH68aGgnSaTosLbaxefYfv7V9dBi4U8DrYR2rZbLAwnBS1IKzNEQ8pWVp2BryqPcmb7
+         XzkJBNaNm9dfLh5tBKeyo2ias+/EowD6jn/sO9ial2vei7OYZy3BbIZAfQw2EPsm4WBz
+         LXAn5VnwT/9L2v4wHm6veATTn6Q0C+FieqK/KlDUlvoF3G2h4x2hnEzLy8YdLspoRFmC
+         WphU2kDCOXWSqxH4lD8YZmrRGF2cQ4s3l4A+z2r8bmmkbUWAsZlQdFjN2Tx6scuEqNlP
+         54Xg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721783475; x=1722388275;
+        d=1e100.net; s=20230601; t=1721783476; x=1722388276;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wYE88dZwxum6KV/GhN2JgnjTuhwRm296Ss1xDF2ZSzg=;
-        b=VLsWYyXB19bcbZMlUWJ3rNqIjEPFs/FYnwEKfZu48m+GqD2GaZ6skJW3yvincjKH82
-         1l/vJ5n/OYbccnzcyYCBmhGpiHsijtVjSocMGfdAhdLEr6Or5AoKuyqmJJSJx80uv26L
-         sV6SiNbzC1ARu1jSpz2AoQODtINmrpYoJnU0ovmRKoUV9y2+dD71gLFiMPXeRhiHfCUd
-         bXO+F9kgnLY7MVeuC+xai4cMD34bYCvWSvZI1kOANxiY8Pas0TGeHWcj1w+PSIq/wftS
-         e5s7CUJ2y4VVgQJm75qPaWQxvQRx3tQkQ9QlefeYHIixj4nfvBnqs6n1j/JrJ8eMzBf+
-         GC7g==
-X-Forwarded-Encrypted: i=1; AJvYcCX2iFrp15o4uZees5Z8YLLbmiDpsM+TQWaewPFQX9vFtF8RM8xjtX+QrNSHU3G36jwiU8Hhu1uhWhOAxCp3bKPsW46GhKbX
-X-Gm-Message-State: AOJu0YztpRQ8sBl+6P2iM53taNvSZG7ZUfvet1dsRobGWWwNIZ03k8sT
-	8W718WDAbsVMcRofGxID+R84SB4jfG9CgR2oFm3aA90VnZHb953FnHRdwvDTziYTi1A5Bd7W1nN
-	yDKyNb4SHHbdfLhC7vg==
-X-Google-Smtp-Source: AGHT+IFlbCwOv7FcHHPSyN/4LSWSns0pNrKnm/Gh8fQ5E5vmLdKRE2NJsut+pxEH6Bu3xVJUKO8eEZSj9XJO7SkF
+        bh=lX17S5nNca5CiBEi8R7tHh84KKPLmRWb0mcnxRYOK88=;
+        b=JHyL05z7w3Born3jw76Xa1wry1I4HDDZqLk88GvuQp/yt4Tac2Qsx46fF0xutEYh40
+         cX5RmLYccujvy294OQarqUqbG5schF/mm8h0EoDCTTXcXOB5lRP6mXPOD9H/GSlc/flY
+         s5Xaujkxjre4cg5/exfhpc9K+aIAeutp/jkFb0ThTE2SsJdi403/P/YfGWqbhQNaD0XA
+         3j6nV8LC86u1s7xS23Z7zqt3DAQwF0ZOjmf7m53vW5+8hUhRa8K3540JPXTbYh0PZteI
+         jVlKOyXskbFGL2K+geFedG/P5BB9UbiCEyJ2byyhyznZi70pYSdf4GV6R7cjHiRFUnZj
+         WsMA==
+X-Forwarded-Encrypted: i=1; AJvYcCUQgBpA9U0SR1rXM2Q8Hbu6yQ83C+6LydN/GodUEH4x36SMpMdJmHWP8FKbiuqq1RjsVt7KnVMgyxe/D8kLkAwPtzeJtAaO
+X-Gm-Message-State: AOJu0YyKA99ToQr25a+bA2gjk705Bxb7pUOYG5oRcOy0g/JUXNyG1+xv
+	JbEgYwUnWZ54hK15jRvHgWZIHp4/hadFpUr0RYIwObkCOz7wvcKPJvrfm785vUHZ9AQXMCFduiv
+	ek9fLDVoYr1DUyWU62g==
+X-Google-Smtp-Source: AGHT+IGlIuIrgkANC0pZBbk8z8He5iptT26RG1V2ZrvO9VkU9yoaN+aGYmYAd60aeXGiO8520IPOKzxK6pnBSRdv
 X-Received: from jthoughton.c.googlers.com ([fda3:e722:ac3:cc00:14:4d90:c0a8:2a4f])
- (user=jthoughton job=sendgmr) by 2002:a0d:ff85:0:b0:665:7b0d:ed27 with SMTP
- id 00721157ae682-672bcb1f07cmr141337b3.2.1721783474906; Tue, 23 Jul 2024
- 18:11:14 -0700 (PDT)
-Date: Wed, 24 Jul 2024 01:10:27 +0000
+ (user=jthoughton job=sendgmr) by 2002:a05:6102:2ac6:b0:492:9449:c33e with
+ SMTP id ada2fe7eead31-493c19d19c5mr46187137.5.1721783475890; Tue, 23 Jul 2024
+ 18:11:15 -0700 (PDT)
+Date: Wed, 24 Jul 2024 01:10:28 +0000
 In-Reply-To: <20240724011037.3671523-1-jthoughton@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240724011037.3671523-1-jthoughton@google.com>
 X-Mailer: git-send-email 2.46.0.rc1.232.g9752f9e123-goog
-Message-ID: <20240724011037.3671523-3-jthoughton@google.com>
-Subject: [PATCH v6 02/11] KVM: x86: Relax locking for kvm_test_age_gfn and kvm_age_gfn
+Message-ID: <20240724011037.3671523-4-jthoughton@google.com>
+Subject: [PATCH v6 03/11] KVM: arm64: Relax locking for kvm_test_age_gfn and kvm_age_gfn
 From: James Houghton <jthoughton@google.com>
 To: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: Ankit Agrawal <ankita@nvidia.com>, Axel Rasmussen <axelrasmussen@google.com>, 
@@ -77,265 +77,125 @@ Cc: Ankit Agrawal <ankita@nvidia.com>, Axel Rasmussen <axelrasmussen@google.com>
 	linux-kernel@vger.kernel.org, linux-mm@kvack.org
 Content-Type: text/plain; charset="UTF-8"
 
-Walk the TDP MMU in an RCU read-side critical section. This requires a
-way to do RCU-safe walking of the tdp_mmu_roots; do this with a new
-macro. The PTE modifications are now done atomically, and
-kvm_tdp_mmu_spte_need_atomic_write() has been updated to account for the
-fact that kvm_age_gfn can now lockless update the accessed bit and the
-R/X bits).
+Replace the MMU write locks (taken in the memslot iteration loop) for
+read locks.
 
-If the cmpxchg for marking the spte for access tracking fails, we simply
-retry if the spte is still a leaf PTE. If it isn't, we return false
-to continue the walk.
+Grabbing the read lock instead of the write lock is safe because the
+only requirement we have is that the stage-2 page tables do not get
+deallocated while we are walking them. The stage2_age_walker() callback
+is safe to race with itself; update the comment to reflect the
+synchronization change.
 
-Harvesting age information from the shadow MMU is still done while
-holding the MMU write lock.
-
-Suggested-by: Yu Zhao <yuzhao@google.com>
 Signed-off-by: James Houghton <jthoughton@google.com>
 ---
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/Kconfig            |  1 +
- arch/x86/kvm/mmu/mmu.c          | 10 ++++-
- arch/x86/kvm/mmu/tdp_iter.h     | 27 +++++++------
- arch/x86/kvm/mmu/tdp_mmu.c      | 67 +++++++++++++++++++++++++--------
- 5 files changed, 77 insertions(+), 29 deletions(-)
+ arch/arm64/kvm/Kconfig       |  1 +
+ arch/arm64/kvm/hyp/pgtable.c | 15 +++++++++------
+ arch/arm64/kvm/mmu.c         | 30 ++++++++++++++++++++++--------
+ 3 files changed, 32 insertions(+), 14 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 950a03e0181e..096988262005 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1456,6 +1456,7 @@ struct kvm_arch {
- 	 * tdp_mmu_page set.
- 	 *
- 	 * For reads, this list is protected by:
-+	 *	RCU alone or
- 	 *	the MMU lock in read mode + RCU or
- 	 *	the MMU lock in write mode
- 	 *
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index 4287a8071a3a..6ac43074c5e9 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -23,6 +23,7 @@ config KVM
- 	depends on X86_LOCAL_APIC
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index 58f09370d17e..7a1af8141c0e 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -22,6 +22,7 @@ menuconfig KVM
  	select KVM_COMMON
+ 	select KVM_GENERIC_HARDWARE_ENABLING
  	select KVM_GENERIC_MMU_NOTIFIER
 +	select KVM_MMU_NOTIFIER_YOUNG_LOCKLESS
- 	select HAVE_KVM_IRQCHIP
- 	select HAVE_KVM_PFNCACHE
- 	select HAVE_KVM_DIRTY_RING_TSO
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 901be9e420a4..7b93ce8f0680 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1633,8 +1633,11 @@ bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
- {
- 	bool young = false;
+ 	select HAVE_KVM_CPU_RELAX_INTERCEPT
+ 	select KVM_MMIO
+ 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index 9e2bbee77491..a24a2a857456 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -1319,10 +1319,10 @@ static int stage2_age_walker(const struct kvm_pgtable_visit_ctx *ctx,
+ 	data->young = true;
  
--	if (kvm_memslots_have_rmaps(kvm))
-+	if (kvm_memslots_have_rmaps(kvm)) {
-+		write_lock(&kvm->mmu_lock);
- 		young = kvm_handle_gfn_range(kvm, range, kvm_age_rmap);
-+		write_unlock(&kvm->mmu_lock);
-+	}
+ 	/*
+-	 * stage2_age_walker() is always called while holding the MMU lock for
+-	 * write, so this will always succeed. Nonetheless, this deliberately
+-	 * follows the race detection pattern of the other stage-2 walkers in
+-	 * case the locking mechanics of the MMU notifiers is ever changed.
++	 * This walk is not exclusive; the PTE is permitted to change from
++	 * under us. If there is a race to update this PTE, then the GFN is
++	 * most likely young, so failing to clear the AF is likely to be
++	 * inconsequential.
+ 	 */
+ 	if (data->mkold && !stage2_try_set_pte(ctx, new))
+ 		return -EAGAIN;
+@@ -1345,10 +1345,13 @@ bool kvm_pgtable_stage2_test_clear_young(struct kvm_pgtable *pgt, u64 addr,
+ 	struct kvm_pgtable_walker walker = {
+ 		.cb		= stage2_age_walker,
+ 		.arg		= &data,
+-		.flags		= KVM_PGTABLE_WALK_LEAF,
++		.flags		= KVM_PGTABLE_WALK_LEAF |
++				  KVM_PGTABLE_WALK_SHARED,
+ 	};
++	int r;
  
- 	if (tdp_mmu_enabled)
- 		young |= kvm_tdp_mmu_age_gfn_range(kvm, range);
-@@ -1646,8 +1649,11 @@ bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
- {
- 	bool young = false;
- 
--	if (kvm_memslots_have_rmaps(kvm))
-+	if (kvm_memslots_have_rmaps(kvm)) {
-+		write_lock(&kvm->mmu_lock);
- 		young = kvm_handle_gfn_range(kvm, range, kvm_test_age_rmap);
-+		write_unlock(&kvm->mmu_lock);
-+	}
- 
- 	if (tdp_mmu_enabled)
- 		young |= kvm_tdp_mmu_test_age_gfn(kvm, range);
-diff --git a/arch/x86/kvm/mmu/tdp_iter.h b/arch/x86/kvm/mmu/tdp_iter.h
-index 2880fd392e0c..510936a8455a 100644
---- a/arch/x86/kvm/mmu/tdp_iter.h
-+++ b/arch/x86/kvm/mmu/tdp_iter.h
-@@ -25,6 +25,13 @@ static inline u64 kvm_tdp_mmu_write_spte_atomic(tdp_ptep_t sptep, u64 new_spte)
- 	return xchg(rcu_dereference(sptep), new_spte);
+-	WARN_ON(kvm_pgtable_walk(pgt, addr, size, &walker));
++	r = kvm_pgtable_walk(pgt, addr, size, &walker);
++	WARN_ON_ONCE(r && r != -EAGAIN);
+ 	return data.young;
  }
  
-+static inline u64 tdp_mmu_clear_spte_bits_atomic(tdp_ptep_t sptep, u64 mask)
-+{
-+	atomic64_t *sptep_atomic = (atomic64_t *)rcu_dereference(sptep);
-+
-+	return (u64)atomic64_fetch_and(~mask, sptep_atomic);
-+}
-+
- static inline void __kvm_tdp_mmu_write_spte(tdp_ptep_t sptep, u64 new_spte)
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 6981b1bc0946..e37765f6f2a1 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1912,29 +1912,43 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+ bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
  {
- 	KVM_MMU_WARN_ON(is_ept_ve_possible(new_spte));
-@@ -32,10 +39,11 @@ static inline void __kvm_tdp_mmu_write_spte(tdp_ptep_t sptep, u64 new_spte)
+ 	u64 size = (range->end - range->start) << PAGE_SHIFT;
++	bool young = false;
++
++	read_lock(&kvm->mmu_lock);
+ 
+ 	if (!kvm->arch.mmu.pgt)
+-		return false;
++		goto out;
+ 
+-	return kvm_pgtable_stage2_test_clear_young(kvm->arch.mmu.pgt,
+-						   range->start << PAGE_SHIFT,
+-						   size, true);
++	young = kvm_pgtable_stage2_test_clear_young(kvm->arch.mmu.pgt,
++						    range->start << PAGE_SHIFT,
++						    size, true);
+ 	/*
+ 	 * TODO: Handle nested_mmu structures here using the reverse mapping in
+ 	 * a later version of patch series.
+ 	 */
++
++out:
++	read_unlock(&kvm->mmu_lock);
++	return young;
  }
  
- /*
-- * SPTEs must be modified atomically if they are shadow-present, leaf
-- * SPTEs, and have volatile bits, i.e. has bits that can be set outside
-- * of mmu_lock.  The Writable bit can be set by KVM's fast page fault
-- * handler, and Accessed and Dirty bits can be set by the CPU.
-+ * SPTEs must be modified atomically if they have bits that can be set outside
-+ * of the mmu_lock. This can happen for any shadow-present leaf SPTEs, as the
-+ * Writable bit can be set by KVM's fast page fault handler, the Accessed and
-+ * Dirty bits can be set by the CPU, and the Accessed and R/X bits can be
-+ * cleared by age_gfn_range.
-  *
-  * Note, non-leaf SPTEs do have Accessed bits and those bits are
-  * technically volatile, but KVM doesn't consume the Accessed bit of
-@@ -46,8 +54,7 @@ static inline void __kvm_tdp_mmu_write_spte(tdp_ptep_t sptep, u64 new_spte)
- static inline bool kvm_tdp_mmu_spte_need_atomic_write(u64 old_spte, int level)
+ bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
  {
- 	return is_shadow_present_pte(old_spte) &&
--	       is_last_spte(old_spte, level) &&
--	       spte_has_volatile_bits(old_spte);
-+	       is_last_spte(old_spte, level);
+ 	u64 size = (range->end - range->start) << PAGE_SHIFT;
++	bool young = false;
++
++	read_lock(&kvm->mmu_lock);
+ 
+ 	if (!kvm->arch.mmu.pgt)
+-		return false;
++		goto out;
+ 
+-	return kvm_pgtable_stage2_test_clear_young(kvm->arch.mmu.pgt,
+-						   range->start << PAGE_SHIFT,
+-						   size, false);
++	young = kvm_pgtable_stage2_test_clear_young(kvm->arch.mmu.pgt,
++						    range->start << PAGE_SHIFT,
++						    size, false);
++
++out:
++	read_unlock(&kvm->mmu_lock);
++	return young;
  }
  
- static inline u64 kvm_tdp_mmu_write_spte(tdp_ptep_t sptep, u64 old_spte,
-@@ -63,12 +70,8 @@ static inline u64 kvm_tdp_mmu_write_spte(tdp_ptep_t sptep, u64 old_spte,
- static inline u64 tdp_mmu_clear_spte_bits(tdp_ptep_t sptep, u64 old_spte,
- 					  u64 mask, int level)
- {
--	atomic64_t *sptep_atomic;
--
--	if (kvm_tdp_mmu_spte_need_atomic_write(old_spte, level)) {
--		sptep_atomic = (atomic64_t *)rcu_dereference(sptep);
--		return (u64)atomic64_fetch_and(~mask, sptep_atomic);
--	}
-+	if (kvm_tdp_mmu_spte_need_atomic_write(old_spte, level))
-+		return tdp_mmu_clear_spte_bits_atomic(sptep, mask);
- 
- 	__kvm_tdp_mmu_write_spte(sptep, old_spte & ~mask);
- 	return old_spte;
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index c7dc49ee7388..3f13b2db53de 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -29,6 +29,11 @@ static __always_inline bool kvm_lockdep_assert_mmu_lock_held(struct kvm *kvm,
- 
- 	return true;
- }
-+static __always_inline bool kvm_lockdep_assert_rcu_read_lock_held(void)
-+{
-+	WARN_ON_ONCE(!rcu_read_lock_held());
-+	return true;
-+}
- 
- void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm)
- {
-@@ -178,6 +183,15 @@ static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
- 		     ((_only_valid) && (_root)->role.invalid))) {		\
- 		} else
- 
-+/*
-+ * Iterate over all TDP MMU roots in an RCU read-side critical section.
-+ */
-+#define for_each_tdp_mmu_root_rcu(_kvm, _root, _as_id)				\
-+	list_for_each_entry_rcu(_root, &_kvm->arch.tdp_mmu_roots, link)		\
-+		if (kvm_lockdep_assert_rcu_read_lock_held() &&			\
-+		    (_as_id >= 0 && kvm_mmu_page_as_id(_root) != _as_id)) {	\
-+		} else
-+
- #define for_each_tdp_mmu_root(_kvm, _root, _as_id)			\
- 	__for_each_tdp_mmu_root(_kvm, _root, _as_id, false)
- 
-@@ -1224,6 +1238,27 @@ static __always_inline bool kvm_tdp_mmu_handle_gfn(struct kvm *kvm,
- 	return ret;
- }
- 
-+static __always_inline bool kvm_tdp_mmu_handle_gfn_lockless(
-+		struct kvm *kvm,
-+		struct kvm_gfn_range *range,
-+		tdp_handler_t handler)
-+{
-+	struct kvm_mmu_page *root;
-+	struct tdp_iter iter;
-+	bool ret = false;
-+
-+	rcu_read_lock();
-+
-+	for_each_tdp_mmu_root_rcu(kvm, root, range->slot->as_id) {
-+		tdp_root_for_each_leaf_pte(iter, root, range->start, range->end)
-+			ret |= handler(kvm, &iter, range);
-+	}
-+
-+	rcu_read_unlock();
-+
-+	return ret;
-+}
-+
- /*
-  * Mark the SPTEs range of GFNs [start, end) unaccessed and return non-zero
-  * if any of the GFNs in the range have been accessed.
-@@ -1237,28 +1272,30 @@ static bool age_gfn_range(struct kvm *kvm, struct tdp_iter *iter,
- {
- 	u64 new_spte;
- 
-+retry:
- 	/* If we have a non-accessed entry we don't need to change the pte. */
- 	if (!is_accessed_spte(iter->old_spte))
- 		return false;
- 
- 	if (spte_ad_enabled(iter->old_spte)) {
--		iter->old_spte = tdp_mmu_clear_spte_bits(iter->sptep,
--							 iter->old_spte,
--							 shadow_accessed_mask,
--							 iter->level);
-+		iter->old_spte = tdp_mmu_clear_spte_bits_atomic(iter->sptep,
-+						shadow_accessed_mask);
- 		new_spte = iter->old_spte & ~shadow_accessed_mask;
- 	} else {
--		/*
--		 * Capture the dirty status of the page, so that it doesn't get
--		 * lost when the SPTE is marked for access tracking.
--		 */
-+		new_spte = mark_spte_for_access_track(iter->old_spte);
-+		if (__tdp_mmu_set_spte_atomic(iter, new_spte)) {
-+			/*
-+			 * The cmpxchg failed. If the spte is still a
-+			 * last-level spte, we can safely retry.
-+			 */
-+			if (is_shadow_present_pte(iter->old_spte) &&
-+			    is_last_spte(iter->old_spte, iter->level))
-+				goto retry;
-+			/* Otherwise, continue walking. */
-+			return false;
-+		}
- 		if (is_writable_pte(iter->old_spte))
- 			kvm_set_pfn_dirty(spte_to_pfn(iter->old_spte));
--
--		new_spte = mark_spte_for_access_track(iter->old_spte);
--		iter->old_spte = kvm_tdp_mmu_write_spte(iter->sptep,
--							iter->old_spte, new_spte,
--							iter->level);
- 	}
- 
- 	trace_kvm_tdp_mmu_spte_changed(iter->as_id, iter->gfn, iter->level,
-@@ -1268,7 +1305,7 @@ static bool age_gfn_range(struct kvm *kvm, struct tdp_iter *iter,
- 
- bool kvm_tdp_mmu_age_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
- {
--	return kvm_tdp_mmu_handle_gfn(kvm, range, age_gfn_range);
-+	return kvm_tdp_mmu_handle_gfn_lockless(kvm, range, age_gfn_range);
- }
- 
- static bool test_age_gfn(struct kvm *kvm, struct tdp_iter *iter,
-@@ -1279,7 +1316,7 @@ static bool test_age_gfn(struct kvm *kvm, struct tdp_iter *iter,
- 
- bool kvm_tdp_mmu_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
- {
--	return kvm_tdp_mmu_handle_gfn(kvm, range, test_age_gfn);
-+	return kvm_tdp_mmu_handle_gfn_lockless(kvm, range, test_age_gfn);
- }
- 
- /*
+ phys_addr_t kvm_mmu_get_httbr(void)
 -- 
 2.46.0.rc1.232.g9752f9e123-goog
 
