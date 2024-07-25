@@ -1,42 +1,41 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0D8619AD7B
-	for <kvmarm@lists.linux.dev>; Thu, 25 Jul 2024 15:48:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3B8019AD7B
+	for <kvmarm@lists.linux.dev>; Thu, 25 Jul 2024 15:49:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721922530; cv=none; b=crnzU0SWvKlAkC//4XPkA+qPWxblxCMkW9ku+mSBaxtbV0XFKU7pin7P7pPj236BmPUaWHDx2QkvMTfnROGQVFd2t/oj7iuSe3T54pf+XeFNUsG+vdGGh8nPPTSQ5LUHIPgXkLCMydkfaZp3Q+TP4lGkxnMW9XOurFdlLyFrke0=
+	t=1721922556; cv=none; b=eMp8qUhFWj5MjbxNVo0AEH3TkSUuuzhPxUHOZrZQHhGXP1SDFY7In0/7o5N2FkfKVky0ZReZlmJ+c+O2ujNFoe64jF94lcuBjnLbibYlhlc7knHeva1P3WOdXvdXIZBL2hRewSeI6ISw4J4UndUtxMDDo4BXXWT4XLi66mlZmQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721922530; c=relaxed/simple;
-	bh=9veYD6Cw20WWIP5a5rcYdQynxeXuIU3pwTIEVcyvAh0=;
+	s=arc-20240116; t=1721922556; c=relaxed/simple;
+	bh=RJYw0pND0OcBMJQdBlB5c5gKpbzA1lyRCnIAkzvS7VQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q0dc2DLgJTVg7zggdeie00RSuuMVKNAwTx+NA+cycYDK+UPBuG1Nh9qRRr/vqSc6BEBs0SSetrrrWARh+Qw3x1olBsP3DwjL7lz4pRXwfa+F9unib+jak0UHPkVmo5f3EiPrhCa4oO5Bd/VB1+5XrlfwqFIcuvxvqOl/7fJv8sk=
+	 Content-Type:Content-Disposition:In-Reply-To; b=baxtRwA8Hl9EhUYWAxcFKpDUhMi4QhJ8IvTXbKhVC7aO1YJsoYPaiIdBSj+EGSMKXELBB3aOEjucUrJbqFXSZ50RbCuH++1ln7VEyIb0QAJwRokov24RR+PJHkRChqrHibC9dNA+Od+9pvjo3oDzpTHhT6jf76+Ah/FsbUGn7Ak=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 78FD21476;
-	Thu, 25 Jul 2024 08:49:13 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 990801596;
+	Thu, 25 Jul 2024 08:49:40 -0700 (PDT)
 Received: from e133380.arm.com (e133380.arm.com [10.1.197.55])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2FA393F766;
-	Thu, 25 Jul 2024 08:48:44 -0700 (PDT)
-Date: Thu, 25 Jul 2024 16:48:41 +0100
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 684063F766;
+	Thu, 25 Jul 2024 08:49:11 -0700 (PDT)
+Date: Thu, 25 Jul 2024 16:49:08 +0100
 From: Dave Martin <Dave.Martin@arm.com>
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: Joey Gouly <joey.gouly@arm.com>, linux-arm-kernel@lists.infradead.org,
-	akpm@linux-foundation.org, aneesh.kumar@kernel.org,
-	aneesh.kumar@linux.ibm.com, bp@alien8.de, broonie@kernel.org,
-	catalin.marinas@arm.com, christophe.leroy@csgroup.eu,
-	dave.hansen@linux.intel.com, hpa@zytor.com,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
+	aneesh.kumar@kernel.org, aneesh.kumar@linux.ibm.com, bp@alien8.de,
+	broonie@kernel.org, catalin.marinas@arm.com,
+	christophe.leroy@csgroup.eu, dave.hansen@linux.intel.com,
+	hpa@zytor.com, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
 	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
 	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
 	oliver.upton@linux.dev, shuah@kernel.org, szabolcs.nagy@arm.com,
 	tglx@linutronix.de, will@kernel.org, x86@kernel.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 19/29] arm64: enable PKEY support for CPUs with S1POE
-Message-ID: <ZqJz2S4MDjDmKzJE@e133380.arm.com>
+Subject: Re: [PATCH v4 10/29] arm64: enable the Permission Overlay Extension
+ for EL0
+Message-ID: <ZqJz9EoqJE95Oe7g@e133380.arm.com>
 References: <20240503130147.1154804-1-joey.gouly@arm.com>
- <20240503130147.1154804-20-joey.gouly@arm.com>
- <fe3ccf1e-4c57-4795-add3-1eb47f3bdcaa@arm.com>
+ <20240503130147.1154804-11-joey.gouly@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -45,51 +44,45 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <fe3ccf1e-4c57-4795-add3-1eb47f3bdcaa@arm.com>
+In-Reply-To: <20240503130147.1154804-11-joey.gouly@arm.com>
 
-On Tue, Jul 16, 2024 at 04:17:12PM +0530, Anshuman Khandual wrote:
+On Fri, May 03, 2024 at 02:01:28PM +0100, Joey Gouly wrote:
+> Expose a HWCAP and ID_AA64MMFR3_EL1_S1POE to userspace, so they can be used to
+> check if the CPU supports the feature.
+> 
+> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will@kernel.org>
+> ---
+> 
+> This takes the last bit of HWCAP2, is this fine? What can we do about more features in the future?
 > 
 > 
-> On 5/3/24 18:31, Joey Gouly wrote:
-> > Now that PKEYs support has been implemented, enable it for CPUs that
-> > support S1POE.
-> > 
-> > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-> > Cc: Catalin Marinas <catalin.marinas@arm.com>
-> > Cc: Will Deacon <will@kernel.org>
-> > Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+>  Documentation/arch/arm64/elf_hwcaps.rst |  2 ++
+>  arch/arm64/include/asm/hwcap.h          |  1 +
+>  arch/arm64/include/uapi/asm/hwcap.h     |  1 +
+>  arch/arm64/kernel/cpufeature.c          | 14 ++++++++++++++
+>  arch/arm64/kernel/cpuinfo.c             |  1 +
+>  5 files changed, 19 insertions(+)
 > 
-> Reviewed-by: Anshuman Khandual <anshuman.khandual@arm.com>
-> 
-> > ---
-> >  arch/arm64/include/asm/pkeys.h | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/pkeys.h b/arch/arm64/include/asm/pkeys.h
-> > index a284508a4d02..3ea928ec94c0 100644
-> > --- a/arch/arm64/include/asm/pkeys.h
-> > +++ b/arch/arm64/include/asm/pkeys.h
-> > @@ -17,7 +17,7 @@ int arch_set_user_pkey_access(struct task_struct *tsk, int pkey,
-> >  
-> >  static inline bool arch_pkeys_enabled(void)
-> >  {
-> > -	return false;
-> > +	return system_supports_poe();
-> >  }
-> >  
-> >  static inline int vma_pkey(struct vm_area_struct *vma)
-> 
-> Small nit. Would it better to be consistently using system_supports_poe()
-> helper rather than arch_pkeys_enabled() inside arch/arm64/ platform code
-> like - during POE fault handling i.e inside fault_from_pkey().
-> 
+> diff --git a/Documentation/arch/arm64/elf_hwcaps.rst b/Documentation/arch/arm64/elf_hwcaps.rst
+> index 448c1664879b..694f67fa07d1 100644
+> --- a/Documentation/arch/arm64/elf_hwcaps.rst
+> +++ b/Documentation/arch/arm64/elf_hwcaps.rst
+> @@ -365,6 +365,8 @@ HWCAP2_SME_SF8DP2
+>  HWCAP2_SME_SF8DP4
+>      Functionality implied by ID_AA64SMFR0_EL1.SF8DP4 == 0b1.
+>  
+> +HWCAP2_POE
+> +    Functionality implied by ID_AA64MMFR3_EL1.S1POE == 0b0001.
 
-(FWIW, arch_pkeys_enabled() looks like the hook for the arch to tell
-the pkeys generic code whether the arch support is there, so I guess
-the proposed change looks sensible to me.
+Nit: unintentionally dropped blank line before the section heading?
 
-For the arch backend code that is agnostic to whether pkeys is actually
-in use, system_supports_poe() seems to be the more appropriate check.)
+>  
+>  4. Unused AT_HWCAP bits
+>  -----------------------
+
+[...]
 
 Cheers
 ---Dave
