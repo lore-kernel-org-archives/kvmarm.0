@@ -1,152 +1,101 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DD1819CCF4;
-	Thu, 25 Jul 2024 15:33:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C36819D887
+	for <kvmarm@lists.linux.dev>; Thu, 25 Jul 2024 15:44:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721921600; cv=none; b=eVOQJyTuLr+lWFmVw3scXePFqxI1Zxms4Rwl7/YPrQ/Og5Yrd2fME2UtrbAGCKX/uf3zKNDXKM066ZqKBRpCcoFzPn6dg8VIHnUy0ue5jnFQOe4DKsF9fKgQnB4PgHxcJ/5AZX5poAoLrq9tzupHMozeJMdHdWmHPnApbINytQ0=
+	t=1721922265; cv=none; b=oM4EDRJY0L/TYjATIFarQUGP4fiqve5V4qocakQPwL6+DewF8oQYlSHpUzD3j9JaqOZRoOTEWIbWly8oxYFng69YV6hfpgeHm64RVhM2sh4hTGMAzBQnhAS3E102hBaHspi0830Syw88hoy6sH7HI/eyccxpTg//7otPmkg1T2Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721921600; c=relaxed/simple;
-	bh=MDq1Q4saoPwdhXmKqgMKL/Ay+WsV+Wk+4g7Y7dWlJZc=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qwsjAtT6z1f2jLjacuV/0GhQyI1CnlsykpobIrjL0vL27yisWXQQbmx3gTMNPt+GPBM2oN3u4XZbINMhJ+YHZS+O4M7llFCLJhMokO6dCB48u/50T/4t4vRmSVGLNCLxxY5DnukJqRfriWbAqw5rVW74z5NWEh5ofHe0vc7lTHU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NcEJB0v9; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NcEJB0v9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C524BC116B1;
-	Thu, 25 Jul 2024 15:33:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721921599;
-	bh=MDq1Q4saoPwdhXmKqgMKL/Ay+WsV+Wk+4g7Y7dWlJZc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=NcEJB0v9/lQuR42qN7+wQgACD3DChNNImNTi9QOMAKcYLAkCDTNSR0rM/vyyy5ZMA
-	 OoMpnkNxnttzVYIzr6vnlu5oh6MhN7Rm9U0xh0gN9kPiXfyXyXGF24jd6p0LI5l+ue
-	 EAMEcOKi0T2R9sZRKNy24uWBXKOxTqy2sOuJZTArcLVKdZbkRzZrG15+P7VSS/afxW
-	 rhkHlGilpkmSH5eKdl1TDnvWOHX5f+jU51ANkRld1GuKqiVteb/FVMEt3xfwzqNT1t
-	 77QWXyUS8aRC4KxMp/iypALlnODZx8RE5pr71w2+Tmx/01/dWvYO8r9SGt6AYtAM+K
-	 lYjvPv/RjTj6w==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sX0Sz-00FLAl-Qa;
-	Thu, 25 Jul 2024 16:33:17 +0100
-Date: Thu, 25 Jul 2024 16:33:17 +0100
-Message-ID: <8634nx32rm.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Joey Gouly <joey.gouly@arm.com>
-Subject: Re: [PATCH 10/12] KVM: arm64: nv: Add SW walker for AT S1 emulation
-In-Reply-To: <ZqJrlcIv2_bWQk2r@raptor>
-References: <20240625133508.259829-1-maz@kernel.org>
-	<20240708165800.1220065-1-maz@kernel.org>
-	<ZqJeLDGJwWEFMKD4@raptor>
-	<864j8d35p3.wl-maz@kernel.org>
-	<ZqJrlcIv2_bWQk2r@raptor>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.3
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1721922265; c=relaxed/simple;
+	bh=QSxiIlyLcph/pKL/kx8GogyXDhKxtTHelYu+FuiLDoY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QTM+4czWauYVHVf3nidkgDXqn/lYlg90XjFGpIDL+galThThY63JdWkVEmGevlM9KQ7dee/HXJseaWM5p2Gtcq/mzV+SpptcvGVjEl4juI+m32bwlKSh9aOwQSH7W6P4g7xlDcUaucsXZ0ZfA8kiUYp87RBwCN+RsNNjdEsiU4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A92B61007;
+	Thu, 25 Jul 2024 08:44:47 -0700 (PDT)
+Received: from e133380.arm.com (e133380.arm.com [10.1.197.55])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 312CB3F766;
+	Thu, 25 Jul 2024 08:44:19 -0700 (PDT)
+Date: Thu, 25 Jul 2024 16:44:13 +0100
+From: Dave Martin <Dave.Martin@arm.com>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
+	aneesh.kumar@kernel.org, aneesh.kumar@linux.ibm.com, bp@alien8.de,
+	broonie@kernel.org, catalin.marinas@arm.com,
+	christophe.leroy@csgroup.eu, dave.hansen@linux.intel.com,
+	hpa@zytor.com, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
+	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
+	oliver.upton@linux.dev, shuah@kernel.org, szabolcs.nagy@arm.com,
+	tglx@linutronix.de, will@kernel.org, x86@kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v4 04/29] arm64: disable trapping of POR_EL0 to EL2
+Message-ID: <ZqJyzZB8Y8GLzYIA@e133380.arm.com>
+References: <20240503130147.1154804-1-joey.gouly@arm.com>
+ <20240503130147.1154804-5-joey.gouly@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240503130147.1154804-5-joey.gouly@arm.com>
 
-On Thu, 25 Jul 2024 16:13:25 +0100,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> 
-> Hi,
-> 
-> On Thu, Jul 25, 2024 at 03:30:00PM +0100, Marc Zyngier wrote:
-> > On Thu, 25 Jul 2024 15:16:12 +0100,
-> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> > > 
-> > > Hi Marc,
-> > > 
-> > > On Mon, Jul 08, 2024 at 05:57:58PM +0100, Marc Zyngier wrote:
-> > > > +	if (perm_fail) {
-> > > > +		struct s1_walk_result tmp;
-> > > 
-> > > I was wondering if you would consider initializing 'tmp' to the empty struct
-> > > here. That makes it consistent with the initialization of 'wr' in the !perm_fail
-> > > case and I think it will make the code more robust wrt to changes to
-> > > compute_par_s1() and what fields it accesses.
-> > 
-> > I think there is a slightly better way, with something like this:
-> > 
-> > diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-> > index b02d8dbffd209..36fa2801ab4ef 100644
-> > --- a/arch/arm64/kvm/at.c
-> > +++ b/arch/arm64/kvm/at.c
-> > @@ -803,12 +803,12 @@ static u64 handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
-> >  	}
-> >  
-> >  	if (perm_fail) {
-> > -		struct s1_walk_result tmp;
-> > -
-> > -		tmp.failed = true;
-> > -		tmp.fst = ESR_ELx_FSC_PERM | wr.level;
-> > -		tmp.s2 = false;
-> > -		tmp.ptw = false;
-> > +		struct s1_walk_result tmp = (struct s1_walk_result){
-> > +			.failed	= true,
-> > +			.fst	= ESR_ELx_FSC_PERM | wr.level,
-> > +			.s2	= false,
-> > +			.ptw	= false,
-> > +		};
-> >  
-> >  		wr = tmp;
-> >  	}
-> > 
-> > Thoughts?
-> 
-> How about (diff against your kvm-arm64/nv-at-pan-WIP branch, in case something
-> looks off):
-> 
-> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-> index b02d8dbffd20..74ebe3223a13 100644
-> --- a/arch/arm64/kvm/at.c
-> +++ b/arch/arm64/kvm/at.c
-> @@ -802,16 +802,8 @@ static u64 handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
->                 BUG();
->         }
-> 
-> -       if (perm_fail) {
-> -               struct s1_walk_result tmp;
-> -
-> -               tmp.failed = true;
-> -               tmp.fst = ESR_ELx_FSC_PERM | wr.level;
-> -               tmp.s2 = false;
-> -               tmp.ptw = false;
-> -
-> -               wr = tmp;
-> -       }
-> +       if (perm_fail)
-> +               fail_s1_walk(&wr, ESR_ELx_FSC_PERM | wr.level, false, false);
-> 
->  compute_par:
->         return compute_par_s1(vcpu, &wr);
-> 
+Hi,
 
-Ah, much nicer indeed!
+On Fri, May 03, 2024 at 02:01:22PM +0100, Joey Gouly wrote:
+> Allow EL0 or EL1 to access POR_EL0 without being trapped to EL2.
+> 
+> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will@kernel.org>
+> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+> ---
+>  arch/arm64/include/asm/el2_setup.h | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
+> index b7afaa026842..df5614be4b70 100644
+> --- a/arch/arm64/include/asm/el2_setup.h
+> +++ b/arch/arm64/include/asm/el2_setup.h
+> @@ -184,12 +184,20 @@
+>  .Lset_pie_fgt_\@:
+>  	mrs_s	x1, SYS_ID_AA64MMFR3_EL1
+>  	ubfx	x1, x1, #ID_AA64MMFR3_EL1_S1PIE_SHIFT, #4
+> -	cbz	x1, .Lset_fgt_\@
+> +	cbz	x1, .Lset_poe_fgt_\@
+>  
+>  	/* Disable trapping of PIR_EL1 / PIRE0_EL1 */
+>  	orr	x0, x0, #HFGxTR_EL2_nPIR_EL1
+>  	orr	x0, x0, #HFGxTR_EL2_nPIRE0_EL1
+>  
+> +.Lset_poe_fgt_\@:
+> +	mrs_s	x1, SYS_ID_AA64MMFR3_EL1
+> +	ubfx	x1, x1, #ID_AA64MMFR3_EL1_S1POE_SHIFT, #4
+> +	cbz	x1, .Lset_fgt_\@
+> +
+> +	/* Disable trapping of POR_EL0 */
+> +	orr	x0, x0, #HFGxTR_EL2_nPOR_EL0
 
-Thanks,
+Do I understand correctly that this is just to allow the host to access
+its own POR_EL0, before (or unless) KVM starts up?
 
-	M.
+KVM always overrides all the EL2 trap controls while running a guest,
+right?  We don't want this bit still set when running in a guest just
+because KVM doesn't know about POE yet.
 
--- 
-Without deviation from the norm, progress is not possible.
+(Hopefully this follows naturally from the way the KVM code works, but
+my KVM-fu is a bit rusty.)
+
+Also, what about POR_EL1?  Do we have to reset that to something sane
+(and so untrap it here), or it is sufficient if we never turn on POE
+support in the host, via TCR2_EL1.POE?
+
+[...]
+
+Cheers
+---Dave
