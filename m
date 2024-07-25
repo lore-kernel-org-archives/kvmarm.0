@@ -1,57 +1,57 @@
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C36223749
-	for <kvmarm@lists.linux.dev>; Thu, 25 Jul 2024 18:17:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA20A2376A
+	for <kvmarm@lists.linux.dev>; Thu, 25 Jul 2024 18:24:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721931469; cv=none; b=nAajglZwg31f7OZ6+j2bHW8S80Be5oQu/Q4BgHiBLq/x9Npar88pfmMP6/UO5QJNUfmIKR04oCVQGDlwDmZWapq78G47fcqvPHuDm47oUhz5CR+m0qloo5jcH/D9Kyknw745qDZmnTuJFAZq/QRmru5xVFqz8EJrn9o6HFxMPbA=
+	t=1721931885; cv=none; b=i+N0vg6Vwh9p/aqn422WocfZRpqyfmz6sDe3UtFptbCB9AEY5L3L1pJNY7AfwPqmBv3v3i3GkS38ArSFhf9hm36EeESpjjFfus8fD7jkfXkCG+IXs7R6nrikGqUMqr9eLDNWJNKIOnrvcovU8bCEhyDX4EbdW3sUe69qXNX2mfE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721931469; c=relaxed/simple;
-	bh=7TGdImb3lenZ6if5s4D0hbXhdDde95DNNoZfafPu3I8=;
+	s=arc-20240116; t=1721931885; c=relaxed/simple;
+	bh=i3R8nP9zLb+svWwS6BlGQj3N7iJXoBGSLMafotY8l+w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=W7WFEzGLbdHRB8lDymtOkBAuW4aAVqDQA9eqqzKZ/qEHgIweRYHrBRe4IABQWAnI/dcSXbCkCgIYnWPPZmy9JUwy35dPFhBNO1z3Ytb2n+W7Fmv/DfRchnWJZ6+JAS0hvTXnrng2zDgWRYzdzcN+22Wu4KhzF+Hnr/QvXqX0baQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=S6V5l6X1; arc=none smtp.client-ip=209.85.210.179
+	 Content-Type:Content-Disposition:In-Reply-To; b=tV6RXM7+zl7Ovkiu+ubLNUIY4AxkS4dTXkGWtSuCO1kWykjPEgeNV6fB+njVjpGrZi27zu6EG9VshCsH0Sh51MyTLGaNMNgq+8MDSQrv77HmFdWxctgtFyMtAsAOdtHdq7Tzy1A7nxv2FFhBt5uVdv0jNoASehBiVNaRIUDAaTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Hzh6axHs; arc=none smtp.client-ip=209.85.214.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="S6V5l6X1"
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-70d19c525b5so124119b3a.2
-        for <kvmarm@lists.linux.dev>; Thu, 25 Jul 2024 11:17:48 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Hzh6axHs"
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1fc52394c92so11503005ad.1
+        for <kvmarm@lists.linux.dev>; Thu, 25 Jul 2024 11:24:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1721931468; x=1722536268; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1721931883; x=1722536683; darn=lists.linux.dev;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZCU/39n/MEh1qJPI6jK5LfqbsxyFwdIdQzHQHHv611A=;
-        b=S6V5l6X1POF44Aq+sDSizcekO+zVJBxu0xG5h9ovEUMlWpqlBXZ/sbQZ89YCShwAzS
-         FPqQOiw8TkXKXbl/MAltN0Q+mfsKvPEX6NGv1pdclDPLlDX3LSKrQLPbeZH0sYFgj6jj
-         k37F9wv4dXKXIyhtPht7Wuy+q/jqrYtqQstELh/5U/y8fiYAT0lab1USA6KRVcmeLl0d
-         GFBiU7DROJ6z7RuYmPcHMF8j9CohuFZKwNDyTEdjbrx7pb/fLwEJ2/Idfd2AlbicF/a4
-         i1fASztw5CJjbswS5J9WTq27abES0wRcGLiaYrXQ1Sykg1e6ROCzMQknMYxHYbGtBE+E
-         85aA==
+        bh=Se8gRYY5LIzNKXtdqfpnU7+bApyeWuI8Q5DVjozYskA=;
+        b=Hzh6axHs5yg8bOdfVoAA1XcdaoktRJEXvRX22y7UzboG1H2q1H/+tDeURcS5+m05sw
+         u21HlRxaAY2GReaxomTz/dhRxyT9M4UmcsViysW+I9Eb94K3vz9Co76cEsMBfAHj+9R5
+         JyuCFKBYe9TfKZd6fBrboFEJMB/fj2k0pAwsVd+maFQx3uQ6a2UjwKO8QNL5qaDb/TEc
+         dX0dA/TxqmKrUmhGNN8O5lOfVa6oT9PYp945nxXs0Tm1Ase3wEWtwKG3JGqleAyZldKg
+         fsSqRKnXW8AHK9e4L2legsDWK1a9DRUNisHpPKn4JS5L4EZ3o3+Zbrgn1pl9noG8kggV
+         gznA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721931468; x=1722536268;
+        d=1e100.net; s=20230601; t=1721931883; x=1722536683;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZCU/39n/MEh1qJPI6jK5LfqbsxyFwdIdQzHQHHv611A=;
-        b=RC9iZunyEdWwp1rCKx+/EfiUSFl/+KTLPood3VFfQcRjxA5ti3o5/fqiea2kDVXHjf
-         0pqcB+IVgOJZizce2Qzo2cJzqzrCCNfFasx6vu9MpIYVyv3WDr/Iuk1NlWxAb6CVhQTr
-         vt6OhCVixDTVLqPByQV3V3lq0qeA9qLI2dfzx/n6JCFD+2MaBWSUYNcgyDdnrz+G21uh
-         k0ijsWcbFv38N7S0o+YCY7/7TVFnXVARWlG7Mzm1XZ8UA8myNpKcpIFal1TjHt2Q47SR
-         XJ0sgUicYMrYuaK95CR1sc9MRm+fnkHH6K/ofgjTH3WAfF2iVYnlOOmdtV3t/8SLsqI6
-         je9g==
-X-Forwarded-Encrypted: i=1; AJvYcCVAOL6XwaVy3IpQCL98TzYpiKnYW3U9pMmQg05D+k5KC2XxovRkMO/UxQ0aNBg/+PHLcrUbIE+rhS9z5tHTAB5gOUjOow8+
-X-Gm-Message-State: AOJu0Yx4cdcAdPqjyKTNmR5RxD908IqiVkuVNqwyOZlV1goHQQNLR7KT
-	I9eXM0Q2voZhepmv5ZZ0vL0P8dG55ueiFQ44r5vPuNFbCFhsF81TfyC19ivi4w==
-X-Google-Smtp-Source: AGHT+IGgJJ2MHUDyfdNf8nuLsnVaCfQ9A96+ttKTHUsGKEKorXbwZR90OZ/UEb7mApStThubbs9AYw==
-X-Received: by 2002:a05:6a00:2d8c:b0:70e:8070:f9d0 with SMTP id d2e1a72fcca58-70eae8d5c8amr3531836b3a.9.1721931466986;
-        Thu, 25 Jul 2024 11:17:46 -0700 (PDT)
+        bh=Se8gRYY5LIzNKXtdqfpnU7+bApyeWuI8Q5DVjozYskA=;
+        b=MBJgkmGju3TZNN6oLjXboAASRn37KGE6Fo4H2cJCCd6s03TdSwT0if37m3rNy9ZOVZ
+         NPTnga0PMFTjt1kFz0JdsNB4JBurD/LG8xK56ysxsjSbAGAHDvOxUjkLwSXujrSH8DsS
+         XRLE+y2RkQhO2qTns7QXkyC4LngMUKSRtUTzWcW7m3l41hscI2GvUbkWzOJEo26tq6Ih
+         FihNknOQYN/nwLh6h46oYWPhLuhA1HRdcEECDg8SwcgIfwPOHGk9lJxFsrnN/wwdWlUg
+         qb4nwwcsUhGA+V6MgXJkL7NJ8TuRO1aPv52+7eF1Zio+x615R4uxcGTh/W6v1Zmp+BOe
+         oWww==
+X-Forwarded-Encrypted: i=1; AJvYcCWoseqD89Y0rCSpr6c6N+LqTa3rg+2VepzA6L2JOPMu5/LJdlUUKMsCnJrIMkaCBBF0noo/mVEofxFraRj7Ed/oILyyXf3T
+X-Gm-Message-State: AOJu0YwUEu048OH1xZcVNpT+z5xRFR1TFoM0hGWsTl8Ydlyh29NN2v7l
+	PQo1d0B0fU2GFtCehntv/vQkxZkV5BZ7K85Zio3n6/9nUY9Dy+GRjUZ/U3LLig==
+X-Google-Smtp-Source: AGHT+IGk5VWe3MPnS2h4842sbCO2M3IxnHPFyqsvxia4EgfDcheEN/25uzJzuwNsHLA2SFZv0xA2tg==
+X-Received: by 2002:a17:902:da91:b0:1fc:5b68:ffb8 with SMTP id d9443c01a7336-1fed38ba92fmr44676985ad.30.1721931882617;
+        Thu, 25 Jul 2024 11:24:42 -0700 (PDT)
 Received: from google.com (61.139.125.34.bc.googleusercontent.com. [34.125.139.61])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7a9f884c245sm1490390a12.50.2024.07.25.11.17.45
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fed7fa4045sm17298215ad.258.2024.07.25.11.24.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jul 2024 11:17:46 -0700 (PDT)
-Date: Thu, 25 Jul 2024 11:17:41 -0700
+        Thu, 25 Jul 2024 11:24:42 -0700 (PDT)
+Date: Thu, 25 Jul 2024 11:24:37 -0700
 From: David Matlack <dmatlack@google.com>
 To: James Houghton <jthoughton@google.com>
 Cc: Andrew Morton <akpm@linux-foundation.org>,
@@ -73,11 +73,11 @@ Cc: Andrew Morton <akpm@linux-foundation.org>,
 	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH v6 08/11] KVM: x86: Optimize kvm_{test_,}age_gfn a little
- bit
-Message-ID: <ZqKWxfqRoJzUWroG@google.com>
+Subject: Re: [PATCH v6 09/11] KVM: x86: Implement fast_only versions of
+ kvm_{test_,}age_gfn
+Message-ID: <ZqKYZagP55dVD1m4@google.com>
 References: <20240724011037.3671523-1-jthoughton@google.com>
- <20240724011037.3671523-9-jthoughton@google.com>
+ <20240724011037.3671523-10-jthoughton@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -86,97 +86,66 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240724011037.3671523-9-jthoughton@google.com>
+In-Reply-To: <20240724011037.3671523-10-jthoughton@google.com>
 
 On 2024-07-24 01:10 AM, James Houghton wrote:
-> Optimize both kvm_age_gfn and kvm_test_age_gfn's interaction with the
-
-nit: Use () when referring to functions.
-
-> shadow MMU by, rather than checking if our memslot has rmaps, check if
-> there are any indirect_shadow_pages at all.
-
-What is optimized by checking indirect_shadow_pages instead of
-have_rmaps and what's the benefit? Smells like a premature optimization.
-
+> These fast-only versions simply ignore the shadow MMU. We can locklessly
+> handle the shadow MMU later.
 > 
-> Also, for kvm_test_age_gfn, reorder the TDP MMU check to be first. If we
-> find that the range is young, we do not need to check the shadow MMU.
+> Set HAVE_KVM_MMU_NOTIFIER_YOUNG_FAST_ONLY for X86_64 only, as that is
+> the only case where the TDP MMU might be used. Without the TDP MMU, the
+> fast-only notifiers will always be no-ops. It would be ideal not to
+> report has_fast_only if !tdp_mmu_enabled, but tdp_mmu_enabled can be
+> changed at any time.
 
-This should be a separate commit since it's a logically distinct change
-and no dependency on the other change in this commit (other than both
-touch the same function).
+tdp_mmu_enabled is a read-only KVM parameter. And even when it was
+writable, it was still fixed for a given VM at VM creation time.
 
-Splitting the commits up will also make it easier to write more specific
-short logs (instead of "optimize a little bit" :)
-
-Also, the commit re-orders kvm_age_gfn() as well but the commit message
-only mentions kvm_test_age_gfn(). No objection to keeping the two
-functions consistent but it should be called out in the commit message.
+Would it make more sense to have kvm_arch_post_init_vm() set
+has_fast_aging if the architecture supports it. And for x86 that means
+iff tdp_mmu_enabled.
 
 > 
 > Signed-off-by: James Houghton <jthoughton@google.com>
 > ---
->  arch/x86/kvm/mmu/mmu.c | 21 +++++++++++++--------
->  1 file changed, 13 insertions(+), 8 deletions(-)
+>  arch/x86/kvm/Kconfig   | 1 +
+>  arch/x86/kvm/mmu/mmu.c | 4 ++--
+>  2 files changed, 3 insertions(+), 2 deletions(-)
 > 
+> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+> index 6ac43074c5e9..ed9049cf1255 100644
+> --- a/arch/x86/kvm/Kconfig
+> +++ b/arch/x86/kvm/Kconfig
+> @@ -24,6 +24,7 @@ config KVM
+>  	select KVM_COMMON
+>  	select KVM_GENERIC_MMU_NOTIFIER
+>  	select KVM_MMU_NOTIFIER_YOUNG_LOCKLESS
+> +	select HAVE_KVM_MMU_NOTIFIER_YOUNG_FAST_ONLY if X86_64
+>  	select HAVE_KVM_IRQCHIP
+>  	select HAVE_KVM_PFNCACHE
+>  	select HAVE_KVM_DIRTY_RING_TSO
 > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 7b93ce8f0680..919d59385f89 100644
+> index 919d59385f89..3c6c9442434a 100644
 > --- a/arch/x86/kvm/mmu/mmu.c
 > +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -1629,19 +1629,24 @@ static void rmap_add(struct kvm_vcpu *vcpu, const struct kvm_memory_slot *slot,
->  	__rmap_add(vcpu->kvm, cache, slot, spte, gfn, access);
->  }
+> @@ -1641,7 +1641,7 @@ bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+>  	if (tdp_mmu_enabled)
+>  		young |= kvm_tdp_mmu_age_gfn_range(kvm, range);
 >  
-> +static bool kvm_has_shadow_mmu_sptes(struct kvm *kvm)
-> +{
-> +	return !tdp_mmu_enabled || READ_ONCE(kvm->arch.indirect_shadow_pages);
-> +}
-> +
->  bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
->  {
->  	bool young = false;
->  
-> -	if (kvm_memslots_have_rmaps(kvm)) {
-> +	if (tdp_mmu_enabled)
-> +		young |= kvm_tdp_mmu_age_gfn_range(kvm, range);
-> +
-> +	if (kvm_has_shadow_mmu_sptes(kvm)) {
+> -	if (kvm_has_shadow_mmu_sptes(kvm)) {
+> +	if (!range->arg.fast_only && kvm_has_shadow_mmu_sptes(kvm)) {
 >  		write_lock(&kvm->mmu_lock);
 >  		young = kvm_handle_gfn_range(kvm, range, kvm_age_rmap);
 >  		write_unlock(&kvm->mmu_lock);
->  	}
+> @@ -1657,7 +1657,7 @@ bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+>  	if (tdp_mmu_enabled)
+>  		young |= kvm_tdp_mmu_test_age_gfn(kvm, range);
 >  
-> -	if (tdp_mmu_enabled)
-> -		young |= kvm_tdp_mmu_age_gfn_range(kvm, range);
-> -
->  	return young;
->  }
->  
-> @@ -1649,15 +1654,15 @@ bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
->  {
->  	bool young = false;
->  
-> -	if (kvm_memslots_have_rmaps(kvm)) {
-> +	if (tdp_mmu_enabled)
-> +		young |= kvm_tdp_mmu_test_age_gfn(kvm, range);
-> +
-> +	if (!young && kvm_has_shadow_mmu_sptes(kvm)) {
-
-nit: A short comment here might be helpful to explain why young is
-checked.
-
+> -	if (!young && kvm_has_shadow_mmu_sptes(kvm)) {
+> +	if (!young && !range->arg.fast_only && kvm_has_shadow_mmu_sptes(kvm)) {
 >  		write_lock(&kvm->mmu_lock);
 >  		young = kvm_handle_gfn_range(kvm, range, kvm_test_age_rmap);
 >  		write_unlock(&kvm->mmu_lock);
->  	}
->  
-> -	if (tdp_mmu_enabled)
-> -		young |= kvm_tdp_mmu_test_age_gfn(kvm, range);
-> -
->  	return young;
->  }
->  
 > -- 
 > 2.46.0.rc1.232.g9752f9e123-goog
 > 
