@@ -1,57 +1,57 @@
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 647F617FAC0
-	for <kvmarm@lists.linux.dev>; Fri, 26 Jul 2024 23:53:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CFF117F4EB
+	for <kvmarm@lists.linux.dev>; Fri, 26 Jul 2024 23:53:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722038030; cv=none; b=QKDLMWjXcGK8EC5iI6SzKmNJKsWHmPuz2SqcoQHLCLroZTK4/9VhXFRqdRpaPeBHb0+3QsF8CF4Zj4fR/8ZSdZHw0+AkaJkY4OGaE5Ogdgb66jWLEn4PIoZsD8uUyKaeWTkUebZLWNo2jRQHKM9utW6LCiFWJ7yznHaa2/aMIz8=
+	t=1722038032; cv=none; b=fJc/5hJoStj+T8PXUzDMRS2ahrHHAbs/jaHSvjQTfixMm7Ty9z77Z2bw9WEUSwFTmg6xJ7Qc0e0eJ++CXb/EIhSNRhQZe1qNhMG2XJMKamzYRW31cirQb2lJu8iJYCon7UlwaLQwxTmaj9+OQ//M8Q9vEM7VpdvnDgupf6I/lP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722038030; c=relaxed/simple;
-	bh=iyko0n6fwOnAH7YleGpA9px1iO4LPswzFGIVpqZk3kk=;
+	s=arc-20240116; t=1722038032; c=relaxed/simple;
+	bh=RxYXW38TO1i/zpJ/VZw7DD4eCUef7bpZ1SOW7WvxVVk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=aMObYMHHwdotJpkZi5rJWvDzzFyoIgZK4wPw4toDJYpWnLX7SqPiFUXWFqQyWUQPxbXfz3Jc7XvtGP7DWOR9NOPr7bu4uxKxnbUnGJ06hkLMqZucU3faxqbal1sBMR0HvZRqxop7ugSD4bcHD4wa5P8ii1mp1ZMc1sW7q/Oan/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=v6VVhaan; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=t9amGUHz5rcMD1Ycd3d5twissZUBBuOb2zSi4+u9S13rmmVYGzh5XuSefwf3IonKc/wX92V18T7M/13p2EfHCG+azQ/u0gOL4HwhHEhL0NAWIYMbs8wX/ed9t7j81Tw65ceLtWfGMf3NvA3IGhKVfBz1k5lCQBzSFzk8z76SEbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iaq2DrbE; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="v6VVhaan"
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1fd72932d74so11082015ad.1
-        for <kvmarm@lists.linux.dev>; Fri, 26 Jul 2024 16:53:48 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iaq2DrbE"
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-70d1df50db2so1368137b3a.0
+        for <kvmarm@lists.linux.dev>; Fri, 26 Jul 2024 16:53:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722038028; x=1722642828; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1722038030; x=1722642830; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=f0UOaTihDpRJ7PP+Ej2doGcOk+AHWo0BkuOsHzozLVI=;
-        b=v6VVhaanJw67KnBUhiQpuCSSA6BD8HpgA8LZG/BMmzFr08WlSt2PiI8iriFB0NTQoM
-         zyPPNr7ZvlFVIeL4Zx5mGJAM1cAw4WWz8Dh+fdk0BllfbWn/2kjzMUe3++LAynoO5gLJ
-         Uu0dQAeWfi1+a4H4fYSQNwqqhBPvHebZHu5LJVDwdaZyxEqH8yfr6UsAAWgQ0olLbIOD
-         948XQF0sPd6jOgV1DPo3qYrTd33gdZKdlLae9behp5SW5am7vzdC2RqBrIOZsblAJjFf
-         obUBNDkUHwLedMDe/udGQykXIoNuY/MzJlwJDl1Anccyk7VzmdiuBYpu0Fh+jFkKthsQ
-         NdzA==
+        bh=Xse5B7AOfcqAOlY7bR5VB/olShqjuvoHnQg+aILML2Y=;
+        b=iaq2DrbELvqx27YjY5hd+hlNf+MWQ3sGBHV7fLbJP1jCWwWfuNYrrJZBIrBiPAp0q3
+         IiTtrHNPD4yEhpt/sV9yVMqjA46V4N/d+8aPm8/HGzB30vmAsAJHo/AmZM4DFfallzXq
+         MQC77NOMfitA/Mf0gWdqSiT8j/w5DTFzh3Hf9Iw/amDi/ZALxmWq+SnnyA8wCt5bZxx8
+         R5AAHUrW8pFY39Tk/dTw3khoJouB7z4GANlN+SwmTCEN4xXrt6z5noRrSwpxMD1xHZG5
+         BdfH2iREIXj6otrHh0OL9WcsfTWxa6NO5Hma81S9p5zE1bkIQHmOTngavJz4dzj2hQMG
+         FYSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722038028; x=1722642828;
+        d=1e100.net; s=20230601; t=1722038030; x=1722642830;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=f0UOaTihDpRJ7PP+Ej2doGcOk+AHWo0BkuOsHzozLVI=;
-        b=dWuE+SIJTnM2iMBtVCj9omMX8MNWQfUCk2lD3eJQZpoG/hDX/wQ9ijeoSOrOFZ4E77
-         UJ0B+D9o8zeOA+XyuWZQHc+AhosrTHN+uSyQkyqSyEMHvBwQBRWteptN194p7V9KEMlf
-         1KKu/nPbGn+uH9qcKaEeUKW/i6ct01+2epHun/Yq0VV712yRp7+HMYdErUD+yK1LkceJ
-         7o2LeAQpVCpT2YxAB+OZYc5qn9gZVPrrLSd3ETLgLq/CG+dsET+iG9BxnZmU5cxStljP
-         qjGaI7oGwEnRWJjHopvDgI7avCeU2iXpnHcjYJ1j2Gj5UUvUDmPQ68szExiS7sYSIfKA
-         Y1TQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXDhIT/gjXdx5WRPkN6osOPNcEYEvT+EhTxcn3oGQj4eaoMRzLvOjIQULPYJRggUWqFC2I8yMk=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxsFxPm3onauVOOcO5s9sKKMPMwgDXLKxaSvRCtqLoZtnRaaH4V
-	BHSweG04bes1hKsb6hjyVXVLOpNBuPgHykgseq0qYBMR4z4qgsiJ1Cur4QBB4DS6ZtU3KStTSnA
-	4DQ==
-X-Google-Smtp-Source: AGHT+IGYUMRc1uUxr912DKcgHH4gUUnvf0wLEKnF8dkY5ruUFOJLgoqFTBS1LD3evC3JUrfTD0ZWGbhz678=
+        bh=Xse5B7AOfcqAOlY7bR5VB/olShqjuvoHnQg+aILML2Y=;
+        b=aHLuD/gx1Kj5y6uMJ2o86HaOPFRwDfSAggDqTJJbf2rHz5lO7aFiv+8MLFyhrD+fW6
+         M5lxQpELeRUBQLOYYOlsIfBf7rSrsPHgqgKIgeHSswV2VgE4iC/pOa5XM3DhZjT8H86D
+         qpZtloGqUQEKoREoXTlInfyrhKiNOYgPD+tArZwyxRZjTR/5AitWpY6/4/dK3p+GNxT5
+         chkUElUabM5DVZko65rHdXBemfwJO5ShcS5wkU7C8Hl1xLwZKgu0+DtAPqIwYiJ6JeQQ
+         r4teGX0KClyXy6ZsJIzyNBTLZcdy5kuDg51TJRQidHbXAyXLtUz/UBC0qHN08Us2SY2H
+         8vkg==
+X-Forwarded-Encrypted: i=1; AJvYcCVkrEYBO7XQ//hiK8NxCDCge6dkTygMleOeiZSq4MvMh/NHiHUj16VTntirixOwOybqhe/CWPRtCl4wpLQLE2dcZM4gvnIG
+X-Gm-Message-State: AOJu0YzGflFaCWAR//2SH3/Vw5tBT1zDrsMj+Tsk3lzWYyvgfiBFRZ/S
+	KkPXbq4u+iE+WRldXcWD7fw6amBWqNNhIMGxjsbhFjF1pvBaREijgpnKsJpwEqtGm7lEXT/77ji
+	v4Q==
+X-Google-Smtp-Source: AGHT+IEFcNwoZPtxzQ32cLJ1vxa7gkQJVcgltXDXIuLlGv+WV+Ss10kIc9nwtzcNKm3zIIgT6vAGf5Ndk9o=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:cecd:b0:1fd:6529:7443 with SMTP id
- d9443c01a7336-1ff0486a65amr545105ad.11.1722038027663; Fri, 26 Jul 2024
- 16:53:47 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:2e2a:b0:70d:9a0e:c13b with SMTP id
+ d2e1a72fcca58-70ece7f0562mr55820b3a.3.1722038029490; Fri, 26 Jul 2024
+ 16:53:49 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 26 Jul 2024 16:51:43 -0700
+Date: Fri, 26 Jul 2024 16:51:44 -0700
 In-Reply-To: <20240726235234.228822-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,9 +61,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240726235234.228822-1-seanjc@google.com>
 X-Mailer: git-send-email 2.46.0.rc1.232.g9752f9e123-goog
-Message-ID: <20240726235234.228822-35-seanjc@google.com>
-Subject: [PATCH v12 34/84] KVM: Add a helper to lookup a pfn without grabbing
- a reference
+Message-ID: <20240726235234.228822-36-seanjc@google.com>
+Subject: [PATCH v12 35/84] KVM: x86: Use kvm_lookup_pfn() to check if retrying
+ #PF is useful
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
@@ -80,57 +80,66 @@ Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	David Matlack <dmatlack@google.com>, David Stevens <stevensd@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 
-Add a kvm_follow_pfn() wrapper, kvm_lookup_pfn(), to allow looking up a
-gfn=>pfn mapping without the caller getting a reference to any underlying
-page.  The API will be used in flows that want to know if a gfn points at
-a valid pfn, but don't actually need to do anything with the pfn.
+Use kvm_lookup_pfn() instead of an open coded equivalent when checking to
+see if KVM should exit to userspace or re-enter the guest after failed
+instruction emulation triggered by a guest page fault.
+
+Note, there is a small functional change as kvm_lookup_pfn() doesn't mark
+the page as accessed, whereas kvm_release_pfn_clean() does mark the page
+accessed (if the pfn is backed by a refcounted struct page).  Neither
+behavior is wrong per se, e.g. querying the gfn=>pfn mapping doesn't
+actually access the page, but the guest _did_ access the gfn, otherwise
+the fault wouldn't have occurred.
+
+That said, either KVM will exit to userspace and the guest will likely be
+terminated, or KVM will re-enter the guest and, barring weirdness in the
+guest, the guest will re-access the gfn, and KVM will fault-in the pfn and
+mark it accessed.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- include/linux/kvm_host.h |  2 ++
- virt/kvm/kvm_main.c      | 16 ++++++++++++++++
- 2 files changed, 18 insertions(+)
+ arch/x86/kvm/x86.c | 16 ++++------------
+ 1 file changed, 4 insertions(+), 12 deletions(-)
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 82ca0971c156..5a572cef4adc 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1212,6 +1212,8 @@ static inline void kvm_release_page_unused(struct page *page)
- void kvm_release_page_clean(struct page *page);
- void kvm_release_page_dirty(struct page *page);
- 
-+kvm_pfn_t kvm_lookup_pfn(struct kvm *kvm, gfn_t gfn);
-+
- kvm_pfn_t gfn_to_pfn(struct kvm *kvm, gfn_t gfn);
- kvm_pfn_t gfn_to_pfn_prot(struct kvm *kvm, gfn_t gfn, bool write_fault,
- 		      bool *writable);
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 0b3c0bddaa07..ad84dab8c5dc 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -3118,6 +3118,22 @@ kvm_pfn_t kvm_vcpu_gfn_to_pfn(struct kvm_vcpu *vcpu, gfn_t gfn)
- }
- EXPORT_SYMBOL_GPL(kvm_vcpu_gfn_to_pfn);
- 
-+kvm_pfn_t kvm_lookup_pfn(struct kvm *kvm, gfn_t gfn)
-+{
-+	struct page *refcounted_page = NULL;
-+	struct kvm_follow_pfn kfp = {
-+		.slot = gfn_to_memslot(kvm, gfn),
-+		.gfn = gfn,
-+		.flags = FOLL_WRITE,
-+		.refcounted_page = &refcounted_page,
-+	};
-+	kvm_pfn_t pfn;
-+
-+	pfn = kvm_follow_pfn(&kfp);
-+	kvm_release_page_unused(refcounted_page);
-+	return pfn;
-+}
-+
- int kvm_prefetch_pages(struct kvm_memory_slot *slot, gfn_t gfn,
- 		       struct page **pages, int nr_pages)
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index af6c8cf6a37a..59501ad6e7f5 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -8867,7 +8867,6 @@ static bool reexecute_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+ 				  int emulation_type)
  {
+ 	gpa_t gpa = cr2_or_gpa;
+-	kvm_pfn_t pfn;
+ 
+ 	if (!(emulation_type & EMULTYPE_ALLOW_RETRY_PF))
+ 		return false;
+@@ -8892,22 +8891,15 @@ static bool reexecute_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+ 	}
+ 
+ 	/*
+-	 * Do not retry the unhandleable instruction if it faults on the
+-	 * readonly host memory, otherwise it will goto a infinite loop:
++	 * Do not retry the unhandleable instruction if emulation was triggered
++	 * for emulated MMIO, e.g. by a readonly memslot or lack of a memslot,
++	 * otherwise KVM will send the vCPU into an infinite loop:
+ 	 * retry instruction -> write #PF -> emulation fail -> retry
+ 	 * instruction -> ...
+ 	 */
+-	pfn = gfn_to_pfn(vcpu->kvm, gpa_to_gfn(gpa));
+-
+-	/*
+-	 * If the instruction failed on the error pfn, it can not be fixed,
+-	 * report the error to userspace.
+-	 */
+-	if (is_error_noslot_pfn(pfn))
++	if (is_error_noslot_pfn(kvm_lookup_pfn(vcpu->kvm, gpa_to_gfn(gpa))))
+ 		return false;
+ 
+-	kvm_release_pfn_clean(pfn);
+-
+ 	/*
+ 	 * If emulation may have been triggered by a write to a shadowed page
+ 	 * table, unprotect the gfn (zap any relevant SPTEs) and re-enter the
 -- 
 2.46.0.rc1.232.g9752f9e123-goog
 
