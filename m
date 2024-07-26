@@ -1,57 +1,57 @@
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CFF117F4EB
-	for <kvmarm@lists.linux.dev>; Fri, 26 Jul 2024 23:53:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B50217F4EB
+	for <kvmarm@lists.linux.dev>; Fri, 26 Jul 2024 23:53:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722038032; cv=none; b=fJc/5hJoStj+T8PXUzDMRS2ahrHHAbs/jaHSvjQTfixMm7Ty9z77Z2bw9WEUSwFTmg6xJ7Qc0e0eJ++CXb/EIhSNRhQZe1qNhMG2XJMKamzYRW31cirQb2lJu8iJYCon7UlwaLQwxTmaj9+OQ//M8Q9vEM7VpdvnDgupf6I/lP4=
+	t=1722038034; cv=none; b=jun+TDSzpRYZhWZDuN94OQ68MBlG8wawaW44eMlLgc+XxZ+y3f9QylKRzbVKMc6tkvr/JhatF8Ru6YlAMWWRctPXf7+PF5HwxOjR5hw2M2OdtEukkg15dZuRxk6JhPLTGAfuwE7RSs2NzFZe8BA9PPLPsyDMRcB3oWIWQEiUh18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722038032; c=relaxed/simple;
-	bh=RxYXW38TO1i/zpJ/VZw7DD4eCUef7bpZ1SOW7WvxVVk=;
+	s=arc-20240116; t=1722038034; c=relaxed/simple;
+	bh=DtXqKMMIismcR5Jrwgm9yWaU7DBxhq5zzlFfV1KGA1w=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=t9amGUHz5rcMD1Ycd3d5twissZUBBuOb2zSi4+u9S13rmmVYGzh5XuSefwf3IonKc/wX92V18T7M/13p2EfHCG+azQ/u0gOL4HwhHEhL0NAWIYMbs8wX/ed9t7j81Tw65ceLtWfGMf3NvA3IGhKVfBz1k5lCQBzSFzk8z76SEbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iaq2DrbE; arc=none smtp.client-ip=209.85.210.201
+	 To:Cc:Content-Type; b=aexWwsoLnh97flOvo19yRHH54viZAQte+V0E1cOZYpsTl3TjA5YoQTzIj+nRkpcs/byBlkNeEPKGpWzNNjETIPn7ob3UF8FzV7ki7WRO/2T06EUWFJCPTHPidOeaNGVyNZ0a+DuLK5KwjhNYhjrhSZa+S6Uv0VjotPTGLqQsqyw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=s8+O8ldH; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iaq2DrbE"
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-70d1df50db2so1368137b3a.0
-        for <kvmarm@lists.linux.dev>; Fri, 26 Jul 2024 16:53:50 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="s8+O8ldH"
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2cb63abe6f7so1690411a91.0
+        for <kvmarm@lists.linux.dev>; Fri, 26 Jul 2024 16:53:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722038030; x=1722642830; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1722038032; x=1722642832; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=Xse5B7AOfcqAOlY7bR5VB/olShqjuvoHnQg+aILML2Y=;
-        b=iaq2DrbELvqx27YjY5hd+hlNf+MWQ3sGBHV7fLbJP1jCWwWfuNYrrJZBIrBiPAp0q3
-         IiTtrHNPD4yEhpt/sV9yVMqjA46V4N/d+8aPm8/HGzB30vmAsAJHo/AmZM4DFfallzXq
-         MQC77NOMfitA/Mf0gWdqSiT8j/w5DTFzh3Hf9Iw/amDi/ZALxmWq+SnnyA8wCt5bZxx8
-         R5AAHUrW8pFY39Tk/dTw3khoJouB7z4GANlN+SwmTCEN4xXrt6z5noRrSwpxMD1xHZG5
-         BdfH2iREIXj6otrHh0OL9WcsfTWxa6NO5Hma81S9p5zE1bkIQHmOTngavJz4dzj2hQMG
-         FYSg==
+        bh=4+b7zhduK4lVkLFwoy0UCXuK8f7LQragdXHyxQERLss=;
+        b=s8+O8ldHz1HEX3IomLpLhym89LmMr5eLKEG0bYYCJqdXjep7pjlE89aWs5YGjl/9HM
+         H0gkZCzezjWFjFCri0OIx4LhY+hylqKn54tahKjCedhZsvC04EKm//n6ide2pZyCMtz2
+         OB9rZqV8kvuysrFqM7I2VqbnTX0F0P/CcVROxdqrLd9KbyYe4XUxf8i/qRITM1kakrNd
+         i8a5q7Kk+upnVQGVk2iiAaQ9OwzRqkoya/XTkxBbq60kq3RKJ+0nY48xpF/taWmpU4Jh
+         EQP6sjrFzJzsM/flt7mzYDzSbVN3LZn5XHPC2O8a/G00jBoiuHzwOF2HY6uc6MRifdqn
+         oqyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722038030; x=1722642830;
+        d=1e100.net; s=20230601; t=1722038032; x=1722642832;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Xse5B7AOfcqAOlY7bR5VB/olShqjuvoHnQg+aILML2Y=;
-        b=aHLuD/gx1Kj5y6uMJ2o86HaOPFRwDfSAggDqTJJbf2rHz5lO7aFiv+8MLFyhrD+fW6
-         M5lxQpELeRUBQLOYYOlsIfBf7rSrsPHgqgKIgeHSswV2VgE4iC/pOa5XM3DhZjT8H86D
-         qpZtloGqUQEKoREoXTlInfyrhKiNOYgPD+tArZwyxRZjTR/5AitWpY6/4/dK3p+GNxT5
-         chkUElUabM5DVZko65rHdXBemfwJO5ShcS5wkU7C8Hl1xLwZKgu0+DtAPqIwYiJ6JeQQ
-         r4teGX0KClyXy6ZsJIzyNBTLZcdy5kuDg51TJRQidHbXAyXLtUz/UBC0qHN08Us2SY2H
-         8vkg==
-X-Forwarded-Encrypted: i=1; AJvYcCVkrEYBO7XQ//hiK8NxCDCge6dkTygMleOeiZSq4MvMh/NHiHUj16VTntirixOwOybqhe/CWPRtCl4wpLQLE2dcZM4gvnIG
-X-Gm-Message-State: AOJu0YzGflFaCWAR//2SH3/Vw5tBT1zDrsMj+Tsk3lzWYyvgfiBFRZ/S
-	KkPXbq4u+iE+WRldXcWD7fw6amBWqNNhIMGxjsbhFjF1pvBaREijgpnKsJpwEqtGm7lEXT/77ji
-	v4Q==
-X-Google-Smtp-Source: AGHT+IEFcNwoZPtxzQ32cLJ1vxa7gkQJVcgltXDXIuLlGv+WV+Ss10kIc9nwtzcNKm3zIIgT6vAGf5Ndk9o=
+        bh=4+b7zhduK4lVkLFwoy0UCXuK8f7LQragdXHyxQERLss=;
+        b=GVjEobDfhZ5Ipt3WeE7AMjlNXfpDlBlnRE8ovHErgRR9psp/z28sXnyScS/wx5DwC+
+         j/H1dKZgD18a8y4ieAwNy3btB7MudA4v/67E27n8hCvbh9bboR73mhijU5OIEvL+1B1X
+         QDvfPoLJZ2uzLM7yaVAxScgT730kHvTSQEfiS2vIguSwbiZSSJcPWBkZTnXO7Oc3d9eS
+         mLwHxhoh+5Iruwfpiohvj9jmSfdupOdUQVYBglsQVoxaG+14jwmtxe308jNCxA8XzJyj
+         qFennzgd7Snl/kCPhJcoQpqP0aoXa0ZeLJ/UXXAPWRsv+ngpxgnBpW1NhnZs0DI6sWn4
+         SF0w==
+X-Forwarded-Encrypted: i=1; AJvYcCXhDQ007+PJqMMpoUvWVkEv+qmagSd5dKh7Zw1DdlTOlmPiap1ZIU4gSJ99+W3O113sJMpcmiLHCH11lbdvR+RcK6SZeFXu
+X-Gm-Message-State: AOJu0YzfeuI/BRaN9EiAOtlBSHpkfktJZW4D65ln45hJQwHvYfyicE8b
+	lU/ft4LZFNCE7n1zP8teZN9dCyvMZY3LjqaEyDWH1bxuZKqMTSC5KSZ5QcTbuD57mT98hCBL3A2
+	9sQ==
+X-Google-Smtp-Source: AGHT+IH83fBTCbgjCdiYRsrBHzQDSmPEXzxw/dBUECcFBZL6/864S5lAdfsy5Zb31ECaUXnMa239gb1WZDE=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:2e2a:b0:70d:9a0e:c13b with SMTP id
- d2e1a72fcca58-70ece7f0562mr55820b3a.3.1722038029490; Fri, 26 Jul 2024
- 16:53:49 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:90b:4f8b:b0:2c9:759f:a47d with SMTP id
+ 98e67ed59e1d1-2cf7e84e558mr8570a91.4.1722038031713; Fri, 26 Jul 2024 16:53:51
+ -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 26 Jul 2024 16:51:44 -0700
+Date: Fri, 26 Jul 2024 16:51:45 -0700
 In-Reply-To: <20240726235234.228822-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,9 +61,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240726235234.228822-1-seanjc@google.com>
 X-Mailer: git-send-email 2.46.0.rc1.232.g9752f9e123-goog
-Message-ID: <20240726235234.228822-36-seanjc@google.com>
-Subject: [PATCH v12 35/84] KVM: x86: Use kvm_lookup_pfn() to check if retrying
- #PF is useful
+Message-ID: <20240726235234.228822-37-seanjc@google.com>
+Subject: [PATCH v12 36/84] KVM: x86: Use kvm_lookup_pfn() to check if APIC
+ access page was installed
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
@@ -80,66 +80,55 @@ Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	David Matlack <dmatlack@google.com>, David Stevens <stevensd@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 
-Use kvm_lookup_pfn() instead of an open coded equivalent when checking to
-see if KVM should exit to userspace or re-enter the guest after failed
-instruction emulation triggered by a guest page fault.
-
-Note, there is a small functional change as kvm_lookup_pfn() doesn't mark
-the page as accessed, whereas kvm_release_pfn_clean() does mark the page
-accessed (if the pfn is backed by a refcounted struct page).  Neither
-behavior is wrong per se, e.g. querying the gfn=>pfn mapping doesn't
-actually access the page, but the guest _did_ access the gfn, otherwise
-the fault wouldn't have occurred.
-
-That said, either KVM will exit to userspace and the guest will likely be
-terminated, or KVM will re-enter the guest and, barring weirdness in the
-guest, the guest will re-access the gfn, and KVM will fault-in the pfn and
-mark it accessed.
+Use kvm_lookup_pfn() to verify that the APIC access page was allocated and
+installed as expected.  The mapping is controlled by KVM, i.e. it's
+guaranteed to be backed by struct page, the purpose of the check is purely
+to ensure the page is allocated, i.e. that KVM doesn't point the guest at
+garbage.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/x86.c | 16 ++++------------
- 1 file changed, 4 insertions(+), 12 deletions(-)
+ arch/x86/kvm/lapic.c | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index af6c8cf6a37a..59501ad6e7f5 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -8867,7 +8867,6 @@ static bool reexecute_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 				  int emulation_type)
- {
- 	gpa_t gpa = cr2_or_gpa;
--	kvm_pfn_t pfn;
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 6d65b36fac29..88dc43660d23 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -2612,8 +2612,8 @@ void kvm_apic_update_apicv(struct kvm_vcpu *vcpu)
  
- 	if (!(emulation_type & EMULTYPE_ALLOW_RETRY_PF))
- 		return false;
-@@ -8892,22 +8891,15 @@ static bool reexecute_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+ int kvm_alloc_apic_access_page(struct kvm *kvm)
+ {
+-	struct page *page;
+ 	void __user *hva;
++	kvm_pfn_t pfn;
+ 	int ret = 0;
+ 
+ 	mutex_lock(&kvm->slots_lock);
+@@ -2628,17 +2628,16 @@ int kvm_alloc_apic_access_page(struct kvm *kvm)
+ 		goto out;
  	}
  
+-	page = gfn_to_page(kvm, APIC_DEFAULT_PHYS_BASE >> PAGE_SHIFT);
+-	if (!page) {
+-		ret = -EFAULT;
+-		goto out;
+-	}
+-
  	/*
--	 * Do not retry the unhandleable instruction if it faults on the
--	 * readonly host memory, otherwise it will goto a infinite loop:
-+	 * Do not retry the unhandleable instruction if emulation was triggered
-+	 * for emulated MMIO, e.g. by a readonly memslot or lack of a memslot,
-+	 * otherwise KVM will send the vCPU into an infinite loop:
- 	 * retry instruction -> write #PF -> emulation fail -> retry
- 	 * instruction -> ...
+ 	 * Do not pin the page in memory, so that memory hot-unplug
+ 	 * is able to migrate it.
  	 */
--	pfn = gfn_to_pfn(vcpu->kvm, gpa_to_gfn(gpa));
--
--	/*
--	 * If the instruction failed on the error pfn, it can not be fixed,
--	 * report the error to userspace.
--	 */
--	if (is_error_noslot_pfn(pfn))
-+	if (is_error_noslot_pfn(kvm_lookup_pfn(vcpu->kvm, gpa_to_gfn(gpa))))
- 		return false;
- 
--	kvm_release_pfn_clean(pfn);
--
- 	/*
- 	 * If emulation may have been triggered by a write to a shadowed page
- 	 * table, unprotect the gfn (zap any relevant SPTEs) and re-enter the
+-	put_page(page);
++	pfn = kvm_lookup_pfn(kvm, APIC_DEFAULT_PHYS_BASE >> PAGE_SHIFT);
++	if (is_error_noslot_pfn(pfn)) {
++		ret = -EFAULT;
++		goto out;
++	}
++
+ 	kvm->arch.apic_access_memslot_enabled = true;
+ out:
+ 	mutex_unlock(&kvm->slots_lock);
 -- 
 2.46.0.rc1.232.g9752f9e123-goog
 
