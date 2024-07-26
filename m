@@ -1,57 +1,57 @@
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BCB317E8E0
-	for <kvmarm@lists.linux.dev>; Fri, 26 Jul 2024 23:53:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83A1117E47F
+	for <kvmarm@lists.linux.dev>; Fri, 26 Jul 2024 23:53:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722038020; cv=none; b=bFMEEbp2WaBxjXTe4gOcU9p0gFEl6BlB9dZcfe5eHMs0NXtshfifp4J1nb6f6X/e5rvS2vYdD9VGnT0IXtAxNOJcDQDN4a1ZLzUCu7bgXvp4xlRGuC2k2G8uP3vwxy7RRUa7/fEDFFXdyyd1om2zTiiYkw0JWMeOpxmoA3bydXk=
+	t=1722038022; cv=none; b=BkFgRuIqvZ5raapAsCydPOhQQWr5mEAYTJTYk375Wpl5ZkB+tEh5Se3YbDjmFdG//cEYj1vuchW9HlJImNORsjbh7VQtkzEzqeED9fyqO7MCPeUap9bLS3XmIXnJJV4Tt31Vyt4BfAMI8V5wSs00o6bP+Wc5T6UaZJb3+aJzI8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722038020; c=relaxed/simple;
-	bh=4wtI3HrZftg8TSroI/LySwRU47K0urA1mYWFvNIe4WQ=;
+	s=arc-20240116; t=1722038022; c=relaxed/simple;
+	bh=Ha3QOJ9ztlbiDtlpfFA1Gmi3O5m4m+UNE8dfT+rqtiE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=SUMQQEb1hqXxKBPRhvd/VTHUxvLvqvcIXp8Z7uUF3WRRr5RC7dxKYGdXedMTnwv1BJeNth/7kqMZTfFeRtujMVuhbgjuN+pEIh7a72b3HnIl6sQHSgGgUkop10TpzOwYdAqSD8kDfVR+5UOgBpMRS5iufjz874S12wW5ho76Dys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3qJCfrLy; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=O1E0uKQEasSScHlaCNlktsztNCk+H+VjLeq0UVYY00OA+fNWaAVJX6FawOb72xrE9LP27pPkHmI93hquE1wZz4EOvGQKYIcMEXVuPvyuaJo8kmsak4cap7atsU8vyNObg0jxCigtFl9WH7+5tzYWbJri2gRt4aSWFKMYTpIHneo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XFHje9kc; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3qJCfrLy"
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-70d1a9bad5dso1374029b3a.0
-        for <kvmarm@lists.linux.dev>; Fri, 26 Jul 2024 16:53:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XFHje9kc"
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e03b3f48c65so446176276.0
+        for <kvmarm@lists.linux.dev>; Fri, 26 Jul 2024 16:53:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722038018; x=1722642818; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1722038020; x=1722642820; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=hlhq7We3LF/Ul7sqre1CZocM6x6KNUXlB6LyC83BMPc=;
-        b=3qJCfrLywH35oOArM5Ex2p2/J/1PlJsfFfLXh0oUKQLIBPOwLxKBXcvIphQ9PqW2Ga
-         2gAOPSYs1LjBM65aUq3m+WBNvD7u2axin5a2kGMCtbmoDsH9VDd6ci0JH4/ElgdJX4r9
-         PwROUS8kHiB2cBhGshJX1fmGe0YD800tEr3cYfwCUSesfViDaF827SWHUly2+6EIXG+P
-         1gBFlAXZGMzEJD4x56m0PU+QV1LLghQHFBgX1W4hYjM0WHfSL9gn1fJsVOY5muLAww8N
-         EptEKMNJ3m+gG+8CPuKxHB0vo1NxL3Gf614s06B8e4jXHID8SQM3s1zclfnb/NP0pwLJ
-         Q2jQ==
+        bh=ABkrzr1cGSxzpfOXTkcnfxpngM7W7Byv3yxUL9/Xpog=;
+        b=XFHje9kc/CyTO+iiqLn+glqd8m1PnaVXDQ2b0W30tGAxJbV4w9ZrwYjdEzW/v173Au
+         YbVUl8EBAXE/nNWZuNxT/Bm5EbSHREhAYfsX+2ZVZ0HtIGNWA2IkENNhZ1oO87UGea+Q
+         pg20SjlpITATPffF/w3lcZ4c+qO6HucsTRYM2LqhZ0VPvvMFdvIYMpa7wAKdcA2as4jM
+         9qkF24E0sCW/4aTQ4ldzIKnMM6icwGYq6Qrm2MX/E8D+B4C06tvfcxzPMt8Uh75m5ahs
+         GKxydL8HWUA8cvn+ohGSopu4qi97OHbTfYqSzZ2rf/mPvxkMfs2/mH/GF8DFImkSr68w
+         hEaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722038018; x=1722642818;
+        d=1e100.net; s=20230601; t=1722038020; x=1722642820;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=hlhq7We3LF/Ul7sqre1CZocM6x6KNUXlB6LyC83BMPc=;
-        b=moWz9aeV4/jTNPnkYMSq13TGM1ivZlEqQZSWWAjBKtMehth7m95ETIs3kw03QDIIJ4
-         VxzSlKV4cz+9XKw5HlyP0OrlPe4mCFTKweDPUVjQ17WNXnb3LGoiX9JqWtUYAeFWX5R/
-         ka7FoyRPUmG7Ltn+im4BnsEx6M7rTWdnHkIJHTsHQDdUaAiw8TtgN316aL24Q1drVdEY
-         Z2assQ4Cri3ipTI86XDrN+FBTUIwGgpGhp7xcyIzThi34ILmUJyDSHKBm7r6/vUJHg1L
-         QBpWqOMoiMqkRiGZRd9mQcYMyJ+ndzMrSqpWYhIDDrxpPSJReMf2SUuz1kKvGD1KBGHY
-         4xLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXOc5FZUXJbJX0Amyz3XO78IO7pnTiuqme8/4rmgXc0PoC24ak4xKePYFtcgDtKirSd1/sbHbcONKVgEpQWGLPAHVANYOgx
-X-Gm-Message-State: AOJu0YwqBujuTODN9UfX3mLHp0drbbHm8kqeFu43OzOe0dq9maBK8H/Q
-	Q+ygz0Kp/1smIJrsPV+dyrkk00G2yr2R+vbWM8NteiWHrf13NFW9KiSZQPahX/RzlBAAvCiE982
-	pjg==
-X-Google-Smtp-Source: AGHT+IHh1dyWiT0um9sPElrkv3mBIH4IG/eZ2ITHeKZHWjYM95v4ERaP3jgKxmY1KlRL2J6TSkYz8SuqfJg=
+        bh=ABkrzr1cGSxzpfOXTkcnfxpngM7W7Byv3yxUL9/Xpog=;
+        b=Omn7nHGE8nkBoEopXASglXZV7ThMhDn65g5MOZ8riQNZCs6coiKfmAdsmoXMhsmL/U
+         91qo8yNTUJ+JerjFKqSneIuuvmzxLu1j3zs02A00nA/5t2rN4SQF2bViYJIqPvIFCE3Q
+         1XhBiiIUgU7H0uK4E73p+syhFusD+FgGqVFJW1E5HBB32nKRJFEVGO0utf8VF8+rh8Bx
+         saNOiQgJ2w77XvoW74XKnHKxwjd1eLaGJn6b7u7kZXqmEtt5IEBrLFRmq5spZoRhqrnR
+         3MHLPXQs2inmxrNBG2plw2lovWjVJUpq7ADUXd4HNtDJL7m13WRzIR9c9jSJnHCZD09x
+         c6Bw==
+X-Forwarded-Encrypted: i=1; AJvYcCUtsfvNbzH1xJ9WpakV2tHsvZ9ommuYxX7/n1CnyyH8G723wXcpxnIC9RBw14jEmG794vWLyz/Qa8ou06rZ51Dh8lfl93W2
+X-Gm-Message-State: AOJu0YxJ+OdkGogRkJdaKfWLu+0jnp36XDjQnSduekyNBcQI0yeliHlL
+	cyrV+R9jM/7x7vjO6DjkMl6ov/KEJLKB0r0OHRTri3YeI6O0mLGWa3cV6+IqptCuLB1wakqCz7D
+	XLQ==
+X-Google-Smtp-Source: AGHT+IF9e10ucuu5PEDYEm2t1VHH57SvniduNcr3PDVCEbnd2uQ/527xnsEGixiu/Fx7KhH32OKutuDbjT0=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:2f10:b0:70e:9de1:9edf with SMTP id
- d2e1a72fcca58-70ece9fc2c1mr8667b3a.1.1722038017517; Fri, 26 Jul 2024 16:53:37
+ (user=seanjc job=sendgmr) by 2002:a25:9004:0:b0:e03:b9df:aa13 with SMTP id
+ 3f1490d57ef6-e0b5455eafcmr36206276.8.1722038019655; Fri, 26 Jul 2024 16:53:39
  -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 26 Jul 2024 16:51:38 -0700
+Date: Fri, 26 Jul 2024 16:51:39 -0700
 In-Reply-To: <20240726235234.228822-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,8 +61,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240726235234.228822-1-seanjc@google.com>
 X-Mailer: git-send-email 2.46.0.rc1.232.g9752f9e123-goog
-Message-ID: <20240726235234.228822-30-seanjc@google.com>
-Subject: [PATCH v12 29/84] KVM: Pin (as in FOLL_PIN) pages during kvm_vcpu_map()
+Message-ID: <20240726235234.228822-31-seanjc@google.com>
+Subject: [PATCH v12 30/84] KVM: nVMX: Mark vmcs12's APIC access page dirty
+ when unmapping
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
@@ -79,179 +80,38 @@ Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	David Matlack <dmatlack@google.com>, David Stevens <stevensd@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 
-Pin, as in FOLL_PIN, pages when mapping them for direct access by KVM.
-As per Documentation/core-api/pin_user_pages.rst, writing to a page that
-was gotten via FOLL_GET is explicitly disallowed.
+Mark the APIC access page as dirty when unmapping it from KVM.  The fact
+that the page _shouldn't_ be written doesn't guarantee the page _won't_ be
+written.  And while the contents are likely irrelevant, the values _are_
+visible to the guest, i.e. dropping writes would be visible to the guest
+(though obviously highly unlikely to be problematic in practice).
 
-  Correct (uses FOLL_PIN calls):
-      pin_user_pages()
-      write to the data within the pages
-      unpin_user_pages()
+Marking the map dirty will allow specifying the write vs. read-only when
+*mapping* the memory, which in turn will allow creating read-only maps.
 
-  INCORRECT (uses FOLL_GET calls):
-      get_user_pages()
-      write to the data within the pages
-      put_page()
-
-Unfortunately, FOLL_PIN is a "private" flag, and so kvm_follow_pfn must
-use a one-off bool instead of being able to piggyback the "flags" field.
-
-Link: https://lwn.net/Articles/930667
-Link: https://lore.kernel.org/all/cover.1683044162.git.lstoakes@gmail.com
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- include/linux/kvm_host.h |  2 +-
- virt/kvm/kvm_main.c      | 54 +++++++++++++++++++++++++++++-----------
- virt/kvm/kvm_mm.h        |  7 ++++++
- 3 files changed, 47 insertions(+), 16 deletions(-)
+ arch/x86/kvm/vmx/nested.c | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 8b5ac3305b05..3d4094ece479 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -280,7 +280,7 @@ struct kvm_host_map {
- 	 * can be used as guest memory but they are not managed by host
- 	 * kernel).
- 	 */
--	struct page *refcounted_page;
-+	struct page *pinned_page;
- 	struct page *page;
- 	void *hva;
- 	kvm_pfn_t pfn;
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 255cbed83b40..4a9b99c11355 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -2824,9 +2824,12 @@ static kvm_pfn_t kvm_resolve_pfn(struct kvm_follow_pfn *kfp, struct page *page,
- 	 */
- 	if (pte) {
- 		pfn = pte_pfn(*pte);
--		page = kvm_pfn_to_refcounted_page(pfn);
--		if (page && !get_page_unless_zero(page))
--			return KVM_PFN_ERR_FAULT;
-+
-+		if (!kfp->pin) {
-+			page = kvm_pfn_to_refcounted_page(pfn);
-+			if (page && !get_page_unless_zero(page))
-+				return KVM_PFN_ERR_FAULT;
-+		}
- 	} else {
- 		pfn = page_to_pfn(page);
- 	}
-@@ -2845,16 +2848,24 @@ static kvm_pfn_t kvm_resolve_pfn(struct kvm_follow_pfn *kfp, struct page *page,
- static bool hva_to_pfn_fast(struct kvm_follow_pfn *kfp, kvm_pfn_t *pfn)
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 8d05d1d9f544..3096f6f5ecdb 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -318,12 +318,7 @@ static void nested_put_vmcs12_pages(struct kvm_vcpu *vcpu)
  {
- 	struct page *page;
-+	bool r;
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
  
- 	/*
--	 * Fast pin a writable pfn only if it is a write fault request
--	 * or the caller allows to map a writable pfn for a read fault
--	 * request.
-+	 * Try the fast-only path when the caller wants to pin/get the page for
-+	 * writing.  If the caller only wants to read the page, KVM must go
-+	 * down the full, slow path in order to avoid racing an operation that
-+	 * breaks Copy-on-Write (CoW), e.g. so that KVM doesn't end up pointing
-+	 * at the old, read-only page while mm/ points at a new, writable page.
- 	 */
- 	if (!((kfp->flags & FOLL_WRITE) || kfp->map_writable))
- 		return false;
- 
--	if (get_user_page_fast_only(kfp->hva, FOLL_WRITE, &page)) {
-+	if (kfp->pin)
-+		r = pin_user_pages_fast(kfp->hva, 1, FOLL_WRITE, &page) == 1;
-+	else
-+		r = get_user_page_fast_only(kfp->hva, FOLL_WRITE, &page);
-+
-+	if (r) {
- 		*pfn = kvm_resolve_pfn(kfp, page, NULL, true);
- 		return true;
- 	}
-@@ -2883,10 +2894,21 @@ static int hva_to_pfn_slow(struct kvm_follow_pfn *kfp, kvm_pfn_t *pfn)
- 	struct page *page, *wpage;
- 	int npages;
- 
--	npages = get_user_pages_unlocked(kfp->hva, 1, &page, flags);
-+	if (kfp->pin)
-+		npages = pin_user_pages_unlocked(kfp->hva, 1, &page, flags);
-+	else
-+		npages = get_user_pages_unlocked(kfp->hva, 1, &page, flags);
- 	if (npages != 1)
- 		return npages;
- 
-+	/*
-+	 * Pinning is mutually exclusive with opportunistically mapping a read
-+	 * fault as writable, as KVM should never pin pages when mapping memory
-+	 * into the guest (pinning is only for direct accesses from KVM).
-+	 */
-+	if (WARN_ON_ONCE(kfp->map_writable && kfp->pin))
-+		goto out;
-+
- 	/* map read fault as writable if possible */
- 	if (!(flags & FOLL_WRITE) && kfp->map_writable &&
- 	    get_user_page_fast_only(kfp->hva, FOLL_WRITE, &wpage)) {
-@@ -2895,6 +2917,7 @@ static int hva_to_pfn_slow(struct kvm_follow_pfn *kfp, kvm_pfn_t *pfn)
- 		flags |= FOLL_WRITE;
- 	}
- 
-+out:
- 	*pfn = kvm_resolve_pfn(kfp, page, NULL, flags & FOLL_WRITE);
- 	return npages;
- }
-@@ -3119,10 +3142,11 @@ int kvm_vcpu_map(struct kvm_vcpu *vcpu, gfn_t gfn, struct kvm_host_map *map)
- 		.slot = gfn_to_memslot(vcpu->kvm, gfn),
- 		.gfn = gfn,
- 		.flags = FOLL_WRITE,
--		.refcounted_page = &map->refcounted_page,
-+		.refcounted_page = &map->pinned_page,
-+		.pin = true,
- 	};
- 
--	map->refcounted_page = NULL;
-+	map->pinned_page = NULL;
- 	map->page = NULL;
- 	map->hva = NULL;
- 	map->gfn = gfn;
-@@ -3159,16 +3183,16 @@ void kvm_vcpu_unmap(struct kvm_vcpu *vcpu, struct kvm_host_map *map, bool dirty)
- 	if (dirty)
- 		kvm_vcpu_mark_page_dirty(vcpu, map->gfn);
- 
--	if (map->refcounted_page) {
-+	if (map->pinned_page) {
- 		if (dirty)
--			kvm_release_page_dirty(map->refcounted_page);
--		else
--			kvm_release_page_clean(map->refcounted_page);
-+			kvm_set_page_dirty(map->pinned_page);
-+		kvm_set_page_accessed(map->pinned_page);
-+		unpin_user_page(map->pinned_page);
- 	}
- 
- 	map->hva = NULL;
- 	map->page = NULL;
--	map->refcounted_page = NULL;
-+	map->pinned_page = NULL;
- }
- EXPORT_SYMBOL_GPL(kvm_vcpu_unmap);
- 
-diff --git a/virt/kvm/kvm_mm.h b/virt/kvm/kvm_mm.h
-index d3ac1ba8ba66..acef3f5c582a 100644
---- a/virt/kvm/kvm_mm.h
-+++ b/virt/kvm/kvm_mm.h
-@@ -30,6 +30,13 @@ struct kvm_follow_pfn {
- 	/* FOLL_* flags modifying lookup behavior, e.g. FOLL_WRITE. */
- 	unsigned int flags;
- 
-+	/*
-+	 * Pin the page (effectively FOLL_PIN, which is an mm/ internal flag).
-+	 * The page *must* be pinned if KVM will write to the page via a kernel
-+	 * mapping, e.g. via kmap(), mremap(), etc.
-+	 */
-+	bool pin;
-+
- 	/*
- 	 * If non-NULL, try to get a writable mapping even for a read fault.
- 	 * Set to true if a writable mapping was obtained.
+-	/*
+-	 * Unpin physical memory we referred to in the vmcs02.  The APIC access
+-	 * page's backing page (yeah, confusing) shouldn't actually be accessed,
+-	 * and if it is written, the contents are irrelevant.
+-	 */
+-	kvm_vcpu_unmap(vcpu, &vmx->nested.apic_access_page_map, false);
++	kvm_vcpu_unmap(vcpu, &vmx->nested.apic_access_page_map, true);
+ 	kvm_vcpu_unmap(vcpu, &vmx->nested.virtual_apic_map, true);
+ 	kvm_vcpu_unmap(vcpu, &vmx->nested.pi_desc_map, true);
+ 	vmx->nested.pi_desc = NULL;
 -- 
 2.46.0.rc1.232.g9752f9e123-goog
 
