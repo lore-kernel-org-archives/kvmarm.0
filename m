@@ -1,57 +1,57 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E287215AAD6
-	for <kvmarm@lists.linux.dev>; Fri, 26 Jul 2024 23:52:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCEA715B11F
+	for <kvmarm@lists.linux.dev>; Fri, 26 Jul 2024 23:52:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722037978; cv=none; b=Sfaaaa+hYYjn70VTTAkXzZ0WlX24fDjdiHGOk4urKKCjOnxV92iAHIerNyNjbylZTQT/Qr7ksMqV+Pvkdlj8WyC2Z6OQrkzVqcKgsfZfrNgul7g9bpkxtGI5I7Tai2oQlDBhUbHaqa0xbZf+MeX1o6MagUhQI18CsUyOYu4F300=
+	t=1722037980; cv=none; b=OeKQPskWeXM2VN7oC76XxEK2xubtzAAB1UfPAheoPAFp1UxVjmRNX8sUNVznwuZfKOyZYKfcrTzmV5hfSBVwB2S6MqRhvv2SEkWWgt2CpUIU8XGnMfSF/ExcXCsasHu2uJrRDfr1YX6PdVvDkLWcIGQQeq+d/R+wlx68PkIBZAI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722037978; c=relaxed/simple;
-	bh=P7WAicOgvpnFP/OgYcMHNilB3cYbvZdOfqdCkUi/Hw0=;
+	s=arc-20240116; t=1722037980; c=relaxed/simple;
+	bh=eYPpE7SnzshOjYhzmXkcsAp87ERqXcDPZzZJ9L8u3ZE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=l1OrTyNippORgr8+C/NHkIQvF61XYk3FXKMJGV/kYPnAppLiHQSeGt/1oYYqg6PnA/18tp3YU0TRvNe43ILtjpBrRsAzWsfCOhzHHWW0qjmY3PBFMyfFEj1ayi+iTqFcOzF22qpll3OhEp/IIGj+7eXgxU2E7ED9vshlGtH3Ysg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Kr5fMLy/; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=CbCWT1aivE6RcBY9o9ysljWDQE1QNu7B0Yo7cjTzyaCr3LvdDD+VjahY+T9W4Ws0u20QCQdV0AZl4Y3gvuTeoVtefIzTQ70D2ZyqodvcGUINFhaTQbC2FGu5xXzuzATteFuQSxcEKtXvewXJP8vjdSTqVzrgW75YuxzoctI+NQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QD6gkmM1; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Kr5fMLy/"
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-65194ea3d4dso6498937b3.0
-        for <kvmarm@lists.linux.dev>; Fri, 26 Jul 2024 16:52:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QD6gkmM1"
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dfa7a8147c3so389705276.3
+        for <kvmarm@lists.linux.dev>; Fri, 26 Jul 2024 16:52:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722037976; x=1722642776; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1722037978; x=1722642778; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=fmU/HR7p0h2R7XRsIfqUXhH6E22vlxrvSMQX4VgE/mU=;
-        b=Kr5fMLy/pOLs57XijataZ3InWKTQs0JevYzZ44miR1Nko2yYGZkRZJ3mL4PMsHKq68
-         0DoZxnKhniV8enhKpsZ4YEU1ebDbR1TWLf22c438voFgUirtIXFx1jv2xnD+ESGtX6ws
-         YlgsbaHxG7HxVbM4dX9bprEAoMlrJR7oMJOQDHovarRBpv7E6XyRfGVz7PDxZ+e6LE78
-         YxRNUiPU60YsC4qXhBJvnQM7dQxutXYtckY94tzh0x2CwXFWu6OX4KX8E+Wi4+4Ai5+J
-         SudTbttuK+c361I/T5SKdzXIAHxGjrCNEtywGbMZiTmBPC8XK1PcOvvO+wGwUEsvaLrB
-         D5xg==
+        bh=e1uaEfwlbucR9PkkwcUB/hlZrD43F2tYkTCYXf9cR5U=;
+        b=QD6gkmM15zARXWGw9OmpXevfyA/9/Zs6/DnBP7B0DTcpFifQrkEtYKRgZ+IMV7I1iJ
+         Dm/J6fvDVCUbFvFYvzT5oFrpTuMo3NpYyGczDjNaARiVlVsv/5dDKE6EuUyhwI8/hNkI
+         beunzykb9IZG/1LzFSdGuyg18s3EMyEfREX6suA4tk31HW2vsDRQKu1DBtfZFnVU69bk
+         sJNQQqiOeCLMT91+eBGOwIBIpCz5b5zWZwL8LIEmQUBqqhqDaWD/ry8p9t9/PGQPwURO
+         GbZNRTXrPWiQyoxOmsP6ik4V15d0Gy56KBU6Qklk2jA/OzEAYap4p8Uhv0q7Aay82Nbs
+         YNLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722037976; x=1722642776;
+        d=1e100.net; s=20230601; t=1722037978; x=1722642778;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=fmU/HR7p0h2R7XRsIfqUXhH6E22vlxrvSMQX4VgE/mU=;
-        b=S8EigYnXzubqMqJ2WA9p3epMs7U0AHwKBBN31Nt0jpbxTzEGh8q2Ytm83i+BzNGYC4
-         4nw4G4lrCdHItXDZqq3rsl0fxN4p4ZUlAl6PIsDNgPZKXBdMcg5MO9FvOnygs2sXmI8Q
-         21Bnxjx0aiABhniQ9AqggDrywFP4ER9R+NagypKFRTCtMY0a/qOpJMeZrz2MKUD0qn3o
-         Nk31QqVrN1aBo0z78qVf6qTBGb6Eeu2s4FwayGWHW7aD9D9tw/2KaNRhoKM7dQLhv1wg
-         xTM7uEFnGQF24TDSr/jKPDoiDtneIBlDXMNFt1XVOsez5cJQlJ0iIRtAxlpV6byS87/T
-         q+0w==
-X-Forwarded-Encrypted: i=1; AJvYcCX6sXKCTDKB/bCLa7r2pRMymuM4odfCP5/STF9rS1YT5mimSlJ0iSTDgeosq6AujaEKHNxCEDD76URHt+E9axkmc3yBudTv
-X-Gm-Message-State: AOJu0YzJzC7AXZG8uhlfbdCMJkHMI/mf9oaIkIIhIA/fdVr2bixelLNz
-	JtKugzofLmB2RZiBRVVrFTRkEavNQYLQuD1LyEj+1+Oaz6pifVdeKVJGjmyYL0HxV+/H+VmDwvE
-	J5A==
-X-Google-Smtp-Source: AGHT+IEZeCODu/YeM5d/iOhxGxPVHISuly+z8I6+5BlUeuWOyJE5t2wqwhMJ9ApQGl0yAUOujG/KjtPFVv0=
+        bh=e1uaEfwlbucR9PkkwcUB/hlZrD43F2tYkTCYXf9cR5U=;
+        b=qM69BtCEYPgb0n41AyVBvkMJL26GxfVUVlofQnuPDHVozODiXvtnCUK6hV2HT1EbKa
+         wg0kxnlSqAFhwT9oYwnnb5soN4aRQVSe4ixIrFc/mroVsYWgNw//GTwrwiuhZG5L45MU
+         S6bZszCh+Uz7PFWbM+qxhGLNiKQVh93tRRoGR75bfo2TArSeHzJxsW/Yl1raZvoD3vlU
+         4ncGuaxp2xUDx7hHUnS3vFvWpR3Xi1RuwOiMnN2u1aWrbx9TnuLFae0qW2dmVmVWf+2z
+         YZaYcK3tlw8ws+rc4bYA0hRc6mEH78dF8RQPR/jMj6I7XtZiYkV98dSUEoKa5gjoloVM
+         E5WA==
+X-Forwarded-Encrypted: i=1; AJvYcCWe/eAXzXCzeoXaN9XSAMsDJvj4E6sI9JicYShoxEXbicrYRyb3DHPucbd2TQg6CASoo4pGjiClPq34/Fvb2Q5gPB4zZAtn
+X-Gm-Message-State: AOJu0Yy3rdBPRZmoBurzm6xsqVC9UFR3JuIYVMKDGRaC7VF//1NY1tmC
+	WaUwXX8Tgum2JmY0LqY2IKkcjsCtnnhnt/x0Hw4nvonI1Sp8USZ2vGe1VLiQCBuU1DmnGTIo5Im
+	Hgw==
+X-Google-Smtp-Source: AGHT+IG4XdyN3FgjZWItv/Lgg5QEKJKUQifoplgps87wy/mf6q3lv4u9rcIn8zN490p0nZ8TWmWhP2C2xyU=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:ad14:0:b0:62f:f535:f41 with SMTP id
- 00721157ae682-67a0abd4d1fmr288247b3.9.1722037976008; Fri, 26 Jul 2024
- 16:52:56 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1081:b0:e0b:1407:e357 with SMTP id
+ 3f1490d57ef6-e0b543f0dc9mr70203276.3.1722037977844; Fri, 26 Jul 2024 16:52:57
+ -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 26 Jul 2024 16:51:18 -0700
+Date: Fri, 26 Jul 2024 16:51:19 -0700
 In-Reply-To: <20240726235234.228822-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,9 +61,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240726235234.228822-1-seanjc@google.com>
 X-Mailer: git-send-email 2.46.0.rc1.232.g9752f9e123-goog
-Message-ID: <20240726235234.228822-10-seanjc@google.com>
-Subject: [PATCH v12 09/84] KVM: x86/mmu: Don't force flush if SPTE update
- clears Accessed bit
+Message-ID: <20240726235234.228822-11-seanjc@google.com>
+Subject: [PATCH v12 10/84] KVM: x86/mmu: Use gfn_to_page_many_atomic() when
+ prefetching indirect PTEs
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
@@ -80,78 +80,50 @@ Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	David Matlack <dmatlack@google.com>, David Stevens <stevensd@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 
-Don't force a TLB flush if mmu_spte_update() clears Accessed bit, as
-access tracking tolerates false negatives, as evidenced by the
-mmu_notifier hooks that explicit test and age SPTEs without doing a TLB
-flush.
+Use gfn_to_page_many_atomic() instead of gfn_to_pfn_memslot_atomic() when
+prefetching indirect PTEs (direct_pte_prefetch_many() already uses the
+"to page" APIS).  Functionally, the two are subtly equivalent, as the "to
+pfn" API short-circuits hva_to_pfn() if hva_to_pfn_fast() fails, i.e. is
+just a wrapper for get_user_page_fast_only()/get_user_pages_fast_only().
 
-In practice, this is very nearly a nop.  spte_write_protect() and
-spte_clear_dirty() never clear the Accessed bit.  make_spte() always
-sets the Accessed bit for !prefetch scenarios.  FNAME(sync_spte) only sets
-SPTE if the protection bits are changing, i.e. if a flush will be needed
-regardless of the Accessed bits.  And FNAME(pte_prefetch) sets SPTE if and
-only if the old SPTE is !PRESENT.
-
-That leaves kvm_arch_async_page_ready() as the one path that will generate
-a !ACCESSED SPTE *and* overwrite a PRESENT SPTE.  And that's very arguably
-a bug, as clobbering a valid SPTE in that case is nonsensical.
+Switching to the "to page" API will allow dropping the @atomic parameter
+from the entire hva_to_pfn() callchain.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 31 +++++++++----------------------
- 1 file changed, 9 insertions(+), 22 deletions(-)
+ arch/x86/kvm/mmu/paging_tmpl.h | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 58b70328b20c..b7642f1f993f 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -518,37 +518,24 @@ static u64 mmu_spte_update_no_track(u64 *sptep, u64 new_spte)
-  * TLBs must be flushed. Otherwise rmap_write_protect will find a read-only
-  * spte, even though the writable spte might be cached on a CPU's TLB.
-  *
-+ * Remote TLBs also need to be flushed if the Dirty bit is cleared, as false
-+ * negatives are not acceptable, e.g. if KVM is using D-bit based PML on VMX.
-+ *
-+ * Don't flush if the Accessed bit is cleared, as access tracking tolerates
-+ * false negatives, and the one path that does care about TLB flushes,
-+ * kvm_mmu_notifier_clear_flush_young(), uses mmu_spte_update_no_track().
-+ *
-  * Returns true if the TLB needs to be flushed
-  */
- static bool mmu_spte_update(u64 *sptep, u64 new_spte)
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index ef0b3b213e5b..6b215a932158 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -535,8 +535,8 @@ FNAME(prefetch_gpte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
  {
--	bool flush = false;
- 	u64 old_spte = mmu_spte_update_no_track(sptep, new_spte);
+ 	struct kvm_memory_slot *slot;
+ 	unsigned pte_access;
++	struct page *page;
+ 	gfn_t gfn;
+-	kvm_pfn_t pfn;
  
- 	if (!is_shadow_present_pte(old_spte))
+ 	if (FNAME(prefetch_invalid_gpte)(vcpu, sp, spte, gpte))
+ 		return false;
+@@ -549,12 +549,11 @@ FNAME(prefetch_gpte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+ 	if (!slot)
  		return false;
  
--	/*
--	 * For the spte updated out of mmu-lock is safe, since
--	 * we always atomically update it, see the comments in
--	 * spte_has_volatile_bits().
--	 */
--	if (is_mmu_writable_spte(old_spte) &&
--	      !is_writable_pte(new_spte))
--		flush = true;
--
--	/*
--	 * Flush TLB when accessed/dirty states are changed in the page tables,
--	 * to guarantee consistency between TLB and page tables.
--	 */
--
--	if (is_accessed_spte(old_spte) && !is_accessed_spte(new_spte))
--		flush = true;
--
--	if (is_dirty_spte(old_spte) && !is_dirty_spte(new_spte))
--		flush = true;
--
--	return flush;
-+	return (is_mmu_writable_spte(old_spte) && !is_writable_pte(new_spte)) ||
-+	       (is_dirty_spte(old_spte) && !is_dirty_spte(new_spte));
+-	pfn = gfn_to_pfn_memslot_atomic(slot, gfn);
+-	if (is_error_pfn(pfn))
++	if (gfn_to_page_many_atomic(slot, gfn, &page, 1) != 1)
+ 		return false;
+ 
+-	mmu_set_spte(vcpu, slot, spte, pte_access, gfn, pfn, NULL);
+-	kvm_release_pfn_clean(pfn);
++	mmu_set_spte(vcpu, slot, spte, pte_access, gfn, page_to_pfn(page), NULL);
++	kvm_release_page_clean(page);
+ 	return true;
  }
  
- /*
 -- 
 2.46.0.rc1.232.g9752f9e123-goog
 
