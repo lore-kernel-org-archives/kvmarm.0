@@ -1,91 +1,127 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 115CA17838E
-	for <kvmarm@lists.linux.dev>; Fri, 26 Jul 2024 16:14:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D9112770B
+	for <kvmarm@lists.linux.dev>; Fri, 26 Jul 2024 16:50:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722010452; cv=none; b=o8E14V+Y4GV7ouLT1I/HgwYkT5PMB2TRNwj5MjUf6Rtk36w2zREgBe6v7tzf7Vt/n3Tm104+iXJMxP6R5Qh95VAtjCQynQnNZgHvDvWTT1pjWsYWhazdvdnIzEEhsl2JheTGqfWm01hV4ijAtrSM+jWlbJubvasifSrRNqMxOPg=
+	t=1722012628; cv=none; b=h7vHj9ceOK9jskx1/qpKg+1ZPcI0QDJ3ilAZJTVzyA8x1hpSZAqlVV/tHIWVsdhRomTejBcgSnh1EYLs+Ki0UZIbtT9PjXoJ3zxr8YX0bQwGtQR41pfMJpPKjZKbIT09diTRhT3PeoEok4yD7x648UkWSnPG9FsL2drffcM71r0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722010452; c=relaxed/simple;
-	bh=tCDver3MNrltrPETi9z05thLEBA350sjUjwIIO4/xFc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tuTxQWavZvuTn8MoJvev5RafC5gYEKGxmLf1mWfcfQsX55WCrUwLMWluUm/6yhPxJNzfsHBEdgyMTzl5c/ScBP9B7C8s9o5r+NiupUqvAFi7Qfwu0PnnJ/LnkbWtBRj4o1HPQpNY0ibQbLhuIipo/1u5sIyOrx2iMDNnmbbjZII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D2C1E1007;
-	Fri, 26 Jul 2024 09:14:35 -0700 (PDT)
-Received: from e133380.arm.com (e133380.arm.com [10.1.197.55])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3E7AB3F766;
-	Fri, 26 Jul 2024 09:14:07 -0700 (PDT)
-Date: Fri, 26 Jul 2024 17:14:01 +0100
-From: Dave Martin <Dave.Martin@arm.com>
-To: Mark Brown <broonie@kernel.org>
-Cc: Amit Daniel Kachhap <amitdaniel.kachhap@arm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
-	aneesh.kumar@kernel.org, aneesh.kumar@linux.ibm.com, bp@alien8.de,
-	catalin.marinas@arm.com, christophe.leroy@csgroup.eu,
-	dave.hansen@linux.intel.com, hpa@zytor.com,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
-	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
-	oliver.upton@linux.dev, shuah@kernel.org, szabolcs.nagy@arm.com,
-	tglx@linutronix.de, will@kernel.org, x86@kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 18/29] arm64: add POE signal support
-Message-ID: <ZqPLSRjjE+SRoGAQ@e133380.arm.com>
-References: <20240503130147.1154804-1-joey.gouly@arm.com>
- <20240503130147.1154804-19-joey.gouly@arm.com>
- <229bd367-466e-4bf9-9627-24d2d0821ff4@arm.com>
- <7789da64-34e2-49db-b203-84b80e5831d5@sirena.org.uk>
- <cf7de572-420a-4d59-a8dd-effaff002e12@arm.com>
- <ZqJ2I3f2qdiD2DfP@e133380.arm.com>
- <a13c3d5e-6517-4632-b20d-49ce9f0d8e58@sirena.org.uk>
+	s=arc-20240116; t=1722012628; c=relaxed/simple;
+	bh=rqbgT/0iYp0SyvwyUNh8ElGIQ4w4+Dw0nQzyKcM25qM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=LeDXdmjeL6SVu96qfrnvXMXC0KyrDM+BuBQdlflBN1fz8xQr3CA/VBd/TqIMKpusLn1dDZcrBT6tX6jY75+p07Jb3fBjJ3j4rsGcbij1JzYST4SY8DLowtcAPyAYmC8gIf4Tz54wvvPj2R9JnW9x78hFZTGbbYXNnL9BBz3FkFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=UcE/YCsU; arc=none smtp.client-ip=207.171.188.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="UcE/YCsU"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1722012626; x=1753548626;
+  h=message-id:date:mime-version:reply-to:subject:to:cc:
+   references:from:in-reply-to:content-transfer-encoding;
+  bh=LunzKZL6emWKetW1H3wwaEoDFwJcR/2MIjOK6DAsJmI=;
+  b=UcE/YCsUtQxG+zGIiJ4nVx+3okKvVaD9+wqpKFoLU4oiAeTg5N38wcMa
+   yv3F7aFbT194t+4YxNJ3/b5RxP/6MAAfXSmwQvl6tatqdRicbczDQl4cL
+   7gOqR2MavUNTEx3Bp+Pe0bfdM2GgS92jvg408XVkJkHxpmit9v5DYSomc
+   c=;
+X-IronPort-AV: E=Sophos;i="6.09,239,1716249600"; 
+   d="scan'208";a="744977504"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jul 2024 16:50:19 +0000
+Received: from EX19MTAEUA001.ant.amazon.com [10.0.10.100:41594]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.0.129:2525] with esmtp (Farcaster)
+ id dd7c83a3-7c90-419d-98f4-4e8089f8113d; Fri, 26 Jul 2024 16:50:18 +0000 (UTC)
+X-Farcaster-Flow-ID: dd7c83a3-7c90-419d-98f4-4e8089f8113d
+Received: from EX19D022EUC002.ant.amazon.com (10.252.51.137) by
+ EX19MTAEUA001.ant.amazon.com (10.252.50.223) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Fri, 26 Jul 2024 16:50:18 +0000
+Received: from [192.168.9.159] (10.106.83.8) by EX19D022EUC002.ant.amazon.com
+ (10.252.51.137) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34; Fri, 26 Jul 2024
+ 16:50:17 +0000
+Message-ID: <4e5c2904-f628-4391-853e-37b7f0e132e8@amazon.com>
+Date: Fri, 26 Jul 2024 17:50:15 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a13c3d5e-6517-4632-b20d-49ce9f0d8e58@sirena.org.uk>
+User-Agent: Mozilla Thunderbird
+Reply-To: <kalyazin@amazon.com>
+Subject: Re: [RFC PATCH 14/18] KVM: Add asynchronous userfaults,
+ KVM_READ_USERFAULT
+To: James Houghton <jthoughton@google.com>
+CC: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, Sean Christopherson <seanjc@google.com>,
+	Shuah Khan <shuah@kernel.org>, Peter Xu <peterx@redhat.org>, Axel Rasmussen
+	<axelrasmussen@google.com>, David Matlack <dmatlack@google.com>,
+	<kvm@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>, <roypat@amazon.co.uk>, <kalyazin@amazon.com>,
+	"Paolo Bonzini" <pbonzini@redhat.com>
+References: <20240710234222.2333120-1-jthoughton@google.com>
+ <20240710234222.2333120-15-jthoughton@google.com>
+Content-Language: en-US
+From: Nikita Kalyazin <kalyazin@amazon.com>
+Autocrypt: addr=kalyazin@amazon.com; keydata=
+ xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
+ JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
+ BjLQwD9FsK+SyiCpmmTzBQJj5ki9BQkDwmcAAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
+ IKmaZPOR1wD/UTcn4GbLC39QIwJuWXW0DeLoikxFBYkbhYyZ5CbtrtAA/2/rnR/zKZmyXqJ6
+ ULlSE8eWA3ywAIOH8jIETF2fCaUCzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
+ ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
+ ZPMFAmPmSL0FCQPCZwACGwwACgkQr5LKIKmaZPNCxAEAxwnrmyqSC63nf6hoCFCfJYQapghC
+ abLV0+PWemntlwEA/RYx8qCWD6zOEn4eYhQAucEwtg6h1PBbeGK94khVMooF
+In-Reply-To: <20240710234222.2333120-15-jthoughton@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: EX19D008EUC001.ant.amazon.com (10.252.51.165) To
+ EX19D022EUC002.ant.amazon.com (10.252.51.137)
 
-On Thu, Jul 25, 2024 at 07:11:41PM +0100, Mark Brown wrote:
-> On Thu, Jul 25, 2024 at 04:58:27PM +0100, Dave Martin wrote:
-> 
-> > I'll post a draft patch separately, since I think the update could
-> > benefit from separate discussion, but my back-of-the-envelope
-> > calculation suggests that (before this patch) we are down to 0x90
-> > bytes of free space (i.e., over 96% full).
-> 
-> > I wonder whether it is time to start pushing back on adding a new
-> > _foo_context for every individual register, though?
-> 
-> > Maybe we could add some kind of _misc_context for miscellaneous 64-bit
-> > regs.
-> 
-> That'd have to be a variably sized structure with pairs of sysreg
-> ID/value items in it I think which would be a bit of a pain to implement
-> but doable.  The per-record header is 64 bits, we'd get maximal saving
-> by allocating a byte for the IDs.
+Hi James,
 
-Or possibly the regs could be identified positionally, avoiding the
-need for IDs.  Space would be at a premium, and we would have to think
-carefully about what should and should not be allowed in there.
+On 11/07/2024 00:42, James Houghton wrote:
+> It is possible that KVM wants to access a userfault-enabled GFN in a
+> path where it is difficult to return out to userspace with the fault
+> information. For these cases, add a mechanism for KVM to wait for a GFN
+> to not be userfault-enabled.
+In this patch series, an asynchronous notification mechanism is used 
+only in cases "where it is difficult to return out to userspace with the 
+fault information". However, we (AWS) have a use case where we would 
+like to be notified asynchronously about _all_ faults. Firecracker can 
+restore a VM from a memory snapshot where the guest memory is supplied 
+via a Userfaultfd by a process separate from the VMM itself [1]. While 
+it looks technically possible for the VMM process to handle exits via 
+forwarding the faults to the other process, that would require building 
+a complex userspace protocol on top and likely introduce extra latency 
+on the critical path. This also implies that a KVM API 
+(KVM_READ_USERFAULT) is not suitable, because KVM checks that the ioctls 
+are performed specifically by the VMM process [2]:
+	if (kvm->mm != current->mm || kvm->vm_dead)
+		return -EIO;
 
-> It would be very unfortunate timing to start gating things on such a
-> change though (I'm particularly worried about GCS here, at this point
-> the kernel changes are blocking the entire ecosystem).
+ > The implementation of this mechanism is certain to change before KVM
+ > Userfault could possibly be merged.
+How do you envision resolving faults in userspace? Copying the page in 
+(provided that userspace mapping of guest_memfd is supported [3]) and 
+clearing the KVM_MEMORY_ATTRIBUTE_USERFAULT alone do not look 
+sufficient to resolve the fault because an attempt to copy the page 
+directly in userspace will trigger a fault on its own and may lead to a 
+deadlock in the case where the original fault was caused by the VMM. An 
+interface similar to UFFDIO_COPY is needed that would allocate a page, 
+copy the content in and update page tables.
 
-For GCS, I wonder whether it should be made a strictly opt-in feature:
-i.e., if you use it then you must tolerate large sigframes, and if it
-is turned off then its state is neither dumped nor restored.  Since GCS
-requires an explict prctl to turn it on, the mechanism seems partly
-there already in your series.
+[1] Firecracker snapshot restore via UserfaultFD: 
+https://github.com/firecracker-microvm/firecracker/blob/main/docs/snapshotting/handling-page-faults-on-snapshot-resume.md
+[2] KVM ioctl check for the address space: 
+https://elixir.bootlin.com/linux/v6.10.1/source/virt/kvm/kvm_main.c#L5083
+[3] mmap() of guest_memfd: 
+https://lore.kernel.org/kvm/489d1494-626c-40d9-89ec-4afc4cd0624b@redhat.com/T/#mc944a6fdcd20a35f654c2be99f9c91a117c1bed4
 
-I guess the GCS thread is the better place to discuss that, though.
-
-Cheers
----Dave
+Thanks,
+Nikita
