@@ -1,140 +1,189 @@
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78F242261D
-	for <kvmarm@lists.linux.dev>; Fri, 26 Jul 2024 04:15:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19F3F1F951
+	for <kvmarm@lists.linux.dev>; Fri, 26 Jul 2024 09:05:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721967310; cv=none; b=tUpceh2xRnQ/WHfeUkTp3/43c+N23hnq5X1nsDA/e7ydEigNRFq5hmTDkmUBrrGnis+JDL/fzE0ih7tpJRLPyMcLK/KzMjc+FwtSPPMCpWRunsitkD9zyh/TPI60VcrtSMYNlY+XSWI/n5bG4PPjBAObAElBG3v0Wr+lKO2Xj0c=
+	t=1721984721; cv=none; b=iuWGUgIAGwVEgeX7C2Nyr02Rp+amt24X17Gv4i3pHwgwMEH3ucdZefyVMRW0JmG1Gb+3ycMe8eEmFbLCjgw9JPaWSjzmJ8UtKdclErn9jmvxWxx54LJWunZgxQ4Dsmp/6dqLCD42kCmC0jdNl1ROHX8TfiIR5x/bnmSl8Iu1Unw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721967310; c=relaxed/simple;
-	bh=gIKFqyMJQYAqXJDAdieEmwb8TBBzQrThuJSv7pNtuRM=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:Cc:
-	 References:In-Reply-To; b=pjSgywLhGShV8YS0sy0kmnsy85qgeT4wkI7e1XJy1wYhiFnni4sUY5Ro7Wv7EVCgyK06+jS0CwTKld4qekdT1MPHfc1K1PzgkSpkG99UZNhkJ7rOXPCZ/ZhpumE3TOHznDmJ8cnqFAeYshIZxTqUCGSccPC7HOJC4FSXJEe1mwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aDlv0UCd; arc=none smtp.client-ip=209.85.216.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1721984721; c=relaxed/simple;
+	bh=TfMAVMmemdCyQxc+aatfEmZS83cBvnNOc+9YsE89iug=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uVRBmpSbyKS2/3DuH3zKfewTrwaf5DUrjs6ZrQfxVA3kMunFwZia8KdKKBgx6seCfSlq4s7N2EQ0/QySSq6w7r5sX5XI3yY6oFTl67M0pB0uPmDgmkZVaC7ej+ms3tGOilCv1PQuLV3CniIc76yTubH5H9cH0p7fO3RwfOhAvrI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TM1tYn5J; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aDlv0UCd"
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2cb63ceff6dso426847a91.1
-        for <kvmarm@lists.linux.dev>; Thu, 25 Jul 2024 21:15:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721967309; x=1722572109; darn=lists.linux.dev;
-        h=in-reply-to:references:cc:to:from:subject:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=f3jDQgJjkOPkFdNASGIQMdZJ31Vgc4apYAqzb/U5CKI=;
-        b=aDlv0UCdoQFDZ52zOMw6VteCVPclthXU+QhxZXRLOrtyxJXhGO3CZOQInQPi9Rkoh5
-         i8Cmw7STErTvZisTsx32B8KIZGTQYRrxOJUzpbpzbUJmCQLX32TheeEBQRXGDRkUiMVD
-         G8XbJ6NfHY83d7nhD29PkYYvX0iQrjEuUaOp1pq1ySwQQCDkc+bIXLJCaP9+b2i6iDoL
-         CipVUoVYulMHJcEvIl4+ockcWbSnlbBsSduOeJ1ewy+USZjxJAieEsaaexfN0v+/J8nW
-         /Wysa7/E8bwPAEKf6ZYOg/IPd0AS3XX5miOcFVtehbw/WcAP29Hveun3iLmkAlwiss9Y
-         ypHQ==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TM1tYn5J"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1721984719;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=HRGCaxSvc666yYmWNbyZKl/wJUaVbOHVwo8Yj4hCL/0=;
+	b=TM1tYn5J5riqUsN9Tzkjp03Zn24jILzicoZzLrdBxACAtXwoqluAYjqq2WM5nJzi1f5Hla
+	Gm8DOJsvqLfVGH433oiOsOvhNBOJPsGy5MwoNwg3suUH+l19eToRZUAYavwiXHstpFDwWt
+	jPvLJwrNRVufTOTBgoLCmCGH2GSSSPw=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-558-MEXdudRlOe-MoR_xPzt6JA-1; Fri, 26 Jul 2024 05:05:17 -0400
+X-MC-Unique: MEXdudRlOe-MoR_xPzt6JA-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-42668796626so14185385e9.0
+        for <kvmarm@lists.linux.dev>; Fri, 26 Jul 2024 02:05:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721967309; x=1722572109;
-        h=in-reply-to:references:cc:to:from:subject:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=f3jDQgJjkOPkFdNASGIQMdZJ31Vgc4apYAqzb/U5CKI=;
-        b=qVK0E/+h/+LtSEF/8pmqQYgah1r8ldNwJaM65AnQy1urzg+CMPkPOz8hRAqERjogwl
-         iWUAVL4NmGKMJmAfyaoOcsJUPnf5gTf5JpD+3g+2rUfQca97NqTi/n6reAQHZXgi9QT3
-         tLL6t//F96wSFSuFYHBAPQVmsrp1cbhBNEHjqjHtmEcVVbrmb5EgOxdvm9scWO9wagkj
-         8gKHAAPvrYg1o1kX0/2i/i44km2kAisDwE4VcSertSuAU3bvn9GEr7vNs6rN1YqqfP+F
-         +1g/OdflJqA9/Oyi07lFUPBN6ix9bAnPexxyH3TZkmiGFUJDP9mbznD9dQEXrlMzF1wr
-         g+0A==
-X-Forwarded-Encrypted: i=1; AJvYcCXnTMPzlylR0rvEzt9qkhofyVgrs7+3TldcuF46AdTYPYYPQd/vEss0MTRHml139BtWDV+eRhUi5BH/QLdekGrMvtRJvX0o
-X-Gm-Message-State: AOJu0YwNay4/C7IAReSxJx6CMBJWGH5wWEF/58SITVmOwysGk3Ic1YnJ
-	dWFCNipJxWEGfj2J13uKG+nERurFYRRZsPe7F8xd5vqxodDJy3K3
-X-Google-Smtp-Source: AGHT+IFmN17I4J5GSEbfLIh57WYix6Z4DqY06Of+f+JtOC/7oBUIVl0iyJ5AherVGcrUqk8gycWzzw==
-X-Received: by 2002:a17:90b:3e8b:b0:2c8:538d:95b7 with SMTP id 98e67ed59e1d1-2cf238ccb87mr5415523a91.32.1721967308684;
-        Thu, 25 Jul 2024 21:15:08 -0700 (PDT)
-Received: from localhost ([1.146.16.227])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2cf28c9cef7sm2365286a91.29.2024.07.25.21.15.03
+        d=1e100.net; s=20230601; t=1721984716; x=1722589516;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HRGCaxSvc666yYmWNbyZKl/wJUaVbOHVwo8Yj4hCL/0=;
+        b=JOZq/z535mfKyJyVV9on8HzomwBN0VFjbQ6jZIYXm66XspCWj5+19vx6LfCkVpgbyp
+         B/cKScVRkprqUc+Wh35FbEbteWKO+dxfUKIG1q5mQX3bcoS/xEjGrlxc7T/DdLWtZ51V
+         CHyjZibaUAYj50WD6qzRQSMyZCQa+SBjigPtaK0Wqr8LsUfhvQ5XmmFP/08kIntZcXPf
+         xocNX11RLWxQmurMfxggz2NjvLsaW+9dXza0D5EkJynKyWF+p3Lx5S6Au54gIawCEwG8
+         tOEhh4SvEqJRZ2uMhGlLD09S4CNHiFjZkaKfcxp/MA89pKWeFf/h0V0Aj75E7h8ZvlvH
+         YcyA==
+X-Forwarded-Encrypted: i=1; AJvYcCUPKtjLTLt+yezkGWxlBOeGRiQ4YUkgihEoag5xEb/5Uk8u9cJeD7bKB32TqX3mEI/iIEgyIQ+tio4WJ19vwTyYkBdeiyJX
+X-Gm-Message-State: AOJu0Yx1LgNSL/LIwrimJ35+AT5mX/sO3x7WhHuYcjhKaYz4JX2WdjCs
+	B/9trwuizS4p8aTHoxPe05iehT8b3yPnQw/ZXUlYN/LbMviIKgKomC04cPyItomm3PpK1+Jo5Tw
+	FTRk85/ll4eVa91w0ES3rf3hA6DzmotepLOQZsqzciv8SeiwN0sZmeA==
+X-Received: by 2002:a05:600c:19d2:b0:426:6f5f:9da6 with SMTP id 5b1f17b1804b1-4280578b9b6mr35448335e9.27.1721984716019;
+        Fri, 26 Jul 2024 02:05:16 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHwk07jUaAT8ojnh2s98h6UPE6SOVmQ7wq5CBJHKGpwRHZk1gVq/4L8tg0+qalxenlpWVy2Gg==
+X-Received: by 2002:a05:600c:19d2:b0:426:6f5f:9da6 with SMTP id 5b1f17b1804b1-4280578b9b6mr35447975e9.27.1721984715417;
+        Fri, 26 Jul 2024 02:05:15 -0700 (PDT)
+Received: from [10.33.192.191] (nat-pool-str-t.redhat.com. [149.14.88.106])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42805730e47sm69535525e9.1.2024.07.26.02.05.14
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Jul 2024 21:15:08 -0700 (PDT)
+        Fri, 26 Jul 2024 02:05:15 -0700 (PDT)
+Message-ID: <8c9ca85f-0995-4c34-bb57-5a8490f74b50@redhat.com>
+Date: Fri, 26 Jul 2024 11:05:14 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Fri, 26 Jul 2024 14:15:00 +1000
-Message-Id: <D2Z6GP2VFOJ8.2KU7OB25CUXTC@gmail.com>
-Subject: Re: [kvm-unit-tests PATCH] build: retain intermediate .aux.o
- targets
-From: "Nicholas Piggin" <npiggin@gmail.com>
-To: "Nicholas Piggin" <npiggin@gmail.com>, "Segher Boessenkool"
- <segher@kernel.crashing.org>
-Cc: "Thomas Huth" <thuth@redhat.com>, <kvm@vger.kernel.org>,
- <linux-s390@vger.kernel.org>, "Andrew Jones" <andrew.jones@linux.dev>,
- "Marc Hartmayer" <mhartmay@linux.ibm.com>, <kvm-riscv@lists.infradead.org>,
- <kvmarm@lists.linux.dev>, <linuxppc-dev@lists.ozlabs.org>
-X-Mailer: aerc 0.18.0
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH] build: retain intermediate .aux.o targets
+To: Nicholas Piggin <npiggin@gmail.com>,
+ Segher Boessenkool <segher@kernel.crashing.org>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+ Andrew Jones <andrew.jones@linux.dev>,
+ Marc Hartmayer <mhartmay@linux.ibm.com>, kvm-riscv@lists.infradead.org,
+ kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org
 References: <20240612044234.212156-1-npiggin@gmail.com>
  <20240612082847.GG19790@gate.crashing.org>
  <D1ZBO021MLHV.3C7E4V3WOHO8V@gmail.com>
  <20240614010856.GK19790@gate.crashing.org>
- <D1ZLRVNGPWTV.5H76A3E8DJCV@gmail.com>
-In-Reply-To: <D1ZLRVNGPWTV.5H76A3E8DJCV@gmail.com>
+ <D1ZLRVNGPWTV.5H76A3E8DJCV@gmail.com> <D2Z6GP2VFOJ8.2KU7OB25CUXTC@gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+In-Reply-To: <D2Z6GP2VFOJ8.2KU7OB25CUXTC@gmail.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri Jun 14, 2024 at 6:38 PM AEST, Nicholas Piggin wrote:
-> On Fri Jun 14, 2024 at 11:08 AM AEST, Segher Boessenkool wrote:
-> > On Fri, Jun 14, 2024 at 10:43:39AM +1000, Nicholas Piggin wrote:
-> > > On Wed Jun 12, 2024 at 6:28 PM AEST, Segher Boessenkool wrote:
-> > > > On Wed, Jun 12, 2024 at 02:42:32PM +1000, Nicholas Piggin wrote:
-> > > > > arm, powerpc, riscv, build .aux.o targets with implicit pattern r=
-ules
-> > > > > in dependency chains that cause them to be made as intermediate f=
-iles,
-> > > > > which get removed when make finishes. This results in unnecessary
-> > > > > partial rebuilds. If make is run again, this time the .aux.o targ=
-ets
-> > > > > are not intermediate, possibly due to being made via different
-> > > > > dependencies.
-> > > > >=20
-> > > > > Adding .aux.o files to .PRECIOUS prevents them being removed and =
-solves
-> > > > > the rebuild problem.
-> > > > >=20
-> > > > > s390x does not have the problem because .SECONDARY prevents depen=
-dancies
-> > > > > from being built as intermediate. However the same change is made=
- for
-> > > > > s390x, for consistency.
-> > > >
-> > > > This is exactly what .SECONDARY is for, as its documentation says,
-> > > > even.  Wouldn't it be better to just add a .SECONDARY to the other
-> > > > targets as well?
-> > >=20
-> > > Yeah we were debating that and agreed .PRECIOUS may not be the
-> > > cleanest fix but since we already use that it's okay for a
-> > > minimal fix.
-> >
-> > But why add it to s390x then?  It is not a fix there at all!
->
-> Eh, not a big deal. I mentioned that in the changelog it doesn't seem to
-> pracicaly fix something. And I rather the makefiles converge as much as
-> possible rather than diverge more.
->
-> .SECONDARY was added independently and not to fix this problem in
-> s390x. And s390x has .SECONDARY slightly wrong AFAIKS. It mentions
-> .SECONDARY: twice in a way that looks like it was meant to depend on
-> specific targets, it actually gives it no dependencies and the
-> resulting semantics are that all intermediate files in the build are
-> treated as secondary. So somethig there should be cleaned up. If the
-> .SECONDARY was changed to only depend on the .gobj and .hdr.obj then
-> suddenly that would break .aux.o if I don't make the change.
->
-> So I'm meaning to work out what to do with all that, i.e., whether to
-> add blanket .SECONDARY for all and trim or remove the .PRECIOUS files,
-> or remove s390x's secondary, or make it more specific, or something
-> else. But it takes a while for me to do makefile work.
+On 26/07/2024 06.15, Nicholas Piggin wrote:
+> On Fri Jun 14, 2024 at 6:38 PM AEST, Nicholas Piggin wrote:
+>> On Fri Jun 14, 2024 at 11:08 AM AEST, Segher Boessenkool wrote:
+>>> On Fri, Jun 14, 2024 at 10:43:39AM +1000, Nicholas Piggin wrote:
+>>>> On Wed Jun 12, 2024 at 6:28 PM AEST, Segher Boessenkool wrote:
+>>>>> On Wed, Jun 12, 2024 at 02:42:32PM +1000, Nicholas Piggin wrote:
+>>>>>> arm, powerpc, riscv, build .aux.o targets with implicit pattern rules
+>>>>>> in dependency chains that cause them to be made as intermediate files,
+>>>>>> which get removed when make finishes. This results in unnecessary
+>>>>>> partial rebuilds. If make is run again, this time the .aux.o targets
+>>>>>> are not intermediate, possibly due to being made via different
+>>>>>> dependencies.
+>>>>>>
+>>>>>> Adding .aux.o files to .PRECIOUS prevents them being removed and solves
+>>>>>> the rebuild problem.
+>>>>>>
+>>>>>> s390x does not have the problem because .SECONDARY prevents dependancies
+>>>>>> from being built as intermediate. However the same change is made for
+>>>>>> s390x, for consistency.
+>>>>>
+>>>>> This is exactly what .SECONDARY is for, as its documentation says,
+>>>>> even.  Wouldn't it be better to just add a .SECONDARY to the other
+>>>>> targets as well?
+>>>>
+>>>> Yeah we were debating that and agreed .PRECIOUS may not be the
+>>>> cleanest fix but since we already use that it's okay for a
+>>>> minimal fix.
+>>>
+>>> But why add it to s390x then?  It is not a fix there at all!
+>>
+>> Eh, not a big deal. I mentioned that in the changelog it doesn't seem to
+>> pracicaly fix something. And I rather the makefiles converge as much as
+>> possible rather than diverge more.
+>>
+>> .SECONDARY was added independently and not to fix this problem in
+>> s390x. And s390x has .SECONDARY slightly wrong AFAIKS. It mentions
+>> .SECONDARY: twice in a way that looks like it was meant to depend on
+>> specific targets, it actually gives it no dependencies and the
+>> resulting semantics are that all intermediate files in the build are
+>> treated as secondary. So somethig there should be cleaned up. If the
+>> .SECONDARY was changed to only depend on the .gobj and .hdr.obj then
+>> suddenly that would break .aux.o if I don't make the change.
+>>
+>> So I'm meaning to work out what to do with all that, i.e., whether to
+>> add blanket .SECONDARY for all and trim or remove the .PRECIOUS files,
+>> or remove s390x's secondary, or make it more specific, or something
+>> else. But it takes a while for me to do makefile work.
+> 
+> Hi Thomas,
+> 
+> Ping on this patch?
 
-Hi Thomas,
+I assumed that Marc would chime in on the s390x part here?
 
-Ping on this patch?
+  Thomas
 
-Thanks,
-Nick
+
