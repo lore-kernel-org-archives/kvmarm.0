@@ -1,189 +1,91 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19F3F1F951
-	for <kvmarm@lists.linux.dev>; Fri, 26 Jul 2024 09:05:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 115CA17838E
+	for <kvmarm@lists.linux.dev>; Fri, 26 Jul 2024 16:14:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721984721; cv=none; b=iuWGUgIAGwVEgeX7C2Nyr02Rp+amt24X17Gv4i3pHwgwMEH3ucdZefyVMRW0JmG1Gb+3ycMe8eEmFbLCjgw9JPaWSjzmJ8UtKdclErn9jmvxWxx54LJWunZgxQ4Dsmp/6dqLCD42kCmC0jdNl1ROHX8TfiIR5x/bnmSl8Iu1Unw=
+	t=1722010452; cv=none; b=o8E14V+Y4GV7ouLT1I/HgwYkT5PMB2TRNwj5MjUf6Rtk36w2zREgBe6v7tzf7Vt/n3Tm104+iXJMxP6R5Qh95VAtjCQynQnNZgHvDvWTT1pjWsYWhazdvdnIzEEhsl2JheTGqfWm01hV4ijAtrSM+jWlbJubvasifSrRNqMxOPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721984721; c=relaxed/simple;
-	bh=TfMAVMmemdCyQxc+aatfEmZS83cBvnNOc+9YsE89iug=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uVRBmpSbyKS2/3DuH3zKfewTrwaf5DUrjs6ZrQfxVA3kMunFwZia8KdKKBgx6seCfSlq4s7N2EQ0/QySSq6w7r5sX5XI3yY6oFTl67M0pB0uPmDgmkZVaC7ej+ms3tGOilCv1PQuLV3CniIc76yTubH5H9cH0p7fO3RwfOhAvrI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TM1tYn5J; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TM1tYn5J"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721984719;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=HRGCaxSvc666yYmWNbyZKl/wJUaVbOHVwo8Yj4hCL/0=;
-	b=TM1tYn5J5riqUsN9Tzkjp03Zn24jILzicoZzLrdBxACAtXwoqluAYjqq2WM5nJzi1f5Hla
-	Gm8DOJsvqLfVGH433oiOsOvhNBOJPsGy5MwoNwg3suUH+l19eToRZUAYavwiXHstpFDwWt
-	jPvLJwrNRVufTOTBgoLCmCGH2GSSSPw=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-558-MEXdudRlOe-MoR_xPzt6JA-1; Fri, 26 Jul 2024 05:05:17 -0400
-X-MC-Unique: MEXdudRlOe-MoR_xPzt6JA-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-42668796626so14185385e9.0
-        for <kvmarm@lists.linux.dev>; Fri, 26 Jul 2024 02:05:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721984716; x=1722589516;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HRGCaxSvc666yYmWNbyZKl/wJUaVbOHVwo8Yj4hCL/0=;
-        b=JOZq/z535mfKyJyVV9on8HzomwBN0VFjbQ6jZIYXm66XspCWj5+19vx6LfCkVpgbyp
-         B/cKScVRkprqUc+Wh35FbEbteWKO+dxfUKIG1q5mQX3bcoS/xEjGrlxc7T/DdLWtZ51V
-         CHyjZibaUAYj50WD6qzRQSMyZCQa+SBjigPtaK0Wqr8LsUfhvQ5XmmFP/08kIntZcXPf
-         xocNX11RLWxQmurMfxggz2NjvLsaW+9dXza0D5EkJynKyWF+p3Lx5S6Au54gIawCEwG8
-         tOEhh4SvEqJRZ2uMhGlLD09S4CNHiFjZkaKfcxp/MA89pKWeFf/h0V0Aj75E7h8ZvlvH
-         YcyA==
-X-Forwarded-Encrypted: i=1; AJvYcCUPKtjLTLt+yezkGWxlBOeGRiQ4YUkgihEoag5xEb/5Uk8u9cJeD7bKB32TqX3mEI/iIEgyIQ+tio4WJ19vwTyYkBdeiyJX
-X-Gm-Message-State: AOJu0Yx1LgNSL/LIwrimJ35+AT5mX/sO3x7WhHuYcjhKaYz4JX2WdjCs
-	B/9trwuizS4p8aTHoxPe05iehT8b3yPnQw/ZXUlYN/LbMviIKgKomC04cPyItomm3PpK1+Jo5Tw
-	FTRk85/ll4eVa91w0ES3rf3hA6DzmotepLOQZsqzciv8SeiwN0sZmeA==
-X-Received: by 2002:a05:600c:19d2:b0:426:6f5f:9da6 with SMTP id 5b1f17b1804b1-4280578b9b6mr35448335e9.27.1721984716019;
-        Fri, 26 Jul 2024 02:05:16 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHwk07jUaAT8ojnh2s98h6UPE6SOVmQ7wq5CBJHKGpwRHZk1gVq/4L8tg0+qalxenlpWVy2Gg==
-X-Received: by 2002:a05:600c:19d2:b0:426:6f5f:9da6 with SMTP id 5b1f17b1804b1-4280578b9b6mr35447975e9.27.1721984715417;
-        Fri, 26 Jul 2024 02:05:15 -0700 (PDT)
-Received: from [10.33.192.191] (nat-pool-str-t.redhat.com. [149.14.88.106])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42805730e47sm69535525e9.1.2024.07.26.02.05.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 26 Jul 2024 02:05:15 -0700 (PDT)
-Message-ID: <8c9ca85f-0995-4c34-bb57-5a8490f74b50@redhat.com>
-Date: Fri, 26 Jul 2024 11:05:14 +0200
+	s=arc-20240116; t=1722010452; c=relaxed/simple;
+	bh=tCDver3MNrltrPETi9z05thLEBA350sjUjwIIO4/xFc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tuTxQWavZvuTn8MoJvev5RafC5gYEKGxmLf1mWfcfQsX55WCrUwLMWluUm/6yhPxJNzfsHBEdgyMTzl5c/ScBP9B7C8s9o5r+NiupUqvAFi7Qfwu0PnnJ/LnkbWtBRj4o1HPQpNY0ibQbLhuIipo/1u5sIyOrx2iMDNnmbbjZII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D2C1E1007;
+	Fri, 26 Jul 2024 09:14:35 -0700 (PDT)
+Received: from e133380.arm.com (e133380.arm.com [10.1.197.55])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3E7AB3F766;
+	Fri, 26 Jul 2024 09:14:07 -0700 (PDT)
+Date: Fri, 26 Jul 2024 17:14:01 +0100
+From: Dave Martin <Dave.Martin@arm.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: Amit Daniel Kachhap <amitdaniel.kachhap@arm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
+	aneesh.kumar@kernel.org, aneesh.kumar@linux.ibm.com, bp@alien8.de,
+	catalin.marinas@arm.com, christophe.leroy@csgroup.eu,
+	dave.hansen@linux.intel.com, hpa@zytor.com,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
+	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
+	oliver.upton@linux.dev, shuah@kernel.org, szabolcs.nagy@arm.com,
+	tglx@linutronix.de, will@kernel.org, x86@kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v4 18/29] arm64: add POE signal support
+Message-ID: <ZqPLSRjjE+SRoGAQ@e133380.arm.com>
+References: <20240503130147.1154804-1-joey.gouly@arm.com>
+ <20240503130147.1154804-19-joey.gouly@arm.com>
+ <229bd367-466e-4bf9-9627-24d2d0821ff4@arm.com>
+ <7789da64-34e2-49db-b203-84b80e5831d5@sirena.org.uk>
+ <cf7de572-420a-4d59-a8dd-effaff002e12@arm.com>
+ <ZqJ2I3f2qdiD2DfP@e133380.arm.com>
+ <a13c3d5e-6517-4632-b20d-49ce9f0d8e58@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH] build: retain intermediate .aux.o targets
-To: Nicholas Piggin <npiggin@gmail.com>,
- Segher Boessenkool <segher@kernel.crashing.org>
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org,
- Andrew Jones <andrew.jones@linux.dev>,
- Marc Hartmayer <mhartmay@linux.ibm.com>, kvm-riscv@lists.infradead.org,
- kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org
-References: <20240612044234.212156-1-npiggin@gmail.com>
- <20240612082847.GG19790@gate.crashing.org>
- <D1ZBO021MLHV.3C7E4V3WOHO8V@gmail.com>
- <20240614010856.GK19790@gate.crashing.org>
- <D1ZLRVNGPWTV.5H76A3E8DJCV@gmail.com> <D2Z6GP2VFOJ8.2KU7OB25CUXTC@gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-In-Reply-To: <D2Z6GP2VFOJ8.2KU7OB25CUXTC@gmail.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a13c3d5e-6517-4632-b20d-49ce9f0d8e58@sirena.org.uk>
 
-On 26/07/2024 06.15, Nicholas Piggin wrote:
-> On Fri Jun 14, 2024 at 6:38 PM AEST, Nicholas Piggin wrote:
->> On Fri Jun 14, 2024 at 11:08 AM AEST, Segher Boessenkool wrote:
->>> On Fri, Jun 14, 2024 at 10:43:39AM +1000, Nicholas Piggin wrote:
->>>> On Wed Jun 12, 2024 at 6:28 PM AEST, Segher Boessenkool wrote:
->>>>> On Wed, Jun 12, 2024 at 02:42:32PM +1000, Nicholas Piggin wrote:
->>>>>> arm, powerpc, riscv, build .aux.o targets with implicit pattern rules
->>>>>> in dependency chains that cause them to be made as intermediate files,
->>>>>> which get removed when make finishes. This results in unnecessary
->>>>>> partial rebuilds. If make is run again, this time the .aux.o targets
->>>>>> are not intermediate, possibly due to being made via different
->>>>>> dependencies.
->>>>>>
->>>>>> Adding .aux.o files to .PRECIOUS prevents them being removed and solves
->>>>>> the rebuild problem.
->>>>>>
->>>>>> s390x does not have the problem because .SECONDARY prevents dependancies
->>>>>> from being built as intermediate. However the same change is made for
->>>>>> s390x, for consistency.
->>>>>
->>>>> This is exactly what .SECONDARY is for, as its documentation says,
->>>>> even.  Wouldn't it be better to just add a .SECONDARY to the other
->>>>> targets as well?
->>>>
->>>> Yeah we were debating that and agreed .PRECIOUS may not be the
->>>> cleanest fix but since we already use that it's okay for a
->>>> minimal fix.
->>>
->>> But why add it to s390x then?  It is not a fix there at all!
->>
->> Eh, not a big deal. I mentioned that in the changelog it doesn't seem to
->> pracicaly fix something. And I rather the makefiles converge as much as
->> possible rather than diverge more.
->>
->> .SECONDARY was added independently and not to fix this problem in
->> s390x. And s390x has .SECONDARY slightly wrong AFAIKS. It mentions
->> .SECONDARY: twice in a way that looks like it was meant to depend on
->> specific targets, it actually gives it no dependencies and the
->> resulting semantics are that all intermediate files in the build are
->> treated as secondary. So somethig there should be cleaned up. If the
->> .SECONDARY was changed to only depend on the .gobj and .hdr.obj then
->> suddenly that would break .aux.o if I don't make the change.
->>
->> So I'm meaning to work out what to do with all that, i.e., whether to
->> add blanket .SECONDARY for all and trim or remove the .PRECIOUS files,
->> or remove s390x's secondary, or make it more specific, or something
->> else. But it takes a while for me to do makefile work.
+On Thu, Jul 25, 2024 at 07:11:41PM +0100, Mark Brown wrote:
+> On Thu, Jul 25, 2024 at 04:58:27PM +0100, Dave Martin wrote:
 > 
-> Hi Thomas,
+> > I'll post a draft patch separately, since I think the update could
+> > benefit from separate discussion, but my back-of-the-envelope
+> > calculation suggests that (before this patch) we are down to 0x90
+> > bytes of free space (i.e., over 96% full).
 > 
-> Ping on this patch?
+> > I wonder whether it is time to start pushing back on adding a new
+> > _foo_context for every individual register, though?
+> 
+> > Maybe we could add some kind of _misc_context for miscellaneous 64-bit
+> > regs.
+> 
+> That'd have to be a variably sized structure with pairs of sysreg
+> ID/value items in it I think which would be a bit of a pain to implement
+> but doable.  The per-record header is 64 bits, we'd get maximal saving
+> by allocating a byte for the IDs.
 
-I assumed that Marc would chime in on the s390x part here?
+Or possibly the regs could be identified positionally, avoiding the
+need for IDs.  Space would be at a premium, and we would have to think
+carefully about what should and should not be allowed in there.
 
-  Thomas
+> It would be very unfortunate timing to start gating things on such a
+> change though (I'm particularly worried about GCS here, at this point
+> the kernel changes are blocking the entire ecosystem).
 
+For GCS, I wonder whether it should be made a strictly opt-in feature:
+i.e., if you use it then you must tolerate large sigframes, and if it
+is turned off then its state is neither dumped nor restored.  Since GCS
+requires an explict prctl to turn it on, the mechanism seems partly
+there already in your series.
 
+I guess the GCS thread is the better place to discuss that, though.
+
+Cheers
+---Dave
