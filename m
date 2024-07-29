@@ -1,105 +1,141 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8ED2823A9;
-	Mon, 29 Jul 2024 14:41:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 385D113C9A7
+	for <kvmarm@lists.linux.dev>; Mon, 29 Jul 2024 15:26:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722264070; cv=none; b=fnNQiGK/mxnOWDsDZz1gK/EQVgzXj3NbU21chbbCrh+foCrLFKDLMOulDq3J2U+WRq9XbQ4fpieee4HyjH19YMo64pq66KjoO9ZOtciu/f43++hcyxN2os3K2/wz0V/uWcNK0j8hTcCoZHkz+ypke6hCzhrRbbNXR9Aa5RFePpc=
+	t=1722266773; cv=none; b=XTTQQgxEefKC3QTj+6WFiEOvoqb+Lr3jfJkJUkRjGWP+gXwhXTO0pPrGPiIvhxOkhUSTDt9OsUwGV4S816QKE9VuMjqiL0klARrfmq7J/vxP6b2bfdh9rEuX8v9fFc8iUi2tnl5N7qEI7cd3VNuUZlUVos5vk5YxDvpgfmbgwdQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722264070; c=relaxed/simple;
-	bh=Q1+AFnT8npjT4Lpzo89th+2c5Ce2NhXgTpXjWRxaQgU=;
+	s=arc-20240116; t=1722266773; c=relaxed/simple;
+	bh=mLrg+0IKo6uYpSaRffHV0UgyaCigABx44CllcBktsEw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bCDeF9cLoC5TtFfDFBy5PnJyUzg34VsSTZkO0e3nlMa4W+ViGfG9KexjXsaRYre4KB1WVaBpVb/w0YfhTFiL2J4u9sROd3W9VMmboIbaj5HvJwlsqfDRivNr5gxi4pjfrjXGpnFIwywitK+HmPn4Rd5xW07YhvFaH3XvjBlZfH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tGBYnPIB; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tGBYnPIB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 432FDC32786;
-	Mon, 29 Jul 2024 14:41:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722264070;
-	bh=Q1+AFnT8npjT4Lpzo89th+2c5Ce2NhXgTpXjWRxaQgU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=tGBYnPIBHtddODwHKJTwc5SNcydiu0rIYiiTdQSD6Jcfh58muUgxoWWx1HGhX+dBA
-	 q4aNdnMat9XV/dJSr0Krv+/572bI25pLk/Mw8m3pM/U67w+XRoDfY2+d4KHpmcz3zd
-	 fs7kdyp/5OPkGmfFhDPiV8SESJ0AtpesUlGHkWwO5faFczHM1ygCJXXDhxZQtS9nMM
-	 L7cFmnCjTkawc8+Es8/SthD6tGXrnfkoP8QVC8hDN+yc/Ow6VOcYYv+1KldeWxoBo2
-	 ImEtsNVE8MBdBTpOGXTm/zjat/YsFzJyu+drwCuJE0zSeQMzp8zqe1jcPiaFpveRI2
-	 IYuXCKTTYBmqQ==
-Date: Mon, 29 Jul 2024 15:41:00 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: Amit Daniel Kachhap <amitdaniel.kachhap@arm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
-	aneesh.kumar@kernel.org, aneesh.kumar@linux.ibm.com, bp@alien8.de,
-	catalin.marinas@arm.com, christophe.leroy@csgroup.eu,
-	dave.hansen@linux.intel.com, hpa@zytor.com,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
-	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
-	oliver.upton@linux.dev, shuah@kernel.org, szabolcs.nagy@arm.com,
-	tglx@linutronix.de, will@kernel.org, x86@kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 18/29] arm64: add POE signal support
-Message-ID: <8a6135cc-67cd-4fbe-96fa-3598491c1c66@sirena.org.uk>
-References: <20240503130147.1154804-1-joey.gouly@arm.com>
- <20240503130147.1154804-19-joey.gouly@arm.com>
- <229bd367-466e-4bf9-9627-24d2d0821ff4@arm.com>
- <7789da64-34e2-49db-b203-84b80e5831d5@sirena.org.uk>
- <cf7de572-420a-4d59-a8dd-effaff002e12@arm.com>
- <ZqJ2I3f2qdiD2DfP@e133380.arm.com>
- <a13c3d5e-6517-4632-b20d-49ce9f0d8e58@sirena.org.uk>
- <ZqPLSRjjE+SRoGAQ@e133380.arm.com>
- <a52f1762-afd4-4527-88ac-76cdd8a59d5d@sirena.org.uk>
- <Zqemv4YUSM0gouYO@e133380.arm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=HWarMpDyVwcXsM1IMXvZkrB0u7R90cO0rf93sElZ9jabFHoKjnBsWgCVVFw3O99RtndPRYI3r2zdMKAHIxk0kZms9dUEZjjvoFkxK7iypIxTy64MXFif4IFDQbKaV71gYozDyBG5nwLHMxgRUCIcKsBlALF9rQm+wJnYfG9cQmw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 182CF1007;
+	Mon, 29 Jul 2024 08:26:36 -0700 (PDT)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E61B83F64C;
+	Mon, 29 Jul 2024 08:26:08 -0700 (PDT)
+Date: Mon, 29 Jul 2024 16:26:00 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>, Joey Gouly <joey.gouly@arm.com>
+Subject: Re: [PATCH 10/12] KVM: arm64: nv: Add SW walker for AT S1 emulation
+Message-ID: <Zqe0iBtD4389Lhei@raptor>
+References: <20240625133508.259829-1-maz@kernel.org>
+ <20240708165800.1220065-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="hJtaL31y4F/8RS76"
-Content-Disposition: inline
-In-Reply-To: <Zqemv4YUSM0gouYO@e133380.arm.com>
-X-Cookie: List was current at time of printing.
-
-
---hJtaL31y4F/8RS76
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20240708165800.1220065-1-maz@kernel.org>
 
-On Mon, Jul 29, 2024 at 03:27:11PM +0100, Dave Martin wrote:
-> On Fri, Jul 26, 2024 at 06:39:27PM +0100, Mark Brown wrote:
+Hi Marc,
 
-> > Yes, though that would mean if we had to generate any register in there
-> > we'd always have to generate at least as many entries as whatever number
-> > it got assigned which depending on how much optionality ends up getting
-> > used might be unfortunate.
+On Mon, Jul 08, 2024 at 05:57:58PM +0100, Marc Zyngier wrote:
+> In order to plug the brokenness of our current AT implementation,
+> we need a SW walker that is going to... err.. walk the S1 tables
+> and tell us what it finds.
+> 
+> Of course, it builds on top of our S2 walker, and share similar
+> concepts. The beauty of it is that since it uses kvm_read_guest(),
+> it is able to bring back pages that have been otherwise evicted.
+> 
+> This is then plugged in the two AT S1 emulation functions as
+> a "slow path" fallback. I'm not sure it is that slow, but hey.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/at.c | 538 ++++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 520 insertions(+), 18 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> index 71e3390b43b4c..8452273cbff6d 100644
+> --- a/arch/arm64/kvm/at.c
+> +++ b/arch/arm64/kvm/at.c
+> @@ -4,9 +4,305 @@
+>   * Author: Jintack Lim <jintack.lim@linaro.org>
+>   */
+>  
+> +#include <linux/kvm_host.h>
+> +
+> +#include <asm/esr.h>
+>  #include <asm/kvm_hyp.h>
+>  #include <asm/kvm_mmu.h>
+>  
+> +struct s1_walk_info {
+> +	u64	     baddr;
+> +	unsigned int max_oa_bits;
+> +	unsigned int pgshift;
+> +	unsigned int txsz;
+> +	int 	     sl;
+> +	bool	     hpd;
+> +	bool	     be;
+> +	bool	     nvhe;
+> +	bool	     s2;
+> +};
+> +
+> +struct s1_walk_result {
+> +	union {
+> +		struct {
+> +			u64	desc;
+> +			u64	pa;
+> +			s8	level;
+> +			u8	APTable;
+> +			bool	UXNTable;
+> +			bool	PXNTable;
+> +		};
+> +		struct {
+> +			u8	fst;
+> +			bool	ptw;
+> +			bool	s2;
+> +		};
+> +	};
+> +	bool	failed;
+> +};
+> +
+> +static void fail_s1_walk(struct s1_walk_result *wr, u8 fst, bool ptw, bool s2)
+> +{
+> +	wr->fst		= fst;
+> +	wr->ptw		= ptw;
+> +	wr->s2		= s2;
+> +	wr->failed	= true;
+> +}
+> +
+> +#define S1_MMU_DISABLED		(-127)
+> +
+> +static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+> +			 struct s1_walk_result *wr, const u64 va, const int el)
+> +{
+> +	u64 sctlr, tcr, tg, ps, ia_bits, ttbr;
+> +	unsigned int stride, x;
+> +	bool va55, tbi;
+> +
+> +	wi->nvhe = el == 2 && !vcpu_el2_e2h_is_set(vcpu);
 
-> Ack, though it's only 150 bytes or so at most, so just zeroing it all
-> (or as much as we know about) doesn't feel like a big cost.
+Where 'el' is computed in handle_at_slow() as:
 
-> It depends how determined we are to squeeze the most out of the
-> remaining space.
+	/*
+	 * We only get here from guest EL2, so the translation regime
+	 * AT applies to is solely defined by {E2H,TGE}.
+	 */
+	el = (vcpu_el2_e2h_is_set(vcpu) &&
+	      vcpu_el2_tge_is_set(vcpu)) ? 2 : 1;
 
-Indeed, I was more thinking about how it might scale as the number of
-extensions grows rather than the current costs.
+I think 'nvhe' will always be false ('el' is 2 only when E2H is set).
 
---hJtaL31y4F/8RS76
-Content-Type: application/pgp-signature; name="signature.asc"
+I'm curious about what 'el' represents. The translation regime for the AT
+instruction?
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmanqfsACgkQJNaLcl1U
-h9AXbgf+JtPrAvhLYf2ZdjhYtqAh1SMzgRQmESORZGriT/8kYjk9Mo4NTTvAC2Yn
-/VfRFTo1v4jtdJYliDP8UNjdn0/QJDc/vV8wuWpM2OuGhJIY632rnSXGdUKRyg1n
-x2CMonSmVuyf9RgJv7ycXFXL2p1CqtQTJ1s1B/q+JMxL0qRTtPouELOvuEzsk6Pu
-cr0MQ6m9KR1RlhfmTeW23zy+Diwyrgj9E6Fp5vHHU31sK1rYS7z7ODNzWxhBOkdw
-JY29M0Zsww4EHQqBRB9CoPAKSbx3GgG6c5yo6BHxem4Fpun2mq0OKuIfobbb8Luk
-psf1yW9CJPnOO6ekMQXlpmPZwS1CPg==
-=os6B
------END PGP SIGNATURE-----
-
---hJtaL31y4F/8RS76--
+Thanks,
+Alex
