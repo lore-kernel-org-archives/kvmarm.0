@@ -1,166 +1,124 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F204419580A
-	for <kvmarm@lists.linux.dev>; Tue, 30 Jul 2024 11:52:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A05E863D;
+	Tue, 30 Jul 2024 13:31:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722340344; cv=none; b=bxI8r1Vbtva9pb+IFJ0Zyp4kEUTnYsP+ALW4oIU7SnT82kFkywJ6B2YYfUfTL6x42HnSjPQQWHnLA8eaWe8+ZpYAUai7je1GxyoP7BSVTzgxRia4SLYsZ28lXll4jKPE452uD6BUkXVIpRTcxLWel1mExqKQZ//yIgRt4ziwjQI=
+	t=1722346260; cv=none; b=gQsmdTjiakF6JsM8H5hzELACefCTfLxU/TGX5JNp3uMwaAbU9WLfvsQp5ZfTnGgOQdIJwfN3gmDy9SpPUvBDDURQt58iJQHCIe3iZGqd0LFBghESUyl6lGRgaIHmuFZQEG9LmFFrenzAzmiQo5fmmm29OTyRRjP8HmUSsjVX6N0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722340344; c=relaxed/simple;
-	bh=i5pqEBAzsxZVYdIgCz2pQRWHOKq/9I2sY7ExiVSJ1S0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dx8/O9hY3MYpYB1KILFDQ0Uf308jaI09f7xUg0KwPJikC1xOWau/ydAll41EP3/7nWBcMpVxg18yI3Ixv/LA4f0fTSwXwqvsdD0hGSvaB3ksoiH+c+8LWQDDmPNdfgHI8gmRs/lQgNJYJziy90rqLNB9c8M8y39g4AugE4rJDCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Hf5X5npP; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1722346260; c=relaxed/simple;
+	bh=yy7+5mJanhSnLny9/z+l3tsyVx0RSv5rtYylirglrzA=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Xl0qr8Sm9LXhqF7hxu6ywQFRxKzTY3U4tb3/dKxVfMivbYqq/bOm+PRRRJ8RBDOoPfIGTrQ0+eADBt4uf+PDhF9Ugifso+7CGzRNUM76u0QuIIqjsUl+ljBqKGL3lHCq+t4Ewf+Gtl8hpY/FhTAag9BTKhGohaE5vmnXxdIxSpM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=brxI5y5+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hf5X5npP"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722340341;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=kBFBIKd1rJgOI9YcivSLfU1/eAHX+x0Dw4M+NCBYe5U=;
-	b=Hf5X5npPCSB3TJunaCO7/yEglHaWSbpLOg7or/hkRqXSVOyYZtkyK6hgC1QIR1Kbxl8Vqh
-	TAmCGanWbuTWf/HB4k3YG4ySXy0RM62Cu7nTnqsSuEzg/YyaEz/ndYnKnuOsKhnvfwY/CH
-	HR23bPkVSPAn+IKNNdhRtEu0J5XT5X0=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-488-bpjTB9HbOO6F8NBOpykE0Q-1; Tue, 30 Jul 2024 07:52:20 -0400
-X-MC-Unique: bpjTB9HbOO6F8NBOpykE0Q-1
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-5a7493ad70fso3349044a12.2
-        for <kvmarm@lists.linux.dev>; Tue, 30 Jul 2024 04:52:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722340338; x=1722945138;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kBFBIKd1rJgOI9YcivSLfU1/eAHX+x0Dw4M+NCBYe5U=;
-        b=XPYo68xSbjwE1jWp6SSSTWvtYLdbZ81hpSmuDdeRpzFG5Rz0QF7OtjOSFmT2RUuThy
-         zhpG58yLd2gJWaKFBQfla47iPLJhRzqTw4R08y0Ag20CcfJeJotyrK+jXnbFEqQpgjLf
-         vcRu3jT6pA4tAOPYW+hoRhjPVJ6M06U2zF8pIDsbJnlHOqkBkxIs+pvp1MtXA7/kbOMf
-         KVfzP1pVsxzSod84m/Wh1G8DFLqV7WMlvYEja4dxMRbEYvBB0qV3odqXiyHJuoP5oGqc
-         VPeAb52onBGcEt26Dwq/GueynFfaW/ORUs8jvGuxBcAyClJN8Rrv6fp1EhKqPfosjUjO
-         BHcg==
-X-Forwarded-Encrypted: i=1; AJvYcCVZUL8gb8XQuDRwaHgbZnika6o7PY01/ivMJEFkTDpMS1jr194TViZWEKWvyVK65i6WdhGHMOw31uKQF8bDVSKCDnI6tpYw
-X-Gm-Message-State: AOJu0YwWES/zu1bBJwehFxVD+W8lzhbSjhzsVi4P+HOV2bIDGTG7XbvK
-	eJWK1OPV7CH+8YJvthdrEwadxyZp8cjZgaTR9jQgKbxVW/yUF6qlAcSuU3aWVqthqvVOSvwM6zY
-	o/wvvTKEULMO4iXcPmCpfXM662OtH+JuLgvm3BnUPLRZ03mP2cPudxg==
-X-Received: by 2002:a50:d742:0:b0:5a1:6c50:a35 with SMTP id 4fb4d7f45d1cf-5b022b8cd30mr5926689a12.37.1722340338221;
-        Tue, 30 Jul 2024 04:52:18 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGBJKwuTl3GcCc5YuDbeqMD1zDkMcs4VmkJUQMAj6w6PoPQ2QTlBUJ4IvJ66qrB4FTpUDSGzA==
-X-Received: by 2002:a50:d742:0:b0:5a1:6c50:a35 with SMTP id 4fb4d7f45d1cf-5b022b8cd30mr5926669a12.37.1722340337692;
-        Tue, 30 Jul 2024 04:52:17 -0700 (PDT)
-Received: from [192.168.10.47] ([151.95.101.29])
-        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-5b0044c72d4sm5211327a12.70.2024.07.30.04.52.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 30 Jul 2024 04:52:17 -0700 (PDT)
-Message-ID: <419ea6ce-83ca-413e-936c-1935e2c51497@redhat.com>
-Date: Tue, 30 Jul 2024 13:52:15 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="brxI5y5+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C0DFC32782;
+	Tue, 30 Jul 2024 13:30:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722346260;
+	bh=yy7+5mJanhSnLny9/z+l3tsyVx0RSv5rtYylirglrzA=;
+	h=From:Subject:Date:To:Cc:From;
+	b=brxI5y5+ueGJkOCI3yHtZTXCSXMZnPdO4pOcQxjAzZY3MTMHq1ARACPHMXzKcaVxm
+	 snAP/VyJVG0NFBLMnvZRQUXfsNvTWl4GxVcyiJJ3Pve+qH4wyxQtsc9M7zmvcx4OJP
+	 wuE1ZlhmIb9GH4S+A8OxR384km5s+ZusCcNI915Pof2JnyeMRINijWyA3PviY4Qfyx
+	 st2sIrjrtAlvG8JIsc1/H5DO4+TO6AAKqHz7GUpmEn+qf/Ovv0p9Xrl2/3FRkJg9SB
+	 g+AihyWv1gOpwZ9oiJVM1wlALxc954F7Hh+W/V6mzj0qAuA06UHXfxHi2UjDXNV+7E
+	 fVAMCTgq2YYKA==
+From: Mark Brown <broonie@kernel.org>
+Subject: [PATCH v6 0/4] KVM: arm64: Fix underallocation of storage for SVE
+ state
+Date: Tue, 30 Jul 2024 14:29:12 +0100
+Message-Id: <20240730-kvm-arm64-fix-pkvm-sve-vl-v6-0-cae8a2e0bd66@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 00/84] KVM: Stop grabbing references to PFNMAP'd pages
-To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao
- <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
- Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>,
- Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, loongarch@lists.linux.dev,
- linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
- linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
- David Stevens <stevensd@chromium.org>
-References: <20240726235234.228822-1-seanjc@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <20240726235234.228822-1-seanjc@google.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAKjqqGYC/33QTWrDMBAF4KsErauin9FIyar3CF1Y1jgRSewgF
+ ZESfPfKgVIXg5ZvmPkG3pNlSpEyO+yeLFGJOU5jDfi2Y/25G0/EY6iZKaFAoAB+KTfepRsCH+K
+ D35eYC/Fy5VL3wcoh2OAFq/f3RHXlZR8/az7H/DWl79eropbpr4oNtSgueO/cAOTBS/AfF0ojX
+ d+ndGILW+SaMi1KVgqdCOhBe+jlhtJryrYoXSmzJ+ukFRjQbCj4o2yztgKV8uj2rvNKhx42lFl
+ TrkWZSgUlrbHagcH/Xc3z/AOeMHbx7wEAAA==
+To: Catalin Marinas <catalin.marinas@arm.com>, 
+ Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+ Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Fuad Tabba <tabba@google.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ kvmarm@lists.linux.dev, Mark Brown <broonie@kernel.org>
+X-Mailer: b4 0.15-dev-37811
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2551; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=yy7+5mJanhSnLny9/z+l3tsyVx0RSv5rtYylirglrzA=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBmqOsNqaeRRdie8SdDAQ1lneq5D6pOxAZk+JOkgK1T
+ u5d7SHSJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZqjrDQAKCRAk1otyXVSH0KxZB/
+ 49KowH0dC5AqjvGa56kImJwH54qJ+8xxn8+/i4xsXTkGObox6ZvOgGSo0TraoMKT9Qll/hDZ03IWmP
+ SFD94uuj5FauK0rAoGn6Vj62Zd86banU5TfpapC7jWyMQ99+Kvdihv/dm951YlTwNk6AolPrqCwNgx
+ QnPb7tuHeWkWfmFT5fvJAz40N3XZ+VtLuB+BypWWGc2e6gVzM/IfP5cZHazTCB1DALVHB3ruJVXLpA
+ qWuiFwlt8HNOyo+UY172RIFVg9Xad1pSknK3F8eBIrH/C23FngcxSgXSG+sFCwjdPRekw4vv8CveD9
+ Nwpt3j9rwcWmVm0LxFM4BcZXmE0mMU
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-On 7/27/24 01:51, Sean Christopherson wrote:
-> arm64 folks, the first two patches are bug fixes, but I have very low
-> confidence that they are correct and/or desirable.  If they are more or
-> less correct, I can post them separately if that'd make life easier.  I
-> included them here to avoid conflicts, and because I'm pretty sure how
-> KVM deals with MTE tags vs. dirty logging will impact what APIs KVM needs
-> to provide to arch code.
-> 
-> On to the series...  The TL;DR is that I would like to get input on two
-> things:
-> 
->   1. Marking folios dirty/accessed only on the intial stage-2 page fault
->   2. The new APIs for faulting, prefetching, and doing "lookups" on pfns
+As observed during review the pKVM support for saving host SVE state is
+broken if an asymmetric system has VLs larger than the maximum shared
+VL, fix this by discovering then using the maximum VL for allocations
+and using RDVL during the save/restore process.
 
-Wow!
+Fuad posted[1] another attempt to address this issues but as indicated
+in review I have maintanability concerns since the VL configuration does
+not follow best practices and the enumeration is not well integrated
+with the rest of the enumeration code.
 
-Splitting out prefetching makes a lot of sense, as it's the only one 
-with npages > 1 and it doesn't need all the complexity of hva_to_pfn().
+[1] https://lore.kernel.org/r/20240606092623.2236172-1-tabba@google.com
 
-I've left a comment on the lookup API, which is probably the only one 
-that can be simplified further.
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+Changes in v6:
+- Rebase onto v6.11-rc1.
+- Link to v5: https://lore.kernel.org/r/20240708-kvm-arm64-fix-pkvm-sve-vl-v5-0-d2175738456b@kernel.org
 
-The faulting API looks good as a first iteration.  Code-wise, 
-kvm_resolve_pfn() is probably unnecessary at the end of the series but I 
-can see why you had to restrain yourself and declare it done. :)
+Changes in v5:
+- Clarify commit message on patch 3.
+- Link to v4: https://lore.kernel.org/r/20240704-kvm-arm64-fix-pkvm-sve-vl-v4-0-b6898ab23dc4@kernel.org
 
-An interesting evolution of the API could be to pass a struct 
-kvm_follow_pfn pointer to {,__}kvm_faultin_pfn() and __gfn_to_page() 
-(the "constructors"); and on the other side to 
-kvm_release_faultin_page() and kvm_release_page_*().  The struct 
-kvm_follow_pfn could be embedded in the (x86) kvm_page_fault and 
-(generic) kvm_host_map structs.  But certainly not as part of this 
-already huge work.
+Changes in v4:
+- Roll in Catalin's acks.
+- Link to v3: https://lore.kernel.org/r/20240607-kvm-arm64-fix-pkvm-sve-vl-v3-0-59e781706d65@kernel.org
 
-Paolo
+Changes in v3:
+- Replace %u with %lu in late CPU error message.
+Changes in v2:
+- Downgrade check for a late CPU increasing maximum VL to a warning only
+  but do it unconditionally since pKVM prevents late CPUs anyway.
+- Commit log tweaks.
+- Link to v1: https://lore.kernel.org/r/20240605-kvm-arm64-fix-pkvm-sve-vl-v1-0-680d6b43b4c1@kernel.org
+
+---
+Mark Brown (4):
+      arm64/fpsimd: Introduce __bit_to_vl() helper
+      arm64/fpsimd: Discover maximum vector length implemented by any CPU
+      KVM: arm64: Fix FFR offset calculation for pKVM host state save and restore
+      KVM: arm64: Avoid underallocating storage for host SVE state
+
+ arch/arm64/include/asm/fpsimd.h         | 17 +++++++++++++++
+ arch/arm64/include/asm/kvm_host.h       |  2 +-
+ arch/arm64/include/asm/kvm_hyp.h        |  3 ++-
+ arch/arm64/include/asm/kvm_pkvm.h       |  2 +-
+ arch/arm64/kernel/fpsimd.c              | 38 +++++++++++++++++++++++++++------
+ arch/arm64/kvm/hyp/fpsimd.S             |  5 +++++
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  6 +++---
+ arch/arm64/kvm/hyp/nvhe/pkvm.c          |  2 +-
+ arch/arm64/kvm/reset.c                  |  6 +++---
+ 10 files changed, 65 insertions(+), 18 deletions(-)
+---
+base-commit: 8400291e289ee6b2bf9779ff1c83a291501f017b
+change-id: 20240604-kvm-arm64-fix-pkvm-sve-vl-13cd71fd7db0
+
+Best regards,
+-- 
+Mark Brown <broonie@kernel.org>
 
