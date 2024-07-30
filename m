@@ -1,66 +1,25 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89C48944E
-	for <kvmarm@lists.linux.dev>; Tue, 30 Jul 2024 09:05:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79B3219DF77;
+	Tue, 30 Jul 2024 10:36:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722330345; cv=none; b=DmTsuUsr/z+eAIfJd1fQhsPQQ+F31/HyCesphNCwbQ1djFDw1H/nH9bM9ph/3rLrF/9oQKngoZ/3N/A/rLZG6hHLIrAwNDdSXRZ4/c4ke7Sw2owO/CpV18t6qFTdZfEPHVTl67alWS1zq9+0ovhdFiJhwK32YFpr/yXFRSb6ZTs=
+	t=1722335779; cv=none; b=O4NZbLwZVFxkI+Fca38c2Ov/ohoH6icpvXqwF7nshyTR0jxqgj9tg9s1hf8KwGkoCM6FTa6nz/lrEwrvNAdTo7kWuA4g/90ISAgMs9PEVlkXxPWbAJmtuLk1UKojVeXwXYVJAP6SB3ivWEcEGWPw4iaMC8ZHE+r/sJgMN+7XwzY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722330345; c=relaxed/simple;
-	bh=AMADz3cAvKTXjxmizkMCUls5b/7+qLUiUKoat0OUU9w=;
+	s=arc-20240116; t=1722335779; c=relaxed/simple;
+	bh=RfiwyEUsPb8tPAYC80PiZ5qOL/iGu9KCxcDr+2YKA6M=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Dj77RIaU60wQXqMqkUKyuMJF5Px4LCj7ZtAETf7C+1ys/G90oLfGg2lff2M7G89KavkQZN3sglTR4DnB6/+HbEMT0/eKsGyebTtLf569/Ob//dR3wW42LW+8LBBDjy3GsBe8isbyUMJgkxzrIRy+lf3l8dsJGx5xLvd+nft+Q20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SH89Gu4w; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SH89Gu4w"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722330342;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=y8G0Rsvl2ZfKQVim3WYEu/ULpMdQ5SB3TZr8FpmD1gs=;
-	b=SH89Gu4wyG7tWzOQ7a9n3AmdbUK6j/8XmicE5Yy2RbVQUoAKxdQoMyhbm6uWHnSBjJ6yW3
-	NKi2WK5tHwBVamjgrolwvssbUmwDHiyTK7wSbA3zhI2Ssjb3Z/2HZDVTKAmoNcPrKSc/sH
-	1x6P5VrHlyacvdzM/CGMBWssaFxC9eM=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-507-ZsYHuqNYMUqsHlGNgkmxCA-1; Tue, 30 Jul 2024 05:05:39 -0400
-X-MC-Unique: ZsYHuqNYMUqsHlGNgkmxCA-1
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a7a9761bf6dso400442666b.3
-        for <kvmarm@lists.linux.dev>; Tue, 30 Jul 2024 02:05:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722330338; x=1722935138;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=y8G0Rsvl2ZfKQVim3WYEu/ULpMdQ5SB3TZr8FpmD1gs=;
-        b=vHlWNSCP5XbI5wCed+9MbxSzhuT8jX0DytdMpfE7ZWSlkbMEVo0w2KCbIcsXSHLw/U
-         +tA3t8IB0VWkyXenZftXo2R+dKDjzhId4+zHqJ9o779Umcf1dcYGC+wnbg5U+5kY6Hb4
-         lHqFuxCgJAKjw1qVtJuqvF2kCNDV6ESg/bY/LxN2yGWcdfQEIzR838eXBd/zJFXXbEDp
-         jLVTelF9pkUHln6Bd19oUlbqRKsKHVj7GqXjwaocZDBqtCb+X0SIDbWJwevcV/505n7M
-         o1GCBhDaTkyAQgAbnETydG2bq4O2yMyRLqWfg9dxmbP2zSlSgnZMNg/W9FEr7sumKlpr
-         x5oA==
-X-Forwarded-Encrypted: i=1; AJvYcCVrr3ruPYXBYEOL+FEktxYEK0LsPOOJpcxMd8Po3X3hWM9m/Y/XNR/RF45x0437mZ+NFit4Z+m7IfLPal/SkHQ93mKZvR+H
-X-Gm-Message-State: AOJu0YzrEn+Yo2WksqsVBKez+yVm9e2hNGzKWIw+i6D08Xe7cB3uCHjq
-	7ybg2wWb0m+kLpAw9zlEX5agZLuhb8udPjGpMV9uWBdjB8JwFJRpuaHaUgBz1Umd5wpfYiJ9fMH
-	P4rmH2V1hG8FvCaJKlkPdv5nUHiUZbq1RYNm+LwwsXn6oL9f2RchQMQ==
-X-Received: by 2002:a17:907:9803:b0:a6f:4f2c:1936 with SMTP id a640c23a62f3a-a7d4011446bmr605768366b.44.1722330338320;
-        Tue, 30 Jul 2024 02:05:38 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGyHe4aJyS1Uxr4GJW4wjt2WBKjxS53+1D2JV4zXUtkqi7IDeNByS7dwef5YTgCXCGFtY96FA==
-X-Received: by 2002:a17:907:9803:b0:a6f:4f2c:1936 with SMTP id a640c23a62f3a-a7d4011446bmr605763366b.44.1722330337702;
-        Tue, 30 Jul 2024 02:05:37 -0700 (PDT)
-Received: from [192.168.10.47] ([151.95.101.29])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a7acab23157sm617304466b.33.2024.07.30.02.05.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 30 Jul 2024 02:05:37 -0700 (PDT)
-Message-ID: <2da6b57e-d5c2-4016-b89b-d51700eeb845@redhat.com>
-Date: Tue, 30 Jul 2024 11:05:35 +0200
+	 In-Reply-To:Content-Type; b=R+wfMwuOKGhgWWJNEX/2YKqntCgi0q/uNwTt2L7zgr6FCQEmn0dluSBdhuULM2bUYBsfYKXZqptxbR6HeifMvvn3rcBa8m/w8AlbZfVO3DDgVHn+I1Z9fGvE7Sl0nUC13H8aBo67p27mGCnEHUxO2WWQvtfzNp16ggu+85fjaBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5E68F1007;
+	Tue, 30 Jul 2024 03:36:42 -0700 (PDT)
+Received: from [10.57.94.83] (unknown [10.57.94.83])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 116653F766;
+	Tue, 30 Jul 2024 03:36:13 -0700 (PDT)
+Message-ID: <e05d2363-d3e4-4a23-9347-723454d603c9@arm.com>
+Date: Tue, 30 Jul 2024 11:36:12 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -68,194 +27,132 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 45/84] KVM: guest_memfd: Provide "struct page" as
- output from kvm_gmem_get_pfn()
-To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao
- <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
- Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>,
- Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, loongarch@lists.linux.dev,
- linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
- linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
- David Stevens <stevensd@chromium.org>
-References: <20240726235234.228822-1-seanjc@google.com>
- <20240726235234.228822-46-seanjc@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <20240726235234.228822-46-seanjc@google.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
+Subject: Re: [PATCH v4 05/15] arm64: Mark all I/O as non-secure shared
+Content-Language: en-GB
+To: Gavin Shan <gshan@redhat.com>, Steven Price <steven.price@arm.com>,
+ kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+References: <20240701095505.165383-1-steven.price@arm.com>
+ <20240701095505.165383-6-steven.price@arm.com>
+ <b20b7e5b-95aa-4fdb-88a7-72f8aa3da8db@redhat.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <b20b7e5b-95aa-4fdb-88a7-72f8aa3da8db@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 7/27/24 01:51, Sean Christopherson wrote:
-> Provide the "struct page" associated with a guest_memfd pfn as an output
-> from __kvm_gmem_get_pfn() so that KVM guest page fault handlers can
-        ^^^^^^^^^^^^^^^^^^^^
+Hi Gavin,
 
-Just "kvm_gmem_get_pfn()".
+Thanks for looking at the patch. Responses inline.
 
-> directly put the page instead of having to rely on
-> kvm_pfn_to_refcounted_page().
-
-This will conflict with my series, where I'm introducing
-folio_file_pfn() and using it here:
-> -	page = folio_file_page(folio, index);
-> +	*page = folio_file_page(folio, index);
->   
-> -	*pfn = page_to_pfn(page);
-> +	*pfn = page_to_pfn(*page);
->   	if (max_order)
->   		*max_order = 0;
-
-That said, I think it's better to turn kvm_gmem_get_pfn() into
-kvm_gmem_get_page() here, and pull the page_to_pfn() or page_to_phys()
-to the caller as applicable.  This highlights that the caller always
-gets a refcounted page with guest_memfd.
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 901be9e420a4..bcc4a4c594ef 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4348,13 +4348,14 @@ static int kvm_faultin_pfn_private(struct kvm_vcpu *vcpu,
-  		return -EFAULT;
-  	}
-  
--	r = kvm_gmem_get_pfn(vcpu->kvm, fault->slot, fault->gfn, &fault->pfn,
-+	r = kvm_gmem_get_page(vcpu->kvm, fault->slot, fault->gfn, &fault->refcounted_page,
-  			     &max_order);
-  	if (r) {
-  		kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
-  		return r;
-  	}
-  
-+	fault->pfn = page_to_pfn(page);
-  	fault->map_writable = !(fault->slot->flags & KVM_MEM_READONLY);
-  	fault->max_level = kvm_max_private_mapping_level(vcpu->kvm, fault->pfn,
-  							 fault->max_level, max_order);
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index a16c873b3232..db4181d11f2e 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -3847,7 +3847,7 @@ static int __sev_snp_update_protected_guest_state(struct kvm_vcpu *vcpu)
-  	if (VALID_PAGE(svm->sev_es.snp_vmsa_gpa)) {
-  		gfn_t gfn = gpa_to_gfn(svm->sev_es.snp_vmsa_gpa);
-  		struct kvm_memory_slot *slot;
--		kvm_pfn_t pfn;
-+		struct page *page;
-  
-  		slot = gfn_to_memslot(vcpu->kvm, gfn);
-  		if (!slot)
-@@ -3857,7 +3857,7 @@ static int __sev_snp_update_protected_guest_state(struct kvm_vcpu *vcpu)
-  		 * The new VMSA will be private memory guest memory, so
-  		 * retrieve the PFN from the gmem backend.
-  		 */
--		if (kvm_gmem_get_pfn(vcpu->kvm, slot, gfn, &pfn, NULL))
-+		if (kvm_gmem_get_page(vcpu->kvm, slot, gfn, &page, NULL))
-  			return -EINVAL;
-  
-  		/*
-@@ -3873,7 +3873,7 @@ static int __sev_snp_update_protected_guest_state(struct kvm_vcpu *vcpu)
-  		svm->sev_es.snp_has_guest_vmsa = true;
-  
-  		/* Use the new VMSA */
--		svm->vmcb->control.vmsa_pa = pfn_to_hpa(pfn);
-+		svm->vmcb->control.vmsa_pa = page_to_phys(page);
-  
-  		/* Mark the vCPU as runnable */
-  		vcpu->arch.pv.pv_unhalted = false;
-@@ -3886,7 +3886,7 @@ static int __sev_snp_update_protected_guest_state(struct kvm_vcpu *vcpu)
-  		 * changes then care should be taken to ensure
-  		 * svm->sev_es.vmsa is pinned through some other means.
-  		 */
--		kvm_release_pfn_clean(pfn);
-+		kvm_release_page_clean(page);
-  	}
-  
-  	/*
-@@ -4687,6 +4687,7 @@ void sev_handle_rmp_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code)
-  	struct kvm *kvm = vcpu->kvm;
-  	int order, rmp_level, ret;
-  	bool assigned;
-+	struct page *page;
-  	kvm_pfn_t pfn;
-  	gfn_t gfn;
-  
-@@ -4712,13 +4713,14 @@ void sev_handle_rmp_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code)
-  		return;
-  	}
-  
--	ret = kvm_gmem_get_pfn(kvm, slot, gfn, &pfn, &order);
-+	ret = kvm_gmem_get_page(kvm, slot, gfn, &page, &order);
-  	if (ret) {
-  		pr_warn_ratelimited("SEV: Unexpected RMP fault, no backing page for private GPA 0x%llx\n",
-  				    gpa);
-  		return;
-  	}
-  
-+	pfn = page_to_pfn(page);
-  	ret = snp_lookup_rmpentry(pfn, &assigned, &rmp_level);
-  	if (ret || !assigned) {
-  		pr_warn_ratelimited("SEV: Unexpected RMP fault, no assigned RMP entry found for GPA 0x%llx PFN 0x%llx error %d\n",
-@@ -4770,7 +4772,7 @@ void sev_handle_rmp_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code)
-  out:
-  	trace_kvm_rmp_fault(vcpu, gpa, pfn, error_code, rmp_level, ret);
-  out_no_trace:
--	put_page(pfn_to_page(pfn));
-+	kvm_release_page_unused(page);
-  }
-  
-  static bool is_pfn_range_shared(kvm_pfn_t start, kvm_pfn_t end)
+On 30/07/2024 02:36, Gavin Shan wrote:
+> On 7/1/24 7:54 PM, Steven Price wrote:
+>> All I/O is by default considered non-secure for realms. As such
+>> mark them as shared with the host.
+>>
+>> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>> Changes since v3:
+>>   * Add PROT_NS_SHARED to FIXMAP_PAGE_IO rather than overriding
+>>     set_fixmap_io() with a custom function.
+>>   * Modify ioreamp_cache() to specify PROT_NS_SHARED too.
+>> ---
+>>   arch/arm64/include/asm/fixmap.h | 2 +-
+>>   arch/arm64/include/asm/io.h     | 8 ++++----
+>>   2 files changed, 5 insertions(+), 5 deletions(-)
+>>
+> 
+> I'm unable to understand this. Steven, could you please explain a bit how
+> PROT_NS_SHARED is turned to a shared (non-secure) mapping to hardware?
+> According to tf-rmm's implementation in 
+> tf-rmm/lib/s2tt/src/s2tt_pvt_defs.h,
+> a shared (non-secure) mapping is is identified by NS bit (bit#55). I find
+> difficulties how the NS bit is correlate with PROT_NS_SHARED. For example,
+> how the NS bit is set based on PROT_NS_SHARED.
 
 
-And the change in virt/kvm/guest_memfd.c then is just as trivial, apart
-from all the renaming:
+There are two things at play here :
 
--	*pfn = folio_file_pfn(folio, index);
-+	*page = folio_file_page(folio, index);
+1. Stage1 mapping controlled by the Realm (Linux in this case, as above).
+2. Stage2 mapping controlled by the RMM (with RMI commands from NS Host).
 
+Also :
+The Realm's IPA space is divided into two halves (decided by the IPA 
+Width of the Realm, not the NSbit #55), protected (Lower half) and
+Unprotected (Upper half). All stage2 mappings of the "Unprotected IPA"
+will have the NS bit (#55) set by the RMM. By design, any MMIO access
+to an unprotected half is sent to the NS Host by RMM and any page
+the Realm wants to share with the Host must be in the Upper half
+of the IPA.
 
-Paolo
+What we do above is controlling the "Stage1" used by the Linux. i.e,
+for a given VA, we flip the Guest "PA" (in reality IPA) to the
+"Unprotected" alias.
+
+e.g., DTB describes a UART at address 0x10_0000 to Realm (with an IPA 
+width of 40, like in the normal VM case), emulated by the host. Realm is
+trying to map this I/O address into Stage1 at VA. So we apply the
+BIT(39) as PROT_NS_SHARED while creating the Stage1 mapping.
+
+ie., VA == stage1 ==> BIT(39) | 0x10_0000 =(IPA)== > 0x80_10_0000
+
+Now, the Stage2 mapping won't be present for this IPA if it is emulated
+and thus an access to "VA" causes a Stage2 Abort to the Host, which the
+RMM allows the host to emulate. Otherwise a shared page would have been
+mapped by the Host (and NS bit set at Stage2 by RMM), allowing the
+data to be shared with the host.
+
+Does that answer your question ?
+
+Suzuki
+
+> 
+>> diff --git a/arch/arm64/include/asm/fixmap.h 
+>> b/arch/arm64/include/asm/fixmap.h
+>> index 87e307804b99..f2c5e653562e 100644
+>> --- a/arch/arm64/include/asm/fixmap.h
+>> +++ b/arch/arm64/include/asm/fixmap.h
+>> @@ -98,7 +98,7 @@ enum fixed_addresses {
+>>   #define FIXADDR_TOT_SIZE    (__end_of_fixed_addresses << PAGE_SHIFT)
+>>   #define FIXADDR_TOT_START    (FIXADDR_TOP - FIXADDR_TOT_SIZE)
+>> -#define FIXMAP_PAGE_IO     __pgprot(PROT_DEVICE_nGnRE)
+>> +#define FIXMAP_PAGE_IO     __pgprot(PROT_DEVICE_nGnRE | PROT_NS_SHARED)
+>>   void __init early_fixmap_init(void);
+>> diff --git a/arch/arm64/include/asm/io.h b/arch/arm64/include/asm/io.h
+>> index 4ff0ae3f6d66..07fc1801c6ad 100644
+>> --- a/arch/arm64/include/asm/io.h
+>> +++ b/arch/arm64/include/asm/io.h
+>> @@ -277,12 +277,12 @@ static inline void __const_iowrite64_copy(void 
+>> __iomem *to, const void *from,
+>>   #define ioremap_prot ioremap_prot
+>> -#define _PAGE_IOREMAP PROT_DEVICE_nGnRE
+>> +#define _PAGE_IOREMAP (PROT_DEVICE_nGnRE | PROT_NS_SHARED)
+>>   #define ioremap_wc(addr, size)    \
+>> -    ioremap_prot((addr), (size), PROT_NORMAL_NC)
+>> +    ioremap_prot((addr), (size), (PROT_NORMAL_NC | PROT_NS_SHARED))
+>>   #define ioremap_np(addr, size)    \
+>> -    ioremap_prot((addr), (size), PROT_DEVICE_nGnRnE)
+>> +    ioremap_prot((addr), (size), (PROT_DEVICE_nGnRnE | PROT_NS_SHARED))
+>>   /*
+>>    * io{read,write}{16,32,64}be() macros
+>> @@ -303,7 +303,7 @@ static inline void __iomem 
+>> *ioremap_cache(phys_addr_t addr, size_t size)
+>>       if (pfn_is_map_memory(__phys_to_pfn(addr)))
+>>           return (void __iomem *)__phys_to_virt(addr);
+>> -    return ioremap_prot(addr, size, PROT_NORMAL);
+>> +    return ioremap_prot(addr, size, PROT_NORMAL | PROT_NS_SHARED);
+>>   }
+>>   /*
+> 
+> Thanks,
+> Gavin
+> 
 
