@@ -1,25 +1,66 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79B3219DF77;
-	Tue, 30 Jul 2024 10:36:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04C7918A929
+	for <kvmarm@lists.linux.dev>; Tue, 30 Jul 2024 10:41:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722335779; cv=none; b=O4NZbLwZVFxkI+Fca38c2Ov/ohoH6icpvXqwF7nshyTR0jxqgj9tg9s1hf8KwGkoCM6FTa6nz/lrEwrvNAdTo7kWuA4g/90ISAgMs9PEVlkXxPWbAJmtuLk1UKojVeXwXYVJAP6SB3ivWEcEGWPw4iaMC8ZHE+r/sJgMN+7XwzY=
+	t=1722336099; cv=none; b=INaATyMYr0tm6yljNFKtbNUwp9t/RP57uBbRnuebjIWZFoDuqplO6ceFyjKUAZSNbf1M3lt16JE9mn1s/1BxrsI0fg7Pb7909HToSHy9252ewdRGOCiQrmFVghrDjDs8wnMM1vR5y9qHhcw59bX7EUomqPtYCfrR7xrKviRu9zM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722335779; c=relaxed/simple;
-	bh=RfiwyEUsPb8tPAYC80PiZ5qOL/iGu9KCxcDr+2YKA6M=;
+	s=arc-20240116; t=1722336099; c=relaxed/simple;
+	bh=DhzCAI2qKRiMRe5MUI4Qm796RQ6OVVSx+lGb39s7xlc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=R+wfMwuOKGhgWWJNEX/2YKqntCgi0q/uNwTt2L7zgr6FCQEmn0dluSBdhuULM2bUYBsfYKXZqptxbR6HeifMvvn3rcBa8m/w8AlbZfVO3DDgVHn+I1Z9fGvE7Sl0nUC13H8aBo67p27mGCnEHUxO2WWQvtfzNp16ggu+85fjaBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5E68F1007;
-	Tue, 30 Jul 2024 03:36:42 -0700 (PDT)
-Received: from [10.57.94.83] (unknown [10.57.94.83])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 116653F766;
-	Tue, 30 Jul 2024 03:36:13 -0700 (PDT)
-Message-ID: <e05d2363-d3e4-4a23-9347-723454d603c9@arm.com>
-Date: Tue, 30 Jul 2024 11:36:12 +0100
+	 In-Reply-To:Content-Type; b=RgL36jkNpOOm9D+cTeblEMoSiJzEYqZX+HCp8PRTXx2Ks9sfRaY07ppE4naemUGBirD1Y51qrNHPGSiIlmyzR4nQhIBeE2Wsr5fiRpbpOcbkOEQml6/Du8gs4MUp4m7kQWezaE6+xtVdQykC5JADU1NEkIzbuKGBL3SPMErpHDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B7w4uLEw; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B7w4uLEw"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722336096;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=8g9eu69hY+tFcVns2hzHdTrw7hODbFfcDdVx3JGaNxs=;
+	b=B7w4uLEw7TtOLa2Hj39vW+sRgDu0gFuDb1pI4B+a87Up4gu9YzLiy6RVMLcm2EzWYRx8Xa
+	l+Wge+1pfBCyZdLX09WbyYsY+ScnWVXRGldMJFQSR16lz/9QAZxwdMD5sKTeI8hU17oGiD
+	FN7yQ6a2ckcYiF5T13D5DKqKwM0Exr4=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-49-3jCxZos1OrqqUiGKzeT28Q-1; Tue, 30 Jul 2024 06:41:35 -0400
+X-MC-Unique: 3jCxZos1OrqqUiGKzeT28Q-1
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-5a7661b251aso4624149a12.1
+        for <kvmarm@lists.linux.dev>; Tue, 30 Jul 2024 03:41:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722336094; x=1722940894;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8g9eu69hY+tFcVns2hzHdTrw7hODbFfcDdVx3JGaNxs=;
+        b=rzCJaR+PPuh3l6huZ36Gkw4gh7vQyOjVViwoK4kjgvCOUs2nX/YYG+YwE0zYYS86sO
+         1H3YtDXYiAs/0A/7ZnBALHbnHj3mlLGr0otJq9yBprfmndPh9Qocl6yvxdNSXS8XNn8Q
+         bqi0HvXRhoayN9k+W9nTpfdJqhPSQWaRbKx6FVVaF+hslKITkOuUzPglvOJOu7l+GR/r
+         7XAHzT1qrDNJb8zJB7WJo6WkjVVGEhD7G28pwqwwLDOLfnexEI3XLJJYJs3k7dVO3CAF
+         2p+SBfPAVJ537LSjOs+eOSFM6MvvGcijlAro+RfxTpUHsMnYmgzdjocPnBAfa/0l2xEy
+         eMpQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVAHYbQVpPIGHZ5scClGkd+nCLD28fPrkm+LhyVlmuo33SDWIH/f3aKCMXvlLDiXNIkVxWt0GU2v62wDc05CJC3d4c0tkTR
+X-Gm-Message-State: AOJu0YwKFTgiPBdN1quwinJov89QUf181Gm2hoB3caJ4feRBhR5xxi12
+	yxGTaUYfgWi0Zwukgtupd/+Aa+btpHIFSYnQgRCPD8esxPzoiFr8fVbVKkTBrWvp9GMDgob2Pjy
+	HuGeCq5WNFcnEG9+FxXWZH611k0vhiO/htYfJ4ERbyqmtmvk3wrS8ig==
+X-Received: by 2002:a50:a411:0:b0:5a1:7d68:62d8 with SMTP id 4fb4d7f45d1cf-5b022c81f43mr6159508a12.38.1722336094338;
+        Tue, 30 Jul 2024 03:41:34 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEDPyYZQ8rptYaeG/QLRVtJLyqTXdGIvl8oYe7Os3i41TwtBzRWbRKhmb66UoorwOaLwZdqjQ==
+X-Received: by 2002:a50:a411:0:b0:5a1:7d68:62d8 with SMTP id 4fb4d7f45d1cf-5b022c81f43mr6159475a12.38.1722336093853;
+        Tue, 30 Jul 2024 03:41:33 -0700 (PDT)
+Received: from [192.168.10.47] ([151.95.101.29])
+        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-5ac6377e06fsm7118734a12.28.2024.07.30.03.41.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 30 Jul 2024 03:41:33 -0700 (PDT)
+Message-ID: <63c41e25-2523-4397-96b4-557394281443@redhat.com>
+Date: Tue, 30 Jul 2024 12:41:31 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,132 +68,80 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 05/15] arm64: Mark all I/O as non-secure shared
-Content-Language: en-GB
-To: Gavin Shan <gshan@redhat.com>, Steven Price <steven.price@arm.com>,
- kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-References: <20240701095505.165383-1-steven.price@arm.com>
- <20240701095505.165383-6-steven.price@arm.com>
- <b20b7e5b-95aa-4fdb-88a7-72f8aa3da8db@redhat.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <b20b7e5b-95aa-4fdb-88a7-72f8aa3da8db@redhat.com>
+Subject: Re: [PATCH v12 34/84] KVM: Add a helper to lookup a pfn without
+ grabbing a reference
+To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao
+ <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
+ Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>,
+ Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, loongarch@lists.linux.dev,
+ linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+ linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
+ David Stevens <stevensd@chromium.org>
+References: <20240726235234.228822-1-seanjc@google.com>
+ <20240726235234.228822-35-seanjc@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <20240726235234.228822-35-seanjc@google.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Hi Gavin,
+On 7/27/24 01:51, Sean Christopherson wrote:
+> Add a kvm_follow_pfn() wrapper, kvm_lookup_pfn(), to allow looking up a
+> gfn=>pfn mapping without the caller getting a reference to any underlying
+> page.  The API will be used in flows that want to know if a gfn points at
+> a valid pfn, but don't actually need to do anything with the pfn.
 
-Thanks for looking at the patch. Responses inline.
+Can you rename the function kvm_gfn_has_pfn(), or 
+kvm_gfn_can_be_mapped(), and make it return a bool?
 
-On 30/07/2024 02:36, Gavin Shan wrote:
-> On 7/1/24 7:54 PM, Steven Price wrote:
->> All I/O is by default considered non-secure for realms. As such
->> mark them as shared with the host.
->>
->> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->> Changes since v3:
->>   * Add PROT_NS_SHARED to FIXMAP_PAGE_IO rather than overriding
->>     set_fixmap_io() with a custom function.
->>   * Modify ioreamp_cache() to specify PROT_NS_SHARED too.
->> ---
->>   arch/arm64/include/asm/fixmap.h | 2 +-
->>   arch/arm64/include/asm/io.h     | 8 ++++----
->>   2 files changed, 5 insertions(+), 5 deletions(-)
->>
-> 
-> I'm unable to understand this. Steven, could you please explain a bit how
-> PROT_NS_SHARED is turned to a shared (non-secure) mapping to hardware?
-> According to tf-rmm's implementation in 
-> tf-rmm/lib/s2tt/src/s2tt_pvt_defs.h,
-> a shared (non-secure) mapping is is identified by NS bit (bit#55). I find
-> difficulties how the NS bit is correlate with PROT_NS_SHARED. For example,
-> how the NS bit is set based on PROT_NS_SHARED.
+(As an aside, I wonder if reexecute_instruction() could just use 
+kvm_is_error_hva(kvm_vcpu_gfn_to_hva(vcpu, gpa_to_gfn(gpa)) instead of 
+going all the way to a pfn.  But it's ok to be more restrictive).
 
-
-There are two things at play here :
-
-1. Stage1 mapping controlled by the Realm (Linux in this case, as above).
-2. Stage2 mapping controlled by the RMM (with RMI commands from NS Host).
-
-Also :
-The Realm's IPA space is divided into two halves (decided by the IPA 
-Width of the Realm, not the NSbit #55), protected (Lower half) and
-Unprotected (Upper half). All stage2 mappings of the "Unprotected IPA"
-will have the NS bit (#55) set by the RMM. By design, any MMIO access
-to an unprotected half is sent to the NS Host by RMM and any page
-the Realm wants to share with the Host must be in the Upper half
-of the IPA.
-
-What we do above is controlling the "Stage1" used by the Linux. i.e,
-for a given VA, we flip the Guest "PA" (in reality IPA) to the
-"Unprotected" alias.
-
-e.g., DTB describes a UART at address 0x10_0000 to Realm (with an IPA 
-width of 40, like in the normal VM case), emulated by the host. Realm is
-trying to map this I/O address into Stage1 at VA. So we apply the
-BIT(39) as PROT_NS_SHARED while creating the Stage1 mapping.
-
-ie., VA == stage1 ==> BIT(39) | 0x10_0000 =(IPA)== > 0x80_10_0000
-
-Now, the Stage2 mapping won't be present for this IPA if it is emulated
-and thus an access to "VA" causes a Stage2 Abort to the Host, which the
-RMM allows the host to emulate. Otherwise a shared page would have been
-mapped by the Host (and NS bit set at Stage2 by RMM), allowing the
-data to be shared with the host.
-
-Does that answer your question ?
-
-Suzuki
-
-> 
->> diff --git a/arch/arm64/include/asm/fixmap.h 
->> b/arch/arm64/include/asm/fixmap.h
->> index 87e307804b99..f2c5e653562e 100644
->> --- a/arch/arm64/include/asm/fixmap.h
->> +++ b/arch/arm64/include/asm/fixmap.h
->> @@ -98,7 +98,7 @@ enum fixed_addresses {
->>   #define FIXADDR_TOT_SIZE    (__end_of_fixed_addresses << PAGE_SHIFT)
->>   #define FIXADDR_TOT_START    (FIXADDR_TOP - FIXADDR_TOT_SIZE)
->> -#define FIXMAP_PAGE_IO     __pgprot(PROT_DEVICE_nGnRE)
->> +#define FIXMAP_PAGE_IO     __pgprot(PROT_DEVICE_nGnRE | PROT_NS_SHARED)
->>   void __init early_fixmap_init(void);
->> diff --git a/arch/arm64/include/asm/io.h b/arch/arm64/include/asm/io.h
->> index 4ff0ae3f6d66..07fc1801c6ad 100644
->> --- a/arch/arm64/include/asm/io.h
->> +++ b/arch/arm64/include/asm/io.h
->> @@ -277,12 +277,12 @@ static inline void __const_iowrite64_copy(void 
->> __iomem *to, const void *from,
->>   #define ioremap_prot ioremap_prot
->> -#define _PAGE_IOREMAP PROT_DEVICE_nGnRE
->> +#define _PAGE_IOREMAP (PROT_DEVICE_nGnRE | PROT_NS_SHARED)
->>   #define ioremap_wc(addr, size)    \
->> -    ioremap_prot((addr), (size), PROT_NORMAL_NC)
->> +    ioremap_prot((addr), (size), (PROT_NORMAL_NC | PROT_NS_SHARED))
->>   #define ioremap_np(addr, size)    \
->> -    ioremap_prot((addr), (size), PROT_DEVICE_nGnRnE)
->> +    ioremap_prot((addr), (size), (PROT_DEVICE_nGnRnE | PROT_NS_SHARED))
->>   /*
->>    * io{read,write}{16,32,64}be() macros
->> @@ -303,7 +303,7 @@ static inline void __iomem 
->> *ioremap_cache(phys_addr_t addr, size_t size)
->>       if (pfn_is_map_memory(__phys_to_pfn(addr)))
->>           return (void __iomem *)__phys_to_virt(addr);
->> -    return ioremap_prot(addr, size, PROT_NORMAL);
->> +    return ioremap_prot(addr, size, PROT_NORMAL | PROT_NS_SHARED);
->>   }
->>   /*
-> 
-> Thanks,
-> Gavin
-> 
+Paolo
 
