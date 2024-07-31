@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD70C14A0AE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2D7414D70E;
 	Wed, 31 Jul 2024 19:40:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722454855; cv=none; b=j/umr4zEIBWaK0r6ZA2a4jJ9maV/OX+UicIQyvINwJ4Gz9ZOLV3Vp2XzvvOBoNiqNdAVp7x6wJnvrOUmrnVt0qAA3u7VYjflhQv9ldhjkqU97QjN/H+tazqHk7vl2NnK8/s+87VQMRPY4XPEKgfpY9Noq5EaX9S7mgEguiw2NpY=
+	t=1722454856; cv=none; b=CnSKhxf+lINLvBszZoRzB5ggOBu2i6Nwn56mXBffv6sQNFHIe+VB8a+CWes2I4TxrcnOiyxqf9glVvDfyaKF6VXkX0DJSp4msqxbDb09MlzLi8EV8KkIoWskH7C6KYeV91EouIWvAIf6yEE+fPT+0NJcY63Uzx1fnv77TwE1MJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722454855; c=relaxed/simple;
-	bh=N1dfuCYFccAOdWqTfVzbuHnh1OCX3eKrk8hFfdOBjwA=;
+	s=arc-20240116; t=1722454856; c=relaxed/simple;
+	bh=Qr6b5GYd96pu0YEgbNtFYok+p4sjzjCNIQpIrSoubus=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ToMj5IbMSzCJJYrFoUIL1gaZx+6FVCW6M31Lm0c4ldOfpK7S9pWw4VwfMxiyHPCtDLYDqHO5WnKyx1+eln/EgdNlNy4cp/Hbh3b2IJXJ7zBBkGF4OlQtdzLALPOZEKZbX1owKs+TnG/5e41JJBHPn/VTInvaVj/WHblYRFnJyXs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J3FwwANk; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=R3AW90wf4YdgIzAdPMd7SeJVi+HLgxWItygBpFUYJ/VpMTxj+sj4ud9V29k2PM0v2ALz6DuFTMwVvS+b7U+3AKpOIn7G/3rAsPqC0ZELLecmHmNOdSJ2gKD7rS359/oWEAUcuCtABLtbGyxMvdZwqDnUgOH/tst2pmUJt0pu3Q8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hTuTHEnU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J3FwwANk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7EA34C4AF0C;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hTuTHEnU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3C09C4AF0F;
 	Wed, 31 Jul 2024 19:40:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1722454855;
-	bh=N1dfuCYFccAOdWqTfVzbuHnh1OCX3eKrk8hFfdOBjwA=;
+	bh=Qr6b5GYd96pu0YEgbNtFYok+p4sjzjCNIQpIrSoubus=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=J3FwwANk50ryQFoggFcCZvaoLcG6w0iF9A95GuI0uPwaMyUn0Yd/g4+PqTiFSvmLw
-	 0Rypku8bQP9d+YUZdROW/SqX3+GDke6HejDl1/Q0AGv2z0kz9Jf10/aDMIi7VlZ+dQ
-	 MiU5HtbLWVedfA4/6ry3pBuh1YKu73WWNWS9MDH7dcC6oOJTSZNjM78o7ALxnQPpHT
-	 FebbLeoPK/zTFR8Kf/ArsfX+rip6+rMb7l0NK/MtEGygA/wy3am5WHI0rA+YdaVndP
-	 GS9xw7nV6nUsbISrgjpwNMEG7beu0YNcz706UIO27mRnTKqsZ05q50lqbKc6gJ5IW2
-	 fWnGScAVi2/Hg==
+	b=hTuTHEnUCHgUt6542ySKsnmOJuF8O2osw7lyBsaNCS/TKpfxspIHc4ZVSEo4jy76J
+	 CjuTtq4f1tJDz3T9LCbLQgp53C91kGtkUxlOqMI8UPArc9m5mjmZiv+K42ZMSGw7Oh
+	 Y3nYl1/10LkjU/2lyhXmkUU/8agkhE25QCzcwviTQ7kXos7K+LHmNDO0Jflq4k/Kcp
+	 t+PshWo15onUxiI+9T/AvFkTUuiF3lgLjqvu6oZnT2cr7FeJPp6YM0UZ5WUSsu+i0C
+	 NdytqvDfjsonWn00wE0l16BtmLDGCf5R9U6q/0ioWA6l5inD83M71Hp02eMmMDhcuK
+	 noiSjdMttd38Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sZFBt-00H6Gh-Aa;
+	id 1sZFBt-00H6Gh-PU;
 	Wed, 31 Jul 2024 20:40:53 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -44,9 +44,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Anshuman Khandual <anshuman.khandual@arm.com>,
 	Przemyslaw Gaj <pgaj@cadence.com>
-Subject: [PATCH v2 02/17] arm64: Add PAR_EL1 field description
-Date: Wed, 31 Jul 2024 20:40:15 +0100
-Message-Id: <20240731194030.1991237-3-maz@kernel.org>
+Subject: [PATCH v2 04/17] arm64: Add ESR_ELx_FSC_ADDRSZ_L() helper
+Date: Wed, 31 Jul 2024 20:40:17 +0100
+Message-Id: <20240731194030.1991237-5-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240731194030.1991237-1-maz@kernel.org>
 References: <20240731194030.1991237-1-maz@kernel.org>
@@ -62,47 +62,40 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-As KVM is about to grow a full emulation for the AT instructions,
-add the layout of the PAR_EL1 register in its non-D128 configuration.
+Although we have helpers that encode the level of a given fault
+type, the Address Size fault type is missing it.
 
-Note that the constants are a bit ugly, as the register has two
-layouts, based on the state of the F bit.
+While we're at it, fix the bracketting for ESR_ELx_FSC_ACCESS_L()
+and ESR_ELx_FSC_PERM_L().
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/sysreg.h | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ arch/arm64/include/asm/esr.h | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 4a9ea103817e..d9d5e07f768d 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -325,7 +325,25 @@
- #define SYS_PAR_EL1			sys_reg(3, 0, 7, 4, 0)
+diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+index 56c148890daf..d79308c23ddb 100644
+--- a/arch/arm64/include/asm/esr.h
++++ b/arch/arm64/include/asm/esr.h
+@@ -122,8 +122,8 @@
+ #define ESR_ELx_FSC_SECC_TTW(n)	(0x1c + (n))
  
- #define SYS_PAR_EL1_F			BIT(0)
-+/* When PAR_EL1.F == 1 */
- #define SYS_PAR_EL1_FST			GENMASK(6, 1)
-+#define SYS_PAR_EL1_PTW			BIT(8)
-+#define SYS_PAR_EL1_S			BIT(9)
-+#define SYS_PAR_EL1_AssuredOnly		BIT(12)
-+#define SYS_PAR_EL1_TopLevel		BIT(13)
-+#define SYS_PAR_EL1_Overlay		BIT(14)
-+#define SYS_PAR_EL1_DirtyBit		BIT(15)
-+#define SYS_PAR_EL1_F1_IMPDEF		GENMASK_ULL(63, 48)
-+#define SYS_PAR_EL1_F1_RES0		(BIT(7) | BIT(10) | GENMASK_ULL(47, 16))
-+#define SYS_PAR_EL1_RES1		BIT(11)
-+/* When PAR_EL1.F == 0 */
-+#define SYS_PAR_EL1_SH			GENMASK_ULL(8, 7)
-+#define SYS_PAR_EL1_NS			BIT(9)
-+#define SYS_PAR_EL1_F0_IMPDEF		BIT(10)
-+#define SYS_PAR_EL1_NSE			BIT(11)
-+#define SYS_PAR_EL1_PA			GENMASK_ULL(51, 12)
-+#define SYS_PAR_EL1_ATTR		GENMASK_ULL(63, 56)
-+#define SYS_PAR_EL1_F0_RES0		(GENMASK_ULL(6, 1) | GENMASK_ULL(55, 52))
+ /* Status codes for individual page table levels */
+-#define ESR_ELx_FSC_ACCESS_L(n)	(ESR_ELx_FSC_ACCESS + n)
+-#define ESR_ELx_FSC_PERM_L(n)	(ESR_ELx_FSC_PERM + n)
++#define ESR_ELx_FSC_ACCESS_L(n)	(ESR_ELx_FSC_ACCESS + (n))
++#define ESR_ELx_FSC_PERM_L(n)	(ESR_ELx_FSC_PERM + (n))
  
- /*** Statistical Profiling Extension ***/
- #define PMSEVFR_EL1_RES0_IMP	\
+ #define ESR_ELx_FSC_FAULT_nL	(0x2C)
+ #define ESR_ELx_FSC_FAULT_L(n)	(((n) < 0 ? ESR_ELx_FSC_FAULT_nL : \
+@@ -161,6 +161,7 @@
+ 
+ /* ISS field definitions for exceptions taken in to Hyp */
+ #define ESR_ELx_FSC_ADDRSZ	(0x00)
++#define ESR_ELx_FSC_ADDRSZ_L(n)	(ESR_ELx_FSC_ADDRSZ + (n))
+ #define ESR_ELx_CV		(UL(1) << 24)
+ #define ESR_ELx_COND_SHIFT	(20)
+ #define ESR_ELx_COND_MASK	(UL(0xF) << ESR_ELx_COND_SHIFT)
 -- 
 2.39.2
 
