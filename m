@@ -1,110 +1,186 @@
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30A7238B
-	for <kvmarm@lists.linux.dev>; Tue, 30 Jul 2024 22:35:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC7561494A9
+	for <kvmarm@lists.linux.dev>; Wed, 31 Jul 2024 06:37:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722378922; cv=none; b=LfXDba6KVPCO1/wtFadRq07jkt9JEdxyX9Iii2XqUOIAq/E9vG0y8ivtyJc3+yW6SXwx/Jj+5GFWahTYXL6b9GaiiPJtlh+dfae4IyFbZD1xyhUrhLejR2YYhXqzh5Y8u5p+z1HL9gxkZhWX8DpiOxAeRNEgq60YWNxNUvBUUu8=
+	t=1722407825; cv=none; b=m8n3e1z9oGaTDCOebnmFytuSUg++G0oaoqtU3dBEGAqrktsdjB97xD7FCgCQQK89xbt3R0aiJaKDNti5HYCYly6/bMZIju2eTm9tS1amTcMmKX42n56ONJcAiuvLo34YRLm2LRtSrJGT7k1tlrSRXQV1TuRzhS+XO6tykiViX5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722378922; c=relaxed/simple;
-	bh=YFDCChsqaB4UhHP0/2HzjxvaMXC55WBTMkh7IBQDDtE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=hLnruuqXmgcT+lCthwUoJzN6RDzvDpBZwGDcRExiovUOWhNEEnsFppUNOy5wlPjKwvk1CJlh7z7bN+hfPss/NUhOEaNgfngfmaptaRsLcrKkPay1TdocOuWy/Umfwc7KLL0+NzgZwe8c8txAhd8RNooYtYzHRerflY2mGA7JXJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dyR82lnw; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1722407825; c=relaxed/simple;
+	bh=T5xtq2+T4SGA+SuVDFG7nCUZboCIDjJHRn/Bzy4RjSY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EgARh3KMMLgVXo3f7ZkdCyJM26BM7wwEMIlda8nxsWy1q2Ox5rkEAzNkpNz9gO2kW2lOZRXTHmjyIp/h7B53+yIQedzpBa6bJUMuwvrMJZZpWgvRgHXcXsTKes2WgXwOXruUNDc6x3L8KzaYQ9lSLY7SrtUmi3/9s+SJNQEx2go=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Agl1ePpN; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dyR82lnw"
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-70d188c9cabso4144936b3a.0
-        for <kvmarm@lists.linux.dev>; Tue, 30 Jul 2024 15:35:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722378920; x=1722983720; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=eSOwPlC4K/K4c1NtKrHXJlP1TgjanOwgNCfxP6XzMYQ=;
-        b=dyR82lnwmdLl0WcLqcAxWHGW51KIKMIAMkJUUH3tL/oMTnv35dOTKC4TyYQqEOWP9t
-         fVgM/5NjUycQkPThxTgBDuzLS9izlsIWj5bnV7TIHEUnfPkH37KaAn7qJ3ufiksq/7kh
-         /lmFPrXR/8aJ0xClwW07R4Zmm/JKtrT5pUQkj4ScVR4VOxVaj6cHfR+ejYtsvo7hjWXA
-         0tYeXKU/wiFpMHpWms+EYYszMQt47mHeUnkzInEMTtBrdfOGQjGQjj80BZiln2t1rdlC
-         LHGDinBLzUpFh1/Gb+v1HmwKo+wnKzY4ci6/1QQhyHywozRcIBLIaNeQIrkddermhi3P
-         qQ1w==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Agl1ePpN"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722407822;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2f5yai2p+2ixByjx7pWktU2JtLhPUEw7G/kkgGPzfME=;
+	b=Agl1ePpN3fN9ZO/Al2xGq351ASohUb3D9vwP4FjFzQlkE/Se4drMmS5DWAC1WqSSPG44ao
+	oqrtq82rE0IODBK7dBC7g0+f2lmF7FKCZWzl519CTp0SK1FmMUr29tKhMezlMfHPlVomoF
+	bsKOkyu4NNEBVvB2c1IVoLuXPR6Ymk8=
+Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
+ [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-206-3snGBhbpMsOg4jd9RTF8ZA-1; Wed, 31 Jul 2024 02:37:01 -0400
+X-MC-Unique: 3snGBhbpMsOg4jd9RTF8ZA-1
+Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-7a267d9e7b0so4035587a12.2
+        for <kvmarm@lists.linux.dev>; Tue, 30 Jul 2024 23:37:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722378920; x=1722983720;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eSOwPlC4K/K4c1NtKrHXJlP1TgjanOwgNCfxP6XzMYQ=;
-        b=A2KfnFYglQCJzMrQ43fn64UcZ/V0fbyU97tCjpQlmOO0SDDmLMBB94JV4wBDJ+v09y
-         k8Fprg9hGcP9GGnvV/FrzC8ggHhlZaOni+lDRIybqUZW6rGr90NpBHqa0gBVlxiyzLlm
-         5fVKbQLnej30+RarDAR6+CwzNDzaLOWelIASBzfYOvPUwsACyuf4AWKotdSVl2uXkTgd
-         7L2X7dlY7kmz0anXSPG90IuHEQHUFyb08PLulPUvbd72V0hged3osVJw1645BvIbSF/q
-         22u1BXxis3zO1y1gXKIEsLTCZ8Q0zIpntZyASqqIduPeQmlMky1cf55DUyWprSGWund7
-         IXGg==
-X-Forwarded-Encrypted: i=1; AJvYcCXAW2ArRAN86A+Enk0W7qsBjxFqvn1hGDDAji/7CCj+JSpE3mL4T58abW1/OXFG8EJEXa6Dse7MnLIIy0Lm/8qb0gQe+sNF
-X-Gm-Message-State: AOJu0YzhCbLxaiLd/lY3fQ2p97xpYvUh7vbXgLEuuxmxdK4p2V+iX1i5
-	udLZ0roh9q8ARPxXdAs8h7+hciHiP7iazd2cCnJ/jq/zmywadExqGWpw6xR8MmswD6qZm5ZI10V
-	tLg==
-X-Google-Smtp-Source: AGHT+IFhvXMAoVFBOUzUOOlo2Rzlu+lOmmXT/AMKduASO9OrwvfaDw5U6qKsr5Vo6lwrA4+Cjt72+QiZt8Y=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:91c7:b0:710:4d08:e41f with SMTP id
- d2e1a72fcca58-7104d08e48amr716b3a.4.1722378920090; Tue, 30 Jul 2024 15:35:20
- -0700 (PDT)
-Date: Tue, 30 Jul 2024 15:35:18 -0700
-In-Reply-To: <419ea6ce-83ca-413e-936c-1935e2c51497@redhat.com>
+        d=1e100.net; s=20230601; t=1722407819; x=1723012619;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2f5yai2p+2ixByjx7pWktU2JtLhPUEw7G/kkgGPzfME=;
+        b=MaBPD2ge2V2r9eSNS2K4u5sQi0/sL4julsGdD/LKprjta80mrrMGJVEBzyrSoX6edQ
+         CCQ+i7/9SBH7L4HnJizeu3QqQtnsglINXyLkrC8kx+ooy0rao89PlQX8ECuRGqv7SGoE
+         lqtjzR/GNnSw9BwHBegQvLQmfum5+7+IzfBtHv/+AQfNTZM88rI/JjFDqrT13JxznPFf
+         seEB05ALTGhP8YmJECZ9JnkJcIwoYpOSgGZhlhKNjKaVrVw8iHl3hnVhGj/rDH3gQGCZ
+         UJgY0G2q6JzAoJchwW2+UbxtycnDd8UzcHl1xN1cC12fe56C1Z5QVB4hDrZDfB1U88M/
+         4Mbw==
+X-Forwarded-Encrypted: i=1; AJvYcCUHGtykYJnBRxLIJyItQSxhF5sqgfk+t6uSBnKyN+5kcI6EEX+WQyw4jcJv9+l/RAn9MB+aO9wsECjwxnsVglHqlV8LweAK
+X-Gm-Message-State: AOJu0Yz3178hUSv+h46DzB/l3aIZUv1hpvOAvGbSAabvKxhBWBvbGyQs
+	LHDU5nNTwdw/s4gkdoMtK11WKfidfDpeihq22FHz8SH8APEYWzdhfk/rth6aTaPL6u3aFtH7lkK
+	CLT9+bkcAa9EyKoHeNnCb2QV3HEngaOfGob4Jp1XHRuKwu5XXYzoDk4aNQC1Z9w==
+X-Received: by 2002:a17:902:e810:b0:1f7:1655:825c with SMTP id d9443c01a7336-1ff04860a59mr127749445ad.36.1722407819471;
+        Tue, 30 Jul 2024 23:36:59 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHmcfjVds5cuNEcd1txMPa+VApIJaSskNZFLiX3i8Sit0Q2n9g9r0lcLijWVpFQdhLCW8zJaA==
+X-Received: by 2002:a17:902:e810:b0:1f7:1655:825c with SMTP id d9443c01a7336-1ff04860a59mr127749205ad.36.1722407819034;
+        Tue, 30 Jul 2024 23:36:59 -0700 (PDT)
+Received: from [192.168.68.54] ([43.252.112.134])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fed7ee1477sm113129505ad.169.2024.07.30.23.36.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 30 Jul 2024 23:36:58 -0700 (PDT)
+Message-ID: <68acf6c9-4ab8-4ed5-bddc-f3fc5313597e@redhat.com>
+Date: Wed, 31 Jul 2024 16:36:49 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20240726235234.228822-1-seanjc@google.com> <419ea6ce-83ca-413e-936c-1935e2c51497@redhat.com>
-Message-ID: <ZqlqpjO0TiWnOEqx@google.com>
-Subject: Re: [PATCH v12 00/84] KVM: Stop grabbing references to PFNMAP'd pages
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
-	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	David Matlack <dmatlack@google.com>, David Stevens <stevensd@chromium.org>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 05/15] arm64: Mark all I/O as non-secure shared
+To: Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+References: <20240701095505.165383-1-steven.price@arm.com>
+ <20240701095505.165383-6-steven.price@arm.com>
+ <b20b7e5b-95aa-4fdb-88a7-72f8aa3da8db@redhat.com>
+ <e05d2363-d3e4-4a23-9347-723454d603c9@arm.com>
+From: Gavin Shan <gshan@redhat.com>
+In-Reply-To: <e05d2363-d3e4-4a23-9347-723454d603c9@arm.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jul 30, 2024, Paolo Bonzini wrote:
-> An interesting evolution of the API could be to pass a struct kvm_follow_pfn
-> pointer to {,__}kvm_faultin_pfn() and __gfn_to_page() (the "constructors");
-> and on the other side to kvm_release_faultin_page() and
-> kvm_release_page_*().  The struct kvm_follow_pfn could be embedded in the
-> (x86) kvm_page_fault and (generic) kvm_host_map structs.  But certainly not
-> as part of this already huge work.
+Hi Suzuki,
 
-For kvm_faultin_pfn(), my hope/dream is to make kvm_page_fault a common struct,
-with an arch member (a la kvm_vcpu), and get to something like:
+On 7/30/24 8:36 PM, Suzuki K Poulose wrote:
+> On 30/07/2024 02:36, Gavin Shan wrote:
+>> On 7/1/24 7:54 PM, Steven Price wrote:
+>> I'm unable to understand this. Steven, could you please explain a bit how
+>> PROT_NS_SHARED is turned to a shared (non-secure) mapping to hardware?
+>> According to tf-rmm's implementation in tf-rmm/lib/s2tt/src/s2tt_pvt_defs.h,
+>> a shared (non-secure) mapping is is identified by NS bit (bit#55). I find
+>> difficulties how the NS bit is correlate with PROT_NS_SHARED. For example,
+>> how the NS bit is set based on PROT_NS_SHARED.
+> 
+> 
+> There are two things at play here :
+> 
+> 1. Stage1 mapping controlled by the Realm (Linux in this case, as above).
+> 2. Stage2 mapping controlled by the RMM (with RMI commands from NS Host).
+> 
+> Also :
+> The Realm's IPA space is divided into two halves (decided by the IPA Width of the Realm, not the NSbit #55), protected (Lower half) and
+> Unprotected (Upper half). All stage2 mappings of the "Unprotected IPA"
+> will have the NS bit (#55) set by the RMM. By design, any MMIO access
+> to an unprotected half is sent to the NS Host by RMM and any page
+> the Realm wants to share with the Host must be in the Upper half
+> of the IPA.
+> 
+> What we do above is controlling the "Stage1" used by the Linux. i.e,
+> for a given VA, we flip the Guest "PA" (in reality IPA) to the
+> "Unprotected" alias.
+> 
+> e.g., DTB describes a UART at address 0x10_0000 to Realm (with an IPA width of 40, like in the normal VM case), emulated by the host. Realm is
+> trying to map this I/O address into Stage1 at VA. So we apply the
+> BIT(39) as PROT_NS_SHARED while creating the Stage1 mapping.
+> 
+> ie., VA == stage1 ==> BIT(39) | 0x10_0000 =(IPA)== > 0x80_10_0000
+> 
+                                                      0x8000_10_0000
 
-  static int arch_page_fault_handler(...)
-  {
-	struct kvm_page_fault fault = {
-		<const common stuff>,
+> Now, the Stage2 mapping won't be present for this IPA if it is emulated
+> and thus an access to "VA" causes a Stage2 Abort to the Host, which the
+> RMM allows the host to emulate. Otherwise a shared page would have been
+> mapped by the Host (and NS bit set at Stage2 by RMM), allowing the
+> data to be shared with the host.
+> 
 
-		.arch.xxx = <arch stuff>,
-	};
+Thank you for the explanation and details. It really helps to understand
+how the access fault to the unprotected space (upper half) is routed to NS
+host, and then VMM (QEMU) for emulation. If the commit log can be improved
+with those information, it will make reader easier to understand the code.
 
-	<arch code>
+I had the following call trace and it seems the address 0x8000_10_1000 is
+converted to 0x10_0000 in [1], based on current code base (branch: cca-full/v3).
+At [1], the GPA is masked with kvm_gpa_stolen_bits() so that BIT#39 is removed
+in this particular case.
+
+   kvm_vcpu_ioctl(KVM_RUN)                         // non-secured host
+   kvm_arch_vcpu_ioctl_run
+   kvm_rec_enter
+   rmi_rec_enter                                   // -> SMC_RMI_REC_ENTER
+     :
+   rmm_handler                                     // tf-rmm
+   handle_ns_smc
+   smc_rec_enter
+   rec_run_loop
+   run_realm
+     :
+   el2_vectors
+   el2_sync_lel
+   realm_exit
+     :
+   handle_realm_exit
+   handle_exception_sync
+   handle_data_abort
+     :
+   handle_rme_exit                                 // non-secured host
+   rec_exit_sync_dabt
+   kvm_handle_guest_abort                          // -> [1]
+   gfn_to_memslot
+   io_mem_abort
+   kvm_io_bus_write                                // -> run->exit_reason = KVM_EXIT_MMIO
+
+Another question is how the Granule Protection Check (GPC) table is updated so
+that the corresponding granule (0x8000_10_1000) to is accessible by NS host? I
+mean how the BIT#39 is synchronized to GPC table and translated to the property
+"granule is accessible by NS host".
+     
+Thanks,
+Gavin
 
 
-	r = kvm_faultin_pfn();
-	
-	...
-  }
 
-In theory, that would allow moving the kvm->mmu_invalidate_seq handling, memslot
-lookup, etc. into kvm_faultin_pfn(), or maybe another helper that is invoked to
-setup the fault structure.  I.e. it would give us a way to drive convergence for
-at least some of the fault handling logic, without having to tackle gory arch
-details, at least not right away.
+
+
