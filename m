@@ -1,128 +1,139 @@
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3C611799F
-	for <kvmarm@lists.linux.dev>; Wed, 31 Jul 2024 16:23:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D04F41AD9ED;
+	Wed, 31 Jul 2024 16:51:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722443020; cv=none; b=k2+Rg/98bQhi6drsdjnD0Wg4MXVXnDjorAfDcKlLbKC3Lbyk6Zr9sPKDliI9Rup6uFx89kWRVUpbqTBrhAqTnk7nv48rXxieZE1zcryikQpmJYuS9Gzn2y79jsQHoSXqjco39QatL3a/rHDWQhG/VvinijZqmPCWkcW99N5RK1s=
+	t=1722444698; cv=none; b=mJT2H2Uz+qcP8rirK2JqkMCXOv0AvajFalWL3iYQeJmfwFT8XtyKfkXdcebnYRV2EMVTmUCz1C+c1OS0z0hA1Vk0AxJY0yBCqfuhDOHYwEph3mjJvbE62nIHpCPcRHtYa09YLHxZlfVHq6/74M46zO1lpa+PqIDniE8BwgayGUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722443020; c=relaxed/simple;
-	bh=2HhUeVKAqujM6tGjz7xY7eoGDJF2k6V8JCfwVRNXp0M=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=MaaQSeSH4voP/75Rh5MvXepo6tTe//+vGVkClh/kk4wHXeW2CCWUC6SNdwIp28KhOnFp4aKG+PIIL/wjFZQn72FPTFuGW564wkpirPMrI3F3mU6FlxRElE3hyumEtmFCMkS/k53I1dpNj+rWyYoKXVV7O/ainbapxzR1XVmlKoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=GAA5B0xL; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1722444698; c=relaxed/simple;
+	bh=a3N1jdJkjGQcJ3ZzY05M9xZbajIj8LwGdUK1HF2vmvM=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=SPPpyZIWc0D7PiKE7LDHoRvgHvEe4D7B3njNT/lLCHlHbRoKuu/6flgO8DFP43Q+VEAuZXRr7IEhyPEG8H2U/L7Ari8HC4lc+eOp4/oWnqnB0uAdG0zno01Y+zQKDmNrxjwljGqNa7AK99aPyzWWchN/72hCNmmZU6vWJ77Oa7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iAeVyuNo; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GAA5B0xL"
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a7aa086b077so529244566b.0
-        for <kvmarm@lists.linux.dev>; Wed, 31 Jul 2024 09:23:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1722443016; x=1723047816; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/Jy3Eo6Gu+vhJFsd2nEOfkihTm91GOS2uDXcn/bR1Cs=;
-        b=GAA5B0xLMxei9D/hOLh0U6AKzRakAwvFJRuUal+08LdYjBpP+Q51vdU1sCPm+AJVmH
-         xJSAj8eVqZT/Hbo8OlQALRjAuyg0V7BSg/nLZamSmJLKsEUXQ183WCY+9NFI3Mpm2MFV
-         Slk7sMauS0mXx+mi9lpt/sxRxoAu6Ks2Ale3hSDgsif1ucD/2CnjvTunFR9ZuhZ82znR
-         yZAGtnEnaYZBVXShzEzr0LX/ZrskkslmHRBVcT3bG4AYGCso26pkqr0sHUr/DhF/d3cE
-         oTzuex03bAxD8HMDC2DUwA7xuxdUgyhgR1wLS4V5nStJjH4+/hQfR8m6iaUY/9za2PBT
-         wWMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722443016; x=1723047816;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/Jy3Eo6Gu+vhJFsd2nEOfkihTm91GOS2uDXcn/bR1Cs=;
-        b=MdzAKSLY+H52OwFVT58mrixwhcF9dX5zd77NO3CJx53kS98DYZt9LkMBNwXfsyzjBc
-         RtWAvdXniULwUeXdfJBvpVfPchL8MrhjWNv0vzbvjSdWai0mJM/XCLmlbDlzzctIOYcV
-         /RZnvbupvi71bfj+0iTxSiI6sFG5O+4hHGDL1ttLtWE5JfuEcttykEVmTVavHmDC0vnk
-         /ZGucq6SUPoMgp8YLoJcKcZlGhe8qrym7+CuCkdZnpQCaPpNc7bTaBaDkr22Ro51xMnt
-         eLpG19lfCZiyUPojEmMim+jJZkJqMArE2OlzFn6gIxui0rZx849jiQGApoV2u27YTWVZ
-         4MlQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXTHfkgpfhUggDNXVQ4QcySs6pwbBjmqsg/3XPMkHBEXg2YiTsoZhO8lCs0/qoO0Mn6e6n/29HTPapg0Wr6Ue82jozI8rd0
-X-Gm-Message-State: AOJu0YwV/Eyo0lZKNEsOOkYZxANvP2qS8STL5JGe+tozQ1vxMw+/1Ed8
-	BtnJWMZ0b907AlFkanLphRKMjKR9IyIVkI08JJpyIH26igWszv80t0xDEy1/VRE=
-X-Google-Smtp-Source: AGHT+IFaeuLsqXvHIvwNkMOmXQ/kk95KnaHAVzfZZFY2rJSwrdZANzuSfUeE19U50MBeGB1J/TbUHg==
-X-Received: by 2002:a17:907:a0d5:b0:a7a:b070:92c6 with SMTP id a640c23a62f3a-a7d40116a4bmr801926666b.50.1722443015967;
-        Wed, 31 Jul 2024 09:23:35 -0700 (PDT)
-Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7acad416basm784769266b.104.2024.07.31.09.23.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Jul 2024 09:23:35 -0700 (PDT)
-Received: from draig (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 614DC5F8CB;
-	Wed, 31 Jul 2024 17:23:34 +0100 (BST)
-From: =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,  Marc Zyngier <maz@kernel.org>,
-  Oliver Upton <oliver.upton@linux.dev>,  Tianrui Zhao
- <zhaotianrui@loongson.cn>,  Bibo Mao <maobibo@loongson.cn>,  Huacai Chen
- <chenhuacai@kernel.org>,  Michael Ellerman <mpe@ellerman.id.au>,  Anup
- Patel <anup@brainfault.org>,  Paul Walmsley <paul.walmsley@sifive.com>,
-  Palmer Dabbelt <palmer@dabbelt.com>,  Albert Ou <aou@eecs.berkeley.edu>,
-  Christian Borntraeger <borntraeger@linux.ibm.com>,  Janosch Frank
- <frankja@linux.ibm.com>,  Claudio Imbrenda <imbrenda@linux.ibm.com>,
-  kvm@vger.kernel.org,  linux-arm-kernel@lists.infradead.org,
-  kvmarm@lists.linux.dev,  loongarch@lists.linux.dev,
-  linux-mips@vger.kernel.org,  linuxppc-dev@lists.ozlabs.org,
-  kvm-riscv@lists.infradead.org,  linux-riscv@lists.infradead.org,
-  linux-kernel@vger.kernel.org,  David Matlack <dmatlack@google.com>,
-  David Stevens <stevensd@chromium.org>
-Subject: Re: [PATCH v12 01/84] KVM: arm64: Release pfn, i.e. put page, if
- copying MTE tags hits ZONE_DEVICE
-In-Reply-To: <20240726235234.228822-2-seanjc@google.com> (Sean
-	Christopherson's message of "Fri, 26 Jul 2024 16:51:10 -0700")
-References: <20240726235234.228822-1-seanjc@google.com>
-	<20240726235234.228822-2-seanjc@google.com>
-Date: Wed, 31 Jul 2024 17:23:34 +0100
-Message-ID: <87a5hxfs3d.fsf@draig.linaro.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iAeVyuNo"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D84E4C116B1;
+	Wed, 31 Jul 2024 16:51:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722444698;
+	bh=a3N1jdJkjGQcJ3ZzY05M9xZbajIj8LwGdUK1HF2vmvM=;
+	h=From:Subject:Date:To:Cc:From;
+	b=iAeVyuNoztqPUGoDanPeAcyu7Ve54IKxX4KN/dntZHo3z5MbsuDnY8Ju3bdLl2tQz
+	 JpvpSsPEZn4MadFMaSGCS7lNbZz54aIrH0bpoMDI98ADKC6RCSnvemigwpRxj15Pbq
+	 R7fPltHSBJvjig4qvhwRyma6fys1jAJGzRbW9wC5R1VVSeFG5qcwhT1Y+dexn5K8It
+	 kGIE2fuvcsi/IuQSQt3yxUPpGVy/N+QFAnODhdCIIzlswW/wRR2FtNlEnBdervg07u
+	 fovGFErtcmLgC1cRHwmcXILoqEUw7mgLP3mNfTlOAZO9tf/x7pUuQXn/bL7MazzYkD
+	 oTbP6nQRfCMHA==
+From: "Rob Herring (Arm)" <robh@kernel.org>
+Subject: [PATCH v3 0/7] arm64: Add support for Armv9.4 PMU fixed
+ instruction counter
+Date: Wed, 31 Jul 2024 10:51:17 -0600
+Message-Id: <20240731-arm-pmu-3-9-icntr-v3-0-280a8d7ff465@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAIVrqmYC/33NSw6CMBCA4auQrh1T2kLBlfcwLqAPaJRCpthoC
+ He3sNLEuPwnM98sJBh0JpBTthA00QU3+hT8kBHVN74z4HRqwigTtKQSGhxgGh7AoQan/IxABZe
+ F1prSipF0N6Gx7rmbl2vq3oV5xNf+Iubb9J8Wc6CgZKuZVsZa3p5vBr25H0fsyMZF9kGw8hfBN
+ qKWlWiFTUvFF7Gu6xvBKQEc9gAAAA==
+To: Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+ Mark Rutland <mark.rutland@arm.com>, James Clark <james.clark@linaro.org>, 
+ James Morse <james.morse@arm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Catalin Marinas <catalin.marinas@arm.com>, 
+ Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
+ Arnaldo Carvalho de Melo <acme@kernel.org>, 
+ Namhyung Kim <namhyung@kernel.org>, 
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>, 
+ Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>, 
+ Adrian Hunter <adrian.hunter@intel.com>, 
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ linux-perf-users@vger.kernel.org, kvmarm@lists.linux.dev
+X-Mailer: b4 0.15-dev
 
-Sean Christopherson <seanjc@google.com> writes:
+This series adds support for the optional fixed instruction counter 
+added in Armv9.4 PMU. Most of the series is a refactoring to remove the 
+index to counter number conversion which dates back to the Armv7 PMU 
+driver. Removing it is necessary in order to support more than 32 
+counters without a bunch of conditional code further complicating the 
+conversion.
 
-> Put the page reference acquired by gfn_to_pfn_prot() if
-> kvm_vm_ioctl_mte_copy_tags() runs into ZONE_DEVICE memory.  KVM's less-
-> than-stellar heuristics for dealing with pfn-mapped memory means that KVM
-> can get a page reference to ZONE_DEVICE memory.
->
-> Fixes: f0376edb1ddc ("KVM: arm64: Add ioctl to fetch/store tags in a gues=
-t")
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/arm64/kvm/guest.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index 11098eb7eb44..e1f0ff08836a 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-> @@ -1059,6 +1059,7 @@ int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
->  		page =3D pfn_to_online_page(pfn);
->  		if (!page) {
->  			/* Reject ZONE_DEVICE memory */
-> +			kvm_release_pfn_clean(pfn);
+Patch 1 changes struct arm_pmu.num_events to a bitmap of events, and 
+updates all the users. This removes the index to counter conversion 
+on the PMUv3 and Armv7 drivers.
 
-I guess this gets renamed later in the series.
+Patch 2 updates various register accessors to use 64-bit values matching 
+the register size.
 
-However my main comment is does lack of page always mean a ZONE_DEVICE?
-Looking at pfn_to_online_page() I see a bunch of other checks first. Why
-isn't it that functions responsibility to clean up after itself if its
-returning NULLs?
+Patches 3-4 update KVM PMU register accesses to use shared accessors 
+from asm/arm_pmuv3.h.
 
->  			ret =3D -EFAULT;
->  			goto out;
->  		}
+Patches 5-6 rework KVM and perf PMU defines for counter indexes and 
+number of counters.
 
---=20
-Alex Benn=C3=A9e
-Virtualisation Tech Lead @ Linaro
+Patch 7 finally adds support for the fixed instruction counter.
+
+I tested this on FVP with VHE host and a guest. Also ran kvm-unittests 
+in Arm's kernelCI.
+
+Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+---
+Changes in v3:
+- Fix using 64-bit counters in pre-Armv8.5. The chained event check 
+  for cycle counter in armv8pmu_event_is_chained() was returning the 
+  cycle counter needed chaining which is never true. Separate fix is 
+  here: https://lore.kernel.org/all/20240710182357.3701635-1-robh@kernel.org/
+- Rebase to v6.11-rc1 and dropped already applied patches
+- Link to v2: https://lore.kernel.org/r/20240626-arm-pmu-3-9-icntr-v2-0-c9784b4f4065@kernel.org
+
+Changes in v2:
+- Include threshold fix patches and account for threshold support in 
+  counter assignment.
+- Add patch including asm/arm_pmuv3.h from linux/perf/arm_pmuv3.h
+- Fix compile error for Apple PMU
+- Minor review comments detailed in individual patches
+- Link to v1: https://lore.kernel.org/r/20240607-arm-pmu-3-9-icntr-v1-0-c7bd2dceff3b@kernel.org
+
+---
+Rob Herring (Arm) (7):
+      perf: arm_pmu: Remove event index to counter remapping
+      perf: arm_pmuv3: Prepare for more than 32 counters
+      KVM: arm64: pmu: Use arm_pmuv3.h register accessors
+      KVM: arm64: pmu: Use generated define for PMSELR_EL0.SEL access
+      arm64: perf/kvm: Use a common PMU cycle counter define
+      KVM: arm64: Refine PMU defines for number of counters
+      perf: arm_pmuv3: Add support for Armv9.4 PMU instruction counter
+
+ arch/arm/include/asm/arm_pmuv3.h   |  20 ++++++
+ arch/arm64/include/asm/arm_pmuv3.h |  53 ++++++++++++--
+ arch/arm64/include/asm/kvm_host.h  |   8 +--
+ arch/arm64/include/asm/sysreg.h    |   1 -
+ arch/arm64/kvm/pmu-emul.c          |  14 ++--
+ arch/arm64/kvm/pmu.c               |  87 ++++++-----------------
+ arch/arm64/kvm/sys_regs.c          |  11 +--
+ arch/arm64/tools/sysreg            |  30 ++++++++
+ drivers/perf/apple_m1_cpu_pmu.c    |   4 +-
+ drivers/perf/arm_pmu.c             |  11 +--
+ drivers/perf/arm_pmuv3.c           | 140 +++++++++++++++++++------------------
+ drivers/perf/arm_v6_pmu.c          |   6 +-
+ drivers/perf/arm_v7_pmu.c          |  77 ++++++++------------
+ drivers/perf/arm_xscale_pmu.c      |  12 ++--
+ include/kvm/arm_pmu.h              |   8 +--
+ include/linux/perf/arm_pmu.h       |  10 ++-
+ include/linux/perf/arm_pmuv3.h     |   9 ++-
+ 17 files changed, 272 insertions(+), 229 deletions(-)
+---
+base-commit: 8400291e289ee6b2bf9779ff1c83a291501f017b
+change-id: 20240607-arm-pmu-3-9-icntr-04375ddd0082
+
+Best regards,
+-- 
+Rob Herring (Arm) <robh@kernel.org>
+
