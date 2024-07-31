@@ -1,181 +1,103 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10A1A1B5824
-	for <kvmarm@lists.linux.dev>; Wed, 31 Jul 2024 16:05:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D4B01CAA9;
+	Wed, 31 Jul 2024 16:22:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722441930; cv=none; b=qlEA2ySaqTQAumII2hHJ+ZyGlMV5wZCUcFpTsMpIn9/W9rsFAjDAmbSFGqHwvHDeg3qaSOdm8a+4V6uE19WDVAEwIwof/s0zFOitkDGwKsiW/r4FboBoK8YNkRHZut+LIDiXLkX77O4HXWzqDoKUFSWDzvxkeG8twLJG1VYdQJw=
+	t=1722442942; cv=none; b=u3535e0STKDCCLuViS0mwO1feH4cpfwJ2WZCvTY1150eKUt37mHdSKvF7sTNwFd9pZZ8S5+M6rvHAyG2aNpnRGJ84fZf+v/h7Oxm+Y+K7s3Qp5s98E+FkDL9QJShloRzZlOS7rgqKajRN1SN7vrLQEJL99n+r/5lNM/FOCsiG+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722441930; c=relaxed/simple;
-	bh=u3EFQ8M28u9qY6CANyuFcamS2Vh7fWSDEBXMErYDl/Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tM9YwV97LuzTk+BuVKtjv22sTuxLgD+ebAEOl+5MsvFkP7kymlM1fhe3AMSrlJS1SkT7Br2V+sSDap6V/vXtTBpbAoM9LtcxXJhUwuCQtXyS5pByK9T5n6BNFKBIKI5a9qL4fMFQu9A29vFUOelo5ovaPGPbtZCu+wpdX8Vci+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 05E7D1007;
-	Wed, 31 Jul 2024 09:05:52 -0700 (PDT)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BC8E73F5A1;
-	Wed, 31 Jul 2024 09:05:24 -0700 (PDT)
-Date: Wed, 31 Jul 2024 17:05:21 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>, Joey Gouly <joey.gouly@arm.com>
-Subject: Re: [PATCH 10/12] KVM: arm64: nv: Add SW walker for AT S1 emulation
-Message-ID: <ZqpgwaNzZbE-seyC@raptor>
-References: <20240625133508.259829-1-maz@kernel.org>
- <20240708165800.1220065-1-maz@kernel.org>
- <ZqpLNT8bVFDB6oWJ@raptor>
- <86r0b91sa3.wl-maz@kernel.org>
+	s=arc-20240116; t=1722442942; c=relaxed/simple;
+	bh=4xS0pD2n/vpTAJI9k2seY/mT9WcQsaPxpoFu1kzIwSY=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=ePgAz01CxZkM6c3nG86HyRMmoUSNQX4uOmxRfhW6arp0Uavl1WM3iPz/1huXPi1kQHoVPslAEyX4/CYnir9hv2PpNZputmMt4fI3DdnYxm8D4UruaXqYBJFPbOmftQfR+tO07AbFF2olnTAWmeYyw34Ku9Y8w13LpHQnolKhgMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C2MBkEav; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C2MBkEav"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FC3EC116B1;
+	Wed, 31 Jul 2024 16:22:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722442941;
+	bh=4xS0pD2n/vpTAJI9k2seY/mT9WcQsaPxpoFu1kzIwSY=;
+	h=From:Date:Subject:To:Cc:From;
+	b=C2MBkEavnwa7rJ0kZ6GI52VlH99xH0jl9GgQckr4U22QF1wbaiyYfZS2iN4ZFMVPo
+	 3q39Q5+M5eeaEBGfXwDM/YBr8h61g4cd+XHy3ibH7EWN3WEvp0EkeCOmfVzh+0Mcnh
+	 AT6hJ/Io+sUULd9tDslVf+aTTDWJKHB4dtXpsKep8+nIB/+9e+AspZiFJ0ONroji50
+	 BKnBXAPFJ7PdKYoswBaWwFj1nHzFWHBDSiKd5D8mhpdtmAu+yNhxKdmnOFpchzqzbB
+	 6oPhsqyb/l9AOyVmJhcXk2kjTNQGwQqGOJ4FPn01qBt3fJKw8J2FCZEhVen4ShKzGE
+	 WcxzWG4VQZMAg==
+From: Mark Brown <broonie@kernel.org>
+Date: Wed, 31 Jul 2024 17:21:13 +0100
+Subject: [PATCH] KVM: selftests: arm64: Correct feature test for S1PIE in
+ get-reg-list
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86r0b91sa3.wl-maz@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240731-kvm-arm64-fix-s1pie-test-v1-1-a9253f3b7db4@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAHlkqmYC/x2MSQqAMAwAvyI5G2i1WvEr4qHVqEFcaESE4t8tH
+ gdmJoJQYBJoswiBbhY+9gQ6z2BY3D4T8pgYClUYZUuN672hC1ttcOIHRZ9MeJFc6IzytaeqGa2
+ HlJ+BkvGvu/59P+CCE1pqAAAA
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+ James Morse <james.morse@arm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+ Catalin Marinas <catalin.marinas@arm.com>, Joey Gouly <joey.gouly@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+ kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>
+X-Mailer: b4 0.15-dev-37811
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1222; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=4xS0pD2n/vpTAJI9k2seY/mT9WcQsaPxpoFu1kzIwSY=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBmqmS6GOeWEWP62/aXDViXEkZrsrUtBn51zh/OWFiZ
+ uDkGI/aJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZqpkugAKCRAk1otyXVSH0E06B/
+ 9VOmuwqQYplgVUUsHIPEJG5GVO9uTAgm62aij3o6EomU20qF9CObSRrFct3b0xaucS568Co/VI6tpp
+ gWS3LZJAz5GqV1E1ZynABm+8i9Fo8tVfaWY/E16wv4/DSNNOYApn7+5p7p+sodTV6y2v5y4rWulO9D
+ DnT2pOYhB6A163lBIbSdOuFoeLfDRcvA0ou2OICK3GUDa0H5993gqjVbJhh8dSmvSA43qhm6yLW7Oe
+ qotWzu21jHfs+PPxIPBVstkTPueah2l0mESFTOOGEi7PcMIUMF7uCjrpiJZqwowtAyjyeL1Iyqcjl4
+ 4yOCGR/2Cb/u/Y8Hf+11+sr7jTugSm
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-Hi Marc,
+The ID register for S1PIE is ID_AA64MMFR3_EL1.S1PIE which is bits 11:8 but
+get-reg-list uses a shift of 4, checking SCTLRX instead. Use a shift of 8
+instead.
 
-On Wed, Jul 31, 2024 at 04:43:16PM +0100, Marc Zyngier wrote:
-> On Wed, 31 Jul 2024 15:33:25 +0100,
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> > 
-> > Hi Marc,
-> > 
-> > On Mon, Jul 08, 2024 at 05:57:58PM +0100, Marc Zyngier wrote:
-> > > In order to plug the brokenness of our current AT implementation,
-> > > we need a SW walker that is going to... err.. walk the S1 tables
-> > > and tell us what it finds.
-> > > 
-> > > Of course, it builds on top of our S2 walker, and share similar
-> > > concepts. The beauty of it is that since it uses kvm_read_guest(),
-> > > it is able to bring back pages that have been otherwise evicted.
-> > > 
-> > > This is then plugged in the two AT S1 emulation functions as
-> > > a "slow path" fallback. I'm not sure it is that slow, but hey.
-> > > 
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > ---
-> > >  arch/arm64/kvm/at.c | 538 ++++++++++++++++++++++++++++++++++++++++++--
-> > >  1 file changed, 520 insertions(+), 18 deletions(-)
-> > > 
-> > > diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-> > > index 71e3390b43b4c..8452273cbff6d 100644
-> > > --- a/arch/arm64/kvm/at.c
-> > > +++ b/arch/arm64/kvm/at.c
-> > > @@ -4,9 +4,305 @@
-> > >   * Author: Jintack Lim <jintack.lim@linaro.org>
-> > >   */
-> > >  
-> > > +#include <linux/kvm_host.h>
-> > > +
-> > > +#include <asm/esr.h>
-> > >  #include <asm/kvm_hyp.h>
-> > >  #include <asm/kvm_mmu.h>
-> > >  
-> > > +struct s1_walk_info {
-> > > +	u64	     baddr;
-> > > +	unsigned int max_oa_bits;
-> > > +	unsigned int pgshift;
-> > > +	unsigned int txsz;
-> > > +	int 	     sl;
-> > > +	bool	     hpd;
-> > > +	bool	     be;
-> > > +	bool	     nvhe;
-> > > +	bool	     s2;
-> > > +};
-> > > +
-> > > +struct s1_walk_result {
-> > > +	union {
-> > > +		struct {
-> > > +			u64	desc;
-> > > +			u64	pa;
-> > > +			s8	level;
-> > > +			u8	APTable;
-> > > +			bool	UXNTable;
-> > > +			bool	PXNTable;
-> > > +		};
-> > > +		struct {
-> > > +			u8	fst;
-> > > +			bool	ptw;
-> > > +			bool	s2;
-> > > +		};
-> > > +	};
-> > > +	bool	failed;
-> > > +};
-> > > +
-> > > +static void fail_s1_walk(struct s1_walk_result *wr, u8 fst, bool ptw, bool s2)
-> > > +{
-> > > +	wr->fst		= fst;
-> > > +	wr->ptw		= ptw;
-> > > +	wr->s2		= s2;
-> > > +	wr->failed	= true;
-> > > +}
-> > > +
-> > > +#define S1_MMU_DISABLED		(-127)
-> > > +
-> > > +static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
-> > > +			 struct s1_walk_result *wr, const u64 va, const int el)
-> > > +{
-> > > +	u64 sctlr, tcr, tg, ps, ia_bits, ttbr;
-> > > +	unsigned int stride, x;
-> > > +	bool va55, tbi;
-> > > +
-> > > +	wi->nvhe = el == 2 && !vcpu_el2_e2h_is_set(vcpu);
-> > > +
-> > > +	va55 = va & BIT(55);
-> > > +
-> > > +	if (wi->nvhe && va55)
-> > > +		goto addrsz;
-> > > +
-> > > +	wi->s2 = el < 2 && (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_VM);
-> > > +
-> > > +	switch (el) {
-> > > +	case 1:
-> > > +		sctlr	= vcpu_read_sys_reg(vcpu, SCTLR_EL1);
-> > > +		tcr	= vcpu_read_sys_reg(vcpu, TCR_EL1);
-> > > +		ttbr	= (va55 ?
-> > > +			   vcpu_read_sys_reg(vcpu, TTBR1_EL1) :
-> > > +			   vcpu_read_sys_reg(vcpu, TTBR0_EL1));
-> > > +		break;
-> > > +	case 2:
-> > > +		sctlr	= vcpu_read_sys_reg(vcpu, SCTLR_EL2);
-> > > +		tcr	= vcpu_read_sys_reg(vcpu, TCR_EL2);
-> > > +		ttbr	= (va55 ?
-> > > +			   vcpu_read_sys_reg(vcpu, TTBR1_EL2) :
-> > > +			   vcpu_read_sys_reg(vcpu, TTBR0_EL2));
-> > > +		break;
-> > > +	default:
-> > > +		BUG();
-> > > +	}
-> > > +
-> > > +	/* Let's put the MMU disabled case aside immediately */
-> > > +	if (!(sctlr & SCTLR_ELx_M) ||
-> > > +	    (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_DC)) {
-> > > +		if (va >= BIT(kvm_get_pa_bits(vcpu->kvm)))
-> > 
-> > As far as I can tell, if TBI, the pseudocode ignores bits 63:56 when checking
-> > for out-of-bounds VA for the MMU disabled case (above) and the MMU enabled case
-> > (below). That also matches the description of TBIx bits in the TCR_ELx
-> > registers.
-> 
-> Right. Then the check needs to be hoisted up and the VA sanitised
-> before we compare it to anything.
-> 
-> Thanks for all your review comments, but I am going to ask you to stop
-> here. You are reviewing a pretty old code base, and although I'm sure
-> you look at what is in my tree, I'd really like to post a new version
-> for everyone to enjoy.
+Fixes: 5f0419a0083b ("KVM: selftests: get-reg-list: add Permission Indirection registers")
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+ tools/testing/selftests/kvm/aarch64/get-reg-list.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Got it.
+diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+index 709d7d721760..4abebde78187 100644
+--- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
++++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+@@ -32,13 +32,13 @@ static struct feature_id_reg feat_id_regs[] = {
+ 	{
+ 		ARM64_SYS_REG(3, 0, 10, 2, 2),	/* PIRE0_EL1 */
+ 		ARM64_SYS_REG(3, 0, 0, 7, 3),	/* ID_AA64MMFR3_EL1 */
+-		4,
++		8,
+ 		1
+ 	},
+ 	{
+ 		ARM64_SYS_REG(3, 0, 10, 2, 3),	/* PIR_EL1 */
+ 		ARM64_SYS_REG(3, 0, 0, 7, 3),	/* ID_AA64MMFR3_EL1 */
+-		4,
++		8,
+ 		1
+ 	}
+ };
 
-Thanks,
-Alex
+---
+base-commit: 8400291e289ee6b2bf9779ff1c83a291501f017b
+change-id: 20240731-kvm-arm64-fix-s1pie-test-a40b6be58d7b
+
+Best regards,
+-- 
+Mark Brown <broonie@kernel.org>
+
