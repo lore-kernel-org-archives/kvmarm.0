@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50819DF53;
-	Wed, 31 Jul 2024 19:56:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9246717579;
+	Wed, 31 Jul 2024 20:12:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722455763; cv=none; b=Z9jXOxXr5AYSrAEHPrUBmvuhf5de1muFwcdkm5j0RmYhcbqypSqRTbf73D+IMD6W/ApldWUtsh7sufS9uU4G/QIuYfDxgLfZvk6UjckjAhFAtVLTuQASj2GHEeeKmwFkMtyyvqpWLoOepU3c+XzUo7vVNqau1JSTpAVEPbPLxdc=
+	t=1722456723; cv=none; b=t7TsMKsWB2MW4gxkmBg9VQ9nQKo5bsRuq+KacSE/A3oYnFBD+90ao17LLd8LlWDqIhOrRU3BZtmpjUaNV7KIVo8kA9Ke3BtrjrA4TNQlxuqCfKiNRqVIb3Kjz1o7WbfJ3JVGa3BkDbXkiXAqDRaiyvNjzIZ+5BkXxM+5xzoRnCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722455763; c=relaxed/simple;
-	bh=o8N+u0byDeedT1YKt9nGlaJQnl4BOMWVYyEe55Z9/Ig=;
+	s=arc-20240116; t=1722456723; c=relaxed/simple;
+	bh=5IeJZWRy61r1+KpM9Ds67BGzx8a4wfH6JVyA+DyWDoE=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NykrLKtaoGBAWN39wxXXeA4xwESUihOmyAks8WWm2csnW6F8O0hTp7cpFATLnVqSAZBnLoJbQeBH5k9IEp2bfjUcC3MC/RyCHXbnjvAgqeOT/g+JAqnNYI71eTFvr0J8aFl3e9zEEfcp/qyC2Wslpr8m+R5go+vVF6cl4keCupM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ANt9xDQn; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=EN6GvATodaKk4uQGI4aKqhX9uEkb+/6sjWRhoZuhB9GuHvByr/harsaVjaMHKg3cJMQfNYKL64Wzh0Ket7Aab6qid2XhJm18Dl79vinuZdPHB9P0NR/xXS2UAl7iib35TVTHIbLLPTeEWrwFk+HC6ME3s4kKG04Zzih85xUD6Jo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vt+QSq4b; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ANt9xDQn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7742C116B1;
-	Wed, 31 Jul 2024 19:56:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vt+QSq4b"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F8D7C116B1;
+	Wed, 31 Jul 2024 20:12:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722455762;
-	bh=o8N+u0byDeedT1YKt9nGlaJQnl4BOMWVYyEe55Z9/Ig=;
+	s=k20201202; t=1722456723;
+	bh=5IeJZWRy61r1+KpM9Ds67BGzx8a4wfH6JVyA+DyWDoE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ANt9xDQn4Gb2H/+k7BQBmKlegDc9USQMvOgq9Dr07ezmC41r62uKt+3Sp8UFHdhvB
-	 4zMkm9qW7I1j0d+u98xdzUcCQbYBG53O9hvA5mTWax+Peo71wjaAqMff3ER+uSrAKz
-	 pqwQCee70uVSGJj0zBD/XDtqeTGBYI3VEwgyIGR7M9OF6tF/qKBKnTdZTVKsE7O5Id
-	 4oSRNEK2hYpUjhefsXiOdKf+nTmGkAWXSNAzD2QwvIGrnXJrjJY73F9YYFgjX9ZMOs
-	 oZFBxurb1Ax9D+zZMjjm4TsoUmnd3LOEYof/7iFKNWuGc8YuMg5zsAu3GifIGLrB98
-	 1PWq7+dReq2jw==
+	b=Vt+QSq4bzdxKdy9JENfaxNjJv5lZI3/6Le8VIwsPYAyrt3KBvl1diWGcJIVHXTMSB
+	 l4oYCqDH4hCzUoeZMC3s9qTZAk+Zkc6s9ZCnVQwIKM2bc4DxG7AobXMhqQMNPp7KsR
+	 af0/ngdvsXtRSBfmRMHPhDEeeotphdHJpgZg4bH/r/lPbahyKvVXeaGOgOTqsM2iA7
+	 9kFOli1C24jMkQnN2MIW+I4dfS0qzbXwAR05RXLASkMSEWLdghQftDq18pj686sItO
+	 zpaut9sGNWH0WOkYsr1G4hBgQeIvV5DscPwIuiLmfbjldaaEman2NwxQqahtigB6Q7
+	 DGURJmCFVrU8A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sZFQW-00H6l8-OW;
-	Wed, 31 Jul 2024 20:56:00 +0100
-Date: Wed, 31 Jul 2024 20:55:59 +0100
-Message-ID: <87wml149ps.wl-maz@kernel.org>
+	id 1sZFg1-00H70p-4D;
+	Wed, 31 Jul 2024 21:12:01 +0100
+Date: Wed, 31 Jul 2024 21:12:00 +0100
+Message-ID: <87v80l48z3.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Mark Brown <broonie@kernel.org>
 Cc: Oliver Upton <oliver.upton@linux.dev>,
@@ -45,10 +45,10 @@ Cc: Oliver Upton <oliver.upton@linux.dev>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] KVM: arm64: Fix outdated comment about incomplete FGT bitmask definitions
-In-Reply-To: <20240731-kvm-arm64-fgt-doc-v1-1-abb364f8fe57@kernel.org>
+Subject: Re: [PATCH 2/2] KVM: arm64: Clarify meaning of _MASK and _nMASK for FGT registers
+In-Reply-To: <20240731-kvm-arm64-fgt-doc-v1-2-abb364f8fe57@kernel.org>
 References: <20240731-kvm-arm64-fgt-doc-v1-0-abb364f8fe57@kernel.org>
-	<20240731-kvm-arm64-fgt-doc-v1-1-abb364f8fe57@kernel.org>
+	<20240731-kvm-arm64-fgt-doc-v1-2-abb364f8fe57@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -64,26 +64,33 @@ X-SA-Exim-Rcpt-To: broonie@kernel.org, oliver.upton@linux.dev, james.morse@arm.c
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 31 Jul 2024 19:58:37 +0100,
+On Wed, 31 Jul 2024 19:58:38 +0100,
 Mark Brown <broonie@kernel.org> wrote:
 > 
-> Comments in the code say that our definitions for the FGT registers are not
-> the generated ones and are updated only as far as DDI0487 J.a however in
-> commit 9ff67dd26a9e ("KVM: arm64: Use generated FGT RES0 bits instead of
-> specifying them") we updated to use the generated definitions, and as of
-> the release of DDI0487 K.a the XML in DD0601 is in sync with the ARM.
+> Since the use of _MASK to mean bits where setting the bit causes traps to
+> be generated is a little unusual add a clarifying comment.
+> 
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_arm.h | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index d347483395b4..1d8745740fb1 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -343,6 +343,10 @@
+>   * FGT register definitions
+>   *
+>   * RES0 and polarity masks for the FGT registers.
+> + *
+> + * _RES0:  Bits which are RES0
+> + * _MASK:  Bits which enable traps when set
+> + * _nMASK: Bits which disable traps when set
 
-s/ARM/ARM ARM/. Which revision of the XML? K.a and the latest version
-of the XML are definitely not in sync.
-
-Also, please make use of punctuation. I can't parse this *single*
-sentence as it stands.
-
-> Remove the outdated comment about divergence.
->
-> Fixes: 9ff67dd26a9e ("KVM: arm64: Use generated FGT RES0 bits instead of specifying them")
-
-Definitely *not* a fix.
+The rest of the code call this "negative polarity". Also, in some
+cases (such as with HCRX_EL2), such bits are *enable* bits. So you
+probably want to capture this as well.
 
 	M.
 
