@@ -1,35 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB3941BE24F;
-	Wed, 31 Jul 2024 16:51:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48FA11BE857;
+	Wed, 31 Jul 2024 16:51:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722444708; cv=none; b=N3TCtbdCfZk02JOXPIjA9CwqdHVNjIEQIU+P6fqU7Ai7eYTHA2JqcUF3Xjj9pX+jmSPHPRIcvreMg2HAuDDs1vp84l6Y32G9laNYKZn6IsFcrUwkzOJn8Ny/Xjgvidb63TppOoKq4vmni8YodTNPU5GpG+3fWYYYUh9bxYjPYXI=
+	t=1722444710; cv=none; b=CcvKBKtnqXZAMJEoH07zkjT0YWJElmxeFvrLC3FvF6upS2jtpiBJdg/RLSNsy78JYV4X3ZlEumsiUh6vLLlpXsUI6D88v1KAyX35gX1HM8Cqfia+D+Zzg9VXuuZCgHyYxzV/BEEzTSA1OpyBcsHHya6QFrozcC1UOJcjZ5MqsTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722444708; c=relaxed/simple;
-	bh=qwLOrEKtP0iovFP0me6J6poit6hFpATmdQzESC42ZcA=;
+	s=arc-20240116; t=1722444710; c=relaxed/simple;
+	bh=sN+E69Sud6EeT1BhEmoWX2EU0ff+4hzJ09gHXyXFt58=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Z4D6xNeF4Fr7PNKkWA4UtJfXpXy42znrGbxy9BBquxLJyzG1ETn53Mp4h8Lyp1GahoTVFHndr+9vPeP8jnrJSnonCsFAEWfWMFlAaE8ErvOl2RF9uN/gbmOpuwOXrx0IM+/sMVXFNIa9Ht+fJW0Jwzg7rKAXjxgy2cMDl7ZPXy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AvNAbZMj; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=WjZAwJPz2Ch7r3WJzRpu21RVVMfPnDxgiRhJxmANdGjegimqkZsrmsGTWcCK77y5aRWWf1PYHC9VKX4pxDqh51Iwlz2A60jK6a5u0W9eyxAqI19pD9YJwqHgeo404L0qDSPaL/st0DkyYTrB/KmkCHli0im0GXM0exl/m3PiTCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IOcC4WMK; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AvNAbZMj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D173C4AF0B;
-	Wed, 31 Jul 2024 16:51:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IOcC4WMK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9EC9C116B1;
+	Wed, 31 Jul 2024 16:51:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722444708;
-	bh=qwLOrEKtP0iovFP0me6J6poit6hFpATmdQzESC42ZcA=;
+	s=k20201202; t=1722444709;
+	bh=sN+E69Sud6EeT1BhEmoWX2EU0ff+4hzJ09gHXyXFt58=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=AvNAbZMjPU9AqGj2nGAGEw2NhEvATXks4+3osrBCDevB8QiqyXscpUabYx47GC5s7
-	 cPLrR3i6bGh5kXCkjzRwNPCN1knLAy5CraHiSu/eDON4TeRl+ZBNvMfihbqq30r1iL
-	 +Q9vH2v6EcocNPEDpvTOdb68drXmaq/jtNZRQxy3ZrDhDOaaoNXWjRQLmHmc86nIM4
-	 A6LneQO43UdbfGKUoCbl8N4/CKH0r0ABiahxOXQEOdCQXRrqDAWKfr9yaTfJEPDjWv
-	 3nS9uL6wQo+6kcg5dex75SdiTihLzANHls0iI2Y4c3yUFEvdf7zT8gLcjbyjKbgNrG
-	 zbJ0m+ah6GQZQ==
+	b=IOcC4WMKJ9gqOpJ/tIThyy4DZM3vEp9pQ7+SWXYvv4fgioYi+Sm0pOdDsSPBDXZUl
+	 DZCzNHsrb2lPb5LrzV2M2DgUUdEaWnTFGOzesuwObfjL/yLwMAKTP/H1lwkT23ttch
+	 HiVLU7d/yD/aflWyMOHfrCtmiAloQnZqVvPGUT811/gXn5TTIsqjCAqaGZZZCjAtjt
+	 AFLg7VAhpCd0oH+vRkG99hRje2SfdvnkOErRgOK58myBenyNQtzppmxrKE1wVjNuNP
+	 aErX3C3zYjBXLFqKBh+Ilch3P/Vl1DuhZOO5e7m+OMTC9F4ughtOfVxRG1jpPOoUpC
+	 pipK77bqp3TAQ==
 From: "Rob Herring (Arm)" <robh@kernel.org>
-Date: Wed, 31 Jul 2024 10:51:22 -0600
-Subject: [PATCH v3 5/7] arm64: perf/kvm: Use a common PMU cycle counter
- define
+Date: Wed, 31 Jul 2024 10:51:23 -0600
+Subject: [PATCH v3 6/7] KVM: arm64: Refine PMU defines for number of
+ counters
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -38,7 +38,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240731-arm-pmu-3-9-icntr-v3-5-280a8d7ff465@kernel.org>
+Message-Id: <20240731-arm-pmu-3-9-icntr-v3-6-280a8d7ff465@kernel.org>
 References: <20240731-arm-pmu-3-9-icntr-v3-0-280a8d7ff465@kernel.org>
 In-Reply-To: <20240731-arm-pmu-3-9-icntr-v3-0-280a8d7ff465@kernel.org>
 To: Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, 
@@ -57,133 +57,131 @@ Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
  linux-perf-users@vger.kernel.org, kvmarm@lists.linux.dev
 X-Mailer: b4 0.15-dev
 
-The PMUv3 and KVM code each have a define for the PMU cycle counter
-index. Move KVM's define to a shared location and use it for PMUv3
-driver.
+There are 2 defines for the number of PMU counters:
+ARMV8_PMU_MAX_COUNTERS and ARMPMU_MAX_HWEVENTS. Both are the same
+currently, but Armv9.4/8.9 increases the number of possible counters
+from 32 to 33. With this change, the maximum number of counters will
+differ for KVM's PMU emulation which is PMUv3.4. Give KVM PMU emulation
+its own define to decouple it from the rest of the kernel's number PMU
+counters.
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
+The VHE PMU code needs to match the PMU driver, so switch it to use
+ARMPMU_MAX_HWEVENTS instead.
+
 Acked-by: Mark Rutland <mark.rutland@arm.com>
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
 ---
-v2:
- - Move ARMV8_PMU_CYCLE_IDX to linux/perf/arm_pmuv3.h
----
- arch/arm64/kvm/sys_regs.c      |  1 +
- drivers/perf/arm_pmuv3.c       | 19 +++++++------------
- include/kvm/arm_pmu.h          |  1 -
- include/linux/perf/arm_pmuv3.h |  3 +++
- 4 files changed, 11 insertions(+), 13 deletions(-)
+ arch/arm64/kvm/pmu-emul.c      | 8 ++++----
+ arch/arm64/kvm/pmu.c           | 5 +++--
+ include/kvm/arm_pmu.h          | 3 ++-
+ include/linux/perf/arm_pmuv3.h | 2 --
+ 4 files changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 33497db257fb..7db24de37ed6 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -18,6 +18,7 @@
- #include <linux/printk.h>
- #include <linux/uaccess.h>
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index 0e598f6c42c0..ac36c438b8c1 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -233,7 +233,7 @@ void kvm_pmu_vcpu_init(struct kvm_vcpu *vcpu)
+ 	int i;
+ 	struct kvm_pmu *pmu = &vcpu->arch.pmu;
  
-+#include <asm/arm_pmuv3.h>
- #include <asm/cacheflush.h>
- #include <asm/cputype.h>
- #include <asm/debug-monitors.h>
-diff --git a/drivers/perf/arm_pmuv3.c b/drivers/perf/arm_pmuv3.c
-index bd45fbcb9a5a..18046cf4b3a3 100644
---- a/drivers/perf/arm_pmuv3.c
-+++ b/drivers/perf/arm_pmuv3.c
-@@ -451,11 +451,6 @@ static const struct attribute_group armv8_pmuv3_caps_attr_group = {
- 	.attrs = armv8_pmuv3_caps_attrs,
- };
+-	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++)
++	for (i = 0; i < KVM_ARMV8_PMU_MAX_COUNTERS; i++)
+ 		pmu->pmc[i].idx = i;
+ }
  
--/*
-- * Perf Events' indices
-- */
--#define	ARMV8_IDX_CYCLE_COUNTER	31
--
- /*
-  * We unconditionally enable ARMv8.5-PMU long event counter support
-  * (64-bit events) where supported. Indicate if this arm_pmu has long
-@@ -574,7 +569,7 @@ static u64 armv8pmu_read_counter(struct perf_event *event)
- 	int idx = hwc->idx;
- 	u64 value;
+@@ -260,7 +260,7 @@ void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu)
+ {
+ 	int i;
  
--	if (idx == ARMV8_IDX_CYCLE_COUNTER)
-+	if (idx == ARMV8_PMU_CYCLE_IDX)
- 		value = read_pmccntr();
- 	else
- 		value = armv8pmu_read_hw_counter(event);
-@@ -607,7 +602,7 @@ static void armv8pmu_write_counter(struct perf_event *event, u64 value)
+-	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++)
++	for (i = 0; i < KVM_ARMV8_PMU_MAX_COUNTERS; i++)
+ 		kvm_pmu_release_perf_event(kvm_vcpu_idx_to_pmc(vcpu, i));
+ 	irq_work_sync(&vcpu->arch.pmu.overflow_work);
+ }
+@@ -291,7 +291,7 @@ void kvm_pmu_enable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
+ 	if (!(kvm_vcpu_read_pmcr(vcpu) & ARMV8_PMU_PMCR_E) || !val)
+ 		return;
  
- 	value = armv8pmu_bias_long_counter(event, value);
+-	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++) {
++	for (i = 0; i < KVM_ARMV8_PMU_MAX_COUNTERS; i++) {
+ 		struct kvm_pmc *pmc;
  
--	if (idx == ARMV8_IDX_CYCLE_COUNTER)
-+	if (idx == ARMV8_PMU_CYCLE_IDX)
- 		write_pmccntr(value);
- 	else
- 		armv8pmu_write_hw_counter(event, value);
-@@ -644,7 +639,7 @@ static void armv8pmu_write_event_type(struct perf_event *event)
- 		armv8pmu_write_evtype(idx - 1, hwc->config_base);
- 		armv8pmu_write_evtype(idx, chain_evt);
- 	} else {
--		if (idx == ARMV8_IDX_CYCLE_COUNTER)
-+		if (idx == ARMV8_PMU_CYCLE_IDX)
- 			write_pmccfiltr(hwc->config_base);
- 		else
- 			armv8pmu_write_evtype(idx, hwc->config_base);
-@@ -772,7 +767,7 @@ static void armv8pmu_enable_user_access(struct arm_pmu *cpu_pmu)
- 	/* Clear any unused counters to avoid leaking their contents */
- 	for_each_andnot_bit(i, cpu_pmu->cntr_mask, cpuc->used_mask,
- 			    ARMPMU_MAX_HWEVENTS) {
--		if (i == ARMV8_IDX_CYCLE_COUNTER)
-+		if (i == ARMV8_PMU_CYCLE_IDX)
- 			write_pmccntr(0);
- 		else
- 			armv8pmu_write_evcntr(i, 0);
-@@ -933,8 +928,8 @@ static int armv8pmu_get_event_idx(struct pmu_hw_events *cpuc,
- 	/* Always prefer to place a cycle counter into the cycle counter. */
- 	if ((evtype == ARMV8_PMUV3_PERFCTR_CPU_CYCLES) &&
- 	    !armv8pmu_event_get_threshold(&event->attr)) {
--		if (!test_and_set_bit(ARMV8_IDX_CYCLE_COUNTER, cpuc->used_mask))
--			return ARMV8_IDX_CYCLE_COUNTER;
-+		if (!test_and_set_bit(ARMV8_PMU_CYCLE_IDX, cpuc->used_mask))
-+			return ARMV8_PMU_CYCLE_IDX;
- 		else if (armv8pmu_event_is_64bit(event) &&
- 			   armv8pmu_event_want_user_access(event) &&
- 			   !armv8pmu_has_long_event(cpu_pmu))
-@@ -1196,7 +1191,7 @@ static void __armv8pmu_probe_pmu(void *info)
- 		   0, FIELD_GET(ARMV8_PMU_PMCR_N, armv8pmu_pmcr_read()));
+ 		if (!(val & BIT(i)))
+@@ -323,7 +323,7 @@ void kvm_pmu_disable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
+ 	if (!kvm_vcpu_has_pmu(vcpu) || !val)
+ 		return;
  
- 	/* Add the CPU cycles counter */
--	set_bit(ARMV8_IDX_CYCLE_COUNTER, cpu_pmu->cntr_mask);
-+	set_bit(ARMV8_PMU_CYCLE_IDX, cpu_pmu->cntr_mask);
+-	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++) {
++	for (i = 0; i < KVM_ARMV8_PMU_MAX_COUNTERS; i++) {
+ 		struct kvm_pmc *pmc;
  
- 	pmceid[0] = pmceid_raw[0] = read_pmceid0();
- 	pmceid[1] = pmceid_raw[1] = read_pmceid1();
+ 		if (!(val & BIT(i)))
+diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
+index a47ae311d4a8..215b74875815 100644
+--- a/arch/arm64/kvm/pmu.c
++++ b/arch/arm64/kvm/pmu.c
+@@ -5,6 +5,7 @@
+  */
+ #include <linux/kvm_host.h>
+ #include <linux/perf_event.h>
++#include <linux/perf/arm_pmu.h>
+ #include <linux/perf/arm_pmuv3.h>
+ 
+ static DEFINE_PER_CPU(struct kvm_pmu_events, kvm_pmu_events);
+@@ -95,7 +96,7 @@ static void kvm_vcpu_pmu_enable_el0(unsigned long events)
+ 	u64 typer;
+ 	u32 counter;
+ 
+-	for_each_set_bit(counter, &events, 32) {
++	for_each_set_bit(counter, &events, ARMPMU_MAX_HWEVENTS) {
+ 		typer = kvm_vcpu_pmu_read_evtype_direct(counter);
+ 		typer &= ~ARMV8_PMU_EXCLUDE_EL0;
+ 		kvm_vcpu_pmu_write_evtype_direct(counter, typer);
+@@ -110,7 +111,7 @@ static void kvm_vcpu_pmu_disable_el0(unsigned long events)
+ 	u64 typer;
+ 	u32 counter;
+ 
+-	for_each_set_bit(counter, &events, 32) {
++	for_each_set_bit(counter, &events, ARMPMU_MAX_HWEVENTS) {
+ 		typer = kvm_vcpu_pmu_read_evtype_direct(counter);
+ 		typer |= ARMV8_PMU_EXCLUDE_EL0;
+ 		kvm_vcpu_pmu_write_evtype_direct(counter, typer);
 diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index 334d7c5503cf..871067fb2616 100644
+index 871067fb2616..e08aeec5d936 100644
 --- a/include/kvm/arm_pmu.h
 +++ b/include/kvm/arm_pmu.h
-@@ -10,7 +10,6 @@
+@@ -10,6 +10,7 @@
  #include <linux/perf_event.h>
  #include <linux/perf/arm_pmuv3.h>
  
--#define ARMV8_PMU_CYCLE_IDX		(ARMV8_PMU_MAX_COUNTERS - 1)
++#define KVM_ARMV8_PMU_MAX_COUNTERS	32
  
  #if IS_ENABLED(CONFIG_HW_PERF_EVENTS) && IS_ENABLED(CONFIG_KVM)
  struct kvm_pmc {
+@@ -25,7 +26,7 @@ struct kvm_pmu_events {
+ struct kvm_pmu {
+ 	struct irq_work overflow_work;
+ 	struct kvm_pmu_events events;
+-	struct kvm_pmc pmc[ARMV8_PMU_MAX_COUNTERS];
++	struct kvm_pmc pmc[KVM_ARMV8_PMU_MAX_COUNTERS];
+ 	int irq_num;
+ 	bool created;
+ 	bool irq_level;
 diff --git a/include/linux/perf/arm_pmuv3.h b/include/linux/perf/arm_pmuv3.h
-index 792b8e10b72a..f4ec76f725a3 100644
+index f4ec76f725a3..4f7a7f2222e5 100644
 --- a/include/linux/perf/arm_pmuv3.h
 +++ b/include/linux/perf/arm_pmuv3.h
-@@ -9,6 +9,9 @@
- #define ARMV8_PMU_MAX_GENERAL_COUNTERS	31
- #define ARMV8_PMU_MAX_COUNTERS	32
+@@ -7,8 +7,6 @@
+ #define __PERF_ARM_PMUV3_H
  
-+#define ARMV8_PMU_CYCLE_IDX		31
-+
-+
- /*
-  * Common architectural and microarchitectural event numbers.
-  */
+ #define ARMV8_PMU_MAX_GENERAL_COUNTERS	31
+-#define ARMV8_PMU_MAX_COUNTERS	32
+-
+ #define ARMV8_PMU_CYCLE_IDX		31
+ 
+ 
 
 -- 
 2.43.0
