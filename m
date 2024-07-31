@@ -1,89 +1,134 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67C1E14F9F4;
-	Wed, 31 Jul 2024 18:59:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F42235280;
+	Wed, 31 Jul 2024 19:40:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722452363; cv=none; b=dsDo2Sa7oOSoFAeHq55ESkbCtZvktGWmCxN7Ex90gC/HYe2NdR0UdSFd86u1eVBJX+AeyyU3ihZbYy7DUUSeZDd7brXaElIJ1VFDjTou97XkuJBnjVoiepsCVnY81H1tXcVM8OoY3DU2E29OAymApGSZrFyzhCdeBLGuRJS8bYc=
+	t=1722454855; cv=none; b=UVyzzUNvSdIraYMrOSGoatPSU3NocSZgo1DvIHlL0DhX5WOqdnbxb8b1VP2iyu66b5cOACTsYqhnjyBnIXnj5JaeGs3EN/X73KarMibP09C9nHHrBrOg5ty5oRUY77XwGKse4z0EfdzZpSl7GJlvW0SsTMTnp0PD/pu3M1s/TVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722452363; c=relaxed/simple;
-	bh=D1SKn5zDUad8T7fVsAtfQDtAE7+9Q9bJUWeW7NKX3PU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=t6oglkzu4pUIVzccj+MqwHmmjQbJFQoi3N/vEq8WGbdP5Pysm4P6UGkyGUWRRmowBVuS1l8AmgINtDPeGjUyyfjH+qJGnDMO50lreNePP94PXz+E1fd8VYVgZ9jfyPSo2uXmXJ3k21vw4rgv8bu0v0Bpmd2AljlRbfchTrma2u8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B0qL0Ogw; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1722454855; c=relaxed/simple;
+	bh=nZsTfRkPRsBDTl7KWkqYsSA/btlrP7383aII6HM3n8A=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=thsYnDj8l7HYxm/cpyJ11SxY7VMwjA5cUWBgxqwGaRCVz8J7UUhmiVTj/v967UTo1tndJExlMnJDSBMDm42z2eblcyR+JayWAJlzCqw1l6xOcC/f7yqwMRSP1MHe5+tie7GADFKm2CspjdYGHpBpgKoopZZUyOZ+yiN7CtNtAcQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jirpesr8; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B0qL0Ogw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E09AEC4AF10;
-	Wed, 31 Jul 2024 18:59:20 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jirpesr8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02D05C4AF0C;
+	Wed, 31 Jul 2024 19:40:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722452363;
-	bh=D1SKn5zDUad8T7fVsAtfQDtAE7+9Q9bJUWeW7NKX3PU=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=B0qL0OgwBkTw/11CjRtPe7lABacGq+Nc1+ru4CS7zzz8j2RpYMFmdp6VcUZilzedk
-	 AzDInJuMRgAGxbbsvW8Ld2zX7MTfMf9QsrrNn2muf20GGpB1AdI8w2d/peeHtsFONA
-	 V00PrRGhQoxhIWvEBlj21QEOThBR1WxcX+CTaMgxCA9dKQPC9vCFTjz0Ota4o9QRPD
-	 VRfxQRsbGaYK/955AFfFpnKexiFqIr/gRa6fPnhwSBrwWfLH+AiqPo0POaQIrDORQp
-	 MUFpP2GwyOn1O/3dnvsiXOCRUb5Dd0oD9UJqnvHOxeF15BAUyxXfLk5bdnl+/ZAbf6
-	 cnJDqtxLdjmqA==
-From: Mark Brown <broonie@kernel.org>
-Date: Wed, 31 Jul 2024 19:58:38 +0100
-Subject: [PATCH 2/2] KVM: arm64: Clarify meaning of _MASK and _nMASK for
- FGT registers
+	s=k20201202; t=1722454855;
+	bh=nZsTfRkPRsBDTl7KWkqYsSA/btlrP7383aII6HM3n8A=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Jirpesr8hL0Saat3zFCWd82wVd9xlaiYSjjEt4PXnxNews/E66FXNGAXW4/rhqRI1
+	 +SKwK9CU4UOFatLuZodIc9h/ZX1hCSxFNS/WeFi/FAMN/dVhI8mTihgLe3gu7YUg10
+	 JAttELO5VpzlUJizWP45nE4nmyY9ydtkIqwdB2q687Rci+HL9aYMIX/ln8k2u04OzS
+	 fQdCvcl7ccXf3gwrmL9r1NH51GRjSRORWzEniRm36b5wNRBHGpVjTAO2GVZsYPl13q
+	 ADVhYnqe6saqNH6l7Hl1ShCTR1857iSir3CmGlNy/9V55dXrmeyLvV8TCXDJKcDhfM
+	 PsO54X91NPNrg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sZFBs-00H6Gh-U0;
+	Wed, 31 Jul 2024 20:40:52 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Przemyslaw Gaj <pgaj@cadence.com>
+Subject: [PATCH v2 00/17] KVM: arm64: nv: Add support for address translation instructions
+Date: Wed, 31 Jul 2024 20:40:13 +0100
+Message-Id: <20240731194030.1991237-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240731-kvm-arm64-fgt-doc-v1-2-abb364f8fe57@kernel.org>
-References: <20240731-kvm-arm64-fgt-doc-v1-0-abb364f8fe57@kernel.org>
-In-Reply-To: <20240731-kvm-arm64-fgt-doc-v1-0-abb364f8fe57@kernel.org>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
- James Morse <james.morse@arm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
- Fuad Tabba <tabba@google.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
- linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.15-dev-37811
-X-Developer-Signature: v=1; a=openpgp-sha256; l=821; i=broonie@kernel.org;
- h=from:subject:message-id; bh=D1SKn5zDUad8T7fVsAtfQDtAE7+9Q9bJUWeW7NKX3PU=;
- b=owGbwMvMwMWocq27KDak/QLjabUkhrRVnU1eRZ/vFpwzi/Q2mtfjLsIi7fnm9ifeNw6L50w5+STy
- gsH/TkZjFgZGLgZZMUWWtc8yVqWHS2yd/2j+K5hBrEwgUxi4OAVgIm+S2P+ns+i9Trj/OzvfYcraR8
- uN85U/2F/8lnTF2DJs4vVqlRkrwvgWpIdI1XkK6IX3JT8Ou15noPb5rPOproeZ6tp6craLVtiEm9av
- Zlu4SuuOHDtj9oOgpdoOTRu9cjnCnxV4hbzOfM/89VHvrPOrGf+n1ti1PVq6plfs27wsk4IFZ41mC6
- gc/ZNn9Wbh1LY9y20qA/foxE+yqsjhu8h6u+Jt8VrRLyrih2/7ijv3nDWXrdnTzOysMctQKubaWjbL
- 2yHmCgcVV2o0Jc9s1U3KOp6ntTbsa7CJgN3NeNer2jc8y669OP/As6TzzIbvFVV8mj4OeafjZWtf3N
- As9/i1TF6JLSnqbhr/HQbl1fWPAA==
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com, alexandru.elisei@arm.com, anshuman.khandual@arm.com, pgaj@cadence.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Since the use of _MASK to mean bits where setting the bit causes traps to
-be generated is a little unusual add a clarifying comment.
+This is the second revision of the address translation emulation for
+NV support on arm64 initially posted at [1]. I haven't kept an
+detailed change log of what happened since, but here are the
+highlights:
 
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- arch/arm64/include/asm/kvm_arm.h | 4 ++++
- 1 file changed, 4 insertions(+)
+  * A fair amount has changed in the series, starting with a lot of
+    bugs being fixed thanks to Alex's hard work comparing the
+    implementation and the pseudocode. All credits to him, this is a
+    lot harder than writing code.
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index d347483395b4..1d8745740fb1 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -343,6 +343,10 @@
-  * FGT register definitions
-  *
-  * RES0 and polarity masks for the FGT registers.
-+ *
-+ * _RES0:  Bits which are RES0
-+ * _MASK:  Bits which enable traps when set
-+ * _nMASK: Bits which disable traps when set
-  */
- #define __HFGRTR_EL2_RES0	HFGxTR_EL2_RES0
- #define __HFGRTR_EL2_MASK	GENMASK(49, 0)
+  * At Alex's request, the code structure is now a bit closer to the
+    pseudocode in a number of aspects, so that people can eyeball it
+    more easily.
+
+  * Whenever I could, I added references to ARM ARM rules to help with
+    cross-referencing the implementation and the requirements.
+
+  * FEAT_PAN2 support is now implemented using the... FEAT_PAN2
+    instructions (surprise!) instead of the previous version that was
+    using three different AT instructions.
+
+  * The code now has the notion of translation regime, which makes it
+    somehow clearer what is going on. I was pretty sceptical about it
+    initially, but it turned out rather OK.
+
+  * The series has been resplit to make it more digestable. Patch 13
+    is still on a mission to make you puke.
+
+I've added the usual reviewers on Cc, plus people who explicitly asked
+to be on it, and people who seem to be super keen on NV.
+
+Patches on top of 6.11-rc1, tested on my usual M2 (so VHE only).
+
+[1] https://lore.kernel.org/r/20240625133508.259829-1-maz@kernel.org
+
+Joey Gouly (1):
+  KVM: arm64: Make kvm_at() take an OP_AT_*
+
+Marc Zyngier (16):
+  arm64: Add missing APTable and TCR_ELx.HPD masks
+  arm64: Add PAR_EL1 field description
+  arm64: Add system register encoding for PSTATE.PAN
+  arm64: Add ESR_ELx_FSC_ADDRSZ_L() helper
+  KVM: arm64: nv: Turn upper_attr for S2 walk into the full descriptor
+  KVM: arm64: nv: Honor absence of FEAT_PAN2
+  KVM: arm64: nv: Add basic emulation of AT S1E{0,1}{R,W}
+  KVM: arm64: nv: Add basic emulation of AT S1E1{R,W}P
+  KVM: arm64: nv: Add basic emulation of AT S1E2{R,W}
+  KVM: arm64: nv: Add emulation of AT S12E{0,1}{R,W}
+  KVM: arm64: nv: Make ps_to_output_size() generally available
+  KVM: arm64: nv: Add SW walker for AT S1 emulation
+  KVM: arm64: nv: Sanitise SCTLR_EL1.EPAN according to VM configuration
+  KVM: arm64: nv: Make AT+PAN instructions aware of FEAT_PAN3
+  KVM: arm64: nv: Plumb handling of AT S1* traps from EL2
+  KVM: arm64: nv: Add support for FEAT_ATS1A
+
+ arch/arm64/include/asm/esr.h           |    5 +-
+ arch/arm64/include/asm/kvm_arm.h       |    1 +
+ arch/arm64/include/asm/kvm_asm.h       |    6 +-
+ arch/arm64/include/asm/kvm_nested.h    |   18 +-
+ arch/arm64/include/asm/pgtable-hwdef.h |    9 +
+ arch/arm64/include/asm/sysreg.h        |   22 +
+ arch/arm64/kvm/Makefile                |    2 +-
+ arch/arm64/kvm/at.c                    | 1058 ++++++++++++++++++++++++
+ arch/arm64/kvm/emulate-nested.c        |    2 +
+ arch/arm64/kvm/hyp/include/hyp/fault.h |    2 +-
+ arch/arm64/kvm/nested.c                |   34 +-
+ arch/arm64/kvm/sys_regs.c              |   60 ++
+ 12 files changed, 1192 insertions(+), 27 deletions(-)
+ create mode 100644 arch/arm64/kvm/at.c
 
 -- 
 2.39.2
