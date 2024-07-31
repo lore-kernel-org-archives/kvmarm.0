@@ -1,25 +1,66 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F10781A76C4;
-	Wed, 31 Jul 2024 09:06:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A321B1AAE00
+	for <kvmarm@lists.linux.dev>; Wed, 31 Jul 2024 09:50:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722416766; cv=none; b=WS5xYT4Kjwnis4NEC5ZfPskmQKzNTfZAXuF1q+hcZn2BxM1gqEvCHsHXQkus4aWzwBPz0I2AUyzOzTU1N9kES7SdhdV4hUifyFVwB2zP8grSWxkB4lgYCQA6HwF/JTzE/7lZk/WuBraXNJfsfPMofe2BcCle0ef9F74Mlf2CvuE=
+	t=1722419447; cv=none; b=JJH6RyHhkFL6PtnmpD6JYTFpNZtv4CFr+O5iAisidNoqa9SQA0FSzFCVfxQvCs3g7uSIsjkPwwYMbISXqRHnYZbVLp+uIELfIYHk/4uBQXod9Fd0+r2+C/jdNrf0SWU805JWa3FQXpmI6+NyvYpoNfPyTQcbGoLP9LVnq5CtH1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722416766; c=relaxed/simple;
-	bh=ZBP69a7Qz9AKbdvVTW2t0/bNPMxBzb6bEMYliDYZoMs=;
+	s=arc-20240116; t=1722419447; c=relaxed/simple;
+	bh=XTrejJ34wyqTmqzJGqmoE5EbaZZYWrCKbhJX3mWbjW0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VelYKtAEKJE4/8I9KMgD/yN5T+3p0k+snzUbUQACW+XYnJPL5ZwH3dhK0SSKV15xDG1IsWtbTJ1zNAV+RFePAKRbFM01RJwV1eTNp3y8zBfDejV3602JcOFLT5oVD14Ugio31HbhKuT1sypfibexP51tOVFWMxVNFXJaA/spvng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 284DD1007;
-	Wed, 31 Jul 2024 02:06:29 -0700 (PDT)
-Received: from [10.57.94.83] (unknown [10.57.94.83])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A80913F5A1;
-	Wed, 31 Jul 2024 02:06:00 -0700 (PDT)
-Message-ID: <cde39215-1203-4f98-9145-ecf0078c48be@arm.com>
-Date: Wed, 31 Jul 2024 10:05:59 +0100
+	 In-Reply-To:Content-Type; b=o8EgfjHKBDcJcEP0tVhycQWb5aq5xbT4J6NSgJxuSJGusySas4mHeVFl78iHgI3OiBcX6PgPqFsqG43E5CN5/J0dRkDZYn3DvpNvSHQlFJURB2deodYMsPFn9T+Si2UvocEPSHeL9ymN7tIsuHG5U+QxcOGGK38PguI6KI8iimY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KrEy5xBV; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KrEy5xBV"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722419444;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=kF8YsGqLWNT4+a8R4w4P9MUEGEAYWYiYSABna27uXpU=;
+	b=KrEy5xBVc1iGF2PVOY7dITK1PYtisicQgOaKSayL34SW7TgJ27MZDD7csgG0vXDCoIV4lP
+	XDevCAOVyoCv7zJYenootvNrJFekg08VPCUcOwVk5HetdAL1xAdx/5306f55E8Cpo0cFe5
+	6YT1V7vpeNo/sA63WDaazWkq43GtuRs=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-90-IJkElFs9PfSS2ub5p4KcIA-1; Wed, 31 Jul 2024 05:50:41 -0400
+X-MC-Unique: IJkElFs9PfSS2ub5p4KcIA-1
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a7aa020cef5so502213666b.0
+        for <kvmarm@lists.linux.dev>; Wed, 31 Jul 2024 02:50:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722419440; x=1723024240;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kF8YsGqLWNT4+a8R4w4P9MUEGEAYWYiYSABna27uXpU=;
+        b=rPv99+Q1n0a/dSS4wB3ZUsNaEqJ7OjVyDwFdh6gh5q/Cob3JPTFaspcrSd3NLOYpc/
+         5dh1qnGg6HOTCcSDWtLuyE57fkqxHWemHj8pDZ7W0ZeczzCa4N/CxkGqYeeNb/Z2pvDu
+         1st7MSN6SMoXwP90aBq4fJh7BfSYpXMFAEcnotRWfBqIpFaNSLsTXZxwuKqumTjBiToa
+         McrNyhZpRyMgau3GNrQwd/l98hiU4CYpLbwlGhsMVFD6oHHe/9is7lxAaxoW5c2O1IXp
+         evG/8lV6t3MWAi+4Vy7pmKSx1nFJZSDoJZhttiZYTejQm3bG257Dm30xHOyrrz1GuqiU
+         R53A==
+X-Forwarded-Encrypted: i=1; AJvYcCVpq2gTMquCPFe3Za1XEj6mL2NxyRPKeuMZy8LxjpQh5qmbYJMSCS9G9GcpZEflREd6idk2khtu0kEvPm8WoHMsjY1Pqg8r
+X-Gm-Message-State: AOJu0YzwzAt/JJINk8VJXY511cYLab8CZiOFDYOiRFQWAxqyTXmFjJ6/
+	OGc74XxoqXcWCcE9n7mcS1XjppsnIZQWSw6Dek2ZYeTrd2DO31QXG3Ahcmj9RMl2IO3edvjK/Xz
+	26aZH3LurplKf8qnAej1RpR4RAMAqwlW382+uJ5J8FYDhCtrZmnfslQ==
+X-Received: by 2002:a17:907:94cb:b0:a7a:bece:6223 with SMTP id a640c23a62f3a-a7d3ff7b8e4mr1064731266b.6.1722419440613;
+        Wed, 31 Jul 2024 02:50:40 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHm0sw2f7Q/hSxPLtTI3KYQw5uCrmW/NKDuI5rQ7HlgfsjazxGbnWK3KS2H8Xhx5SNKvtVQug==
+X-Received: by 2002:a17:907:94cb:b0:a7a:bece:6223 with SMTP id a640c23a62f3a-a7d3ff7b8e4mr1064728266b.6.1722419440130;
+        Wed, 31 Jul 2024 02:50:40 -0700 (PDT)
+Received: from [192.168.10.81] ([151.95.101.29])
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a7acad93105sm746255566b.167.2024.07.31.02.50.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 31 Jul 2024 02:50:39 -0700 (PDT)
+Message-ID: <57ba7e1d-0121-4d71-89b8-c61c476ca724@redhat.com>
+Date: Wed, 31 Jul 2024 11:50:38 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,476 +68,97 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 03/15] arm64: Detect if in a realm and set RIPAS RAM
-Content-Language: en-GB
-To: Gavin Shan <gshan@redhat.com>, Steven Price <steven.price@arm.com>,
- kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-References: <20240701095505.165383-1-steven.price@arm.com>
- <20240701095505.165383-4-steven.price@arm.com>
- <2b4f0496-99f4-4bc6-af6c-a8be8fca69a8@redhat.com>
- <7203814a-1a1d-41c4-8fc5-95216e2febcd@arm.com>
- <3e30f7b8-c7a4-4ab9-8afc-a48c84e62728@redhat.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <3e30f7b8-c7a4-4ab9-8afc-a48c84e62728@redhat.com>
+Subject: Re: [PATCH v12 84/84] KVM: Don't grab reference on VM_MIXEDMAP pfns
+ that have a "struct page"
+To: Sean Christopherson <seanjc@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
+ Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>,
+ Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+ linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+ David Matlack <dmatlack@google.com>, David Stevens <stevensd@chromium.org>
+References: <20240726235234.228822-1-seanjc@google.com>
+ <20240726235234.228822-85-seanjc@google.com>
+ <992c4a07-fb84-42d8-93b3-96fb3a12c8e0@redhat.com>
+ <ZqlLWl0R1p41CS0O@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <ZqlLWl0R1p41CS0O@google.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 31/07/2024 08:03, Gavin Shan wrote:
-> Hi Suzuki,
-> 
-> On 7/30/24 11:51 PM, Suzuki K Poulose wrote:
->> On 30/07/2024 00:37, Gavin Shan wrote:
->>> On 7/1/24 7:54 PM, Steven Price wrote:
->>>> From: Suzuki K Poulose <suzuki.poulose@arm.com>
->>>>
->>>> Detect that the VM is a realm guest by the presence of the RSI
->>>> interface.
->>>>
->>>> If in a realm then all memory needs to be marked as RIPAS RAM 
->>>> initially,
->>>> the loader may or may not have done this for us. To be sure iterate 
->>>> over
->>>> all RAM and mark it as such. Any failure is fatal as that implies the
->>>> RAM regions passed to Linux are incorrect - which would mean failing
->>>> later when attempting to access non-existent RAM.
->>>>
->>>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->>>> Co-developed-by: Steven Price <steven.price@arm.com>
->>>> Signed-off-by: Steven Price <steven.price@arm.com>
->>>> ---
->>>> Changes since v3:
->>>>   * Provide safe/unsafe versions for converting memory to protected,
->>>>     using the safer version only for the early boot.
->>>>   * Use the new psci_early_test_conduit() function to avoid calling an
->>>>     SMC if EL3 is not present (or not configured to handle an SMC).
->>>> Changes since v2:
->>>>   * Use DECLARE_STATIC_KEY_FALSE rather than "extern struct
->>>>     static_key_false".
->>>>   * Rename set_memory_range() to rsi_set_memory_range().
->>>>   * Downgrade some BUG()s to WARN()s and handle the condition by
->>>>     propagating up the stack. Comment the remaining case that ends in a
->>>>     BUG() to explain why.
->>>>   * Rely on the return from rsi_request_version() rather than checking
->>>>     the version the RMM claims to support.
->>>>   * Rename the generic sounding arm64_setup_memory() to
->>>>     arm64_rsi_setup_memory() and move the call site to setup_arch().
->>>> ---
->>>>   arch/arm64/include/asm/rsi.h      | 64 +++++++++++++++++++++++++
->>>>   arch/arm64/include/asm/rsi_cmds.h | 22 +++++++++
->>>>   arch/arm64/kernel/Makefile        |  3 +-
->>>>   arch/arm64/kernel/rsi.c           | 77 
->>>> +++++++++++++++++++++++++++++++
->>>>   arch/arm64/kernel/setup.c         |  8 ++++
->>>>   5 files changed, 173 insertions(+), 1 deletion(-)
->>>>   create mode 100644 arch/arm64/include/asm/rsi.h
->>>>   create mode 100644 arch/arm64/kernel/rsi.c
->>>>
->>>> diff --git a/arch/arm64/include/asm/rsi.h 
->>>> b/arch/arm64/include/asm/rsi.h
->>>> new file mode 100644
->>>> index 000000000000..29fdc194d27b
->>>> --- /dev/null
->>>> +++ b/arch/arm64/include/asm/rsi.h
->>>> @@ -0,0 +1,64 @@
->>>> +/* SPDX-License-Identifier: GPL-2.0-only */
->>>> +/*
->>>> + * Copyright (C) 2024 ARM Ltd.
->>>> + */
->>>> +
->>>> +#ifndef __ASM_RSI_H_
->>>> +#define __ASM_RSI_H_
->>>> +
->>>> +#include <linux/jump_label.h>
->>>> +#include <asm/rsi_cmds.h>
->>>> +
->>>> +DECLARE_STATIC_KEY_FALSE(rsi_present);
->>>> +
->>>> +void __init arm64_rsi_init(void);
->>>> +void __init arm64_rsi_setup_memory(void);
->>>> +static inline bool is_realm_world(void)
->>>> +{
->>>> +    return static_branch_unlikely(&rsi_present);
->>>> +}
->>>> +
->>>> +static inline int rsi_set_memory_range(phys_addr_t start, 
->>>> phys_addr_t end,
->>>> +                       enum ripas state, unsigned long flags)
->>>> +{
->>>> +    unsigned long ret;
->>>> +    phys_addr_t top;
->>>> +
->>>> +    while (start != end) {
->>>> +        ret = rsi_set_addr_range_state(start, end, state, flags, 
->>>> &top);
->>>> +        if (WARN_ON(ret || top < start || top > end))
->>>> +            return -EINVAL;
->>>> +        start = top;
->>>> +    }
->>>> +
->>>> +    return 0;
->>>> +}
->>>> +
->>>
->>> @flags has been defined as int instead of unsigned long, which is 
->>> inconsistent
->>> to TF-RMM's definitions since it has type of 'unsigned long'.
+On 7/30/24 22:21, Sean Christopherson wrote:
+> On Tue, Jul 30, 2024, Paolo Bonzini wrote:
+>> On 7/27/24 01:52, Sean Christopherson wrote:
+>>> Now that KVM no longer relies on an ugly heuristic to find its struct page
+>>> references, i.e. now that KVM can't get false positives on VM_MIXEDMAP
+>>> pfns, remove KVM's hack to elevate the refcount for pfns that happen to
+>>> have a valid struct page.  In addition to removing a long-standing wart
+>>> in KVM, this allows KVM to map non-refcounted struct page memory into the
+>>> guest, e.g. for exposing GPU TTM buffers to KVM guests.
 >>
->> Sorry, do you mean that TF-RMM treats the "flags" as an "int" instead of
->> unsigned long and we should be consistent with TF-RMM ? If so, I don't
->> think that is correct. We should be compliant to the RMM spec, which
->> describes "RsiRipasChangeFlags" as a 64bit value and thus must be
->> 'unsigned long' as we used here.
->>
+>> Feel free to leave it to me for later, but there are more cleanups that
+>> can be made, given how simple kvm_resolve_pfn() is now:
 > 
-> No worries, I guess I didn't make myself clear enough. Sorry about that.
-> Let me explain it with more details. @flag is passed down as the following
-> call trace shows.
-> 
->    rsi_set_memory_range_protected_safe
->      rsi_set_memory_range                             // 
-> RSI_NO_CHANGE_DESTROYED
->        rsi_set_addr_range_state
->          arm_smccc_smc(SMC_RSI_IPA_STATE_SET, ...)
-> 
-> The kernel defines RSI_CHANGE_DESTROYED as a "int" value, but same flag has
-> been defined as 'unsigned int' value in tf-rmm. However, kernel uses 
-> 'unsigned
-> long' flags to hold it.
-> 
->    // kernel's prototype - 'unsigned long flags'
->    static inline int rsi_set_memory_range(phys_addr_t start, phys_addr_t 
-> end,
->                                         enum ripas state, unsigned long 
-> flags)
-> 
->    // kernel's definition - 'int'
->    #define RSI_CHANGE_DESTROYED    0
+> I'll revisit kvm_resolve_pfn(), Maxim also wasn't a fan of a similar helper that
+> existed in v11.
 
-Thanks for the detailed explanation, you are right, we should fix it.
+FWIW kvm_resolve_pfn() is totally fine as an intermediate step.  Just 
+food for thought for possible follow-ups.
 
+>> Also, check_user_page_hwpoison() should not be needed anymore, probably
+>> not since commit 234b239bea39 ("kvm: Faults which trigger IO release the
+>> mmap_sem", 2014-09-24) removed get_user_pages_fast() from hva_to_pfn_slow().
 > 
->    // tf-rmm's definition - 'unsigned int'
->    #define U(_x)                 (unsigned int)(_x)
->    #define RSI_CHANGE_DESTROYED  U(0)
-> 
->>>
->>>> +/*
->>>> + * Convert the specified range to RAM. Do not use this if you rely 
->>>> on the
->>>> + * contents of a page that may already be in RAM state.
->>>> + */
->>>> +static inline int rsi_set_memory_range_protected(phys_addr_t start,
->>>> +                         phys_addr_t end)
->>>> +{
->>>> +    return rsi_set_memory_range(start, end, RSI_RIPAS_RAM,
->>>> +                    RSI_CHANGE_DESTROYED);
->>>> +}
->>>> +
->>>> +/*
->>>> + * Convert the specified range to RAM. Do not convert any pages 
->>>> that may have
->>>> + * been DESTROYED, without our permission.
->>>> + */
->>>> +static inline int rsi_set_memory_range_protected_safe(phys_addr_t 
->>>> start,
->>>> +                              phys_addr_t end)
->>>> +{
->>>> +    return rsi_set_memory_range(start, end, RSI_RIPAS_RAM,
->>>> +                    RSI_NO_CHANGE_DESTROYED);
->>>> +}
->>>> +
->>>> +static inline int rsi_set_memory_range_shared(phys_addr_t start,
->>>> +                          phys_addr_t end)
->>>> +{
->>>> +    return rsi_set_memory_range(start, end, RSI_RIPAS_EMPTY, 0);
->>>> +}
->>>> +#endif
->>>
->>> s/0/RSI_NO_CHANGE_DESTROYED
->>
->> This is not required as we do not care if the GRANULE was destroyed or
->> not, since it is going to be "UNUSED" anyway in a protected way 
->> (RIPAS_EMPTY). And we do not rely on the contents of the memory being
->> preserved, when the page is made shared (In fact we cannot do that
->> with Arm CCA).
->>
->> Thus we do not get any security benefits with the flag. The flag is ONLY
->> useful, when the Realm does a "blanket" IPA_STATE_SET(RIPAS_RAM) for
->> all of its memory area described as RAM. In this case, we want to make
->> sure that the Host hasn't destroyed any DATA that was loaded (and
->> measured) in the "NEW" state.
->>
->> e.g, Host loads Kernel at Addr X in RAM (which is transitioned to 
->> RIPAS_RAM, measured in RIM by RMM) and ACTIVATEs the Realm. Host could 
->> then destroy some pages of the loaded image before the Realm boots (thus
->> transitioning into DESTROYED). But for the Realm, at early boot, it is
->> much easier to "mark" the entire RAM region as RIPAS_RAM,
->>
->>
->> for_each_memory_region(region) {
->>      set_ipa_state_range(region->start, region->end, RIPAS_RAM, 
->> RSI_NO_CHANGE_DESTROYED);
->> }
->>
->> rather than performing:
->>
->> for_each_granule(g in DRAM) :
->>
->> switch (rsi_get_ipa_state(g)) {
->> case RIPAS_EMPTY: rsi_set_ipa_state(g, RIPAS_RAM); break;
->> case RIPAS_RAM: break; /* Nothing to do */
->> case DESTROYED: BUG();
->> }
->>
->>
-> 
-> The point was 0 and RSI_NO_CHANGE_DESTROYED are interchangeable. Since 
-> RSI_NO_CHANGE_DESTROYED
-> has been defined as 0, why we don't used RSI_NO_CHANGE_DESTROYED?
+> Ha, I *knew* this sounded familiar.  Past me apparently came to the same
+> conclusion[*], though I wrongly suspected a memory leak and promptly forgot to
+> ever send a patch.  I'll tack one on this time around.
 
-Ah, my bad. But like I said, we should instead use the 
-RSI_CHANGE_DESTROYED for transitions to EMPTY.
+As you prefer.
 
-Suzuki
-
-
-
-> 
->>
->>> s/#endif/#endif /* __ASM_RSI_H_ */
->>>
->>>> diff --git a/arch/arm64/include/asm/rsi_cmds.h 
->>>> b/arch/arm64/include/asm/rsi_cmds.h
->>>> index 89e907f3af0c..acb557dd4b88 100644
->>>> --- a/arch/arm64/include/asm/rsi_cmds.h
->>>> +++ b/arch/arm64/include/asm/rsi_cmds.h
->>>> @@ -10,6 +10,11 @@
->>>>   #include <asm/rsi_smc.h>
->>>> +enum ripas {
->>>> +    RSI_RIPAS_EMPTY,
->>>> +    RSI_RIPAS_RAM,
->>>> +};
->>>> +
->>>>   static inline unsigned long rsi_request_version(unsigned long req,
->>>>                           unsigned long *out_lower,
->>>>                           unsigned long *out_higher)
->>>> @@ -35,4 +40,21 @@ static inline unsigned long 
->>>> rsi_get_realm_config(struct realm_config *cfg)
->>>>       return res.a0;
->>>>   }
->>>> +static inline unsigned long rsi_set_addr_range_state(phys_addr_t 
->>>> start,
->>>> +                             phys_addr_t end,
->>>> +                             enum ripas state,
->>>> +                             unsigned long flags,
->>>> +                             phys_addr_t *top)
->>>> +{
->>>> +    struct arm_smccc_res res;
->>>> +
->>>> +    arm_smccc_smc(SMC_RSI_IPA_STATE_SET, start, end, state,
->>>> +              flags, 0, 0, 0, &res);
->>>> +
->>>> +    if (top)
->>>> +        *top = res.a1;
->>>> +
->>>> +    return res.a0;
->>>> +}
->>>> +
->>>>   #endif
->>>> diff --git a/arch/arm64/kernel/Makefile b/arch/arm64/kernel/Makefile
->>>> index 763824963ed1..a483b916ed11 100644
->>>> --- a/arch/arm64/kernel/Makefile
->>>> +++ b/arch/arm64/kernel/Makefile
->>>> @@ -33,7 +33,8 @@ obj-y            := debug-monitors.o entry.o irq.o 
->>>> fpsimd.o        \
->>>>                  return_address.o cpuinfo.o cpu_errata.o        \
->>>>                  cpufeature.o alternative.o cacheinfo.o        \
->>>>                  smp.o smp_spin_table.o topology.o smccc-call.o    \
->>>> -               syscall.o proton-pack.o idle.o patching.o pi/
->>>> +               syscall.o proton-pack.o idle.o patching.o pi/    \
->>>> +               rsi.o
->>>>   obj-$(CONFIG_COMPAT)            += sys32.o signal32.o            \
->>>>                          sys_compat.o
->>>> diff --git a/arch/arm64/kernel/rsi.c b/arch/arm64/kernel/rsi.c
->>>> new file mode 100644
->>>> index 000000000000..f01bff9dab04
->>>> --- /dev/null
->>>> +++ b/arch/arm64/kernel/rsi.c
->>>> @@ -0,0 +1,77 @@
->>>> +// SPDX-License-Identifier: GPL-2.0-only
->>>> +/*
->>>> + * Copyright (C) 2023 ARM Ltd.
->>>> + */
->>>> +
->>>> +#include <linux/jump_label.h>
->>>> +#include <linux/memblock.h>
->>>> +#include <linux/psci.h>
->>>> +#include <asm/rsi.h>
->>>> +
->>>> +DEFINE_STATIC_KEY_FALSE_RO(rsi_present);
->>>> +EXPORT_SYMBOL(rsi_present);
->>>> +
->>>> +static bool rsi_version_matches(void)
->>>> +{
->>>> +    unsigned long ver_lower, ver_higher;
->>>> +    unsigned long ret = rsi_request_version(RSI_ABI_VERSION,
->>>> +                        &ver_lower,
->>>> +                        &ver_higher);
->>>> +
->>>> +    if (ret == SMCCC_RET_NOT_SUPPORTED)
->>>> +        return false;
->>>> +
->>>> +    if (ret != RSI_SUCCESS) {
->>>> +        pr_err("RME: RMM doesn't support RSI version %u.%u. 
->>>> Supported range: %lu.%lu-%lu.%lu\n",
->>>> +               RSI_ABI_VERSION_MAJOR, RSI_ABI_VERSION_MINOR,
->>>> +               RSI_ABI_VERSION_GET_MAJOR(ver_lower),
->>>> +               RSI_ABI_VERSION_GET_MINOR(ver_lower),
->>>> +               RSI_ABI_VERSION_GET_MAJOR(ver_higher),
->>>> +               RSI_ABI_VERSION_GET_MINOR(ver_higher));
->>>> +        return false;
->>>> +    }
->>>> +
->>>> +    pr_info("RME: Using RSI version %lu.%lu\n",
->>>> +        RSI_ABI_VERSION_GET_MAJOR(ver_lower),
->>>> +        RSI_ABI_VERSION_GET_MINOR(ver_lower));
->>>> +
->>>> +    return true;
->>>> +}
->>>> +
->>>> +void __init arm64_rsi_setup_memory(void)
->>>> +{
->>>> +    u64 i;
->>>> +    phys_addr_t start, end;
->>>> +
->>>> +    if (!is_realm_world())
->>>> +        return;
->>>> +
->>>> +    /*
->>>> +     * Iterate over the available memory ranges and convert the 
->>>> state to
->>> ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
->>>                                               blocks and convert them to
->>
->> TBH, I don't see any significant difference between the two. Am I
->> missing something ?
->>
-> 
-> for_each_mem_range() is a helper provided by memory block management 
-> module.
-> So 'memory block' sounds like more accurate than broadly used term "memory
-> range" here.
-> 
->>>
->>>> +     * protected memory. We should take extra care to ensure that 
->>>> we DO NOT
->>>> +     * permit any "DESTROYED" pages to be converted to "RAM".
->>>> +     *
->>>> +     * BUG_ON is used because if the attempt to switch the memory to
->>>> +     * protected has failed here, then future accesses to the 
->>>> memory are
->>>> +     * simply going to be reflected as a fault which we can't handle.
->>>> +     * Bailing out early prevents the guest limping on and dieing 
->>>> later.
->>>> +     */
->>>> +    for_each_mem_range(i, &start, &end) {
->>>> +        BUG_ON(rsi_set_memory_range_protected_safe(start, end));
->>>> +    }
->>>> +}
->>>> +
->>>
->>> If I'm understanding the code completely, this changes the memory 
->>> state from
->>> RIPAS_EMPTY to RIPAS_RAM so that the following page faults can be 
->>> routed to
->>> host properly. Otherwise, a SEA is injected to the realm according to
->>> tf-rmm/runtime/core/exit.c::handle_data_abort(). The comments can be 
->>> more
->>> explicit to replace "fault" with "SEA (Synchronous External Abort)".
->>
->> Agreed.  SEA is more accurate than fault.
->>
-> 
-> Ok.
-> 
->>>
->>> Besides, this forces a guest exit with reason RMI_EXIT_RIPAS_CHANGE 
->>> which is
->>> handled by the host, where RMI_RTT_SET_RIPAS is triggered to convert 
->>> the memory
->>> state from RIPAS_EMPTY to RIPAS_RAM. The question is why the 
->>> conversion can't
->>> be done by VMM (QEMU)?
->>
->> A VMM could potentially do this via INIT_RIPAS at Realm creation for
->> the entire RAM. But, as far as the Realm is concerned it is always 
->> safer to do this step and is relatively a lightweight operation at 
->> boot. Physical pages need not be allocated/mapped in stage2 with the 
->> IPA State change.
->>
-> 
-> Ok. Thanks for the explanation.
-> 
->>
->> Suzuki
->>>
->>>> +void __init arm64_rsi_init(void)
->>>> +{
->>>> +    /*
->>>> +     * If PSCI isn't using SMC, RMM isn't present. Don't try to 
->>>> execute an
->>>> +     * SMC as it could be UNDEFINED.
->>>> +     */
->>>> +    if (!psci_early_test_conduit(SMCCC_CONDUIT_SMC))
->>>> +        return;
->>>> +    if (!rsi_version_matches())
->>>> +        return;
->>>> +
->>>> +    static_branch_enable(&rsi_present);
->>>> +}
->>>> +
->>>> diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
->>>> index a096e2451044..143f87615af0 100644
->>>> --- a/arch/arm64/kernel/setup.c
->>>> +++ b/arch/arm64/kernel/setup.c
->>>> @@ -43,6 +43,7 @@
->>>>   #include <asm/cpu_ops.h>
->>>>   #include <asm/kasan.h>
->>>>   #include <asm/numa.h>
->>>> +#include <asm/rsi.h>
->>>>   #include <asm/scs.h>
->>>>   #include <asm/sections.h>
->>>>   #include <asm/setup.h>
->>>> @@ -293,6 +294,11 @@ void __init __no_sanitize_address 
->>>> setup_arch(char **cmdline_p)
->>>>        * cpufeature code and early parameters.
->>>>        */
->>>>       jump_label_init();
->>>> +    /*
->>>> +     * Init RSI before early param so that "earlycon" console uses the
->>>> +     * shared alias when in a realm
->>>> +     */
->>>> +    arm64_rsi_init();
->>>>       parse_early_param();
->>>>       dynamic_scs_init();
->>>> @@ -328,6 +334,8 @@ void __init __no_sanitize_address 
->>>> setup_arch(char **cmdline_p)
->>>>       arm64_memblock_init();
->>>> +    arm64_rsi_setup_memory();
->>>> +
->>>>       paging_init();
->>>>       acpi_table_upgrade();
->>>
-> 
-> Thanks,
-> Gavin
-> 
+Paolo
 
