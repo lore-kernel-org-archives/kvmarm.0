@@ -1,135 +1,202 @@
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AADEC1FB4
-	for <kvmarm@lists.linux.dev>; Wed, 31 Jul 2024 15:01:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F12F31BBBE6;
+	Wed, 31 Jul 2024 15:43:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722438084; cv=none; b=mP98QuW49r8adz09G/ajNOUrW50JTITALtrcXfFo30Zfng2wCYDLBf336uerdQoQBgdqOHZg63ZCjdg16pD+5GcwBssPnnYymlzCXKBAYpsCzjgLDxAvkK4VWiT9Zvn2SjwJX6iHnNraotu1tXaw7bOde1zVzGhGl1RKZXT8bq0=
+	t=1722440600; cv=none; b=BiSoOxDICrunaSPpjbEEBOs328hUU+vgSxJfSSh3iGoDNKFOJCc1yKuxJ0ueIqsT1I84jYTOL/29rwhhxEfD8B3Ixey0Vrm5KqPaTDlj2sfXRoihiYsrBEVbaRyEmLM7HXFE9XB5HUEZJxyUfEM4Oe7fG3iF+/eYOCK1lTwnrcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722438084; c=relaxed/simple;
-	bh=wUHLhFS9SdXHmqa3PQC6xsI/T85uU0FHGAHHTqH7qew=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=WJC0szHoCwRkw5VaChPpqNsLubY3Ny32kQMWilEpS4TFgXlXXe9sjabumrxrIKhPEqD3EXzkDIg4GEgnHQqsHdi7QVEifK4KJerKgtG1PNHCayb6wDyLLsht6j+XqND0y9/zZaa0ap/yIFhZ+HhQVFC3uC7C0Fde1XyOvmCa2t8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JAo8+erZ; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1722440600; c=relaxed/simple;
+	bh=G896pcxF3uDoNw8ktN8pUWQyBBes3qJ3pESAiQmRU8w=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=W4MmEoJQpMyxyQQ0lmL1wavRuloAlZOKWuUA1q6ht74kFKADZDhVv2gYaYlL4njt1Qj/PG4OJBnnhqKm253NoZzilG5MS5Wdm1pPtyiJl8/6Bi4dNX87j5cTxdoT50N+/A06XrEqt18Bauk7UeoABFYVfTAzmpl7EpB3vaPoW8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MufYV+Lb; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JAo8+erZ"
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-6fd42bf4316so4015015a12.2
-        for <kvmarm@lists.linux.dev>; Wed, 31 Jul 2024 08:01:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722438082; x=1723042882; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gNJBybQopQ2ZrxRweqcaE48I1KQGrUoMT3Gla2tgL0c=;
-        b=JAo8+erZQTnDW8xpNUTMdh24EWsjByQpWJ+D+Fq8UI91x9NLxDlqsPs6rjk53qt6I3
-         JydqqNHwLSZHRS7l/39RXP2Okg/CqViTLbLzbPqKzXowYAFHwIqdknsbckJL7YxAdluE
-         Pj897obdoAjC7tDSSgtfUCaHr83FxlEV7wBzcpaOug4hKvRGpcyhD5KCv62sXpsNujwG
-         3ovqNpAtH9RjWWh5WDVBd+5fy+cJ1VFMxGIdICnv/5SsYBSMeep6ACiUZ2doW1WJRs1F
-         6uxmcYZTis5UbVZ50dm8fRjOC7xymPWfYFkKhizQbDRD6bx4hvqnl4KUTwPGlCigtz/m
-         smCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722438082; x=1723042882;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=gNJBybQopQ2ZrxRweqcaE48I1KQGrUoMT3Gla2tgL0c=;
-        b=nWvkmH7AxGOWeoud9vgE6ZXO1kDyhJemZHYGdxYqyxvwM8L5igiqrFaqB791Uxm9QB
-         TWkztwGbms7C5Vim4sdPXGf5PjFj/2Jxw1O6zu6HaucKaScewwAtI7E41jL4Medwvk6u
-         K2XX8Yitmejdb2gdvWso+QWTxqk7F5UQz04GZmoF3kTtDkdjKJchB8+JRZizVvbJgI31
-         itvJ65aiODJ52/mwnGG7RAjMggNHPw6cWGzmTRWRAub0Hg7zhzxgypUZGrOOBjW0CPQ6
-         zLg5RNi5wqzgJs2xd6WuRv7rXvO4x4ePuxZs8kHTXiD2VfQD/idOhvm6dXaoUpNjdD0b
-         AZRw==
-X-Forwarded-Encrypted: i=1; AJvYcCUm8XBko0Zqu2+aP9AOU2kvA++x2P//Kn4kpzqBoT/mwe4a5gzW+dqE9neDfwQELQAsImUV7VYkXn9TMPloxL7dnjaTjxl8
-X-Gm-Message-State: AOJu0YyBLWyNk0uw13qZRZccfrc47xwE3oxqSBsbDrVNbVjT1dhzIrx/
-	FVdEGfge6NO21e9yIklWlKRiH7/jyzg6Az8z9rau9wvHLzEmLAF/yFmj7nTiAU0292IlztSu7Hm
-	Jcg==
-X-Google-Smtp-Source: AGHT+IGcAn8E6dkVWW8sE36BP9jCnCmxK5HfcNcn6NYUeDPjrXiDSAMLJMNmKjWnCHzC8DBP855Q/NibcH4=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a02:610:b0:7a1:6633:6a07 with SMTP id
- 41be03b00d2f7-7ac8dcbb142mr75473a12.2.1722438081874; Wed, 31 Jul 2024
- 08:01:21 -0700 (PDT)
-Date: Wed, 31 Jul 2024 08:01:20 -0700
-In-Reply-To: <87cymtdc0t.fsf@draig.linaro.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MufYV+Lb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B29DC116B1;
+	Wed, 31 Jul 2024 15:43:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722440599;
+	bh=G896pcxF3uDoNw8ktN8pUWQyBBes3qJ3pESAiQmRU8w=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=MufYV+LbD+Av80LGLnUf3eChdaZo/HaZgSHMhUzlCPdgj8dWzhXAGWrhzMh/eMx2i
+	 WrimB6SqZ+pq0DySwdmHBgNZJYuRwNhrZVFjZEUhF9oo5TxG72XtpaPdCrqkrWqeDk
+	 zcw8Unnck/ljSr3gfsUWIErN5bReAp8k7bnu/ZfTsURRnXxKcZx91ns8+WVPCmA0cV
+	 JpLhr4LMhP2tnfBc/entEDrCtNiFTBUL3rnt5HUAuJXuouUMbFIKW/vw+o6w6L8S8B
+	 92u2zx2nKsByRB1WfOdydUgZuOb76LY19Dt5LVHdpecH536paLdonU2qsX3ruXOis8
+	 NyW6KoY2rAlHg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sZBTw-00H31o-UA;
+	Wed, 31 Jul 2024 16:43:17 +0100
+Date: Wed, 31 Jul 2024 16:43:16 +0100
+Message-ID: <86r0b91sa3.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Joey Gouly <joey.gouly@arm.com>
+Subject: Re: [PATCH 10/12] KVM: arm64: nv: Add SW walker for AT S1 emulation
+In-Reply-To: <ZqpLNT8bVFDB6oWJ@raptor>
+References: <20240625133508.259829-1-maz@kernel.org>
+	<20240708165800.1220065-1-maz@kernel.org>
+	<ZqpLNT8bVFDB6oWJ@raptor>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.3
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20240229025759.1187910-1-stevensd@google.com> <ZnXHQid_N1w4kLoC@google.com>
- <87cymtdc0t.fsf@draig.linaro.org>
-Message-ID: <ZqpRwCKxVkDmmDB3@google.com>
-Subject: Re: [PATCH v11 0/8] KVM: allow mapping non-refcounted pages
-From: Sean Christopherson <seanjc@google.com>
-To: "Alex =?utf-8?Q?Benn=C3=A9e?=" <alex.bennee@linaro.org>
-Cc: David Stevens <stevensd@chromium.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Yu Zhang <yu.c.zhang@linux.intel.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	Zhi Wang <zhi.wang.linux@gmail.com>, Maxim Levitsky <mlevitsk@redhat.com>, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Jul 31, 2024, Alex Benn=C3=A9e wrote:
-> Sean Christopherson <seanjc@google.com> writes:
->=20
-> > On Thu, Feb 29, 2024, David Stevens wrote:
-> >> From: David Stevens <stevensd@chromium.org>
-> >>=20
-> >> This patch series adds support for mapping VM_IO and VM_PFNMAP memory
-> >> that is backed by struct pages that aren't currently being refcounted
-> >> (e.g. tail pages of non-compound higher order allocations) into the
-> >> guest.
-> >>=20
-> >> Our use case is virtio-gpu blob resources [1], which directly map host
-> >> graphics buffers into the guest as "vram" for the virtio-gpu device.
-> >> This feature currently does not work on systems using the amdgpu drive=
-r,
-> >> as that driver allocates non-compound higher order pages via
-> >> ttm_pool_alloc_page().
-> >>=20
-> >> First, this series replaces the gfn_to_pfn_memslot() API with a more
-> >> extensible kvm_follow_pfn() API. The updated API rearranges
-> >> gfn_to_pfn_memslot()'s args into a struct and where possible packs the
-> >> bool arguments into a FOLL_ flags argument. The refactoring changes do
-> >> not change any behavior.
-> >>=20
-> >> From there, this series extends the kvm_follow_pfn() API so that
-> >> non-refconuted pages can be safely handled. This invloves adding an
-> >> input parameter to indicate whether the caller can safely use
-> >> non-refcounted pfns and an output parameter to tell the caller whether
-> >> or not the returned page is refcounted. This change includes a breakin=
-g
-> >> change, by disallowing non-refcounted pfn mappings by default, as such
-> >> mappings are unsafe. To allow such systems to continue to function, an
-> >> opt-in module parameter is added to allow the unsafe behavior.
-> >>=20
-> >> This series only adds support for non-refcounted pages to x86. Other
-> >> MMUs can likely be updated without too much difficulty, but it is not
-> >> needed at this point. Updating other parts of KVM (e.g. pfncache) is n=
-ot
-> >> straightforward [2].
-> >
-> > FYI, on the off chance that someone else is eyeballing this, I am worki=
-ng on
-> > revamping this series.  It's still a ways out, but I'm optimistic that =
-we'll be
-> > able to address the concerns raised by Christoph and Christian, and may=
-be even
-> > get KVM out of the weeds straightaway (PPC looks thorny :-/).
->=20
-> I've applied this series to the latest 6.9.x while attempting to
-> diagnose some of the virtio-gpu problems it may or may not address.
-> However launching KVM guests keeps triggering a bunch of BUGs that
-> eventually leave a hung guest:
+On Wed, 31 Jul 2024 15:33:25 +0100,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Mon, Jul 08, 2024 at 05:57:58PM +0100, Marc Zyngier wrote:
+> > In order to plug the brokenness of our current AT implementation,
+> > we need a SW walker that is going to... err.. walk the S1 tables
+> > and tell us what it finds.
+> > 
+> > Of course, it builds on top of our S2 walker, and share similar
+> > concepts. The beauty of it is that since it uses kvm_read_guest(),
+> > it is able to bring back pages that have been otherwise evicted.
+> > 
+> > This is then plugged in the two AT S1 emulation functions as
+> > a "slow path" fallback. I'm not sure it is that slow, but hey.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/at.c | 538 ++++++++++++++++++++++++++++++++++++++++++--
+> >  1 file changed, 520 insertions(+), 18 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> > index 71e3390b43b4c..8452273cbff6d 100644
+> > --- a/arch/arm64/kvm/at.c
+> > +++ b/arch/arm64/kvm/at.c
+> > @@ -4,9 +4,305 @@
+> >   * Author: Jintack Lim <jintack.lim@linaro.org>
+> >   */
+> >  
+> > +#include <linux/kvm_host.h>
+> > +
+> > +#include <asm/esr.h>
+> >  #include <asm/kvm_hyp.h>
+> >  #include <asm/kvm_mmu.h>
+> >  
+> > +struct s1_walk_info {
+> > +	u64	     baddr;
+> > +	unsigned int max_oa_bits;
+> > +	unsigned int pgshift;
+> > +	unsigned int txsz;
+> > +	int 	     sl;
+> > +	bool	     hpd;
+> > +	bool	     be;
+> > +	bool	     nvhe;
+> > +	bool	     s2;
+> > +};
+> > +
+> > +struct s1_walk_result {
+> > +	union {
+> > +		struct {
+> > +			u64	desc;
+> > +			u64	pa;
+> > +			s8	level;
+> > +			u8	APTable;
+> > +			bool	UXNTable;
+> > +			bool	PXNTable;
+> > +		};
+> > +		struct {
+> > +			u8	fst;
+> > +			bool	ptw;
+> > +			bool	s2;
+> > +		};
+> > +	};
+> > +	bool	failed;
+> > +};
+> > +
+> > +static void fail_s1_walk(struct s1_walk_result *wr, u8 fst, bool ptw, bool s2)
+> > +{
+> > +	wr->fst		= fst;
+> > +	wr->ptw		= ptw;
+> > +	wr->s2		= s2;
+> > +	wr->failed	= true;
+> > +}
+> > +
+> > +#define S1_MMU_DISABLED		(-127)
+> > +
+> > +static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+> > +			 struct s1_walk_result *wr, const u64 va, const int el)
+> > +{
+> > +	u64 sctlr, tcr, tg, ps, ia_bits, ttbr;
+> > +	unsigned int stride, x;
+> > +	bool va55, tbi;
+> > +
+> > +	wi->nvhe = el == 2 && !vcpu_el2_e2h_is_set(vcpu);
+> > +
+> > +	va55 = va & BIT(55);
+> > +
+> > +	if (wi->nvhe && va55)
+> > +		goto addrsz;
+> > +
+> > +	wi->s2 = el < 2 && (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_VM);
+> > +
+> > +	switch (el) {
+> > +	case 1:
+> > +		sctlr	= vcpu_read_sys_reg(vcpu, SCTLR_EL1);
+> > +		tcr	= vcpu_read_sys_reg(vcpu, TCR_EL1);
+> > +		ttbr	= (va55 ?
+> > +			   vcpu_read_sys_reg(vcpu, TTBR1_EL1) :
+> > +			   vcpu_read_sys_reg(vcpu, TTBR0_EL1));
+> > +		break;
+> > +	case 2:
+> > +		sctlr	= vcpu_read_sys_reg(vcpu, SCTLR_EL2);
+> > +		tcr	= vcpu_read_sys_reg(vcpu, TCR_EL2);
+> > +		ttbr	= (va55 ?
+> > +			   vcpu_read_sys_reg(vcpu, TTBR1_EL2) :
+> > +			   vcpu_read_sys_reg(vcpu, TTBR0_EL2));
+> > +		break;
+> > +	default:
+> > +		BUG();
+> > +	}
+> > +
+> > +	/* Let's put the MMU disabled case aside immediately */
+> > +	if (!(sctlr & SCTLR_ELx_M) ||
+> > +	    (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_DC)) {
+> > +		if (va >= BIT(kvm_get_pa_bits(vcpu->kvm)))
+> 
+> As far as I can tell, if TBI, the pseudocode ignores bits 63:56 when checking
+> for out-of-bounds VA for the MMU disabled case (above) and the MMU enabled case
+> (below). That also matches the description of TBIx bits in the TCR_ELx
+> registers.
 
-Can you give v12 (which is comically large) a spin?  I still need to do mor=
-e
-testing, but if it too is buggy, I definitely want to know sooner than late=
-r.
+Right. Then the check needs to be hoisted up and the VA sanitised
+before we compare it to anything.
 
-Thanks!
+Thanks for all your review comments, but I am going to ask you to stop
+here. You are reviewing a pretty old code base, and although I'm sure
+you look at what is in my tree, I'd really like to post a new version
+for everyone to enjoy.
 
-https://lore.kernel.org/all/20240726235234.228822-1-seanjc@google.com
+I'll stash that last change on top and post the result.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
