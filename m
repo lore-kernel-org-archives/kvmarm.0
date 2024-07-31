@@ -1,24 +1,24 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC8011A8C12
-	for <kvmarm@lists.linux.dev>; Wed, 31 Jul 2024 09:53:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4AC71A8C14
+	for <kvmarm@lists.linux.dev>; Wed, 31 Jul 2024 10:05:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722419602; cv=none; b=p7IQOMFDiFsV4gH1SjPcK4x3Ny7z+1Ov0hZ4SO9UEr2y4UCBK+BJuCuiNEPPhQVKiAET8BTTVds1PIKRvtLE2AxzKhWnVi6sl6VNspbTkP/h35IDH8RArp9rzcoBspXWct2ti3qSQDLAVKBLvVIb9Hk8bYgN/w+rSk8q7Dc98PQ=
+	t=1722420313; cv=none; b=tGwQgl+uQFl8qjSwhZF4A9nSWelMEe90lTRiBZBmRspaka5nddd7ewOfS0tJpXa8mGj+jGsnovdEBRNdmc+9FHCkuhdmuqTdZts4ted7rM365+DoD6mf7Veh12euS+VilRAwc36Pj3wPP2CtbfFOK/cc1EFlrG70AmHTuwUBcRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722419602; c=relaxed/simple;
-	bh=OJIosK3Ql2nbnFRp+YXJmhi072hMp3NTP8G7ibcFI9I=;
+	s=arc-20240116; t=1722420313; c=relaxed/simple;
+	bh=K+vD9/aMeC1TJMgPdGGFbotOzCqA5/w8SWFYS2npk0I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TTSkUmfenPKILHtcuTb5/HQCOe/6jWUk9nv60Vw7mrIXu8FTqjxxI3WL+w17SbgSl1nFPfMpmLEES+Depsb01EWFb2MIjsDKNCBVE/WTsgdTj21weHgZ9y5gyjD/jd8BGMA/FBsPRL5YRgXzEowJsPC4aiBt1weHQPAAFhA4G50=
+	 Content-Type:Content-Disposition:In-Reply-To; b=OJ/i54RUnmR4tBRJ43DawaKrcX/aaaOL3JF7Vo0B6KTXJNzwyrznwtxBF+pNScyWl+8GqIQZbH3dvN7hVK8nLhFDdscWNUgwHLMG1PK39w3d2xVNnSN037FM9wKNvtHDCvXM3WTDvWIOQKznFC0F8WgT7agr5FZZrOlQWwkHR8o=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CD5831007;
-	Wed, 31 Jul 2024 02:53:44 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 49EBF1007;
+	Wed, 31 Jul 2024 03:05:35 -0700 (PDT)
 Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7C40C3F5A1;
-	Wed, 31 Jul 2024 02:53:17 -0700 (PDT)
-Date: Wed, 31 Jul 2024 10:53:14 +0100
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0D7233F5A1;
+	Wed, 31 Jul 2024 03:05:07 -0700 (PDT)
+Date: Wed, 31 Jul 2024 11:05:05 +0100
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: Marc Zyngier <maz@kernel.org>
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
@@ -26,12 +26,10 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>, Joey Gouly <joey.gouly@arm.com>
-Subject: Re: [PATCH 10/12] KVM: arm64: nv: Add SW walker for AT S1 emulation
-Message-ID: <ZqoJiiNPWBtRhRur@raptor>
+Subject: Re: [PATCH 00/12] KVM: arm64: nv: Add support for address
+ translation instructions
+Message-ID: <ZqoMUb_Q6n8J_pYq@raptor>
 References: <20240625133508.259829-1-maz@kernel.org>
- <20240708165800.1220065-1-maz@kernel.org>
- <Zqe0iBtD4389Lhei@raptor>
- <86v80m0wlb.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -40,130 +38,91 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <86v80m0wlb.wl-maz@kernel.org>
+In-Reply-To: <20240625133508.259829-1-maz@kernel.org>
 
-Hi,
+Hi Marc,
 
-On Wed, Jul 31, 2024 at 09:55:28AM +0100, Marc Zyngier wrote:
-> On Mon, 29 Jul 2024 16:26:00 +0100,
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> > 
-> > Hi Marc,
-> > 
-> > On Mon, Jul 08, 2024 at 05:57:58PM +0100, Marc Zyngier wrote:
-> > > In order to plug the brokenness of our current AT implementation,
-> > > we need a SW walker that is going to... err.. walk the S1 tables
-> > > and tell us what it finds.
-> > > 
-> > > Of course, it builds on top of our S2 walker, and share similar
-> > > concepts. The beauty of it is that since it uses kvm_read_guest(),
-> > > it is able to bring back pages that have been otherwise evicted.
-> > > 
-> > > This is then plugged in the two AT S1 emulation functions as
-> > > a "slow path" fallback. I'm not sure it is that slow, but hey.
-> > > 
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > ---
-> > >  arch/arm64/kvm/at.c | 538 ++++++++++++++++++++++++++++++++++++++++++--
-> > >  1 file changed, 520 insertions(+), 18 deletions(-)
-> > > 
-> > > diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-> > > index 71e3390b43b4c..8452273cbff6d 100644
-> > > --- a/arch/arm64/kvm/at.c
-> > > +++ b/arch/arm64/kvm/at.c
-> > > @@ -4,9 +4,305 @@
-> > >   * Author: Jintack Lim <jintack.lim@linaro.org>
-> > >   */
-> > >  
-> > > +#include <linux/kvm_host.h>
-> > > +
-> > > +#include <asm/esr.h>
-> > >  #include <asm/kvm_hyp.h>
-> > >  #include <asm/kvm_mmu.h>
-> > >  
-> > > +struct s1_walk_info {
-> > > +	u64	     baddr;
-> > > +	unsigned int max_oa_bits;
-> > > +	unsigned int pgshift;
-> > > +	unsigned int txsz;
-> > > +	int 	     sl;
-> > > +	bool	     hpd;
-> > > +	bool	     be;
-> > > +	bool	     nvhe;
-> > > +	bool	     s2;
-> > > +};
-> > > +
-> > > +struct s1_walk_result {
-> > > +	union {
-> > > +		struct {
-> > > +			u64	desc;
-> > > +			u64	pa;
-> > > +			s8	level;
-> > > +			u8	APTable;
-> > > +			bool	UXNTable;
-> > > +			bool	PXNTable;
-> > > +		};
-> > > +		struct {
-> > > +			u8	fst;
-> > > +			bool	ptw;
-> > > +			bool	s2;
-> > > +		};
-> > > +	};
-> > > +	bool	failed;
-> > > +};
-> > > +
-> > > +static void fail_s1_walk(struct s1_walk_result *wr, u8 fst, bool ptw, bool s2)
-> > > +{
-> > > +	wr->fst		= fst;
-> > > +	wr->ptw		= ptw;
-> > > +	wr->s2		= s2;
-> > > +	wr->failed	= true;
-> > > +}
-> > > +
-> > > +#define S1_MMU_DISABLED		(-127)
-> > > +
-> > > +static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
-> > > +			 struct s1_walk_result *wr, const u64 va, const int el)
-> > > +{
-> > > +	u64 sctlr, tcr, tg, ps, ia_bits, ttbr;
-> > > +	unsigned int stride, x;
-> > > +	bool va55, tbi;
-> > > +
-> > > +	wi->nvhe = el == 2 && !vcpu_el2_e2h_is_set(vcpu);
-> > 
-> > Where 'el' is computed in handle_at_slow() as:
-> > 
-> > 	/*
-> > 	 * We only get here from guest EL2, so the translation regime
-> > 	 * AT applies to is solely defined by {E2H,TGE}.
-> > 	 */
-> > 	el = (vcpu_el2_e2h_is_set(vcpu) &&
-> > 	      vcpu_el2_tge_is_set(vcpu)) ? 2 : 1;
-> > 
-> > I think 'nvhe' will always be false ('el' is 2 only when E2H is
-> > set).
-> 
-> Yeah, there is a number of problems here. el should depend on both the
-> instruction (some are EL2-specific) and the HCR control bits. I'll
-> tackle that now.
+On Tue, Jun 25, 2024 at 02:34:59PM +0100, Marc Zyngier wrote:
+> Another task that a hypervisor supporting NV on arm64 has to deal with
+> is to emulate the AT instruction, because we multiplex all the S1
+> translations on a single set of registers, and the guest S2 is never
+> truly resident on the CPU.
 
-Yeah, also noticed that how sctlr, tcr and ttbr are chosen in setup_s1_walk()
-doesn't look quite right for the nvhe case.
+I'm unfamiliar with the state of NV support in KVM, but I thought I would have a
+look at when AT trapping is enabled. As far as I can tell, it's only enabled in
+vhe/switch.c::__activate_traps() -> compute_hcr() if is_hyp_ctct(vcpu). Found
+this by grep'ing for HCR_AT.
 
-> 
-> > I'm curious about what 'el' represents. The translation regime for the AT
-> > instruction?
-> 
-> Exactly that.
+Assuming the above is correct, I am curious about the following:
 
-Might I make a suggestion here? I was thinking about dropping the (el, wi-nvhe*)
-tuple to represent the translation regime and have a wi->regime (or similar) to
-unambiguously encode the regime. The value can be an enum with three values to
-represent the three possible regimes (REGIME_EL10, REGIME_EL2, REGIME_EL20).
+- The above paragraph mentions guest's stage 2 (and the code takes that into
+  consideration), yet when is_hyp_ctxt() is true it is likely that the guest
+  stage 2 is not enabled. Are you planning to enable the AT trap based on
+  virtual HCR_EL2.VM being set in a later series?
 
-Just a thought though, feel free to ignore at your leisure.
-
-*wi->single_range on the kvm-arm64/nv-at-pan-WIP branch.
+- A guest might also set the HCR_EL2.AT bit in the virtual HCR_EL2 register. I
+  suppose I have the same question, injecting the exception back into the guest
+  is going to be handled in another series?
 
 Thanks,
 Alex
+
+> 
+> So given that we lie about page tables, we also have to lie about
+> translation instructions, hence the emulation. Things are made
+> complicated by the fact that guest S1 page tables can be swapped out,
+> and that our shadow S2 is likely to be incomplete. So while using AT
+> to emulate AT is tempting (and useful), it is not going to always
+> work, and we thus need a fallback in the shape of a SW S1 walker.
+> 
+> This series is built in 4 basic blocks:
+> 
+> - Add missing definition and basic reworking
+> 
+> - Dumb emulation of all relevant AT instructions using AT instructions
+> 
+> - Add a SW S1 walker that is using our S2 walker
+> 
+> - Add FEAT_ATS1A support, which is almost trivial
+> 
+> This has been tested by comparing the output of a HW walker with the
+> output of the SW one. Obviously, this isn't bullet proof, and I'm
+> pretty sure there are some nasties in there.
+> 
+> In a departure from my usual habit, this series is on top of
+> kvmarm/next, as it depends on the NV S2 shadow code.
+> 
+> Joey Gouly (1):
+>   KVM: arm64: make kvm_at() take an OP_AT_*
+> 
+> Marc Zyngier (11):
+>   arm64: Add missing APTable and TCR_ELx.HPD masks
+>   arm64: Add PAR_EL1 field description
+>   KVM: arm64: nv: Turn upper_attr for S2 walk into the full descriptor
+>   KVM: arm64: nv: Honor absence of FEAT_PAN2
+>   KVM: arm64: nv: Add basic emulation of AT S1E{0,1}{R,W}[P]
+>   KVM: arm64: nv: Add basic emulation of AT S1E2{R,W}
+>   KVM: arm64: nv: Add emulation of AT S12E{0,1}{R,W}
+>   KVM: arm64: nv: Make ps_to_output_size() generally available
+>   KVM: arm64: nv: Add SW walker for AT S1 emulation
+>   KVM: arm64: nv: Plumb handling of AT S1* traps from EL2
+>   KVM: arm64: nv: Add support for FEAT_ATS1A
+> 
+>  arch/arm64/include/asm/kvm_arm.h       |    1 +
+>  arch/arm64/include/asm/kvm_asm.h       |    6 +-
+>  arch/arm64/include/asm/kvm_nested.h    |   18 +-
+>  arch/arm64/include/asm/pgtable-hwdef.h |    7 +
+>  arch/arm64/include/asm/sysreg.h        |   19 +
+>  arch/arm64/kvm/Makefile                |    2 +-
+>  arch/arm64/kvm/at.c                    | 1007 ++++++++++++++++++++++++
+>  arch/arm64/kvm/emulate-nested.c        |    2 +
+>  arch/arm64/kvm/hyp/include/hyp/fault.h |    2 +-
+>  arch/arm64/kvm/nested.c                |   26 +-
+>  arch/arm64/kvm/sys_regs.c              |   60 ++
+>  11 files changed, 1125 insertions(+), 25 deletions(-)
+>  create mode 100644 arch/arm64/kvm/at.c
+> 
+> -- 
+> 2.39.2
+> 
+> 
