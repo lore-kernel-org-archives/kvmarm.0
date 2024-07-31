@@ -1,202 +1,181 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F12F31BBBE6;
-	Wed, 31 Jul 2024 15:43:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10A1A1B5824
+	for <kvmarm@lists.linux.dev>; Wed, 31 Jul 2024 16:05:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722440600; cv=none; b=BiSoOxDICrunaSPpjbEEBOs328hUU+vgSxJfSSh3iGoDNKFOJCc1yKuxJ0ueIqsT1I84jYTOL/29rwhhxEfD8B3Ixey0Vrm5KqPaTDlj2sfXRoihiYsrBEVbaRyEmLM7HXFE9XB5HUEZJxyUfEM4Oe7fG3iF+/eYOCK1lTwnrcM=
+	t=1722441930; cv=none; b=qlEA2ySaqTQAumII2hHJ+ZyGlMV5wZCUcFpTsMpIn9/W9rsFAjDAmbSFGqHwvHDeg3qaSOdm8a+4V6uE19WDVAEwIwof/s0zFOitkDGwKsiW/r4FboBoK8YNkRHZut+LIDiXLkX77O4HXWzqDoKUFSWDzvxkeG8twLJG1VYdQJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722440600; c=relaxed/simple;
-	bh=G896pcxF3uDoNw8ktN8pUWQyBBes3qJ3pESAiQmRU8w=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=W4MmEoJQpMyxyQQ0lmL1wavRuloAlZOKWuUA1q6ht74kFKADZDhVv2gYaYlL4njt1Qj/PG4OJBnnhqKm253NoZzilG5MS5Wdm1pPtyiJl8/6Bi4dNX87j5cTxdoT50N+/A06XrEqt18Bauk7UeoABFYVfTAzmpl7EpB3vaPoW8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MufYV+Lb; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MufYV+Lb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B29DC116B1;
-	Wed, 31 Jul 2024 15:43:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722440599;
-	bh=G896pcxF3uDoNw8ktN8pUWQyBBes3qJ3pESAiQmRU8w=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MufYV+LbD+Av80LGLnUf3eChdaZo/HaZgSHMhUzlCPdgj8dWzhXAGWrhzMh/eMx2i
-	 WrimB6SqZ+pq0DySwdmHBgNZJYuRwNhrZVFjZEUhF9oo5TxG72XtpaPdCrqkrWqeDk
-	 zcw8Unnck/ljSr3gfsUWIErN5bReAp8k7bnu/ZfTsURRnXxKcZx91ns8+WVPCmA0cV
-	 JpLhr4LMhP2tnfBc/entEDrCtNiFTBUL3rnt5HUAuJXuouUMbFIKW/vw+o6w6L8S8B
-	 92u2zx2nKsByRB1WfOdydUgZuOb76LY19Dt5LVHdpecH536paLdonU2qsX3ruXOis8
-	 NyW6KoY2rAlHg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sZBTw-00H31o-UA;
-	Wed, 31 Jul 2024 16:43:17 +0100
-Date: Wed, 31 Jul 2024 16:43:16 +0100
-Message-ID: <86r0b91sa3.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
+	s=arc-20240116; t=1722441930; c=relaxed/simple;
+	bh=u3EFQ8M28u9qY6CANyuFcamS2Vh7fWSDEBXMErYDl/Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tM9YwV97LuzTk+BuVKtjv22sTuxLgD+ebAEOl+5MsvFkP7kymlM1fhe3AMSrlJS1SkT7Br2V+sSDap6V/vXtTBpbAoM9LtcxXJhUwuCQtXyS5pByK9T5n6BNFKBIKI5a9qL4fMFQu9A29vFUOelo5ovaPGPbtZCu+wpdX8Vci+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 05E7D1007;
+	Wed, 31 Jul 2024 09:05:52 -0700 (PDT)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BC8E73F5A1;
+	Wed, 31 Jul 2024 09:05:24 -0700 (PDT)
+Date: Wed, 31 Jul 2024 17:05:21 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Joey Gouly <joey.gouly@arm.com>
+	Zenghui Yu <yuzenghui@huawei.com>, Joey Gouly <joey.gouly@arm.com>
 Subject: Re: [PATCH 10/12] KVM: arm64: nv: Add SW walker for AT S1 emulation
-In-Reply-To: <ZqpLNT8bVFDB6oWJ@raptor>
+Message-ID: <ZqpgwaNzZbE-seyC@raptor>
 References: <20240625133508.259829-1-maz@kernel.org>
-	<20240708165800.1220065-1-maz@kernel.org>
-	<ZqpLNT8bVFDB6oWJ@raptor>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.3
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <20240708165800.1220065-1-maz@kernel.org>
+ <ZqpLNT8bVFDB6oWJ@raptor>
+ <86r0b91sa3.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86r0b91sa3.wl-maz@kernel.org>
 
-On Wed, 31 Jul 2024 15:33:25 +0100,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+Hi Marc,
+
+On Wed, Jul 31, 2024 at 04:43:16PM +0100, Marc Zyngier wrote:
+> On Wed, 31 Jul 2024 15:33:25 +0100,
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> > 
+> > Hi Marc,
+> > 
+> > On Mon, Jul 08, 2024 at 05:57:58PM +0100, Marc Zyngier wrote:
+> > > In order to plug the brokenness of our current AT implementation,
+> > > we need a SW walker that is going to... err.. walk the S1 tables
+> > > and tell us what it finds.
+> > > 
+> > > Of course, it builds on top of our S2 walker, and share similar
+> > > concepts. The beauty of it is that since it uses kvm_read_guest(),
+> > > it is able to bring back pages that have been otherwise evicted.
+> > > 
+> > > This is then plugged in the two AT S1 emulation functions as
+> > > a "slow path" fallback. I'm not sure it is that slow, but hey.
+> > > 
+> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > > ---
+> > >  arch/arm64/kvm/at.c | 538 ++++++++++++++++++++++++++++++++++++++++++--
+> > >  1 file changed, 520 insertions(+), 18 deletions(-)
+> > > 
+> > > diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> > > index 71e3390b43b4c..8452273cbff6d 100644
+> > > --- a/arch/arm64/kvm/at.c
+> > > +++ b/arch/arm64/kvm/at.c
+> > > @@ -4,9 +4,305 @@
+> > >   * Author: Jintack Lim <jintack.lim@linaro.org>
+> > >   */
+> > >  
+> > > +#include <linux/kvm_host.h>
+> > > +
+> > > +#include <asm/esr.h>
+> > >  #include <asm/kvm_hyp.h>
+> > >  #include <asm/kvm_mmu.h>
+> > >  
+> > > +struct s1_walk_info {
+> > > +	u64	     baddr;
+> > > +	unsigned int max_oa_bits;
+> > > +	unsigned int pgshift;
+> > > +	unsigned int txsz;
+> > > +	int 	     sl;
+> > > +	bool	     hpd;
+> > > +	bool	     be;
+> > > +	bool	     nvhe;
+> > > +	bool	     s2;
+> > > +};
+> > > +
+> > > +struct s1_walk_result {
+> > > +	union {
+> > > +		struct {
+> > > +			u64	desc;
+> > > +			u64	pa;
+> > > +			s8	level;
+> > > +			u8	APTable;
+> > > +			bool	UXNTable;
+> > > +			bool	PXNTable;
+> > > +		};
+> > > +		struct {
+> > > +			u8	fst;
+> > > +			bool	ptw;
+> > > +			bool	s2;
+> > > +		};
+> > > +	};
+> > > +	bool	failed;
+> > > +};
+> > > +
+> > > +static void fail_s1_walk(struct s1_walk_result *wr, u8 fst, bool ptw, bool s2)
+> > > +{
+> > > +	wr->fst		= fst;
+> > > +	wr->ptw		= ptw;
+> > > +	wr->s2		= s2;
+> > > +	wr->failed	= true;
+> > > +}
+> > > +
+> > > +#define S1_MMU_DISABLED		(-127)
+> > > +
+> > > +static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+> > > +			 struct s1_walk_result *wr, const u64 va, const int el)
+> > > +{
+> > > +	u64 sctlr, tcr, tg, ps, ia_bits, ttbr;
+> > > +	unsigned int stride, x;
+> > > +	bool va55, tbi;
+> > > +
+> > > +	wi->nvhe = el == 2 && !vcpu_el2_e2h_is_set(vcpu);
+> > > +
+> > > +	va55 = va & BIT(55);
+> > > +
+> > > +	if (wi->nvhe && va55)
+> > > +		goto addrsz;
+> > > +
+> > > +	wi->s2 = el < 2 && (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_VM);
+> > > +
+> > > +	switch (el) {
+> > > +	case 1:
+> > > +		sctlr	= vcpu_read_sys_reg(vcpu, SCTLR_EL1);
+> > > +		tcr	= vcpu_read_sys_reg(vcpu, TCR_EL1);
+> > > +		ttbr	= (va55 ?
+> > > +			   vcpu_read_sys_reg(vcpu, TTBR1_EL1) :
+> > > +			   vcpu_read_sys_reg(vcpu, TTBR0_EL1));
+> > > +		break;
+> > > +	case 2:
+> > > +		sctlr	= vcpu_read_sys_reg(vcpu, SCTLR_EL2);
+> > > +		tcr	= vcpu_read_sys_reg(vcpu, TCR_EL2);
+> > > +		ttbr	= (va55 ?
+> > > +			   vcpu_read_sys_reg(vcpu, TTBR1_EL2) :
+> > > +			   vcpu_read_sys_reg(vcpu, TTBR0_EL2));
+> > > +		break;
+> > > +	default:
+> > > +		BUG();
+> > > +	}
+> > > +
+> > > +	/* Let's put the MMU disabled case aside immediately */
+> > > +	if (!(sctlr & SCTLR_ELx_M) ||
+> > > +	    (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_DC)) {
+> > > +		if (va >= BIT(kvm_get_pa_bits(vcpu->kvm)))
+> > 
+> > As far as I can tell, if TBI, the pseudocode ignores bits 63:56 when checking
+> > for out-of-bounds VA for the MMU disabled case (above) and the MMU enabled case
+> > (below). That also matches the description of TBIx bits in the TCR_ELx
+> > registers.
 > 
-> Hi Marc,
+> Right. Then the check needs to be hoisted up and the VA sanitised
+> before we compare it to anything.
 > 
-> On Mon, Jul 08, 2024 at 05:57:58PM +0100, Marc Zyngier wrote:
-> > In order to plug the brokenness of our current AT implementation,
-> > we need a SW walker that is going to... err.. walk the S1 tables
-> > and tell us what it finds.
-> > 
-> > Of course, it builds on top of our S2 walker, and share similar
-> > concepts. The beauty of it is that since it uses kvm_read_guest(),
-> > it is able to bring back pages that have been otherwise evicted.
-> > 
-> > This is then plugged in the two AT S1 emulation functions as
-> > a "slow path" fallback. I'm not sure it is that slow, but hey.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/at.c | 538 ++++++++++++++++++++++++++++++++++++++++++--
-> >  1 file changed, 520 insertions(+), 18 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-> > index 71e3390b43b4c..8452273cbff6d 100644
-> > --- a/arch/arm64/kvm/at.c
-> > +++ b/arch/arm64/kvm/at.c
-> > @@ -4,9 +4,305 @@
-> >   * Author: Jintack Lim <jintack.lim@linaro.org>
-> >   */
-> >  
-> > +#include <linux/kvm_host.h>
-> > +
-> > +#include <asm/esr.h>
-> >  #include <asm/kvm_hyp.h>
-> >  #include <asm/kvm_mmu.h>
-> >  
-> > +struct s1_walk_info {
-> > +	u64	     baddr;
-> > +	unsigned int max_oa_bits;
-> > +	unsigned int pgshift;
-> > +	unsigned int txsz;
-> > +	int 	     sl;
-> > +	bool	     hpd;
-> > +	bool	     be;
-> > +	bool	     nvhe;
-> > +	bool	     s2;
-> > +};
-> > +
-> > +struct s1_walk_result {
-> > +	union {
-> > +		struct {
-> > +			u64	desc;
-> > +			u64	pa;
-> > +			s8	level;
-> > +			u8	APTable;
-> > +			bool	UXNTable;
-> > +			bool	PXNTable;
-> > +		};
-> > +		struct {
-> > +			u8	fst;
-> > +			bool	ptw;
-> > +			bool	s2;
-> > +		};
-> > +	};
-> > +	bool	failed;
-> > +};
-> > +
-> > +static void fail_s1_walk(struct s1_walk_result *wr, u8 fst, bool ptw, bool s2)
-> > +{
-> > +	wr->fst		= fst;
-> > +	wr->ptw		= ptw;
-> > +	wr->s2		= s2;
-> > +	wr->failed	= true;
-> > +}
-> > +
-> > +#define S1_MMU_DISABLED		(-127)
-> > +
-> > +static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
-> > +			 struct s1_walk_result *wr, const u64 va, const int el)
-> > +{
-> > +	u64 sctlr, tcr, tg, ps, ia_bits, ttbr;
-> > +	unsigned int stride, x;
-> > +	bool va55, tbi;
-> > +
-> > +	wi->nvhe = el == 2 && !vcpu_el2_e2h_is_set(vcpu);
-> > +
-> > +	va55 = va & BIT(55);
-> > +
-> > +	if (wi->nvhe && va55)
-> > +		goto addrsz;
-> > +
-> > +	wi->s2 = el < 2 && (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_VM);
-> > +
-> > +	switch (el) {
-> > +	case 1:
-> > +		sctlr	= vcpu_read_sys_reg(vcpu, SCTLR_EL1);
-> > +		tcr	= vcpu_read_sys_reg(vcpu, TCR_EL1);
-> > +		ttbr	= (va55 ?
-> > +			   vcpu_read_sys_reg(vcpu, TTBR1_EL1) :
-> > +			   vcpu_read_sys_reg(vcpu, TTBR0_EL1));
-> > +		break;
-> > +	case 2:
-> > +		sctlr	= vcpu_read_sys_reg(vcpu, SCTLR_EL2);
-> > +		tcr	= vcpu_read_sys_reg(vcpu, TCR_EL2);
-> > +		ttbr	= (va55 ?
-> > +			   vcpu_read_sys_reg(vcpu, TTBR1_EL2) :
-> > +			   vcpu_read_sys_reg(vcpu, TTBR0_EL2));
-> > +		break;
-> > +	default:
-> > +		BUG();
-> > +	}
-> > +
-> > +	/* Let's put the MMU disabled case aside immediately */
-> > +	if (!(sctlr & SCTLR_ELx_M) ||
-> > +	    (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_DC)) {
-> > +		if (va >= BIT(kvm_get_pa_bits(vcpu->kvm)))
-> 
-> As far as I can tell, if TBI, the pseudocode ignores bits 63:56 when checking
-> for out-of-bounds VA for the MMU disabled case (above) and the MMU enabled case
-> (below). That also matches the description of TBIx bits in the TCR_ELx
-> registers.
+> Thanks for all your review comments, but I am going to ask you to stop
+> here. You are reviewing a pretty old code base, and although I'm sure
+> you look at what is in my tree, I'd really like to post a new version
+> for everyone to enjoy.
 
-Right. Then the check needs to be hoisted up and the VA sanitised
-before we compare it to anything.
+Got it.
 
-Thanks for all your review comments, but I am going to ask you to stop
-here. You are reviewing a pretty old code base, and although I'm sure
-you look at what is in my tree, I'd really like to post a new version
-for everyone to enjoy.
-
-I'll stash that last change on top and post the result.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+Alex
