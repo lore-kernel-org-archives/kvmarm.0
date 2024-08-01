@@ -1,157 +1,125 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2E501A57DA
-	for <kvmarm@lists.linux.dev>; Thu,  1 Aug 2024 14:43:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A29616C695
+	for <kvmarm@lists.linux.dev>; Thu,  1 Aug 2024 15:54:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722523397; cv=none; b=OzbTNlC4dyHAPARifgjZcqQnKHiAR89PZjeAUJHdtEYNdKPXcvCTZyAy1Oo9SWlzssqLe4+Ho+osx6MsUBIhREHAYqkHqcgdaq7koVrC0WPzGyXxNZ5SjRTdLJjaTR1CAiON4zhg5TaUSqStA2nufH8blOgnunQJBFhqZt+QO5o=
+	t=1722527688; cv=none; b=uadqv7M84P4KcuUSQpv23POCetqIPm0bC3SPCo9TqByqaxVsoIRf/4Me7/DUM0hIYrAEYUwDmO+60Xg8TnXU8AyBd+nbXryaNDNJq0GlcdjG3ZZEGAe3VmkmJvjrjUScdBaAMUoavazh2cWyzQM7iKudsQMEmxsVkbQv578ekXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722523397; c=relaxed/simple;
-	bh=IsY6cT/EMNbdEHxsGGmKU2yom71VQGN3eoqzlVoDRMA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Vojookl6i9yIjjI082PvGRI5yX0QXi/C2NvxzlKTImBAC3ifwsFiWqQjghKGV5fEfgbWzRKCQGQyiRFL8j6d4RVDDn+uHIMiS6CNeM8p1n+YpwjjK5Tili0VHFyRlGr2r7y/wTN+1HDihEMRNKwoldV2wtw3D0U+U9GuEj4RWBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ATCP681e; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ATCP681e"
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e0b7922ed63so8248284276.0
-        for <kvmarm@lists.linux.dev>; Thu, 01 Aug 2024 07:43:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722523395; x=1723128195; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9BUCK9RfTKafiexBRvCEwFw2qC43V57hNjDHfumiy08=;
-        b=ATCP681eu6Kt/PIShW2CFNQX/BZoqW5aNGnpvDNef2M3MXvAQmWNK5JwOkQ8Dvxorc
-         1aj/D4P+2OyWlPKbFiUz6tCYOdRcGzUJnwU2rsLJ/QruRyHY43meKFIpeIZ1/a5fmfyS
-         5TAMilY26MdtIiZRRY3FJIyek184T9YAujscE31mFTsPlxRyzzWFiefUIX5R3HZcxuCO
-         EjBTf6hAZJTOkJOR5lL/dQ/fK7KphemfBeBLaUQNfUxltSQGXTxYB6hirwviflWhMBbP
-         TA5Xw1S3AKPAcA2TUruA1zOSI1TcToobJBiWeurOOkms4kqd/odRgu4/J3YqeWgxI+T5
-         su4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722523395; x=1723128195;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=9BUCK9RfTKafiexBRvCEwFw2qC43V57hNjDHfumiy08=;
-        b=f2N4kzWi6XlLI3++HYkV85cYgKdDn31VSPa/5bjFPimdaBBXroE9YBtJzNxmnS8MnX
-         vFcCTNR++jtm5YjsEmWCuEUaXHp4NONrPHt+tIZmxwxdY7GZbOVxvc2Y30JFf9OnGvpU
-         oR+mHi3HsXkKZCtpKzmD1IlW9uDRROTM2842RdOAkboybhMVuli1vqHetsdo38mMW4Do
-         unj/tXWbwJmRSbSOXCR5ZzdoEhDli9ORXHHF7l54x9XDICk3WC7i4t2G/5WZFt+Vi+px
-         tAvEVdD5hYXyrHyR+T65xKLsk2UEIN+QoY2LCiIVAgAwkhC2ksKgNNvq7is9vd3yKryy
-         r3IQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUTiA2hHvOCjE894ANMyO3gOuT37BLwr0TtWRrwxHeM9y+lCOBSl5Ietvd48zWg6ePft9a/S4bRkKXQUxj9oS5djeU2td5g
-X-Gm-Message-State: AOJu0YwtRmHYBeIkw3zPTQRRta43j7X6oVGmwV283Mm6ByW07mXbFjHC
-	j+x28IDBM1qgt/KOZj2QkBN+vzrbE8wv3fIebttVv+9ey5AOSctVaZ2rW+0ruHoxgkt6TEBnc5I
-	SVw==
-X-Google-Smtp-Source: AGHT+IHkE7Ce/eHqXIIWUhOrz6iZ7wUAM+0kNmbjyrQoG1wEe6+vtvmxZ2gwjb9N0RAQKGaJuDaT2daG0VE=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1104:b0:e0b:b6f3:85 with SMTP id
- 3f1490d57ef6-e0bde2f0105mr658276.2.1722523394843; Thu, 01 Aug 2024 07:43:14
- -0700 (PDT)
-Date: Thu, 1 Aug 2024 07:43:13 -0700
-In-Reply-To: <87wml0egzo.fsf@draig.linaro.org>
+	s=arc-20240116; t=1722527688; c=relaxed/simple;
+	bh=3K7h6kqYrpVVi3yJIDa/MfHmTk3MeT2DYdT5sel9lyo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hm4dUcpBaEGnKo1FYTcANB+f3UF2P4veDMFuXwCoFNQbEUvCqAlUFe8sLdJCn5gWC2vGvKKftDkq/+gtDbFSW+eIWs4yMdHx/au1wNCTz+MsnzzeaCi9hBauXvX3QaD2+hYbWM5gtiQkoV3Lr+2dLeg7uB8BdNGlx6+o34RFca0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EB88115A1;
+	Thu,  1 Aug 2024 08:55:11 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 33D933F5A1;
+	Thu,  1 Aug 2024 08:54:43 -0700 (PDT)
+Date: Thu, 1 Aug 2024 16:54:41 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
+	aneesh.kumar@kernel.org, aneesh.kumar@linux.ibm.com, bp@alien8.de,
+	broonie@kernel.org, catalin.marinas@arm.com,
+	christophe.leroy@csgroup.eu, dave.hansen@linux.intel.com,
+	hpa@zytor.com, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
+	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
+	oliver.upton@linux.dev, shuah@kernel.org, szabolcs.nagy@arm.com,
+	tglx@linutronix.de, will@kernel.org, x86@kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v4 18/29] arm64: add POE signal support
+Message-ID: <20240801155441.GB841837@e124191.cambridge.arm.com>
+References: <20240503130147.1154804-1-joey.gouly@arm.com>
+ <20240503130147.1154804-19-joey.gouly@arm.com>
+ <ZqJ2knGETfS4nfEA@e133380.arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20240726235234.228822-1-seanjc@google.com> <20240726235234.228822-6-seanjc@google.com>
- <87wml0egzo.fsf@draig.linaro.org>
-Message-ID: <ZqufAYyVOa9M1z76@google.com>
-Subject: Re: [PATCH v12 05/84] KVM: Add kvm_release_page_unused() API to put
- pages that KVM never consumes
-From: Sean Christopherson <seanjc@google.com>
-To: "Alex =?utf-8?Q?Benn=C3=A9e?=" <alex.bennee@linaro.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
-	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	David Matlack <dmatlack@google.com>, David Stevens <stevensd@chromium.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZqJ2knGETfS4nfEA@e133380.arm.com>
 
-On Thu, Aug 01, 2024, Alex Benn=C3=A9e wrote:
-> Sean Christopherson <seanjc@google.com> writes:
->=20
-> > Add an API to release an unused page, i.e. to put a page without markin=
-g
-> > it accessed or dirty.  The API will be used when KVM faults-in a page b=
-ut
-> > bails before installing the guest mapping (and other similar flows).
-> >
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+On Thu, Jul 25, 2024 at 05:00:18PM +0100, Dave Martin wrote:
+> Hi,
+> 
+> On Fri, May 03, 2024 at 02:01:36PM +0100, Joey Gouly wrote:
+> > Add PKEY support to signals, by saving and restoring POR_EL0 from the stackframe.
+> > 
+> > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+> > Cc: Catalin Marinas <catalin.marinas@arm.com>
+> > Cc: Will Deacon <will@kernel.org>
+> > Reviewed-by: Mark Brown <broonie@kernel.org>
+> > Acked-by: Szabolcs Nagy <szabolcs.nagy@arm.com>
 > > ---
-> >  include/linux/kvm_host.h | 9 +++++++++
-> >  1 file changed, 9 insertions(+)
-> >
-> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > index 3d9617d1de41..c5d39a337aa3 100644
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -1201,6 +1201,15 @@ unsigned long gfn_to_hva_prot(struct kvm *kvm, g=
-fn_t gfn, bool *writable);
-> >  unsigned long gfn_to_hva_memslot(struct kvm_memory_slot *slot, gfn_t g=
-fn);
-> >  unsigned long gfn_to_hva_memslot_prot(struct kvm_memory_slot *slot, gf=
-n_t gfn,
-> >  				      bool *writable);
+> >  arch/arm64/include/uapi/asm/sigcontext.h |  7 ++++
+> >  arch/arm64/kernel/signal.c               | 52 ++++++++++++++++++++++++
+> >  2 files changed, 59 insertions(+)
+> > 
+> > diff --git a/arch/arm64/include/uapi/asm/sigcontext.h b/arch/arm64/include/uapi/asm/sigcontext.h
+> > index 8a45b7a411e0..e4cba8a6c9a2 100644
+> > --- a/arch/arm64/include/uapi/asm/sigcontext.h
+> > +++ b/arch/arm64/include/uapi/asm/sigcontext.h
+> 
+> [...]
+> 
+> > @@ -980,6 +1013,13 @@ static int setup_sigframe_layout(struct rt_sigframe_user_layout *user,
+> >  			return err;
+> >  	}
+> >  
+> > +	if (system_supports_poe()) {
+> > +		err = sigframe_alloc(user, &user->poe_offset,
+> > +				     sizeof(struct poe_context));
+> > +		if (err)
+> > +			return err;
+> > +	}
 > > +
-> > +static inline void kvm_release_page_unused(struct page *page)
-> > +{
-> > +	if (!page)
-> > +		return;
+> >  	return sigframe_alloc_end(user);
+> >  }
+> >  
+> > @@ -1020,6 +1060,15 @@ static int setup_sigframe(struct rt_sigframe_user_layout *user,
+> >  		__put_user_error(current->thread.fault_code, &esr_ctx->esr, err);
+> >  	}
+> >  
+> > +	if (system_supports_poe() && err == 0 && user->poe_offset) {
+> > +		struct poe_context __user *poe_ctx =
+> > +			apply_user_offset(user, user->poe_offset);
 > > +
-> > +	put_page(page);
-> > +}
->=20
-> I guess it's unfamiliarity with the mm layout but I was trying to find
-> where the get_pages come from to see the full pattern of allocate and
-> return. I guess somewhere in the depths of hva_to_pfn() from
-> hva_to_pfn_retry()?
+> > +		__put_user_error(POE_MAGIC, &poe_ctx->head.magic, err);
+> > +		__put_user_error(sizeof(*poe_ctx), &poe_ctx->head.size, err);
+> > +		__put_user_error(read_sysreg_s(SYS_POR_EL0), &poe_ctx->por_el0, err);
+> > +	}
+> > +
+> 
+> Does the AArch64 procedure call standard say anything about whether
+> POR_EL0 is caller-saved?
 
-If successful, get_user_page_fast_only() and get_user_pages_unlocked() grab=
- a
-reference on behalf of the caller.
+I asked about this, and it doesn't say anything and they don't plan on it,
+since it's very application specific.
 
-As of this patch, hva_to_pfn_remapped() also grabs a reference to pages tha=
-t
-appear to be refcounted, which is the underlying wart this series aims to f=
-ix.
-In KVM's early days, it _only_ supported GUP, i.e. if KVM got a pfn, that p=
-fn
-was (a) backed by struct page and (b) KVM had a reference to said page.  Th=
-at
-led to the current mess, as KVM didn't get reworked to properly track pages=
- vs.
-pfns when support for VM_MIXEDMAP was added.
+> 
+> <bikeshed>
+> 
+> In theory we could skip saving this register if it is already
+> POR_EL0_INIT (which it often will be), and if the signal handler is not
+> supposed to modify and leave the modified value in the register when
+> returning.
+> 
+> The complexity of the additional check my be a bit pointless though,
+> and the the handler might theoretically want to change the interrupted
+> code's POR_EL0 explicitly, which would be complicated if POE_MAGIC is
+> sometimes there and sometimes not.
+> 
+> </bikeshed>
+> 
+I think trying to skip/optimise something here would be more effort than any
+possible benefits!
 
-	/*
-	 * Get a reference here because callers of *hva_to_pfn* and
-	 * *gfn_to_pfn* ultimately call kvm_release_pfn_clean on the
-	 * returned pfn.  This is only needed if the VMA has VM_MIXEDMAP
-	 * set, but the kvm_try_get_pfn/kvm_release_pfn_clean pair will
-	 * simply do nothing for reserved pfns.
-	 *
-	 * Whoever called remap_pfn_range is also going to call e.g.
-	 * unmap_mapping_range before the underlying pages are freed,
-	 * causing a call to our MMU notifier.
-	 *
-	 * Certain IO or PFNMAP mappings can be backed with valid
-	 * struct pages, but be allocated without refcounting e.g.,
-	 * tail pages of non-compound higher order allocations, which
-	 * would then underflow the refcount when the caller does the
-	 * required put_page. Don't allow those pages here.
-	 */
-	if (!kvm_try_get_pfn(pfn))
-		r =3D -EFAULT;
+Thanks,
+Joey
