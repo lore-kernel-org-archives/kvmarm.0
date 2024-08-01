@@ -1,128 +1,129 @@
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 658BB14374F
-	for <kvmarm@lists.linux.dev>; Thu,  1 Aug 2024 18:01:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B03813C832;
+	Thu,  1 Aug 2024 19:07:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722535294; cv=none; b=Umq4cse8apMOAEUTGBy1NE9m0/ajY00mzHgNQJRvNvgJ/omF3E0YHoG28StF/72KSeKKDOrXPODSuhpxBWigiCnsLTd/S7S2WOPIlRzMg77+k6TNaqzlgmCTVwsp/V8/CLnroMK8rNVBreOHElv70Q3RCAtmApGdmGCc1rlMk2o=
+	t=1722539243; cv=none; b=qBV6w4rdMbVUXV5pThXXmT6gnq22XXWASQvYkXJEPn1HRyzkZlngaRNd6fDifpZvG/mxOjH48Kro8DDafSCnSIcrxPVkox4t9getI6yXSHv0cJ0lwNHYgzoAVBiLl/23XZTR49A8VBs+jIzcQlRR8qQbZP/C9V0brXMK3xPtnj8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722535294; c=relaxed/simple;
-	bh=B4USJ3DcoEtC2grgJaNeehMjrX/R6yyLoOz0nwuEw9c=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=sCYzOOq/lWYxSdUt5TRv0M2ysvO2DKO3vlqFQCM9iHpoJ5fPOivT+CTm38PM+dSmhYzQXhsQydlmc/ul9DM8haOAtVNov2q5DiSnnfFKzkUyrQk+SwK0n8L/xOnaGaz6fCuoOpS2IqKIojrzlzEur2c+hiXBzK6B+FLXpmJnlUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4moarI/e; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1722539243; c=relaxed/simple;
+	bh=tNpnTWvsIE5V07rG1mHukfAwFOGjd+/BGaRx9L1/i/k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=V4icCE57czfJX413cmbQLmWRSh1aGo1lTf0g8HoAUAkIi4FO9qq8jOw7UeRrMWB8qmhpiszW/xrFQIxuIRLypjazAR5e/UyIYh4UGvVhaC0Qxy7iuQheBodnC2xokEa/opUOIyEAzusp5umBGlwqWPO7WCS7BnXhax/3ID5inas=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JOe4CT0W; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4moarI/e"
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-7a28217cfecso7441116a12.2
-        for <kvmarm@lists.linux.dev>; Thu, 01 Aug 2024 11:01:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722535292; x=1723140092; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xl2Pju3NY9Fnm1xajnPNr4ZOFDET+sfv7XV8JXyIerc=;
-        b=4moarI/efjsuhWG1RgrJl0p8ZHZ3T7DeYTEUR5q5CwH3okgTbbhOwjsdV5coFVbyCO
-         wG6IAnlwtcJGVtJ5w0ag5f3AIsIapjuYNQsasHFHKp9eI+A9URbCb+O0LEdoa3/FCrxB
-         EsDDugHkFSVWjXI/PjFZjaP9T2qUc6nItlLefNlWOoXtANyv1Z7PlWe/+cxWIhCr3CQ1
-         Z5WmKHvDwOnyABHEiKAs7Uqh+IGS+EgH9Ew+DC3tl0zScVWwWL78x4F6Ovzp0K80GbTR
-         2SZ4P1uH4UL6QYcHFgVo9SdjK0r+VnGb76SbExvYPT3bN/UXth16B/ceHH+LWkEZdcsF
-         DwBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722535292; x=1723140092;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xl2Pju3NY9Fnm1xajnPNr4ZOFDET+sfv7XV8JXyIerc=;
-        b=Hbd+rsKFRlXkJtKyCX2IVVNjP5owe2bJUZMPmPORpuva1ZdpBUwHM3V9EgDyDrft7d
-         qPjRm6xcmRyKr8xcM2SgRs+DH5xANowXa74kRcx1q9N4bUMX5FalB3QKGtPEU+GhkGO3
-         TUMMg4d9RA4njX2SVCn+DIiroxpmFsdzk73cVyUeVRaPgcE9623Ony7uf5hL7wOZSN8R
-         AOt3CEcx4+SOkzy102qcHOAcqlmyVZZqQzE1oG2E500JzFOxY829jA51hmyIGXH4Ojcc
-         uYhRRu5wumw4+Q+2tAGmczieHjatXxX+yj368LnqF31AxJWZq6mdLyePRG8t9ZmEk/3S
-         pNLg==
-X-Forwarded-Encrypted: i=1; AJvYcCVluDStd2WqhJ604CfmC2wg+3RsbE3UfFkK1k2fA5f5IvfWb4m3DewRCtlrhx7Va7MDTOZF72OF+5XhXn6FiXZo0GemkHdb
-X-Gm-Message-State: AOJu0Yy8LUWpXC5Lux+8yTTjXCm6IX+lnxTgdZnEZjxOvhz4LyNm0owD
-	zODK+u+TaTor9zNpyz1flupBvnCbmnvg3yp+Dw6vDCCleMd3zIPnKg4Jx/R0Ik1lLXpK7/ZDgRg
-	BIg==
-X-Google-Smtp-Source: AGHT+IF64U8Ib+bNIe3iPxoSzJOvvilQGXPjPZq7Y/8acNPwlcg0hACHnvmYPGnFv3dx9aufX4l27GJDySU=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a65:6252:0:b0:75a:b299:85b6 with SMTP id
- 41be03b00d2f7-7b74669c7b3mr1534a12.2.1722535291408; Thu, 01 Aug 2024 11:01:31
- -0700 (PDT)
-Date: Thu, 1 Aug 2024 11:01:30 -0700
-In-Reply-To: <yq5aikwku25o.fsf@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JOe4CT0W"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8851C32786;
+	Thu,  1 Aug 2024 19:07:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722539243;
+	bh=tNpnTWvsIE5V07rG1mHukfAwFOGjd+/BGaRx9L1/i/k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JOe4CT0W01q2w4wLUfsdxMf1BBG2SO168tpPxZrox6sq6Zvo7LYRQBZDOi6Qug42a
+	 hD5YvP9BVhgwlctCItX5VjCnPBhuaSQaS/GU8rTvbcUomC5nfm6RsxErVNYNkWpiCi
+	 FSHQZi5WphGaEqt8pZ0/No6U9LZbVEEnduMwGV2PsaroucKXFIhRKRQepxD1GrH+Sr
+	 /t438cxdYVPNgrNQzUhkVJGZgtSdmGTjIqIph2QgijyX5wtBRhevO3nYI2pDyDhfq4
+	 MPpPdR1ASiiuBL3JsWBvOcUj0OvwbU9SaJhS1pUhMEPBarKn+Wz28aMCVzosZSWBGg
+	 Um1eYy2fKNKEg==
+Date: Thu, 1 Aug 2024 20:07:16 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>, Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>
+Subject: Re: [PATCH v2 4/8] KVM: arm64: Add save/restore support for FPMR
+Message-ID: <1a00165f-7ae5-4c58-9283-836716205db7@sirena.org.uk>
+References: <20240801091955.2066364-1-maz@kernel.org>
+ <20240801091955.2066364-5-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20240726235234.228822-1-seanjc@google.com> <20240726235234.228822-3-seanjc@google.com>
- <yq5aikwku25o.fsf@kernel.org>
-Message-ID: <ZqvNekQAjs-SN-se@google.com>
-Subject: Re: [PATCH v12 02/84] KVM: arm64: Disallow copying MTE to guest
- memory while KVM is dirty logging
-From: Sean Christopherson <seanjc@google.com>
-To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
-	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	David Matlack <dmatlack@google.com>, David Stevens <stevensd@chromium.org>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="UP17P9dMGGZrnuYZ"
+Content-Disposition: inline
+In-Reply-To: <20240801091955.2066364-5-maz@kernel.org>
+X-Cookie: Be cautious in your daily affairs.
 
-On Thu, Aug 01, 2024, Aneesh Kumar K.V wrote:
-> Sean Christopherson <seanjc@google.com> writes:
-> 
-> > Disallow copying MTE tags to guest memory while KVM is dirty logging, as
-> > writing guest memory without marking the gfn as dirty in the memslot could
-> > result in userspace failing to migrate the updated page.  Ideally (maybe?),
-> > KVM would simply mark the gfn as dirty, but there is no vCPU to work with,
-> > and presumably the only use case for copy MTE tags _to_ the guest is when
-> > restoring state on the target.
-> >
-> > Fixes: f0376edb1ddc ("KVM: arm64: Add ioctl to fetch/store tags in a guest")
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  arch/arm64/kvm/guest.c | 5 +++++
-> >  1 file changed, 5 insertions(+)
-> >
-> > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> > index e1f0ff08836a..962f985977c2 100644
-> > --- a/arch/arm64/kvm/guest.c
-> > +++ b/arch/arm64/kvm/guest.c
-> > @@ -1045,6 +1045,11 @@ int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
-> >  
-> >  	mutex_lock(&kvm->slots_lock);
-> >  
-> > +	if (write && atomic_read(&kvm->nr_memslots_dirty_logging)) {
-> > +		ret = -EBUSY;
-> > +		goto out;
-> > +	}
-> > +
-> >
-> 
-> is this equivalent to kvm_follow_pfn() with kfp->pin = 1 ?
 
-No, gfn_to_pfn_prot() == FOLL_GET, kfp->pin == FOLL_PIN.  But that's not really
-relevant.
+--UP17P9dMGGZrnuYZ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-> Should all those pin request fail if kvm->nr_memslots_dirty_logging != 0? 
+On Thu, Aug 01, 2024 at 10:19:51AM +0100, Marc Zyngier wrote:
 
-No, the conflict with dirty logging is specifically that this code doesn't invoke
-mark_page_dirty().  And it can't easily do that, because there's no loaded ("running")
-vCPU, i.e. doing so would trip this WARN:
+> index 6af179c6356d..2466dd231362 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+> @@ -198,6 +198,15 @@ static void kvm_hyp_save_fpsimd_host(struct kvm_vcpu *vcpu)
+>  	} else {
+>  		__fpsimd_save_state(*host_data_ptr(fpsimd_state));
+>  	}
+> +
+> +	if (kvm_has_fpmr(vcpu->kvm)) {
 
-#ifdef CONFIG_HAVE_KVM_DIRTY_RING
-	if (WARN_ON_ONCE(vcpu && vcpu->kvm != kvm))
-		return;
+nVHE is faulting for me, apparently on the kvm_has_fpmr() check though I
+ran out of time to actually figure out where exactly it is going wrong.
+I'll have a further poke tomorrow.  Backtrace below.
 
-	WARN_ON_ONCE(!vcpu && !kvm_arch_allow_write_without_running_vcpu(kvm)); <====
-#endif
+> +		u64 fpmr = read_sysreg_s(SYS_FPMR);
+> +
+> +		if (unlikely(is_protected_kvm_enabled()))
+> +			*host_data_ptr(fpmr) = fpmr;
+
+That looks wrong until you remember what host_data_ptr() does but but
+it's actually fine.  host_data_ptr() is looking inside the struct
+kvm_host_data for the CPU rather than referencing the locally defined
+variable fpmr here.  I do think it's worth avoiding the name collision
+though, perhaps just avoid the temporary variable?
+
+[ 1610.219274][  T247] kvm [247]: nVHE hyp panic at: [<ffffffc080ce3fc8>] __kvm_
+nvhe_$x.262+0x24/0x38!
+[ 1610.219435][  T247] kvm [247]: nVHE call trace:
+[ 1610.219509][  T247] kvm [247]:  [<ffffffc080ce3c2c>] __kvm_nvhe_hyp_panic+0xb
+4/0xf8
+[ 1610.219657][  T247] kvm [247]:  [<ffffffc080ce3df4>] __kvm_nvhe_$x.238+0x14/0x60
+[ 1610.219803][  T247] kvm [247]:  [<ffffffc080ce33f8>] __kvm_nvhe_$x.88+0x24/0x23c
+[ 1610.219942][  T247] kvm [247]:  [<ffffffc080ce64b4>] __kvm_nvhe_$x.26+0x8/0x2c
+[ 1610.220080][  T247] kvm [247]:  [<ffffffc080ce617c>] __kvm_nvhe_$x.1+0x9c/0xa4
+[ 1610.220216][  T247] kvm [247]:  [<ffffffc080ce50fc>] __kvm_nvhe___skip_pauth_save+0x4/0x4
+[ 1610.220356][  T247] kvm [247]: ---[ end nVHE call trace ]---
+[ 1610.220435][  T247] kvm [247]: Hyp Offset: 0xffffff807fe00000
+[ 1610.220566][  T247] Kernel panic - not syncing: HYP panic:
+[ 1610.220566][  T247] PS:1624023c9 PC:0000004000ee3fc8 ESR:0000000096000004
+[ 1610.220566][  T247] FAR:ffffff880115cd1c HPFAR:0000000000000000 PAR:1d00007edbadc8de
+[ 1610.220566][  T247] VCPU:0000004801e88000
+[ 1610.220743][  T247] CPU: 0 UID: 0 PID: 247 Comm: kvm-vcpu-0 Not tainted 6.11.0-rc1+ #247
+[ 1610.220878][  T247] Hardware name: FVP Base RevC (DT)
+[ 1610.220958][  T247] Call trace:
+[ 1610.221023][  T247]  dump_backtrace+0xfc/0x140
+[ 1610.221132][  T247]  show_stack+0x24/0x38
+[ 1610.221239][  T247]  dump_stack_lvl+0x3c/0x118
+[ 1610.221358][  T247]  dump_stack+0x18/0x40
+[ 1610.221474][  T247]  panic+0x134/0x368
+[ 1610.221609][  T247]  nvhe_hyp_panic_handler+0x114/0x1a0
+[ 1610.221758][  T247]  kvm_arm_vcpu_enter_exit+0x54/0xc0
+[ 1610.221895][  T247]  kvm_arch_vcpu_ioctl_run+0x494/0xa28
+
+--UP17P9dMGGZrnuYZ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmar3OQACgkQJNaLcl1U
+h9BxZAf/eG0DRkq8+lSJZn2eZWw79ujhY7MpdW3KaE5Zr7PwbXf5Y2/ht28j3E0y
+A7IhKlj9Ya2brKHhfRNKb6DU45qH3yP3alB+DIEgkCWEUePTrcEbD0ZShKRFpfMI
+NeFnXxD0aoiqha6DTn/H60uS3k88GmGkfaOoz7n/ZegXXypLc86uIvBLHDH7GlqY
++Q7qrjbRdwTeNQYoFuDHA6CEQY3K/LLydXW8sva70kWlvFmye992IyX2cUmGZ48R
++8TokGkRUn2ZJ/aS2LZBj5Ht1TFom8TDmqh8rxhJJCxATwlICyzik0Lv2Th2/NPh
+2t2uGBHkEYMzulfNqBTqrvqep0gghQ==
+=c5ht
+-----END PGP SIGNATURE-----
+
+--UP17P9dMGGZrnuYZ--
