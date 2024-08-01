@@ -1,104 +1,118 @@
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5E3B170855
-	for <kvmarm@lists.linux.dev>; Thu,  1 Aug 2024 09:55:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9497B174EEB;
+	Thu,  1 Aug 2024 10:07:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722506140; cv=none; b=bsfSOK8pIwpF+6tZhsx4YkVLr9Ufpz8G9G8zLmz6fugG18rhgXO4nsaKtBetqAc8Sq9ItgBSHt4++Rschml+o33birDOFpPgql6ihuPj6TITzD3+c9BfYfm2UJ0YMXDN7DNJmeRA6LM0+wpOklX6qMyprzGLpcax89PIISQ9fmg=
+	t=1722506875; cv=none; b=ZmExBWe5zAR+cOGlD15LpPLHtdtwyCr2eziKpeXPsQXpO3LFwGDoJrAGKevmrCpspPjalQ1jx9h9/HFkiRDBMQ+5e28ncU3CdJP/2NfU66WPw7n6L4slDCggakecQmsgvz1klbeut+mIoNWePWB2lOcOl6jntmwcs4IrEBiHgW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722506140; c=relaxed/simple;
-	bh=CfWoHfDxpbd/BrLn4R6OTlWdsgX7K0q/kTBzQqeOmF4=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=nR7hg6fNy/kkQNxuATkXYRIz4oBZy+lVrhjqK9gq93iieLvVkPvoklquDyTLsn6egndvneftH+8ssGsheXRloaA4xLdluwUePnx9MBBGUAfONMkj4pr5EF5DFtsKikBPWFANXsQ/eMoRtLRdwcG8naVFGhdtTviJNPNCzZA0/eA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=MNdz8peN; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1722506875; c=relaxed/simple;
+	bh=1omcIl0ySlr8+5216FhuGPRNQkd7nfMr+PkPp6A7HmE=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IIKOpcMyG9xy3Fj9vvkPaF3lDgbgN9Qjk1MNP7rz35ILJcWhVPtcOv9B+vjmJzt2+I+dwCQcQWXYCOYA6CIih2vioIrx+eO+V+/KQ4kaQQHwmZwDSOwSKsLqvN9weqigqU17pn1+9Nu00xrU7EmnhvTaZPI5zaEpA50GaX//ito=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dXl6XfVw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MNdz8peN"
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5a2ffc34677so9743903a12.2
-        for <kvmarm@lists.linux.dev>; Thu, 01 Aug 2024 02:55:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1722506136; x=1723110936; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=CfWoHfDxpbd/BrLn4R6OTlWdsgX7K0q/kTBzQqeOmF4=;
-        b=MNdz8peN6KtrqBOQwl6xXah3O52uqJETLTuIhe8Yqe0IbAswEVgAZvgsmdRTJx6kg6
-         gL8Hq+5n03pihPla6+En3ARVm7/4ycB0G3wzhcoX/fhq5bv8vf5EwaWHT8I0oXS5Xfqg
-         sAnFbZcW+g0QJPccVFoliIvosDHib60KYMik75S/j7LgCnfZNQngFB087Yphxdmau1bd
-         B+9NLsL3ZnQZ+bSuEAItna6freS92E+l5pZO1CiYu19vgrP0S8qCPxzud3pWEgKXd6TK
-         POcJBHnvgTyUAJBhaUkgIkryxvyRF1OHLQ3z/IvizIllIrHvHgWZMUmUhnrt4KqWnQJJ
-         mpJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722506136; x=1723110936;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CfWoHfDxpbd/BrLn4R6OTlWdsgX7K0q/kTBzQqeOmF4=;
-        b=whjgsxPU8mcGv2eEWzs96QkO16F8VQv+YxbTAm0VV6jbncyswu7nXLMNomp6Vjgbpl
-         IvumDdbjmTlycIfKLDo4stgMu6Vx2WP7YlVCjY2bE3zN4sLGpPm9Z7T3SOHGtRxlL5zu
-         /nsonSm3LcCLoV4/WPUHgFsdd5glA7MqOXrToDa8/2kGAE7SUKvlJrjE9VAao5jx4qRa
-         6srWbWUQ9gtQeez7UYfL5ifQb+Wdda2BAh2tU0iK8v6Z0xQ6zMNN0x+ccScXv2bSmcgg
-         uE3d1u4LV2oAI9rH6uh1lbZ271gE0iex/neKRaF9dP/WWlL71bhIkPVrdJsWA5oFqD5L
-         ozUg==
-X-Forwarded-Encrypted: i=1; AJvYcCX9fmeXjrcXA2/vgbF6n2aPEThOyZzYlcKo3NkelzzeDxP59r5OFYKngL6lxD89UtvN44n/C9+adHvzOv5nkwHnZwoeMN5G
-X-Gm-Message-State: AOJu0YyM03AS+y5zDbddstd4dV/fc/Bwk1VfJRciMV4r9ULezkFwpIKL
-	35hQiWr8rA2RRXTDRxfPQwCSvQk6YLX5qUrlSxyFnM2VOJ558T+nzAHsSmvPlkw=
-X-Google-Smtp-Source: AGHT+IGb/nSGVf7NWCnHjhhrhlGi5SRtFpH69is58qT222M0oYGxJthjaOlCxTOcuwDzU1FyViVsdw==
-X-Received: by 2002:a05:6402:b32:b0:5a3:5218:5d80 with SMTP id 4fb4d7f45d1cf-5b6ff4e0399mr1182829a12.21.1722506135641;
-        Thu, 01 Aug 2024 02:55:35 -0700 (PDT)
-Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5ac6377d005sm9858902a12.38.2024.08.01.02.55.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Aug 2024 02:55:33 -0700 (PDT)
-Received: from draig (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 2329A5F80C;
-	Thu,  1 Aug 2024 10:55:32 +0100 (BST)
-From: =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,  Marc Zyngier <maz@kernel.org>,
-  Oliver Upton <oliver.upton@linux.dev>,  Tianrui Zhao
- <zhaotianrui@loongson.cn>,  Bibo Mao <maobibo@loongson.cn>,  Huacai Chen
- <chenhuacai@kernel.org>,  Michael Ellerman <mpe@ellerman.id.au>,  Anup
- Patel <anup@brainfault.org>,  Paul Walmsley <paul.walmsley@sifive.com>,
-  Palmer Dabbelt <palmer@dabbelt.com>,  Albert Ou <aou@eecs.berkeley.edu>,
-  Christian Borntraeger <borntraeger@linux.ibm.com>,  Janosch Frank
- <frankja@linux.ibm.com>,  Claudio Imbrenda <imbrenda@linux.ibm.com>,
-  kvm@vger.kernel.org,  linux-arm-kernel@lists.infradead.org,
-  kvmarm@lists.linux.dev,  loongarch@lists.linux.dev,
-  linux-mips@vger.kernel.org,  linuxppc-dev@lists.ozlabs.org,
-  kvm-riscv@lists.infradead.org,  linux-riscv@lists.infradead.org,
-  linux-kernel@vger.kernel.org,  David Matlack <dmatlack@google.com>,
-  David Stevens <stevensd@chromium.org>
-Subject: Re: [PATCH v12 26/84] KVM: Move
- kvm_{set,release}_page_{clean,dirty}() helpers up in kvm_main.c
-In-Reply-To: <20240726235234.228822-27-seanjc@google.com> (Sean
-	Christopherson's message of "Fri, 26 Jul 2024 16:51:35 -0700")
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dXl6XfVw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F19EC32786;
+	Thu,  1 Aug 2024 10:07:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722506875;
+	bh=1omcIl0ySlr8+5216FhuGPRNQkd7nfMr+PkPp6A7HmE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=dXl6XfVwOB9GlSLpifm4SQnLN1SxN9WD5f/MTtx+7gzr1ecINtOADxIOmr8sjVBL0
+	 DVMXHY/qfYmEhNan55mGOmG6D7THyLOPd70VPVKIpK/4MAQ5E5HS45NyBgeC5R48+X
+	 z9v7rywzNiMJ0Y3pLiLCJmKABr+FNbRPJFAyTyruso3jShF040qqp9MpwrWDsAtHKt
+	 fWTz+yRtpK8TbmWmQV9Ovzo1U3O3+yf5d0a9Gg2dNbSlY68eZRNVapCcFH1FcVxKAs
+	 Ludh8f3lr4RMdR6f7qJHOWB6bVOFl8ZRUulSkXqf7CV6Gn2MFS6IIw7ZvAl4rbJ8vr
+	 zHK3gmvw2IfAQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sZSiv-00HLX2-08;
+	Thu, 01 Aug 2024 11:07:53 +0100
+Date: Thu, 01 Aug 2024 11:07:52 +0100
+Message-ID: <86plqs1rpj.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sean Christopherson <seanjc@google.com>,
+    Steven Price <steven.price@arm.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Tianrui Zhao <zhaotianrui@loongson.cn>,
+	Bibo Mao <maobibo@loongson.cn>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Anup Patel <anup@brainfault.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	loongarch@lists.linux.dev,
+	linux-mips@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	kvm-riscv@lists.infradead.org,
+	linux-riscv@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	David Matlack <dmatlack@google.com>,
+	David Stevens <stevensd@chromium.org>
+Subject: Re: [PATCH v12 01/84] KVM: arm64: Release pfn, i.e. put page, if copying MTE tags hits ZONE_DEVICE
+In-Reply-To: <20240726235234.228822-2-seanjc@google.com>
 References: <20240726235234.228822-1-seanjc@google.com>
-	<20240726235234.228822-27-seanjc@google.com>
-Date: Thu, 01 Aug 2024 10:55:32 +0100
-Message-ID: <87h6c4efe3.fsf@draig.linaro.org>
+	<20240726235234.228822-2-seanjc@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.3
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: seanjc@google.com, steven.price@arm.com, pbonzini@redhat.com, oliver.upton@linux.dev, zhaotianrui@loongson.cn, maobibo@loongson.cn, chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, borntraeger@linux.ibm.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, loongarch@lists.linux.dev, linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, dmatlack@google.com, stevensd@chromium.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Sean Christopherson <seanjc@google.com> writes:
++ Steven Price for this patch (and the following one), as this really
+is his turf.
 
-> Hoist the kvm_{set,release}_page_{clean,dirty}() APIs further up in
-> kvm_main.c so that they can be used by the kvm_follow_pfn family of APIs.
->
-> No functional change intended.
->
+On Sat, 27 Jul 2024 00:51:10 +0100,
+Sean Christopherson <seanjc@google.com> wrote:
+> 
+> Put the page reference acquired by gfn_to_pfn_prot() if
+> kvm_vm_ioctl_mte_copy_tags() runs into ZONE_DEVICE memory.  KVM's less-
+> than-stellar heuristics for dealing with pfn-mapped memory means that KVM
+> can get a page reference to ZONE_DEVICE memory.
+> 
+> Fixes: f0376edb1ddc ("KVM: arm64: Add ioctl to fetch/store tags in a guest")
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/arm64/kvm/guest.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> index 11098eb7eb44..e1f0ff08836a 100644
+> --- a/arch/arm64/kvm/guest.c
+> +++ b/arch/arm64/kvm/guest.c
+> @@ -1059,6 +1059,7 @@ int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+>  		page = pfn_to_online_page(pfn);
+>  		if (!page) {
+>  			/* Reject ZONE_DEVICE memory */
+> +			kvm_release_pfn_clean(pfn);
+>  			ret = -EFAULT;
+>  			goto out;
+>  		}
+> -- 
+> 2.46.0.rc1.232.g9752f9e123-goog
+> 
+> 
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
---=20
-Alex Benn=C3=A9e
-Virtualisation Tech Lead @ Linaro
+-- 
+Without deviation from the norm, progress is not possible.
