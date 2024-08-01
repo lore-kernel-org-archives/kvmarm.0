@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC804170A35;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC857170A37;
 	Thu,  1 Aug 2024 09:22:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722504149; cv=none; b=o3Zywd+QbMgPhLkrXCaRxh3HupWOf8aC45pq2ma9jaPuKkAI6eS20OOAquqdFsp3qPabjKjBIcbRhW59/c3FfHwltWpMzVIlu+crLip97L8NEDj2cQFRNJyrOf3UU3i5koI+IzkzixZVdRfO2YvT9FfZKai8HyElO8PJgv3tABI=
+	t=1722504149; cv=none; b=lFiL2HHU/uU3Co2aEHqUTdvaxebz3MkfqPHgGx0wNAnDnj6moJYARwmqN8xuZ5HLDNTTHB02BTYHVrtfdf8wBVWOprl17+TpbCb2+ZAElrNYRUM18e25UCbq2ZKhFculVksl7OJ1o9okDL8QstJ5YVcJm6UQmge20efpipUdgJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1722504149; c=relaxed/simple;
-	bh=Mc7TZVN9UAGLw7VMT6n/xlZTGIZNfGL0jqmWlwOCfQU=;
+	bh=Xu/A5wRo87cCV/14kvsmL7JZiq2gS7qhR9OHy9H2AHg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=rJuXA4FoLPpcMeFMMycU8rWkz/2i2mlxrP8jpISDDFlXlWxR/1VQwqVbHrBqlbDFSTpC8duTniGXBIlFefRlNVZ2zBtAmToQbfIl1ZGgSfWdAx1322mtgPajdq7jn2V70iXYav+waZANcCWuQi2sCb7JQlKmcOdn1+l0EGbdfb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PR/h/wUY; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=XzK+cD8ECG2MhH+jB7Y5GjDPERXMlJW+qXXPr4kkEo1cCQFM9rA7sHw3njCqVv4erxXeXHbrd51yZc5Jp3xLpcgTCttCHFlfwAd/BmJMIGqZaTjQd31WUTEw1rrpOX6O0I/J9+2yF8oFjlOSi/gQQe8BhPkK+rsFnyU5/cgj5Fk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GhqVPvaf; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PR/h/wUY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F533C4AF0E;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GhqVPvaf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7EB01C32786;
 	Thu,  1 Aug 2024 09:22:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1722504149;
-	bh=Mc7TZVN9UAGLw7VMT6n/xlZTGIZNfGL0jqmWlwOCfQU=;
+	bh=Xu/A5wRo87cCV/14kvsmL7JZiq2gS7qhR9OHy9H2AHg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=PR/h/wUYmBOxUigR0crqXKV7l4oISoea3m9SnyUXZBxL6Ra9ceMay+u9osGVSQai4
-	 IxSydy/9k2bRO9TA5UsmqYMtZoP4IIzRfEx4fidaBLt+bz00Saz09S2nqHbrVDtHk8
-	 XNm85AZ9wWL5VYN5cHDi4N0HvGd5GiUMxcu8pErh3CV8hk6dAc5s7xlMQfoozav9hV
-	 9CQEPQso1KZ6asJMMbgxIXjiw/Ldr2oJFJNp+Slj4ysfpO9mx1GWOdxuuCIiZA6lkU
-	 hoAbVFLyFPSDKG1V/f677Rzr6bolJMXShQz8wB1aaLO7LPavZ5VtfqjzE0Z6Fu2sHI
-	 Lhbi1lqI7akLQ==
+	b=GhqVPvafnl8Anxk2NuReshvN5RzJri4ekYed+/VQ+QcTAnDN6y7wcrKDfHU9zf988
+	 Pzf8KdipR41679BOhiEG2Ft5rdJvbg4tv5gA4QH6S+8waVI1Bsxvg+azpjEbdciGUP
+	 5uRnZH2IYYA1XMRUBOi2QZqP0+dJ5QKQLVdmSnRObZwRQ0L16kx2jSzP0xKUcyhlr8
+	 xXpvX1cPi/NydeKp2TYneC3PCST2ocMM3+Bu1AIJ18anPcCW4cuctkagQeA9++CYwa
+	 XxXQRos9MpulOAIQCyA8PJM84+crZUwNcdFs2qc4LWTtPsPsrrW4i2p15ygzIOKqj4
+	 tuV5BM8KudRZQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sZRya-00HKNZ-Hh;
-	Thu, 01 Aug 2024 10:20:00 +0100
+	id 1sZRyb-00HKNZ-LE;
+	Thu, 01 Aug 2024 10:20:01 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -43,9 +43,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Fuad Tabba <tabba@google.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v2 4/8] KVM: arm64: Add save/restore support for FPMR
-Date: Thu,  1 Aug 2024 10:19:51 +0100
-Message-Id: <20240801091955.2066364-5-maz@kernel.org>
+Subject: [PATCH v2 8/8] KVM: arm64: Expose ID_AA64PFR2_EL1 to userspace and guests
+Date: Thu,  1 Aug 2024 10:19:55 +0100
+Message-Id: <20240801091955.2066364-9-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240801091955.2066364-1-maz@kernel.org>
 References: <20240801091955.2066364-1-maz@kernel.org>
@@ -61,136 +61,52 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Just like the rest of the FP/SIMD state, FPMR needs to be context
-switched.
+Everything is now in place for a guest to "enjoy" FP8 support.
+Expose ID_AA64PFR2_EL1 to both userspace and guests, with the
+explicit restriction of only being able to clear FPMR.
 
-The only interesting thing here is that we need to treat the pKVM
-part a bit differently, as the host FP state is never written back
-to the vcpu thread, but instead stored locally and eagerly restored.
+All other features (MTE* at the time of writing) are hidden
+and not writable.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h       | 10 ++++++++++
- arch/arm64/kvm/fpsimd.c                 |  1 +
- arch/arm64/kvm/hyp/include/hyp/switch.h |  3 +++
- arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  9 +++++++++
- arch/arm64/kvm/hyp/nvhe/switch.c        |  9 +++++++++
- arch/arm64/kvm/hyp/vhe/switch.c         |  3 +++
- 6 files changed, 35 insertions(+)
+ arch/arm64/kvm/sys_regs.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 021f7a1845f2..a6b684c08fe7 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -599,6 +599,16 @@ struct kvm_host_data {
- 		struct cpu_sve_state *sve_state;
- 	};
- 
-+	union {
-+		/* HYP VA pointer to the host storage for FPMR */
-+		u64	*fpmr_ptr;
-+		/*
-+		 * Used by pKVM only, as it needs to provide storage
-+		 * for the host
-+		 */
-+		u64	fpmr;
-+	};
-+
- 	/* Ownership of the FP regs */
- 	enum {
- 		FP_STATE_FREE,
-diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-index 4cb8ad5d69a8..ea5484ce1f3b 100644
---- a/arch/arm64/kvm/fpsimd.c
-+++ b/arch/arm64/kvm/fpsimd.c
-@@ -63,6 +63,7 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
- 	 */
- 	*host_data_ptr(fp_owner) = FP_STATE_HOST_OWNED;
- 	*host_data_ptr(fpsimd_state) = kern_hyp_va(&current->thread.uw.fpsimd_state);
-+	*host_data_ptr(fpmr_ptr) = kern_hyp_va(&current->thread.uw.fpmr);
- 
- 	vcpu_clear_flag(vcpu, HOST_SVE_ENABLED);
- 	if (read_sysreg(cpacr_el1) & CPACR_EL1_ZEN_EL0EN)
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index f59ccfe11ab9..84a135ba21a9 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -404,6 +404,9 @@ static bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
- 	else
- 		__fpsimd_restore_state(&vcpu->arch.ctxt.fp_regs);
- 
-+	if (kvm_has_fpmr(kern_hyp_va(vcpu->kvm)))
-+		write_sysreg_s(__vcpu_sys_reg(vcpu, FPMR), SYS_FPMR);
-+
- 	/* Skip restoring fpexc32 for AArch64 guests */
- 	if (!(read_sysreg(hcr_el2) & HCR_RW))
- 		write_sysreg(__vcpu_sys_reg(vcpu, FPEXC32_EL2), fpexc32_el2);
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index f43d845f3c4e..87692b566d90 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -62,6 +62,8 @@ static void fpsimd_sve_flush(void)
- 
- static void fpsimd_sve_sync(struct kvm_vcpu *vcpu)
- {
-+	bool has_fpmr;
-+
- 	if (!guest_owns_fp_regs())
- 		return;
- 
-@@ -73,11 +75,18 @@ static void fpsimd_sve_sync(struct kvm_vcpu *vcpu)
- 	else
- 		__fpsimd_save_state(&vcpu->arch.ctxt.fp_regs);
- 
-+	has_fpmr = kvm_has_fpmr(kern_hyp_va(vcpu->kvm));
-+	if (has_fpmr)
-+		__vcpu_sys_reg(vcpu, FPMR) = read_sysreg_s(SYS_FPMR);
-+
- 	if (system_supports_sve())
- 		__hyp_sve_restore_host();
- 	else
- 		__fpsimd_restore_state(*host_data_ptr(fpsimd_state));
- 
-+	if (has_fpmr)
-+		write_sysreg_s(*host_data_ptr(fpmr), SYS_FPMR);
-+
- 	*host_data_ptr(fp_owner) = FP_STATE_HOST_OWNED;
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 51627add0a72..da6d017f24a1 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1722,6 +1722,15 @@ static u64 read_sanitised_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+ 	return val;
  }
  
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index 6af179c6356d..2466dd231362 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -198,6 +198,15 @@ static void kvm_hyp_save_fpsimd_host(struct kvm_vcpu *vcpu)
- 	} else {
- 		__fpsimd_save_state(*host_data_ptr(fpsimd_state));
- 	}
++static u64 read_sanitised_id_aa64pfr2_el1(struct kvm_vcpu *vcpu,
++					  const struct sys_reg_desc *rd)
++{
++	u64 val = read_sanitised_ftr_reg(SYS_ID_AA64PFR2_EL1);
 +
-+	if (kvm_has_fpmr(vcpu->kvm)) {
-+		u64 fpmr = read_sysreg_s(SYS_FPMR);
++	/* We only expose FPMR */
++	return val & ID_AA64PFR2_EL1_FPMR;
++}
 +
-+		if (unlikely(is_protected_kvm_enabled()))
-+			*host_data_ptr(fpmr) = fpmr;
-+		else
-+			**host_data_ptr(fpmr_ptr) = fpmr;
-+	}
- }
- 
- static const exit_handler_fn hyp_exit_handlers[] = {
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index 77010b76c150..80581b1c3995 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -312,6 +312,9 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
- static void kvm_hyp_save_fpsimd_host(struct kvm_vcpu *vcpu)
- {
- 	__fpsimd_save_state(*host_data_ptr(fpsimd_state));
-+
-+	if (kvm_has_fpmr(vcpu->kvm))
-+		**host_data_ptr(fpmr_ptr) = read_sysreg_s(SYS_FPMR);
- }
- 
- static bool kvm_hyp_handle_tlbi_el2(struct kvm_vcpu *vcpu, u64 *exit_code)
+ #define ID_REG_LIMIT_FIELD_ENUM(val, reg, field, limit)			       \
+ ({									       \
+ 	u64 __f_val = FIELD_GET(reg##_##field##_MASK, val);		       \
+@@ -2381,7 +2390,12 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 		   ID_AA64PFR0_EL1_AdvSIMD |
+ 		   ID_AA64PFR0_EL1_FP), },
+ 	ID_SANITISED(ID_AA64PFR1_EL1),
+-	ID_UNALLOCATED(4,2),
++	{ SYS_DESC(SYS_ID_AA64PFR2_EL1),
++	  .access	= access_id_reg,
++	  .get_user	= get_id_reg,
++	  .set_user	= set_id_reg,
++	  .reset	= read_sanitised_id_aa64pfr2_el1,
++	  .val		= ID_AA64PFR2_EL1_FPMR, },
+ 	ID_UNALLOCATED(4,3),
+ 	ID_WRITABLE(ID_AA64ZFR0_EL1, ~ID_AA64ZFR0_EL1_RES0),
+ 	ID_HIDDEN(ID_AA64SMFR0_EL1),
 -- 
 2.39.2
 
