@@ -1,92 +1,104 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD201140E5C
-	for <kvmarm@lists.linux.dev>; Thu,  1 Aug 2024 09:30:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10A9128F3
+	for <kvmarm@lists.linux.dev>; Thu,  1 Aug 2024 09:31:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722504630; cv=none; b=KPs6inBKs/IeXtA5mHyWkGMJL1qrwiwLngKQ28Tlp+YHNwcUtEIK/MhkvY//6YTPz78ag+hmCQuwzK95lY2avl3Zfv3CsmL1XIYrR7iXLC/TVAmgymnxXjuCgHMxrc0Q6OGaQLGXFgkB7XS47/ASt5VxNRz03dD4kRtUt1hF+/k=
+	t=1722504713; cv=none; b=lLks34dSK4xnq6Q45I49R050EJyOGznIAsawRUtEkfiD/SFFtCLTKD0yTHXD/BQk80/r58ZRTwDt+D1LjSyyPm7gXnbf9gdv8HnOYshD79S3GNnWQcN9o5ms2WUOxf/ojUPlO8+BSxkJkP5uilW/rjxSHWfrSlitvTmn6EvHn/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722504630; c=relaxed/simple;
-	bh=/OTW+2gYWzzGtg5eh5Ri6h4zgQIrGeCZb7gtCGgQcJg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OucnHRfHrp23lKLC+N2EK34RRZJOyRg1uIq2/EyprNyrg7RYUxoD1d9woUn80ue8LYvmcxPMN3xZ5VaE1/pwE0oI5bdapAr+9nld4t3bhTMbQRZQBAVdEBHHZmCOZpzsddcFrPEizCEv5/wiIle2f/fRhXDV3qZ9fSsgfzsl1iE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A013EDA7;
-	Thu,  1 Aug 2024 02:30:52 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 681BB3F5A1;
-	Thu,  1 Aug 2024 02:30:25 -0700 (PDT)
-Date: Thu, 1 Aug 2024 10:30:20 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Mark Brown <broonie@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: selftests: arm64: Correct feature test for S1PIE in
- get-reg-list
-Message-ID: <20240801093020.GA841418@e124191.cambridge.arm.com>
-References: <20240731-kvm-arm64-fix-s1pie-test-v1-1-a9253f3b7db4@kernel.org>
+	s=arc-20240116; t=1722504713; c=relaxed/simple;
+	bh=Rijpxav22ULBZ/jbonQFBSqZGbACHb2Ltfu5GqR29ew=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=aQa4n3AeGxWcCH888yshuzr5BvCRR61X/vpzBBIo/NW/jc93pPMXO34FYZckIUU2Xm/QvE36pFLYqGFbRIQ/H7sNXItZIUUd3QdseSS0YOAf97CjdQTKDwH6BKjcMp5cRaTPqO/4sxbPfRaN8+TW7Em6bTI74mcRj3KswzBmROE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=urgINMw+; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="urgINMw+"
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a7d89bb07e7so376858166b.3
+        for <kvmarm@lists.linux.dev>; Thu, 01 Aug 2024 02:31:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1722504709; x=1723109509; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Rijpxav22ULBZ/jbonQFBSqZGbACHb2Ltfu5GqR29ew=;
+        b=urgINMw+C/ND7z0yDkVSltBMIO/b5/Euw0U+l+KreBMZA4ld2kKK2abuTH4tA+UwKV
+         0GOiESQyi3OoBpBbHh1FKwsSdGbedholkTihec6hO6n3ODAjEb9q6/jrMSoMPQ5Vwvjf
+         U4RMYZVR8L/tynVMrE4eCggPZoSsm8zyK0KqW0csZNOcCI5urrtpJf7MDyBtfioS59ii
+         EI9EJa3fsoapc2Lg3mRf/GM2STErXfjIPU8Gr+ZMcXAXyczblo59PQxoKikO0Eg1lJ9L
+         9zDyGI2DeV9qJfzYHImztnAbqW2j4JBtPPDcvz5DwVIjvJLM98ybhr1MIVU/uv0aaE/5
+         VHDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722504709; x=1723109509;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Rijpxav22ULBZ/jbonQFBSqZGbACHb2Ltfu5GqR29ew=;
+        b=BWK4VCfazNn2NAruZkvwlS5tBeN6Kpm0KbT6G586EKMDE47gIwOcXeFC8kjoUzejbo
+         kt91Ks0snRxH7mSVIfeqi8tZUgEEXM4KPjMIIityyShlVgBSntuLRqRdrbGD/i8JX/sj
+         LjiQqLteyktVdSHCmVBp6CsyWAsSdLQ/7kWw6Aa9TsD07/9rIgCDV8qlSlSx6vWufOvQ
+         FafSeqdWPK+qE1PWAJfI7DyVVvDZawQhbIX6PNjpeAeL5tM85v2Xd4MpYHfR0Dukf/GI
+         Cr8sm35bsvvwyeoYS9onB+PQw250+Lwn0DwqmmD6SFGQALzfnJyZLjQnzj7Z9+m9Yp8o
+         2afQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXqNwy8+lUmW91YW5d2H3gGBCLabHAFQsZRao2N7ArnNnu1ERtypsYI/ptt69BZJmXW74w5Jy06NxoXarfmN8f23QAJa4ng
+X-Gm-Message-State: AOJu0YyBt6aJVZ94+f8fInaubIVREqM+D5XTdhB1pifP3DXSmHnXokqi
+	OoOGrgWpi0CgPZRkw3eesTojr5JPuEUqaaa5HdBbUMRM1ZW1Rg+LwJQJoWhfrfQ=
+X-Google-Smtp-Source: AGHT+IG5iXbqJIGCb3pyknIex0iMsjWXZk5BqBH1pB4+wqA2VBzM+EI5zwQ/R0bb0H5+cKiu5+pmpA==
+X-Received: by 2002:a17:907:968b:b0:a77:cdaa:88ab with SMTP id a640c23a62f3a-a7daf544a4fmr161420366b.15.1722504708836;
+        Thu, 01 Aug 2024 02:31:48 -0700 (PDT)
+Received: from draig.lan ([85.9.250.243])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7acadb8313sm876290366b.211.2024.08.01.02.31.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Aug 2024 02:31:47 -0700 (PDT)
+Received: from draig (localhost [IPv6:::1])
+	by draig.lan (Postfix) with ESMTP id 5DD7F5F80C;
+	Thu,  1 Aug 2024 10:31:46 +0100 (BST)
+From: =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,  Marc Zyngier <maz@kernel.org>,
+  Oliver Upton <oliver.upton@linux.dev>,  Tianrui Zhao
+ <zhaotianrui@loongson.cn>,  Bibo Mao <maobibo@loongson.cn>,  Huacai Chen
+ <chenhuacai@kernel.org>,  Michael Ellerman <mpe@ellerman.id.au>,  Anup
+ Patel <anup@brainfault.org>,  Paul Walmsley <paul.walmsley@sifive.com>,
+  Palmer Dabbelt <palmer@dabbelt.com>,  Albert Ou <aou@eecs.berkeley.edu>,
+  Christian Borntraeger <borntraeger@linux.ibm.com>,  Janosch Frank
+ <frankja@linux.ibm.com>,  Claudio Imbrenda <imbrenda@linux.ibm.com>,
+  kvm@vger.kernel.org,  linux-arm-kernel@lists.infradead.org,
+  kvmarm@lists.linux.dev,  loongarch@lists.linux.dev,
+  linux-mips@vger.kernel.org,  linuxppc-dev@lists.ozlabs.org,
+  kvm-riscv@lists.infradead.org,  linux-riscv@lists.infradead.org,
+  linux-kernel@vger.kernel.org,  David Matlack <dmatlack@google.com>,
+  David Stevens <stevensd@chromium.org>
+Subject: Re: [PATCH v12 12/84] KVM: Drop @atomic param from gfn=>pfn and
+ hva=>pfn APIs
+In-Reply-To: <20240726235234.228822-13-seanjc@google.com> (Sean
+	Christopherson's message of "Fri, 26 Jul 2024 16:51:21 -0700")
+References: <20240726235234.228822-1-seanjc@google.com>
+	<20240726235234.228822-13-seanjc@google.com>
+Date: Thu, 01 Aug 2024 10:31:46 +0100
+Message-ID: <87plqseghp.fsf@draig.linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240731-kvm-arm64-fix-s1pie-test-v1-1-a9253f3b7db4@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 31, 2024 at 05:21:13PM +0100, Mark Brown wrote:
-> The ID register for S1PIE is ID_AA64MMFR3_EL1.S1PIE which is bits 11:8 but
-> get-reg-list uses a shift of 4, checking SCTLRX instead. Use a shift of 8
-> instead.
-> 
-> Fixes: 5f0419a0083b ("KVM: selftests: get-reg-list: add Permission Indirection registers")
-> Signed-off-by: Mark Brown <broonie@kernel.org>
+Sean Christopherson <seanjc@google.com> writes:
 
-Argh!
+> Drop @atomic from the myriad "to_pfn" APIs now that all callers pass
+> "false".
+>
+> No functional change intended.
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-Thanks for spotting that.
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
-
-> ---
->  tools/testing/selftests/kvm/aarch64/get-reg-list.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-> index 709d7d721760..4abebde78187 100644
-> --- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-> +++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-> @@ -32,13 +32,13 @@ static struct feature_id_reg feat_id_regs[] = {
->  	{
->  		ARM64_SYS_REG(3, 0, 10, 2, 2),	/* PIRE0_EL1 */
->  		ARM64_SYS_REG(3, 0, 0, 7, 3),	/* ID_AA64MMFR3_EL1 */
-> -		4,
-> +		8,
->  		1
->  	},
->  	{
->  		ARM64_SYS_REG(3, 0, 10, 2, 3),	/* PIR_EL1 */
->  		ARM64_SYS_REG(3, 0, 0, 7, 3),	/* ID_AA64MMFR3_EL1 */
-> -		4,
-> +		8,
->  		1
->  	}
->  };
-> 
-> ---
-> base-commit: 8400291e289ee6b2bf9779ff1c83a291501f017b
-> change-id: 20240731-kvm-arm64-fix-s1pie-test-a40b6be58d7b
-> 
-> Best regards,
-> -- 
-> Mark Brown <broonie@kernel.org>
-> 
+--=20
+Alex Benn=C3=A9e
+Virtualisation Tech Lead @ Linaro
