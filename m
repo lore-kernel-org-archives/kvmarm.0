@@ -1,106 +1,104 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D62E49626;
-	Thu,  1 Aug 2024 07:34:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46C7516E884
+	for <kvmarm@lists.linux.dev>; Thu,  1 Aug 2024 08:57:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722497697; cv=none; b=C0LKgxEEixIvmvrz2Z71vPPn+rE7jB9LdR4DycUbwMvTH06/gu4HiRrcpjk3UmRiYz+Et59qLPerbK/FMgxrX3o8xuc+wbh71TJdCmSMxItWN+D3HxDT67sIfOwtr7+fYM9C0O/OSY2wLnZ5pU2VA4NGbSFTlL1RirBNwXMYR8Y=
+	t=1722502651; cv=none; b=R8OLHkSot2c+s1g9Wqlwif2etg461IQjbSbgDSXEgvHswAb3v+/tC9XLTn8G8eImyBqn4NWanzRQAh1wPoubi5XAch+ocuZBACgURH38qwOnAHHb1W8rh+9GI3vA+hw3NnMx20kc/zaywsHc11eF/OILLCKGOTRYqt4yat0wdfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722497697; c=relaxed/simple;
-	bh=4fAL4cODCnjl0NV8qGw/Qqudnit/5hoHCsZrciMhbUs=;
+	s=arc-20240116; t=1722502651; c=relaxed/simple;
+	bh=JtRBSdBvaqBsQtNVvhstlkMyWmalBV9Q7J8Cb3IfAjw=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=k5YpY4R0L2a3dtzCWqRnB773xA7F7htuHc5vID+7jZnEq6MkxZW+qSQzIdy50YMa4wXUnOP0Qd83IqLfYQwedCPAuQxxrx0/dAeA0CrSriyf1l8EywNnJAEh9BsXuqVJHS70NhnTqxbL1krEWKk+U1xrX6aY0+w7OG2FeyKEoSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hm6lqGrn; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=OWBaWTaqSBUsdtbcEk7u31XYVjHHIfmHiW7Yi5nTK3cZyNVUW44LFE6MXwqZKxHQ+XC8k0+CiqQLkNXalSpsooyNX4+RdA5gp0dfk91LdNFVfYkdOBdqc8LLSxhRMqgXqG1Lp2rYeT7XvtfzgtUdVJVFHQgQyT+b+bIvGg8YFv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Ct4JDeIz; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hm6lqGrn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C540CC4AF0A;
-	Thu,  1 Aug 2024 07:34:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722497697;
-	bh=4fAL4cODCnjl0NV8qGw/Qqudnit/5hoHCsZrciMhbUs=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=hm6lqGrnGLdGUt29ZxrQ9cGwGC5e/My8adr9xG8pGwOWvxzaIy2wVVZecHcsaS7MD
-	 2vhxDp5qw6P6jWSVDdYpSlndt26lYMY/9L3hrdQVP6XL1jiOwA3de3PchwMF07I1N4
-	 2YEHskiwTzLI1+iwXeDgxTjbuc9HN0GjQyrYNiG+t6NhVrrxrlXYCf8VJMbSS/9yNs
-	 oHiP/3JEHHEyg0SbxiUkt+heXZ9wY3Uvo6jOHCc4TGv31tTJIER/7SKgCRJbrwGHtk
-	 ninurOs1MqcQM+fogPcJEhZWkju/RfarTKElxrf4Eq/YQ9RcoW3WZjBJcrAerVNRjv
-	 rukvhfzurLf/A==
-X-Mailer: emacs 31.0.50 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Tianrui Zhao <zhaotianrui@loongson.cn>,
-	Bibo Mao <maobibo@loongson.cn>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, loongarch@lists.linux.dev,
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
-	David Stevens <stevensd@chromium.org>
-Subject: Re: [PATCH v12 02/84] KVM: arm64: Disallow copying MTE to guest
- memory while KVM is dirty logging
-In-Reply-To: <20240726235234.228822-3-seanjc@google.com>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ct4JDeIz"
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a7a83a968ddso942897566b.0
+        for <kvmarm@lists.linux.dev>; Thu, 01 Aug 2024 01:57:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1722502649; x=1723107449; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Syi3zSlJ8k1vqxBzUq6nZD+avtMgHQU+/NZ7B5gDmQ4=;
+        b=Ct4JDeIz4tVP3G/9jQ1ptBJDTjvm9PS6RW5+2wwMMCvSNfXFUxv+AgckDgulghchrU
+         YkpcFc2f673T8XS7JnAFeASh/QBWaHdzJ379tYMnbKzpMDQJwQlS6PAG6pBAciqnoKux
+         dljzbHkGZ+zLGT4N/LO62MH7to0l6UYQRX7fA2M/42lDde2lxFkf1cbVW1pTHFNZiQWp
+         9/Ku2F2KvodppdeTmr6SyZWvoIa1+pksqyCak4RLw0cGyLGyNw5PO/BCVFO+HnfrtMts
+         7WC2vpfwJr/1pe6TQ4FdTvKzjWTL3Mwp0HeDY+EoQBB12PMzhd3qDALkBd7mt8UEjTnX
+         tt2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722502649; x=1723107449;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Syi3zSlJ8k1vqxBzUq6nZD+avtMgHQU+/NZ7B5gDmQ4=;
+        b=tFnymuap37tIQoSg5zL9oxtpNdLtA0/yuUt+YTLuzUrfA4S3+0Lj0VZ8zXCT5auYYj
+         o8QJMKGo7Y5x9XPpvXB/RfIwQ1tb4wWPbSts/l2mem3Ju3xe0U38GJMBZAU0XokzjS14
+         VEjsJzGdapF+GVO/X3329930Da1d2Eod1gjmU8R8f7Wd4geOt47PHmo5EXCYwzcg5kVu
+         cU8xq8ImDl4S10tLKmLIcjAKlJY4i9butYlOnGTeGHwWxle59Wl2PEBbWuKeg8OLgsyQ
+         kjJYVgleO3FxlPhb2oSFMdsGBMd+ykZIA9D8N1wg9RHFz5rphgRHQ5dtbx+/Ic9oNpvG
+         t6hQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWqCqQ3p+hWuaB0uUldNfZ7yan1Ic5IQcoNoS9Jz6Y9rZCmRrRO5T+yyIJKrRi1x+hsUILd8b3ybUP9TuoMIWjazCnk/EjI
+X-Gm-Message-State: AOJu0YxpZWMROLV6RPfGYRKumaurkbeY4Nb8uhNsPrPreiq9MNzQSrby
+	yoA4AUsHXXIgAEpIPyThVVaUMap8KGFlk3WpAn3xA0Qbonn6BHYGzFsGH4vgZQg=
+X-Google-Smtp-Source: AGHT+IEdS3NM6t6Y7T/95sEL4C7ubpn/6F0Cu3mCtANczyd9mmWSLE4tcyyhWaOoIZKPq4CsXdarWQ==
+X-Received: by 2002:a17:907:6d0e:b0:a75:1069:5b94 with SMTP id a640c23a62f3a-a7daf535320mr136914966b.21.1722502647807;
+        Thu, 01 Aug 2024 01:57:27 -0700 (PDT)
+Received: from draig.lan ([85.9.250.243])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7acadb82d5sm865337466b.199.2024.08.01.01.57.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Aug 2024 01:57:27 -0700 (PDT)
+Received: from draig (localhost [IPv6:::1])
+	by draig.lan (Postfix) with ESMTP id 3FE7E5F80C;
+	Thu,  1 Aug 2024 09:57:26 +0100 (BST)
+From: =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,  Marc Zyngier <maz@kernel.org>,
+  Oliver Upton <oliver.upton@linux.dev>,  Tianrui Zhao
+ <zhaotianrui@loongson.cn>,  Bibo Mao <maobibo@loongson.cn>,  Huacai Chen
+ <chenhuacai@kernel.org>,  Michael Ellerman <mpe@ellerman.id.au>,  Anup
+ Patel <anup@brainfault.org>,  Paul Walmsley <paul.walmsley@sifive.com>,
+  Palmer Dabbelt <palmer@dabbelt.com>,  Albert Ou <aou@eecs.berkeley.edu>,
+  Christian Borntraeger <borntraeger@linux.ibm.com>,  Janosch Frank
+ <frankja@linux.ibm.com>,  Claudio Imbrenda <imbrenda@linux.ibm.com>,
+  kvm@vger.kernel.org,  linux-arm-kernel@lists.infradead.org,
+  kvmarm@lists.linux.dev,  loongarch@lists.linux.dev,
+  linux-mips@vger.kernel.org,  linuxppc-dev@lists.ozlabs.org,
+  kvm-riscv@lists.infradead.org,  linux-riscv@lists.infradead.org,
+  linux-kernel@vger.kernel.org,  David Matlack <dmatlack@google.com>,
+  David Stevens <stevensd@chromium.org>
+Subject: Re: [PATCH v12 03/84] KVM: Drop KVM_ERR_PTR_BAD_PAGE and instead
+ return NULL to indicate an error
+In-Reply-To: <20240726235234.228822-4-seanjc@google.com> (Sean
+	Christopherson's message of "Fri, 26 Jul 2024 16:51:12 -0700")
 References: <20240726235234.228822-1-seanjc@google.com>
- <20240726235234.228822-3-seanjc@google.com>
-Date: Thu, 01 Aug 2024 13:04:43 +0530
-Message-ID: <yq5aikwku25o.fsf@kernel.org>
+	<20240726235234.228822-4-seanjc@google.com>
+Date: Thu, 01 Aug 2024 09:57:26 +0100
+Message-ID: <875xskfwnd.fsf@draig.linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
 Sean Christopherson <seanjc@google.com> writes:
 
-> Disallow copying MTE tags to guest memory while KVM is dirty logging, as
-> writing guest memory without marking the gfn as dirty in the memslot could
-> result in userspace failing to migrate the updated page.  Ideally (maybe?),
-> KVM would simply mark the gfn as dirty, but there is no vCPU to work with,
-> and presumably the only use case for copy MTE tags _to_ the guest is when
-> restoring state on the target.
+> Remove KVM_ERR_PTR_BAD_PAGE and instead return NULL, as "bad page" is just
+> a leftover bit of weirdness from days of old when KVM stuffed a "bad" page
+> into the guest instead of actually handling missing pages.  See commit
+> cea7bb21280e ("KVM: MMU: Make gfn_to_page() always safe").
 >
-> Fixes: f0376edb1ddc ("KVM: arm64: Add ioctl to fetch/store tags in a guest")
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/arm64/kvm/guest.c | 5 +++++
->  1 file changed, 5 insertions(+)
->
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index e1f0ff08836a..962f985977c2 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-> @@ -1045,6 +1045,11 @@ int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
->  
->  	mutex_lock(&kvm->slots_lock);
->  
-> +	if (write && atomic_read(&kvm->nr_memslots_dirty_logging)) {
-> +		ret = -EBUSY;
-> +		goto out;
-> +	}
-> +
->
 
-is this equivalent to kvm_follow_pfn() with kfp->pin = 1 ? Should all
-those pin request fail if kvm->nr_memslots_dirty_logging != 0? 
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-
->  	while (length > 0) {
->  		kvm_pfn_t pfn = gfn_to_pfn_prot(kvm, gfn, write, NULL);
->  		void *maddr;
-> -- 
-> 2.46.0.rc1.232.g9752f9e123-goog
+--=20
+Alex Benn=C3=A9e
+Virtualisation Tech Lead @ Linaro
