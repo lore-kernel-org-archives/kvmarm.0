@@ -1,149 +1,157 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BBBA1A38FD;
-	Thu,  1 Aug 2024 13:02:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2E501A57DA
+	for <kvmarm@lists.linux.dev>; Thu,  1 Aug 2024 14:43:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722517321; cv=none; b=R2G+VJev8Ggk1UFqDKMS2tCwz3qmfdsTI5H4I/3mU4F9owRbqXIxTRymI615MaWfKHzt1gD4j7YKRyud8dL9yn4Bo+rskbs2Hf0VLxBMePUM/EkDxiZV1SVvvjQ5z5Ze4u2vqlVOvuYuyRtiQ5jPPAAY0PWJsC7je7Ht83oaY/Y=
+	t=1722523397; cv=none; b=OzbTNlC4dyHAPARifgjZcqQnKHiAR89PZjeAUJHdtEYNdKPXcvCTZyAy1Oo9SWlzssqLe4+Ho+osx6MsUBIhREHAYqkHqcgdaq7koVrC0WPzGyXxNZ5SjRTdLJjaTR1CAiON4zhg5TaUSqStA2nufH8blOgnunQJBFhqZt+QO5o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722517321; c=relaxed/simple;
-	bh=2o7H97U54cEmD5Tv71kF1eEpEycy3n5iAga6TGpYn58=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=udckuX4csP3n1BwERt9fvK3jvduWQOkeBVPFr0MYUsLVaOLM/C+9+33AaO0qbLyynthH/LYNckoTlrmoS9k2mNa07dMJ7dk1GpktjxWrdW/3BLwvd/i5CxntxLmLIJ0zZK4H0TljDqPABx3Pw1Pq0E1CW/S7xv/vTdPEXviuBoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EOypttz1; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1722523397; c=relaxed/simple;
+	bh=IsY6cT/EMNbdEHxsGGmKU2yom71VQGN3eoqzlVoDRMA=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Vojookl6i9yIjjI082PvGRI5yX0QXi/C2NvxzlKTImBAC3ifwsFiWqQjghKGV5fEfgbWzRKCQGQyiRFL8j6d4RVDDn+uHIMiS6CNeM8p1n+YpwjjK5Tili0VHFyRlGr2r7y/wTN+1HDihEMRNKwoldV2wtw3D0U+U9GuEj4RWBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ATCP681e; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EOypttz1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4528C4AF0A;
-	Thu,  1 Aug 2024 13:01:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722517321;
-	bh=2o7H97U54cEmD5Tv71kF1eEpEycy3n5iAga6TGpYn58=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=EOypttz1iUC6Oqt2kwkwmd4hYK/iYBJyUlsSGBCxML2MrAMFnoFqWmEE8yplv/Zf2
-	 g8lM4YlFhj9+fdD1LFcVHcxhbj4wVXGv9AFclgyBJJdQI8TN26iUHLke/PjeQJ6pha
-	 qtzIUteV2oxLMg4GPFfIUSHThfXVm5pvBCWlc0/TXAbN+PB65tYEWVsOkGR0/ooeu3
-	 wR3cCoXFofGIvrX3WiieIBTXZzDojnzLlQJTv+YC7WLr+WhDa3+nuZN0FbZnNlAel4
-	 HYAP0fEe7Pdb1UGWHxPOw1/2ocSKJhL8rPBXlAIPbaw2nrLP0p+9aBvD0dE10tKzcX
-	 caaPVWssBnNAw==
-From: Mark Brown <broonie@kernel.org>
-Date: Thu, 01 Aug 2024 13:07:07 +0100
-Subject: [PATCH v10 40/40] KVM: selftests: arm64: Add GCS registers to
- get-reg-list
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ATCP681e"
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e0b7922ed63so8248284276.0
+        for <kvmarm@lists.linux.dev>; Thu, 01 Aug 2024 07:43:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1722523395; x=1723128195; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9BUCK9RfTKafiexBRvCEwFw2qC43V57hNjDHfumiy08=;
+        b=ATCP681eu6Kt/PIShW2CFNQX/BZoqW5aNGnpvDNef2M3MXvAQmWNK5JwOkQ8Dvxorc
+         1aj/D4P+2OyWlPKbFiUz6tCYOdRcGzUJnwU2rsLJ/QruRyHY43meKFIpeIZ1/a5fmfyS
+         5TAMilY26MdtIiZRRY3FJIyek184T9YAujscE31mFTsPlxRyzzWFiefUIX5R3HZcxuCO
+         EjBTf6hAZJTOkJOR5lL/dQ/fK7KphemfBeBLaUQNfUxltSQGXTxYB6hirwviflWhMBbP
+         TA5Xw1S3AKPAcA2TUruA1zOSI1TcToobJBiWeurOOkms4kqd/odRgu4/J3YqeWgxI+T5
+         su4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722523395; x=1723128195;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=9BUCK9RfTKafiexBRvCEwFw2qC43V57hNjDHfumiy08=;
+        b=f2N4kzWi6XlLI3++HYkV85cYgKdDn31VSPa/5bjFPimdaBBXroE9YBtJzNxmnS8MnX
+         vFcCTNR++jtm5YjsEmWCuEUaXHp4NONrPHt+tIZmxwxdY7GZbOVxvc2Y30JFf9OnGvpU
+         oR+mHi3HsXkKZCtpKzmD1IlW9uDRROTM2842RdOAkboybhMVuli1vqHetsdo38mMW4Do
+         unj/tXWbwJmRSbSOXCR5ZzdoEhDli9ORXHHF7l54x9XDICk3WC7i4t2G/5WZFt+Vi+px
+         tAvEVdD5hYXyrHyR+T65xKLsk2UEIN+QoY2LCiIVAgAwkhC2ksKgNNvq7is9vd3yKryy
+         r3IQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUTiA2hHvOCjE894ANMyO3gOuT37BLwr0TtWRrwxHeM9y+lCOBSl5Ietvd48zWg6ePft9a/S4bRkKXQUxj9oS5djeU2td5g
+X-Gm-Message-State: AOJu0YwtRmHYBeIkw3zPTQRRta43j7X6oVGmwV283Mm6ByW07mXbFjHC
+	j+x28IDBM1qgt/KOZj2QkBN+vzrbE8wv3fIebttVv+9ey5AOSctVaZ2rW+0ruHoxgkt6TEBnc5I
+	SVw==
+X-Google-Smtp-Source: AGHT+IHkE7Ce/eHqXIIWUhOrz6iZ7wUAM+0kNmbjyrQoG1wEe6+vtvmxZ2gwjb9N0RAQKGaJuDaT2daG0VE=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1104:b0:e0b:b6f3:85 with SMTP id
+ 3f1490d57ef6-e0bde2f0105mr658276.2.1722523394843; Thu, 01 Aug 2024 07:43:14
+ -0700 (PDT)
+Date: Thu, 1 Aug 2024 07:43:13 -0700
+In-Reply-To: <87wml0egzo.fsf@draig.linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
+Mime-Version: 1.0
+References: <20240726235234.228822-1-seanjc@google.com> <20240726235234.228822-6-seanjc@google.com>
+ <87wml0egzo.fsf@draig.linaro.org>
+Message-ID: <ZqufAYyVOa9M1z76@google.com>
+Subject: Re: [PATCH v12 05/84] KVM: Add kvm_release_page_unused() API to put
+ pages that KVM never consumes
+From: Sean Christopherson <seanjc@google.com>
+To: "Alex =?utf-8?Q?Benn=C3=A9e?=" <alex.bennee@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
+	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	David Matlack <dmatlack@google.com>, David Stevens <stevensd@chromium.org>
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240801-arm64-gcs-v10-40-699e2bd2190b@kernel.org>
-References: <20240801-arm64-gcs-v10-0-699e2bd2190b@kernel.org>
-In-Reply-To: <20240801-arm64-gcs-v10-0-699e2bd2190b@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>, 
- Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
- Andrew Morton <akpm@linux-foundation.org>, Marc Zyngier <maz@kernel.org>, 
- Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, Arnd Bergmann <arnd@arndb.de>, 
- Oleg Nesterov <oleg@redhat.com>, Eric Biederman <ebiederm@xmission.com>, 
- Shuah Khan <shuah@kernel.org>, 
- "Rick P. Edgecombe" <rick.p.edgecombe@intel.com>, 
- Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>, 
- Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>
-Cc: "H.J. Lu" <hjl.tools@gmail.com>, 
- Paul Walmsley <paul.walmsley@sifive.com>, 
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
- Florian Weimer <fweimer@redhat.com>, Christian Brauner <brauner@kernel.org>, 
- Thiago Jung Bauermann <thiago.bauermann@linaro.org>, 
- Ross Burton <ross.burton@arm.com>, linux-arm-kernel@lists.infradead.org, 
- linux-doc@vger.kernel.org, kvmarm@lists.linux.dev, 
- linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org, 
- linux-mm@kvack.org, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
- Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.15-dev-37811
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2352; i=broonie@kernel.org;
- h=from:subject:message-id; bh=2o7H97U54cEmD5Tv71kF1eEpEycy3n5iAga6TGpYn58=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBmq4Yl2GIZXXyTb/zmM1+n2z4UQxnV39+pL7mDiQag
- cFTi6HGJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZquGJQAKCRAk1otyXVSH0PXDB/
- 4j5qGQGsGNdUNY04r8BP8DhGZFseiQkyBLks8Be56HfC2p51Bs37kAiCN7vw5o6FNjV7nHuKordgf8
- yw8h5xIw20SOGbtSiJzK+Ytmcij7dKixG3lRNnjLjqaDdEBHYQd36UkkNAQgXrVYEHb3uGUdeSe4Pf
- bVg2h3X4uA2HXpmx1Re6duBQnFxQkT9rwDaPrUVUJ8O1yGDA6GES8iwokMeuWIm1IuG8kk4/ryxjLS
- MQuOjZLd4+rfnA99YvtwSC6d7LH3XTe6kZlg8lx4hPJ/2a1XoSi//5g2fntfcaHvPuz/xHErMA3FRH
- FgQKeE4l1SWZJYN8U5tIpu0CgGk3wq
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+Content-Transfer-Encoding: quoted-printable
 
-GCS adds new registers GCSCR_EL1, GCSCRE0_EL1, GCSPR_EL1 and GCSPR_EL0. Add
-these to those validated by get-reg-list.
+On Thu, Aug 01, 2024, Alex Benn=C3=A9e wrote:
+> Sean Christopherson <seanjc@google.com> writes:
+>=20
+> > Add an API to release an unused page, i.e. to put a page without markin=
+g
+> > it accessed or dirty.  The API will be used when KVM faults-in a page b=
+ut
+> > bails before installing the guest mapping (and other similar flows).
+> >
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >  include/linux/kvm_host.h | 9 +++++++++
+> >  1 file changed, 9 insertions(+)
+> >
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index 3d9617d1de41..c5d39a337aa3 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -1201,6 +1201,15 @@ unsigned long gfn_to_hva_prot(struct kvm *kvm, g=
+fn_t gfn, bool *writable);
+> >  unsigned long gfn_to_hva_memslot(struct kvm_memory_slot *slot, gfn_t g=
+fn);
+> >  unsigned long gfn_to_hva_memslot_prot(struct kvm_memory_slot *slot, gf=
+n_t gfn,
+> >  				      bool *writable);
+> > +
+> > +static inline void kvm_release_page_unused(struct page *page)
+> > +{
+> > +	if (!page)
+> > +		return;
+> > +
+> > +	put_page(page);
+> > +}
+>=20
+> I guess it's unfamiliarity with the mm layout but I was trying to find
+> where the get_pages come from to see the full pattern of allocate and
+> return. I guess somewhere in the depths of hva_to_pfn() from
+> hva_to_pfn_retry()?
 
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- tools/testing/selftests/kvm/aarch64/get-reg-list.c | 28 ++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+If successful, get_user_page_fast_only() and get_user_pages_unlocked() grab=
+ a
+reference on behalf of the caller.
 
-diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-index 709d7d721760..9785f41e6042 100644
---- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-+++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-@@ -29,6 +29,24 @@ static struct feature_id_reg feat_id_regs[] = {
- 		0,
- 		1
- 	},
-+	{
-+		ARM64_SYS_REG(3, 0, 2, 5, 0),	/* GCSCR_EL1 */
-+		ARM64_SYS_REG(3, 0, 0, 4, 1),	/* ID_AA64PFR1_EL1 */
-+		44,
-+		1
-+	},
-+	{
-+		ARM64_SYS_REG(3, 0, 2, 5, 1),	/* GCSPR_EL1 */
-+		ARM64_SYS_REG(3, 0, 0, 4, 1),	/* ID_AA64PFR1_EL1 */
-+		44,
-+		1
-+	},
-+	{
-+		ARM64_SYS_REG(3, 0, 2, 5, 2),	/* GCSCRE0_EL1 */
-+		ARM64_SYS_REG(3, 0, 0, 4, 1),	/* ID_AA64PFR1_EL1 */
-+		44,
-+		1
-+	},
- 	{
- 		ARM64_SYS_REG(3, 0, 10, 2, 2),	/* PIRE0_EL1 */
- 		ARM64_SYS_REG(3, 0, 0, 7, 3),	/* ID_AA64MMFR3_EL1 */
-@@ -40,6 +58,12 @@ static struct feature_id_reg feat_id_regs[] = {
- 		ARM64_SYS_REG(3, 0, 0, 7, 3),	/* ID_AA64MMFR3_EL1 */
- 		4,
- 		1
-+	},
-+	{
-+		ARM64_SYS_REG(3, 3, 2, 5, 1),	/* GCSPR_EL0 */
-+		ARM64_SYS_REG(3, 0, 0, 4, 1),	/* ID_AA64PFR1_EL1 */
-+		44,
-+		1
- 	}
- };
- 
-@@ -460,6 +484,9 @@ static __u64 base_regs[] = {
- 	ARM64_SYS_REG(3, 0, 2, 0, 1),	/* TTBR1_EL1 */
- 	ARM64_SYS_REG(3, 0, 2, 0, 2),	/* TCR_EL1 */
- 	ARM64_SYS_REG(3, 0, 2, 0, 3),	/* TCR2_EL1 */
-+	ARM64_SYS_REG(3, 0, 2, 5, 0),	/* GCSCR_EL1 */
-+	ARM64_SYS_REG(3, 0, 2, 5, 1),	/* GCSPR_EL1 */
-+	ARM64_SYS_REG(3, 0, 2, 5, 2),	/* GCSCRE0_EL1 */
- 	ARM64_SYS_REG(3, 0, 5, 1, 0),	/* AFSR0_EL1 */
- 	ARM64_SYS_REG(3, 0, 5, 1, 1),	/* AFSR1_EL1 */
- 	ARM64_SYS_REG(3, 0, 5, 2, 0),	/* ESR_EL1 */
-@@ -475,6 +502,7 @@ static __u64 base_regs[] = {
- 	ARM64_SYS_REG(3, 0, 13, 0, 4),	/* TPIDR_EL1 */
- 	ARM64_SYS_REG(3, 0, 14, 1, 0),	/* CNTKCTL_EL1 */
- 	ARM64_SYS_REG(3, 2, 0, 0, 0),	/* CSSELR_EL1 */
-+	ARM64_SYS_REG(3, 3, 2, 5, 1),	/* GCSPR_EL0 */
- 	ARM64_SYS_REG(3, 3, 13, 0, 2),	/* TPIDR_EL0 */
- 	ARM64_SYS_REG(3, 3, 13, 0, 3),	/* TPIDRRO_EL0 */
- 	ARM64_SYS_REG(3, 3, 14, 0, 1),	/* CNTPCT_EL0 */
+As of this patch, hva_to_pfn_remapped() also grabs a reference to pages tha=
+t
+appear to be refcounted, which is the underlying wart this series aims to f=
+ix.
+In KVM's early days, it _only_ supported GUP, i.e. if KVM got a pfn, that p=
+fn
+was (a) backed by struct page and (b) KVM had a reference to said page.  Th=
+at
+led to the current mess, as KVM didn't get reworked to properly track pages=
+ vs.
+pfns when support for VM_MIXEDMAP was added.
 
--- 
-2.39.2
-
+	/*
+	 * Get a reference here because callers of *hva_to_pfn* and
+	 * *gfn_to_pfn* ultimately call kvm_release_pfn_clean on the
+	 * returned pfn.  This is only needed if the VMA has VM_MIXEDMAP
+	 * set, but the kvm_try_get_pfn/kvm_release_pfn_clean pair will
+	 * simply do nothing for reserved pfns.
+	 *
+	 * Whoever called remap_pfn_range is also going to call e.g.
+	 * unmap_mapping_range before the underlying pages are freed,
+	 * causing a call to our MMU notifier.
+	 *
+	 * Certain IO or PFNMAP mappings can be backed with valid
+	 * struct pages, but be allocated without refcounting e.g.,
+	 * tail pages of non-compound higher order allocations, which
+	 * would then underflow the refcount when the caller does the
+	 * required put_page. Don't allow those pages here.
+	 */
+	if (!kvm_try_get_pfn(pfn))
+		r =3D -EFAULT;
