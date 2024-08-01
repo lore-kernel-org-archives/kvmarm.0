@@ -1,117 +1,128 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5363D1B151B;
-	Thu,  1 Aug 2024 16:45:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 658BB14374F
+	for <kvmarm@lists.linux.dev>; Thu,  1 Aug 2024 18:01:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722530752; cv=none; b=AQ9x3S1GWiMQSQs+hOXX9xD0rGlQGNTon+MNyZu/KzclMR1sVTqCm2kwrDpI7eoSi4zXLK3+l554YWxfYuWZoWC9wMfarzTj9ewNPaiaSu+UeEyqmpMTJLQt+jVGXu4mT73r4Ex5fa8np2OYERRyyM02lS9bhNIoGVuFtBQJokg=
+	t=1722535294; cv=none; b=Umq4cse8apMOAEUTGBy1NE9m0/ajY00mzHgNQJRvNvgJ/omF3E0YHoG28StF/72KSeKKDOrXPODSuhpxBWigiCnsLTd/S7S2WOPIlRzMg77+k6TNaqzlgmCTVwsp/V8/CLnroMK8rNVBreOHElv70Q3RCAtmApGdmGCc1rlMk2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722530752; c=relaxed/simple;
-	bh=9K8/1ZKy51T9Ax3Xh2WIgRnxkcihHgffb1DNF0IENQQ=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=s1sXNHunNnXwp1dT1UFkXW1u36cNg8HIYWNmcb68TaECTolVBscpaqycRo8smEolAXBCnQf9hSwYTptB3SBRJzQnAyJmR4TNZs96B/nixdrqhIvbH3QAbwuxGOP75U43g2nOtC+F/+d1UBP8OdzPJok/86tFViFYrRR6WbD2cX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KscuT4xq; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1722535294; c=relaxed/simple;
+	bh=B4USJ3DcoEtC2grgJaNeehMjrX/R6yyLoOz0nwuEw9c=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=sCYzOOq/lWYxSdUt5TRv0M2ysvO2DKO3vlqFQCM9iHpoJ5fPOivT+CTm38PM+dSmhYzQXhsQydlmc/ul9DM8haOAtVNov2q5DiSnnfFKzkUyrQk+SwK0n8L/xOnaGaz6fCuoOpS2IqKIojrzlzEur2c+hiXBzK6B+FLXpmJnlUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4moarI/e; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KscuT4xq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB49EC32786;
-	Thu,  1 Aug 2024 16:45:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722530751;
-	bh=9K8/1ZKy51T9Ax3Xh2WIgRnxkcihHgffb1DNF0IENQQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=KscuT4xqJXdHZXNNabFmnRhf9Y+fGFdNBEfaZHinesb/+F44xEIOj28bdj+DHMD7O
-	 qegrmkvL4KFgE4UK/dVJvnqeg8awqUImJbw0dXGzbkqTlcWWnqodHRwH61q5TcOhy4
-	 pS4B/RFonxyvQ/Kw0tbWXc8twvOZLF5+YL27DxUe6ugYEZN280C/ZN7851On1DNpU+
-	 KxrkszkzkoCf9DCCsjAEZXc0kxOUjaoyg3gGtFAS4j/Voe0gMqJgXPl1JmBQaZMh7J
-	 tIRiyVdns9GVeGnuJIa3AG/splbo8jObmHDdRWTEHFx2b5IHRINuVw2YmkcKRQ3ohW
-	 pP6fqmGeqt7Jg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sZYw1-00HTHq-IK;
-	Thu, 01 Aug 2024 17:45:49 +0100
-Date: Thu, 01 Aug 2024 17:45:49 +0100
-Message-ID: <86le1g19aa.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: selftests: arm64: Correct feature test for S1PIE in get-reg-list
-In-Reply-To: <20240731-kvm-arm64-fix-s1pie-test-v1-1-a9253f3b7db4@kernel.org>
-References: <20240731-kvm-arm64-fix-s1pie-test-v1-1-a9253f3b7db4@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.3
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4moarI/e"
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-7a28217cfecso7441116a12.2
+        for <kvmarm@lists.linux.dev>; Thu, 01 Aug 2024 11:01:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1722535292; x=1723140092; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xl2Pju3NY9Fnm1xajnPNr4ZOFDET+sfv7XV8JXyIerc=;
+        b=4moarI/efjsuhWG1RgrJl0p8ZHZ3T7DeYTEUR5q5CwH3okgTbbhOwjsdV5coFVbyCO
+         wG6IAnlwtcJGVtJ5w0ag5f3AIsIapjuYNQsasHFHKp9eI+A9URbCb+O0LEdoa3/FCrxB
+         EsDDugHkFSVWjXI/PjFZjaP9T2qUc6nItlLefNlWOoXtANyv1Z7PlWe/+cxWIhCr3CQ1
+         Z5WmKHvDwOnyABHEiKAs7Uqh+IGS+EgH9Ew+DC3tl0zScVWwWL78x4F6Ovzp0K80GbTR
+         2SZ4P1uH4UL6QYcHFgVo9SdjK0r+VnGb76SbExvYPT3bN/UXth16B/ceHH+LWkEZdcsF
+         DwBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722535292; x=1723140092;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xl2Pju3NY9Fnm1xajnPNr4ZOFDET+sfv7XV8JXyIerc=;
+        b=Hbd+rsKFRlXkJtKyCX2IVVNjP5owe2bJUZMPmPORpuva1ZdpBUwHM3V9EgDyDrft7d
+         qPjRm6xcmRyKr8xcM2SgRs+DH5xANowXa74kRcx1q9N4bUMX5FalB3QKGtPEU+GhkGO3
+         TUMMg4d9RA4njX2SVCn+DIiroxpmFsdzk73cVyUeVRaPgcE9623Ony7uf5hL7wOZSN8R
+         AOt3CEcx4+SOkzy102qcHOAcqlmyVZZqQzE1oG2E500JzFOxY829jA51hmyIGXH4Ojcc
+         uYhRRu5wumw4+Q+2tAGmczieHjatXxX+yj368LnqF31AxJWZq6mdLyePRG8t9ZmEk/3S
+         pNLg==
+X-Forwarded-Encrypted: i=1; AJvYcCVluDStd2WqhJ604CfmC2wg+3RsbE3UfFkK1k2fA5f5IvfWb4m3DewRCtlrhx7Va7MDTOZF72OF+5XhXn6FiXZo0GemkHdb
+X-Gm-Message-State: AOJu0Yy8LUWpXC5Lux+8yTTjXCm6IX+lnxTgdZnEZjxOvhz4LyNm0owD
+	zODK+u+TaTor9zNpyz1flupBvnCbmnvg3yp+Dw6vDCCleMd3zIPnKg4Jx/R0Ik1lLXpK7/ZDgRg
+	BIg==
+X-Google-Smtp-Source: AGHT+IF64U8Ib+bNIe3iPxoSzJOvvilQGXPjPZq7Y/8acNPwlcg0hACHnvmYPGnFv3dx9aufX4l27GJDySU=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a65:6252:0:b0:75a:b299:85b6 with SMTP id
+ 41be03b00d2f7-7b74669c7b3mr1534a12.2.1722535291408; Thu, 01 Aug 2024 11:01:31
+ -0700 (PDT)
+Date: Thu, 1 Aug 2024 11:01:30 -0700
+In-Reply-To: <yq5aikwku25o.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, shuah@kernel.org, catalin.marinas@arm.com, joey.gouly@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+References: <20240726235234.228822-1-seanjc@google.com> <20240726235234.228822-3-seanjc@google.com>
+ <yq5aikwku25o.fsf@kernel.org>
+Message-ID: <ZqvNekQAjs-SN-se@google.com>
+Subject: Re: [PATCH v12 02/84] KVM: arm64: Disallow copying MTE to guest
+ memory while KVM is dirty logging
+From: Sean Christopherson <seanjc@google.com>
+To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
+	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	David Matlack <dmatlack@google.com>, David Stevens <stevensd@chromium.org>
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, 31 Jul 2024 17:21:13 +0100,
-Mark Brown <broonie@kernel.org> wrote:
+On Thu, Aug 01, 2024, Aneesh Kumar K.V wrote:
+> Sean Christopherson <seanjc@google.com> writes:
 > 
-> The ID register for S1PIE is ID_AA64MMFR3_EL1.S1PIE which is bits 11:8 but
-> get-reg-list uses a shift of 4, checking SCTLRX instead. Use a shift of 8
-> instead.
+> > Disallow copying MTE tags to guest memory while KVM is dirty logging, as
+> > writing guest memory without marking the gfn as dirty in the memslot could
+> > result in userspace failing to migrate the updated page.  Ideally (maybe?),
+> > KVM would simply mark the gfn as dirty, but there is no vCPU to work with,
+> > and presumably the only use case for copy MTE tags _to_ the guest is when
+> > restoring state on the target.
+> >
+> > Fixes: f0376edb1ddc ("KVM: arm64: Add ioctl to fetch/store tags in a guest")
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >  arch/arm64/kvm/guest.c | 5 +++++
+> >  1 file changed, 5 insertions(+)
+> >
+> > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> > index e1f0ff08836a..962f985977c2 100644
+> > --- a/arch/arm64/kvm/guest.c
+> > +++ b/arch/arm64/kvm/guest.c
+> > @@ -1045,6 +1045,11 @@ int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+> >  
+> >  	mutex_lock(&kvm->slots_lock);
+> >  
+> > +	if (write && atomic_read(&kvm->nr_memslots_dirty_logging)) {
+> > +		ret = -EBUSY;
+> > +		goto out;
+> > +	}
+> > +
+> >
 > 
-> Fixes: 5f0419a0083b ("KVM: selftests: get-reg-list: add Permission Indirection registers")
-> Signed-off-by: Mark Brown <broonie@kernel.org>
-> ---
->  tools/testing/selftests/kvm/aarch64/get-reg-list.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-> index 709d7d721760..4abebde78187 100644
-> --- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-> +++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-> @@ -32,13 +32,13 @@ static struct feature_id_reg feat_id_regs[] = {
->  	{
->  		ARM64_SYS_REG(3, 0, 10, 2, 2),	/* PIRE0_EL1 */
->  		ARM64_SYS_REG(3, 0, 0, 7, 3),	/* ID_AA64MMFR3_EL1 */
-> -		4,
-> +		8,
->  		1
->  	},
->  	{
->  		ARM64_SYS_REG(3, 0, 10, 2, 3),	/* PIR_EL1 */
->  		ARM64_SYS_REG(3, 0, 0, 7, 3),	/* ID_AA64MMFR3_EL1 */
-> -		4,
-> +		8,
->  		1
->  	}
->  };
+> is this equivalent to kvm_follow_pfn() with kfp->pin = 1 ?
 
-Thanks for spotting this. However, we are fixing it in a very backward
-way.
+No, gfn_to_pfn_prot() == FOLL_GET, kfp->pin == FOLL_PIN.  But that's not really
+relevant.
 
-Can we please switch all this stuff to symbolic naming instead of
-magic numbers? Given how much effort is going into the "automated
-generation" thing, it is mind-boggling that the tests still rely on
-handcrafted numbers. We just end-up with two different sets of bugs.
+> Should all those pin request fail if kvm->nr_memslots_dirty_logging != 0? 
 
-At the moment, the level of confidence I have in this stuff is
-sub-zero.
+No, the conflict with dirty logging is specifically that this code doesn't invoke
+mark_page_dirty().  And it can't easily do that, because there's no loaded ("running")
+vCPU, i.e. doing so would trip this WARN:
 
-	M.
+#ifdef CONFIG_HAVE_KVM_DIRTY_RING
+	if (WARN_ON_ONCE(vcpu && vcpu->kvm != kvm))
+		return;
 
--- 
-Without deviation from the norm, progress is not possible.
+	WARN_ON_ONCE(!vcpu && !kvm_arch_allow_write_without_running_vcpu(kvm)); <====
+#endif
