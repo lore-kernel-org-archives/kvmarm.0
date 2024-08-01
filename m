@@ -1,147 +1,92 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E8161A257D;
-	Thu,  1 Aug 2024 09:22:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD201140E5C
+	for <kvmarm@lists.linux.dev>; Thu,  1 Aug 2024 09:30:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722504156; cv=none; b=T6MoV/EcJC/RQWqytn5bWTyNDt/kVrWO1W8WWxd8dhsmy+36DcHvv1srcS8O7GUCgfup9/Mq3cYhR6qxA+VH7ZicVQUvQeAvdrMZDsPBP1+BRbRsvnW9wmqmXTJAGiB5UPu3GwY18hqoOp0R3ER8ck0vsuFvQE+v6+yh03JifnM=
+	t=1722504630; cv=none; b=KPs6inBKs/IeXtA5mHyWkGMJL1qrwiwLngKQ28Tlp+YHNwcUtEIK/MhkvY//6YTPz78ag+hmCQuwzK95lY2avl3Zfv3CsmL1XIYrR7iXLC/TVAmgymnxXjuCgHMxrc0Q6OGaQLGXFgkB7XS47/ASt5VxNRz03dD4kRtUt1hF+/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722504156; c=relaxed/simple;
-	bh=grh5Q/rcvt9bAWN63AYijQmUwGmeLeQjuYTHuxc1Nk8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=oOshkMRZUGJvSO0TxMJFvkQKWhwV+1YGKPfdyEa2cdm7FXz+Y7WZwg9uz6wZ3JNtTdG+4qhRMPppnbA3Nn+hBmY4UkFV6WQAiC+0AANkusdiijgfcgi6cEVV5XjG4XKUjATHTl65Up1DEc6T8oq1Rj9RoV/PVPXsPrZBSLFXRsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=diuaXWeL; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="diuaXWeL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB22FC4AF0B;
-	Thu,  1 Aug 2024 09:22:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722504156;
-	bh=grh5Q/rcvt9bAWN63AYijQmUwGmeLeQjuYTHuxc1Nk8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=diuaXWeLk4Ohsvr0yKsLwqK0W6xqTKeb8QMX6z8USlIlKOvqIgS1OMMvLo3D3XDOe
-	 0NeEe6YHR+Yzn7vWd0Os15fMEsXKgyk97vMTzLWWXLWJkSzVNwuVP5tbnbYb7Hlky5
-	 I3PTFT9saPpUnL9r5C+khf9pdphPQPry2HlW4sdnl18KEl5aXJKNDRC/wPqp0jeZ1W
-	 /hO2qlkM9KJCBQUnZGT5K13sqC3VSDn/5QgdfTw/bHygK9oQ/IZ41qdGK0GGnOhhzh
-	 /QiP7rpM/7iou97jd9T1A7jLElhtYR0WQQ+7i5vElNN1M6BX3c19saMFZ73PI2ot/o
-	 KG/m1Knl27mrg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sZRyZ-00HKNZ-NJ;
-	Thu, 01 Aug 2024 10:19:59 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: James Morse <james.morse@arm.com>,
+	s=arc-20240116; t=1722504630; c=relaxed/simple;
+	bh=/OTW+2gYWzzGtg5eh5Ri6h4zgQIrGeCZb7gtCGgQcJg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OucnHRfHrp23lKLC+N2EK34RRZJOyRg1uIq2/EyprNyrg7RYUxoD1d9woUn80ue8LYvmcxPMN3xZ5VaE1/pwE0oI5bdapAr+9nld4t3bhTMbQRZQBAVdEBHHZmCOZpzsddcFrPEizCEv5/wiIle2f/fRhXDV3qZ9fSsgfzsl1iE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A013EDA7;
+	Thu,  1 Aug 2024 02:30:52 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 681BB3F5A1;
+	Thu,  1 Aug 2024 02:30:25 -0700 (PDT)
+Date: Thu, 1 Aug 2024 10:30:20 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Fuad Tabba <tabba@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v2 1/8] KVM: arm64: Move SVCR into the sysreg array
-Date: Thu,  1 Aug 2024 10:19:48 +0100
-Message-Id: <20240801091955.2066364-2-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240801091955.2066364-1-maz@kernel.org>
-References: <20240801091955.2066364-1-maz@kernel.org>
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: selftests: arm64: Correct feature test for S1PIE in
+ get-reg-list
+Message-ID: <20240801093020.GA841418@e124191.cambridge.arm.com>
+References: <20240731-kvm-arm64-fix-s1pie-test-v1-1-a9253f3b7db4@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, tabba@google.com, joey.gouly@arm.com, broonie@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240731-kvm-arm64-fix-s1pie-test-v1-1-a9253f3b7db4@kernel.org>
 
-SVCR is just a system register, and has no purpose being outside
-of the sysreg array. If anything, it only makes it more difficult
-to eventually support SME one day. If ever.
+On Wed, Jul 31, 2024 at 05:21:13PM +0100, Mark Brown wrote:
+> The ID register for S1PIE is ID_AA64MMFR3_EL1.S1PIE which is bits 11:8 but
+> get-reg-list uses a shift of 4, checking SCTLRX instead. Use a shift of 8
+> instead.
+> 
+> Fixes: 5f0419a0083b ("KVM: selftests: get-reg-list: add Permission Indirection registers")
+> Signed-off-by: Mark Brown <broonie@kernel.org>
 
-Move it into the array with its little friends, and associate it
-with a visibility predicate.
+Argh!
 
-Although this is dead code, it at least paves the way for the
-next set of FP-related extensions.
+Thanks for spotting that.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/kvm_host.h |  4 +++-
- arch/arm64/kvm/fpsimd.c           |  2 +-
- arch/arm64/kvm/sys_regs.c         | 11 ++++++++++-
- 3 files changed, 14 insertions(+), 3 deletions(-)
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index a33f5996ca9f..e244e3176b56 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -446,6 +446,9 @@ enum vcpu_sysreg {
- 	GCR_EL1,	/* Tag Control Register */
- 	TFSRE0_EL1,	/* Tag Fault Status Register (EL0) */
- 
-+	/* FP/SIMD/SVE */
-+	SVCR,
-+
- 	/* 32bit specific registers. */
- 	DACR32_EL2,	/* Domain Access Control Register */
- 	IFSR32_EL2,	/* Instruction Fault Status Register */
-@@ -664,7 +667,6 @@ struct kvm_vcpu_arch {
- 	void *sve_state;
- 	enum fp_type fp_type;
- 	unsigned int sve_max_vl;
--	u64 svcr;
- 	u64 fpmr;
- 
- 	/* Stage 2 paging state used by the hardware on next switch */
-diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-index c53e5b14038d..e6425414d301 100644
---- a/arch/arm64/kvm/fpsimd.c
-+++ b/arch/arm64/kvm/fpsimd.c
-@@ -134,7 +134,7 @@ void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu)
- 		fp_state.sve_state = vcpu->arch.sve_state;
- 		fp_state.sve_vl = vcpu->arch.sve_max_vl;
- 		fp_state.sme_state = NULL;
--		fp_state.svcr = &vcpu->arch.svcr;
-+		fp_state.svcr = &__vcpu_sys_reg(vcpu, SVCR);
- 		fp_state.fpmr = &vcpu->arch.fpmr;
- 		fp_state.fp_type = &vcpu->arch.fp_type;
- 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index c90324060436..2dc6cab43b2f 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1669,6 +1669,15 @@ static unsigned int sve_visibility(const struct kvm_vcpu *vcpu,
- 	return REG_HIDDEN;
- }
- 
-+static unsigned int sme_visibility(const struct kvm_vcpu *vcpu,
-+				   const struct sys_reg_desc *rd)
-+{
-+	if (kvm_has_feat(vcpu->kvm, ID_AA64PFR1_EL1, SME, IMP))
-+		return 0;
-+
-+	return REG_HIDDEN;
-+}
-+
- static u64 read_sanitised_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
- 					  const struct sys_reg_desc *rd)
- {
-@@ -2535,7 +2544,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 			     CTR_EL0_IDC_MASK |
- 			     CTR_EL0_DminLine_MASK |
- 			     CTR_EL0_IminLine_MASK),
--	{ SYS_DESC(SYS_SVCR), undef_access },
-+	{ SYS_DESC(SYS_SVCR), undef_access, reset_val, SVCR, 0, .visibility = sme_visibility  },
- 
- 	{ PMU_SYS_REG(PMCR_EL0), .access = access_pmcr, .reset = reset_pmcr,
- 	  .reg = PMCR_EL0, .get_user = get_pmcr, .set_user = set_pmcr },
--- 
-2.39.2
-
+> ---
+>  tools/testing/selftests/kvm/aarch64/get-reg-list.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> index 709d7d721760..4abebde78187 100644
+> --- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> +++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> @@ -32,13 +32,13 @@ static struct feature_id_reg feat_id_regs[] = {
+>  	{
+>  		ARM64_SYS_REG(3, 0, 10, 2, 2),	/* PIRE0_EL1 */
+>  		ARM64_SYS_REG(3, 0, 0, 7, 3),	/* ID_AA64MMFR3_EL1 */
+> -		4,
+> +		8,
+>  		1
+>  	},
+>  	{
+>  		ARM64_SYS_REG(3, 0, 10, 2, 3),	/* PIR_EL1 */
+>  		ARM64_SYS_REG(3, 0, 0, 7, 3),	/* ID_AA64MMFR3_EL1 */
+> -		4,
+> +		8,
+>  		1
+>  	}
+>  };
+> 
+> ---
+> base-commit: 8400291e289ee6b2bf9779ff1c83a291501f017b
+> change-id: 20240731-kvm-arm64-fix-s1pie-test-a40b6be58d7b
+> 
+> Best regards,
+> -- 
+> Mark Brown <broonie@kernel.org>
+> 
