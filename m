@@ -1,142 +1,106 @@
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 286AF1DAC65
-	for <kvmarm@lists.linux.dev>; Fri,  2 Aug 2024 11:16:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 319B4A31;
+	Fri,  2 Aug 2024 12:43:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722597377; cv=none; b=aJwzl4XgFxoxgKgbi+ZWP6ZAfTCdDYuRW1Osbn69NvVoo5rNTvjS/OBGiyrHW2Wu0Airylds8MzOQaXC3sL4OrbauN7YDxMaA2HJ1E/7z9PWrRBhu8nm/VQMW0YlJdjpwl7tM6TvlgeQYw/ncL0quFKsS+xn1YbuLatBYVRw0WA=
+	t=1722602590; cv=none; b=Fe/Yr6sz/iDCbHQwJ5ogenr5Do+sVTVb8mhuOg0QmQRjFLdgzePOWq6T41DhyCiY8w8soLriORVPznAzixPt4tArlhkSoCDQwzOyeLSrNYxa4wPETZiiTjihjzsIzfqnZ7QLOwo3Su9B12fH6B52VnU6v1ewoG5Rc6iR6wMK3zM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722597377; c=relaxed/simple;
-	bh=5/L0Yc2Z+AOSOKZw3/Dotf6pZ+cloK9IZVwKZGtH7AE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=bWH36oY8TjlAgG5WpDxidzN3jWnvZeIidbTwSFby89m3Jm+qk1wYz/hUu++5y+moXv8i2obWgNzHmcn2Dyv8m2OUuXg8DIurvWGP1KwhehN9fX7UivneZKGjOqi7MFI0ymLPmjT2WBb7LkshxsKkh/ABjSr+ws7kEZ1XlVlcZ+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=REymIrjO; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1722602590; c=relaxed/simple;
+	bh=633lVYjHNRU3EjRX/nYwTZxzcH0uaJwWa8OgY7HscFw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mU/ajVw4qvH8s384y8S7wu4SJRpUW0A2YeGpCnzxp4LYdCk/gmpcjke0aCtrw8HN1+bMH/0RCaU9TPoJ5+xCHlCIQqb1FYpE3rknXifVH3NpOMah6fPuP3fFBlbSunPxUHa7klLf0wc5bRoGD7wcM0IDRVd4YaVpIxvVgJY6vVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YIBV7iZT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="REymIrjO"
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5af326eddb2so5439388a12.1
-        for <kvmarm@lists.linux.dev>; Fri, 02 Aug 2024 04:16:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1722597373; x=1723202173; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=h+a+YbUYnYp2O9o3vDX++ZHVr+zNy81A/L7Ak8HFY0M=;
-        b=REymIrjO6nz8wh62hISnn4LImQPpjFqsUw8yhtlO6qeC0I9bgSWxKozVCOCE0hBxcn
-         3BzwHdOKC/9Rci/92rYO3hkxjj74RtkvwcnTN3Mx0spXMn85Bsv4MZsbruZ2kJhDYCtm
-         dWnnIRp46D/R0T5Y0oHZ/WssjT34nN5dr+SVBNxU0g/K8vQp7k64sk53qyTSkbHoOOym
-         k3tbe+rrfFXRPG8ic6lH3kGDVvLwA3W1a4EGp9ye+wuHLIlJccbQ6I6H7UQyYRDEUQ5k
-         hbd+K8lGzCxIa+Tfmogw6szFwAPPxZ2iJt78gCo9oe5/1yJQuG3N/0nr2G0g/fKXHyOU
-         oWBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722597373; x=1723202173;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=h+a+YbUYnYp2O9o3vDX++ZHVr+zNy81A/L7Ak8HFY0M=;
-        b=ejx4z98YhPpRYUjtmqigUOvFzI404yOW6lnaV0jWNXqYrOPlLyiFU0HxHyyPzHnYhk
-         v+bNawU0OQmtnC1mCzkkaabBFoyJgTvyY1ORzQva/owvoRGV0EnjgxxGe1DiUTdvP7Fa
-         o1piJ5uQR1Or2Jom3AyDlChOijvnaXhgAvf23xBeMwnbLTSuzYpdnAI7vLgneFxrnsJ0
-         85HRBeOqBghSQttcLmluplWFAOoS4pe6Ihn2dVJ2xdVtM9cgGEE3WGiHpsYysfQFujC8
-         lx3wgIaZQoE4Ed+77YmrL4DhAaR2vSF4JNWemcI4gXXsk30lZzEN0EwjG8JNQhOobN+W
-         q/2A==
-X-Forwarded-Encrypted: i=1; AJvYcCWNKU3CURunjYR8GMaecQjudJ6fUVpQsA+1qjSaaxn4UKVqF1/Q7K3XtB1CJe+roSL1a/ROnr3/XNPwXdxl1AgzMI/8CdVh
-X-Gm-Message-State: AOJu0YzUFViJZSXvTPyEbC8gtffZfPh7W1IXtzafUqdpqy+fFGZoDOd9
-	0tmNlMmWcphCAPesPAlvm2mPp+3JeEtCGjL/5YMrbmBXFeJN7vtXmyWpN3Uu8Pg=
-X-Google-Smtp-Source: AGHT+IHUr2+eigMQMyKiFV2SC/+LcUpbtIeuSXGg+vhEQqD67tJuIK6amWVCFT4RRO+CzEGYIGxtXA==
-X-Received: by 2002:a17:907:25c5:b0:a7a:acae:340b with SMTP id a640c23a62f3a-a7dc628bf8fmr256404766b.31.1722597372903;
-        Fri, 02 Aug 2024 04:16:12 -0700 (PDT)
-Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7dc9bcb19csm87224666b.42.2024.08.02.04.16.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Aug 2024 04:16:08 -0700 (PDT)
-Received: from draig (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 91DEE5F8A9;
-	Fri,  2 Aug 2024 12:16:04 +0100 (BST)
-From: =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,  Marc Zyngier <maz@kernel.org>,
-  Oliver Upton <oliver.upton@linux.dev>,  Tianrui Zhao
- <zhaotianrui@loongson.cn>,  Bibo Mao <maobibo@loongson.cn>,  Huacai Chen
- <chenhuacai@kernel.org>,  Michael Ellerman <mpe@ellerman.id.au>,  Anup
- Patel <anup@brainfault.org>,  Paul Walmsley <paul.walmsley@sifive.com>,
-  Palmer Dabbelt <palmer@dabbelt.com>,  Albert Ou <aou@eecs.berkeley.edu>,
-  Christian Borntraeger <borntraeger@linux.ibm.com>,  Janosch Frank
- <frankja@linux.ibm.com>,  Claudio Imbrenda <imbrenda@linux.ibm.com>,
-  kvm@vger.kernel.org,  linux-arm-kernel@lists.infradead.org,
-  kvmarm@lists.linux.dev,  loongarch@lists.linux.dev,
-  linux-mips@vger.kernel.org,  linuxppc-dev@lists.ozlabs.org,
-  kvm-riscv@lists.infradead.org,  linux-riscv@lists.infradead.org,
-  linux-kernel@vger.kernel.org,  David Matlack <dmatlack@google.com>,
-  David Stevens <stevensd@chromium.org>
-Subject: Re: [PATCH v12 11/84] KVM: Rename gfn_to_page_many_atomic() to
- kvm_prefetch_pages()
-In-Reply-To: <20240726235234.228822-12-seanjc@google.com> (Sean
-	Christopherson's message of "Fri, 26 Jul 2024 16:51:20 -0700")
-References: <20240726235234.228822-1-seanjc@google.com>
-	<20240726235234.228822-12-seanjc@google.com>
-Date: Fri, 02 Aug 2024 12:16:04 +0100
-Message-ID: <87frrncgzv.fsf@draig.linaro.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YIBV7iZT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13F8BC32782;
+	Fri,  2 Aug 2024 12:43:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722602588;
+	bh=633lVYjHNRU3EjRX/nYwTZxzcH0uaJwWa8OgY7HscFw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YIBV7iZTMmq2Z5PgLMx4dEAx7osuIAdcyHHr7XtgSLzBNk9EmyRGUtYBqZueJTlEe
+	 Yoe4zkJ1Wrb641tuC/3m4R160s+aO55ZE7WCWJaV8kYmfIlUOStsdcG+3jLrJNEar0
+	 Fo3MSS4pim+5DOwnj2QWgU8O/YkI0uZ5V2Rf4VbFdEEqQqHaNCmSW+1UdBcdDU/Uwv
+	 TGCS05qgKKRDDT/7E8y8pvO9RrptgjlbpjFZ6ue6nXhxV4VqlmcevKqfj5nOxdlMaI
+	 IhP4nbGzfO5pcbmtBP+61scNwYBFnNSwuNDStJiTxN7+Zn7wmj0jMnCsIzMnhQXCa1
+	 A9BF40NdLyTRQ==
+Date: Fri, 2 Aug 2024 13:43:03 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: selftests: arm64: Correct feature test for S1PIE in
+ get-reg-list
+Message-ID: <7b9b3ef4-66da-4314-8265-5947998758e9@sirena.org.uk>
+References: <20240731-kvm-arm64-fix-s1pie-test-v1-1-a9253f3b7db4@kernel.org>
+ <86le1g19aa.wl-maz@kernel.org>
+ <811ea0eb-bc87-4ac3-8bca-27c787e43051@sirena.org.uk>
+ <86jzgz1eqb.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="eCayuY2LI5Ibm307"
+Content-Disposition: inline
+In-Reply-To: <86jzgz1eqb.wl-maz@kernel.org>
+X-Cookie: -- I have seen the FUN --
 
-Sean Christopherson <seanjc@google.com> writes:
 
-> Rename gfn_to_page_many_atomic() to kvm_prefetch_pages() to try and
-> communicate its true purpose, as the "atomic" aspect is essentially a
-> side effect of the fact that x86 uses the API while holding mmu_lock.
+--eCayuY2LI5Ibm307
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-It's never too late to start adding some kdoc annotations to a function
-and renaming a kvm_host API call seems like a good time to do it.
+On Fri, Aug 02, 2024 at 10:00:28AM +0100, Marc Zyngier wrote:
 
-> E.g. even if mmu_lock weren't held, KVM wouldn't want to fault-in pages,
-> as the goal is to opportunistically grab surrounding pages that have
-> already been accessed and/or dirtied by the host, and to do so quickly.
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
-<snip>
+> Also, the test predates the generated stuff by some margin.
 
-/**
- * kvm_prefetch_pages() - opportunistically grab previously accessed pages
- * @slot: which @kvm_memory_slot the pages are in
- * @gfn: guest frame
- * @pages: array to receives page pointers
- * @nr_pages: number of pages
- *
- * Returns the number of pages actually mapped.
- */
+Yeah, there were still defines in the main kernel source that were being
+retyped rather than shared previously which made me wonder.
 
-?
+> Mark Brown <broonie@kernel.org> wrote:
 
->=20=20
-> -int gfn_to_page_many_atomic(struct kvm_memory_slot *slot, gfn_t gfn,
-> -			    struct page **pages, int nr_pages)
-> +int kvm_prefetch_pages(struct kvm_memory_slot *slot, gfn_t gfn,
-> +		       struct page **pages, int nr_pages)
->  {
->  	unsigned long addr;
->  	gfn_t entry =3D 0;
-> @@ -3075,7 +3075,7 @@ int gfn_to_page_many_atomic(struct kvm_memory_slot =
-*slot, gfn_t gfn,
->=20=20
->  	return get_user_pages_fast_only(addr, nr_pages, FOLL_WRITE, pages);
->  }
-> -EXPORT_SYMBOL_GPL(gfn_to_page_many_atomic);
-> +EXPORT_SYMBOL_GPL(kvm_prefetch_pages);
->=20=20
->  /*
->   * Do not use this helper unless you are absolutely certain the gfn _mus=
-t_ be
+> > I'd certainly be happy to convert, though that does
+> > seem a bit invasive for a fix.
 
---=20
-Alex Benn=C3=A9e
-Virtualisation Tech Lead @ Linaro
+> Not for a point fix, for sure. And if you do, make sure it is entirely
+> scripted.
+
+When you say "entirely scripted" here I take it you're referring to the
+list of registers as well, and I guess also to the information about
+what is enumerated by which ID register values?  I'd already been
+thinking about looking at the latter bit, and possibly also tracking
+wiring things up to traps (though that's only relevant inside the
+kernel).  I agree that seems sensible, but I do think we can usefully do
+things in stages - even just replacing the magic numbers with use of the
+defines would be less error prone.  It would be great if we just
+automatically covered every sysreg we know about in this test without
+any manual steps.
+
+--eCayuY2LI5Ibm307
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmas1FYACgkQJNaLcl1U
+h9DpJAf/U25LzOtlHywYKGpxk73rxEA/68hitfX505a0+ZlIYHFFD6RqH0x+Kw/A
+ngf/3/BlP5kbKJ2pOysyUlh0RZWCei3IAToZpAINczoiNaEvXdpe+cZgi3nQUAL+
+DZmG7uN2og56sEGReLy9bUQbyjretNRF//+7Og6186yXBYenL4rNlDUB0CikT9sT
+Aehvs+6RWM3/DQCi0oGm4LoLaf64MGlFFYMw+6mA8N4aPYWEwxkiUFdd/NOHhJ0T
+PifGAPV3f6fFosjPtUsPS4por6cHubvXl/s67zqwbMKS2pxfXIk5GTGlI0h+7+GU
+V0VrWdmAtowwcrU+Mz6h1EHAmjxDAg==
+=ERtX
+-----END PGP SIGNATURE-----
+
+--eCayuY2LI5Ibm307--
