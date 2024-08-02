@@ -1,94 +1,111 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5F401BE87A;
-	Fri,  2 Aug 2024 13:03:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB788A31;
+	Fri,  2 Aug 2024 13:36:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722603792; cv=none; b=pOl79YQgHLztTeQq3/OTvQ4+jxLXLyBuNbLVyN1nYcSIxTVZngAWFrGKv2Q7uYRl2QQJc74ZQB7ProDYZXnY8YdjURtqKXTfUfD3YZLaY6pxJ5a/yFsArHGTYfBnT4bdQeeFXdbQPf8QJufbdXuE7JAfAYg71UrTIPfgrel2+yo=
+	t=1722605777; cv=none; b=WdwNnFtgQQhq/ZKHzxG56denjWqe1VuIAfjtcaeRWt+IvdEX7eGcVXQdw/j8jqnAT/ise+m46f5mo4ZM4fpYVTcIZ04ja8KnURG/ogWcqGnswMxmZl+8/rpGjYGOQ+P3Y7Xcjb5/tPU7JUiC0+XOJ7IN5iyX+Q3pdkQ72Wgq67Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722603792; c=relaxed/simple;
-	bh=eNepbBfqF2TuR1nUKNmOJBk5xlbLcvyFSrrd+Jt7kUA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QvHbD52prkxpu61Q8gKzzA00QbYPulj598+V6uGhdUReyTWcIWpRF79llHBpcNOq8GHdGxQqzOm8We5JFZ1J+7xyy9JFXjkxUAd3uTE09Y7uGHo/4yEHv91nnsflHg92tUzcL+bjtWEHKN46f288B4P11gqz9hhXOPpErxDgYvs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VDTAY15H; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1722605777; c=relaxed/simple;
+	bh=8StiAuH5ByNU4EjrPJTT/7UntXVKMxJ7YxtTnvcEyxg=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=E/zlSxutmFlR1T2XUumjv8/QslXg3CAJxccXD+GpmAnM5YVwaB+tlUPU4v/JWFfmK6nTCFQXetGKuTd8NiyqrQKIlBndHlhWKeB+dV3qjxh6JvNWZdvntCbAFtlINPHlUTJX0RIHaZty9rLqX3qjxQUMg1F8aiQVp5Hec66vOBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LZvQQuGT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VDTAY15H"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5CD4C32782;
-	Fri,  2 Aug 2024 13:03:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LZvQQuGT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56126C32782;
+	Fri,  2 Aug 2024 13:36:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722603792;
-	bh=eNepbBfqF2TuR1nUKNmOJBk5xlbLcvyFSrrd+Jt7kUA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VDTAY15Hytw4gdcOvPPNroOgf4uEUcaGz/MrzVZpPIpSDk8xF8B75VqRNAcpCuYtg
-	 stSojknuFbv6Fqxse0NG4WSThhOhOqtpf/uLiW3+knz+y15tctTw2gu/K59QrhDF4W
-	 SWXRIQ2WYOM7NWXDuCypncuOuWRX+2njXV12lhKdJyZeI3GvFZPNuqIH3XK/ICSzIl
-	 rNx9w47OcKGL6ZkzK8074yHC7+JCkcmBG30vPf9es0Dm9aU24wpXia2Waq7zjxMlM9
-	 91MHEVyo0/G+kTd+D1OUOM3sS9M6edbgLHxXho+9umqzV8sXg/AeNWCV0+A5qqOfo/
-	 D09d96/wW/qgA==
-Date: Fri, 2 Aug 2024 14:03:06 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+	s=k20201202; t=1722605777;
+	bh=8StiAuH5ByNU4EjrPJTT/7UntXVKMxJ7YxtTnvcEyxg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LZvQQuGTvIpiS6crUIO6ngLx9lQpIgRiX6EUnj67z9YoAk3ZcDc4YZSh5pa0bJrEA
+	 lsz5MvNfhcepkkPfA/pPSA8++iZDuHdD39m+/Zdo+8oAzBKsMuk5/ADyk/tVT1x9HD
+	 UrOpP/ape23k0SGgK1PBIIdsTeqkjs8iJGMa8t+6Amgj4voukcZXv+iUX2xoLH0JT0
+	 3OSIEcOqy1Vzoa0l791XIl7L4L8E8xULmAYLbAmDiuur8o1rz3wxgdA9zquKEaXMNV
+	 pPo5YeXizEfmMhryhc1IBY7e30XYTZYtvzERg/Lss31EbRXrdoPWQi1UpGjqCWluKe
+	 nvevFkc3EiipA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sZsS7-000APR-1H;
+	Fri, 02 Aug 2024 14:36:15 +0100
+Date: Fri, 02 Aug 2024 14:36:14 +0100
+Message-ID: <86a5hv11yp.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>, Fuad Tabba <tabba@google.com>,
-	Joey Gouly <joey.gouly@arm.com>
-Subject: Re: [PATCH v2 4/8] KVM: arm64: Add save/restore support for FPMR
-Message-ID: <3a18d8e8-c610-47f6-8f86-4e9e5188cd40@sirena.org.uk>
-References: <20240801091955.2066364-1-maz@kernel.org>
- <20240801091955.2066364-5-maz@kernel.org>
- <1a00165f-7ae5-4c58-9283-836716205db7@sirena.org.uk>
- <87ttg43szf.wl-maz@kernel.org>
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: selftests: arm64: Correct feature test for S1PIE in get-reg-list
+In-Reply-To: <7b9b3ef4-66da-4314-8265-5947998758e9@sirena.org.uk>
+References: <20240731-kvm-arm64-fix-s1pie-test-v1-1-a9253f3b7db4@kernel.org>
+	<86le1g19aa.wl-maz@kernel.org>
+	<811ea0eb-bc87-4ac3-8bca-27c787e43051@sirena.org.uk>
+	<86jzgz1eqb.wl-maz@kernel.org>
+	<7b9b3ef4-66da-4314-8265-5947998758e9@sirena.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.3
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="s4KEHDyvf9qME22j"
-Content-Disposition: inline
-In-Reply-To: <87ttg43szf.wl-maz@kernel.org>
-X-Cookie: -- I have seen the FUN --
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, shuah@kernel.org, catalin.marinas@arm.com, joey.gouly@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Fri, 02 Aug 2024 13:43:03 +0100,
+Mark Brown <broonie@kernel.org> wrote:
+> 
+> [1  <text/plain; us-ascii (7bit)>]
+> On Fri, Aug 02, 2024 at 10:00:28AM +0100, Marc Zyngier wrote:
+> 
+> > Also, the test predates the generated stuff by some margin.
+> 
+> Yeah, there were still defines in the main kernel source that were being
+> retyped rather than shared previously which made me wonder.
 
---s4KEHDyvf9qME22j
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Definitions in the kernel are likely to exist for a long time though,
+as the tool is still pretty primitive and doesn't handle anything that
+changes layout (such as any register affected by E2H).
 
-On Thu, Aug 01, 2024 at 09:09:40PM +0100, Marc Zyngier wrote:
-> Mark Brown <broonie@kernel.org> wrote:
+> 
+> > Mark Brown <broonie@kernel.org> wrote:
+> 
+> > > I'd certainly be happy to convert, though that does
+> > > seem a bit invasive for a fix.
+> 
+> > Not for a point fix, for sure. And if you do, make sure it is entirely
+> > scripted.
+> 
+> When you say "entirely scripted" here I take it you're referring to the
+> list of registers as well, and I guess also to the information about
+> what is enumerated by which ID register values?
 
-> > nVHE is faulting for me, apparently on the kvm_has_fpmr() check though I
-> > ran out of time to actually figure out where exactly it is going wrong.
-> > I'll have a further poke tomorrow.  Backtrace below.
+The register list is indeed the #1 offender, and that should just be a
+script that goes over all the occurrences of ARM64_SYS_REG() and
+replace the encoding with something that uses the symbolic name.
 
-> Well, that's actually pretty obvious when you see the crash
-> (FAR:ffffff880115cd1c spills the beans).
+For the rest (shifts and stuff), we can probably do that by hand
+(there are only a few occurrences).
 
-Ah, good tip.  My problems are usually more to do with traps than
-pointer dereferences.
+	M.
 
-> I'll rename the variable if that avoids people getting their brains in
-> a twist. Full potential fix below.
-
-That's working well for me here.
-
---s4KEHDyvf9qME22j
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmas2QkACgkQJNaLcl1U
-h9DnHwf/Rf3JY7dWR3sez9zyBv1qu/LhZHai54OD5JxwRPbSvDcwawZx6giVyzH1
-PcmysPYEAdSh0nbZ9K953ZtNE2+FJzWwVvtpAzaQLxDkWFYS9RByyejH4u0jX356
-hqO8A3IsJtzoiXTj4wTNATGV7ewkxrBgmTdT4CeT+Wd3M+icSZWP9H/VDcu5mLHn
-RSoqOJ74J/iYFAZMKfFUoVGazOfOl5bVsO8U1wWPF3CYlRnpbWhLiNPiIF2KBI/j
-zlY5WRODw2pY39CUoA18hYQZc3AHcoGr0bkxrSXwj7ipANeur+bGSaOTWGBV9Jrc
-P/szgsD8ULRvlDfbyW07C/PhI3CkOQ==
-=3kCX
------END PGP SIGNATURE-----
-
---s4KEHDyvf9qME22j--
+-- 
+Without deviation from the norm, progress is not possible.
