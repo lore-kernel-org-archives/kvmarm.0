@@ -1,161 +1,103 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A734E1DE87A;
-	Fri,  2 Aug 2024 10:59:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0F1E1DF67D
+	for <kvmarm@lists.linux.dev>; Fri,  2 Aug 2024 11:03:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722596346; cv=none; b=r13p7JZSx70muRmiEp38xz6uaMOkP1LQrE5PEwdzF7k9zmYbkY4MRhBZR2DkDdMsNdUrMPDZI1yxD7fbuax5A9Dh24iQcrGKC47NFrGOJVOVJOGn2OaZQam95sd0zDaneOhzGimdj+VqESEkZIYVs8P00GpgKooLCQkqpyLhyXU=
+	t=1722596596; cv=none; b=VBp3+y6IQIqeBCzNoH526oEU3+W4aenf+Q0v7T91M9ydRxCFroZ/Rx6WyPH7IRi6z60GZWBToxh3ILtUogjTJceXCf3q5ZOMqN1A4jGiAYdnQlHcVrheT9c7hInyr+kRUL/JLSfQr/cDQLGazwW93AGaTut6YLTzrtcOy+bIhzM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722596346; c=relaxed/simple;
-	bh=qppczfrXCD0TYJ6nOu5rI+WZpfgTJHoBUkyW5pmMA34=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WfosZp2iWkHpiXg+dv7N0SaJpl9JfWew2nKX511ZADD8HUo5KKIVL9NT0oqaqlVtMVxvenk+O1zkD5GHDxhjoFwiIE9s4oxMgm0/YfLMuJJlWhtYiHcXdeWWhSACpXLzelCxKW0XvBlwbOtvMOZ6WuswS2ny+A7HQhXY+cgWE4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gzeS/dru; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1722596596; c=relaxed/simple;
+	bh=f7XccJFQ+QycCZFwHexROwL6oGOM5nxC8z9cehuDsO8=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=LMcdB86hfFZnRqS+/1NotgQtl4MQ0UliADIUwluLww1XYu7AiQ5qHqfFGadtY5N9uyQNGAemVCsvK2oZsr64vAGmEwX6osSt90rzZfpQp7JW83HdmBkNJrprqRKuDjyPnTjSes9B3gJF813Gn5V8Wbk3ooNZOINARCnko5KMh+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=R9KxccLB; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gzeS/dru"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70C08C32782;
-	Fri,  2 Aug 2024 10:59:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722596346;
-	bh=qppczfrXCD0TYJ6nOu5rI+WZpfgTJHoBUkyW5pmMA34=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gzeS/druFECbIE1E4ibEX4W2hE1kkH3O08i0uo7jgyzti17yMlDUOq0uMFrnvZuyw
-	 CDz3YC+zg4Lb83Mhyt6NyLLJ5BAbyI37mXFw5/gjefbiGysuzD8MKJ/FKjY2o0nfYP
-	 2S4SPG9i3RPWCwDllMaSIa5y1KhxFAec1N2dlhLsESv79N9R8tGYMvMRk1EcsFO7sN
-	 QUEeld+hWPZXBfZXiR9MWA2wTbpOOHBWDnCJvsVnlf3U8uiFWXdW5oRynB8Dpa+xfx
-	 XTNn3DUo0UbU43ucrBaN9jImnLEqubQ5Adnt9w3q2FVZRv1hnbXtNCzbXI4mAPVRnZ
-	 G+M3yXjDpkauA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sZq00-0005hG-2K;
-	Fri, 02 Aug 2024 11:59:04 +0100
-Date: Fri, 02 Aug 2024 11:59:03 +0100
-Message-ID: <86bk2b198o.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Brown <broonie@kernel.org>,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC 10/10] KVM: arm64: nv: Add new HDFGRTR2_GROUP & HDFGRTR2_GROUP based FGU handling
-In-Reply-To: <d56735e2-3fee-4d91-84e1-a5b480ec0ce1@arm.com>
-References: <20240620065807.151540-1-anshuman.khandual@arm.com>
-	<20240620065807.151540-11-anshuman.khandual@arm.com>
-	<865xu3kh4r.wl-maz@kernel.org>
-	<4d256df7-1ec7-4300-b5c8-355f46c0e869@arm.com>
-	<878qyy35e5.wl-maz@kernel.org>
-	<47dc4299-52cc-4f98-929b-fb86bd9757ae@arm.com>
-	<86tthhi0nz.wl-maz@kernel.org>
-	<c84d0081-5afa-4bc2-82f4-a6dd07b8ab87@arm.com>
-	<86o76c1b8p.wl-maz@kernel.org>
-	<d56735e2-3fee-4d91-84e1-a5b480ec0ce1@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.3
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="R9KxccLB"
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5a156557029so12407613a12.2
+        for <kvmarm@lists.linux.dev>; Fri, 02 Aug 2024 04:03:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1722596593; x=1723201393; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=f7XccJFQ+QycCZFwHexROwL6oGOM5nxC8z9cehuDsO8=;
+        b=R9KxccLB/prVbR+fG+hJV8kJiFKoIDcjyBVTP6biBJx3/DM+zFBbEAluaHyGIEO2hq
+         UDbzzY45kSj0QZbQzlIinsPUavEE8S+JmLy3UC1c35+7Fx96n7/zbC7hVIGC4rroiF1V
+         PNPTU0dgRG9L8KBBw3qB8WxELmZNf/rFU1beLADe9NLHTh5miVyhgS2RoepSqHDrWQMc
+         lf5u+hleJKvCdN+6I7JIfySgYk9Rr0+WCToFDXY+hIJscUavSu0u2ERZlg8HxHe0VDvl
+         ReN/Fht1ZNyhKJbiFU117RiIa1isAi44Nf/Iultxi6RpB7OG6mYEF0Bxb9xh3+0vh9zH
+         QY+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722596593; x=1723201393;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=f7XccJFQ+QycCZFwHexROwL6oGOM5nxC8z9cehuDsO8=;
+        b=vXTAYKymBI7FUGno52vQ675KQjWdSHSg50Fx3AMuRHyxCU54jT8u7jcij81OQJD3l3
+         1zPHSfNRL3IuDRwOfN28UiOYG6Hbd1JuEIZT1D/Pc/fR6kVR359BjDAl5FApVriGuI4n
+         oS/tsnldWw7p7gZ3oNQFhaFMp2Zl/2BeEF0wFgsrojYgJnOJV+HySkTegpx8Lklfd8XJ
+         gx9nGp1j5k92ZIuAApT5C91wiKs9/ukoe20cMfjrbVcfQsHrBc1qMFbiBZk8L3PiWWyS
+         0a2ydriGKl+R2mFqTR4r3n52bsjoR2QXLz6n9dHtnUXcrO6X8n4XDJBKanantnonHkL8
+         gqkA==
+X-Forwarded-Encrypted: i=1; AJvYcCUcLQE13dcv8D+evW8SDWQFZDvmRTlRDfSkHLpUrSnetim5wfJD3/XBw/4rm1bmTLaDBE/EHWSBfYpfeIkh7tlyDTRV9ckO
+X-Gm-Message-State: AOJu0YyendwNYGUrVBxl2+6NAl9kuB/zaomACG8TQBDJMDzAWoFsopOo
+	YtfZYb30z+BpMBOxwmr0iEYPUWihTBFUm83ZvLcfsqycbCb+7VYMRB4NCSnd1iM=
+X-Google-Smtp-Source: AGHT+IFGQonexgpZjGUwl51oIYY4w2W/jqJ1zQyOCpk3kJFGs8T5j8dynyIwmzMmmRUPMHGi6NWZlQ==
+X-Received: by 2002:a17:907:7f24:b0:a7d:a29e:5c41 with SMTP id a640c23a62f3a-a7dc5029a1dmr251865166b.40.1722596592689;
+        Fri, 02 Aug 2024 04:03:12 -0700 (PDT)
+Received: from draig.lan ([85.9.250.243])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7dc9e8676fsm84603966b.164.2024.08.02.04.03.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 Aug 2024 04:03:12 -0700 (PDT)
+Received: from draig (localhost [IPv6:::1])
+	by draig.lan (Postfix) with ESMTP id 24FEC5F8A9;
+	Fri,  2 Aug 2024 12:03:11 +0100 (BST)
+From: =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,  Marc Zyngier <maz@kernel.org>,
+  Oliver Upton <oliver.upton@linux.dev>,  Tianrui Zhao
+ <zhaotianrui@loongson.cn>,  Bibo Mao <maobibo@loongson.cn>,  Huacai Chen
+ <chenhuacai@kernel.org>,  Michael Ellerman <mpe@ellerman.id.au>,  Anup
+ Patel <anup@brainfault.org>,  Paul Walmsley <paul.walmsley@sifive.com>,
+  Palmer Dabbelt <palmer@dabbelt.com>,  Albert Ou <aou@eecs.berkeley.edu>,
+  Christian Borntraeger <borntraeger@linux.ibm.com>,  Janosch Frank
+ <frankja@linux.ibm.com>,  Claudio Imbrenda <imbrenda@linux.ibm.com>,
+  kvm@vger.kernel.org,  linux-arm-kernel@lists.infradead.org,
+  kvmarm@lists.linux.dev,  loongarch@lists.linux.dev,
+  linux-mips@vger.kernel.org,  linuxppc-dev@lists.ozlabs.org,
+  kvm-riscv@lists.infradead.org,  linux-riscv@lists.infradead.org,
+  linux-kernel@vger.kernel.org,  David Matlack <dmatlack@google.com>,
+  David Stevens <stevensd@chromium.org>
+Subject: Re: [PATCH v12 83/84] KVM: Drop APIs that manipulate "struct page"
+ via pfns
+In-Reply-To: <20240726235234.228822-84-seanjc@google.com> (Sean
+	Christopherson's message of "Fri, 26 Jul 2024 16:52:32 -0700")
+References: <20240726235234.228822-1-seanjc@google.com>
+	<20240726235234.228822-84-seanjc@google.com>
+Date: Fri, 02 Aug 2024 12:03:11 +0100
+Message-ID: <87jzgzchlc.fsf@draig.linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: anshuman.khandual@arm.com, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, broonie@kernel.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 02 Aug 2024 10:25:44 +0100,
-Anshuman Khandual <anshuman.khandual@arm.com> wrote:
-> 
-> On 8/1/24 21:33, Marc Zyngier wrote:
-> > On Thu, 01 Aug 2024 11:46:22 +0100,
-> > Anshuman Khandual <anshuman.khandual@arm.com> wrote:
+Sean Christopherson <seanjc@google.com> writes:
 
-[...]
+> Remove all kvm_{release,set}_pfn_*() APIs not that all users are gone.
 
-> >> +	SR_FGT(SYS_SPMACCESSR_EL1,	HDFGRTR2, nSPMACCESSR_EL1, 0),
-> > 
-> > This (and I take it most of the stuff here) is also gated by
-> > MDCR_EL2.SPM, which is a coarse grained trap. That needs to be
-> > described as well. For every new register that you add here.
-> 
-> I did not find a SPM field in MDCR_EL2 either in latest ARM ARM or in
-> the latest XML. But as per current HDFGRTR2_EL2 description the field
-> nSPMACCESSR_EL1 is gated by FEAT_SPMU feature, which is being checked
-> via ID_AA64DFR1_EL1.PMU when required. So could you please give some
-> more details.
+now?
 
-I misspelled it. It is MDCR_EL2.EnSPM.
+Otherwise:
 
-And you are completely missing the point. It is not about
-HDFGRTR2_EL2, but about SPMACCESSR_EL1 (and all its little friends).
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-To convince yourself, just look at the pseudocode for SPMACCESSR_EL1,
-limited to an EL1 access:
-
-elsif PSTATE.EL == EL1 then
-    if HaveEL(EL3) && EL3SDDUndefPriority() && MDCR_EL3.EnPM2 == '0' then
-        UNDEFINED;
-    elsif EL2Enabled() && IsFeatureImplemented(FEAT_FGT2) && ((HaveEL(EL3) && SCR_EL3.FGTEn2 == '0') || HDFGRTR2_EL2.nSPMACCESSR_EL1 == '0') then
-        AArch64.SystemAccessTrap(EL2, 0x18);
-    elsif EL2Enabled() && MDCR_EL2.EnSPM == '0' then
-        AArch64.SystemAccessTrap(EL2, 0x18);
-    elsif HaveEL(EL3) && MDCR_EL3.EnPM2 == '0' then
-        if EL3SDDUndef() then
-            UNDEFINED;
-        else
-            AArch64.SystemAccessTrap(EL3, 0x18);
-    elsif EffectiveHCR_EL2_NVx() IN {'111'} then
-        X[t, 64] = NVMem[0x8E8];
-    else
-        X[t, 64] = SPMACCESSR_EL1;
-
-
-Can you spot the *TWO* conditions where we take an exception to EL2
-with 0x18 as the EC?
-
-- One is when HDFGxTR2_EL2.nSPMACCESSR_EL1 == '0': that's a fine
-  grained trap.
-- The other is when MDCR_EL2.EnSPM == '0': that's a coarse grained
-  trap.
-
-Both conditions need to be captured in the various tables in this
-file, for each and every register that you describe.
-
-[...]
-
-> > Now, the main issues are that:
-> > 
-> > - you're missing the coarse grained trapping for all the stuff you
-> >   have just added. It's not a huge amount of work, but you need, for
-> >   each register, to describe what traps apply to it. The fine grained
-> >   stuff is most, but not all of it. There should be enough of it
-> >   already to guide you through it.
-> 
-> Coarse grained trapping for FEAT_FGT2 based fine grained registers ?
-
-Not for FEAT_FGT2. For the registers that FEAT_FGT2 traps. Can you see
-the difference?
-
-> Afraid, did not understand this. Could you please give some pointers
-> on similar existing code.
-
-See above. And if you want some example, just took at the file you are
-patching already. Look at how MDCR_EL2 conditions the trapping of all
-the debug, PMU, AMU registers, for example. There is no shortage of
-them.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+--=20
+Alex Benn=C3=A9e
+Virtualisation Tech Lead @ Linaro
