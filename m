@@ -1,369 +1,93 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAC7C13C9C4;
-	Fri,  2 Aug 2024 21:58:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A53FB13C3EE
+	for <kvmarm@lists.linux.dev>; Fri,  2 Aug 2024 22:41:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722635898; cv=none; b=TdpVkSHMwjTp0pKZReIpOjW/CrVRqnROs6tXSTJFxRUmHdI6UgycxtXT3xsaPMY0PAHFEoDqflvoUjJuVfQ6fUl4Cz8gpRyJQCJTYs7Y2HvfddJv+kvAhugf6agKwTYpJzUL0+5Mtr6xmPksKfvUJDiq/zEoUCLUdh+ZtiFJB1c=
+	t=1722638463; cv=none; b=e2U962bBnzlnDwV8xgQlbsZ5BNhzv8y1U4aVJqSV/p9d7KVlLCacyLOBjrROYoyTT1QRqOuAgYxkCzCMZgkbCAoIn8r9VfAHyyNzYvimMw4tSj/zOnc7vUZSr59+Z2YUGZw/Vuy3DB7rqwR/tj2JXtlfEUH58Wm+rPiLcw36hko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722635898; c=relaxed/simple;
-	bh=VoSJImacX+kY6vdGrODiJZGx2cTYlpBVWC6lRFq1lJs=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Di5aUKVyWxmQ7b7SOt1epq8QjMNONyzaBnl8Z8NNXu2RDcL0MKlADC54X4v3kGENbVJNjURG8jdotB8/5obBmud84HNek4/nsaW8VUV5jbcFyAJ9+hOtHe3gBddalfMw0Sav5j+hYV9Kj0UBFWiFjJZQeFCvmE24GUl9+tXzjjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G9j8Hy9O; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1722638463; c=relaxed/simple;
+	bh=qr5BTy+0rP4m99VwQ0GuNK/YeJP/WBSk49NkTt1nPdc=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=X7Aj2PjVIRT5ZqdWEn2EV3oTtAYuGfSufURS/jJ07niBm+zat52Zz/I791ZzEncqzojmwCzrAN6f5MUX6Qinjy1pkaM4YN0InkKkLPrTQL1gfqgAQtFY+6k57FE+RZtJYgDEmK6eiC9Bg5S0LD/OXnL0L/VWwQjLbGlUz4nqhv4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--amoorthy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MrSEVG3f; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--amoorthy.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G9j8Hy9O"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A2C1C4AF0A;
-	Fri,  2 Aug 2024 21:58:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722635898;
-	bh=VoSJImacX+kY6vdGrODiJZGx2cTYlpBVWC6lRFq1lJs=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=G9j8Hy9OeTb8EmMFmjr6avJ6B2j3krD+pJhUG1APmXBpEN9jOOGIMdSs3vj10VdAK
-	 l00ltjg38VN2wprlXljw4CTTSq/Uzerpd3bGnWlAduIHcsGucxt7ExavLpKK3FZdS2
-	 v5Z9VX0lijqRUbykpzk1vxgDsYzQ88zPh5gHhb6ifRvaVUrzGJYGSFQDQXlG8cQsdL
-	 0EiChI9rojO7eMcpyNeyk/n8L5eR7qliNIOct/dqSPepUn2gl+wuDoYcFFrM1aNBrj
-	 JHlcwDGlDkXx3J/kv8uWuJXIgATSGezNvrx1pSEvyDMghPN6uqD2RpPKIFJqcymYYZ
-	 kJjw3bKtqxENw==
-From: Mark Brown <broonie@kernel.org>
-Date: Fri, 02 Aug 2024 22:57:54 +0100
-Subject: [PATCH 2/2] KVM: selftests: arm64: Use generated defines for named
- system registers
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MrSEVG3f"
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-664b7a67ad4so177621887b3.2
+        for <kvmarm@lists.linux.dev>; Fri, 02 Aug 2024 15:41:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1722638460; x=1723243260; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=XoExkem0pI3PQlrsfFLGIInPgK2Os7OnG4xaWi9xIB0=;
+        b=MrSEVG3fp5E5PdALDGoHZeK5L+Gnft42Z2T/gJAdvO7if1FUjYZPNopQ/gl+cP0mt4
+         IB8JSlh1arxYfUsWCa3Fj/Ap96R4iNbS4mXuMz+qZi+Bn4KVbA1VcuuMM/7nlyFEKNkl
+         J1A1myelxjnJFbZpFM00xm10Qj72PWTn/eFKNyD4Ehm0hli7hOEy6oN7ZEhyBm5f6pOq
+         Qxq8LrCqWt3RPnpqgVzM7uB+yxY6xE2ZSFDDncwP1S1DfXzfJEZr2q+WQAHSrNKGewN9
+         WHhVIXz9EZaOLKc9z9Ix4k6AaZpu0/pEfKQFkMNIDP5x7pIofA1Ba0UZgII4anAGArxJ
+         bNAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722638460; x=1723243260;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XoExkem0pI3PQlrsfFLGIInPgK2Os7OnG4xaWi9xIB0=;
+        b=SUxRMxR9CvHlFQnEZLqNr9yYW27IibmL3NXC/aizE8s+V3iD/Rim0oHSyo6krtgipU
+         SDizoGm+ivofpMug7ECjandEc1nDkkbxyaiZaWiaseNRiIrdhxSG3Wd9S1Mmn1nf0Z52
+         mcZ2GKDYgFXWqyaIHvsAbnOMgTYlw7jEK8rGhPSpWaTum3jSVg6Q5ygk3wAapeNq0CZe
+         cuQO/AdvlBfC350UQSkl5PGz6n9M3ia3dwM7tlt1jOcoCYZHd1caVLiEXSSv86+45UQ7
+         XFwFwoQ2eZlS+jUwqbmm9U+1R2zmHH1regui9Xdvol/wBlNtt5fyhilLtPm+Cjc2AzaG
+         LkIg==
+X-Forwarded-Encrypted: i=1; AJvYcCXXML/H/vBNg7V/cmxKVclCzVhN7TQXAeesJ0EImCJzdIxZiJrLFOLblTOXsLv8lDJL6qKOmag=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyJ2t8tP6ByandwYv+M8kj4O1t/HuAzZK2CMB/065S3Q4zvZ6sH
+	y80zwyJ8CibaVHLG3IJU0absnOJqCZgd3QImGu+a9C/NnW9jywbZI+3p+tKtiPwmWdCFQh2fIYP
+	UpIbGVlaB7Q==
+X-Google-Smtp-Source: AGHT+IHWsNULlr0OmaF5l6nZ9yDeq3lPANgbS+u1ex6NibNf4/8aS9SuVg1An9LGCqPy2z4RP/nXzJOyr2/9rQ==
+X-Received: from laogai.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:2c9])
+ (user=amoorthy job=sendgmr) by 2002:a05:690c:86:b0:673:b39a:92ce with SMTP id
+ 00721157ae682-689601ab898mr265957b3.3.1722638460490; Fri, 02 Aug 2024
+ 15:41:00 -0700 (PDT)
+Date: Fri,  2 Aug 2024 22:40:28 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240802-kvm-arm64-get-reg-list-v1-2-3a5bf8f80765@kernel.org>
-References: <20240802-kvm-arm64-get-reg-list-v1-0-3a5bf8f80765@kernel.org>
-In-Reply-To: <20240802-kvm-arm64-get-reg-list-v1-0-3a5bf8f80765@kernel.org>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
- James Morse <james.morse@arm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
- Catalin Marinas <catalin.marinas@arm.com>, Joey Gouly <joey.gouly@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
- kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.15-dev-37811
-X-Developer-Signature: v=1; a=openpgp-sha256; l=12914; i=broonie@kernel.org;
- h=from:subject:message-id; bh=VoSJImacX+kY6vdGrODiJZGx2cTYlpBVWC6lRFq1lJs=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBmrVZw0VmwKwRA4y3IJkIxFqM4Wr/pdN25rzGyUc4O
- yxeh2ImJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZq1WcAAKCRAk1otyXVSH0O0JB/
- 4teQM72Wwp4fMh8rdKcU6+ke9mdpokyhRYLklCZPgYdaxEHU3vUd/QGOxWODtoYDuRzCaPiyrGLYTJ
- GuozqMB+YRF8lMB7vDjBqpUfa8RL0xsjOdaG5td4shwDnUahSS9OgptjFcUPdMmn5i5S8ApWnHaKcf
- TaSPs/NRmiXVrodpLMqILnOSCQnZcctVsZJ8Q3EJyz7VlKpleQMb4WLfcge4kYCehI5ZvmMUfKelJO
- 6vdeKxWy1KTwHOIie94Zn/necUDMnGbHyg9V57buV05JbmZFZ32G3KsCkUA8auFj2Af7pTtUxDAuJO
- z+kywfYyrXJOn1oy6z9MopEL/ofVIs
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.46.0.rc2.264.g509ed76dc8-goog
+Message-ID: <20240802224031.154064-1-amoorthy@google.com>
+Subject: [PATCH 0/3] Set up KVM_EXIT_MEMORY_FAULTs when arm64/x86 stage-2
+ fault handlers fail
+From: Anish Moorthy <amoorthy@google.com>
+To: seanjc@google.com, oliver.upton@linux.dev
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, jthoughton@google.com, 
+	amoorthy@google.com, rananta@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-Currently the get-reg-list test uses directly specified numeric values to
-define system registers to validate. Since we already have a macro which
-allows us to use the generated system register definitions from the main
-kernel easily let's update all the registers where we have specified the
-name in a comment to just use that macro. This reduces the number of
-places where we need to validate the name to number mapping.
+Memory fault exits were originally conceived for the stage-2 fault
+handlers in the first place: it's probably time they were actually added
+there :)
 
-This conversion was done with the sed command:
+Sean and Oliver: you guys were having a discussion on the arm64 patch
+the last time I posted it: here's the link in case you need it.
+https://lore.kernel.org/kvm/20240215235405.368539-9-amoorthy@google.com/
 
-  sed -i -E 's-ARM64_SYS_REG.*/\* (.*) \*/-KVM_ARM64_SYS_REG(SYS_\1),-' tools/testing/selftests/kvm/aarch64/get-reg-list.c
+Anish Moorthy (3):
+  KVM: x86: Do a KVM_MEMORY_FAULT EXIT when stage-2 fault handler
+    EFAULTs
+  KVM: arm64: Declare support for KVM_CAP_MEMORY_FAULT_INFO
+  KVM: arm64: Do a KVM_EXIT_MEMORY_FAULT when stage-2 fault handler
+    EFAULTs
 
-We still have a number of numerically specified registers, some of these
-are reserved registers without defined names (eg, unallocated ID registers)
-and others don't have kernel macro definitions yet.
+ Documentation/virt/kvm/api.rst | 2 +-
+ arch/arm64/kvm/arm.c           | 1 +
+ arch/arm64/kvm/mmu.c           | 5 ++++-
+ arch/x86/kvm/mmu/mmu.c         | 1 +
+ 4 files changed, 7 insertions(+), 2 deletions(-)
 
-No change in the generated output.
 
-Suggested-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- tools/testing/selftests/kvm/aarch64/get-reg-list.c | 208 ++++++++++-----------
- 1 file changed, 104 insertions(+), 104 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-index a00322970578..4d786c4ab28a 100644
---- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-+++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-@@ -313,14 +313,14 @@ static __u64 base_regs[] = {
- 	KVM_REG_ARM_FW_FEAT_BMAP_REG(0),	/* KVM_REG_ARM_STD_BMAP */
- 	KVM_REG_ARM_FW_FEAT_BMAP_REG(1),	/* KVM_REG_ARM_STD_HYP_BMAP */
- 	KVM_REG_ARM_FW_FEAT_BMAP_REG(2),	/* KVM_REG_ARM_VENDOR_HYP_BMAP */
--	ARM64_SYS_REG(3, 3, 14, 3, 1),	/* CNTV_CTL_EL0 */
--	ARM64_SYS_REG(3, 3, 14, 3, 2),	/* CNTV_CVAL_EL0 */
-+	KVM_ARM64_SYS_REG(SYS_CNTV_CTL_EL0),
-+	KVM_ARM64_SYS_REG(SYS_CNTV_CVAL_EL0),
- 	ARM64_SYS_REG(3, 3, 14, 0, 2),
--	ARM64_SYS_REG(3, 0, 0, 0, 0),	/* MIDR_EL1 */
--	ARM64_SYS_REG(3, 0, 0, 0, 6),	/* REVIDR_EL1 */
--	ARM64_SYS_REG(3, 1, 0, 0, 1),	/* CLIDR_EL1 */
--	ARM64_SYS_REG(3, 1, 0, 0, 7),	/* AIDR_EL1 */
--	ARM64_SYS_REG(3, 3, 0, 0, 1),	/* CTR_EL0 */
-+	KVM_ARM64_SYS_REG(SYS_MIDR_EL1),
-+	KVM_ARM64_SYS_REG(SYS_REVIDR_EL1),
-+	KVM_ARM64_SYS_REG(SYS_CLIDR_EL1),
-+	KVM_ARM64_SYS_REG(SYS_AIDR_EL1),
-+	KVM_ARM64_SYS_REG(SYS_CTR_EL0),
- 	ARM64_SYS_REG(2, 0, 0, 0, 4),
- 	ARM64_SYS_REG(2, 0, 0, 0, 5),
- 	ARM64_SYS_REG(2, 0, 0, 0, 6),
-@@ -329,8 +329,8 @@ static __u64 base_regs[] = {
- 	ARM64_SYS_REG(2, 0, 0, 1, 5),
- 	ARM64_SYS_REG(2, 0, 0, 1, 6),
- 	ARM64_SYS_REG(2, 0, 0, 1, 7),
--	ARM64_SYS_REG(2, 0, 0, 2, 0),	/* MDCCINT_EL1 */
--	ARM64_SYS_REG(2, 0, 0, 2, 2),	/* MDSCR_EL1 */
-+	KVM_ARM64_SYS_REG(SYS_MDCCINT_EL1),
-+	KVM_ARM64_SYS_REG(SYS_MDSCR_EL1),
- 	ARM64_SYS_REG(2, 0, 0, 2, 4),
- 	ARM64_SYS_REG(2, 0, 0, 2, 5),
- 	ARM64_SYS_REG(2, 0, 0, 2, 6),
-@@ -387,109 +387,109 @@ static __u64 base_regs[] = {
- 	ARM64_SYS_REG(2, 0, 0, 15, 5),
- 	ARM64_SYS_REG(2, 0, 0, 15, 6),
- 	ARM64_SYS_REG(2, 0, 0, 15, 7),
--	ARM64_SYS_REG(2, 0, 1, 1, 4),	/* OSLSR_EL1 */
--	ARM64_SYS_REG(2, 4, 0, 7, 0),	/* DBGVCR32_EL2 */
--	ARM64_SYS_REG(3, 0, 0, 0, 5),	/* MPIDR_EL1 */
--	ARM64_SYS_REG(3, 0, 0, 1, 0),	/* ID_PFR0_EL1 */
--	ARM64_SYS_REG(3, 0, 0, 1, 1),	/* ID_PFR1_EL1 */
--	ARM64_SYS_REG(3, 0, 0, 1, 2),	/* ID_DFR0_EL1 */
--	ARM64_SYS_REG(3, 0, 0, 1, 3),	/* ID_AFR0_EL1 */
--	ARM64_SYS_REG(3, 0, 0, 1, 4),	/* ID_MMFR0_EL1 */
--	ARM64_SYS_REG(3, 0, 0, 1, 5),	/* ID_MMFR1_EL1 */
--	ARM64_SYS_REG(3, 0, 0, 1, 6),	/* ID_MMFR2_EL1 */
--	ARM64_SYS_REG(3, 0, 0, 1, 7),	/* ID_MMFR3_EL1 */
--	ARM64_SYS_REG(3, 0, 0, 2, 0),	/* ID_ISAR0_EL1 */
--	ARM64_SYS_REG(3, 0, 0, 2, 1),	/* ID_ISAR1_EL1 */
--	ARM64_SYS_REG(3, 0, 0, 2, 2),	/* ID_ISAR2_EL1 */
--	ARM64_SYS_REG(3, 0, 0, 2, 3),	/* ID_ISAR3_EL1 */
--	ARM64_SYS_REG(3, 0, 0, 2, 4),	/* ID_ISAR4_EL1 */
--	ARM64_SYS_REG(3, 0, 0, 2, 5),	/* ID_ISAR5_EL1 */
--	ARM64_SYS_REG(3, 0, 0, 2, 6),	/* ID_MMFR4_EL1 */
--	ARM64_SYS_REG(3, 0, 0, 2, 7),	/* ID_ISAR6_EL1 */
--	ARM64_SYS_REG(3, 0, 0, 3, 0),	/* MVFR0_EL1 */
--	ARM64_SYS_REG(3, 0, 0, 3, 1),	/* MVFR1_EL1 */
--	ARM64_SYS_REG(3, 0, 0, 3, 2),	/* MVFR2_EL1 */
-+	KVM_ARM64_SYS_REG(SYS_OSLSR_EL1),
-+	KVM_ARM64_SYS_REG(SYS_DBGVCR32_EL2),
-+	KVM_ARM64_SYS_REG(SYS_MPIDR_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_PFR0_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_PFR1_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_DFR0_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_AFR0_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_MMFR0_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_MMFR1_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_MMFR2_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_MMFR3_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_ISAR0_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_ISAR1_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_ISAR2_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_ISAR3_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_ISAR4_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_ISAR5_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_MMFR4_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_ISAR6_EL1),
-+	KVM_ARM64_SYS_REG(SYS_MVFR0_EL1),
-+	KVM_ARM64_SYS_REG(SYS_MVFR1_EL1),
-+	KVM_ARM64_SYS_REG(SYS_MVFR2_EL1),
- 	ARM64_SYS_REG(3, 0, 0, 3, 3),
--	ARM64_SYS_REG(3, 0, 0, 3, 4),	/* ID_PFR2_EL1 */
--	ARM64_SYS_REG(3, 0, 0, 3, 5),	/* ID_DFR1_EL1 */
--	ARM64_SYS_REG(3, 0, 0, 3, 6),	/* ID_MMFR5_EL1 */
-+	KVM_ARM64_SYS_REG(SYS_ID_PFR2_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_DFR1_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_MMFR5_EL1),
- 	ARM64_SYS_REG(3, 0, 0, 3, 7),
--	ARM64_SYS_REG(3, 0, 0, 4, 0),	/* ID_AA64PFR0_EL1 */
--	ARM64_SYS_REG(3, 0, 0, 4, 1),	/* ID_AA64PFR1_EL1 */
--	ARM64_SYS_REG(3, 0, 0, 4, 2),	/* ID_AA64PFR2_EL1 */
-+	KVM_ARM64_SYS_REG(SYS_ID_AA64PFR0_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_AA64PFR1_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_AA64PFR2_EL1),
- 	ARM64_SYS_REG(3, 0, 0, 4, 3),
--	ARM64_SYS_REG(3, 0, 0, 4, 4),	/* ID_AA64ZFR0_EL1 */
--	ARM64_SYS_REG(3, 0, 0, 4, 5),	/* ID_AA64SMFR0_EL1 */
-+	KVM_ARM64_SYS_REG(SYS_ID_AA64ZFR0_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_AA64SMFR0_EL1),
- 	ARM64_SYS_REG(3, 0, 0, 4, 6),
- 	ARM64_SYS_REG(3, 0, 0, 4, 7),
--	ARM64_SYS_REG(3, 0, 0, 5, 0),	/* ID_AA64DFR0_EL1 */
--	ARM64_SYS_REG(3, 0, 0, 5, 1),	/* ID_AA64DFR1_EL1 */
-+	KVM_ARM64_SYS_REG(SYS_ID_AA64DFR0_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_AA64DFR1_EL1),
- 	ARM64_SYS_REG(3, 0, 0, 5, 2),
- 	ARM64_SYS_REG(3, 0, 0, 5, 3),
--	ARM64_SYS_REG(3, 0, 0, 5, 4),	/* ID_AA64AFR0_EL1 */
--	ARM64_SYS_REG(3, 0, 0, 5, 5),	/* ID_AA64AFR1_EL1 */
-+	KVM_ARM64_SYS_REG(SYS_ID_AA64AFR0_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_AA64AFR1_EL1),
- 	ARM64_SYS_REG(3, 0, 0, 5, 6),
- 	ARM64_SYS_REG(3, 0, 0, 5, 7),
--	ARM64_SYS_REG(3, 0, 0, 6, 0),	/* ID_AA64ISAR0_EL1 */
--	ARM64_SYS_REG(3, 0, 0, 6, 1),	/* ID_AA64ISAR1_EL1 */
--	ARM64_SYS_REG(3, 0, 0, 6, 2),	/* ID_AA64ISAR2_EL1 */
-+	KVM_ARM64_SYS_REG(SYS_ID_AA64ISAR0_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_AA64ISAR1_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_AA64ISAR2_EL1),
- 	ARM64_SYS_REG(3, 0, 0, 6, 3),
- 	ARM64_SYS_REG(3, 0, 0, 6, 4),
- 	ARM64_SYS_REG(3, 0, 0, 6, 5),
- 	ARM64_SYS_REG(3, 0, 0, 6, 6),
- 	ARM64_SYS_REG(3, 0, 0, 6, 7),
--	ARM64_SYS_REG(3, 0, 0, 7, 0),	/* ID_AA64MMFR0_EL1 */
--	ARM64_SYS_REG(3, 0, 0, 7, 1),	/* ID_AA64MMFR1_EL1 */
--	ARM64_SYS_REG(3, 0, 0, 7, 2),	/* ID_AA64MMFR2_EL1 */
--	ARM64_SYS_REG(3, 0, 0, 7, 3),	/* ID_AA64MMFR3_EL1 */
--	ARM64_SYS_REG(3, 0, 0, 7, 4),	/* ID_AA64MMFR4_EL1 */
-+	KVM_ARM64_SYS_REG(SYS_ID_AA64MMFR0_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_AA64MMFR1_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_AA64MMFR2_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_AA64MMFR3_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_AA64MMFR4_EL1),
- 	ARM64_SYS_REG(3, 0, 0, 7, 5),
- 	ARM64_SYS_REG(3, 0, 0, 7, 6),
- 	ARM64_SYS_REG(3, 0, 0, 7, 7),
--	ARM64_SYS_REG(3, 0, 1, 0, 0),	/* SCTLR_EL1 */
--	ARM64_SYS_REG(3, 0, 1, 0, 1),	/* ACTLR_EL1 */
--	ARM64_SYS_REG(3, 0, 1, 0, 2),	/* CPACR_EL1 */
--	ARM64_SYS_REG(3, 0, 2, 0, 0),	/* TTBR0_EL1 */
--	ARM64_SYS_REG(3, 0, 2, 0, 1),	/* TTBR1_EL1 */
--	ARM64_SYS_REG(3, 0, 2, 0, 2),	/* TCR_EL1 */
--	ARM64_SYS_REG(3, 0, 2, 0, 3),	/* TCR2_EL1 */
--	ARM64_SYS_REG(3, 0, 5, 1, 0),	/* AFSR0_EL1 */
--	ARM64_SYS_REG(3, 0, 5, 1, 1),	/* AFSR1_EL1 */
--	ARM64_SYS_REG(3, 0, 5, 2, 0),	/* ESR_EL1 */
--	ARM64_SYS_REG(3, 0, 6, 0, 0),	/* FAR_EL1 */
--	ARM64_SYS_REG(3, 0, 7, 4, 0),	/* PAR_EL1 */
--	ARM64_SYS_REG(3, 0, 10, 2, 0),	/* MAIR_EL1 */
--	ARM64_SYS_REG(3, 0, 10, 2, 2),	/* PIRE0_EL1 */
--	ARM64_SYS_REG(3, 0, 10, 2, 3),	/* PIR_EL1 */
--	ARM64_SYS_REG(3, 0, 10, 3, 0),	/* AMAIR_EL1 */
--	ARM64_SYS_REG(3, 0, 12, 0, 0),	/* VBAR_EL1 */
--	ARM64_SYS_REG(3, 0, 12, 1, 1),	/* DISR_EL1 */
--	ARM64_SYS_REG(3, 0, 13, 0, 1),	/* CONTEXTIDR_EL1 */
--	ARM64_SYS_REG(3, 0, 13, 0, 4),	/* TPIDR_EL1 */
--	ARM64_SYS_REG(3, 0, 14, 1, 0),	/* CNTKCTL_EL1 */
--	ARM64_SYS_REG(3, 2, 0, 0, 0),	/* CSSELR_EL1 */
--	ARM64_SYS_REG(3, 3, 13, 0, 2),	/* TPIDR_EL0 */
--	ARM64_SYS_REG(3, 3, 13, 0, 3),	/* TPIDRRO_EL0 */
--	ARM64_SYS_REG(3, 3, 14, 0, 1),	/* CNTPCT_EL0 */
--	ARM64_SYS_REG(3, 3, 14, 2, 1),	/* CNTP_CTL_EL0 */
--	ARM64_SYS_REG(3, 3, 14, 2, 2),	/* CNTP_CVAL_EL0 */
--	ARM64_SYS_REG(3, 4, 3, 0, 0),	/* DACR32_EL2 */
--	ARM64_SYS_REG(3, 4, 5, 0, 1),	/* IFSR32_EL2 */
--	ARM64_SYS_REG(3, 4, 5, 3, 0),	/* FPEXC32_EL2 */
-+	KVM_ARM64_SYS_REG(SYS_SCTLR_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ACTLR_EL1),
-+	KVM_ARM64_SYS_REG(SYS_CPACR_EL1),
-+	KVM_ARM64_SYS_REG(SYS_TTBR0_EL1),
-+	KVM_ARM64_SYS_REG(SYS_TTBR1_EL1),
-+	KVM_ARM64_SYS_REG(SYS_TCR_EL1),
-+	KVM_ARM64_SYS_REG(SYS_TCR2_EL1),
-+	KVM_ARM64_SYS_REG(SYS_AFSR0_EL1),
-+	KVM_ARM64_SYS_REG(SYS_AFSR1_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ESR_EL1),
-+	KVM_ARM64_SYS_REG(SYS_FAR_EL1),
-+	KVM_ARM64_SYS_REG(SYS_PAR_EL1),
-+	KVM_ARM64_SYS_REG(SYS_MAIR_EL1),
-+	KVM_ARM64_SYS_REG(SYS_PIRE0_EL1),
-+	KVM_ARM64_SYS_REG(SYS_PIR_EL1),
-+	KVM_ARM64_SYS_REG(SYS_AMAIR_EL1),
-+	KVM_ARM64_SYS_REG(SYS_VBAR_EL1),
-+	KVM_ARM64_SYS_REG(SYS_DISR_EL1),
-+	KVM_ARM64_SYS_REG(SYS_CONTEXTIDR_EL1),
-+	KVM_ARM64_SYS_REG(SYS_TPIDR_EL1),
-+	KVM_ARM64_SYS_REG(SYS_CNTKCTL_EL1),
-+	KVM_ARM64_SYS_REG(SYS_CSSELR_EL1),
-+	KVM_ARM64_SYS_REG(SYS_TPIDR_EL0),
-+	KVM_ARM64_SYS_REG(SYS_TPIDRRO_EL0),
-+	KVM_ARM64_SYS_REG(SYS_CNTPCT_EL0),
-+	KVM_ARM64_SYS_REG(SYS_CNTP_CTL_EL0),
-+	KVM_ARM64_SYS_REG(SYS_CNTP_CVAL_EL0),
-+	KVM_ARM64_SYS_REG(SYS_DACR32_EL2),
-+	KVM_ARM64_SYS_REG(SYS_IFSR32_EL2),
-+	KVM_ARM64_SYS_REG(SYS_FPEXC32_EL2),
- };
- 
- static __u64 pmu_regs[] = {
--	ARM64_SYS_REG(3, 0, 9, 14, 1),	/* PMINTENSET_EL1 */
--	ARM64_SYS_REG(3, 0, 9, 14, 2),	/* PMINTENCLR_EL1 */
--	ARM64_SYS_REG(3, 3, 9, 12, 0),	/* PMCR_EL0 */
--	ARM64_SYS_REG(3, 3, 9, 12, 1),	/* PMCNTENSET_EL0 */
--	ARM64_SYS_REG(3, 3, 9, 12, 2),	/* PMCNTENCLR_EL0 */
--	ARM64_SYS_REG(3, 3, 9, 12, 3),	/* PMOVSCLR_EL0 */
--	ARM64_SYS_REG(3, 3, 9, 12, 4),	/* PMSWINC_EL0 */
--	ARM64_SYS_REG(3, 3, 9, 12, 5),	/* PMSELR_EL0 */
--	ARM64_SYS_REG(3, 3, 9, 13, 0),	/* PMCCNTR_EL0 */
--	ARM64_SYS_REG(3, 3, 9, 14, 0),	/* PMUSERENR_EL0 */
--	ARM64_SYS_REG(3, 3, 9, 14, 3),	/* PMOVSSET_EL0 */
-+	KVM_ARM64_SYS_REG(SYS_PMINTENSET_EL1),
-+	KVM_ARM64_SYS_REG(SYS_PMINTENCLR_EL1),
-+	KVM_ARM64_SYS_REG(SYS_PMCR_EL0),
-+	KVM_ARM64_SYS_REG(SYS_PMCNTENSET_EL0),
-+	KVM_ARM64_SYS_REG(SYS_PMCNTENCLR_EL0),
-+	KVM_ARM64_SYS_REG(SYS_PMOVSCLR_EL0),
-+	KVM_ARM64_SYS_REG(SYS_PMSWINC_EL0),
-+	KVM_ARM64_SYS_REG(SYS_PMSELR_EL0),
-+	KVM_ARM64_SYS_REG(SYS_PMCCNTR_EL0),
-+	KVM_ARM64_SYS_REG(SYS_PMUSERENR_EL0),
-+	KVM_ARM64_SYS_REG(SYS_PMOVSSET_EL0),
- 	ARM64_SYS_REG(3, 3, 14, 8, 0),
- 	ARM64_SYS_REG(3, 3, 14, 8, 1),
- 	ARM64_SYS_REG(3, 3, 14, 8, 2),
-@@ -552,7 +552,7 @@ static __u64 pmu_regs[] = {
- 	ARM64_SYS_REG(3, 3, 14, 15, 4),
- 	ARM64_SYS_REG(3, 3, 14, 15, 5),
- 	ARM64_SYS_REG(3, 3, 14, 15, 6),
--	ARM64_SYS_REG(3, 3, 14, 15, 7),	/* PMCCFILTR_EL0 */
-+	KVM_ARM64_SYS_REG(SYS_PMCCFILTR_EL0),
- };
- 
- static __u64 vregs[] = {
-@@ -641,7 +641,7 @@ static __u64 sve_regs[] = {
- 	KVM_REG_ARM64_SVE_PREG(14, 0),
- 	KVM_REG_ARM64_SVE_PREG(15, 0),
- 	KVM_REG_ARM64_SVE_FFR(0),
--	ARM64_SYS_REG(3, 0, 1, 2, 0),   /* ZCR_EL1 */
-+	KVM_ARM64_SYS_REG(SYS_ZCR_EL1),
- };
- 
- static __u64 sve_rejects_set[] = {
-@@ -649,19 +649,19 @@ static __u64 sve_rejects_set[] = {
- };
- 
- static __u64 pauth_addr_regs[] = {
--	ARM64_SYS_REG(3, 0, 2, 1, 0),	/* APIAKEYLO_EL1 */
--	ARM64_SYS_REG(3, 0, 2, 1, 1),	/* APIAKEYHI_EL1 */
--	ARM64_SYS_REG(3, 0, 2, 1, 2),	/* APIBKEYLO_EL1 */
--	ARM64_SYS_REG(3, 0, 2, 1, 3),	/* APIBKEYHI_EL1 */
--	ARM64_SYS_REG(3, 0, 2, 2, 0),	/* APDAKEYLO_EL1 */
--	ARM64_SYS_REG(3, 0, 2, 2, 1),	/* APDAKEYHI_EL1 */
--	ARM64_SYS_REG(3, 0, 2, 2, 2),	/* APDBKEYLO_EL1 */
--	ARM64_SYS_REG(3, 0, 2, 2, 3)	/* APDBKEYHI_EL1 */
-+	KVM_ARM64_SYS_REG(SYS_APIAKEYLO_EL1),
-+	KVM_ARM64_SYS_REG(SYS_APIAKEYHI_EL1),
-+	KVM_ARM64_SYS_REG(SYS_APIBKEYLO_EL1),
-+	KVM_ARM64_SYS_REG(SYS_APIBKEYHI_EL1),
-+	KVM_ARM64_SYS_REG(SYS_APDAKEYLO_EL1),
-+	KVM_ARM64_SYS_REG(SYS_APDAKEYHI_EL1),
-+	KVM_ARM64_SYS_REG(SYS_APDBKEYLO_EL1),
-+	KVM_ARM64_SYS_REG(SYS_APDBKEYHI_EL1),
- };
- 
- static __u64 pauth_generic_regs[] = {
--	ARM64_SYS_REG(3, 0, 2, 3, 0),	/* APGAKEYLO_EL1 */
--	ARM64_SYS_REG(3, 0, 2, 3, 1),	/* APGAKEYHI_EL1 */
-+	KVM_ARM64_SYS_REG(SYS_APGAKEYLO_EL1),
-+	KVM_ARM64_SYS_REG(SYS_APGAKEYHI_EL1),
- };
- 
- #define BASE_SUBLIST \
-
+base-commit: 332d2c1d713e232e163386c35a3ba0c1b90df83f
 -- 
-2.39.2
+2.46.0.rc2.264.g509ed76dc8-goog
 
