@@ -1,143 +1,144 @@
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB3081482E2
-	for <kvmarm@lists.linux.dev>; Thu,  1 Aug 2024 23:14:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1AB51BE87F;
+	Fri,  2 Aug 2024 07:34:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722554060; cv=none; b=kipCc1ErkFJzEGeW1aFbYsAqnPrirqkbXOCaEB04nwzaFsttUrAerFe1p0lqY6nkSgxe3f+hqg+PgVbvSV84nbWGMYLA6fSnsgauj2Y2kvG1CBtnNmHfAhpMklk8StIkV/4Pu94kGyzrvvSKmRSV3dR6TLuUiIbKulLPwHd4j8A=
+	t=1722584085; cv=none; b=qNc4rGwmNWLyHxihEp0Fy0yoJ+34VAVxI/2knktQXzu7BzjXOnOnFT+bqibCno4gD9bR37U278eAIYYBWJ5cMPp6qDjFVN/J/TE8VUK8jIqRb4opbOI3v3a+Ut+spfwEOH2cluw16rkCDDoyc93xxFCoTfop9W0fD4A8m7FwElI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722554060; c=relaxed/simple;
-	bh=LakDI92yHujNYi+vD9cXq4g/itDQoPvZyDTcFrObMss=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GV1p98KbAe+oeQ7FdjgvrXPUYvpIUIBtJGJ7ekD4PSTx35dGyxHDzSulqjN9uAri56N00EaWcHBAu1AGoiBKUk9hJelTX8X5SNaPY5nZM1m+fPZPftqu0V8NTmKpMwNbTflEBBm2WovlQ3aMCbp7n1h4HeJ9Zzytcftm/HK+apA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=q59Cdu6W; arc=none smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="q59Cdu6W"
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-44fdc70e695so1145421cf.0
-        for <kvmarm@lists.linux.dev>; Thu, 01 Aug 2024 16:14:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722554057; x=1723158857; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bgdFSK67EnlVzS0oNU0oXBgCMZ8Z41GsOasZvN/Cis8=;
-        b=q59Cdu6WXCKtEnlI0txgZ1ZAPqxO4rMicFJ/FKutAN+jFzwZmDZZIBTS8Aly6Y8zhe
-         PUpFTauIn9MVnb3LjObDxjok6vIsXJdz1Vhb/p40ma/GbNRXmEyTYy+X61Lwoo89Dfcb
-         SEsYaqTl+Vq1PIBHLLBVnJEENHtNG7WK6Zlppuy6BNYvcrPafg+Gfp4hrzp3/cITmQXA
-         KEr+dJ1IILX1SeWhHV5FBi66bFKp6zEuAmAlzhAdZ6J4RwJ6YTAhypjwm62J3fKfrKeg
-         6hr5CMdPkfOB2nKRFIeYIKZnbtE6ZPDNJacZDMxRER1iIcmc8+qZLd97FeWUvTzXKq1P
-         xgoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722554057; x=1723158857;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bgdFSK67EnlVzS0oNU0oXBgCMZ8Z41GsOasZvN/Cis8=;
-        b=E1gVZQyYooVcH08ZM/qxvy92KL2Zp/fAuIWqQ7rQd2FSh6Jh9EAFLUxBNbuQQUZHsH
-         aHuA8Cvo9lSGQTesbhK11wb7cISlfRne1GCDhGZi7RqYv6s2WdAV1BsgA+JLbfqFoGwW
-         n2rz4+6yTdX8IcIIzEaczd6Y3LsbCedBiOViB+1yJrIAgzcrUbP+1RzLrXp+jsmk8Njf
-         tPqguIV6YJvyGKsg9te/5La3n3SjIcR0y/ttNSXl93ktRE4tcITkuCeDKAPBB5DOCDA0
-         88Cc9MTJSimt0QpxAWNs57sTnFx21/iqelqxtN0xZDzM0S4Gp0POoFYOeWpmmWmF5EBC
-         aMkA==
-X-Forwarded-Encrypted: i=1; AJvYcCUQQoVKD1t/MNK+m0T1BWD9k0Ca5C8tUx8XstPiEq5DFZVUgYHdpspDwjY+s2VH67qe6gSBj0+vDR88G57PuoGLMpMjOcc7
-X-Gm-Message-State: AOJu0YwW/7QV/216hBMMYlxpL3do6Le8lA5UzC8mHniX7JAe2EmPloDy
-	nBwt0YICIvb6KJGerIj07apO71Xgx7253kv64AHcrLSX9LTe2iDFSv3UUHjDkPaHc6mhG/K1omq
-	7pJUGbngCoy85TapLiL7w+/a7+Eh/eADSJGhV
-X-Google-Smtp-Source: AGHT+IEavFuwjE3Uo37LnJzCLlUcmMvqQudZCR32/8HyzTxNRzd5eGXPN4zy9/nrSL3qCpUTpDg7un5y0ylSK+y54Ao=
-X-Received: by 2002:a05:622a:178a:b0:447:e153:66e0 with SMTP id
- d75a77b69052e-4518c6e3d95mr497911cf.2.1722554057325; Thu, 01 Aug 2024
- 16:14:17 -0700 (PDT)
+	s=arc-20240116; t=1722584085; c=relaxed/simple;
+	bh=28kV5J8/flAVt86/GsEj43NZxtciKgmXFgOHNgHpFQI=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=Nkt1whhHeHqduO2aeRypfZkO/l/pO76WKHur2omTYhcbhOumMdklxrDUy94fsAcdJUHzlVwkOtRULmmHWNKnBzvIiKobZUl2arE5dZzTmJI5HSU93jUkNTtrFjHWDML8ao+sVq5Xu7SY6Bnm5Hauo8dFEbQ+yvi99Pud2CI1dGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.62])
+	by gateway (Coremail) with SMTP id _____8AxnOoQjKxmAVoGAA--.22201S3;
+	Fri, 02 Aug 2024 15:34:40 +0800 (CST)
+Received: from [10.20.42.62] (unknown [10.20.42.62])
+	by front1 (Coremail) with SMTP id qMiowMCxbuUPjKxm0GILAA--.55848S3;
+	Fri, 02 Aug 2024 15:34:39 +0800 (CST)
+Subject: Re: [PATCH v12 65/84] KVM: LoongArch: Mark "struct page" pfns
+ accessed only in "slow" page fault path
+To: Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao
+ <zhaotianrui@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
+ Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, loongarch@lists.linux.dev,
+ linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+ linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
+ David Stevens <stevensd@chromium.org>
+References: <20240726235234.228822-1-seanjc@google.com>
+ <20240726235234.228822-66-seanjc@google.com>
+From: maobibo <maobibo@loongson.cn>
+Message-ID: <d5405245-edd3-9bc5-0c40-282a30e46fae@loongson.cn>
+Date: Fri, 2 Aug 2024 15:34:38 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20240724011037.3671523-1-jthoughton@google.com>
- <20240724011037.3671523-6-jthoughton@google.com> <37ae59f2-777a-4a58-ae58-4a20066364dd@redhat.com>
-In-Reply-To: <37ae59f2-777a-4a58-ae58-4a20066364dd@redhat.com>
-From: James Houghton <jthoughton@google.com>
-Date: Thu, 1 Aug 2024 16:13:40 -0700
-Message-ID: <CADrL8HUmQWDc-75p=Z2KZzHkyWCCh8xnX=+ZXm5MZ-drALjKTA@mail.gmail.com>
-Subject: Re: [PATCH v6 05/11] mm: Add fast_only bool to test_young and
- clear_young MMU notifiers
-To: David Hildenbrand <david@redhat.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Ankit Agrawal <ankita@nvidia.com>, Axel Rasmussen <axelrasmussen@google.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, David Matlack <dmatlack@google.com>, 
-	David Rientjes <rientjes@google.com>, James Morse <james.morse@arm.com>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Raghavendra Rao Ananta <rananta@google.com>, 
-	Ryan Roberts <ryan.roberts@arm.com>, Sean Christopherson <seanjc@google.com>, 
-	Shaoqin Huang <shahuang@redhat.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Wei Xu <weixugc@google.com>, Will Deacon <will@kernel.org>, Yu Zhao <yuzhao@google.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20240726235234.228822-66-seanjc@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowMCxbuUPjKxm0GILAA--.55848S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoW7WFWUJw1rKF47AFWUZFWfCrX_yoW8ZF1xpF
+	ZxCwsrtr4rtrn093srta4qvF17Gw4DKr1xX3W2q34FkFnIqw1Y93W8W397WFyUJ392ya1S
+	vF1rt3WUWan0vacCm3ZEXasCq-sJn29KB7ZKAUJUUUUk529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUPab4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2kKe7AKxVWUtVW8ZwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	tVWrXwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
+	8JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vI
+	r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_Jw0_GFylx2IqxVAqx4xG67
+	AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIY
+	rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14
+	v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWx
+	JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUstxhDU
+	UUU
 
-On Thu, Aug 1, 2024 at 2:36=E2=80=AFAM David Hildenbrand <david@redhat.com>=
- wrote:
->
-> On 24.07.24 03:10, James Houghton wrote:
-> > For implementers, the fast_only bool indicates that the age information
-> > needs to be harvested such that we do not slow down other MMU operation=
-s,
-> > and ideally that we are not ourselves slowed down by other MMU
-> > operations.  Usually this means that the implementation should be
-> > lockless.
->
-> But what are the semantics if "fast_only" cannot be achieved by the
-> implementer?
->
-> Can we add some documentation to the new functions that explain what
-> this mysterious "fast_only" is and what the expected semantics are?
-> Please? :)
 
-Thanks for pointing out the missing documentation. How's this?
 
-diff --git a/include/linux/mmu_notifier.h b/include/linux/mmu_notifier.h
-index 45c5995ebd84..c21992036dd3 100644
---- a/include/linux/mmu_notifier.h
-+++ b/include/linux/mmu_notifier.h
-@@ -106,6 +106,18 @@ struct mmu_notifier_ops {
-         * clear_young is a lightweight version of clear_flush_young. Like =
-the
-         * latter, it is supposed to test-and-clear the young/accessed bitf=
-lag
-         * in the secondary pte, but it may omit flushing the secondary tlb=
-.
-+        *
-+        * The fast_only parameter indicates that this call should not bloc=
-k,
-+        * and this function should not cause other MMU notifier calls to
-+        * block. Usually this means that the implementation should be
-+        * lockless.
-+        *
-+        * When called with fast_only, this notifier will be a no-op unless
-+        * has_fast_aging is set on the struct mmu_notifier.
-+        *
-+        * When fast_only is true, if the implementer cannot determine that=
- a
-+        * range is young without blocking, it should return 0 (i.e.,
-+        * that the range is NOT young).
-         */
-        int (*clear_young)(struct mmu_notifier *subscription,
-                           struct mm_struct *mm,
-@@ -118,6 +130,8 @@ struct mmu_notifier_ops {
-         * the secondary pte. This is used to know if the page is
-         * frequently used without actually clearing the flag or tearing
-         * down the secondary mapping on the page.
-+        *
-+        * The fast_only parameter has the same meaning as with clear_young=
-.
-         */
-        int (*test_young)(struct mmu_notifier *subscription,
-                          struct mm_struct *mm,
+On 2024/7/27 上午7:52, Sean Christopherson wrote:
+> Mark pages accessed only in the slow path, before dropping mmu_lock when
+> faulting in guest memory so that LoongArch can convert to
+> kvm_release_faultin_page() without tripping its lockdep assertion on
+> mmu_lock being held.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>   arch/loongarch/kvm/mmu.c | 20 ++------------------
+>   1 file changed, 2 insertions(+), 18 deletions(-)
+> 
+> diff --git a/arch/loongarch/kvm/mmu.c b/arch/loongarch/kvm/mmu.c
+> index 364dd35e0557..52b5c16cf250 100644
+> --- a/arch/loongarch/kvm/mmu.c
+> +++ b/arch/loongarch/kvm/mmu.c
+> @@ -552,12 +552,10 @@ bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+>   static int kvm_map_page_fast(struct kvm_vcpu *vcpu, unsigned long gpa, bool write)
+>   {
+>   	int ret = 0;
+> -	kvm_pfn_t pfn = 0;
+>   	kvm_pte_t *ptep, changed, new;
+>   	gfn_t gfn = gpa >> PAGE_SHIFT;
+>   	struct kvm *kvm = vcpu->kvm;
+>   	struct kvm_memory_slot *slot;
+> -	struct page *page;
+>   
+>   	spin_lock(&kvm->mmu_lock);
+>   
+> @@ -570,8 +568,6 @@ static int kvm_map_page_fast(struct kvm_vcpu *vcpu, unsigned long gpa, bool writ
+>   
+>   	/* Track access to pages marked old */
+>   	new = kvm_pte_mkyoung(*ptep);
+> -	/* call kvm_set_pfn_accessed() after unlock */
+> -
+>   	if (write && !kvm_pte_dirty(new)) {
+>   		if (!kvm_pte_write(new)) {
+>   			ret = -EFAULT;
+> @@ -595,23 +591,11 @@ static int kvm_map_page_fast(struct kvm_vcpu *vcpu, unsigned long gpa, bool writ
+>   	}
+>   
+>   	changed = new ^ (*ptep);
+> -	if (changed) {
+> +	if (changed)
+>   		kvm_set_pte(ptep, new);
+> -		pfn = kvm_pte_pfn(new);
+> -		page = kvm_pfn_to_refcounted_page(pfn);
+> -		if (page)
+> -			get_page(page);
+> -	}
+> +
+>   	spin_unlock(&kvm->mmu_lock);
+>   
+> -	if (changed) {
+> -		if (kvm_pte_young(changed))
+> -			kvm_set_pfn_accessed(pfn);
+> -
+> -		if (page)
+> -			put_page(page);
+> -	}
+> -
+>   	if (kvm_pte_dirty(changed))
+>   		mark_page_dirty(kvm, gfn);
+>   
+> 
+Reviewed-by: Bibo Mao <maobibo@loongson.cn>
 
-I've also moved the commit that follows this one (the one that adds
-has_fast_aging) to be before this one so that the comment makes sense.
