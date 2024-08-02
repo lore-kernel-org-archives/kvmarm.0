@@ -1,181 +1,148 @@
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 038181A34AA
-	for <kvmarm@lists.linux.dev>; Fri,  2 Aug 2024 16:03:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E5661ABEAF
+	for <kvmarm@lists.linux.dev>; Fri,  2 Aug 2024 19:32:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722614638; cv=none; b=DTqNasTY9UPWE7KYNu6Xx8EEyXkh25LkD22t58yMioMGkn2/ywpW95jyJ085g+s3JFoQyHX2yawjuABQpOnUDZAtYFTsUb8+kD83MgHxul2znfwWOWuHuMMyTMhL1cKit6OGGyL/wGdtW6QwJqO+6bbWMaP2ik6wZ5DemaCnkE0=
+	t=1722627133; cv=none; b=TbQmEJNOchSx+ui/cF44vMQPvWe6ZSTNixgj8FzNin5iszIA9D4qLCrdBDiCvhiBxIV/KwIf4c/LC1IjE0WmCgaCS8htCOLIRUDLEf9g5s8FdXtS6A5ra+3A0lIl9Hh/StXJQ19KPLHT5ZFSxn8pJ/4HLld8Hi05hOsEzAv65vU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722614638; c=relaxed/simple;
-	bh=D5cezDh4A5XyfwFkC2BlahwYraXx3RdiYvjPIXTBfDE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HA5vn+5iAhYEzQdyXPKp5LgOW7QGcRmk6VcEYvKGCx3WeLxAO6gsefAY2d4GMK0ZMNb5aQ93dgMVBlWFyfTBSbPan7/10IsECYnqrmk7iObPm1TDEBYL518Jgo/r1MmJjzd58Qr1aVze6mHFAh2Ivf88MH025QBlp5MpDL7pnJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=kps2eVR2; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1722627133; c=relaxed/simple;
+	bh=csd0MkbfiRZ32mkpXZ9twM9kRQL1vy8OM+kdMsU6aRQ=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=crJAAE4gOgeMtKEnD5PNvyI+hxx4KBvcGuifyT+88g8GjBDIKP4iaQsRUFqKXp9f6x8oODuBMQECw9pWMs858rV+cYGGd4rXLomW2IGBHdX6yZSM0Wr0Te9lwp/flPG1Vd22fmnr7hIoGGVDERIK9ghFO+hGHuDJ3cChpUrROH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iNmJ+tal; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kps2eVR2"
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-52efe4c7c16so12147336e87.0
-        for <kvmarm@lists.linux.dev>; Fri, 02 Aug 2024 09:03:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iNmJ+tal"
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2cfe9270d82so2854032a91.3
+        for <kvmarm@lists.linux.dev>; Fri, 02 Aug 2024 12:32:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1722614634; x=1723219434; darn=lists.linux.dev;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jaYp+4ySrYqox0C2LwNhC4Vws80twAVdjJbOgnZz/S0=;
-        b=kps2eVR26qL577hZygElPYNBUywYQC2pD+xX/kONql95wtdzkeCDIJxzjwB6ydsa0R
-         RstGdPptAlamKvKPxbmTGyS1M7wZh1huvc5w3vK/aTfaq0E3xL9n7fRfIHQMWYJdz2Dw
-         k3CKHZ6v/yOUWfohlFLrXMnY5YIRYz88jwtlYc5FzFQls2Oayzzh6HMJioizJjetNhM4
-         qHU1knQtUs0zlOAIOlwCcVgULTO8u20y3tKN2RoA0QhJSCP5SAtRVQ3ACptxhByGuY9r
-         0v4v2ZPkzJHulEHquDi1aMF8dPu0aE+EfApmsG7QsFOsyBRNPVQ8UbKlBPIC1f9ht/Pr
-         1w5A==
+        d=google.com; s=20230601; t=1722627130; x=1723231930; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TTqa7oavJrWkxSTFWtVmMnGsBDrmN4Dgl5PSeoZtRS0=;
+        b=iNmJ+talcLKvuEHChjLnAk72W65Z9sdjrj8B3sFMPPDTx6js2H94XAp9aFOpyxNOJx
+         pe8HbMqzjT1wfVn6uOkA8gfQ1pFFM+U4Seg9LsTgI9vW+hlzBj4gNOvNa0ktNXxy57XI
+         kOuyOI7mhUFZIbdPbcKhXFXnu2yC1c9yMHZsS15MlnCrDiPEwYFD7eEUA+51nlBwgE6r
+         DA9ET2i7HN3WQwrOdKzPtvL20dx5sORUmp3bvQp0VN4P5s9ZjfYphKE45csPdiW9CMgL
+         ojl1fs0hDJX5fjr/qP6f4E9Typ8+U8gYCLrWtaEhGECr8SPoTx8WbBDAqmpSLVQGRA1x
+         LwOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722614634; x=1723219434;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jaYp+4ySrYqox0C2LwNhC4Vws80twAVdjJbOgnZz/S0=;
-        b=sSUcT/egPCuUKCkUTW9YrKu0pUBYslqPfwkm3BFIsE8wWTHZ/2s0NZ/6GkPFNMgYrq
-         SGjykhlQ+LYACJMfD1FEfPGRb3CokRz2MVsj4J9EJiiuUEaRUHayI+raxAcFGXJE2Dar
-         nedCKOT7v7yBZd3hPVndKCNx4+TLWe8hwZZT+7VAIRDvq3GidUl6s5UwAn8ncboPFeSq
-         zSQgx6QZoIZTMOCRb3gcCLcY7viclbxx1BD4cvAAyT+g+M2Fd3lVahuv9r2mgF9gXaCM
-         0ck10ygob0sJVPv/3me2nYsYazbzCt6aTmuArngZ+jJ4RnUdNejCypdxNHG2gI2VeExZ
-         DbmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWZPyl2EGGekHDh5IWiQw67gXBPBxIQUaT9zBwESRX9ML81OkG8WqGgGcmHLJ2Urbda/IviOEgoIXP0sxnG53RUdt3D2ujf
-X-Gm-Message-State: AOJu0YzxwLP/GgKrDpsgnceY7SfaAmu4ItecCDOU3fiR4x79MjcnvDl2
-	dhuQ77CMsYX/oE7v7l5/U3Dr2FI4qPozZsQ6yzNe9tHuKWlO0X+FtPwgXKfxYYM=
-X-Google-Smtp-Source: AGHT+IHar+PPGcrxDNcjSr1um3g+3xRCfTrmLOXPeIhwAHJBP67s3XLeWwHx6hWOKLC6el1844qAfg==
-X-Received: by 2002:a05:6512:3ba0:b0:52f:c14e:2533 with SMTP id 2adb3069b0e04-530bb3c79e9mr2525031e87.48.1722614633808;
-        Fri, 02 Aug 2024 09:03:53 -0700 (PDT)
-Received: from mutt (c-9b0ee555.07-21-73746f28.bbcust.telenor.se. [85.229.14.155])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-530bba07dc7sm266293e87.16.2024.08.02.09.03.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Aug 2024 09:03:44 -0700 (PDT)
-Date: Fri, 2 Aug 2024 18:03:27 +0200
-From: Anders Roxell <anders.roxell@linaro.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Florian Weimer <fweimer@redhat.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
-	Ross Burton <ross.burton@arm.com>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v10 00/40] arm64/gcs: Provide support for GCS in userspace
-Message-ID: <20240802160326.GA36502@mutt>
-References: <20240801-arm64-gcs-v10-0-699e2bd2190b@kernel.org>
+        d=1e100.net; s=20230601; t=1722627130; x=1723231930;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=TTqa7oavJrWkxSTFWtVmMnGsBDrmN4Dgl5PSeoZtRS0=;
+        b=dndWPpSus2wf3bFFlJ69GnHiNdK0Ppljdlig7+JM5X1aLv3Ai+ULS/cgzD1Q7Br32p
+         8eLifXqjtHmW4ZnicQOKKgSLIB+zraQjpnATXSPO87eVs27/CrDTxvH/jTFbC7ujQXC5
+         10Lu7G2yB+LCo98F1msJTVj6yqN+kATaFyV3dsn3DdLSoP7daX/jT1ENNdAhEcY7GHSh
+         fEDIkherzEH/8s8GonoRpwRcczwfh5i7da0epUQ/6iSbtWeV9tPSTUFsQcd339KgF8k8
+         veAPfQZz+aQ05BAysjrMC4iCOiA2KoA8vimDBcE5DjqHANousOPAYY2LjvtZeK9Jatsk
+         3jzQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUhxQKWLG9ucAB1bPNTXySOQPlOOgkD2yXemlWhvQLLUdrEdVdJRFNmZwoJpDLlZVSshQJLUSfd3ssEhqkjuRGd+oGHGhhI
+X-Gm-Message-State: AOJu0Yz7QHykZFksnNGe6Ib3Yk0hTOJKF0loNhdkqsrrd6CCxvbqEaCz
+	BI1KSs/Y+qutL9k5V2zL/8tFgKK04TYmyks4QDB8V2JzawCdUFVzII4RM17PMxWjdgg9gotpKqT
+	bew==
+X-Google-Smtp-Source: AGHT+IHxpD4UvI3cH5YcMAfSn5X/q5FbzhvcZwiTnoiXfWEKupcq/mKgFqqrl+E4nqq+ftOi/sOAAYuzYXs=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90b:50cf:b0:2c9:61f9:9b27 with SMTP id
+ 98e67ed59e1d1-2cff9526286mr68117a91.5.1722627130434; Fri, 02 Aug 2024
+ 12:32:10 -0700 (PDT)
+Date: Fri, 2 Aug 2024 12:32:09 -0700
+In-Reply-To: <a039b758-d4e3-3798-806f-25bceb2f33a5@loongson.cn>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240801-arm64-gcs-v10-0-699e2bd2190b@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Mime-Version: 1.0
+References: <20240726235234.228822-1-seanjc@google.com> <20240726235234.228822-65-seanjc@google.com>
+ <a039b758-d4e3-3798-806f-25bceb2f33a5@loongson.cn>
+Message-ID: <Zq00OYowF5kc9QFE@google.com>
+Subject: Re: [PATCH v12 64/84] KVM: LoongArch: Mark "struct page" pfns dirty
+ only in "slow" page fault path
+From: Sean Christopherson <seanjc@google.com>
+To: maobibo <maobibo@loongson.cn>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
+	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	David Matlack <dmatlack@google.com>, David Stevens <stevensd@chromium.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2024-08-01 13:06, Mark Brown wrote:
-> The arm64 Guarded Control Stack (GCS) feature provides support for
-> hardware protected stacks of return addresses, intended to provide
-> hardening against return oriented programming (ROP) attacks and to make
-> it easier to gather call stacks for applications such as profiling.
-> 
-> When GCS is active a secondary stack called the Guarded Control Stack is
-> maintained, protected with a memory attribute which means that it can
-> only be written with specific GCS operations.  The current GCS pointer
-> can not be directly written to by userspace.  When a BL is executed the
-> value stored in LR is also pushed onto the GCS, and when a RET is
-> executed the top of the GCS is popped and compared to LR with a fault
-> being raised if the values do not match.  GCS operations may only be
-> performed on GCS pages, a data abort is generated if they are not.
-> 
-> The combination of hardware enforcement and lack of extra instructions
-> in the function entry and exit paths should result in something which
-> has less overhead and is more difficult to attack than a purely software
-> implementation like clang's shadow stacks.
-> 
-> This series implements support for use of GCS by userspace, along with
-> support for use of GCS within KVM guests.  It does not enable use of GCS
-> by either EL1 or EL2, this will be implemented separately.  Executables
-> are started without GCS and must use a prctl() to enable it, it is
-> expected that this will be done very early in application execution by
-> the dynamic linker or other startup code.  For dynamic linking this will
-> be done by checking that everything in the executable is marked as GCS
-> compatible.
-> 
-> x86 has an equivalent feature called shadow stacks, this series depends
-> on the x86 patches for generic memory management support for the new
-> guarded/shadow stack page type and shares APIs as much as possible.  As
-> there has been extensive discussion with the wider community around the
-> ABI for shadow stacks I have as far as practical kept implementation
-> decisions close to those for x86, anticipating that review would lead to
-> similar conclusions in the absence of strong reasoning for divergence.
-> 
-> The main divergence I am concious of is that x86 allows shadow stack to
-> be enabled and disabled repeatedly, freeing the shadow stack for the
-> thread whenever disabled, while this implementation keeps the GCS
-> allocated after disable but refuses to reenable it.  This is to avoid
-> races with things actively walking the GCS during a disable, we do
-> anticipate that some systems will wish to disable GCS at runtime but are
-> not aware of any demand for subsequently reenabling it.
-> 
-> x86 uses an arch_prctl() to manage enable and disable, since only x86
-> and S/390 use arch_prctl() a generic prctl() was proposed[1] as part of a
-> patch set for the equivalent RISC-V Zicfiss feature which I initially
-> adopted fairly directly but following review feedback has been revised
-> quite a bit.
-> 
-> We currently maintain the x86 pattern of implicitly allocating a shadow
-> stack for threads started with shadow stack enabled, there has been some
-> discussion of removing this support and requiring the use of clone3()
-> with explicit allocation of shadow stacks instead.  I have no strong
-> feelings either way, implicit allocation is not really consistent with
-> anything else we do and creates the potential for errors around thread
-> exit but on the other hand it is existing ABI on x86 and minimises the
-> changes needed in userspace code.
-> 
-> glibc and bionic changes using this ABI have been implemented and
-> tested.  Headless Android systems have been validated and Ross Burton
-> has used this code has been used to bring up a Yocto system with GCS
-> enabed as standard, a test implementation of V8 support has also been
-> done.
-> 
-> There is an open issue with support for CRIU, on x86 this required the
-> ability to set the GCS mode via ptrace.  This series supports
-> configuring mode bits other than enable/disable via ptrace but it needs
-> to be confirmed if this is sufficient.
-> 
-> The series depends on support for shadow stacks in clone3(), that series
-> includes the addition of ARCH_HAS_USER_SHADOW_STACK.
-> 
->    https://lore.kernel.org/r/20240731-clone3-shadow-stack-v7-0-a9532eebfb1d@kernel.org
-> 
+On Fri, Aug 02, 2024, maobibo wrote:
+> On 2024/7/27 =E4=B8=8A=E5=8D=887:52, Sean Christopherson wrote:
+> > Mark pages/folios dirty only the slow page fault path, i.e. only when
+> > mmu_lock is held and the operation is mmu_notifier-protected, as markin=
+g a
+> > page/folio dirty after it has been written back can make some filesyste=
+ms
+> > unhappy (backing KVM guests will such filesystem files is uncommon, and
+> > the race is minuscule, hence the lack of complaints).
+> >=20
+> > See the link below for details.
+> >=20
+> > Link: https://lore.kernel.org/all/cover.1683044162.git.lstoakes@gmail.c=
+om
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >   arch/loongarch/kvm/mmu.c | 18 ++++++++++--------
+> >   1 file changed, 10 insertions(+), 8 deletions(-)
+> >=20
+> > diff --git a/arch/loongarch/kvm/mmu.c b/arch/loongarch/kvm/mmu.c
+> > index 2634a9e8d82c..364dd35e0557 100644
+> > --- a/arch/loongarch/kvm/mmu.c
+> > +++ b/arch/loongarch/kvm/mmu.c
+> > @@ -608,13 +608,13 @@ static int kvm_map_page_fast(struct kvm_vcpu *vcp=
+u, unsigned long gpa, bool writ
+> >   		if (kvm_pte_young(changed))
+> >   			kvm_set_pfn_accessed(pfn);
+> > -		if (kvm_pte_dirty(changed)) {
+> > -			mark_page_dirty(kvm, gfn);
+> > -			kvm_set_pfn_dirty(pfn);
+> > -		}
+> >   		if (page)
+> >   			put_page(page);
+> >   	}
+> > +
+> > +	if (kvm_pte_dirty(changed))
+> > +		mark_page_dirty(kvm, gfn);
+> > +
+> >   	return ret;
+> >   out:
+> >   	spin_unlock(&kvm->mmu_lock);
+> > @@ -915,12 +915,14 @@ static int kvm_map_page(struct kvm_vcpu *vcpu, un=
+signed long gpa, bool write)
+> >   	else
+> >   		++kvm->stat.pages;
+> >   	kvm_set_pte(ptep, new_pte);
+> > -	spin_unlock(&kvm->mmu_lock);
+> > -	if (prot_bits & _PAGE_DIRTY) {
+> > -		mark_page_dirty_in_slot(kvm, memslot, gfn);
+> > +	if (writeable)
+> Is it better to use write or (prot_bits & _PAGE_DIRTY) here?  writable is
+> pte permission from function hva_to_pfn_slow(), write is fault action.
 
-Verified this patchset on a FVP.
+Marking folios dirty in the slow/full path basically necessitates marking t=
+he
+folio dirty if KVM creates a writable SPTE, as KVM won't mark the folio dir=
+ty
+if/when _PAGE_DIRTY is set.
 
-Tested-by: Linux Kernel Functional Testing <lkft@linaro.org>
-
-
-Cheers,
-Anders
+Practically speaking, I'm 99.9% certain it doesn't matter.  The folio is ma=
+rked
+dirty by core MM when the folio is made writable, and cleaning the folio tr=
+iggers
+an mmu_notifier invalidation.  I.e. if the page is mapped writable in KVM's
+stage-2 PTEs, then its folio has already been marked dirty.
