@@ -1,154 +1,154 @@
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3F87F9F5;
-	Sat,  3 Aug 2024 03:02:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6117E2EAEA;
+	Sat,  3 Aug 2024 09:35:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722654146; cv=none; b=q81gNYHri9+3GEvorN0kb1C4ZebCRXj9UtDSQPGfjYD0/BrUmZ6NH9Xhm8XgCaAQnzPWsbyTPJvjW5d5q2hX7PI3tiV4xAZ5GeQrCY3rtE9hk8tEBHNRYXJm/eHjMDsREwWDI0W2A5vFMQPPD/3X0nLL2JNDHYZFRsrbztCdREA=
+	t=1722677757; cv=none; b=Hut75TLVwJBMCoEouAInJ3IYmLeZAbvASVOmIrI54978+EldmKAzKuKP40XRpgF8vxduLrlLON1bLcGij0/u6hhNAGAEUjQk5XZdgnL/DsNOf9DmI+Q1c0ddrNDOa2bnJArQG01x6XZDYONtDLCuYZ8bqhkCXXcodHK67mYzFvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722654146; c=relaxed/simple;
-	bh=NoDHZy9WHNV+LcYNuOiFb+aviu1JIBbgKM7qngzRd8c=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=MOgpO56JL+XUYm3nmdVeUyGksq5x9OqFSwStfpNmLbM0lLy8pOABS5jJlnjrKQrKjahi8X0UWyTyy8KpBJFyvlmrw3PnUtlgkfVViO1TSpI1vpj6vgnD7e6TTxWpYvX67XcuLN5flcdyABunqjAgWz3s6+07Kf5XqG6Sj9DyFtU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8Bx7eq1na1myuEGAA--.24073S3;
-	Sat, 03 Aug 2024 11:02:13 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front1 (Coremail) with SMTP id qMiowMCxwuGwna1mXuwAAA--.5506S3;
-	Sat, 03 Aug 2024 11:02:10 +0800 (CST)
-Subject: Re: [PATCH v12 64/84] KVM: LoongArch: Mark "struct page" pfns dirty
- only in "slow" page fault path
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao
- <zhaotianrui@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
- Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
- linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
- David Matlack <dmatlack@google.com>, David Stevens <stevensd@chromium.org>
-References: <20240726235234.228822-1-seanjc@google.com>
- <20240726235234.228822-65-seanjc@google.com>
- <a039b758-d4e3-3798-806f-25bceb2f33a5@loongson.cn>
- <Zq00OYowF5kc9QFE@google.com>
-From: maobibo <maobibo@loongson.cn>
-Message-ID: <345d89c1-4f31-6b49-2cd4-a0696210fa7c@loongson.cn>
-Date: Sat, 3 Aug 2024 11:02:07 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1722677757; c=relaxed/simple;
+	bh=JEbsnrTzSmhOmnx/e5esxkcGV3rSX/GncsC3HN+bUFQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LKvetop4G6fzM4ipQ3Xg8Q+Tv1BpM2PKQKEafClEvDjxKmH8aIG2EklWft2f7j5mNDLG9xLmtH4bAHh3a1qc54IUprlOHrG1Cw+kuJmYOzgutxL5wDNHlY5ge+mI+ZnxNWoETsI4BWsFrzlm8KprIku4ZCYtifQ+7dfpJvNz8YE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QM+nyj2r; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QM+nyj2r"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFEB8C116B1;
+	Sat,  3 Aug 2024 09:35:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722677757;
+	bh=JEbsnrTzSmhOmnx/e5esxkcGV3rSX/GncsC3HN+bUFQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=QM+nyj2rOf9eNpv7HTwm4Yvl582CUak/+I/ywihkAhigADTLUmGK3qsrg3uF8Us4q
+	 T9yLXq2uDCIwL7Pv0MCAOhngtRrfD9MkmfEWacBXfwJW9UrymMbMp4zQGJnXS2Vqzu
+	 ZFAJYky7XnrZ7rBfaYXLSf+E2LvM6d2JWJVc92KWaHOxqu3QOwIToL5Ce/1HFSCq4t
+	 cgbQ/quWJmy1EQGKjMI4WT7a+9mVA2bKKVXtkynyv197wWgqq0k+ModGmORY0nMJb6
+	 BrRnR2rYJXBCHjIUePO74SA0IZQt6ZswKVvxHOmNHEW2cOVm/BAumIgH7ohiaG6gbI
+	 FSG+KbS1j28zw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1saBB4-000Ymy-Mz;
+	Sat, 03 Aug 2024 10:35:54 +0100
+Date: Sat, 03 Aug 2024 10:35:54 +0100
+Message-ID: <868qxe0wzp.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] KVM: selftests: arm64: Use generated defines for named system registers
+In-Reply-To: <20240802-kvm-arm64-get-reg-list-v1-2-3a5bf8f80765@kernel.org>
+References: <20240802-kvm-arm64-get-reg-list-v1-0-3a5bf8f80765@kernel.org>
+	<20240802-kvm-arm64-get-reg-list-v1-2-3a5bf8f80765@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.3
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-In-Reply-To: <Zq00OYowF5kc9QFE@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowMCxwuGwna1mXuwAAA--.5506S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoWxJFyfAryfKw1fGw43AFyrGrX_yoW5uw17pF
-	WUCFWqkFs5tryYyrZrt39IvrWrK39xKr1xX3W7J34Fkas0qr1IqF10grWfWFyUA3yfAayS
-	qr4UKF9xuFZ8AwcCm3ZEXasCq-sJn29KB7ZKAUJUUUUk529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUPFb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
-	Gr0_Gr1UM2kKe7AKxVWUtVW8ZwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYI
-	kI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUtVWr
-	XwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMx
-	k0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l
-	4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_Jw0_GFylx2IqxVAqx4xG67AKxV
-	WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI
-	7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
-	4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI
-	42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUstxhDUUUU
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, shuah@kernel.org, catalin.marinas@arm.com, joey.gouly@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-
-
-On 2024/8/3 上午3:32, Sean Christopherson wrote:
-> On Fri, Aug 02, 2024, maobibo wrote:
->> On 2024/7/27 上午7:52, Sean Christopherson wrote:
->>> Mark pages/folios dirty only the slow page fault path, i.e. only when
->>> mmu_lock is held and the operation is mmu_notifier-protected, as marking a
->>> page/folio dirty after it has been written back can make some filesystems
->>> unhappy (backing KVM guests will such filesystem files is uncommon, and
->>> the race is minuscule, hence the lack of complaints).
->>>
->>> See the link below for details.
->>>
->>> Link: https://lore.kernel.org/all/cover.1683044162.git.lstoakes@gmail.com
->>> Signed-off-by: Sean Christopherson <seanjc@google.com>
->>> ---
->>>    arch/loongarch/kvm/mmu.c | 18 ++++++++++--------
->>>    1 file changed, 10 insertions(+), 8 deletions(-)
->>>
->>> diff --git a/arch/loongarch/kvm/mmu.c b/arch/loongarch/kvm/mmu.c
->>> index 2634a9e8d82c..364dd35e0557 100644
->>> --- a/arch/loongarch/kvm/mmu.c
->>> +++ b/arch/loongarch/kvm/mmu.c
->>> @@ -608,13 +608,13 @@ static int kvm_map_page_fast(struct kvm_vcpu *vcpu, unsigned long gpa, bool writ
->>>    		if (kvm_pte_young(changed))
->>>    			kvm_set_pfn_accessed(pfn);
->>> -		if (kvm_pte_dirty(changed)) {
->>> -			mark_page_dirty(kvm, gfn);
->>> -			kvm_set_pfn_dirty(pfn);
->>> -		}
->>>    		if (page)
->>>    			put_page(page);
->>>    	}
->>> +
->>> +	if (kvm_pte_dirty(changed))
->>> +		mark_page_dirty(kvm, gfn);
->>> +
->>>    	return ret;
->>>    out:
->>>    	spin_unlock(&kvm->mmu_lock);
->>> @@ -915,12 +915,14 @@ static int kvm_map_page(struct kvm_vcpu *vcpu, unsigned long gpa, bool write)
->>>    	else
->>>    		++kvm->stat.pages;
->>>    	kvm_set_pte(ptep, new_pte);
->>> -	spin_unlock(&kvm->mmu_lock);
->>> -	if (prot_bits & _PAGE_DIRTY) {
->>> -		mark_page_dirty_in_slot(kvm, memslot, gfn);
->>> +	if (writeable)
->> Is it better to use write or (prot_bits & _PAGE_DIRTY) here?  writable is
->> pte permission from function hva_to_pfn_slow(), write is fault action.
+On Fri, 02 Aug 2024 22:57:54 +0100,
+Mark Brown <broonie@kernel.org> wrote:
 > 
-> Marking folios dirty in the slow/full path basically necessitates marking the
-> folio dirty if KVM creates a writable SPTE, as KVM won't mark the folio dirty
-> if/when _PAGE_DIRTY is set.
+> Currently the get-reg-list test uses directly specified numeric values to
+> define system registers to validate. Since we already have a macro which
+> allows us to use the generated system register definitions from the main
+> kernel easily let's update all the registers where we have specified the
+> name in a comment to just use that macro. This reduces the number of
+> places where we need to validate the name to number mapping.
 > 
-> Practically speaking, I'm 99.9% certain it doesn't matter.  The folio is marked
-> dirty by core MM when the folio is made writable, and cleaning the folio triggers
-> an mmu_notifier invalidation.  I.e. if the page is mapped writable in KVM's
-yes, it is. Thanks for the explanation. kvm_set_pfn_dirty() can be put 
-only in slow page fault path. I only concern with fault type, read fault 
-type can set pte entry writable however not _PAGE_DIRTY at stage-2 mmu 
-table.
+> This conversion was done with the sed command:
+> 
+>   sed -i -E 's-ARM64_SYS_REG.*/\* (.*) \*/-KVM_ARM64_SYS_REG(SYS_\1),-' tools/testing/selftests/kvm/aarch64/get-reg-list.c
+>
 
-> stage-2 PTEs, then its folio has already been marked dirty.
-Considering one condition although I do not know whether it exists 
-actually. user mode VMM writes the folio with hva address firstly, then 
-VCPU thread *reads* the folio. With primary mmu table, pte entry is 
-writable and _PAGE_DIRTY is set, with secondary mmu table(state-2 PTE 
-table), it is pte_none since the filio is accessed at first time, so 
-there will be slow page fault path for stage-2 mmu page table filling.
+[Eyes rolling]
 
-Since it is read fault, stage-2 PTE will be created with 
-_PAGE_WRITE(coming from function hva_to_pfn_slow()), however _PAGE_DIRTY 
-is not set. Do we need call kvm_set_pfn_dirty() at this situation?
+What I asked about scripting the whole thing, it never occurred to me
+that you would use the *comments* as a reliable source of information.
+Do we have anything less reliable than comments in the kernel?
 
-Regards
-Bibo Mao
+The matching must be done from the arch/arm64/tools/sysreg file,
+because that's the (admittedly dubious) source of truth. We actually
+trust the encodings because they are reported by the kernel itself.
+The comment is hand-written, and likely wrong.
 
+Also, this hides the horrible truth about existing ABI bugs, see
+below.
+
+> We still have a number of numerically specified registers, some of these
+> are reserved registers without defined names (eg, unallocated ID registers)
+> and others don't have kernel macro definitions yet.
+> 
+> No change in the generated output.
+> 
+> Suggested-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> ---
+>  tools/testing/selftests/kvm/aarch64/get-reg-list.c | 208 ++++++++++-----------
+>  1 file changed, 104 insertions(+), 104 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> index a00322970578..4d786c4ab28a 100644
+> --- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> +++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> @@ -313,14 +313,14 @@ static __u64 base_regs[] = {
+>  	KVM_REG_ARM_FW_FEAT_BMAP_REG(0),	/* KVM_REG_ARM_STD_BMAP */
+>  	KVM_REG_ARM_FW_FEAT_BMAP_REG(1),	/* KVM_REG_ARM_STD_HYP_BMAP */
+>  	KVM_REG_ARM_FW_FEAT_BMAP_REG(2),	/* KVM_REG_ARM_VENDOR_HYP_BMAP */
+> -	ARM64_SYS_REG(3, 3, 14, 3, 1),	/* CNTV_CTL_EL0 */
+> -	ARM64_SYS_REG(3, 3, 14, 3, 2),	/* CNTV_CVAL_EL0 */
+> +	KVM_ARM64_SYS_REG(SYS_CNTV_CTL_EL0),
+> +	KVM_ARM64_SYS_REG(SYS_CNTV_CVAL_EL0),
+>  	ARM64_SYS_REG(3, 3, 14, 0, 2),
+
+Great. So not only you fail convert a register, but you also ignore
+the nugget described in arch/arm64/invlude/uapi/asm/kvm.h:267.
+
+Sure, having both described hides the crap, as we don't attach any
+significance to the registers themselves. But that shows how
+untrustworthy the comments are.
+
+> -	ARM64_SYS_REG(3, 0, 0, 0, 0),	/* MIDR_EL1 */
+> -	ARM64_SYS_REG(3, 0, 0, 0, 6),	/* REVIDR_EL1 */
+> -	ARM64_SYS_REG(3, 1, 0, 0, 1),	/* CLIDR_EL1 */
+> -	ARM64_SYS_REG(3, 1, 0, 0, 7),	/* AIDR_EL1 */
+> -	ARM64_SYS_REG(3, 3, 0, 0, 1),	/* CTR_EL0 */
+> +	KVM_ARM64_SYS_REG(SYS_MIDR_EL1),
+> +	KVM_ARM64_SYS_REG(SYS_REVIDR_EL1),
+> +	KVM_ARM64_SYS_REG(SYS_CLIDR_EL1),
+> +	KVM_ARM64_SYS_REG(SYS_AIDR_EL1),
+> +	KVM_ARM64_SYS_REG(SYS_CTR_EL0),
+>  	ARM64_SYS_REG(2, 0, 0, 0, 4),
+>  	ARM64_SYS_REG(2, 0, 0, 0, 5),
+>  	ARM64_SYS_REG(2, 0, 0, 0, 6),
+
+As far as I can tell, these registers are not unallocated, and they
+should be named.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
