@@ -1,60 +1,67 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 274DF320B;
-	Sun,  4 Aug 2024 09:21:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E43CC38F86;
+	Sun,  4 Aug 2024 11:05:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722763307; cv=none; b=Q2KGZCmRR4Q2xws4BG+0YYMnICrsVKo2CKQE0ErL/6r8T02G9lkFZo9ccgTvR20Uso+sd1ZrSlifb+32kwVyjOIYOZzfUa/yjgJQLJ/Ru96Q+UVfdsDGQH8iyPMPP5VH5/8vW8Vj6zX3iBZbQvIIwP81C6RAWByWrexEyUrbmIM=
+	t=1722769512; cv=none; b=tfn3vwOA99ufXwozfS3hSMe1D3+PsLDoPf6ItMMyaLIV8LOwkKcPGbQk74RowhbzgThIeXUnbjf+T7S5uhCi0n6oRUMyW9IrWZM5LWN2RjZtoj4jQmkerNep/TNAMmtSlwmqBx97J+rcqM68l/miCrNkIGRjZ5c0u8pAnn8wIDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722763307; c=relaxed/simple;
-	bh=YqVP8ZHxp1yJban5jv+izZlf+awTJjF2bAUM/uiFMDg=;
+	s=arc-20240116; t=1722769512; c=relaxed/simple;
+	bh=Gy6I584IGzicBXyzg6q5/89C48fBtUYKR3xsKS4pyDo=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OOVAuJdVola7LCZs2AoapY17uT4Ov7qSYJWJNDc16UnGdL7y3GHc/1l5h3jm9nbXeHn+gBsISsW+0JrraSW1NAddnRFehzNKtwVRa3LjrYQNdQyNAlPhGZrHLsTaG7QwR1ihWYYqXciXAQZtmB5Gk+DjAfp+ZZV5zrALTKUGhDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l81fgcw3; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=t279JJuWg+Ea/svzmPYfAybWrF09TsOQ6ZZ91xOdPp02qt0ZYx0BmXu4Aefe5g6lD1y9mvLI68e4CVlJbHdGmmfamN+VVUOVvLTD2Dgb7jttejTCk45TEIDSyLh2UuxNEdICRBl2YvdBpZM3YGBhjm5MMcK7EChqmGpkCPGrQKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=exHQCFVN; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l81fgcw3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6CF5C32786;
-	Sun,  4 Aug 2024 09:21:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="exHQCFVN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BA8CC32786;
+	Sun,  4 Aug 2024 11:05:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722763306;
-	bh=YqVP8ZHxp1yJban5jv+izZlf+awTJjF2bAUM/uiFMDg=;
+	s=k20201202; t=1722769511;
+	bh=Gy6I584IGzicBXyzg6q5/89C48fBtUYKR3xsKS4pyDo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=l81fgcw3S5FNSYeV+Q8QEnZ/szHofUY9q6fZeCCOeMyjlDR4fu+iTQ0i1oJZYhHQ0
-	 cxzERANif8Fd137qhTWlkAtKVmvXcTtoMsrTaUgsqsVxsiXXiZnCvejAKZxPixiOXa
-	 2soST4lUHju5qpJo+gpL2I4Bpeyxagb+EtS7yuu7jsazgDpDwRBLzvCvyqcvzEdU0i
-	 k9O+Ls8ekj4QKEf7cvcmqCcjRqlm7o378JTY5rnXSr5ZKV7vA1THTql0bJ96nlr2N+
-	 KqKWgCpiwkgiCyGvFedNGmoUBU4CGJIZ2K5N8lVlpMgW3fvRbagZFxW3WsVJyRSOXr
-	 tMBYk/617UqdA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	b=exHQCFVNTiJ28lW5EtNMPi34LogQvcUSA3Fpzdi3YolVUN4J51yHn1DEJ+EhXu1cG
+	 lNl2/4Q60ct2No56frPw1Z7XHNj65ds+TukisTx0+6/Wu0RIFJm7L1oLMplXYsZhmJ
+	 DmklP2aDIGRgS4vwsWhomLSmereRrXfyXxkODO30EWad3Utuc4tHHg+DetK5i0ijBW
+	 PJC5Sa/4RWKPpUFWwAAf/KI689o5+Dhep2k2/fZK51vnGWL1usxC2v6HxwumsHp+Vf
+	 lYhtZb/WmRqXOGFce+3LTMorccVfnPbdOCrlHNfIsl4S+SMH3YpDz06/rejyMCl3G/
+	 ZwxFQYBDQZeRQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1saXQu-000kBS-Ac;
-	Sun, 04 Aug 2024 10:21:44 +0100
-Date: Sun, 04 Aug 2024 10:21:44 +0100
-Message-ID: <867ccw1w47.wl-maz@kernel.org>
+	id 1saZ2z-000l1v-06;
+	Sun, 04 Aug 2024 12:05:09 +0100
+Date: Sun, 04 Aug 2024 12:05:08 +0100
+Message-ID: <87sevk4kgr.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: 	Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <zenghui.yu@linux.dev>
-Cc: Takahiro Itazuri <itazur@amazon.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Dave Martin <Dave.Martin@arm.com>,
-	linux-doc@vger.kernel.org,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	zulinx86@gmail.com,
-	kvmarm@lists.linux.dev,
+To: Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	glider@google.com
-Subject: Re: [PATCH v2] docs: KVM: Fix register ID of SPSR_FIQ
-In-Reply-To: <401bebca-9637-4626-901f-e46b2d058768@linux.dev>
-References: <20230606154628.95498-1-itazur@amazon.com>
-	<401bebca-9637-4626-901f-e46b2d058768@linux.dev>
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Brown <broonie@kernel.org>,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC 10/10] KVM: arm64: nv: Add new HDFGRTR2_GROUP & HDFGRTR2_GROUP based FGU handling
+In-Reply-To: <fb9bef18-adf2-4d3a-8205-b22a65b0c6db@arm.com>
+References: <20240620065807.151540-1-anshuman.khandual@arm.com>
+	<20240620065807.151540-11-anshuman.khandual@arm.com>
+	<865xu3kh4r.wl-maz@kernel.org>
+	<4d256df7-1ec7-4300-b5c8-355f46c0e869@arm.com>
+	<878qyy35e5.wl-maz@kernel.org>
+	<47dc4299-52cc-4f98-929b-fb86bd9757ae@arm.com>
+	<86tthhi0nz.wl-maz@kernel.org>
+	<c84d0081-5afa-4bc2-82f4-a6dd07b8ab87@arm.com>
+	<86o76c1b8p.wl-maz@kernel.org>
+	<d56735e2-3fee-4d91-84e1-a5b480ec0ce1@arm.com>
+	<86bk2b198o.wl-maz@kernel.org>
+	<fb9bef18-adf2-4d3a-8205-b22a65b0c6db@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.3
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -63,71 +70,218 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, zenghui.yu@linux.dev, itazur@amazon.com, pbonzini@redhat.com, corbet@lwn.net, Dave.Martin@arm.com, linux-doc@vger.kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, zulinx86@gmail.com, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, glider@google.com
+X-SA-Exim-Rcpt-To: anshuman.khandual@arm.com, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, broonie@kernel.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sun, 04 Aug 2024 09:17:47 +0100,
-Zenghui Yu <zenghui.yu@linux.dev> wrote:
+On Sat, 03 Aug 2024 11:38:11 +0100,
+Anshuman Khandual <anshuman.khandual@arm.com> wrote:
 > 
-> +Cc kvmarm people and the list ...
-
-Thanks Zenghui.
-
 > 
-> On 2023/6/6 23:46, Takahiro Itazuri wrote:
-> > Fixes the register ID of SPSR_FIQ.
+> On 8/2/24 16:29, Marc Zyngier wrote:
+> > On Fri, 02 Aug 2024 10:25:44 +0100,
+> > Anshuman Khandual <anshuman.khandual@arm.com> wrote:
+> >>
+> >> On 8/1/24 21:33, Marc Zyngier wrote:
+> >>> On Thu, 01 Aug 2024 11:46:22 +0100,
+> >>> Anshuman Khandual <anshuman.khandual@arm.com> wrote:
 > > 
-> > SPSR_FIQ is a 64-bit register and the 64-bit register size mask is
-> > 0x0030000000000000ULL.
+> > [...]
 > > 
-> > Fixes: fd3bc912d3d1 ("KVM: Documentation: Document arm64 core registers in detail")
-> > Signed-off-by: Takahiro Itazuri <itazur@amazon.com>
+> >>>> +	SR_FGT(SYS_SPMACCESSR_EL1,	HDFGRTR2, nSPMACCESSR_EL1, 0),
+> >>>
+> >>> This (and I take it most of the stuff here) is also gated by
+> >>> MDCR_EL2.SPM, which is a coarse grained trap. That needs to be
+> >>> described as well. For every new register that you add here.
+> >>
+> >> I did not find a SPM field in MDCR_EL2 either in latest ARM ARM or in
+> >> the latest XML. But as per current HDFGRTR2_EL2 description the field
+> >> nSPMACCESSR_EL1 is gated by FEAT_SPMU feature, which is being checked
+> >> via ID_AA64DFR1_EL1.PMU when required. So could you please give some
+> >> more details.
+> > 
+> > I misspelled it. It is MDCR_EL2.EnSPM.
+> > 
+> > And you are completely missing the point. It is not about
+> > HDFGRTR2_EL2, but about SPMACCESSR_EL1 (and all its little friends).
+> > 
+> > To convince yourself, just look at the pseudocode for SPMACCESSR_EL1,
+> > limited to an EL1 access:
+> > 
+> > elsif PSTATE.EL == EL1 then
+> >     if HaveEL(EL3) && EL3SDDUndefPriority() && MDCR_EL3.EnPM2 == '0' then
+> >         UNDEFINED;
+> >     elsif EL2Enabled() && IsFeatureImplemented(FEAT_FGT2) && ((HaveEL(EL3) && SCR_EL3.FGTEn2 == '0') || HDFGRTR2_EL2.nSPMACCESSR_EL1 == '0') then
+> >         AArch64.SystemAccessTrap(EL2, 0x18);
+> >     elsif EL2Enabled() && MDCR_EL2.EnSPM == '0' then
+> >         AArch64.SystemAccessTrap(EL2, 0x18);
+> >     elsif HaveEL(EL3) && MDCR_EL3.EnPM2 == '0' then
+> >         if EL3SDDUndef() then
+> >             UNDEFINED;
+> >         else
+> >             AArch64.SystemAccessTrap(EL3, 0x18);
+> >     elsif EffectiveHCR_EL2_NVx() IN {'111'} then
+> >         X[t, 64] = NVMem[0x8E8];
+> >     else
+> >         X[t, 64] = SPMACCESSR_EL1;
+> > 
+> > 
+> > Can you spot the *TWO* conditions where we take an exception to EL2
+> > with 0x18 as the EC?
+> > 
+> > - One is when HDFGxTR2_EL2.nSPMACCESSR_EL1 == '0': that's a fine
+> >   grained trap.
+> > - The other is when MDCR_EL2.EnSPM == '0': that's a coarse grained
+> >   trap.
+> > 
+> > Both conditions need to be captured in the various tables in this
+> > file, for each and every register that you describe.
 > 
-> ... since you're fixing the encoding of an *arm64* core register and the
-> mentioned commit fd3bc912d3d1 was merged via the kvmarm tree. I guess
-> this is the main reason why this patch has been blocked on the list for
-> over a year, as pointed out recently by Alexander [*].
+> Ahh, got it now. Because now KVM knows about SPMACCESSR_EL1 register,
+> access to that register must also be enabled via both fine grained trap
+> (HDFGxTR2_EL2.nSPMACCESSR_EL1) and coarse grained trap (MDCR_EL2.EnSPM).
+> 
+> For all the registers that are being added via FEAT_FGT2 here in this
+> patch, their corresponding CGT based path also needs to be enabled via
+> corresponding CGT_MDCR_XXX groups.
 
-That, and the fact that this is send to an email address I haven't
-been reachable on for about 5 years...
+Exactly.
 
 > 
 > > 
-> > ---
-> > Changes from v1
-> > - Add a description about the 64-bit register size mask in the commit
-> >   message.
-> > - Link: https://lore.kernel.org/all/20230410121927.26953-1-itazur@amazon.com/
+> > [...]
 > > 
-> > ---
-> >  Documentation/virt/kvm/api.rst | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >>> Now, the main issues are that:
+> >>>
+> >>> - you're missing the coarse grained trapping for all the stuff you
+> >>>   have just added. It's not a huge amount of work, but you need, for
+> >>>   each register, to describe what traps apply to it. The fine grained
+> >>>   stuff is most, but not all of it. There should be enough of it
+> >>>   already to guide you through it.
+> >>
+> >> Coarse grained trapping for FEAT_FGT2 based fine grained registers ?
 > > 
-> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> > index a5c803f39832..65dad2581751 100644
-> > --- a/Documentation/virt/kvm/api.rst
-> > +++ b/Documentation/virt/kvm/api.rst
-> > @@ -2535,7 +2535,7 @@ Specifically:
-> >    0x6030 0000 0010 004a SPSR_ABT    64  spsr[KVM_SPSR_ABT]
-> >    0x6030 0000 0010 004c SPSR_UND    64  spsr[KVM_SPSR_UND]
-> >    0x6030 0000 0010 004e SPSR_IRQ    64  spsr[KVM_SPSR_IRQ]
-> > -  0x6060 0000 0010 0050 SPSR_FIQ    64  spsr[KVM_SPSR_FIQ]
-> > +  0x6030 0000 0010 0050 SPSR_FIQ    64  spsr[KVM_SPSR_FIQ]
-> >    0x6040 0000 0010 0054 V0         128  fp_regs.vregs[0]    [1]_
-> >    0x6040 0000 0010 0058 V1         128  fp_regs.vregs[1]    [1]_
-> >    ...
+> > Not for FEAT_FGT2. For the registers that FEAT_FGT2 traps. Can you see
+> > the difference?
 > 
-> The change itself looks reasonable.
+> Understood, for example PMIAR_EL1 register which FEAT_FGT2 now traps via
 > 
-> Thanks,
-> Zenghui
+> SR_FGT(SYS_PMIAR_EL1,           HDFGRTR2, nPMIAR_EL1, 0),
 > 
-> [*] https://lore.kernel.org/all/20240802132036.914457-1-glider@google.com
+> also needs to have corresponding coarse grained trap.
+> 
+> SR_TRAP(SYS_PMIAR_EL1,          CGT_MDCR_TPM),
 
-In case Oliver picks this up for 6.11:
+Yup.
 
-Acked-by: Marc Zyngier <maz@kernel.org>
+> 
+> Similarly corresponding SR_TRAP() needs to be covered for all registers
+> that are now being trapped with FEAT_FGT2.
+> 
+> Example code snippet.
+> 
+> ........
+> +       SR_TRAP(SYS_SPMEVFILT2R_EL0(8), CGT_MDCR_EnSPM),
+> +       SR_TRAP(SYS_SPMEVFILT2R_EL0(9), CGT_MDCR_EnSPM),
+> +       SR_TRAP(SYS_SPMEVFILT2R_EL0(10),        CGT_MDCR_EnSPM),
+> +       SR_TRAP(SYS_SPMEVFILT2R_EL0(11),        CGT_MDCR_EnSPM),
+> +       SR_TRAP(SYS_SPMEVFILT2R_EL0(12),        CGT_MDCR_EnSPM),
+> +       SR_TRAP(SYS_SPMEVFILT2R_EL0(13),        CGT_MDCR_EnSPM),
+> +       SR_TRAP(SYS_SPMEVFILT2R_EL0(14),        CGT_MDCR_EnSPM),
+> +       SR_TRAP(SYS_SPMEVFILT2R_EL0(15),        CGT_MDCR_EnSPM),
+
+I think it is a bit more complicated than just that. Again, look at
+the pseudocode:
+
+elsif PSTATE.EL == EL1 then
+    if HaveEL(EL3) && EL3SDDUndefPriority() && MDCR_EL3.EnPM2 == '0' then
+        UNDEFINED;
+    elsif HaveEL(EL3) && EL3SDDUndefPriority() && SPMACCESSR_EL3<(UInt(SPMSELR_EL0.SYSPMUSEL) * 2) + 1:UInt(SPMSELR_EL0.SYSPMUSEL) * 2> == '00' then
+        UNDEFINED;
+    elsif EL2Enabled() && IsFeatureImplemented(FEAT_FGT2) && ((HaveEL(EL3) && SCR_EL3.FGTEn2 == '0') || HDFGRTR2_EL2.nSPMEVTYPERn_EL0 == '0') then
+        AArch64.SystemAccessTrap(EL2, 0x18);
+    elsif EL2Enabled() && MDCR_EL2.EnSPM == '0' then
+        AArch64.SystemAccessTrap(EL2, 0x18);
+    elsif EL2Enabled() && SPMACCESSR_EL2<(UInt(SPMSELR_EL0.SYSPMUSEL) * 2) + 1:UInt(SPMSELR_EL0.SYSPMUSEL) * 2> == '00' then
+        AArch64.SystemAccessTrap(EL2, 0x18);
+    elsif HaveEL(EL3) && MDCR_EL3.EnPM2 == '0' then
+        if EL3SDDUndef() then
+            UNDEFINED;
+        else
+            AArch64.SystemAccessTrap(EL3, 0x18);
+    elsif HaveEL(EL3) && SPMACCESSR_EL3<(UInt(SPMSELR_EL0.SYSPMUSEL) * 2) + 1:UInt(SPMSELR_EL0.SYSPMUSEL) * 2> == '00' then
+        if EL3SDDUndef() then
+            UNDEFINED;
+        else
+            AArch64.SystemAccessTrap(EL3, 0x18);
+    elsif !IsSPMUCounterImplemented(UInt(SPMSELR_EL0.SYSPMUSEL), (UInt(SPMSELR_EL0.BANK) * 16) + m) then
+        X[t, 64] = Zeros(64);
+    else
+        X[t, 64] = SPMEVFILT2R_EL0[UInt(SPMSELR_EL0.SYSPMUSEL), (UInt(SPMSELR_EL0.BANK) * 16) + m];
+
+which shows that an SPMEVFILT2Rn_EL0 access from EL1 traps to EL2 if:
+
+- either HDFGRTR2_EL2.nSPMEVTYPERn_EL0 == '0', (check)
+- or MDCR_EL2.EnSPM == '0', (check)
+- or SPMACCESSR_EL2<(UInt(SPMSELR_EL0.SYSPMUSEL) * 2) + 1:UInt(SPMSELR_EL0.SYSPMUSEL) * 2> == '00'
+
+and that last condition requires some more handling as you need to
+evaluate both SPMSELR_EL0.SYSPMUSEL and the corresponding field of
+SPMACCESSR_EL2 to make a decision. It's not majorly complicated, but
+it isn't solved by simply setting a static attribute.
+
+> +
+> +       SR_TRAP(SYS_SPMCGCR0_EL1,       CGT_MDCR_EnSPM),
+> +       SR_TRAP(SYS_SPMCGCR1_EL1,       CGT_MDCR_EnSPM),
+> +       SR_TRAP(SYS_SPMACCESSR_EL1,     CGT_MDCR_EnSPM),
+> +       SR_TRAP(SYS_SPMCFGR_EL1,        CGT_MDCR_EnSPM),
+> +       SR_TRAP(SYS_SPMCNTENCLR_EL0,    CGT_MDCR_EnSPM),
+> +       SR_TRAP(SYS_SPMCNTENSET_EL0,    CGT_MDCR_EnSPM),
+> +       SR_TRAP(SYS_SPMCR_EL0,          CGT_MDCR_EnSPM),
+> +       SR_TRAP(SYS_SPMDEVAFF_EL1,      CGT_MDCR_EnSPM),
+> +       SR_TRAP(SYS_SPMDEVARCH_EL1,     CGT_MDCR_EnSPM),
+> +       SR_TRAP(SYS_SPMIIDR_EL1,        CGT_MDCR_EnSPM),
+> +       SR_TRAP(SYS_SPMINTENCLR_EL1,    CGT_MDCR_EnSPM),
+> +       SR_TRAP(SYS_SPMINTENSET_EL1,    CGT_MDCR_EnSPM),
+> +       SR_TRAP(SYS_SPMOVSCLR_EL0,      CGT_MDCR_EnSPM),
+> +       SR_TRAP(SYS_SPMOVSSET_EL0,      CGT_MDCR_EnSPM),
+> +       SR_TRAP(SYS_SPMSCR_EL1,         CGT_MDCR_EnSPM),
+> +       SR_TRAP(SYS_SPMSELR_EL0,        CGT_MDCR_EnSPM),
+
+So please look at the pseudocode for each and every register you
+add. If there is a trap to EL2 that is described, you must have the
+corresponding handling. None of that is optional.
+
+> ........
+> 
+> > 
+> >> Afraid, did not understand this. Could you please give some pointers
+> >> on similar existing code.
+> > 
+> > See above. And if you want some example, just took at the file you are
+> > patching already. Look at how MDCR_EL2 conditions the trapping of all
+> > the debug, PMU, AMU registers, for example. There is no shortage of
+> > them.
+> 
+> Right, I understand your point now. I am planning to send out the following
+> patches (in reply to the current thread) for your review, before sending out
+> the entire series as V1.
+> 
+> - Patch adding VNCR details for virtual EL2 access
+> - Patch adding FEAT_FGT2 based FGU handling
+> - Patch adding corresponding CGT handling for registers being added above
+> 
+> Although, can skip that step and just send out the series directly if you so
+> prefer. Please do suggest. Thanks for all the detailed information above.
+
+My suggestion is that you take a good look at the pseudocode and
+implement all the existing requirements.  Yes, this is undesirably
+complicated, but I'm not the one making the rules here...
+
+Once you think you have all these requirements in place, please post
+the series. But not before that. If you have any question, just ask.
+
+Thanks,
 
 	M.
 
