@@ -1,197 +1,100 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 949BD1ABEA7
-	for <kvmarm@lists.linux.dev>; Sat,  3 Aug 2024 10:38:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A86A1CA9E
+	for <kvmarm@lists.linux.dev>; Sun,  4 Aug 2024 08:18:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722681533; cv=none; b=ZwZY0zU5a5NW4APzarKDdygBMKhtK3Upukt9iJrZgH8WgXuM9chCqVJF5RZTuPsNA8PegZOsoaf+/hd0K4P4812kAa8+BsP2hbuzGhjgCyZ9mx988GJsjhXOcRTggZyaImldlj4HvK4Zniz1DVCJMMXbL40TZOQYWOUy4vAIi9E=
+	t=1722759489; cv=none; b=bGJAxUy9FAawFJNROQuce3wH8mImVj28KJm1vbyVdWCs1k8PdJ0QXdQPCWagvV14LpadsiEFv6HCSnFvHqzHTz3h36xSgyWp3Vxy5OwboUBBeF9CCStHIdx9SbSgJ+4+cmnd9RFLbPTamRT4kc2QG9VtqnxrXVKdT1b9ht0sK/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722681533; c=relaxed/simple;
-	bh=YGq3TVZtqJrXxBplwOG85CUfLYaIn/S8Akul9NrisN4=;
+	s=arc-20240116; t=1722759489; c=relaxed/simple;
+	bh=ZYRZnef0yxaS5bV9saKBDKO14pgVNfmF9j2Bk9jzlJk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eSc3ZoH2QWK6OZ4CgJ4zz13X9DwCswiBCSZrvfNtn4P0i0dJ3QIKC5ruEcZyJT5dedUOvTKAtRh4fNb2FBs8qLsQ7MfPfKuDqo+UhW7aIAPj2pwG+LBcBy/Z22BiYLyxqD34yvHaQnu1jfu9CfEuctdYdRc6yQNR6TeE/HbfpxQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ED00DDA7;
-	Sat,  3 Aug 2024 03:39:09 -0700 (PDT)
-Received: from [10.163.57.20] (unknown [10.163.57.20])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9EB953F64C;
-	Sat,  3 Aug 2024 03:38:16 -0700 (PDT)
-Message-ID: <fb9bef18-adf2-4d3a-8205-b22a65b0c6db@arm.com>
-Date: Sat, 3 Aug 2024 16:08:11 +0530
+	 In-Reply-To:Content-Type; b=GNPNswpeRy3DyCfnIZsMGLvO3y0+qwb7vUIaIcAoh8M4ab0Rnj9e9dyIzGljyOu9NSspLSeoHajjznzmEmRSfj1W/4ETwth8XSl0p5mMvCV8AQkdDr+8Yw7Z7pZiSYdv0JkDcIXoK/7kMdFHPbtR2IF9HPMekuXm7Q0DgQTxtKg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ara32mym; arc=none smtp.client-ip=91.218.175.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ara32mym"
+Message-ID: <401bebca-9637-4626-901f-e46b2d058768@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1722759484;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BR8nESmyux7KPrlPtWm/y86ziQt1dIfCuk1340ZZ33o=;
+	b=ara32mymUPXn1tDy4bLqkZuYghp73ABnXKvkf214k9mbGPs4NlINmZEHazKOB+P84dAFc7
+	luVgeGbq8L7ea+dNC0SpntN3dVFowg3obE63kXZvD+oCKpN2lmqh2cwtEnOGvKKkYCyhrp
+	kwRXT5GHI+wbOmfqrTETGUTO+1NIvio=
+Date: Sun, 4 Aug 2024 16:17:47 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC 10/10] KVM: arm64: nv: Add new HDFGRTR2_GROUP &
- HDFGRTR2_GROUP based FGU handling
-To: Marc Zyngier <maz@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org,
+Subject: Re: [PATCH v2] docs: KVM: Fix register ID of SPSR_FIQ
+To: Takahiro Itazuri <itazur@amazon.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+ Dave Martin <Dave.Martin@arm.com>, linux-doc@vger.kernel.org,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org, zulinx86@gmail.com,
+ kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
  Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Mark Brown <broonie@kernel.org>, kvmarm@lists.linux.dev,
- linux-kernel@vger.kernel.org
-References: <20240620065807.151540-1-anshuman.khandual@arm.com>
- <20240620065807.151540-11-anshuman.khandual@arm.com>
- <865xu3kh4r.wl-maz@kernel.org> <4d256df7-1ec7-4300-b5c8-355f46c0e869@arm.com>
- <878qyy35e5.wl-maz@kernel.org> <47dc4299-52cc-4f98-929b-fb86bd9757ae@arm.com>
- <86tthhi0nz.wl-maz@kernel.org> <c84d0081-5afa-4bc2-82f4-a6dd07b8ab87@arm.com>
- <86o76c1b8p.wl-maz@kernel.org> <d56735e2-3fee-4d91-84e1-a5b480ec0ce1@arm.com>
- <86bk2b198o.wl-maz@kernel.org>
+ Suzuki K Poulose <suzuki.poulose@arm.com>, glider@google.com
+References: <20230606154628.95498-1-itazur@amazon.com>
 Content-Language: en-US
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <86bk2b198o.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zenghui Yu <zenghui.yu@linux.dev>
+In-Reply-To: <20230606154628.95498-1-itazur@amazon.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
++Cc kvmarm people and the list ...
 
-On 8/2/24 16:29, Marc Zyngier wrote:
-> On Fri, 02 Aug 2024 10:25:44 +0100,
-> Anshuman Khandual <anshuman.khandual@arm.com> wrote:
->>
->> On 8/1/24 21:33, Marc Zyngier wrote:
->>> On Thu, 01 Aug 2024 11:46:22 +0100,
->>> Anshuman Khandual <anshuman.khandual@arm.com> wrote:
+On 2023/6/6 23:46, Takahiro Itazuri wrote:
+> Fixes the register ID of SPSR_FIQ.
 > 
-> [...]
+> SPSR_FIQ is a 64-bit register and the 64-bit register size mask is
+> 0x0030000000000000ULL.
 > 
->>>> +	SR_FGT(SYS_SPMACCESSR_EL1,	HDFGRTR2, nSPMACCESSR_EL1, 0),
->>>
->>> This (and I take it most of the stuff here) is also gated by
->>> MDCR_EL2.SPM, which is a coarse grained trap. That needs to be
->>> described as well. For every new register that you add here.
->>
->> I did not find a SPM field in MDCR_EL2 either in latest ARM ARM or in
->> the latest XML. But as per current HDFGRTR2_EL2 description the field
->> nSPMACCESSR_EL1 is gated by FEAT_SPMU feature, which is being checked
->> via ID_AA64DFR1_EL1.PMU when required. So could you please give some
->> more details.
-> 
-> I misspelled it. It is MDCR_EL2.EnSPM.
-> 
-> And you are completely missing the point. It is not about
-> HDFGRTR2_EL2, but about SPMACCESSR_EL1 (and all its little friends).
-> 
-> To convince yourself, just look at the pseudocode for SPMACCESSR_EL1,
-> limited to an EL1 access:
-> 
-> elsif PSTATE.EL == EL1 then
->     if HaveEL(EL3) && EL3SDDUndefPriority() && MDCR_EL3.EnPM2 == '0' then
->         UNDEFINED;
->     elsif EL2Enabled() && IsFeatureImplemented(FEAT_FGT2) && ((HaveEL(EL3) && SCR_EL3.FGTEn2 == '0') || HDFGRTR2_EL2.nSPMACCESSR_EL1 == '0') then
->         AArch64.SystemAccessTrap(EL2, 0x18);
->     elsif EL2Enabled() && MDCR_EL2.EnSPM == '0' then
->         AArch64.SystemAccessTrap(EL2, 0x18);
->     elsif HaveEL(EL3) && MDCR_EL3.EnPM2 == '0' then
->         if EL3SDDUndef() then
->             UNDEFINED;
->         else
->             AArch64.SystemAccessTrap(EL3, 0x18);
->     elsif EffectiveHCR_EL2_NVx() IN {'111'} then
->         X[t, 64] = NVMem[0x8E8];
->     else
->         X[t, 64] = SPMACCESSR_EL1;
-> 
-> 
-> Can you spot the *TWO* conditions where we take an exception to EL2
-> with 0x18 as the EC?
-> 
-> - One is when HDFGxTR2_EL2.nSPMACCESSR_EL1 == '0': that's a fine
->   grained trap.
-> - The other is when MDCR_EL2.EnSPM == '0': that's a coarse grained
->   trap.
-> 
-> Both conditions need to be captured in the various tables in this
-> file, for each and every register that you describe.
+> Fixes: fd3bc912d3d1 ("KVM: Documentation: Document arm64 core registers in detail")
+> Signed-off-by: Takahiro Itazuri <itazur@amazon.com>
 
-Ahh, got it now. Because now KVM knows about SPMACCESSR_EL1 register,
-access to that register must also be enabled via both fine grained trap
-(HDFGxTR2_EL2.nSPMACCESSR_EL1) and coarse grained trap (MDCR_EL2.EnSPM).
-
-For all the registers that are being added via FEAT_FGT2 here in this
-patch, their corresponding CGT based path also needs to be enabled via
-corresponding CGT_MDCR_XXX groups.
+... since you're fixing the encoding of an *arm64* core register and the
+mentioned commit fd3bc912d3d1 was merged via the kvmarm tree. I guess
+this is the main reason why this patch has been blocked on the list for
+over a year, as pointed out recently by Alexander [*].
 
 > 
-> [...]
+> ---
+> Changes from v1
+> - Add a description about the 64-bit register size mask in the commit
+>   message.
+> - Link: https://lore.kernel.org/all/20230410121927.26953-1-itazur@amazon.com/
 > 
->>> Now, the main issues are that:
->>>
->>> - you're missing the coarse grained trapping for all the stuff you
->>>   have just added. It's not a huge amount of work, but you need, for
->>>   each register, to describe what traps apply to it. The fine grained
->>>   stuff is most, but not all of it. There should be enough of it
->>>   already to guide you through it.
->>
->> Coarse grained trapping for FEAT_FGT2 based fine grained registers ?
+> ---
+>  Documentation/virt/kvm/api.rst | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> Not for FEAT_FGT2. For the registers that FEAT_FGT2 traps. Can you see
-> the difference?
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index a5c803f39832..65dad2581751 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -2535,7 +2535,7 @@ Specifically:
+>    0x6030 0000 0010 004a SPSR_ABT    64  spsr[KVM_SPSR_ABT]
+>    0x6030 0000 0010 004c SPSR_UND    64  spsr[KVM_SPSR_UND]
+>    0x6030 0000 0010 004e SPSR_IRQ    64  spsr[KVM_SPSR_IRQ]
+> -  0x6060 0000 0010 0050 SPSR_FIQ    64  spsr[KVM_SPSR_FIQ]
+> +  0x6030 0000 0010 0050 SPSR_FIQ    64  spsr[KVM_SPSR_FIQ]
+>    0x6040 0000 0010 0054 V0         128  fp_regs.vregs[0]    [1]_
+>    0x6040 0000 0010 0058 V1         128  fp_regs.vregs[1]    [1]_
+>    ...
 
-Understood, for example PMIAR_EL1 register which FEAT_FGT2 now traps via
+The change itself looks reasonable.
 
-SR_FGT(SYS_PMIAR_EL1,           HDFGRTR2, nPMIAR_EL1, 0),
+Thanks,
+Zenghui
 
-also needs to have corresponding coarse grained trap.
-
-SR_TRAP(SYS_PMIAR_EL1,          CGT_MDCR_TPM),
-
-Similarly corresponding SR_TRAP() needs to be covered for all registers
-that are now being trapped with FEAT_FGT2.
-
-Example code snippet.
-
-........
-+       SR_TRAP(SYS_SPMEVFILT2R_EL0(8), CGT_MDCR_EnSPM),
-+       SR_TRAP(SYS_SPMEVFILT2R_EL0(9), CGT_MDCR_EnSPM),
-+       SR_TRAP(SYS_SPMEVFILT2R_EL0(10),        CGT_MDCR_EnSPM),
-+       SR_TRAP(SYS_SPMEVFILT2R_EL0(11),        CGT_MDCR_EnSPM),
-+       SR_TRAP(SYS_SPMEVFILT2R_EL0(12),        CGT_MDCR_EnSPM),
-+       SR_TRAP(SYS_SPMEVFILT2R_EL0(13),        CGT_MDCR_EnSPM),
-+       SR_TRAP(SYS_SPMEVFILT2R_EL0(14),        CGT_MDCR_EnSPM),
-+       SR_TRAP(SYS_SPMEVFILT2R_EL0(15),        CGT_MDCR_EnSPM),
-+
-+       SR_TRAP(SYS_SPMCGCR0_EL1,       CGT_MDCR_EnSPM),
-+       SR_TRAP(SYS_SPMCGCR1_EL1,       CGT_MDCR_EnSPM),
-+       SR_TRAP(SYS_SPMACCESSR_EL1,     CGT_MDCR_EnSPM),
-+       SR_TRAP(SYS_SPMCFGR_EL1,        CGT_MDCR_EnSPM),
-+       SR_TRAP(SYS_SPMCNTENCLR_EL0,    CGT_MDCR_EnSPM),
-+       SR_TRAP(SYS_SPMCNTENSET_EL0,    CGT_MDCR_EnSPM),
-+       SR_TRAP(SYS_SPMCR_EL0,          CGT_MDCR_EnSPM),
-+       SR_TRAP(SYS_SPMDEVAFF_EL1,      CGT_MDCR_EnSPM),
-+       SR_TRAP(SYS_SPMDEVARCH_EL1,     CGT_MDCR_EnSPM),
-+       SR_TRAP(SYS_SPMIIDR_EL1,        CGT_MDCR_EnSPM),
-+       SR_TRAP(SYS_SPMINTENCLR_EL1,    CGT_MDCR_EnSPM),
-+       SR_TRAP(SYS_SPMINTENSET_EL1,    CGT_MDCR_EnSPM),
-+       SR_TRAP(SYS_SPMOVSCLR_EL0,      CGT_MDCR_EnSPM),
-+       SR_TRAP(SYS_SPMOVSSET_EL0,      CGT_MDCR_EnSPM),
-+       SR_TRAP(SYS_SPMSCR_EL1,         CGT_MDCR_EnSPM),
-+       SR_TRAP(SYS_SPMSELR_EL0,        CGT_MDCR_EnSPM),
-........
-
-> 
->> Afraid, did not understand this. Could you please give some pointers
->> on similar existing code.
-> 
-> See above. And if you want some example, just took at the file you are
-> patching already. Look at how MDCR_EL2 conditions the trapping of all
-> the debug, PMU, AMU registers, for example. There is no shortage of
-> them.
-
-Right, I understand your point now. I am planning to send out the following
-patches (in reply to the current thread) for your review, before sending out
-the entire series as V1.
-
-- Patch adding VNCR details for virtual EL2 access
-- Patch adding FEAT_FGT2 based FGU handling
-- Patch adding corresponding CGT handling for registers being added above
-
-Although, can skip that step and just send out the series directly if you so
-prefer. Please do suggest. Thanks for all the detailed information above.
-
-- Anshuman
+[*] https://lore.kernel.org/all/20240802132036.914457-1-glider@google.com
