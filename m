@@ -1,137 +1,116 @@
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9F72149C4E
-	for <kvmarm@lists.linux.dev>; Mon,  5 Aug 2024 23:44:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EBA714C5A1
+	for <kvmarm@lists.linux.dev>; Mon,  5 Aug 2024 23:53:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722901463; cv=none; b=nqGGrB7NGv2t/2G37xO7ZFH3HcTxXWkMJSfbIYBDjjrGKsoKDMZISCgGqAR3knQC58rrAG4gAbQfstuCALyRRDTiw1+QEA2dwhb/ITyfuSKbg0Z/Phcxj+2xP5yLyPAMUUKqhvgkiXxY/MeTf1/kMEHHVp2e7orpi8m7VwZ4YgU=
+	t=1722901985; cv=none; b=BTo8vPSBVjpVG9Bz+3CdLlqm24cW7aErRNyWtt8vzKdR08r5HNzF9K8zS5SKe9IbAno//QlpB2bHcnXtYw4GxDieb30rMD9zllk9HMf87jVmZdWW1wA1CudL7hQJoP/kOhPyMrTa99AvtBfE/302BtgUaaNOl6I4HSzBrx+v+aA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722901463; c=relaxed/simple;
-	bh=N36BgzP/Ze7QI1FmjnSinfkcU4TKCKVAfKUS3FFhhCM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WJFBrK0OJTLVbcoEsqTrvAlnqgWiWS1RvhTNt/wRbWVEWIQfz1Hw/F6afbSlHVE6/cYZTdLM3kJ/n+pA/Ke5cgBVhlvfR4S01a8JY7Y8fpj/dcfc+EEfrCjAJstnHEPHVLU3VV+bvXD2HoskYlzf6ldeAbRdw6FcVwG+5LUybhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=nIr9T/c2; arc=none smtp.client-ip=209.85.208.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1722901985; c=relaxed/simple;
+	bh=XE64EO9QsKUjNS+RxiZtVEDU63XJXco52ktIOyCusQg=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=pD1Or3ZFxwTugC4i17r+ryDaU6ImGsDAOMvPa/Cgw2Iw1AE7srkTQXg25Qd+MyuqZR489L75b3HoYp4A0CyLZxBpmXprEs9Ah7NU1Br8GBjPPfyrIen28hDcag50Ter3b8f23FTxvRYMQ85Odx020tf7ozhqNg4Vxwr6YNEtGRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=T2pOljBt; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="nIr9T/c2"
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2f035ae0ff1so2531941fa.0
-        for <kvmarm@lists.linux.dev>; Mon, 05 Aug 2024 16:44:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="T2pOljBt"
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-664916e5b40so4660237b3.1
+        for <kvmarm@lists.linux.dev>; Mon, 05 Aug 2024 16:53:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1722901460; x=1723506260; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ldf/5dV/loYFjBwyCn5nK6gnfSKwn5dyvPTT5/+hrg8=;
-        b=nIr9T/c2xvActtRMI4DHyX4YxVoBRrFzO8KtQAhmihLV/2zK6rfKfTGRx4OZ127NjN
-         7u2wOK+Shk4x1fkSBmYvsuBJhDoMbbQ/kyJfags3loFoATzBLORH/lqUG1sGHaujr9aS
-         sV+zA5tI4PzcgMOjIOnCZeWDpj84s4XWilD/w=
+        d=google.com; s=20230601; t=1722901982; x=1723506782; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8tNxfozveIy4KhK+t6BTSFuKqZ3CnwWBfLDeoqvVNkU=;
+        b=T2pOljBtwUyz1Oo9FHySrT2DnYTzLDXNeZ8dbCiLQqL9bhcboYvIu4Rr/eAPDwpsgw
+         B2mcAplYIXgYn8NxbW7fTrAJUpgRTjB0je0ZqbJB54jGPCqwAox92o9apSnaurEFBBJV
+         Iizpe6c7DCVzRCw6zLfeEDf1PCexgqF0pTmBOo7mvxE33HE8+VyXis++tyEv2Aih6zV1
+         CumRcH+4ayx9iUW0z+bD0WMBUkejvMiU0F6yyTpq+RTDz/+rA3yLsaUSUKCvdJ5hrMYo
+         NX9gMHW7AMq48wgXNsnQaB7Y3h1SuOrGo3FaAdTDQD9xr4WVvlX84kqjYY6VWgkkaREx
+         rBfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722901460; x=1723506260;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Ldf/5dV/loYFjBwyCn5nK6gnfSKwn5dyvPTT5/+hrg8=;
-        b=TJWueZW3G/epcLSHZ8juIsi17bmsItHPL/rCFDUBaBmbN86g9LHJT5lgD89e0HcmUS
-         rQ7E5lKwEM5QQKoAfBXTEao+BwdmxE7c6Ezo+X6UlIjkReyFBRzy9Pccgx59TkJxRhS3
-         HZXGdmdXTq1p4JmNFQiLbtcFmpfMS1mrWUtT13MMHmgSINmaOCL2wvM601aH8wrqxjJa
-         x1/YuptFlmydt5w4KhsOm31HU1AtqK+8V5lymNFTVtUiRLy/eEfZI+GKWAMFuQZGsAKT
-         pSC2OJ6HN1nSh3UoiowvgQwI5U5QY3hxGs8t8c2GwnSNKD60S01qoOhgIysmx/bSZ1ll
-         ChqA==
-X-Forwarded-Encrypted: i=1; AJvYcCUN9muh2a4Yl1j1AnvjPmHFEXaOYrvT2ZD56ZTzF0kJqlm7ydDT7Z9nsToMU3NLWWWZiKiAomYSpWOyw7+SbrprQ5Lcvh1D
-X-Gm-Message-State: AOJu0YxWtfGxFLcgnYFWew8LcGGgU77Gn63j76CSnxAXWAJUwy/4bUCz
-	jwn7wezkjbVdgsXQfYPkcAk1Lhe1sr3DKOwafIK83G5wXCAgg1Lu4kM87U6+GcG7/IIHR57OGD2
-	htjraQb6wfIyJTg03pgX60om7dzbDdjD85UR1
-X-Google-Smtp-Source: AGHT+IHIK0kYEUYapI5tIc8vSMvjbESuyPpwn3iTc/MzDz8eRJWcfhJa0eyJoudkIswN6TS8V0q74Bp34S0uh1BvkQE=
-X-Received: by 2002:a2e:9004:0:b0:2ec:347a:b020 with SMTP id
- 38308e7fff4ca-2f15b13c649mr36224431fa.12.1722901459336; Mon, 05 Aug 2024
- 16:44:19 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1722901982; x=1723506782;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8tNxfozveIy4KhK+t6BTSFuKqZ3CnwWBfLDeoqvVNkU=;
+        b=uolqfX+m9HbVA9khEPl+tVZQbeOHlQzaBwnGbdUPELgJJJvZjT4MuFXPIpZXWyhmva
+         gk7IwckGYpG8OZl7Nl/Jj1Qkx84O2tZcra2flkiMIZKSWEMwS5hCgmZuQilyQ5KM6nTN
+         IzYGsVRrkbHxSr67qC4yzvbXlapCw+GYJIvK0QEzhgXRBInRPBd4TjphSa+BwhA0u0bh
+         7RlBPNMqu3rlc1cgIQZoc4sEGd5os4noGcxkm0C5US617dQg74yBh92K7s/1iy1PMW41
+         RRthumBeLAuoQiEZOMTWtastOFhd14sFBe0fQ0GDMcEWeygTU0BXstaMP4QcQzHfad+t
+         w/iQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUisoCBidGkDGJO5jxUltxPognJqxbLgUBQRhLaogs857JtJXcJ9hZu7odk7CRYY0jOYrn44kQ+q6xTGwPfZBjAjaB0CMJd
+X-Gm-Message-State: AOJu0YxNdI5pbltpIaSyOSzV7JzmLC2c9tuqDwT15uxXo7Si3oawrrSt
+	vF1aJywkBrqUnTZ91BIKNEXdt5GWQsVBIfo+YjSvZItfEMrOQIvcBWHlKoZn4aPXWH/wIcrnx3N
+	+Eg==
+X-Google-Smtp-Source: AGHT+IHjgF0Ca8ethUSfrozdkFUFp0o0AUPtEhLPgrNZWa8lbUZ7qZQp3Z7lR+cNHb6EVM2g/AygpE/k1/Q=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:f16:b0:691:a38c:a61d with SMTP id
+ 00721157ae682-691a39bf26cmr3721507b3.3.1722901982364; Mon, 05 Aug 2024
+ 16:53:02 -0700 (PDT)
+Date: Mon, 5 Aug 2024 16:53:01 -0700
+In-Reply-To: <ZrFfvjy_-Tyx4xUV@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20240229025759.1187910-1-stevensd@google.com> <ZnXHQid_N1w4kLoC@google.com>
- <87cymtdc0t.fsf@draig.linaro.org>
-In-Reply-To: <87cymtdc0t.fsf@draig.linaro.org>
-From: David Stevens <stevensd@chromium.org>
-Date: Tue, 6 Aug 2024 08:44:08 +0900
-Message-ID: <CAD=HUj6gjqthaenpZUr2Lci3WJW86OWe559YrDWiUSVfZBNHiQ@mail.gmail.com>
-Subject: Re: [PATCH v11 0/8] KVM: allow mapping non-refcounted pages
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Yu Zhang <yu.c.zhang@linux.intel.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	Zhi Wang <zhi.wang.linux@gmail.com>, Maxim Levitsky <mlevitsk@redhat.com>, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20240726235234.228822-1-seanjc@google.com> <20240726235234.228822-55-seanjc@google.com>
+ <ZrFfgzRbiqT-Zi2O@linux.dev> <ZrFfvjy_-Tyx4xUV@linux.dev>
+Message-ID: <ZrFl3faiGHQ5oLjf@google.com>
+Subject: Re: [PATCH v12 54/84] KVM: arm64: Mark "struct page" pfns
+ accessed/dirty before dropping mmu_lock
+From: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
+	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	David Matlack <dmatlack@google.com>, David Stevens <stevensd@chromium.org>, 
+	Fuad Tabba <tabba@google.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Jul 31, 2024 at 8:41=E2=80=AFPM Alex Benn=C3=A9e <alex.bennee@linar=
-o.org> wrote:
->
-> Sean Christopherson <seanjc@google.com> writes:
->
-> > On Thu, Feb 29, 2024, David Stevens wrote:
-> >> From: David Stevens <stevensd@chromium.org>
-> >>
-> >> This patch series adds support for mapping VM_IO and VM_PFNMAP memory
-> >> that is backed by struct pages that aren't currently being refcounted
-> >> (e.g. tail pages of non-compound higher order allocations) into the
-> >> guest.
-> >>
-> >> Our use case is virtio-gpu blob resources [1], which directly map host
-> >> graphics buffers into the guest as "vram" for the virtio-gpu device.
-> >> This feature currently does not work on systems using the amdgpu drive=
-r,
-> >> as that driver allocates non-compound higher order pages via
-> >> ttm_pool_alloc_page().
-> >>
-> >> First, this series replaces the gfn_to_pfn_memslot() API with a more
-> >> extensible kvm_follow_pfn() API. The updated API rearranges
-> >> gfn_to_pfn_memslot()'s args into a struct and where possible packs the
-> >> bool arguments into a FOLL_ flags argument. The refactoring changes do
-> >> not change any behavior.
-> >>
-> >> From there, this series extends the kvm_follow_pfn() API so that
-> >> non-refconuted pages can be safely handled. This invloves adding an
-> >> input parameter to indicate whether the caller can safely use
-> >> non-refcounted pfns and an output parameter to tell the caller whether
-> >> or not the returned page is refcounted. This change includes a breakin=
-g
-> >> change, by disallowing non-refcounted pfn mappings by default, as such
-> >> mappings are unsafe. To allow such systems to continue to function, an
-> >> opt-in module parameter is added to allow the unsafe behavior.
-> >>
-> >> This series only adds support for non-refcounted pages to x86. Other
-> >> MMUs can likely be updated without too much difficulty, but it is not
-> >> needed at this point. Updating other parts of KVM (e.g. pfncache) is n=
-ot
-> >> straightforward [2].
-> >
-> > FYI, on the off chance that someone else is eyeballing this, I am worki=
-ng on
-> > revamping this series.  It's still a ways out, but I'm optimistic that =
-we'll be
-> > able to address the concerns raised by Christoph and Christian, and may=
-be even
-> > get KVM out of the weeds straightaway (PPC looks thorny :-/).
->
-> I've applied this series to the latest 6.9.x while attempting to
-> diagnose some of the virtio-gpu problems it may or may not address.
-> However launching KVM guests keeps triggering a bunch of BUGs that
-> eventually leave a hung guest:
->
+On Mon, Aug 05, 2024, Oliver Upton wrote:
+> > > ---
+> > >  arch/arm64/kvm/mmu.c | 10 ++++++----
+> > >  1 file changed, 6 insertions(+), 4 deletions(-)
+> > > 
+> > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > > index 22ee37360c4e..ce13c3d884d5 100644
+> > > --- a/arch/arm64/kvm/mmu.c
+> > > +++ b/arch/arm64/kvm/mmu.c
+> > > @@ -1685,15 +1685,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> > >  	}
+> > >  
+> > >  out_unlock:
+> > > +	if (writable && !ret)
+> > > +		kvm_set_pfn_dirty(pfn);
+> > 
+> > I'm guessing you meant kvm_release_pfn_dirty() here, because this leaks
+> > a reference.
 
-Likely the same issue as [1]. Commit d02c357e5bfa added another call
-to kvm_release_pfn_clean() in kvm_faultin_pfn(), which ends up
-releasing a reference that is no longer being taken. If you replace
-that with kvm_set_page_accessed() instead, then things should work
-again. I didn't send out a rebased version of the series, since Sean's
-work supersedes my series.
+Doh, I did indeed.  Alternatively, this could be:
 
--David
+	if (writable && !ret)
+		kvm_set_pfn_dirty(pfn);
 
-[1] https://lore.kernel.org/lkml/15865985-4688-4b7e-9f2d-89803adb8f5b@colla=
-bora.com/
+	kvm_release_pfn_clean(pfn);
+
+It won't matter in the end, because this just becomes:
+
+	kvm_release_faultin_page(kvm, page, !!ret, writable);
+
+So I guess the question is if you prefer to make the switch to an if-else in this
+path, or more implicitly in the conversion to kvm_release_faultin_page().
+
+I made the same goof for RISC-V, perhaps to prove that I too can copy+paste arm64's
+MMU code ;-)
