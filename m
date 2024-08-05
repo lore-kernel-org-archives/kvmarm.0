@@ -1,62 +1,65 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62C6817C64
-	for <kvmarm@lists.linux.dev>; Mon,  5 Aug 2024 17:33:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D27915C13D
+	for <kvmarm@lists.linux.dev>; Mon,  5 Aug 2024 17:33:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722879215; cv=none; b=BNxsFaim5dqnrtabCV3YsGMzycSysqoeORYGs/8u4gcbpzKb7+rPs3CCRTn8bzff85OtMaVW+zdPhjLuLn2G3t+m9OjwGa1KC5NqarfFo/cAKR30A4008YZqcMOc9Y28e9I1zJ/lCcd4de+mlGHXuv7oZlPvfsCpaxqZWcGGUg0=
+	t=1722879217; cv=none; b=jopuQq1X08gLWtueRY/HCq1IXJTxKrCWwVHS6MbIoIx3i/6eSUULROalA6Vs5vHZd26XushDRBbFe59yU1c8lXaSSXWgf34dJCByoL8dYDqqb/xm77fZo6A0AeXX1BZNGwmp8B6j5E0U+8mYMYd2QwDUIvyTuPfg45d6ySha2iA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722879215; c=relaxed/simple;
-	bh=J1tnYntwg50fTpjA0mrAEwd6kGMrYyjO+qV+J0d5bL0=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=lyKBXl7un6UzlUw8HS9h6HbKu0nHVC2awJJnWR2BH9KUNgSFSBKXYfLzFyZuEECoJeSLPYuR59aMZkG+ZR6BeQkzeUQxf00gkgWNL4a5tlo/XcVaYGfGg08DWifkpaSa2/9NjmHy3wrrdn15AmfJD+hbX25zqXNHbt6rTSY0ihc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hw6Nnjkl; arc=none smtp.client-ip=209.85.128.201
+	s=arc-20240116; t=1722879217; c=relaxed/simple;
+	bh=1NrPIOiaFcWy1pA7SeZO58DyGP+moHdFsjNSYGiQovs=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Vf3xt6j19T26zca8Uv8a6EFNfo78u3ZHPEj/WtsVXEXy6eTnXWeE1DKnEhFZh5eeOcU/6vOQ29pzYYxLznQsWSmtzMusWZkVLTsOpSPJj58WiZxBfjrOQwPcyGWWR+5s18iqnfDikKFj3Mt+zXq3AT+yqdr9OKJk3j5iLM48PmE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nTf+jABe; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hw6Nnjkl"
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6688c44060fso236984427b3.2
-        for <kvmarm@lists.linux.dev>; Mon, 05 Aug 2024 10:33:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nTf+jABe"
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-665a6dd38c8so215529547b3.1
+        for <kvmarm@lists.linux.dev>; Mon, 05 Aug 2024 10:33:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722879212; x=1723484012; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=XFsKcyry/RGvnDXDztV7J/rjOs8FjUssMxjCbt3gJjw=;
-        b=hw6NnjklnFCHb1NxmJGZZi11lbWQc7aK9CJgFmVNWi8ZnaNB8SRDDbYZ4zdM0hdqrs
-         VcnvlTcv8st+AqqcLTK+fyBDGoMKUOLI0C0pR83zZLqWwvo54rOB4RluMZ+ZB+Uq407p
-         7NSeNffMkQyjuKiuu/oNqiw3+zTds6f3WuOWFkvpbLGuS//56d1jIVHVp4PuwRCn/IZh
-         Btdd0p200C2Kp7VNYbDcqeoDWrZh1Xn9tiBqtkwbPikqn7T0O6wxHvZvigCIRqPaYmlM
-         Bl1M1cDKJ845QbDCbzajTMkKtijNmUOUHuXrFbwsmh04BmIY+9Ua4Ap7J8/+8Slag5zj
-         /zWA==
+        d=google.com; s=20230601; t=1722879215; x=1723484015; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=A2jd+nZ7zCydcSHS9qkv11rRGweV2pR3YmHjm/L+b6o=;
+        b=nTf+jABe9uYvxISbIU+CseupW7V6XxqldR9hbAd/tm1yXlYTX0cpDhv+6WnlyUwz8w
+         VrAZBheGXYySuji619ujjYq8pxFDs5Xuyq77K8hyayr5Clj1aMQJGm6+XYQBvFgPvX87
+         GUqLgGCoYBb47lDcB/jHfV0grUk9/Q63PSsMDdQ4RJTVM8cUTwwImQWFfwj+aMeJ1pxX
+         WjAmKGzbOJdnq8dFaoflsVM4tC6FqIjfC6nOHYe+jcPVb9rtJYZr6lUEfs/ixXjC8Wiy
+         RTdRnV2KHuw6OZsk32p4jl8/v+Dl2E+aa1K1CAw70vzkK7ICdbC0MHliLxcl6PuZ9VV7
+         Zf/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722879212; x=1723484012;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XFsKcyry/RGvnDXDztV7J/rjOs8FjUssMxjCbt3gJjw=;
-        b=gqhecCXqQ3kXW6sunpaw0c3fByEVopXw184eqSBaSXO3/zlbiusPmmNXTkAqU/lboc
-         lSJeUm2EQldcORsZu8nV2mq+t/DbVbZbcSmI25BheQzabfBPJybuN+xYnoO/llpU+s6G
-         l/hhQFjR482mQwQpdKzISb2dE43JJeE2r9Ef51rSJ18mJHo+/HFzM5LCoPjKm2o3Ds7A
-         J2ZrHXzLVRxAgT6oi+hpwu8/WWqaakpXdgv5a+Q5Rz26+OevZRd0E+f/2Di7xX3DGb5D
-         bA3+MGugrTd34gSlyq33poTzmf0wfi9Q/rbpczQHDE3dM8x0bGEJwdSUEM80kH9o46Y/
-         uQCg==
-X-Gm-Message-State: AOJu0YwKAwHS/UyRtvaWo/foAgsjx9NkI/NNVpysqZLHNYsX4FwgbprZ
-	3g7Km3bCY/ilO00LdGnwovTge2t1w2Oomoc/1m/EbUxQ3EOmbHtuSUx/wDJOuwVZ438RKjyuq0r
-	eLyBh3kaRHCwZDZkvEg==
-X-Google-Smtp-Source: AGHT+IFZlxJNmQzbt9N82rYot7byBSPmj3iU12CQIJ/Po6Ln73cDVxthhXbSBDiWXirkdAWQL+ODuSEp2kVxxz5a
+        d=1e100.net; s=20230601; t=1722879215; x=1723484015;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=A2jd+nZ7zCydcSHS9qkv11rRGweV2pR3YmHjm/L+b6o=;
+        b=bU8iyOtRqgAnoo2utIHj4kCsn+JHHC8FzxSMsH+yq5Q0HjxBRdevrUwP61LCh9fGJw
+         X/oDt91E3eEzJH2IfszbyqRA8MJaMj2Oi/TsRwWpSkrzjdsPVm2ZFTQ85Mn+H8sw6Omy
+         4jh/cuycnMckBrowLExfXMg8O6uz2UlX+o2qy5uogLJwP5ETa9cOstqlg0EybH7Q3BWM
+         OX9hOxAixDXJsP2ShLxGoCa9sk1JjOy5tgDKqDzs1hms+/yC7TOB53dHCy1SxKKPvrV+
+         +nPA9nfhYr1OxiRN9D5WhoXjwrlIS/9iAnsgQ89wcs5fJVOA4J/SP5VwWoMx6OqNJwDR
+         hEpg==
+X-Gm-Message-State: AOJu0Ywd0jnwFmzBZXqmwprOm/m0t3LpbIAHh7TFeCJ9/dy6rluhfE6r
+	GyYBG1bA6atujOnLdX6DVUtHM7nqEoidd/eRUK1SfHky8XR69hH67p9Xevga24c6sex9baXkThh
+	JoffYde92eFzvh7GqdQ==
+X-Google-Smtp-Source: AGHT+IH9rlAJCZiANrVd4cygC2GlEEarzxxTnrIG5AU1Lx9lNgnvYh5Ez2oOozI3CIzKmGFUVsO/YBSH0IL4yed+
 X-Received: from vdonnefort.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:2eea])
- (user=vdonnefort job=sendgmr) by 2002:a05:690c:7107:b0:673:b39a:92ea with
- SMTP id 00721157ae682-68963233905mr4252017b3.7.1722879212424; Mon, 05 Aug
- 2024 10:33:32 -0700 (PDT)
-Date: Mon,  5 Aug 2024 18:32:23 +0100
+ (user=vdonnefort job=sendgmr) by 2002:a05:690c:113:b0:61b:e103:804d with SMTP
+ id 00721157ae682-68959c192bfmr3553157b3.0.1722879215017; Mon, 05 Aug 2024
+ 10:33:35 -0700 (PDT)
+Date: Mon,  5 Aug 2024 18:32:24 +0100
+In-Reply-To: <20240805173234.3542917-1-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20240805173234.3542917-1-vdonnefort@google.com>
 X-Mailer: git-send-email 2.46.0.rc2.264.g509ed76dc8-goog
-Message-ID: <20240805173234.3542917-1-vdonnefort@google.com>
-Subject: [RFC PATCH 00/11] Tracefs support for pKVM
+Message-ID: <20240805173234.3542917-2-vdonnefort@google.com>
+Subject: [RFC PATCH 01/11] ring-buffer: Check for empty ring-buffer with rb_num_of_entries()
 From: Vincent Donnefort <vdonnefort@google.com>
 To: rostedt@goodmis.org, mhiramat@kernel.org, 
 	linux-trace-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev
@@ -64,188 +67,97 @@ Cc: kvmarm@lists.linux.dev, will@kernel.org, qperret@google.com,
 	kernel-team@android.com, Vincent Donnefort <vdonnefort@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-The growing set of features supported by the hypervisor in protected
-mode necessitates debugging and profiling tools. Tracefs is the
-ideal candidate for this task:
+Currently there are two ways of identifying an empty ring-buffer. One
+relying on the current status of the commit / reader page
+(rb_per_cpu_empty()) and the other on the write and read counters
+(rb_num_of_entries() used in rb_get_reader_page()).
 
-  * It is simple to use and to script.
+with rb_num_of_entries(). This intends to ease later
+introduction of ring-buffer writers which are out of the kernel control
+and with whom, the only information available is through the meta-page
+counters.
 
-  * It is supported by various tools, from the trace-cmd CLI to the
-    Android web-based perfetto.
+Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 
-  * The ring-buffer, where are stored trace events consists of linked
-    pages, making it an ideal structure for sharing between kernel and
-    hypervisor.
-
-This series introduces a method to create events and to generate them
-from the hypervisor (hyp_enter/hyp_exit given as an example) as well as
-a Tracefs user-space interface to read them.
-
-A presentation was given on this matter during the tracing summit in
-2022. [1]
-
-1. ring-buffer
---------------
-
-To setup the per-cpu ring-buffers, a new interface is created:
-
-  ring_buffer_writer:	Describes what the kernel needs to know about the
-			writer, that is, the set of pages forming the
-			ring-buffer and a callback for the reader/head
-			swapping (enables consuming read)
-
-  ring_buffer_reader():	Creates a read-only ring-buffer from a
-			ring_buffer_writer.
-
-To keep the internals of `struct ring_buffer` in sync with the writer,
-the meta-page is used. It was originally introduced to enable user-space
-mapping of the ring-buffer [1]. In this case, the kernel is not the
-producer anymore but the reader. The function to read that meta-page is:
-
-  ring_buffer_poll_writer():
-			Update `struct ring_buffer` based on the writer
-			meta-page. Wake-up readers if necessary.
-
-The kernel has to poll the meta-page to be notified of newly written
-events.
-
-2. Tracefs interface
---------------------
-
-The interface is a hyp/ folder at the root of the tracefs mount point.
-This folder is like an instance and you'll find there a subset of the
-regular Tracefs user-space interface:
-
-  hyp/
-     buffer_size_kb
-     trace_pipe
-     trace_pipe_raw
-     trace
-     per_cpu/
-             cpuX/
-                 trace_pipe
-                 trace_pipe_raw
-     events/
-            hyp/
-                hyp_enter/
-                          enable
-                          id
-
-Behind the scenes, kvm/hyp_trace.c must rebuild the tracing hierarchy
-without relying on kernel/trace/trace.c. This is due to fundamental
-differences:
-
-  * Hypervisor tracing doesn't support trace_array's system-specific
-    features (snapshots, tracers, etc.).
-
-  * Logged event formats differ (e.g., no PID in hypervisor
-    events).
-
-  * Buffer operations require specific hypervisor interactions.
-
-3. Events
----------
-
-In the hypervisor, "hyp events" can be generated with trace_<event_name>
-in a similar fashion to what the kernel does. They're also created with
-similar macros than the kernel (see kvm_hypevents.h)
-
-HYP_EVENT("foboar",
-	HE_PROTO(void),
-	HE_STRUCT(),
-	HE_ASSIGN(),
-	HE_PRINTK(" ")
-)
-
-Despite the apparent similarities with TRACE_EVENT(), those macros
-internally differs: they must be used in parallel between the hypervisor
-(for the writing part) and the kernel (for the reading part) which makes
-it difficult to share anything with their kernel counterpart.
-
-Also, events directory isn't using eventfs.
-
-4. Few limitations:
--------------------
-
-Non consuming reading of the buffer isn't supported (i.e. cat trace) due
-to the lack of support in the ring-buffer meta-page.
-
-Tracing must be stopped for the buffer to be reset. i.e. (echo 0 >
-tracing_on; echo 0 > trace)
-
-[1] https://tracingsummit.org/ts/2022/hypervisortracing/
-[2] https://lore.kernel.org/all/20240510140435.3550353-1-vdonnefort@google.com/
-
-Vincent Donnefort (11):
-  ring-buffer: Check for empty ring-buffer with rb_num_of_entries()
-  ring-buffer: Introducing ring-buffer writer
-  ring-buffer: Expose buffer_data_page material
-  timekeeping: Export the boot clock in snapshots
-  KVM: arm64: Support unaligned fixmap in the nVHE hyp
-  KVM: arm64: Add clock support in the nVHE hyp
-  KVM: arm64: Add tracing support for the pKVM hyp
-  KVM: arm64: Add hyp tracing to tracefs
-  KVM: arm64: Add raw interface for hyp tracefs
-  KVM: arm64: Add support for hyp events
-  KVM: arm64: Add kselftest for tracefs hyp tracefs
-
- arch/arm64/include/asm/kvm_asm.h              |   6 +
- arch/arm64/include/asm/kvm_define_hypevents.h |  60 ++
- arch/arm64/include/asm/kvm_hyp.h              |   6 +
- arch/arm64/include/asm/kvm_hypevents.h        |  41 +
- arch/arm64/include/asm/kvm_hypevents_defs.h   |  41 +
- arch/arm64/include/asm/kvm_hyptrace.h         |  38 +
- arch/arm64/kernel/image-vars.h                |   4 +
- arch/arm64/kernel/vmlinux.lds.S               |  18 +
- arch/arm64/kvm/Kconfig                        |   9 +
- arch/arm64/kvm/Makefile                       |   2 +
- arch/arm64/kvm/arm.c                          |   6 +
- arch/arm64/kvm/hyp/hyp-constants.c            |   4 +
- arch/arm64/kvm/hyp/include/nvhe/arm-smccc.h   |  13 +
- arch/arm64/kvm/hyp/include/nvhe/clock.h       |  15 +
- .../kvm/hyp/include/nvhe/define_events.h      |  21 +
- arch/arm64/kvm/hyp/include/nvhe/trace.h       |  55 ++
- arch/arm64/kvm/hyp/nvhe/Makefile              |   1 +
- arch/arm64/kvm/hyp/nvhe/clock.c               |  42 +
- arch/arm64/kvm/hyp/nvhe/events.c              |  35 +
- arch/arm64/kvm/hyp/nvhe/ffa.c                 |   2 +-
- arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  64 ++
- arch/arm64/kvm/hyp/nvhe/hyp.lds.S             |   4 +
- arch/arm64/kvm/hyp/nvhe/mm.c                  |   2 +-
- arch/arm64/kvm/hyp/nvhe/psci-relay.c          |  14 +-
- arch/arm64/kvm/hyp/nvhe/switch.c              |   5 +-
- arch/arm64/kvm/hyp/nvhe/trace.c               | 594 ++++++++++++
- arch/arm64/kvm/hyp_events.c                   | 164 ++++
- arch/arm64/kvm/hyp_trace.c                    | 854 ++++++++++++++++++
- arch/arm64/kvm/hyp_trace.h                    |  15 +
- include/linux/ring_buffer.h                   | 124 ++-
- include/linux/timekeeping.h                   |   6 +
- kernel/time/timekeeping.c                     |   9 +
- kernel/trace/ring_buffer.c                    | 244 +++--
- tools/testing/selftests/hyp-trace/Makefile    |   6 +
- tools/testing/selftests/hyp-trace/config      |   4 +
- .../selftests/hyp-trace/hyp-trace-test        | 161 ++++
- 36 files changed, 2591 insertions(+), 98 deletions(-)
- create mode 100644 arch/arm64/include/asm/kvm_define_hypevents.h
- create mode 100644 arch/arm64/include/asm/kvm_hypevents.h
- create mode 100644 arch/arm64/include/asm/kvm_hypevents_defs.h
- create mode 100644 arch/arm64/include/asm/kvm_hyptrace.h
- create mode 100644 arch/arm64/kvm/hyp/include/nvhe/arm-smccc.h
- create mode 100644 arch/arm64/kvm/hyp/include/nvhe/clock.h
- create mode 100644 arch/arm64/kvm/hyp/include/nvhe/define_events.h
- create mode 100644 arch/arm64/kvm/hyp/include/nvhe/trace.h
- create mode 100644 arch/arm64/kvm/hyp/nvhe/clock.c
- create mode 100644 arch/arm64/kvm/hyp/nvhe/events.c
- create mode 100644 arch/arm64/kvm/hyp/nvhe/trace.c
- create mode 100644 arch/arm64/kvm/hyp_events.c
- create mode 100644 arch/arm64/kvm/hyp_trace.c
- create mode 100644 arch/arm64/kvm/hyp_trace.h
- create mode 100644 tools/testing/selftests/hyp-trace/Makefile
- create mode 100644 tools/testing/selftests/hyp-trace/config
- create mode 100644 tools/testing/selftests/hyp-trace/hyp-trace-test
-
-
-base-commit: e4fc196f5ba36eb7b9758cf2c73df49a44199895
+diff --git a/kernel/trace/ring_buffer.c b/kernel/trace/ring_buffer.c
+index 28853966aa9a..f4f4dda28077 100644
+--- a/kernel/trace/ring_buffer.c
++++ b/kernel/trace/ring_buffer.c
+@@ -3953,40 +3953,22 @@ int ring_buffer_write(struct trace_buffer *buffer,
+ }
+ EXPORT_SYMBOL_GPL(ring_buffer_write);
+ 
+-static bool rb_per_cpu_empty(struct ring_buffer_per_cpu *cpu_buffer)
++/*
++ * The total entries in the ring buffer is the running counter
++ * of entries entered into the ring buffer, minus the sum of
++ * the entries read from the ring buffer and the number of
++ * entries that were overwritten.
++ */
++static inline unsigned long
++rb_num_of_entries(struct ring_buffer_per_cpu *cpu_buffer)
+ {
+-	struct buffer_page *reader = cpu_buffer->reader_page;
+-	struct buffer_page *head = rb_set_head_page(cpu_buffer);
+-	struct buffer_page *commit = cpu_buffer->commit_page;
+-
+-	/* In case of error, head will be NULL */
+-	if (unlikely(!head))
+-		return true;
+-
+-	/* Reader should exhaust content in reader page */
+-	if (reader->read != rb_page_size(reader))
+-		return false;
+-
+-	/*
+-	 * If writers are committing on the reader page, knowing all
+-	 * committed content has been read, the ring buffer is empty.
+-	 */
+-	if (commit == reader)
+-		return true;
+-
+-	/*
+-	 * If writers are committing on a page other than reader page
+-	 * and head page, there should always be content to read.
+-	 */
+-	if (commit != head)
+-		return false;
++	return local_read(&cpu_buffer->entries) -
++		(local_read(&cpu_buffer->overrun) + cpu_buffer->read);
++}
+ 
+-	/*
+-	 * Writers are committing on the head page, we just need
+-	 * to care about there're committed data, and the reader will
+-	 * swap reader page with head page when it is to read data.
+-	 */
+-	return rb_page_commit(commit) == 0;
++static bool rb_per_cpu_empty(struct ring_buffer_per_cpu *cpu_buffer)
++{
++	return !rb_num_of_entries(cpu_buffer);
+ }
+ 
+ /**
+@@ -4132,19 +4114,6 @@ void ring_buffer_record_enable_cpu(struct trace_buffer *buffer, int cpu)
+ }
+ EXPORT_SYMBOL_GPL(ring_buffer_record_enable_cpu);
+ 
+-/*
+- * The total entries in the ring buffer is the running counter
+- * of entries entered into the ring buffer, minus the sum of
+- * the entries read from the ring buffer and the number of
+- * entries that were overwritten.
+- */
+-static inline unsigned long
+-rb_num_of_entries(struct ring_buffer_per_cpu *cpu_buffer)
+-{
+-	return local_read(&cpu_buffer->entries) -
+-		(local_read(&cpu_buffer->overrun) + cpu_buffer->read);
+-}
+-
+ /**
+  * ring_buffer_oldest_event_ts - get the oldest event timestamp from the buffer
+  * @buffer: The ring buffer
 -- 
 2.46.0.rc2.264.g509ed76dc8-goog
 
