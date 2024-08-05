@@ -1,155 +1,170 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E31FC376F5;
-	Mon,  5 Aug 2024 16:16:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D735015C12C
+	for <kvmarm@lists.linux.dev>; Mon,  5 Aug 2024 16:54:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722874610; cv=none; b=KiShkVMzy3riGBIWjU6WexpAhqQrLXPCcN67Ho7Ct/PUjhg686UGaa+GcQzcyv6e3hR/J3liKIQ9Rkd5xxvmI5NIYBO6XgDEKS3EAki1URQmyG5JQ5sQsyfv/hqR4mZ0oDz9xC1FQ9iSr60AMlovL/DaJESfc4Iu9cm4eVQFxyM=
+	t=1722876890; cv=none; b=FoZ+m0VS2zKex2Jm9AfTSKanaxhu7A16tZQLodKrCnAddIFKCiv26F0Sn/NRN/SiwMMyyHi4AH3p+ypkKyKG0m/dbVY11AZ8Q529LYYr0c3ajRh8npCzfhB2vjwp/UY/dq5tAnrpWlrWKg0QxZFJzMp55JDT2yaEk1IzdL4m/uU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722874610; c=relaxed/simple;
-	bh=y9ldZbTyfHtWmV56N6wsb2EpJn4YFyke+2byGlPJ2Ck=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oqDlFTXSmSzJKkne3TIKWJ/9Q9iMA8m60W/+A0kE1L9pdsYSddQM2DvuZ1rEjhGFepTzjYeQU1UnZgt/qLIcyI1yDxeXpdP/C5JKZSDx9bu3KlTxob7C5XgQ7TaCYVi5B11f5rIUY+pFfoocNvnw7nl4Ud88D+SAFT8XKbZBtp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dE9vq1Bu; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1722876890; c=relaxed/simple;
+	bh=DZR96w7+yR+8QAvUxt2vUtynjYuzg6oCFxeOrTtAAY4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SZk3IrEh/ICjejlqPgmbHBD8lfZWfPH3nWC58zx1c+L1awmDM6GqnDajnTcdRQ9tNxGy3yQfkQQRKnLtcrnfmPsmq7gZYDJcWPrNXiyENd6gydEAHPvGDeRHdYFIvdrD81Nxcy/qcI7LLineR01YsiQTIyRK/T7tMb+gpUyXGXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fK728mOZ; arc=none smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dE9vq1Bu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C69E9C4AF0C;
-	Mon,  5 Aug 2024 16:16:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722874609;
-	bh=y9ldZbTyfHtWmV56N6wsb2EpJn4YFyke+2byGlPJ2Ck=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dE9vq1BuB7DySNJ0jmsO8oDVdSmXiOtDPZZ+qMEI4JVqefYufKzfUqg36Y8Gtymsn
-	 yw8UXACxwiu7eOw2VaFkkLc9DKj+IcG8GYXfAQ7axO+sy+4Opse6dwr+CwW795gh8I
-	 Yy6XsxPaiwvT55c5+H2DphPa9LPRBo7WzA/TKvrZcGTy6LsO6m1iXKKZedZzwVB504
-	 QjmY78WVHFacbV9dV2pWObXlY4M94SsfzOB7Qh40ctDl74gMT+EI9RHeQlieTk7c+6
-	 CJ71uHEUxPNKvoJxM44gmoUiTq6g1QfZFJY3baXmSMWlbwiJAcTvBXyD+N4ly0eZ4k
-	 fI8UPtwF5DtqQ==
-Date: Mon, 5 Aug 2024 17:16:43 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] KVM: selftests: arm64: Use generated defines for
- named system registers
-Message-ID: <6c1beda4-7211-4f64-95c8-7a11c489b145@sirena.org.uk>
-References: <20240802-kvm-arm64-get-reg-list-v1-0-3a5bf8f80765@kernel.org>
- <20240802-kvm-arm64-get-reg-list-v1-2-3a5bf8f80765@kernel.org>
- <868qxe0wzp.wl-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fK728mOZ"
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-44fdc70e695so12161cf.0
+        for <kvmarm@lists.linux.dev>; Mon, 05 Aug 2024 09:54:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1722876888; x=1723481688; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=w+EjPosfkeXziba69Qb6GXWNK9P7pF1IIw+Hux9jBR8=;
+        b=fK728mOZXJqIelBTuGU4ryyrt9YOfJCys7XX+ZVvhhl1pnr6AxQqkkDp/OPZ0bmrrj
+         lY+uAL4rfRE/a37MbYYk2O+bNoU/ndD/8NeIN3BPJ5ZfvrxJ4C+fSvxKbT2eScJ6GTu9
+         uIcatiFhZZ2HBBakhc9oJH2uPc7Nrg8g6rSjAiqMx2INTd2fU5lWd+PH8Wkvmm/vQcGe
+         TCsMS/A7igvdOGmsjDUGvuy6Axy0jw3rGxMm0WOhDDm1DqEgQoZorI58BlyroHnR17Dc
+         i2gyZsP7l+QIuUoMmfDRJQjo5dl6MK9RzBSo2kGvHczk824B3kjpR3aWCFhuQGEWrdie
+         l6Dg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722876888; x=1723481688;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=w+EjPosfkeXziba69Qb6GXWNK9P7pF1IIw+Hux9jBR8=;
+        b=BO9OKtoIEghyFxynJDkfjiG/Xs8U+a6FK+AlQkmpz6Ch+lp++zH+8EkXQIZirbk0kV
+         IUdjELF27Lew8kPYXyJmI/0au9Vqr989kza3a8Qu4OLpB4ddaBZqeObiO/Jf1S+ur5fD
+         COg2upA+VQRSZhnnyNLEZVLwi1DqI4wL6YLMPOpZlLYaiXWnNtVXP+T1RxQIg+6evc9r
+         O98PqvVT2TABGYLI3PeVrWwl+aLoh3LVzixtD2WrqbJWgOuY5HDNTC5S1Am+iVO8GULU
+         0E8H79RiianP3pp7ZypD17XI57quGyP2LVVGo0SFSjodrxi0zXStSELeLzjUGm4cctgN
+         TVsg==
+X-Forwarded-Encrypted: i=1; AJvYcCWjN5yteahmGuNLWwVzTRDLlFdVr7i6xac208zUE9srFS00JOXjnzLarnA1wZLvyU4lzvfJtd7e5+x4v7K2gACMJrKh4/Av
+X-Gm-Message-State: AOJu0Yxi+oUnp2mM2R+XwCSn6qqrQkVske7gzi/NrK4u+4GSFfeAQV9S
+	/ix1/iGaxcSU4Nl9y+GwB5Us+S1RMKpru0hiASA7uUpBl08dqyjnLNmxtJeM+CwD/+8uG04HzYH
+	QL44tEYlJWZdM02DpCsHq9+aC4Oux1lBP7g2L
+X-Google-Smtp-Source: AGHT+IEew9O40a1eagPinVnKq66XRqxq93dCPlTyT+sju/BWCkpRZjCn//Ri9HlnLHZeIehCzQD5j6qeXg1tqDmASbI=
+X-Received: by 2002:a05:622a:301:b0:44f:cb30:8b71 with SMTP id
+ d75a77b69052e-4519b663469mr5193091cf.25.1722876887583; Mon, 05 Aug 2024
+ 09:54:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="vBXB/GZWADW/Ncoh"
-Content-Disposition: inline
-In-Reply-To: <868qxe0wzp.wl-maz@kernel.org>
-X-Cookie: Goodbye, cool world.
+References: <20240724011037.3671523-1-jthoughton@google.com>
+ <20240724011037.3671523-6-jthoughton@google.com> <37ae59f2-777a-4a58-ae58-4a20066364dd@redhat.com>
+ <CADrL8HUmQWDc-75p=Z2KZzHkyWCCh8xnX=+ZXm5MZ-drALjKTA@mail.gmail.com> <1ea7a0d2-e640-4549-ac0e-8ae0df8d8e6a@redhat.com>
+In-Reply-To: <1ea7a0d2-e640-4549-ac0e-8ae0df8d8e6a@redhat.com>
+From: James Houghton <jthoughton@google.com>
+Date: Mon, 5 Aug 2024 09:54:10 -0700
+Message-ID: <CADrL8HVfnA2OmqqUWSsiPkCXhCX7RXdqUDvzwF-m3uccBa6ndA@mail.gmail.com>
+Subject: Re: [PATCH v6 05/11] mm: Add fast_only bool to test_young and
+ clear_young MMU notifiers
+To: David Hildenbrand <david@redhat.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Ankit Agrawal <ankita@nvidia.com>, Axel Rasmussen <axelrasmussen@google.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, David Matlack <dmatlack@google.com>, 
+	David Rientjes <rientjes@google.com>, James Morse <james.morse@arm.com>, 
+	Jason Gunthorpe <jgg@ziepe.ca>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Raghavendra Rao Ananta <rananta@google.com>, 
+	Ryan Roberts <ryan.roberts@arm.com>, Sean Christopherson <seanjc@google.com>, 
+	Shaoqin Huang <shahuang@redhat.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Wei Xu <weixugc@google.com>, Will Deacon <will@kernel.org>, Yu Zhao <yuzhao@google.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Aug 2, 2024 at 8:57=E2=80=AFAM David Hildenbrand <david@redhat.com>=
+ wrote:
+>
+> On 02.08.24 01:13, James Houghton wrote:
+> > On Thu, Aug 1, 2024 at 2:36=E2=80=AFAM David Hildenbrand <david@redhat.=
+com> wrote:
+> >>
+> >> On 24.07.24 03:10, James Houghton wrote:
+> >>> For implementers, the fast_only bool indicates that the age informati=
+on
+> >>> needs to be harvested such that we do not slow down other MMU operati=
+ons,
+> >>> and ideally that we are not ourselves slowed down by other MMU
+> >>> operations.  Usually this means that the implementation should be
+> >>> lockless.
+> >>
+> >> But what are the semantics if "fast_only" cannot be achieved by the
+> >> implementer?
+> >>
+> >> Can we add some documentation to the new functions that explain what
+> >> this mysterious "fast_only" is and what the expected semantics are?
+> >> Please? :)
+> >
+> > Thanks for pointing out the missing documentation. How's this?
+> >
+> > diff --git a/include/linux/mmu_notifier.h b/include/linux/mmu_notifier.=
+h
+> > index 45c5995ebd84..c21992036dd3 100644
+> > --- a/include/linux/mmu_notifier.h
+> > +++ b/include/linux/mmu_notifier.h
+> > @@ -106,6 +106,18 @@ struct mmu_notifier_ops {
+> >           * clear_young is a lightweight version of clear_flush_young. =
+Like the
+> >           * latter, it is supposed to test-and-clear the young/accessed=
+ bitflag
+> >           * in the secondary pte, but it may omit flushing the secondar=
+y tlb.
+> > +        *
+>
+> Probably makes sense to highlight the parameters like @fast_only
 
---vBXB/GZWADW/Ncoh
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Will do.
 
-On Sat, Aug 03, 2024 at 10:35:54AM +0100, Marc Zyngier wrote:
-> Mark Brown <broonie@kernel.org> wrote:
+>
+> > +        * The fast_only parameter indicates that this call should not =
+block,
+> > +        * and this function should not cause other MMU notifier calls =
+to
+> > +        * block. Usually this means that the implementation should be
+> > +        * lockless.
+> > +        *
+> > +        * When called with fast_only, this notifier will be a no-op un=
+less
+> > +        * has_fast_aging is set on the struct mmu_notifier.
+>
+> "... and will return 0 (NOT young)." ?
 
-> > This conversion was done with the sed command:
+Thanks, I'll add this.
 
-> >   sed -i -E 's-ARM64_SYS_REG.*/\* (.*) \*/-KVM_ARM64_SYS_REG(SYS_\1),-' tools/testing/selftests/kvm/aarch64/get-reg-list.c
+>
+> > +        *
+> > +        * When fast_only is true, if the implementer cannot determine =
+that a
+> > +        * range is young without blocking, it should return 0 (i.e.,
+> > +        * that the range is NOT young).
+> >           */
+> >          int (*clear_young)(struct mmu_notifier *subscription,
+> >                             struct mm_struct *mm,
+> > @@ -118,6 +130,8 @@ struct mmu_notifier_ops {
+> >           * the secondary pte. This is used to know if the page is
+> >           * frequently used without actually clearing the flag or teari=
+ng
+> >           * down the secondary mapping on the page.
+> > +        *
+> > +        * The fast_only parameter has the same meaning as with clear_y=
+oung.
+> >           */
+> >          int (*test_young)(struct mmu_notifier *subscription,
+> >                            struct mm_struct *mm,
+> >
+> > I've also moved the commit that follows this one (the one that adds
+> > has_fast_aging) to be before this one so that the comment makes sense.
+>
+>
+> Makes sense, thanks!
 
-> [Eyes rolling]
-
-> What I asked about scripting the whole thing, it never occurred to me
-> that you would use the *comments* as a reliable source of information.
-> Do we have anything less reliable than comments in the kernel?
-
-I think we should ultimately be using both the comments and the
-encodings - the comments indicate what people thought was being tested
-and it's useful to make sure we have that coverage even if the
-implementation were to have been wrong.
-
-Doing this step is also going to have picked up registers which we don't
-yet have in the sysreg file, some of which are going to be painful to
-add there (things like ESR for example) so aren't likely to get done in
-a hurry due to complexity in their definitions.
-
-This was quick to do, represents progress, and offers a hint to anyone
-adding new registers that they should use the symbolic definitions.
-
-> The matching must be done from the arch/arm64/tools/sysreg file,
-> because that's the (admittedly dubious) source of truth. We actually
-> trust the encodings because they are reported by the kernel itself.
-> The comment is hand-written, and likely wrong.
-
-Sure, there's a reason I compared the resulting binaries rather than
-just trusting that the conversion gave the same result.
-
-> > -	ARM64_SYS_REG(3, 3, 14, 3, 1),	/* CNTV_CTL_EL0 */
-> > -	ARM64_SYS_REG(3, 3, 14, 3, 2),	/* CNTV_CVAL_EL0 */
-> > +	KVM_ARM64_SYS_REG(SYS_CNTV_CTL_EL0),
-> > +	KVM_ARM64_SYS_REG(SYS_CNTV_CVAL_EL0),
-> >  	ARM64_SYS_REG(3, 3, 14, 0, 2),
-
-> Great. So not only you fail convert a register, but you also ignore
-> the nugget described in arch/arm64/invlude/uapi/asm/kvm.h:267.
-
-That's that CNTV_CTL_EL0 and CNTV_CVAL_EL0 have their encodings
-reversed in the ABI.
-
-> Sure, having both described hides the crap, as we don't attach any
-> significance to the registers themselves. But that shows how
-> untrustworthy the comments are.
-
-I'm afraid that any automated conversion is likely to trip over an ABI
-issue like that - the obvious thing to do when looking up by encoding
-would be to just emit a KVM_ARM64_SYS_REG() if we find the encoding
-which would give the same end result.  I'll add a separate manual update
-of these registers.
-
-Are there any other similar issues?  I didn't spot anything in kvm.h.
-
-> >  	ARM64_SYS_REG(2, 0, 0, 0, 4),
-> >  	ARM64_SYS_REG(2, 0, 0, 0, 5),
-> >  	ARM64_SYS_REG(2, 0, 0, 0, 6),
-
-> As far as I can tell, these registers are not unallocated, and they
-> should be named.
-
-I agree that we should do all named registers eventually, the above are
-numbered debug registers (DBGBVR0_EL1, DBGBCR0_EL1 and DBGWVR0_EL1)
-which aren't in the sysreg file yet so wouldn't currently be covered by
-a conversion based on pulling encodings from there.  They could also be
-done immediately with a generator script as there are DBGBVRn_EL1 style
-macros there.
-
-Like I say this is a quick first step and does improve things, there's
-still more to do but I do think this moves us forward.  We can and
-should come back later and build on things as people have time.
-
---vBXB/GZWADW/Ncoh
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmaw+usACgkQJNaLcl1U
-h9A5QQf/eq0ZOdpYjJXRG4CZ3SHDFIZ/NM9H8ZnuG8wQ5BVfd1DI1hdEiZ9P+jT5
-IgxAmzyq0jBtYm+llNM9Bh/KmjK9rLDfqIDPmfgpIKithc/IVo56E5SYXakQG5Fl
-7pAT1nQt9Favk+dUlWY/4gShcfvJw12CpZn6hGI+6ZYr5tfYL7WbCrSlJ9XXlVPX
-NU3YDGHDj0x2jiQDLndhAEeg53i3KwXSsngtyXQejpaI5GB6EIdTUKQ0bOVBoDq2
-2PUjl74LLOZ/ELvCZsRGm7bPhZeMV5QBafI4H2Dl2fE02TM5ObCIjSW3sDdQXZTf
-v6kOGV2I6Y9d+DfFwOec3a308g10rQ==
-=TkJy
------END PGP SIGNATURE-----
-
---vBXB/GZWADW/Ncoh--
+Thanks David!
