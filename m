@@ -1,115 +1,94 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4619D149C68;
-	Mon,  5 Aug 2024 07:57:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C1E02C684;
+	Mon,  5 Aug 2024 13:59:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722844651; cv=none; b=qvigliiJ9beQjhqRpbYq9Qgp4ogpu9AuZjRKLBM9/kGhB172/WfQRVY1QCdw4cxUBai/DEpJ202nYqX+W3okxd41Oa6Mn1RWuUG9LUd4nhsmQBCGhP9iYyQfVD/UVS/4wPckXAnk6qnNEqo/p1H7DUWTTSZev9lcxDwB2LrN3NA=
+	t=1722866389; cv=none; b=SR4Ag92GhH/1Da94ExVzt+k+NbYk0jtGCMu0ms8Zs0UPBL6kqxVQOLu1eyzNaL96DwXbTgKUXik6E9GpejXTKYauVhGNw4LJhF1eXQUEVVoCGW8o+YuRMLSt/Wm1P7L3QIIKC735pegN9U1PrPUELUSocrJs3p32XyHDimg27F8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722844651; c=relaxed/simple;
-	bh=Geket5xHj+rV/lTGgYhI+mobx7QxgrRmSJGYSEDRkpk=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Y54TeAirpMelSVU1oSi7HNK07/FqLHF4NUTPp4bVQqznk/EcKOsJIEik67eN55jdGyz6kxvKNFxSzkuiQnhTmHGx6GI43/YjcQroiVBrrH/PnKH+PaesdBpe/cH7hRt8zxGu+/iJQn9RTdZ4k3sbGxULkGODVvkg0UQmmwncCow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UBQwR8Dv; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1722866389; c=relaxed/simple;
+	bh=EyTSiPAafa66YyrGSKzx20HNcdBnILGm5FLS3y8oypQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Gwtk2DHZpRGZiT8o/S6g+IjU3NX4Ef4mYqKhuMStd9wExEdFfHFRhQaomnmkqLJPFqnvv02WdJbrRFQNu51Wi4VArYpQHUEyschzYYQIr5R6YideqoBJipZ1y0hKkw8oSgUBXh19E9eBgmO5Ba+SPEtIjD4eofRZNLJOaEFkKOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t998Gk2N; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UBQwR8Dv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59266C32782;
-	Mon,  5 Aug 2024 07:57:22 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t998Gk2N"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5FD6C32782;
+	Mon,  5 Aug 2024 13:59:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722844650;
-	bh=Geket5xHj+rV/lTGgYhI+mobx7QxgrRmSJGYSEDRkpk=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=UBQwR8Dv5k7JtkeG4laWC2Xs0oOnozRLy+3hVYnDYQn2Ed5eCrDNKiqSjdoXT4acx
-	 1hPdTL4JDstUhQJJ7lCM7YYqnV4Qh1m6C+CK460q8siGoQwJJKzkWsjMOX4qcfmelz
-	 A6Yt57Xlk92ABmDDhigDShW3vM0pnXKBZJdZWOrnwttmRyqlw3hP4oeUm/b5LanIcX
-	 fVlLRwpf9c9nuW6b7SobjiC6lu0VN8iuGUvVZHCooHxsAnFt7ePn4zwuEV1kg+BLX4
-	 tQQRPbEFjC/HMt7oQ6FPHcOxgz1D3ofgxyEIT69W/KjqEASCYIB1LwhYcesfg0NZf1
-	 asOwN60f4YLIQ==
-X-Mailer: emacs 31.0.50 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+	s=k20201202; t=1722866389;
+	bh=EyTSiPAafa66YyrGSKzx20HNcdBnILGm5FLS3y8oypQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=t998Gk2NceJq97cj5UOfzb+BNyyqsd+QrO/qJtIHwHaTHZfGFYz/JwMmwj2B5rU2A
+	 Miotl4sWUylpJK0ztkIzPC7o/Q48bl7ddXrBkQ/F7AJ3Jrr3cj9oG/XnXmpPOCdcBi
+	 7HRg7VC6jB0TgldZ2hCMo0Yxyt8CmLVyeW1y1OJnpxSQa8FKAeLwOZpMEoUgmlXS4s
+	 ZEheMORGq04OHCqjK1c5Y0Iu4m2SeQJ+rKfFqf4nGHwxFRjfxE0Y+9eCwzitBGpwKQ
+	 4MXZL0C6NLmJn4kxpfadbii3WDDLsMei7h3YitRxXOMp/Iw9/T4BzKVDGQo3qeAP5j
+	 iPVhTasgeVZ4w==
+Date: Mon, 5 Aug 2024 14:59:42 +0100
+From: Will Deacon <will@kernel.org>
+To: Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, Jonathan Corbet <corbet@lwn.net>,
+	Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Tianrui Zhao <zhaotianrui@loongson.cn>,
-	Bibo Mao <maobibo@loongson.cn>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-	David Matlack <dmatlack@google.com>,
-	David Stevens <stevensd@chromium.org>
-Subject: Re: [PATCH v12 02/84] KVM: arm64: Disallow copying MTE to guest
- memory while KVM is dirty logging
-In-Reply-To: <ZqvNekQAjs-SN-se@google.com>
-References: <20240726235234.228822-1-seanjc@google.com>
- <20240726235234.228822-3-seanjc@google.com> <yq5aikwku25o.fsf@kernel.org>
- <ZqvNekQAjs-SN-se@google.com>
-Date: Mon, 05 Aug 2024 13:27:18 +0530
-Message-ID: <yq5a5xsftna9.fsf@kernel.org>
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Mark Brown <broonie@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC V2 1/3] arm64/cpufeature: Add field details for
+ ID_AA64DFR1_EL1 register
+Message-ID: <20240805135942.GA9866@willie-the-truck>
+References: <20240620092607.267132-1-anshuman.khandual@arm.com>
+ <20240620092607.267132-2-anshuman.khandual@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240620092607.267132-2-anshuman.khandual@arm.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-Sean Christopherson <seanjc@google.com> writes:
+On Thu, Jun 20, 2024 at 02:56:05PM +0530, Anshuman Khandual wrote:
+> This adds required field details for ID_AA64DFR1_EL1, and also drops dummy
+> ftr_raz[] array which is now redundant. These register fields will be used
+> to enable increased breakpoint and watchpoint registers via FEAT_Debugv8p9
+> later.
+> 
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will@kernel.org>
+> cc: Mark Brown <broonie@kernel.org>
+> Cc: Mark Rutland <mark.rutland@arm.com>
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: linux-kernel@vger.kernel.org
+> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+> ---
+>  arch/arm64/kernel/cpufeature.c | 21 ++++++++++++++++-----
+>  1 file changed, 16 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> index 48e7029f1054..12f0a5181bf2 100644
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@ -527,6 +527,21 @@ static const struct arm64_ftr_bits ftr_id_aa64dfr0[] = {
+>  	ARM64_FTR_END,
+>  };
+>  
+> +static const struct arm64_ftr_bits ftr_id_aa64dfr1[] = {
+> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR1_EL1_ABL_CMPs_SHIFT, 8, 0),
+> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR1_EL1_DPFZS_SHIFT, 4, 0),
 
-> On Thu, Aug 01, 2024, Aneesh Kumar K.V wrote:
->> Sean Christopherson <seanjc@google.com> writes:
->> 
->> > Disallow copying MTE tags to guest memory while KVM is dirty logging, as
->> > writing guest memory without marking the gfn as dirty in the memslot could
->> > result in userspace failing to migrate the updated page.  Ideally (maybe?),
->> > KVM would simply mark the gfn as dirty, but there is no vCPU to work with,
->> > and presumably the only use case for copy MTE tags _to_ the guest is when
->> > restoring state on the target.
->> >
->> > Fixes: f0376edb1ddc ("KVM: arm64: Add ioctl to fetch/store tags in a guest")
->> > Signed-off-by: Sean Christopherson <seanjc@google.com>
->> > ---
->> >  arch/arm64/kvm/guest.c | 5 +++++
->> >  1 file changed, 5 insertions(+)
->> >
->> > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
->> > index e1f0ff08836a..962f985977c2 100644
->> > --- a/arch/arm64/kvm/guest.c
->> > +++ b/arch/arm64/kvm/guest.c
->> > @@ -1045,6 +1045,11 @@ int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
->> >  
->> >  	mutex_lock(&kvm->slots_lock);
->> >  
->> > +	if (write && atomic_read(&kvm->nr_memslots_dirty_logging)) {
->> > +		ret = -EBUSY;
->> > +		goto out;
->> > +	}
->> > +
->> >
->> 
->> is this equivalent to kvm_follow_pfn() with kfp->pin = 1 ?
->
-> No, gfn_to_pfn_prot() == FOLL_GET, kfp->pin == FOLL_PIN.  But that's not really
-> relevant.
->
+I only got this far in the patch, but why is this FTR_STRICT +
+FTR_LOWER_SAFE? The behaviour of the cycle counter on an SPE management
+event sounds like it would be fine to differ between cores, no?
 
+Please go through all the new fields, bearing in mind that most of the
+PMU stuff is per-CPU type rather than global.
 
-What I meant was, should we consider mte_copy_tags_from_user() as one
-that update the page contents (even though it is updating tags) and
-use kvm_follow_pfn() with kfp->pin = 1 instead?
-
-Is my understanding correct in that, if we want to look up a pfn/page
-from gfn with the intent of updating the page contents, we should use
-kfp->pin == 1? 
-
--aneesh
+Will
