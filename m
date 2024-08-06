@@ -1,24 +1,24 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65D751D27BF
-	for <kvmarm@lists.linux.dev>; Tue,  6 Aug 2024 14:38:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACDAE1D6187
+	for <kvmarm@lists.linux.dev>; Tue,  6 Aug 2024 15:00:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722955115; cv=none; b=AUBoy6dI6I7EAvEh6bJf2jxqUIxFfjvf8DJ/adlkfRsFm99VVbodqMVHYR3k3qTkRMQWwjaT6GGfMaIyC/6fCK2DaXlbUlfa1s1eghxaJ5sXUFtADXZ6qTlFmlMTlGcIRtEZV4oODU62GwsqEBFix0zGd9v4+HgYMBmMoMo5ZFw=
+	t=1722956426; cv=none; b=VIgkWO2WCfinQmtZenJGVTrN2LZFLhzFOcGeXdxhh5ngaHBtUmW2W2tLtzWng7N/glQiSPnu4+WG5mfuzWsIJnRbrCHO+AY8rKBl30NokUUTDmA03K3uyTS/44qyJ36Pd56+yJ6yhahhQsUVtTyaxovR9O4RnYvw/vBjCDKpfFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722955115; c=relaxed/simple;
-	bh=I7uuq+gz1aOnDED7ieqVh/OdYhRbOKEI+TyDsKUjMHg=;
+	s=arc-20240116; t=1722956426; c=relaxed/simple;
+	bh=61CoXZfgsgqLdwhTY8Rc15/7W2dnAlAbcsuxcK7LaqM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hoW0aHao1Xn2Y52RNF60Eu/C1vVLgMFSVeKg2XEKDFsPADdRsxt0gimdWajPHYsCZ0g+SZTQzaS3f2bw+gqNoBZn+nNaxuw4nO/T7eIRk5SXJeUGZdUF0qrcO90isV+N/9sqOV/O4BGQhmnknqdoBmtYTsbVzyMsamsZXSSIjqw=
+	 Content-Type:Content-Disposition:In-Reply-To; b=IfpYLuws0FzVJeoO61PthgDSfPTiFaOKn78M+2pTvZQSyNN910BtDxAuozieo/LO4+AAw6ZX/KjMqxUHE1ZetjxOnV5qNVGflL/lVdb4kCoSNRBZ4NUuCaaPh6f/sONVScQGcjP1lLYWWyWBUTVO0pbIpbPYh6+yrjA9yJMeTs8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7D3071063;
-	Tue,  6 Aug 2024 07:38:58 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CB59BFEC;
+	Tue,  6 Aug 2024 08:00:49 -0700 (PDT)
 Received: from e133380.arm.com (e133380.arm.com [10.1.197.55])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 168703F6A8;
-	Tue,  6 Aug 2024 07:38:28 -0700 (PDT)
-Date: Tue, 6 Aug 2024 15:38:26 +0100
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5A3133F6A8;
+	Tue,  6 Aug 2024 08:00:20 -0700 (PDT)
+Date: Tue, 6 Aug 2024 16:00:17 +0100
 From: Dave Martin <Dave.Martin@arm.com>
 To: Joey Gouly <joey.gouly@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
@@ -31,14 +31,15 @@ Cc: linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
 	oliver.upton@linux.dev, shuah@kernel.org, szabolcs.nagy@arm.com,
 	tglx@linutronix.de, will@kernel.org, x86@kernel.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 15/29] arm64: handle PKEY/POE faults
-Message-ID: <ZrI1Yo6UZ/grRWYu@e133380.arm.com>
+Subject: Re: [PATCH v4 18/29] arm64: add POE signal support
+Message-ID: <ZrI6gRQWW8HU8p0/@e133380.arm.com>
 References: <20240503130147.1154804-1-joey.gouly@arm.com>
- <20240503130147.1154804-16-joey.gouly@arm.com>
- <ZqJ11TqIJq9oB+pt@e133380.arm.com>
- <20240801160110.GC841837@e124191.cambridge.arm.com>
- <ZrImMQ44dlrqCf6v@e133380.arm.com>
- <20240806134357.GA2017741@e124191.cambridge.arm.com>
+ <20240503130147.1154804-19-joey.gouly@arm.com>
+ <ZqJ2knGETfS4nfEA@e133380.arm.com>
+ <20240801155441.GB841837@e124191.cambridge.arm.com>
+ <Zqu2VYELikM5LFY/@e133380.arm.com>
+ <20240806103532.GA1986436@e124191.cambridge.arm.com>
+ <20240806143103.GB2017741@e124191.cambridge.arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,149 +48,189 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240806134357.GA2017741@e124191.cambridge.arm.com>
+In-Reply-To: <20240806143103.GB2017741@e124191.cambridge.arm.com>
 
-Hi,
-
-On Tue, Aug 06, 2024 at 02:43:57PM +0100, Joey Gouly wrote:
-> On Tue, Aug 06, 2024 at 02:33:37PM +0100, Dave Martin wrote:
-> > Hi,
-> > 
-> > On Thu, Aug 01, 2024 at 05:01:10PM +0100, Joey Gouly wrote:
-> > > On Thu, Jul 25, 2024 at 04:57:09PM +0100, Dave Martin wrote:
-> > > > On Fri, May 03, 2024 at 02:01:33PM +0100, Joey Gouly wrote:
-> > > > > If a memory fault occurs that is due to an overlay/pkey fault, report that to
-> > > > > userspace with a SEGV_PKUERR.
+On Tue, Aug 06, 2024 at 03:31:03PM +0100, Joey Gouly wrote:
+> On Tue, Aug 06, 2024 at 11:35:32AM +0100, Joey Gouly wrote:
+> > On Thu, Aug 01, 2024 at 05:22:45PM +0100, Dave Martin wrote:
+> > > On Thu, Aug 01, 2024 at 04:54:41PM +0100, Joey Gouly wrote:
+> > > > On Thu, Jul 25, 2024 at 05:00:18PM +0100, Dave Martin wrote:
+> > > > > Hi,
 > > > > > 
-> > > > > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-> > > > > Cc: Catalin Marinas <catalin.marinas@arm.com>
-> > > > > Cc: Will Deacon <will@kernel.org>
-> > > > > ---
-> > > > >  arch/arm64/include/asm/traps.h |  1 +
-> > > > >  arch/arm64/kernel/traps.c      | 12 ++++++--
-> > > > >  arch/arm64/mm/fault.c          | 56 ++++++++++++++++++++++++++++++++--
-> > > > >  3 files changed, 64 insertions(+), 5 deletions(-)
-
-[...]
-
-> > > > > diff --git a/arch/arm64/kernel/traps.c b/arch/arm64/kernel/traps.c
-> > > > > index 215e6d7f2df8..1bac6c84d3f5 100644
-> > > > > --- a/arch/arm64/kernel/traps.c
-> > > > > +++ b/arch/arm64/kernel/traps.c
-> > > > > @@ -263,16 +263,24 @@ static void arm64_show_signal(int signo, const char *str)
-> > > > >  	__show_regs(regs);
-> > > > >  }
-> > > > >  
-> > > > > -void arm64_force_sig_fault(int signo, int code, unsigned long far,
-> > > > > -			   const char *str)
-> > > > > +void arm64_force_sig_fault_pkey(int signo, int code, unsigned long far,
-> > > > > +			   const char *str, int pkey)
-> > > > >  {
-> > > > >  	arm64_show_signal(signo, str);
-> > > > >  	if (signo == SIGKILL)
-> > > > >  		force_sig(SIGKILL);
-> > > > > +	else if (code == SEGV_PKUERR)
-> > > > > +		force_sig_pkuerr((void __user *)far, pkey);
+> > > > > On Fri, May 03, 2024 at 02:01:36PM +0100, Joey Gouly wrote:
+> > > > > > Add PKEY support to signals, by saving and restoring POR_EL0 from the stackframe.
+> > > > > > 
+> > > > > > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+> > > > > > Cc: Catalin Marinas <catalin.marinas@arm.com>
+> > > > > > Cc: Will Deacon <will@kernel.org>
+> > > > > > Reviewed-by: Mark Brown <broonie@kernel.org>
+> > > > > > Acked-by: Szabolcs Nagy <szabolcs.nagy@arm.com>
+> > > > > > ---
+> > > > > >  arch/arm64/include/uapi/asm/sigcontext.h |  7 ++++
+> > > > > >  arch/arm64/kernel/signal.c               | 52 ++++++++++++++++++++++++
+> > > > > >  2 files changed, 59 insertions(+)
+> > > > > > 
+> > > > > > diff --git a/arch/arm64/include/uapi/asm/sigcontext.h b/arch/arm64/include/uapi/asm/sigcontext.h
+> > > > > > index 8a45b7a411e0..e4cba8a6c9a2 100644
+> > > > > > --- a/arch/arm64/include/uapi/asm/sigcontext.h
+> > > > > > +++ b/arch/arm64/include/uapi/asm/sigcontext.h
+> > > > > 
+> > > > > [...]
+> > > > > 
+> > > > > > @@ -980,6 +1013,13 @@ static int setup_sigframe_layout(struct rt_sigframe_user_layout *user,
+> > > > > >  			return err;
+> > > > > >  	}
+> > > > > >  
+> > > > > > +	if (system_supports_poe()) {
+> > > > > > +		err = sigframe_alloc(user, &user->poe_offset,
+> > > > > > +				     sizeof(struct poe_context));
+> > > > > > +		if (err)
+> > > > > > +			return err;
+> > > > > > +	}
+> > > > > > +
+> > > > > >  	return sigframe_alloc_end(user);
+> > > > > >  }
+> > > > > >  
+> > > > > > @@ -1020,6 +1060,15 @@ static int setup_sigframe(struct rt_sigframe_user_layout *user,
+> > > > > >  		__put_user_error(current->thread.fault_code, &esr_ctx->esr, err);
+> > > > > >  	}
+> > > > > >  
+> > > > > > +	if (system_supports_poe() && err == 0 && user->poe_offset) {
+> > > > > > +		struct poe_context __user *poe_ctx =
+> > > > > > +			apply_user_offset(user, user->poe_offset);
+> > > > > > +
+> > > > > > +		__put_user_error(POE_MAGIC, &poe_ctx->head.magic, err);
+> > > > > > +		__put_user_error(sizeof(*poe_ctx), &poe_ctx->head.size, err);
+> > > > > > +		__put_user_error(read_sysreg_s(SYS_POR_EL0), &poe_ctx->por_el0, err);
+> > > > > > +	}
+> > > > > > +
+> > > > > 
+> > > > > Does the AArch64 procedure call standard say anything about whether
+> > > > > POR_EL0 is caller-saved?
 > > > > 
-> > > > Is signo definitely SIGSEGV here?  It looks to me like we can get in
-> > > > here for SIGBUS, SIGTRAP etc.
-> > > > 
-> > > > si_codes are not unique between different signo here, so I'm wondering
-> > > > whether this should this be:
-> > > > 
-> > > > 	else if (signo == SIGSEGV && code == SEGV_PKUERR)
-> > > > 
-> > > > ...?
-> > > > 
-> > > > 
-> > > > >  	else
-> > > > >  		force_sig_fault(signo, code, (void __user *)far);
-> > > > >  }
-> > > > >  
-> > > > > +void arm64_force_sig_fault(int signo, int code, unsigned long far,
-> > > > > +			   const char *str)
-> > > > > +{
-> > > > > +	arm64_force_sig_fault_pkey(signo, code, far, str, 0);
-> > > > 
-> > > > Is there a reason not to follow the same convention as elsewhere, where
-> > > > -1 is passed for "no pkey"?
-> > > > 
-> > > > If we think this should never be called with signo == SIGSEGV &&
-> > > > code == SEGV_PKUERR and no valid pkey but if it's messy to prove, then
-> > > > maybe a WARN_ON_ONCE() would be worth it here?
-> > > > 
+> > > > I asked about this, and it doesn't say anything and they don't plan on it,
+> > > > since it's very application specific.
 > > > 
-> > > Anshuman suggested to separate them out, which I did like below, I think that
-> > > addresses your comments too?
+> > > Right.  I think that confirms that we don't absolutely need to preserve
+> > > POR_EL0, because if compiler-generated code was allowed to fiddle with
+> > > this and not clean up after itself, the PCS would have to document this.
 > > > 
-> > > diff --git arch/arm64/kernel/traps.c arch/arm64/kernel/traps.c
-> > > index 215e6d7f2df8..49bac9ae04c0 100644
-> > > --- arch/arm64/kernel/traps.c
-> > > +++ arch/arm64/kernel/traps.c
-> > > @@ -273,6 +273,13 @@ void arm64_force_sig_fault(int signo, int code, unsigned long far,
-> > >                 force_sig_fault(signo, code, (void __user *)far);
-> > >  }
-> > >  
-> > > +void arm64_force_sig_fault_pkey(int signo, int code, unsigned long far,
-> > > +                          const char *str, int pkey)
-> > > +{
-> > > +       arm64_show_signal(signo, str);
-> > > +       force_sig_pkuerr((void __user *)far, pkey);
-> > > +}
-> > > +
-> > >  void arm64_force_sig_mceerr(int code, unsigned long far, short lsb,
-> > >                             const char *str)
-> > >  {
+> > > > > 
+> > > > > <bikeshed>
+> > > > > 
+> > > > > In theory we could skip saving this register if it is already
+> > > > > POR_EL0_INIT (which it often will be), and if the signal handler is not
+> > > > > supposed to modify and leave the modified value in the register when
+> > > > > returning.
+> > > > > 
+> > > > > The complexity of the additional check my be a bit pointless though,
+> > > > > and the the handler might theoretically want to change the interrupted
+> > > > > code's POR_EL0 explicitly, which would be complicated if POE_MAGIC is
+> > > > > sometimes there and sometimes not.
+> > > > > 
+> > > > > </bikeshed>
+> > > > > 
+> > > > I think trying to skip/optimise something here would be more effort than any
+> > > > possible benefits!
 > > > 
-> > > diff --git arch/arm64/mm/fault.c arch/arm64/mm/fault.c
-> > > index 451ba7cbd5ad..1ddd46b97f88 100644
-> > > --- arch/arm64/mm/fault.c
-> > > +++ arch/arm64/mm/fault.c
+> > > Actually, having thought about this some more I think that only dumping
+> > > this register if != POR_EL0_INIT may be right right thing to do.
+> > > 
+> > > This would mean that old binary would stacks never see poe_context in
+> > > the signal frame, and so will never experience unexpected stack
+> > > overruns (at least, not due solely to the presence of this feature).
 > > 
-> > (Guessing where this is means to apply, since there is no hunk header
-> > or context...)
-> 
-> Sorry I had some other changes and just mashed the bits into a diff-looking-thing.
-
-Fair enough.  There are a few similar bits of code, so including more
-lines of context would have been helpful.
-
-The change looked reasonable though.
-
+> > They can already see things they don't expect, like FPMR that was added
+> > recently.
+> > 
 > > > 
-> > > -               arm64_force_sig_fault(SIGSEGV, si_code, far, inf->name);
-> > > +               if (si_code == SEGV_PKUERR)
-> > > +                       arm64_force_sig_fault_pkey(SIGSEGV, si_code, far, inf->name, pkey);
+> > > POE-aware signal handlers have to do something fiddly and nonportable
+> > > to obtain the original value of POR_EL0 regardless, so requiring them
+> > > do handle both cases (present in sigframe and absent) doesn't seem too
+> > > onerous to me.
 > > 
-> > Maybe drop the the signo and si_code argument?  This would mean that
-> > arm64_force_sig_fault_pkey() can't be called with a signo/si_code
-> > combination that makes no sense.
+> > If the signal handler wanted to modify the value, from the default, wouldn't it
+> > need to mess around with the sig context stuff, to allocate some space for
+> > POR_EL0, such that the kernel would restore it properly? (If that's even
+> > possible).
 > > 
-> > I think pkey faults are always going to be SIGSEGV/SEGV_PKUERR, right?
-> > Or are there other combinations that can apply for these faults?
+> > > 
+> > > 
+> > > Do you think this approach would break any known use cases?
+> > 
+> > Not sure.
+> > 
 > 
-> Ah yes, I can simplify it even more, thanks.
+> We talked about this offline, helped me understand it more, and I think
+> something like this makes sense:
 > 
-> diff --git arch/arm64/kernel/traps.c arch/arm64/kernel/traps.c
-> index 49bac9ae04c0..d9abb8b390c0 100644
-> --- arch/arm64/kernel/traps.c
-> +++ arch/arm64/kernel/traps.c
-> @@ -273,10 +273,9 @@ void arm64_force_sig_fault(int signo, int code, unsigned long far,
->                 force_sig_fault(signo, code, (void __user *)far);
->  }
+> diff --git arch/arm64/kernel/signal.c arch/arm64/kernel/signal.c
+> index 561986947530..ca7d4e0be275 100644
+> --- arch/arm64/kernel/signal.c
+> +++ arch/arm64/kernel/signal.c
+> @@ -1024,7 +1025,10 @@ static int setup_sigframe_layout(struct rt_sigframe_user_layout *user,
+>                         return err;
+>         }
 >  
-> -void arm64_force_sig_fault_pkey(int signo, int code, unsigned long far,
-> -                          const char *str, int pkey)
-> +void arm64_force_sig_fault_pkey(unsigned long far, const char *str, int pkey)
->  {
-> -       arm64_show_signal(signo, str);
-> +       arm64_show_signal(SIGSEGV, str);
->         force_sig_pkuerr((void __user *)far, pkey);
->  }
+> -       if (system_supports_poe()) {
+> +       if (system_supports_poe() &&
+> +                       (add_all ||
+> +                        mm_pkey_allocation_map(current->mm) != 0x1 ||
 
-Looks sensible.
+We probably ought to holding the mm lock for read around this (as in
+mm/mprotect.c:pkey_alloc()), or have a wrapper to encapsulate that.
 
-I see that force_sig_pkuerr() fills in the signo and si_code itself.
+Signal delivery is not fast path, so I think we should stick to the
+simple and obviously correct approach rather than trying to be
+lockless (at least until somebody comes up with a compelling reason to
+change it).
+
+If doing that, we should probably put the condition on the allocation
+map last so that we don't take the lock unnecessarily.
+
+> +                        read_sysreg_s(SYS_POR_EL0) != POR_EL0_INIT)) {
+>                 err = sigframe_alloc(user, &user->poe_offset,
+>                                      sizeof(struct poe_context));
+>                 if (err)
+> 
+> 
+> That is, we only save the POR_EL0 value if any pkeys have been allocated (other
+> than pkey 0) *or* if POR_EL0 is a non-default value.
+> 
+> The latter case is a corner case, where a userspace would have changed POR_EL0
+> before allocating any extra pkeys.
+> That could be:
+> 	- pkey 0, if it restricts pkey 0 without allocating other pkeys, it's
+> 	  unlikely the program can do anything useful anyway
+> 	- Another pkey, which userspace probably shouldn't do anyway.
+> 	  The man pages say:
+> 		The kernel guarantees that the contents of the hardware rights
+> 		register (PKRU) will be preserved only for allocated protection keys. Any time
+> 		a key is unallocated (either before the first call returning that key from
+> 		pkey_alloc() or after it is freed via pkey_free()), the kernel may make
+> 		arbitrary changes to the parts of the rights register affecting access to that
+> 		key.
+> 	  So userspace shouldn't be changing POR_EL0 before allocating pkeys anyway..
+> 
+> Thanks,
+> Joey
+
+This seems better, thanks.
+
+I'll leave it for others to comment on whether this is an issue for any
+pkeys use case, but it does mean that non-POE-aware arm64 code
+shouldn't see any impact on the signal handling side.
+
+Your new approach means that poe_context is always present in the
+sigframe for code that is using POE, so I think that reasonable
+scenarios of wanting to change the POR_EL0 value for sigreturn ought
+to work.
+
+Processes that contain a mixture of POE and non-POE code are a bit more
+of a grey area, but I think that libraries should not be arbitrarily
+commandeering pkeys since they have no way to be sure that won't break
+the calling program...  I'm assuming that we won't have to worry about
+that scenario in practice.
 
 Cheers
 ---Dave
