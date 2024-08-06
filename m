@@ -1,70 +1,97 @@
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEB553D984
-	for <kvmarm@lists.linux.dev>; Tue,  6 Aug 2024 16:00:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D955347A73;
+	Tue,  6 Aug 2024 16:21:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722960059; cv=none; b=p0tOXqueYGw9X/gWYmImqvUuuH7qcHApTCszgxjoVMs1PPpSHcVguyydHGhhSvDbYoiBY9YdpP71Yg6YToPPk/sYL0Q9TNRXJ6/aGhGrRfrSUfAtNGe/nvQUisHy8dtqN9U2ugIqEWJPIChM9VW/GlLjauBAjGCdb0eKratST4o=
+	t=1722961306; cv=none; b=UnLdjuYFCgLQvD/5Vidz1ijPzKOgJV9oRnH9ECAUqiTZRuTRAuUFRiAfAxXYS5qlvbVl9azLNxC7xmlvjrsVU1K/XxIABa/qH6gtbWzW0GeJ7VQnpbUPfyy9UWX9oStjbgIKToZQe9371jCUHTezK2KFxnX7SVx/dwZiDpIW6UI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722960059; c=relaxed/simple;
-	bh=MuSFzd2gz2MGU5lWXj5uAOg5Ekswq6739w5tTDuCQDw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dHoIQ6mFD+kpgOaDxovN3J9+7KwhTJZLhi+b7Z4C3g9+uDoTgbzDKCNK2iyc7V62Jc1NVlDKZp+NuD0n9SR5pI43km7BXgCFmat94Vo5sKu2lTdSJqH3Y3CjsnGVvRcbd87Ir9Gp2h0zDZrpv+fnfbUsjJ9vEekQklWRCJ+yge8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=gs3WFVbb; arc=none smtp.client-ip=91.218.175.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1722961306; c=relaxed/simple;
+	bh=dc3KF3oDWfsS3M4tak5yXyNDQ5kcGqznXlmWK6GcUFQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=s05ct+jaKPcmBR4bpfYUpVEGx/eqe1t23s7ch3FEf4y7gqoYKHGiQLWy2g1cKPc2jVigVPeYzr0UR3mUkPIyfq20xDBizzdozHcX2tq1jVrTqIo76omqbrDB/U2PY23vmNrIdWKM6nQN5R2iIwCaithkJJStnC6Ul8Ul0z4LjsI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KxLtsMRF; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gs3WFVbb"
-Message-ID: <91ac51ff-6bba-4a8b-93c1-e1534911faee@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1722960055;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eDe/zCvoncz0vd6vk1ajyYGjxPA5a/HaUHlqKh5qrGM=;
-	b=gs3WFVbbNUtuqucFRYq+J8MfA18n4BJkD7SDLEeSFAntr+lO9yHP9IYlbgekYzWlOevHzp
-	W3p2cNCPrJ5+k3OB3nR7JvnBleT96rvqI/SubhDyfZV8S/5cVBLlCOZmnXzwgyR8b3KrQx
-	Q1uAilhJ5xuLwVDneKO6erPRZ4MbkwE=
-Date: Wed, 7 Aug 2024 00:00:44 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KxLtsMRF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C752C32786;
+	Tue,  6 Aug 2024 16:21:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722961306;
+	bh=dc3KF3oDWfsS3M4tak5yXyNDQ5kcGqznXlmWK6GcUFQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=KxLtsMRFmxWmtYsHYxJP9LjR8Q8hnIrSirH0CxmlabpjikzvUkwsMWVFSCone/IGU
+	 aIpAzNTrdiFAYaJCclclFfs+CQKqR/NfQaafpHuNZqT7to6L7Z9eJSfLcF6xNlQxqQ
+	 hNVqz3OrC920rO/lGQ6/TWBchzN2nuRq7vK7V28rXXMCZmz4Tp0GAAu2tpU9ssHZ9g
+	 rAR9XqLjVCKXboCPDRZFHLdlv5XSj94j9J9euPxz1e2nTyS7gqYAZsQJVlhONxl1Ty
+	 YSZmVB5BMpdQaH1H8fki2EDh37G7I2IdsmBMZ/DItXG2e2kQ2LYW9Dap9KLvAGxiWo
+	 dUwgU83R1A5vA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sbMwS-001RBk-0p;
+	Tue, 06 Aug 2024 17:21:44 +0100
+Date: Tue, 06 Aug 2024 17:21:43 +0100
+Message-ID: <86h6bx39m0.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Zenghui Yu <zenghui.yu@linux.dev>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	kvmarm@lists.linux.dev,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose
+ <suzuki.poulose@arm.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH v3 05/19] KVM: arm64: vgic-debug: Use an xarray mark for debug iterator
+In-Reply-To: <91ac51ff-6bba-4a8b-93c1-e1534911faee@linux.dev>
+References: <20240422200158.2606761-1-oliver.upton@linux.dev>
+	<20240422200158.2606761-6-oliver.upton@linux.dev>
+	<d034a9b8-34ae-923e-8e68-09d2de3cf079@huawei.com>
+	<178f30f7-edfd-78c5-f392-43cef1ef9baf@huawei.com>
+	<3df0159d-efe8-f5fb-a99b-d53f1ed8058c@huawei.com>
+	<91ac51ff-6bba-4a8b-93c1-e1534911faee@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.3
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Subject: Re: [PATCH v3 05/19] KVM: arm64: vgic-debug: Use an xarray mark for
- debug iterator
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
- James Morse <james.morse@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Eric Auger <eric.auger@redhat.com>,
- kvm@vger.kernel.org
-References: <20240422200158.2606761-1-oliver.upton@linux.dev>
- <20240422200158.2606761-6-oliver.upton@linux.dev>
- <d034a9b8-34ae-923e-8e68-09d2de3cf079@huawei.com>
- <178f30f7-edfd-78c5-f392-43cef1ef9baf@huawei.com>
- <3df0159d-efe8-f5fb-a99b-d53f1ed8058c@huawei.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zenghui Yu <zenghui.yu@linux.dev>
-In-Reply-To: <3df0159d-efe8-f5fb-a99b-d53f1ed8058c@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: zenghui.yu@linux.dev, oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, eric.auger@redhat.com, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 2024/8/6 22:11, Zenghui Yu wrote:
-> @@ -112,7 +113,7 @@ static bool end_of_vgic(struct vgic_state_iter *iter)
->  	return iter->dist_id > 0 &&
->  		iter->vcpu_id == iter->nr_cpus &&
->  		iter->intid >= (iter->nr_spis + VGIC_NR_PRIVATE_IRQS) &&
-> -		iter->lpi_idx > iter->nr_lpis;
-> +		(iter->lpi_idx > iter->nr_lpis || !iter->nr_lpis);
+On Tue, 06 Aug 2024 17:00:44 +0100,
+Zenghui Yu <zenghui.yu@linux.dev> wrote:
+> 
+> On 2024/8/6 22:11, Zenghui Yu wrote:
+> > @@ -112,7 +113,7 @@ static bool end_of_vgic(struct vgic_state_iter *iter)
+> >  	return iter->dist_id > 0 &&
+> >  		iter->vcpu_id == iter->nr_cpus &&
+> >  		iter->intid >= (iter->nr_spis + VGIC_NR_PRIVATE_IRQS) &&
+> > -		iter->lpi_idx > iter->nr_lpis;
+> > +		(iter->lpi_idx > iter->nr_lpis || !iter->nr_lpis);
+> 
+> And this should actually be written as:
+> 
+> iter->lpi_idx >= iter->nr_lpis
+> 
+> even in the first commit adding the LPI status in debugfs (e294cb3a6d1a)
+> if I understand it correctly. I will give it a bit more tests tomorrow..
 
-And this should actually be written as:
+Yup, this looks like a long-standing bug (/me pleads guilty).
 
-iter->lpi_idx >= iter->nr_lpis
+Maybe worth fixing them independently in order to facilitate the
+inevitable backports?
 
-even in the first commit adding the LPI status in debugfs (e294cb3a6d1a)
-if I understand it correctly. I will give it a bit more tests tomorrow..
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
