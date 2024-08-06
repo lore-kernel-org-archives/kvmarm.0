@@ -1,73 +1,73 @@
-Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A71421EA0BD
-	for <kvmarm@lists.linux.dev>; Tue,  6 Aug 2024 15:04:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46676C2E9
+	for <kvmarm@lists.linux.dev>; Tue,  6 Aug 2024 15:19:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722956674; cv=none; b=b0bHudL4v1GYeJ39jZEZ0U70VaFnaum4+LcPVNpLXpKJJd/tu8ztouVDb18tIF1gHovUiLKf7zN3GR+VgyQmx8zi4deGx1yjrvvRSiUBtLwyP4Le6YVJFQBYnXTz3bmSBJ2p24L+xN30prSJtd7As3bQVG7iFmxhugg/0fi14yQ=
+	t=1722957573; cv=none; b=DNpkkYyXn7yI3LrIk2XqfGoUIU5luQO0ZPJGkIIm47n6PMj4Sb2yY4k39TNkg0rO01L35zYjGLlS/aJhjeN6BiLubWqNxwxCF0CVShEKpdrtKc42LNzNgOgO0uS9BN3FZdZEFmr5l2L7Ni24KJMcZK76YpC/t6KSJuX5w6ppF74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722956674; c=relaxed/simple;
-	bh=LUNW9RUIstkrjibzIwDixQZwd8z0VowIYpuqj/xpKxc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RdFCg4eihC8wRxA8ZBdCKBmFszFAkSFr8EEAI2YlDbnFzF8QUp8QCRC2LSZkmOK0v8h9eAOuj8dRglG4myk8gPdnIYJIFiMjmHmHpBazqaAHrxyxMHoWC41GHmLKm+1SDQZhlAS8My7J5qL7GIK6nX4BueXfjMXTMXSFTf1O4Qk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=YFhpMdNJ; arc=none smtp.client-ip=209.85.166.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+	s=arc-20240116; t=1722957573; c=relaxed/simple;
+	bh=507JunshFPL0z45Z3MTpxjvv85WUDf3XTVoh4ip9AK8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=U32WoAMWCv54ICzIvpjLq+NnSZY6A5zs63efJifh3D7q89MuitDEfBlLUgvFbtAXVvuo4R5i/uT2/hTDiKXZWMzcSBS+FeDXeI+R+W6LfG9mG43i+lNTPkb6h+iJsAWl7B48wbpllexqErtXwcCFPZxi0HuVrpMFn97cWLBKdPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iVLpNt8H; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="YFhpMdNJ"
-Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-37636c3872bso2972635ab.3
-        for <kvmarm@lists.linux.dev>; Tue, 06 Aug 2024 08:04:32 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iVLpNt8H"
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1fc51ea72abso7299605ad.1
+        for <kvmarm@lists.linux.dev>; Tue, 06 Aug 2024 08:19:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1722956672; x=1723561472; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uLbAu/3JQVhbekGE1m18EyrvzfniM5U0p+PtTw3SPlQ=;
-        b=YFhpMdNJsX1I38w9hgilx9IeoNEcRPfUutZDylHGvcpaEUZUGN1XOwVW4voQhU2lbB
-         JsdWnC75u4LrcdlZ8IvQfHtNAv6a2Sa+f7IBoe/iB+w7l2xp7e2Rr/iz1zf/75LWOm3i
-         wtYu/AgnSBcq+vqTLphUvh1YuZHi0+dEf7IfLOnzYPBcB/aYG09E2eQGcZ2EUU1slOSq
-         IuqoD+egy7/Ql/+XrtY7TLOhR+Mh5WwMrIbUbZlqRBmPU/e4nEnn90kPGA+deVaXbkVC
-         vr3mrrIKrcjOQgZVDAlVcbXy8+L2t8aiUOzxq6c4beYoNvXuOuDZu6Ik+EfgDl2dJo5h
-         3bgg==
+        d=google.com; s=20230601; t=1722957572; x=1723562372; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=zfDlFqosrXLKfrNosA2JBe6CUch6c/VqYqOk4CYX594=;
+        b=iVLpNt8HQO4wYEdnnjSjRlbnbQxOTNZtYKDfnPpHaseFWo5rNXVL7mNe3b+OX9K7K+
+         OZrxO3xGpQBXYUrO5ezrBM6ZiXunCT02FXUR1pUX0lx9IBPNnImShdseHlqu+23sVOal
+         WQVzrE9Ssov9R+YUO+yvBoSYMEMkPSPGSOR14G7/RkownBYnEXb5OeFHnY6pvVNeRINt
+         r2j45hCeywjBtyhiFn5dueFKYEWBGf/QN23tE+1h6SCGO/ulegqulTRwyONiwQEqtikz
+         Fh2uQRATQF287ICDw3kvbYE/qCJTCdTPn5BKHHPkjUV7Srq6ZNE/sEYVtLcvKKQZDtNa
+         wqFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722956672; x=1723561472;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uLbAu/3JQVhbekGE1m18EyrvzfniM5U0p+PtTw3SPlQ=;
-        b=j9hzfG+dKa0hI3ZMUhSvT/DM0bfA6yoUaSl4eYcoJHnYuxIE8pQyxjlB8BXTD4ifpu
-         FpofVQlUiGrmFoY6+I2sP1knLKg47TTS6676Z2VA2GIbo0DriXT0PEZDj5V5gAVW62vX
-         ml5RtgGwt5hKBJgYGxPJzKHf33BrdXojmjuR99yLI5JcO125Ke8BgSRXFT8d0cc8a+05
-         A552U6INsVUZtbJpPmeCO3LQeXq99QyfkNtBESzqA5Ivnk/cQXCsELt7nxJmgp3CI1/v
-         qSEpbVC6YxwuQ9LiRCPSqrikc7w05wb+JXaolIyZ199iy+WYlZ4+T4X+TP4em0jJI3OM
-         j6TA==
-X-Forwarded-Encrypted: i=1; AJvYcCU/pYj5pumoe9o+UpJu1YvEwj3Sa/ar4yaO562Lgw56yRllw5xXkGx4HW0aLv/5QaqKMSxhGhd9kkJTC+WLJIeWEgaD4fYD
-X-Gm-Message-State: AOJu0Yzp2NcT8lroEB0CbVRY49Dm+3yW1GAC+cxf9NjO9pEcAG7jumJB
-	fN6iPyXxFx+Yv5lrOIzbxQYuuA/RG3hd/rlMl78Was+vmqhyCOJMDNLHMuyDPFeVk0TUkii3qGu
-	Gt5YOu4VGgFAh8UpkHC3BhaNt9mHawRSVPNTuYQ==
-X-Google-Smtp-Source: AGHT+IHdYOEWf6qlsoZVXjSZ7lVz4nHt9XoyHycNquwMn333FMaz4B6ys0O5Sw1BKpWpYjBg2+pZRslO+PRicrnJai8=
-X-Received: by 2002:a92:d1cd:0:b0:39a:e86b:a76a with SMTP id
- e9e14a558f8ab-39b1fc2bbbdmr148654105ab.26.1722956671518; Tue, 06 Aug 2024
- 08:04:31 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1722957572; x=1723562372;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zfDlFqosrXLKfrNosA2JBe6CUch6c/VqYqOk4CYX594=;
+        b=wZcMz5kdhC/51+/omlcoTMloKpa5UCn3AIZRgHBvBTFBDlAeDC3W0zBeq1x9iWC+rP
+         mhNcVDG/7yUwzQ6OCmJR09P3czdENMohvnWdyO7l2P/87kRUDpzR3VBoYWMI/WS7uQbJ
+         xUAKKeR3og69/kdofHM8KRKvK92N7az6CO5NUD9LbwI0nWpoCh4+UDeBbHGeF94mGC2o
+         s6V8gTDbt6VqowkvgIlB+tg50TAYzYGXFROEEvGUq64qYNaI8+vVk8BLswm9ldvY45QJ
+         NJnTUOVNl5EPVeKAoRFFxbYPhsjU2zi2ZphsyzflnvYsQNVu7iSP2rxxzUGpmjO5Xliz
+         ULLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVG7ATBhur6DIbPRNvmK8jm0q1bB/0dH6PpkT49pQxpsXlUivpIorRZR6ENGGry8vjZAGGZmOlheY1DajQwlYokJtfCK04F
+X-Gm-Message-State: AOJu0Yzdzyh3HMOolaNAajlL89U8T0pw7mpdKIFhrQWRNXiLxz2Z8adz
+	PsJ41nL1iioqGC7J4eYSyW6ecObPSqZwiUGomVcNDohxnyr0aEj9n3a7CmV4WZbXJg0gU7HooLG
+	gPw==
+X-Google-Smtp-Source: AGHT+IG+kq4xSCmsszhC87T6ezpGfclhL8SLo9v6dzemvAwTfI9EBqVt37Vs+G2GK8dBxj5hzSimY+F6XI8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:e743:b0:1fb:54d9:ebb3 with SMTP id
+ d9443c01a7336-1ff57309939mr9499665ad.6.1722957571476; Tue, 06 Aug 2024
+ 08:19:31 -0700 (PDT)
+Date: Tue, 6 Aug 2024 08:19:29 -0700
+In-Reply-To: <86ikwe2fph.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20240726235234.228822-1-seanjc@google.com> <20240726235234.228822-59-seanjc@google.com>
-In-Reply-To: <20240726235234.228822-59-seanjc@google.com>
-From: Anup Patel <anup@brainfault.org>
-Date: Tue, 6 Aug 2024 20:34:20 +0530
-Message-ID: <CAAhSdy2whfRBm9HBkr=gSwxpFHGwGtB70fKNCqG1-MeHmB1K7w@mail.gmail.com>
-Subject: Re: [PATCH v12 58/84] KVM: RISC-V: Use kvm_faultin_pfn() when mapping
- pfns into the guest
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
-	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Paul Walmsley <paul.walmsley@sifive.com>, 
+Mime-Version: 1.0
+References: <20240726235234.228822-1-seanjc@google.com> <20240726235234.228822-55-seanjc@google.com>
+ <ZrFfgzRbiqT-Zi2O@linux.dev> <ZrFfvjy_-Tyx4xUV@linux.dev> <86ikwe2fph.wl-maz@kernel.org>
+Message-ID: <ZrI_AdLhWZqNKC4z@google.com>
+Subject: Re: [PATCH v12 54/84] KVM: arm64: Mark "struct page" pfns
+ accessed/dirty before dropping mmu_lock
+From: Sean Christopherson <seanjc@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
+	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
 	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
 	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
 	Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, 
@@ -75,79 +75,65 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
 	loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
 	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
 	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	David Matlack <dmatlack@google.com>, David Stevens <stevensd@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	David Matlack <dmatlack@google.com>, David Stevens <stevensd@chromium.org>, 
+	Fuad Tabba <tabba@google.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Sat, Jul 27, 2024 at 5:24=E2=80=AFAM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> Convert RISC-V to __kvm_faultin_pfn()+kvm_release_faultin_page(), which
-> are new APIs to consolidate arch code and provide consistent behavior
-> across all KVM architectures.
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+On Tue, Aug 06, 2024, Marc Zyngier wrote:
+> On Tue, 06 Aug 2024 00:26:54 +0100,
+> Oliver Upton <oliver.upton@linux.dev> wrote:
+> > 
+> > On Mon, Aug 05, 2024 at 11:26:03PM +0000, Oliver Upton wrote:
+> > > [+cc Fuad]
+> > 
+> > Take 2!
+> > 
+> > > Fuad, you mentioned in commit 9c30fc615daa ("KVM: arm64: Move setting
+> > > the page as dirty out of the critical section") that restructuring
+> > > around the MMU lock was helpful for reuse (presumably for pKVM), but I
+> > > lack the context there.
+> > > 
+> > > On Fri, Jul 26, 2024 at 04:52:03PM -0700, Sean Christopherson wrote:
+> > > > Mark pages/folios accessed+dirty prior to dropping mmu_lock, as marking a
+> > > > page/folio dirty after it has been written back can make some filesystems
+> > > > unhappy (backing KVM guests will such filesystem files is uncommon, and
+> > > 
+> > > typo: s/will/with/
+> > > 
+> > > > the race is minuscule, hence the lack of complaints).  See the link below
+> > > > for details.
+> 
+> Should we consider reverting 9c30fc615daa then?
 
-For KVM RISC-V:
-Acked-by: Anup Patel <anup@brainfault.org>
+Aha!  After thinking through things more, I don't think a revert is necessary.
+I _think_ the worst case scenario is that KVM would trigger this WARN in
+filemap_unaccount_folio():
 
-Regards,
-Anup
+	/*
+	 * At this point folio must be either written or cleaned by
+	 * truncate.  Dirty folio here signals a bug and loss of
+	 * unwritten data - on ordinary filesystems.
+	 *
+	 * But it's harmless on in-memory filesystems like tmpfs; and can
+	 * occur when a driver which did get_user_pages() sets page dirty
+	 * before putting it, while the inode is being finally evicted.
+	 *
+	 * Below fixes dirty accounting after removing the folio entirely
+	 * but leaves the dirty flag set: it has no effect for truncated
+	 * folio and anyway will be cleared before returning folio to
+	 * buddy allocator.
+	 */
+	if (WARN_ON_ONCE(folio_test_dirty(folio) &&
+			 mapping_can_writeback(mapping)))
+		folio_account_cleaned(folio, inode_to_wb(mapping->host));
 
+KVM won't actually write memory because the stage-2 mappings are protected by the
+mmu_notifier, i.e. there is no risk of loss of data, even if the VM were backed
+by memory that needs writeback.
 
-> ---
->  arch/riscv/kvm/mmu.c | 11 ++++-------
->  1 file changed, 4 insertions(+), 7 deletions(-)
->
-> diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
-> index 806f68e70642..f73d6a79a78c 100644
-> --- a/arch/riscv/kvm/mmu.c
-> +++ b/arch/riscv/kvm/mmu.c
-> @@ -601,6 +601,7 @@ int kvm_riscv_gstage_map(struct kvm_vcpu *vcpu,
->         bool logging =3D (memslot->dirty_bitmap &&
->                         !(memslot->flags & KVM_MEM_READONLY)) ? true : fa=
-lse;
->         unsigned long vma_pagesize, mmu_seq;
-> +       struct page *page;
->
->         /* We need minimum second+third level pages */
->         ret =3D kvm_mmu_topup_memory_cache(pcache, gstage_pgd_levels);
-> @@ -631,7 +632,7 @@ int kvm_riscv_gstage_map(struct kvm_vcpu *vcpu,
->
->         /*
->          * Read mmu_invalidate_seq so that KVM can detect if the results =
-of
-> -        * vma_lookup() or gfn_to_pfn_prot() become stale priort to acqui=
-ring
-> +        * vma_lookup() or __kvm_faultin_pfn() become stale priort to acq=
-uiring
->          * kvm->mmu_lock.
->          *
->          * Rely on mmap_read_unlock() for an implicit smp_rmb(), which pa=
-irs
-> @@ -647,7 +648,7 @@ int kvm_riscv_gstage_map(struct kvm_vcpu *vcpu,
->                 return -EFAULT;
->         }
->
-> -       hfn =3D gfn_to_pfn_prot(kvm, gfn, is_write, &writable);
-> +       hfn =3D kvm_faultin_pfn(vcpu, gfn, is_write, &writable, &page);
->         if (hfn =3D=3D KVM_PFN_ERR_HWPOISON) {
->                 send_sig_mceerr(BUS_MCEERR_AR, (void __user *)hva,
->                                 vma_pageshift, current);
-> @@ -681,11 +682,7 @@ int kvm_riscv_gstage_map(struct kvm_vcpu *vcpu,
->                 kvm_err("Failed to map in G-stage\n");
->
->  out_unlock:
-> -       if ((!ret || ret =3D=3D -EEXIST) && writable)
-> -               kvm_set_pfn_dirty(hfn);
-> -       else
-> -               kvm_release_pfn_clean(hfn);
-> -
-> +       kvm_release_faultin_page(kvm, page, ret && ret !=3D -EEXIST, writ=
-able);
->         spin_unlock(&kvm->mmu_lock);
->         return ret;
->  }
-> --
-> 2.46.0.rc1.232.g9752f9e123-goog
->
+And FWIW, given that multiple other KVM architectures mark folios dirty outside
+of mmu_notifier protection and have never tripped over this, I think it's highly
+unlikely the WARN will ever be triggered by a sane virtualization setup.
+
+I can add something to that effect to the changelog, e.g. to document that this
+isn't super urgent.  
