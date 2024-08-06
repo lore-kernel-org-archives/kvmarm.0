@@ -1,136 +1,129 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55FC017A931;
-	Tue,  6 Aug 2024 23:10:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7EAD176FA5
+	for <kvmarm@lists.linux.dev>; Wed,  7 Aug 2024 00:00:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722985804; cv=none; b=ugv9zDJsowP1m2EwOJRmeanz4y07XmUZ8NDvbh60HhnUPv7oUWfVTAD7bBQyFml1RKN7MlD5mkcN6jJqrzRmjpZJZwq+z+xAL+HDFENNhztlbyngw1SqqrGkqMwyTWWpOFQ2pADt+7ec/YAJaPyt6w96Xcntr4R35N/pTPMRT8Q=
+	t=1722988808; cv=none; b=c3LdHC0OvtKlbnAhX+wr3So+hcVZgwIRMsnZ1CX7fqlPa9YHFw3LKBDRrvZMZXoZaF94URZc/13dwe2/WmfdEHzDu+mtdlOHQZglLMm9Afh74LEVgpaungAHvfT/Kj06WdFcIeaodGgVuSwk27sT+OtOczKh4PkhNPcYHpCD3Ug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722985804; c=relaxed/simple;
-	bh=JOwNCNr3/IEbe6BdNnnrPTwJINMvSZj5yZCINdET7DM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=E2MXNK/YWdfyXIWsiU7bqfe7wakufUCkRrB/fxSZktD0H0LQ5+Fn6YEJHuuJ1wd3y1YZZ+QaB2AQ6hH4a96aeTHGS6XVXnvFKtla5b/m5THobPrz9cCOye8XHtAsptYjAtbW+Sxz53EjYgIO8/+Gq88YqnLXmqkXbGLbUNIboYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d1tdHXXG; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1722988808; c=relaxed/simple;
+	bh=UHgIWVKvGfmyugfK+5SUX8pCsbKk968BZK+Jt1c65xc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=jyl3pwp7/jaF/FuZBkhHuBIjnOQntWlgK1Jj1+zXlpMBFhDRxauNA9uljknbVx9g9sMHyLbLydd5B1sa/ciszBzfKE5C4Y4zBvQRW25YV41MFdJgchyVS80Ap0mUpq1fvJHUjUQTvtOKfgzwLMWXRayNpTSreIhdtR5DaGox0Cg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=112gqB5g; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d1tdHXXG"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BC8D9C4AF1C;
-	Tue,  6 Aug 2024 23:10:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722985803;
-	bh=JOwNCNr3/IEbe6BdNnnrPTwJINMvSZj5yZCINdET7DM=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=d1tdHXXGxre4WSP+5XHhbrZaAFl9Q1axTlOCxWPyt0PC+zHC5BPvvBMCXPxJ5VQPQ
-	 D/MKgQHR6vbSQV3xdkFAZ/FjkZFAGbq2Mhb5PonaeTYS7pTdpS3TKqZcqo+TzgG+Uw
-	 fpzPYYvGH8RF4B8nDZDoBPruy+MECvLKlGrh/gif7Kofoz15Xs5ofSpukwv4A6lgXC
-	 6b0fkVNKMKXF5pf05LOBnSUX58K9ml4QGZ+UQUC/UJzNI7jmYDK+UoOJgLqDwPCBrh
-	 +uomJrEsMpLCrEGtUP6Kk1JIJ65rwcpNSVxo+XEvqZ93peIKWNNwnPJdTWXcKGtneW
-	 aF6P7uexYQfhA==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF56DC49EA1;
-	Tue,  6 Aug 2024 23:10:03 +0000 (UTC)
-From: Daniel Gomez via B4 Relay <devnull+da.gomez.samsung.com@kernel.org>
-Date: Wed, 07 Aug 2024 01:09:25 +0200
-Subject: [PATCH 11/12] tty/vt: conmakehash requires linux/limits.h
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="112gqB5g"
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7a242496897so974770a12.2
+        for <kvmarm@lists.linux.dev>; Tue, 06 Aug 2024 17:00:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1722988806; x=1723593606; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3Q2NRiav7MDRT7LLYySbofxe/7oFalUeoZKG+LR63fQ=;
+        b=112gqB5gbfLbOtE5F1rMt5rLyxXcNaUARV9FwhMYPYvYTr2XXMC0UFfjDZ1rcjy3sq
+         QWPpQe+32fqrymVpfv/SOlct+vMQdC3+j+xXNSHSQjftB/wjvnBDUQ8s3knQnhk6IfF0
+         SGywsrck16+EGwBKcGORmX1I+MUfrUgw323CMd11c7ufKpO3f5fmpXEuth5Me6n6nGWk
+         HjnMfKaXKSwOusZO0mqpUvWgZxKAwim+0BjI8kH+hiyyDku+lZwY6mexVe/lPPoNz/F0
+         e/Os5bEgnXSWXk/HxDQHwVz74LLeloIxstLcP42nRY/f+4LMDM/rzzkuzLssfSvf6Q2A
+         XVvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722988806; x=1723593606;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3Q2NRiav7MDRT7LLYySbofxe/7oFalUeoZKG+LR63fQ=;
+        b=WiLak9Kt2S62apVkljzEeA0ePyGHlAvE+A4/4AwZD/uTzZwL/aDAFG/ufRz1Jgcj3N
+         gvREG0mEIxY6obq4WFHHZnfX4dS0O5FR9cU85Ix4bZrrGghF5ZUS9hofDOcuQfnU+sOU
+         WA9xnLSQt1W7v1bCXO60Ytj+GxEYQxgAFnFJh6utNBbZDGPGFsdNrgn5eTNBd8elT7kY
+         GXrfyLH+Sl4QbIrWLkxr/MbfsJdBFZNU2AouuzBBYEFILtNQaSo+AVquqWwbVygMqC/a
+         tAWi/lxEWSbvx26uEZIDtcEtmQ4a1U1yzfCDiDHKxSExsBibJeC1Mu8K+KauSB+9Vg7k
+         Qb1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU5DwrPvK/IPuUTcoHsjpfxF7MwiDUqQ9q15sEAuCLVziJ4dMyIAphHpM86JfiZnLjgumUMMHdMR0Xl8lz+uj7LbCCrA88x
+X-Gm-Message-State: AOJu0Yxca1gTgwKkX6UC/MaU+aTY1yS7/14dkuvY/FbGk14roBB67K9m
+	gtaknQn4F1febjCxTBccrzaejwNj14RyUngWPuUnSuacJLijqhz2tdo4Ox3TG0PDr6RgtH91q9e
+	2/Q==
+X-Google-Smtp-Source: AGHT+IHvS0fM2LOTssx0eAi+ioCPUdUHmTfVhIBg5USnscLvdfSuqB0Ekxw+gGimmHjT/noSv8q+S+cCN3A=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a65:6904:0:b0:7a0:cd17:c701 with SMTP id
+ 41be03b00d2f7-7b74a9d0286mr33925a12.10.1722988805874; Tue, 06 Aug 2024
+ 17:00:05 -0700 (PDT)
+Date: Tue, 6 Aug 2024 16:59:03 -0700
+In-Reply-To: <ZrKqrCnNpNQ_K_qi@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240807-macos-build-support-v1-11-4cd1ded85694@samsung.com>
-References: <20240807-macos-build-support-v1-0-4cd1ded85694@samsung.com>
-In-Reply-To: <20240807-macos-build-support-v1-0-4cd1ded85694@samsung.com>
-To: Masahiro Yamada <masahiroy@kernel.org>, 
- Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, 
- Lucas De Marchi <lucas.demarchi@intel.com>, 
- =?utf-8?q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>, 
- Rodrigo Vivi <rodrigo.vivi@intel.com>, 
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
- David Airlie <airlied@gmail.com>, Daniel Vetter <daniel@ffwll.ch>, 
- William Hubbs <w.d.hubbs@gmail.com>, Chris Brannon <chris@the-brannons.com>, 
- Kirk Reiser <kirk@reisers.ca>, 
- Samuel Thibault <samuel.thibault@ens-lyon.org>, 
- Paul Moore <paul@paul-moore.com>, 
- Stephen Smalley <stephen.smalley.work@gmail.com>, 
- Ondrej Mosnacek <omosnace@redhat.com>, 
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
- James Morse <james.morse@arm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Zenghui Yu <yuzenghui@huawei.com>, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- Jiri Slaby <jirislaby@kernel.org>, 
- Nick Desaulniers <ndesaulniers@google.com>, 
- Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
- intel-xe@lists.freedesktop.org, dri-devel@lists.freedesktop.org, 
- speakup@linux-speakup.org, selinux@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
- linux-serial@vger.kernel.org, llvm@lists.linux.dev, 
- Finn Behrens <me@kloenk.dev>, 
- "Daniel Gomez (Samsung)" <d+samsung@kruces.com>, gost.dev@samsung.com, 
- Daniel Gomez <da.gomez@samsung.com>
-X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1722985800; l=1705;
- i=da.gomez@samsung.com; s=20240621; h=from:subject:message-id;
- bh=GlY+ZLQcYSKSN3SyY915ZDHwX28gVnVDJorFIIf1+Jo=;
- b=TXC+qEwbi6LwhRfspoNf9uCJM5mS5rpVYHpZ3bnRG1KFrfzm+UI/apLoI43ShxbZHbpUUEVBL
- CkbYZiLdsfUA4G8wSWyMc3cIK3tGKT6BD0jGlYhjBBXl1eg0MflhqKS
-X-Developer-Key: i=da.gomez@samsung.com; a=ed25519;
- pk=BqYk31UHkmv0WZShES6pIZcdmPPGay5LbzifAdZ2Ia4=
-X-Endpoint-Received: by B4 Relay for da.gomez@samsung.com/20240621 with
- auth_id=175
-X-Original-From: Daniel Gomez <da.gomez@samsung.com>
-Reply-To: da.gomez@samsung.com
+Mime-Version: 1.0
+References: <20240802200136.329973-1-seanjc@google.com> <20240802200136.329973-3-seanjc@google.com>
+ <ZrKqrCnNpNQ_K_qi@linux.dev>
+Message-ID: <ZrK4x4LLz1wlwGQN@google.com>
+Subject: Re: [PATCH 2/2] KVM: Protect vCPU's "last run PID" with rwlock, not RCU
+From: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Steve Rutherford <srutherford@google.com>
+Content-Type: text/plain; charset="us-ascii"
 
-From: Daniel Gomez <da.gomez@samsung.com>
+On Tue, Aug 06, 2024, Oliver Upton wrote:
+> On Fri, Aug 02, 2024 at 01:01:36PM -0700, Sean Christopherson wrote:
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index a33f5996ca9f..7199cb014806 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -1115,7 +1115,7 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+> >  void kvm_arm_halt_guest(struct kvm *kvm);
+> >  void kvm_arm_resume_guest(struct kvm *kvm);
+> >  
+> > -#define vcpu_has_run_once(vcpu)	!!rcu_access_pointer((vcpu)->pid)
+> > +#define vcpu_has_run_once(vcpu)	(!!READ_ONCE((vcpu)->pid))
+> >  
+> >  #ifndef __KVM_NVHE_HYPERVISOR__
+> >  #define kvm_call_hyp_nvhe(f, ...)						\
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index 689e8be873a7..d6f4e8b2b44c 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -342,7 +342,8 @@ struct kvm_vcpu {
+> >  #ifndef __KVM_HAVE_ARCH_WQP
+> >  	struct rcuwait wait;
+> >  #endif
+> > -	struct pid __rcu *pid;
+> > +	struct pid *pid;
+> > +	rwlock_t pid_lock;
+> >  	int sigset_active;
+> >  	sigset_t sigset;
+> >  	unsigned int halt_poll_ns;
+> 
+> Adding yet another lock is never exciting, but this looks fine.
 
-macOS hosts do not provide the linux/limits.h header required for
-conmakehash. To address this, ensure that usr/include is included in
-the conmakehash HOSTCFLAGS. This will provide the necessary header for
-successful compilation on macOS.
+Heh, my feelings too.  Maybe that's why I didn't post this for two years.
 
-Fixes error:
-HOSTCC  drivers/tty/vt/conmakehash - due to target missing
-  clang -Wp,-MMD,drivers/tty/vt/.conmakehash.d -Wall
--Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer
--std=gnu11   -I ./scripts/include     -o drivers/tty/vt/conmakehash
-drivers/tty/vt/conmakehash.c
-drivers/tty/vt/conmakehash.c:15:10: fatal error: 'linux/
-   limits.h' file not found 15 | #include <linux/limits.h>    |
-   ^~~~~~~~~~~~~~~~
-1 error generated.
-make[5]: *** [scripts/Makefile.host:116: drivers/tty/vt/conmakehash]
-Error 1
-make[4]: *** [scripts/Makefile.build:485: drivers/tty/vt] Error 2
-make[3]: *** [scripts/Makefile.build:485: drivers/tty] Error 2
-make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
-make[1]: *** [/Volumes/src/kernel/linux-next/Makefile:1925: .] Error 2
-make: *** [Makefile:224: __sub-make] Error 2
+> Can you nest this lock inside of the vcpu->mutex acquisition in
+> kvm_vm_ioctl_create_vcpu() so lockdep gets the picture?
 
-Signed-off-by: Daniel Gomez <da.gomez@samsung.com>
----
- drivers/tty/vt/Makefile | 1 +
- 1 file changed, 1 insertion(+)
+I don't think that's necessary.  Commit 42a90008f890 ("KVM: Ensure lockdep knows
+about kvm->lock vs. vcpu->mutex ordering rule") added the lock+unlock in
+kvm_vm_ioctl_create_vcpu() purely because actually taking vcpu->mutex inside
+kvm->lock is rare, i.e. lockdep would be unable to detect issues except for very
+specific VM types hitting very specific flows.
 
-diff --git a/drivers/tty/vt/Makefile b/drivers/tty/vt/Makefile
-index 2c8ce8b592ed..d266895357e5 100644
---- a/drivers/tty/vt/Makefile
-+++ b/drivers/tty/vt/Makefile
-@@ -13,6 +13,7 @@ obj-$(CONFIG_CONSOLE_TRANSLATIONS)	+= consolemap.o consolemap_deftbl.o
- clean-files := consolemap_deftbl.c defkeymap.c
- 
- hostprogs += conmakehash
-+HOSTCFLAGS_conmakehash.o = -I$(srctree)/usr/include
- 
- quiet_cmd_conmk = CONMK   $@
-       cmd_conmk = $(obj)/conmakehash $< > $@
+But for this lock, every arch is guaranteed to take the lock on the first KVM_RUN,
+as "oldpid" is '0' and guaranteed to mismatch task_pid(current).  So I don't think
+we go out of our way to alert lockdep.
 
--- 
-Git-146)
+> > @@ -4466,7 +4469,7 @@ static long kvm_vcpu_ioctl(struct file *filp,
+> >  		r = -EINVAL;
+> >  		if (arg)
+> >  			goto out;
+> > -		oldpid = rcu_access_pointer(vcpu->pid);
+> > +		oldpid = vcpu->pid;
+> 
+> It'd be good to add a comment here about how this is guarded by the
+> vcpu->mutex, as Steve points out.
 
-
+Roger that.
