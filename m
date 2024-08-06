@@ -1,202 +1,120 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 687D11EA0B9
-	for <kvmarm@lists.linux.dev>; Tue,  6 Aug 2024 13:44:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD9ED18D624
+	for <kvmarm@lists.linux.dev>; Tue,  6 Aug 2024 14:11:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722951848; cv=none; b=ufUc0UZPbOuyvLdo6/Anm/6JJrdTMi4b7giCBvqfmUyV8iWVFDpojdMaZvqgXSSBkOKfpojjQAF5FJ2JRZwO054DZazOBaxKIndQko4rwwdCv1T2cNbNqefvvYUrJ7vtnzS5Fzoubf5tUPqnVKmM1MyAiD4vEO0Kj0GYdqtuJDA=
+	t=1722953469; cv=none; b=eEQjI0eTEXy8bDHFbP+m0v+nBsjDmrgLUhkh4zQQZraZwxCTRUQHF+I2tbDP/F80WaksjMEwZRKO8dS3u55j5mo7MozQW0CnMRAe+vH0SP2midBofvb77NaJByd9vJv8I9cpSwGRZlUt1hjcy5SlFzMFkeSQVypQEyd1qUKTVTU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722951848; c=relaxed/simple;
-	bh=edGDsYoXs6sZr/MpxfOHcFQkpIlPGxqnoOuvCH4izW0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a0K2C0xxglvkAGrsjg1XGNBWgoXYeW/apY8MUnBsQwje+Oh8zI4DOobYCjHexq+d/O6wu/UZ77czJnI1+TmB/m5BhzHZvLXR7iXiwjvZgodXqLU6Qx+R4t8lHwl2CktXlWJn4my1Hu15KLKTprILM/Ya9dVc1wGfDWt5B/TgPwM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 97A33FEC;
-	Tue,  6 Aug 2024 06:44:31 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D72173F766;
-	Tue,  6 Aug 2024 06:44:02 -0700 (PDT)
-Date: Tue, 6 Aug 2024 14:43:57 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
-	aneesh.kumar@kernel.org, aneesh.kumar@linux.ibm.com, bp@alien8.de,
-	broonie@kernel.org, catalin.marinas@arm.com,
-	christophe.leroy@csgroup.eu, dave.hansen@linux.intel.com,
-	hpa@zytor.com, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
-	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
-	oliver.upton@linux.dev, shuah@kernel.org, szabolcs.nagy@arm.com,
-	tglx@linutronix.de, will@kernel.org, x86@kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 15/29] arm64: handle PKEY/POE faults
-Message-ID: <20240806134357.GA2017741@e124191.cambridge.arm.com>
-References: <20240503130147.1154804-1-joey.gouly@arm.com>
- <20240503130147.1154804-16-joey.gouly@arm.com>
- <ZqJ11TqIJq9oB+pt@e133380.arm.com>
- <20240801160110.GC841837@e124191.cambridge.arm.com>
- <ZrImMQ44dlrqCf6v@e133380.arm.com>
+	s=arc-20240116; t=1722953469; c=relaxed/simple;
+	bh=sFHOeVq86PRXcRWe6Xl+bM7PY69Ue0BYKxb104fH5cM=;
+	h=Subject:From:To:CC:References:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=lLOSg4kq+3t0WshmuK8iqLDhckgW3SRiuiK9qZPLXpQWx5nfFqOhlC08HcsfHWo4TRlP8RXLun8uwfWvBdoZC8z2von4fyc7vG6IWnCUpILW6VJavG2UJZ3zMm4Us7ldQGSONKwVaRkUbjeSgoNzkU0WmOW+lI0V2oapChoMrH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4WdZw34Xjxz1L9Hl;
+	Tue,  6 Aug 2024 22:10:43 +0800 (CST)
+Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
+	by mail.maildlp.com (Postfix) with ESMTPS id 050B11800A0;
+	Tue,  6 Aug 2024 22:11:03 +0800 (CST)
+Received: from [10.174.178.219] (10.174.178.219) by
+ kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 6 Aug 2024 22:11:01 +0800
+Subject: Re: [PATCH v3 05/19] KVM: arm64: vgic-debug: Use an xarray mark for
+ debug iterator
+From: Zenghui Yu <yuzenghui@huawei.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+CC: <kvmarm@lists.linux.dev>, Marc Zyngier <maz@kernel.org>, James Morse
+	<james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Eric Auger
+	<eric.auger@redhat.com>, <kvm@vger.kernel.org>
+References: <20240422200158.2606761-1-oliver.upton@linux.dev>
+ <20240422200158.2606761-6-oliver.upton@linux.dev>
+ <d034a9b8-34ae-923e-8e68-09d2de3cf079@huawei.com>
+ <178f30f7-edfd-78c5-f392-43cef1ef9baf@huawei.com>
+Message-ID: <3df0159d-efe8-f5fb-a99b-d53f1ed8058c@huawei.com>
+Date: Tue, 6 Aug 2024 22:11:01 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZrImMQ44dlrqCf6v@e133380.arm.com>
+In-Reply-To: <178f30f7-edfd-78c5-f392-43cef1ef9baf@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemm600007.china.huawei.com (7.193.23.208)
 
-On Tue, Aug 06, 2024 at 02:33:37PM +0100, Dave Martin wrote:
-> Hi,
+On 2024/8/6 20:39, Zenghui Yu wrote:
+> On 2024/8/6 17:23, Zenghui Yu wrote:
+> > The following diff seems work for me.
+> >
+> > diff --git a/arch/arm64/kvm/vgic/vgic-debug.c 
+> > b/arch/arm64/kvm/vgic/vgic-debug.c
+> > index 6faa1d16c9ce..f56f74c8cf54 100644
+> > --- a/arch/arm64/kvm/vgic/vgic-debug.c
+> > +++ b/arch/arm64/kvm/vgic/vgic-debug.c
+> > @@ -41,11 +41,16 @@ static void iter_next(struct kvm *kvm, struct vgic_state_iter *iter)
+> >  		return;
+> >  	}
+> > 
+> > +	iter->intid++;
 > 
-> On Thu, Aug 01, 2024 at 05:01:10PM +0100, Joey Gouly wrote:
-> > On Thu, Jul 25, 2024 at 04:57:09PM +0100, Dave Martin wrote:
-> > > On Fri, May 03, 2024 at 02:01:33PM +0100, Joey Gouly wrote:
-> > > > If a memory fault occurs that is due to an overlay/pkey fault, report that to
-> > > > userspace with a SEGV_PKUERR.
-> > > > 
-> > > > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-> > > > Cc: Catalin Marinas <catalin.marinas@arm.com>
-> > > > Cc: Will Deacon <will@kernel.org>
-> > > > ---
-> > > >  arch/arm64/include/asm/traps.h |  1 +
-> > > >  arch/arm64/kernel/traps.c      | 12 ++++++--
-> > > >  arch/arm64/mm/fault.c          | 56 ++++++++++++++++++++++++++++++++--
-> > > >  3 files changed, 64 insertions(+), 5 deletions(-)
-> > > > 
-> > > > diff --git a/arch/arm64/include/asm/traps.h b/arch/arm64/include/asm/traps.h
-> > > > index eefe766d6161..f6f6f2cb7f10 100644
-> > > > --- a/arch/arm64/include/asm/traps.h
-> > > > +++ b/arch/arm64/include/asm/traps.h
-> > > > @@ -25,6 +25,7 @@ try_emulate_armv8_deprecated(struct pt_regs *regs, u32 insn)
-> > > >  void force_signal_inject(int signal, int code, unsigned long address, unsigned long err);
-> > > >  void arm64_notify_segfault(unsigned long addr);
-> > > >  void arm64_force_sig_fault(int signo, int code, unsigned long far, const char *str);
-> > > > +void arm64_force_sig_fault_pkey(int signo, int code, unsigned long far, const char *str, int pkey);
-> > > >  void arm64_force_sig_mceerr(int code, unsigned long far, short lsb, const char *str);
-> > > >  void arm64_force_sig_ptrace_errno_trap(int errno, unsigned long far, const char *str);
-> > > >  
-> > > > diff --git a/arch/arm64/kernel/traps.c b/arch/arm64/kernel/traps.c
-> > > > index 215e6d7f2df8..1bac6c84d3f5 100644
-> > > > --- a/arch/arm64/kernel/traps.c
-> > > > +++ b/arch/arm64/kernel/traps.c
-> > > > @@ -263,16 +263,24 @@ static void arm64_show_signal(int signo, const char *str)
-> > > >  	__show_regs(regs);
-> > > >  }
-> > > >  
-> > > > -void arm64_force_sig_fault(int signo, int code, unsigned long far,
-> > > > -			   const char *str)
-> > > > +void arm64_force_sig_fault_pkey(int signo, int code, unsigned long far,
-> > > > +			   const char *str, int pkey)
-> > > >  {
-> > > >  	arm64_show_signal(signo, str);
-> > > >  	if (signo == SIGKILL)
-> > > >  		force_sig(SIGKILL);
-> > > > +	else if (code == SEGV_PKUERR)
-> > > > +		force_sig_pkuerr((void __user *)far, pkey);
-> > > 
-> > > Is signo definitely SIGSEGV here?  It looks to me like we can get in
-> > > here for SIGBUS, SIGTRAP etc.
-> > > 
-> > > si_codes are not unique between different signo here, so I'm wondering
-> > > whether this should this be:
-> > > 
-> > > 	else if (signo == SIGSEGV && code == SEGV_PKUERR)
-> > > 
-> > > ...?
-> > > 
-> > > 
-> > > >  	else
-> > > >  		force_sig_fault(signo, code, (void __user *)far);
-> > > >  }
-> > > >  
-> > > > +void arm64_force_sig_fault(int signo, int code, unsigned long far,
-> > > > +			   const char *str)
-> > > > +{
-> > > > +	arm64_force_sig_fault_pkey(signo, code, far, str, 0);
-> > > 
-> > > Is there a reason not to follow the same convention as elsewhere, where
-> > > -1 is passed for "no pkey"?
-> > > 
-> > > If we think this should never be called with signo == SIGSEGV &&
-> > > code == SEGV_PKUERR and no valid pkey but if it's messy to prove, then
-> > > maybe a WARN_ON_ONCE() would be worth it here?
-> > > 
-> > 
-> > Anshuman suggested to separate them out, which I did like below, I think that
-> > addresses your comments too?
-> > 
-> > diff --git arch/arm64/kernel/traps.c arch/arm64/kernel/traps.c
-> > index 215e6d7f2df8..49bac9ae04c0 100644
-> > --- arch/arm64/kernel/traps.c
-> > +++ arch/arm64/kernel/traps.c
-> > @@ -273,6 +273,13 @@ void arm64_force_sig_fault(int signo, int code, unsigned long far,
-> >                 force_sig_fault(signo, code, (void __user *)far);
-> >  }
-> >  
-> > +void arm64_force_sig_fault_pkey(int signo, int code, unsigned long far,
-> > +                          const char *str, int pkey)
-> > +{
-> > +       arm64_show_signal(signo, str);
-> > +       force_sig_pkuerr((void __user *)far, pkey);
-> > +}
+> [*]
+> 
+> > +	if (iter->intid == VGIC_NR_PRIVATE_IRQS &&
+> > +	    ++iter->vcpu_id < iter->nr_cpus)
+> > +		iter->intid = 0;
 > > +
-> >  void arm64_force_sig_mceerr(int code, unsigned long far, short lsb,
-> >                             const char *str)
-> >  {
-> > 
-> > diff --git arch/arm64/mm/fault.c arch/arm64/mm/fault.c
-> > index 451ba7cbd5ad..1ddd46b97f88 100644
-> > --- arch/arm64/mm/fault.c
-> > +++ arch/arm64/mm/fault.c
+> >  	/*
+> >  	 * Let the xarray drive the iterator after the last SPI, as the iterator
+> >  	 * has exhausted the sequentially-allocated INTID space.
+> >  	 */
+> > -	if (iter->intid >= (iter->nr_spis + VGIC_NR_PRIVATE_IRQS - 1)) {
+> > +	if (iter->intid >= (iter->nr_spis + VGIC_NR_PRIVATE_IRQS)) {
+> >  		if (iter->lpi_idx < iter->nr_lpis)
+> >  			xa_find_after(&dist->lpi_xa, &iter->intid,
 > 
-> (Guessing where this is means to apply, since there is no hunk header
-> or context...)
+> Just noticed that it's wrong to increase intid before xa_find_after(),
+> which would break the LPI case. Let me have a think...
 
-Sorry I had some other changes and just mashed the bits into a diff-looking-thing.
+So searching the LPI xarray and populating lpi_idx when the guest
+doesn't have LPI is pointless. We can fix the reported issue by dealing
+with the 'nr_lpis == 0' case directly, which might be the easiest
+approach. Let me know what do you think.
 
-> 
-> > 
-> > -               arm64_force_sig_fault(SIGSEGV, si_code, far, inf->name);
-> > +               if (si_code == SEGV_PKUERR)
-> > +                       arm64_force_sig_fault_pkey(SIGSEGV, si_code, far, inf->name, pkey);
-> 
-> Maybe drop the the signo and si_code argument?  This would mean that
-> arm64_force_sig_fault_pkey() can't be called with a signo/si_code
-> combination that makes no sense.
-> 
-> I think pkey faults are always going to be SIGSEGV/SEGV_PKUERR, right?
-> Or are there other combinations that can apply for these faults?
+diff --git a/arch/arm64/kvm/vgic/vgic-debug.c 
+b/arch/arm64/kvm/vgic/vgic-debug.c
+index bcbc8c986b1d..8177e5972ea8 100644
+--- a/arch/arm64/kvm/vgic/vgic-debug.c
++++ b/arch/arm64/kvm/vgic/vgic-debug.c
+@@ -45,7 +45,8 @@ static void iter_next(struct kvm *kvm, struct 
+vgic_state_iter *iter)
+  	 * Let the xarray drive the iterator after the last SPI, as the iterator
+  	 * has exhausted the sequentially-allocated INTID space.
+  	 */
+-	if (iter->intid >= (iter->nr_spis + VGIC_NR_PRIVATE_IRQS - 1)) {
++	if (iter->intid >= (iter->nr_spis + VGIC_NR_PRIVATE_IRQS - 1) &&
++	    iter->nr_lpis) {
+  		if (iter->lpi_idx < iter->nr_lpis)
+  			xa_find_after(&dist->lpi_xa, &iter->intid,
+  				      VGIC_LPI_MAX_INTID,
+@@ -112,7 +113,7 @@ static bool end_of_vgic(struct vgic_state_iter *iter)
+  	return iter->dist_id > 0 &&
+  		iter->vcpu_id == iter->nr_cpus &&
+  		iter->intid >= (iter->nr_spis + VGIC_NR_PRIVATE_IRQS) &&
+-		iter->lpi_idx > iter->nr_lpis;
++		(iter->lpi_idx > iter->nr_lpis || !iter->nr_lpis);
+  }
 
-Ah yes, I can simplify it even more, thanks.
+  static void *vgic_debug_start(struct seq_file *s, loff_t *pos)
 
-diff --git arch/arm64/kernel/traps.c arch/arm64/kernel/traps.c
-index 49bac9ae04c0..d9abb8b390c0 100644
---- arch/arm64/kernel/traps.c
-+++ arch/arm64/kernel/traps.c
-@@ -273,10 +273,9 @@ void arm64_force_sig_fault(int signo, int code, unsigned long far,
-                force_sig_fault(signo, code, (void __user *)far);
- }
- 
--void arm64_force_sig_fault_pkey(int signo, int code, unsigned long far,
--                          const char *str, int pkey)
-+void arm64_force_sig_fault_pkey(unsigned long far, const char *str, int pkey)
- {
--       arm64_show_signal(signo, str);
-+       arm64_show_signal(SIGSEGV, str);
-        force_sig_pkuerr((void __user *)far, pkey);
- }
-
-
-> 
-> 
-> > +               else
-> > +                       arm64_force_sig_fault(SIGSEGV, si_code, far, inf->name);
-> 
-> Otherwise yes, I think splitting things this way makes sense.
-> 
-> Cheers
-> ---Dave
-
+Thanks,
+Zenghui
