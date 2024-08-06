@@ -1,24 +1,24 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E1EA1BD516
-	for <kvmarm@lists.linux.dev>; Tue,  6 Aug 2024 10:04:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D254B15A4AF
+	for <kvmarm@lists.linux.dev>; Tue,  6 Aug 2024 10:36:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722938662; cv=none; b=GXz059u7xqvO4oDvwWuyNSLVEU8gaROcmiDqB9vWrLf6maofeir2Igo6/d2XPc9pvzkWoVFYh5Kd6iXGEaCBaZFkjjWm1mEVMJhHg3lubQAALpUJ8bT1vTVf+ZDkAeQEu2+MBrgNQDGBJdoYVz3eiF7ZFRUaiydfM4mk7aSyLJE=
+	t=1722940589; cv=none; b=DUwoCWbZJM6Sr1r1SGvDEdtLKW6c51cJxm0nBpBHhDrpBjd44om7hzUNVOKXjOO0yghNG8W3Zs59N0E80aF1BVAMpfoiXQLVFoqNV3DB2Kad6N6VmECpo5V7hbVxBjjPnrxhIepdcNUrFKzcsq13Jio8my7UgGf8FLNwHiu54Kc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722938662; c=relaxed/simple;
-	bh=Nz3cNR+Mt159G5KgVqt0YOrnk0UCpdEEE+jR7HnV+vI=;
+	s=arc-20240116; t=1722940589; c=relaxed/simple;
+	bh=vmwD1XCbDUA24A0XTc5V9rqqcZGJZlrTvlHytkE4w6A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UtoFtJyBh/O/XQkhuhApnJ1zsSjRuefooF3PD0ZKaUnz8sqSMBs7eE257PZZSjmr2r8q6CZN2eEZO1xBVZcCoSDPjA5bMdPETyq8m+mIM021k0TIZr5yroVa96UmCqDnuVVPP0MBDlm1mzF5zyZ9SFIGqFuiD1lKVhvusFAJnuU=
+	 Content-Type:Content-Disposition:In-Reply-To; b=oleuAXAX8tv+xSioGgTTOQw9pj1n5vgnpJ0QAJBtyh6s7T0rGxRwSWxWjniANikPDuo/YOALubaOmSt+hIxZGdeyjyIuZ8FyAnMgNxi37w8PSmOMqlQENxNgdt3laz78KCyjj9GDa8OPFVY5jtiZviGdxjhhjF6sOnCTrcmPSpg=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 82D53DA7;
-	Tue,  6 Aug 2024 03:04:44 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BE013FEC;
+	Tue,  6 Aug 2024 03:36:51 -0700 (PDT)
 Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C837F3F6A8;
-	Tue,  6 Aug 2024 03:04:15 -0700 (PDT)
-Date: Tue, 6 Aug 2024 11:04:13 +0100
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7792B3F6A8;
+	Tue,  6 Aug 2024 03:36:22 -0700 (PDT)
+Date: Tue, 6 Aug 2024 11:35:32 +0100
 From: Joey Gouly <joey.gouly@arm.com>
 To: Dave Martin <Dave.Martin@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
@@ -31,11 +31,13 @@ Cc: linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
 	oliver.upton@linux.dev, shuah@kernel.org, szabolcs.nagy@arm.com,
 	tglx@linutronix.de, will@kernel.org, x86@kernel.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 04/29] arm64: disable trapping of POR_EL0 to EL2
-Message-ID: <20240806100413.GE841837@e124191.cambridge.arm.com>
+Subject: Re: [PATCH v4 18/29] arm64: add POE signal support
+Message-ID: <20240806103532.GA1986436@e124191.cambridge.arm.com>
 References: <20240503130147.1154804-1-joey.gouly@arm.com>
- <20240503130147.1154804-5-joey.gouly@arm.com>
- <ZqJyzZB8Y8GLzYIA@e133380.arm.com>
+ <20240503130147.1154804-19-joey.gouly@arm.com>
+ <ZqJ2knGETfS4nfEA@e133380.arm.com>
+ <20240801155441.GB841837@e124191.cambridge.arm.com>
+ <Zqu2VYELikM5LFY/@e133380.arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -44,77 +46,117 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZqJyzZB8Y8GLzYIA@e133380.arm.com>
+In-Reply-To: <Zqu2VYELikM5LFY/@e133380.arm.com>
 
-On Thu, Jul 25, 2024 at 04:44:13PM +0100, Dave Martin wrote:
-> Hi,
-> 
-> On Fri, May 03, 2024 at 02:01:22PM +0100, Joey Gouly wrote:
-> > Allow EL0 or EL1 to access POR_EL0 without being trapped to EL2.
+On Thu, Aug 01, 2024 at 05:22:45PM +0100, Dave Martin wrote:
+> On Thu, Aug 01, 2024 at 04:54:41PM +0100, Joey Gouly wrote:
+> > On Thu, Jul 25, 2024 at 05:00:18PM +0100, Dave Martin wrote:
+> > > Hi,
+> > > 
+> > > On Fri, May 03, 2024 at 02:01:36PM +0100, Joey Gouly wrote:
+> > > > Add PKEY support to signals, by saving and restoring POR_EL0 from the stackframe.
+> > > > 
+> > > > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+> > > > Cc: Catalin Marinas <catalin.marinas@arm.com>
+> > > > Cc: Will Deacon <will@kernel.org>
+> > > > Reviewed-by: Mark Brown <broonie@kernel.org>
+> > > > Acked-by: Szabolcs Nagy <szabolcs.nagy@arm.com>
+> > > > ---
+> > > >  arch/arm64/include/uapi/asm/sigcontext.h |  7 ++++
+> > > >  arch/arm64/kernel/signal.c               | 52 ++++++++++++++++++++++++
+> > > >  2 files changed, 59 insertions(+)
+> > > > 
+> > > > diff --git a/arch/arm64/include/uapi/asm/sigcontext.h b/arch/arm64/include/uapi/asm/sigcontext.h
+> > > > index 8a45b7a411e0..e4cba8a6c9a2 100644
+> > > > --- a/arch/arm64/include/uapi/asm/sigcontext.h
+> > > > +++ b/arch/arm64/include/uapi/asm/sigcontext.h
+> > > 
+> > > [...]
+> > > 
+> > > > @@ -980,6 +1013,13 @@ static int setup_sigframe_layout(struct rt_sigframe_user_layout *user,
+> > > >  			return err;
+> > > >  	}
+> > > >  
+> > > > +	if (system_supports_poe()) {
+> > > > +		err = sigframe_alloc(user, &user->poe_offset,
+> > > > +				     sizeof(struct poe_context));
+> > > > +		if (err)
+> > > > +			return err;
+> > > > +	}
+> > > > +
+> > > >  	return sigframe_alloc_end(user);
+> > > >  }
+> > > >  
+> > > > @@ -1020,6 +1060,15 @@ static int setup_sigframe(struct rt_sigframe_user_layout *user,
+> > > >  		__put_user_error(current->thread.fault_code, &esr_ctx->esr, err);
+> > > >  	}
+> > > >  
+> > > > +	if (system_supports_poe() && err == 0 && user->poe_offset) {
+> > > > +		struct poe_context __user *poe_ctx =
+> > > > +			apply_user_offset(user, user->poe_offset);
+> > > > +
+> > > > +		__put_user_error(POE_MAGIC, &poe_ctx->head.magic, err);
+> > > > +		__put_user_error(sizeof(*poe_ctx), &poe_ctx->head.size, err);
+> > > > +		__put_user_error(read_sysreg_s(SYS_POR_EL0), &poe_ctx->por_el0, err);
+> > > > +	}
+> > > > +
+> > > 
+> > > Does the AArch64 procedure call standard say anything about whether
+> > > POR_EL0 is caller-saved?
 > > 
-> > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-> > Cc: Catalin Marinas <catalin.marinas@arm.com>
-> > Cc: Will Deacon <will@kernel.org>
-> > Acked-by: Catalin Marinas <catalin.marinas@arm.com>
-> > ---
-> >  arch/arm64/include/asm/el2_setup.h | 10 +++++++++-
-> >  1 file changed, 9 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
-> > index b7afaa026842..df5614be4b70 100644
-> > --- a/arch/arm64/include/asm/el2_setup.h
-> > +++ b/arch/arm64/include/asm/el2_setup.h
-> > @@ -184,12 +184,20 @@
-> >  .Lset_pie_fgt_\@:
-> >  	mrs_s	x1, SYS_ID_AA64MMFR3_EL1
-> >  	ubfx	x1, x1, #ID_AA64MMFR3_EL1_S1PIE_SHIFT, #4
-> > -	cbz	x1, .Lset_fgt_\@
-> > +	cbz	x1, .Lset_poe_fgt_\@
-> >  
-> >  	/* Disable trapping of PIR_EL1 / PIRE0_EL1 */
-> >  	orr	x0, x0, #HFGxTR_EL2_nPIR_EL1
-> >  	orr	x0, x0, #HFGxTR_EL2_nPIRE0_EL1
-> >  
-> > +.Lset_poe_fgt_\@:
-> > +	mrs_s	x1, SYS_ID_AA64MMFR3_EL1
-> > +	ubfx	x1, x1, #ID_AA64MMFR3_EL1_S1POE_SHIFT, #4
-> > +	cbz	x1, .Lset_fgt_\@
-> > +
-> > +	/* Disable trapping of POR_EL0 */
-> > +	orr	x0, x0, #HFGxTR_EL2_nPOR_EL0
+> > I asked about this, and it doesn't say anything and they don't plan on it,
+> > since it's very application specific.
 > 
-> Do I understand correctly that this is just to allow the host to access
-> its own POR_EL0, before (or unless) KVM starts up?
-
-Yup.
-
+> Right.  I think that confirms that we don't absolutely need to preserve
+> POR_EL0, because if compiler-generated code was allowed to fiddle with
+> this and not clean up after itself, the PCS would have to document this.
 > 
-> KVM always overrides all the EL2 trap controls while running a guest,
-> right?  We don't want this bit still set when running in a guest just
-> because KVM doesn't know about POE yet.
+> > > 
+> > > <bikeshed>
+> > > 
+> > > In theory we could skip saving this register if it is already
+> > > POR_EL0_INIT (which it often will be), and if the signal handler is not
+> > > supposed to modify and leave the modified value in the register when
+> > > returning.
+> > > 
+> > > The complexity of the additional check my be a bit pointless though,
+> > > and the the handler might theoretically want to change the interrupted
+> > > code's POR_EL0 explicitly, which would be complicated if POE_MAGIC is
+> > > sometimes there and sometimes not.
+> > > 
+> > > </bikeshed>
+> > > 
+> > I think trying to skip/optimise something here would be more effort than any
+> > possible benefits!
+> 
+> Actually, having thought about this some more I think that only dumping
+> this register if != POR_EL0_INIT may be right right thing to do.
+> 
+> This would mean that old binary would stacks never see poe_context in
+> the signal frame, and so will never experience unexpected stack
+> overruns (at least, not due solely to the presence of this feature).
 
-KVM currently unconditionally traps POE regs currently, this series makes that
-conditional.
+They can already see things they don't expect, like FPMR that was added
+recently.
 
 > 
-> (Hopefully this follows naturally from the way the KVM code works, but
-> my KVM-fu is a bit rusty.)
-> 
-> Also, what about POR_EL1?  Do we have to reset that to something sane
-> (and so untrap it here), or it is sufficient if we never turn on POE
-> support in the host, via TCR2_EL1.POE?
+> POE-aware signal handlers have to do something fiddly and nonportable
+> to obtain the original value of POR_EL0 regardless, so requiring them
+> do handle both cases (present in sigframe and absent) doesn't seem too
+> onerous to me.
 
-Since the host isn't using it, we don't need to reset it. It will be reset to an unknown value for guests.
-
-In patch 7:
-
-+	{ SYS_DESC(SYS_POR_EL1), NULL, reset_unknown, POR_EL1 },
+If the signal handler wanted to modify the value, from the default, wouldn't it
+need to mess around with the sig context stuff, to allocate some space for
+POR_EL0, such that the kernel would restore it properly? (If that's even
+possible).
 
 > 
-> [...]
+> 
+> Do you think this approach would break any known use cases?
+
+Not sure.
+
 > 
 > Cheers
 > ---Dave
-
-Thanks,
-Joey
+> 
