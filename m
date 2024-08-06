@@ -1,38 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D08FB179665;
-	Tue,  6 Aug 2024 23:10:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0888217A58F;
+	Tue,  6 Aug 2024 23:10:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722985804; cv=none; b=pH0Lzjnq3Ddh/nI5lVy5uC75DtnxXHq6QmNyhrr31jFHWSjjuPZtgbr0Nqesv7JhF+uzUWA9lG9Q2zigcL6gOX91o/m/oKEV2U03gtjNZ1GkrfZcAA/ALdPCcghNWEXi9+FG9QM3dl+QxjcXeNTCrFY37FU9w88RYocP9L6Un/c=
+	t=1722985804; cv=none; b=nukqPQ3qSBLo1h87TPZWKbOuYXojSrH1nc/FXcsG0/z/5yqTheY0G5NVNlV9qIrMWQyrvRTMMdeR68TftdmNL18jWztCrh72bB1Jk62cueDB64SxAHn20+YtKUSGfOEzcfCOquOuvayFBH7TJl+1JNdD4PpX1DlklwnsxFuW4tU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1722985804; c=relaxed/simple;
-	bh=D5CNbSA2nd8+8BFJ/Lxf4zZjzdHe9mqU7tf5klT3gu0=;
+	bh=9e5HihbYrzW+yqMwPJuNIyYK7+g4nznwrO87MB3vxcw=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=tzF1LcxGRmzZqfUpN0uUk7jTdBKXsnQCetPmJLFe1+bJ9vVcLPotZFbuTm0a085yytpZBEf1hsG0q3gSgz+byb0YiNwfhb1E4FGw2/pZlGnYd5HHa5GpHPQWVcpbbXaVgVsnAt8SmoPwVIaG91yS4UwUTwR4FfM6UhlM9b/33K0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fOMwWeuX; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=qI7Rn6LOKBFDvNFvtysZ6UBA4/eeDNxBgbMqYlEpXzOAzZ0x9wGsmbj6b8LXgN1AQMjpXhyeMhFRHtgyvTKA/zV3kCN0ds2pAkGebzxgaO9aZrk74lDahdKZX44E/7Q91mcIxAiC0Ip08EPH7D3Z5XKGJuhibXkjBnOONmlWv1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o+lQ8BSo; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fOMwWeuX"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 331BDC4AF63;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o+lQ8BSo"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id AC059C4DDF2;
 	Tue,  6 Aug 2024 23:10:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1722985803;
-	bh=D5CNbSA2nd8+8BFJ/Lxf4zZjzdHe9mqU7tf5klT3gu0=;
+	bh=9e5HihbYrzW+yqMwPJuNIyYK7+g4nznwrO87MB3vxcw=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=fOMwWeuX+6Lfvtx14e8n+SexhkQo577QRdYpNq9mh/HWXy2DjmUULeQdEJJrIovoE
-	 4d52aBfFcg/yKGYahmwaE4dwPQjUrghawQhWXyDJ5WW/fZz8yjfflghGrX2ymxjf/9
-	 UE2FKzdrsmYjDwZiau3Z0f4L3w6x0WaVYJc7HKru0bj+ALIaNZdjXYr8QpDabbF4oS
-	 rvxa8WAvV0gKqwLm+mmlC/cmHUk+lR1bEd9Fu375CaXb4Blquf5Ep1P6d4njo6wL+s
-	 pRjUvs3oJeJtI0h2h9ISbF5TaJrz9+zbtPn4QfswfOCDJTLvwo/Mi3QYIPUiitzfhK
-	 olW0RHxF3r0qA==
+	b=o+lQ8BSoR4Ju/qZlqGOlRz8W2f4q625HDTETwcqpRBjBIpAHGmQ4EhMKKTCrVreRQ
+	 cIij2h8u3Uj6gXm5CHjB8ZQimA5YafQ9XWOV2o1uu3tZBWOvgIMFI8AFfFiJ0dI92M
+	 aoytBlmDJanRB8H64UdAlaPbXPnzN4D/Wc3OFyrsX5han8E3MgpLOUmmDDLWEAHz9y
+	 p+5O8jYXU7kKMItQ7ePyHdVWGORIV+pm5SYHGS28lg/JmvXwTxkuGKyTZ97qEWWWqF
+	 AjIMrzZ4mMs+L8E3mvHZQYOkKmBB3WEHGFQ6jwmqa8mALLsYxxk4D8WrcyhqZtG2kx
+	 h3F7SMY6psQPQ==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2813FC49EA1;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C3E3C52D7C;
 	Tue,  6 Aug 2024 23:10:03 +0000 (UTC)
 From: Daniel Gomez via B4 Relay <devnull+da.gomez.samsung.com@kernel.org>
-Date: Wed, 07 Aug 2024 01:09:20 +0200
-Subject: [PATCH 06/12] selinux/genheaders: include bitsperlong and
- posix_types headers
+Date: Wed, 07 Aug 2024 01:09:24 +0200
+Subject: [PATCH 10/12] scripts/mod: add byteswap support
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -41,7 +40,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240807-macos-build-support-v1-6-4cd1ded85694@samsung.com>
+Message-Id: <20240807-macos-build-support-v1-10-4cd1ded85694@samsung.com>
 References: <20240807-macos-build-support-v1-0-4cd1ded85694@samsung.com>
 In-Reply-To: <20240807-macos-build-support-v1-0-4cd1ded85694@samsung.com>
 To: Masahiro Yamada <masahiroy@kernel.org>, 
@@ -76,11 +75,11 @@ Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
  "Daniel Gomez (Samsung)" <d+samsung@kruces.com>, gost.dev@samsung.com, 
  Daniel Gomez <da.gomez@samsung.com>
 X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1722985800; l=952;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1722985800; l=5000;
  i=da.gomez@samsung.com; s=20240621; h=from:subject:message-id;
- bh=zkjqCDDWwxxcXmEm+jW0QannFSOP4w7DOpEHzeqzznI=;
- b=KS1HzePsm7adJO0+ulRuXmL0XzGu396kl5PQIL/Y+Ha4sBVswReLg26gtWlRY9ulp9HZfXTef
- mC9Dy8SO9GADeLaEPqz0n4cBifOqORRoKLP9Y+NObQyFVh4zLY67qbh
+ bh=Qowyf7kXi1f6DRNle64eE+hm/m7HuihHCLdS1ou6yWA=;
+ b=XP/CA3ITn/u6BrAjNNPHqWBAlVrrGINO1YjcxsqBUDayPo6aLVaS+rjtkAXOWZpLD9D5LKteD
+ curVBFT06iiCK+55uBnnvP0sGKgQlV/aIMRgcPJ3CQmwNbgNCAfx2DS
 X-Developer-Key: i=da.gomez@samsung.com; a=ed25519;
  pk=BqYk31UHkmv0WZShES6pIZcdmPPGay5LbzifAdZ2Ia4=
 X-Endpoint-Received: by B4 Relay for da.gomez@samsung.com/20240621 with
@@ -90,28 +89,130 @@ Reply-To: da.gomez@samsung.com
 
 From: Daniel Gomez <da.gomez@samsung.com>
 
-The genheaders requires the bitsperlong.h and posix_types.h headers.
-To ensure these headers are found during compilation on macOS hosts,
-add usr/include to HOST_EXTRACFLAGS in the genheaders Makefile. This
-adjustment allows the compiler to locate all necessary headers when they
-are not available by default on macOS.
+macOS hosts do not include byteswap.h header required for modpost
+objects. Add a copy of the string/byteswap.h from the GNU C Library
+(glibc), version glibc-2.40 into include/byteswap and update the modpost
+Makefile to include the library.
+
+Remove the following headers from glibc:
+
+diff --git a/include/byteswap/byteswap.h b/include/byteswap/byteswap.h
+index 66efb8fc4327..d27dd5e4bc6a 100644
+--- a/include/byteswap/byteswap.h
++++ b/include/byteswap/byteswap.h
+@@ -19,11 +19,6 @@
+ #ifndef _BYTESWAP_H
+ #define _BYTESWAP_H    1
+
+-#include <features.h>
+-
+-/* Get the machine specific, optimized definitions.  */
+-#include <bits/byteswap.h>
+-
+
+ /* The following definitions must all be macros, otherwise some
+    of the possible optimizations are not possible.  */
+
+Fixes build error for macOS:
+
+$SUBARCH is [arm64]
+  HOSTCC  scripts/mod/modpost.o
+  HOSTCC  scripts/mod/sumversion.o
+  HOSTCC  scripts/mod/symsearch.o
+  HOSTCC  scripts/mod/file2alias.o
+In file included from scripts/mod/symsearch.c:8:
+scripts/mod/modpost.h:2:10: fatal error: 'byteswap.h' file not found
+         ^~~~~~~~~~~~
+In file included from scripts/mod/sumversion.c:11:
+scripts/mod/modpost.h:2:10: fatal error: 'byteswap.h' file not found
+         ^~~~~~~~~~~~
+In file included from scripts/mod/modpost.c:23:
+scripts/mod/modpost.h:2:10: fatal error: 'byteswap.h' file not found
+         ^~~~~~~~~~~~
+1 error generated.
+make[1]: *** [scripts/Makefile.host:133: scripts/mod/symsearch.o] Error 1
+make[1]: *** Waiting for unfinished jobs....
+1 error generated.
+In file included from scripts/mod/file2alias.c:15:
+scripts/mod/modpost.h:2:10: fatal error: 'byteswap.h' file not found
+         ^~~~~~~~~~~~
+make[1]: *** [scripts/Makefile.host:133: scripts/mod/sumversion.o] Error 1
+1 error generated.
+make[1]: *** [scripts/Makefile.host:133: scripts/mod/modpost.o] Error 1
+1 error generated.
+make[1]: *** [scripts/Makefile.host:133: scripts/mod/file2alias.o] Error 1
+make: *** [Makefile:1191: prepare0] Error 2
+error: Recipe `kernel-build` failed with exit code 2
+
+Fixes: bd78c9d71420 ("modpost: define TO_NATIVE() using bswap_*
+functions") build error for macOS.
 
 Signed-off-by: Daniel Gomez <da.gomez@samsung.com>
 ---
- scripts/selinux/genheaders/Makefile | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ include/byteswap/byteswap.h | 35 +++++++++++++++++++++++++++++++++++
+ scripts/mod/Makefile        |  8 ++++----
+ 2 files changed, 39 insertions(+), 4 deletions(-)
 
-diff --git a/scripts/selinux/genheaders/Makefile b/scripts/selinux/genheaders/Makefile
-index 1faf7f07e8db..017149c90f8e 100644
---- a/scripts/selinux/genheaders/Makefile
-+++ b/scripts/selinux/genheaders/Makefile
-@@ -2,4 +2,5 @@
- hostprogs-always-y += genheaders
- HOST_EXTRACFLAGS += \
- 	-I$(srctree)/include/uapi -I$(srctree)/include \
--	-I$(srctree)/security/selinux/include
-+	-I$(srctree)/security/selinux/include \
-+	-I$(srctree)/usr/include
+diff --git a/include/byteswap/byteswap.h b/include/byteswap/byteswap.h
+new file mode 100644
+index 000000000000..d27dd5e4bc6a
+--- /dev/null
++++ b/include/byteswap/byteswap.h
+@@ -0,0 +1,35 @@
++/* Swap byte order for 16, 32 and 64 bit values
++   Copyright (C) 1997-2024 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, see
++   <https://www.gnu.org/licenses/>.  */
++
++#ifndef _BYTESWAP_H
++#define _BYTESWAP_H	1
++
++
++/* The following definitions must all be macros, otherwise some
++   of the possible optimizations are not possible.  */
++
++/* Return a value with both bytes in the 16 bit argument swapped.  */
++#define bswap_16(x) __bswap_16 (x)
++
++/* Return a value with all bytes in the 32 bit argument swapped.  */
++#define bswap_32(x) __bswap_32 (x)
++
++/* Return a value with all bytes in the 64 bit argument swapped.  */
++#define bswap_64(x) __bswap_64 (x)
++
++#endif /* byteswap.h */
+diff --git a/scripts/mod/Makefile b/scripts/mod/Makefile
+index 98b4cd8cc7e6..f398dcddef58 100644
+--- a/scripts/mod/Makefile
++++ b/scripts/mod/Makefile
+@@ -8,10 +8,10 @@ modpost-objs	:= modpost.o file2alias.o sumversion.o symsearch.o
+ 
+ devicetable-offsets-file := devicetable-offsets.h
+ 
+-HOSTCFLAGS_modpost.o = -I$(srctree)/include/elf
+-HOSTCFLAGS_file2alias.o = -I$(srctree)/include/elf
+-HOSTCFLAGS_sumversion.o = -I$(srctree)/include/elf
+-HOSTCFLAGS_symsearch.o = -I$(srctree)/include/elf
++HOSTCFLAGS_modpost.o = -I$(srctree)/include/elf -I$(srctree)/include/byteswap
++HOSTCFLAGS_file2alias.o = -I$(srctree)/include/elf -I$(srctree)/include/byteswap
++HOSTCFLAGS_sumversion.o = -I$(srctree)/include/elf -I$(srctree)/include/byteswap
++HOSTCFLAGS_symsearch.o = -I$(srctree)/include/elf -I$(srctree)/include/byteswap
+ HOSTCFLAGS_mk_elfconfig.o = -I$(srctree)/include/elf
+ 
+ $(obj)/$(devicetable-offsets-file): $(obj)/devicetable-offsets.s FORCE
 
 -- 
 Git-146)
