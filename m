@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE456155307;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFC6A17997D;
 	Tue,  6 Aug 2024 23:10:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722985803; cv=none; b=PdvZhebzZiHCIyfEm8x40bX5BXvUSbBx6OZCkftblVXutxl2XqyAENfetw8vAQpn5+nMA6RoiK9AClRGr/gH96IA5LIuu5duImDA6gsA79sfm7buZXD6x8Zu+8h6jy7mS4d93lesh6ZfhyGLRRZMTm1xd1eyuFhcGlg0c1zk7LU=
+	t=1722985803; cv=none; b=oGESd9B4GfRNEkRtkvlZQ24i/JHkhhP4ZqJ0gb9oZeVEJjorVbXe8sdUy+c4II0mzFeUHDxR2Ep7O4D+AFoAqELXeCJUzWYboGqm3JZbySMrw9ad6F8f+hpXQIs5Z3renOYSyzW/97WWIHdJAz31xSyCR+nKCfWjhbAWp4D6Z1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1722985803; c=relaxed/simple;
-	bh=+He+gtxBEfl84UV5f19qlMQcV5CCfyJDOMqxiVvtbII=;
+	bh=v+3D4lb213MioskawpwIVm0n1gy9X7rS+9rTnnk/THc=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=uWkOutlbkYMrhYEo8I0miQ7F35lNINt0E4WrBP2hxDcMth6l9CK0QB/yJslfQPpPELrYrHDMXBbueMbXO409QCL4qFJ8NhIRX5NRmJMheKRNR9ECKQGPw+BXddBeygfixQAgm9SBW/0HsjUIcPbKNv8K682WFZFO7ianF/MASsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aLbLyJxt; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=gF4CxP6uTVJ8FJjcxGVcv7XYihEzMnoeApdpa7Rq10rH1fi9a8fj6YV85sLtpA4TciHj9w0Uh+y7PwWxgGQg5/5Sv1k1MXBdKYIxpwWkz9f17ttUQZ6Gt11OrS4L+n7qU8n2a1Z+z0fb0JM0oWYmaXsx7JgQzEpmlVJddZKYnOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UcbTcNUC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aLbLyJxt"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 21795C4AF52;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UcbTcNUC"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4E0C3C4DDE3;
 	Tue,  6 Aug 2024 23:10:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1722985803;
-	bh=+He+gtxBEfl84UV5f19qlMQcV5CCfyJDOMqxiVvtbII=;
+	bh=v+3D4lb213MioskawpwIVm0n1gy9X7rS+9rTnnk/THc=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=aLbLyJxtYoDu5TGf0hBkTczCnA5tXznd/CqtRPoDueECJQqPixBgxrK1R6VJU4ALQ
-	 wHZifyZwJpUqkcXzqh6ZTUeJXh9uE8lwd+OxU3dU99uZ56ZTSP+q0vSy4QSJktfZ2x
-	 /tZyFRY2dnCmPxOfo9NVMRqfVfcLqsZZVeXzBKgqj3BArSKVY8my2wx9g9QVJssTD6
-	 gNmwARWq1WXchHb2JkQ5HlE7cifTbfItuWLYcMPM7rUweSS21IVX5l3qCGZP/bNc0S
-	 UUfSWuCWYu8/aAQmFYejLcdLA2FzilLeIF0l4Ry824CqiUIGQZq5bXm3UEaPJIRGnc
-	 RI9UhDJq7BmUw==
+	b=UcbTcNUCEVVl6oxvmOWw2BiT+ElArILeG1oAnslTRxcJ2Gi/SKYGJ3ADXB4KM/kSD
+	 7zI3tsZhf2PmkVPU5R+uYhWu/TEhYxpocso0dOHhwOgkKklRBv6LdbJ77P9RHQXtaF
+	 ApdZKxzrcB/pDn5/1+TiL5lJPZhercu5kvwmQ0W8EooGSrDr+D92E/CzUSfxMOUrFX
+	 UnqvanuR+aWSDbCHLTEQEpKrHqWGS7wwJWna8YEFXu+DaJ5DlqM+KpV8TH56nbPlBR
+	 YxA2dAU+3VQstKQl5GgOjBjoX8itT3D0ZB6tVaFxDyGYk1zRBxPiivAZr6tuDRFo0o
+	 XwlIForxD80Qw==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13D5DC52D7D;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40075C52D6F;
 	Tue,  6 Aug 2024 23:10:03 +0000 (UTC)
 From: Daniel Gomez via B4 Relay <devnull+da.gomez.samsung.com@kernel.org>
-Date: Wed, 07 Aug 2024 01:09:19 +0200
-Subject: [PATCH 05/12] accessiblity/speakup: genmap and makemapdata require
- linux/version.h
+Date: Wed, 07 Aug 2024 01:09:21 +0200
+Subject: [PATCH 07/12] selinux/mdp: include bitsperlong and posix_types
+ headers
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -41,7 +41,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240807-macos-build-support-v1-5-4cd1ded85694@samsung.com>
+Message-Id: <20240807-macos-build-support-v1-7-4cd1ded85694@samsung.com>
 References: <20240807-macos-build-support-v1-0-4cd1ded85694@samsung.com>
 In-Reply-To: <20240807-macos-build-support-v1-0-4cd1ded85694@samsung.com>
 To: Masahiro Yamada <masahiroy@kernel.org>, 
@@ -76,11 +76,11 @@ Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
  "Daniel Gomez (Samsung)" <d+samsung@kruces.com>, gost.dev@samsung.com, 
  Daniel Gomez <da.gomez@samsung.com>
 X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1722985800; l=1496;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1722985800; l=995;
  i=da.gomez@samsung.com; s=20240621; h=from:subject:message-id;
- bh=D/b2l/ogAQ53pGShlNQZ21O8ea5Cj2WGeFYeW0o1yvE=;
- b=R4qyiYP+OSMcXzv9ooR7/t6MnLqProoNVp1nlUQ8nIYUNbvpy7GzUbYP6W8c5xRb6Xs1z5qrf
- NNsKqstejrNCJU8W3NSEixOEN8GSNjVGvk+o0yOAwyi6oB306luifET
+ bh=amef7shqe+/pJSAuEYnttZteE9emVf2D8FOtG6wVLQs=;
+ b=eEEO2XdHsOnjD70zsmSUCRd3hvX9udH5ozkEUFwVyjIqPSuD7NI4opv6Ndry8dslEYtsT1ENp
+ 5rF5WjiBGzLAJoGrJzqo1wNi95MqafOkOKXvTlY0lrf9E5wgwW5kr+C
 X-Developer-Key: i=da.gomez@samsung.com; a=ed25519;
  pk=BqYk31UHkmv0WZShES6pIZcdmPPGay5LbzifAdZ2Ia4=
 X-Endpoint-Received: by B4 Relay for da.gomez@samsung.com/20240621 with
@@ -90,46 +90,30 @@ Reply-To: da.gomez@samsung.com
 
 From: Daniel Gomez <da.gomez@samsung.com>
 
-Both genmap and makemapdata require the linux/version.h header. To
-ensure successful builds on macOS hosts, make sure usr/include is
-included in the HOSTCFLAGS.
-
-Fixes errors:
-drivers/accessibility/speakup/genmap.c:13:10: fatal error: 'linux/version.h' file not found
-   13 | #include <linux/version.h>
-      |          ^~~~~~~~~~~~~~~~~
-1 error generated.
-
-drivers/accessibility/speakup/makemapdata.c:13:10: fatal error: 'linux/version.h' file not found
-   13 | #include <linux/version.h>
-      |          ^~~~~~~~~~~~~~~~~
-1 error generated.
+The mdp object requires the bitsperlong.h and posix_types.h headers.
+To ensure these headers are found during compilation on macOS hosts,
+add usr/include to HOST_EXTRACFLAGS in the genheaders Makefile. This
+adjustment allows the compiler to locate all necessary headers when they
+are not available by default on macOS.
 
 Signed-off-by: Daniel Gomez <da.gomez@samsung.com>
 ---
- drivers/accessibility/speakup/Makefile | 2 ++
- 1 file changed, 2 insertions(+)
+ scripts/selinux/mdp/Makefile | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/accessibility/speakup/Makefile b/drivers/accessibility/speakup/Makefile
-index 6f6a83565c0d..74ee0c31370f 100644
---- a/drivers/accessibility/speakup/Makefile
-+++ b/drivers/accessibility/speakup/Makefile
-@@ -38,6 +38,7 @@ clean-files := mapdata.h speakupmap.h
- # Generate mapdata.h from headers
- hostprogs += makemapdata
- makemapdata-objs := makemapdata.o
-+HOSTCFLAGS_makemapdata.o += -I$(srctree)/usr/include
+diff --git a/scripts/selinux/mdp/Makefile b/scripts/selinux/mdp/Makefile
+index d61058ddd15c..19ab8682ae3d 100644
+--- a/scripts/selinux/mdp/Makefile
++++ b/scripts/selinux/mdp/Makefile
+@@ -2,6 +2,7 @@
+ hostprogs-always-y += mdp
+ HOST_EXTRACFLAGS += \
+ 	-I$(srctree)/include/uapi -I$(srctree)/include \
+-	-I$(srctree)/security/selinux/include -I$(objtree)/include
++	-I$(srctree)/security/selinux/include -I$(objtree)/include \
++	-I$(srctree)/usr/include
  
- quiet_cmd_mkmap = MKMAP   $@
-       cmd_mkmap = TOPDIR=$(srctree) \
-@@ -51,6 +52,7 @@ $(obj)/mapdata.h: $(obj)/makemapdata
- # Generate speakupmap.h from mapdata.h
- hostprogs += genmap
- genmap-objs := genmap.o
-+HOSTCFLAGS_genmap.o += -I$(srctree)/usr/include
- $(obj)/genmap.o: $(obj)/mapdata.h
- 
- quiet_cmd_genmap = GENMAP  $@
+ clean-files	:= policy.* file_contexts
 
 -- 
 Git-146)
