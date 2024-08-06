@@ -1,165 +1,120 @@
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 358221607BD
-	for <kvmarm@lists.linux.dev>; Tue,  6 Aug 2024 09:23:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E1EA1BD516
+	for <kvmarm@lists.linux.dev>; Tue,  6 Aug 2024 10:04:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722936239; cv=none; b=ARIkM4pJ+svclQuRGlX0emE3ImmPQCIwvV/KrrpAqGPp3btIPGECyrrkRx7hLnTpTpnBJslfjY05ns17Tj4/xmNfazulu6A0amaoVWG8LytmBFmPLI4LdcySyt0dofczIo9MlzSfLDArf3iukpGLIgrqDj79Purfg2/8hu0s+xw=
+	t=1722938662; cv=none; b=GXz059u7xqvO4oDvwWuyNSLVEU8gaROcmiDqB9vWrLf6maofeir2Igo6/d2XPc9pvzkWoVFYh5Kd6iXGEaCBaZFkjjWm1mEVMJhHg3lubQAALpUJ8bT1vTVf+ZDkAeQEu2+MBrgNQDGBJdoYVz3eiF7ZFRUaiydfM4mk7aSyLJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722936239; c=relaxed/simple;
-	bh=zsDFLloGSiIW6aScJ2fJ7R0B6ARsNB5xRfftH8XEHwg=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=qUhEwz6PYl/AxgirKzVFMKanADgW8PBVYRg9Xpunxk2+psOZs7Zsuu8U7TeQi9OAsSmkyDqdgdVg4692bcghZnjw98pRVabK1VN3NO/7QD8SvRowm2YBCVxFsD+7HBHMy2waWKoDdKGNKTkaEmFCDUXjL/I+m0ubdlHaq11wIK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4WdSWp1W4dzpSt1;
-	Tue,  6 Aug 2024 17:22:46 +0800 (CST)
-Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
-	by mail.maildlp.com (Postfix) with ESMTPS id AE7121400D8;
-	Tue,  6 Aug 2024 17:23:54 +0800 (CST)
-Received: from [10.174.178.219] (10.174.178.219) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 6 Aug 2024 17:23:53 +0800
-Subject: Re: [PATCH v3 05/19] KVM: arm64: vgic-debug: Use an xarray mark for
- debug iterator
-To: Oliver Upton <oliver.upton@linux.dev>
-CC: <kvmarm@lists.linux.dev>, Marc Zyngier <maz@kernel.org>, James Morse
-	<james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Eric Auger
-	<eric.auger@redhat.com>, <kvm@vger.kernel.org>
-References: <20240422200158.2606761-1-oliver.upton@linux.dev>
- <20240422200158.2606761-6-oliver.upton@linux.dev>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <d034a9b8-34ae-923e-8e68-09d2de3cf079@huawei.com>
-Date: Tue, 6 Aug 2024 17:23:52 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
+	s=arc-20240116; t=1722938662; c=relaxed/simple;
+	bh=Nz3cNR+Mt159G5KgVqt0YOrnk0UCpdEEE+jR7HnV+vI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UtoFtJyBh/O/XQkhuhApnJ1zsSjRuefooF3PD0ZKaUnz8sqSMBs7eE257PZZSjmr2r8q6CZN2eEZO1xBVZcCoSDPjA5bMdPETyq8m+mIM021k0TIZr5yroVa96UmCqDnuVVPP0MBDlm1mzF5zyZ9SFIGqFuiD1lKVhvusFAJnuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 82D53DA7;
+	Tue,  6 Aug 2024 03:04:44 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C837F3F6A8;
+	Tue,  6 Aug 2024 03:04:15 -0700 (PDT)
+Date: Tue, 6 Aug 2024 11:04:13 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
+	aneesh.kumar@kernel.org, aneesh.kumar@linux.ibm.com, bp@alien8.de,
+	broonie@kernel.org, catalin.marinas@arm.com,
+	christophe.leroy@csgroup.eu, dave.hansen@linux.intel.com,
+	hpa@zytor.com, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
+	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
+	oliver.upton@linux.dev, shuah@kernel.org, szabolcs.nagy@arm.com,
+	tglx@linutronix.de, will@kernel.org, x86@kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v4 04/29] arm64: disable trapping of POR_EL0 to EL2
+Message-ID: <20240806100413.GE841837@e124191.cambridge.arm.com>
+References: <20240503130147.1154804-1-joey.gouly@arm.com>
+ <20240503130147.1154804-5-joey.gouly@arm.com>
+ <ZqJyzZB8Y8GLzYIA@e133380.arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <20240422200158.2606761-6-oliver.upton@linux.dev>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemm600007.china.huawei.com (7.193.23.208)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZqJyzZB8Y8GLzYIA@e133380.arm.com>
 
-Hi Oliver,
-
-On 2024/4/23 4:01, Oliver Upton wrote:
-> The vgic debug iterator is the final user of vgic_copy_lpi_list(), but
-> is a bit more complicated to transition to something else. Use a mark
-> in the LPI xarray to record the indices 'known' to the debug iterator.
-> Protect against the LPIs from being freed by associating an additional
-> reference with the xarray mark.
+On Thu, Jul 25, 2024 at 04:44:13PM +0100, Dave Martin wrote:
+> Hi,
 > 
-> Rework iter_next() to let the xarray walk 'drive' the iteration after
-> visiting all of the SGIs, PPIs, and SPIs.
+> On Fri, May 03, 2024 at 02:01:22PM +0100, Joey Gouly wrote:
+> > Allow EL0 or EL1 to access POR_EL0 without being trapped to EL2.
+> > 
+> > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+> > Cc: Catalin Marinas <catalin.marinas@arm.com>
+> > Cc: Will Deacon <will@kernel.org>
+> > Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+> > ---
+> >  arch/arm64/include/asm/el2_setup.h | 10 +++++++++-
+> >  1 file changed, 9 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
+> > index b7afaa026842..df5614be4b70 100644
+> > --- a/arch/arm64/include/asm/el2_setup.h
+> > +++ b/arch/arm64/include/asm/el2_setup.h
+> > @@ -184,12 +184,20 @@
+> >  .Lset_pie_fgt_\@:
+> >  	mrs_s	x1, SYS_ID_AA64MMFR3_EL1
+> >  	ubfx	x1, x1, #ID_AA64MMFR3_EL1_S1PIE_SHIFT, #4
+> > -	cbz	x1, .Lset_fgt_\@
+> > +	cbz	x1, .Lset_poe_fgt_\@
+> >  
+> >  	/* Disable trapping of PIR_EL1 / PIRE0_EL1 */
+> >  	orr	x0, x0, #HFGxTR_EL2_nPIR_EL1
+> >  	orr	x0, x0, #HFGxTR_EL2_nPIRE0_EL1
+> >  
+> > +.Lset_poe_fgt_\@:
+> > +	mrs_s	x1, SYS_ID_AA64MMFR3_EL1
+> > +	ubfx	x1, x1, #ID_AA64MMFR3_EL1_S1POE_SHIFT, #4
+> > +	cbz	x1, .Lset_fgt_\@
+> > +
+> > +	/* Disable trapping of POR_EL0 */
+> > +	orr	x0, x0, #HFGxTR_EL2_nPOR_EL0
 > 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  arch/arm64/kvm/vgic/vgic-debug.c | 82 +++++++++++++++++++++++---------
->  arch/arm64/kvm/vgic/vgic-its.c   |  4 +-
->  arch/arm64/kvm/vgic/vgic.h       |  1 +
->  include/kvm/arm_vgic.h           |  2 +
->  4 files changed, 64 insertions(+), 25 deletions(-)
+> Do I understand correctly that this is just to allow the host to access
+> its own POR_EL0, before (or unless) KVM starts up?
+
+Yup.
+
 > 
-> diff --git a/arch/arm64/kvm/vgic/vgic-debug.c b/arch/arm64/kvm/vgic/vgic-debug.c
-> index 389025ce7749..bcbc8c986b1d 100644
-> --- a/arch/arm64/kvm/vgic/vgic-debug.c
-> +++ b/arch/arm64/kvm/vgic/vgic-debug.c
-> @@ -28,27 +28,65 @@ struct vgic_state_iter {
->  	int nr_lpis;
->  	int dist_id;
->  	int vcpu_id;
-> -	int intid;
-> +	unsigned long intid;
->  	int lpi_idx;
-> -	u32 *lpi_array;
->  };
->  
-> -static void iter_next(struct vgic_state_iter *iter)
-> +static void iter_next(struct kvm *kvm, struct vgic_state_iter *iter)
->  {
-> +	struct vgic_dist *dist = &kvm->arch.vgic;
-> +
->  	if (iter->dist_id == 0) {
->  		iter->dist_id++;
->  		return;
->  	}
->  
-> +	/*
-> +	 * Let the xarray drive the iterator after the last SPI, as the iterator
-> +	 * has exhausted the sequentially-allocated INTID space.
-> +	 */
-> +	if (iter->intid >= (iter->nr_spis + VGIC_NR_PRIVATE_IRQS - 1)) {
-> +		if (iter->lpi_idx < iter->nr_lpis)
-> +			xa_find_after(&dist->lpi_xa, &iter->intid,
-> +				      VGIC_LPI_MAX_INTID,
-> +				      LPI_XA_MARK_DEBUG_ITER);
-> +		iter->lpi_idx++;
-> +		return;
-> +	}
+> KVM always overrides all the EL2 trap controls while running a guest,
+> right?  We don't want this bit still set when running in a guest just
+> because KVM doesn't know about POE yet.
 
-What's the purpose of moving the LPI handling up here?
+KVM currently unconditionally traps POE regs currently, this series makes that
+conditional.
 
-> +
->  	iter->intid++;
->  	if (iter->intid == VGIC_NR_PRIVATE_IRQS &&
->  	    ++iter->vcpu_id < iter->nr_cpus)
->  		iter->intid = 0;
+> 
+> (Hopefully this follows naturally from the way the KVM code works, but
+> my KVM-fu is a bit rusty.)
+> 
+> Also, what about POR_EL1?  Do we have to reset that to something sane
+> (and so untrap it here), or it is sufficient if we never turn on POE
+> support in the host, via TCR2_EL1.POE?
 
-In case the guest *doesn't* have any LPI, we previously relied on the
-iterator setting
+Since the host isn't using it, we don't need to reset it. It will be reset to an unknown value for guests.
 
-	'intid = nr_spis + VGIC_NR_PRIVATE_IRQS' && 'lpi_idx = 1'
+In patch 7:
 
-to exit the iterator. But it was broken with this refactor -- the intid
-remains at 'nr_spis + VGIC_NR_PRIVATE_IRQS - 1', and vgic_debug_show()
-endlessly prints the last SPI's state.
++	{ SYS_DESC(SYS_POR_EL1), NULL, reset_unknown, POR_EL1 },
 
-The following diff seems work for me.
+> 
+> [...]
+> 
+> Cheers
+> ---Dave
 
-diff --git a/arch/arm64/kvm/vgic/vgic-debug.c 
-b/arch/arm64/kvm/vgic/vgic-debug.c
-index 6faa1d16c9ce..f56f74c8cf54 100644
---- a/arch/arm64/kvm/vgic/vgic-debug.c
-+++ b/arch/arm64/kvm/vgic/vgic-debug.c
-@@ -41,11 +41,16 @@ static void iter_next(struct kvm *kvm, struct 
-vgic_state_iter *iter)
-  		return;
-  	}
-
-+	iter->intid++;
-+	if (iter->intid == VGIC_NR_PRIVATE_IRQS &&
-+	    ++iter->vcpu_id < iter->nr_cpus)
-+		iter->intid = 0;
-+
-  	/*
-  	 * Let the xarray drive the iterator after the last SPI, as the iterator
-  	 * has exhausted the sequentially-allocated INTID space.
-  	 */
--	if (iter->intid >= (iter->nr_spis + VGIC_NR_PRIVATE_IRQS - 1)) {
-+	if (iter->intid >= (iter->nr_spis + VGIC_NR_PRIVATE_IRQS)) {
-  		if (iter->lpi_idx < iter->nr_lpis)
-  			xa_find_after(&dist->lpi_xa, &iter->intid,
-  				      VGIC_LPI_MAX_INTID,
-@@ -53,11 +58,6 @@ static void iter_next(struct kvm *kvm, struct 
-vgic_state_iter *iter)
-  		iter->lpi_idx++;
-  		return;
-  	}
--
--	iter->intid++;
--	if (iter->intid == VGIC_NR_PRIVATE_IRQS &&
--	    ++iter->vcpu_id < iter->nr_cpus)
--		iter->intid = 0;
-  }
-
-  static int iter_mark_lpis(struct kvm *kvm)
+Thanks,
+Joey
