@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFC6A17997D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D08FB179665;
 	Tue,  6 Aug 2024 23:10:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722985803; cv=none; b=oGESd9B4GfRNEkRtkvlZQ24i/JHkhhP4ZqJ0gb9oZeVEJjorVbXe8sdUy+c4II0mzFeUHDxR2Ep7O4D+AFoAqELXeCJUzWYboGqm3JZbySMrw9ad6F8f+hpXQIs5Z3renOYSyzW/97WWIHdJAz31xSyCR+nKCfWjhbAWp4D6Z1k=
+	t=1722985804; cv=none; b=pH0Lzjnq3Ddh/nI5lVy5uC75DtnxXHq6QmNyhrr31jFHWSjjuPZtgbr0Nqesv7JhF+uzUWA9lG9Q2zigcL6gOX91o/m/oKEV2U03gtjNZ1GkrfZcAA/ALdPCcghNWEXi9+FG9QM3dl+QxjcXeNTCrFY37FU9w88RYocP9L6Un/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722985803; c=relaxed/simple;
-	bh=v+3D4lb213MioskawpwIVm0n1gy9X7rS+9rTnnk/THc=;
+	s=arc-20240116; t=1722985804; c=relaxed/simple;
+	bh=D5CNbSA2nd8+8BFJ/Lxf4zZjzdHe9mqU7tf5klT3gu0=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=gF4CxP6uTVJ8FJjcxGVcv7XYihEzMnoeApdpa7Rq10rH1fi9a8fj6YV85sLtpA4TciHj9w0Uh+y7PwWxgGQg5/5Sv1k1MXBdKYIxpwWkz9f17ttUQZ6Gt11OrS4L+n7qU8n2a1Z+z0fb0JM0oWYmaXsx7JgQzEpmlVJddZKYnOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UcbTcNUC; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=tzF1LcxGRmzZqfUpN0uUk7jTdBKXsnQCetPmJLFe1+bJ9vVcLPotZFbuTm0a085yytpZBEf1hsG0q3gSgz+byb0YiNwfhb1E4FGw2/pZlGnYd5HHa5GpHPQWVcpbbXaVgVsnAt8SmoPwVIaG91yS4UwUTwR4FfM6UhlM9b/33K0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fOMwWeuX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UcbTcNUC"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4E0C3C4DDE3;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fOMwWeuX"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 331BDC4AF63;
 	Tue,  6 Aug 2024 23:10:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1722985803;
-	bh=v+3D4lb213MioskawpwIVm0n1gy9X7rS+9rTnnk/THc=;
+	bh=D5CNbSA2nd8+8BFJ/Lxf4zZjzdHe9mqU7tf5klT3gu0=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=UcbTcNUCEVVl6oxvmOWw2BiT+ElArILeG1oAnslTRxcJ2Gi/SKYGJ3ADXB4KM/kSD
-	 7zI3tsZhf2PmkVPU5R+uYhWu/TEhYxpocso0dOHhwOgkKklRBv6LdbJ77P9RHQXtaF
-	 ApdZKxzrcB/pDn5/1+TiL5lJPZhercu5kvwmQ0W8EooGSrDr+D92E/CzUSfxMOUrFX
-	 UnqvanuR+aWSDbCHLTEQEpKrHqWGS7wwJWna8YEFXu+DaJ5DlqM+KpV8TH56nbPlBR
-	 YxA2dAU+3VQstKQl5GgOjBjoX8itT3D0ZB6tVaFxDyGYk1zRBxPiivAZr6tuDRFo0o
-	 XwlIForxD80Qw==
+	b=fOMwWeuX+6Lfvtx14e8n+SexhkQo577QRdYpNq9mh/HWXy2DjmUULeQdEJJrIovoE
+	 4d52aBfFcg/yKGYahmwaE4dwPQjUrghawQhWXyDJ5WW/fZz8yjfflghGrX2ymxjf/9
+	 UE2FKzdrsmYjDwZiau3Z0f4L3w6x0WaVYJc7HKru0bj+ALIaNZdjXYr8QpDabbF4oS
+	 rvxa8WAvV0gKqwLm+mmlC/cmHUk+lR1bEd9Fu375CaXb4Blquf5Ep1P6d4njo6wL+s
+	 pRjUvs3oJeJtI0h2h9ISbF5TaJrz9+zbtPn4QfswfOCDJTLvwo/Mi3QYIPUiitzfhK
+	 olW0RHxF3r0qA==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40075C52D6F;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2813FC49EA1;
 	Tue,  6 Aug 2024 23:10:03 +0000 (UTC)
 From: Daniel Gomez via B4 Relay <devnull+da.gomez.samsung.com@kernel.org>
-Date: Wed, 07 Aug 2024 01:09:21 +0200
-Subject: [PATCH 07/12] selinux/mdp: include bitsperlong and posix_types
- headers
+Date: Wed, 07 Aug 2024 01:09:20 +0200
+Subject: [PATCH 06/12] selinux/genheaders: include bitsperlong and
+ posix_types headers
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -41,7 +41,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240807-macos-build-support-v1-7-4cd1ded85694@samsung.com>
+Message-Id: <20240807-macos-build-support-v1-6-4cd1ded85694@samsung.com>
 References: <20240807-macos-build-support-v1-0-4cd1ded85694@samsung.com>
 In-Reply-To: <20240807-macos-build-support-v1-0-4cd1ded85694@samsung.com>
 To: Masahiro Yamada <masahiroy@kernel.org>, 
@@ -76,11 +76,11 @@ Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
  "Daniel Gomez (Samsung)" <d+samsung@kruces.com>, gost.dev@samsung.com, 
  Daniel Gomez <da.gomez@samsung.com>
 X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1722985800; l=995;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1722985800; l=952;
  i=da.gomez@samsung.com; s=20240621; h=from:subject:message-id;
- bh=amef7shqe+/pJSAuEYnttZteE9emVf2D8FOtG6wVLQs=;
- b=eEEO2XdHsOnjD70zsmSUCRd3hvX9udH5ozkEUFwVyjIqPSuD7NI4opv6Ndry8dslEYtsT1ENp
- 5rF5WjiBGzLAJoGrJzqo1wNi95MqafOkOKXvTlY0lrf9E5wgwW5kr+C
+ bh=zkjqCDDWwxxcXmEm+jW0QannFSOP4w7DOpEHzeqzznI=;
+ b=KS1HzePsm7adJO0+ulRuXmL0XzGu396kl5PQIL/Y+Ha4sBVswReLg26gtWlRY9ulp9HZfXTef
+ mC9Dy8SO9GADeLaEPqz0n4cBifOqORRoKLP9Y+NObQyFVh4zLY67qbh
 X-Developer-Key: i=da.gomez@samsung.com; a=ed25519;
  pk=BqYk31UHkmv0WZShES6pIZcdmPPGay5LbzifAdZ2Ia4=
 X-Endpoint-Received: by B4 Relay for da.gomez@samsung.com/20240621 with
@@ -90,7 +90,7 @@ Reply-To: da.gomez@samsung.com
 
 From: Daniel Gomez <da.gomez@samsung.com>
 
-The mdp object requires the bitsperlong.h and posix_types.h headers.
+The genheaders requires the bitsperlong.h and posix_types.h headers.
 To ensure these headers are found during compilation on macOS hosts,
 add usr/include to HOST_EXTRACFLAGS in the genheaders Makefile. This
 adjustment allows the compiler to locate all necessary headers when they
@@ -98,22 +98,20 @@ are not available by default on macOS.
 
 Signed-off-by: Daniel Gomez <da.gomez@samsung.com>
 ---
- scripts/selinux/mdp/Makefile | 3 ++-
+ scripts/selinux/genheaders/Makefile | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/scripts/selinux/mdp/Makefile b/scripts/selinux/mdp/Makefile
-index d61058ddd15c..19ab8682ae3d 100644
---- a/scripts/selinux/mdp/Makefile
-+++ b/scripts/selinux/mdp/Makefile
-@@ -2,6 +2,7 @@
- hostprogs-always-y += mdp
+diff --git a/scripts/selinux/genheaders/Makefile b/scripts/selinux/genheaders/Makefile
+index 1faf7f07e8db..017149c90f8e 100644
+--- a/scripts/selinux/genheaders/Makefile
++++ b/scripts/selinux/genheaders/Makefile
+@@ -2,4 +2,5 @@
+ hostprogs-always-y += genheaders
  HOST_EXTRACFLAGS += \
  	-I$(srctree)/include/uapi -I$(srctree)/include \
--	-I$(srctree)/security/selinux/include -I$(objtree)/include
-+	-I$(srctree)/security/selinux/include -I$(objtree)/include \
+-	-I$(srctree)/security/selinux/include
++	-I$(srctree)/security/selinux/include \
 +	-I$(srctree)/usr/include
- 
- clean-files	:= policy.* file_contexts
 
 -- 
 Git-146)
