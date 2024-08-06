@@ -1,162 +1,86 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D254B15A4AF
-	for <kvmarm@lists.linux.dev>; Tue,  6 Aug 2024 10:36:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E0901C3F30
+	for <kvmarm@lists.linux.dev>; Tue,  6 Aug 2024 12:39:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722940589; cv=none; b=DUwoCWbZJM6Sr1r1SGvDEdtLKW6c51cJxm0nBpBHhDrpBjd44om7hzUNVOKXjOO0yghNG8W3Zs59N0E80aF1BVAMpfoiXQLVFoqNV3DB2Kad6N6VmECpo5V7hbVxBjjPnrxhIepdcNUrFKzcsq13Jio8my7UgGf8FLNwHiu54Kc=
+	t=1722947955; cv=none; b=Vy82wtnN/nv0Lxr77e+4iWUrDmJ70y5yL8yAkPSv+SgTPxfTigrrOueA9xrEwGEbZh7mxRkz8XI/+XjjAWsMJ9SYI0Iy0Lv2pcL6ladR0WDJcmmLaDa04riTANbs5I/rmpt2ydlfHnri/7EJ3lxZtPQ/+zKH8VgHE2+hbRJDKu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722940589; c=relaxed/simple;
-	bh=vmwD1XCbDUA24A0XTc5V9rqqcZGJZlrTvlHytkE4w6A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oleuAXAX8tv+xSioGgTTOQw9pj1n5vgnpJ0QAJBtyh6s7T0rGxRwSWxWjniANikPDuo/YOALubaOmSt+hIxZGdeyjyIuZ8FyAnMgNxi37w8PSmOMqlQENxNgdt3laz78KCyjj9GDa8OPFVY5jtiZviGdxjhhjF6sOnCTrcmPSpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BE013FEC;
-	Tue,  6 Aug 2024 03:36:51 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7792B3F6A8;
-	Tue,  6 Aug 2024 03:36:22 -0700 (PDT)
-Date: Tue, 6 Aug 2024 11:35:32 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
-	aneesh.kumar@kernel.org, aneesh.kumar@linux.ibm.com, bp@alien8.de,
-	broonie@kernel.org, catalin.marinas@arm.com,
-	christophe.leroy@csgroup.eu, dave.hansen@linux.intel.com,
-	hpa@zytor.com, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
-	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
-	oliver.upton@linux.dev, shuah@kernel.org, szabolcs.nagy@arm.com,
-	tglx@linutronix.de, will@kernel.org, x86@kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 18/29] arm64: add POE signal support
-Message-ID: <20240806103532.GA1986436@e124191.cambridge.arm.com>
-References: <20240503130147.1154804-1-joey.gouly@arm.com>
- <20240503130147.1154804-19-joey.gouly@arm.com>
- <ZqJ2knGETfS4nfEA@e133380.arm.com>
- <20240801155441.GB841837@e124191.cambridge.arm.com>
- <Zqu2VYELikM5LFY/@e133380.arm.com>
+	s=arc-20240116; t=1722947955; c=relaxed/simple;
+	bh=HX8macLD4W6eLAeksBC+hPhEd3r4zlNwPqvc21C0Eto=;
+	h=Subject:From:To:CC:References:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=LJ8orZQkBWqtayxyrXBTXzFOTsefuH81FVXZ49G6aQvdRCdUCvVyo9gCiKBeK/3JoUm1BgM31mH8CuYgG+uyGNQ3KF0tPBu3ZGWqwwctmw7X1jOiGAqTR6UM357GiMSTTGBiY2h417B5C90ci24THMNGi9qmPbrKsqLUm2fZS3Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4WdXrF0BwVzfZPr;
+	Tue,  6 Aug 2024 20:37:17 +0800 (CST)
+Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
+	by mail.maildlp.com (Postfix) with ESMTPS id 6A10B1800A0;
+	Tue,  6 Aug 2024 20:39:10 +0800 (CST)
+Received: from [10.174.178.219] (10.174.178.219) by
+ kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 6 Aug 2024 20:39:09 +0800
+Subject: Re: [PATCH v3 05/19] KVM: arm64: vgic-debug: Use an xarray mark for
+ debug iterator
+From: Zenghui Yu <yuzenghui@huawei.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+CC: <kvmarm@lists.linux.dev>, Marc Zyngier <maz@kernel.org>, James Morse
+	<james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Eric Auger
+	<eric.auger@redhat.com>, <kvm@vger.kernel.org>
+References: <20240422200158.2606761-1-oliver.upton@linux.dev>
+ <20240422200158.2606761-6-oliver.upton@linux.dev>
+ <d034a9b8-34ae-923e-8e68-09d2de3cf079@huawei.com>
+Message-ID: <178f30f7-edfd-78c5-f392-43cef1ef9baf@huawei.com>
+Date: Tue, 6 Aug 2024 20:39:08 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zqu2VYELikM5LFY/@e133380.arm.com>
+In-Reply-To: <d034a9b8-34ae-923e-8e68-09d2de3cf079@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemm600007.china.huawei.com (7.193.23.208)
 
-On Thu, Aug 01, 2024 at 05:22:45PM +0100, Dave Martin wrote:
-> On Thu, Aug 01, 2024 at 04:54:41PM +0100, Joey Gouly wrote:
-> > On Thu, Jul 25, 2024 at 05:00:18PM +0100, Dave Martin wrote:
-> > > Hi,
-> > > 
-> > > On Fri, May 03, 2024 at 02:01:36PM +0100, Joey Gouly wrote:
-> > > > Add PKEY support to signals, by saving and restoring POR_EL0 from the stackframe.
-> > > > 
-> > > > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-> > > > Cc: Catalin Marinas <catalin.marinas@arm.com>
-> > > > Cc: Will Deacon <will@kernel.org>
-> > > > Reviewed-by: Mark Brown <broonie@kernel.org>
-> > > > Acked-by: Szabolcs Nagy <szabolcs.nagy@arm.com>
-> > > > ---
-> > > >  arch/arm64/include/uapi/asm/sigcontext.h |  7 ++++
-> > > >  arch/arm64/kernel/signal.c               | 52 ++++++++++++++++++++++++
-> > > >  2 files changed, 59 insertions(+)
-> > > > 
-> > > > diff --git a/arch/arm64/include/uapi/asm/sigcontext.h b/arch/arm64/include/uapi/asm/sigcontext.h
-> > > > index 8a45b7a411e0..e4cba8a6c9a2 100644
-> > > > --- a/arch/arm64/include/uapi/asm/sigcontext.h
-> > > > +++ b/arch/arm64/include/uapi/asm/sigcontext.h
-> > > 
-> > > [...]
-> > > 
-> > > > @@ -980,6 +1013,13 @@ static int setup_sigframe_layout(struct rt_sigframe_user_layout *user,
-> > > >  			return err;
-> > > >  	}
-> > > >  
-> > > > +	if (system_supports_poe()) {
-> > > > +		err = sigframe_alloc(user, &user->poe_offset,
-> > > > +				     sizeof(struct poe_context));
-> > > > +		if (err)
-> > > > +			return err;
-> > > > +	}
-> > > > +
-> > > >  	return sigframe_alloc_end(user);
-> > > >  }
-> > > >  
-> > > > @@ -1020,6 +1060,15 @@ static int setup_sigframe(struct rt_sigframe_user_layout *user,
-> > > >  		__put_user_error(current->thread.fault_code, &esr_ctx->esr, err);
-> > > >  	}
-> > > >  
-> > > > +	if (system_supports_poe() && err == 0 && user->poe_offset) {
-> > > > +		struct poe_context __user *poe_ctx =
-> > > > +			apply_user_offset(user, user->poe_offset);
-> > > > +
-> > > > +		__put_user_error(POE_MAGIC, &poe_ctx->head.magic, err);
-> > > > +		__put_user_error(sizeof(*poe_ctx), &poe_ctx->head.size, err);
-> > > > +		__put_user_error(read_sysreg_s(SYS_POR_EL0), &poe_ctx->por_el0, err);
-> > > > +	}
-> > > > +
-> > > 
-> > > Does the AArch64 procedure call standard say anything about whether
-> > > POR_EL0 is caller-saved?
-> > 
-> > I asked about this, and it doesn't say anything and they don't plan on it,
-> > since it's very application specific.
+On 2024/8/6 17:23, Zenghui Yu wrote:
+> The following diff seems work for me.
 > 
-> Right.  I think that confirms that we don't absolutely need to preserve
-> POR_EL0, because if compiler-generated code was allowed to fiddle with
-> this and not clean up after itself, the PCS would have to document this.
-> 
-> > > 
-> > > <bikeshed>
-> > > 
-> > > In theory we could skip saving this register if it is already
-> > > POR_EL0_INIT (which it often will be), and if the signal handler is not
-> > > supposed to modify and leave the modified value in the register when
-> > > returning.
-> > > 
-> > > The complexity of the additional check my be a bit pointless though,
-> > > and the the handler might theoretically want to change the interrupted
-> > > code's POR_EL0 explicitly, which would be complicated if POE_MAGIC is
-> > > sometimes there and sometimes not.
-> > > 
-> > > </bikeshed>
-> > > 
-> > I think trying to skip/optimise something here would be more effort than any
-> > possible benefits!
-> 
-> Actually, having thought about this some more I think that only dumping
-> this register if != POR_EL0_INIT may be right right thing to do.
-> 
-> This would mean that old binary would stacks never see poe_context in
-> the signal frame, and so will never experience unexpected stack
-> overruns (at least, not due solely to the presence of this feature).
+> diff --git a/arch/arm64/kvm/vgic/vgic-debug.c 
+> b/arch/arm64/kvm/vgic/vgic-debug.c
+> index 6faa1d16c9ce..f56f74c8cf54 100644
+> --- a/arch/arm64/kvm/vgic/vgic-debug.c
+> +++ b/arch/arm64/kvm/vgic/vgic-debug.c
+> @@ -41,11 +41,16 @@ static void iter_next(struct kvm *kvm, struct vgic_state_iter *iter)
+>  		return;
+>  	}
+>  
+> +	iter->intid++;
 
-They can already see things they don't expect, like FPMR that was added
-recently.
+[*]
 
-> 
-> POE-aware signal handlers have to do something fiddly and nonportable
-> to obtain the original value of POR_EL0 regardless, so requiring them
-> do handle both cases (present in sigframe and absent) doesn't seem too
-> onerous to me.
+> +	if (iter->intid == VGIC_NR_PRIVATE_IRQS &&
+> +	    ++iter->vcpu_id < iter->nr_cpus)
+> +		iter->intid = 0;
+> +
+>  	/*
+>  	 * Let the xarray drive the iterator after the last SPI, as the iterator
+>  	 * has exhausted the sequentially-allocated INTID space.
+>  	 */
+> -	if (iter->intid >= (iter->nr_spis + VGIC_NR_PRIVATE_IRQS - 1)) {
+> +	if (iter->intid >= (iter->nr_spis + VGIC_NR_PRIVATE_IRQS)) {
+>  		if (iter->lpi_idx < iter->nr_lpis)
+>  		    xa_find_after(&dist->lpi_xa, &iter->intid,
 
-If the signal handler wanted to modify the value, from the default, wouldn't it
-need to mess around with the sig context stuff, to allocate some space for
-POR_EL0, such that the kernel would restore it properly? (If that's even
-possible).
+Just noticed that it's wrong to increase intid before xa_find_after(),
+which would break the LPI case. Let me have a think...
 
-> 
-> 
-> Do you think this approach would break any known use cases?
-
-Not sure.
-
-> 
-> Cheers
-> ---Dave
-> 
+Zenghui
