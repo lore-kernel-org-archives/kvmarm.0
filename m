@@ -1,128 +1,182 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7088CB664;
-	Wed,  7 Aug 2024 13:36:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B37A920011B;
+	Wed,  7 Aug 2024 13:56:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723037811; cv=none; b=JfUaH/jM4jDbSr/9YPc1H1tuvpkQrU8sDU0tvjgzJwvHEbAreWPrEnjFKCndxsexTgIxm+MOfIcuzzg/JFoUwZ0eNMn1ZuKj/7Vgd6Q80IVnldSmNWPBuvkmj2KNnWN+wTdaoMPAHD8Ak0bH2EAxh2yLWUvxsQ0yAgVgDaC0Lfg=
+	t=1723039011; cv=none; b=rV9GDhDZkJDllBbfFrXFi2DnoOKjfU8VziPu6claDF15Vlc7idj0razRaGyjJgU9ZpnkWQqxLz+Js7DBMA1d6owXjzaHkfam36q/6T9DSan5IKfWX4IW5J/emBfX69U/mx3Y1FAuMZ/pBAaDUrtRTvZi9uQCRpOuPqoXbET8UCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723037811; c=relaxed/simple;
-	bh=cJ8/vW0xVevY81Gwdh1aeGnupi+13YFObO9AG1Q+dRI=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jXersHqA5RUem+55jprsHFpjhIr6tqtUcA5UJOiMALBYbVi197VzyE8cnlucQdDYKVoiIbpHkPhfLQOjTZgNradn0BPWiYuliSqG/uBv080xfEx11QAthMeCA+w35APY3olbJ7FbuI6MGvpnljm93XJBLj5LJ8lnqVWXLEYbb5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tXxV4sXo; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1723039011; c=relaxed/simple;
+	bh=accmoAdNzaDWZXx9M0Eeyh9wIUkdDuhSxMXSiQ+RpYg=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:Content-Type:
+	 MIME-Version:References; b=Hg3isK/SYKWAdHKhzTG1Ca5aPAtHLL36IQhTzs9ILMw260sjPbfCsjvfHq/be+NKKNJM8tW+68+QMs+29jSDRKE/CuG1RberpvI01M+NxIsxu39U9vXARmpLg8kK/o4xnQmNC5i5nl0IzdfdIjyPQbGlFrc26iFaF0QCAsekfB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=INxzaSiC; arc=none smtp.client-ip=210.118.77.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tXxV4sXo"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05BF3C32782;
-	Wed,  7 Aug 2024 13:36:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723037811;
-	bh=cJ8/vW0xVevY81Gwdh1aeGnupi+13YFObO9AG1Q+dRI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tXxV4sXodND7tpDelncBVH8gdH+Q3r9bs+1shG7jImk21pJYPbBT106VmRN5oiQsG
-	 c0kKh9ajx4KVTG+S5F0hPgQOTLjZIYkWjIAqNnO5gqz1CvBwv2KKYCY5LyKzXWlPdg
-	 o9E9IVLnNz9NeuNNLBm2cthbn+NwX5AhsG8fkzoPRz7xwYAg70n39QTe90TAOeHtk9
-	 nfaeDBMr+N1uWk8djXt4IFDzyU+MTL3+AVxLyJeEnv6rVUXKKiRKloMYs9Bdm+Covj
-	 Rbs2XzcMoyq4y4CaFV2kIQkM3kg04nuv326Bg4HLShAChl7614J+ia8N/P25jYZgVF
-	 D4KIEoAzbBPaw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sbgqN-001iiI-Ne;
-	Wed, 07 Aug 2024 14:36:47 +0100
-Date: Wed, 07 Aug 2024 14:36:47 +0100
-Message-ID: <86a5ho315c.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Arnd Bergmann <arnd@linaro.org>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Viresh Kumar <viresh.kumar@linaro.org>
-Subject: Re: [PATCH] KVM: arm64: Enforce dependency on an ARMv8.4-aware toolchain
-In-Reply-To: <CAKWjNY-=WWxUX-u0g4A_a26U1GNsv2Faak49dkjP-x=ZuQfPvA@mail.gmail.com>
-References: <20240807115144.3237260-1-maz@kernel.org>
-	<CAKWjNY-=WWxUX-u0g4A_a26U1GNsv2Faak49dkjP-x=ZuQfPvA@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.3
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="INxzaSiC"
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20240807135640euoutp0286ea7eef83e03aad6a6e04a6315089c5~pdtd0h6d11803118031euoutp02B;
+	Wed,  7 Aug 2024 13:56:40 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20240807135640euoutp0286ea7eef83e03aad6a6e04a6315089c5~pdtd0h6d11803118031euoutp02B
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1723039000;
+	bh=RD4VCR8zcAhpzCYoVdHahIWyW9KGCB3RFPi11K81luc=;
+	h=From:To:CC:Subject:Date:In-Reply-To:References:From;
+	b=INxzaSiC9Ycwbv2GeiH7lCELe5ljbafikAZ0+PPTR+7EcplhZqubD2H69a5+/xfq9
+	 pD5YZoX8NfqTrpFw4oYeUNKUdRgTTk2qaO+cm+qPVVkSyvuiC3M3TK/pE3O9kLqP9R
+	 k5pmPh3ih1oDv6e09n1Y5MJ6V6IorNlnVv6VzuYs=
+Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
+	eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+	20240807135639eucas1p18cf775d2f2cbfdbf5b7bf2a57b7f73c9~pdtdYaf-32629426294eucas1p1f;
+	Wed,  7 Aug 2024 13:56:39 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+	eusmges2new.samsung.com (EUCPMTA) with SMTP id 30.CE.09875.71D73B66; Wed,  7
+	Aug 2024 14:56:39 +0100 (BST)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+	20240807135639eucas1p19f1d9712d29bdbfcc447308db0353327~pdtc6WloT2647726477eucas1p1l;
+	Wed,  7 Aug 2024 13:56:39 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+	eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20240807135639eusmtrp1b67e1514abe665307a794aba282fcbd9~pdtc4_DFi2631226312eusmtrp1z;
+	Wed,  7 Aug 2024 13:56:39 +0000 (GMT)
+X-AuditID: cbfec7f4-11bff70000002693-ca-66b37d178b2b
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+	eusmgms1.samsung.com (EUCPMTA) with SMTP id 30.62.08810.71D73B66; Wed,  7
+	Aug 2024 14:56:39 +0100 (BST)
+Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
+	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20240807135638eusmtip2ef9530a5bc066906498e2d25e05ce525~pdtcnQ5_c0435104351eusmtip2O;
+	Wed,  7 Aug 2024 13:56:38 +0000 (GMT)
+Received: from CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348) by
+	CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348) with Microsoft SMTP
+	Server (TLS) id 15.0.1497.2; Wed, 7 Aug 2024 14:56:38 +0100
+Received: from CAMSVWEXC02.scsc.local ([::1]) by CAMSVWEXC02.scsc.local
+	([fe80::3c08:6c51:fa0a:6384%13]) with mapi id 15.00.1497.012; Wed, 7 Aug
+	2024 14:56:38 +0100
+From: Daniel Gomez <da.gomez@samsung.com>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+CC: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor
+	<nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, Lucas De Marchi
+	<lucas.demarchi@intel.com>, =?iso-8859-1?Q?Thomas_Hellstr=F6m?=
+	<thomas.hellstrom@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard
+	<mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, David Airlie
+	<airlied@gmail.com>, Daniel Vetter <daniel@ffwll.ch>, William Hubbs
+	<w.d.hubbs@gmail.com>, Chris Brannon <chris@the-brannons.com>, Kirk Reiser
+	<kirk@reisers.ca>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Paul
+	Moore <paul@paul-moore.com>, Stephen Smalley
+	<stephen.smalley.work@gmail.com>, Ondrej Mosnacek <omosnace@redhat.com>,
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, James
+	Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, Jiri Slaby <jirislaby@kernel.org>, Nick
+	Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-kbuild@vger.kernel.org"
+	<linux-kbuild@vger.kernel.org>, "intel-xe@lists.freedesktop.org"
+	<intel-xe@lists.freedesktop.org>, "dri-devel@lists.freedesktop.org"
+	<dri-devel@lists.freedesktop.org>, "speakup@linux-speakup.org"
+	<speakup@linux-speakup.org>, "selinux@vger.kernel.org"
+	<selinux@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "linux-serial@vger.kernel.org"
+	<linux-serial@vger.kernel.org>, "llvm@lists.linux.dev"
+	<llvm@lists.linux.dev>, Finn Behrens <me@kloenk.dev>, "Daniel Gomez
+ (Samsung)" <d+samsung@kruces.com>, "gost.dev@samsung.com"
+	<gost.dev@samsung.com>, Nick Desaulniers <nick.desaulniers@gmail.com>
+Subject: Re: [PATCH 00/12] Enable build system on macOS hosts
+Thread-Topic: [PATCH 00/12] Enable build system on macOS hosts
+Thread-Index: AQHa6FXa2qO1hDUbAkeBhFl865k4bbIbkMYAgAAxCIA=
+Date: Wed, 7 Aug 2024 13:56:38 +0000
+Message-ID: <3jnp6tnkjpvnisefomxagazu2u3uzzt7rcon3r5jssraxzwegb@gsxc7c5sfh7v>
+In-Reply-To: <2024080753-debug-roulette-8cb1@gregkh>
+Accept-Language: en-US, en-GB
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-exchange-transport-fromentityheader: Hosted
+Content-Type: text/plain; charset="iso-8859-1"
+Content-ID: <D2FE3BDA1F1CEC4DBF273ECDE479024B@scsc.local>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: arnd@linaro.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, viresh.kumar@linaro.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Ta0yTVxzGPe+1EDpfEeFMXdwYfhggujn0jE0zEp3vl+ncwpaYqHTjBRvu
+	LaBzWUDAKhcHKIitXFspF1nAcglUroUVKnbIZSggK2iZDGGFAAoT6SjtDN9+5zz/8zzP/8Ph
+	4Y5Z9FaeMCyKE4UJQlwpe6JWu/T7LpefqwL31PS5oc6HcgyZlKkAacsmcHTXPIIjc20GjvoX
+	TBRKUFRQaLFqAkOGpmIM/ZO7HV2/raBQXo+OQJPVbQRSPR0g0bK6DkN96hwK3VdcoZExs5lC
+	40+VFCqcrSHQ2OgjEtXn6EjUWNFHIVXfHIkkSUoSXSodp9BMuhlD6uYlAv3V2EmirKUpCk2n
+	/0aj4avZBGqWDdCoZDEboO4OLY1q6/QAPeu+BpB0eBig53WrztVTGSSSS/ajxMfeaLCokv7c
+	gy3PKwdsg1ZPsY0vCghWrami2HrZCM0WqKLZxPZpklU0/I2xqrIkis1LysNY85VRkm03y2m2
+	MC4LZ/N0x9nm3HKaNaR0YF/BE/afBXAhwhhOtPugv/2ZrlePqQgFea6isBSPA9lEMuDxIPMx
+	TMw+lgzseY5MCYCJxiIqGditHuYBHFd7WoU5ACX6l4RFsDwwTM1jVqEYwF7pLezNVPuNCcp6
+	6AKwuV0O3hinplxcM6aYD2CTTkVb2InZC9P0MtoyhDMPNkJDjha3CJuZA3CiuIGyDh2EPWaN
+	jX2g9OIyaWGCcYOX+yvXjPjMl7Ak6eravd1qwTsTGszCgHkHPin9d20GZ1zgkDEfsy6xCcpv
+	NuBWdoYr6jHKyp5Q/9AIrLwH1hQ12ZZ+D17WDlJWHy/4KCvTxp/Am89GbP4eUFn4HLf22QR1
+	UiNhWQwyEgeo7fnFFnAIKluKbSU2w8mOajodeMrW9ZOty5Cty5Cty5CtyygAZBlw4aLFoUGc
+	+KMw7qyXWBAqjg4L8vohPFQFVn9O10rHfB0onpz10gCMBzQA8nBXJ37Cd6pAR36A4MfznCj8
+	tCg6hBNrwDYe4erC3xmwg3NkggRRXDDHRXCi/1WMZ7c1DtuXKzzetTB2KP7skQv5MYp7kcEO
+	U10d5Mn507t9Q6VkLz3q98WW6Nqoyvrgolu8vD6nJ2HuL6f9NgyZvk478WnOr9sz4etMX9HO
+	Pz3294i9DwsrNk6ld294rRe3NCx27go/PJOR4jh0yuOG/21XTUar/UDbgV7/VCpCki8MVbqt
+	8Fqb+QvyfZ3c4ivp2/J7pjHjthjDN8HuR4diIvyS0qTO4w8KL5QWLasMe3dIXqSH3z2ypcBn
+	LqEtMrLS+aRD2Uhs/x8rg54e46g6+dt47wTfenhde2rEFKg6JpyVv+vS872PPvbScmuBU/xR
+	n4E7sUMz597v1N0Xnmf4ppafKOeBt2hXQnxG8KE7LhIL/gNsQvf1qAQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA01Ta0yTVxjO+a6FpNk3LnJGWDY7zIJKodw8ZYozi8tnIlEz54xMWSMFjEBZ
+	W9hwLGGBAUXB4kDWDsqlcpWBlEu4s1UpMERgRS4DBhOYRWBCwAUGowPKEv49b85zOc+bvBzc
+	Jpd25FyLkIulEaIwHmVNdG92/O7q8HV1sPvKKoE6hwow9LLoFkCGMhOOmszjODLXpeNo4NVL
+	CsVrKym0Wm3C0ERrMYb+ynFCd+9rKaTp7yLQi5qHBNJNDZJoo7EeQ8bGbAo91qbSaDqjjUIz
+	U0UUyl+qJdAfk8MkasjuIlFLpZFCOuMyiRIVRSRKKp2h0KLSjKHGtjUC/dnSSaLMtXkKLSjb
+	aTR6J4tAbepBGpWsZgHU22GgUV19D0DPe78DSDU6CtBc/ZZzzXw6iQoSj6CEMW80UviAfv8Q
+	W64pB2yzoYdiW/7OI9hGfTXFNqjHaTZPF8UmPFogWW3zLMbqyhQUq1FoMNacOkmyj8wFNJsf
+	l4mzmq5zbFtOOc1O3OzAzsJL/KNSSZRc/HaoRCY/xgsQIA++QIj4Hl5CvsDzyGVfD2+em9/R
+	IHHYtWix1M3vM35o9/oYFaklv6zML8XjQBaRAqw4kPGCE/MrWAqw5tgwhQA+HUoDlgcnWLXy
+	lLRgW7gxmEJZSEsA9vdVAMvQDWBFajdhGUoAzDYrqG0JxbjA1i4dvY3tGE94u0dNb5Nwpu81
+	uDw4vpNhyxyDpuJmykLyg/1m/S72hapvN3ayCcYZJg882DHiMv6wRHGHtKQZAJz9uWnHyGqr
+	RZVJj21jwLwJn5X+syPAGQf423QuZinBwHvNvbgF28PZqc3dcodhz9D0bml3WFvYuruZ/TDZ
+	MEJZfPhwODNjFwvhD8/Hd/0PwaL8Odzyuddhl2qaUAIn9Z5o9R65eo9cvUeu3iPPA2QZsBNH
+	ycJDwmUCvkwULouKCOFflYTrwNal1BnWquuB5sUSXw8wDtADyMF5dtz4T3TBNtwgUcwNsVQS
+	KI0KE8v0wHtreem4o/1VydapRcgDBT7u3gIvH6G7t9DHk+fAPRWZLLJhQkRy8XWxOFIs/V+H
+	cawc47C2D/+tuh65dkMX/XA9OmkjueLUoqGs3jTmmHog8dzGbIbtV1B9RvIBrnOJqEkNdRVZ
+	n77y45x85Hy8dbtNeoJKl7VwOy0hgCMs6ryf9mvzcIje9XM89iRT2XPe5WbDwZJB00/KyxHx
+	HrX640EnL8QY+xoPq0xXnsXdU16q+0gVO7Phceb42jv7ueGrvcaPvyjZ1Dz5dOzEKyXXPVeh
+	9VkM7r87kipyzAzmD+E5xY+dRB302cwyX+KE6OK66pt+qaQl5pb/AaVU8ktSlfNbdYFF3dDR
+	fXT9+2XbnoA3QpwbJt+LbaqlB4z78nP8RYtdF+vs9/kuGC6UNr3bnvkkSKNwKynmEbJQkeAg
+	LpWJ/gO+4EoXsgQAAA==
+X-CMS-MailID: 20240807135639eucas1p19f1d9712d29bdbfcc447308db0353327
+X-Msg-Generator: CA
+X-RootMTR: 20240807110114eucas1p2e1ca4cbd352c6cd9d60688b1570df8d4
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20240807110114eucas1p2e1ca4cbd352c6cd9d60688b1570df8d4
+References: <20240807-macos-build-support-v1-0-4cd1ded85694@samsung.com>
+	<CGME20240807110114eucas1p2e1ca4cbd352c6cd9d60688b1570df8d4@eucas1p2.samsung.com>
+	<2024080753-debug-roulette-8cb1@gregkh>
 
-On Wed, 07 Aug 2024 13:03:28 +0100,
-Arnd Bergmann <arnd@linaro.org> wrote:
-> 
-> On Wed, 7 Aug 2024 at 13:51, Marc Zyngier <maz@kernel.org> wrote:
-> >
-> > With the NV support of TLBI-range operations, KVM makes use of
-> > instructions that are only supported by binutils versions >= 2.30.
-> >
-> > This breaks the build for very old toolchains.
-> >
-> > Make KVM support conditional on having ARMv8.4 support in the
-> > assembler, side-stepping the issue.
-> >
-> > Fixes: 5d476ca57d7d ("KVM: arm64: nv: Add handling of range-based TLBI operations")
-> > Reported-by: Viresh Kumar <viresh.kumar@linaro.org>
-> > Suggested-by: Arnd Bergmann <arnd@linaro.org>
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> 
-> Acked-by: Arnd Bergmann <arnd@arndb.de>
+On Wed, Aug 07, 2024 at 01:01:08PM GMT, Greg Kroah-Hartman wrote:
+> On Wed, Aug 07, 2024 at 01:09:14AM +0200, Daniel Gomez via B4 Relay wrote=
+:
+> > This patch set allows for building the Linux kernel for arm64 in macOS =
+with
+> > LLVM.
+>=20
+> Is this a requirement somewhere that this must work?  It seems like an
+> odd request, what workflows require cross-operating-system builds like
+> this?
 
-Thanks for that.
+This isn't a requirement, but it would, for example, support workflows for =
+QEMU
+users and developers on macOS. They could build/compile the kernel natively=
+ and
+use it to launch QEMU instances, simplifying their process.
 
-> 
-> >  menuconfig KVM
-> >         bool "Kernel-based Virtual Machine (KVM) support"
-> > +       depends on AS_HAS_ARMV8_4
-> >         select KVM_COMMON
-> >         select KVM_GENERIC_HARDWARE_ENABLING
-> >         select KVM_GENERIC_MMU_NOTIFIER
-> 
-> I think this is good enough here, only slightly more limiting than
-> we strictly need. A slightly more fine-grained approach would
-> turn off VHE mode on old binutils but keep NVHE. That is still
-> inaccurate of course since VHE only depends on v8.2, so
-> I'm in favor of keeping the version you posted.
-
-nit: VHE is from ARMv8.1, though there isn't a large number of v8.1
-implementations (Cavium/Broadcom TX2 is the best known one).
-
-Now, splitting VHE out would be pretty invasive. A marginally better
-approach would be to disable NV support for TLBI range instructions
-and make them UNDEF in the guest.
-
-But overall, I really hate the idea of playing a "dice and slice" game
-with KVM, just because the toolchain is from a time when I could still
-have long hair. It leads to all sort of issues with latent bugs that
-only show-up in some configs (cue the repeated issues with PMU
-emulation, which has generally been a disaster). I would only consider
-this if someone came up with a valid reason why they cannot move to a
-toolchain that has newer binutils (like the ones you provide on k.org).
-
-> For reference, even the gcc-5.5 toolchain I built for kernel.org
-> in 2019 came with recent enough binutils, and we are likely to
-> soon require gcc-8 or higher anyway.
-
-Definitely looking forward to this!
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+>=20
+> thanks,
+>=20
+> greg k-h=
