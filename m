@@ -1,46 +1,78 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2932F26AFC;
-	Wed,  7 Aug 2024 14:15:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C1452209B;
+	Wed,  7 Aug 2024 14:18:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723040139; cv=none; b=XjcUSKFSfXo2xNRVCnESDtCglSnmvBTPvoszpbeUZlAD07CZU/WSQpNJca0sy8SIwnKm9tLVC+yeFtXp+GBFVBbDMuNujSmDg5MbMpIJkXk0bg7IOpdALyUP5jsiHx3zRfut+M6Ibv6RblFVBMwLCtMlXFlgoay5/fJjTXDkAW8=
+	t=1723040338; cv=none; b=p2iaKupkaTEUzJljSM5rpHia5MjT6Te8dJZtAsx9FlTH9Ryg+lHROvHPaEnPX6CNFqnKijPelVrF220TIP2PE0kxuJOGmpmBUKFgC7sPFX+TwNIf8/rPlfH9OfvtAsOh4Vy3nm4Y5xqCWhRx2HqF/L+UMDi59Ree0e+dOEwk3T8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723040139; c=relaxed/simple;
-	bh=N3Upe6B3zDaIo7gAE4ChFYQqp1vXvS+k5/9lYXUJDpU=;
+	s=arc-20240116; t=1723040338; c=relaxed/simple;
+	bh=ruDqzUJIFxwXUEMKpcoMsTtq7dxHLYVF5qNLHuT7WR0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hiLcJ7HrtVu155KlOSO584KLToKqbfUiVALPcqIXVD1UdkyKNTBHfPYpwv033Gxa9v67+R58ltJp/7O9tW9zVZhCD4h+0djzbd1qzW62KPHnPwe9yzCjbWuqHANxoWXAt1zl9W2+iK3O5hiN4wN8dxqnPRVKuWVBxiJUjNESAWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3C09C4AF0B;
-	Wed,  7 Aug 2024 14:15:33 +0000 (UTC)
-Date: Wed, 7 Aug 2024 15:15:31 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=dct3APWJb1UPr9dkGf/mzczL9OkiWTDWIk4J+iyipkPaDZSOT3sYFrm1Fr8trlfayJc+QiY+qdwzADTjouohcNXB3RlJOyiUn7PC0nTw7+42wTXw/1wGbdIrB4vuI/TK+LhEr+UIftTNH5kKgskXSMBVbQK1YObw2rNejj+JgKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=U5zk5gh9; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="U5zk5gh9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 195CBC32781;
+	Wed,  7 Aug 2024 14:18:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1723040337;
+	bh=ruDqzUJIFxwXUEMKpcoMsTtq7dxHLYVF5qNLHuT7WR0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=U5zk5gh9o70xsm2UVa6IfL8qN12x9njGZIBv0jZ3z+jxdrm5r2WLPJyND2hRPeQqd
+	 HwGNHZj0N7EF2rGxX6UVf73Ha9LqL9Oa4e99gWOAxHHulWR/VKE7z89Lw+8QFpxLLQ
+	 JWzbgxoyn4h4VkwhM102ef4o4CoiVq7Hhvmexoog=
+Date: Wed, 7 Aug 2024 16:18:54 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Daniel Gomez <da.gomez@samsung.com>
+Cc: Masahiro Yamada <masahiroy@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nicolas@fjasle.eu>,
+	Lucas De Marchi <lucas.demarchi@intel.com>,
+	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	David Airlie <airlied@gmail.com>, Daniel Vetter <daniel@ffwll.ch>,
+	William Hubbs <w.d.hubbs@gmail.com>,
+	Chris Brannon <chris@the-brannons.com>,
+	Kirk Reiser <kirk@reisers.ca>,
+	Samuel Thibault <samuel.thibault@ens-lyon.org>,
+	Paul Moore <paul@paul-moore.com>,
+	Stephen Smalley <stephen.smalley.work@gmail.com>,
+	Ondrej Mosnacek <omosnace@redhat.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Tianrui Zhao <zhaotianrui@loongson.cn>,
-	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-	David Matlack <dmatlack@google.com>,
-	David Stevens <stevensd@chromium.org>,
-	Steven Price <steven.price@arm.com>
-Subject: Re: [PATCH v12 01/84] KVM: arm64: Release pfn, i.e. put page, if
- copying MTE tags hits ZONE_DEVICE
-Message-ID: <ZrOBg70pCnv7PHyK@arm.com>
-References: <20240726235234.228822-1-seanjc@google.com>
- <20240726235234.228822-2-seanjc@google.com>
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Jiri Slaby <jirislaby@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>,
+	"intel-xe@lists.freedesktop.org" <intel-xe@lists.freedesktop.org>,
+	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+	"speakup@linux-speakup.org" <speakup@linux-speakup.org>,
+	"selinux@vger.kernel.org" <selinux@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
+	"llvm@lists.linux.dev" <llvm@lists.linux.dev>,
+	Finn Behrens <me@kloenk.dev>,
+	"Daniel Gomez (Samsung)" <d+samsung@kruces.com>,
+	"gost.dev@samsung.com" <gost.dev@samsung.com>
+Subject: Re: [PATCH 08/12] include: add elf.h support
+Message-ID: <2024080720-skyline-recapture-d80d@gregkh>
+References: <20240807-macos-build-support-v1-0-4cd1ded85694@samsung.com>
+ <20240807-macos-build-support-v1-8-4cd1ded85694@samsung.com>
+ <CGME20240807110435eucas1p2eca071b0a0122b8686d43c57bd94dc8c@eucas1p2.samsung.com>
+ <2024080717-cross-retiree-862e@gregkh>
+ <dxkmmrlhlhsrjulnyabfgcr37ojway2dxaypelf3uchkmhw4jn@z54e33jdpxmr>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -49,35 +81,15 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240726235234.228822-2-seanjc@google.com>
+In-Reply-To: <dxkmmrlhlhsrjulnyabfgcr37ojway2dxaypelf3uchkmhw4jn@z54e33jdpxmr>
 
-On Fri, Jul 26, 2024 at 04:51:10PM -0700, Sean Christopherson wrote:
-> Put the page reference acquired by gfn_to_pfn_prot() if
-> kvm_vm_ioctl_mte_copy_tags() runs into ZONE_DEVICE memory.  KVM's less-
-> than-stellar heuristics for dealing with pfn-mapped memory means that KVM
-> can get a page reference to ZONE_DEVICE memory.
+On Wed, Aug 07, 2024 at 02:13:57PM +0000, Daniel Gomez wrote:
+> > Also, as this is not internal for the kernel, but rather for userspace
+> > builds, shouldn't the include/ path be different?
 > 
-> Fixes: f0376edb1ddc ("KVM: arm64: Add ioctl to fetch/store tags in a guest")
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/arm64/kvm/guest.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index 11098eb7eb44..e1f0ff08836a 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-> @@ -1059,6 +1059,7 @@ int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
->  		page = pfn_to_online_page(pfn);
->  		if (!page) {
->  			/* Reject ZONE_DEVICE memory */
-> +			kvm_release_pfn_clean(pfn);
->  			ret = -EFAULT;
->  			goto out;
->  		}
+> Can you suggest an alternative path or provide documentation that could help
+> identify the correct location? Perhaps usr/include?
 
-This patch makes sense irrespective of whether the above pfn is a
-ZONE_DEVICE or not. gfn_to_pfn_prot() increased the page refcount via
-GUP, so it must be released before bailing out of this loop.
+That is better than the generic include path as you are attempting to
+mix userspace and kernel headers in the same directory :(
 
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
