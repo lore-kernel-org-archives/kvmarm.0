@@ -1,157 +1,138 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-oa1-f50.google.com (mail-oa1-f50.google.com [209.85.160.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 459D32F3E
-	for <kvmarm@lists.linux.dev>; Wed,  7 Aug 2024 16:39:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E27DD762DF
+	for <kvmarm@lists.linux.dev>; Wed,  7 Aug 2024 18:26:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723048786; cv=none; b=P/9ty8prjZJ6DsRdJ32lTAtaImSVUWclmIxYC0siN1oiIEtvBdYj0Z3a5T8Lb64UfEJx7KHdYLlytVZH4cuAB0PVFKw9WIajzjfNSpI9sx2QJkAq2I/dNH7OvtWtCB2b1NOkjt5dKXDenXyIYTQnGMyLcHIYRr1d8h04/35+wUw=
+	t=1723055178; cv=none; b=kbBnlKXvSPkidll0K8kS6QEqoVENintGseZBKw5TzGe96wbFsYeKQJrO5k6Be2/BLpYweMshXyfhfVfjLhRiDhGn5g1lXtN7Z3J0G/j5Lj3su4IQNaMjjm/bzqxhd5/6EoFKM6KOyzETPEcO0gVN2+oh9/u5HjmDvG6E4cEfXI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723048786; c=relaxed/simple;
-	bh=LPdAnUCvP/1/42vQX7gvD0FSLRCj53R2KV60JM7JR70=;
+	s=arc-20240116; t=1723055178; c=relaxed/simple;
+	bh=LLEn5MDBQHmrgyVACBfMnS4xxjGfc9LgvIlsA65/wbo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GAYoRg+dqxRD5Oua2Ih0hl3D9FCCdQUPMeCMW9Ql0zUPF9g5FMFsMajO0eREo0HZ6XOgEzA8vaJTrmXjXKMuv6BxV+JWm3CEdh7V0GunwMYmHt74Lq5DECFwOkH3OvzHPtFPUQuDooutnx2cYuPwkGCMQB6KUHtjfStM1z4IpqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aMcb3LKu; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=nXhCMOG78TqhCtRSmROrtZWCzVyV+T5GdqjIUsIVTzbNaN4v8AhSoRMCJN3FXnFNgffhOKzUErW8ujf7MiTFwy7LLAzZn+8GUZvHuIwpRIFD1LTwTmKIWcCL8FTXWh9VadDjf0EbTgbadh/4pHpkrv8rUsHJh/6zzr8x0W1SQLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=YFTV2FQv; arc=none smtp.client-ip=209.85.160.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aMcb3LKu"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-42808071810so511095e9.1
-        for <kvmarm@lists.linux.dev>; Wed, 07 Aug 2024 09:39:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="YFTV2FQv"
+Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-260f863108fso103067fac.1
+        for <kvmarm@lists.linux.dev>; Wed, 07 Aug 2024 11:26:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723048782; x=1723653582; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QHW1mxXo99BTncFCV2Od8EwldJIdp0HcoBntkRqHPbI=;
-        b=aMcb3LKua9oAtOpovy3hrVFShkN6rwV2ht2yojcfYyz8uEM8E/25M7crYXzg36kq/t
-         /1+gU9x8BNnQc33Bxtj53MCzMWZhaZ3tWJemZF/vS1n1j2lrrLIScWZszTGyJd1ebn84
-         Ids2l3geIifxoyY5tVetXmQjDgXj8SYecXl9vHuYSPEndDy+kESVw4CNFYVFDwUr0ZYf
-         gLze+UCFL+4IfRWsPmX9qcZnt13q7Oer3tFs5HjNenFiCj0C6K/c+8yfYoCsBjeW4sR9
-         xdp0t2wh67m2qGLIOFSSgMJ9IFWLmsesYeojN1eWsxB4ipcF5p60Dg1wd+djRg9oIpwc
-         G0oA==
+        d=ziepe.ca; s=google; t=1723055174; x=1723659974; darn=lists.linux.dev;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=qIRgOrphujOZNK9+4f2LlAnWUepvShfv1Q6TgIqEiJY=;
+        b=YFTV2FQvUEkZNXqiyk1VuBOcbU0DZzWOefYDguvuW8e1/wqO6QhxYUNV8QSO/rmf+k
+         +ka6LUf0Ch1PWPP93+mNTr2x1tKXinJgf3eh1lUqm0794jIewGxZO9Te6pUzCU6xQLhW
+         PCyK2oYs9r+hqLpYperFaqaHqtCeOMbDMl1/1m+UftzGdyRukl6MPXL8RPVZHnSaz44L
+         boteV/KgrJqICVs8uUEeU02RbcPxvr7Vy9xym40wXH8Z0ODARqMGIefdXorfY5A00PBe
+         b2PxGZwN2EaM9MSfrS76uKvlXvck6H/9n12TLhdaGOCzKjDlgmKM02S2+09dmNycmatu
+         pcdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723048782; x=1723653582;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QHW1mxXo99BTncFCV2Od8EwldJIdp0HcoBntkRqHPbI=;
-        b=PexOSlyNP0qSMekLa6vBpsV18AZdNdmNCBD1gAWP8CQAEzObY4lJL3aZn0ES+Jxfux
-         I+sEY2QYgvcTJmXt22FsSqmq8aQvbPS/n+KjV5PCYFjGKj3qm4gbBwW1baf0NKBTvY7W
-         N3H1WC/BX4KxZJ/bZmy+FSbSZF6Y9o+8ne09VvDfOvEOYqdj+cwrgWD9WtaQWQx1CdLE
-         Ux8YTaFIptCk7vT4u7jn6DQZo+F2tq6hACAjTucLLTbzGNqM6NGehRlfaoUElgY7V7s3
-         UmKSxrMuWeHy3qsP4TtaIr4FLOKugYAHerwLUDKnV6b11Uo83tvqmBq7d5ZrFVVe1LwB
-         133w==
-X-Forwarded-Encrypted: i=1; AJvYcCXBtMW58j+cgx00KBX99DYEm4HRvOMsw8m4GQAFfAWfW4O6zq36imELLopZrY9JfWUXFNeE1LpQ91hM3G74jAK/ZIFyGf2l
-X-Gm-Message-State: AOJu0Yy7ABumb3x2N7c7RS49/ILRIA3ylz5aodtmeKBDw62Zy9K79Bjt
-	k6cQBNTSaaWlM+LkMh6qVGxfBqb3YYIIugz/y+uP1KnlihjmEzDpkZ1HHoAcQQ==
-X-Google-Smtp-Source: AGHT+IFpj8OAf/zU2P5H1nf7aSDiDGP+hlwNCJGS6cZvB3Vvk1HpMfsIAD1gNsJAlgupqm5KpgXoAQ==
-X-Received: by 2002:a5d:6d49:0:b0:368:36e6:b248 with SMTP id ffacd0b85a97d-36bbc0cc71cmr14259786f8f.23.1723048782179;
-        Wed, 07 Aug 2024 09:39:42 -0700 (PDT)
-Received: from google.com (203.75.199.104.bc.googleusercontent.com. [104.199.75.203])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36bbd05ad0csm16751056f8f.79.2024.08.07.09.39.41
+        d=1e100.net; s=20230601; t=1723055174; x=1723659974;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qIRgOrphujOZNK9+4f2LlAnWUepvShfv1Q6TgIqEiJY=;
+        b=a/e12B8pb9GM0k+tjY9jC6cvG3RBWNU/n3g+XBF5mZ6T4OeWR4aOAVHmhvDQVqoM/J
+         gcfxg/sjd2j0GcGu9hxLJZABWm3iUvNXXHTlDyJCn/8YcBm2gnbupnabK/AsgtthFoQ3
+         k3WawXmTudZRxbqE61k0vxOcE0yfQcjI/XzOwB9VxnxQ/35Z7Ahq9R2c5vc+SM5lWOCi
+         v6knV3vlfODZsgT3fzPkH6QD7kYM+oIm0EVFSy6jQf/J+vgRWOntDa6FlhQ5ehvC/VFs
+         8G4LjD3kGg0l/KrCMjLN7ZAzehyxTjKRzfpevzCglw8rl+DgG1kwY0Z/WONr0fqnwACs
+         rLbw==
+X-Forwarded-Encrypted: i=1; AJvYcCVBBqnqO7yK7ufGpSSgUMZKpcoXeoFFrQYXrZBVI9LS/v4vKpUXNzKaCcMUwmVjUfV4Fz52ijA9V4aK/QL58u+CfKLYMsvb
+X-Gm-Message-State: AOJu0Yz/TKTbJG/Tk3gqMI+FL/SIDyZEL2djQTDo9KaqZsfhRJv3+7YM
+	Rn9tO/peVPy+F9Dr3INxPdWyUPqy9APMyE74uG6ONf2pJ6IJFhi9jPwcTF3pxzw=
+X-Google-Smtp-Source: AGHT+IF4dmL7QQFh54XoTTYzluGtiIHPWtm1r4ZnSMjpESeur6JHnnxQaalp3hZhfOljJo1uPFxdYA==
+X-Received: by 2002:a05:6870:4693:b0:260:e6a6:396c with SMTP id 586e51a60fabf-26891d5aebfmr23740831fac.30.1723055173896;
+        Wed, 07 Aug 2024 11:26:13 -0700 (PDT)
+Received: from ziepe.ca ([128.77.69.90])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a3786bbcffsm82167785a.99.2024.08.07.11.26.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Aug 2024 09:39:41 -0700 (PDT)
-Date: Wed, 7 Aug 2024 17:39:37 +0100
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: mhiramat@kernel.org, linux-trace-kernel@vger.kernel.org, maz@kernel.org,
-	oliver.upton@linux.dev, kvmarm@lists.linux.dev, will@kernel.org,
-	qperret@google.com, kernel-team@android.com
-Subject: Re: [RFC PATCH 00/11] Tracefs support for pKVM
-Message-ID: <ZrOjSZ_JfcaLnCgh@google.com>
-References: <20240805173234.3542917-1-vdonnefort@google.com>
- <20240806161138.3a91c04a@gandalf.local.home>
+        Wed, 07 Aug 2024 11:26:13 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1sblMR-003SUs-9y;
+	Wed, 07 Aug 2024 15:26:11 -0300
+Date: Wed, 7 Aug 2024 15:26:11 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: James Houghton <jthoughton@google.com>
+Cc: David Hildenbrand <david@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Axel Rasmussen <axelrasmussen@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	David Matlack <dmatlack@google.com>,
+	David Rientjes <rientjes@google.com>,
+	James Morse <james.morse@arm.com>, Jonathan Corbet <corbet@lwn.net>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Shaoqin Huang <shahuang@redhat.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Wei Xu <weixugc@google.com>, Will Deacon <will@kernel.org>,
+	Yu Zhao <yuzhao@google.com>, Zenghui Yu <yuzenghui@huawei.com>,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH v6 05/11] mm: Add fast_only bool to test_young and
+ clear_young MMU notifiers
+Message-ID: <20240807182611.GH8473@ziepe.ca>
+References: <20240724011037.3671523-1-jthoughton@google.com>
+ <20240724011037.3671523-6-jthoughton@google.com>
+ <37ae59f2-777a-4a58-ae58-4a20066364dd@redhat.com>
+ <CADrL8HUmQWDc-75p=Z2KZzHkyWCCh8xnX=+ZXm5MZ-drALjKTA@mail.gmail.com>
+ <20240806172349.GQ676757@ziepe.ca>
+ <CADrL8HXFK=1cUS+0Z5k048U4rzpTNL634f57VtJ7TD_umrbNiA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240806161138.3a91c04a@gandalf.local.home>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADrL8HXFK=1cUS+0Z5k048U4rzpTNL634f57VtJ7TD_umrbNiA@mail.gmail.com>
 
-On Tue, Aug 06, 2024 at 04:11:38PM -0400, Steven Rostedt wrote:
+On Wed, Aug 07, 2024 at 08:02:26AM -0700, James Houghton wrote:
+> On Tue, Aug 6, 2024 at 10:23 AM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+> >
+> > On Thu, Aug 01, 2024 at 04:13:40PM -0700, James Houghton wrote:
+> > > --- a/include/linux/mmu_notifier.h
+> > > +++ b/include/linux/mmu_notifier.h
+> > > @@ -106,6 +106,18 @@ struct mmu_notifier_ops {
+> > >          * clear_young is a lightweight version of clear_flush_young. Like the
+> > >          * latter, it is supposed to test-and-clear the young/accessed bitflag
+> > >          * in the secondary pte, but it may omit flushing the secondary tlb.
+> > > +        *
+> > > +        * The fast_only parameter indicates that this call should not block,
+> > > +        * and this function should not cause other MMU notifier calls to
+> > > +        * block. Usually this means that the implementation should be
+> > > +        * lockless.
+> > > +        *
+> > > +        * When called with fast_only, this notifier will be a no-op unless
+> > > +        * has_fast_aging is set on the struct mmu_notifier.
+> >
+> > If you add a has_fast_aging I wonder if it is better to introduce new
+> > ops instead? The semantics are a bit easier to explain that way
 > 
-> Hi Vincent,
-> 
-> Thanks for sending this!
+> v5 implemented these with a new op[1]. *Just* having the new op is
+> kind of problematic -- we have yet another op to do something very
+> similar to what already exists. We are left with two options:
+> consolidate everything into a single notifier[2] or add a new
+> parameter to test/clear_young()[3]. The latter, implemented in this
+> v6, is somewhat simpler to implement (fewer LoC, reduces some
+> duplication in KVM), though it does indeed make the explanation for
+> test/clear_young() slightly more complex. I don't feel very strongly,
+> but unless you do, I think I just ought to stick with how the v6 does
+> it. :)
 
-And thanks for already having a look at it!
+If it does makes the code simpler then it is probably the better choice
 
-[..]
-
-> > 2. Tracefs interface
-> > --------------------
-> > 
-> > The interface is a hyp/ folder at the root of the tracefs mount point.
-> > This folder is like an instance and you'll find there a subset of the
-> > regular Tracefs user-space interface:
-> > 
-> >   hyp/
-> 
-> Hmm, do we really need to shorten it? Why not just call it "hypervisor". I
-> mean tab completion helps with the typing.
-
-In most of the code we do refer to hyp, that's why we kept the naming here too.
-But yeah we could expand it.
-
-> 
-> >      buffer_size_kb
-> >      trace_pipe
-> >      trace_pipe_raw
-> >      trace
-> >      per_cpu/
-> >              cpuX/
-> >                  trace_pipe
-> >                  trace_pipe_raw
-> >      events/
-> >             hyp/
-> >                 hyp_enter/
-> >                           enable
-> >                           id
-> > 
-
-[...]
-
-> > 
-> > 4. Few limitations:
-> > -------------------
-> > 
-> > Non consuming reading of the buffer isn't supported (i.e. cat trace) due
-> > to the lack of support in the ring-buffer meta-page.
-> 
-> Hmm, I don't think it should be hard to support that. I've been looking
-> into it for the user mapping. But that can be added later. For now, perhaps
-> "cat trace" just returns -EPERM?
-
-Yeah, I am sure that's something we can make work. But definitely not a priority
-as it is less reliable than _pipe and unused by user-space tools I believe.
-
-For now we print "Not supported yet". But happy to modify it to a EPERM.
-
-> 
-> > 
-> > Tracing must be stopped for the buffer to be reset. i.e. (echo 0 >
-> > tracing_on; echo 0 > trace)
-> 
-> Hmm, why this?  I haven't looked at the patches yet, but why can't the
-> write to trace just stop tracing and re-enable it after the reset?
-
-I could reset the buffers from the hypervisor with a dedicated hypercall.
-
-However I'd still need a way to "teardown" the buffer, that is unsharing it with
-the hypervisor and freeing the allocated memory. Using that reset for this
-purpose was nice even though it implied to stop tracing in a first place. 
-
-Perhaps `echo 0 > trace` could reset the buffer if tracing_on=1 and teardown the
-buffers if tracing_on=0?
-
-Alternatively, I could use `echo 0 > buffer_size_kb` for the teardown. But I
-prefer the former solution: interface users are more likely to just 0 tracing_on
-and trace.
-
-> 
-> > 
-> 
-> -- Steve
+Jason
