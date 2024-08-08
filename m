@@ -1,147 +1,105 @@
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C96B13DDD9
-	for <kvmarm@lists.linux.dev>; Thu,  8 Aug 2024 18:38:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B8753398E
+	for <kvmarm@lists.linux.dev>; Thu,  8 Aug 2024 19:58:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723142330; cv=none; b=KuZpUmGblCI8xG2f55GcMHSJKCPss3yaU374mTV/2WIAljRaW0I+CjC5OvK6NgE7gYd9FFOZaU8NpKB4pvFU/i4aS70p4xzdHDvsanGg0mboGMCdH95OgikEUPYo6M5M2oXr3d2YFNVI0xvTn3VKtq+NIsaN1FduSY0PxDaLIXo=
+	t=1723147123; cv=none; b=Vp/LRwcD5htRlwx67LVFEB+jIdqOmIzOTp3WN+4P/RQ+9+CqijhoIxY6xEM0eWaZ5xS98XRCnFsFK6KR+ZzqMhyTSJG+IsivOo7oYXQBTM/LGUMBR6v7sXY5P9LDPrRENvYoFL0t4uMh3yYvCaI1mor5CK+twsQH1c3QiXOH7+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723142330; c=relaxed/simple;
-	bh=Zul5dPpRijd36xMcbhj3qKEBK3J2pVUs4vMz75golak=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=XGaeIsdED6N/RFGZXRJe4ZlpzRI2KO6tjP3MxJuzvnlM6iciJQZ/VJtFDPdcqF6k0PKFn2Ku+8vT/41r1f1aMXuZBuPqG14JANMsPI/EvM2G7C2pIpcTHovjcHSP5ja9iUEx/lceCc6uyaQc6351nCJ24E0xoBqFa3dgIpOZq1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Wfwl05dJJzpT8l;
-	Fri,  9 Aug 2024 02:37:32 +0800 (CST)
-Received: from dggems703-chm.china.huawei.com (unknown [10.3.19.180])
-	by mail.maildlp.com (Postfix) with ESMTPS id E4587180AE5;
-	Fri,  9 Aug 2024 02:38:44 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
- dggems703-chm.china.huawei.com (10.3.19.180) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Fri, 9 Aug 2024 02:38:43 +0800
-Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
- lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.039;
- Thu, 8 Aug 2024 19:38:41 +0100
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-CC: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "maz@kernel.org" <maz@kernel.org>,
-	"will@kernel.org" <will@kernel.org>, "catalin.marinas@arm.com"
-	<catalin.marinas@arm.com>, "james.morse@arm.com" <james.morse@arm.com>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, yuzenghui
-	<yuzenghui@huawei.com>, "Wangzhou (B)" <wangzhou1@hisilicon.com>, Linuxarm
-	<linuxarm@huawei.com>
-Subject: RE: [PATCH] KVM: arm64: Disable OS double lock visibility by default
- and ignore VMM writes
-Thread-Topic: [PATCH] KVM: arm64: Disable OS double lock visibility by default
- and ignore VMM writes
-Thread-Index: AQHa6ZLiWjeeh1HBGka45Wu/S0A0I7IdkAQAgAAWKlD///hCgIAAET2g
-Date: Thu, 8 Aug 2024 18:38:41 +0000
-Message-ID: <f41074b4b460431e9830bc717b8a58b6@huawei.com>
-References: <20240808125711.14368-1-shameerali.kolothum.thodi@huawei.com>
- <ZrUC5O8XUuvlLJcc@linux.dev> <f81365c28d1b4ae1a5e9c2345d24b2c7@huawei.com>
- <ZrUO_RG6a9We7neT@linux.dev>
-In-Reply-To: <ZrUO_RG6a9We7neT@linux.dev>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1723147123; c=relaxed/simple;
+	bh=qhoRELp0nXoI/COuYWXvg+4+/JGWDI6UHeZkQ4j9XoE=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=DidB1Fxvgb7IM8AmiKEwieaCAnJVtEv0cxsl7dAT7RnzcwBMyvV+HJ2/wMDUmjAf8RNBAcfvOccxlIK9UQMZwRkQkRXjL+IHMrGcRe/l9bt+Nerjm9ok1/pFBX7YWNHHIECrm8SuBbApcJj4Bx1qWtHlq19wC7/1TkJqb1XU/iU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NKQqyn1Y; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NKQqyn1Y"
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-690404fd230so30007187b3.3
+        for <kvmarm@lists.linux.dev>; Thu, 08 Aug 2024 12:58:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1723147119; x=1723751919; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=qhoRELp0nXoI/COuYWXvg+4+/JGWDI6UHeZkQ4j9XoE=;
+        b=NKQqyn1YlntLNwHenRqIOZszpOZBOONJO7rCfd2tsX5f5EgBqgwAL0NH8Rn0+tUa29
+         TimYFC9K16tlGgDBIKz+5aR2FHX99XqGduWSDVePcRHc2+MjZXRCF0Lggoho2k5GJS+m
+         udtQRXrMmZcf6IE/XJU9tYq80xX7vwni+9VweisTSguJviYTw1a+CyU/arkhLrc8yoF3
+         37eIWRt/3hgl0T3RQu3H8//9b3KV7/2Hg7jxIRb5zTc71ZuzPB3oHxHgZJL4fSbMs1St
+         I9a38B8Mgv2qxnRWvuqPF9qCz9eKuLvRFm0xnpUn4l2xTNn52P2hPUcNrcs2qEVM9aA2
+         Ub+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723147119; x=1723751919;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qhoRELp0nXoI/COuYWXvg+4+/JGWDI6UHeZkQ4j9XoE=;
+        b=P0Alciu7RLOfOvoOyy8ijANG+KLr8F+xFpqCMSHRhHGZW2qUz3ro+D6oR4/zsSUfdd
+         3gcGgz/zUPN1L0RAUrwribpZ6Zl9LnniSIoCNe+/ic2luBlVrL7A61tj8mR2NCyxUdny
+         x8j/AcsaOe2UT49WnhOlb8yzcX5PzX84MpvVyUa8DiuvZoSEY3tNsM6ytgfdpOzOpG8v
+         VWPoCfc4jpEu199izEVjY3Q9FTAFf/gnHRSuo7jQaUaZQFbqRL3t/Ua2/iN4jm3TTkhB
+         3nM/2uQAQilCECEgJd3AbYfiHor0uQ6SQ7QegYey1lzz0OeZZn3DdFZ+IDYK548i/iUp
+         Awsw==
+X-Forwarded-Encrypted: i=1; AJvYcCWo7Q63ZeaX4KtHi5iZ1LjY0kMFgLn8FT+EKwak1BJctrTxEy2vI48LnAUsj/sd0F6eVzhK/cy3hHimQvd85DzLAZla3fnX
+X-Gm-Message-State: AOJu0Yyk+vehEL113lU9+JRDYH+xOt9FOmFZfrqXnwt9zdwJPlPQI7oP
+	Irn/TkV45kg2DaUZUwrUqwLhlUR9A723wX+TVuDDVzJdTuKJRS1zqPipQmMOUO+u6K15eSLMQWO
+	tpNwGZ25bzzFlp8BhtOYdKg==
+X-Google-Smtp-Source: AGHT+IEigNweiXDrAdz21J+YdPs1Skcc9+Ege+GZLI1vt28thJN0TK7T9V1VytHT8g9OrCSwhqlqBNlR2BBx3Tt0VQ==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
+ (user=coltonlewis job=sendgmr) by 2002:a05:690c:3082:b0:66a:764f:e57f with
+ SMTP id 00721157ae682-69bfb7e34admr335247b3.7.1723147119376; Thu, 08 Aug 2024
+ 12:58:39 -0700 (PDT)
+Date: Thu, 08 Aug 2024 19:58:38 +0000
+In-Reply-To: <ZrUGpZVnUN1NaVga@linux.dev> (message from Oliver Upton on Thu, 8
+ Aug 2024 17:55:49 +0000)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
+Mime-Version: 1.0
+Message-ID: <gsnted6y23dd.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH v2] KVM: arm64: Move data barrier to end of split walk
+From: Colton Lewis <coltonlewis@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvm@vger.kernel.org, maz@kernel.org, ricarkol@google.com, 
+	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	catalin.marinas@arm.com, will@kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogT2xpdmVyIFVwdG9uIDxv
-bGl2ZXIudXB0b25AbGludXguZGV2Pg0KPiBTZW50OiBUaHVyc2RheSwgQXVndXN0IDgsIDIwMjQg
-NzozMSBQTQ0KPiBUbzogU2hhbWVlcmFsaSBLb2xvdGh1bSBUaG9kaSA8c2hhbWVlcmFsaS5rb2xv
-dGh1bS50aG9kaUBodWF3ZWkuY29tPg0KPiBDYzoga3ZtYXJtQGxpc3RzLmxpbnV4LmRldjsgbGlu
-dXgtYXJtLWtlcm5lbEBsaXN0cy5pbmZyYWRlYWQub3JnOw0KPiBtYXpAa2VybmVsLm9yZzsgd2ls
-bEBrZXJuZWwub3JnOyBjYXRhbGluLm1hcmluYXNAYXJtLmNvbTsNCj4gamFtZXMubW9yc2VAYXJt
-LmNvbTsgc3V6dWtpLnBvdWxvc2VAYXJtLmNvbTsgeXV6ZW5naHVpDQo+IDx5dXplbmdodWlAaHVh
-d2VpLmNvbT47IFdhbmd6aG91IChCKSA8d2FuZ3pob3UxQGhpc2lsaWNvbi5jb20+Ow0KPiBMaW51
-eGFybSA8bGludXhhcm1AaHVhd2VpLmNvbT4NCj4gU3ViamVjdDogUmU6IFtQQVRDSF0gS1ZNOiBh
-cm02NDogRGlzYWJsZSBPUyBkb3VibGUgbG9jayB2aXNpYmlsaXR5IGJ5IGRlZmF1bHQNCj4gYW5k
-IGlnbm9yZSBWTU0gd3JpdGVzDQo+IA0KPiBPbiBUaHUsIEF1ZyAwOCwgMjAyNCBhdCAwNjoxMDoz
-M1BNICswMDAwLCBTaGFtZWVyYWxpIEtvbG90aHVtIFRob2RpDQo+IHdyb3RlOg0KPiA+ID4gSSBm
-aW5kIG15c2VsZiBhc2tpbmcgKndoeSogd2UgbmVlZCB0aGlzLCBjb3VsZCB5b3Ugc2hhcmUgc29t
-ZSBkZXRhaWxzDQo+ID4gPiBvbiB0aGUgaXNzdWUgeW91J3JlIGVuY291bnRlcmluZz8NCj4gPg0K
-PiA+IFNvcnJ5LCBJIG1pc3NlZCB0aGUgd2h5IHBhcnQuIE1haW5seSBmb3IgVk0gbWlncmF0aW9u
-IHB1cnBvc2VzIGFzIHdlIGhhdmUNCj4gc3lzdGVtcw0KPiA+IHdpdGggRG91YmxlTG9jayBpbXBs
-ZW1lbnRlZCBhbmQgbm90IGltcGxlbWVudGVkKHdpdGggRGVidWdWZXIgOC4yKS4NCj4gDQo+IEFo
-LCBnb3QgaXQsIHRoYW5rcyBmb3IgdGhlIGNvbnRleHQuDQo+IA0KPiA+ID4NCj4gPiA+IEluZGVl
-ZCwgUkFaL1dJIGlzIG5vdCBhIGZhaXRoZnVsIGltcGxlbWVudGF0aW9uIG9mIEZFQVRfRG91Ymxl
-TG9jaywgYnV0DQo+ID4gPiBJIHdvdWxkbid0IGV4cGVjdCBpdCB0byBiZSB1c2VkIGluIGEgVk0g
-aW4gdGhlIGZpcnN0IHBsYWNlLg0KPiA+ID4NCj4gPiA+IE9uIFRodSwgQXVnIDA4LCAyMDI0IGF0
-IDAxOjU3OjExUE0gKzAxMDAsIFNoYW1lZXIgS29sb3RodW0gd3JvdGU6DQo+ID4gPiA+IEtWTSBl
-eHBvc2VzIHRoZSBPUyBkb3VibGUgbG9jayBmZWF0dXJlIGJpdCB0byBHdWVzdHMgYnV0IHJldHVy
-bnMNCj4gPiA+ID4gUkFaL1dJIG9uIEd1ZXN0IE9TRExSX0VMMSBhY2Nlc3MuIE1ha2Ugc3VyZSB3
-ZSBhcmUgaGlkaW5nIE9TDQo+IGRvdWJsZQ0KPiA+ID4gPiBsb2NrIGZyb20gR3Vlc3RzIG5vdy4g
-SG93ZXZlciB3ZSBjYW4ndCBoaWRlIERvdWJsZUxvY2sgaWYgdGhlDQo+IHJlcG9ydGVkDQo+ID4g
-PiA+IERlYnVnVmVyIGlzIDwgOC4yLiBTbyByZXBvcnQgYSBtaW5pbXVtIERlYnVnVmVyIG9mIDgu
-MiB0byBHdWVzdHMuDQo+ID4gPg0KPiA+ID4gV2hhdCBpZiBhIHVzZXIgd2FudGVkIHRvIHZpcnR1
-YWxpemUgYW4gZXhhY3QgQ1BVIG1vZGVsIHRoYXQgb25seQ0KPiA+ID4gaW1wbGVtZW50ZWQgdjgu
-MD8NCj4gPg0KPiA+IFllYWguIEkgd2FzIGEgYml0IGNvbmNlcm5lZCBhcyBtZW50aW9uZWQgYmVs
-b3cgb2YgYnVtcGluZyB1cCBEZWJ1Z1Zlcg0KPiB0byA4LjIuDQo+ID4gQnV0IHRoZW4gSSBmb3Vu
-ZCBhIHNpbWlsYXIgYXR0ZW1wdCB5b3UgbWFkZSBhIHdoaWxlIGJhY2ssDQo+ID4gaHR0cHM6Ly9s
-b3JlLmtlcm5lbC5vcmcvbGludXgtYXJtLWtlcm5lbC8yMDIxMTAyOTAwMzIwMi4xNTgxNjEtMS0N
-Cj4gb3VwdG9uQGdvb2dsZS5jb20vVC8jbWVlZTk0ZDg3ZGIzZjgwNDIxNTY1NTdkYmY5NzQzYmIw
-M2NmMGFhYTkNCj4gDQo+IFVzaW5nIG15IG93biBjcmFwIHBhdGNoZXMgYWdhaW5zdCBtZSwgZHJh
-dCEgOi0pDQoNCvCfmIouIE5vdCBpbnRlbnRpb25hbC4gSSBmb3VuZCBpdCBhZnRlciBJIHByZXBh
-cmVkIHRoaXMgcGF0Y2ggYW5kIGZlbHQNCnZhbGlkYXRlZCEuDQoNCj4gDQo+IEluIGFsbCBzZXJp
-b3VzbmVzcywgdGhpcyBoYXMgc2luY2UgYmVlbiByZXNvbHZlZCB3aXRoIHRoZSAnd3JpdGFibGUn
-IElEDQo+IHJlZ2lzdGVyIGluZnJhc3RydWN0dXJlIGFuZCBjb3JyZXNwb25kaW5nIGNoYW5nZXMg
-cmFpc2luZyB0aGUgbWF4DQo+IHBvc3NpYmxlIGRlYnVnIGFyY2ggdG8gdjguOC4gRGVidWdWZXIg
-d2lsbCBtYXRjaCB0aGUgSFcgdmFsdWUgdXAgdG8NCj4gdjguOCwgYnV0IHVzZXJzcGFjZSBjYW4g
-J2Rvd25ncmFkZScgdGhlIGZlYXR1cmUgYnkgd3JpdGluZyBhIGxlc3Nlcg0KPiB2YWx1ZS4NCj4g
-DQo+IFNvIGluIHRoZSBjYXNlIG9mIGNyb3NzLXN5c3RlbSBtaWdyYXRpb24sIHRoZSBvbGQgdmFs
-dWUgaXMgc3RpbGwNCj4gYWNjZXB0ZWQgYnkgS1ZNICsgYWR2ZXJ0aXNlZCB0byB0aGUgVk0uDQo+
-IA0KPiA+ID4NCj4gPiA+ID4gQWxsIHRoaXMgbWF5IGJyZWFrIG1pZ3JhdGlvbiBmcm9tIHRoZSBv
-bGRlciBrZXJuZWxzLiBUYWtlIGNhcmUgb2YNCj4gPiA+ID4gdGhhdCBieSBpZ25vcmluZyBWTU0g
-d3JpdGVzIGZvciB0aGVzZSB2YWx1ZXMuDQo+ID4gPg0KPiA+ID4gSWdub3JpbmcgdXNlcnNwYWNl
-IHdyaXRlcyBpcyBhIHByZXR0eSBiaWcgaGFtbWVyLiBJbiBzaXR1YXRpb25zIHdoZXJlDQo+ID4g
-PiBLVk0gaGFkIGFkdmVydGlzZWQgYSBmZWF0dXJlIHRoYXQgd2FzIG91dHJpZ2h0IG5vdCBzdXBw
-b3J0ZWQgKGUuZy4gSU1QDQo+IERFRg0KPiA+ID4gUE1VcykgaXQgX21pZ2h0XyBtYWtlIHNlbnNl
-LiBCdXQgd2l0aCB0aGlzIGNoYW5nZSB3ZSdyZSBtZXNzaW5nIHdpdGggYQ0KPiA+ID4gQ1BVIGZl
-YXR1cmUgd2UgKmRvKiBzdXBwb3J0Lg0KPiA+DQo+ID4gVGhlIGNvbmNlcm4gaGVyZSBpcyBmb3Ig
-dGhlIERlYnVnVmVyIEkgZ3Vlc3MuDQo+IA0KPiBJbmRlZWQuDQo+IA0KPiA+IEJ1dCBpZiBWTXMg
-YXJlIG5vdCBtYWtpbmcgdXNlIG9mIGFueSA4LjAgc3BlY2lmaWMgZmVhdHVyZXMoYXMgSSB1bmRl
-cnN0YW5kDQo+IGl0LA0KPiA+IG9ubHkgZXh0ZXJuYWwgZGVidWdnZXIgc3VwcG9ydCBpcyB0aGUg
-ZGlmZmVyZW5jZSksIHRoZW4gaXMgdGhhdCBhbiBpc3N1ZT8NCj4gDQo+IFlvdSdyZSBhYnNvbHV0
-ZWx5IHJpZ2h0IHRvIHBvaW50IG91dCB0aGF0IHY4LjAgLT4gdjguMiBkb2Vzbid0IGNoYW5nZQ0K
-PiBhbnl0aGluZyBmcm9tIHRoZSBWTSdzIFBPVi4NCj4gDQo+IE15IGNvbmNlcm4gaXMgdGhhdCB0
-aGUgZ3Vlc3QgZG9lcyBub3QgYW50aWNpcGF0ZSBJRCByZWdpc3RlcnMgY2hhbmdpbmcNCj4gdmFs
-dWVzIGF0IHJ1bnRpbWUsIGFuZCB3ZSBzaG91bGQgb25seSByZWFjaCBmb3IgdGhhdCBiaWcgaGFt
-bWVyIGlmIHdlDQo+IChLVk0pIGhhdmUgZG9uZSBzb21ldGhpbmcgdHJ1bHkgc3R1cGlkLg0KPiAN
-Cj4gV2hpY2ggbmV2ZXIgaGFwcGVucywgb2YgY291cnNlIDopDQo+IA0KPiA+ID4gV291bGQgYWxs
-b3dpbmcgdXNlcnNwYWNlIHRvIGRvd25ncmFkZSBJRF9BQTY2NERGUjBfRUwxLkRvdWJsZUxvY2sN
-Cj4gdG8NCj4gPiA+IDBiMTExMSBiZSBlbm91Z2g/DQo+ID4NCj4gPiBZZWFoLiBDb3VsZCBJIGd1
-ZXNzLiBCdXQgdGhlbiB3ZSBuZWVkIHRvIGNoZWNrIHRoZSBEZWJ1Z1ZlciBtYXRjaGVzIHRvDQo+
-IDguMiBvciBub3QNCj4gPiBhcyB3ZWxsLg0KPiANCj4gRWgsIEkgZG9uJ3QgdGhpbmsgdGhhdCBL
-Vk0gbmVlZHMgdG8gYmUgcG9saWNpbmcgdGhlIFZNTSBmb3IgdG90YWwNCj4gY29tcGxpYW5jZSB3
-aXRoIHRoZSBhcmNoaXRlY3R1cmUuIFdoYXQncyBmYXIgbW9yZSBpbXBvcnRhbnQgaXMNCj4gZ3Vh
-cmFudGVlaW5nIHRoZSBzZWxlY3RlZCBDUFUgZmVhdHVyZSBzZXQgaXMgYSBzdWJzZXQgb2Ygd2hh
-dCBLVk0NCj4gdmlydHVhbGl6ZXMuDQogDQo+IFNvIGV2ZW4gdGhvdWdoIHRoZSBhcmNoaXRlY3R1
-cmUgc2F5cw0KPiANCj4gICAhRkVBVF9Eb3VibGVMb2NrICYmICFGRUFUX0RlYnVndjhwMg0KPiAN
-Cj4gaXMgbm90IGFsbG93ZWQsIGl0IGlzbid0IGEgcHJvYmxlbWF0aWMgY29uZmlndXJhdGlvbiBm
-b3IgS1ZNLiBTdGlsbCwNCj4gdGhlIGRlZmF1bHRzIGZyb20gS1ZNIHNob3VsZCBzdGlsbCBjb21w
-bHkgd2l0aCB0aGUgYXJjaGl0ZWN0dXJlIGFzDQo+IGNsb3NlbHkgYXMgcG9zc2libGUuDQoNClll
-YWguIFRoYXQgd2FzIHRoZSBiaXQgSSB3YXMgbm90IHN1cmUgYWJvdXQuIE9rLCBmaW5lIHRoZW4u
-DQoNCj4gPiBJZGVhIHdhcywgaXMgdGhlcmUgYW55IHBvaW50IGluIGV4cG9zaW5nICBmZWF0dXJl
-cyB0aGF0IGFyZSBub3Qgc3VwcG9ydGVkIG9yDQo+IHVzZWQNCj4gPiBieSBWTXMgaW4gdGhlIGZp
-cnN0IHBsYWNlLg0KPiANCj4gQW5kIEkgZ2VuZXJhbGx5IGFncmVlLCBidXQgdGhlIG5lZWQgdG8g
-Y2h1cm4gb3RoZXIgZmllbGRzIHRvIGdldCB0byBhDQo+IHNhbmUgc3RhcnRpbmcgcG9pbnQgZ2F2
-ZSBtZSBhIGJpdCBvZiBwYXVzZS4NCg0KWWVhaC4gR290IGl0Lg0KDQo+IA0KPiBXb3VsZCB5b3Ug
-YmUgd2lsbGluZyB0byBjb29rIHVwIGEgcGF0Y2ggdGhhdCBqdXN0IG9wZW5zIHVwIHRoZQ0KPiBE
-b3VibGVMb2NrIGZpZWxkIHRvIGRvd25ncmFkZXM/DQoNClN1cmUuIFdpbGwgZG8uKEFuZCB3ZSBt
-aWdodCBuZWVkIG1vcmUgYXMgd2VsbC4gTGV0IG1lIHNlZS4pDQoNClRoYW5rcywNClNoYW1lZXIN
-Cg==
+Oliver Upton <oliver.upton@linux.dev> writes:
+
+> Hi Colton,
+
+> On Thu, Aug 08, 2024 at 05:42:43PM +0000, Colton Lewis wrote:
+>> This DSB guarantees page table updates have been made visible to the
+>> hardware table walker. Moving the DSB from stage2_split_walker() to
+>> after the walk is finished in kvm_pgtable_stage2_split() results in a
+>> roughly 70% reduction in Clear Dirty Log Time in
+>> dirty_log_perf_test (modified to use eager page splitting) when using
+>> huge pages. This gain holds steady through a range of vcpus
+>> used (tested 1-64) and memory used (tested 1-64GB).
+
+> Would you have time to put together a patch for the dirty_log_perf_test
+> changes you've made? This would be quite valuable for testing future
+> improvements to eager page splitting.
+
+I can do that.
+
+>> This is safe to do because nothing else is using the page tables while
+>> they are still being mapped and this is how other page table walkers
+>> already function. None of them have a data barrier in the walker
+>> itself because relative ordering of table PTEs to table contents comes
+>> from the release semantics of stage2_make_pte().
+
+>> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+
+> The diff itself looks good to me, so:
+
+> Acked-by: Oliver Upton <oliver.upton@linux.dev>
+
+> --
+> Thanks,
+> Oliver
