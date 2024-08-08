@@ -1,151 +1,147 @@
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33C7880C13
-	for <kvmarm@lists.linux.dev>; Thu,  8 Aug 2024 18:31:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C96B13DDD9
+	for <kvmarm@lists.linux.dev>; Thu,  8 Aug 2024 18:38:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723141895; cv=none; b=H3aa9O8b/5gdmbURCC8gDIJqY5It/6Jh1yQpqWK0ZLK4B1DyaSYB07dytl0+E6/RC2LEBlrRDkBP/b8nEtl1Mxt989rNwSYK1jSKRCOYS2pHnFB/QWsOc7HnWEUepXm5NW60atILakD5wQ65h8DPWxtQT65+WdroafVEyP/WLxo=
+	t=1723142330; cv=none; b=KuZpUmGblCI8xG2f55GcMHSJKCPss3yaU374mTV/2WIAljRaW0I+CjC5OvK6NgE7gYd9FFOZaU8NpKB4pvFU/i4aS70p4xzdHDvsanGg0mboGMCdH95OgikEUPYo6M5M2oXr3d2YFNVI0xvTn3VKtq+NIsaN1FduSY0PxDaLIXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723141895; c=relaxed/simple;
-	bh=hAd5wPQ+HEnNgjAlvK80xNJSgDb+C4pUScPMcooggzU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QGOdtimVDb5kaQZYgbDN1EcAZpah5cmAhO3dzf9lSYNJJnpAgyM8MseF091tpa0t6PdSJd/Gw2cMzg6uC7VFVGHZmMRdbZyrWAVIgmsFp77k39MbKCwl7X/E+3CBRZg0R/MuujERCqXWR/m1zDq3SOwjxl27HEtV9dXCKjPWFxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=P35qKX3j; arc=none smtp.client-ip=95.215.58.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="P35qKX3j"
-Date: Thu, 8 Aug 2024 18:31:25 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1723141890;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MCEvSa1rci8lOZvwzCzc6u9Pm8Tp4sCjT5NtOCzDNF0=;
-	b=P35qKX3jpcNrEiDjJ3mJ+K9wSyV6ibp3BE01cQLuPeHycT2wFJnnUtA+olTGhaHhLD2HR8
-	PzCBUBbmj1+FZn68ZBJHSkg5Waj9XWqj9eMVh7pqoemZ5fwbGxmK5ptAF20yQ2LxCFO3L5
-	Z9GcCxjDnHpDebH+qgA3uocWlvwJ3aQ=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Cc: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"maz@kernel.org" <maz@kernel.org>,
-	"will@kernel.org" <will@kernel.org>,
-	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-	"james.morse@arm.com" <james.morse@arm.com>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
-	yuzenghui <yuzenghui@huawei.com>,
-	"Wangzhou (B)" <wangzhou1@hisilicon.com>,
-	Linuxarm <linuxarm@huawei.com>
-Subject: Re: [PATCH] KVM: arm64: Disable OS double lock visibility by default
+	s=arc-20240116; t=1723142330; c=relaxed/simple;
+	bh=Zul5dPpRijd36xMcbhj3qKEBK3J2pVUs4vMz75golak=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=XGaeIsdED6N/RFGZXRJe4ZlpzRI2KO6tjP3MxJuzvnlM6iciJQZ/VJtFDPdcqF6k0PKFn2Ku+8vT/41r1f1aMXuZBuPqG14JANMsPI/EvM2G7C2pIpcTHovjcHSP5ja9iUEx/lceCc6uyaQc6351nCJ24E0xoBqFa3dgIpOZq1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Wfwl05dJJzpT8l;
+	Fri,  9 Aug 2024 02:37:32 +0800 (CST)
+Received: from dggems703-chm.china.huawei.com (unknown [10.3.19.180])
+	by mail.maildlp.com (Postfix) with ESMTPS id E4587180AE5;
+	Fri,  9 Aug 2024 02:38:44 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
+ dggems703-chm.china.huawei.com (10.3.19.180) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Fri, 9 Aug 2024 02:38:43 +0800
+Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
+ lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.039;
+ Thu, 8 Aug 2024 19:38:41 +0100
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+CC: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "maz@kernel.org" <maz@kernel.org>,
+	"will@kernel.org" <will@kernel.org>, "catalin.marinas@arm.com"
+	<catalin.marinas@arm.com>, "james.morse@arm.com" <james.morse@arm.com>,
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, yuzenghui
+	<yuzenghui@huawei.com>, "Wangzhou (B)" <wangzhou1@hisilicon.com>, Linuxarm
+	<linuxarm@huawei.com>
+Subject: RE: [PATCH] KVM: arm64: Disable OS double lock visibility by default
  and ignore VMM writes
-Message-ID: <ZrUO_RG6a9We7neT@linux.dev>
+Thread-Topic: [PATCH] KVM: arm64: Disable OS double lock visibility by default
+ and ignore VMM writes
+Thread-Index: AQHa6ZLiWjeeh1HBGka45Wu/S0A0I7IdkAQAgAAWKlD///hCgIAAET2g
+Date: Thu, 8 Aug 2024 18:38:41 +0000
+Message-ID: <f41074b4b460431e9830bc717b8a58b6@huawei.com>
 References: <20240808125711.14368-1-shameerali.kolothum.thodi@huawei.com>
- <ZrUC5O8XUuvlLJcc@linux.dev>
- <f81365c28d1b4ae1a5e9c2345d24b2c7@huawei.com>
+ <ZrUC5O8XUuvlLJcc@linux.dev> <f81365c28d1b4ae1a5e9c2345d24b2c7@huawei.com>
+ <ZrUO_RG6a9We7neT@linux.dev>
+In-Reply-To: <ZrUO_RG6a9We7neT@linux.dev>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f81365c28d1b4ae1a5e9c2345d24b2c7@huawei.com>
-X-Migadu-Flow: FLOW_OUT
 
-On Thu, Aug 08, 2024 at 06:10:33PM +0000, Shameerali Kolothum Thodi wrote:
-> > I find myself asking *why* we need this, could you share some details
-> > on the issue you're encountering?
-> 
-> Sorry, I missed the why part. Mainly for VM migration purposes as we have systems
-> with DoubleLock implemented and not implemented(with DebugVer 8.2).
-
-Ah, got it, thanks for the context.
-
-> > 
-> > Indeed, RAZ/WI is not a faithful implementation of FEAT_DoubleLock, but
-> > I wouldn't expect it to be used in a VM in the first place.
-> > 
-> > On Thu, Aug 08, 2024 at 01:57:11PM +0100, Shameer Kolothum wrote:
-> > > KVM exposes the OS double lock feature bit to Guests but returns
-> > > RAZ/WI on Guest OSDLR_EL1 access. Make sure we are hiding OS double
-> > > lock from Guests now. However we can't hide DoubleLock if the reported
-> > > DebugVer is < 8.2. So report a minimum DebugVer of 8.2 to Guests.
-> > 
-> > What if a user wanted to virtualize an exact CPU model that only
-> > implemented v8.0?
-> 
-> Yeah. I was a bit concerned as mentioned below of bumping up DebugVer to 8.2.
-> But then I found a similar attempt you made a while back,
-> https://lore.kernel.org/linux-arm-kernel/20211029003202.158161-1-oupton@google.com/T/#meee94d87db3f8042156557dbf9743bb03cf0aaa9
-
-Using my own crap patches against me, drat! :-)
-
-In all seriousness, this has since been resolved with the 'writable' ID
-register infrastructure and corresponding changes raising the max
-possible debug arch to v8.8. DebugVer will match the HW value up to
-v8.8, but userspace can 'downgrade' the feature by writing a lesser
-value.
-
-So in the case of cross-system migration, the old value is still
-accepted by KVM + advertised to the VM.
-
-> > 
-> > > All this may break migration from the older kernels. Take care of
-> > > that by ignoring VMM writes for these values.
-> > 
-> > Ignoring userspace writes is a pretty big hammer. In situations where
-> > KVM had advertised a feature that was outright not supported (e.g. IMP DEF
-> > PMUs) it _might_ make sense. But with this change we're messing with a
-> > CPU feature we *do* support.
-> 
-> The concern here is for the DebugVer I guess.
-
-Indeed.
-
-> But if VMs are not making use of any 8.0 specific features(as I understand it,
-> only external debugger support is the difference), then is that an issue?
-
-You're absolutely right to point out that v8.0 -> v8.2 doesn't change
-anything from the VM's POV.
-
-My concern is that the guest does not anticipate ID registers changing
-values at runtime, and we should only reach for that big hammer if we
-(KVM) have done something truly stupid.
-
-Which never happens, of course :)
-
-> > Would allowing userspace to downgrade ID_AA664DFR0_EL1.DoubleLock to
-> > 0b1111 be enough?
-> 
-> Yeah. Could I guess. But then we need to check the DebugVer matches to 8.2 or not
-> as well.
-
-Eh, I don't think that KVM needs to be policing the VMM for total
-compliance with the architecture. What's far more important is
-guaranteeing the selected CPU feature set is a subset of what KVM
-virtualizes.
-
-So even though the architecture says
-
-  !FEAT_DoubleLock && !FEAT_Debugv8p2
-
-is not allowed, it isn't a problematic configuration for KVM. Still,
-the defaults from KVM should still comply with the architecture as
-closely as possible.
-
-> Idea was, is there any point in exposing  features that are not supported or used
-> by VMs in the first place.
-
-And I generally agree, but the need to churn other fields to get to a
-sane starting point gave me a bit of pause.
-
-Would you be willing to cook up a patch that just opens up the
-DoubleLock field to downgrades?
-
--- 
-Thanks,
-Oliver
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogT2xpdmVyIFVwdG9uIDxv
+bGl2ZXIudXB0b25AbGludXguZGV2Pg0KPiBTZW50OiBUaHVyc2RheSwgQXVndXN0IDgsIDIwMjQg
+NzozMSBQTQ0KPiBUbzogU2hhbWVlcmFsaSBLb2xvdGh1bSBUaG9kaSA8c2hhbWVlcmFsaS5rb2xv
+dGh1bS50aG9kaUBodWF3ZWkuY29tPg0KPiBDYzoga3ZtYXJtQGxpc3RzLmxpbnV4LmRldjsgbGlu
+dXgtYXJtLWtlcm5lbEBsaXN0cy5pbmZyYWRlYWQub3JnOw0KPiBtYXpAa2VybmVsLm9yZzsgd2ls
+bEBrZXJuZWwub3JnOyBjYXRhbGluLm1hcmluYXNAYXJtLmNvbTsNCj4gamFtZXMubW9yc2VAYXJt
+LmNvbTsgc3V6dWtpLnBvdWxvc2VAYXJtLmNvbTsgeXV6ZW5naHVpDQo+IDx5dXplbmdodWlAaHVh
+d2VpLmNvbT47IFdhbmd6aG91IChCKSA8d2FuZ3pob3UxQGhpc2lsaWNvbi5jb20+Ow0KPiBMaW51
+eGFybSA8bGludXhhcm1AaHVhd2VpLmNvbT4NCj4gU3ViamVjdDogUmU6IFtQQVRDSF0gS1ZNOiBh
+cm02NDogRGlzYWJsZSBPUyBkb3VibGUgbG9jayB2aXNpYmlsaXR5IGJ5IGRlZmF1bHQNCj4gYW5k
+IGlnbm9yZSBWTU0gd3JpdGVzDQo+IA0KPiBPbiBUaHUsIEF1ZyAwOCwgMjAyNCBhdCAwNjoxMDoz
+M1BNICswMDAwLCBTaGFtZWVyYWxpIEtvbG90aHVtIFRob2RpDQo+IHdyb3RlOg0KPiA+ID4gSSBm
+aW5kIG15c2VsZiBhc2tpbmcgKndoeSogd2UgbmVlZCB0aGlzLCBjb3VsZCB5b3Ugc2hhcmUgc29t
+ZSBkZXRhaWxzDQo+ID4gPiBvbiB0aGUgaXNzdWUgeW91J3JlIGVuY291bnRlcmluZz8NCj4gPg0K
+PiA+IFNvcnJ5LCBJIG1pc3NlZCB0aGUgd2h5IHBhcnQuIE1haW5seSBmb3IgVk0gbWlncmF0aW9u
+IHB1cnBvc2VzIGFzIHdlIGhhdmUNCj4gc3lzdGVtcw0KPiA+IHdpdGggRG91YmxlTG9jayBpbXBs
+ZW1lbnRlZCBhbmQgbm90IGltcGxlbWVudGVkKHdpdGggRGVidWdWZXIgOC4yKS4NCj4gDQo+IEFo
+LCBnb3QgaXQsIHRoYW5rcyBmb3IgdGhlIGNvbnRleHQuDQo+IA0KPiA+ID4NCj4gPiA+IEluZGVl
+ZCwgUkFaL1dJIGlzIG5vdCBhIGZhaXRoZnVsIGltcGxlbWVudGF0aW9uIG9mIEZFQVRfRG91Ymxl
+TG9jaywgYnV0DQo+ID4gPiBJIHdvdWxkbid0IGV4cGVjdCBpdCB0byBiZSB1c2VkIGluIGEgVk0g
+aW4gdGhlIGZpcnN0IHBsYWNlLg0KPiA+ID4NCj4gPiA+IE9uIFRodSwgQXVnIDA4LCAyMDI0IGF0
+IDAxOjU3OjExUE0gKzAxMDAsIFNoYW1lZXIgS29sb3RodW0gd3JvdGU6DQo+ID4gPiA+IEtWTSBl
+eHBvc2VzIHRoZSBPUyBkb3VibGUgbG9jayBmZWF0dXJlIGJpdCB0byBHdWVzdHMgYnV0IHJldHVy
+bnMNCj4gPiA+ID4gUkFaL1dJIG9uIEd1ZXN0IE9TRExSX0VMMSBhY2Nlc3MuIE1ha2Ugc3VyZSB3
+ZSBhcmUgaGlkaW5nIE9TDQo+IGRvdWJsZQ0KPiA+ID4gPiBsb2NrIGZyb20gR3Vlc3RzIG5vdy4g
+SG93ZXZlciB3ZSBjYW4ndCBoaWRlIERvdWJsZUxvY2sgaWYgdGhlDQo+IHJlcG9ydGVkDQo+ID4g
+PiA+IERlYnVnVmVyIGlzIDwgOC4yLiBTbyByZXBvcnQgYSBtaW5pbXVtIERlYnVnVmVyIG9mIDgu
+MiB0byBHdWVzdHMuDQo+ID4gPg0KPiA+ID4gV2hhdCBpZiBhIHVzZXIgd2FudGVkIHRvIHZpcnR1
+YWxpemUgYW4gZXhhY3QgQ1BVIG1vZGVsIHRoYXQgb25seQ0KPiA+ID4gaW1wbGVtZW50ZWQgdjgu
+MD8NCj4gPg0KPiA+IFllYWguIEkgd2FzIGEgYml0IGNvbmNlcm5lZCBhcyBtZW50aW9uZWQgYmVs
+b3cgb2YgYnVtcGluZyB1cCBEZWJ1Z1Zlcg0KPiB0byA4LjIuDQo+ID4gQnV0IHRoZW4gSSBmb3Vu
+ZCBhIHNpbWlsYXIgYXR0ZW1wdCB5b3UgbWFkZSBhIHdoaWxlIGJhY2ssDQo+ID4gaHR0cHM6Ly9s
+b3JlLmtlcm5lbC5vcmcvbGludXgtYXJtLWtlcm5lbC8yMDIxMTAyOTAwMzIwMi4xNTgxNjEtMS0N
+Cj4gb3VwdG9uQGdvb2dsZS5jb20vVC8jbWVlZTk0ZDg3ZGIzZjgwNDIxNTY1NTdkYmY5NzQzYmIw
+M2NmMGFhYTkNCj4gDQo+IFVzaW5nIG15IG93biBjcmFwIHBhdGNoZXMgYWdhaW5zdCBtZSwgZHJh
+dCEgOi0pDQoNCvCfmIouIE5vdCBpbnRlbnRpb25hbC4gSSBmb3VuZCBpdCBhZnRlciBJIHByZXBh
+cmVkIHRoaXMgcGF0Y2ggYW5kIGZlbHQNCnZhbGlkYXRlZCEuDQoNCj4gDQo+IEluIGFsbCBzZXJp
+b3VzbmVzcywgdGhpcyBoYXMgc2luY2UgYmVlbiByZXNvbHZlZCB3aXRoIHRoZSAnd3JpdGFibGUn
+IElEDQo+IHJlZ2lzdGVyIGluZnJhc3RydWN0dXJlIGFuZCBjb3JyZXNwb25kaW5nIGNoYW5nZXMg
+cmFpc2luZyB0aGUgbWF4DQo+IHBvc3NpYmxlIGRlYnVnIGFyY2ggdG8gdjguOC4gRGVidWdWZXIg
+d2lsbCBtYXRjaCB0aGUgSFcgdmFsdWUgdXAgdG8NCj4gdjguOCwgYnV0IHVzZXJzcGFjZSBjYW4g
+J2Rvd25ncmFkZScgdGhlIGZlYXR1cmUgYnkgd3JpdGluZyBhIGxlc3Nlcg0KPiB2YWx1ZS4NCj4g
+DQo+IFNvIGluIHRoZSBjYXNlIG9mIGNyb3NzLXN5c3RlbSBtaWdyYXRpb24sIHRoZSBvbGQgdmFs
+dWUgaXMgc3RpbGwNCj4gYWNjZXB0ZWQgYnkgS1ZNICsgYWR2ZXJ0aXNlZCB0byB0aGUgVk0uDQo+
+IA0KPiA+ID4NCj4gPiA+ID4gQWxsIHRoaXMgbWF5IGJyZWFrIG1pZ3JhdGlvbiBmcm9tIHRoZSBv
+bGRlciBrZXJuZWxzLiBUYWtlIGNhcmUgb2YNCj4gPiA+ID4gdGhhdCBieSBpZ25vcmluZyBWTU0g
+d3JpdGVzIGZvciB0aGVzZSB2YWx1ZXMuDQo+ID4gPg0KPiA+ID4gSWdub3JpbmcgdXNlcnNwYWNl
+IHdyaXRlcyBpcyBhIHByZXR0eSBiaWcgaGFtbWVyLiBJbiBzaXR1YXRpb25zIHdoZXJlDQo+ID4g
+PiBLVk0gaGFkIGFkdmVydGlzZWQgYSBmZWF0dXJlIHRoYXQgd2FzIG91dHJpZ2h0IG5vdCBzdXBw
+b3J0ZWQgKGUuZy4gSU1QDQo+IERFRg0KPiA+ID4gUE1VcykgaXQgX21pZ2h0XyBtYWtlIHNlbnNl
+LiBCdXQgd2l0aCB0aGlzIGNoYW5nZSB3ZSdyZSBtZXNzaW5nIHdpdGggYQ0KPiA+ID4gQ1BVIGZl
+YXR1cmUgd2UgKmRvKiBzdXBwb3J0Lg0KPiA+DQo+ID4gVGhlIGNvbmNlcm4gaGVyZSBpcyBmb3Ig
+dGhlIERlYnVnVmVyIEkgZ3Vlc3MuDQo+IA0KPiBJbmRlZWQuDQo+IA0KPiA+IEJ1dCBpZiBWTXMg
+YXJlIG5vdCBtYWtpbmcgdXNlIG9mIGFueSA4LjAgc3BlY2lmaWMgZmVhdHVyZXMoYXMgSSB1bmRl
+cnN0YW5kDQo+IGl0LA0KPiA+IG9ubHkgZXh0ZXJuYWwgZGVidWdnZXIgc3VwcG9ydCBpcyB0aGUg
+ZGlmZmVyZW5jZSksIHRoZW4gaXMgdGhhdCBhbiBpc3N1ZT8NCj4gDQo+IFlvdSdyZSBhYnNvbHV0
+ZWx5IHJpZ2h0IHRvIHBvaW50IG91dCB0aGF0IHY4LjAgLT4gdjguMiBkb2Vzbid0IGNoYW5nZQ0K
+PiBhbnl0aGluZyBmcm9tIHRoZSBWTSdzIFBPVi4NCj4gDQo+IE15IGNvbmNlcm4gaXMgdGhhdCB0
+aGUgZ3Vlc3QgZG9lcyBub3QgYW50aWNpcGF0ZSBJRCByZWdpc3RlcnMgY2hhbmdpbmcNCj4gdmFs
+dWVzIGF0IHJ1bnRpbWUsIGFuZCB3ZSBzaG91bGQgb25seSByZWFjaCBmb3IgdGhhdCBiaWcgaGFt
+bWVyIGlmIHdlDQo+IChLVk0pIGhhdmUgZG9uZSBzb21ldGhpbmcgdHJ1bHkgc3R1cGlkLg0KPiAN
+Cj4gV2hpY2ggbmV2ZXIgaGFwcGVucywgb2YgY291cnNlIDopDQo+IA0KPiA+ID4gV291bGQgYWxs
+b3dpbmcgdXNlcnNwYWNlIHRvIGRvd25ncmFkZSBJRF9BQTY2NERGUjBfRUwxLkRvdWJsZUxvY2sN
+Cj4gdG8NCj4gPiA+IDBiMTExMSBiZSBlbm91Z2g/DQo+ID4NCj4gPiBZZWFoLiBDb3VsZCBJIGd1
+ZXNzLiBCdXQgdGhlbiB3ZSBuZWVkIHRvIGNoZWNrIHRoZSBEZWJ1Z1ZlciBtYXRjaGVzIHRvDQo+
+IDguMiBvciBub3QNCj4gPiBhcyB3ZWxsLg0KPiANCj4gRWgsIEkgZG9uJ3QgdGhpbmsgdGhhdCBL
+Vk0gbmVlZHMgdG8gYmUgcG9saWNpbmcgdGhlIFZNTSBmb3IgdG90YWwNCj4gY29tcGxpYW5jZSB3
+aXRoIHRoZSBhcmNoaXRlY3R1cmUuIFdoYXQncyBmYXIgbW9yZSBpbXBvcnRhbnQgaXMNCj4gZ3Vh
+cmFudGVlaW5nIHRoZSBzZWxlY3RlZCBDUFUgZmVhdHVyZSBzZXQgaXMgYSBzdWJzZXQgb2Ygd2hh
+dCBLVk0NCj4gdmlydHVhbGl6ZXMuDQogDQo+IFNvIGV2ZW4gdGhvdWdoIHRoZSBhcmNoaXRlY3R1
+cmUgc2F5cw0KPiANCj4gICAhRkVBVF9Eb3VibGVMb2NrICYmICFGRUFUX0RlYnVndjhwMg0KPiAN
+Cj4gaXMgbm90IGFsbG93ZWQsIGl0IGlzbid0IGEgcHJvYmxlbWF0aWMgY29uZmlndXJhdGlvbiBm
+b3IgS1ZNLiBTdGlsbCwNCj4gdGhlIGRlZmF1bHRzIGZyb20gS1ZNIHNob3VsZCBzdGlsbCBjb21w
+bHkgd2l0aCB0aGUgYXJjaGl0ZWN0dXJlIGFzDQo+IGNsb3NlbHkgYXMgcG9zc2libGUuDQoNClll
+YWguIFRoYXQgd2FzIHRoZSBiaXQgSSB3YXMgbm90IHN1cmUgYWJvdXQuIE9rLCBmaW5lIHRoZW4u
+DQoNCj4gPiBJZGVhIHdhcywgaXMgdGhlcmUgYW55IHBvaW50IGluIGV4cG9zaW5nICBmZWF0dXJl
+cyB0aGF0IGFyZSBub3Qgc3VwcG9ydGVkIG9yDQo+IHVzZWQNCj4gPiBieSBWTXMgaW4gdGhlIGZp
+cnN0IHBsYWNlLg0KPiANCj4gQW5kIEkgZ2VuZXJhbGx5IGFncmVlLCBidXQgdGhlIG5lZWQgdG8g
+Y2h1cm4gb3RoZXIgZmllbGRzIHRvIGdldCB0byBhDQo+IHNhbmUgc3RhcnRpbmcgcG9pbnQgZ2F2
+ZSBtZSBhIGJpdCBvZiBwYXVzZS4NCg0KWWVhaC4gR290IGl0Lg0KDQo+IA0KPiBXb3VsZCB5b3Ug
+YmUgd2lsbGluZyB0byBjb29rIHVwIGEgcGF0Y2ggdGhhdCBqdXN0IG9wZW5zIHVwIHRoZQ0KPiBE
+b3VibGVMb2NrIGZpZWxkIHRvIGRvd25ncmFkZXM/DQoNClN1cmUuIFdpbGwgZG8uKEFuZCB3ZSBt
+aWdodCBuZWVkIG1vcmUgYXMgd2VsbC4gTGV0IG1lIHNlZS4pDQoNClRoYW5rcywNClNoYW1lZXIN
+Cg==
