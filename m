@@ -1,113 +1,111 @@
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 440EC186E43
-	for <kvmarm@lists.linux.dev>; Thu,  8 Aug 2024 06:25:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB9F618950C
+	for <kvmarm@lists.linux.dev>; Thu,  8 Aug 2024 07:20:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723098328; cv=none; b=tcDJhBNqKb29StODytlmdIX00iidvBHpAlH4yNYgjcx4+CedrjH/qaVCzKbyzZpOFsStFZll7++taqkHxYD8ttcnBD3zQTPlLWQHu3W66UC/dPBhrFqtvQVyXdLOMc/Ze57Uuk99U2WqAS5sKMvR4j7KnHdPVAwp3lRYePUZgLA=
+	t=1723101608; cv=none; b=DWEW45jsiGT7gbritJ6weqKJAVzTFLgwVFVB/BT9xvejRvlO4UVmcTKOfYaUrH1HJq0wj5gs2RcDxAApR3Yf+eNhPAANFDd0AgGIYV7dfsMSChXhcuBrJYxFZdtyEs2DXlIFgrco14CIaX/wKO0lqrqDtqQ/lVdLxcRVA3h3caw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723098328; c=relaxed/simple;
-	bh=vLLuKNqR9XU5O+YIcehGr09FLrfxLy2W9TjakvRNxc4=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=f5FY8zA7X5TjyyaNkaWcqIiSuZefGHxgV3IlApMgGpiw6XLjsgecT8eGlBg3NwwE3W+hMcY2lKxI4N4tSfMmLoYYCAR4W/7my2oD7Q7tKqnQ49nFPFoUjY5RsPT0wEvLN99xsRnm1Ic46ECl63Gvq18fWp/wH0ILAJRKtN0Nmvg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=NoivvhDV; arc=none smtp.client-ip=209.85.216.52
+	s=arc-20240116; t=1723101608; c=relaxed/simple;
+	bh=b/kpH/3tmPauPmCl8Zu5mF23kdDNk69dX/Z2CiAKZro=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=s/mryH5ubvcB4lW6GxH4SM67hthGFbj1/P7uCC5bx/e8rRShefntH4/EENW8cl51Lb/7MYn1PwJDGlcDfL0d1e4rhp6oq/2nwz/asf70Id0f4C4stKF9s5MM+mB6UQx/nlX8gyYPiZ+2Q7/9g5WWkTUoFT0V2qdM1/hKz1gaC4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=bF1fRGwf; arc=none smtp.client-ip=209.85.210.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NoivvhDV"
-Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-2d1bb65e906so496867a91.3
-        for <kvmarm@lists.linux.dev>; Wed, 07 Aug 2024 23:25:27 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bF1fRGwf"
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-70d162eef54so553172b3a.3
+        for <kvmarm@lists.linux.dev>; Thu, 08 Aug 2024 00:20:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1723098326; x=1723703126; darn=lists.linux.dev;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=sJzbBpFNwwY6e+GIMU5iIyI4LLoSSqWXmhkhActO1pM=;
-        b=NoivvhDVFfFL99PoFbTL0GThrxJdrbN0h1pWx3R3LsRmlnKoX3ebsGEAR6P1hrw2Iz
-         VvZaCoTffE90hz8iD2/WaFCw6hZbwOtgZ9yYJEhh9/kigLSMhal/XkC9n8kW2kqNOcid
-         AopTncGMsQCMlhJMu5W1F/JCzwlZ1sgit9Evkvn07WWFauQp/lqoNXqW4+gVQqs686hj
-         t0YnnPjl0L5mlMGJuTNENUcr0rfWcZ0fNKymz76nyfcuX2BsmKmkLfGbH8smd49sJxkh
-         6NScpfyUoDoBHaI7p3upWaa8ABBLggS3a8bifYMa8qx++zHLwv9d0uAm7oPQNJMCtznT
-         GeeA==
+        d=linaro.org; s=google; t=1723101606; x=1723706406; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=61Dq28Nf3F9g5/Td//Ft/plKsDILKvExnLDG0dDTx/E=;
+        b=bF1fRGwfr8HjAt17t+xJHcsDdQl3fmDhJLo328tISb3DPbS/LeRNhU0d8i7YClJVFr
+         9IGjxLTTbZup0w0mxezprC59kO/gqaGspBB7TEYZV5KWri91l2Zd1ML+i5P4GQtwWlr6
+         f27mEH2TRDPswj8gnPUCMKnOHDbqLB39NAxJoiyYIPm+fGBt5/asvtfchlermPuYupr4
+         hte2dcew8lWhz8znQXmqAkGwcZoSy3kAd02jIiXqytr7BJjmH1DWM55X6WruIUv02a69
+         U1TIwT3GQddB6KTbGwmWd3iXAy4K7n4rH4cx81uUPWvND0TKmlG9Dt7oLem42uN5bjCN
+         c3Cw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723098326; x=1723703126;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sJzbBpFNwwY6e+GIMU5iIyI4LLoSSqWXmhkhActO1pM=;
-        b=TG70g1QlK0NYxy/luWQeCE/uW+VvdLZ/9pu1LHquio2R9u/R8eYV3x0VuKbwjzIPq9
-         swCRFGZ1R0RI4f0D86dIH8sny+ilR46Q9HvspUgldBuYP3XFgE86XeMqsTUrplk+AqfY
-         Q7zedDSp3oN3rPqkXe44LDU5mDc0Co2b723vyKDd/sIORhDtEIE56VzojMvObxYa8iXi
-         bNCdKo7FD5udQwkBTd319e9JGBF4eJfdyqK+QUOq9EbF4k7+i1dF7xnQue8fzsTnRWng
-         QbPZtSODh6HxJCKkrzZWdk71LPvEccCJ2iK9/5IRYX6i4wW6d9ZoCqzpTt2lIPJoEts+
-         gtog==
-X-Forwarded-Encrypted: i=1; AJvYcCUCAaQ71qtYwbUeSOUBxrdG2YCEI7Iw/59XKjOtL/QdccizR7sWRDhS7HExyA1sQuEJwb4kCiL11ctk1+AGfam1QSqzKUWf
-X-Gm-Message-State: AOJu0YygM0fcQhA3zBDzYB6MFaCdicms5ylr3P/aa9EcbhpFnC0wW4Jf
-	ykXZWVKWsSxQjs701djdGZdvE4rdjYPrbLN8KkVYon3W6A1HwFFTHak+vYFQJRY=
-X-Google-Smtp-Source: AGHT+IG5Sh4RPZDFGIdFKwM0iRTPb/2nHrMhAgBHSqeUq3wn62Dbr5Jen5m7Eo7OeNMhWJA7SfHwfg==
-X-Received: by 2002:a17:90b:4ac9:b0:2c4:dc63:96d7 with SMTP id 98e67ed59e1d1-2d1c349446emr921727a91.41.1723098326578;
-        Wed, 07 Aug 2024 23:25:26 -0700 (PDT)
-Received: from localhost ([2804:14c:87d5:5261:ed46:7c69:6cee:3c20])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2d1c9db74a0sm328001a91.47.2024.08.07.23.25.25
+        d=1e100.net; s=20230601; t=1723101606; x=1723706406;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=61Dq28Nf3F9g5/Td//Ft/plKsDILKvExnLDG0dDTx/E=;
+        b=Anwa4TKgYKtM1hliwjUgYSa5thc82HtO/FQ1AHePhvp1Oy5h/QBkHGrjOboJtUMaXh
+         FO5JBEwkPc1pa5TjcrQxNR7HFHe/JDhbQZTiQwJF0lIQqk9yVSZd7htsjEAru817TMkS
+         fKCf3Hr7xVB+D87xzg59RKAGek26oHf2p7ZnGOitYzGs463bh8UcN8Q0ZYldtQdUgQd0
+         SFiUKKP/y9XLoFICpmuijd8FCx7+VmuQk2EcPSC8vhJTbyTsfpfkagk8gI3Dk+ikl3SV
+         xKjDmjJt39aL9XIkNpNVoFXSfm5tLT+oy0aaA8Mv6p6ca+n6sxHdwyh6kyq7yWBsNnPM
+         6vUw==
+X-Gm-Message-State: AOJu0YxORINgvnjr5SbiC3bAX65BpjEr3N297yV4v6GA5d1oDF07fgoI
+	tAZa6wgeV5emLohYOUfA8PXn9wf5exkMPAvWQhReuet48hlH7/gw79EFpljyYgo=
+X-Google-Smtp-Source: AGHT+IHVwhaQmB+d14u8C5u0Db/YHWcOUNGK2FDbdbISVxJ0Yl/Gk9DnzZRjMnbItZYZ8mQzqORc6A==
+X-Received: by 2002:a05:6a21:328c:b0:1c4:986a:de71 with SMTP id adf61e73a8af0-1c6fcf82a90mr1091067637.35.1723101605996;
+        Thu, 08 Aug 2024 00:20:05 -0700 (PDT)
+Received: from localhost ([122.172.84.129])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-710cb2e74fbsm572565b3a.168.2024.08.08.00.20.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Aug 2024 23:25:26 -0700 (PDT)
-From: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,  Will Deacon
- <will@kernel.org>,  Jonathan Corbet <corbet@lwn.net>,  Andrew Morton
- <akpm@linux-foundation.org>,  Marc Zyngier <maz@kernel.org>,  Oliver Upton
- <oliver.upton@linux.dev>,  James Morse <james.morse@arm.com>,  Suzuki K
- Poulose <suzuki.poulose@arm.com>,  Arnd Bergmann <arnd@arndb.de>,  Oleg
- Nesterov <oleg@redhat.com>,  Eric Biederman <ebiederm@xmission.com>,
-  Shuah Khan <shuah@kernel.org>,  "Rick P. Edgecombe"
- <rick.p.edgecombe@intel.com>,  Deepak Gupta <debug@rivosinc.com>,  Ard
- Biesheuvel <ardb@kernel.org>,  Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-  Kees Cook <kees@kernel.org>,  "H.J. Lu" <hjl.tools@gmail.com>,  Paul
- Walmsley <paul.walmsley@sifive.com>,  Palmer Dabbelt <palmer@dabbelt.com>,
-  Albert Ou <aou@eecs.berkeley.edu>,  Florian Weimer <fweimer@redhat.com>,
-  Christian Brauner <brauner@kernel.org>,  Ross Burton
- <ross.burton@arm.com>,  linux-arm-kernel@lists.infradead.org,
-  linux-doc@vger.kernel.org,  kvmarm@lists.linux.dev,
-  linux-fsdevel@vger.kernel.org,  linux-arch@vger.kernel.org,
-  linux-mm@kvack.org,  linux-kselftest@vger.kernel.org,
-  linux-kernel@vger.kernel.org,  linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v10 39/40] kselftest/arm64: Enable GCS for the FP stress
- tests
-In-Reply-To: <20240801-arm64-gcs-v10-39-699e2bd2190b@kernel.org> (Mark Brown's
-	message of "Thu, 01 Aug 2024 13:07:06 +0100")
-References: <20240801-arm64-gcs-v10-0-699e2bd2190b@kernel.org>
-	<20240801-arm64-gcs-v10-39-699e2bd2190b@kernel.org>
-Date: Thu, 08 Aug 2024 03:25:23 -0300
-Message-ID: <87v80bcyzw.fsf@linaro.org>
+        Thu, 08 Aug 2024 00:20:05 -0700 (PDT)
+Date: Thu, 8 Aug 2024 12:50:03 +0530
+From: Viresh Kumar <viresh.kumar@linaro.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>, Arnd Bergmann <arnd@linaro.org>
+Subject: Re: [PATCH] KVM: arm64: Enforce dependency on an ARMv8.4-aware
+ toolchain
+Message-ID: <20240808072003.3r6cfgaxbcvayhrg@vireshk-i7>
+References: <20240807115144.3237260-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240807115144.3237260-1-maz@kernel.org>
 
-Mark Brown <broonie@kernel.org> writes:
-
-> While it's a bit off topic for them the floating point stress tests do give
-> us some coverage of context thrashing cases, and also of active signal
-> delivery separate to the relatively complicated framework in the actual
-> signals tests. Have the tests enable GCS on startup, ignoring failures so
-> they continue to work as before on systems without GCS.
->
-> Reviewed-by: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
-> Signed-off-by: Mark Brown <broonie@kernel.org>
+On 07-08-24, 12:51, Marc Zyngier wrote:
+> With the NV support of TLBI-range operations, KVM makes use of
+> instructions that are only supported by binutils versions >= 2.30.
+> 
+> This breaks the build for very old toolchains.
+> 
+> Make KVM support conditional on having ARMv8.4 support in the
+> assembler, side-stepping the issue.
+> 
+> Fixes: 5d476ca57d7d ("KVM: arm64: nv: Add handling of range-based TLBI operations")
+> Reported-by: Viresh Kumar <viresh.kumar@linaro.org>
+> Suggested-by: Arnd Bergmann <arnd@linaro.org>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  tools/testing/selftests/arm64/fp/assembler.h   | 15 +++++++++++++++
->  tools/testing/selftests/arm64/fp/fpsimd-test.S |  2 ++
->  tools/testing/selftests/arm64/fp/sve-test.S    |  2 ++
->  tools/testing/selftests/arm64/fp/za-test.S     |  2 ++
->  tools/testing/selftests/arm64/fp/zt-test.S     |  2 ++
->  5 files changed, 23 insertions(+)
+>  arch/arm64/kvm/Kconfig | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> index 58f09370d17e..8304eb342be9 100644
+> --- a/arch/arm64/kvm/Kconfig
+> +++ b/arch/arm64/kvm/Kconfig
+> @@ -19,6 +19,7 @@ if VIRTUALIZATION
+>  
+>  menuconfig KVM
+>  	bool "Kernel-based Virtual Machine (KVM) support"
+> +	depends on AS_HAS_ARMV8_4
+>  	select KVM_COMMON
+>  	select KVM_GENERIC_HARDWARE_ENABLING
+>  	select KVM_GENERIC_MMU_NOTIFIER
 
-The fpsimd, sve, za and zt tests don't find any errors on my FVP setup
-when left running for a while:
+Tested-by: Viresh Kumar <viresh.kumar@linaro.org>
 
-Tested-by: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
+(Build only).
 
 -- 
-Thiago
+viresh
