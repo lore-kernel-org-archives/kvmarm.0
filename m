@@ -1,141 +1,154 @@
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FD8E18C348
-	for <kvmarm@lists.linux.dev>; Thu,  8 Aug 2024 12:00:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E46821487C0
+	for <kvmarm@lists.linux.dev>; Thu,  8 Aug 2024 12:58:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723118407; cv=none; b=hvK2zvMCmzV4pC2CQWGvUgIlEQf3DFwMb5KbWenhgMawuoIdLeXCtbZ7LjdNWZEz4kd2U1L37Tvd+XKEZ1AcraBsfTS8COUiD7jdoIUcLvVnC/az8dIlfSKC2JRLOtpF/n316LMdXPHoPLf5WTKQ8qbZSb/xquEwFkel4WYi+bM=
+	t=1723121908; cv=none; b=beTXdFR6WzIC5FFXWYMHNKN0Rr0nqCMbcN9eBGwVU39Vnc2EwPnThK+o7ma1eeT59lBond+HlMOgy9M6oWzQscOLAp2WxmbqrR6VOdCKjb/iHBtwhyxTX9ulxQ2xcBKvBZH1bYFEBFEqldunjZHyOtETa7QdHrz9QPPzFBbTXjg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723118407; c=relaxed/simple;
-	bh=4VJkCGOnJpRwR4YKBH81A1uxdWFs9jOzqwkiDCMslRY=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=COWwSVER0HqJZuoqv7GgFE4u01OdI3wz0L//ZQdjvuWf3sVkVXfQ3FtYgmi6myh2YHhpn34e0kvInHf6Lsbr1NSalP+mAo6UAxhCuu9sLRWgzES3GjASLRAKcSOidI6zMriwld2f9Qg9ryn6zPIarhCo/7sc/s0/fWGgEF0VFC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ddkuFE9F; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ddkuFE9F"
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-3685b3dbcdcso489400f8f.3
-        for <kvmarm@lists.linux.dev>; Thu, 08 Aug 2024 05:00:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1723118403; x=1723723203; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=l8fBZbfSfQMp8/8SurSvfBz+MaimrqNdI2CubOLP3Ew=;
-        b=ddkuFE9FINzia0qQVVaAQtZuEXNAIekNuYkVjCLYxZyvoCdYq1EEgTZx2+1AOrzHqt
-         +31SUlBnAGOJ3JBSQYO66KKvQvP5QfHjsLIzws812nAW0O5c5nVf6fCLOO1CvOPDh5oK
-         Lzw6NNaIXWLRKVugiwcSxG/lfgdfWXCaSQBjhhslNoOO47IsjeA7Jkkp3WP2zljECXlP
-         pSiWXIF6m7UxwyEqa1Gl3LCvcBuqYhHXMdQI6BMMYHT6Ux1CP9a7iWJ5HW/BiPZEJa0w
-         Lo/G490AaghDCjLxE4LDa3KBmPgjeaytGziiOh25PJ7sBROW/mXaPdMqBcBAi8ZRahgb
-         +Z1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723118403; x=1723723203;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=l8fBZbfSfQMp8/8SurSvfBz+MaimrqNdI2CubOLP3Ew=;
-        b=GWnRU1iGYc9ImjDjojUN99+EPmtq/+DqbmBrc6/GgDhjs/1lyugWCWL0UxJw6iIbMu
-         lGtBLkigJkC9s+VV4oWTcW/ZKpEv+30NMLkITI7R7MQ0H4+U7qYUOC2IJt+wOU0nyzX2
-         QTyVc1BW3Tybcoi6ADTIRrzeG88ldHnaNw/QU2C66RUODK+RqUKdcaDa8eMD1/ZGET65
-         Kc9GZhn4eJ0qG9fJUUvkZWFbeeDRu+PXUiYr5RDSQPEss3dUggDLvrJMyWjhuCg3n+81
-         FsAnYbSJik/wcO6HvZkeMapYNKgzN1dRaRrpwxeJgfBeWo3WWLXUIGmzxDcngwLByNyQ
-         e+4g==
-X-Forwarded-Encrypted: i=1; AJvYcCUCFGxdCfAmIbjA/N7KoXohLVY6Kt5SKCf3BkGvhI80KotOvDU1K78Q1R05up48yst2L/O7K82pTgA83cm6vlTFCNP+wcoy
-X-Gm-Message-State: AOJu0Yx8NTt9lXQ+qyJM3kxd48+DnIbwCcSEirOC2f4lKtIKNstK886C
-	BbCbZvpjlW3shNIJISDcu5tGNKhpaqnxXae+j4+00G1oD5ClouWfxtPGFmNHIIk=
-X-Google-Smtp-Source: AGHT+IHHX2fBYyF3bzrkIN6FI+lRc2WcNWD9HizbtFbwpwdbf6zDJoYFHOfDyhNaZKL5sM+Jijm6XQ==
-X-Received: by 2002:a5d:698f:0:b0:367:8fee:443b with SMTP id ffacd0b85a97d-36d27561461mr1129489f8f.41.1723118402280;
-        Thu, 08 Aug 2024 05:00:02 -0700 (PDT)
-Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36d27156c8asm1700288f8f.24.2024.08.08.05.00.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Aug 2024 05:00:01 -0700 (PDT)
-Received: from draig (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 751635F769;
-	Thu,  8 Aug 2024 13:00:00 +0100 (BST)
-From: =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,  Marc Zyngier <maz@kernel.org>,
-  Oliver Upton <oliver.upton@linux.dev>,  Tianrui Zhao
- <zhaotianrui@loongson.cn>,  Bibo Mao <maobibo@loongson.cn>,  Huacai Chen
- <chenhuacai@kernel.org>,  Michael Ellerman <mpe@ellerman.id.au>,  Anup
- Patel <anup@brainfault.org>,  Paul Walmsley <paul.walmsley@sifive.com>,
-  Palmer Dabbelt <palmer@dabbelt.com>,  Albert Ou <aou@eecs.berkeley.edu>,
-  Christian Borntraeger <borntraeger@linux.ibm.com>,  Janosch Frank
- <frankja@linux.ibm.com>,  Claudio Imbrenda <imbrenda@linux.ibm.com>,
-  kvm@vger.kernel.org,  linux-arm-kernel@lists.infradead.org,
-  kvmarm@lists.linux.dev,  loongarch@lists.linux.dev,
-  linux-mips@vger.kernel.org,  linuxppc-dev@lists.ozlabs.org,
-  kvm-riscv@lists.infradead.org,  linux-riscv@lists.infradead.org,
-  linux-kernel@vger.kernel.org,  David Matlack <dmatlack@google.com>,
-  David Stevens <stevensd@chromium.org>
-Subject: Re: [PATCH v12 13/84] KVM: Annotate that all paths in hva_to_pfn()
- might sleep
-In-Reply-To: <20240726235234.228822-14-seanjc@google.com> (Sean
-	Christopherson's message of "Fri, 26 Jul 2024 16:51:22 -0700")
-References: <20240726235234.228822-1-seanjc@google.com>
-	<20240726235234.228822-14-seanjc@google.com>
-Date: Thu, 08 Aug 2024 13:00:00 +0100
-Message-ID: <87bk23ql6n.fsf@draig.linaro.org>
+	s=arc-20240116; t=1723121908; c=relaxed/simple;
+	bh=Z8ZHbqZqEFtjMwwrzeOphbQj08fVPq3hy5xlhDMdDQg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=SjSS4yLrDPr2LssgZa/LVGjJp+08H5vApOrDJ4eL6hKKLtJpX0KjUR9iAGQ2bCNzlhQzaeADbDB+EQp0N4O1lShQoWyoyxkw+P4lRC4YnwDHW0nBzRBU8c0RDGtWZVqzyWXYv5bCvd2FoXKvA0T5ZJwvN4MW2vopmaLxaSXoT5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Wfn883pWPz6K7cB;
+	Thu,  8 Aug 2024 20:55:20 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id 9C9EC1401DC;
+	Thu,  8 Aug 2024 20:58:17 +0800 (CST)
+Received: from A2303104131.china.huawei.com (10.203.177.241) by
+ lhrpeml500005.china.huawei.com (7.191.163.240) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 8 Aug 2024 13:58:11 +0100
+From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+To: <kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>
+CC: <maz@kernel.org>, <will@kernel.org>, <catalin.marinas@arm.com>,
+	<oliver.upton@linux.dev>, <james.morse@arm.com>, <suzuki.poulose@arm.com>,
+	<yuzenghui@huawei.com>, <wangzhou1@hisilicon.com>, <linuxarm@huawei.com>
+Subject: [PATCH] KVM: arm64: Disable OS double lock visibility by default and ignore VMM writes
+Date: Thu, 8 Aug 2024 13:57:11 +0100
+Message-ID: <20240808125711.14368-1-shameerali.kolothum.thodi@huawei.com>
+X-Mailer: git-send-email 2.12.0.windows.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
-Sean Christopherson <seanjc@google.com> writes:
+KVM exposes the OS double lock feature bit to Guests but returns
+RAZ/WI on Guest OSDLR_EL1 access. Make sure we are hiding OS double
+lock from Guests now. However we can't hide DoubleLock if the reported
+DebugVer is < 8.2. So report a minimum DebugVer of 8.2 to Guests.
 
-> Now that hva_to_pfn() no longer supports being called in atomic context,
-> move the might_sleep() annotation from hva_to_pfn_slow() to
-> hva_to_pfn().
+All this may break migration from the older kernels. Take care of
+that by ignoring VMM writes for these values.
 
-The commentary for hva_to_pfn_fast disagrees.
+Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+---
+Note:
+ - I am not very sure on reporting DebugVer a min of 8.2. Hopefully this is
+   fine. Please let me know.
+   
+Thanks,
+Shameer
+---  
+ arch/arm64/kvm/sys_regs.c | 36 ++++++++++++++++++++++++++++++++----
+ 1 file changed, 32 insertions(+), 4 deletions(-)
 
-  /*
-   * The fast path to get the writable pfn which will be stored in @pfn,
-   * true indicates success, otherwise false is returned.  It's also the
-   * only part that runs if we can in atomic context.
-   */
-  static bool hva_to_pfn_fast(struct kvm_follow_pfn *kfp, kvm_pfn_t *pfn)
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index c90324060436..06e57d7730d8 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1704,13 +1704,14 @@ static u64 read_sanitised_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+ 	return val;
+ }
+ 
+-#define ID_REG_LIMIT_FIELD_ENUM(val, reg, field, limit)			       \
++#define ID_REG_LIMIT_FIELD_ENUM(val, reg, field, min_val, max_val)	       \
+ ({									       \
+ 	u64 __f_val = FIELD_GET(reg##_##field##_MASK, val);		       \
++	(__f_val) = max_t(u64, __f_val, SYS_FIELD_VALUE(reg, field, min_val)); \
+ 	(val) &= ~reg##_##field##_MASK;					       \
+ 	(val) |= FIELD_PREP(reg##_##field##_MASK,			       \
+ 			    min(__f_val,				       \
+-				(u64)SYS_FIELD_VALUE(reg, field, limit)));     \
++				(u64)SYS_FIELD_VALUE(reg, field, max_val)));   \
+ 	(val);								       \
+ })
+ 
+@@ -1719,7 +1720,7 @@ static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+ {
+ 	u64 val = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
+ 
+-	val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64DFR0_EL1, DebugVer, V8P8);
++	val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64DFR0_EL1, DebugVer, V8P2, V8P8);
+ 
+ 	/*
+ 	 * Only initialize the PMU version if the vCPU was configured with one.
+@@ -1732,6 +1733,10 @@ static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+ 	/* Hide SPE from guests */
+ 	val &= ~ID_AA64DFR0_EL1_PMSVer_MASK;
+ 
++	/* Hide DoubleLock from guests */
++	val &= ~ID_AA64DFR0_EL1_DoubleLock_MASK;
++	val |= SYS_FIELD_PREP_ENUM(ID_AA64DFR0_EL1, DoubleLock, NI);
++
+ 	return val;
+ }
+ 
+@@ -1739,6 +1744,7 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+ 			       const struct sys_reg_desc *rd,
+ 			       u64 val)
+ {
++	u64 hw_val = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
+ 	u8 debugver = SYS_FIELD_GET(ID_AA64DFR0_EL1, DebugVer, val);
+ 	u8 pmuver = SYS_FIELD_GET(ID_AA64DFR0_EL1, PMUVer, val);
+ 
+@@ -1765,6 +1771,28 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+ 	 */
+ 	if (debugver < ID_AA64DFR0_EL1_DebugVer_IMP)
+ 		return -EINVAL;
++	else if (debugver < ID_AA64DFR0_EL1_DebugVer_V8P2) {
++		/*
++		 * KVM now reports a minimum DebugVer 8.2 to Guests. In order to keep
++		 * the migration working from old kernels, check and ignore the VMM
++		 * write.
++		 */
++		if ((hw_val & ID_AA64DFR0_EL1_DebugVer_MASK) ==
++		    (val & ID_AA64DFR0_EL1_DebugVer_MASK)) {
++			val &= ~ID_AA64DFR0_EL1_DebugVer_MASK;
++			val |= SYS_FIELD_PREP_ENUM(ID_AA64DFR0_EL1, DebugVer, V8P2);
++		}
++	}
++	/*
++	 * KVM used to expose OS double lock feature bit to Guests but returned
++	 * RAZ/WI on Guest OSDLR_EL1 access. We are hiding OS double lock now.
++	 * But for migration from old kernels to work ignore the VMM write.
++	 */
++	if ((hw_val & ID_AA64DFR0_EL1_DoubleLock_MASK) ==
++	    (val & ID_AA64DFR0_EL1_DoubleLock_MASK)) {
++		val &= ~ID_AA64DFR0_EL1_DoubleLock_MASK;
++		val |= SYS_FIELD_PREP_ENUM(ID_AA64DFR0_EL1, DoubleLock, NI);
++	}
+ 
+ 	return set_id_reg(vcpu, rd, val);
+ }
+@@ -1779,7 +1807,7 @@ static u64 read_sanitised_id_dfr0_el1(struct kvm_vcpu *vcpu,
+ 	if (kvm_vcpu_has_pmu(vcpu))
+ 		val |= SYS_FIELD_PREP(ID_DFR0_EL1, PerfMon, perfmon);
+ 
+-	val = ID_REG_LIMIT_FIELD_ENUM(val, ID_DFR0_EL1, CopDbg, Debugv8p8);
++	val = ID_REG_LIMIT_FIELD_ENUM(val, ID_DFR0_EL1, CopDbg, NI, Debugv8p8);
+ 
+ 	return val;
+ }
+-- 
+2.45.2
 
-At which point did it loose the ability to run in the atomic context? I
-couldn't work it out from the commits.
-
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  virt/kvm/kvm_main.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 84c73b4fc804..03af1a0090b1 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -2807,8 +2807,6 @@ static int hva_to_pfn_slow(unsigned long addr, bool=
- *async, bool write_fault,
->  	struct page *page;
->  	int npages;
->=20=20
-> -	might_sleep();
-> -
->  	if (writable)
->  		*writable =3D write_fault;
->=20=20
-> @@ -2947,6 +2945,8 @@ kvm_pfn_t hva_to_pfn(unsigned long addr, bool inter=
-ruptible, bool *async,
->  	kvm_pfn_t pfn;
->  	int npages, r;
->=20=20
-> +	might_sleep();
-> +
->  	if (hva_to_pfn_fast(addr, write_fault, writable, &pfn))
->  		return pfn;
-
---=20
-Alex Benn=C3=A9e
-Virtualisation Tech Lead @ Linaro
