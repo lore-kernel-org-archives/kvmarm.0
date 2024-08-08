@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1021D1DFD8;
-	Thu,  8 Aug 2024 09:54:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BECE181328;
+	Thu,  8 Aug 2024 09:54:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723110872; cv=none; b=lpysh6Fo/a+EghMue+VZsapdvKWeoAoy/m8Q3Jh6QRU+YDcHhX2Ji8NFPAZqZFrX9iRJAn+vTR0tSvZ5WsqmASAOvKEfLOyG78+9UGG0r5qVl4QZmk290mPiO1rsSR7YUoNfPMfgN02RGln7rO+YwfIucrEZaBQ/r67yNbVJvRU=
+	t=1723110879; cv=none; b=klcrwfloFumzJErBnEIYULDXI+taWiYzwqfVv0lfdZN4FXNCxMfwc/P/M7+DLSJaKXUh2955kJ9GGT9Yqo1WJ5W9sxj+UxpULoFOXjQ8VSU3h/MPutels5fHGolmgy4k4Y+GyhZZFGNgNBk3gEKIui5RdJUX7Je8hoKECr2nh5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723110872; c=relaxed/simple;
-	bh=PbFKdQioBXqrCR8IhPsvdeiSsqZdtgzRJibcfIc0ipk=;
+	s=arc-20240116; t=1723110879; c=relaxed/simple;
+	bh=kYdZ12KYr52wq3EuDfSIsj0fkppY2ClttYsU/ZJzhBE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=osYunhYhestYpX4AORdKV27hWggo4rcfb/5Pcw4H9whO16XnpzmP7Qz1xOauO/o7Yqaz6DKUl/XxAH9f7bGuAPh/3cESRAnLI3UxqpjH8/uZcwL+R+SkOLuvoYKbJjyhpH8MalaWnZL18jf34mDfdKNRv8gdriTtcJIrIXacypY=
+	 In-Reply-To:Content-Type; b=X3QmtW4hBrxJivwfzrv3EP/cMJ5k8UFK9SVu3ZokjksIYq7Csfl0MnD74MFHzL+Iyl6dGjWeGxeMt3NDUaAZznS6iQHSL1gFed158geypv3rjq47jYDEe0RF/3PK35I2FGKUOAFB6tld0Y+J5g1bbBeVsQnmrJkV8JN88J81tGA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0E8C0DA7;
-	Thu,  8 Aug 2024 02:54:55 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AA0441042;
+	Thu,  8 Aug 2024 02:55:01 -0700 (PDT)
 Received: from [10.1.26.21] (e122027.cambridge.arm.com [10.1.26.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 632F73F6A8;
-	Thu,  8 Aug 2024 02:54:23 -0700 (PDT)
-Message-ID: <34468ff8-2159-4adb-b680-c6048eecee80@arm.com>
-Date: Thu, 8 Aug 2024 10:54:20 +0100
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A95173F6A8;
+	Thu,  8 Aug 2024 02:54:29 -0700 (PDT)
+Message-ID: <fbcbd4da-cab5-420e-b8b6-bf04e27bf69c@arm.com>
+Date: Thu, 8 Aug 2024 10:54:24 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,8 +27,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 01/84] KVM: arm64: Release pfn, i.e. put page, if
- copying MTE tags hits ZONE_DEVICE
+Subject: Re: [PATCH v12 02/84] KVM: arm64: Disallow copying MTE to guest
+ memory while KVM is dirty logging
 To: Catalin Marinas <catalin.marinas@arm.com>,
  Sean Christopherson <seanjc@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
@@ -46,51 +46,54 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
  linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
  David Matlack <dmatlack@google.com>, David Stevens <stevensd@chromium.org>
 References: <20240726235234.228822-1-seanjc@google.com>
- <20240726235234.228822-2-seanjc@google.com> <ZrOBg70pCnv7PHyK@arm.com>
+ <20240726235234.228822-3-seanjc@google.com> <ZrOfB8bOdSJVcWFr@arm.com>
 From: Steven Price <steven.price@arm.com>
 Content-Language: en-GB
-In-Reply-To: <ZrOBg70pCnv7PHyK@arm.com>
+In-Reply-To: <ZrOfB8bOdSJVcWFr@arm.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 07/08/2024 15:15, Catalin Marinas wrote:
-> On Fri, Jul 26, 2024 at 04:51:10PM -0700, Sean Christopherson wrote:
->> Put the page reference acquired by gfn_to_pfn_prot() if
->> kvm_vm_ioctl_mte_copy_tags() runs into ZONE_DEVICE memory.  KVM's less-
->> than-stellar heuristics for dealing with pfn-mapped memory means that KVM
->> can get a page reference to ZONE_DEVICE memory.
+On 07/08/2024 17:21, Catalin Marinas wrote:
+> On Fri, Jul 26, 2024 at 04:51:11PM -0700, Sean Christopherson wrote:
+>> Disallow copying MTE tags to guest memory while KVM is dirty logging, as
+>> writing guest memory without marking the gfn as dirty in the memslot could
+>> result in userspace failing to migrate the updated page.  Ideally (maybe?),
+>> KVM would simply mark the gfn as dirty, but there is no vCPU to work with,
+>> and presumably the only use case for copy MTE tags _to_ the guest is when
+>> restoring state on the target.
 >>
 >> Fixes: f0376edb1ddc ("KVM: arm64: Add ioctl to fetch/store tags in a guest")
 >> Signed-off-by: Sean Christopherson <seanjc@google.com>
 >> ---
->>  arch/arm64/kvm/guest.c | 1 +
->>  1 file changed, 1 insertion(+)
+>>  arch/arm64/kvm/guest.c | 5 +++++
+>>  1 file changed, 5 insertions(+)
 >>
 >> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
->> index 11098eb7eb44..e1f0ff08836a 100644
+>> index e1f0ff08836a..962f985977c2 100644
 >> --- a/arch/arm64/kvm/guest.c
 >> +++ b/arch/arm64/kvm/guest.c
->> @@ -1059,6 +1059,7 @@ int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
->>  		page = pfn_to_online_page(pfn);
->>  		if (!page) {
->>  			/* Reject ZONE_DEVICE memory */
->> +			kvm_release_pfn_clean(pfn);
->>  			ret = -EFAULT;
->>  			goto out;
->>  		}
+>> @@ -1045,6 +1045,11 @@ int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+>>  
+>>  	mutex_lock(&kvm->slots_lock);
+>>  
+>> +	if (write && atomic_read(&kvm->nr_memslots_dirty_logging)) {
+>> +		ret = -EBUSY;
+>> +		goto out;
+>> +	}
 > 
-> This patch makes sense irrespective of whether the above pfn is a
-> ZONE_DEVICE or not. gfn_to_pfn_prot() increased the page refcount via
-> GUP, so it must be released before bailing out of this loop.
+> There are ways to actually log the page dirtying but I don't think
+> it's worth it. AFAICT, reading the tags still works and that's what's
+> used during migration (on the VM where dirty tracking takes place).
 > 
 > Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 > 
 
-Yep, as Catalin says, this is an 'obviously' correct fix - the reference
-needs releasing before bailing out. The comment there is perhaps
-misleading - it's not just ZONE_DEVICE memory that will be rejected, but
-this is the case that was in my mind when I wrote it. Although clearly I
-wasn't thinking hard enough when writing the code in the first place... ;)
+Looks sensible to me - my initial thought was "why would a VMM do
+that?". But it would make sense to actually return a failure rather than
+letting the VMM shoot itself in the foot.
+
+If there's actually a use-case then we could look at making the dirty
+tracking work, but I'm not convinced there is a good reason.
 
 Reviewed-by: Steven Price <steven.price@arm.com>
 
