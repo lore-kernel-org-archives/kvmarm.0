@@ -1,111 +1,111 @@
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB9F618950C
-	for <kvmarm@lists.linux.dev>; Thu,  8 Aug 2024 07:20:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C24E139CE9;
+	Thu,  8 Aug 2024 08:18:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723101608; cv=none; b=DWEW45jsiGT7gbritJ6weqKJAVzTFLgwVFVB/BT9xvejRvlO4UVmcTKOfYaUrH1HJq0wj5gs2RcDxAApR3Yf+eNhPAANFDd0AgGIYV7dfsMSChXhcuBrJYxFZdtyEs2DXlIFgrco14CIaX/wKO0lqrqDtqQ/lVdLxcRVA3h3caw=
+	t=1723105122; cv=none; b=r2Sc1BAQ2sdfm7x56R3lZ8Pw18wV2ppOa+JJqx7Ix//YySXCHJT59Q48UUb4NaWMxJ6I73LevuKLLWDn+TYg8M8NtlGFLhgYRKfrwJ+wmDmYUpCmzCf1y/ccFe9nei2DkjqeLOIaAT6LiGDGvWY1ujL9xdPj9H60U+EZHCi/L4U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723101608; c=relaxed/simple;
-	bh=b/kpH/3tmPauPmCl8Zu5mF23kdDNk69dX/Z2CiAKZro=;
+	s=arc-20240116; t=1723105122; c=relaxed/simple;
+	bh=BR4CYQvHKo7S4XehLC4CADBELA11Nm62X+WdUtFf9n4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s/mryH5ubvcB4lW6GxH4SM67hthGFbj1/P7uCC5bx/e8rRShefntH4/EENW8cl51Lb/7MYn1PwJDGlcDfL0d1e4rhp6oq/2nwz/asf70Id0f4C4stKF9s5MM+mB6UQx/nlX8gyYPiZ+2Q7/9g5WWkTUoFT0V2qdM1/hKz1gaC4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=bF1fRGwf; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=G/EXyhZHzeh//IruO0XLJOhbi0m6ubi7jjKjvbAuDmBSSnBkob5yVkc5fVLP14wz1b1pTm0maLxr9DSM+NXnYG9CW7H5yTAqvuBLCBgAuXyvXduq34bq6robDQT12j/6C9I1UsXFSTaKuF86p1Q/PGDfHeAiJR0mPL00eDKMd2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jc1TkavT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bF1fRGwf"
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-70d162eef54so553172b3a.3
-        for <kvmarm@lists.linux.dev>; Thu, 08 Aug 2024 00:20:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1723101606; x=1723706406; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=61Dq28Nf3F9g5/Td//Ft/plKsDILKvExnLDG0dDTx/E=;
-        b=bF1fRGwfr8HjAt17t+xJHcsDdQl3fmDhJLo328tISb3DPbS/LeRNhU0d8i7YClJVFr
-         9IGjxLTTbZup0w0mxezprC59kO/gqaGspBB7TEYZV5KWri91l2Zd1ML+i5P4GQtwWlr6
-         f27mEH2TRDPswj8gnPUCMKnOHDbqLB39NAxJoiyYIPm+fGBt5/asvtfchlermPuYupr4
-         hte2dcew8lWhz8znQXmqAkGwcZoSy3kAd02jIiXqytr7BJjmH1DWM55X6WruIUv02a69
-         U1TIwT3GQddB6KTbGwmWd3iXAy4K7n4rH4cx81uUPWvND0TKmlG9Dt7oLem42uN5bjCN
-         c3Cw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723101606; x=1723706406;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=61Dq28Nf3F9g5/Td//Ft/plKsDILKvExnLDG0dDTx/E=;
-        b=Anwa4TKgYKtM1hliwjUgYSa5thc82HtO/FQ1AHePhvp1Oy5h/QBkHGrjOboJtUMaXh
-         FO5JBEwkPc1pa5TjcrQxNR7HFHe/JDhbQZTiQwJF0lIQqk9yVSZd7htsjEAru817TMkS
-         fKCf3Hr7xVB+D87xzg59RKAGek26oHf2p7ZnGOitYzGs463bh8UcN8Q0ZYldtQdUgQd0
-         SFiUKKP/y9XLoFICpmuijd8FCx7+VmuQk2EcPSC8vhJTbyTsfpfkagk8gI3Dk+ikl3SV
-         xKjDmjJt39aL9XIkNpNVoFXSfm5tLT+oy0aaA8Mv6p6ca+n6sxHdwyh6kyq7yWBsNnPM
-         6vUw==
-X-Gm-Message-State: AOJu0YxORINgvnjr5SbiC3bAX65BpjEr3N297yV4v6GA5d1oDF07fgoI
-	tAZa6wgeV5emLohYOUfA8PXn9wf5exkMPAvWQhReuet48hlH7/gw79EFpljyYgo=
-X-Google-Smtp-Source: AGHT+IHVwhaQmB+d14u8C5u0Db/YHWcOUNGK2FDbdbISVxJ0Yl/Gk9DnzZRjMnbItZYZ8mQzqORc6A==
-X-Received: by 2002:a05:6a21:328c:b0:1c4:986a:de71 with SMTP id adf61e73a8af0-1c6fcf82a90mr1091067637.35.1723101605996;
-        Thu, 08 Aug 2024 00:20:05 -0700 (PDT)
-Received: from localhost ([122.172.84.129])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-710cb2e74fbsm572565b3a.168.2024.08.08.00.20.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Aug 2024 00:20:05 -0700 (PDT)
-Date: Thu, 8 Aug 2024 12:50:03 +0530
-From: Viresh Kumar <viresh.kumar@linaro.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jc1TkavT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F67FC32782;
+	Thu,  8 Aug 2024 08:18:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723105122;
+	bh=BR4CYQvHKo7S4XehLC4CADBELA11Nm62X+WdUtFf9n4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=jc1TkavT0yEwNQChojDNn6AzGcsiESQp68rBPCuDzS3h7cmm5mLAyY/voHLXit3ob
+	 YkYUfwcDxzH57mFobw6RuiTbcQDB7A/Dj18LPpDs/7TM+IzPBk1iMMJa8aGs8NIabQ
+	 rLTZBdmlTgnZinuKZ6W70lM90r+vHQruMzAhCDUOcQPyLqDx4HgggSMUhP/irHTGzK
+	 XLQkATMF3M9dx/Iw7RIjCYaaU8Opo84nZlHK4TCSxzmpVukJESm7/IP13d0V+6AyDb
+	 xJw618pEuua6MmBDeXs0tcK8qgBBc2CVlYuyDwUg1htX4TnGHXSl1aUscA1F2nWxgC
+	 BiJGXD7RqbUwQ==
+Date: Thu, 8 Aug 2024 09:18:37 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>, Arnd Bergmann <arnd@linaro.org>
-Subject: Re: [PATCH] KVM: arm64: Enforce dependency on an ARMv8.4-aware
- toolchain
-Message-ID: <20240808072003.3r6cfgaxbcvayhrg@vireshk-i7>
-References: <20240807115144.3237260-1-maz@kernel.org>
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Florian Weimer <fweimer@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Ross Burton <ross.burton@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v10 38/40] kselftest/arm64: Add a GCS stress test
+Message-ID: <ZrR_XZ3JCCIrZUIo@finisterre.sirena.org.uk>
+References: <20240801-arm64-gcs-v10-0-699e2bd2190b@kernel.org>
+ <20240801-arm64-gcs-v10-38-699e2bd2190b@kernel.org>
+ <877ccsdkjp.fsf@linaro.org>
+ <ZrP-9gHsvVHr2Y5B@finisterre.sirena.org.uk>
+ <87y157cz2h.fsf@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="2xjwlae8dVoFu1hA"
+Content-Disposition: inline
+In-Reply-To: <87y157cz2h.fsf@linaro.org>
+X-Cookie: Your love life will be... interesting.
+
+
+--2xjwlae8dVoFu1hA
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240807115144.3237260-1-maz@kernel.org>
+Content-Transfer-Encoding: quoted-printable
 
-On 07-08-24, 12:51, Marc Zyngier wrote:
-> With the NV support of TLBI-range operations, KVM makes use of
-> instructions that are only supported by binutils versions >= 2.30.
-> 
-> This breaks the build for very old toolchains.
-> 
-> Make KVM support conditional on having ARMv8.4 support in the
-> assembler, side-stepping the issue.
-> 
-> Fixes: 5d476ca57d7d ("KVM: arm64: nv: Add handling of range-based TLBI operations")
-> Reported-by: Viresh Kumar <viresh.kumar@linaro.org>
-> Suggested-by: Arnd Bergmann <arnd@linaro.org>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/Kconfig | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> index 58f09370d17e..8304eb342be9 100644
-> --- a/arch/arm64/kvm/Kconfig
-> +++ b/arch/arm64/kvm/Kconfig
-> @@ -19,6 +19,7 @@ if VIRTUALIZATION
->  
->  menuconfig KVM
->  	bool "Kernel-based Virtual Machine (KVM) support"
-> +	depends on AS_HAS_ARMV8_4
->  	select KVM_COMMON
->  	select KVM_GENERIC_HARDWARE_ENABLING
->  	select KVM_GENERIC_MMU_NOTIFIER
+On Thu, Aug 08, 2024 at 03:23:50AM -0300, Thiago Jung Bauermann wrote:
 
-Tested-by: Viresh Kumar <viresh.kumar@linaro.org>
+> Thank you for the pointer. It turned out that I accidentally ran the
+> selftests binaries from the v9 version instead of the v10 version, and
+> the gcs-stress-thread binary failed because it was using the old value
+> for PR_SET_SHADOW_STACK_STATUS.
+>=20
+> Using the v10 version of the selftests the gcs-stress test passes. Sorry
+> for the false alarm.
+>=20
+> Tested-by: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
 
-(Build only).
+Ah, that's a relief thanks!
 
--- 
-viresh
+--2xjwlae8dVoFu1hA
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEyBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAma0f1wACgkQJNaLcl1U
+h9AAlAf3QAXjvC2gygXbsaueHos4q0nKMAX2bdp+mK3zjoJgg9+GqHPoEFx3Efja
+cj5Ct4enLdN36SwqP5OU/agevzvPdKsT2CstNckW/VhAbkgbEi4F8w62q9q2NBO2
+gyXPx0aWtgmzptzEPgrEl8+PeL/kyPB9DVnbYGfMI5X2xeMgn4XRyZYjLYuuBWAR
+2BlS1DNybUyfO+005zhZnrjlbTN56woklGF9gOfbNT8HoKpWh/VcX9giGP9v/EFi
+e+Qpos4Bb9+b3JKeJo2EFjdgvborCnQQJxvGSEMp7QB9wrOs0QsrrhD+Jvs6rmcg
+J0pHE5R3OyGMXNNpg2MHtg9o1FPh
+=uK/+
+-----END PGP SIGNATURE-----
+
+--2xjwlae8dVoFu1hA--
