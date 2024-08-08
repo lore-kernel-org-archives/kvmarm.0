@@ -1,25 +1,59 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BECE181328;
-	Thu,  8 Aug 2024 09:54:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 737E918C93C
+	for <kvmarm@lists.linux.dev>; Thu,  8 Aug 2024 10:40:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723110879; cv=none; b=klcrwfloFumzJErBnEIYULDXI+taWiYzwqfVv0lfdZN4FXNCxMfwc/P/M7+DLSJaKXUh2955kJ9GGT9Yqo1WJ5W9sxj+UxpULoFOXjQ8VSU3h/MPutels5fHGolmgy4k4Y+GyhZZFGNgNBk3gEKIui5RdJUX7Je8hoKECr2nh5Q=
+	t=1723113614; cv=none; b=WeM3wxNnKfn4waUIXdKQJSEyPJmjZ9NUtTxhSu3MJkQNBZ6C7m6aQgO2tNjuzTyUeRs4OD1+ZB32zyH1GZ0361WCBIVe5560hFYAUXx0JplomWHppEzfbZjtTNg2H6XDEka1SyAtq+g3uJY7r6flOkyXiIZJnHI99TCpcpPm0EM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723110879; c=relaxed/simple;
-	bh=kYdZ12KYr52wq3EuDfSIsj0fkppY2ClttYsU/ZJzhBE=;
+	s=arc-20240116; t=1723113614; c=relaxed/simple;
+	bh=93EvhuTl9ahqB5emxkAMtf9z0ofEgXEiFiod3siNX7I=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=X3QmtW4hBrxJivwfzrv3EP/cMJ5k8UFK9SVu3ZokjksIYq7Csfl0MnD74MFHzL+Iyl6dGjWeGxeMt3NDUaAZznS6iQHSL1gFed158geypv3rjq47jYDEe0RF/3PK35I2FGKUOAFB6tld0Y+J5g1bbBeVsQnmrJkV8JN88J81tGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AA0441042;
-	Thu,  8 Aug 2024 02:55:01 -0700 (PDT)
-Received: from [10.1.26.21] (e122027.cambridge.arm.com [10.1.26.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A95173F6A8;
-	Thu,  8 Aug 2024 02:54:29 -0700 (PDT)
-Message-ID: <fbcbd4da-cab5-420e-b8b6-bf04e27bf69c@arm.com>
-Date: Thu, 8 Aug 2024 10:54:24 +0100
+	 In-Reply-To:Content-Type; b=A3df49XfbSV4/rQKGXAynE3nLTu0AK4AagwwNz4GVbYsvTkJqwBYgFAgWtPIOqkigHNXriGcnz7m8sVUyR6uw0KmFLN+lSBZjf/xKYWDUur3EksKjU+2P1omXkHOPcUv/NmqlMdVRii275vTKFUq8iRGYjff0wj1oIvfBPWahes=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=FwKdfrQk; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FwKdfrQk"
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3685a5e7d3cso419864f8f.1
+        for <kvmarm@lists.linux.dev>; Thu, 08 Aug 2024 03:40:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1723113611; x=1723718411; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3Vywnv2khWwNnQXbEb1k0L/IQrqUeraWcCrhITh2GYs=;
+        b=FwKdfrQknUyMblPzJ0wYn0TbzM9yywUp3LPGcTjHQON9nRKqBdBFj6Cc0RkTO4/I8g
+         XHs/a7QZ4bQxaP589tJ9qYY7eUfJDj5ZUFoP1PdckzdLIafk2qwWK0mfmTPOiZ49E9bq
+         h/TPGe/11ZfXA3L84MV53C+xW91E9Lvhc72kiqKIp0Rv/4UhmxseiQjO6Gg/l8+kN+hx
+         l+vVi+CL5xoIeUHxlAJDvSKmpbS2E8C1B7MqaxmADdawtsEUk5PQYoe1mXhGhtesdnjL
+         6hR4vPwN6WTbDKTAoThFlxjYQ1mWW1D71g0pGXBtjhYt1fk/ObkKIG7oKrNTLSt7Prbz
+         n/eg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723113611; x=1723718411;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3Vywnv2khWwNnQXbEb1k0L/IQrqUeraWcCrhITh2GYs=;
+        b=K+qhq77k3BNHxLyPRu2Lm0nxi0/ZmEX0UNOZBtPxpLLke268bvri7bQAxNPkquHEcG
+         kJIu+O2c17dEq/HXG6cId7OYCx/cciXiZ5xd9j1kyPNfMLlnPlsXNwH3aMkXvlZUb6io
+         2uXLqUeEx8OQIWrC2Cs5wnTA4GzyG/4gBdw2yFAyaB0NatX1oUe1lwlHPTOKzGx6fc9j
+         i/zuXoyr1pdwZTlNBjL6CPQUBpC55+sRr/zikIhkj1XaQxRIU05g3z03uRzGO+kO/Tno
+         3IkNxVjvXXacE6mB1B/yswMNkbj4B0ft7tPL6UztkSlANqJ9u28g5WvXLu2AuTOpd29l
+         2pwA==
+X-Forwarded-Encrypted: i=1; AJvYcCXGZBHawuXP0WGkk1qhpapI2Osz8eXkQxjBOqRcyl8rab7swRpuc6/fen+gMAlRES/3ZmkaASNZlnSAdq/d9Ys3oze7gQKI
+X-Gm-Message-State: AOJu0YyTR3iv+DS6mggFcM5kcbN0mg6XWVjBsOHQnbioBsv4KM1AkTc+
+	2IQtB9abppDiMDt20T6orJ5ZxD/rAFzQxItBkaJiesXpfWOY7QJZuHDvnbPd1HQ=
+X-Google-Smtp-Source: AGHT+IEGxZsKPo0MfhXCCFxSfCW7K4JInkbw4e4NnCHx4wlQJHciyyD/pmRe1wNjUVMP3CXg9q2VBw==
+X-Received: by 2002:a05:6000:1007:b0:367:9614:fb99 with SMTP id ffacd0b85a97d-36d273bfaf4mr1044354f8f.10.1723113610569;
+        Thu, 08 Aug 2024 03:40:10 -0700 (PDT)
+Received: from [192.168.1.3] ([89.47.253.130])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36d271569d1sm1459252f8f.18.2024.08.08.03.40.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 08 Aug 2024 03:40:10 -0700 (PDT)
+Message-ID: <67ac1ce4-7d95-4215-ae49-c32869bfe6eb@linaro.org>
+Date: Thu, 8 Aug 2024 11:40:08 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,76 +61,59 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 02/84] KVM: arm64: Disallow copying MTE to guest
- memory while KVM is dirty logging
-To: Catalin Marinas <catalin.marinas@arm.com>,
- Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao
- <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
- Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>,
- Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
- linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
- David Matlack <dmatlack@google.com>, David Stevens <stevensd@chromium.org>
-References: <20240726235234.228822-1-seanjc@google.com>
- <20240726235234.228822-3-seanjc@google.com> <ZrOfB8bOdSJVcWFr@arm.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <ZrOfB8bOdSJVcWFr@arm.com>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH v3 0/7] arm64: Add support for Armv9.4 PMU fixed
+ instruction counter
+To: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linux-perf-users@vger.kernel.org, kvmarm@lists.linux.dev,
+ Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+ Mark Rutland <mark.rutland@arm.com>, James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+ Adrian Hunter <adrian.hunter@intel.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
+References: <20240731-arm-pmu-3-9-icntr-v3-0-280a8d7ff465@kernel.org>
+Content-Language: en-US
+From: James Clark <james.clark@linaro.org>
+In-Reply-To: <20240731-arm-pmu-3-9-icntr-v3-0-280a8d7ff465@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 07/08/2024 17:21, Catalin Marinas wrote:
-> On Fri, Jul 26, 2024 at 04:51:11PM -0700, Sean Christopherson wrote:
->> Disallow copying MTE tags to guest memory while KVM is dirty logging, as
->> writing guest memory without marking the gfn as dirty in the memslot could
->> result in userspace failing to migrate the updated page.  Ideally (maybe?),
->> KVM would simply mark the gfn as dirty, but there is no vCPU to work with,
->> and presumably the only use case for copy MTE tags _to_ the guest is when
->> restoring state on the target.
->>
->> Fixes: f0376edb1ddc ("KVM: arm64: Add ioctl to fetch/store tags in a guest")
->> Signed-off-by: Sean Christopherson <seanjc@google.com>
->> ---
->>  arch/arm64/kvm/guest.c | 5 +++++
->>  1 file changed, 5 insertions(+)
->>
->> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
->> index e1f0ff08836a..962f985977c2 100644
->> --- a/arch/arm64/kvm/guest.c
->> +++ b/arch/arm64/kvm/guest.c
->> @@ -1045,6 +1045,11 @@ int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
->>  
->>  	mutex_lock(&kvm->slots_lock);
->>  
->> +	if (write && atomic_read(&kvm->nr_memslots_dirty_logging)) {
->> +		ret = -EBUSY;
->> +		goto out;
->> +	}
+
+
+On 31/07/2024 5:51 pm, Rob Herring (Arm) wrote:
+> This series adds support for the optional fixed instruction counter
+> added in Armv9.4 PMU. Most of the series is a refactoring to remove the
+> index to counter number conversion which dates back to the Armv7 PMU
+> driver. Removing it is necessary in order to support more than 32
+> counters without a bunch of conditional code further complicating the
+> conversion.
 > 
-> There are ways to actually log the page dirtying but I don't think
-> it's worth it. AFAICT, reading the tags still works and that's what's
-> used during migration (on the VM where dirty tracking takes place).
+> Patch 1 changes struct arm_pmu.num_events to a bitmap of events, and
+> updates all the users. This removes the index to counter conversion
+> on the PMUv3 and Armv7 drivers.
 > 
-> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+> Patch 2 updates various register accessors to use 64-bit values matching
+> the register size.
+> 
+> Patches 3-4 update KVM PMU register accesses to use shared accessors
+> from asm/arm_pmuv3.h.
+> 
+> Patches 5-6 rework KVM and perf PMU defines for counter indexes and
+> number of counters.
+> 
+> Patch 7 finally adds support for the fixed instruction counter.
+> 
+> I tested this on FVP with VHE host and a guest. Also ran kvm-unittests
+> in Arm's kernelCI.
 > 
 
-Looks sensible to me - my initial thought was "why would a VMM do
-that?". But it would make sense to actually return a failure rather than
-letting the VMM shoot itself in the foot.
+I ran the Perf tests and poked around a bit with PMUs and chaining 
+events (on non-fixed instruction counter hardware):
 
-If there's actually a use-case then we could look at making the dirty
-tracking work, but I'm not convinced there is a good reason.
-
-Reviewed-by: Steven Price <steven.price@arm.com>
-
-Thanks,
-
-Steve
+Tested-by: James Clark <james.clark@linaro.org>
