@@ -1,63 +1,67 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E184E12B176
-	for <kvmarm@lists.linux.dev>; Fri,  9 Aug 2024 18:38:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE7972F41
+	for <kvmarm@lists.linux.dev>; Fri,  9 Aug 2024 18:38:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723228698; cv=none; b=aHHzks66cVJMYqdEp7O2JTD5qSiBzmVAmCDunXRsv8vLpBGZkRrp2mOGt550dsrVesM+CjfGEmyK4JbcEYNfwxkLiLLEfVMhSSuPkX8vV5m7Kf2s4bkNqPkg/ztV/IZFofh8G4DLZThxTaSI04sVZNX8QzRHsyrvcWZNXIefYOo=
+	t=1723228699; cv=none; b=Y3acNQ7A/nhAp1ThiIi52tROAu4M63ghAE6E3+q6l9V0HeCRSyNj71sFx/WfwI53cc9InltsSa4j6Sh9ceYUNvDdWxnNtOMSdWrOcyIUbAJFvCLN+uSIZNaQ8FGycxNzOCX7yEkro+Jmzh7c+QKN8UbqlfaBsN6ogavKW5v14U8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723228698; c=relaxed/simple;
-	bh=WgFcAp2Lf8zyPmmusFZaXFyM7LQjQCGcA8kgp6zTh1w=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=hLz9dezzPxOly2u1WBxzdzUS7/AbmfPKngZWor+uni7SlXOiz1vfhVB8blT0J4XqWkRo7cEtzonAOTDFIoFGnpqhC6b79Im4BhHcxElDSZQf4zRcAoqV8Nde12HTvFdFo2GueA3c7gceFY215JPEOeFOryR82TOadSpZLQx2CRQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IyOTi83P; arc=none smtp.client-ip=209.85.219.201
+	s=arc-20240116; t=1723228699; c=relaxed/simple;
+	bh=z8cWETLfeelpsbjyY0RVg3S8QOFntzeUcxoFKGzI+5Y=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=DrCbMV3wLXGhlsyNeCf5BQnQnAJ9/PAP+9oqMTsMHepDh4B2Y9enCIA0hTsc9/EunRX5gNQQev/7SVa628d7kmw1o2er8Hz5B5Nn26E9n6g0k/0rWnr0w7N4YY4WdSNSWolL0IozcbaDi4ouuKVOPVnjKWv9i/G6LLEyyGUIKHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hhi1LYzZ; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IyOTi83P"
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e05e9e4dfbeso4243616276.1
-        for <kvmarm@lists.linux.dev>; Fri, 09 Aug 2024 11:38:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hhi1LYzZ"
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e05e9e4dfbeso4243638276.1
+        for <kvmarm@lists.linux.dev>; Fri, 09 Aug 2024 11:38:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723228696; x=1723833496; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=9QpRWP4XLNMJiIvVol8OxLNovEZIjUaHM/c1cDtRmx0=;
-        b=IyOTi83PqrsX33MC75+SZts/gGL6s5QTfKk510RG7GcdRLTIC1g0YIHZhi2xpeZ0RA
-         b+HUJJkBkLotYI0fLDf9mtx7VXuah1/oTlMSc1eP5oAdQJUp1sfSROzX9A5+K30SXTIM
-         QZfYr2sRbO8SnV7J62DY9woogwp9sQld1kakRgK4t84Fg5O3lsgHTa1+SJWWGKqPGZYJ
-         UfmZa/RHlyDEq5UNbgMgMdJB946lnoJGaHmTiXQDDbjYQYKxniLA/ozoLXJf3EJUwW4K
-         dsFTO5B08neoXAL91y4AN5Z4HWMJZ/xVaUEAl7LQZwRSpZqs+nWFb78grLZ7nwa/J2/h
-         cWxw==
+        d=google.com; s=20230601; t=1723228697; x=1723833497; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=eKGu5OXwE/hWG2bMxqy/PoB6z3BlOaKV4IBDRrUObAs=;
+        b=hhi1LYzZydoYgdCjh+c6UTYG9pSZQHcITQZwC6F3A87qcInbn5XZI4CMVC2Hdm5bto
+         TXq+6apmO3U7pCYVV7afrhMo56ymhhl97bt06NEZsjG5KmQVCNDtkRLnrLw8t9HvEjxZ
+         heye2iZbkk1VcwVppJydrbnP01dIJF1/9n7yBL+UQkFFEBV+wf0iqBwxjEiYei/vIxuV
+         GRqaPw5jsTLv9ZP7PrqLG+gPTtUR5zNu4gQS+DDNym8FOZ6oja8QgdBhH/rnsuQT/Dpp
+         Xk5Xc413vOY2p2tOTSLgMrxe5Q3riuzm7tUFjnbq9DZlyTH6K1iloEGK7H2IzutnEiWN
+         uxuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723228696; x=1723833496;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9QpRWP4XLNMJiIvVol8OxLNovEZIjUaHM/c1cDtRmx0=;
-        b=Hjc4XH597zwDVq9AfYUW7AKJXzzZlO9nOoJmRmZ3CJR18wWxWx0Vi5WPca9eDrTT7K
-         ulFd6BadSkF91jJp/SSk2ewo3tUtpSDVcKNyJhhgPYX4JzCjZws6Cdjh34yzcip6jEDt
-         u6u7Ywlx/1jk9SML+8Xe7pxGrEKZp3WwTd8j+OIuyw+MlMuyNUW/kj/lklLtU0ZNlEmm
-         8FX+2wV0JNDKeTLdP1hOQIDCwGxxNLCHv1yr/dULkcZP8sQf9XKOsdxfxQenhieFpQKg
-         vNOejDiHhk12bF84rWoTJjf4uKnikgMDdTi1ZUUKuMGjqz8DBR8/9Vxe+WsrS6VO81C1
-         Zm9w==
-X-Forwarded-Encrypted: i=1; AJvYcCUXa3eCkdgUQmuyWlGGazso/ccx5f37NXfxdYSAiQsfq029dg3azE7VJUmln8VR/revkGTTg+CDqaPDJCyvO3XwutkcpTwr
-X-Gm-Message-State: AOJu0Yxo5SO3xtrJwBp/hegHGisGgPim/n4PccAEN05/Z9Yzv6Y6jwQ+
-	edgiCcnC/7uY1EJTh1woHil9cPu4TSOlBAkZ80mrpM22Nv7QH2gSwvOJsKL/vOOV9KcWGrV3rTL
-	l6Ux8+vfHMzqhxvU5P6EQLw==
-X-Google-Smtp-Source: AGHT+IEQzaYfkd9MJCLSU0EZ0iwERGwinl3PjreNXMmt5xE9iCRLweaZNLIudRz1qRDKokEE+0gqU4sbJ8n0hwOLfQ==
+        d=1e100.net; s=20230601; t=1723228697; x=1723833497;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=eKGu5OXwE/hWG2bMxqy/PoB6z3BlOaKV4IBDRrUObAs=;
+        b=OpBTEjkwSNHRwfowr26mq2JtACbYrFkuvZyedYSHXPyIMVny3rXSj1TgEkBy1cI/cU
+         EWOrWhS9QLx2FVmpVs871/r6QkpDkJi3bbl5uVuieBcV8yto5HafmOh18FecHfgcKu/I
+         uNPmijqUWkm5JFkl0UboTe+mkU+NFlOhVQSvSuSuGYYVAGcCOgPWKzFzXaCd7uV8pI2c
+         l9FthV6jLNKCCBrkl+y6hrWly9Mm2Pt+e+SSpLMSuw9gIclFDhG3su96gEcknCSkcG95
+         HlCPe+XYByFK6n2jDt5bO1eOP3jwW25HDvymbpBOaE/V4uhbgKOhbOPaBNjHAVszsK/L
+         rt9g==
+X-Forwarded-Encrypted: i=1; AJvYcCWTCy4Q60CazKdVF7XtnSKBYlN9kzpSSreKDKi2lWNEp8MPeJyUCkHvZVQoy2y94xTRNvdHWZuPDOOwhpV4DNPxkDFEEZuN
+X-Gm-Message-State: AOJu0Yys1HSyKROvavPeQEgFwdUl6Ai9t/xbDjCOrc3qORBIJwb7tF1/
+	C/iOZDShsEHUcvAATlJRQf3DWW8SJ8DHzInIw0IEKK1KDJGtilICPbkYGqYQJxv2RadrVQ3OdqU
+	gYFfxF669kkpb7UdQwReS/g==
+X-Google-Smtp-Source: AGHT+IH6o1VN3yBM641/JDVgDhIluIEuwPASTzC6s9TvXRuzgn4u60dgcL8d5jJ+CKLoRta5OwQR2leUR2cDrWqLhQ==
 X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a25:ab93:0:b0:e03:b0b4:9456 with SMTP
- id 3f1490d57ef6-e0eb9a107c8mr23264276.7.1723228695743; Fri, 09 Aug 2024
- 11:38:15 -0700 (PDT)
-Date: Fri,  9 Aug 2024 18:38:00 +0000
+ (user=coltonlewis job=sendgmr) by 2002:a25:9a86:0:b0:e0e:4537:6e92 with SMTP
+ id 3f1490d57ef6-e0eb993b146mr42483276.6.1723228696721; Fri, 09 Aug 2024
+ 11:38:16 -0700 (PDT)
+Date: Fri,  9 Aug 2024 18:38:01 +0000
+In-Reply-To: <20240809183802.3572177-1-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20240809183802.3572177-1-coltonlewis@google.com>
 X-Mailer: git-send-email 2.46.0.76.ge559c4bf1a-goog
-Message-ID: <20240809183802.3572177-1-coltonlewis@google.com>
-Subject: [PATCH v5 0/2] Add arch_timer_edge_cases selftest
+Message-ID: <20240809183802.3572177-2-coltonlewis@google.com>
+Subject: [PATCH v5 1/2] KVM: selftests: Ensure pending interrupts are handled
+ in arch_timer test
 From: Colton Lewis <coltonlewis@google.com>
 To: kvm@vger.kernel.org
 Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
@@ -67,51 +71,68 @@ Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
 	Colton Lewis <coltonlewis@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Add arch_timer_edge_cases selftest to test various corner cases of the
-ARM timers such as:
+Break up the asm instructions poking daifclr and daifset to handle
+interrupts. R_RBZYL specifies pending interrupts will be handle after
+context synchronization events such as an ISB.
 
-* timers above the max TVAL value
-* timers in the past
-* moving counters ahead and behind pending timers
-* reprogramming timers
-* timers fired multiple times
-* masking/unmasking using the timer control mask
+Introduce a function wrapper for the WFI instruction.
 
-These are intentionally unusual scenarios to stress compliance with
-the arm architecture.
+Signed-off-by: Colton Lewis <coltonlewis@google.com>
+---
+ tools/testing/selftests/kvm/aarch64/vgic_irq.c        | 11 +++++------
+ .../testing/selftests/kvm/include/aarch64/processor.h |  3 +++
+ tools/testing/selftests/kvm/lib/aarch64/processor.c   |  6 ++++++
+ 3 files changed, 14 insertions(+), 6 deletions(-)
 
-v5:
-* Drop previous patch 1 standardizing GIC addresses as this has now been
-  done by another series
-* Fix shortlog message for patch on arch_timer test
-* Comment ISB use appropriately
-* Rename gic_wfi() helper to wfi() as WFI instructions don't imply a GIC
-
-v4:
-https://lore.kernel.org/kvmarm/20240307183907.1184775-1-coltonlewis@google.com/
-
-v3:
-https://lore.kernel.org/kvmarm/20231103192915.2209393-1-coltonlewis@google.com/
-
-v2:
-https://lore.kernel.org/kvmarm/20230928210201.1310536-1-coltonlewis@google.com/
-
-v1:
-https://lore.kernel.org/kvm/20230516213731.387132-1-coltonlewis@google.com/
-
-Colton Lewis (2):
-  KVM: selftests: Ensure pending interrupts are handled in arch_timer
-    test
-  KVM: arm64: selftests: Add arch_timer_edge_cases selftest
-
- tools/testing/selftests/kvm/Makefile          |    1 +
- .../kvm/aarch64/arch_timer_edge_cases.c       | 1099 +++++++++++++++++
- .../testing/selftests/kvm/aarch64/vgic_irq.c  |   11 +-
- .../kvm/include/aarch64/arch_timer.h          |   18 +-
- .../selftests/kvm/include/aarch64/processor.h |    3 +
- .../selftests/kvm/lib/aarch64/processor.c     |    6 +
- 6 files changed, 1131 insertions(+), 7 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/aarch64/arch_timer_edge_cases.c
-
---
+diff --git a/tools/testing/selftests/kvm/aarch64/vgic_irq.c b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
+index a51dbd2a5f84..f4ac28d53747 100644
+--- a/tools/testing/selftests/kvm/aarch64/vgic_irq.c
++++ b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
+@@ -269,13 +269,12 @@ static void guest_inject(struct test_args *args,
+ 	KVM_INJECT_MULTI(cmd, first_intid, num);
+ 
+ 	while (irq_handled < num) {
+-		asm volatile("wfi\n"
+-			     "msr daifclr, #2\n"
+-			     /* handle IRQ */
+-			     "msr daifset, #2\n"
+-			     : : : "memory");
++		wfi();
++		local_irq_enable();
++		isb(); /* handle IRQ */
++		local_irq_disable();
+ 	}
+-	asm volatile("msr daifclr, #2" : : : "memory");
++	local_irq_enable();
+ 
+ 	GUEST_ASSERT_EQ(irq_handled, num);
+ 	for (i = first_intid; i < num + first_intid; i++)
+diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
+index 9b20a355d81a..de977d131082 100644
+--- a/tools/testing/selftests/kvm/include/aarch64/processor.h
++++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+@@ -243,4 +243,7 @@ void smccc_smc(uint32_t function_id, uint64_t arg0, uint64_t arg1,
+ 	       uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg5,
+ 	       uint64_t arg6, struct arm_smccc_res *res);
+ 
++/* Execute a Wait For Interrupt instruction. */
++void wfi(void);
++
+ #endif /* SELFTEST_KVM_PROCESSOR_H */
+diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+index 0ac7cc89f38c..fe4dc3693112 100644
+--- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
++++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+@@ -639,3 +639,9 @@ void vm_vaddr_populate_bitmap(struct kvm_vm *vm)
+ 	sparsebit_set_num(vm->vpages_valid, 0,
+ 			  (1ULL << vm->va_bits) >> vm->page_shift);
+ }
++
++/* Helper to call wfi instruction. */
++void wfi(void)
++{
++	asm volatile("wfi");
++}
+-- 
 2.46.0.76.ge559c4bf1a-goog
+
