@@ -1,165 +1,128 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8493015EFCD;
-	Fri,  9 Aug 2024 12:15:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A60571DFF5
+	for <kvmarm@lists.linux.dev>; Fri,  9 Aug 2024 12:38:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723205754; cv=none; b=rvgutAaVDLYHGwThMRbQoWwn3YwImYQuWZrjIBb/uAnc7FHzd7vG03kHEMOkA7qpEmDjOtMjL1qRLoBYevf6lipOOcqCPQ/OFhb52jVPs1b7AXwMJqHFk/Gbz977ymSgJB6+GejFyGbVXtBdexZEgLVBjjHroQV6M618uNzSkbE=
+	t=1723207113; cv=none; b=olUv4pQVaGWE9pXvMHGwt5NH6kcNNONA2qRfHp51B7R/oUrL7l1hlstMEvRA/r/RxyeXVTkO+VfjMHXsvZXjZ6zCem7hJfV7UI9PQFfuCn2mePmW/s77pg0PF9XIsw0LNy7d2p9XpsJotA8/oP6ov9fZ0mdNI9VyVJRENG2ZYWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723205754; c=relaxed/simple;
-	bh=YmzphMja6XXmXFsRDikB4wVg7CMV9XsA3fHfiK6varY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qshsMgUTJs6RgoRo0sS0PW/HblWgP2MrNw8xIqGyKtUPE8lKS3p3yzftWqwp4Wg/AhNEH0J+TERBjwnQDTNWG+7XzRILYP2oSVzPT3hA+SFCUkfUBz0mlXV8F2hShjQwc+Acd8x+9wxWBET6+uWIiYC0i3wFRNHQXiO/kBG1ZzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fRN/2jYx; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1723207113; c=relaxed/simple;
+	bh=ssPfoXbt81Fg6MwEoQ5t/2yiiU4J51bXCCA03eZCzLE=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ar6vsCEVNOet7bi0MlhZn/h1wLTio7GjBQ04PM7EYKzxgAWsz2A8bB9jKBIx8qy8AcE5jz5tPrncIcLzCtAfEwCGg26Mo1oHnRIcbmtBCj25OP3mlhr0YkSPYY4Pu3HdjVwdvtJrh7qxoE3u/im82+q20x9wy9RCG9YhscguCD8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=auMqGMLm; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fRN/2jYx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 251AFC4AF0D;
-	Fri,  9 Aug 2024 12:15:54 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="auMqGMLm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B908C32782;
+	Fri,  9 Aug 2024 12:38:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723205754;
-	bh=YmzphMja6XXmXFsRDikB4wVg7CMV9XsA3fHfiK6varY=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=fRN/2jYxvxAK2rPD3+0naMbaZ/DnT37y8CwrQvdGhQ5zxh/2Z+G0bnaEdZKNDyS3l
-	 yBGIzBnKK5I66olifKJ+Xe3c70z15ijiIrBrEwB8qDXOFo1cXjMwLfbE1HwtSELDcr
-	 cr3NGFHumQf2V5oaCmKYbFErdr17fgRqOndlWO6eoZG9HF+4kHn0PRVEaR2u64sl7w
-	 6+nHVpfU8Y9irVsV+NuCz95HvmH+bk0DRm7Hiqr7Ca/EProf7zoSean45ouoNR9xqX
-	 WvQT1EfO599+KS8CWjkHm6uEsz2r2ssdlmB3ttsSVZ4xxM6fFpReUasLUCFVn8H5O8
-	 rE0BWb9/quglQ==
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-52efbb55d24so3597467e87.1;
-        Fri, 09 Aug 2024 05:15:54 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUuCh7pFctCXTdjWVk6dkNrJyNJycpcgkPqO9/cqSwPdfdJiJqVYgyMBe/WgJYfY19zSEwDsyIcJDluLjVQdbnYCXnOGpqpZly7PQ7DBQyhban8Ay2DAbuXTceUOA==
-X-Gm-Message-State: AOJu0YyJf22KOW13O1WQCGDBJrLMqrUEasTQxguftmGvhAy0VWBKxSbK
-	tNdil2DuCfShrAaK6JWDNG1X13mMy9st+GhM4TbOkU8pxdtmYduoKN/UqhXeGnqfDY2K2F2/X4h
-	nfnilh1qBK9qRgFNAuXoK6OuQNYY=
-X-Google-Smtp-Source: AGHT+IGlPsd9qpxK+kaW4uaKRNj+aYSzSne6anO3DKhp0I4fJNAaAhyO1zxPErAVmUP4wrg91CYucQo7Gmyudhjr2sM=
-X-Received: by 2002:a05:6512:2311:b0:52c:db76:2a7a with SMTP id
- 2adb3069b0e04-530ee9b76bemr1127480e87.34.1723205752741; Fri, 09 Aug 2024
- 05:15:52 -0700 (PDT)
+	s=k20201202; t=1723207113;
+	bh=ssPfoXbt81Fg6MwEoQ5t/2yiiU4J51bXCCA03eZCzLE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=auMqGMLmbyHBLQLRtPVfEUbvbusGu4sICR9x8yIZTNXXVNHKoyS3besfdqlWM3T/A
+	 j46PKS8ifkv7OSpLdiwKqr5xhPlEKr9fMzprMQa7UHPXyO7jHmMwBQDq/pDfj5tRgO
+	 wtckt0/AkKRPgam7+3hQGbwRBx6okp/VCOO5pN+/C2ZFSkanpWn3Eywe5pIeJejaQJ
+	 zlhwQix10POLnrGTTd1qcaXfEWR0CpB5k/RpKfbCMmZo3ZRtPi6TwwxmapumFxb6nt
+	 CfgcQfHUwyNEtdh9bH/eKAcQsWKdWSOg90wKXfAvcoxN9LVqCZdJ13fsNGMFyNS4kM
+	 mtokqg9yiQLOg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1scOt5-002Kks-3C;
+	Fri, 09 Aug 2024 13:38:31 +0100
+Date: Fri, 09 Aug 2024 13:38:23 +0100
+Message-ID: <868qx527nk.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Zhang Zekun <zhangzekun11@huawei.com>
+Cc: <oliver.upton@linux.dev>,
+	<james.morse@arm.com>,
+	<suzuki.poulose@arm.com>,
+	<yuzenghui@huawei.com>,
+	<kvmarm@lists.linux.dev>
+Subject: Re: [PATCH] KVM: arm64: vgic-v4: Use helper function irq_get_irq_data()
+In-Reply-To: <20240809083906.2534-1-zhangzekun11@huawei.com>
+References: <20240809083906.2534-1-zhangzekun11@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20240807-macos-build-support-v1-0-4cd1ded85694@samsung.com> <20240807-macos-build-support-v1-11-4cd1ded85694@samsung.com>
-In-Reply-To: <20240807-macos-build-support-v1-11-4cd1ded85694@samsung.com>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Fri, 9 Aug 2024 21:15:16 +0900
-X-Gmail-Original-Message-ID: <CAK7LNARafZ=zFMeoDdiMh=ZRU_XiJ08Naf=oAdYpOiUN02HizQ@mail.gmail.com>
-Message-ID: <CAK7LNARafZ=zFMeoDdiMh=ZRU_XiJ08Naf=oAdYpOiUN02HizQ@mail.gmail.com>
-Subject: Re: [PATCH 11/12] tty/vt: conmakehash requires linux/limits.h
-To: da.gomez@samsung.com
-Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, 
-	Lucas De Marchi <lucas.demarchi@intel.com>, 
-	=?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>, 
-	Rodrigo Vivi <rodrigo.vivi@intel.com>, 
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Daniel Vetter <daniel@ffwll.ch>, 
-	William Hubbs <w.d.hubbs@gmail.com>, Chris Brannon <chris@the-brannons.com>, 
-	Kirk Reiser <kirk@reisers.ca>, Samuel Thibault <samuel.thibault@ens-lyon.org>, 
-	Paul Moore <paul@paul-moore.com>, Stephen Smalley <stephen.smalley.work@gmail.com>, 
-	Ondrej Mosnacek <omosnace@redhat.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Jiri Slaby <jirislaby@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
-	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, linux-kernel@vger.kernel.org, 
-	linux-kbuild@vger.kernel.org, intel-xe@lists.freedesktop.org, 
-	dri-devel@lists.freedesktop.org, speakup@linux-speakup.org, 
-	selinux@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-serial@vger.kernel.org, llvm@lists.linux.dev, 
-	Finn Behrens <me@kloenk.dev>, "Daniel Gomez (Samsung)" <d+samsung@kruces.com>, gost.dev@samsung.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: zhangzekun11@huawei.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Aug 7, 2024 at 8:10=E2=80=AFAM Daniel Gomez via B4 Relay
-<devnull+da.gomez.samsung.com@kernel.org> wrote:
->
-> From: Daniel Gomez <da.gomez@samsung.com>
->
-> macOS hosts do not provide the linux/limits.h header required for
-> conmakehash. To address this, ensure that usr/include is included in
-> the conmakehash HOSTCFLAGS. This will provide the necessary header for
-> successful compilation on macOS.
->
-> Fixes error:
-> HOSTCC  drivers/tty/vt/conmakehash - due to target missing
->   clang -Wp,-MMD,drivers/tty/vt/.conmakehash.d -Wall
-> -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer
-> -std=3Dgnu11   -I ./scripts/include     -o drivers/tty/vt/conmakehash
-> drivers/tty/vt/conmakehash.c
-> drivers/tty/vt/conmakehash.c:15:10: fatal error: 'linux/
->    limits.h' file not found 15 | #include <linux/limits.h>    |
->    ^~~~~~~~~~~~~~~~
+On Fri, 09 Aug 2024 09:39:06 +0100,
+Zhang Zekun <zhangzekun11@huawei.com> wrote:
+> 
+> The returned value of irq_to_desc() is only used to get the irq_data
+> by calling irq_desc_get_irq_data(), and there is a helper function
+> irq_get_irq_data() which has already provided the functionality. So,
+> use irq_get_irq_data() to make the code more simple.
 
+Unfortunately, simpler doesn't equate to better.
 
-The error is reported at line 15 of drivers/tty/vt/conmakehash.c
-
-
-The line 15 is #include <stdlib.h>:
-
-https://github.com/torvalds/linux/blob/v6.11-rc1/drivers/tty/vt/conmakehash=
-.c#L15
-
-
-So, host programs cannot include <stdlib.h> on your build machine.
-
-
-
-drivers/tty/vt/conmakehash.c has only 5 include directives:
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <sysexits.h>
-#include <string.h>
-#include <ctype.h>
-
-
-You cannot build this, your build machine cannot build anything.
-
-
-
-
-
-
-
-
-
-> 1 error generated.
-> make[5]: *** [scripts/Makefile.host:116: drivers/tty/vt/conmakehash]
-> Error 1
-> make[4]: *** [scripts/Makefile.build:485: drivers/tty/vt] Error 2
-> make[3]: *** [scripts/Makefile.build:485: drivers/tty] Error 2
-> make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
-> make[1]: *** [/Volumes/src/kernel/linux-next/Makefile:1925: .] Error 2
-> make: *** [Makefile:224: __sub-make] Error 2
->
-> Signed-off-by: Daniel Gomez <da.gomez@samsung.com>
+> 
+> Signed-off-by: Zhang Zekun <zhangzekun11@huawei.com>
 > ---
->  drivers/tty/vt/Makefile | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/drivers/tty/vt/Makefile b/drivers/tty/vt/Makefile
-> index 2c8ce8b592ed..d266895357e5 100644
-> --- a/drivers/tty/vt/Makefile
-> +++ b/drivers/tty/vt/Makefile
-> @@ -13,6 +13,7 @@ obj-$(CONFIG_CONSOLE_TRANSLATIONS)    +=3D consolemap.o=
- consolemap_deftbl.o
->  clean-files :=3D consolemap_deftbl.c defkeymap.c
->
->  hostprogs +=3D conmakehash
-> +HOSTCFLAGS_conmakehash.o =3D -I$(srctree)/usr/include
->
->  quiet_cmd_conmk =3D CONMK   $@
->        cmd_conmk =3D $(obj)/conmakehash $< > $@
->
-> --
-> Git-146)
->
->
+>  arch/arm64/kvm/vgic/vgic-v4.c | 8 ++------
+>  1 file changed, 2 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
+> index 74a67ad87f29..2707ab0ab0a5 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v4.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v4.c
+> @@ -124,7 +124,6 @@ static void vgic_v4_enable_vsgis(struct kvm_vcpu *vcpu)
+>  	 */
+>  	for (i = 0; i < VGIC_NR_SGIS; i++) {
+>  		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, i);
+> -		struct irq_desc *desc;
+>  		unsigned long flags;
+>  		int ret;
+>  
+> @@ -138,8 +137,7 @@ static void vgic_v4_enable_vsgis(struct kvm_vcpu *vcpu)
+>  
+>  		/* Transfer the full irq state to the vPE */
+>  		vgic_v4_sync_sgi_config(vpe, irq);
+> -		desc = irq_to_desc(irq->host_irq);
+> -		ret = irq_domain_activate_irq(irq_desc_get_irq_data(desc),
+> +		ret = irq_domain_activate_irq(irq_get_irq_data(irq->host_irq),
+>  					      false);
 
+And you are still performing two lookups (one in the domain, one in
+the mapple tree), when everything could be solve with one:
 
---
-Best Regards
-Masahiro Yamada
+diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
+index 74a67ad87f29..9f0f15b376f2 100644
+--- a/arch/arm64/kvm/vgic/vgic-v4.c
++++ b/arch/arm64/kvm/vgic/vgic-v4.c
+@@ -134,11 +134,10 @@ static void vgic_v4_enable_vsgis(struct kvm_vcpu *vcpu)
+ 			goto unlock;
+ 
+ 		irq->hw = true;
+-		irq->host_irq = irq_find_mapping(vpe->sgi_domain, i);
++		desc = __irq_resolve_mapping(vpe->sgi_domain, i, &irq->host_irq);
+ 
+ 		/* Transfer the full irq state to the vPE */
+ 		vgic_v4_sync_sgi_config(vpe, irq);
+-		desc = irq_to_desc(irq->host_irq);
+ 		ret = irq_domain_activate_irq(irq_desc_get_irq_data(desc),
+ 					      false);
+ 		if (!WARN_ON(ret)) {
+
+So no, I'm not going to change this just to drop a local variable. If
+we are going to change something, it is to improve the *result*.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
