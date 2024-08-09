@@ -1,135 +1,96 @@
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 499EAC8D1
-	for <kvmarm@lists.linux.dev>; Fri,  9 Aug 2024 08:12:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5286518DF90
+	for <kvmarm@lists.linux.dev>; Fri,  9 Aug 2024 08:51:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723191152; cv=none; b=BgymMYb3VBhR3b53iNbpN0R+RLRD87eROICzlqq5WkW5mmdYeinT2I52H2gzRAOYI0O7f8AG8W556yMhhIUKcxUjcOsM+l41jsVZkCn+Xkm/XAxscGtVS+ht1rKTWMivvFsvmONXqJeq4BqDTJfL5gm7XqMniagcb14sEbE4T7c=
+	t=1723193517; cv=none; b=D/YM0/mMsucl2GjhPb0cP/DqkreeG5wgIFPZ2RXPrhy/yEehojN0s4yr3sym556X9tIMQ2uBMB9AagVwbkp1MX1UkLgfKWU7Owzqz+kzcO3HYIOtok/VGekXJJofiG0vwMGLYQ4A3orDZEBpbDzwQ2KM6yUpe0dkLqCfZHPM6qA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723191152; c=relaxed/simple;
-	bh=kHDhDSR2+w+Ph+NdsUodVPwydVWb2V+/ba4K3JJ4EvM=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=WurSsPk8URSz47szhXYSMNVjvMjMAKeC1k+76qGJRY/Q7fCTf3/HGeTwpWJVK3ZQySEhpTg5QJxBX2lWKjNq3nqIs66zxsGFOZTwP1PL7zuakdMl5cUSqpLN9guDd39dzuVo6wSUHqa74RYe7b9uj2cBKIDNT3lWbHByJ2U60Fs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OeVRqCC1; arc=none smtp.client-ip=95.215.58.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OeVRqCC1"
-Date: Fri, 9 Aug 2024 01:12:19 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1723191146;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=ZHuIVP7wwieh91FvNO32MlwMqME40e728uT/JCQsoZ8=;
-	b=OeVRqCC1RsSwvbLdaEG7URAMTfh5Eum+qKE4wrIElDzzFHGHjeZVNhU8LfsYEsQcQdeMvD
-	jSIlNjv154Swu/c7f9AoAm3t/9qOg0t6CdU0PK1T13NSySCLD5gnajIhzFDUgvwp2yKuO9
-	pEP0IWiyo2Po/D10G6h869HaEs/u3hw=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, Alexander Potapenko <glider@google.com>,
-	Mark Brown <broonie@kernel.org>, Fuad Tabba <tabba@google.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Takahiro Itazuri <itazur@amazon.com>,
-	Sebastian Ott <sebott@redhat.com>,
-	Danilo Krummrich <dakr@kernel.org>, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: [GIT PULL] KVM/arm64 fixes for 6.11, round #1
-Message-ID: <ZrXPY7yIG0eu8mQU@linux.dev>
+	s=arc-20240116; t=1723193517; c=relaxed/simple;
+	bh=sU/E4wH+yel4Jh1AAzSD0n9C6fLxtQCi4BrWa7rew2c=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nmBaWLnl0/FRbcu65rQf2NZgnvghsPG60EIrgXjvlkK/tA3I44nekzJSYwQggL1FG8mqu4SYBmJjuJOyflNKVGkhx23NKItrH5yM45vpKDQI+FgBjzv2YiC6/4d6OCMLsbSzrIfSmwYmZv0+vV8Dxf71eQdFqe36nh2VScmT9DM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4WgHb90Gv9z2Cm0L;
+	Fri,  9 Aug 2024 16:47:01 +0800 (CST)
+Received: from kwepemf500003.china.huawei.com (unknown [7.202.181.241])
+	by mail.maildlp.com (Postfix) with ESMTPS id 7A8DB1A0188;
+	Fri,  9 Aug 2024 16:51:46 +0800 (CST)
+Received: from huawei.com (10.175.112.208) by kwepemf500003.china.huawei.com
+ (7.202.181.241) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 9 Aug
+ 2024 16:51:45 +0800
+From: Zhang Zekun <zhangzekun11@huawei.com>
+To: <maz@kernel.org>, <oliver.upton@linux.dev>, <james.morse@arm.com>,
+	<suzuki.poulose@arm.com>, <yuzenghui@huawei.com>, <kvmarm@lists.linux.dev>
+CC: <zhangzekun11@huawei.com>
+Subject: [PATCH] KVM: arm64: vgic-v4: Use helper function irq_get_irq_data()
+Date: Fri, 9 Aug 2024 16:39:06 +0800
+Message-ID: <20240809083906.2534-1-zhangzekun11@huawei.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemf500003.china.huawei.com (7.202.181.241)
 
-Hi Paolo,
+The returned value of irq_to_desc() is only used to get the irq_data
+by calling irq_desc_get_irq_data(), and there is a helper function
+irq_get_irq_data() which has already provided the functionality. So,
+use irq_get_irq_data() to make the code more simple.
 
-Decent bit of fixes this time around. The most noteworthy among these
-is probably Marc's vgic fix that closes a race which can precipitate a
-UAF, as seen w/ syskaller.
+Signed-off-by: Zhang Zekun <zhangzekun11@huawei.com>
+---
+ arch/arm64/kvm/vgic/vgic-v4.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
-Please pull.
-
+diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
+index 74a67ad87f29..2707ab0ab0a5 100644
+--- a/arch/arm64/kvm/vgic/vgic-v4.c
++++ b/arch/arm64/kvm/vgic/vgic-v4.c
+@@ -124,7 +124,6 @@ static void vgic_v4_enable_vsgis(struct kvm_vcpu *vcpu)
+ 	 */
+ 	for (i = 0; i < VGIC_NR_SGIS; i++) {
+ 		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, i);
+-		struct irq_desc *desc;
+ 		unsigned long flags;
+ 		int ret;
+ 
+@@ -138,8 +137,7 @@ static void vgic_v4_enable_vsgis(struct kvm_vcpu *vcpu)
+ 
+ 		/* Transfer the full irq state to the vPE */
+ 		vgic_v4_sync_sgi_config(vpe, irq);
+-		desc = irq_to_desc(irq->host_irq);
+-		ret = irq_domain_activate_irq(irq_desc_get_irq_data(desc),
++		ret = irq_domain_activate_irq(irq_get_irq_data(irq->host_irq),
+ 					      false);
+ 		if (!WARN_ON(ret)) {
+ 			/* Transfer pending state */
+@@ -161,7 +159,6 @@ static void vgic_v4_disable_vsgis(struct kvm_vcpu *vcpu)
+ 
+ 	for (i = 0; i < VGIC_NR_SGIS; i++) {
+ 		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, i);
+-		struct irq_desc *desc;
+ 		unsigned long flags;
+ 		int ret;
+ 
+@@ -176,8 +173,7 @@ static void vgic_v4_disable_vsgis(struct kvm_vcpu *vcpu)
+ 					    &irq->pending_latch);
+ 		WARN_ON(ret);
+ 
+-		desc = irq_to_desc(irq->host_irq);
+-		irq_domain_deactivate_irq(irq_desc_get_irq_data(desc));
++		irq_domain_deactivate_irq(irq_get_irq_data(irq->host_irq));
+ 	unlock:
+ 		raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
+ 		vgic_put_irq(vcpu->kvm, irq);
 -- 
-Thanks,
-Oliver
+2.17.1
 
-The following changes since commit 8400291e289ee6b2bf9779ff1c83a291501f017b:
-
-  Linux 6.11-rc1 (2024-07-28 14:19:55 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.11-1
-
-for you to fetch changes up to 9eb18136af9fe4dd688724070f2bfba271bd1542:
-
-  KVM: arm64: vgic: Hold config_lock while tearing down a CPU interface (2024-08-08 16:58:22 +0000)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for 6.11, round #1
-
- - Use kvfree() for the kvmalloc'd nested MMUs array
-
- - Set of fixes to address warnings in W=1 builds
-
- - Make KVM depend on assembler support for ARMv8.4
-
- - Fix for vgic-debug interface for VMs without LPIs
-
- - Actually check ID_AA64MMFR3_EL1.S1PIE in get-reg-list selftest
-
- - Minor code / comment cleanups for configuring PAuth traps
-
- - Take kvm->arch.config_lock to prevent destruction / initialization
-   race for a vCPU's CPUIF which may lead to a UAF
-
-----------------------------------------------------------------
-Danilo Krummrich (1):
-      KVM: arm64: free kvm->arch.nested_mmus with kvfree()
-
-Fuad Tabba (1):
-      KVM: arm64: Tidying up PAuth code in KVM
-
-Marc Zyngier (2):
-      KVM: arm64: Enforce dependency on an ARMv8.4-aware toolchain
-      KVM: arm64: vgic: Hold config_lock while tearing down a CPU interface
-
-Mark Brown (1):
-      KVM: selftests: arm64: Correct feature test for S1PIE in get-reg-list
-
-Sebastian Ott (3):
-      KVM: arm64: fix override-init warnings in W=1 builds
-      KVM: arm64: fix kdoc warnings in W=1 builds
-      KVM: arm64: vgic: fix unexpected unlock sparse warnings
-
-Takahiro Itazuri (1):
-      docs: KVM: Fix register ID of SPSR_FIQ
-
-Zenghui Yu (1):
-      KVM: arm64: vgic-debug: Exit the iterator properly w/o LPI
-
- Documentation/virt/kvm/api.rst                     |  2 +-
- arch/arm64/include/asm/kvm_ptrauth.h               |  2 +-
- arch/arm64/kvm/Kconfig                             |  1 +
- arch/arm64/kvm/Makefile                            |  3 +++
- arch/arm64/kvm/arm.c                               | 15 +++++----------
- arch/arm64/kvm/hyp/include/hyp/switch.h            |  1 -
- arch/arm64/kvm/hyp/nvhe/Makefile                   |  2 ++
- arch/arm64/kvm/hyp/nvhe/switch.c                   |  5 ++---
- arch/arm64/kvm/hyp/vhe/Makefile                    |  2 ++
- arch/arm64/kvm/nested.c                            |  2 +-
- arch/arm64/kvm/vgic/vgic-debug.c                   |  5 +++--
- arch/arm64/kvm/vgic/vgic-init.c                    |  3 +--
- arch/arm64/kvm/vgic/vgic-irqfd.c                   |  7 ++++---
- arch/arm64/kvm/vgic/vgic-its.c                     | 18 +++++++++++-------
- arch/arm64/kvm/vgic/vgic-v3.c                      |  2 +-
- arch/arm64/kvm/vgic/vgic.c                         |  2 +-
- arch/arm64/kvm/vgic/vgic.h                         |  2 +-
- tools/testing/selftests/kvm/aarch64/get-reg-list.c |  4 ++--
- 18 files changed, 42 insertions(+), 36 deletions(-)
