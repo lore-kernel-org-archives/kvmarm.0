@@ -1,159 +1,483 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 356B016A921
-	for <kvmarm@lists.linux.dev>; Fri,  9 Aug 2024 20:52:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB41C14AD23;
+	Sat, 10 Aug 2024 10:16:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723236729; cv=none; b=iCi7AzNHGHSINHd90AmzeTIgxQwbeIVOjskqnSivTkpXqDpgIVsEl+n8NtCKFKNZi7fun9xVF597BohErsp2IE2TzQK8JEEKFp9M++uRNmRmIrbeyHB7YjSV1uAox4u2rQ8YaFzTptUbJ++3Y3l3SCIynxENXLCQR9heCzwBaKs=
+	t=1723284978; cv=none; b=GihOKFSXkezZO/pYZ45I7V04cL7BUmO9aVDqOTYloYuf/D5bYscKefO7T/U//Tp8qp9kyVE0fv7LGXf6fXvxFRp4fV6OCvgCDQzY4eFwpPLw1OBdELsbh2Jl3qdc0Y5ihB/LNoOR/wMZcJmAKm18fbA02h9OxkpqVCJMky0Biwc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723236729; c=relaxed/simple;
-	bh=aRlZUJEaiHRJGRJLYanOLgphxj1dBoKyLzhPuRD+1jE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=NumJ9WGLU/FsonyUqjy2/i/NQ3yfBxMRRohkPByDxms2GQ0u8iy19Z8aMw13jm6Oa1P8XM6/nImHUNvR3KBkmRogfcTpB3e2tXY9pUTRCTgydN0BvITOc38uFbfrMhSA0I7nGKlmTzAoAHGznFu8W4FiUX9FEbXwgQ0N24S8rNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--amoorthy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PPTq6fWy; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--amoorthy.bounces.google.com
+	s=arc-20240116; t=1723284978; c=relaxed/simple;
+	bh=+rDDZ1Ja7xtP8rnE5tBLELzQBuDnWa+J3LWZxa/TMs8=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=J8OoaO4uIzASsY62/o0borEJYMVO8sxvTtz8N8rCZOiePv1dxaF0yc2Cr203MZQSz+sBDBlXPOcNlg7JR9R0kEkGp+gbn5aoiqfvJQh2pyBlgx08JnfXA3qyxBjGOk7jZl4ZaSxYOqX84OuZ/CqycRj/o0nh+jufG3JElmZM+Lk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gSXK4Msm; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PPTq6fWy"
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-66a2aee82a0so52735467b3.0
-        for <kvmarm@lists.linux.dev>; Fri, 09 Aug 2024 13:52:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723236727; x=1723841527; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dIbtHxMOA9YLjvqp+dS6Qdcb7Qd+13Wo6Sg7tuMzI5Y=;
-        b=PPTq6fWytrwi5FHB+9CADYANaKtprSLvfsX/QzASpqln/UQCuXnzODOHQNLF8GQuj8
-         NFZ2PjcWhkSDdCrvUkoRbgFhMpFZsYKC3QBmgefzlj0XlNWxC4odEzl1gxrcuwgWWIOJ
-         BErS4qmgFv+8DMie6bmVv0zRAWvsiIOYYb9P6jtzykuvU+pUQk3qMptuAjOjL1dpLfKh
-         L1Z+gl2TjaG9Y4K88KFnxv9VvFnfwU3ZcvniemzEfEuUjFjxWbL6vl/34Y4kt+Cl2Tub
-         X1J/ehZYXX5hDVfKTMSTp6Atht2CJIntB9k5Zi1y2HV1grQI9zGcSz89Y2xm7SJ0yDux
-         Ly8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723236727; x=1723841527;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dIbtHxMOA9YLjvqp+dS6Qdcb7Qd+13Wo6Sg7tuMzI5Y=;
-        b=SQfibu8g8MnfjFF1OGC3Cgy7WLiWdfO54A/w/RnmV7HLnlHliVuCmcpbV/lhEPb1SF
-         Ully1BHqJtrTc2fC9EljHLFyxcNeJpQOR7O6E/PWw5GKRhQyRB1tJZbYlpI5ng8wF3Vu
-         B5jFbHMTVlUkINFG3zzEcXKq3gUo8LlSisiG7EYPOk7QtIJkvKfqYb2hy71CNRJ66UE2
-         oJfgTgzEogZqoqod+SR0D/P2SlWFAE90Btpg+AdojhCYTaCahAXb1D3QpN3gBSitHWs+
-         F1Vgpap3AFM5s34oKGuZL1mqOhb3ooqZxd/JGYRjhC0+akE5omgMPPqLa/P8Wj3GpDz0
-         0c9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWOwsWmwxrEKKU9jpZX3vWH+xW+C1HOpDtMr5qtKGmG6T0StJ0+2PgYzUxexv0wFgL+xWSVWeDYUXn1QzikCDd7s6l/ypmF
-X-Gm-Message-State: AOJu0YzCZq9oKMWq8WGinD753On8R93gTCzra7hk85i7UNZahxZQuFzC
-	4YckPfhhL3WE8BUrnbe79kg9caWmEIlyjJnD2sxusqK6PgChyBV6pAQfr84T+qMY1P0G6Pkke1r
-	z6nM9X7VrtA==
-X-Google-Smtp-Source: AGHT+IFEaybp/gQAI2dPTCR/v0E5CX7dxbSJimk27amgMiDWfuzdCjImbiciR7wYsAeR11wIqKwlf/27qs26HA==
-X-Received: from laogai.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:2c9])
- (user=amoorthy job=sendgmr) by 2002:a81:8786:0:b0:68d:14aa:894a with SMTP id
- 00721157ae682-69ec4a193b8mr1144237b3.2.1723236727230; Fri, 09 Aug 2024
- 13:52:07 -0700 (PDT)
-Date: Fri,  9 Aug 2024 20:51:58 +0000
-In-Reply-To: <20240809205158.1340255-1-amoorthy@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gSXK4Msm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4481FC32781;
+	Sat, 10 Aug 2024 10:16:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723284978;
+	bh=+rDDZ1Ja7xtP8rnE5tBLELzQBuDnWa+J3LWZxa/TMs8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=gSXK4MsmvMPxAkJVlPnZd8xTfmS4MEc2J/51UFtwrTH9oZpdXjncsJl4WD2FZQtLn
+	 BCH2r/jXKNnXW9Jn7YtzUgQI/gWw8eV1plDry2xctp7Z8M/2SOlZh3oCgk5dULppXf
+	 gKD8wWUEZu6aN16ZwI1Rlrhdh89CuOdZJTwlcmld0JfjCXwI8O7Fy9iumnbjDq5HbC
+	 N64GUekLA9GS4DVJyhdbch6TO86FKsdUqRMWl0K8oBC++Ei6H8+RrPzEnPYbQMxeJO
+	 Wxf2gXL3VM5++vuN0/umRkkEabUZXy/FtRAj6920aWHi20lNTHkf+cHP7BGYnS+Amq
+	 BbaCm/8wXj6wg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1scj8y-002aaP-0k;
+	Sat, 10 Aug 2024 11:16:16 +0100
+Date: Sat, 10 Aug 2024 11:16:15 +0100
+Message-ID: <867cco1y4w.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Przemyslaw Gaj <pgaj@cadence.com>
+Subject: Re: [PATCH v2 13/17] KVM: arm64: nv: Add SW walker for AT S1 emulation
+In-Reply-To: <ZrYO9SK52rHhGvEd@arm.com>
+References: <20240731194030.1991237-1-maz@kernel.org>
+	<20240731194030.1991237-14-maz@kernel.org>
+	<ZrYO9SK52rHhGvEd@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20240809205158.1340255-1-amoorthy@google.com>
-X-Mailer: git-send-email 2.46.0.76.ge559c4bf1a-goog
-Message-ID: <20240809205158.1340255-4-amoorthy@google.com>
-Subject: [PATCH v2 3/3] KVM: arm64: Perform memory fault exits when stage-2
- handler EFAULTs
-From: Anish Moorthy <amoorthy@google.com>
-To: seanjc@google.com, oliver.upton@linux.dev, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev
-Cc: jthoughton@google.com, amoorthy@google.com, rananta@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com, anshuman.khandual@arm.com, pgaj@cadence.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Right now userspace just gets a bare EFAULT when the stage-2 fault
-handler fails to fault in the relevant page. Set up a
-KVM_EXIT_MEMORY_FAULT whenever this happens, which at the very least
-eases debugging and might also let userspace decide on/take some
-specific action other than crashing the VM.
+Hi Alex,
 
-In some cases, user_mem_abort() EFAULTs before the size of the fault is
-calculated: return 0 in these cases to indicate that the fault is of
-unknown size.
+On Fri, 09 Aug 2024 13:43:33 +0100,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> Hi Marc,
+> 
+> Finally managed to go through the patch. Bunch of nitpicks from me (can be
+> safely ignored), and some corner cases where KVM deviates from the spec.
 
-Signed-off-by: Anish Moorthy <amoorthy@google.com>
----
- Documentation/virt/kvm/api.rst |  2 +-
- arch/arm64/kvm/arm.c           |  1 +
- arch/arm64/kvm/mmu.c           | 11 ++++++++++-
- 3 files changed, 12 insertions(+), 2 deletions(-)
+Thanks for taking the time to go through this mess.
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index c5ce7944005c..7b321fefcb3e 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -8129,7 +8129,7 @@ unavailable to host or other VMs.
- 7.34 KVM_CAP_MEMORY_FAULT_INFO
- ------------------------------
+[...]
+
+> > +		break;
+> > +	default:
+> > +		return (vcpu_el2_e2h_is_set(vcpu) &&
+> > +			vcpu_el2_tge_is_set(vcpu)) ? TR_EL20 : TR_EL10;
+> 
+> This also looks correct to me. Following the pseudocode was not trivial, so I'm
+> leaving this here in case I made a mistake somewhere.
+> 
+> For the S1E0* variants: AArch64.AT(el_in=EL0) => TranslationRegime(el=EL0) =>
+> ELIsInHost(el=EL0); ELIsInHost(el=EL0) is true if {E2H,TGE} = {1,1}, and in this
+> case TranslationRegime(el=EL0) returns Regime_EL20, otherwise Regime_EL10.
+> 
+> For the S1E1* variants: AArch64.AT(el_in=EL1), where:
+> 
+> - if ELIsInHost(el=EL0) is true, then 'el' is changed to EL2, where
+>   ELIsInHost(el=EL0) is true if {E2H,TGE} = {1,1}. In this case,
+>   TranslationRegime(el=EL2) will return Regime_EL20.
+> 
+> - if ELIsInHost(el=EL0) is false, then 'el' remains EL1, and
+>   TranslationRegime(el=EL1) returns Regime_EL10.
+
+Yup. Somehow, the C version is far easier to understand!
+
+> 
+> > +	}
+> > +}
+> > +
+> > +static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
+> > +			 struct s1_walk_result *wr, u64 va)
+> > +{
+> > +	u64 sctlr, tcr, tg, ps, ia_bits, ttbr;
+> > +	unsigned int stride, x;
+> > +	bool va55, tbi, lva, as_el0;
+> > +
+> > +	wi->regime = compute_translation_regime(vcpu, op);
+> > +	as_el0 = (op == OP_AT_S1E0R || op == OP_AT_S1E0W);
+> > +
+> > +	va55 = va & BIT(55);
+> > +
+> > +	if (wi->regime == TR_EL2 && va55)
+> > +		goto addrsz;
+> > +
+> > +	wi->s2 = wi->regime == TR_EL10 && (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_VM);
+> 
+> According to AArch64.NSS2TTWParams(), stage 2 is enabled if HCR_EL2.VM or
+> HCR_EL2.DC.
+> 
+> From the description of HCR_EL2.DC, when the bit is set:
+> 
+> 'The PE behaves as if the value of the HCR_EL2.VM field is 1 for all purposes
+> other than returning the value of a direct read of HCR_EL2.'
+
+Yup, good point. And as you noticed further down, the HCR_EL2.DC
+handling is currently a mess.
+
+[...]
+
+> > +	/* Let's put the MMU disabled case aside immediately */
+> > +	if (!(sctlr & SCTLR_ELx_M) ||
+> > +	    (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_DC)) {
+> 
+> I think the condition doesn't match AArch64.S1Enabled():
+> 
+> - if regime is Regime_EL20 or Regime_EL2, then S1 is disabled if and only if
+>   SCTLR_EL2.M is not set; it doesn't matter if HCR_EL2.DC is set, because "[..]
+>   this field has no effect on the EL2, EL2&0, and EL3 translation regimes."
+>   (HCR_EL2.DC bit field description).
+> 
+> - if regime is Regime_EL10, then S1 is disabled if SCTLR_EL1.M == 0 or
+>   HCR_EL2.TGE = 0 or the effective value of HCR_EL2.DC* is 0.
+> 
+> From the description of HCR_EL2.TGE, when the bit is set:
+> 
+> 'If EL1 is using AArch64, the SCTLR_EL1.M field is treated as being 0 for all
+> purposes other than returning the result of a direct read of SCTLR_EL1.'
+> 
+> From the description of HCR_EL2.DC, when the bit is set:
+> 
+> 'When EL1 is using AArch64, the PE behaves as if the value of the SCTLR_EL1.M
+> field is 0 for all purposes other than returning the value of a direct read of
+> SCTLR_EL1.'
+> 
+> *The description of HCR_EL2.DC states:
+> 
+> 'When the Effective value of HCR_EL2.{E2H,TGE} is {1,1}, this field behaves as
+> 0 for all purposes other than a direct read of the value of this field.'
+> 
+> But if {E2H,TGE} = {1,1} then the regime is Regime_EL20, which ignores the DC
+> bit.  If we're looking at the DC bit, then that means that the regime is EL10,
+> ({E2H,TGE} != {1,1} in compute_translation_regime()) and the effective value of
+> HCR_EL2.DC is the same as the DC bit.
+
+Yup. That's what I've stashed on top:
+
+@@ -136,12 +137,22 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
+ 	va = (u64)sign_extend64(va, 55);
  
--:Architectures: x86
-+:Architectures: arm64, x86
- :Returns: Informational only, -EINVAL on direct KVM_ENABLE_CAP.
+ 	/* Let's put the MMU disabled case aside immediately */
+-	if (!(sctlr & SCTLR_ELx_M) ||
+-	    (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_DC)) {
++	switch (wi->regime) {
++	case TR_EL10:
++		if (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_DC)
++			wr->level = S1_MMU_DISABLED;
++		fallthrough;
++	case TR_EL2:
++	case TR_EL20:
++		if (!(sctlr & SCTLR_ELx_M))
++			wr->level = S1_MMU_DISABLED;
++		break;
++	}
++
++	if (wr->level == S1_MMU_DISABLED) {
+ 		if (va >= BIT(kvm_get_pa_bits(vcpu->kvm)))
+ 			goto addrsz;
  
- The presence of this capability indicates that KVM_RUN *may* fill
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index a7ca776b51ec..4121b5a43b9c 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -335,6 +335,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_ARM_SYSTEM_SUSPEND:
- 	case KVM_CAP_IRQFD_RESAMPLE:
- 	case KVM_CAP_COUNTER_OFFSET:
-+	case KVM_CAP_MEMORY_FAULT_INFO:
- 		r = 1;
- 		break;
- 	case KVM_CAP_SET_GUEST_DEBUG2:
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 6981b1bc0946..c97199d1feac 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1448,6 +1448,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 
- 	if (fault_is_perm && !write_fault && !exec_fault) {
- 		kvm_err("Unexpected L2 read permission error\n");
-+		kvm_prepare_memory_fault_exit(vcpu, fault_ipa, 0,
-+					      write_fault, exec_fault, false);
- 		return -EFAULT;
- 	}
- 
-@@ -1473,6 +1475,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (unlikely(!vma)) {
- 		kvm_err("Failed to find VMA for hva 0x%lx\n", hva);
- 		mmap_read_unlock(current->mm);
-+		kvm_prepare_memory_fault_exit(vcpu, fault_ipa, 0,
-+					      write_fault, exec_fault, false);
- 		return -EFAULT;
- 	}
- 
-@@ -1568,8 +1572,11 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		kvm_send_hwpoison_signal(hva, vma_shift);
+-		wr->level = S1_MMU_DISABLED;
+ 		wr->pa = va;
  		return 0;
  	}
--	if (is_error_noslot_pfn(pfn))
-+	if (is_error_noslot_pfn(pfn)) {
-+		kvm_prepare_memory_fault_exit(vcpu, fault_ipa, vma_pagesize,
-+					      write_fault, exec_fault, false);
- 		return -EFAULT;
-+	}
- 
- 	if (kvm_is_device_pfn(pfn)) {
- 		/*
-@@ -1643,6 +1650,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		if (mte_allowed) {
- 			sanitise_mte_tags(kvm, pfn, vma_pagesize);
- 		} else {
-+			kvm_prepare_memory_fault_exit(vcpu, fault_ipa, vma_pagesize,
-+						      write_fault, exec_fault, false);
- 			ret = -EFAULT;
- 			goto out_unlock;
- 		}
--- 
-2.46.0.76.ge559c4bf1a-goog
 
+[...]
+
+> > +	/* R_PLCGL, R_YXNYW */
+> > +	if ((!kvm_has_feat_enum(vcpu->kvm, ID_AA64MMFR2_EL1, ST, 48_47) &&
+> > +	     wi->txsz > 39) ||
+> > +	    (wi->pgshift == 16 && wi->txsz > 47) || wi->txsz > 48)
+> > +		goto transfault_l0;
+> 
+> It's probably just me, but I find this hard to parse. There are three cases when
+> the condition (!FEAT_TTST && TxSZ > 39) evaluates to false. But the other two
+> conditions make sense to check only if !FEAT_TTST is false and wi->txsz > 39 is
+> true.
+> 
+> I find this easier to read:
+> 
+> 	if (!kvm_has_feat_enum(vcpu->kvm, ID_AA64MMFR2_EL1, ST, 48_47)) {
+> 		if (wi->txsz > 39)
+> 			goto transfault_l0;
+> 	} else {
+> 		if (wi->txsz > 48 || (wi->pgshift == 16 && wi->txsz > 47))
+> 			goto transfault_l0;
+> 	}
+> 
+> What do you think?
+
+Sure, happy to rewrite it like this if it helps.
+
+[...]
+
+> > +	/* R_YYVYV, I_THCZK */
+> > +	if ((!va55 && va > GENMASK(ia_bits - 1, 0)) ||
+> > +	    (va55 && va < GENMASK(63, ia_bits)))
+> > +		goto transfault_l0;
+> > +
+> > +	/* R_ZFSYQ */
+> 
+> This is rather pedantic, but I think that should be I_ZFSYQ.
+
+Well, these references are supposed to help. If they are incorrect,
+they serve no purpose. Thanks for spotting this.
+
+[...]
+
+> > +		if (!(desc & 1) || ((desc & 3) == 1 && level == 3))
+> > +			goto transfault;
+> 
+> The check for block mapping at level 3 is replicated below, when the level of
+> the block is checked for correctnes.
+> 
+> Also, would you consider rewriting the valid descriptor check to
+> (desc & BIT(0)), to match the block level check?
+> 
+> > +
+> > +		/* We found a leaf, handle that */
+> > +		if ((desc & 3) == 1 || level == 3)
+> > +			break;
+> 
+> Here we know that (desc & 1), do you think rewriting the check to !(desc &
+> BIT(1)), again matching the block level check, would be a good idea?
+
+Other that the BIT() stuff, I'm not completely clear what you are
+asking for. Are you objecting to the fact that the code is slightly
+redundant? If so, I may be able to clean things up for you:
+
+@@ -309,13 +323,19 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+ 		else
+ 			desc = le64_to_cpu((__force __le64)desc);
+ 
+-		if (!(desc & 1) || ((desc & 3) == 1 && level == 3))
++		/* Invalid descriptor */
++		if (!(desc & BIT(0)))
+ 			goto transfault;
+ 
+-		/* We found a leaf, handle that */
+-		if ((desc & 3) == 1 || level == 3)
++		/* Block mapping, check validity down the line */
++		if (!(desc & BIT(1)))
++			break;
++
++		/* Page mapping */
++		if (level == 3)
+ 			break;
+ 
++		/* Table handling */
+ 		if (!wi->hpd) {
+ 			wr->APTable  |= FIELD_GET(S1_TABLE_AP, desc);
+ 			wr->UXNTable |= FIELD_GET(PMD_TABLE_UXN, desc);
+
+Do you like this one better? Each bit only gets tested once.
+
+[...]
+
+> > +
+> > +	if (check_output_size(desc & GENMASK(47, va_bottom), wi))
+> > +		goto addrsz;
+> > +
+> > +	wr->failed = false;
+> > +	wr->level = level;
+> > +	wr->desc = desc;
+> > +	wr->pa = desc & GENMASK(47, va_bottom);
+> > +	if (va_bottom > 12)
+> > +		wr->pa |= va & GENMASK_ULL(va_bottom - 1, 12);
+> 
+> I'm looking at StageOA(), and I don't think this matches what happens when the
+> contiguous bit is set and the contiguous OA isn't aligned as per Table D8-98.
+> Yes, I know, that's something super niche and unlikely to happen in practice.
+> 
+> Let's assume 4K pages, level = 3 (so va_bottom = 12), the first page in the
+> contiguous OA range is 0x23_000 (so not aligned to 64K), and the input address
+> that maps to the first page from the contiguous OA range is 0xf0_000 (aligned to
+> 64K).
+> 
+> According to the present code:
+> 
+> wr->pa = 0x23_000
+> 
+> According to StageOA():
+> 
+> tsize  = 12
+> csize  = 4
+> oa     = 0x23_000 & GENMASK_ULL(47, 16) | 0xf0_000 & GENMASK_ULL(15, 0) = 0x20_000
+> wr->pa = oa & ~GENMASK_ULL(11, 0) = 0x20_000
+> 
+> If the stage 1 is correctly programmed and the OA aligned to the required
+> alignment, the two outputs match
+
+Huh, that's another nice catch. I had the (dumb) idea that if we
+didn't use the Contiguous bit as a TLB hint, we didn't need to do
+anything special when it came to the alignment of the OA.
+
+But clearly, the spec says that this alignment must be honoured, and
+there is no way out of it. Which means that the S2 walker also has a
+bit of a problem on that front.
+
+> On a different topic, but still regarding wr->pa. I guess the code aligns wr->pa
+> to 4K because that's how the OA in PAR_EL1 is reported.
+> 
+> Would it make more sense to have wr->pa represent the real output address, i.e,
+> also contain the 12 least significant bits of the input address?  It wouldn't
+> change how PAR_EL1 is computed (bits 11:0 are already masked out), but it would
+> make wr->pa consistent with what the output address of a given input address
+> should be (according to StageOA()).
+
+Yup. That'd be consistent with the way wr->pa is reported when S1 is disabled.
+
+I ended-up with this (untested):
+
+@@ -354,12 +374,24 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+ 	if (check_output_size(desc & GENMASK(47, va_bottom), wi))
+ 		goto addrsz;
+ 
++	if (desc & PTE_CONT) {
++		switch (BIT(wi->pgshift)) {
++		case SZ_4K:
++			va_bottom += 4;
++			break;
++		case SZ_16K:
++			va_bottom += level == 2 ? 5 : 7;
++			break;
++		case SZ_64K:
++			va_bottom += 5;
++		}
++	}
++
+ 	wr->failed = false;
+ 	wr->level = level;
+ 	wr->desc = desc;
+ 	wr->pa = desc & GENMASK(47, va_bottom);
+-	if (va_bottom > 12)
+-		wr->pa |= va & GENMASK_ULL(va_bottom - 1, 12);
++	wr->pa |= va & GENMASK_ULL(va_bottom - 1, 0);
+ 
+ 	return 0;
+ 
+
+Note that I'm still checking for the address size before the
+contiguous bit alignment, as per R_JHQPP.
+
+[...]
+
+> > +		if (!(__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_DC)) {
+> > +			par |= FIELD_PREP(SYS_PAR_EL1_ATTR, 0); /* nGnRnE */
+> > +			par |= FIELD_PREP(SYS_PAR_EL1_SH, 0b10); /* OS */
+> 
+> s/0b10/ATTR_OSH ?
+> 
+> > +		} else {
+> > +			par |= FIELD_PREP(SYS_PAR_EL1_ATTR,
+> > +					  MEMATTR(WbRaWa, WbRaWa));
+> > +			par |= FIELD_PREP(SYS_PAR_EL1_SH, 0b00); /* NS */
+> 
+> s/0b00/ATTR_NSH ?
+> 
+> > +		}
+> 
+> HCR_EL2.DC applies only to Regime_EL10, I think the bit should be ignored for
+> the EL2 and EL20 regimes.
+
+Yup, now fixed.
+
+> 
+> > +	} else {
+> > +		u64 mair, sctlr;
+> > +		u8 sh;
+> > +
+> > +		mair = (regime == TR_EL10 ?
+> > +			vcpu_read_sys_reg(vcpu, MAIR_EL1) :
+> > +			vcpu_read_sys_reg(vcpu, MAIR_EL2));
+> > +
+> > +		mair >>= FIELD_GET(PTE_ATTRINDX_MASK, wr->desc) * 8;
+> > +		mair &= 0xff;
+> > +
+> > +		sctlr = (regime == TR_EL10 ?
+> > +			 vcpu_read_sys_reg(vcpu, SCTLR_EL1) :
+> > +			 vcpu_read_sys_reg(vcpu, SCTLR_EL2));
+> > +
+> > +		/* Force NC for memory if SCTLR_ELx.C is clear */
+> > +		if (!(sctlr & SCTLR_EL1_C) && !MEMATTR_IS_DEVICE(mair))
+> > +			mair = MEMATTR(NC, NC);
+> > +
+> > +		par  = FIELD_PREP(SYS_PAR_EL1_ATTR, mair);
+> > +		par |= wr->pa & GENMASK_ULL(47, 12);
+> > +
+> > +		sh = compute_sh(mair, wr->desc);
+> > +		par |= FIELD_PREP(SYS_PAR_EL1_SH, sh);
+> > +	}
+> 
+> When PAR_EL1.F = 0 and !FEAT_RME, bit 11 (NSE) is RES1, according to the
+> description of the register and EncodePAR().
+
+Fixed.
+
+[...]
+
+> >  void __kvm_at_s1e01(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+> >  {
+> >  	u64 par = __kvm_at_s1e01_fast(vcpu, op, vaddr);
+> >  
+> > +	/*
+> > +	 * If we see a permission fault at S1, then the fast path
+> > +	 * succeedded. By failing. Otherwise, take a walk on the wild
+> > +	 * side.
+> 
+> This is rather ambiguous. Maybe something along the lines would be more helpful:
+> 
+> 'If PAR_EL1 encodes a permission fault, we know for sure that the hardware
+> translation table walker was able to walk the stage 1 tables and there's nothing
+> else that KVM needs to do. On the other hand, if the AT instruction failed for
+> any other reason, then KVM must walk the guest stage 1 tables (and possibly the
+> virtual stage 2 tables) to emulate the instruction.'
+
+Sure. I've adopted a slightly less verbose version of this:
+
+@@ -930,9 +966,12 @@ void __kvm_at_s1e01(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+ 	u64 par = __kvm_at_s1e01_fast(vcpu, op, vaddr);
+ 
+ 	/*
+-	 * If we see a permission fault at S1, then the fast path
+-	 * succeedded. By failing. Otherwise, take a walk on the wild
+-	 * side.
++	 * If PAR_EL1 reports that AT failed on a S1 permission fault, we
++	 * know for sure that the PTW was able to walk the S1 tables and
++	 * there's nothing else to do.
++	 *
++	 * If AT failed for any other reason, then we must walk the guest S1
++	 * to emulate the instruction.
+ 	 */
+ 	if ((par & SYS_PAR_EL1_F) && !par_check_s1_perm_fault(par))
+ 		par = handle_at_slow(vcpu, op, vaddr);
+
+
+I'll retest things over the weekend and post a new version early next
+week.
+
+Thanks again for your review, this is awesome work!
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
