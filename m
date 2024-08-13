@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41AF019AA43;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B77919AD56;
 	Tue, 13 Aug 2024 10:44:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723545851; cv=none; b=ncw0EVwjLKqReuqUEbpeXBHcLpLunSICvi5Z23Dm/r4xkXzE+Vz+wRRqvHWel3T6fRtQoQ5pyiTeTIOXnJvqjOfe5HPYfIm0+ZxHX85SEILkcrwuW8I1q8kacc3v/TSexpubB0zgxuXbKRj7aVMLuEtFfEJi604IwLzZDsmLolM=
+	t=1723545851; cv=none; b=q7BbvenDL7CGMCkwYKXkRkzxt2/K2Po1t/gFROvO2cthB9VApNMU/X2hmVUXZ8ZBqBgs2GpDn4kWLiv4xa5DtlTWbqP8kFmA3lSX2QwYeWYKIq2bbVjcguWYfC3DCOIlJ1fFkcsW5YZiRVE0tFV2rII/6OIC/QX2Y+GCeaWRyw4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1723545851; c=relaxed/simple;
-	bh=mcDksh3U4KLI5FYXHkvHzDVOLwp0prVY32Ojy0Do63s=;
+	bh=Xu/A5wRo87cCV/14kvsmL7JZiq2gS7qhR9OHy9H2AHg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=CDZ2uUluIEVfAjujlglvHp2kYoe8y3Zq2Zn1W6uzHNxRx7c5uxg5Jf9UWBFh0ONqQu3YHFQwJ+ziBp6Abqsz5kd7ah6xpCpll/cS4gqAFVTNN4b3TTjFxJmgBlua0Y99Msmjv+h1vYv3ZUq9R7FcFjHg6kMOQC17JIsXBxCzwPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BfC/dzN/; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=fBEJg8iOys45z3Pg/yZWJwlcLK8CaJ88Iw6fgWtTKqHugFrJqN+WBEoNbQ3xZesFzESwJjWoYuTuiSZp7mgs+sUtYW2jvrxuLzQ6gmVdmxKaFGkCmPdTS9wHGRS2W1WYB7xA6NvJqG+De/FMLpzZw9v+Kp5IAPUPbw3Nlplftso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uWG6gU2z; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BfC/dzN/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3FF0C4AF18;
-	Tue, 13 Aug 2024 10:44:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uWG6gU2z"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CB21C4AF15;
+	Tue, 13 Aug 2024 10:44:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723545850;
-	bh=mcDksh3U4KLI5FYXHkvHzDVOLwp0prVY32Ojy0Do63s=;
+	s=k20201202; t=1723545851;
+	bh=Xu/A5wRo87cCV/14kvsmL7JZiq2gS7qhR9OHy9H2AHg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=BfC/dzN/e+su9MZ88MNp39yik96svabW4uzOQhzH5ld/K23H/8iUeLI56Zx+PgOYn
-	 ipaNi44Hn+N5LlaqQv3Gl6a5apTpcXTR2UTeFs7f3RU7/0O68eEIWQsBoDM/ld8z7s
-	 eKEZxnoa9utQudtYOXYuch9w15gg9GJzxRQupbCE/oLTFafAGrjojgH5Yl3YwR6Rog
-	 p15MhntB5QoHGQUzTNQjyBbWeu7UYfnZqguaOxCQbaw2NSkbE0cLh6mqb8ZVPCeRq/
-	 8qfNohFygoe3//LfpZGp45zhAv5nO2b/tmaDigarvbdiNr9yh3X3Nd5qedF6aRa4Bq
-	 stu3jL3x2qw2w==
+	b=uWG6gU2zu+S/dmU9/enI3mJ6kre1VSoect6wCQCTt067yL/3m5rGPh0TPk1kd6Gs4
+	 irvs3eoKYyjufG+LYdWO1SzEzVgWdf+ceZKeH5OMNo6bTqxYR8Z3999e2P4Mp+g2vT
+	 L5W3z0FT/XP1c2QKmzd+Ng1AbJ9c3YcJalV+hT7bkMA9lEDnwkvzIPMbXXj/5P/eFP
+	 LPqPeJyy0LZy9a+aljbANIMnNpRRtwU1606hAk4BfODSAOAbbZaM5/ulcdtzTRmroi
+	 4wuPDzoZsx1D+Mj4Fo6tv7nUBLfdhswDMG7I42sUWSyIizi5xSHITywoYTc9kozsWa
+	 y56NeyK5R6DCA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sdp0a-003JD1-UN;
-	Tue, 13 Aug 2024 11:44:08 +0100
+	id 1sdp0b-003JD1-GB;
+	Tue, 13 Aug 2024 11:44:09 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -43,9 +43,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Fuad Tabba <tabba@google.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v3 5/8] KVM: arm64: Honor trap routing for FPMR
-Date: Tue, 13 Aug 2024 11:43:57 +0100
-Message-Id: <20240813104400.1956132-6-maz@kernel.org>
+Subject: [PATCH v3 8/8] KVM: arm64: Expose ID_AA64PFR2_EL1 to userspace and guests
+Date: Tue, 13 Aug 2024 11:44:00 +0100
+Message-Id: <20240813104400.1956132-9-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240813104400.1956132-1-maz@kernel.org>
 References: <20240813104400.1956132-1-maz@kernel.org>
@@ -61,50 +61,52 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-HCRX_EL2.EnFPM controls the trapping of FPMR (as well as the validity
-of any FP8 instruction, but we don't really care about this last part).
+Everything is now in place for a guest to "enjoy" FP8 support.
+Expose ID_AA64PFR2_EL1 to both userspace and guests, with the
+explicit restriction of only being able to clear FPMR.
 
-Describe the trap bit so that the exception can be reinjected in a
-NV guest.
+All other features (MTE* at the time of writing) are hidden
+and not writable.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/emulate-nested.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ arch/arm64/kvm/sys_regs.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 05166eccea0a..ee280239f14f 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -83,6 +83,7 @@ enum cgt_group_id {
- 	CGT_CPTR_TAM,
- 	CGT_CPTR_TCPAC,
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 51627add0a72..da6d017f24a1 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1722,6 +1722,15 @@ static u64 read_sanitised_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+ 	return val;
+ }
  
-+	CGT_HCRX_EnFPM,
- 	CGT_HCRX_TCR2En,
- 
- 	/*
-@@ -372,6 +373,12 @@ static const struct trap_bits coarse_trap_bits[] = {
- 		.mask		= CPTR_EL2_TCPAC,
- 		.behaviour	= BEHAVE_FORWARD_ANY,
- 	},
-+	[CGT_HCRX_EnFPM] = {
-+		.index		= HCRX_EL2,
-+		.value 		= 0,
-+		.mask		= HCRX_EL2_EnFPM,
-+		.behaviour	= BEHAVE_FORWARD_ANY,
-+	},
- 	[CGT_HCRX_TCR2En] = {
- 		.index		= HCRX_EL2,
- 		.value 		= 0,
-@@ -1108,6 +1115,7 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
- 	SR_TRAP(SYS_CNTP_CTL_EL0,	CGT_CNTHCTL_EL1PTEN),
- 	SR_TRAP(SYS_CNTPCT_EL0,		CGT_CNTHCTL_EL1PCTEN),
- 	SR_TRAP(SYS_CNTPCTSS_EL0,	CGT_CNTHCTL_EL1PCTEN),
-+	SR_TRAP(SYS_FPMR,		CGT_HCRX_EnFPM),
- };
- 
- static DEFINE_XARRAY(sr_forward_xa);
++static u64 read_sanitised_id_aa64pfr2_el1(struct kvm_vcpu *vcpu,
++					  const struct sys_reg_desc *rd)
++{
++	u64 val = read_sanitised_ftr_reg(SYS_ID_AA64PFR2_EL1);
++
++	/* We only expose FPMR */
++	return val & ID_AA64PFR2_EL1_FPMR;
++}
++
+ #define ID_REG_LIMIT_FIELD_ENUM(val, reg, field, limit)			       \
+ ({									       \
+ 	u64 __f_val = FIELD_GET(reg##_##field##_MASK, val);		       \
+@@ -2381,7 +2390,12 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 		   ID_AA64PFR0_EL1_AdvSIMD |
+ 		   ID_AA64PFR0_EL1_FP), },
+ 	ID_SANITISED(ID_AA64PFR1_EL1),
+-	ID_UNALLOCATED(4,2),
++	{ SYS_DESC(SYS_ID_AA64PFR2_EL1),
++	  .access	= access_id_reg,
++	  .get_user	= get_id_reg,
++	  .set_user	= set_id_reg,
++	  .reset	= read_sanitised_id_aa64pfr2_el1,
++	  .val		= ID_AA64PFR2_EL1_FPMR, },
+ 	ID_UNALLOCATED(4,3),
+ 	ID_WRITABLE(ID_AA64ZFR0_EL1, ~ID_AA64ZFR0_EL1_RES0),
+ 	ID_HIDDEN(ID_AA64SMFR0_EL1),
 -- 
 2.39.2
 
