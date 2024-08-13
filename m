@@ -1,124 +1,127 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE084C156;
-	Mon, 12 Aug 2024 18:05:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0940AD531
+	for <kvmarm@lists.linux.dev>; Tue, 13 Aug 2024 02:05:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723485902; cv=none; b=jBYp5GlYWoJV/WLcLAhxhGuV6vPyN2AMFC00He9e3jsJXLv6GmOfRp6n1GL1JnOiuMTv+vOJEFBOdaaTGRisDuDmH7dqHAjVUHgK8gh2y4LQdv61ZAyqZ/x/pJa83lZsAe6Cs3CgxfByNHWH2uPgmt5/b/2/InNqLVy/V+ZZlk0=
+	t=1723514761; cv=none; b=YG1oWYGUwsh1WPgC8tb7uhT9kJ5nyfzZ18numQqC4gjclYTI/xPbVY4CGkG8UHNcWQGz47hY2KDHTM6nPoepwDgNRc1VEoFnOz6gYH/vVhdbe/SOZw+oOpyBCS2+KTuiUS+SbmBE10IDRqGPzuMpQMt5xa9efU7YxV1S2XJmDrY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723485902; c=relaxed/simple;
-	bh=U7qc2svI0870+6cT4W//HuRzvJZzOIOWuylXoGD4yFs=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lHkU3LLFzvxv1q6zd+icrsn8nJQ2Ir7TVcF+xXBbIW7XThjFUlakEV0xIBXqgN9aDW1cqst7zVHEkcpiKU7BFqSplTl7tAIucYMVAmNFSDld/i8e0AbZD3s9n5o2TQANwMIwPJoNalpLbA4aqVO1OCGtgdvEsRKouxgy1PsDSKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jR9/CQ6j; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1723514761; c=relaxed/simple;
+	bh=/hCQcM4Y08P6qJOn4vVha/UUYcfFhpNYaUuiBNAL/ng=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=kRO3ir/0mkxcK6rJgQoXr9zSSjlOYp6/co2KgCWWXyj3j9wqVOemZiNueiZvhcouMLpB/YxoeD9r70KliWfwPrx2gIcYk3uM408gPc7mMDhL+yKBXeHebVIg+g+CYsGtf7AKhWXndDhD/Y6NVlQkXtgxaUV2LHHdSgCUkEmK6WY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kZYfvT6X; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jR9/CQ6j"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0274C32782;
-	Mon, 12 Aug 2024 18:05:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723485901;
-	bh=U7qc2svI0870+6cT4W//HuRzvJZzOIOWuylXoGD4yFs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jR9/CQ6jYx9ws2sovRA7I1dz0ecyrbIVWr7t+qi32fvxIdmhEY1MttrUukVfNI1qL
-	 oNIUW7Hr5SMfNypdj2+YgIybkSlSLZTgsUILlCZBWVPRqZntaY4Z2IuaT2cKMVFdDK
-	 LRnaVjotay90awufaQ6SRmMNgBIguduW9ikcPc8EQj5Rx0LYtps0TEcXdZ/+4RAN3j
-	 vkuMixIsffOpPpIgphWtV3AoydCNGKBYoT36HiqJ2lB3952aT9jwc/DVNblvOFPfui
-	 RoWPZcLjTwvGPb680fSL1KoLVeovJNh469IUxKlPA3duh4pkqrNnENCBqyMyXKQhtk
-	 KWAa/xnbP2/tQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sdZPf-0035xD-Bf;
-	Mon, 12 Aug 2024 19:04:59 +0100
-Date: Mon, 12 Aug 2024 19:04:59 +0100
-Message-ID: <861q2t1ut0.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Przemyslaw Gaj <pgaj@cadence.com>
-Subject: Re: [PATCH v2 13/17] KVM: arm64: nv: Add SW walker for AT S1 emulation
-In-Reply-To: <8634n91v3z.wl-maz@kernel.org>
-References: <20240731194030.1991237-1-maz@kernel.org>
-	<20240731194030.1991237-14-maz@kernel.org>
-	<ZrYO9SK52rHhGvEd@arm.com>
-	<867cco1y4w.wl-maz@kernel.org>
-	<ZromBtfbjaHbcjT7@arm.com>
-	<8634n91v3z.wl-maz@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kZYfvT6X"
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-70f0a00eb16so3418611b3a.1
+        for <kvmarm@lists.linux.dev>; Mon, 12 Aug 2024 19:05:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1723514759; x=1724119559; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=JTrcYlNshYngPiSYeGYBD6ZRFP0rJ4yWLqR8htIj1GU=;
+        b=kZYfvT6Xor13GVp9kJKxaiMfBNrxnZT3+Lu40PbaxuxdGXa8KJfdxijkJXavxYMKtV
+         4nSKYwBMf/J9IVJywrgtYaS3oLDBFW/t41n5ZRI3WTQeg+UcarICQ9jldzTpR9DhTBKb
+         smOfyUiJDzoYtiBkiiEsXo343WUQjv82sUQujhosEGFRNIGXwC+W3sNzb0J5GUg3j7gS
+         Ny7bFjZL6JxzsrxZRnKVYakunzF+/lTROtVmlp9rj13hD3vPFNxEqUsKZzgphCqZ5Cum
+         5g5HvIVwj7sIRKe7/ujr/+16PxsfsXzh1+/hPAqPU8Jq/d0SrznK/Yo07A8K5auA2UA1
+         8XCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723514759; x=1724119559;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JTrcYlNshYngPiSYeGYBD6ZRFP0rJ4yWLqR8htIj1GU=;
+        b=imYoRC+uZn6fXwhdF7/naN1TNhsu85vByKPZYbOaWw5sH+9+kx9b9gqZzNyDBMWYe7
+         n9uxvr3IqmREzQ38lMcKNEcOcXdMq8/Fkalpt0Svi5lSVmJDwzLfRp2S5XzkIjofIfyG
+         F8CEA9D7wHyiZ/HiszWX+rAYU/VygNIOv6tLvpjz3AYjmogrD1Y+g8An2cPw2Lub5mWK
+         gekhhKoSPysLVIsxD9HL5xgXpH+Q2unmX/7Y6T/b5paeLjVIV3e+vfcDVlrmMILStheS
+         iVQKtsanJ9BogZKiynOjukbABSZK0gyXY+/DD3oTfloX8iMiwDybNzjo/E4utc2xwEcA
+         xIjA==
+X-Forwarded-Encrypted: i=1; AJvYcCUHi04fbkoIiydEZEfxGupiejK7DLC6cey4/hRS6w9X7GtFf/A+s/zg1KrvvbhDmJYRWuAfrbkNy1QIt5ninYRXELMsLHcL
+X-Gm-Message-State: AOJu0YwGXP/njM1V0V4JLJv6jLQxRmolimuc5vqOrMad3/Gi9YSoE4aH
+	9RJj/84yeXG1zqm5QiUss93sSouwLDD7n7LZjFqSNHpB7elr4EeaGm0MacTge72zfkOnOQUHuoa
+	AYA==
+X-Google-Smtp-Source: AGHT+IEw4KOWnUezKCb07r49r8VQShv4Y6sqr3v4rfwBcl9BYsQ7jzdYpBrfRXTk/LiFtqSR5qMGQ76wylw=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:6215:b0:710:4d39:c8f9 with SMTP id
+ d2e1a72fcca58-7125551dce5mr5087b3a.6.1723514758712; Mon, 12 Aug 2024 19:05:58
+ -0700 (PDT)
+Date: Mon, 12 Aug 2024 19:05:57 -0700
+In-Reply-To: <ZrZafa66bRxoVc0Z@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com, anshuman.khandual@arm.com, pgaj@cadence.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+References: <20240802200136.329973-1-seanjc@google.com> <20240802200136.329973-3-seanjc@google.com>
+ <ZrKqrCnNpNQ_K_qi@linux.dev> <ZrK4x4LLz1wlwGQN@google.com> <ZrZafa66bRxoVc0Z@linux.dev>
+Message-ID: <Zrq_hd5CkmmOl6jp@google.com>
+Subject: Re: [PATCH 2/2] KVM: Protect vCPU's "last run PID" with rwlock, not RCU
+From: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Steve Rutherford <srutherford@google.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Mon, 12 Aug 2024 18:58:24 +0100,
-Marc Zyngier <maz@kernel.org> wrote:
-> 
-> Hi Alex,
-> 
-> On Mon, 12 Aug 2024 16:11:02 +0100,
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+On Fri, Aug 09, 2024, Oliver Upton wrote:
+> On Tue, Aug 06, 2024 at 04:59:03PM -0700, Sean Christopherson wrote:
+> > > Can you nest this lock inside of the vcpu->mutex acquisition in
+> > > kvm_vm_ioctl_create_vcpu() so lockdep gets the picture?
 > > 
-> > Hi Marc,
-> > 
-> > On Sat, Aug 10, 2024 at 11:16:15AM +0100, Marc Zyngier wrote:
-> > > Hi Alex,
-> > > 
-> > > @@ -136,12 +137,22 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
-> > >  	va = (u64)sign_extend64(va, 55);
-> > >  
-> > >  	/* Let's put the MMU disabled case aside immediately */
-> > > -	if (!(sctlr & SCTLR_ELx_M) ||
-> > > -	    (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_DC)) {
-> > > +	switch (wi->regime) {
-> > > +	case TR_EL10:
-> > > +		if (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_DC)
-> > > +			wr->level = S1_MMU_DISABLED;
-> > 
-> > In compute_translation_regime(), for AT instructions other than AT S1E2*, when
-> > {E2H,TGE} = {0,1}, regime is Regime_EL10. As far as I can tell, when regime is
-> > Regime_EL10 and TGE is set, stage 1 is disabled, according to
-> > AArch64.S1Enabled() and the decription of the TGE bit.
+> > I don't think that's necessary.  Commit 42a90008f890 ("KVM: Ensure lockdep knows
+> > about kvm->lock vs. vcpu->mutex ordering rule") added the lock+unlock in
+> > kvm_vm_ioctl_create_vcpu() purely because actually taking vcpu->mutex inside
+> > kvm->lock is rare, i.e. lockdep would be unable to detect issues except for very
+> > specific VM types hitting very specific flows.
 > 
-> Grmbl... I really dislike E2H=0. May it die a painful death. How about
-> this on top?
+> I don't think the perceived rarity matters at all w/ this.
+
+Rarity definitely matters.  If KVM was splattered with code that takes vcpu->mutex
+inside kvm->lock, then the mess that led to above commit likely would never had
+happened.
+
+> Beyond the lockdep benefits, it is a self-documenting way to describe lock
+> ordering.
+
+Lock acquisition alone won't suffice, many of the more unique locks in KVM need
+comments/documentation, e.g. to explain additional rules, assumptions that make
+things work, etc.  We could obviously add comments for everything, but I don't
+see how that's clearly better than actual documentation.  E.g. pid_lock is taken
+for read across vCPUs.  Acquiring vcpu->pid_lock inside vcpu->mutex doesn't
+capture that at all.
+
+It's also simply not realistic to enumerate every possible combination.  Many of
+the combinations will likely never happen in practice, especially for spinlocks
+since their usage is quite targeted.  Trying to document the "preferred" ordering
+between the various spinlocks would be an exercise in futility as so many would
+be 100% arbitrary due to lack of a use case.
+
+KVM's mutexes are more interesting because they tend to be coarser, and thus are
+more prone to nesting, so maybe we could have lockdep-enforced documentation for
+those?  But if we want to do that, I think we should have a dedicated helper (and
+possible arch hooks), not an ad hoc pile of locks in vCPU creation.
+
+And we should have that discussion over here[*], because I was planning on posting
+a patch to revert the lockdep-only lock "documentation".
+
+[*] https://lore.kernel.org/all/ZrFYsSPaDWUHOl0N@google.com
+
+> Dunno about you, but I haven't kept up with locking.rst at all :)
+
+Heh, x86 has done a decent job of documenting its lock usage.  I would much rather
+add an entry in locking.rst for this new lock than add a lock+unlock in vCPU
+creation.  Especially since the usage is rather uncommon (guaranteed single writer,
+readers are best-effort and cross-vCPU).
+
+> Having said that, an inversion would still be *very* obvious, as it
+> would be trying to grab a mutex while holding a spinlock...
 > 
-> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-> index 10017d990bc3..870e77266f80 100644
-> --- a/arch/arm64/kvm/at.c
-> +++ b/arch/arm64/kvm/at.c
-> @@ -139,7 +139,19 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
->  	/* Let's put the MMU disabled case aside immediately */
->  	switch (wi->regime) {
->  	case TR_EL10:
-> -		if (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_DC)
-> +		/*
-> +		 * If dealing with the EL1&0 translation regime, 3 things
-> +		 * can disable the S1 translation:
-> +		 *
-> +		 * - HCR_EL2.DC = 0
-
-s/0/1/
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+> -- 
+> Thanks,
+> Oliver
