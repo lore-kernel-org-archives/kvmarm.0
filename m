@@ -1,127 +1,248 @@
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0940AD531
-	for <kvmarm@lists.linux.dev>; Tue, 13 Aug 2024 02:05:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 224E83CF4F
+	for <kvmarm@lists.linux.dev>; Tue, 13 Aug 2024 06:53:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723514761; cv=none; b=YG1oWYGUwsh1WPgC8tb7uhT9kJ5nyfzZ18numQqC4gjclYTI/xPbVY4CGkG8UHNcWQGz47hY2KDHTM6nPoepwDgNRc1VEoFnOz6gYH/vVhdbe/SOZw+oOpyBCS2+KTuiUS+SbmBE10IDRqGPzuMpQMt5xa9efU7YxV1S2XJmDrY=
+	t=1723532020; cv=none; b=IqG3LT//PnNQfJOIO4UbcZkor/ue0GAGt9WQOMatjjAZuyd1h1Z4IZp1i6oEB3PGkk0XcRg6OlWPZVLqS514lKpGQ8itUVRQMSRLGhNEPdO6YNuPDoZ9XaBvJ+3aG0hhl5j9hdlNSK5C3tOJvKImzBqye3NjvZSvRp1Q/LyAPgI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723514761; c=relaxed/simple;
-	bh=/hCQcM4Y08P6qJOn4vVha/UUYcfFhpNYaUuiBNAL/ng=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=kRO3ir/0mkxcK6rJgQoXr9zSSjlOYp6/co2KgCWWXyj3j9wqVOemZiNueiZvhcouMLpB/YxoeD9r70KliWfwPrx2gIcYk3uM408gPc7mMDhL+yKBXeHebVIg+g+CYsGtf7AKhWXndDhD/Y6NVlQkXtgxaUV2LHHdSgCUkEmK6WY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kZYfvT6X; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kZYfvT6X"
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-70f0a00eb16so3418611b3a.1
-        for <kvmarm@lists.linux.dev>; Mon, 12 Aug 2024 19:05:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723514759; x=1724119559; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JTrcYlNshYngPiSYeGYBD6ZRFP0rJ4yWLqR8htIj1GU=;
-        b=kZYfvT6Xor13GVp9kJKxaiMfBNrxnZT3+Lu40PbaxuxdGXa8KJfdxijkJXavxYMKtV
-         4nSKYwBMf/J9IVJywrgtYaS3oLDBFW/t41n5ZRI3WTQeg+UcarICQ9jldzTpR9DhTBKb
-         smOfyUiJDzoYtiBkiiEsXo343WUQjv82sUQujhosEGFRNIGXwC+W3sNzb0J5GUg3j7gS
-         Ny7bFjZL6JxzsrxZRnKVYakunzF+/lTROtVmlp9rj13hD3vPFNxEqUsKZzgphCqZ5Cum
-         5g5HvIVwj7sIRKe7/ujr/+16PxsfsXzh1+/hPAqPU8Jq/d0SrznK/Yo07A8K5auA2UA1
-         8XCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723514759; x=1724119559;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JTrcYlNshYngPiSYeGYBD6ZRFP0rJ4yWLqR8htIj1GU=;
-        b=imYoRC+uZn6fXwhdF7/naN1TNhsu85vByKPZYbOaWw5sH+9+kx9b9gqZzNyDBMWYe7
-         n9uxvr3IqmREzQ38lMcKNEcOcXdMq8/Fkalpt0Svi5lSVmJDwzLfRp2S5XzkIjofIfyG
-         F8CEA9D7wHyiZ/HiszWX+rAYU/VygNIOv6tLvpjz3AYjmogrD1Y+g8An2cPw2Lub5mWK
-         gekhhKoSPysLVIsxD9HL5xgXpH+Q2unmX/7Y6T/b5paeLjVIV3e+vfcDVlrmMILStheS
-         iVQKtsanJ9BogZKiynOjukbABSZK0gyXY+/DD3oTfloX8iMiwDybNzjo/E4utc2xwEcA
-         xIjA==
-X-Forwarded-Encrypted: i=1; AJvYcCUHi04fbkoIiydEZEfxGupiejK7DLC6cey4/hRS6w9X7GtFf/A+s/zg1KrvvbhDmJYRWuAfrbkNy1QIt5ninYRXELMsLHcL
-X-Gm-Message-State: AOJu0YwGXP/njM1V0V4JLJv6jLQxRmolimuc5vqOrMad3/Gi9YSoE4aH
-	9RJj/84yeXG1zqm5QiUss93sSouwLDD7n7LZjFqSNHpB7elr4EeaGm0MacTge72zfkOnOQUHuoa
-	AYA==
-X-Google-Smtp-Source: AGHT+IEw4KOWnUezKCb07r49r8VQShv4Y6sqr3v4rfwBcl9BYsQ7jzdYpBrfRXTk/LiFtqSR5qMGQ76wylw=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:6215:b0:710:4d39:c8f9 with SMTP id
- d2e1a72fcca58-7125551dce5mr5087b3a.6.1723514758712; Mon, 12 Aug 2024 19:05:58
- -0700 (PDT)
-Date: Mon, 12 Aug 2024 19:05:57 -0700
-In-Reply-To: <ZrZafa66bRxoVc0Z@linux.dev>
+	s=arc-20240116; t=1723532020; c=relaxed/simple;
+	bh=qemWfSTJHKWEHM94RKC3FR9sl/oT0O+11bgLPLS0EIM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rIejP0+FINvTqck/C1MlHM1WPD+FwCbSw9T2nPVFL467nC1QYK3ilaj0k5DhXZ0riuw5mOn11VZ+iOa0cOOQkp9xraWZDL9qauPARcE6PjsQF35BqK4XDCF+xL1Gj/yu5iqcHoshahzY0DrGejzPp+nw38iCjWyMyKltvnju2k8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3585112FC;
+	Mon, 12 Aug 2024 23:54:03 -0700 (PDT)
+Received: from [10.163.57.59] (unknown [10.163.57.59])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B169D3F40C;
+	Mon, 12 Aug 2024 23:53:33 -0700 (PDT)
+Message-ID: <6c479aba-10b9-46ba-92fa-d3b20cc82d61@arm.com>
+Date: Tue, 13 Aug 2024 12:23:31 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20240802200136.329973-1-seanjc@google.com> <20240802200136.329973-3-seanjc@google.com>
- <ZrKqrCnNpNQ_K_qi@linux.dev> <ZrK4x4LLz1wlwGQN@google.com> <ZrZafa66bRxoVc0Z@linux.dev>
-Message-ID: <Zrq_hd5CkmmOl6jp@google.com>
-Subject: Re: [PATCH 2/2] KVM: Protect vCPU's "last run PID" with rwlock, not RCU
-From: Sean Christopherson <seanjc@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Steve Rutherford <srutherford@google.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC 10/10] KVM: arm64: nv: Add new HDFGRTR2_GROUP &
+ HDFGRTR2_GROUP based FGU handling
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org,
+ Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Mark Brown <broonie@kernel.org>, kvmarm@lists.linux.dev,
+ linux-kernel@vger.kernel.org
+References: <20240620065807.151540-1-anshuman.khandual@arm.com>
+ <20240620065807.151540-11-anshuman.khandual@arm.com>
+ <865xu3kh4r.wl-maz@kernel.org> <4d256df7-1ec7-4300-b5c8-355f46c0e869@arm.com>
+ <878qyy35e5.wl-maz@kernel.org> <47dc4299-52cc-4f98-929b-fb86bd9757ae@arm.com>
+ <86tthhi0nz.wl-maz@kernel.org> <c84d0081-5afa-4bc2-82f4-a6dd07b8ab87@arm.com>
+ <86o76c1b8p.wl-maz@kernel.org> <d56735e2-3fee-4d91-84e1-a5b480ec0ce1@arm.com>
+ <86bk2b198o.wl-maz@kernel.org> <fb9bef18-adf2-4d3a-8205-b22a65b0c6db@arm.com>
+ <87sevk4kgr.wl-maz@kernel.org>
+Content-Language: en-US
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+In-Reply-To: <87sevk4kgr.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Aug 09, 2024, Oliver Upton wrote:
-> On Tue, Aug 06, 2024 at 04:59:03PM -0700, Sean Christopherson wrote:
-> > > Can you nest this lock inside of the vcpu->mutex acquisition in
-> > > kvm_vm_ioctl_create_vcpu() so lockdep gets the picture?
-> > 
-> > I don't think that's necessary.  Commit 42a90008f890 ("KVM: Ensure lockdep knows
-> > about kvm->lock vs. vcpu->mutex ordering rule") added the lock+unlock in
-> > kvm_vm_ioctl_create_vcpu() purely because actually taking vcpu->mutex inside
-> > kvm->lock is rare, i.e. lockdep would be unable to detect issues except for very
-> > specific VM types hitting very specific flows.
+On 8/4/24 16:35, Marc Zyngier wrote:
+> On Sat, 03 Aug 2024 11:38:11 +0100,
+> Anshuman Khandual <anshuman.khandual@arm.com> wrote:
+>>
+>> On 8/2/24 16:29, Marc Zyngier wrote:
+>>> On Fri, 02 Aug 2024 10:25:44 +0100,
+>>> Anshuman Khandual <anshuman.khandual@arm.com> wrote:
+>>>> On 8/1/24 21:33, Marc Zyngier wrote:
+>>>>> On Thu, 01 Aug 2024 11:46:22 +0100,
+>>>>> Anshuman Khandual <anshuman.khandual@arm.com> wrote:
+>>> [...]
+>>>
+>>>>>> +	SR_FGT(SYS_SPMACCESSR_EL1,	HDFGRTR2, nSPMACCESSR_EL1, 0),
+>>>>> This (and I take it most of the stuff here) is also gated by
+>>>>> MDCR_EL2.SPM, which is a coarse grained trap. That needs to be
+>>>>> described as well. For every new register that you add here.
+>>>> I did not find a SPM field in MDCR_EL2 either in latest ARM ARM or in
+>>>> the latest XML. But as per current HDFGRTR2_EL2 description the field
+>>>> nSPMACCESSR_EL1 is gated by FEAT_SPMU feature, which is being checked
+>>>> via ID_AA64DFR1_EL1.PMU when required. So could you please give some
+>>>> more details.
+>>> I misspelled it. It is MDCR_EL2.EnSPM.
+>>>
+>>> And you are completely missing the point. It is not about
+>>> HDFGRTR2_EL2, but about SPMACCESSR_EL1 (and all its little friends).
+>>>
+>>> To convince yourself, just look at the pseudocode for SPMACCESSR_EL1,
+>>> limited to an EL1 access:
+>>>
+>>> elsif PSTATE.EL == EL1 then
+>>>     if HaveEL(EL3) && EL3SDDUndefPriority() && MDCR_EL3.EnPM2 == '0' then
+>>>         UNDEFINED;
+>>>     elsif EL2Enabled() && IsFeatureImplemented(FEAT_FGT2) && ((HaveEL(EL3) && SCR_EL3.FGTEn2 == '0') || HDFGRTR2_EL2.nSPMACCESSR_EL1 == '0') then
+>>>         AArch64.SystemAccessTrap(EL2, 0x18);
+>>>     elsif EL2Enabled() && MDCR_EL2.EnSPM == '0' then
+>>>         AArch64.SystemAccessTrap(EL2, 0x18);
+>>>     elsif HaveEL(EL3) && MDCR_EL3.EnPM2 == '0' then
+>>>         if EL3SDDUndef() then
+>>>             UNDEFINED;
+>>>         else
+>>>             AArch64.SystemAccessTrap(EL3, 0x18);
+>>>     elsif EffectiveHCR_EL2_NVx() IN {'111'} then
+>>>         X[t, 64] = NVMem[0x8E8];
+>>>     else
+>>>         X[t, 64] = SPMACCESSR_EL1;
+>>>
+>>>
+>>> Can you spot the *TWO* conditions where we take an exception to EL2
+>>> with 0x18 as the EC?
+>>>
+>>> - One is when HDFGxTR2_EL2.nSPMACCESSR_EL1 == '0': that's a fine
+>>>   grained trap.
+>>> - The other is when MDCR_EL2.EnSPM == '0': that's a coarse grained
+>>>   trap.
+>>>
+>>> Both conditions need to be captured in the various tables in this
+>>> file, for each and every register that you describe.
+>> Ahh, got it now. Because now KVM knows about SPMACCESSR_EL1 register,
+>> access to that register must also be enabled via both fine grained trap
+>> (HDFGxTR2_EL2.nSPMACCESSR_EL1) and coarse grained trap (MDCR_EL2.EnSPM).
+>>
+>> For all the registers that are being added via FEAT_FGT2 here in this
+>> patch, their corresponding CGT based path also needs to be enabled via
+>> corresponding CGT_MDCR_XXX groups.
+> Exactly.
 > 
-> I don't think the perceived rarity matters at all w/ this.
-
-Rarity definitely matters.  If KVM was splattered with code that takes vcpu->mutex
-inside kvm->lock, then the mess that led to above commit likely would never had
-happened.
-
-> Beyond the lockdep benefits, it is a self-documenting way to describe lock
-> ordering.
-
-Lock acquisition alone won't suffice, many of the more unique locks in KVM need
-comments/documentation, e.g. to explain additional rules, assumptions that make
-things work, etc.  We could obviously add comments for everything, but I don't
-see how that's clearly better than actual documentation.  E.g. pid_lock is taken
-for read across vCPUs.  Acquiring vcpu->pid_lock inside vcpu->mutex doesn't
-capture that at all.
-
-It's also simply not realistic to enumerate every possible combination.  Many of
-the combinations will likely never happen in practice, especially for spinlocks
-since their usage is quite targeted.  Trying to document the "preferred" ordering
-between the various spinlocks would be an exercise in futility as so many would
-be 100% arbitrary due to lack of a use case.
-
-KVM's mutexes are more interesting because they tend to be coarser, and thus are
-more prone to nesting, so maybe we could have lockdep-enforced documentation for
-those?  But if we want to do that, I think we should have a dedicated helper (and
-possible arch hooks), not an ad hoc pile of locks in vCPU creation.
-
-And we should have that discussion over here[*], because I was planning on posting
-a patch to revert the lockdep-only lock "documentation".
-
-[*] https://lore.kernel.org/all/ZrFYsSPaDWUHOl0N@google.com
-
-> Dunno about you, but I haven't kept up with locking.rst at all :)
-
-Heh, x86 has done a decent job of documenting its lock usage.  I would much rather
-add an entry in locking.rst for this new lock than add a lock+unlock in vCPU
-creation.  Especially since the usage is rather uncommon (guaranteed single writer,
-readers are best-effort and cross-vCPU).
-
-> Having said that, an inversion would still be *very* obvious, as it
-> would be trying to grab a mutex while holding a spinlock...
+>>> [...]
+>>>
+>>>>> Now, the main issues are that:
+>>>>>
+>>>>> - you're missing the coarse grained trapping for all the stuff you
+>>>>>   have just added. It's not a huge amount of work, but you need, for
+>>>>>   each register, to describe what traps apply to it. The fine grained
+>>>>>   stuff is most, but not all of it. There should be enough of it
+>>>>>   already to guide you through it.
+>>>> Coarse grained trapping for FEAT_FGT2 based fine grained registers ?
+>>> Not for FEAT_FGT2. For the registers that FEAT_FGT2 traps. Can you see
+>>> the difference?
+>> Understood, for example PMIAR_EL1 register which FEAT_FGT2 now traps via
+>>
+>> SR_FGT(SYS_PMIAR_EL1,           HDFGRTR2, nPMIAR_EL1, 0),
+>>
+>> also needs to have corresponding coarse grained trap.
+>>
+>> SR_TRAP(SYS_PMIAR_EL1,          CGT_MDCR_TPM),
+> Yup.
 > 
-> -- 
-> Thanks,
-> Oliver
+>> Similarly corresponding SR_TRAP() needs to be covered for all registers
+>> that are now being trapped with FEAT_FGT2.
+>>
+>> Example code snippet.
+>>
+>> ........
+>> +       SR_TRAP(SYS_SPMEVFILT2R_EL0(8), CGT_MDCR_EnSPM),
+>> +       SR_TRAP(SYS_SPMEVFILT2R_EL0(9), CGT_MDCR_EnSPM),
+>> +       SR_TRAP(SYS_SPMEVFILT2R_EL0(10),        CGT_MDCR_EnSPM),
+>> +       SR_TRAP(SYS_SPMEVFILT2R_EL0(11),        CGT_MDCR_EnSPM),
+>> +       SR_TRAP(SYS_SPMEVFILT2R_EL0(12),        CGT_MDCR_EnSPM),
+>> +       SR_TRAP(SYS_SPMEVFILT2R_EL0(13),        CGT_MDCR_EnSPM),
+>> +       SR_TRAP(SYS_SPMEVFILT2R_EL0(14),        CGT_MDCR_EnSPM),
+>> +       SR_TRAP(SYS_SPMEVFILT2R_EL0(15),        CGT_MDCR_EnSPM),
+> I think it is a bit more complicated than just that. Again, look at
+> the pseudocode:
+> 
+> elsif PSTATE.EL == EL1 then
+>     if HaveEL(EL3) && EL3SDDUndefPriority() && MDCR_EL3.EnPM2 == '0' then
+>         UNDEFINED;
+>     elsif HaveEL(EL3) && EL3SDDUndefPriority() && SPMACCESSR_EL3<(UInt(SPMSELR_EL0.SYSPMUSEL) * 2) + 1:UInt(SPMSELR_EL0.SYSPMUSEL) * 2> == '00' then
+>         UNDEFINED;
+>     elsif EL2Enabled() && IsFeatureImplemented(FEAT_FGT2) && ((HaveEL(EL3) && SCR_EL3.FGTEn2 == '0') || HDFGRTR2_EL2.nSPMEVTYPERn_EL0 == '0') then
+>         AArch64.SystemAccessTrap(EL2, 0x18);
+>     elsif EL2Enabled() && MDCR_EL2.EnSPM == '0' then
+>         AArch64.SystemAccessTrap(EL2, 0x18);
+>     elsif EL2Enabled() && SPMACCESSR_EL2<(UInt(SPMSELR_EL0.SYSPMUSEL) * 2) + 1:UInt(SPMSELR_EL0.SYSPMUSEL) * 2> == '00' then
+>         AArch64.SystemAccessTrap(EL2, 0x18);
+>     elsif HaveEL(EL3) && MDCR_EL3.EnPM2 == '0' then
+>         if EL3SDDUndef() then
+>             UNDEFINED;
+>         else
+>             AArch64.SystemAccessTrap(EL3, 0x18);
+>     elsif HaveEL(EL3) && SPMACCESSR_EL3<(UInt(SPMSELR_EL0.SYSPMUSEL) * 2) + 1:UInt(SPMSELR_EL0.SYSPMUSEL) * 2> == '00' then
+>         if EL3SDDUndef() then
+>             UNDEFINED;
+>         else
+>             AArch64.SystemAccessTrap(EL3, 0x18);
+>     elsif !IsSPMUCounterImplemented(UInt(SPMSELR_EL0.SYSPMUSEL), (UInt(SPMSELR_EL0.BANK) * 16) + m) then
+>         X[t, 64] = Zeros(64);
+>     else
+>         X[t, 64] = SPMEVFILT2R_EL0[UInt(SPMSELR_EL0.SYSPMUSEL), (UInt(SPMSELR_EL0.BANK) * 16) + m];
+> 
+> which shows that an SPMEVFILT2Rn_EL0 access from EL1 traps to EL2 if:
+> 
+> - either HDFGRTR2_EL2.nSPMEVTYPERn_EL0 == '0', (check)
+> - or MDCR_EL2.EnSPM == '0', (check)
+> - or SPMACCESSR_EL2<(UInt(SPMSELR_EL0.SYSPMUSEL) * 2) + 1:UInt(SPMSELR_EL0.SYSPMUSEL) * 2> == '00'
+> 
+> and that last condition requires some more handling as you need to
+> evaluate both SPMSELR_EL0.SYSPMUSEL and the corresponding field of
+> SPMACCESSR_EL2 to make a decision. It's not majorly complicated, but
+> it isn't solved by simply setting a static attribute.
+
+So IIUC you are suggesting to handle SYS_SPMEVFILT2R_EL0() registers via
+complex condition checks where the CGT_XXX can be directed to a function
+callback instead ? For example, something like the following (untested).
+
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -116,6 +116,7 @@ enum cgt_group_id {
+        __COMPLEX_CONDITIONS__,
+        CGT_CNTHCTL_EL1PCTEN = __COMPLEX_CONDITIONS__,
+        CGT_CNTHCTL_EL1PTEN,
++       CGT_TEST,
+ 
+        CGT_CPTR_TTA,
+ 
+@@ -486,6 +487,23 @@ static enum trap_behaviour check_cptr_tta(struct kvm_vcpu *vcpu)
+        return BEHAVE_HANDLE_LOCALLY;
+ }
+ 
++static enum trap_behaviour check_test(struct kvm_vcpu *vcpu)
++{
++       u64 spmaccessr_el2 = __vcpu_sys_reg(vcpu, SPMACCESSR_EL2);
++       u64 spmselr_el2 = __vcpu_sys_reg(vcpu, SPMSELR_EL0);
++       u64 mdcr_el2 = __vcpu_sys_reg(vcpu, MDCR_EL2);
++       int syspmusel, spmaccessr_idx;
++
++       if (!(mdcr_el2 & MDCR_EL2_EnSPM)) {
++               syspmusel = FIELD_GET(SPMSELR_EL0_SYSPMUSEL_MASK, spmselr_el2);
++               spmaccessr_idx = syspmusel * 2;
++
++               if (((spmaccessr_el2 >> spmaccessr_idx) & 0x3) == 0x0)
++                       return BEHAVE_FORWARD_ANY;
++       }
++       return BEHAVE_HANDLE_LOCALLY;
++}
++
+ #define CCC(id, fn)                            \
+        [id - __COMPLEX_CONDITIONS__] = fn
+ 
+@@ -493,6 +511,7 @@ static const complex_condition_check ccc[] = {
+        CCC(CGT_CNTHCTL_EL1PCTEN, check_cnthctl_el1pcten),
+        CCC(CGT_CNTHCTL_EL1PTEN, check_cnthctl_el1pten),
+        CCC(CGT_CPTR_TTA, check_cptr_tta),
++       CCC(CGT_TEST, check_test),
+ };
+ 
+ /*
+@@ -1163,7 +1182,7 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
+        SR_TRAP(SYS_SPMEVFILTR_EL0(14), CGT_MDCR_EnSPM),
+        SR_TRAP(SYS_SPMEVFILTR_EL0(15), CGT_MDCR_EnSPM),
+ 
+-       SR_TRAP(SYS_SPMEVFILT2R_EL0(0), CGT_MDCR_EnSPM),
++       SR_TRAP(SYS_SPMEVFILT2R_EL0(0), CGT_TEST),
+        SR_TRAP(SYS_SPMEVFILT2R_EL0(1), CGT_MDCR_EnSPM),
+        SR_TRAP(SYS_SPMEVFILT2R_EL0(2), CGT_MDCR_EnSPM),
+        SR_TRAP(SYS_SPMEVFILT2R_EL0(3), CGT_MDCR_EnSPM),
