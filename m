@@ -1,145 +1,129 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB56749654;
-	Tue, 13 Aug 2024 15:45:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2923E1A08C2
+	for <kvmarm@lists.linux.dev>; Tue, 13 Aug 2024 16:20:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723563952; cv=none; b=QUCGgao7Yl4EMvjEGed1XhH7E5utAJX1UgrWmfPvNDbpRsbrddVKF/i35GajmJZ/Wri4Cre+2pntTIFez6FO90FRo1kvr9WyON94fUnMJiYZUhrfYvJGvGAoU/18mCpEE1QRuSdD5kFmb2K9fz4nkvJD/mKvKkiWeMzXdJpSnq8=
+	t=1723566010; cv=none; b=gofbDE/Z+OxvPrUWZPD3tNKgFfJdUPGcJYycIIUQlkcC1p22rT2YfCdqL12wrOakk3MilT2As5ZNsRrlI1/oN6iZtluJaXWtqhpEEgJAbGGBJjZeS61arIUeQDxzqcPa4oH9vuIGzkaXWBOgFa0JnlAB5bPvcJzDl3/vTM8tYZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723563952; c=relaxed/simple;
-	bh=qiupYbycqVBit5agDXmiS2ivXVrYBP8IffrAeg8D5Vw=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FDkavrxnqt/KpCMzDzF/IhLZcxiXRZFqy41CApruHWlY5aATDjjm/yvwGKHaU75HIxEugF+PH5mt3p8rB28TjGp0d4hvnP2q8+r+fDezcNWORTSi5725F4KjisjxZ1BVMuFkhle6MZ1cWTkqAwXbAmknZS8kLZO9ZTsR8+29RUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OzzD2/d9; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OzzD2/d9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F27DC4AF09;
-	Tue, 13 Aug 2024 15:45:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723563952;
-	bh=qiupYbycqVBit5agDXmiS2ivXVrYBP8IffrAeg8D5Vw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OzzD2/d9xpMH/LzWE9QUn7DlL0zA0MeRBeAmcl4kZeEpC6zuhxBMlUouGmd7/GT3n
-	 Ofmx9QLwqa6+UJc5T962vuEviLaGv62x4u56b2l5LYf1qG+2HXUgc9T/9Gzqr81a7O
-	 LW1+RIM9F7KzscDDD+rMShK/cWent4kd7oHqIqJBuNcFO3wKfHrvjnnHJvdtur2eCU
-	 b1LiGR0c6RC8tM95bCfWEOgEhOi644mvNA+5YZb0fhgQ/mRfuEOckBhB79uTOx+vD1
-	 XqkzRwEQ2Qp3yP1TfOUoDJpSorluR8cDblTTEotfgGuEZYNoaQEOkFBTsDsRRSe4aD
-	 NMquau0YWlYKg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sdtiY-003PH1-FD;
-	Tue, 13 Aug 2024 16:45:50 +0100
-Date: Tue, 13 Aug 2024 16:45:46 +0100
-Message-ID: <878qx05sut.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
+	s=arc-20240116; t=1723566010; c=relaxed/simple;
+	bh=ZKTCFZmbG5pTOi9ndxbq9LGUYrME/QFRl3HIWniT/i4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oGkxu0+KjmtUlQiICXT+JEUsgunkFq9IgqH4hDQ2tPkWUBjOJvNYi/991FsZhMH6Fc4a+mQzhz7NrDU/n8Nuh+6nKcbtA4cR4yq99kgua9ihBEhaGJRjMMFrKYIuHVS4s/3qCIqV/yr/UIZ5lD6rPYPQU9xbwH8oHI50jZLDfCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4221412FC;
+	Tue, 13 Aug 2024 09:20:32 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F1CB13F6A8;
+	Tue, 13 Aug 2024 09:20:04 -0700 (PDT)
+Date: Tue, 13 Aug 2024 17:19:59 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>
 Subject: Re: [PATCH 09/10] KVM: arm64: Handle  PIR{,E0}_EL2 traps
-In-Reply-To: <20240813152452.GD3321997@e124191.cambridge.arm.com>
+Message-ID: <20240813154937.GA3328587@e124191.cambridge.arm.com>
 References: <20240813144738.2048302-1-maz@kernel.org>
-	<20240813144738.2048302-10-maz@kernel.org>
-	<20240813152452.GD3321997@e124191.cambridge.arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <20240813144738.2048302-10-maz@kernel.org>
+ <20240813152452.GD3321997@e124191.cambridge.arm.com>
+ <878qx05sut.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, alexandru.elisei@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <878qx05sut.wl-maz@kernel.org>
 
-On Tue, 13 Aug 2024 16:24:52 +0100,
-Joey Gouly <joey.gouly@arm.com> wrote:
+On Tue, Aug 13, 2024 at 04:45:46PM +0100, Marc Zyngier wrote:
+> On Tue, 13 Aug 2024 16:24:52 +0100,
+> Joey Gouly <joey.gouly@arm.com> wrote:
+> > 
+> > On Tue, Aug 13, 2024 at 03:47:37PM +0100, Marc Zyngier wrote:
+> > > Add the FEAT_S1PIE EL2 registers the sysreg descriptor array so that
+> > > they can be handled as a trap.
+> > > 
+> > > Access to these registers is conditionned on ID_AA64MMFR3_EL1.S1PIE
+> > > being advertised.
+> > > 
+> > > Similarly to other other changes, PIRE0_EL2 is guaranteed to trap
+> > > thanks to the D22677 update to the architecture..
+> > > 
+> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > > ---
+> > >  arch/arm64/kvm/sys_regs.c | 14 ++++++++++++++
+> > >  1 file changed, 14 insertions(+)
+> > > 
+> > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > > index 52250db3c122..a5f604e24e05 100644
+> > > --- a/arch/arm64/kvm/sys_regs.c
+> > > +++ b/arch/arm64/kvm/sys_regs.c
+> > > @@ -346,6 +346,18 @@ static bool access_rw(struct kvm_vcpu *vcpu,
+> > >  	return true;
+> > >  }
+> > >  
+> > > +static bool check_s1pie_access_rw(struct kvm_vcpu *vcpu,
+> > > +				  struct sys_reg_params *p,
+> > > +				  const struct sys_reg_desc *r)
+> > > +{
+> > > +	if (!kvm_has_feat(vcpu->kvm, ID_AA64MMFR3_EL1, S1PIE, IMP)) {
+> > > +		kvm_inject_undefined(vcpu);
+> > > +		return false;
+> > > +	}
+> > > +
+> > > +	return access_rw(vcpu, p, r);
+> > > +}
+> > > +
+> > >  /*
+> > >   * See note at ARMv7 ARM B1.14.4 (TL;DR: S/W ops are not easily virtualized).
+> > >   */
+> > > @@ -2827,6 +2839,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+> > >  	EL2_REG(HPFAR_EL2, access_rw, reset_val, 0),
+> > >  
+> > >  	EL2_REG(MAIR_EL2, access_rw, reset_val, 0),
+> > > +	EL2_REG(PIRE0_EL2, check_s1pie_access_rw, reset_val, 0),
+> > > +	EL2_REG(PIR_EL2, check_s1pie_access_rw, reset_val, 0),
+> > >  	EL2_REG(AMAIR_EL2, access_rw, reset_val, 0),
+> > >  
+> > >  	EL2_REG(VBAR_EL2, access_rw, reset_val, 0),
+> > 
+> > I think we should also use this for PIR_EL1 / PIRE0_EL1? We have NULL for their access field.
+> > 
+> > 	{ SYS_DESC(SYS_PIR_EL1), NULL, reset_unknown, PIR_EL1 },
 > 
-> On Tue, Aug 13, 2024 at 03:47:37PM +0100, Marc Zyngier wrote:
-> > Add the FEAT_S1PIE EL2 registers the sysreg descriptor array so that
-> > they can be handled as a trap.
-> > 
-> > Access to these registers is conditionned on ID_AA64MMFR3_EL1.S1PIE
-> > being advertised.
-> > 
-> > Similarly to other other changes, PIRE0_EL2 is guaranteed to trap
-> > thanks to the D22677 update to the architecture..
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/sys_regs.c | 14 ++++++++++++++
-> >  1 file changed, 14 insertions(+)
-> > 
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index 52250db3c122..a5f604e24e05 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -346,6 +346,18 @@ static bool access_rw(struct kvm_vcpu *vcpu,
-> >  	return true;
-> >  }
-> >  
-> > +static bool check_s1pie_access_rw(struct kvm_vcpu *vcpu,
-> > +				  struct sys_reg_params *p,
-> > +				  const struct sys_reg_desc *r)
-> > +{
-> > +	if (!kvm_has_feat(vcpu->kvm, ID_AA64MMFR3_EL1, S1PIE, IMP)) {
-> > +		kvm_inject_undefined(vcpu);
-> > +		return false;
-> > +	}
-> > +
-> > +	return access_rw(vcpu, p, r);
-> > +}
-> > +
-> >  /*
-> >   * See note at ARMv7 ARM B1.14.4 (TL;DR: S/W ops are not easily virtualized).
-> >   */
-> > @@ -2827,6 +2839,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
-> >  	EL2_REG(HPFAR_EL2, access_rw, reset_val, 0),
-> >  
-> >  	EL2_REG(MAIR_EL2, access_rw, reset_val, 0),
-> > +	EL2_REG(PIRE0_EL2, check_s1pie_access_rw, reset_val, 0),
-> > +	EL2_REG(PIR_EL2, check_s1pie_access_rw, reset_val, 0),
-> >  	EL2_REG(AMAIR_EL2, access_rw, reset_val, 0),
-> >  
-> >  	EL2_REG(VBAR_EL2, access_rw, reset_val, 0),
+> I don't think we need this. In general, the EL1 FEAT_S1PIE registers
+> are directly accessed by the VM, and do not trap.
 > 
-> I think we should also use this for PIR_EL1 / PIRE0_EL1? We have NULL for their access field.
+> However, if the VM has been configured to not expose S1PIE, then we
+> set the corresponding FGU bits in kvm_calculate_traps():
 > 
-> 	{ SYS_DESC(SYS_PIR_EL1), NULL, reset_unknown, PIR_EL1 },
+> 	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, S1PIE, IMP))
+> 		kvm->arch.fgu[HFGxTR_GROUP] |= (HFGxTR_EL2_nPIRE0_EL1 |
+> 						HFGxTR_EL2_nPIR_EL1);
+> 
+> The effect of this is that we don't even make to the sysreg array, and
+> inject an UNDEF directly from the point of decoding the trap (see the
+> beginning of triage_sysreg_trap()).
+> 
+> For EL2 registers, there is no concept of FGT since they always trap,
+> so no architectural trick we can play to shortcut the handling.
+> Therefore we make it to the handler and have to triage things there.
+> 
+> Does it make sense?
 
-I don't think we need this. In general, the EL1 FEAT_S1PIE registers
-are directly accessed by the VM, and do not trap.
+Ah yes, forgot how that worked, thanks for the reminder!
 
-However, if the VM has been configured to not expose S1PIE, then we
-set the corresponding FGU bits in kvm_calculate_traps():
+There's another 'conditionned' typo in the commit message, but otherwise:
 
-	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, S1PIE, IMP))
-		kvm->arch.fgu[HFGxTR_GROUP] |= (HFGxTR_EL2_nPIRE0_EL1 |
-						HFGxTR_EL2_nPIR_EL1);
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 
-The effect of this is that we don't even make to the sysreg array, and
-inject an UNDEF directly from the point of decoding the trap (see the
-beginning of triage_sysreg_trap()).
-
-For EL2 registers, there is no concept of FGT since they always trap,
-so no architectural trick we can play to shortcut the handling.
-Therefore we make it to the handler and have to triage things there.
-
-Does it make sense?
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+Joey
