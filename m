@@ -1,104 +1,135 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3AF736139;
-	Tue, 13 Aug 2024 07:16:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E04B5210E7
+	for <kvmarm@lists.linux.dev>; Tue, 13 Aug 2024 09:17:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723533378; cv=none; b=X9BaqDWAOikJVUmBdq0+hJ4rFNHcAS38j318lHLICnvZum4w7MTdiN29DUV6vs7WqS2K05TTtSbTDOgLLXVcxvjFSFUgeGEsSWpvyeO/Be1nx1fwUZ9H3gQXuGrZAtq7k/muiddSR2847asQYxS4fKSJTqbdH+0ehkc0Xq9mEow=
+	t=1723540654; cv=none; b=WfpjhsUEXWFh3EHVHJCrNOtFxl94yHoHdTc+sHAeF/FobsUWqA7wYO9vnivc9Olsl2Ba/Tl8y+AcucajcjIJrxe6PwJhXoPUvrlSFDOI+vGwiUlFhOF+OgIggYiglZ/TQmpwDUG89b8UZB1OnN917PrSU36b4Wxj2C2xynqNEHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723533378; c=relaxed/simple;
-	bh=Zw38o+oLyow2tsJrgb+SA6FlgG4nHiNDqOq3Xu6bCOE=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=BjafUvxqzJFHtuuiygUvhF5z/MVY3dnd/By311fEG4KqWz5h3PmKUBDoFf/e1tKpFXdTaUvRJup4+NhRBcguNJKyKbO+j2ftrWX/UwTVA+GZrBMN25G2RihL88MoNneh1hr+ukUA1rvioG6efLUUa7bmhueq0EW2oLdXU7QrBpA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oQfshzgB; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oQfshzgB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DB13C4AF09;
-	Tue, 13 Aug 2024 07:16:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723533377;
-	bh=Zw38o+oLyow2tsJrgb+SA6FlgG4nHiNDqOq3Xu6bCOE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=oQfshzgBYzi06GWTwVnYuFQ3M2OJFuGmpSKXX2xposVRmUl+p/hkTjLGQitQoIj1O
-	 Ra6aElb2eP9oQjEOzDt+h2rSVKUXHA61UlL83EveTxWSW3rNRzzZ4p/zNBn5qWBD+D
-	 QZ+PQwQXITqEMtVzQO9eOXjjn1h8UQcjkBNg3vjj/XdPm6kuc41gkdSCG6C1y7lR6I
-	 JS30VHXT4yf6F/DQSSFqFQ3quo9EMIWwucL1Kpd6DojwlhH3Q9AWJN24kz18jHw/KX
-	 ublu3qxLW8rt88IMS1z6/l7TTnfvyQq7doYIi26FptgdASvmxrz8/gVBpYt9NRkSp+
-	 VNFQdtt7aVF3g==
-Received: from disco-boy.misterjones.org ([217.182.43.188] helo=www.loen.fr)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sdllP-003F8N-7R;
-	Tue, 13 Aug 2024 08:16:15 +0100
+	s=arc-20240116; t=1723540654; c=relaxed/simple;
+	bh=ZqjwqbtEbJdz0EI/ONsVhvlf8aUL8C4HoEu8grOYelU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u6kxo/pb/aOj3yvVPfU7jke8aG7Fhts+P7VUWi8sb8fLzu50Slmbh9OLXbHjffTJR9vHkFflES+DAlaAo4+oSwFlfWaAHa57+9lgwkUj/lvQBO0bJxJ09wPOoCdmZ76K4mMwmAxqF4CIFBbmUIUAkAvSMY0Rl9HvMeud8d33FcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0B9C212FC;
+	Tue, 13 Aug 2024 02:17:57 -0700 (PDT)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3BCAA3F73B;
+	Tue, 13 Aug 2024 02:17:29 -0700 (PDT)
+Date: Tue, 13 Aug 2024 10:17:26 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>, Joey Gouly <joey.gouly@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Przemyslaw Gaj <pgaj@cadence.com>
+Subject: Re: [PATCH v2 13/17] KVM: arm64: nv: Add SW walker for AT S1
+ emulation
+Message-ID: <ZrskpqmkoLNVE2H4@raptor>
+References: <20240731194030.1991237-1-maz@kernel.org>
+ <20240731194030.1991237-14-maz@kernel.org>
+ <ZrYO9SK52rHhGvEd@arm.com>
+ <867cco1y4w.wl-maz@kernel.org>
+ <ZromBtfbjaHbcjT7@arm.com>
+ <8634n91v3z.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Date: Tue, 13 Aug 2024 08:16:15 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, Oliver Upton
- <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, Suzuki K
- Poulose <suzuki.poulose@arm.com>, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>,
- kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-Subject: Re: [RFC 10/10] KVM: arm64: nv: Add new HDFGRTR2_GROUP &
- HDFGRTR2_GROUP based FGU handling
-In-Reply-To: <6c479aba-10b9-46ba-92fa-d3b20cc82d61@arm.com>
-References: <20240620065807.151540-1-anshuman.khandual@arm.com>
- <20240620065807.151540-11-anshuman.khandual@arm.com>
- <865xu3kh4r.wl-maz@kernel.org>
- <4d256df7-1ec7-4300-b5c8-355f46c0e869@arm.com>
- <878qyy35e5.wl-maz@kernel.org>
- <47dc4299-52cc-4f98-929b-fb86bd9757ae@arm.com>
- <86tthhi0nz.wl-maz@kernel.org>
- <c84d0081-5afa-4bc2-82f4-a6dd07b8ab87@arm.com>
- <86o76c1b8p.wl-maz@kernel.org>
- <d56735e2-3fee-4d91-84e1-a5b480ec0ce1@arm.com>
- <86bk2b198o.wl-maz@kernel.org>
- <fb9bef18-adf2-4d3a-8205-b22a65b0c6db@arm.com>
- <87sevk4kgr.wl-maz@kernel.org>
- <6c479aba-10b9-46ba-92fa-d3b20cc82d61@arm.com>
-User-Agent: Roundcube Webmail/1.4.15
-Message-ID: <39b14f98acfa1afcbdcb46950c62e6c7@kernel.org>
-X-Sender: maz@kernel.org
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 217.182.43.188
-X-SA-Exim-Rcpt-To: anshuman.khandual@arm.com, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, broonie@kernel.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8634n91v3z.wl-maz@kernel.org>
 
-On 2024-08-13 07:53, Anshuman Khandual wrote:
-> On 8/4/24 16:35, Marc Zyngier wrote:
->> which shows that an SPMEVFILT2Rn_EL0 access from EL1 traps to EL2 if:
->> 
->> - either HDFGRTR2_EL2.nSPMEVTYPERn_EL0 == '0', (check)
->> - or MDCR_EL2.EnSPM == '0', (check)
->> - or SPMACCESSR_EL2<(UInt(SPMSELR_EL0.SYSPMUSEL) * 2) + 
->> 1:UInt(SPMSELR_EL0.SYSPMUSEL) * 2> == '00'
->> 
->> and that last condition requires some more handling as you need to
->> evaluate both SPMSELR_EL0.SYSPMUSEL and the corresponding field of
->> SPMACCESSR_EL2 to make a decision. It's not majorly complicated, but
->> it isn't solved by simply setting a static attribute.
+Hi Marc,
+
+On Mon, Aug 12, 2024 at 06:58:24PM +0100, Marc Zyngier wrote:
+> Hi Alex,
 > 
-> So IIUC you are suggesting to handle SYS_SPMEVFILT2R_EL0() registers 
-> via
-> complex condition checks where the CGT_XXX can be directed to a 
-> function
-> callback instead ? For example, something like the following 
-> (untested).
+> On Mon, 12 Aug 2024 16:11:02 +0100,
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> > 
+> > Hi Marc,
+> > 
+> > On Sat, Aug 10, 2024 at 11:16:15AM +0100, Marc Zyngier wrote:
+> > > Hi Alex,
+> > > 
+> > > @@ -136,12 +137,22 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
+> > >  	va = (u64)sign_extend64(va, 55);
+> > >  
+> > >  	/* Let's put the MMU disabled case aside immediately */
+> > > -	if (!(sctlr & SCTLR_ELx_M) ||
+> > > -	    (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_DC)) {
+> > > +	switch (wi->regime) {
+> > > +	case TR_EL10:
+> > > +		if (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_DC)
+> > > +			wr->level = S1_MMU_DISABLED;
+> > 
+> > In compute_translation_regime(), for AT instructions other than AT S1E2*, when
+> > {E2H,TGE} = {0,1}, regime is Regime_EL10. As far as I can tell, when regime is
+> > Regime_EL10 and TGE is set, stage 1 is disabled, according to
+> > AArch64.S1Enabled() and the decription of the TGE bit.
+> 
+> Grmbl... I really dislike E2H=0. May it die a painful death. How about
+> this on top?
+> 
+> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> index 10017d990bc3..870e77266f80 100644
+> --- a/arch/arm64/kvm/at.c
+> +++ b/arch/arm64/kvm/at.c
+> @@ -139,7 +139,19 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
+>  	/* Let's put the MMU disabled case aside immediately */
+>  	switch (wi->regime) {
+>  	case TR_EL10:
+> -		if (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_DC)
+> +		/*
+> +		 * If dealing with the EL1&0 translation regime, 3 things
+> +		 * can disable the S1 translation:
+> +		 *
+> +		 * - HCR_EL2.DC = 0
+> +		 * - HCR_EL2.{E2H,TGE} = {0,1}
+> +		 * - SCTLR_EL1.M = 0
+> +		 *
+> +		 * The TGE part is interesting. If we have decided that this
+> +		 * is EL1&0, then it means that either {E2H,TGE} == {1,0} or
+> +		 * {0,x}, and we only need to test for TGE == 1.
+> +		 */
+> +		if (__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_DC | HCR_TGE))
+>  			wr->level = S1_MMU_DISABLED;
 
-[...]
+The condition looks good now.
 
-Something like that, yes.
+>  		fallthrough;
+>  	case TR_EL2:
+> 
+> [...]
+> 
+> >
+> > 	switch (desc & GENMASK_ULL(1, 0)) {
+> > 	case 0b00:
+> > 	case 0b10:
+> > 		goto transfault;
+> > 	case 0b01:
+> > 		/* Block mapping */
+> > 		break;
+> > 	default:
+> > 		if (level == 3)
+> > 			break;
+> > 	}
+> > 
+> > Is this better? Perhaps slightly easier to match against the descriptor layouts,
+> > but I'm not sure it's an improvement over your suggestion. Up to you, no point
+> > in bikeshedding over it.
+> 
+> I think I'll leave it as is for now. I'm getting sick of this code...
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+Agreed!
+
+Thanks,
+Alex
