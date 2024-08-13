@@ -1,193 +1,181 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EAC419D066;
-	Tue, 13 Aug 2024 10:06:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B45F433B9
+	for <kvmarm@lists.linux.dev>; Tue, 13 Aug 2024 10:07:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723543589; cv=none; b=WcVmKH3TmPExEWcR0ykCtVIW6sFeET5x6H8W7UgHyBbzRzQJclmpKd8pu1LQpFp2wY5r2x2YMjWenkJGHNJhWRmT/UQ2mMmO1Gh1aMHMwwohn6kI/lPS/FS4MLTjj+bColJIx/HLZxomF7UP7k4UlKC1mNMK6UWXMLi98u9Lkj8=
+	t=1723543629; cv=none; b=qHktvVaIzK1CVp3IP0aM8allpfLP8np0Hm1q+3Pm22A2E5H/5qZ/kqzXhLB0vkZGxaJJ2Y/WpAV+vc7hwoyB1S5UjNW4UdBkjNQ5GzRk7ehU3q368HQMhFB4Gb1n+2AnV79IfpBS5ttM8LOnCmA/rrjmNkw+WnOadH4GDWig3S4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723543589; c=relaxed/simple;
-	bh=XIoXnrnAarn70eltNbWTEbJ4za+AVZpJDRGiMJMnLZI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=bz3BzITnYPB2A7B+Bw4Bu7Gx3B8CZ6+YxqbbCq27TyuSyqVA8Z3U87C5Mh5lltn95doT2Bkbvv7g0lQgVRnWt89aDvtfhjaMUeoc9clS2U4SwQv096OmQ5BeRQWhFJzbUz/ggNQLFpdtBjFwtOvDD1FsBJusB2sx1qT0tnyA6cs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U3CMw2pE; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1723543629; c=relaxed/simple;
+	bh=OpU1+ywTBKCCT1UVkJHl2CzzFHTxAXlIpSi9zVut8Ow=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UiEobnCjfAmBAZ4I3tu+6BJ4gWm2m6fFZVUSSJsiqBGyfc0ryFCJmK+pFsW+sKBMb7jy8GltztW2mUimN0uQXREwGmdAYqmo6Frf5dI9TAFac+klIDszOWws0KZ9nrQUFQPetW3maSI4D745TO/Hyi6WItTL2qTIKzKZZCk3YfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=haWuzjqh; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U3CMw2pE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3D48C4AF10;
-	Tue, 13 Aug 2024 10:06:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723543588;
-	bh=XIoXnrnAarn70eltNbWTEbJ4za+AVZpJDRGiMJMnLZI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=U3CMw2pEEcykmg3Tzcc3LNzWX/Pmz+yAYsJv3z6t2HexdJq4TfXCtMcaktqC57uWe
-	 TrtD39cvmBfzj5JqXGmie5JseiGikCP8WJh6pWWSjGSkACATIrqZ9q8pE/O5nst4Kz
-	 w81eTkO1TFGCKQ0CPtLZSKoxfdnXGAdU+TbiAY+3jzlv5y2upHFN/hE4wGOCS2byCK
-	 EZhn9t3rjy50MrQFSMpq4yvpHcfMiOX65JOh++FLNTJ0Vctu4MHKoQZ8mAE7XxWB+f
-	 Wmq4vrrALHsKeFN9VVHjjzNbviV864UE6E+aKQtMRHdKlNjCl9QbBHZ0P6sAbjS25J
-	 106ZfBPM8uyZQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sdoQ6-003INM-EO;
-	Tue, 13 Aug 2024 11:06:26 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Przemyslaw Gaj <pgaj@cadence.com>
-Subject: [PATCH v3 18/18] KVM: arm64: nv: Add support for FEAT_ATS1A
-Date: Tue, 13 Aug 2024 11:05:40 +0100
-Message-Id: <20240813100540.1955263-19-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240813100540.1955263-1-maz@kernel.org>
-References: <20240813100540.1955263-1-maz@kernel.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="haWuzjqh"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1723543626;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZdGpFIJhXUbfoxC6RL3l2LvGdIi9u4emfZaadOLgiuo=;
+	b=haWuzjqhFIFX+T+PavrDFVrAFwZx2qUnJ7QbYLqvTekbH+HLbslH9kozFs5sVOhk6kPBf/
+	6SY0sdFydgIhtpPuq+MdTxnN3surD5RNuVFRigmP3tQX9h0KWqOii2V4wxQOwb6sGNKfHp
+	LAu7NiYcdrueMaXjPFS/cMwOApQvPr0=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-458-UpzdPk49PHWiqqm0KgriTg-1; Tue, 13 Aug 2024 06:07:04 -0400
+X-MC-Unique: UpzdPk49PHWiqqm0KgriTg-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3685e0df024so3071624f8f.0
+        for <kvmarm@lists.linux.dev>; Tue, 13 Aug 2024 03:07:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723543623; x=1724148423;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZdGpFIJhXUbfoxC6RL3l2LvGdIi9u4emfZaadOLgiuo=;
+        b=xIqfEIfFfPEpDgAC78yBsW7D5Fm/XTORTL8JpwEHBe6eRj0kRX3Sn9jqzcULW/ODkB
+         hdxYSHKkpRfL4SefqO1vwWVlCPObPdMgzCQMaw3PuCRRNWsFhyhSLT/jTLR0KlpTXpUZ
+         HzUNz9trHQydWZRRCeJMp587zwPHKv+qn+qmN2KFL22HWkmumzXmtNWKSN/jLT9tvI1S
+         yXG8zybnE6a/DRAXsQ6ceNe0EX5yeuKIEUVBcIM6259HKXRPPdF3mBtneHN7LPz4OX8l
+         jKqUxcnU+1k1ysbZCF6pLLjhbB/mRLWvOEYFe7RXQlyR50GJQDqepPhatNJ6OYt4nwd2
+         inaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUrXKBvqma/B130bEsLwxD8t6u23BdDRhNXNXRQSrBjN0PzZHNEM69yaDvUJyGNVLHox7zkgOJeuBA3DQ3/YzzpQcMVexUq
+X-Gm-Message-State: AOJu0YzP6MxycKeTcC77fTL/mOHvNfaEl5lWj4QPtdLeN60gQpinSpP6
+	XjTd/4iCH18kyPg5xRxx2S9/zP/LdBC7isj1u+QRAWHi/AjXIosclHwDnHWZg1hUpG1jaJy9FEU
+	kyIIszDArMHXbPU2YTsi9QDzff3zENwp6aoF+O18sMH5HXxrNcHEbIGTRbN050030xB6GLjjmcv
+	vXQ/L7NZ8FOMsRy0uKUuUctMDJeV8x
+X-Received: by 2002:a05:6000:45:b0:366:ebd1:3bc1 with SMTP id ffacd0b85a97d-3716ccd71aemr1739829f8f.3.1723543622994;
+        Tue, 13 Aug 2024 03:07:02 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFDvTUTDd+LsRhjmB6zNVog1K4fVcAdlK3qvWE8ZDFz2Q/6hzL0KTKDRwibjwzk8bnEf5C27ISqUKXY48zo5Zg=
+X-Received: by 2002:a05:6000:45:b0:366:ebd1:3bc1 with SMTP id
+ ffacd0b85a97d-3716ccd71aemr1739813f8f.3.1723543622487; Tue, 13 Aug 2024
+ 03:07:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com, alexandru.elisei@arm.com, anshuman.khandual@arm.com, pgaj@cadence.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+References: <ZrXPY7yIG0eu8mQU@linux.dev>
+In-Reply-To: <ZrXPY7yIG0eu8mQU@linux.dev>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 13 Aug 2024 12:06:51 +0200
+Message-ID: <CABgObfa=AL_+-oYAAOYM+gbS=UXnoBfsroohB5B+b1g4cvoJbg@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.11, round #1
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Alexander Potapenko <glider@google.com>, Mark Brown <broonie@kernel.org>, 
+	Fuad Tabba <tabba@google.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Takahiro Itazuri <itazur@amazon.com>, Sebastian Ott <sebott@redhat.com>, 
+	Danilo Krummrich <dakr@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Handling FEAT_ATS1A (which provides the AT S1E{1,2}A instructions)
-is pretty easy, as it is just the usual AT without the permission
-check.
+On Fri, Aug 9, 2024 at 10:12=E2=80=AFAM Oliver Upton <oliver.upton@linux.de=
+v> wrote:
+>
+> Hi Paolo,
+>
+> Decent bit of fixes this time around. The most noteworthy among these
+> is probably Marc's vgic fix that closes a race which can precipitate a
+> UAF, as seen w/ syskaller.
+>
+> Please pull.
 
-This basically amounts to plumbing the instructions in the various
-dispatch tables, and handling FEAT_ATS1A being disabled in the
-ID registers.
+Pulled, thanks.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/sysreg.h |  1 +
- arch/arm64/kvm/at.c             | 10 ++++++++++
- arch/arm64/kvm/emulate-nested.c |  2 ++
- arch/arm64/kvm/sys_regs.c       | 11 +++++++++++
- 4 files changed, 24 insertions(+)
+Paolo
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index a2787091d5a0..bc161f160854 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -673,6 +673,7 @@
- #define OP_AT_S12E1W	sys_insn(AT_Op0, 4, AT_CRn, 8, 5)
- #define OP_AT_S12E0R	sys_insn(AT_Op0, 4, AT_CRn, 8, 6)
- #define OP_AT_S12E0W	sys_insn(AT_Op0, 4, AT_CRn, 8, 7)
-+#define OP_AT_S1E2A	sys_insn(AT_Op0, 4, AT_CRn, 9, 2)
- 
- /* TLBI instructions */
- #define TLBI_Op0	1
-diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index c134bcd0338d..ff8a24a2d3d6 100644
---- a/arch/arm64/kvm/at.c
-+++ b/arch/arm64/kvm/at.c
-@@ -78,6 +78,7 @@ static enum trans_regime compute_translation_regime(struct kvm_vcpu *vcpu, u32 o
- 	switch (op) {
- 	case OP_AT_S1E2R:
- 	case OP_AT_S1E2W:
-+	case OP_AT_S1E2A:
- 		return vcpu_el2_e2h_is_set(vcpu) ? TR_EL20 : TR_EL2;
- 		break;
- 	default:
-@@ -849,6 +850,9 @@ static u64 handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
- 	case OP_AT_S1E0W:
- 		perm_fail = !uw;
- 		break;
-+	case OP_AT_S1E1A:
-+	case OP_AT_S1E2A:
-+		break;
- 	default:
- 		BUG();
- 	}
-@@ -932,6 +936,9 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
- 	case OP_AT_S1E0W:
- 		fail = __kvm_at(OP_AT_S1E0W, vaddr);
- 		break;
-+	case OP_AT_S1E1A:
-+		fail = __kvm_at(OP_AT_S1E1A, vaddr);
-+		break;
- 	default:
- 		WARN_ON_ONCE(1);
- 		fail = true;
-@@ -1007,6 +1014,9 @@ void __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
- 		case OP_AT_S1E2W:
- 			fail = __kvm_at(OP_AT_S1E1W, vaddr);
- 			break;
-+		case OP_AT_S1E2A:
-+			fail = __kvm_at(OP_AT_S1E1A, vaddr);
-+			break;
- 		default:
- 			WARN_ON_ONCE(1);
- 			fail = true;
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 05166eccea0a..dbbae64c642c 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -786,6 +786,7 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
- 	SR_TRAP(OP_AT_S12E1W,		CGT_HCR_NV),
- 	SR_TRAP(OP_AT_S12E0R,		CGT_HCR_NV),
- 	SR_TRAP(OP_AT_S12E0W,		CGT_HCR_NV),
-+	SR_TRAP(OP_AT_S1E2A,		CGT_HCR_NV),
- 	SR_TRAP(OP_TLBI_IPAS2E1,	CGT_HCR_NV),
- 	SR_TRAP(OP_TLBI_RIPAS2E1,	CGT_HCR_NV),
- 	SR_TRAP(OP_TLBI_IPAS2LE1,	CGT_HCR_NV),
-@@ -867,6 +868,7 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
- 	SR_TRAP(OP_AT_S1E0W, 		CGT_HCR_AT),
- 	SR_TRAP(OP_AT_S1E1RP, 		CGT_HCR_AT),
- 	SR_TRAP(OP_AT_S1E1WP, 		CGT_HCR_AT),
-+	SR_TRAP(OP_AT_S1E1A,		CGT_HCR_AT),
- 	SR_TRAP(SYS_ERXPFGF_EL1,	CGT_HCR_nFIEN),
- 	SR_TRAP(SYS_ERXPFGCTL_EL1,	CGT_HCR_nFIEN),
- 	SR_TRAP(SYS_ERXPFGCDN_EL1,	CGT_HCR_nFIEN),
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 9f3cf82e5231..5ab0b2799393 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2818,6 +2818,13 @@ static bool handle_at_s1e2(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- {
- 	u32 op = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
- 
-+	/* There is no FGT associated with AT S1E2A :-( */
-+	if (op == OP_AT_S1E2A &&
-+	    !kvm_has_feat(vcpu->kvm, ID_AA64ISAR2_EL1, ATS1A, IMP)) {
-+		kvm_inject_undefined(vcpu);
-+		return false;
-+	}
-+
- 	__kvm_at_s1e2(vcpu, op, p->regval);
- 
- 	return true;
-@@ -3188,6 +3195,7 @@ static struct sys_reg_desc sys_insn_descs[] = {
- 	SYS_INSN(AT_S12E1W, handle_at_s12),
- 	SYS_INSN(AT_S12E0R, handle_at_s12),
- 	SYS_INSN(AT_S12E0W, handle_at_s12),
-+	SYS_INSN(AT_S1E2A, handle_at_s1e2),
- 
- 	SYS_INSN(TLBI_IPAS2E1IS, handle_ipas2e1is),
- 	SYS_INSN(TLBI_RIPAS2E1IS, handle_ripas2e1is),
-@@ -4645,6 +4653,9 @@ void kvm_calculate_traps(struct kvm_vcpu *vcpu)
- 						HFGITR_EL2_TLBIRVAAE1OS	|
- 						HFGITR_EL2_TLBIRVAE1OS);
- 
-+	if (!kvm_has_feat(kvm, ID_AA64ISAR2_EL1, ATS1A, IMP))
-+		kvm->arch.fgu[HFGITR_GROUP] |= HFGITR_EL2_ATS1E1A;
-+
- 	if (!kvm_has_feat(kvm, ID_AA64MMFR1_EL1, PAN, PAN2))
- 		kvm->arch.fgu[HFGITR_GROUP] |= (HFGITR_EL2_ATS1E1RP |
- 						HFGITR_EL2_ATS1E1WP);
--- 
-2.39.2
+> --
+> Thanks,
+> Oliver
+>
+> The following changes since commit 8400291e289ee6b2bf9779ff1c83a291501f01=
+7b:
+>
+>   Linux 6.11-rc1 (2024-07-28 14:19:55 -0700)
+>
+> are available in the Git repository at:
+>
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kv=
+marm-fixes-6.11-1
+>
+> for you to fetch changes up to 9eb18136af9fe4dd688724070f2bfba271bd1542:
+>
+>   KVM: arm64: vgic: Hold config_lock while tearing down a CPU interface (=
+2024-08-08 16:58:22 +0000)
+>
+> ----------------------------------------------------------------
+> KVM/arm64 fixes for 6.11, round #1
+>
+>  - Use kvfree() for the kvmalloc'd nested MMUs array
+>
+>  - Set of fixes to address warnings in W=3D1 builds
+>
+>  - Make KVM depend on assembler support for ARMv8.4
+>
+>  - Fix for vgic-debug interface for VMs without LPIs
+>
+>  - Actually check ID_AA64MMFR3_EL1.S1PIE in get-reg-list selftest
+>
+>  - Minor code / comment cleanups for configuring PAuth traps
+>
+>  - Take kvm->arch.config_lock to prevent destruction / initialization
+>    race for a vCPU's CPUIF which may lead to a UAF
+>
+> ----------------------------------------------------------------
+> Danilo Krummrich (1):
+>       KVM: arm64: free kvm->arch.nested_mmus with kvfree()
+>
+> Fuad Tabba (1):
+>       KVM: arm64: Tidying up PAuth code in KVM
+>
+> Marc Zyngier (2):
+>       KVM: arm64: Enforce dependency on an ARMv8.4-aware toolchain
+>       KVM: arm64: vgic: Hold config_lock while tearing down a CPU interfa=
+ce
+>
+> Mark Brown (1):
+>       KVM: selftests: arm64: Correct feature test for S1PIE in get-reg-li=
+st
+>
+> Sebastian Ott (3):
+>       KVM: arm64: fix override-init warnings in W=3D1 builds
+>       KVM: arm64: fix kdoc warnings in W=3D1 builds
+>       KVM: arm64: vgic: fix unexpected unlock sparse warnings
+>
+> Takahiro Itazuri (1):
+>       docs: KVM: Fix register ID of SPSR_FIQ
+>
+> Zenghui Yu (1):
+>       KVM: arm64: vgic-debug: Exit the iterator properly w/o LPI
+>
+>  Documentation/virt/kvm/api.rst                     |  2 +-
+>  arch/arm64/include/asm/kvm_ptrauth.h               |  2 +-
+>  arch/arm64/kvm/Kconfig                             |  1 +
+>  arch/arm64/kvm/Makefile                            |  3 +++
+>  arch/arm64/kvm/arm.c                               | 15 +++++----------
+>  arch/arm64/kvm/hyp/include/hyp/switch.h            |  1 -
+>  arch/arm64/kvm/hyp/nvhe/Makefile                   |  2 ++
+>  arch/arm64/kvm/hyp/nvhe/switch.c                   |  5 ++---
+>  arch/arm64/kvm/hyp/vhe/Makefile                    |  2 ++
+>  arch/arm64/kvm/nested.c                            |  2 +-
+>  arch/arm64/kvm/vgic/vgic-debug.c                   |  5 +++--
+>  arch/arm64/kvm/vgic/vgic-init.c                    |  3 +--
+>  arch/arm64/kvm/vgic/vgic-irqfd.c                   |  7 ++++---
+>  arch/arm64/kvm/vgic/vgic-its.c                     | 18 +++++++++++-----=
+--
+>  arch/arm64/kvm/vgic/vgic-v3.c                      |  2 +-
+>  arch/arm64/kvm/vgic/vgic.c                         |  2 +-
+>  arch/arm64/kvm/vgic/vgic.h                         |  2 +-
+>  tools/testing/selftests/kvm/aarch64/get-reg-list.c |  4 ++--
+>  18 files changed, 42 insertions(+), 36 deletions(-)
+>
 
