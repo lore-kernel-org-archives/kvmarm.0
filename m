@@ -1,259 +1,123 @@
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 770303A8CE
-	for <kvmarm@lists.linux.dev>; Tue, 13 Aug 2024 14:22:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65A1019D07B
+	for <kvmarm@lists.linux.dev>; Tue, 13 Aug 2024 14:26:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723558922; cv=none; b=PDtHOSBACibhUPnGOfvK/iWT2YKvjcEjhHZ0HYWusAKk6RPT0iuMdiNcwCx4FrMrnHGPGGTD7Pfs+VXhcXrlW1GUSSbjpJfOd5uIJkoBj8jGgSPR+rr/o7N12p3Iel6NDL5F9EhyhD5py50LSi4NdvNt8Zwn2qCLaY3OPxOAhbk=
+	t=1723559219; cv=none; b=DPdFjxwELKfxBa3jDLzR/e0A//DAt63wY6Y8qXeISExViO7WcITwZwzoxCJU3nmJi2NsfBncmU5uGImCCH4eKLZsl47kzFaBfzalDWmGmuqTJp1xbSIsEop+mK+1ZZ0tO3vdumLyp+bePgU0K2AioG8FUtyJlfhYJRR1s98VD7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723558922; c=relaxed/simple;
-	bh=SEa1BAOEwFjduz9qiUW+EK1ULp95O6BGGl/eg0TIEO8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DG5z/JEqUeeiRl+4JY3obGocSLySkWosiuSw2pLoX0AVs9byXmZEVg7IVdvunZAPsMwJiZd8in+R3k6R+H2IcGHNZAhaG5r7glEtIsTdWou6eAl78eVmfq7UmE1BG2tdYVlJSKKwDDR4eHY8dGK4AREhEX8E6Y/1vnbBX3QuxaY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fUjYMIUt; arc=none smtp.client-ip=209.85.221.44
+	s=arc-20240116; t=1723559219; c=relaxed/simple;
+	bh=nDFtrRLCiIpry9mS1jdG2ZuIuLH24n/ueW+EVQCN18s=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=R8I0vphviPUjX3T71+RP5sPFJOp7tG/dVwxf36rpDVNq3Rn5ntR0xRI7qMCRakmRKEakM521DNHEZciet0AVFKkxzzjr1mvz4B0Y3BdwceriLO7vLw9fzjmMq6stPs035KMTULVK7Gs029hr1FNNSkh4HfWfI03Tp2Qn9z0hz3Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BkI0Jkir; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fUjYMIUt"
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-36887ca3da2so2739633f8f.2
-        for <kvmarm@lists.linux.dev>; Tue, 13 Aug 2024 07:22:00 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BkI0Jkir"
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6886cd07673so129133917b3.3
+        for <kvmarm@lists.linux.dev>; Tue, 13 Aug 2024 07:26:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723558919; x=1724163719; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=uJhazaIqBCEFZJ1umrpl7QIxO4QXyxs3C3nE1KqHzL8=;
-        b=fUjYMIUtMCJ0JDLk3nzWZIx064sAAb6WWLMnQbd1kov3DUzIyXJL/75I7AH6wlrzF4
-         KKEsgn4adrXCjAAR3/E5Nod3jvhXmgGQC6+Xu6g3DFskBqVQu/fPg0PAhzCClU4RVXcb
-         zr5dLTxWM8CoyYtDWzuasJ/L/6FS18WWlWOt8V4NskgK6k/nes18FzIkSuonjvZfHdqL
-         V0FAZzVx4eJOJVsuJFNgXPdNlTPK9a5cDZ9o8Cu+55x7TeFYqwx3wmP3LEX6L/wjEf9E
-         8mCpLxe59v32NBXuKQQq1GlTCV2HFz0akCKmSpLsUBcIay4mxs2rI/UdHz3BiuvsKMnu
-         dJnA==
+        d=google.com; s=20230601; t=1723559217; x=1724164017; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=nlePOXAg16VujwWpQo53FC8BTqwskF/Ge2QXUD/85QE=;
+        b=BkI0JkiraL7hnqosr82uRktwFJ7vkweL4xGO6dAw4eIYPYpR4Xh2VJcojbeW5xd6ey
+         E/f5LIbegNI74VCZ3oovTOoQTR0TFS/H494AuC2H3xzU6hKfs1O6z0s/bWoOEgrDhanM
+         CaPmx7yJjbgPBkTwuFNKelh+1o3tEAnJhPqPUd2BKkzthLqG6bcE9PAcK8ns1CSsXBSP
+         w5QtQ1LRa+m4W5Hmx+fdWPcOSM3jJl4AMLp4OCPX1hwqi1jZoaaXjEqa6uyITYEpIzN4
+         kh5OrPzbO1oG+B8FBRHeW8PJFObd6IUMzKGN3sPzKsl1ChsLqfVWindywAxIlLyfeNFJ
+         kxfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723558919; x=1724163719;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uJhazaIqBCEFZJ1umrpl7QIxO4QXyxs3C3nE1KqHzL8=;
-        b=ZaJHAE336za9/heeJzaV+1oXtFwRLFXxuuctPbOso8FLqq7hy0tkDylu7rbkfMi+Fy
-         Yo3a1ixfJ686cBgPq71ZFdBfFThMUYq7UrXRN2WUUbSdKhmiZDODfSGbza9XQ2pVlxk6
-         JUfArmCzcOpqmeV/2bZzGCFRMWabulBvIibvcbwNhs0/ntGaQMJVqFtyaZndKNgPMoOS
-         DxFYFFFyVCatraCNPQVWY0biHBr3TaduxbvrRRSXzCUQ+pEs53YBzh72GE/1KWzPHgz8
-         sDXS69pvfd/JkUC0Soir9XBZaZhK16mlezm7wjp6H/AmTNpR2dmuyfyqcFgsjDmGhXNp
-         5jdA==
-X-Forwarded-Encrypted: i=1; AJvYcCWfDmua590fWR3TmjDaKjICWNjqU4YpGXmdeFb9Aofu61gAH968CptHCQPMKe3qLNzHATl3lSpNi1EknZ9S70/quVvRq1BY
-X-Gm-Message-State: AOJu0YzRPIjMuFYuzkkUfwpDZGJXbFdpwkajOOXz1xsTYru0flPSeyhM
-	CGtwxjwtRibEgUJfexEc49G6HFlbUum/InNqxRHJ5cUPSSVib7heHwL4Q2CM6vopEUpjrBESHIM
-	Fkw==
-X-Google-Smtp-Source: AGHT+IG8+2xve7yGq/AYBb8rdgjsNxTTvms1qY4v/xoTml5Oy0JCovnHWN+VYX6a+wnmVvRBuoVt/Q==
-X-Received: by 2002:a05:6000:1843:b0:367:8383:6305 with SMTP id ffacd0b85a97d-3716cd3124emr2517392f8f.55.1723558918364;
-        Tue, 13 Aug 2024 07:21:58 -0700 (PDT)
-Received: from google.com (203.75.199.104.bc.googleusercontent.com. [104.199.75.203])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36e4ecc7a52sm10421401f8f.103.2024.08.13.07.21.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Aug 2024 07:21:57 -0700 (PDT)
-Date: Tue, 13 Aug 2024 15:21:54 +0100
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: mhiramat@kernel.org, linux-trace-kernel@vger.kernel.org, maz@kernel.org,
-	oliver.upton@linux.dev, kvmarm@lists.linux.dev, will@kernel.org,
-	qperret@google.com, kernel-team@android.com
-Subject: Re: [RFC PATCH 02/11] ring-buffer: Introducing ring-buffer writer
-Message-ID: <ZrtsAl4zpdMFAN4q@google.com>
-References: <20240805173234.3542917-1-vdonnefort@google.com>
- <20240805173234.3542917-3-vdonnefort@google.com>
- <20240806163953.5ec6551a@gandalf.local.home>
+        d=1e100.net; s=20230601; t=1723559217; x=1724164017;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nlePOXAg16VujwWpQo53FC8BTqwskF/Ge2QXUD/85QE=;
+        b=F2C4AFm8CVulpgTzttrcveGCOSyaA8ZkPODWg29Va7xHFGzpYCJL8434OZ/mexCHLs
+         9qVZYpIQqv+Hx77gOAt5j9SCxt2Spm312mGRZaCFubdJXlqFceCdMnIZ1FcBpe460eAk
+         ijxEK+FA+Vflz1ti239RCBScm7hXYgpJrIo2IY4n0LSXMjaLR8+lG13NHVw8jQ2574iH
+         O3bFEPUB/2vPyiFIYUaJMj0aGUbFhKs18RIBrYp7QgYlVzv5dpG5/xMbmOpt9JUlA/n3
+         bxJjl8fQPrsjnWDh483HncUoDU2rFwUvMLDEab/jCWy9jy14kmAuk0JbjPcv/uO89336
+         TCQw==
+X-Forwarded-Encrypted: i=1; AJvYcCWIbvKVx5SQ+siglGZuvC7+Ld1Jorfgi7Y7PMWCZk2DyNqdI0FrKHV6s+ksKudfq0l8UVugWlhFk5fqS+1CAsTrFDjSHkFO
+X-Gm-Message-State: AOJu0Yzz2GHPiVhR55NGawcunD1y/jYxL44zcWiqgoJYR8R9o2Ywu/o1
+	906wgwfOl+0q3ZcT90voPUbxLc8e8NwUvemgo01ic+VPxdNazVIwvU7iULNojEPAjGm1Wa74FqE
+	h7w==
+X-Google-Smtp-Source: AGHT+IEEvTWXYJINBxGMayHtOBEQqp7u1QCGe3ozNbbkvySjfSWo9grl4aqe1MPeA+og7VSh05yZ5yELEz4=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:185:b0:e03:2f8e:9d81 with SMTP id
+ 3f1490d57ef6-e113c909013mr7713276.0.1723559217266; Tue, 13 Aug 2024 07:26:57
+ -0700 (PDT)
+Date: Tue, 13 Aug 2024 07:26:55 -0700
+In-Reply-To: <yq5aikw6ji14.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240806163953.5ec6551a@gandalf.local.home>
+Mime-Version: 1.0
+References: <20240809205158.1340255-1-amoorthy@google.com> <20240809205158.1340255-4-amoorthy@google.com>
+ <yq5aikw6ji14.fsf@kernel.org>
+Message-ID: <ZrtskXJ6jH90pqB2@google.com>
+Subject: Re: [PATCH v2 3/3] KVM: arm64: Perform memory fault exits when
+ stage-2 handler EFAULTs
+From: Sean Christopherson <seanjc@google.com>
+To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>
+Cc: Anish Moorthy <amoorthy@google.com>, oliver.upton@linux.dev, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, jthoughton@google.com, rananta@google.com
+Content-Type: text/plain; charset="us-ascii"
 
-Sorry I have been preempted before I can answer here:
+On Mon, Aug 12, 2024, Aneesh Kumar K.V wrote:
+> Anish Moorthy <amoorthy@google.com> writes:
+> 
+> > Right now userspace just gets a bare EFAULT when the stage-2 fault
+> > handler fails to fault in the relevant page. Set up a
+> > KVM_EXIT_MEMORY_FAULT whenever this happens, which at the very least
+> > eases debugging and might also let userspace decide on/take some
+> > specific action other than crashing the VM.
+> >
+> > In some cases, user_mem_abort() EFAULTs before the size of the fault is
+> > calculated: return 0 in these cases to indicate that the fault is of
+> > unknown size.
+> >
+> 
+> VMMs are now converting private memory to shared or vice-versa on vcpu
+> exit due to memory fault. This change will require VMM track each page's
+> private/shared state so that they can now handle an exit fault on a
+> shared memory where the fault happened due to reasons other than
+> conversion.
 
-On Tue, Aug 06, 2024 at 04:39:53PM -0400, Steven Rostedt wrote:
-> On Mon,  5 Aug 2024 18:32:25 +0100
-> Vincent Donnefort <vdonnefort@google.com> wrote:
-> 
-> > +
-> > +#define for_each_rb_page_desc(__pdesc, __cpu, __trace_pdesc)				\
-> > +	for (__pdesc = (struct rb_page_desc *)&((__trace_pdesc)->__data[0]), __cpu = 0;	\
-> > +	     __cpu < (__trace_pdesc)->nr_cpus;						\
-> > +	     __cpu++, __pdesc = __next_rb_page_desc(__pdesc))
-> > +
-> > +static inline
-> > +struct rb_page_desc *rb_page_desc(struct trace_page_desc *trace_pdesc, int cpu)
-> > +{
-> > +	struct rb_page_desc *pdesc;
-> > +	int i;
-> > +
-> > +	if (!trace_pdesc)
-> > +		return NULL;
-> > +
-> > +	for_each_rb_page_desc(pdesc, i, trace_pdesc) {
-> > +		if (pdesc->cpu == cpu)
-> 
-> Is there a reason for the linear search?
-> 
-> Why not just:
-> 
-> 	if (cpu >= trace_pdesc->nr_cpus)
-> 		return NULL;
-> 
-> 	len = struct_size(pdesc, page_va, pdesc->nr_page_va);
-> 	pdesc = (void *)&(trace_pdesc->__data[0]);
-> 
-> 	return pdesc + len * cpu;
-> 
-> (note I don't think you need to typecast the void pointer).
+I don't see how filling kvm_run.memory_fault in more locations changes anything.
+The userspace exits are inherently racy, e.g. userspace may have already converted
+the page to the appropriate state, thus making KVM's exit spurious.  So either
+the VMM already tracks state, or the VMM blindly converts to shared/private.
 
-I supposed we can't assume buffers will be allocated for each CPU, hence the
-need to look at each buffer.
+> Should we make it easy by adding additional flag bits to
+> indicate the fault was due to attribute and access type mismatch?
 
-> 
-> > +			return pdesc;
-> > +	}
-> > +
-> > +	return NULL;
-> > +}
-> > +
-> > +static inline
-> > +void *rb_page_desc_page(struct rb_page_desc *pdesc, int page_id)
-> > +{
-> > +	return page_id > pdesc->nr_page_va ? NULL : (void *)pdesc->page_va[page_id];
-> > +}
-> > +
-> > +struct ring_buffer_writer {
-> > +	struct trace_page_desc	*pdesc;
-> > +	int (*get_reader_page)(int cpu);
-> > +};
-> > +
-> > +int ring_buffer_poll_writer(struct trace_buffer *buffer, int cpu);
-> > +
-> > +#define ring_buffer_reader(writer)				\
-> > +({								\
-> > +	static struct lock_class_key __key;			\
-> > +	__ring_buffer_alloc(0, RB_FL_OVERWRITE, &__key, writer);\
-> > +})
-> >  #endif /* _LINUX_RING_BUFFER_H */
-> > diff --git a/kernel/trace/ring_buffer.c b/kernel/trace/ring_buffer.c
-> > index f4f4dda28077..a07c22254cfd 100644
-> > --- a/kernel/trace/ring_buffer.c
-> > +++ b/kernel/trace/ring_buffer.c
-> > @@ -495,6 +495,8 @@ struct ring_buffer_per_cpu {
-> >  	unsigned long			*subbuf_ids;	/* ID to subbuf VA */
-> >  	struct trace_buffer_meta	*meta_page;
-> >  
-> > +	struct ring_buffer_writer	*writer;
-> > +
-> >  	/* ring buffer pages to update, > 0 to add, < 0 to remove */
-> >  	long				nr_pages_to_update;
-> >  	struct list_head		new_pages; /* new pages to add */
-> > @@ -517,6 +519,8 @@ struct trace_buffer {
-> >  
-> >  	struct ring_buffer_per_cpu	**buffers;
-> >  
-> > +	struct ring_buffer_writer	*writer;
-> > +
-> >  	struct hlist_node		node;
-> >  	u64				(*clock)(void);
-> >  
-> > @@ -1626,6 +1630,31 @@ rb_allocate_cpu_buffer(struct trace_buffer *buffer, long nr_pages, int cpu)
-> >  
-> >  	cpu_buffer->reader_page = bpage;
-> >  
-> > +	if (buffer->writer) {
-> > +		struct rb_page_desc *pdesc = rb_page_desc(buffer->writer->pdesc, cpu);
-> > +
-> > +		if (!pdesc)
-> > +			goto fail_free_reader;
-> > +
-> > +		cpu_buffer->writer = buffer->writer;
-> > +		cpu_buffer->meta_page = (struct trace_buffer_meta *)(void *)pdesc->meta_va;
-> > +		cpu_buffer->subbuf_ids = pdesc->page_va;
-> > +		cpu_buffer->nr_pages = pdesc->nr_page_va - 1;
-> > +		atomic_inc(&cpu_buffer->record_disabled);
-> > +		atomic_inc(&cpu_buffer->resize_disabled);
-> > +
-> > +		bpage->page = rb_page_desc_page(pdesc,
-> > +						cpu_buffer->meta_page->reader.id);
-> > +		if (!bpage->page)
-> > +			goto fail_free_reader;
-> > +		/*
-> > +		 * The meta-page can only describe which of the ring-buffer page
-> > +		 * is the reader. There is no need to init the rest of the
-> > +		 * ring-buffer.
-> > +		 */
-> > +		return cpu_buffer;
-> > +	}
-> > +
-> >  	page = alloc_pages_node(cpu_to_node(cpu), GFP_KERNEL | __GFP_COMP | __GFP_ZERO,
-> >  				cpu_buffer->buffer->subbuf_order);
-> >  	if (!page)
-> > @@ -1663,6 +1692,10 @@ static void rb_free_cpu_buffer(struct ring_buffer_per_cpu *cpu_buffer)
-> >  
-> >  	irq_work_sync(&cpu_buffer->irq_work.work);
-> >  
-> > +	if (cpu_buffer->writer)
-> > +		/* the ring_buffer doesn't own the data pages */
-> > +		cpu_buffer->reader_page->page = NULL;
-> 
-> Note, if statements are to have brackets if it's more than one line. That
-> even includes comments. So the above should be written either as:
-> 
-> 	if (cpu_buffer->writer) {
-> 		/* the ring_buffer doesn't own the data pages */
-> 		cpu_buffer->reader_page->page = NULL;
-> 	}
-> 
-> Or
-> 
-> 	/* the ring_buffer doesn't own the data pages */
-> 	if (cpu_buffer->writer)
-> 		cpu_buffer->reader_page->page = NULL;
-> 
-> For the second version, you should probably add more detail:
-> 
-> 	/* ring_buffers with writer set do not own the data pages */
-> 	if (cpu_buffer->writer)
-> 		cpu_buffer->reader_page->page = NULL;
-> 
-> 
-> > +
-> >  	free_buffer_page(cpu_buffer->reader_page);
-> >  
-> >  	if (head) {
-> > @@ -1693,7 +1726,8 @@ static void rb_free_cpu_buffer(struct ring_buffer_per_cpu *cpu_buffer)
-> >   * drop data when the tail hits the head.
-> >   */
-> >  struct trace_buffer *__ring_buffer_alloc(unsigned long size, unsigned flags,
-> > -					struct lock_class_key *key)
-> > +					struct lock_class_key *key,
-> > +					struct ring_buffer_writer *writer)
-> >  {
-> >  	struct trace_buffer *buffer;
-> >  	long nr_pages;
-> > @@ -1721,6 +1755,10 @@ struct trace_buffer *__ring_buffer_alloc(unsigned long size, unsigned flags,
-> >  	buffer->flags = flags;
-> >  	buffer->clock = trace_clock_local;
-> >  	buffer->reader_lock_key = key;
-> > +	if (writer) {
-> > +		buffer->writer = writer;
-> 
-> Should probably add a comment here:
-> 
-> 		/* The writer is external and never done by the kernel */
-> 
-> or something like that.
-> 
-> > +		atomic_inc(&buffer->record_disabled);
-> > +	}
-> >  
-> 
-> -- Steve
->
-[...]
+Like above, describing _why_ an exit occurred is problematic when an exit races
+with a "fix" from userspace.  It's also problematic when there are multiple
+possible faults, e.g. if the guest attempts to write to private memory, but
+userspace has the memory mapped as read-only, shared (contrived, but possible).
+Describing only the fault that KVM's see means the vCPU will encounter multiple
+faults, and userspace will end up getting multiple exits
+
+Instead, KVM should describe the access that led to the fault, as planned in the
+original series[1][2].  Userpace can then get the page into the correct state
+straightaway, or take punitive action if the guest is misbehaving.
+
+	if (is_write)
+		vcpu->run->memory_fault.flags |= KVM_MEMORY_FAULT_FLAG_WRITE;
+	else if (is_exec)
+		vcpu->run->memory_fault.flags |= KVM_MEMORY_FAULT_FLAG_EXEC;
+	else
+		vcpu->run->memory_fault.flags |= KVM_MEMORY_FAULT_FLAG_READ;
+
+That said, I'm a little hesitant to capture RWX information without a use case,
+mainly because it will require a new capability for userspace to be able to rely
+on the information.  In hindsight, it probably would have been better to capture
+RWX information in the initial implementation.  Doh.
+
+[1] https://lore.kernel.org/all/ZIn6VQSebTRN1jtX@google.com
+[2] https://lore.kernel.org/all/ZR4N8cwzTMDanPUY@google.com
