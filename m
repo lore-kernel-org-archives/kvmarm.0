@@ -1,181 +1,114 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B45F433B9
-	for <kvmarm@lists.linux.dev>; Tue, 13 Aug 2024 10:07:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22A92208AD;
+	Tue, 13 Aug 2024 10:44:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723543629; cv=none; b=qHktvVaIzK1CVp3IP0aM8allpfLP8np0Hm1q+3Pm22A2E5H/5qZ/kqzXhLB0vkZGxaJJ2Y/WpAV+vc7hwoyB1S5UjNW4UdBkjNQ5GzRk7ehU3q368HQMhFB4Gb1n+2AnV79IfpBS5ttM8LOnCmA/rrjmNkw+WnOadH4GDWig3S4=
+	t=1723545850; cv=none; b=cAoJw3O5CaFYAXHItSjeKxAauj/oOz8wIbCHGuhL9z+AeWYwbKadWWdpbnn4RStO47kgDWa5QwAaj5DQp7Ah3aVunZiddcdVbkI3PTMUfzYmqTARye8s+0QpBqL0R2xXMHEA/H79yWwtIVt9Y4WRIHosTNPklnmxDQx47+vwSIY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723543629; c=relaxed/simple;
-	bh=OpU1+ywTBKCCT1UVkJHl2CzzFHTxAXlIpSi9zVut8Ow=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UiEobnCjfAmBAZ4I3tu+6BJ4gWm2m6fFZVUSSJsiqBGyfc0ryFCJmK+pFsW+sKBMb7jy8GltztW2mUimN0uQXREwGmdAYqmo6Frf5dI9TAFac+klIDszOWws0KZ9nrQUFQPetW3maSI4D745TO/Hyi6WItTL2qTIKzKZZCk3YfM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=haWuzjqh; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1723545850; c=relaxed/simple;
+	bh=KeAEfHGzQzII5PNpXANK31ac/qnVj2yuiImhA5avUVY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=FvrSL9S+rwGbCeYdsLDCu2IeMafbNsw7kAfIC0Hv5vHBmAHybB7N3LkhdrVXNP3CglBiTQFTGvR7v4dL1K+HK68MRFpZX93qik0gKTkN60pvMT0HhBhHeV8Burusml0suHRfE/4cqtGgvQsgVFyiVoDSvV6fOt9iGuAQofedC2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qHuxyvBd; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="haWuzjqh"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723543626;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZdGpFIJhXUbfoxC6RL3l2LvGdIi9u4emfZaadOLgiuo=;
-	b=haWuzjqhFIFX+T+PavrDFVrAFwZx2qUnJ7QbYLqvTekbH+HLbslH9kozFs5sVOhk6kPBf/
-	6SY0sdFydgIhtpPuq+MdTxnN3surD5RNuVFRigmP3tQX9h0KWqOii2V4wxQOwb6sGNKfHp
-	LAu7NiYcdrueMaXjPFS/cMwOApQvPr0=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-458-UpzdPk49PHWiqqm0KgriTg-1; Tue, 13 Aug 2024 06:07:04 -0400
-X-MC-Unique: UpzdPk49PHWiqqm0KgriTg-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3685e0df024so3071624f8f.0
-        for <kvmarm@lists.linux.dev>; Tue, 13 Aug 2024 03:07:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723543623; x=1724148423;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZdGpFIJhXUbfoxC6RL3l2LvGdIi9u4emfZaadOLgiuo=;
-        b=xIqfEIfFfPEpDgAC78yBsW7D5Fm/XTORTL8JpwEHBe6eRj0kRX3Sn9jqzcULW/ODkB
-         hdxYSHKkpRfL4SefqO1vwWVlCPObPdMgzCQMaw3PuCRRNWsFhyhSLT/jTLR0KlpTXpUZ
-         HzUNz9trHQydWZRRCeJMp587zwPHKv+qn+qmN2KFL22HWkmumzXmtNWKSN/jLT9tvI1S
-         yXG8zybnE6a/DRAXsQ6ceNe0EX5yeuKIEUVBcIM6259HKXRPPdF3mBtneHN7LPz4OX8l
-         jKqUxcnU+1k1ysbZCF6pLLjhbB/mRLWvOEYFe7RXQlyR50GJQDqepPhatNJ6OYt4nwd2
-         inaQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUrXKBvqma/B130bEsLwxD8t6u23BdDRhNXNXRQSrBjN0PzZHNEM69yaDvUJyGNVLHox7zkgOJeuBA3DQ3/YzzpQcMVexUq
-X-Gm-Message-State: AOJu0YzP6MxycKeTcC77fTL/mOHvNfaEl5lWj4QPtdLeN60gQpinSpP6
-	XjTd/4iCH18kyPg5xRxx2S9/zP/LdBC7isj1u+QRAWHi/AjXIosclHwDnHWZg1hUpG1jaJy9FEU
-	kyIIszDArMHXbPU2YTsi9QDzff3zENwp6aoF+O18sMH5HXxrNcHEbIGTRbN050030xB6GLjjmcv
-	vXQ/L7NZ8FOMsRy0uKUuUctMDJeV8x
-X-Received: by 2002:a05:6000:45:b0:366:ebd1:3bc1 with SMTP id ffacd0b85a97d-3716ccd71aemr1739829f8f.3.1723543622994;
-        Tue, 13 Aug 2024 03:07:02 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFDvTUTDd+LsRhjmB6zNVog1K4fVcAdlK3qvWE8ZDFz2Q/6hzL0KTKDRwibjwzk8bnEf5C27ISqUKXY48zo5Zg=
-X-Received: by 2002:a05:6000:45:b0:366:ebd1:3bc1 with SMTP id
- ffacd0b85a97d-3716ccd71aemr1739813f8f.3.1723543622487; Tue, 13 Aug 2024
- 03:07:02 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qHuxyvBd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A42C9C4AF0B;
+	Tue, 13 Aug 2024 10:44:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723545849;
+	bh=KeAEfHGzQzII5PNpXANK31ac/qnVj2yuiImhA5avUVY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=qHuxyvBdOdpzMhJavvgEjaLnFY81a+R8A2ajo4+t8Pbp11VG/QUxP1GvmjZBzBc/r
+	 ol9mB5kJ7ME4xMRa12S7lyAAowvNlSk/Xv4musANzFPo1ztszVk1DKoX6Tg6SgNyuH
+	 RqvcZoZ9RIJliDSH/4wNS5YA67toUUWbiBwpn8ws1QKvUptal7Fr2CbVfSisQfLbVV
+	 HUVlFaWN89I3kq592Tw+AV+IF+efDoL+uvS6OHYrpb5WjRsAkFkVrBasr60+7R/WqI
+	 dRdjYmZhuWTRv2vt0X5S+pIy1EUfUY/8sf5h/6WjnvMsrDT41aYTo/myVFa2vt2RF3
+	 xJqVuAyW/c0tA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sdp0Z-003JD1-Kh;
+	Tue, 13 Aug 2024 11:44:07 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Mark Brown <broonie@kernel.org>
+Subject: [PATCH v3 0/8] KVM: arm64: Add support for FP8
+Date: Tue, 13 Aug 2024 11:43:52 +0100
+Message-Id: <20240813104400.1956132-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <ZrXPY7yIG0eu8mQU@linux.dev>
-In-Reply-To: <ZrXPY7yIG0eu8mQU@linux.dev>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 13 Aug 2024 12:06:51 +0200
-Message-ID: <CABgObfa=AL_+-oYAAOYM+gbS=UXnoBfsroohB5B+b1g4cvoJbg@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.11, round #1
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, Alexander Potapenko <glider@google.com>, Mark Brown <broonie@kernel.org>, 
-	Fuad Tabba <tabba@google.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Takahiro Itazuri <itazur@amazon.com>, Sebastian Ott <sebott@redhat.com>, 
-	Danilo Krummrich <dakr@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, tabba@google.com, joey.gouly@arm.com, broonie@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Aug 9, 2024 at 10:12=E2=80=AFAM Oliver Upton <oliver.upton@linux.de=
-v> wrote:
->
-> Hi Paolo,
->
-> Decent bit of fixes this time around. The most noteworthy among these
-> is probably Marc's vgic fix that closes a race which can precipitate a
-> UAF, as seen w/ syskaller.
->
-> Please pull.
+Although FP8 support was merged in 6.9, the KVM side was dropped, with
+no sign of it being picked up again. Given that its absence is getting
+in the way of NV upstreaming (HCRX_EL2 needs fleshing out), here's a
+small series addressing it.
 
-Pulled, thanks.
+The support is following the save/restore model established for the
+rest of the FP code, with FPMR being tied to it. The sole additions
+are the handling of traps in a nested context, and the corresponding
+ID registers being made writable. As an extra cleanup, SVCR and FPMR
+are moved into the sysreg array.
 
-Paolo
+Patches are on top of v6.11-rc1. Note that this is compile-tested
+only, as I have no access to FP8 HW or model (and running NV in a
+model is not something I wish to entertain ever again).
 
-> --
-> Thanks,
-> Oliver
->
-> The following changes since commit 8400291e289ee6b2bf9779ff1c83a291501f01=
-7b:
->
->   Linux 6.11-rc1 (2024-07-28 14:19:55 -0700)
->
-> are available in the Git repository at:
->
->   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kv=
-marm-fixes-6.11-1
->
-> for you to fetch changes up to 9eb18136af9fe4dd688724070f2bfba271bd1542:
->
->   KVM: arm64: vgic: Hold config_lock while tearing down a CPU interface (=
-2024-08-08 16:58:22 +0000)
->
-> ----------------------------------------------------------------
-> KVM/arm64 fixes for 6.11, round #1
->
->  - Use kvfree() for the kvmalloc'd nested MMUs array
->
->  - Set of fixes to address warnings in W=3D1 builds
->
->  - Make KVM depend on assembler support for ARMv8.4
->
->  - Fix for vgic-debug interface for VMs without LPIs
->
->  - Actually check ID_AA64MMFR3_EL1.S1PIE in get-reg-list selftest
->
->  - Minor code / comment cleanups for configuring PAuth traps
->
->  - Take kvm->arch.config_lock to prevent destruction / initialization
->    race for a vCPU's CPUIF which may lead to a UAF
->
-> ----------------------------------------------------------------
-> Danilo Krummrich (1):
->       KVM: arm64: free kvm->arch.nested_mmus with kvfree()
->
-> Fuad Tabba (1):
->       KVM: arm64: Tidying up PAuth code in KVM
->
-> Marc Zyngier (2):
->       KVM: arm64: Enforce dependency on an ARMv8.4-aware toolchain
->       KVM: arm64: vgic: Hold config_lock while tearing down a CPU interfa=
-ce
->
-> Mark Brown (1):
->       KVM: selftests: arm64: Correct feature test for S1PIE in get-reg-li=
-st
->
-> Sebastian Ott (3):
->       KVM: arm64: fix override-init warnings in W=3D1 builds
->       KVM: arm64: fix kdoc warnings in W=3D1 builds
->       KVM: arm64: vgic: fix unexpected unlock sparse warnings
->
-> Takahiro Itazuri (1):
->       docs: KVM: Fix register ID of SPSR_FIQ
->
-> Zenghui Yu (1):
->       KVM: arm64: vgic-debug: Exit the iterator properly w/o LPI
->
->  Documentation/virt/kvm/api.rst                     |  2 +-
->  arch/arm64/include/asm/kvm_ptrauth.h               |  2 +-
->  arch/arm64/kvm/Kconfig                             |  1 +
->  arch/arm64/kvm/Makefile                            |  3 +++
->  arch/arm64/kvm/arm.c                               | 15 +++++----------
->  arch/arm64/kvm/hyp/include/hyp/switch.h            |  1 -
->  arch/arm64/kvm/hyp/nvhe/Makefile                   |  2 ++
->  arch/arm64/kvm/hyp/nvhe/switch.c                   |  5 ++---
->  arch/arm64/kvm/hyp/vhe/Makefile                    |  2 ++
->  arch/arm64/kvm/nested.c                            |  2 +-
->  arch/arm64/kvm/vgic/vgic-debug.c                   |  5 +++--
->  arch/arm64/kvm/vgic/vgic-init.c                    |  3 +--
->  arch/arm64/kvm/vgic/vgic-irqfd.c                   |  7 ++++---
->  arch/arm64/kvm/vgic/vgic-its.c                     | 18 +++++++++++-----=
---
->  arch/arm64/kvm/vgic/vgic-v3.c                      |  2 +-
->  arch/arm64/kvm/vgic/vgic.c                         |  2 +-
->  arch/arm64/kvm/vgic/vgic.h                         |  2 +-
->  tools/testing/selftests/kvm/aarch64/get-reg-list.c |  4 ++--
->  18 files changed, 42 insertions(+), 36 deletions(-)
->
+* From v2 [2]
+
+  - Add missing kern_hyp_va() when dereferencing vcpu->kvm on nVHE
+    setups
+
+* From v1 [1]
+
+  - Correctly save/restore the guest state (duh), including pKVM
+    (double duh)
+
+  - Add a predicate for FPMR support in a VM, as this gets used more
+    than twice...
+
+[1] https://lore.kernel.org/r/20240708154438.1218186-1-maz@kernel.org
+[2] https://lore.kernel.org/r/20240708154438.1218186-1-maz@kernel.org
+
+Marc Zyngier (8):
+  KVM: arm64: Move SVCR into the sysreg array
+  KVM: arm64: Add predicate for FPMR support in a VM
+  KVM: arm64: Move FPMR into the sysreg array
+  KVM: arm64: Add save/restore support for FPMR
+  KVM: arm64: Honor trap routing for FPMR
+  KVM: arm64: Expose ID_AA64FPFR0_EL1 as a writable ID reg
+  KVM: arm64: Enable FP8 support when available and configured
+  KVM: arm64: Expose ID_AA64PFR2_EL1 to userspace and guests
+
+ arch/arm64/include/asm/kvm_host.h       | 20 ++++++++++--
+ arch/arm64/kvm/emulate-nested.c         |  8 +++++
+ arch/arm64/kvm/fpsimd.c                 |  5 +--
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  3 ++
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  9 ++++++
+ arch/arm64/kvm/hyp/nvhe/switch.c        |  9 ++++++
+ arch/arm64/kvm/hyp/vhe/switch.c         |  3 ++
+ arch/arm64/kvm/sys_regs.c               | 42 +++++++++++++++++++++++--
+ 8 files changed, 92 insertions(+), 7 deletions(-)
+
+-- 
+2.39.2
 
