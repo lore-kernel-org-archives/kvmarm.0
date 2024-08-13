@@ -1,179 +1,162 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ABA319923D;
-	Tue, 13 Aug 2024 12:47:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D03019B5B8
+	for <kvmarm@lists.linux.dev>; Tue, 13 Aug 2024 13:38:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723553271; cv=none; b=ctx2IbTXQ29bJUsErK1zrM2R69atSbQxLmBoMJqYkgMd9ok1QM6HEnKltTg/lKHsukoQJmOXe4hFjZ6ouWqvE+SSVZUtFvklWX0TEI6hlV7swqCFKXMB+zHlGl0jtUjCCv3ZvDsBAOyAwJUAEtBT/fsFvGShxJAL1xp4FCyk9ig=
+	t=1723556289; cv=none; b=mXhnVx3XxSOb+puAB6AsdsIxt2rioW0QcwE5EBeV7+NueJbdwIbBhriInpZvSLaHOm7wxOGFUj36kl9c6JEgvV2RVKl5LLugBkH/353M4uiNiVhUsri4WidsSl+NgX/WO9iYzKQywsKSn2pog2Vtb5H4EspQ42Kk5olhbZNmeL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723553271; c=relaxed/simple;
-	bh=orcxlu4mFWbtOQTPvb5VDP/fc5WJYshCiS3ICkhDed8=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qtl0ebwEY7rSXoNUZR6v/3mhVfixFoNgrz8ypjUXDFutAD2ISeNCft1Up21FJOiMIv624o4YAeGue+/jQWaXEmmslschSDAsORJKZt0SS1EWV4Krpi4EEOyWq2L33qO9S8Fgvu4e1SJ0UMctgatRlYdY1PcjWtuP+/ukHmueo2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hIvKQ2pi; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hIvKQ2pi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D18AC4AF0E;
-	Tue, 13 Aug 2024 12:47:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723553271;
-	bh=orcxlu4mFWbtOQTPvb5VDP/fc5WJYshCiS3ICkhDed8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hIvKQ2piX2QnLNQenzQh1uh6XJSryy5zpUu7blgoq6ylVvLszS7nliuF3gBKXYKt4
-	 BEq0akyRSKHCaAKtzuBOy1Mxq3gCu459BP8N5erCJTFUNPQf6GgLwj0KlzXUffjqH/
-	 3SP/ghU0WA96e3TybLMVyyiJlDQy+zMtlEIvKGlt5EEo7p4cnd5BlTcr0M8MSx7ntf
-	 q6m+nkw702Pj2je6GLt/LsG0miJUXbHGrMkECcm9nMiEtGJgzGwaov1HADuSa9tEZx
-	 u5MsuzRUmil2Di1gFcwebsp18uVNF5YElWP3Tc3jGe2R8gJwdFby2JJChQUxWDJYus
-	 at6S9ZEG84wNQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sdqwG-003Lpw-Tl;
-	Tue, 13 Aug 2024 13:47:48 +0100
-Date: Tue, 13 Aug 2024 13:47:48 +0100
-Message-ID: <86y150zj0r.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
+	s=arc-20240116; t=1723556289; c=relaxed/simple;
+	bh=kVnKTGUyx186WH53rJ1bkIhT8F/92+Amrllr42j6lFs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=E9AdGCeNxUUAImT1hL74K3OSIve0COHCLsr+psFHZcL7rxGZ8g8w5qOVVTjyuF0pgkkMm/KVitUXPA286mMbsE8fnIPnOyVFRQHFUQV3+xBBFITd0IPNZ9mhcZNdWKWDVR9uE/iRxCKoCqXv5Jg8Ccs59mwJkiGXT6pypqYmGW4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4E28112FC;
+	Tue, 13 Aug 2024 06:38:33 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 234A93F6A8;
+	Tue, 13 Aug 2024 06:38:06 -0700 (PDT)
+Date: Tue, 13 Aug 2024 14:38:01 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Fuad Tabba <tabba@google.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, Fuad Tabba <tabba@google.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v3 8/8] KVM: arm64: Expose ID_AA64PFR2_EL1 to userspace and guests
-In-Reply-To: <20240813105710.GA3154421@e124191.cambridge.arm.com>
+Subject: Re: [PATCH v3 8/8] KVM: arm64: Expose ID_AA64PFR2_EL1 to userspace
+ and guests
+Message-ID: <20240813133801.GA3180143@e124191.cambridge.arm.com>
 References: <20240813104400.1956132-1-maz@kernel.org>
-	<20240813104400.1956132-9-maz@kernel.org>
-	<20240813105710.GA3154421@e124191.cambridge.arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <20240813104400.1956132-9-maz@kernel.org>
+ <20240813105710.GA3154421@e124191.cambridge.arm.com>
+ <86y150zj0r.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, tabba@google.com, broonie@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86y150zj0r.wl-maz@kernel.org>
 
-On Tue, 13 Aug 2024 11:57:10 +0100,
-Joey Gouly <joey.gouly@arm.com> wrote:
-> 
-> Hello!
-> 
-> On Tue, Aug 13, 2024 at 11:44:00AM +0100, Marc Zyngier wrote:
-> > Everything is now in place for a guest to "enjoy" FP8 support.
-> > Expose ID_AA64PFR2_EL1 to both userspace and guests, with the
-> > explicit restriction of only being able to clear FPMR.
+On Tue, Aug 13, 2024 at 01:47:48PM +0100, Marc Zyngier wrote:
+> On Tue, 13 Aug 2024 11:57:10 +0100,
+> Joey Gouly <joey.gouly@arm.com> wrote:
 > > 
-> > All other features (MTE* at the time of writing) are hidden
-> > and not writable.
+> > Hello!
 > > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/sys_regs.c | 16 +++++++++++++++-
-> >  1 file changed, 15 insertions(+), 1 deletion(-)
+> > On Tue, Aug 13, 2024 at 11:44:00AM +0100, Marc Zyngier wrote:
+> > > Everything is now in place for a guest to "enjoy" FP8 support.
+> > > Expose ID_AA64PFR2_EL1 to both userspace and guests, with the
+> > > explicit restriction of only being able to clear FPMR.
+> > > 
+> > > All other features (MTE* at the time of writing) are hidden
+> > > and not writable.
+> > > 
+> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > > ---
+> > >  arch/arm64/kvm/sys_regs.c | 16 +++++++++++++++-
+> > >  1 file changed, 15 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > > index 51627add0a72..da6d017f24a1 100644
+> > > --- a/arch/arm64/kvm/sys_regs.c
+> > > +++ b/arch/arm64/kvm/sys_regs.c
+> > > @@ -1722,6 +1722,15 @@ static u64 read_sanitised_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+> > >  	return val;
+> > >  }
+> > >  
+> > > +static u64 read_sanitised_id_aa64pfr2_el1(struct kvm_vcpu *vcpu,
+> > > +					  const struct sys_reg_desc *rd)
+> > > +{
+> > > +	u64 val = read_sanitised_ftr_reg(SYS_ID_AA64PFR2_EL1);
+> > > +
+> > > +	/* We only expose FPMR */
+> > > +	return val & ID_AA64PFR2_EL1_FPMR;
+> > > +}
 > > 
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index 51627add0a72..da6d017f24a1 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -1722,6 +1722,15 @@ static u64 read_sanitised_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
-> >  	return val;
-> >  }
-> >  
-> > +static u64 read_sanitised_id_aa64pfr2_el1(struct kvm_vcpu *vcpu,
-> > +					  const struct sys_reg_desc *rd)
-> > +{
-> > +	u64 val = read_sanitised_ftr_reg(SYS_ID_AA64PFR2_EL1);
-> > +
-> > +	/* We only expose FPMR */
-> > +	return val & ID_AA64PFR2_EL1_FPMR;
-> > +}
+> > Wondering why you're adding this function instead of extending __kvm_read_sanitised_id_reg()?
+> >
+> > > +
+> > >  #define ID_REG_LIMIT_FIELD_ENUM(val, reg, field, limit)			       \
+> > >  ({									       \
+> > >  	u64 __f_val = FIELD_GET(reg##_##field##_MASK, val);		       \
+> > > @@ -2381,7 +2390,12 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+> > >  		   ID_AA64PFR0_EL1_AdvSIMD |
+> > >  		   ID_AA64PFR0_EL1_FP), },
+> > >  	ID_SANITISED(ID_AA64PFR1_EL1),
+> > > -	ID_UNALLOCATED(4,2),
+> > > +	{ SYS_DESC(SYS_ID_AA64PFR2_EL1),
+> > > +	  .access	= access_id_reg,
+> > > +	  .get_user	= get_id_reg,
+> > > +	  .set_user	= set_id_reg,
+> > > +	  .reset	= read_sanitised_id_aa64pfr2_el1,
+> > > +	  .val		= ID_AA64PFR2_EL1_FPMR, },
+> > 
+> > Then I think this would just be ID_WRITABLE(ID_AA64PFR2_EL1, ID_AA64PFR2_EL1_FPMR).
 > 
-> Wondering why you're adding this function instead of extending __kvm_read_sanitised_id_reg()?
->
-> > +
-> >  #define ID_REG_LIMIT_FIELD_ENUM(val, reg, field, limit)			       \
-> >  ({									       \
-> >  	u64 __f_val = FIELD_GET(reg##_##field##_MASK, val);		       \
-> > @@ -2381,7 +2390,12 @@ static const struct sys_reg_desc sys_reg_descs[] = {
-> >  		   ID_AA64PFR0_EL1_AdvSIMD |
-> >  		   ID_AA64PFR0_EL1_FP), },
-> >  	ID_SANITISED(ID_AA64PFR1_EL1),
-> > -	ID_UNALLOCATED(4,2),
-> > +	{ SYS_DESC(SYS_ID_AA64PFR2_EL1),
-> > +	  .access	= access_id_reg,
-> > +	  .get_user	= get_id_reg,
-> > +	  .set_user	= set_id_reg,
-> > +	  .reset	= read_sanitised_id_aa64pfr2_el1,
-> > +	  .val		= ID_AA64PFR2_EL1_FPMR, },
+> Yeah, that's an interesting point. I'm afraid I have lost track of the
+> many helpers that have been added over time.
 > 
-> Then I think this would just be ID_WRITABLE(ID_AA64PFR2_EL1, ID_AA64PFR2_EL1_FPMR).
+> Something like this?
 
-Yeah, that's an interesting point. I'm afraid I have lost track of the
-many helpers that have been added over time.
+LGTM!
 
-Something like this?
-
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index da6d017f24a1..2d1e45178422 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1539,6 +1539,10 @@ static u64 __kvm_read_sanitised_id_reg(const struct kvm_vcpu *vcpu,
- 
- 		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_SME);
- 		break;
-+	case SYS_ID_AA64PFR2_EL1:
-+		/* We only expose FPMR */
-+		val &= ID_AA64PFR2_EL1_FPMR;
-+		break;
- 	case SYS_ID_AA64ISAR1_EL1:
- 		if (!vcpu_has_ptrauth(vcpu))
- 			val &= ~(ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_APA) |
-@@ -1722,15 +1726,6 @@ static u64 read_sanitised_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
- 	return val;
- }
- 
--static u64 read_sanitised_id_aa64pfr2_el1(struct kvm_vcpu *vcpu,
--					  const struct sys_reg_desc *rd)
--{
--	u64 val = read_sanitised_ftr_reg(SYS_ID_AA64PFR2_EL1);
--
--	/* We only expose FPMR */
--	return val & ID_AA64PFR2_EL1_FPMR;
--}
--
- #define ID_REG_LIMIT_FIELD_ENUM(val, reg, field, limit)			       \
- ({									       \
- 	u64 __f_val = FIELD_GET(reg##_##field##_MASK, val);		       \
-@@ -2390,12 +2385,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 		   ID_AA64PFR0_EL1_AdvSIMD |
- 		   ID_AA64PFR0_EL1_FP), },
- 	ID_SANITISED(ID_AA64PFR1_EL1),
--	{ SYS_DESC(SYS_ID_AA64PFR2_EL1),
--	  .access	= access_id_reg,
--	  .get_user	= get_id_reg,
--	  .set_user	= set_id_reg,
--	  .reset	= read_sanitised_id_aa64pfr2_el1,
--	  .val		= ID_AA64PFR2_EL1_FPMR, },
-+	ID_WRITABLE(ID_AA64PFR2_EL1, ID_AA64PFR2_EL1_FPMR),
- 	ID_UNALLOCATED(4,3),
- 	ID_WRITABLE(ID_AA64ZFR0_EL1, ~ID_AA64ZFR0_EL1_RES0),
- 	ID_HIDDEN(ID_AA64SMFR0_EL1),
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index da6d017f24a1..2d1e45178422 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1539,6 +1539,10 @@ static u64 __kvm_read_sanitised_id_reg(const struct kvm_vcpu *vcpu,
+>  
+>  		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_SME);
+>  		break;
+> +	case SYS_ID_AA64PFR2_EL1:
+> +		/* We only expose FPMR */
+> +		val &= ID_AA64PFR2_EL1_FPMR;
+> +		break;
+>  	case SYS_ID_AA64ISAR1_EL1:
+>  		if (!vcpu_has_ptrauth(vcpu))
+>  			val &= ~(ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_APA) |
+> @@ -1722,15 +1726,6 @@ static u64 read_sanitised_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+>  	return val;
+>  }
+>  
+> -static u64 read_sanitised_id_aa64pfr2_el1(struct kvm_vcpu *vcpu,
+> -					  const struct sys_reg_desc *rd)
+> -{
+> -	u64 val = read_sanitised_ftr_reg(SYS_ID_AA64PFR2_EL1);
+> -
+> -	/* We only expose FPMR */
+> -	return val & ID_AA64PFR2_EL1_FPMR;
+> -}
+> -
+>  #define ID_REG_LIMIT_FIELD_ENUM(val, reg, field, limit)			       \
+>  ({									       \
+>  	u64 __f_val = FIELD_GET(reg##_##field##_MASK, val);		       \
+> @@ -2390,12 +2385,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  		   ID_AA64PFR0_EL1_AdvSIMD |
+>  		   ID_AA64PFR0_EL1_FP), },
+>  	ID_SANITISED(ID_AA64PFR1_EL1),
+> -	{ SYS_DESC(SYS_ID_AA64PFR2_EL1),
+> -	  .access	= access_id_reg,
+> -	  .get_user	= get_id_reg,
+> -	  .set_user	= set_id_reg,
+> -	  .reset	= read_sanitised_id_aa64pfr2_el1,
+> -	  .val		= ID_AA64PFR2_EL1_FPMR, },
+> +	ID_WRITABLE(ID_AA64PFR2_EL1, ID_AA64PFR2_EL1_FPMR),
+>  	ID_UNALLOCATED(4,3),
+>  	ID_WRITABLE(ID_AA64ZFR0_EL1, ~ID_AA64ZFR0_EL1_RES0),
+>  	ID_HIDDEN(ID_AA64SMFR0_EL1),
+> 
+> Thanks,
+> 
+> 	M.
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
