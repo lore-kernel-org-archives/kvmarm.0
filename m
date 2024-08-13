@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4433119FA8E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 705D11A00D0;
 	Tue, 13 Aug 2024 14:47:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723560479; cv=none; b=lOCXAikRMLSm5c8jnF/hHjZ//fi7kGlwpDyFgSh6FYWWpWiY+Wdv4mXo02WspfbK6NsIlSxQmh9/b3nhWIhyfY6sNi5vkM1216ADX4iXUlDrpLBl/vRFfBHdBpPTxkMOTXUtFWep37H3z8VeFbm7NyPj/i8BrWzPkA9y/3jf1iQ=
+	t=1723560479; cv=none; b=UGNq33MjOMEMp9dZKPfJdjoV86MZ/T21cE4Hl1cZhmO8uXtIqPYjaYJ8GcyT4bzPzwadekUMYgAqLsdo65LsoqPP6UY32XraunO97HM+aXUMQb2l8En8FyhKVX8wWy66tyzeUxlDOycSFOeQCDLYLCEvQZR6wGX1T8uKdTmau1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1723560479; c=relaxed/simple;
-	bh=hMvaTIIDsws2gWarUwjsfFWKccw4pmnymZDpQdb9O2M=;
+	bh=ffoZGFIxqM7xv66FGMTRLGczJEXgIqnAiwt3W1CgEKE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=GZKzvVyOyL34T2iqFvNZIpH8upT4T9L8DqY5akacYB/7V1zsAZD+doWx9YHZFp7QTKxLUbwD9J1kfMFMfBpigtgENgX8mEXbaJl9I9suHPQTPJpvSVnoJTaOkt+dqtcyTwVXu+3vBt9WmcFsKv0mK6lpMrLdGYCMSGF+li0kYPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FFuLmPln; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=pseuJgpr7ayB1ckvilGbBmlJa8MpfXNFaHuwjWqkyheXCvxJmoXtEa2sb0H2Eo1NqIV9n7PlWzVCGnXm5qytYOMpR5tetcOUaNcoXaP5LFxrp9evVOms/8tUtrTPpLqftBXoHqinvu/HChhNlP0M5+DhyxXYKC1IiD8F80oFZpM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yf5Q24ZK; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FFuLmPln"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16697C4AF18;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yf5Q24ZK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13077C4AF0B;
 	Tue, 13 Aug 2024 14:47:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1723560479;
-	bh=hMvaTIIDsws2gWarUwjsfFWKccw4pmnymZDpQdb9O2M=;
+	bh=ffoZGFIxqM7xv66FGMTRLGczJEXgIqnAiwt3W1CgEKE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=FFuLmPlnki+A6KNzfNt3bJRtM120mELggB2D0lAavBB1tIQZ9nbigi0OMG9ZvuVVs
-	 auGmEKfO96zwikNqfO+KJS+y2kMWy02XGPY1IVCzoPg3fcitJ9OAeCNMMv/HLhz4Wh
-	 tn/Ipgh60DbUmVqYfWkwuhHnZnvhSXFFTmSWJUQDnHaxjuJmlxxMDdM5UqmsYmhT3O
-	 HMKJ9hoUAAiQm5OHI4x9OocSegOO+m3ffw3mS+i0mLqg52efWMTNc+Sa2NkVqSYbnJ
-	 LD2G6d3D9+BprlnC/zUGLeTDvZdGu7BnUC/YaKVMxu0ax8jqS2Eu2Y5B4d6fRxbOUQ
-	 pGOoC478eM8Qw==
+	b=Yf5Q24ZK02j7lMO+tm5EQ320nqC4YCnMQreegy+3BhzJBpruYdeGwVnEg36lccXaq
+	 FokVoW2eO6crbLwId9e+grv5dxHFJoWvRuyA9YvtIt9v3SQJY+lXM1kDphLOYKLMFx
+	 z8aOj8kXSD3r5mr9DPQ3z9QYBOW0YntMKTUC2lVwYU/rihAjDJKiOeDDnR3XKk35/C
+	 bCI2dA4jJ0xAxTiTsPhKNfR5nDHjeIxC4OfIDnXV+nyOeYUxteQKme3w23Cqcjpbz6
+	 Zj6ojUdyaFTxU/eXNi/LFsETSygosjbr8kQQkNkf5EY8vN99CYhli90SMDTljM/oIn
+	 4eER39So1t51A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sdsoW-003O27-VD;
+	id 1sdsoX-003O27-Aj;
 	Tue, 13 Aug 2024 15:47:57 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -42,9 +42,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [PATCH 04/10] KVM: arm64: Add save/restore for TCR2_EL2
-Date: Tue, 13 Aug 2024 15:47:32 +0100
-Message-Id: <20240813144738.2048302-5-maz@kernel.org>
+Subject: [PATCH 06/10] arm64: Remove VNCR definition for PIRE0_EL2
+Date: Tue, 13 Aug 2024 15:47:34 +0100
+Message-Id: <20240813144738.2048302-7-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240813144738.2048302-1-maz@kernel.org>
 References: <20240813144738.2048302-1-maz@kernel.org>
@@ -60,38 +60,30 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Like its EL1 equivalent, TCR2_EL2 gets context-switched.
-This is made conditional on FEAT_TCRX being adversised.
+As of the ARM ARM Known Issues document 102105_K.a_04_en, D22677
+fixes a problem with the PIRE0_EL2 register, resulting in its
+removal from the VNCR page (it had no purpose being there the
+first place).
+
+Follow the architecture update by removing this offset.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/vhe/sysreg-sr.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ arch/arm64/include/asm/vncr_mapping.h | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-index 6db5b4d0f3a4..7099775cd505 100644
---- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-@@ -51,6 +51,9 @@ static void __sysreg_save_vel2_state(struct kvm_cpu_context *ctxt)
- 		ctxt_sys_reg(ctxt, TTBR1_EL2)	= read_sysreg_el1(SYS_TTBR1);
- 		ctxt_sys_reg(ctxt, TCR_EL2)	= read_sysreg_el1(SYS_TCR);
- 
-+		if (ctxt_has_tcrx(ctxt))
-+			ctxt_sys_reg(ctxt, TCR2_EL2) = read_sysreg_el1(SYS_TCR2);
-+
- 		/*
- 		 * The EL1 view of CNTKCTL_EL1 has a bunch of RES0 bits where
- 		 * the interesting CNTHCTL_EL2 bits live. So preserve these
-@@ -108,6 +111,9 @@ static void __sysreg_restore_vel2_state(struct kvm_cpu_context *ctxt)
- 		write_sysreg_el1(val, SYS_TCR);
- 	}
- 
-+	if (ctxt_has_tcrx(ctxt))
-+		write_sysreg_el1(ctxt_sys_reg(ctxt, TCR2_EL2), SYS_TCR2);
-+
- 	write_sysreg_el1(ctxt_sys_reg(ctxt, ESR_EL2),	SYS_ESR);
- 	write_sysreg_el1(ctxt_sys_reg(ctxt, AFSR0_EL2),	SYS_AFSR0);
- 	write_sysreg_el1(ctxt_sys_reg(ctxt, AFSR1_EL2),	SYS_AFSR1);
+diff --git a/arch/arm64/include/asm/vncr_mapping.h b/arch/arm64/include/asm/vncr_mapping.h
+index df2c47c55972..9e593bb60975 100644
+--- a/arch/arm64/include/asm/vncr_mapping.h
++++ b/arch/arm64/include/asm/vncr_mapping.h
+@@ -50,7 +50,6 @@
+ #define VNCR_VBAR_EL1           0x250
+ #define VNCR_TCR2_EL1		0x270
+ #define VNCR_PIRE0_EL1		0x290
+-#define VNCR_PIRE0_EL2		0x298
+ #define VNCR_PIR_EL1		0x2A0
+ #define VNCR_ICH_LR0_EL2        0x400
+ #define VNCR_ICH_LR1_EL2        0x408
 -- 
 2.39.2
 
