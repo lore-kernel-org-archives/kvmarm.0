@@ -1,93 +1,141 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7215719EEC2;
-	Tue, 13 Aug 2024 14:35:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C8811D68F;
+	Tue, 13 Aug 2024 14:47:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723559740; cv=none; b=f7Xzyz8HdsXqMZTmr0bJNaPb7WPf4VlE5W3il3Eo1Y4HIUEooQp1CoaGiVx/1zDCU3/ooPWwb5uuIhRHPigBElbtDFFwKmDqTnWfDyPsfFREuSn5Jt/iMJDD/+idXAYO0vTI8WomD3qZ9a72MQSKH0btgKK6PbkstY79p5avmz8=
+	t=1723560477; cv=none; b=svlva5izgerxkztL/NXQTMcLao1DjKOsBwVCOAK1RkzfF4V9vE6PeJ50UzGZNDBpFSvonZoh0BBYyT3F/tdO4fkzD08GQd9OZhRh6KX3CYFf2Sxpmq+R88IG8WmnlJrS23Vs/vhkM75RYH73OE+3+jH8M4oqb9z96Bph0JWa+98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723559740; c=relaxed/simple;
-	bh=dhGepppGGmSWpWeZiWkVz8+PeRCv7f8LwNPwF7Czhv0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OaNNT9p61boOkuWVu9JjQHFcVsC6X0Ta76XAs3IugpP8AebRe0gLrlWd08gUlUlHp8ggRrdMCcxSmSDeyBiP2KhgqcNfbSI9/bkVX6IYcuLUyIXPucasTuBtrkleDG8VbDyM9bMBEqGs9mxd+IbdX2p6KcrahNwhtTU2DOYFVtA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0806C4AF09;
-	Tue, 13 Aug 2024 14:35:38 +0000 (UTC)
-Date: Tue, 13 Aug 2024 10:35:37 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: mhiramat@kernel.org, linux-trace-kernel@vger.kernel.org, maz@kernel.org,
- oliver.upton@linux.dev, kvmarm@lists.linux.dev, will@kernel.org,
- qperret@google.com, kernel-team@android.com
-Subject: Re: [RFC PATCH 02/11] ring-buffer: Introducing ring-buffer writer
-Message-ID: <20240813103537.441321aa@rorschach.local.home>
-In-Reply-To: <ZrtsAl4zpdMFAN4q@google.com>
-References: <20240805173234.3542917-1-vdonnefort@google.com>
-	<20240805173234.3542917-3-vdonnefort@google.com>
-	<20240806163953.5ec6551a@gandalf.local.home>
-	<ZrtsAl4zpdMFAN4q@google.com>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1723560477; c=relaxed/simple;
+	bh=tQhs6sQmLRKSXnFl/3yZscrAIYRb7Tz89+/QXGEXSMs=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=d2jKcF7ccjFYmK3FBmXDzPet/fdqSMgZ54PG+1kbVlY/upRZDqm1fOJ6ygrWsIgut2s7BVy9lzzxH2dxfwcJXkQa3G9BI1nySC/MIg3DkykqzDm2kd4D8MW76emxRkAW+yX9p3XYt0Mh0SjQbd9wXN430xT2B3eBeBb0CDlflk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mua16IWe; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mua16IWe"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39227C4AF0F;
+	Tue, 13 Aug 2024 14:47:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723560477;
+	bh=tQhs6sQmLRKSXnFl/3yZscrAIYRb7Tz89+/QXGEXSMs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=mua16IWe6C4QYn718rOjMLNbcblOr9rsWmY/KNFHaN/rzsgwnJ2FYozg3S0ZXHdn3
+	 XQqvSKUmzsFM35dhx/cX4M+iQX6oPUYRLzg5SEHAiotV6yp8PnENggPN7wRFON2QZq
+	 WT1vZ/oVaslkagtXHsZPDncrFnM69Log5qb2FwBXSKKldd+FZdgwQJbXZLMhAB3+Sm
+	 GjBnQF7BchOLmTtemcYGleEXt49v8BPK0ce0BtIDO1bA2ftTGiNFaXhypcghIv/kVH
+	 GsvtmU3jrhUoJvlpf2ds+ZBh1YkfHP4iiy4SrPisFAecIV+fdL6J8wfYDGLGtsdqQv
+	 /xUCotHq+So0g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sdsoV-003O27-D7;
+	Tue, 13 Aug 2024 15:47:55 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: [PATCH 01/10] KVM: arm64: nv: Handle CNTHCTL_EL2 specially
+Date: Tue, 13 Aug 2024 15:47:29 +0100
+Message-Id: <20240813144738.2048302-2-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240813144738.2048302-1-maz@kernel.org>
+References: <20240813144738.2048302-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com, alexandru.elisei@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 13 Aug 2024 15:21:54 +0100
-Vincent Donnefort <vdonnefort@google.com> wrote:
+Accessing CNTHCTL_EL2 is fraught with danger if running with
+HCR_EL2.E2H=1: half of the bits are held in CNTKCTL_EL1, and
+thus can be changed behind our back, while the rest lives
+in the CNTHCTL_EL2 shadow copy that is memory-based.
 
-> > > +
-> > > +#define for_each_rb_page_desc(__pdesc, __cpu, __trace_pdesc)				\
-> > > +	for (__pdesc = (struct rb_page_desc *)&((__trace_pdesc)->__data[0]), __cpu = 0;	\
-> > > +	     __cpu < (__trace_pdesc)->nr_cpus;						\
-> > > +	     __cpu++, __pdesc = __next_rb_page_desc(__pdesc))
-> > > +
-> > > +static inline
-> > > +struct rb_page_desc *rb_page_desc(struct trace_page_desc *trace_pdesc, int cpu)
-> > > +{
-> > > +	struct rb_page_desc *pdesc;
-> > > +	int i;
-> > > +
-> > > +	if (!trace_pdesc)
-> > > +		return NULL;
-> > > +
-> > > +	for_each_rb_page_desc(pdesc, i, trace_pdesc) {
-> > > +		if (pdesc->cpu == cpu)  
-> > 
-> > Is there a reason for the linear search?
-> > 
-> > Why not just:
-> > 
-> > 	if (cpu >= trace_pdesc->nr_cpus)
-> > 		return NULL;
-> > 
-> > 	len = struct_size(pdesc, page_va, pdesc->nr_page_va);
-> > 	pdesc = (void *)&(trace_pdesc->__data[0]);
-> > 
-> > 	return pdesc + len * cpu;
-> > 
-> > (note I don't think you need to typecast the void pointer).  
-> 
-> I supposed we can't assume buffers will be allocated for each CPU, hence the
-> need to look at each buffer.
+Yes, this is a lot of fun!
 
-OK, but by default that should be the fast path. We could add the above
-and then do:
+Make sure that we merge the two on read access, while we can
+write to CNTKCTL_EL1 in a more straightforward manner.
 
-	pdesc += len * cpu;
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/sys_regs.c    | 28 ++++++++++++++++++++++++++++
+ include/kvm/arm_arch_timer.h |  3 +++
+ 2 files changed, 31 insertions(+)
 
-	if (pdesc->cpu == cpu)
-		return pdesc;
-
-	/* Missing CPUs, need to do a linear search */
-
-	for_each_rb_page_desc(pdesc, i, trace_pdesc) {
-		if (pdesc->cpu == cpu)
-	[...]
-
--- Steve
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index c90324060436..95832881fd66 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -140,6 +140,21 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+ 		if (!is_hyp_ctxt(vcpu))
+ 			goto memory_read;
+ 
++		/*
++		 * CNTHCTL_EL2 requires some special treatment to
++		 * account for the bits that can be set via CNTKCTL_EL1.
++		 */
++		switch (reg) {
++		case CNTHCTL_EL2:
++			if (vcpu_el2_e2h_is_set(vcpu)) {
++				val = read_sysreg_el1(SYS_CNTKCTL);
++				val &= CNTKCTL_VALID_BITS;
++				val |= __vcpu_sys_reg(vcpu, reg) & ~CNTKCTL_VALID_BITS;
++				return val;
++			}
++			break;
++		}
++
+ 		/*
+ 		 * If this register does not have an EL1 counterpart,
+ 		 * then read the stored EL2 version.
+@@ -190,6 +205,19 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
+ 		 */
+ 		__vcpu_sys_reg(vcpu, reg) = val;
+ 
++		switch (reg) {
++		case CNTHCTL_EL2:
++			/*
++			 * If E2H=0, CNHTCTL_EL2 is a pure shadow register.
++			 * Otherwise, some of the bits are backed by
++			 * CNTKCTL_EL1, while the rest is kept in memory.
++			 * Yes, this is fun stuff.
++			 */
++			if (vcpu_el2_e2h_is_set(vcpu))
++				write_sysreg_el1(val, SYS_CNTKCTL);
++			return;
++		}
++
+ 		/* No EL1 counterpart? We're done here.? */
+ 		if (reg == el1r)
+ 			return;
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+index c819c5d16613..fd650a8789b9 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -147,6 +147,9 @@ u64 timer_get_cval(struct arch_timer_context *ctxt);
+ void kvm_timer_cpu_up(void);
+ void kvm_timer_cpu_down(void);
+ 
++/* CNTKCTL_EL1 valid bits as of DDI0487J.a */
++#define CNTKCTL_VALID_BITS	(BIT(17) | GENMASK_ULL(9, 0))
++
+ static inline bool has_cntpoff(void)
+ {
+ 	return (has_vhe() && cpus_have_final_cap(ARM64_HAS_ECV_CNTPOFF));
+-- 
+2.39.2
 
