@@ -1,151 +1,146 @@
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 683891B3F16
-	for <kvmarm@lists.linux.dev>; Wed, 14 Aug 2024 14:49:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5FBF1B374D
+	for <kvmarm@lists.linux.dev>; Wed, 14 Aug 2024 14:51:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723646974; cv=none; b=eG9HuD+sOvgYSHV6KuHQj4bKNt65Yk/tDZdUGuOxRj9mM5LIRqYlDoSsQDwCNAeO4L+2GzdvOgFAJUvI0hu+dZk6+8hnPJeDDtuZV7nGeVWuC5woiWFA+OUI+J55tXoyex4UhRqTqphHwzWgj8c4lt60HbHlg5xtnRNlAbBrNQM=
+	t=1723647112; cv=none; b=s6mFy4Rwqm3dFr+hanW/n03x1nJ6nOkQRYrB0+NboQwqIlzwwghTuSnDZuc/Z4JkeZBZGRunkRfWlQ4OPYcTOfDtyNkI+cppiYDEYadnxsNCaVW9YuBBqCjOCIBw5a7VF2lwUFGfJ6FMh1SzXBFYx5FlFut6HGSK/idte/4BwPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723646974; c=relaxed/simple;
-	bh=/+q2N0WMy8zi1EQ8v8/v51IJF0vlxa+BET4jSNKtPHI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=TgbZTR6rDaNP3VHxBLg1du3Ca1C9GxMlmjlWSvVWvshKzS1BOF78eZjPIQV0mgA/70I7hLrj8sJdoWjcSMLeKV3qS9zwUFekwvY/pLpP6iyKQWH2iePDriaYlVWNKGwxV/57cDHf0q4Do/mnVqOoN+Ih07bQ/VjZqgGVzUi5jEM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XcADASfs; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XcADASfs"
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1fc52d3c76eso72886615ad.3
-        for <kvmarm@lists.linux.dev>; Wed, 14 Aug 2024 07:49:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723646973; x=1724251773; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DnSCSaSy3plYeVBVOGtckRrfN95Z3a9Gqe/5qm41Hxk=;
-        b=XcADASfsNwyLC8H8HkTbC3BniyW+X1LCWbvPOfmeOfN2y9f2T7DuA7c1pAVc27nVP+
-         Td7XeEGikVMC66BfwpDsXT/hIurSvHH5DltbXCvm9qhwflGb9+S8XMGzg9YH5yGsTuxp
-         bPVNdb1/kpsier9cam/secOsIH2nn4HUq8D76n3zFFLYUtrLZjwM/a0v9UrIkwr6bhGL
-         ueoiQ0i+eX1iPoaMkOH+sty+A7bK0eQmUGnbdN75SG1NVbg1qA95DAh/Z6MntN+GzNDr
-         mv6olqJfXPcqrB0Gvt5RlIoT38yNkmmhhWB0oQADZM87gflTkuEHASDxjth1G8pYPz9N
-         blBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723646973; x=1724251773;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DnSCSaSy3plYeVBVOGtckRrfN95Z3a9Gqe/5qm41Hxk=;
-        b=TWOSbaaWyS+h+gzV5gaNK5EDvakZL2Y1AncM2MWtB8urQeBs3yjyoYOS+aRvtuPQ9I
-         I8Pujg8poY2So2iTi/BuENpIM+A9+AyAC8aMLCMJ0piXntTMTlsA58CxW5ukfnWo492p
-         eDV2+j0WK6HggrbOZXs+gPMIUaJmhZBQ83fwmfHJnNgaflow5fC+flijq1IjQmtXJ24J
-         F6mrn4Lbo8iIuWWGVQl+SouxxoXxSYHL7R3Q9eX3nMYo2+IfT4XiMxGZmK0boPIX7t0Q
-         kMP1IDPo7SOurWXdwauF5MbMn/Yc6fXKj/+gabg7Yo07/YIZZ+MCpYUiVEB4PQQFqkr/
-         Yrag==
-X-Forwarded-Encrypted: i=1; AJvYcCXo8yURWF/wgVqGWqM/w+7DIcteD6QGIho37nNcZNmnsZ94wPInn1sIDfp1TjwPIugGQCYJJ3nBODtepIzHLPP0oREpcebs
-X-Gm-Message-State: AOJu0Yy0Kv5Gl2axO/KnF1Sw7qnu1J4g/SZY5Ve4SkkPGtHU1x6O0EXA
-	ZBmyZ/X/RsUqbY0P1GrIA/8Prhkwr43b3GAHB18ePhcCSHBJnkF23o2KsBKITaCeCiahTmYa4u9
-	x9Q==
-X-Google-Smtp-Source: AGHT+IFB61s8uHv+FQHeDsB6TsbibBjrr/ZwNididN1e3znPTPIm8eFzYZIoLcM3rfqSDWNYlAvaPhyrfFs=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:6544:b0:201:dc7b:a8b5 with SMTP id
- d9443c01a7336-201dc7bac0emr541235ad.12.1723646972522; Wed, 14 Aug 2024
- 07:49:32 -0700 (PDT)
-Date: Wed, 14 Aug 2024 07:49:31 -0700
-In-Reply-To: <yq5ajzgjy1jp.fsf@kernel.org>
+	s=arc-20240116; t=1723647112; c=relaxed/simple;
+	bh=E1PvKzZfFbl9Y7vjlzg9rl6r2PYqNMNxihVjb/Okon4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RI4JI0ZaAkoLbES6TtAguSGJfub3DbxgIzH7Qk02VZxWgcPaUFOMymyuFl4wHNOLigLEsN7Sbmz8DnnqrPJ0OVgzRQ/TDQKNgLRXLXgWUEUNPuAph+BdIoe52KAidM+ikPoROBGWIsqBwylw1ZUZMUt8g7rOKytxy4n3vpYhg/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C4071DA7;
+	Wed, 14 Aug 2024 07:52:14 -0700 (PDT)
+Received: from e133380.arm.com (e133380.arm.com [10.1.197.55])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E6CB73F58B;
+	Wed, 14 Aug 2024 07:51:44 -0700 (PDT)
+Date: Wed, 14 Aug 2024 15:51:42 +0100
+From: Dave Martin <Dave.Martin@arm.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Florian Weimer <fweimer@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
+	Ross Burton <ross.burton@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v10 23/40] arm64/signal: Set up and restore the GCS
+ context for signal handlers
+Message-ID: <ZrzEfg5LqdAzgJ6+@e133380.arm.com>
+References: <20240801-arm64-gcs-v10-0-699e2bd2190b@kernel.org>
+ <20240801-arm64-gcs-v10-23-699e2bd2190b@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20240809205158.1340255-1-amoorthy@google.com> <20240809205158.1340255-4-amoorthy@google.com>
- <yq5aikw6ji14.fsf@kernel.org> <ZrtskXJ6jH90pqB2@google.com> <yq5ajzgjy1jp.fsf@kernel.org>
-Message-ID: <ZrzD-3r4XyJr3auG@google.com>
-Subject: Re: [PATCH v2 3/3] KVM: arm64: Perform memory fault exits when
- stage-2 handler EFAULTs
-From: Sean Christopherson <seanjc@google.com>
-To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>
-Cc: Anish Moorthy <amoorthy@google.com>, oliver.upton@linux.dev, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev, jthoughton@google.com, rananta@google.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240801-arm64-gcs-v10-23-699e2bd2190b@kernel.org>
 
-On Wed, Aug 14, 2024, Aneesh Kumar K.V wrote:
-> Sean Christopherson <seanjc@google.com> writes:
+On Thu, Aug 01, 2024 at 01:06:50PM +0100, Mark Brown wrote:
+> When invoking a signal handler we use the GCS configuration and stack
+> for the current thread.
 > 
-> > On Mon, Aug 12, 2024, Aneesh Kumar K.V wrote:
-> >> Anish Moorthy <amoorthy@google.com> writes:
-> >>
-> >> > Right now userspace just gets a bare EFAULT when the stage-2 fault
-> >> > handler fails to fault in the relevant page. Set up a
-> >> > KVM_EXIT_MEMORY_FAULT whenever this happens, which at the very least
-> >> > eases debugging and might also let userspace decide on/take some
-> >> > specific action other than crashing the VM.
-> >> >
-> >> > In some cases, user_mem_abort() EFAULTs before the size of the fault is
-> >> > calculated: return 0 in these cases to indicate that the fault is of
-> >> > unknown size.
-> >> >
-> >>
-> >> VMMs are now converting private memory to shared or vice-versa on vcpu
-> >> exit due to memory fault. This change will require VMM track each page's
-> >> private/shared state so that they can now handle an exit fault on a
-> >> shared memory where the fault happened due to reasons other than
-> >> conversion.
-> >
-> > I don't see how filling kvm_run.memory_fault in more locations changes anything.
-> > The userspace exits are inherently racy, e.g. userspace may have already converted
-> > the page to the appropriate state, thus making KVM's exit spurious.  So either
-> > the VMM already tracks state, or the VMM blindly converts to shared/private.
-> >
+> Since we implement signal return by calling the signal handler with a
+> return address set up pointing to a trampoline in the vDSO we need to
+> also configure any active GCS for this by pushing a frame for the
+> trampoline onto the GCS.  If we do not do this then signal return will
+> generate a GCS protection fault.
 > 
-> I might be missing some details here. The change is adding exit_reason =
-> KVM_EXIT_MEMORY_FAULT to code path which would earlier result in VMM
-> panics?
+> In order to guard against attempts to bypass GCS protections via signal
+> return we only allow returning with GCSPR_EL0 pointing to an address
+> where it was previously preempted by a signal.  We do this by pushing a
+> cap onto the GCS, this takes the form of an architectural GCS cap token
+> with the top bit set and token type of 0 which we add on signal entry
+> and validate and pop off on signal return.  The combination of the top
+> bit being set and the token type mean that this can't be interpreted as
+> a valid token or address.
 > 
-> For ex:
+> Reviewed-by: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> ---
+>  arch/arm64/include/asm/gcs.h |   1 +
+>  arch/arm64/kernel/signal.c   | 134 +++++++++++++++++++++++++++++++++++++++++--
+>  arch/arm64/mm/gcs.c          |   1 +
+>  3 files changed, 131 insertions(+), 5 deletions(-)
 > 
-> @@ -1473,6 +1475,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> 	if (unlikely(!vma)) {
-> 		kvm_err("Failed to find VMA for hva 0x%lx\n", hva);
-> 		mmap_read_unlock(current->mm);
-> +		kvm_prepare_memory_fault_exit(vcpu, fault_ipa, 0,
-> +					      write_fault, exec_fault, false);
-> 		return -EFAULT;
-> 	}
-> 
-> 
-> VMMs handle this with code as below
-> 
-> static bool handle_memoryfault(struct kvm_cpu *vcpu)
-> {
-> ....
->         return true;
-> }
-> 
-> bool kvm_cpu__handle_exit(struct kvm_cpu *vcpu)
-> {
-> 	switch (vcpu->kvm_run->exit_reason) {
->         ...
-> 	case KVM_EXIT_MEMORY_FAULT:
-> 		return handle_memoryfault(vcpu);
-> 	}
-> 
-> 	return false;
-> }
-> 
-> and the caller did
-> 
-> 		ret = kvm_cpu__handle_exit(cpu);
-> 		if (!ret)
-> 			goto panic_kvm;
-> 		break;
-> 
-> 
-> This change will break those VMMs isn't? ie, we will not panic after
-> this change?
+> diff --git a/arch/arm64/kernel/signal.c b/arch/arm64/kernel/signal.c
 
-If the VMM unconditionally resumes the guest on errno=EFAULT, that's a VMM bug.
-handle_memoryfault() needs to have some amount of checking to verify that it can
-actually resolve the fault that was reported, given the gfn and metadata.  In
-practice, that means panicking on any gfn that's not associated with a memslot
-that has KVM_MEM_GUEST_MEMFD, because prior to this series, it's impossible for
-userspace to resolve any faults besides implict shared<=>private conversions.
+[...]
+
+> +#ifdef CONFIG_ARM64_GCS
+> +
+> +static int gcs_signal_entry(__sigrestore_t sigtramp, struct ksignal *ksig)
+> +{
+> +	unsigned long __user *gcspr_el0;
+> +	int ret = 0;
+> +
+> +	if (!system_supports_gcs())
+> +		return 0;
+> +
+> +	if (!task_gcs_el0_enabled(current))
+> +		return 0;
+> +
+> +	/*
+> +	 * We are entering a signal handler, current register state is
+> +	 * active.
+> +	 */
+> +	gcspr_el0 = (unsigned long __user *)read_sysreg_s(SYS_GCSPR_EL0);
+> +
+> +	/*
+> +	 * Push a cap and the GCS entry for the trampoline onto the GCS.
+> +	 */
+> +	put_user_gcs((unsigned long)sigtramp, gcspr_el0 - 2, &ret);
+> +	put_user_gcs(GCS_SIGNAL_CAP(gcspr_el0 - 1), gcspr_el0 - 1, &ret);
+> +	if (ret != 0)
+> +		return ret;
+
+What happens if we went wrong here, or if the signal we are delivering
+was caused by a GCS overrun or bad GCSPR_EL0 in the first place?
+
+It feels like a program has no way to rescue itself from excessive
+recursion in some thread.  Is there something equivalent to
+sigaltstack()?
+
+Or is the shadow stack always supposed to be big enough to cope with
+recursion that exhausts the main stack and alternate signal stack (and
+if so, how is this ensured)?
+
+> +
+> +	gcsb_dsync();
+> +
+> +	gcspr_el0 -= 2;
+> +	write_sysreg_s((unsigned long)gcspr_el0, SYS_GCSPR_EL0);
+> +
+> +	return 0;
+> +}
+
+[...]
+
+Cheers
+---Dave
