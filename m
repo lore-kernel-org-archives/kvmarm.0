@@ -1,105 +1,169 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2F2E15C9
-	for <kvmarm@lists.linux.dev>; Wed, 14 Aug 2024 12:34:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E81A1E535
+	for <kvmarm@lists.linux.dev>; Wed, 14 Aug 2024 13:30:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723638878; cv=none; b=F/tS+OVEw+bskdRPT6dTmnVZNdjoxl++lMmzcZiGq3DFzagVJn7U81HRU5qBMhaB1+ioAE13RbBTOILC1BuLx5WRVnXfg3wGO71/7H0IF8sqr9j9jJ3XcZFdH/ywa5QPaU8GwEb4bVYM2sAV0DhSRJZOOEmcWKVUC7wlFZkKAIw=
+	t=1723642256; cv=none; b=jFkeJVKqpjGtOemKqiejWbPF1ezbnPl/VaBJUobsufcMznf4ns8J6+jRjhnVf4iUDROlZ1xcBUt4GhSleyYO4mrphhGDWeiNIN5aMlDLppg2qZ1A+DIGYHeEHfU7OCpQJIUWxi4/YV+q9pyIQ+VrXyTcaYg2Q8PAShdxIc+7EAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723638878; c=relaxed/simple;
-	bh=SI9hLU+Or0+BIYHu7IxOEE+FRI74wNTkfKN9m2X+qIY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=cNiogucvACQN5OdKWvjZZsgNXkwcSini9/GQlmtNc42jflkd3Oa9L+/0gzdV5/i5lXy3e1NUY7JnmpZiKE7iLXz1vvpfFP4VNuTmlQRjWylATBOLNNeMy71xma7qDCJd+aNDVUp6SplFVOafslDetHyJTUcUTCWVYS8G7sau4bA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m41DBnEk; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1723642256; c=relaxed/simple;
+	bh=6PEuPukI+6pCm/WZ+0rZZCOQMHCGiIb3Ln74vcVm85Q=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ApbPWT0h4nQeUbLeRJM2o422yB5DYOaPVADi3QyoKCasmOYXLkxzMTu0P87DfqlE0+NzLV8ocY1NAGhxtmnrl1/k6sZpUsCSPrEPlJQiWo+53RrDdEkLp9y1+Sq/GUSPGlgsr0QeWMJmKVlnyigHn4HqYKubikIO+IMkwT3/1s4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i1ubjz1D; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m41DBnEk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B104C4AF0F;
-	Wed, 14 Aug 2024 12:34:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i1ubjz1D"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D55CEC32786;
+	Wed, 14 Aug 2024 13:30:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723638877;
-	bh=SI9hLU+Or0+BIYHu7IxOEE+FRI74wNTkfKN9m2X+qIY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=m41DBnEkuZzQXiBPWqDVtAfQYIR+76WzHtf4ojE+XtbKqyK4rp9VAqFcTKg57oyhx
-	 owEiP/4BZ6d01vCWfLKfs9+DW0s8498PWh6HMG7rhdGxIg1pFbv2wdCtpVquNcgkey
-	 rxNce//66CabRrWCj8DclvoBYN2kLXK5pRuV3t1XQdrtgpLgMbW/an8rp3tonmVR2k
-	 eDDl/yzt+rX1oQu2KYfpagfPCcxLNNv2HxG+jhFFPasB6S0VXS1Di44KaZlYOPspqo
-	 Q0i1BxpV68mHPXz9I85Fte9OPg8T17n4CLjC7O/dQ2tj9eHQ1uP6W3L1Jo01qAOh/F
-	 weudeHNopNTCg==
-From: Will Deacon <will@kernel.org>
-To: linux-arm-kernel@lists.infradead.org
-Cc: Will Deacon <will@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
+	s=k20201202; t=1723642255;
+	bh=6PEuPukI+6pCm/WZ+0rZZCOQMHCGiIb3Ln74vcVm85Q=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=i1ubjz1DXBzvMLx2fPT+p/DlJVztCOo4Sw0/J9799UByx24X6P8HBgOYYuBHfTDNv
+	 DCWmoq7IF3hDOyrJ3fW3I8DU4WY5OJtgh2U5q8TE6o9noOjqsnltJqOnQQnQYcawCV
+	 l7v+Y0EFGtkdkqzDWtxU3MvGqhufJKJ7wHmcTrapiZAZNUdYYd9X4jhKz1yMUgwRzP
+	 ksEu8HbAd7d4oeb/CUY9r2DOyOU1STiutF6pBBkrXIsoLdM/McacOzv4rNCUjXisdo
+	 WWgaDLGUpftpBa18MJoxTjxbWWxHKDm+fi4HMmvTKDt1GZpAXaPgCYCepJac8K03ua
+	 GgMP04vyv9g6w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1seE5V-003gBe-Q0;
+	Wed, 14 Aug 2024 14:30:53 +0100
+Date: Wed, 14 Aug 2024 14:30:53 +0100
+Message-ID: <86ttfnz0xe.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Will Deacon <will@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Fuad Tabba <tabba@google.com>,
 	kvmarm@lists.linux.dev
-Subject: [PATCH 2/2] KVM: arm64: Ensure TLBI uses correct VMID after changing context
-Date: Wed, 14 Aug 2024 13:34:29 +0100
-Message-Id: <20240814123429.20457-3-will@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20240814123429.20457-1-will@kernel.org>
+Subject: Re: [PATCH 2/2] KVM: arm64: Ensure TLBI uses correct VMID after changing context
+In-Reply-To: <20240814123429.20457-3-will@kernel.org>
 References: <20240814123429.20457-1-will@kernel.org>
+	<20240814123429.20457-3-will@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: will@kernel.org, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, tabba@google.com, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-When the target context passed to enter_vmid_context() matches the
-current running context, the function returns early without manipulating
-the registers of the stage-2 MMU. This can result in a stale VMID due to
-the lack of an ISB instruction in exit_vmid_context() after writing the
-VTTBR when ARM64_WORKAROUND_SPECULATIVE_AT is not enabled.
+Hi Will,
 
-For example, with pKVM enabled:
+On Wed, 14 Aug 2024 13:34:29 +0100,
+Will Deacon <will@kernel.org> wrote:
+> 
+> When the target context passed to enter_vmid_context() matches the
+> current running context, the function returns early without manipulating
+> the registers of the stage-2 MMU. This can result in a stale VMID due to
+> the lack of an ISB instruction in exit_vmid_context() after writing the
 
-	// Initially running in host context
-	enter_vmid_context(guest);
-		-> __load_stage2(guest); isb	// Writes VTCR & VTTBR
-	exit_vmid_context(guest);
-		-> __load_stage2(host);		// Restores VTCR & VTTBR
+This refers to the exit_vmid_context() *before* a subsequent
+enter_vmid_context(), right?
 
-	enter_vmid_context(host);
-		-> Returns early as we're already in host context
-	tlbi vmalls12e1is	// !!! Can use the stale VMID as we
-				// haven't performed context
-				// synchronisation since restoring
-				// VTTBR.VMID
+> VTTBR when ARM64_WORKAROUND_SPECULATIVE_AT is not enabled.
 
-Add an unconditional ISB instruction to exit_vmid_context() after
-restoring the VTTBR. This already existed for the
-ARM64_WORKAROUND_SPECULATIVE_AT path, so we can simply hoist that onto
-the common path.
+I'm not sure I completely get the failure mode, so please bear with me.
 
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>
-Cc: Fuad Tabba <tabba@google.com>
-Fixes: 58f3b0fc3b87 ("KVM: arm64: Support TLB invalidation in guest context")
-Signed-off-by: Will Deacon <will@kernel.org>
----
- arch/arm64/kvm/hyp/nvhe/tlb.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> For example, with pKVM enabled:
+> 
+> 	// Initially running in host context
+> 	enter_vmid_context(guest);
+> 		-> __load_stage2(guest); isb	// Writes VTCR & VTTBR
+> 	exit_vmid_context(guest);
+> 		-> __load_stage2(host);		// Restores VTCR & VTTBR
+> 
+> 	enter_vmid_context(host);
+> 		-> Returns early as we're already in host context
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
-index ca3c09df8d7c..48da9ca9763f 100644
---- a/arch/arm64/kvm/hyp/nvhe/tlb.c
-+++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
-@@ -132,10 +132,10 @@ static void exit_vmid_context(struct tlb_inv_context *cxt)
- 	else
- 		__load_host_stage2();
- 
--	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
--		/* Ensure write of the old VMID */
--		isb();
-+	/* Ensure write of the old VMID */
-+	isb();
- 
-+	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
- 		if (!(cxt->sctlr & SCTLR_ELx_M)) {
- 			write_sysreg_el1(cxt->sctlr, SYS_SCTLR);
- 			isb();
+Is this the code you are referring to?
+
+	vcpu = host_ctxt->__hyp_running_vcpu;
+
+	[...]
+
+	if (vcpu) {
+		/*
+		 * We're in guest context. However, for this to work, this needs
+		 * to be called from within __kvm_vcpu_run(), which ensures that
+		 * __hyp_running_vcpu is set to the current guest vcpu.
+		 */
+		if (mmu == vcpu->arch.hw_mmu || WARN_ON(mmu != host_s2_mmu))
+			return;
+
+		cxt->mmu = vcpu->arch.hw_mmu;
+	} else {
+		/* We're in host context. */
+		if (mmu == host_s2_mmu)
+			return;
+
+		cxt->mmu = host_s2_mmu;
+	}
+
+So I take it that no vcpu is running at this point, and that we have
+done a vcpu_put().
+
+Is there an actual path within pKVM that causes a guest TLBI to be
+followed by a host __kvm_tlb_flush_vmid() *without* a CSE? I can't
+convinced myself that such a path exist in the current upstream code
+base.
+
+> 	tlbi vmalls12e1is	// !!! Can use the stale VMID as we
+> 				// haven't performed context
+> 				// synchronisation since restoring
+> 				// VTTBR.VMID
+> 
+> Add an unconditional ISB instruction to exit_vmid_context() after
+> restoring the VTTBR. This already existed for the
+> ARM64_WORKAROUND_SPECULATIVE_AT path, so we can simply hoist that onto
+> the common path.
+> 
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Oliver Upton <oliver.upton@linux.dev>
+> Cc: Fuad Tabba <tabba@google.com>
+> Fixes: 58f3b0fc3b87 ("KVM: arm64: Support TLB invalidation in guest context")
+> Signed-off-by: Will Deacon <will@kernel.org>
+> ---
+>  arch/arm64/kvm/hyp/nvhe/tlb.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
+> index ca3c09df8d7c..48da9ca9763f 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/tlb.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
+> @@ -132,10 +132,10 @@ static void exit_vmid_context(struct tlb_inv_context *cxt)
+>  	else
+>  		__load_host_stage2();
+>  
+> -	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
+> -		/* Ensure write of the old VMID */
+> -		isb();
+> +	/* Ensure write of the old VMID */
+> +	isb();
+>  
+> +	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
+>  		if (!(cxt->sctlr & SCTLR_ELx_M)) {
+>  			write_sysreg_el1(cxt->sctlr, SYS_SCTLR);
+>  			isb();
+
+The patch itself makes sense to me. I'd just like to understand how we
+end-up in that situation.
+
+Thanks,
+
+	M.
+
 -- 
-2.46.0.76.ge559c4bf1a-goog
-
+Without deviation from the norm, progress is not possible.
