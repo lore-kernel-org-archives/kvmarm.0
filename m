@@ -1,119 +1,125 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8604B43155
-	for <kvmarm@lists.linux.dev>; Tue, 13 Aug 2024 18:20:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 017C213D52F;
+	Wed, 14 Aug 2024 08:03:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723573258; cv=none; b=bnGTYd3b7/gDK3vsA9O1zy0pGdIpWoWVKJSlBZwBXtzMUJVDTIQp08UOxEpqCMaP49xDoUCcIO0rQHiFnqtp0jxrB9aLrZRfIKFbyifpqbrLH6nLkIoHaOcDQOWL/qfZwbNDVRu7TXAkF1K8qx2v/qCjNC8gOxAcjSe4Krw1Z9U=
+	t=1723622582; cv=none; b=dRazm/KlbLYA+8pp5JCDJz+jbEtAig/0ptXkXgfXK+k53BVQFxTH43IDxRzEmFdLW949KkxTvXBkavxtOdjrFLrfVYHqQhictm9r+PWp9zuKlBsQ20Wxtq3U/NH8MpQ+ofmR+bb8Vikfe9GtzP1DHK5sZRQxBPmv4n9iiesvuz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723573258; c=relaxed/simple;
-	bh=orNml0EfHsL/20Fp8OD1Gy6lh554X4vQdFDgJ8ulL20=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Rv3PtkPoLFbrfHHSGtBb4WIwhSnymSQMI+9q8QinjyUdmW9y2z1FbM4BVLLm4MR3b9Oxzdl85R7CfMdN5s/49j9g+k2T5Tb6Ah3a+Xfz64L0nGdJdzjM/whO/hXVueDErH2RnaryucK6OquCpTYZw1d6UH9VMSt9E3SXXbOJIBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UM7Y7TF5; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1723622582; c=relaxed/simple;
+	bh=25E5kitv9sYS9/weg7WZ4WQn27ejAhVnqXHuS1uqRT8=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=nXTDrGhHfSuO1xsY8uVn59AmcJEom4iFG137b5+fw98QcNtMTbpRIYVYV5VElwD6Bgj6dPbMNSR29zNdmpu+6fn2+gqcMTqA46nFXM3SZUZWETTTkv2Om1M5KqvSHBJ87aKiYzL1c5OnNgaBz3ZyK5SQUC1Fj6qSKze8Zu5lduM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CZkB4oc5; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UM7Y7TF5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6F7DC32782;
-	Tue, 13 Aug 2024 18:20:57 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CZkB4oc5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27964C32786;
+	Wed, 14 Aug 2024 08:02:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723573258;
-	bh=orNml0EfHsL/20Fp8OD1Gy6lh554X4vQdFDgJ8ulL20=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UM7Y7TF5TNKAvq/YvqpldIP67N0nknWdDTuQ6rnZGOtKNadHqVPbgGOy3Mn1i6kgw
-	 llmCOjP/kx7iTD0mxkyfW1UDjyvCqL4Q1JEcLa/lDH0ASt5F8bI2NZImvjMvBYbmkj
-	 wJ2/ml7zVA+4ZQoHuoseiwa8PaFEMS9eYWhLPwMyYCi+09/3fOWGIej2lhXqa7/Sl5
-	 /TVQi+gsJQiJxtUOIP6eVAsJIqaJ9YA75/uH50F3Agpbm6Lr8Qm82eky1xhBMs1AqN
-	 yPVEZJrO1UeOV+EnShOvoOX1XR8FNhsQjM+YQdCLEhb4Kc6A4CJXvOgDWPr/KMb8LW
-	 hMa1JZGcLW1AQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sdw8d-003Rae-Ex;
-	Tue, 13 Aug 2024 19:20:55 +0100
-Date: Tue, 13 Aug 2024 19:20:55 +0100
-Message-ID: <86v804z3lk.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Cc: <kvmarm@lists.linux.dev>,
-	<linux-arm-kernel@lists.infradead.org>,
-	<will@kernel.org>,
-	<catalin.marinas@arm.com>,
-	<oliver.upton@linux.dev>,
-	<james.morse@arm.com>,
-	<suzuki.poulose@arm.com>,
-	<yuzenghui@huawei.com>,
-	<wangzhou1@hisilicon.com>,
-	<linuxarm@huawei.com>
-Subject: Re: [PATCH] KVM: arm64: Make the exposed feature bits in AA64DFR0_EL1 writable from userspace
-In-Reply-To: <20240813142835.77180-1-shameerali.kolothum.thodi@huawei.com>
-References: <20240813142835.77180-1-shameerali.kolothum.thodi@huawei.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1723622581;
+	bh=25E5kitv9sYS9/weg7WZ4WQn27ejAhVnqXHuS1uqRT8=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=CZkB4oc5ssGZ9IQxWELOoQaYqg69SjAzMl2N/jT9EIE7zPDoMjtBJTKuqfH3VX7B6
+	 EaSd5Is6FNoqCCdOf7rGhrRPGyXnxPpmtvvnEvlyhiWakcrbZSP9KwVvi/723AnLIU
+	 qiOqAnP+5h4vwxiztd+FTO80T/DbriW9DJd0BFrzm5PJqLuDJbgPEndAZK7uiavEC/
+	 A0i+eebEDQtYXI6ApyR3iY6ynRw4fv7E96bWY09btPuVTuVsXznB7x2jeDhFLoBxl7
+	 Ei/SXt1Jxv+rMlBQosdMnTk+SA0ekSCpa6M0ft9Xvn8KHMDGy6XKDe+N/4eHthtadX
+	 m0qeff23PomSA==
+X-Mailer: emacs 31.0.50 (via feedmail 11-beta-1 I)
+From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Anish Moorthy <amoorthy@google.com>, oliver.upton@linux.dev,
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev, jthoughton@google.com,
+	rananta@google.com
+Subject: Re: [PATCH v2 3/3] KVM: arm64: Perform memory fault exits when
+ stage-2 handler EFAULTs
+In-Reply-To: <ZrtskXJ6jH90pqB2@google.com>
+References: <20240809205158.1340255-1-amoorthy@google.com>
+ <20240809205158.1340255-4-amoorthy@google.com>
+ <yq5aikw6ji14.fsf@kernel.org> <ZrtskXJ6jH90pqB2@google.com>
+Date: Wed, 14 Aug 2024 13:32:50 +0530
+Message-ID: <yq5ajzgjy1jp.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: shameerali.kolothum.thodi@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, will@kernel.org, catalin.marinas@arm.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, wangzhou1@hisilicon.com, linuxarm@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain
 
-On Tue, 13 Aug 2024 15:28:35 +0100,
-Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
-> 
-> KVM exposes the OS double lock feature bit to Guests but returns
-> RAZ/WI on Guest OSDLR_EL1 access. This breaks Guest migration between
-> systems where this feature support differ. Add support to make this
-> feature writable from userspace by setting the mask bit. While at it,
-> set the mask bits for other exposed features in the AA64DFR0_EL1
-> register as well.
-> 
-> Also update the selftest to cover these fields.
-> 
-> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> ---
->    This is based on the discussion here(Thanks to Oliver),
->    https://lore.kernel.org/all/ZrVSlbVwnaMDShah@linux.dev/
-> ---
->  arch/arm64/kvm/sys_regs.c                         | 6 +++++-
->  tools/testing/selftests/kvm/aarch64/set_id_regs.c | 4 ++++
->  2 files changed, 9 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index c90324060436..adb49d681052 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -2376,7 +2376,11 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	  .get_user = get_id_reg,
->  	  .set_user = set_id_aa64dfr0_el1,
->  	  .reset = read_sanitised_id_aa64dfr0_el1,
-> -	  .val = ID_AA64DFR0_EL1_PMUVer_MASK |
-> +	  .val = ID_AA64DFR0_EL1_DoubleLock_MASK |
-> +		 ID_AA64DFR0_EL1_CTX_CMPs_MASK |
-> +		 ID_AA64DFR0_EL1_WRPs_MASK |
-> +		 ID_AA64DFR0_EL1_BRPs_MASK |
+Sean Christopherson <seanjc@google.com> writes:
+
+> On Mon, Aug 12, 2024, Aneesh Kumar K.V wrote:
+>> Anish Moorthy <amoorthy@google.com> writes:
+>>
+>> > Right now userspace just gets a bare EFAULT when the stage-2 fault
+>> > handler fails to fault in the relevant page. Set up a
+>> > KVM_EXIT_MEMORY_FAULT whenever this happens, which at the very least
+>> > eases debugging and might also let userspace decide on/take some
+>> > specific action other than crashing the VM.
+>> >
+>> > In some cases, user_mem_abort() EFAULTs before the size of the fault is
+>> > calculated: return 0 in these cases to indicate that the fault is of
+>> > unknown size.
+>> >
+>>
+>> VMMs are now converting private memory to shared or vice-versa on vcpu
+>> exit due to memory fault. This change will require VMM track each page's
+>> private/shared state so that they can now handle an exit fault on a
+>> shared memory where the fault happened due to reasons other than
+>> conversion.
+>
+> I don't see how filling kvm_run.memory_fault in more locations changes anything.
+> The userspace exits are inherently racy, e.g. userspace may have already converted
+> the page to the appropriate state, thus making KVM's exit spurious.  So either
+> the VMM already tracks state, or the VMM blindly converts to shared/private.
+>
+
+I might be missing some details here. The change is adding exit_reason =
+KVM_EXIT_MEMORY_FAULT to code path which would earlier result in VMM
+panics?
+
+For ex:
+
+@@ -1473,6 +1475,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+	if (unlikely(!vma)) {
+		kvm_err("Failed to find VMA for hva 0x%lx\n", hva);
+		mmap_read_unlock(current->mm);
++		kvm_prepare_memory_fault_exit(vcpu, fault_ipa, 0,
++					      write_fault, exec_fault, false);
+		return -EFAULT;
+	}
 
 
-I think this is going to cause some troubles.
+VMMs handle this with code as below
 
-The issue is that context-aware breakpoints are the highest-numbered
-breakpoints, right after the normal breakpoints (D2.8.3 "Breakpoint
-types and linking of breakpoints"). So if you reduce the number of
-normal breakpoints, you shift the context-aware ones down, and
-everything breaks.
+static bool handle_memoryfault(struct kvm_cpu *vcpu)
+{
+....
+        return true;
+}
 
-I really don't see how you can safely do that without completely
-changing the way we handle the debug registers.
+bool kvm_cpu__handle_exit(struct kvm_cpu *vcpu)
+{
+	switch (vcpu->kvm_run->exit_reason) {
+        ...
+	case KVM_EXIT_MEMORY_FAULT:
+		return handle_memoryfault(vcpu);
+	}
 
-Thanks,
+	return false;
+}
 
-	M.
+and the caller did
 
--- 
-Without deviation from the norm, progress is not possible.
+		ret = kvm_cpu__handle_exit(cpu);
+		if (!ret)
+			goto panic_kvm;
+		break;
+
+
+This change will break those VMMs isn't? ie, we will not panic after
+this change?
+
+-aneesh
