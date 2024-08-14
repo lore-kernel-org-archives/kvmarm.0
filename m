@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9623D15C9
-	for <kvmarm@lists.linux.dev>; Wed, 14 Aug 2024 12:34:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2F2E15C9
+	for <kvmarm@lists.linux.dev>; Wed, 14 Aug 2024 12:34:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723638876; cv=none; b=qYRwh+1OACY/mtwgTUqpHe9iQBcd7HUXQg9J0SlUDeIY0tEAYkNlXc1q9hiDr2/kb2WxaQ3cuyy60RFYrYSli6wS2MyxYqUD1Nfju/9/tUM36V7saJ7bxET3844I/t1rJXPL0phaPtvu1DUbmRxpA0WZr4HSx9dQTQKH735j1SU=
+	t=1723638878; cv=none; b=F/tS+OVEw+bskdRPT6dTmnVZNdjoxl++lMmzcZiGq3DFzagVJn7U81HRU5qBMhaB1+ioAE13RbBTOILC1BuLx5WRVnXfg3wGO71/7H0IF8sqr9j9jJ3XcZFdH/ywa5QPaU8GwEb4bVYM2sAV0DhSRJZOOEmcWKVUC7wlFZkKAIw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723638876; c=relaxed/simple;
-	bh=0lLzlVnV/SkrNnd+QeWCt7iZ7o14ooMiGjV2yyrPM2s=;
+	s=arc-20240116; t=1723638878; c=relaxed/simple;
+	bh=SI9hLU+Or0+BIYHu7IxOEE+FRI74wNTkfKN9m2X+qIY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=XijPhTATUidkS6mehS3sWNu4d2hPwIkiJKwdAGlxPtCgwbV8jnTKCJYkA8nkuOO2eOvhq6YgY9dnhPIxGFZ3wuvgcRbN9iY8JjFn3Ywb3LfUFyRw9zV+FYkOnngoq5dq4Qq6e3z2h3ac1yibbdKpQ2e774Du9HSBU7NUjjHfv4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VtLxct10; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=cNiogucvACQN5OdKWvjZZsgNXkwcSini9/GQlmtNc42jflkd3Oa9L+/0gzdV5/i5lXy3e1NUY7JnmpZiKE7iLXz1vvpfFP4VNuTmlQRjWylATBOLNNeMy71xma7qDCJd+aNDVUp6SplFVOafslDetHyJTUcUTCWVYS8G7sau4bA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m41DBnEk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VtLxct10"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8D5AC4AF0D;
-	Wed, 14 Aug 2024 12:34:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m41DBnEk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B104C4AF0F;
+	Wed, 14 Aug 2024 12:34:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723638876;
-	bh=0lLzlVnV/SkrNnd+QeWCt7iZ7o14ooMiGjV2yyrPM2s=;
+	s=k20201202; t=1723638877;
+	bh=SI9hLU+Or0+BIYHu7IxOEE+FRI74wNTkfKN9m2X+qIY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=VtLxct10ZKkJY0pWU7zuCSgN1dcnsd8uP+UK8cVZD/sjv+gcFdEZvrbP6scD2UlwX
-	 aqDuzWc386Cj+WE9NvUdLVnXJQXsKJ8RJ1lv+0bndNQntMQ8SlTYOywDQrnzspzndY
-	 1C49pY10PUXDH9SPvqICXxynKaIfLDkWpwrlAMYx6Kc6IaAkRrrhYm/D0zoFaKntlT
-	 J6IjVza1NcECTEh8xtNJ4FtzqCbJq4wkEylJCj+ag8AEEI4Pl6ROQxNcDXxcPL2S/I
-	 28g6cdP2u9DN9KFmX6FM5arhCHVFHfPKplZwWCbMZAstd+f29cfkh7yD1ni1lt9OWU
-	 430E23YGvhKxA==
+	b=m41DBnEkuZzQXiBPWqDVtAfQYIR+76WzHtf4ojE+XtbKqyK4rp9VAqFcTKg57oyhx
+	 owEiP/4BZ6d01vCWfLKfs9+DW0s8498PWh6HMG7rhdGxIg1pFbv2wdCtpVquNcgkey
+	 rxNce//66CabRrWCj8DclvoBYN2kLXK5pRuV3t1XQdrtgpLgMbW/an8rp3tonmVR2k
+	 eDDl/yzt+rX1oQu2KYfpagfPCcxLNNv2HxG+jhFFPasB6S0VXS1Di44KaZlYOPspqo
+	 Q0i1BxpV68mHPXz9I85Fte9OPg8T17n4CLjC7O/dQ2tj9eHQ1uP6W3L1Jo01qAOh/F
+	 weudeHNopNTCg==
 From: Will Deacon <will@kernel.org>
 To: linux-arm-kernel@lists.infradead.org
 Cc: Will Deacon <will@kernel.org>,
@@ -33,9 +33,9 @@ Cc: Will Deacon <will@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Fuad Tabba <tabba@google.com>,
 	kvmarm@lists.linux.dev
-Subject: [PATCH 1/2] KVM: arm64: Invalidate EL1&0 TLB entries for all VMIDs in nvhe hyp init
-Date: Wed, 14 Aug 2024 13:34:28 +0100
-Message-Id: <20240814123429.20457-2-will@kernel.org>
+Subject: [PATCH 2/2] KVM: arm64: Ensure TLBI uses correct VMID after changing context
+Date: Wed, 14 Aug 2024 13:34:29 +0100
+Message-Id: <20240814123429.20457-3-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20240814123429.20457-1-will@kernel.org>
 References: <20240814123429.20457-1-will@kernel.org>
@@ -47,35 +47,59 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When initialising the nVHE hypervisor, we invalidate potentially stale
-TLB entries for the EL1&0 regime using a 'vmalls12e1' invalidation.
-However, this invalidation operation applies only to the active VMID
-and therefore we could proceed with stale TLB entries for other VMIDs.
+When the target context passed to enter_vmid_context() matches the
+current running context, the function returns early without manipulating
+the registers of the stage-2 MMU. This can result in a stale VMID due to
+the lack of an ISB instruction in exit_vmid_context() after writing the
+VTTBR when ARM64_WORKAROUND_SPECULATIVE_AT is not enabled.
 
-Replace the operation with an 'alle1' which applies to all entries for
-the EL1&0 regime, regardless of the VMID.
+For example, with pKVM enabled:
+
+	// Initially running in host context
+	enter_vmid_context(guest);
+		-> __load_stage2(guest); isb	// Writes VTCR & VTTBR
+	exit_vmid_context(guest);
+		-> __load_stage2(host);		// Restores VTCR & VTTBR
+
+	enter_vmid_context(host);
+		-> Returns early as we're already in host context
+	tlbi vmalls12e1is	// !!! Can use the stale VMID as we
+				// haven't performed context
+				// synchronisation since restoring
+				// VTTBR.VMID
+
+Add an unconditional ISB instruction to exit_vmid_context() after
+restoring the VTTBR. This already existed for the
+ARM64_WORKAROUND_SPECULATIVE_AT path, so we can simply hoist that onto
+the common path.
 
 Cc: Marc Zyngier <maz@kernel.org>
 Cc: Oliver Upton <oliver.upton@linux.dev>
-Fixes: 1025c8c0c6ac ("KVM: arm64: Wrap the host with a stage 2")
+Cc: Fuad Tabba <tabba@google.com>
+Fixes: 58f3b0fc3b87 ("KVM: arm64: Support TLB invalidation in guest context")
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/kvm/hyp/nvhe/hyp-init.S | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm64/kvm/hyp/nvhe/tlb.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-index 07120b37da35..401af1835be6 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-@@ -130,7 +130,7 @@ alternative_else_nop_endif
+diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
+index ca3c09df8d7c..48da9ca9763f 100644
+--- a/arch/arm64/kvm/hyp/nvhe/tlb.c
++++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
+@@ -132,10 +132,10 @@ static void exit_vmid_context(struct tlb_inv_context *cxt)
+ 	else
+ 		__load_host_stage2();
  
- 	/* Invalidate the stale TLBs from Bootloader */
- 	tlbi	alle2
--	tlbi	vmalls12e1
-+	tlbi	alle1
- 	dsb	sy
+-	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
+-		/* Ensure write of the old VMID */
+-		isb();
++	/* Ensure write of the old VMID */
++	isb();
  
- 	mov_q	x0, INIT_SCTLR_EL2_MMU_ON
++	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
+ 		if (!(cxt->sctlr & SCTLR_ELx_M)) {
+ 			write_sysreg_el1(cxt->sctlr, SYS_SCTLR);
+ 			isb();
 -- 
 2.46.0.76.ge559c4bf1a-goog
 
