@@ -1,41 +1,56 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B7531B3745;
-	Wed, 14 Aug 2024 15:03:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 662931B3F0D
+	for <kvmarm@lists.linux.dev>; Wed, 14 Aug 2024 15:09:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723647834; cv=none; b=kXQSG8jywpE/+3Bj63sfOQRo0ywWBhTueJS5hdL37+gK3ezBR4s24+w4DC7CTEXy+Ob1NfQcQzz+vSeavQdoqFBrMV0KMxNBS3OaTVJgb2mVcTZmGTKNwRK/LP38VUg76ngHps3NUMss4dYBOkKH9Tqlf+zFFilHr4IerYQilZs=
+	t=1723648201; cv=none; b=jPyfkvi9PsqP9yE6G4ujcWz8E15+diebxQajtI1Jp8EIIRLqz1VxHquFKFUCZMfYdufIEGbr1Y7jAzY180kW2UBVvmOtkI5TruxpRUZJXS0LO6eqMiSe2upcBqsUq+x1u7Hmqqs0wNLEo34PTgBLIowpgB1TNVf31Lm57UlC7Ds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723647834; c=relaxed/simple;
-	bh=siu8KpDoN20y20VOLFZmKnaCcTW4RPxpPg9rC0A+0Vs=;
+	s=arc-20240116; t=1723648201; c=relaxed/simple;
+	bh=Ex5i7IuYmiDIp+jR8sdfsK2sQRn/4xZA629mGrDAPFk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Yzv8r2VDOpmDdvOh+f29nMV8yqfXS1gdhawnF9hOcrSxmvRFIJGqPKi8yS4SCMcFd7SCO/QWMgZfWsBw/ehy5CQmCUikr3U788956JJ/KFEAJWRw03pPf1FEjr1TJotuEE4/gZjVqMYlVlQFQOG9LJCG9DvZRkH9X17juabK0QY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 727D4C4AF0A;
-	Wed, 14 Aug 2024 15:03:49 +0000 (UTC)
-Date: Wed, 14 Aug 2024 16:03:47 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org,
-	akpm@linux-foundation.org, aneesh.kumar@kernel.org,
-	aneesh.kumar@linux.ibm.com, bp@alien8.de, broonie@kernel.org,
-	christophe.leroy@csgroup.eu, dave.hansen@linux.intel.com,
-	hpa@zytor.com, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
-	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
-	oliver.upton@linux.dev, shuah@kernel.org, szabolcs.nagy@arm.com,
-	tglx@linutronix.de, will@kernel.org, x86@kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 18/29] arm64: add POE signal support
-Message-ID: <ZrzHU9et8L_0Tv_B@arm.com>
-References: <20240503130147.1154804-1-joey.gouly@arm.com>
- <20240503130147.1154804-19-joey.gouly@arm.com>
- <ZqJ2knGETfS4nfEA@e133380.arm.com>
- <20240801155441.GB841837@e124191.cambridge.arm.com>
- <Zqu2VYELikM5LFY/@e133380.arm.com>
- <20240806103532.GA1986436@e124191.cambridge.arm.com>
- <20240806143103.GB2017741@e124191.cambridge.arm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=QuTvfX5+HVKgKZGscM29tShfMeWzPiTTSSvCmcAg7MFYBiLq2HH3E0rLKBk7aANg3ESQFbxhWgAFSocdJGpqhInKf38vkgfcanuSI4UZU6pKODzkn7pw80uABRM0WX9MnTotfspnLLj3CG46NiMHSlAyDUqrnfcCkxmjWXch1n0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A2CD2DA7;
+	Wed, 14 Aug 2024 08:10:24 -0700 (PDT)
+Received: from e133380.arm.com (e133380.arm.com [10.1.197.55])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 126053F58B;
+	Wed, 14 Aug 2024 08:09:53 -0700 (PDT)
+Date: Wed, 14 Aug 2024 16:09:51 +0100
+From: Dave Martin <Dave.Martin@arm.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Florian Weimer <fweimer@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
+	Ross Burton <ross.burton@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v10 24/40] arm64/signal: Expose GCS state in signal frames
+Message-ID: <ZrzIv3FWNgJizDc2@e133380.arm.com>
+References: <20240801-arm64-gcs-v10-0-699e2bd2190b@kernel.org>
+ <20240801-arm64-gcs-v10-24-699e2bd2190b@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -44,46 +59,82 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240806143103.GB2017741@e124191.cambridge.arm.com>
+In-Reply-To: <20240801-arm64-gcs-v10-24-699e2bd2190b@kernel.org>
 
-Hi Joey,
+On Thu, Aug 01, 2024 at 01:06:51PM +0100, Mark Brown wrote:
+> Add a context for the GCS state and include it in the signal context when
+> running on a system that supports GCS. We reuse the same flags that the
+> prctl() uses to specify which GCS features are enabled and also provide the
+> current GCS pointer.
+> 
+> We do not support enabling GCS via signal return, there is a conflict
+> between specifying GCSPR_EL0 and allocation of a new GCS and this is not
+> an ancticipated use case.  We also enforce GCS configuration locking on
+> signal return.
+> 
+> Reviewed-by: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> ---
+>  arch/arm64/include/uapi/asm/sigcontext.h |   9 +++
+>  arch/arm64/kernel/signal.c               | 106 +++++++++++++++++++++++++++++++
+>  2 files changed, 115 insertions(+)
 
-On Tue, Aug 06, 2024 at 03:31:03PM +0100, Joey Gouly wrote:
-> diff --git arch/arm64/kernel/signal.c arch/arm64/kernel/signal.c
-> index 561986947530..ca7d4e0be275 100644
-> --- arch/arm64/kernel/signal.c
-> +++ arch/arm64/kernel/signal.c
-> @@ -1024,7 +1025,10 @@ static int setup_sigframe_layout(struct rt_sigframe_user_layout *user,
->                         return err;
->         }
+[...]
+
+> diff --git a/arch/arm64/kernel/signal.c b/arch/arm64/kernel/signal.c
+
+[...]
+
+> @@ -999,6 +1092,13 @@ static int setup_sigframe_layout(struct rt_sigframe_user_layout *user,
+>  			return err;
+>  	}
 >  
-> -       if (system_supports_poe()) {
-> +       if (system_supports_poe() &&
-> +                       (add_all ||
-> +                        mm_pkey_allocation_map(current->mm) != 0x1 ||
-> +                        read_sysreg_s(SYS_POR_EL0) != POR_EL0_INIT)) {
->                 err = sigframe_alloc(user, &user->poe_offset,
->                                      sizeof(struct poe_context));
->                 if (err)
-> 
-> 
-> That is, we only save the POR_EL0 value if any pkeys have been allocated (other
-> than pkey 0) *or* if POR_EL0 is a non-default value.
+> +	if (add_all || task_gcs_el0_enabled(current)) {
+> +		err = sigframe_alloc(user, &user->gcs_offset,
+> +				     sizeof(struct gcs_context));
+> +		if (err)
+> +			return err;
+> +	}
+> +
 
-I had a chat with Dave as well on this and, in principle, we don't want
-to add stuff to the signal frame unnecessarily, especially for old
-binaries that have no clue of pkeys. OTOH, it looks like too complicated
-for just 16 bytes. Also POR_EL0 all RWX is a valid combination, I don't
-think we should exclude it.
+Who turns on GCS?  I have a concern that if libc is new enough to be
+built for GCS then the libc startup code will to turn it on, even if
+the binary stack running on top of libc is old.
 
-If no pkey has been allocated, I guess we could skip this and it also
-matches the x86 description of the PKRU being guaranteed to be preserved
-only for the allocated keys. Do we reserve pkey 0 for arm64? I thought
-that's only an x86 thing to emulate execute-only mappings.
+Whether a given library should break old binaries is a bit of a grey
+area, but I think that libraries that deliberately export stable ABIs
+probably shouldn't.
 
-Another corner case would be the signal handler doing a pkey_alloc() and
-willing to populate POR_EL0 on sigreturn. It will have to find room in
-the signal handler, though I don't think that's a problem.
 
--- 
-Catalin
+With that in mind, does any GCS state need to be saved at all?
+
+Is there any scenario where it is legitimate for the signal handler to
+change the shadow stack mode or to return with an altered GCSPR_EL0?
+
+Is the guarded stack considered necessary (or at least beneficial) for
+backtracing, or is the regular stack sufficient?
+
+(I'm assuming that unwind tables / debug info should allow the shadow
+stack to be unwound anyway; rather this question is about whether
+software can straightforwardly find out the interrupted GCSPR_EL0
+without this information... and whether it needs to.)
+
+
+>  	if (system_supports_sve() || system_supports_sme()) {
+>  		unsigned int vq = 0;
+>  
+> @@ -1099,6 +1199,12 @@ static int setup_sigframe(struct rt_sigframe_user_layout *user,
+>  		__put_user_error(current->thread.fault_code, &esr_ctx->esr, err);
+>  	}
+>  
+> +	if (system_supports_gcs() && err == 0 && user->gcs_offset) {
+> +		struct gcs_context __user *gcs_ctx =
+> +			apply_user_offset(user, user->gcs_offset);
+> +		err |= preserve_gcs_context(gcs_ctx);
+> +	}
+> +
+
+[...]
+
+Cheers
+---Dave
