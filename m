@@ -1,146 +1,155 @@
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FD0013AA32
-	for <kvmarm@lists.linux.dev>; Wed, 14 Aug 2024 09:17:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2996C19F461;
+	Wed, 14 Aug 2024 10:08:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723627041; cv=none; b=ZmcQVHYfm+GgiJDtqKpD/cc3mFaK5WY0mEBRh6THjI5+WelNYavNLa4KtJTAfxrOSf53LnFCNxUSynbaYQ18POPYVGYadWaGen8hJTfi9goM4HrnNhoItQan8nj+Nvi6sVwmVjJKZTwz/J1Q5GuQapeGQsNl0tq1aE6WoBDPpUM=
+	t=1723630087; cv=none; b=d2Z9CQkhH47qaQUDWl9r3PBKaUletlvm53cCaLLfxRVs+7bLryfj97VF9afbEAW8+Q/zJazqtUz8u8eCpnYZc/ZKRrYOJeqeWpa3EqSuauoTgqDuI+Ngu5RQfpA0MvOOZRZDWDw5bINCet48gpKftr3dQR4nWln6bgx2V5OdowA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723627041; c=relaxed/simple;
-	bh=WJwi6yHYSwrdh0FNJ6uXg0YK0eD/DkdKs5FzxvuinI8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=GBvfqllrvANeXzEVmXVqV0CdlBuYlr4V8DSZ8IhfO4PTe0bmpoT+SXkyYZ5lJiN8st1Ig4ghG6VK7/EYEH2Sphf3yOkxS3vyyHapAPZHSVZ5UER9dNrx/faZC+T05z0HSgPDg1lRLxmsjAIgungF+nb25U93OIFaB1FUJhcporQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4WkMw52DDTz1S7sK;
-	Wed, 14 Aug 2024 17:12:21 +0800 (CST)
-Received: from dggems701-chm.china.huawei.com (unknown [10.3.19.178])
-	by mail.maildlp.com (Postfix) with ESMTPS id 8F48214013B;
-	Wed, 14 Aug 2024 17:17:13 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
- dggems701-chm.china.huawei.com (10.3.19.178) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Wed, 14 Aug 2024 17:17:12 +0800
-Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
- lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.039;
- Wed, 14 Aug 2024 10:17:10 +0100
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: Marc Zyngier <maz@kernel.org>
-CC: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "will@kernel.org" <will@kernel.org>,
-	"catalin.marinas@arm.com" <catalin.marinas@arm.com>, "oliver.upton@linux.dev"
-	<oliver.upton@linux.dev>, "james.morse@arm.com" <james.morse@arm.com>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, yuzenghui
-	<yuzenghui@huawei.com>, "Wangzhou (B)" <wangzhou1@hisilicon.com>, Linuxarm
-	<linuxarm@huawei.com>, "reijiw@google.com" <reijiw@google.com>
-Subject: RE: [PATCH] KVM: arm64: Make the exposed feature bits in AA64DFR0_EL1
- writable from userspace
-Thread-Topic: [PATCH] KVM: arm64: Make the exposed feature bits in
- AA64DFR0_EL1 writable from userspace
-Thread-Index: AQHa7Y1+WzkgTs0yNU+rMcrsz2HCl7IlbzSAgAEG32A=
-Date: Wed, 14 Aug 2024 09:17:10 +0000
-Message-ID: <b2dad37ac5464384abe4edf76cb6b546@huawei.com>
-References: <20240813142835.77180-1-shameerali.kolothum.thodi@huawei.com>
- <86v804z3lk.wl-maz@kernel.org>
-In-Reply-To: <86v804z3lk.wl-maz@kernel.org>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1723630087; c=relaxed/simple;
+	bh=/O+zco5tN5jy0KvDNjb92RKBNcmlhfZAvjQ/8bbSy3I=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=lW2+p0Xxdtbi7owCUmygvbzj+T4fq6wwpn85SgeGIxQj4YGesC5LFoefJPk5QirQ2ko8Pm/oZY1CZLykX/ej6iAhS5lsbEeZv0u4Zg9EF33cBOMmad0PQ6ltz3F0olD6csGrzY1fC/POHWyVLB2lC/Xo7gE2bOj6u6ubyL1/yvs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bPEvpgQ0; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bPEvpgQ0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5892C32786;
+	Wed, 14 Aug 2024 10:08:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723630086;
+	bh=/O+zco5tN5jy0KvDNjb92RKBNcmlhfZAvjQ/8bbSy3I=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=bPEvpgQ0U+fkLwmsWNq84kZCSmMgiX1pYeIlgBLGk46mtxYwVQGTEfs7Rvzyy0SUn
+	 WRLiMfYE1GuNYh+IBsVPhz3ySdOpoj4lMueIrzdBIHkGqj9BHlZIw2+VDeseKoR1W8
+	 Pjg07EtK951Im6IRvgcZuLPHQF9ZlDPGS5rlC9gKnG4XH7CwrabeCnPdG1JSktFem4
+	 SqU5NhSExUiwCEWQJ10L73fMhbC1dSOlyXBLIoaPAysokoXDYqeYcTUetNeB1IySwn
+	 01lJmqhRDvpK2wlJ3sTvqZ10WIYbk25MbCojER4duDhQxP0d/oKXBm2UqSL//4S1HE
+	 +2mB363qtWoEQ==
+Received: from disco-boy.misterjones.org ([217.182.43.188] helo=www.loen.fr)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1seAvE-003cdg-Ba;
+	Wed, 14 Aug 2024 11:08:04 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Date: Wed, 14 Aug 2024 11:08:03 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ kvm@vger.kernel.org
+Cc: James Morse <james.morse@arm.com>, Suzuki K Poulose
+ <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu
+ <yuzenghui@huawei.com>, Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Anshuman Khandual <anshuman.khandual@arm.com>,
+ Przemyslaw Gaj <pgaj@cadence.com>
+Subject: Re: [PATCH v3 14/18] KVM: arm64: nv: Add SW walker for AT S1
+ emulation
+In-Reply-To: <20240813100540.1955263-15-maz@kernel.org>
+References: <20240813100540.1955263-1-maz@kernel.org>
+ <20240813100540.1955263-15-maz@kernel.org>
+User-Agent: Roundcube Webmail/1.4.15
+Message-ID: <256756ebb8440e1f2a4d90dc0608879f@kernel.org>
+X-Sender: maz@kernel.org
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 217.182.43.188
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com, alexandru.elisei@arm.com, anshuman.khandual@arm.com, pgaj@cadence.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On 2024-08-13 11:05, Marc Zyngier wrote:
+> In order to plug the brokenness of our current AT implementation,
+> we need a SW walker that is going to... err.. walk the S1 tables
+> and tell us what it finds.
+> 
+> Of course, it builds on top of our S2 walker, and share similar
+> concepts. The beauty of it is that since it uses kvm_read_guest(),
+> it is able to bring back pages that have been otherwise evicted.
+> 
+> This is then plugged in the two AT S1 emulation functions as
+> a "slow path" fallback. I'm not sure it is that slow, but hey.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/at.c | 607 +++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 605 insertions(+), 2 deletions(-)
 
+[...]
 
-> -----Original Message-----
-> From: Marc Zyngier <maz@kernel.org>
-> Sent: Tuesday, August 13, 2024 7:21 PM
-> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-> Cc: kvmarm@lists.linux.dev; linux-arm-kernel@lists.infradead.org;
-> will@kernel.org; catalin.marinas@arm.com; oliver.upton@linux.dev;
-> james.morse@arm.com; suzuki.poulose@arm.com; yuzenghui
-> <yuzenghui@huawei.com>; Wangzhou (B) <wangzhou1@hisilicon.com>;
-> Linuxarm <linuxarm@huawei.com>
-> Subject: Re: [PATCH] KVM: arm64: Make the exposed feature bits in
-> AA64DFR0_EL1 writable from userspace
->=20
-> On Tue, 13 Aug 2024 15:28:35 +0100,
-> Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
-> >
-> > KVM exposes the OS double lock feature bit to Guests but returns
-> > RAZ/WI on Guest OSDLR_EL1 access. This breaks Guest migration between
-> > systems where this feature support differ. Add support to make this
-> > feature writable from userspace by setting the mask bit. While at it,
-> > set the mask bits for other exposed features in the AA64DFR0_EL1
-> > register as well.
-> >
-> > Also update the selftest to cover these fields.
-> >
-> > Signed-off-by: Shameer Kolothum
-> <shameerali.kolothum.thodi@huawei.com>
-> > ---
-> >    This is based on the discussion here(Thanks to Oliver),
-> >    https://lore.kernel.org/all/ZrVSlbVwnaMDShah@linux.dev/
-> > ---
-> >  arch/arm64/kvm/sys_regs.c                         | 6 +++++-
-> >  tools/testing/selftests/kvm/aarch64/set_id_regs.c | 4 ++++
-> >  2 files changed, 9 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index c90324060436..adb49d681052 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -2376,7 +2376,11 @@ static const struct sys_reg_desc sys_reg_descs[]
-> =3D {
-> >  	  .get_user =3D get_id_reg,
-> >  	  .set_user =3D set_id_aa64dfr0_el1,
-> >  	  .reset =3D read_sanitised_id_aa64dfr0_el1,
-> > -	  .val =3D ID_AA64DFR0_EL1_PMUVer_MASK |
-> > +	  .val =3D ID_AA64DFR0_EL1_DoubleLock_MASK |
-> > +		 ID_AA64DFR0_EL1_CTX_CMPs_MASK |
-> > +		 ID_AA64DFR0_EL1_WRPs_MASK |
-> > +		 ID_AA64DFR0_EL1_BRPs_MASK |
->=20
->=20
-> I think this is going to cause some troubles.
->=20
-> The issue is that context-aware breakpoints are the highest-numbered
-> breakpoints, right after the normal breakpoints (D2.8.3 "Breakpoint
-> types and linking of breakpoints"). So if you reduce the number of
-> normal breakpoints, you shift the context-aware ones down, and
-> everything breaks.
+> +static u64 handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+> +{
+> +	bool perm_fail, ur, uw, ux, pr, pw, px;
+> +	struct s1_walk_result wr = {};
+> +	struct s1_walk_info wi = {};
+> +	int ret, idx;
+> +
+> +	ret = setup_s1_walk(vcpu, op, &wi, &wr, vaddr);
+> +	if (ret)
+> +		goto compute_par;
+> +
+> +	if (wr.level == S1_MMU_DISABLED)
+> +		goto compute_par;
+> +
+> +	idx = srcu_read_lock(&vcpu->kvm->srcu);
+> +
+> +	ret = walk_s1(vcpu, &wi, &wr, vaddr);
+> +
+> +	srcu_read_unlock(&vcpu->kvm->srcu, idx);
+> +
+> +	if (ret)
+> +		goto compute_par;
+> +
+> +	/* FIXME: revisit when adding indirect permission support */
+> +	/* AArch64.S1DirectBasePermissions() */
+> +	if (wi.regime != TR_EL2) {
+> +		switch (FIELD_GET(PTE_USER | PTE_RDONLY, wr.desc)) {
+> +		case 0b00:
+> +			pr = pw = true;
+> +			ur = uw = false;
+> +			break;
+> +		case 0b01:
+> +			pr = pw = ur = uw = true;
+> +			break;
+> +		case 0b10:
+> +			pr = true;
+> +			pw = ur = uw = false;
+> +			break;
+> +		case 0b11:
+> +			pr = ur = true;
+> +			pw = uw = false;
+> +			break;
+> +		}
+> +
+> +		switch (wr.APTable) {
+> +		case 0b00:
+> +			break;
+> +		case 0b01:
+> +			ur = uw = false;
+> +			break;
+> +		case 0b10:
+> +			pw = uw = false;
+> +			break;
+> +		case 0b11:
+> +			pw = ur = uw = false;
+> +			break;
+> +		}
+> +
+> +		/* We don't use px for anything yet, but hey... */
+> +		px = !((wr.desc & PTE_PXN) || wr.PXNTable || pw);
 
-Thanks Marc for explaining this. I was not aware of this one.
+Annoying (but so far harmless) bug here: the last term should be 'uw',
+and not 'pw'. It is a *userspace* writable permission that disables
+privileged execution. 'pw' would only make sense if with WXN, and
+that has nothing to do with AT at all.
 
-> I really don't see how you can safely do that without completely
-> changing the way we handle the debug registers.
+I've fixed that locally.
 
-Looks like Reji has attempted to do this a while back,=20
-https://lore.kernel.org/kvm/20220419065544.3616948-13-reijiw@google.com/
-
-I guess that one is trying to address the problem you described above, righ=
-t?
-Though, not clear to me what happened  afterwards to these patches in the s=
-eries.
-
-Coming back to this patch, we don't have a requirement now to make the
-breakpoints writable for migration. The only concern is OS Double lock feat=
-ure.=20
-Not sure anyone has a high priority requirement to make the other features
-writable or not. Will it be acceptable if I resent this patch with just OS =
-Double Lock
-being writable?(Sorry If I sound selfish, but at least some progress can be=
- made soon).
-
-Thanks,
-Shameer
+         M.
+-- 
+Jazz is not dead. It just smells funny...
