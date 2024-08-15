@@ -1,38 +1,52 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A66A41B9B5A
-	for <kvmarm@lists.linux.dev>; Thu, 15 Aug 2024 16:48:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 634911B3749;
+	Thu, 15 Aug 2024 17:00:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723740486; cv=none; b=pLMGhric7AxnuXkiJboFeDPYgUgNAWa3LquXdevaCgzbg5Zo7NCMdZ2BUYC796wbH0p7a3nxOCbJO6BVCy+geupsoGq359aYLvaPQfKMYx2LuR0tCdS/LtfodeM3HP/DRN9Ihw33BSxUgYJxF4v4reWI0Si4CVPIbcCa9YZ4Ly8=
+	t=1723741223; cv=none; b=fz04eRcLSvGWh8cuzAj1ZMrAPP8002CPg0EfEZInROP1kroHrRen8B3FhoS4u1eZg/SrxV8D0TTCMPNcNUPDXXrPZHqOc+nszK3iCGPaciuQjo4pMf4Pf5LiW9LvQbDM/6LJ5BDcd3sYmX+qU+xtF4duW+yEop4A1Fs+O0fvZd8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723740486; c=relaxed/simple;
-	bh=Gww+JuGDutyIvvwRzRxDpWv+dAmSrYITFV+aZJsSFeg=;
+	s=arc-20240116; t=1723741223; c=relaxed/simple;
+	bh=Gg6eqMTXx74NWcO2J4NNXwW0PfKl0OCmoU0K7Wl6Ryg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rQFiO2VJedRyIt9215dGe3cvZg+Gslmo/7uHjW1XuUSI3m+h+S31NNQ1u+jmtEPEILWZociDhF6gWZrET1QTupDi/CRlKXcQC8PF7UtepeqdOMr9tiiFWBChRJufPUXwX66T1uI0QG7mC03JilnzR19JcPJCHmHM4w/GQYb7UXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 048FC14BF;
-	Thu, 15 Aug 2024 09:48:30 -0700 (PDT)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E9B6B3F6A8;
-	Thu, 15 Aug 2024 09:48:01 -0700 (PDT)
-Date: Thu, 15 Aug 2024 17:47:58 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=RcoEaH+u6u7K68p7xlsOGdAFbNv0usFHgHjQ/atWBbZIvuOjc2pPi9cz2Y6HGzOCsgiUWB3L66W/ykpdzrBvzSU5QrYUYoN1IWrXrSZD9/vt+AJvSYb34ZOoNfk/L2GuMUzRoGZm+P6iYDJTIaGxYlL8k6u0L8b4MzIbRS9Y2LE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AED9C32786;
+	Thu, 15 Aug 2024 17:00:17 +0000 (UTC)
+Date: Thu, 15 Aug 2024 18:00:15 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>, Joey Gouly <joey.gouly@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Przemyslaw Gaj <pgaj@cadence.com>
-Subject: Re: [PATCH v3 16/18] KVM: arm64: nv: Make AT+PAN instructions aware
- of FEAT_PAN3
-Message-ID: <Zr4xPjLLGSs2JhhS@raptor>
-References: <20240813100540.1955263-1-maz@kernel.org>
- <20240813100540.1955263-17-maz@kernel.org>
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Florian Weimer <fweimer@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
+	Ross Burton <ross.burton@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v10 04/40] arm64: Document boot requirements for Guarded
+ Control Stacks
+Message-ID: <Zr40H4xAb00MdMlX@arm.com>
+References: <20240801-arm64-gcs-v10-0-699e2bd2190b@kernel.org>
+ <20240801-arm64-gcs-v10-4-699e2bd2190b@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -41,62 +55,27 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240813100540.1955263-17-maz@kernel.org>
+In-Reply-To: <20240801-arm64-gcs-v10-4-699e2bd2190b@kernel.org>
 
-Hi Marc,
-
-On Tue, Aug 13, 2024 at 11:05:38AM +0100, Marc Zyngier wrote:
-> FEAT_PAN3 added a check for executable permissions to FEAT_PAN2.
-> Add the required SCTLR_ELx.EPAN and descriptor checks to handle
-> this correctly.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/at.c | 17 ++++++++++++++++-
->  1 file changed, 16 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-> index 6d5555e98557..c134bcd0338d 100644
-> --- a/arch/arm64/kvm/at.c
-> +++ b/arch/arm64/kvm/at.c
-> @@ -728,6 +728,21 @@ static u64 compute_par_s1(struct kvm_vcpu *vcpu, struct s1_walk_result *wr,
->  	return par;
->  }
->  
-> +static bool pan3_enabled(struct kvm_vcpu *vcpu, enum trans_regime regime)
-> +{
-> +	u64 sctlr;
+On Thu, Aug 01, 2024 at 01:06:31PM +0100, Mark Brown wrote:
+> +  - If EL2 is present:
 > +
-> +	if (!kvm_has_feat(vcpu->kvm, ID_AA64MMFR1_EL1, PAN, PAN3))
-> +		return false;
+> +    - GCSCR_EL2 must be initialised to 0.
 > +
-> +	if (regime == TR_EL10)
-> +		sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL1);
-> +	else
-> +		sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL2);
+> + - If the kernel is entered at EL1 and EL2 is present:
 > +
-> +	return sctlr & SCTLR_EL1_EPAN;
-
-Checked that the EPAN is on the same position for SCTLR_EL1 and SCTLR_EL2.
-
-> +}
+> +    - GCSCR_EL1 must be initialised to 0.
 > +
->  static u64 handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
->  {
->  	bool perm_fail, ur, uw, ux, pr, pw, px;
-> @@ -794,7 +809,7 @@ static u64 handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
->  			bool pan;
->  
->  			pan = *vcpu_cpsr(vcpu) & PSR_PAN_BIT;
-> -			pan &= ur || uw;
-> +			pan &= ur || uw || (pan3_enabled(vcpu, wi.regime) && ux);
->  			pw &= !pan;
->  			pr &= !pan;
->  		}
+> +    - GCSCRE0_EL1 must be initialised to 0.
 
-Matches AArch64.S1DirectBasePermissions().
+Currently booting.rst doesn't list *_EL1 registers to be initialised
+when the kernel is entered at EL1, that would usually be the
+responsibility of EL1. The exception is some bits in SCTLR_EL1 around
+not entering with the MMU and caches enabled. But here I think it makes
+sense to add these GCS registers since if some random bits are set, they
+can affect kernels (and user apps) that don't have GCS support.
 
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Don't we need HCRX_EL2.GCSEn to be set when entered at EL1?
 
-Thanks,
-Alex
+-- 
+Catalin
