@@ -1,134 +1,171 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F135D1BBBC1;
-	Wed, 14 Aug 2024 16:21:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B01B1C4624
+	for <kvmarm@lists.linux.dev>; Thu, 15 Aug 2024 08:32:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723652514; cv=none; b=r3MSCah6bq70dpv42QfWQaocr5iXxMwGHY7ZCl+SspKMpj9h2/AhCotoWBLopAe2P7YyyI+N4ArQ3CBlqbcpIrnDpvl5LGRFYOmZKZ9qTtC56PWe4E8mlo5Yhz1OXH0eef4wiESvy4Qj4/t7xtacTDb1fXicixRJdA15l1vWcjc=
+	t=1723710758; cv=none; b=E4ZNz0l6a2waqMxj1yOcsDHzM2vGBSl8ofTytVcpJ6Tly3aRpeA1OH6ztZi/G53k+tkbxGHfozZRnWHvqgVaD+1BMagNs0x5JgOwqGECzdgCE9lwvoymYfWq1O7G8EzBNaXQtgGtnR/11TqxwFbU09VsDjN0k1ltlPfvK2BYmMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723652514; c=relaxed/simple;
-	bh=y8gPBkTOEvl5zKXterrWvlJucqFgWO/8eWjzKQnvzD4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MypPMNqIFcx80G15We0GjLvZpIA/0VzUFScWZrw3gD/EgtXRrmBzU9oDXtlApeuBIpgWmgPgT+foK8IAEuIRCon6ICva2hJJsAkI2GktoBfodfNXPrCQdC1Er+O6d/DO6nYfbKe+WEpQ8yfCuzJAQPv165ezRpDtgC8PAOh2saQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q4rPNJ6Z; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1723710758; c=relaxed/simple;
+	bh=6VumOH6sUbEjX3ePmxvl/Ioiqex2/jEnnPH6/yAeX5A=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FM9IjFNRglu67Dw/AFR1wcaLe8eDqXYKxD2MPuK+4bxJrx8ByGlyB9etxoR25h0cFKxcQdn4yr99pIY60AD9SmZhcZK9ohDuOAyPUQQZJlshJVKzzhcWKLdXR/QyF7X7yae+LWehp73GJU4VkPLwhOare4/7C/+AorGHb0VxS8E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mhV5Mdj0; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q4rPNJ6Z"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F5CBC4AF09;
-	Wed, 14 Aug 2024 16:21:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mhV5Mdj0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 865A6C32786;
+	Thu, 15 Aug 2024 08:32:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723652513;
-	bh=y8gPBkTOEvl5zKXterrWvlJucqFgWO/8eWjzKQnvzD4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Q4rPNJ6ZS8/YTjHc/9HkxRU27ouAY0yibwaXXAm+1vcSBPqrepnOKEU4AR3KEhnOt
-	 s58dD84l+9v/yfPZN6YN2ee+5/Ym6lay4t2aiB6H3CiXfg445fDVhup1StlDclBTyN
-	 d6Tf9ZIXcKqcM2L3sfgF+ddNkeVAxqDhU5qIjR7ZPgaAoUWw/E0xVSN5pIIVghvJgH
-	 ao3pIeIoMl3CcpagSZ9IYoUJzDC0aICQgPiBRlV88oVgdcBIHluUExu1ctrkOZWkoE
-	 9l/H09OLwebwQfZ3EaETR7W2P/kahXmTAg0E5aVvsQbbYfL+9JItY7NLBOg8IGqomK
-	 WAZ23R2KyrVjw==
-Date: Wed, 14 Aug 2024 17:21:44 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Florian Weimer <fweimer@redhat.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
-	Ross Burton <ross.burton@arm.com>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v10 24/40] arm64/signal: Expose GCS state in signal frames
-Message-ID: <7433e3d2-996a-45a0-b917-666a340ad109@sirena.org.uk>
-References: <20240801-arm64-gcs-v10-0-699e2bd2190b@kernel.org>
- <20240801-arm64-gcs-v10-24-699e2bd2190b@kernel.org>
- <ZrzIv3FWNgJizDc2@e133380.arm.com>
+	s=k20201202; t=1723710757;
+	bh=6VumOH6sUbEjX3ePmxvl/Ioiqex2/jEnnPH6/yAeX5A=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mhV5Mdj0yIROnluWPyRKJ9DaCqJd8wvAa87F1BU1gJAf/+CGWtAQNhXHqkJ+wWqQn
+	 kOQ74ux3kEZ9e9LFT5Pggd40mfZ7PrsmtAOBVRcW8RB0br01d5kgYehhF8fXCYqSnx
+	 B0Qr2fNLwbsToh+SMKb9qS7n8vSrozddIOeq+civYZJl0Kx1Aa2zwmqXpTlrLszCFp
+	 jQzOYTI41X7y0IL67rI990ZJgnrL9DxNQG5KDcb5lytO2MVWIhvBR3OSomC6upHlg6
+	 oI9bIdQF7Uu9jMuPZjwbzUgH5LrMqv5MK834nJqvVV6zBL2iJyjFHcWG1NjxzYNxdS
+	 7Hbm8C1lT3ajA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1seVuN-003u5W-68;
+	Thu, 15 Aug 2024 09:32:35 +0100
+Date: Thu, 15 Aug 2024 09:32:34 +0100
+Message-ID: <86r0aqyyn1.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Cc: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"will@kernel.org" <will@kernel.org>,
+	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+	"oliver.upton@linux.dev"
+	<oliver.upton@linux.dev>,
+	"james.morse@arm.com" <james.morse@arm.com>,
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+	yuzenghui
+	<yuzenghui@huawei.com>,
+	"Wangzhou (B)" <wangzhou1@hisilicon.com>,
+	Linuxarm
+	<linuxarm@huawei.com>,
+	"reijiw@google.com" <reijiw@google.com>
+Subject: Re: [PATCH] KVM: arm64: Make the exposed feature bits in AA64DFR0_EL1 writable from userspace
+In-Reply-To: <b2dad37ac5464384abe4edf76cb6b546@huawei.com>
+References: <20240813142835.77180-1-shameerali.kolothum.thodi@huawei.com>
+	<86v804z3lk.wl-maz@kernel.org>
+	<b2dad37ac5464384abe4edf76cb6b546@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="m4k347TUK5jMfMto"
-Content-Disposition: inline
-In-Reply-To: <ZrzIv3FWNgJizDc2@e133380.arm.com>
-X-Cookie: The second best policy is dishonesty.
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: shameerali.kolothum.thodi@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, will@kernel.org, catalin.marinas@arm.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, wangzhou1@hisilicon.com, linuxarm@huawei.com, reijiw@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Wed, 14 Aug 2024 10:17:10 +0100,
+Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
+> 
+> 
+> 
+> > -----Original Message-----
+> > From: Marc Zyngier <maz@kernel.org>
+> > Sent: Tuesday, August 13, 2024 7:21 PM
+> > To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> > Cc: kvmarm@lists.linux.dev; linux-arm-kernel@lists.infradead.org;
+> > will@kernel.org; catalin.marinas@arm.com; oliver.upton@linux.dev;
+> > james.morse@arm.com; suzuki.poulose@arm.com; yuzenghui
+> > <yuzenghui@huawei.com>; Wangzhou (B) <wangzhou1@hisilicon.com>;
+> > Linuxarm <linuxarm@huawei.com>
+> > Subject: Re: [PATCH] KVM: arm64: Make the exposed feature bits in
+> > AA64DFR0_EL1 writable from userspace
+> > 
+> > On Tue, 13 Aug 2024 15:28:35 +0100,
+> > Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
+> > >
+> > > KVM exposes the OS double lock feature bit to Guests but returns
+> > > RAZ/WI on Guest OSDLR_EL1 access. This breaks Guest migration between
+> > > systems where this feature support differ. Add support to make this
+> > > feature writable from userspace by setting the mask bit. While at it,
+> > > set the mask bits for other exposed features in the AA64DFR0_EL1
+> > > register as well.
+> > >
+> > > Also update the selftest to cover these fields.
+> > >
+> > > Signed-off-by: Shameer Kolothum
+> > <shameerali.kolothum.thodi@huawei.com>
+> > > ---
+> > >    This is based on the discussion here(Thanks to Oliver),
+> > >    https://lore.kernel.org/all/ZrVSlbVwnaMDShah@linux.dev/
+> > > ---
+> > >  arch/arm64/kvm/sys_regs.c                         | 6 +++++-
+> > >  tools/testing/selftests/kvm/aarch64/set_id_regs.c | 4 ++++
+> > >  2 files changed, 9 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > > index c90324060436..adb49d681052 100644
+> > > --- a/arch/arm64/kvm/sys_regs.c
+> > > +++ b/arch/arm64/kvm/sys_regs.c
+> > > @@ -2376,7 +2376,11 @@ static const struct sys_reg_desc sys_reg_descs[]
+> > = {
+> > >  	  .get_user = get_id_reg,
+> > >  	  .set_user = set_id_aa64dfr0_el1,
+> > >  	  .reset = read_sanitised_id_aa64dfr0_el1,
+> > > -	  .val = ID_AA64DFR0_EL1_PMUVer_MASK |
+> > > +	  .val = ID_AA64DFR0_EL1_DoubleLock_MASK |
+> > > +		 ID_AA64DFR0_EL1_CTX_CMPs_MASK |
+> > > +		 ID_AA64DFR0_EL1_WRPs_MASK |
+> > > +		 ID_AA64DFR0_EL1_BRPs_MASK |
+> > 
+> > 
+> > I think this is going to cause some troubles.
+> > 
+> > The issue is that context-aware breakpoints are the highest-numbered
+> > breakpoints, right after the normal breakpoints (D2.8.3 "Breakpoint
+> > types and linking of breakpoints"). So if you reduce the number of
+> > normal breakpoints, you shift the context-aware ones down, and
+> > everything breaks.
+> 
+> Thanks Marc for explaining this. I was not aware of this one.
 
---m4k347TUK5jMfMto
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Yeah, that's a pretty annoying shortcoming of the architecture.  There
+is an effort to try and address it, but not sure when that will be
+fixed.
 
-On Wed, Aug 14, 2024 at 04:09:51PM +0100, Dave Martin wrote:
-> On Thu, Aug 01, 2024 at 01:06:51PM +0100, Mark Brown wrote:
+> 
+> > I really don't see how you can safely do that without completely
+> > changing the way we handle the debug registers.
+> 
+> Looks like Reji has attempted to do this a while back, 
+> https://lore.kernel.org/kvm/20220419065544.3616948-13-reijiw@google.com/
+> 
+> I guess that one is trying to address the problem you described
+> above, right?  Though, not clear to me what happened afterwards to
+> these patches in the series.
+> 
+> Coming back to this patch, we don't have a requirement now to make
+> the breakpoints writable for migration. The only concern is OS
+> Double lock feature.  Not sure anyone has a high priority
+> requirement to make the other features writable or not. Will it be
+> acceptable if I resent this patch with just OS Double Lock being
+> writable?(Sorry If I sound selfish, but at least some progress can
+> be made soon).
 
-> > +	if (add_all || task_gcs_el0_enabled(current)) {
-> > +		err = sigframe_alloc(user, &user->gcs_offset,
-> > +				     sizeof(struct gcs_context));
-> > +		if (err)
-> > +			return err;
-> > +	}
+I think you can keep all the other two fields, as they are
+independent. You could add a comment indicating why we can't just let
+userspace change this field.
 
-> Who turns on GCS?  I have a concern that if libc is new enough to be
-> built for GCS then the libc startup code will to turn it on, even if
-> the binary stack running on top of libc is old.
+Thanks,
 
-It should normally be the dynamic linker which should be looking for
-annotatations in the binaries it's loading before it decides if it's
-going to turn on GCS (and libc doing something similar if it's going to
-dlopen() things in a process with GCS enabled).
+	M.
 
-> Is there any scenario where it is legitimate for the signal handler to
-> change the shadow stack mode or to return with an altered GCSPR_EL0?
-
-If userspace can rewrite the stack pointer on return (eg, to return to a
-different context as part of userspace threading) then it will need to
-be able to also update GCSPR_EL0 to something consistent otherwise
-attempting to return from the interrupted context isn't going to go
-well.  Changing the mode is a bit more exotic, as it is in general.
-It's as much to provide information to the signal handler as anything
-else.
-
-> Is the guarded stack considered necessary (or at least beneficial) for
-> backtracing, or is the regular stack sufficient?
-
-It's potentially beneficial, being less vulnerable to corruption and
-simpler to parse if all you're interested in is return addresses.
-Profiling in particular was mentioned, grabbing a linear block of memory
-will hopefully be less overhead than chasing down the stack.  The
-regular stack should generally be sufficient though.
-
---m4k347TUK5jMfMto
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAma82ZcACgkQJNaLcl1U
-h9Dw8Af/XElMBO/KVokIR07KfaB7sgnHeJUwP31NSZhm66aDj1xZVgyEok6vrQOQ
-UAQRifPV98myi1QmsusRk+fCC2OGUG2eLWctGHDghxBwYs5hOCl5kebcUIKzzjNH
-8aqD3GZNX1JLH8PLbzDMVhdLpM4uyKOvZFammGDrnoXjhZaBVSKS0PibtS54TY+R
-HA7tSTIm/+xG4rXkAPJ/vo9YZf+cF1bTp1ccC47oQGzsPJIlPfulipp25A71VIiQ
-9enlRUbkSEEZhQH+UZ2Rkpk1+sMCKUv5uT/m2vNWx1gRkngD8YkNUG2TnE9FQqSE
-01uJahLacQ3yCSaWsm6UnjpUxI3Qng==
-=9afo
------END PGP SIGNATURE-----
-
---m4k347TUK5jMfMto--
+-- 
+Without deviation from the norm, progress is not possible.
