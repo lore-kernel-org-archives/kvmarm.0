@@ -1,129 +1,316 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2DEF481C4;
-	Thu, 15 Aug 2024 18:19:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C47513C909;
+	Thu, 15 Aug 2024 18:28:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723745974; cv=none; b=kfpb7c10tXyPMkfSqvs4mocrlwaiqfEts36Zdftn4HPfCA2U+g3JuYb3YQRrkWyy6lu3lq+YeJ8HvIYVGDDDt07niEh6pp1mEzMgNF5qjpPJ3T5pHNzY3rLA3sOeSWUcENGFrfjf0oOK6xmS9DNybS78D3LtxeIawrzkFz22KmI=
+	t=1723746524; cv=none; b=fYoawLCwLWj4A9nVITT7rLLcx+7tE/JzenpIZQEOVeZP7t5oJdummfVFoPV/sdzfiORoM/mzVGRlp7WcmTzd8BZBH9XS1vRc5LLeTlsnK9paKRob/0r8Lx54jU/+A+qw9LtOBPnqWCK4BbI60j/g1sOTj8Puk1xlVtEUjEZmUek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723745974; c=relaxed/simple;
-	bh=gvOHdCK9aUdR7DPVLDdBmQ4rCqBdWg1NiIKC9n0vn/s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=na5yoBDuTp9Xk4YocxzqnEyvyg236iZd4McF7x8d1wVI4N+IfgKQVVmRMUsrtJuVfq1T3updEVyZDF7fuintRexxbYKECmfb/puUBG20Rh+C6hcbsVOic3QeAAC7U9ZfZzaJ11hnZMJtj7S4DgriVZaTxOcodAL8GIpcNZ2JNVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jmAPusW9; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1723746524; c=relaxed/simple;
+	bh=TnkEmfIWsIecDCCRKfcH9H2UtA9GK9Cl/t13FaOmFOg=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gJnIUP+RlQgpVkKFiqE29ZqehSXA4QfDOf4No6qcI0T+sQ+WuXsii07hoS66xSNZS5ym2nQMXdl2kDrlXtpVOvR1aJvIDt8X3SzAPUrFQYoXJSEQRq8bgafYLUjvWtxYxZWZllAIrnDBIevJlbSzOZwUBZDGKLzmuj9BUqy8yO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OcvS3ZMQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jmAPusW9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BDE0C32786;
-	Thu, 15 Aug 2024 18:19:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OcvS3ZMQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 052A7C4AF09;
+	Thu, 15 Aug 2024 18:28:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723745973;
-	bh=gvOHdCK9aUdR7DPVLDdBmQ4rCqBdWg1NiIKC9n0vn/s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jmAPusW9RWevvrm7Hg88q9xewbIsd/N/8xTtQyDPWPc982vMFTh7r29JlLa6aHf0o
-	 8io0uPtO83IiC/fkk0GKoQNNWuDUbOcvZAodgohYE/SjWTMQpUBTSbad1t64GFmGyS
-	 iVChoroyACoTlO+/w+ZVPqDVFAt/hYnGedb6MWnURMr/r772xCwXH9niKnJdXYUqJX
-	 ljF+fG3keMrMEmAZlQBZgeB5qVBYqMTd2O22DXiRYL9ul8f7b5FVTiy0/sBLHu0Gpw
-	 9wAE4WmxHy9lFZGd0S9lYGKcP1IFTR4cDZzHAlueePqA4AxAzNcZtdqHVh8a0mF8BL
-	 9fI1RwFnauAuw==
-Date: Thu, 15 Aug 2024 19:19:24 +0100
-From: Mark Brown <broonie@kernel.org>
-To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-Cc: "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
-	"ross.burton@arm.com" <ross.burton@arm.com>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
-	"Szabolcs.Nagy@arm.com" <Szabolcs.Nagy@arm.com>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-	"corbet@lwn.net" <corbet@lwn.net>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"kees@kernel.org" <kees@kernel.org>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	"palmer@dabbelt.com" <palmer@dabbelt.com>,
-	"debug@rivosinc.com" <debug@rivosinc.com>,
-	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
-	"shuah@kernel.org" <shuah@kernel.org>,
-	"arnd@arndb.de" <arnd@arndb.de>, "maz@kernel.org" <maz@kernel.org>,
-	"oleg@redhat.com" <oleg@redhat.com>,
-	"fweimer@redhat.com" <fweimer@redhat.com>,
-	"thiago.bauermann@linaro.org" <thiago.bauermann@linaro.org>,
-	"james.morse@arm.com" <james.morse@arm.com>,
-	"ebiederm@xmission.com" <ebiederm@xmission.com>,
-	"brauner@kernel.org" <brauner@kernel.org>,
-	"will@kernel.org" <will@kernel.org>,
-	"hjl.tools@gmail.com" <hjl.tools@gmail.com>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	"paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
-	"ardb@kernel.org" <ardb@kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>
-Subject: Re: [PATCH v10 12/40] mm: Define VM_SHADOW_STACK for arm64 when we
- support GCS
-Message-ID: <9949a344-be8e-40ed-b483-02ff95175072@sirena.org.uk>
-References: <20240801-arm64-gcs-v10-0-699e2bd2190b@kernel.org>
- <20240801-arm64-gcs-v10-12-699e2bd2190b@kernel.org>
- <34f7a5378447b1a8d5a9561594b37cfeaa6bd2b1.camel@intel.com>
- <3a7d9b69-e9df-4271-a3f0-8e8683c2654f@sirena.org.uk>
- <68ec09da-fb4a-4d59-9c8c-6fae4c48ea68@sirena.org.uk>
- <e6c8618a1585006dde44c17192a3bb7ae8ec5c0b.camel@intel.com>
+	s=k20201202; t=1723746524;
+	bh=TnkEmfIWsIecDCCRKfcH9H2UtA9GK9Cl/t13FaOmFOg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=OcvS3ZMQiPNZfUqEYoW7vLYM3MpmYSz2RCqvTTtYppOpqLMDmc5rshwEbsygQpM47
+	 JfaIFFX4xql2E5P1KrZUuqttI8aucpQQZFIUObiilfjpbLvX+hnnLQb+NP5we7djqK
+	 7T4NJ6iLfAvTEj5dZiaNjroBnQOagFjIy2ZLjeYbHrdIU0CkOXQKICtak25ZheGVxd
+	 RYCvThg+qxg+ku6DYaVKJzAore1DFGnx7pA3+CV6z6kusaeRxf2rgUFKi5VryAd0fy
+	 /GjGbrwh17DGMWzeiHoKvv7Yrjzp2ZC7DbddOGf3gUij92WKEjskzw0/Hq7f6BBcJd
+	 UQTPAznhY/9ZA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sefDF-0042zX-JH;
+	Thu, 15 Aug 2024 19:28:41 +0100
+Date: Thu, 15 Aug 2024 19:28:41 +0100
+Message-ID: <86msldzlly.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Przemyslaw Gaj <pgaj@cadence.com>
+Subject: Re: [PATCH v3 14/18] KVM: arm64: nv: Add SW walker for AT S1 emulation
+In-Reply-To: <Zr4wUj5mpKkwMyCq@raptor>
+References: <20240813100540.1955263-1-maz@kernel.org>
+	<20240813100540.1955263-15-maz@kernel.org>
+	<Zr4wUj5mpKkwMyCq@raptor>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="U12vN05f82sjc1Kd"
-Content-Disposition: inline
-In-Reply-To: <e6c8618a1585006dde44c17192a3bb7ae8ec5c0b.camel@intel.com>
-X-Cookie: -- Owen Meredith
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com, anshuman.khandual@arm.com, pgaj@cadence.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
 
---U12vN05f82sjc1Kd
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi Alex,
 
-On Thu, Aug 15, 2024 at 05:53:19PM +0000, Edgecombe, Rick P wrote:
-> On Thu, 2024-08-15 at 17:39 +0100, Mark Brown wrote:
+On Thu, 15 Aug 2024 17:44:02 +0100,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 
-> > > Oh, thanks for the heads up - I'd missed that.
+[..]
 
-> > Looking at this I think it makes sense to do as was done for x86 and
-> > split this out into a separate series (part of why I'd missed it),
-> > updating the generic implementation to do this by default.=A0 That'll
-> > touch a bunch of architectures and the series is already quite big,
-> > it's not really an ABI impact.
+> > +static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
+> > +			 struct s1_walk_result *wr, u64 va)
+> > +{
+> > +	u64 sctlr, tcr, tg, ps, ia_bits, ttbr;
+> > +	unsigned int stride, x;
+> > +	bool va55, tbi, lva, as_el0;
+> > +
+> > +	wi->regime = compute_translation_regime(vcpu, op);
+> > +	as_el0 = (op == OP_AT_S1E0R || op == OP_AT_S1E0W);
+> > +
+> > +	va55 = va & BIT(55);
+> > +
+> > +	if (wi->regime == TR_EL2 && va55)
+> > +		goto addrsz;
+> > +
+> > +	wi->s2 = (wi->regime == TR_EL10 &&
+> > +		  (__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_VM | HCR_DC)));
+> 
+> This could be written on one line if there were a local variable for the HCR_EL2
+> register (which is already read multiple times in the function).
 
-> The series is already upstream. You just need to add an arm version of th=
-at
-> linked patch. But up to you.
+Sure thing.
 
-Your series modified the existing x86 custom arch_get_unmapped_area*()
-functions, arm64 uses the generic implementation of those so I'd have to
-either add custom implementations (which I can't imagine would be met
-with great enthusiasm) or update the generic ones.  A generic
-implementation seems reasonable and it looks like RISC-V would also end
-up using it so while it's a bit invasive it does seem more sensible to
-do the change there.
+[...]
 
---U12vN05f82sjc1Kd
-Content-Type: application/pgp-signature; name="signature.asc"
+> > +	/* Let's put the MMU disabled case aside immediately */
+> > +	switch (wi->regime) {
+> > +	case TR_EL10:
+> > +		/*
+> > +		 * If dealing with the EL1&0 translation regime, 3 things
+> > +		 * can disable the S1 translation:
+> > +		 *
+> > +		 * - HCR_EL2.DC = 1
+> > +		 * - HCR_EL2.{E2H,TGE} = {0,1}
+> > +		 * - SCTLR_EL1.M = 0
+> > +		 *
+> > +		 * The TGE part is interesting. If we have decided that this
+> > +		 * is EL1&0, then it means that either {E2H,TGE} == {1,0} or
+> > +		 * {0,x}, and we only need to test for TGE == 1.
+> > +		 */
+> > +		if (__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_DC | HCR_TGE))
+> > +			wr->level = S1_MMU_DISABLED;
+> 
+> There's no need to fallthrough and check SCTLR_ELx.M if the MMU disabled check
+> here is true.
 
------BEGIN PGP SIGNATURE-----
+I'm not sure it makes the code more readable. But if you do, why not.
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAma+RqsACgkQJNaLcl1U
-h9C2ogf/ZUz9M5cZLraiijYr3jTrEMdCaa6D0jRDGoL0IP3BclPhluw29VOQVf4x
-aJ10O4eGMRHl32XL0oWXQlmSmjiHfXTvVmeAnPrKkq6Sx8BDI7tOW1f4b64Iyouq
-aGNPYw1YjXPdazXxXLbaQVZZOrq5BE2dbXw6ocHaombvt/oG6sAGc4F4KFXwb6+A
-OR+jpoND8CbzSxh4EO89eoixTKgqvVZTLfQ3zZBdyjrrk1jyp6Q/63wMC325Bmam
-FebFR/NFJlNNAGpnhBbZhme21z1oZ+1h9K6G37zJUsXqqkOnH56fbsfKJ3wGW37B
-VjXIsdlILKUDIICvYmo5rxepKRyUqQ==
-=DIrs
------END PGP SIGNATURE-----
+[...]
 
---U12vN05f82sjc1Kd--
+> > +	/* Someone was silly enough to encode TG0/TG1 differently */
+> > +	if (va55) {
+> > +		wi->txsz = FIELD_GET(TCR_T1SZ_MASK, tcr);
+> > +		tg = FIELD_GET(TCR_TG1_MASK, tcr);
+> > +
+> > +		switch (tg << TCR_TG1_SHIFT) {
+> > +		case TCR_TG1_4K:
+> > +			wi->pgshift = 12;	 break;
+> > +		case TCR_TG1_16K:
+> > +			wi->pgshift = 14;	 break;
+> > +		case TCR_TG1_64K:
+> > +		default:	    /* IMPDEF: treat any other value as 64k */
+> > +			wi->pgshift = 16;	 break;
+> > +		}
+> 
+> Just a thought, wi->pgshift is used in several places to identify the guest page
+> size, might be useful to have something like PAGE_SHIFT_{4K,16K,64K}. That would
+> also make its usage consistent, because in some places wi->pgshift is compared
+> directly to 12, 14 or 16, in other places the page size is computed from
+> wi->pgshift and compared to SZ_4K, SZ_16K or SZ_64K.
+
+I only found a single place where we compare wi->pgshift to a
+non-symbolic integer (as part of the R_YXNYW handling). Everywhere
+else, we use BIT(wi->pgshift) and compare it to SZ_*K. We moved away
+from the various PAGE_SHIFT_* macros some years ago, and I don't think
+we want them back.
+
+What I can do is to convert the places where we init pgshift to use an
+explicit size using const_ilog2():
+
+@@ -185,12 +188,12 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
+ 
+ 		switch (tg << TCR_TG1_SHIFT) {
+ 		case TCR_TG1_4K:
+-			wi->pgshift = 12;	 break;
++			wi->pgshift = const_ilog2(SZ_4K);	 break;
+ 		case TCR_TG1_16K:
+-			wi->pgshift = 14;	 break;
++			wi->pgshift = const_ilog2(SZ_16K);	 break;
+ 		case TCR_TG1_64K:
+ 		default:	    /* IMPDEF: treat any other value as 64k */
+-			wi->pgshift = 16;	 break;
++			wi->pgshift = const_ilog2(SZ_64K);	 break;
+ 		}
+ 	} else {
+ 		wi->txsz = FIELD_GET(TCR_T0SZ_MASK, tcr);
+@@ -198,12 +201,12 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
+ 
+ 		switch (tg << TCR_TG0_SHIFT) {
+ 		case TCR_TG0_4K:
+-			wi->pgshift = 12;	 break;
++			wi->pgshift = const_ilog2(SZ_4K);	 break;
+ 		case TCR_TG0_16K:
+-			wi->pgshift = 14;	 break;
++			wi->pgshift = const_ilog2(SZ_16K);	 break;
+ 		case TCR_TG0_64K:
+ 		default:	    /* IMPDEF: treat any other value as 64k */
+-			wi->pgshift = 16;	 break;
++			wi->pgshift = const_ilog2(SZ_64K);	 break;
+ 		}
+ 	}
+ 
+@@ -212,7 +215,7 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
+ 		if (wi->txsz > 39)
+ 			goto transfault_l0;
+ 	} else {
+-		if (wi->txsz > 48 || (wi->pgshift == 16 && wi->txsz > 47))
++		if (wi->txsz > 48 || (BIT(wi->pgshift) == SZ_64K && wi->txsz > 47))
+ 			goto transfault_l0;
+ 	}
+
+
+> 
+> > +	} else {
+> > +		wi->txsz = FIELD_GET(TCR_T0SZ_MASK, tcr);
+> > +		tg = FIELD_GET(TCR_TG0_MASK, tcr);
+> > +
+> > +		switch (tg << TCR_TG0_SHIFT) {
+> > +		case TCR_TG0_4K:
+> > +			wi->pgshift = 12;	 break;
+> > +		case TCR_TG0_16K:
+> > +			wi->pgshift = 14;	 break;
+> > +		case TCR_TG0_64K:
+> > +		default:	    /* IMPDEF: treat any other value as 64k */
+> > +			wi->pgshift = 16;	 break;
+> > +		}
+> > +	}
+> > +
+> > +	/* R_PLCGL, R_YXNYW */
+> > +	if (!kvm_has_feat_enum(vcpu->kvm, ID_AA64MMFR2_EL1, ST, 48_47)) {
+> > +		if (wi->txsz > 39)
+> > +			goto transfault_l0;
+> > +	} else {
+> > +		if (wi->txsz > 48 || (wi->pgshift == 16 && wi->txsz > 47))
+> > +			goto transfault_l0;
+> > +	}
+> > +
+> > +	/* R_GTJBY, R_SXWGM */
+> > +	switch (BIT(wi->pgshift)) {
+> > +	case SZ_4K:
+> > +		lva = kvm_has_feat(vcpu->kvm, ID_AA64MMFR0_EL1, TGRAN4, 52_BIT);
+> > +		lva &= tcr & (wi->regime == TR_EL2 ? TCR_EL2_DS : TCR_DS);
+> > +		break;
+> > +	case SZ_16K:
+> > +		lva = kvm_has_feat(vcpu->kvm, ID_AA64MMFR0_EL1, TGRAN16, 52_BIT);
+> > +		lva &= tcr & (wi->regime == TR_EL2 ? TCR_EL2_DS : TCR_DS);
+> > +		break;
+> > +	case SZ_64K:
+> > +		lva = kvm_has_feat(vcpu->kvm, ID_AA64MMFR2_EL1, VARange, 52);
+> > +		break;
+> > +	}
+> > +
+> > +	if ((lva && wi->txsz < 12) || wi->txsz < 16)
+> > +		goto transfault_l0;
+> 
+> Let's assume lva = true, wi->txsz greater than 12, but smaller than 16, which is
+> architecturally allowed according to R_GTJBY and AArch64.S1MinTxSZ().
+> 
+> (lva && wi->txsz < 12) = false
+> wi->txsz < 16 = true
+> 
+> KVM treats it as a fault.
+
+Gah... Fixed with:
+
+@@ -231,7 +234,7 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
+ 		break;
+ 	}
+ 
+-	if ((lva && wi->txsz < 12) || wi->txsz < 16)
++	if ((lva && wi->txsz < 12) || (!lva && wi->txsz < 16))
+ 		goto transfault_l0;
+ 
+ 	ia_bits = get_ia_size(wi);
+
+Not that it has an impact yet, given that we don't support any of the
+52bit stuff yet, but thanks for spotting this!
+
+[...]
+
+> > +	/* R_VPBBF */
+> > +	if (check_output_size(wi->baddr, wi))
+> > +		goto transfault_l0;
+> 
+> I think R_VPBBF says that an Address size fault is generated here, not a
+> translation fault.
+
+Indeed, another one fixed.
+
+> 
+> > +
+> > +	wi->baddr &= GENMASK_ULL(wi->max_oa_bits - 1, x);
+> > +
+> > +	return 0;
+> > +
+> > +addrsz:				/* Address Size Fault level 0 */
+> > +	fail_s1_walk(wr, ESR_ELx_FSC_ADDRSZ_L(0), false, false);
+> > +	return -EFAULT;
+> > +
+> > +transfault_l0:			/* Translation Fault level 0 */
+> > +	fail_s1_walk(wr, ESR_ELx_FSC_FAULT_L(0), false, false);
+> > +	return -EFAULT;
+> > +}
+> 
+> [..]
+> 
+> > +static bool par_check_s1_perm_fault(u64 par)
+> > +{
+> > +	u8 fst = FIELD_GET(SYS_PAR_EL1_FST, par);
+> > +
+> > +	return  ((fst & ESR_ELx_FSC_TYPE) == ESR_ELx_FSC_PERM &&
+> > +		 !(par & SYS_PAR_EL1_S));
+> 
+> ESR_ELx_FSC_PERM = 0x0c is a permission fault, level 0, which Arm ARM says can
+> only happen when FEAT_LPA2. I think the code should check that the value for
+> PAR_EL1.FST is in the interval (ESR_ELx_FSC_PERM_L(0), ESR_ELx_FSC_PERM_L(3)].
+
+I honestly don't want to second-guess the HW. If it reports something
+that is the wrong level, why should we trust the FSC at all?
+
+> With the remaining minor issues fixed:
+> 
+> Reviewed-by: Alexandru Elisei <alexandru.elisei@Arm.com>
+
+Again, many thanks for your patience going through this.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
