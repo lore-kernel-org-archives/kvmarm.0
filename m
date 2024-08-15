@@ -1,51 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0463F1AB50A;
-	Thu, 15 Aug 2024 10:42:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64BF01714DB
+	for <kvmarm@lists.linux.dev>; Thu, 15 Aug 2024 12:08:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723718556; cv=none; b=PBZQ/QBfGqLu3G9e2Eu4Ih9IHA4Itv3MGjpYmzmLSWNhCVzuePU1hrtAbAndPTNJqcchVN0smNrdqYZppVexQMnYsWSuQlk2IkzCk/TED3vot/lbEz2e8X+dPacWYwBvDquTQ94yNg44ggkJ1CeqpAvDgOocjziT18Dt39nc/Bs=
+	t=1723723694; cv=none; b=PC41MfsHIVEcOyYcmsnjZZsqcLnubzL+lwRI8HhK6Fy8PuoYIpkV7DGZ+o2vEWqQNa9q7uIHQn5DCwcJqTL1PWP1bEkU8QbouQy051Rs5QehZ+YTuAs5Rtx4YGkaPB4Hq6iZNVVodofxqcnlD/FD/sDuxVPES2JtAOIAC7W0FmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723718556; c=relaxed/simple;
-	bh=5Z5ob43v97sv7FlY2gStwSzKV526jmeLqAdW9ir+IKQ=;
+	s=arc-20240116; t=1723723694; c=relaxed/simple;
+	bh=PwO7Q0OxKpR0x01p8xfvh019piHM7daDQq117UP0e50=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DwxwVSvEsukDSKE0H4qmdRGZ52DLbNXT0Oqz/LCKtL0FjgF7iiC7knqPwKe3F1Npt0OVLEk4t+Bghx4DlEvcx6l1UnFgjwE/1/5Rl3igK7MilorWYsrMHYPF6ZVlUKG420RBSs+Ni14lc3zK/ZZLpkSEBIPkss0/KSuclzlhCTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36C1AC32786;
-	Thu, 15 Aug 2024 10:42:30 +0000 (UTC)
-Date: Thu, 15 Aug 2024 11:42:28 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Mark Brown <broonie@kernel.org>
-Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Marc Zyngier <maz@kernel.org>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=BnuoyzB6LyWg/Oj2M5H/jmOExOPIDbrAFMSwlD9qJ73OEFX910AuC9MBj5rfZ/2NSIrOmV54RKY1ay6voLjLIkMo6COwuHZvhjsMLbtbPYZ8ifR3JnSF4th6L6js/QZcHzooCwP3ZgKJCWcDZC1p4D1h/p6jYSs3Tz7tr1arQ4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lBaEX6+A; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lBaEX6+A"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BFC3C32786;
+	Thu, 15 Aug 2024 12:08:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723723693;
+	bh=PwO7Q0OxKpR0x01p8xfvh019piHM7daDQq117UP0e50=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lBaEX6+AvNexhoNsl3j9IWShjXCMsI6jJeA6yWUX9wHysd8BnTddsgiyqcmlILNjL
+	 dXI9Q/UdW53o0QJ0lW27IrEwmgyjPZV4BgjFbeOnrYmxuEcv79BstygnIijBObv3/I
+	 HGSIuunD6KrEmwjvo6nYGSSxgp5oELaVDq9+dHoDK//YQdSLqQXdzZs6XZ59xHCKF2
+	 bowWxnEUjs0uMQlpJwXnb89QlCET2ADRmgrUIElGtYd6AJVI8DI5iTKOGKODKl7nqg
+	 aogLNm1GAMi6FnBVl7jjEqNQIDk/3SGoUEFMZ+W5stN34yfwwR1rgxTr67f3zyvebU
+	 TslJJscbG2DxQ==
+Date: Thu, 15 Aug 2024 13:08:03 +0100
+From: Will Deacon <will@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org,
 	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Florian Weimer <fweimer@redhat.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
-	Ross Burton <ross.burton@arm.com>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v10 02/40] prctl: arch-agnostic prctl for shadow stack
-Message-ID: <Zr3blK41YpWEgZSb@arm.com>
-References: <20240801-arm64-gcs-v10-0-699e2bd2190b@kernel.org>
- <20240801-arm64-gcs-v10-2-699e2bd2190b@kernel.org>
+	Fuad Tabba <tabba@google.com>, kvmarm@lists.linux.dev
+Subject: Re: [PATCH 2/2] KVM: arm64: Ensure TLBI uses correct VMID after
+ changing context
+Message-ID: <20240815120803.GA21444@willie-the-truck>
+References: <20240814123429.20457-1-will@kernel.org>
+ <20240814123429.20457-3-will@kernel.org>
+ <86ttfnz0xe.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -54,36 +46,92 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240801-arm64-gcs-v10-2-699e2bd2190b@kernel.org>
+In-Reply-To: <86ttfnz0xe.wl-maz@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Thu, Aug 01, 2024 at 01:06:29PM +0100, Mark Brown wrote:
-> Three architectures (x86, aarch64, riscv) have announced support for
-> shadow stacks with fairly similar functionality.  While x86 is using
-> arch_prctl() to control the functionality neither arm64 nor riscv uses
-> that interface so this patch adds arch-agnostic prctl() support to
-> get and set status of shadow stacks and lock the current configuation to
-> prevent further changes, with support for turning on and off individual
-> subfeatures so applications can limit their exposure to features that
-> they do not need.  The features are:
-> 
->   - PR_SHADOW_STACK_ENABLE: Tracking and enforcement of shadow stacks,
->     including allocation of a shadow stack if one is not already
->     allocated.
->   - PR_SHADOW_STACK_WRITE: Writes to specific addresses in the shadow
->     stack.
->   - PR_SHADOW_STACK_PUSH: Push additional values onto the shadow stack.
-> 
-> These features are expected to be inherited by new threads and cleared
-> on exec(), unknown features should be rejected for enable but accepted
-> for locking (in order to allow for future proofing).
-> 
-> This is based on a patch originally written by Deepak Gupta but modified
-> fairly heavily, support for indirect landing pads is removed, additional
-> modes added and the locking interface reworked.  The set status prctl()
-> is also reworked to just set flags, if setting/reading the shadow stack
-> pointer is required this could be a separate prctl.
-> 
-> Reviewed-by: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
-> Signed-off-by: Mark Brown <broonie@kernel.org>
+Hey Marc,
 
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+Thanks for having a look.
+
+On Wed, Aug 14, 2024 at 02:30:53PM +0100, Marc Zyngier wrote:
+> On Wed, 14 Aug 2024 13:34:29 +0100,
+> Will Deacon <will@kernel.org> wrote:
+> > 
+> > When the target context passed to enter_vmid_context() matches the
+> > current running context, the function returns early without manipulating
+> > the registers of the stage-2 MMU. This can result in a stale VMID due to
+> > the lack of an ISB instruction in exit_vmid_context() after writing the
+> 
+> This refers to the exit_vmid_context() *before* a subsequent
+> enter_vmid_context(), right?
+
+Yes!
+
+> > VTTBR when ARM64_WORKAROUND_SPECULATIVE_AT is not enabled.
+> 
+> I'm not sure I completely get the failure mode, so please bear with me.
+
+Of course, it's confused me a tonne of times and writing the commit
+message was a real pain.
+
+> > For example, with pKVM enabled:
+> > 
+> > 	// Initially running in host context
+> > 	enter_vmid_context(guest);
+> > 		-> __load_stage2(guest); isb	// Writes VTCR & VTTBR
+> > 	exit_vmid_context(guest);
+> > 		-> __load_stage2(host);		// Restores VTCR & VTTBR
+> > 
+> > 	enter_vmid_context(host);
+> > 		-> Returns early as we're already in host context
+> 
+> Is this the code you are referring to?
+> 
+> 	vcpu = host_ctxt->__hyp_running_vcpu;
+> 
+> 	[...]
+> 
+> 	if (vcpu) {
+> 		/*
+> 		 * We're in guest context. However, for this to work, this needs
+> 		 * to be called from within __kvm_vcpu_run(), which ensures that
+> 		 * __hyp_running_vcpu is set to the current guest vcpu.
+> 		 */
+> 		if (mmu == vcpu->arch.hw_mmu || WARN_ON(mmu != host_s2_mmu))
+> 			return;
+> 
+> 		cxt->mmu = vcpu->arch.hw_mmu;
+> 	} else {
+> 		/* We're in host context. */
+> 		if (mmu == host_s2_mmu)
+> 			return;
+> 
+> 		cxt->mmu = host_s2_mmu;
+> 	}
+
+Yes, this is the "early return" where we don't bother touching the MMU
+because we're already in the correct context.
+
+> So I take it that no vcpu is running at this point, and that we have
+> done a vcpu_put().
+> 
+> Is there an actual path within pKVM that causes a guest TLBI to be
+> followed by a host __kvm_tlb_flush_vmid() *without* a CSE? I can't
+> convinced myself that such a path exist in the current upstream code
+> base.
+
+I think you're right that this can't happen upstream. We see the issue
+in Android when reclaiming pages from a guest during teardown. That
+amounts to unmapping pages from the guest, poisoning them and mapping
+them back into the host. Mapping them into the host can then trigger
+table -> block conversion and the associated TLB invalidation wasn't
+effective because it was still using the guest VMID.
+
+We can carry this patch in Android if you prefer, but given that
+{enter,exit}_vmid_context() are upstream, it would be nice to land the
+fix so that we don't run into this bug again in future (it took some
+debugging!).
+
+Cheers,
+
+Will
