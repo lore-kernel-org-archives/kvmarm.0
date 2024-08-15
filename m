@@ -1,108 +1,100 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0722A1B375F
-	for <kvmarm@lists.linux.dev>; Thu, 15 Aug 2024 16:00:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F38D42AF12
+	for <kvmarm@lists.linux.dev>; Thu, 15 Aug 2024 16:31:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723737625; cv=none; b=rXKzxrRbJdSoTxnnO8VKMHsfgZIj/kBsRVwEJxeltRdu8Lx+OnwjeQWxYs/P9uZi3yogArT8eP4mO0iv9fxPMr4umFyvBaHeAqN3iLmQwoaDuTi/cnlUIsDbIc1QriK3IgJfm8SkcktQ0RRHK1cQ2dHaf6w2oDU54iv3WTKRWac=
+	t=1723739520; cv=none; b=gIM93NydbOVP9TkwhYCL+J2ZIhzCtQwN5Rwo12AGasw1G7+adZO/ZdU87v4YwJCyxRPtu7gBJuXKJktCf7AZ1P4GDssiwNQCDF/jwLNQcjPnCYp2OIxDimbJMQnGglbXAFlFmN6cnQjuvCud8eRiuHp3L9bCPRoRuS4513h7vtM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723737625; c=relaxed/simple;
-	bh=LAlAFNPkLbQZ2rsS1x/8jzamWztOlnH/Ek+3JvMew0c=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UBrVdjAAS4DrJHUutNdD7W6w6GZps5FGIoeVax8W++mCMH7P36Yd4+/wTYch9y3Xo477Z6P4TN1vfKqg6uuaiZ+Iv7XfCRWRKC7zhYw8fDCIypQS8Ws7zQMdgxedNDE4fEwu+weCYH/n3/vOBmXWSuLUuBal5CrSoNBdwGV7wH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.216])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Wl8rz19LXz6D92H;
-	Thu, 15 Aug 2024 23:57:23 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id E43AD140119;
-	Fri, 16 Aug 2024 00:00:19 +0800 (CST)
-Received: from A2303104131.china.huawei.com (10.203.177.241) by
- lhrpeml500005.china.huawei.com (7.191.163.240) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 15 Aug 2024 17:00:14 +0100
-From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-To: <kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>
-CC: <maz@kernel.org>, <will@kernel.org>, <catalin.marinas@arm.com>,
-	<oliver.upton@linux.dev>, <james.morse@arm.com>, <suzuki.poulose@arm.com>,
-	<yuzenghui@huawei.com>, <wangzhou1@hisilicon.com>, <linuxarm@huawei.com>
-Subject: [PATCH v2] KVM: arm64: Make the exposed feature bits in AA64DFR0_EL1 writable from userspace
-Date: Thu, 15 Aug 2024 16:59:54 +0100
-Message-ID: <20240815155954.85480-1-shameerali.kolothum.thodi@huawei.com>
-X-Mailer: git-send-email 2.12.0.windows.1
+	s=arc-20240116; t=1723739520; c=relaxed/simple;
+	bh=v2DuIKDRYstSgnLhL+gVxytmZsWL98Xb4yRNcEnje9M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EmBs3P8UeX6Ynvz6tmGfKlRoWOwX+dfow9XdM/KjKg8maFXlPzsHonlcAfMrQvQfFgY2PWP2jGEZ3FAx2h98l1ACxqzq25I8msCbEo9KK6PcHNf28EfKuzvn/hyz7YeR4MIRTbL2l88hpM6REXU/nP8EVR4pddzR4MLu1/jHN0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 47EB014BF;
+	Thu, 15 Aug 2024 09:32:24 -0700 (PDT)
+Received: from e133380.arm.com (e133380.arm.com [10.1.197.55])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 94A073F6A8;
+	Thu, 15 Aug 2024 09:31:52 -0700 (PDT)
+Date: Thu, 15 Aug 2024 17:31:49 +0100
+From: Dave Martin <Dave.Martin@arm.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Florian Weimer <fweimer@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
+	Ross Burton <ross.burton@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v10 23/40] arm64/signal: Set up and restore the GCS
+ context for signal handlers
+Message-ID: <Zr4tdcj8DF92GzVS@e133380.arm.com>
+References: <20240801-arm64-gcs-v10-0-699e2bd2190b@kernel.org>
+ <20240801-arm64-gcs-v10-23-699e2bd2190b@kernel.org>
+ <ZrzEfg5LqdAzgJ6+@e133380.arm.com>
+ <08932f6d-01ef-40e8-97d2-08f0d2016191@sirena.org.uk>
+ <Zr4EkmtUKop9o9wu@e133380.arm.com>
+ <c56fa974-88f7-4c1f-83bd-8c481fe0045d@sirena.org.uk>
+ <Zr4avB6+U4tLDy8E@e133380.arm.com>
+ <7fa96f26-5bf6-490f-8986-258033fbfe0e@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7fa96f26-5bf6-490f-8986-258033fbfe0e@sirena.org.uk>
 
-KVM exposes the OS double lock feature bit to Guests but returns
-RAZ/WI on Guest OSDLR_EL1 access. This breaks Guest migration between
-systems where this feature differ. Add support to make this feature
-writable from userspace by setting the mask bit. While at it, set the
-mask bits for the exposed WRPs(Number of Watchpoints) as well.
-Also update the selftest to cover these fields.
+On Thu, Aug 15, 2024 at 04:29:54PM +0100, Mark Brown wrote:
+> On Thu, Aug 15, 2024 at 04:11:56PM +0100, Dave Martin wrote:
+> > On Thu, Aug 15, 2024 at 03:45:45PM +0100, Mark Brown wrote:
+> > > On Thu, Aug 15, 2024 at 02:37:22PM +0100, Dave Martin wrote:
+> 
+> > > > Is there a test for taking and returning from a signal on an alternate
+> > > > (main) stack, when a shadow stack is in use?  Sounds like something
+> > > > that would be good to check if not.
+> 
+> > > Not specifically for any of the architectures.
+> 
+> > Can you see any reason why this shouldn't work?
+> 
+> No, it's expected to work - I'm just not specifically aware of an
+> explicit test for it.  Possibly some of the userspace bringup work
+> might've covered it?  Any libc tests for altstack support should've
+> exercised it for example.
 
-However we still can't make BRPs and CTX_CMPs fields writable, because
-as per ARM ARM DDI 0487K.a, section G2.8.2 Breakpoint types and
-linking of breakpoints, highest numbered breakpoints must be context aware
-breakpoints. And it will be problematic if userspace decreases the number
-of non-context aware breakpoints as it will make the context aware
-breakpoints for the guest mapped to a wrong one.
+That's true; if libc is built to use shadow stack, generic API tests
+ought to cover this.
 
-Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
----
-   v1 --> v2:
-   Removed making BRPs and CTX_CMPs writable.
-   v1: https://lore.kernel.org/all/20240813142835.77180-1-shameerali.kolothum.thodi@huawei.com/
----
- arch/arm64/kvm/sys_regs.c                         | 13 ++++++++++++-
- tools/testing/selftests/kvm/aarch64/set_id_regs.c |  2 ++
- 2 files changed, 14 insertions(+), 1 deletion(-)
+> > Maybe I'll hacking up a test if I get around to it, but don't take this
+> > as a promise!
+> 
+> Thanks for your firm commitment!  :P
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index c90324060436..e77cd6d1abb5 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2376,7 +2376,18 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	  .get_user = get_id_reg,
- 	  .set_user = set_id_aa64dfr0_el1,
- 	  .reset = read_sanitised_id_aa64dfr0_el1,
--	  .val = ID_AA64DFR0_EL1_PMUVer_MASK |
-+	/*
-+	 * We can't still make BRPs and CTX_CMPx writable as highest
-+	 * numbered breakpoints must be context aware breakpoints(ARM ARM
-+	 * DDI 0487K.a, section G2.8.2 Breakpoint types and linking of
-+	 * breakpoints). Hence, if the number of non-context aware breakpoints
-+	 * for the Guest is decreased by userspace, that will be problematic
-+	 * as KVM will map context aware breakpoints for the vCPU to different
-+	 * numbered breakpoints for the pCPU.
-+	 */
-+	  .val = ID_AA64DFR0_EL1_DoubleLock_MASK |
-+		 ID_AA64DFR0_EL1_WRPs_MASK |
-+		 ID_AA64DFR0_EL1_PMUVer_MASK |
- 		 ID_AA64DFR0_EL1_DebugVer_MASK, },
- 	ID_SANITISED(ID_AA64DFR1_EL1),
- 	ID_UNALLOCATED(5,2),
-diff --git a/tools/testing/selftests/kvm/aarch64/set_id_regs.c b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-index d20981663831..6edc5412abe8 100644
---- a/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-+++ b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-@@ -68,6 +68,8 @@ struct test_feature_reg {
- 	}
- 
- static const struct reg_ftr_bits ftr_id_aa64dfr0_el1[] = {
-+	S_REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64DFR0_EL1, DoubleLock, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64DFR0_EL1, WRPs, 0),
- 	S_REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64DFR0_EL1, PMUVer, 0),
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64DFR0_EL1, DebugVer, ID_AA64DFR0_EL1_DebugVer_IMP),
- 	REG_FTR_END,
--- 
-2.45.2
+No problem...
 
+Cheers
+---Dave
