@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92BE619DF97;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A596C19DF42;
 	Thu, 15 Aug 2024 13:00:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723726805; cv=none; b=owAtRtA1GPbbZvVRfiY6UNqf8nPIyUb/rR+iHBlMThxmuyvWazDZXLQKaAEu9MI6oU1uCNG1JSu3AXLJxBsgHj0PhU+H/sSb4w3tW0B3IX8gJ5DZbFb+vyTGw2pzfKhhbevLR/jdjxokcTxvypu+2/3iKXwRNiIQqIR1M0YvJEk=
+	t=1723726805; cv=none; b=UMkcvf75jNXYBU5eQ8i3DK2Jc7PzvX7XLnXu6cTsbdVhgsLMZaqQoYtF2nUq9WbJ8XDqlqwPb8NEK3tCI40XtUcqJ83LhG9I7P4GbqyBPwvMpFbAU6PtoJkc8aNA9WGlUlsoV+4vYk8Z1rMSN5fhFAy4CAFq52smoCJwYe8X14Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1723726805; c=relaxed/simple;
-	bh=knD9A7RR7k7dMVag/IIKZfs9Lw12TkLZBEesnE10nOo=;
+	bh=qEawXgiyDbzCTmN/dR322ZhS1/QnoFktWqU0ISs5GK0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=NU7m5y7Z+D6iFkCzRNcuMcZBoTaSV8K5U63d/LRqphzOyT+vZKlyXQXBJ85em3a3kYlmGqQXhQPj1HVJsn3TY9RAcRoq4Ui5TSz5pKalXPVkmlQj1pM/6BzVdJ8MBo/xeEXG3USD3rqmzjjC6RAYmiEmkMGypD1n7zM+EmHPVUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VvRK+wAL; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=Iaif3iP8oh03JxP4okhemAMXEOe0J3Ih8bIazX26nQT1kV3+5qAGNY2zUFOR2jp7HeR2R7SctVIBp5cqnY+avUMgdogrp+oPMJdQ8it+G6I7d20JLGWkjiXf5NzxHsOnA/1On/CetPW996blwFEW6SMFI86Ejj5MfPck2V9YEvs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c08KVrqi; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VvRK+wAL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3029CC4AF10;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c08KVrqi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BDF7C32786;
 	Thu, 15 Aug 2024 13:00:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1723726805;
-	bh=knD9A7RR7k7dMVag/IIKZfs9Lw12TkLZBEesnE10nOo=;
+	bh=qEawXgiyDbzCTmN/dR322ZhS1/QnoFktWqU0ISs5GK0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=VvRK+wALz4hW7ifjNRqAIPfJLWftvRDM60N0Fvie6ozLb6jGSKr+pS7hEFYZMC7JY
-	 2z+1iGut81owXtFGPJ1QrNrqmholXgmtIwh/k8rsrUUT8bOn0jWZCYdo4q+XqxHOPM
-	 ghcHv05TU7L7Yb4FiManOYVkrMV8LJ1Of+A+jnT+ilptClj2xNZmW1zud4eAhl9uP6
-	 bquBuQwd/Fiy30Xy8r/26RVKZj16Q3UZVPtV+Fuq7rWG89W99XeaLlYBg+xsi5FmwY
-	 bRY3YfG7rTUbx0KK5suuzkepDstEdKNre+XIF5EkqknqNtOoCJyBYdagywqf/O7cBe
-	 98bQcQ8pX5KAw==
+	b=c08KVrqibvuFKIuE596yw2ZbQGR5Lt7W5JiYUqXqxTIvMtiT8QkuT9NIWya/VHx+x
+	 +QkJxRC1Dt8oJMxgfKHBc8a/WCRlb/typkXYeN4B2vzM3verGxwlAp7/0A6F5ZYVK4
+	 m34VLwZoASkGU2TvCC3x3YBV4+aACbuxD2i338fwiapaAFXwYxefWgNUaXc2pL2JbV
+	 eLTOdKq6hM05gbFUDzrpqaTA+wIj9FV/89/ciPmX0qETKHdjbBs7r1Vg4mdcktQJf4
+	 uH+6BuHgPAQbpYdpb17dlfRry0pPPXauRflc+7nYIZkddA5yzOK0jjjVtfpCkXDLQn
+	 5u2pxjarLhyOQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sea5D-003xld-8c;
+	id 1sea5D-003xld-J4;
 	Thu, 15 Aug 2024 14:00:03 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -40,9 +40,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 03/11] KVM: arm64: Add ACCDATA_EL1 to the sysreg array
-Date: Thu, 15 Aug 2024 13:59:51 +0100
-Message-Id: <20240815125959.2097734-4-maz@kernel.org>
+Subject: [PATCH 05/11] KVM: arm64: Handle trapping of FEAT_LS64* instructions
+Date: Thu, 15 Aug 2024 13:59:53 +0100
+Message-Id: <20240815125959.2097734-6-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240815125959.2097734-1-maz@kernel.org>
 References: <20240815125959.2097734-1-maz@kernel.org>
@@ -58,59 +58,100 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Make ACCDATA_EL1 a first-class citizen, and add it to the sysreg
-array. Visibility is conditioned on the feature being enabled.
+We generally don't expect FEAT_LS64* instructions to trap, unless
+they are trapped by a guest hypervisor.
+
+Otherwise, this is just the guest playing tricks on us by using
+an instruction that isn't advertised, which we handle with a well
+deserved UNDEF.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h |  3 +++
- arch/arm64/kvm/sys_regs.c         | 12 +++++++++++-
- 2 files changed, 14 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/handle_exit.c | 64 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 64 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index a33f5996ca9f..25ee4e5f55f1 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -446,6 +446,9 @@ enum vcpu_sysreg {
- 	GCR_EL1,	/* Tag Control Register */
- 	TFSRE0_EL1,	/* Tag Fault Status Register (EL0) */
- 
-+	/* Random stuff */
-+	ACCDATA_EL1,	/* Accelerator Data */
-+
- 	/* 32bit specific registers. */
- 	DACR32_EL2,	/* Domain Access Control Register */
- 	IFSR32_EL2,	/* Instruction Fault Status Register */
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index c90324060436..7b540811aa38 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2233,6 +2233,15 @@ static unsigned int sve_el2_visibility(const struct kvm_vcpu *vcpu,
- 	return sve_visibility(vcpu, rd);
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index d7c2990e7c9e..8cb0091f8e1e 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -291,6 +291,69 @@ static int handle_svc(struct kvm_vcpu *vcpu)
+ 	return 1;
  }
  
-+static unsigned int accdata_visibility(const struct kvm_vcpu *vcpu,
-+				       const struct sys_reg_desc *rd)
++static int handle_ls64b(struct kvm_vcpu *vcpu)
 +{
-+	if (kvm_has_feat(vcpu->kvm, ID_AA64ISAR1_EL1, LS64, LS64_ACCDATA))
-+		return 0;
++	struct kvm *kvm = vcpu->kvm;
++	u64 esr = kvm_vcpu_get_esr(vcpu);
++	u64 iss = ESR_ELx_ISS(esr);
++	bool allowed;
 +
-+	return REG_HIDDEN;
++	switch (iss) {
++	case ESR_ELx_ISS_ST64BV:
++		allowed = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_V);
++		break;
++	case ESR_ELx_ISS_ST64BV0:
++		allowed = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_ACCDATA);
++		break;
++	case ESR_ELx_ISS_LDST64B:
++		allowed = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64);
++		break;
++	default:
++		/* Clearly, we're missing something. */
++		goto unknown_trap;
++	}
++
++	if (!allowed)
++		goto undef;
++
++	if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu)) {
++		u64 hcrx = __vcpu_sys_reg(vcpu, HCRX_EL2);
++		bool fwd;
++
++		switch (iss) {
++		case ESR_ELx_ISS_ST64BV:
++			fwd = !(hcrx & HCRX_EL2_EnASR);
++			break;
++		case ESR_ELx_ISS_ST64BV0:
++			fwd = !(hcrx & HCRX_EL2_EnAS0);
++			break;
++		case ESR_ELx_ISS_LDST64B:
++			fwd = !(hcrx & HCRX_EL2_EnALS);
++			break;
++		default:
++			/* We don't expect to be here */
++			fwd = false;
++		}
++
++		if (fwd) {
++			kvm_inject_nested_sync(vcpu, esr);
++			return 1;
++		}
++	}
++
++unknown_trap:
++	/*
++	 * If we land here, something must be very wrong, because we
++	 * have no idea why we trapped at all. Warn and undef as a
++	 * fallback.
++	 */
++	WARN_ON(1);
++
++undef:
++	kvm_inject_undefined(vcpu);
++	return 1;
 +}
 +
- static bool access_zcr_el2(struct kvm_vcpu *vcpu,
- 			   struct sys_reg_params *p,
- 			   const struct sys_reg_desc *r)
-@@ -2519,7 +2528,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_CONTEXTIDR_EL1), access_vm_reg, reset_val, CONTEXTIDR_EL1, 0 },
- 	{ SYS_DESC(SYS_TPIDR_EL1), NULL, reset_unknown, TPIDR_EL1 },
- 
--	{ SYS_DESC(SYS_ACCDATA_EL1), undef_access },
-+	{ SYS_DESC(SYS_ACCDATA_EL1), undef_access, reset_val, ACCDATA_EL1, 0,
-+	  .visibility = accdata_visibility},
- 
- 	{ SYS_DESC(SYS_SCXTNUM_EL1), undef_access },
- 
+ static exit_handle_fn arm_exit_handlers[] = {
+ 	[0 ... ESR_ELx_EC_MAX]	= kvm_handle_unknown_ec,
+ 	[ESR_ELx_EC_WFx]	= kvm_handle_wfx,
+@@ -300,6 +363,7 @@ static exit_handle_fn arm_exit_handlers[] = {
+ 	[ESR_ELx_EC_CP14_LS]	= kvm_handle_cp14_load_store,
+ 	[ESR_ELx_EC_CP10_ID]	= kvm_handle_cp10_id,
+ 	[ESR_ELx_EC_CP14_64]	= kvm_handle_cp14_64,
++	[ESR_ELx_EC_LS64B]	= handle_ls64b,
+ 	[ESR_ELx_EC_HVC32]	= handle_hvc,
+ 	[ESR_ELx_EC_SMC32]	= handle_smc,
+ 	[ESR_ELx_EC_HVC64]	= handle_hvc,
 -- 
 2.39.2
 
