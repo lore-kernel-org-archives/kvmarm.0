@@ -1,144 +1,130 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B71501A08CB;
-	Thu, 15 Aug 2024 13:00:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D618A19DF4A;
+	Thu, 15 Aug 2024 13:04:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723726807; cv=none; b=A8SZ7CyjemNfQhlF9LGgld/bGM2ZOIbZgV4xeq1IRiwJyxelZTzrKVjYNIUjLGQNxZmiU08vvcSwmETqZlDYpstQE5xX4TeehnBAeOML3fsUiPUxTZ5pWcpYKqVWsa4d35UAV1NlOsH8L7q1kC7RM5ihIhJtndKzVdI63G572pM=
+	t=1723727065; cv=none; b=fs1jC4QaoDdQY/RyWt87Dt64+jJkLj9Z1444qaupg97mioA0xkgHY4kft7DPho3VJWAZAje/Z2PN5mqAN1ugqwqSu/Eqllf5U0gSDQEhGBh/oPBlpOWYNGkuOhs+wIfWa5YGHU+h2QLZT1K3CVfp/3eisWvLCSGTHRw05Y5nVg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723726807; c=relaxed/simple;
-	bh=tL3485s77cp3nyUQox1RhnAa+GQ+JHb6xQAgmB1rbBE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=J1LXQRYNm+oCgLHNmFOD2ktUdnO8raxfvpVNaNT84WPthNuBaR7cSNeEOgv5TFJ24HCeuVoFgzhlamxZ1CFKUvPCL0zBt6/VWpgcljN7k/BKPKLXcrqnwXRHkeZsfTsHnq+iq/ccNFnIQ0qyZE2IRw4653EdokCD0x0xraQq5Gs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EZJfd8Jg; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1723727065; c=relaxed/simple;
+	bh=TcE9Fmkg76QEca3z+T0r9EanPBCiYLxL8EoYuoiKbzY=;
+	h=Subject:To:Cc:From:Date:In-Reply-To:Message-ID:MIME-Version:
+	 Content-Type; b=klBHaQWTl+LXSyNMeo0HiAJqvEYr9o/io2detaaKgsaTaODVzqA+WWItgzKugUxhDKGcYrZPtDCfoT0FisXs6qWqY4kq31Rv1HZNz/VmQFX06jFp97whP2Q4WjKOd9QQA2t1PvszW3j06y6irBzO4o/029nO461eQauU/4ddl1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=WfWoug1C; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EZJfd8Jg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EF67C4AF0A;
-	Thu, 15 Aug 2024 13:00:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723726807;
-	bh=tL3485s77cp3nyUQox1RhnAa+GQ+JHb6xQAgmB1rbBE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=EZJfd8JgYOLvbakZS7DAgnt5EMW4qc631/frUT8uHXg9HzYUq6/3+ImD9b1tIZbGX
-	 rlrXy5aKZA84P8n9KfXgPIgxcT1kr3BAM2Kfh3Yyu0gkYYn0it22FKIspDYvPaCkZR
-	 Bpweg/aM+QeBvIE7gU33Z/yxiqh7oThTXCzNV6Db9x+/liJ8Muya95DGg8csL1iHng
-	 VzXoeQhtB4oI3XPL3iH5xHvhwXnHTlMzWCw8dYDThpkTeJXFaAEuCL9TGu4knJKoOp
-	 Kva2YiT5I0Nqx2+0bLtgM8B+HrY3zIV9k1kz1Va7bfHI2QcyBHsftI6Bi7pHjqI54B
-	 4SSwx8heHeP0Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sea5F-003xld-OV;
-	Thu, 15 Aug 2024 14:00:05 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 11/11] KVM: arm64: Add documentation for KVM_EXIT_ARM_LDST64B
-Date: Thu, 15 Aug 2024 13:59:59 +0100
-Message-Id: <20240815125959.2097734-12-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240815125959.2097734-1-maz@kernel.org>
-References: <20240815125959.2097734-1-maz@kernel.org>
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="WfWoug1C"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28CBBC32786;
+	Thu, 15 Aug 2024 13:04:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1723727064;
+	bh=TcE9Fmkg76QEca3z+T0r9EanPBCiYLxL8EoYuoiKbzY=;
+	h=Subject:To:Cc:From:Date:In-Reply-To:From;
+	b=WfWoug1CnO7PJ6V6imGZ8sSHmuyUjbnZpUhu3NHje1OZCuAoWVBqZctY29f533mFW
+	 5tXX6B6HayDQGOnXmK4x6jV59BEb0EV6Ov3NrdrNhd5Z8FwRCqkYNmRRTcQMFyqDwy
+	 7cs5QkYrhCW7Tgsvu9z+Zz9vlR86FoU6SfSiqY4U=
+Subject: Patch "KVM: arm64: Don't defer TLB invalidation when zapping table entries" has been added to the 6.6-stable tree
+To: gregkh@linuxfoundation.org,kvmarm@lists.linux.dev,maz@kernel.org,oliver.upton@linux.dev,rananta@google.com,shahuang@redhat.com,will@kernel.org
+Cc: <stable-commits@vger.kernel.org>
+From: <gregkh@linuxfoundation.org>
+Date: Thu, 15 Aug 2024 15:04:21 +0200
+In-Reply-To: <20240815124626.21674-2-will@kernel.org>
+Message-ID: <2024081521-backfire-deputize-0792@gregkh>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=ANSI_X3.4-1968
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-stable: commit
+X-Patchwork-Hint: ignore 
 
-Add a bit of documentation for KVM_EXIT_ARM_LDST64B so that userspace
-knows what to expect.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
+This is a note to let you know that I've just added the patch titled
+
+    KVM: arm64: Don't defer TLB invalidation when zapping table entries
+
+to the 6.6-stable tree which can be found at:
+    http://www.kernel.org/git/?p=linux/kernel/git/stable/stable-queue.git;a=summary
+
+The filename of the patch is:
+     kvm-arm64-don-t-defer-tlb-invalidation-when-zapping-table-entries.patch
+and it can be found in the queue-6.6 subdirectory.
+
+If you, or anyone else, feels it should not be added to the stable tree,
+please let <stable@vger.kernel.org> know about it.
+
+
+From stable+bounces-67767-greg=kroah.com@vger.kernel.org Thu Aug 15 14:49:10 2024
+From: Will Deacon <will@kernel.org>
+Date: Thu, 15 Aug 2024 13:46:25 +0100
+Subject: KVM: arm64: Don't defer TLB invalidation when zapping table entries
+To: stable@vger.kernel.org
+Cc: Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev, Raghavendra Rao Ananta <rananta@google.com>, Shaoqin Huang <shahuang@redhat.com>
+Message-ID: <20240815124626.21674-2-will@kernel.org>
+
+From: Will Deacon <will@kernel.org>
+
+commit f62d4c3eb687d87b616b4279acec7862553bda77 upstream.
+
+Commit 7657ea920c54 ("KVM: arm64: Use TLBI range-based instructions for
+unmap") introduced deferred TLB invalidation for the stage-2 page-table
+so that range-based invalidation can be used for the accumulated
+addresses. This works fine if the structure of the page-tables remains
+unchanged, but if entire tables are zapped and subsequently freed then
+we transiently leave the hardware page-table walker with a reference
+to freed memory thanks to the translation walk caches. For example,
+stage2_unmap_walker() will free page-table pages:
+
+	if (childp)
+		mm_ops->put_page(childp);
+
+and issue the TLB invalidation later in kvm_pgtable_stage2_unmap():
+
+	if (stage2_unmap_defer_tlb_flush(pgt))
+		/* Perform the deferred TLB invalidations */
+		kvm_tlb_flush_vmid_range(pgt->mmu, addr, size);
+
+For now, take the conservative approach and invalidate the TLB eagerly
+when we clear a table entry. Note, however, that the existing level
+hint passed to __kvm_tlb_flush_vmid_ipa() is incorrect and will be
+fixed in a subsequent patch.
+
+Cc: Raghavendra Rao Ananta <rananta@google.com>
+Cc: Shaoqin Huang <shahuang@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>
+Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
+Reviewed-by: Marc Zyngier <maz@kernel.org>
+Link: https://lore.kernel.org/r/20240327124853.11206-2-will@kernel.org
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+Cc: <stable@vger.kernel.org> # 6.6.y only
+Signed-off-by: Will Deacon <will@kernel.org>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- Documentation/virt/kvm/api.rst | 43 ++++++++++++++++++++++++++++------
- 1 file changed, 36 insertions(+), 7 deletions(-)
+ arch/arm64/kvm/hyp/pgtable.c |    4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index fe722c5dada9..323f9fdf225d 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -1283,12 +1283,13 @@ userspace, for example because of missing instruction syndrome decode
- information or because there is no device mapped at the accessed IPA, then
- userspace can ask the kernel to inject an external abort using the address
- from the exiting fault on the VCPU. It is a programming error to set
--ext_dabt_pending after an exit which was not either KVM_EXIT_MMIO or
--KVM_EXIT_ARM_NISV. This feature is only available if the system supports
--KVM_CAP_ARM_INJECT_EXT_DABT. This is a helper which provides commonality in
--how userspace reports accesses for the above cases to guests, across different
--userspace implementations. Nevertheless, userspace can still emulate all Arm
--exceptions by manipulating individual registers using the KVM_SET_ONE_REG API.
-+ext_dabt_pending after an exit which was not either KVM_EXIT_MMIO,
-+KVM_EXIT_ARM_NISV, or KVM_EXIT_ARM_LDST64B. This feature is only available if
-+the system supports KVM_CAP_ARM_INJECT_EXT_DABT. This is a helper which
-+provides commonality in how userspace reports accesses for the above cases to
-+guests, across different userspace implementations. Nevertheless, userspace
-+can still emulate all Arm exceptions by manipulating individual registers
-+using the KVM_SET_ONE_REG API.
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -861,9 +861,11 @@ static void stage2_unmap_put_pte(const s
+ 	if (kvm_pte_valid(ctx->old)) {
+ 		kvm_clear_pte(ctx->ptep);
  
- See KVM_GET_VCPU_EVENTS for the data structure.
+-		if (!stage2_unmap_defer_tlb_flush(pgt))
++		if (!stage2_unmap_defer_tlb_flush(pgt) ||
++		    kvm_pte_table(ctx->old, ctx->level)) {
+ 			kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu,
+ 					ctx->addr, ctx->level);
++		}
+ 	}
  
-@@ -6935,12 +6936,14 @@ in send_page or recv a buffer to recv_page).
- 
- ::
- 
--		/* KVM_EXIT_ARM_NISV */
-+		/* KVM_EXIT_ARM_NISV / KVM_EXIT_ARM_LDST64B */
- 		struct {
- 			__u64 esr_iss;
- 			__u64 fault_ipa;
- 		} arm_nisv;
- 
-+- KVM_EXIT_ARM_NISV:
-+
- Used on arm64 systems. If a guest accesses memory not in a memslot,
- KVM will typically return to userspace and ask it to do MMIO emulation on its
- behalf. However, for certain classes of instructions, no instruction decode
-@@ -6974,6 +6977,32 @@ Note that although KVM_CAP_ARM_NISV_TO_USER will be reported if
- queried outside of a protected VM context, the feature will not be
- exposed if queried on a protected VM file descriptor.
- 
-+- KVM_EXIT_ARM_LDST64B:
-+
-+Used on arm64 systems. When a guest using a LD64B, ST64B, ST64BV, ST64BV0,
-+outside of a memslot, KVM will return to userspace with KVM_EXIT_ARM_LDST64B,
-+exposing the relevant ESR_EL2 information and faulting IPA, similarly to
-+KVM_EXIT_ARM_NISV.
-+
-+Userspace is supposed to fully emulate the instructions, which includes:
-+
-+	- fetch of the operands for a store, including ACCDATA_EL1 in the case
-+	  of a ST64BV0 instruction
-+	- deal with the endianness if the guest is big-endian
-+	- emulate the access, including the delivery of an exception if the
-+	  access didn't succeed
-+	- provide a return value in the case of ST64BV/ST64BV0
-+	- return the data in the case of a load
-+	- increment PC if the instruction was successfully executed
-+
-+Note that there is no expectation of performance for this emulation, as it
-+involves a large number of interaction with the guest state. It is, however,
-+expected that the instruction's semantics are preserved, specially the
-+single-copy atomicity property of the 64 byte access.
-+
-+This exit reason must be handled if userspace sets ID_AA64ISAR1_EL1.LS64 to a
-+non-zero value, indicating that FEAT_LS64* is enabled.
-+
- ::
- 
- 		/* KVM_EXIT_X86_RDMSR / KVM_EXIT_X86_WRMSR */
--- 
-2.39.2
+ 	mm_ops->put_page(ctx->ptep);
 
+
+Patches currently in stable-queue which might be from will@kernel.org are
+
+queue-6.6/kvm-arm64-don-t-defer-tlb-invalidation-when-zapping-table-entries.patch
+queue-6.6/kvm-arm64-don-t-pass-a-tlbi-level-hint-when-zapping-table-entries.patch
