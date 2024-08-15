@@ -1,143 +1,108 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CA9D1A4F3B;
-	Thu, 15 Aug 2024 15:46:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0722A1B375F
+	for <kvmarm@lists.linux.dev>; Thu, 15 Aug 2024 16:00:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723736774; cv=none; b=tK8R4wTQjXSItjCcyt2LB2GmzfmSwT8Jp7Vbi6Mb0Yt6Dhb43qw9ECOXfER8pLsRbr6JeMKX2JZm6EAfx0nd2UtG2mmhrGmVv4VNkS14ybfYwELYUIOaDmIEwnDAKmnhwjrdHOYM4C7/1zMxU10Obx44xfmP1iR2VbK2248OGnQ=
+	t=1723737625; cv=none; b=rXKzxrRbJdSoTxnnO8VKMHsfgZIj/kBsRVwEJxeltRdu8Lx+OnwjeQWxYs/P9uZi3yogArT8eP4mO0iv9fxPMr4umFyvBaHeAqN3iLmQwoaDuTi/cnlUIsDbIc1QriK3IgJfm8SkcktQ0RRHK1cQ2dHaf6w2oDU54iv3WTKRWac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723736774; c=relaxed/simple;
-	bh=OhahuUFfndYeeiIAqMoZWO/itLbhbmCl9Dektx2bSmw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Do8fxN4JEcNSI1DtjxbxpoOw4H+WuJbkuvy6QBOV3yKEfuPWDb1vppfqcWL7AG4LbOwoIwLzp04QRhorlteGAlF+b9uj8M/n1fOfmhdMOwAj1keUkRq7nUtgc7uvLKlqsQDN7Fixrk2NUxesjEsyeMBunw2pPYVmgwlHjTgA0VU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZQHxQvc5; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZQHxQvc5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A925FC32786;
-	Thu, 15 Aug 2024 15:46:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723736774;
-	bh=OhahuUFfndYeeiIAqMoZWO/itLbhbmCl9Dektx2bSmw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZQHxQvc5mzqu6Xt9OdE1XNZLD70/O3dkcJiXZaxebgJDxx2JQVYIg435975yYCQQr
-	 l5jUPJ9oJMKRElz7Dpy6UeqrDFRWxrZL9GgVJl4lw07+FN4VZhWpX5TJn27GiUUmzn
-	 zflbVeq8Fynrs4ZZayXEmrP67CO7FB82ptXHbETuTJY707TwQqihr/CnxYOeOkK3Iq
-	 Dls40SNfnnISQ4sF8cCZV+d/wVSzh4VpXAdOpq9qVv/6PVrUYatD7Il2JO1i+4JRAP
-	 0bkotokage4eWgXhiPbnrXkVCVs4p5DoijU6EnNn09pzgcTeB9heRVbuopXzrzYpak
-	 8cbW3fI2l2ChA==
-Date: Thu, 15 Aug 2024 16:46:04 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Florian Weimer <fweimer@redhat.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
-	Ross Burton <ross.burton@arm.com>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v10 24/40] arm64/signal: Expose GCS state in signal frames
-Message-ID: <280e4455-9cf7-40e1-9114-7bb3aa9de868@sirena.org.uk>
-References: <20240801-arm64-gcs-v10-0-699e2bd2190b@kernel.org>
- <20240801-arm64-gcs-v10-24-699e2bd2190b@kernel.org>
- <ZrzIv3FWNgJizDc2@e133380.arm.com>
- <7433e3d2-996a-45a0-b917-666a340ad109@sirena.org.uk>
- <Zr4KMaBv4JXx8uBz@e133380.arm.com>
- <efe1d936-011d-49e3-a0ff-8f6276e4d782@sirena.org.uk>
- <Zr4fxZ8wf+Wcey4E@e133380.arm.com>
+	s=arc-20240116; t=1723737625; c=relaxed/simple;
+	bh=LAlAFNPkLbQZ2rsS1x/8jzamWztOlnH/Ek+3JvMew0c=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UBrVdjAAS4DrJHUutNdD7W6w6GZps5FGIoeVax8W++mCMH7P36Yd4+/wTYch9y3Xo477Z6P4TN1vfKqg6uuaiZ+Iv7XfCRWRKC7zhYw8fDCIypQS8Ws7zQMdgxedNDE4fEwu+weCYH/n3/vOBmXWSuLUuBal5CrSoNBdwGV7wH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Wl8rz19LXz6D92H;
+	Thu, 15 Aug 2024 23:57:23 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id E43AD140119;
+	Fri, 16 Aug 2024 00:00:19 +0800 (CST)
+Received: from A2303104131.china.huawei.com (10.203.177.241) by
+ lhrpeml500005.china.huawei.com (7.191.163.240) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 15 Aug 2024 17:00:14 +0100
+From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+To: <kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>
+CC: <maz@kernel.org>, <will@kernel.org>, <catalin.marinas@arm.com>,
+	<oliver.upton@linux.dev>, <james.morse@arm.com>, <suzuki.poulose@arm.com>,
+	<yuzenghui@huawei.com>, <wangzhou1@hisilicon.com>, <linuxarm@huawei.com>
+Subject: [PATCH v2] KVM: arm64: Make the exposed feature bits in AA64DFR0_EL1 writable from userspace
+Date: Thu, 15 Aug 2024 16:59:54 +0100
+Message-ID: <20240815155954.85480-1-shameerali.kolothum.thodi@huawei.com>
+X-Mailer: git-send-email 2.12.0.windows.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="GXfbjsfo8XCmDLMF"
-Content-Disposition: inline
-In-Reply-To: <Zr4fxZ8wf+Wcey4E@e133380.arm.com>
-X-Cookie: -- Owen Meredith
+Content-Type: text/plain
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
+KVM exposes the OS double lock feature bit to Guests but returns
+RAZ/WI on Guest OSDLR_EL1 access. This breaks Guest migration between
+systems where this feature differ. Add support to make this feature
+writable from userspace by setting the mask bit. While at it, set the
+mask bits for the exposed WRPs(Number of Watchpoints) as well.
+Also update the selftest to cover these fields.
 
---GXfbjsfo8XCmDLMF
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+However we still can't make BRPs and CTX_CMPs fields writable, because
+as per ARM ARM DDI 0487K.a, section G2.8.2 Breakpoint types and
+linking of breakpoints, highest numbered breakpoints must be context aware
+breakpoints. And it will be problematic if userspace decreases the number
+of non-context aware breakpoints as it will make the context aware
+breakpoints for the guest mapped to a wrong one.
 
-On Thu, Aug 15, 2024 at 04:33:25PM +0100, Dave Martin wrote:
-> On Thu, Aug 15, 2024 at 04:05:32PM +0100, Mark Brown wrote:
+Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+---
+   v1 --> v2:
+   Removed making BRPs and CTX_CMPs writable.
+   v1: https://lore.kernel.org/all/20240813142835.77180-1-shameerali.kolothum.thodi@huawei.com/
+---
+ arch/arm64/kvm/sys_regs.c                         | 13 ++++++++++++-
+ tools/testing/selftests/kvm/aarch64/set_id_regs.c |  2 ++
+ 2 files changed, 14 insertions(+), 1 deletion(-)
 
-> > The expectation (at least for arm64) is that the main program will only
-> > have shadow stacks if everything says it can support them.  If the
-> > dynamic linker turns them on during startup prior to parsing the main
-> > executables this means that it should turn them off before actually
-> > starting the executable, taking care to consider any locking of feature=
-s.
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index c90324060436..e77cd6d1abb5 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2376,7 +2376,18 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	  .get_user = get_id_reg,
+ 	  .set_user = set_id_aa64dfr0_el1,
+ 	  .reset = read_sanitised_id_aa64dfr0_el1,
+-	  .val = ID_AA64DFR0_EL1_PMUVer_MASK |
++	/*
++	 * We can't still make BRPs and CTX_CMPx writable as highest
++	 * numbered breakpoints must be context aware breakpoints(ARM ARM
++	 * DDI 0487K.a, section G2.8.2 Breakpoint types and linking of
++	 * breakpoints). Hence, if the number of non-context aware breakpoints
++	 * for the Guest is decreased by userspace, that will be problematic
++	 * as KVM will map context aware breakpoints for the vCPU to different
++	 * numbered breakpoints for the pCPU.
++	 */
++	  .val = ID_AA64DFR0_EL1_DoubleLock_MASK |
++		 ID_AA64DFR0_EL1_WRPs_MASK |
++		 ID_AA64DFR0_EL1_PMUVer_MASK |
+ 		 ID_AA64DFR0_EL1_DebugVer_MASK, },
+ 	ID_SANITISED(ID_AA64DFR1_EL1),
+ 	ID_UNALLOCATED(5,2),
+diff --git a/tools/testing/selftests/kvm/aarch64/set_id_regs.c b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
+index d20981663831..6edc5412abe8 100644
+--- a/tools/testing/selftests/kvm/aarch64/set_id_regs.c
++++ b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
+@@ -68,6 +68,8 @@ struct test_feature_reg {
+ 	}
+ 
+ static const struct reg_ftr_bits ftr_id_aa64dfr0_el1[] = {
++	S_REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64DFR0_EL1, DoubleLock, 0),
++	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64DFR0_EL1, WRPs, 0),
+ 	S_REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64DFR0_EL1, PMUVer, 0),
+ 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64DFR0_EL1, DebugVer, ID_AA64DFR0_EL1_DebugVer_IMP),
+ 	REG_FTR_END,
+-- 
+2.45.2
 
-> Hmm, so we really do get a clear "enable shadow stack" call to the
-> kernel, which we can reasonaly expect won't happen for ancient software?
-
-Yes, userspace always has to explicitly enable the GCS.
-
-> If so, I think dumping the GCS state in the sigframe could be made
-> conditional on that without problems (?)
-
-It is - we only allocate the sigframe if the task has GCS enabled.
-
-> > > Related question: does shadow stack work with ucontext-based coroutin=
-es?
-> > > Per-context stacks need to be allocated by the program for that.
-
-> > Yes, ucontext based coroutines are the sort of thing I meant when I was
-> > talking about returning to a different context? =20
-
-> Ah, right.  Doing this asynchronously on the back of a signal (instead
-> of doing a sigreturn) is the bad thing.  setcontext() officially
-> doesn't work for this any more, and doing it by hacking or rebuilding
-> the sigframe is extremely hairy and probably a terrible idea for the
-> reasons I gave.
-
-I see.  I tend to view this as more adventurous than I personally would
-be when writing userspace code but equally I don't see a need to
-actively break things.  There's no *requirement* to use libc...
-
-> So, overall I think making ucontext coroutines with with GCS is purely
-> a libc matter that is "interesting" here, but we don't need to worry
-> about.
-
-Yes, it's not our problem so long as we don't get in the way somehow.
-
---GXfbjsfo8XCmDLMF
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAma+IrsACgkQJNaLcl1U
-h9DSDwf/fvoSsWjkRUucDXlPXcS3xALg/zYnf2jri8K1FvhKbx6ExKFpnk/0g2BM
-wK2PwaNUJU1aco+sWt4qWO5BpC2IehhK4SayS1RosRQNYaC++NMOh2/8HVNEHE10
-XYPyfSZwI+nnf/4yS6Zz1HdzVTbuTkNBtkWyJtEO+gVukwrqd8ZroQ0fuSBvQyOu
-ZmkniP6ouY5JUJvZtbLtaP0MurY44KnJyfZKbDuNyinTVw/SRukqIPVzy3RT0tTJ
-rYVAnu34kZUCOei6ztPt+st1eA0IfyO0JvM2DcPAY7ZI1JHi15NFj0P2SedICD9d
-gFptQBZcUxVlVAqy5L/gZ2G4JmaFVw==
-=AdhV
------END PGP SIGNATURE-----
-
---GXfbjsfo8XCmDLMF--
