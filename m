@@ -1,46 +1,59 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B39FD19F470
-	for <kvmarm@lists.linux.dev>; Thu, 15 Aug 2024 13:18:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF89219F49A
+	for <kvmarm@lists.linux.dev>; Thu, 15 Aug 2024 13:37:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723727914; cv=none; b=J3Q9e01BXpOwtPYv2M9LtZu4YElFN2hJIjlyuSwjYa7gRsyMlt4k76C8DX7yEBfdCPgivfJgD2bKyOtmLpBK3LUHTSvrRc3EzM0ttdPpKH8BdF5BKb53kGrs9m0wVoDWQJdPCpV7y8jdNKnHwxDl1lhqtHYz9/AnZ0SRP7KLkJs=
+	t=1723729055; cv=none; b=WIAKeMf5AjRB1cViM7d6HGmVUNLhNvxwJlKHczo7TxLX5yx+2qBnHpmOo7/EHDmeenUmNOX9cEcPCrWIBS03K7cnVmyTW6kCVEk+SHVgcypPTlfAcdhl0HBy72GcRwdjoojInHhmsYQjmqXS+//9ZncF+xbjm3HOBTD2FWDrccM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723727914; c=relaxed/simple;
-	bh=ju1PbOxKkRMBSCDPfwqbV55KIg/fWtObHE44vWARDIc=;
+	s=arc-20240116; t=1723729055; c=relaxed/simple;
+	bh=S55pv2tvhOplbIrUC4DKqA+mD14R5cLIsvDmthqKVzA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Vt/4J5KUKxqMkzJXs2UabCSQytYOJK3mAQ0rw7ELcEtXftuVm3X1ipk/3DYYsWJtDlfGzFexqXRsKfQMhazcxo4aYAgCwvLF95KLY3CvQlEVYu0G05wY3/ylCHkwsBkYQEqI2+qZ5Dx88OQrEot3jOYMWj383fgquRV1GVEJQJ0=
+	 Content-Type:Content-Disposition:In-Reply-To; b=L6s4WctyvMiO2fCofrup8ORU8b4kLe+uPPOLUZRz1N99GVUhJa6eJQV/bTKHii9Tvl9VZvHwuLcoBApH24C5WE6OZhUY5vGMiv2SPRjouoZJ+VvQvrZTgKYebNlB3h5CgS4pE5dk56uWLrwj0B7HzYnKEs1TwLf/9njGwLJGChM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C896914BF;
-	Thu, 15 Aug 2024 06:18:50 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 52C343F6A8;
-	Thu, 15 Aug 2024 06:18:21 -0700 (PDT)
-Date: Thu, 15 Aug 2024 14:18:15 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org,
-	akpm@linux-foundation.org, aneesh.kumar@kernel.org,
-	aneesh.kumar@linux.ibm.com, bp@alien8.de, broonie@kernel.org,
-	christophe.leroy@csgroup.eu, dave.hansen@linux.intel.com,
-	hpa@zytor.com, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
-	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
-	oliver.upton@linux.dev, shuah@kernel.org, szabolcs.nagy@arm.com,
-	tglx@linutronix.de, will@kernel.org, x86@kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 18/29] arm64: add POE signal support
-Message-ID: <20240815131815.GA3657684@e124191.cambridge.arm.com>
-References: <20240503130147.1154804-1-joey.gouly@arm.com>
- <20240503130147.1154804-19-joey.gouly@arm.com>
- <ZqJ2knGETfS4nfEA@e133380.arm.com>
- <20240801155441.GB841837@e124191.cambridge.arm.com>
- <Zqu2VYELikM5LFY/@e133380.arm.com>
- <20240806103532.GA1986436@e124191.cambridge.arm.com>
- <20240806143103.GB2017741@e124191.cambridge.arm.com>
- <ZrzHU9et8L_0Tv_B@arm.com>
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D46EC14BF;
+	Thu, 15 Aug 2024 06:37:58 -0700 (PDT)
+Received: from e133380.arm.com (e133380.arm.com [10.1.197.55])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3AA023F6A8;
+	Thu, 15 Aug 2024 06:37:28 -0700 (PDT)
+Date: Thu, 15 Aug 2024 14:37:22 +0100
+From: Dave Martin <Dave.Martin@arm.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Florian Weimer <fweimer@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
+	Ross Burton <ross.burton@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v10 23/40] arm64/signal: Set up and restore the GCS
+ context for signal handlers
+Message-ID: <Zr4EkmtUKop9o9wu@e133380.arm.com>
+References: <20240801-arm64-gcs-v10-0-699e2bd2190b@kernel.org>
+ <20240801-arm64-gcs-v10-23-699e2bd2190b@kernel.org>
+ <ZrzEfg5LqdAzgJ6+@e133380.arm.com>
+ <08932f6d-01ef-40e8-97d2-08f0d2016191@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -49,81 +62,65 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZrzHU9et8L_0Tv_B@arm.com>
+In-Reply-To: <08932f6d-01ef-40e8-97d2-08f0d2016191@sirena.org.uk>
 
-Hi Catalin,
-
-On Wed, Aug 14, 2024 at 04:03:47PM +0100, Catalin Marinas wrote:
-> Hi Joey,
+On Wed, Aug 14, 2024 at 05:00:23PM +0100, Mark Brown wrote:
+> On Wed, Aug 14, 2024 at 03:51:42PM +0100, Dave Martin wrote:
+> > On Thu, Aug 01, 2024 at 01:06:50PM +0100, Mark Brown wrote:
 > 
-> On Tue, Aug 06, 2024 at 03:31:03PM +0100, Joey Gouly wrote:
-> > diff --git arch/arm64/kernel/signal.c arch/arm64/kernel/signal.c
-> > index 561986947530..ca7d4e0be275 100644
-> > --- arch/arm64/kernel/signal.c
-> > +++ arch/arm64/kernel/signal.c
-> > @@ -1024,7 +1025,10 @@ static int setup_sigframe_layout(struct rt_sigframe_user_layout *user,
-> >                         return err;
-> >         }
-> >  
-> > -       if (system_supports_poe()) {
-> > +       if (system_supports_poe() &&
-> > +                       (add_all ||
-> > +                        mm_pkey_allocation_map(current->mm) != 0x1 ||
-> > +                        read_sysreg_s(SYS_POR_EL0) != POR_EL0_INIT)) {
-> >                 err = sigframe_alloc(user, &user->poe_offset,
-> >                                      sizeof(struct poe_context));
-> >                 if (err)
-> > 
-> > 
-> > That is, we only save the POR_EL0 value if any pkeys have been allocated (other
-> > than pkey 0) *or* if POR_EL0 is a non-default value.
+> > > +	put_user_gcs((unsigned long)sigtramp, gcspr_el0 - 2, &ret);
+> > > +	put_user_gcs(GCS_SIGNAL_CAP(gcspr_el0 - 1), gcspr_el0 - 1, &ret);
+> > > +	if (ret != 0)
+> > > +		return ret;
 > 
-> I had a chat with Dave as well on this and, in principle, we don't want
-> to add stuff to the signal frame unnecessarily, especially for old
-> binaries that have no clue of pkeys. OTOH, it looks like too complicated
-> for just 16 bytes. Also POR_EL0 all RWX is a valid combination, I don't
-> think we should exclude it.
+> > What happens if we went wrong here, or if the signal we are delivering
+> > was caused by a GCS overrun or bad GCSPR_EL0 in the first place?
 > 
-> If no pkey has been allocated, I guess we could skip this and it also
-> matches the x86 description of the PKRU being guaranteed to be preserved
-> only for the allocated keys. Do we reserve pkey 0 for arm64? I thought
-> that's only an x86 thing to emulate execute-only mappings.
-
-To make it less complicated, I could drop the POR_EL0 check and just do:
-
--       if (system_supports_poe()) {
-+       if (system_supports_poe() &&
-+                       (add_all ||
-+                        mm_pkey_allocation_map(current->mm) != 0x1) {
-
-This wouldn't preserve the value of POR_EL0 if no pkeys had been allocated, but
-that is fine, as you said / the man pages say.
-
-We don't preserve pkey 0, but it is the default for mappings and defaults to
-RWX. So changing it probably will lead to unexpected things.
-
+> > It feels like a program has no way to rescue itself from excessive
+> > recursion in some thread.  Is there something equivalent to
+> > sigaltstack()?
 > 
-> Another corner case would be the signal handler doing a pkey_alloc() and
-> willing to populate POR_EL0 on sigreturn. It will have to find room in
-> the signal handler, though I don't think that's a problem.
+> > Or is the shadow stack always supposed to be big enough to cope with
+> > recursion that exhausts the main stack and alternate signal stack (and
+> > if so, how is this ensured)?
+> 
+> There's no sigaltstack() for GCS, this is also the ABI with the existing
+> shadow stack on x86 and should be addressed in a cross architecture
+> fashion.  There have been some discussions about providing a shadow alt
+> stack but they've generally been circular and inconclusive, there were a
+> bunch of tradeoffs for corner cases and nobody had a clear sense as to
+> what a good solution should be.  It was a bit unclear that actively
+> doing anything was worthwhile.  The issues were IIRC around unwinders
+> and disjoint shadow stacks, compatibility with non-shadow stacks and
+> behaviour when we overflow the shadow stack.  I think there were also
+> some applications trying to be very clever with alt stacks that needed
+> to be interacted with and complicated everything but I could be
+> misremembering there.
+> 
+> Practically speaking since we're only storing return addresses the
+> default GCS should be extremely large so it's unlikely to come up
+> without first encountering and handling issues on the normal stack.
+> Users allocating their own shadow stacks should be careful.  This isn't
+> really satisfying but is probably fine in practice, there's certainly
+> not been any pressure yet from the existing x86 deployments (though at
+> present nobody can explicitly select their own shadow stack size,
+> perhaps it'll become more of an issue when the clone3() stuff is in).
 
-pkey_alloc() doesn't appear in the signal safety man page, but that might just
-be an omission due to permission keys being newer, than actually saying
-pkey_alloc() can't be used.
+Ack, if this is a known limitation then I guess it makes sense just to
+follow other arches.
 
-If POR_EL0 isn't in the sig context, I think the signal handler could just
-write the POR_EL0 system register directly? The kernel wouldn't restore POR_EL0
-in that case, so the value set in the signal handler would just be preserved.
-
-The reason that trying to preserve the value of POR_EL0 without any pkeys
-allocated (like in the patch in my previous e-mail had) doesn't really make
-sense, is that when you do pkey_alloc() you have to pass an initial value for
-the pkey, so that will overwite what you may have manually written into
-POR_EL0. Also you can't pass an unallocated pkey value to pkey_mprotect().
+I see that we default the shadow stack size to half the main stack size,
+which should indeed count as "huge".  I guess this makes shadow stack
+overrun unlikely at least (at least, not before the main stack
+overruns).
 
 
-That's a lot of words to say, or ask, do you agree with the approach of only
-saving POR_EL0 in the signal frame if num_allocated_pkeys() > 1?
+Hopping to an alternate (main) stack while continuing to push on the
+same shadow stack doesn't sound broken in principle.
 
-Thanks,
-Joey
+Is there a test for taking and returning from a signal on an alternate
+(main) stack, when a shadow stack is in use?  Sounds like something
+that would be good to check if not.
+
+Cheers
+---Dave
