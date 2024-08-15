@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5081E19DF58;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92BE619DF97;
 	Thu, 15 Aug 2024 13:00:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723726805; cv=none; b=OHjE7XvCAC6BX3alvJgSNlG2BwVyC5YZhk7LGFOZLASgVhErB43X35kuA1cn1Th1dlR+/bvz4aTLjpco1UY1QkQ/P1eRuHzFjAXmfAVUvzYoMiCRqOt+xvciISGqXplfYZxxSrvD+weVOMvcuOML9dJOc5kwiw+kn6f2FA52nLg=
+	t=1723726805; cv=none; b=owAtRtA1GPbbZvVRfiY6UNqf8nPIyUb/rR+iHBlMThxmuyvWazDZXLQKaAEu9MI6oU1uCNG1JSu3AXLJxBsgHj0PhU+H/sSb4w3tW0B3IX8gJ5DZbFb+vyTGw2pzfKhhbevLR/jdjxokcTxvypu+2/3iKXwRNiIQqIR1M0YvJEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1723726805; c=relaxed/simple;
-	bh=7yPgO+gFWmtYo2hX7bb0kFw4QbZDVO3VBIpTe6cAldM=;
+	bh=knD9A7RR7k7dMVag/IIKZfs9Lw12TkLZBEesnE10nOo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=HD4yz4A6y3+ccpaIksl+IxQ2/tZstv6sVyiKZtC9dYuvAITbLThIfXgbUeJRhVH/ZHb38f1aLWNUaa/7hbWxeaBoafE0mgQbKDMk/VxwynBypBgxpJvPyrPf2/i3wBU2GIt5RIi84AoJOVkgOo/zgIN3EbRT5T02OlIVBuSuzPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qMKdasHC; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=NU7m5y7Z+D6iFkCzRNcuMcZBoTaSV8K5U63d/LRqphzOyT+vZKlyXQXBJ85em3a3kYlmGqQXhQPj1HVJsn3TY9RAcRoq4Ui5TSz5pKalXPVkmlQj1pM/6BzVdJ8MBo/xeEXG3USD3rqmzjjC6RAYmiEmkMGypD1n7zM+EmHPVUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VvRK+wAL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qMKdasHC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C020C4AF0D;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VvRK+wAL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3029CC4AF10;
 	Thu, 15 Aug 2024 13:00:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1723726805;
-	bh=7yPgO+gFWmtYo2hX7bb0kFw4QbZDVO3VBIpTe6cAldM=;
+	bh=knD9A7RR7k7dMVag/IIKZfs9Lw12TkLZBEesnE10nOo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=qMKdasHC5YS4Rlmnbt4dvh5r5AeObcjiPwiU5fwMpoeNG++dJLoCFXsPjq356SVYU
-	 mpbfTqsooVdK10bPI4f38Y3Uu/JpTPRVjds06qwEFCH1gh7O3IvR1glCp68CA9tuSN
-	 d/SbJlubQ3OkvlsQ79Gn80vWJSC+Foaf6tgdIBxr18GcmhKN2Q7NCPCB3sOOpX00lO
-	 4h96kJtkEDJP7O0VWc4Qgfeb0VmLczZJ6Jgv+J4ETDwUVgU6RjdMOtjgh5+FXBBCSr
-	 ld3uO4dsTgfhOmNixEyYLcnYZ/L4HWk4BqFH6NjqepLMr4YwZuvYoGlTxhoQWlaiFd
-	 owrwbNvWUlZhw==
+	b=VvRK+wALz4hW7ifjNRqAIPfJLWftvRDM60N0Fvie6ozLb6jGSKr+pS7hEFYZMC7JY
+	 2z+1iGut81owXtFGPJ1QrNrqmholXgmtIwh/k8rsrUUT8bOn0jWZCYdo4q+XqxHOPM
+	 ghcHv05TU7L7Yb4FiManOYVkrMV8LJ1Of+A+jnT+ilptClj2xNZmW1zud4eAhl9uP6
+	 bquBuQwd/Fiy30Xy8r/26RVKZj16Q3UZVPtV+Fuq7rWG89W99XeaLlYBg+xsi5FmwY
+	 bRY3YfG7rTUbx0KK5suuzkepDstEdKNre+XIF5EkqknqNtOoCJyBYdagywqf/O7cBe
+	 98bQcQ8pX5KAw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sea5D-003xld-Dl;
+	id 1sea5D-003xld-8c;
 	Thu, 15 Aug 2024 14:00:03 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -40,9 +40,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 04/11] KVM: arm64: Add context-switch of ACCDATA_EL1
-Date: Thu, 15 Aug 2024 13:59:52 +0100
-Message-Id: <20240815125959.2097734-5-maz@kernel.org>
+Subject: [PATCH 03/11] KVM: arm64: Add ACCDATA_EL1 to the sysreg array
+Date: Thu, 15 Aug 2024 13:59:51 +0100
+Message-Id: <20240815125959.2097734-4-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240815125959.2097734-1-maz@kernel.org>
 References: <20240815125959.2097734-1-maz@kernel.org>
@@ -58,69 +58,59 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add ACCDATA_EL1 save/restore as part of the EL0 context. This is
-conditioned on the guest's view of ID_AA64ISAR1_EL1.LS64 reporting
-that this register is supported.
+Make ACCDATA_EL1 a first-class citizen, and add it to the sysreg
+array. Visibility is conditioned on the feature being enabled.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 29 +++++++++++++++++-----
- 1 file changed, 23 insertions(+), 6 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |  3 +++
+ arch/arm64/kvm/sys_regs.c         | 12 +++++++++++-
+ 2 files changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-index 4c0fdabaf8ae..d23d7113261b 100644
---- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-@@ -21,12 +21,6 @@ static inline void __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
- 	ctxt_sys_reg(ctxt, MDSCR_EL1)	= read_sysreg(mdscr_el1);
- }
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index a33f5996ca9f..25ee4e5f55f1 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -446,6 +446,9 @@ enum vcpu_sysreg {
+ 	GCR_EL1,	/* Tag Control Register */
+ 	TFSRE0_EL1,	/* Tag Fault Status Register (EL0) */
  
--static inline void __sysreg_save_user_state(struct kvm_cpu_context *ctxt)
--{
--	ctxt_sys_reg(ctxt, TPIDR_EL0)	= read_sysreg(tpidr_el0);
--	ctxt_sys_reg(ctxt, TPIDRRO_EL0)	= read_sysreg(tpidrro_el0);
--}
--
- static inline struct kvm_vcpu *ctxt_to_vcpu(struct kvm_cpu_context *ctxt)
- {
- 	struct kvm_vcpu *vcpu = ctxt->__hyp_running_vcpu;
-@@ -66,6 +60,26 @@ static inline bool ctxt_has_tcrx(struct kvm_cpu_context *ctxt)
- 	return kvm_has_feat(kern_hyp_va(vcpu->kvm), ID_AA64MMFR3_EL1, TCRX, IMP);
- }
- 
-+static inline bool ctxt_has_accdata(struct kvm_cpu_context *ctxt)
-+{
-+	struct kvm_vcpu *vcpu = ctxt_to_vcpu(ctxt);
++	/* Random stuff */
++	ACCDATA_EL1,	/* Accelerator Data */
 +
-+	return kvm_has_feat(kern_hyp_va(vcpu->kvm), ID_AA64ISAR1_EL1, LS64, LS64_ACCDATA);
+ 	/* 32bit specific registers. */
+ 	DACR32_EL2,	/* Domain Access Control Register */
+ 	IFSR32_EL2,	/* Instruction Fault Status Register */
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index c90324060436..7b540811aa38 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2233,6 +2233,15 @@ static unsigned int sve_el2_visibility(const struct kvm_vcpu *vcpu,
+ 	return sve_visibility(vcpu, rd);
+ }
+ 
++static unsigned int accdata_visibility(const struct kvm_vcpu *vcpu,
++				       const struct sys_reg_desc *rd)
++{
++	if (kvm_has_feat(vcpu->kvm, ID_AA64ISAR1_EL1, LS64, LS64_ACCDATA))
++		return 0;
++
++	return REG_HIDDEN;
 +}
 +
-+static inline void __sysreg_save_user_state(struct kvm_cpu_context *ctxt)
-+{
-+	ctxt_sys_reg(ctxt, TPIDR_EL0)	= read_sysreg(tpidr_el0);
-+	ctxt_sys_reg(ctxt, TPIDRRO_EL0)	= read_sysreg(tpidrro_el0);
-+
-+	/*
-+	 * Despite the appearances, ACCDATA_EL1 is part of the EL0
-+	 * context, as it can only be used using ST64BV0.
-+	 */
-+	if (ctxt_has_accdata(ctxt))
-+		ctxt_sys_reg(ctxt, ACCDATA_EL1)	= read_sysreg_s(SYS_ACCDATA_EL1);
-+}
-+
- static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
- {
- 	ctxt_sys_reg(ctxt, SCTLR_EL1)	= read_sysreg_el1(SYS_SCTLR);
-@@ -126,6 +140,9 @@ static inline void __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
- {
- 	write_sysreg(ctxt_sys_reg(ctxt, TPIDR_EL0),	tpidr_el0);
- 	write_sysreg(ctxt_sys_reg(ctxt, TPIDRRO_EL0),	tpidrro_el0);
-+
-+	if (ctxt_has_accdata(ctxt))
-+		write_sysreg_s(ctxt_sys_reg(ctxt, ACCDATA_EL1), SYS_ACCDATA_EL1);
- }
+ static bool access_zcr_el2(struct kvm_vcpu *vcpu,
+ 			   struct sys_reg_params *p,
+ 			   const struct sys_reg_desc *r)
+@@ -2519,7 +2528,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_CONTEXTIDR_EL1), access_vm_reg, reset_val, CONTEXTIDR_EL1, 0 },
+ 	{ SYS_DESC(SYS_TPIDR_EL1), NULL, reset_unknown, TPIDR_EL1 },
  
- static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
+-	{ SYS_DESC(SYS_ACCDATA_EL1), undef_access },
++	{ SYS_DESC(SYS_ACCDATA_EL1), undef_access, reset_val, ACCDATA_EL1, 0,
++	  .visibility = accdata_visibility},
+ 
+ 	{ SYS_DESC(SYS_SCXTNUM_EL1), undef_access },
+ 
 -- 
 2.39.2
 
