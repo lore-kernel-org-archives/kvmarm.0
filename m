@@ -1,316 +1,244 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2073.outbound.protection.outlook.com [40.107.100.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C47513C909;
-	Thu, 15 Aug 2024 18:28:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723746524; cv=none; b=fYoawLCwLWj4A9nVITT7rLLcx+7tE/JzenpIZQEOVeZP7t5oJdummfVFoPV/sdzfiORoM/mzVGRlp7WcmTzd8BZBH9XS1vRc5LLeTlsnK9paKRob/0r8Lx54jU/+A+qw9LtOBPnqWCK4BbI60j/g1sOTj8Puk1xlVtEUjEZmUek=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723746524; c=relaxed/simple;
-	bh=TnkEmfIWsIecDCCRKfcH9H2UtA9GK9Cl/t13FaOmFOg=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gJnIUP+RlQgpVkKFiqE29ZqehSXA4QfDOf4No6qcI0T+sQ+WuXsii07hoS66xSNZS5ym2nQMXdl2kDrlXtpVOvR1aJvIDt8X3SzAPUrFQYoXJSEQRq8bgafYLUjvWtxYxZWZllAIrnDBIevJlbSzOZwUBZDGKLzmuj9BUqy8yO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OcvS3ZMQ; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E345015445D;
+	Thu, 15 Aug 2024 22:16:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.100.73
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723760192; cv=fail; b=ZArV1uzkRJwEuQcXh1kv9QzuzZz6qEl+sDfBIy7taXgrlh9/L8NRpSRLRtwj3ovmKfdJ3NcKvEONT4jZMgNNNnwmd2GQnctLCePxhFZBWyiLwfFvinvkglouIt+rSs1JrvdE78d487GHsCDmo+4RvPE1H/cVhD0sk+ikSqUBxOI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723760192; c=relaxed/simple;
+	bh=LH+/iO+q1DcTpyZydpiL/6uFAN0Cfra/XuTpmuqW298=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=dn/llljdZTaioWB20rU/SH6gy5MVSr9fIpQzz+KZJXvcCPZ24pc1Dwg2UKt3qLhX7MW+sdmty6oW29RIFeqCzQKv3npfEv1biaIhGiWgEMz7tCcStlsuoVY92MFwVhD93SeDdyADApT2u+bSTGrLOlaFMGWIsxMZzcir012IZSs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=N689XOrl; arc=fail smtp.client-ip=40.107.100.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OcvS3ZMQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 052A7C4AF09;
-	Thu, 15 Aug 2024 18:28:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723746524;
-	bh=TnkEmfIWsIecDCCRKfcH9H2UtA9GK9Cl/t13FaOmFOg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OcvS3ZMQiPNZfUqEYoW7vLYM3MpmYSz2RCqvTTtYppOpqLMDmc5rshwEbsygQpM47
-	 JfaIFFX4xql2E5P1KrZUuqttI8aucpQQZFIUObiilfjpbLvX+hnnLQb+NP5we7djqK
-	 7T4NJ6iLfAvTEj5dZiaNjroBnQOagFjIy2ZLjeYbHrdIU0CkOXQKICtak25ZheGVxd
-	 RYCvThg+qxg+ku6DYaVKJzAore1DFGnx7pA3+CV6z6kusaeRxf2rgUFKi5VryAd0fy
-	 /GjGbrwh17DGMWzeiHoKvv7Yrjzp2ZC7DbddOGf3gUij92WKEjskzw0/Hq7f6BBcJd
-	 UQTPAznhY/9ZA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sefDF-0042zX-JH;
-	Thu, 15 Aug 2024 19:28:41 +0100
-Date: Thu, 15 Aug 2024 19:28:41 +0100
-Message-ID: <86msldzlly.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Przemyslaw Gaj <pgaj@cadence.com>
-Subject: Re: [PATCH v3 14/18] KVM: arm64: nv: Add SW walker for AT S1 emulation
-In-Reply-To: <Zr4wUj5mpKkwMyCq@raptor>
-References: <20240813100540.1955263-1-maz@kernel.org>
-	<20240813100540.1955263-15-maz@kernel.org>
-	<Zr4wUj5mpKkwMyCq@raptor>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="N689XOrl"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=WaUx7Qa2IH5znjZPU54O0Iqsm3/72Lmj9A116w4ObW3XTjd0GkRIsu7MQCLpa1ydMOa5vMbQ10HIAZVJbvHsUAm0RddxplEeqjsS0QPib4jbdRZhg9oeT9+JCctAoX0gO5BRe3mb/v+THuiOKj8mXk6wz31nxb1K9UposVoD+mFdbW947moswP3m2tr9P/72jNk+Q8cVjTfUaQ4JXOItxHlanvGPzJHKamx79/ZjXC4n5AFYOgFzOqkBWb/qkC+NZM5AMZblDIuOdnqazWVdnfewuMyiHhhA2DjicpQ2/Il5SALe6LDGlCzc6iy4peU0a+IYe2sf07UV7HaR4+AfYw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=riXmhHj/+Ud+jiPO8Fu+HFIo6rHq2pTfLsGPBye3r44=;
+ b=rNbOqh72WbZKpYY8K1QHcs3O2Zm48ALaqE69oSBEi5FACWcVEvhL9a+yXPBe3a7lqgdQ3vra7CmC0Exs2IY1o/UluVReOh8XpDExJBgAcyc17foy7QgoFb5vce7I6V+mEez6qOnCzDmn1T2otfcRulzKR+J2SZK6Mj6Bq9RDZ1BABmikUQrLoTmcdowr8L8OxSZmo0yHjYBZnkkAGhE1/dSnTSitth3a8VjqYIBKGU6LSEsrt+/N04jCx3/+H5hl2xJK0k90a086CpxNft9kt3DitkJs74TwOz0JDCFr8CKKD4ROjO1Z+ZhXpMFnMRnMgXJTRuaC7WfIFjI/n25hcw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=riXmhHj/+Ud+jiPO8Fu+HFIo6rHq2pTfLsGPBye3r44=;
+ b=N689XOrlNP8Ut/Gsf+MBO2NlrMNgVRncamapzl8y7whLUHGajveCoX+q+4cO6RKXjI2c+YjpjGxf/M9NMomvvIYrLC6Hn4G6IyX/7mKBvewBP9OgJ0Pyf11QTlWaN2Oao+tRehgfxiPDNZdCtS4sRB8iwVpnvcD4syvfzHrYVbAdeMLPOWA4sON1drqBVzXY8++Y4xFdY7g8S6E7ARfjxvyEAZEO0rz4+hQiEF6l98ccWgQHVZp7dSWBpXRrfk7LsVqP+uTNyoJaz89clBBa1y9D1aIYv7WjeH8h3HzZgSp49ATjeK5Ff9+UFgANFoJXPaL68P3E7kVidhdV5fiIxg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CY8PR12MB8194.namprd12.prod.outlook.com (2603:10b6:930:76::5)
+ by PH0PR12MB5677.namprd12.prod.outlook.com (2603:10b6:510:14d::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.19; Thu, 15 Aug
+ 2024 22:16:26 +0000
+Received: from CY8PR12MB8194.namprd12.prod.outlook.com
+ ([fe80::82b9:9338:947f:fc9]) by CY8PR12MB8194.namprd12.prod.outlook.com
+ ([fe80::82b9:9338:947f:fc9%6]) with mapi id 15.20.7875.016; Thu, 15 Aug 2024
+ 22:16:26 +0000
+Message-ID: <09fdebd7-32a0-4a88-9002-0f24eebe00a8@nvidia.com>
+Date: Thu, 15 Aug 2024 17:16:22 -0500
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 00/15] arm64: Support for running as a guest in Arm CCA
+To: Matias Ezequiel Vara Larsen <mvaralar@redhat.com>,
+ Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+References: <20240701095505.165383-1-steven.price@arm.com>
+ <ZpDvTXMDq6i+4O0m@fedora>
+Content-Language: en-US
+From: Shanker Donthineni <sdonthineni@nvidia.com>
+In-Reply-To: <ZpDvTXMDq6i+4O0m@fedora>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SJ0PR05CA0114.namprd05.prod.outlook.com
+ (2603:10b6:a03:334::29) To CY8PR12MB8194.namprd12.prod.outlook.com
+ (2603:10b6:930:76::5)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com, anshuman.khandual@arm.com, pgaj@cadence.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY8PR12MB8194:EE_|PH0PR12MB5677:EE_
+X-MS-Office365-Filtering-Correlation-Id: 83bc3284-1ff8-46c2-a312-08dcbd77e7b4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?SWE3TDhkRzVUTWNSTE8vOHo4U0lDQnQ2dUVkQzRjSXlJcTZSSW1Ya2hUMlRE?=
+ =?utf-8?B?VlV3emE2czFJb3lqN2h6STlhMTJoLzhCZkJFUjlvLys0SUdMZXgyMEJsdmlt?=
+ =?utf-8?B?T0EzcGtCVzB5eEZTbDEzcHhvdjJIbktzKzJpSTBINk5IZXUwN3V5aUN5NDRH?=
+ =?utf-8?B?RE1uTnJVUzVDTjc2cVNrRzJCM1I0UU1nUjV4QXYwOElmT1g3UTdFY2UxdFQv?=
+ =?utf-8?B?MXRlR0NqOGdUZHIxQ0JibHJIdlcwVzdpWTNyZUg4STg5eWNKMFFjZ1VQQ3Jh?=
+ =?utf-8?B?YXVkU09FTmYrVzJhOGttNlJMdTlISEs4OTR2UkRGc2xPZzhOQmJtc2NpZE9W?=
+ =?utf-8?B?U2psUFVaNFFTN2MveWVUUlJxQkVWUFFDcEYyeHRuVU5QM2JvYW1zWFk2amdz?=
+ =?utf-8?B?TWFsY2trdWtIYitHeGtTUTl4NWszNGZ2cllmSjRUenJlRzdzcmxBZU9iREI2?=
+ =?utf-8?B?Y3cyL1lGd3FvSHBhRlNIdXBXaloxaTYxUnZNeWJRaFRKckk0ZWVGRkdxWElZ?=
+ =?utf-8?B?a2orMWVSU1I4SGlWOEF3N3VKbFkvaHRvK1FFaXlQZkE5WDZIVC9NQjR2QUdY?=
+ =?utf-8?B?MG5oeGx3YlFucHBCUHRxcXA5VXRFM005S0tpMmhSWTZLYkNNRm1EUVpqdzdw?=
+ =?utf-8?B?eE44dEVxTmdERU1KOGdOblNmSHdIZklxa2JtYUN5anhJM3JTcyt5amQzWXA4?=
+ =?utf-8?B?QlRuM1V3L29xUjdONkxhU2tYWXg1SXRTSFpVOXJ1VURiUDU5ZXdua1VFQThU?=
+ =?utf-8?B?Z0xzWEk3bjA1OEN4UXhOb09wb3JwZkVnNlh0VTgvUDBoV1BpODVyMmcrTVJu?=
+ =?utf-8?B?a0o0enN3QnRRbThqMFp5dlVGTkc0UWMxWkoxZTVCaXFta1UxLzYvSDFCbHpz?=
+ =?utf-8?B?enl1bU5rRmJHUDdVVnpFWmFReE5NLzBpeWRMQlpYT2x3ZlB2ZUdacUZlK2xi?=
+ =?utf-8?B?RlpOTHhNK05KNmZXR09NNlZhQ1JydTZTT1B1NmZ0N2xSNVVLNVhqcHhZWk1L?=
+ =?utf-8?B?Zmh5TTdVS0ZGbVhlR0JmSysrdnBSS2MyeDJ1dkFiWWdkUXBKUWJWSlVqc005?=
+ =?utf-8?B?TTVWczNGWTdWWFFpQVlkUndqNlluRHY3eE00RDAwVlFtdWlyNUNxV2JIei8v?=
+ =?utf-8?B?ZXpIbDM3OEwyY01tZ3ZYYVdORVpDNGZBUzJsK0c5dlpqZHB1aXJOU2M2b2hj?=
+ =?utf-8?B?dFlJUGFxVDUrbFBjcm1NTm1LR3NwdFM4MGZyc1hsN2tQc083VUpFU0tNSjJ4?=
+ =?utf-8?B?ZHEvVlNOVE0yY0ExRTVuWTdtRWlIR3JVendrTGN0Ync5cXMzM2lTcHZjbkpX?=
+ =?utf-8?B?M28xOXQ5TkZTUS81bXdBQXJPWHU4QXNPb3hKSjVtVmpoSFN3TnZINXp3SnZH?=
+ =?utf-8?B?OWNIb05DalBwb2JUWnF6R1lFZHNGUU9jY2ZKSUlNWDhTTzV1cUNzRytDM3B3?=
+ =?utf-8?B?eWhHQko2QVEwOVVpNUREYzFocDlxc3RadDZSbFk1OUYvZlpQWXBVckR6c1dv?=
+ =?utf-8?B?dVdZclVKNmpWOGZtbENIdnNyRzdhbmFPR2cxQ0VhY0hwNnZlV3poUEJpNWEr?=
+ =?utf-8?B?WGxnT0VFci9sQjhzQVc2cktxek0zMmh6ZlBWVnprM29JZ1dwZTA3WHB3L1c5?=
+ =?utf-8?B?SURGUTAvM0pza01SOGlXOGhiVU9QWHo0ZFMzYVZhVUhzb2ZsQmZJY1NnWi93?=
+ =?utf-8?B?YnpkellNY2drY25YT0lIVE1oYVNaQW8zSmtGZzFxVTlUYlhWMTlCQTM3bzZ0?=
+ =?utf-8?B?bkdjMER4VWdqU3R5a3VsR1dWb1FoWUp1ZW90LzF4WnlSSlBINVF4eFJ4Q1NC?=
+ =?utf-8?Q?sHY12xAzOHqqMH4wUJIIgOr2nC17KV0DPCWSk=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR12MB8194.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?NXh6Tko1WVg5MU9jWVFQemJPQ1RLMjk2ZzZaU3pPM2ZlSVpieWNiN0FLbWlP?=
+ =?utf-8?B?YnBncndqUSsxRTVIa3M4d3FQN1Raa0k5TkxackpoNU4vVVR1a1o0SGh4RFZ4?=
+ =?utf-8?B?Ry9vZmtIRXZ4TVE0MlFVY1cyTDlXUCtBRFVETUFXNnY5TnJCUEdXSDcva094?=
+ =?utf-8?B?Vm5JS1BHNTRYWSs3b09tdnQ3VjhBcTR2SXhabDhwY2R6NmMyQ2hUdFRKZG9C?=
+ =?utf-8?B?VncyVFJaalNJLzFtUXBoUFIzV1lZMjhBMFlaSTFSTEQxSjc5bjE1SnlwTzVt?=
+ =?utf-8?B?c3V2QTlVTUw3b25GbVBLZjU2Y3V1MUhVNXpaZVJhOGEyUXRTVExrVXEwaFdk?=
+ =?utf-8?B?MHJkaHh5WFdZc2J6SzRVQ2RYcVcwRFhuUTlBMERtTTk5clRJM3h6NllTdUx5?=
+ =?utf-8?B?cnBIcHpkNUROeStnRUU3M0xWenFiSWFBdnhFZHhiM3pRVTFOTHdaRjNBTUJY?=
+ =?utf-8?B?ekIvS3JlZ3JZWm1HeXNhOGxjbTZTTE42RjJUaFpiT1g0RzlUY2pJeit4UjlJ?=
+ =?utf-8?B?SjhwUDNKMzZzQXJ1VmwxeTJOaC9MeWYyclpOTDFFakJZT3lSb3JCRzRtVWND?=
+ =?utf-8?B?aFBvZXY0Q3JrcjduTTkrMDNZYVdHSG43aDF6bjJ1N0Vvems2cGMzOVphODN4?=
+ =?utf-8?B?VUJ0eVpnUFlTOTZoTTJZVm1ETVc1bU9pZ2FtOVJmWGhrRUcxbTZ6MG1xZjVm?=
+ =?utf-8?B?U2xmdzF2dEN3YkoxMU5kaWd4TlR6N3NNWWVRdTRRcXF2bkhCWStXSlE1VnFP?=
+ =?utf-8?B?R2svNGFhK1J0RyswYUI4VVJDajJDRVcwVWMxaHhWNGhMdkFzQmhtOWQxaFNZ?=
+ =?utf-8?B?cGxGaldmcEZMOEJNTDR0N1g4N0FvNGl3N0dxOGZvVHc4MEIyWGtQZGpCNy95?=
+ =?utf-8?B?MWNUY29od3hPTUprQi9uSFNqdUVUTXpRTjhyakZtdWo1cklsZGh6M0tiTXRl?=
+ =?utf-8?B?T2ZZdWRHaEFHWjBleGNxV0pUM0lobkVwT2laMDZqclVoY2RoMlArRlpBRVhk?=
+ =?utf-8?B?ajl5ZXpMQzVrekdkcmMxanlIMExGL1hPVlJZNkFLanZ6TDFnNlhIb2VidURO?=
+ =?utf-8?B?MlFzVFNwczR0eXE5WWNvamI5OWZDdERRL0xrOHVRQ1JINkU0RllEdUFOb3dz?=
+ =?utf-8?B?WnFpWDhWeTVOd2ZNSFdnOWs3MG9xMmZEdzFEclZSS0IvR2NhTEJXaGpNb0lO?=
+ =?utf-8?B?bTdMdzFFSWVvMG1YQWI2eHBMNytWTHFVeE9mVCtZS2t6V1JtNWVSa2Nhazl6?=
+ =?utf-8?B?c3ZzcjRBVFNIU2RBc2xmd1Y4bFJwRDYyUmI0L2F3SU8vTkZSNDYxVW9wb0lF?=
+ =?utf-8?B?NVRFU3dzNExkSjl6OXA3T2srOTBmUTBiYlFTVGNuUnc4VDVxUnd4ZENOV0Ey?=
+ =?utf-8?B?NVpGQU1lNGhtY1JxYld3N29nRmRCVTdmTkZYQjBJWE1aUHJ5K2doQTAzbDh0?=
+ =?utf-8?B?aHBkVUQ0NkhmR0M3clpreGJsclpVL1ZFdnJZanJFVUdYTzVmNkJhTkVZNTkr?=
+ =?utf-8?B?MHBLSFRJK0ljWjFDNnFqdjVHSk9HREI5MWlMSUIwMzZFeUhkMWhLSDZnK0s4?=
+ =?utf-8?B?ZHRzaDBSN0ZubWh1bHdXZTN3b3pzajNydk1VRVBIbm5OMTczQUkwYUxMOTdN?=
+ =?utf-8?B?ZldIbndKQWZ1eE0yYWdCa2pjN0V4RWF3SHdUNGZDWXRoOGU1eVBEMWk4a0ll?=
+ =?utf-8?B?cUNUaGxac2pwMUFka3BlQWhYdG1sYWdNcUVjbmNlSUt2SUZBOTUwQWZvTXZO?=
+ =?utf-8?B?dkJES21JT2lwOFZhVlBTQlNWRUtHR2cwUE1uUmpOZzRyZXJ4ejM0OHY0cFRx?=
+ =?utf-8?B?bzJycERkRGEyRW9QMENpTjkwN1F1U3p3cDNpbjBVblN6blZvcmhiTGYrN1FE?=
+ =?utf-8?B?OVRHdWNxRTZ2TDBPVmNZRHpKTVd3czdkQVZhOGdYMXl0clRQTVRaYlJCTzFl?=
+ =?utf-8?B?a1hkalFCekxRWWNTZXF4b1pPZ1FRbTZMbzM0bEd0TFFuWHBIelV0SERkWkFB?=
+ =?utf-8?B?dEoyNG5PNHN2OVk3RmhPczJkVC8vMDNSelBtQjZVOHlUZnptN0hnKytqUC85?=
+ =?utf-8?B?WUl3dXJGS1JMSm5lK2ZmZDlyTlJURTRJeE1nYWhKZlJtcGdEcXMrVDU1QUVu?=
+ =?utf-8?Q?7iTBCkH+o/bm4LBgckyQsl6Ep?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 83bc3284-1ff8-46c2-a312-08dcbd77e7b4
+X-MS-Exchange-CrossTenant-AuthSource: CY8PR12MB8194.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Aug 2024 22:16:26.7278
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: PpBji/Evhd3OBtmD38tlYZR8ZHz3IEzWtaNZKkWeNxWeISndGwPqeU+14c6+c0pT4UmTc3E1VxjSDZ13XtuT4A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB5677
+
+Hi Steven,
+
+On 7/12/24 03:54, Matias Ezequiel Vara Larsen wrote:
+> On Mon, Jul 01, 2024 at 10:54:50AM +0100, Steven Price wrote:
+>> This series adds support for running Linux in a protected VM under the
+>> Arm Confidential Compute Architecture (CCA). This has been updated
+>> following the feedback from the v3 posting[1]. Thanks for the feedback!
+>> Individual patches have a change log. But things to highlight:
+>>
+>>   * a new patch ("firmware/psci: Add psci_early_test_conduit()") to
+>>     prevent SMC calls being made on systems which don't support them -
+>>     i.e. systems without EL2/EL3 - thanks Jean-Philippe!
+>>
+>>   * two patches dropped (overriding set_fixmap_io). Instead
+>>     FIXMAP_PAGE_IO is modified to include PROT_NS_SHARED. When support
+>>     for assigning hardware devices to a realm guest is added this will
+>>     need to be brought back in some form. But for now it's just adding
+>>     complixity and confusion for no gain.
+>>
+>>   * a new patch ("arm64: mm: Avoid TLBI when marking pages as valid")
+>>     which avoids doing an extra TLBI when doing the break-before-make.
+>>     Note that this changes the behaviour in other cases when making
+>>     memory valid. This should be safe (and saves a TLBI for those cases),
+>>     but it's a separate patch in case of regressions.
+>>
+>>   * GIC ITT allocation now uses a custom genpool-based allocator. I
+>>     expect this will be replaced with a generic way of allocating
+>>     decrypted memory (see [4]), but for now this gets things working
+>>     without wasting too much memory.
+>>
+>> The ABI to the RMM from a realm (the RSI) is based on the final RMM v1.0
+>> (EAC 5) specification[2]. Future RMM specifications will be backwards
+>> compatible so a guest using the v1.0 specification (i.e. this series)
+>> will be able to run on future versions of the RMM without modification.
+>>
+>> This series is based on v6.10-rc1. It is also available as a git
+>> repository:
+>>
+>> https://gitlab.arm.com/linux-arm/linux-cca cca-guest/v4
+
+Which cca-host branch should I use for testing cca-guest/v4?
+
+I'm getting compilation errors with cca-host/v3 and cca-guest/v4, is there
+any known WAR or fix to resolve this issue?
 
 
-Hi Alex,
+arch/arm64/kvm/rme.c: In function ‘kvm_realm_reset_id_aa64dfr0_el1’:
+././include/linux/compiler_types.h:487:45: error: call to ‘__compiletime_assert_650’ declared with attribute error: FIELD_PREP: value too large for the field
+   487 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+       |                                             ^
+././include/linux/compiler_types.h:468:25: note: in definition of macro ‘__compiletime_assert’
+   468 |                         prefix ## suffix();                             \
+       |                         ^~~~~~
+././include/linux/compiler_types.h:487:9: note: in expansion of macro ‘_compiletime_assert’
+   487 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+       |         ^~~~~~~~~~~~~~~~~~~
+./include/linux/build_bug.h:39:37: note: in expansion of macro ‘compiletime_assert’
+    39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
+       |                                     ^~~~~~~~~~~~~~~~~~
+./include/linux/bitfield.h:68:17: note: in expansion of macro ‘BUILD_BUG_ON_MSG’
+    68 |                 BUILD_BUG_ON_MSG(__builtin_constant_p(_val) ?           \
+       |                 ^~~~~~~~~~~~~~~~
+./include/linux/bitfield.h:115:17: note: in expansion of macro ‘__BF_FIELD_CHECK’
+   115 |                 __BF_FIELD_CHECK(_mask, 0ULL, _val, "FIELD_PREP: ");    \
+       |                 ^~~~~~~~~~~~~~~~
+arch/arm64/kvm/rme.c:315:16: note: in expansion of macro ‘FIELD_PREP’
+   315 |         val |= FIELD_PREP(ID_AA64DFR0_EL1_BRPs_MASK, bps - 1) |
+       |                ^~~~~~~~~~
+make[5]: *** [scripts/Makefile.build:244: arch/arm64/kvm/rme.o] Error 1
+make[4]: *** [scripts/Makefile.build:485: arch/arm64/kvm] Error 2
+make[3]: *** [scripts/Makefile.build:485: arch/arm64] Error 2
+make[3]: *** Waiting for unfinished jobs....
 
-On Thu, 15 Aug 2024 17:44:02 +0100,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-
-[..]
-
-> > +static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
-> > +			 struct s1_walk_result *wr, u64 va)
-> > +{
-> > +	u64 sctlr, tcr, tg, ps, ia_bits, ttbr;
-> > +	unsigned int stride, x;
-> > +	bool va55, tbi, lva, as_el0;
-> > +
-> > +	wi->regime = compute_translation_regime(vcpu, op);
-> > +	as_el0 = (op == OP_AT_S1E0R || op == OP_AT_S1E0W);
-> > +
-> > +	va55 = va & BIT(55);
-> > +
-> > +	if (wi->regime == TR_EL2 && va55)
-> > +		goto addrsz;
-> > +
-> > +	wi->s2 = (wi->regime == TR_EL10 &&
-> > +		  (__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_VM | HCR_DC)));
-> 
-> This could be written on one line if there were a local variable for the HCR_EL2
-> register (which is already read multiple times in the function).
-
-Sure thing.
-
-[...]
-
-> > +	/* Let's put the MMU disabled case aside immediately */
-> > +	switch (wi->regime) {
-> > +	case TR_EL10:
-> > +		/*
-> > +		 * If dealing with the EL1&0 translation regime, 3 things
-> > +		 * can disable the S1 translation:
-> > +		 *
-> > +		 * - HCR_EL2.DC = 1
-> > +		 * - HCR_EL2.{E2H,TGE} = {0,1}
-> > +		 * - SCTLR_EL1.M = 0
-> > +		 *
-> > +		 * The TGE part is interesting. If we have decided that this
-> > +		 * is EL1&0, then it means that either {E2H,TGE} == {1,0} or
-> > +		 * {0,x}, and we only need to test for TGE == 1.
-> > +		 */
-> > +		if (__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_DC | HCR_TGE))
-> > +			wr->level = S1_MMU_DISABLED;
-> 
-> There's no need to fallthrough and check SCTLR_ELx.M if the MMU disabled check
-> here is true.
-
-I'm not sure it makes the code more readable. But if you do, why not.
-
-[...]
-
-> > +	/* Someone was silly enough to encode TG0/TG1 differently */
-> > +	if (va55) {
-> > +		wi->txsz = FIELD_GET(TCR_T1SZ_MASK, tcr);
-> > +		tg = FIELD_GET(TCR_TG1_MASK, tcr);
-> > +
-> > +		switch (tg << TCR_TG1_SHIFT) {
-> > +		case TCR_TG1_4K:
-> > +			wi->pgshift = 12;	 break;
-> > +		case TCR_TG1_16K:
-> > +			wi->pgshift = 14;	 break;
-> > +		case TCR_TG1_64K:
-> > +		default:	    /* IMPDEF: treat any other value as 64k */
-> > +			wi->pgshift = 16;	 break;
-> > +		}
-> 
-> Just a thought, wi->pgshift is used in several places to identify the guest page
-> size, might be useful to have something like PAGE_SHIFT_{4K,16K,64K}. That would
-> also make its usage consistent, because in some places wi->pgshift is compared
-> directly to 12, 14 or 16, in other places the page size is computed from
-> wi->pgshift and compared to SZ_4K, SZ_16K or SZ_64K.
-
-I only found a single place where we compare wi->pgshift to a
-non-symbolic integer (as part of the R_YXNYW handling). Everywhere
-else, we use BIT(wi->pgshift) and compare it to SZ_*K. We moved away
-from the various PAGE_SHIFT_* macros some years ago, and I don't think
-we want them back.
-
-What I can do is to convert the places where we init pgshift to use an
-explicit size using const_ilog2():
-
-@@ -185,12 +188,12 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
- 
- 		switch (tg << TCR_TG1_SHIFT) {
- 		case TCR_TG1_4K:
--			wi->pgshift = 12;	 break;
-+			wi->pgshift = const_ilog2(SZ_4K);	 break;
- 		case TCR_TG1_16K:
--			wi->pgshift = 14;	 break;
-+			wi->pgshift = const_ilog2(SZ_16K);	 break;
- 		case TCR_TG1_64K:
- 		default:	    /* IMPDEF: treat any other value as 64k */
--			wi->pgshift = 16;	 break;
-+			wi->pgshift = const_ilog2(SZ_64K);	 break;
- 		}
- 	} else {
- 		wi->txsz = FIELD_GET(TCR_T0SZ_MASK, tcr);
-@@ -198,12 +201,12 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
- 
- 		switch (tg << TCR_TG0_SHIFT) {
- 		case TCR_TG0_4K:
--			wi->pgshift = 12;	 break;
-+			wi->pgshift = const_ilog2(SZ_4K);	 break;
- 		case TCR_TG0_16K:
--			wi->pgshift = 14;	 break;
-+			wi->pgshift = const_ilog2(SZ_16K);	 break;
- 		case TCR_TG0_64K:
- 		default:	    /* IMPDEF: treat any other value as 64k */
--			wi->pgshift = 16;	 break;
-+			wi->pgshift = const_ilog2(SZ_64K);	 break;
- 		}
- 	}
- 
-@@ -212,7 +215,7 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
- 		if (wi->txsz > 39)
- 			goto transfault_l0;
- 	} else {
--		if (wi->txsz > 48 || (wi->pgshift == 16 && wi->txsz > 47))
-+		if (wi->txsz > 48 || (BIT(wi->pgshift) == SZ_64K && wi->txsz > 47))
- 			goto transfault_l0;
- 	}
+I'm using gcc-13.3.0 compiler and cross-compiling on X86 machine.
 
 
-> 
-> > +	} else {
-> > +		wi->txsz = FIELD_GET(TCR_T0SZ_MASK, tcr);
-> > +		tg = FIELD_GET(TCR_TG0_MASK, tcr);
-> > +
-> > +		switch (tg << TCR_TG0_SHIFT) {
-> > +		case TCR_TG0_4K:
-> > +			wi->pgshift = 12;	 break;
-> > +		case TCR_TG0_16K:
-> > +			wi->pgshift = 14;	 break;
-> > +		case TCR_TG0_64K:
-> > +		default:	    /* IMPDEF: treat any other value as 64k */
-> > +			wi->pgshift = 16;	 break;
-> > +		}
-> > +	}
-> > +
-> > +	/* R_PLCGL, R_YXNYW */
-> > +	if (!kvm_has_feat_enum(vcpu->kvm, ID_AA64MMFR2_EL1, ST, 48_47)) {
-> > +		if (wi->txsz > 39)
-> > +			goto transfault_l0;
-> > +	} else {
-> > +		if (wi->txsz > 48 || (wi->pgshift == 16 && wi->txsz > 47))
-> > +			goto transfault_l0;
-> > +	}
-> > +
-> > +	/* R_GTJBY, R_SXWGM */
-> > +	switch (BIT(wi->pgshift)) {
-> > +	case SZ_4K:
-> > +		lva = kvm_has_feat(vcpu->kvm, ID_AA64MMFR0_EL1, TGRAN4, 52_BIT);
-> > +		lva &= tcr & (wi->regime == TR_EL2 ? TCR_EL2_DS : TCR_DS);
-> > +		break;
-> > +	case SZ_16K:
-> > +		lva = kvm_has_feat(vcpu->kvm, ID_AA64MMFR0_EL1, TGRAN16, 52_BIT);
-> > +		lva &= tcr & (wi->regime == TR_EL2 ? TCR_EL2_DS : TCR_DS);
-> > +		break;
-> > +	case SZ_64K:
-> > +		lva = kvm_has_feat(vcpu->kvm, ID_AA64MMFR2_EL1, VARange, 52);
-> > +		break;
-> > +	}
-> > +
-> > +	if ((lva && wi->txsz < 12) || wi->txsz < 16)
-> > +		goto transfault_l0;
-> 
-> Let's assume lva = true, wi->txsz greater than 12, but smaller than 16, which is
-> architecturally allowed according to R_GTJBY and AArch64.S1MinTxSZ().
-> 
-> (lva && wi->txsz < 12) = false
-> wi->txsz < 16 = true
-> 
-> KVM treats it as a fault.
-
-Gah... Fixed with:
-
-@@ -231,7 +234,7 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
- 		break;
- 	}
- 
--	if ((lva && wi->txsz < 12) || wi->txsz < 16)
-+	if ((lva && wi->txsz < 12) || (!lva && wi->txsz < 16))
- 		goto transfault_l0;
- 
- 	ia_bits = get_ia_size(wi);
-
-Not that it has an impact yet, given that we don't support any of the
-52bit stuff yet, but thanks for spotting this!
-
-[...]
-
-> > +	/* R_VPBBF */
-> > +	if (check_output_size(wi->baddr, wi))
-> > +		goto transfault_l0;
-> 
-> I think R_VPBBF says that an Address size fault is generated here, not a
-> translation fault.
-
-Indeed, another one fixed.
-
-> 
-> > +
-> > +	wi->baddr &= GENMASK_ULL(wi->max_oa_bits - 1, x);
-> > +
-> > +	return 0;
-> > +
-> > +addrsz:				/* Address Size Fault level 0 */
-> > +	fail_s1_walk(wr, ESR_ELx_FSC_ADDRSZ_L(0), false, false);
-> > +	return -EFAULT;
-> > +
-> > +transfault_l0:			/* Translation Fault level 0 */
-> > +	fail_s1_walk(wr, ESR_ELx_FSC_FAULT_L(0), false, false);
-> > +	return -EFAULT;
-> > +}
-> 
-> [..]
-> 
-> > +static bool par_check_s1_perm_fault(u64 par)
-> > +{
-> > +	u8 fst = FIELD_GET(SYS_PAR_EL1_FST, par);
-> > +
-> > +	return  ((fst & ESR_ELx_FSC_TYPE) == ESR_ELx_FSC_PERM &&
-> > +		 !(par & SYS_PAR_EL1_S));
-> 
-> ESR_ELx_FSC_PERM = 0x0c is a permission fault, level 0, which Arm ARM says can
-> only happen when FEAT_LPA2. I think the code should check that the value for
-> PAR_EL1.FST is in the interval (ESR_ELx_FSC_PERM_L(0), ESR_ELx_FSC_PERM_L(3)].
-
-I honestly don't want to second-guess the HW. If it reports something
-that is the wrong level, why should we trust the FSC at all?
-
-> With the remaining minor issues fixed:
-> 
-> Reviewed-by: Alexandru Elisei <alexandru.elisei@Arm.com>
-
-Again, many thanks for your patience going through this.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+-Shanker
