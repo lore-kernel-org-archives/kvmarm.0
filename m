@@ -1,36 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B7841991B1;
-	Thu, 15 Aug 2024 13:00:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36AE219D89D;
+	Thu, 15 Aug 2024 13:00:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723726805; cv=none; b=hDX/tdvGMiEtMEYKbimitftQjSvjKqWUNcI41+wlKEXntub1b152leI2kYuOMINBAqLeaYjShzxUt5oo1HgP4NFDLV+i1jZB0b2EWWSdNg6+sapYImKE1bABiePaydAbVWP8+VK2lzUwuCFb49RbyS295XqYExVz6oVPBYxn1XI=
+	t=1723726805; cv=none; b=SDbl6iLEWrHqJk2sXvai3GMqpou8Ym9Vpkc+woqsk2DFH3Pv4ilIuGizm9dpHMQqDUcL1X6SxDsoRQV/91RW7Q2ppvmp3rKlioxkG2mcqhgfvUKHUQ6ybUJR4syCCgBdD8Jd7qP0OLDNEx0a7uBofGSSsfoCr9JdWEwxPux8PoY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1723726805; c=relaxed/simple;
-	bh=5P04ykbmzh8C6jEQrvdjizXGGEpPVWPIOo78t8wPxO0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KxZHkiEZU7F+Y6Pv7e5al7O2OLuJT/cufWNiapek4KOGxgXxQvpBj2xngB8VKg0eta6ZWgE/uBL1f+rV68cryon88qlZU926c9NfewLPG4S//VwxUs1gfAQmO7C2NvYNqar3l+iWSyZXOeNtSregeenhSkNp39aTdZogM3/y9E4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fn3tmV9i; arc=none smtp.client-ip=10.30.226.201
+	bh=Rw+oG70QnJ4dX4Pty/A4PbvCVTYBSSQWvkzzsj/HeD4=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=kYc+ht9mRQjT/qGvzBjnbjXUqv4WPemqsjn905dYgJaCWbQtnopuK0YPyhFNz4jaglhurkxLNmVO3gg1vYZKhPXAIVFaG2r63PORDqkt2Kncyfgpj9pKriLZtRuTC+bZAao2MoToEIPKtDcjp6kvIsjAWvzhdlPt5oywqlWXkdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XG+M6Wdt; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fn3tmV9i"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A36C6C32786;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XG+M6Wdt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6083C4AF0E;
 	Thu, 15 Aug 2024 13:00:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1723726804;
-	bh=5P04ykbmzh8C6jEQrvdjizXGGEpPVWPIOo78t8wPxO0=;
-	h=From:To:Cc:Subject:Date:From;
-	b=fn3tmV9iCXVehiYp45JhYoCAFk8j7Xefo9L/vbhK5lyeFDdR2RYRBC9OMOtakRsL3
-	 PP27JlUdw2LO84yLQnH4EK6NaU2sVKck39lu/+d+9u15i37unjIueEJCN+PLS3DYT/
-	 QEvKl3wJIOWAzcTi4WizveU/UlivWhIMlzUiUPMYaagxCFH4lB3GUm/+m5CjWjgSl6
-	 5pvaEK+ULsRPlpS8mh0y/ysYyAJA44KXSNZ7/+fL/cuMHUqf+8a6JtxQwdjmhfDlFb
-	 E3T9F77c9p/dQCPYvnWlWFOx4m9X9NRtP8nBN0YtdIcXM4SiSHmFv6CKPWxcu3d5+2
-	 PezwWJ5YzILNQ==
+	bh=Rw+oG70QnJ4dX4Pty/A4PbvCVTYBSSQWvkzzsj/HeD4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=XG+M6Wdtlj0+qoeUh2LReYONRjTITOVjA9LGIpPpuzYn7t8mWDM+i4tsJq3F1kbYU
+	 qaA4TnAjshvZ+U3syJU8E+nux7L+YxAKcLejuH973JFIHMevu58mYIWzXQ0hg1l/nP
+	 42gz7Zru+DwEub9ig3GQ95LbYv4ucO+/lS7FVRT7swSpZmaLAat2DV1uiFcn7oCo47
+	 dzm3mMBMv5RX5WF7zByIxqGHzrmmO7EjXea6Kb2gmXtnO5ExmxHeQQgyGCE+Z4uzC5
+	 nZzusfopgzSnwnwD01dAdb0N+zF14NBEkKEmukyZ+Dpfyui6q2q3Bg4xzvDT6xmfWm
+	 OljWi5+BREWVA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sea5C-003xld-LH;
-	Thu, 15 Aug 2024 14:00:02 +0100
+	id 1sea5D-003xld-3N;
+	Thu, 15 Aug 2024 14:00:03 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -39,10 +40,12 @@ Cc: James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 00/11] KVM: arm64: Add support for FEAT_LS64 and co
-Date: Thu, 15 Aug 2024 13:59:48 +0100
-Message-Id: <20240815125959.2097734-1-maz@kernel.org>
+Subject: [PATCH 02/11] arm64: Add syndrome information for trapped LD64B/ST64B{,V,V0}
+Date: Thu, 15 Aug 2024 13:59:50 +0100
+Message-Id: <20240815125959.2097734-3-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240815125959.2097734-1-maz@kernel.org>
+References: <20240815125959.2097734-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -55,62 +58,40 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-The ARM architecture has introduced a while back some 64 byte
-Load/Store operations that are targeting NormalNC or Device memory.
-People have been threatening of using this in actual code, so we might
-as well support it. It also fits my plans to cover the features
-enabled by HCRX_EL2.
+Provide the architected EC and ISS values for all the FEAT_LS64*
+instructions.
 
-From a KVM perspective, it is only a load/store. Nothing to call home
-about. However, there are two situations where this is interesting:
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/include/asm/esr.h | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-- a NV guest wants to trap these instructions: we need to correctly
-  route them.
-
-- the access falls outside of a memslot, and userspace needs to handle
-  this.
-
-This last point is of special interest. Instead of going through the
-pain of doing all the decoding in the kernel and presenting the VMM
-with a fully decoded access (like it is the case for normal MMIO), we
-brutally return the ESR+IPA and let userspace deal with the outcome,
-hijacking the data structures for KVM_EXIT_ARM_NISV for that purpose.
-
-It has all the information at its disposal through the vcpu ioctl
-interface, and can definitely do what's asked. Just not very quickly
-
-I don't think this is a problem, and that approximately 100% of the
-VMMs will simply inject an external abort as an indication that they
-are not handling this.
-
-This is otherwise pretty uninteresting code.
-
-Marc Zyngier (11):
-  arm64: Expose ID_AA64ISAR1_EL1.XS to sanitised feature consumers
-  arm64: Add syndrome information for trapped LD64B/ST64B{,V,V0}
-  KVM: arm64: Add ACCDATA_EL1 to the sysreg array
-  KVM: arm64: Add context-switch of ACCDATA_EL1
-  KVM: arm64: Handle trapping of FEAT_LS64* instructions
-  KVM: arm64: Add exit to userspace on {LD,ST}64B* outside of memslots
-  KVM: arm64: Restrict ACCDATA_EL1 undef to FEAT_ST64_ACCDATA being
-    disabled
-  KVM: arm64: Conditionnaly enable FEAT_LS64* instructions
-  KVM: arm64: nv: Expose FEAT_LS64* to a nested guest
-  arm64: Expose ID_AA64ISAR1_EL1.LS64 to sanitised feature consumers
-  KVM: arm64: Add documentation for KVM_EXIT_ARM_LDST64B
-
- Documentation/virt/kvm/api.rst             | 43 ++++++++++++---
- arch/arm64/include/asm/esr.h               |  8 ++-
- arch/arm64/include/asm/kvm_host.h          |  3 +
- arch/arm64/kernel/cpufeature.c             |  2 +
- arch/arm64/kvm/handle_exit.c               | 64 ++++++++++++++++++++++
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 29 ++++++++--
- arch/arm64/kvm/mmio.c                      | 27 ++++++++-
- arch/arm64/kvm/nested.c                    |  5 +-
- arch/arm64/kvm/sys_regs.c                  | 25 ++++++++-
- include/uapi/linux/kvm.h                   |  3 +-
- 10 files changed, 188 insertions(+), 21 deletions(-)
-
+diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+index 56c148890daf..4a76883616ab 100644
+--- a/arch/arm64/include/asm/esr.h
++++ b/arch/arm64/include/asm/esr.h
+@@ -20,7 +20,8 @@
+ #define ESR_ELx_EC_FP_ASIMD	(0x07)
+ #define ESR_ELx_EC_CP10_ID	(0x08)	/* EL2 only */
+ #define ESR_ELx_EC_PAC		(0x09)	/* EL2 and above */
+-/* Unallocated EC: 0x0A - 0x0B */
++#define ESR_ELx_EC_LS64B	(0x0A)
++/* Unallocated EC: 0x0B */
+ #define ESR_ELx_EC_CP14_64	(0x0C)
+ #define ESR_ELx_EC_BTI		(0x0D)
+ #define ESR_ELx_EC_ILL		(0x0E)
+@@ -172,6 +173,11 @@
+ #define ESR_ELx_WFx_ISS_WFE	(UL(1) << 0)
+ #define ESR_ELx_xVC_IMM_MASK	((UL(1) << 16) - 1)
+ 
++/* ISS definitions for LD64B/ST64B instructions */
++#define ESR_ELx_ISS_ST64BV	(0)
++#define ESR_ELx_ISS_ST64BV0	(1)
++#define ESR_ELx_ISS_LDST64B	(2)
++
+ #define DISR_EL1_IDS		(UL(1) << 24)
+ /*
+  * DISR_EL1 and ESR_ELx share the bottom 13 bits, but the RES0 bits may mean
 -- 
 2.39.2
 
