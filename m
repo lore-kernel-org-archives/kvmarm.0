@@ -1,112 +1,158 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 807B4156967
-	for <kvmarm@lists.linux.dev>; Fri, 16 Aug 2024 13:28:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D2451BDA89;
+	Fri, 16 Aug 2024 13:45:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723814925; cv=none; b=EbA21XkKQJLQ4fNIeeATJvdW25fxdZTY8ncxtbsSZUz2W2DL8FqOkg7WkYnodz0WnjkYyhrImQVDl+c7uiNpZXE5p5cbzFuopqWcwEHUQBEIuXfsYNvIS5pOHxd2z5m/2/khdbdZdCVjfkvUHUhTiMnDv5hYcHOvwYlqTPLja6E=
+	t=1723815901; cv=none; b=lZduBM9sJNJ2ISpHNslvps6Et5jtvjVmTK60W1QR1DTKjk+sIS+1D9cOMKNIZY5KBup2SBVNmEsGhVsj5VF+im7T4fKWEALiAO+L6pyPGQgVgyQSYrOQOMeNUfSOBE0pZVuWR57SkKPtoq8PIVP52I2wFVxeDic17IYVw7FER2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723814925; c=relaxed/simple;
-	bh=Lf7Td2aJBrsVS6sGbAVw2JycKPXUAJiw0B+zerzyxOM=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DXxNBmFEprHlqAEXAE5bAnPzvgtobEXfubmvHQg1PxGvAmrSATMddhVWcbd9j1uWPKXRRcJT5d8q0g5Ckjv3mXhMyfV27iughmSDViBl4+91OH7gLilCMa4U2Scgo+cyB+7r11mRgBM1KF7Tpptuxx7V33PLdY2XR+SAUIOUS2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.216])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4WljRT3gjwz6K90M;
-	Fri, 16 Aug 2024 21:25:41 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id 961D61400DB;
-	Fri, 16 Aug 2024 21:28:39 +0800 (CST)
-Received: from A2303104131.china.huawei.com (10.203.177.241) by
- lhrpeml500005.china.huawei.com (7.191.163.240) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Fri, 16 Aug 2024 14:28:33 +0100
-From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-To: <kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>
-CC: <maz@kernel.org>, <will@kernel.org>, <catalin.marinas@arm.com>,
-	<oliver.upton@linux.dev>, <james.morse@arm.com>, <suzuki.poulose@arm.com>,
-	<yuzenghui@huawei.com>, <wangzhou1@hisilicon.com>, <linuxarm@huawei.com>
-Subject: [PATCH v3] KVM: arm64: Make the exposed feature bits in AA64DFR0_EL1 writable from userspace
-Date: Fri, 16 Aug 2024 14:28:19 +0100
-Message-ID: <20240816132819.34316-1-shameerali.kolothum.thodi@huawei.com>
-X-Mailer: git-send-email 2.12.0.windows.1
+	s=arc-20240116; t=1723815901; c=relaxed/simple;
+	bh=YQT8ZDRJOg8IW7UFAymgBTObemrs1T7N8zH4s23+HPk=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=aZJprsG53t9nH/58HlIsRn6PYrxOYD27vGAFSoaUrONAYfbi9dy72laC/oF2IeVmJWVkDf/X9xyVpcH8UnYQnB3lH7cTWmOE9Sz5Mxf38q6lOMLR20SKkwTJ3ED9xkcaThL+fwge1830a6D399Q0R7+Uh9ItZHiepFrGbh9ApBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X8pjbaC2; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X8pjbaC2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C322C4AF0C;
+	Fri, 16 Aug 2024 13:45:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723815901;
+	bh=YQT8ZDRJOg8IW7UFAymgBTObemrs1T7N8zH4s23+HPk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=X8pjbaC2F/ylOjRoBQrUnbKG7P1R3Q5ZbhpjbLNcy+SInKZNi9wdIIMQ0Vi1UzKFS
+	 ZqkC57XGsnaszGg5iTu6CYosPBMaiC+IuO/8UNVIBY4G2dUoLBu5uhDKkbZle4HuIa
+	 kN9b/6+InTLntdr6WUWAtoe1ghjNvwSXNEXluYT971G9d9XrukQ1tLbD5EyWiCMBMt
+	 5RUhAymAi5rtFX11Iv4BnpI37/rjmrX0uxn+TUdl1/1d3KujHjCZ9OJABjQCvz/mCA
+	 QT5qwO1q8HCSQ1JRwokdGqQMVCp/fcva8HwhmwTKKCZNYFtZ4JptJpVspE1Nc1u3/p
+	 pmi4J5w4XhmnA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sexGF-004Hra-84;
+	Fri, 16 Aug 2024 14:44:59 +0100
+Date: Fri, 16 Aug 2024 14:44:58 +0100
+Message-ID: <86jzggzin9.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Przemyslaw Gaj <pgaj@cadence.com>
+Subject: Re: [PATCH v3 14/18] KVM: arm64: nv: Add SW walker for AT S1 emulation
+In-Reply-To: <Zr8xzdmMELK07YUo@raptor>
+References: <20240813100540.1955263-1-maz@kernel.org>
+	<20240813100540.1955263-15-maz@kernel.org>
+	<Zr4wUj5mpKkwMyCq@raptor>
+	<86msldzlly.wl-maz@kernel.org>
+	<Zr8aYymB_2xSqIQp@raptor>
+	<86le0wzrbv.wl-maz@kernel.org>
+	<Zr8xzdmMELK07YUo@raptor>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com, anshuman.khandual@arm.com, pgaj@cadence.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-KVM exposes the OS double lock feature bit to Guests but returns
-RAZ/WI on Guest OSDLR_EL1 access. This breaks Guest migration between
-systems where this feature differ. Add support to make this feature
-writable from userspace by setting the mask bit. While at it, set the
-mask bits for the exposed WRPs(Number of Watchpoints) as well.
-Also update the selftest to cover these fields.
+On Fri, 16 Aug 2024 12:02:37 +0100,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Fri, Aug 16, 2024 at 11:37:24AM +0100, Marc Zyngier wrote:
+> > Hi Alex,
+> > 
+> > On Fri, 16 Aug 2024 10:22:43 +0100,
+> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> > > 
+> > > Hi Marc,
+> > > 
+> > > On Thu, Aug 15, 2024 at 07:28:41PM +0100, Marc Zyngier wrote:
+> > > > 
+> > > > Hi Alex,
+> > > > 
+> > > > On Thu, 15 Aug 2024 17:44:02 +0100,
+> > > > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> > 
+> > [...]
+> > 
+> > > > > > +static bool par_check_s1_perm_fault(u64 par)
+> > > > > > +{
+> > > > > > +	u8 fst = FIELD_GET(SYS_PAR_EL1_FST, par);
+> > > > > > +
+> > > > > > +	return  ((fst & ESR_ELx_FSC_TYPE) == ESR_ELx_FSC_PERM &&
+> > > > > > +		 !(par & SYS_PAR_EL1_S));
+> > > > > 
+> > > > > ESR_ELx_FSC_PERM = 0x0c is a permission fault, level 0, which Arm ARM says can
+> > > > > only happen when FEAT_LPA2. I think the code should check that the value for
+> > > > > PAR_EL1.FST is in the interval (ESR_ELx_FSC_PERM_L(0), ESR_ELx_FSC_PERM_L(3)].
+> > > > 
+> > > > I honestly don't want to second-guess the HW. If it reports something
+> > > > that is the wrong level, why should we trust the FSC at all?
+> > > 
+> > > Sorry, I should have been clearer.
+> > > 
+> > > It's not about the hardware reporting a fault on level 0 of the translation
+> > > tables, it's about the function returning false if the hardware reports a
+> > > permission fault on levels 1, 2 or 3 of the translation tables.
+> > > 
+> > > For example, on a permssion fault on level 3, PAR_EL1. FST = 0b001111 = 0x0F,
+> > > which means that the condition:
+> > > 
+> > > (fst & ESR_ELx_FSC_TYPE) == ESR_ELx_FSC_PERM (which is 0x0C) is false and KVM
+> > > will fall back to the software walker.
+> > > 
+> > > Does that make sense to you?
+> > 
+> > I'm afraid I still don't get it.
+> > 
+> > From the kernel source:
+> > 
+> > #define ESR_ELx_FSC_TYPE	(0x3C)
+> > 
+> > This is a mask covering all fault types.
+> > 
+> > #define ESR_ELx_FSC_PERM	(0x0C)
+> > 
+> > This is the value for a permission fault, not encoding a level.
+> > 
+> > Taking your example:
+> > 
+> > (fst & ESR_ELx_FSC_TYPE) == (0x0F & 0x3C) == 0x0C == ESR_ELx_FSC_PERM
+> > 
+> > As I read it, the condition is true, as it catches a permission fault
+> > on any level between 0 and 3.
+> > 
+> > You're obviously seeing something I don't, and I'm starting to
+> > question my own sanity...
+> 
+> No, no, sorry for leading you on a wild goose chase, I read 0x3F for
+> ESR_ELx_FSC_TYPE, which the value for the variable directly above it, instead of
+> 0x3C :(
+> 
+> My bad, the code is correct!
 
-However we still can't make BRPs and CTX_CMPs fields writable, because
-as per ARM ARM DDI 0487K.a, section D2.8.3 Breakpoint types and
-linking of breakpoints, highest numbered breakpoints(BRPs) must be
-context aware breakpoints(CTX_CMPs). KVM does not trap + emulate the
-breakpoint registers, and as such cannot support a layout that misaligns
-with the underlying hardware.
+Ah, glad we agree, I was starting to worry!
 
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
-Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
----
-v2 --> v3:
-   -Updated comments on BRPs and CTX_CMPs. Corrected ARM ARM reference.
-   v2:https://lore.kernel.org/kvmarm/20240815155954.85480-1-shameerali.kolothum.thodi@huawei.com/
----
- arch/arm64/kvm/sys_regs.c                        | 16 +++++++++++++++-
- .../testing/selftests/kvm/aarch64/set_id_regs.c  |  2 ++
- 2 files changed, 17 insertions(+), 1 deletion(-)
+Thanks,
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index c90324060436..5a49e8331fbf 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2376,7 +2376,21 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	  .get_user = get_id_reg,
- 	  .set_user = set_id_aa64dfr0_el1,
- 	  .reset = read_sanitised_id_aa64dfr0_el1,
--	  .val = ID_AA64DFR0_EL1_PMUVer_MASK |
-+	/*
-+	 * Prior to FEAT_Debugv8.9, the architecture defines context-aware
-+	 * breakpoints (CTX_CMPs) as the highest numbered breakpoints (BRPs).
-+	 * KVM does not trap + emulate the breakpoint registers, and as such
-+	 * cannot support a layout that misaligns with the underlying hardware.
-+	 * While it may be possible to describe a subset that aligns with
-+	 * hardware, just prevent changes to BRPs and CTX_CMPs altogether for
-+	 * simplicity.
-+	 *
-+	 * See DDI0487K.a, section D2.8.3 Breakpoint types and linking
-+	 * of breakpoints for more details.
-+	 */
-+	  .val = ID_AA64DFR0_EL1_DoubleLock_MASK |
-+		 ID_AA64DFR0_EL1_WRPs_MASK |
-+		 ID_AA64DFR0_EL1_PMUVer_MASK |
- 		 ID_AA64DFR0_EL1_DebugVer_MASK, },
- 	ID_SANITISED(ID_AA64DFR1_EL1),
- 	ID_UNALLOCATED(5,2),
-diff --git a/tools/testing/selftests/kvm/aarch64/set_id_regs.c b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-index d20981663831..6edc5412abe8 100644
---- a/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-+++ b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-@@ -68,6 +68,8 @@ struct test_feature_reg {
- 	}
- 
- static const struct reg_ftr_bits ftr_id_aa64dfr0_el1[] = {
-+	S_REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64DFR0_EL1, DoubleLock, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64DFR0_EL1, WRPs, 0),
- 	S_REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64DFR0_EL1, PMUVer, 0),
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64DFR0_EL1, DebugVer, ID_AA64DFR0_EL1_DebugVer_IMP),
- 	REG_FTR_END,
+	M.
+
 -- 
-2.45.2
-
+Without deviation from the norm, progress is not possible.
