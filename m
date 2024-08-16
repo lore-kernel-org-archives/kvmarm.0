@@ -1,311 +1,150 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2BED13CA9C
-	for <kvmarm@lists.linux.dev>; Fri, 16 Aug 2024 09:22:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D9482A1CF;
+	Fri, 16 Aug 2024 10:37:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723800172; cv=none; b=RqsD1/mFM/PFGTKr39D9tdFBOYrSc/JXXt9EGEuQq3GGeqR7z2GS2f3N7JMm84P05pbSpk37kxMp/J0tE7PhVNKP8Xl6AvpAgfJSJkk2y0tR+o0Ih1oPbD6G+4XEM3/x2XXvOvrNapC7+A5i/YoclonAR6nSvhsNNFnizmt2Ayw=
+	t=1723804647; cv=none; b=BQvxVebOnF2xSJk1KifB4O1Mqmnf5MHfMGwcY3B4uPQ1P3LfCsGqCZerkxMmuJCfa+EHdC4Ru708zPByUGo/s/UEFiMsm3ao4JVSpQa2KJk1y1MEwB9cg+pEp0p4hagvozSgrfuPnZvv53FCWmccaQYzzWt+kdhcL7Y3V0RY2a0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723800172; c=relaxed/simple;
-	bh=NT7Eov3UZcQdiLqOVT/EaW1jIf0VWRjFqRfDNKR9zx0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YGpmFhrnrPfQMGFHl63Y0rIhY1gR+wKAwuLES5ltn9IJn0FlMyvaxqn7uYqL1EJ0TMz59fDrD4km6t5sDCR2AymjQ2l3PuauDW2tn9w3dc+f4onJbZg2xqDgfA1FpP/v6MgAterVfYSMRFEwYeDs2T/3nWSGcEJ7tEKI1kRWjFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0B69B143D;
-	Fri, 16 Aug 2024 02:23:15 -0700 (PDT)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AF7CE3F58B;
-	Fri, 16 Aug 2024 02:22:46 -0700 (PDT)
-Date: Fri, 16 Aug 2024 10:22:43 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+	s=arc-20240116; t=1723804647; c=relaxed/simple;
+	bh=2SqZBMShpMFdkkFGruZbe4h3zcLtotowYjTioO8i3yM=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ka1CLvTsrtdvxXfHrDrGGI3SxtI+8cNGxAuMM/Z+Cqqlso5dUu0KaReNpmgAIEdtTG9ih9+NvT4EHKQvm5hGrmWpiMQsIcanxEJguY6rMYdC8nyTu+ERVBrlPEWqV0MxmEs3FmhfuJq5t4wTjOU03euSTwZEg5lHnzrpdu4ejAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tGQVcvR3; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tGQVcvR3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B815FC32782;
+	Fri, 16 Aug 2024 10:37:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723804646;
+	bh=2SqZBMShpMFdkkFGruZbe4h3zcLtotowYjTioO8i3yM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=tGQVcvR3u7AfkW6fQ+jSzSqX7zvmBOQiyr1pM/fXBxX6nIWseFYBGENVy095A2zYq
+	 WN1DfblC/XVYZVa8ge/Tvv/Io5o/HV2rvgwj0B+iLpyKUaDsvagYuK/KuwCmROxy5x
+	 2Y5jINgNQ7y9zdVPwaHT0gTx1D1uxqP13KfzY7TKQKxTsNo14mV2XaNsdt+g3Gumyh
+	 Ma2WmXzy9GW72udh64WQP4/MWjpXyL5vtYc7OvqkFvGC8Y3ZbLsbRAPpSmIIaj3/fY
+	 BR26v40/4xJPTDpofRJ/2mAZs2exrsWFICFevXaLFbhbuMe82mljOzuY9yJbUMsHKx
+	 U7Jw/uqevTskQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1seuKi-004FDh-GX;
+	Fri, 16 Aug 2024 11:37:24 +0100
+Date: Fri, 16 Aug 2024 11:37:24 +0100
+Message-ID: <86le0wzrbv.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>, Joey Gouly <joey.gouly@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Anshuman Khandual <anshuman.khandual@arm.com>,
 	Przemyslaw Gaj <pgaj@cadence.com>
-Subject: Re: [PATCH v3 14/18] KVM: arm64: nv: Add SW walker for AT S1
- emulation
-Message-ID: <Zr8aYymB_2xSqIQp@raptor>
+Subject: Re: [PATCH v3 14/18] KVM: arm64: nv: Add SW walker for AT S1 emulation
+In-Reply-To: <Zr8aYymB_2xSqIQp@raptor>
 References: <20240813100540.1955263-1-maz@kernel.org>
- <20240813100540.1955263-15-maz@kernel.org>
- <Zr4wUj5mpKkwMyCq@raptor>
- <86msldzlly.wl-maz@kernel.org>
+	<20240813100540.1955263-15-maz@kernel.org>
+	<Zr4wUj5mpKkwMyCq@raptor>
+	<86msldzlly.wl-maz@kernel.org>
+	<Zr8aYymB_2xSqIQp@raptor>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86msldzlly.wl-maz@kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com, anshuman.khandual@arm.com, pgaj@cadence.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Marc,
+Hi Alex,
 
-On Thu, Aug 15, 2024 at 07:28:41PM +0100, Marc Zyngier wrote:
-> 
-> Hi Alex,
-> 
-> On Thu, 15 Aug 2024 17:44:02 +0100,
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> 
-> [..]
-> 
-> > > +static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
-> > > +			 struct s1_walk_result *wr, u64 va)
-> > > +{
-> > > +	u64 sctlr, tcr, tg, ps, ia_bits, ttbr;
-> > > +	unsigned int stride, x;
-> > > +	bool va55, tbi, lva, as_el0;
-> > > +
-> > > +	wi->regime = compute_translation_regime(vcpu, op);
-> > > +	as_el0 = (op == OP_AT_S1E0R || op == OP_AT_S1E0W);
-> > > +
-> > > +	va55 = va & BIT(55);
-> > > +
-> > > +	if (wi->regime == TR_EL2 && va55)
-> > > +		goto addrsz;
-> > > +
-> > > +	wi->s2 = (wi->regime == TR_EL10 &&
-> > > +		  (__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_VM | HCR_DC)));
-> > 
-> > This could be written on one line if there were a local variable for the HCR_EL2
-> > register (which is already read multiple times in the function).
-> 
-> Sure thing.
-> 
-> [...]
-> 
-> > > +	/* Let's put the MMU disabled case aside immediately */
-> > > +	switch (wi->regime) {
-> > > +	case TR_EL10:
-> > > +		/*
-> > > +		 * If dealing with the EL1&0 translation regime, 3 things
-> > > +		 * can disable the S1 translation:
-> > > +		 *
-> > > +		 * - HCR_EL2.DC = 1
-> > > +		 * - HCR_EL2.{E2H,TGE} = {0,1}
-> > > +		 * - SCTLR_EL1.M = 0
-> > > +		 *
-> > > +		 * The TGE part is interesting. If we have decided that this
-> > > +		 * is EL1&0, then it means that either {E2H,TGE} == {1,0} or
-> > > +		 * {0,x}, and we only need to test for TGE == 1.
-> > > +		 */
-> > > +		if (__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_DC | HCR_TGE))
-> > > +			wr->level = S1_MMU_DISABLED;
-> > 
-> > There's no need to fallthrough and check SCTLR_ELx.M if the MMU disabled check
-> > here is true.
-> 
-> I'm not sure it makes the code more readable. But if you do, why not.
-> 
-> [...]
-> 
-> > > +	/* Someone was silly enough to encode TG0/TG1 differently */
-> > > +	if (va55) {
-> > > +		wi->txsz = FIELD_GET(TCR_T1SZ_MASK, tcr);
-> > > +		tg = FIELD_GET(TCR_TG1_MASK, tcr);
-> > > +
-> > > +		switch (tg << TCR_TG1_SHIFT) {
-> > > +		case TCR_TG1_4K:
-> > > +			wi->pgshift = 12;	 break;
-> > > +		case TCR_TG1_16K:
-> > > +			wi->pgshift = 14;	 break;
-> > > +		case TCR_TG1_64K:
-> > > +		default:	    /* IMPDEF: treat any other value as 64k */
-> > > +			wi->pgshift = 16;	 break;
-> > > +		}
-> > 
-> > Just a thought, wi->pgshift is used in several places to identify the guest page
-> > size, might be useful to have something like PAGE_SHIFT_{4K,16K,64K}. That would
-> > also make its usage consistent, because in some places wi->pgshift is compared
-> > directly to 12, 14 or 16, in other places the page size is computed from
-> > wi->pgshift and compared to SZ_4K, SZ_16K or SZ_64K.
-> 
-> I only found a single place where we compare wi->pgshift to a
-> non-symbolic integer (as part of the R_YXNYW handling). Everywhere
-> else, we use BIT(wi->pgshift) and compare it to SZ_*K. We moved away
-> from the various PAGE_SHIFT_* macros some years ago, and I don't think
-> we want them back.
+On Fri, 16 Aug 2024 10:22:43 +0100,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+>=20
+> Hi Marc,
+>=20
+> On Thu, Aug 15, 2024 at 07:28:41PM +0100, Marc Zyngier wrote:
+> >=20
+> > Hi Alex,
+> >=20
+> > On Thu, 15 Aug 2024 17:44:02 +0100,
+> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 
-Oh, I wasn't aware of that bit of history. No need to change the current code
-then, it's readable enough.
+[...]
 
-> 
-> What I can do is to convert the places where we init pgshift to use an
-> explicit size using const_ilog2():
-> 
-> @@ -185,12 +188,12 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
->  
->  		switch (tg << TCR_TG1_SHIFT) {
->  		case TCR_TG1_4K:
-> -			wi->pgshift = 12;	 break;
-> +			wi->pgshift = const_ilog2(SZ_4K);	 break;
->  		case TCR_TG1_16K:
-> -			wi->pgshift = 14;	 break;
-> +			wi->pgshift = const_ilog2(SZ_16K);	 break;
->  		case TCR_TG1_64K:
->  		default:	    /* IMPDEF: treat any other value as 64k */
-> -			wi->pgshift = 16;	 break;
-> +			wi->pgshift = const_ilog2(SZ_64K);	 break;
->  		}
->  	} else {
->  		wi->txsz = FIELD_GET(TCR_T0SZ_MASK, tcr);
-> @@ -198,12 +201,12 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
->  
->  		switch (tg << TCR_TG0_SHIFT) {
->  		case TCR_TG0_4K:
-> -			wi->pgshift = 12;	 break;
-> +			wi->pgshift = const_ilog2(SZ_4K);	 break;
->  		case TCR_TG0_16K:
-> -			wi->pgshift = 14;	 break;
-> +			wi->pgshift = const_ilog2(SZ_16K);	 break;
->  		case TCR_TG0_64K:
->  		default:	    /* IMPDEF: treat any other value as 64k */
-> -			wi->pgshift = 16;	 break;
-> +			wi->pgshift = const_ilog2(SZ_64K);	 break;
->  		}
->  	}
->  
-> @@ -212,7 +215,7 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
->  		if (wi->txsz > 39)
->  			goto transfault_l0;
->  	} else {
-> -		if (wi->txsz > 48 || (wi->pgshift == 16 && wi->txsz > 47))
-> +		if (wi->txsz > 48 || (BIT(wi->pgshift) == SZ_64K && wi->txsz > 47))
->  			goto transfault_l0;
->  	}
-> 
-> 
-> > 
-> > > +	} else {
-> > > +		wi->txsz = FIELD_GET(TCR_T0SZ_MASK, tcr);
-> > > +		tg = FIELD_GET(TCR_TG0_MASK, tcr);
-> > > +
-> > > +		switch (tg << TCR_TG0_SHIFT) {
-> > > +		case TCR_TG0_4K:
-> > > +			wi->pgshift = 12;	 break;
-> > > +		case TCR_TG0_16K:
-> > > +			wi->pgshift = 14;	 break;
-> > > +		case TCR_TG0_64K:
-> > > +		default:	    /* IMPDEF: treat any other value as 64k */
-> > > +			wi->pgshift = 16;	 break;
-> > > +		}
-> > > +	}
-> > > +
-> > > +	/* R_PLCGL, R_YXNYW */
-> > > +	if (!kvm_has_feat_enum(vcpu->kvm, ID_AA64MMFR2_EL1, ST, 48_47)) {
-> > > +		if (wi->txsz > 39)
-> > > +			goto transfault_l0;
-> > > +	} else {
-> > > +		if (wi->txsz > 48 || (wi->pgshift == 16 && wi->txsz > 47))
-> > > +			goto transfault_l0;
-> > > +	}
-> > > +
-> > > +	/* R_GTJBY, R_SXWGM */
-> > > +	switch (BIT(wi->pgshift)) {
-> > > +	case SZ_4K:
-> > > +		lva = kvm_has_feat(vcpu->kvm, ID_AA64MMFR0_EL1, TGRAN4, 52_BIT);
-> > > +		lva &= tcr & (wi->regime == TR_EL2 ? TCR_EL2_DS : TCR_DS);
-> > > +		break;
-> > > +	case SZ_16K:
-> > > +		lva = kvm_has_feat(vcpu->kvm, ID_AA64MMFR0_EL1, TGRAN16, 52_BIT);
-> > > +		lva &= tcr & (wi->regime == TR_EL2 ? TCR_EL2_DS : TCR_DS);
-> > > +		break;
-> > > +	case SZ_64K:
-> > > +		lva = kvm_has_feat(vcpu->kvm, ID_AA64MMFR2_EL1, VARange, 52);
-> > > +		break;
-> > > +	}
-> > > +
-> > > +	if ((lva && wi->txsz < 12) || wi->txsz < 16)
-> > > +		goto transfault_l0;
-> > 
-> > Let's assume lva = true, wi->txsz greater than 12, but smaller than 16, which is
-> > architecturally allowed according to R_GTJBY and AArch64.S1MinTxSZ().
-> > 
-> > (lva && wi->txsz < 12) = false
-> > wi->txsz < 16 = true
-> > 
-> > KVM treats it as a fault.
-> 
-> Gah... Fixed with:
-> 
-> @@ -231,7 +234,7 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
->  		break;
->  	}
->  
-> -	if ((lva && wi->txsz < 12) || wi->txsz < 16)
-> +	if ((lva && wi->txsz < 12) || (!lva && wi->txsz < 16))
->  		goto transfault_l0;
->  
->  	ia_bits = get_ia_size(wi);
-> 
-> Not that it has an impact yet, given that we don't support any of the
-> 52bit stuff yet, but thanks for spotting this!
+> > > > +static bool par_check_s1_perm_fault(u64 par)
+> > > > +{
+> > > > +	u8 fst =3D FIELD_GET(SYS_PAR_EL1_FST, par);
+> > > > +
+> > > > +	return  ((fst & ESR_ELx_FSC_TYPE) =3D=3D ESR_ELx_FSC_PERM &&
+> > > > +		 !(par & SYS_PAR_EL1_S));
+> > >=20
+> > > ESR_ELx_FSC_PERM =3D 0x0c is a permission fault, level 0, which Arm A=
+RM says can
+> > > only happen when FEAT_LPA2. I think the code should check that the va=
+lue for
+> > > PAR_EL1.FST is in the interval (ESR_ELx_FSC_PERM_L(0), ESR_ELx_FSC_PE=
+RM_L(3)].
+> >=20
+> > I honestly don't want to second-guess the HW. If it reports something
+> > that is the wrong level, why should we trust the FSC at all?
+>=20
+> Sorry, I should have been clearer.
+>=20
+> It's not about the hardware reporting a fault on level 0 of the translati=
+on
+> tables, it's about the function returning false if the hardware reports a
+> permission fault on levels 1, 2 or 3 of the translation tables.
+>=20
+> For example, on a permssion fault on level 3, PAR_EL1. FST =3D 0b001111 =
+=3D 0x0F,
+> which means that the condition:
+>=20
+> (fst & ESR_ELx_FSC_TYPE) =3D=3D ESR_ELx_FSC_PERM (which is 0x0C) is false=
+ and KVM
+> will fall back to the software walker.
+>=20
+> Does that make sense to you?
 
-The change looks correct to me.
+I'm afraid I still don't get it.
 
-> 
-> [...]
-> 
-> > > +	/* R_VPBBF */
-> > > +	if (check_output_size(wi->baddr, wi))
-> > > +		goto transfault_l0;
-> > 
-> > I think R_VPBBF says that an Address size fault is generated here, not a
-> > translation fault.
-> 
-> Indeed, another one fixed.
-> 
-> > 
-> > > +
-> > > +	wi->baddr &= GENMASK_ULL(wi->max_oa_bits - 1, x);
-> > > +
-> > > +	return 0;
-> > > +
-> > > +addrsz:				/* Address Size Fault level 0 */
-> > > +	fail_s1_walk(wr, ESR_ELx_FSC_ADDRSZ_L(0), false, false);
-> > > +	return -EFAULT;
-> > > +
-> > > +transfault_l0:			/* Translation Fault level 0 */
-> > > +	fail_s1_walk(wr, ESR_ELx_FSC_FAULT_L(0), false, false);
-> > > +	return -EFAULT;
-> > > +}
-> > 
-> > [..]
-> > 
-> > > +static bool par_check_s1_perm_fault(u64 par)
-> > > +{
-> > > +	u8 fst = FIELD_GET(SYS_PAR_EL1_FST, par);
-> > > +
-> > > +	return  ((fst & ESR_ELx_FSC_TYPE) == ESR_ELx_FSC_PERM &&
-> > > +		 !(par & SYS_PAR_EL1_S));
-> > 
-> > ESR_ELx_FSC_PERM = 0x0c is a permission fault, level 0, which Arm ARM says can
-> > only happen when FEAT_LPA2. I think the code should check that the value for
-> > PAR_EL1.FST is in the interval (ESR_ELx_FSC_PERM_L(0), ESR_ELx_FSC_PERM_L(3)].
-> 
-> I honestly don't want to second-guess the HW. If it reports something
-> that is the wrong level, why should we trust the FSC at all?
+=46rom the kernel source:
 
-Sorry, I should have been clearer.
+#define ESR_ELx_FSC_TYPE	(0x3C)
 
-It's not about the hardware reporting a fault on level 0 of the translation
-tables, it's about the function returning false if the hardware reports a
-permission fault on levels 1, 2 or 3 of the translation tables.
+This is a mask covering all fault types.
 
-For example, on a permssion fault on level 3, PAR_EL1. FST = 0b001111 = 0x0F,
-which means that the condition:
+#define ESR_ELx_FSC_PERM	(0x0C)
 
-(fst & ESR_ELx_FSC_TYPE) == ESR_ELx_FSC_PERM (which is 0x0C) is false and KVM
-will fall back to the software walker.
+This is the value for a permission fault, not encoding a level.
 
-Does that make sense to you?
+Taking your example:
+
+(fst & ESR_ELx_FSC_TYPE) =3D=3D (0x0F & 0x3C) =3D=3D 0x0C =3D=3D ESR_ELx_FS=
+C_PERM
+
+As I read it, the condition is true, as it catches a permission fault
+on any level between 0 and 3.
+
+You're obviously seeing something I don't, and I'm starting to
+question my own sanity...
 
 Thanks,
-Alex
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
