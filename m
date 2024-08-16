@@ -1,54 +1,54 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F33821B8EA8
-	for <kvmarm@lists.linux.dev>; Fri, 16 Aug 2024 12:39:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB07D1BB691
+	for <kvmarm@lists.linux.dev>; Fri, 16 Aug 2024 12:39:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723811966; cv=none; b=DHuTJSURvNIHv4kCqrlwkae/5FwnWlyNTRkvhv1u3eXU96ECrS6rxy95SIqMwZH0mv5YMSDpZX+BxO9++siahKP3BpyEu15Ghwl7k2fEDjmPwl/zzdk3dckfDElYcxajEu8f5XIIHlYGBPKThHR8mi3q39KxodGce4uFi57xc20=
+	t=1723811969; cv=none; b=Hqg396Q6r2LTobnRuO3JY0qH7Xv7LBt0K+vyM4OCE0/pSfYUwt4vP4YjbzlyrAO8fOWqyhx+aoppgcAAk4jerM2snHIi/PRi2DczndnV5xlsOlU0nA/uj2OucUCpGs37A5l7sBjAZInxKTVtXZIRB/aCGYNKcWsxpZDW7vOaqWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723811966; c=relaxed/simple;
-	bh=8Cexea0dzRdr47M50Br5yJsGcLhFPUvBxCXJPUnZwzA=;
+	s=arc-20240116; t=1723811969; c=relaxed/simple;
+	bh=rUTR5Uw2CU6HdDslJgJgvaaNW9+0iMJMSD2PvX3S4Mc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=nvALs+EgRwVK1rFEybjb7Kmtc1Nc9TM5Yq00EIcW58VZ46OoZS3nucnbCSzzNsztg/TrEyCRw6XSfraFdfJevb6Vcm73tg3rGqwusA/sJfXSUIDWPAPdK0c/jqso1sq2MZobGZBOFRqcep8kdjaS37BqeYRdxMvXxHyKkcOEqhg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OUKygwle; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=j8z/MzZ/zVZyw0b/OiGOFaXiDODpdMX3YB24o9B4PmviqmG311mOCLcINTZ7UOSk9qZagHOEp+tJq7YiNZQgwV5dhhUiAQBgjRG4rqO3bMNJ2dwOdQ/vM26nOkeXs3NmihpASeXTiVmXTDi1zmqegnlF4buB1FaOSwPsVbVz1EE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=McjHhOVe; arc=none smtp.client-ip=209.85.128.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OUKygwle"
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e02fff66a83so3337800276.0
-        for <kvmarm@lists.linux.dev>; Fri, 16 Aug 2024 05:39:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="McjHhOVe"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4280c0b3017so14656125e9.1
+        for <kvmarm@lists.linux.dev>; Fri, 16 Aug 2024 05:39:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723811964; x=1724416764; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1723811966; x=1724416766; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=czjtgk0THntC/xnLf2aWE5vi1aKv5GZ9fmo01l7czSk=;
-        b=OUKygwleu6/8FNG7GcOkKtiE8xR9hK3G1ruiegmMJJvby4M/FuETzxYvSC9B+9NoM5
-         29Jf0RDbZRfoCNqn3jWa9MiuZyGjHIsgp+pFn6TCKrFRyItTCmFXS8/HL/kfcsp7F9B9
-         aQUEVQbeRZltjRwSwEVffJa0M1IRCrbnm1T5dTLGRNZaX+Vhaddc4T3VxsUni8NGOkfh
-         lfYMCvVqksoT5o1N1YQZ91DWPJ0TRybpWPivhzU6d4izgeceyNkcp8ckhczMj8Sz5lvz
-         1ktjhTi+yKte9ZQwI6Np2ii5IQdthKu3vMw53SBuvVLygtUVZod6QhCTUCVYaj+GSrgK
-         A+jw==
+        bh=i5eauNhTcQzE72bplFQ4XGy8D3RpEmD9MyGnD7LBaN4=;
+        b=McjHhOVeuISe/I8j3u37nIZLcBsOo0d9DKqM8Yh2SC9zv3NTlTZnkqVI7L4y1UMeot
+         warBnpNisLOoMw9xpGa95h3yNZ37scwC1eZosQAX2SGSKX16tR61+0KL/bEb70UgILcQ
+         C1ybKpww78hxDhQ6VAZ0+ghar8iiTYwr6mVGUQYmLkZopapXOSoEcwVRs/LD44Dm4yrK
+         5JjJR5jV0ZrMUwMtwaOf1VY/ZP2hP6qunBKUmDDNBI2CS0mM2GusevwedEc5rbd41ckg
+         ZoJiEI/eRE6MBr5Zoa15b9Qn9u1uEcB76vAAXnZOqbhCzUq70URYsNfhmF7rymPWOLBV
+         ToTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723811964; x=1724416764;
+        d=1e100.net; s=20230601; t=1723811966; x=1724416766;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=czjtgk0THntC/xnLf2aWE5vi1aKv5GZ9fmo01l7czSk=;
-        b=gDyoblthdB7FiOkLoWAaXHvGAX/+91Y1h1hIbqb6OWEMuNX6AHtiv27DlIVgqZuVKk
-         tfCAJWNkbbawoyXng3285vfUBscts+SbBMBDDosxHdl3h5N9wD3H5maWnstBGiks72dW
-         msLmkkJlEkWUOO2tR3SyJNkWyMQWQVXLWZPwfEVmpOx7cr5Chj2dcKZLYvQeMbtVgMHi
-         nfJ4S053YtzQ30+t7jSrtZG7ODom4fuP4bSzb85BgQxzwzAjHzAmGI2hz44sV4Hj2Q6Q
-         4lx+VvmIIgVqzH82f1xz9+z8Whz0ZXpi1FUdDh/UW22hvQwgjMTgKsR4Xgqy5ZEKQzqF
-         0fYw==
-X-Gm-Message-State: AOJu0Yw+2M0J0+SV5gwnM/QTmDZa3nORmrZO2VOZnBC1e2qu5dSMrYJA
-	YHuRiek7Xl0vyvhFXNdkFV0nLqY5diuslirrDqyR1Cul9noC4BSnD5K4455Dc6quqXq/RslXZE2
-	U+J/0zi790S8Y151sPHArUvVQNA==
-X-Google-Smtp-Source: AGHT+IEBl2Jwr492NkaB67XJngVIdAPNlygBC/0Vw/Bc+AHOUtSwJrRm/7vBBySziaJP1f/tml+FbOFt7tZsvUVVL0c=
+        bh=i5eauNhTcQzE72bplFQ4XGy8D3RpEmD9MyGnD7LBaN4=;
+        b=dwNQi8hlrXj7gSyiy3eGU9158KI3sHvjtVIWGM5qy2FOG9m28qy8VzVqyRUne9ZQML
+         eOcZOpjt8JlrZtlap0Ma9w+LeYYoo6wB1sabvdFVvF64g+iHwz9BG0W2xElVgYJlLvaJ
+         0OAa/T9Zgo1wSvLF45FdGUGaTgXhfEJRyc8Wy8fg9Y5oY/TCASW1JOyOURR5AJ5itNYV
+         rPvbQID7BGj6JhrQm8WHnDtn5Gw6j0X4qcmHQEjGsF6/66BTLI9IH89K0SNRJ/iNzhLP
+         TafsfwveNabQItc2ozhJvnZp/AuJhB3tOwve1uu9SOaxYS3TY68QecUO3qLEheeBqgLW
+         /rqw==
+X-Gm-Message-State: AOJu0YzBvKMIP9esBgmJt0rA6oyMBr3OlClk0/qaRvLTA1QhJEAjwp18
+	TYU+ZHJsd/lN4blI7u68Qw2NTF0q7PBeNaLsuoZLibtczuU9FO0HmfPqLPGtMjoeUU2sFkzZ+cc
+	R77xsuBjMReq2BsU0vAb2jfJlbA==
+X-Google-Smtp-Source: AGHT+IG1VARFxBSm1/RC48H0ZjztqDQmLfmamJgW5HCygZC+rMZkIMsZGB0I2wgNiB3LORe0b8lZmKSxQJdbF5eeByQ=
 X-Received: from sebkvm.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:cd5])
- (user=sebastianene job=sendgmr) by 2002:a25:910e:0:b0:e03:59e2:e82 with SMTP
- id 3f1490d57ef6-e1180fb2b4dmr4115276.10.1723811963785; Fri, 16 Aug 2024
- 05:39:23 -0700 (PDT)
-Date: Fri, 16 Aug 2024 12:39:04 +0000
+ (user=sebastianene job=sendgmr) by 2002:a5d:6691:0:b0:366:ec30:add3 with SMTP
+ id ffacd0b85a97d-37194314665mr4594f8f.1.1723811966138; Fri, 16 Aug 2024
+ 05:39:26 -0700 (PDT)
+Date: Fri, 16 Aug 2024 12:39:05 +0000
 In-Reply-To: <20240816123906.3683425-1-sebastianene@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -58,8 +58,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240816123906.3683425-1-sebastianene@google.com>
 X-Mailer: git-send-email 2.46.0.184.g6999bdac58-goog
-Message-ID: <20240816123906.3683425-5-sebastianene@google.com>
-Subject: [PATCH v8 4/6] KVM: arm64: Register ptdump with debugfs on guest creation
+Message-ID: <20240816123906.3683425-6-sebastianene@google.com>
+Subject: [PATCH v8 5/6] KVM: arm64: Initialize the ptdump parser with stage-2 attributes
 From: Sebastian Ene <sebastianene@google.com>
 To: akpm@linux-foundation.org, alexghiti@rivosinc.com, ankita@nvidia.com, 
 	ardb@kernel.org, catalin.marinas@arm.com, christophe.leroy@csgroup.eu, 
@@ -71,205 +71,195 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org, kernel-team@android.com
 Content-Type: text/plain; charset="UTF-8"
 
-While arch/*/mem/ptdump handles the kernel pagetable dumping code,
-introduce KVM/ptdump which shows the guest stage-2 pagetables. The
-separation is necessary because most of the definitions from the
-stage-2 pagetable reside in the KVM path and we will be invoking
-functionality **specific** to KVM.
-
-When a guest is created, register a new file entry under the guest
-debugfs dir which allows userspace to show the contents of the guest
-stage-2 pagetables when accessed.
+Define a set of attributes used by the ptdump parser to display the
+properties of a guest memory region covered by a pagetable descriptor.
+Build a description of the pagetable levels and initialize the parser
+with this configuration.
 
 Signed-off-by: Sebastian Ene <sebastianene@google.com>
 ---
- arch/arm64/kvm/Kconfig      | 14 ++++++
- arch/arm64/kvm/Makefile     |  1 +
- arch/arm64/kvm/arm.c        |  2 +
- arch/arm64/kvm/kvm_ptdump.h | 20 ++++++++
- arch/arm64/kvm/ptdump.c     | 91 +++++++++++++++++++++++++++++++++++++
- 5 files changed, 128 insertions(+)
- create mode 100644 arch/arm64/kvm/kvm_ptdump.h
- create mode 100644 arch/arm64/kvm/ptdump.c
+ arch/arm64/kvm/ptdump.c | 135 ++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 129 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index 8304eb342be9..fcc41e58ede6 100644
---- a/arch/arm64/kvm/Kconfig
-+++ b/arch/arm64/kvm/Kconfig
-@@ -66,4 +66,18 @@ config PROTECTED_NVHE_STACKTRACE
+diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
+index 52483d56be2e..79be07ec3c3c 100644
+--- a/arch/arm64/kvm/ptdump.c
++++ b/arch/arm64/kvm/ptdump.c
+@@ -14,6 +14,51 @@
+ #include <kvm_ptdump.h>
  
- 	  If unsure, or not using protected nVHE (pKVM), say N.
  
-+config PTDUMP_STAGE2_DEBUGFS
-+       bool "Present the stage-2 pagetables to debugfs"
-+       depends on KVM
-+       select PTDUMP_CORE
-+       default n
-+       help
-+         Say Y here if you want to show the stage-2 kernel pagetables
-+         layout in a debugfs file. This information is only useful for kernel developers
-+         who are working in architecture specific areas of the kernel.
-+         It is probably not a good idea to enable this feature in a production
-+         kernel.
++#define MARKERS_LEN		(2)
++#define KVM_PGTABLE_MAX_LEVELS	(KVM_PGTABLE_LAST_LEVEL + 1)
 +
-+         If in doubt, say N.
++struct kvm_ptdump_guest_state {
++	struct kvm		*kvm;
++	struct ptdump_pg_state	parser_state;
++	struct addr_marker	ipa_marker[MARKERS_LEN];
++	struct ptdump_pg_level	level[KVM_PGTABLE_MAX_LEVELS];
++	struct ptdump_range	range[MARKERS_LEN];
++};
 +
- endif # VIRTUALIZATION
-diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-index 86a629aaf0a1..e4233b323a73 100644
---- a/arch/arm64/kvm/Makefile
-+++ b/arch/arm64/kvm/Makefile
-@@ -27,6 +27,7 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
- 
- kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o pmu.o
- kvm-$(CONFIG_ARM64_PTR_AUTH)  += pauth.o
-+kvm-$(CONFIG_PTDUMP_STAGE2_DEBUGFS) += ptdump.o
- 
- always-y := hyp_constants.h hyp-constants.s
- 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 9bef7638342e..60fed2146763 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -45,6 +45,7 @@
- #include <kvm/arm_hypercalls.h>
- #include <kvm/arm_pmu.h>
- #include <kvm/arm_psci.h>
-+#include <kvm_ptdump.h>
- 
- static enum kvm_mode kvm_mode = KVM_MODE_DEFAULT;
- 
-@@ -228,6 +229,7 @@ vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
- void kvm_arch_create_vm_debugfs(struct kvm *kvm)
++static const struct ptdump_prot_bits stage2_pte_bits[] = {
++	{
++		.mask	= PTE_VALID,
++		.val	= PTE_VALID,
++		.set	= " ",
++		.clear	= "F",
++	}, {
++		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | PTE_VALID,
++		.val	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | PTE_VALID,
++		.set	= "R",
++		.clear	= " ",
++	}, {
++		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W | PTE_VALID,
++		.val	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W | PTE_VALID,
++		.set	= "W",
++		.clear	= " ",
++	}, {
++		.mask	= KVM_PTE_LEAF_ATTR_HI_S2_XN | PTE_VALID,
++		.val	= PTE_VALID,
++		.set	= " ",
++		.clear	= "X",
++	}, {
++		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_AF | PTE_VALID,
++		.val	= KVM_PTE_LEAF_ATTR_LO_S2_AF | PTE_VALID,
++		.set	= "AF",
++		.clear	= "  ",
++	}, {
++		.mask	= PTE_TABLE_BIT | PTE_VALID,
++		.val	= PTE_VALID,
++		.set	= "BLK",
++		.clear	= "   ",
++	},
++};
++
+ static int kvm_ptdump_visitor(const struct kvm_pgtable_visit_ctx *ctx,
+ 			      enum kvm_pgtable_walk_flags visit)
  {
- 	kvm_sys_regs_create_debugfs(kvm);
-+	kvm_ptdump_guest_register(kvm);
+@@ -40,15 +85,81 @@ static int kvm_ptdump_show_common(struct seq_file *m,
+ 	return kvm_pgtable_walk(pgtable, 0, BIT(pgtable->ia_bits), &walker);
  }
  
- static void kvm_destroy_mpidr_data(struct kvm *kvm)
-diff --git a/arch/arm64/kvm/kvm_ptdump.h b/arch/arm64/kvm/kvm_ptdump.h
-new file mode 100644
-index 000000000000..0a62b0e2908c
---- /dev/null
-+++ b/arch/arm64/kvm/kvm_ptdump.h
-@@ -0,0 +1,20 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) Google, 2024
-+ * Author: Sebastian Ene <sebastianene@google.com>
-+ */
-+
-+#ifndef __KVM_PTDUMP_H
-+#define __KVM_PTDUMP_H
-+
-+#include <linux/kvm_host.h>
-+#include <asm/ptdump.h>
-+
-+
-+#ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
-+void kvm_ptdump_guest_register(struct kvm *kvm);
-+#else
-+static inline void kvm_ptdump_guest_register(struct kvm *kvm) {}
-+#endif /* CONFIG_PTDUMP_STAGE2_DEBUGFS */
-+
-+#endif /* __KVM_PTDUMP_H */
-diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
-new file mode 100644
-index 000000000000..52483d56be2e
---- /dev/null
-+++ b/arch/arm64/kvm/ptdump.c
-@@ -0,0 +1,91 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Debug helper used to dump the stage-2 pagetables of the system and their
-+ * associated permissions.
-+ *
-+ * Copyright (C) Google, 2024
-+ * Author: Sebastian Ene <sebastianene@google.com>
-+ */
-+#include <linux/debugfs.h>
-+#include <linux/kvm_host.h>
-+#include <linux/seq_file.h>
-+
-+#include <asm/kvm_pgtable.h>
-+#include <kvm_ptdump.h>
-+
-+
-+static int kvm_ptdump_visitor(const struct kvm_pgtable_visit_ctx *ctx,
-+			      enum kvm_pgtable_walk_flags visit)
++static int kvm_ptdump_build_levels(struct ptdump_pg_level *level, u32 start_lvl)
 +{
-+	struct ptdump_pg_state *st = ctx->arg;
-+	struct ptdump_state *pt_st = &st->ptdump;
++	static const char * const level_names[] = {"PGD", "PUD", "PMD", "PTE"};
++	u32 i = 0;
++	u64 mask = 0;
 +
-+	note_page(pt_st, ctx->addr, ctx->level, ctx->old);
++	if (start_lvl > 2) {
++		pr_err("invalid start_lvl %u\n", start_lvl);
++		return -EINVAL;
++	}
++
++	if (WARN_ON_ONCE(start_lvl >= KVM_PGTABLE_LAST_LEVEL))
++		return -EINVAL;
++
++	for (i = 0; i < ARRAY_SIZE(stage2_pte_bits); i++)
++		mask |= stage2_pte_bits[i].mask;
++
++	for (i = start_lvl; i < KVM_PGTABLE_MAX_LEVELS; i++) {
++		strscpy(level[i].name, level_names[i], sizeof(level[i].name));
++
++		level[i].num	= ARRAY_SIZE(stage2_pte_bits);
++		level[i].bits	= stage2_pte_bits;
++		level[i].mask	= mask;
++	}
++
++	if (start_lvl > 0)
++		strscpy(level[start_lvl].name, "PGD", sizeof(level[start_lvl].name));
++
 +	return 0;
 +}
 +
-+static int kvm_ptdump_show_common(struct seq_file *m,
-+				  struct kvm_pgtable *pgtable,
-+				  struct ptdump_pg_state *parser_state)
++static struct kvm_ptdump_guest_state
++*kvm_ptdump_parser_init(struct kvm *kvm)
 +{
-+	struct kvm_pgtable_walker walker = (struct kvm_pgtable_walker) {
-+		.cb     = kvm_ptdump_visitor,
-+		.arg	= parser_state,
-+		.flags	= KVM_PGTABLE_WALK_LEAF,
++	struct kvm_ptdump_guest_state *st;
++	struct kvm_s2_mmu *mmu = &kvm->arch.mmu;
++	struct kvm_pgtable *pgtable = mmu->pgt;
++	int ret;
++
++	st = kzalloc(sizeof(struct kvm_ptdump_guest_state), GFP_KERNEL_ACCOUNT);
++	if (!st)
++		return NULL;
++
++	ret = kvm_ptdump_build_levels(&st->level[0], pgtable->start_level);
++	if (ret) {
++		kfree(st);
++		return ERR_PTR(ret);
++	}
++
++	st->ipa_marker[0].name		= "Guest IPA";
++	st->ipa_marker[1].start_address = BIT(pgtable->ia_bits);
++	st->range[0].end		= BIT(pgtable->ia_bits);
++
++	st->kvm				= kvm;
++	st->parser_state = (struct ptdump_pg_state) {
++		.marker		= &st->ipa_marker[0],
++		.level		= -1,
++		.pg_level	= &st->level[0],
++		.ptdump.range	= &st->range[0],
 +	};
 +
-+	parser_state->level = -1;
-+	parser_state->start_address = 0;
-+
-+	return kvm_pgtable_walk(pgtable, 0, BIT(pgtable->ia_bits), &walker);
++	return st;
 +}
 +
-+static int kvm_ptdump_guest_show(struct seq_file *m, void *unused)
-+{
-+	struct kvm *kvm = m->private;
-+	struct kvm_s2_mmu *mmu = &kvm->arch.mmu;
-+	struct ptdump_pg_state parser_state = {0};
-+	int ret;
+ static int kvm_ptdump_guest_show(struct seq_file *m, void *unused)
+ {
+-	struct kvm *kvm = m->private;
++	struct kvm_ptdump_guest_state *st = m->private;
++	struct kvm *kvm = st->kvm;
+ 	struct kvm_s2_mmu *mmu = &kvm->arch.mmu;
+-	struct ptdump_pg_state parser_state = {0};
+ 	int ret;
+ 
++	st->parser_state.seq = m;
 +
-+	write_lock(&kvm->mmu_lock);
-+	ret = kvm_ptdump_show_common(m, mmu->pgt, &parser_state);
-+	write_unlock(&kvm->mmu_lock);
+ 	write_lock(&kvm->mmu_lock);
+-	ret = kvm_ptdump_show_common(m, mmu->pgt, &parser_state);
++	ret = kvm_ptdump_show_common(m, mmu->pgt, &st->parser_state);
+ 	write_unlock(&kvm->mmu_lock);
+ 
+ 	return ret;
+@@ -57,22 +168,34 @@ static int kvm_ptdump_guest_show(struct seq_file *m, void *unused)
+ static int kvm_ptdump_guest_open(struct inode *m, struct file *file)
+ {
+ 	struct kvm *kvm = m->i_private;
++	struct kvm_ptdump_guest_state *st;
+ 	int ret;
+ 
+ 	if (!kvm_get_kvm_safe(kvm))
+ 		return -ENOENT;
+ 
+-	ret = single_open(file, kvm_ptdump_guest_show, m->i_private);
+-	if (ret < 0)
+-		kvm_put_kvm(kvm);
++	st = kvm_ptdump_parser_init(kvm);
++	if (IS_ERR(st)) {
++		ret = PTR_ERR(st);
++		goto free_with_kvm_ref;
++	}
 +
-+	return ret;
-+}
-+
-+static int kvm_ptdump_guest_open(struct inode *m, struct file *file)
-+{
-+	struct kvm *kvm = m->i_private;
-+	int ret;
-+
-+	if (!kvm_get_kvm_safe(kvm))
-+		return -ENOENT;
-+
-+	ret = single_open(file, kvm_ptdump_guest_show, m->i_private);
-+	if (ret < 0)
-+		kvm_put_kvm(kvm);
-+
-+	return ret;
-+}
-+
-+static int kvm_ptdump_guest_close(struct inode *m, struct file *file)
-+{
-+	struct kvm *kvm = m->i_private;
-+
++	ret = single_open(file, kvm_ptdump_guest_show, st);
++	if (!ret)
++		return 0;
+ 
++	kfree(st);
++free_with_kvm_ref:
 +	kvm_put_kvm(kvm);
-+	return single_release(m, file);
-+}
-+
-+static const struct file_operations kvm_ptdump_guest_fops = {
-+	.open		= kvm_ptdump_guest_open,
-+	.read		= seq_read,
-+	.llseek		= seq_lseek,
-+	.release	= kvm_ptdump_guest_close,
-+};
-+
-+void kvm_ptdump_guest_register(struct kvm *kvm)
-+{
-+	debugfs_create_file("stage2_page_tables", 0400, kvm->debugfs_dentry,
-+			    kvm, &kvm_ptdump_guest_fops);
-+}
+ 	return ret;
+ }
+ 
+ static int kvm_ptdump_guest_close(struct inode *m, struct file *file)
+ {
+ 	struct kvm *kvm = m->i_private;
++	void *st = ((struct seq_file *)file->private_data)->private;
+ 
++	kfree(st);
+ 	kvm_put_kvm(kvm);
+ 	return single_release(m, file);
+ }
 -- 
 2.46.0.184.g6999bdac58-goog
 
