@@ -1,147 +1,112 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AFAF1BB6B9
-	for <kvmarm@lists.linux.dev>; Fri, 16 Aug 2024 12:39:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 807B4156967
+	for <kvmarm@lists.linux.dev>; Fri, 16 Aug 2024 13:28:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723811972; cv=none; b=fP11zpFx1JgeDfmt01emhQk1CrBossqd1mSWiNlI1gpvWEVIvZfXwYNie5xe2MNlM+yVxvg72rOAZ2ff39Z3stUlsV9/f1hk84kji8Yo8YsiVKhHkbQHXdjR1JGNOTBeybI5SyFegqzYsmWs+uOdCjK0tuLMGwtzP8d2Xya8rRQ=
+	t=1723814925; cv=none; b=EbA21XkKQJLQ4fNIeeATJvdW25fxdZTY8ncxtbsSZUz2W2DL8FqOkg7WkYnodz0WnjkYyhrImQVDl+c7uiNpZXE5p5cbzFuopqWcwEHUQBEIuXfsYNvIS5pOHxd2z5m/2/khdbdZdCVjfkvUHUhTiMnDv5hYcHOvwYlqTPLja6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723811972; c=relaxed/simple;
-	bh=mY6xy3N+Ro6xX5leeMZAa8gpa+1gdMNp/aUTBfJ3SK0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=rkLNtFiYm9gGAjaX8KJi5CZ65c5C9V7nOUCJGgTBB3xg7+Ogf+YCJVFlAMEXkIueF5FjyD0uX2mp9+RmSZMwcTPUlRpRoS3d1jSWhQCeNDSU6fShi268/5Ww1afjp2ohU4m5TBYHLC+y3ebzOYe+IsLz/d7q1hC0ItPtTJluFP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AYW12WEL; arc=none smtp.client-ip=209.85.128.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AYW12WEL"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-42817980766so13353615e9.3
-        for <kvmarm@lists.linux.dev>; Fri, 16 Aug 2024 05:39:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723811969; x=1724416769; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fVLGFavEAQJdYF6sohZy6GLteiKbgm4SNZHa6M3Hrik=;
-        b=AYW12WEL6IUVoR9x9nQeiuSv9KOTKas5JJz6kbQtAkEADFclYyU2NGz6RhFwFARnt5
-         t5WayKT08JGZ1jTBF/xy3utkiSxjJ7FuLaepr+Lvc6TITBiZG/p/e3zxcSIrxGOFnZuj
-         wcG1fNsrliMDXDz1CfOsBUTRj/FXLJWJcfLBGxmLhZUb3tV2stWvc/PqKoLtaB1lZ4F3
-         nWW/haFH3jJwFPIwFl7fdBrSS8nRpHJvIApuntIVEs0btNhvLclSL75VZdKG2nUVFoMJ
-         +EK2hIO9EljNIl13uDlAR+/rD12Om20UqbjtnBuGeqjOBT8T9tzj76Y0OQUxdeSzhbHd
-         FJSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723811969; x=1724416769;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fVLGFavEAQJdYF6sohZy6GLteiKbgm4SNZHa6M3Hrik=;
-        b=cmqcko0dhYdYdaYvgxFoh3T20l6x1pLju5Va8w8GVpEW+Sjf2vorW7CBwK9rJIk1Np
-         wjHlSRlC+z8QXITMCFKD3V3mJOGHpZ8jBN73JhNRdVsH4zbfXtdkwQLMkvo+03AI02Bi
-         RdU+ZkkqYuF3b4eC6pePW9KYjOyuWAW1YLl83fJCUOi3n9zL1ehHV9sABbggSsX0aCDE
-         7BjuWNP+Sjdb/Z5bfqBcgcFcMaiCso386pUw9b/9qRhJjt98Dccfz1ZhoRYYmJzoQ2FA
-         YrZ7w864JjG7wS3DvbpzFWuEm5r82ITHxHMEu60q68YXiFxuenoEqJnfo/CD/5tFmHnW
-         ZOGw==
-X-Gm-Message-State: AOJu0YyZuSFev+K8TON2++FRYFhamIDndervqllv96l+ae8N0tpxUtGr
-	FcW3yCKYJNa7rEuFgZH2N9DfyjXRbQHyWYaOf5wiwm4Ejmdv5pTa/erNOZdscQBZxkbO0zM7bYA
-	WUCujrRVJ8iPr8Q3lU2xo+fU3yg==
-X-Google-Smtp-Source: AGHT+IFGgP1UpKc1nFsMN2cnAW/WNRr3YojR2uI15QJjFmnongfC+MYnDiKQo3s4RWZo8/KjRQyeYn/x04TBgYlZR34=
-X-Received: from sebkvm.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:cd5])
- (user=sebastianene job=sendgmr) by 2002:a05:6000:1e81:b0:366:ea7c:bed1 with
- SMTP id ffacd0b85a97d-371943164fbmr3636f8f.1.1723811968492; Fri, 16 Aug 2024
- 05:39:28 -0700 (PDT)
-Date: Fri, 16 Aug 2024 12:39:06 +0000
-In-Reply-To: <20240816123906.3683425-1-sebastianene@google.com>
+	s=arc-20240116; t=1723814925; c=relaxed/simple;
+	bh=Lf7Td2aJBrsVS6sGbAVw2JycKPXUAJiw0B+zerzyxOM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DXxNBmFEprHlqAEXAE5bAnPzvgtobEXfubmvHQg1PxGvAmrSATMddhVWcbd9j1uWPKXRRcJT5d8q0g5Ckjv3mXhMyfV27iughmSDViBl4+91OH7gLilCMa4U2Scgo+cyB+7r11mRgBM1KF7Tpptuxx7V33PLdY2XR+SAUIOUS2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4WljRT3gjwz6K90M;
+	Fri, 16 Aug 2024 21:25:41 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id 961D61400DB;
+	Fri, 16 Aug 2024 21:28:39 +0800 (CST)
+Received: from A2303104131.china.huawei.com (10.203.177.241) by
+ lhrpeml500005.china.huawei.com (7.191.163.240) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Fri, 16 Aug 2024 14:28:33 +0100
+From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+To: <kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>
+CC: <maz@kernel.org>, <will@kernel.org>, <catalin.marinas@arm.com>,
+	<oliver.upton@linux.dev>, <james.morse@arm.com>, <suzuki.poulose@arm.com>,
+	<yuzenghui@huawei.com>, <wangzhou1@hisilicon.com>, <linuxarm@huawei.com>
+Subject: [PATCH v3] KVM: arm64: Make the exposed feature bits in AA64DFR0_EL1 writable from userspace
+Date: Fri, 16 Aug 2024 14:28:19 +0100
+Message-ID: <20240816132819.34316-1-shameerali.kolothum.thodi@huawei.com>
+X-Mailer: git-send-email 2.12.0.windows.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20240816123906.3683425-1-sebastianene@google.com>
-X-Mailer: git-send-email 2.46.0.184.g6999bdac58-goog
-Message-ID: <20240816123906.3683425-7-sebastianene@google.com>
-Subject: [PATCH v8 6/6] KVM: arm64: Expose guest stage-2 pagetable config to debugfs
-From: Sebastian Ene <sebastianene@google.com>
-To: akpm@linux-foundation.org, alexghiti@rivosinc.com, ankita@nvidia.com, 
-	ardb@kernel.org, catalin.marinas@arm.com, christophe.leroy@csgroup.eu, 
-	james.morse@arm.com, vdonnefort@google.com, mark.rutland@arm.com, 
-	maz@kernel.org, oliver.upton@linux.dev, rananta@google.com, 
-	ryan.roberts@arm.com, sebastianene@google.com, shahuang@redhat.com, 
-	suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kernel-team@android.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
-Make the start level and the IPA bits properties available in the
-virtual machine debugfs directory. Make sure that the KVM structure
-doesn't disappear behind our back and keep a reference to the KVM struct
-while these files are opened.
+KVM exposes the OS double lock feature bit to Guests but returns
+RAZ/WI on Guest OSDLR_EL1 access. This breaks Guest migration between
+systems where this feature differ. Add support to make this feature
+writable from userspace by setting the mask bit. While at it, set the
+mask bits for the exposed WRPs(Number of Watchpoints) as well.
+Also update the selftest to cover these fields.
 
-Signed-off-by: Sebastian Ene <sebastianene@google.com>
+However we still can't make BRPs and CTX_CMPs fields writable, because
+as per ARM ARM DDI 0487K.a, section D2.8.3 Breakpoint types and
+linking of breakpoints, highest numbered breakpoints(BRPs) must be
+context aware breakpoints(CTX_CMPs). KVM does not trap + emulate the
+breakpoint registers, and as such cannot support a layout that misaligns
+with the underlying hardware.
+
+Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 ---
- arch/arm64/kvm/ptdump.c | 48 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 48 insertions(+)
+v2 --> v3:
+   -Updated comments on BRPs and CTX_CMPs. Corrected ARM ARM reference.
+   v2:https://lore.kernel.org/kvmarm/20240815155954.85480-1-shameerali.kolothum.thodi@huawei.com/
+---
+ arch/arm64/kvm/sys_regs.c                        | 16 +++++++++++++++-
+ .../testing/selftests/kvm/aarch64/set_id_regs.c  |  2 ++
+ 2 files changed, 17 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
-index 79be07ec3c3c..b0d55ea3fb2a 100644
---- a/arch/arm64/kvm/ptdump.c
-+++ b/arch/arm64/kvm/ptdump.c
-@@ -207,8 +207,56 @@ static const struct file_operations kvm_ptdump_guest_fops = {
- 	.release	= kvm_ptdump_guest_close,
- };
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index c90324060436..5a49e8331fbf 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2376,7 +2376,21 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	  .get_user = get_id_reg,
+ 	  .set_user = set_id_aa64dfr0_el1,
+ 	  .reset = read_sanitised_id_aa64dfr0_el1,
+-	  .val = ID_AA64DFR0_EL1_PMUVer_MASK |
++	/*
++	 * Prior to FEAT_Debugv8.9, the architecture defines context-aware
++	 * breakpoints (CTX_CMPs) as the highest numbered breakpoints (BRPs).
++	 * KVM does not trap + emulate the breakpoint registers, and as such
++	 * cannot support a layout that misaligns with the underlying hardware.
++	 * While it may be possible to describe a subset that aligns with
++	 * hardware, just prevent changes to BRPs and CTX_CMPs altogether for
++	 * simplicity.
++	 *
++	 * See DDI0487K.a, section D2.8.3 Breakpoint types and linking
++	 * of breakpoints for more details.
++	 */
++	  .val = ID_AA64DFR0_EL1_DoubleLock_MASK |
++		 ID_AA64DFR0_EL1_WRPs_MASK |
++		 ID_AA64DFR0_EL1_PMUVer_MASK |
+ 		 ID_AA64DFR0_EL1_DebugVer_MASK, },
+ 	ID_SANITISED(ID_AA64DFR1_EL1),
+ 	ID_UNALLOCATED(5,2),
+diff --git a/tools/testing/selftests/kvm/aarch64/set_id_regs.c b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
+index d20981663831..6edc5412abe8 100644
+--- a/tools/testing/selftests/kvm/aarch64/set_id_regs.c
++++ b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
+@@ -68,6 +68,8 @@ struct test_feature_reg {
+ 	}
  
-+static int kvm_pgtable_debugfs_show(struct seq_file *m, void *unused)
-+{
-+	const struct file *file = m->file;
-+	struct kvm_pgtable *pgtable = m->private;
-+
-+	if (!strcmp(file_dentry(file)->d_iname, "ipa_range"))
-+		seq_printf(m, "%2u\n", pgtable->ia_bits);
-+	else if (!strcmp(file_dentry(file)->d_iname, "stage2_levels"))
-+		seq_printf(m, "%1d\n", KVM_PGTABLE_LAST_LEVEL - pgtable->start_level + 1);
-+	return 0;
-+}
-+
-+static int kvm_pgtable_debugfs_open(struct inode *m, struct file *file)
-+{
-+	struct kvm *kvm = m->i_private;
-+	struct kvm_pgtable *pgtable;
-+	int ret;
-+
-+	if (!kvm_get_kvm_safe(kvm))
-+		return -ENOENT;
-+
-+	pgtable = kvm->arch.mmu.pgt;
-+
-+	ret = single_open(file, kvm_pgtable_debugfs_show, pgtable);
-+	if (ret < 0)
-+		kvm_put_kvm(kvm);
-+	return ret;
-+}
-+
-+static int kvm_pgtable_debugfs_close(struct inode *m, struct file *file)
-+{
-+	struct kvm *kvm = m->i_private;
-+
-+	kvm_put_kvm(kvm);
-+	return single_release(m, file);
-+}
-+
-+static const struct file_operations kvm_pgtable_debugfs_fops = {
-+	.open		= kvm_pgtable_debugfs_open,
-+	.read		= seq_read,
-+	.llseek		= seq_lseek,
-+	.release	= kvm_pgtable_debugfs_close,
-+};
-+
- void kvm_ptdump_guest_register(struct kvm *kvm)
- {
- 	debugfs_create_file("stage2_page_tables", 0400, kvm->debugfs_dentry,
- 			    kvm, &kvm_ptdump_guest_fops);
-+	debugfs_create_file("ipa_range", 0400, kvm->debugfs_dentry, kvm,
-+			    &kvm_pgtable_debugfs_fops);
-+	debugfs_create_file("stage2_levels", 0400, kvm->debugfs_dentry,
-+			    kvm, &kvm_pgtable_debugfs_fops);
- }
+ static const struct reg_ftr_bits ftr_id_aa64dfr0_el1[] = {
++	S_REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64DFR0_EL1, DoubleLock, 0),
++	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64DFR0_EL1, WRPs, 0),
+ 	S_REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64DFR0_EL1, PMUVer, 0),
+ 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64DFR0_EL1, DebugVer, ID_AA64DFR0_EL1_DebugVer_IMP),
+ 	REG_FTR_END,
 -- 
-2.46.0.184.g6999bdac58-goog
+2.45.2
 
