@@ -1,160 +1,181 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F5AF1BDA94;
-	Fri, 16 Aug 2024 16:06:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC69F44374
+	for <kvmarm@lists.linux.dev>; Fri, 16 Aug 2024 20:53:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723824391; cv=none; b=Xobx+jOWS3DzBpzdGt7lV/tTYrqnyJriLLe+QnRSgIFckzhc7Ha5pH0QAky7UN3wyryjz6q7sEF6+wPMXL3OcYI7Y+b3ciwcOtrl1Yrf8g056c5/PlnEfmOrZou/R/OUt3CoaIE/9ftDYYQR23uH+tlbyk9LjjpdTWVcjIhdPPY=
+	t=1723841591; cv=none; b=CWE+qtUyGW8k2Aq8Mjza0kYXZIxe9PGhDVNuVqy9qcUG63ZnzxtC+/BFF/HTWBefqXsnUiC+LT+wzuIYjocjQJoyeR/cbG2OcyF2jkmjI9N+C/6hajLobijl7jDpPCJkFc2oWJNh67kVQESE5n0/SzE4baqeUMKD4m8UNZ5JAug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723824391; c=relaxed/simple;
-	bh=37h/oRDfh6L4BPlZhucfApa/80jVTHA6BUgyGnnHCjs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qJauXQkuIrP1lxYLPJbOHtyX/Cu5wl978Sk4e6qjHGn0TogQXGqT624agarnH5v6DIol8HUvCPXV2s6PJoTXyBoH+smBvjl2+gG8JhS1L8oNrf0dkkBMJYm3JHcMX2fDvYkTwISuHrGmuy8aIUC5hrZkEaRgah/oumMAR+VQIJ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C928013D5;
-	Fri, 16 Aug 2024 09:06:54 -0700 (PDT)
-Received: from [10.1.34.14] (e122027.cambridge.arm.com [10.1.34.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 44E003F58B;
-	Fri, 16 Aug 2024 09:06:26 -0700 (PDT)
-Message-ID: <27c942e0-0e7c-4e71-b1df-1a8f70df5411@arm.com>
-Date: Fri, 16 Aug 2024 17:06:24 +0100
+	s=arc-20240116; t=1723841591; c=relaxed/simple;
+	bh=5UyYQI7yu8x9ERunnWfw8TX2oiDwoyPuYXK5BmikKNI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=CB5AxL4wGCSX6UCiRxklxEvYr96h/rQV3bSfYYVU+SpFYg0hwvgC1KLL5AveYSKaoeHqgvptndHSZVMVBNJBbfG+7Of+++GSAdIHvrzuIZOtCsRyYn8ii3LTBx0XkTteoQHkCOzPj9N4lqy8M7zCVwm7miEGx4KYGrFD1UFPuu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YkD8HYhx; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YkD8HYhx"
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2d3cd20b25cso1963209a91.1
+        for <kvmarm@lists.linux.dev>; Fri, 16 Aug 2024 13:53:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1723841589; x=1724446389; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=srTYGx2O1W3qN60rjYZPJHIr/dbzcFBsu06le/7UmjM=;
+        b=YkD8HYhxaXOO1PHTc6zMIi8PAcUZRiJXkpw5GKjWWVN7XtLPrAq8QjDuO1esUIVYVJ
+         4FrO6yQwnGi8qjwmDbNQjoznqpS/dNL0gA9mZ9L/Cvk+o0jC6L559yFwXkf0+E+tHN9p
+         NX/tLPsqjAHrcpdRsEQ5oApuHuPnSmp/Ei/nDZ7dWWFRB+t59U0ZdNomahngbBC8eydY
+         ouxNvrN81WJTr/tXCrNbklUVu/8pNG8FuKKT2rjnfSxZ3eW2tdfkqpOU/6E1EcGet6Xj
+         dsbo1PkGuvM7KYEbqGeloPB1ezUK6sOG1O+hak4r0RhukdzrRjUrmn94NayveWxpMbIT
+         tesw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723841589; x=1724446389;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=srTYGx2O1W3qN60rjYZPJHIr/dbzcFBsu06le/7UmjM=;
+        b=UhGRbz876/kqMmKl1Drf4V58Rf5qf3uG7HyyTLJWk43cajxP7MO+h+q1rgXFVK3vZA
+         40MrCg5VzIbqwhOC9suAq+6wPQV0DoIDT7hqYrgcDIyrLDN5r20bvoIC6mBgSDod08yg
+         8QjUCNVY6s7FrunIDCFybT71wr4KekYCNzqq9c/F4wkZ+A4vvLoc85cVb9odBAzVWDlE
+         LxrISK2dT3luMsYzYpPX//hQBv02NxWvXGk2tDznSnzttOmVf0MRYxVoaq7ipElr8aSR
+         8/0jDRWas9/lhQj1e63fJbwmTVDMruDSRqiFYB+K5puxppOuQ+VvdDpR3pbGbRnNtGSI
+         YZIQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUHUer8zv+kDBhRqrgpKZkDu++TDH9XYi7ti204EmrZlTqrcE/vjQZfKtTwod/lqDPc/4dXnf2uMA05MqE74fMkHIifDDpe
+X-Gm-Message-State: AOJu0Yyivx4S3IalEKnoRV0Mm6EmJzpJF/sVOmmL8E841kMUDS94D22E
+	jB74+AjdAktwMbSsKvM5Q9bZLKpFwIRP+GLGlVqIjh9FtzKwq1GoSMy9U/m7soKhL+o80GiHfLz
+	rew==
+X-Google-Smtp-Source: AGHT+IGpyWIC88JQ8UpHHFnbzA9sTpzlT6P3gnU0rL654gJSXsYoPHhMaqAVVk4iprqVrw9qiV+Fuc1p7zg=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90a:9c05:b0:2d3:acfd:5805 with SMTP id
+ 98e67ed59e1d1-2d3e03e9c70mr9727a91.8.1723841588800; Fri, 16 Aug 2024 13:53:08
+ -0700 (PDT)
+Date: Fri, 16 Aug 2024 13:53:07 -0700
+In-Reply-To: <20240809205158.1340255-2-amoorthy@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 00/15] arm64: Support for running as a guest in Arm CCA
-To: Shanker Donthineni <sdonthineni@nvidia.com>,
- Matias Ezequiel Vara Larsen <mvaralar@redhat.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-References: <20240701095505.165383-1-steven.price@arm.com>
- <ZpDvTXMDq6i+4O0m@fedora> <09fdebd7-32a0-4a88-9002-0f24eebe00a8@nvidia.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <09fdebd7-32a0-4a88-9002-0f24eebe00a8@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20240809205158.1340255-1-amoorthy@google.com> <20240809205158.1340255-2-amoorthy@google.com>
+Message-ID: <Zr-8M9rYplgN6IS3@google.com>
+Subject: Re: [PATCH v2 1/3] KVM: Documentation: Clarify docs for KVM_CAP_MEMORY_FAULT_INFO
+From: Sean Christopherson <seanjc@google.com>
+To: Anish Moorthy <amoorthy@google.com>
+Cc: oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	jthoughton@google.com, rananta@google.com
+Content-Type: text/plain; charset="us-ascii"
 
-On 15/08/2024 23:16, Shanker Donthineni wrote:
-> Hi Steven,
+On Fri, Aug 09, 2024, Anish Moorthy wrote:
+> The initial paragraph of the documentation here makes it sound like a
+> KVM_EXIT_MEMORY_FAULT will always accompany an EFAULT from KVM_RUN, but
+> that's not a guarantee.
 > 
-> On 7/12/24 03:54, Matias Ezequiel Vara Larsen wrote:
->> On Mon, Jul 01, 2024 at 10:54:50AM +0100, Steven Price wrote:
->>> This series adds support for running Linux in a protected VM under the
->>> Arm Confidential Compute Architecture (CCA). This has been updated
->>> following the feedback from the v3 posting[1]. Thanks for the feedback!
->>> Individual patches have a change log. But things to highlight:
->>>
->>>   * a new patch ("firmware/psci: Add psci_early_test_conduit()") to
->>>     prevent SMC calls being made on systems which don't support them -
->>>     i.e. systems without EL2/EL3 - thanks Jean-Philippe!
->>>
->>>   * two patches dropped (overriding set_fixmap_io). Instead
->>>     FIXMAP_PAGE_IO is modified to include PROT_NS_SHARED. When support
->>>     for assigning hardware devices to a realm guest is added this will
->>>     need to be brought back in some form. But for now it's just adding
->>>     complixity and confusion for no gain.
->>>
->>>   * a new patch ("arm64: mm: Avoid TLBI when marking pages as valid")
->>>     which avoids doing an extra TLBI when doing the break-before-make.
->>>     Note that this changes the behaviour in other cases when making
->>>     memory valid. This should be safe (and saves a TLBI for those
->>> cases),
->>>     but it's a separate patch in case of regressions.
->>>
->>>   * GIC ITT allocation now uses a custom genpool-based allocator. I
->>>     expect this will be replaced with a generic way of allocating
->>>     decrypted memory (see [4]), but for now this gets things working
->>>     without wasting too much memory.
->>>
->>> The ABI to the RMM from a realm (the RSI) is based on the final RMM v1.0
->>> (EAC 5) specification[2]. Future RMM specifications will be backwards
->>> compatible so a guest using the v1.0 specification (i.e. this series)
->>> will be able to run on future versions of the RMM without modification.
->>>
->>> This series is based on v6.10-rc1. It is also available as a git
->>> repository:
->>>
->>> https://gitlab.arm.com/linux-arm/linux-cca cca-guest/v4
+> Also, define zero to be a special value for the "size" field. This
+> allows memory faults exits to be set up in spots where KVM_RUN must
+> EFAULT, but is not able to supply an accurate size.
 > 
-> Which cca-host branch should I use for testing cca-guest/v4?
+> Signed-off-by: Anish Moorthy <amoorthy@google.com>
+> ---
+>  Documentation/virt/kvm/api.rst | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
 > 
-> I'm getting compilation errors with cca-host/v3 and cca-guest/v4, is there
-> any known WAR or fix to resolve this issue?
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 8e5dad80b337..c5ce7944005c 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -7073,7 +7073,8 @@ spec refer, https://github.com/riscv/riscv-sbi-doc.
+>  
+>  KVM_EXIT_MEMORY_FAULT indicates the vCPU has encountered a memory fault that
+>  could not be resolved by KVM.  The 'gpa' and 'size' (in bytes) describe the
+> -guest physical address range [gpa, gpa + size) of the fault.  The 'flags' field
+> +guest physical address range [gpa, gpa + size) of the fault: when zero, it
+> +indicates that the size of the fault could not be determined. The 'flags' field
+>  describes properties of the faulting access that are likely pertinent:
+>  
+>   - KVM_MEMORY_EXIT_FLAG_PRIVATE - When set, indicates the memory fault occurred
+> @@ -8131,7 +8132,7 @@ unavailable to host or other VMs.
+>  :Architectures: x86
+>  :Returns: Informational only, -EINVAL on direct KVM_ENABLE_CAP.
+>  
+> -The presence of this capability indicates that KVM_RUN will fill
+> +The presence of this capability indicates that KVM_RUN *may* fill
 
-cca-host/v3 should work with cca-guest/v4. I've been working on
-rebasing/updating the branches and should be able to post v4/v5 series
-next week.
+I would prefer to fix KVM than to change the documentation.  The "will fill" is
+specifically scoped to guest page fault VM-Exits, so it should be a fully solvable
+problem.  I don't want to leave wriggle room for KVM, because then it will be
+quite difficult for userspace to do anything useful with memory_fault.
 
-> 
-> arch/arm64/kvm/rme.c: In function ‘kvm_realm_reset_id_aa64dfr0_el1’:
-> ././include/linux/compiler_types.h:487:45: error: call to
-> ‘__compiletime_assert_650’ declared with attribute error: FIELD_PREP:
-> value too large for the field
->   487 |         _compiletime_assert(condition, msg,
-> __compiletime_assert_, __COUNTER__)
->       |                                             ^
-> ././include/linux/compiler_types.h:468:25: note: in definition of macro
-> ‘__compiletime_assert’
->   468 |                         prefix ##
-> suffix();                             \
->       |                         ^~~~~~
-> ././include/linux/compiler_types.h:487:9: note: in expansion of macro
-> ‘_compiletime_assert’
->   487 |         _compiletime_assert(condition, msg,
-> __compiletime_assert_, __COUNTER__)
->       |         ^~~~~~~~~~~~~~~~~~~
-> ./include/linux/build_bug.h:39:37: note: in expansion of macro
-> ‘compiletime_assert’
->    39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond),
-> msg)
->       |                                     ^~~~~~~~~~~~~~~~~~
-> ./include/linux/bitfield.h:68:17: note: in expansion of macro
-> ‘BUILD_BUG_ON_MSG’
->    68 |                 BUILD_BUG_ON_MSG(__builtin_constant_p(_val)
-> ?           \
->       |                 ^~~~~~~~~~~~~~~~
-> ./include/linux/bitfield.h:115:17: note: in expansion of macro
-> ‘__BF_FIELD_CHECK’
->   115 |                 __BF_FIELD_CHECK(_mask, 0ULL, _val, "FIELD_PREP:
-> ");    \
->       |                 ^~~~~~~~~~~~~~~~
-> arch/arm64/kvm/rme.c:315:16: note: in expansion of macro ‘FIELD_PREP’
->   315 |         val |= FIELD_PREP(ID_AA64DFR0_EL1_BRPs_MASK, bps - 1) |
->       |                ^~~~~~~~~~
-> make[5]: *** [scripts/Makefile.build:244: arch/arm64/kvm/rme.o] Error 1
-> make[4]: *** [scripts/Makefile.build:485: arch/arm64/kvm] Error 2
-> make[3]: *** [scripts/Makefile.build:485: arch/arm64] Error 2
-> make[3]: *** Waiting for unfinished jobs....
-> 
-> I'm using gcc-13.3.0 compiler and cross-compiling on X86 machine.
+E.g. for x86, convert all -EFAULTs that are returned when KVM is hosed to -EIO
+and KVM_BUG_ON, and then there's only one -EFAULT that doesn't fill memory_fault.
+Completely untested...
 
-I'm not sure quite how this happens. The 'value' (bps - 1) shouldn't be
-considered constant, so I don't see how the compiler has decided to
-complain here - the __builtin_constant_p() should really be evaluating to 0.
+---
+ arch/x86/kvm/mmu/mmu.c         | 13 +++++++------
+ arch/x86/kvm/mmu/paging_tmpl.h |  4 ++--
+ 2 files changed, 9 insertions(+), 8 deletions(-)
 
-The only thing I can think of is if the compiler has somehow determined
-that rmm_feat_reg0 is 0 - which in theory it could do if it knew that
-kvm_init_rme() cannot succeed (rmi_features() would never be called, so
-the variable will never be set). Which makes me wonder if you're
-building with a PAGE_SIZE other than 4k?
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 928cf84778b0..cb4e3a1041ed 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3225,8 +3225,8 @@ static int direct_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ 					     fault->req_level >= it.level);
+ 	}
+ 
+-	if (WARN_ON_ONCE(it.level != fault->goal_level))
+-		return -EFAULT;
++	if (KVM_BUG_ON(it.level != fault->goal_level, vcpu->kvm))
++		return -EIO;
+ 
+ 	ret = mmu_set_spte(vcpu, fault->slot, it.sptep, ACC_ALL,
+ 			   base_gfn, fault->pfn, fault);
+@@ -3264,6 +3264,7 @@ static int kvm_handle_error_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fa
+ 		return RET_PF_RETRY;
+ 	}
+ 
++	kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
+ 	return -EFAULT;
+ }
+ 
+@@ -4597,8 +4598,8 @@ int kvm_handle_page_fault(struct kvm_vcpu *vcpu, u64 error_code,
+ 
+ #ifndef CONFIG_X86_64
+ 	/* A 64-bit CR2 should be impossible on 32-bit KVM. */
+-	if (WARN_ON_ONCE(fault_address >> 32))
+-		return -EFAULT;
++	if (KVM_BUG_ON(fault_address >> 32, vcpu->kvm))
++		return -EIO;
+ #endif
+ 	/*
+ 	 * Legacy #PF exception only have a 32-bit error code.  Simply drop the
+@@ -5988,8 +5989,8 @@ int noinline kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 err
+ 
+ 	r = RET_PF_INVALID;
+ 	if (unlikely(error_code & PFERR_RSVD_MASK)) {
+-		if (WARN_ON_ONCE(error_code & PFERR_PRIVATE_ACCESS))
+-			return -EFAULT;
++		if (KVM_BUG_ON(error_code & PFERR_PRIVATE_ACCESS, vcpu->kvm))
++			return -EIO;
+ 
+ 		r = handle_mmio_page_fault(vcpu, cr2_or_gpa, direct);
+ 		if (r == RET_PF_EMULATE)
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index 69941cebb3a8..4f4704c65c40 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -745,8 +745,8 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+ 					     fault->req_level >= it.level);
+ 	}
+ 
+-	if (WARN_ON_ONCE(it.level != fault->goal_level))
+-		return -EFAULT;
++	if (KVM_BUG_ON(it.level != fault->goal_level, vcpu->kvm))
++		return -EIO;
+ 
+ 	ret = mmu_set_spte(vcpu, fault->slot, it.sptep, gw->pte_access,
+ 			   base_gfn, fault->pfn, fault);
 
-Obviously the code should still build if that's the case (so this would
-be a bug) but we don't currently support CCA with PAGE_SIZE != 4k.
-
-Steve
+base-commit: 12ac7b9981ff30f0deffe6331bb742c71b279300
+-- 
 
