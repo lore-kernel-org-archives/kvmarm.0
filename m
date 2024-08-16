@@ -1,228 +1,101 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A131C817
-	for <kvmarm@lists.linux.dev>; Fri, 16 Aug 2024 15:13:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C4661BDAB8;
+	Fri, 16 Aug 2024 15:16:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723821193; cv=none; b=QmKMXcYe2CLaoi4Rga4BMO4gf/PEdCNaiCk6joksJNnVI2fpjmcd//whjBdNewcAuHLVNihPvYLE4MyMUsTMspRo1wwPjObMvPkr1wo9ocoWTl4/fMX/ByjeSJhK4+uFXJEHYgnOBAfPyMrfaau1LuVDCUb7t148w4HGrLVGGkc=
+	t=1723821400; cv=none; b=Iay5nC+4wRKCKTzK4C/qIF/UjUeVHxIhObEzLNuAwXO85KaSjglAHbCUNGl0i9BoeS9bgL5IVP4g6DMHgDAg+MWpiSNYlRrgeu1OwuOmk1jBW2M+uLbZoqCOS94w5LyQtkCK1BVCfKNxv1+qqf0ms8Mm/XGQ8xCZAtxUiFVWLDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723821193; c=relaxed/simple;
-	bh=BwXkT8qJsxeKFgXPuj34GBkj1PMWj8yaR+BdQmqbXnU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZDa+YD3czBMp2vssEETn2ngcGKgYzTHo6VUD0RGuBFX1aEZru3MEdnOUyiwyK3i0wGMixOqWPaGe0Dna9X6fknvrKrUfpRrllSFeWjjO3hnEaBBf7RNM/PtgSKqYor2g7FJ38ArVn6vjwm9g3RWyHZ4XGH3Z4i06eLj3oNgd07g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BA36213D5;
-	Fri, 16 Aug 2024 08:13:35 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5E4FF3F6A8;
-	Fri, 16 Aug 2024 08:13:06 -0700 (PDT)
-Date: Fri, 16 Aug 2024 16:13:01 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
-	aneesh.kumar@kernel.org, aneesh.kumar@linux.ibm.com, bp@alien8.de,
-	broonie@kernel.org, catalin.marinas@arm.com,
-	christophe.leroy@csgroup.eu, dave.hansen@linux.intel.com,
-	hpa@zytor.com, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linuxppc-dev@lists.ozlabs.org, mingo@redhat.com, mpe@ellerman.id.au,
-	naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
-	oliver.upton@linux.dev, shuah@kernel.org, szabolcs.nagy@arm.com,
-	tglx@linutronix.de, will@kernel.org, x86@kernel.org,
+	s=arc-20240116; t=1723821400; c=relaxed/simple;
+	bh=HrCbWr5sE7d1FSdM7OLBHJqb9SmFXoXZLsUxeMJ23UI=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OLzeYLLxKHAOrY1uGjiDrp8lkpG/tX/nYT+oc/v5ZapGRxVNhGD6T3v+zm1IwdjVSEIJoJOShJz8yFVjCci+UAflcnF0opJ2rb/Qlq1WXnFzxVpBIf/lv+vlbRte4qKcq0I9isuCWmuoxHOtno0iUU4Y2bRUA8CwyroW8R1g2/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g0ow7PZC; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g0ow7PZC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB04DC4AF15;
+	Fri, 16 Aug 2024 15:16:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723821397;
+	bh=HrCbWr5sE7d1FSdM7OLBHJqb9SmFXoXZLsUxeMJ23UI=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=g0ow7PZCEAeb1DhfX64PhHghH8VhkFKmrwqQMgR9rLVNBmd43SIIOtS9FOi0qX87X
+	 cUiRlvGtXuTGsgtYcFxohdKZmuHSSd8c4sbESFF3D2QK8pmWOM4qwKXL1NT30h/UeD
+	 r9jE65tOX6EtKYQVm7Juj2voDjuY3UmN6jAqmm+/jGos7P78CW0+3m329QJ9u8+oiO
+	 5EX+MbrCoGy0qHv8iKYxH1LVj4feBTxQknCiQP5DAY0q+bNYvaaY66dBc4GksU7tIS
+	 HZ5dRigI+gtE7jjSrTaKl0+kr2arqwy7vaMbtoKd0Ftf3BHovRC5UBvE+qga02mZTt
+	 ur8Qgvx40jshg==
+From: Will Deacon <will@kernel.org>
+To: Marc Zyngier <maz@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	James Clark <james.clark@linaro.org>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Ian Rogers <irogers@google.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	"Rob Herring (Arm)" <robh@kernel.org>
+Cc: kernel-team@android.com,
+	Will Deacon <will@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-perf-users@vger.kernel.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 07/29] KVM: arm64: Save/restore POE registers
-Message-ID: <20240816151301.GA138302@e124191.cambridge.arm.com>
-References: <20240503130147.1154804-1-joey.gouly@arm.com>
- <20240503130147.1154804-8-joey.gouly@arm.com>
- <86ed6ozfe8.wl-maz@kernel.org>
+Subject: Re: [PATCH v3 0/7] arm64: Add support for Armv9.4 PMU fixed instruction counter
+Date: Fri, 16 Aug 2024 16:16:00 +0100
+Message-Id: <172381015369.134151.12311687013802000544.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20240731-arm-pmu-3-9-icntr-v3-0-280a8d7ff465@kernel.org>
+References: <20240731-arm-pmu-3-9-icntr-v3-0-280a8d7ff465@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86ed6ozfe8.wl-maz@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Fri, Aug 16, 2024 at 03:55:11PM +0100, Marc Zyngier wrote:
-> On Fri, 03 May 2024 14:01:25 +0100,
-> Joey Gouly <joey.gouly@arm.com> wrote:
-> > 
-> > Define the new system registers that POE introduces and context switch them.
-> > 
-> > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-> > Cc: Marc Zyngier <maz@kernel.org>
-> > Cc: Oliver Upton <oliver.upton@linux.dev>
-> > Cc: Catalin Marinas <catalin.marinas@arm.com>
-> > Cc: Will Deacon <will@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/kvm_host.h          |  4 +++
-> >  arch/arm64/include/asm/vncr_mapping.h      |  1 +
-> >  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 29 ++++++++++++++++++++++
-> >  arch/arm64/kvm/sys_regs.c                  |  8 ++++--
-> >  4 files changed, 40 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index 9e8a496fb284..28042da0befd 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -419,6 +419,8 @@ enum vcpu_sysreg {
-> >  	GCR_EL1,	/* Tag Control Register */
-> >  	TFSRE0_EL1,	/* Tag Fault Status Register (EL0) */
-> >  
-> > +	POR_EL0,	/* Permission Overlay Register 0 (EL0) */
-> > +
-> >  	/* 32bit specific registers. */
-> >  	DACR32_EL2,	/* Domain Access Control Register */
-> >  	IFSR32_EL2,	/* Instruction Fault Status Register */
-> > @@ -489,6 +491,8 @@ enum vcpu_sysreg {
-> >  	VNCR(PIR_EL1),	 /* Permission Indirection Register 1 (EL1) */
-> >  	VNCR(PIRE0_EL1), /*  Permission Indirection Register 0 (EL1) */
-> >  
-> > +	VNCR(POR_EL1),	/* Permission Overlay Register 1 (EL1) */
-> > +
-> >  	VNCR(HFGRTR_EL2),
-> >  	VNCR(HFGWTR_EL2),
-> >  	VNCR(HFGITR_EL2),
-> > diff --git a/arch/arm64/include/asm/vncr_mapping.h b/arch/arm64/include/asm/vncr_mapping.h
-> > index df2c47c55972..06f8ec0906a6 100644
-> > --- a/arch/arm64/include/asm/vncr_mapping.h
-> > +++ b/arch/arm64/include/asm/vncr_mapping.h
-> > @@ -52,6 +52,7 @@
-> >  #define VNCR_PIRE0_EL1		0x290
-> >  #define VNCR_PIRE0_EL2		0x298
-> >  #define VNCR_PIR_EL1		0x2A0
-> > +#define VNCR_POR_EL1		0x2A8
-> >  #define VNCR_ICH_LR0_EL2        0x400
-> >  #define VNCR_ICH_LR1_EL2        0x408
-> >  #define VNCR_ICH_LR2_EL2        0x410
-> > diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> > index 4be6a7fa0070..1c9536557bae 100644
-> > --- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> > +++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> > @@ -16,9 +16,15 @@
-> >  #include <asm/kvm_hyp.h>
-> >  #include <asm/kvm_mmu.h>
-> >  
-> > +static inline bool ctxt_has_s1poe(struct kvm_cpu_context *ctxt);
-> > +
-> >  static inline void __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
-> >  {
-> >  	ctxt_sys_reg(ctxt, MDSCR_EL1)	= read_sysreg(mdscr_el1);
-> > +
-> > +	// POR_EL0 can affect uaccess, so must be saved/restored early.
-> > +	if (ctxt_has_s1poe(ctxt))
-> > +		ctxt_sys_reg(ctxt, POR_EL0)	= read_sysreg_s(SYS_POR_EL0);
-> >  }
-> >  
-> >  static inline void __sysreg_save_user_state(struct kvm_cpu_context *ctxt)
-> > @@ -55,6 +61,17 @@ static inline bool ctxt_has_s1pie(struct kvm_cpu_context *ctxt)
-> >  	return kvm_has_feat(kern_hyp_va(vcpu->kvm), ID_AA64MMFR3_EL1, S1PIE, IMP);
-> >  }
-> >  
-> > +static inline bool ctxt_has_s1poe(struct kvm_cpu_context *ctxt)
-> > +{
-> > +	struct kvm_vcpu *vcpu;
-> > +
-> > +	if (!system_supports_poe())
-> > +		return false;
-> > +
-> > +	vcpu = ctxt_to_vcpu(ctxt);
-> > +	return kvm_has_feat(kern_hyp_va(vcpu->kvm), ID_AA64MMFR3_EL1, S1POE, IMP);
-> > +}
-> > +
-> >  static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
-> >  {
-> >  	ctxt_sys_reg(ctxt, SCTLR_EL1)	= read_sysreg_el1(SYS_SCTLR);
-> > @@ -77,6 +94,10 @@ static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
-> >  		ctxt_sys_reg(ctxt, PIR_EL1)	= read_sysreg_el1(SYS_PIR);
-> >  		ctxt_sys_reg(ctxt, PIRE0_EL1)	= read_sysreg_el1(SYS_PIRE0);
-> >  	}
-> > +
-> > +	if (ctxt_has_s1poe(ctxt))
-> > +		ctxt_sys_reg(ctxt, POR_EL1)	= read_sysreg_el1(SYS_POR);
-> > +
-> >  	ctxt_sys_reg(ctxt, PAR_EL1)	= read_sysreg_par();
-> >  	ctxt_sys_reg(ctxt, TPIDR_EL1)	= read_sysreg(tpidr_el1);
-> >  
-> > @@ -107,6 +128,10 @@ static inline void __sysreg_save_el2_return_state(struct kvm_cpu_context *ctxt)
-> >  static inline void __sysreg_restore_common_state(struct kvm_cpu_context *ctxt)
-> >  {
-> >  	write_sysreg(ctxt_sys_reg(ctxt, MDSCR_EL1),  mdscr_el1);
-> > +
-> > +	// POR_EL0 can affect uaccess, so must be saved/restored early.
-> > +	if (ctxt_has_s1poe(ctxt))
-> > +		write_sysreg_s(ctxt_sys_reg(ctxt, POR_EL0),	SYS_POR_EL0);
-> >  }
-> >  
-> >  static inline void __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
-> > @@ -153,6 +178,10 @@ static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
-> >  		write_sysreg_el1(ctxt_sys_reg(ctxt, PIR_EL1),	SYS_PIR);
-> >  		write_sysreg_el1(ctxt_sys_reg(ctxt, PIRE0_EL1),	SYS_PIRE0);
-> >  	}
-> > +
-> > +	if (ctxt_has_s1poe(ctxt))
-> > +		write_sysreg_el1(ctxt_sys_reg(ctxt, POR_EL1),	SYS_POR);
-> > +
-> >  	write_sysreg(ctxt_sys_reg(ctxt, PAR_EL1),	par_el1);
-> >  	write_sysreg(ctxt_sys_reg(ctxt, TPIDR_EL1),	tpidr_el1);
-> >  
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index c9f4f387155f..be04fae35afb 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -2423,6 +2423,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
-> >  	{ SYS_DESC(SYS_MAIR_EL1), access_vm_reg, reset_unknown, MAIR_EL1 },
-> >  	{ SYS_DESC(SYS_PIRE0_EL1), NULL, reset_unknown, PIRE0_EL1 },
-> >  	{ SYS_DESC(SYS_PIR_EL1), NULL, reset_unknown, PIR_EL1 },
-> > +	{ SYS_DESC(SYS_POR_EL1), NULL, reset_unknown, POR_EL1 },
-> >  	{ SYS_DESC(SYS_AMAIR_EL1), access_vm_reg, reset_amair_el1, AMAIR_EL1 },
-> >  
-> >  	{ SYS_DESC(SYS_LORSA_EL1), trap_loregion },
-> > @@ -2506,6 +2507,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
-> >  	  .access = access_pmovs, .reg = PMOVSSET_EL0,
-> >  	  .get_user = get_pmreg, .set_user = set_pmreg },
-> >  
-> > +	{ SYS_DESC(SYS_POR_EL0), NULL, reset_unknown, POR_EL0 },
-> >  	{ SYS_DESC(SYS_TPIDR_EL0), NULL, reset_unknown, TPIDR_EL0 },
-> >  	{ SYS_DESC(SYS_TPIDRRO_EL0), NULL, reset_unknown, TPIDRRO_EL0 },
-> >  	{ SYS_DESC(SYS_TPIDR2_EL0), undef_access },
-> > @@ -4057,8 +4059,6 @@ void kvm_init_sysreg(struct kvm_vcpu *vcpu)
-> >  	kvm->arch.fgu[HFGxTR_GROUP] = (HFGxTR_EL2_nAMAIR2_EL1		|
-> >  				       HFGxTR_EL2_nMAIR2_EL1		|
-> >  				       HFGxTR_EL2_nS2POR_EL1		|
-> > -				       HFGxTR_EL2_nPOR_EL1		|
-> > -				       HFGxTR_EL2_nPOR_EL0		|
-> >  				       HFGxTR_EL2_nACCDATA_EL1		|
-> >  				       HFGxTR_EL2_nSMPRI_EL1_MASK	|
-> >  				       HFGxTR_EL2_nTPIDR2_EL0_MASK);
-> > @@ -4093,6 +4093,10 @@ void kvm_init_sysreg(struct kvm_vcpu *vcpu)
-> >  		kvm->arch.fgu[HFGxTR_GROUP] |= (HFGxTR_EL2_nPIRE0_EL1 |
-> >  						HFGxTR_EL2_nPIR_EL1);
-> >  
-> > +	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, S1POE, IMP))
-> > +		kvm->arch.fgu[HFGxTR_GROUP] |= (HFGxTR_EL2_nPOR_EL1 |
-> > +						HFGxTR_EL2_nPOR_EL0);
-> > +
+On Wed, 31 Jul 2024 10:51:17 -0600, Rob Herring (Arm) wrote:
+> This series adds support for the optional fixed instruction counter
+> added in Armv9.4 PMU. Most of the series is a refactoring to remove the
+> index to counter number conversion which dates back to the Armv7 PMU
+> driver. Removing it is necessary in order to support more than 32
+> counters without a bunch of conditional code further complicating the
+> conversion.
 > 
-> As Broonie pointed out in a separate thread, this cannot work, short
-> of making ID_AA64MMFR3_EL1 writable.
-> 
-> This can be done in a separate patch, but it needs doing as it
-> otherwise breaks migration.
-> 
-> Thanks,
-> 
-> 	M.
-> 
+> [...]
 
-Looks like it's wrong for PIE currently too, but your patch here fixes that:
-	https://lore.kernel.org/kvmarm/20240813144738.2048302-11-maz@kernel.org/
+Applied to will (for-next/perf), thanks!
 
-If I basically apply that patch, but only for POE, the conflict can be resolved
-later, or a rebase will fix it up, depending on what goes through first.
+[1/7] perf: arm_pmu: Remove event index to counter remapping
+      https://git.kernel.org/will/c/bf5ffc8c80e0
+[2/7] perf: arm_pmuv3: Prepare for more than 32 counters
+      https://git.kernel.org/will/c/a4a6e2078d85
+[3/7] KVM: arm64: pmu: Use arm_pmuv3.h register accessors
+      https://git.kernel.org/will/c/741ee5284551
+[4/7] KVM: arm64: pmu: Use generated define for PMSELR_EL0.SEL access
+      https://git.kernel.org/will/c/f9b11aa00708
+[5/7] arm64: perf/kvm: Use a common PMU cycle counter define
+      https://git.kernel.org/will/c/126d7d7cce5e
+[6/7] KVM: arm64: Refine PMU defines for number of counters
+      https://git.kernel.org/will/c/2f62701fa5b0
+[7/7] perf: arm_pmuv3: Add support for Armv9.4 PMU instruction counter
+      https://git.kernel.org/will/c/d8226d8cfbaf
 
-Thanks,
-Joey
+Cheers,
+-- 
+Will
+
+https://fixes.arm64.dev
+https://next.arm64.dev
+https://will.arm64.dev
