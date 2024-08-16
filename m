@@ -1,101 +1,131 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C4661BDAB8;
-	Fri, 16 Aug 2024 15:16:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D89E51C6895;
+	Fri, 16 Aug 2024 15:32:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723821400; cv=none; b=Iay5nC+4wRKCKTzK4C/qIF/UjUeVHxIhObEzLNuAwXO85KaSjglAHbCUNGl0i9BoeS9bgL5IVP4g6DMHgDAg+MWpiSNYlRrgeu1OwuOmk1jBW2M+uLbZoqCOS94w5LyQtkCK1BVCfKNxv1+qqf0ms8Mm/XGQ8xCZAtxUiFVWLDA=
+	t=1723822346; cv=none; b=lcIDPxj659LtBiwQtM1Ic3niw8Hjwope8fqLiPB+mX2iFc4XOkEcf1NvrppWITETyjl9OC8Kr2Z48MpICZzMBo2UR8urG8MmIB7NaChKP+fpTRpfsTEWuBJgbOm5HvJ4MuYjWW4AUIFfFnrG5A9F7pzC/DBxWX7E9EY6o3aL/e4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723821400; c=relaxed/simple;
-	bh=HrCbWr5sE7d1FSdM7OLBHJqb9SmFXoXZLsUxeMJ23UI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OLzeYLLxKHAOrY1uGjiDrp8lkpG/tX/nYT+oc/v5ZapGRxVNhGD6T3v+zm1IwdjVSEIJoJOShJz8yFVjCci+UAflcnF0opJ2rb/Qlq1WXnFzxVpBIf/lv+vlbRte4qKcq0I9isuCWmuoxHOtno0iUU4Y2bRUA8CwyroW8R1g2/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g0ow7PZC; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1723822346; c=relaxed/simple;
+	bh=2/SyteaEDgLjslhjK5Qrg9vsTkx+4CL4Pn+Rur8QC18=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pXJ/sSId0JG/ClTzQwY9F2K3TdiMTCdxbrHJzEkr8NybaA/VELWxka7zMNF3d+i7v8WMtBYZRt7QJ/D+W8nTbHE9l6RGM4g64IC8n5mwfdgBGHpeRPF2hyC9rLE2UNScPpVtWhKXWTPDbc9ae2EHQkLFpF1GUjp8YUDJysm0qJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tPVlavzi; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g0ow7PZC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB04DC4AF15;
-	Fri, 16 Aug 2024 15:16:33 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tPVlavzi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67E49C4AF0B;
+	Fri, 16 Aug 2024 15:32:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723821397;
-	bh=HrCbWr5sE7d1FSdM7OLBHJqb9SmFXoXZLsUxeMJ23UI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=g0ow7PZCEAeb1DhfX64PhHghH8VhkFKmrwqQMgR9rLVNBmd43SIIOtS9FOi0qX87X
-	 cUiRlvGtXuTGsgtYcFxohdKZmuHSSd8c4sbESFF3D2QK8pmWOM4qwKXL1NT30h/UeD
-	 r9jE65tOX6EtKYQVm7Juj2voDjuY3UmN6jAqmm+/jGos7P78CW0+3m329QJ9u8+oiO
-	 5EX+MbrCoGy0qHv8iKYxH1LVj4feBTxQknCiQP5DAY0q+bNYvaaY66dBc4GksU7tIS
-	 HZ5dRigI+gtE7jjSrTaKl0+kr2arqwy7vaMbtoKd0Ftf3BHovRC5UBvE+qga02mZTt
-	 ur8Qgvx40jshg==
-From: Will Deacon <will@kernel.org>
-To: Marc Zyngier <maz@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	James Clark <james.clark@linaro.org>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Ian Rogers <irogers@google.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	"Rob Herring (Arm)" <robh@kernel.org>
-Cc: kernel-team@android.com,
-	Will Deacon <will@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-perf-users@vger.kernel.org,
+	s=k20201202; t=1723822346;
+	bh=2/SyteaEDgLjslhjK5Qrg9vsTkx+4CL4Pn+Rur8QC18=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=tPVlavzii20FYM/2odXn3dc4J0pC/bFkESC3D+bRAYJ60xDKKbQDYU7wLO92oko/9
+	 I0igy24KZcT6i753jJI9WxsYUU6D68lkfP9VPCfYKB9F5uUoX7c1EdnvFBs6qCWc+4
+	 D+ly54JIrs5pIPKeHAVaFMTESgVSdKBPQBvD45Le70/UO5fD86Y5/6p19KuZnkt8px
+	 XF07CnZ9evf7RwPPBLQ4UKPDxTwFwVLHTmmhV5OByZ8TaO3m2MEuHcoHcj7oCGaAHK
+	 OqmY+UmluMV9KFtA93H1zXF/fAIGQQwntdR7E/Kym2bSphGLZxNh0c6eYNBAdDv/5U
+	 Nq6MGN86ZajLw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1seywB-004K1i-3k;
+	Fri, 16 Aug 2024 16:32:23 +0100
+Date: Fri, 16 Aug 2024 16:32:22 +0100
+Message-ID: <86cym8zdo9.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	akpm@linux-foundation.org,
+	aneesh.kumar@kernel.org,
+	aneesh.kumar@linux.ibm.com,
+	bp@alien8.de,
+	broonie@kernel.org,
+	catalin.marinas@arm.com,
+	christophe.leroy@csgroup.eu,
+	dave.hansen@linux.intel.com,
+	hpa@zytor.com,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linuxppc-dev@lists.ozlabs.org,
+	mingo@redhat.com,
+	mpe@ellerman.id.au,
+	naveen.n.rao@linux.ibm.com,
+	npiggin@gmail.com,
+	oliver.upton@linux.dev,
+	shuah@kernel.org,
+	szabolcs.nagy@arm.com,
+	tglx@linutronix.de,
+	will@kernel.org,
+	x86@kernel.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 0/7] arm64: Add support for Armv9.4 PMU fixed instruction counter
-Date: Fri, 16 Aug 2024 16:16:00 +0100
-Message-Id: <172381015369.134151.12311687013802000544.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20240731-arm-pmu-3-9-icntr-v3-0-280a8d7ff465@kernel.org>
-References: <20240731-arm-pmu-3-9-icntr-v3-0-280a8d7ff465@kernel.org>
+Subject: Re: [PATCH v4 07/29] KVM: arm64: Save/restore POE registers
+In-Reply-To: <20240816151301.GA138302@e124191.cambridge.arm.com>
+References: <20240503130147.1154804-1-joey.gouly@arm.com>
+	<20240503130147.1154804-8-joey.gouly@arm.com>
+	<86ed6ozfe8.wl-maz@kernel.org>
+	<20240816151301.GA138302@e124191.cambridge.arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org, aneesh.kumar@kernel.org, aneesh.kumar@linux.ibm.com, bp@alien8.de, broonie@kernel.org, catalin.marinas@arm.com, christophe.leroy@csgroup.eu, dave.hansen@linux.intel.com, hpa@zytor.com, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org, mingo@redhat.com, mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com, oliver.upton@linux.dev, shuah@kernel.org, szabolcs.nagy@arm.com, tglx@linutronix.de, will@kernel.org, x86@kernel.org, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 31 Jul 2024 10:51:17 -0600, Rob Herring (Arm) wrote:
-> This series adds support for the optional fixed instruction counter
-> added in Armv9.4 PMU. Most of the series is a refactoring to remove the
-> index to counter number conversion which dates back to the Armv7 PMU
-> driver. Removing it is necessary in order to support more than 32
-> counters without a bunch of conditional code further complicating the
-> conversion.
+On Fri, 16 Aug 2024 16:13:01 +0100,
+Joey Gouly <joey.gouly@arm.com> wrote:
 > 
-> [...]
+> On Fri, Aug 16, 2024 at 03:55:11PM +0100, Marc Zyngier wrote:
+> > On Fri, 03 May 2024 14:01:25 +0100,
+> > Joey Gouly <joey.gouly@arm.com> wrote:
+> > > 
+> > > +	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, S1POE, IMP))
+> > > +		kvm->arch.fgu[HFGxTR_GROUP] |= (HFGxTR_EL2_nPOR_EL1 |
+> > > +						HFGxTR_EL2_nPOR_EL0);
+> > > +
+> > 
+> > As Broonie pointed out in a separate thread, this cannot work, short
+> > of making ID_AA64MMFR3_EL1 writable.
+> > 
+> > This can be done in a separate patch, but it needs doing as it
+> > otherwise breaks migration.
+> > 
+> > Thanks,
+> > 
+> > 	M.
+> > 
+> 
+> Looks like it's wrong for PIE currently too, but your patch here fixes that:
+> 	https://lore.kernel.org/kvmarm/20240813144738.2048302-11-maz@kernel.org/
+> 
+> If I basically apply that patch, but only for POE, the conflict can be resolved
+> later, or a rebase will fix it up, depending on what goes through first.
 
-Applied to will (for-next/perf), thanks!
+If I trust my feature dependency decoder, you need to make both
+TCRX and POE writable:
 
-[1/7] perf: arm_pmu: Remove event index to counter remapping
-      https://git.kernel.org/will/c/bf5ffc8c80e0
-[2/7] perf: arm_pmuv3: Prepare for more than 32 counters
-      https://git.kernel.org/will/c/a4a6e2078d85
-[3/7] KVM: arm64: pmu: Use arm_pmuv3.h register accessors
-      https://git.kernel.org/will/c/741ee5284551
-[4/7] KVM: arm64: pmu: Use generated define for PMSELR_EL0.SEL access
-      https://git.kernel.org/will/c/f9b11aa00708
-[5/7] arm64: perf/kvm: Use a common PMU cycle counter define
-      https://git.kernel.org/will/c/126d7d7cce5e
-[6/7] KVM: arm64: Refine PMU defines for number of counters
-      https://git.kernel.org/will/c/2f62701fa5b0
-[7/7] perf: arm_pmuv3: Add support for Armv9.4 PMU instruction counter
-      https://git.kernel.org/will/c/d8226d8cfbaf
+(FEAT_S1POE --> v8Ap8)
+(FEAT_S1POE --> FEAT_TCR2)
+(FEAT_S1POE --> FEAT_ATS1A)
+(FEAT_S1POE --> FEAT_HPDS)
+(FEAT_S1POE <-> (AArch64 ID_AA64MMFR3_EL1.S1POE >= 1))
+(FEAT_TCR2 --> v8Ap0)
+(v8Ap9 --> FEAT_TCR2)
+((FEAT_TCR2 && FEAT_AA64EL2) --> FEAT_HCX)
+(FEAT_TCR2 <-> (AArch64 ID_AA64MMFR3_EL1.TCRX >= 1))
 
-Cheers,
+Feel free to lift part of that patch as you see fit.
+
+	M.
+
 -- 
-Will
-
-https://fixes.arm64.dev
-https://next.arm64.dev
-https://will.arm64.dev
+Without deviation from the norm, progress is not possible.
