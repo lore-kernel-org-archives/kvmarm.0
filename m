@@ -1,159 +1,125 @@
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 989AE1BE85D
-	for <kvmarm@lists.linux.dev>; Fri, 16 Aug 2024 21:22:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB5DB1C27
+	for <kvmarm@lists.linux.dev>; Sat, 17 Aug 2024 00:46:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723843366; cv=none; b=VZ12e5i47FBM744xoPfx1YGU2pRmm4yCiZ3dQXTVDpRkI4psnsAjUFJy/Wvf6Q3wXVIMfkjsZE/8fJ1SMg3FyuoUrkDbSNaMrsiSMgqfOHPjlVy9HO4O/7BN+k4ne24zKUwmBKgGuJv044mBUSLfUT35e/fRpHtAPWJaj1qEbjE=
+	t=1723855600; cv=none; b=BvRuh7yfuNA38S1t0kkONj5PWaAH5raLpFrxgW++0VrhLBsEvgL/izAxPLuLCOUtH2X0scoAdsupllveYaMce04c3NjmzZ3POYG+Q8G49g+eYidxSnRVhHEaYq5+HXoLVbwkyuOVXF0FsZcbgddHMSPtleC7O8NwTbkHyWuo+IU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723843366; c=relaxed/simple;
-	bh=sWA1R4Z+hjjLgkZaegTM4CTQgixl0MSxWNpQ2OfSHSk=;
+	s=arc-20240116; t=1723855600; c=relaxed/simple;
+	bh=bb1MWnkDkGldXADxQf3JhyfD+gBzbYqcRmbOgpBPRRw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ZnIQEdFVyuuqyi5SQF70wercXMUEbISDpG/L3eeQsIjkPDCnUD+eWE99iiqDa6I4Vzu0odMZzzasX/g3JUsJkQdmwv1KdLg6Z8+OXyftVL/xBnafu/PcsoxscKahb7CI75bacdDs7Qjn0jrJaiJ76s9mNGMc0bTQmZV4HLQAQeo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zk6DGiSA; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=SD5AHBiU5JYASyizk1VnF5K/AQ8LON22jwGocTci6qvslYtOQ0r9waO7YghR0DZqIIP6EY1OCcsMPao/4SZHU1EL3QrUFLhkgfGSl6HaDi5XYNKpsJ11BYh46ezzAnfSEfMT+7MAlwHArzBeTWX9yxq9xUwYFPYkB9Cp9opc1js=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DGsnbGHA; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zk6DGiSA"
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-713d4a9a3ffso375879b3a.1
-        for <kvmarm@lists.linux.dev>; Fri, 16 Aug 2024 14:22:44 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DGsnbGHA"
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2d3c02f6b57so2237244a91.2
+        for <kvmarm@lists.linux.dev>; Fri, 16 Aug 2024 17:46:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723843364; x=1724448164; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=o9uTxs0mkniTI3GS8tRBaRROslovtMgDYxgP4WPwRKU=;
-        b=zk6DGiSAQhfQtObHcPW+FTSnCdLGikkt8UCWOqBT2t18eORb01RNXGEt3BwahdGx17
-         Vdm9qCdUlKT54fIBANxf5eUxGvP5eIwAJ1J83lgsYChLZ3XJvbh6ZK2xkevAm7tTPSdF
-         gYJLsSOx9lQHmEw8Is6RNKtkkmI38L4w2b8noOtRsbm/Ajzjm3U85/JRR6zByKFGVDxX
-         OqJ0Q/BiaG30UeHSHas580XSdLAqk2q93WLVtUhMjOeWB5DCrlY5RMQzAUFbp1n+6TS+
-         DmaZG/iH2zBW0wCyQAM3UzP4oLy574YkPEKJmvc87kBdMzHKHUp5MjAkT8ub2Z/YWwos
-         aiZg==
+        d=google.com; s=20230601; t=1723855598; x=1724460398; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pUVcDB/UhVzyJRPGgEdwjLq8K5rZucutDkBEkag+mUI=;
+        b=DGsnbGHAI0f8ZpoUzsmVCNVGmSpmSGtZu1yj6gUgNQ/JjuTL0JcsIDw2doPvgQTiw6
+         fJ/2gF3IP8bn2rxFlOC/6ZKecn/Hsl55NSsvrdmvz3NjUQCfQykg34p4KaDSgnc/U7vb
+         RvtQOtvzlcyrZMK4ij831ICeVbOhAesf+TRgF7eLCDpB/6QYZ9ChfiTpRasdC0vD7175
+         mvw+SnMWunh9U7oM06ezdv9kVN2q70crOIA+0Eh+Qku3j7s3AiV7k0A50dtoSwTkciC3
+         FYblk+42hzpAyBloF6fRBs3QMviGHoBBOaRkpb1mfX6MadCvWCZe7LOXr9rsUcd7v/x3
+         DbEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723843364; x=1724448164;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=o9uTxs0mkniTI3GS8tRBaRROslovtMgDYxgP4WPwRKU=;
-        b=t72fxPdeumeuGCyWf1qo/2PVh587O3yJQ2hSdg6mP2QREyEjW3xFMGZZ5WaUalcFkR
-         XeeMNQpfdZmTW+zTXvLsHLgxnzZm65HjSEQdoGGIKIT7juwpYtWGZAQkBmFEukh6Iuox
-         FP/otRFLaeZfZ0P7FXGfTQ5C2+5Gguhj0K8X6KUMzG/JHVoOCxKA4w6kKAyjlISnkNx5
-         IlZUJLus1JLDNdjozTUhBBDN5B+EG2IvmMTWjKBjZFiKpiCVfM6arW783+BebUgRu3pJ
-         zuWKN/DPMgNOeTI5Ivv8un0Ire7Y6NHLTeLcPmtpHYjZV4gGeCUmctbGwmfMnMUHccaf
-         JzIA==
-X-Forwarded-Encrypted: i=1; AJvYcCXEhoGJBoL2yC23UK5dzWurgcbhrhLsUam/AjOLofSSJYkCbFoRa6GZuOWd1j7v0+oywY3MojGAhYaFYbYtgMLiq2bbmhTb
-X-Gm-Message-State: AOJu0Yy1+49YtGyV3FtOA3OxOOwLsiwYynNSDvV1YF/o6MtSKST4f47e
-	reqxsRIm0P002/1xPy6d/lLUDPOX19fPztZ/tl6kjg57VGS2W+mq4x+xBAO5NQc5IqWN8oyRiwT
-	wWA==
-X-Google-Smtp-Source: AGHT+IHDYed5uLkrjadTM1HkBjUKX+hpJJsh/EyZ8evcAdTKPd0muQAu8d9inIi0f9HwyVQ2JOWLPGX7nk0=
+        d=1e100.net; s=20230601; t=1723855598; x=1724460398;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=pUVcDB/UhVzyJRPGgEdwjLq8K5rZucutDkBEkag+mUI=;
+        b=RiB0yOR5VuNeUK+LbaUXGeRE+18U2S++3CjjVl6T7jzU8AYiNNCaw9cdH/7yDdG4wI
+         NsxengGkKr2F25/j6mVgje8RWtuLPrL9EmuPdl31EjWcYj5CCuPLofhtbVs6+IfzMAwX
+         VwfMNvXtmHiDfsMqnuRF5nVnzfKrG9MLNVRo7ik9EtgKG/enkqGF1vUILzPVBFkO/Dlm
+         rwXr4lxsWyugcvrpmXnUseqXjGlhC/nasZ0nYkCcS05FVgiw2UqWNeAoA8YJfU+iywVB
+         qtF/dRoOfOFCgR4eJnjR7naIgeSn5IL+KhaVmXGFQ7uBeYLfVPOBq0E+HO2gG1Q85Qm2
+         xYdw==
+X-Forwarded-Encrypted: i=1; AJvYcCXDvpr00vk+9xSI2Nn+7/akVuW0YMaqSK+GtFhmkwJS6KsakkpEZgq+E0xOJNkCUTzwO70zOF4VSrlV3EsqOx5z+qePLLXy
+X-Gm-Message-State: AOJu0YxTgtob7d+o60o4krayZN4qklTvGcpCi9mGCdEfYx93JAM8h3iC
+	O4ZP8AFmeATF6/Sk9xNODIqUj2Y08cx2A5NzzGRh71aMjPJv6LIPHvFFHqORSePGROUdypAZcZv
+	s+g==
+X-Google-Smtp-Source: AGHT+IF8ePhNFPsi5W3jK4xS3om0njOksRe8S5j87v+OHTQjcpd6pz36Ai21gNWSPDXmyrWg15yLm3dMmPg=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:91cb:b0:710:4e4c:a4ad with SMTP id
- d2e1a72fcca58-71276c8a229mr65569b3a.0.1723843363684; Fri, 16 Aug 2024
- 14:22:43 -0700 (PDT)
-Date: Fri, 16 Aug 2024 14:22:42 -0700
-In-Reply-To: <20240809205158.1340255-4-amoorthy@google.com>
+ (user=seanjc job=sendgmr) by 2002:a17:90b:fcb:b0:2d3:c00d:b362 with SMTP id
+ 98e67ed59e1d1-2d3dfc1310cmr13127a91.1.1723855597709; Fri, 16 Aug 2024
+ 17:46:37 -0700 (PDT)
+Date: Fri, 16 Aug 2024 17:46:36 -0700
+In-Reply-To: <CADrL8HV5M-n72KDseDKWpGrUVMjC147Jqz98PxyG2ZeRVbFu8g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20240809205158.1340255-1-amoorthy@google.com> <20240809205158.1340255-4-amoorthy@google.com>
-Message-ID: <Zr_DIuWBRuaQIYmX@google.com>
-Subject: Re: [PATCH v2 3/3] KVM: arm64: Perform memory fault exits when
- stage-2 handler EFAULTs
+References: <20240724011037.3671523-1-jthoughton@google.com>
+ <20240724011037.3671523-4-jthoughton@google.com> <CADrL8HV5M-n72KDseDKWpGrUVMjC147Jqz98PxyG2ZeRVbFu8g@mail.gmail.com>
+Message-ID: <Zr_y7Fn63hdowfYM@google.com>
+Subject: Re: [PATCH v6 03/11] KVM: arm64: Relax locking for kvm_test_age_gfn
+ and kvm_age_gfn
 From: Sean Christopherson <seanjc@google.com>
-To: Anish Moorthy <amoorthy@google.com>
-Cc: oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	jthoughton@google.com, rananta@google.com
-Content-Type: text/plain; charset="us-ascii"
+To: James Houghton <jthoughton@google.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Ankit Agrawal <ankita@nvidia.com>, Axel Rasmussen <axelrasmussen@google.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, David Matlack <dmatlack@google.com>, 
+	David Rientjes <rientjes@google.com>, James Morse <james.morse@arm.com>, 
+	Jason Gunthorpe <jgg@ziepe.ca>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Raghavendra Rao Ananta <rananta@google.com>, 
+	Ryan Roberts <ryan.roberts@arm.com>, Shaoqin Huang <shahuang@redhat.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Wei Xu <weixugc@google.com>, 
+	Will Deacon <will@kernel.org>, Yu Zhao <yuzhao@google.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Aug 09, 2024, Anish Moorthy wrote:
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 6981b1bc0946..c97199d1feac 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1448,6 +1448,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  
->  	if (fault_is_perm && !write_fault && !exec_fault) {
->  		kvm_err("Unexpected L2 read permission error\n");
-> +		kvm_prepare_memory_fault_exit(vcpu, fault_ipa, 0,
+On Thu, Jul 25, 2024, James Houghton wrote:
+> On Tue, Jul 23, 2024 at 6:11=E2=80=AFPM James Houghton <jthoughton@google=
+.com> wrote:
+> >
+> > Replace the MMU write locks (taken in the memslot iteration loop) for
+> > read locks.
+> >
+> > Grabbing the read lock instead of the write lock is safe because the
+> > only requirement we have is that the stage-2 page tables do not get
+> > deallocated while we are walking them. The stage2_age_walker() callback
+> > is safe to race with itself; update the comment to reflect the
+> > synchronization change.
+> >
+> > Signed-off-by: James Houghton <jthoughton@google.com>
+> > ---
+>=20
+> Here is some data to show that this patch at least *can* be helpful:
+>=20
+> # arm64 patched to do aging (i.e., set HAVE_KVM_MMU_NOTIFIER_YOUNG_FAST_O=
+NLY)
+> # The test is faulting memory in while doing aging as fast as possible.
+> # taskset -c 0-32 ./access_tracking_perf_test -l -r /dev/cgroup/memory
+> -p -v 32 -m 3
+>=20
+> # Write lock
+> vcpu wall time                : 3.039207157s
+> lru_gen avg pass duration     : 1.660541541s, (passes:2, total:3.32108308=
+3s)
+>=20
+> # Read lock
+> vcpu wall time                : 3.010848445s
+> lru_gen avg pass duration     : 0.306623698s, (passes:11, total:3.3728606=
+88s)
+>=20
+> Aging is able to run significantly faster, but vCPU runtime isn't
+> affected much (in this test).
 
-In this case, KVM has the fault granule, can't we just use that instead of
-reporting '0'?
+Were you expecting vCPU runtime to improve (more)?  If so, lack of movement=
+ could
+be due to KVM arm64 taking mmap_lock for read when handling faults:
 
-> +					      write_fault, exec_fault, false);
->  		return -EFAULT;
->  	}
->  
-> @@ -1473,6 +1475,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	if (unlikely(!vma)) {
->  		kvm_err("Failed to find VMA for hva 0x%lx\n", hva);
->  		mmap_read_unlock(current->mm);
-> +		kvm_prepare_memory_fault_exit(vcpu, fault_ipa, 0,
-
-Why can't KVM use the minimum possible page (granule?) size.  It's _always_ legal
-for KVM to map at a smaller granularity than the primary MMU, thus it's always
-accurate to report KVM's minimum size.
-
-In fact, I would argue that it's inaccurate to report anything larger, because
-there's no way for KVM to know if the badness extends to an entire hugepage.
-E.g. even in the MTE case below, reporting the vma _page size_ is weird.  IIUC,
-the problem exists with the entire vma, not some random (huge)page in the vma.
-
-> +					      write_fault, exec_fault, false);
->  		return -EFAULT;
->  	}
->  
-> @@ -1568,8 +1572,11 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  		kvm_send_hwpoison_signal(hva, vma_shift);
->  		return 0;
->  	}
-> -	if (is_error_noslot_pfn(pfn))
-> +	if (is_error_noslot_pfn(pfn)) {
-> +		kvm_prepare_memory_fault_exit(vcpu, fault_ipa, vma_pagesize,
-> +					      write_fault, exec_fault, false);
->  		return -EFAULT;
-
-Shouldn't this be:
-
-	if (KVM_BUG_ON(is_error_noslot_pfn(pfn), vcpu->kvm))
-		return -EIO;
-
-Emulated MMIO is suppposed to be handled in kvm_handle_guest_abort():
-
-	if (kvm_is_error_hva(hva) || (write_fault && !writable)) {o
-		...
-
-		/*
-		 * The IPA is reported as [MAX:12], so we need to
-		 * complement it with the bottom 12 bits from the
-		 * faulting VA. This is always 12 bits, irrespective
-		 * of the page size.
-		 */
-		ipa |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
-		ret = io_mem_abort(vcpu, ipa);
-		goto out_unlock;
-	}
-
-And the memslot itself is stable, e.g. it can't disappear, and it can't have its
-flags toggled.  KVM specifically does all modifications to memslots on unreachable
-structures so that a memslot cannot change once it has been retrieved from the
-memslots tree. 
-	/*
-	 * Mark the current slot INVALID.  As with all memslot modifications,
-	 * this must be done on an unreachable slot to avoid modifying the
-	 * current slot in the active tree.
-	 */
-	kvm_copy_memslot(invalid_slot, old);
-	invalid_slot->flags |= KVM_MEMSLOT_INVALID;
-	kvm_replace_memslot(kvm, old, invalid_slot);
-
-And if KVM were indeed re-retrieving the memslot from kvm->memslots, then the
-appropriate behavior would be
-
-	if (is_error_noslot_pfn(pfn))
-		return -EAGAIN;
-
-so that KVM retries the fault.  It's perfectly legal to delete a memslot at any
-time, with the rather large caveat that if bad things happen to the guest, it's
-userspace responsibility to deal with the fallout.
+https://lore.kernel.org/all/Zr0ZbPQHVNzmvwa6@google.com
