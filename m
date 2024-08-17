@@ -1,108 +1,135 @@
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-ua1-f43.google.com (mail-ua1-f43.google.com [209.85.222.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 160A5184E
-	for <kvmarm@lists.linux.dev>; Sat, 17 Aug 2024 01:00:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DFA32F44
+	for <kvmarm@lists.linux.dev>; Sat, 17 Aug 2024 01:04:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723856454; cv=none; b=GOdqZURIz7AuFthxfGMUhZen9uR83ML6LMeyYOQynr/3CbQ5a+HiGAr6+txuRledprZzAkzbKrN0SvhetJ1SDpMxPpYKSh30KqpGNPb4DlB98vjo5o7Yi1pCanSgZkwmtc5HyskOdhHDQr2SKRSdxPASrVqqjTMG1GrAbewc+Ec=
+	t=1723856648; cv=none; b=FQe9nQJQQQZZP3jXHWXhkH1xMjiC/Aj6f7dswDhnySJOvLIgV0IuQLeLyoLqWJSurx+ETgIYVg0j/x7NinNVxx3q77Vffr9UGhg14do46jHyr2zKkMM7/pGyUkcgVvX1O9tS3SvCDxS8AobhpLPJa/ExN3tWvfSVITp4IMhbg3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723856454; c=relaxed/simple;
-	bh=xME3BnPckt7E13btYdrc63u8unf/OOEIYZuvPJ+UGKE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ZSxuT/s7jlM24xXuCrMKNRKsSUIS4gUJEPQhQJ6zK3s6TS5xWnjMv3JdJmI0Ys5xahvDPqCpPzs0+wiI1ubVcZHm74/ZIonacHE+MiLOnri59haUlGcy6bPrQtngEVU0wRYje1NHDgSKqhznlUU4wTlgRWumRmK7YAo3EWI5oZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DAJStbtm; arc=none smtp.client-ip=209.85.215.201
+	s=arc-20240116; t=1723856648; c=relaxed/simple;
+	bh=WCZrkUgQEbVisIjIvmosSf/ZV8hiR799Km9gEhjpk4c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Dax4A+phC/T5ap4E1rQaSLiN7Lwq4dJZ+D+mYFEisbGlUIoQ3ZfuuFoxtgGhiBhYj6Frp87FzSSz1L0p/vubLEt7bBwR9Kz73LvujiEPbFwtyT26JH/4e/LyUkc+0S2mnqdijNtVWmhFCzN3Gu6UoIhS4gBtHkgg2Whp6+alcxc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QPk/au5j; arc=none smtp.client-ip=209.85.222.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DAJStbtm"
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7a994e332a8so2047238a12.3
-        for <kvmarm@lists.linux.dev>; Fri, 16 Aug 2024 18:00:52 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QPk/au5j"
+Received: by mail-ua1-f43.google.com with SMTP id a1e0cc1a2514c-842fec2987eso657854241.2
+        for <kvmarm@lists.linux.dev>; Fri, 16 Aug 2024 18:04:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723856452; x=1724461252; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DHurR+fx7zf8gF+fH8OqsanlwZHSvsgIt3z0suTHGLw=;
-        b=DAJStbtmh8npYE/u3rM4vU2N0gy7374SjlvvLEMtn8ggxLJnSjXgcsMGjRijkJLJfK
-         o43NMdFaO2xdtXM+HrFW9VCnZRsZJ0/bYbfgLT8xUhSxmiXlRkWKFhSL5iCIDgoccLsy
-         2WETV9rWpOU9AdKO2cK9JScBYRGP2Yzzw8RQeHMMQeGFJ8dJZUTjx1ea3E5KDt7z3id2
-         4kXvcNVppEwuUuGT/PJ3C1hDA47U+5hfP9LQkgmOpHnXYmzKhSyqJ6RqP0yg5eK3PsC5
-         gh/YbI4UkpxNfnC7qh8ty5VXzDNDOdrVwChWnwbkOBDy2xp3UHE4EmEioypMG8jcYVcR
-         bSbA==
+        d=google.com; s=20230601; t=1723856646; x=1724461446; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1ZkT/FAH8t+UEeZZlsBiF2qoKJwELVKvUU9sus3nhBA=;
+        b=QPk/au5jqIEcywO/1/RDCUZumLhDis7YWnnM7uV4eFZh/mJOve9W8+dria9ZrT/pyj
+         rtx7SptJeNCIZDu29Gvs8hgo39szLuSmXX+wnafhePXuQK/V85mT0KweF+wBC/tRwVfk
+         ew9TxjmJP8Fqnol2JrqLE9i314gUtvPuA6Afx1Bdj8OUjmzyNZGcB82iWn5Jr2N3p9rg
+         NhU231p45wiKpwVUX0BiJUtDzRdmq7vIpc4N7kE4B0908gsDXvy9Mq7N+Rq2ruGABlMh
+         S31q31mxFN1r4m6PWxNnLqfgaV+aJdk+tMnH4P5l6FGodn1vFBDfoyq3mwz255ufSCLa
+         UaAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723856452; x=1724461252;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DHurR+fx7zf8gF+fH8OqsanlwZHSvsgIt3z0suTHGLw=;
-        b=C3v6BfhDY5CEHaj9Rmi2c/3oEzgOx5leuPxb8OUQdt6FM1hidPT+NyZSM9961fHY8A
-         40YSv/Y0cME11+YhwuL3ws/bd11sN2tGr6u3O/yKpgJbDatIVh3oy8GPbYwLDdi7maV8
-         1sIDv0HpQ4FI8DTwlOJAFcKv2TQmNhvHuZmrxwRlQ7ms84xiDm0eatkEDmMQmcrvwcYI
-         /Mi5zjm+XpoxdP4C9JBqY/Qd2zzEMRx8ZoQAZsJQnCaKS6QretZHT1jhA7LechFBmQsm
-         aDSppTU+IZ6mvan7ZbWS8CUUEZ5hnpVj5vPHzlhIsvxSyYaAmJtjnJvdH2DJRoV45EKz
-         DS3w==
-X-Forwarded-Encrypted: i=1; AJvYcCUbfQL+BfH2UYwW4UQKFlFwFV8+NjXU10CT+zCaZYtxlC8r+bQicZt5lfwZ0rgP8QQIoEMGyc/knrvRL3QQq7I2ETxbZwGn
-X-Gm-Message-State: AOJu0Yx4NI81OhaMif3IwmEOnurMsDYJjO0WuUoAh91ro9WpZ7orGyxM
-	3klxZjN8ncLW+lgxDTpEmSmhCP7QrsOcA3tRGxP/JukldVIyjkiwUGvysZOgFlmmZQcJDsUyJw9
-	T1g==
-X-Google-Smtp-Source: AGHT+IGgQ5L96WEtrOF85LpPpxMbEdlboogX890StOgCMUdrhDjVb+vU60wuE1WwXFLKi0Z3aJ4DtITuwPA=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a02:4a3:b0:75f:3d6e:6461 with SMTP id
- 41be03b00d2f7-7c97af56e6bmr10481a12.6.1723856452244; Fri, 16 Aug 2024
- 18:00:52 -0700 (PDT)
-Date: Fri, 16 Aug 2024 18:00:50 -0700
-In-Reply-To: <ZqKWxfqRoJzUWroG@google.com>
+        d=1e100.net; s=20230601; t=1723856646; x=1724461446;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1ZkT/FAH8t+UEeZZlsBiF2qoKJwELVKvUU9sus3nhBA=;
+        b=bmjV8uEA7CGctoy/Cwqc5HO/Ss+Mx+/mD1AJxiCjgcnrM+JpurNabbvFdBIuhLOrPW
+         oGBTr+dtcy/NHeUs7dLnFSjt50Gtv7pl5u8hyO16JrOtuhtUnA3FMSgcPZglzU3baAie
+         81wpIWU43+9+1MYmZkQTZsVS3DJwyZ8m8OeIml6p9aXn3kyFaAqVh9BwK+HQ0/uBrlh3
+         eGkxUxmIEaYjBIpfPR6bJxk5d/yhr0Vjd9WxHGI0bD0GhP62dxk3si0AH0X+I7WDNyUg
+         eLQCflADBU3Z3sAv+BUk23g2gch1e5rgaKfvgMInr2G5iNVIR0M4xiIsLB8KArLzKMOm
+         oAdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWh/qcTKp1HYyb5sFXWw9SgwMc7e6vfkQvXZPxIXdQYrFz3aHglCvDdUYWPnI85dyfI0X/jwTPEw7XJ80TOYr6aqDKjbZPq
+X-Gm-Message-State: AOJu0Yw1fVf2nTrLrsla62b/zj0EZGH7iwnh+/2dyQdKkXrPq2+qLPFH
+	oagnn/RojA2kxJrUBndJxFdLXGgkEbqm4vV1rETe4H296Xl/CwAfgaAeK8aZU+3ECPyZsRsieGb
+	yEq3yJ5hhnH4jXphiN8zTKeCpuURw+kXGM2tK
+X-Google-Smtp-Source: AGHT+IH+z/yVUCGn/kvsFe3FWe5Y4PrsBx6c3aNhHuqGExQKF6hhvvYIWba1m2Vl5PvAw0UlZYeqJffhxIB+o44gihE=
+X-Received: by 2002:a05:6102:3e85:b0:48f:e7c2:1faf with SMTP id
+ ada2fe7eead31-497799a0eb9mr6016565137.28.1723856645893; Fri, 16 Aug 2024
+ 18:04:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
+MIME-Version: 1.0
 References: <20240724011037.3671523-1-jthoughton@google.com>
- <20240724011037.3671523-9-jthoughton@google.com> <ZqKWxfqRoJzUWroG@google.com>
-Message-ID: <Zr_2Qhflx5xBhFCY@google.com>
-Subject: Re: [PATCH v6 08/11] KVM: x86: Optimize kvm_{test_,}age_gfn a little bit
-From: Sean Christopherson <seanjc@google.com>
-To: David Matlack <dmatlack@google.com>
+ <20240724011037.3671523-4-jthoughton@google.com> <CADrL8HV5M-n72KDseDKWpGrUVMjC147Jqz98PxyG2ZeRVbFu8g@mail.gmail.com>
+ <Zr_y7Fn63hdowfYM@google.com>
+In-Reply-To: <Zr_y7Fn63hdowfYM@google.com>
+From: Yu Zhao <yuzhao@google.com>
+Date: Fri, 16 Aug 2024 19:03:27 -0600
+Message-ID: <CAOUHufYc3hr-+fp14jgEkDN++v6t-z-PRf1yQdKtnje6SgLiiA@mail.gmail.com>
+Subject: Re: [PATCH v6 03/11] KVM: arm64: Relax locking for kvm_test_age_gfn
+ and kvm_age_gfn
+To: Sean Christopherson <seanjc@google.com>
 Cc: James Houghton <jthoughton@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
 	Paolo Bonzini <pbonzini@redhat.com>, Ankit Agrawal <ankita@nvidia.com>, 
 	Axel Rasmussen <axelrasmussen@google.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	David Rientjes <rientjes@google.com>, James Morse <james.morse@arm.com>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Raghavendra Rao Ananta <rananta@google.com>, 
-	Ryan Roberts <ryan.roberts@arm.com>, Shaoqin Huang <shahuang@redhat.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Wei Xu <weixugc@google.com>, 
-	Will Deacon <will@kernel.org>, Yu Zhao <yuzhao@google.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	David Matlack <dmatlack@google.com>, David Rientjes <rientjes@google.com>, 
+	James Morse <james.morse@arm.com>, Jason Gunthorpe <jgg@ziepe.ca>, Jonathan Corbet <corbet@lwn.net>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Raghavendra Rao Ananta <rananta@google.com>, Ryan Roberts <ryan.roberts@arm.com>, 
+	Shaoqin Huang <shahuang@redhat.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Wei Xu <weixugc@google.com>, Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, 
 	kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
 	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
 	linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 25, 2024, David Matlack wrote:
-> On 2024-07-24 01:10 AM, James Houghton wrote:
-> > Optimize both kvm_age_gfn and kvm_test_age_gfn's interaction with the
-> 
-> nit: Use () when referring to functions.
-> 
-> > shadow MMU by, rather than checking if our memslot has rmaps, check if
-> > there are any indirect_shadow_pages at all.
-> 
-> What is optimized by checking indirect_shadow_pages instead of
-> have_rmaps and what's the benefit? Smells like a premature optimization.
+On Fri, Aug 16, 2024 at 6:46=E2=80=AFPM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> On Thu, Jul 25, 2024, James Houghton wrote:
+> > On Tue, Jul 23, 2024 at 6:11=E2=80=AFPM James Houghton <jthoughton@goog=
+le.com> wrote:
+> > >
+> > > Replace the MMU write locks (taken in the memslot iteration loop) for
+> > > read locks.
+> > >
+> > > Grabbing the read lock instead of the write lock is safe because the
+> > > only requirement we have is that the stage-2 page tables do not get
+> > > deallocated while we are walking them. The stage2_age_walker() callba=
+ck
+> > > is safe to race with itself; update the comment to reflect the
+> > > synchronization change.
+> > >
+> > > Signed-off-by: James Houghton <jthoughton@google.com>
+> > > ---
+> >
+> > Here is some data to show that this patch at least *can* be helpful:
+> >
+> > # arm64 patched to do aging (i.e., set HAVE_KVM_MMU_NOTIFIER_YOUNG_FAST=
+_ONLY)
+> > # The test is faulting memory in while doing aging as fast as possible.
+> > # taskset -c 0-32 ./access_tracking_perf_test -l -r /dev/cgroup/memory
+> > -p -v 32 -m 3
+> >
+> > # Write lock
+> > vcpu wall time                : 3.039207157s
+> > lru_gen avg pass duration     : 1.660541541s, (passes:2, total:3.321083=
+083s)
+> >
+> > # Read lock
+> > vcpu wall time                : 3.010848445s
+> > lru_gen avg pass duration     : 0.306623698s, (passes:11, total:3.37286=
+0688s)
+> >
+> > Aging is able to run significantly faster, but vCPU runtime isn't
+> > affected much (in this test).
+>
+> Were you expecting vCPU runtime to improve (more)?  If so, lack of moveme=
+nt could
+> be due to KVM arm64 taking mmap_lock for read when handling faults:
+>
+> https://lore.kernel.org/all/Zr0ZbPQHVNzmvwa6@google.com
 
-Checking indirect_shadow_pages avoids taking mmu_lock for write when KVM doesn't
-currently have shadow MMU pages, but did at some point in the past, whereas
-kvm_memslots_have_rmaps() is sticky and will return true forever.
-
-> > Also, for kvm_test_age_gfn, reorder the TDP MMU check to be first. If we
-> > find that the range is young, we do not need to check the shadow MMU.
-> 
-> This should be a separate commit since it's a logically distinct change
-> and no dependency on the other change in this commit (other than both
-> touch the same function).
-> 
-> Splitting the commits up will also make it easier to write more specific
-> short logs (instead of "optimize a little bit" :)
-
-+1.  Especially code movement and refactoring, e.g. factoring out
-tdp_mmu_clear_spte_bits_atomic() would ideally be in a standalone patch that's
-dead simple to review.
+For the above test, I don't think it's mmap_lock -- the reclaim path,
+e.g., when zswapping guest memory, has two stages: aging (scanning
+PTEs) and eviction (unmapping PTEs). Only testing the former isn't
+realistic at all. IOW, for a r/w lock use case, only testing the read
+lock path would be bad coverage.
