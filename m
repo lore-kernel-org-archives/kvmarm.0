@@ -1,74 +1,106 @@
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10C4A53373
-	for <kvmarm@lists.linux.dev>; Sat, 17 Aug 2024 10:16:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7217B657;
+	Sat, 17 Aug 2024 10:25:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723889800; cv=none; b=a3fi/5RMJBhqBoSWRb3/ok+Dwk4zRN7dZ3tuprR48WEMVumzY2GyVmRzKpWX1OgKnFlskRAdQZiAfOAYOsr71LvYmhM49XLTVl/2enmxe74H/wkEZf85tWrENGZJsgO5YjpBsxfNpPLIoSKWuHh0/SfzYhFGD7qK4TxOXxCFg5Y=
+	t=1723890345; cv=none; b=eKrG9x+7usGBNxG4NEiKcNcrVk20vu2RWDZVw9pOTQu+QlTcNoigvSSWLg0k6xRjFE/zthPzDOLf/4eQ/KGPJ3mKHsC144Q5j0XM8qtsuTFenTcXwFG9E3b0O3sHfkzYQ+iagUMu9u5GBbFvo8x5YgrOFXXLkJeeltk8oC49VU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723889800; c=relaxed/simple;
-	bh=iOtg+i5wMlWNqEwP42cHZN7C73ZQKag0NQLv+2KnlR8=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=p+208kZtZAth+jU1aykcEG/s607naw+8xMdRgFNUdcwLRL1IJyfpLyzwrlALsuD7ndHcbHKj0cIY5UkOmxtYxMJrDbiGY94wTYpkk4qoptKvFocwWidgPK/EMehi7ri2yRWXAPLFfjb+ulXK4vC++iwxaReYLhzGH+F7Cgz4BH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.163])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4WmF545yYhz2CmfR;
-	Sat, 17 Aug 2024 18:11:36 +0800 (CST)
-Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
-	by mail.maildlp.com (Postfix) with ESMTPS id A7942180044;
-	Sat, 17 Aug 2024 18:16:32 +0800 (CST)
-Received: from DESKTOP-8RFUVS3.china.huawei.com (10.174.178.219) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Sat, 17 Aug 2024 18:16:31 +0800
-From: Zenghui Yu <yuzenghui@huawei.com>
-To: <kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>
-CC: <maz@kernel.org>, <oliver.upton@linux.dev>, <james.morse@arm.com>,
-	<suzuki.poulose@arm.com>, <wanghaibin.wang@huawei.com>, Zenghui Yu
-	<yuzenghui@huawei.com>
-Subject: [PATCH] KVM: arm64: vgic-debug: Don't put unmarked LPIs
-Date: Sat, 17 Aug 2024 18:15:41 +0800
-Message-ID: <20240817101541.1664-1-yuzenghui@huawei.com>
-X-Mailer: git-send-email 2.23.0.windows.1
+	s=arc-20240116; t=1723890345; c=relaxed/simple;
+	bh=DHhe3pmtDxyRax9ygVaZwi+haQX8zawBPIakTdO65OU=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kMUGlwNgoT4Fe7euzf129TocG+B3zBd92QC5old6vjDIOgYVj5+f6nuuisExNG/1xPNL7o/UdqkwjI2PLJ5qqFtJW3NrAy+g0AWSPiWpfuR8PiAAezoAfvXXVtCROwj0OZyE5Tg/1nUy2mWMgfn8XJXdMiVJZKUqKhUtjMOIHIk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X1uZUHiE; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X1uZUHiE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32F01C116B1;
+	Sat, 17 Aug 2024 10:25:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723890345;
+	bh=DHhe3pmtDxyRax9ygVaZwi+haQX8zawBPIakTdO65OU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=X1uZUHiEhv04V2Z9T7Ey1pL2Ih2gnasu7T5IuEMEwQ8lOHweIsVlQKl17TW68jzIF
+	 0PIBCnwAcmU9GGeM55o0tj+nMe+fwmBWuKc3RETFMPYBWbVY/pQ9bdq/aAFkksYPEa
+	 8+e+8R/xjssLoRXBKPK2WR7E+AeQChlPCU80Ak+Dms9l3aNiBUB9hvqkasOFxxAmLW
+	 Ty+I/pbP2X9aAZg06HXUMOFfgpTqZCCIh9n9BlDsrLkSw668JhTk18SF7WTcjZgBRR
+	 5xmb3RUbqMM23X/YXCo6LdjYC5NNGHWmfZJZFhs4KVCH6jRNcqnilfkp6XyuJYVw1D
+	 z3drnIZYCLuFA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sfGcx-004Vcv-00;
+	Sat, 17 Aug 2024 11:25:43 +0100
+Date: Sat, 17 Aug 2024 11:25:42 +0100
+Message-ID: <86a5hbzbrt.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Zenghui Yu <yuzenghui@huawei.com>
+Cc: <kvmarm@lists.linux.dev>,
+	<linux-arm-kernel@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>,
+	<oliver.upton@linux.dev>,
+	<james.morse@arm.com>,
+	<suzuki.poulose@arm.com>,
+	<wanghaibin.wang@huawei.com>
+Subject: Re: [PATCH] KVM: arm64: vgic-debug: Don't put unmarked LPIs
+In-Reply-To: <20240817101541.1664-1-yuzenghui@huawei.com>
+References: <20240817101541.1664-1-yuzenghui@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm600007.china.huawei.com (7.193.23.208)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, wanghaibin.wang@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-If there were LPIs being mapped behind our back (i.e., between .start() and
-.stop()), we would put them at iter_unmark_lpis() without checking if they
-were actually *marked*, which is obviously not good.
+On Sat, 17 Aug 2024 11:15:41 +0100,
+Zenghui Yu <yuzenghui@huawei.com> wrote:
+> 
+> If there were LPIs being mapped behind our back (i.e., between .start() and
+> .stop()), we would put them at iter_unmark_lpis() without checking if they
+> were actually *marked*, which is obviously not good.
+> 
+> Switch to use the xa_for_each_marked() iterator to fix it.
+> 
+> Fixes: 85d3ccc8b75b ("KVM: arm64: vgic-debug: Use an xarray mark for debug iterator")
+> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+> ---
+>  arch/arm64/kvm/vgic/vgic-debug.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-debug.c b/arch/arm64/kvm/vgic/vgic-debug.c
+> index bc74d06398ef..e1397ab2072a 100644
+> --- a/arch/arm64/kvm/vgic/vgic-debug.c
+> +++ b/arch/arm64/kvm/vgic/vgic-debug.c
+> @@ -85,7 +85,7 @@ static void iter_unmark_lpis(struct kvm *kvm)
+>  	struct vgic_irq *irq;
+>  	unsigned long intid;
+>  
+> -	xa_for_each(&dist->lpi_xa, intid, irq) {
+> +	xa_for_each_marked(&dist->lpi_xa, intid, irq, LPI_XA_MARK_DEBUG_ITER) {
+>  		xa_clear_mark(&dist->lpi_xa, intid, LPI_XA_MARK_DEBUG_ITER);
+>  		vgic_put_irq(kvm, irq);
+>  	}
 
-Switch to use the xa_for_each_marked() iterator to fix it.
+Ouch. Nicely caught. I think this deserves a
 
-Fixes: 85d3ccc8b75b ("KVM: arm64: vgic-debug: Use an xarray mark for debug iterator")
-Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
----
- arch/arm64/kvm/vgic/vgic-debug.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Cc: stable@vger.kernel.org # v6.10
 
-diff --git a/arch/arm64/kvm/vgic/vgic-debug.c b/arch/arm64/kvm/vgic/vgic-debug.c
-index bc74d06398ef..e1397ab2072a 100644
---- a/arch/arm64/kvm/vgic/vgic-debug.c
-+++ b/arch/arm64/kvm/vgic/vgic-debug.c
-@@ -85,7 +85,7 @@ static void iter_unmark_lpis(struct kvm *kvm)
- 	struct vgic_irq *irq;
- 	unsigned long intid;
- 
--	xa_for_each(&dist->lpi_xa, intid, irq) {
-+	xa_for_each_marked(&dist->lpi_xa, intid, irq, LPI_XA_MARK_DEBUG_ITER) {
- 		xa_clear_mark(&dist->lpi_xa, intid, LPI_XA_MARK_DEBUG_ITER);
- 		vgic_put_irq(kvm, irq);
- 	}
+With that,
+
+Reviewed-by: Marc Zyngier <maz@kernel.org>
+
+Thanks,
+
+	M.
+
 -- 
-2.33.0
-
+Without deviation from the norm, progress is not possible.
