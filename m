@@ -1,76 +1,136 @@
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79A5F446A1
-	for <kvmarm@lists.linux.dev>; Mon, 19 Aug 2024 17:27:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D53D015958A
+	for <kvmarm@lists.linux.dev>; Mon, 19 Aug 2024 20:42:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724088480; cv=none; b=oHknYK0QCq2NzTc1KfLvsmW7mlWtDJ8x5OOlfyNJ4+zfFzFhkiNq91JBQ2ch/iMyIoRbUbKtwO0zqos6PqoKY2Xds+uB215FyuDGy54gkceun5ys8bi4hcbNgbiWFHkvmqBsFxHrNJ06rrxFu+vU4WK637CELKR2hdFKLmQqaqs=
+	t=1724100127; cv=none; b=lb0nVr2W8NmY9fi7VNrnG50jsyuyUWGOjqZDs8uyp69anYauaMDjXRI5n6YFSoD7aFjjB05zQ9hqLgTzQ+gSx28mcahon+FMFmJESi5U1CiCCzROkvltO0yb/vzQVQOfyFE+I8Vs3xLFGLYkOKZmc1CGLUjruOdKwgMd/nbHTmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724088480; c=relaxed/simple;
-	bh=7M0OZHShhDAC+gzzpjewgdBrRAPvIOZhXlQ0c5RHqvY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=l9p7jm7yHBZX8dEW7RPUwCnGVofxVakehvEWAZPApT7QLz94AEHxoysTT6Ftc7gDCxr9b+hjM+RhEEKmgDbjdnMOuJqd/kdTUgtVB0yI1rEdhS9ZQVACqjj173ghl4aTkBHk0PyyyMhvOCNLd0towxSRQ0Peitr+0O55X330zA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=U9sem894; arc=none smtp.client-ip=95.215.58.170
+	s=arc-20240116; t=1724100127; c=relaxed/simple;
+	bh=Dt1Ff7fKLLYPfMaJ4kJTzH4evyvUMfCz59lijmotGOk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kuoHFNxbr+VgPb0DbzjP0nUEMB9a4suL9Rtl6aXXmCpU1X8Z0a5tPROpOulyEIo1Z8ar2FO8pGy5n552lQ39ONQ0hZZpMOqTNZyoAwmEY0Eu2XntailjaHqrEJ25xqx0TySvZM9EXWpSQMmecCj4uyT+Hkmv/qYwTckQo5sO1jw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QjckSWmi; arc=none smtp.client-ip=95.215.58.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="U9sem894"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QjckSWmi"
+Date: Mon, 19 Aug 2024 20:41:52 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1724088476;
+	t=1724100121;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=PqS49g30NErX314MhXi3K/PTA6QBsp5a3jiODOwBZa0=;
-	b=U9sem894frqgnlVFBLhfZgS55Pyk3teGaKz1drhTFCvQq93SIQFVk6Xb5iPyN5H+ZjTiVM
-	+75LrAXCCBtFS52PLN0voCqgt6B7drdgujEAz+o7C4jMJPMg5TGkwGvKUfCUglAJM6Iz1X
-	CFIboyJOlRYchQjibRk8gZ+g74yWDk4=
+	bh=9Y168q5crzOyuR0vBXeOnFBth7VvFqg3LAjS8RW/lCM=;
+	b=QjckSWmi/C6logVG6INyLTdl2yFG7ehaLWTfObZBDHmH29dWtGBfep0KYv6Z9gBDYeh9S+
+	B6R9XRrjvorKQxuRIfjSMJWax726Gq0p6dIEjHG9Ct8t5QfdejAKRHlb7mGX73T27kmL/f
+	3zLPC94bHuABE9SXOJjRNTeVEwEQcVA=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: kvm@vger.kernel.org,
-	Marc Zyngier <maz@kernel.org>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
+To: Yu Zhao <yuzhao@google.com>
+Cc: Sean Christopherson <seanjc@google.com>,
+	James Houghton <jthoughton@google.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Axel Rasmussen <axelrasmussen@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	David Matlack <dmatlack@google.com>,
+	David Rientjes <rientjes@google.com>,
+	James Morse <james.morse@arm.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	Shaoqin Huang <shahuang@redhat.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH] KVM: arm64: vgic: Don't hold config_lock while unregistering redistributors
-Date: Mon, 19 Aug 2024 17:26:05 +0000
-Message-ID: <172408829924.848017.13221469817768550925.b4-ty@linux.dev>
-In-Reply-To: <20240819125045.3474845-1-maz@kernel.org>
-References: <20240819125045.3474845-1-maz@kernel.org>
+	Wei Xu <weixugc@google.com>, Will Deacon <will@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org
+Subject: Re: [PATCH v6 03/11] KVM: arm64: Relax locking for kvm_test_age_gfn
+ and kvm_age_gfn
+Message-ID: <ZsOuEP6P0v45ffC0@linux.dev>
+References: <20240724011037.3671523-1-jthoughton@google.com>
+ <20240724011037.3671523-4-jthoughton@google.com>
+ <CADrL8HV5M-n72KDseDKWpGrUVMjC147Jqz98PxyG2ZeRVbFu8g@mail.gmail.com>
+ <Zr_y7Fn63hdowfYM@google.com>
+ <CAOUHufYc3hr-+fp14jgEkDN++v6t-z-PRf1yQdKtnje6SgLiiA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAOUHufYc3hr-+fp14jgEkDN++v6t-z-PRf1yQdKtnje6SgLiiA@mail.gmail.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Mon, 19 Aug 2024 13:50:45 +0100, Marc Zyngier wrote:
-> We recently moved the teardown of the vgic part of a vcpu inside
-> a critical section guarded by the config_lock. This teardown phase
-> involves calling into kvm_io_bus_unregister_dev(), which takes the
-> kvm->srcu lock.
+On Fri, Aug 16, 2024 at 07:03:27PM -0600, Yu Zhao wrote:
+> On Fri, Aug 16, 2024 at 6:46 PM Sean Christopherson <seanjc@google.com> wrote:
+
+[...]
+
+> > Were you expecting vCPU runtime to improve (more)?  If so, lack of movement could
+> > be due to KVM arm64 taking mmap_lock for read when handling faults:
+> >
+> > https://lore.kernel.org/all/Zr0ZbPQHVNzmvwa6@google.com
 > 
-> However, this violates the established order where kvm->srcu is
-> taken on a memory fault (such as an MMIO access), possibly
-> followed by taking the config_lock if the GIC emulation requires
-> mutual exclusion from the other vcpus.
-> 
-> [...]
+> For the above test, I don't think it's mmap_lock
 
-Tested this w/ kvm-unit-tests, selftests, and a few VMs on a lockdep kernel.
+Yeah, I don't think this is related to the mmap_lock.
 
-Applied to kvmarm/fixes, thanks!
+James is likely using hardware that has FEAT_HAFDBS, so vCPUs won't
+fault for an Access flag update. Even if he's on a machine w/o it,
+Access flag faults are handled outside the mmap_lock.
 
-[1/1] KVM: arm64: vgic: Don't hold config_lock while unregistering redistributors
-      https://git.kernel.org/kvmarm/kvmarm/c/f616506754d3
+Forcing SW management of the AF at stage-2 would be the best case for
+demonstrating the locking improvement:
 
---
-Best,
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index a24a2a857456..a640e8a8c6ea 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -669,8 +669,6 @@ u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift)
+ 	 * happen to be running on a design that has unadvertised support for
+ 	 * HAFDBS. Here be dragons.
+ 	 */
+-	if (!cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
+-		vtcr |= VTCR_EL2_HA;
+ #endif /* CONFIG_ARM64_HW_AFDBM */
+ 
+ 	if (kvm_lpa2_is_enabled())
+
+Changing the config option would work too, but I wasn't sure if
+FEAT_HAFDBS on the primary MMU influenced MGLRU heuristics.
+
+> -- the reclaim path,
+> e.g., when zswapping guest memory, has two stages: aging (scanning
+> PTEs) and eviction (unmapping PTEs). Only testing the former isn't
+> realistic at all.
+
+AIUI, the intention of this test data is to provide some justification
+for why Marc + I should consider the locking change *outside* of any
+MMU notifier changes. So from that POV, this is meant as a hacked
+up microbenchmark and not meant to be realistic.
+
+And really, the arm64 change has nothing to do with this series at
+this point, which is disappointing. In the interest of moving this
+feature along for both architectures, would you be able help James
+with:
+
+ - Identifying a benchmark that you believe is realistic
+
+ - Suggestions on how to run that benchmark on Google infrastructure
+
+Asking since you had a setup / data earlier on when you were carrying
+the series. Hopefully with supportive data we can get arm64 to opt-in
+to HAVE_KVM_MMU_NOTIFIER_YOUNG_FAST_ONLY as well.
+
+-- 
+Thanks,
 Oliver
