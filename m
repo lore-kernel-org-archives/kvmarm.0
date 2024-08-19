@@ -1,123 +1,82 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 226022AD2C;
-	Mon, 19 Aug 2024 15:14:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB9CD38DE9
+	for <kvmarm@lists.linux.dev>; Mon, 19 Aug 2024 15:20:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724080491; cv=none; b=XSJYua2hnxAhmf0d7klJ9mHbGkiw/z7g+/XO5nNVnRaHNq+FxDReAlBbU8GpKIQYZiilLR3A0zMg25/M4eU85Zdi34R7Wg3FhQHhnkiwvtGDw1MnRdsiBqi3Ib7f0+jB1ZIXSE6a6BIe/SjqM1pEMc+oIwZ6HiXSIaDpHSbGfOo=
+	t=1724080846; cv=none; b=meGkwWg6Xdc694Uii2cMUJKkv29+VYlig/iN+YQZ480cJ5p97ZjwziYaLOEU2hhUGfQRRssPTv4DQ6R/6oSL7odykIu3CSjk7nlFeOxVgbhTAzVppi1rpR0ZQZ59Bh2R64AzsjCsgjWFvrIDgece+SWW8XO/Cjf0bnbR5OtPV3k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724080491; c=relaxed/simple;
-	bh=S8xLhlX6RpZyNHWb7anPniOddgqkLHLd/F+Q/aXteFs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hKHTWfhqPuW3e9FJLuiFsjLXeVfq7k0k5vPZZZd9Lpzzj3w/VOD76l2FzB636Ye4mxIOC+4hBDWA29Mmu9feTeXF3qu00Y3Impg9VsU2WnGlygzJaNHp/q1v3a8utfo+b/lKRXA1cWp4xBfJpNBrF2DcW9IOnokOORNpqq54/VY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lCYk6sau; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lCYk6sau"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33AF7C32782;
-	Mon, 19 Aug 2024 15:14:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724080490;
-	bh=S8xLhlX6RpZyNHWb7anPniOddgqkLHLd/F+Q/aXteFs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lCYk6sauuzGZXdmOUXd2qTfJWvnED9bat34saswazgl+M63wcMrmkDGih3C8kQurA
-	 Y2P6GJV0apLQodqEjQKA4tdHpmZayAUehizPYmJryKzc9k2pe7FjLLsB+nMt+yQu9h
-	 6haqcAo1ROW4FSaTAo1ixtaogoPe/ZoVBT9tJrC3lFtzrBO+EUNak/Eatw3H2Lcpe/
-	 c/nYpouIZebXmyZmxMOP8ewWLGfSRVwk2VIvLTWpC+zyPpx85rnhXiCbZ9E8XxLZ9C
-	 WuivjB335AbSXgBL+2B1hZIrxM8FYBoq6IoTjhDAc4WPE3BbvP3auleWIgXw19OJYa
-	 wCRcfVWJ45ZMA==
-Date: Mon, 19 Aug 2024 16:14:41 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Florian Weimer <fweimer@redhat.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
-	Ross Burton <ross.burton@arm.com>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v10 18/40] arm64/mm: Handle GCS data aborts
-Message-ID: <24d33455-d958-4f27-8a2c-4f237fc2bd29@sirena.org.uk>
-References: <20240801-arm64-gcs-v10-0-699e2bd2190b@kernel.org>
- <20240801-arm64-gcs-v10-18-699e2bd2190b@kernel.org>
- <ZsMNwAsAWr2IxFns@arm.com>
+	s=arc-20240116; t=1724080846; c=relaxed/simple;
+	bh=H/iWQbOFtHgMP/wqC5TO2211vKyUB5vV7KL+6O6khxE=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=HnZCAmHO/0wKw78ACcnad1iwtzkHk9CNRKWvAc+bFHP24vNnl7GdUTzt4dDKOYjSniQ4IN7sq1TVEZEECuIOba1wGhJsW1xCihrwmNSTpsNQMqsPoBkPTMA0CDbVbf85pSYqbifaqLtyaTbeKdLTo6BbL0lmsRED1jqkyiN3Mjs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4WnblM07hrz20m3K;
+	Mon, 19 Aug 2024 23:15:59 +0800 (CST)
+Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
+	by mail.maildlp.com (Postfix) with ESMTPS id A88581A0188;
+	Mon, 19 Aug 2024 23:20:38 +0800 (CST)
+Received: from [10.174.178.219] (10.174.178.219) by
+ kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 19 Aug 2024 23:20:37 +0800
+Subject: Re: [PATCH] KVM: arm64: vgic: Don't hold config_lock while
+ unregistering redistributors
+To: Marc Zyngier <maz@kernel.org>
+CC: <kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton
+	<oliver.upton@linux.dev>
+References: <20240819125045.3474845-1-maz@kernel.org>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <b3e2e05b-7ce1-5bf6-f400-c0dff652796c@huawei.com>
+Date: Mon, 19 Aug 2024 23:20:37 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="4ClE/UJ5laHl8PFo"
-Content-Disposition: inline
-In-Reply-To: <ZsMNwAsAWr2IxFns@arm.com>
-X-Cookie: Interchangeable parts won't.
+In-Reply-To: <20240819125045.3474845-1-maz@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemm600007.china.huawei.com (7.193.23.208)
 
+On 2024/8/19 20:50, Marc Zyngier wrote:
+> We recently moved the teardown of the vgic part of a vcpu inside
+> a critical section guarded by the config_lock. This teardown phase
+> involves calling into kvm_io_bus_unregister_dev(), which takes the
+> kvm->srcu lock.
+> 
+> However, this violates the established order where kvm->srcu is
+> taken on a memory fault (such as an MMIO access), possibly
+> followed by taking the config_lock if the GIC emulation requires
+> mutual exclusion from the other vcpus.
+> 
+> It therefore results in a bad lockdep splat, as reported by Zenghui.
+> 
+> Fix this by moving the call to kvm_io_bus_unregister_dev() outside
+> of the config_lock critical section. At this stage, there shouln't
+> be any need to hold the config_lock.
+> 
+> As an additional bonus, document the ordering between kvm->slots_lock,
+> kvm->srcu and kvm->arch.config_lock so that I cannot pretend I didn't
+> know about those anymore.
+> 
+> Fixes: 9eb18136af9f ("KVM: arm64: vgic: Hold config_lock while tearing down a CPU interface")
+> Reported-by: Zenghui Yu <yuzenghui@huawei.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
---4ClE/UJ5laHl8PFo
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
+Tested-by: Zenghui Yu <yuzenghui@huawei.com>
 
-On Mon, Aug 19, 2024 at 10:17:52AM +0100, Catalin Marinas wrote:
-> On Thu, Aug 01, 2024 at 01:06:45PM +0100, Mark Brown wrote:
-
-> > +static bool is_invalid_gcs_access(struct vm_area_struct *vma, u64 esr)
-> > +{
-
-> > +	if (unlikely(is_gcs_fault(esr))) {
-> > +		/* GCS accesses must be performed on a GCS page */
-> > +		if (!(vma->vm_flags & VM_SHADOW_STACK))
-> > +			return true;
-> > +		if (!(vma->vm_flags & VM_WRITE))
-> > +			return true;
-
-> Do we need the VM_WRITE check here? Further down in do_page_fault(), we
-> already do the check as we set vm_flags = VM_WRITE.
-
-> >       if (!(vma->vm_flags & vm_flags)) {
-> >               vma_end_read(vma);
-> >               fault = 0;
-
-It looks bitrotted, yes.
-
-> I was wondering whether we should prevent mprotect(PROT_READ) on the GCS
-> page. But I guess that's fine, we'll SIGSEGV later if we get an invalid
-> GCS access.
-
-Yeah, that doesn't seem like a particular problem - the concern is
-adding rather than removing GCS.
-
---4ClE/UJ5laHl8PFo
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmbDYWAACgkQJNaLcl1U
-h9CIagf8CVGRJRPIYEL8OXtLlRDHe/BAx31NyJ8PnnV2H/LyZ/HkpxFqkEdopZ2W
-SnomGLDZ/Sbry7VZUUVbO9QNmD/7UinwFR26WOigUY8aHtv/SDsMpx68OMvMPGtp
-aOgTkLDZdZiL3OZbxsdYj24aQ2gywicEb/JxgcqYwclQvQn3geXt9wvBJIZvUqOI
-f9ioaV7/pP5zWb35Kra+jjC2CUxouQ1ozkrxlJhyTT9VM3I4iefpf6eaGmgah7G9
-n5vrIJWkdxaC4B8K/p+Uk/2LJYWdvOho+S1PnJPJloXX/3+dCvveT+3yVcEzT1z0
-73smiFLb21oBkc5wjzRqiGDdQA7z3Q==
-=d5gu
------END PGP SIGNATURE-----
-
---4ClE/UJ5laHl8PFo--
+Thanks,
+Zenghui
