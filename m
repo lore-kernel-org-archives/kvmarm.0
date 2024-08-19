@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63C2C1741F0;
-	Mon, 19 Aug 2024 13:20:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 848A517838D;
+	Mon, 19 Aug 2024 13:20:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724073625; cv=none; b=mjM81N6Q4tI3E1JdIXqXX/eqES2K2ML83ECNyDTGQCPtjmCD7dkWss93gjwBLtEqUxvLWy4a9STvVBA9y534cs1GyNSY/sk4vq/MRr73Iesmh6ZvZCABDOROSgHGLxNGaSVgBSMUz8zWEtpZyneBH0DdEOU2+bpokn0z7Tsf8DY=
+	t=1724073629; cv=none; b=Zes8X0aBFR6lUj026+WaiksdRM7+S3PHIXgV/4rc2ddyrEfl0r0X2ckweAf8I4hx1uT0NWyLUTg/K+2XCvSdu1ODcppSRLukuYFUExF3zWoDZ+ykyPClarHP2RhSqhs9KKTqLd0Q1c8JMLn2+dbx6OnfOO+0wfXaSc2BaHu+GXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724073625; c=relaxed/simple;
-	bh=X9rSIQC9SH0+joSsR6x+uTW2R5jX6hBOUSDo1zmSjFk=;
+	s=arc-20240116; t=1724073629; c=relaxed/simple;
+	bh=Q9AA0bsOlUx9dNmprQGHuNvhKFPzaftwoNqmHHPLeVQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=dtyFHziGKLof1FSj3pd2Sf6U5/vb0WF/voyLfDC5cr1K2e26j8Z5MoJ279lK6Tpsnh/5gMbst++VqTgLE5kvd7mNrHHibIxvMzqheqqrq/TuoGZ5YhXAN1vtcn1JfGVH7MH3x8nUSk2teogVSDQRILgW+UQzWhr7vc20PagRfNA=
+	 MIME-Version; b=KQZ5DAixZZNVsnzivJAbuste9NecEws2P+WPXdKW5ZdfbkDW6RRYManE+n1+ziup+MxT3P2WMB9oLSj3hGbNBhDhBpBUlapbCXVRDOPqdZi9LCFN7fwQYR0qET/+lHL0W6ppO8N8yOxUPrfiB7Gn4563Pwss6PYv4bUV9k0a1AQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1229D339;
-	Mon, 19 Aug 2024 06:20:50 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 344AE1063;
+	Mon, 19 Aug 2024 06:20:54 -0700 (PDT)
 Received: from e122027.arm.com (unknown [10.57.85.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 69F013F73B;
-	Mon, 19 Aug 2024 06:20:20 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6999C3F73B;
+	Mon, 19 Aug 2024 06:20:24 -0700 (PDT)
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -40,9 +40,9 @@ Cc: Steven Price <steven.price@arm.com>,
 	Gavin Shan <gshan@redhat.com>,
 	Shanker Donthineni <sdonthineni@nvidia.com>,
 	Alper Gun <alpergun@google.com>
-Subject: [PATCH v5 10/19] arm64: Override set_fixmap_io
-Date: Mon, 19 Aug 2024 14:19:15 +0100
-Message-Id: <20240819131924.372366-11-steven.price@arm.com>
+Subject: [PATCH v5 11/19] arm64: rsi: Map unprotected MMIO as decrypted
+Date: Mon, 19 Aug 2024 14:19:16 +0100
+Message-Id: <20240819131924.372366-12-steven.price@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240819131924.372366-1-steven.price@arm.com>
 References: <20240819131924.372366-1-steven.price@arm.com>
@@ -56,63 +56,71 @@ Content-Transfer-Encoding: 8bit
 
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-Override the set_fixmap_io to set shared permission for the host
-in case of a CC guest. For now we mark it shared unconditionally.
-
-If/when support for device assignment and device emulation in the realm
-is added in the future then this will need to filter the physical
-address and make the decision accordingly.
+Instead of marking every MMIO as shared, check if the given region is
+"Protected" and apply the permissions accordingly.
 
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
 New patch for v5
 ---
- arch/arm64/include/asm/fixmap.h |  2 ++
- arch/arm64/mm/mmu.c             | 17 +++++++++++++++++
- 2 files changed, 19 insertions(+)
+ arch/arm64/kernel/rsi.c | 15 +++++++++++++++
+ arch/arm64/mm/mmu.c     |  2 +-
+ 2 files changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/fixmap.h b/arch/arm64/include/asm/fixmap.h
-index 87e307804b99..2c20da3a468c 100644
---- a/arch/arm64/include/asm/fixmap.h
-+++ b/arch/arm64/include/asm/fixmap.h
-@@ -108,6 +108,8 @@ void __init early_fixmap_init(void);
- #define __late_clear_fixmap(idx) __set_fixmap((idx), 0, FIXMAP_PAGE_CLEAR)
+diff --git a/arch/arm64/kernel/rsi.c b/arch/arm64/kernel/rsi.c
+index 381a5b9a5333..672dd6862298 100644
+--- a/arch/arm64/kernel/rsi.c
++++ b/arch/arm64/kernel/rsi.c
+@@ -6,6 +6,8 @@
+ #include <linux/jump_label.h>
+ #include <linux/memblock.h>
+ #include <linux/psci.h>
++
++#include <asm/io.h>
+ #include <asm/rsi.h>
  
- extern void __set_fixmap(enum fixed_addresses idx, phys_addr_t phys, pgprot_t prot);
-+#define set_fixmap_io set_fixmap_io
-+void set_fixmap_io(enum fixed_addresses idx, phys_addr_t phys);
- 
- #include <asm-generic/fixmap.h>
- 
-diff --git a/arch/arm64/mm/mmu.c b/arch/arm64/mm/mmu.c
-index 353ea5dc32b8..06b66c23c124 100644
---- a/arch/arm64/mm/mmu.c
-+++ b/arch/arm64/mm/mmu.c
-@@ -1193,6 +1193,23 @@ void vmemmap_free(unsigned long start, unsigned long end,
+ struct realm_config config;
+@@ -93,6 +95,16 @@ bool arm64_rsi_is_protected_mmio(phys_addr_t base, size_t size)
  }
- #endif /* CONFIG_MEMORY_HOTPLUG */
+ EXPORT_SYMBOL(arm64_rsi_is_protected_mmio);
  
-+void set_fixmap_io(enum fixed_addresses idx, phys_addr_t phys)
++static int realm_ioremap_hook(phys_addr_t phys, size_t size, pgprot_t *prot)
 +{
-+	pgprot_t prot = FIXMAP_PAGE_IO;
-+
-+	/*
-+	 * The set_fixmap_io maps a single Page covering phys.
-+	 * To make better decision, we stick to the smallest page
-+	 * size supported (4K).
-+	 */
-+	if (!arm64_is_iomem_private(phys, SZ_4K))
-+		prot = pgprot_decrypted(prot);
++	if (arm64_rsi_is_protected_mmio(phys, size))
++		*prot = pgprot_encrypted(*prot);
 +	else
-+		prot = pgprot_encrypted(prot);
++		*prot = pgprot_decrypted(*prot);
 +
-+	__set_fixmap(idx, phys, prot);
++	return 0;
 +}
 +
- int pud_set_huge(pud_t *pudp, phys_addr_t phys, pgprot_t prot)
+ void __init arm64_rsi_init(void)
  {
- 	pud_t new_pud = pfn_pud(__phys_to_pfn(phys), mk_pud_sect_prot(prot));
+ 	/*
+@@ -107,6 +119,9 @@ void __init arm64_rsi_init(void)
+ 		return;
+ 	prot_ns_shared = BIT(config.ipa_bits - 1);
+ 
++	if (arm64_ioremap_prot_hook_register(realm_ioremap_hook))
++		return;
++
+ 	static_branch_enable(&rsi_present);
+ }
+ 
+diff --git a/arch/arm64/mm/mmu.c b/arch/arm64/mm/mmu.c
+index 06b66c23c124..0c2fa35beca0 100644
+--- a/arch/arm64/mm/mmu.c
++++ b/arch/arm64/mm/mmu.c
+@@ -1207,7 +1207,7 @@ void set_fixmap_io(enum fixed_addresses idx, phys_addr_t phys)
+ 	else
+ 		prot = pgprot_encrypted(prot);
+ 
+-	__set_fixmap(idx, phys, prot);
++	__set_fixmap(idx, phys & PAGE_MASK, prot);
+ }
+ 
+ int pud_set_huge(pud_t *pudp, phys_addr_t phys, pgprot_t prot)
 -- 
 2.34.1
 
