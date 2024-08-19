@@ -1,183 +1,126 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72E1E26AD3;
-	Mon, 19 Aug 2024 15:24:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89F9C13C67C;
+	Mon, 19 Aug 2024 15:44:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724081075; cv=none; b=Tw45/+Iq+kzxFdUWtMhKSVimM2uOIWEbNIOvPyFKkgIAwPxdD5Sp8FcvCgAQIUSwaGEBywvskpCOJMNtLtOcseLBXiyjAUYNHTchEv9S0Vz3ef1rARiJOHx5IM+nEPk9u4NQKDz2V6xK/23p4IoeZJf20z3S/lIeZoe3Il/4kTo=
+	t=1724082292; cv=none; b=k7dmOJMeHnZJTjnGiNEG2l9exTFQjs/yDrst4K3tgkqZvCz50TPxczqoKh0XWEQyW3a3wVg4eQSpfVkDys5gIjjQXiTCE6uvbxynDefr1zdGdlr0f6MUaLgIFeOalgRt8uQ+2HYN5f+GOaEMsUWh5+CaAZbuEyv0o5rsWaMnrLM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724081075; c=relaxed/simple;
-	bh=9SrzYFYWu8XTyOkpWU8KfwdY1kOQ4PufChUBufGqjQE=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EnzM9Z06Yhsab2Lkcq/F6q/rVQIvA51j9V6bEyXhHrilFtwMV64s8Zmz7wmK70c7BZauEB1gz2PQWREN61Ru1yzhr+Y5GVRXlf33jrMHJRepPMdTlDZFIuKR2MaDKeCMGC8NM/cRS1uQT6Keh1YQ+IB80FHzThzDtjJ/vpdx3uo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S1r/cj+i; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1724082292; c=relaxed/simple;
+	bh=9K0lJYsHQSHszMJjX6x7fDt2250JGt/1bnUzF/FZPSc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rBbmFqtR6iDSs0kEclbaG6WQxGVqS1SKeAV8jolYILC/TLOq3j9uJ1E8aTIvVMrD18JKRPdX4pefEUI4JvhBSjVl+bG5f6beIEopfqbkoZBQf0Q9w0dBYHCMvs74txPmrvvlXidtVXcMjnmOK1uEsfbWopduod4P/5Gjpg6veaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jrEBxu+g; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S1r/cj+i"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 452CDC32782;
-	Mon, 19 Aug 2024 15:24:35 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jrEBxu+g"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B65FAC32782;
+	Mon, 19 Aug 2024 15:44:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724081075;
-	bh=9SrzYFYWu8XTyOkpWU8KfwdY1kOQ4PufChUBufGqjQE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=S1r/cj+i/j/Y2h9GHVksnTVsgr0Hom/4Ghqr8HlW9/MjECmiL9CrjkDqewI30ufe4
-	 zqOEXKMR3jOOliR7XDYljdxoAvJaP4GAEzSr8vwSUyTKI8xwLag5JS6DS37NEUZ49h
-	 60Q5L8hpFVCnRUenuNnyBHgV3bRvbWdh2qmN9XAuC3mE5WI8DvvGXiDlkNwHeQENUb
-	 YYYaTKgl5jF0zwwJYSyhqDubEcElzPSYGJt9FS0BoaBxWzeLabsXM3DpOllyyFYRVN
-	 lvHlppSzmYo+tsiaYVRRvpMvJVKZdSwibA8GGoprSXEOC6Kn4f67pKfiSAGKKPoBhJ
-	 jdkJpuBp1a6Sg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sg4FE-004y1j-OU;
-	Mon, 19 Aug 2024 16:24:32 +0100
-Date: Mon, 19 Aug 2024 16:24:31 +0100
-Message-ID: <86y14sy1qo.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Steven Price <steven.price@arm.com>,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
+	s=k20201202; t=1724082292;
+	bh=9K0lJYsHQSHszMJjX6x7fDt2250JGt/1bnUzF/FZPSc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=jrEBxu+g3W/W+F6pOwBR+ng5/r6bUlowypNEQ5XHXHVtCPf0wKbvU4xTgMe9Qetd9
+	 CpxBjhrcQP82vY34DM/oKUpHXTPk2KEebrCDA3E0dMchzEiyt0dca2ruZpP+KvX71Q
+	 NwDog8RMhIViPcZETR41MbRx0xKj/jUc44DG9evJ+m9HP5CRKyjS+M7TufOKn5ciyF
+	 3LWI3TU1CsuCqWTWGOZMfOVKsxB+FXtrKuo0wgw6hyF8PRTBVcGrH8B1mD03k5dX2L
+	 VBG1R7OT29miF6OIF7EC+xeskwwWxFN4tCku3j084T6J6hzY96a0cH2CTJ6UGJaAvl
+	 yKUaOabpdi6/A==
+Date: Mon, 19 Aug 2024 16:44:42 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei
- <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>
-Subject: Re: [PATCH v5 17/19] irqchip/gic-v3-its: Share ITS tables with a non-trusted hypervisor
-In-Reply-To: <beff9162-e1ba-4f72-91ea-329eaed48dbc@arm.com>
-References: <20240819131924.372366-1-steven.price@arm.com>
-	<20240819131924.372366-18-steven.price@arm.com>
-	<beff9162-e1ba-4f72-91ea-329eaed48dbc@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Florian Weimer <fweimer@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
+	Ross Burton <ross.burton@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v10 19/40] arm64/gcs: Context switch GCS state for EL0
+Message-ID: <0f6fd3ec-2481-4507-af0e-3cbbb7406b54@sirena.org.uk>
+References: <20240801-arm64-gcs-v10-0-699e2bd2190b@kernel.org>
+ <20240801-arm64-gcs-v10-19-699e2bd2190b@kernel.org>
+ <ZsMwhdmE_Ai9BbM9@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="RY211L+JHDJI/V3D"
+Content-Disposition: inline
+In-Reply-To: <ZsMwhdmE_Ai9BbM9@arm.com>
+X-Cookie: Interchangeable parts won't.
 
-On Mon, 19 Aug 2024 15:51:00 +0100,
-Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
-> 
-> Hi Steven,
-> 
-> On 19/08/2024 14:19, Steven Price wrote:
-> > Within a realm guest the ITS is emulated by the host. This means the
-> > allocations must have been made available to the host by a call to
-> > set_memory_decrypted(). Introduce an allocation function which performs
-> > this extra call.
-> > 
-> > For the ITT use a custom genpool-based allocator that calls
-> > set_memory_decrypted() for each page allocated, but then suballocates
-> > the size needed for each ITT. Note that there is no mechanism
-> > implemented to return pages from the genpool, but it is unlikely the
-> > peak number of devices will so much larger than the normal level - so
-> > this isn't expected to be an issue.
-> > 
-> 
-> This may not be sufficient to make it future proof. We need to detect if
-> the GIC is private vs shared, before we make the allocation
-> choice. Please see below :
 
-What do you mean by that? Do you foresee a *GICv3* implementation on
-the realm side?
+--RY211L+JHDJI/V3D
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-[...]
+On Mon, Aug 19, 2024 at 12:46:13PM +0100, Catalin Marinas wrote:
+> On Thu, Aug 01, 2024 at 01:06:46PM +0100, Mark Brown wrote:
 
-> How about something like this folded into this patch ? Or if this
-> patch goes in independently, we could carry the following as part of
-> the CCA
-> series.
-> 
-> diff --git a/drivers/irqchip/irq-gic-v3-its.c
-> b/drivers/irqchip/irq-gic-v3-its.c
-> index 6f4ddf7faed1..f1a779b52210 100644
-> --- a/drivers/irqchip/irq-gic-v3-its.c
-> +++ b/drivers/irqchip/irq-gic-v3-its.c
-> @@ -209,7 +209,7 @@ static struct page *its_alloc_pages_node(int node,
-> gfp_t gfp,
-> 
->  	page = alloc_pages_node(node, gfp, order);
-> 
-> -	if (page)
-> +	if (gic_rdists->is_shared && page)
->  		set_memory_decrypted((unsigned long)page_address(page),
->  				     BIT(order));
->  	return page;
-> @@ -222,7 +222,8 @@ static struct page *its_alloc_pages(gfp_t gfp,
-> unsigned int order)
-> 
->  static void its_free_pages(void *addr, unsigned int order)
->  {
-> -	set_memory_encrypted((unsigned long)addr, BIT(order));
-> +	if (gic_rdists->is_shared)
-> +		set_memory_encrypted((unsigned long)addr, BIT(order));
->  	free_pages((unsigned long)addr, order);
->  }
-> 
-> diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
-> index 6fb276504bcc..48c6b2c8dd8c 100644
-> --- a/drivers/irqchip/irq-gic-v3.c
-> +++ b/drivers/irqchip/irq-gic-v3.c
-> @@ -2015,6 +2015,8 @@ static int __init gic_init_bases(phys_addr_t
-> dist_phys_base,
->  	typer = readl_relaxed(gic_data.dist_base + GICD_TYPER);
->  	gic_data.rdists.gicd_typer = typer;
-> 
-> +	gic_data.rdists.is_shared =
-> !arm64_is_iomem_private(gic_data.dist_phys_base,
-> +							    PAGE_SIZE);
+> > +	/*
+> > +	 * Ensure that GCS changes are observable by/from other PEs in
+> > +	 * case of migration.
+> > +	 */
+> > +	if (task_gcs_el0_enabled(current) || task_gcs_el0_enabled(next))
+> > +		gcsb_dsync();
 
-Why would you base the status of the RDs on that of the distributor?
+> Could we do the sysreg writing under this 'if' block? If no app is using
+> GCS (which would be the case for a while), it looks like unnecessary
+> sysreg accesses.
 
->  	gic_enable_quirks(readl_relaxed(gic_data.dist_base + GICD_IIDR),
->  			  gic_quirks, &gic_data);
-> 
-> diff --git a/include/linux/irqchip/arm-gic-v3.h
-> b/include/linux/irqchip/arm-gic-v3.h
-> index 728691365464..1edc33608d52 100644
-> --- a/include/linux/irqchip/arm-gic-v3.h
-> +++ b/include/linux/irqchip/arm-gic-v3.h
-> @@ -631,6 +631,7 @@ struct rdists {
->  	bool			has_rvpeid;
->  	bool			has_direct_lpi;
->  	bool			has_vpend_valid_dirty;
-> +	bool			is_shared;
->  };
-> 
->  struct irq_domain;
-> 
+Yes, that should be fine I think.
 
-I really don't like this.
+> What's the GCSB DSYNC supposed to do here? The Arm ARM talks about
+> ordering between GCS memory effects and other memory effects. I haven't
+> looked at the memory model in detail yet (D11.9.1) but AFAICT it has
+> nothing to do with the system registers. We'll need this barrier when
+> ordering is needed between explicit or implicit (e.g. BL) GCS accesses
+> and the explicit classic memory accesses. Paging comes to mind, so maybe
+> flush_dcache_page() would need this barrier. ptrace() is another case if
+> the memory accessed is a GCS page. I can see you added it in other
+> places, I'll have a look as I go through the rest. But I don't think one
+> is needed here.
 
-If we have to go down the route of identifying whether the GIC needs
-encryption or not based on the platform, then maybe we should bite the
-bullet and treat it as a first class device, given that we expect
-devices to be either realm or non-secure.
+It's not particuarly for the system registers, is there's so that
+anything else that looks at the task's GCS sees the current state.  I'm
+pretty confident this excessive, the goal was to err on the side of
+correctness and then relax later.
 
-Thanks,
+--RY211L+JHDJI/V3D
+Content-Type: application/pgp-signature; name="signature.asc"
 
-	M.
+-----BEGIN PGP SIGNATURE-----
 
--- 
-Without deviation from the norm, progress is not possible.
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmbDaGkACgkQJNaLcl1U
+h9BvXwf/RQT11d03bUvuvD6MuYImODPR+T57Yc5/4X0OndD0EPF5k5PWbkvH//Tw
+ZLgMt2oTPhRGxuAsNqSI3SJndV6cvgGv2BgT8L/c48ftU6TrvwdLiFuEXY6wzpTu
+NcL4WCQ/1U9z74jPkVSAAyyLyhHkjXyzlnlweiOH2IiBaUtoJrq7TcRjAjChMRLG
+noxrNAXiLahjU8QUP1bvQeMrCGWdz4TT/sCHjf8Gwo9kySFe8KOcFH56x4FHt+J4
+xktf7O8cR+W41/Y+T2xSadecOHrdXU8fW2X/6o5252Ims33XJpYsyrzDV42nzv1T
+gKlZCm6EGCD0AKemQ2JTc3fuppNpzw==
+=ff4l
+-----END PGP SIGNATURE-----
+
+--RY211L+JHDJI/V3D--
