@@ -1,136 +1,182 @@
-Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D53D015958A
-	for <kvmarm@lists.linux.dev>; Mon, 19 Aug 2024 20:42:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D95431D54CA;
+	Mon, 19 Aug 2024 22:19:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724100127; cv=none; b=lb0nVr2W8NmY9fi7VNrnG50jsyuyUWGOjqZDs8uyp69anYauaMDjXRI5n6YFSoD7aFjjB05zQ9hqLgTzQ+gSx28mcahon+FMFmJESi5U1CiCCzROkvltO0yb/vzQVQOfyFE+I8Vs3xLFGLYkOKZmc1CGLUjruOdKwgMd/nbHTmc=
+	t=1724105999; cv=none; b=eQdN0DgH27vJaRULVHxVZB/wmSZCCYs71q3aZ+QOSAlI2OZ388XYbr7hzTZ5EZceeY2dO29cHkBnULf5XY3DoJhTHlWgh1qMloc1yBug995GGcfsY6oXl63NueSy6Nble5tKwN9R+hQYmg4meNuBIfupnFZcQfhVE3Htp2ImS8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724100127; c=relaxed/simple;
-	bh=Dt1Ff7fKLLYPfMaJ4kJTzH4evyvUMfCz59lijmotGOk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kuoHFNxbr+VgPb0DbzjP0nUEMB9a4suL9Rtl6aXXmCpU1X8Z0a5tPROpOulyEIo1Z8ar2FO8pGy5n552lQ39ONQ0hZZpMOqTNZyoAwmEY0Eu2XntailjaHqrEJ25xqx0TySvZM9EXWpSQMmecCj4uyT+Hkmv/qYwTckQo5sO1jw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QjckSWmi; arc=none smtp.client-ip=95.215.58.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QjckSWmi"
-Date: Mon, 19 Aug 2024 20:41:52 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1724100121;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9Y168q5crzOyuR0vBXeOnFBth7VvFqg3LAjS8RW/lCM=;
-	b=QjckSWmi/C6logVG6INyLTdl2yFG7ehaLWTfObZBDHmH29dWtGBfep0KYv6Z9gBDYeh9S+
-	B6R9XRrjvorKQxuRIfjSMJWax726Gq0p6dIEjHG9Ct8t5QfdejAKRHlb7mGX73T27kmL/f
-	3zLPC94bHuABE9SXOJjRNTeVEwEQcVA=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Yu Zhao <yuzhao@google.com>
-Cc: Sean Christopherson <seanjc@google.com>,
-	James Houghton <jthoughton@google.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Ankit Agrawal <ankita@nvidia.com>,
-	Axel Rasmussen <axelrasmussen@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	David Matlack <dmatlack@google.com>,
-	David Rientjes <rientjes@google.com>,
-	James Morse <james.morse@arm.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	Shaoqin Huang <shahuang@redhat.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Wei Xu <weixugc@google.com>, Will Deacon <will@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org
-Subject: Re: [PATCH v6 03/11] KVM: arm64: Relax locking for kvm_test_age_gfn
- and kvm_age_gfn
-Message-ID: <ZsOuEP6P0v45ffC0@linux.dev>
-References: <20240724011037.3671523-1-jthoughton@google.com>
- <20240724011037.3671523-4-jthoughton@google.com>
- <CADrL8HV5M-n72KDseDKWpGrUVMjC147Jqz98PxyG2ZeRVbFu8g@mail.gmail.com>
- <Zr_y7Fn63hdowfYM@google.com>
- <CAOUHufYc3hr-+fp14jgEkDN++v6t-z-PRf1yQdKtnje6SgLiiA@mail.gmail.com>
+	s=arc-20240116; t=1724105999; c=relaxed/simple;
+	bh=yG1zQUbI2Ajj4i85UdepG+N4h7adB4AVz6eU8zpAAkk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ffqyVFsjBh9vQ4PhUD58No/P05M8lnbx939CN+SxzLxKjrtdl92pzfz2qf99JIyaNfSrDmB56elXmC7fypD24cndHWMlmQ0tGO0N9qZz0KSyA6ONxU663ysEdZbzajPw+0df10ggZyGQXGB3qwtwhGDXaGnCRXaPXE1MQduUmwc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1B1A6339;
+	Mon, 19 Aug 2024 15:20:22 -0700 (PDT)
+Received: from [10.57.70.210] (unknown [10.57.70.210])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 02B683F58B;
+	Mon, 19 Aug 2024 15:19:52 -0700 (PDT)
+Message-ID: <dccfad5a-cda8-436b-87c9-b588cf790e86@arm.com>
+Date: Mon, 19 Aug 2024 23:19:51 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAOUHufYc3hr-+fp14jgEkDN++v6t-z-PRf1yQdKtnje6SgLiiA@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 17/19] irqchip/gic-v3-its: Share ITS tables with a
+ non-trusted hypervisor
+Content-Language: en-GB
+To: Marc Zyngier <maz@kernel.org>
+Cc: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>
+References: <20240819131924.372366-1-steven.price@arm.com>
+ <20240819131924.372366-18-steven.price@arm.com>
+ <beff9162-e1ba-4f72-91ea-329eaed48dbc@arm.com> <86y14sy1qo.wl-maz@kernel.org>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <86y14sy1qo.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Aug 16, 2024 at 07:03:27PM -0600, Yu Zhao wrote:
-> On Fri, Aug 16, 2024 at 6:46 PM Sean Christopherson <seanjc@google.com> wrote:
+Hi Marc
 
-[...]
-
-> > Were you expecting vCPU runtime to improve (more)?  If so, lack of movement could
-> > be due to KVM arm64 taking mmap_lock for read when handling faults:
-> >
-> > https://lore.kernel.org/all/Zr0ZbPQHVNzmvwa6@google.com
+On 19/08/2024 16:24, Marc Zyngier wrote:
+> On Mon, 19 Aug 2024 15:51:00 +0100,
+> Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+>>
+>> Hi Steven,
+>>
+>> On 19/08/2024 14:19, Steven Price wrote:
+>>> Within a realm guest the ITS is emulated by the host. This means the
+>>> allocations must have been made available to the host by a call to
+>>> set_memory_decrypted(). Introduce an allocation function which performs
+>>> this extra call.
+>>>
+>>> For the ITT use a custom genpool-based allocator that calls
+>>> set_memory_decrypted() for each page allocated, but then suballocates
+>>> the size needed for each ITT. Note that there is no mechanism
+>>> implemented to return pages from the genpool, but it is unlikely the
+>>> peak number of devices will so much larger than the normal level - so
+>>> this isn't expected to be an issue.
+>>>
+>>
+>> This may not be sufficient to make it future proof. We need to detect if
+>> the GIC is private vs shared, before we make the allocation
+>> choice. Please see below :
 > 
-> For the above test, I don't think it's mmap_lock
+> What do you mean by that? Do you foresee a *GICv3* implementation on
+> the realm side?
 
-Yeah, I don't think this is related to the mmap_lock.
+No, but it may be emulated in the Realm World (by a higher privileged 
+component, with future RMM versions with Planes - Plane0) and this
+"Realm guest" may run in a lesser privileged plane and must use
+"protected" accesses to make sure the accesses are seen by the "Realm
+world" emulator.
 
-James is likely using hardware that has FEAT_HAFDBS, so vCPUs won't
-fault for an Access flag update. Even if he's on a machine w/o it,
-Access flag faults are handled outside the mmap_lock.
+> 
+> [...]
+> 
+>> How about something like this folded into this patch ? Or if this
+>> patch goes in independently, we could carry the following as part of
+>> the CCA
+>> series.
+>>
+>> diff --git a/drivers/irqchip/irq-gic-v3-its.c
+>> b/drivers/irqchip/irq-gic-v3-its.c
+>> index 6f4ddf7faed1..f1a779b52210 100644
+>> --- a/drivers/irqchip/irq-gic-v3-its.c
+>> +++ b/drivers/irqchip/irq-gic-v3-its.c
+>> @@ -209,7 +209,7 @@ static struct page *its_alloc_pages_node(int node,
+>> gfp_t gfp,
+>>
+>>   	page = alloc_pages_node(node, gfp, order);
+>>
+>> -	if (page)
+>> +	if (gic_rdists->is_shared && page)
+>>   		set_memory_decrypted((unsigned long)page_address(page),
+>>   				     BIT(order));
+>>   	return page;
+>> @@ -222,7 +222,8 @@ static struct page *its_alloc_pages(gfp_t gfp,
+>> unsigned int order)
+>>
+>>   static void its_free_pages(void *addr, unsigned int order)
+>>   {
+>> -	set_memory_encrypted((unsigned long)addr, BIT(order));
+>> +	if (gic_rdists->is_shared)
+>> +		set_memory_encrypted((unsigned long)addr, BIT(order));
+>>   	free_pages((unsigned long)addr, order);
+>>   }
+>>
+>> diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
+>> index 6fb276504bcc..48c6b2c8dd8c 100644
+>> --- a/drivers/irqchip/irq-gic-v3.c
+>> +++ b/drivers/irqchip/irq-gic-v3.c
+>> @@ -2015,6 +2015,8 @@ static int __init gic_init_bases(phys_addr_t
+>> dist_phys_base,
+>>   	typer = readl_relaxed(gic_data.dist_base + GICD_TYPER);
+>>   	gic_data.rdists.gicd_typer = typer;
+>>
+>> +	gic_data.rdists.is_shared =
+>> !arm64_is_iomem_private(gic_data.dist_phys_base,
+>> +							    PAGE_SIZE);
+> 
+> Why would you base the status of the RDs on that of the distributor?
 
-Forcing SW management of the AF at stage-2 would be the best case for
-demonstrating the locking improvement:
+We expect that, the GIC as a whole is either Realm or non-secure, but
+not split (like most of the devices). The only reason for using rdists
+is because thats shared and available with the ITS driver code. (and
+was an easy hack). Happy to change this to something better.
 
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index a24a2a857456..a640e8a8c6ea 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -669,8 +669,6 @@ u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift)
- 	 * happen to be running on a design that has unadvertised support for
- 	 * HAFDBS. Here be dragons.
- 	 */
--	if (!cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
--		vtcr |= VTCR_EL2_HA;
- #endif /* CONFIG_ARM64_HW_AFDBM */
- 
- 	if (kvm_lpa2_is_enabled())
+> 
+>>   	gic_enable_quirks(readl_relaxed(gic_data.dist_base + GICD_IIDR),
+>>   			  gic_quirks, &gic_data);
+>>
+>> diff --git a/include/linux/irqchip/arm-gic-v3.h
+>> b/include/linux/irqchip/arm-gic-v3.h
+>> index 728691365464..1edc33608d52 100644
+>> --- a/include/linux/irqchip/arm-gic-v3.h
+>> +++ b/include/linux/irqchip/arm-gic-v3.h
+>> @@ -631,6 +631,7 @@ struct rdists {
+>>   	bool			has_rvpeid;
+>>   	bool			has_direct_lpi;
+>>   	bool			has_vpend_valid_dirty;
+>> +	bool			is_shared;
+>>   };
+>>
+>>   struct irq_domain;
+>>
+> 
+> I really don't like this.
+> 
+> If we have to go down the route of identifying whether the GIC needs
+> encryption or not based on the platform, then maybe we should bite the
+> bullet and treat it as a first class device, given that we expect
+> devices to be either realm or non-secure.
 
-Changing the config option would work too, but I wasn't sure if
-FEAT_HAFDBS on the primary MMU influenced MGLRU heuristics.
+Agreed and that is exactly we would like. i.e., treat the GIC as either
+Realm or NS (as a whole). Now, how do we make that decision is based on
+whether GIC Distributor area is private or not. Like I mentioned above, 
+we need a cleaner way of making this available in the ITS driver.
 
-> -- the reclaim path,
-> e.g., when zswapping guest memory, has two stages: aging (scanning
-> PTEs) and eviction (unmapping PTEs). Only testing the former isn't
-> realistic at all.
+Thoughts ? Is that what you were hinting at ?
 
-AIUI, the intention of this test data is to provide some justification
-for why Marc + I should consider the locking change *outside* of any
-MMU notifier changes. So from that POV, this is meant as a hacked
-up microbenchmark and not meant to be realistic.
+Suzuki
 
-And really, the arm64 change has nothing to do with this series at
-this point, which is disappointing. In the interest of moving this
-feature along for both architectures, would you be able help James
-with:
 
- - Identifying a benchmark that you believe is realistic
+> Thanks,
+> 
+> 	M.
+> 
 
- - Suggestions on how to run that benchmark on Google infrastructure
-
-Asking since you had a setup / data earlier on when you were carrying
-the series. Hopefully with supportive data we can get arm64 to opt-in
-to HAVE_KVM_MMU_NOTIFIER_YOUNG_FAST_ONLY as well.
-
--- 
-Thanks,
-Oliver
