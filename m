@@ -1,51 +1,73 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DAD116B3BD;
-	Mon, 19 Aug 2024 12:04:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F382116132E
+	for <kvmarm@lists.linux.dev>; Mon, 19 Aug 2024 12:19:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724069066; cv=none; b=ENeXTlbqBagGHKtmMV26Xtf+HppGMhU2r+UEr95OzF1X2wajo63aR+Ajxej1tUrtgcNfuEJlvZKilv7gfXWX9LyRyRE8J2p8ovcwmy4+JzB2ylYHTPVac5/56LZacbk4onAtIDOuL5UweR+b8o4sQ8S+I9RKdmQkwuzMqtYpj18=
+	t=1724069944; cv=none; b=hIAv/cYE+fRN65Wxg7FDqvjk4LNf0FlMbfpT9vi9R7nBXY0K4phn86wXJi+xJMhQSzEaR+GhwsZ63paROZgrGMp+GjbsuD6GL7LDvraVjlWNFLIbaLao+gFQ5XE7qH3es534Y7gaJG2PwiMALWn/EIjy7OW6q/Qs4A2AxhGTpMo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724069066; c=relaxed/simple;
-	bh=aOsW0+lWbeQKqbvgTx+i39YwF3O+mmvE/GLBzRh1v3A=;
+	s=arc-20240116; t=1724069944; c=relaxed/simple;
+	bh=OVUuDphKRX+9NR8bK/07mU2BsYGjbieYyOKc83Tblc8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d9N0Za9c6vpOKaZG7ajess+6kN1mhbdDBTn7ueq2x/Uq+y7vn5BQ08iN7eaTRfdGtQ030Le/0+wMoi7UTL1thAP/om80Wy6eysTr1SohwsmZ7uEZJ+ci4IF9iXk0lxWdhldwg67xUqTl91aBU3pCjAVWcjqYjxMHXWidGDS+Ii8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 949ABC32782;
-	Mon, 19 Aug 2024 12:04:20 +0000 (UTC)
-Date: Mon, 19 Aug 2024 13:04:18 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Mark Brown <broonie@kernel.org>
-Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Florian Weimer <fweimer@redhat.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
-	Ross Burton <ross.burton@arm.com>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v10 20/40] arm64/gcs: Ensure that new threads have a GCS
-Message-ID: <ZsM0wkRRguMchecK@arm.com>
-References: <20240801-arm64-gcs-v10-0-699e2bd2190b@kernel.org>
- <20240801-arm64-gcs-v10-20-699e2bd2190b@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=oBi6m62jGj4A2qfSTK2qp1xwbTyBNxdnGZBXQEFos+R/Zw4V4xU5Td7fiuwcIw7DBEk+mfnrO+LkHfjzjkXmF99dRnf608m1iXxaX+1Zv85y60jmzYBhxgEOxg66xGJeVuZQIXl7owiOvZkdK+kc90ygwq0jMrYy7bsQSNIDhIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0xN76EFX; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0xN76EFX"
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5bebc830406so8141a12.0
+        for <kvmarm@lists.linux.dev>; Mon, 19 Aug 2024 05:19:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1724069941; x=1724674741; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Db4hN2w3m7INit2SBeLbUeRnILkMZrxR2DmZlcKp+hU=;
+        b=0xN76EFX+jW2ud5UcfD9MGdYkEKE1NO61tWVyMAI8g0/F576aLogr0UqDETNLosbw8
+         FnP6PImuPstkgfz0GdMeDEQKMxNACs3xepvqg+tqCbkxUdDWjENTXRUe9KmSu5owcvlu
+         Qkb1BtkOUk9QuTr6QMg2XPbFnydmVTGlb3oAp1Gl+CyygVyBHubCjCjLluZskrANceiE
+         XnQlOSmNSLsGzvP9Gse/gXa7aPLq67VZedBQ8V1oYfekop3QwjVHuvyh8oDozlSddpK8
+         ze/4aB00N6qsbtwZL4P3dC7Rpj6xAzY97ZqCvWMUDNTuzVJfmOws0a02laDIwS+ia3YB
+         7fTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724069941; x=1724674741;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Db4hN2w3m7INit2SBeLbUeRnILkMZrxR2DmZlcKp+hU=;
+        b=r/cSkkJM5VvVT4xBc4QbIOOlkXoU3vAGxYhd5zguHrNAddu/4AIwjDOn6mk5Z+AOtV
+         cnT3/Q55i0G3TBSSsFwYtafZJ2BHGnMOOwoi5wddFFlASqP+V4wRFDcFpSmfgf90jlYb
+         nws7Y/xCofzuTLxYXauIfDy2KLs9eZGNEQF3/P7o12w7hVuri49MISqNW52j5I/6EYdv
+         lCGJhd6iG7DC+1cBgkGGdeZd+9Zt8TqYP7e+yQlBuUKemUHpzc0ljDq/76IsSRJaJWWR
+         fixn+5tI5FpUKoIEYEqzFXPcaTsiJUI9YDZr+/EuF5rXZIdp7ZgDJAfOhfMU3fmdwcjl
+         L7xw==
+X-Forwarded-Encrypted: i=1; AJvYcCWJeoNjokk+ky+8ghBL2MrzUV1eoAIefNufO/CE7OlRmr8SOwWRpiHGSVepzA7pbn4JEThCJUk=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxitioBtmFkwHlzQbMxaOk+kj4xIrDUGGmZfQjdT28taG29KI1Z
+	Xoz9++U0ab55XG8sa9iuYMZLvr4Q2JqFHKg3HRvkcascrQ9XjdZvyQs4nhHSyg==
+X-Google-Smtp-Source: AGHT+IEoH4NgDY0zYg9fqa4QM4SVY1O10WJ1j4848W30tFwb35xVV/g6Yfo36yCo36vqfTQ8XhRfwQ==
+X-Received: by 2002:a05:6402:348f:b0:5b8:ccae:a8b8 with SMTP id 4fb4d7f45d1cf-5bede24bf57mr84286a12.3.1724069940865;
+        Mon, 19 Aug 2024 05:19:00 -0700 (PDT)
+Received: from google.com (44.232.78.34.bc.googleusercontent.com. [34.78.232.44])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37189857069sm10401322f8f.47.2024.08.19.05.18.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Aug 2024 05:18:59 -0700 (PDT)
+Date: Mon, 19 Aug 2024 12:18:57 +0000
+From: Sebastian Ene <sebastianene@google.com>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: akpm@linux-foundation.org, alexghiti@rivosinc.com, ankita@nvidia.com,
+	ardb@kernel.org, catalin.marinas@arm.com,
+	christophe.leroy@csgroup.eu, james.morse@arm.com,
+	mark.rutland@arm.com, maz@kernel.org, oliver.upton@linux.dev,
+	rananta@google.com, ryan.roberts@arm.com, shahuang@redhat.com,
+	suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, kernel-team@android.com
+Subject: Re: [PATCH v8 5/6] KVM: arm64: Initialize the ptdump parser with
+ stage-2 attributes
+Message-ID: <ZsM4MacbOe7GLIKl@google.com>
+References: <20240816123906.3683425-1-sebastianene@google.com>
+ <20240816123906.3683425-6-sebastianene@google.com>
+ <ZsMeQ8nAZLDhsBmA@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -54,108 +76,96 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240801-arm64-gcs-v10-20-699e2bd2190b@kernel.org>
+In-Reply-To: <ZsMeQ8nAZLDhsBmA@google.com>
 
-On Thu, Aug 01, 2024 at 01:06:47PM +0100, Mark Brown wrote:
-> diff --git a/arch/arm64/kernel/process.c b/arch/arm64/kernel/process.c
-> index 5f00cb0da9c3..d6d3a96cf2e4 100644
-> --- a/arch/arm64/kernel/process.c
-> +++ b/arch/arm64/kernel/process.c
-> @@ -285,9 +285,32 @@ static void flush_gcs(void)
->  	write_sysreg_s(0, SYS_GCSPR_EL0);
->  }
->  
-> +static int copy_thread_gcs(struct task_struct *p,
-> +			   const struct kernel_clone_args *args)
-> +{
-> +	unsigned long gcs;
-> +
-> +	gcs = gcs_alloc_thread_stack(p, args);
-> +	if (IS_ERR_VALUE(gcs))
-> +		return PTR_ERR((void *)gcs);
+On Mon, Aug 19, 2024 at 11:28:19AM +0100, Vincent Donnefort wrote:
+> 
+> [...]
+> 
+> > +static int kvm_ptdump_build_levels(struct ptdump_pg_level *level, u32 start_lvl)
+> > +{
+> > +	static const char * const level_names[] = {"PGD", "PUD", "PMD", "PTE"};
+> > +	u32 i = 0;
+> > +	u64 mask = 0;
+> > +
+> > +	if (start_lvl > 2) {
+> > +		pr_err("invalid start_lvl %u\n", start_lvl);
+> > +		return -EINVAL;
+> > +	}
+> 
+> It looks like a duplicate of the if below.
 
-Is 0 an ok value here? I can see further down that
-gcs_alloc_thread_stack() may return 0.
+I will drop this.
 
-> +
-> +	p->thread.gcs_el0_mode = current->thread.gcs_el0_mode;
-> +	p->thread.gcs_el0_locked = current->thread.gcs_el0_locked;
-> +
-> +	/* Ensure the current state of the GCS is seen by CoW */
-> +	gcsb_dsync();
+> 
+> > +
+> > +	if (WARN_ON_ONCE(start_lvl >= KVM_PGTABLE_LAST_LEVEL))
+> > +		return -EINVAL;
+> > +
+> > +	for (i = 0; i < ARRAY_SIZE(stage2_pte_bits); i++)
+> > +		mask |= stage2_pte_bits[i].mask;
+> > +
+> > +	for (i = start_lvl; i < KVM_PGTABLE_MAX_LEVELS; i++) {
+> > +		strscpy(level[i].name, level_names[i], sizeof(level[i].name));
+> > +
+> > +		level[i].num	= ARRAY_SIZE(stage2_pte_bits);
+> > +		level[i].bits	= stage2_pte_bits;
+> > +		level[i].mask	= mask;
+> > +	}
+> > +
+> > +	if (start_lvl > 0)
+> > +		strscpy(level[start_lvl].name, "PGD", sizeof(level[start_lvl].name));
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +static struct kvm_ptdump_guest_state
+> > +*kvm_ptdump_parser_init(struct kvm *kvm)
+> 
+> nit: I guess it's more a "create" than an "init" as we allocate the memory.
 
-I don't get this barrier. What does it have to do with CoW, which memory
-effects is it trying to order?
+Yes, that should work as well.
 
-> diff --git a/arch/arm64/mm/gcs.c b/arch/arm64/mm/gcs.c
-> index b0a67efc522b..b71f6b408513 100644
-> --- a/arch/arm64/mm/gcs.c
-> +++ b/arch/arm64/mm/gcs.c
-> @@ -8,6 +8,138 @@
->  #include <asm/cpufeature.h>
->  #include <asm/page.h>
->  
-> +static unsigned long alloc_gcs(unsigned long addr, unsigned long size)
-> +{
-> +	int flags = MAP_ANONYMOUS | MAP_PRIVATE;
-> +	struct mm_struct *mm = current->mm;
-> +	unsigned long mapped_addr, unused;
-> +
-> +	if (addr)
-> +		flags |= MAP_FIXED_NOREPLACE;
-> +
-> +	mmap_write_lock(mm);
-> +	mapped_addr = do_mmap(NULL, addr, size, PROT_READ, flags,
-> +			      VM_SHADOW_STACK | VM_WRITE, 0, &unused, NULL);
-> +	mmap_write_unlock(mm);
-> +
-> +	return mapped_addr;
-> +}
-> +
-> +static unsigned long gcs_size(unsigned long size)
-> +{
-> +	if (size)
-> +		return PAGE_ALIGN(size);
-> +
-> +	/* Allocate RLIMIT_STACK/2 with limits of PAGE_SIZE..2G */
-> +	size = PAGE_ALIGN(min_t(unsigned long long,
-> +				rlimit(RLIMIT_STACK) / 2, SZ_2G));
-> +	return max(PAGE_SIZE, size);
-> +}
+> 
+> > +{
+> > +	struct kvm_ptdump_guest_state *st;
+> > +	struct kvm_s2_mmu *mmu = &kvm->arch.mmu;
+> > +	struct kvm_pgtable *pgtable = mmu->pgt;
+> > +	int ret;
+> > +
+> > +	st = kzalloc(sizeof(struct kvm_ptdump_guest_state), GFP_KERNEL_ACCOUNT);
+> > +	if (!st)
+> > +		return NULL;
+> 
+> return ERR_PTR(-ENOMEM); ?
 
-So we still have RLIMIT_STACK/2. I thought we got rid of that and just
-went with RLIMIT_STACK (or I misremember).
+Yep, we can encode the ENOMEM in the ptr.
 
-> +
-> +static bool gcs_consume_token(struct mm_struct *mm, unsigned long user_addr)
-> +{
-> +	u64 expected = GCS_CAP(user_addr);
-> +	u64 val;
-> +	int ret;
-> +
-> +	/* This should really be an atomic cmpxchg.  It is not. */
-> +	ret = access_remote_vm(mm, user_addr, &val, sizeof(val),
-> +			       FOLL_FORCE);
-> +	if (ret != sizeof(val))
-> +		return false;
-> +
-> +	if (val != expected)
-> +		return false;
-> +
-> +	val = 0;
-> +	ret = access_remote_vm(mm, user_addr, &val, sizeof(val),
-> +			       FOLL_FORCE | FOLL_WRITE);
-> +	if (ret != sizeof(val))
-> +		return false;
-> +
-> +	return true;
-> +}
+> 
+> > +
+> > +	ret = kvm_ptdump_build_levels(&st->level[0], pgtable->start_level);
+> > +	if (ret) {
+> > +		kfree(st);
+> > +		return ERR_PTR(ret);
+> > +	}
+> > +
+> > +	st->ipa_marker[0].name		= "Guest IPA";
+> > +	st->ipa_marker[1].start_address = BIT(pgtable->ia_bits);
+> > +	st->range[0].end		= BIT(pgtable->ia_bits);
+> > +
+> > +	st->kvm				= kvm;
+> > +	st->parser_state = (struct ptdump_pg_state) {
+> > +		.marker		= &st->ipa_marker[0],
+> > +		.level		= -1,
+> > +		.pg_level	= &st->level[0],
+> > +		.ptdump.range	= &st->range[0],
+> > +	};
+> > +
+> > +	return st;
+> > +}
+> > +
+> 
+> [...]
 
-As per the clone3() thread, I think we should try to use
-get_user_page_vma_remote() and do a cmpxchg() directly.
-
-How does the user write the initial token? Do we need any barriers
-before/after consuming the token?
-
--- 
-Catalin
+Thanks,
+Seb
