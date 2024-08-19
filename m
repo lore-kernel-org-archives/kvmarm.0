@@ -1,22 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEA9816C680;
-	Mon, 19 Aug 2024 13:19:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6665416C857;
+	Mon, 19 Aug 2024 13:19:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724073584; cv=none; b=CDFP1sS43SeTN8ci8G89J1iETu8SYjt6YB8z2+x36WCilchwFaZFx+Ftg4gfhCP7kar1TcI4xNgomGcSPuYYHVKiiLT9YFJaB1yntVT+E4jJdNWg0of51bgCdJSXzaVKYF9KdI4q+X32XUTUZeNkbx0NGERJyOKwsVk7l8jjbzM=
+	t=1724073587; cv=none; b=A0MVruIXOZlsvdsbIm480d38Pzla+T/iBkSe3+h+eQKeixpH0VvXoosaELC6uUBS7LGFxI2cCuE8WciMa55cM+T25eUnMCOgOTDrzaB7PfOmEDYo+Zkx7UBoNrtJfw/gyHOmv43mguKNt+Vsbo18KH6TcihVaE3IUKBJTdq0pNE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724073584; c=relaxed/simple;
-	bh=q7n4yox1qlvnzKsPcwva4ELTO5183R23ss6XmWPQJUE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=du1/yx4npMknjjaKQDeChxWtVDGUIeN9wOlK1h0l2jEDUJ0fpry4Pp41sjflLFpOzg9ljoVJubZZDy0ygtEorGUcK/T1xAmkk0AErCIC7+CNkZluXby7QP4W6Nj3WH+H/6yBtioW/LjJgdPDMOcQwkJ1fnGuGkcSGXEO7mRhU/M=
+	s=arc-20240116; t=1724073587; c=relaxed/simple;
+	bh=JsStGkCgNb6gy2BWmOepJzcY7eBBGSwzX/ny0Aat0xU=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=b0E9D1pgTHhIQDSM/x/3X13HHpdmnbmtJzBMiEWrFdZaBg1SQyhD+Sy2fAGgxCOFNBcwjxEB3YKKdAos9kfPvuZySZNF7VVDRQbNCkFNMk15QTGRXv3ZW7MinCetFiM2l398d+FMNmnU85ynDN4WPsqRzpTxFCsQhOkYPEwmQ/I=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4372A339;
-	Mon, 19 Aug 2024 06:20:07 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D68C11063;
+	Mon, 19 Aug 2024 06:20:11 -0700 (PDT)
 Received: from e122027.arm.com (unknown [10.57.85.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 33A913F73B;
-	Mon, 19 Aug 2024 06:19:37 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A21603F73B;
+	Mon, 19 Aug 2024 06:19:41 -0700 (PDT)
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -39,10 +40,12 @@ Cc: Steven Price <steven.price@arm.com>,
 	Gavin Shan <gshan@redhat.com>,
 	Shanker Donthineni <sdonthineni@nvidia.com>,
 	Alper Gun <alpergun@google.com>
-Subject: [PATCH v5 00/19] arm64: Support for running as a guest in Arm CCA
-Date: Mon, 19 Aug 2024 14:19:05 +0100
-Message-Id: <20240819131924.372366-1-steven.price@arm.com>
+Subject: [PATCH v5 01/19] arm64: mm: Add top-level dispatcher for internal mem_encrypt API
+Date: Mon, 19 Aug 2024 14:19:06 +0100
+Message-Id: <20240819131924.372366-2-steven.price@arm.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240819131924.372366-1-steven.price@arm.com>
+References: <20240819131924.372366-1-steven.price@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -51,128 +54,143 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series adds support for running Linux in a protected VM under the
-Arm Confidential Compute Architecture (CCA). This has been updated
-following the feedback from the v4 posting[1]. Thanks for the feedback!
-Individual patches have a change log. But things to highlight:
+From: Will Deacon <will@kernel.org>
 
- * New RMM spec version[2] (v1.0-rel0-rc1). Note that this makes a
-   number of (small) breaking changes so you will need to update the RMM
-   and host too (see below).
+Implementing the internal mem_encrypt API for arm64 depends entirely on
+the Confidential Computing environment in which the kernel is running.
 
- * 'Borrowed' two commits by Will from the pKVM series which add a
-   dispatcher/hook for mem_encrypt and ioremap. These will hopefully
-   make it easier for CCA to live alongside pKVM.
+Introduce a simple dispatcher so that backend hooks can be registered
+depending upon the environment in which the kernel finds itself.
 
- * Reworked the code for handling protected/shared MMIO. The new RMM
-   spec adds a new state (RIPAS_IO - although that may get renamed),
-   which is currently unused, but will be used in a later version to
-   signify that a granule is backed by a protected hardware MMIO region.
-   Using this we can now identify whether the top bit should be set when
-   performing an ioremap (or similar).
-
-The ABI to the RMM from a realm (the RSI) is based on the RMM
-v1.0-rel0-rc1 specification[2]. Future RMM specifications after v1.0
-will be backwards compatible so a guest using the v1.0 specification
-(i.e. this series) will be able to run on future versions of the RMM
-without modification.
-
-This series is based on v6.11-rc1. It is also available as a git
-repository:
-
-https://gitlab.arm.com/linux-arm/linux-cca cca-guest/v5
-
-As mentioned above the new RMM specification means that corresponding
-changes need to be made in the RMM, at this time these changes are still
-in review (see 'topics/rmm-1.0-rel0-rc1'). So you'll need to fetch the
-changes[3] from the gerrit instance until they are pushed to the main
-branch.
-
-It has also been pointed out that some documentation would be a good
-idea - I'm afraid it hasn't made this version, but I didn't want to hold
-off posting for any longer.
-
-The new version of the RMM also means you'll need to update the host
-support, a v4 of the host changes will be posted soon, in the mean time
-the code is available from git here:
-
-https://gitlab.arm.com/linux-arm/linux-cca cca-host/v4
-
-[1] https://lore.kernel.org/r/20240701095505.165383-1-steven.price%40arm.com
-[2] https://developer.arm.com/-/cdn-downloads/permalink/PDF/Architectures/DEN0137_1.0-rel0-rc1_rmm-arch_external.pdf
-[3] https://review.trustedfirmware.org/c/TF-RMM/tf-rmm/+/30485
-
-Jean-Philippe Brucker (1):
-  firmware/psci: Add psci_early_test_conduit()
-
-Sami Mujawar (1):
-  virt: arm-cca-guest: TSM_REPORT support for realms
-
-Steven Price (6):
-  arm64: realm: Query IPA size from the RMM
-  arm64: Make the PHYS_MASK_SHIFT dynamic
-  arm64: Enforce bounce buffers for realm DMA
-  arm64: mm: Avoid TLBI when marking pages as valid
-  irqchip/gic-v3-its: Share ITS tables with a non-trusted hypervisor
-  irqchip/gic-v3-its: Rely on genpool alignment
-
-Suzuki K Poulose (9):
-  arm64: rsi: Add RSI definitions
-  arm64: Detect if in a realm and set RIPAS RAM
-  arm64: rsi: Add support for checking whether an MMIO is protected
-  fixmap: Allow architecture overriding set_fixmap_io
-  fixmap: Pass down the full phys address for set_fixmap_io
-  arm64: Override set_fixmap_io
-  arm64: rsi: Map unprotected MMIO as decrypted
-  efi: arm64: Map Device with Prot Shared
-  arm64: Enable memory encrypt for Realms
-
-Will Deacon (2):
-  arm64: mm: Add top-level dispatcher for internal mem_encrypt API
-  arm64: mm: Add confidential computing hook to ioremap_prot()
-
- arch/arm64/Kconfig                            |   4 +
- arch/arm64/include/asm/fixmap.h               |   2 +
- arch/arm64/include/asm/io.h                   |  12 +
- arch/arm64/include/asm/mem_encrypt.h          |  24 ++
- arch/arm64/include/asm/pgtable-hwdef.h        |   6 -
- arch/arm64/include/asm/pgtable-prot.h         |   4 +
- arch/arm64/include/asm/pgtable.h              |  10 +
- arch/arm64/include/asm/rsi.h                  |  68 ++++++
- arch/arm64/include/asm/rsi_cmds.h             | 157 +++++++++++++
- arch/arm64/include/asm/rsi_smc.h              | 189 ++++++++++++++++
- arch/arm64/include/asm/set_memory.h           |   4 +
- arch/arm64/kernel/Makefile                    |   3 +-
- arch/arm64/kernel/efi.c                       |  12 +-
- arch/arm64/kernel/rsi.c                       | 149 +++++++++++++
- arch/arm64/kernel/setup.c                     |   8 +
- arch/arm64/mm/Makefile                        |   2 +-
- arch/arm64/mm/init.c                          |  10 +-
- arch/arm64/mm/ioremap.c                       |  23 +-
- arch/arm64/mm/mem_encrypt.c                   |  50 +++++
- arch/arm64/mm/mmu.c                           |  17 ++
- arch/arm64/mm/pageattr.c                      |  84 ++++++-
- drivers/firmware/psci/psci.c                  |  25 +++
- drivers/irqchip/irq-gic-v3-its.c              | 142 +++++++++---
- drivers/tty/serial/earlycon.c                 |   2 +-
- drivers/virt/coco/Kconfig                     |   2 +
- drivers/virt/coco/Makefile                    |   1 +
- drivers/virt/coco/arm-cca-guest/Kconfig       |  11 +
- drivers/virt/coco/arm-cca-guest/Makefile      |   2 +
- .../virt/coco/arm-cca-guest/arm-cca-guest.c   | 211 ++++++++++++++++++
- include/asm-generic/fixmap.h                  |   4 +-
- include/linux/psci.h                          |   5 +
- 31 files changed, 1200 insertions(+), 43 deletions(-)
+Signed-off-by: Will Deacon <will@kernel.org>
+Signed-off-by: Steven Price <steven.price@arm.com>
+---
+Patch 'borrowed' from Will's series for pKVM:
+https://lore.kernel.org/r/20240730151113.1497-4-will%40kernel.org
+---
+ arch/arm64/Kconfig                   |  1 +
+ arch/arm64/include/asm/mem_encrypt.h | 15 +++++++++
+ arch/arm64/include/asm/set_memory.h  |  1 +
+ arch/arm64/mm/Makefile               |  2 +-
+ arch/arm64/mm/mem_encrypt.c          | 50 ++++++++++++++++++++++++++++
+ 5 files changed, 68 insertions(+), 1 deletion(-)
  create mode 100644 arch/arm64/include/asm/mem_encrypt.h
- create mode 100644 arch/arm64/include/asm/rsi.h
- create mode 100644 arch/arm64/include/asm/rsi_cmds.h
- create mode 100644 arch/arm64/include/asm/rsi_smc.h
- create mode 100644 arch/arm64/kernel/rsi.c
  create mode 100644 arch/arm64/mm/mem_encrypt.c
- create mode 100644 drivers/virt/coco/arm-cca-guest/Kconfig
- create mode 100644 drivers/virt/coco/arm-cca-guest/Makefile
- create mode 100644 drivers/virt/coco/arm-cca-guest/arm-cca-guest.c
 
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index b3fc891f1544..68d77a2f4d1a 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -34,6 +34,7 @@ config ARM64
+ 	select ARCH_HAS_KERNEL_FPU_SUPPORT if KERNEL_MODE_NEON
+ 	select ARCH_HAS_KEEPINITRD
+ 	select ARCH_HAS_MEMBARRIER_SYNC_CORE
++	select ARCH_HAS_MEM_ENCRYPT
+ 	select ARCH_HAS_NMI_SAFE_THIS_CPU_OPS
+ 	select ARCH_HAS_NON_OVERLAPPING_ADDRESS_SPACE
+ 	select ARCH_HAS_PTE_DEVMAP
+diff --git a/arch/arm64/include/asm/mem_encrypt.h b/arch/arm64/include/asm/mem_encrypt.h
+new file mode 100644
+index 000000000000..b0c9a86b13a4
+--- /dev/null
++++ b/arch/arm64/include/asm/mem_encrypt.h
+@@ -0,0 +1,15 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++#ifndef __ASM_MEM_ENCRYPT_H
++#define __ASM_MEM_ENCRYPT_H
++
++struct arm64_mem_crypt_ops {
++	int (*encrypt)(unsigned long addr, int numpages);
++	int (*decrypt)(unsigned long addr, int numpages);
++};
++
++int arm64_mem_crypt_ops_register(const struct arm64_mem_crypt_ops *ops);
++
++int set_memory_encrypted(unsigned long addr, int numpages);
++int set_memory_decrypted(unsigned long addr, int numpages);
++
++#endif	/* __ASM_MEM_ENCRYPT_H */
+diff --git a/arch/arm64/include/asm/set_memory.h b/arch/arm64/include/asm/set_memory.h
+index 0f740b781187..917761feeffd 100644
+--- a/arch/arm64/include/asm/set_memory.h
++++ b/arch/arm64/include/asm/set_memory.h
+@@ -3,6 +3,7 @@
+ #ifndef _ASM_ARM64_SET_MEMORY_H
+ #define _ASM_ARM64_SET_MEMORY_H
+ 
++#include <asm/mem_encrypt.h>
+ #include <asm-generic/set_memory.h>
+ 
+ bool can_set_direct_map(void);
+diff --git a/arch/arm64/mm/Makefile b/arch/arm64/mm/Makefile
+index 60454256945b..2fc8c6dd0407 100644
+--- a/arch/arm64/mm/Makefile
++++ b/arch/arm64/mm/Makefile
+@@ -1,7 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0
+ obj-y				:= dma-mapping.o extable.o fault.o init.o \
+ 				   cache.o copypage.o flush.o \
+-				   ioremap.o mmap.o pgd.o mmu.o \
++				   ioremap.o mmap.o pgd.o mem_encrypt.o mmu.o \
+ 				   context.o proc.o pageattr.o fixmap.o
+ obj-$(CONFIG_ARM64_CONTPTE)	+= contpte.o
+ obj-$(CONFIG_HUGETLB_PAGE)	+= hugetlbpage.o
+diff --git a/arch/arm64/mm/mem_encrypt.c b/arch/arm64/mm/mem_encrypt.c
+new file mode 100644
+index 000000000000..ee3c0ab04384
+--- /dev/null
++++ b/arch/arm64/mm/mem_encrypt.c
+@@ -0,0 +1,50 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Implementation of the memory encryption/decryption API.
++ *
++ * Since the low-level details of the operation depend on the
++ * Confidential Computing environment (e.g. pKVM, CCA, ...), this just
++ * acts as a top-level dispatcher to whatever hooks may have been
++ * registered.
++ *
++ * Author: Will Deacon <will@kernel.org>
++ * Copyright (C) 2024 Google LLC
++ *
++ * "Hello, boils and ghouls!"
++ */
++
++#include <linux/bug.h>
++#include <linux/compiler.h>
++#include <linux/err.h>
++#include <linux/mm.h>
++
++#include <asm/mem_encrypt.h>
++
++static const struct arm64_mem_crypt_ops *crypt_ops;
++
++int arm64_mem_crypt_ops_register(const struct arm64_mem_crypt_ops *ops)
++{
++	if (WARN_ON(crypt_ops))
++		return -EBUSY;
++
++	crypt_ops = ops;
++	return 0;
++}
++
++int set_memory_encrypted(unsigned long addr, int numpages)
++{
++	if (likely(!crypt_ops) || WARN_ON(!PAGE_ALIGNED(addr)))
++		return 0;
++
++	return crypt_ops->encrypt(addr, numpages);
++}
++EXPORT_SYMBOL_GPL(set_memory_encrypted);
++
++int set_memory_decrypted(unsigned long addr, int numpages)
++{
++	if (likely(!crypt_ops) || WARN_ON(!PAGE_ALIGNED(addr)))
++		return 0;
++
++	return crypt_ops->decrypt(addr, numpages);
++}
++EXPORT_SYMBOL_GPL(set_memory_decrypted);
 -- 
 2.34.1
 
