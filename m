@@ -1,108 +1,128 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A56B16CD0E;
-	Mon, 19 Aug 2024 14:13:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA95616EB72;
+	Mon, 19 Aug 2024 14:27:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724076805; cv=none; b=XSPF3eb80ZPyBJrK5XPwo7C2jSxAC/icSL0P9ivEkI3V+EyYkPfWICp0PgoCn+hmQfAbje5ZnMHGNnUnz95nQ2txSswdLsSR2aBEXx+J6RqX0GykBmLxd4RnZ/xQ7GLQzMKBCEXjuiBIhwx8rlJlAwLQAzyVOJSj5KpckWEuR9M=
+	t=1724077626; cv=none; b=H7NYuewzZ9NopY6B+TFlyNBhD31n9atST1bj6Oho5q5eDs15Qx2t7172TH8TbmfXW0GmjQKvvWkS9TMwhmpZXPwvbgPPFmPIq6fyoLPLGY4E/lFzBj3i5fOVCx1qrJyqOI7Br8bFwhE1jVrHGtk7KUH2JyilvaCX4cMV+Wmxy1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724076805; c=relaxed/simple;
-	bh=FtywNzPYFeb8fTHXzo+TIBaYvwGku+MpTkeQW/3Pudg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ji1bBfUTo0XCXdPKNChuKk6XFqBn1R5kPpkj4TTJZWaqeJQWJspEYJAkVshAfb9WPW4Hnaeipm19p68u0Kwm0wO18L1UYlDvY6LT/+jJ9kFIjq26rzRu3JK9X7jlPzngbJ5pkdvBK0lcpV8vtlLCXYjd3GKlvtDEEyrIKrfruFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9C37B339;
-	Mon, 19 Aug 2024 07:13:49 -0700 (PDT)
-Received: from [10.1.36.36] (FVFF763DQ05P.cambridge.arm.com [10.1.36.36])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CD7443F73B;
-	Mon, 19 Aug 2024 07:13:20 -0700 (PDT)
-Message-ID: <13bc77b7-5f68-44ca-93ce-578ffe029437@arm.com>
-Date: Mon, 19 Aug 2024 15:13:19 +0100
+	s=arc-20240116; t=1724077626; c=relaxed/simple;
+	bh=92vs1z9MJHYLppaZxpLGVPpoeizrEXIXxh58tBbHIPQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=W9QxRG5qhNYgpiYUcAnFVfKq7LMcD3cg/no8viBtdOp0YiD9VdcmoZOmCMArjtyyZrGufbD4eUj6iEsweBO87f4WfZwVebVgQq1pjUuFBvXcHuyYAvww1bqhTdl8oUfrxDT6rPUTtRVLGwvCCUYz1I4YbFrSJZ0KwBgpjuezG5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U6ez3x1d; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U6ez3x1d"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9B0FC4AF0E;
+	Mon, 19 Aug 2024 14:27:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724077625;
+	bh=92vs1z9MJHYLppaZxpLGVPpoeizrEXIXxh58tBbHIPQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=U6ez3x1dZDy/p53VrG8ygnkCFr4VSTtndIgIoOHzPp/XpI8ceHnY5yAsWsIiR8Les
+	 1mWcyLnAQspXe5CtrLaUdk8MgBujlHvEJYfUWw7qUP8rd0hcHgEW08w5LfTa6qf7Mo
+	 MeDcD2Qp/2QIw4RMvzs/3QRjPV+4A6fYGnhgIURfrDvDlH8S1420RBT8/NT0h98zpB
+	 KsoxGTHoOiMZrIWmFm8nbEKEePKLqEvHVxTZOUxlcrhy+fEup/Nyvy/KsWRFi5A/gA
+	 RvPXBERCxZVZxyF4sJqtzibSug7PntBKyczzt+grsLptxbJoA0YxLXJ0ghTpF2Ncto
+	 VgwOIQtQQQ9Ww==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sg3Lb-004wwP-LU;
+	Mon, 19 Aug 2024 15:27:03 +0100
+Date: Mon, 19 Aug 2024 15:27:03 +0100
+Message-ID: <86zfp8y4eg.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>
+Subject: Re: [PATCH v5 17/19] irqchip/gic-v3-its: Share ITS tables with a non-trusted hypervisor
+In-Reply-To: <20240819131924.372366-18-steven.price@arm.com>
+References: <20240819131924.372366-1-steven.price@arm.com>
+	<20240819131924.372366-18-steven.price@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 10/19] arm64: Override set_fixmap_io
-Content-Language: en-GB
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>
-References: <20240819131924.372366-1-steven.price@arm.com>
- <20240819131924.372366-11-steven.price@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20240819131924.372366-11-steven.price@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 19/08/2024 14:19, Steven Price wrote:
-> From: Suzuki K Poulose <suzuki.poulose@arm.com>
+On Mon, 19 Aug 2024 14:19:22 +0100,
+Steven Price <steven.price@arm.com> wrote:
 > 
-> Override the set_fixmap_io to set shared permission for the host
-> in case of a CC guest. For now we mark it shared unconditionally.
+> Within a realm guest the ITS is emulated by the host. This means the
+> allocations must have been made available to the host by a call to
+> set_memory_decrypted(). Introduce an allocation function which performs
+> this extra call.
 > 
-> If/when support for device assignment and device emulation in the realm
-> is added in the future then this will need to filter the physical
-> address and make the decision accordingly.
+> For the ITT use a custom genpool-based allocator that calls
+> set_memory_decrypted() for each page allocated, but then suballocates
+> the size needed for each ITT. Note that there is no mechanism
+> implemented to return pages from the genpool, but it is unlikely the
+> peak number of devices will so much larger than the normal level - so
+> this isn't expected to be an issue.
 > 
+> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 > Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Tested-by: Will Deacon <will@kernel.org>
 > Signed-off-by: Steven Price <steven.price@arm.com>
 > ---
-> New patch for v5
+> Changes since v3:
+>  * Use BIT() macro.
+>  * Use a genpool based allocator in its_create_device() to avoid
+>    allocating a full page.
+>  * Fix subject to drop "realm" and use gic-v3-its.
+>  * Add error handling to ITS alloc/free.
+> Changes since v2:
+>  * Drop 'shared' from the new its_xxx function names as they are used
+>    for non-realm guests too.
+>  * Don't handle the NUMA_NO_NODE case specially - alloc_pages_node()
+>    should do the right thing.
+>  * Drop a pointless (void *) cast.
 > ---
->   arch/arm64/include/asm/fixmap.h |  2 ++
->   arch/arm64/mm/mmu.c             | 17 +++++++++++++++++
->   2 files changed, 19 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/fixmap.h b/arch/arm64/include/asm/fixmap.h
-> index 87e307804b99..2c20da3a468c 100644
-> --- a/arch/arm64/include/asm/fixmap.h
-> +++ b/arch/arm64/include/asm/fixmap.h
-> @@ -108,6 +108,8 @@ void __init early_fixmap_init(void);
->   #define __late_clear_fixmap(idx) __set_fixmap((idx), 0, FIXMAP_PAGE_CLEAR)
->   
->   extern void __set_fixmap(enum fixed_addresses idx, phys_addr_t phys, pgprot_t prot);
-> +#define set_fixmap_io set_fixmap_io
-> +void set_fixmap_io(enum fixed_addresses idx, phys_addr_t phys);
->   
->   #include <asm-generic/fixmap.h>
->   
-> diff --git a/arch/arm64/mm/mmu.c b/arch/arm64/mm/mmu.c
-> index 353ea5dc32b8..06b66c23c124 100644
-> --- a/arch/arm64/mm/mmu.c
-> +++ b/arch/arm64/mm/mmu.c
-> @@ -1193,6 +1193,23 @@ void vmemmap_free(unsigned long start, unsigned long end,
->   }
->   #endif /* CONFIG_MEMORY_HOTPLUG */
->   
-> +void set_fixmap_io(enum fixed_addresses idx, phys_addr_t phys)
-> +{
-> +	pgprot_t prot = FIXMAP_PAGE_IO;
-> +
-> +	/*
-> +	 * The set_fixmap_io maps a single Page covering phys.
-> +	 * To make better decision, we stick to the smallest page
-> +	 * size supported (4K).
-> +	 */
-> +	if (!arm64_is_iomem_private(phys, SZ_4K))
-> +		prot = pgprot_decrypted(prot);
-> +	else
-> +		prot = pgprot_encrypted(prot);
+>  drivers/irqchip/irq-gic-v3-its.c | 139 ++++++++++++++++++++++++++-----
+>  1 file changed, 116 insertions(+), 23 deletions(-)
 
-With the ioremap_prot_hook introduction, this one looks like should use
-that, instead of open coding the same thing. Thoughts ?
+I think this patch and the next are pretty ripe, and shouldn't have to
+wait much longer.
 
-Suzuki
+Can you please send them as a separate irqchip series, with the
+relevant people on Cc (realistically, tglx and me), with a
+
+Reviewed-by: Marc Zyngier <maz@kernel.org>
+
+added to them?
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
