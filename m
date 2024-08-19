@@ -1,171 +1,111 @@
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F382116132E
-	for <kvmarm@lists.linux.dev>; Mon, 19 Aug 2024 12:19:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36CC61649A8
+	for <kvmarm@lists.linux.dev>; Mon, 19 Aug 2024 12:32:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724069944; cv=none; b=hIAv/cYE+fRN65Wxg7FDqvjk4LNf0FlMbfpT9vi9R7nBXY0K4phn86wXJi+xJMhQSzEaR+GhwsZ63paROZgrGMp+GjbsuD6GL7LDvraVjlWNFLIbaLao+gFQ5XE7qH3es534Y7gaJG2PwiMALWn/EIjy7OW6q/Qs4A2AxhGTpMo=
+	t=1724070729; cv=none; b=rl6l0TwJI19EZ9JOfO9F5mRvGvTmkAYSNoKiWMlMOHH/UXekudb459nWsg317agUUwruADEnMwDm+JCJkeDsab1AwOs828GjOE5sVDA13ZmgBM7ZTfKI4nfm6lgkvl9ENueIJXZBWo0a1b7EtpwJ2AtB4gy74xqdC9kM+xLZdsY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724069944; c=relaxed/simple;
-	bh=OVUuDphKRX+9NR8bK/07mU2BsYGjbieYyOKc83Tblc8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oBi6m62jGj4A2qfSTK2qp1xwbTyBNxdnGZBXQEFos+R/Zw4V4xU5Td7fiuwcIw7DBEk+mfnrO+LkHfjzjkXmF99dRnf608m1iXxaX+1Zv85y60jmzYBhxgEOxg66xGJeVuZQIXl7owiOvZkdK+kc90ygwq0jMrYy7bsQSNIDhIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0xN76EFX; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0xN76EFX"
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5bebc830406so8141a12.0
-        for <kvmarm@lists.linux.dev>; Mon, 19 Aug 2024 05:19:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724069941; x=1724674741; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Db4hN2w3m7INit2SBeLbUeRnILkMZrxR2DmZlcKp+hU=;
-        b=0xN76EFX+jW2ud5UcfD9MGdYkEKE1NO61tWVyMAI8g0/F576aLogr0UqDETNLosbw8
-         FnP6PImuPstkgfz0GdMeDEQKMxNACs3xepvqg+tqCbkxUdDWjENTXRUe9KmSu5owcvlu
-         Qkb1BtkOUk9QuTr6QMg2XPbFnydmVTGlb3oAp1Gl+CyygVyBHubCjCjLluZskrANceiE
-         XnQlOSmNSLsGzvP9Gse/gXa7aPLq67VZedBQ8V1oYfekop3QwjVHuvyh8oDozlSddpK8
-         ze/4aB00N6qsbtwZL4P3dC7Rpj6xAzY97ZqCvWMUDNTuzVJfmOws0a02laDIwS+ia3YB
-         7fTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724069941; x=1724674741;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Db4hN2w3m7INit2SBeLbUeRnILkMZrxR2DmZlcKp+hU=;
-        b=r/cSkkJM5VvVT4xBc4QbIOOlkXoU3vAGxYhd5zguHrNAddu/4AIwjDOn6mk5Z+AOtV
-         cnT3/Q55i0G3TBSSsFwYtafZJ2BHGnMOOwoi5wddFFlASqP+V4wRFDcFpSmfgf90jlYb
-         nws7Y/xCofzuTLxYXauIfDy2KLs9eZGNEQF3/P7o12w7hVuri49MISqNW52j5I/6EYdv
-         lCGJhd6iG7DC+1cBgkGGdeZd+9Zt8TqYP7e+yQlBuUKemUHpzc0ljDq/76IsSRJaJWWR
-         fixn+5tI5FpUKoIEYEqzFXPcaTsiJUI9YDZr+/EuF5rXZIdp7ZgDJAfOhfMU3fmdwcjl
-         L7xw==
-X-Forwarded-Encrypted: i=1; AJvYcCWJeoNjokk+ky+8ghBL2MrzUV1eoAIefNufO/CE7OlRmr8SOwWRpiHGSVepzA7pbn4JEThCJUk=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxitioBtmFkwHlzQbMxaOk+kj4xIrDUGGmZfQjdT28taG29KI1Z
-	Xoz9++U0ab55XG8sa9iuYMZLvr4Q2JqFHKg3HRvkcascrQ9XjdZvyQs4nhHSyg==
-X-Google-Smtp-Source: AGHT+IEoH4NgDY0zYg9fqa4QM4SVY1O10WJ1j4848W30tFwb35xVV/g6Yfo36yCo36vqfTQ8XhRfwQ==
-X-Received: by 2002:a05:6402:348f:b0:5b8:ccae:a8b8 with SMTP id 4fb4d7f45d1cf-5bede24bf57mr84286a12.3.1724069940865;
-        Mon, 19 Aug 2024 05:19:00 -0700 (PDT)
-Received: from google.com (44.232.78.34.bc.googleusercontent.com. [34.78.232.44])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37189857069sm10401322f8f.47.2024.08.19.05.18.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Aug 2024 05:18:59 -0700 (PDT)
-Date: Mon, 19 Aug 2024 12:18:57 +0000
-From: Sebastian Ene <sebastianene@google.com>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: akpm@linux-foundation.org, alexghiti@rivosinc.com, ankita@nvidia.com,
-	ardb@kernel.org, catalin.marinas@arm.com,
-	christophe.leroy@csgroup.eu, james.morse@arm.com,
-	mark.rutland@arm.com, maz@kernel.org, oliver.upton@linux.dev,
-	rananta@google.com, ryan.roberts@arm.com, shahuang@redhat.com,
-	suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, kernel-team@android.com
-Subject: Re: [PATCH v8 5/6] KVM: arm64: Initialize the ptdump parser with
- stage-2 attributes
-Message-ID: <ZsM4MacbOe7GLIKl@google.com>
-References: <20240816123906.3683425-1-sebastianene@google.com>
- <20240816123906.3683425-6-sebastianene@google.com>
- <ZsMeQ8nAZLDhsBmA@google.com>
+	s=arc-20240116; t=1724070729; c=relaxed/simple;
+	bh=UuK3R21pMLnxcqgcC2kcg68rWiX8ItH6ti3h1KLV/pg=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=CB4gtbXAr0hfEBP+4h9ogLxfRwUQqAQs7Ms49fYStTIWFWji5q8cQj9M1fAuY+h9N68vms+ZmBPmGRBnSnyQKaFW+0lJ2EpbCWjCBO5b8SRqt2Zxf65C5qH1R1UJ100aTI3C61j/BKxKfQcIAQA+qsws2y0jLKNUfCIIcaguX3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4WnX0Q2wJ3z1S8Cg;
+	Mon, 19 Aug 2024 20:27:02 +0800 (CST)
+Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
+	by mail.maildlp.com (Postfix) with ESMTPS id 420B814022E;
+	Mon, 19 Aug 2024 20:32:01 +0800 (CST)
+Received: from [10.174.178.219] (10.174.178.219) by
+ kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 19 Aug 2024 20:32:00 +0800
+Subject: Re: [PATCH] KVM: arm64: vgic: Hold config_lock while tearing down a
+ CPU interface
+To: Marc Zyngier <maz@kernel.org>
+CC: <kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>, James
+ Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>, Alexander Potapenko
+	<glider@google.com>
+References: <20240808091546.3262111-1-maz@kernel.org>
+ <c8f4602a-c3af-958f-6c8e-a4226d613a6b@huawei.com>
+ <8634n0zsu0.wl-maz@kernel.org>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <40d0a14b-b501-aef6-a168-1c1acd5448e7@huawei.com>
+Date: Mon, 19 Aug 2024 20:31:59 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZsMeQ8nAZLDhsBmA@google.com>
+In-Reply-To: <8634n0zsu0.wl-maz@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemm600007.china.huawei.com (7.193.23.208)
 
-On Mon, Aug 19, 2024 at 11:28:19AM +0100, Vincent Donnefort wrote:
+On 2024/8/19 18:53, Marc Zyngier wrote:
+> On Mon, 19 Aug 2024 10:39:50 +0100,
+> Zenghui Yu <yuzenghui@huawei.com> wrote:
+> >
+> > Hi Marc,
+> >
+> > On 2024/8/8 17:15, Marc Zyngier wrote:
+> > > Tearing down a vcpu CPU interface involves freeing the private interrupt
+> > > array. If we don't hold the lock, we may race against another thread
+> > > trying to configure it. Yeah, fuzzers do wonderful things...
+> > >
+> > > Taking the lock early solves this particular problem.
+> > >
+> > > Fixes: 03b3d00a70b5 ("KVM: arm64: vgic: Allocate private interrupts on demand")
+> > > Reported-by: Alexander Potapenko <glider@google.com>
+> > > Tested-by: Alexander Potapenko <glider@google.com>
+> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > > ---
+> > >  arch/arm64/kvm/vgic/vgic-init.c | 3 +--
+> > >  1 file changed, 1 insertion(+), 2 deletions(-)
+> > >
+> > > diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+> > > index 7f68cf58b978..41feb858ff9a 100644
+> > > --- a/arch/arm64/kvm/vgic/vgic-init.c
+> > > +++ b/arch/arm64/kvm/vgic/vgic-init.c
+> > > @@ -438,14 +438,13 @@ void kvm_vgic_destroy(struct kvm *kvm)
+> > >  	unsigned long i;
+> > >  
+> > >  	mutex_lock(&kvm->slots_lock);
+> > > +	mutex_lock(&kvm->arch.config_lock);
+> > >  
+> > >  	vgic_debug_destroy(kvm);
+> > >  
+> > >  	kvm_for_each_vcpu(i, vcpu, kvm)
+> > >  		__kvm_vgic_vcpu_destroy(vcpu);
+> > >  
+> > > -	mutex_lock(&kvm->arch.config_lock);
+> > > -
+> > >  	kvm_vgic_dist_destroy(kvm);
+> > >  
+> > >  	mutex_unlock(&kvm->arch.config_lock);
+> >
+> > The following splat was triggered when running the vgic_init selftest on
+> > a lockdep kernel (I use rc4, with defconfig + PROVE_LOCKING).
+> >
+> > I'm not entirely sure that the splat is related to this change. Just
+> > haven't got time to dig further so post it out early for record.
 > 
-> [...]
-> 
-> > +static int kvm_ptdump_build_levels(struct ptdump_pg_level *level, u32 start_lvl)
-> > +{
-> > +	static const char * const level_names[] = {"PGD", "PUD", "PMD", "PTE"};
-> > +	u32 i = 0;
-> > +	u64 mask = 0;
-> > +
-> > +	if (start_lvl > 2) {
-> > +		pr_err("invalid start_lvl %u\n", start_lvl);
-> > +		return -EINVAL;
-> > +	}
-> 
-> It looks like a duplicate of the if below.
+> Arghh. Thanks for reporting this. Can you try the following patch? It
+> does the trick for me, but I don't trust myself anymore...
 
-I will drop this.
-
-> 
-> > +
-> > +	if (WARN_ON_ONCE(start_lvl >= KVM_PGTABLE_LAST_LEVEL))
-> > +		return -EINVAL;
-> > +
-> > +	for (i = 0; i < ARRAY_SIZE(stage2_pte_bits); i++)
-> > +		mask |= stage2_pte_bits[i].mask;
-> > +
-> > +	for (i = start_lvl; i < KVM_PGTABLE_MAX_LEVELS; i++) {
-> > +		strscpy(level[i].name, level_names[i], sizeof(level[i].name));
-> > +
-> > +		level[i].num	= ARRAY_SIZE(stage2_pte_bits);
-> > +		level[i].bits	= stage2_pte_bits;
-> > +		level[i].mask	= mask;
-> > +	}
-> > +
-> > +	if (start_lvl > 0)
-> > +		strscpy(level[start_lvl].name, "PGD", sizeof(level[start_lvl].name));
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static struct kvm_ptdump_guest_state
-> > +*kvm_ptdump_parser_init(struct kvm *kvm)
-> 
-> nit: I guess it's more a "create" than an "init" as we allocate the memory.
-
-Yes, that should work as well.
-
-> 
-> > +{
-> > +	struct kvm_ptdump_guest_state *st;
-> > +	struct kvm_s2_mmu *mmu = &kvm->arch.mmu;
-> > +	struct kvm_pgtable *pgtable = mmu->pgt;
-> > +	int ret;
-> > +
-> > +	st = kzalloc(sizeof(struct kvm_ptdump_guest_state), GFP_KERNEL_ACCOUNT);
-> > +	if (!st)
-> > +		return NULL;
-> 
-> return ERR_PTR(-ENOMEM); ?
-
-Yep, we can encode the ENOMEM in the ptr.
-
-> 
-> > +
-> > +	ret = kvm_ptdump_build_levels(&st->level[0], pgtable->start_level);
-> > +	if (ret) {
-> > +		kfree(st);
-> > +		return ERR_PTR(ret);
-> > +	}
-> > +
-> > +	st->ipa_marker[0].name		= "Guest IPA";
-> > +	st->ipa_marker[1].start_address = BIT(pgtable->ia_bits);
-> > +	st->range[0].end		= BIT(pgtable->ia_bits);
-> > +
-> > +	st->kvm				= kvm;
-> > +	st->parser_state = (struct ptdump_pg_state) {
-> > +		.marker		= &st->ipa_marker[0],
-> > +		.level		= -1,
-> > +		.pg_level	= &st->level[0],
-> > +		.ptdump.range	= &st->range[0],
-> > +	};
-> > +
-> > +	return st;
-> > +}
-> > +
-> 
-> [...]
+I tested it with defconfig+PROVE_LOCKING and my own config, both worked
+for me (the WARNING disappeared). I think the locking order should be
+correct now.
 
 Thanks,
-Seb
+Zenghui
