@@ -1,78 +1,72 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-184.mta1.migadu.com (out-184.mta1.migadu.com [95.215.58.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5FA33FEC;
-	Mon, 19 Aug 2024 17:09:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E13EF176233
+	for <kvmarm@lists.linux.dev>; Mon, 19 Aug 2024 17:25:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724087353; cv=none; b=Q4Skk3B3OQbqoWYc7oLT3Lgo8M4MmC7VOfwe2my09rlPwOho/PfOpQLj4yvyn8AxeJCtUmoxxSiktaLAchNBMffg1B1BkX4V/LXNNVGYxE8k4nKNz3c4bXQ9r5Y3+lKTKz1su7OhPtcH4iTIPEq+Aai08vgiLKRxhP/itnYxiAA=
+	t=1724088362; cv=none; b=E6xEIpQHb+TtgP8FincyA/1mGcQS8YaE2jPwm1O5796U86gkH2GwNF6Cdseej5Cff1R2NbNcv6pkGIkSTLjDJdKHFYr5SfZ4GO6FkfFHh1Swkm7jOJde3ksqQDL5+vbMCTKSAL8tEXFhSMBhjNzvoEZ0t0Y/l+xk01IBVzP5AT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724087353; c=relaxed/simple;
-	bh=tJD8iYqoav6OGFnS3050ksXE14pyLpasnKlZxgo6l90=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mNvprpHU33S+kueVnU5OxO035vICqRp2zoTS+b6vRmNaEzXtr+VMQKXNI0B+wE/PgLyckMQ8UM0EqDKhi6w9sN9bqsl+w0cQ3e1NE/QAt/LoRKYK7j0PgNXrPmg+72rV5QmMi51qD7lY6dz47/7mhoL/QcacwMmYUYicW5bD++k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31FABC4AF0E;
-	Mon, 19 Aug 2024 17:09:09 +0000 (UTC)
-Date: Mon, 19 Aug 2024 18:09:06 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: Joey Gouly <joey.gouly@arm.com>, linux-arm-kernel@lists.infradead.org,
-	akpm@linux-foundation.org, aneesh.kumar@kernel.org,
-	aneesh.kumar@linux.ibm.com, bp@alien8.de, broonie@kernel.org,
-	christophe.leroy@csgroup.eu, dave.hansen@linux.intel.com,
-	hpa@zytor.com, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
-	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
-	oliver.upton@linux.dev, shuah@kernel.org, szabolcs.nagy@arm.com,
-	tglx@linutronix.de, will@kernel.org, x86@kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 18/29] arm64: add POE signal support
-Message-ID: <ZsN8MnSqIWEMh7Ma@arm.com>
-References: <20240503130147.1154804-1-joey.gouly@arm.com>
- <20240503130147.1154804-19-joey.gouly@arm.com>
- <ZqJ2knGETfS4nfEA@e133380.arm.com>
- <20240801155441.GB841837@e124191.cambridge.arm.com>
- <Zqu2VYELikM5LFY/@e133380.arm.com>
- <20240806103532.GA1986436@e124191.cambridge.arm.com>
- <20240806143103.GB2017741@e124191.cambridge.arm.com>
- <ZrzHU9et8L_0Tv_B@arm.com>
- <20240815131815.GA3657684@e124191.cambridge.arm.com>
- <Zr4aJqc/ifRXJQAd@e133380.arm.com>
+	s=arc-20240116; t=1724088362; c=relaxed/simple;
+	bh=V8HqJZq8ou5qqu3gnI9Q6yW31ZSw3/U0vK1iIw+2vLg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=InyMaenEpQv1X9UZQTiWCcD4G19BlgKE0x0CMa8Yzy6b8Us6+Jxiimc52JluSINwVv1QV4zKrosLCgfUvVj8eeW6i7v8LWbIJvKg6wHKtu+TAvAd8YfvTknXqymPkF3Paksuo2kSfCeBgd6iiinMOjtLKtxga6pZL88UpjXKrXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=v2sldeMK; arc=none smtp.client-ip=95.215.58.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="v2sldeMK"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1724088357;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pjXIgrQkbNbdREGaeSmiEsu2NJFDyg3k70yEW2RV1tI=;
+	b=v2sldeMKhW8eJfG+muN64Qp4PR999jCGAV6mnCRNxSDgC4jjnTj65/nmmgps0FTCDPlVAZ
+	PeIAx4O4z7VyjZkiwaHGX1+SDUJPmeGXbfajfOPfqPnZufNNvrEh3CqZepH1pgSn/aIx+I
+	cawaL39lc9vEq6DUOW98JmSS3CkLrS8=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Zenghui Yu <yuzenghui@huawei.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	james.morse@arm.com,
+	suzuki.poulose@arm.com,
+	wanghaibin.wang@huawei.com,
+	maz@kernel.org
+Subject: Re: [PATCH] KVM: arm64: vgic-debug: Don't put unmarked LPIs
+Date: Mon, 19 Aug 2024 17:25:47 +0000
+Message-ID: <172408829923.848017.11368160825024844050.b4-ty@linux.dev>
+In-Reply-To: <20240817101541.1664-1-yuzenghui@huawei.com>
+References: <20240817101541.1664-1-yuzenghui@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zr4aJqc/ifRXJQAd@e133380.arm.com>
-X-TUID: jP0NMMmVUuyc
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Aug 15, 2024 at 04:09:26PM +0100, Dave P Martin wrote:
-> On Thu, Aug 15, 2024 at 02:18:15PM +0100, Joey Gouly wrote:
-> > That's a lot of words to say, or ask, do you agree with the approach of only
-> > saving POR_EL0 in the signal frame if num_allocated_pkeys() > 1?
-> > 
-> > Thanks,
-> > Joey
+On Sat, 17 Aug 2024 18:15:41 +0800, Zenghui Yu wrote:
+> If there were LPIs being mapped behind our back (i.e., between .start() and
+> .stop()), we would put them at iter_unmark_lpis() without checking if they
+> were actually *marked*, which is obviously not good.
 > 
-> ...So..., given all the above, it is perhaps best to go back to
-> dumping POR_EL0 unconditionally after all, unless we have a mechanism
-> to determine whether pkeys are in use at all.
+> Switch to use the xa_for_each_marked() iterator to fix it.
+> 
+> 
+> [...]
 
-Ah, I can see why checking for POR_EL0_INIT is useful. Only checking for
-the allocated keys gets confusing with pkey 0.
+Applied to kvmarm/fixes, thanks!
 
-Not sure what the deal is with pkey 0. Is it considered allocated by
-default or unallocatable? If the former, it implies that pkeys are
-already in use (hence the additional check for POR_EL0_INIT). In
-principle the hardware allows us to use permissions where the pkeys do
-not apply but we'd run out of indices and PTE bits to encode them, so I
-think by default we should assume that pkey 0 is pre-allocated.
+[1/1] KVM: arm64: vgic-debug: Don't put unmarked LPIs
+      https://git.kernel.org/kvmarm/kvmarm/c/2240a50e6294
 
-So I agree that it's probably best to save it unconditionally.
-
--- 
-Catalin
+--
+Best,
+Oliver
