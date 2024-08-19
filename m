@@ -1,153 +1,103 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C561B13698B;
-	Mon, 19 Aug 2024 15:57:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98A8882D94
+	for <kvmarm@lists.linux.dev>; Mon, 19 Aug 2024 16:26:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724083039; cv=none; b=sgfatrmCbcfeCddOmtizqUEjq6mLCI15A7jX+uREzCG2huikZTLWvjW1elVoAXpzKdgZ/GxF66avmb0PuI1J/2fDbU/w/UJg1fjb+iagdHjdf2fmxcffBQIETFg7BMC0E1G1g/l/1sumOSO4BOo5vFKh9g/iYO+mnfkccTZm418=
+	t=1724084820; cv=none; b=VfdW96nroi/K2qLqXkl7kNAzClSgmrRjPAW+UANkvlvtDBS8bET6jwHVlrPchsCxiNd4L8dIWLqD1OkLgoyWc5rTMWL8c6uPYY+vXB3KtSxlFI6yF4qk/SJX1givLqV82AFfPCJ9J+BuWwcXhec7sqELWSjL8mR3+pE7WF8WGBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724083039; c=relaxed/simple;
-	bh=v3qZPwIeSRlS1QcsBxR5WSu2pfKLNLQcLI/q+clxwYM=;
+	s=arc-20240116; t=1724084820; c=relaxed/simple;
+	bh=BeG96sLKNi1TFbn65BaLHfUheDtSwpLdRfYAZIQofHg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ob7RHmWYcs23qAfKb0FkmIYE0zsibaSwl9313iTHFmZMZtrwSs4Gvp/Cv07jMMd+Efx92jCBAihJC3ErCgJJg7OndEE5MfQFXaVCUgDL+9FJmDsfr7yS3mKvGDRbRfczUSrc9kmmbZ91yr1ayH8J9abuz3vQbJOrdgoSbe6d7Kg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZshOpuuO; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=J/VTT6SOI7XTOij8Z4GKLbScJdD28ASZUxR+50/WZzulCDYtJMgOtnQpGAf/grIQj+7grI/cI2q2e9GyqdyYcPfUO04329JMtexPMheY/yyVm3H98E+WrX5eOziV+tmnvqbevz0eS/1aKfE2EAs1VvxYLT8mWltbSzNWUtJ1kc4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=DA0zKqhF; arc=none smtp.client-ip=91.218.175.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZshOpuuO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4129C4AF0E;
-	Mon, 19 Aug 2024 15:57:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724083039;
-	bh=v3qZPwIeSRlS1QcsBxR5WSu2pfKLNLQcLI/q+clxwYM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZshOpuuOha2m4jngC5/MOOet1h6SG+jGlUt+nz0zAcvFxaYVevSimDv5TPH5RhGBk
-	 n9vXYpX2cb21q0uvpWQv1L6nybcMoVEMup5m4axyZt05/rSJoSBjekbnGpY8sr0ywF
-	 Gnp2cqrKP/n0xk9tO5th3hGes39+M3iEGePBCZbWExauae/tlRw3tpDARhLj6Oorsg
-	 rIN5jPdnyNDiNGWeAYS7CxM75DLtEWLAVknNiDb3ExafscAPpWC0uwHsY0zKDE31ie
-	 0Qn9rSwvoAU5BKY8j1qsz3b8iuKoZrmb6ZqECQIQZAr7Ul403nM7FWVzz2x+/GzUCl
-	 B0n1sNxvYU1SQ==
-Date: Mon, 19 Aug 2024 16:57:08 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Florian Weimer <fweimer@redhat.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
-	Ross Burton <ross.burton@arm.com>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v10 20/40] arm64/gcs: Ensure that new threads have a GCS
-Message-ID: <e1d40f17-2c03-4440-8d41-85368e138f03@sirena.org.uk>
-References: <20240801-arm64-gcs-v10-0-699e2bd2190b@kernel.org>
- <20240801-arm64-gcs-v10-20-699e2bd2190b@kernel.org>
- <ZsM0wkRRguMchecK@arm.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="DA0zKqhF"
+Date: Mon, 19 Aug 2024 09:26:49 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1724084815;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AsK28yHmfsApUch3ci6Pzhi4GLlWPP29RXZc1Ds3IyI=;
+	b=DA0zKqhFxpybDfL5Z45D02TvTiKVCUI402G2mvw/UFkpdus/5RUA3xXm49eeD6u5hgTB5T
+	fSKKMN+3XF8UjAKwuHlhVUX5VebqC9G4N7SxgHzVuJ74sZuSyaEekMpS47+mbwp8KlUd7k
+	cGZhnieInUL6orETKfgOhJKVPMHVqzc=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Zenghui Yu <yuzenghui@huawei.com>
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	james.morse@arm.com, suzuki.poulose@arm.com,
+	wanghaibin.wang@huawei.com
+Subject: Re: [PATCH] KVM: arm64: vgic-debug: Don't put unmarked LPIs
+Message-ID: <ZsNySeySMxxcpUTS@linux.dev>
+References: <20240817101541.1664-1-yuzenghui@huawei.com>
+ <86a5hbzbrt.wl-maz@kernel.org>
+ <99900ad4-6b05-4bba-ec7a-f4f4d36ab71b@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="RbrhEhE3nEZQH9R3"
-Content-Disposition: inline
-In-Reply-To: <ZsM0wkRRguMchecK@arm.com>
-X-Cookie: Interchangeable parts won't.
-
-
---RbrhEhE3nEZQH9R3
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <99900ad4-6b05-4bba-ec7a-f4f4d36ab71b@huawei.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Aug 19, 2024 at 01:04:18PM +0100, Catalin Marinas wrote:
-> On Thu, Aug 01, 2024 at 01:06:47PM +0100, Mark Brown wrote:
+On Sat, Aug 17, 2024 at 06:31:45PM +0800, Zenghui Yu wrote:
+> On 2024/8/17 18:25, Marc Zyngier wrote:
+> > On Sat, 17 Aug 2024 11:15:41 +0100,
+> > Zenghui Yu <yuzenghui@huawei.com> wrote:
+> > >
+> > > If there were LPIs being mapped behind our back (i.e., between .start() and
+> > > .stop()), we would put them at iter_unmark_lpis() without checking if they
+> > > were actually *marked*, which is obviously not good.
+> > >
+> > > Switch to use the xa_for_each_marked() iterator to fix it.
 
-> > +static int copy_thread_gcs(struct task_struct *p,
-> > +			   const struct kernel_clone_args *args)
-> > +{
-> > +	unsigned long gcs;
-> > +
-> > +	gcs = gcs_alloc_thread_stack(p, args);
-> > +	if (IS_ERR_VALUE(gcs))
-> > +		return PTR_ERR((void *)gcs);
+Urgh, that's what I'd meant to do. Thanks for catching this Zenghui.
 
-> Is 0 an ok value here? I can see further down that
-> gcs_alloc_thread_stack() may return 0.
+> > > Fixes: 85d3ccc8b75b ("KVM: arm64: vgic-debug: Use an xarray mark for debug iterator")
+> > > Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+> > > ---
+> > >  arch/arm64/kvm/vgic/vgic-debug.c | 2 +-
+> > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > >
+> > > diff --git a/arch/arm64/kvm/vgic/vgic-debug.c b/arch/arm64/kvm/vgic/vgic-debug.c
+> > > index bc74d06398ef..e1397ab2072a 100644
+> > > --- a/arch/arm64/kvm/vgic/vgic-debug.c
+> > > +++ b/arch/arm64/kvm/vgic/vgic-debug.c
+> > > @@ -85,7 +85,7 @@ static void iter_unmark_lpis(struct kvm *kvm)
+> > >  	struct vgic_irq *irq;
+> > >  	unsigned long intid;
+> > >  
+> > > -	xa_for_each(&dist->lpi_xa, intid, irq) {
+> > > +	xa_for_each_marked(&dist->lpi_xa, intid, irq, LPI_XA_MARK_DEBUG_ITER) {
+> > >  		xa_clear_mark(&dist->lpi_xa, intid, LPI_XA_MARK_DEBUG_ITER);
+> > >  		vgic_put_irq(kvm, irq);
+> > >  	}
+> > 
+> > Ouch. Nicely caught. I think this deserves a
+> > 
+> > Cc: stable@vger.kernel.org # v6.10
+> 
+> Yup. I guess Oliver will help to add it when applying ;-)
 
-Yes, it's fine for a thread not to have a GCS.
+Indeed, I'll grab it here in a moment.
 
-> > +	p->thread.gcs_el0_mode = current->thread.gcs_el0_mode;
-> > +	p->thread.gcs_el0_locked = current->thread.gcs_el0_locked;
+> > 
+> > With that,
+> > 
+> > Reviewed-by: Marc Zyngier <maz@kernel.org>
+> 
 
-> > +	/* Ensure the current state of the GCS is seen by CoW */
-> > +	gcsb_dsync();
+Thanks both!
 
-> I don't get this barrier. What does it have to do with CoW, which memory
-> effects is it trying to order?
-
-Yeah, I can't remember what that's supposed to be protecting.
-
-> > +	/* Allocate RLIMIT_STACK/2 with limits of PAGE_SIZE..2G */
-> > +	size = PAGE_ALIGN(min_t(unsigned long long,
-> > +				rlimit(RLIMIT_STACK) / 2, SZ_2G));
-> > +	return max(PAGE_SIZE, size);
-> > +}
-
-> So we still have RLIMIT_STACK/2. I thought we got rid of that and just
-> went with RLIMIT_STACK (or I misremember).
-
-I honestly can't remember either way, it's quite possible it's changed
-multiple times.  I don't have super strong feelings on the particular
-value here.
-
-> > +static bool gcs_consume_token(struct mm_struct *mm, unsigned long user_addr)
-> > +{
-
-> As per the clone3() thread, I think we should try to use
-> get_user_page_vma_remote() and do a cmpxchg() directly.
-
-I've left this as is for now, mainly because it keeps the code in line
-with x86 and I can't directly test the x86 code.  IIRC we can't just do
-a standard userspace cmpxchg since that will access as though we were at
-EL0 but EL0 doesn't have standard write permission for the page.
-
-> How does the user write the initial token? Do we need any barriers
-> before/after consuming the token?
-
-The token is created by map_shadow_stack() or as part of a GCS pivot.  A
-sync beforehand is probably safer, with the current code we'll have one
-when we switch to the task.
-
---RbrhEhE3nEZQH9R3
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmbDa1MACgkQJNaLcl1U
-h9DbuQf/SjnwfLskheecxP/Aw1iuvcdM5Lad9HYiZl1LzHJXMVCIt1kMcKPJ3MS6
-O9iMeWyDk7d7EKrWneyrvSODTNZAFjUnExoo/+WNpnaumrwTH4vS12ZNpq7/1a8W
-AsxmGCrQ8IsHpSkEuJyMKshASponZtgCQwUqQX24QyTqP527qXCrX2VmwKppiR0K
-4Ve0jwxpZxGhlRUdEWD2k1yIsfxh8qa336gUFDOLxmwW1SRYdQnUpfDzrBg1Kj7m
-svrFPBMCQySshntbpRCF0xNG2bxseTrXAKwuqFM1Om5CwvV5DVSRD1n7AaaJmOm0
-Gki/1SM6NelVLm9JiPdHIZCf3bkbZg==
-=dVcd
------END PGP SIGNATURE-----
-
---RbrhEhE3nEZQH9R3--
+-- 
+Best,
+Oliver
