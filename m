@@ -1,164 +1,98 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D59B7148315
-	for <kvmarm@lists.linux.dev>; Mon, 19 Aug 2024 10:54:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 288D5200CD;
+	Mon, 19 Aug 2024 11:46:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724064843; cv=none; b=nWdaERbM+F1IWK60s6u0ONhTR1x52FwzBO2D5uyhPsj+u0dd6+SOgPWfVBgoem0lhznl73YtbMJIh4gxoFACltVAgUtvqzA1FA4d0MBczaU23PK+LdReRxfdqyVrQQM/qKs9sQB7F1etVot9ZOQnSNzs2hx0xYSrCofwbJCN+0g=
+	t=1724067981; cv=none; b=gGEQSY0Ckh3NNLlCZxyRgz77sEC5EB50H8YQGNWNw56fDmyAaTcXGP43uGJRFZCIEuf6V0o5cjAqbE/E5Qd+0hdNDDzcL65+mZO32Lrcgy6BL8vyouC9nY3PUrTO2DciWhDjlDMKE+hhnKH27cEJniV/2belXsuv5fb6/SMW18Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724064843; c=relaxed/simple;
-	bh=hfi2xWUQDHNzoOIDKBnqZk6fSJrAUllso94P3ypE0GY=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bgHYIXbZTy2RXfRQw+OCeHpr/S1mZkF/Z6M00FMCkw1oYbCNkPqQ9aFQBf2PWhpog6+wa8CTIzXWc5dn05dXZs1peeY6WuHgu6kgsg3Q7L9peBOSglJPnJYeRBWID/38+XwqviHa8K+eVF3yHXou/RFBWcmtJPB7/pTNZ+9D4l8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f+zEvglK; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f+zEvglK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 649E9C32782;
-	Mon, 19 Aug 2024 10:54:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724064843;
-	bh=hfi2xWUQDHNzoOIDKBnqZk6fSJrAUllso94P3ypE0GY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=f+zEvglK+0ypG7S6lMy6tMUEZpH3BYeGaWjfMZ6fgjIv816gfbwt4PrGb0Y3Ph3or
-	 6HfAKbu63DGiFRg4m0WX8hg0O07kMuebvxLhW8al/1xFZmbyoQuMkJg2IQX3uths/B
-	 r6vRlKZjnJ1N3XqrOKoJLBvy74kZV72jWNWyFmXOIvX0JOdUsLsDessHrGT3VpIcLT
-	 ssqsMLeEzFKOdQQETf02i35Xbmojchml9zh5NeGgRNFN4DnTMl+l0k5CNzMYYA1538
-	 585KGto2LD/EO074Sxi/L6uhOIfVsQSqaAhwHHPZ1nOwReIMMpsF1idIw8Rq3ZjRnl
-	 jBEjXh846vblQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sg01R-004shy-6Z;
-	Mon, 19 Aug 2024 11:54:01 +0100
-Date: Mon, 19 Aug 2024 11:53:59 +0100
-Message-ID: <8634n0zsu0.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Zenghui Yu <yuzenghui@huawei.com>
-Cc: <kvmarm@lists.linux.dev>,
-	<linux-arm-kernel@lists.infradead.org>,
-	James
- Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	s=arc-20240116; t=1724067981; c=relaxed/simple;
+	bh=zEv87BYt6wC90sTxda6kAJTqECnwIwmYypAIQB4STro=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gneyyNuMBQuFKgihfokeRww84QsvHft1VyZySh9F5OtllBmGi0vROVlwB0YV76DF+17UcCp0fpVbwf8tr3XGmUepoI54PElZbF041VEKS20LdajVdqh45jilaFrylFlVDccChQkphpcN1E4XybHggxzRcG/Ri4++mCa5yuhDaiE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DF1DC32782;
+	Mon, 19 Aug 2024 11:46:15 +0000 (UTC)
+Date: Mon, 19 Aug 2024 12:46:13 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Alexander Potapenko
-	<glider@google.com>
-Subject: Re: [PATCH] KVM: arm64: vgic: Hold config_lock while tearing down a CPU interface
-In-Reply-To: <c8f4602a-c3af-958f-6c8e-a4226d613a6b@huawei.com>
-References: <20240808091546.3262111-1-maz@kernel.org>
-	<c8f4602a-c3af-958f-6c8e-a4226d613a6b@huawei.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Florian Weimer <fweimer@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
+	Ross Burton <ross.burton@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v10 19/40] arm64/gcs: Context switch GCS state for EL0
+Message-ID: <ZsMwhdmE_Ai9BbM9@arm.com>
+References: <20240801-arm64-gcs-v10-0-699e2bd2190b@kernel.org>
+ <20240801-arm64-gcs-v10-19-699e2bd2190b@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, glider@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240801-arm64-gcs-v10-19-699e2bd2190b@kernel.org>
 
-On Mon, 19 Aug 2024 10:39:50 +0100,
-Zenghui Yu <yuzenghui@huawei.com> wrote:
-> 
-> Hi Marc,
-> 
-> On 2024/8/8 17:15, Marc Zyngier wrote:
-> > Tearing down a vcpu CPU interface involves freeing the private interrupt
-> > array. If we don't hold the lock, we may race against another thread
-> > trying to configure it. Yeah, fuzzers do wonderful things...
-> > 
-> > Taking the lock early solves this particular problem.
-> > 
-> > Fixes: 03b3d00a70b5 ("KVM: arm64: vgic: Allocate private interrupts on demand")
-> > Reported-by: Alexander Potapenko <glider@google.com>
-> > Tested-by: Alexander Potapenko <glider@google.com>
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/vgic/vgic-init.c | 3 +--
-> >  1 file changed, 1 insertion(+), 2 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-> > index 7f68cf58b978..41feb858ff9a 100644
-> > --- a/arch/arm64/kvm/vgic/vgic-init.c
-> > +++ b/arch/arm64/kvm/vgic/vgic-init.c
-> > @@ -438,14 +438,13 @@ void kvm_vgic_destroy(struct kvm *kvm)
-> >  	unsigned long i;
-> >  
-> >  	mutex_lock(&kvm->slots_lock);
-> > +	mutex_lock(&kvm->arch.config_lock);
-> >  
-> >  	vgic_debug_destroy(kvm);
-> >  
-> >  	kvm_for_each_vcpu(i, vcpu, kvm)
-> >  		__kvm_vgic_vcpu_destroy(vcpu);
-> >  
-> > -	mutex_lock(&kvm->arch.config_lock);
-> > -
-> >  	kvm_vgic_dist_destroy(kvm);
-> >  
-> >  	mutex_unlock(&kvm->arch.config_lock);
-> 
-> The following splat was triggered when running the vgic_init selftest on
-> a lockdep kernel (I use rc4, with defconfig + PROVE_LOCKING).
-> 
-> I'm not entirely sure that the splat is related to this change. Just
-> haven't got time to dig further so post it out early for record.
+On Thu, Aug 01, 2024 at 01:06:46PM +0100, Mark Brown wrote:
+> diff --git a/arch/arm64/kernel/process.c b/arch/arm64/kernel/process.c
+> index 4ae31b7af6c3..5f00cb0da9c3 100644
+> --- a/arch/arm64/kernel/process.c
+> +++ b/arch/arm64/kernel/process.c
+[...]
+> +static void gcs_thread_switch(struct task_struct *next)
+> +{
+> +	if (!system_supports_gcs())
+> +		return;
+> +
+> +	gcs_preserve_current_state();
+> +
+> +	gcs_set_el0_mode(next);
+> +	write_sysreg_s(next->thread.gcspr_el0, SYS_GCSPR_EL0);
+> +
+> +	/*
+> +	 * Ensure that GCS changes are observable by/from other PEs in
+> +	 * case of migration.
+> +	 */
+> +	if (task_gcs_el0_enabled(current) || task_gcs_el0_enabled(next))
+> +		gcsb_dsync();
 
-Arghh. Thanks for reporting this. Can you try the following patch? It
-does the trick for me, but I don't trust myself anymore...
+Could we do the sysreg writing under this 'if' block? If no app is using
+GCS (which would be the case for a while), it looks like unnecessary
+sysreg accesses.
 
-	M.
-
-diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-index 41feb858ff9a..e7c53e8af3d1 100644
---- a/arch/arm64/kvm/vgic/vgic-init.c
-+++ b/arch/arm64/kvm/vgic/vgic-init.c
-@@ -417,10 +417,8 @@ static void __kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
- 	kfree(vgic_cpu->private_irqs);
- 	vgic_cpu->private_irqs = NULL;
- 
--	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
--		vgic_unregister_redist_iodev(vcpu);
-+	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
- 		vgic_cpu->rd_iodev.base_addr = VGIC_ADDR_UNDEF;
--	}
- }
- 
- void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
-@@ -448,6 +446,11 @@ void kvm_vgic_destroy(struct kvm *kvm)
- 	kvm_vgic_dist_destroy(kvm);
- 
- 	mutex_unlock(&kvm->arch.config_lock);
-+
-+	if (kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
-+		kvm_for_each_vcpu(i, vcpu, kvm)
-+			vgic_unregister_redist_iodev(vcpu);
-+
- 	mutex_unlock(&kvm->slots_lock);
- }
- 
-diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-index 2caa64415ff3..f50274fd5581 100644
---- a/arch/arm64/kvm/vgic/vgic.c
-+++ b/arch/arm64/kvm/vgic/vgic.c
-@@ -36,6 +36,11 @@ struct vgic_global kvm_vgic_global_state __ro_after_init = {
-  * we have to disable IRQs before taking this lock and everything lower
-  * than it.
-  *
-+ * The config_lock has additional ordering requirements:
-+ * kvm->slots_lock
-+ *   kvm->srcu
-+ *     kvm->arch.config_lock
-+ *
-  * If you need to take multiple locks, always take the upper lock first,
-  * then the lower ones, e.g. first take the its_lock, then the irq_lock.
-  * If you are already holding a lock and need to take a higher one, you
+What's the GCSB DSYNC supposed to do here? The Arm ARM talks about
+ordering between GCS memory effects and other memory effects. I haven't
+looked at the memory model in detail yet (D11.9.1) but AFAICT it has
+nothing to do with the system registers. We'll need this barrier when
+ordering is needed between explicit or implicit (e.g. BL) GCS accesses
+and the explicit classic memory accesses. Paging comes to mind, so maybe
+flush_dcache_page() would need this barrier. ptrace() is another case if
+the memory accessed is a GCS page. I can see you added it in other
+places, I'll have a look as I go through the rest. But I don't think one
+is needed here.
 
 -- 
-Without deviation from the norm, progress is not possible.
+Catalin
