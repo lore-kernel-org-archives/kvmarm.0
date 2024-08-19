@@ -1,48 +1,48 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB3B816B72B;
-	Mon, 19 Aug 2024 12:51:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEA9816C680;
+	Mon, 19 Aug 2024 13:19:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724071871; cv=none; b=QHXnABT9DmtQqbFbOM65ANXhr5o/PTlQXeaxy9cXfl6E2yDwSFY/L4WfBr948kxkI9gI8O87GzoHyS7cTLA347WyPMx5GYFRhRQzWY8C7FM8+Nvde+cpI2nsdFUyQB+ig7nFZ8qmst2vnm9+nH6dNv4G6dBmzmhDGQwNiZicMpI=
+	t=1724073584; cv=none; b=CDFP1sS43SeTN8ci8G89J1iETu8SYjt6YB8z2+x36WCilchwFaZFx+Ftg4gfhCP7kar1TcI4xNgomGcSPuYYHVKiiLT9YFJaB1yntVT+E4jJdNWg0of51bgCdJSXzaVKYF9KdI4q+X32XUTUZeNkbx0NGERJyOKwsVk7l8jjbzM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724071871; c=relaxed/simple;
-	bh=JXUpYHtZACRIuspTSI0Js+ODC8Xo4P7wetbbael4Ih4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=O2Ipd7XU9qUhvHHHXG96+7PrTWL0Js/n17SfNOYpQalafhWZ9tIFnMqTxP5ReQ/6eMOZ2TURxVPZtjnw8de6S3N+37MIySAxyHa8uDs3foy18q8UYdbPsUt5V0UJxaHKQJwbIl/imbTS1gA1F7PVq7xnqWRfEfAAt1BgYYC/9rA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UBlv6oZx; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UBlv6oZx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44BE8C32782;
-	Mon, 19 Aug 2024 12:51:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724071871;
-	bh=JXUpYHtZACRIuspTSI0Js+ODC8Xo4P7wetbbael4Ih4=;
-	h=From:To:Cc:Subject:Date:From;
-	b=UBlv6oZx7OQw/ZMewuNPV/fyZzMXH+WXgzC0eXUD/Cu7j3YkIc5feQ6xlYRKBwDt1
-	 wx2p4z7Y9KzmMXWmSGdhUK4ofSMX2qJmes62M8OZnv7GFDRrsTbY0zKt47i8l2dq82
-	 umVQIf035O/k63kqv02aA+LJ2HmO1Iyxe0DzghYshd4AGuV9bu+B/3vcoPu8t1dZpO
-	 EZBZxZV1kyQK1be+8H2NU0zz0oAEGCBfu8DHbhAEKaaq53nUfT01hJifBBmuGHa2Rx
-	 2z1Wir6Aym+02h6kkB8dRQCjWHs9tYLH6RYdpnN93Je3PeETMKx7UPKE3GrlHBRuyf
-	 WeTb+3Mix0IPg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sg1qn-004uwa-DR;
-	Mon, 19 Aug 2024 13:51:09 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Cc: James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	s=arc-20240116; t=1724073584; c=relaxed/simple;
+	bh=q7n4yox1qlvnzKsPcwva4ELTO5183R23ss6XmWPQJUE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=du1/yx4npMknjjaKQDeChxWtVDGUIeN9wOlK1h0l2jEDUJ0fpry4Pp41sjflLFpOzg9ljoVJubZZDy0ygtEorGUcK/T1xAmkk0AErCIC7+CNkZluXby7QP4W6Nj3WH+H/6yBtioW/LjJgdPDMOcQwkJ1fnGuGkcSGXEO7mRhU/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4372A339;
+	Mon, 19 Aug 2024 06:20:07 -0700 (PDT)
+Received: from e122027.arm.com (unknown [10.57.85.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 33A913F73B;
+	Mon, 19 Aug 2024 06:19:37 -0700 (PDT)
+From: Steven Price <steven.price@arm.com>
+To: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Cc: Steven Price <steven.price@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH] KVM: arm64: vgic: Don't hold config_lock while unregistering redistributors
-Date: Mon, 19 Aug 2024 13:50:45 +0100
-Message-Id: <20240819125045.3474845-1-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>
+Subject: [PATCH v5 00/19] arm64: Support for running as a guest in Arm CCA
+Date: Mon, 19 Aug 2024 14:19:05 +0100
+Message-Id: <20240819131924.372366-1-steven.price@arm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -50,83 +50,129 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-We recently moved the teardown of the vgic part of a vcpu inside
-a critical section guarded by the config_lock. This teardown phase
-involves calling into kvm_io_bus_unregister_dev(), which takes the
-kvm->srcu lock.
+This series adds support for running Linux in a protected VM under the
+Arm Confidential Compute Architecture (CCA). This has been updated
+following the feedback from the v4 posting[1]. Thanks for the feedback!
+Individual patches have a change log. But things to highlight:
 
-However, this violates the established order where kvm->srcu is
-taken on a memory fault (such as an MMIO access), possibly
-followed by taking the config_lock if the GIC emulation requires
-mutual exclusion from the other vcpus.
+ * New RMM spec version[2] (v1.0-rel0-rc1). Note that this makes a
+   number of (small) breaking changes so you will need to update the RMM
+   and host too (see below).
 
-It therefore results in a bad lockdep splat, as reported by Zenghui.
+ * 'Borrowed' two commits by Will from the pKVM series which add a
+   dispatcher/hook for mem_encrypt and ioremap. These will hopefully
+   make it easier for CCA to live alongside pKVM.
 
-Fix this by moving the call to kvm_io_bus_unregister_dev() outside
-of the config_lock critical section. At this stage, there shouln't
-be any need to hold the config_lock.
+ * Reworked the code for handling protected/shared MMIO. The new RMM
+   spec adds a new state (RIPAS_IO - although that may get renamed),
+   which is currently unused, but will be used in a later version to
+   signify that a granule is backed by a protected hardware MMIO region.
+   Using this we can now identify whether the top bit should be set when
+   performing an ioremap (or similar).
 
-As an additional bonus, document the ordering between kvm->slots_lock,
-kvm->srcu and kvm->arch.config_lock so that I cannot pretend I didn't
-know about those anymore.
+The ABI to the RMM from a realm (the RSI) is based on the RMM
+v1.0-rel0-rc1 specification[2]. Future RMM specifications after v1.0
+will be backwards compatible so a guest using the v1.0 specification
+(i.e. this series) will be able to run on future versions of the RMM
+without modification.
 
-Fixes: 9eb18136af9f ("KVM: arm64: vgic: Hold config_lock while tearing down a CPU interface")
-Reported-by: Zenghui Yu <yuzenghui@huawei.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/vgic/vgic-init.c | 9 ++++++---
- arch/arm64/kvm/vgic/vgic.c      | 5 +++++
- 2 files changed, 11 insertions(+), 3 deletions(-)
+This series is based on v6.11-rc1. It is also available as a git
+repository:
 
-diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-index 41feb858ff9a..e7c53e8af3d1 100644
---- a/arch/arm64/kvm/vgic/vgic-init.c
-+++ b/arch/arm64/kvm/vgic/vgic-init.c
-@@ -417,10 +417,8 @@ static void __kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
- 	kfree(vgic_cpu->private_irqs);
- 	vgic_cpu->private_irqs = NULL;
- 
--	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
--		vgic_unregister_redist_iodev(vcpu);
-+	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
- 		vgic_cpu->rd_iodev.base_addr = VGIC_ADDR_UNDEF;
--	}
- }
- 
- void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
-@@ -448,6 +446,11 @@ void kvm_vgic_destroy(struct kvm *kvm)
- 	kvm_vgic_dist_destroy(kvm);
- 
- 	mutex_unlock(&kvm->arch.config_lock);
-+
-+	if (kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
-+		kvm_for_each_vcpu(i, vcpu, kvm)
-+			vgic_unregister_redist_iodev(vcpu);
-+
- 	mutex_unlock(&kvm->slots_lock);
- }
- 
-diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-index 2caa64415ff3..f50274fd5581 100644
---- a/arch/arm64/kvm/vgic/vgic.c
-+++ b/arch/arm64/kvm/vgic/vgic.c
-@@ -36,6 +36,11 @@ struct vgic_global kvm_vgic_global_state __ro_after_init = {
-  * we have to disable IRQs before taking this lock and everything lower
-  * than it.
-  *
-+ * The config_lock has additional ordering requirements:
-+ * kvm->slots_lock
-+ *   kvm->srcu
-+ *     kvm->arch.config_lock
-+ *
-  * If you need to take multiple locks, always take the upper lock first,
-  * then the lower ones, e.g. first take the its_lock, then the irq_lock.
-  * If you are already holding a lock and need to take a higher one, you
+https://gitlab.arm.com/linux-arm/linux-cca cca-guest/v5
+
+As mentioned above the new RMM specification means that corresponding
+changes need to be made in the RMM, at this time these changes are still
+in review (see 'topics/rmm-1.0-rel0-rc1'). So you'll need to fetch the
+changes[3] from the gerrit instance until they are pushed to the main
+branch.
+
+It has also been pointed out that some documentation would be a good
+idea - I'm afraid it hasn't made this version, but I didn't want to hold
+off posting for any longer.
+
+The new version of the RMM also means you'll need to update the host
+support, a v4 of the host changes will be posted soon, in the mean time
+the code is available from git here:
+
+https://gitlab.arm.com/linux-arm/linux-cca cca-host/v4
+
+[1] https://lore.kernel.org/r/20240701095505.165383-1-steven.price%40arm.com
+[2] https://developer.arm.com/-/cdn-downloads/permalink/PDF/Architectures/DEN0137_1.0-rel0-rc1_rmm-arch_external.pdf
+[3] https://review.trustedfirmware.org/c/TF-RMM/tf-rmm/+/30485
+
+Jean-Philippe Brucker (1):
+  firmware/psci: Add psci_early_test_conduit()
+
+Sami Mujawar (1):
+  virt: arm-cca-guest: TSM_REPORT support for realms
+
+Steven Price (6):
+  arm64: realm: Query IPA size from the RMM
+  arm64: Make the PHYS_MASK_SHIFT dynamic
+  arm64: Enforce bounce buffers for realm DMA
+  arm64: mm: Avoid TLBI when marking pages as valid
+  irqchip/gic-v3-its: Share ITS tables with a non-trusted hypervisor
+  irqchip/gic-v3-its: Rely on genpool alignment
+
+Suzuki K Poulose (9):
+  arm64: rsi: Add RSI definitions
+  arm64: Detect if in a realm and set RIPAS RAM
+  arm64: rsi: Add support for checking whether an MMIO is protected
+  fixmap: Allow architecture overriding set_fixmap_io
+  fixmap: Pass down the full phys address for set_fixmap_io
+  arm64: Override set_fixmap_io
+  arm64: rsi: Map unprotected MMIO as decrypted
+  efi: arm64: Map Device with Prot Shared
+  arm64: Enable memory encrypt for Realms
+
+Will Deacon (2):
+  arm64: mm: Add top-level dispatcher for internal mem_encrypt API
+  arm64: mm: Add confidential computing hook to ioremap_prot()
+
+ arch/arm64/Kconfig                            |   4 +
+ arch/arm64/include/asm/fixmap.h               |   2 +
+ arch/arm64/include/asm/io.h                   |  12 +
+ arch/arm64/include/asm/mem_encrypt.h          |  24 ++
+ arch/arm64/include/asm/pgtable-hwdef.h        |   6 -
+ arch/arm64/include/asm/pgtable-prot.h         |   4 +
+ arch/arm64/include/asm/pgtable.h              |  10 +
+ arch/arm64/include/asm/rsi.h                  |  68 ++++++
+ arch/arm64/include/asm/rsi_cmds.h             | 157 +++++++++++++
+ arch/arm64/include/asm/rsi_smc.h              | 189 ++++++++++++++++
+ arch/arm64/include/asm/set_memory.h           |   4 +
+ arch/arm64/kernel/Makefile                    |   3 +-
+ arch/arm64/kernel/efi.c                       |  12 +-
+ arch/arm64/kernel/rsi.c                       | 149 +++++++++++++
+ arch/arm64/kernel/setup.c                     |   8 +
+ arch/arm64/mm/Makefile                        |   2 +-
+ arch/arm64/mm/init.c                          |  10 +-
+ arch/arm64/mm/ioremap.c                       |  23 +-
+ arch/arm64/mm/mem_encrypt.c                   |  50 +++++
+ arch/arm64/mm/mmu.c                           |  17 ++
+ arch/arm64/mm/pageattr.c                      |  84 ++++++-
+ drivers/firmware/psci/psci.c                  |  25 +++
+ drivers/irqchip/irq-gic-v3-its.c              | 142 +++++++++---
+ drivers/tty/serial/earlycon.c                 |   2 +-
+ drivers/virt/coco/Kconfig                     |   2 +
+ drivers/virt/coco/Makefile                    |   1 +
+ drivers/virt/coco/arm-cca-guest/Kconfig       |  11 +
+ drivers/virt/coco/arm-cca-guest/Makefile      |   2 +
+ .../virt/coco/arm-cca-guest/arm-cca-guest.c   | 211 ++++++++++++++++++
+ include/asm-generic/fixmap.h                  |   4 +-
+ include/linux/psci.h                          |   5 +
+ 31 files changed, 1200 insertions(+), 43 deletions(-)
+ create mode 100644 arch/arm64/include/asm/mem_encrypt.h
+ create mode 100644 arch/arm64/include/asm/rsi.h
+ create mode 100644 arch/arm64/include/asm/rsi_cmds.h
+ create mode 100644 arch/arm64/include/asm/rsi_smc.h
+ create mode 100644 arch/arm64/kernel/rsi.c
+ create mode 100644 arch/arm64/mm/mem_encrypt.c
+ create mode 100644 drivers/virt/coco/arm-cca-guest/Kconfig
+ create mode 100644 drivers/virt/coco/arm-cca-guest/Makefile
+ create mode 100644 drivers/virt/coco/arm-cca-guest/arm-cca-guest.c
+
 -- 
-2.39.2
+2.34.1
 
