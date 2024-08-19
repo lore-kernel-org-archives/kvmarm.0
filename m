@@ -1,157 +1,164 @@
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 092C71607B4
-	for <kvmarm@lists.linux.dev>; Mon, 19 Aug 2024 10:28:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D59B7148315
+	for <kvmarm@lists.linux.dev>; Mon, 19 Aug 2024 10:54:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724063308; cv=none; b=h+JDj1NIPImku/DdV/4w/SnsjA28f5F8wrRRoptY7hORF4dOtBZWcdNQPyHtUxtIm+pHtLOcXsuvG/N6cCT5qlXDVlq4LrSIuKPBJHh0exT+fJgsA1thopaeCOTyEsKPFxbyI+YXfdgek6BlmmNifGVE0Hxb7DDQvzWbccQNkP8=
+	t=1724064843; cv=none; b=nWdaERbM+F1IWK60s6u0ONhTR1x52FwzBO2D5uyhPsj+u0dd6+SOgPWfVBgoem0lhznl73YtbMJIh4gxoFACltVAgUtvqzA1FA4d0MBczaU23PK+LdReRxfdqyVrQQM/qKs9sQB7F1etVot9ZOQnSNzs2hx0xYSrCofwbJCN+0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724063308; c=relaxed/simple;
-	bh=+h8HIi/gend96fRCd9l2WJq86aZzGE94/3TDyV88XYk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VQzOv9YAVocXkueld/G0v1AGuhGsNJPzcVl50O62r+W9B6OLU3KB68Ysf3lr8wKOFZxhPDLqG2o0eTr6i5txC/UW0U8qBjHEMB2EnRZONkMokSaCgZjMMJC5nj9b+eb3pElKrdQnj6XK/jMr17SKrhr9+neC/kQVYVfCMRz/2fg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4gr7OPrZ; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1724064843; c=relaxed/simple;
+	bh=hfi2xWUQDHNzoOIDKBnqZk6fSJrAUllso94P3ypE0GY=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bgHYIXbZTy2RXfRQw+OCeHpr/S1mZkF/Z6M00FMCkw1oYbCNkPqQ9aFQBf2PWhpog6+wa8CTIzXWc5dn05dXZs1peeY6WuHgu6kgsg3Q7L9peBOSglJPnJYeRBWID/38+XwqviHa8K+eVF3yHXou/RFBWcmtJPB7/pTNZ+9D4l8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f+zEvglK; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4gr7OPrZ"
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-371aa511609so1144529f8f.1
-        for <kvmarm@lists.linux.dev>; Mon, 19 Aug 2024 03:28:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724063305; x=1724668105; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HCnYXKbPejxZx0vHdL+PDYgS0GrW5E1HoGp5p5wjmA8=;
-        b=4gr7OPrZC0gUoLtwnrh1eGulU9NC1/qtDHJiS6zpzSFWkDeJ0Ni76NAddMT8aKocUQ
-         ouUyjFYBQ7nbIuSM0thzPBLuHGc3xPVIaEpEfiSxC8GYwARVigNdz6nbiXFND9z/7hsI
-         WU/jn7sHvfLsinz9Ywl+VdKNS/E/fL8lhK7FrZHigeZB2vq60CR0ZkMMCAxBNbL2Ivlt
-         D2t+eOnh80gvQ/7vBhiFFyAvuOVpVWoNvXKD0v2BtHxwDsZIX6lMiYxP8S3jSUXx2inh
-         hTlBig3flnTfgJykB1PvNJU5zXLrjsqpSqDbY3vpFdC9w2rZJV6AAR3PaWVJH4Ai8OxP
-         qa0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724063305; x=1724668105;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HCnYXKbPejxZx0vHdL+PDYgS0GrW5E1HoGp5p5wjmA8=;
-        b=wYCIAMnAJzLPazVTCYneNfpUVMinuohH+wrHO+6p5GkI4SjhYpeRc/bN4z25AV2nGJ
-         ab9zDtsAN+jlGhz/xoaxoLKz4Ti//5X3YOVbSV9gu/6J+pq03AW6qe+NZz4lgtX6gO85
-         kF8J1LnfdRc1bHgU2ncOvKSwee7BmuyPrYsgLqYPjHnXg5F8KXhFeOz4tv1qV4u7N7ct
-         qqPb+0D6TrI7HtjNtVe/0XXVsSVcmcdb7yXe6S+aa0MZpT03Z1KAC2VdwYAuGI4hNcg2
-         3305eM8t7gEiQtYNP6j0NBTqXgKlJxYptV+dcx1e4O1MAgKrnSv+Pes01UOgCVzATTle
-         0Xjg==
-X-Forwarded-Encrypted: i=1; AJvYcCXpQPD67yExDk0KrFm6Le3MFhntZv5afsBJFvKm1Ba4aiLUHyxr68Dabg34hzWTQhJAqzrnBuTYIHod+GPwPwrzWwr69fC3
-X-Gm-Message-State: AOJu0Yz7Kv15q/QHOMlqbalhhn39tpemMyhePrck3mvaPpVzv9T228NC
-	oZ+umXTktD6tjxzy49yjJLpx1m/X5xNS3OEFAdnvRBN/29TUvkkQIPAYTl6fvg==
-X-Google-Smtp-Source: AGHT+IH29AZnz1h0T1T38pt3izR9PAR4PDYKW5YJTXZhxJwmI5d0SQZeuuiLw0/+rgopZIybK6w00Q==
-X-Received: by 2002:adf:a35d:0:b0:368:319c:9a77 with SMTP id ffacd0b85a97d-371946535f5mr5589469f8f.29.1724063305033;
-        Mon, 19 Aug 2024 03:28:25 -0700 (PDT)
-Received: from google.com (203.75.199.104.bc.googleusercontent.com. [104.199.75.203])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-371898498e1sm10186667f8f.41.2024.08.19.03.28.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Aug 2024 03:28:24 -0700 (PDT)
-Date: Mon, 19 Aug 2024 11:28:19 +0100
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Sebastian Ene <sebastianene@google.com>
-Cc: akpm@linux-foundation.org, alexghiti@rivosinc.com, ankita@nvidia.com,
-	ardb@kernel.org, catalin.marinas@arm.com,
-	christophe.leroy@csgroup.eu, james.morse@arm.com,
-	mark.rutland@arm.com, maz@kernel.org, oliver.upton@linux.dev,
-	rananta@google.com, ryan.roberts@arm.com, shahuang@redhat.com,
-	suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, kernel-team@android.com
-Subject: Re: [PATCH v8 5/6] KVM: arm64: Initialize the ptdump parser with
- stage-2 attributes
-Message-ID: <ZsMeQ8nAZLDhsBmA@google.com>
-References: <20240816123906.3683425-1-sebastianene@google.com>
- <20240816123906.3683425-6-sebastianene@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f+zEvglK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 649E9C32782;
+	Mon, 19 Aug 2024 10:54:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724064843;
+	bh=hfi2xWUQDHNzoOIDKBnqZk6fSJrAUllso94P3ypE0GY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=f+zEvglK+0ypG7S6lMy6tMUEZpH3BYeGaWjfMZ6fgjIv816gfbwt4PrGb0Y3Ph3or
+	 6HfAKbu63DGiFRg4m0WX8hg0O07kMuebvxLhW8al/1xFZmbyoQuMkJg2IQX3uths/B
+	 r6vRlKZjnJ1N3XqrOKoJLBvy74kZV72jWNWyFmXOIvX0JOdUsLsDessHrGT3VpIcLT
+	 ssqsMLeEzFKOdQQETf02i35Xbmojchml9zh5NeGgRNFN4DnTMl+l0k5CNzMYYA1538
+	 585KGto2LD/EO074Sxi/L6uhOIfVsQSqaAhwHHPZ1nOwReIMMpsF1idIw8Rq3ZjRnl
+	 jBEjXh846vblQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sg01R-004shy-6Z;
+	Mon, 19 Aug 2024 11:54:01 +0100
+Date: Mon, 19 Aug 2024 11:53:59 +0100
+Message-ID: <8634n0zsu0.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Zenghui Yu <yuzenghui@huawei.com>
+Cc: <kvmarm@lists.linux.dev>,
+	<linux-arm-kernel@lists.infradead.org>,
+	James
+ Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Alexander Potapenko
+	<glider@google.com>
+Subject: Re: [PATCH] KVM: arm64: vgic: Hold config_lock while tearing down a CPU interface
+In-Reply-To: <c8f4602a-c3af-958f-6c8e-a4226d613a6b@huawei.com>
+References: <20240808091546.3262111-1-maz@kernel.org>
+	<c8f4602a-c3af-958f-6c8e-a4226d613a6b@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240816123906.3683425-6-sebastianene@google.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, glider@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Mon, 19 Aug 2024 10:39:50 +0100,
+Zenghui Yu <yuzenghui@huawei.com> wrote:
+> 
+> Hi Marc,
+> 
+> On 2024/8/8 17:15, Marc Zyngier wrote:
+> > Tearing down a vcpu CPU interface involves freeing the private interrupt
+> > array. If we don't hold the lock, we may race against another thread
+> > trying to configure it. Yeah, fuzzers do wonderful things...
+> > 
+> > Taking the lock early solves this particular problem.
+> > 
+> > Fixes: 03b3d00a70b5 ("KVM: arm64: vgic: Allocate private interrupts on demand")
+> > Reported-by: Alexander Potapenko <glider@google.com>
+> > Tested-by: Alexander Potapenko <glider@google.com>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/vgic/vgic-init.c | 3 +--
+> >  1 file changed, 1 insertion(+), 2 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+> > index 7f68cf58b978..41feb858ff9a 100644
+> > --- a/arch/arm64/kvm/vgic/vgic-init.c
+> > +++ b/arch/arm64/kvm/vgic/vgic-init.c
+> > @@ -438,14 +438,13 @@ void kvm_vgic_destroy(struct kvm *kvm)
+> >  	unsigned long i;
+> >  
+> >  	mutex_lock(&kvm->slots_lock);
+> > +	mutex_lock(&kvm->arch.config_lock);
+> >  
+> >  	vgic_debug_destroy(kvm);
+> >  
+> >  	kvm_for_each_vcpu(i, vcpu, kvm)
+> >  		__kvm_vgic_vcpu_destroy(vcpu);
+> >  
+> > -	mutex_lock(&kvm->arch.config_lock);
+> > -
+> >  	kvm_vgic_dist_destroy(kvm);
+> >  
+> >  	mutex_unlock(&kvm->arch.config_lock);
+> 
+> The following splat was triggered when running the vgic_init selftest on
+> a lockdep kernel (I use rc4, with defconfig + PROVE_LOCKING).
+> 
+> I'm not entirely sure that the splat is related to this change. Just
+> haven't got time to dig further so post it out early for record.
 
-[...]
+Arghh. Thanks for reporting this. Can you try the following patch? It
+does the trick for me, but I don't trust myself anymore...
 
-> +static int kvm_ptdump_build_levels(struct ptdump_pg_level *level, u32 start_lvl)
-> +{
-> +	static const char * const level_names[] = {"PGD", "PUD", "PMD", "PTE"};
-> +	u32 i = 0;
-> +	u64 mask = 0;
-> +
-> +	if (start_lvl > 2) {
-> +		pr_err("invalid start_lvl %u\n", start_lvl);
-> +		return -EINVAL;
-> +	}
+	M.
 
-It looks like a duplicate of the if below.
+diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+index 41feb858ff9a..e7c53e8af3d1 100644
+--- a/arch/arm64/kvm/vgic/vgic-init.c
++++ b/arch/arm64/kvm/vgic/vgic-init.c
+@@ -417,10 +417,8 @@ static void __kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
+ 	kfree(vgic_cpu->private_irqs);
+ 	vgic_cpu->private_irqs = NULL;
+ 
+-	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
+-		vgic_unregister_redist_iodev(vcpu);
++	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
+ 		vgic_cpu->rd_iodev.base_addr = VGIC_ADDR_UNDEF;
+-	}
+ }
+ 
+ void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
+@@ -448,6 +446,11 @@ void kvm_vgic_destroy(struct kvm *kvm)
+ 	kvm_vgic_dist_destroy(kvm);
+ 
+ 	mutex_unlock(&kvm->arch.config_lock);
++
++	if (kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
++		kvm_for_each_vcpu(i, vcpu, kvm)
++			vgic_unregister_redist_iodev(vcpu);
++
+ 	mutex_unlock(&kvm->slots_lock);
+ }
+ 
+diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+index 2caa64415ff3..f50274fd5581 100644
+--- a/arch/arm64/kvm/vgic/vgic.c
++++ b/arch/arm64/kvm/vgic/vgic.c
+@@ -36,6 +36,11 @@ struct vgic_global kvm_vgic_global_state __ro_after_init = {
+  * we have to disable IRQs before taking this lock and everything lower
+  * than it.
+  *
++ * The config_lock has additional ordering requirements:
++ * kvm->slots_lock
++ *   kvm->srcu
++ *     kvm->arch.config_lock
++ *
+  * If you need to take multiple locks, always take the upper lock first,
+  * then the lower ones, e.g. first take the its_lock, then the irq_lock.
+  * If you are already holding a lock and need to take a higher one, you
 
-> +
-> +	if (WARN_ON_ONCE(start_lvl >= KVM_PGTABLE_LAST_LEVEL))
-> +		return -EINVAL;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(stage2_pte_bits); i++)
-> +		mask |= stage2_pte_bits[i].mask;
-> +
-> +	for (i = start_lvl; i < KVM_PGTABLE_MAX_LEVELS; i++) {
-> +		strscpy(level[i].name, level_names[i], sizeof(level[i].name));
-> +
-> +		level[i].num	= ARRAY_SIZE(stage2_pte_bits);
-> +		level[i].bits	= stage2_pte_bits;
-> +		level[i].mask	= mask;
-> +	}
-> +
-> +	if (start_lvl > 0)
-> +		strscpy(level[start_lvl].name, "PGD", sizeof(level[start_lvl].name));
-> +
-> +	return 0;
-> +}
-> +
-> +static struct kvm_ptdump_guest_state
-> +*kvm_ptdump_parser_init(struct kvm *kvm)
-
-nit: I guess it's more a "create" than an "init" as we allocate the memory.
-
-> +{
-> +	struct kvm_ptdump_guest_state *st;
-> +	struct kvm_s2_mmu *mmu = &kvm->arch.mmu;
-> +	struct kvm_pgtable *pgtable = mmu->pgt;
-> +	int ret;
-> +
-> +	st = kzalloc(sizeof(struct kvm_ptdump_guest_state), GFP_KERNEL_ACCOUNT);
-> +	if (!st)
-> +		return NULL;
-
-return ERR_PTR(-ENOMEM); ?
-
-> +
-> +	ret = kvm_ptdump_build_levels(&st->level[0], pgtable->start_level);
-> +	if (ret) {
-> +		kfree(st);
-> +		return ERR_PTR(ret);
-> +	}
-> +
-> +	st->ipa_marker[0].name		= "Guest IPA";
-> +	st->ipa_marker[1].start_address = BIT(pgtable->ia_bits);
-> +	st->range[0].end		= BIT(pgtable->ia_bits);
-> +
-> +	st->kvm				= kvm;
-> +	st->parser_state = (struct ptdump_pg_state) {
-> +		.marker		= &st->ipa_marker[0],
-> +		.level		= -1,
-> +		.pg_level	= &st->level[0],
-> +		.ptdump.range	= &st->range[0],
-> +	};
-> +
-> +	return st;
-> +}
-> +
-
-[...]
+-- 
+Without deviation from the norm, progress is not possible.
