@@ -1,133 +1,132 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0600416B753
-	for <kvmarm@lists.linux.dev>; Mon, 19 Aug 2024 12:48:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB3B816B72B;
+	Mon, 19 Aug 2024 12:51:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724071722; cv=none; b=uAPAl8wQVtvQ/eJX96GEFmcSayikOWIJClr3Dv4fZEU8PbZXh13pqsn3flPo35b3zaxK6BMZYT0iCPDl19mWLWDlhdKMzOgc4I1ySnjTVb7RLO9bn7yo7KfbMgwyJNQaAj5PbqsvKV9wMoDcJYliC3nB3YFBQ+JJHUugyArkJf4=
+	t=1724071871; cv=none; b=QHXnABT9DmtQqbFbOM65ANXhr5o/PTlQXeaxy9cXfl6E2yDwSFY/L4WfBr948kxkI9gI8O87GzoHyS7cTLA347WyPMx5GYFRhRQzWY8C7FM8+Nvde+cpI2nsdFUyQB+ig7nFZ8qmst2vnm9+nH6dNv4G6dBmzmhDGQwNiZicMpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724071722; c=relaxed/simple;
-	bh=rJ00fmlX3u2TZClBGgRz2pCSLIEUy/YzfF3e903e8yk=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aZsqVsjocuZzQCQDksQLEh40Q5m1mrfZP+A/NL0YEWj+mfXskVcLIeWaLbGJAs4z+2UDyYGAHoNavrU9a5Pfz3Cnz3usaYup03SLjspwJLrqSbJB700Bs9smxB2q6YLATzysQaQov7/Qt5hl7G+hBYdQHhfSKSWtTUeNZV6pwr0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WlqT2UHV; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1724071871; c=relaxed/simple;
+	bh=JXUpYHtZACRIuspTSI0Js+ODC8Xo4P7wetbbael4Ih4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=O2Ipd7XU9qUhvHHHXG96+7PrTWL0Js/n17SfNOYpQalafhWZ9tIFnMqTxP5ReQ/6eMOZ2TURxVPZtjnw8de6S3N+37MIySAxyHa8uDs3foy18q8UYdbPsUt5V0UJxaHKQJwbIl/imbTS1gA1F7PVq7xnqWRfEfAAt1BgYYC/9rA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UBlv6oZx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WlqT2UHV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 820E4C4AF11;
-	Mon, 19 Aug 2024 12:48:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UBlv6oZx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44BE8C32782;
+	Mon, 19 Aug 2024 12:51:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724071721;
-	bh=rJ00fmlX3u2TZClBGgRz2pCSLIEUy/YzfF3e903e8yk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WlqT2UHVJ11bw9efaSi7HxgJLTWhqxkIFhqsx9WYw5Q/hOW5hsDTYsFPICwt6HP92
-	 2G3wt/bYWIKkTFB7Ee/gKPFy0wKYUtfEUMIkv4CAoLpo3SqBR08Fu9vuWqRQh9bI+1
-	 EmtoufYqKz4fu71fDrVB2hCBacwtJfmZjJn0FtcMkddnNyvaPXeB0t4gbihgC3QPwn
-	 O/EY2mvKRnPdQiH3YEsBlpefXW5RX9vb+CGpMIGU3jhglhy0EmvZuSyv5tOGGwCw+D
-	 r4ejylHd8UWIbrV/TDFs2V5CZ5hhTTZyYh6BAXQfqqwPEserpB+T4jYKKmHkPOzzl8
-	 6NIa3IMzVZshg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	s=k20201202; t=1724071871;
+	bh=JXUpYHtZACRIuspTSI0Js+ODC8Xo4P7wetbbael4Ih4=;
+	h=From:To:Cc:Subject:Date:From;
+	b=UBlv6oZx7OQw/ZMewuNPV/fyZzMXH+WXgzC0eXUD/Cu7j3YkIc5feQ6xlYRKBwDt1
+	 wx2p4z7Y9KzmMXWmSGdhUK4ofSMX2qJmes62M8OZnv7GFDRrsTbY0zKt47i8l2dq82
+	 umVQIf035O/k63kqv02aA+LJ2HmO1Iyxe0DzghYshd4AGuV9bu+B/3vcoPu8t1dZpO
+	 EZBZxZV1kyQK1be+8H2NU0zz0oAEGCBfu8DHbhAEKaaq53nUfT01hJifBBmuGHa2Rx
+	 2z1Wir6Aym+02h6kkB8dRQCjWHs9tYLH6RYdpnN93Je3PeETMKx7UPKE3GrlHBRuyf
+	 WeTb+3Mix0IPg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sg1oN-004uuX-41;
-	Mon, 19 Aug 2024 13:48:39 +0100
-Date: Mon, 19 Aug 2024 13:48:38 +0100
-Message-ID: <861q2kznix.wl-maz@kernel.org>
+	id 1sg1qn-004uwa-DR;
+	Mon, 19 Aug 2024 13:51:09 +0100
 From: Marc Zyngier <maz@kernel.org>
-To: Zenghui Yu <yuzenghui@huawei.com>
-Cc: <kvmarm@lists.linux.dev>,
-	<linux-arm-kernel@lists.infradead.org>,
-	James
- Morse <james.morse@arm.com>,
+To: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Cc: James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Alexander Potapenko
-	<glider@google.com>
-Subject: Re: [PATCH] KVM: arm64: vgic: Hold config_lock while tearing down a CPU interface
-In-Reply-To: <40d0a14b-b501-aef6-a168-1c1acd5448e7@huawei.com>
-References: <20240808091546.3262111-1-maz@kernel.org>
-	<c8f4602a-c3af-958f-6c8e-a4226d613a6b@huawei.com>
-	<8634n0zsu0.wl-maz@kernel.org>
-	<40d0a14b-b501-aef6-a168-1c1acd5448e7@huawei.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH] KVM: arm64: vgic: Don't hold config_lock while unregistering redistributors
+Date: Mon, 19 Aug 2024 13:50:45 +0100
+Message-Id: <20240819125045.3474845-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, glider@google.com
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 19 Aug 2024 13:31:59 +0100,
-Zenghui Yu <yuzenghui@huawei.com> wrote:
-> 
-> On 2024/8/19 18:53, Marc Zyngier wrote:
-> > On Mon, 19 Aug 2024 10:39:50 +0100,
-> > Zenghui Yu <yuzenghui@huawei.com> wrote:
-> > >
-> > > Hi Marc,
-> > >
-> > > On 2024/8/8 17:15, Marc Zyngier wrote:
-> > > > Tearing down a vcpu CPU interface involves freeing the private interrupt
-> > > > array. If we don't hold the lock, we may race against another thread
-> > > > trying to configure it. Yeah, fuzzers do wonderful things...
-> > > >
-> > > > Taking the lock early solves this particular problem.
-> > > >
-> > > > Fixes: 03b3d00a70b5 ("KVM: arm64: vgic: Allocate private interrupts on demand")
-> > > > Reported-by: Alexander Potapenko <glider@google.com>
-> > > > Tested-by: Alexander Potapenko <glider@google.com>
-> > > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > > ---
-> > > >  arch/arm64/kvm/vgic/vgic-init.c | 3 +--
-> > > >  1 file changed, 1 insertion(+), 2 deletions(-)
-> > > >
-> > > > diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-> > > > index 7f68cf58b978..41feb858ff9a 100644
-> > > > --- a/arch/arm64/kvm/vgic/vgic-init.c
-> > > > +++ b/arch/arm64/kvm/vgic/vgic-init.c
-> > > > @@ -438,14 +438,13 @@ void kvm_vgic_destroy(struct kvm *kvm)
-> > > >  	unsigned long i;
-> > > >  
-> > > >  	mutex_lock(&kvm->slots_lock);
-> > > > +	mutex_lock(&kvm->arch.config_lock);
-> > > >  
-> > > >  	vgic_debug_destroy(kvm);
-> > > >  
-> > > >  	kvm_for_each_vcpu(i, vcpu, kvm)
-> > > >  		__kvm_vgic_vcpu_destroy(vcpu);
-> > > >  
-> > > > -	mutex_lock(&kvm->arch.config_lock);
-> > > > -
-> > > >  	kvm_vgic_dist_destroy(kvm);
-> > > >  
-> > > >  	mutex_unlock(&kvm->arch.config_lock);
-> > >
-> > > The following splat was triggered when running the vgic_init selftest on
-> > > a lockdep kernel (I use rc4, with defconfig + PROVE_LOCKING).
-> > >
-> > > I'm not entirely sure that the splat is related to this change. Just
-> > > haven't got time to dig further so post it out early for record.
-> > 
-> > Arghh. Thanks for reporting this. Can you try the following patch? It
-> > does the trick for me, but I don't trust myself anymore...
-> 
-> I tested it with defconfig+PROVE_LOCKING and my own config, both worked
-> for me (the WARNING disappeared). I think the locking order should be
-> correct now.
+We recently moved the teardown of the vgic part of a vcpu inside
+a critical section guarded by the config_lock. This teardown phase
+involves calling into kvm_io_bus_unregister_dev(), which takes the
+kvm->srcu lock.
 
-Awesome. Let me post a proper patch right away.
+However, this violates the established order where kvm->srcu is
+taken on a memory fault (such as an MMIO access), possibly
+followed by taking the config_lock if the GIC emulation requires
+mutual exclusion from the other vcpus.
 
-Thanks again,
+It therefore results in a bad lockdep splat, as reported by Zenghui.
 
-	M.
+Fix this by moving the call to kvm_io_bus_unregister_dev() outside
+of the config_lock critical section. At this stage, there shouln't
+be any need to hold the config_lock.
 
+As an additional bonus, document the ordering between kvm->slots_lock,
+kvm->srcu and kvm->arch.config_lock so that I cannot pretend I didn't
+know about those anymore.
+
+Fixes: 9eb18136af9f ("KVM: arm64: vgic: Hold config_lock while tearing down a CPU interface")
+Reported-by: Zenghui Yu <yuzenghui@huawei.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/vgic/vgic-init.c | 9 ++++++---
+ arch/arm64/kvm/vgic/vgic.c      | 5 +++++
+ 2 files changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+index 41feb858ff9a..e7c53e8af3d1 100644
+--- a/arch/arm64/kvm/vgic/vgic-init.c
++++ b/arch/arm64/kvm/vgic/vgic-init.c
+@@ -417,10 +417,8 @@ static void __kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
+ 	kfree(vgic_cpu->private_irqs);
+ 	vgic_cpu->private_irqs = NULL;
+ 
+-	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
+-		vgic_unregister_redist_iodev(vcpu);
++	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
+ 		vgic_cpu->rd_iodev.base_addr = VGIC_ADDR_UNDEF;
+-	}
+ }
+ 
+ void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
+@@ -448,6 +446,11 @@ void kvm_vgic_destroy(struct kvm *kvm)
+ 	kvm_vgic_dist_destroy(kvm);
+ 
+ 	mutex_unlock(&kvm->arch.config_lock);
++
++	if (kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
++		kvm_for_each_vcpu(i, vcpu, kvm)
++			vgic_unregister_redist_iodev(vcpu);
++
+ 	mutex_unlock(&kvm->slots_lock);
+ }
+ 
+diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+index 2caa64415ff3..f50274fd5581 100644
+--- a/arch/arm64/kvm/vgic/vgic.c
++++ b/arch/arm64/kvm/vgic/vgic.c
+@@ -36,6 +36,11 @@ struct vgic_global kvm_vgic_global_state __ro_after_init = {
+  * we have to disable IRQs before taking this lock and everything lower
+  * than it.
+  *
++ * The config_lock has additional ordering requirements:
++ * kvm->slots_lock
++ *   kvm->srcu
++ *     kvm->arch.config_lock
++ *
+  * If you need to take multiple locks, always take the upper lock first,
+  * then the lower ones, e.g. first take the its_lock, then the irq_lock.
+  * If you are already holding a lock and need to take a higher one, you
 -- 
-Without deviation from the norm, progress is not possible.
+2.39.2
+
