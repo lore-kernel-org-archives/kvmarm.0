@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C13318F2D9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C98CA18FC66;
 	Tue, 20 Aug 2024 10:38:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724150289; cv=none; b=skJLaUtPx1FEVaNmo8UbCYv/U0osJNsF1LYi17ka7D29Iv5XQ9sP/a3P+4g9nqjdUmBKfwLHE0QRK6I3xPR80v7fPA+xtIUlHObDo/qBD6dsUHho8m7NpRwxTE5WAfkIJXyrfKmDwcNUnvwczYnpsVZr/Z6M21pOUOV2ucBewEQ=
+	t=1724150289; cv=none; b=cM/fzWH8N7VNkn04gYG+RBNTHtl9YBYBgsLpiKUl85wK6YFSlpVmic1KnWrKSlRgJWO/S9AednX3cVqZi9j6CciRKO5SUVBdZYe2IzfkX/4BOFu/0eivIKFHewC5TW1Q7H80rWhBmHpIIBD9kukfcR7hyK6MLblbUgiKdFmxsqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1724150289; c=relaxed/simple;
-	bh=k5pYh1Yp0jxWFeMrnF7ay2rjkHNJ1NpYhUlOrVS5zOE=;
+	bh=TuS/6cRtmtNveKfMTQt2TRlXalUYKcoPDKFjEDaud+I=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=GmxhdY6uXPoGOGBPeFOHE2zWU0xHTPrnockTQBA5koIyn8UMcVxFgLw58FBH4CTS1RTvFV9FdSpirzsWOIobMHlV1OZ1MEQhcUMBqnxt97lFuRJgoFdcSF8m9EZi52/o5IIPbYFZcZn8kWXe5R6lL7QTECGakW7h+7WVSmi7nrg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UNdYx8ae; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=BIuFOSWOqJrbjZZtXHPgiQHAnSWMAuxTN1VnY5rF6i6Y5fW9FVKu42nzLDPKSornn0jfWr+fMj7hIC6tJPZEl7Mrnk4l0J20rixgu4AFFHs9Z35FEWGGrK4DPX8QV0C0jQMh5Q/RQw3MVBMe/9KNfCzZrhtzGKzuKT/pjDA2Ih8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U+IKFyXJ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UNdYx8ae"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD20BC4AF15;
-	Tue, 20 Aug 2024 10:38:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U+IKFyXJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E1CAC4AF11;
+	Tue, 20 Aug 2024 10:38:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724150288;
-	bh=k5pYh1Yp0jxWFeMrnF7ay2rjkHNJ1NpYhUlOrVS5zOE=;
+	s=k20201202; t=1724150289;
+	bh=TuS/6cRtmtNveKfMTQt2TRlXalUYKcoPDKFjEDaud+I=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=UNdYx8ae1FeS9wBMHFq80Bad1BmdSagcDX0UaMwSqUysZWHg3E+RkkgG7d1qud6Mx
-	 BeTjfVMVK/yD0QlfwTWCoer1YYLnT+R9hUkmPDtp073OMRVRGKVGbxQ7fZqj97yk+/
-	 MzwHFZOmRwsmWG6ubKtEtPuFXSh8omKEKRKd1DJcUfyjT7i0nIA+7trhkGM9jI68ad
-	 HxNp0PYt5Nl3XSyypQd0wBJKERFUF76+f0OYwQ7aAHII/uTUFxR4mua8d0216TNnAx
-	 ew373uh3YvvN6cBLgpIpj/446EeajDWBzIepCzCQCl68yTAmHdGNl2KYqoEknPr5lu
-	 fvPE3jDRL74nw==
+	b=U+IKFyXJPFifpkxdz5Nsc3NyGDay9w1ARfODKI9jmXUTiq0sU4+zJP20r9XzHaOMW
+	 UXfdo8xcBQyicT7jtJCkV+aYowLdBVfRZxOHA7IChrqrYARWEe7YxUvwGODWbNG1zK
+	 mYfVTXcDAXOxwbkeWvjxTarBYiHIslAaScll4wDRhLrDXmLsNAdCa7R0utYYy23GR1
+	 x2ZjJrrVISHvP1SyhUU3pqTrmXLHnmVJNhgsy1IsQmCrvNvusimPQ81GHiPZ7Vzqi2
+	 UTsPEXtYhOyLzH+9WGdYFoHJHtvYniwJ4F5EYXz+T5D4pjT/YvWn9KJVuguH1Z9Ag2
+	 VBnDHeGT/WHyw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sgMFb-005Ea3-77;
+	id 1sgMFb-005Ea3-K5;
 	Tue, 20 Aug 2024 11:38:07 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -44,9 +44,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Anshuman Khandual <anshuman.khandual@arm.com>,
 	Przemyslaw Gaj <pgaj@cadence.com>
-Subject: [PATCH v4 15/18] KVM: arm64: nv: Sanitise SCTLR_EL1.EPAN according to VM configuration
-Date: Tue, 20 Aug 2024 11:37:53 +0100
-Message-Id: <20240820103756.3545976-16-maz@kernel.org>
+Subject: [PATCH v4 17/18] KVM: arm64: nv: Plumb handling of AT S1* traps from EL2
+Date: Tue, 20 Aug 2024 11:37:55 +0100
+Message-Id: <20240820103756.3545976-18-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240820103756.3545976-1-maz@kernel.org>
 References: <20240820103756.3545976-1-maz@kernel.org>
@@ -62,32 +62,84 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Ensure that SCTLR_EL1.EPAN is RES0 when FEAT_PAN3 isn't supported.
+Hooray, we're done. Plug the AT traps into the system instruction
+table, and let it rip.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/nested.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ arch/arm64/kvm/sys_regs.c | 45 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
 
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 9c8573493d80..133cc2f9530d 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -1178,6 +1178,14 @@ int kvm_init_nv_sysregs(struct kvm *kvm)
- 	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, AMU, V1P1))
- 		res0 |= ~(res0 | res1);
- 	set_sysreg_masks(kvm, HAFGRTR_EL2, res0, res1);
-+
-+	/* SCTLR_EL1 */
-+	res0 = SCTLR_EL1_RES0;
-+	res1 = SCTLR_EL1_RES1;
-+	if (!kvm_has_feat(kvm, ID_AA64MMFR1_EL1, PAN, PAN3))
-+		res0 |= SCTLR_EL1_EPAN;
-+	set_sysreg_masks(kvm, SCTLR_EL1, res0, res1);
-+
- out:
- 	mutex_unlock(&kvm->arch.config_lock);
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index e7e5e0df119e..9f3cf82e5231 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2803,6 +2803,36 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	EL2_REG(SP_EL2, NULL, reset_unknown, 0),
+ };
  
++static bool handle_at_s1e01(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
++			    const struct sys_reg_desc *r)
++{
++	u32 op = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
++
++	__kvm_at_s1e01(vcpu, op, p->regval);
++
++	return true;
++}
++
++static bool handle_at_s1e2(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
++			   const struct sys_reg_desc *r)
++{
++	u32 op = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
++
++	__kvm_at_s1e2(vcpu, op, p->regval);
++
++	return true;
++}
++
++static bool handle_at_s12(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
++			  const struct sys_reg_desc *r)
++{
++	u32 op = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
++
++	__kvm_at_s12(vcpu, op, p->regval);
++
++	return true;
++}
++
+ static bool kvm_supported_tlbi_s12_op(struct kvm_vcpu *vpcu, u32 instr)
+ {
+ 	struct kvm *kvm = vpcu->kvm;
+@@ -3065,6 +3095,14 @@ static struct sys_reg_desc sys_insn_descs[] = {
+ 	{ SYS_DESC(SYS_DC_ISW), access_dcsw },
+ 	{ SYS_DESC(SYS_DC_IGSW), access_dcgsw },
+ 	{ SYS_DESC(SYS_DC_IGDSW), access_dcgsw },
++
++	SYS_INSN(AT_S1E1R, handle_at_s1e01),
++	SYS_INSN(AT_S1E1W, handle_at_s1e01),
++	SYS_INSN(AT_S1E0R, handle_at_s1e01),
++	SYS_INSN(AT_S1E0W, handle_at_s1e01),
++	SYS_INSN(AT_S1E1RP, handle_at_s1e01),
++	SYS_INSN(AT_S1E1WP, handle_at_s1e01),
++
+ 	{ SYS_DESC(SYS_DC_CSW), access_dcsw },
+ 	{ SYS_DESC(SYS_DC_CGSW), access_dcgsw },
+ 	{ SYS_DESC(SYS_DC_CGDSW), access_dcgsw },
+@@ -3144,6 +3182,13 @@ static struct sys_reg_desc sys_insn_descs[] = {
+ 	SYS_INSN(TLBI_VALE1NXS, handle_tlbi_el1),
+ 	SYS_INSN(TLBI_VAALE1NXS, handle_tlbi_el1),
+ 
++	SYS_INSN(AT_S1E2R, handle_at_s1e2),
++	SYS_INSN(AT_S1E2W, handle_at_s1e2),
++	SYS_INSN(AT_S12E1R, handle_at_s12),
++	SYS_INSN(AT_S12E1W, handle_at_s12),
++	SYS_INSN(AT_S12E0R, handle_at_s12),
++	SYS_INSN(AT_S12E0W, handle_at_s12),
++
+ 	SYS_INSN(TLBI_IPAS2E1IS, handle_ipas2e1is),
+ 	SYS_INSN(TLBI_RIPAS2E1IS, handle_ripas2e1is),
+ 	SYS_INSN(TLBI_IPAS2LE1IS, handle_ipas2e1is),
 -- 
 2.39.2
 
