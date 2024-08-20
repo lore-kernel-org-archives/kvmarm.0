@@ -1,20 +1,20 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7301E196D9D;
-	Tue, 20 Aug 2024 17:07:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EE2D1C4635;
+	Tue, 20 Aug 2024 17:28:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724173658; cv=none; b=OcziNq0Y7hwHBYLEhZVzNH751VtIGF1wzGVZ/adDalzlRM1U/q3xaBxuUamXm2QvobiFn9qYvl4iGixevfU09/KwTDjXwmprMNWBLmBDqFaUpNhrq/fX5jUwzpVOaXSQQmGaDx5p68Bk588/7QeCOIRP/f0GxnkxQmHy70PhFBo=
+	t=1724174922; cv=none; b=i2JkiEzB+WU3mq1vPJWO4D2p29L1y7zIwRIGvpALhdwWIREGWTUJAwBcib9Fi2DbzAmpS/sbXg4pxo/yQcARdo4jLi2xpiFzcapBmnRzMBaTdvuxHv1w5vkDVWIXC+OSFYZyA71OLtMo/XS/al24GUXHrSmFMHzUjPNv4HWNUzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724173658; c=relaxed/simple;
-	bh=s2/nlNfABLd/gPvPhiiI1Kam85/3uV84O8KDv9iaquQ=;
+	s=arc-20240116; t=1724174922; c=relaxed/simple;
+	bh=HqgIFw/MNbVJxTLj0yyv6f+URL447V9dt+D8R5sOaP0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B/NVZRii2AirrbrchHmeBLqqtPU6H2VoliTJzyKUVPW9IowWoiBB0xtdKFfNHpYLMLJUiLAbJM6UC7Jw5pmYbvyy9VSgLWFcmf1fdkV9QFcHRMxZhmqGUb5a/9Ug1YnGqnAcqGoYu0RaPpjZlzTBLKTw1ngluyYwjXS3WuVxkS8=
+	 Content-Type:Content-Disposition:In-Reply-To; b=mE0u/yrlYZjeoFH/zAZMgQh3PAL+dfaLiIeiUd31BUx10w89WcnU29qdiolxdo5KNGM7VpqcB7qUIMdJtO0R8IzzT3hR0NxJJlXC/JVwrrzPq2CSMOs100RB7CUmXYC0VUFuG0sn39Xx34Eic84+sj5OQlBMulBuxvr/jUzoexw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6B55C4AF13;
-	Tue, 20 Aug 2024 17:07:31 +0000 (UTC)
-Date: Tue, 20 Aug 2024 18:07:29 +0100
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1055C4AF0E;
+	Tue, 20 Aug 2024 17:28:36 +0000 (UTC)
+Date: Tue, 20 Aug 2024 18:28:34 +0100
 From: Catalin Marinas <catalin.marinas@arm.com>
 To: Mark Brown <broonie@kernel.org>
 Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
@@ -42,12 +42,12 @@ Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
 	linux-arch@vger.kernel.org, linux-mm@kvack.org,
 	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v10 19/40] arm64/gcs: Context switch GCS state for EL0
-Message-ID: <ZsTNUYCMKgkrdRiS@arm.com>
+Subject: Re: [PATCH v10 20/40] arm64/gcs: Ensure that new threads have a GCS
+Message-ID: <ZsTSQmKV4zAEnara@arm.com>
 References: <20240801-arm64-gcs-v10-0-699e2bd2190b@kernel.org>
- <20240801-arm64-gcs-v10-19-699e2bd2190b@kernel.org>
- <ZsMwhdmE_Ai9BbM9@arm.com>
- <0f6fd3ec-2481-4507-af0e-3cbbb7406b54@sirena.org.uk>
+ <20240801-arm64-gcs-v10-20-699e2bd2190b@kernel.org>
+ <ZsM0wkRRguMchecK@arm.com>
+ <e1d40f17-2c03-4440-8d41-85368e138f03@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -56,60 +56,90 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <0f6fd3ec-2481-4507-af0e-3cbbb7406b54@sirena.org.uk>
+In-Reply-To: <e1d40f17-2c03-4440-8d41-85368e138f03@sirena.org.uk>
 
-On Mon, Aug 19, 2024 at 04:44:42PM +0100, Mark Brown wrote:
-> On Mon, Aug 19, 2024 at 12:46:13PM +0100, Catalin Marinas wrote:
-> > On Thu, Aug 01, 2024 at 01:06:46PM +0100, Mark Brown wrote:
-> > > +	/*
-> > > +	 * Ensure that GCS changes are observable by/from other PEs in
-> > > +	 * case of migration.
-> > > +	 */
-> > > +	if (task_gcs_el0_enabled(current) || task_gcs_el0_enabled(next))
-> > > +		gcsb_dsync();
-[...]
-> > What's the GCSB DSYNC supposed to do here? The Arm ARM talks about
-> > ordering between GCS memory effects and other memory effects. I haven't
-> > looked at the memory model in detail yet (D11.9.1) but AFAICT it has
-> > nothing to do with the system registers. We'll need this barrier when
-> > ordering is needed between explicit or implicit (e.g. BL) GCS accesses
-> > and the explicit classic memory accesses. Paging comes to mind, so maybe
-> > flush_dcache_page() would need this barrier. ptrace() is another case if
-> > the memory accessed is a GCS page. I can see you added it in other
-> > places, I'll have a look as I go through the rest. But I don't think one
-> > is needed here.
+On Mon, Aug 19, 2024 at 04:57:08PM +0100, Mark Brown wrote:
+> On Mon, Aug 19, 2024 at 01:04:18PM +0100, Catalin Marinas wrote:
+> > On Thu, Aug 01, 2024 at 01:06:47PM +0100, Mark Brown wrote:
+> > > +static int copy_thread_gcs(struct task_struct *p,
+> > > +			   const struct kernel_clone_args *args)
+> > > +{
+> > > +	unsigned long gcs;
+> > > +
+> > > +	gcs = gcs_alloc_thread_stack(p, args);
+> > > +	if (IS_ERR_VALUE(gcs))
+> > > +		return PTR_ERR((void *)gcs);
 > 
-> It's not particuarly for the system registers, is there's so that
-> anything else that looks at the task's GCS sees the current state.
+> > Is 0 an ok value here? I can see further down that
+> > gcs_alloc_thread_stack() may return 0.
+> 
+> Yes, it's fine for a thread not to have a GCS.
 
-Ah, so that's the to ensure that any writes on the CPU to the GCS stack
-would be observable if the task appears on a different CPU (together
-with the additional classic ordering/spinlocks used for the run queues).
-Maybe update the comment to say "GCS memory effects" instead of "GCS
-changes". I read the latter as GCS sysreg changes. Something like below
-would make it clearer:
+OK, so we only get a 0 here if the gcs_{base,size} has not be
+initialised. Looks fine.
 
-	/*
-	 * Ensure that GCS memory effects of the 'prev' thread are
-	 * ordered before other memory accesses with release semantics
-	 * (or preceded by a DMB) on the current PE. In addition, any
-	 * memory accesses with acquire semantics (or succeeded by a
-	 * DMB) are ordered before GCS memory effects of the 'next'
-	 * thread. This will ensure that the GCS memory effects are
-	 * visible to other PEs in case of migration.
-	 */
+> > > +	p->thread.gcs_el0_mode = current->thread.gcs_el0_mode;
+> > > +	p->thread.gcs_el0_locked = current->thread.gcs_el0_locked;
+> 
+> > > +	/* Ensure the current state of the GCS is seen by CoW */
+> > > +	gcsb_dsync();
+> 
+> > I don't get this barrier. What does it have to do with CoW, which memory
+> > effects is it trying to order?
+> 
+> Yeah, I can't remember what that's supposed to be protecting.
 
-Feel free to rephrase as you see fit.
+The GCS memory writes in the parent must indeed be visible in the child
+that could start on a different CPU. So, in principle, we need some form
+of ordering similar to the context switch. However, in case of classic
+fork(), the child won't be started until the PTEs have been made
+read-only and a TLBI issued. This would ensure the completion of any GCS
+memory accesses in the parent (at least that's my reading of the Arm
+ARM).
 
-> I'm pretty confident this excessive, the goal was to err on the side
-> of correctness and then relax later.
+If we have normal thread creation without CoW, is the parent writing
+anything to the stack that the new thread needs to observe? The
+map_shadow_stack() call will cause a GCSSTTR and this wouldn't be
+ordered with subsequent memory writes. But we already have a GCSB DSYNC
+in map_shadow_stack() after put_user_gcs().
 
-I think we are missing some. Paging should be ok as we have a pte change
-and TLBI and IIRC the same rules as for standard memory accesses apply.
-ptrace() memory accesses may need something though I'm fine with
-considering this a best effort (we can't guarantee anyway if any
-accesses are on different CPUs). I haven't got to the signal handling
-patch yet.
+My conclusion is that we don't need this barrier.
+
+> > > +	/* Allocate RLIMIT_STACK/2 with limits of PAGE_SIZE..2G */
+> > > +	size = PAGE_ALIGN(min_t(unsigned long long,
+> > > +				rlimit(RLIMIT_STACK) / 2, SZ_2G));
+> > > +	return max(PAGE_SIZE, size);
+> > > +}
+> 
+> > So we still have RLIMIT_STACK/2. I thought we got rid of that and just
+> > went with RLIMIT_STACK (or I misremember).
+> 
+> I honestly can't remember either way, it's quite possible it's changed
+> multiple times.  I don't have super strong feelings on the particular
+> value here.
+
+The half size looks a lot more arbitrary to me than picking the same
+size as the stack. So I'd go with RLIMIT_STACK.
+
+> > > +static bool gcs_consume_token(struct mm_struct *mm, unsigned long user_addr)
+> > > +{
+> 
+> > As per the clone3() thread, I think we should try to use
+> > get_user_page_vma_remote() and do a cmpxchg() directly.
+> 
+> I've left this as is for now, mainly because it keeps the code in line
+> with x86 and I can't directly test the x86 code. 
+
+I thought for the clone3() x86 code we'll need the remote vma, so we
+have to use the get_user_page_vma_remote() API anyway.
+
+> IIRC we can't just do
+> a standard userspace cmpxchg since that will access as though we were at
+> EL0 but EL0 doesn't have standard write permission for the page.
+
+Correct but GUP goes through the kernel mapping, not the user one. So
+get_user_page_vma_remote() returns a page and you just do a classic
+cmpxchg() at page_address() (plus some offset).
 
 -- 
 Catalin
