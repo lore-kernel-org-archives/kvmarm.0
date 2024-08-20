@@ -1,331 +1,199 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6376318FDD0;
-	Tue, 20 Aug 2024 14:06:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1760B189F3F
+	for <kvmarm@lists.linux.dev>; Tue, 20 Aug 2024 14:13:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724162809; cv=none; b=qXR4BTUdoirjA9cjZ9wF0ubJ+QY9WiSdGtCQrcuh0MSOU2FpmfsrGtKAd1v+7rXaMXV3axcT5HTh1TO0ztWZ8ttKaU/7Dt9SDWhQtKjOtnu/gVBbZJqqTsY7ztdGSfvhTvA5xKs7T0gtzFMkb3dplZojH3Z7H3NuLqnKa63HWH0=
+	t=1724163215; cv=none; b=oqUyBgJIHugQ+WEANysfacVXE60KsMlW+yTPAJM0tlKRqusDgLJEyWv4I/PdIG1r7DMLj/XTbZ80MiThjQKdojybE6eASo3Pkena/8c9k52xl/BUgiYQ829sIX8b5HNR6HjDHQfCzOjx0t6qup+gnz0i1HmAnxvOq6oiVL0S1wc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724162809; c=relaxed/simple;
-	bh=EM4p/wmqIOkPlzWiX5O0ERZflz0MZ3+ngnfORf2TNRc=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=J6JOiSjUEhkdErhKFVnhrV6+1QOh+0CY/w/tA8NNgffU7OHSjpC0GsQITRmamrGLGwIL2AP2H2s+/vEbTkhVfJaJrdkYdMcYFRp7a+xIkH2sCQ92ESd2kaiHReFLvLIcsN54TsEpZEdXgdnepRrO6rY0TAjVl8JuOVek+GJVnRg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CxQ+HFQO; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1724163215; c=relaxed/simple;
+	bh=yGCtgCorSiOAoryOCIgqexjc0t7ggJz8lR+Bfk0R4+A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ejeex07afJ7cUBUvsVoeDWNKtMT3q8VTcWfoIcBEkemnjI03UDHHSqkgSPzK4OUiMIkwvopCjsNtIfP8EZpKc4Fhw7RukfZ6kelbsAA1W9GBT6AMjkHcKNDXxloCzExCmx/JoMtq0Nry5KOAc21K26pPof+W0ZKJmPsrFzJhIqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2Hf6qRYa; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CxQ+HFQO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C15B3C4AF0F;
-	Tue, 20 Aug 2024 14:06:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724162808;
-	bh=EM4p/wmqIOkPlzWiX5O0ERZflz0MZ3+ngnfORf2TNRc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CxQ+HFQOLA70vUPJqQuU0tZlXYMRSE356mjRzcbRLxSU9vr/8YC7nCtnnu1oaMfGf
-	 5lZX6nti8ys5MQkrq9FSFCurjgKM8eP+pYPMeZG+woZ1h1un/aGXlK5qsp4sW5jILF
-	 VPqbPOGQD4quZfe0WdRAJvxwC+XC1k8sRGEVEzZ+h6DZCUE5kN6OeC6rA8T4ietbXC
-	 FeB/lzNnYkXEJ4fTb+HopCfMQtlJ2vlH/Ri+vPjvm2EvXO1tF8S4JPXlAHgne8t8UA
-	 Cbc5cRRPmldL3FYLRO6KcqeEZdMZKgK5sCpit1ireFz1WolL3qKMdsXz/16ZVAZtAj
-	 /9NjuUO/JTTEw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sgPVW-005I9X-AR;
-	Tue, 20 Aug 2024 15:06:46 +0100
-Date: Tue, 20 Aug 2024 15:06:45 +0100
-Message-ID: <86r0ajxp8q.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Sebastian Ene <sebastianene@google.com>
-Cc: akpm@linux-foundation.org,
-	alexghiti@rivosinc.com,
-	ankita@nvidia.com,
-	ardb@kernel.org,
-	catalin.marinas@arm.com,
-	christophe.leroy@csgroup.eu,
-	james.morse@arm.com,
-	vdonnefort@google.com,
-	mark.rutland@arm.com,
-	oliver.upton@linux.dev,
-	rananta@google.com,
-	ryan.roberts@arm.com,
-	shahuang@redhat.com,
-	suzuki.poulose@arm.com,
-	will@kernel.org,
-	yuzenghui@huawei.com,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	kernel-team@android.com
-Subject: Re: [PATCH v8 4/6] KVM: arm64: Register ptdump with debugfs on guest creation
-In-Reply-To: <20240816123906.3683425-5-sebastianene@google.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2Hf6qRYa"
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5bec7c5af2aso7094a12.1
+        for <kvmarm@lists.linux.dev>; Tue, 20 Aug 2024 07:13:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1724163212; x=1724768012; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=e23Hu8+Z1sCUC2nCZq+qZMQygcSEW/P8er1otbAoihc=;
+        b=2Hf6qRYa6YzcnKEVXf2rRO4UKzqttlrQBUFLqgRi949hXRvHTzsTKtMeTbz6ipyOjr
+         +5O5p1PuFoX1piiWKYar9lL7mm9cNkL7qr0Wmv4wX8INQaiQb1hCit9dXcHKkm2W4Ltv
+         EbgJiKjM2w5xUdXZ79ZNSD+XYgzM1dNxvUaHkXsiyK1KfBSyQ7gLxv23cydPIardbeIJ
+         6WuNBFvbM5YoO4PD+zu0VKpmzTzH7S40J9sFR8+BGMZ0xl0YWbLU26uJx2B0myyx/w6Q
+         xLTjvokwd1hSpCHbC6RHf7zroJk63rymRWs3wIJ4c/yvUkrwrl0iNTAcxfsLxTYNdOC0
+         INYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724163212; x=1724768012;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=e23Hu8+Z1sCUC2nCZq+qZMQygcSEW/P8er1otbAoihc=;
+        b=q57bx2l5dgaffhpC2ciEwHRpepP1CLCf3fxF8OUqmS+zqBlOp95Q3KUerE7sq71qrJ
+         hOyi0mBmaODw5UvKYxk8jB07jXc3TutRZklaGVVa3M5PDXUNI/JFb5NRqsKh1YPyQCyo
+         tasWHDM0kTEMquhwBVG9C7wI/RQ53k7ea2QV8CEswqMGd73V7H95sk6ay1h+dIsaTg65
+         GxvXALEAf1UHiTbSJEOiQ+VIPJ58cxru93P8ds6lsUNr5eHAZ7L67P4saur2LxmPIrKM
+         4TMOBhRK24Nfee17LGUOIwI3c+aEEsFj8X8uSMTkwhI71W9isQLMlxnrajRrznOlQpuW
+         b0zw==
+X-Forwarded-Encrypted: i=1; AJvYcCUAv9QxoNtWWMBaNOtZp4Ba6NbT4wJYjM8or0hT8LCCrnzJa4ykQtElVGv4nRiXSIG+5MfeNoc=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yz8ZCUCkcmILpJRbJ1yBK63Rq2sENdRpxX02HTOdc6STB5pzhVk
+	ByR9QD1G7HBAki9qw2d5aYSe+1iIrbUQpsaHhLvgJWIfyriZkB6PFU3AQ0/7cg==
+X-Google-Smtp-Source: AGHT+IH6v5g16+oGR8+nvA7bQYPp8gwjKoUxL4x3NW45RWOQa0iz4Xar7ykgmKpu8OpJ6xRVSzRb1A==
+X-Received: by 2002:a05:6402:3546:b0:5be:c28a:97cf with SMTP id 4fb4d7f45d1cf-5bf0e5a28eemr65188a12.5.1724163212081;
+        Tue, 20 Aug 2024 07:13:32 -0700 (PDT)
+Received: from google.com (44.232.78.34.bc.googleusercontent.com. [34.78.232.44])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429ded364fesm195663365e9.27.2024.08.20.07.13.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Aug 2024 07:13:31 -0700 (PDT)
+Date: Tue, 20 Aug 2024 14:13:27 +0000
+From: Sebastian Ene <sebastianene@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: akpm@linux-foundation.org, alexghiti@rivosinc.com, ankita@nvidia.com,
+	ardb@kernel.org, catalin.marinas@arm.com,
+	christophe.leroy@csgroup.eu, james.morse@arm.com,
+	vdonnefort@google.com, mark.rutland@arm.com, oliver.upton@linux.dev,
+	rananta@google.com, ryan.roberts@arm.com, shahuang@redhat.com,
+	suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, kernel-team@android.com
+Subject: Re: [PATCH v8 3/6] arm64: ptdump: Use the mask from the state
+ structure
+Message-ID: <ZsSkh2iw8s5Oa5xb@google.com>
 References: <20240816123906.3683425-1-sebastianene@google.com>
-	<20240816123906.3683425-5-sebastianene@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <20240816123906.3683425-4-sebastianene@google.com>
+ <86seuzxq27.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sebastianene@google.com, akpm@linux-foundation.org, alexghiti@rivosinc.com, ankita@nvidia.com, ardb@kernel.org, catalin.marinas@arm.com, christophe.leroy@csgroup.eu, james.morse@arm.com, vdonnefort@google.com, mark.rutland@arm.com, oliver.upton@linux.dev, rananta@google.com, ryan.roberts@arm.com, shahuang@redhat.com, suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86seuzxq27.wl-maz@kernel.org>
 
-On Fri, 16 Aug 2024 13:39:04 +0100,
-Sebastian Ene <sebastianene@google.com> wrote:
+On Tue, Aug 20, 2024 at 02:49:04PM +0100, Marc Zyngier wrote:
+> On Fri, 16 Aug 2024 13:39:03 +0100,
+> Sebastian Ene <sebastianene@google.com> wrote:
+> > 
+> > Printing the descriptor attributes requires accessing a mask which has a
+> > different set of attributes for stage-2. In preparation for adding support
+> > for the stage-2 pagetables dumping, use the mask from the local context
+> > and not from the globally defined pg_level array. Store a pointer to
+> > the pg_level array in the ptdump state structure. This will allow us to
+> > extract the mask which is wrapped in the pg_level array and use it for
+> > descriptor parsing in the note_page.
+> > 
+> > Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> > ---
+> >  arch/arm64/include/asm/ptdump.h |  1 +
+> >  arch/arm64/mm/ptdump.c          | 13 ++++++++-----
+> >  2 files changed, 9 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/ptdump.h b/arch/arm64/include/asm/ptdump.h
+> > index bd5d3ee3e8dc..71a7ed01153a 100644
+> > --- a/arch/arm64/include/asm/ptdump.h
+> > +++ b/arch/arm64/include/asm/ptdump.h
+> > @@ -44,6 +44,7 @@ struct ptdump_pg_level {
+> >   */
+> >  struct ptdump_pg_state {
+> >  	struct ptdump_state ptdump;
+> > +	struct ptdump_pg_level *pg_level;
+> >  	struct seq_file *seq;
+> >  	const struct addr_marker *marker;
+> >  	const struct mm_struct *mm;
+> > diff --git a/arch/arm64/mm/ptdump.c b/arch/arm64/mm/ptdump.c
+> > index 404751fd30fe..ca53ef274a8b 100644
+> > --- a/arch/arm64/mm/ptdump.c
+> > +++ b/arch/arm64/mm/ptdump.c
+> > @@ -117,7 +117,7 @@ static const struct ptdump_prot_bits pte_bits[] = {
+> >  	}
+> >  };
+> >  
+> > -static struct ptdump_pg_level pg_level[] __ro_after_init = {
+> > +static struct ptdump_pg_level kernel_pg_levels[] __ro_after_init = {
+
+Hi Marc,
+
+ 
+> Do you actually need this sort of renaming? Given that it is static,
+> this looks like some slightly abusive repainting which isn't warranted
+> here.
+
+I applied Will's suggestion from
+https://lore.kernel.org/all/20240705111229.GB9231@willie-the-truck/
+>
 > 
-> While arch/*/mem/ptdump handles the kernel pagetable dumping code,
-> introduce KVM/ptdump which shows the guest stage-2 pagetables. The
-> separation is necessary because most of the definitions from the
-> stage-2 pagetable reside in the KVM path and we will be invoking
-> functionality **specific** to KVM.
+> I also didn't understand the commit message: you're not tracking any
+> mask here, but a page table level. You are also not using it for
+> anything yet, see below.
 
-Drop the ** emphasis.
+and I missed updating the commit message.
 
 > 
-> When a guest is created, register a new file entry under the guest
-> debugfs dir which allows userspace to show the contents of the guest
-> stage-2 pagetables when accessed.
 > 
-> Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> ---
->  arch/arm64/kvm/Kconfig      | 14 ++++++
->  arch/arm64/kvm/Makefile     |  1 +
->  arch/arm64/kvm/arm.c        |  2 +
->  arch/arm64/kvm/kvm_ptdump.h | 20 ++++++++
->  arch/arm64/kvm/ptdump.c     | 91 +++++++++++++++++++++++++++++++++++++
->  5 files changed, 128 insertions(+)
->  create mode 100644 arch/arm64/kvm/kvm_ptdump.h
->  create mode 100644 arch/arm64/kvm/ptdump.c
+> >  	{ /* pgd */
+> >  		.name	= "PGD",
+> >  		.bits	= pte_bits,
+> > @@ -192,6 +192,7 @@ void note_page(struct ptdump_state *pt_st, unsigned long addr, int level,
+> >  	       u64 val)
+> >  {
+> >  	struct ptdump_pg_state *st = container_of(pt_st, struct ptdump_pg_state, ptdump);
+> > +	struct ptdump_pg_level *pg_level = st->pg_level;
 > 
-> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> index 8304eb342be9..fcc41e58ede6 100644
-> --- a/arch/arm64/kvm/Kconfig
-> +++ b/arch/arm64/kvm/Kconfig
-> @@ -66,4 +66,18 @@ config PROTECTED_NVHE_STACKTRACE
->  
->  	  If unsure, or not using protected nVHE (pKVM), say N.
->  
-> +config PTDUMP_STAGE2_DEBUGFS
-> +       bool "Present the stage-2 pagetables to debugfs"
-> +       depends on KVM
-> +       select PTDUMP_CORE
+> This is what I mean. What is this pg_level used for?
 
-This looks wrong. Looking at PTDUMP_DEBUGFS, it has the following
-constraints:
-
-        depends on DEBUG_KERNEL
-        depends on DEBUG_FS
-        depends on GENERIC_PTDUMP
-        select PTDUMP_CORE
-
-I don't see why the Stage-2 version should have anything different.
-
-> +       default n
-> +       help
-> +         Say Y here if you want to show the stage-2 kernel pagetables
-> +         layout in a debugfs file. This information is only useful for kernel developers
-> +         who are working in architecture specific areas of the kernel.
-> +         It is probably not a good idea to enable this feature in a production
-> +         kernel.
-
-nit: try to keep the formatting within 80 columns.
-
-More importantly, I find it very strange to expose the configuration
-option so early in the series, while the support code isn't there yet.
-You can perfectly introduce code that is conditional on a config
-option and only add it at the end.
-
-> +
-> +         If in doubt, say N.
-> +
->  endif # VIRTUALIZATION
-> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-> index 86a629aaf0a1..e4233b323a73 100644
-> --- a/arch/arm64/kvm/Makefile
-> +++ b/arch/arm64/kvm/Makefile
-> @@ -27,6 +27,7 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
->  
->  kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o pmu.o
->  kvm-$(CONFIG_ARM64_PTR_AUTH)  += pauth.o
-> +kvm-$(CONFIG_PTDUMP_STAGE2_DEBUGFS) += ptdump.o
->  
->  always-y := hyp_constants.h hyp-constants.s
->  
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 9bef7638342e..60fed2146763 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -45,6 +45,7 @@
->  #include <kvm/arm_hypercalls.h>
->  #include <kvm/arm_pmu.h>
->  #include <kvm/arm_psci.h>
-> +#include <kvm_ptdump.h>
->  
->  static enum kvm_mode kvm_mode = KVM_MODE_DEFAULT;
->  
-> @@ -228,6 +229,7 @@ vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
->  void kvm_arch_create_vm_debugfs(struct kvm *kvm)
->  {
->  	kvm_sys_regs_create_debugfs(kvm);
-> +	kvm_ptdump_guest_register(kvm);
-
-Consider using a name that is homogeneous with what we already have
-(kvm_s2_ptdump_create_debugfs?).
-
->  }
->  
->  static void kvm_destroy_mpidr_data(struct kvm *kvm)
-> diff --git a/arch/arm64/kvm/kvm_ptdump.h b/arch/arm64/kvm/kvm_ptdump.h
-> new file mode 100644
-> index 000000000000..0a62b0e2908c
-> --- /dev/null
-> +++ b/arch/arm64/kvm/kvm_ptdump.h
-> @@ -0,0 +1,20 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (C) Google, 2024
-> + * Author: Sebastian Ene <sebastianene@google.com>
-> + */
-> +
-> +#ifndef __KVM_PTDUMP_H
-> +#define __KVM_PTDUMP_H
-> +
-> +#include <linux/kvm_host.h>
-> +#include <asm/ptdump.h>
-> +
-> +
-> +#ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
-> +void kvm_ptdump_guest_register(struct kvm *kvm);
-> +#else
-> +static inline void kvm_ptdump_guest_register(struct kvm *kvm) {}
-> +#endif /* CONFIG_PTDUMP_STAGE2_DEBUGFS */
-> +
-> +#endif /* __KVM_PTDUMP_H */
-
-Please don't add new include files that contain so little stuff. These
-things may as well be added either to asm/kvm_host.h or asm/ptdump.h.
-
-> diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
-> new file mode 100644
-> index 000000000000..52483d56be2e
-> --- /dev/null
-> +++ b/arch/arm64/kvm/ptdump.c
-> @@ -0,0 +1,91 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Debug helper used to dump the stage-2 pagetables of the system and their
-> + * associated permissions.
-> + *
-> + * Copyright (C) Google, 2024
-> + * Author: Sebastian Ene <sebastianene@google.com>
-> + */
-> +#include <linux/debugfs.h>
-> +#include <linux/kvm_host.h>
-> +#include <linux/seq_file.h>
-> +
-> +#include <asm/kvm_pgtable.h>
-> +#include <kvm_ptdump.h>
-> +
-> +
-> +static int kvm_ptdump_visitor(const struct kvm_pgtable_visit_ctx *ctx,
-> +			      enum kvm_pgtable_walk_flags visit)
-> +{
-> +	struct ptdump_pg_state *st = ctx->arg;
-> +	struct ptdump_state *pt_st = &st->ptdump;
-> +
-> +	note_page(pt_st, ctx->addr, ctx->level, ctx->old);
-> +	return 0;
-> +}
-> +
-> +static int kvm_ptdump_show_common(struct seq_file *m,
-
-What does "common" mean here? You have exactly *one* caller, so why
-isn't that inlined in kvm_ptdump_guest_show()?
-
-> +				  struct kvm_pgtable *pgtable,
-> +				  struct ptdump_pg_state *parser_state)
-> +{
-> +	struct kvm_pgtable_walker walker = (struct kvm_pgtable_walker) {
-> +		.cb     = kvm_ptdump_visitor,
-> +		.arg	= parser_state,
-> +		.flags	= KVM_PGTABLE_WALK_LEAF,
-> +	};
-> +
-> +	parser_state->level = -1;
-> +	parser_state->start_address = 0;
-> +
-> +	return kvm_pgtable_walk(pgtable, 0, BIT(pgtable->ia_bits), &walker);
-> +}
-> +
-> +static int kvm_ptdump_guest_show(struct seq_file *m, void *unused)
-> +{
-> +	struct kvm *kvm = m->private;
-> +	struct kvm_s2_mmu *mmu = &kvm->arch.mmu;
-> +	struct ptdump_pg_state parser_state = {0};
-
-nit: the common idiom is "parser_state = {}".
-
-> +	int ret;
-> +
-> +	write_lock(&kvm->mmu_lock);
-> +	ret = kvm_ptdump_show_common(m, mmu->pgt, &parser_state);
-> +	write_unlock(&kvm->mmu_lock);
-> +
-> +	return ret;
-> +}
-> +
-> +static int kvm_ptdump_guest_open(struct inode *m, struct file *file)
-> +{
-> +	struct kvm *kvm = m->i_private;
-> +	int ret;
-> +
-> +	if (!kvm_get_kvm_safe(kvm))
-> +		return -ENOENT;
-> +
-> +	ret = single_open(file, kvm_ptdump_guest_show, m->i_private);
-> +	if (ret < 0)
-> +		kvm_put_kvm(kvm);
-> +
-> +	return ret;
-> +}
-> +
-> +static int kvm_ptdump_guest_close(struct inode *m, struct file *file)
-> +{
-> +	struct kvm *kvm = m->i_private;
-> +
-> +	kvm_put_kvm(kvm);
-> +	return single_release(m, file);
-> +}
-> +
-> +static const struct file_operations kvm_ptdump_guest_fops = {
-> +	.open		= kvm_ptdump_guest_open,
-> +	.read		= seq_read,
-> +	.llseek		= seq_lseek,
-> +	.release	= kvm_ptdump_guest_close,
-> +};
-> +
-> +void kvm_ptdump_guest_register(struct kvm *kvm)
-> +{
-> +	debugfs_create_file("stage2_page_tables", 0400, kvm->debugfs_dentry,
-> +			    kvm, &kvm_ptdump_guest_fops);
-> +}
-> -- 
-> 2.46.0.184.g6999bdac58-goog
-
-Overall, I have a hard time understanding what this does. It walks the
-page tables, but doesn't do anything useful.
-
-I have the feeling that this patch would be better squashed together
-with patch #5, since it significantly reworks what patch #4 does.
+I make use of it to extract the name based on the level. The suggestion
+that Will made allowed me to keep the code with less changes.
 
 Thanks,
+Seb
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+> 
+> >  	static const char units[] = "KMGTPE";
+> >  	u64 prot = 0;
+> >  
+> > @@ -262,6 +263,7 @@ void ptdump_walk(struct seq_file *s, struct ptdump_info *info)
+> >  		.seq = s,
+> >  		.marker = info->markers,
+> >  		.mm = info->mm,
+> > +		.pg_level = &kernel_pg_levels[0],
+> >  		.level = -1,
+> >  		.ptdump = {
+> >  			.note_page = note_page,
+> > @@ -279,10 +281,10 @@ static void __init ptdump_initialize(void)
+> >  {
+> >  	unsigned i, j;
+> >  
+> > -	for (i = 0; i < ARRAY_SIZE(pg_level); i++)
+> > -		if (pg_level[i].bits)
+> > -			for (j = 0; j < pg_level[i].num; j++)
+> > -				pg_level[i].mask |= pg_level[i].bits[j].mask;
+> > +	for (i = 0; i < ARRAY_SIZE(kernel_pg_levels); i++)
+> > +		if (kernel_pg_levels[i].bits)
+> > +			for (j = 0; j < kernel_pg_levels[i].num; j++)
+> > +				kernel_pg_levels[i].mask |= kernel_pg_levels[i].bits[j].mask;
+> >  }
+> >  
+> >  static struct ptdump_info kernel_ptdump_info __ro_after_init = {
+> > @@ -297,6 +299,7 @@ bool ptdump_check_wx(void)
+> >  			{ 0, NULL},
+> >  			{ -1, NULL},
+> >  		},
+> > +		.pg_level = &kernel_pg_levels[0],
+> >  		.level = -1,
+> >  		.check_wx = true,
+> >  		.ptdump = {
+> 
+> Thanks,
+> 
+> 	M.
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
