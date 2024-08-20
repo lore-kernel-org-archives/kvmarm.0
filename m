@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 657E418D637;
-	Tue, 20 Aug 2024 10:06:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47C0F18DF9C;
+	Tue, 20 Aug 2024 10:06:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724148374; cv=none; b=Zi/MxYe7lXg7O7aPLZg5dNRzG3govQlL9QzbTOXKBcv3nj1lEwtPwehsgIeRxtHH9ZQ/jswXoYNRCcGs1avyFR28bZaxZQkSg5AmwRT90H1I0BLgpXK+lYNI8vn3iAk+5uQ41PtT1sa4RkgP1v+EsZSQHY15fMtl8Ah9RUu0orA=
+	t=1724148376; cv=none; b=GO92QYcmg5H/quPKq/OagJk/ZNwL5TqR/5+SXhDWbjy+GOV/WZ+5r81KC3uFE3mBjJv2UfeHAlXomh7bJ2AQm+zjegnNvBpf7aGI0FU4k3NnGM+sf9RkXKqliHgzpItiCAKFiqFv4CtwzccZcm1feWC3/4ABvZrWFNJfXE/W9jU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724148374; c=relaxed/simple;
-	bh=s6DwZrvfjDEG5/5UIRQDo131wlA6C66neRxQ2BfCud8=;
+	s=arc-20240116; t=1724148376; c=relaxed/simple;
+	bh=N/NszJnC50UIOKoSwK5FhseAsipaQ50EUH0eqkLU8+E=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=loWTGOAGTR2kX+u/0LWu3s7DikDP6Q0tP8ySggkjy87AWJc8CrmJpuTCsoxZ+mgGp1NBvxflVd7f2AtHaDaeSi7c8/J90EdfQcrC+F7zsF7AnbqmVHyJDqFBJxmZvLWL3EYMJd79VRQJJLeboiubP6PXwBqMYKLfivPMhzQVaT0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ni5Ig6jx; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=U4mfhhZks8Wopynn0+6rLaT1Ho0oos/EpuSWrKX7sUZmqwQPk79EM0j7f1yCmdo5u/luFees5euQT4UTF+1L1DeuRSsosW9/WNCeRqXGae7eadx/Qy+a6dcJd/lN0gYzvEi4rUFtmeGC4T+taV0Flym7gHEjAroFDlG8hpjWvDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oFuDPLqc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ni5Ig6jx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5A1BC4AF17;
-	Tue, 20 Aug 2024 10:06:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oFuDPLqc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 252AAC4AF09;
+	Tue, 20 Aug 2024 10:06:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724148373;
-	bh=s6DwZrvfjDEG5/5UIRQDo131wlA6C66neRxQ2BfCud8=;
+	s=k20201202; t=1724148376;
+	bh=N/NszJnC50UIOKoSwK5FhseAsipaQ50EUH0eqkLU8+E=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ni5Ig6jxXvK4j/m9SixjQmWyCfezsMapVZlzQA8MV/nd5/7Futnkis4m2uNP4YccP
-	 gUgc2225cP3iz/9DKNj0Ghs8rmszjwaSEj/YjcGG3mCpULFsCQyjhp2E8js86kPEbo
-	 4r70vMIsMYiuUnUAN/7zT6a/AC09W4hOc8p+fLY2ZJO52J7k9y+CqEglJLQhJmPa9d
-	 JmBe1UgxfDJsw4Jj426POSItTSoOWXPAweYs37lPldo+5BeZihoLIBsbKRz0HNt75L
-	 QT+DwhXBJtQFaySjXq7C5gXxx3t+4pvZy5pk+GDTjGlYhzFqRzDUAnl8+D1Ri4LCt9
-	 Ujn1gU2LrXmXA==
+	b=oFuDPLqcyzjeWo577iKYpUVIMa+vgBUopR+WC64j7VVEU9KWpa5KqIW7rELpP2NDu
+	 phjNZipJbzLyoAPIGVhiTmx8+Sa0HYQgI8jf7maXfo1B0lj4kFQOz9qWy9L5RrAq+Q
+	 G7R2QMSWkStB98ME4/XIGU3/t5R/JfmxVYHjkdDq2tCI2UggxJVlr/OPSJSIzRV8nq
+	 zIb25/QbDHGAypw2N23jGZcv+PmsU9vV62v9L9t+ScL63uvI/lP1+lu8HtL2Ueq6Cn
+	 t70VdJNBoXVRu/ps6aQKQC0bl8CE3tXTal8j1hx2DEJgVAIP+A5uxRy2Zcl+8cx2r+
+	 EGyv589xKqQgw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sgLkh-005Dk2-SR;
-	Tue, 20 Aug 2024 11:06:11 +0100
+	id 1sgLki-005Dk2-Gi;
+	Tue, 20 Aug 2024 11:06:14 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -41,9 +41,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Alexander Potapenko <glider@google.com>
-Subject: [PATCH 05/12] KVM: arm64: Add helper for last ditch idreg adjustments
-Date: Tue, 20 Aug 2024 11:03:42 +0100
-Message-Id: <20240820100349.3544850-6-maz@kernel.org>
+Subject: [PATCH 08/12] KVM: arm64: Add trap routing information for ICH_HCR_EL2
+Date: Tue, 20 Aug 2024 11:03:45 +0100
+Message-Id: <20240820100349.3544850-9-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240820100349.3544850-1-maz@kernel.org>
 References: <20240820100349.3544850-1-maz@kernel.org>
@@ -59,131 +59,150 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-We already have to perform a set of last-chance adjustments for
-NV purposes. We will soon have to do the same for the GIC, so
-introduce a helper for that exact purpose.
+The usual song and dance. Anything that is a trap, any register
+it traps. Note that we don't handle the registers added by
+FEAT_NMI for now.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/arm.c      | 10 +++++-----
- arch/arm64/kvm/nested.c   | 15 +++++----------
- arch/arm64/kvm/sys_regs.c | 23 +++++++++++++++++++++++
- arch/arm64/kvm/sys_regs.h |  2 ++
- 4 files changed, 35 insertions(+), 15 deletions(-)
+ arch/arm64/kvm/emulate-nested.c | 77 ++++++++++++++++++++++++++++++---
+ 1 file changed, 72 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 9bef7638342e..fc46457d38d6 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -46,6 +46,8 @@
- #include <kvm/arm_pmu.h>
- #include <kvm/arm_psci.h>
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index 05166eccea0a..63a2ce76619f 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -85,12 +85,17 @@ enum cgt_group_id {
  
-+#include "sys_regs.h"
+ 	CGT_HCRX_TCR2En,
+ 
++	CGT_ICH_HCR_TC,
++	CGT_ICH_HCR_TALL0,
++	CGT_ICH_HCR_TALL1,
++	CGT_ICH_HCR_TDIR,
 +
- static enum kvm_mode kvm_mode = KVM_MODE_DEFAULT;
- 
- enum kvm_wfx_trap_policy {
-@@ -821,11 +823,9 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
- 			return ret;
- 	}
- 
--	if (vcpu_has_nv(vcpu)) {
--		ret = kvm_init_nv_sysregs(vcpu->kvm);
--		if (ret)
--			return ret;
--	}
-+	ret = kvm_finalize_sys_regs(vcpu);
-+	if (ret)
-+		return ret;
- 
  	/*
- 	 * This needs to happen after NV has imposed its own restrictions on
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index bab27f9d8cc6..e2067c594e4a 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -954,19 +954,16 @@ static void set_sysreg_masks(struct kvm *kvm, int sr, u64 res0, u64 res1)
- int kvm_init_nv_sysregs(struct kvm *kvm)
- {
- 	u64 res0, res1;
--	int ret = 0;
+ 	 * Anything after this point is a combination of coarse trap
+ 	 * controls, which must all be evaluated to decide what to do.
+ 	 */
+ 	__MULTIPLE_CONTROL_BITS__,
+-	CGT_HCR_IMO_FMO = __MULTIPLE_CONTROL_BITS__,
++	CGT_HCR_IMO_FMO_ICH_HCR_TC = __MULTIPLE_CONTROL_BITS__,
+ 	CGT_HCR_TID2_TID4,
+ 	CGT_HCR_TTLB_TTLBIS,
+ 	CGT_HCR_TTLB_TTLBOS,
+@@ -105,6 +110,8 @@ enum cgt_group_id {
+ 	CGT_MDCR_TDE_TDRA,
+ 	CGT_MDCR_TDCC_TDE_TDA,
  
--	mutex_lock(&kvm->arch.config_lock);
-+	lockdep_assert_held(&kvm->arch.config_lock);
- 
- 	if (kvm->arch.sysreg_masks)
--		goto out;
-+		return 0;
- 
- 	kvm->arch.sysreg_masks = kzalloc(sizeof(*(kvm->arch.sysreg_masks)),
- 					 GFP_KERNEL_ACCOUNT);
--	if (!kvm->arch.sysreg_masks) {
--		ret = -ENOMEM;
--		goto out;
--	}
-+	if (!kvm->arch.sysreg_masks)
-+		return -ENOMEM;
- 
- 	limit_nv_id_regs(kvm);
- 
-@@ -1195,8 +1192,6 @@ int kvm_init_nv_sysregs(struct kvm *kvm)
- 	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, AMU, V1P1))
- 		res0 |= ~(res0 | res1);
- 	set_sysreg_masks(kvm, HAFGRTR_EL2, res0, res1);
--out:
--	mutex_unlock(&kvm->arch.config_lock);
- 
--	return ret;
-+	return 0;
- }
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 257c8da23a4e..bc2d54da3827 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -4620,6 +4620,29 @@ void kvm_calculate_traps(struct kvm_vcpu *vcpu)
- 	mutex_unlock(&kvm->arch.config_lock);
- }
- 
-+/*
-+ * Perform last adjustments to the ID registers that are implied by the
-+ * configuration outside of the ID regs themselves, as well as any
-+ * initialisation that directly depend on these ID registers (such as
-+ * RES0/RES1 behaviours). This is not the place to configure traps though.
-+ *
-+ * Because this can be called once per CPU, changes must be idempotent.
-+ */
-+int kvm_finalize_sys_regs(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm *kvm = vcpu->kvm;
++	CGT_ICH_HCR_TC_TDIR,
 +
-+	guard(mutex)(&kvm->arch.config_lock);
-+
-+	if (vcpu_has_nv(vcpu)) {
-+		int ret = kvm_init_nv_sysregs(kvm);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	return 0;
-+}
-+
- int __init kvm_sys_reg_table_init(void)
- {
- 	bool valid = true;
-diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-index 997eea21ba2a..7c9b4eb0baa6 100644
---- a/arch/arm64/kvm/sys_regs.h
-+++ b/arch/arm64/kvm/sys_regs.h
-@@ -235,6 +235,8 @@ int kvm_sys_reg_set_user(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg,
+ 	/*
+ 	 * Anything after this point requires a callback evaluating a
+ 	 * complex trap condition. Ugly stuff.
+@@ -378,6 +385,36 @@ static const struct trap_bits coarse_trap_bits[] = {
+ 		.mask		= HCRX_EL2_TCR2En,
+ 		.behaviour	= BEHAVE_FORWARD_ANY,
+ 	},
++	[CGT_ICH_HCR_TC] = {
++		.index		= ICH_HCR_EL2,
++		.value		= ICH_HCR_TC,
++		.mask		= ICH_HCR_TC,
++		.behaviour	= BEHAVE_FORWARD_ANY,
++	},
++	[CGT_ICH_HCR_TALL0] = {
++		.index		= ICH_HCR_EL2,
++		.value		= ICH_HCR_TALL0,
++		.mask		= ICH_HCR_TALL0,
++		.behaviour	= BEHAVE_FORWARD_ANY,
++	},
++	[CGT_ICH_HCR_TALL1] = {
++		.index		= ICH_HCR_EL2,
++		.value		= ICH_HCR_TALL1,
++		.mask		= ICH_HCR_TALL1,
++		.behaviour	= BEHAVE_FORWARD_ANY,
++	},
++	[CGT_ICH_HCR_TALL0] = {
++		.index		= ICH_HCR_EL2,
++		.value		= ICH_HCR_TALL0,
++		.mask		= ICH_HCR_TALL0,
++		.behaviour	= BEHAVE_FORWARD_ANY,
++	},
++	[CGT_ICH_HCR_TDIR] = {
++		.index		= ICH_HCR_EL2,
++		.value		= ICH_HCR_TDIR,
++		.mask		= ICH_HCR_TDIR,
++		.behaviour	= BEHAVE_FORWARD_ANY,
++	},
+ };
  
- bool triage_sysreg_trap(struct kvm_vcpu *vcpu, int *sr_index);
+ #define MCB(id, ...)						\
+@@ -387,7 +424,6 @@ static const struct trap_bits coarse_trap_bits[] = {
+ 		}
  
-+int kvm_finalize_sys_regs(struct kvm_vcpu *vcpu);
+ static const enum cgt_group_id *coarse_control_combo[] = {
+-	MCB(CGT_HCR_IMO_FMO,		CGT_HCR_IMO, CGT_HCR_FMO),
+ 	MCB(CGT_HCR_TID2_TID4,		CGT_HCR_TID2, CGT_HCR_TID4),
+ 	MCB(CGT_HCR_TTLB_TTLBIS,	CGT_HCR_TTLB, CGT_HCR_TTLBIS),
+ 	MCB(CGT_HCR_TTLB_TTLBOS,	CGT_HCR_TTLB, CGT_HCR_TTLBOS),
+@@ -402,6 +438,9 @@ static const enum cgt_group_id *coarse_control_combo[] = {
+ 	MCB(CGT_MDCR_TDE_TDOSA,		CGT_MDCR_TDE, CGT_MDCR_TDOSA),
+ 	MCB(CGT_MDCR_TDE_TDRA,		CGT_MDCR_TDE, CGT_MDCR_TDRA),
+ 	MCB(CGT_MDCR_TDCC_TDE_TDA,	CGT_MDCR_TDCC, CGT_MDCR_TDE, CGT_MDCR_TDA),
 +
- #define AA32(_x)	.aarch32_map = AA32_##_x
- #define Op0(_x) 	.Op0 = _x
- #define Op1(_x) 	.Op1 = _x
++	MCB(CGT_HCR_IMO_FMO_ICH_HCR_TC,	CGT_HCR_IMO, CGT_HCR_FMO, CGT_ICH_HCR_TC),
++	MCB(CGT_ICH_HCR_TC_TDIR,	CGT_ICH_HCR_TC, CGT_ICH_HCR_TDIR),
+ };
+ 
+ typedef enum trap_behaviour (*complex_condition_check)(struct kvm_vcpu *);
+@@ -536,9 +575,9 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
+ 	SR_TRAP(SYS_CSSELR_EL1,		CGT_HCR_TID2_TID4),
+ 	SR_RANGE_TRAP(SYS_ID_PFR0_EL1,
+ 		      sys_reg(3, 0, 0, 7, 7), CGT_HCR_TID3),
+-	SR_TRAP(SYS_ICC_SGI0R_EL1,	CGT_HCR_IMO_FMO),
+-	SR_TRAP(SYS_ICC_ASGI1R_EL1,	CGT_HCR_IMO_FMO),
+-	SR_TRAP(SYS_ICC_SGI1R_EL1,	CGT_HCR_IMO_FMO),
++	SR_TRAP(SYS_ICC_SGI0R_EL1,	CGT_HCR_IMO_FMO_ICH_HCR_TC),
++	SR_TRAP(SYS_ICC_ASGI1R_EL1,	CGT_HCR_IMO_FMO_ICH_HCR_TC),
++	SR_TRAP(SYS_ICC_SGI1R_EL1,	CGT_HCR_IMO_FMO_ICH_HCR_TC),
+ 	SR_RANGE_TRAP(sys_reg(3, 0, 11, 0, 0),
+ 		      sys_reg(3, 0, 11, 15, 7), CGT_HCR_TIDCP),
+ 	SR_RANGE_TRAP(sys_reg(3, 1, 11, 0, 0),
+@@ -1108,6 +1147,34 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
+ 	SR_TRAP(SYS_CNTP_CTL_EL0,	CGT_CNTHCTL_EL1PTEN),
+ 	SR_TRAP(SYS_CNTPCT_EL0,		CGT_CNTHCTL_EL1PCTEN),
+ 	SR_TRAP(SYS_CNTPCTSS_EL0,	CGT_CNTHCTL_EL1PCTEN),
++	/*
++	 * IMPDEF choice:
++	 * We treat ICC_SRE_EL2.{SRE,Enable) and ICV_SRE_EL1.SRE as
++	 * RAO/WI. We therefore never consider ICC_SRE_EL2.Enable for
++	 * ICC_SRE_EL1 access, and always handle it locally.
++	 */
++	SR_TRAP(SYS_ICC_AP0R0_EL1,	CGT_ICH_HCR_TALL0),
++	SR_TRAP(SYS_ICC_AP0R1_EL1,	CGT_ICH_HCR_TALL0),
++	SR_TRAP(SYS_ICC_AP0R2_EL1,	CGT_ICH_HCR_TALL0),
++	SR_TRAP(SYS_ICC_AP0R3_EL1,	CGT_ICH_HCR_TALL0),
++	SR_TRAP(SYS_ICC_AP1R0_EL1,	CGT_ICH_HCR_TALL1),
++	SR_TRAP(SYS_ICC_AP1R1_EL1,	CGT_ICH_HCR_TALL1),
++	SR_TRAP(SYS_ICC_AP1R2_EL1,	CGT_ICH_HCR_TALL1),
++	SR_TRAP(SYS_ICC_AP1R3_EL1,	CGT_ICH_HCR_TALL1),
++	SR_TRAP(SYS_ICC_BPR0_EL1,	CGT_ICH_HCR_TALL0),
++	SR_TRAP(SYS_ICC_BPR1_EL1,	CGT_ICH_HCR_TALL1),
++	SR_TRAP(SYS_ICC_CTLR_EL1,	CGT_ICH_HCR_TC),
++	SR_TRAP(SYS_ICC_DIR_EL1,	CGT_ICH_HCR_TC_TDIR),
++	SR_TRAP(SYS_ICC_EOIR0_EL1,	CGT_ICH_HCR_TALL0),
++	SR_TRAP(SYS_ICC_EOIR1_EL1,	CGT_ICH_HCR_TALL1),
++	SR_TRAP(SYS_ICC_HPPIR0_EL1,	CGT_ICH_HCR_TALL0),
++	SR_TRAP(SYS_ICC_HPPIR1_EL1,	CGT_ICH_HCR_TALL1),
++	SR_TRAP(SYS_ICC_IAR0_EL1,	CGT_ICH_HCR_TALL0),
++	SR_TRAP(SYS_ICC_IAR1_EL1,	CGT_ICH_HCR_TALL1),
++	SR_TRAP(SYS_ICC_IGRPEN0_EL1,	CGT_ICH_HCR_TALL0),
++	SR_TRAP(SYS_ICC_IGRPEN1_EL1,	CGT_ICH_HCR_TALL1),
++	SR_TRAP(SYS_ICC_PMR_EL1,	CGT_ICH_HCR_TC),
++	SR_TRAP(SYS_ICC_RPR_EL1,	CGT_ICH_HCR_TC),
+ };
+ 
+ static DEFINE_XARRAY(sr_forward_xa);
 -- 
 2.39.2
 
