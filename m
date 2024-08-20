@@ -1,37 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFF7118FC9B;
-	Tue, 20 Aug 2024 10:38:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A55318CC08;
+	Tue, 20 Aug 2024 13:18:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724150291; cv=none; b=pv73GO9IOKvjnoJS91/nYDuz4aZG7/PvdggVAcz2t74vntUsMbZZlfrUrjDLFZSGQCeSba6Rij7x0foI4pMY8D2S7P8P6SB1AMW4Avu5Bf8crC/pBCII/40bXsEpFNbg5i6uZUrT6bBTg4kKadiEAwPyv5Bb5+k00sB4Wn5PrMM=
+	t=1724159888; cv=none; b=rUnV0jeMQ0SToxkXKe+Bh/tXv9Qqw1fkQ1AisEzcEKHmSSv7435e4nGQrfeYaHX3seNZkCJlR9EkQgLOI/lm9AIPjoWsnem6JecAR3F0zZtDf0JDKFZPRGeegnS9TiVyxTQVYHVPpMJGE753ZD3+4rh8ZFIJvs8IEJxSkHT5nho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724150291; c=relaxed/simple;
-	bh=OPZZu5/a0DZAyaCFsKFqOH6VKRtf5E6Cfkltar7mQ/w=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=pFOH4jIaNgdlift6AB/83DQlSxhtizYw8kuMey7eIsAO0cPF/pevwWl8H88WtzTI7XQGqeB/p+dvK+CTjiTh372E+01mUwFiTvzdQAu/j3VHFAt0vW3S2H3Lx34p0OhmVr5CNNHTjhNOJM5opsOhYhs0ZKWgbhQPhbtN8RAaKcM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I1pTev5T; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1724159888; c=relaxed/simple;
+	bh=w66lr3+fWgepBhO+Q8813/VtQfHj20xrCsLXmI3bW6M=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Vf+BRLAhEDTtEAAxEufmEDhuDcNn6EApQlExH1dMM+09PS7DUzsifeGcqYluwOs7UYPGvch2+BVAg9cHWCIvH7wKobImW2fzDePqZ8rd+HwujethjuTV5NPquaYH+wxh7OHt5IzvlvFZmzflOZnl6uWI5iN49WjeIDvn4uj7oQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gYjJQoS/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I1pTev5T"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92F0BC4AF15;
-	Tue, 20 Aug 2024 10:38:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gYjJQoS/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02C9AC4AF10;
+	Tue, 20 Aug 2024 13:18:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724150289;
-	bh=OPZZu5/a0DZAyaCFsKFqOH6VKRtf5E6Cfkltar7mQ/w=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=I1pTev5TOb907fLkcCsNYTPc0ixhdUIz/nNeUlQ5trEl0lj3/3KoWGRwgk1pBGnv2
-	 3UvF29Fd8Nb676L4WIqM5v/jfNeV72bJe8x3GHJWBNySITOzPDRkW0OCES/75apiBe
-	 bKDVxu5dgayD+bqKg2JOaxH+yIkpCEqKTAIzqZrFqDl3XtQosfbze/kHjnORp2ng7R
-	 mpWCD2Vb8ys53UY/A0IOrlyzLqDtfsXRjUES9RTyPvYRqAvLX05iu7shwCUgEHmhBM
-	 8xIVTuqmasxNxcdQoguAw8sG6h8JemKsFfa5tWGnW9x57U2P6qP9eQkPhXhtSN9Tij
-	 xjLjV/h1C5XhQ==
+	s=k20201202; t=1724159888;
+	bh=w66lr3+fWgepBhO+Q8813/VtQfHj20xrCsLXmI3bW6M=;
+	h=From:To:Cc:Subject:Date:From;
+	b=gYjJQoS/JlQ57qP/qoqHQrvHgHuROkqDRoZLKpK5ymiqdRO8TrybmbFgITU1R48bX
+	 RnUCq15ehC2D1VHfL3QlGS1M+8f0cj4tN2h0Uf1zBLEFHYVw6QWd2A1YVJNtJvn9m3
+	 l3GJrswoIO26nqN/Xe6ZiHbfB0A2ix3qXMzGxB8psqHvqoSuFgkXnuARDtitLGJ96+
+	 +rCEmOJd0xI/Z+9l0e6gHScBpVHZlaTFcy365K9GupYey9qae4GFATlRMmJDoH77Yy
+	 h1p3uVBgO3LygW09xvIwkQaCBwWitUMqmwxecIvpi/cx+8TawvxU9misNXUs+OuTl3
+	 degyNHG4XA1pw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sgMFb-005Ea3-Rh;
-	Tue, 20 Aug 2024 11:38:07 +0100
+	id 1sgOkP-005HMQ-Qf;
+	Tue, 20 Aug 2024 14:18:05 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -40,16 +39,13 @@ Cc: James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
+	Fuad Tabba <tabba@google.com>,
 	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Przemyslaw Gaj <pgaj@cadence.com>
-Subject: [PATCH v4 18/18] KVM: arm64: nv: Add support for FEAT_ATS1A
-Date: Tue, 20 Aug 2024 11:37:56 +0100
-Message-Id: <20240820103756.3545976-19-maz@kernel.org>
+	Mark Brown <broonie@kernel.org>
+Subject: [PATCH v4 0/8] KVM: arm64: Add support for FP8
+Date: Tue, 20 Aug 2024 14:17:54 +0100
+Message-Id: <20240820131802.3547589-1-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240820103756.3545976-1-maz@kernel.org>
-References: <20240820103756.3545976-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -58,136 +54,66 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com, alexandru.elisei@arm.com, anshuman.khandual@arm.com, pgaj@cadence.com
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, tabba@google.com, joey.gouly@arm.com, broonie@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Handling FEAT_ATS1A (which provides the AT S1E{1,2}A instructions)
-is pretty easy, as it is just the usual AT without the permission
-check.
+Although FP8 support was merged in 6.9, the KVM side was dropped, with
+no sign of it being picked up again. Given that its absence is getting
+in the way of NV upstreaming (HCRX_EL2 needs fleshing out), here's a
+small series addressing it.
 
-This basically amounts to plumbing the instructions in the various
-dispatch tables, and handling FEAT_ATS1A being disabled in the
-ID registers.
+The support is following the save/restore model established for the
+rest of the FP code, with FPMR being tied to it. The sole additions
+are the handling of traps in a nested context, and the corresponding
+ID registers being made writable. As an extra cleanup, SVCR and FPMR
+are moved into the sysreg array.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/sysreg.h |  1 +
- arch/arm64/kvm/at.c             | 10 ++++++++++
- arch/arm64/kvm/emulate-nested.c |  2 ++
- arch/arm64/kvm/sys_regs.c       | 11 +++++++++++
- 4 files changed, 24 insertions(+)
+Patches are on top of v6.11-rc1. Note that this is compile-tested
+only, as I have no access to FP8 HW or model (and running NV in a
+model is not something I wish to entertain ever again).
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index a2787091d5a0..bc161f160854 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -673,6 +673,7 @@
- #define OP_AT_S12E1W	sys_insn(AT_Op0, 4, AT_CRn, 8, 5)
- #define OP_AT_S12E0R	sys_insn(AT_Op0, 4, AT_CRn, 8, 6)
- #define OP_AT_S12E0W	sys_insn(AT_Op0, 4, AT_CRn, 8, 7)
-+#define OP_AT_S1E2A	sys_insn(AT_Op0, 4, AT_CRn, 9, 2)
- 
- /* TLBI instructions */
- #define TLBI_Op0	1
-diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index 60f1ca3a897d..39f0e87a340e 100644
---- a/arch/arm64/kvm/at.c
-+++ b/arch/arm64/kvm/at.c
-@@ -78,6 +78,7 @@ static enum trans_regime compute_translation_regime(struct kvm_vcpu *vcpu, u32 o
- 	switch (op) {
- 	case OP_AT_S1E2R:
- 	case OP_AT_S1E2W:
-+	case OP_AT_S1E2A:
- 		return vcpu_el2_e2h_is_set(vcpu) ? TR_EL20 : TR_EL2;
- 		break;
- 	default:
-@@ -852,6 +853,9 @@ static u64 handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
- 	case OP_AT_S1E0W:
- 		perm_fail = !uw;
- 		break;
-+	case OP_AT_S1E1A:
-+	case OP_AT_S1E2A:
-+		break;
- 	default:
- 		BUG();
- 	}
-@@ -935,6 +939,9 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
- 	case OP_AT_S1E0W:
- 		fail = __kvm_at(OP_AT_S1E0W, vaddr);
- 		break;
-+	case OP_AT_S1E1A:
-+		fail = __kvm_at(OP_AT_S1E1A, vaddr);
-+		break;
- 	default:
- 		WARN_ON_ONCE(1);
- 		fail = true;
-@@ -1010,6 +1017,9 @@ void __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
- 		case OP_AT_S1E2W:
- 			fail = __kvm_at(OP_AT_S1E1W, vaddr);
- 			break;
-+		case OP_AT_S1E2A:
-+			fail = __kvm_at(OP_AT_S1E1A, vaddr);
-+			break;
- 		default:
- 			WARN_ON_ONCE(1);
- 			fail = true;
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 05166eccea0a..dbbae64c642c 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -786,6 +786,7 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
- 	SR_TRAP(OP_AT_S12E1W,		CGT_HCR_NV),
- 	SR_TRAP(OP_AT_S12E0R,		CGT_HCR_NV),
- 	SR_TRAP(OP_AT_S12E0W,		CGT_HCR_NV),
-+	SR_TRAP(OP_AT_S1E2A,		CGT_HCR_NV),
- 	SR_TRAP(OP_TLBI_IPAS2E1,	CGT_HCR_NV),
- 	SR_TRAP(OP_TLBI_RIPAS2E1,	CGT_HCR_NV),
- 	SR_TRAP(OP_TLBI_IPAS2LE1,	CGT_HCR_NV),
-@@ -867,6 +868,7 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
- 	SR_TRAP(OP_AT_S1E0W, 		CGT_HCR_AT),
- 	SR_TRAP(OP_AT_S1E1RP, 		CGT_HCR_AT),
- 	SR_TRAP(OP_AT_S1E1WP, 		CGT_HCR_AT),
-+	SR_TRAP(OP_AT_S1E1A,		CGT_HCR_AT),
- 	SR_TRAP(SYS_ERXPFGF_EL1,	CGT_HCR_nFIEN),
- 	SR_TRAP(SYS_ERXPFGCTL_EL1,	CGT_HCR_nFIEN),
- 	SR_TRAP(SYS_ERXPFGCDN_EL1,	CGT_HCR_nFIEN),
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 9f3cf82e5231..5ab0b2799393 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2818,6 +2818,13 @@ static bool handle_at_s1e2(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- {
- 	u32 op = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
- 
-+	/* There is no FGT associated with AT S1E2A :-( */
-+	if (op == OP_AT_S1E2A &&
-+	    !kvm_has_feat(vcpu->kvm, ID_AA64ISAR2_EL1, ATS1A, IMP)) {
-+		kvm_inject_undefined(vcpu);
-+		return false;
-+	}
-+
- 	__kvm_at_s1e2(vcpu, op, p->regval);
- 
- 	return true;
-@@ -3188,6 +3195,7 @@ static struct sys_reg_desc sys_insn_descs[] = {
- 	SYS_INSN(AT_S12E1W, handle_at_s12),
- 	SYS_INSN(AT_S12E0R, handle_at_s12),
- 	SYS_INSN(AT_S12E0W, handle_at_s12),
-+	SYS_INSN(AT_S1E2A, handle_at_s1e2),
- 
- 	SYS_INSN(TLBI_IPAS2E1IS, handle_ipas2e1is),
- 	SYS_INSN(TLBI_RIPAS2E1IS, handle_ripas2e1is),
-@@ -4645,6 +4653,9 @@ void kvm_calculate_traps(struct kvm_vcpu *vcpu)
- 						HFGITR_EL2_TLBIRVAAE1OS	|
- 						HFGITR_EL2_TLBIRVAE1OS);
- 
-+	if (!kvm_has_feat(kvm, ID_AA64ISAR2_EL1, ATS1A, IMP))
-+		kvm->arch.fgu[HFGITR_GROUP] |= HFGITR_EL2_ATS1E1A;
-+
- 	if (!kvm_has_feat(kvm, ID_AA64MMFR1_EL1, PAN, PAN2))
- 		kvm->arch.fgu[HFGITR_GROUP] |= (HFGITR_EL2_ATS1E1RP |
- 						HFGITR_EL2_ATS1E1WP);
+* From v3 [3]
+
+  - Simplify handling of SYS_ID_AA64PFR2_EL1
+
+* From v2 [2]
+
+  - Add missing kern_hyp_va() when dereferencing vcpu->kvm on nVHE
+    setups
+
+* From v1 [1]
+
+  - Correctly save/restore the guest state (duh), including pKVM
+    (double duh)
+
+  - Add a predicate for FPMR support in a VM, as this gets used more
+    than twice...
+
+[1] https://lore.kernel.org/r/20240708154438.1218186-1-maz@kernel.org
+[2] https://lore.kernel.org/r/20240708154438.1218186-1-maz@kernel.org
+[3] https://lore.kernel.org/r/20240813104400.1956132-1-maz@kernel.org
+
+Marc Zyngier (8):
+  KVM: arm64: Move SVCR into the sysreg array
+  KVM: arm64: Add predicate for FPMR support in a VM
+  KVM: arm64: Move FPMR into the sysreg array
+  KVM: arm64: Add save/restore support for FPMR
+  KVM: arm64: Honor trap routing for FPMR
+  KVM: arm64: Expose ID_AA64FPFR0_EL1 as a writable ID reg
+  KVM: arm64: Enable FP8 support when available and configured
+  KVM: arm64: Expose ID_AA64PFR2_EL1 to userspace and guests
+
+ arch/arm64/include/asm/kvm_host.h       | 20 ++++++++++++++--
+ arch/arm64/kvm/emulate-nested.c         |  8 +++++++
+ arch/arm64/kvm/fpsimd.c                 |  5 ++--
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  3 +++
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  9 +++++++
+ arch/arm64/kvm/hyp/nvhe/switch.c        |  9 +++++++
+ arch/arm64/kvm/hyp/vhe/switch.c         |  3 +++
+ arch/arm64/kvm/sys_regs.c               | 32 ++++++++++++++++++++++---
+ 8 files changed, 82 insertions(+), 7 deletions(-)
+
 -- 
 2.39.2
 
