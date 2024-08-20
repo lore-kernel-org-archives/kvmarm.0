@@ -1,123 +1,331 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 895C918CBEF
-	for <kvmarm@lists.linux.dev>; Tue, 20 Aug 2024 14:06:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6376318FDD0;
+	Tue, 20 Aug 2024 14:06:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724162793; cv=none; b=T0oZK/JBRUMLq/gG6PQs152N9ZetkF199YSC/5P6oJh5dcn19dU0biNyZ/hdEZRUunrfOBDtJYma0jwV3LYf3bDzl1l+hGcrrl3qeWoqmxDs4B+zBECYz7xZmUlBJyIBSa0cIlf8jnga+zbQhTa3HMZjw4N0PAn7UDuXQTsRH/w=
+	t=1724162809; cv=none; b=qXR4BTUdoirjA9cjZ9wF0ubJ+QY9WiSdGtCQrcuh0MSOU2FpmfsrGtKAd1v+7rXaMXV3axcT5HTh1TO0ztWZ8ttKaU/7Dt9SDWhQtKjOtnu/gVBbZJqqTsY7ztdGSfvhTvA5xKs7T0gtzFMkb3dplZojH3Z7H3NuLqnKa63HWH0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724162793; c=relaxed/simple;
-	bh=7B/yStqomEmUqZ3N4m958EM2NXqBy3agfP86oOPX03I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B9rO2PeB6ygmrkg6aThvwIP3/09jq4j6vsWY9VZIZXduhZNg9/yYOQYY0jcgvxUNNw5QyfFJT+D4mWkvlOv/WDPpFhlP62Hmajb5swLKn2KCfxJyIoewCUTNFnmwqYq7thbHLxmQkwEHIWRQSyF1om2VDZ73vs3muPgstDdXpWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DB55ADA7;
-	Tue, 20 Aug 2024 07:06:56 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DE2083F66E;
-	Tue, 20 Aug 2024 07:06:27 -0700 (PDT)
-Date: Tue, 20 Aug 2024 15:06:06 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
-	aneesh.kumar@kernel.org, aneesh.kumar@linux.ibm.com, bp@alien8.de,
-	broonie@kernel.org, christophe.leroy@csgroup.eu,
-	dave.hansen@linux.intel.com, hpa@zytor.com,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
-	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
-	oliver.upton@linux.dev, shuah@kernel.org, szabolcs.nagy@arm.com,
-	tglx@linutronix.de, will@kernel.org, x86@kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 18/29] arm64: add POE signal support
-Message-ID: <20240820140606.GA1011855@e124191.cambridge.arm.com>
-References: <20240801155441.GB841837@e124191.cambridge.arm.com>
- <Zqu2VYELikM5LFY/@e133380.arm.com>
- <20240806103532.GA1986436@e124191.cambridge.arm.com>
- <20240806143103.GB2017741@e124191.cambridge.arm.com>
- <ZrzHU9et8L_0Tv_B@arm.com>
- <20240815131815.GA3657684@e124191.cambridge.arm.com>
- <Zr4aJqc/ifRXJQAd@e133380.arm.com>
- <ZsN8MnSqIWEMh7Ma@arm.com>
- <20240820095441.GA688664@e124191.cambridge.arm.com>
- <ZsSgKl2JINjdpuW1@e133380.arm.com>
+	s=arc-20240116; t=1724162809; c=relaxed/simple;
+	bh=EM4p/wmqIOkPlzWiX5O0ERZflz0MZ3+ngnfORf2TNRc=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=J6JOiSjUEhkdErhKFVnhrV6+1QOh+0CY/w/tA8NNgffU7OHSjpC0GsQITRmamrGLGwIL2AP2H2s+/vEbTkhVfJaJrdkYdMcYFRp7a+xIkH2sCQ92ESd2kaiHReFLvLIcsN54TsEpZEdXgdnepRrO6rY0TAjVl8JuOVek+GJVnRg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CxQ+HFQO; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CxQ+HFQO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C15B3C4AF0F;
+	Tue, 20 Aug 2024 14:06:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724162808;
+	bh=EM4p/wmqIOkPlzWiX5O0ERZflz0MZ3+ngnfORf2TNRc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=CxQ+HFQOLA70vUPJqQuU0tZlXYMRSE356mjRzcbRLxSU9vr/8YC7nCtnnu1oaMfGf
+	 5lZX6nti8ys5MQkrq9FSFCurjgKM8eP+pYPMeZG+woZ1h1un/aGXlK5qsp4sW5jILF
+	 VPqbPOGQD4quZfe0WdRAJvxwC+XC1k8sRGEVEzZ+h6DZCUE5kN6OeC6rA8T4ietbXC
+	 FeB/lzNnYkXEJ4fTb+HopCfMQtlJ2vlH/Ri+vPjvm2EvXO1tF8S4JPXlAHgne8t8UA
+	 Cbc5cRRPmldL3FYLRO6KcqeEZdMZKgK5sCpit1ireFz1WolL3qKMdsXz/16ZVAZtAj
+	 /9NjuUO/JTTEw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sgPVW-005I9X-AR;
+	Tue, 20 Aug 2024 15:06:46 +0100
+Date: Tue, 20 Aug 2024 15:06:45 +0100
+Message-ID: <86r0ajxp8q.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sebastian Ene <sebastianene@google.com>
+Cc: akpm@linux-foundation.org,
+	alexghiti@rivosinc.com,
+	ankita@nvidia.com,
+	ardb@kernel.org,
+	catalin.marinas@arm.com,
+	christophe.leroy@csgroup.eu,
+	james.morse@arm.com,
+	vdonnefort@google.com,
+	mark.rutland@arm.com,
+	oliver.upton@linux.dev,
+	rananta@google.com,
+	ryan.roberts@arm.com,
+	shahuang@redhat.com,
+	suzuki.poulose@arm.com,
+	will@kernel.org,
+	yuzenghui@huawei.com,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kernel-team@android.com
+Subject: Re: [PATCH v8 4/6] KVM: arm64: Register ptdump with debugfs on guest creation
+In-Reply-To: <20240816123906.3683425-5-sebastianene@google.com>
+References: <20240816123906.3683425-1-sebastianene@google.com>
+	<20240816123906.3683425-5-sebastianene@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZsSgKl2JINjdpuW1@e133380.arm.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: sebastianene@google.com, akpm@linux-foundation.org, alexghiti@rivosinc.com, ankita@nvidia.com, ardb@kernel.org, catalin.marinas@arm.com, christophe.leroy@csgroup.eu, james.morse@arm.com, vdonnefort@google.com, mark.rutland@arm.com, oliver.upton@linux.dev, rananta@google.com, ryan.roberts@arm.com, shahuang@redhat.com, suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Aug 20, 2024 at 02:54:50PM +0100, Dave Martin wrote:
-> On Tue, Aug 20, 2024 at 10:54:41AM +0100, Joey Gouly wrote:
-> > On Mon, Aug 19, 2024 at 06:09:06PM +0100, Catalin Marinas wrote:
-> > > On Thu, Aug 15, 2024 at 04:09:26PM +0100, Dave P Martin wrote:
-> > > > On Thu, Aug 15, 2024 at 02:18:15PM +0100, Joey Gouly wrote:
-> > > > > That's a lot of words to say, or ask, do you agree with the approach of only
-> > > > > saving POR_EL0 in the signal frame if num_allocated_pkeys() > 1?
-> > > > > 
-> > > > > Thanks,
-> > > > > Joey
-> > > > 
-> > > > ...So..., given all the above, it is perhaps best to go back to
-> > > > dumping POR_EL0 unconditionally after all, unless we have a mechanism
-> > > > to determine whether pkeys are in use at all.
-> > > 
-> > > Ah, I can see why checking for POR_EL0_INIT is useful. Only checking for
-> > > the allocated keys gets confusing with pkey 0.
-> > > 
-> > > Not sure what the deal is with pkey 0. Is it considered allocated by
-> > > default or unallocatable? If the former, it implies that pkeys are
-> > > already in use (hence the additional check for POR_EL0_INIT). In
-> > > principle the hardware allows us to use permissions where the pkeys do
-> > > not apply but we'd run out of indices and PTE bits to encode them, so I
-> > > think by default we should assume that pkey 0 is pre-allocated.
-> > > 
-> > > 
-> > 
-> > You can consider pkey 0 allocated by default. You can actually pkey_free(0), there's nothing stopping that.
+On Fri, 16 Aug 2024 13:39:04 +0100,
+Sebastian Ene <sebastianene@google.com> wrote:
 > 
-> Is that intentional?
+> While arch/*/mem/ptdump handles the kernel pagetable dumping code,
+> introduce KVM/ptdump which shows the guest stage-2 pagetables. The
+> separation is necessary because most of the definitions from the
+> stage-2 pagetable reside in the KVM path and we will be invoking
+> functionality **specific** to KVM.
 
-I don't really know? It's intentional from my side in that it, I allow it,
-because it doesn't look like x86 or PPC block pkey_free(0).
-
-I found this code that does pkey_free(0), but obviously it's a bit of a weird test case:
-
-	https://github.com/ColinIanKing/stress-ng/blob/master/test/test-pkey-free.c#L29
+Drop the ** emphasis.
 
 > 
-> You're not supposed to free pkeys that are in use, and it's quasi-
-> impossible to know whether pkey 0 is in use: all binaries in the
-> process assume that pkey is available and use it by default for their
-> pages, plus the stack will be painted with pkey 0, and the vDSO has to
-> be painted with some pkey.
+> When a guest is created, register a new file entry under the guest
+> debugfs dir which allows userspace to show the contents of the guest
+> stage-2 pagetables when accessed.
 > 
-> Actually, that's a good point, because of the vDSO I think that only
-> special bits of code with a private ABI (e.g., JITted code etc.) that
-> definitely don't call into the vDSO can block permissions on pkey 0...
-> otherwise, stuff will break.
+> Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> ---
+>  arch/arm64/kvm/Kconfig      | 14 ++++++
+>  arch/arm64/kvm/Makefile     |  1 +
+>  arch/arm64/kvm/arm.c        |  2 +
+>  arch/arm64/kvm/kvm_ptdump.h | 20 ++++++++
+>  arch/arm64/kvm/ptdump.c     | 91 +++++++++++++++++++++++++++++++++++++
+>  5 files changed, 128 insertions(+)
+>  create mode 100644 arch/arm64/kvm/kvm_ptdump.h
+>  create mode 100644 arch/arm64/kvm/ptdump.c
 > 
-> > 
-> > > So I agree that it's probably best to save it unconditionally.
-> > 
-> > Alright, will leave it as is!
-> 
-> Ack, I think the whole discussion around this has shown that there
-> isn't a _simple_ argument for conditionally dumping POR_EL0... so I'm
-> prepared to admit defeat here.
-> 
-> We might still try to slow down the consumption of the remaining space
-> with a "misc registers" record, instead of dedicating a record to
-> POR_EL0.  I have some thoughts on that, but if nobody cares that much
-> then this probably isn't worth pursuing.
-> 
-> Cheers
-> ---Dave
-> 
+> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> index 8304eb342be9..fcc41e58ede6 100644
+> --- a/arch/arm64/kvm/Kconfig
+> +++ b/arch/arm64/kvm/Kconfig
+> @@ -66,4 +66,18 @@ config PROTECTED_NVHE_STACKTRACE
+>  
+>  	  If unsure, or not using protected nVHE (pKVM), say N.
+>  
+> +config PTDUMP_STAGE2_DEBUGFS
+> +       bool "Present the stage-2 pagetables to debugfs"
+> +       depends on KVM
+> +       select PTDUMP_CORE
+
+This looks wrong. Looking at PTDUMP_DEBUGFS, it has the following
+constraints:
+
+        depends on DEBUG_KERNEL
+        depends on DEBUG_FS
+        depends on GENERIC_PTDUMP
+        select PTDUMP_CORE
+
+I don't see why the Stage-2 version should have anything different.
+
+> +       default n
+> +       help
+> +         Say Y here if you want to show the stage-2 kernel pagetables
+> +         layout in a debugfs file. This information is only useful for kernel developers
+> +         who are working in architecture specific areas of the kernel.
+> +         It is probably not a good idea to enable this feature in a production
+> +         kernel.
+
+nit: try to keep the formatting within 80 columns.
+
+More importantly, I find it very strange to expose the configuration
+option so early in the series, while the support code isn't there yet.
+You can perfectly introduce code that is conditional on a config
+option and only add it at the end.
+
+> +
+> +         If in doubt, say N.
+> +
+>  endif # VIRTUALIZATION
+> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> index 86a629aaf0a1..e4233b323a73 100644
+> --- a/arch/arm64/kvm/Makefile
+> +++ b/arch/arm64/kvm/Makefile
+> @@ -27,6 +27,7 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
+>  
+>  kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o pmu.o
+>  kvm-$(CONFIG_ARM64_PTR_AUTH)  += pauth.o
+> +kvm-$(CONFIG_PTDUMP_STAGE2_DEBUGFS) += ptdump.o
+>  
+>  always-y := hyp_constants.h hyp-constants.s
+>  
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 9bef7638342e..60fed2146763 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -45,6 +45,7 @@
+>  #include <kvm/arm_hypercalls.h>
+>  #include <kvm/arm_pmu.h>
+>  #include <kvm/arm_psci.h>
+> +#include <kvm_ptdump.h>
+>  
+>  static enum kvm_mode kvm_mode = KVM_MODE_DEFAULT;
+>  
+> @@ -228,6 +229,7 @@ vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
+>  void kvm_arch_create_vm_debugfs(struct kvm *kvm)
+>  {
+>  	kvm_sys_regs_create_debugfs(kvm);
+> +	kvm_ptdump_guest_register(kvm);
+
+Consider using a name that is homogeneous with what we already have
+(kvm_s2_ptdump_create_debugfs?).
+
+>  }
+>  
+>  static void kvm_destroy_mpidr_data(struct kvm *kvm)
+> diff --git a/arch/arm64/kvm/kvm_ptdump.h b/arch/arm64/kvm/kvm_ptdump.h
+> new file mode 100644
+> index 000000000000..0a62b0e2908c
+> --- /dev/null
+> +++ b/arch/arm64/kvm/kvm_ptdump.h
+> @@ -0,0 +1,20 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (C) Google, 2024
+> + * Author: Sebastian Ene <sebastianene@google.com>
+> + */
+> +
+> +#ifndef __KVM_PTDUMP_H
+> +#define __KVM_PTDUMP_H
+> +
+> +#include <linux/kvm_host.h>
+> +#include <asm/ptdump.h>
+> +
+> +
+> +#ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
+> +void kvm_ptdump_guest_register(struct kvm *kvm);
+> +#else
+> +static inline void kvm_ptdump_guest_register(struct kvm *kvm) {}
+> +#endif /* CONFIG_PTDUMP_STAGE2_DEBUGFS */
+> +
+> +#endif /* __KVM_PTDUMP_H */
+
+Please don't add new include files that contain so little stuff. These
+things may as well be added either to asm/kvm_host.h or asm/ptdump.h.
+
+> diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
+> new file mode 100644
+> index 000000000000..52483d56be2e
+> --- /dev/null
+> +++ b/arch/arm64/kvm/ptdump.c
+> @@ -0,0 +1,91 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Debug helper used to dump the stage-2 pagetables of the system and their
+> + * associated permissions.
+> + *
+> + * Copyright (C) Google, 2024
+> + * Author: Sebastian Ene <sebastianene@google.com>
+> + */
+> +#include <linux/debugfs.h>
+> +#include <linux/kvm_host.h>
+> +#include <linux/seq_file.h>
+> +
+> +#include <asm/kvm_pgtable.h>
+> +#include <kvm_ptdump.h>
+> +
+> +
+> +static int kvm_ptdump_visitor(const struct kvm_pgtable_visit_ctx *ctx,
+> +			      enum kvm_pgtable_walk_flags visit)
+> +{
+> +	struct ptdump_pg_state *st = ctx->arg;
+> +	struct ptdump_state *pt_st = &st->ptdump;
+> +
+> +	note_page(pt_st, ctx->addr, ctx->level, ctx->old);
+> +	return 0;
+> +}
+> +
+> +static int kvm_ptdump_show_common(struct seq_file *m,
+
+What does "common" mean here? You have exactly *one* caller, so why
+isn't that inlined in kvm_ptdump_guest_show()?
+
+> +				  struct kvm_pgtable *pgtable,
+> +				  struct ptdump_pg_state *parser_state)
+> +{
+> +	struct kvm_pgtable_walker walker = (struct kvm_pgtable_walker) {
+> +		.cb     = kvm_ptdump_visitor,
+> +		.arg	= parser_state,
+> +		.flags	= KVM_PGTABLE_WALK_LEAF,
+> +	};
+> +
+> +	parser_state->level = -1;
+> +	parser_state->start_address = 0;
+> +
+> +	return kvm_pgtable_walk(pgtable, 0, BIT(pgtable->ia_bits), &walker);
+> +}
+> +
+> +static int kvm_ptdump_guest_show(struct seq_file *m, void *unused)
+> +{
+> +	struct kvm *kvm = m->private;
+> +	struct kvm_s2_mmu *mmu = &kvm->arch.mmu;
+> +	struct ptdump_pg_state parser_state = {0};
+
+nit: the common idiom is "parser_state = {}".
+
+> +	int ret;
+> +
+> +	write_lock(&kvm->mmu_lock);
+> +	ret = kvm_ptdump_show_common(m, mmu->pgt, &parser_state);
+> +	write_unlock(&kvm->mmu_lock);
+> +
+> +	return ret;
+> +}
+> +
+> +static int kvm_ptdump_guest_open(struct inode *m, struct file *file)
+> +{
+> +	struct kvm *kvm = m->i_private;
+> +	int ret;
+> +
+> +	if (!kvm_get_kvm_safe(kvm))
+> +		return -ENOENT;
+> +
+> +	ret = single_open(file, kvm_ptdump_guest_show, m->i_private);
+> +	if (ret < 0)
+> +		kvm_put_kvm(kvm);
+> +
+> +	return ret;
+> +}
+> +
+> +static int kvm_ptdump_guest_close(struct inode *m, struct file *file)
+> +{
+> +	struct kvm *kvm = m->i_private;
+> +
+> +	kvm_put_kvm(kvm);
+> +	return single_release(m, file);
+> +}
+> +
+> +static const struct file_operations kvm_ptdump_guest_fops = {
+> +	.open		= kvm_ptdump_guest_open,
+> +	.read		= seq_read,
+> +	.llseek		= seq_lseek,
+> +	.release	= kvm_ptdump_guest_close,
+> +};
+> +
+> +void kvm_ptdump_guest_register(struct kvm *kvm)
+> +{
+> +	debugfs_create_file("stage2_page_tables", 0400, kvm->debugfs_dentry,
+> +			    kvm, &kvm_ptdump_guest_fops);
+> +}
+> -- 
+> 2.46.0.184.g6999bdac58-goog
+
+Overall, I have a hard time understanding what this does. It walks the
+page tables, but doesn't do anything useful.
+
+I have the feeling that this patch would be better squashed together
+with patch #5, since it significantly reworks what patch #4 does.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
