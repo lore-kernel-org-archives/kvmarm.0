@@ -1,102 +1,178 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C963B19146E;
-	Tue, 20 Aug 2024 13:18:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A72C4189F3F;
+	Tue, 20 Aug 2024 13:49:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724159889; cv=none; b=Zit/djd8kpfWJC1O1A2v6lLtsFPpZueAedMz14qcmk5aR9a4ZyJQlCzgUV0gegF7eE4s2koOMyJnpxdvAbEjA1pCmj1ZpoB8psejRNi01CUQ7vDIZQSZLvl3mQCViUxUQdfG4mentCAzl9RrYw/D6tuZUKWrPlgJ8Xt/KaoDCMs=
+	t=1724161747; cv=none; b=cVtiTzK4o1J9icWjYzNj90fuQdNhfaaXzy8USznFn3TOP+fZX+r6kH1IJJxqr19SCsciFFf5KbY4SlcU/GVxEQp6F8Ti82Yha2z9tFkiBiOCY+znAgrUuzoS8HsWgFKFR+4tDyOhFHiT0dcXs7i16Q3QeERJEome8iTlFJaQTuM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724159889; c=relaxed/simple;
-	bh=cFqreJ/QbxIcyFcklwuEN/SmjI5Xc8eDvAlus4TNHLI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=R7W85rM+jWCHzMWR3r+4eWFsJmiwLRIlJwvx382oSmptCwct0ghfSMkSZhZ/nZ3uJLf9IYIsoVrQLSnzuUV+Gda50Pw7s90iUOXGo4CZruMrI+PyfYGE77Ljpp3gcapU83+Rng6tddCd0zf3Dhi/8TYYPZV6EOFwnzmdNGgIeDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KgwyPb05; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1724161747; c=relaxed/simple;
+	bh=bhRwn+mVa1bt+TlSFVqIGGL3160ePN1rMaL5tku4pr0=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YVa0IiqpX8E3K4kjFjaydhBGgoSZT6PChgARnMsBnAMB6makSDqboc0Z2F4e60FgrckJwK9jM6PyPYaKGN8FTKLnpBnpilSesX/7Z1jdv7+weHuu3fAlIwACj4jScAadHnNxr9JilRl82Og/etzExtytieMc7lfaFOkSG3NbyEg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=evk4h2E1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KgwyPb05"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A77A2C4AF0C;
-	Tue, 20 Aug 2024 13:18:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="evk4h2E1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D767C4AF0E;
+	Tue, 20 Aug 2024 13:49:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724159889;
-	bh=cFqreJ/QbxIcyFcklwuEN/SmjI5Xc8eDvAlus4TNHLI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KgwyPb05YoSan4ON9gfuNdapsHaPM9npzM3H0ZH/m4O3KRnEyoadshkDtB233ebIR
-	 l8V7iQC8GkUeYUCnbJ/x00WH1UH0qhlfoyGn2pSbQz6vTZRgb0+U/WpCMfb90TdY74
-	 s4enKzKZsyx379Sg9G8wFo80Zp9Y405/VkTj6FQjpRkn+Q41YWpSk6AUuk6JWAzH1+
-	 CN5ArTvsAtQGA6P1SdbY9OvtutMj9psdlP64RYs/80c+OEaIvYA3HSuvuI3cUYOzeb
-	 X+ZNOyhLWsega/HYmQu3vOu2ZwFlGJnbJMEVBTrfUbJUAc2h906YLJ5rL+oF8F6ouc
-	 sDGyG6V9ZOVDQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	s=k20201202; t=1724161747;
+	bh=bhRwn+mVa1bt+TlSFVqIGGL3160ePN1rMaL5tku4pr0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=evk4h2E1nkNef2/bTxkH/5JMSYGg6VWdjgJKeMbMaEdaivq7L6N9i6SzQvDzfsT4k
+	 S603bEwXO2pLPUWy3li5pE3fDcTyNarc6t9465yvDNDRGleiEs2HT7gjCb+wwNwFsX
+	 KpwMxYbIoqO2Y0j4doscuk6dpWE0K2BfUrJkWeXUEh20CTPt0PjnQSBb0X8Htr6dnJ
+	 aNkYd6OGL/QrUYns3ADV9Qci+vCzwOFCkWBLnCrYyUx2VQEYjMibSMARxg/Fr+KsAH
+	 lFBrwCMmhjUNy8RlvUawRl8J/DKJ5P11GO9NYV/23fBUC8AGPeGA6EpOd/0nH4T9wf
+	 eIxuanOzE8vxA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sgOkR-005HMQ-Jr;
-	Tue, 20 Aug 2024 14:18:07 +0100
+	id 1sgPEP-005Hv4-2L;
+	Tue, 20 Aug 2024 14:49:05 +0100
+Date: Tue, 20 Aug 2024 14:49:04 +0100
+Message-ID: <86seuzxq27.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
+To: Sebastian Ene <sebastianene@google.com>
+Cc: akpm@linux-foundation.org,
+	alexghiti@rivosinc.com,
+	ankita@nvidia.com,
+	ardb@kernel.org,
+	catalin.marinas@arm.com,
+	christophe.leroy@csgroup.eu,
+	james.morse@arm.com,
+	vdonnefort@google.com,
+	mark.rutland@arm.com,
+	oliver.upton@linux.dev,
+	rananta@google.com,
+	ryan.roberts@arm.com,
+	shahuang@redhat.com,
+	suzuki.poulose@arm.com,
+	will@kernel.org,
+	yuzenghui@huawei.com,
+	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Fuad Tabba <tabba@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v4 8/8] KVM: arm64: Expose ID_AA64PFR2_EL1 to userspace and guests
-Date: Tue, 20 Aug 2024 14:18:02 +0100
-Message-Id: <20240820131802.3547589-9-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240820131802.3547589-1-maz@kernel.org>
-References: <20240820131802.3547589-1-maz@kernel.org>
+	linux-kernel@vger.kernel.org,
+	kernel-team@android.com
+Subject: Re: [PATCH v8 3/6] arm64: ptdump: Use the mask from the state structure
+In-Reply-To: <20240816123906.3683425-4-sebastianene@google.com>
+References: <20240816123906.3683425-1-sebastianene@google.com>
+	<20240816123906.3683425-4-sebastianene@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, tabba@google.com, joey.gouly@arm.com, broonie@kernel.org
+X-SA-Exim-Rcpt-To: sebastianene@google.com, akpm@linux-foundation.org, alexghiti@rivosinc.com, ankita@nvidia.com, ardb@kernel.org, catalin.marinas@arm.com, christophe.leroy@csgroup.eu, james.morse@arm.com, vdonnefort@google.com, mark.rutland@arm.com, oliver.upton@linux.dev, rananta@google.com, ryan.roberts@arm.com, shahuang@redhat.com, suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Everything is now in place for a guest to "enjoy" FP8 support.
-Expose ID_AA64PFR2_EL1 to both userspace and guests, with the
-explicit restriction of only being able to clear FPMR.
+On Fri, 16 Aug 2024 13:39:03 +0100,
+Sebastian Ene <sebastianene@google.com> wrote:
+> 
+> Printing the descriptor attributes requires accessing a mask which has a
+> different set of attributes for stage-2. In preparation for adding support
+> for the stage-2 pagetables dumping, use the mask from the local context
+> and not from the globally defined pg_level array. Store a pointer to
+> the pg_level array in the ptdump state structure. This will allow us to
+> extract the mask which is wrapped in the pg_level array and use it for
+> descriptor parsing in the note_page.
+> 
+> Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> ---
+>  arch/arm64/include/asm/ptdump.h |  1 +
+>  arch/arm64/mm/ptdump.c          | 13 ++++++++-----
+>  2 files changed, 9 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/ptdump.h b/arch/arm64/include/asm/ptdump.h
+> index bd5d3ee3e8dc..71a7ed01153a 100644
+> --- a/arch/arm64/include/asm/ptdump.h
+> +++ b/arch/arm64/include/asm/ptdump.h
+> @@ -44,6 +44,7 @@ struct ptdump_pg_level {
+>   */
+>  struct ptdump_pg_state {
+>  	struct ptdump_state ptdump;
+> +	struct ptdump_pg_level *pg_level;
+>  	struct seq_file *seq;
+>  	const struct addr_marker *marker;
+>  	const struct mm_struct *mm;
+> diff --git a/arch/arm64/mm/ptdump.c b/arch/arm64/mm/ptdump.c
+> index 404751fd30fe..ca53ef274a8b 100644
+> --- a/arch/arm64/mm/ptdump.c
+> +++ b/arch/arm64/mm/ptdump.c
+> @@ -117,7 +117,7 @@ static const struct ptdump_prot_bits pte_bits[] = {
+>  	}
+>  };
+>  
+> -static struct ptdump_pg_level pg_level[] __ro_after_init = {
+> +static struct ptdump_pg_level kernel_pg_levels[] __ro_after_init = {
 
-All other features (MTE* at the time of writing) are hidden
-and not writable.
+Do you actually need this sort of renaming? Given that it is static,
+this looks like some slightly abusive repainting which isn't warranted
+here.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/sys_regs.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+I also didn't understand the commit message: you're not tracking any
+mask here, but a page table level. You are also not using it for
+anything yet, see below.
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 51627add0a72..2d1e45178422 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1539,6 +1539,10 @@ static u64 __kvm_read_sanitised_id_reg(const struct kvm_vcpu *vcpu,
- 
- 		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_SME);
- 		break;
-+	case SYS_ID_AA64PFR2_EL1:
-+		/* We only expose FPMR */
-+		val &= ID_AA64PFR2_EL1_FPMR;
-+		break;
- 	case SYS_ID_AA64ISAR1_EL1:
- 		if (!vcpu_has_ptrauth(vcpu))
- 			val &= ~(ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_APA) |
-@@ -2381,7 +2385,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 		   ID_AA64PFR0_EL1_AdvSIMD |
- 		   ID_AA64PFR0_EL1_FP), },
- 	ID_SANITISED(ID_AA64PFR1_EL1),
--	ID_UNALLOCATED(4,2),
-+	ID_WRITABLE(ID_AA64PFR2_EL1, ID_AA64PFR2_EL1_FPMR),
- 	ID_UNALLOCATED(4,3),
- 	ID_WRITABLE(ID_AA64ZFR0_EL1, ~ID_AA64ZFR0_EL1_RES0),
- 	ID_HIDDEN(ID_AA64SMFR0_EL1),
+
+>  	{ /* pgd */
+>  		.name	= "PGD",
+>  		.bits	= pte_bits,
+> @@ -192,6 +192,7 @@ void note_page(struct ptdump_state *pt_st, unsigned long addr, int level,
+>  	       u64 val)
+>  {
+>  	struct ptdump_pg_state *st = container_of(pt_st, struct ptdump_pg_state, ptdump);
+> +	struct ptdump_pg_level *pg_level = st->pg_level;
+
+This is what I mean. What is this pg_level used for?
+
+>  	static const char units[] = "KMGTPE";
+>  	u64 prot = 0;
+>  
+> @@ -262,6 +263,7 @@ void ptdump_walk(struct seq_file *s, struct ptdump_info *info)
+>  		.seq = s,
+>  		.marker = info->markers,
+>  		.mm = info->mm,
+> +		.pg_level = &kernel_pg_levels[0],
+>  		.level = -1,
+>  		.ptdump = {
+>  			.note_page = note_page,
+> @@ -279,10 +281,10 @@ static void __init ptdump_initialize(void)
+>  {
+>  	unsigned i, j;
+>  
+> -	for (i = 0; i < ARRAY_SIZE(pg_level); i++)
+> -		if (pg_level[i].bits)
+> -			for (j = 0; j < pg_level[i].num; j++)
+> -				pg_level[i].mask |= pg_level[i].bits[j].mask;
+> +	for (i = 0; i < ARRAY_SIZE(kernel_pg_levels); i++)
+> +		if (kernel_pg_levels[i].bits)
+> +			for (j = 0; j < kernel_pg_levels[i].num; j++)
+> +				kernel_pg_levels[i].mask |= kernel_pg_levels[i].bits[j].mask;
+>  }
+>  
+>  static struct ptdump_info kernel_ptdump_info __ro_after_init = {
+> @@ -297,6 +299,7 @@ bool ptdump_check_wx(void)
+>  			{ 0, NULL},
+>  			{ -1, NULL},
+>  		},
+> +		.pg_level = &kernel_pg_levels[0],
+>  		.level = -1,
+>  		.check_wx = true,
+>  		.ptdump = {
+
+Thanks,
+
+	M.
+
 -- 
-2.39.2
-
+Without deviation from the norm, progress is not possible.
