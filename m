@@ -1,75 +1,49 @@
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41CCD1922EE
-	for <kvmarm@lists.linux.dev>; Tue, 20 Aug 2024 14:39:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CA0B191F72
+	for <kvmarm@lists.linux.dev>; Tue, 20 Aug 2024 14:45:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724164762; cv=none; b=p50bASOvSMNb8DjKFQ1nRhmalTMzqGTMnONkGyVKseIiEFeSkQI3dkP4fbeXWgxGFRX/aJEGugERsqIKJ+KHwUkFMgwxhDmRyWLiTckGwJe0wSLNeunVRX5DEzjdskHe4tX3e0psEsIMqcyrH4UuAJyS/vwh7k8v/gMbYG1sj8Q=
+	t=1724165128; cv=none; b=TrDuTCfmftjqCoY8GFKuRFDpllMJ1S7OcbbyX01+0JVkHbogr4lT24b1v8DjZofYTzAKGoXxEJwbSYaju9vfG+DTSFIx+7ugjpDtzZulx1VD3hPWvgsNrm/EjsrkbQ16g6R/17KfsIcXPJfikpXiuaXGN1idvhUtN99/avk7eug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724164762; c=relaxed/simple;
-	bh=6K/5oa3KeOCD8BeLjlcTBvqfRBS/79+0n2Kq0SJWKq8=;
+	s=arc-20240116; t=1724165128; c=relaxed/simple;
+	bh=vlryMHK2Fs/BfF1L8tDkzmLCv7GbWXARabhNUAS+VSA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oP9IkriuhKrdqvgDG097kJ2/8BuTTnP0ToZN3scnawq8Qg/DzZHVjw46ps5vvfHBzRGZXnhnpkR5ZVdAV9JtqjU+vx+MXl6nPogf6yXxERkUcq5/+J/AQJSrDF9D4+/11CG/qNrgtm7yFzl2Do0Z995EH+sE+GkSA6JmI0uDIBo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oAQr8Kfb; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oAQr8Kfb"
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-427fc9834deso38605e9.0
-        for <kvmarm@lists.linux.dev>; Tue, 20 Aug 2024 07:39:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724164758; x=1724769558; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cqVmNf36unFHBK+FfoUHfv7AMu5TB9aKm0xHrMHZXeI=;
-        b=oAQr8KfbK78UawWsKPrrRcZne9Qw28mzJyWe4bi/+MmHjqJFSuHDkMzw2TUPVoUPD+
-         8qZvqpjx3CMpz91sLjvLBoE/s4/oXGSE2kNUyPI62wQXGXIb5kwpJflbRi2RCpshz453
-         C1zoGgr30vVez9bSeQweVUPbyWHvnrNLc5UPmuIIwSUJAEB6FMz08T0EYbjeM+At2gmm
-         Z2pFh4Z6emllRfI89jpQ7MYAg9Q/Y4FZguPU00Ufj4r8bDO/lBvbXgcZtrp2sWl3ezya
-         U/Km7LbaW4KzhlSDk1iTv7In1Ohb47MnJwK5VsSyRz/Vn6GNruZIhQ3RWY0cuTI5ahq1
-         Ps1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724164758; x=1724769558;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cqVmNf36unFHBK+FfoUHfv7AMu5TB9aKm0xHrMHZXeI=;
-        b=V5D1RvkShqwZSdWfkIywRQ/WrTAyJ5e2a3IRAqSDI0SteQm3FmmoeWey7OEbW9nnHw
-         Gagx6rKxkDbwdPepsKDTXSLAC7ntfz8B90rKxiKwWnOAKgCHeH2SeuOGVfOLnKi3j/Ns
-         kFE31cdRoHm3Dn5gDq3PDr1/pgqTJ+LUrbXbTFqNkgcmGQh5TDkUE1WoD2+boucpMpn7
-         bnNr+XxcACuhj3MMQ043hRLDZX2eYu1QwYaXCUQXOzDYiiihEJscWfHty9tN2sEgJf+x
-         nM6TllPD36uEGzrHIBzRUfJhp5KxFDPwwCdlZ+JGIb7U4+2Fwalnqk7b07T++57B7TkO
-         klHA==
-X-Forwarded-Encrypted: i=1; AJvYcCVUr/e64Z8Lb/FGCdnKieLHwfbQ3fbRaUjyJsh+9iEwFV1eMBv5pQUNjXi1oCnWo78UlnlNdOwJ8thUdkzeg+xO6+VlQXUd
-X-Gm-Message-State: AOJu0Yz5EgbhMrM4+pSwnAvTO5tG7rQm8G1jd5NhzOz7rv/lJAV3rgrd
-	BK/ZITyAsdLekn6M6SA9VjDAtM9lVg+RtIY5Aa/1y2d1k1n8znO9v+z3IdON6Q==
-X-Google-Smtp-Source: AGHT+IGIk3MuqZdFNT/V7eQCmxiAfwHKBaInvEhxBOOQ8nVu90AHYeozvhTj6iSXtj9NeYtV9xajCA==
-X-Received: by 2002:a05:600c:3d8d:b0:426:5d89:896d with SMTP id 5b1f17b1804b1-42ab78c2de8mr553675e9.1.1724164758048;
-        Tue, 20 Aug 2024 07:39:18 -0700 (PDT)
-Received: from google.com (44.232.78.34.bc.googleusercontent.com. [34.78.232.44])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429ded29303sm196157775e9.15.2024.08.20.07.39.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Aug 2024 07:39:17 -0700 (PDT)
-Date: Tue, 20 Aug 2024 14:39:16 +0000
-From: Sebastian Ene <sebastianene@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: akpm@linux-foundation.org, alexghiti@rivosinc.com, ankita@nvidia.com,
-	ardb@kernel.org, catalin.marinas@arm.com,
-	christophe.leroy@csgroup.eu, james.morse@arm.com,
-	vdonnefort@google.com, mark.rutland@arm.com, oliver.upton@linux.dev,
-	rananta@google.com, ryan.roberts@arm.com, shahuang@redhat.com,
-	suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, kernel-team@android.com
-Subject: Re: [PATCH v8 3/6] arm64: ptdump: Use the mask from the state
- structure
-Message-ID: <ZsSqlIVsSylHaGaW@google.com>
-References: <20240816123906.3683425-1-sebastianene@google.com>
- <20240816123906.3683425-4-sebastianene@google.com>
- <86seuzxq27.wl-maz@kernel.org>
- <ZsSkh2iw8s5Oa5xb@google.com>
- <86o75nxody.wl-maz@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=axsQiVb2EWJx+CAwIzI1+t19USMgReALqsthBLRFGCDP3RmobjdhlcFqMxdmRghhti4nB7kjwqV22mh9KNSh0CwyNEJV+4vvFTYs7lg6hXiLLkgJl1S+ibG9t67tVN5YDe79M720J9aAbKOf5QlzAh/t7ask3mijrkPRd/FaWfg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B7AD6DA7;
+	Tue, 20 Aug 2024 07:45:52 -0700 (PDT)
+Received: from e133380.arm.com (e133380.arm.com [10.1.197.59])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B2E113F66E;
+	Tue, 20 Aug 2024 07:45:23 -0700 (PDT)
+Date: Tue, 20 Aug 2024 15:45:21 +0100
+From: Dave Martin <Dave.Martin@arm.com>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
+	aneesh.kumar@kernel.org, aneesh.kumar@linux.ibm.com, bp@alien8.de,
+	broonie@kernel.org, christophe.leroy@csgroup.eu,
+	dave.hansen@linux.intel.com, hpa@zytor.com,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
+	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
+	oliver.upton@linux.dev, shuah@kernel.org, szabolcs.nagy@arm.com,
+	tglx@linutronix.de, will@kernel.org, x86@kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v4 18/29] arm64: add POE signal support
+Message-ID: <ZsSsAdGc99I10cMn@e133380.arm.com>
+References: <Zqu2VYELikM5LFY/@e133380.arm.com>
+ <20240806103532.GA1986436@e124191.cambridge.arm.com>
+ <20240806143103.GB2017741@e124191.cambridge.arm.com>
+ <ZrzHU9et8L_0Tv_B@arm.com>
+ <20240815131815.GA3657684@e124191.cambridge.arm.com>
+ <Zr4aJqc/ifRXJQAd@e133380.arm.com>
+ <ZsN8MnSqIWEMh7Ma@arm.com>
+ <20240820095441.GA688664@e124191.cambridge.arm.com>
+ <ZsSgKl2JINjdpuW1@e133380.arm.com>
+ <20240820140606.GA1011855@e124191.cambridge.arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -78,99 +52,58 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <86o75nxody.wl-maz@kernel.org>
+In-Reply-To: <20240820140606.GA1011855@e124191.cambridge.arm.com>
 
-On Tue, Aug 20, 2024 at 03:25:13PM +0100, Marc Zyngier wrote:
-> On Tue, 20 Aug 2024 15:13:27 +0100,
-> Sebastian Ene <sebastianene@google.com> wrote:
-> > 
-> > On Tue, Aug 20, 2024 at 02:49:04PM +0100, Marc Zyngier wrote:
-> > > On Fri, 16 Aug 2024 13:39:03 +0100,
-> > > Sebastian Ene <sebastianene@google.com> wrote:
+On Tue, Aug 20, 2024 at 03:06:06PM +0100, Joey Gouly wrote:
+> On Tue, Aug 20, 2024 at 02:54:50PM +0100, Dave Martin wrote:
+> > On Tue, Aug 20, 2024 at 10:54:41AM +0100, Joey Gouly wrote:
+> > > On Mon, Aug 19, 2024 at 06:09:06PM +0100, Catalin Marinas wrote:
+> > > > On Thu, Aug 15, 2024 at 04:09:26PM +0100, Dave P Martin wrote:
+> > > > > On Thu, Aug 15, 2024 at 02:18:15PM +0100, Joey Gouly wrote:
+> > > > > > That's a lot of words to say, or ask, do you agree with the approach of only
+> > > > > > saving POR_EL0 in the signal frame if num_allocated_pkeys() > 1?
+> > > > > > 
+> > > > > > Thanks,
+> > > > > > Joey
+> > > > > 
+> > > > > ...So..., given all the above, it is perhaps best to go back to
+> > > > > dumping POR_EL0 unconditionally after all, unless we have a mechanism
+> > > > > to determine whether pkeys are in use at all.
 > > > > 
-> > > > Printing the descriptor attributes requires accessing a mask which has a
-> > > > different set of attributes for stage-2. In preparation for adding support
-> > > > for the stage-2 pagetables dumping, use the mask from the local context
-> > > > and not from the globally defined pg_level array. Store a pointer to
-> > > > the pg_level array in the ptdump state structure. This will allow us to
-> > > > extract the mask which is wrapped in the pg_level array and use it for
-> > > > descriptor parsing in the note_page.
+> > > > Ah, I can see why checking for POR_EL0_INIT is useful. Only checking for
+> > > > the allocated keys gets confusing with pkey 0.
 > > > > 
-> > > > Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> > > > ---
-> > > >  arch/arm64/include/asm/ptdump.h |  1 +
-> > > >  arch/arm64/mm/ptdump.c          | 13 ++++++++-----
-> > > >  2 files changed, 9 insertions(+), 5 deletions(-)
+> > > > Not sure what the deal is with pkey 0. Is it considered allocated by
+> > > > default or unallocatable? If the former, it implies that pkeys are
+> > > > already in use (hence the additional check for POR_EL0_INIT). In
+> > > > principle the hardware allows us to use permissions where the pkeys do
+> > > > not apply but we'd run out of indices and PTE bits to encode them, so I
+> > > > think by default we should assume that pkey 0 is pre-allocated.
 > > > > 
-> > > > diff --git a/arch/arm64/include/asm/ptdump.h b/arch/arm64/include/asm/ptdump.h
-> > > > index bd5d3ee3e8dc..71a7ed01153a 100644
-> > > > --- a/arch/arm64/include/asm/ptdump.h
-> > > > +++ b/arch/arm64/include/asm/ptdump.h
-> > > > @@ -44,6 +44,7 @@ struct ptdump_pg_level {
-> > > >   */
-> > > >  struct ptdump_pg_state {
-> > > >  	struct ptdump_state ptdump;
-> > > > +	struct ptdump_pg_level *pg_level;
-> > > >  	struct seq_file *seq;
-> > > >  	const struct addr_marker *marker;
-> > > >  	const struct mm_struct *mm;
-> > > > diff --git a/arch/arm64/mm/ptdump.c b/arch/arm64/mm/ptdump.c
-> > > > index 404751fd30fe..ca53ef274a8b 100644
-> > > > --- a/arch/arm64/mm/ptdump.c
-> > > > +++ b/arch/arm64/mm/ptdump.c
-> > > > @@ -117,7 +117,7 @@ static const struct ptdump_prot_bits pte_bits[] = {
-> > > >  	}
-> > > >  };
-> > > >  
-> > > > -static struct ptdump_pg_level pg_level[] __ro_after_init = {
-> > > > +static struct ptdump_pg_level kernel_pg_levels[] __ro_after_init = {
-> > 
-> > Hi Marc,
-> > 
-> >  
-> > > Do you actually need this sort of renaming? Given that it is static,
-> > > this looks like some slightly abusive repainting which isn't warranted
-> > > here.
-> > 
-> > I applied Will's suggestion from
-> > https://lore.kernel.org/all/20240705111229.GB9231@willie-the-truck/
-> > >
+> > > > 
 > > > 
-> > > I also didn't understand the commit message: you're not tracking any
-> > > mask here, but a page table level. You are also not using it for
-> > > anything yet, see below.
+> > > You can consider pkey 0 allocated by default. You can actually pkey_free(0), there's nothing stopping that.
 > > 
-> > and I missed updating the commit message.
-> > 
-> > > 
-> > > 
-> > > >  	{ /* pgd */
-> > > >  		.name	= "PGD",
-> > > >  		.bits	= pte_bits,
-> > > > @@ -192,6 +192,7 @@ void note_page(struct ptdump_state *pt_st, unsigned long addr, int level,
-> > > >  	       u64 val)
-> > > >  {
-> > > >  	struct ptdump_pg_state *st = container_of(pt_st, struct ptdump_pg_state, ptdump);
-> > > > +	struct ptdump_pg_level *pg_level = st->pg_level;
-> > > 
-> > > This is what I mean. What is this pg_level used for?
-> > 
-> > I make use of it to extract the name based on the level. The suggestion
-> > that Will made allowed me to keep the code with less changes.
+> > Is that intentional?
 > 
-> Err, I see that now. It'd be good if you described what actually
-> happens, because it is almost impossible to understand it from reading
-> the patch.
+> I don't really know? It's intentional from my side in that it, I allow it,
+> because it doesn't look like x86 or PPC block pkey_free(0).
+> 
+> I found this code that does pkey_free(0), but obviously it's a bit of a weird test case:
+> 
+> 	https://github.com/ColinIanKing/stress-ng/blob/master/test/test-pkey-free.c#L29
 
-Yes, let me re-write the commit message in the next version,
+Of course, pkey 0 will still be in use for everything, and if the man
+pages are to be believed, the PKRU bits for pkey 0 may no longer be
+maintained after this call...
 
-Thanks,
-Seb
+So this test is possibly a little braindead.  A clear use-case for
+freeing pkey 0 would be more convincing.
 
-> 
-> Thanks,
-> 
-> 	M.
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
+In the meantime though, it makes most sense for arm64 to follow
+the precedent set by other arches on this (as you did).
+
+[...]
+
+Cheers
+---Dave
