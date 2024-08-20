@@ -1,127 +1,88 @@
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 751E31D6DA5
-	for <kvmarm@lists.linux.dev>; Mon, 19 Aug 2024 22:47:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEBD018A95A
+	for <kvmarm@lists.linux.dev>; Tue, 20 Aug 2024 09:54:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724107640; cv=none; b=f9n3Tfi1z6B1tj0wnyplM8p31hRl7VXTlu2Ax18sieLJlSDW+w0XJ3JcVJi+m1bGMo/qHKab4oW6hFkS1ryigR16cRAgleHWtQXn3c3N7HMSeApEDOmDuM4I9lmTMILeDhLz3gbfQgUZ9gx603gxri+IPeg0yUQ+ZZAyA5O4T0k=
+	t=1724147691; cv=none; b=t7N88J1/JPFzzp4ayX6Syer9OosMmFn+Ovq34SmViZgAkrdMbW3f2imIoqaTQfM4I1bx8l8MNeQf+sMoVQeZqv3V+N/3ISwNVdoca9wJuwH3GoUekP/OVn4EnGaxeyYQdEDktAO0X+tP3Wie3W5xMlf6gUpjR7jMHSGXyZhmgzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724107640; c=relaxed/simple;
-	bh=VDHlprhqwjCM5N4nwmrW+/M8UE6X+2dcwSHCzgZZckE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=G6Y3/spf+MDM4RWbGsLlIyVCdJXIu3wsDxPRD1+jN4qBdnroshRqIM2jIYx8B6jh0mPEe0JoO330IplIcaGiVa5Fx7Rj8YL7y0jA+bGbPRCSruErL3XWK6w39XGVp45c4UfG0/fnzTEIKCpMNNTHBmNmjbx8kbqHEfVLTeemnM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nKcugh27; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nKcugh27"
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-6818fa37eecso4737940a12.1
-        for <kvmarm@lists.linux.dev>; Mon, 19 Aug 2024 15:47:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724107639; x=1724712439; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0mpr7864OCZvv9Hj0Yv++YX+VmARQzYZRUR5rU9bOeY=;
-        b=nKcugh27NUxrVTj+lNIYOOQ/LZ3rLQQuwgCPegmG+TSJ9ScbFX4JkSc6ZdZt8T1B4a
-         hXvA0Zgs0cY/M2u9cNiOMXIEWtZyBNNKfWqQ4DJJXac1otDyqK+4rLUR8MIxZQ98H9vW
-         D1iRZSdxZvCYGXavt430/eClK7jZi5vInoGX7FKgpBJtkiiQnu/BdX8vAHsiVR3uMs4x
-         829o2ekwKxCN2nwcWKSLU1iFqUAdZzc8FC/OEVg+sZWj7E3oGCOZqvqwdhsRTXc/VrmD
-         jIBFOwzyYilTdVZC1t6z7j+Moq0o8Xe32/9O4Gujo/2Rf2gkRrm+BTf4nJ39+lScI08S
-         Kuug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724107639; x=1724712439;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=0mpr7864OCZvv9Hj0Yv++YX+VmARQzYZRUR5rU9bOeY=;
-        b=jx40a75ZC2IP3c6yJnSIsWS45l8d7bCtU59IvP1jwtkDs9qO3ivmIIoQ5GLtQ6nHox
-         xyVvPfnwW1QPi7n94hfsZBuhpqNIZfj/E6yICovkrl8X+ybLOQmOTNL861z/JuP+Qu/w
-         7XpdR+w+HxvYVTp8GdbJvHlnYL1E6nlPzeOb/QqFdK5qFqEJmIiCzs+ecNH5VbgsZMke
-         rrt3l+h03dLpuhHBIdMHWZM6BeJbVrSxsHrTKxxOl44iBcABZUkxyuGeWocDDvUXyO66
-         CTY2VgF5gwH63rtvV8AC3nGNbt3ttdWwDhWkZrl2jEV2uEwp3WqznqmJGWIk9lQVQ7mt
-         F0pw==
-X-Forwarded-Encrypted: i=1; AJvYcCXlismI0O9RN6pjisvOwvr2fFsQyBOngTWi121JHJ37gNbT+J8jPWid2OTp7wEgM1sAawZCeiQ=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyMo9WbKrS7sOjLZmxbsy+9v0bvJx5OHNiTLlvarA++g2gNfIFI
-	m2w1Yn8NCn/qvdnMoRZ4au/RoYrYDJX5PgGbfbSWwU57KsHVSWSwJR7c2ZTmqLLLoslqvmp67F9
-	Shg==
-X-Google-Smtp-Source: AGHT+IGngB58TyyXwtykQy2TchYmizV3K6F19AJubcP5aFPXxhvBteRSy0IDpLShOfEeLOPTdkLjdiTkkuE=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:247:b0:1fd:8e8d:8695 with SMTP id
- d9443c01a7336-20203f27f39mr13121725ad.12.1724107638639; Mon, 19 Aug 2024
- 15:47:18 -0700 (PDT)
-Date: Mon, 19 Aug 2024 15:47:17 -0700
-In-Reply-To: <ZsOuEP6P0v45ffC0@linux.dev>
+	s=arc-20240116; t=1724147691; c=relaxed/simple;
+	bh=Xsq0jN/Nr+6zUwRCip9WuKjFgEPV9fhR9Eb321ulRpA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MfENZBE7JrAJoxcHwqn9OE1cWhmsOGHMarYIBR2pDB+qciAolZrdudCAL/axYYKX7XNZgDSPioUM71H1azsfasiyStDr3yN5daQMR9kg32E5PJJrE/9UN7TrKJPfjck/Mcz2+4tnWDrB/eHD9P1yMXNBz2u/ElseUSAO2D0Y+D4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 50B44DA7;
+	Tue, 20 Aug 2024 02:55:15 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 532323F66E;
+	Tue, 20 Aug 2024 02:54:46 -0700 (PDT)
+Date: Tue, 20 Aug 2024 10:54:41 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org,
+	akpm@linux-foundation.org, aneesh.kumar@kernel.org,
+	aneesh.kumar@linux.ibm.com, bp@alien8.de, broonie@kernel.org,
+	christophe.leroy@csgroup.eu, dave.hansen@linux.intel.com,
+	hpa@zytor.com, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
+	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
+	oliver.upton@linux.dev, shuah@kernel.org, szabolcs.nagy@arm.com,
+	tglx@linutronix.de, will@kernel.org, x86@kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v4 18/29] arm64: add POE signal support
+Message-ID: <20240820095441.GA688664@e124191.cambridge.arm.com>
+References: <20240503130147.1154804-19-joey.gouly@arm.com>
+ <ZqJ2knGETfS4nfEA@e133380.arm.com>
+ <20240801155441.GB841837@e124191.cambridge.arm.com>
+ <Zqu2VYELikM5LFY/@e133380.arm.com>
+ <20240806103532.GA1986436@e124191.cambridge.arm.com>
+ <20240806143103.GB2017741@e124191.cambridge.arm.com>
+ <ZrzHU9et8L_0Tv_B@arm.com>
+ <20240815131815.GA3657684@e124191.cambridge.arm.com>
+ <Zr4aJqc/ifRXJQAd@e133380.arm.com>
+ <ZsN8MnSqIWEMh7Ma@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20240724011037.3671523-1-jthoughton@google.com>
- <20240724011037.3671523-4-jthoughton@google.com> <CADrL8HV5M-n72KDseDKWpGrUVMjC147Jqz98PxyG2ZeRVbFu8g@mail.gmail.com>
- <Zr_y7Fn63hdowfYM@google.com> <CAOUHufYc3hr-+fp14jgEkDN++v6t-z-PRf1yQdKtnje6SgLiiA@mail.gmail.com>
- <ZsOuEP6P0v45ffC0@linux.dev>
-Message-ID: <ZsPLdUC44-DHKAON@google.com>
-Subject: Re: [PATCH v6 03/11] KVM: arm64: Relax locking for kvm_test_age_gfn
- and kvm_age_gfn
-From: Sean Christopherson <seanjc@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Yu Zhao <yuzhao@google.com>, James Houghton <jthoughton@google.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Ankit Agrawal <ankita@nvidia.com>, Axel Rasmussen <axelrasmussen@google.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, David Matlack <dmatlack@google.com>, 
-	David Rientjes <rientjes@google.com>, James Morse <james.morse@arm.com>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
-	Raghavendra Rao Ananta <rananta@google.com>, Ryan Roberts <ryan.roberts@arm.com>, 
-	Shaoqin Huang <shahuang@redhat.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Wei Xu <weixugc@google.com>, Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZsN8MnSqIWEMh7Ma@arm.com>
 
-On Mon, Aug 19, 2024, Oliver Upton wrote:
-> On Fri, Aug 16, 2024 at 07:03:27PM -0600, Yu Zhao wrote:
-> > On Fri, Aug 16, 2024 at 6:46=E2=80=AFPM Sean Christopherson <seanjc@goo=
-gle.com> wrote:
->=20
-> [...]
->=20
-> > > Were you expecting vCPU runtime to improve (more)?  If so, lack of mo=
-vement could
-> > > be due to KVM arm64 taking mmap_lock for read when handling faults:
-> > >
-> > > https://lore.kernel.org/all/Zr0ZbPQHVNzmvwa6@google.com
-> >=20
-> > For the above test, I don't think it's mmap_lock
->=20
-> Yeah, I don't think this is related to the mmap_lock.
->=20
-> James is likely using hardware that has FEAT_HAFDBS, so vCPUs won't
-> fault for an Access flag update.
+On Mon, Aug 19, 2024 at 06:09:06PM +0100, Catalin Marinas wrote:
+> On Thu, Aug 15, 2024 at 04:09:26PM +0100, Dave P Martin wrote:
+> > On Thu, Aug 15, 2024 at 02:18:15PM +0100, Joey Gouly wrote:
+> > > That's a lot of words to say, or ask, do you agree with the approach of only
+> > > saving POR_EL0 in the signal frame if num_allocated_pkeys() > 1?
+> > > 
+> > > Thanks,
+> > > Joey
+> > 
+> > ...So..., given all the above, it is perhaps best to go back to
+> > dumping POR_EL0 unconditionally after all, unless we have a mechanism
+> > to determine whether pkeys are in use at all.
+> 
+> Ah, I can see why checking for POR_EL0_INIT is useful. Only checking for
+> the allocated keys gets confusing with pkey 0.
+> 
+> Not sure what the deal is with pkey 0. Is it considered allocated by
+> default or unallocatable? If the former, it implies that pkeys are
+> already in use (hence the additional check for POR_EL0_INIT). In
+> principle the hardware allows us to use permissions where the pkeys do
+> not apply but we'd run out of indices and PTE bits to encode them, so I
+> think by default we should assume that pkey 0 is pre-allocated.
+> 
+> 
 
-Huh, didn't know that was a thing on ARM.  Ooh, that lends even more creden=
-ce to
-my assertion that marking folios accessed in handle_access_fault() can go a=
-way[*].
-I assume hardware-assisted updates means this code in handle_access_fault()=
- will
-no longer be hit, as KVM simply won't ever get access faults?  If so, I'll =
-add
-that info to the changelog.
+You can consider pkey 0 allocated by default. You can actually pkey_free(0), there's nothing stopping that.
 
-	if (kvm_pte_valid(pte))
-		kvm_set_pfn_accessed(kvm_pte_to_pfn(pte));
+> So I agree that it's probably best to save it unconditionally.
 
-[*] https://lore.kernel.org/all/20240726235234.228822-83-seanjc@google.com
+Alright, will leave it as is!
 
-> Even if he's on a machine w/o it, Access flag faults are handled outside =
-the
-> mmap_lock.
-
-Oh, right, they go down handle_access_fault(), not user_mem_abort().
-
-Reviewing late Friday afternoon, never a good idea ;-)
+Thanks,
+Joey
