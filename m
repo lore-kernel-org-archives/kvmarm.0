@@ -1,178 +1,113 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A72C4189F3F;
-	Tue, 20 Aug 2024 13:49:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 245941917C6
+	for <kvmarm@lists.linux.dev>; Tue, 20 Aug 2024 13:54:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724161747; cv=none; b=cVtiTzK4o1J9icWjYzNj90fuQdNhfaaXzy8USznFn3TOP+fZX+r6kH1IJJxqr19SCsciFFf5KbY4SlcU/GVxEQp6F8Ti82Yha2z9tFkiBiOCY+znAgrUuzoS8HsWgFKFR+4tDyOhFHiT0dcXs7i16Q3QeERJEome8iTlFJaQTuM=
+	t=1724162101; cv=none; b=TKMiAFkJLvWH42g2iBw6BnRaZnEVK5Hpjiq5jhXo4ndLHXaXTWcvXDtHtwSWyCl15f8ZsaJfK7SvNvBYGOnhHk4VweEhCd595ENLOR1gIpg0hfV7D5lL3OMLLm/pF5OvD7NotGf453b4iyZlZq+DA6LZQuEy4YliALfG+HCy0GE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724161747; c=relaxed/simple;
-	bh=bhRwn+mVa1bt+TlSFVqIGGL3160ePN1rMaL5tku4pr0=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YVa0IiqpX8E3K4kjFjaydhBGgoSZT6PChgARnMsBnAMB6makSDqboc0Z2F4e60FgrckJwK9jM6PyPYaKGN8FTKLnpBnpilSesX/7Z1jdv7+weHuu3fAlIwACj4jScAadHnNxr9JilRl82Og/etzExtytieMc7lfaFOkSG3NbyEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=evk4h2E1; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="evk4h2E1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D767C4AF0E;
-	Tue, 20 Aug 2024 13:49:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724161747;
-	bh=bhRwn+mVa1bt+TlSFVqIGGL3160ePN1rMaL5tku4pr0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=evk4h2E1nkNef2/bTxkH/5JMSYGg6VWdjgJKeMbMaEdaivq7L6N9i6SzQvDzfsT4k
-	 S603bEwXO2pLPUWy3li5pE3fDcTyNarc6t9465yvDNDRGleiEs2HT7gjCb+wwNwFsX
-	 KpwMxYbIoqO2Y0j4doscuk6dpWE0K2BfUrJkWeXUEh20CTPt0PjnQSBb0X8Htr6dnJ
-	 aNkYd6OGL/QrUYns3ADV9Qci+vCzwOFCkWBLnCrYyUx2VQEYjMibSMARxg/Fr+KsAH
-	 lFBrwCMmhjUNy8RlvUawRl8J/DKJ5P11GO9NYV/23fBUC8AGPeGA6EpOd/0nH4T9wf
-	 eIxuanOzE8vxA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sgPEP-005Hv4-2L;
-	Tue, 20 Aug 2024 14:49:05 +0100
-Date: Tue, 20 Aug 2024 14:49:04 +0100
-Message-ID: <86seuzxq27.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Sebastian Ene <sebastianene@google.com>
-Cc: akpm@linux-foundation.org,
-	alexghiti@rivosinc.com,
-	ankita@nvidia.com,
-	ardb@kernel.org,
-	catalin.marinas@arm.com,
-	christophe.leroy@csgroup.eu,
-	james.morse@arm.com,
-	vdonnefort@google.com,
-	mark.rutland@arm.com,
-	oliver.upton@linux.dev,
-	rananta@google.com,
-	ryan.roberts@arm.com,
-	shahuang@redhat.com,
-	suzuki.poulose@arm.com,
-	will@kernel.org,
-	yuzenghui@huawei.com,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	kernel-team@android.com
-Subject: Re: [PATCH v8 3/6] arm64: ptdump: Use the mask from the state structure
-In-Reply-To: <20240816123906.3683425-4-sebastianene@google.com>
-References: <20240816123906.3683425-1-sebastianene@google.com>
-	<20240816123906.3683425-4-sebastianene@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1724162101; c=relaxed/simple;
+	bh=ZUM3Sw7j7/PudTQ/JnBeZRy7OldTJDX5aMa/HKx7QXE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VecRh7sv49m46/I35DNZolMxDIVxIN6rJZppdazghx51WRgbsQ+zc9ZtaZz3rRTDB+5TJ++6DKAZovFDC72DsoB4vffBJl3g1NMucsD83fFZs9ctpz5C3pvdx4dlVbsLyj98CM2wtgzSP8dk1rldzKwH7qP1WrH/dEl1B4b9dfg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5A545DA7;
+	Tue, 20 Aug 2024 06:55:24 -0700 (PDT)
+Received: from e133380.arm.com (e133380.arm.com [10.1.197.59])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5460C3F66E;
+	Tue, 20 Aug 2024 06:54:55 -0700 (PDT)
+Date: Tue, 20 Aug 2024 14:54:50 +0100
+From: Dave Martin <Dave.Martin@arm.com>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
+	aneesh.kumar@kernel.org, aneesh.kumar@linux.ibm.com, bp@alien8.de,
+	broonie@kernel.org, christophe.leroy@csgroup.eu,
+	dave.hansen@linux.intel.com, hpa@zytor.com,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
+	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
+	oliver.upton@linux.dev, shuah@kernel.org, szabolcs.nagy@arm.com,
+	tglx@linutronix.de, will@kernel.org, x86@kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v4 18/29] arm64: add POE signal support
+Message-ID: <ZsSgKl2JINjdpuW1@e133380.arm.com>
+References: <ZqJ2knGETfS4nfEA@e133380.arm.com>
+ <20240801155441.GB841837@e124191.cambridge.arm.com>
+ <Zqu2VYELikM5LFY/@e133380.arm.com>
+ <20240806103532.GA1986436@e124191.cambridge.arm.com>
+ <20240806143103.GB2017741@e124191.cambridge.arm.com>
+ <ZrzHU9et8L_0Tv_B@arm.com>
+ <20240815131815.GA3657684@e124191.cambridge.arm.com>
+ <Zr4aJqc/ifRXJQAd@e133380.arm.com>
+ <ZsN8MnSqIWEMh7Ma@arm.com>
+ <20240820095441.GA688664@e124191.cambridge.arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sebastianene@google.com, akpm@linux-foundation.org, alexghiti@rivosinc.com, ankita@nvidia.com, ardb@kernel.org, catalin.marinas@arm.com, christophe.leroy@csgroup.eu, james.morse@arm.com, vdonnefort@google.com, mark.rutland@arm.com, oliver.upton@linux.dev, rananta@google.com, ryan.roberts@arm.com, shahuang@redhat.com, suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240820095441.GA688664@e124191.cambridge.arm.com>
 
-On Fri, 16 Aug 2024 13:39:03 +0100,
-Sebastian Ene <sebastianene@google.com> wrote:
+On Tue, Aug 20, 2024 at 10:54:41AM +0100, Joey Gouly wrote:
+> On Mon, Aug 19, 2024 at 06:09:06PM +0100, Catalin Marinas wrote:
+> > On Thu, Aug 15, 2024 at 04:09:26PM +0100, Dave P Martin wrote:
+> > > On Thu, Aug 15, 2024 at 02:18:15PM +0100, Joey Gouly wrote:
+> > > > That's a lot of words to say, or ask, do you agree with the approach of only
+> > > > saving POR_EL0 in the signal frame if num_allocated_pkeys() > 1?
+> > > > 
+> > > > Thanks,
+> > > > Joey
+> > > 
+> > > ...So..., given all the above, it is perhaps best to go back to
+> > > dumping POR_EL0 unconditionally after all, unless we have a mechanism
+> > > to determine whether pkeys are in use at all.
+> > 
+> > Ah, I can see why checking for POR_EL0_INIT is useful. Only checking for
+> > the allocated keys gets confusing with pkey 0.
+> > 
+> > Not sure what the deal is with pkey 0. Is it considered allocated by
+> > default or unallocatable? If the former, it implies that pkeys are
+> > already in use (hence the additional check for POR_EL0_INIT). In
+> > principle the hardware allows us to use permissions where the pkeys do
+> > not apply but we'd run out of indices and PTE bits to encode them, so I
+> > think by default we should assume that pkey 0 is pre-allocated.
+> > 
+> > 
 > 
-> Printing the descriptor attributes requires accessing a mask which has a
-> different set of attributes for stage-2. In preparation for adding support
-> for the stage-2 pagetables dumping, use the mask from the local context
-> and not from the globally defined pg_level array. Store a pointer to
-> the pg_level array in the ptdump state structure. This will allow us to
-> extract the mask which is wrapped in the pg_level array and use it for
-> descriptor parsing in the note_page.
+> You can consider pkey 0 allocated by default. You can actually pkey_free(0), there's nothing stopping that.
+
+Is that intentional?
+
+You're not supposed to free pkeys that are in use, and it's quasi-
+impossible to know whether pkey 0 is in use: all binaries in the
+process assume that pkey is available and use it by default for their
+pages, plus the stack will be painted with pkey 0, and the vDSO has to
+be painted with some pkey.
+
+Actually, that's a good point, because of the vDSO I think that only
+special bits of code with a private ABI (e.g., JITted code etc.) that
+definitely don't call into the vDSO can block permissions on pkey 0...
+otherwise, stuff will break.
+
 > 
-> Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> ---
->  arch/arm64/include/asm/ptdump.h |  1 +
->  arch/arm64/mm/ptdump.c          | 13 ++++++++-----
->  2 files changed, 9 insertions(+), 5 deletions(-)
+> > So I agree that it's probably best to save it unconditionally.
 > 
-> diff --git a/arch/arm64/include/asm/ptdump.h b/arch/arm64/include/asm/ptdump.h
-> index bd5d3ee3e8dc..71a7ed01153a 100644
-> --- a/arch/arm64/include/asm/ptdump.h
-> +++ b/arch/arm64/include/asm/ptdump.h
-> @@ -44,6 +44,7 @@ struct ptdump_pg_level {
->   */
->  struct ptdump_pg_state {
->  	struct ptdump_state ptdump;
-> +	struct ptdump_pg_level *pg_level;
->  	struct seq_file *seq;
->  	const struct addr_marker *marker;
->  	const struct mm_struct *mm;
-> diff --git a/arch/arm64/mm/ptdump.c b/arch/arm64/mm/ptdump.c
-> index 404751fd30fe..ca53ef274a8b 100644
-> --- a/arch/arm64/mm/ptdump.c
-> +++ b/arch/arm64/mm/ptdump.c
-> @@ -117,7 +117,7 @@ static const struct ptdump_prot_bits pte_bits[] = {
->  	}
->  };
->  
-> -static struct ptdump_pg_level pg_level[] __ro_after_init = {
-> +static struct ptdump_pg_level kernel_pg_levels[] __ro_after_init = {
+> Alright, will leave it as is!
 
-Do you actually need this sort of renaming? Given that it is static,
-this looks like some slightly abusive repainting which isn't warranted
-here.
+Ack, I think the whole discussion around this has shown that there
+isn't a _simple_ argument for conditionally dumping POR_EL0... so I'm
+prepared to admit defeat here.
 
-I also didn't understand the commit message: you're not tracking any
-mask here, but a page table level. You are also not using it for
-anything yet, see below.
+We might still try to slow down the consumption of the remaining space
+with a "misc registers" record, instead of dedicating a record to
+POR_EL0.  I have some thoughts on that, but if nobody cares that much
+then this probably isn't worth pursuing.
 
-
->  	{ /* pgd */
->  		.name	= "PGD",
->  		.bits	= pte_bits,
-> @@ -192,6 +192,7 @@ void note_page(struct ptdump_state *pt_st, unsigned long addr, int level,
->  	       u64 val)
->  {
->  	struct ptdump_pg_state *st = container_of(pt_st, struct ptdump_pg_state, ptdump);
-> +	struct ptdump_pg_level *pg_level = st->pg_level;
-
-This is what I mean. What is this pg_level used for?
-
->  	static const char units[] = "KMGTPE";
->  	u64 prot = 0;
->  
-> @@ -262,6 +263,7 @@ void ptdump_walk(struct seq_file *s, struct ptdump_info *info)
->  		.seq = s,
->  		.marker = info->markers,
->  		.mm = info->mm,
-> +		.pg_level = &kernel_pg_levels[0],
->  		.level = -1,
->  		.ptdump = {
->  			.note_page = note_page,
-> @@ -279,10 +281,10 @@ static void __init ptdump_initialize(void)
->  {
->  	unsigned i, j;
->  
-> -	for (i = 0; i < ARRAY_SIZE(pg_level); i++)
-> -		if (pg_level[i].bits)
-> -			for (j = 0; j < pg_level[i].num; j++)
-> -				pg_level[i].mask |= pg_level[i].bits[j].mask;
-> +	for (i = 0; i < ARRAY_SIZE(kernel_pg_levels); i++)
-> +		if (kernel_pg_levels[i].bits)
-> +			for (j = 0; j < kernel_pg_levels[i].num; j++)
-> +				kernel_pg_levels[i].mask |= kernel_pg_levels[i].bits[j].mask;
->  }
->  
->  static struct ptdump_info kernel_ptdump_info __ro_after_init = {
-> @@ -297,6 +299,7 @@ bool ptdump_check_wx(void)
->  			{ 0, NULL},
->  			{ -1, NULL},
->  		},
-> +		.pg_level = &kernel_pg_levels[0],
->  		.level = -1,
->  		.check_wx = true,
->  		.ptdump = {
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Cheers
+---Dave
