@@ -1,88 +1,123 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEBD018A95A
-	for <kvmarm@lists.linux.dev>; Tue, 20 Aug 2024 09:54:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8443318E355;
+	Tue, 20 Aug 2024 10:06:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724147691; cv=none; b=t7N88J1/JPFzzp4ayX6Syer9OosMmFn+Ovq34SmViZgAkrdMbW3f2imIoqaTQfM4I1bx8l8MNeQf+sMoVQeZqv3V+N/3ISwNVdoca9wJuwH3GoUekP/OVn4EnGaxeyYQdEDktAO0X+tP3Wie3W5xMlf6gUpjR7jMHSGXyZhmgzA=
+	t=1724148371; cv=none; b=ctyobD1F0+tt+P8lfVVOHvgqqHZ1+bc0+KjKEl1H7XFXBoH1ILtBptaEBxT+GUhaNKojC/jpMtslr58Kp3YbNleH0sexMyKb3bZDOF20oJ4ZqBXxWVmwSZ+B8ZT2skMnSvO4bTwc9JfISrciwpey6vjp+CppuDzorgmN24W4Oo4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724147691; c=relaxed/simple;
-	bh=Xsq0jN/Nr+6zUwRCip9WuKjFgEPV9fhR9Eb321ulRpA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MfENZBE7JrAJoxcHwqn9OE1cWhmsOGHMarYIBR2pDB+qciAolZrdudCAL/axYYKX7XNZgDSPioUM71H1azsfasiyStDr3yN5daQMR9kg32E5PJJrE/9UN7TrKJPfjck/Mcz2+4tnWDrB/eHD9P1yMXNBz2u/ElseUSAO2D0Y+D4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 50B44DA7;
-	Tue, 20 Aug 2024 02:55:15 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 532323F66E;
-	Tue, 20 Aug 2024 02:54:46 -0700 (PDT)
-Date: Tue, 20 Aug 2024 10:54:41 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org,
-	akpm@linux-foundation.org, aneesh.kumar@kernel.org,
-	aneesh.kumar@linux.ibm.com, bp@alien8.de, broonie@kernel.org,
-	christophe.leroy@csgroup.eu, dave.hansen@linux.intel.com,
-	hpa@zytor.com, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
-	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
-	oliver.upton@linux.dev, shuah@kernel.org, szabolcs.nagy@arm.com,
-	tglx@linutronix.de, will@kernel.org, x86@kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 18/29] arm64: add POE signal support
-Message-ID: <20240820095441.GA688664@e124191.cambridge.arm.com>
-References: <20240503130147.1154804-19-joey.gouly@arm.com>
- <ZqJ2knGETfS4nfEA@e133380.arm.com>
- <20240801155441.GB841837@e124191.cambridge.arm.com>
- <Zqu2VYELikM5LFY/@e133380.arm.com>
- <20240806103532.GA1986436@e124191.cambridge.arm.com>
- <20240806143103.GB2017741@e124191.cambridge.arm.com>
- <ZrzHU9et8L_0Tv_B@arm.com>
- <20240815131815.GA3657684@e124191.cambridge.arm.com>
- <Zr4aJqc/ifRXJQAd@e133380.arm.com>
- <ZsN8MnSqIWEMh7Ma@arm.com>
+	s=arc-20240116; t=1724148371; c=relaxed/simple;
+	bh=LOn8tbYqpTMo41juZ2qkyQCqnzv3ZHAiBo/Bqa9Q1yk=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=f/IT9BSCnrYtORoXyOf/U7LF6eTGlLnDUAg9w8LTRXCMnaCu0eVTNd4r68a6GbbyuItBAWwZq2lJRgu+KEgKuKr9JI8HlquJ50wAMvcMk5Jo/2vstUR+hwt2IiGqpaag1RCX5bUI1pEY1da7pJ2iSzJlPzRBZ99vlcfI9OW8wO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WjkfdWsw; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WjkfdWsw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24AD4C4AF09;
+	Tue, 20 Aug 2024 10:06:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724148371;
+	bh=LOn8tbYqpTMo41juZ2qkyQCqnzv3ZHAiBo/Bqa9Q1yk=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=WjkfdWswvzeL9O4dMnfDrLLWRNbHRxqWc3pVtdW8xZ9mDPZ8YxJHdWJYPzcpPnkp7
+	 mfKjcWALdwbOX4APYMwOhXOkAKtTVqslLaNrvJ1EIwso0HCXAj9V7bZN9jACGqrhNG
+	 gE9fJgTGI7z8kraDBU66wpdP/03HWnVuxGoGqrELumL7gGfCJG7aV7+SounlcxVApI
+	 jFquupe6gaK1ACOY6anTUP6sz6j1JPDVHkmaMZGiX2KVPGCC6PT3aM7U56v5ToxjOa
+	 E9SExhCfezuvkRV1ilqqwC3ZohlJPcBViYR0U02JrpfVXKYrl0SSCi7FfTsrZ/PTsx
+	 1hne43Wn2FgvQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sgLkf-005Dk2-12;
+	Tue, 20 Aug 2024 11:06:09 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Alexander Potapenko <glider@google.com>,
+	stable@vger.kernel.org
+Subject: [PATCH 01/12] KVM: arm64: Make ICC_*SGI*_EL1 undef in the absence of a vGICv3
+Date: Tue, 20 Aug 2024 11:03:38 +0100
+Message-Id: <20240820100349.3544850-2-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240820100349.3544850-1-maz@kernel.org>
+References: <20240820100349.3544850-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZsN8MnSqIWEMh7Ma@arm.com>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, glider@google.com, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Aug 19, 2024 at 06:09:06PM +0100, Catalin Marinas wrote:
-> On Thu, Aug 15, 2024 at 04:09:26PM +0100, Dave P Martin wrote:
-> > On Thu, Aug 15, 2024 at 02:18:15PM +0100, Joey Gouly wrote:
-> > > That's a lot of words to say, or ask, do you agree with the approach of only
-> > > saving POR_EL0 in the signal frame if num_allocated_pkeys() > 1?
-> > > 
-> > > Thanks,
-> > > Joey
-> > 
-> > ...So..., given all the above, it is perhaps best to go back to
-> > dumping POR_EL0 unconditionally after all, unless we have a mechanism
-> > to determine whether pkeys are in use at all.
-> 
-> Ah, I can see why checking for POR_EL0_INIT is useful. Only checking for
-> the allocated keys gets confusing with pkey 0.
-> 
-> Not sure what the deal is with pkey 0. Is it considered allocated by
-> default or unallocatable? If the former, it implies that pkeys are
-> already in use (hence the additional check for POR_EL0_INIT). In
-> principle the hardware allows us to use permissions where the pkeys do
-> not apply but we'd run out of indices and PTE bits to encode them, so I
-> think by default we should assume that pkey 0 is pre-allocated.
-> 
-> 
+On a system with a GICv3, if a guest hasn't been configured with
+GICv3 and that the host is not capable of GICv2 emulation,
+a write to any of the ICC_*SGI*_EL1 registers is trapped to EL2.
 
-You can consider pkey 0 allocated by default. You can actually pkey_free(0), there's nothing stopping that.
+We therefore try to emulate the SGI access, only to hit a NULL
+pointer as no private interrupt is allocated (no GIC, remember?).
 
-> So I agree that it's probably best to save it unconditionally.
+The obvious fix is to give the guest what it deserves, in the
+shape of a UNDEF exception.
 
-Alright, will leave it as is!
+Reported-by: Alexander Potapenko <glider@google.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Cc: stable@vger.kernel.org
+---
+ arch/arm64/kvm/sys_regs.c  | 6 ++++++
+ arch/arm64/kvm/vgic/vgic.h | 7 +++++++
+ 2 files changed, 13 insertions(+)
 
-Thanks,
-Joey
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index c90324060436..31e49da867ff 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -33,6 +33,7 @@
+ #include <trace/events/kvm.h>
+ 
+ #include "sys_regs.h"
++#include "vgic/vgic.h"
+ 
+ #include "trace.h"
+ 
+@@ -435,6 +436,11 @@ static bool access_gic_sgi(struct kvm_vcpu *vcpu,
+ {
+ 	bool g1;
+ 
++	if (!kvm_has_gicv3(vcpu->kvm)) {
++		kvm_inject_undefined(vcpu);
++		return false;
++	}
++
+ 	if (!p->is_write)
+ 		return read_from_write_only(vcpu, p, r);
+ 
+diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+index ba8f790431bd..8532bfe3fed4 100644
+--- a/arch/arm64/kvm/vgic/vgic.h
++++ b/arch/arm64/kvm/vgic/vgic.h
+@@ -346,4 +346,11 @@ void vgic_v4_configure_vsgis(struct kvm *kvm);
+ void vgic_v4_get_vlpi_state(struct vgic_irq *irq, bool *val);
+ int vgic_v4_request_vpe_irq(struct kvm_vcpu *vcpu, int irq);
+ 
++static inline bool kvm_has_gicv3(struct kvm *kvm)
++{
++	return (static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif) &&
++		irqchip_in_kernel(kvm) &&
++		kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3);
++}
++
+ #endif
+-- 
+2.39.2
+
