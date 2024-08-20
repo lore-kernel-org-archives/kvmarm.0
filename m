@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64E7018E77C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 810C218EFC9;
 	Tue, 20 Aug 2024 10:38:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724150288; cv=none; b=PMjXe7U2tGXD0FNHpIgV0qV7jzWdm67AFTLrL/qWnPC1BVOBicEInQ4gLXf9Oa9NyTLQXqkyRTuScpkBV9YUNAC5ASju+l73wFT6pi8XdSwLHKjIugHFYBP2ZMVWOvfKtMtLIIBuRRRw6bSvSPSL9Qh8FAXdWtAOmP0IEJwoLW4=
+	t=1724150288; cv=none; b=enKjL2Srxvvil1spTm/LOhn9zN43HHQAPNZXy7wLRULZQNzvkYOSanYElFGKA9I66NnjfsxSgLbNpzm4u6bo1Q+GYhzFQB4DRt8+1pLNtYlozmWIOVWgfXkRMFcRDi3yKAg3XsAi7eXHVO1hzcfXYlwvZmE95wErmtF+Aaf0Mzw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1724150288; c=relaxed/simple;
-	bh=aU4Ozt59GbaUbO3+PotNeMwxVTRMgu3/5LP0uRVy3Do=;
+	bh=gQN6nCKWBkprbcXGO7KrP8gwMcmhmNPkCSpin2Fq/QY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=n+v0oxKQz8EwIhxm6UJtAVdft9fEfW/Rfzoqg9AVBslK8GbkvWAOs1wk15BuabeEVhIVZJks9PIqnjsK0FbwWwfhW3VoqtAktNuG7xCoBCjqEK1iwFQDV99E7g8dggnjM8f5DFkL+91/je4ECJZExyEAjc1oI+rxbgTtT6mRfao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eyABIcgT; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=TXB/otaOUpiHSVGHe92UCDMm2ekcHEmDSjMLZlVRSPoGYep2B/HLfKxPzDEhfirVGvbL4Nyw58Fof6pj/nbD8iqFCb5c4n6/pb/cEDICcsDJGffasrr5MxgHQsrj3yUgTz873HBdEAwvAq8e5cdHXr88YA+dRes5cPxI4FeCLy0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pxm3TPfV; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eyABIcgT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C92D2C4AF1D;
-	Tue, 20 Aug 2024 10:38:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pxm3TPfV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 478C0C4AF16;
+	Tue, 20 Aug 2024 10:38:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724150287;
-	bh=aU4Ozt59GbaUbO3+PotNeMwxVTRMgu3/5LP0uRVy3Do=;
+	s=k20201202; t=1724150288;
+	bh=gQN6nCKWBkprbcXGO7KrP8gwMcmhmNPkCSpin2Fq/QY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=eyABIcgT1aQd3O5WHw+/O1fh/pxaVRaMW45ZvyDWoFKmMD1prsBG5l48lH/nIM6qp
-	 c0ofGnUThD5tZvvto4wVh21qeV87123khrS6PxaZyXiIeEQVbZcdfa+zxv2s2ZMqE2
-	 Mb05IYAlSTp5f8JCvB2n+OZraRNZZMv88sw4TgjcVwGg877ftjirhkLhqPhsLcfaho
-	 F760HlkNjCAER99crXtn13DqDX2JqmOT6W7uf1RocdJIsUO7et6d7yfco1TBBvrMtd
-	 3HjulqvIp4O2f6gi8D4iBa6R7lqSz2wgLnuIfVi6lgiVvI8C+S8zjDNKBdKNbvIKL/
-	 T/kVXJTtOXHuA==
+	b=pxm3TPfVe1w6W4Go0p8rhR6mCtK8duGG25bwWMTCcZLhTRze+3zCdpDzsi+REIYRB
+	 9/7x2CIKy2GvStoMpmrHmmh9jkF/HpkUaQ3OkAzNoPpD15bGfXxCs3Tp6QJzRQrSDn
+	 kYNcttZGlFtFNYGgVRbAx89VK9ikajjRtg2bfcg7AGbx4EIPwyhf9rVmro6G1yAogk
+	 CEFYMPaW5w+f3BdwmdyDlPtZBnGFnouFpj5dEj+jpr0oMonEgtWs80W1xd72I3XGFc
+	 ggVFQ5EEZh0In3k72k6bze+uFyQj2g7lzPR/y5Ld+73T3AzSs2MLX4GYwGuLisxc6d
+	 QU9If9Cey7OWg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sgMFZ-005Ea3-Rh;
-	Tue, 20 Aug 2024 11:38:05 +0100
+	id 1sgMFa-005Ea3-IV;
+	Tue, 20 Aug 2024 11:38:06 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -43,11 +43,10 @@ Cc: James Morse <james.morse@arm.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Przemyslaw Gaj <pgaj@cadence.com>,
-	Jintack Lim <jintack.lim@linaro.org>
-Subject: [PATCH v4 09/18] KVM: arm64: nv: Add basic emulation of AT S1E{0,1}{R,W}
-Date: Tue, 20 Aug 2024 11:37:47 +0100
-Message-Id: <20240820103756.3545976-10-maz@kernel.org>
+	Przemyslaw Gaj <pgaj@cadence.com>
+Subject: [PATCH v4 12/18] KVM: arm64: nv: Add emulation of AT S12E{0,1}{R,W}
+Date: Tue, 20 Aug 2024 11:37:50 +0100
+Message-Id: <20240820103756.3545976-13-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240820103756.3545976-1-maz@kernel.org>
 References: <20240820103756.3545976-1-maz@kernel.org>
@@ -59,205 +58,302 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com, alexandru.elisei@arm.com, anshuman.khandual@arm.com, pgaj@cadence.com, jintack.lim@linaro.org
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com, alexandru.elisei@arm.com, anshuman.khandual@arm.com, pgaj@cadence.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Emulating AT instructions is one the tasks devolved to the host
-hypervisor when NV is on.
+On the face of it, AT S12E{0,1}{R,W} is pretty simple. It is the
+combination of AT S1E{0,1}{R,W}, followed by an extra S2 walk.
 
-Here, we take the basic approach of emulating AT S1E{0,1}{R,W}
-using the AT instructions themselves. While this mostly work,
-it doesn't *always* work:
+However, there is a great deal of complexity coming from combining
+the S1 and S2 attributes to report something consistent in PAR_EL1.
 
-- S1 page tables can be swapped out
+This is an absolute mine field, and I have a splitting headache.
 
-- shadow S2 can be incomplete and not contain mappings for
-  the S1 page tables
-
-We are not trying to handle these case here, and defer it to
-a later patch. Suitable comments indicate where we are in dire
-need of better handling.
-
-Co-developed-by: Jintack Lim <jintack.lim@linaro.org>
-Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
  arch/arm64/include/asm/kvm_asm.h |   1 +
- arch/arm64/kvm/Makefile          |   2 +-
- arch/arm64/kvm/at.c              | 140 +++++++++++++++++++++++++++++++
- 3 files changed, 142 insertions(+), 1 deletion(-)
- create mode 100644 arch/arm64/kvm/at.c
+ arch/arm64/kvm/at.c              | 253 +++++++++++++++++++++++++++++++
+ 2 files changed, 254 insertions(+)
 
 diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 25f49f5fc4a6..9b6c9f4f4d88 100644
+index 6ec062296976..b36a3b6cc011 100644
 --- a/arch/arm64/include/asm/kvm_asm.h
 +++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -236,6 +236,7 @@ extern void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu);
- extern int __kvm_tlbi_s1e2(struct kvm_s2_mmu *mmu, u64 va, u64 sys_encoding);
- 
+@@ -238,6 +238,7 @@ extern int __kvm_tlbi_s1e2(struct kvm_s2_mmu *mmu, u64 va, u64 sys_encoding);
  extern void __kvm_timer_set_cntvoff(u64 cntvoff);
-+extern void __kvm_at_s1e01(struct kvm_vcpu *vcpu, u32 op, u64 vaddr);
+ extern void __kvm_at_s1e01(struct kvm_vcpu *vcpu, u32 op, u64 vaddr);
+ extern void __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr);
++extern void __kvm_at_s12(struct kvm_vcpu *vcpu, u32 op, u64 vaddr);
  
  extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
  
-diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-index a6497228c5a8..8a3ae76b4da2 100644
---- a/arch/arm64/kvm/Makefile
-+++ b/arch/arm64/kvm/Makefile
-@@ -14,7 +14,7 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
- 	 inject_fault.o va_layout.o handle_exit.o \
- 	 guest.o debug.o reset.o sys_regs.o stacktrace.o \
- 	 vgic-sys-reg-v3.o fpsimd.o pkvm.o \
--	 arch_timer.o trng.o vmid.o emulate-nested.o nested.o \
-+	 arch_timer.o trng.o vmid.o emulate-nested.o nested.o at.o \
- 	 vgic/vgic.o vgic/vgic-init.o \
- 	 vgic/vgic-irqfd.o vgic/vgic-v2.o \
- 	 vgic/vgic-v3.o vgic/vgic-v4.o \
 diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-new file mode 100644
-index 000000000000..da378ad834cd
---- /dev/null
+index 34736c1fe398..9865d29b3149 100644
+--- a/arch/arm64/kvm/at.c
 +++ b/arch/arm64/kvm/at.c
-@@ -0,0 +1,140 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) 2017 - Linaro Ltd
-+ * Author: Jintack Lim <jintack.lim@linaro.org>
-+ */
+@@ -71,6 +71,200 @@ static bool at_s1e1p_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+ 	return fail;
+ }
+ 
++#define MEMATTR(ic, oc)		(MEMATTR_##oc << 4 | MEMATTR_##ic)
++#define MEMATTR_NC		0b0100
++#define MEMATTR_Wt		0b1000
++#define MEMATTR_Wb		0b1100
++#define MEMATTR_WbRaWa		0b1111
 +
-+#include <asm/kvm_hyp.h>
-+#include <asm/kvm_mmu.h>
++#define MEMATTR_IS_DEVICE(m)	(((m) & GENMASK(7, 4)) == 0)
 +
-+struct mmu_config {
-+	u64	ttbr0;
-+	u64	ttbr1;
-+	u64	tcr;
-+	u64	mair;
-+	u64	sctlr;
-+	u64	vttbr;
-+	u64	vtcr;
-+	u64	hcr;
-+};
-+
-+static void __mmu_config_save(struct mmu_config *config)
++static u8 s2_memattr_to_attr(u8 memattr)
 +{
-+	config->ttbr0	= read_sysreg_el1(SYS_TTBR0);
-+	config->ttbr1	= read_sysreg_el1(SYS_TTBR1);
-+	config->tcr	= read_sysreg_el1(SYS_TCR);
-+	config->mair	= read_sysreg_el1(SYS_MAIR);
-+	config->sctlr	= read_sysreg_el1(SYS_SCTLR);
-+	config->vttbr	= read_sysreg(vttbr_el2);
-+	config->vtcr	= read_sysreg(vtcr_el2);
-+	config->hcr	= read_sysreg(hcr_el2);
++	memattr &= 0b1111;
++
++	switch (memattr) {
++	case 0b0000:
++	case 0b0001:
++	case 0b0010:
++	case 0b0011:
++		return memattr << 2;
++	case 0b0100:
++		return MEMATTR(Wb, Wb);
++	case 0b0101:
++		return MEMATTR(NC, NC);
++	case 0b0110:
++		return MEMATTR(Wt, NC);
++	case 0b0111:
++		return MEMATTR(Wb, NC);
++	case 0b1000:
++		/* Reserved, assume NC */
++		return MEMATTR(NC, NC);
++	case 0b1001:
++		return MEMATTR(NC, Wt);
++	case 0b1010:
++		return MEMATTR(Wt, Wt);
++	case 0b1011:
++		return MEMATTR(Wb, Wt);
++	case 0b1100:
++		/* Reserved, assume NC */
++		return MEMATTR(NC, NC);
++	case 0b1101:
++		return MEMATTR(NC, Wb);
++	case 0b1110:
++		return MEMATTR(Wt, Wb);
++	case 0b1111:
++		return MEMATTR(Wb, Wb);
++	default:
++		unreachable();
++	}
 +}
 +
-+static void __mmu_config_restore(struct mmu_config *config)
++static u8 combine_s1_s2_attr(u8 s1, u8 s2)
 +{
-+	write_sysreg(config->hcr,	hcr_el2);
++	bool transient;
++	u8 final = 0;
 +
-+	/*
-+	 * ARM errata 1165522 and 1530923 require TGE to be 1 before
-+	 * we update the guest state.
-+	 */
-+	asm(ALTERNATIVE("nop", "isb", ARM64_WORKAROUND_SPECULATIVE_AT));
-+
-+	write_sysreg_el1(config->ttbr0,	SYS_TTBR0);
-+	write_sysreg_el1(config->ttbr1,	SYS_TTBR1);
-+	write_sysreg_el1(config->tcr,	SYS_TCR);
-+	write_sysreg_el1(config->mair,	SYS_MAIR);
-+	write_sysreg_el1(config->sctlr,	SYS_SCTLR);
-+	write_sysreg(config->vttbr,	vttbr_el2);
-+	write_sysreg(config->vtcr,	vtcr_el2);
-+}
-+
-+/*
-+ * Return the PAR_EL1 value as the result of a valid translation.
-+ *
-+ * If the translation is unsuccessful, the value may only contain
-+ * PAR_EL1.F, and cannot be taken at face value. It isn't an
-+ * indication of the translation having failed, only that the fast
-+ * path did not succeed, *unless* it indicates a S1 permission fault.
-+ */
-+static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
-+{
-+	struct mmu_config config;
-+	struct kvm_s2_mmu *mmu;
-+	bool fail;
-+	u64 par;
-+
-+	par = SYS_PAR_EL1_F;
-+
-+	/*
-+	 * We've trapped, so everything is live on the CPU. As we will
-+	 * be switching contexts behind everybody's back, disable
-+	 * interrupts while holding the mmu lock.
-+	 */
-+	guard(write_lock_irqsave)(&vcpu->kvm->mmu_lock);
-+
-+	/*
-+	 * If HCR_EL2.{E2H,TGE} == {1,1}, the MMU context is already
-+	 * the right one (as we trapped from vEL2). If not, save the
-+	 * full MMU context.
-+	 */
-+	if (vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu))
-+		goto skip_mmu_switch;
-+
-+	/*
-+	 * Obtaining the S2 MMU for a L2 is horribly racy, and we may not
-+	 * find it (recycled by another vcpu, for example). When this
-+	 * happens, admit defeat immediately and use the SW (slow) path.
-+	 */
-+	mmu = lookup_s2_mmu(vcpu);
-+	if (!mmu)
-+		return par;
-+
-+	__mmu_config_save(&config);
-+
-+	write_sysreg_el1(vcpu_read_sys_reg(vcpu, TTBR0_EL1),	SYS_TTBR0);
-+	write_sysreg_el1(vcpu_read_sys_reg(vcpu, TTBR1_EL1),	SYS_TTBR1);
-+	write_sysreg_el1(vcpu_read_sys_reg(vcpu, TCR_EL1),	SYS_TCR);
-+	write_sysreg_el1(vcpu_read_sys_reg(vcpu, MAIR_EL1),	SYS_MAIR);
-+	write_sysreg_el1(vcpu_read_sys_reg(vcpu, SCTLR_EL1),	SYS_SCTLR);
-+	__load_stage2(mmu, mmu->arch);
-+
-+skip_mmu_switch:
-+	/* Clear TGE, enable S2 translation, we're rolling */
-+	write_sysreg((config.hcr & ~HCR_TGE) | HCR_VM,	hcr_el2);
-+	isb();
-+
-+	switch (op) {
-+	case OP_AT_S1E1R:
-+		fail = __kvm_at(OP_AT_S1E1R, vaddr);
++	/* Upgrade transient s1 to non-transient to simplify things */
++	switch (s1) {
++	case 0b0001 ... 0b0011:	/* Normal, Write-Through Transient */
++		transient = true;
++		s1 = MEMATTR_Wt | (s1 & GENMASK(1,0));
 +		break;
-+	case OP_AT_S1E1W:
-+		fail = __kvm_at(OP_AT_S1E1W, vaddr);
-+		break;
-+	case OP_AT_S1E0R:
-+		fail = __kvm_at(OP_AT_S1E0R, vaddr);
-+		break;
-+	case OP_AT_S1E0W:
-+		fail = __kvm_at(OP_AT_S1E0W, vaddr);
++	case 0b0101 ... 0b0111:	/* Normal, Write-Back Transient */
++		transient = true;
++		s1 = MEMATTR_Wb | (s1 & GENMASK(1,0));
 +		break;
 +	default:
-+		WARN_ON_ONCE(1);
-+		fail = true;
-+		break;
++		transient = false;
 +	}
 +
-+	if (!fail)
-+		par = read_sysreg_par();
++	/* S2CombineS1AttrHints() */
++	if ((s1 & GENMASK(3, 2)) == MEMATTR_NC ||
++	    (s2 & GENMASK(3, 2)) == MEMATTR_NC)
++		final = MEMATTR_NC;
++	else if ((s1 & GENMASK(3, 2)) == MEMATTR_Wt ||
++		 (s2 & GENMASK(3, 2)) == MEMATTR_Wt)
++		final = MEMATTR_Wt;
++	else
++		final = MEMATTR_Wb;
 +
-+	if (!(vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu)))
-+		__mmu_config_restore(&config);
++	if (final != MEMATTR_NC) {
++		/* Inherit RaWa hints form S1 */
++		if (transient) {
++			switch (s1 & GENMASK(3, 2)) {
++			case MEMATTR_Wt:
++				final = 0;
++				break;
++			case MEMATTR_Wb:
++				final = MEMATTR_NC;
++				break;
++			}
++		}
++
++		final |= s1 & GENMASK(1, 0);
++	}
++
++	return final;
++}
++
++#define ATTR_NSH	0b00
++#define ATTR_RSV	0b01
++#define ATTR_OSH	0b10
++#define ATTR_ISH	0b11
++
++static u8 compute_sh(u8 attr, u64 desc)
++{
++	u8 sh;
++
++	/* Any form of device, as well as NC has SH[1:0]=0b10 */
++	if (MEMATTR_IS_DEVICE(attr) || attr == MEMATTR(NC, NC))
++		return ATTR_OSH;
++
++	sh = FIELD_GET(PTE_SHARED, desc);
++	if (sh == ATTR_RSV)		/* Reserved, mapped to NSH */
++		sh = ATTR_NSH;
++
++	return sh;
++}
++
++static u64 compute_par_s12(struct kvm_vcpu *vcpu, u64 s1_par,
++			   struct kvm_s2_trans *tr)
++{
++	u8 s1_parattr, s2_memattr, final_attr;
++	u64 par;
++
++	/* If S2 has failed to translate, report the damage */
++	if (tr->esr) {
++		par = SYS_PAR_EL1_RES1;
++		par |= SYS_PAR_EL1_F;
++		par |= SYS_PAR_EL1_S;
++		par |= FIELD_PREP(SYS_PAR_EL1_FST, tr->esr);
++		return par;
++	}
++
++	s1_parattr = FIELD_GET(SYS_PAR_EL1_ATTR, s1_par);
++	s2_memattr = FIELD_GET(GENMASK(5, 2), tr->desc);
++
++	if (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_FWB) {
++		if (!kvm_has_feat(vcpu->kvm, ID_AA64PFR2_EL1, MTEPERM, IMP))
++			s2_memattr &= ~BIT(3);
++
++		/* Combination of R_VRJSW and R_RHWZM */
++		switch (s2_memattr) {
++		case 0b0101:
++			if (MEMATTR_IS_DEVICE(s1_parattr))
++				final_attr = s1_parattr;
++			else
++				final_attr = MEMATTR(NC, NC);
++			break;
++		case 0b0110:
++		case 0b1110:
++			final_attr = MEMATTR(WbRaWa, WbRaWa);
++			break;
++		case 0b0111:
++		case 0b1111:
++			/* Preserve S1 attribute */
++			final_attr = s1_parattr;
++			break;
++		case 0b0100:
++		case 0b1100:
++		case 0b1101:
++			/* Reserved, do something non-silly */
++			final_attr = s1_parattr;
++			break;
++		default:
++			/* MemAttr[2]=0, Device from S2 */
++			final_attr = s2_memattr & GENMASK(1,0) << 2;
++		}
++	} else {
++		/* Combination of R_HMNDG, R_TNHFM and R_GQFSF */
++		u8 s2_parattr = s2_memattr_to_attr(s2_memattr);
++
++		if (MEMATTR_IS_DEVICE(s1_parattr) ||
++		    MEMATTR_IS_DEVICE(s2_parattr)) {
++			final_attr = min(s1_parattr, s2_parattr);
++		} else {
++			/* At this stage, this is memory vs memory */
++			final_attr  = combine_s1_s2_attr(s1_parattr & 0xf,
++							 s2_parattr & 0xf);
++			final_attr |= combine_s1_s2_attr(s1_parattr >> 4,
++							 s2_parattr >> 4) << 4;
++		}
++	}
++
++	if ((__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_CD) &&
++	    !MEMATTR_IS_DEVICE(final_attr))
++		final_attr = MEMATTR(NC, NC);
++
++	par  = FIELD_PREP(SYS_PAR_EL1_ATTR, final_attr);
++	par |= tr->output & GENMASK(47, 12);
++	par |= FIELD_PREP(SYS_PAR_EL1_SH,
++			  compute_sh(final_attr, tr->desc));
 +
 +	return par;
 +}
 +
-+void __kvm_at_s1e01(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
-+{
-+	u64 par = __kvm_at_s1e01_fast(vcpu, op, vaddr);
+ /*
+  * Return the PAR_EL1 value as the result of a valid translation.
+  *
+@@ -215,3 +409,62 @@ void __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+ 
+ 	vcpu_write_sys_reg(vcpu, par, PAR_EL1);
+ }
 +
++void __kvm_at_s12(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
++{
++	struct kvm_s2_trans out = {};
++	u64 ipa, par;
++	bool write;
++	int ret;
++
++	/* Do the stage-1 translation */
++	switch (op) {
++	case OP_AT_S12E1R:
++		op = OP_AT_S1E1R;
++		write = false;
++		break;
++	case OP_AT_S12E1W:
++		op = OP_AT_S1E1W;
++		write = true;
++		break;
++	case OP_AT_S12E0R:
++		op = OP_AT_S1E0R;
++		write = false;
++		break;
++	case OP_AT_S12E0W:
++		op = OP_AT_S1E0W;
++		write = true;
++		break;
++	default:
++		WARN_ON_ONCE(1);
++		return;
++	}
++
++	__kvm_at_s1e01(vcpu, op, vaddr);
++	par = vcpu_read_sys_reg(vcpu, PAR_EL1);
++	if (par & SYS_PAR_EL1_F)
++		return;
++
++	/*
++	 * If we only have a single stage of translation (E2H=0 or
++	 * TGE=1), exit early. Same thing if {VM,DC}=={0,0}.
++	 */
++	if (!vcpu_el2_e2h_is_set(vcpu) || vcpu_el2_tge_is_set(vcpu) ||
++	    !(vcpu_read_sys_reg(vcpu, HCR_EL2) & (HCR_VM | HCR_DC)))
++		return;
++
++	/* Do the stage-2 translation */
++	ipa = (par & GENMASK_ULL(47, 12)) | (vaddr & GENMASK_ULL(11, 0));
++	out.esr = 0;
++	ret = kvm_walk_nested_s2(vcpu, ipa, &out);
++	if (ret < 0)
++		return;
++
++	/* Check the access permission */
++	if (!out.esr &&
++	    ((!write && !out.readable) || (write && !out.writable)))
++		out.esr = ESR_ELx_FSC_PERM | (out.level & 0x3);
++
++	par = compute_par_s12(vcpu, par, &out);
 +	vcpu_write_sys_reg(vcpu, par, PAR_EL1);
 +}
 -- 
