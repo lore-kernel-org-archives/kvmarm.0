@@ -1,34 +1,22 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82CE9192B79;
-	Tue, 20 Aug 2024 15:28:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7301E196D9D;
+	Tue, 20 Aug 2024 17:07:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724167712; cv=none; b=Wlt8mNVL7suFyw9uY3nEAIyejhpSV9aWbKMdlaKRf3G9RIBwTqO0mlUpZJ44C0E2klzxO85K/UORwA68u8H5/BgPOFfrNdtU3dF3XVqL1oZ3Qlc0HUpSDo7upbhX7U7iSjWoosAem2atRPQArRnjRStGO0ZViaMwLs9xJGgCcoI=
+	t=1724173658; cv=none; b=OcziNq0Y7hwHBYLEhZVzNH751VtIGF1wzGVZ/adDalzlRM1U/q3xaBxuUamXm2QvobiFn9qYvl4iGixevfU09/KwTDjXwmprMNWBLmBDqFaUpNhrq/fX5jUwzpVOaXSQQmGaDx5p68Bk588/7QeCOIRP/f0GxnkxQmHy70PhFBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724167712; c=relaxed/simple;
-	bh=xOjQogCtboiaDEhhAKTxRH8bKSHT1uounx3l9TGETkQ=;
+	s=arc-20240116; t=1724173658; c=relaxed/simple;
+	bh=s2/nlNfABLd/gPvPhiiI1Kam85/3uV84O8KDv9iaquQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ucknl9L1tszzlP7Wrr6/gtl/+udJuYaD+PTIGOcZ7+RpEzU+K3Z5ae1TmofJHQzVSW9ZQrpW8A5Hsci+T5GjyJgAtRBTOSiEYitM+4BelMaa4KWCH0YKBJMBSlcuUqjb9Ph0/CsYHrdTOF+Bs7kWaXFv46582dYtOpG+3jINVuk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eUHjXyZ2; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eUHjXyZ2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04A68C4AF15;
-	Tue, 20 Aug 2024 15:28:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724167711;
-	bh=xOjQogCtboiaDEhhAKTxRH8bKSHT1uounx3l9TGETkQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eUHjXyZ2cuMRwBZU5drzIzAGHafYcOZVbd1dCQIvRqjL+mp8tIA7XyiFy2cCb1lAg
-	 shLO3+WN20Pzstfw7TIY2Fm2/7O7P4rPMgRslOFF8FRrg5Tw2W6K9hg6CDeDyr8s2Z
-	 dKLgO9QioVdce5HjIPnrHbA9CcZr9rhwfYiWAECOhm3Baxn+aET9P9N/7KW01x8G0S
-	 /YxbQ0SJf9JMPYzBsRG29MU+0Jcbf2gF1OwWZVEZ7C4nAiUP1XjAknZZ1nqJiNVWhj
-	 kyX3Qc98DJ/Vu/F5kkqrEn7yAsqfSZ1u+3FxpVBchfgoZTJgonBtBTHqFWeoKMXyEt
-	 2C+GLM3zIUHtg==
-Date: Tue, 20 Aug 2024 16:28:21 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=B/NVZRii2AirrbrchHmeBLqqtPU6H2VoliTJzyKUVPW9IowWoiBB0xtdKFfNHpYLMLJUiLAbJM6UC7Jw5pmYbvyy9VSgLWFcmf1fdkV9QFcHRMxZhmqGUb5a/9Ug1YnGqnAcqGoYu0RaPpjZlzTBLKTw1ngluyYwjXS3WuVxkS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6B55C4AF13;
+	Tue, 20 Aug 2024 17:07:31 +0000 (UTC)
+Date: Tue, 20 Aug 2024 18:07:29 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Mark Brown <broonie@kernel.org>
 Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
 	Andrew Morton <akpm@linux-foundation.org>,
 	Marc Zyngier <maz@kernel.org>,
@@ -54,80 +42,74 @@ Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
 	linux-arch@vger.kernel.org, linux-mm@kvack.org,
 	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v10 13/40] arm64/mm: Map pages for guarded control stack
-Message-ID: <ec999bf5-6273-4a3c-b1df-f8594d7bb228@sirena.org.uk>
+Subject: Re: [PATCH v10 19/40] arm64/gcs: Context switch GCS state for EL0
+Message-ID: <ZsTNUYCMKgkrdRiS@arm.com>
 References: <20240801-arm64-gcs-v10-0-699e2bd2190b@kernel.org>
- <20240801-arm64-gcs-v10-13-699e2bd2190b@kernel.org>
- <ZsMMDNIp6Pkfbg1e@arm.com>
- <d43f8036-cc06-430c-9e9e-b938037fc64c@sirena.org.uk>
- <ZsSvSeE303LGtk4b@arm.com>
+ <20240801-arm64-gcs-v10-19-699e2bd2190b@kernel.org>
+ <ZsMwhdmE_Ai9BbM9@arm.com>
+ <0f6fd3ec-2481-4507-af0e-3cbbb7406b54@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="RmO2vT/CXaa26vbH"
-Content-Disposition: inline
-In-Reply-To: <ZsSvSeE303LGtk4b@arm.com>
-X-Cookie: You are false data.
-
-
---RmO2vT/CXaa26vbH
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <0f6fd3ec-2481-4507-af0e-3cbbb7406b54@sirena.org.uk>
 
-On Tue, Aug 20, 2024 at 03:59:21PM +0100, Catalin Marinas wrote:
-> On Mon, Aug 19, 2024 at 05:33:24PM +0100, Mark Brown wrote:
-> > On Mon, Aug 19, 2024 at 10:10:36AM +0100, Catalin Marinas wrote:
+On Mon, Aug 19, 2024 at 04:44:42PM +0100, Mark Brown wrote:
+> On Mon, Aug 19, 2024 at 12:46:13PM +0100, Catalin Marinas wrote:
+> > On Thu, Aug 01, 2024 at 01:06:46PM +0100, Mark Brown wrote:
+> > > +	/*
+> > > +	 * Ensure that GCS changes are observable by/from other PEs in
+> > > +	 * case of migration.
+> > > +	 */
+> > > +	if (task_gcs_el0_enabled(current) || task_gcs_el0_enabled(next))
+> > > +		gcsb_dsync();
+[...]
+> > What's the GCSB DSYNC supposed to do here? The Arm ARM talks about
+> > ordering between GCS memory effects and other memory effects. I haven't
+> > looked at the memory model in detail yet (D11.9.1) but AFAICT it has
+> > nothing to do with the system registers. We'll need this barrier when
+> > ordering is needed between explicit or implicit (e.g. BL) GCS accesses
+> > and the explicit classic memory accesses. Paging comes to mind, so maybe
+> > flush_dcache_page() would need this barrier. ptrace() is another case if
+> > the memory accessed is a GCS page. I can see you added it in other
+> > places, I'll have a look as I go through the rest. But I don't think one
+> > is needed here.
+> 
+> It's not particuarly for the system registers, is there's so that
+> anything else that looks at the task's GCS sees the current state.
 
-> > > At a quick look, do_mmap() seems to always set VM_MAYEXEC but discard it
-> > > for non-executable file mmap. Last time I looked (when doing MTE) there
-> > > wasn't a way for the arch code to clear specific VM_* flags, only to
-> > > validate them. But I think we should just clear VM_MAYEXEC and also
-> > > return an error for VM_EXEC in the core do_mmap() if VM_SHADOW_STACK. It
-> > > would cover the other architectures doing shadow stacks.
+Ah, so that's the to ensure that any writes on the CPU to the GCS stack
+would be observable if the task appears on a different CPU (together
+with the additional classic ordering/spinlocks used for the run queues).
+Maybe update the comment to say "GCS memory effects" instead of "GCS
+changes". I read the latter as GCS sysreg changes. Something like below
+would make it clearer:
 
-> > Yes, I think adding something generic would make sense here.  That feels
-> > like a cleanup which could be split out?
+	/*
+	 * Ensure that GCS memory effects of the 'prev' thread are
+	 * ordered before other memory accesses with release semantics
+	 * (or preceded by a DMB) on the current PE. In addition, any
+	 * memory accesses with acquire semantics (or succeeded by a
+	 * DMB) are ordered before GCS memory effects of the 'next'
+	 * thread. This will ensure that the GCS memory effects are
+	 * visible to other PEs in case of migration.
+	 */
 
-> It can be done separately. It doesn't look like x86 has such checks.
-> Adding it generically would be a slight ABI tightening but I doubt it
-> matters, no sane software would use an executable shadow stack.
+Feel free to rephrase as you see fit.
 
-OK.
+> I'm pretty confident this excessive, the goal was to err on the side
+> of correctness and then relax later.
 
-> > > Is there any arch restriction with setting BTI and GCS? It doesn't make
-> > > sense but curious if it matters. We block the exec permission anyway
-> > > (unless the BTI pages moved to PIE as well, I don't remember).
+I think we are missing some. Paging should be ok as we have a pte change
+and TLBI and IIRC the same rules as for standard memory accesses apply.
+ptrace() memory accesses may need something though I'm fine with
+considering this a best effort (we can't guarantee anyway if any
+accesses are on different CPUs). I haven't got to the signal handling
+patch yet.
 
-> > As you say BTI should be meaningless for a non-executable page like GCS,
-> > I'm not aware of any way in which it matters.  BTI is separate to PIE.
-
-> My thoughts were whether we can get rid of this hunk entirely by
-> handling it in the core code. We'd allow BTI if one wants such useless
-> combination but clear VM_MAYEXEC in the core code (and ignore VM_SHARED
-> since you can't set it anyway).
-
-I have to admit that the BTI because I was shoving _EXEC in there rather
-than because it specifically needed to be blocked.  So change the check
-for VM_SHARED to a VM_WARN_ON(), and leave the _EXEC check for now
-pending the above core change?
-
---RmO2vT/CXaa26vbH
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmbEthQACgkQJNaLcl1U
-h9C1gwf+L79Si923x11LZKfwuy0dQkE7LpTPSafOEhNGVDQZTOrYQW9x1homrSt5
-28vBitZZV/TtBmLO+HSzt1fq5JM76Q0BaPH3ngunEJ0umUMkZwC3r59YzFHNXhQL
-THzCh+B05luDGr58Ay6K29M/I8JVGiXNBd+Ag+/LYQTq2HXOPC7lJimbZAU0aS+Q
-mV43kq/p+Ipazr6Bymd4tGQI5HjdMgMp2dhKT0bLH06aGJhif8691f8t9ZTp4lGX
-1PqWpOuyg0qYDA8JAraUHsc+4FaMyygUqV1ZRC+aTjL/EVsIFwhvqeZzESS+C+/p
-C9zocGnFLEdepXWg3jQHODDOF+LxiQ==
-=8nDO
------END PGP SIGNATURE-----
-
---RmO2vT/CXaa26vbH--
+-- 
+Catalin
