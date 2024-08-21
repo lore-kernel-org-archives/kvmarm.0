@@ -1,97 +1,95 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91D8C14D711;
-	Wed, 21 Aug 2024 16:40:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A13D15098E
+	for <kvmarm@lists.linux.dev>; Wed, 21 Aug 2024 16:52:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724258409; cv=none; b=WpuFYcpIBiyw7x1YkYYhKJvLZATBV4f6PVVXsL6zta4lrI7ZKvwFJxxs4vjGmT6oFzNaTI2Uzi6VysGmPJWcWs3VOZhCL5hIIIpzkLZ6c3Og9LTx3ogxK1A9fIluWaFY7DDA+GAC1q6P+x+SOO2HHgoipAwl6tLP4YAxgfsdfhQ=
+	t=1724259162; cv=none; b=l9CBgn9yDtvFVYEZJSKDpnuGeGQxQyguTTKXFoJEavAjq1v6fUTxGBmGvO3xCIDBYXYFtAv7zO/Qa9WUirPyLmMYPPvoipKdWrkcsswQCBFZQOK/zfhk4eYYnKHRiCvKNA2Bp+QWGTL+wKl3ev/+CxXiAm8RC9HLWxGGt1ypMKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724258409; c=relaxed/simple;
-	bh=i/mb4Rdm8eNfaYVfTxUHpcRDCFr7vBDdRywXy1aBhUs=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ELl2gVEtBR75bp/ARMT9PLwbR8UviAP2L5/yVbo1ka/UrQr5dF3D/vsmM4z+xdyo/Mf0mSOdSF68+zvDn0MNn2kAqlLjSFojOH09lMIeydvT4hkjWQdKpTWpVrhtacHh0Wiy214ZFrkcQXplNnb1hwtKZm3ybGr3CVUXv88YoQ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BTPlLGzf; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1724259162; c=relaxed/simple;
+	bh=cjvjXhlB9flVKxb/cblakppl907aLEdm2vk5HrKBcvA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X+DhGTenI+pfI2DrdD5KbzNyHpqEw5sRkIzvbw/2clZlsHsWuw+p2nlJSYQa25BuLNWmv/w8MZcrusvIXkspIGfGmpowRF4ILfnDWkfSgIWXVVXCBoLv/Q8sqchbCWjeXFYqlTwNGDP/aEdYNiwGdi4enZO5CFyV8b60coUTgTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hkdJH2X9; arc=none smtp.client-ip=91.218.175.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BTPlLGzf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F387C32781;
-	Wed, 21 Aug 2024 16:40:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724258409;
-	bh=i/mb4Rdm8eNfaYVfTxUHpcRDCFr7vBDdRywXy1aBhUs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=BTPlLGzf/rOkRoEuCyFLMupInG7QL2OgmLGETnQ58eRmBS4n98NCXkUelAv6kDSRj
-	 /dDmsjnsGzfVULXN1LHRIVMGsAyCfF04ZPrEB8LeonXypLtVOMAJr6holszVqYSBxK
-	 O3uJmezyDePmzqiqs7xV1ng8uacA/ZQ9BHsP1+ls8kvpBJJK7sHYmU9S0FoyHYWzmK
-	 +qkYW4cSQOT+XQypkaXVB1+Wa2uzYOpo5s6sW4cr37YID+xaDxqgufo+Hw30LRkZyI
-	 fQnMMAcX/w7NXAgsdIkCkbmEPzj9sFnlSWE3N2vT1zqQBNlASp+/kfXesNvGrv2Qrd
-	 UlJZOe3rLuBEg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sgoNT-005fap-2M;
-	Wed, 21 Aug 2024 17:40:07 +0100
-Date: Wed, 21 Aug 2024 17:40:06 +0100
-Message-ID: <86bk1lygm1.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hkdJH2X9"
+Date: Wed, 21 Aug 2024 09:52:28 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1724259157;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RhkCn0ao6zdR20+7bDAZFdJNVPYbj05+LvI61+DYOno=;
+	b=hkdJH2X91AdgM5+zOVDGLwr1HTzeTZ+2p/Sarj0/EpdGETIuqicK3PLbiV88vGem+y99BK
+	/IlJ0jOrxwXdyJeL3xzUUwPnYJJrjahouXN9btym0vOpJyxeOcc576JwwwQHFbXRI5cN9C
+	03rU7h1VL0q8tHMhgeR+4ODXUDAvF7I=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/2] KVM: arm64: Control visibility of S1PIE related sysregs to userspace
-In-Reply-To: <5304749b-04c8-44f4-b4de-b2d0cef61169@sirena.org.uk>
-References: <20240821-kvm-arm64-hide-pie-regs-v1-0-08cb3c79cb57@kernel.org>
-	<86ed6ixa32.wl-maz@kernel.org>
-	<e123ee24-2a0c-4ab3-8dc3-2906bf96f38d@sirena.org.uk>
-	<86cym2x7cv.wl-maz@kernel.org>
-	<5304749b-04c8-44f4-b4de-b2d0cef61169@sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Alexander Potapenko <glider@google.com>
+Subject: Re: [PATCH 04/12] KVM: arm64: Force GICv3 traps activa when no
+ irqchip is configured on VHE
+Message-ID: <ZsYbTAfH3lK7M1aU@linux.dev>
+References: <20240820100349.3544850-1-maz@kernel.org>
+ <20240820100349.3544850-5-maz@kernel.org>
+ <ZsUn1E6Gytu40iOW@linux.dev>
+ <86ikvuxh56.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86ikvuxh56.wl-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, 21 Aug 2024 16:19:59 +0100,
-Mark Brown <broonie@kernel.org> wrote:
+On Wed, Aug 21, 2024 at 12:13:57PM +0100, Marc Zyngier wrote:
+> On Wed, 21 Aug 2024 00:33:40 +0100,
+> Oliver Upton <oliver.upton@linux.dev> wrote:
+> > 
+> > s/activa/active/
+> > 
+> > On Tue, Aug 20, 2024 at 11:03:41AM +0100, Marc Zyngier wrote:
+> > > On a VHE system, no GICv3 traps get configured when no irqchip is
+> > > present. This is not quite matching the "no GICv3" semantics that
+> > > we want to present.
+> > > 
+> > > Force such traps to be configured in this case.
+> > > 
+> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > > ---
+> > >  arch/arm64/kvm/vgic/vgic.c | 14 ++++++++++----
+> > >  1 file changed, 10 insertions(+), 4 deletions(-)
+> > > 
+> > > diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+> > > index 974849ea7101..2caa64415ff3 100644
+> > > --- a/arch/arm64/kvm/vgic/vgic.c
+> > > +++ b/arch/arm64/kvm/vgic/vgic.c
+> > > @@ -917,10 +917,13 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
+> > >  
+> > >  void kvm_vgic_load(struct kvm_vcpu *vcpu)
+> > >  {
+> > > -	if (unlikely(!vgic_initialized(vcpu->kvm)))
+> > > +	if (unlikely(!irqchip_in_kernel(vcpu->kvm) || !vgic_initialized(vcpu->kvm))) {
+> > 
+> > Doesn't !vgic_initialized(vcpu->kvm) also cover the case of no irqchip
+> > in kernel?
 > 
-> On Wed, Aug 21, 2024 at 03:45:20PM +0100, Marc Zyngier wrote:
-> 
-> > Ultimately, we need to revisit the way we deal with visibility, as
-> > adding a myriad of helpers checking a combination of features doesn't
-> > scale. That information should exist as a static table, just like the
-> > trap bits.
-> 
-> Indeed, I was wondering about just adding a description of the relevant
-> ID register field to the sys_regs table.
+> It does, but that's purely accidental. I can drop that, but it is
+> really fragile.
 
-You'd need more than that.
-
-How would you express the visibility of TCR2_EL2? It depends on both
-ID_AA64PFR0_EL1.EL2==1 *and* ID_AA64MMFR3_EL1.TCRX==1. So it cannot be
-just a single tuple { idreg, field, value }. It needs to be an
-arbitrary conjunction of those.
-
-The good news is that it is a much smaller table than the monster trap
-routing table: it is "enum vcpu_sysreg" plus things that are
-synthesised (anything with a .get_user callback).
-
-	M.
+Oh, definitely not, I was just wondering if this was meant as a
+functional change or a readability change to make the relation explicit.
 
 -- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+Oliver
