@@ -1,31 +1,31 @@
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from out-175.mta1.migadu.com (out-175.mta1.migadu.com [95.215.58.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A13D15098E
-	for <kvmarm@lists.linux.dev>; Wed, 21 Aug 2024 16:52:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99EDA14F9E1
+	for <kvmarm@lists.linux.dev>; Wed, 21 Aug 2024 16:53:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724259162; cv=none; b=l9CBgn9yDtvFVYEZJSKDpnuGeGQxQyguTTKXFoJEavAjq1v6fUTxGBmGvO3xCIDBYXYFtAv7zO/Qa9WUirPyLmMYPPvoipKdWrkcsswQCBFZQOK/zfhk4eYYnKHRiCvKNA2Bp+QWGTL+wKl3ev/+CxXiAm8RC9HLWxGGt1ypMKg=
+	t=1724259240; cv=none; b=T/+suwHvos4hwtkQAV8VzDl/RVa91E5S7VexGggzWFfGsqpnuRPI1ZUR4aorBF5rjRlIIj1zA2eLNTR3vVlXC/7PAFicq2IrF84hVwmq4yCbzQchvdd6i3mAAJju9APyrjlPA5EU1oib2tcYky4D4JgwSep8Q36uIGBHQDToLYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724259162; c=relaxed/simple;
-	bh=cjvjXhlB9flVKxb/cblakppl907aLEdm2vk5HrKBcvA=;
+	s=arc-20240116; t=1724259240; c=relaxed/simple;
+	bh=KRqYf0D7qKIvZDRldP2GF+vIYtADtDZc+uaNUudfuhA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X+DhGTenI+pfI2DrdD5KbzNyHpqEw5sRkIzvbw/2clZlsHsWuw+p2nlJSYQa25BuLNWmv/w8MZcrusvIXkspIGfGmpowRF4ILfnDWkfSgIWXVVXCBoLv/Q8sqchbCWjeXFYqlTwNGDP/aEdYNiwGdi4enZO5CFyV8b60coUTgTA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hkdJH2X9; arc=none smtp.client-ip=91.218.175.171
+	 Content-Type:Content-Disposition:In-Reply-To; b=W5mgicshLoLVRFDhEIMjhrAkNT04lwJUYzqAYw8uOLUbtCGmdHPbYnw/As+H6+XekY9wadzd87VwykhVrGRMCWcSgKfxeqlP0NGN9frWd0PWWIMHjgKDIUIJ+5fI8DZ5pNA+QbpDTYNzKKJ3DkbdouXQglhvNe5YdVlssFwg9d4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=DtfrdYkV; arc=none smtp.client-ip=95.215.58.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hkdJH2X9"
-Date: Wed, 21 Aug 2024 09:52:28 -0700
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="DtfrdYkV"
+Date: Wed, 21 Aug 2024 09:53:47 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1724259157;
+	t=1724259236;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=RhkCn0ao6zdR20+7bDAZFdJNVPYbj05+LvI61+DYOno=;
-	b=hkdJH2X91AdgM5+zOVDGLwr1HTzeTZ+2p/Sarj0/EpdGETIuqicK3PLbiV88vGem+y99BK
-	/IlJ0jOrxwXdyJeL3xzUUwPnYJJrjahouXN9btym0vOpJyxeOcc576JwwwQHFbXRI5cN9C
-	03rU7h1VL0q8tHMhgeR+4ODXUDAvF7I=
+	bh=vlQGzGWk8tm0muGf8AU98KPFAWS2rZ3ejTpHnzVFAeM=;
+	b=DtfrdYkV68G2vLS7xazpLrwqXKOB8+hUKiu+fgS9cXylowM4cw6AsBFHKCeKSSbmzxZFTk
+	eLeti0zxH3xtakjmF9lVvK29Ebh/Wfse6rz7P47ZItEpRwXu/cE4RCSjCeq2jdVFNVfpWn
+	gUZw1wFLoOLWmOXVa1H2J3aETUp18cE=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Marc Zyngier <maz@kernel.org>
@@ -33,14 +33,14 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Alexander Potapenko <glider@google.com>
-Subject: Re: [PATCH 04/12] KVM: arm64: Force GICv3 traps activa when no
- irqchip is configured on VHE
-Message-ID: <ZsYbTAfH3lK7M1aU@linux.dev>
+	Alexander Potapenko <glider@google.com>, stable@vger.kernel.org
+Subject: Re: [PATCH 01/12] KVM: arm64: Make ICC_*SGI*_EL1 undef in the
+ absence of a vGICv3
+Message-ID: <ZsYbm1PSqQMGmNyt@linux.dev>
 References: <20240820100349.3544850-1-maz@kernel.org>
- <20240820100349.3544850-5-maz@kernel.org>
- <ZsUn1E6Gytu40iOW@linux.dev>
- <86ikvuxh56.wl-maz@kernel.org>
+ <20240820100349.3544850-2-maz@kernel.org>
+ <ZsUOtp9kfpqm1enx@linux.dev>
+ <86le0qxhsn.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -49,46 +49,35 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <86ikvuxh56.wl-maz@kernel.org>
+In-Reply-To: <86le0qxhsn.wl-maz@kernel.org>
 X-Migadu-Flow: FLOW_OUT
 
-On Wed, Aug 21, 2024 at 12:13:57PM +0100, Marc Zyngier wrote:
-> On Wed, 21 Aug 2024 00:33:40 +0100,
+On Wed, Aug 21, 2024 at 11:59:52AM +0100, Marc Zyngier wrote:
+> On Tue, 20 Aug 2024 22:46:30 +0100,
 > Oliver Upton <oliver.upton@linux.dev> wrote:
 > > 
-> > s/activa/active/
-> > 
-> > On Tue, Aug 20, 2024 at 11:03:41AM +0100, Marc Zyngier wrote:
-> > > On a VHE system, no GICv3 traps get configured when no irqchip is
-> > > present. This is not quite matching the "no GICv3" semantics that
-> > > we want to present.
+> > On Tue, Aug 20, 2024 at 11:03:38AM +0100, Marc Zyngier wrote:
+> > > On a system with a GICv3, if a guest hasn't been configured with
+> > > GICv3 and that the host is not capable of GICv2 emulation,
+> > > a write to any of the ICC_*SGI*_EL1 registers is trapped to EL2.
 > > > 
-> > > Force such traps to be configured in this case.
+> > > We therefore try to emulate the SGI access, only to hit a NULL
+> > > pointer as no private interrupt is allocated (no GIC, remember?).
 > > > 
+> > > The obvious fix is to give the guest what it deserves, in the
+> > > shape of a UNDEF exception.
+> > > 
+> > > Reported-by: Alexander Potapenko <glider@google.com>
 > > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > ---
-> > >  arch/arm64/kvm/vgic/vgic.c | 14 ++++++++++----
-> > >  1 file changed, 10 insertions(+), 4 deletions(-)
-> > > 
-> > > diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-> > > index 974849ea7101..2caa64415ff3 100644
-> > > --- a/arch/arm64/kvm/vgic/vgic.c
-> > > +++ b/arch/arm64/kvm/vgic/vgic.c
-> > > @@ -917,10 +917,13 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
-> > >  
-> > >  void kvm_vgic_load(struct kvm_vcpu *vcpu)
-> > >  {
-> > > -	if (unlikely(!vgic_initialized(vcpu->kvm)))
-> > > +	if (unlikely(!irqchip_in_kernel(vcpu->kvm) || !vgic_initialized(vcpu->kvm))) {
+> > > Cc: stable@vger.kernel.org
 > > 
-> > Doesn't !vgic_initialized(vcpu->kvm) also cover the case of no irqchip
-> > in kernel?
+> > LGTM, and just as an FYI I do plan on grabbing this for 6.11
 > 
-> It does, but that's purely accidental. I can drop that, but it is
-> really fragile.
+> Great, thanks. Are you planning to route this via arm64, given that
+> Paolo is away for a bit?
 
-Oh, definitely not, I was just wondering if this was meant as a
-functional change or a readability change to make the relation explicit.
+Yup, exactly that. I'll send the PR in the next day or two when I have
+some time to kick the tires on everything.
 
 -- 
 Thanks,
