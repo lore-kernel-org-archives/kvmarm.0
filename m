@@ -1,46 +1,52 @@
-Received: from out-175.mta1.migadu.com (out-175.mta1.migadu.com [95.215.58.175])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99EDA14F9E1
-	for <kvmarm@lists.linux.dev>; Wed, 21 Aug 2024 16:53:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F30F21B253C;
+	Wed, 21 Aug 2024 17:28:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724259240; cv=none; b=T/+suwHvos4hwtkQAV8VzDl/RVa91E5S7VexGggzWFfGsqpnuRPI1ZUR4aorBF5rjRlIIj1zA2eLNTR3vVlXC/7PAFicq2IrF84hVwmq4yCbzQchvdd6i3mAAJju9APyrjlPA5EU1oib2tcYky4D4JgwSep8Q36uIGBHQDToLYg=
+	t=1724261337; cv=none; b=q06jyhh9bZv/T5lnAuPGCMD8NzpC4vo3NArvr/xjs1denxwYDUzwnFdq1PZHYAHgmO4fwkTiip2FUwgcO1p6nHfGhcvLZvhqrV8Vv1HQfdZLfzrKuzcVLrM7kBK+wqYncpAcG6Q5wY8rDOy0BA7C7wjQwhXpn5X0zR7sSFcpjkg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724259240; c=relaxed/simple;
-	bh=KRqYf0D7qKIvZDRldP2GF+vIYtADtDZc+uaNUudfuhA=;
+	s=arc-20240116; t=1724261337; c=relaxed/simple;
+	bh=Y36hndsmna6Cj17isFdEqLLJSj8xaaWul7b+DjkH7Tg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=W5mgicshLoLVRFDhEIMjhrAkNT04lwJUYzqAYw8uOLUbtCGmdHPbYnw/As+H6+XekY9wadzd87VwykhVrGRMCWcSgKfxeqlP0NGN9frWd0PWWIMHjgKDIUIJ+5fI8DZ5pNA+QbpDTYNzKKJ3DkbdouXQglhvNe5YdVlssFwg9d4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=DtfrdYkV; arc=none smtp.client-ip=95.215.58.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="DtfrdYkV"
-Date: Wed, 21 Aug 2024 09:53:47 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1724259236;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vlQGzGWk8tm0muGf8AU98KPFAWS2rZ3ejTpHnzVFAeM=;
-	b=DtfrdYkV68G2vLS7xazpLrwqXKOB8+hUKiu+fgS9cXylowM4cw6AsBFHKCeKSSbmzxZFTk
-	eLeti0zxH3xtakjmF9lVvK29Ebh/Wfse6rz7P47ZItEpRwXu/cE4RCSjCeq2jdVFNVfpWn
-	gUZw1wFLoOLWmOXVa1H2J3aETUp18cE=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=W/8bKfZqzNpmtxon0MFyoACeCTJBg3bsJJb4ZYWip7bOSc9buoBdhcErt7koe5GkByGJg+JwzEsFXiKHlJa6UHmssoTFnTxGL/yUUG0W/YqapW2Gkc4kRg7Y9J7p2Akr7H3rAvylo6lityM8nIdEpGkFuqqPsQUs935KEqV94GQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 439DCC4AF09;
+	Wed, 21 Aug 2024 17:28:51 +0000 (UTC)
+Date: Wed, 21 Aug 2024 18:28:49 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Alexander Potapenko <glider@google.com>, stable@vger.kernel.org
-Subject: Re: [PATCH 01/12] KVM: arm64: Make ICC_*SGI*_EL1 undef in the
- absence of a vGICv3
-Message-ID: <ZsYbm1PSqQMGmNyt@linux.dev>
-References: <20240820100349.3544850-1-maz@kernel.org>
- <20240820100349.3544850-2-maz@kernel.org>
- <ZsUOtp9kfpqm1enx@linux.dev>
- <86le0qxhsn.wl-maz@kernel.org>
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Florian Weimer <fweimer@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
+	Ross Burton <ross.burton@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v10 23/40] arm64/signal: Set up and restore the GCS
+ context for signal handlers
+Message-ID: <ZsYj0YYMuX1YRBZT@arm.com>
+References: <20240801-arm64-gcs-v10-0-699e2bd2190b@kernel.org>
+ <20240801-arm64-gcs-v10-23-699e2bd2190b@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -49,36 +55,88 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <86le0qxhsn.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20240801-arm64-gcs-v10-23-699e2bd2190b@kernel.org>
 
-On Wed, Aug 21, 2024 at 11:59:52AM +0100, Marc Zyngier wrote:
-> On Tue, 20 Aug 2024 22:46:30 +0100,
-> Oliver Upton <oliver.upton@linux.dev> wrote:
-> > 
-> > On Tue, Aug 20, 2024 at 11:03:38AM +0100, Marc Zyngier wrote:
-> > > On a system with a GICv3, if a guest hasn't been configured with
-> > > GICv3 and that the host is not capable of GICv2 emulation,
-> > > a write to any of the ICC_*SGI*_EL1 registers is trapped to EL2.
-> > > 
-> > > We therefore try to emulate the SGI access, only to hit a NULL
-> > > pointer as no private interrupt is allocated (no GIC, remember?).
-> > > 
-> > > The obvious fix is to give the guest what it deserves, in the
-> > > shape of a UNDEF exception.
-> > > 
-> > > Reported-by: Alexander Potapenko <glider@google.com>
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > Cc: stable@vger.kernel.org
-> > 
-> > LGTM, and just as an FYI I do plan on grabbing this for 6.11
-> 
-> Great, thanks. Are you planning to route this via arm64, given that
-> Paolo is away for a bit?
+On Thu, Aug 01, 2024 at 01:06:50PM +0100, Mark Brown wrote:
+> @@ -860,6 +892,50 @@ static int restore_sigframe(struct pt_regs *regs,
+>  	return err;
+>  }
+>  
+> +#ifdef CONFIG_ARM64_GCS
+> +static int gcs_restore_signal(void)
+> +{
+> +	u64 gcspr_el0, cap;
 
-Yup, exactly that. I'll send the PR in the next day or two when I have
-some time to kick the tires on everything.
+Nitpick: use 'unsigned long __user *gcspr_el0' as in the
+gcs_signal_entry(). It's more consistent and probably less casting.
+
+> +	int ret;
+> +
+> +	if (!system_supports_gcs())
+> +		return 0;
+> +
+> +	if (!(current->thread.gcs_el0_mode & PR_SHADOW_STACK_ENABLE))
+> +		return 0;
+> +
+> +	gcspr_el0 = read_sysreg_s(SYS_GCSPR_EL0);
+> +
+> +	/*
+> +	 * GCSPR_EL0 should be pointing at a capped GCS, read the cap...
+> +	 */
+> +	gcsb_dsync();
+> +	ret = copy_from_user(&cap, (__user void*)gcspr_el0, sizeof(cap));
+> +	if (ret)
+> +		return -EFAULT;
+
+Can the user change GCSPR_EL0 to a non-shadow-stack region, fake the
+cap before sigreturn? copy_from_user() cannot check it's a GCS page.
+Does it actually matter?
+
+> @@ -1130,7 +1209,50 @@ static int get_sigframe(struct rt_sigframe_user_layout *user,
+>  	return 0;
+>  }
+>  
+> -static void setup_return(struct pt_regs *regs, struct k_sigaction *ka,
+> +#ifdef CONFIG_ARM64_GCS
+> +
+> +static int gcs_signal_entry(__sigrestore_t sigtramp, struct ksignal *ksig)
+> +{
+> +	unsigned long __user *gcspr_el0;
+> +	int ret = 0;
+> +
+> +	if (!system_supports_gcs())
+> +		return 0;
+> +
+> +	if (!task_gcs_el0_enabled(current))
+> +		return 0;
+> +
+> +	/*
+> +	 * We are entering a signal handler, current register state is
+> +	 * active.
+> +	 */
+> +	gcspr_el0 = (unsigned long __user *)read_sysreg_s(SYS_GCSPR_EL0);
+> +
+> +	/*
+> +	 * Push a cap and the GCS entry for the trampoline onto the GCS.
+> +	 */
+> +	put_user_gcs((unsigned long)sigtramp, gcspr_el0 - 2, &ret);
+> +	put_user_gcs(GCS_SIGNAL_CAP(gcspr_el0 - 1), gcspr_el0 - 1, &ret);
+> +	if (ret != 0)
+> +		return ret;
+
+Doesn't the second put_user_gcs() override the previous ret?
+
+> +
+> +	gcsb_dsync();
+
+Wondering if we need the barrier both for entry and restore. If the
+restore happens on another CPU, we have the barriers in the context
+switch code already. If it's only the kernel writing the caps with
+GCSSTTR on setting up the stack and checking it on return, a single
+barrier is sufficient (can be this one). If the user can write something
+on the stack or maybe doing a sigreturn without fully unwinding the
+stack, we may need both. Either way, it would help to add some comments
+on these barriers.
 
 -- 
-Thanks,
-Oliver
+Catalin
