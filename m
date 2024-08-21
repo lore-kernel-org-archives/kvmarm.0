@@ -1,158 +1,139 @@
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 444571B3B0D
-	for <kvmarm@lists.linux.dev>; Wed, 21 Aug 2024 18:23:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 944451B253F;
+	Wed, 21 Aug 2024 18:28:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724264628; cv=none; b=CuvzJqbVT9AqFPi6dJ/JUR5AOdkwPUBFC6EJu2+BZFMs71r8QZ7crrFhc3mjTrHoUWqSh1FRDsnBOJU7Xs+VjCBrN6tdJgQkqsANTAcqrsVlzECM8nThPZ8/iEiRysverouQH0Y8VWbPjDKPDYT4XPR5ir8qsyTeG/jljZpLayE=
+	t=1724264888; cv=none; b=tGgt1hL+ahC/lweNRiz6rfN0svV9X1x/UHj2IFEHyF8+9y0fHgN8bA8X4YtJiW9t7W2KIvubCeWHq2izpZOJb/p7QZSYJeTcvsvmGgqflb7tv3GCM+cUC8rl7pNDQ9UO7TU7UCWS+Zf9jXrETWo0b8R3jUXGkNq+zTM+Sc8pEGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724264628; c=relaxed/simple;
-	bh=CrEj/Mm0l0HK3myb0E/qBhnRWruG+WlfNx8WdX2N9Ks=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=Y+hJ6DW4JJdn0ris+NOhNBIW+FTquzJoV88RYSzuyoj4ugs+3Kszd62C/pYY4vjm5W9QYvk6mdxq8wKKhdcTYi2R8pUACwqQCOgfHXE+/5DVnNxqTF2p5f45E1SD4Mn+JO1YdIOomfSWeUkppVJ1tLUPNRvNHXNezlGN7naUayY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4WpvpH6w2jzpVXZ;
-	Thu, 22 Aug 2024 02:23:03 +0800 (CST)
-Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
-	by mail.maildlp.com (Postfix) with ESMTPS id 989E518009B;
-	Thu, 22 Aug 2024 02:23:43 +0800 (CST)
-Received: from [10.174.176.125] (10.174.176.125) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 22 Aug 2024 02:23:42 +0800
-Subject: Re: [bug report] GICv4.1: multiple vpus execute vgic_v4_load at the
- same time will greatly increase the time consumption
-To: Marc Zyngier <maz@kernel.org>
-CC: Thomas Gleixner <tglx@linutronix.de>, Oliver Upton
-	<oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, Suzuki K Poulose
-	<suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, "open list:IRQ
- SUBSYSTEM" <linux-kernel@vger.kernel.org>, "moderated list:ARM SMMU DRIVERS"
-	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	"wanghaibin.wang@huawei.com" <wanghaibin.wang@huawei.com>,
-	<nizhiqiang1@huawei.com>, "tangnianyao@huawei.com" <tangnianyao@huawei.com>,
-	<wangzhou1@hisilicon.com>
-References: <a7fc58e4-64c2-77fc-c1dc-f5eb78dbbb01@huawei.com>
- <86msl6xhu2.wl-maz@kernel.org>
-From: Kunkun Jiang <jiangkunkun@huawei.com>
-Message-ID: <f1574274-efd8-eb56-436b-5a1dd7620f2c@huawei.com>
-Date: Thu, 22 Aug 2024 02:23:30 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+	s=arc-20240116; t=1724264888; c=relaxed/simple;
+	bh=33baSij/lfUz4rEbu0DhfDZckukmuW2FH61KazHkxLQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DLeqNt7kTCZHlT5ffJWBGl1MmnKWBqd+m8lqb2im2Yk1a5rk67xmd8vcRZjpBSOi8ZFQjjHj5aXqUPgPBx3/JBpl7rgjTNq+Szky3PpI0JwR6crx5LttqIpUupeWzPVZmuH8jCIXJoDSFYRZ8zkF5bmJFrqFRfP2ITLrBuHosTg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aTYagprE; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aTYagprE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA21CC32781;
+	Wed, 21 Aug 2024 18:28:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724264888;
+	bh=33baSij/lfUz4rEbu0DhfDZckukmuW2FH61KazHkxLQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=aTYagprEzcz2g3EIW4SxspQ7iO18F5DjDWUNZgvbFQBngLuxfa6dpeP9T9dw7WcuL
+	 wATPmQQbugIpTAh+yu8sQl3uSAiFbniz7t3a2VnwftqkWda+6Ps2U60RXXCERSDZKk
+	 2G5yackwgc9NzDJc7QB/noWi9xSl7fY6yumKqreAng88x0/HI5LN6dTxOu0JwDYf32
+	 p3tyUuzRIkNq5iNeYht0PNQ+RGraYbbe95MRQSJXxDFqT1bsLDmzRKGdCcZTHGY5YK
+	 AJQoS+KuBojRbSang2TOeLaRZyoOISyOl2kL2kBHWHcU8AvSgrttUrgRRyzQGIPGaq
+	 KzW+H6ExR6s6Q==
+Date: Wed, 21 Aug 2024 19:27:53 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Florian Weimer <fweimer@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
+	Ross Burton <ross.burton@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v10 25/40] arm64/ptrace: Expose GCS via ptrace and core
+ files
+Message-ID: <58ee01de-88a6-4d0c-845a-3d5bebc0c55c@sirena.org.uk>
+References: <20240801-arm64-gcs-v10-0-699e2bd2190b@kernel.org>
+ <20240801-arm64-gcs-v10-25-699e2bd2190b@kernel.org>
+ <ZsYqfJ3V_-ljqlwq@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <86msl6xhu2.wl-maz@kernel.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemm600007.china.huawei.com (7.193.23.208)
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="XTSIK84UC9+qnNMX"
+Content-Disposition: inline
+In-Reply-To: <ZsYqfJ3V_-ljqlwq@arm.com>
+X-Cookie: You are false data.
 
-Hi Marc,
 
-On 2024/8/21 18:59, Marc Zyngier wrote:
-> On Wed, 21 Aug 2024 10:51:27 +0100,
-> Kunkun Jiang <jiangkunkun@huawei.com> wrote:
->>
->> Hi all,
->>
->> Recently I discovered a problem about GICv4.1, the scenario is as follows:
->> 1. Enable GICv4.1
->> 2. Create multiple VMs.For example, 50 VMs(4U8G)
+--XTSIK84UC9+qnNMX
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-s/4U8G/8U16G/, sorry..
+On Wed, Aug 21, 2024 at 06:57:16PM +0100, Catalin Marinas wrote:
+> On Thu, Aug 01, 2024 at 01:06:52PM +0100, Mark Brown wrote:
 
-> I don't know what 4U8G means. On how many physical CPUs are you
-> running 50 VMs? Direct injection of interrupts and over-subscription
-> are fundamentally incompatible.
+> > +	if (user_gcs.features_enabled & ~PR_SHADOW_STACK_SUPPORTED_STATUS_MASK)
+> > +		return -EINVAL;
 
-Each VM is configured with 8 vcpus and 16G memory. The number of
-physical CPUs is 320.
+> > +	/* Do not allow enable via ptrace */
+> > +	if ((user_gcs.features_enabled & PR_SHADOW_STACK_ENABLE) &&
+> > +	    !(target->thread.gcs_el0_mode & PR_SHADOW_STACK_ENABLE))
+> > +		return -EBUSY;
 
-> 
->> 3. The business running in VMs has a frequent mmio access and need to exit
->>    to qemu for processing.
->> 4. Or modify the kvm code so that wfi must trap to kvm
->> 5. Then the utilization of pcpu where the vcpu is located will be 100%,and
->>    basically all in sys.
-> 
-> What did you expect? If you trap all the time, your performance will
-> suck.  Don't do that.
-> 
->> 6. This problem does not exist in GICv3.
-> 
-> Because GICv3 doesn't have the same constraints.
-> 
->>
->> According to analysis, this problem is due to the execution of vgic_v4_load.
->> vcpu_load or kvm_sched_in
->>      kvm_arch_vcpu_load
->>      ...
->>          vgic_v4_load
->>              irq_set_affinity
->>              ...
->>                  irq_do_set_affinity
->>                      raw_spin_lock(&tmp_mask_lock)
->>                      chip->irq_set_affinity
->>                      ...
->>                        its_vpe_set_affinity
->>
->> The tmp_mask_lock is the key. This is a global lock. I don't quite
->> understand
->> why tmp_mask_lock is needed here. I think there are two possible
->> solutions here:
->> 1. Remove this tmp_mask_lock
-> 
-> Maybe you could have a look at 33de0aa4bae98 (and 11ea68f553e24)? It
-> would allow you to understand the nature of the problem.
-> 
-> This can probably be replaced with a per-CPU cpumask, which would
-> avoid the locking, but potentially result in a larger memory usage.
+> > +	target->thread.gcs_el0_mode = user_gcs.features_enabled;
+> > +	target->thread.gcs_el0_locked = user_gcs.features_locked;
+> > +	target->thread.gcspr_el0 = user_gcs.gcspr_el0;
 
-Thanks, I will try it.
+> As in the previous thread, I thought we need to restore GCSPR_EL0
+> unconditionally.
 
->> 2. Modify the gicv4 driver,do not perfrom VMOVP via
->> irq_set_affinity.
-> 
-> Sure. You could also not use KVM at all if don't care about interrupts
-> being delivered to your VM. We do not send a VMOVP just for fun. We
-> send it because your vcpu has moved to a different CPU, and the ITS
-> needs to know about that.
+My thinking here is that if we return an error code then ideally we
+shouldn't implement any changes, especially in cases like this one
+where we're rejecting inputs that are just invalid.  That seems like the
+least surprising outcome and what we should strive for, even if it's too
+complicated for some cases.  It is possible to write GCSPR_EL0
+regardless of if GCS is enabled, it's just not possible to write it as
+part of an otherwise invalid write.  The validation is checking for
+unknown features and enables.  With clone3() we could relax the enable
+check, but I've just pulled that out of the series for the time being.
 
-When a vcpu is moved to a different CPU, of course VMOVP has to be sent.
-I mean is it possible to call its_vpe_set_affinity() to send VMOVP by
-other means (instead of by calling the irq_set_affinity() API). So we
-can bypass this tmp_mask_lock.
+> I don't particularly like that this register becomes some scrap one that
+> threads can use regardless of GCS. Not sure we have a simple solution.
+> We could track three states: GCS never enabled, GCS enabled and GCS
+> disabled after being enabled. It's probably not worth it.
 
-> 
-> You seem to be misunderstanding the use case for GICv4: a partitioned
-> system, without any over-subscription, no vcpu migration between CPUs.
-> If that's not your setup, then GICv4 will always be a net loss
-> compared to SW injection with GICv3 (additional HW interaction,
-> doorbell interrupts).
+Yeah, I did give consideration to that but as you say I think it's
+probably not worth it - you end up with a state machine which for the
+most part only gets two of the states exercised.
 
-Thanks for the explanation. The key to the problem is not vcpu migration
-between CPUs. The key point is that many vcpus execute vgic_v4_load() at
-the same time. Even if it is not migrated to another CPU, there may be a
-large number of vcpus executing vgic_v4_load() at the same time. For
-example, the service running in VMs has a large number of MMIO accesses
-and need to return to userspace for emulation. Due to the competition of
-tmp_mask_lock, performance will deteriorate.
+> On ptrace() access to the shadow stack, we rely on the barrier in the
+> context switch code if stopping a thread. If other threads are running
+> on other CPUs, it's racy anyway even for normal accesses, so I don't
+> think we need to do anything more for ptrace.
 
-When the target CPU is the same CPU as the last run, there seems to be
-no need to call irq_set_affinity() in this case. I did a test and it was
-indeed able to alleviate the problem described above.
+Yes, I don't see any reason to try to do anything special there.
 
-I feel it might be better to remove tmp_mask_lock or call
-its_vpe_set_affinity() in another way. So I mentioned these two ideas
-above.
+--XTSIK84UC9+qnNMX
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Thanks,
-Kunkun Jiang
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmbGMagACgkQJNaLcl1U
+h9Db9wf/YDOH2BjzBXwu0lqzdwn2i+txsrhK+t+d9GX2VzQ6TRQJVseEw3ZiryNO
+J1DTR+iMp5FlHiA+dBqzqZs6Fm09BlHVaMuawV056J8O9fcpyhzG+xMMxoPyAika
+UeVQkZEUvs2eE76O+txWVhVwfLbKWAspcwflXBcFPVd8iT3yQxAgcS4k/h40zC3M
+h96mx+doBNKP+V9QlLlcLMiSsPS6VVN6PGE36A1uHbJWx03Kg133qsB+hzBPC8DU
+mJUnsZprHcbNVOYMJa/HMExbUltPGbuN61YzZvRT3mXkX/eykU2RkhITaZ7p8H8m
+SUu+YRFrKXGRJYWTXtUkcFtUO90vrA==
+=5j94
+-----END PGP SIGNATURE-----
+
+--XTSIK84UC9+qnNMX--
