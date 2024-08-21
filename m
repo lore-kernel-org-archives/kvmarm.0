@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4B7D1C4ED1;
-	Wed, 21 Aug 2024 15:40:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF6641C6F4D;
+	Wed, 21 Aug 2024 15:40:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724254858; cv=none; b=OqLT04WtCwkfdBLV4OFT//Gmwqug3RpG3zluGGYiN/N9ZFcEjEDMJp7RFS8NML9hLNPOtBUlVvkxKnfdTPupYrTXJulEhdbOWbypkoQ25qSbUa5Q5Bg7cRXmRreIuHsjPW2SR5aFEz03HRdAPow4JhHwmz+JZ7QnHzIL+9NnPVA=
+	t=1724254862; cv=none; b=lBf2012AJJFIin+P9PIJ+gnGbWw91h1u8T3Mu8eWXP8y21CJGh1P4Xge7Hg7ET0mgB59mGTnBEtVBt0cTjc9UfIvFk0s6PbQAGPEcLfIT4/ieA+Ii81IHA0IFuKnjaOqHATUuW2rdsqSzmVqyGblIesJTEVlLoX9iJYIlglEqX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724254858; c=relaxed/simple;
-	bh=7dFRLmYbQPPvXqx62ZOdaxgpmXONhbvS3aBvjZJzqK8=;
+	s=arc-20240116; t=1724254862; c=relaxed/simple;
+	bh=0FTGyd73NdcPxPjy3HGliC+U45rk9EzjvroXFLtszKY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=coJ671oDjbrMI4pwFzt1/i0r7W4zd9UPlGwa6ayRCIB0rdvGKw+ugVCyDDBVkQZI3vLitcdRZjYHlq6N6VsMSGRxwW/6z0CPScMuWSZBqMNItfPe2KhIs6vnD38P6Ebqhqp/c5FVbiuR82Gan8T+ujoLL+yG8RT2SmKXwt5bxUQ=
+	 MIME-Version; b=UopxF5a8rZw28Fwj+JcxfVK0Sj4bgP9M7sJcpuz4+K86wb5bXyiPdbDnXlRma4q2ryz342cSEflMzkA5f7ZU5UKOKrURBz3GgP+fY3viqcUNib+MiIKOZ6sVH7ix4tMn31eqAg1jQTCljWBgPc1O+rZFvW4r6t8fDieZFwuMp2k=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7297ADA7;
-	Wed, 21 Aug 2024 08:41:21 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6FC3BDA7;
+	Wed, 21 Aug 2024 08:41:25 -0700 (PDT)
 Received: from e122027.cambridge.arm.com (e122027.cambridge.arm.com [10.1.37.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 96C803F73B;
-	Wed, 21 Aug 2024 08:40:51 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AE0CE3F73B;
+	Wed, 21 Aug 2024 08:40:55 -0700 (PDT)
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -40,9 +40,9 @@ Cc: Steven Price <steven.price@arm.com>,
 	Gavin Shan <gshan@redhat.com>,
 	Shanker Donthineni <sdonthineni@nvidia.com>,
 	Alper Gun <alpergun@google.com>
-Subject: [PATCH v4 30/43] arm64: RME: Always use 4k pages for realms
-Date: Wed, 21 Aug 2024 16:38:31 +0100
-Message-Id: <20240821153844.60084-31-steven.price@arm.com>
+Subject: [PATCH v4 31/43] arm64: rme: Prevent Device mappings for Realms
+Date: Wed, 21 Aug 2024 16:38:32 +0100
+Message-Id: <20240821153844.60084-32-steven.price@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240821153844.60084-1-steven.price@arm.com>
 References: <20240821153844.60084-1-steven.price@arm.com>
@@ -54,22 +54,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Always split up huge pages to avoid problems managing huge pages. There
-are two issues currently:
-
-1. The uABI for the VMM allows populating memory on 4k boundaries even
-   if the underlying allocator (e.g. hugetlbfs) is using a larger page
-   size. Using a memfd for private allocations will push this issue onto
-   the VMM as it will need to respect the granularity of the allocator.
-
-2. The guest is able to request arbitrary ranges to be remapped as
-   shared. Again with a memfd approach it will be up to the VMM to deal
-   with the complexity and either overmap (need the huge mapping and add
-   an additional 'overlapping' shared mapping) or reject the request as
-   invalid due to the use of a huge page allocator.
-
-For now just break everything down to 4k pages in the RMM controlled
-stage 2.
+Physical device assignment is not yet supported by the RMM, so it
+doesn't make much sense to allow device mappings within the realm.
+Prevent them when the guest is a realm.
 
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
@@ -77,20 +64,20 @@ Signed-off-by: Steven Price <steven.price@arm.com>
  1 file changed, 4 insertions(+)
 
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index eb8b8d013f3e..dfc3dd628e43 100644
+index dfc3dd628e43..2110dd4c18db 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -1580,6 +1580,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (logging_active) {
- 		force_pte = true;
- 		vma_shift = PAGE_SHIFT;
-+	} else if (kvm_is_realm(kvm)) {
-+		// Force PTE level mappings for realms
-+		force_pte = true;
-+		vma_shift = PAGE_SHIFT;
- 	} else {
- 		vma_shift = get_vma_page_shift(vma, hva);
- 	}
+@@ -1142,6 +1142,10 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+ 	if (is_protected_kvm_enabled())
+ 		return -EPERM;
+ 
++	/* We don't support mapping special pages into a Realm */
++	if (kvm_is_realm(kvm))
++		return -EINVAL;
++
+ 	size += offset_in_page(guest_ipa);
+ 	guest_ipa &= PAGE_MASK;
+ 
 -- 
 2.34.1
 
