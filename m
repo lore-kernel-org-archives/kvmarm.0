@@ -1,96 +1,92 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A6315FBB1;
-	Wed, 21 Aug 2024 14:45:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 845A9364D6;
+	Wed, 21 Aug 2024 15:20:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724251523; cv=none; b=qE7ufvivvjDEQMtZ/cqKBXHLcnvMqRTHwdelaRBtplpP0FAYPg18RxXfBh+Qo1TKQDRwO0TFIPzEj2W6vsEhDuyMKVnQl+Nu2xl42psIV2wrf0yQRgcqdp0s/7qJYJPcjJrFrNwS2QVCyxDS/IcmwmwayW1k0lHYeVq2pskuCiE=
+	t=1724253604; cv=none; b=egq7Qu5J//VLlK8F98sBmqNg1p985eqFRXm5QqZWaKAuitEFARgt1I4zUdXr7JUhGBpVyBt2wttA8dzNeyuyQ0IVJlGGe2xZJIWWaqtAIa1aqpEDwGIQzTlw9jLGm7jnCnR+BACQBZnVr04t1X3z1ooeOKIBhEVrGC2oJmNmaig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724251523; c=relaxed/simple;
-	bh=oSdN2mapCpigX8ncRReYsys7Ulxa5sWAPbuin0RYUvU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IO2W7BDlREzpjvGmmKQkAF5BO4NYiQdNsCLmw5ew6QkWvVSKL3Le832fMVZ3EbseGjpb61HxUQx9jDtlnLdZ59h6VopSTR845oG9mtfdDvzMFNZNTUKQ08Ga1PgzenJgOxBbnbVMbIpHDWqML0SBBLrwJYTWcWdk678ovZkMnLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SVfN0mtm; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1724253604; c=relaxed/simple;
+	bh=LW2B0rUQmtGb5KJOrbVlBsBL1I7G2UBAhAr7AKIy7DU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dT0uAL52Hoa/fv/IgyydWR0Q9VLKslx7ayXRAT4ngLYqzL3VdbHmQK2EkAu0REKKJtFA1DbTBkB4foqeMQdUoS9RhXz0A9+zL/Cw/Pt7WsjqnJ8KQPihOzsqIll5Zot9fQy70aT8/H+l1GaARQCLzF0BptspLGJUU06C0Dkz45Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sBuDlxDn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SVfN0mtm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29BD3C32786;
-	Wed, 21 Aug 2024 14:45:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sBuDlxDn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0144C32781;
+	Wed, 21 Aug 2024 15:20:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724251523;
-	bh=oSdN2mapCpigX8ncRReYsys7Ulxa5sWAPbuin0RYUvU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=SVfN0mtmkqzc6ENOWWEy0Wy8xGKZvj+7PobPUjuDdatCKOhBqe0VaCKn5MClguufT
-	 q/WmNKx2+OWHR5GU+cQud/xjvjH8SAION2ceLSVSLIPbufW50KicPLfWbCzZG9HEGB
-	 JjCHnEm/lla4ow2ICaoXSidtqDTLboegDMTedfTgREM8VF5UvzQPE1aUVuv9MKSM4o
-	 4KY0FPHssFcJY7NfnFSkXXg8N+WYfK5ZbkobyQ6KJuPBXF/qR23j8JhT63E1vtHr+6
-	 xVtRrT1/DfcRk+BjbPK1BPdfdvdveCIgqi9knCo/elT0fHXGEDeBd67HgnjWk+SXm+
-	 +qPuVn6zNg7eg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sgmaO-005cqv-Sd;
-	Wed, 21 Aug 2024 15:45:20 +0100
-Date: Wed, 21 Aug 2024 15:45:20 +0100
-Message-ID: <86cym2x7cv.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
+	s=k20201202; t=1724253604;
+	bh=LW2B0rUQmtGb5KJOrbVlBsBL1I7G2UBAhAr7AKIy7DU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=sBuDlxDnVGXQYmQh2efA6iMuIIX4A/W4/ykvFpg/TmZwaeKY4OuzQVN7+eOTPCv15
+	 Q0qQp6emkGr3CW5GcKW0ylLsLYTdj3j9fMKuooqHq9AHjsT7OY9+Dt1UBe7TwXAg8k
+	 IDi4WguvQBWTULRIcwGGRMZ6NapR5fRvgemWiyJxOpdMpgIv245P8nSPPxp5AfUijt
+	 3QeezUZwXl9b8SQPN4aP7xBG/YBA7j7btBU0zIT7w+lcM7PJ0mvYNE11RATSgXiDGq
+	 ZINd3zU4vNNEagaju6RlK8nhtfd3mDzIirJsJqyQE/Vg7ph0O03EKCkxc8QR+/krVG
+	 lQ6VBRKjFmDIg==
+Date: Wed, 21 Aug 2024 16:19:59 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
 Cc: Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
+	Will Deacon <will@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/2] KVM: arm64: Control visibility of S1PIE related sysregs to userspace
-In-Reply-To: <e123ee24-2a0c-4ab3-8dc3-2906bf96f38d@sirena.org.uk>
+Subject: Re: [PATCH 0/2] KVM: arm64: Control visibility of S1PIE related
+ sysregs to userspace
+Message-ID: <5304749b-04c8-44f4-b4de-b2d0cef61169@sirena.org.uk>
 References: <20240821-kvm-arm64-hide-pie-regs-v1-0-08cb3c79cb57@kernel.org>
-	<86ed6ixa32.wl-maz@kernel.org>
-	<e123ee24-2a0c-4ab3-8dc3-2906bf96f38d@sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <86ed6ixa32.wl-maz@kernel.org>
+ <e123ee24-2a0c-4ab3-8dc3-2906bf96f38d@sirena.org.uk>
+ <86cym2x7cv.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="6cLz53WUGCeFW2Yg"
+Content-Disposition: inline
+In-Reply-To: <86cym2x7cv.wl-maz@kernel.org>
+X-Cookie: You are false data.
 
-On Wed, 21 Aug 2024 15:01:54 +0100,
-Mark Brown <broonie@kernel.org> wrote:
-> 
-> [1  <text/plain; us-ascii (7bit)>]
-> On Wed, Aug 21, 2024 at 02:46:25PM +0100, Marc Zyngier wrote:
-> > Mark Brown <broonie@kernel.org> wrote:
-> 
-> > > Mark Brown (2):
-> > >       KVM: arm64: Hide TCR2_EL1 from userspace when disabled for guests
-> > >       KVM: arm64: Hide S1PIE registers from userspace when disabled for guests
-> 
-> > If you are going to do this, please add it on top of [1], and handle
-> > the corresponding EL2 registers.
-> 
-> OK.  To confirm, this is a desirable change?
 
-Yes.
+--6cLz53WUGCeFW2Yg
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Ultimately, we need to revisit the way we deal with visibility, as
-adding a myriad of helpers checking a combination of features doesn't
-scale. That information should exist as a static table, just like the
-trap bits.
+On Wed, Aug 21, 2024 at 03:45:20PM +0100, Marc Zyngier wrote:
 
-But until then, that's probably the way.
+> Ultimately, we need to revisit the way we deal with visibility, as
+> adding a myriad of helpers checking a combination of features doesn't
+> scale. That information should exist as a static table, just like the
+> trap bits.
 
-	M.
+Indeed, I was wondering about just adding a description of the relevant
+ID register field to the sys_regs table.
 
--- 
-Without deviation from the norm, progress is not possible.
+> But until then, that's probably the way.
+
+OK.
+
+--6cLz53WUGCeFW2Yg
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmbGBZ4ACgkQJNaLcl1U
+h9Cz5gf9FFQ0KM4qx77AR0jIauNqQZvDlayfaImNDovZWP2kGj9p04KMoOY3uiqU
+FFUmJOuNuzH5Fg8HmgoCsmQxO9xrEW0E/qKVf+Vyw1VUat8v2CkRCsBCVbeOrZlI
+nCdLja4AwoCuuSazo77dd6BTqUs93qBE+5CIhWm9U4P1AFIRZiFZGweOwODn8WYy
+xVWBGfkqSMnQ/sfF2PMxOlEKK2pET0lnpJPRIm1KoZNhUTzRU2LrAHdMrdvA840V
+59CVMBYcdUbBUxB7pjULgpD9LJVdgRL+e1VJCymhmaChxvjgg+2vzKfcNIuR0d7M
+PfldwjFzCW76/Ls0SF93Jp3NGiCHww==
+=pEMe
+-----END PGP SIGNATURE-----
+
+--6cLz53WUGCeFW2Yg--
