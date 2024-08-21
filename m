@@ -1,178 +1,238 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from BN8PR05CU002.outbound.protection.outlook.com (mail-eastus2azon11021139.outbound.protection.outlook.com [52.101.57.139])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 154581537D6
-	for <kvmarm@lists.linux.dev>; Wed, 21 Aug 2024 02:45:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724208358; cv=none; b=PGIye59qf8TjwI1O2cjOVH7d7kmn2jet7z+/SP7xONqZAiym4KMCXWpxKpq6QKEQX8ZSXbwLlBJYm2UGeg0hTGNGh8Ni5s7dAhTvJDLBuT6oRq5kUZ5jUOV8eBUT8ktO2CrZyJcbSQyFIKLPIyh4GyE+ncdcsMjEy8cr6wahWjY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724208358; c=relaxed/simple;
-	bh=1tpxTosyO9oxG72wvXeOM17GOQXVSYOsZcA5bZgcwWY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sApfa3KH6bOQDz3lmIR3ndi7O23bL85wJ4kwo936c/tV4KyH/keia1PGgiGJ1FiPlGFj261sYk1tN18VHBTw0z6nkpGzwXXxJE7Fq89dJ4PIaOm6xvljpkJjQb7KMzGYso9a9ItukrVqy+VDHEeABB5RNp1JKB5wlYrWduUbd9g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GlkFEL2W; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F34E37602D
+	for <kvmarm@lists.linux.dev>; Wed, 21 Aug 2024 04:25:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.57.139
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724214352; cv=fail; b=twsJUUo2GgWCKlDGopBqgo6qHjezu158XtCivqwnAlIVI1FHtKyupAGoHkqokNcYsjw5dEjMw7JEinbWmRTVchU3Te10zus49DY8ho+wd4FComVtmHl/sNXHgqKwQrPIftP9pIXEW87vo23/4DN9FstjUyCMw2XLWssoUcxqWB0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724214352; c=relaxed/simple;
+	bh=nzWPw5on4tH/B3gcQhg/0Cq0aplwL5BYw8s9kGh0CgI=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=CsLgPXlKKRMNLwzG7jDI2Qs1WDymlslAa8bkWiA9ipEV45+8+9sUm6BIA4XRqVDmE/ICy1MfXm7RZZTtBY9SMY/k47uKTiM9OKRI1TF5boEE0mCNR8wt8NQYxKdu8loz/VzTHJs6vI1Cr4Um5q3lkk9NJAsFBg0Hk+ex4/4r/j8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=nowqEVUu; arc=fail smtp.client-ip=52.101.57.139
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GlkFEL2W"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724208356;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QnCB9XL+js96QTUnqcwBPZip9eUqUJSLO61FBStGX2g=;
-	b=GlkFEL2Wv+7nXjt6hHiAWuh3jVnkbyiNUMJFSeknVO4dK+KeFZa1TTX1/+8J4PZRn8uszU
-	Jjp9Jo+8xkuT97Hyn8an298G7dwVXToooSPCaxLTKKD9WtKU5dbBUSdTARUOyHcPJ6wxEL
-	MLv5gYIrkZ+Ym5NAXuSNW9UxYvjKKlo=
-Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
- [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-550-ThXO_lP3MMeMP-cMgyi2Ew-1; Tue, 20 Aug 2024 22:45:53 -0400
-X-MC-Unique: ThXO_lP3MMeMP-cMgyi2Ew-1
-Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-202088f100aso42340535ad.3
-        for <kvmarm@lists.linux.dev>; Tue, 20 Aug 2024 19:45:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724208353; x=1724813153;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QnCB9XL+js96QTUnqcwBPZip9eUqUJSLO61FBStGX2g=;
-        b=mW0agX76arbJwDY+fynnMt2acQpnRH5W8HhbesUurqY83/TU/EMd73ZKo7pXAH7vJm
-         sAwDqNO/zyyiZh4pDwqN6RvhmnnE2SZKLE9qtY9BLvHbgBJ5awv1UsvNxA4o/BC3nM7B
-         deuX9Py3LkEQkE4CGo+5WPWplVtY0U5vlRuLyRe9oI1s47fpbg3x7Xlqe2/In0dN9flh
-         yXQkzagVTAVlKEkjpNgEuxxECVXAdyJG60k51yUTPBwSNFPybUZEikDZuXCYQ/qIQvJw
-         i+LD7yNJ+aZPgt3TmMq/5xteOqPxlNDJGyFUNgR37BpIOgn5lQqXeKhImAToxpGRxSll
-         FsFg==
-X-Forwarded-Encrypted: i=1; AJvYcCX6u9sGoFLthIuef4N+CZkK0fQCUMOxmcn15i2gOwx+WYEhpXI8yvTeRjgkqlT8KGmO+TkoDic=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzohPfeDta2Isg8MaDM2KbuGsa/Z9Y+h0+bIQuEVyGlMetpWbrM
-	+4jMaYOj82fSEyllUBd062S2/AG1GCuoaGwweedVzLwwjR/sY1Bwk4f2bUkQvmltJhmOG96sgiQ
-	RSswEMiw/k1XDCGLHmYvBlmVTTRgj0o6qCtGT2ve1gFZOvv6JpD2X5g==
-X-Received: by 2002:a17:903:247:b0:1fb:8cab:ccc9 with SMTP id d9443c01a7336-203681e3d0fmr12418355ad.45.1724208352846;
-        Tue, 20 Aug 2024 19:45:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGLvx8xlkUZjlEq0KcUSI9PEcJu6+23cYjpsS4sKgWdxqVJexOjK6LBAMbnz8YDagYUZLFm8A==
-X-Received: by 2002:a17:903:247:b0:1fb:8cab:ccc9 with SMTP id d9443c01a7336-203681e3d0fmr12417995ad.45.1724208352388;
-        Tue, 20 Aug 2024 19:45:52 -0700 (PDT)
-Received: from [10.72.116.48] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-201f037903csm84174065ad.125.2024.08.20.19.45.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Aug 2024 19:45:51 -0700 (PDT)
-Message-ID: <f423a404-82bd-43e2-a2a7-c0ea038cbbda@redhat.com>
-Date: Wed, 21 Aug 2024 10:45:45 +0800
+	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="nowqEVUu"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=O4qNohgfZbSPSfqDea9DPHs1oovoxjxGNo94WUNM11hm4HItmqwjf3JWsTq5VOmIFg+M+NgYtQDrpLp/Fpm4wxx4gmv3y3wxNN1eYDWQRR28H9w5gwcoV3MAOXL2BVCLdNqUGDICk0nr5b96sGUSBT9Q0Y27lSOdRPzDrWBtXaYC+WVt38exq04UNaRFQmQ4vJ8GlyhEiPkWsxdCDZwQGg9svlyDC3E3dCDxRSssWP543fUl7sYojHNtIyEaaaFXxwtUgojtWSzE4KwhCuSy1uPYAIQAJk0+ohV2wKhX2nH+m9k7B4GFODjfMRNFBQ902VLbh50mhlJK29NMfBzyDQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=sh1Y8xzIDOw/Py7CxKHOoPoCIhCSIm0UEJyu2PdZxw4=;
+ b=Ov0L7mjcMGTq2FXtjOkdtOMVlCDXSVv5R0nIWBytPtmmzhC3KTBMIpCg9iWQBcfB9VO92aEkFwOYCAtcdygUEU9EGZ1eH9+nALdHmC5sKczJZhm9UOzKhVxDFZSiI6f++CfQAMZz1+IGheH9K61LnslmeNYUjzWD+b8hQATI0a8dJINyzeEr00s4IC8zwFeXtWUNGPOa+DRwr9W0SIEVcGSZQNp59m7fs5YzKAfwB2NASb45zMW+CARQAOZigaXFFzcTA1gBhwze5T0VBzFAuJUqkEzvnWeoOislgwAlNTzb/44V7lZUtTOD7Yf8em48SbaspGIuYTPYWgrA77QdAA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=os.amperecomputing.com; dkim=pass
+ header.d=os.amperecomputing.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=os.amperecomputing.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sh1Y8xzIDOw/Py7CxKHOoPoCIhCSIm0UEJyu2PdZxw4=;
+ b=nowqEVUuD46ZZ3WtYR6fRWcyDjyYVICCX+jR4UDE9Rh6yS80EUH4KQvjuy8l6XLXNnWOxg9FcPryih3A7yNqA2LXRqJ5F8U0cdEBfjqPBTKfpnB9Sx+kssf5Z5ki2LiWKOKxR/uzfy8fKnsCyPnQtYwFow6WNR/0QHhK39JsYgE=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
+Received: from SJ2PR01MB8101.prod.exchangelabs.com (2603:10b6:a03:4f6::10) by
+ LV8PR01MB8477.prod.exchangelabs.com (2603:10b6:408:188::10) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7875.21; Wed, 21 Aug 2024 04:25:46 +0000
+Received: from SJ2PR01MB8101.prod.exchangelabs.com
+ ([fe80::292:6d9c:eb9a:95c9]) by SJ2PR01MB8101.prod.exchangelabs.com
+ ([fe80::292:6d9c:eb9a:95c9%4]) with mapi id 15.20.7875.018; Wed, 21 Aug 2024
+ 04:25:46 +0000
+Message-ID: <b3e34ca2-911e-471f-8418-5a3144044e56@os.amperecomputing.com>
+Date: Wed, 21 Aug 2024 09:55:37 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 00/18] KVM: arm64: nv: Add support for address
+ translation instructions
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Anshuman Khandual <anshuman.khandual@arm.com>,
+ Przemyslaw Gaj <pgaj@cadence.com>
+References: <20240820103756.3545976-1-maz@kernel.org>
+Content-Language: en-US
+From: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+In-Reply-To: <20240820103756.3545976-1-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MA0PR01CA0075.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:a01:ad::16) To SJ2PR01MB8101.prod.exchangelabs.com
+ (2603:10b6:a03:4f6::10)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 0/4] Allow userspace to change ID_AA64PFR1_EL1
-To: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>,
- kvmarm@lists.linux.dev, Mark Brown <broonie@kernel.org>
-Cc: Eric Auger <eauger@redhat.com>, Sebastian Ott <sebott@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, Catalin Marinas
- <catalin.marinas@arm.com>, James Morse <james.morse@arm.com>,
- kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Will Deacon <will@kernel.org>,
- Zenghui Yu <yuzenghui@huawei.com>
-References: <20240723072004.1470688-1-shahuang@redhat.com>
-From: Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20240723072004.1470688-1-shahuang@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ2PR01MB8101:EE_|LV8PR01MB8477:EE_
+X-MS-Office365-Filtering-Correlation-Id: 292bd846-6ebf-469d-6ec9-08dcc199541a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?KytyVE9oOTVZb0tPVWh3YzBvdE8wRGl4VUhrMFZIWHFrdVhFangzdE5XdVVv?=
+ =?utf-8?B?TXpnSTlxVlhWVzEvSWhUWFlRazQwRmZaUHhjdkVzeFkvNVV4TXowY0JYcE1X?=
+ =?utf-8?B?alRLWDlYc01SRDZsQi9WNTExQVZrSWlWc0k4T3Y3MFFPWmkzaWZaSWNDWkZo?=
+ =?utf-8?B?VDZpaGZ4Ly9OTmpCS2g1UVhhR0dmSUV3TzdkNkRhckN5LzNEbGxYMHVSTzdh?=
+ =?utf-8?B?V2dlcWk0YTZ5N3dFR2xSY3FrYSswUXBKbjFkazZtQ3ptTi8wYjQyUEZacEJv?=
+ =?utf-8?B?QUdTZjBOVTNlUUIwQ3NDVlU5QWI2UEFVVGpuVEhBdWt2VkJaUU56MXdhU2ox?=
+ =?utf-8?B?S0FjNTNJRjIxbktpRXQ4MFdaYUM4a3RQaWY3Ymd0d0dpZnpPWkQ4UE9rVmpx?=
+ =?utf-8?B?RC8rcnVEalBvRWIzanZ4dmtRTHI1a0RoSW83UmRaMHpIV3dQcjMveWVGRVNu?=
+ =?utf-8?B?aFB6RC9tRlZlb3djeWZFdW1nd3dEaGNsclhZTkl2NkVCNW5kTnFhYzhSaWFL?=
+ =?utf-8?B?aTFVVm1QclMydXZOeHNGbndHdHBoVlB3UFdZNXA4ZWhJVEQyL2lFemRWeTBo?=
+ =?utf-8?B?a0VHZ2hoT1dSUEVkQldjL0hLWHpTOEVsaGpzN2IzNjNwRUR1RTFZU2FCQWY4?=
+ =?utf-8?B?WmZDd3lDQlhIanBLK0VHNGNMd3ViN3JxVWdSak4wckNsVFZabTV4Q2lUODht?=
+ =?utf-8?B?ZWtFU0RXZDcrK0hpK2liS3JKZDZXMkF4dVlrNGFIa0Q1akNFbGlUTDZ4cWFK?=
+ =?utf-8?B?ZHNsSnBGeWp6T1VvbzMySW1ucHg4QnVlQUQ5dnJFdTRyZ2VZS2xBaDgyUTlY?=
+ =?utf-8?B?aVV4MllVU1RPZENPdlE4bk9XZ3p3elpKdm9PZVB1S3RJdVEyT2JWMTFRSVNs?=
+ =?utf-8?B?K0tiUjArVUNJcG13TkdlcThHUHVqb1NqMURhYmF6V3VOQkJPOFdhZzNJZnRY?=
+ =?utf-8?B?amVTUVY5dnBjY1N2UytXV1lTVHU0VkNmZXJySTgycjArU0hxUTFDZUtjaXla?=
+ =?utf-8?B?bG5HS2ZDeGJoakdxRmFrM3gvSW5KTkdSRFE3NjJ4VUZoTExoOGhndXlVaVQ0?=
+ =?utf-8?B?a2xNV0tnempueml3OVNrUmpraEhIdC9mSWtpU0wxRUFoY2VNeVdMSDQyR05Z?=
+ =?utf-8?B?bTJrNEttQ05oZUoxbnIyVXRKYVVzVTV6MlJsdU1sUTVhZkNnSnh1UFlqTzlJ?=
+ =?utf-8?B?d0NzZUJITnYybERPOVJ2bmlxT3JiWmFSRW5Kek1ZQlNNc1diaUIzU09FRk14?=
+ =?utf-8?B?bEMxak1kQlcyZ09mSUtua25RaUxsSms4S3JLd2o5NlZpUkJRc0N6d3hPVU5q?=
+ =?utf-8?B?SVp6MVFud3lMdEZ6QXd6Q3VEWEdMbHplOW5zaW9mR0NWMHY0dEtsRTAyTWRT?=
+ =?utf-8?B?OHNQdkxGakhJRHIxM0VHeTVTRU5HSTZxcnloK1BiczdtWlQwL3l4TzE5R2U5?=
+ =?utf-8?B?azErSC9SajFNaUlWb3R3Tm9sMVNFejJkRU1aL01FWjAwZlBDNytnQWpuQjNF?=
+ =?utf-8?B?dzNEM3hZQzhQNlVyVnQwS0ZjYmVhZmhLbUQ2dWZQbG04a1VYeHJkd1BXY28v?=
+ =?utf-8?B?VVJmUElJSjNWcWh4d1BHeXFMZEh5TFlYZTVSWS9wYUVqeTVaVWJreisrYUh6?=
+ =?utf-8?B?ejNRNzZvT1lIT1JxUFZxYTBpZktvc0I4cUxiRDBEN1UrejhvYVpuQnN2aHZS?=
+ =?utf-8?B?L2I2SVBoV1BUUnpBTjlaWVlMemI1YzczdUR6c1lLMFIvbi9MdTFjU3laNG5Y?=
+ =?utf-8?B?QW5LenI5RTZkdG1jeHJOU1NHMnh5MXBNMU8rdCtNbWcvK1M0OXo0aXdpT2M4?=
+ =?utf-8?Q?eMCR9BpEHH1bJq9E+6tUy7FP1PaDPiHF9ia8Q=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR01MB8101.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?Uk5kN3FDZ1V0eFh2K1BLZmxDa05MYStKbFdSZkhTMGF1WjJNQ3VWK0lFYS9Z?=
+ =?utf-8?B?clpNeDdRM0tjYm13eTNFVXNZc0Vyazd3NXZaNkpyd1JObHYyV213aHE5TllS?=
+ =?utf-8?B?RXVMc2VJVUhVYS8zQi9BZC9yRm16UDhmQnlyYWVoVlBFZitPcHRZVldRWGk1?=
+ =?utf-8?B?TWd2dXYwN0JqVWdjb3hFa2xBV1dsLzZPNEtKNmpMTzR0a2JuNkJQM2Zzdy9J?=
+ =?utf-8?B?emNndG56dktEYVlmd0lkcE50NjNhTS9DOVhucGh4Tk9qaFp1Vm9SaDlvNHZI?=
+ =?utf-8?B?N0IyQ0tTcUJZbDI3Q0lzUThnRFp4amFGVFpZQUdib0pQTk9SUzJwUSttWGRW?=
+ =?utf-8?B?M1kwZGw3TW04QmNqVFhmdlFkQXBhSnM0QWZKa2NOTjE3a0g5ckl5Z1ZRblRV?=
+ =?utf-8?B?OG1VQWlyQmxPSHExY3VlUDM2ZUFwSlpVVFNLMVFwU0Q3VHVBZGxWWEJibVov?=
+ =?utf-8?B?MmdmOEljL3JzL2R4c0ZUbCtad202UnJhU20wN2lHTjdJa2VjWGdZeU5DbVVi?=
+ =?utf-8?B?RU5VZEZ5eW1uQVFXbVJkQ2JDUVRkYzEvUUM4dmRnSEtpUVFldFlpQVdxNlE5?=
+ =?utf-8?B?RXkxREhVS1RLRFFNYkJvc2JQUkh0d1JXYXpmQ1pFZVJxM3ZvN3dvQ3BuTk9Q?=
+ =?utf-8?B?djJDY1Jyd2xkekIrV3dvQUp5c01rZm52VFJzbVpJMHVLaDhuam0yNnZWSmE0?=
+ =?utf-8?B?WDE2cUpwOU5HaWJaWWRQajl2RFNHZmpwUVViWnN5cnhFMlJoYzF6bklNK09V?=
+ =?utf-8?B?RERZdEgwaCtQcnVSOFQ3Vm5UNXptSEFjajhDUFpvMzg3b25hRU5LMldPUFFU?=
+ =?utf-8?B?OStxZEN2Zld1d2ZobEd5ckVWbVBidmtyTi9YbGk3ODhRNFBuVlR3OU5VaUVh?=
+ =?utf-8?B?dGRERDljZFF6T09DbG9nd0pmSWdaN2EzT2llQVFmTmNuR0JOb0JnWGtoZjJQ?=
+ =?utf-8?B?SVovVjgzaGVtN0Qva1FkVytCTnBBVGl4YVcvanorNXBRWEp2L3BuZk9QdStQ?=
+ =?utf-8?B?UWkxZXNxMkJaMkJpeFFOcW0vNEo3UUZubS9rL1ZsOUhOVUpteVJDZXQzdEZ1?=
+ =?utf-8?B?WTY3YWNvNkdQektybFlVbDlDelZoZTAxZ1NQSWtaUHBiZ1JNdEVtaUdmNGda?=
+ =?utf-8?B?c3F0ekU4WjdpQy80N29GWUNjcG1mVHc5QVdGODQ1VEtzNVNSUHdIUXVicnBE?=
+ =?utf-8?B?WEVFTHh6VmZtYmFkRi9oZHBKQ2lTWmMrWGlBRDdXYUw1bUsxb0lmMDdiMXJO?=
+ =?utf-8?B?SkpBWS82VmtNWlpsVFNPK25WTlVnQ3Eva2pOcjRvVFNBYUhtbVRRck9ycmVU?=
+ =?utf-8?B?Q2R1Nmt6aEdkazg0SWhLY2J6VjkwRlZBeWU4dGltOW1QWFUzd3RhU012bGpq?=
+ =?utf-8?B?RWI4b29CUElyZUFYbDFMaG4wdlNudE1BUkh6ZVJGOTFvcDhSL3JZZnFZSVpP?=
+ =?utf-8?B?ZHV5Sk52ZTg3a1BoT3NaSE5ZRENHN0NTVmtiMVlHRWJxVUhLSkdJMVZNcFVz?=
+ =?utf-8?B?N0xHaGFkaThra0xBYTBvSjJjcDFKK2NTS3lQYnM2b2V0UEI4bFg0dC9vbW5u?=
+ =?utf-8?B?V3c1TlE0T1ZvM0c3L21na3l2NXRHWTJ2QlpVTy9MTE5XTm5iVkwrVWIxUVBv?=
+ =?utf-8?B?aVl5UCtjaldlWXJWRUJST3FzUHVuaTdueFpNN1gvUnF4RlJ3QXVnQlkyYXR1?=
+ =?utf-8?B?S2x5RTRwMkRGQWRCaXJRMExPNVBqWU94UmtuZ29DNmIvKzlBMmEvRjdvdTlM?=
+ =?utf-8?B?ODVXYWo2Ulpwd1RrOW1aNkp3ZW9WOUt3WktqaXUvTkhCby9JSXd2UzYrSUdE?=
+ =?utf-8?B?ZG9nTTkyTlAwd21hWGkybDRCY05SNGVDUGxwdTByMVJiREo0b3VtVGgvQlpv?=
+ =?utf-8?B?aEpzbS9xSWF3akgyanA0S2hYREJoMU5UcDFKUERURzgvMmtZS2RrTXdtMU1U?=
+ =?utf-8?B?M1BTemFtWE85WE9VVlJPRmxseTZBSU9OdGp2RFpsTURRa0QrYWMyRkNDRW5Y?=
+ =?utf-8?B?VHdyTysxN3VvOTNEQmpWRmNtODluaVRVQ0hwYklhM2JmQUVKUk9BSkJsN3dP?=
+ =?utf-8?B?cG5IbXhPQnFhZXQ3MTg2YVZYcjgxaUw3dmRHVGMvdWxpUEhTRmVOTEJ6RW1p?=
+ =?utf-8?B?bm5OWEpkUFFKZHgvYW8zMTl2NUJlS080dlFUMUswTGxKcHlsbm5pRVpZeTZl?=
+ =?utf-8?Q?rzvDz5n7OIJU1s9tRELTqchOZk7vM2n7k4Qt1e40scx4?=
+X-OriginatorOrg: os.amperecomputing.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 292bd846-6ebf-469d-6ec9-08dcc199541a
+X-MS-Exchange-CrossTenant-AuthSource: SJ2PR01MB8101.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2024 04:25:46.6017
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: XkNVh2d36BFS4MIwBUfNMPJAd6IN2c+v6w7osovE6vcWgffGRcF+KAXCpMFrNd45YCGXm6vjsFppHJsA5PDrYAyez37J26sPocFyGh1QiCzYuC3+POom3LbNHsYAhx0+
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR01MB8477
 
-Hi Marc, Oliver,
 
-Kindly ping for this series. Welcome your feedbacks. I wonder if this 
-implementation satisfy your expectation?
+Hi Marc,
 
-Thanks,
-Shaoqin
+On 20-08-2024 04:07 pm, Marc Zyngier wrote:
+> This is the fourth revision of the address translation emulation for
+> NV support on arm64 previously posted at [1].
+> 
+> Thanks again to Alex for his continuous (contiguous? ;-) scrutiny on
+> this series.
+> 
+> * From v3:
+> 
+>    - Fix out of range conditions for TxSZ when LVA is implemented
+> 
+>    - Fix implementation of R_VPBBF to deliver an Address Size Fault
+> 
+>    - Don't grant PX if UW is set
+> 
+>    - Various cleanups
+> 
+>    - Collected Alex's RBs, with thanks.
+> 
+> I've added the usual reviewers on Cc, plus people who explicitly asked
+> to be on it, and people who seem to be super keen on NV.
+> 
+> Patches on top of 6.11-rc1, tested on my usual M2 (so VHE only). FWIW,
+> I plan to take this into 6.12.
+> 
+> [1] https://lore.kernel.org/r/20240813100540.1955263-1-maz@kernel.org
+> 
+> Joey Gouly (1):
+>    KVM: arm64: Make kvm_at() take an OP_AT_*
+> 
 
-On 7/23/24 15:19, Shaoqin Huang wrote:
-> Hi guys,
+Have you tested/tried NV with host/L0 booted with GICv4.x enabled?
+We do see L2 boot hang and I don't have much debug info at the moment.
+
+> Marc Zyngier (17):
+>    arm64: Add missing APTable and TCR_ELx.HPD masks
+>    arm64: Add PAR_EL1 field description
+>    arm64: Add system register encoding for PSTATE.PAN
+>    arm64: Add ESR_ELx_FSC_ADDRSZ_L() helper
+>    KVM: arm64: nv: Enforce S2 alignment when contiguous bit is set
+>    KVM: arm64: nv: Turn upper_attr for S2 walk into the full descriptor
+>    KVM: arm64: nv: Honor absence of FEAT_PAN2
+>    KVM: arm64: nv: Add basic emulation of AT S1E{0,1}{R,W}
+>    KVM: arm64: nv: Add basic emulation of AT S1E1{R,W}P
+>    KVM: arm64: nv: Add basic emulation of AT S1E2{R,W}
+>    KVM: arm64: nv: Add emulation of AT S12E{0,1}{R,W}
+>    KVM: arm64: nv: Make ps_to_output_size() generally available
+>    KVM: arm64: nv: Add SW walker for AT S1 emulation
+>    KVM: arm64: nv: Sanitise SCTLR_EL1.EPAN according to VM configuration
+>    KVM: arm64: nv: Make AT+PAN instructions aware of FEAT_PAN3
+>    KVM: arm64: nv: Plumb handling of AT S1* traps from EL2
+>    KVM: arm64: nv: Add support for FEAT_ATS1A
 > 
-> This is another try to allow userspace to change ID_AA64PFR1_EL1, and we want to
-> give userspace the ability to control the visible feature set for a VM, which
-> could be used by userspace in such a way to transparently migrate VMs.
-> 
-> The patch series have four part:
-> 
-> The first patch disable those fields which KVM doesn't know how to handle, so
-> KVM will only expose value 0 of those fields to the guest.
-> 
-> The second patch check the FEAT_SSBS in guest IDREG instead of the cpu
-> capability.
-> 
-> The third patch allow userspace to change ID_AA64PFR1_EL1, it only advertise the
-> fields known to KVM and leave others unadvertise.
-> 
-> The fourth patch adds the kselftest to test if userspace can change the
-> ID_AA64PFR1_EL1.
-> 
-> Besides, I also noticed there is another patch [1] which try to make the
-> ID_AA64PFR1_EL1 writable. This patch [1] is try to enable GCS on baremental, and
-> add GCS support for the guest. What I understand is if we have GCS support on
-> baremental, it will be clear to how to handle them in KVM. And same for other
-> fields like NMI, THE, DF2, MTEX.. At that time, they can be writable.
-> 
-> [1] [PATCH v9 13/39] KVM: arm64: Manage GCS registers for guests
->      https://lore.kernel.org/all/20240625-arm64-gcs-v9-13-0f634469b8f0@kernel.org/
-> 
-> Changelog:
-> ----------
-> v4 -> v5:
->    * Only advertise fields which KVM know how to handle to userspace, leave
->      others unadvertised.
->    * Add a new patch to check FEAT_SSBS in IDREG instead of cpu capability.
->    * Tweak the kselftest writable fields.
->    * Improve the commit message.
-> 
-> v3 -> v4:
->    * Add a new patch to disable some feature which KVM doesn't know how to
->      handle in the register accessor.
->    * Handle all the fields in the register.
->    * Fixes a small cnt issue in kselftest.
-> 
-> v2 -> v3:
->    * Give more description about why only part of the fields can be writable.
->    * Updated the writable mask by referring the latest ARM spec.
-> 
-> v1 -> v2:
->    * Tackling the full register instead of single field.
->    * Changing the patch title and commit message.
-> 
-> RFCv1 -> v1:
->    * Fix the compilation error.
->    * Delete the machine specific information and make the description more
->      generable.
-> 
-> RFCv1: https://lore.kernel.org/all/20240612023553.127813-1-shahuang@redhat.com/
-> v1: https://lore.kernel.org/all/20240617075131.1006173-1-shahuang@redhat.com/
-> v2: https://lore.kernel.org/all/20240618063808.1040085-1-shahuang@redhat.com/
-> v3: https://lore.kernel.org/all/20240628060454.1936886-2-shahuang@redhat.com/
-> v4: https://lore.kernel.org/all/20240718035017.434996-1-shahuang@redhat.com/
-> 
-> Shaoqin Huang (4):
->    KVM: arm64: Disable fields that KVM doesn't know how to handle in
->      ID_AA64PFR1_EL1
->    KVM: arm64: Use kvm_has_feat() to check if FEAT_SSBS is advertised to
->      the guest
->    KVM: arm64: Allow userspace to change ID_AA64PFR1_EL1
->    KVM: selftests: aarch64: Add writable test for ID_AA64PFR1_EL1
-> 
->   arch/arm64/kvm/hypercalls.c                   | 12 +++++-----
->   arch/arm64/kvm/sys_regs.c                     | 22 ++++++++++++++++++-
->   .../selftests/kvm/aarch64/set_id_regs.c       | 14 +++++++++---
->   3 files changed, 38 insertions(+), 10 deletions(-)
+>   arch/arm64/include/asm/esr.h           |    5 +-
+>   arch/arm64/include/asm/kvm_arm.h       |    1 +
+>   arch/arm64/include/asm/kvm_asm.h       |    6 +-
+>   arch/arm64/include/asm/kvm_nested.h    |   40 +-
+>   arch/arm64/include/asm/pgtable-hwdef.h |    9 +
+>   arch/arm64/include/asm/sysreg.h        |   22 +
+>   arch/arm64/kvm/Makefile                |    2 +-
+>   arch/arm64/kvm/at.c                    | 1101 ++++++++++++++++++++++++
+>   arch/arm64/kvm/emulate-nested.c        |    2 +
+>   arch/arm64/kvm/hyp/include/hyp/fault.h |    2 +-
+>   arch/arm64/kvm/nested.c                |   41 +-
+>   arch/arm64/kvm/sys_regs.c              |   60 ++
+>   12 files changed, 1259 insertions(+), 32 deletions(-)
+>   create mode 100644 arch/arm64/kvm/at.c
 > 
 
 -- 
-Shaoqin
-
+Thanks,
+Ganapat/GK
