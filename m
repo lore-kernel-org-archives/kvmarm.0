@@ -1,109 +1,97 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C070B1CC891;
-	Wed, 21 Aug 2024 15:41:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91D8C14D711;
+	Wed, 21 Aug 2024 16:40:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724254906; cv=none; b=PSTd57By1x/iAH2jeDDAJG48GFGi/Bx/y2PjGZ3DYgBj+1T3SMmX1rGIHlr/dMcuiLv0nTIow4fCR0TX/QDS543zE7ZZiOD14XIivl+owl1wjARfYkYsLjvcP30p1cyOzmxmmhsS7i8l35ZMr5naqQ71R2YZbM8p/KHQaYzCcRg=
+	t=1724258409; cv=none; b=WpuFYcpIBiyw7x1YkYYhKJvLZATBV4f6PVVXsL6zta4lrI7ZKvwFJxxs4vjGmT6oFzNaTI2Uzi6VysGmPJWcWs3VOZhCL5hIIIpzkLZ6c3Og9LTx3ogxK1A9fIluWaFY7DDA+GAC1q6P+x+SOO2HHgoipAwl6tLP4YAxgfsdfhQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724254906; c=relaxed/simple;
-	bh=BLH9SkxYE4yfg6HFGTT/3WoZIwvr55jwIJ65h/1hzsQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=SboxGW6r+TesRT3/3bsjymdXb3VRHB0n4lZobIUAu9JwpvUqLZkP1jvqxpyq3Qa8QKWUiMfP1r4Tb37xOGdS8hXXmrNHBmFav/BZCuRXrqljF9yvwLgVUkDrQWFlMBGsUu8c3o3n4KmJZPnnR/g59O0hi5BiOQS6tyeQKiLPEDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7DD2B152B;
-	Wed, 21 Aug 2024 08:42:10 -0700 (PDT)
-Received: from e122027.cambridge.arm.com (e122027.cambridge.arm.com [10.1.37.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 34ADF3F8A4;
-	Wed, 21 Aug 2024 08:41:41 -0700 (PDT)
-From: Steven Price <steven.price@arm.com>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Cc: Steven Price <steven.price@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Will Deacon <will@kernel.org>,
+	s=arc-20240116; t=1724258409; c=relaxed/simple;
+	bh=i/mb4Rdm8eNfaYVfTxUHpcRDCFr7vBDdRywXy1aBhUs=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ELl2gVEtBR75bp/ARMT9PLwbR8UviAP2L5/yVbo1ka/UrQr5dF3D/vsmM4z+xdyo/Mf0mSOdSF68+zvDn0MNn2kAqlLjSFojOH09lMIeydvT4hkjWQdKpTWpVrhtacHh0Wiy214ZFrkcQXplNnb1hwtKZm3ybGr3CVUXv88YoQ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BTPlLGzf; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BTPlLGzf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F387C32781;
+	Wed, 21 Aug 2024 16:40:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724258409;
+	bh=i/mb4Rdm8eNfaYVfTxUHpcRDCFr7vBDdRywXy1aBhUs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=BTPlLGzf/rOkRoEuCyFLMupInG7QL2OgmLGETnQ58eRmBS4n98NCXkUelAv6kDSRj
+	 /dDmsjnsGzfVULXN1LHRIVMGsAyCfF04ZPrEB8LeonXypLtVOMAJr6holszVqYSBxK
+	 O3uJmezyDePmzqiqs7xV1ng8uacA/ZQ9BHsP1+ls8kvpBJJK7sHYmU9S0FoyHYWzmK
+	 +qkYW4cSQOT+XQypkaXVB1+Wa2uzYOpo5s6sW4cr37YID+xaDxqgufo+Hw30LRkZyI
+	 fQnMMAcX/w7NXAgsdIkCkbmEPzj9sFnlSWE3N2vT1zqQBNlASp+/kfXesNvGrv2Qrd
+	 UlJZOe3rLuBEg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sgoNT-005fap-2M;
+	Wed, 21 Aug 2024 17:40:07 +0100
+Date: Wed, 21 Aug 2024 17:40:06 +0100
+Message-ID: <86bk1lygm1.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>
-Subject: [PATCH v4 43/43] KVM: arm64: Allow activating realms
-Date: Wed, 21 Aug 2024 16:38:44 +0100
-Message-Id: <20240821153844.60084-44-steven.price@arm.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240821153844.60084-1-steven.price@arm.com>
-References: <20240821153844.60084-1-steven.price@arm.com>
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/2] KVM: arm64: Control visibility of S1PIE related sysregs to userspace
+In-Reply-To: <5304749b-04c8-44f4-b4de-b2d0cef61169@sirena.org.uk>
+References: <20240821-kvm-arm64-hide-pie-regs-v1-0-08cb3c79cb57@kernel.org>
+	<86ed6ixa32.wl-maz@kernel.org>
+	<e123ee24-2a0c-4ab3-8dc3-2906bf96f38d@sirena.org.uk>
+	<86cym2x7cv.wl-maz@kernel.org>
+	<5304749b-04c8-44f4-b4de-b2d0cef61169@sirena.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add the ioctl to activate a realm and set the static branch to enable
-access to the realm functionality if the RMM is detected.
+On Wed, 21 Aug 2024 16:19:59 +0100,
+Mark Brown <broonie@kernel.org> wrote:
+> 
+> On Wed, Aug 21, 2024 at 03:45:20PM +0100, Marc Zyngier wrote:
+> 
+> > Ultimately, we need to revisit the way we deal with visibility, as
+> > adding a myriad of helpers checking a combination of features doesn't
+> > scale. That information should exist as a static table, just like the
+> > trap bits.
+> 
+> Indeed, I was wondering about just adding a description of the relevant
+> ID register field to the sys_regs table.
 
-Signed-off-by: Steven Price <steven.price@arm.com>
----
- arch/arm64/kvm/rme.c | 19 ++++++++++++++++++-
- 1 file changed, 18 insertions(+), 1 deletion(-)
+You'd need more than that.
 
-diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
-index 9f415411d3b5..1eeef9e15d1c 100644
---- a/arch/arm64/kvm/rme.c
-+++ b/arch/arm64/kvm/rme.c
-@@ -1194,6 +1194,20 @@ static int kvm_init_ipa_range_realm(struct kvm *kvm,
- 	return realm_init_ipa_state(realm, addr, end);
- }
- 
-+static int kvm_activate_realm(struct kvm *kvm)
-+{
-+	struct realm *realm = &kvm->arch.realm;
-+
-+	if (kvm_realm_state(kvm) != REALM_STATE_NEW)
-+		return -EINVAL;
-+
-+	if (rmi_realm_activate(virt_to_phys(realm->rd)))
-+		return -ENXIO;
-+
-+	WRITE_ONCE(realm->state, REALM_STATE_ACTIVE);
-+	return 0;
-+}
-+
- /* Protects access to rme_vmid_bitmap */
- static DEFINE_SPINLOCK(rme_vmid_lock);
- static unsigned long *rme_vmid_bitmap;
-@@ -1343,6 +1357,9 @@ int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
- 		r = kvm_populate_realm(kvm, &args);
- 		break;
- 	}
-+	case KVM_CAP_ARM_RME_ACTIVATE_REALM:
-+		r = kvm_activate_realm(kvm);
-+		break;
- 	default:
- 		r = -EINVAL;
- 		break;
-@@ -1599,5 +1616,5 @@ void kvm_init_rme(void)
- 	if (rme_vmid_init())
- 		return;
- 
--	/* Future patch will enable static branch kvm_rme_is_available */
-+	static_branch_enable(&kvm_rme_is_available);
- }
+How would you express the visibility of TCR2_EL2? It depends on both
+ID_AA64PFR0_EL1.EL2==1 *and* ID_AA64MMFR3_EL1.TCRX==1. So it cannot be
+just a single tuple { idreg, field, value }. It needs to be an
+arbitrary conjunction of those.
+
+The good news is that it is a much smaller table than the monster trap
+routing table: it is "enum vcpu_sysreg" plus things that are
+synthesised (anything with a .get_user callback).
+
+	M.
+
 -- 
-2.34.1
-
+Without deviation from the norm, progress is not possible.
