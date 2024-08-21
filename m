@@ -1,58 +1,54 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 309277BB14;
-	Wed, 21 Aug 2024 10:59:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 130601B5314;
+	Wed, 21 Aug 2024 10:59:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724237945; cv=none; b=koSAYtcJwKRk2SN/CDXSdrXnnFNSuz3Y5dY2ZWQU2g5HSZMXQYPa8BZ/o22TzgdgmWdBcpSs2CGry0Mtvz2Sbg/Twds9M0YeB8HBYV27gPTYzaVuE20ptRls68QqBs9RVPEoTzWh/O8CewWvlxTG6yIQbfZ2MAc2A9fToQALBWI=
+	t=1724237996; cv=none; b=QAVbfLWbOKrCaxAD5cYzRVrJ/tnmma/3Q6IcHTGkSd7PPn2hUCKLpB2FQrKUVMdXD7V3dPh/7jpZsqG925JnxYas02xByG8IAQIWyWeTCCCeGQdVCZ+MY3xGQnqekGRyPQUhAVzgfXvocqgYc6z5HU2Lm7scTfePPDMu64PfsKM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724237945; c=relaxed/simple;
-	bh=6VtQ654ZipmwCUWFmVP4piOvyD/1VFnoOAb687T2AYM=;
+	s=arc-20240116; t=1724237996; c=relaxed/simple;
+	bh=oG3C/CyEhEg8t+4o65Fl/gjP36ABhhIxycBx70x7ZH8=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BdP45ZD64okK/kFzlti4zQ8agI3S3BaXSSwJvW+HyyuxDSk0bZdjUpHSmTDnfuXOWp5DVThHgbZgYkSwBKPT5eKXYQ2qSyLBzN6U11EKMjyhE6zSpu3c7+clDTN7Qjxigk1BP9EX6qflZf6YKIEASNECcMvFW05xIFzyW9dEBbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JqOK4Tp8; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=eR5FhhmoqFRgcK9mkBazr6avzmsmFJdq4iHRhWqjnHHCaYzQtullk18LoFWtHNdgwYJ9DBcgaK1/y9nxizESPOLY4ozBlmmHH5L9XdDJs9qKRa7e9ihSPm6NHVO3XByj0cs8ECIQ9clcfy4VAek6Gzj4b8kKpc3NROTysAMsC4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CFUdtImv; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JqOK4Tp8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98B4AC32782;
-	Wed, 21 Aug 2024 10:59:04 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CFUdtImv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A9E0C4AF0C;
+	Wed, 21 Aug 2024 10:59:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724237944;
-	bh=6VtQ654ZipmwCUWFmVP4piOvyD/1VFnoOAb687T2AYM=;
+	s=k20201202; t=1724237995;
+	bh=oG3C/CyEhEg8t+4o65Fl/gjP36ABhhIxycBx70x7ZH8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=JqOK4Tp8kjl/H7p9XVAPCs/YbKZ2lCYJYbalErDH+pX9g2W8k8dGyBAx4Uysw9uTG
-	 LZgF/UwmrnEAQLLH2zoDDKHbj5FKcs1lIEY0V3XtIkhrsgbrm9N4ctIvPxCulJrv8g
-	 Q4jA5FKnUPihHi1ULapkwcOCkcTObb6fbpaf+d/fOZnIvbJ559k0OYZkR/jE016afQ
-	 mcLWE63gpgkd/mW9Lyjtkp5M9zEy2/0hUBfUSx93wOGGdRpRZ77RaFo151VhwZfnel
-	 v/agk5+UD12Ss0bUNlfeHVd+dCxYAXm1foxwHGQPpTQCG47ssM4/Q5fvyvfpcZTmjg
-	 2X8RCLYV26Dug==
+	b=CFUdtImvk8zS41kpFawufI6p4JNkgaHn5CMkgARWa4eIdl/F0mEWRMSgGJvnUF3Ml
+	 0esBag33idw/qWD+W40FjGSH8+8Sfk7NJFkbh0zuA15k07uFu30JGlMee86Hf+UqUy
+	 BrbmUg1bsrpabAt9ktKw3y+h+hyW05Z5h6750luRf0gmb0TmRaHJgh8nu/9320KKMb
+	 +2CxKHvpk3Nk4rGh51B9ROhB/nmWPYCTjFgwN147Z32uMDxwiI+7K2DjxRup/hG7G/
+	 bgrlu826uk5P64OejOaJusJddyJUAd6EFLQ28Ed8igCSRJs28oVqVZg05iNEh3+mRV
+	 iBRe0IoFg0mnQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sgj3O-005Y81-1P;
-	Wed, 21 Aug 2024 11:59:02 +0100
-Date: Wed, 21 Aug 2024 11:59:01 +0100
-Message-ID: <86msl6xhu2.wl-maz@kernel.org>
+	id 1sgj4D-005YAo-3D;
+	Wed, 21 Aug 2024 11:59:53 +0100
+Date: Wed, 21 Aug 2024 11:59:52 +0100
+Message-ID: <86le0qxhsn.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Kunkun Jiang <jiangkunkun@huawei.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>,
-	Oliver Upton <oliver.upton@linux.dev>,
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	"open list:IRQ SUBSYSTEM" <linux-kernel@vger.kernel.org>,
-	"moderated\
- list:ARM SMMU DRIVERS" <linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>,
-	"wanghaibin.wang@huawei.com"
-	<wanghaibin.wang@huawei.com>,
-	<nizhiqiang1@huawei.com>,
-	"tangnianyao@huawei.com" <tangnianyao@huawei.com>,
-	<wangzhou1@hisilicon.com>
-Subject: Re: [bug report] GICv4.1: multiple vpus execute vgic_v4_load at the same time will greatly increase the time consumption
-In-Reply-To: <a7fc58e4-64c2-77fc-c1dc-f5eb78dbbb01@huawei.com>
-References: <a7fc58e4-64c2-77fc-c1dc-f5eb78dbbb01@huawei.com>
+	Alexander Potapenko <glider@google.com>,
+	stable@vger.kernel.org
+Subject: Re: [PATCH 01/12] KVM: arm64: Make ICC_*SGI*_EL1 undef in the absence of a vGICv3
+In-Reply-To: <ZsUOtp9kfpqm1enx@linux.dev>
+References: <20240820100349.3544850-1-maz@kernel.org>
+	<20240820100349.3544850-2-maz@kernel.org>
+	<ZsUOtp9kfpqm1enx@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -62,86 +58,36 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: jiangkunkun@huawei.com, tglx@linutronix.de, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, wanghaibin.wang@huawei.com, nizhiqiang1@huawei.com, tangnianyao@huawei.com, wangzhou1@hisilicon.com
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, glider@google.com, stable@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 21 Aug 2024 10:51:27 +0100,
-Kunkun Jiang <jiangkunkun@huawei.com> wrote:
->=20
-> Hi all,
->=20
-> Recently I discovered a problem about GICv4.1, the scenario is as follows:
-> 1. Enable GICv4.1
-> 2. Create multiple VMs.For example, 50 VMs(4U8G)
+On Tue, 20 Aug 2024 22:46:30 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> On Tue, Aug 20, 2024 at 11:03:38AM +0100, Marc Zyngier wrote:
+> > On a system with a GICv3, if a guest hasn't been configured with
+> > GICv3 and that the host is not capable of GICv2 emulation,
+> > a write to any of the ICC_*SGI*_EL1 registers is trapped to EL2.
+> > 
+> > We therefore try to emulate the SGI access, only to hit a NULL
+> > pointer as no private interrupt is allocated (no GIC, remember?).
+> > 
+> > The obvious fix is to give the guest what it deserves, in the
+> > shape of a UNDEF exception.
+> > 
+> > Reported-by: Alexander Potapenko <glider@google.com>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > Cc: stable@vger.kernel.org
+> 
+> LGTM, and just as an FYI I do plan on grabbing this for 6.11
 
-I don't know what 4U8G means. On how many physical CPUs are you
-running 50 VMs? Direct injection of interrupts and over-subscription
-are fundamentally incompatible.
-
-> 3. The business running in VMs has a frequent mmio access and need to exit
-> =C2=A0 to qemu for processing.
-> 4. Or modify the kvm code so that wfi must trap to kvm
-> 5. Then the utilization of pcpu where the vcpu is located will be 100%,and
-> =C2=A0 basically all in sys.
-
-What did you expect? If you trap all the time, your performance will
-suck.  Don't do that.
-
-> 6. This problem does not exist in GICv3.
-
-Because GICv3 doesn't have the same constraints.
-
->=20
-> According to analysis, this problem is due to the execution of vgic_v4_lo=
-ad.
-> vcpu_load or kvm_sched_in
-> =C2=A0=C2=A0=C2=A0 kvm_arch_vcpu_load
-> =C2=A0=C2=A0=C2=A0 ...
-> =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 vgic_v4_load
-> =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 irq_set_affinity
-> =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 ...
-> =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=
-=A0 irq_do_set_affinity
-> =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=
-=A0 =C2=A0=C2=A0=C2=A0 raw_spin_lock(&tmp_mask_lock)
-> =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=
-=A0 =C2=A0=C2=A0=C2=A0 chip->irq_set_affinity
-> =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=
-=A0 =C2=A0=C2=A0=C2=A0 ...
-> =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=
-=A0 =C2=A0=C2=A0=C2=A0 =C2=A0 its_vpe_set_affinity
->=20
-> The tmp_mask_lock is the key. This is a global lock. I don't quite
-> understand
-> why tmp_mask_lock is needed here. I think there are two possible
-> solutions here:
-> 1. Remove this tmp_mask_lock
-
-Maybe you could have a look at 33de0aa4bae98 (and 11ea68f553e24)? It
-would allow you to understand the nature of the problem.
-
-This can probably be replaced with a per-CPU cpumask, which would
-avoid the locking, but potentially result in a larger memory usage.
-
-> 2. Modify the gicv4 driver,do not perfrom VMOVP via
-> irq_set_affinity.
-
-Sure. You could also not use KVM at all if don't care about interrupts
-being delivered to your VM. We do not send a VMOVP just for fun. We
-send it because your vcpu has moved to a different CPU, and the ITS
-needs to know about that.
-
-You seem to be misunderstanding the use case for GICv4: a partitioned
-system, without any over-subscription, no vcpu migration between CPUs.
-If that's not your setup, then GICv4 will always be a net loss
-compared to SW injection with GICv3 (additional HW interaction,
-doorbell interrupts).
+Great, thanks. Are you planning to route this via arm64, given that
+Paolo is away for a bit?
 
 	M.
 
---=20
+-- 
 Without deviation from the norm, progress is not possible.
