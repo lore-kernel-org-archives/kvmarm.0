@@ -1,84 +1,176 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B55F2D03B;
-	Thu, 22 Aug 2024 16:15:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20966282FC;
+	Thu, 22 Aug 2024 16:15:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724343329; cv=none; b=N97WHKnDVD0Z2oKHWLJx59LaSz/WEyZ0nMFq2StOaKC7k7iKSkK57CTZ0e7QazoswLSm+x7dyni6mb+ygCzqoE/t6Q1Mw+w9ybMmhtf55uDi9G2dl6DUDkiHaMKr8UYl57vOB7yadwvN4IETrTOZaMyo9Sn+8RoAoI8jMURToVA=
+	t=1724343358; cv=none; b=Z8zvJBIQUq9lHNPccFQi9u5kCn9U3ASAazt4QxwFG6fC50x3xKuIS33+c9yAV44Ey84rcT2YfN2yjJCDaQgqLkNgg+PBqofCezYPCXmukZtp5g5JhZOytmmmrbQtn7H9787v85MRLibzfnKq/yeknXgBOlDCEB0AM9ivJyJVlo0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724343329; c=relaxed/simple;
-	bh=1uX7PcR4Ki0mG7RlhQG8n+uohdePjIJKoDnD5+Tuxv8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jyuX7/vyIFJkJGrFWf6n2YNj7Wnsf8vf6sAdc0TrGenNAhIqBH7Fo4Jb/OSmVh0wJHwp42NltKTRp6L8PAzNuYi9i0/tGiaWgxACOpLwB1y+k7dNIHMv5DswYnKKaGpAX6OegA8hK+ak/Iz6Mwu3qzXtCeXo2dBHzA7wP8knjVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39F58C32782;
-	Thu, 22 Aug 2024 16:15:23 +0000 (UTC)
-Date: Thu, 22 Aug 2024 17:15:20 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Mark Brown <broonie@kernel.org>
-Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Florian Weimer <fweimer@redhat.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
-	Ross Burton <ross.burton@arm.com>,
-	Yury Khrustalev <yury.khrustalev@arm.com>,
-	Wilco Dijkstra <wilco.dijkstra@arm.com>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v11 20/39] arm64/gcs: Context switch GCS state for EL0
-Message-ID: <ZsdkGJb93LjLUyzo@arm.com>
-References: <20240822-arm64-gcs-v11-0-41b81947ecb5@kernel.org>
- <20240822-arm64-gcs-v11-20-41b81947ecb5@kernel.org>
+	s=arc-20240116; t=1724343358; c=relaxed/simple;
+	bh=A3rEyuw2kdPrbN4L/IO6fUCvnPWSPIRA8UpE8wG6wCU=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kZsU1M1IbT0rjbcOXYC3VCzActUEmxAnG5PnJkmP/+r3PLcIw7vg2RvA+9OyNPfz5QY3rlmXiB1RRp/9ACcYivzBMqeVeZpcM5X1coLr78St1Uoj77qQ80G96qsGYGw6+REXmJJZaGiDirYNMAKzWivVhpWWTk1ECEb9y60gY4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i5yY+Fbv; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i5yY+Fbv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3F09C32782;
+	Thu, 22 Aug 2024 16:15:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724343357;
+	bh=A3rEyuw2kdPrbN4L/IO6fUCvnPWSPIRA8UpE8wG6wCU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=i5yY+Fbvpx9C1LUn6wYiZ8SwL98ThhxDnRFGQinMyiamLNu4FTyOhQG+PSml4njHF
+	 vCz67ipdBEjiaoY0ietjKiZRwSmZdk1CEsvd29juDiCWCmBumbKqi9Gb8CaI8j5Lik
+	 sA8F9oS1HVTZdfk3ny0fJg4AuXi1blgSkCt+nDjmnAzStLSJZD/ZlTZhSncASmTJte
+	 Aag+2pTju3/aCb9JwEKcdWBxOJerhm/ZIvYgzj4AJPIcojBSVLdQyRjBaCL3UIClD8
+	 UgpyJymZDBlus6rXBdaCzLgjDsZpk/vGc5HV5dmMxmpWg1fJtTgjmcxYKnU8tcn2bU
+	 7nJjj/8B7aIQA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1shATb-00613P-4B;
+	Thu, 22 Aug 2024 17:15:55 +0100
+Date: Thu, 22 Aug 2024 17:15:54 +0100
+Message-ID: <8634mwy1mt.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sebastian Ene <sebastianene@google.com>
+Cc: akpm@linux-foundation.org,
+	alexghiti@rivosinc.com,
+	ankita@nvidia.com,
+	ardb@kernel.org,
+	catalin.marinas@arm.com,
+	christophe.leroy@csgroup.eu,
+	james.morse@arm.com,
+	vdonnefort@google.com,
+	mark.rutland@arm.com,
+	oliver.upton@linux.dev,
+	rananta@google.com,
+	ryan.roberts@arm.com,
+	shahuang@redhat.com,
+	suzuki.poulose@arm.com,
+	will@kernel.org,
+	yuzenghui@huawei.com,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kernel-team@android.com
+Subject: Re: [PATCH v8 5/6] KVM: arm64: Initialize the ptdump parser with stage-2 attributes
+In-Reply-To: <86plq3xoly.wl-maz@kernel.org>
+References: <20240816123906.3683425-1-sebastianene@google.com>
+	<20240816123906.3683425-6-sebastianene@google.com>
+	<86plq3xoly.wl-maz@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240822-arm64-gcs-v11-20-41b81947ecb5@kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: sebastianene@google.com, akpm@linux-foundation.org, alexghiti@rivosinc.com, ankita@nvidia.com, ardb@kernel.org, catalin.marinas@arm.com, christophe.leroy@csgroup.eu, james.morse@arm.com, vdonnefort@google.com, mark.rutland@arm.com, oliver.upton@linux.dev, rananta@google.com, ryan.roberts@arm.com, shahuang@redhat.com, suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, Aug 22, 2024 at 02:15:23AM +0100, Mark Brown wrote:
-> There are two registers controlling the GCS state of EL0, GCSPR_EL0 which
-> is the current GCS pointer and GCSCRE0_EL1 which has enable bits for the
-> specific GCS functionality enabled for EL0. Manage these on context switch
-> and process lifetime events, GCS is reset on exec().  Also ensure that
-> any changes to the GCS memory are visible to other PEs and that changes
-> from other PEs are visible on this one by issuing a GCSB DSYNC when
-> moving to or from a thread with GCS.
+On Tue, 20 Aug 2024 15:20:25 +0100,
+Marc Zyngier <maz@kernel.org> wrote:
 > 
-> Since the current GCS configuration of a thread will be visible to
-> userspace we store the configuration in the format used with userspace
-> and provide a helper which configures the system register as needed.
+> On Fri, 16 Aug 2024 13:39:05 +0100,
+> Sebastian Ene <sebastianene@google.com> wrote:
+> > 
+> > Define a set of attributes used by the ptdump parser to display the
+> > properties of a guest memory region covered by a pagetable descriptor.
+> > Build a description of the pagetable levels and initialize the parser
+> > with this configuration.
+> > 
+> > Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> > ---
+> >  arch/arm64/kvm/ptdump.c | 135 ++++++++++++++++++++++++++++++++++++++--
+> >  1 file changed, 129 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
+> > index 52483d56be2e..79be07ec3c3c 100644
+> > --- a/arch/arm64/kvm/ptdump.c
+> > +++ b/arch/arm64/kvm/ptdump.c
+> > @@ -14,6 +14,51 @@
+> >  #include <kvm_ptdump.h>
+> >  
+> >  
+> > +#define MARKERS_LEN		(2)
+> > +#define KVM_PGTABLE_MAX_LEVELS	(KVM_PGTABLE_LAST_LEVEL + 1)
+> > +
+> > +struct kvm_ptdump_guest_state {
+> > +	struct kvm		*kvm;
+> > +	struct ptdump_pg_state	parser_state;
+> > +	struct addr_marker	ipa_marker[MARKERS_LEN];
+> > +	struct ptdump_pg_level	level[KVM_PGTABLE_MAX_LEVELS];
+> > +	struct ptdump_range	range[MARKERS_LEN];
+> > +};
+> > +
+> > +static const struct ptdump_prot_bits stage2_pte_bits[] = {
+> > +	{
+> > +		.mask	= PTE_VALID,
+> > +		.val	= PTE_VALID,
+> > +		.set	= " ",
+> > +		.clear	= "F",
+> > +	}, {
+> > +		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | PTE_VALID,
+> > +		.val	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | PTE_VALID,
+> > +		.set	= "R",
+> > +		.clear	= " ",
+> > +	}, {
+> > +		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W | PTE_VALID,
+> > +		.val	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W | PTE_VALID,
+> > +		.set	= "W",
+> > +		.clear	= " ",
+> > +	}, {
+> > +		.mask	= KVM_PTE_LEAF_ATTR_HI_S2_XN | PTE_VALID,
+> > +		.val	= PTE_VALID,
+> > +		.set	= " ",
+> > +		.clear	= "X",
+> > +	}, {
+> > +		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_AF | PTE_VALID,
+> > +		.val	= KVM_PTE_LEAF_ATTR_LO_S2_AF | PTE_VALID,
+> > +		.set	= "AF",
+> > +		.clear	= "  ",
+> > +	}, {
+> > +		.mask	= PTE_TABLE_BIT | PTE_VALID,
+> > +		.val	= PTE_VALID,
+> > +		.set	= "BLK",
+> > +		.clear	= "   ",
+> > +	},
+> > +};
+> > +
+> >  static int kvm_ptdump_visitor(const struct kvm_pgtable_visit_ctx *ctx,
+> >  			      enum kvm_pgtable_walk_flags visit)
+> >  {
+> > @@ -40,15 +85,81 @@ static int kvm_ptdump_show_common(struct seq_file *m,
+> >  	return kvm_pgtable_walk(pgtable, 0, BIT(pgtable->ia_bits), &walker);
+> >  }
+> >  
+> > +static int kvm_ptdump_build_levels(struct ptdump_pg_level *level, u32 start_lvl)
+> > +{
+> > +	static const char * const level_names[] = {"PGD", "PUD", "PMD", "PTE"};
 > 
-> On systems that support GCS we always allow access to GCSPR_EL0, this
-> facilitates reporting of GCS faults if userspace implements disabling of
-> GCS on error - the GCS can still be discovered and examined even if GCS
-> has been disabled.
-> 
-> Signed-off-by: Mark Brown <broonie@kernel.org>
+> How about 5 level page tables, which we support since v6.8? The
+> architecture uses a SL=-1 in this case, and I have the feeling this is
+> going to expose in a lovely way, given that you use a u32 for
+> start_level... :-/
 
-We could do with a bit more code comments around GCSB DSYNC but
-otherwise it looks fine now.
+Talking to Oliver, I just had an epiphany: we never have a 5th level
+with KVM, because we always use concatenated page tables at the start
+level. So the depth is still 4 levels, but we get up to 16 pages at
+level 0, and that's how we expand the IPA space from 48 to 52 bits.
 
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+So by the look of it, your code should still be OK with only 4 levels.
+
+Apologies for leading you in the wrong direction.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
