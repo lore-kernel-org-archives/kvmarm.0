@@ -1,20 +1,20 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FE0E1C93D9;
-	Thu, 22 Aug 2024 11:31:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3295E17DE06;
+	Thu, 22 Aug 2024 11:32:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724326269; cv=none; b=evr+/6QYN/hf6EJG2qKTFMO5kvtl5yGhK1XAYygWL0LVH5Cf7AA+//lMNRqy8JynIeIGYEIiXS0GBvhNbeFhtRsga6lzdJPRm3OIoBHrmJxUTIKdw2B4ZR7Ezd6/+V2B0F9rFaGaXR21ia6XQSM2CtLojbMdG7AYx10yn9zBIpQ=
+	t=1724326323; cv=none; b=DGiCw51+SC5f5FylkrsuaVQ4o1V5LC4hfNf32jSu7TVV3hyxXveJlT2GBea7wPXncFVnDh3HfBlaPznoze3V1xLIGkGStPFsVz53obdE87ElmKQ2x56u50Jr2masHmHd3H6Ul8pTUdypS5Z/QDeS5jp3WFJWipCF/JDBfHJ2KH0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724326269; c=relaxed/simple;
-	bh=TYqshyijczK+66nni4qIL01IOJseL8EmB+RHuiK2eHU=;
+	s=arc-20240116; t=1724326323; c=relaxed/simple;
+	bh=ahYQxnZlDKF67DiooDXeohmk++gTfdE7lJjaYpBT67Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lxabrNOLfFqZ4WwUfCUUgtLwOFb9SZnrltuyO/2xO+HNJBtECOpIufsJjEBwwTWqRW2u+2UWWF6C/gBQsoshvEFosV3RQ3XTpUlsqYCSJ7CJBB68BisYV/5MF0t+JoD29Xx1EW4uEHFnHrgPFwnhLKXOEa23Oe9xZv/FYWuLeWU=
+	 Content-Type:Content-Disposition:In-Reply-To; b=SVvTAjIPLxySkIKyp3iITiHnm7P3BBE6aH1RmXTwQBNq4B18v4jghgNP4gh91JZRfCsvI8duDGKxoAa27zyALAkULCnB9Oa5g6lNtE4s+Ozn1uihPi+/lgtzgbFhF8qKqB36Y9GorFHnsY0r3cqtB4wyNQPVWGh9iutSYUGlUKY=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FAABC4AF0B;
-	Thu, 22 Aug 2024 11:31:03 +0000 (UTC)
-Date: Thu, 22 Aug 2024 12:31:01 +0100
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3579BC32782;
+	Thu, 22 Aug 2024 11:31:57 +0000 (UTC)
+Date: Thu, 22 Aug 2024 12:31:55 +0100
 From: Catalin Marinas <catalin.marinas@arm.com>
 To: Mark Brown <broonie@kernel.org>
 Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
@@ -44,10 +44,10 @@ Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
 	linux-arch@vger.kernel.org, linux-mm@kvack.org,
 	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v11 17/39] arm64/hwcap: Add hwcap for GCS
-Message-ID: <ZschddrfehjVUMXw@arm.com>
+Subject: Re: [PATCH v11 18/39] arm64/traps: Handle GCS exceptions
+Message-ID: <Zschq9JbvIRjmXVR@arm.com>
 References: <20240822-arm64-gcs-v11-0-41b81947ecb5@kernel.org>
- <20240822-arm64-gcs-v11-17-41b81947ecb5@kernel.org>
+ <20240822-arm64-gcs-v11-18-41b81947ecb5@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -56,10 +56,22 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240822-arm64-gcs-v11-17-41b81947ecb5@kernel.org>
+In-Reply-To: <20240822-arm64-gcs-v11-18-41b81947ecb5@kernel.org>
 
-On Thu, Aug 22, 2024 at 02:15:20AM +0100, Mark Brown wrote:
-> Provide a hwcap to enable userspace to detect support for GCS.
+On Thu, Aug 22, 2024 at 02:15:21AM +0100, Mark Brown wrote:
+> A new exception code is defined for GCS specific faults other than
+> standard load/store faults, for example GCS token validation failures,
+> add handling for this. These faults are reported to userspace as
+> segfaults with code SEGV_CPERR (protection error), mirroring the
+> reporting for x86 shadow stack errors.
+> 
+> GCS faults due to memory load/store operations generate data aborts with
+> a flag set, these will be handled separately as part of the data abort
+> handling.
+> 
+> Since we do not currently enable GCS for EL1 we should not get any faults
+> there but while we're at it we wire things up there, treating any GCS
+> fault as fatal.
 > 
 > Reviewed-by: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
 > Signed-off-by: Mark Brown <broonie@kernel.org>
