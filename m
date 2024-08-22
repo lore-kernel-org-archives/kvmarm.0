@@ -1,22 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C43731CE6F9;
-	Thu, 22 Aug 2024 17:19:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A2DA1D12E4;
+	Thu, 22 Aug 2024 17:30:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724347190; cv=none; b=W0qH3MchrLoyy3qjki2hEYSnYhYsYR2xadsAZgcHJRlhStVSLWFQk6AkHqIgL93uSIBptrPbWdwVxkwWBN7UK1FVG8lwTnHDGIFZAUrNzRcxg9n8Rc4esdZ2uOum85KD5CJDhz0Sxgzs0pZhHgz5hygFOVRimWauVHqazo4UWZk=
+	t=1724347859; cv=none; b=EN4vgeKd9UBvupeYtuj48maAkCelVdXmx5QJJNoqD6Rrad3KUuQo0OmPW6W5eUQ9FR2SfCYzpha6qxYxvuKofBcHjjXaAl1iPfcVjr3A/Al52rSgmICLjR8pBOXrCQe67hrrXBiLc8PMLcWQQPDbvDNKTA8+X+7L1kP+BfofmuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724347190; c=relaxed/simple;
-	bh=Y9AE9hh59polEoeUWWiPw1U6I0GOY7hTVod5vDQs2Po=;
+	s=arc-20240116; t=1724347859; c=relaxed/simple;
+	bh=NEmbbg8L2Bfrsg3LdNNpLmYp7+z/wYUOhdnFgomJAhI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B6tJgFWdKxkXaKOfgiIBeCXHtzFbvEhucVpUhgCsHuK42JXfVCieO2slzf24kJkHld3pIjv9ULk8kRFTsDNyQCJOWDpeifSAVvY2fJgwc1WL20r7FwgeM1JDjJ4e5QVIJ1mDOHQy8qTrtTstdBpBOVAbdD9gttrFdAYAabuNDrA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82D34C32782;
-	Thu, 22 Aug 2024 17:19:44 +0000 (UTC)
-Date: Thu, 22 Aug 2024 18:19:38 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Mark Brown <broonie@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=gybwa6OqavMFZ0iZ7crZJrRWkBs9xfd0n3tvXGTmJNp2z4d0g+D++906PbqBV+9uy5V9jxUeWAJ9fphWB0iZRQOWo1abM180D9B5H3qybzkcowG8e4F1x5QSntP6ZJ0B1P2nkhYsciW5+S+EcKPOKT263VwJP4JMt9wEWi7xvsw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ikqtAQwt; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ikqtAQwt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85044C32782;
+	Thu, 22 Aug 2024 17:30:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724347859;
+	bh=NEmbbg8L2Bfrsg3LdNNpLmYp7+z/wYUOhdnFgomJAhI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ikqtAQwtRrEpLzRohAGA+qNmOG+TVb1qThYeB20Y/Rk8LI7FU0VJET/gHeWL16BXq
+	 QZJfX39NMfafJ1FzVkN4ltE2CZW3ItKeVYt8IycDgCeLLfuh0r2uRLDWZ04/PypHs6
+	 s+MGNZPewB6jtWVhV7hrSdK3dA9ZJDHvvHhPAtsfxbo5lcriqWLIPch63YvNEb7bvj
+	 mKT4+II0xSVQPbirmPqGpXOCJtrJ5BOwbz+S2JpDOkZcFSQI6txfB5pByPQr/Jo0Mu
+	 8SvR/xM9sWHMARckle6xSHr228r6G6hj9zO2NXqWhsK7TG51FQwJDp+RQ7WZOdHsEf
+	 rIBkFTrNQkZOg==
+Date: Thu, 22 Aug 2024 18:30:55 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Catalin Marinas <catalin.marinas@arm.com>
 Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
 	Andrew Morton <akpm@linux-foundation.org>,
 	Marc Zyngier <maz@kernel.org>,
@@ -45,52 +57,74 @@ Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
 	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-riscv@lists.infradead.org
 Subject: Re: [PATCH v11 19/39] arm64/mm: Handle GCS data aborts
-Message-ID: <ZsdzKrTbrolW0lHn@arm.com>
+Message-ID: <Zsd1zxJ1n5-_lpbx@finisterre.sirena.org.uk>
 References: <20240822-arm64-gcs-v11-0-41b81947ecb5@kernel.org>
  <20240822-arm64-gcs-v11-19-41b81947ecb5@kernel.org>
  <ZsdjbsDrMWgBU9Hj@arm.com>
  <Zsdq4ymaW0vQffH_@finisterre.sirena.org.uk>
+ <ZsdzKrTbrolW0lHn@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="QBL8uS70EYGjHk3p"
+Content-Disposition: inline
+In-Reply-To: <ZsdzKrTbrolW0lHn@arm.com>
+X-Cookie: Your love life will be... interesting.
+
+
+--QBL8uS70EYGjHk3p
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Zsdq4ymaW0vQffH_@finisterre.sirena.org.uk>
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 22, 2024 at 05:44:19PM +0100, Mark Brown wrote:
-> On Thu, Aug 22, 2024 at 05:12:30PM +0100, Catalin Marinas wrote:
-> > On Thu, Aug 22, 2024 at 02:15:22AM +0100, Mark Brown wrote:
-> 
-> > > +static bool is_invalid_gcs_access(struct vm_area_struct *vma, u64 esr)
-> 
-> > > +	} else if (unlikely(vma->vm_flags & VM_SHADOW_STACK)) {
-> > > +		/* Only GCS operations can write to a GCS page */
-> > > +		return is_write_abort(esr);
-> > > +	}
-> 
-> > I don't think that's right. The ESR on this path may not even indicate a
-> > data abort and ESR.WnR bit check wouldn't make sense.
-> 
-> > I presume we want to avoid an infinite loop on a (writeable) GCS page
-> > when the user does a normal STR but the CPU raises a permission fault. I
-> > think this function needs to just return false if !esr_is_data_abort().
-> 
-> Yes, that should check for a data abort.  I think I'd formed the
-> impression that is_write_abort() included that check somehow.  As you
-> say it's to avoid spinning trying to resolve a permission fault for a
-> write (non-GCS reads to a GCS page are valid), I do think we need the 
-> is_write_abort() since non-GCS reads are valid so something like:
-> 
-> 	if (!esr_is_data_abort(esr))
-> 		return false;
-> 
-> 	return is_write_abort(esr);
+On Thu, Aug 22, 2024 at 06:19:38PM +0100, Catalin Marinas wrote:
+> On Thu, Aug 22, 2024 at 05:44:19PM +0100, Mark Brown wrote:
+> > On Thu, Aug 22, 2024 at 05:12:30PM +0100, Catalin Marinas wrote:
+> > > On Thu, Aug 22, 2024 at 02:15:22AM +0100, Mark Brown wrote:
+> >=20
+> > > > +static bool is_invalid_gcs_access(struct vm_area_struct *vma, u64 =
+esr)
+> >=20
+> > > > +	} else if (unlikely(vma->vm_flags & VM_SHADOW_STACK)) {
+> > > > +		/* Only GCS operations can write to a GCS page */
+> > > > +		return is_write_abort(esr);
+> > > > +	}
 
-We do need the write abort check but not unconditionally, only if to a
-GCS page (you can have other genuine write aborts).
+> > Yes, that should check for a data abort.  I think I'd formed the
+> > impression that is_write_abort() included that check somehow.  As you
+> > say it's to avoid spinning trying to resolve a permission fault for a
+> > write (non-GCS reads to a GCS page are valid), I do think we need the=
+=20
+> > is_write_abort() since non-GCS reads are valid so something like:
+> >=20
+> > 	if (!esr_is_data_abort(esr))
+> > 		return false;
+> >=20
+> > 	return is_write_abort(esr);
+>=20
+> We do need the write abort check but not unconditionally, only if to a
+> GCS page (you can have other genuine write aborts).
 
--- 
-Catalin
+tThat was to replace the checks in the above case, not the function as a
+whole.
+
+--QBL8uS70EYGjHk3p
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmbHdcwACgkQJNaLcl1U
+h9DRZgf/cfCggcnTIkzrBOCGpdBnnvrHenLxqYdUHuYxfAA/f/+OY6Ryiz7GiVVN
+dsEg7gYHWwsk0cTwEgGm++++b84foIZ1WeBZ46XlkFKSK0McT1h01SxvUqi6bu3R
+Mj62HWq2M43bg8tVzjIsNFMIZKxKg/8RJVKFsg0KTx/Y4JLXoJkLtplgh4eCuxh0
+Xg0yYgmx4aE7JOYegrvzRVUuj0F6rT8Io3eU7LbdJ4GpP28wCf6jVymCjyhQOHav
+sWHIP3j85jUutzI9HQAsfUt9BnT6GMnKfu16R9nOAdGgfc/XMzzW7lgzRJhLeroa
+kebp1dN/8F8ek5AKqLqstfOmgDdTzg==
+=+1Rr
+-----END PGP SIGNATURE-----
+
+--QBL8uS70EYGjHk3p--
