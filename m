@@ -1,102 +1,201 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B50161CC89A;
-	Thu, 22 Aug 2024 15:06:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0D7B1CB31B
+	for <kvmarm@lists.linux.dev>; Thu, 22 Aug 2024 15:11:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724339185; cv=none; b=lFVpbtUohBcPy+Tc5D9lsTuWkLn2eGwFSuNXowWi4jGtiyg7zGpGjJVBjjS6HxXrFEh2Ut/yrMMYlNBQHJhlo+dwg4wqFZVwP5n9FFSic7u0zpUNsBJu1pTaxbwk8y7EE91qiqy1hD5C9lfCzRr9uaL0y6pXNuIyvzW06ZD4k5U=
+	t=1724339487; cv=none; b=fsXI9eIk9cgL3XOYiP5wYTWg+SbsfSsmmx9M79nO3mpKzVwvyI3qukIvmMuWVU2kOwdTw22wXmT6jRi/wuiTcJQy2JKNTYf4iEcCL4AzwVoC+nj1igQ5qqvoPOwiA5nYl/9/QTo/3EVyFtlofbbtm6bxlpDfMdhzKBIGlJ7xtSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724339185; c=relaxed/simple;
-	bh=QCgSudnWYAHAbhwqPzcmGR64pvLJdT3jGrGJ7AS7PPI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BDe3WhN4OJw3dt0tDh2YRow0tXrHIW2yUfJ6XP47MHBrhrEYi2gNwckRpg95oS8bghGyumaGFBAF90Zwj5TN0d8SpUwoofgFcSCu9vp4fdEgvlKDJpFFeGGQ/tXy6JGOoGhjtdwPoZO4g4n+cWNNJh1E4ThqaekTrQJMvGcykDg=
+	s=arc-20240116; t=1724339487; c=relaxed/simple;
+	bh=/FMZHU5iQ5bZSW66TvGt+m6RFBSaOJTfr8aPbHQt0lA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=n7tTuXmOhAXKg14LvvK4kRPLFvXBUsEpD1fehDWlGSbz20tg2rVG/P1+nPuQFKaoYVBnidJnUl7aSzFRakJp+IoYxpdDQrYf1gjzL0D8q3pFM6gqYKz3Ox1i0TvmSqdlHaE3O6VWBzW+/FwkPQg2fIKVkmtutX47zxk0h7NnaEk=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 51FF5DA7;
-	Thu, 22 Aug 2024 08:06:49 -0700 (PDT)
-Received: from [10.57.85.214] (unknown [10.57.85.214])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 608E83F58B;
-	Thu, 22 Aug 2024 08:06:18 -0700 (PDT)
-Message-ID: <282a765a-3b42-4175-8d9f-58456d13a37d@arm.com>
-Date: Thu, 22 Aug 2024 16:06:16 +0100
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5B47FDA7;
+	Thu, 22 Aug 2024 08:11:50 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3A0263F58B;
+	Thu, 22 Aug 2024 08:11:20 -0700 (PDT)
+From: Joey Gouly <joey.gouly@arm.com>
+To: linux-arm-kernel@lists.infradead.org
+Cc: nd@arm.com,
+	akpm@linux-foundation.org,
+	aneesh.kumar@kernel.org,
+	aneesh.kumar@linux.ibm.com,
+	anshuman.khandual@arm.com,
+	bp@alien8.de,
+	broonie@kernel.org,
+	catalin.marinas@arm.com,
+	christophe.leroy@csgroup.eu,
+	dave.hansen@linux.intel.com,
+	hpa@zytor.com,
+	joey.gouly@arm.com,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linuxppc-dev@lists.ozlabs.org,
+	maz@kernel.org,
+	mingo@redhat.com,
+	mpe@ellerman.id.au,
+	naveen.n.rao@linux.ibm.com,
+	npiggin@gmail.com,
+	oliver.upton@linux.dev,
+	shuah@kernel.org,
+	skhan@linuxfoundation.org,
+	szabolcs.nagy@arm.com,
+	tglx@linutronix.de,
+	will@kernel.org,
+	x86@kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH v5 00/30] Permission Overlay Extension
+Date: Thu, 22 Aug 2024 16:10:43 +0100
+Message-Id: <20240822151113.1479789-1-joey.gouly@arm.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 18/43] arm64: RME: Handle realm enter/exit
-To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>
-References: <20240821153844.60084-1-steven.price@arm.com>
- <20240821153844.60084-19-steven.price@arm.com> <yq5a34mx2of7.fsf@kernel.org>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <yq5a34mx2of7.fsf@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 22/08/2024 05:04, Aneesh Kumar K.V wrote:
-> Steven Price <steven.price@arm.com> writes:
-> 
-> ....
-> 
->> +static int rec_exit_ripas_change(struct kvm_vcpu *vcpu)
->> +{
->> +	struct kvm *kvm = vcpu->kvm;
->> +	struct realm *realm = &kvm->arch.realm;
->> +	struct realm_rec *rec = &vcpu->arch.rec;
->> +	unsigned long base = rec->run->exit.ripas_base;
->> +	unsigned long top = rec->run->exit.ripas_top;
->> +	unsigned long ripas = rec->run->exit.ripas_value & 1;
->> +	unsigned long top_ipa;
->> +	int ret = -EINVAL;
->> +
->> +	if (realm_is_addr_protected(realm, base) &&
->> +	    realm_is_addr_protected(realm, top - 1)) {
->> +		kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_page_cache,
->> +					   kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu));
->> +		write_lock(&kvm->mmu_lock);
->> +		ret = realm_set_ipa_state(vcpu, base, top, ripas, &top_ipa);
->> +		write_unlock(&kvm->mmu_lock);
->> +	}
->> +
->> +	WARN(ret && ret != -ENOMEM,
->> +	     "Unable to satisfy SET_IPAS for %#lx - %#lx, ripas: %#lx\n",
->> +	     base, top, ripas);
->> +
->> +	/* Exit to VMM to complete the change */
->> +	kvm_prepare_memory_fault_exit(vcpu, base, top_ipa - base, false, false,
->> +				      ripas == 1);
->> +
->> +	return 0;
->> +}
->> +
-> 
-> arch/arm64/kvm/rme-exit.c:100:6: warning: variable 'top_ipa' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
->         if (realm_is_addr_protected(realm, base) &&
->             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> arch/arm64/kvm/rme-exit.c:114:44: note: uninitialized use occurs here
->         kvm_prepare_memory_fault_exit(vcpu, base, top_ipa - base, false, false,
->                                                   ^~~~~~~
+Hi all,
 
-I'm not sure why I didn't notice this before, if the condition is false
-then we're hitting the WARN (i.e. this shouldn't happen), but I should
-fix that up to handle the situation better.
+This series implements the Permission Overlay Extension introduced in 2022
+VMSA enhancements [1]. It is based on v6.11-rc4.
 
-Steve
+Changes since v4[2]:
+	- Added Acks and R-bs, thanks!
+	- KVM:
+		- Move POR_EL{0,1} handling inside TCR_EL2 blocks
+		- Add visibility functions for registers [4]
+		- Make ID_AA64MMFR3_EL1 writable
+	- use system_supports_poe() more consistently
+	- use BIT instead of hex constants
+	- fix off-by-one in arch_max_pkey() macro
+	- add PKEY_DISABLE_EXECUTE and PKEY_DISABLE_READ
+	- Update some comments and commit messages.
+	- No change to when we save/restore POR_EL0 for signals!
+
+Conflicts with GCS:
+	- Uses the same (last) bit in HWCAP2
+	- Uses the same VM_HIGH_ARCH_5
+
+Conflicts with arm64 KVM:
+	- Maz has taken patch 8 into one of his own series
+	- I have taken and modified a patch from Maz (patch 9)
+
+The Permission Overlay Extension allows to constrain permissions on memory
+regions. This can be used from userspace (EL0) without a system call or TLB
+invalidation.
+
+POE is used to implement the Memory Protection Keys [3] Linux syscall.
+
+The first few patches add the basic framework, then the PKEYS interface is
+implemented, and then the selftests are made to work on arm64.
+
+I have tested the modified protection_keys test on x86_64, but not PPC.
+I haven't build tested the x86/ppc arch changes.
+
+Thanks,
+Joey
+
+[1] https://community.arm.com/arm-community-blogs/b/architectures-and-processors-blog/posts/arm-a-profile-architecture-2022
+[2] https://lore.kernel.org/linux-arm-kernel/20240503130147.1154804-1-joey.gouly@arm.com/
+[3] Documentation/core-api/protection-keys.rst
+[4] https://lore.kernel.org/linux-arm-kernel/20240806-kvm-arm64-get-reg-list-v2-0-1d3fbc7b6844@kernel.org/
+
+Joey Gouly (30):
+  powerpc/mm: add ARCH_PKEY_BITS to Kconfig
+  x86/mm: add ARCH_PKEY_BITS to Kconfig
+  mm: use ARCH_PKEY_BITS to define VM_PKEY_BITN
+  arm64: disable trapping of POR_EL0 to EL2
+  arm64: cpufeature: add Permission Overlay Extension cpucap
+  arm64: context switch POR_EL0 register
+  KVM: arm64: Save/restore POE registers
+  KVM: arm64: make kvm_at() take an OP_AT_*
+  KVM: arm64: use `at s1e1a` for POE
+  KVM: arm64: Sanitise ID_AA64MMFR3_EL1
+  arm64: enable the Permission Overlay Extension for EL0
+  arm64: re-order MTE VM_ flags
+  arm64: add POIndex defines
+  arm64: convert protection key into vm_flags and pgprot values
+  arm64: mask out POIndex when modifying a PTE
+  arm64: handle PKEY/POE faults
+  arm64: add pte_access_permitted_no_overlay()
+  arm64: implement PKEYS support
+  arm64: add POE signal support
+  arm64/ptrace: add support for FEAT_POE
+  arm64: enable POE and PIE to coexist
+  arm64: enable PKEY support for CPUs with S1POE
+  arm64: add Permission Overlay Extension Kconfig
+  kselftest/arm64: move get_header()
+  selftests: mm: move fpregs printing
+  selftests: mm: make protection_keys test work on arm64
+  kselftest/arm64: add HWCAP test for FEAT_S1POE
+  kselftest/arm64: parse POE_MAGIC in a signal frame
+  kselftest/arm64: Add test case for POR_EL0 signal frame records
+  KVM: selftests: get-reg-list: add Permission Overlay registers
+
+ Documentation/arch/arm64/elf_hwcaps.rst       |   2 +
+ arch/arm64/Kconfig                            |  23 +++
+ arch/arm64/include/asm/cpufeature.h           |   6 +
+ arch/arm64/include/asm/el2_setup.h            |  10 +-
+ arch/arm64/include/asm/hwcap.h                |   1 +
+ arch/arm64/include/asm/kvm_asm.h              |   3 +-
+ arch/arm64/include/asm/kvm_host.h             |   4 +
+ arch/arm64/include/asm/mman.h                 |  10 +-
+ arch/arm64/include/asm/mmu.h                  |   1 +
+ arch/arm64/include/asm/mmu_context.h          |  46 +++++-
+ arch/arm64/include/asm/pgtable-hwdef.h        |  10 ++
+ arch/arm64/include/asm/pgtable-prot.h         |   8 +-
+ arch/arm64/include/asm/pgtable.h              |  34 ++++-
+ arch/arm64/include/asm/pkeys.h                | 108 ++++++++++++++
+ arch/arm64/include/asm/por.h                  |  33 +++++
+ arch/arm64/include/asm/processor.h            |   1 +
+ arch/arm64/include/asm/sysreg.h               |   3 +
+ arch/arm64/include/asm/traps.h                |   1 +
+ arch/arm64/include/asm/vncr_mapping.h         |   1 +
+ arch/arm64/include/uapi/asm/hwcap.h           |   1 +
+ arch/arm64/include/uapi/asm/mman.h            |   9 ++
+ arch/arm64/include/uapi/asm/sigcontext.h      |   7 +
+ arch/arm64/kernel/cpufeature.c                |  23 +++
+ arch/arm64/kernel/cpuinfo.c                   |   1 +
+ arch/arm64/kernel/process.c                   |  28 ++++
+ arch/arm64/kernel/ptrace.c                    |  46 ++++++
+ arch/arm64/kernel/signal.c                    |  62 ++++++++
+ arch/arm64/kernel/traps.c                     |   6 +
+ arch/arm64/kvm/hyp/include/hyp/fault.h        |   5 +-
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h    |  27 ++++
+ arch/arm64/kvm/sys_regs.c                     |  25 +++-
+ arch/arm64/mm/fault.c                         |  55 ++++++-
+ arch/arm64/mm/mmap.c                          |  11 ++
+ arch/arm64/mm/mmu.c                           |  45 ++++++
+ arch/arm64/tools/cpucaps                      |   1 +
+ arch/powerpc/Kconfig                          |   4 +
+ arch/x86/Kconfig                              |   4 +
+ fs/proc/task_mmu.c                            |   2 +
+ include/linux/mm.h                            |  20 ++-
+ include/uapi/linux/elf.h                      |   1 +
+ tools/testing/selftests/arm64/abi/hwcap.c     |  14 ++
+ .../testing/selftests/arm64/signal/.gitignore |   1 +
+ .../arm64/signal/testcases/poe_siginfo.c      |  86 +++++++++++
+ .../arm64/signal/testcases/testcases.c        |  27 +---
+ .../arm64/signal/testcases/testcases.h        |  28 +++-
+ .../selftests/kvm/aarch64/get-reg-list.c      |  14 ++
+ tools/testing/selftests/mm/Makefile           |   2 +-
+ tools/testing/selftests/mm/pkey-arm64.h       | 139 ++++++++++++++++++
+ tools/testing/selftests/mm/pkey-helpers.h     |   8 +
+ tools/testing/selftests/mm/pkey-powerpc.h     |   3 +
+ tools/testing/selftests/mm/pkey-x86.h         |   4 +
+ tools/testing/selftests/mm/protection_keys.c  | 109 ++++++++++++--
+ 52 files changed, 1060 insertions(+), 63 deletions(-)
+ create mode 100644 arch/arm64/include/asm/pkeys.h
+ create mode 100644 arch/arm64/include/asm/por.h
+ create mode 100644 tools/testing/selftests/arm64/signal/testcases/poe_siginfo.c
+ create mode 100644 tools/testing/selftests/mm/pkey-arm64.h
+
+-- 
+2.25.1
 
