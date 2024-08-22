@@ -1,87 +1,96 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E9D326AC1
-	for <kvmarm@lists.linux.dev>; Thu, 22 Aug 2024 17:07:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C43731CE6F9;
+	Thu, 22 Aug 2024 17:19:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724346472; cv=none; b=reIrRebHiYnNEG9X2GaO73sg0MIjvTS8tsyDL8MJeUCjpneRFutmJ2KAue+kgtWLgN886BtOoobxUKwbcfqJqALQ4fFl50VWOyOOXFXhykHorGIyNsEYhyCJKURLkeRsXu8O4kVrJKOJ/CpMcUILQVpL7UbtV57E2X0NLRp6x7A=
+	t=1724347190; cv=none; b=W0qH3MchrLoyy3qjki2hEYSnYhYsYR2xadsAZgcHJRlhStVSLWFQk6AkHqIgL93uSIBptrPbWdwVxkwWBN7UK1FVG8lwTnHDGIFZAUrNzRcxg9n8Rc4esdZ2uOum85KD5CJDhz0Sxgzs0pZhHgz5hygFOVRimWauVHqazo4UWZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724346472; c=relaxed/simple;
-	bh=abNbRCmvXLH/Tfykdx5aUA/V33nTyAAVIElYlJpE8Xk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tQ7laMQX4Ulvi79XQAUm3fO3VSnNyAniCqqMlZfCigRKMQd7nq++x6e0ARuIc+meg6xt4OBqtQr6rG+H651Sby3LLE6Tfes5+5BUo+ZeYz4e/EushOfzbQ+zSLW4sJ4C9n7UTVrkJV6DR3VdtazXUtnDOpF1aWy5JFOfDHlK9bs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PsrTe/Ad; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PsrTe/Ad"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C3FDC32782;
-	Thu, 22 Aug 2024 17:07:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724346471;
-	bh=abNbRCmvXLH/Tfykdx5aUA/V33nTyAAVIElYlJpE8Xk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=PsrTe/AdRmuSs9A3QN/P0kL++3fx/3Z3m29xDI+Cfs+jwvQwX32ZIqOJmPGNFTtBs
-	 ejZP8aJrMZxA2vKJORlj6px1vSSHcCVmUuJUTy28nq3jx9XCwSOk2pw/KHKMtveScB
-	 qMt+yttTXcw4xQZs47+FQF0ps8MCcGveF4OzxbcO4WHnuggS4iw0F5NAcmXtuFDnXZ
-	 7kzN0+FrO9MK7P8wVIS7v8vNA5yEoiuEe1+3aq1UB73CeZkI+75zm25YtQ8mn28yDk
-	 pImp+HdxUDL65SCsqmn6QTHFLIr6nx35pspvf5i1SJdosQicwVWroBUARFOAcyLoeV
-	 j5yPTMLQ9hd2A==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1shBHo-0061zY-VX;
-	Thu, 22 Aug 2024 18:07:49 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Cc: will@kernel.org,
-	catalin.marinas@arm.com,
-	oliver.upton@linux.dev,
-	james.morse@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	wangzhou1@hisilicon.com,
-	linuxarm@huawei.com
-Subject: Re: [PATCH v3] KVM: arm64: Make the exposed feature bits in AA64DFR0_EL1 writable from userspace
-Date: Thu, 22 Aug 2024 18:07:44 +0100
-Message-Id: <172434645587.3704052.425194410416640895.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240816132819.34316-1-shameerali.kolothum.thodi@huawei.com>
-References: <20240816132819.34316-1-shameerali.kolothum.thodi@huawei.com>
+	s=arc-20240116; t=1724347190; c=relaxed/simple;
+	bh=Y9AE9hh59polEoeUWWiPw1U6I0GOY7hTVod5vDQs2Po=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=B6tJgFWdKxkXaKOfgiIBeCXHtzFbvEhucVpUhgCsHuK42JXfVCieO2slzf24kJkHld3pIjv9ULk8kRFTsDNyQCJOWDpeifSAVvY2fJgwc1WL20r7FwgeM1JDjJ4e5QVIJ1mDOHQy8qTrtTstdBpBOVAbdD9gttrFdAYAabuNDrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82D34C32782;
+	Thu, 22 Aug 2024 17:19:44 +0000 (UTC)
+Date: Thu, 22 Aug 2024 18:19:38 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Florian Weimer <fweimer@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
+	Ross Burton <ross.burton@arm.com>,
+	Yury Khrustalev <yury.khrustalev@arm.com>,
+	Wilco Dijkstra <wilco.dijkstra@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v11 19/39] arm64/mm: Handle GCS data aborts
+Message-ID: <ZsdzKrTbrolW0lHn@arm.com>
+References: <20240822-arm64-gcs-v11-0-41b81947ecb5@kernel.org>
+ <20240822-arm64-gcs-v11-19-41b81947ecb5@kernel.org>
+ <ZsdjbsDrMWgBU9Hj@arm.com>
+ <Zsdq4ymaW0vQffH_@finisterre.sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, shameerali.kolothum.thodi@huawei.com, will@kernel.org, catalin.marinas@arm.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, wangzhou1@hisilicon.com, linuxarm@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zsdq4ymaW0vQffH_@finisterre.sirena.org.uk>
 
-On Fri, 16 Aug 2024 14:28:19 +0100, Shameer Kolothum wrote:
-> KVM exposes the OS double lock feature bit to Guests but returns
-> RAZ/WI on Guest OSDLR_EL1 access. This breaks Guest migration between
-> systems where this feature differ. Add support to make this feature
-> writable from userspace by setting the mask bit. While at it, set the
-> mask bits for the exposed WRPs(Number of Watchpoints) as well.
-> Also update the selftest to cover these fields.
+On Thu, Aug 22, 2024 at 05:44:19PM +0100, Mark Brown wrote:
+> On Thu, Aug 22, 2024 at 05:12:30PM +0100, Catalin Marinas wrote:
+> > On Thu, Aug 22, 2024 at 02:15:22AM +0100, Mark Brown wrote:
 > 
-> [...]
+> > > +static bool is_invalid_gcs_access(struct vm_area_struct *vma, u64 esr)
+> 
+> > > +	} else if (unlikely(vma->vm_flags & VM_SHADOW_STACK)) {
+> > > +		/* Only GCS operations can write to a GCS page */
+> > > +		return is_write_abort(esr);
+> > > +	}
+> 
+> > I don't think that's right. The ESR on this path may not even indicate a
+> > data abort and ESR.WnR bit check wouldn't make sense.
+> 
+> > I presume we want to avoid an infinite loop on a (writeable) GCS page
+> > when the user does a normal STR but the CPU raises a permission fault. I
+> > think this function needs to just return false if !esr_is_data_abort().
+> 
+> Yes, that should check for a data abort.  I think I'd formed the
+> impression that is_write_abort() included that check somehow.  As you
+> say it's to avoid spinning trying to resolve a permission fault for a
+> write (non-GCS reads to a GCS page are valid), I do think we need the 
+> is_write_abort() since non-GCS reads are valid so something like:
+> 
+> 	if (!esr_is_data_abort(esr))
+> 		return false;
+> 
+> 	return is_write_abort(esr);
 
-Applied to next, thanks!
+We do need the write abort check but not unconditionally, only if to a
+GCS page (you can have other genuine write aborts).
 
-[1/1] KVM: arm64: Make the exposed feature bits in AA64DFR0_EL1 writable from userspace
-      commit: 980c41f554c3029ce4f99678c0cd95296212775f
-
-Cheers,
-
-	M.
 -- 
-Without deviation from the norm, progress is not possible.
-
-
+Catalin
