@@ -1,130 +1,143 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A2DA1D12E4;
-	Thu, 22 Aug 2024 17:30:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF1A21CEAC8;
+	Thu, 22 Aug 2024 17:44:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724347859; cv=none; b=EN4vgeKd9UBvupeYtuj48maAkCelVdXmx5QJJNoqD6Rrad3KUuQo0OmPW6W5eUQ9FR2SfCYzpha6qxYxvuKofBcHjjXaAl1iPfcVjr3A/Al52rSgmICLjR8pBOXrCQe67hrrXBiLc8PMLcWQQPDbvDNKTA8+X+7L1kP+BfofmuU=
+	t=1724348651; cv=none; b=I16fMfLnj5weDmCCPt8it+w+szEVXZM6y0upUal5bWiIue1BKPOOb3sw1UIbbHQDGXZb3YW4Xql29/Q3PbTxxYkjI8DqDIBmhsalBVcBfCrY1iLeOsn5rlqYj1jzcymhLiQaWZjilI9L8taTZP6Xfbt7se6bc9LD3BiSVGgaCHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724347859; c=relaxed/simple;
-	bh=NEmbbg8L2Bfrsg3LdNNpLmYp7+z/wYUOhdnFgomJAhI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gybwa6OqavMFZ0iZ7crZJrRWkBs9xfd0n3tvXGTmJNp2z4d0g+D++906PbqBV+9uy5V9jxUeWAJ9fphWB0iZRQOWo1abM180D9B5H3qybzkcowG8e4F1x5QSntP6ZJ0B1P2nkhYsciW5+S+EcKPOKT263VwJP4JMt9wEWi7xvsw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ikqtAQwt; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1724348651; c=relaxed/simple;
+	bh=cegSBI2AjOyPEuaaHuikZeuINmD27Fy73BpZBPzkNzk=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JhMrdAY1LKsmQa+SeQ4L+PCIK8tarla/PHhr/WUfup8JJM1NrsV1iquZLzXs8JexC4C/wEOBYKdOkpm58kauBeWl4LdXKfTWnAR9ayGLSXaXjigsJlVumBNXN+gshDnDFX/afOzkDP/ZNG+hQXx3dRu3u8wHQjMjevjdVk61hXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=reLLsGSg; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ikqtAQwt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85044C32782;
-	Thu, 22 Aug 2024 17:30:58 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="reLLsGSg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A86DC32782;
+	Thu, 22 Aug 2024 17:44:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724347859;
-	bh=NEmbbg8L2Bfrsg3LdNNpLmYp7+z/wYUOhdnFgomJAhI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ikqtAQwtRrEpLzRohAGA+qNmOG+TVb1qThYeB20Y/Rk8LI7FU0VJET/gHeWL16BXq
-	 QZJfX39NMfafJ1FzVkN4ltE2CZW3ItKeVYt8IycDgCeLLfuh0r2uRLDWZ04/PypHs6
-	 s+MGNZPewB6jtWVhV7hrSdK3dA9ZJDHvvHhPAtsfxbo5lcriqWLIPch63YvNEb7bvj
-	 mKT4+II0xSVQPbirmPqGpXOCJtrJ5BOwbz+S2JpDOkZcFSQI6txfB5pByPQr/Jo0Mu
-	 8SvR/xM9sWHMARckle6xSHr228r6G6hj9zO2NXqWhsK7TG51FQwJDp+RQ7WZOdHsEf
-	 rIBkFTrNQkZOg==
-Date: Thu, 22 Aug 2024 18:30:55 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
+	s=k20201202; t=1724348651;
+	bh=cegSBI2AjOyPEuaaHuikZeuINmD27Fy73BpZBPzkNzk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=reLLsGSgLLs9TbINYoQ7LtSZaGtIDLxQS/W9uDxZHFpbsxthQyuvo/ybpUdkqcTcm
+	 izWOtRUbKQOcbSvOa0zEdRGk6h8KQrak5UHPyEYUmmpAm7dllRgPVgxZY4hvlhetJz
+	 2Pjk3gMCGXWNyiBD1Q8Xydue9JDyBA2VsqUsaaAXn38SQuOwz7S6AfOs1ERU/CLNic
+	 N8mGvsKnRbAZm0jurtQRG/nxjYBZduwrWFaA4ZSv5rIS/FKsoua6ha3W11YLgHVY6n
+	 d6UoVhJnvYuXyVH7Bhrm/mgkFa7+5Uxgmi36NoanIT9pdsrq6r5C0YRVLRWdJZTU+R
+	 cOrB8Ik/QcFQA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1shBqz-0062ae-4E;
+	Thu, 22 Aug 2024 18:44:09 +0100
+Date: Thu, 22 Aug 2024 18:44:08 +0100
+Message-ID: <861q2gxxjr.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Florian Weimer <fweimer@redhat.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
-	Ross Burton <ross.burton@arm.com>,
-	Yury Khrustalev <yury.khrustalev@arm.com>,
-	Wilco Dijkstra <wilco.dijkstra@arm.com>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v11 19/39] arm64/mm: Handle GCS data aborts
-Message-ID: <Zsd1zxJ1n5-_lpbx@finisterre.sirena.org.uk>
-References: <20240822-arm64-gcs-v11-0-41b81947ecb5@kernel.org>
- <20240822-arm64-gcs-v11-19-41b81947ecb5@kernel.org>
- <ZsdjbsDrMWgBU9Hj@arm.com>
- <Zsdq4ymaW0vQffH_@finisterre.sirena.org.uk>
- <ZsdzKrTbrolW0lHn@arm.com>
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/2] KVM: arm64: Control visibility of S1PIE related sysregs to userspace
+In-Reply-To: <ZsdZohZhre-fRmUv@finisterre.sirena.org.uk>
+References: <20240821-kvm-arm64-hide-pie-regs-v1-0-08cb3c79cb57@kernel.org>
+	<86ed6ixa32.wl-maz@kernel.org>
+	<e123ee24-2a0c-4ab3-8dc3-2906bf96f38d@sirena.org.uk>
+	<86cym2x7cv.wl-maz@kernel.org>
+	<5304749b-04c8-44f4-b4de-b2d0cef61169@sirena.org.uk>
+	<86bk1lygm1.wl-maz@kernel.org>
+	<ZsdZohZhre-fRmUv@finisterre.sirena.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="QBL8uS70EYGjHk3p"
-Content-Disposition: inline
-In-Reply-To: <ZsdzKrTbrolW0lHn@arm.com>
-X-Cookie: Your love life will be... interesting.
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Thu, 22 Aug 2024 16:30:42 +0100,
+Mark Brown <broonie@kernel.org> wrote:
+> 
+> [1  <text/plain; us-ascii (quoted-printable)>]
+> On Wed, Aug 21, 2024 at 05:40:06PM +0100, Marc Zyngier wrote:
+> > Mark Brown <broonie@kernel.org> wrote:
+> 
+> > > Indeed, I was wondering about just adding a description of the relevant
+> > > ID register field to the sys_regs table.
+> 
+> > You'd need more than that.
+> 
+> > How would you express the visibility of TCR2_EL2? It depends on both
+> > ID_AA64PFR0_EL1.EL2==1 *and* ID_AA64MMFR3_EL1.TCRX==1. So it cannot be
+> > just a single tuple { idreg, field, value }. It needs to be an
+> > arbitrary conjunction of those.
+> 
+> I haven't done an audit for fun cases to see how viable things are, for
+> the EL2 cases I'd just have an encoding based check for EL2 rather than
+> explicitly enumerating the ID register for each EL2.  That seemed
+> quicker and less error prone.
 
---QBL8uS70EYGjHk3p
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Sure, you can do that. Or rather, you can do that *right now*. But
+that's not what the architecture says (there is no statement saying
+that Op1==4 for an EL2 register). So the forward-looking way to do it
+is to match the full encoding of a register against the properties
+that define its existence.  Anything else is a short lived hack, and I
+don't care much for them.
 
-On Thu, Aug 22, 2024 at 06:19:38PM +0100, Catalin Marinas wrote:
-> On Thu, Aug 22, 2024 at 05:44:19PM +0100, Mark Brown wrote:
-> > On Thu, Aug 22, 2024 at 05:12:30PM +0100, Catalin Marinas wrote:
-> > > On Thu, Aug 22, 2024 at 02:15:22AM +0100, Mark Brown wrote:
-> >=20
-> > > > +static bool is_invalid_gcs_access(struct vm_area_struct *vma, u64 =
-esr)
-> >=20
-> > > > +	} else if (unlikely(vma->vm_flags & VM_SHADOW_STACK)) {
-> > > > +		/* Only GCS operations can write to a GCS page */
-> > > > +		return is_write_abort(esr);
-> > > > +	}
+But a simple way to deal with that is to encode a property that checks
+a vcpu creation property (EL2, PAuth...).
 
-> > Yes, that should check for a data abort.  I think I'd formed the
-> > impression that is_write_abort() included that check somehow.  As you
-> > say it's to avoid spinning trying to resolve a permission fault for a
-> > write (non-GCS reads to a GCS page are valid), I do think we need the=
-=20
-> > is_write_abort() since non-GCS reads are valid so something like:
-> >=20
-> > 	if (!esr_is_data_abort(esr))
-> > 		return false;
-> >=20
-> > 	return is_write_abort(esr);
->=20
-> We do need the write abort check but not unconditionally, only if to a
-> GCS page (you can have other genuine write aborts).
+> 
+> The other cases I'm aware of are more along the lines of features
+> restricting the values other features/idregs can have (eg, for SME the
+> information in ID_AA64PFR1_EL1.SME can also be gleaned from
+> ID_AA64SMFR0_EL1.SMEver).
 
-tThat was to replace the checks in the above case, not the function as a
-whole.
+Well, they don't quite advertise the same thing. If you decode the
+feature specification, you get:
 
---QBL8uS70EYGjHk3p
-Content-Type: application/pgp-signature; name="signature.asc"
+(FEAT_SME <-> (AArch64 ID_AA64PFR1_EL1.SME >= 1))
+(FEAT_SME2 --> (AArch64 ID_AA64SMFR0_EL1.SMEver >= 1))
+(FEAT_SME2 --> (AArch64 ID_AA64PFR1_EL1.SME >= 2))
+(((AArch64 ID_AA64SMFR0_EL1.SMEver >= 1) || (AArch64 ID_AA64PFR1_EL1.SME >= 2)) --> FEAT_SME2)
+(FEAT_SME2p1 <-> (AArch64 ID_AA64SMFR0_EL1.SMEver >= 2))
 
------BEGIN PGP SIGNATURE-----
+So SME isn't really advertised in SMEver, SME2 is advertised in both
+(and it is enough that one advertises SME2 for the feature to be
+present), and SME2p1 is only advertised in SMEver.
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmbHdcwACgkQJNaLcl1U
-h9DRZgf/cfCggcnTIkzrBOCGpdBnnvrHenLxqYdUHuYxfAA/f/+OY6Ryiz7GiVVN
-dsEg7gYHWwsk0cTwEgGm++++b84foIZ1WeBZ46XlkFKSK0McT1h01SxvUqi6bu3R
-Mj62HWq2M43bg8tVzjIsNFMIZKxKg/8RJVKFsg0KTx/Y4JLXoJkLtplgh4eCuxh0
-Xg0yYgmx4aE7JOYegrvzRVUuj0F6rT8Io3eU7LbdJ4GpP28wCf6jVymCjyhQOHav
-sWHIP3j85jUutzI9HQAsfUt9BnT6GMnKfu16R9nOAdGgfc/XMzzW7lgzRJhLeroa
-kebp1dN/8F8ek5AKqLqstfOmgDdTzg==
-=+1Rr
------END PGP SIGNATURE-----
+That's what we need to implement. Yes, this part of the architecture
+is... interesting.
 
---QBL8uS70EYGjHk3p--
+> For those I'm not sure if visibility checks
+> are the best approach, if we should audit the registers when starting
+> the guest to make sure they're self consistent or if we should just pick
+> the most directly relevant register and rely on userspace to enforce
+> consistancy.
+
+We definitely rely on userspace to enforce consistency. If userspace
+messes up, it's "garbage in, garbage out".
+
+We enforce the sysregs visible by the guest and userspace based on
+that, and if that means evaluating 10 registers because there is a
+terrible set of combinations (such as PAuth-like features), so be it.
+We can always find ways to accelerate that.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
