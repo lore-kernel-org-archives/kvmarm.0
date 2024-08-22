@@ -1,143 +1,208 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF1A21CEAC8;
-	Thu, 22 Aug 2024 17:44:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E54D21CEABF
+	for <kvmarm@lists.linux.dev>; Thu, 22 Aug 2024 18:13:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724348651; cv=none; b=I16fMfLnj5weDmCCPt8it+w+szEVXZM6y0upUal5bWiIue1BKPOOb3sw1UIbbHQDGXZb3YW4Xql29/Q3PbTxxYkjI8DqDIBmhsalBVcBfCrY1iLeOsn5rlqYj1jzcymhLiQaWZjilI9L8taTZP6Xfbt7se6bc9LD3BiSVGgaCHA=
+	t=1724350407; cv=none; b=NVGVps6IdcKX7IrHQ8slXPM5ogTe6kLisYlHsiJv2kjV8RTO8VqvQjZzTHDWWOBE4GTUiKpZxfYlPMx1OYksC5Egbc8az0C9aioRStM0r4y8FoEFW/ynbqikXsUyIXjg+4JKAakVdCrELHqzywy4DPph2abJTeShSTM1P6fAMxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724348651; c=relaxed/simple;
-	bh=cegSBI2AjOyPEuaaHuikZeuINmD27Fy73BpZBPzkNzk=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JhMrdAY1LKsmQa+SeQ4L+PCIK8tarla/PHhr/WUfup8JJM1NrsV1iquZLzXs8JexC4C/wEOBYKdOkpm58kauBeWl4LdXKfTWnAR9ayGLSXaXjigsJlVumBNXN+gshDnDFX/afOzkDP/ZNG+hQXx3dRu3u8wHQjMjevjdVk61hXs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=reLLsGSg; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1724350407; c=relaxed/simple;
+	bh=7W6AaAuvGbYK5j4uwqemfKmyhu4/qcf4rmyVPrUi8po=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fNGcQArBRnCj67H5GsBp4fe8J+K3YxEGRSY83xAHq/+YGGvK8Ygs3w3SEOe9CU49J4VTViTGbjWAhmuKm1Uoczw+UAFaft6YQnuygS55jDsCAXt3DQGBARd1Ur4OO2ApxC1dt30tE+yypMYb9YaliiY3urW4h63tcFPsWwH6Z7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vbKho2Bc; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="reLLsGSg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A86DC32782;
-	Thu, 22 Aug 2024 17:44:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724348651;
-	bh=cegSBI2AjOyPEuaaHuikZeuINmD27Fy73BpZBPzkNzk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=reLLsGSgLLs9TbINYoQ7LtSZaGtIDLxQS/W9uDxZHFpbsxthQyuvo/ybpUdkqcTcm
-	 izWOtRUbKQOcbSvOa0zEdRGk6h8KQrak5UHPyEYUmmpAm7dllRgPVgxZY4hvlhetJz
-	 2Pjk3gMCGXWNyiBD1Q8Xydue9JDyBA2VsqUsaaAXn38SQuOwz7S6AfOs1ERU/CLNic
-	 N8mGvsKnRbAZm0jurtQRG/nxjYBZduwrWFaA4ZSv5rIS/FKsoua6ha3W11YLgHVY6n
-	 d6UoVhJnvYuXyVH7Bhrm/mgkFa7+5Uxgmi36NoanIT9pdsrq6r5C0YRVLRWdJZTU+R
-	 cOrB8Ik/QcFQA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1shBqz-0062ae-4E;
-	Thu, 22 Aug 2024 18:44:09 +0100
-Date: Thu, 22 Aug 2024 18:44:08 +0100
-Message-ID: <861q2gxxjr.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/2] KVM: arm64: Control visibility of S1PIE related sysregs to userspace
-In-Reply-To: <ZsdZohZhre-fRmUv@finisterre.sirena.org.uk>
-References: <20240821-kvm-arm64-hide-pie-regs-v1-0-08cb3c79cb57@kernel.org>
-	<86ed6ixa32.wl-maz@kernel.org>
-	<e123ee24-2a0c-4ab3-8dc3-2906bf96f38d@sirena.org.uk>
-	<86cym2x7cv.wl-maz@kernel.org>
-	<5304749b-04c8-44f4-b4de-b2d0cef61169@sirena.org.uk>
-	<86bk1lygm1.wl-maz@kernel.org>
-	<ZsdZohZhre-fRmUv@finisterre.sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vbKho2Bc"
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-428f5c0833bso12082425e9.0
+        for <kvmarm@lists.linux.dev>; Thu, 22 Aug 2024 11:13:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1724350404; x=1724955204; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=V/anGTvjJVK/2MoIj/z7y54NxrhSiznN5JcZCeLu05A=;
+        b=vbKho2Bcd0TponKes46/ydHVO5bBy8wDBaN4N5xrWXK7MJA5O6ikmbe9kxh/banEhQ
+         BBQJhgh90mrKoNdAQEVPpgJR2jwbyF58oTxPQRS4PFadLF9Jm3BeKz2Tx7oQ3dnpxZfd
+         0mt5uIlUuITli3xZRK9JKaUmvRxo3nn346KE6Uyi/+2ucoKeVirGnmx4j2yxfuHRCRCt
+         XWqbA9/E1BNXsZkThxxmmp+9lje1jSJS/3qCM/KOPtQDsQDyldCvRtEtIJWzlpBhGu4K
+         gv8XVvbAjENy9qM5pr5U22uosu/B7en7/8auj4BVVpaagGzfyQeWcS/9e8laNRw8Bo4o
+         QRJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724350404; x=1724955204;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=V/anGTvjJVK/2MoIj/z7y54NxrhSiznN5JcZCeLu05A=;
+        b=lM94aVNU751r96HCrTJM9R//XMG9FExJkrASiPMVt9WC/5l/x/4iGh8uxMp1C9l9ru
+         W5J7GktC9YcQrueJLRYTyAEfc4aMWTCqUnnku+pyVHCdfOSG0fUi2VhfR4GWTUDNIPBU
+         UBXRXZGneVDeKIn//cr4Z7ofl31LAzVNAFLf9qK+N+spYOmX7rKa6a8yAr5/3tlPtMz8
+         9SpRp9i6354TrgRVxsX5bFuJ25Phqk/4azo4tku1G3Kx2ZOW7tNQfEPQBpARcLCcLBUd
+         5KdcP1aw/B7RyFHhEeeui48a+V2fNMPbATaP68ljcsWP/dYSYQ5Kg5Ql/jc20QUp/YHY
+         LNQw==
+X-Forwarded-Encrypted: i=1; AJvYcCXjuiyw2hyo3PzLljvsTCA8V8wIgDb1uF4d9tbZ1mvhzfezIAlQZfuG4/Pp8dLbjtmduCzAq88=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxL2sFmJIWurJcDddbfGM8WGrk2j3kN5x8lVjDlzlJpc5Is5+0b
+	dnKfOLtZaJaztmIC4ANhIM0BUb70mqg8+oATUYvOuA4XRfMR0zbuClkESu+q93UWXm1J8RKSzYI
+	OrMlcnGKLwxDcT+O18XE8U6n9LYbkeXSlioQ=
+X-Google-Smtp-Source: AGHT+IGrIgUIJwt0UKI7HXbF269KMJ2021VtmSioDifbs+8lZRKMvAZ7kztHIsKImKLVPEof7MrOkToAtKTzsxe9aI4=
+X-Received: by 2002:a5d:68c9:0:b0:371:846d:558d with SMTP id
+ ffacd0b85a97d-373052a6d02mr2299460f8f.34.1724350403725; Thu, 22 Aug 2024
+ 11:13:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20240805173234.3542917-1-vdonnefort@google.com> <20240805173234.3542917-5-vdonnefort@google.com>
+In-Reply-To: <20240805173234.3542917-5-vdonnefort@google.com>
+From: John Stultz <jstultz@google.com>
+Date: Thu, 22 Aug 2024 11:13:11 -0700
+Message-ID: <CANDhNCoWvBn=h3ENEM9bbJO8LBVh5m=3vw79Bawr3e4NE4UMSQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 04/11] timekeeping: Export the boot clock in snapshots
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: rostedt@goodmis.org, mhiramat@kernel.org, 
+	linux-trace-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev, 
+	kvmarm@lists.linux.dev, will@kernel.org, qperret@google.com, 
+	kernel-team@android.com, Thomas Gleixner <tglx@linutronix.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 22 Aug 2024 16:30:42 +0100,
-Mark Brown <broonie@kernel.org> wrote:
-> 
-> [1  <text/plain; us-ascii (quoted-printable)>]
-> On Wed, Aug 21, 2024 at 05:40:06PM +0100, Marc Zyngier wrote:
-> > Mark Brown <broonie@kernel.org> wrote:
-> 
-> > > Indeed, I was wondering about just adding a description of the relevant
-> > > ID register field to the sys_regs table.
-> 
-> > You'd need more than that.
-> 
-> > How would you express the visibility of TCR2_EL2? It depends on both
-> > ID_AA64PFR0_EL1.EL2==1 *and* ID_AA64MMFR3_EL1.TCRX==1. So it cannot be
-> > just a single tuple { idreg, field, value }. It needs to be an
-> > arbitrary conjunction of those.
-> 
-> I haven't done an audit for fun cases to see how viable things are, for
-> the EL2 cases I'd just have an encoding based check for EL2 rather than
-> explicitly enumerating the ID register for each EL2.  That seemed
-> quicker and less error prone.
+On Mon, Aug 5, 2024 at 10:33=E2=80=AFAM 'Vincent Donnefort' via kernel-team
+<kernel-team@android.com> wrote:
+>
+> On arm64 systems, the arch timer can be accessible by both EL1 and EL2.
+> This means when running with nVHE or protected KVM, it is easy to
+> generate clock values from the hypervisor, synchronized with the kernel.
+>
+> For tracing purpose, the boot clock is interesting as it doesn't stop on
+> suspend. Export it as part of the time snapshot. This will later allow
+> the hypervisor to add boot clock timestamps to its events.
+>
+> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+>
+> diff --git a/include/linux/timekeeping.h b/include/linux/timekeeping.h
+> index fc12a9ba2c88..0fc6a61d64bd 100644
+> --- a/include/linux/timekeeping.h
+> +++ b/include/linux/timekeeping.h
+> @@ -275,18 +275,24 @@ struct ktime_timestamps {
+>   *                              counter value
+>   * @cycles:    Clocksource counter value to produce the system times
+>   * @real:      Realtime system time
+> + * @boot:      Boot time
 
-Sure, you can do that. Or rather, you can do that *right now*. But
-that's not what the architecture says (there is no statement saying
-that Op1==4 for an EL2 register). So the forward-looking way to do it
-is to match the full encoding of a register against the properties
-that define its existence.  Anything else is a short lived hack, and I
-don't care much for them.
+So, adding the boottime to this kernel-internal snapshot seems reasonable t=
+o me.
 
-But a simple way to deal with that is to encode a property that checks
-a vcpu creation property (EL2, PAuth...).
+>   * @raw:       Monotonic raw system time
+>   * @cs_id:     Clocksource ID
+>   * @clock_was_set_seq: The sequence number of clock-was-set events
+>   * @cs_was_changed_seq:        The sequence number of clocksource change=
+ events
+> + * @mono_shift:        The monotonic clock slope shift
+> + * @mono_mult: The monotonic clock slope mult
 
-> 
-> The other cases I'm aware of are more along the lines of features
-> restricting the values other features/idregs can have (eg, for SME the
-> information in ID_AA64PFR1_EL1.SME can also be gleaned from
-> ID_AA64SMFR0_EL1.SMEver).
 
-Well, they don't quite advertise the same thing. If you decode the
-feature specification, you get:
+This bit, including the mult/shift pair however, isn't well explained
+and is a little more worrying.
 
-(FEAT_SME <-> (AArch64 ID_AA64PFR1_EL1.SME >= 1))
-(FEAT_SME2 --> (AArch64 ID_AA64SMFR0_EL1.SMEver >= 1))
-(FEAT_SME2 --> (AArch64 ID_AA64PFR1_EL1.SME >= 2))
-(((AArch64 ID_AA64SMFR0_EL1.SMEver >= 1) || (AArch64 ID_AA64PFR1_EL1.SME >= 2)) --> FEAT_SME2)
-(FEAT_SME2p1 <-> (AArch64 ID_AA64SMFR0_EL1.SMEver >= 2))
 
-So SME isn't really advertised in SMEver, SME2 is advertised in both
-(and it is enough that one advertises SME2 for the feature to be
-present), and SME2p1 is only advertised in SMEver.
+> @@ -1074,14 +1076,21 @@ void ktime_get_snapshot(struct system_time_snapsh=
+ot *systime_snapshot)
+>                 systime_snapshot->clock_was_set_seq =3D tk->clock_was_set=
+_seq;
+>                 base_real =3D ktime_add(tk->tkr_mono.base,
+>                                       tk_core.timekeeper.offs_real);
+> +               base_boot =3D ktime_add(tk->tkr_mono.base,
+> +                                     tk_core.timekeeper.offs_boot);
+>                 base_raw =3D tk->tkr_raw.base;
+>                 nsec_real =3D timekeeping_cycles_to_ns(&tk->tkr_mono, now=
+);
+>                 nsec_raw  =3D timekeeping_cycles_to_ns(&tk->tkr_raw, now)=
+;
+> +               mono_mult =3D tk->tkr_mono.mult;
+> +               mono_shift =3D tk->tkr_mono.shift;
+>         } while (read_seqcount_retry(&tk_core.seq, seq));
+>
+>         systime_snapshot->cycles =3D now;
+>         systime_snapshot->real =3D ktime_add_ns(base_real, nsec_real);
+> +       systime_snapshot->boot =3D ktime_add_ns(base_boot, nsec_real);
+>         systime_snapshot->raw =3D ktime_add_ns(base_raw, nsec_raw);
+> +       systime_snapshot->mono_shift =3D mono_shift;
+> +       systime_snapshot->mono_mult =3D mono_mult;
+>  }
+>  EXPORT_SYMBOL_GPL(ktime_get_snapshot);
 
-That's what we need to implement. Yes, this part of the architecture
-is... interesting.
+So this looks like you're trying to stuff kernel timekeeping internal
+values into the snapshot so you can skirt around the timekeeping
+subsystem and generate your own timestamps.
 
-> For those I'm not sure if visibility checks
-> are the best approach, if we should audit the registers when starting
-> the guest to make sure they're self consistent or if we should just pick
-> the most directly relevant register and rely on userspace to enforce
-> consistancy.
+This ends up duplicating logic, but in an incomplete way.  For
+instance, you don't have things like ntp state, etc, so the timestamps
+you generate will not exactly match the kernel, and may have
+discontinuities. :(
 
-We definitely rely on userspace to enforce consistency. If userspace
-messes up, it's "garbage in, garbage out".
+Now for many cases "close enough" is fine. But the difficulty is the
+expectation bar always raises, and eventually "close enough" isn't and
+we have a broken interface that has to be fixed.
 
-We enforce the sysregs visible by the guest and userspace based on
-that, and if that means evaluating 10 registers because there is a
-terrible set of combinations (such as PAuth-like features), so be it.
-We can always find ways to accelerate that.
+That said, I do get the need to have something like this is
+legitimate. There have been a number of cases where external hardware
+(PTP timestamps from NICs) or contexts (virt) are able to record
+hardware clocksource timestamps on their own, and want to be able to
+map that back to the kernel's (or maybe "a kernel's" if there are
+multiple VMs) sense of time.  Sometimes even wanting to do this quite
+a bit later after the timestamp was recorded. The ktime_get_snapshot()
+logic was added in the first place for this reason.
 
-	M.
+Some more aggressive approaches try to dump a bunch of the internal
+kernel timekeeping state out to userland and call it an api.
+See https://lore.kernel.org/lkml/410bbef9771ef8aa51704994a70d5965e367e2ce.c=
+amel@infradead.org/
+for a recent (and thorough) effort there.
 
--- 
-Without deviation from the norm, progress is not possible.
+I'm very much not a fan of this approach, as it mimics older efforts
+for userspace time calculations that were done before we settled on
+VDSOs, which were very fragile and required years of keeping backwards
+compatibility logic to map the current kernel state back to separate
+structures and expensive conversions to different units that userland
+expected.
+
+The benefit with VDSO interface is while the data is exposed to
+userland, the structure is not, and the logic is still kernel
+controlled, so changes to internal state can be done without breaking
+userland.
+
+Something I have been thinking about is maybe it would be beneficial
+to rework the timekeeping core so that given a clocksource timestamp,
+it could calculate the time for that timestamp. While existing apis
+would still do a new read of the clocksource, so the timestamps would
+always increase, an old timestamp could be used to retro-calculate a
+past time.  The thing that prevents this now is that the timekeeping
+core doesn't keep any history, so we can't correctly back-calculate
+times before the last state change. But potentially we could keep a
+buffer of timekeeper states associated with clocksource intervals, and
+so we could find the right state to use for a given clocksource
+timestamp. Now, this would still only work to a point, as we don't
+want to keep tons of historical state.  But then with this, maybe we
+could switch to something more VDSO-like where the PTP drivers or host
+systems could request a time given a timestamp (and probably some
+clocksource id so we can sanity check everyone is using the same
+clock), and we could still provide what they want without having to
+expose all of our state.
+
+Unfortunately though, this is all hand waving and pontificating on my
+part, as it would be a large rework. But it seems something closer
+where we share opaque kernel state along with logic with proper
+syscall like APIs to do the calculations, would be a much better
+approach over just exporting more kernel state as an API.
+
+For a more short term approach, since you can't be exact outside of
+the timekeeping logic, why not interpolate from the data
+ktime_get_snapshot already provides to calculate your own sense of the
+frequency?
+
+thanks
+-john
