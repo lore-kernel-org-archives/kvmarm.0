@@ -1,66 +1,55 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-184.mta1.migadu.com (out-184.mta1.migadu.com [95.215.58.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E55B0A933
-	for <kvmarm@lists.linux.dev>; Thu, 22 Aug 2024 07:33:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33F641547EA
+	for <kvmarm@lists.linux.dev>; Thu, 22 Aug 2024 07:41:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724312013; cv=none; b=OxSqbMgsaze2eaPPPXIK+4II6Js/qt5alYb9S+1SKyVBreiWRk5X0nhm/gTOD5eO+/Y23JEZB1UlPvA507R8VgXIzU7Nx4B20XEGLIgAKwlaBmzrqIJTDX/uyEdSYlSWQusoHFspqRvL/Ua3+nr3c1VfnbhGoXlB6wqQXoD8YRg=
+	t=1724312521; cv=none; b=REfGBp6IPr5IEJL6U9OrecYkuAtldKv+Qm+8C5r6/RdnQN3FkLThA3NLta8AruJDJ9XI1Idi7kbDR8+WeopfXG1aYuley/onmKnrWWyB5kiAFNVIpdSlwNKkvSHeMIXZopR5S5kXJn2+Kh4aoVsknIUOzmW+4r/25MWypH1tDZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724312013; c=relaxed/simple;
-	bh=310Aek93BkPbuEL/1PxxopwHlhe3LDMfjKFLUTPY7ls=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sClzZ1rEQi32Bh2jAzUdNYMQAMVpgEUmhkUjHkLDDH9/tGqHjqEGqbh+E4C6L8KdnRj/w5WeoIvK8tNsvShuWHD1euGIOgHs1KGXFBifIJ5m02Qxd642e/VG2ZmfVIuVTQM90Cze9fN1uuv0BRmiy8eDcLqbdy6fS/AGjvuS9JI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T6NpPomy; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1724312521; c=relaxed/simple;
+	bh=q9y2t5nUcxQ3W70A9lhWmsrgVVZr8gEfCWJ34bzMkg0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=vGeylRnFHC2vUWNKSXGFW30WNi6EKmHHwLTIKZTMSFccIyjhsI0vDRpXK/7KeVNL7/18labx6nKyFVedZOVkVZ/cUuSXvA0ozTNz5A7MGjbE2UDg4kgBPh/t0jBbZL/LveFsEWirKuTloyGBhUOXMIUR1TxwBaoe1jwRBD1IxCA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kzVo1LLq; arc=none smtp.client-ip=95.215.58.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T6NpPomy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C593C4AF09;
-	Thu, 22 Aug 2024 07:33:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724312012;
-	bh=310Aek93BkPbuEL/1PxxopwHlhe3LDMfjKFLUTPY7ls=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=T6NpPomyoXDW10wd0TLz75elFNpM/hNGdu5WtZrE0iLyBfJMICWX4cWPwBppf2lk7
-	 mhXV6vpKzGidUkSvW88aPpdhV2/UBUqHBw/MAv2om+wB68P5YHMOdD/mrwurrY2q8x
-	 HhkRiBNjaDGe12AsTl4ar3ni88nLjQmOZrfg2T5Ea6aCUF/mEIguNST/kBN4EP27OG
-	 jjeAOgh7NVdmwpzrD7lILIx8N7QPULp76shvGnK+yG/JHw86v8JSSFLUcN1otO6Gyy
-	 mEHFBcVnYSMQu6z6rEHaorsUe3GE0eechyLl7phgO9YeExgiJSrnReep8klwkha9xv
-	 0GVJfh0VvmtWA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sh2K2-005qlz-2P;
-	Thu, 22 Aug 2024 08:33:30 +0100
-Date: Thu, 22 Aug 2024 08:33:29 +0100
-Message-ID: <868qwpxb92.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kzVo1LLq"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1724312516;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tcMwRFue1M148124CvwX/uZrRZ+SY+enr1KuPrMg2ow=;
+	b=kzVo1LLqn1CWCuJYm2JymevjTFGG2l92FFxO+SuE7774axaHc3gXxZTQywQ9CqyqXlxoce
+	1smkEsLI/kLh7iHUOY7drADwOjeogrbk42nfpea4jTrXFTXs9q4dyRK1MYClYtyzrGFh5J
+	Lt0bkozQkrz6bpPIF1isK39B9GMuM/8=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Oliver Upton <oliver.upton@linux.dev>,
+	kvmarm@lists.linux.dev
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
 	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
+	Marc Zyngier <maz@kernel.org>
 Subject: Re: [PATCH] KVM: arm64: Ensure canonical IPA is hugepage-aligned when handling fault
+Date: Thu, 22 Aug 2024 07:41:27 +0000
+Message-ID: <172431248188.2300140.11719556919990393962.b4-ty@linux.dev>
 In-Reply-To: <20240822071710.2291690-1-oliver.upton@linux.dev>
 References: <20240822071710.2291690-1-oliver.upton@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, 22 Aug 2024 08:17:09 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
+On Thu, 22 Aug 2024 07:17:09 +0000, Oliver Upton wrote:
 > Zenghui reports that VMs backed by hugetlb pages are no longer booting
 > after commit fd276e71d1e7 ("KVM: arm64: nv: Handle shadow stage 2 page
 > faults").
@@ -70,51 +59,13 @@ Oliver Upton <oliver.upton@linux.dev> wrote:
 > non-nested case, as the hardware stage-2 context is always that of the
 > canonical IPA space.
 > 
-> Both addresses need to be hugepage-aligned when preparing to install a
-> hugepage mapping to ensure that KVM uses the correct GFN->PFN translation
-> and installs that at the correct IPA for the current stage-2.
-> 
-> And now I'm feeling thirsty after all this talk of IPAs...
-> 
-> Fixes: fd276e71d1e7 ("KVM: arm64: nv: Handle shadow stage 2 page faults")
-> Reported-by: Zenghui Yu <yuzenghui@huawei.com>
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
-> 
-> Tested w/ non-nested and nested (well, protected mode) VMs backed
-> using hugepages.
-> 
->  arch/arm64/kvm/mmu.c | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 6981b1bc0946..a509b63bd4dd 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1540,8 +1540,15 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  		vma_pagesize = min(vma_pagesize, (long)max_map_size);
->  	}
->  
-> -	if (vma_pagesize == PMD_SIZE || vma_pagesize == PUD_SIZE)
-> +	/*
-> +	 * Both the canonical IPA and fault IPA must be hugepage-aligned to
-> +	 * ensure we find the right PFN and lay down the mapping in the right
-> +	 * place.
-> +	 */
-> +	if (vma_pagesize == PMD_SIZE || vma_pagesize == PUD_SIZE) {
->  		fault_ipa &= ~(vma_pagesize - 1);
-> +		ipa &= ~(vma_pagesize - 1);
-> +	}
->  
->  	gfn = ipa >> PAGE_SHIFT;
->  	mte_allowed = kvm_vma_mte_allowed(vma);
+> [...]
 
-Rather obvious in retrospect, and I should add some hugetlb-based
-testing to my setup. Thanks both for spotting and fixing it.
+Applied to kvmarm/fixes, thanks!
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
+[1/1] KVM: arm64: Ensure canonical IPA is hugepage-aligned when handling fault
+      https://git.kernel.org/kvmarm/kvmarm/c/1d8c3c23a6bc
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+--
+Best,
+Oliver
