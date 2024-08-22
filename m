@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F033E1CBE94
-	for <kvmarm@lists.linux.dev>; Thu, 22 Aug 2024 15:11:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 687481CC172
+	for <kvmarm@lists.linux.dev>; Thu, 22 Aug 2024 15:11:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724339490; cv=none; b=raJkmI78f3y+CekkMOedxajwTvG40oQ+GP40ESeTzECxxDk349YpYqvyUDXtVE/iXs9aRJT+i7MDV6X5CJ77Rc1guCOpJDsmqTn/mWQSEbkxc3R3ohnjD03IgFOD18TnEaFjATs5ds9ic/nT6jzXzwQgN0u6QYkzesr14PVkRWI=
+	t=1724339494; cv=none; b=uZzpdADTz79kKfNiUIsSGpjMnMRcZQNmdDGhrc9i8i319cjEu683UH9RLI438GvunCH0R0NNQx35v2+eRidtCXneRkS0V9RccDMrJwmYPawbkZyYUDM5TINzQWZR0mzfcKgySER/8xlM2CPmdWKp3fkEzbu8TKUIqcI5OWvNjJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724339490; c=relaxed/simple;
-	bh=mMR77yN/5/U0+rjMRKVDIMUPno5GgLTM0SPRDjSdOhU=;
+	s=arc-20240116; t=1724339494; c=relaxed/simple;
+	bh=OgOF4aP3d/eoPRqHdpUelEtCRZwNWw2rYjXXBRVelPE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=a3Ig5OEFSe1IW4CL1opU2DbIJq0ElVe1KzmDJvtm5q8kezvNntnQpcXBFZQmnq3o5un4Iev6Xe3p7AwfXKvcdObt4W82LPcEH+jVNcb0dTVlSdonuID1TQpAS6IbikG+oe9Lz0/oDuChP1vjCbmWRuo7dK0LZ9btBdWu93KFw3c=
+	 MIME-Version; b=jwcNxfZg5F0NA7vVeo4OWhGC1iLZNwfrbIEsuMh4549RcHRq7iMN+f7QKRHO6TFGZvheRZEpjtN3pbGQKDrTwl36oo3AmCRlE1ScUQkOPpBNlfB7CCoB6je4N2wtyniuu17WUTXYQYR3awOCdNsD7ihXBUmJoSEjzAVeFJqR8GI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A8DFFFEC;
-	Thu, 22 Aug 2024 08:11:54 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 037931576;
+	Thu, 22 Aug 2024 08:11:59 -0700 (PDT)
 Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8A4E13F58B;
-	Thu, 22 Aug 2024 08:11:24 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D92D73F58B;
+	Thu, 22 Aug 2024 08:11:28 -0700 (PDT)
 From: Joey Gouly <joey.gouly@arm.com>
 To: linux-arm-kernel@lists.infradead.org
 Cc: nd@arm.com,
@@ -49,9 +49,9 @@ Cc: nd@arm.com,
 	x86@kernel.org,
 	kvmarm@lists.linux.dev,
 	linux-kselftest@vger.kernel.org
-Subject: [PATCH v5 01/30] powerpc/mm: add ARCH_PKEY_BITS to Kconfig
-Date: Thu, 22 Aug 2024 16:10:44 +0100
-Message-Id: <20240822151113.1479789-2-joey.gouly@arm.com>
+Subject: [PATCH v5 02/30] x86/mm: add ARCH_PKEY_BITS to Kconfig
+Date: Thu, 22 Aug 2024 16:10:45 +0100
+Message-Id: <20240822151113.1479789-3-joey.gouly@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240822151113.1479789-1-joey.gouly@arm.com>
 References: <20240822151113.1479789-1-joey.gouly@arm.com>
@@ -66,32 +66,32 @@ Content-Transfer-Encoding: 8bit
 The new config option specifies how many bits are in each PKEY.
 
 Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-Cc: Michael Ellerman <mpe@ellerman.id.au>
-Cc: Nicholas Piggin <npiggin@gmail.com>
-Cc: Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>
-Cc: "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>
-Cc: linuxppc-dev@lists.ozlabs.org
-Acked-by: Michael Ellerman <mpe@ellerman.id.au>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: Dave Hansen <dave.hansen@linux.intel.com>
+Cc: H. Peter Anvin <hpa@zytor.com>
+Cc: x86@kernel.org
+Acked-by: Dave Hansen <dave.hansen@linux.intel.com>
 ---
- arch/powerpc/Kconfig | 4 ++++
+ arch/x86/Kconfig | 4 ++++
  1 file changed, 4 insertions(+)
 
-diff --git arch/powerpc/Kconfig arch/powerpc/Kconfig
-index d7b09b064a8a..8a4ee57cd4ef 100644
---- arch/powerpc/Kconfig
-+++ arch/powerpc/Kconfig
-@@ -1026,6 +1026,10 @@ config PPC_MEM_KEYS
+diff --git arch/x86/Kconfig arch/x86/Kconfig
+index 007bab9f2a0e..683c0a64efe2 100644
+--- arch/x86/Kconfig
++++ arch/x86/Kconfig
+@@ -1889,6 +1889,10 @@ config X86_INTEL_MEMORY_PROTECTION_KEYS
  
  	  If unsure, say y.
  
 +config ARCH_PKEY_BITS
 +	int
-+	default 5
++	default 4
 +
- config PPC_SECURE_BOOT
- 	prompt "Enable secure boot support"
- 	bool
+ choice
+ 	prompt "TSX enable mode"
+ 	depends on CPU_SUP_INTEL
 -- 
 2.25.1
 
