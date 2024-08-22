@@ -1,208 +1,264 @@
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E54D21CEABF
-	for <kvmarm@lists.linux.dev>; Thu, 22 Aug 2024 18:13:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E777B43165
+	for <kvmarm@lists.linux.dev>; Thu, 22 Aug 2024 20:56:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724350407; cv=none; b=NVGVps6IdcKX7IrHQ8slXPM5ogTe6kLisYlHsiJv2kjV8RTO8VqvQjZzTHDWWOBE4GTUiKpZxfYlPMx1OYksC5Egbc8az0C9aioRStM0r4y8FoEFW/ynbqikXsUyIXjg+4JKAakVdCrELHqzywy4DPph2abJTeShSTM1P6fAMxU=
+	t=1724360194; cv=none; b=a3k4HJcYclBjuY6BAHWTl3CKiMfaPpxd06VNFeYVxVIJGCYBoUapTyb4bTT8fnShGQ1R8R4twJMCJXTfzEY3kWx6322o1eIGcLG47fdUhfDPih0Hq3HM1z7McKAtVZyLnKut3ZdEyqy9udIj+uV+h6ryjXbJtJ57Z+kFIDkpIKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724350407; c=relaxed/simple;
-	bh=7W6AaAuvGbYK5j4uwqemfKmyhu4/qcf4rmyVPrUi8po=;
+	s=arc-20240116; t=1724360194; c=relaxed/simple;
+	bh=8CopyTKSL1XJRyLPsu28ciQkolQndACBLxFByVay1/I=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fNGcQArBRnCj67H5GsBp4fe8J+K3YxEGRSY83xAHq/+YGGvK8Ygs3w3SEOe9CU49J4VTViTGbjWAhmuKm1Uoczw+UAFaft6YQnuygS55jDsCAXt3DQGBARd1Ur4OO2ApxC1dt30tE+yypMYb9YaliiY3urW4h63tcFPsWwH6Z7w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vbKho2Bc; arc=none smtp.client-ip=209.85.128.48
+	 To:Cc:Content-Type; b=tGxrrbzhumF5zPkAjv/3bE3qzvu8E5X2bmSin/3xe5R/TzS85scQyfqdNzqWvMT30peKPpIMnI/y7nqt7bYKzBGqUVeZDsmXTS2mMu/J9ngeMMRRZRBaA+L8WPBYw3Zr0waG05HVK6kUxHpSYLQCa/vYzW19cTafpyCAuYTenTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uRV4PDY9; arc=none smtp.client-ip=209.85.208.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vbKho2Bc"
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-428f5c0833bso12082425e9.0
-        for <kvmarm@lists.linux.dev>; Thu, 22 Aug 2024 11:13:25 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uRV4PDY9"
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5bebb241fddso1708a12.1
+        for <kvmarm@lists.linux.dev>; Thu, 22 Aug 2024 13:56:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724350404; x=1724955204; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1724360191; x=1724964991; darn=lists.linux.dev;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=V/anGTvjJVK/2MoIj/z7y54NxrhSiznN5JcZCeLu05A=;
-        b=vbKho2Bcd0TponKes46/ydHVO5bBy8wDBaN4N5xrWXK7MJA5O6ikmbe9kxh/banEhQ
-         BBQJhgh90mrKoNdAQEVPpgJR2jwbyF58oTxPQRS4PFadLF9Jm3BeKz2Tx7oQ3dnpxZfd
-         0mt5uIlUuITli3xZRK9JKaUmvRxo3nn346KE6Uyi/+2ucoKeVirGnmx4j2yxfuHRCRCt
-         XWqbA9/E1BNXsZkThxxmmp+9lje1jSJS/3qCM/KOPtQDsQDyldCvRtEtIJWzlpBhGu4K
-         gv8XVvbAjENy9qM5pr5U22uosu/B7en7/8auj4BVVpaagGzfyQeWcS/9e8laNRw8Bo4o
-         QRJg==
+        bh=td79jgMjWx4Orz9AL6SJH05EMU9DfYAEJ300uGx7uoE=;
+        b=uRV4PDY9yhzuyL1WGuTbOes+Rs7zdpEPQMtTIf6NkGZS8/WgHjP2HdBY/vOpcbjKSq
+         uScoivah+tDxsOA2nDHtPgORoVcZD9SAhEXLlEl9Wz7cBCwjVfRBIheyrwFS4r75/mI3
+         Jm5v4y0LmdlrTlamt7MOg3HKj3J8LD2UYoKYu0H7cXp85jOIj2NrvC3LE2YR95ltsSFp
+         6Wzmpn7KW37Eawukqlff2bqTraVetMSBBLLlenhJDJm3lBe+LwyShwjUQpBLGq3iUFth
+         pbicbiBnaBRVTSTAaE7Vbgn7DJhXIrPPvpMz6xwvoW9rdV1MvCcJ/IUCTZdLhZ0by210
+         vpxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724350404; x=1724955204;
+        d=1e100.net; s=20230601; t=1724360191; x=1724964991;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=V/anGTvjJVK/2MoIj/z7y54NxrhSiznN5JcZCeLu05A=;
-        b=lM94aVNU751r96HCrTJM9R//XMG9FExJkrASiPMVt9WC/5l/x/4iGh8uxMp1C9l9ru
-         W5J7GktC9YcQrueJLRYTyAEfc4aMWTCqUnnku+pyVHCdfOSG0fUi2VhfR4GWTUDNIPBU
-         UBXRXZGneVDeKIn//cr4Z7ofl31LAzVNAFLf9qK+N+spYOmX7rKa6a8yAr5/3tlPtMz8
-         9SpRp9i6354TrgRVxsX5bFuJ25Phqk/4azo4tku1G3Kx2ZOW7tNQfEPQBpARcLCcLBUd
-         5KdcP1aw/B7RyFHhEeeui48a+V2fNMPbATaP68ljcsWP/dYSYQ5Kg5Ql/jc20QUp/YHY
-         LNQw==
-X-Forwarded-Encrypted: i=1; AJvYcCXjuiyw2hyo3PzLljvsTCA8V8wIgDb1uF4d9tbZ1mvhzfezIAlQZfuG4/Pp8dLbjtmduCzAq88=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxL2sFmJIWurJcDddbfGM8WGrk2j3kN5x8lVjDlzlJpc5Is5+0b
-	dnKfOLtZaJaztmIC4ANhIM0BUb70mqg8+oATUYvOuA4XRfMR0zbuClkESu+q93UWXm1J8RKSzYI
-	OrMlcnGKLwxDcT+O18XE8U6n9LYbkeXSlioQ=
-X-Google-Smtp-Source: AGHT+IGrIgUIJwt0UKI7HXbF269KMJ2021VtmSioDifbs+8lZRKMvAZ7kztHIsKImKLVPEof7MrOkToAtKTzsxe9aI4=
-X-Received: by 2002:a5d:68c9:0:b0:371:846d:558d with SMTP id
- ffacd0b85a97d-373052a6d02mr2299460f8f.34.1724350403725; Thu, 22 Aug 2024
- 11:13:23 -0700 (PDT)
+        bh=td79jgMjWx4Orz9AL6SJH05EMU9DfYAEJ300uGx7uoE=;
+        b=DmLSDza8bzBM7X/EMym4dZFyiXtyoRQcq222VCQjXh3+A3Rq4bhAIov0DQFY6mlg2t
+         x4nucl6/S/LqAJlsiGeyCOp7vgEcMXtDQXkoh57upkbyD9NfNQw+2ojj7UJ3F9VMoI5+
+         cyCP2yQbOz/OaWAXS9xG2U4GidZ7Uiz810BHpQ/tFsx1GcgA2lDSR4VGbevyIsN7XI3r
+         d4WMRNedKGLwnL5bDXsSgWM7Zk8zoehqqFpuVlgS4kqU4dl+uTFbas4YUdtHkEnKojTF
+         a6YjChO3jrVm3SClGgS/djeLCM7YxFzKISemgIBkn3rtLHbYe3jmQDHTMUJrRLdYxBqv
+         /wFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWI1ZwgOQ8icmCC2zYopGxoqX2Bxuzk0VGxQ/Yfu5Scs5lLJgf8vxfU3arRpTFUWC7RFmXV1/0=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyDcRmijtKlYJWwrAyWUS4amx5/AL6kHWj7WLnAw0j0KtNO4VBl
+	pGps/nq4JWK7ZTVT1c1y7QSuiqjl9zE6ednLxmjdw9Yh4tqwFkTXhQ4aTzLaodVTL/n2PhLKiEZ
+	NMZEDjOkTryHfa0YaCmKroeJQ3MlnpKawOf0o
+X-Google-Smtp-Source: AGHT+IHo5tJteyr4d1a/DUKU7A9PBB0j6bhzWnkCmBM6x6M3MSRCZRGoEClRJv71KXRc/RKfYDKJvWl16Yr4u3Ha/UI=
+X-Received: by 2002:a05:6402:1e8f:b0:58b:93:b624 with SMTP id
+ 4fb4d7f45d1cf-5c088db5028mr5636a12.1.1724360190911; Thu, 22 Aug 2024 13:56:30
+ -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20240805173234.3542917-1-vdonnefort@google.com> <20240805173234.3542917-5-vdonnefort@google.com>
-In-Reply-To: <20240805173234.3542917-5-vdonnefort@google.com>
-From: John Stultz <jstultz@google.com>
-Date: Thu, 22 Aug 2024 11:13:11 -0700
-Message-ID: <CANDhNCoWvBn=h3ENEM9bbJO8LBVh5m=3vw79Bawr3e4NE4UMSQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 04/11] timekeeping: Export the boot clock in snapshots
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: rostedt@goodmis.org, mhiramat@kernel.org, 
-	linux-trace-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev, 
-	kvmarm@lists.linux.dev, will@kernel.org, qperret@google.com, 
-	kernel-team@android.com, Thomas Gleixner <tglx@linutronix.de>
+References: <20240821223012.3757828-1-vipinsh@google.com>
+In-Reply-To: <20240821223012.3757828-1-vipinsh@google.com>
+From: Vipin Sharma <vipinsh@google.com>
+Date: Thu, 22 Aug 2024 13:55:54 -0700
+Message-ID: <CAHVum0eSxCTAme8=oV9a=cVaJ9Jzu3-W-3vgbubVZ2qAWVjfJA@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/1] KVM selftests runner for running more than just default
+To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org, 
+	linux-arm-kernel@lists.infradead.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
+	Anup Patel <anup@brainfault.org>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Aug 5, 2024 at 10:33=E2=80=AFAM 'Vincent Donnefort' via kernel-team
-<kernel-team@android.com> wrote:
+Oops! Adding archs mailing list and maintainers which have arch folder
+in tool/testing/selftests/kvm
+
+On Wed, Aug 21, 2024 at 3:30=E2=80=AFPM Vipin Sharma <vipinsh@google.com> w=
+rote:
 >
-> On arm64 systems, the arch timer can be accessible by both EL1 and EL2.
-> This means when running with nVHE or protected KVM, it is easy to
-> generate clock values from the hypervisor, synchronized with the kernel.
+> This series is introducing a KVM selftests runner to make it easier to
+> run selftests with some interesting configurations and provide some
+> enhancement over existing kselftests runner.
 >
-> For tracing purpose, the boot clock is interesting as it doesn't stop on
-> suspend. Export it as part of the time snapshot. This will later allow
-> the hypervisor to add boot clock timestamps to its events.
+> I would like to get an early feedback from the community and see if this
+> is something which can be useful for improving KVM selftests coverage
+> and worthwhile investing time in it. Some specific questions:
 >
-> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+> 1. Should this be done?
+> 2. What features are must?
+> 3. Any other way to write test configuration compared to what is done her=
+e?
 >
-> diff --git a/include/linux/timekeeping.h b/include/linux/timekeeping.h
-> index fc12a9ba2c88..0fc6a61d64bd 100644
-> --- a/include/linux/timekeeping.h
-> +++ b/include/linux/timekeeping.h
-> @@ -275,18 +275,24 @@ struct ktime_timestamps {
->   *                              counter value
->   * @cycles:    Clocksource counter value to produce the system times
->   * @real:      Realtime system time
-> + * @boot:      Boot time
-
-So, adding the boottime to this kernel-internal snapshot seems reasonable t=
-o me.
-
->   * @raw:       Monotonic raw system time
->   * @cs_id:     Clocksource ID
->   * @clock_was_set_seq: The sequence number of clock-was-set events
->   * @cs_was_changed_seq:        The sequence number of clocksource change=
- events
-> + * @mono_shift:        The monotonic clock slope shift
-> + * @mono_mult: The monotonic clock slope mult
-
-
-This bit, including the mult/shift pair however, isn't well explained
-and is a little more worrying.
-
-
-> @@ -1074,14 +1076,21 @@ void ktime_get_snapshot(struct system_time_snapsh=
-ot *systime_snapshot)
->                 systime_snapshot->clock_was_set_seq =3D tk->clock_was_set=
-_seq;
->                 base_real =3D ktime_add(tk->tkr_mono.base,
->                                       tk_core.timekeeper.offs_real);
-> +               base_boot =3D ktime_add(tk->tkr_mono.base,
-> +                                     tk_core.timekeeper.offs_boot);
->                 base_raw =3D tk->tkr_raw.base;
->                 nsec_real =3D timekeeping_cycles_to_ns(&tk->tkr_mono, now=
-);
->                 nsec_raw  =3D timekeeping_cycles_to_ns(&tk->tkr_raw, now)=
-;
-> +               mono_mult =3D tk->tkr_mono.mult;
-> +               mono_shift =3D tk->tkr_mono.shift;
->         } while (read_seqcount_retry(&tk_core.seq, seq));
+> Note, python code written for runner is not optimized but shows how this
+> runner can be useful.
 >
->         systime_snapshot->cycles =3D now;
->         systime_snapshot->real =3D ktime_add_ns(base_real, nsec_real);
-> +       systime_snapshot->boot =3D ktime_add_ns(base_boot, nsec_real);
->         systime_snapshot->raw =3D ktime_add_ns(base_raw, nsec_raw);
-> +       systime_snapshot->mono_shift =3D mono_shift;
-> +       systime_snapshot->mono_mult =3D mono_mult;
->  }
->  EXPORT_SYMBOL_GPL(ktime_get_snapshot);
-
-So this looks like you're trying to stuff kernel timekeeping internal
-values into the snapshot so you can skirt around the timekeeping
-subsystem and generate your own timestamps.
-
-This ends up duplicating logic, but in an incomplete way.  For
-instance, you don't have things like ntp state, etc, so the timestamps
-you generate will not exactly match the kernel, and may have
-discontinuities. :(
-
-Now for many cases "close enough" is fine. But the difficulty is the
-expectation bar always raises, and eventually "close enough" isn't and
-we have a broken interface that has to be fixed.
-
-That said, I do get the need to have something like this is
-legitimate. There have been a number of cases where external hardware
-(PTP timestamps from NICs) or contexts (virt) are able to record
-hardware clocksource timestamps on their own, and want to be able to
-map that back to the kernel's (or maybe "a kernel's" if there are
-multiple VMs) sense of time.  Sometimes even wanting to do this quite
-a bit later after the timestamp was recorded. The ktime_get_snapshot()
-logic was added in the first place for this reason.
-
-Some more aggressive approaches try to dump a bunch of the internal
-kernel timekeeping state out to userland and call it an api.
-See https://lore.kernel.org/lkml/410bbef9771ef8aa51704994a70d5965e367e2ce.c=
-amel@infradead.org/
-for a recent (and thorough) effort there.
-
-I'm very much not a fan of this approach, as it mimics older efforts
-for userspace time calculations that were done before we settled on
-VDSOs, which were very fragile and required years of keeping backwards
-compatibility logic to map the current kernel state back to separate
-structures and expensive conversions to different units that userland
-expected.
-
-The benefit with VDSO interface is while the data is exposed to
-userland, the structure is not, and the logic is still kernel
-controlled, so changes to internal state can be done without breaking
-userland.
-
-Something I have been thinking about is maybe it would be beneficial
-to rework the timekeeping core so that given a clocksource timestamp,
-it could calculate the time for that timestamp. While existing apis
-would still do a new read of the clocksource, so the timestamps would
-always increase, an old timestamp could be used to retro-calculate a
-past time.  The thing that prevents this now is that the timekeeping
-core doesn't keep any history, so we can't correctly back-calculate
-times before the last state change. But potentially we could keep a
-buffer of timekeeper states associated with clocksource intervals, and
-so we could find the right state to use for a given clocksource
-timestamp. Now, this would still only work to a point, as we don't
-want to keep tons of historical state.  But then with this, maybe we
-could switch to something more VDSO-like where the PTP drivers or host
-systems could request a time given a timestamp (and probably some
-clocksource id so we can sanity check everyone is using the same
-clock), and we could still provide what they want without having to
-expose all of our state.
-
-Unfortunately though, this is all hand waving and pontificating on my
-part, as it would be a large rework. But it seems something closer
-where we share opaque kernel state along with logic with proper
-syscall like APIs to do the calculations, would be a much better
-approach over just exporting more kernel state as an API.
-
-For a more short term approach, since you can't be exact outside of
-the timekeeping logic, why not interpolate from the data
-ktime_get_snapshot already provides to calculate your own sense of the
-frequency?
-
-thanks
--john
+> What are the goals?
+> - Run tests with more than just the default settings of KVM module
+>   parameters and test itself.
+> - Capture issues which only show when certain combination of module
+>   parameter and tests options are used.
+> - Provide minimum testing which can be standardised for KVM patches.
+> - Run tests parallely.
+> - Dump output in a hierarchical folder structure for easier tracking of
+>   failures/success output
+> - Feel free to add yours :)
+>
+> Why not use/extend kselftests?
+> - Other submodules goal might not align and its gonna be difficult to
+>   capture broader set of requirements.
+> - Instead of test configuration we will need separate shell scripts
+>   which will act as tests for each test arg and module parameter
+>   combination. This will easily pollute the KVM selftests directory.
+> - Easier to enhance features using Python packages than shell scripts.
+>
+> What this runner do?
+> - Reads a test configuration file (tests.json in patch 1).
+>   Configuration in json are written in hierarchy where multiple suites
+>   exist and each suite contains multiple tests.
+> - Provides a way to execute tests inside a suite parallelly.
+> - Provides a way to dump output to a folder in a hierarchical manner.
+> - Allows to run selected suites, or tests in a specific suite.
+> - Allows to do some setup and teardown for test suites and tests.
+> - Timeout can be provided to limit test execution duration.
+> - Allows to run test suites or tests on specific architecture only.
+>
+> Runner is written in python and goal is to only use standard library
+> constructs. This runner will work on Python 3.6 and up
+>
+> What does a test configuration file looks like?
+> Test configuration are written in json as it is easier to read and has
+> inbuilt package support in Python. Root level is a json array denoting
+> suites and each suite can multiple tests in it using json array.
+>
+> [
+>   {
+>     "suite": "dirty_log_perf_tests",
+>     "timeout_s": 300,
+>     "arch": "x86_64",
+>     "setup": "echo Setting up suite",
+>     "teardown": "echo tearing down suite",
+>     "tests": [
+>       {
+>         "name": "dirty_log_perf_test_max_vcpu_no_manual_protect",
+>         "command": "./dirty_log_perf_test -v $(grep -c ^processor /proc/c=
+puinfo) -g",
+>         "arch": "x86_64",
+>         "setup": "echo Setting up test",
+>         "teardown": "echo tearing down test",
+>         "timeout_s": 5
+>       }
+>     ]
+>   }
+> ]
+>
+> Usage:
+> Runner "runner.py" and test configuration "tests.json" lives in
+> tool/testing/selftests/kvm directory.
+>
+> To run serially:
+> ./runner.py tests.json
+>
+> To run specific test suites:
+> ./runner.py tests.json dirty_log_perf_tests x86_sanity_tests
+>
+> To run specific test in a suite:
+> ./runner.py tests.json x86_sanity_tests/vmx_msrs_test
+>
+> To run everything parallely (runs tests inside a suite parallely):
+> ./runner.py -j 10 tests.json
+>
+> To dump output to disk:
+> ./runner.py -j 10 tests.json -o sample_run
+>
+> Sample output (after removing timestamp, process ID, and logging
+> level columns):
+>
+>   ./runner.py tests.json  -j 10 -o sample_run
+>   PASSED: dirty_log_perf_tests/dirty_log_perf_test_max_vcpu_no_manual_pro=
+tect
+>   PASSED: dirty_log_perf_tests/dirty_log_perf_test_max_vcpu_manual_protec=
+t
+>   PASSED: dirty_log_perf_tests/dirty_log_perf_test_max_vcpu_manual_protec=
+t_random_access
+>   PASSED: dirty_log_perf_tests/dirty_log_perf_test_max_10_vcpu_hugetlb
+>   PASSED: x86_sanity_tests/vmx_msrs_test
+>   SKIPPED: x86_sanity_tests/private_mem_conversions_test
+>   FAILED: x86_sanity_tests/apic_bus_clock_test
+>   PASSED: x86_sanity_tests/dirty_log_page_splitting_test
+>   -----------------------------------------------------------------------=
+---
+>   Test runner result:
+>   1) dirty_log_perf_tests:
+>      1) PASSED: dirty_log_perf_test_max_vcpu_no_manual_protect
+>      2) PASSED: dirty_log_perf_test_max_vcpu_manual_protect
+>      3) PASSED: dirty_log_perf_test_max_vcpu_manual_protect_random_access
+>      4) PASSED: dirty_log_perf_test_max_10_vcpu_hugetlb
+>   2) x86_sanity_tests:
+>      1) PASSED: vmx_msrs_test
+>      2) SKIPPED: private_mem_conversions_test
+>      3) FAILED: apic_bus_clock_test
+>      4) PASSED: dirty_log_page_splitting_test
+>   -----------------------------------------------------------------------=
+---
+>
+> Directory structure created:
+>
+> sample_run/
+> |-- dirty_log_perf_tests
+> |   |-- dirty_log_perf_test_max_10_vcpu_hugetlb
+> |   |   |-- command.stderr
+> |   |   |-- command.stdout
+> |   |   |-- setup.stderr
+> |   |   |-- setup.stdout
+> |   |   |-- teardown.stderr
+> |   |   `-- teardown.stdout
+> |   |-- dirty_log_perf_test_max_vcpu_manual_protect
+> |   |   |-- command.stderr
+> |   |   `-- command.stdout
+> |   |-- dirty_log_perf_test_max_vcpu_manual_protect_random_access
+> |   |   |-- command.stderr
+> |   |   `-- command.stdout
+> |   `-- dirty_log_perf_test_max_vcpu_no_manual_protect
+> |       |-- command.stderr
+> |       `-- command.stdout
+> `-- x86_sanity_tests
+>     |-- apic_bus_clock_test
+>     |   |-- command.stderr
+>     |   `-- command.stdout
+>     |-- dirty_log_page_splitting_test
+>     |   |-- command.stderr
+>     |   |-- command.stdout
+>     |   |-- setup.stderr
+>     |   |-- setup.stdout
+>     |   |-- teardown.stderr
+>     |   `-- teardown.stdout
+>     |-- private_mem_conversions_test
+>     |   |-- command.stderr
+>     |   `-- command.stdout
+>     `-- vmx_msrs_test
+>         |-- command.stderr
+>         `-- command.stdout
+>
+>
+> Some other features for future:
+> - Provide "precheck" command option in json, which can filter/skip tests =
+if
+>   certain conditions are not met.
+> - Iteration option in the runner. This will allow the same test suites to
+>   run again.
+>
+> Vipin Sharma (1):
+>   KVM: selftestsi: Create KVM selftests runnner to run interesting tests
+>
+>  tools/testing/selftests/kvm/runner.py  | 282 +++++++++++++++++++++++++
+>  tools/testing/selftests/kvm/tests.json |  60 ++++++
+>  2 files changed, 342 insertions(+)
+>  create mode 100755 tools/testing/selftests/kvm/runner.py
+>  create mode 100644 tools/testing/selftests/kvm/tests.json
+>
+>
+> base-commit: de9c2c66ad8e787abec7c9d7eff4f8c3cdd28aed
+> --
+> 2.46.0.184.g6999bdac58-goog
+>
