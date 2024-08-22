@@ -1,20 +1,20 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24F621A2C10;
-	Thu, 22 Aug 2024 11:30:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FE0E1C93D9;
+	Thu, 22 Aug 2024 11:31:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724326213; cv=none; b=k4iZstPRHIoxTpeJeEMqMSzduv2vcpXxgU1qcCvOJR7wNJcn8opMSWzrv+5xl24TL3ZzQDDXwthfYxdMRjojqcXq86nq9pgjdNh8jLNJhkLkq/JR6Y0OOvYVfaZgfIx042vWVfIguuWdVQIHpUuSAN8OfwaQx6gTFVQKkefYY+0=
+	t=1724326269; cv=none; b=evr+/6QYN/hf6EJG2qKTFMO5kvtl5yGhK1XAYygWL0LVH5Cf7AA+//lMNRqy8JynIeIGYEIiXS0GBvhNbeFhtRsga6lzdJPRm3OIoBHrmJxUTIKdw2B4ZR7Ezd6/+V2B0F9rFaGaXR21ia6XQSM2CtLojbMdG7AYx10yn9zBIpQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724326213; c=relaxed/simple;
-	bh=BDrs6Un52wYeKJaaHzXRq/2axxKAwlrLJwTQCz0kT6M=;
+	s=arc-20240116; t=1724326269; c=relaxed/simple;
+	bh=TYqshyijczK+66nni4qIL01IOJseL8EmB+RHuiK2eHU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B723+2i+PMNAJMx9jGVZ3vCKGMXYj+1P0ClQOpJvzNDQ3Vg3Iu7UG8cMf90zRA6ZP3YxUgDrv7DeX0m/a+4oDb064p9+EDP4H/JStt/D1nxRvP3nWmZSSjBzrbSZfsRRoY9vadszX/X/dCJLHFrWR3Lw3qHj5HgQIjLfgEgfK3E=
+	 Content-Type:Content-Disposition:In-Reply-To; b=lxabrNOLfFqZ4WwUfCUUgtLwOFb9SZnrltuyO/2xO+HNJBtECOpIufsJjEBwwTWqRW2u+2UWWF6C/gBQsoshvEFosV3RQ3XTpUlsqYCSJ7CJBB68BisYV/5MF0t+JoD29Xx1EW4uEHFnHrgPFwnhLKXOEa23Oe9xZv/FYWuLeWU=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E549C32782;
-	Thu, 22 Aug 2024 11:30:06 +0000 (UTC)
-Date: Thu, 22 Aug 2024 12:30:04 +0100
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FAABC4AF0B;
+	Thu, 22 Aug 2024 11:31:03 +0000 (UTC)
+Date: Thu, 22 Aug 2024 12:31:01 +0100
 From: Catalin Marinas <catalin.marinas@arm.com>
 To: Mark Brown <broonie@kernel.org>
 Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
@@ -44,10 +44,10 @@ Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
 	linux-arch@vger.kernel.org, linux-mm@kvack.org,
 	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v11 16/39] arm64/idreg: Add overrride for GCS
-Message-ID: <ZschPLEzEq2dOpgN@arm.com>
+Subject: Re: [PATCH v11 17/39] arm64/hwcap: Add hwcap for GCS
+Message-ID: <ZschddrfehjVUMXw@arm.com>
 References: <20240822-arm64-gcs-v11-0-41b81947ecb5@kernel.org>
- <20240822-arm64-gcs-v11-16-41b81947ecb5@kernel.org>
+ <20240822-arm64-gcs-v11-17-41b81947ecb5@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -56,11 +56,10 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240822-arm64-gcs-v11-16-41b81947ecb5@kernel.org>
+In-Reply-To: <20240822-arm64-gcs-v11-17-41b81947ecb5@kernel.org>
 
-On Thu, Aug 22, 2024 at 02:15:19AM +0100, Mark Brown wrote:
-> Hook up an override for GCS, allowing it to be disabled from the command
-> line by specifying arm64.nogcs in case there are problems.
+On Thu, Aug 22, 2024 at 02:15:20AM +0100, Mark Brown wrote:
+> Provide a hwcap to enable userspace to detect support for GCS.
 > 
 > Reviewed-by: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
 > Signed-off-by: Mark Brown <broonie@kernel.org>
