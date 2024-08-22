@@ -1,79 +1,179 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3295E17DE06;
-	Thu, 22 Aug 2024 11:32:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CA2E1C9DD9;
+	Thu, 22 Aug 2024 12:47:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724326323; cv=none; b=DGiCw51+SC5f5FylkrsuaVQ4o1V5LC4hfNf32jSu7TVV3hyxXveJlT2GBea7wPXncFVnDh3HfBlaPznoze3V1xLIGkGStPFsVz53obdE87ElmKQ2x56u50Jr2masHmHd3H6Ul8pTUdypS5Z/QDeS5jp3WFJWipCF/JDBfHJ2KH0=
+	t=1724330824; cv=none; b=ffDIJzUeqO4D9N2z5LezlqVNy8mmaHa66aYOVjtoFTxjDqB8Z8QMXLSrBdEu6yQAAG7oO358WMiVLB+YiSbW89V8HCIocWHazomR4ejOS0Q7m6nCEZYgHVAJAnxkCjngsOM9cvrA7m747nggCwcoMovq+AujgxuKJ/JVC+wuugs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724326323; c=relaxed/simple;
-	bh=ahYQxnZlDKF67DiooDXeohmk++gTfdE7lJjaYpBT67Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SVvTAjIPLxySkIKyp3iITiHnm7P3BBE6aH1RmXTwQBNq4B18v4jghgNP4gh91JZRfCsvI8duDGKxoAa27zyALAkULCnB9Oa5g6lNtE4s+Ozn1uihPi+/lgtzgbFhF8qKqB36Y9GorFHnsY0r3cqtB4wyNQPVWGh9iutSYUGlUKY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3579BC32782;
-	Thu, 22 Aug 2024 11:31:57 +0000 (UTC)
-Date: Thu, 22 Aug 2024 12:31:55 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Mark Brown <broonie@kernel.org>
-Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
+	s=arc-20240116; t=1724330824; c=relaxed/simple;
+	bh=UL9KdxQwjMHFvFq1mPEw+yGPoW0CCK/syQv6TvsTFbo=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tys0IRK60l2U9aXv48rv3rexlfi9EUKd+meXwTW1C0CvqHzMXP5WJCCtUOMpEibb7694q0Ne/R6sMEVXX+dQB0+6wlPIdmq2tYb7FQshT84kCVYhS+s4ozY8NM4w4fZkf/1CfYRMIaSqPbR8AIUohqOuoBxyIeiqBBMawAFdr1c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WvyvQvDv; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WvyvQvDv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C98E6C32782;
+	Thu, 22 Aug 2024 12:47:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724330823;
+	bh=UL9KdxQwjMHFvFq1mPEw+yGPoW0CCK/syQv6TvsTFbo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=WvyvQvDvHj1VB8ey/AVxBXTbGwFiJsoSe+5GQwtp+6RJp6V+iTTZBGcTDb8ZqOHwt
+	 syHzi2tMvtx13/QZCaVXB+tvc5udI+IXnW5Wct6pgDzk+iK3ZKSj1fftMu4mGdAJ8r
+	 +iFwetdkE55FK72qocSkNbk1WCCoSvMuFZMW/Et5eslQpR/q/OPxtzE/sXqbvfAyHi
+	 GbCJZ1GugutbcIe9IwQI6TvBSpS1xBpvsIZSkxoURcwy2mYxxP8qvAxLVp6EMR3QaH
+	 W2d1m7pvQ+tLSPXxPVwFFunyUYxBgbuQK9PBzE+TEG+GejFbj55ggUhQHWYiRV9nam
+	 4B4eHSv2XnZmg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sh7DR-005wRE-OP;
+	Thu, 22 Aug 2024 13:47:01 +0100
+Date: Thu, 22 Aug 2024 13:47:01 +0100
+Message-ID: <864j7cybay.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Kunkun Jiang <jiangkunkun@huawei.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>,
+	Oliver Upton
+	<oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Florian Weimer <fweimer@redhat.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
-	Ross Burton <ross.burton@arm.com>,
-	Yury Khrustalev <yury.khrustalev@arm.com>,
-	Wilco Dijkstra <wilco.dijkstra@arm.com>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v11 18/39] arm64/traps: Handle GCS exceptions
-Message-ID: <Zschq9JbvIRjmXVR@arm.com>
-References: <20240822-arm64-gcs-v11-0-41b81947ecb5@kernel.org>
- <20240822-arm64-gcs-v11-18-41b81947ecb5@kernel.org>
+	Suzuki K Poulose
+	<suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	"open list:IRQ\
+ SUBSYSTEM" <linux-kernel@vger.kernel.org>,
+	"moderated list:ARM SMMU DRIVERS"
+	<linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>,
+	"wanghaibin.wang@huawei.com" <wanghaibin.wang@huawei.com>,
+	<nizhiqiang1@huawei.com>,
+	"tangnianyao@huawei.com" <tangnianyao@huawei.com>,
+	<wangzhou1@hisilicon.com>
+Subject: Re: [bug report] GICv4.1: multiple vpus execute vgic_v4_load at the same time will greatly increase the time consumption
+In-Reply-To: <bd3c3103-a6d7-a91b-911d-5bc5f2382dae@huawei.com>
+References: <a7fc58e4-64c2-77fc-c1dc-f5eb78dbbb01@huawei.com>
+	<86msl6xhu2.wl-maz@kernel.org>
+	<f1574274-efd8-eb56-436b-5a1dd7620f2c@huawei.com>
+	<867cc9x8si.wl-maz@kernel.org>
+	<bd3c3103-a6d7-a91b-911d-5bc5f2382dae@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240822-arm64-gcs-v11-18-41b81947ecb5@kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: jiangkunkun@huawei.com, tglx@linutronix.de, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, wanghaibin.wang@huawei.com, nizhiqiang1@huawei.com, tangnianyao@huawei.com, wangzhou1@hisilicon.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, Aug 22, 2024 at 02:15:21AM +0100, Mark Brown wrote:
-> A new exception code is defined for GCS specific faults other than
-> standard load/store faults, for example GCS token validation failures,
-> add handling for this. These faults are reported to userspace as
-> segfaults with code SEGV_CPERR (protection error), mirroring the
-> reporting for x86 shadow stack errors.
-> 
-> GCS faults due to memory load/store operations generate data aborts with
-> a flag set, these will be handled separately as part of the data abort
-> handling.
-> 
-> Since we do not currently enable GCS for EL1 we should not get any faults
-> there but while we're at it we wire things up there, treating any GCS
-> fault as fatal.
-> 
-> Reviewed-by: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
-> Signed-off-by: Mark Brown <broonie@kernel.org>
+On Thu, 22 Aug 2024 11:59:50 +0100,
+Kunkun Jiang <jiangkunkun@huawei.com> wrote:
+>=20
+> Hi Marc,
+>=20
+> On 2024/8/22 16:26, Marc Zyngier wrote:
+> >>>> According to analysis, this problem is due to the execution of vgic_=
+v4_load.
+> >>>> vcpu_load or kvm_sched_in
+> >>>>   =C2=A0=C2=A0=C2=A0 kvm_arch_vcpu_load
+> >>>>   =C2=A0=C2=A0=C2=A0 ...
+> >>>>   =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 vgic_v4_load
+> >>>>   =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 irq_set_a=
+ffinity
+> >>>>   =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 ...
+> >>>>   =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=
+=A0=C2=A0 irq_do_set_affinity
+> >>>>   =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=
+=A0=C2=A0 =C2=A0=C2=A0=C2=A0 raw_spin_lock(&tmp_mask_lock)
+> >>>>   =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=
+=A0=C2=A0 =C2=A0=C2=A0=C2=A0 chip->irq_set_affinity
+> >>>>   =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=
+=A0=C2=A0 =C2=A0=C2=A0=C2=A0 ...
+> >>>>   =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=
+=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0 its_vpe_set_affinity
+> >>>>=20
+> >>>> The tmp_mask_lock is the key. This is a global lock. I don't quite
+> >>>> understand
+> >>>> why tmp_mask_lock is needed here. I think there are two possible
+> >>>> solutions here:
+> >>>> 1. Remove this tmp_mask_lock
+> >>>=20
+> >>> Maybe you could have a look at 33de0aa4bae98 (and 11ea68f553e24)? It
+> >>> would allow you to understand the nature of the problem.
+> >>>=20
+> >>> This can probably be replaced with a per-CPU cpumask, which would
+> >>> avoid the locking, but potentially result in a larger memory usage.
+> >>=20
+> >> Thanks, I will try it.
+> >=20
+> > A simple alternative would be this:
+> >=20
+> > diff --git a/kernel/irq/manage.c b/kernel/irq/manage.c
+> > index dd53298ef1a5..0d11b74af38c 100644
+> > --- a/kernel/irq/manage.c
+> > +++ b/kernel/irq/manage.c
+> > @@ -224,15 +224,12 @@ int irq_do_set_affinity(struct irq_data *data, co=
+nst struct cpumask *mask,
+> >   	struct irq_desc *desc =3D irq_data_to_desc(data);
+> >   	struct irq_chip *chip =3D irq_data_get_irq_chip(data);
+> >   	const struct cpumask  *prog_mask;
+> > +	struct cpumask tmp_mask =3D {};
+> >   	int ret;
+> >   -	static DEFINE_RAW_SPINLOCK(tmp_mask_lock);
+> > -	static struct cpumask tmp_mask;
+> > -
+> >   	if (!chip || !chip->irq_set_affinity)
+> >   		return -EINVAL;
+> >   -	raw_spin_lock(&tmp_mask_lock);
+> >   	/*
+> >   	 * If this is a managed interrupt and housekeeping is enabled on
+> >   	 * it check whether the requested affinity mask intersects with
+> > @@ -280,8 +277,6 @@ int irq_do_set_affinity(struct irq_data *data, cons=
+t struct cpumask *mask,
+> >   	else
+> >   		ret =3D -EINVAL;
+> >   -	raw_spin_unlock(&tmp_mask_lock);
+> > -
+> >   	switch (ret) {
+> >   	case IRQ_SET_MASK_OK:
+> >   	case IRQ_SET_MASK_OK_DONE:
+> >=20
+> > but that will eat a significant portion of your stack if your kernel is
+> > configured for a large number of CPUs.
+> >=20
+>=20
+> Currently CONFIG_NR_CPUS=3D4096,each `struct cpumask` occupies 512 bytes.
 
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+This seems crazy. Why would you build a kernel with something *that*
+big, specially considering that you have a lot less than 1k CPUs?
+
+[...]
+
+> > The removal of this global lock is the only option in my opinion.
+> > Either the cpumask becomes a stack variable, or it becomes a static
+> > per-CPU variable. Both have drawbacks, but they are not a bottleneck
+> > anymore.
+>=20
+> I also prefer to remove the global lock. Which variable do you think is
+> better?
+
+Given the number of CPUs your system is configured for, there is no
+good answer. An on-stack variable is dangerously large, and a per-CPU
+cpumask results in 2MB being allocated, which I find insane.
+
+You'll have to pick your own poison and convince Thomas of the
+validity of your approach.
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
