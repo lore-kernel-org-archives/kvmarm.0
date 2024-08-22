@@ -1,38 +1,54 @@
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B8721802E
-	for <kvmarm@lists.linux.dev>; Thu, 22 Aug 2024 08:36:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B0B219470;
+	Thu, 22 Aug 2024 08:59:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724315804; cv=none; b=eyk6JG/6UsGN0mvdgvUf5E5qLrN7Zb20z63xl2WSKFxgTj+42dtCjLf2Dvfczx75KyCoU/2RoOvLtB2cuRfAFinJhwO2HeKsNfyl+VKr0TuyxFjxbosQ3UVOvL1FWYGaYC7Gfcd/jsHXzcYKeuIO72qO5oLM0DjRgydSRDTRUzU=
+	t=1724317144; cv=none; b=APwsXk/lkXVLnbgnxsi+ZdbYJ8+hMuykLQG9FB+ictV/FM4Izq/kodz4MUsEa01Y6so3A6a2kQT6GOijhx0Lt8fRkjatVWdpn2xTYLD4jFmHIGj2Tgo2lyX+MqlejHkGzhEUJ9rrdV8UcHsm5DPndfcaKhPVD90AJg4OsP1NmM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724315804; c=relaxed/simple;
-	bh=LSQVp0gOynObcNqwjGT2JXTi+qt6YE2Ny0x4vK2nF98=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=hYiXpry7fK+XgfBID2yQyx/P8FgyvnAxB0HU/DOKdT5mHIzopPblHLengvsiunFJOQqhAZMTnymFcb7b33X/vgkFgV/Op6JD0WHNyPKgfUSx0QLd+kXpZGGy6hhYGAq8T9vT+kWHw7Sy5pJD0mlABft60NjLs1V2tMv6Qz3Kv+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TWfsGwGe; arc=none smtp.client-ip=95.215.58.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TWfsGwGe"
-Date: Thu, 22 Aug 2024 01:36:33 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1724315800;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=pcL3SznNZSWm9dN7/mUyjJcTwqEA+cVbdDDcB/ulbas=;
-	b=TWfsGwGeAOaSdjAOZxRueTVOGqNEx7M91qD5MatowOG+uZnNhGn+rL/q2AUmZOBnh2S5wb
-	l9a1fTHNpA3XmgBCjG8AuXf2MNSAyEq5F4mG2C9dn57PHYoAp/ukmXUIp+4UDHlY235NzI
-	PhMH2hUcMhZ7Q6+kvHv4JIamVhl+wZ0=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Marc Zyngier <maz@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
-	kvmarm@lists.linux.dev, Paolo Bonzini <pbonzini@redhat.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: [GIT PULL] KVM/arm64 fixes for 6.11, round #2
-Message-ID: <Zsb4kbq6FAfgg4WA@linux.dev>
+	s=arc-20240116; t=1724317144; c=relaxed/simple;
+	bh=DpcDNDe+KZn/iuhwArlRSzqBJ/Xnc+TAR6oqznVkNwQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mvdGvfKVcprgHzwvOmlghkxJ8t8tPNQIK2tP07h4I1OgjK+/YDYC78oCdz3qiyIj13twSlon5xlqdoxMYOGMFkzE7bFaYhYa4zD9AU5iiLcBBkiYp8kxVUWQUBb2XhWgSUJ5K8hAcAKbmrk0QrqsCPElU0hQUmlq76deb5bcS+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35801C4AF0B;
+	Thu, 22 Aug 2024 08:58:58 +0000 (UTC)
+Date: Thu, 22 Aug 2024 09:58:55 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Florian Weimer <fweimer@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
+	Ross Burton <ross.burton@arm.com>,
+	Yury Khrustalev <yury.khrustalev@arm.com>,
+	Wilco Dijkstra <wilco.dijkstra@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v11 05/39] arm64: Document boot requirements for Guarded
+ Control Stacks
+Message-ID: <Zsb9z2giUQbUTH5a@arm.com>
+References: <20240822-arm64-gcs-v11-0-41b81947ecb5@kernel.org>
+ <20240822-arm64-gcs-v11-5-41b81947ecb5@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -41,66 +57,21 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20240822-arm64-gcs-v11-5-41b81947ecb5@kernel.org>
 
-Hi Catalin,
+On Thu, Aug 22, 2024 at 02:15:08AM +0100, Mark Brown wrote:
+> FEAT_GCS introduces a number of new system registers, we require that
+> access to these registers is not trapped when we identify that the feature
+> is present.  There is also a HCRX_EL2 control to make GCS operations
+> functional.
+> 
+> Since if GCS is enabled any function call instruction will cause a fault
+> we also require that the feature be specifically disabled, existing
+> kernels implicitly have this requirement and especially given that the
+> MMU must be disabled it is difficult to see a situation where leaving
+> GCS enabled would be reasonable.
+> 
+> Reviewed-by: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
+> Signed-off-by: Mark Brown <broonie@kernel.org>
 
-Paolo is on holiday for a few weeks and has asked that KVM arch maintainers
-send pulls through the architecture trees in his absence.
-
-So lucky you, here's a pile of kvmarm crap from the past week.
-
-Details can be found in the tag, but this is a set of small fixes
-around the shop thanks to syzkaller bringup on KVM/arm64 and a few
-recently introduced bugs.
-
-Please pull.
-
--- 
-Thanks,
-Oliver
-
-The following changes since commit 9eb18136af9fe4dd688724070f2bfba271bd1542:
-
-  KVM: arm64: vgic: Hold config_lock while tearing down a CPU interface (2024-08-08 16:58:22 +0000)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.11-2
-
-for you to fetch changes up to 3e6245ebe7ef341639e9a7e402b3ade8ad45a19f:
-
-  KVM: arm64: Make ICC_*SGI*_EL1 undef in the absence of a vGICv3 (2024-08-22 08:08:37 +0000)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for 6.11, round #2
-
- - Don't drop references on LPIs that weren't visited by the
-   vgic-debug iterator
-
- - Cure lock ordering issue when unregistering vgic redistributors
-
- - Fix for misaligned stage-2 mappings when VMs are backed by hugetlb
-   pages
-
- - Treat SGI registers as UNDEFINED if a VM hasn't been configured for
-   GICv3
-
-----------------------------------------------------------------
-Marc Zyngier (2):
-      KVM: arm64: vgic: Don't hold config_lock while unregistering redistributors
-      KVM: arm64: Make ICC_*SGI*_EL1 undef in the absence of a vGICv3
-
-Oliver Upton (1):
-      KVM: arm64: Ensure canonical IPA is hugepage-aligned when handling fault
-
-Zenghui Yu (1):
-      KVM: arm64: vgic-debug: Don't put unmarked LPIs
-
- arch/arm64/kvm/mmu.c             | 9 ++++++++-
- arch/arm64/kvm/sys_regs.c        | 6 ++++++
- arch/arm64/kvm/vgic/vgic-debug.c | 2 +-
- arch/arm64/kvm/vgic/vgic-init.c  | 9 ++++++---
- arch/arm64/kvm/vgic/vgic.c       | 5 +++++
- arch/arm64/kvm/vgic/vgic.h       | 7 +++++++
- 6 files changed, 33 insertions(+), 5 deletions(-)
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
