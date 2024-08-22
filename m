@@ -1,359 +1,147 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 122021CC890;
-	Thu, 22 Aug 2024 15:44:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 865241CDA08;
+	Thu, 22 Aug 2024 16:12:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724341467; cv=none; b=MfCO2mz3hCjEON3I0/YdEXQoKyB6zEXq9SKWpbm9FThca6jzCCh0fO0SD7HQNjZLNTtrZkWLxsGlePmkVGeba584QXJ3NJbTcE7nGEt1nnKrfg95fL7hWP4N2g37F4ZGQBByKXJPu3ChM24jy49k/LUhU/z7F2JK+Sb5//4oZfQ=
+	t=1724343159; cv=none; b=rBAFsucXbSQo+GNqrGXDl5lYGSK+u2TdPXXlh3HGj8EQwXZNvoJeFWvYd1HWOVSQENIp6bFg8ZjMFukFJ0bNVFdHUCsNQY/ZUnltwlxfFiZXtdzNpFgyeP/X37pp/on+goxIzbw3VMKscnrWKpZsRI7KYpLUBcGbjNA5COS3ays=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724341467; c=relaxed/simple;
-	bh=bVp52h0ZAViCvx5Fu8FuOEuKUIw7N5AReDsofzoN+IQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PSDbaWMHFLU8zkshI5rY5JCTuSuHyCG8Mltnj10yLnkFvRciBC3BN6A/4EfdoQTcCRyCfWOpQFwHAw4VZLm3uZPQsf0UCo/RGJvfm7qfZ63FbGjadxrfvehzyvqWxDHfTfNCyGKRbALYZ8CD6uzqLFYjqr6qOvMl9ClPRxDo1ZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9B73ADA7;
-	Thu, 22 Aug 2024 08:44:51 -0700 (PDT)
-Received: from [10.57.72.240] (unknown [10.57.72.240])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0DA2D3F58B;
-	Thu, 22 Aug 2024 08:44:22 -0700 (PDT)
-Message-ID: <26c56f74-629b-48f9-bf73-e559be0cca75@arm.com>
-Date: Thu, 22 Aug 2024 16:44:21 +0100
+	s=arc-20240116; t=1724343159; c=relaxed/simple;
+	bh=arNvsRUXm7jY00uvGkAwSitSYm9UxPvScMuijKZi0Fg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=F5e2AsFFZQJTuID5ka9rGZrp7RiQO8LfhXnbZ3Bo6xmclRchzH0THPvqxNSImvWAs9At1v+UlPtDCjF8od0qi2seVRAkqJtYbKLqAfke5aYyo/HgoRTZ/pLIE4W6x6s4JfxHqE1iHpzYkQphgiMajeE5PGEg8JvEEJ2CBI+v6og=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A751C4AF0C;
+	Thu, 22 Aug 2024 16:12:33 +0000 (UTC)
+Date: Thu, 22 Aug 2024 17:12:30 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Florian Weimer <fweimer@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
+	Ross Burton <ross.burton@arm.com>,
+	Yury Khrustalev <yury.khrustalev@arm.com>,
+	Wilco Dijkstra <wilco.dijkstra@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v11 19/39] arm64/mm: Handle GCS data aborts
+Message-ID: <ZsdjbsDrMWgBU9Hj@arm.com>
+References: <20240822-arm64-gcs-v11-0-41b81947ecb5@kernel.org>
+ <20240822-arm64-gcs-v11-19-41b81947ecb5@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 05/43] arm64: RME: Add SMC definitions for calling the
- RMM
-Content-Language: en-GB
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>
-References: <20240821153844.60084-1-steven.price@arm.com>
- <20240821153844.60084-6-steven.price@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20240821153844.60084-6-steven.price@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240822-arm64-gcs-v11-19-41b81947ecb5@kernel.org>
 
-Hi Steven
+On Thu, Aug 22, 2024 at 02:15:22AM +0100, Mark Brown wrote:
+> diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
+> index 451ba7cbd5ad..3ada31c2ac12 100644
+> --- a/arch/arm64/mm/fault.c
+> +++ b/arch/arm64/mm/fault.c
+> @@ -486,6 +486,14 @@ static void do_bad_area(unsigned long far, unsigned long esr,
+>  	}
+>  }
+>  
+> +static bool is_gcs_fault(unsigned long esr)
+> +{
+> +	if (!esr_is_data_abort(esr))
+> +		return false;
+> +
+> +	return ESR_ELx_ISS2(esr) & ESR_ELx_GCS;
+> +}
+> +
+>  static bool is_el0_instruction_abort(unsigned long esr)
+>  {
+>  	return ESR_ELx_EC(esr) == ESR_ELx_EC_IABT_LOW;
+> @@ -500,6 +508,23 @@ static bool is_write_abort(unsigned long esr)
+>  	return (esr & ESR_ELx_WNR) && !(esr & ESR_ELx_CM);
+>  }
+>  
+> +static bool is_invalid_gcs_access(struct vm_area_struct *vma, u64 esr)
+> +{
+> +	if (!system_supports_gcs())
+> +		return false;
+> +
+> +	if (unlikely(is_gcs_fault(esr))) {
+> +		/* GCS accesses must be performed on a GCS page */
+> +		if (!(vma->vm_flags & VM_SHADOW_STACK))
+> +			return true;
 
-On 21/08/2024 16:38, Steven Price wrote:
-> The RMM (Realm Management Monitor) provides functionality that can be
-> accessed by SMC calls from the host.
-> 
-> The SMC definitions are based on DEN0137[1] version 1.0-rel0-rc1
-> 
-> [1] https://developer.arm.com/-/cdn-downloads/permalink/PDF/Architectures/DEN0137_1.0-rel0-rc1_rmm-arch_external.pdf
-> 
+This first check covers the GCSPOPM/RET etc. permission faults on
+non-GCS vmas. It looks correct.
 
-The definitions match RMM spec. Some ultra minor comments below, feel 
-free to ignore ;-)
+> +	} else if (unlikely(vma->vm_flags & VM_SHADOW_STACK)) {
+> +		/* Only GCS operations can write to a GCS page */
+> +		return is_write_abort(esr);
+> +	}
 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Changes since v3:
->   * Update to match RMM spec v1.0-rel0-rc1.
-> Changes since v2:
->   * Fix specification link.
->   * Rename rec_entry->rec_enter to match spec.
->   * Fix size of pmu_ovf_status to match spec.
-> ---
->   arch/arm64/include/asm/rmi_smc.h | 253 +++++++++++++++++++++++++++++++
->   1 file changed, 253 insertions(+)
->   create mode 100644 arch/arm64/include/asm/rmi_smc.h
-> 
-> diff --git a/arch/arm64/include/asm/rmi_smc.h b/arch/arm64/include/asm/rmi_smc.h
-> new file mode 100644
-> index 000000000000..5ee71c12a9cd
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/rmi_smc.h
-> @@ -0,0 +1,253 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Copyright (C) 2023-2024 ARM Ltd.
-> + *
-> + * The values and structures in this file are from the Realm Management Monitor
-> + * specification (DEN0137) version 1.0-rel0-rc1:
-> + * https://developer.arm.com/-/cdn-downloads/permalink/PDF/Architectures/DEN0137_1.0-rel0-rc1_rmm-arch_external.pdf
-> + */
-> +
-> +#ifndef __ASM_RME_SMC_H
-> +#define __ASM_RME_SMC_H
-> +
-> +#include <linux/arm-smccc.h>
-> +
-> +#define SMC_RxI_CALL(func)				\
-> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,		\
-> +			   ARM_SMCCC_SMC_64,		\
-> +			   ARM_SMCCC_OWNER_STANDARD,	\
-> +			   (func))
-> +
-> +#define SMC_RMI_DATA_CREATE		SMC_RxI_CALL(0x0153)
-> +#define SMC_RMI_DATA_CREATE_UNKNOWN	SMC_RxI_CALL(0x0154)
-> +#define SMC_RMI_DATA_DESTROY		SMC_RxI_CALL(0x0155)
-> +#define SMC_RMI_FEATURES		SMC_RxI_CALL(0x0165)
-> +#define SMC_RMI_GRANULE_DELEGATE	SMC_RxI_CALL(0x0151)
-> +#define SMC_RMI_GRANULE_UNDELEGATE	SMC_RxI_CALL(0x0152)
-> +#define SMC_RMI_PSCI_COMPLETE		SMC_RxI_CALL(0x0164)
-> +#define SMC_RMI_REALM_ACTIVATE		SMC_RxI_CALL(0x0157)
-> +#define SMC_RMI_REALM_CREATE		SMC_RxI_CALL(0x0158)
-> +#define SMC_RMI_REALM_DESTROY		SMC_RxI_CALL(0x0159)
-> +#define SMC_RMI_REC_AUX_COUNT		SMC_RxI_CALL(0x0167)
-> +#define SMC_RMI_REC_CREATE		SMC_RxI_CALL(0x015a)
-> +#define SMC_RMI_REC_DESTROY		SMC_RxI_CALL(0x015b)
-> +#define SMC_RMI_REC_ENTER		SMC_RxI_CALL(0x015c)
-> +#define SMC_RMI_RTT_CREATE		SMC_RxI_CALL(0x015d)
-> +#define SMC_RMI_RTT_DESTROY		SMC_RxI_CALL(0x015e)
-> +#define SMC_RMI_RTT_FOLD		SMC_RxI_CALL(0x0166)
-> +#define SMC_RMI_RTT_INIT_RIPAS		SMC_RxI_CALL(0x0168)
-> +#define SMC_RMI_RTT_MAP_UNPROTECTED	SMC_RxI_CALL(0x015f)
-> +#define SMC_RMI_RTT_READ_ENTRY		SMC_RxI_CALL(0x0161)
-> +#define SMC_RMI_RTT_SET_RIPAS		SMC_RxI_CALL(0x0169)
-> +#define SMC_RMI_RTT_UNMAP_UNPROTECTED	SMC_RxI_CALL(0x0162)
-> +#define SMC_RMI_VERSION			SMC_RxI_CALL(0x0150)
-> +
-> +#define RMI_ABI_MAJOR_VERSION	1
-> +#define RMI_ABI_MINOR_VERSION	0
-> +
-> +#define RMI_UNASSIGNED			0
-> +#define RMI_ASSIGNED			1
-> +#define RMI_TABLE			2
-> +
-> +#define RMI_ABI_VERSION_GET_MAJOR(version) ((version) >> 16)
-> +#define RMI_ABI_VERSION_GET_MINOR(version) ((version) & 0xFFFF)
-> +#define RMI_ABI_VERSION(major, minor)      (((major) << 16) | (minor))
+I don't think that's right. The ESR on this path may not even indicate a
+data abort and ESR.WnR bit check wouldn't make sense.
 
-super minor nit: Please could we keep it closer to the 
-RMI_ABI_M..R_VERSION defintions ?
-	
-> +
-> +#define RMI_RETURN_STATUS(ret)		((ret) & 0xFF)
-> +#define RMI_RETURN_INDEX(ret)		(((ret) >> 8) & 0xFF)
-> +
-> +#define RMI_SUCCESS		0
-> +#define RMI_ERROR_INPUT		1
-> +#define RMI_ERROR_REALM		2
-> +#define RMI_ERROR_REC		3
-> +#define RMI_ERROR_RTT		4
-> +
-> +#define RMI_EMPTY		0
-> +#define RMI_RAM			1
-> +#define RMI_DESTROYED		2
-> +
-> +#define RMI_NO_MEASURE_CONTENT	0
-> +#define RMI_MEASURE_CONTENT	1
-> +
-> +#define RMI_FEATURE_REGISTER_0_S2SZ		GENMASK(7, 0)
-> +#define RMI_FEATURE_REGISTER_0_LPA2		BIT(8)
-> +#define RMI_FEATURE_REGISTER_0_SVE_EN		BIT(9)
-> +#define RMI_FEATURE_REGISTER_0_SVE_VL		GENMASK(13, 10)
-> +#define RMI_FEATURE_REGISTER_0_NUM_BPS		GENMASK(19, 14)
-> +#define RMI_FEATURE_REGISTER_0_NUM_WPS		GENMASK(25, 20)
-> +#define RMI_FEATURE_REGISTER_0_PMU_EN		BIT(26)
-> +#define RMI_FEATURE_REGISTER_0_PMU_NUM_CTRS	GENMASK(31, 27)
-> +#define RMI_FEATURE_REGISTER_0_HASH_SHA_256	BIT(32)
-> +#define RMI_FEATURE_REGISTER_0_HASH_SHA_512	BIT(33)
-> +#define RMI_FEATURE_REGISTER_0_GICV3_NUM_LRS	GENMASK(37, 34)
-> +#define RMI_FEATURE_REGISTER_0_MAX_RECS_ORDER	GENMASK(41, 38)
-> +
-> +#define RMI_REALM_PARAM_FLAG_LPA2		BIT(0)
-> +#define RMI_REALM_PARAM_FLAG_SVE		BIT(1)
-> +#define RMI_REALM_PARAM_FLAG_PMU		BIT(2)
-> +
-> +/*
-> + * Note many of these fields are smaller than u64 but all fields have u64
-> + * alignment, so use u64 to ensure correct alignment.
-> + */
-> +struct realm_params {
-> +	union { /* 0x0 */
-> +		struct {
-> +			u64 flags;
-> +			u64 s2sz;
-> +			u64 sve_vl;
-> +			u64 num_bps;
-> +			u64 num_wps;
-> +			u64 pmu_num_ctrs;
-> +			u64 hash_algo;
-> +		};
-> +		u8 padding_1[0x400];
-
-super minor nit: padding_[0-9] vs padding[0-9] below for other objects.
-It may be nicer to keep them consistent.
-
-> +	};
-> +	union { /* 0x400 */
-> +		u8 rpv[64];
-> +		u8 padding_2[0x400];
-> +	};
-> +	union { /* 0x800 */
-> +		struct {
-> +			u64 vmid;
-> +			u64 rtt_base;
-> +			s64 rtt_level_start;
-> +			u64 rtt_num_start;
-> +		};
-> +		u8 padding_3[0x800];
-> +	};
-> +};
-> +
-> +/*
-> + * The number of GPRs (starting from X0) that are
-> + * configured by the host when a REC is created.
-> + */
-> +#define REC_CREATE_NR_GPRS		8
-> +
-> +#define REC_PARAMS_FLAG_RUNNABLE	BIT_ULL(0)
-> +
-> +#define REC_PARAMS_AUX_GRANULES		16
-> +
-> +struct rec_params {
-> +	union { /* 0x0 */
-> +		u64 flags;
-> +		u8 padding1[0x100];
-> +	};
-> +	union { /* 0x100 */
-> +		u64 mpidr;
-> +		u8 padding2[0x100];
-> +	};
-> +	union { /* 0x200 */
-> +		u64 pc;
-> +		u8 padding3[0x100];
-> +	};
-> +	union { /* 0x300 */
-> +		u64 gprs[REC_CREATE_NR_GPRS];
-> +		u8 padding4[0x500];
-> +	};
-> +	union { /* 0x800 */
-> +		struct {
-> +			u64 num_rec_aux;
-> +			u64 aux[REC_PARAMS_AUX_GRANULES];
-> +		};
-> +		u8 padding5[0x800];
-> +	};
-> +};
-> +
-> +#define RMI_EMULATED_MMIO		BIT(0)
-> +#define RMI_INJECT_SEA			BIT(1)
-> +#define RMI_TRAP_WFI			BIT(2)
-> +#define RMI_TRAP_WFE			BIT(3)
-> +#define RMI_RIPAS_RESPONSE		BIT(4)
-
-minor nit: I was hoping to suggest something that gives a clue of
-REC_ENTER_FLAGS, but it may be too long.
-
-#define RMI_REC_ENTER_FLAG_EMULATED_MMIO	BIT(0)
-#define RMI_REC_ENTER_..
-
-similar to REC_PARAM_FLAG/RMI_PARAM_FLAG.
-
-May be REC_ENTER_FLAG_xxx even. Thoughts ?
-
-Suzuki
+I presume we want to avoid an infinite loop on a (writeable) GCS page
+when the user does a normal STR but the CPU raises a permission fault. I
+think this function needs to just return false if !esr_is_data_abort().
 
 > +
-> +#define REC_RUN_GPRS			31
-> +#define REC_GIC_NUM_LRS			16
+> +	return false;
+> +}
 > +
-> +struct rec_enter {
-> +	union { /* 0x000 */
-> +		u64 flags;
-> +		u8 padding0[0x200];
-> +	};
-> +	union { /* 0x200 */
-> +		u64 gprs[REC_RUN_GPRS];
-> +		u8 padding2[0x100];
-> +	};
-> +	union { /* 0x300 */
-> +		struct {
-> +			u64 gicv3_hcr;
-> +			u64 gicv3_lrs[REC_GIC_NUM_LRS];
-> +		};
-> +		u8 padding3[0x100];
-> +	};
-> +	u8 padding4[0x400];
-> +};
-> +
-> +#define RMI_EXIT_SYNC			0x00
-> +#define RMI_EXIT_IRQ			0x01
-> +#define RMI_EXIT_FIQ			0x02
-> +#define RMI_EXIT_PSCI			0x03
-> +#define RMI_EXIT_RIPAS_CHANGE		0x04
-> +#define RMI_EXIT_HOST_CALL		0x05
-> +#define RMI_EXIT_SERROR			0x06
-> +
-> +struct rec_exit {
-> +	union { /* 0x000 */
-> +		u8 exit_reason;
-> +		u8 padding0[0x100];
-> +	};
-> +	union { /* 0x100 */
-> +		struct {
-> +			u64 esr;
-> +			u64 far;
-> +			u64 hpfar;
-> +		};
-> +		u8 padding1[0x100];
-> +	};
-> +	union { /* 0x200 */
-> +		u64 gprs[REC_RUN_GPRS];
-> +		u8 padding2[0x100];
-> +	};
-> +	union { /* 0x300 */
-> +		struct {
-> +			u64 gicv3_hcr;
-> +			u64 gicv3_lrs[REC_GIC_NUM_LRS];
-> +			u64 gicv3_misr;
-> +			u64 gicv3_vmcr;
-> +		};
-> +		u8 padding3[0x100];
-> +	};
-> +	union { /* 0x400 */
-> +		struct {
-> +			u64 cntp_ctl;
-> +			u64 cntp_cval;
-> +			u64 cntv_ctl;
-> +			u64 cntv_cval;
-> +		};
-> +		u8 padding4[0x100];
-> +	};
-> +	union { /* 0x500 */
-> +		struct {
-> +			u64 ripas_base;
-> +			u64 ripas_top;
-> +			u64 ripas_value;
-> +		};
-> +		u8 padding5[0x100];
-> +	};
-> +	union { /* 0x600 */
-> +		u16 imm;
-> +		u8 padding6[0x100];
-> +	};
-> +	union { /* 0x700 */
-> +		struct {
-> +			u8 pmu_ovf_status;
-> +		};
-> +		u8 padding7[0x100];
-> +	};
-> +};
-> +
-> +struct rec_run {
-> +	struct rec_enter enter;
-> +	struct rec_exit exit;
-> +};
-> +
-> +#endif
+>  static int __kprobes do_page_fault(unsigned long far, unsigned long esr,
+>  				   struct pt_regs *regs)
+>  {
+> @@ -535,6 +560,14 @@ static int __kprobes do_page_fault(unsigned long far, unsigned long esr,
+>  		/* It was exec fault */
+>  		vm_flags = VM_EXEC;
+>  		mm_flags |= FAULT_FLAG_INSTRUCTION;
+> +	} else if (is_gcs_fault(esr)) {
+> +		/*
+> +		 * The GCS permission on a page implies both read and
+> +		 * write so always handle any GCS fault as a write fault,
+> +		 * we need to trigger CoW even for GCS reads.
+> +		 */
+> +		vm_flags = VM_WRITE;
+> +		mm_flags |= FAULT_FLAG_WRITE;
+>  	} else if (is_write_abort(esr)) {
+>  		/* It was write fault */
+>  		vm_flags = VM_WRITE;
+> @@ -568,6 +601,13 @@ static int __kprobes do_page_fault(unsigned long far, unsigned long esr,
+>  	if (!vma)
+>  		goto lock_mmap;
+>  
+> +	if (is_invalid_gcs_access(vma, esr)) {
+> +		vma_end_read(vma);
+> +		fault = 0;
+> +		si_code = SEGV_ACCERR;
+> +		goto bad_area;
+> +	}
 
+Here there's a risk that the above function returns true for some
+unrelated fault that happens to have bit 6 in ESR set.
+
+-- 
+Catalin
