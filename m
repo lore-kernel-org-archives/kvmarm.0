@@ -1,169 +1,68 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91147175D3D;
-	Thu, 22 Aug 2024 09:13:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01CD3180A80;
+	Thu, 22 Aug 2024 10:04:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724318017; cv=none; b=lk+D7tEjcou5ICsc3da1hTVg0Dn0vh7YSKCf3NMtOBpXbsVcOkYzXA6LX4+ZepPUc79V1b5KiAsxG8f+WRbLO/gdAohEhSvV8PXSG87Y6fAHcowvGNdB6+zwLvfrU8avR2AUCZJP26LmbS6i5rz8TMQlOuJ4AMUxZ8NczRd39Kw=
+	t=1724321075; cv=none; b=RjykkRaJwpNAX18icybiEnOfNAnzkcyWFMxeFPYFjxXTXt8U4C1OfZLeUGtGhpFoO+5ySIhuTJYrXY601W9fUwIJnvVMI2EXLX1bp7L4QSx8cO3UrXqdnNNoHne8vC8yssIYmnpkYRcKxqM39UXRUHeNIK+9yyn0kCb0uuu3dUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724318017; c=relaxed/simple;
-	bh=2xsU6ODJjuSH+LZhdB/2WdQNKFW4SDix/LJvvwqaLSg=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nCaRBCL0LZNimqq6YPb77oew4gHKL5ANrafzaEGryTnzDNk8c8K7PZEklZ7Is3nfgp+MR+zeDHBX+90APQj7yzZGMqXN2fckW7dcXD+T+TmYoNFbToH+GdjPu8O7e2ZlXD03QCrORJxLzskHup+cSe8b7yA7fzxCpRfx6lUU1GU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nrNIPaLN; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nrNIPaLN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 268EFC4AF09;
-	Thu, 22 Aug 2024 09:13:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724318017;
-	bh=2xsU6ODJjuSH+LZhdB/2WdQNKFW4SDix/LJvvwqaLSg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nrNIPaLNhZH2d+alqKztRpOOGAwiHT9G041TE5Oh4AiWaX0vcHS+/r3KRmeJ6XWZh
-	 tv0QC4E5g/+f1b9V5ioPQNWY/0TQvGQQTVXa1+dzRzCNjgWrb7zvOoDKiJONu7X5Y4
-	 hVGT3/qQ0nlO3gllORASOEive2CTqTmBi50G5x4tLwGdxVdyRGpNMhpRtN8kbL4Z0+
-	 xzy1aTyB/9ZeVMXaWpf4lNnD9bux3TiC6LvmE0tt0n7npTNq2TBrW2STcqAU6rY67i
-	 RszRkF3MPpLstfsz8jjj5BCu0NfHHh67leAGq1EGyww4bxkONxeOAvTCX/eWaEr1iQ
-	 SL7bmboNjcGBA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sh3ss-005scS-UT;
-	Thu, 22 Aug 2024 10:13:35 +0100
-Date: Thu, 22 Aug 2024 10:13:34 +0100
-Message-ID: <865xrsyl6p.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: rostedt@goodmis.org,
-	mhiramat@kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	oliver.upton@linux.dev,
-	kvmarm@lists.linux.dev,
-	will@kernel.org,
-	qperret@google.com,
-	kernel-team@android.com
-Subject: Re: [RFC PATCH 04/11] timekeeping: Export the boot clock in snapshots
-In-Reply-To: <20240805173234.3542917-5-vdonnefort@google.com>
-References: <20240805173234.3542917-1-vdonnefort@google.com>
-	<20240805173234.3542917-5-vdonnefort@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1724321075; c=relaxed/simple;
+	bh=uRZ+2080/qYSdqovOL+EXXS23WTCIDmPpUP6IN3B7+0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=K65PMLGvkuX26K6+9Mx3v01/1sRyzBVBc3TVx5sM8u63xtcu2xYzXnJLFeu9c2Qjl8DRSFUrR2XryRSQhp2q0Fh7YyWf4iUyoJGTPgfDC22y7S4FRPHtdH0G/eZcDsrCHHV6FCKMKNy1b/8ugCK1t+xc0SmXYo5WNUuCP2dNVjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 855C3C32782;
+	Thu, 22 Aug 2024 10:04:28 +0000 (UTC)
+Date: Thu, 22 Aug 2024 11:04:26 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Florian Weimer <fweimer@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
+	Ross Burton <ross.burton@arm.com>,
+	Yury Khrustalev <yury.khrustalev@arm.com>,
+	Wilco Dijkstra <wilco.dijkstra@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v11 06/39] arm64/gcs: Document the ABI for Guarded
+ Control Stacks
+Message-ID: <ZscNKgvz2FsUc30Q@arm.com>
+References: <20240822-arm64-gcs-v11-0-41b81947ecb5@kernel.org>
+ <20240822-arm64-gcs-v11-6-41b81947ecb5@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: vdonnefort@google.com, rostedt@goodmis.org, mhiramat@kernel.org, linux-trace-kernel@vger.kernel.org, oliver.upton@linux.dev, kvmarm@lists.linux.dev, will@kernel.org, qperret@google.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240822-arm64-gcs-v11-6-41b81947ecb5@kernel.org>
 
-On Mon, 05 Aug 2024 18:32:27 +0100,
-Vincent Donnefort <vdonnefort@google.com> wrote:
+On Thu, Aug 22, 2024 at 02:15:09AM +0100, Mark Brown wrote:
+> Add some documentation of the userspace ABI for Guarded Control Stacks.
 > 
-> On arm64 systems, the arch timer can be accessible by both EL1 and EL2.
-> This means when running with nVHE or protected KVM, it is easy to
-> generate clock values from the hypervisor, synchronized with the kernel.
+> Reviewed-by: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
+> Signed-off-by: Mark Brown <broonie@kernel.org>
 
-When you say "arch_timer" here, are you talking about the data
-structure describing the timer? Or about the actual *counter*, a
-system register provided by the HW?
-
-I'm not sure the architecture-specific details are massively relevant,
-given that this is an arch-agnostic change.
-
->
-> For tracing purpose, the boot clock is interesting as it doesn't stop on
-> suspend. Export it as part of the time snapshot. This will later allow
-> the hypervisor to add boot clock timestamps to its events.
-
-Isn't that the actual description of the change? By getting the boot
-time as well as the parameters to compute an increment, you allow any
-subsystem able to perform a snapshot to compute a delta from boot time
-as long as they have access to the counter source.
-
-> 
-> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
-> 
-> diff --git a/include/linux/timekeeping.h b/include/linux/timekeeping.h
-> index fc12a9ba2c88..0fc6a61d64bd 100644
-> --- a/include/linux/timekeeping.h
-> +++ b/include/linux/timekeeping.h
-> @@ -275,18 +275,24 @@ struct ktime_timestamps {
->   *				 counter value
->   * @cycles:	Clocksource counter value to produce the system times
->   * @real:	Realtime system time
-> + * @boot:	Boot time
->   * @raw:	Monotonic raw system time
->   * @cs_id:	Clocksource ID
->   * @clock_was_set_seq:	The sequence number of clock-was-set events
->   * @cs_was_changed_seq:	The sequence number of clocksource change events
-> + * @mono_shift:	The monotonic clock slope shift
-> + * @mono_mult:	The monotonic clock slope mult
->   */
->  struct system_time_snapshot {
->  	u64			cycles;
->  	ktime_t			real;
-> +	ktime_t			boot;
->  	ktime_t			raw;
->  	enum clocksource_ids	cs_id;
->  	unsigned int		clock_was_set_seq;
->  	u8			cs_was_changed_seq;
-> +	u32			mono_shift;
-> +	u32			mono_mult;
->  };
->  
->  /**
-> diff --git a/kernel/time/timekeeping.c b/kernel/time/timekeeping.c
-> index 2fa87dcfeda9..6d0488a555a7 100644
-> --- a/kernel/time/timekeeping.c
-> +++ b/kernel/time/timekeeping.c
-> @@ -1057,9 +1057,11 @@ noinstr time64_t __ktime_get_real_seconds(void)
->  void ktime_get_snapshot(struct system_time_snapshot *systime_snapshot)
->  {
->  	struct timekeeper *tk = &tk_core.timekeeper;
-> +	u32 mono_mult, mono_shift;
->  	unsigned int seq;
->  	ktime_t base_raw;
->  	ktime_t base_real;
-> +	ktime_t base_boot;
->  	u64 nsec_raw;
->  	u64 nsec_real;
->  	u64 now;
-> @@ -1074,14 +1076,21 @@ void ktime_get_snapshot(struct system_time_snapshot *systime_snapshot)
->  		systime_snapshot->clock_was_set_seq = tk->clock_was_set_seq;
->  		base_real = ktime_add(tk->tkr_mono.base,
->  				      tk_core.timekeeper.offs_real);
-> +		base_boot = ktime_add(tk->tkr_mono.base,
-> +				      tk_core.timekeeper.offs_boot);
->  		base_raw = tk->tkr_raw.base;
->  		nsec_real = timekeeping_cycles_to_ns(&tk->tkr_mono, now);
->  		nsec_raw  = timekeeping_cycles_to_ns(&tk->tkr_raw, now);
-> +		mono_mult = tk->tkr_mono.mult;
-> +		mono_shift = tk->tkr_mono.shift;
->  	} while (read_seqcount_retry(&tk_core.seq, seq));
->  
->  	systime_snapshot->cycles = now;
->  	systime_snapshot->real = ktime_add_ns(base_real, nsec_real);
-> +	systime_snapshot->boot = ktime_add_ns(base_boot, nsec_real);
->  	systime_snapshot->raw = ktime_add_ns(base_raw, nsec_raw);
-> +	systime_snapshot->mono_shift = mono_shift;
-> +	systime_snapshot->mono_mult = mono_mult;
->  }
->  EXPORT_SYMBOL_GPL(ktime_get_snapshot);
->  
-
-This looks good to me, but you should probably Cc the timekeeping
-maintainers (tglx, John Stultz, and Stephen Boyd).
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
