@@ -1,73 +1,256 @@
-Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55AE513C812
-	for <kvmarm@lists.linux.dev>; Thu, 22 Aug 2024 08:16:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46D50165F11;
+	Thu, 22 Aug 2024 08:26:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724314572; cv=none; b=C8UWAhispfg5s/Xo2mWGtecXs3RtOw4DCWQH4ilo9tqI+9jwvR7njDRkCIClnV9CyRkDwGIocHYbQKIDwYwaAXwwOrfuoYYNSKbek8uRaqu5QylWdkdMe3IP1uUYcI0Vi6TD06ReXmLxpBrkK/OeIsBqyF5Xf1zNKvYOOFwbSn0=
+	t=1724315202; cv=none; b=Uigg+Tcbj1GQu4Vl2vr9Bg0kh4SKLwfCN31C1RIsoxlHHUa4UtYwB3APXdIQT9iU9+T2qxvQa1H6xpWt+j0iDBRQbPcXf36kpG4y+7kfebNCeRaljaKO7uxmAYFq4crC0nKwuHmwq55aj/Neu93yVPzSkdrFwZEwiLIClTL6GWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724314572; c=relaxed/simple;
-	bh=o5E46Xsb+BlTB2zC+u0hFLeCrAXDtPVQ6nr9N66H1+4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=P1sX8GZ+gK09vVWoiHWoKGAaUJcvPQKQ1zoYkwS9yoX3c5JJJxI7iGFMYjjCm5ebfrbrGvOlebsQ0/GucycDJ5yD0/MbwJHeUK+G81atmeiIi/90hZXbvrw4LCbsJTff36+H2k5DIkEoPWpAUKCoA8zzCyC+hNima6qG7rpAYi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Jqxinqx+; arc=none smtp.client-ip=91.218.175.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1724315202; c=relaxed/simple;
+	bh=X0aPNFWBD1VUe6HCE0yap3QSbgor0f8vCoFEYAOSJjg=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iof00HoahXNDcAFFxdBlITG5FaGVaDanqVleLXzwl0tv6MLNkstUMIuzBXBimwRkIf23VRWPvMWTixU7+sB6lKhaiIfRARQx+/buxSAVn7b0n89ilTk9e3oXLaG2Gq34oE7B/+5AXTjwGk4DimYvVDd8su30TDsRTDhyW12JrHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OBjxm3Yk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Jqxinqx+"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1724314567;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Z1gK+Roe+VZc4bhdfUlpfcFVrYk93QsyMczdTtdp7Mk=;
-	b=Jqxinqx+WqcC2agGavlOiXIaKq+HhJTYeGSdWbOftYI9H1NPTixbPV616iIKrC9edDoRMW
-	P/nt4GfHbfBlZ8BP4icfPUX4eF+iMalCGTiZH5QWml/JDx+LmtNKVMBcMFrb4Ct9IrJFRV
-	xL7X5ZaY8s2RG3q4MuhM/DHuKCvf67Q=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	Marc Zyngier <maz@kernel.org>,
-	linux-arm-kernel@lists.infradead.org
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OBjxm3Yk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0828C4AF09;
+	Thu, 22 Aug 2024 08:26:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724315200;
+	bh=X0aPNFWBD1VUe6HCE0yap3QSbgor0f8vCoFEYAOSJjg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=OBjxm3YkJWBffcjm3/rFfx9zn60qtEx8AP7j8MBB3X8i0tz0okL+omjGGeC0NK3SX
+	 NHKJDbYxzkSVdZteDIVOltkbklFrOqYTCODZq59ED90Iw9BBWFFgr+Db/2ZIagH8ah
+	 GuHtFqs5eg0ynLywfF7lzMXKXnOCCTcLG09meYLO6n2VGloxYZMA2cGRvOlgkPdGPT
+	 QNQj4JZmzqIJjpDK61vKKVUi2XBEz9kf3uYm2XselQUcRAemFF5mcubOrC4d85+mTq
+	 JYSyglvEc7k0tFO6if35ht9PFKg8Qm9buyIUwV+9YncbVefp1cNB7spbpFwEGfo5L0
+	 1vmfdv7amM8NQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sh39S-005rlM-JP;
+	Thu, 22 Aug 2024 09:26:38 +0100
+Date: Thu, 22 Aug 2024 09:26:37 +0100
+Message-ID: <867cc9x8si.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Kunkun Jiang <jiangkunkun@huawei.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>,
+	Oliver Upton
+	<oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
-	stable@vger.kernel.org,
-	Alexander Potapenko <glider@google.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: (subset) [PATCH 01/12] KVM: arm64: Make ICC_*SGI*_EL1 undef in the absence of a vGICv3
-Date: Thu, 22 Aug 2024 08:15:55 +0000
-Message-ID: <172431442241.2387551.1840120236670803060.b4-ty@linux.dev>
-In-Reply-To: <20240820100349.3544850-2-maz@kernel.org>
-References: <20240820100349.3544850-1-maz@kernel.org> <20240820100349.3544850-2-maz@kernel.org>
+	Suzuki K Poulose
+	<suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	"open list:IRQ\
+ SUBSYSTEM" <linux-kernel@vger.kernel.org>,
+	"moderated list:ARM SMMU DRIVERS"
+	<linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>,
+	"wanghaibin.wang@huawei.com" <wanghaibin.wang@huawei.com>,
+	<nizhiqiang1@huawei.com>,
+	"tangnianyao@huawei.com" <tangnianyao@huawei.com>,
+	<wangzhou1@hisilicon.com>
+Subject: Re: [bug report] GICv4.1: multiple vpus execute vgic_v4_load at the same time will greatly increase the time consumption
+In-Reply-To: <f1574274-efd8-eb56-436b-5a1dd7620f2c@huawei.com>
+References: <a7fc58e4-64c2-77fc-c1dc-f5eb78dbbb01@huawei.com>
+	<86msl6xhu2.wl-maz@kernel.org>
+	<f1574274-efd8-eb56-436b-5a1dd7620f2c@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: jiangkunkun@huawei.com, tglx@linutronix.de, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, wanghaibin.wang@huawei.com, nizhiqiang1@huawei.com, tangnianyao@huawei.com, wangzhou1@hisilicon.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 20 Aug 2024 11:03:38 +0100, Marc Zyngier wrote:
-> On a system with a GICv3, if a guest hasn't been configured with
-> GICv3 and that the host is not capable of GICv2 emulation,
-> a write to any of the ICC_*SGI*_EL1 registers is trapped to EL2.
-> 
-> We therefore try to emulate the SGI access, only to hit a NULL
-> pointer as no private interrupt is allocated (no GIC, remember?).
-> 
-> [...]
+On Wed, 21 Aug 2024 19:23:30 +0100,
+Kunkun Jiang <jiangkunkun@huawei.com> wrote:
+>=20
+> Hi Marc,
+>=20
+> On 2024/8/21 18:59, Marc Zyngier wrote:
+> > On Wed, 21 Aug 2024 10:51:27 +0100,
+> > Kunkun Jiang <jiangkunkun@huawei.com> wrote:
+> >>=20
+> >> Hi all,
+> >>=20
+> >> Recently I discovered a problem about GICv4.1, the scenario is as foll=
+ows:
+> >> 1. Enable GICv4.1
+> >> 2. Create multiple VMs.For example, 50 VMs(4U8G)
+>=20
+> s/4U8G/8U16G/, sorry..
+>=20
+> > I don't know what 4U8G means. On how many physical CPUs are you
+> > running 50 VMs? Direct injection of interrupts and over-subscription
+> > are fundamentally incompatible.
+>=20
+> Each VM is configured with 8 vcpus and 16G memory. The number of
+> physical CPUs is 320.
 
-Applied to kvmarm/fixes, thanks!
+So you spawn 200 vcpus in one go. Fun.
 
-[01/12] KVM: arm64: Make ICC_*SGI*_EL1 undef in the absence of a vGICv3
-        https://git.kernel.org/kvmarm/kvmarm/c/3e6245ebe7ef
+>=20
+> >=20
+> >> 3. The business running in VMs has a frequent mmio access and need to =
+exit
+> >>  =C2=A0 to qemu for processing.
+> >> 4. Or modify the kvm code so that wfi must trap to kvm
+> >> 5. Then the utilization of pcpu where the vcpu is located will be 100%=
+,and
+> >>  =C2=A0 basically all in sys.
+> >=20
+> > What did you expect? If you trap all the time, your performance will
+> > suck.  Don't do that.
+> >=20
+> >> 6. This problem does not exist in GICv3.
+> >=20
+> > Because GICv3 doesn't have the same constraints.
+> >=20
+> >>=20
+> >> According to analysis, this problem is due to the execution of vgic_v4=
+_load.
+> >> vcpu_load or kvm_sched_in
+> >>  =C2=A0=C2=A0=C2=A0 kvm_arch_vcpu_load
+> >>  =C2=A0=C2=A0=C2=A0 ...
+> >>  =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 vgic_v4_load
+> >>  =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 irq_set_affi=
+nity
+> >>  =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 ...
+> >>  =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
+=C2=A0 irq_do_set_affinity
+> >>  =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
+=C2=A0 =C2=A0=C2=A0=C2=A0 raw_spin_lock(&tmp_mask_lock)
+> >>  =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
+=C2=A0 =C2=A0=C2=A0=C2=A0 chip->irq_set_affinity
+> >>  =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
+=C2=A0 =C2=A0=C2=A0=C2=A0 ...
+> >>  =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
+=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0 its_vpe_set_affinity
+> >>=20
+> >> The tmp_mask_lock is the key. This is a global lock. I don't quite
+> >> understand
+> >> why tmp_mask_lock is needed here. I think there are two possible
+> >> solutions here:
+> >> 1. Remove this tmp_mask_lock
+> >=20
+> > Maybe you could have a look at 33de0aa4bae98 (and 11ea68f553e24)? It
+> > would allow you to understand the nature of the problem.
+> >=20
+> > This can probably be replaced with a per-CPU cpumask, which would
+> > avoid the locking, but potentially result in a larger memory usage.
+>=20
+> Thanks, I will try it.
 
---
-Best,
-Oliver
+A simple alternative would be this:
+
+diff --git a/kernel/irq/manage.c b/kernel/irq/manage.c
+index dd53298ef1a5..0d11b74af38c 100644
+--- a/kernel/irq/manage.c
++++ b/kernel/irq/manage.c
+@@ -224,15 +224,12 @@ int irq_do_set_affinity(struct irq_data *data, const =
+struct cpumask *mask,
+ 	struct irq_desc *desc =3D irq_data_to_desc(data);
+ 	struct irq_chip *chip =3D irq_data_get_irq_chip(data);
+ 	const struct cpumask  *prog_mask;
++	struct cpumask tmp_mask =3D {};
+ 	int ret;
+=20
+-	static DEFINE_RAW_SPINLOCK(tmp_mask_lock);
+-	static struct cpumask tmp_mask;
+-
+ 	if (!chip || !chip->irq_set_affinity)
+ 		return -EINVAL;
+=20
+-	raw_spin_lock(&tmp_mask_lock);
+ 	/*
+ 	 * If this is a managed interrupt and housekeeping is enabled on
+ 	 * it check whether the requested affinity mask intersects with
+@@ -280,8 +277,6 @@ int irq_do_set_affinity(struct irq_data *data, const st=
+ruct cpumask *mask,
+ 	else
+ 		ret =3D -EINVAL;
+=20
+-	raw_spin_unlock(&tmp_mask_lock);
+-
+ 	switch (ret) {
+ 	case IRQ_SET_MASK_OK:
+ 	case IRQ_SET_MASK_OK_DONE:
+
+but that will eat a significant portion of your stack if your kernel is
+configured for a large number of CPUs.
+
+>=20
+> >> 2. Modify the gicv4 driver,do not perfrom VMOVP via
+> >> irq_set_affinity.
+> >=20
+> > Sure. You could also not use KVM at all if don't care about interrupts
+> > being delivered to your VM. We do not send a VMOVP just for fun. We
+> > send it because your vcpu has moved to a different CPU, and the ITS
+> > needs to know about that.
+>=20
+> When a vcpu is moved to a different CPU, of course VMOVP has to be sent.
+> I mean is it possible to call its_vpe_set_affinity() to send VMOVP by
+> other means (instead of by calling the irq_set_affinity() API). So we
+> can bypass this tmp_mask_lock.
+
+The whole point of this infrastructure is that the VPE doorbell is the
+control point for the VPE. If the VPE moves, then the change of
+affinity *must* be done using irq_set_affinity(). All the locking is
+constructed around that. Please read the abundant documentation that
+exists in both the GIC code and KVM describing why this is done like
+that.
+
+>=20
+> >=20
+> > You seem to be misunderstanding the use case for GICv4: a partitioned
+> > system, without any over-subscription, no vcpu migration between CPUs.
+> > If that's not your setup, then GICv4 will always be a net loss
+> > compared to SW injection with GICv3 (additional HW interaction,
+> > doorbell interrupts).
+>=20
+> Thanks for the explanation. The key to the problem is not vcpu migration
+> between CPUs. The key point is that many vcpus execute vgic_v4_load() at
+> the same time. Even if it is not migrated to another CPU, there may be a
+> large number of vcpus executing vgic_v4_load() at the same time. For
+> example, the service running in VMs has a large number of MMIO accesses
+> and need to return to userspace for emulation. Due to the competition of
+> tmp_mask_lock, performance will deteriorate.
+
+That's only a symptom. And that doesn't affect only pathological VM
+workloads, but all interrupts being moved around for any reason.
+
+>=20
+> When the target CPU is the same CPU as the last run, there seems to be
+> no need to call irq_set_affinity() in this case. I did a test and it was
+> indeed able to alleviate the problem described above.
+
+The premise is that irq_set_affinity() should be cheap when there
+isn't much to do, and you are papering over the problem.
+
+>=20
+> I feel it might be better to remove tmp_mask_lock or call
+> its_vpe_set_affinity() in another way. So I mentioned these two ideas
+> above.
+
+The removal of this global lock is the only option in my opinion.
+Either the cpumask becomes a stack variable, or it becomes a static
+per-CPU variable. Both have drawbacks, but they are not a bottleneck
+anymore.
+
+Thanks,
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
