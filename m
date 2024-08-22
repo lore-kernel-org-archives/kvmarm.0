@@ -1,122 +1,96 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F0161CCEE5
-	for <kvmarm@lists.linux.dev>; Thu, 22 Aug 2024 15:13:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75C4612E75;
+	Thu, 22 Aug 2024 15:14:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724339615; cv=none; b=ElfwzrRXbetU5k38CVtSgXJ8DbdXGSclyKxDROUdtkEcmEmyISbRA4lUsdYF1zPA0qzyeZ6X5VJZSGPtoNCoo5Z07VQfohaKQa1qdMpjzmcTTk7BaspCWzubs3yVnLylkL4dV66Y+fKRG0ee6OIMUBpJoQe68fw1lqrA0gk4f3c=
+	t=1724339666; cv=none; b=ZgKvT8hf1c6dQEqftfFPibH7V8g2kKlPGdkBYEaCAWfmT8ioaWgTRN8aZ8RbzrPoEr8welU22OMMsPt9thhc6CM80T61yuz7JIH4OkPiSWUm2pTxSA24ZTjKP4ZsGmO6lqP0IS+IHuL7VdRjTou8iqOJHugo6tBYW1dhRcWcWZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724339615; c=relaxed/simple;
-	bh=FYuGbzi8wqAHYjLVxSo7ckNrfQddZ1WoKb3IjN/XxjI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=nZ/l7q2cQq1oazYUPm3TmrBe5qgnFDkv66NkRKCzlIDuE8uXrne4LCGCrkGP1CKnqaf5i8j2pxJPRPCMJX0sCt5npv0e/rh3ME4sBr5eOzpMqaYgww4pXsenLOSOskvBDjTBOAnO4k3g6J0Nc1mkaTNe2J/sCt70OOrhyDPvU2M=
+	s=arc-20240116; t=1724339666; c=relaxed/simple;
+	bh=Z0x+iQbZGRupwKlqBCAsGrzbaayYp2vs4jBrbc+BHTI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JLuWTz7M/AUMSM5kQDyeisdZsXE/dSa7EOJWYZ+HwpiD7MbsN7noVWuxY3+ASZadiJuLq0uo65LOyB45yf2W5bx81bg8Ce0mUJYkWFlmapROmwT6KX+6K/HQ45FL7Np5QJH7WdbGmqNWJZAk1p+pAY/s7IAYlkzTqFyoz6kv38Y=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1EC09169C;
-	Thu, 22 Aug 2024 08:14:00 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 00D0F3F58B;
-	Thu, 22 Aug 2024 08:13:29 -0700 (PDT)
-From: Joey Gouly <joey.gouly@arm.com>
-To: linux-arm-kernel@lists.infradead.org
-Cc: nd@arm.com,
-	akpm@linux-foundation.org,
-	aneesh.kumar@kernel.org,
-	aneesh.kumar@linux.ibm.com,
-	anshuman.khandual@arm.com,
-	bp@alien8.de,
-	broonie@kernel.org,
-	catalin.marinas@arm.com,
-	christophe.leroy@csgroup.eu,
-	dave.hansen@linux.intel.com,
-	hpa@zytor.com,
-	joey.gouly@arm.com,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linuxppc-dev@lists.ozlabs.org,
-	maz@kernel.org,
-	mingo@redhat.com,
-	mpe@ellerman.id.au,
-	naveen.n.rao@linux.ibm.com,
-	npiggin@gmail.com,
-	oliver.upton@linux.dev,
-	shuah@kernel.org,
-	skhan@linuxfoundation.org,
-	szabolcs.nagy@arm.com,
-	tglx@linutronix.de,
-	will@kernel.org,
-	x86@kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH v5 30/30] KVM: selftests: get-reg-list: add Permission Overlay registers
-Date: Thu, 22 Aug 2024 16:11:13 +0100
-Message-Id: <20240822151113.1479789-31-joey.gouly@arm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240822151113.1479789-1-joey.gouly@arm.com>
-References: <20240822151113.1479789-1-joey.gouly@arm.com>
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DB36F169E;
+	Thu, 22 Aug 2024 08:14:50 -0700 (PDT)
+Received: from [10.57.85.214] (unknown [10.57.85.214])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 58C693F58B;
+	Thu, 22 Aug 2024 08:14:20 -0700 (PDT)
+Message-ID: <8c0f787c-35d4-4cb1-84d3-ff3f2e3f003a@arm.com>
+Date: Thu, 22 Aug 2024 16:14:18 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 21/43] arm64: RME: Runtime faulting of memory
+To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>
+References: <20240821153844.60084-1-steven.price@arm.com>
+ <20240821153844.60084-22-steven.price@arm.com> <yq5afrqx2pxr.fsf@kernel.org>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <yq5afrqx2pxr.fsf@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Add new system registers:
-  - POR_EL1
-  - POR_EL0
+On 22/08/2024 04:32, Aneesh Kumar K.V wrote:
+> Steven Price <steven.price@arm.com> writes:
+> 
+>> At runtime if the realm guest accesses memory which hasn't yet been
+>> mapped then KVM needs to either populate the region or fault the guest.
+>>
+>> For memory in the lower (protected) region of IPA a fresh page is
+>> provided to the RMM which will zero the contents. For memory in the
+>> upper (shared) region of IPA, the memory from the memslot is mapped
+>> into the realm VM non secure.
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>> Changes since v2:
+>>  * Avoid leaking memory if failing to map it in the realm.
+>>  * Correctly mask RTT based on LPA2 flag (see rtt_get_phys()).
+>>  * Adapt to changes in previous patches.
+>>
+> 
+> ....
+> 
+>> -	gfn = ipa >> PAGE_SHIFT;
+>> +	gfn = (ipa & ~gpa_stolen_mask) >> PAGE_SHIFT;
+>>  	memslot = gfn_to_memslot(vcpu->kvm, gfn);
+>> +
+>> +	if (kvm_slot_can_be_private(memslot)) {
+>> +		ret = private_memslot_fault(vcpu, fault_ipa, memslot);
+>> +		if (ret != -EAGAIN)
+>> +			goto out;
+>> +	}
+>>
+> 
+> Shouldn't this be s/fault_ipa/ipa ?
 
-Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>
-Cc: Shuah Khan <shuah@kernel.org>
-Reviewed-by: Mark Brown <broonie@kernel.org>
----
- tools/testing/selftests/kvm/aarch64/get-reg-list.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+Well they should both be the same unless we're in some scary parallel
+universe where we have nested virtualisation *and* realms at the same
+time (shudder!). But yes "ipa" would be more consistent so I'll change it!
 
-diff --git tools/testing/selftests/kvm/aarch64/get-reg-list.c tools/testing/selftests/kvm/aarch64/get-reg-list.c
-index 4abebde78187..d43fb3f49050 100644
---- tools/testing/selftests/kvm/aarch64/get-reg-list.c
-+++ tools/testing/selftests/kvm/aarch64/get-reg-list.c
-@@ -40,6 +40,18 @@ static struct feature_id_reg feat_id_regs[] = {
- 		ARM64_SYS_REG(3, 0, 0, 7, 3),	/* ID_AA64MMFR3_EL1 */
- 		8,
- 		1
-+	},
-+	{
-+		ARM64_SYS_REG(3, 0, 10, 2, 4),	/* POR_EL1 */
-+		ARM64_SYS_REG(3, 0, 0, 7, 3),	/* ID_AA64MMFR3_EL1 */
-+		16,
-+		1
-+	},
-+	{
-+		ARM64_SYS_REG(3, 3, 10, 2, 4),	/* POR_EL0 */
-+		ARM64_SYS_REG(3, 0, 0, 7, 3),	/* ID_AA64MMFR3_EL1 */
-+		16,
-+		1
- 	}
- };
- 
-@@ -468,6 +480,7 @@ static __u64 base_regs[] = {
- 	ARM64_SYS_REG(3, 0, 10, 2, 0),	/* MAIR_EL1 */
- 	ARM64_SYS_REG(3, 0, 10, 2, 2),	/* PIRE0_EL1 */
- 	ARM64_SYS_REG(3, 0, 10, 2, 3),	/* PIR_EL1 */
-+	ARM64_SYS_REG(3, 0, 10, 2, 4),	/* POR_EL1 */
- 	ARM64_SYS_REG(3, 0, 10, 3, 0),	/* AMAIR_EL1 */
- 	ARM64_SYS_REG(3, 0, 12, 0, 0),	/* VBAR_EL1 */
- 	ARM64_SYS_REG(3, 0, 12, 1, 1),	/* DISR_EL1 */
-@@ -475,6 +488,7 @@ static __u64 base_regs[] = {
- 	ARM64_SYS_REG(3, 0, 13, 0, 4),	/* TPIDR_EL1 */
- 	ARM64_SYS_REG(3, 0, 14, 1, 0),	/* CNTKCTL_EL1 */
- 	ARM64_SYS_REG(3, 2, 0, 0, 0),	/* CSSELR_EL1 */
-+	ARM64_SYS_REG(3, 3, 10, 2, 4),	/* POR_EL0 */
- 	ARM64_SYS_REG(3, 3, 13, 0, 2),	/* TPIDR_EL0 */
- 	ARM64_SYS_REG(3, 3, 13, 0, 3),	/* TPIDRRO_EL0 */
- 	ARM64_SYS_REG(3, 3, 14, 0, 1),	/* CNTPCT_EL0 */
--- 
-2.25.1
+Steve
+
+> 	ret = private_memslot_fault(vcpu, ipa, memslot);
+> 
+> -aneesh
 
