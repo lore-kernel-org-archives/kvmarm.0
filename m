@@ -1,57 +1,57 @@
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D8ED18732D
-	for <kvmarm@lists.linux.dev>; Fri, 23 Aug 2024 10:45:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 743D518733B
+	for <kvmarm@lists.linux.dev>; Fri, 23 Aug 2024 10:53:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724409908; cv=none; b=tWkyiaDEazaKgK2E4Pfd8w2s1vY7lcccy36+gYplPYlk+LWf6D8nJuP6aizmPtTnm66Mid3uvlodWA9YtD7wfY/536GMkSmUnr9/eDnWnBKCegm6kf3tPDGVEpGhO21QMINu0LjjeK9An21tkcHy/ai58EaPyuGjELznrLq8YOo=
+	t=1724410421; cv=none; b=JdL5Ky/bxW9DZJhXkq0DMNhmAiF5rSb29qCUZjdU4iUKO6rzmBEH24owUDKKT/e1/74lyj7fvKSMAduVtgObqVZ6+WUTHU2Lar0RBmhbxA2K1NGzsNpl6I5sTMw0JnBemaneIZ9zPGyo2YEJSdTzGvik+BkJ5ZF1vTCeuYkOOjc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724409908; c=relaxed/simple;
-	bh=mY7WG1BpnmaYL8oGHoYsvPIyFann+pzTX5NMGm/xcIw=;
+	s=arc-20240116; t=1724410421; c=relaxed/simple;
+	bh=14eI9wbxnFWRE77Aw9u75ObMAFW9V9XQKX7ZYi2n93o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EIE4x0pM/fgj7g7EWmfK+gD1+gMa2PfLwzlT3zb4mXZkdnPTLwylw54GIy7xvfJHCWNR0sfW3TPC7vP4XI0WiTdiCcqbtz2RJt5cig87jX+HS1jKgiYkLBPgqVpA3nlVawl+2BD7CmI7oRUp3m0hQewGpQiZWRPny7ir4whw4q0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=to5JMLY3; arc=none smtp.client-ip=209.85.128.54
+	 Content-Type:Content-Disposition:In-Reply-To; b=r3Z4p23zRaumqResviAzgQouvlNQmH66ixpgJippkySGGHxMGxA57lqgbSlO+AS4S8uRcvpx7kFDVbDAhHXjsMP2kAnjKrUFSwng6M/YuroLdBwcXAmzsPcjWbkhXn39D/Q41hQDmUs1A3VH+H2JA/KAlchdrdIGmClHhxCGhOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WvL5ARC7; arc=none smtp.client-ip=209.85.208.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="to5JMLY3"
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-42807cb6afdso44675e9.1
-        for <kvmarm@lists.linux.dev>; Fri, 23 Aug 2024 03:45:06 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WvL5ARC7"
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5bebc830406so12358a12.0
+        for <kvmarm@lists.linux.dev>; Fri, 23 Aug 2024 03:53:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724409905; x=1725014705; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1724410418; x=1725015218; darn=lists.linux.dev;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dM4LwHl+OTfLAzGqAwV8fBwSI5CJb/Eqh34hFcM3170=;
-        b=to5JMLY3fLaEm0+39hnWjhCSLM5ShCqxcFZ7E5CLnuXiB0zjpoMEUrd9OwxU1j1drG
-         mc8rxUqS8q61LfHlmv8pvnIr3cd1Ig2sE1hRCV3Xlum8Qo3G+E4NaOJwx3ZB7YQXjLHp
-         DyWfGFDma0NOGCrMA6HOnxfWeyc5mrQODqUdAjtjCFQ3K85OkFmZClpLBUE7I4W81kMe
-         o9lvW+s2/rQxICotY+RdGCBtHW0USRFhvTqK2TUG0TWSiI4v/1q6meTYSaK0sAnmjyaE
-         8ca78cB/vlelZoEasyPMtoyqApJqlEoyaRu4WWD0MdWuVevCsn6ubqMEZG221+IACxM5
-         U3Mg==
+        bh=97kJncKaau0XUtGqu9KlbMlq17Xy5W14fLjy+xayMp8=;
+        b=WvL5ARC7dRksxMptRqmsiOOnrFRpAs+spiI642oJ3OkFYXeL4pSHdP6E0a8gamGsTi
+         1SOwAEfxrWgCTTDtl23hdecBDYkwLogPoFnCucGvxySxOnphbZh56B3ULv9BXSOLX7kz
+         Xsm8pG+DwMAdvZZ5kME7sRmT9aRk1aKrQneaDJIu5BV4CexkF0SQHXylQXnnzbcUr9NQ
+         Wemg0bMAPezQUsGFPcHTL11TIidgu914SRvIRueOJgT3etSef1uZd/O3ORSrbcGrK5l/
+         jvEnWY4w0HGZZo4B//8WYkuzKrQnWCLH8cm9yhBmcE632lKVn0dpvP7PjWvYcafZzWz/
+         tgXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724409905; x=1725014705;
+        d=1e100.net; s=20230601; t=1724410418; x=1725015218;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dM4LwHl+OTfLAzGqAwV8fBwSI5CJb/Eqh34hFcM3170=;
-        b=IstIenhSP9w9U0nTa9vS2D0PFydxiwvHtFP9R+O85bwTREpIGqnR3LU7K6GZ44MGXR
-         2UEnp29KWu9uDWEXm6rQ6JBVWyEaOnlaO5DHoI3zaEqUQjVvuN1WAEL1XaIIWsh33uvd
-         p0ok/MAsqVdoYRqty/n87pv1QhxOccZjGKcT4w/i+jWM8DR8ZKEPkZ+W6gLcChjs1eEr
-         4xaymK+P4W1n3x3tVtD0CKxJnFeBzF/q1Z4v3o4x150Ya9+Flm8wdCd3H3w49E3MYP49
-         xMjvpdKrLSC/R1wftCxYCd1gof+MeUJnP6gjvk/mtt9GKAHGq+vJismTfzn9/RD7ncvC
-         Zoqw==
-X-Forwarded-Encrypted: i=1; AJvYcCXjVwAZ/4S5Ynhdgg47YIHdFQQEFMqqdG8q+XA1jFGOj1zCivmyJR1+TLyxFI4fr/+LokifAFE=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyDAw3atsdQi8BxZczfqcluKRBxkDBZIfFctYP2e49d/RXYKWG6
-	jlvNIIqp4QN4bm5qmE/wDnNe9QdjOom06cy6UQVok5U/kYrMUHIWJ746nad8xA==
-X-Google-Smtp-Source: AGHT+IGCq/lP92Pn/y/bVzPCgVO2MjtdDpM7iwE1zQYcrndOus0Lqjotk/0CReJDBM3G1Xwqzynk+Q==
-X-Received: by 2002:a05:600c:1da7:b0:428:e6eb:1340 with SMTP id 5b1f17b1804b1-42acc3a072dmr1145875e9.4.1724409904466;
-        Fri, 23 Aug 2024 03:45:04 -0700 (PDT)
+        bh=97kJncKaau0XUtGqu9KlbMlq17Xy5W14fLjy+xayMp8=;
+        b=iWAXuyX9tFkkRU4At6dFtgZfvjxe/QS55d6JbBiFFPq8wjIpuqG7Uz8jwPAUpr4/BL
+         ShcdxjpYAFjX+RESIBcKcIIhTvhS7lIf5QIvVn8+p5sKu2x67iCCGbMEb7+x3Iy3MPi9
+         dvHy5OTcblU6I5FvjC7vEsWfXf2IUF03Z5QjugevyC/nmaOdnAfHlvtLTXRfCPNoSeWS
+         s7xEVxHNGSIrOZwlqVBEBOvBMV+MhSRxR4OH3H4pVGcDsRApRFO3Nm2tXdC4UYXJYw3k
+         gZiTG1jIxgNSm5e+FY0lh6CuG9b1HuGC8DJ9aQHXIs/aAwiMGCKqluley2ZAAhxUcX+3
+         eeJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX7uEFKlB4lKroeYvQcTn1/88rMaQrUlqPWK2poBAtIwKwQfrw/ErK/OcBZz/v9N5nXhDN8c5w=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwNYxg7klmpeJTaenFUYEmkQ3jDZAFM8lv4/2HWNYArSZ0fnsJx
+	fdurJ8+3kP3K5WuDJIWFndvrIAjhFZY8oQz7fw9irA8ZecaZ7x6DfFRAO6f36Q==
+X-Google-Smtp-Source: AGHT+IFG5GPViFVRlRs7iRjC5gsUhcjRYi1WRKI4026Wk+Av5lQ341JA3hRRqV2uWIfCqwSh25olAA==
+X-Received: by 2002:a05:6402:3493:b0:58b:90c6:c59e with SMTP id 4fb4d7f45d1cf-5c088db8927mr94562a12.7.1724410417331;
+        Fri, 23 Aug 2024 03:53:37 -0700 (PDT)
 Received: from google.com (44.232.78.34.bc.googleusercontent.com. [34.78.232.44])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37308265ae6sm3828084f8f.109.2024.08.23.03.45.03
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-373081ff654sm3851203f8f.75.2024.08.23.03.53.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Aug 2024 03:45:03 -0700 (PDT)
-Date: Fri, 23 Aug 2024 10:45:02 +0000
+        Fri, 23 Aug 2024 03:53:36 -0700 (PDT)
+Date: Fri, 23 Aug 2024 10:53:35 +0000
 From: Sebastian Ene <sebastianene@google.com>
 To: Marc Zyngier <maz@kernel.org>
 Cc: akpm@linux-foundation.org, alexghiti@rivosinc.com, ankita@nvidia.com,
@@ -64,7 +64,7 @@ Cc: akpm@linux-foundation.org, alexghiti@rivosinc.com, ankita@nvidia.com,
 	linux-kernel@vger.kernel.org, kernel-team@android.com
 Subject: Re: [PATCH v8 4/6] KVM: arm64: Register ptdump with debugfs on guest
  creation
-Message-ID: <ZshoLrEseHJZvyE_@google.com>
+Message-ID: <ZshqL23kf1GokHWt@google.com>
 References: <20240816123906.3683425-1-sebastianene@google.com>
  <20240816123906.3683425-5-sebastianene@google.com>
  <86r0ajxp8q.wl-maz@kernel.org>
@@ -79,9 +79,6 @@ Content-Disposition: inline
 In-Reply-To: <86r0ajxp8q.wl-maz@kernel.org>
 
 On Tue, Aug 20, 2024 at 03:06:45PM +0100, Marc Zyngier wrote:
-
-Hello Marc,
-
 > On Fri, 16 Aug 2024 13:39:04 +0100,
 > Sebastian Ene <sebastianene@google.com> wrote:
 > > 
@@ -92,9 +89,6 @@ Hello Marc,
 > > functionality **specific** to KVM.
 > 
 > Drop the ** emphasis.
-
-I will drop this.
-
 > 
 > > 
 > > When a guest is created, register a new file entry under the guest
@@ -144,18 +138,11 @@ I will drop this.
 > > +         kernel.
 > 
 > nit: try to keep the formatting within 80 columns.
-
-Let me fix the formatting and add the other depends on rules.
-
 > 
 > More importantly, I find it very strange to expose the configuration
 > option so early in the series, while the support code isn't there yet.
 > You can perfectly introduce code that is conditional on a config
 > option and only add it at the end.
-
-I will move the configuration option as a separate patch in the last
-part of the series.
-
 > 
 > > +
 > > +         If in doubt, say N.
@@ -227,6 +214,9 @@ part of the series.
 > Please don't add new include files that contain so little stuff. These
 > things may as well be added either to asm/kvm_host.h or asm/ptdump.h.
 > 
+
+I will drop this in this case.
+
 > > diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
 > > new file mode 100644
 > > index 000000000000..52483d56be2e
@@ -264,6 +254,13 @@ part of the series.
 > What does "common" mean here? You have exactly *one* caller, so why
 > isn't that inlined in kvm_ptdump_guest_show()?
 > 
+
+Right, this first part of the series adds the support for non-protected
+VM which is only one caller. The later one which I haven't sent yet adds
+support for protected for both the host and the guest. I will keep it in 
+kvm_ptdump_guest_show() for now.
+
+
 > > +				  struct kvm_pgtable *pgtable,
 > > +				  struct ptdump_pg_state *parser_state)
 > > +{
@@ -340,14 +337,6 @@ part of the series.
 > I have the feeling that this patch would be better squashed together
 > with patch #5, since it significantly reworks what patch #4 does.
 > 
-
-Right, I think there are a few patches that should be squashed to
-prevent this "empty" functionality.
-
-Thanks for the feedback,
-Seb
-
-
 > Thanks,
 > 
 > 	M.
