@@ -1,120 +1,90 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37F87188937;
-	Fri, 23 Aug 2024 14:24:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D51C41EB27;
+	Fri, 23 Aug 2024 14:45:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724423046; cv=none; b=brsPWpRoVCz9EMskndFyFSWjhXXlAyWueD5EwxaekBGNYizWgGfpevBjqWCjs5vjH8a1Cms5fGyDMt6HXgssrJ0r+M0m+ncrmMMFN0ZO2ZbLvxfQKhnN79kgC9Mg7DXYp49O5NwSXpO2LFbXRYdLDLA5oYVh/EKkIxMmu+7aqy0=
+	t=1724424340; cv=none; b=cpihHkgP+2FhBTuBkhas0ciB01ESbx/AS2Y2P7EKzXNjwyvkmLLU4VS2bxHLKxTuE3EA5S0KXOS5QRkGDUr6NirwEhkj3WqtuGVctEa27Jgyt1IvSdw7eEeIzpSOQ0ToLX4+yG8hLH1SFKOz/QvH+yZoF1opVYrc5tYJeDm5Z9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724423046; c=relaxed/simple;
-	bh=SLKDSke/wUGBLMnN3vAtRLfAoCEBzo3yPCvhIy66cMs=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TSx1XSDl6WzM14ShLxg9yTAfcaoiNbqbgFB5mB+QXN8OKxxaU/kqowuwlCe0wx1KlowQz6bsWZp1nQLoePF0FYPJ/uFPotLH1PQ4hCn/6ezMMbaG0UHmDwJdzEHXWCT1GoQV/WN/mRJ8Sb0VCmfDcPHxR52pI5O9YduDjJgcTQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VWd+f4b2; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1724424340; c=relaxed/simple;
+	bh=W6z8CSJIQISlh38AzR3KbpPdvjf84h6oaEwrIWjYySE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=m+ZmO2Gmj51N62pxDAWIQI+14D4sDV7LvEZq18sMx2/i6LPcVbv7xd5KQGWTfi7XGkh9wp8JZ26PwzX1mSXfqOR4HRAUFugptPoDMkPsx05YwjDmEaUGNdLpRw6gZ3fDjDPfATKwRgQK3noeKa939DfVVbSUpVChly9NM2qOq6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sZqjTOS2; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VWd+f4b2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B35ACC32786;
-	Fri, 23 Aug 2024 14:24:05 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sZqjTOS2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CE55C32786;
+	Fri, 23 Aug 2024 14:45:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724423045;
-	bh=SLKDSke/wUGBLMnN3vAtRLfAoCEBzo3yPCvhIy66cMs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=VWd+f4b2S+YOt8PKvFw5i15F+pg7C+6aSIQa9MizkvCFuKxRrud1ZrCcdJw/AD8xf
-	 /ciMYGVTP9SSf+vfKrx0qnwjy7dWxFvcVJPSQpWaB/HEu+TDMG96BQBTJQkCPLWquS
-	 5pDyqFoAfYqdYLcl4qlUcydaXnm37OR69LPY+4+DXAp/jUN7D+5lMBrtrArsId1mi4
-	 pW9OA1PmIwTosxByk06YAlOi3xUJADfAVKbLQUwhj5xm/pWHgmCSI5EcY+7t6E50o/
-	 p6JoNnNhp5kL7TURfNRLZsw2sWTD74MEIxhFolJNAITP7r9wHti3u4tjeIEseeXYi8
-	 YypkKASN5KcaA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1shVCt-006ICL-3b;
-	Fri, 23 Aug 2024 15:24:03 +0100
-Date: Fri, 23 Aug 2024 15:24:02 +0100
-Message-ID: <86y14nwc59.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Will Deacon <will@kernel.org>
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	nd@arm.com,
-	akpm@linux-foundation.org,
-	aneesh.kumar@kernel.org,
-	aneesh.kumar@linux.ibm.com,
-	anshuman.khandual@arm.com,
-	bp@alien8.de,
-	broonie@kernel.org,
-	catalin.marinas@arm.com,
-	christophe.leroy@csgroup.eu,
-	dave.hansen@linux.intel.com,
-	hpa@zytor.com,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linuxppc-dev@lists.ozlabs.org,
-	mingo@redhat.com,
-	mpe@ellerman.id.au,
-	naveen.n.rao@linux.ibm.com,
-	npiggin@gmail.com,
-	oliver.upton@linux.dev,
-	shuah@kernel.org,
-	skhan@linuxfoundation.org,
-	szabolcs.nagy@arm.com,
-	tglx@linutronix.de,
-	x86@kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v5 08/30] KVM: arm64: make kvm_at() take an OP_AT_*
-In-Reply-To: <20240823134811.GG32156@willie-the-truck>
+	s=k20201202; t=1724424340;
+	bh=W6z8CSJIQISlh38AzR3KbpPdvjf84h6oaEwrIWjYySE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=sZqjTOS2yJ3SZLJsVGt+kPr01XngWDjZhXRB11P59QKeuj0yVdJ2sI1jiTOtfwc1l
+	 0KofF0+gZW+2ilrX698/xbyYRzb0afe9ZQFHS1eX/89s0tT+SeZqTHYfl0x18Zexz+
+	 ojJmzjO42Pp6SJ9/97BgEuwauVrtWeqDuXAITbu5HlICS/eRA8zhCqnIg8SX7Th28A
+	 y7taxVji40p7C4F97d5UAN7RkOd33c6kp1ratVeJjgaBBAfyebkKljPHUnl0HXwW3X
+	 1mwWo5iqo+efoKR6XMU/0Rs+9uXSAMETOVivGRw42b48YIgSaoiHjeAEww/ehNsqRy
+	 s82ANrYxvLTLA==
+Date: Fri, 23 Aug 2024 15:45:32 +0100
+From: Will Deacon <will@kernel.org>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, nd@arm.com,
+	akpm@linux-foundation.org, aneesh.kumar@kernel.org,
+	aneesh.kumar@linux.ibm.com, anshuman.khandual@arm.com, bp@alien8.de,
+	broonie@kernel.org, catalin.marinas@arm.com,
+	christophe.leroy@csgroup.eu, dave.hansen@linux.intel.com,
+	hpa@zytor.com, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
+	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
+	oliver.upton@linux.dev, shuah@kernel.org, skhan@linuxfoundation.org,
+	szabolcs.nagy@arm.com, tglx@linutronix.de, x86@kernel.org,
+	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v5 06/30] arm64: context switch POR_EL0 register
+Message-ID: <20240823144531.GH32156@willie-the-truck>
 References: <20240822151113.1479789-1-joey.gouly@arm.com>
-	<20240822151113.1479789-9-joey.gouly@arm.com>
-	<20240823134811.GG32156@willie-the-truck>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <20240822151113.1479789-7-joey.gouly@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: will@kernel.org, joey.gouly@arm.com, linux-arm-kernel@lists.infradead.org, nd@arm.com, akpm@linux-foundation.org, aneesh.kumar@kernel.org, aneesh.kumar@linux.ibm.com, anshuman.khandual@arm.com, bp@alien8.de, broonie@kernel.org, catalin.marinas@arm.com, christophe.leroy@csgroup.eu, dave.hansen@linux.intel.com, hpa@zytor.com, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org, mingo@redhat.com, mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com, oliver.upton@linux.dev, shuah@kernel.org, skhan@linuxfoundation.org, szabolcs.nagy@arm.com, tglx@linutronix.de, x86@kernel.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240822151113.1479789-7-joey.gouly@arm.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Fri, 23 Aug 2024 14:48:11 +0100,
-Will Deacon <will@kernel.org> wrote:
+On Thu, Aug 22, 2024 at 04:10:49PM +0100, Joey Gouly wrote:
+> POR_EL0 is a register that can be modified by userspace directly,
+> so it must be context switched.
 > 
-> On Thu, Aug 22, 2024 at 04:10:51PM +0100, Joey Gouly wrote:
-> > To allow using newer instructions that current assemblers don't know about,
-> > replace the `at` instruction with the underlying SYS instruction.
-> > 
-> > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-> > Cc: Marc Zyngier <maz@kernel.org>
-> > Cc: Oliver Upton <oliver.upton@linux.dev>
-> > Cc: Catalin Marinas <catalin.marinas@arm.com>
-> > Cc: Will Deacon <will@kernel.org>
-> > Reviewed-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/kvm_asm.h       | 3 ++-
-> >  arch/arm64/kvm/hyp/include/hyp/fault.h | 2 +-
-> >  2 files changed, 3 insertions(+), 2 deletions(-)
-> 
-> Marc -- what would you like to do with this patch? I think the POE series
-> is really close now, so ideally I'd queue the lot on a branch in arm64
-> and you could pull the first ~10 patches into kvmarm if you need 'em.
->
-> Would what work for you, or did you have something else in mind (since
-> this one is also included in your series adding nv support for AT).
+> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will@kernel.org>
+> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+> ---
+>  arch/arm64/include/asm/cpufeature.h |  6 ++++++
+>  arch/arm64/include/asm/processor.h  |  1 +
+>  arch/arm64/include/asm/sysreg.h     |  3 +++
+>  arch/arm64/kernel/process.c         | 28 ++++++++++++++++++++++++++++
+>  4 files changed, 38 insertions(+)
 
-Yup, that works for me. I can take that prefix as the base for the AT
-series and drop my copy of this patch.
+[...]
 
-Thanks,
+> +static void permission_overlay_switch(struct task_struct *next)
+> +{
+> +	if (!system_supports_poe())
+> +		return;
+> +
+> +	current->thread.por_el0 = read_sysreg_s(SYS_POR_EL0);
+> +	if (current->thread.por_el0 != next->thread.por_el0) {
+> +		write_sysreg_s(next->thread.por_el0, SYS_POR_EL0);
+> +		/* ISB required for kernel uaccess routines when chaning POR_EL0 */
 
-	M.
+nit: typo "chaning".
 
--- 
-Without deviation from the norm, progress is not possible.
+But more substantially, is this just to prevent spurious faults in the
+context of a new thread using a stale value for POR_EL0?
+
+Will
