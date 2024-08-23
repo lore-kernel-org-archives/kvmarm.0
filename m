@@ -1,198 +1,58 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D232244C76;
-	Fri, 23 Aug 2024 08:49:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B09B1494D6;
+	Fri, 23 Aug 2024 08:54:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724402968; cv=none; b=J2e/2FnJKzA6eNyTaAl3eRJKZ5COAvvyVzY7l7qdJe6BOFsZUFzWfQLJqD9zbq4M5fG04y8jyoeKo9YXLhgFmPDZ8BMqrdkq9FSoChptZpm3Ge0O87FYqp2s/wO+sI7HruquKkOmZXT4UaekgPoXd7oITm8jTItCDaErXoo50Nc=
+	t=1724403258; cv=none; b=Z2akU6OWmxD7sNMHALNJTTiJkZAVcuih3BkhmwlZmYv1JgXwZMlD4GYhqzl0gekKcaIHOCpoJ2MwRkT0T/ep93W8nJ4/h1BygSEM7IRd3Er7GL2k67BcwGYUYvbxJZYE5nQPGEWyUP5m2hGKMa7ESCOOC8bjvn9SMLgJlKA52wo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724402968; c=relaxed/simple;
-	bh=zCE2kZSuqOPFejVfzIWBbTQf/qt0/VX9kCnDZTFKx2Y=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GxbEYGCyBA4P5VNPX8EmD6OBtCPtEjDV69w+rKFcJFM78HTEPHabA8An0RqyiEWR41I/Zmqg98DsF0NSwlA8RBv2bPWoqP73g0pzWvr7me2aztGbJ8oiLtV3JakqXvn4L3jnhThFm5gqSi8yAOFnNtMNnspPXJnzqOkTbwClVvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i8xYP4k3; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i8xYP4k3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5BCCFC32786;
-	Fri, 23 Aug 2024 08:49:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724402968;
-	bh=zCE2kZSuqOPFejVfzIWBbTQf/qt0/VX9kCnDZTFKx2Y=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=i8xYP4k3ewj6fE4mQ+/VBWhzCjnSPwmNYTT4N81gCesGnl05TVs7xarsdMDTEhsua
-	 WrQETnlwpTX8Uzjzo9d0Ez1otntpVCMyp10pxmCDz4RwHLpMp5oSqxjr4U/1V1kyYD
-	 PNOu5j9E56plxGGMvIqPZ5AT9+2jhN+mUiaFGMSYbPWWWBfp2FPdI6IMVwacvfGVfl
-	 FjGp41usHf/BBtikuakb0zBMszV/+TfNy9PuUSyBqwzK/oP+5fS2WkHf80VV4pLorU
-	 ZxcCsUdHX2A0fMZQ1+rdPmLoFCQ8cAddOVxQUt5Jp9+6YJBwbe81vbt7V0FYLCnk9f
-	 QDtEvaVyThBOg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1shPz3-006Bvc-Vn;
-	Fri, 23 Aug 2024 09:49:26 +0100
-Date: Fri, 23 Aug 2024 09:49:25 +0100
-Message-ID: <86zfp3wrmy.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Thomas Gleixner <tglx@linutronix.de>, Kunkun Jiang <jiangkunkun@huawei.com>
-Cc: 	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse
- <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui
- Yu <yuzenghui@huawei.com>,
-	"open list:IRQ\
- SUBSYSTEM" <linux-kernel@vger.kernel.org>,
-	"moderated list:ARM SMMU\
- DRIVERS" <linux-arm-kernel@lists.infradead.org>,
-	kvmarm@lists.linux.dev,
-	"wanghaibin.wang@huawei.com" <wanghaibin.wang@huawei.com>,
-	nizhiqiang1@huawei.com,
-	"tangnianyao@huawei.com" <tangnianyao@huawei.com>,
-	wangzhou1@hisilicon.com
-Subject: Re: [bug report] GICv4.1: multiple vpus execute vgic_v4_load at the same time will greatly increase the time consumption
-In-Reply-To: <87o75kgspg.ffs@tglx>
-References: <a7fc58e4-64c2-77fc-c1dc-f5eb78dbbb01@huawei.com>
-	<86msl6xhu2.wl-maz@kernel.org>
-	<f1574274-efd8-eb56-436b-5a1dd7620f2c@huawei.com>
-	<867cc9x8si.wl-maz@kernel.org>
-	<bd3c3103-a6d7-a91b-911d-5bc5f2382dae@huawei.com>
-	<864j7cybay.wl-maz@kernel.org>
-	<87o75kgspg.ffs@tglx>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1724403258; c=relaxed/simple;
+	bh=7i6fCcCwJYX6XAHAEsm0q7UIi0qq58vGvrmMaBBTV08=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KSl7oxhXiDWK2Qihj/gSM1GdqiKNnk3JzXauT3S7RlVf8F+NMu2xLfAUo6YOAJx1U4SfjH6QbTiND/IzUQy9vBT3a9o9b6DLGpjCk/DH7alQx4I1xa0BvV9/ySkWLTa/YS1DIkNaCCAD3V8yOtvXJxJpzXrPyhTki1P6Wsd01TI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7DADAC32786;
+	Fri, 23 Aug 2024 08:54:16 +0000 (UTC)
+Date: Fri, 23 Aug 2024 09:54:14 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
+	kvmarm@lists.linux.dev, Paolo Bonzini <pbonzini@redhat.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Will Deacon <will@kernel.org>
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.11, round #2
+Message-ID: <ZshONupF3nIhAlRf@arm.com>
+References: <Zsb4kbq6FAfgg4WA@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tglx@linutronix.de, jiangkunkun@huawei.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, wanghaibin.wang@huawei.com, nizhiqiang1@huawei.com, tangnianyao@huawei.com, wangzhou1@hisilicon.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zsb4kbq6FAfgg4WA@linux.dev>
 
-On Thu, 22 Aug 2024 22:20:43 +0100,
-Thomas Gleixner <tglx@linutronix.de> wrote:
+Hi Oliver,
+
+On Thu, Aug 22, 2024 at 01:36:33AM -0700, Oliver Upton wrote:
+> Paolo is on holiday for a few weeks and has asked that KVM arch maintainers
+> send pulls through the architecture trees in his absence.
 > 
-> On Thu, Aug 22 2024 at 13:47, Marc Zyngier wrote:
-> > On Thu, 22 Aug 2024 11:59:50 +0100,
-> > Kunkun Jiang <jiangkunkun@huawei.com> wrote:
-> >> > but that will eat a significant portion of your stack if your kernel is
-> >> > configured for a large number of CPUs.
-> >> > 
-> >> 
-> >> Currently CONFIG_NR_CPUS=4096,each `struct cpumask` occupies 512 bytes.
-> >
-> > This seems crazy. Why would you build a kernel with something *that*
-> > big, specially considering that you have a lot less than 1k CPUs?
+> So lucky you, here's a pile of kvmarm crap from the past week.
 > 
-> That's why CONFIG_CPUMASK_OFFSTACK exists, but that does not help in
-> that context. :)
->
-> >> > The removal of this global lock is the only option in my opinion.
-> >> > Either the cpumask becomes a stack variable, or it becomes a static
-> >> > per-CPU variable. Both have drawbacks, but they are not a bottleneck
-> >> > anymore.
-> >> 
-> >> I also prefer to remove the global lock. Which variable do you think is
-> >> better?
-> >
-> > Given the number of CPUs your system is configured for, there is no
-> > good answer. An on-stack variable is dangerously large, and a per-CPU
-> > cpumask results in 2MB being allocated, which I find insane.
-> 
-> Only if there are actually 4096 CPUs enumerated. The per CPU magic is
-> smart enough to limit the damage to the actual number of possible CPUs
-> which are enumerated at boot time. It still will over-allocate due to
-> NR_CPUS being insanely large but on a 4 CPU machine this boils down to
-> 2k of memory waste unless Aaarg64 is stupid enough to allocate for
-> NR_CPUS instead of num_possible_cpus()...
+> Details can be found in the tag, but this is a set of small fixes
+> around the shop thanks to syzkaller bringup on KVM/arm64 and a few
+> recently introduced bugs.
 
-No difference between arm64 and xyz85.999 here.
+Pulled into the arm64 for-next/fixes branch. I'll send a pull request to
+Linus later today.
 
-> 
-> That said, on a real 4k CPU system 2M of memory should be the least of
-> your worries.
+BTW, I'm also away next week. I'll randomly check emails but if you have
+another pull request, better send it to Will.
 
-Don't underestimate the general level of insanity!
-
-> 
-> > You'll have to pick your own poison and convince Thomas of the
-> > validity of your approach.
-> 
-> As this is an operation which is really not suitable for on demand
-> or large stack allocations the per CPU approach makes sense.
-
-Right, so let's shoot for that. Kunkun, can you please give the
-following hack a go with your workload?
-
-Thanks,
-
-	M.
-
-diff --git a/kernel/irq/manage.c b/kernel/irq/manage.c
-index dd53298ef1a5..b6aa259ac749 100644
---- a/kernel/irq/manage.c
-+++ b/kernel/irq/manage.c
-@@ -224,15 +224,16 @@ int irq_do_set_affinity(struct irq_data *data, const struct cpumask *mask,
- 	struct irq_desc *desc = irq_data_to_desc(data);
- 	struct irq_chip *chip = irq_data_get_irq_chip(data);
- 	const struct cpumask  *prog_mask;
-+	struct cpumask *tmp_mask;
- 	int ret;
- 
--	static DEFINE_RAW_SPINLOCK(tmp_mask_lock);
--	static struct cpumask tmp_mask;
-+	static DEFINE_PER_CPU(struct cpumask, __tmp_mask);
- 
- 	if (!chip || !chip->irq_set_affinity)
- 		return -EINVAL;
- 
--	raw_spin_lock(&tmp_mask_lock);
-+	tmp_mask = this_cpu_ptr(&__tmp_mask);
-+
- 	/*
- 	 * If this is a managed interrupt and housekeeping is enabled on
- 	 * it check whether the requested affinity mask intersects with
-@@ -258,11 +259,11 @@ int irq_do_set_affinity(struct irq_data *data, const struct cpumask *mask,
- 
- 		hk_mask = housekeeping_cpumask(HK_TYPE_MANAGED_IRQ);
- 
--		cpumask_and(&tmp_mask, mask, hk_mask);
--		if (!cpumask_intersects(&tmp_mask, cpu_online_mask))
-+		cpumask_and(tmp_mask, mask, hk_mask);
-+		if (!cpumask_intersects(tmp_mask, cpu_online_mask))
- 			prog_mask = mask;
- 		else
--			prog_mask = &tmp_mask;
-+			prog_mask = tmp_mask;
- 	} else {
- 		prog_mask = mask;
- 	}
-@@ -272,16 +273,14 @@ int irq_do_set_affinity(struct irq_data *data, const struct cpumask *mask,
- 	 * unless we are being asked to force the affinity (in which
- 	 * case we do as we are told).
- 	 */
--	cpumask_and(&tmp_mask, prog_mask, cpu_online_mask);
--	if (!force && !cpumask_empty(&tmp_mask))
--		ret = chip->irq_set_affinity(data, &tmp_mask, force);
-+	cpumask_and(tmp_mask, prog_mask, cpu_online_mask);
-+	if (!force && !cpumask_empty(tmp_mask))
-+		ret = chip->irq_set_affinity(data, tmp_mask, force);
- 	else if (force)
- 		ret = chip->irq_set_affinity(data, mask, force);
- 	else
- 		ret = -EINVAL;
- 
--	raw_spin_unlock(&tmp_mask_lock);
--
- 	switch (ret) {
- 	case IRQ_SET_MASK_OK:
- 	case IRQ_SET_MASK_OK_DONE:
+Thanks.
 
 -- 
-Without deviation from the norm, progress is not possible.
+Catalin
