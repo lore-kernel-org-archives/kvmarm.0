@@ -1,149 +1,165 @@
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64BAD80C02
-	for <kvmarm@lists.linux.dev>; Fri, 23 Aug 2024 21:27:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F1A1195;
+	Fri, 23 Aug 2024 22:01:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724448451; cv=none; b=J5bF1V5yrpiHviw/R//V/x7x4OItX8pLHmVAxeOpv+WGq3mXHvrR3l8UvSdtZWJfy5n0ccsciTO7FGoMfgsYDU0VdMjU01QCNlLmEa/SKvhWo2lP8mfLlBXKbsPu3ArpkQYbymV5rFUQNBvo8jngmHBDefqO+/QoX1/yd+gI9gE=
+	t=1724450477; cv=none; b=Tts6HZLrgTPuVNecKVK3rEdEwtnxg+okY1lzAv/Rk/uVw6alQu8n+KHrxCCnR/+r7go9OzjaEFtUd0P2E3WE3BxTIwewcgwtyWUGTmeKg3eYbk3BD7GDiK6BBl1vTOUDB0c79Pqj6DEFGawwZh6AaJ01TorZiK68WhM8UGgIRug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724448451; c=relaxed/simple;
-	bh=9pIaf7gNuQnMFIaWAZZyQ/6h+d05+Q52J/y+cvwUOkI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fUvU75LYAjCGwZJvVHvnGSOwbdBQQE/sw5o/efjVLHq3JtfruVsDY0EpqHk8qlC4sfrz7EvwhOt82Ht5LmeQMcpJTQly14BNoaji3k+5GKwx7lFPO8VUCvliXwQDDelbFGuSofcisVsyzceGFKg3Y13faKkDnt+hUD/keDIh4o4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Xzt6QyZ2; arc=none smtp.client-ip=91.218.175.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1724450477; c=relaxed/simple;
+	bh=4E2/SMw5ipU2qtwXN1Uwic3Rzbvi3xioIyGpbAx2lVk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EcgypmTIJU0XR7o0nULt7S3/QGG12G6OV8vEQhZx81mjKR7K0cTyMjWUuGRyl7i08hyCJB7QDB92eixgkyvSzJUKQwLGoOh6k0akNFAuZKsuDPzbNsJlTqudtNKFnW4ZXUQRpcxW0qr6ax7oU2GLUsUmL6NtllOjGM1sqYzAp7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DJhUw/1q; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Xzt6QyZ2"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1724448447;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AVsh9kb6vW+Bt06Jn03oX1j/efdsDBql1xIMg/8pdI0=;
-	b=Xzt6QyZ2RMgH8Lp9OMcSOmJ6IqS9GtHItiLjY1ySH+LhJE6Wnq2CCPXQRuqQKDsE1JmimN
-	LBpYMJdoQEdg26QSdxVRYlgYGwcB5OP5NnMYtu4sj1MovKDFdKAPnKfv4ATec66TZLDN9s
-	WRE+SqJrcSzPVWXKa1LG8T+gP8pyJ1c=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DJhUw/1q"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71569C32786;
+	Fri, 23 Aug 2024 22:01:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724450477;
+	bh=4E2/SMw5ipU2qtwXN1Uwic3Rzbvi3xioIyGpbAx2lVk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DJhUw/1qZ9BDQyGdrwh4ZFy64bp7OwurHPaIZF/8dlHGGMyUg6oD3nsAesh264NNS
+	 FoGyn2Rq2QL39OrogIEFtmo21ioxgFBgEj7Es9kG5Qpgra3wSXqqpYQ1pNK2A8IoYg
+	 Z8fN8zNIL9aOQlXGKDnm0SrmFwR/DdFSAkSXCqRoUqve0c9CIlohY5Kez50qcxZXm+
+	 BBy4p4qNCrGMIXT5+V5RxKrFG95GKkg8ilN9BZLYBhNJwhkvW2QkCMhzkT8j4erCII
+	 zjx/mdrol0O8/FIK5z9vPsPhmzvc3K733r3dtwz1kN8Njo8cs83m645QMmL+XqdHr7
+	 WVHT/FDFTov3Q==
+Date: Fri, 23 Aug 2024 23:01:13 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 3/3] KVM: arm64: nv: Request vPE doorbell upon nested ERET to L2
-Date: Fri, 23 Aug 2024 21:27:03 +0000
-Message-ID: <20240823212703.3576061-4-oliver.upton@linux.dev>
-In-Reply-To: <20240823212703.3576061-1-oliver.upton@linux.dev>
-References: <20240823212703.3576061-1-oliver.upton@linux.dev>
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Florian Weimer <fweimer@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
+	Ross Burton <ross.burton@arm.com>,
+	Yury Khrustalev <yury.khrustalev@arm.com>,
+	Wilco Dijkstra <wilco.dijkstra@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v11 25/39] arm64/signal: Expose GCS state in signal frames
+Message-ID: <ZskGqU8BSvR01W30@finisterre.sirena.org.uk>
+References: <20240822-arm64-gcs-v11-0-41b81947ecb5@kernel.org>
+ <20240822-arm64-gcs-v11-25-41b81947ecb5@kernel.org>
+ <ZshYTyNbveD7WMyJ@arm.com>
+ <ZshjmuYcejbhaSBg@finisterre.sirena.org.uk>
+ <Zsixz6Y9xWxqaQaV@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="BjuuYVXdnzsl9n3l"
+Content-Disposition: inline
+In-Reply-To: <Zsixz6Y9xWxqaQaV@arm.com>
+X-Cookie: Your love life will be... interesting.
 
-Running an L2 guest with GICv4 enabled goes absolutely nowhere, and gets
-into a vicious cycle of nested ERET followed by nested exception entry
-into the L1.
 
-When KVM does a put on a runnable vCPU, it marks the vPE as nonresident
-but does not request a doorbell IRQ. Behind the scenes in the ITS
-driver's view of the vCPU, its_vpe::pending_last gets set to true to
-indicate that context is still runnable.
+--BjuuYVXdnzsl9n3l
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-This comes to a head when doing the nested ERET into L2. The vPE doesn't
-get scheduled on the redistributor as it is exclusively part of the L1's
-VGIC context. kvm_vgic_vcpu_pending_irq() returns true because the vPE
-appears runnable, and KVM does a nested exception entry into the L1
-before L2 ever gets off the ground.
+On Fri, Aug 23, 2024 at 04:59:11PM +0100, Catalin Marinas wrote:
+> On Fri, Aug 23, 2024 at 11:25:30AM +0100, Mark Brown wrote:
 
-This issue can be papered over by requesting a doorbell IRQ when
-descheduling a vPE as part of a nested ERET. KVM needs this anyway to
-kick the vCPU out of the L2 when an IRQ becomes pending for the L1.
+> > We could store either the cap token or the interrupted GCSPR_EL0 (the
+> > address below the cap token).  It felt more joined up to go with the cap
+> > token since notionally signal return is consuming the cap token but
+> > either way would work, we could just add an offset when looking at the
+> > pointer.
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- arch/arm64/include/asm/kvm_host.h |  2 ++
- arch/arm64/kvm/emulate-nested.c   |  2 ++
- arch/arm64/kvm/vgic/vgic-v4.c     | 18 +++++++++++++++++-
- 3 files changed, 21 insertions(+), 1 deletion(-)
+> In a hypothetical sigaltshadowstack() scenario, would the cap go on the
+> new signal shadow stack or on the old one? I assume on the new one but
+> in sigcontext we'd save the original GCSPR_EL0. In such hypothetical
+> case, the original GCSPR_EL0 would not need 8 subtracted.
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index f959d03decfc..7d561f0bd9bf 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -897,6 +897,8 @@ struct kvm_vcpu_arch {
- #define PMUSERENR_ON_CPU	__vcpu_single_flag(sflags, BIT(4))
- /* WFI instruction trapped */
- #define IN_WFI			__vcpu_single_flag(sflags, BIT(5))
-+/* KVM is currently emulating a nested ERET */
-+#define IN_NESTED_ERET		__vcpu_single_flag(sflags, BIT(6))
- 
- 
- /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 05166eccea0a..fd3d6275b777 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -2310,6 +2310,7 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
- 	}
- 
- 	preempt_disable();
-+	vcpu_set_flag(vcpu, IN_NESTED_ERET);
- 	kvm_arch_vcpu_put(vcpu);
- 
- 	if (!esr_iss_is_eretax(esr))
-@@ -2321,6 +2322,7 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
- 	*vcpu_cpsr(vcpu) = spsr;
- 
- 	kvm_arch_vcpu_load(vcpu, smp_processor_id());
-+	vcpu_clear_flag(vcpu, IN_NESTED_ERET);
- 	preempt_enable();
- }
- 
-diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
-index 74a67ad87f29..9f3f06ac76cc 100644
---- a/arch/arm64/kvm/vgic/vgic-v4.c
-+++ b/arch/arm64/kvm/vgic/vgic-v4.c
-@@ -336,6 +336,22 @@ void vgic_v4_teardown(struct kvm *kvm)
- 	its_vm->vpes = NULL;
- }
- 
-+static inline bool vgic_v4_want_doorbell(struct kvm_vcpu *vcpu)
-+{
-+	if (vcpu_get_flag(vcpu, IN_WFI))
-+		return true;
-+
-+	if (likely(!vcpu_has_nv(vcpu)))
-+		return false;
-+
-+	/*
-+	 * GICv4 hardware is only ever used for the L1. Mark the vPE (i.e. the
-+	 * L1 context) nonresident and request a doorbell to kick us out of the
-+	 * L2 when an IRQ becomes pending.
-+	 */
-+	return vcpu_get_flag(vcpu, IN_NESTED_ERET);
-+}
-+
- int vgic_v4_put(struct kvm_vcpu *vcpu)
- {
- 	struct its_vpe *vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
-@@ -343,7 +359,7 @@ int vgic_v4_put(struct kvm_vcpu *vcpu)
- 	if (!vgic_supports_direct_msis(vcpu->kvm) || !vpe->resident)
- 		return 0;
- 
--	return its_make_vpe_non_resident(vpe, !!vcpu_get_flag(vcpu, IN_WFI));
-+	return its_make_vpe_non_resident(vpe, vgic_v4_want_doorbell(vcpu));
- }
- 
- int vgic_v4_load(struct kvm_vcpu *vcpu)
--- 
-2.46.0.295.g3b9ea8a38a-goog
+I would have put the token on the old stack since that's what we'd be
+returning to.  This raises interesting questions about what happens if
+the reason for the signal is that we just overflowed the normal stack
+(which are among the issues that have got in the way of working out if
+or how we do something with sigaltshadowstack).  I'm not clear what the
+purpose of the token would be on the new stack, the token basically says
+"this is somewhere we can sigreturn to", that's not the case for the
+alternative stack.
 
+> I need to think some more about this. The gcs_restore_signal() function
+> makes sense, it starts with the current GCSPR_EL0 on the signal stack
+> and consumes the token, adds 8 to the shadow stack pointer. The
+> restore_gcs_context() one is confusing as it happens before consuming
+> the cap token and assumes that the GCSPR_EL0 value actually points to
+> the signal stack. If we ever implement an alternative shadow stack, the
+> original GCSPR_EL0 of the interrupted context would be lost. I know it's
+> not planned for now but the principles should be the same. The
+> sigframe.uc should store the interrupted state.
+
+I think the issues you're pointing out here go to the thing with the cap
+token marking a place we can sigreturn to and therefore being on the
+original stack.
+
+> To me the order for sigreturn should be first to consume the cap token,
+> validate it etc. and then restore GCSPR_EL0 to whatever was saved in the
+> sigframe.uc prior to the signal being delivered.
+
+To me what we're doing here is that the signal frame says where
+userspace wants to point GCSPR_EL0 in the returned context, we then go
+and confirm that this is a valid address by looking at it and checking
+for a token.  The token serves to validate what was saved in sigframe.uc
+so that it can't just be pointed at some random address.
+
+> > restore_gcs_context() is loading values from the signal frame in memory
+> > (which will only happen if a GCS context is present) then
+> > gcs_restore_signal() consumes the token at the top of the stack.  The
+> > split is because userspace can skip the restore_X_context() functions
+> > for the optional signal frame elements by removing them from the context
+> > but we want to ensure that we always consume a token.
+
+> I agree we should always consume a token but this should be done from
+> the actual hardware GCSPR_EL0 value on the sigreturn call rather than
+> the one restored from sigframe.uc. The restoring should be the last
+> step.
+
+If we look for a token at the GCSPR_EL0 on sigreturn then it wouldn't be
+valid to call sigreturn() (well, without doing something first to unwind
+the stack which seems hostile and would require code to become GCS aware
+that wouldn't otherwise), if you do a sigreturn from somewhere other
+than the vDSO then you'd have at least the vDSO signal frame left in the
+GCS.  You'd also be able to point GCSPR_EL0 to anywhere since we'd just
+load a value from the signal frame but not do the cap verification.
+
+--BjuuYVXdnzsl9n3l
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmbJBqgACgkQJNaLcl1U
+h9BLswf/SWEpbfZkH/LtOITztzCmYc/9r1ewDv1+OENkYT92eXaB9xbvJoP9TSK7
+9L5zc2aRpMs8ND7Z79oBC2ukkLkNGlZgk50jrxAj/ABNYEwGhWr6WCEURjpJCREV
+waO+TZDL2bO84z/f9ES1W4aKPZfTVfDArJ7orEQM8OgkSdql3wE/D9qqw2FgivU+
+pO4BYgkO67qg2p1/UIlgWEJAQAgYLI60IZkP2g6CawlFdze3kHo5cnIBh0Ou3sxa
++HfHlY5BIjhQvlSdEx5GfhZuGdRSUlZdYwbbJGKAXt9sB80z6QbAet3BfFUGt83I
+CqP6WBYkc5NW8mLg/8gZCbn3Quh5Xg==
+=fp7z
+-----END PGP SIGNATURE-----
+
+--BjuuYVXdnzsl9n3l--
