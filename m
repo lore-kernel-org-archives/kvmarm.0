@@ -1,49 +1,55 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D51C41EB27;
-	Fri, 23 Aug 2024 14:45:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C2FB189535;
+	Fri, 23 Aug 2024 15:59:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724424340; cv=none; b=cpihHkgP+2FhBTuBkhas0ciB01ESbx/AS2Y2P7EKzXNjwyvkmLLU4VS2bxHLKxTuE3EA5S0KXOS5QRkGDUr6NirwEhkj3WqtuGVctEa27Jgyt1IvSdw7eEeIzpSOQ0ToLX4+yG8hLH1SFKOz/QvH+yZoF1opVYrc5tYJeDm5Z9Q=
+	t=1724428760; cv=none; b=Ha3sJI0A4EAEBlngAZBusI0R5miEhdRwj0ynJeVq3tZtP8dXS37jktwO9KMGqnR5FD06YDKN4DpJIrZwklmpI/U3EUfywb5AK6t1oyMGP1q9NrXAjjMki8AA0OP5GhyE/lPY5VZK8JyP/AjSCNzmN6F5KDsZ0eHi6nmtzIYkL34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724424340; c=relaxed/simple;
-	bh=W6z8CSJIQISlh38AzR3KbpPdvjf84h6oaEwrIWjYySE=;
+	s=arc-20240116; t=1724428760; c=relaxed/simple;
+	bh=yTzD+B1z/7Em4lUy5BYRbkbEdL3Ho0yTaWOm/CmXCIw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m+ZmO2Gmj51N62pxDAWIQI+14D4sDV7LvEZq18sMx2/i6LPcVbv7xd5KQGWTfi7XGkh9wp8JZ26PwzX1mSXfqOR4HRAUFugptPoDMkPsx05YwjDmEaUGNdLpRw6gZ3fDjDPfATKwRgQK3noeKa939DfVVbSUpVChly9NM2qOq6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sZqjTOS2; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sZqjTOS2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CE55C32786;
-	Fri, 23 Aug 2024 14:45:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724424340;
-	bh=W6z8CSJIQISlh38AzR3KbpPdvjf84h6oaEwrIWjYySE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sZqjTOS2yJ3SZLJsVGt+kPr01XngWDjZhXRB11P59QKeuj0yVdJ2sI1jiTOtfwc1l
-	 0KofF0+gZW+2ilrX698/xbyYRzb0afe9ZQFHS1eX/89s0tT+SeZqTHYfl0x18Zexz+
-	 ojJmzjO42Pp6SJ9/97BgEuwauVrtWeqDuXAITbu5HlICS/eRA8zhCqnIg8SX7Th28A
-	 y7taxVji40p7C4F97d5UAN7RkOd33c6kp1ratVeJjgaBBAfyebkKljPHUnl0HXwW3X
-	 1mwWo5iqo+efoKR6XMU/0Rs+9uXSAMETOVivGRw42b48YIgSaoiHjeAEww/ehNsqRy
-	 s82ANrYxvLTLA==
-Date: Fri, 23 Aug 2024 15:45:32 +0100
-From: Will Deacon <will@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, nd@arm.com,
-	akpm@linux-foundation.org, aneesh.kumar@kernel.org,
-	aneesh.kumar@linux.ibm.com, anshuman.khandual@arm.com, bp@alien8.de,
-	broonie@kernel.org, catalin.marinas@arm.com,
-	christophe.leroy@csgroup.eu, dave.hansen@linux.intel.com,
-	hpa@zytor.com, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
-	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
-	oliver.upton@linux.dev, shuah@kernel.org, skhan@linuxfoundation.org,
-	szabolcs.nagy@arm.com, tglx@linutronix.de, x86@kernel.org,
-	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v5 06/30] arm64: context switch POR_EL0 register
-Message-ID: <20240823144531.GH32156@willie-the-truck>
-References: <20240822151113.1479789-1-joey.gouly@arm.com>
- <20240822151113.1479789-7-joey.gouly@arm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=cJMCOE2izDzMywFqc3DbRIF8HbFWhSd2S3sL1R/vtoV2S8ranaIPxMXOkwznXRYRAmXwEZZxuy+i9FIBZSQkaElZSidVXivOcMpBnQ15o/dmMZcKP3xIVBocsyLa1LvIUNHXgOf+jYDkWfV/85OmhOoggz/uFupLOnYW3yNq+9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B7C1C32786;
+	Fri, 23 Aug 2024 15:59:14 +0000 (UTC)
+Date: Fri, 23 Aug 2024 16:59:11 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Florian Weimer <fweimer@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
+	Ross Burton <ross.burton@arm.com>,
+	Yury Khrustalev <yury.khrustalev@arm.com>,
+	Wilco Dijkstra <wilco.dijkstra@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v11 25/39] arm64/signal: Expose GCS state in signal frames
+Message-ID: <Zsixz6Y9xWxqaQaV@arm.com>
+References: <20240822-arm64-gcs-v11-0-41b81947ecb5@kernel.org>
+ <20240822-arm64-gcs-v11-25-41b81947ecb5@kernel.org>
+ <ZshYTyNbveD7WMyJ@arm.com>
+ <ZshjmuYcejbhaSBg@finisterre.sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -52,39 +58,78 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240822151113.1479789-7-joey.gouly@arm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <ZshjmuYcejbhaSBg@finisterre.sirena.org.uk>
 
-On Thu, Aug 22, 2024 at 04:10:49PM +0100, Joey Gouly wrote:
-> POR_EL0 is a register that can be modified by userspace directly,
-> so it must be context switched.
+On Fri, Aug 23, 2024 at 11:25:30AM +0100, Mark Brown wrote:
+> On Fri, Aug 23, 2024 at 10:37:19AM +0100, Catalin Marinas wrote:
+> > On Thu, Aug 22, 2024 at 02:15:28AM +0100, Mark Brown wrote:
 > 
-> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will@kernel.org>
-> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
-> ---
->  arch/arm64/include/asm/cpufeature.h |  6 ++++++
->  arch/arm64/include/asm/processor.h  |  1 +
->  arch/arm64/include/asm/sysreg.h     |  3 +++
->  arch/arm64/kernel/process.c         | 28 ++++++++++++++++++++++++++++
->  4 files changed, 38 insertions(+)
+> > > +	gcs_preserve_current_state();
+> > > +	gcspr = current->thread.gcspr_el0 - 8;
+> 
+> > > +	__put_user_error(gcspr, &ctx->gcspr, err);
+> 
+> > Do we actually need to store the gcspr value after the cap token has
+> > been pushed or just the value of the interrupted context? If we at some
+> > point get a sigaltshadowstack() syscall, the saved GCS wouldn't point to
+> > the new stack but rather the original one. Unwinders should be able to
+> > get the actual GCSPR_EL0 register, no need for the sigcontext to point
+> > to the new shadow stack.
+> 
+> We could store either the cap token or the interrupted GCSPR_EL0 (the
+> address below the cap token).  It felt more joined up to go with the cap
+> token since notionally signal return is consuming the cap token but
+> either way would work, we could just add an offset when looking at the
+> pointer.
 
-[...]
+In a hypothetical sigaltshadowstack() scenario, would the cap go on the
+new signal shadow stack or on the old one? I assume on the new one but
+in sigcontext we'd save the original GCSPR_EL0. In such hypothetical
+case, the original GCSPR_EL0 would not need 8 subtracted.
 
-> +static void permission_overlay_switch(struct task_struct *next)
-> +{
-> +	if (!system_supports_poe())
-> +		return;
-> +
-> +	current->thread.por_el0 = read_sysreg_s(SYS_POR_EL0);
-> +	if (current->thread.por_el0 != next->thread.por_el0) {
-> +		write_sysreg_s(next->thread.por_el0, SYS_POR_EL0);
-> +		/* ISB required for kernel uaccess routines when chaning POR_EL0 */
+I need to think some more about this. The gcs_restore_signal() function
+makes sense, it starts with the current GCSPR_EL0 on the signal stack
+and consumes the token, adds 8 to the shadow stack pointer. The
+restore_gcs_context() one is confusing as it happens before consuming
+the cap token and assumes that the GCSPR_EL0 value actually points to
+the signal stack. If we ever implement an alternative shadow stack, the
+original GCSPR_EL0 of the interrupted context would be lost. I know it's
+not planned for now but the principles should be the same. The
+sigframe.uc should store the interrupted state.
 
-nit: typo "chaning".
+To me the order for sigreturn should be first to consume the cap token,
+validate it etc. and then restore GCSPR_EL0 to whatever was saved in the
+sigframe.uc prior to the signal being delivered.
 
-But more substantially, is this just to prevent spurious faults in the
-context of a new thread using a stale value for POR_EL0?
+> > Also in gcs_signal_entry() in the previous patch, we seem to subtract 16
+> > rather than 8.
+> 
+> We need to not only place a cap but also a GCS frame for the sigreturn
+> trampoline, the sigreturn trampoline isn't part of the interrupted
+> context so isn't included in the signal frame but it needs to have a
+> record on the GCS so that the signal handler doesn't just generate a GCS
+> fault if it tries to return to the trampoline.  This means that the
+> GCSPR_EL0 that is set for the signal handler needs to move two entries,
+> one for the cap token and one for the trampoline.
 
-Will
+Yes, this makes sense.
+
+> > What I find confusing is that both restore_gcs_context() and
+> > gcs_restore_signal() seem to touch current->thread.gcspr_el0 and the
+> > sysreg. Which one takes priority? I should probably check the branch out
+> > to see the end result.
+> 
+> restore_gcs_context() is loading values from the signal frame in memory
+> (which will only happen if a GCS context is present) then
+> gcs_restore_signal() consumes the token at the top of the stack.  The
+> split is because userspace can skip the restore_X_context() functions
+> for the optional signal frame elements by removing them from the context
+> but we want to ensure that we always consume a token.
+
+I agree we should always consume a token but this should be done from
+the actual hardware GCSPR_EL0 value on the sigreturn call rather than
+the one restored from sigframe.uc. The restoring should be the last
+step.
+
+-- 
+Catalin
