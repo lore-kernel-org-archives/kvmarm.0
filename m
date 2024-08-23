@@ -1,158 +1,68 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98B96194C9E;
-	Fri, 23 Aug 2024 16:13:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00304187855;
+	Fri, 23 Aug 2024 16:41:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724429586; cv=none; b=Ejc70EMbfX9OM291CzZ4MfusIMPnAKuVHIewWX/Ks+kH2EFvYCqubenuikew5i37XJcbhaBVf5sWHo4Z3kagaIoyv4/AvMJ7VdA81TgAr9xpG9oUtbikzBkkExZivKjg8xV6rvzb7yQo0Xh8eBBbih7elaOc+OnZ7NfVjEi6Q7U=
+	t=1724431274; cv=none; b=RuZel4nNpPVvRAC7U90SHk3YffowF4gzTcDCUCWNEY++5ZKcyedHNei0vuFSzolzocttslwC8DOpMBGo92yXqGjFQfcWAPRsquu1HEFZWUOrptnSTDyFkdluS4NCVLZz7ioSg5qKwIxbS7Tb+kzTkVN4Bg4OnTEcEwnnrdTDB8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724429586; c=relaxed/simple;
-	bh=302mPfppIzV0eIiBLegANXAiB+NF/JryI6zwyAqPKeI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oOocNxTBYVq7Th/YAtRJdhTz5eRCGFBMJzNj+HqdfbCHQNi7g9oX7FhjYV4HwQgfXPJnjAAdd0TeM9sxnX/yLYfQ81g+dE+nWJvjoOAQx18yg3yfzSX36DMXhFF0B9Zo8AOqmXdX1d5H8fy6RNKdPCuEsBXLxLAKT4Q4H88plRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gf+WMIRu; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gf+WMIRu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B9AEC4AF51;
-	Fri, 23 Aug 2024 16:13:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724429586;
-	bh=302mPfppIzV0eIiBLegANXAiB+NF/JryI6zwyAqPKeI=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=gf+WMIRurTbcCUp5XG/SJqSuNJlC/5jTbjfrtjz9Bke6unn38fmcRN+YM+/H/43FY
-	 lbsc3h6ZC8f35iYEa6UeUssIiTd08RvXwBi0MjdL4zAyp5kjx1JxZ/jC1iaIgqVRiC
-	 ur7OZG2hFz/jXs+MMeV/l8lH7W26g2wD/QYWC2kZo7w7gmoo9/4AMNkWWYGV3JSqVU
-	 VYLEbcUT4YrL0R0e4pLlZFcUYiVRRx3QTP0KTf1NhMoH/d4g/aTw9/BbDf/isvQzr/
-	 EiLGa0gp/ERZgq1t2tqvHzgTKwOtnypPYBaPN7Is/mZCf7pHacg835+FQlJc3L0cNq
-	 yW2ydpGu7UQUg==
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2f3edb2d908so22009911fa.2;
-        Fri, 23 Aug 2024 09:13:06 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVU+HzF/6t4Rh/l70QVPgM5ynjYXvBt7lpkIJZm6up/UsEWqtphxh0KqXBVki43J2KofgW8XNk=@lists.linux.dev, AJvYcCXFvpVhaLVMd5/SyYwr7O6U9fqWiGOjHAnUHiKz9LJfu0N39oDkW4DARxeR3G7jVXzRi/zNsA==@lists.linux.dev
-X-Gm-Message-State: AOJu0Yyz+d4JI6D48eRBWM8uUfzz8HzaSSlaNZqal3Ldp1wPMOWrVOtR
-	6+VS8LQlV9JhtRtGDSCvyjGDcK96ghMC1jqsb4SQXB5YbM6ULLPxeb62CrNRByDbpvZ1gILERTc
-	4VuPSd7sclOmcW1rdPg3COXs+w+0=
-X-Google-Smtp-Source: AGHT+IGLQePVn5RhKmrGdV43WiO6IyDdZ4P8M+JxvZmPPDeIiajBOGYYWmzAWjRdCByIm/YmPmOehjlJ0SdmJRob6wc=
-X-Received: by 2002:a05:651c:1505:b0:2ef:2dfd:15dc with SMTP id
- 38308e7fff4ca-2f4f48ef636mr23768021fa.9.1724429584330; Fri, 23 Aug 2024
- 09:13:04 -0700 (PDT)
+	s=arc-20240116; t=1724431274; c=relaxed/simple;
+	bh=ppzAQCslayB1hl9YWar70+u3v8kuzOARmAZmCO5P9e0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DNb6sTE1ji3RoqBTZ7ns2yxiKgaYcuXqWPEuADkA9mbAtQ0DGPJGpSlg0LWb5eOltbxRfSJIuYXR3tT078N62/oDDwEgHWFVPzj5xe9wshGaV8U/3JsveNPRWqN1gRbHefM1uhsZHA96JLIsK/YCJxzs2nb4ei8FgguksG9dRhQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBB56C32786;
+	Fri, 23 Aug 2024 16:41:08 +0000 (UTC)
+Date: Fri, 23 Aug 2024 17:41:06 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Will Deacon <will@kernel.org>
+Cc: Joey Gouly <joey.gouly@arm.com>, linux-arm-kernel@lists.infradead.org,
+	nd@arm.com, akpm@linux-foundation.org, aneesh.kumar@kernel.org,
+	aneesh.kumar@linux.ibm.com, anshuman.khandual@arm.com, bp@alien8.de,
+	broonie@kernel.org, christophe.leroy@csgroup.eu,
+	dave.hansen@linux.intel.com, hpa@zytor.com,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
+	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
+	oliver.upton@linux.dev, shuah@kernel.org, skhan@linuxfoundation.org,
+	szabolcs.nagy@arm.com, tglx@linutronix.de, x86@kernel.org,
+	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v5 06/30] arm64: context switch POR_EL0 register
+Message-ID: <Zsi7ovLOfuFdfuuz@arm.com>
+References: <20240822151113.1479789-1-joey.gouly@arm.com>
+ <20240822151113.1479789-7-joey.gouly@arm.com>
+ <20240823144531.GH32156@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20240807-macos-build-support-v1-0-4cd1ded85694@samsung.com> <20240807-macos-build-support-v1-1-4cd1ded85694@samsung.com>
-In-Reply-To: <20240807-macos-build-support-v1-1-4cd1ded85694@samsung.com>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Sat, 24 Aug 2024 01:12:26 +0900
-X-Gmail-Original-Message-ID: <CAK7LNARmy=N+6O87BJGZbodssDw21sHgMf36TXdcxD4=5A_OBA@mail.gmail.com>
-Message-ID: <CAK7LNARmy=N+6O87BJGZbodssDw21sHgMf36TXdcxD4=5A_OBA@mail.gmail.com>
-Subject: Re: [PATCH 01/12] scripts: subarch.include: fix SUBARCH on MacOS hosts
-To: da.gomez@samsung.com
-Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, 
-	Lucas De Marchi <lucas.demarchi@intel.com>, 
-	=?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>, 
-	Rodrigo Vivi <rodrigo.vivi@intel.com>, 
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Daniel Vetter <daniel@ffwll.ch>, 
-	William Hubbs <w.d.hubbs@gmail.com>, Chris Brannon <chris@the-brannons.com>, 
-	Kirk Reiser <kirk@reisers.ca>, Samuel Thibault <samuel.thibault@ens-lyon.org>, 
-	Paul Moore <paul@paul-moore.com>, Stephen Smalley <stephen.smalley.work@gmail.com>, 
-	Ondrej Mosnacek <omosnace@redhat.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Jiri Slaby <jirislaby@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
-	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, linux-kernel@vger.kernel.org, 
-	linux-kbuild@vger.kernel.org, intel-xe@lists.freedesktop.org, 
-	dri-devel@lists.freedesktop.org, speakup@linux-speakup.org, 
-	selinux@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-serial@vger.kernel.org, llvm@lists.linux.dev, 
-	Finn Behrens <me@kloenk.dev>, "Daniel Gomez (Samsung)" <d+samsung@kruces.com>, gost.dev@samsung.com, 
-	Nick Desaulniers <nick.desaulniers@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240823144531.GH32156@willie-the-truck>
 
-On Wed, Aug 7, 2024 at 8:10=E2=80=AFAM Daniel Gomez via B4 Relay
-<devnull+da.gomez.samsung.com@kernel.org> wrote:
->
-> From: Nick Desaulniers <nick.desaulniers@gmail.com>
->
-> When building the Linux kernel on an aarch64 MacOS based host, if we don'=
-t
-> specify a value for ARCH when invoking make, we default to arm and thus
-> multi_v7_defconfig rather than the expected arm64 and arm64's defconfig.
->
-> This is because subarch.include invokes `uname -m` which on MacOS hosts
-> evaluates to `arm64` but on Linux hosts evaluates to `aarch64`,
->
-> This allows us to build ARCH=3Darm64 natively on MacOS (as in ARCH need
-> not be specified on an aarch64-based system).
->
-> Utilize a negative lookahead regular expression to avoid matching arm64.
+On Fri, Aug 23, 2024 at 03:45:32PM +0100, Will Deacon wrote:
+> On Thu, Aug 22, 2024 at 04:10:49PM +0100, Joey Gouly wrote:
+> > +static void permission_overlay_switch(struct task_struct *next)
+> > +{
+> > +	if (!system_supports_poe())
+> > +		return;
+> > +
+> > +	current->thread.por_el0 = read_sysreg_s(SYS_POR_EL0);
+> > +	if (current->thread.por_el0 != next->thread.por_el0) {
+> > +		write_sysreg_s(next->thread.por_el0, SYS_POR_EL0);
+> > +		/* ISB required for kernel uaccess routines when chaning POR_EL0 */
+> 
+> nit: typo "chaning".
+> 
+> But more substantially, is this just to prevent spurious faults in the
+> context of a new thread using a stale value for POR_EL0?
 
+Not just prevent faults but enforce the permissions from the new
+thread's POR_EL0. The kernel may continue with a uaccess routine from
+here, we can't tell.
 
-Does sed support "negative lookahead regular expression"?
-
->
-> Add a separate expression to support for armv.* as per error reported by
-> Nicolas Schier [1].
->
-> [1] https://lore.kernel.org/all/Y3MRvtwdjIwMHvRo@bergen.fjasle.eu/#t
->
-> Signed-off-by: Nick Desaulniers <nick.desaulniers@gmail.com>
-> Signed-off-by: Daniel Gomez <da.gomez@samsung.com>
-> ---
->  scripts/subarch.include | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/scripts/subarch.include b/scripts/subarch.include
-> index 4bd327d0ae42..5d84ad8c0dee 100644
-> --- a/scripts/subarch.include
-> +++ b/scripts/subarch.include
-> @@ -6,7 +6,8 @@
->
->  SUBARCH :=3D $(shell uname -m | sed -e s/i.86/x86/ -e s/x86_64/x86/ \
->                                   -e s/sun4u/sparc64/ \
-> -                                 -e s/arm.*/arm/ -e s/sa110/arm/ \
-> +                                 -e s/armv.*/arm/ \
-> +                                 -e s/arm\(?:\(?!64\).*\)/arm/ -e s/sa11=
-0/arm/ \
-
-
-s/arm\(?:\(?!64\).*\)/arm/
-
-In sed, this expression does not seem to match anything.
-
-(or please give me some matching examples if I miss something)
-
-
-
-
-
-Nocolas already provided correct code:
-
-> [1] https://lore.kernel.org/all/Y3MRvtwdjIwMHvRo@bergen.fjasle.eu/#t
-
-
-
-
-
-
->                                   -e s/s390x/s390/ \
->                                   -e s/ppc.*/powerpc/ -e s/mips.*/mips/ \
->                                   -e s/sh[234].*/sh/ -e s/aarch64.*/arm64=
-/ \
->
-> --
-> Git-146)
->
->
-
-
---
-Best Regards
-
-
-Masahiro Yamada
+-- 
+Catalin
