@@ -1,91 +1,84 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D58A18DF81;
-	Fri, 23 Aug 2024 18:40:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24B0280C02
+	for <kvmarm@lists.linux.dev>; Fri, 23 Aug 2024 21:27:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724438461; cv=none; b=QVKDp/JkZBB8lXbnHgXLPHprM4/JjPRgpKH6yvhGBvHL1LK5WemH4ShTBwPoli5I8YLpWlOGcFk0zif7uSs5nqVAZc2AcY9Bzp2BlRggTT+4zzKFeeszEIuxxBe1EghBc1ykPLxVfcq3fbHRm4hycZo1VqM3IlRPVoWRDly4gTg=
+	t=1724448448; cv=none; b=fGtmi6PIwBYVWvi64w1wXR/fGR7UqX/czTOhljrDjabwFR5bhK3EH0a4GLiyXut72RZPVjTcSx24OoPl3QslJdIHQAk5A6x4oFm5R71Uc4qafzqvxB8AWyqfy7FZ0u3qpJIttUxEPKDZXncbIk7jvAUM8sQkfqrDNm2P5Pql2Kc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724438461; c=relaxed/simple;
-	bh=ounfh/bXLyxQViCNcAOjTt5R6ApsmH4cEaxiopLxJbg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EDeHDU8HYPGOOvcO0EMaorX2BsdjwDww6f0ogHvtZC4sWK6MBafkOK6ta3oUAZXQzP2TbzZUk7NQw3tH3uk+BrgiEDzAW2g5h/npynKX67mPita0g+lzASD3WPSRBl9+hGoPqaUjUqRV3EuoD1APpjqHfnMXwvxPfn18+2pSDz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E84C5C32786;
-	Fri, 23 Aug 2024 18:40:54 +0000 (UTC)
-Date: Fri, 23 Aug 2024 19:40:52 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Will Deacon <will@kernel.org>
-Cc: Joey Gouly <joey.gouly@arm.com>, linux-arm-kernel@lists.infradead.org,
-	nd@arm.com, akpm@linux-foundation.org, aneesh.kumar@kernel.org,
-	aneesh.kumar@linux.ibm.com, anshuman.khandual@arm.com, bp@alien8.de,
-	broonie@kernel.org, christophe.leroy@csgroup.eu,
-	dave.hansen@linux.intel.com, hpa@zytor.com,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
-	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
-	oliver.upton@linux.dev, shuah@kernel.org, skhan@linuxfoundation.org,
-	szabolcs.nagy@arm.com, tglx@linutronix.de, x86@kernel.org,
-	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v5 06/30] arm64: context switch POR_EL0 register
-Message-ID: <ZsjXtE7Kg0LQwNAL@arm.com>
-References: <20240822151113.1479789-1-joey.gouly@arm.com>
- <20240822151113.1479789-7-joey.gouly@arm.com>
- <20240823144531.GH32156@willie-the-truck>
- <Zsi7ovLOfuFdfuuz@arm.com>
- <20240823170835.GA1181@willie-the-truck>
+	s=arc-20240116; t=1724448448; c=relaxed/simple;
+	bh=UN75N7u9kgIBbLyrBPENF/qle2S5zLqBOchCNtBBXiI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nGr5L2udJqUk9APjba1r0hCDRfU3mVQiKYZSwE+wV4qAWHzYZZt7uWVQUK9IHByLWoLtG+SH0akbSzHdoIdDQdMn2FQIEa3v9cgW9VVfTJNpVQxzC0kcF522x59HFcyrQRIIEbgj8sAY7JXSU7A4y+Q0UhkFu8XjFd5zx/wow0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KPjW9x9s; arc=none smtp.client-ip=91.218.175.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KPjW9x9s"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1724448442;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=U/KCmivpEAcPokV1whcNtbbTcN8czkWIDLJpXrNOGf0=;
+	b=KPjW9x9svnQgPZPxj/ijXhVs1yo+Gmvin+36Hsa32D2O0t8o8o8pXkCE4UyIq+CRSxOl8m
+	LGJSUxeDTR1rwY53Wd6jy5UtXduTt7iUI1Ysm9xXd7b+x8X9ku5qKdXCVinibNtqpc4/bk
+	uUlxcE6vlFdTzTjujBHC5MhNwoSoNVI=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH 0/3] KVM: arm64: nv: Fix nested IRQ exception storm on NV+GICv4
+Date: Fri, 23 Aug 2024 21:27:00 +0000
+Message-ID: <20240823212703.3576061-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240823170835.GA1181@willie-the-truck>
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Aug 23, 2024 at 06:08:36PM +0100, Will Deacon wrote:
-> On Fri, Aug 23, 2024 at 05:41:06PM +0100, Catalin Marinas wrote:
-> > On Fri, Aug 23, 2024 at 03:45:32PM +0100, Will Deacon wrote:
-> > > On Thu, Aug 22, 2024 at 04:10:49PM +0100, Joey Gouly wrote:
-> > > > +static void permission_overlay_switch(struct task_struct *next)
-> > > > +{
-> > > > +	if (!system_supports_poe())
-> > > > +		return;
-> > > > +
-> > > > +	current->thread.por_el0 = read_sysreg_s(SYS_POR_EL0);
-> > > > +	if (current->thread.por_el0 != next->thread.por_el0) {
-> > > > +		write_sysreg_s(next->thread.por_el0, SYS_POR_EL0);
-> > > > +		/* ISB required for kernel uaccess routines when chaning POR_EL0 */
-> > > 
-> > > nit: typo "chaning".
-> > > 
-> > > But more substantially, is this just to prevent spurious faults in the
-> > > context of a new thread using a stale value for POR_EL0?
-> > 
-> > Not just prevent faults but enforce the permissions from the new
-> > thread's POR_EL0. The kernel may continue with a uaccess routine from
-> > here, we can't tell.
-> 
-> Hmm, I wondered if that was the case. It's a bit weird though, because:
-> 
->   - There's a window between switch_mm() and switch_to() where you might
->     reasonably expect to be able to execute uaccess routines
+Hi,
 
-I don't think we can have any uaccess between these two switches (a
-uaccess could fault, that's a pretty weird state between these two).
+There's a rather annoying collision between nested virt and GICv4 that
+leads to a storm of nested excpetions taken to the L1, meaning the L2
+can never get off the ground.
 
->   - kthread_use_mm() doesn't/can't look at this at all
+Here's a small series to address the immediate issue + ensure IRQs
+destined for the L1 aren't erroneously masked by running an L2.
 
-No, but a kthread would have it's own, most permissive, POR_EL0.
+Marc, I've deliberately based this on top of upstream rather than the NV
+series. I did this to avoid stacking more crap on top of the out of tree
+series. The fact we don't virtualize GICv4 for the L1 isn't really
+up for discussion right now, so taking that limitation ahead of full
+nested VGIC support seems OK.
 
->   - GUP obviously doesn't care
-> 
-> So what do we actually gain by having the uaccess routines honour this?
+Note that I spun off a small portion of the nested VGIC patch which avoids
+making the vPE resident in nested state to give the full picture of how
+the vPE is managed while nested.
 
-I guess where it matters is more like not accidentally faulting because
-the previous thread had more restrictive permissions.
+Oliver Upton (3):
+  KVM: arm64: nv: Leave vPE nonresident in nested vgic state
+  KVM: arm64: Move host SVE/SME state flags out of vCPU
+  KVM: arm64: nv: Request vPE doorbell upon nested ERET to L2
 
+ arch/arm64/include/asm/kvm_host.h | 28 ++++++++++++++++++----------
+ arch/arm64/kvm/emulate-nested.c   |  2 ++
+ arch/arm64/kvm/fpsimd.c           | 12 ++++++------
+ arch/arm64/kvm/vgic/vgic-v3.c     | 15 ++++++++++++++-
+ arch/arm64/kvm/vgic/vgic-v4.c     | 18 +++++++++++++++++-
+ include/kvm/arm_vgic.h            |  5 +++++
+ 6 files changed, 62 insertions(+), 18 deletions(-)
+
+
+base-commit: 7c626ce4bae1ac14f60076d00eafe71af30450ba
 -- 
-Catalin
+2.46.0.295.g3b9ea8a38a-goog
+
