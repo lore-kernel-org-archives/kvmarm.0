@@ -1,29 +1,54 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B09B1494D6;
-	Fri, 23 Aug 2024 08:54:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66AD7149002;
+	Fri, 23 Aug 2024 09:11:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724403258; cv=none; b=Z2akU6OWmxD7sNMHALNJTTiJkZAVcuih3BkhmwlZmYv1JgXwZMlD4GYhqzl0gekKcaIHOCpoJ2MwRkT0T/ep93W8nJ4/h1BygSEM7IRd3Er7GL2k67BcwGYUYvbxJZYE5nQPGEWyUP5m2hGKMa7ESCOOC8bjvn9SMLgJlKA52wo=
+	t=1724404314; cv=none; b=ozyTXUigKIq9RnHuQwyDlmjwM6GgKlQKvGHomc4NR0126UOon/SEmWwFmR/jvPjbKFqpGsz2qDFeSRb8PPjoqTGDptx4desMFST1iDuXc9t7XxlfBuxene+oNMHwQe9BZdjXJe+rNJrlcgZQ6V9D4niy6oV/im34fTBlDVT2l5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724403258; c=relaxed/simple;
-	bh=7i6fCcCwJYX6XAHAEsm0q7UIi0qq58vGvrmMaBBTV08=;
+	s=arc-20240116; t=1724404314; c=relaxed/simple;
+	bh=sBxjqPY90sA8th14z9PpmpXgc0D2hH/Ae9bcg6vUdp4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KSl7oxhXiDWK2Qihj/gSM1GdqiKNnk3JzXauT3S7RlVf8F+NMu2xLfAUo6YOAJx1U4SfjH6QbTiND/IzUQy9vBT3a9o9b6DLGpjCk/DH7alQx4I1xa0BvV9/ySkWLTa/YS1DIkNaCCAD3V8yOtvXJxJpzXrPyhTki1P6Wsd01TI=
+	 Content-Type:Content-Disposition:In-Reply-To; b=XYuRGyzQe6ar5thOz4+y+6uh9OH9OFFmwLBc0M412O7L3PsLxBWyha9Gs0B3+fttpE3IkvVls+LOI0N+ZO+z14WTQ4oFNpO0FJpcXmUuiPpNH2ytj0QPvuVG3hUcdArGfhLhaFhOOY4BXNSDVFtRw2mpvw5Lr9V+xvEpwKze5qw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7DADAC32786;
-	Fri, 23 Aug 2024 08:54:16 +0000 (UTC)
-Date: Fri, 23 Aug 2024 09:54:14 +0100
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27A89C32786;
+	Fri, 23 Aug 2024 09:11:47 +0000 (UTC)
+Date: Fri, 23 Aug 2024 10:11:45 +0100
 From: Catalin Marinas <catalin.marinas@arm.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
-	kvmarm@lists.linux.dev, Paolo Bonzini <pbonzini@redhat.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Will Deacon <will@kernel.org>
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.11, round #2
-Message-ID: <ZshONupF3nIhAlRf@arm.com>
-References: <Zsb4kbq6FAfgg4WA@linux.dev>
+To: Mark Brown <broonie@kernel.org>
+Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Florian Weimer <fweimer@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
+	Ross Burton <ross.burton@arm.com>,
+	Yury Khrustalev <yury.khrustalev@arm.com>,
+	Wilco Dijkstra <wilco.dijkstra@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v11 24/39] arm64/signal: Set up and restore the GCS
+ context for signal handlers
+Message-ID: <ZshSUcVIsdeJKcc5@arm.com>
+References: <20240822-arm64-gcs-v11-0-41b81947ecb5@kernel.org>
+ <20240822-arm64-gcs-v11-24-41b81947ecb5@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -32,27 +57,28 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Zsb4kbq6FAfgg4WA@linux.dev>
+In-Reply-To: <20240822-arm64-gcs-v11-24-41b81947ecb5@kernel.org>
 
-Hi Oliver,
-
-On Thu, Aug 22, 2024 at 01:36:33AM -0700, Oliver Upton wrote:
-> Paolo is on holiday for a few weeks and has asked that KVM arch maintainers
-> send pulls through the architecture trees in his absence.
+On Thu, Aug 22, 2024 at 02:15:27AM +0100, Mark Brown wrote:
+> When invoking a signal handler we use the GCS configuration and stack
+> for the current thread.
 > 
-> So lucky you, here's a pile of kvmarm crap from the past week.
+> Since we implement signal return by calling the signal handler with a
+> return address set up pointing to a trampoline in the vDSO we need to
+> also configure any active GCS for this by pushing a frame for the
+> trampoline onto the GCS.  If we do not do this then signal return will
+> generate a GCS protection fault.
 > 
-> Details can be found in the tag, but this is a set of small fixes
-> around the shop thanks to syzkaller bringup on KVM/arm64 and a few
-> recently introduced bugs.
+> In order to guard against attempts to bypass GCS protections via signal
+> return we only allow returning with GCSPR_EL0 pointing to an address
+> where it was previously preempted by a signal.  We do this by pushing a
+> cap onto the GCS, this takes the form of an architectural GCS cap token
+> with the top bit set and token type of 0 which we add on signal entry
+> and validate and pop off on signal return.  The combination of the top
+> bit being set and the token type mean that this can't be interpreted as
+> a valid token or address.
+> 
+> Reviewed-by: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
+> Signed-off-by: Mark Brown <broonie@kernel.org>
 
-Pulled into the arm64 for-next/fixes branch. I'll send a pull request to
-Linus later today.
-
-BTW, I'm also away next week. I'll randomly check emails but if you have
-another pull request, better send it to Will.
-
-Thanks.
-
--- 
-Catalin
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
