@@ -1,190 +1,70 @@
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA134195;
-	Fri, 23 Aug 2024 22:54:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7324186A
+	for <kvmarm@lists.linux.dev>; Sat, 24 Aug 2024 00:14:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724453699; cv=none; b=Nvg5Y0GPVy/HP7csg2KbymN+GtlhwD9GFFV/2PBEklI/nLub3Pmb2pJlS65Ze6ziyM/7iSTWTHC2T/KZPBdKWC1p7pH/jBdTZ0jJhigPBUXmtrC56JFMHP1JgoRP4HihrTDr/A/cryFKY618iBJUCNo/lzlTBiVQPUHshQBUJ8I=
+	t=1724458459; cv=none; b=L0Ru/ELFlrpl2JSeRO+Ln5kNv34QE77FetppzL+IDb+uO/81nHUCJoJ+vRyLJ7WypOszXhJDZKhpQQ9BgL08iZ6QNVwC46Ks6mFk+YghhIodKUvQzEsvHnsDiUkwuQc0AW6OWR4EsgkDmG+iIIpBkyKIGygH7TFOfVY25mxcWX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724453699; c=relaxed/simple;
-	bh=Rnj+dk2XHjizn5i53H8f9IyUV6MwSkaqFicjA03ZnqI=;
-	h=Date:From:To:CC:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To:References; b=MJypA8HNcM5F8U/d2YKUGYdIdZz7qNalfKtxWmO/NTMaU6ap3c5B1Nfs+36MrbWBFvYUGES6dtnxHIGikpJXA+6rs54/6Dqn1OXElkRC3sFvwM/+Wrl7L/Bv/AqeedPyIqV5w7aF+5ojAqjYiMt4FXF4Oxj/ERg44LYSTr7rZuQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=Ux/qa2If; arc=none smtp.client-ip=210.118.77.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1724458459; c=relaxed/simple;
+	bh=j7TrpWJmxiT8kl0l/12eQsczyyB8BbIqNPuCP5/dx0g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XBWXJVhSDS3odm6nx+2rd0YaNtwMbOGouWP2yHgS/zYjXuYSk8IANQz0Rfy+AdO3swm5p6gJ5De8ooUJtLvwkzKD6stNx1+VMbToledh6mMtVc3x0snZR4EQqBBriEmEahpLLLsNdOcVMfx1wa47xYLlwRj+xTEYqS80V9xB4Bs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=LKDMiWKA; arc=none smtp.client-ip=91.218.175.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="Ux/qa2If"
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20240823225453euoutp026a4c1e9d554dbce0fba5d82bb33e8c10~ufX940N8x0994209942euoutp02M;
-	Fri, 23 Aug 2024 22:54:53 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20240823225453euoutp026a4c1e9d554dbce0fba5d82bb33e8c10~ufX940N8x0994209942euoutp02M
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1724453693;
-	bh=WZywpxZk213zxxUl31497eHvW1dsZ+KqGEl5j8Wx7YI=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=Ux/qa2IftSlmEfjUkiRYodMEceK94MePWDuHOrGKbBtBLxgI5Xzqk77nhgNloL46K
-	 4+sUO+BwP8os6IGpz/lpGM5WxluxoZ9UYHpSgPe7uiHOcxDJMH1i5OtWRbrto9ahX5
-	 NpOlMgQBAsUcxMoKWU8vqIQWCN6/r/YH03F77MtE=
-Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-	20240823225453eucas1p1eb9974f802f13dbd765f97f84c89c7e5~ufX9WRNYf1031110311eucas1p1k;
-	Fri, 23 Aug 2024 22:54:53 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-	eusmges2new.samsung.com (EUCPMTA) with SMTP id AC.99.09875.C3319C66; Fri, 23
-	Aug 2024 23:54:53 +0100 (BST)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-	20240823225452eucas1p16c2a886d94d236a72889bbaccef65274~ufX8PS9uX1030710307eucas1p1U;
-	Fri, 23 Aug 2024 22:54:51 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-	eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20240823225451eusmtrp140cbc81b3a594842dbec333e3f0c13be~ufX8LeoJo2368423684eusmtrp1g;
-	Fri, 23 Aug 2024 22:54:51 +0000 (GMT)
-X-AuditID: cbfec7f4-11bff70000002693-21-66c9133c0156
-Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
-	eusmgms1.samsung.com (EUCPMTA) with SMTP id CA.86.08810.B3319C66; Fri, 23
-	Aug 2024 23:54:51 +0100 (BST)
-Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
-	eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20240823225451eusmtip13ade4e62403833e6c850d99cd91c7f36~ufX77yOEz1404214042eusmtip1L;
-	Fri, 23 Aug 2024 22:54:51 +0000 (GMT)
-Received: from localhost (106.110.32.87) by CAMSVWEXC02.scsc.local
-	(2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-	Fri, 23 Aug 2024 23:54:51 +0100
-Date: Sat, 24 Aug 2024 00:54:50 +0200
-From: Daniel Gomez <da.gomez@samsung.com>
-To: Nicolas Schier <nicolas@fjasle.eu>
-CC: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Masahiro Yamada
-	<masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, "Lucas De
- Marchi" <lucas.demarchi@intel.com>, Thomas =?utf-8?Q?Hellstr=C3=B6m?=
-	<thomas.hellstrom@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard
-	<mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, David Airlie
-	<airlied@gmail.com>, Daniel Vetter <daniel@ffwll.ch>, William Hubbs
-	<w.d.hubbs@gmail.com>, Chris Brannon <chris@the-brannons.com>, Kirk Reiser
-	<kirk@reisers.ca>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Paul
-	Moore <paul@paul-moore.com>, Stephen Smalley
-	<stephen.smalley.work@gmail.com>, Ondrej Mosnacek <omosnace@redhat.com>,
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, James
-	Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, Jiri Slaby <jirislaby@kernel.org>, Nick
-	Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-kbuild@vger.kernel.org"
-	<linux-kbuild@vger.kernel.org>, "intel-xe@lists.freedesktop.org"
-	<intel-xe@lists.freedesktop.org>, "dri-devel@lists.freedesktop.org"
-	<dri-devel@lists.freedesktop.org>, "speakup@linux-speakup.org"
-	<speakup@linux-speakup.org>, "selinux@vger.kernel.org"
-	<selinux@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "linux-serial@vger.kernel.org"
-	<linux-serial@vger.kernel.org>, "llvm@lists.linux.dev"
-	<llvm@lists.linux.dev>, Finn Behrens <me@kloenk.dev>, "Daniel Gomez
- (Samsung)" <d+samsung@kruces.com>, "gost.dev@samsung.com"
-	<gost.dev@samsung.com>
-Subject: Re: [PATCH 08/12] include: add elf.h support
-Message-ID: <20240823225450.spuvjs5b5ruujim4@AALNPWDAGOMEZ1.aal.scsc.local>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LKDMiWKA"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1724458454;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=yxSpvc6ZRzelzKb4uY83xmlYL3M/8jZ2CVDrwjVVeSY=;
+	b=LKDMiWKAp0YkqIHxl7q1D8O1JFUqGjAE3oF6MfOPSyUP8+bWu8gT1oxPqrrtZ3ryWqdrfW
+	/a/FgZcv/Du50HOMcCMnxoiGvFftIBCXOVqJ/tOJh/wp4Pi8jikvfuwjPSEwb4lw8qXo/E
+	8LNVsrVFkMxOeC5xSdSG4ucPpjka+5s=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH 0/3] KVM: arm64: nv: Add EL2 PMU event filtering support
+Date: Sat, 24 Aug 2024 00:13:59 +0000
+Message-ID: <20240824001402.3909504-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240807-mottled-stoic-degu-d1e4cb@lindesnes>
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-	CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Te0yTZxTG837XAhY/ignvxM2JkWxkIC66vcsYg2RkX6IZ3maWbZnr5AMc
-	BbEFRI2GiFRA2nERKh0ybnIpFbRgB5RLVuRSLmFbJ/ciE/CCIHKRgDA6auvmf7/znOd5zzl/
-	vDxcsEBt5h2PiOLEEUKRG2VPaFuXezw/cTYEe99+AVB7XwGGZopTAGpVPcKRzmzCkVmbhqO/
-	ns9QKL6wkkJLVY8wdK+xBENPr21BWeWFFMr9w0CgyepmAmnGekm0WleDIWNdDoW6CmU0Gr/S
-	RKGJsWIK5c/eJtDfo/0kqs0xkKih0kghjXGeRNKkYhJdKpug0LNUM4YeNLSTKHN5ikLTqS00
-	GkpXEKhJ2Uuj0iUFQD1trTTS1nQD9LAnA6DsoSGAntSsP1o9lUaiAumH6OLwHjRw/Sbt58Gq
-	c9WArW/tptiGxTyCrdNXUWyt0kSzeZpo9uKdaZItrH+MsRpVEsXmJuVirFk2SrJ3zAU0mx+X
-	ibO5hgNs0zU1zd673Ibth1/b+wRxouMxnHin7/f2oYvlpVjkCD+2tVSLxYEV+2Rgx4PMbjgg
-	f4AnA3uegCkFUP4wg7AWCwCONv9DWot5ABflg9irSGbWE8zaKAGwsrCI/s+VV7RgK6oAXGt8
-	RlkiBLMDJijjgYUp5l3YaNDQFt7EuMPV2QuUJYAzFRthf1cnYWk4M3vgY+UCbmE+sxcW9UlJ
-	KztBQ/b4Sw/OvAfzdHPrYd46u8KSNZ5FtmM+hsN6GW1ddRu8mlZGWPkc7KgefLk2ZHIcYLui
-	xGb6DC5l5dhMznCyrdqmb4GdGSk2PQQWVShtHAnrh5SkZS5cHybvElllf9ibr8OtsiPsn3ay
-	bukI07UKm8yHiVKB1e0Oy0emiFSwXfnaXcrX7lL+f1cewFXAhYuWhIdwkvcjuFNeEmG4JDoi
-	xOvYiXANWP8YnWttCzWgZHLWSw8wHtADyMPdNvF/GGkJFvCDhKfPcOITR8XRIk6iB648ws2F
-	vyNoKydgQoRRXBjHRXLiV12MZ7c5DjsZpMzfu73btzTA87Br2NjyhMktpezHwJ8H7C50TF76
-	RnLw+daBDcx5Vh6zWzp8bGXbV/ohodOg9yp5P8aobk58Q3M98wU2HyhqWJMtKcdUkSrPU4RJ
-	w5IDrmnGihtnw9w/8JkJn9vodaNGXUz4pHn+OaLfL1d8JBt0+emAuvvsaYerX4Sa0rS/ZHso
-	vL5NqdqnG5Gedwp4+ptOlvpOYuwE74pDER18JOzNy9/5OXsfHp+eCcgMePsW76R/26HyL+Od
-	98X63YrqdUxf6TDWklUbRE2mt7T07y1HDqqjBH1B2Z86+d49Yz50LmExPlDkEb0rzD+Z0h11
-	vy/69fObc3cTduar3AhJqHCXBy6WCP8FA997SIcEAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Se0yTVxiHc76v/VowZJ8F5gm4BLooG7JKgcLLRWKyf75lYU6zxWzOQQcV
-	yICSXggumTKtIGjlsgFaSoOtIJdGthZIRS6ultZGmTEIuHGRBXDIRexwChnYFbpl/vec9/ze
-	5z05ebkkr4oK4mbnKSSyPHEOn/Jl3XnlmHgv0d95LLJ7Sgi3R/UELDedR2BvnSPhhnuCBHdX
-	JQkP/lqm4LShnYJV8xwBj/quEvC0fifUtBko0N13smC+4xYLTNMjbFjvthAw1K2l4K5BzYGZ
-	H/opmJ1uouCyq5MFv089ZMN1rZMNve1DFJiGVthQXNrEhpKWWQqeVbgJeNx7mw3Va4sULFUM
-	cGCsqpYF/ZoRDjSv1iK457BzoMsyiOCPe98juDQ2hmDB4pF2LFayQV8cB6pxEfza+CNnfzhj
-	1BkR02MfpJjeFw0spttqppjrmgkO02BSMirbEpsx9DwhGFNrKcXoSnUE41ZPsRmbW89hLhdV
-	k4zOeZDprzdymEfnHMTH+HNBkkyqVEhCsqRyxT7+ESFECYTxIIiKiRcIo+OOJkSJ+HuTkzIk
-	OdkFEtne5DRB1ou2ZiJ/0q/Q3txFFKG/fcuQDxfTMbi6ZoEoQ75cHt2IsGXUwPFe7MQ/PR9m
-	e9kfr4+UUd6QyxOabSe9BzPC03OTxGaKRe/CZzSn0SZT9Lu4z2naMgXQu/G669RWN0lfewMv
-	v3RsNfjTIvxE85zcZD/6Q3xltHhrHI9uIrFW/aa3vh07L82wNpmkI3DDjT89Iq6Hg/HVV9zN
-	sg+diMet6n9fHYovVrawvPwtXtl4jCqQv+Y1k+Y1k+Z/UwMiW1GARCnPzcyVCwVyca5cmZcp
-	SJfmmpBnObvsa2YL0s27BFZEcJEVYS7JD/D7anLgGM8vQ3z8G4lMmipT5kjkViTyfEUlGRSY
-	LvVsd54iVRgbKRLGxMZHiuJjo/k7/D7IPyvm0ZliheRriSRfIvuvj+D6BBURZ5rf/iXhztS6
-	tjbMOLa/92LcDD4VuLJds0+xO0Qv4C+d8LE8XaspmB12RRruBxmhx1aWkpQqj7KnZ4x/VOib
-	G279Leydmp8zSpyUg/8gvDUtNGGgfs9wnn+danDbAelw2+HvDqX2ZlMBY89CN1hpI+dDVK6w
-	sBJl7EKBWRWREnlwOSexPDT41qGoVbY29OZw8MPglpvdnx1NUd/F8yMqfVCpyl41flbeeWS6
-	1PJpXN2OL/Y4qPKkTmOXbVeWLeLLjsHy91NOXNPXFWmZ6WjbckHdW2q18JMLJwXurI11+0lq
-	sXEJoXP9yZxt87yXdRd8nLLj5FwyKq4vhFpzYB+fJc8SC8NJmVz8D+zmgCYlBAAA
-X-CMS-MailID: 20240823225452eucas1p16c2a886d94d236a72889bbaccef65274
-X-Msg-Generator: CA
-X-RootMTR: 20240807110435eucas1p2eca071b0a0122b8686d43c57bd94dc8c
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20240807110435eucas1p2eca071b0a0122b8686d43c57bd94dc8c
-References: <20240807-macos-build-support-v1-0-4cd1ded85694@samsung.com>
-	<20240807-macos-build-support-v1-8-4cd1ded85694@samsung.com>
-	<CGME20240807110435eucas1p2eca071b0a0122b8686d43c57bd94dc8c@eucas1p2.samsung.com>
-	<2024080717-cross-retiree-862e@gregkh>
-	<dxkmmrlhlhsrjulnyabfgcr37ojway2dxaypelf3uchkmhw4jn@z54e33jdpxmr>
-	<2024080720-skyline-recapture-d80d@gregkh>
-	<20240807-mottled-stoic-degu-d1e4cb@lindesnes>
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Aug 07, 2024 at 05:46:03PM +0200, Nicolas Schier wrote:
-> On Wed, Aug 07, 2024 at 04:18:54PM +0200, Greg Kroah-Hartman wrote:
-> > On Wed, Aug 07, 2024 at 02:13:57PM +0000, Daniel Gomez wrote:
-> > > > Also, as this is not internal for the kernel, but rather for userspace
-> > > > builds, shouldn't the include/ path be different?
-> > > 
-> > > Can you suggest an alternative path or provide documentation that could help
-> > > identify the correct location? Perhaps usr/include?
-> > 
-> > That is better than the generic include path as you are attempting to
-> > mix userspace and kernel headers in the same directory :(
-> 
-> Please keep in mind, that usr/include/ currently does not hold a single
-> header file but is used for dynamically composing the UAPI header tree.
-> 
-> In general, I do not like the idea of keeping a elf.h file here that
-> possibly is out-of-sync with the actual system's version (even though
-> elf.h should not see that much changes).  Might it be more helpful to
-> provide a "development kit" for Linux devs that need to build on MacOS
-> that provides necessary missing system header files, instead of merging
-> those into upstream?
+We allow a nested VM to be configured with a vPMU, although it isn't
+entirely functional. We do not currently respect the EL2 event filter
+configuration from the guest hypervisor, which really needs to be
+applied to EL1 when in a hyp context.
 
-I took this suggestion and tried pushing a Homebrew formula/package here [1].
-I think I chose a wrong name and maybe something like "development kit" would
-have been better. However, would it be possible instead to include the *.rb file
-in the scripts/ directory? So users of this can generate the development kit in
-their environments. I would maintain the script to keep it in sync with the
-required glibc version for the latest kernel version.
+Series to do just that. Tested on Neoverse-V2 which fortunately
+implements PMUv3 and NV, unlike the fruity stuff I'm typically using...
 
-[1] https://github.com/Homebrew/homebrew-core/pull/181885
+Oliver Upton (3):
+  KVM: arm64: Add helpers to determine if PMC counts at a given EL
+  KVM: arm64: nv: Honor NSH filter when in hyp context
+  KVM: arm64: nv: Reprogram PMU events affected by nested transition
 
-> 
-> Kind regards,
-> Nicolas
-> 
-> -- 
-> Nicolas
+ arch/arm64/kvm/emulate-nested.c |  4 ++
+ arch/arm64/kvm/pmu-emul.c       | 77 ++++++++++++++++++++++++++++-----
+ include/kvm/arm_pmu.h           |  3 ++
+ 3 files changed, 72 insertions(+), 12 deletions(-)
+
+
+base-commit: 7c626ce4bae1ac14f60076d00eafe71af30450ba
+-- 
+2.46.0.295.g3b9ea8a38a-goog
+
