@@ -1,49 +1,61 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D33053365
-	for <kvmarm@lists.linux.dev>; Sun, 25 Aug 2024 08:16:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5B9412B94;
+	Sun, 25 Aug 2024 16:46:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724573798; cv=none; b=n8vofK1IW6425c9nOdlwPE1H6u7J+h1lyzuhvaZuPLtQdf/ToXx3lFgftIx+vA/hBip29kNrU01Uxs8gZgJsx/0NAVtOs8zy/6dsKfYlUnOErLMpeTEYpm0fl0H2p1yGHK3mm/61MKrtktH6waz09uNTXDQ0OEn/j0Zaesdonlg=
+	t=1724604400; cv=none; b=nSl6yKVgPCPFkKp8hwVVuwdNGuyURsZo/JSf76Q3zhgpOkmvUSllbScwtPEsEUYNT89dwKIeGxotzAVs9Uj08foXXNNprgDuO7/FDCct/FqKb2x7uINYEydwAzNx5snxMEFZnGVqzvEpFnFHyHCqehTE7/G8CtuDXFMeVpQgZIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724573798; c=relaxed/simple;
-	bh=Q5MM0Bk7QQETveLGxvwXY/Ap1w+V4XneBVdkR8i2ZeA=;
+	s=arc-20240116; t=1724604400; c=relaxed/simple;
+	bh=ZoCeY/nGvicUbwynsgEk0MCHr1pxhUGttHarltMd2SI=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=owapqjOfkYBR423sS2ewK9CsypVZOeZpNzBi1+OetkkvhP/pcc0LhC/LPgUrCR8cXvoJ/b80a6SrBjR4OoMAOJaFp0wvMxkl6Wica4p7BkBT8I1S0yh08uPwwRJwvSEgQSRsXXoaWMoUuhKuS4I/C4O13CTVeoNTXo3n+qyMseo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YVSylgOr; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=PlnMOJ3eU3WmFt6hRi6Wy0gD4+YW/iJG4zqR/GAlnrxcqZ4Nue+g6XbUrtHxRZ3vYzPkylLEoE+KKPGzN9LxbHjgZS3sfEEhVI6zXlfdwfW/HVW3/xwrV5WxWrqm54TKALNMZf7hkOZlWiLQw0Ady0rJ2hJE8ql9Um9N5tEt5xg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hWjZdXuR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YVSylgOr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B5EDC32782;
-	Sun, 25 Aug 2024 08:16:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hWjZdXuR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AFFF9C32782;
+	Sun, 25 Aug 2024 16:46:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724573797;
-	bh=Q5MM0Bk7QQETveLGxvwXY/Ap1w+V4XneBVdkR8i2ZeA=;
+	s=k20201202; t=1724604399;
+	bh=ZoCeY/nGvicUbwynsgEk0MCHr1pxhUGttHarltMd2SI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=YVSylgOr/+ggqIlmEVQERzMNG5KvLLZGeh3Qi+BPPDxiC9xVgg/fmBFXIu/H9k02J
-	 ccxaVcPExeSvJuGUZ8+6szz1kt8VmT4YWx3K971GiAfcgS+6k3YyJPXmfaoa/GJqSF
-	 yuomdE2lnTiGq2NGliLIRgpbfRXgLuEjz82lvm+/ihRbyMNGP1/j0/c+Zmunt2K/aj
-	 rKsYJnDvZvcWWVoM32J6E0F4dagg71mrcoV/TG9FltJXE7rDdcslU+uUgZieIdns0K
-	 +/vBb7maheaNAqA6OnnsXPNOApKXKmkP7RLxkLbik8MxyVi1gt7QZVm2heGXO3ORMH
-	 qoZT2w5ZJ8ADA==
+	b=hWjZdXuRTUyYB1URlqmOJ/zJYqVlPvVMAya7LMyigSuhG2hAdd1DGwLhYeH+2U/S/
+	 Upi5M5VQjSixDrsUeuHA5EKmkUQhqJpI0tVzgNwEO90OnBxPe+65VtWjF3tWmXQGDB
+	 4pt8JtXX9u4392jHkqXvv5jXHBFB0LZ+yPDekmuLoUmKwvnskdy8XQxb2aeyq6rR/+
+	 0/xCsSKjpzkDieAxLxJE1CLtkTHOpW+FVVGBQavEp8cPvICv+6Q3bb/504Iwohvj+g
+	 RtuMRRfJg8g0UERzMqCOdGB7gwU88nL53a21o606rFVfdsvDP/WvrBrtt6hvaTlJbP
+	 9W/uF2g2BKCSw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1si8QM-006dKA-SU;
-	Sun, 25 Aug 2024 09:16:34 +0100
-Date: Sun, 25 Aug 2024 09:16:33 +0100
-Message-ID: <86v7zpvwym.wl-maz@kernel.org>
+	id 1siGNx-006hAo-54;
+	Sun, 25 Aug 2024 17:46:37 +0100
+Date: Sun, 25 Aug 2024 17:46:36 +0100
+Message-ID: <86ttf8wnwz.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
+To: Shaoqin Huang <shahuang@redhat.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	kvmarm@lists.linux.dev,
+	Mark Brown <broonie@kernel.org>,
+	Eric Auger <eauger@redhat.com>,
+	Sebastian Ott <sebott@redhat.com>,
+	Cornelia Huck <cohuck@redhat.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
 	James Morse <james.morse@arm.com>,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: Re: [PATCH 0/3] KVM: arm64: nv: Add EL2 PMU event filtering support
-In-Reply-To: <20240824001402.3909504-1-oliver.upton@linux.dev>
-References: <20240824001402.3909504-1-oliver.upton@linux.dev>
+	Will Deacon <will@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v5 0/4] Allow userspace to change ID_AA64PFR1_EL1
+In-Reply-To: <20240723072004.1470688-1-shahuang@redhat.com>
+References: <20240723072004.1470688-1-shahuang@redhat.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -55,43 +67,51 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, gankulkarni@os.amperecomputing.com
+X-SA-Exim-Rcpt-To: shahuang@redhat.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, broonie@kernel.org, eauger@redhat.com, sebott@redhat.com, cohuck@redhat.com, catalin.marinas@arm.com, james.morse@arm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, pbonzini@redhat.com, shuah@kernel.org, suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sat, 24 Aug 2024 01:13:59 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On Tue, 23 Jul 2024 08:19:59 +0100,
+Shaoqin Huang <shahuang@redhat.com> wrote:
 > 
-> We allow a nested VM to be configured with a vPMU, although it isn't
-> entirely functional. We do not currently respect the EL2 event filter
-> configuration from the guest hypervisor, which really needs to be
-> applied to EL1 when in a hyp context.
+> Hi guys,
 > 
-> Series to do just that. Tested on Neoverse-V2 which fortunately
-> implements PMUv3 and NV, unlike the fruity stuff I'm typically using...
-> 
-> Oliver Upton (3):
->   KVM: arm64: Add helpers to determine if PMC counts at a given EL
->   KVM: arm64: nv: Honor NSH filter when in hyp context
->   KVM: arm64: nv: Reprogram PMU events affected by nested transition
-> 
->  arch/arm64/kvm/emulate-nested.c |  4 ++
->  arch/arm64/kvm/pmu-emul.c       | 77 ++++++++++++++++++++++++++++-----
->  include/kvm/arm_pmu.h           |  3 ++
->  3 files changed, 72 insertions(+), 12 deletions(-)
-> 
-> 
-> base-commit: 7c626ce4bae1ac14f60076d00eafe71af30450ba
+> This is another try to allow userspace to change ID_AA64PFR1_EL1, and we want to
+> give userspace the ability to control the visible feature set for a VM, which
+> could be used by userspace in such a way to transparently migrate VMs.
 
-I had a quick look, and definitely like the way it is shaping up (it
-does the job without fuss, and NV isn't about performance anyway).
 
-However, I think it needs a bit more work so that MDCR_EL2.HPMN is
-correctly handled. This shouldn't be hard to do, and if FEAT_FGT is
-supported in the guest, then we could even expose FEAT_HPMN0 (though I
-haven't worked out yet why FGT is a dependency).
+I think this looks OK now, thanks for going through the motions and
+doing the right thing.
 
-With that, I think we could take it in.
+What is missing is similar handling for 32bit ID registers, but I'm
+not sure we keen on going down that road -- machines capable of
+running those are on their way out. This can be done later anyway,
+should anyone care.
+
+>
+> The patch series have four part:
+> 
+> The first patch disable those fields which KVM doesn't know how to handle, so
+> KVM will only expose value 0 of those fields to the guest.
+> 
+> The second patch check the FEAT_SSBS in guest IDREG instead of the cpu
+> capability.
+> 
+> The third patch allow userspace to change ID_AA64PFR1_EL1, it only advertise the
+> fields known to KVM and leave others unadvertise.
+> 
+> The fourth patch adds the kselftest to test if userspace can change the
+> ID_AA64PFR1_EL1.
+> 
+> Besides, I also noticed there is another patch [1] which try to make the
+> ID_AA64PFR1_EL1 writable. This patch [1] is try to enable GCS on baremental, and
+> add GCS support for the guest. What I understand is if we have GCS support on
+> baremental, it will be clear to how to handle them in KVM. And same for other
+> fields like NMI, THE, DF2, MTEX.. At that time, they can be
+> writable.
+
+I expect that Broonie would look into this as part of his series.
 
 Thanks,
 
