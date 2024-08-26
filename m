@@ -1,20 +1,20 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D054E14B08E;
-	Mon, 26 Aug 2024 10:41:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0C8639ACC;
+	Mon, 26 Aug 2024 10:46:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724668903; cv=none; b=mlcelXgTi1iqnDoeSzDjM5ApIi/w1kxgKmVNF1J/ZIbnc80d0M7+b4xkXeTgNkDeF/mTTz6u4oTEEEPeWvU3dGpxUgdbDaKxmRSqVE7fqETdmeRuBZ+wPRVMB2SPVlPtKyCZDOxxEHEBIRXELeprJtPnt2CaD4Myaf3YSg/C7Jg=
+	t=1724669176; cv=none; b=YuoBw+3eYVNpHa9U4sP5ctGVE2jo52TSDIY/umZSv2cKr0DZXr03AurBvxxaNGuTfJ0XWXN1CdVFpTERt9rh0aVsixHH3VJ5+eDeIVFbqtHFD2W+fNnnlREI2JSbPFJguiKJFDPsaXenfBJiXqCTA2gSaX8ecK+vPLjiSHnIYuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724668903; c=relaxed/simple;
-	bh=OaR1tbVDdm/m5K9cLg9sPIowmN8GOxy2+PGzwGloHPA=;
+	s=arc-20240116; t=1724669176; c=relaxed/simple;
+	bh=XAj4Tq5MjaiO37oruDpqrEgc3uF2VimxxQHdGrtWnDE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UPtJUCap5IYCO9bKLp/WGL/3lSH8Bcmi+ZqVBdteupLRD/VrVWLKvtnzLC9PWE6af9ysf2oY2zommqA+J0Pu+2zfH7mG/65zUajdO8ICqZSmnM0f+lsocgHOnfM2MAgR3AtSeNRKQqjni/FGNKc+hzesAETSjn8gEBEVv24CkFA=
+	 Content-Type:Content-Disposition:In-Reply-To; b=fI8hblSWxu3OFSiHiNMMeJPn2RS3z8HibO7BsBgmPXYJLgn6xEFU50HmpoNnIzCeJMKEro8AdZz+prEKvrijAWaRkC+a3mKCUxfGWAsVxBuvhpOYJJfQEbOPmBSM4HNTMqmodvZS6LVtZCtkJJ0dOams01Mb424JmV8GcBD8T4A=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5AC6BC51408;
-	Mon, 26 Aug 2024 10:41:39 +0000 (UTC)
-Date: Mon, 26 Aug 2024 13:41:48 +0300
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D9AFC51404;
+	Mon, 26 Aug 2024 10:46:10 +0000 (UTC)
+Date: Mon, 26 Aug 2024 13:46:19 +0300
 From: Catalin Marinas <catalin.marinas@arm.com>
 To: Steven Price <steven.price@arm.com>
 Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
@@ -32,11 +32,10 @@ Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
 	Gavin Shan <gshan@redhat.com>,
 	Shanker Donthineni <sdonthineni@nvidia.com>,
 	Alper Gun <alpergun@google.com>
-Subject: Re: [PATCH v5 15/19] arm64: mm: Avoid TLBI when marking pages as
- valid
-Message-ID: <Zsxb7MpUklPK3Chf@arm.com>
+Subject: Re: [PATCH v5 16/19] arm64: Enable memory encrypt for Realms
+Message-ID: <Zsxc-wqGaQLpyO-W@arm.com>
 References: <20240819131924.372366-1-steven.price@arm.com>
- <20240819131924.372366-16-steven.price@arm.com>
+ <20240819131924.372366-17-steven.price@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -45,14 +44,19 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240819131924.372366-16-steven.price@arm.com>
+In-Reply-To: <20240819131924.372366-17-steven.price@arm.com>
 
-On Mon, Aug 19, 2024 at 02:19:20PM +0100, Steven Price wrote:
-> When __change_memory_common() is purely setting the valid bit on a PTE
-> (e.g. via the set_memory_valid() call) there is no need for a TLBI as
-> either the entry isn't changing (the valid bit was already set) or the
-> entry was invalid and so should not have been cached in the TLB.
+On Mon, Aug 19, 2024 at 02:19:21PM +0100, Steven Price wrote:
+> From: Suzuki K Poulose <suzuki.poulose@arm.com>
 > 
+> Use the memory encryption APIs to trigger a RSI call to request a
+> transition between protected memory and shared memory (or vice versa)
+> and updating the kernel's linear map of modified pages to flip the top
+> bit of the IPA. This requires that block mappings are not used in the
+> direct map for realm guests.
+> 
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Co-developed-by: Steven Price <steven.price@arm.com>
 > Signed-off-by: Steven Price <steven.price@arm.com>
 
 Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
