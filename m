@@ -1,125 +1,108 @@
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22433176FD3
-	for <kvmarm@lists.linux.dev>; Tue, 27 Aug 2024 09:06:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A105019DF82;
+	Tue, 27 Aug 2024 11:38:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724749580; cv=none; b=OOWjmzh0UusD599G7V5oxtQwtHVmllYn11/If8eFP5/w0rMNVTww3MrDtY18ycgWbW8WkDuhMkQMdYNShyg2lZ0ZMimwzAEUV95ONmJEZN+zfSBdfJ4Ce0j+1pWX7axba4KxpCanNW2Tx7zVIbr+4tEfgG8IQvlzwVhr1WuJsPc=
+	t=1724758692; cv=none; b=oM4eFY4LzYaZo3rV+QQ80B747RGKwi4anxxF3luzC7p34h5ljWIEoAT8dlLJnotQnSa/WEHgWwVGUKsnkyQvt0+p72K4HkRxqdiSpHkRHPxBIgX5Dv6eNBocTpVvQxL9WUnQtfdYGTAUOb4nNhVkPLWd6MXOgCxTbOkfCCJUv7k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724749580; c=relaxed/simple;
-	bh=td6TsY+x1jF2bYWtgW1QVma5ZvKvJwuhzTvVDhTcxRU=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=dNvrn/T7PnRGiNjMz3FFUdQUQW5K459vy2vGdHZaHxylVd+A6HAiyNna/CJtpUQWTGt6VZoLI34qPBsKGgnPjaAWWrM9cf8+GtgeksXzP7N6z7RiOBlhPrsaVBQhEPV3ucjj3uWU6yWmS5a6SMJkBHkIA7tnQ+VyueWwOHPtA2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=b25Gnzx/; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1724758692; c=relaxed/simple;
+	bh=2+A2bF7Lj9wuQUwEpvgzmZKK3imkhu2KCOi7wnoixak=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uXgsdoAQlp21dyu9f+5tkWlLgTSMZNQFo44ol2/4f603pF7RxVPIB/me551QVnyez/9XLLlXuKN3c+ztjfNbniDqt4/NltYPVRq+FWxw5FLYA7IbdDkqbOHMvBAw3qWRKD+TvssFlu1aiMeUATbLe6+viHBO1eRTzUdVz2Scx7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gpf8ddOX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="b25Gnzx/"
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-371b015572cso3821578f8f.1
-        for <kvmarm@lists.linux.dev>; Tue, 27 Aug 2024 02:06:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1724749576; x=1725354376; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ys5q7+xt7V4u8ZvUMbFPxHX+g0yKhziPVMVNXUTaajE=;
-        b=b25Gnzx/5ImiEj6Cnq6tTZzD9X9E6P7hyRY1sAFRyQi0Kvn7+CZmnTI83imZeuPc9e
-         w0+JTkwhS3zojb8dqoQwnmb7ukSPQ6lS8V8woYAA8MTCKJMh+HSPkyiJi216NyZ/49Zd
-         Zy+yNhiR5Fdo0swMyvlLgvZtTgniRuH5ei7INPJshfQfkBDjqk0W3iZa7HYsT+WOaQfb
-         GJkMwT9uPf9lGDGEraTCMOqcWTQ5ca8MuqTlDpu9ZSeBeEtvn+ttiW/qorWR+YaPOrs8
-         O8+KIOnGIXDGuwmouvAKhzrtxcwIWbCnwQprAWN49Po08AWmDSb3HTJ9q3d1XnbVxk71
-         JQ0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724749576; x=1725354376;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ys5q7+xt7V4u8ZvUMbFPxHX+g0yKhziPVMVNXUTaajE=;
-        b=bLS8lHYI3GHXzXc+kfBI0eu7oteFCmS2QDZONpeq7IElWDuDd6+VU9hMyxDTGnPdQ8
-         YOQGf50xiSjoPANLg/AXDuK0sHCo08A943FBEFElQjxYRn5MVdzpREXzovEhWlFTTBNp
-         yS18GAI6KL878whpOLsNiU/VC1sNmoeKnUDnQ78FunF0eJWvqKHdH0nWIG6IoBqrugl7
-         7oWqRboDjlQHSxp0mqYULTcqhA2PIYMQQivCbgnuEDyL9Jnjzgk/BlQGwXkTVbOcfVTB
-         XcqPjZ/guchwAN6JpcGbSRHJosz20M1f8FIES4Gg0a0xJahksstV9mis0ZSxKxiiLcKO
-         b7JQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUkA0W4GeGQ4gAQUtzzr1/ZCsIm8DYdeqEfFIPRq0Pd1iLw9/MlvikzSFP4NMFGxEd+jGUmlAg=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxVJyZee+t5vzor3B61luBZXRJK8vx7WHVN4LbFhILGWRX+Qk5x
-	g19tPdV9xVnkLMcZfWXmYr+fRb1eI3MDHmwNljJ9xgVYrsngzLjQfLH8yaKNWN4=
-X-Google-Smtp-Source: AGHT+IE+VDn5FOe01bWlunlr3Q/efu0PB9LC4RFl5VPjT0A0kz6PEXEkfZYstnAt53OJLkCDA/f1HA==
-X-Received: by 2002:adf:b311:0:b0:368:3f6a:1dea with SMTP id ffacd0b85a97d-37311840050mr9300691f8f.6.1724749575912;
-        Tue, 27 Aug 2024 02:06:15 -0700 (PDT)
-Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3730826a3f7sm12533503f8f.112.2024.08.27.02.06.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Aug 2024 02:06:15 -0700 (PDT)
-Received: from draig (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 507E15F7A2;
-	Tue, 27 Aug 2024 10:06:14 +0100 (BST)
-From: =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,  Marc Zyngier <maz@kernel.org>,
-  Oliver Upton <oliver.upton@linux.dev>,  Tianrui Zhao
- <zhaotianrui@loongson.cn>,  Bibo Mao <maobibo@loongson.cn>,  Huacai Chen
- <chenhuacai@kernel.org>,  Michael Ellerman <mpe@ellerman.id.au>,  Anup
- Patel <anup@brainfault.org>,  Paul Walmsley <paul.walmsley@sifive.com>,
-  Palmer Dabbelt <palmer@dabbelt.com>,  Albert Ou <aou@eecs.berkeley.edu>,
-  Christian Borntraeger <borntraeger@linux.ibm.com>,  Janosch Frank
- <frankja@linux.ibm.com>,  Claudio Imbrenda <imbrenda@linux.ibm.com>,
-  kvm@vger.kernel.org,  linux-arm-kernel@lists.infradead.org,
-  kvmarm@lists.linux.dev,  loongarch@lists.linux.dev,
-  linux-mips@vger.kernel.org,  linuxppc-dev@lists.ozlabs.org,
-  kvm-riscv@lists.infradead.org,  linux-riscv@lists.infradead.org,
-  linux-kernel@vger.kernel.org,  David Matlack <dmatlack@google.com>,
-  David Stevens <stevensd@chromium.org>
-Subject: Re: [PATCH v12 00/84] KVM: Stop grabbing references to PFNMAP'd pages
-In-Reply-To: <20240726235234.228822-1-seanjc@google.com> (Sean
-	Christopherson's message of "Fri, 26 Jul 2024 16:51:09 -0700")
-References: <20240726235234.228822-1-seanjc@google.com>
-Date: Tue, 27 Aug 2024 10:06:14 +0100
-Message-ID: <875xrme3nd.fsf@draig.linaro.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gpf8ddOX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60A82C582AB;
+	Tue, 27 Aug 2024 11:38:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724758692;
+	bh=2+A2bF7Lj9wuQUwEpvgzmZKK3imkhu2KCOi7wnoixak=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Gpf8ddOXDK2vLQMMp3FzmG/a/m/kr0GXzqv0V69de1kGXjsWZZVM5il9nZ3rJgJ/C
+	 HhCk9FpXwrs24xGKZufPQ6AVtvbP5tMYwDBYGmyjXUFSAs0/qqunKiRjR5cHaGfdBj
+	 NELnVGfuXrKZce7YLlJBXHfzEBMziXjXhbc2oCx/U/canba16aHthF+qGabnfRBtoM
+	 BP6yHu6nKpM6xKRbubnCGD2Di4NReNtwAwTcMpZZI8xnW+1KjwLJ14ftgHU2j0y4CR
+	 5qpdVZJYRS0/PkwK6KW2GK7c8ijyUvbxdWydqc2U6Yg0gjukfhNJnDfFkqe+yURXpL
+	 dMagJjNp/hQXA==
+Date: Tue, 27 Aug 2024 12:38:04 +0100
+From: Will Deacon <will@kernel.org>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Joey Gouly <joey.gouly@arm.com>, linux-arm-kernel@lists.infradead.org,
+	nd@arm.com, akpm@linux-foundation.org, aneesh.kumar@kernel.org,
+	aneesh.kumar@linux.ibm.com, anshuman.khandual@arm.com, bp@alien8.de,
+	broonie@kernel.org, christophe.leroy@csgroup.eu,
+	dave.hansen@linux.intel.com, hpa@zytor.com,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
+	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
+	oliver.upton@linux.dev, shuah@kernel.org, skhan@linuxfoundation.org,
+	szabolcs.nagy@arm.com, tglx@linutronix.de, x86@kernel.org,
+	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v5 06/30] arm64: context switch POR_EL0 register
+Message-ID: <20240827113803.GB4318@willie-the-truck>
+References: <20240822151113.1479789-1-joey.gouly@arm.com>
+ <20240822151113.1479789-7-joey.gouly@arm.com>
+ <20240823144531.GH32156@willie-the-truck>
+ <Zsi7ovLOfuFdfuuz@arm.com>
+ <20240823170835.GA1181@willie-the-truck>
+ <ZsjXtE7Kg0LQwNAL@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZsjXtE7Kg0LQwNAL@arm.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-Sean Christopherson <seanjc@google.com> writes:
+On Fri, Aug 23, 2024 at 07:40:52PM +0100, Catalin Marinas wrote:
+> On Fri, Aug 23, 2024 at 06:08:36PM +0100, Will Deacon wrote:
+> > On Fri, Aug 23, 2024 at 05:41:06PM +0100, Catalin Marinas wrote:
+> > > On Fri, Aug 23, 2024 at 03:45:32PM +0100, Will Deacon wrote:
+> > > > On Thu, Aug 22, 2024 at 04:10:49PM +0100, Joey Gouly wrote:
+> > > > > +static void permission_overlay_switch(struct task_struct *next)
+> > > > > +{
+> > > > > +	if (!system_supports_poe())
+> > > > > +		return;
+> > > > > +
+> > > > > +	current->thread.por_el0 = read_sysreg_s(SYS_POR_EL0);
+> > > > > +	if (current->thread.por_el0 != next->thread.por_el0) {
+> > > > > +		write_sysreg_s(next->thread.por_el0, SYS_POR_EL0);
+> > > > > +		/* ISB required for kernel uaccess routines when chaning POR_EL0 */
+> > > > 
+> > > > nit: typo "chaning".
+> > > > 
+> > > > But more substantially, is this just to prevent spurious faults in the
+> > > > context of a new thread using a stale value for POR_EL0?
+> > > 
+> > > Not just prevent faults but enforce the permissions from the new
+> > > thread's POR_EL0. The kernel may continue with a uaccess routine from
+> > > here, we can't tell.
+> > 
+> > Hmm, I wondered if that was the case. It's a bit weird though, because:
+> > 
+> >   - There's a window between switch_mm() and switch_to() where you might
+> >     reasonably expect to be able to execute uaccess routines
+> 
+> I don't think we can have any uaccess between these two switches (a
+> uaccess could fault, that's a pretty weird state between these two).
+> 
+> >   - kthread_use_mm() doesn't/can't look at this at all
+> 
+> No, but a kthread would have it's own, most permissive, POR_EL0.
+> 
+> >   - GUP obviously doesn't care
+> > 
+> > So what do we actually gain by having the uaccess routines honour this?
+> 
+> I guess where it matters is more like not accidentally faulting because
+> the previous thread had more restrictive permissions.
 
-> arm64 folks, the first two patches are bug fixes, but I have very low
-> confidence that they are correct and/or desirable.  If they are more or
-> less correct, I can post them separately if that'd make life easier.  I
-> included them here to avoid conflicts, and because I'm pretty sure how
-> KVM deals with MTE tags vs. dirty logging will impact what APIs KVM needs
-> to provide to arch code.
->
-> On to the series...  The TL;DR is that I would like to get input on two
-> things:
->
->  1. Marking folios dirty/accessed only on the intial stage-2 page fault
->  2. The new APIs for faulting, prefetching, and doing "lookups" on
->  pfns
+That's what I wondered initially, but won't the fault handler retry in
+that case?
 
-I've finally managed to get virtio-vulkan working on my Arm64 devbox
-with an AMD graphics card plugged into the PCI. I'm confident that the
-graphics path is using the discrete card memory (as it has been mapped
-as device memory with alignment handlers to deal with the broken Altra
-PCI). However aside from running graphics workloads in KVM guests is
-their anything else I can check to see things are behaving as expected?
-
-The predecessor series did break launching some KVM guests on my x86
-system but with this series launching guests works fine and I haven't
-noticed any weirdness.
-
-So for those caveats you can certainly have a:
-
-Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-However if there is anything else I can do to further stress test this
-code do let me know.
-
---=20
-Alex Benn=C3=A9e
-Virtualisation Tech Lead @ Linaro
+Will
