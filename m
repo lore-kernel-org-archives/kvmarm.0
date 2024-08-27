@@ -1,164 +1,103 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-176.mta0.migadu.com (out-176.mta0.migadu.com [91.218.175.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90F7D179A8
-	for <kvmarm@lists.linux.dev>; Tue, 27 Aug 2024 06:35:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6F351854
+	for <kvmarm@lists.linux.dev>; Tue, 27 Aug 2024 07:01:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724740518; cv=none; b=TeWWNtk/z9mJIMf5EgjYzUhlvcrbO9nk6dGmnHfaTatzY/HSzAsuUUXzqoKwMQHeGEjsCbv1hRtBPOfWcD948ZDGeW51Sa6PwUS6j30BRFxwh4Vt9R4Pc5n06h9yK6h06xF9XMvEd/Z20CjrTZA786QTe2auH3njlDO+7Ffp5BE=
+	t=1724742083; cv=none; b=V7gtwBXU6X5WRHCFAzOhStDjxqJDUfy2gCNZrpMJheFwW6fNVXZ58gOo5bbNMp22lW2bRlyDfB9Fg3/s+0xxS15yFem+8UXKZ1UBRNtOyByyYqOTLmQsoTBkIX9Z0weXKMo0LU7W7eFhFMH4QAEy44rIY/I4dZqCCksW8K7DFCY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724740518; c=relaxed/simple;
-	bh=nJtg2zIXT2Jsiz7qa7+0YV61BfPrGm4xjUffC2k/thM=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DkO6X+1s3oJvVnYA9nb0iPx7mJImyvG2x1ghIHQ/KTk9+4NmCZrD/kw9koRZqeLaT3NX+gOfNXh+63vC7OwMvtCS/djiSS2kYQvBlaZFPWbTS/O5l9JFgntpItbBJwDYv1vnSkc4cYHa06EGbXXSMuALHoc7rKqldHLVErw/zL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bixllikv; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1724742083; c=relaxed/simple;
+	bh=qVRZOnR3iBZ7KNZ3lUscpxiB6Ig2csGS9p0ZZrEiT0g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uhyDjf9Y7r4emC7+OGWFVa7tkQRULHCEtxHqMfngTc+Qs2cvtpTmQ8ewU19d+S9h+FWu/3YbsxFXmZlHG9+Jg7+bM0o1kdj6K1Y9CuWZxuogAViwl+l4Sjl317Of+ZH501Pl//nXZbH4fx0F6rm89v9dLzEWiugRlBGtN7Fs8WI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dVp6nHO5; arc=none smtp.client-ip=91.218.175.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bixllikv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2768EC9039B;
-	Tue, 27 Aug 2024 06:35:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724740518;
-	bh=nJtg2zIXT2Jsiz7qa7+0YV61BfPrGm4xjUffC2k/thM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bixllikv8mhAdWOP2JATNAntUrR5/msbNiP2E3xERC5t63/iFECDbej1PThM9UKPk
-	 MuJghdYS2JXYRN4PyhorPhAZf2lI4i7JM08avSBafQAv1eWPF5L95EInCF0QenD5cb
-	 0RrdZwN6vyEsJCl++8rQ6Yw5cnp6irf9IFbxoa5re5YWG2iy7xG93/+m79JSub2f/5
-	 1CsrjRbIuL2148AgoGu00lVy3/TlE762DJTi/6IdY+HzgwGvxIMNxjsxHQznbx1SnA
-	 3B5pN6GyS0A07hIIVnkGwQjrhwHgZSyZ+JJUiP7RpTSj6oiRoFuaogoXYauNY/3w4g
-	 A2o1tnAzh7+cA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sipnQ-00772U-2B;
-	Tue, 27 Aug 2024 07:35:16 +0100
-Date: Tue, 27 Aug 2024 07:35:15 +0100
-Message-ID: <86r0aawk0s.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	James Morse <james.morse@arm.com>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dVp6nHO5"
+Date: Tue, 27 Aug 2024 00:01:11 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1724742078;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LCZto46Oql9ITvqT1x4W20RV9lpPDbDDuODidlE2w2Y=;
+	b=dVp6nHO5n1Kb0QNlTJQK//lKQRNLrcrilyhEM8c4VFOqhS8jsEcKIsiVpDiFv8LlZBNwRg
+	YNp/dDJNJteeQkq9ohg8S4MfxeYaQ+2qQptrtAM3hzWQ/cYIv2GDsXQ+jPiJQesvDZGHMs
+	m6KZAJOrXBr1M8ugoeKumWPEvYS2Sc4=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
 Subject: Re: [PATCH 0/3] KVM: arm64: nv: Add EL2 PMU event filtering support
-In-Reply-To: <Zsy6zNQT2o6sTidY@linux.dev>
+Message-ID: <Zs15t5JVqcG6AYjF@linux.dev>
 References: <20240824001402.3909504-1-oliver.upton@linux.dev>
-	<86v7zpvwym.wl-maz@kernel.org>
-	<Zsy6zNQT2o6sTidY@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <86v7zpvwym.wl-maz@kernel.org>
+ <Zsy6zNQT2o6sTidY@linux.dev>
+ <86r0aawk0s.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, gankulkarni@os.amperecomputing.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86r0aawk0s.wl-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, 26 Aug 2024 18:26:36 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On Tue, Aug 27, 2024 at 07:35:15AM +0100, Marc Zyngier wrote:
+> > Thoughts?
 > 
-> Hey,
+> I see that you have already posted your proposed approach, but allow
+> me to say what I have in mind.
 > 
-> On Sun, Aug 25, 2024 at 09:16:33AM +0100, Marc Zyngier wrote:
-> > On Sat, 24 Aug 2024 01:13:59 +0100,
-> > Oliver Upton <oliver.upton@linux.dev> wrote:
-> > > 
-> > > We allow a nested VM to be configured with a vPMU, although it isn't
-> > > entirely functional. We do not currently respect the EL2 event filter
-> > > configuration from the guest hypervisor, which really needs to be
-> > > applied to EL1 when in a hyp context.
-> > > 
-> > > Series to do just that. Tested on Neoverse-V2 which fortunately
-> > > implements PMUv3 and NV, unlike the fruity stuff I'm typically using...
-> > > 
-> > > Oliver Upton (3):
-> > >   KVM: arm64: Add helpers to determine if PMC counts at a given EL
-> > >   KVM: arm64: nv: Honor NSH filter when in hyp context
-> > >   KVM: arm64: nv: Reprogram PMU events affected by nested transition
-> > > 
-> > >  arch/arm64/kvm/emulate-nested.c |  4 ++
-> > >  arch/arm64/kvm/pmu-emul.c       | 77 ++++++++++++++++++++++++++++-----
-> > >  include/kvm/arm_pmu.h           |  3 ++
-> > >  3 files changed, 72 insertions(+), 12 deletions(-)
-> > > 
-> > > 
-> > > base-commit: 7c626ce4bae1ac14f60076d00eafe71af30450ba
-> > 
-> > I had a quick look, and definitely like the way it is shaping up (it
-> > does the job without fuss, and NV isn't about performance anyway).
-> > 
-> > However, I think it needs a bit more work so that MDCR_EL2.HPMN is
-> > correctly handled. This shouldn't be hard to do, and if FEAT_FGT is
-> > supported in the guest, then we could even expose FEAT_HPMN0 (though I
-> > haven't worked out yet why FGT is a dependency).
+> We have three possibilities:
 > 
-> Right, I was hoping to spoon-feed some more PMU patches going forward,
-> since we already allow the NV+PMU combination and can treat it as a 'bugfix'.
-> But I'm happy to throw some more cycles at the problem.
-
-We absolutely can. As long as we don't let userspace get in the way,
-we can play the incremental game for as long as we want.
-
+> - either we go with your approach, which has the advantage of not
+>   requiring any new trap description, but breaks the (unwritten)
+>   promise that we don't do any "local" handling at this stage
 > 
-> I think there are some gaps in the way the other coarse-grained PMU
-> traps are handled (TPM, TPMCR), since it looks like they also apply to
-> Host EL0 based on the pseudocode. I don't want to have a separate
-> mechanism for describing these 'InHost' traps, so I'm gonna try and
-> address this like so:
+> - or we perform the handling where we normally do it (in sys_regs.c),
+>   but we start littering the already overly complicated emulation code
+>   for something that is barely a trap reinjection
+
+Hell no :)
+
+> - or (and this is my preferred option), we treat it as a "fast" trap,
+>   which would match what we do for other things that we trap and that
+>   behave differently when 'InHost' (ERET, TLBIs).
 > 
->  - Indicate if CGTs apply to host EL0 in the trap_bits descriptor
+> This last option does require another bit of decoding, but has the
+> following advantages:
 > 
->  - Steal a trap_config bit to indicate if a sysreg can trap while
->    InHost, and:
+> - it follows the existing model for 'InHost' trap handling
 > 
->  - Mark a trap_config as InHost if any of the associated CGTs are
->    InHost when inserting in the xarray
+> - it is close to optimal from a performance perspective
 > 
-> That way I can preserve the early return for is_hyp_ctxt() for all but a
-> few trap configs.
+> - it doesn't change the existing behaviour of the xarray handling
 > 
-> Thoughts?
+> The way I think of it, this sort of EL0->EL2 trap reinjection is
+> simply the other side of the ERET coin, and I would very much like to
+> keep this symmetry, unless I have missed something obvious.
+> 
+> What do you think?
 
-I see that you have already posted your proposed approach, but allow
-me to say what I have in mind.
+My primary concern about stuffing more things into the fast path is the
+limited debuggability since we can't use instrumentation in a
+not-quite-kernel context.
 
-We have three possibilities:
+I do generally agree with the intent of organizing it all similarly,
+just that the traps infrastructure is _really_ handy for doing the job.
 
-- either we go with your approach, which has the advantage of not
-  requiring any new trap description, but breaks the (unwritten)
-  promise that we don't do any "local" handling at this stage
-
-- or we perform the handling where we normally do it (in sys_regs.c),
-  but we start littering the already overly complicated emulation code
-  for something that is barely a trap reinjection
-
-- or (and this is my preferred option), we treat it as a "fast" trap,
-  which would match what we do for other things that we trap and that
-  behave differently when 'InHost' (ERET, TLBIs).
-
-This last option does require another bit of decoding, but has the
-following advantages:
-
-- it follows the existing model for 'InHost' trap handling
-
-- it is close to optimal from a performance perspective
-
-- it doesn't change the existing behaviour of the xarray handling
-
-The way I think of it, this sort of EL0->EL2 trap reinjection is
-simply the other side of the ERET coin, and I would very much like to
-keep this symmetry, unless I have missed something obvious.
-
-What do you think?
-
-	M.
+Let me take an accounting of how many other 'InHost' trap bits we have
+and get a feel for if we need a generalized solution or if I can do
+something PMU-specific here.
 
 -- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+Oliver
