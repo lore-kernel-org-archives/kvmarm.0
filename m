@@ -1,142 +1,164 @@
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91F881FAA
-	for <kvmarm@lists.linux.dev>; Tue, 27 Aug 2024 00:23:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90F7D179A8
+	for <kvmarm@lists.linux.dev>; Tue, 27 Aug 2024 06:35:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724718192; cv=none; b=QlRSWz57MZwo+gODxSWU11YHns9T6FhMPSKUbaF3anFxlo6XQr4xQbkI1w0fLrsT3pClrt06fRzY9mHVGzc9kdSBSsoeDrED+c42/g2Rhz+PK4paYNEKqj5ljP6eD7LjaIn/WY6eZOCaX9zAUQaZ/X1NeNOThrZCFFDPYpYOiic=
+	t=1724740518; cv=none; b=TeWWNtk/z9mJIMf5EgjYzUhlvcrbO9nk6dGmnHfaTatzY/HSzAsuUUXzqoKwMQHeGEjsCbv1hRtBPOfWcD948ZDGeW51Sa6PwUS6j30BRFxwh4Vt9R4Pc5n06h9yK6h06xF9XMvEd/Z20CjrTZA786QTe2auH3njlDO+7Ffp5BE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724718192; c=relaxed/simple;
-	bh=Pp9YrKpswXnvpe+HFy4/qjTm2KlfXOBazn7dNk3a6u4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=moIubr27EHvq0znwEZ5VSMiBHigD3aB4KnJu5l95f7ERwH8QQR+BI4zlVp7QWkrJpegCeGA82uICMf0vJQ6tWvkl1leKM9c5MEPwJkLlgOjddPm1G+qEailsTQnf9dinpckwEBs1+22Dy2rtsNdH3u3OknBktRfahdUBOR5I/lA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xEgcXZ4F; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1724740518; c=relaxed/simple;
+	bh=nJtg2zIXT2Jsiz7qa7+0YV61BfPrGm4xjUffC2k/thM=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DkO6X+1s3oJvVnYA9nb0iPx7mJImyvG2x1ghIHQ/KTk9+4NmCZrD/kw9koRZqeLaT3NX+gOfNXh+63vC7OwMvtCS/djiSS2kYQvBlaZFPWbTS/O5l9JFgntpItbBJwDYv1vnSkc4cYHa06EGbXXSMuALHoc7rKqldHLVErw/zL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bixllikv; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xEgcXZ4F"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1724718188;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ObM6iY5Nr6LaS3YCvxHLfg3vKETemK1F5KGQ+yubIFA=;
-	b=xEgcXZ4F8zSnR8L+HOn2A+8LZmX208IrjgiuHvzdN2daG4DLnaXbAoO/jqf17xcMzvginm
-	NeCmQBUmvBnvX3m/1GazXxycAYpNHAIdu7Gp+5Sy5CxVsl2pykoytYriK5PYv8HILp4fZo
-	Y4HP1wdCb68ZADF5/3nTKd9WhrZ28Co=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bixllikv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2768EC9039B;
+	Tue, 27 Aug 2024 06:35:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724740518;
+	bh=nJtg2zIXT2Jsiz7qa7+0YV61BfPrGm4xjUffC2k/thM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=bixllikv8mhAdWOP2JATNAntUrR5/msbNiP2E3xERC5t63/iFECDbej1PThM9UKPk
+	 MuJghdYS2JXYRN4PyhorPhAZf2lI4i7JM08avSBafQAv1eWPF5L95EInCF0QenD5cb
+	 0RrdZwN6vyEsJCl++8rQ6Yw5cnp6irf9IFbxoa5re5YWG2iy7xG93/+m79JSub2f/5
+	 1CsrjRbIuL2148AgoGu00lVy3/TlE762DJTi/6IdY+HzgwGvxIMNxjsxHQznbx1SnA
+	 3B5pN6GyS0A07hIIVnkGwQjrhwHgZSyZ+JJUiP7RpTSj6oiRoFuaogoXYauNY/3w4g
+	 A2o1tnAzh7+cA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sipnQ-00772U-2B;
+	Tue, 27 Aug 2024 07:35:16 +0100
+Date: Tue, 27 Aug 2024 07:35:15 +0100
+Message-ID: <86r0aawk0s.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v2 12/12] KVM: arm64: nv: Reprogram PMU events affected by nested transition
-Date: Tue, 27 Aug 2024 00:22:35 +0000
-Message-ID: <20240827002235.1753237-13-oliver.upton@linux.dev>
-In-Reply-To: <20240827002235.1753237-1-oliver.upton@linux.dev>
-References: <20240827002235.1753237-1-oliver.upton@linux.dev>
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: Re: [PATCH 0/3] KVM: arm64: nv: Add EL2 PMU event filtering support
+In-Reply-To: <Zsy6zNQT2o6sTidY@linux.dev>
+References: <20240824001402.3909504-1-oliver.upton@linux.dev>
+	<86v7zpvwym.wl-maz@kernel.org>
+	<Zsy6zNQT2o6sTidY@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, gankulkarni@os.amperecomputing.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Start reprogramming PMU events at nested boundaries now that everything
-is in place to handle the EL2 event filter. Only repaint events where
-the filter differs between EL1 and EL2 as a slight optimization.
+On Mon, 26 Aug 2024 18:26:36 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> Hey,
+> 
+> On Sun, Aug 25, 2024 at 09:16:33AM +0100, Marc Zyngier wrote:
+> > On Sat, 24 Aug 2024 01:13:59 +0100,
+> > Oliver Upton <oliver.upton@linux.dev> wrote:
+> > > 
+> > > We allow a nested VM to be configured with a vPMU, although it isn't
+> > > entirely functional. We do not currently respect the EL2 event filter
+> > > configuration from the guest hypervisor, which really needs to be
+> > > applied to EL1 when in a hyp context.
+> > > 
+> > > Series to do just that. Tested on Neoverse-V2 which fortunately
+> > > implements PMUv3 and NV, unlike the fruity stuff I'm typically using...
+> > > 
+> > > Oliver Upton (3):
+> > >   KVM: arm64: Add helpers to determine if PMC counts at a given EL
+> > >   KVM: arm64: nv: Honor NSH filter when in hyp context
+> > >   KVM: arm64: nv: Reprogram PMU events affected by nested transition
+> > > 
+> > >  arch/arm64/kvm/emulate-nested.c |  4 ++
+> > >  arch/arm64/kvm/pmu-emul.c       | 77 ++++++++++++++++++++++++++++-----
+> > >  include/kvm/arm_pmu.h           |  3 ++
+> > >  3 files changed, 72 insertions(+), 12 deletions(-)
+> > > 
+> > > 
+> > > base-commit: 7c626ce4bae1ac14f60076d00eafe71af30450ba
+> > 
+> > I had a quick look, and definitely like the way it is shaping up (it
+> > does the job without fuss, and NV isn't about performance anyway).
+> > 
+> > However, I think it needs a bit more work so that MDCR_EL2.HPMN is
+> > correctly handled. This shouldn't be hard to do, and if FEAT_FGT is
+> > supported in the guest, then we could even expose FEAT_HPMN0 (though I
+> > haven't worked out yet why FGT is a dependency).
+> 
+> Right, I was hoping to spoon-feed some more PMU patches going forward,
+> since we already allow the NV+PMU combination and can treat it as a 'bugfix'.
+> But I'm happy to throw some more cycles at the problem.
 
-PMU now 'works' for nested VMs, albeit slow.
+We absolutely can. As long as we don't let userspace get in the way,
+we can play the incremental game for as long as we want.
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- arch/arm64/kvm/emulate-nested.c |  4 ++++
- arch/arm64/kvm/pmu-emul.c       | 24 ++++++++++++++++++++++++
- include/kvm/arm_pmu.h           |  3 +++
- 3 files changed, 31 insertions(+)
+> 
+> I think there are some gaps in the way the other coarse-grained PMU
+> traps are handled (TPM, TPMCR), since it looks like they also apply to
+> Host EL0 based on the pseudocode. I don't want to have a separate
+> mechanism for describing these 'InHost' traps, so I'm gonna try and
+> address this like so:
+> 
+>  - Indicate if CGTs apply to host EL0 in the trap_bits descriptor
+> 
+>  - Steal a trap_config bit to indicate if a sysreg can trap while
+>    InHost, and:
+> 
+>  - Mark a trap_config as InHost if any of the associated CGTs are
+>    InHost when inserting in the xarray
+> 
+> That way I can preserve the early return for is_hyp_ctxt() for all but a
+> few trap configs.
+> 
+> Thoughts?
 
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index ae183dea79b7..6f748c4257f5 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -2411,6 +2411,8 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
- 
- 	kvm_arch_vcpu_load(vcpu, smp_processor_id());
- 	preempt_enable();
-+
-+	kvm_pmu_reprogram_events(vcpu);
- }
- 
- static void kvm_inject_el2_exception(struct kvm_vcpu *vcpu, u64 esr_el2,
-@@ -2493,6 +2495,8 @@ static int kvm_inject_nested(struct kvm_vcpu *vcpu, u64 esr_el2,
- 	kvm_arch_vcpu_load(vcpu, smp_processor_id());
- 	preempt_enable();
- 
-+	kvm_pmu_reprogram_events(vcpu);
-+
- 	return 1;
- }
- 
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 3dee669c0674..0cd0426892be 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -1180,3 +1180,27 @@ u64 kvm_vcpu_read_pmcr(struct kvm_vcpu *vcpu)
- 
- 	return u64_replace_bits(pmcr, vcpu->kvm->arch.pmcr_n, ARMV8_PMU_PMCR_N);
- }
-+
-+void kvm_pmu_reprogram_events(struct kvm_vcpu *vcpu)
-+{
-+	unsigned long mask;
-+	int i;
-+
-+	if (!kvm_vcpu_has_pmu(vcpu))
-+		return;
-+
-+	mask = __vcpu_sys_reg(vcpu, PMCNTENSET_EL0);
-+	for_each_set_bit(i, &mask, 32) {
-+		struct kvm_pmc *pmc = kvm_vcpu_idx_to_pmc(vcpu, i);
-+
-+		/*
-+		 * We only need to reconfigure events where the filter is
-+		 * different at EL1 vs. EL2, as we're multiplexing the true EL1
-+		 * event filter bit for nested.
-+		 */
-+		if (kvm_pmc_counts_at_el1(pmc) == kvm_pmc_counts_at_el2(pmc))
-+			continue;
-+
-+		kvm_pmu_create_perf_event(pmc);
-+	}
-+}
-diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index 25017e72c562..4e3f35b00bf8 100644
---- a/include/kvm/arm_pmu.h
-+++ b/include/kvm/arm_pmu.h
-@@ -97,6 +97,7 @@ int kvm_arm_set_default_pmu(struct kvm *kvm);
- u8 kvm_arm_pmu_get_max_counters(struct kvm *kvm);
- 
- u64 kvm_vcpu_read_pmcr(struct kvm_vcpu *vcpu);
-+void kvm_pmu_reprogram_events(struct kvm_vcpu *vcpu);
- #else
- struct kvm_pmu {
- };
-@@ -192,6 +193,8 @@ static inline u64 kvm_vcpu_read_pmcr(struct kvm_vcpu *vcpu)
- 	return 0;
- }
- 
-+static inline void kvm_pmu_reprogram_events(struct kvm_vcpu *vcpu) {}
-+
- #endif
- 
- #endif
+I see that you have already posted your proposed approach, but allow
+me to say what I have in mind.
+
+We have three possibilities:
+
+- either we go with your approach, which has the advantage of not
+  requiring any new trap description, but breaks the (unwritten)
+  promise that we don't do any "local" handling at this stage
+
+- or we perform the handling where we normally do it (in sys_regs.c),
+  but we start littering the already overly complicated emulation code
+  for something that is barely a trap reinjection
+
+- or (and this is my preferred option), we treat it as a "fast" trap,
+  which would match what we do for other things that we trap and that
+  behave differently when 'InHost' (ERET, TLBIs).
+
+This last option does require another bit of decoding, but has the
+following advantages:
+
+- it follows the existing model for 'InHost' trap handling
+
+- it is close to optimal from a performance perspective
+
+- it doesn't change the existing behaviour of the xarray handling
+
+The way I think of it, this sort of EL0->EL2 trap reinjection is
+simply the other side of the ERET coin, and I would very much like to
+keep this symmetry, unless I have missed something obvious.
+
+What do you think?
+
+	M.
+
 -- 
-2.46.0.295.g3b9ea8a38a-goog
-
+Without deviation from the norm, progress is not possible.
