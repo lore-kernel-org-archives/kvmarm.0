@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 896DF1CC8A3;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 896881CC898;
 	Tue, 27 Aug 2024 15:25:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724772331; cv=none; b=QOwcWANuhbHE1gNH6sMbMusBrF+/ILKPCmCJ19HMiG0syn7gJIyK0F0SX2ujJzWvjrrVTMTNubQIgyLS0cRgeZE20VUeA7CNc37GN111yKzXdOdKmg8q1nv9QgcU1ZGE4CbvGE0Ht0k7ZR5QFBFYB7ouhGAw4FKn1NWBtJL6Aaw=
+	t=1724772331; cv=none; b=QzhU41CqcTRi00eSx9+wsAOVoO5qOAo0OFCwTNnQmTrHwqUkyDESFC7E6bjIfzK3aeXw0Eji3bQNqmBKMu1Xva7D24EG6bE145yWC/eRgv4FXMDppTQLzB6IrdlCBJg32lkdDlFYmpxKSivYDeCZWdATgRT2H85xTA6rzJ1V/D0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1724772331; c=relaxed/simple;
-	bh=anA2CdCiCWX02SnKLlpLI+Sqst4BJB17IvkKgkWcfFw=;
+	bh=HoxjbOcruSzMUxx5Syb5tMrTIfQJ2HtLlIW5T1CuApc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=eZDgIhDo6KXACZpm75l/3wKIy8OC/Lp7HI8XUpqPZpwwTM+avPitm1+8CeBRDdayUM/OcQ6rSiZZR2GE4AV02wVPiTtpawrlyVaamJO5sCeAVsxAQzp6WL62f/+fIsH4SCul1uVR/3qJmhJCE2RMf6oibzRZxBqwJVJt5C3RFzI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KlZ5L+SK; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=MB6ii2mjyGMNIPUQN/fKf2H7GqMlTLp+Vskh0kgeCXR6xV87u/LQT2K4bmYL42Kuj1IQqx2eOW6vEFMOkxHov4MnGRKuMM+Wi7iSb3a+R5L98q9VdHsQothfv05g3uv5iZGU+PGnQdCBJymT1/A2fPeMaI8F3GdMtj9mCoXUvSo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uvRfkZPg; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KlZ5L+SK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08C99C6107A;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uvRfkZPg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E540C4DE0D;
 	Tue, 27 Aug 2024 15:25:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1724772331;
-	bh=anA2CdCiCWX02SnKLlpLI+Sqst4BJB17IvkKgkWcfFw=;
+	bh=HoxjbOcruSzMUxx5Syb5tMrTIfQJ2HtLlIW5T1CuApc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KlZ5L+SK/ogSoFVPsMJiDuXNouFDKeZlDROJQ03TzoH5UoPiMA0z5MBgOPfb/3JW6
-	 LULTO2J0kOdLtU7G39/VZTGPsQCd2VkgR2a4AX4LEIZoU5B5q8srTj2GfS10ygo2cI
-	 DOaFiSvaKOaaYDhfYlh2t3kM7jJP2LqYRPIEKnASHQPNVzBMMc+D1qFkuGxHUECh94
-	 a+YdHOHixO0AwOpD7SuayraQPpUhUNlEkuAknvK2/C9jsP2aiMznwXK8ebTNahQVds
-	 tXKVVIa8evM5dpJlTg68puSgGBvr+2C10zfvwY4Ad3a2sW+rXykq2yOoeZpaB2txy0
-	 9xFHWhjIksO7g==
+	b=uvRfkZPgEgMXXD5xwztNmJzHf4MylV//0QpFqyNUxpJjZbUPCtiiZ0ZNrpmiPLpVb
+	 BVRTmK7tNvO1d4TbaPgiJ7WhvQviFT/3dHSrEql+/0fde4plc6q8WSXHuqWdf6/7gB
+	 LBwGExNdYpHYr8+hee+mHxvT02vyEopV9qHQTvdTcytLNmmHHb4XIP2ZQha5OfWDog
+	 w1i1Dnft/Z3AIAN25yTQFvqkxbXcm5NHaKLQdwPl7Jhz2urliUN/x+XKw5c8jfDRiT
+	 P+w8LmWkB/pCD5T3oRJie7vgaKQh2o7UY7vOLz/cTt8vVBDW7kBiACP8cX6586QTWu
+	 XQuTDpu8ateqQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1siy4X-007HOs-7y;
+	id 1siy4X-007HOs-LE;
 	Tue, 27 Aug 2024 16:25:29 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -41,9 +41,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Alexander Potapenko <glider@google.com>
-Subject: [PATCH v2 09/11] KVM: arm64: Make most GICv3 accesses UNDEF if they trap
-Date: Tue, 27 Aug 2024 16:25:15 +0100
-Message-Id: <20240827152517.3909653-10-maz@kernel.org>
+Subject: [PATCH v2 11/11] KVM: arm64: Add selftest checking how the absence of GICv3 is handled
+Date: Tue, 27 Aug 2024 16:25:17 +0100
+Message-Id: <20240827152517.3909653-12-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240827152517.3909653-1-maz@kernel.org>
 References: <20240827152517.3909653-1-maz@kernel.org>
@@ -59,181 +59,209 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-We don't expect to trap any GICv3 register for host handling,
-apart from ICC_SRE_EL1 and the SGI registers. If they trap,
-that's because the guest is playing with us despite being
-told it doesn't have a GICv3.
-
-If it does, UNDEF is what it will get.
+Given how tortuous and fragile the whole lack-of-GICv3 story is,
+add a selftest checking that we don't regress it.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/vgic-v3-sr.c |  3 ++
- arch/arm64/kvm/sys_regs.c       | 74 +++++++++++++++++++++++++--------
- arch/arm64/kvm/sys_regs.h       |  7 ++++
- 3 files changed, 66 insertions(+), 18 deletions(-)
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/aarch64/no-vgic-v3.c        | 175 ++++++++++++++++++
+ 2 files changed, 176 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/aarch64/no-vgic-v3.c
 
-diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-index 39f6363caa1f..18d4677002b1 100644
---- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-+++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-@@ -1120,6 +1120,9 @@ int __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
- 	bool is_read;
- 	u32 sysreg;
- 
-+	if (kern_hyp_va(vcpu->kvm)->arch.vgic.vgic_model != KVM_DEV_TYPE_ARM_VGIC_V3)
-+		return 0;
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index 48d32c5aa3eb..f66b37acc0b0 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -163,6 +163,7 @@ TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
+ TEST_GEN_PROGS_aarch64 += aarch64/vgic_irq
+ TEST_GEN_PROGS_aarch64 += aarch64/vgic_lpi_stress
+ TEST_GEN_PROGS_aarch64 += aarch64/vpmu_counter_access
++TEST_GEN_PROGS_aarch64 += aarch64/no-vgic-v3
+ TEST_GEN_PROGS_aarch64 += access_tracking_perf_test
+ TEST_GEN_PROGS_aarch64 += arch_timer
+ TEST_GEN_PROGS_aarch64 += demand_paging_test
+diff --git a/tools/testing/selftests/kvm/aarch64/no-vgic-v3.c b/tools/testing/selftests/kvm/aarch64/no-vgic-v3.c
+new file mode 100644
+index 000000000000..943d65fc6b0b
+--- /dev/null
++++ b/tools/testing/selftests/kvm/aarch64/no-vgic-v3.c
+@@ -0,0 +1,175 @@
++// SPDX-License-Identifier: GPL-2.0
 +
- 	esr = kvm_vcpu_get_esr(vcpu);
- 	if (vcpu_mode_is_32bit(vcpu)) {
- 		if (!kvm_condition_valid(vcpu)) {
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index a57374de6968..b93ad721fb7f 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -47,6 +47,13 @@ static u64 sys_reg_to_index(const struct sys_reg_desc *reg);
- static int set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
- 		      u64 val);
- 
-+static bool undef_access(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-+			 const struct sys_reg_desc *r)
++// Check that, on a GICv3 system, not configuring GICv3 correctly
++// results in all of the sysregs generating an UNDEF exception.
++
++#include <test_util.h>
++#include <kvm_util.h>
++#include <processor.h>
++
++static volatile bool handled;
++
++#define __check_sr_read(r)					\
++	({							\
++		uint64_t val;					\
++								\
++		handled = false;				\
++		dsb(sy);					\
++		val = read_sysreg_s(SYS_ ## r);			\
++		val;						\
++	})
++
++#define __check_sr_write(r)					\
++	do {							\
++		handled = false;				\
++		dsb(sy);					\
++		write_sysreg_s(0, SYS_ ## r);			\
++		isb();						\
++	} while(0)
++
++/* Fatal checks */
++#define check_sr_read(r)					\
++	do {							\
++		__check_sr_read(r);				\
++		__GUEST_ASSERT(handled, #r " no read trap");	\
++	} while(0)
++
++#define check_sr_write(r)					\
++	do {							\
++		__check_sr_write(r);				\
++		__GUEST_ASSERT(handled, #r " no write trap");	\
++	} while(0)
++
++#define check_sr_rw(r)				\
++	do {					\
++		check_sr_read(r);		\
++		check_sr_write(r);		\
++	} while(0)
++
++static void guest_code(void)
 +{
-+	kvm_inject_undefined(vcpu);
-+	return false;
++	uint64_t val;
++
++	/*
++	 * Check that we advertise that ID_AA64PFR0_EL1.GIC == 0, having
++	 * hidden the feature at runtime without any other userspace action.
++	 */
++	__GUEST_ASSERT(FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC),
++				 read_sysreg(id_aa64pfr0_el1)) == 0,
++		       "GICv3 wrongly advertised");
++
++	/*
++	 * Access all GICv3 registers, and fail if we don't get an UNDEF.
++	 * Note that we happily access all the APxRn registers without
++	 * checking their existance, as all we want to see is a failure.
++	 */
++	check_sr_rw(ICC_PMR_EL1);
++	check_sr_read(ICC_IAR0_EL1);
++	check_sr_write(ICC_EOIR0_EL1);
++	check_sr_rw(ICC_HPPIR0_EL1);
++	check_sr_rw(ICC_BPR0_EL1);
++	check_sr_rw(ICC_AP0R0_EL1);
++	check_sr_rw(ICC_AP0R1_EL1);
++	check_sr_rw(ICC_AP0R2_EL1);
++	check_sr_rw(ICC_AP0R3_EL1);
++	check_sr_rw(ICC_AP1R0_EL1);
++	check_sr_rw(ICC_AP1R1_EL1);
++	check_sr_rw(ICC_AP1R2_EL1);
++	check_sr_rw(ICC_AP1R3_EL1);
++	check_sr_write(ICC_DIR_EL1);
++	check_sr_read(ICC_RPR_EL1);
++	check_sr_write(ICC_SGI1R_EL1);
++	check_sr_write(ICC_ASGI1R_EL1);
++	check_sr_write(ICC_SGI0R_EL1);
++	check_sr_read(ICC_IAR1_EL1);
++	check_sr_write(ICC_EOIR1_EL1);
++	check_sr_rw(ICC_HPPIR1_EL1);
++	check_sr_rw(ICC_BPR1_EL1);
++	check_sr_rw(ICC_CTLR_EL1);
++	check_sr_rw(ICC_IGRPEN0_EL1);
++	check_sr_rw(ICC_IGRPEN1_EL1);
++
++	/*
++	 * ICC_SRE_EL1 may not be trappable, as ICC_SRE_EL2.Enable can
++	 * be RAO/WI. Engage in non-fatal accesses, starting with a
++	 * write of 0 to try and disable SRE, and let's see if it
++	 * sticks.
++	 */
++	__check_sr_write(ICC_SRE_EL1);
++	if (!handled)
++		GUEST_PRINTF("ICC_SRE_EL1 write not trapping (OK)\n");
++
++	val = __check_sr_read(ICC_SRE_EL1);
++	if (!handled) {
++		__GUEST_ASSERT((val & BIT(0)),
++			       "ICC_SRE_EL1 not trapped but ICC_SRE_EL1.SRE not set\n");
++		GUEST_PRINTF("ICC_SRE_EL1 read not trapping (OK)\n");
++	}
++
++	GUEST_DONE();
 +}
 +
- static bool bad_trap(struct kvm_vcpu *vcpu,
- 		     struct sys_reg_params *params,
- 		     const struct sys_reg_desc *r,
-@@ -484,6 +491,9 @@ static bool access_gic_sre(struct kvm_vcpu *vcpu,
- 			   struct sys_reg_params *p,
- 			   const struct sys_reg_desc *r)
- {
-+	if (!kvm_has_gicv3(vcpu->kvm))
-+		return undef_access(vcpu, p, r);
++static void guest_undef_handler(struct ex_regs *regs)
++{
++	/* Success, we've gracefully exploded! */
++	handled = true;
++	regs->pc += 4;
++}
 +
- 	if (p->is_write)
- 		return ignore_write(vcpu, p);
- 
-@@ -1344,14 +1354,6 @@ static int set_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
- 	  .reset = reset_pmevtyper,					\
- 	  .access = access_pmu_evtyper, .reg = (PMEVTYPER0_EL0 + n), }
- 
--static bool undef_access(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
--			 const struct sys_reg_desc *r)
--{
--	kvm_inject_undefined(vcpu);
--
--	return false;
--}
--
- /* Macro to expand the AMU counter and type registers*/
- #define AMU_AMEVCNTR0_EL0(n) { SYS_DESC(SYS_AMEVCNTR0_EL0(n)), undef_access }
- #define AMU_AMEVTYPER0_EL0(n) { SYS_DESC(SYS_AMEVTYPER0_EL0(n)), undef_access }
-@@ -2454,6 +2456,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_SPSR_EL1), access_spsr},
- 	{ SYS_DESC(SYS_ELR_EL1), access_elr},
- 
-+	{ SYS_DESC(SYS_ICC_PMR_EL1), undef_access },
++static void test_run_vcpu(struct kvm_vcpu *vcpu)
++{
++	struct ucall uc;
 +
- 	{ SYS_DESC(SYS_AFSR0_EL1), access_vm_reg, reset_unknown, AFSR0_EL1 },
- 	{ SYS_DESC(SYS_AFSR1_EL1), access_vm_reg, reset_unknown, AFSR1_EL1 },
- 	{ SYS_DESC(SYS_ESR_EL1), access_vm_reg, reset_unknown, ESR_EL1 },
-@@ -2508,18 +2512,31 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_VBAR_EL1), access_rw, reset_val, VBAR_EL1, 0 },
- 	{ SYS_DESC(SYS_DISR_EL1), NULL, reset_val, DISR_EL1, 0 },
- 
--	{ SYS_DESC(SYS_ICC_IAR0_EL1), write_to_read_only },
--	{ SYS_DESC(SYS_ICC_EOIR0_EL1), read_from_write_only },
--	{ SYS_DESC(SYS_ICC_HPPIR0_EL1), write_to_read_only },
--	{ SYS_DESC(SYS_ICC_DIR_EL1), read_from_write_only },
--	{ SYS_DESC(SYS_ICC_RPR_EL1), write_to_read_only },
-+	{ SYS_DESC(SYS_ICC_IAR0_EL1), undef_access },
-+	{ SYS_DESC(SYS_ICC_EOIR0_EL1), undef_access },
-+	{ SYS_DESC(SYS_ICC_HPPIR0_EL1), undef_access },
-+	{ SYS_DESC(SYS_ICC_BPR0_EL1), undef_access },
-+	{ SYS_DESC(SYS_ICC_AP0R0_EL1), undef_access },
-+	{ SYS_DESC(SYS_ICC_AP0R1_EL1), undef_access },
-+	{ SYS_DESC(SYS_ICC_AP0R2_EL1), undef_access },
-+	{ SYS_DESC(SYS_ICC_AP0R3_EL1), undef_access },
-+	{ SYS_DESC(SYS_ICC_AP1R0_EL1), undef_access },
-+	{ SYS_DESC(SYS_ICC_AP1R1_EL1), undef_access },
-+	{ SYS_DESC(SYS_ICC_AP1R2_EL1), undef_access },
-+	{ SYS_DESC(SYS_ICC_AP1R3_EL1), undef_access },
-+	{ SYS_DESC(SYS_ICC_DIR_EL1), undef_access },
-+	{ SYS_DESC(SYS_ICC_RPR_EL1), undef_access },
- 	{ SYS_DESC(SYS_ICC_SGI1R_EL1), access_gic_sgi },
- 	{ SYS_DESC(SYS_ICC_ASGI1R_EL1), access_gic_sgi },
- 	{ SYS_DESC(SYS_ICC_SGI0R_EL1), access_gic_sgi },
--	{ SYS_DESC(SYS_ICC_IAR1_EL1), write_to_read_only },
--	{ SYS_DESC(SYS_ICC_EOIR1_EL1), read_from_write_only },
--	{ SYS_DESC(SYS_ICC_HPPIR1_EL1), write_to_read_only },
-+	{ SYS_DESC(SYS_ICC_IAR1_EL1), undef_access },
-+	{ SYS_DESC(SYS_ICC_EOIR1_EL1), undef_access },
-+	{ SYS_DESC(SYS_ICC_HPPIR1_EL1), undef_access },
-+	{ SYS_DESC(SYS_ICC_BPR1_EL1), undef_access },
-+	{ SYS_DESC(SYS_ICC_CTLR_EL1), undef_access },
- 	{ SYS_DESC(SYS_ICC_SRE_EL1), access_gic_sre },
-+	{ SYS_DESC(SYS_ICC_IGRPEN0_EL1), undef_access },
-+	{ SYS_DESC(SYS_ICC_IGRPEN1_EL1), undef_access },
- 
- 	{ SYS_DESC(SYS_CONTEXTIDR_EL1), access_vm_reg, reset_val, CONTEXTIDR_EL1, 0 },
- 	{ SYS_DESC(SYS_TPIDR_EL1), NULL, reset_unknown, TPIDR_EL1 },
-@@ -3394,6 +3411,7 @@ static const struct sys_reg_desc cp15_regs[] = {
- 	/* TTBCR2 */
- 	{ AA32(HI), Op1( 0), CRn( 2), CRm( 0), Op2( 3), access_vm_reg, NULL, TCR_EL1 },
- 	{ Op1( 0), CRn( 3), CRm( 0), Op2( 0), access_vm_reg, NULL, DACR32_EL2 },
-+	{ CP15_SYS_DESC(SYS_ICC_PMR_EL1), undef_access },
- 	/* DFSR */
- 	{ Op1( 0), CRn( 5), CRm( 0), Op2( 0), access_vm_reg, NULL, ESR_EL1 },
- 	{ Op1( 0), CRn( 5), CRm( 0), Op2( 1), access_vm_reg, NULL, IFSR32_EL2 },
-@@ -3443,8 +3461,28 @@ static const struct sys_reg_desc cp15_regs[] = {
- 	/* AMAIR1 */
- 	{ AA32(HI), Op1( 0), CRn(10), CRm( 3), Op2( 1), access_vm_reg, NULL, AMAIR_EL1 },
- 
--	/* ICC_SRE */
--	{ Op1( 0), CRn(12), CRm(12), Op2( 5), access_gic_sre },
-+	{ CP15_SYS_DESC(SYS_ICC_IAR0_EL1), undef_access },
-+	{ CP15_SYS_DESC(SYS_ICC_EOIR0_EL1), undef_access },
-+	{ CP15_SYS_DESC(SYS_ICC_HPPIR0_EL1), undef_access },
-+	{ CP15_SYS_DESC(SYS_ICC_BPR0_EL1), undef_access },
-+	{ CP15_SYS_DESC(SYS_ICC_AP0R0_EL1), undef_access },
-+	{ CP15_SYS_DESC(SYS_ICC_AP0R1_EL1), undef_access },
-+	{ CP15_SYS_DESC(SYS_ICC_AP0R2_EL1), undef_access },
-+	{ CP15_SYS_DESC(SYS_ICC_AP0R3_EL1), undef_access },
-+	{ CP15_SYS_DESC(SYS_ICC_AP1R0_EL1), undef_access },
-+	{ CP15_SYS_DESC(SYS_ICC_AP1R1_EL1), undef_access },
-+	{ CP15_SYS_DESC(SYS_ICC_AP1R2_EL1), undef_access },
-+	{ CP15_SYS_DESC(SYS_ICC_AP1R3_EL1), undef_access },
-+	{ CP15_SYS_DESC(SYS_ICC_DIR_EL1), undef_access },
-+	{ CP15_SYS_DESC(SYS_ICC_RPR_EL1), undef_access },
-+	{ CP15_SYS_DESC(SYS_ICC_IAR1_EL1), undef_access },
-+	{ CP15_SYS_DESC(SYS_ICC_EOIR1_EL1), undef_access },
-+	{ CP15_SYS_DESC(SYS_ICC_HPPIR1_EL1), undef_access },
-+	{ CP15_SYS_DESC(SYS_ICC_BPR1_EL1), undef_access },
-+	{ CP15_SYS_DESC(SYS_ICC_CTLR_EL1), undef_access },
-+	{ CP15_SYS_DESC(SYS_ICC_SRE_EL1), access_gic_sre },
-+	{ CP15_SYS_DESC(SYS_ICC_IGRPEN0_EL1), undef_access },
-+	{ CP15_SYS_DESC(SYS_ICC_IGRPEN1_EL1), undef_access },
- 
- 	{ Op1( 0), CRn(13), CRm( 0), Op2( 1), access_vm_reg, NULL, CONTEXTIDR_EL1 },
- 
-diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-index 7c9b4eb0baa6..dfb2ec83b284 100644
---- a/arch/arm64/kvm/sys_regs.h
-+++ b/arch/arm64/kvm/sys_regs.h
-@@ -250,4 +250,11 @@ int kvm_finalize_sys_regs(struct kvm_vcpu *vcpu);
- 	CRn(sys_reg_CRn(reg)), CRm(sys_reg_CRm(reg)),	\
- 	Op2(sys_reg_Op2(reg))
- 
-+#define CP15_SYS_DESC(reg)				\
-+	.name = #reg,					\
-+	.aarch32_map = AA32_DIRECT,			\
-+	Op0(0), Op1(sys_reg_Op1(reg)),			\
-+	CRn(sys_reg_CRn(reg)), CRm(sys_reg_CRm(reg)),	\
-+	Op2(sys_reg_Op2(reg))
++	do {
++		vcpu_run(vcpu);
 +
- #endif /* __ARM64_KVM_SYS_REGS_LOCAL_H__ */
++		switch (get_ucall(vcpu, &uc)) {
++		case UCALL_ABORT:
++			REPORT_GUEST_ASSERT(uc);
++			break;
++		case UCALL_PRINTF:
++			printf("%s", uc.buffer);
++			break;
++		case UCALL_DONE:
++			break;
++		default:
++			TEST_FAIL("Unknown ucall %lu", uc.cmd);
++		}
++	} while (uc.cmd != UCALL_DONE);
++}
++
++static void test_guest_no_gicv3(void)
++{
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm;
++
++	/* Create a VM without a GICv3 */
++	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
++
++	vm_init_descriptor_tables(vm);
++	vcpu_init_descriptor_tables(vcpu);
++
++	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
++				ESR_EC_UNKNOWN, guest_undef_handler);
++
++	test_run_vcpu(vcpu);
++
++	kvm_vm_free(vm);
++}
++
++int main(int argc, char *argv[])
++{
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm;
++	uint64_t pfr0;
++
++	vm = vm_create_with_one_vcpu(&vcpu, NULL);
++	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR0_EL1), &pfr0);
++	__TEST_REQUIRE(FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC), pfr0),
++		       "GICv3 not supported.");
++	kvm_vm_free(vm);
++
++	test_guest_no_gicv3();
++
++	return 0;
++}
 -- 
 2.39.2
 
