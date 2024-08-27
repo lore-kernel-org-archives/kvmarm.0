@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53D6C481CD
-	for <kvmarm@lists.linux.dev>; Tue, 27 Aug 2024 16:24:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD1B654767
+	for <kvmarm@lists.linux.dev>; Tue, 27 Aug 2024 16:40:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724775896; cv=none; b=lFKP74U+FVR++g0M+SNS886gP1mvgJSjqAQLfxMrn57O8FYdBhOIlnKIoLzVIxSkyL8oIckLowJ8lI9bQ3hlMY7KnoduLiuXaj81h/IbuogecG7/f3hIP6qHRnfxYSWz0AgkphfWUkhmCZR7Q3zo5E5VlR+FPMsYgLtBbqwCavc=
+	t=1724776836; cv=none; b=MFTa/ZPau2f/SNr8NZkU+nrkunqmRbv0RE6/8NE+1u85mIH0PsXQ7zAVdC3IP1ZGheuq7Q72AJ16KhlfXsqrYw0U8RQiR/QSI2DDZq/he/8HV57vl9OPPz4U8ocSir5BNAlmMdHxf23GQJAlyWS+EMHKdL2PLoVzmsAxJbLjICc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724775896; c=relaxed/simple;
-	bh=jI59YhbC8MnzRAl88Bsf9IP7Z0zD2uxPrjLwIeCygY8=;
+	s=arc-20240116; t=1724776836; c=relaxed/simple;
+	bh=YmFy6I+FOIp8e0gC/sd4B75E6JcawsEbBSOL+Wk2fQE=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WmFDzjqGq+xfv2pmBPoIG5dsb397zCkS+ywXXBoPfXDEQVOZTWvg4Gwe+3uh3xcU+CHP0OmYNuiG72sz/DXG8kE0XWjzFQqMLrluGNIYHWQwibUmzaojm3O5UyofWsjNxFfcB+2oMS6LnvyG2tRxE87iBoWsMB2peyvH6y5q4tQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ND2fVZb6; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=p/zYlLkfaWRvisB8TCFgDP3GczllKR/kJDFcQtfz+zIQLRrdP0vPY9yyJ9tD9morAP6IcMEzyCLHgxveKBaBZriKdVKVGFOCd1rB2x0uS1jOZL7fy8pVyte3WzxGPmMoeFI06NNjAIjfvC7hsbflr5CphKEZ2dYsYaUy+3/AfHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n0mxmiXP; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ND2fVZb6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7106C8B7AD;
-	Tue, 27 Aug 2024 16:24:55 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n0mxmiXP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D695C4AF0C;
+	Tue, 27 Aug 2024 16:40:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724775895;
-	bh=jI59YhbC8MnzRAl88Bsf9IP7Z0zD2uxPrjLwIeCygY8=;
+	s=k20201202; t=1724776836;
+	bh=YmFy6I+FOIp8e0gC/sd4B75E6JcawsEbBSOL+Wk2fQE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ND2fVZb6Jb4Uw8JhVUr4+w6MTc+JGHpK/7JZ3G6rrjJfv+U+B+cBxzEUXC4pf2L6G
-	 UHsiD4AhTpplOA+MEtXLolOL0UKV89lGNx2iH0zMyDQHY4MqpGJtvErls3TK8DEj7C
-	 oYGY2jd6e4MbZ+aBYL9gMlDUcRnmF8nZjGnPv93Bh17Ohn68stTqMmh5a+EpTzkXf+
-	 ZFYw8aFpgzmET0d/AKgOBAT+gkewbhMzcp9EqSWP5bd4quXcrmzBJUA1x6QUgQQ/WA
-	 SND+P13KMH6NyV7f6BJeynAZSeU1sCkjeTudl2/qGTIDKtJhrIeyxsVUQRBF+rAYjM
-	 zS+InoD3MQCKA==
+	b=n0mxmiXPAeRRDPrpMitOZw/2o74O39e9jpbKN/92IzozJFbOikB5iRYuXrz9+SepW
+	 7nt/4U6NHqL98AM4VmGxzpoAHkkDENaviM0flo7okqGN2OfQwMRGXLlY2Sxh4qKI4M
+	 ZZfDllJkeRkVPyRY2yS5ZEl7LgoLJbmt7Oau5BfnuuxYHTOVZwr0+sPUQnyHQvxGGR
+	 +pxQR+iab+OvlZ9eDpJEcI0d7h5xY8h34uVmwqcmYkOu0pDcJwVYuFzCoVKutY2q0a
+	 BqmoKZgc6pw3DHoBRuzCfVe01FYi2ZLZSdwzqsBTOYBRXX+CHw7EUE5M92Y3F49HwU
+	 CfeTIqIDSBWeQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1siz02-007IVB-2o;
-	Tue, 27 Aug 2024 17:24:54 +0100
-Date: Tue, 27 Aug 2024 17:24:52 +0100
-Message-ID: <86le0ivsq3.wl-maz@kernel.org>
+	id 1sizFC-007IhG-3c;
+	Tue, 27 Aug 2024 17:40:34 +0100
+Date: Tue, 27 Aug 2024 17:40:33 +0100
+Message-ID: <86jzg1x6ke.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
@@ -41,10 +41,10 @@ Cc: kvmarm@lists.linux.dev,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: Re: [PATCH v2 04/12] KVM: arm64: nv: Add support for describing traps that affect Host EL0
-In-Reply-To: <20240827002235.1753237-5-oliver.upton@linux.dev>
+Subject: Re: [PATCH v2 09/12] KVM: arm64: nv: Advertise support for FEAT_HPMN0
+In-Reply-To: <20240827002235.1753237-10-oliver.upton@linux.dev>
 References: <20240827002235.1753237-1-oliver.upton@linux.dev>
-	<20240827002235.1753237-5-oliver.upton@linux.dev>
+	<20240827002235.1753237-10-oliver.upton@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -60,129 +60,44 @@ X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@a
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 27 Aug 2024 01:22:27 +0100,
+On Tue, 27 Aug 2024 01:22:32 +0100,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> The EL2 PMU trap controls are rather annoying, because they take effect
-> for *host* EL0 in addition to the guest. Set up some basic support for
-> describing EL2 traps that affect host EL0.
-> 
-> Do so by describing trap bits that can take effect in host EL0. Preserve
-> the early return for most hyp context traps by taking a bit out of the
-> trap_config value to indicate if the trap might take effect InHost.
+> Everything is in place now for KVM to actually handle MDCR_EL2.HPMN. Not
+> only that, the emulation is capable of doing FEAT_HPMN0. Advertise
+> support for the feature in the VM's ID registers.
 > 
 > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > ---
->  arch/arm64/kvm/emulate-nested.c | 37 ++++++++++++++++++++++++++++++---
->  1 file changed, 34 insertions(+), 3 deletions(-)
+>  arch/arm64/kvm/nested.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> index 26d32f308dd3..b9f3e19a1b96 100644
-> --- a/arch/arm64/kvm/emulate-nested.c
-> +++ b/arch/arm64/kvm/emulate-nested.c
-> @@ -20,6 +20,9 @@ enum trap_behaviour {
->  	BEHAVE_FORWARD_READ	= BIT(0),
->  	BEHAVE_FORWARD_WRITE	= BIT(1),
->  	BEHAVE_FORWARD_RW	= BEHAVE_FORWARD_READ | BEHAVE_FORWARD_WRITE,
-> +
-> +	/* Traps that take effect in Host EL0, this is rare! */
-> +	BEHAVE_IN_HOST_EL0	= BIT(2),
-
-Do we need to distinguish reads from writes here? There are precedents
-with things like TVM/TRVM, though not affecting EL0.
-
->  };
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index de789e0f1ae9..206aff3d88f7 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -910,12 +910,13 @@ static void limit_nv_id_regs(struct kvm *kvm)
+>  				  ID_AA64MMFR4_EL1_E2H0_NI_NV1);
+>  	kvm_set_vm_id_reg(kvm, SYS_ID_AA64MMFR4_EL1, val);
 >  
->  struct trap_bits {
-> @@ -478,7 +481,8 @@ static const complex_condition_check ccc[] = {
->   * [20]		trap polarity (1 bit)
->   * [25:21]	FG filter (5 bits)
->   * [35:26]	Main SysReg table index (10 bits)
-> - * [62:36]	Unused (27 bits)
-> + * [36]		Trap applies to Host EL0 (1 bit)
-> + * [62:37]	Unused (26 bits)
->   * [63]		RES0 - Must be zero, as lost on insertion in the xarray
->   */
->  #define TC_CGT_BITS	10
-> @@ -495,7 +499,8 @@ union trap_config {
->  		unsigned long	pol:1;		 /* Polarity */
->  		unsigned long	fgf:TC_FGF_BITS; /* Fine Grained Filter */
->  		unsigned long	sri:TC_SRI_BITS; /* SysReg Index */
-> -		unsigned long	unused:27;	 /* Unused, should be zero */
-> +		unsigned long	in_host_el0:1;	 /* Applies to Host EL0 */
+> -	/* Only limited support for PMU, Debug, BPs and WPs */
+> +	/* Only limited support for PMU, Debug, BPs, WPs, and HPMN0 */
+>  	val = kvm_read_vm_id_reg(kvm, SYS_ID_AA64DFR0_EL1);
+>  	val &= (NV_FTR(DFR0, PMUVer)	|
+>  		NV_FTR(DFR0, WRPs)	|
+>  		NV_FTR(DFR0, BRPs)	|
+> -		NV_FTR(DFR0, DebugVer));
+> +		NV_FTR(DFR0, DebugVer)	|
+> +		NV_FTR(DFR0, HPMN0));
 
-I'm a bit confused about the meaning of this new bit. If something
-applies to a Host EL0 access, we already have the information as part
-of the coarse grained traps. Why do we need something extra?
+I don't think it does what you say it does! ;-)
 
-I understand that it is used as some form of summary information and
-avoids looking at the CGT chain, but this also muddies the purpose of
-the trap_config word, because this doesn't describe *why* we have
-trapped.
+What you probably want is something like
 
-It's not really a big deal, as we have plenty of spare bits so far,
-but I find it a bit jarring.
+	val |= FIELD_PREP(NV_FTR(DFR0, HPMN0),
+			  ID_AA64DFR0_EL1_HPMN0_DEF);
 
-> +		unsigned long	unused:26;	 /* Unused, should be zero */
->  		unsigned long	mbz:1;		 /* Must Be Zero */
->  	};
->  };
-> @@ -1875,6 +1880,28 @@ static u32 encoding_next(u32 encoding)
->  	return sys_reg(op0 + 1, 0, 0, 0, 0);
->  }
->  
-> +static bool trap_effective_in_host_el0(const enum cgt_group_id id)
-> +{
-> +	switch (id) {
-> +	case __RESERVED__ ... __MULTIPLE_CONTROL_BITS__ - 1:
-> +		return coarse_trap_bits[id].behaviour & BEHAVE_IN_HOST_EL0;
-> +	case __MULTIPLE_CONTROL_BITS__ ... __COMPLEX_CONDITIONS__ - 1: {
-> +		const enum cgt_group_id *cgids;
-> +		int i;
-> +
-> +		cgids = coarse_control_combo[id - __MULTIPLE_CONTROL_BITS__];
-> +		for (i = 0; cgids[i] != __RESERVED__; i++)
-> +			if (trap_effective_in_host_el0(cgids[i]))
-> +				return true;
-> +
-> +		return false;
-> +	}
-> +	/* Just treat complex traps as InHost for now. */
-
-s/InHost/InHost-capable/
-
-> +	default:
-> +		return true;
-> +	}
-> +}
-> +
->  int __init populate_nv_trap_config(void)
->  {
->  	int ret = 0;
-> @@ -1886,13 +1913,17 @@ int __init populate_nv_trap_config(void)
->  
->  	for (int i = 0; i < ARRAY_SIZE(encoding_to_cgt); i++) {
->  		const struct encoding_to_trap_config *cgt = &encoding_to_cgt[i];
-> +		union trap_config tc = cgt->tc;
->  		void *prev;
->  
-> -		if (cgt->tc.val & BIT(63)) {
-> +		if (tc.val & BIT(63)) {
->  			kvm_err("CGT[%d] has MBZ bit set\n", i);
->  			ret = -EINVAL;
->  		}
->  
-> +		if (trap_effective_in_host_el0(tc.cgt))
-> +			tc.in_host_el0 = true;
-
-nit: do a direct assignment without the test.
-
-> +
->  		for (u32 enc = cgt->encoding; enc <= cgt->end; enc = encoding_next(enc)) {
->  			prev = xa_store(&sr_forward_xa, enc,
->  					xa_mk_value(cgt->tc.val), GFP_KERNEL);
-
-Thanks,
+instead.
 
 	M.
 
