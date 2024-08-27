@@ -1,30 +1,32 @@
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from out-176.mta0.migadu.com (out-176.mta0.migadu.com [91.218.175.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 814F4802
-	for <kvmarm@lists.linux.dev>; Tue, 27 Aug 2024 00:22:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E04041FA4
+	for <kvmarm@lists.linux.dev>; Tue, 27 Aug 2024 00:22:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724718172; cv=none; b=Jetq/JKntsEkhtLfmZYcP/R71l6y7VKNat8OYL2TlRQiNkJhLmOkHclzTxZz0/Va2lnbpCZmWkPv+vaHHJK/l8kkYKWWgZcKAvc7XeFYqTeEsf32+jp+Nr+fGZo7is816c5p8Qu/WpG8i0peHC/dtF3148IPbSGnHS03+7YNBEA=
+	t=1724718174; cv=none; b=c7VINiPpxn7SPRuMitZ6zd2zX9X5yrfnjHa1r4tPAZcGWQdSGQf2zxDoakIZfUGqzkjGFekIaMCUdFVqkt768v7AvFWChLC5+me062Cq/xzhEylkO0WED/Qy3tOi7Nf6MCdbzMhp+Pjf7AX6nyreJkaaqa9VHDl2sRDhjVqP4kQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724718172; c=relaxed/simple;
-	bh=CVgZ6JSLi9o/rGq8Gg5MbbvfzKGcrPKnUaFQmky70Pc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HzOveLr4hXAfYgro0q9pqnDhUh8JmxnZ5cWy5xBN+359+O3oIjx+QjGiBQ0Jgpa4z6cdCaSq8loiq5ZYL8MsUbfTMOF940GxkxoBPz06sny93mw44NItYGHHWTyjNucsY2rUtXJ1D2Xk5/o87JvJcoh79IhL+wKlHsdDnXyA3l0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=aj1R5rUC; arc=none smtp.client-ip=91.218.175.172
+	s=arc-20240116; t=1724718174; c=relaxed/simple;
+	bh=SPr8ICQPPSB3ribiEmqnaOrMfyQouJ8l4qUg5S2AXts=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=M5KgwIy50g7NV88gwMaCJiKy50IymvwlhAybrWnpCgDoi1xBZIgC5BDniZBfyWXgEGmETh9fl7picvPqITRzc2KRVAuPMOuuIYp1cTzGkK7GY4HRCWNK9zU0DLHGW/xIg6spX6ynL9qbK7CiQUV4pJpIAB37QhHzmGADs+M5fbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Owr8LTN+; arc=none smtp.client-ip=91.218.175.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="aj1R5rUC"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Owr8LTN+"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1724718168;
+	t=1724718169;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=+aS9JBXyqvbXhWHYjzwuCT5J+DxGuOdUGh/qszYqjIw=;
-	b=aj1R5rUCB462d0hJw7NQLtzOGzI4IWKkyrxOIzMhOOGlyPIdNoonr/WtGvBBQC8SkfvWfz
-	Cz06Jkcb+oNrJ2Sbw5C6zuRhsg5B3AYF0mT0Wisl5RVQIpLSmkY/dbf/KAvSj3O4XPu60+
-	TdzSWSw0/wIMU1gAz5ayf8MZgPBGIdY=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TRWIJEmiaF7MWU/Hty7bOWTLp4WOhJ/0lc7sXafTwo4=;
+	b=Owr8LTN+x2leQTVRQ/uaUizWIiJsbe/mNDOYdi6eDbADbTnTv+m72PhDyzbJD/7hIB9Npl
+	sGGDpmYY1GEXtP01e+bLKiveB6DTkV6yyVv2g2DH4BNA8FJ6rH3nHIW6Yk/zpB7fSgi2mt
+	wo6IoEm+F7d/4gj8wfclU1qmD/9cyxs=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -33,9 +35,11 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v2 00/12] KVM: arm64: nv: More complete support for FEAT_PMUv3
-Date: Tue, 27 Aug 2024 00:22:23 +0000
-Message-ID: <20240827002235.1753237-1-oliver.upton@linux.dev>
+Subject: [PATCH v2 01/12] KVM: arm64: Rename kvm_pmu_valid_counter_mask()
+Date: Tue, 27 Aug 2024 00:22:24 +0000
+Message-ID: <20240827002235.1753237-2-oliver.upton@linux.dev>
+In-Reply-To: <20240827002235.1753237-1-oliver.upton@linux.dev>
+References: <20240827002235.1753237-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -45,53 +49,141 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Well, looks like that grew a bit :)
+Nested PMU support requires dynamically changing the visible range of
+PMU counters based on the exception level and value of MDCR_EL2.HPMN. At
+the same time, the PMU emulation code needs to know the absolute number
+of implemented counters, regardless of context.
 
-The coarse-grained traps for the PMU available at EL2 are annoyingly
-effective in both guest and host contexts, meaning the traps need to be
-evaluated for a VM's host EL0. Yuck.
+Rename the existing helper to make it obvious that it returns the number
+of implemented counters and not anything else.
 
-First couple patches align the PMU emulation w/ the architecture, where
-a PMU has an implemented set of counters *and* a dynamic view of said
-counters based on the current context.
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+---
+ arch/arm64/kvm/pmu-emul.c |  8 ++++----
+ arch/arm64/kvm/sys_regs.c | 12 ++++++------
+ include/kvm/arm_pmu.h     |  4 ++--
+ 3 files changed, 12 insertions(+), 12 deletions(-)
 
-Patches 2-9 add support for Host EL0 traps to the NV trap
-infrastructure, and takes advantage of it for MDCR_EL2.{TPM, TPMCR,
-HPMN}.
-
-The whole interaction of CGTs declaring their EL0-ness is a bit shaky,
-since it is a property of the triaged sysreg itself. I structured it
-this way for the mostly theoretical problem of a sysreg having multiple
-traps, only some of which take effect in Host EL0.
-
-Last bit is the event filter fixes I had from before.
-
-v1: https://lore.kernel.org/kvmarm/20240824001402.3909504-1-oliver.upton@linux.dev/
-
-Oliver Upton (12):
-  KVM: arm64: Rename kvm_pmu_valid_counter_mask()
-  KVM: arm64: nv: Adjust range of accessible PMCs according to HPMN
-  KVM: arm64: nv: Rename BEHAVE_FORWARD_ANY
-  KVM: arm64: nv: Add support for describing traps that affect Host EL0
-  KVM: arm64: nv: Reinject traps that take effect in Host EL0
-  KVM: arm64: nv: Honor MDCR_EL2.{TPM, TPMCR} in Host EL0
-  KVM: arm64: nv: Allow coarse-grained trap combos to use complex traps
-  KVM: arm64: nv: Describe trap behaviour of MDCR_EL2.HPMN
-  KVM: arm64: nv: Advertise support for FEAT_HPMN0
-  KVM: arm64: Add helpers to determine if PMC counts at a given EL
-  KVM: arm64: nv: Honor NSH filter when in hyp context
-  KVM: arm64: nv: Reprogram PMU events affected by nested transition
-
- arch/arm64/include/asm/kvm_emulate.h |   5 +
- arch/arm64/kvm/emulate-nested.c      | 319 +++++++++++++++++----------
- arch/arm64/kvm/nested.c              |   5 +-
- arch/arm64/kvm/pmu-emul.c            |  97 ++++++--
- arch/arm64/kvm/sys_regs.c            |  12 +-
- include/kvm/arm_pmu.h                |  12 +-
- 6 files changed, 311 insertions(+), 139 deletions(-)
-
-
-base-commit: 7c626ce4bae1ac14f60076d00eafe71af30450ba
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index 82a2a003259c..e88d6bd8221a 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -244,7 +244,7 @@ void kvm_pmu_vcpu_init(struct kvm_vcpu *vcpu)
+  */
+ void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu)
+ {
+-	unsigned long mask = kvm_pmu_valid_counter_mask(vcpu);
++	unsigned long mask = kvm_pmu_implemented_counter_mask(vcpu);
+ 	int i;
+ 
+ 	for_each_set_bit(i, &mask, 32)
+@@ -265,7 +265,7 @@ void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu)
+ 	irq_work_sync(&vcpu->arch.pmu.overflow_work);
+ }
+ 
+-u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
++u64 kvm_pmu_implemented_counter_mask(struct kvm_vcpu *vcpu)
+ {
+ 	u64 val = FIELD_GET(ARMV8_PMU_PMCR_N, kvm_vcpu_read_pmcr(vcpu));
+ 
+@@ -574,7 +574,7 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
+ 		kvm_pmu_set_counter_value(vcpu, ARMV8_PMU_CYCLE_IDX, 0);
+ 
+ 	if (val & ARMV8_PMU_PMCR_P) {
+-		unsigned long mask = kvm_pmu_valid_counter_mask(vcpu);
++		unsigned long mask = kvm_pmu_implemented_counter_mask(vcpu);
+ 		mask &= ~BIT(ARMV8_PMU_CYCLE_IDX);
+ 		for_each_set_bit(i, &mask, 32)
+ 			kvm_pmu_set_pmc_value(kvm_vcpu_idx_to_pmc(vcpu, i), 0, true);
+@@ -804,7 +804,7 @@ u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
+ 
+ void kvm_vcpu_reload_pmu(struct kvm_vcpu *vcpu)
+ {
+-	u64 mask = kvm_pmu_valid_counter_mask(vcpu);
++	u64 mask = kvm_pmu_implemented_counter_mask(vcpu);
+ 
+ 	kvm_pmu_handle_pmcr(vcpu, kvm_vcpu_read_pmcr(vcpu));
+ 
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index c90324060436..b25f6f44f451 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1128,7 +1128,7 @@ static int set_pmreg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r, u64 va
+ {
+ 	bool set;
+ 
+-	val &= kvm_pmu_valid_counter_mask(vcpu);
++	val &= kvm_pmu_implemented_counter_mask(vcpu);
+ 
+ 	switch (r->reg) {
+ 	case PMOVSSET_EL0:
+@@ -1151,7 +1151,7 @@ static int set_pmreg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r, u64 va
+ 
+ static int get_pmreg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r, u64 *val)
+ {
+-	u64 mask = kvm_pmu_valid_counter_mask(vcpu);
++	u64 mask = kvm_pmu_implemented_counter_mask(vcpu);
+ 
+ 	*val = __vcpu_sys_reg(vcpu, r->reg) & mask;
+ 	return 0;
+@@ -1165,7 +1165,7 @@ static bool access_pmcnten(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 	if (pmu_access_el0_disabled(vcpu))
+ 		return false;
+ 
+-	mask = kvm_pmu_valid_counter_mask(vcpu);
++	mask = kvm_pmu_implemented_counter_mask(vcpu);
+ 	if (p->is_write) {
+ 		val = p->regval & mask;
+ 		if (r->Op2 & 0x1) {
+@@ -1188,7 +1188,7 @@ static bool access_pmcnten(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ static bool access_pminten(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 			   const struct sys_reg_desc *r)
+ {
+-	u64 mask = kvm_pmu_valid_counter_mask(vcpu);
++	u64 mask = kvm_pmu_implemented_counter_mask(vcpu);
+ 
+ 	if (check_pmu_access_disabled(vcpu, 0))
+ 		return false;
+@@ -1212,7 +1212,7 @@ static bool access_pminten(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ static bool access_pmovs(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 			 const struct sys_reg_desc *r)
+ {
+-	u64 mask = kvm_pmu_valid_counter_mask(vcpu);
++	u64 mask = kvm_pmu_implemented_counter_mask(vcpu);
+ 
+ 	if (pmu_access_el0_disabled(vcpu))
+ 		return false;
+@@ -1242,7 +1242,7 @@ static bool access_pmswinc(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 	if (pmu_write_swinc_el0_disabled(vcpu))
+ 		return false;
+ 
+-	mask = kvm_pmu_valid_counter_mask(vcpu);
++	mask = kvm_pmu_implemented_counter_mask(vcpu);
+ 	kvm_pmu_software_increment(vcpu, p->regval & mask);
+ 	return true;
+ }
+diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+index 35d4ca4f6122..6af5ac1bdd54 100644
+--- a/include/kvm/arm_pmu.h
++++ b/include/kvm/arm_pmu.h
+@@ -47,7 +47,7 @@ static __always_inline bool kvm_arm_support_pmu_v3(void)
+ #define kvm_arm_pmu_irq_initialized(v)	((v)->arch.pmu.irq_num >= VGIC_NR_SGIS)
+ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx);
+ void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val);
+-u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu);
++u64 kvm_pmu_implemented_counter_mask(struct kvm_vcpu *vcpu);
+ u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1);
+ void kvm_pmu_vcpu_init(struct kvm_vcpu *vcpu);
+ void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu);
+@@ -113,7 +113,7 @@ static inline u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu,
+ }
+ static inline void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu,
+ 					     u64 select_idx, u64 val) {}
+-static inline u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
++static inline u64 kvm_pmu_implemented_counter_mask(struct kvm_vcpu *vcpu)
+ {
+ 	return 0;
+ }
 -- 
 2.46.0.295.g3b9ea8a38a-goog
 
