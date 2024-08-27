@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E5371C7B63;
-	Tue, 27 Aug 2024 15:25:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B22751CCB34;
+	Tue, 27 Aug 2024 15:25:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724772331; cv=none; b=WCpqImwa3+YX279inf7+nPy4WXwN3a2fBh7SFO/dlADRPDaeDPZfs7YMlKHuvGoIJbRKgGQhdOm2BUtdceBbgnSuTCS+UKuK8kyBVM0JK00GiZpps73y7pBwXiYrLu0gLz8yuF37/rFRYacQTtYkCoV3Y1FWuznNYVOsjiKSY1U=
+	t=1724772331; cv=none; b=WhW9wvVLEPWSxfkIbnaKvKUsFsPTNlwR1DVlqxXN7CUW4xf7gIRV/Ag89ULcYyJj+XvnQmIlG09KkY10/Hp7xROPUEFs3+Lu4h5ZXAM16b9KlefnJrY4ptlAnbukCmKauMiyWKqkx/65ZynaAqns1ApLxOaN0siCoGjsf9ks+sk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1724772331; c=relaxed/simple;
-	bh=d9/vPD6r8m+ZxCw8Ldr1tJOIws2zgNGiJj0QcwdZ0ZQ=;
+	bh=onM4pexPIemFKu2u3Qt4AjJBY/ijVLRCBbGeKAw8SUg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=W2v/od1r/1gknp7CeIPq6dpxvDv4Ea5Cv+JZc7nD5NKCUVqE9J7V6pvK+A28LrF57zfDiMqCZMPDC1OsZCKUnOnS0c4i/VvdkTqnEP6A7aEEEZmTyZwF/ouFZtC2LIzZnQooVD2x5m0FdsGSo0SUGt2nit4WYcknS9I+vmDpGZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cak3OSvv; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=sWBaOoQ8HT1l2QtlJ68n9iRa7Uj77JquwEwqJrSoTAUGgAYFPKaKD8beRE9Ad2JRKQ3RBx9NH2VE4lcS6Xm3hUpCjxLmznvCjAoeQBW/JrxFQAccxL1grqi7FsmUH5VCFMApcEjU0acGxhe4a25MBMuYLTzXhzcc9o6w40u4kO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qg7oAmIU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cak3OSvv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E414C4DE0B;
-	Tue, 27 Aug 2024 15:25:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qg7oAmIU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D34DC4DDF2;
+	Tue, 27 Aug 2024 15:25:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724772331;
-	bh=d9/vPD6r8m+ZxCw8Ldr1tJOIws2zgNGiJj0QcwdZ0ZQ=;
+	s=k20201202; t=1724772330;
+	bh=onM4pexPIemFKu2u3Qt4AjJBY/ijVLRCBbGeKAw8SUg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Cak3OSvv44gMdI/2jjjY/FIEkx90oxMpbDYcdppKxHcOyfDT54PJ+2DKxDM12NkOu
-	 XfV3slIsvBroNsJcdJWJ3VM6WqveqDTbUaz6LP8IOIbp1oxgwq1xcmcjXdj7jh7hrK
-	 N/XzUEuAF/1OCfLUiCk383e2PFDXWTWhB/r6ZagEwiCuMA7yMJzFWzkdExthdxxWjn
-	 i3LhV7ncCfeUMjf+6+uke6JUiNHP64eZYlkOG/YWZihjEkWoBIYt9Hlug1ohFWHy7b
-	 7bWV08Qmqyp2dpt9k2IpYxkU7SHU6VKlWxqEliSkla/b5jlEnYSdP7QEYjUOPVloiu
-	 Hp0YOfleAVoFw==
+	b=Qg7oAmIU5rh64WR2ykR4Vtpr5lxT0ScioWv9XSF//4XSWtewvVATSaG3o3CeuGagy
+	 4D8LpjMJqi2A/1FHSwwJ9oKOd+6wQnOhdpWHEeSvjhB7U4hT5S73uZHCQBazwJNVZr
+	 qioHgupWVEDusZ4WMvXs2ZBacf4YfSs1V53p7IwqXXXSnXC1G35CdMhSa0d2OBPQJF
+	 TDqst64muvfEMRpYhmg1TeuLH6N4lWn1gt6o/ZbzvLraFTAdv/vWmKfDD1BAVjPI/H
+	 /czHqltzPfyjlgaEqAhAWfROKb+6+ERzTpDT3VVstZU3HwrBO1mqKII8CVp/NupY2R
+	 tAY9nXIxwOsxQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1siy4X-007HOs-EW;
-	Tue, 27 Aug 2024 16:25:29 +0100
+	id 1siy4W-007HOs-NW;
+	Tue, 27 Aug 2024 16:25:28 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -41,9 +41,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Alexander Potapenko <glider@google.com>
-Subject: [PATCH v2 10/11] KVM: arm64: Unify UNDEF injection helpers
-Date: Tue, 27 Aug 2024 16:25:16 +0100
-Message-Id: <20240827152517.3909653-11-maz@kernel.org>
+Subject: [PATCH v2 07/11] KVM: arm64: Add trap routing information for ICH_HCR_EL2
+Date: Tue, 27 Aug 2024 16:25:13 +0100
+Message-Id: <20240827152517.3909653-8-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240827152517.3909653-1-maz@kernel.org>
 References: <20240827152517.3909653-1-maz@kernel.org>
@@ -59,317 +59,144 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-We currently have two helpers (undef_access() and trap_undef()) that
-do exactly the same thing: inject an UNDEF and return 'false' (as an
-indication that PC should not be incremented).
-
-We definitely could do with one less. Given that undef_access() is
-used 80ish times, while trap_undef() is only used 30 times, the
-latter loses the battle and is immediately sacrificed.
-
-We also have a large number of instances where undef_access() is
-open-coded. Let's also convert those.
+The usual song and dance. Anything that is a trap, any register
+it traps. Note that we don't handle the registers added by
+FEAT_NMI for now.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 132 +++++++++++++++-----------------------
- 1 file changed, 51 insertions(+), 81 deletions(-)
+ arch/arm64/kvm/emulate-nested.c | 71 ++++++++++++++++++++++++++++++---
+ 1 file changed, 66 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index b93ad721fb7f..a3f273f55777 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -61,8 +61,7 @@ static bool bad_trap(struct kvm_vcpu *vcpu,
- {
- 	WARN_ONCE(1, "Unexpected %s\n", msg);
- 	print_sys_reg_instr(params);
--	kvm_inject_undefined(vcpu);
--	return false;
-+	return undef_access(vcpu, params, r);
- }
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index 05166eccea0a..e63be2058173 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -85,12 +85,17 @@ enum cgt_group_id {
  
- static bool read_from_write_only(struct kvm_vcpu *vcpu,
-@@ -353,10 +352,8 @@ static bool access_dcgsw(struct kvm_vcpu *vcpu,
- 			 struct sys_reg_params *p,
- 			 const struct sys_reg_desc *r)
- {
--	if (!kvm_has_mte(vcpu->kvm)) {
--		kvm_inject_undefined(vcpu);
--		return false;
--	}
-+	if (!kvm_has_mte(vcpu->kvm))
-+		return undef_access(vcpu, p, r);
+ 	CGT_HCRX_TCR2En,
  
- 	/* Treat MTE S/W ops as we treat the classic ones: with contempt */
- 	return access_dcsw(vcpu, p, r);
-@@ -393,10 +390,8 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
- 	u64 val, mask, shift;
- 
- 	if (reg_to_encoding(r) == SYS_TCR2_EL1 &&
--	    !kvm_has_feat(vcpu->kvm, ID_AA64MMFR3_EL1, TCRX, IMP)) {
--		kvm_inject_undefined(vcpu);
--		return false;
--	}
-+	    !kvm_has_feat(vcpu->kvm, ID_AA64MMFR3_EL1, TCRX, IMP))
-+		return undef_access(vcpu, p, r);
- 
- 	BUG_ON(!p->is_write);
- 
-@@ -443,10 +438,8 @@ static bool access_gic_sgi(struct kvm_vcpu *vcpu,
- {
- 	bool g1;
- 
--	if (!kvm_has_gicv3(vcpu->kvm)) {
--		kvm_inject_undefined(vcpu);
--		return false;
--	}
-+	if (!kvm_has_gicv3(vcpu->kvm))
-+		return undef_access(vcpu, p, r);
- 
- 	if (!p->is_write)
- 		return read_from_write_only(vcpu, p, r);
-@@ -511,14 +504,6 @@ static bool trap_raz_wi(struct kvm_vcpu *vcpu,
- 		return read_zero(vcpu, p);
- }
- 
--static bool trap_undef(struct kvm_vcpu *vcpu,
--		       struct sys_reg_params *p,
--		       const struct sys_reg_desc *r)
--{
--	kvm_inject_undefined(vcpu);
--	return false;
--}
--
- /*
-  * ARMv8.1 mandates at least a trivial LORegion implementation, where all the
-  * RW registers are RES0 (which we can implement as RAZ/WI). On an ARMv8.0
-@@ -531,10 +516,8 @@ static bool trap_loregion(struct kvm_vcpu *vcpu,
- {
- 	u32 sr = reg_to_encoding(r);
- 
--	if (!kvm_has_feat(vcpu->kvm, ID_AA64MMFR1_EL1, LO, IMP)) {
--		kvm_inject_undefined(vcpu);
--		return false;
--	}
-+	if (!kvm_has_feat(vcpu->kvm, ID_AA64MMFR1_EL1, LO, IMP))
-+		return undef_access(vcpu, p, r);
- 
- 	if (p->is_write && sr == SYS_LORID_EL1)
- 		return write_to_read_only(vcpu, p, r);
-@@ -1267,10 +1250,8 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 			     const struct sys_reg_desc *r)
- {
- 	if (p->is_write) {
--		if (!vcpu_mode_priv(vcpu)) {
--			kvm_inject_undefined(vcpu);
--			return false;
--		}
-+		if (!vcpu_mode_priv(vcpu))
-+			return undef_access(vcpu, p, r);
- 
- 		__vcpu_sys_reg(vcpu, PMUSERENR_EL0) =
- 			       p->regval & ARMV8_PMU_USERENR_MASK;
-@@ -1412,8 +1393,7 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
- 		break;
- 	default:
- 		print_sys_reg_msg(p, "%s", "Unhandled trapped timer register");
--		kvm_inject_undefined(vcpu);
--		return false;
-+		return undef_access(vcpu, p, r);
- 	}
- 
- 	if (p->is_write)
-@@ -2309,7 +2289,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	// DBGDTR[TR]X_EL0 share the same encoding
- 	{ SYS_DESC(SYS_DBGDTRTX_EL0), trap_raz_wi },
- 
--	{ SYS_DESC(SYS_DBGVCR32_EL2), trap_undef, reset_val, DBGVCR32_EL2, 0 },
-+	{ SYS_DESC(SYS_DBGVCR32_EL2), undef_access, reset_val, DBGVCR32_EL2, 0 },
- 
- 	{ SYS_DESC(SYS_MPIDR_EL1), NULL, reset_mpidr, MPIDR_EL1 },
- 
-@@ -2780,7 +2760,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	EL2_REG_VNCR(VTTBR_EL2, reset_val, 0),
- 	EL2_REG_VNCR(VTCR_EL2, reset_val, 0),
- 
--	{ SYS_DESC(SYS_DACR32_EL2), trap_undef, reset_unknown, DACR32_EL2 },
-+	{ SYS_DESC(SYS_DACR32_EL2), undef_access, reset_unknown, DACR32_EL2 },
- 	EL2_REG_VNCR(HDFGRTR_EL2, reset_val, 0),
- 	EL2_REG_VNCR(HDFGWTR_EL2, reset_val, 0),
- 	EL2_REG_VNCR(HAFGRTR_EL2, reset_val, 0),
-@@ -2798,11 +2778,11 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_SPSR_fiq), .access = trap_raz_wi,
- 	  .visibility = hidden_user_visibility },
- 
--	{ SYS_DESC(SYS_IFSR32_EL2), trap_undef, reset_unknown, IFSR32_EL2 },
-+	{ SYS_DESC(SYS_IFSR32_EL2), undef_access, reset_unknown, IFSR32_EL2 },
- 	EL2_REG(AFSR0_EL2, access_rw, reset_val, 0),
- 	EL2_REG(AFSR1_EL2, access_rw, reset_val, 0),
- 	EL2_REG_REDIR(ESR_EL2, reset_val, 0),
--	{ SYS_DESC(SYS_FPEXC32_EL2), trap_undef, reset_val, FPEXC32_EL2, 0x700 },
-+	{ SYS_DESC(SYS_FPEXC32_EL2), undef_access, reset_val, FPEXC32_EL2, 0x700 },
- 
- 	EL2_REG_REDIR(FAR_EL2, reset_val, 0),
- 	EL2_REG(HPFAR_EL2, access_rw, reset_val, 0),
-@@ -2812,7 +2792,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 
- 	EL2_REG(VBAR_EL2, access_rw, reset_val, 0),
- 	EL2_REG(RVBAR_EL2, access_rw, reset_val, 0),
--	{ SYS_DESC(SYS_RMR_EL2), trap_undef },
-+	{ SYS_DESC(SYS_RMR_EL2), undef_access },
- 
- 	EL2_REG_VNCR(ICH_HCR_EL2, reset_val, 0),
- 
-@@ -2848,10 +2828,8 @@ static bool handle_alle1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- {
- 	u32 sys_encoding = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
- 
--	if (!kvm_supported_tlbi_s12_op(vcpu, sys_encoding)) {
--		kvm_inject_undefined(vcpu);
--		return false;
--	}
-+	if (!kvm_supported_tlbi_s12_op(vcpu, sys_encoding))
-+		return undef_access(vcpu, p, r);
- 
- 	write_lock(&vcpu->kvm->mmu_lock);
- 
-@@ -2920,10 +2898,8 @@ static bool handle_vmalls12e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 	u32 sys_encoding = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
- 	u64 limit, vttbr;
- 
--	if (!kvm_supported_tlbi_s12_op(vcpu, sys_encoding)) {
--		kvm_inject_undefined(vcpu);
--		return false;
--	}
-+	if (!kvm_supported_tlbi_s12_op(vcpu, sys_encoding))
-+		return undef_access(vcpu, p, r);
- 
- 	vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
- 	limit = BIT_ULL(kvm_get_pa_bits(vcpu->kvm));
-@@ -2948,10 +2924,8 @@ static bool handle_ripas2e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 	u64 base, range, tg, num, scale;
- 	int shift;
- 
--	if (!kvm_supported_tlbi_ipas2_op(vcpu, sys_encoding)) {
--		kvm_inject_undefined(vcpu);
--		return false;
--	}
-+	if (!kvm_supported_tlbi_ipas2_op(vcpu, sys_encoding))
-+		return undef_access(vcpu, p, r);
- 
++	CGT_ICH_HCR_TC,
++	CGT_ICH_HCR_TALL0,
++	CGT_ICH_HCR_TALL1,
++	CGT_ICH_HCR_TDIR,
++
  	/*
- 	 * Because the shadow S2 structure doesn't necessarily reflect that
-@@ -3019,10 +2993,8 @@ static bool handle_ipas2e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 	u32 sys_encoding = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
- 	u64 vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
+ 	 * Anything after this point is a combination of coarse trap
+ 	 * controls, which must all be evaluated to decide what to do.
+ 	 */
+ 	__MULTIPLE_CONTROL_BITS__,
+-	CGT_HCR_IMO_FMO = __MULTIPLE_CONTROL_BITS__,
++	CGT_HCR_IMO_FMO_ICH_HCR_TC = __MULTIPLE_CONTROL_BITS__,
+ 	CGT_HCR_TID2_TID4,
+ 	CGT_HCR_TTLB_TTLBIS,
+ 	CGT_HCR_TTLB_TTLBOS,
+@@ -105,6 +110,8 @@ enum cgt_group_id {
+ 	CGT_MDCR_TDE_TDRA,
+ 	CGT_MDCR_TDCC_TDE_TDA,
  
--	if (!kvm_supported_tlbi_ipas2_op(vcpu, sys_encoding)) {
--		kvm_inject_undefined(vcpu);
--		return false;
--	}
-+	if (!kvm_supported_tlbi_ipas2_op(vcpu, sys_encoding))
-+		return undef_access(vcpu, p, r);
- 
- 	kvm_s2_mmu_iterate_by_vmid(vcpu->kvm, get_vmid(vttbr),
- 				   &(union tlbi_info) {
-@@ -3062,10 +3034,8 @@ static bool handle_tlbi_el1(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 
- 	WARN_ON(!vcpu_is_el2(vcpu));
- 
--	if (!kvm_supported_tlbi_s1e1_op(vcpu, sys_encoding)) {
--		kvm_inject_undefined(vcpu);
--		return false;
--	}
-+	if (!kvm_supported_tlbi_s1e1_op(vcpu, sys_encoding))
-+		return undef_access(vcpu, p, r);
- 
- 	kvm_s2_mmu_iterate_by_vmid(vcpu->kvm, get_vmid(vttbr),
- 				   &(union tlbi_info) {
-@@ -3173,14 +3143,14 @@ static struct sys_reg_desc sys_insn_descs[] = {
- 	SYS_INSN(TLBI_IPAS2LE1IS, handle_ipas2e1is),
- 	SYS_INSN(TLBI_RIPAS2LE1IS, handle_ripas2e1is),
- 
--	SYS_INSN(TLBI_ALLE2OS, trap_undef),
--	SYS_INSN(TLBI_VAE2OS, trap_undef),
-+	SYS_INSN(TLBI_ALLE2OS, undef_access),
-+	SYS_INSN(TLBI_VAE2OS, undef_access),
- 	SYS_INSN(TLBI_ALLE1OS, handle_alle1is),
--	SYS_INSN(TLBI_VALE2OS, trap_undef),
-+	SYS_INSN(TLBI_VALE2OS, undef_access),
- 	SYS_INSN(TLBI_VMALLS12E1OS, handle_vmalls12e1is),
- 
--	SYS_INSN(TLBI_RVAE2IS, trap_undef),
--	SYS_INSN(TLBI_RVALE2IS, trap_undef),
-+	SYS_INSN(TLBI_RVAE2IS, undef_access),
-+	SYS_INSN(TLBI_RVALE2IS, undef_access),
- 
- 	SYS_INSN(TLBI_ALLE1IS, handle_alle1is),
- 	SYS_INSN(TLBI_VMALLS12E1IS, handle_vmalls12e1is),
-@@ -3192,10 +3162,10 @@ static struct sys_reg_desc sys_insn_descs[] = {
- 	SYS_INSN(TLBI_IPAS2LE1, handle_ipas2e1is),
- 	SYS_INSN(TLBI_RIPAS2LE1, handle_ripas2e1is),
- 	SYS_INSN(TLBI_RIPAS2LE1OS, handle_ripas2e1is),
--	SYS_INSN(TLBI_RVAE2OS, trap_undef),
--	SYS_INSN(TLBI_RVALE2OS, trap_undef),
--	SYS_INSN(TLBI_RVAE2, trap_undef),
--	SYS_INSN(TLBI_RVALE2, trap_undef),
-+	SYS_INSN(TLBI_RVAE2OS, undef_access),
-+	SYS_INSN(TLBI_RVALE2OS, undef_access),
-+	SYS_INSN(TLBI_RVAE2, undef_access),
-+	SYS_INSN(TLBI_RVALE2, undef_access),
- 	SYS_INSN(TLBI_ALLE1, handle_alle1is),
- 	SYS_INSN(TLBI_VMALLS12E1, handle_vmalls12e1is),
- 
-@@ -3204,19 +3174,19 @@ static struct sys_reg_desc sys_insn_descs[] = {
- 	SYS_INSN(TLBI_IPAS2LE1ISNXS, handle_ipas2e1is),
- 	SYS_INSN(TLBI_RIPAS2LE1ISNXS, handle_ripas2e1is),
- 
--	SYS_INSN(TLBI_ALLE2OSNXS, trap_undef),
--	SYS_INSN(TLBI_VAE2OSNXS, trap_undef),
-+	SYS_INSN(TLBI_ALLE2OSNXS, undef_access),
-+	SYS_INSN(TLBI_VAE2OSNXS, undef_access),
- 	SYS_INSN(TLBI_ALLE1OSNXS, handle_alle1is),
--	SYS_INSN(TLBI_VALE2OSNXS, trap_undef),
-+	SYS_INSN(TLBI_VALE2OSNXS, undef_access),
- 	SYS_INSN(TLBI_VMALLS12E1OSNXS, handle_vmalls12e1is),
- 
--	SYS_INSN(TLBI_RVAE2ISNXS, trap_undef),
--	SYS_INSN(TLBI_RVALE2ISNXS, trap_undef),
--	SYS_INSN(TLBI_ALLE2ISNXS, trap_undef),
--	SYS_INSN(TLBI_VAE2ISNXS, trap_undef),
-+	SYS_INSN(TLBI_RVAE2ISNXS, undef_access),
-+	SYS_INSN(TLBI_RVALE2ISNXS, undef_access),
-+	SYS_INSN(TLBI_ALLE2ISNXS, undef_access),
-+	SYS_INSN(TLBI_VAE2ISNXS, undef_access),
- 
- 	SYS_INSN(TLBI_ALLE1ISNXS, handle_alle1is),
--	SYS_INSN(TLBI_VALE2ISNXS, trap_undef),
-+	SYS_INSN(TLBI_VALE2ISNXS, undef_access),
- 	SYS_INSN(TLBI_VMALLS12E1ISNXS, handle_vmalls12e1is),
- 	SYS_INSN(TLBI_IPAS2E1OSNXS, handle_ipas2e1is),
- 	SYS_INSN(TLBI_IPAS2E1NXS, handle_ipas2e1is),
-@@ -3226,14 +3196,14 @@ static struct sys_reg_desc sys_insn_descs[] = {
- 	SYS_INSN(TLBI_IPAS2LE1NXS, handle_ipas2e1is),
- 	SYS_INSN(TLBI_RIPAS2LE1NXS, handle_ripas2e1is),
- 	SYS_INSN(TLBI_RIPAS2LE1OSNXS, handle_ripas2e1is),
--	SYS_INSN(TLBI_RVAE2OSNXS, trap_undef),
--	SYS_INSN(TLBI_RVALE2OSNXS, trap_undef),
--	SYS_INSN(TLBI_RVAE2NXS, trap_undef),
--	SYS_INSN(TLBI_RVALE2NXS, trap_undef),
--	SYS_INSN(TLBI_ALLE2NXS, trap_undef),
--	SYS_INSN(TLBI_VAE2NXS, trap_undef),
-+	SYS_INSN(TLBI_RVAE2OSNXS, undef_access),
-+	SYS_INSN(TLBI_RVALE2OSNXS, undef_access),
-+	SYS_INSN(TLBI_RVAE2NXS, undef_access),
-+	SYS_INSN(TLBI_RVALE2NXS, undef_access),
-+	SYS_INSN(TLBI_ALLE2NXS, undef_access),
-+	SYS_INSN(TLBI_VAE2NXS, undef_access),
- 	SYS_INSN(TLBI_ALLE1NXS, handle_alle1is),
--	SYS_INSN(TLBI_VALE2NXS, trap_undef),
-+	SYS_INSN(TLBI_VALE2NXS, undef_access),
- 	SYS_INSN(TLBI_VMALLS12E1NXS, handle_vmalls12e1is),
++	CGT_ICH_HCR_TC_TDIR,
++
+ 	/*
+ 	 * Anything after this point requires a callback evaluating a
+ 	 * complex trap condition. Ugly stuff.
+@@ -378,6 +385,30 @@ static const struct trap_bits coarse_trap_bits[] = {
+ 		.mask		= HCRX_EL2_TCR2En,
+ 		.behaviour	= BEHAVE_FORWARD_ANY,
+ 	},
++	[CGT_ICH_HCR_TC] = {
++		.index		= ICH_HCR_EL2,
++		.value		= ICH_HCR_TC,
++		.mask		= ICH_HCR_TC,
++		.behaviour	= BEHAVE_FORWARD_ANY,
++	},
++	[CGT_ICH_HCR_TALL0] = {
++		.index		= ICH_HCR_EL2,
++		.value		= ICH_HCR_TALL0,
++		.mask		= ICH_HCR_TALL0,
++		.behaviour	= BEHAVE_FORWARD_ANY,
++	},
++	[CGT_ICH_HCR_TALL1] = {
++		.index		= ICH_HCR_EL2,
++		.value		= ICH_HCR_TALL1,
++		.mask		= ICH_HCR_TALL1,
++		.behaviour	= BEHAVE_FORWARD_ANY,
++	},
++	[CGT_ICH_HCR_TDIR] = {
++		.index		= ICH_HCR_EL2,
++		.value		= ICH_HCR_TDIR,
++		.mask		= ICH_HCR_TDIR,
++		.behaviour	= BEHAVE_FORWARD_ANY,
++	},
  };
  
+ #define MCB(id, ...)						\
+@@ -387,7 +418,6 @@ static const struct trap_bits coarse_trap_bits[] = {
+ 		}
+ 
+ static const enum cgt_group_id *coarse_control_combo[] = {
+-	MCB(CGT_HCR_IMO_FMO,		CGT_HCR_IMO, CGT_HCR_FMO),
+ 	MCB(CGT_HCR_TID2_TID4,		CGT_HCR_TID2, CGT_HCR_TID4),
+ 	MCB(CGT_HCR_TTLB_TTLBIS,	CGT_HCR_TTLB, CGT_HCR_TTLBIS),
+ 	MCB(CGT_HCR_TTLB_TTLBOS,	CGT_HCR_TTLB, CGT_HCR_TTLBOS),
+@@ -402,6 +432,9 @@ static const enum cgt_group_id *coarse_control_combo[] = {
+ 	MCB(CGT_MDCR_TDE_TDOSA,		CGT_MDCR_TDE, CGT_MDCR_TDOSA),
+ 	MCB(CGT_MDCR_TDE_TDRA,		CGT_MDCR_TDE, CGT_MDCR_TDRA),
+ 	MCB(CGT_MDCR_TDCC_TDE_TDA,	CGT_MDCR_TDCC, CGT_MDCR_TDE, CGT_MDCR_TDA),
++
++	MCB(CGT_HCR_IMO_FMO_ICH_HCR_TC,	CGT_HCR_IMO, CGT_HCR_FMO, CGT_ICH_HCR_TC),
++	MCB(CGT_ICH_HCR_TC_TDIR,	CGT_ICH_HCR_TC, CGT_ICH_HCR_TDIR),
+ };
+ 
+ typedef enum trap_behaviour (*complex_condition_check)(struct kvm_vcpu *);
+@@ -536,9 +569,9 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
+ 	SR_TRAP(SYS_CSSELR_EL1,		CGT_HCR_TID2_TID4),
+ 	SR_RANGE_TRAP(SYS_ID_PFR0_EL1,
+ 		      sys_reg(3, 0, 0, 7, 7), CGT_HCR_TID3),
+-	SR_TRAP(SYS_ICC_SGI0R_EL1,	CGT_HCR_IMO_FMO),
+-	SR_TRAP(SYS_ICC_ASGI1R_EL1,	CGT_HCR_IMO_FMO),
+-	SR_TRAP(SYS_ICC_SGI1R_EL1,	CGT_HCR_IMO_FMO),
++	SR_TRAP(SYS_ICC_SGI0R_EL1,	CGT_HCR_IMO_FMO_ICH_HCR_TC),
++	SR_TRAP(SYS_ICC_ASGI1R_EL1,	CGT_HCR_IMO_FMO_ICH_HCR_TC),
++	SR_TRAP(SYS_ICC_SGI1R_EL1,	CGT_HCR_IMO_FMO_ICH_HCR_TC),
+ 	SR_RANGE_TRAP(sys_reg(3, 0, 11, 0, 0),
+ 		      sys_reg(3, 0, 11, 15, 7), CGT_HCR_TIDCP),
+ 	SR_RANGE_TRAP(sys_reg(3, 1, 11, 0, 0),
+@@ -1108,6 +1141,34 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
+ 	SR_TRAP(SYS_CNTP_CTL_EL0,	CGT_CNTHCTL_EL1PTEN),
+ 	SR_TRAP(SYS_CNTPCT_EL0,		CGT_CNTHCTL_EL1PCTEN),
+ 	SR_TRAP(SYS_CNTPCTSS_EL0,	CGT_CNTHCTL_EL1PCTEN),
++	/*
++	 * IMPDEF choice:
++	 * We treat ICC_SRE_EL2.{SRE,Enable) and ICV_SRE_EL1.SRE as
++	 * RAO/WI. We therefore never consider ICC_SRE_EL2.Enable for
++	 * ICC_SRE_EL1 access, and always handle it locally.
++	 */
++	SR_TRAP(SYS_ICC_AP0R0_EL1,	CGT_ICH_HCR_TALL0),
++	SR_TRAP(SYS_ICC_AP0R1_EL1,	CGT_ICH_HCR_TALL0),
++	SR_TRAP(SYS_ICC_AP0R2_EL1,	CGT_ICH_HCR_TALL0),
++	SR_TRAP(SYS_ICC_AP0R3_EL1,	CGT_ICH_HCR_TALL0),
++	SR_TRAP(SYS_ICC_AP1R0_EL1,	CGT_ICH_HCR_TALL1),
++	SR_TRAP(SYS_ICC_AP1R1_EL1,	CGT_ICH_HCR_TALL1),
++	SR_TRAP(SYS_ICC_AP1R2_EL1,	CGT_ICH_HCR_TALL1),
++	SR_TRAP(SYS_ICC_AP1R3_EL1,	CGT_ICH_HCR_TALL1),
++	SR_TRAP(SYS_ICC_BPR0_EL1,	CGT_ICH_HCR_TALL0),
++	SR_TRAP(SYS_ICC_BPR1_EL1,	CGT_ICH_HCR_TALL1),
++	SR_TRAP(SYS_ICC_CTLR_EL1,	CGT_ICH_HCR_TC),
++	SR_TRAP(SYS_ICC_DIR_EL1,	CGT_ICH_HCR_TC_TDIR),
++	SR_TRAP(SYS_ICC_EOIR0_EL1,	CGT_ICH_HCR_TALL0),
++	SR_TRAP(SYS_ICC_EOIR1_EL1,	CGT_ICH_HCR_TALL1),
++	SR_TRAP(SYS_ICC_HPPIR0_EL1,	CGT_ICH_HCR_TALL0),
++	SR_TRAP(SYS_ICC_HPPIR1_EL1,	CGT_ICH_HCR_TALL1),
++	SR_TRAP(SYS_ICC_IAR0_EL1,	CGT_ICH_HCR_TALL0),
++	SR_TRAP(SYS_ICC_IAR1_EL1,	CGT_ICH_HCR_TALL1),
++	SR_TRAP(SYS_ICC_IGRPEN0_EL1,	CGT_ICH_HCR_TALL0),
++	SR_TRAP(SYS_ICC_IGRPEN1_EL1,	CGT_ICH_HCR_TALL1),
++	SR_TRAP(SYS_ICC_PMR_EL1,	CGT_ICH_HCR_TC),
++	SR_TRAP(SYS_ICC_RPR_EL1,	CGT_ICH_HCR_TC),
+ };
+ 
+ static DEFINE_XARRAY(sr_forward_xa);
 -- 
 2.39.2
 
