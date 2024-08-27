@@ -1,105 +1,135 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE6511428F3;
-	Tue, 27 Aug 2024 07:07:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A89B188586
+	for <kvmarm@lists.linux.dev>; Tue, 27 Aug 2024 07:59:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724742458; cv=none; b=n3StdrJC32vCjCcnwKHczNZyH2XZsgfDP7MuQjCIa4oT4GdVGG5IjNWFRSan07clG1yoyclScPOF31l1l327+VFtD6pftoGffNxXxSDP8Iho91jT/YyMjcMcYuKr31ElqgKZ5NVYgLfPuHR9ztn+wuNSCPRA2doB2cISe7ykwew=
+	t=1724745564; cv=none; b=ChUM+IGTmXEyV5G4c8csV+Pjk/cjArXZUIfde1fsz8uBGCp6fShw4kKUbpdFOKPWF+smuV4TNkx0JJDHhTaipS4KtBTsryWW7hm6uTFJclmSzA8IcLtYMGlIHG1w/lO5FiswDCN16ZK3VUST0QbnMFikOJWsU2wSWjlpd6upyfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724742458; c=relaxed/simple;
-	bh=w7cxUhLIAzp2ombetFVrAYWSkIfI6Xs1DMlJ3n1Zcf4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WTB+9LR8NNmmONpWvYSqTYMosZNZV5ktHEIppk0yGZ0CfWwBdt3QV/yXK8JtOnSXX+ZLZFmiugBCQf0Z3AuhZ1qEYSPWLQbhbKGqeL3lbPcaHki1eJ2n75kyTAJGOANCbBARGgILVoPG8h/2MPXGhMLUK0pUnzy+twgB65Vx9J4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jikjkFik; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1724745564; c=relaxed/simple;
+	bh=QxaMYW1cio+OGbEcTTufO1SlqLtT3/SVmgnc+YxE874=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BMyPhco2GbkUFHQSioVUc4TVN5S2OZdq6X2VMDu74waezy+LWh+6ZP6atzOwLIbSgiEf4MPcCD4tgGx/d0rqBa/s2rg28jUYBt1fC5tvAW08cKDswz2N9rt6abd2Rm35feXuYe0vO0oAnwqodJ1odyLXkEa98P15J1KLhxbV78A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eQen7O4/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jikjkFik"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23394C8B7AA;
-	Tue, 27 Aug 2024 07:07:38 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eQen7O4/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03D61C8B7A0;
+	Tue, 27 Aug 2024 07:59:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724742458;
-	bh=w7cxUhLIAzp2ombetFVrAYWSkIfI6Xs1DMlJ3n1Zcf4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=jikjkFik7s5RnDb53CbhMDzOqygs8f1+bSff7o42MTzuuMoGF80LpeFSQFythukkQ
-	 uvs+ECE7wOBG679XDrs0n2A1BaF+o0IxRyY0dEPYsGvZF0XPONJVs8t0YI56r7VuI2
-	 haRN/LZU+sNz9Fv9O0DOxeJJdRGmgrP2TeWoyg7o6jnzhYpXjTutTvlF4yeYUdtLCC
-	 aGbIaY9t9m2mLTNW4Y96YHjX4boM/+gHkKyBTMeO+gbfTzwxqd6OkVjWX61I9fsbQ8
-	 LhT7bcxA5AzIExO1JavuJOT9ZAgTXT61lJu+5uwpAf/k8RgeJo0jf+uGpHYWf6j0Pp
-	 ylI0gy6/uO87A==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	s=k20201202; t=1724745564;
+	bh=QxaMYW1cio+OGbEcTTufO1SlqLtT3/SVmgnc+YxE874=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=eQen7O4/qJjgUZU1WEYT8ZWSu8J+AN+zPCoG8NGlz7RbgcUrCEOTITfx4W2UYI7OV
+	 Y0+egktO1hb2PnzZQKkyaFB0BnKO4YmxmfwEUZaXpLvos4ksyg26mFPmG8g37icl9Y
+	 niQxFGOYotRsW1kBYm2P7nrfOZsZO11KHdb8SiC5ICNrXpPznFe8JbOYWyBolDpZtQ
+	 WmoLC11ntmT2to1TrRlge+q7qPs6tpNEpowGrS30jrfVIqKNuP1DG7ADLYzmHN8lHg
+	 BUteWWvFxkG3INMKCh61e76VZ0uIOmDmXc+YfBoIT0h14A92mMTBFeejp1bdugqDsl
+	 3yo4SB9Djx2Rw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1siqIh-0077cp-J6;
-	Tue, 27 Aug 2024 08:07:35 +0100
+	id 1sir6n-0078Xh-Hn;
+	Tue, 27 Aug 2024 08:59:21 +0100
+Date: Tue, 27 Aug 2024 08:59:20 +0100
+Message-ID: <86o75ewg4n.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Marc Zyngier <maz@kernel.org>
-Cc: James Morse <james.morse@arm.com>,
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Fuad Tabba <tabba@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v4 0/8] KVM: arm64: Add support for FP8
-Date: Tue, 27 Aug 2024 08:07:31 +0100
-Message-Id: <172474244499.3905348.3393130116483819167.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240820131802.3547589-1-maz@kernel.org>
-References: <20240820131802.3547589-1-maz@kernel.org>
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: Re: [PATCH 0/3] KVM: arm64: nv: Add EL2 PMU event filtering support
+In-Reply-To: <Zs15t5JVqcG6AYjF@linux.dev>
+References: <20240824001402.3909504-1-oliver.upton@linux.dev>
+	<86v7zpvwym.wl-maz@kernel.org>
+	<Zsy6zNQT2o6sTidY@linux.dev>
+	<86r0aawk0s.wl-maz@kernel.org>
+	<Zs15t5JVqcG6AYjF@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, tabba@google.com, joey.gouly@arm.com, broonie@kernel.org
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, gankulkarni@os.amperecomputing.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 20 Aug 2024 14:17:54 +0100, Marc Zyngier wrote:
-> Although FP8 support was merged in 6.9, the KVM side was dropped, with
-> no sign of it being picked up again. Given that its absence is getting
-> in the way of NV upstreaming (HCRX_EL2 needs fleshing out), here's a
-> small series addressing it.
+On Tue, 27 Aug 2024 08:01:11 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> The support is following the save/restore model established for the
-> rest of the FP code, with FPMR being tied to it. The sole additions
-> are the handling of traps in a nested context, and the corresponding
-> ID registers being made writable. As an extra cleanup, SVCR and FPMR
-> are moved into the sysreg array.
+> On Tue, Aug 27, 2024 at 07:35:15AM +0100, Marc Zyngier wrote:
+> > > Thoughts?
+> > 
+> > I see that you have already posted your proposed approach, but allow
+> > me to say what I have in mind.
+> > 
+> > We have three possibilities:
+> > 
+> > - either we go with your approach, which has the advantage of not
+> >   requiring any new trap description, but breaks the (unwritten)
+> >   promise that we don't do any "local" handling at this stage
+> > 
+> > - or we perform the handling where we normally do it (in sys_regs.c),
+> >   but we start littering the already overly complicated emulation code
+> >   for something that is barely a trap reinjection
 > 
-> [...]
+> Hell no :)
+> 
+> > - or (and this is my preferred option), we treat it as a "fast" trap,
+> >   which would match what we do for other things that we trap and that
+> >   behave differently when 'InHost' (ERET, TLBIs).
+> > 
+> > This last option does require another bit of decoding, but has the
+> > following advantages:
+> > 
+> > - it follows the existing model for 'InHost' trap handling
+> > 
+> > - it is close to optimal from a performance perspective
+> > 
+> > - it doesn't change the existing behaviour of the xarray handling
+> > 
+> > The way I think of it, this sort of EL0->EL2 trap reinjection is
+> > simply the other side of the ERET coin, and I would very much like to
+> > keep this symmetry, unless I have missed something obvious.
+> > 
+> > What do you think?
+> 
+> My primary concern about stuffing more things into the fast path is the
+> limited debuggability since we can't use instrumentation in a
+> not-quite-kernel context.
 
-Applied to next, thanks!
+Yes and no. We can use *some* instrumentation (such as tracing, and
+even - horror - printk). But it is the likes of WARN() that go south
+because the VHE vectors are not handling BRK as the rest of the
+kernel. This is definitely on my list of things to fix.
 
-[1/8] KVM: arm64: Move SVCR into the sysreg array
-      commit: b55688943597df06f202c67341da5b9b0ec54e93
-[2/8] KVM: arm64: Add predicate for FPMR support in a VM
-      commit: d4db98791aa5316677a1da9bfa0788068c9863dc
-[3/8] KVM: arm64: Move FPMR into the sysreg array
-      commit: 7d9c1ed6f4bfa8d5fcafad847ac64e2839a04301
-[4/8] KVM: arm64: Add save/restore support for FPMR
-      commit: ef3be86021c3bdf384c36d9d4aa1ee9fe65b95af
-[5/8] KVM: arm64: Honor trap routing for FPMR
-      commit: b8f669b491ec4693d07126b20db0fbe747556d11
-[6/8] KVM: arm64: Expose ID_AA64FPFR0_EL1 as a writable ID reg
-      commit: 6d7307651a8a021e7286e90264676b893cb6032d
-[7/8] KVM: arm64: Enable FP8 support when available and configured
-      commit: c9150a8ad9cdb69584d4ec5af61481df41498eb8
-[8/8] KVM: arm64: Expose ID_AA64PFR2_EL1 to userspace and guests
-      commit: 13c7a51eeb747ec315485ac7b13d4ea03707f53e
+> I do generally agree with the intent of organizing it all similarly,
+> just that the traps infrastructure is _really_ handy for doing the job.
 
-Cheers,
+Maybe there is a middle-ground here. We could, as you suggest, use the
+xarray as the repository for trap routing information (including the
+'InHost' aspect), and yet have the fast path. It shouldn't be too hard
+to expose a lookup function and the relevant helpers to decode the
+63bit control word.
+
+> Let me take an accounting of how many other 'InHost' trap bits we have
+> and get a feel for if we need a generalized solution or if I can do
+> something PMU-specific here.
+
+That'd be super useful indeed.
+
+Thanks,
 
 	M.
+
 -- 
 Without deviation from the norm, progress is not possible.
-
-
