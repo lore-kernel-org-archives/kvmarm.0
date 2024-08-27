@@ -1,110 +1,96 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D50A119DF5F
-	for <kvmarm@lists.linux.dev>; Tue, 27 Aug 2024 08:46:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D7E9158DD0
+	for <kvmarm@lists.linux.dev>; Tue, 27 Aug 2024 08:58:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724748373; cv=none; b=bJqoci7lleCKv5pL3j9uiP96jojc9dR4MTm8wWiwdZCW9e3YFYkBb0kcYlFeolElVztJ6tzatC692oQc81LkYSNfnCGhdwhchm7HUdyG74luk0qLnOO6fa63cZgly8Fns1P5waE/xzsX8pi78uxmGvwAPBXgMbDOaKOJTYsKBg4=
+	t=1724749132; cv=none; b=FMMzywtVUIwCgs/woRXsflV8LYOGhwqRGUvFHRSo5P26uwquTVhxvVHYezdpAJ1bbQWefKEdAJfWn5h8b6SpMCbPoImkyxpDGnpYjRr+0wGmgNeNbF2LLM4ihDrVN878Y1j5oNfA5CdFJHiaL14uV9+MBEsyan3zLwRUnvqKuJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724748373; c=relaxed/simple;
-	bh=W/gned1S2aEgveAzwGHcVts33uHXT+GTG81W6x5AeTc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=F4zCq//hxY2jJvR56xVXVUzPtKj32xemscU9W/cFYX+e7clzcpEpv005yuuXt0cSY+SA+PnfruQbThEk5w88483TEq6UCnnGaWWJZq2YXo3nRvEPSXsqUp28T96lw8lTrdhVFxaLgKFZlgn8iC2IKKY8tugLM6oSH7iLn1eZB0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0FNNyQJk; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0FNNyQJk"
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e035949cc4eso10158360276.1
-        for <kvmarm@lists.linux.dev>; Tue, 27 Aug 2024 01:46:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724748371; x=1725353171; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ujfkbxajYNAV9coR+kUVXeI3lwos12vqL1v+iOvXT9g=;
-        b=0FNNyQJkwMUIp7iYJm/RQ0vxKt3wZua7gtUaWQ9TgyC9aMVJR6drIhRxvYLsNGuA5f
-         i/RGPZEPWvmvfu9ObjpqYgGDvrK4fwTIEas7kzzdVovH0TlOHg9EPWdd5OoXCn6t4FqA
-         ir+CDEE8woKRKOKX5RbvxBmbTDR6OVskjyM8kOVSodFyAf5ry+WIZLTlcklv3gAW4sbU
-         3WxWVjE4nGt4S1Z4zUl7pM+uzWrMB68dQnnJ2Rr16PzIqEbbdItfrPmv0a/7WRZlNJn8
-         zuFBh1aHz6RadpkqCmc7wiSyyRaYmd8Ilq9kOqri4hfb0p2EGWwei1Rz/cXdshXX+GxS
-         vEjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724748371; x=1725353171;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ujfkbxajYNAV9coR+kUVXeI3lwos12vqL1v+iOvXT9g=;
-        b=gw2yi73+korUdeEOxL4digJvtXIwONpbBsoiRc3nchALbXpv2GZQ2JTQxYRGn0zHUt
-         O5JjiHTJgD0thN2vgJF4GMqAdKqkwRw4Xfx+vJx9Bwory/b6LKbZvDjKi5tkYVl0qcGq
-         NiicXV+Ydn9TVGEixgLV/n63fP5MnyEwYYKqs4KY/kFhEaY00+gf3W5qk5++XgNeIOjM
-         MkLSc8gCv0+p4Z8tJo9EI9Em43+Cgp9n9lqc4X5jAZuLQEyxYrw9dI/phTkSlYMh3De/
-         Zq14X6SK4mHnW+1ti+CIKiWHaV3buRHjW5DswDnJa0y22JKRNXvWI2uGQT8t6ogryj9/
-         iKSg==
-X-Gm-Message-State: AOJu0YxxO8aBsxLO6OjWtm1B63Qq9OxefpRhaPZd7S5HUqM8o0FqY5DT
-	nhWeqJzYWaPZs1elNiFcZUNnRb6muTyvhFuBMNDxtZleoR/C7gXjAaVMnIEVfbMavH0w1ziz7kl
-	ckBYnPHGtaYTwTqax6XStCWpt3A==
-X-Google-Smtp-Source: AGHT+IHOHuHbuOJF/L350TjQeQOZv00E2Fvna1Z8JsFoQh3TFmDrKS4V7q2AmDtj+RMoJ+girhVAzT4/oTPRZmzkCgA=
-X-Received: from sebkvm.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:cd5])
- (user=sebastianene job=sendgmr) by 2002:a25:a4a2:0:b0:e16:6d88:b8c2 with SMTP
- id 3f1490d57ef6-e1a2a5a6addmr54600276.4.1724748370673; Tue, 27 Aug 2024
- 01:46:10 -0700 (PDT)
-Date: Tue, 27 Aug 2024 08:45:48 +0000
-In-Reply-To: <20240827084549.45731-1-sebastianene@google.com>
+	s=arc-20240116; t=1724749132; c=relaxed/simple;
+	bh=oNdOviKyuIrr5vkcgKfovQ1IBbsfJ1aSy7l73C8Cxj4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=pwa+ps+JXRF8LKnU0PS12+hMiVFzDq5zM31Ioivkx+vHcAQ1CjU1tSCbVAZBJORSHlQDLrl9xkcMS7wpFKGVQxllp7d4112ZXzhwDPm7b0VKwj+jR1BHn39OGADLZZXCjfy7epjyTRK2N+35zimI09rUrr99Gv/rIU9xJRFFnuY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4WtLzs4k2BzyRDN;
+	Tue, 27 Aug 2024 16:58:17 +0800 (CST)
+Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
+	by mail.maildlp.com (Postfix) with ESMTPS id C6032140137;
+	Tue, 27 Aug 2024 16:58:46 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
+ kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 27 Aug 2024 16:58:45 +0800
+Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
+ lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.039;
+ Tue, 27 Aug 2024 09:58:43 +0100
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To: James Morse <james.morse@arm.com>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>
+CC: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>, yuzenghui <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+	Jing Zhang <jingzhangos@google.com>, "Wangzhou (B)" <wangzhou1@hisilicon.com>
+Subject: RE: [PATCH v3 4/6] KVM: arm64: Disable MPAM visibility by default and
+ ignore VMM writes
+Thread-Topic: [PATCH v3 4/6] KVM: arm64: Disable MPAM visibility by default
+ and ignore VMM writes
+Thread-Index: AQHae7EcWBfUhFLWfESLuHqxbBJIrbHdahYAgF5ahfA=
+Date: Tue, 27 Aug 2024 08:58:43 +0000
+Message-ID: <82695efb73ca463b904aa49a595be06c@huawei.com>
+References: <20240321165728.31907-1-james.morse@arm.com>
+ <20240321165728.31907-5-james.morse@arm.com>
+ <e22f30c045b64f3da68fb0aa6c0b4e2c@huawei.com>
+In-Reply-To: <e22f30c045b64f3da68fb0aa6c0b4e2c@huawei.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20240827084549.45731-1-sebastianene@google.com>
-X-Mailer: git-send-email 2.46.0.295.g3b9ea8a38a-goog
-Message-ID: <20240827084549.45731-6-sebastianene@google.com>
-Subject: [PATCH v9 5/5] KVM: arm64: Introduce the PTDUMP_STAGE2_DEBUGFS config
-From: Sebastian Ene <sebastianene@google.com>
-To: akpm@linux-foundation.org, alexghiti@rivosinc.com, ankita@nvidia.com, 
-	ardb@kernel.org, catalin.marinas@arm.com, christophe.leroy@csgroup.eu, 
-	james.morse@arm.com, vdonnefort@google.com, mark.rutland@arm.com, 
-	maz@kernel.org, oliver.upton@linux.dev, rananta@google.com, 
-	ryan.roberts@arm.com, sebastianene@google.com, shahuang@redhat.com, 
-	suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kernel-team@android.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
 
-When this config is enabled, it exposes the stage-2 pagetable layout
-through a debugfs file.
+Hi James,
 
-Signed-off-by: Sebastian Ene <sebastianene@google.com>
----
- arch/arm64/kvm/Kconfig | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+> -----Original Message-----
+> From: Shameerali Kolothum Thodi
+> Sent: Friday, June 28, 2024 9:11 AM
+> To: 'James Morse' <james.morse@arm.com>; linux-arm-
+> kernel@lists.infradead.org; kvmarm@lists.linux.dev
+> Cc: Marc Zyngier <maz@kernel.org>; Oliver Upton <oliver.upton@linux.dev>;
+> Suzuki K Poulose <suzuki.poulose@arm.com>; yuzenghui
+> <yuzenghui@huawei.com>; Catalin Marinas <catalin.marinas@arm.com>;
+> Will Deacon <will@kernel.org>; Jing Zhang <jingzhangos@google.com>;
+> Wangzhou (B) <wangzhou1@hisilicon.com>
+> Subject: RE: [PATCH v3 4/6] KVM: arm64: Disable MPAM visibility by defaul=
+t
+> and ignore VMM writes
+ (vcpu, rd, user_val);
+> > +}
+>=20
+> Commit 14e270fa5c4c(arm64/cpufeature: Add remaining feature bits in
+> ID_AA64PFR1 register")
+> exposes the MPAMFRAC filed in in AA64PFR1_EL1. Don't we need a similar
+> handling for that
+> as well to handle the FEAT_MPAMv0p1 case?
+>=20
+> Also any chance you plan to respin this series soon? We do have hardware
+> that benefits from this
+> series.
 
-diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index 8304eb342be9..ead632ad01b4 100644
---- a/arch/arm64/kvm/Kconfig
-+++ b/arch/arm64/kvm/Kconfig
-@@ -66,4 +66,21 @@ config PROTECTED_NVHE_STACKTRACE
- 
- 	  If unsure, or not using protected nVHE (pKVM), say N.
- 
-+config PTDUMP_STAGE2_DEBUGFS
-+	bool "Present the stage-2 pagetables to debugfs"
-+	depends on KVM
-+	depends on DEBUG_KERNEL
-+	depends on DEBUG_FS
-+	depends on GENERIC_PTDUMP
-+	select PTDUMP_CORE
-+	default n
-+	help
-+	  Say Y here if you want to show the stage-2 kernel pagetables
-+	  layout in a debugfs file. This information is only useful for kernel developers
-+	  who are working in architecture specific areas of the kernel.
-+	  It is probably not a good idea to enable this feature in a production
-+	  kernel.
-+
-+	  If in doubt, say N.
-+
- endif # VIRTUALIZATION
--- 
-2.46.0.295.g3b9ea8a38a-goog
+Just a gentle ping to see if you have plans to respin this series soon or n=
+ot.=20
+Please let me know, if I can be of any help. We do have platforms that
+differ in their MPAM features and that breaks migration.=20
 
+Thanks,
+Shameer
