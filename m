@@ -1,353 +1,171 @@
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99901142E6F;
-	Wed, 28 Aug 2024 08:36:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75268167D80
+	for <kvmarm@lists.linux.dev>; Wed, 28 Aug 2024 09:47:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724834204; cv=none; b=ODYybxVxn+HlOfBa/PwT8XsQhFJsjQT8BdZgs6SLzQSLiWySiXwgqpB/YygSgbUjCnxseAppWIFhmoS9vSXYPZlCCgxkYz7TDNGl+zvAAzHt4ORU4PCfN+9n/CXeBdzDqsV1xe1utzBTu16sP714P5/SXkCBYAna8An/sXgQMIA=
+	t=1724838428; cv=none; b=heqY5d1Yu5lLqQAasleZN2MaYv/obhhGT1ekKgzZv7CvdK3IiBMuHFgJzhv2rBBB57+N3bPxhMz/DtL2WV7Xeh5Kw1qNDg+md/TIifzdI4MZokYIbMnah6EoF9lzz4RpPPanBEUGE+JALksBoOhMxaxKYYJwmzKX9PlSAlxTAks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724834204; c=relaxed/simple;
-	bh=uSmvSJeNFmeyFfY8BGu6VB4JiXjq3KkKYAvR2TQtleU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Lpn5jPyUTyhuCvZA8/L7kIdcBT2Q1fUCwXc6kCLU1IoTAgLaXqWYT80FcomA60XcI+4JkSuZoP6ebnpn8VXcw6cCvz2oEdOmgvzxE9vsqWnjnCxkDjS5JEXHRULyVopesU/EohMgCuKdfVXZKr7UcuyDILytknZPqoOIdLkxumg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=FzUI8QiL; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	s=arc-20240116; t=1724838428; c=relaxed/simple;
+	bh=JaahmtBNvMYpYGDI8TfWiHxXUqqgkc9FlY7+LPCUrzE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=p1BvBQ5ngs2TL1n8BGASZvLkag0JV4CCcspEf4Ok/yse08RuPp5EqSPcRKo+gJugDiEonv6sESwwtPzDCNyMr6o2fH4BaQ94BJLoWmajIRg4dSHgdUzOS8FdL/429imespg1upN+M9PH1BP5g/oks/zUV+qNRziVlcvOB91UQw0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=h9q9Hi5S; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="FzUI8QiL"
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47S7twWb001449;
-	Wed, 28 Aug 2024 08:36:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=
-	from:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding; s=corp-2023-11-20; bh=erGN/lqsjy+1F1
-	v45hgnTn7sAAhyNEqUCYCfrD4e66w=; b=FzUI8QiLz8N8Q9/kg9sBihxj/oY8ZC
-	kaVESOG/UcGONLSec3hC635Mh29O7hxOpDUdTjjabT3xm9XzA5ilWRxKcqdYvxlk
-	bJPD+0O7qe2cpHrmLeHjcXBmnOm3HomNqgoQUnpWsusEOse+YFnLWo2i8bitu41a
-	wpWcjTxX7t/CG1DkypMhFZnk/N8yFry+PdYMVivyXQSRWUnWU1X7MS50tTzYljgN
-	1NidAHdw9C3NtFRWkM+o+ijq4zuEh7OGv8S0iXLNeUpTdvS2xtqUG3AJ8+xM2URU
-	gOoVexbOghjd/moFl666q1VSZmGpCOPEZ8n3Yv+ArqN+8Hr/67+PS9sg==
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 419pugrs44-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 28 Aug 2024 08:36:18 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 47S72I0x016639;
-	Wed, 28 Aug 2024 08:36:17 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 418a5ten6d-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 28 Aug 2024 08:36:17 +0000
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 47S8KiB0017099;
-	Wed, 28 Aug 2024 08:36:17 GMT
-Received: from localhost.localdomain (dhcp-10-175-47-71.vpn.oracle.com [10.175.47.71])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 418a5ten64-1;
-	Wed, 28 Aug 2024 08:36:16 +0000
-From: Vegard Nossum <vegard.nossum@oracle.com>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-omap@vger.kernel.org,
-        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-um@lists.infradead.org, bpf@vger.kernel.org,
-        llvm@lists.linux.dev, Vegard Nossum <vegard.nossum@oracle.com>
-Subject: [PATCH] kbuild: use objcopy to generate asm-offsets
-Date: Wed, 28 Aug 2024 10:36:04 +0200
-Message-Id: <20240828083605.3093701-1-vegard.nossum@oracle.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="h9q9Hi5S"
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-371a9bea8d4so3555630f8f.2
+        for <kvmarm@lists.linux.dev>; Wed, 28 Aug 2024 02:47:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1724838425; x=1725443225; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=f4FnjsYFSElhR+3f7IugFyQV34/agqN5SguHwrwKdRE=;
+        b=h9q9Hi5SQZixOzrk/WBk8n54qu1Qhtz3MKo/KTerKdfG46AYTLJPLkAxbvq76rCpZ/
+         R5rvUefuESFd4w7bsmAJBQW28XYSfVph4K3DMPDVICRZlKYysOU9kWL+zAdqd0TiGX27
+         DPzL+1sPRfM0RBSz0IffgzQEmbE3nn0a2uCDfWXGnfL58SiF28sD+ZJpLIX5DHr3Uf9l
+         1QWyAYqNTJNFrLIKjcnu78j0kw+7hPRldg9LNb1IQH13ashvOSbisB9EieYD8HIecjB6
+         lL0TnUbhaJ7IzVuR4v6UKEfvYmTxPD7kqgMLeTNu7qF4twrX66XALuYzUkTek6rfUVb6
+         My5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724838425; x=1725443225;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=f4FnjsYFSElhR+3f7IugFyQV34/agqN5SguHwrwKdRE=;
+        b=oLMDf6OkaE6MAQQ39nTTQZEM5sbMwcveVkUxDhRAGC4x9zZEYdr7eH/hnBZFJZCHMB
+         Y5KKmTrWZk+R7r7ssMZupv9r7zD6QdMTb5vqb63xXU98cjuAP043zSbjZGr9J+kkvc68
+         1qtDVIO2y8HeVlgukdrYl/Q9VbMvy7/phL0iM+VO4qMZyNsDKlL+zW4DZbiPztoJHkiw
+         XcTgbFftn5kZ/x9Xr5rmrwVI9y/0gNjIinZx7iZLGBb60DuYAPvJAAro9TOVFTbFSprb
+         5VHAbGaT5lFrVV9Zl4drJ2TJho289hY4akWHIj5/r9thufGlYnIWFhICE1Dkb9EHQsDX
+         vRZg==
+X-Forwarded-Encrypted: i=1; AJvYcCXjNeJLoiCcqrJxUf681hcM6rQw691sWUykaL2SPPJ9H8oV4QR970PJmC42tkYYEK/QCp3Fjc4=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyOaqFssl1LerWmqbrrN4DpiwqKDGn9H6Z8dAzx1yWClq87h8hq
+	oz/UfN9iIwg3qoYtSATuGFRnXJzUV6EFS2AM4FSvuXTrPCSFTs7qT+/5Qf34GVgeBLy0uNfoOnt
+	K
+X-Google-Smtp-Source: AGHT+IH0KC6Z0HHx3zEIhScnAd0zosTOFRut+SoaKBSOi0hUzOh0yIoDnTQbgYeiAVq0L8twAXC6cQ==
+X-Received: by 2002:adf:f7d2:0:b0:368:77f9:fb34 with SMTP id ffacd0b85a97d-37311857bf9mr9665467f8f.15.1724838424122;
+        Wed, 28 Aug 2024 02:47:04 -0700 (PDT)
+Received: from draig.lan ([85.9.250.243])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3730813c0dcsm15170235f8f.37.2024.08.28.02.47.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Aug 2024 02:47:03 -0700 (PDT)
+Received: from draig (localhost [IPv6:::1])
+	by draig.lan (Postfix) with ESMTP id 999935F796;
+	Wed, 28 Aug 2024 10:47:02 +0100 (BST)
+From: =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: D Scott Phillips <scott@os.amperecomputing.com>
+Cc: linux-kernel@vger.kernel.org,  kvm@vger.kernel.org,
+  linux-arm-kernel@lists.infradead.org,  kvmarm@lists.linux.dev,
+  maz@kernel.org,  arnd@linaro.org
+Subject: Re: [PATCH 1/3] ampere/arm64: Add a fixup handler for alignment
+ faults in aarch64 code
+In-Reply-To: <86frqpk6d7.fsf@scott-ph-mail.amperecomputing.com> (D. Scott
+	Phillips's message of "Tue, 27 Aug 2024 14:23:16 -0700")
+References: <20240827130829.43632-1-alex.bennee@linaro.org>
+	<20240827130829.43632-2-alex.bennee@linaro.org>
+	<86frqpk6d7.fsf@scott-ph-mail.amperecomputing.com>
+Date: Wed, 28 Aug 2024 10:47:02 +0100
+Message-ID: <87plpt3rop.fsf@draig.linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-28_03,2024-08-27_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxscore=0 mlxlogscore=999
- phishscore=0 bulkscore=0 malwarescore=0 suspectscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2407110000
- definitions=main-2408280060
-X-Proofpoint-GUID: RCp8Tn4L9XlNZemaT9NkL3670WSRULoV
-X-Proofpoint-ORIG-GUID: RCp8Tn4L9XlNZemaT9NkL3670WSRULoV
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-In order to give assembly code access to C structs without having to
-hardcore member offsets, the kernel compiles a C source file listing all
-the structs and offsets that are needed in assembly code. Using some
-C preprocessor trickery and a sed script, the compiled assembly code is
-turned back into C preprocessor code that in turn can be used by the
-asssembly code.
+D Scott Phillips <scott@os.amperecomputing.com> writes:
 
-This sed script is very hard to read and understand.
+> Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+>
+>> From: D Scott Phillips <scott@os.amperecomputing.com>
+>>
+>> A later patch will hand out Device memory in some cases to code
+>> which expects a Normal memory type, as an errata workaround.
+>> Unaligned accesses to Device memory will fault though, so here we
+>> add a fixup handler to emulate faulting accesses, at a performance
+>> penalty.
+>>
+>> Many of the instructions in the Loads and Stores group are supported,
+>> but these groups are not handled here:
+>>
+>>  * Advanced SIMD load/store multiple structures
+>>  * Advanced SIMD load/store multiple structures (post-indexed)
+>>  * Advanced SIMD load/store single structure
+>>  * Advanced SIMD load/store single structure (post-indexed)
+>
+> Hi Alex, I'm keeping my version of these patches here:
+>
+> https://github.com/AmpereComputing/linux-ampere-altra-erratum-pcie-65
+>
+> It looks like the difference to the version you've harvested is that
+> I've since added handling for these load/store types:
+>
+> Advanced SIMD load/store multiple structure
+> Advanced SIMD load/store multiple structure (post-indexed)
+> Advanced SIMD load/store single structure
+> Advanced SIMD load/store single structure (post-indexed)
 
-Remove the sed script and compile the C source listing structs and
-offsets to an object file (instead of assembly code) that embeds C source
-directly. Then extract the C source using objcopy.
+Are you going to roll in the fixes I added or should I re-spin with your
+additional handling?
 
-The resulting code is more readable, less fragile, and sligthly shorter.
+> I've never sent these patches because in my opinion there's too much
+> complexity to maintain upstream for this workaround, though now they're
+> here so we can have that conversation.
 
-Note to reviewers: The 'objcopy ... /dev/stdout | cat' bit is needed to
-force the correct ordering of the objcopy lines vs. the surrounding echo
-commands; without it, objcopy will open /dev/stdout (which refers to a
-temporary file created by kbuild) and reset the file offset to 0. In
-other words, the pipe ensures that objcopy doesn't overwrite the lines
-that already exist in /dev/stdout.
+It's not totally out of the scope of the kernel to do instruction
+decoding to workaround things that can't be executed directly. There is
+already a bunch of instruction decode logic to handle stepping over
+instruction probes. The 32 bit ARM code even has a complete user-space
+alignment fixup handler driver by procfs.
 
-Signed-off-by: Vegard Nossum <vegard.nossum@oracle.com>
----
- Kbuild                       | 10 +++++-----
- arch/arm/mach-at91/Makefile  |  4 ++--
- arch/arm/mach-omap2/Makefile |  4 ++--
- arch/arm64/kvm/Makefile      |  9 +++++----
- arch/x86/kvm/Makefile        |  4 ++--
- arch/x86/um/Makefile         |  6 +++---
- drivers/memory/Makefile      |  4 ++--
- include/linux/kbuild.h       | 15 +++++++++++----
- samples/bpf/Makefile         |  4 ++--
- scripts/Makefile.lib         | 13 +------------
- scripts/mod/Makefile         |  4 ++--
- 11 files changed, 37 insertions(+), 40 deletions(-)
+It might make sense to share some of the logic although of course the
+probe handler and the misaligned handler are targeting different sets of
+instructions.
 
-diff --git a/Kbuild b/Kbuild
-index 464b34a08f51e..412b77007deb1 100644
---- a/Kbuild
-+++ b/Kbuild
-@@ -9,9 +9,9 @@
- 
- bounds-file := include/generated/bounds.h
- 
--targets := kernel/bounds.s
-+targets := kernel/bounds.o
- 
--$(bounds-file): kernel/bounds.s FORCE
-+$(bounds-file): kernel/bounds.o FORCE
- 	$(call filechk,offsets,__LINUX_BOUNDS_H__)
- 
- # Generate timeconst.h
-@@ -27,11 +27,11 @@ $(timeconst-file): kernel/time/timeconst.bc FORCE
- 
- offsets-file := include/generated/asm-offsets.h
- 
--targets += arch/$(SRCARCH)/kernel/asm-offsets.s
-+targets += arch/$(SRCARCH)/kernel/asm-offsets.o
- 
--arch/$(SRCARCH)/kernel/asm-offsets.s: $(timeconst-file) $(bounds-file)
-+arch/$(SRCARCH)/kernel/asm-offsets.o: $(timeconst-file) $(bounds-file)
- 
--$(offsets-file): arch/$(SRCARCH)/kernel/asm-offsets.s FORCE
-+$(offsets-file): arch/$(SRCARCH)/kernel/asm-offsets.o FORCE
- 	$(call filechk,offsets,__ASM_OFFSETS_H__)
- 
- # Check for missing system calls
-diff --git a/arch/arm/mach-at91/Makefile b/arch/arm/mach-at91/Makefile
-index 794bd12ab0a8e..4d4be0000fd98 100644
---- a/arch/arm/mach-at91/Makefile
-+++ b/arch/arm/mach-at91/Makefile
-@@ -18,10 +18,10 @@ ifeq ($(CONFIG_PM_DEBUG),y)
- CFLAGS_pm.o += -DDEBUG
- endif
- 
--$(obj)/pm_data-offsets.h: $(obj)/pm_data-offsets.s FORCE
-+$(obj)/pm_data-offsets.h: $(obj)/pm_data-offsets.o FORCE
- 	$(call filechk,offsets,__PM_DATA_OFFSETS_H__)
- 
- $(obj)/pm_suspend.o: $(obj)/pm_data-offsets.h
- 
--targets += pm_data-offsets.s
-+targets += pm_data-offsets.o
- clean-files += pm_data-offsets.h
-diff --git a/arch/arm/mach-omap2/Makefile b/arch/arm/mach-omap2/Makefile
-index daf21127c82f1..991ffe6871d1d 100644
---- a/arch/arm/mach-omap2/Makefile
-+++ b/arch/arm/mach-omap2/Makefile
-@@ -217,12 +217,12 @@ obj-y					+= omap_phy_internal.o
- 
- obj-$(CONFIG_MACH_OMAP2_TUSB6010)	+= usb-tusb6010.o
- 
--$(obj)/pm-asm-offsets.h: $(obj)/pm-asm-offsets.s FORCE
-+$(obj)/pm-asm-offsets.h: $(obj)/pm-asm-offsets.o FORCE
- 	$(call filechk,offsets,__TI_PM_ASM_OFFSETS_H__)
- 
- $(obj)/sleep33xx.o $(obj)/sleep43xx.o: $(obj)/pm-asm-offsets.h
- 
--targets += pm-asm-offsets.s
-+targets += pm-asm-offsets.o
- clean-files += pm-asm-offsets.h
- 
- obj-$(CONFIG_OMAP_IOMMU)		+= omap-iommu.o
-diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-index 86a629aaf0a13..ee699a683d82c 100644
---- a/arch/arm64/kvm/Makefile
-+++ b/arch/arm64/kvm/Makefile
-@@ -28,17 +28,18 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
- kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o pmu.o
- kvm-$(CONFIG_ARM64_PTR_AUTH)  += pauth.o
- 
--always-y := hyp_constants.h hyp-constants.s
-+always-y := hyp_constants.h hyp-constants.o
- 
- define rule_gen_hyp_constants
- 	$(call filechk,offsets,__HYP_CONSTANTS_H__)
- endef
- 
- CFLAGS_hyp-constants.o = -I $(src)/hyp/include
--$(obj)/hyp-constants.s: $(src)/hyp/hyp-constants.c FORCE
--	$(call if_changed_dep,cc_s_c)
- 
--$(obj)/hyp_constants.h: $(obj)/hyp-constants.s FORCE
-+$(obj)/hyp-constants.o: $(src)/hyp/hyp-constants.c FORCE
-+	$(call if_changed_dep,cc_o_c)
-+
-+$(obj)/hyp_constants.h: $(obj)/hyp-constants.o FORCE
- 	$(call if_changed_rule,gen_hyp_constants)
- 
- obj-kvm := $(addprefix $(obj)/, $(kvm-y))
-diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-index 5494669a055a6..3b561c7e7c4f9 100644
---- a/arch/x86/kvm/Makefile
-+++ b/arch/x86/kvm/Makefile
-@@ -42,8 +42,8 @@ $(obj)/svm/vmenter.o: $(obj)/kvm-asm-offsets.h
- AFLAGS_vmx/vmenter.o    := -iquote $(obj)
- $(obj)/vmx/vmenter.o: $(obj)/kvm-asm-offsets.h
- 
--$(obj)/kvm-asm-offsets.h: $(obj)/kvm-asm-offsets.s FORCE
-+$(obj)/kvm-asm-offsets.h: $(obj)/kvm-asm-offsets.o FORCE
- 	$(call filechk,offsets,__KVM_ASM_OFFSETS_H__)
- 
--targets += kvm-asm-offsets.s
-+targets += kvm-asm-offsets.o
- clean-files += kvm-asm-offsets.h
-diff --git a/arch/x86/um/Makefile b/arch/x86/um/Makefile
-index 36e67fc97c22f..6563503d4b25d 100644
---- a/arch/x86/um/Makefile
-+++ b/arch/x86/um/Makefile
-@@ -38,11 +38,11 @@ subarch-$(CONFIG_MODULES) += ../kernel/module.o
- 
- USER_OBJS := bugs_$(BITS).o ptrace_user.o fault.o
- 
--$(obj)/user-offsets.s: c_flags = -Wp,-MD,$(depfile) $(USER_CFLAGS) \
-+$(obj)/user-offsets.o: c_flags = -Wp,-MD,$(depfile) $(USER_CFLAGS) \
- 	-Iarch/x86/include/generated
--targets += user-offsets.s
-+targets += user-offsets.o
- 
--include/generated/user_constants.h: $(obj)/user-offsets.s FORCE
-+include/generated/user_constants.h: $(obj)/user-offsets.o FORCE
- 	$(call filechk,offsets,__USER_CONSTANT_H__)
- 
- UNPROFILE_OBJS := stub_segv.o
-diff --git a/drivers/memory/Makefile b/drivers/memory/Makefile
-index d2e6ca9abbe02..efae95f315a12 100644
---- a/drivers/memory/Makefile
-+++ b/drivers/memory/Makefile
-@@ -34,8 +34,8 @@ ti-emif-sram-objs		:= ti-emif-pm.o ti-emif-sram-pm.o
- 
- $(obj)/ti-emif-sram-pm.o: $(obj)/ti-emif-asm-offsets.h
- 
--$(obj)/ti-emif-asm-offsets.h: $(obj)/emif-asm-offsets.s FORCE
-+$(obj)/ti-emif-asm-offsets.h: $(obj)/emif-asm-offsets.o FORCE
- 	$(call filechk,offsets,__TI_EMIF_ASM_OFFSETS_H__)
- 
--targets += emif-asm-offsets.s
-+targets += emif-asm-offsets.o
- clean-files += ti-emif-asm-offsets.h
-diff --git a/include/linux/kbuild.h b/include/linux/kbuild.h
-index e7be517aaaf68..d253ae4dfd1c1 100644
---- a/include/linux/kbuild.h
-+++ b/include/linux/kbuild.h
-@@ -2,15 +2,22 @@
- #ifndef __LINUX_KBUILD_H
- #define __LINUX_KBUILD_H
- 
--#define DEFINE(sym, val) \
--	asm volatile("\n.ascii \"->" #sym " %0 " #val "\"" : : "i" (val))
-+#define _LINE(x, ...) \
-+	asm volatile( \
-+		".pushsection \".data.kbuild\"; "\
-+		".ascii \"" x "\\n\"; "\
-+		".popsection" : : __VA_ARGS__)
- 
--#define BLANK() asm volatile("\n.ascii \"->\"" : : )
-+#define DEFINE(sym, val) \
-+	_LINE("#define " #sym " %c0 /* " #val " */", "i" (val))
- 
- #define OFFSET(sym, str, mem) \
- 	DEFINE(sym, offsetof(struct str, mem))
- 
-+#define BLANK() \
-+	_LINE("")
-+
- #define COMMENT(x) \
--	asm volatile("\n.ascii \"->#" x "\"")
-+	_LINE("/* " #x " */")
- 
- #endif
-diff --git a/samples/bpf/Makefile b/samples/bpf/Makefile
-index 3e003dd6bea09..a5d86ac8f5f57 100644
---- a/samples/bpf/Makefile
-+++ b/samples/bpf/Makefile
-@@ -270,10 +270,10 @@ $(LIBBPF_OUTPUT) $(BPFTOOL_OUTPUT):
- 	$(call msg,MKDIR,$@)
- 	$(Q)mkdir -p $@
- 
--$(obj)/syscall_nrs.h:	$(obj)/syscall_nrs.s FORCE
-+$(obj)/syscall_nrs.h:	$(obj)/syscall_nrs.o FORCE
- 	$(call filechk,offsets,__SYSCALL_NRS_H__)
- 
--targets += syscall_nrs.s
-+targets += syscall_nrs.o
- clean-files += syscall_nrs.h
- 
- FORCE:
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 207325eaf1d1c..f78b0b12ace26 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -583,17 +583,6 @@ quiet_cmd_zstd22_with_size = ZSTD22  $@
- # ASM offsets
- # ---------------------------------------------------------------------------
- 
--# Default sed regexp - multiline due to syntax constraints
--#
--# Use [:space:] because LLVM's integrated assembler inserts <tab> around
--# the .ascii directive whereas GCC keeps the <space> as-is.
--define sed-offsets
--	's:^[[:space:]]*\.ascii[[:space:]]*"\(.*\)".*:\1:; \
--	/^->/{s:->#\(.*\):/* \1 */:; \
--	s:^->\([^ ]*\) [\$$#]*\([^ ]*\) \(.*\):#define \1 \2 /* \3 */:; \
--	s:->::; p;}'
--endef
--
- # Use filechk to avoid rebuilds when a header changes, but the resulting file
- # does not
- define filechk_offsets
-@@ -605,7 +594,7 @@ define filechk_offsets
- 	 echo " * This file was generated by Kbuild"; \
- 	 echo " */"; \
- 	 echo ""; \
--	 sed -ne $(sed-offsets) < $<; \
-+	 $(OBJCOPY) -j .data.kbuild -O binary $< /dev/stdout | cat; \
- 	 echo ""; \
- 	 echo "#endif"
- endef
-diff --git a/scripts/mod/Makefile b/scripts/mod/Makefile
-index c729bc936bae1..3c3f5e16a30a2 100644
---- a/scripts/mod/Makefile
-+++ b/scripts/mod/Makefile
-@@ -8,10 +8,10 @@ modpost-objs	:= modpost.o file2alias.o sumversion.o symsearch.o
- 
- devicetable-offsets-file := devicetable-offsets.h
- 
--$(obj)/$(devicetable-offsets-file): $(obj)/devicetable-offsets.s FORCE
-+$(obj)/$(devicetable-offsets-file): $(obj)/devicetable-offsets.o FORCE
- 	$(call filechk,offsets,__DEVICETABLE_OFFSETS_H__)
- 
--targets += $(devicetable-offsets-file) devicetable-offsets.s
-+targets += $(devicetable-offsets-file) devicetable-offsets.o
- 
- # dependencies on generated files need to be listed explicitly
- 
--- 
-2.34.1
+The core kernel code also has a bunch of unaligned load/store helper
+functions that could probably be re-used as well to further reduce the
+code delta.
 
+> Finally, I think a better approach overall would have been to have
+> device memory mapping in the stage 2 page table, then booting with pkvm
+> would have this workaround for both the host and guests. I don't think
+> that approach changes the fact that there's too much complexity here.
+
+That would be a cleaner solution for pKVM although we would like to see
+it ported to Xen as well. There is a tension there between having a
+generic fixup library and something tightly integrated into a given
+kernel/hypervisor.
+
+I don't think instruction decoding is fundamentally too complicated for
+a kernel - although I may be biased as a QEMU developer ;-). However if
+it is to be taken forward I think it should probably come with an
+exhaustive test case to exercise the decoder and fixup handler. The
+fixes so far were found by repeatedly iterating on vkmark and seeing
+were things failed and fixing when they came up.
+
+I will leave it to the kernel maintainers to decide if this is an
+acceptable workaround or not.
+
+I do have two remaining questions:
+
+  - Why do AMD GPUs trigger this and not nVidia? Do they just have their
+    own fixup code hidden in the binary blob? Would Nouveau suffer
+    similar problems?
+
+  - Will Arm SoC PCI implementations continue to see these edge cases
+    that don't affect the x86 world? This is not the first Arm machine
+    with PCI to see issues. In fact of the 3 machines I have (SynQuacer,
+    MachiatoBin and AVA) all have some measure of PCI "fun" to deal
+    with.
+
+Thanks,
+
+--=20
+Alex Benn=C3=A9e
+Virtualisation Tech Lead @ Linaro
