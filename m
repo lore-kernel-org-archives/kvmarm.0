@@ -1,146 +1,74 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5CB11A3BCE;
-	Wed, 28 Aug 2024 17:32:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24BDE1ABEC5
+	for <kvmarm@lists.linux.dev>; Wed, 28 Aug 2024 20:21:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724866378; cv=none; b=sKTXaddVtPQ/6nZUN7s08Euw37DGGj7NOAavF3H7JGv796Bh4rEqjXxucLLBao6U4+e48fe1jT6iL5gd7l12ctyjyujh0/NkotrowsMIXzhyTzklUCvaaUKnOvz/8KmnidPTVKSR4qv/LfYBCyxCE3yuF0efntuRqp3vDSsYPl0=
+	t=1724876494; cv=none; b=OTHhB0rZl+x8JFjgm2iZ94HpYto1AGLjcB3mOZJtGsTQpBZ93HBOhRPGYADi3S/wh9dIESWPIjSuEOL7jz6itM+zBXNU5x8qfkYE+OmeJJHGxIwjW0/vVrrwrz77K6bwg8pFFzmfBI2tmhBkNrWI4189ousaBw0BUWrYKghLtxI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724866378; c=relaxed/simple;
-	bh=4MDDdzSEhRjEbEa2n9fIYxr42mIY+eyZfSj6+j+Bu0s=;
+	s=arc-20240116; t=1724876494; c=relaxed/simple;
+	bh=rhazEJ18zxL7GKKEYCY2DhRXiQx3Zo44AezMhmDRL+Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PEaL/Pf4PgHqJjzwWdqKFjIiFEJJBqGUuOpOLicxoUU5Ol9afleYtlZSluN88oNHOc4ryVuQSfSWbhfJTdXkaYxIWMtcuwJHhCH8cY1uyH8MTCloy8Lx0cCFdJKCs3pB2AwaAFl7KLN+GRX+qpOh8S5gn/eOJLacWLMSjK5Dk/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O/xcOhor; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=mq8mpWXMcG+amyzwzbPmL1EPzzdTsjGuwzGUPR2xnaI7miln9q7zv04uDfhCgGRUPUtAjdqQZQZxqO20MK88QBy3pW+DjvyTfeRsVZRltl2g6OWjVJQZT+sdi9rGbFSpwhGsjFY85qyFF7mUIigQo5z0Sa1vtL6RQ34xCqNzzCA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xDFnR12P; arc=none smtp.client-ip=95.215.58.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O/xcOhor"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71927C4CEC0;
-	Wed, 28 Aug 2024 17:32:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724866378;
-	bh=4MDDdzSEhRjEbEa2n9fIYxr42mIY+eyZfSj6+j+Bu0s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=O/xcOhorFRSv2vHmRagMWmGxh+ScNnb9p5YrzG9/pAmQfUsEg399/CaTU0Z06a3Kd
-	 25gBR9x3tRKON/9TVqn3X9yWKKyvoaXPglSuRX8H/AEzCQfOfamSFXFrUflPvWSiAU
-	 m2RTlwhEQm6GYG4Uu3jWFaCtKcYLtQjATOV2MkQy03IMy9y2Bez9OmpxvhprGtMcQG
-	 PjRlInV3Bc/JK1THjQVmMuPnn6fu1rOqZ3+sGnnl2KRptQU5L4iIPf6dlZynx0jL9x
-	 730E1RPdEdJUvwP5kiHq7t30Mte5uQ7x3NQJjn8eIqgssRzUyqSg0jXamQWsy9Pz/C
-	 BWKufAwkMrGMg==
-Date: Wed, 28 Aug 2024 18:32:48 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xDFnR12P"
+Date: Wed, 28 Aug 2024 20:21:22 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1724876489;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Z3Xm/6To/0+QIxO47lLdLDJqf3M7/P3VQuUcWXRAtwM=;
+	b=xDFnR12P4UZuPbFMRnDS1mOuh500SWCcLTF1T1+dfD+1CiLSGfknLgUYsNMQlyj7Y+Vp5x
+	I0KbpElMYEbGqnYg1eQUS5XhOAUycQDMSTvzW9pyH4Lx6Ot/QSdqjxDLNWwp1dZvtbA/50
+	OgYG+Fs0RH1ZsZTl7D1K96hckCmICrM=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: D Scott Phillips <scott@os.amperecomputing.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	Besar Wicaksono <bwicaksono@nvidia.com>,
+	Easwar Hariharan <eahariha@linux.microsoft.com>,
+	Rob Herring <robh@kernel.org>,
+	Andre Przywara <andre.przywara@arm.com>,
+	linux-kernel@vger.kernel.org, patches@amperecomputing.com,
+	Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Florian Weimer <fweimer@redhat.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
-	Ross Burton <ross.burton@arm.com>,
-	Yury Khrustalev <yury.khrustalev@arm.com>,
-	Wilco Dijkstra <wilco.dijkstra@arm.com>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v11 25/39] arm64/signal: Expose GCS state in signal frames
-Message-ID: <4de41478-3bc8-4cb4-a557-3e9402afe858@sirena.org.uk>
-References: <20240822-arm64-gcs-v11-0-41b81947ecb5@kernel.org>
- <20240822-arm64-gcs-v11-25-41b81947ecb5@kernel.org>
- <ZshYTyNbveD7WMyJ@arm.com>
- <ZshjmuYcejbhaSBg@finisterre.sirena.org.uk>
- <Zsixz6Y9xWxqaQaV@arm.com>
- <ZskGqU8BSvR01W30@finisterre.sirena.org.uk>
- <ZsxSKVAOHQq12YfB@arm.com>
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v2] arm64: errata: Enable the AC03_CPU_38 workaround for
+ ampere1a
+Message-ID: <Zs-GwkIMauATQ16A@linux.dev>
+References: <20240827211701.2216719-1-scott@os.amperecomputing.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="qwAebp9So100JWhv"
-Content-Disposition: inline
-In-Reply-To: <ZsxSKVAOHQq12YfB@arm.com>
-X-Cookie: You are number 6!  Who is number one?
-
-
---qwAebp9So100JWhv
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20240827211701.2216719-1-scott@os.amperecomputing.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Aug 26, 2024 at 01:00:09PM +0300, Catalin Marinas wrote:
-> On Fri, Aug 23, 2024 at 11:01:13PM +0100, Mark Brown wrote:
-> > On Fri, Aug 23, 2024 at 04:59:11PM +0100, Catalin Marinas wrote:
+On Tue, Aug 27, 2024 at 02:17:01PM -0700, D Scott Phillips wrote:
+> The ampere1a cpu is affected by erratum AC04_CPU_10 which is the same
+> bug as AC03_CPU_38. Add ampere1a to the AC03_CPU_38 workaround midr list.
+> 
+> Signed-off-by: D Scott Phillips <scott@os.amperecomputing.com>
 
-> gcs_preserve_current_state() only a context switch thing. Would it work
-> if we don't touch the thread structure at all in the signal code? We
-> wouldn't deliver a signal in the middle of the switch_to() code. So any
-> value we write in thread struct would be overridden at the next switch.
+You'll probably want to cc this to stable, that can be handled when the
+patch is applied though.
 
-I think so, yes.
+Acked-by: Oliver Upton <oliver.upton@linux.dev>
 
-> If GCS is disabled for a guest, we save the GCSPR_EL0 with the cap size
-
-s/guest/task/ I guess?
-
-> subtracted but there's no cap written. In restore_gcs_context() it
-> doesn't look like we add the cap size back when writing GCSPR_EL0. If
-> GCS is enabled, we do consume the cap and add 8 but otherwise it looks
-> that we keep decreasing GCSPR_EL0. I think we should always subtract the
-> cap size if GCS is enabled. This could could do with some refactoring as
-> I find it hard to follow (not sure exactly how, maybe just comments will
-> do).
-
-I've changed this so we instead only add the frame for the token if GCS
-is enabled and updated the comment, that way we don't modify GCSPR_EL0
-in cases where GCS is not enabled.
-
-> I'd also keep a single write to GCSPR_EL0 on the return path but I'm ok
-> with two if we need to cope with GCS being disabled but the GCSPR_EL0
-> still being saved/restored.
-
-I think the handling for the various options in the second case mean
-that it's clearer and simpler to write once when we restore the frame
-and once when we consume the token.
-
-> Another aspect for gcs_restore_signal(), I think it makes more sense for
-> the cap to be consumed _after_ restoring the sigcontext since this has
-> the actual gcspr_el0 where we stored the cap and represents the original
-> stack. If we'll get an alternative shadow stack, current GCSPR_EL0 on
-> sigreturn points to that alternative shadow stack rather than the
-> original one. That's what confused me when reviewing the patch and I
-> thought the cap goes to the top of the signal stack.
-
-I've moved gcs_restore_signal() before the altstack restore which I
-think is what you're looking for here?
-
---qwAebp9So100JWhv
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmbPXz8ACgkQJNaLcl1U
-h9AINwgAghxTu8PB4VcQHkYwz1H/qDleYcPMAHplNpZgcLpx59wTJgBZ5QfIwDnV
-v12mJKsZJ3gfnHdZipZjp7EKhKGELQUTGRLICZqBr9S/8SfK3cXC3z6gQEXLxu3W
-Z122sDonqb/vfykIYhrtWeP12Rgm1n7KRplfJrXGx+xfZD2pQRdydES4L5RWtbZU
-coJqFBLlGHRFqsnIUQni4PFl1UCQRVitFHHS4nL+Fs/lGj+rkjM69mkCQjmAHR1d
-/Wivj6fyHPPQj8UCXiCXkk+/KcM64IZqgoTzIdYH+khbjTKKaBC0s06fnqJqU2n1
-d06XGwawJkM0HfQlIcf0XRaB8a7aew==
-=V6Zo
------END PGP SIGNATURE-----
-
---qwAebp9So100JWhv--
+-- 
+Thanks,
+Oliver
