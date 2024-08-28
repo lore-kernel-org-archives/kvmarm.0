@@ -1,52 +1,70 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C94B319FA94;
-	Wed, 28 Aug 2024 15:10:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5CB11A3BCE;
+	Wed, 28 Aug 2024 17:32:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724857840; cv=none; b=gsrUJXpdOrQO1OGMiC85KvO9KR9LbYgwHX/e9S6/oKk/3/05NlBhaU2La6yU0TKH9wR+1QZQVs+PSXKjNstXKEa3WHs7Iwda7Vet+AGkDbAZBqoXG/7UU+3TqXTVXZgfYmMXKFGJ23OOzbsvxmrjiW5bEoVQuIgl+etOsp4R4hY=
+	t=1724866378; cv=none; b=sKTXaddVtPQ/6nZUN7s08Euw37DGGj7NOAavF3H7JGv796Bh4rEqjXxucLLBao6U4+e48fe1jT6iL5gd7l12ctyjyujh0/NkotrowsMIXzhyTzklUCvaaUKnOvz/8KmnidPTVKSR4qv/LfYBCyxCE3yuF0efntuRqp3vDSsYPl0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724857840; c=relaxed/simple;
-	bh=biJYQeVgYUWBWA89iydoCExb8DsITDohv2E4/d/wiAQ=;
+	s=arc-20240116; t=1724866378; c=relaxed/simple;
+	bh=4MDDdzSEhRjEbEa2n9fIYxr42mIY+eyZfSj6+j+Bu0s=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ohgHZu/ojmgJb0lquwcUvyIVn0IvXZORFMSz4gwxFg2HZfZH6nDNL1sMUIw69xIoY50NmpNzpl47Bhi/yZPppGH+x0TkBRhvqnuheNwH684trhDxW67Fk23g2pKBVsmA1Q+U0yWE1l4K+6omB16QYyY+2jWF/hlCWLWIDJvPhxQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LiGS8aL5; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=PEaL/Pf4PgHqJjzwWdqKFjIiFEJJBqGUuOpOLicxoUU5Ol9afleYtlZSluN88oNHOc4ryVuQSfSWbhfJTdXkaYxIWMtcuwJHhCH8cY1uyH8MTCloy8Lx0cCFdJKCs3pB2AwaAFl7KLN+GRX+qpOh8S5gn/eOJLacWLMSjK5Dk/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O/xcOhor; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LiGS8aL5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4060AC4CEC1;
-	Wed, 28 Aug 2024 15:10:38 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O/xcOhor"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71927C4CEC0;
+	Wed, 28 Aug 2024 17:32:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724857840;
-	bh=biJYQeVgYUWBWA89iydoCExb8DsITDohv2E4/d/wiAQ=;
+	s=k20201202; t=1724866378;
+	bh=4MDDdzSEhRjEbEa2n9fIYxr42mIY+eyZfSj6+j+Bu0s=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LiGS8aL55y9eA9nBTQFsTJDjmoJEJwIBE0mhM5nDmRbGOt9InuYjer0KBYriDsQDe
-	 lz4w2c2cQWAFgzzK/+1t0zoGmRS73ydmcDH4gUdkom3SgHIhRuC9PhVlG0b9cdRzDK
-	 3DTW8IwFZMeume+mQM4lX2sBlSIEKHMFO8KxOdTjuUvVGmFLFV5vlP2xzPu+uhVMop
-	 woV7x0yiTofOfcHjBYm2SRbGMDCzk8gQtUMfpkqM+I5XGVmgGKQFlEWD4Ep86wPFYh
-	 tX05N4zD31uEtNvJEOY4PJK/JA17EeDS1v8ufHlA3OoM0yXwEIEN01pXb4pDeNicTJ
-	 o3EEcCzavdoDw==
-Date: Wed, 28 Aug 2024 16:10:35 +0100
+	b=O/xcOhorFRSv2vHmRagMWmGxh+ScNnb9p5YrzG9/pAmQfUsEg399/CaTU0Z06a3Kd
+	 25gBR9x3tRKON/9TVqn3X9yWKKyvoaXPglSuRX8H/AEzCQfOfamSFXFrUflPvWSiAU
+	 m2RTlwhEQm6GYG4Uu3jWFaCtKcYLtQjATOV2MkQy03IMy9y2Bez9OmpxvhprGtMcQG
+	 PjRlInV3Bc/JK1THjQVmMuPnn6fu1rOqZ3+sGnnl2KRptQU5L4iIPf6dlZynx0jL9x
+	 730E1RPdEdJUvwP5kiHq7t30Mte5uQ7x3NQJjn8eIqgssRzUyqSg0jXamQWsy9Pz/C
+	 BWKufAwkMrGMg==
+Date: Wed, 28 Aug 2024 18:32:48 +0100
 From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/2] KVM: arm64: Control visibility of S1PIE related
- sysregs to userspace
-Message-ID: <41dd2283-d5d8-4171-980d-6385f8b62f68@sirena.org.uk>
-References: <20240821-kvm-arm64-hide-pie-regs-v1-0-08cb3c79cb57@kernel.org>
- <86ed6ixa32.wl-maz@kernel.org>
- <e123ee24-2a0c-4ab3-8dc3-2906bf96f38d@sirena.org.uk>
- <86cym2x7cv.wl-maz@kernel.org>
- <5304749b-04c8-44f4-b4de-b2d0cef61169@sirena.org.uk>
- <86bk1lygm1.wl-maz@kernel.org>
- <ZsdZohZhre-fRmUv@finisterre.sirena.org.uk>
- <861q2gxxjr.wl-maz@kernel.org>
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Florian Weimer <fweimer@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
+	Ross Burton <ross.burton@arm.com>,
+	Yury Khrustalev <yury.khrustalev@arm.com>,
+	Wilco Dijkstra <wilco.dijkstra@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v11 25/39] arm64/signal: Expose GCS state in signal frames
+Message-ID: <4de41478-3bc8-4cb4-a557-3e9402afe858@sirena.org.uk>
+References: <20240822-arm64-gcs-v11-0-41b81947ecb5@kernel.org>
+ <20240822-arm64-gcs-v11-25-41b81947ecb5@kernel.org>
+ <ZshYTyNbveD7WMyJ@arm.com>
+ <ZshjmuYcejbhaSBg@finisterre.sirena.org.uk>
+ <Zsixz6Y9xWxqaQaV@arm.com>
+ <ZskGqU8BSvR01W30@finisterre.sirena.org.uk>
+ <ZsxSKVAOHQq12YfB@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -54,85 +72,75 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="1rSZ6Ar8gPde4zlM"
+	protocol="application/pgp-signature"; boundary="qwAebp9So100JWhv"
 Content-Disposition: inline
-In-Reply-To: <861q2gxxjr.wl-maz@kernel.org>
+In-Reply-To: <ZsxSKVAOHQq12YfB@arm.com>
 X-Cookie: You are number 6!  Who is number one?
 
 
---1rSZ6Ar8gPde4zlM
+--qwAebp9So100JWhv
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-On Thu, Aug 22, 2024 at 06:44:08PM +0100, Marc Zyngier wrote:
-> Mark Brown <broonie@kernel.org> wrote:
+On Mon, Aug 26, 2024 at 01:00:09PM +0300, Catalin Marinas wrote:
+> On Fri, Aug 23, 2024 at 11:01:13PM +0100, Mark Brown wrote:
+> > On Fri, Aug 23, 2024 at 04:59:11PM +0100, Catalin Marinas wrote:
 
-> > I haven't done an audit for fun cases to see how viable things are, for
-> > the EL2 cases I'd just have an encoding based check for EL2 rather than
-> > explicitly enumerating the ID register for each EL2.  That seemed
-> > quicker and less error prone.
+> gcs_preserve_current_state() only a context switch thing. Would it work
+> if we don't touch the thread structure at all in the signal code? We
+> wouldn't deliver a signal in the middle of the switch_to() code. So any
+> value we write in thread struct would be overridden at the next switch.
 
-> Sure, you can do that. Or rather, you can do that *right now*. But
-> that's not what the architecture says (there is no statement saying
-> that Op1==4 for an EL2 register). So the forward-looking way to do it
-> is to match the full encoding of a register against the properties
-> that define its existence.  Anything else is a short lived hack, and I
-> don't care much for them.
+I think so, yes.
 
-Oh, well - I had thought that was a case of me not having found the rule
-rather than the rule not existing given how consistent the scheme is
-currently but yes, if a rule definiteively doesn't exist then I agree
-that making one up in software is a bad idea.
+> If GCS is disabled for a guest, we save the GCSPR_EL0 with the cap size
 
-> > The other cases I'm aware of are more along the lines of features
-> > restricting the values other features/idregs can have (eg, for SME the
-> > information in ID_AA64PFR1_EL1.SME can also be gleaned from
-> > ID_AA64SMFR0_EL1.SMEver).
+s/guest/task/ I guess?
 
-> Well, they don't quite advertise the same thing. If you decode the
-> feature specification, you get:
+> subtracted but there's no cap written. In restore_gcs_context() it
+> doesn't look like we add the cap size back when writing GCSPR_EL0. If
+> GCS is enabled, we do consume the cap and add 8 but otherwise it looks
+> that we keep decreasing GCSPR_EL0. I think we should always subtract the
+> cap size if GCS is enabled. This could could do with some refactoring as
+> I find it hard to follow (not sure exactly how, maybe just comments will
+> do).
 
-> (FEAT_SME <-> (AArch64 ID_AA64PFR1_EL1.SME >= 1))
-> (FEAT_SME2 --> (AArch64 ID_AA64SMFR0_EL1.SMEver >= 1))
-> (FEAT_SME2 --> (AArch64 ID_AA64PFR1_EL1.SME >= 2))
-> (((AArch64 ID_AA64SMFR0_EL1.SMEver >= 1) || (AArch64 ID_AA64PFR1_EL1.SME >= 2)) --> FEAT_SME2)
-> (FEAT_SME2p1 <-> (AArch64 ID_AA64SMFR0_EL1.SMEver >= 2))
+I've changed this so we instead only add the frame for the token if GCS
+is enabled and updated the comment, that way we don't modify GCSPR_EL0
+in cases where GCS is not enabled.
 
-> So SME isn't really advertised in SMEver, SME2 is advertised in both
-> (and it is enough that one advertises SME2 for the feature to be
-> present), and SME2p1 is only advertised in SMEver.
+> I'd also keep a single write to GCSPR_EL0 on the return path but I'm ok
+> with two if we need to cope with GCS being disabled but the GCSPR_EL0
+> still being saved/restored.
 
-> That's what we need to implement. Yes, this part of the architecture
-> is... interesting.
+I think the handling for the various options in the second case mean
+that it's clearer and simpler to write once when we restore the frame
+and once when we consume the token.
 
-Yes, it's not a 1:1 mapping but you can for example identify the
-presence of ZT0 via either SME or SMEVer since either implies FEAT_SME2
-which like you say makes things a bit interesting.
+> Another aspect for gcs_restore_signal(), I think it makes more sense for
+> the cap to be consumed _after_ restoring the sigcontext since this has
+> the actual gcspr_el0 where we stored the cap and represents the original
+> stack. If we'll get an alternative shadow stack, current GCSPR_EL0 on
+> sigreturn points to that alternative shadow stack rather than the
+> original one. That's what confused me when reviewing the patch and I
+> thought the cap goes to the top of the signal stack.
 
-> > For those I'm not sure if visibility checks
-> > are the best approach, if we should audit the registers when starting
-> > the guest to make sure they're self consistent or if we should just pick
-> > the most directly relevant register and rely on userspace to enforce
-> > consistancy.
+I've moved gcs_restore_signal() before the altstack restore which I
+think is what you're looking for here?
 
-> We definitely rely on userspace to enforce consistency. If userspace
-> messes up, it's "garbage in, garbage out".
-
-It's definitely the simpler approach.
-
---1rSZ6Ar8gPde4zlM
+--qwAebp9So100JWhv
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmbPPeoACgkQJNaLcl1U
-h9DVFQf+L7g1Fnx28SJ8CXg4j4VzDz02YsJdysHKApdq4H3hbNdZtKDVB3TmPckY
-hIdozWJbyvZi/4cvIvgakCWA965qujkaoEhsqfrP5GnjjwKB1vx1WiK/3sax2nxl
-PaNPBpfW6aKNLXurN+H/NATYLXFn+bdMaMrPoDF8sc5k7FpyGiIf+ei839MAYdou
-L3/2YsPB9XjmvA4gCAa2xKPGIVdPpVnydjB6vzDukFsZkLivXIDWQgKlrDo5gYDh
-POKHTC9TzURjRbKqlGCGaBbIDEKbfVv8Ghxit7fdh/uEyMY+EZKDNWBfm3W6jngh
-eMKSGmn8bEes97+p5N7MpJd2sDzkTA==
-=8Tbh
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmbPXz8ACgkQJNaLcl1U
+h9AINwgAghxTu8PB4VcQHkYwz1H/qDleYcPMAHplNpZgcLpx59wTJgBZ5QfIwDnV
+v12mJKsZJ3gfnHdZipZjp7EKhKGELQUTGRLICZqBr9S/8SfK3cXC3z6gQEXLxu3W
+Z122sDonqb/vfykIYhrtWeP12Rgm1n7KRplfJrXGx+xfZD2pQRdydES4L5RWtbZU
+coJqFBLlGHRFqsnIUQni4PFl1UCQRVitFHHS4nL+Fs/lGj+rkjM69mkCQjmAHR1d
+/Wivj6fyHPPQj8UCXiCXkk+/KcM64IZqgoTzIdYH+khbjTKKaBC0s06fnqJqU2n1
+d06XGwawJkM0HfQlIcf0XRaB8a7aew==
+=V6Zo
 -----END PGP SIGNATURE-----
 
---1rSZ6Ar8gPde4zlM--
+--qwAebp9So100JWhv--
