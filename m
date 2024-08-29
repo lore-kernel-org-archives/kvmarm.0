@@ -1,152 +1,77 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 531411B3753;
-	Wed, 28 Aug 2024 23:33:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9CB81849
+	for <kvmarm@lists.linux.dev>; Thu, 29 Aug 2024 00:46:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724888001; cv=none; b=eG2L/ILcc0KS/5Vw32krbseolRx0++pmnjhryEySi3a6TMXuEQRStrWScVb7/VC9rIqGUv+MW7ppjfi90hZDsQSVNchhAbvabP0nnv0clj5DxXp3gwhjhVeSqFI6BxXNpJrA/1t7nsTriTOwV8n3oPcaG43HHjGK4ll1DXxTUbk=
+	t=1724892400; cv=none; b=FIXgco9FK/MTCaOl0zhoQTSEZap9XSkVP//sBCzUop+KT25uyZ/Sv08022c9EiGpInbgzrpW3exkma1KDbDyTqQLNrlzpKuxlxi0IYCTpWWV9YNAjJzH6nh+JByH7xfVmPsqrXcvpO3NJImd6t2W/cRLxiuAed4Gtl6G+FvroHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724888001; c=relaxed/simple;
-	bh=W5oN69xYg0RDvkVAq7OBhN9me4eHC7ENTR8wdYTObEg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=grovtN906gy/yMAL30ZdhkDqTHYet6AbROAYoxAZIMqFBDxKQK56B4/qop1VYCKHlpeegr3hLtucRM/YPfFysmlnhZExI0x5GtcINxnxXMOIM4oipf8K3ogRz8msZqE6YRQhKNtTmF05/VpcA+CYoGHgvCrH5zNNiOC45OLoc5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T0sYEOxH; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1724892400; c=relaxed/simple;
+	bh=z4+RNR72EeIbb4HnbiB0RYLg5WLpjNYiY8Vvs1R22Z4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bgfUsfgmHRlMOjCAncrNBxZc+PLHLoKaI9qZBRIuwp59bMM235T7e7dg1xZF5uSGoYPbnu2XsAku6nGRr2qqTeA01P9LDNCMwF6NGPFd6vFfnfYh5ADJPG6Ao7BJ1RBuc9U+6lZs/VdQLngFLisRORer2p93/y3xiq8Qikthyqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YtpU5ywn; arc=none smtp.client-ip=95.215.58.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T0sYEOxH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4D82C4CEC4;
-	Wed, 28 Aug 2024 23:33:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724888001;
-	bh=W5oN69xYg0RDvkVAq7OBhN9me4eHC7ENTR8wdYTObEg=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=T0sYEOxHjFOttsTVvHr8nAQOQ8BUsl9RMPHqa31RJTgSFSQ3TIGLapA1WgRy3jLo0
-	 JeODpovNuVdL80WVrYGVso4DyrRRO1DhF7kWisH1cqnFSCydDl13yVhb0nu6HT2C9z
-	 pD4UgF4Dwo5Y9nuYKXJogdufMhh4W7BZO62+McXl5vR8L6zMt1WUITjQLRzWcA7u25
-	 SPgM+2tb0JJ+WBn06AztAPJ7FrM5sNRzveVcG0IubW9dGdUc/PlsWeypUq2fHpf0Gp
-	 pQfD/DxG1p/Tg1tfKVfxa1CicV/MXc1Phv0Iyv5PVg3YGY/+kSdolqCbHw0513h6ea
-	 haeI2WZc6MlWg==
-From: Mark Brown <broonie@kernel.org>
-Date: Thu, 29 Aug 2024 00:27:55 +0100
-Subject: [PATCH v12 39/39] KVM: selftests: arm64: Add GCS registers to
- get-reg-list
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YtpU5ywn"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1724892396;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=N+MlVNE4Fogg6EjlLW7c731gocx3WBQa/S4313NXfqA=;
+	b=YtpU5ywnZhy1n5QyWJrDnN/FLAI2bam/UhAp1VET0AYTg0HQrrpHp1J2l9kqJ2PrRVjXRa
+	ttDC8b3QHQIqNnLMiCBgoQpn19Zp2ElICV5+Vq4bUKoDXYYlqr/lgJuVdsXmxRx/RamDSV
+	/X66rro46nqZV0cGpounYmx6HytsWfU=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Mark Brown <broonie@kernel.org>
+Subject: [PATCH] KVM: arm64: selftests: Cope with lack of GICv3 in set_id_regs
+Date: Thu, 29 Aug 2024 00:46:22 +0000
+Message-ID: <20240829004622.3058639-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240829-arm64-gcs-v12-39-42fec947436a@kernel.org>
-References: <20240829-arm64-gcs-v12-0-42fec947436a@kernel.org>
-In-Reply-To: <20240829-arm64-gcs-v12-0-42fec947436a@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>, 
- Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
- Andrew Morton <akpm@linux-foundation.org>, Marc Zyngier <maz@kernel.org>, 
- Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, Arnd Bergmann <arnd@arndb.de>, 
- Oleg Nesterov <oleg@redhat.com>, Eric Biederman <ebiederm@xmission.com>, 
- Shuah Khan <shuah@kernel.org>, 
- "Rick P. Edgecombe" <rick.p.edgecombe@intel.com>, 
- Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>, 
- Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>
-Cc: "H.J. Lu" <hjl.tools@gmail.com>, 
- Paul Walmsley <paul.walmsley@sifive.com>, 
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
- Florian Weimer <fweimer@redhat.com>, Christian Brauner <brauner@kernel.org>, 
- Thiago Jung Bauermann <thiago.bauermann@linaro.org>, 
- Ross Burton <ross.burton@arm.com>, 
- Yury Khrustalev <yury.khrustalev@arm.com>, 
- Wilco Dijkstra <wilco.dijkstra@arm.com>, 
- linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
- kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org, 
- linux-arch@vger.kernel.org, linux-mm@kvack.org, 
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-riscv@lists.infradead.org, Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.15-dev-37811
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2418; i=broonie@kernel.org;
- h=from:subject:message-id; bh=W5oN69xYg0RDvkVAq7OBhN9me4eHC7ENTR8wdYTObEg=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBmz7KW23WvfTKbuTefeFx8re+CMzCUi4CC3I85X0Hw
- F+Tp6t6JATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZs+ylgAKCRAk1otyXVSH0AynB/
- 4zJS/fNzXaknnr7WJBxyXZVPJNEDNBY8rJlOhiRC7JR4N1wpHshMVJS7B5HyeOhJWMAuD3mR2CrV1d
- r4v28SEGzfR4d+ILf+hgZkeIgrDji+0MV4VUdT+tsjQyzfTjj8tJ3F2CqTPAP3N3Uny4OsuqLSWzBp
- hlN40ZxT2iqDEbKvGfaT1sz62nwxmh3r34dtmQBwKzh0I3Y2nYIK5zGYUsoMINt5Gtov3e79ziMDIT
- AOI9DcGFA7X0dQUOWVXPLJxkZnXLGhBCT60jSVl0d8qabxjn+iAigD30fNz+DZi1Y79Ar5nZoztoG7
- adadSZsjbnTs20zCvlACDXAlp/hVa5
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-GCS adds new registers GCSCR_EL1, GCSCRE0_EL1, GCSPR_EL1 and GCSPR_EL0. Add
-these to those validated by get-reg-list.
+Broonie reports that the set_id_regs test is failing as of commit
+5cb57a1aff75 ("KVM: arm64: Zero ID_AA64PFR0_EL1.GIC when no GICv3 is
+presented to the guest"). The test does not anticipate the 'late' ID
+register fixup where KVM clobbers the GIC field in absence of GICv3.
 
-Reviewed-by: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
-Signed-off-by: Mark Brown <broonie@kernel.org>
+While the field technically has FTR_LOWER_SAFE behavior, fix the issue
+by setting it to an exact value of 0, matching the effect of the 'late'
+fixup.
+
+Reported-by: Mark Brown <broonie@kernel.org>
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- tools/testing/selftests/kvm/aarch64/get-reg-list.c | 28 ++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+ tools/testing/selftests/kvm/aarch64/set_id_regs.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-index 709d7d721760..9785f41e6042 100644
---- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-+++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-@@ -29,6 +29,24 @@ static struct feature_id_reg feat_id_regs[] = {
- 		0,
- 		1
- 	},
-+	{
-+		ARM64_SYS_REG(3, 0, 2, 5, 0),	/* GCSCR_EL1 */
-+		ARM64_SYS_REG(3, 0, 0, 4, 1),	/* ID_AA64PFR1_EL1 */
-+		44,
-+		1
-+	},
-+	{
-+		ARM64_SYS_REG(3, 0, 2, 5, 1),	/* GCSPR_EL1 */
-+		ARM64_SYS_REG(3, 0, 0, 4, 1),	/* ID_AA64PFR1_EL1 */
-+		44,
-+		1
-+	},
-+	{
-+		ARM64_SYS_REG(3, 0, 2, 5, 2),	/* GCSCRE0_EL1 */
-+		ARM64_SYS_REG(3, 0, 0, 4, 1),	/* ID_AA64PFR1_EL1 */
-+		44,
-+		1
-+	},
- 	{
- 		ARM64_SYS_REG(3, 0, 10, 2, 2),	/* PIRE0_EL1 */
- 		ARM64_SYS_REG(3, 0, 0, 7, 3),	/* ID_AA64MMFR3_EL1 */
-@@ -40,6 +58,12 @@ static struct feature_id_reg feat_id_regs[] = {
- 		ARM64_SYS_REG(3, 0, 0, 7, 3),	/* ID_AA64MMFR3_EL1 */
- 		4,
- 		1
-+	},
-+	{
-+		ARM64_SYS_REG(3, 3, 2, 5, 1),	/* GCSPR_EL0 */
-+		ARM64_SYS_REG(3, 0, 0, 4, 1),	/* ID_AA64PFR1_EL1 */
-+		44,
-+		1
- 	}
- };
- 
-@@ -460,6 +484,9 @@ static __u64 base_regs[] = {
- 	ARM64_SYS_REG(3, 0, 2, 0, 1),	/* TTBR1_EL1 */
- 	ARM64_SYS_REG(3, 0, 2, 0, 2),	/* TCR_EL1 */
- 	ARM64_SYS_REG(3, 0, 2, 0, 3),	/* TCR2_EL1 */
-+	ARM64_SYS_REG(3, 0, 2, 5, 0),	/* GCSCR_EL1 */
-+	ARM64_SYS_REG(3, 0, 2, 5, 1),	/* GCSPR_EL1 */
-+	ARM64_SYS_REG(3, 0, 2, 5, 2),	/* GCSCRE0_EL1 */
- 	ARM64_SYS_REG(3, 0, 5, 1, 0),	/* AFSR0_EL1 */
- 	ARM64_SYS_REG(3, 0, 5, 1, 1),	/* AFSR1_EL1 */
- 	ARM64_SYS_REG(3, 0, 5, 2, 0),	/* ESR_EL1 */
-@@ -475,6 +502,7 @@ static __u64 base_regs[] = {
- 	ARM64_SYS_REG(3, 0, 13, 0, 4),	/* TPIDR_EL1 */
- 	ARM64_SYS_REG(3, 0, 14, 1, 0),	/* CNTKCTL_EL1 */
- 	ARM64_SYS_REG(3, 2, 0, 0, 0),	/* CSSELR_EL1 */
-+	ARM64_SYS_REG(3, 3, 2, 5, 1),	/* GCSPR_EL0 */
- 	ARM64_SYS_REG(3, 3, 13, 0, 2),	/* TPIDR_EL0 */
- 	ARM64_SYS_REG(3, 3, 13, 0, 3),	/* TPIDRRO_EL0 */
- 	ARM64_SYS_REG(3, 3, 14, 0, 1),	/* CNTPCT_EL0 */
-
+diff --git a/tools/testing/selftests/kvm/aarch64/set_id_regs.c b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
+index d20981663831..2a3fe7914b72 100644
+--- a/tools/testing/selftests/kvm/aarch64/set_id_regs.c
++++ b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
+@@ -126,6 +126,7 @@ static const struct reg_ftr_bits ftr_id_aa64pfr0_el1[] = {
+ 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, CSV2, 0),
+ 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, DIT, 0),
+ 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, SEL2, 0),
++	REG_FTR_BITS(FTR_EXACT, ID_AA64PFR0_EL1, GIC, 0),
+ 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, EL3, 0),
+ 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, EL2, 0),
+ 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, EL1, 0),
 -- 
-2.39.2
+2.46.0.295.g3b9ea8a38a-goog
 
