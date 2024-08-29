@@ -1,97 +1,186 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AAA41B373E;
-	Thu, 29 Aug 2024 17:55:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 837421B1D41;
+	Thu, 29 Aug 2024 20:38:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724954116; cv=none; b=cIjOFwRL9p5jb7nZlJ8NmoEsys3g6QlO4K2rzP4z6BNbcIURAV1BZBA1zezrb8mXCCmiIq9eJm6oSkYchqwKi8RESAzaAG1Fjy/pKYXkFpz2RLIZngvO7xAKSTeJe8kDHZAlmKNXDfO3VTxDZ7y5F+9dtiTeyiN6hayfZU6bpAs=
+	t=1724963898; cv=none; b=BjlzDdA/WKx+LXldThH8q4blG3tZX3TGZ5+V1DdIsFozNrKtcHev/PlEn09x+bWf9BPncjjA7XjhXJLmAn1PZKMiSMval2trr7FS6hURZxfNbtXyBYDSqWjUcG7abGzEDgWyYz3zSwFjazqHrfdSyGIdveFaqFqgYTyjV4waMq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724954116; c=relaxed/simple;
-	bh=z1cQe5fZ3eIjl/LjO580rRqXvmPg9r6zi9VQ/SQ8gPw=;
+	s=arc-20240116; t=1724963898; c=relaxed/simple;
+	bh=tscwRgI2saPDR7x1unDsFBI0xOp0fMmY1QDhyt+9PHk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nQSWG1xWqyFrw+KmjQA0BmVrLXO36Zo+/AEJTZrjL93Q7eSJpmV+BEsKSp2lRex7EdZ1nj8wyKO5djCQlUFWz/HUaq+FnR2aHk5Tmzepq81//zUIEI2UctKLk8bQiVONpyxM/XxMIJuUEGHKzf5DA8rgYfl6ODngbCjzdnmvFXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p2Pb7Pr9; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ss3sJVP4SYqLwK/aO06zGgpYIXDBCRWJUcU3tts3v05dtuccu3W6lTIpsrch2enAl6mrU9UtMpENgGxBD6dV8OKwCI9J1K4Li6P1ejHAk6A2FqmyCrkjXlPJkRi8wCSod51A5CUO7i2d4ChCx7uet/5Cf+TAP4lvEAe7OJqstHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=anW59re8; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p2Pb7Pr9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6830DC4CEC2;
-	Thu, 29 Aug 2024 17:55:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724954115;
-	bh=z1cQe5fZ3eIjl/LjO580rRqXvmPg9r6zi9VQ/SQ8gPw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=p2Pb7Pr9Idi3U+1dSAJy5ZGpjTgQK2XuuocvVWY2B529zQ97Vq4V8vzQJwQXOMTcW
-	 gQBJjVRys2e1pQmbBMo9uHpVYFfhiRg2g82986bh9kxyHQZwjtz7pAhW9dY7Z1mDZf
-	 E4G2QpyrU10N9vbMIvp6oxvvHr9+Z7L6OFXjpWynLK0rw0YVWMyogEt3CQr3A7DYm4
-	 dXg5jdhDQWvAQZaxgmmLVH4iJyy2tlrN5uUjSnLqah7tWxtXXcT9tZ3HE3TqXD/BOj
-	 bhRP49xJaAqI6sdcPP3UebPpiOfr7sgNAUUF1R4b0E+6TtsAmsJKBusYZ2JTdZ1aLh
-	 9c8JFmE/294uw==
-Date: Thu, 29 Aug 2024 18:55:07 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, nd@arm.com,
-	akpm@linux-foundation.org, aneesh.kumar@kernel.org,
-	aneesh.kumar@linux.ibm.com, anshuman.khandual@arm.com, bp@alien8.de,
-	catalin.marinas@arm.com, christophe.leroy@csgroup.eu,
-	dave.hansen@linux.intel.com, hpa@zytor.com,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
-	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
-	oliver.upton@linux.dev, shuah@kernel.org, skhan@linuxfoundation.org,
-	szabolcs.nagy@arm.com, tglx@linutronix.de, will@kernel.org,
-	x86@kernel.org, kvmarm@lists.linux.dev,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v5 16/30] arm64: handle PKEY/POE faults
-Message-ID: <40600b75-68eb-421a-a122-256bd20afb89@sirena.org.uk>
-References: <20240822151113.1479789-1-joey.gouly@arm.com>
- <20240822151113.1479789-17-joey.gouly@arm.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="anW59re8"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1724963897; x=1756499897;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=tscwRgI2saPDR7x1unDsFBI0xOp0fMmY1QDhyt+9PHk=;
+  b=anW59re8g7E9kAelpNk+BBP1JV1PEOrPDKd7lZU3vM+SOIaCuXobj0e7
+   uP8jDX1W910+zN1waibuYTbWL94NJXYfhUx2AC9ZLDFiUSrgdhMxcwleh
+   OUEOtML7MWvmxWzN/kTUyo65swMO2bpGzo61/drgiQ/kPWsVZjOSyz2jV
+   RIylGzGYX7dHLL5pkZqeCHM9cIzq4NMLT1Lq1EiwtFMExxfQwx/P2Bse4
+   i3a5xxZANsNKbKJtTLaOEFDOOKEf1GGNI6f/lyXCoFIQCUAf4iwRPCoW8
+   GfNpg9+UU3sctCg7zK6YcjZCv0EM+Dipba01RU1n3VXzfgtzA+iajeMPQ
+   w==;
+X-CSE-ConnectionGUID: NcomHs4hTri3LMAygrhyWQ==
+X-CSE-MsgGUID: HsXmehPIQ4i+cTsWZifFog==
+X-IronPort-AV: E=McAfee;i="6700,10204,11179"; a="34200572"
+X-IronPort-AV: E=Sophos;i="6.10,186,1719903600"; 
+   d="scan'208";a="34200572"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2024 13:37:41 -0700
+X-CSE-ConnectionGUID: +2I+PKpfTEWO7ZhOV/mdjw==
+X-CSE-MsgGUID: 9jFLsk+2R9icUo/uf7t0Ig==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,186,1719903600"; 
+   d="scan'208";a="63325399"
+Received: from lkp-server01.sh.intel.com (HELO 9c6b1c7d3b50) ([10.239.97.150])
+  by fmviesa006.fm.intel.com with ESMTP; 29 Aug 2024 13:37:38 -0700
+Received: from kbuild by 9c6b1c7d3b50 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sjltg-0000iM-02;
+	Thu, 29 Aug 2024 20:37:36 +0000
+Date: Fri, 30 Aug 2024 04:37:35 +0800
+From: kernel test robot <lkp@intel.com>
+To: Vegard Nossum <vegard.nossum@oracle.com>,
+	Masahiro Yamada <masahiroy@kernel.org>
+Cc: oe-kbuild-all@lists.linux.dev, linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-omap@vger.kernel.org, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, linux-um@lists.infradead.org,
+	bpf@vger.kernel.org, llvm@lists.linux.dev,
+	Vegard Nossum <vegard.nossum@oracle.com>
+Subject: Re: [PATCH] kbuild: use objcopy to generate asm-offsets
+Message-ID: <202408300438.xObK98m5-lkp@intel.com>
+References: <20240828083605.3093701-1-vegard.nossum@oracle.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="YUq+oyo8aHhnCJ3l"
-Content-Disposition: inline
-In-Reply-To: <20240822151113.1479789-17-joey.gouly@arm.com>
-X-Cookie: Go 'way!  You're bothering me!
-
-
---YUq+oyo8aHhnCJ3l
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20240828083605.3093701-1-vegard.nossum@oracle.com>
 
-On Thu, Aug 22, 2024 at 04:10:59PM +0100, Joey Gouly wrote:
+Hi Vegard,
 
-> +static bool fault_from_pkey(unsigned long esr, struct vm_area_struct *vma,
-> +			unsigned int mm_flags)
-> +{
-> +	unsigned long iss2 = ESR_ELx_ISS2(esr);
-> +
-> +	if (!system_supports_poe())
-> +		return false;
-> +
-> +	if (iss2 & ESR_ELx_Overlay)
-> +		return true;
+kernel test robot noticed the following build warnings:
 
-Does this need an is_data_abort() && is_instruction_abort() check?
-Overlay doesn't appear to be defined for all exception types and it
-wasn't clear enough to me that the callers have done this check.
+[auto build test WARNING on masahiroy-kbuild/for-next]
+[also build test WARNING on masahiroy-kbuild/fixes soc/for-next kvmarm/next kvm/queue uml/next krzk-mem-ctrl/for-next bpf-next/master bpf/master linus/master v6.11-rc5 next-20240829]
+[cannot apply to tmlind-omap/for-next kvm/linux-next uml/fixes]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
---YUq+oyo8aHhnCJ3l
-Content-Type: application/pgp-signature; name="signature.asc"
+url:    https://github.com/intel-lab-lkp/linux/commits/Vegard-Nossum/kbuild-use-objcopy-to-generate-asm-offsets/20240828-163854
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git for-next
+patch link:    https://lore.kernel.org/r/20240828083605.3093701-1-vegard.nossum%40oracle.com
+patch subject: [PATCH] kbuild: use objcopy to generate asm-offsets
+config: mips-loongson3_defconfig (https://download.01.org/0day-ci/archive/20240830/202408300438.xObK98m5-lkp@intel.com/config)
+compiler: mips64el-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240830/202408300438.xObK98m5-lkp@intel.com/reproduce)
 
------BEGIN PGP SIGNATURE-----
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202408300438.xObK98m5-lkp@intel.com/
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmbQtfoACgkQJNaLcl1U
-h9DlUgf/dqGRzK2dLE7+N4y+4LBWAGW7tClTB7FD0kyv5R02H8XfYHXRznQNP3xw
-e9h9X7WvrF+tHVvKaRLrgCF1qKwIwIpd/i5py+jWxSVZLIg1Al5vjZp6yGIRTiw5
-Gn7Ts60w/kNQNKizo8sr12ekIA8bn+EYGm7YznCxbsQ0Fo6Wx5ZGpcAsIObQVg/J
-bGFjL4IKMlaC8ZgP80PJW+sa3iAhlAK0RuDj1/BiVDfsLQHlMmD6M3Mpn4MTDB4A
-l60V2J4QW1eLkxWHCaeLE+1vBVHMCYgY4orFoA9WAbVFM0UDnI7EKgS22lGK/kxn
-L2I9TP72B0wTkDL1Ft+34Ka8AV+2Sw==
-=72Y0
------END PGP SIGNATURE-----
+All warnings (new ones prefixed by >>):
 
---YUq+oyo8aHhnCJ3l--
+   mips64el-linux-objcopy: /dev/stdout[.data.kbuild]: Illegal seek
+   In file included from include/linux/mm_types.h:18,
+                    from include/linux/uio.h:10,
+                    from include/linux/socket.h:8,
+                    from include/linux/compat.h:15,
+                    from arch/mips/kernel/asm-offsets.c:12:
+   include/linux/page-flags-layout.h:15:5: warning: "MAX_NR_ZONES" is not defined, evaluates to 0 [-Wundef]
+      15 | #if MAX_NR_ZONES < 2
+         |     ^~~~~~~~~~~~
+   include/linux/page-flags-layout.h:58:19: warning: "LRU_GEN_WIDTH" is not defined, evaluates to 0 [-Wundef]
+      58 | #if ZONES_WIDTH + LRU_GEN_WIDTH + SECTIONS_WIDTH + NODES_SHIFT \
+         |                   ^~~~~~~~~~~~~
+   include/linux/page-flags-layout.h:59:28: warning: "NR_PAGEFLAGS" is not defined, evaluates to 0 [-Wundef]
+      59 |         <= BITS_PER_LONG - NR_PAGEFLAGS
+         |                            ^~~~~~~~~~~~
+   include/linux/page-flags-layout.h:93:19: warning: "LRU_GEN_WIDTH" is not defined, evaluates to 0 [-Wundef]
+      93 | #if ZONES_WIDTH + LRU_GEN_WIDTH + SECTIONS_WIDTH + NODES_WIDTH + \
+         |                   ^~~~~~~~~~~~~
+   include/linux/page-flags-layout.h:94:64: warning: "NR_PAGEFLAGS" is not defined, evaluates to 0 [-Wundef]
+      94 |         KASAN_TAG_WIDTH + LAST_CPUPID_SHIFT <= BITS_PER_LONG - NR_PAGEFLAGS
+         |                                                                ^~~~~~~~~~~~
+   include/linux/page-flags-layout.h:104:19: warning: "LRU_GEN_WIDTH" is not defined, evaluates to 0 [-Wundef]
+     104 | #if ZONES_WIDTH + LRU_GEN_WIDTH + SECTIONS_WIDTH + NODES_WIDTH + \
+         |                   ^~~~~~~~~~~~~
+   include/linux/page-flags-layout.h:105:63: warning: "NR_PAGEFLAGS" is not defined, evaluates to 0 [-Wundef]
+     105 |         KASAN_TAG_WIDTH + LAST_CPUPID_WIDTH > BITS_PER_LONG - NR_PAGEFLAGS
+         |                                                               ^~~~~~~~~~~~
+   In file included from include/linux/mm_types.h:5:
+   include/linux/mm_types_task.h:22:34: warning: "SPINLOCK_SIZE" is not defined, evaluates to 0 [-Wundef]
+      22 | #define ALLOC_SPLIT_PTLOCKS     (SPINLOCK_SIZE > BITS_PER_LONG/8)
+         |                                  ^~~~~~~~~~~~~
+   include/linux/mm_types.h:478:5: note: in expansion of macro 'ALLOC_SPLIT_PTLOCKS'
+     478 | #if ALLOC_SPLIT_PTLOCKS
+         |     ^~~~~~~~~~~~~~~~~~~
+   In file included from include/linux/dcache.h:14,
+                    from include/linux/fs.h:8,
+                    from include/linux/compat.h:17:
+>> include/linux/lockref.h:23:36: warning: "SPINLOCK_SIZE" is not defined, evaluates to 0 [-Wundef]
+      23 |          IS_ENABLED(CONFIG_SMP) && SPINLOCK_SIZE <= 4)
+         |                                    ^~~~~~~~~~~~~
+   include/linux/lockref.h:27:5: note: in expansion of macro 'USE_CMPXCHG_LOCKREF'
+      27 | #if USE_CMPXCHG_LOCKREF
+         |     ^~~~~~~~~~~~~~~~~~~
+   In file included from include/linux/gfp.h:7,
+                    from include/linux/xarray.h:16,
+                    from include/linux/list_lru.h:14,
+                    from include/linux/fs.h:13:
+   include/linux/mmzone.h:842:29: error: 'MAX_NR_ZONES' undeclared here (not in a function); did you mean 'MAX_NR_GENS'?
+     842 |         long lowmem_reserve[MAX_NR_ZONES];
+         |                             ^~~~~~~~~~~~
+         |                             MAX_NR_GENS
+   include/linux/mm_types_task.h:22:34: warning: "SPINLOCK_SIZE" is not defined, evaluates to 0 [-Wundef]
+      22 | #define ALLOC_SPLIT_PTLOCKS     (SPINLOCK_SIZE > BITS_PER_LONG/8)
+         |                                  ^~~~~~~~~~~~~
+   include/linux/mm.h:2889:5: note: in expansion of macro 'ALLOC_SPLIT_PTLOCKS'
+    2889 | #if ALLOC_SPLIT_PTLOCKS
+         |     ^~~~~~~~~~~~~~~~~~~
+   In file included from include/linux/swap.h:9,
+                    from include/linux/suspend.h:5,
+                    from arch/mips/kernel/asm-offsets.c:17:
+   include/linux/memcontrol.h: In function 'mem_cgroup_get_zone_lru_size':
+>> include/linux/memcontrol.h:914:31: warning: parameter 'lru' set but not used [-Wunused-but-set-parameter]
+     914 |                 enum lru_list lru, int zone_idx)
+         |                 ~~~~~~~~~~~~~~^~~
+>> include/linux/memcontrol.h:914:40: warning: parameter 'zone_idx' set but not used [-Wunused-but-set-parameter]
+     914 |                 enum lru_list lru, int zone_idx)
+         |                                    ~~~~^~~~~~~~
+   make[3]: *** [scripts/Makefile.build:244: arch/mips/kernel/asm-offsets.o] Error 1
+   make[3]: Target 'missing-syscalls' not remade because of errors.
+   make[2]: *** [arch/mips/Makefile:432: archprepare] Error 2
+   make[2]: Target 'prepare' not remade because of errors.
+   make[1]: *** [Makefile:224: __sub-make] Error 2
+   make[1]: Target 'prepare' not remade because of errors.
+   make: *** [Makefile:224: __sub-make] Error 2
+   make: Target 'prepare' not remade because of errors.
+
+
+vim +/SPINLOCK_SIZE +23 include/linux/lockref.h
+
+57f4257eae33e0 Peter Zijlstra     2013-11-14  20  
+57f4257eae33e0 Peter Zijlstra     2013-11-14  21  #define USE_CMPXCHG_LOCKREF \
+57f4257eae33e0 Peter Zijlstra     2013-11-14  22  	(IS_ENABLED(CONFIG_ARCH_USE_CMPXCHG_LOCKREF) && \
+597d795a2a786d Kirill A. Shutemov 2013-12-20 @23  	 IS_ENABLED(CONFIG_SMP) && SPINLOCK_SIZE <= 4)
+0f8f2aaaab0b0f Waiman Long        2013-08-28  24  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
