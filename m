@@ -1,67 +1,97 @@
-Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 324141B29BB
-	for <kvmarm@lists.linux.dev>; Thu, 29 Aug 2024 16:45:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AAA41B373E;
+	Thu, 29 Aug 2024 17:55:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724949933; cv=none; b=rSIoDqA/hRkFczerWQhLEE0ZmVCr5uVABdiEmDMxC8W0oOfwaL2CeHHyt3s+fVeA86rPzVZMTlqAPPk3gdiWJktT5Pv/RmLH8sF6AmFzVtWxqAj8qRT1E5AtJ8wJitO/jeM7sb5A6Bi4YhFxetyLHA1yD/ApwCmTsg4huC9SdyE=
+	t=1724954116; cv=none; b=cIjOFwRL9p5jb7nZlJ8NmoEsys3g6QlO4K2rzP4z6BNbcIURAV1BZBA1zezrb8mXCCmiIq9eJm6oSkYchqwKi8RESAzaAG1Fjy/pKYXkFpz2RLIZngvO7xAKSTeJe8kDHZAlmKNXDfO3VTxDZ7y5F+9dtiTeyiN6hayfZU6bpAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724949933; c=relaxed/simple;
-	bh=+6mS2vbhHOhMkVmi1xbKVk6cl//S8dAQDwQuzAvpXWM=;
+	s=arc-20240116; t=1724954116; c=relaxed/simple;
+	bh=z1cQe5fZ3eIjl/LjO580rRqXvmPg9r6zi9VQ/SQ8gPw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AzfsW0x7A09AiWREFpsBTwJHOdmGzSGthnraLqh7prbD5SAjvKzOgUBHJQYkcRjCkZBpuKCeQOEfiu8qx+o62THXQSFpCAg786bW8FKhZDXjPVF1Ai7LM4pAnrONVZL8L29/RJCJFZ9XPhFFZGzk1nhFfLRzf2rgPmYQLgIHPeU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=iVVQIeiu; arc=none smtp.client-ip=95.215.58.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	 Content-Type:Content-Disposition:In-Reply-To; b=nQSWG1xWqyFrw+KmjQA0BmVrLXO36Zo+/AEJTZrjL93Q7eSJpmV+BEsKSp2lRex7EdZ1nj8wyKO5djCQlUFWz/HUaq+FnR2aHk5Tmzepq81//zUIEI2UctKLk8bQiVONpyxM/XxMIJuUEGHKzf5DA8rgYfl6ODngbCjzdnmvFXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p2Pb7Pr9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="iVVQIeiu"
-Date: Thu, 29 Aug 2024 09:45:23 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1724949929;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+F9Kr23D/wZKmjC82Pb8H8g1wt5p4xoSDM7i/o/YNcs=;
-	b=iVVQIeiu8d+U5nDH7ICdB6QvVwq9h3VN+9xqOywv6Mb3yD5MvlhqRGq79wzRz2/P4c/Czx
-	Ws0SnSlSR1Y7rxIstYXA+L9TThZRFYERT12J/Th/SsRIxmqZS7H9TjCv61zgX3x58Yse5L
-	pi9exnPGPXVkw/gc03O9ckt20tyPkn0=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Mark Brown <broonie@kernel.org>
-Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH] KVM: arm64: selftests: Cope with lack of GICv3 in
- set_id_regs
-Message-ID: <ZtClo9aoI50CukXz@linux.dev>
-References: <20240829004622.3058639-1-oliver.upton@linux.dev>
- <f399b6b3-8ce4-49b0-85c8-ba9bfb7117ee@sirena.org.uk>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p2Pb7Pr9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6830DC4CEC2;
+	Thu, 29 Aug 2024 17:55:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724954115;
+	bh=z1cQe5fZ3eIjl/LjO580rRqXvmPg9r6zi9VQ/SQ8gPw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=p2Pb7Pr9Idi3U+1dSAJy5ZGpjTgQK2XuuocvVWY2B529zQ97Vq4V8vzQJwQXOMTcW
+	 gQBJjVRys2e1pQmbBMo9uHpVYFfhiRg2g82986bh9kxyHQZwjtz7pAhW9dY7Z1mDZf
+	 E4G2QpyrU10N9vbMIvp6oxvvHr9+Z7L6OFXjpWynLK0rw0YVWMyogEt3CQr3A7DYm4
+	 dXg5jdhDQWvAQZaxgmmLVH4iJyy2tlrN5uUjSnLqah7tWxtXXcT9tZ3HE3TqXD/BOj
+	 bhRP49xJaAqI6sdcPP3UebPpiOfr7sgNAUUF1R4b0E+6TtsAmsJKBusYZ2JTdZ1aLh
+	 9c8JFmE/294uw==
+Date: Thu, 29 Aug 2024 18:55:07 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, nd@arm.com,
+	akpm@linux-foundation.org, aneesh.kumar@kernel.org,
+	aneesh.kumar@linux.ibm.com, anshuman.khandual@arm.com, bp@alien8.de,
+	catalin.marinas@arm.com, christophe.leroy@csgroup.eu,
+	dave.hansen@linux.intel.com, hpa@zytor.com,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
+	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
+	oliver.upton@linux.dev, shuah@kernel.org, skhan@linuxfoundation.org,
+	szabolcs.nagy@arm.com, tglx@linutronix.de, will@kernel.org,
+	x86@kernel.org, kvmarm@lists.linux.dev,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v5 16/30] arm64: handle PKEY/POE faults
+Message-ID: <40600b75-68eb-421a-a122-256bd20afb89@sirena.org.uk>
+References: <20240822151113.1479789-1-joey.gouly@arm.com>
+ <20240822151113.1479789-17-joey.gouly@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="YUq+oyo8aHhnCJ3l"
+Content-Disposition: inline
+In-Reply-To: <20240822151113.1479789-17-joey.gouly@arm.com>
+X-Cookie: Go 'way!  You're bothering me!
+
+
+--YUq+oyo8aHhnCJ3l
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f399b6b3-8ce4-49b0-85c8-ba9bfb7117ee@sirena.org.uk>
-X-Migadu-Flow: FLOW_OUT
 
-On Thu, Aug 29, 2024 at 02:12:09PM +0100, Mark Brown wrote:
-> On Thu, Aug 29, 2024 at 12:46:22AM +0000, Oliver Upton wrote:
-> > Broonie reports that the set_id_regs test is failing as of commit
-> > 5cb57a1aff75 ("KVM: arm64: Zero ID_AA64PFR0_EL1.GIC when no GICv3 is
-> > presented to the guest"). The test does not anticipate the 'late' ID
-> > register fixup where KVM clobbers the GIC field in absence of GICv3.
-> 
-> A bit late but JFTR:
-> 
-> Tested-by: Mark Brown <broonie@kernel.org>
+On Thu, Aug 22, 2024 at 04:10:59PM +0100, Joey Gouly wrote:
 
-Great, thanks for the report + confirming the fix!
+> +static bool fault_from_pkey(unsigned long esr, struct vm_area_struct *vma,
+> +			unsigned int mm_flags)
+> +{
+> +	unsigned long iss2 = ESR_ELx_ISS2(esr);
+> +
+> +	if (!system_supports_poe())
+> +		return false;
+> +
+> +	if (iss2 & ESR_ELx_Overlay)
+> +		return true;
 
--- 
-Thanks,
-Oliver
+Does this need an is_data_abort() && is_instruction_abort() check?
+Overlay doesn't appear to be defined for all exception types and it
+wasn't clear enough to me that the callers have done this check.
+
+--YUq+oyo8aHhnCJ3l
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmbQtfoACgkQJNaLcl1U
+h9DlUgf/dqGRzK2dLE7+N4y+4LBWAGW7tClTB7FD0kyv5R02H8XfYHXRznQNP3xw
+e9h9X7WvrF+tHVvKaRLrgCF1qKwIwIpd/i5py+jWxSVZLIg1Al5vjZp6yGIRTiw5
+Gn7Ts60w/kNQNKizo8sr12ekIA8bn+EYGm7YznCxbsQ0Fo6Wx5ZGpcAsIObQVg/J
+bGFjL4IKMlaC8ZgP80PJW+sa3iAhlAK0RuDj1/BiVDfsLQHlMmD6M3Mpn4MTDB4A
+l60V2J4QW1eLkxWHCaeLE+1vBVHMCYgY4orFoA9WAbVFM0UDnI7EKgS22lGK/kxn
+L2I9TP72B0wTkDL1Ft+34Ka8AV+2Sw==
+=72Y0
+-----END PGP SIGNATURE-----
+
+--YUq+oyo8aHhnCJ3l--
