@@ -1,77 +1,76 @@
-Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
+Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9CB81849
-	for <kvmarm@lists.linux.dev>; Thu, 29 Aug 2024 00:46:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 919C323A9
+	for <kvmarm@lists.linux.dev>; Thu, 29 Aug 2024 00:48:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724892400; cv=none; b=FIXgco9FK/MTCaOl0zhoQTSEZap9XSkVP//sBCzUop+KT25uyZ/Sv08022c9EiGpInbgzrpW3exkma1KDbDyTqQLNrlzpKuxlxi0IYCTpWWV9YNAjJzH6nh+JByH7xfVmPsqrXcvpO3NJImd6t2W/cRLxiuAed4Gtl6G+FvroHE=
+	t=1724892496; cv=none; b=rGFs/i7Ct8s/GoyzwwdeQzxUotqDQoZIZdwRdxdVGpqMU7C5oF3CvS5cX4ArdvO64c9qvzdq6upYj0QadTemYSw62v+YqEq1NM5UXgjnLoZ1hYzLnC+NJv/flS+Ylq1KiWD4S7LVxjqz/S/u6NMBwQPxdMdGuXXeDJzgIf02hME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724892400; c=relaxed/simple;
-	bh=z4+RNR72EeIbb4HnbiB0RYLg5WLpjNYiY8Vvs1R22Z4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bgfUsfgmHRlMOjCAncrNBxZc+PLHLoKaI9qZBRIuwp59bMM235T7e7dg1xZF5uSGoYPbnu2XsAku6nGRr2qqTeA01P9LDNCMwF6NGPFd6vFfnfYh5ADJPG6Ao7BJ1RBuc9U+6lZs/VdQLngFLisRORer2p93/y3xiq8Qikthyqw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YtpU5ywn; arc=none smtp.client-ip=95.215.58.177
+	s=arc-20240116; t=1724892496; c=relaxed/simple;
+	bh=QqSuPRUy9Z8k65jDYu74y1tnd9YHR0HHTjML0qxIqIU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BpR4iojWekJBnKOjTSdTc2MPi44JoFiBNiZTtPs77VZT9KxuWBop+RAvF814qqslAEhQvtq87jfaUAeVUI5cgONfJTvuOfw3mDCVD4zJ6lVutrKHjtnPogLJhJ/hFPCwGeN4JRe+jFXpazLanYYCD8N7fOAvpIfZJXiHw8xBKrU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=B/HwdnXk; arc=none smtp.client-ip=95.215.58.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YtpU5ywn"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="B/HwdnXk"
+Date: Thu, 29 Aug 2024 00:48:07 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1724892396;
+	t=1724892491;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=N+MlVNE4Fogg6EjlLW7c731gocx3WBQa/S4313NXfqA=;
-	b=YtpU5ywnZhy1n5QyWJrDnN/FLAI2bam/UhAp1VET0AYTg0HQrrpHp1J2l9kqJ2PrRVjXRa
-	ttDC8b3QHQIqNnLMiCBgoQpn19Zp2ElICV5+Vq4bUKoDXYYlqr/lgJuVdsXmxRx/RamDSV
-	/X66rro46nqZV0cGpounYmx6HytsWfU=
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZUT6VucVLQZ/G6zrZsweR/i/y1YmIh/YabO7/ru4g0M=;
+	b=B/HwdnXkHGwa9sw7c+lK0aatbPfe+xLycympQuw/gButV9bytRFDwHIqM5vOk3QjHsIbn9
+	/c45mFcrq3+2TppO9utVm9hxl9Q2eDApAoXkjB7pn56HNAE3vxAc5ofkiV/jJp249QTXbQ
+	MOKPj0tz1eoZ4kfdFGHj1OrDFFR4nR8=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
+To: Mark Brown <broonie@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Mark Brown <broonie@kernel.org>
-Subject: [PATCH] KVM: arm64: selftests: Cope with lack of GICv3 in set_id_regs
-Date: Thu, 29 Aug 2024 00:46:22 +0000
-Message-ID: <20240829004622.3058639-1-oliver.upton@linux.dev>
+	Alexander Potapenko <glider@google.com>
+Subject: Re: [PATCH v2 05/11] KVM: arm64: Zero ID_AA64PFR0_EL1.GIC when no
+ GICv3 is presented to the guest
+Message-ID: <Zs_FR0nMRCbASi_k@linux.dev>
+References: <20240827152517.3909653-1-maz@kernel.org>
+ <20240827152517.3909653-6-maz@kernel.org>
+ <fa2ea6cf-0ee9-4208-8526-3426a78895a8@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fa2ea6cf-0ee9-4208-8526-3426a78895a8@sirena.org.uk>
 X-Migadu-Flow: FLOW_OUT
 
-Broonie reports that the set_id_regs test is failing as of commit
-5cb57a1aff75 ("KVM: arm64: Zero ID_AA64PFR0_EL1.GIC when no GICv3 is
-presented to the guest"). The test does not anticipate the 'late' ID
-register fixup where KVM clobbers the GIC field in absence of GICv3.
+On Thu, Aug 29, 2024 at 12:22:52AM +0100, Mark Brown wrote:
+> On Tue, Aug 27, 2024 at 04:25:11PM +0100, Marc Zyngier wrote:
+> > In order to be consistent, we shouldn't advertise a GICv3 when none
+> > is actually usable by the guest.
+> > 
+> > Wipe the feature when these conditions apply, and allow the field
+> > to be written from userspace.
+> > 
+> > This now allows us to rewrite the kvm_has_gicv3 helper() in terms
+> > of kvm_has_feat(), given that it is always evaluated at runtime.
+> 
+> This patch, which is in -next, is causing the set_id_regs tests to fail
+> on a variety of platforms including synquacer (it looks to be everything
+> with GICv3 which wouldn't be surprising but I didn't confirm):
 
-While the field technically has FTR_LOWER_SAFE behavior, fix the issue
-by setting it to an exact value of 0, matching the effect of the 'late'
-fixup.
+Mind taking this for a spin? Seems to do the trick on my end.
 
-Reported-by: Mark Brown <broonie@kernel.org>
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- tools/testing/selftests/kvm/aarch64/set_id_regs.c | 1 +
- 1 file changed, 1 insertion(+)
+https://lore.kernel.org/kvmarm/20240829004622.3058639-1-oliver.upton@linux.dev/
 
-diff --git a/tools/testing/selftests/kvm/aarch64/set_id_regs.c b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-index d20981663831..2a3fe7914b72 100644
---- a/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-+++ b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-@@ -126,6 +126,7 @@ static const struct reg_ftr_bits ftr_id_aa64pfr0_el1[] = {
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, CSV2, 0),
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, DIT, 0),
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, SEL2, 0),
-+	REG_FTR_BITS(FTR_EXACT, ID_AA64PFR0_EL1, GIC, 0),
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, EL3, 0),
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, EL2, 0),
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, EL1, 0),
 -- 
-2.46.0.295.g3b9ea8a38a-goog
-
+Thanks,
+Oliver
