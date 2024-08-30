@@ -1,48 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58C9616D4E5;
-	Fri, 30 Aug 2024 14:11:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58DA018EFEE;
+	Fri, 30 Aug 2024 14:44:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725027098; cv=none; b=Oc/5UXp9T6fb/tTrtZJHrKBwxI+azEDGI51YHJX66aTVv/dTfGQKb8GCqdE8DGtis9Fj7BdI7o2QNLtC0HcPzsK8cUhnexy52dAWgeeR26YpU2Nz898W1zYsa6p335qMkYaUU59i8cOpgchJr0CUC9HeXNAH/TqaoyFoa2xQ13k=
+	t=1725029083; cv=none; b=aDO2eXfl6f+MXvmBYaZCJ+8MOvYiu0vJCcMOTjKYdfGboK9n8C1IbejdqrEe0oeGknWUN/nP1mgAdkak2xmCQvmHbdS05MtHp2CBapX5U/pgfwSGPsZjybxVmJDIlWhA4h1Tod69tLqVSAQlAZijXG2tV3R0vobOFZ3PDZ/vm3o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725027098; c=relaxed/simple;
-	bh=s2RnCgdUW78FLTSGRkUu69/vbK6m5rPyk++vKoilaSI=;
+	s=arc-20240116; t=1725029083; c=relaxed/simple;
+	bh=ztG9aO/UPReKf8rYuGZUvZxefpK4v5qH4ddRdTzZmr4=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RPFXdyGHf3yXv6uEIrR9c5VZhlF88hlXlDEzfO8RlnBC2H98Wxz0IosfovloNPBbaLz0XLvfVftrhLafkMn3DQPtHHXegbhL7H+yCkmXyEpVu5dj34vQoUwabUeNlimht0zHyJ6kv8/66NNDzwhMyYBy1CnfA9POO5R5uXRPH/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s2BBDoN9; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=lAO13cg6D7lWBhsOVVohhn8sCfwRAVAQauYex4l6wkSVjvtHkXNsnIS3ZiM3F5pVgRq1p+1AB+pfRNGpLCQet48ZGjdATQkgEqlt8tG1OsvAKQJnSKJmxGQdhtsNczpzK0b1M5Q38Go6gbmCPbiSFr873vRe8rY9WpbrOmxgqJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b9Q+EPet; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s2BBDoN9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C870C4CEDF;
-	Fri, 30 Aug 2024 14:11:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b9Q+EPet"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE61CC4CEC2;
+	Fri, 30 Aug 2024 14:44:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725027097;
-	bh=s2RnCgdUW78FLTSGRkUu69/vbK6m5rPyk++vKoilaSI=;
+	s=k20201202; t=1725029082;
+	bh=ztG9aO/UPReKf8rYuGZUvZxefpK4v5qH4ddRdTzZmr4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=s2BBDoN9eb5za9c2qsSN5belvV1iyjPnAztDT5L40J+MYfnUkfs+lCNF8+T52s76Q
-	 6d5xWEh/XdDil7BHF+beou61ZBczjyUPou9b0Es+MXZ7jGuijwWCZVcbeHOoPv+nM7
-	 0iqOVbUDr42+5B0r9qbJCfby/ZfLjaoMqu1e3KEIxyxQyLkxC572YK/HQViNdgSWM9
-	 LGemWZtuw11q7c2c23FeQfsdrGcuFDRDT2b1KKew5sKTqBEoFbfxr7t2grZzIf/Jr8
-	 UNELwLNmc2WjfsR+hLn9ZmbXSOwiX34eLPTYJOWTgRCleqvPq4nFm+p+UNwNWDYyTQ
-	 uVAmW8X5J247Q==
+	b=b9Q+EPetA1udPy1i03GtJtRiriTR2PXXX+wB9E+ZgwOIuMvVYAqcQZvYMoCRAMTAk
+	 hjE32N4c33gt1+rgl8XnR7KSaPUxCOReJjXmPs9JFR33Kq7XKm4khcHI+569qTkWnb
+	 a/dIy09EPpD4cB8l/GqbR9ba72bTN96useOrb3nP/GNjoD40uVRZP3rT9fGmD+n+pt
+	 Qnoa82Ft0ssEtUNCezWZaFa0p1cDzWuIIbLeU7/uWWi0GdL3vcnz5dyzmnw4dw7l34
+	 MnqLNrnriBpLMG6tZWqyOe1syj/u5C635lI2BsPgDqsWKzhFKeEdXZA1bhkWhlRFeA
+	 dc6T6ZxQtbybg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sk2Le-008GGZ-JB;
-	Fri, 30 Aug 2024 15:11:34 +0100
-Date: Fri, 30 Aug 2024 15:11:34 +0100
-Message-ID: <865xriw161.wl-maz@kernel.org>
+	id 1sk2rg-008GiT-8i;
+	Fri, 30 Aug 2024 15:44:40 +0100
+Date: Fri, 30 Aug 2024 15:44:39 +0100
+Message-ID: <864j72vzmw.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Vincent Donnefort <vdonnefort@google.com>, Sebastian Ene <sebastianene@google.com>
-Cc:	akpm@linux-foundation.org,
+To: Sebastian Ene <sebastianene@google.com>
+Cc: akpm@linux-foundation.org,
 	alexghiti@rivosinc.com,
 	ankita@nvidia.com,
 	ardb@kernel.org,
 	catalin.marinas@arm.com,
 	christophe.leroy@csgroup.eu,
 	james.morse@arm.com,
+	vdonnefort@google.com,
 	mark.rutland@arm.com,
 	oliver.upton@linux.dev,
 	rananta@google.com,
@@ -55,11 +56,9 @@ Cc:	akpm@linux-foundation.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	kernel-team@android.com
-Subject: Re: [PATCH v9 4/5] KVM: arm64: Register ptdump with debugfs on guest creation
-In-Reply-To: <ZtGd9UEudn8Z0IlG@google.com>
+Subject: Re: [PATCH v9 0/5] arm64: ptdump: View the second stage page-tables
+In-Reply-To: <20240827084549.45731-1-sebastianene@google.com>
 References: <20240827084549.45731-1-sebastianene@google.com>
-	<20240827084549.45731-5-sebastianene@google.com>
-	<ZtGd9UEudn8Z0IlG@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -71,465 +70,97 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: vdonnefort@google.com, sebastianene@google.com, akpm@linux-foundation.org, alexghiti@rivosinc.com, ankita@nvidia.com, ardb@kernel.org, catalin.marinas@arm.com, christophe.leroy@csgroup.eu, james.morse@arm.com, mark.rutland@arm.com, oliver.upton@linux.dev, rananta@google.com, ryan.roberts@arm.com, shahuang@redhat.com, suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kernel-team@android.com
+X-SA-Exim-Rcpt-To: sebastianene@google.com, akpm@linux-foundation.org, alexghiti@rivosinc.com, ankita@nvidia.com, ardb@kernel.org, catalin.marinas@arm.com, christophe.leroy@csgroup.eu, james.morse@arm.com, vdonnefort@google.com, mark.rutland@arm.com, oliver.upton@linux.dev, rananta@google.com, ryan.roberts@arm.com, shahuang@redhat.com, suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 30 Aug 2024 11:24:53 +0100,
-Vincent Donnefort <vdonnefort@google.com> wrote:
-> 
-> Hi Seb,
-> 
-> Thanks for the respin.
-> 
-> On Tue, Aug 27, 2024 at 08:45:47AM +0000, Sebastian Ene wrote:
-> > While arch/*/mem/ptdump handles the kernel pagetable dumping code,
-> > introduce KVM/ptdump to show the guest stage-2 pagetables. The
-> > separation is necessary because most of the definitions from the
-> > stage-2 pagetable reside in the KVM path and we will be invoking
-> > functionality specific to KVM.
-> > 
-> > When a guest is created, register a new file entry under the guest
-> > debugfs dir which allows userspace to show the contents of the guest
-> > stage-2 pagetables when accessed.
-> > 
-> > Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> 
-> I only have some nits, otherwise:
-> 
-> Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
-> 
-> > ---
-> >  arch/arm64/include/asm/kvm_host.h |   6 +
-> >  arch/arm64/kvm/Makefile           |   1 +
-> >  arch/arm64/kvm/arm.c              |   1 +
-> >  arch/arm64/kvm/ptdump.c           | 247 ++++++++++++++++++++++++++++++
-> >  4 files changed, 255 insertions(+)
-> >  create mode 100644 arch/arm64/kvm/ptdump.c
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index a33f5996ca9f..4acd589f086b 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -1473,4 +1473,10 @@ void kvm_set_vm_id_reg(struct kvm *kvm, u32 reg, u64 val);
-> >  		(pa + pi + pa3) == 1;					\
-> >  	})
-> >  
-> > +#ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
-> > +void kvm_s2_ptdump_create_debugfs(struct kvm *kvm);
-> > +#else
-> > +static inline void kvm_s2_ptdump_create_debugfs(struct kvm *kvm) {}
-> > +#endif /* CONFIG_PTDUMP_STAGE2_DEBUGFS */
-> > +
-> >  #endif /* __ARM64_KVM_HOST_H__ */
-> > diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-> > index 86a629aaf0a1..e4233b323a73 100644
-> > --- a/arch/arm64/kvm/Makefile
-> > +++ b/arch/arm64/kvm/Makefile
-> > @@ -27,6 +27,7 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
-> >  
-> >  kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o pmu.o
-> >  kvm-$(CONFIG_ARM64_PTR_AUTH)  += pauth.o
-> > +kvm-$(CONFIG_PTDUMP_STAGE2_DEBUGFS) += ptdump.o
-> >  
-> >  always-y := hyp_constants.h hyp-constants.s
-> >  
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index 9bef7638342e..b9fd928d3477 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -228,6 +228,7 @@ vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
-> >  void kvm_arch_create_vm_debugfs(struct kvm *kvm)
-> >  {
-> >  	kvm_sys_regs_create_debugfs(kvm);
-> > +	kvm_s2_ptdump_create_debugfs(kvm);
-> >  }
-> >  
-> >  static void kvm_destroy_mpidr_data(struct kvm *kvm)
-> > diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
-> > new file mode 100644
-> > index 000000000000..e72a928d4445
-> > --- /dev/null
-> > +++ b/arch/arm64/kvm/ptdump.c
-> > @@ -0,0 +1,247 @@
-> > +// SPDX-License-Identifier: GPL-2.0-only
-> > +/*
-> > + * Debug helper used to dump the stage-2 pagetables of the system and their
-> > + * associated permissions.
-> > + *
-> > + * Copyright (C) Google, 2024
-> > + * Author: Sebastian Ene <sebastianene@google.com>
-> > + */
-> > +#include <linux/debugfs.h>
-> > +#include <linux/kvm_host.h>
-> > +#include <linux/seq_file.h>
-> > +
-> > +#include <asm/kvm_pgtable.h>
-> > +#include <asm/kvm_host.h>
-> 
-> nit: I believe you wanted to follow the alphabetical order, if that is the case,
-> kvm_host.h then kvm_pgtable.h
-> 
-> > +#include <asm/ptdump.h>
-> > +
-> > +
-> 
-> nit: don't think double empty are a rule, I would remove it.
-> 
-> > +#define MARKERS_LEN		(2)
-> 
-> nit: The brackets are not necessary for MARKERS_LEN.
-> 
-> > +#define KVM_PGTABLE_MAX_LEVELS	(KVM_PGTABLE_LAST_LEVEL + 1)
-> > +
-> > +struct kvm_ptdump_guest_state {
-> > +	struct kvm		*kvm;
-> > +	struct ptdump_pg_state	parser_state;
-> > +	struct addr_marker	ipa_marker[MARKERS_LEN];
-> > +	struct ptdump_pg_level	level[KVM_PGTABLE_MAX_LEVELS];
-> > +	struct ptdump_range	range[MARKERS_LEN];
-> > +};
-> > +
-> > +static const struct ptdump_prot_bits stage2_pte_bits[] = {
-> > +	{
-> > +		.mask	= PTE_VALID,
-> > +		.val	= PTE_VALID,
-> > +		.set	= " ",
-> > +		.clear	= "F",
-> 
-> This is effectively never used because an invalid PTE is 0 and note_page() won't
-> print it. This probably can be removed?
+Hi Seb,
 
-Yeah, I can't see how we are going to trigger that one given that
-PTE_VALID must be set, and that we only print something if the bit is
-clear.
-
-Seb?
-
->
-> > +	}, {
-> > +		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | PTE_VALID,
-> > +		.val	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | PTE_VALID,
-> > +		.set	= "R",
-> > +		.clear	= " ",
-> > +	}, {
-> > +		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W | PTE_VALID,
-> > +		.val	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W | PTE_VALID,
-> > +		.set	= "W",
-> > +		.clear	= " ",
-> > +	}, {
-> > +		.mask	= KVM_PTE_LEAF_ATTR_HI_S2_XN | PTE_VALID,
-> > +		.val	= PTE_VALID,
-> > +		.set	= " ",
-> > +		.clear	= "X",
-> > +	}, {
-> > +		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_AF | PTE_VALID,
-> > +		.val	= KVM_PTE_LEAF_ATTR_LO_S2_AF | PTE_VALID,
-> > +		.set	= "AF",
-> > +		.clear	= "  ",
-> > +	}, {
-> > +		.mask	= PTE_TABLE_BIT | PTE_VALID,
-> > +		.val	= PTE_VALID,
-> > +		.set	= "BLK",
-> > +		.clear	= "   ",
-> > +	},
-> > +};
-> > +
-> > +static int kvm_ptdump_visitor(const struct kvm_pgtable_visit_ctx *ctx,
-> > +			      enum kvm_pgtable_walk_flags visit)
-> > +{
-> > +	struct ptdump_pg_state *st = ctx->arg;
-> > +	struct ptdump_state *pt_st = &st->ptdump;
-> > +
-> > +	note_page(pt_st, ctx->addr, ctx->level, ctx->old);
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static int kvm_ptdump_build_levels(struct ptdump_pg_level *level, u32 start_lvl)
-> > +{
-> > +	u32 i;
-> > +	u64 mask;
-> > +
-> > +	if (WARN_ON_ONCE(start_lvl >= KVM_PGTABLE_LAST_LEVEL))
-> > +		return -EINVAL;
-> > +
-> > +	mask = 0;
-> > +	for (i = 0; i < ARRAY_SIZE(stage2_pte_bits); i++)
-> > +		mask |= stage2_pte_bits[i].mask;
-> > +
-> > +	for (i = start_lvl; i < KVM_PGTABLE_MAX_LEVELS; i++) {
-> > +		snprintf(level[i].name, sizeof(level[i].name), "%d", i);
+On Tue, 27 Aug 2024 09:45:43 +0100,
+Sebastian Ene <sebastianene@google.com> wrote:
 > 
-> %u, i being unsigned.
+> Hi,
 > 
-> > +
-> > +		level[i].num	= ARRAY_SIZE(stage2_pte_bits);
-> > +		level[i].bits	= stage2_pte_bits;
-> > +		level[i].mask	= mask;
-> > +	}
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static struct kvm_ptdump_guest_state *kvm_ptdump_parser_create(struct kvm *kvm)
-> > +{
-> > +	struct kvm_ptdump_guest_state *st;
-> > +	struct kvm_s2_mmu *mmu = &kvm->arch.mmu;
-> > +	struct kvm_pgtable *pgtable = mmu->pgt;
-> > +	int ret;
-> > +
-> > +	st = kzalloc(sizeof(struct kvm_ptdump_guest_state), GFP_KERNEL_ACCOUNT);
-> > +	if (!st)
-> > +		return ERR_PTR(-ENOMEM);
-> > +
-> > +	ret = kvm_ptdump_build_levels(&st->level[0], pgtable->start_level);
-> > +	if (ret) {
-> > +		kfree(st);
-> > +		return ERR_PTR(ret);
-> > +	}
-> > +
-> > +	st->ipa_marker[0].name		= "Guest IPA";
-> > +	st->ipa_marker[1].start_address = BIT(pgtable->ia_bits);
-> > +	st->range[0].end		= BIT(pgtable->ia_bits);
-> > +
-> > +	st->kvm				= kvm;
-> > +	st->parser_state = (struct ptdump_pg_state) {
-> > +		.marker		= &st->ipa_marker[0],
-> > +		.level		= -1,
-> > +		.pg_level	= &st->level[0],
-> > +		.ptdump.range	= &st->range[0],
-> > +		.start_address	= 0,
-> > +	};
-> > +
-> > +	return st;
-> > +}
-> > +
-> > +static int kvm_ptdump_guest_show(struct seq_file *m, void *unused)
-> > +{
-> > +	int ret;
-> > +	struct kvm_ptdump_guest_state *st = m->private;
-> > +	struct kvm *kvm = st->kvm;
-> > +	struct kvm_s2_mmu *mmu = &kvm->arch.mmu;
-> > +	struct ptdump_pg_state *parser_state = &st->parser_state;
-> > +	struct kvm_pgtable_walker walker = (struct kvm_pgtable_walker) {
-> > +		.cb	= kvm_ptdump_visitor,
-> > +		.arg	= parser_state,
-> > +		.flags	= KVM_PGTABLE_WALK_LEAF,
-> > +	};
-> > +
-> > +	parser_state->seq = m;
-> > +
-> > +	write_lock(&kvm->mmu_lock);
-> > +	ret = kvm_pgtable_walk(mmu->pgt, 0, BIT(mmu->pgt->ia_bits), &walker);
-> > +	write_unlock(&kvm->mmu_lock);
-> > +
-> > +	return ret;
-> > +}
-> > +
-> > +static int kvm_ptdump_guest_open(struct inode *m, struct file *file)
-> > +{
-> > +	struct kvm *kvm = m->i_private;
-> > +	struct kvm_ptdump_guest_state *st;
-> > +	int ret;
-> > +
-> > +	if (!kvm_get_kvm_safe(kvm))
-> > +		return -ENOENT;
-> > +
-> > +	st = kvm_ptdump_parser_create(kvm);
-> > +	if (IS_ERR(st)) {
-> > +		ret = PTR_ERR(st);
-> > +		goto free_with_kvm_ref;
-> > +	}
-> > +
-> > +	ret = single_open(file, kvm_ptdump_guest_show, st);
-> > +	if (!ret)
-> > +		return 0;
-> > +
-> > +	kfree(st);
-> > +free_with_kvm_ref:
 > 
-> nit: I believe kfree understands IS_ERR() so you could have a simple "err:"
-> label covering all the error path.
-
-I couldn't find such handling in kfree(). Could you point be to it?
-
+> This series extends the ptdump support to allow dumping the guest
+> stage-2 pagetables. When CONFIG_PTDUMP_STAGE2_DEBUGFS is enabled, ptdump
+> registers the new following files under debugfs:
+> - /sys/debug/kvm/<guest_id>/stage2_page_tables
+> - /sys/debug/kvm/<guest_id>/stage2_levels
+> - /sys/debug/kvm/<guest_id>/ipa_range
 > 
-> > +	kvm_put_kvm(kvm);
-> > +	return ret;
-> > +}
-> > +
-> > +static int kvm_ptdump_guest_close(struct inode *m, struct file *file)
-> > +{
-> > +	struct kvm *kvm = m->i_private;
-> > +	void *st = ((struct seq_file *)file->private_data)->private;
-> > +
-> > +	kfree(st);
-> > +	kvm_put_kvm(kvm);
-> > +
-> > +	return single_release(m, file);
-> > +}
-> > +
-> > +static const struct file_operations kvm_ptdump_guest_fops = {
-> > +	.open		= kvm_ptdump_guest_open,
-> > +	.read		= seq_read,
-> > +	.llseek		= seq_lseek,
-> > +	.release	= kvm_ptdump_guest_close,
-> > +};
-> > +
-> > +static int kvm_pgtable_debugfs_show(struct seq_file *m, void *unused)
-> > +{
-> > +	const struct file *file = m->file;
-> > +	struct kvm_pgtable *pgtable = m->private;
-> > +
-> > +	if (!strcmp(file_dentry(file)->d_iname, "ipa_range"))
-
-I really dislike this sort of construct, and I'd rather we pick the
-correct callback by construction rather than relying on a string
-comparison. See below for a suggestion.
-
-> > +		seq_printf(m, "%2u\n", pgtable->ia_bits);
-> > +	else if (!strcmp(file_dentry(file)->d_iname, "stage2_levels"))
-> > +		seq_printf(m, "%1d\n", KVM_PGTABLE_LAST_LEVEL - pgtable->start_level + 1);
+> This allows userspace tools (eg. cat) to dump the stage-2 pagetables by
+> reading the 'stage2_page_tables' file.
+> The output format has the following fields:
+> <IPA range> <size> <level> <access permissions> <mem_attributes>
 > 
-> nit: KVM_PGTABLE_MAX_LEVELS - pgtable->start_level ?
+> Below is the output of a guest stage-2 pagetable dump running under Qemu.
+> After a VM is created, the following files are available:
 > 
-> > +	return 0;
-> > +}
-> > +
-> > +static int kvm_pgtable_debugfs_open(struct inode *m, struct file *file)
-> > +{
-> > +	struct kvm *kvm = m->i_private;
-> > +	struct kvm_pgtable *pgtable;
-> > +	int ret;
-> > +
-> > +	if (!kvm_get_kvm_safe(kvm))
-> > +		return -ENOENT;
-> > +
-> > +	pgtable = kvm->arch.mmu.pgt;
-> > +
-> > +	ret = single_open(file, kvm_pgtable_debugfs_show, pgtable);
-> > +	if (ret < 0)
-> > +		kvm_put_kvm(kvm);
-> > +	return ret;
-> > +}
-> > +
-> > +static int kvm_pgtable_debugfs_close(struct inode *m, struct file *file)
-> > +{
-> > +	struct kvm *kvm = m->i_private;
-> > +
-> > +	kvm_put_kvm(kvm);
-> > +	return single_release(m, file);
-> > +}
-> > +
-> > +static const struct file_operations kvm_pgtable_debugfs_fops = {
-> > +	.open		= kvm_pgtable_debugfs_open,
-> > +	.read		= seq_read,
-> > +	.llseek		= seq_lseek,
-> > +	.release	= kvm_pgtable_debugfs_close,
-> > +};
-> > +
-> > +void kvm_s2_ptdump_create_debugfs(struct kvm *kvm)
-> > +{
-> > +	debugfs_create_file("stage2_page_tables", 0400, kvm->debugfs_dentry,
-> > +			    kvm, &kvm_ptdump_guest_fops);
-> > +	debugfs_create_file("ipa_range", 0400, kvm->debugfs_dentry, kvm,
-> > +			    &kvm_pgtable_debugfs_fops);
-> > +	debugfs_create_file("stage2_levels", 0400, kvm->debugfs_dentry,
-> > +			    kvm, &kvm_pgtable_debugfs_fops);
-> > +}
+> # cat /sys/kernel/debug/kvm/256-4/stage2_levels 
+> 4
+> # cat /sys/kernel/debug/kvm/256-4/ipa_range 
+> 44
+> # cat /sys/kernel/debug/kvm/256-4/stage2_page_tables 
+> ---[ Guest IPA ]---
+> 0x0000000000000000-0x0000000001000000          16M 2
+> 0x0000000001000000-0x0000000001020000         128K 3
+> 0x0000000001020000-0x0000000001021000           4K 3   R W X AF    
+> 0x0000000001021000-0x0000000001200000        1916K 3
+> 0x0000000001200000-0x0000000040000000        1006M 2
+> 0x0000000040000000-0x0000000080000000           1G 0
+> 0x0000000080000000-0x0000000081200000          18M 2   R W   AF BLK
+> 0x0000000081200000-0x0000000081a00000           8M 2   R W X AF BLK
+> 0x0000000081a00000-0x0000000081c00000           2M 2   R W   AF BLK
+> 0x0000000081c00000-0x0000000082200000           6M 2   R W X AF BLK
+> 0x0000000082200000-0x0000000082400000           2M 2   R W   AF BLK
+> 0x0000000082400000-0x0000000082800000           4M 2   R W X AF BLK
+> 0x0000000082800000-0x0000000082a00000           2M 2   R W   AF BLK
+> 0x0000000082a00000-0x0000000082c00000           2M 2
+> 0x0000000082c00000-0x0000000083200000           6M 2   R W X AF BLK
+> 0x0000000083200000-0x0000000083400000           2M 2
+> 0x0000000083400000-0x0000000083a00000           6M 2   R W X AF BLK
+> 0x0000000083a00000-0x000000008fe00000         196M 2
+> 0x000000008fe00000-0x0000000090000000           2M 2   R W   AF BLK
+> 0x0000000090000000-0x0000000099400000         148M 2
+> 0x0000000099400000-0x0000000099600000           2M 2   R W X AF BLK
+> 0x0000000099600000-0x000000009b600000          32M 2
+> 0x000000009b600000-0x000000009be00000           8M 2   R W X AF BLK
+> 0x000000009be00000-0x000000009c000000           2M 2   R W   AF BLK
+> 0x000000009c000000-0x00000000c0000000         576M 2
 
-I'd expect something like this instead:
+I've been giving this a go on my test systems with 16k pages, and it
+doesn't really work as advertised:
 
-diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
-index e72a928d4445..c11ea355aa51 100644
---- a/arch/arm64/kvm/ptdump.c
-+++ b/arch/arm64/kvm/ptdump.c
-@@ -192,19 +191,24 @@ static const struct file_operations kvm_ptdump_guest_fops = {
- 	.release	= kvm_ptdump_guest_close,
- };
- 
--static int kvm_pgtable_debugfs_show(struct seq_file *m, void *unused)
-+static int kvm_pgtable_range_show(struct seq_file *m, void *unused)
-+{
-+	struct kvm_pgtable *pgtable = m->private;
-+
-+	seq_printf(m, "%2u\n", pgtable->ia_bits);
-+	return 0;
-+}
-+
-+static int kvm_pgtable_levels_show(struct seq_file *m, void *unused)
- {
--	const struct file *file = m->file;
- 	struct kvm_pgtable *pgtable = m->private;
- 
--	if (!strcmp(file_dentry(file)->d_iname, "ipa_range"))
--		seq_printf(m, "%2u\n", pgtable->ia_bits);
--	else if (!strcmp(file_dentry(file)->d_iname, "stage2_levels"))
--		seq_printf(m, "%1d\n", KVM_PGTABLE_LAST_LEVEL - pgtable->start_level + 1);
-+	seq_printf(m, "%1d\n", KVM_PGTABLE_LAST_LEVEL - pgtable->start_level + 1);
- 	return 0;
- }
- 
--static int kvm_pgtable_debugfs_open(struct inode *m, struct file *file)
-+static int kvm_pgtable_debugfs_open(struct inode *m, struct file *file,
-+				    int (*show)(struct seq_file *, void *))
- {
- 	struct kvm *kvm = m->i_private;
- 	struct kvm_pgtable *pgtable;
-@@ -215,12 +219,22 @@ static int kvm_pgtable_debugfs_open(struct inode *m, struct file *file)
- 
- 	pgtable = kvm->arch.mmu.pgt;
- 
--	ret = single_open(file, kvm_pgtable_debugfs_show, pgtable);
-+	ret = single_open(file, show, pgtable);
- 	if (ret < 0)
- 		kvm_put_kvm(kvm);
- 	return ret;
- }
- 
-+static int kvm_pgtable_range_open(struct inode *m, struct file *file)
-+{
-+	return kvm_pgtable_debugfs_open(m, file, kvm_pgtable_range_show);
-+}
-+
-+static int kvm_pgtable_levels_open(struct inode *m, struct file *file)
-+{
-+	return kvm_pgtable_debugfs_open(m, file, kvm_pgtable_levels_show);
-+}
-+
- static int kvm_pgtable_debugfs_close(struct inode *m, struct file *file)
- {
- 	struct kvm *kvm = m->i_private;
-@@ -229,8 +243,15 @@ static int kvm_pgtable_debugfs_close(struct inode *m, struct file *file)
- 	return single_release(m, file);
- }
- 
--static const struct file_operations kvm_pgtable_debugfs_fops = {
--	.open		= kvm_pgtable_debugfs_open,
-+static const struct file_operations kvm_pgtable_range_fops = {
-+	.open		= kvm_pgtable_range_open,
-+	.read		= seq_read,
-+	.llseek		= seq_lseek,
-+	.release	= kvm_pgtable_debugfs_close,
-+};
-+
-+static const struct file_operations kvm_pgtable_levels_fops = {
-+	.open		= kvm_pgtable_levels_open,
- 	.read		= seq_read,
- 	.llseek		= seq_lseek,
- 	.release	= kvm_pgtable_debugfs_close,
-@@ -241,7 +262,7 @@ void kvm_s2_ptdump_create_debugfs(struct kvm *kvm)
- 	debugfs_create_file("stage2_page_tables", 0400, kvm->debugfs_dentry,
- 			    kvm, &kvm_ptdump_guest_fops);
- 	debugfs_create_file("ipa_range", 0400, kvm->debugfs_dentry, kvm,
--			    &kvm_pgtable_debugfs_fops);
-+			    &kvm_pgtable_range_fops);
- 	debugfs_create_file("stage2_levels", 0400, kvm->debugfs_dentry,
--			    kvm, &kvm_pgtable_debugfs_fops);
-+			    kvm, &kvm_pgtable_levels_fops);
- }
+root@babette:/sys/kernel/debug/kvm# cat 2573-13/stage2_*
+2
+---[ Guest IPA ]---
+0x0000000000000000-0x0000000008000000         128M 
+0x0000000008000000-0x00000000090a0000       17024K 3
+0x00000000090a0000-0x00000000090a4000          16K 3   R W X AF    
+0x00000000090a4000-0x000000000a000000       15728K 3
 
+Only 16kB mapped? This is a full Linux guest running the Debian
+installer, and just the kernel is about 20MB (the VM has 4GB of RAM,
+and is using QEMU as the VMM)
+
+So clearly something isn't playing as expected. Also, this '128M'
+without a level being displayed makes me wonder. It is probably the
+QEMU flash, but then the rest of the addresses don't make much sense
+(RAM on QEMU is at 1GB, not at 128MB.
+
+On another system with kvmtool, I get something similar:
+
+root@duodenum:/home/maz# cat /sys/kernel/debug/kvm/*/stage2_*
+2
+---[ Guest IPA ]---
+0x0000000000000000-0x0000000001020000       16512K 3
+0x0000000001020000-0x0000000001024000          16K 3   R W X AF    
+0x0000000001024000-0x0000000002000000       16240K 3
+
+and kvmtool places the RAM at 2GB. Clearly not what we're seeing here.
+
+Could you please verify this?
 
 Thanks,
 
