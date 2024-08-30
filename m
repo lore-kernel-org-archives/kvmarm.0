@@ -1,113 +1,124 @@
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AF601B8EA6
-	for <kvmarm@lists.linux.dev>; Fri, 30 Aug 2024 17:09:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87E7D1BAEFA
+	for <kvmarm@lists.linux.dev>; Fri, 30 Aug 2024 17:38:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725037774; cv=none; b=QIA+YVNDZvUiLAjEuMQqsuz1oG0mqM2klWwVLYWoFET4THdOTwIYiIxXUyVUohweIrvC579aGYbLQ02q+z4n/EWizzQMJB9rI/sD5Vwy6FsQVBSOl9xq0GEP5wRp/qgVmUc7os7y8s0frjwxl4c4Dl+JKnf4pnc+TrqdyBjEGDQ=
+	t=1725039526; cv=none; b=S4o2CuHm/ewGwifLLSK4WjuaGi6tcYv1pe87y6qQgUgQkYb8jaFucxBBhCEAfYQektPIpXTmBGSQE3sYoC254Hhzoqp1TeCc9R6v9AGfGUwbQP054KWFoQwLm7HReNeC62jIdrLpLKuCXLgoQcu8mNuUx0LJiE9p0y/SQ8hT0I4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725037774; c=relaxed/simple;
-	bh=CU346vDOqsSTaU3Zni7xFPxbjTXZB+6lE4+IxGvIin4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=GfQJCeW63RcdrZw92SEVtFTiRA4zDzT3nLJekeRri2jf7RbttDouBsN5jgbytuZklSNQYx9nbxb0788ZI2yxEuDBzsbdHJurlsL3D3jlPSoo8o7rmxhGMc75STngHZks7I8wL7MiQFzX+iSWh3qE5gUrRl3cMNMHULbk/H449YE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hH+tDlWN; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1725039526; c=relaxed/simple;
+	bh=lge5FERVK6kb/J6uzbFQGyu7nF5jed3VoSj6+WRGVyA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PLnJ8KsnBSDaEyEjopTshcDIusG6qh312QPCpNuax78dmEsFwt7cohnKRLBnH3nt26w8/Aza7RVdh4f/lSeA1EkaY1zzD972nPB0Jf5HSsAWAG1kPcfadz4PTKnCQqr6RpNeR2s5zq4C78QqK7e2hXMUYPXSncv9w7mWjv9kH6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VxiwD7GQ; arc=none smtp.client-ip=91.218.175.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hH+tDlWN"
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7144c67e3d0so2017371b3a.0
-        for <kvmarm@lists.linux.dev>; Fri, 30 Aug 2024 10:09:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1725037773; x=1725642573; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=U/DqUd03uLisJ+lBV6coVazHA/8Mv1E9hChZqzhDQx4=;
-        b=hH+tDlWNOjbW/qtgZVOF3xU7RaIuHGeARhqDVqD0Wu6rCSfa5uhLvuX2vSJoJlApQ3
-         BUs8rpD1O8OeBrTsk5YWR32eiD2FBC39lyr3z8Jt60u6UIRnZdHsixdrZQLQs7oGX5yj
-         w/XYouTikZD5W9Fzpx+tEN++/eqi5CjS2bvwCtZsOgIbtMWDzDL6VvmweHtumj47kceR
-         sB0A0cnfNZs9xUcGu01G87E2TkE7IzUZ8554YdQCAL8cvOk1lt+nOH7u0L2RgzZGrlxH
-         F+m4dsyC54Bu0JmVJmL3E3JTvZJvC1M1IqsOJY7R0fbEmHFyqyg0A6jwW5gYLQ641kGr
-         qFJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725037773; x=1725642573;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=U/DqUd03uLisJ+lBV6coVazHA/8Mv1E9hChZqzhDQx4=;
-        b=mJfJtyJuLMeM+kjPii90WohXl/UWx3vNksVdpDjzAUbg5xD/KGrCShdWB0j5AglrKu
-         bmzZXEQXn3WEn0U75/ApClzwF17KsQ3XbEHu2ufoMTOWSgMcXkk7Zf8yt0pXXGePhktQ
-         R17rNzC3FdsZowZtMTfui0Mwy2PBU2F1lmRPSWRS+mznICviLpY/0dOcj7QwhBYK1tFC
-         DDWirM+tuKZUAOuh0PCmr4G5CokfBAP1XRKA9r7Ff4OaiwTmDV/Zu1w2lGPCFM1xyEb6
-         NhxNlr6HHv1HlVoEM8pkI1UfCM43grPIVLUxmJTgOPVkUmd+rZH8Ue6CtT5azgGoSYXv
-         6uFQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX0np1OeQxoVx/iTZ7BokSLu3LW+zC9YuZiPZ9aOxH5UpCjcPaU2wWKLfi+2j7dYaggZI/oyL0=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yz89u+4tOChsFU2MyGmel2hR05NIEj+nZMtyiss2RB0DChg69J1
-	CrdmuC9m3tNTs/RgrBBLJSsbjcmPmksaVDfv34L+HU2qouC8NXj5wGa64137qv1gmq0Sh6Xa2U9
-	NKg==
-X-Google-Smtp-Source: AGHT+IFFKP/thrpWlcd7MMBTCnnTgAMVFprrx6gPBFzwzuc79yk0sgtRNBZcK7vPcXyz945EdY+xAc0UhR8=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:9467:b0:714:24bf:eaf5 with SMTP id
- d2e1a72fcca58-717307852dcmr5463b3a.5.1725037772263; Fri, 30 Aug 2024 10:09:32
- -0700 (PDT)
-Date: Fri, 30 Aug 2024 10:09:30 -0700
-In-Reply-To: <20240830124720.GX3468552@ziepe.ca>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VxiwD7GQ"
+Date: Fri, 30 Aug 2024 10:38:33 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1725039522;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=d6L+KI/2jSnOcw8BblWMkOB9gllIb6gCZOsYWN7xgAE=;
+	b=VxiwD7GQ9XhGMOI+EnUY1hbVf1hzgYZ5y62ghG8H7NgsCgvXK4O4uAcphI2s+QGcMzw68d
+	UaCmBNo7L8WOVI0SB8xsTf4TWWtvlNsKEr9IyKBJdR3cffMLp9Ra0WD2saR02EGGsiHuqM
+	Gm5puFHjnuYd9wcQ2Fo4PIH+Gvr10zY=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: David Matlack <dmatlack@google.com>
+Cc: James Houghton <jthoughton@google.com>, Yu Zhao <yuzhao@google.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Axel Rasmussen <axelrasmussen@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	David Rientjes <rientjes@google.com>,
+	James Morse <james.morse@arm.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	Shaoqin Huang <shahuang@redhat.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Wei Xu <weixugc@google.com>, Will Deacon <will@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org
+Subject: Re: [PATCH v6 03/11] KVM: arm64: Relax locking for kvm_test_age_gfn
+ and kvm_age_gfn
+Message-ID: <ZtIDmc_V62ZqrbxW@linux.dev>
+References: <20240724011037.3671523-1-jthoughton@google.com>
+ <20240724011037.3671523-4-jthoughton@google.com>
+ <CADrL8HV5M-n72KDseDKWpGrUVMjC147Jqz98PxyG2ZeRVbFu8g@mail.gmail.com>
+ <Zr_y7Fn63hdowfYM@google.com>
+ <CAOUHufYc3hr-+fp14jgEkDN++v6t-z-PRf1yQdKtnje6SgLiiA@mail.gmail.com>
+ <ZsOuEP6P0v45ffC0@linux.dev>
+ <CADrL8HWf-Onu=4ONBO1CFZ1Tqj5bee=+NnRC333aKqkUy+0Sxg@mail.gmail.com>
+ <ZtEW5Iym5QsJbONM@linux.dev>
+ <CALzav=daN3y9nXNuj7pPpn2u_aAQ84t161z3odP=MGLYCLfYMQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20240724011037.3671523-1-jthoughton@google.com>
- <20240724011037.3671523-3-jthoughton@google.com> <Zr_3Vohvzt0KmFiN@google.com>
- <CADrL8HWQqVm5VbNnR6iMEZF17+nuO_Y25m6uuScCBVSE_YCTdg@mail.gmail.com>
- <ZtFA79zreVt4GBri@google.com> <20240830124720.GX3468552@ziepe.ca>
-Message-ID: <ZtH8yv5AabMEpBoj@google.com>
-Subject: Re: [PATCH v6 02/11] KVM: x86: Relax locking for kvm_test_age_gfn and kvm_age_gfn
-From: Sean Christopherson <seanjc@google.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: James Houghton <jthoughton@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Ankit Agrawal <ankita@nvidia.com>, 
-	Axel Rasmussen <axelrasmussen@google.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	David Matlack <dmatlack@google.com>, David Rientjes <rientjes@google.com>, 
-	James Morse <james.morse@arm.com>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Raghavendra Rao Ananta <rananta@google.com>, 
-	Ryan Roberts <ryan.roberts@arm.com>, Shaoqin Huang <shahuang@redhat.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Wei Xu <weixugc@google.com>, 
-	Will Deacon <will@kernel.org>, Yu Zhao <yuzhao@google.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CALzav=daN3y9nXNuj7pPpn2u_aAQ84t161z3odP=MGLYCLfYMQ@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Aug 30, 2024, Jason Gunthorpe wrote:
-> On Thu, Aug 29, 2024 at 08:47:59PM -0700, Sean Christopherson wrote:
-> > On Thu, Aug 29, 2024, James Houghton wrote:
-> > > On Fri, Aug 16, 2024 at 6:05=E2=80=AFPM Sean Christopherson <seanjc@g=
-oogle.com> wrote:
-> > > > > +static __always_inline bool kvm_tdp_mmu_handle_gfn_lockless(
-> > > > > +             struct kvm *kvm,
-> > > > > +             struct kvm_gfn_range *range,
-> > > > > +             tdp_handler_t handler)
-> > > >
-> > > > Please burn all the Google3 from your brain, and code ;-)
-> > >=20
-> > > I indented this way to avoid going past the 80 character limit. I've
-> > > adjusted it to be more like the other functions in this file.
-> > >=20
-> > > Perhaps I should put `static __always_inline bool` on its own line?
-> >=20
-> > Noooo. Do not wrap before the function name.  Linus has a nice explanat=
-ion/rant
-> > on this[1].
->=20
-> IMHO, run clang-format on your stuff and just be happy with 99% of
-> what it spits out. Saves *so much time* and usually arguing..
+Hey David,
 
-Heh, nope, not bending on this one.  The time I spend far hunting for imple=
-mentations
-because of wraps before the function name far exceeds the time it takes me =
-to
-push back on these warts in review.
+On Fri, Aug 30, 2024 at 08:33:59AM -0700, David Matlack wrote:
+> On Thu, Aug 29, 2024 at 5:48 PM Oliver Upton <oliver.upton@linux.dev> wrote:
+> >
+> > On Thu, Aug 29, 2024 at 05:33:00PM -0700, James Houghton wrote:
+> > > On Mon, Aug 19, 2024 at 1:42 PM Oliver Upton <oliver.upton@linux.dev> wrote:
+> > > > Asking since you had a setup / data earlier on when you were carrying
+> > > > the series. Hopefully with supportive data we can get arm64 to opt-in
+> > > > to HAVE_KVM_MMU_NOTIFIER_YOUNG_FAST_ONLY as well.
+> > >
+> > > I'll keep trying some other approaches I can take for getting similar
+> > > testing that Yu had; it is somewhat difficult for me to reproduce
+> > > those tests (and it really shouldn't be.... sorry).
+> >
+> > No need to apologize. Getting good test hardware for arm64 is a complete
+> > chore. Sure would love a functional workstation with cores from this
+> > decade...
+> >
+> > > I think it makes most sense for me to drop the arm64 patch for now and
+> > > re-propose it (or something stronger) alongside enabling aging. Does
+> > > that sound ok?
+> >
+> > I'm a bit disappointed that we haven't gotten forward progress on the
+> > arm64 patches, but I also recognize this is the direction of travel as
+> > the x86 patches are shaping up.
+> >
+> > So yeah, I'm OK with it, but I'd love to get the arm64 side sorted out
+> > soon while the context is still fresh.
+> 
+> Converting the aging notifiers to holding mmu_lock for read seems like
+> a pure win and minimal churn. Can we keep that patch in v7 (which
+> depends on the lockless notifier refactor, i.e. is not completely
+> stand-alone)? We can revisit enabling MGLRU on arm64 in a subsequent
+> series.
+
+Even though the churn is minimal in LOC, locking changes are significant. If
+one thing has become clear, there are some strong opinions about arm64
+participating in MGLRU w/ the read lock. So it is almost guaranteed that
+these read lock changes will eventually get thrown out in favor of an
+RCU-protected walker.
+
+Then we're stuck with potentially 3 flavors of locking in kernels that
+people actually use, and dealing with breakage that only affects that
+intermediate step is gonna be annoying.
+
+-- 
+Thanks,
+Oliver
