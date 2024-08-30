@@ -1,129 +1,90 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E10A916849A;
-	Fri, 30 Aug 2024 08:01:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 395DC380;
+	Fri, 30 Aug 2024 08:07:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725004883; cv=none; b=Hmc/EB9a5X0SGblipsekJVakGhTsfN72UAhXbJtDENoZaXzDiv2VRa3C/rylhzn80uQxp3Yc/hEmeO+l05N9MVS+u9ANGL4yMKXjnRtMGpnEMppa9tTJPUV4soht2lf6PgnvJ2DbduplB8PRVwqWvDtKY0io6FE/vhfGCyzFd8A=
+	t=1725005247; cv=none; b=JqemUIHVkd25Zyezi8nHgcY0t/ufqyqXejrekx2jdupD7oY8Gk3GfOuUPzL6v3cLPoZujhO+upa3sxJGjvouqMqG1JiK/SN5P2GJrTImZlJCrcZ6tOeCkDljluEOKkKRrXr3znFULE7RGHiFfYWUrlXSG9ZovL1lAkLVFywFOKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725004883; c=relaxed/simple;
-	bh=VshpswIhHW2c4cRGikfOOFamWjs+IRqvkBaQTQe4Rmk=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UDpxv/F8Jqmtg5RGvUXrv8qnBThdP/6xYsZ56PeALMuWaSY2yVysoPCbLQhuJpfdGMQ6t6N6TuT2uw+v6gBMn09tVF8EUASWYU1zNwCEGRK1POZqpadAplIoaLfPXifL61HNk+1yLmzRfzrVINlLbVw2kRWaMsSq1tKA0tVrtKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DYMQKP0f; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1725005247; c=relaxed/simple;
+	bh=l8roqf8kViPOvYRrIjEHUh2DQeMyArROfKcwR+D371o=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=J1C89ZusMaO9PWxF8D7nldYoiLu3Yr9gqPf69nxtIHb7gsPNA+9DFmLzQoRuF2c1LG4Yfn95kHI0rTR9+cl1KhzLaLXQSwQQtmEN0h01Oyvq/UE2BLOljK8ldiqxBZzc8R4ktFh6q9S/LuPgXLsgyMHpeddQ2RyqSN/SrugnDwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i+lrXAL7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DYMQKP0f"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61A2DC4CEC2;
-	Fri, 30 Aug 2024 08:01:22 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i+lrXAL7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB65EC4CEC8;
+	Fri, 30 Aug 2024 08:07:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725004882;
-	bh=VshpswIhHW2c4cRGikfOOFamWjs+IRqvkBaQTQe4Rmk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=DYMQKP0fbJqGrFkeyABDC3Xc1uAQUJL9WtZMQbpIQKfd3PjpKK5MwFFNDLMkWInXt
-	 2VtN33L1xcTYIfHOwnNhHsnpOUhnAr1aKVo1dJ3SUWGwg4JLXcMubWrjgMYcEzS6lA
-	 V5Yk8YclN7qN4SmHipKJONL/bEwHoiXLWBln+Mp8bTflBrerAGu5FcdRuo50zJ0Iiw
-	 2yrR30XICxdZzY612s3+l+nkq211lGa4WJJIg654Vn/KZDLp1KwupaEVk/FHPrAsnP
-	 ZjALZAa0jERSuG6ZpXjVo9/AeFgy4X3Fz1SjNY4gK0aVq61secb+UayB1h2PzRzo48
-	 c38nvUpnlAwOQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	s=k20201202; t=1725005246;
+	bh=l8roqf8kViPOvYRrIjEHUh2DQeMyArROfKcwR+D371o=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=i+lrXAL77Dy6OZ784OTZCEFloe1ktIt+FzesYMm7fnUShwe0iC5yHiwE9B8OZzNK4
+	 S/axU8AK9hSkZT8Ryl/kKvxyNP3PhC2gm/8XzA83L8HT1mGf/a2EQyB8D3uhFeQj5E
+	 pQAf0Id9Dxf0zXpFVCR6lOiJhCdaNTEve4jQCTk3NYTUdMrRHdPhxf67wfJihFDs7M
+	 EP24LdKM9tH2CXQxmft+cJUrbA4RSdDp2iku8YXhcWNqH67+d/TkesSY1ZhH55xbgk
+	 1d4EGasPc/cpQf4M1sK0wXWJbuZ9fwiIDhc4oCW58K+x1SLsGk434YSWpzUoPpRGh9
+	 JMeF5l3Vg9m0A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sjwZL-0089BF-S9;
-	Fri, 30 Aug 2024 09:01:19 +0100
-Date: Fri, 30 Aug 2024 09:01:18 +0100
-Message-ID: <86cylqwib5.wl-maz@kernel.org>
+	id 1sjwfE-0089Jh-KW;
+	Fri, 30 Aug 2024 09:07:24 +0100
 From: Marc Zyngier <maz@kernel.org>
-To: Will Deacon <will@kernel.org>
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	nd@arm.com,
-	akpm@linux-foundation.org,
-	aneesh.kumar@kernel.org,
-	aneesh.kumar@linux.ibm.com,
-	anshuman.khandual@arm.com,
-	bp@alien8.de,
-	broonie@kernel.org,
-	catalin.marinas@arm.com,
-	christophe.leroy@csgroup.eu,
-	dave.hansen@linux.intel.com,
-	hpa@zytor.com,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linuxppc-dev@lists.ozlabs.org,
-	mingo@redhat.com,
-	mpe@ellerman.id.au,
-	naveen.n.rao@linux.ibm.com,
-	npiggin@gmail.com,
-	oliver.upton@linux.dev,
-	shuah@kernel.org,
-	skhan@linuxfoundation.org,
-	szabolcs.nagy@arm.com,
-	tglx@linutronix.de,
-	x86@kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v5 08/30] KVM: arm64: make kvm_at() take an OP_AT_*
-In-Reply-To: <20240823134811.GG32156@willie-the-truck>
-References: <20240822151113.1479789-1-joey.gouly@arm.com>
-	<20240822151113.1479789-9-joey.gouly@arm.com>
-	<20240823134811.GG32156@willie-the-truck>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+To: kvm@vger.kernel.org,
+	Colton Lewis <coltonlewis@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Ricardo Koller <ricarkol@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v6 0/2] Add arch_timer_edge_cases selftest
+Date: Fri, 30 Aug 2024 09:07:20 +0100
+Message-Id: <172500523359.3939805.264149216310075712.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240823175836.2798235-1-coltonlewis@google.com>
+References: <20240823175836.2798235-1-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: will@kernel.org, joey.gouly@arm.com, linux-arm-kernel@lists.infradead.org, nd@arm.com, akpm@linux-foundation.org, aneesh.kumar@kernel.org, aneesh.kumar@linux.ibm.com, anshuman.khandual@arm.com, bp@alien8.de, broonie@kernel.org, catalin.marinas@arm.com, christophe.leroy@csgroup.eu, dave.hansen@linux.intel.com, hpa@zytor.com, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org, mingo@redhat.com, mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com, oliver.upton@linux.dev, shuah@kernel.org, skhan@linuxfoundation.org, szabolcs.nagy@arm.com, tglx@linutronix.de, x86@kernel.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
+X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, coltonlewis@google.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, ricarkol@google.com, rananta@google.com, kvmarm@lists.linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Will,
-
-On Fri, 23 Aug 2024 14:48:11 +0100,
-Will Deacon <will@kernel.org> wrote:
+On Fri, 23 Aug 2024 17:58:34 +0000, Colton Lewis wrote:
+> Add arch_timer_edge_cases selftest to test various corner cases of the
+> ARM timers such as:
 > 
-> On Thu, Aug 22, 2024 at 04:10:51PM +0100, Joey Gouly wrote:
-> > To allow using newer instructions that current assemblers don't know about,
-> > replace the `at` instruction with the underlying SYS instruction.
-> > 
-> > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-> > Cc: Marc Zyngier <maz@kernel.org>
-> > Cc: Oliver Upton <oliver.upton@linux.dev>
-> > Cc: Catalin Marinas <catalin.marinas@arm.com>
-> > Cc: Will Deacon <will@kernel.org>
-> > Reviewed-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/kvm_asm.h       | 3 ++-
-> >  arch/arm64/kvm/hyp/include/hyp/fault.h | 2 +-
-> >  2 files changed, 3 insertions(+), 2 deletions(-)
+> * timers above the max TVAL value
+> * timers in the past
+> * moving counters ahead and behind pending timers
+> * reprogramming timers
+> * timers fired multiple times
+> * masking/unmasking using the timer control mask
 > 
-> Marc -- what would you like to do with this patch? I think the POE series
-> is really close now, so ideally I'd queue the lot on a branch in arm64
-> and you could pull the first ~10 patches into kvmarm if you need 'em.
-> 
-> Would what work for you, or did you have something else in mind (since
-> this one is also included in your series adding nv support for AT).
+> [...]
 
-Is there any progress on this front? I am quite eager to queue the AT
-series, but the dependency on this patch is preventing me to do so.
+Applied to next, thanks!
 
-I can see there are outstanding questions on the POE series, so I was
-wondering if we should consider reversing the dependency: I can create
-a stable branch with this single patch, which you can pull as a prefix
-of the POE series.
+[1/2] KVM: selftests: Ensure pending interrupts are handled in arch_timer test
+      commit: ca1a18368d764f9b29ab0c79b3ddd712f5511855
+[2/2] KVM: arm64: selftests: Add arch_timer_edge_cases selftest
+      commit: 54306f564441f6bc99514af45552236f28b1768d
 
-Please let me know what you prefer.
-
-Thanks,
+Cheers,
 
 	M.
-
 -- 
 Without deviation from the norm, progress is not possible.
+
+
