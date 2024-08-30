@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58DA018EFEE;
-	Fri, 30 Aug 2024 14:44:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C0E126281;
+	Fri, 30 Aug 2024 15:00:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725029083; cv=none; b=aDO2eXfl6f+MXvmBYaZCJ+8MOvYiu0vJCcMOTjKYdfGboK9n8C1IbejdqrEe0oeGknWUN/nP1mgAdkak2xmCQvmHbdS05MtHp2CBapX5U/pgfwSGPsZjybxVmJDIlWhA4h1Tod69tLqVSAQlAZijXG2tV3R0vobOFZ3PDZ/vm3o=
+	t=1725030014; cv=none; b=o2OJiyJoB4l6IZtcBvRCzTkfI+BcqfX888ziGOb+e12BsunEXYPY42qtLT6Vi62ncV7s4wYn/+ixMUkV2cFKkStviM+379ebegPy8CD2tD+1hJ4aw3LIadgara+FKvfCgLtAVDseZiYHT6TIFkScs3kdHdMZEzI3183anSEZdZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725029083; c=relaxed/simple;
-	bh=ztG9aO/UPReKf8rYuGZUvZxefpK4v5qH4ddRdTzZmr4=;
+	s=arc-20240116; t=1725030014; c=relaxed/simple;
+	bh=zYYhOpuAWGQ1E161NyOM5PDEx7oo0DseUsRtf8Sym0c=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lAO13cg6D7lWBhsOVVohhn8sCfwRAVAQauYex4l6wkSVjvtHkXNsnIS3ZiM3F5pVgRq1p+1AB+pfRNGpLCQet48ZGjdATQkgEqlt8tG1OsvAKQJnSKJmxGQdhtsNczpzK0b1M5Q38Go6gbmCPbiSFr873vRe8rY9WpbrOmxgqJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b9Q+EPet; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=jbgC/hj+ciKKkCRlCvTyMUdyMbuqqJDeMiwpX92tovG5tnz46BsCzReQMoIUScGD3CghviHqoMzbHQvgo6KYEJ98K5l65z7CYR83wkxOmYgLV4MU7b3/hT8ax2ZkUbyOQR00Y0uy8N6MNJGMGHObUGC+FYJw6atvpItj0yLBX3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hRCrPg0S; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b9Q+EPet"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE61CC4CEC2;
-	Fri, 30 Aug 2024 14:44:42 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hRCrPg0S"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21632C4CEC2;
+	Fri, 30 Aug 2024 15:00:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725029082;
-	bh=ztG9aO/UPReKf8rYuGZUvZxefpK4v5qH4ddRdTzZmr4=;
+	s=k20201202; t=1725030014;
+	bh=zYYhOpuAWGQ1E161NyOM5PDEx7oo0DseUsRtf8Sym0c=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=b9Q+EPetA1udPy1i03GtJtRiriTR2PXXX+wB9E+ZgwOIuMvVYAqcQZvYMoCRAMTAk
-	 hjE32N4c33gt1+rgl8XnR7KSaPUxCOReJjXmPs9JFR33Kq7XKm4khcHI+569qTkWnb
-	 a/dIy09EPpD4cB8l/GqbR9ba72bTN96useOrb3nP/GNjoD40uVRZP3rT9fGmD+n+pt
-	 Qnoa82Ft0ssEtUNCezWZaFa0p1cDzWuIIbLeU7/uWWi0GdL3vcnz5dyzmnw4dw7l34
-	 MnqLNrnriBpLMG6tZWqyOe1syj/u5C635lI2BsPgDqsWKzhFKeEdXZA1bhkWhlRFeA
-	 dc6T6ZxQtbybg==
+	b=hRCrPg0SJXiRzxNKoVv0C8bC9cQr5gScOiTfEY3s42ywZGdr/A8VefV3/eWkbGXDE
+	 Eo8o7UGJcvbFBmF7UUdCNxCbAaKS+krgu9tAXmmImPucoj4IylH47hGrtSqS8iR7Vj
+	 uQ83Q8sSsCVJg7Ce1NQfu6iUVCPDyXEsA0t6F+GA5M3CiqVeI8XTucuJiwCOiyLscQ
+	 p1WT5tYJyC9SIZPeebyrM5oaOED9LjQYaTETyI62YIRReRgic4g7+tCw/1YQu9eGdc
+	 upmYCVW5rjxUjeHuo0kr1mPUiM9qAWYIZxwhbjyP0wk/3nAELL0v0Pre3HmnWRazZS
+	 kKnlvh9d3imjQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sk2rg-008GiT-8i;
-	Fri, 30 Aug 2024 15:44:40 +0100
-Date: Fri, 30 Aug 2024 15:44:39 +0100
-Message-ID: <864j72vzmw.wl-maz@kernel.org>
+	id 1sk36h-008H1t-SN;
+	Fri, 30 Aug 2024 16:00:11 +0100
+Date: Fri, 30 Aug 2024 16:00:11 +0100
+Message-ID: <8634mmvyx0.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Sebastian Ene <sebastianene@google.com>
 Cc: akpm@linux-foundation.org,
@@ -57,8 +57,9 @@ Cc: akpm@linux-foundation.org,
 	linux-kernel@vger.kernel.org,
 	kernel-team@android.com
 Subject: Re: [PATCH v9 0/5] arm64: ptdump: View the second stage page-tables
-In-Reply-To: <20240827084549.45731-1-sebastianene@google.com>
+In-Reply-To: <864j72vzmw.wl-maz@kernel.org>
 References: <20240827084549.45731-1-sebastianene@google.com>
+	<864j72vzmw.wl-maz@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -74,97 +75,78 @@ X-SA-Exim-Rcpt-To: sebastianene@google.com, akpm@linux-foundation.org, alexghiti
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Seb,
+On Fri, 30 Aug 2024 15:44:39 +0100,
+Marc Zyngier <maz@kernel.org> wrote:
+> 
+> Hi Seb,
 
-On Tue, 27 Aug 2024 09:45:43 +0100,
-Sebastian Ene <sebastianene@google.com> wrote:
+[...]
+
+> I've been giving this a go on my test systems with 16k pages, and it
+> doesn't really work as advertised:
 > 
-> Hi,
-> 
-> 
-> This series extends the ptdump support to allow dumping the guest
-> stage-2 pagetables. When CONFIG_PTDUMP_STAGE2_DEBUGFS is enabled, ptdump
-> registers the new following files under debugfs:
-> - /sys/debug/kvm/<guest_id>/stage2_page_tables
-> - /sys/debug/kvm/<guest_id>/stage2_levels
-> - /sys/debug/kvm/<guest_id>/ipa_range
-> 
-> This allows userspace tools (eg. cat) to dump the stage-2 pagetables by
-> reading the 'stage2_page_tables' file.
-> The output format has the following fields:
-> <IPA range> <size> <level> <access permissions> <mem_attributes>
-> 
-> Below is the output of a guest stage-2 pagetable dump running under Qemu.
-> After a VM is created, the following files are available:
-> 
-> # cat /sys/kernel/debug/kvm/256-4/stage2_levels 
-> 4
-> # cat /sys/kernel/debug/kvm/256-4/ipa_range 
-> 44
-> # cat /sys/kernel/debug/kvm/256-4/stage2_page_tables 
+> root@babette:/sys/kernel/debug/kvm# cat 2573-13/stage2_*
+> 2
 > ---[ Guest IPA ]---
-> 0x0000000000000000-0x0000000001000000          16M 2
-> 0x0000000001000000-0x0000000001020000         128K 3
-> 0x0000000001020000-0x0000000001021000           4K 3   R W X AF    
-> 0x0000000001021000-0x0000000001200000        1916K 3
-> 0x0000000001200000-0x0000000040000000        1006M 2
-> 0x0000000040000000-0x0000000080000000           1G 0
-> 0x0000000080000000-0x0000000081200000          18M 2   R W   AF BLK
-> 0x0000000081200000-0x0000000081a00000           8M 2   R W X AF BLK
-> 0x0000000081a00000-0x0000000081c00000           2M 2   R W   AF BLK
-> 0x0000000081c00000-0x0000000082200000           6M 2   R W X AF BLK
-> 0x0000000082200000-0x0000000082400000           2M 2   R W   AF BLK
-> 0x0000000082400000-0x0000000082800000           4M 2   R W X AF BLK
-> 0x0000000082800000-0x0000000082a00000           2M 2   R W   AF BLK
-> 0x0000000082a00000-0x0000000082c00000           2M 2
-> 0x0000000082c00000-0x0000000083200000           6M 2   R W X AF BLK
-> 0x0000000083200000-0x0000000083400000           2M 2
-> 0x0000000083400000-0x0000000083a00000           6M 2   R W X AF BLK
-> 0x0000000083a00000-0x000000008fe00000         196M 2
-> 0x000000008fe00000-0x0000000090000000           2M 2   R W   AF BLK
-> 0x0000000090000000-0x0000000099400000         148M 2
-> 0x0000000099400000-0x0000000099600000           2M 2   R W X AF BLK
-> 0x0000000099600000-0x000000009b600000          32M 2
-> 0x000000009b600000-0x000000009be00000           8M 2   R W X AF BLK
-> 0x000000009be00000-0x000000009c000000           2M 2   R W   AF BLK
-> 0x000000009c000000-0x00000000c0000000         576M 2
+> 0x0000000000000000-0x0000000008000000         128M 
+> 0x0000000008000000-0x00000000090a0000       17024K 3
+> 0x00000000090a0000-0x00000000090a4000          16K 3   R W X AF    
+> 0x00000000090a4000-0x000000000a000000       15728K 3
+> 
+> Only 16kB mapped? This is a full Linux guest running the Debian
+> installer, and just the kernel is about 20MB (the VM has 4GB of RAM,
+> and is using QEMU as the VMM)
+> 
+> So clearly something isn't playing as expected. Also, this '128M'
+> without a level being displayed makes me wonder. It is probably the
+> QEMU flash, but then the rest of the addresses don't make much sense
+> (RAM on QEMU is at 1GB, not at 128MB.
+> 
+> On another system with kvmtool, I get something similar:
+> 
+> root@duodenum:/home/maz# cat /sys/kernel/debug/kvm/*/stage2_*
+> 2
+> ---[ Guest IPA ]---
+> 0x0000000000000000-0x0000000001020000       16512K 3
+> 0x0000000001020000-0x0000000001024000          16K 3   R W X AF    
+> 0x0000000001024000-0x0000000002000000       16240K 3
+> 
+> and kvmtool places the RAM at 2GB. Clearly not what we're seeing here.
+> 
+> Could you please verify this?
 
-I've been giving this a go on my test systems with 16k pages, and it
-doesn't really work as advertised:
+For the record, on a 4kB host, I get much more plausible results:
 
-root@babette:/sys/kernel/debug/kvm# cat 2573-13/stage2_*
-2
+root@big-leg-emma:/home/maz# cat /sys/kernel/debug/kvm/632-12/stage2_*
+3
 ---[ Guest IPA ]---
-0x0000000000000000-0x0000000008000000         128M 
-0x0000000008000000-0x00000000090a0000       17024K 3
-0x00000000090a0000-0x00000000090a4000          16K 3   R W X AF    
-0x00000000090a4000-0x000000000a000000       15728K 3
+0x0000000000000000-0x0000000000200000           2M 2   R     AF BLK
+0x0000000000200000-0x0000000040000000        1022M 2
+0x0000000040000000-0x0000000040200000           2M 2   R W X AF BLK
+0x0000000040200000-0x0000000044000000          62M 2
+0x0000000044000000-0x0000000044200000           2M 2   R W X AF BLK
+0x0000000044200000-0x0000000047600000          52M 2
+0x0000000047600000-0x0000000047800000           2M 2   R W   AF BLK
+0x0000000047800000-0x0000000047e00000           6M 2   R W X AF BLK
+0x0000000047e00000-0x0000000048000000           2M 2   R W   AF BLK
+0x0000000048000000-0x00000000b9c00000        1820M 2
+0x00000000b9c00000-0x00000000b9e00000           2M 2   R W X AF BLK
+0x00000000b9e00000-0x00000000bb800000          26M 2
+0x00000000bb800000-0x00000000bba00000           2M 2   R W X AF BLK
+0x00000000bba00000-0x00000000bbe00000           4M 2   R W   AF BLK
+0x00000000bbe00000-0x00000000bc200000           4M 2   R W X AF BLK
+0x00000000bc200000-0x00000000bc800000           6M 2   R W   AF BLK
+0x00000000bc800000-0x00000000be400000          28M 2
+0x00000000be400000-0x00000000bf800000          20M 2   R W X AF BLK
+0x00000000bf800000-0x00000000bfe00000           6M 2   R W   AF BLK
+0x00000000bfe00000-0x00000000c0000000           2M 2   R W X AF BLK
 
-Only 16kB mapped? This is a full Linux guest running the Debian
-installer, and just the kernel is about 20MB (the VM has 4GB of RAM,
-and is using QEMU as the VMM)
-
-So clearly something isn't playing as expected. Also, this '128M'
-without a level being displayed makes me wonder. It is probably the
-QEMU flash, but then the rest of the addresses don't make much sense
-(RAM on QEMU is at 1GB, not at 128MB.
-
-On another system with kvmtool, I get something similar:
-
-root@duodenum:/home/maz# cat /sys/kernel/debug/kvm/*/stage2_*
-2
----[ Guest IPA ]---
-0x0000000000000000-0x0000000001020000       16512K 3
-0x0000000001020000-0x0000000001024000          16K 3   R W X AF    
-0x0000000001024000-0x0000000002000000       16240K 3
-
-and kvmtool places the RAM at 2GB. Clearly not what we're seeing here.
-
-Could you please verify this?
+So 16kB is the one that needs investigating, and I strongly suspect
+that 64kB is in the same boat...
 
 Thanks,
 
-	M.
+	M. (signing off for the day)
 
 -- 
 Without deviation from the norm, progress is not possible.
