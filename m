@@ -1,76 +1,65 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC8721917C8;
-	Fri, 30 Aug 2024 11:59:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D474199FC2;
+	Fri, 30 Aug 2024 12:28:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725019141; cv=none; b=Nnw88WXPwTK4IUyigbJJnX3HMJUkPdeR25H3vTU3a5RA87XacZATJjNmASlUNchiYP1m6ypv26sgHwbDcsN1BqOZVW5oFdxz81kbvGVKCO0IUOjSdu+8uaxWpy4BJv48e5FxgDb/3zBHrA95d7l7GCEzTFaGbZNGC9NmIktE9XY=
+	t=1725020920; cv=none; b=Dc1PT8WXAVHeKvIB/v6wB+ZoTxjM1KnXjz+zwhsQ6NvhCtfppXK8NQL7o7xBn3ApcLHut6CeMAkCOoZGRPmCudXNxgpjnB32UiUF0/CUmUESc1JT/8Zcrq9vAoywMJnNf/4ukh6e2+wx94QDR/Q2zPo1zc+RJm2vYOwIh3mcHeY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725019141; c=relaxed/simple;
-	bh=VEP7aVQREPxzdE+e/d07GI+Bf+lB2Ws+XRqTgaeCxu4=;
+	s=arc-20240116; t=1725020920; c=relaxed/simple;
+	bh=zO4wCnBxkRXI4i7T5gLDq8jp8Mqm7VeBGA6ulGBi90g=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tlYsbMsbYVzwtmtKKpUDJcFeOJv9jNV58vGvX1wrZmeE41ovAnhySUJpT5ib6J3vGUKbWNXVdA3qMBxp/ZusUl9ZQqGZ+3l3z8kNBG0k/QUGzsKQVCFt50GD+f58SFomlrJIGhLeyXMzwD3gteRqwN4eYvp870az6OOuZhgA8RI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UfrhExWc; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=WYEYgc5opKenxYK579Zch+IJuc3bbikV9oVWcc0y4ErK0vWYDG8Hqbh3Nky9NOHvt7DJqkBMguNT2Rn5BExZBL1ksykFseYJlrUq1Bba4Mv52ocEftrRK9C1Pd5M3eeFXSr1m301Z28Y4sGYUrM04GoGTfqJy9Sd8Jr137Iyk4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uMGTTGx8; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UfrhExWc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A3B1C4CEC2;
-	Fri, 30 Aug 2024 11:59:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uMGTTGx8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96B95C4CEC8;
+	Fri, 30 Aug 2024 12:28:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725019141;
-	bh=VEP7aVQREPxzdE+e/d07GI+Bf+lB2Ws+XRqTgaeCxu4=;
+	s=k20201202; t=1725020919;
+	bh=zO4wCnBxkRXI4i7T5gLDq8jp8Mqm7VeBGA6ulGBi90g=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UfrhExWcg1C6SQizVcm2DJ85tiDdXrFnSB8Y2HXg+epYhEwbxwSFuCfWuclYXue6N
-	 Az88yVQSFZrVWRa6I2mg39jBGRA6JtmF8GwvK1gSOpQrHPpvs8nT9/PurJreRgj+JE
-	 Oo0T8x2FsW+FZwZL6JYPi3RA7KqNIvtOkt7ydZSizQAHe3gEUVpFtYD/b/Utjrhwg4
-	 oqXfSQqKwsOhWrZXW5Yab56eVHxNrB7njUykaAPOpQTgYnHKGIaLjywFCL3Ys+Ux5G
-	 l/9V+IniLg2JVb5VWjHCCgemFIp5oCZhPrFQkcmUvdvnJ6TRR7LsM0ROlHEW6PgHpQ
-	 DZ9XOSBvXLmLw==
+	b=uMGTTGx8s5zmmy3/df69HrZEHIrifn0gDansnbCAJgTGbTtDclef3IKWPrpklEnPr
+	 ELsNmyQs8e69sUiNCtm/TkT0WXtdqF9hheMKjklQ8C1Kkh/6C9oCFkmU0QjkaN5AaM
+	 AUcrHUyqdMutMujyrs0nVmeXggVkztoWHE3rFppU+7lecAUWcziH7YdOSDOWWQQZyB
+	 oTzcFdhR8/khxQyd3V0JenFzXGwf8Br6rvPNfCW08bDJim1Ltc/HeUlyywyqY/Z1kM
+	 Ln8ygNn+e3DfuSpYf0/tKWADFAJILzYQ6i+xpbKbnJgwNN4A/0fp73lIKR+8zLOsy7
+	 Z3t6HLh+c+jDA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sk0HK-008E0N-Of;
-	Fri, 30 Aug 2024 12:58:58 +0100
-Date: Fri, 30 Aug 2024 12:58:57 +0100
-Message-ID: <86a5guw7b2.wl-maz@kernel.org>
+	id 1sk0k1-008EPI-01;
+	Fri, 30 Aug 2024 13:28:37 +0100
+Date: Fri, 30 Aug 2024 13:28:36 +0100
+Message-ID: <868qwew5xn.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Will Deacon <will@kernel.org>
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	nd@arm.com,
-	akpm@linux-foundation.org,
-	aneesh.kumar@kernel.org,
-	aneesh.kumar@linux.ibm.com,
-	anshuman.khandual@arm.com,
-	bp@alien8.de,
-	broonie@kernel.org,
+To: Sebastian Ene <sebastianene@google.com>
+Cc: akpm@linux-foundation.org,
+	alexghiti@rivosinc.com,
+	ankita@nvidia.com,
+	ardb@kernel.org,
 	catalin.marinas@arm.com,
 	christophe.leroy@csgroup.eu,
-	dave.hansen@linux.intel.com,
-	hpa@zytor.com,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linuxppc-dev@lists.ozlabs.org,
-	mingo@redhat.com,
-	mpe@ellerman.id.au,
-	naveen.n.rao@linux.ibm.com,
-	npiggin@gmail.com,
+	james.morse@arm.com,
+	vdonnefort@google.com,
+	mark.rutland@arm.com,
 	oliver.upton@linux.dev,
-	shuah@kernel.org,
-	skhan@linuxfoundation.org,
-	szabolcs.nagy@arm.com,
-	tglx@linutronix.de,
-	x86@kernel.org,
+	rananta@google.com,
+	ryan.roberts@arm.com,
+	shahuang@redhat.com,
+	suzuki.poulose@arm.com,
+	will@kernel.org,
+	yuzenghui@huawei.com,
 	kvmarm@lists.linux.dev,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v5 08/30] KVM: arm64: make kvm_at() take an OP_AT_*
-In-Reply-To: <20240830090522.GA7678@willie-the-truck>
-References: <20240822151113.1479789-1-joey.gouly@arm.com>
-	<20240822151113.1479789-9-joey.gouly@arm.com>
-	<20240823134811.GG32156@willie-the-truck>
-	<86cylqwib5.wl-maz@kernel.org>
-	<20240830090522.GA7678@willie-the-truck>
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kernel-team@android.com
+Subject: Re: [PATCH v9 2/5] arm64: ptdump: Expose the attribute parsing functionality
+In-Reply-To: <20240827084549.45731-3-sebastianene@google.com>
+References: <20240827084549.45731-1-sebastianene@google.com>
+	<20240827084549.45731-3-sebastianene@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -82,63 +71,38 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: will@kernel.org, joey.gouly@arm.com, linux-arm-kernel@lists.infradead.org, nd@arm.com, akpm@linux-foundation.org, aneesh.kumar@kernel.org, aneesh.kumar@linux.ibm.com, anshuman.khandual@arm.com, bp@alien8.de, broonie@kernel.org, catalin.marinas@arm.com, christophe.leroy@csgroup.eu, dave.hansen@linux.intel.com, hpa@zytor.com, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org, mingo@redhat.com, mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com, oliver.upton@linux.dev, shuah@kernel.org, skhan@linuxfoundation.org, szabolcs.nagy@arm.com, tglx@linutronix.de, x86@kernel.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
+X-SA-Exim-Rcpt-To: sebastianene@google.com, akpm@linux-foundation.org, alexghiti@rivosinc.com, ankita@nvidia.com, ardb@kernel.org, catalin.marinas@arm.com, christophe.leroy@csgroup.eu, james.morse@arm.com, vdonnefort@google.com, mark.rutland@arm.com, oliver.upton@linux.dev, rananta@google.com, ryan.roberts@arm.com, shahuang@redhat.com, suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 30 Aug 2024 10:05:22 +0100,
-Will Deacon <will@kernel.org> wrote:
+On Tue, 27 Aug 2024 09:45:45 +0100,
+Sebastian Ene <sebastianene@google.com> wrote:
 > 
-> Hey Marc,
-> 
-> On Fri, Aug 30, 2024 at 09:01:18AM +0100, Marc Zyngier wrote:
-> > On Fri, 23 Aug 2024 14:48:11 +0100,
-> > Will Deacon <will@kernel.org> wrote:
-> > > 
-> > > On Thu, Aug 22, 2024 at 04:10:51PM +0100, Joey Gouly wrote:
-> > > > To allow using newer instructions that current assemblers don't know about,
-> > > > replace the `at` instruction with the underlying SYS instruction.
-> > > > 
-> > > > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-> > > > Cc: Marc Zyngier <maz@kernel.org>
-> > > > Cc: Oliver Upton <oliver.upton@linux.dev>
-> > > > Cc: Catalin Marinas <catalin.marinas@arm.com>
-> > > > Cc: Will Deacon <will@kernel.org>
-> > > > Reviewed-by: Marc Zyngier <maz@kernel.org>
-> > > > ---
-> > > >  arch/arm64/include/asm/kvm_asm.h       | 3 ++-
-> > > >  arch/arm64/kvm/hyp/include/hyp/fault.h | 2 +-
-> > > >  2 files changed, 3 insertions(+), 2 deletions(-)
-> > > 
-> > > Marc -- what would you like to do with this patch? I think the POE series
-> > > is really close now, so ideally I'd queue the lot on a branch in arm64
-> > > and you could pull the first ~10 patches into kvmarm if you need 'em.
-> > > 
-> > > Would what work for you, or did you have something else in mind (since
-> > > this one is also included in your series adding nv support for AT).
-> > 
-> > Is there any progress on this front? I am quite eager to queue the AT
-> > series, but the dependency on this patch is preventing me to do so.
-> > 
-> > I can see there are outstanding questions on the POE series, so I was
-> > wondering if we should consider reversing the dependency: I can create
-> > a stable branch with this single patch, which you can pull as a prefix
-> > of the POE series.
-> 
-> That sounds like a good idea. The uaccess discussion seems to have
-> stalled and I don't really want to merge the series without concluding
-> that.
-> 
-> So please go ahead with this single patch and I'll pull it in if things
-> start moving again.
+> Reuse the descriptor parsing functionality to keep the same output format
+> as the original ptdump code.
 
-Now pushed to [1].
+This sentence seems either out of place or missing something, because
+this change it not reusing anything...
+
+> In order for this to happen, move the state
+> tracking objects into a common header.
+
+... but instead doing this ^^^.
+
+I propose to rewrite the commit message as:
+
+"Adding a new page-table dumper for stage-2 requires parsing the page
+tables, and reusing the descriptor parsing functionality would help
+keeping the same output format as the original ptdump code.
+
+In order for this to happen, move the state tracking object
+definitions into a common header."
+
+Shout if you object to it!
 
 Thanks,
 
 	M.
-
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git/log/?h=arm64-shared-6.12
 
 -- 
 Without deviation from the norm, progress is not possible.
