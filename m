@@ -1,166 +1,168 @@
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77ACD136E3F
-	for <kvmarm@lists.linux.dev>; Fri, 30 Aug 2024 03:48:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63B58142631
+	for <kvmarm@lists.linux.dev>; Fri, 30 Aug 2024 04:36:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724989683; cv=none; b=VRxXRDES+B6TZorSnbr3JWQgyqoxI0M7SBS9/KP6GB8pp+I7jfS6j+nNxSDAoRy4q3eFXswkT8BREL2NvEfcx7tM7XhXh5P0BRLKA/Z2fHTotV8xuA0NhhmgyN5By27ig+vNPla/8R/hl1IA6ro91/GO9cr7Hu9RXsEMzRZYKaQ=
+	t=1724992567; cv=none; b=TiCQg86zY+muake+8hfCv1IS+fnVnLQh9m1uA1r9f6kMQC8z/VujICYRYBUspdfIv3aPwb0gd59WpexOEeBfqLQ1jYqjti7SbtjQWoQJeXJCJZt7HXtQZuyMZRSev8jVB/cce5qJ6QevIlfQFcDjEFe7JAfvGnnSMEk35A8pLoQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724989683; c=relaxed/simple;
-	bh=8X4cJIJqX+703YojJTQK5ekGonK/y/arTKL/aqKkyEI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=lzvuCYoyxicNrKJNKIiHOitBuR/e+mVyXGXvuVM1GTjyJNVCpzVYVLlq279eu4wdjgE2j1TKKlSdzfTSZzSaiyfj5Xc8J/EOxAhPVMt1ZM7QzrxHSG+OEBghvd2zTplrDqPG8vDs5LNW1ctxNtsgakMBaRiajMx5wxv83gtVj8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GrTw6i/H; arc=none smtp.client-ip=209.85.214.202
+	s=arc-20240116; t=1724992567; c=relaxed/simple;
+	bh=Led2wy/kfxWSht1BA326pNMoaxCFzvQe40FiQLSX4f0=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=WXlTdtmxl0FnxYazUuDd+Yn0i6g05bvGWEEyVY+s5/vxrwtKL6gSHCv2G61bh3RBEHegRTD0MAZgjcTwSFcKHUlvF1C7WGBICY6lb/ZKaCxqeJKvM0jbNX7R7ccpSykuSIH4aA9TLvUT4cNwwIw/0f8EEd5IkOU1JILJeOxUAvw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=N9/n5vJd; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GrTw6i/H"
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-201f464e3e8so14664065ad.3
-        for <kvmarm@lists.linux.dev>; Thu, 29 Aug 2024 20:48:01 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="N9/n5vJd"
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6b4270bdea3so31968957b3.3
+        for <kvmarm@lists.linux.dev>; Thu, 29 Aug 2024 21:36:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724989681; x=1725594481; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7oDkTMtkbW8nQHJkC6FNRU/4bZFr8mldBmCcZx8NdnI=;
-        b=GrTw6i/H3tZdlJVGCbAhKQllnCT+KPY1FIJv1gyb3vmoM/KJMR0y6OgkXQ8UFsK6Xr
-         14Ab9s8jeAuAT87hXIEdWg7C3F9y7o768CvpaEg+lDyOpequxTR1gYVZ9EZpkGFIBBGr
-         dInz1uzqt8RDQ1D5eccPBzm6sQWW6M/NCM0V/EA8XRFin6Y+q/fIsghCHz6BKmfTdRiH
-         lvKlgGWyA3aLF1B/yxZuPlbSyyNAbh8lORzWpO2PmHr1XRhYfOxZuxU+P60h/J7mPFTT
-         1ZKEXwSMcsE1rE7HUyQxy0nHx3HZhSrjznwiWzCmcKS3TwBDkjRRndFmSFK85ZdT7sIz
-         x41Q==
+        d=google.com; s=20230601; t=1724992564; x=1725597364; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0RRTA1H5OtG+8qgMxGB5BU8t5Dbb6+roBouJjwlrdgk=;
+        b=N9/n5vJdmSX0s38ypRVhWtRwEJwzGy/3WN8Z/Odpzzp3ABQHCpOY+XQdv6f/qTf+mE
+         UqlLBAv1MJRz+8cj5zBjFJ5NUIEE2QlP6TlNu5vF8Sb1HsvBMRVst+e7n5E1d0HUvG10
+         4nmfP9kFNlEoaYFK2uUyspH9GZrSw7BshmLMcfIpjJpvoF/y0BMnOH8YjAhLv4ngDrD3
+         dJ1bF0BqpxDcWNTsgPyRaTa/SIufFgSitlLEJvXktDR0vqTZcNBpNXpcrua5NaQ4HcoD
+         4TQKD9jzeGFjOXM5XJdpoXn9On7SWCLkmW43dZzHC6JdFBrGdCcVbm2+RJCKP6T+x6BR
+         T0tg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724989681; x=1725594481;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=7oDkTMtkbW8nQHJkC6FNRU/4bZFr8mldBmCcZx8NdnI=;
-        b=W6WqJsx9GgOfGBB3r7wfzp7S/lIs/F8WKiM/7fdEvXNAg8l7EWhCiPOSUOmYX1t7OK
-         ToB/bTyFh3hz8hgAzP5k5reAnMhxoKdvwgxF2WVnp3yAedXdZgnUICoRG2BrYSErS+IG
-         TXRy2rnPZ00H8morLKSlxng/OkI9QCbE+2vKTs13gThpVdXqeh4I8WURDP/buUY8IaII
-         Ayn0hwZVYituAfbQP9fHOkBpY+FOzk/hl9byu6ESQYjaxNA7M4J7jL70e/XBTFdKSTWt
-         UmeLHz5CcEFIAfSV+z6z8k9PP2VUTL2rnQW23YU5iLJlmc+QK85ii/IPpBQFOyW6Iqux
-         zY2w==
-X-Forwarded-Encrypted: i=1; AJvYcCUC87GgwiqcXQJlyUlCmkNmQV4aWfUousnYD0YEe2myZjw59jHO4Tk+LbbnX3NDVOfc0R+c824=@lists.linux.dev
-X-Gm-Message-State: AOJu0Ywds3QqOFD+MD3glp5NnaIcaMXGHzeXbN/zgn21OxcmkPgV1aDh
-	i/r/Bp/nGajkdQiR1mmcFTubXO3t0HMRRHSrwm/vd+sH1fnVhzk36v6AvgZdWt8EEUnco5VpxD0
-	2Ig==
-X-Google-Smtp-Source: AGHT+IFuJaHoFSCV5+8BWRf+q8zKeUDxkgIb0cxDbWq2MCPl2PJvwzOB/7AGr0dtEc/kwU7osl3dzfbQCdc=
+        d=1e100.net; s=20230601; t=1724992564; x=1725597364;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0RRTA1H5OtG+8qgMxGB5BU8t5Dbb6+roBouJjwlrdgk=;
+        b=Vkb6Culm+jXHd7K2jIU3/BjvH/jhb31cKjPhwsE/2Q+/J+GiTH2BXWW2tPuFuDRkbo
+         os4Bizo8nJOdmyv1CRSVV6eTEBoJIWWtMEULkifguVgTgUIRdG2ErKJDYa0lk+7Y+d1Q
+         lsc3AhmDynX+zcVio2U+KozOOHhRy/tpqRyJTvZQBmHImji3AzRdH/f0nR/BuwNoqdcT
+         /k+0G0+BdCgL1OJ7HF0KzyEuTLIgQZo3AlN6UKj5Gj//hu+NDrnjxviit2uVSuGNjLSB
+         kRSRLHCa8F+1cBkcFtnrAQQ2U/sqKYCWcLQeA0ksXqOnu8/0u8brskYLEvrqcXpugu14
+         z0MQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU5mDqHCBcwAbTVQpDasIqZH0BSUS3cyR6T0iHsHjNNGRE/Cs//BlBWOHG33dQsTldq1c1cz4w=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxMw7RKawEbVlDa7wYFdXef3ERqNyOKeGdLn7nX2AJXB/WmCfK2
+	9RTDfEN9nrbdJm1zVB4ntFTgcQ9vVF4OUIf8SsyFbg5V4Im8hrbAkBodS3B/N/DhXRJ48EBCR33
+	rKA==
+X-Google-Smtp-Source: AGHT+IG+hqynsJ7hdgdKV9gAtkROKS2qGVXayEmYSbfKtO5Jo9FgRfejcOxvLz+XMdzoh9wRJFEwtKQxRPs=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:f54c:b0:1ff:4618:36dd with SMTP id
- d9443c01a7336-20527612dc9mr665745ad.1.1724989680602; Thu, 29 Aug 2024
- 20:48:00 -0700 (PDT)
-Date: Thu, 29 Aug 2024 20:47:59 -0700
-In-Reply-To: <CADrL8HWQqVm5VbNnR6iMEZF17+nuO_Y25m6uuScCBVSE_YCTdg@mail.gmail.com>
+ (user=seanjc job=sendgmr) by 2002:a25:278a:0:b0:e0b:a712:2ceb with SMTP id
+ 3f1490d57ef6-e1a79ff35c5mr30969276.5.1724992564279; Thu, 29 Aug 2024 21:36:04
+ -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Thu, 29 Aug 2024 21:35:50 -0700
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20240724011037.3671523-1-jthoughton@google.com>
- <20240724011037.3671523-3-jthoughton@google.com> <Zr_3Vohvzt0KmFiN@google.com>
- <CADrL8HWQqVm5VbNnR6iMEZF17+nuO_Y25m6uuScCBVSE_YCTdg@mail.gmail.com>
-Message-ID: <ZtFA79zreVt4GBri@google.com>
-Subject: Re: [PATCH v6 02/11] KVM: x86: Relax locking for kvm_test_age_gfn and kvm_age_gfn
+X-Mailer: git-send-email 2.46.0.469.g59c65b2a67-goog
+Message-ID: <20240830043600.127750-1-seanjc@google.com>
+Subject: [PATCH v4 00/10] KVM: Register cpuhp/syscore callbacks when enabling virt
 From: Sean Christopherson <seanjc@google.com>
-To: James Houghton <jthoughton@google.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Ankit Agrawal <ankita@nvidia.com>, Axel Rasmussen <axelrasmussen@google.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, David Matlack <dmatlack@google.com>, 
-	David Rientjes <rientjes@google.com>, James Morse <james.morse@arm.com>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Raghavendra Rao Ananta <rananta@google.com>, 
-	Ryan Roberts <ryan.roberts@arm.com>, Shaoqin Huang <shahuang@redhat.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Wei Xu <weixugc@google.com>, 
-	Will Deacon <will@kernel.org>, Yu Zhao <yuzhao@google.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
+	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, Chao Gao <chao.gao@intel.com>, 
+	Kai Huang <kai.huang@intel.com>, Farrah Chen <farrah.chen@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Aug 29, 2024, James Houghton wrote:
-> On Fri, Aug 16, 2024 at 6:05=E2=80=AFPM Sean Christopherson <seanjc@googl=
-e.com> wrote:
-> > > +static __always_inline bool kvm_tdp_mmu_handle_gfn_lockless(
-> > > +             struct kvm *kvm,
-> > > +             struct kvm_gfn_range *range,
-> > > +             tdp_handler_t handler)
-> >
-> > Please burn all the Google3 from your brain, and code ;-)
->=20
-> I indented this way to avoid going past the 80 character limit. I've
-> adjusted it to be more like the other functions in this file.
->=20
-> Perhaps I should put `static __always_inline bool` on its own line?
+Register KVM's cpuhp and syscore callbacks when enabling virtualization in
+hardware, as the sole purpose of said callbacks is to disable and re-enable
+virtualization as needed.
 
-Noooo. Do not wrap before the function name.  Linus has a nice explanation/=
-rant
-on this[1].
+The primary motivation for this series is to simplify dealing with enabling
+virtualization for Intel's TDX, which needs to enable virtualization
+when kvm-intel.ko is loaded, i.e. long before the first VM is created.
 
-In this case, I'm pretty sure you can avoid the helper and simply handle al=
-l aging
-paths in a single API, e.g. similar to what I proposed for the shadow MMU[2=
-].
+That said, this is a nice cleanup on its own.  By registering the callbacks
+on-demand, the callbacks themselves don't need to check kvm_usage_count,
+because their very existence implies a non-zero count.
 
-[1] https://lore.kernel.org/all/CAHk-=3DwjoLAYG446ZNHfg=3DGhjSY6nFmuB_wA8fY=
-d5iLBNXjo9Bw@mail.gmail.com
-[2] https://lore.kernel.org/all/20240809194335.1726916-16-seanjc@google.com
+Patch 1 (re)adds a dedicated lock for kvm_usage_count.  Hopefully it's a
+temporary lock, as we can likely fix the cpus_read_lock() vs. kvm_lock mess
+for good by switching vm_list to an (S)RCU-protected list.
 
-> > >  /*
-> > >   * Mark the SPTEs range of GFNs [start, end) unaccessed and return n=
-on-zero
-> > >   * if any of the GFNs in the range have been accessed.
-> > > @@ -1237,28 +1272,30 @@ static bool age_gfn_range(struct kvm *kvm, st=
-ruct tdp_iter *iter,
-> > >  {
-> > >       u64 new_spte;
-> > >
-> > > +retry:
-> > >       /* If we have a non-accessed entry we don't need to change the =
-pte. */
-> > >       if (!is_accessed_spte(iter->old_spte))
-> > >               return false;
-> > >
-> > >       if (spte_ad_enabled(iter->old_spte)) {
-> > > -             iter->old_spte =3D tdp_mmu_clear_spte_bits(iter->sptep,
-> > > -                                                      iter->old_spte=
-,
-> > > -                                                      shadow_accesse=
-d_mask,
-> > > -                                                      iter->level);
-> > > +             iter->old_spte =3D tdp_mmu_clear_spte_bits_atomic(iter-=
->sptep,
-> > > +                                             shadow_accessed_mask);
-> > >               new_spte =3D iter->old_spte & ~shadow_accessed_mask;
-> > >       } else {
-> > > -             /*
-> > > -              * Capture the dirty status of the page, so that it doe=
-sn't get
-> > > -              * lost when the SPTE is marked for access tracking.
-> > > -              */
-> > > +             new_spte =3D mark_spte_for_access_track(iter->old_spte)=
-;
-> > > +             if (__tdp_mmu_set_spte_atomic(iter, new_spte)) {
-> > > +                     /*
-> > > +                      * The cmpxchg failed. If the spte is still a
-> > > +                      * last-level spte, we can safely retry.
-> > > +                      */
-> > > +                     if (is_shadow_present_pte(iter->old_spte) &&
-> > > +                         is_last_spte(iter->old_spte, iter->level))
-> > > +                             goto retry;
-> >
-> > Do we have a feel for how often conflicts actually happen?  I.e. is it =
-worth
-> > retrying and having to worry about infinite loops, however improbable t=
-hey may
-> > be?
->=20
-> I'm not sure how common this is. I think it's probably better not to
-> retry actually. If the cmpxchg fails, this spte is probably young
-> anyway, so I can just `return true` instead of potentially retrying.
-> This is all best-effort anyway.
+v4:
+ - Collect more reviews.
+ - Fix documentation for kvm_usage_lock. [Kai]
+ - Add a blurb in locking.rst to call out that cpus_read_lock() vs kvm_lock is
+   a general problem.
+ - Add a paragraph in the locking patch to suggest switching vm_list to an
+   (S)RCU-protected list, so that walkers don't need to take kvm_lock.
+ - Add an example call chain for the other cpus_read_lock() vs kvm_lock issues
+   that are lurking.
+ - Enable the module param by default from the get-go. [Paolo]
+ - Rename even more APIs/symbols (all of 'em I could find). [Paolo]
+ - Clarify that it's the 0=>1 VM creation that's problematic, not simply the
+   creation of the very first VM. [Paolo]
+ - Document enable_virt_at_load, and call out the (dis)advantages of enabling
+   virtualization when KVM is loaded.
+ - Drop the WARN on kvm_usage_count being elevated at the end of
+   kvm_uninit_virtualization(), as it's annoyingly difficult to keep the WARN
+   and still allow arch code (i.e. TDX) to enable virtualization during setup.
 
-+1
+v3:
+ - https://lore.kernel.org/all/20240608000639.3295768-1-seanjc@google.com
+ - Collect reviews/acks.
+ - Switch to kvm_usage_lock in a dedicated patch, Cc'd for stable@. [Chao]
+ - Enable virt at load by default. [Chao]
+ - Add comments to document how kvm_arch_{en,dis}able_virtualization() fit
+   into the overall flow. [Kai]
+
+v2:
+ - https://lore.kernel.org/all/20240522022827.1690416-1-seanjc@google.com
+ - Use a dedicated mutex to avoid lock inversion issues between kvm_lock and
+   the cpuhp lock.
+ - Register emergency disable callbacks on-demand. [Kai]
+ - Drop an unintended s/junk/ign rename. [Kai]
+ - Decrement kvm_usage_count on failure. [Chao]
+
+v1: https://lore.kernel.org/all/20240425233951.3344485-1-seanjc@google.com
+
+Sean Christopherson (10):
+  KVM: Use dedicated mutex to protect kvm_usage_count to avoid deadlock
+  KVM: Register cpuhp and syscore callbacks when enabling hardware
+  KVM: Rename symbols related to enabling virtualization hardware
+  KVM: Rename arch hooks related to per-CPU virtualization enabling
+  KVM: MIPS: Rename virtualization {en,dis}abling APIs to match common
+    KVM
+  KVM: x86: Rename virtualization {en,dis}abling APIs to match common
+    KVM
+  KVM: Add a module param to allow enabling virtualization when KVM is
+    loaded
+  KVM: Add arch hooks for enabling/disabling virtualization
+  x86/reboot: Unconditionally define cpu_emergency_virt_cb typedef
+  KVM: x86: Register "emergency disable" callbacks when virt is enabled
+
+ .../admin-guide/kernel-parameters.txt         |  17 ++
+ Documentation/virt/kvm/locking.rst            |  31 +-
+ arch/arm64/kvm/arm.c                          |   6 +-
+ arch/loongarch/kvm/main.c                     |   4 +-
+ arch/mips/include/asm/kvm_host.h              |   4 +-
+ arch/mips/kvm/mips.c                          |   8 +-
+ arch/mips/kvm/vz.c                            |   8 +-
+ arch/riscv/kvm/main.c                         |   4 +-
+ arch/x86/include/asm/kvm-x86-ops.h            |   4 +-
+ arch/x86/include/asm/kvm_host.h               |   7 +-
+ arch/x86/include/asm/reboot.h                 |   2 +-
+ arch/x86/kvm/svm/svm.c                        |  19 +-
+ arch/x86/kvm/vmx/main.c                       |   6 +-
+ arch/x86/kvm/vmx/vmx.c                        |  10 +-
+ arch/x86/kvm/vmx/x86_ops.h                    |   5 +-
+ arch/x86/kvm/x86.c                            |  26 +-
+ include/linux/kvm_host.h                      |  18 +-
+ virt/kvm/kvm_main.c                           | 270 +++++++++---------
+ 18 files changed, 251 insertions(+), 198 deletions(-)
+
+
+base-commit: 15e1c3d65975524c5c792fcd59f7d89f00402261
+-- 
+2.46.0.469.g59c65b2a67-goog
+
