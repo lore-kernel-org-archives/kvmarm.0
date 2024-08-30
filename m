@@ -1,124 +1,123 @@
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87E7D1BAEFA
-	for <kvmarm@lists.linux.dev>; Fri, 30 Aug 2024 17:38:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F2211BF32B;
+	Fri, 30 Aug 2024 20:01:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725039526; cv=none; b=S4o2CuHm/ewGwifLLSK4WjuaGi6tcYv1pe87y6qQgUgQkYb8jaFucxBBhCEAfYQektPIpXTmBGSQE3sYoC254Hhzoqp1TeCc9R6v9AGfGUwbQP054KWFoQwLm7HReNeC62jIdrLpLKuCXLgoQcu8mNuUx0LJiE9p0y/SQ8hT0I4=
+	t=1725048090; cv=none; b=Mx7u0e6Pv963o/zaGjuDdAMLIdLckdu6kIjCCRP8K6SnqDSXCbFP0j+rjBoGaVFsOCuT0JY5paf9Q6kQ6ni4nWJdVRtc6vZHLs4UJGC0J1y9hJZzD7LnGoiyqAw8h4J6GrA+UW98XhOjzF27oAwMPppF77H+dJs4MZPsHMSZ18E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725039526; c=relaxed/simple;
-	bh=lge5FERVK6kb/J6uzbFQGyu7nF5jed3VoSj6+WRGVyA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PLnJ8KsnBSDaEyEjopTshcDIusG6qh312QPCpNuax78dmEsFwt7cohnKRLBnH3nt26w8/Aza7RVdh4f/lSeA1EkaY1zzD972nPB0Jf5HSsAWAG1kPcfadz4PTKnCQqr6RpNeR2s5zq4C78QqK7e2hXMUYPXSncv9w7mWjv9kH6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VxiwD7GQ; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1725048090; c=relaxed/simple;
+	bh=UnnRz/fXubHjZaCcgN3w8cVmELw8vTqbztLRBLNlvwQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sk0tjRuYlQipgv7vQcoTdmRcgmAQ7APughk2cZ43UTzZKgoacbxkvX5DCerezBmQ/EraliB66Z/ARQViYDwcUhc1EhtGuelxFs5oNmDd5DhGH4ocaMZ61lOHufFunYy8VXwLwaZhFSNf4+EQuAWsAVhZ7LzksEZRFiKSY5kOD0U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CIVs1eTY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VxiwD7GQ"
-Date: Fri, 30 Aug 2024 10:38:33 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1725039522;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=d6L+KI/2jSnOcw8BblWMkOB9gllIb6gCZOsYWN7xgAE=;
-	b=VxiwD7GQ9XhGMOI+EnUY1hbVf1hzgYZ5y62ghG8H7NgsCgvXK4O4uAcphI2s+QGcMzw68d
-	UaCmBNo7L8WOVI0SB8xsTf4TWWtvlNsKEr9IyKBJdR3cffMLp9Ra0WD2saR02EGGsiHuqM
-	Gm5puFHjnuYd9wcQ2Fo4PIH+Gvr10zY=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: David Matlack <dmatlack@google.com>
-Cc: James Houghton <jthoughton@google.com>, Yu Zhao <yuzhao@google.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Ankit Agrawal <ankita@nvidia.com>,
-	Axel Rasmussen <axelrasmussen@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	David Rientjes <rientjes@google.com>,
-	James Morse <james.morse@arm.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	Shaoqin Huang <shahuang@redhat.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CIVs1eTY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52D4EC4CEC2;
+	Fri, 30 Aug 2024 20:01:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725048090;
+	bh=UnnRz/fXubHjZaCcgN3w8cVmELw8vTqbztLRBLNlvwQ=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=CIVs1eTYBMNJLXUF/c9tjbcPnL6OnpO9stlJ/Qk8WgmoqqcJ1NmNs0Nn7pjJ2xVEJ
+	 s26c9pc/iMPQ8iJ2vDcWq30oV3yMQKq7cME7O9ZMI5rzt0HeioytJqKqNL/N3Y3e9N
+	 u85q+mj8rFn1Ov7BpbbSN7Mq7QGc0D5/k0s3oRy9MxZCJ97X7tABt+2pch7Fdnxvjy
+	 WM7JJCRYJKwwYSaUoF8DCc9aAJi3lfQlSHFZoX2jWXaGim5ROH9y08t+Vl8pOj5C/t
+	 YE70V94syL76t/fZcmRcEgudAdUzRsctIweQ/+NhaL9RnCt+Gkc1vxzHQuaqhD9IT3
+	 XikH32811nJnA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sk7oF-008LX5-Bt;
+	Fri, 30 Aug 2024 21:01:28 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Marc Zyngier <maz@kernel.org>
+Cc: James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Wei Xu <weixugc@google.com>, Will Deacon <will@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org
-Subject: Re: [PATCH v6 03/11] KVM: arm64: Relax locking for kvm_test_age_gfn
- and kvm_age_gfn
-Message-ID: <ZtIDmc_V62ZqrbxW@linux.dev>
-References: <20240724011037.3671523-1-jthoughton@google.com>
- <20240724011037.3671523-4-jthoughton@google.com>
- <CADrL8HV5M-n72KDseDKWpGrUVMjC147Jqz98PxyG2ZeRVbFu8g@mail.gmail.com>
- <Zr_y7Fn63hdowfYM@google.com>
- <CAOUHufYc3hr-+fp14jgEkDN++v6t-z-PRf1yQdKtnje6SgLiiA@mail.gmail.com>
- <ZsOuEP6P0v45ffC0@linux.dev>
- <CADrL8HWf-Onu=4ONBO1CFZ1Tqj5bee=+NnRC333aKqkUy+0Sxg@mail.gmail.com>
- <ZtEW5Iym5QsJbONM@linux.dev>
- <CALzav=daN3y9nXNuj7pPpn2u_aAQ84t161z3odP=MGLYCLfYMQ@mail.gmail.com>
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Przemyslaw Gaj <pgaj@cadence.com>
+Subject: Re: [PATCH v4 00/18] KVM: arm64: nv: Add support for address translation instructions
+Date: Fri, 30 Aug 2024 21:01:24 +0100
+Message-Id: <172504804211.526098.10058042822239904952.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240820103756.3545976-1-maz@kernel.org>
+References: <20240820103756.3545976-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CALzav=daN3y9nXNuj7pPpn2u_aAQ84t161z3odP=MGLYCLfYMQ@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com, alexandru.elisei@arm.com, anshuman.khandual@arm.com, pgaj@cadence.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hey David,
-
-On Fri, Aug 30, 2024 at 08:33:59AM -0700, David Matlack wrote:
-> On Thu, Aug 29, 2024 at 5:48 PM Oliver Upton <oliver.upton@linux.dev> wrote:
-> >
-> > On Thu, Aug 29, 2024 at 05:33:00PM -0700, James Houghton wrote:
-> > > On Mon, Aug 19, 2024 at 1:42 PM Oliver Upton <oliver.upton@linux.dev> wrote:
-> > > > Asking since you had a setup / data earlier on when you were carrying
-> > > > the series. Hopefully with supportive data we can get arm64 to opt-in
-> > > > to HAVE_KVM_MMU_NOTIFIER_YOUNG_FAST_ONLY as well.
-> > >
-> > > I'll keep trying some other approaches I can take for getting similar
-> > > testing that Yu had; it is somewhat difficult for me to reproduce
-> > > those tests (and it really shouldn't be.... sorry).
-> >
-> > No need to apologize. Getting good test hardware for arm64 is a complete
-> > chore. Sure would love a functional workstation with cores from this
-> > decade...
-> >
-> > > I think it makes most sense for me to drop the arm64 patch for now and
-> > > re-propose it (or something stronger) alongside enabling aging. Does
-> > > that sound ok?
-> >
-> > I'm a bit disappointed that we haven't gotten forward progress on the
-> > arm64 patches, but I also recognize this is the direction of travel as
-> > the x86 patches are shaping up.
-> >
-> > So yeah, I'm OK with it, but I'd love to get the arm64 side sorted out
-> > soon while the context is still fresh.
+On Tue, 20 Aug 2024 11:37:38 +0100, Marc Zyngier wrote:
+> This is the fourth revision of the address translation emulation for
+> NV support on arm64 previously posted at [1].
 > 
-> Converting the aging notifiers to holding mmu_lock for read seems like
-> a pure win and minimal churn. Can we keep that patch in v7 (which
-> depends on the lockless notifier refactor, i.e. is not completely
-> stand-alone)? We can revisit enabling MGLRU on arm64 in a subsequent
-> series.
+> Thanks again to Alex for his continuous (contiguous? ;-) scrutiny on
+> this series.
+> 
+> * From v3:
+> 
+> [...]
 
-Even though the churn is minimal in LOC, locking changes are significant. If
-one thing has become clear, there are some strong opinions about arm64
-participating in MGLRU w/ the read lock. So it is almost guaranteed that
-these read lock changes will eventually get thrown out in favor of an
-RCU-protected walker.
+Applied to kvm-arm64/s2-ptdump, thanks!
 
-Then we're stuck with potentially 3 flavors of locking in kernels that
-people actually use, and dealing with breakage that only affects that
-intermediate step is gonna be annoying.
+[01/18] arm64: Add missing APTable and TCR_ELx.HPD masks
+        commit: 4abc783e4741cd33216e7796e9b2f4973b4bca61
+[02/18] arm64: Add PAR_EL1 field description
+        commit: 6dcd2ac7ea7c5b20b416ee09d8d5d2ec89866ef8
+[03/18] arm64: Add system register encoding for PSTATE.PAN
+        commit: b229b46b0bf7828bef5f88c91708776869b751ac
+[04/18] arm64: Add ESR_ELx_FSC_ADDRSZ_L() helper
+        commit: 5fddf9abc31a57e2cc35287998994cf4a684fada
+[05/18] KVM: arm64: Make kvm_at() take an OP_AT_*
+        commit: 69231a6fcb638b7929e9fc88c4fa73a04e6d4e0c
+[06/18] KVM: arm64: nv: Enforce S2 alignment when contiguous bit is set
+        commit: 4155539bc5baab514ac71285a1a13fcf148f9cf1
+[07/18] KVM: arm64: nv: Turn upper_attr for S2 walk into the full descriptor
+        commit: 0a0f25b71ca544388717f8bf4a54ba324e234e7a
+[08/18] KVM: arm64: nv: Honor absence of FEAT_PAN2
+        commit: 90659853febcf63ceb71529b247d518df3c2a76c
+[09/18] KVM: arm64: nv: Add basic emulation of AT S1E{0,1}{R,W}
+        commit: 477e89cabb1428d5989430d57828347f5de2be9c
+[10/18] KVM: arm64: nv: Add basic emulation of AT S1E1{R,W}P
+        commit: be0135bde1df5e80cffacd2ed6f952e6d38d6f71
+[11/18] KVM: arm64: nv: Add basic emulation of AT S1E2{R,W}
+        commit: e794049b9acbd6500b77b9ce92a95101091b52d3
+[12/18] KVM: arm64: nv: Add emulation of AT S12E{0,1}{R,W}
+        commit: be04cebf3e78874627dc1042991d5d504464a5cc
+[13/18] KVM: arm64: nv: Make ps_to_output_size() generally available
+        commit: 97634dac1974d28e5ffc067d257f0b0f79b5ed2e
+[14/18] KVM: arm64: nv: Add SW walker for AT S1 emulation
+        commit: d6a01a2dc760c8350fa182a6afd69fabab131f73
+[15/18] KVM: arm64: nv: Sanitise SCTLR_EL1.EPAN according to VM configuration
+        commit: 2441418f3aadb3f9232431aeb10d89e48a934d94
+[16/18] KVM: arm64: nv: Make AT+PAN instructions aware of FEAT_PAN3
+        commit: d95bb9ef164edb33565cb73e3f0b0a581b3e4fbb
+[17/18] KVM: arm64: nv: Plumb handling of AT S1* traps from EL2
+        commit: 8df747f4f3a5c680e3c0e68af3487b97343ca80a
+[18/18] KVM: arm64: nv: Add support for FEAT_ATS1A
+        commit: ff987ffc0c18c98f05ddc7696d56bb493b994450
 
+Cheers,
+
+	M.
 -- 
-Thanks,
-Oliver
+Without deviation from the norm, progress is not possible.
+
+
