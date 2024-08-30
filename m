@@ -1,186 +1,175 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 837421B1D41;
-	Thu, 29 Aug 2024 20:38:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F4AF1D12EC
+	for <kvmarm@lists.linux.dev>; Fri, 30 Aug 2024 00:33:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724963898; cv=none; b=BjlzDdA/WKx+LXldThH8q4blG3tZX3TGZ5+V1DdIsFozNrKtcHev/PlEn09x+bWf9BPncjjA7XjhXJLmAn1PZKMiSMval2trr7FS6hURZxfNbtXyBYDSqWjUcG7abGzEDgWyYz3zSwFjazqHrfdSyGIdveFaqFqgYTyjV4waMq8=
+	t=1724978021; cv=none; b=XNkHzt9O/cjLux1cDJOh9HipTRGDBto6Gw6fdel8hjbzIxFxUQOKgdstJLBKCuq0yl2M+g7dDXeYiX2vzb9kl2kJTzu4CB2s0aw1vCJeZqi0i6etBPBfI2kV8OZj5C7beyWbhWOdbB3tAY3dHGFKuTaR58AxXK4BQqzIfZ+odjE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724963898; c=relaxed/simple;
-	bh=tscwRgI2saPDR7x1unDsFBI0xOp0fMmY1QDhyt+9PHk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ss3sJVP4SYqLwK/aO06zGgpYIXDBCRWJUcU3tts3v05dtuccu3W6lTIpsrch2enAl6mrU9UtMpENgGxBD6dV8OKwCI9J1K4Li6P1ejHAk6A2FqmyCrkjXlPJkRi8wCSod51A5CUO7i2d4ChCx7uet/5Cf+TAP4lvEAe7OJqstHA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=anW59re8; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1724978021; c=relaxed/simple;
+	bh=SH85gWPyWDBMrPTxg5hwF9eFmgdFespsOtsowukOS9M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JvnmL/z1MLF5BW7UKtcw2XpoMfxr5yIF9OLNZ0M1gOxZqNa6hr3MsIM+fdu/BtLda093O6Qk7+fPjBEI6BpLBazAP5kKAeKgbvKOvvqgQhDJZZmGgY/8+qYzDKn3hdyZQZ2Ubz+FyADDSBXMW10Kht3B5/s3/TCf/TMo+f7aA84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=C3ZeXGXu; arc=none smtp.client-ip=209.85.128.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="anW59re8"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724963897; x=1756499897;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=tscwRgI2saPDR7x1unDsFBI0xOp0fMmY1QDhyt+9PHk=;
-  b=anW59re8g7E9kAelpNk+BBP1JV1PEOrPDKd7lZU3vM+SOIaCuXobj0e7
-   uP8jDX1W910+zN1waibuYTbWL94NJXYfhUx2AC9ZLDFiUSrgdhMxcwleh
-   OUEOtML7MWvmxWzN/kTUyo65swMO2bpGzo61/drgiQ/kPWsVZjOSyz2jV
-   RIylGzGYX7dHLL5pkZqeCHM9cIzq4NMLT1Lq1EiwtFMExxfQwx/P2Bse4
-   i3a5xxZANsNKbKJtTLaOEFDOOKEf1GGNI6f/lyXCoFIQCUAf4iwRPCoW8
-   GfNpg9+UU3sctCg7zK6YcjZCv0EM+Dipba01RU1n3VXzfgtzA+iajeMPQ
-   w==;
-X-CSE-ConnectionGUID: NcomHs4hTri3LMAygrhyWQ==
-X-CSE-MsgGUID: HsXmehPIQ4i+cTsWZifFog==
-X-IronPort-AV: E=McAfee;i="6700,10204,11179"; a="34200572"
-X-IronPort-AV: E=Sophos;i="6.10,186,1719903600"; 
-   d="scan'208";a="34200572"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2024 13:37:41 -0700
-X-CSE-ConnectionGUID: +2I+PKpfTEWO7ZhOV/mdjw==
-X-CSE-MsgGUID: 9jFLsk+2R9icUo/uf7t0Ig==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,186,1719903600"; 
-   d="scan'208";a="63325399"
-Received: from lkp-server01.sh.intel.com (HELO 9c6b1c7d3b50) ([10.239.97.150])
-  by fmviesa006.fm.intel.com with ESMTP; 29 Aug 2024 13:37:38 -0700
-Received: from kbuild by 9c6b1c7d3b50 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sjltg-0000iM-02;
-	Thu, 29 Aug 2024 20:37:36 +0000
-Date: Fri, 30 Aug 2024 04:37:35 +0800
-From: kernel test robot <lkp@intel.com>
-To: Vegard Nossum <vegard.nossum@oracle.com>,
-	Masahiro Yamada <masahiroy@kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev, linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-omap@vger.kernel.org, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, linux-um@lists.infradead.org,
-	bpf@vger.kernel.org, llvm@lists.linux.dev,
-	Vegard Nossum <vegard.nossum@oracle.com>
-Subject: Re: [PATCH] kbuild: use objcopy to generate asm-offsets
-Message-ID: <202408300438.xObK98m5-lkp@intel.com>
-References: <20240828083605.3093701-1-vegard.nossum@oracle.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="C3ZeXGXu"
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-6c3f1939d12so11325107b3.2
+        for <kvmarm@lists.linux.dev>; Thu, 29 Aug 2024 17:33:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1724978017; x=1725582817; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=v0c5SIq1ErU8LqTXRTvzlDlvgCjUaMFsATO9CN846VQ=;
+        b=C3ZeXGXuEWB1ivJO6mPXHUW2jwnLUwYm4NCzXY5VDmTEnmKNhW5izT68c9vaFH1/43
+         cCgB6MhPkbRRbltRkA6dzD3fSXinpg3Ej0jC7LAonRL0BjQgP34gEBtnqCHsa6Umciin
+         4gG+FYd01L/e15cA6RQDs9id6ftqpA8/IsxfB53ysg9PP4lDNHPpT45QadPbLKaISJ6B
+         qcjEplOZVNcjqWoATzefcAAqqvn0XS7G6+xdH2zvXu6YNn615VDeDC0HIvXCIMqPsWUl
+         Xq7x0nVX55I9bfmxS0SEixumOYDVNMNzNszFo/Ist9lGZ6J8BWTod2sgW5Kw7D5sf9N+
+         18MQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724978017; x=1725582817;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=v0c5SIq1ErU8LqTXRTvzlDlvgCjUaMFsATO9CN846VQ=;
+        b=ZeRCsumIdxTF3NMwxYRxLMuhD0FPjj1sVfOjnyvOzi+vGuFcFyfj/jE6NPdhMZjp8E
+         kcpJ+inzbZUHqZmv7h+nk7IkzdmZJ0ORX47WRL4Km+aDUeqjlcbhdUR+QOf8XhOrEwZ6
+         gxYV+rfrrfl6LRUjSXpJucnwtDg94Kuf3uvQDzg+gKFFPF/35lhoAKEOKnTNd4h0LeM/
+         YlZfcFrlM9qLHrX50ecVqKhOqPV3WsM2WcJuK9M6C1nZXpRvujPUbEtDJHEqj/8lFA1l
+         jHV6EeIZrsdCryBRz1nLb2mUB9DspTeNRqayMhiRifbuFPWYXrlXbiGl+1XnckHs4hk0
+         /gKg==
+X-Forwarded-Encrypted: i=1; AJvYcCW3cqbuxbTcg6kBni1k3uljyOt0SSYxop8PyE2Pr6cI0rhdSELz3/zTsXnlCw7gSaM3nDk29ag=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxP+81LlsMEc8oAxDClu1QLXFupv4As9fiKpyB0/V2n18wYG5J4
+	kc6+4Sm08sxuKWZp+aKrL8zw3hEHd5dV7VG+DzHdIkkR6JTIbWwON2nvIxHoDzjQi3tN78BGrTR
+	baQ2LwtXZWA18u5v4K6Z+Qnjw7I3XIT7GpC++
+X-Google-Smtp-Source: AGHT+IE56ditvMsqd+EwyV0AwwWQn10JX3FwGZqO74Otl79fYNdQirjfyiEfOM48/ZWOjAG0+PeTvxcA3jfyHAIhk/4=
+X-Received: by 2002:a05:690c:f84:b0:62c:e6c0:e887 with SMTP id
+ 00721157ae682-6d40d88eabfmr4560677b3.9.1724978017312; Thu, 29 Aug 2024
+ 17:33:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240828083605.3093701-1-vegard.nossum@oracle.com>
+References: <20240724011037.3671523-1-jthoughton@google.com>
+ <20240724011037.3671523-4-jthoughton@google.com> <CADrL8HV5M-n72KDseDKWpGrUVMjC147Jqz98PxyG2ZeRVbFu8g@mail.gmail.com>
+ <Zr_y7Fn63hdowfYM@google.com> <CAOUHufYc3hr-+fp14jgEkDN++v6t-z-PRf1yQdKtnje6SgLiiA@mail.gmail.com>
+ <ZsOuEP6P0v45ffC0@linux.dev>
+In-Reply-To: <ZsOuEP6P0v45ffC0@linux.dev>
+From: James Houghton <jthoughton@google.com>
+Date: Thu, 29 Aug 2024 17:33:00 -0700
+Message-ID: <CADrL8HWf-Onu=4ONBO1CFZ1Tqj5bee=+NnRC333aKqkUy+0Sxg@mail.gmail.com>
+Subject: Re: [PATCH v6 03/11] KVM: arm64: Relax locking for kvm_test_age_gfn
+ and kvm_age_gfn
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Yu Zhao <yuzhao@google.com>, Sean Christopherson <seanjc@google.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Ankit Agrawal <ankita@nvidia.com>, Axel Rasmussen <axelrasmussen@google.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, David Matlack <dmatlack@google.com>, 
+	David Rientjes <rientjes@google.com>, James Morse <james.morse@arm.com>, 
+	Jason Gunthorpe <jgg@ziepe.ca>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
+	Raghavendra Rao Ananta <rananta@google.com>, Ryan Roberts <ryan.roberts@arm.com>, 
+	Shaoqin Huang <shahuang@redhat.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Wei Xu <weixugc@google.com>, Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Vegard,
+On Mon, Aug 19, 2024 at 1:42=E2=80=AFPM Oliver Upton <oliver.upton@linux.de=
+v> wrote:
+>
+> On Fri, Aug 16, 2024 at 07:03:27PM -0600, Yu Zhao wrote:
+> > On Fri, Aug 16, 2024 at 6:46=E2=80=AFPM Sean Christopherson <seanjc@goo=
+gle.com> wrote:
+>
+> [...]
+>
+> > > Were you expecting vCPU runtime to improve (more)?  If so, lack of mo=
+vement could
+> > > be due to KVM arm64 taking mmap_lock for read when handling faults:
 
-kernel test robot noticed the following build warnings:
+I had no real expectation. I was hoping that maybe there could be a
+vCPU runtime improvement, given that user_mem_abort() (being called
+because we're faulting memory in continuously in this test) has to
+take the KVM MMU lock for reading, and aging is taking it for reading
+vs. writing. I think that's why aging is a lot slower when using the
+write lock: it is waiting for the readers to drop the lock, but I
+guess the delay on the *readers* due to the pending writer seems to be
+pretty minimal.
 
-[auto build test WARNING on masahiroy-kbuild/for-next]
-[also build test WARNING on masahiroy-kbuild/fixes soc/for-next kvmarm/next kvm/queue uml/next krzk-mem-ctrl/for-next bpf-next/master bpf/master linus/master v6.11-rc5 next-20240829]
-[cannot apply to tmlind-omap/for-next kvm/linux-next uml/fixes]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> > >
+> > > https://lore.kernel.org/all/Zr0ZbPQHVNzmvwa6@google.com
+> >
+> > For the above test, I don't think it's mmap_lock
+>
+> Yeah, I don't think this is related to the mmap_lock.
+>
+> James is likely using hardware that has FEAT_HAFDBS, so vCPUs won't
+> fault for an Access flag update. Even if he's on a machine w/o it,
+> Access flag faults are handled outside the mmap_lock.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Vegard-Nossum/kbuild-use-objcopy-to-generate-asm-offsets/20240828-163854
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git for-next
-patch link:    https://lore.kernel.org/r/20240828083605.3093701-1-vegard.nossum%40oracle.com
-patch subject: [PATCH] kbuild: use objcopy to generate asm-offsets
-config: mips-loongson3_defconfig (https://download.01.org/0day-ci/archive/20240830/202408300438.xObK98m5-lkp@intel.com/config)
-compiler: mips64el-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240830/202408300438.xObK98m5-lkp@intel.com/reproduce)
+Yeah I was running on Ampere Altra CPUs.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202408300438.xObK98m5-lkp@intel.com/
+> Forcing SW management of the AF at stage-2 would be the best case for
+> demonstrating the locking improvement:
+>
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index a24a2a857456..a640e8a8c6ea 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -669,8 +669,6 @@ u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift=
+)
+>          * happen to be running on a design that has unadvertised support=
+ for
+>          * HAFDBS. Here be dragons.
+>          */
+> -       if (!cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
+> -               vtcr |=3D VTCR_EL2_HA;
+>  #endif /* CONFIG_ARM64_HW_AFDBM */
+>
+>         if (kvm_lpa2_is_enabled())
 
-All warnings (new ones prefixed by >>):
+Thanks!
 
-   mips64el-linux-objcopy: /dev/stdout[.data.kbuild]: Illegal seek
-   In file included from include/linux/mm_types.h:18,
-                    from include/linux/uio.h:10,
-                    from include/linux/socket.h:8,
-                    from include/linux/compat.h:15,
-                    from arch/mips/kernel/asm-offsets.c:12:
-   include/linux/page-flags-layout.h:15:5: warning: "MAX_NR_ZONES" is not defined, evaluates to 0 [-Wundef]
-      15 | #if MAX_NR_ZONES < 2
-         |     ^~~~~~~~~~~~
-   include/linux/page-flags-layout.h:58:19: warning: "LRU_GEN_WIDTH" is not defined, evaluates to 0 [-Wundef]
-      58 | #if ZONES_WIDTH + LRU_GEN_WIDTH + SECTIONS_WIDTH + NODES_SHIFT \
-         |                   ^~~~~~~~~~~~~
-   include/linux/page-flags-layout.h:59:28: warning: "NR_PAGEFLAGS" is not defined, evaluates to 0 [-Wundef]
-      59 |         <= BITS_PER_LONG - NR_PAGEFLAGS
-         |                            ^~~~~~~~~~~~
-   include/linux/page-flags-layout.h:93:19: warning: "LRU_GEN_WIDTH" is not defined, evaluates to 0 [-Wundef]
-      93 | #if ZONES_WIDTH + LRU_GEN_WIDTH + SECTIONS_WIDTH + NODES_WIDTH + \
-         |                   ^~~~~~~~~~~~~
-   include/linux/page-flags-layout.h:94:64: warning: "NR_PAGEFLAGS" is not defined, evaluates to 0 [-Wundef]
-      94 |         KASAN_TAG_WIDTH + LAST_CPUPID_SHIFT <= BITS_PER_LONG - NR_PAGEFLAGS
-         |                                                                ^~~~~~~~~~~~
-   include/linux/page-flags-layout.h:104:19: warning: "LRU_GEN_WIDTH" is not defined, evaluates to 0 [-Wundef]
-     104 | #if ZONES_WIDTH + LRU_GEN_WIDTH + SECTIONS_WIDTH + NODES_WIDTH + \
-         |                   ^~~~~~~~~~~~~
-   include/linux/page-flags-layout.h:105:63: warning: "NR_PAGEFLAGS" is not defined, evaluates to 0 [-Wundef]
-     105 |         KASAN_TAG_WIDTH + LAST_CPUPID_WIDTH > BITS_PER_LONG - NR_PAGEFLAGS
-         |                                                               ^~~~~~~~~~~~
-   In file included from include/linux/mm_types.h:5:
-   include/linux/mm_types_task.h:22:34: warning: "SPINLOCK_SIZE" is not defined, evaluates to 0 [-Wundef]
-      22 | #define ALLOC_SPLIT_PTLOCKS     (SPINLOCK_SIZE > BITS_PER_LONG/8)
-         |                                  ^~~~~~~~~~~~~
-   include/linux/mm_types.h:478:5: note: in expansion of macro 'ALLOC_SPLIT_PTLOCKS'
-     478 | #if ALLOC_SPLIT_PTLOCKS
-         |     ^~~~~~~~~~~~~~~~~~~
-   In file included from include/linux/dcache.h:14,
-                    from include/linux/fs.h:8,
-                    from include/linux/compat.h:17:
->> include/linux/lockref.h:23:36: warning: "SPINLOCK_SIZE" is not defined, evaluates to 0 [-Wundef]
-      23 |          IS_ENABLED(CONFIG_SMP) && SPINLOCK_SIZE <= 4)
-         |                                    ^~~~~~~~~~~~~
-   include/linux/lockref.h:27:5: note: in expansion of macro 'USE_CMPXCHG_LOCKREF'
-      27 | #if USE_CMPXCHG_LOCKREF
-         |     ^~~~~~~~~~~~~~~~~~~
-   In file included from include/linux/gfp.h:7,
-                    from include/linux/xarray.h:16,
-                    from include/linux/list_lru.h:14,
-                    from include/linux/fs.h:13:
-   include/linux/mmzone.h:842:29: error: 'MAX_NR_ZONES' undeclared here (not in a function); did you mean 'MAX_NR_GENS'?
-     842 |         long lowmem_reserve[MAX_NR_ZONES];
-         |                             ^~~~~~~~~~~~
-         |                             MAX_NR_GENS
-   include/linux/mm_types_task.h:22:34: warning: "SPINLOCK_SIZE" is not defined, evaluates to 0 [-Wundef]
-      22 | #define ALLOC_SPLIT_PTLOCKS     (SPINLOCK_SIZE > BITS_PER_LONG/8)
-         |                                  ^~~~~~~~~~~~~
-   include/linux/mm.h:2889:5: note: in expansion of macro 'ALLOC_SPLIT_PTLOCKS'
-    2889 | #if ALLOC_SPLIT_PTLOCKS
-         |     ^~~~~~~~~~~~~~~~~~~
-   In file included from include/linux/swap.h:9,
-                    from include/linux/suspend.h:5,
-                    from arch/mips/kernel/asm-offsets.c:17:
-   include/linux/memcontrol.h: In function 'mem_cgroup_get_zone_lru_size':
->> include/linux/memcontrol.h:914:31: warning: parameter 'lru' set but not used [-Wunused-but-set-parameter]
-     914 |                 enum lru_list lru, int zone_idx)
-         |                 ~~~~~~~~~~~~~~^~~
->> include/linux/memcontrol.h:914:40: warning: parameter 'zone_idx' set but not used [-Wunused-but-set-parameter]
-     914 |                 enum lru_list lru, int zone_idx)
-         |                                    ~~~~^~~~~~~~
-   make[3]: *** [scripts/Makefile.build:244: arch/mips/kernel/asm-offsets.o] Error 1
-   make[3]: Target 'missing-syscalls' not remade because of errors.
-   make[2]: *** [arch/mips/Makefile:432: archprepare] Error 2
-   make[2]: Target 'prepare' not remade because of errors.
-   make[1]: *** [Makefile:224: __sub-make] Error 2
-   make[1]: Target 'prepare' not remade because of errors.
-   make: *** [Makefile:224: __sub-make] Error 2
-   make: Target 'prepare' not remade because of errors.
+> Changing the config option would work too, but I wasn't sure if
+> FEAT_HAFDBS on the primary MMU influenced MGLRU heuristics.
 
+Indeed, disabling CONFIG_ARM64_HW_AFDBM will cause MGLRU not to do aging.
 
-vim +/SPINLOCK_SIZE +23 include/linux/lockref.h
+> > -- the reclaim path,
+> > e.g., when zswapping guest memory, has two stages: aging (scanning
+> > PTEs) and eviction (unmapping PTEs). Only testing the former isn't
+> > realistic at all.
+>
+> AIUI, the intention of this test data is to provide some justification
+> for why Marc + I should consider the locking change *outside* of any
+> MMU notifier changes. So from that POV, this is meant as a hacked
+> up microbenchmark and not meant to be realistic.
+>
+> And really, the arm64 change has nothing to do with this series at
+> this point, which is disappointing. In the interest of moving this
+> feature along for both architectures, would you be able help James
+> with:
+>
+>  - Identifying a benchmark that you believe is realistic
+>
+>  - Suggestions on how to run that benchmark on Google infrastructure
+>
+> Asking since you had a setup / data earlier on when you were carrying
+> the series. Hopefully with supportive data we can get arm64 to opt-in
+> to HAVE_KVM_MMU_NOTIFIER_YOUNG_FAST_ONLY as well.
 
-57f4257eae33e0 Peter Zijlstra     2013-11-14  20  
-57f4257eae33e0 Peter Zijlstra     2013-11-14  21  #define USE_CMPXCHG_LOCKREF \
-57f4257eae33e0 Peter Zijlstra     2013-11-14  22  	(IS_ENABLED(CONFIG_ARCH_USE_CMPXCHG_LOCKREF) && \
-597d795a2a786d Kirill A. Shutemov 2013-12-20 @23  	 IS_ENABLED(CONFIG_SMP) && SPINLOCK_SIZE <= 4)
-0f8f2aaaab0b0f Waiman Long        2013-08-28  24  
+I'll keep trying some other approaches I can take for getting similar
+testing that Yu had; it is somewhat difficult for me to reproduce
+those tests (and it really shouldn't be.... sorry).
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+I think it makes most sense for me to drop the arm64 patch for now and
+re-propose it (or something stronger) alongside enabling aging. Does
+that sound ok?
