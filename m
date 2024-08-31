@@ -1,104 +1,111 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1910B1758F;
-	Sat, 31 Aug 2024 07:42:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 349C5168488
+	for <kvmarm@lists.linux.dev>; Sat, 31 Aug 2024 07:56:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725090147; cv=none; b=jZs77cPeWdQFcMDkPnVVnrqoqowBcVrqAIpJekczOYA9hP3PKQIZY8971Xcr0SR4GmzwgEaMa0oo5P0/HGx/HrzAgtLS+zwAr+nBogWzLbdwChO0tPUeoPZy2qPpHt2vUapLiB6p+FvikoWidIxR7FOvjblsBs0CXiLvHouz6fs=
+	t=1725090997; cv=none; b=QZa4h8AjbVHaBumrfdChBG6oYU/QK+P+2UEzyg9dPzy0AKfNfnrSE/lYbhljOE682wXoZppA5lWJH1HyBlqiT+8GUaiPSuZPT2YC+Vfx1Ez8VS7Nk5KdGzfxuy9vrIFJ1wNprkJmEJlZ3QPPuIfhzXe0M5lYinzOjH5tcp7d54s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725090147; c=relaxed/simple;
-	bh=CSYles6ImJnP6hRgL02AQveRmBHZZvF8jl7dwBIrqss=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YknfcB4bq1KTa9maYdhuXr6sdyFGWEM8RW/LFkQloK5EeGLz2fAeh1N9CPplLJsufgux043NruIp7llx/6/qTiNWLjPEeVlYwvprJUpF5qfcXqwAm1C0eETu38wMVF1sRCHAZVtQWPhJ0gWDGgY3GjGALUAcz3w6JFnwB4J7E3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tn0HWQeu; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1725090997; c=relaxed/simple;
+	bh=3UEayJfJBFtKvAdjmCeaSetXwKEkj0MKFMa9bGKtd34=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bJmQFRuEZNBS685DtkSfKQMo1Z+ycW3JoVgoJNM0HnCRwqSUSyxlUUwawtvigMcW4AdDO3HRrs/Xjuhv0mSxg88b3d1XBNOUSL7B2J7CptVCKDReRkte3uAMn5v/FqInuceb7GouI9T+B0lcwOKYhEl/dNLydbydz2Z4Q1bSCSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=URipuntP; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tn0HWQeu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 924FDC4CEC0;
-	Sat, 31 Aug 2024 07:42:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="URipuntP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA3A7C4CEC7
+	for <kvmarm@lists.linux.dev>; Sat, 31 Aug 2024 07:56:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725090146;
-	bh=CSYles6ImJnP6hRgL02AQveRmBHZZvF8jl7dwBIrqss=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tn0HWQeuZfUPF/N6YWMS4/kIkP/e80G4QduNmZ186OA2/aDlwmBaNQ5jPMh3h5MXV
-	 8PqZdrQdMSAWU0TUxH1kAhPPckZyXnTDRBqHNndHMOoZ+gsrqWswRH4ZA0WvpqohFr
-	 3VH1Ljj2nqhiZgBh+kIr4vmILJ763GWrG5zCPUcEkxdvMeRkpXCZAJgxfdLhpYVmK4
-	 /p9WGi3pIQPYbKN0ghTwVOpxUkkDe/RPZMkSTcxsfpcSblT56zn0Kf09Zy1KJICtpC
-	 zHHCsJJbHaQzUdRxb0cUGF+c9csvH+TnmNwe0PvUptstp9Ukf4g7P6+yEeguh/2r0g
-	 LJB3+stHfRLXw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1skIka-008RVF-7l;
-	Sat, 31 Aug 2024 08:42:24 +0100
-Date: Sat, 31 Aug 2024 08:42:23 +0100
-Message-ID: <86zfotuoio.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Tangnianyao <tangnianyao@huawei.com>
-Cc: Will Deacon <will@kernel.org>,
-	<oliver.upton@linux.dev>,
-	<linux-arm-kernel@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>,
-	<kvmarm@lists.linux.dev>,
-	"guoyang (C)" <guoyang2@huawei.com>,
-	Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: Question on get random long worse in VM than on host
-In-Reply-To: <214e37e9-7aba-1e61-f63f-85cb10c9a878@huawei.com>
-References: <214e37e9-7aba-1e61-f63f-85cb10c9a878@huawei.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1725090996;
+	bh=3UEayJfJBFtKvAdjmCeaSetXwKEkj0MKFMa9bGKtd34=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=URipuntPYay30Oc9EaoEQk3jzs5uo/kQzomEzUvlpiNMeqT63JdcnffPpZfUiS0he
+	 5tblZhYTUNGCUzF8V9raNc3hdgc/AOC8C9yysE+zI8SZs5P2RzqKBsCUOC/fRPP5fD
+	 bWwe/HOxXAiT48trD/d6xV15W+DFxUZ8SDZornsmslHrUm01HVuBlkAPtVBmvnu35W
+	 B/sZVyjHvvLPhbuBcrh3OwOrMdQJNavXNxJm1ZAV869ltlZVajo4oAzLoOsj/ybCiU
+	 MzPLukO5ntsXG9BVnvEjBvmvEwKFuGL3oIFUeZWUfucS8jMtMxudIyzMP4+ZGKPXDg
+	 T7pJl7fzJUaCQ==
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2f3f68dd44bso26552461fa.3
+        for <kvmarm@lists.linux.dev>; Sat, 31 Aug 2024 00:56:36 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCWPuBHcPmRjbklO49uDpPH8pEgP8YkwkwzMaqCNF6AfhOGPV0LxEEwvePqPzCPgvNgBW64BHdI=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yxx9qfm1QzJATAlIvD2EC5X1bsCMdc+l+vNAvhABeoo/ltImkpe
+	22qEjLnfLgRa75+DgHk9e0a8SSQHFx/aWT5B3VJsbivAOTywtpiDWHsI3T2CVPEl7jioIV6x1bF
+	sTTbhiaWObiXhJiSEnBbq2jcFTw8=
+X-Google-Smtp-Source: AGHT+IFV5df6xhbkPQQxnT943f6ufMjPf/6uJ/4xj84CfujGO1G74LiSQF7RyO8tGcPKx8TKsROCPNn1smp8qlUYCEk=
+X-Received: by 2002:a05:6512:33c9:b0:52e:9beb:a2e2 with SMTP id
+ 2adb3069b0e04-53546b13ecemr3487099e87.19.1725090995083; Sat, 31 Aug 2024
+ 00:56:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tangnianyao@huawei.com, will@kernel.org, oliver.upton@linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, guoyang2@huawei.com, ardb@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <214e37e9-7aba-1e61-f63f-85cb10c9a878@huawei.com> <86zfotuoio.wl-maz@kernel.org>
+In-Reply-To: <86zfotuoio.wl-maz@kernel.org>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Sat, 31 Aug 2024 09:56:23 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXGocnZPe4EfzsB6xd2QZacp-a45R5f5f6FDpVtVEXCcGQ@mail.gmail.com>
+Message-ID: <CAMj1kXGocnZPe4EfzsB6xd2QZacp-a45R5f5f6FDpVtVEXCcGQ@mail.gmail.com>
+Subject: Re: Question on get random long worse in VM than on host
+To: Marc Zyngier <maz@kernel.org>
+Cc: Tangnianyao <tangnianyao@huawei.com>, Will Deacon <will@kernel.org>, oliver.upton@linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	kvmarm@lists.linux.dev, "guoyang (C)" <guoyang2@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
 
-[+ Ard, who actually understands the whole RNG thing]
-
-On Sat, 31 Aug 2024 04:34:33 +0100,
-Tangnianyao <tangnianyao@huawei.com> wrote:
-> 
-> Hi, all
-> 
-> On ARM64 server(Kunpeng), performance of some syscall cases (like fork
-> and open) in guest, which need random u64, are 10~20% worse than
-> those on host. Because CONFIG_ARCH_HAS_ELF_RANDOMIZE=y and
-> CONFIG_STACKPROTECTOR=y, guest kernel need random u64 and
-> require them from host kvm using hvc.
+On Sat, 31 Aug 2024 at 09:42, Marc Zyngier <maz@kernel.org> wrote:
 >
-> If FEAT_RNG is supported and EL3 firmware not support smccc trng, host
-> kvm finally return random u64 using RNDRRS to guest.
-> 
-> Shall we firstly let guest get random u64 from RNDRRS to avoid hvc trap?
-> For example, if host find smccc trng not available, then tell guest smccc
-> trng not available when guest check trng version.
+> [+ Ard, who actually understands the whole RNG thing]
+>
+> On Sat, 31 Aug 2024 04:34:33 +0100,
+> Tangnianyao <tangnianyao@huawei.com> wrote:
+> >
+> > Hi, all
+> >
+> > On ARM64 server(Kunpeng), performance of some syscall cases (like fork
+> > and open) in guest, which need random u64, are 10~20% worse than
+> > those on host. Because CONFIG_ARCH_HAS_ELF_RANDOMIZE=y and
+> > CONFIG_STACKPROTECTOR=y, guest kernel need random u64 and
+> > require them from host kvm using hvc.
+> >
+> > If FEAT_RNG is supported and EL3 firmware not support smccc trng, host
+> > kvm finally return random u64 using RNDRRS to guest.
+> >
+> > Shall we firstly let guest get random u64 from RNDRRS to avoid hvc trap?
+> > For example, if host find smccc trng not available, then tell guest smccc
+> > trng not available when guest check trng version.
+>
+> My recollection is that it was a deliberate decision to decouple what
+> the host firmware offers from what the guest sees (we can always
+> implement the SMCCC TRNG using any mechanism that the host has to
+> deliver entropy).
+>
+> Now, userspace has almost complete freedom to expose what the guest
+> sees in terms of PV services. In this particular case, it can write to
+> the KVM_REG_ARM_STD_BMAP pseudo register to remove the
+> KVM_REG_ARM_STD_BIT_TRNG_V1_0 bit from the bitmap, which will hide the
+> functionality.
+>
+> Isn't this sufficient here? Given that you seem to be micro-optimising
+> for a particular platform, this seems like the easiest way to reach
+> your goal without having to change anything.
+>
 
-My recollection is that it was a deliberate decision to decouple what
-the host firmware offers from what the guest sees (we can always
-implement the SMCCC TRNG using any mechanism that the host has to
-deliver entropy).
+On top of that, the guest kernel should not be calling this interface
+every single time it needs some randomness. The kernel's entropy pool
+should be used, which is reseeded as needed using whichever source of
+entropy the system provides, which includes arch_get_random_longs().
 
-Now, userspace has almost complete freedom to expose what the guest
-sees in terms of PV services. In this particular case, it can write to
-the KVM_REG_ARM_STD_BMAP pseudo register to remove the
-KVM_REG_ARM_STD_BIT_TRNG_V1_0 bit from the bitmap, which will hide the
-functionality.
+If every fork() and open() results in a HVC, we need to fix that regardless.
 
-Isn't this sufficient here? Given that you seem to be micro-optimising
-for a particular platform, this seems like the easiest way to reach
-your goal without having to change anything.
+As for RNDR/RNDRRS vs TRNG: the former is not a raw entropy source, it
+is a DRBG (or CSPRNG) which provides cryptographically secure random
+numbers whose security strength is limited by the size of the seed.
+TRNG does not have this limitation in principle, although non-p KVM
+happily seeds it from the kernel's entropy pool, which has the same
+limitation in practice.
 
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+TL;DR if the layering inside the kernel is correct, none of this
+should matter to fork() or open() performance.
