@@ -1,154 +1,85 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2635E1A3A93;
-	Mon,  2 Sep 2024 19:12:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D4841C62DD
+	for <kvmarm@lists.linux.dev>; Mon,  2 Sep 2024 21:26:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725304375; cv=none; b=FdJ9SXTjCx3RcJUuaLR2PHqorzB1+6FGpKL7jn7ioUBr2goTl1RSf61zaGnsnJLYXK29dN8fxh6qTqJ56hfRkzANofg3xVmEhEwvZivPCw6Y+vlENblb22Cf678wJ24Os8wlFHHqXk9WNcj95tgqiCJme7dPf6eCIZHJjvN8Xxc=
+	t=1725312405; cv=none; b=u/BMYJUyPwI3rX0pxkcuYIavk22HSogFfkksOgZKsyeM183M0IifSZ5S3GS9q0gQjA7sDx94aZBGdUT3dD29gs/kgO6e02nCgZfCiwkqhl4ycG28PMLAGqtvA++lDofZcVozTqUnmXF44CKe+XC34B2QNOxABGbsw7JnfFovVb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725304375; c=relaxed/simple;
-	bh=GMVnn22J0kYs5YTaIdMO4all44aS9lj+6fg+x5dH8D0=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ECnjmAS9NG0v3G/i3jhYR78LpTMVviCMgxVmUaHi6XWkN1ojhDUvCKT6PCTlGHG8WdrY7oAI48eBelQ3vMvTBuDJVLl/PgwV0tUJpbWB/tF1NAsftWyjcs2cdacD+cDAwjI74ZVJKxnU9ImdnkMgX8P9KRis9lX0ZMmEGOJS6eM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pY5N3Kj/; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1725312405; c=relaxed/simple;
+	bh=7D0+ujGNxr/oMLWxk9V90KOD2exXKgfiR9FgcDqVboU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OEXgdKLwbcPHbS84BGvCyal631C9L4sYyMjiKll9YZmGY4Itc0F+6rBnE1upXs4NLK+E+tzxnVMkH7sLF1F9VzsD7PAxI05cT77xyORBuNEamN/zt/HdmOQ0Fv0HxDjN2A/sfCSSYu8Yf36f2qLYQCZawYiQx+/mgpzc+CJmUP0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BkDyK867; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pY5N3Kj/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EB3FC4CEC2;
-	Mon,  2 Sep 2024 19:12:54 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BkDyK867"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E06E4C4AF0C
+	for <kvmarm@lists.linux.dev>; Mon,  2 Sep 2024 21:26:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725304374;
-	bh=GMVnn22J0kYs5YTaIdMO4all44aS9lj+6fg+x5dH8D0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pY5N3Kj/BU1o+ddbmefgRH5itJPL7HzzRHShngaIA00aPwOvX4i416FEgAJU5TzNE
-	 yZsQjysi6g2pmEXdy1C5TgF4yxwwklqpPj44O078O/rQGagLwa0mFWTrRIOhO+Q2n9
-	 vKopbc/51ysI+HKKObFXrPx9pXTsADlynHTi4dZc0x3dEfFjSh210EfrgoixlRfESt
-	 kMDSdEMmv4/gOSkl5GL1bL1OjnMEvLSCHXLHs9Y+71CFbv13wp/93AaxQAoCCvdadq
-	 K5uonAVrDRMQzDLONq1d7XneiA2WW1GfI0suYXoWNSkJ0itOdV0OVDd4ZlVX+9wcH5
-	 xRrQ2OfDeGcQQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1slCTs-0091pX-0Q;
-	Mon, 02 Sep 2024 20:12:52 +0100
-Date: Mon, 02 Sep 2024 20:12:51 +0100
-Message-ID: <86ttexvpho.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	20240813144738.2048302-1-maz@kernel.org
-Subject: Re: [PATCH v2 2/3] KVM: arm64: Hide TCR2_EL1 from userspace when disabled for guests
-In-Reply-To: <20240822-kvm-arm64-hide-pie-regs-v2-2-376624fa829c@kernel.org>
-References: <20240822-kvm-arm64-hide-pie-regs-v2-0-376624fa829c@kernel.org>
-	<20240822-kvm-arm64-hide-pie-regs-v2-2-376624fa829c@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1725312404;
+	bh=7D0+ujGNxr/oMLWxk9V90KOD2exXKgfiR9FgcDqVboU=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=BkDyK867kTHgEfXmbrcJCW70zLjfOxxfR3fXEJsHS6kE2lmeBjzH6Pnq5sEHKj6pP
+	 iFpjomPYZYrKDtpSbzKTuTBzlET1KnNMqau9DPLd3kuvJP0WMf7ZQog74ORZbDadYl
+	 b8F9I1ef86N6Ecp4BstoOnfEEF6lY5qZkKgwbgUEdwbOElqY3b3jV9m/k/vNN4kGYP
+	 o8qT+v5B5E7ijESr+c2z6X/GzNBrPhT79eHeoGISd0m84zUmYNJWHedeOpfMPW91zP
+	 sxWOBXt3je9esqmVR50KZwJNg7fS3IiRn1l+N3w3HW5pVMQ/nIRuLOr8BBtuv7gsvU
+	 2OyGUw7Gsu0eg==
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-53351642021so4949729e87.3
+        for <kvmarm@lists.linux.dev>; Mon, 02 Sep 2024 14:26:44 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVNDovDyGLLzkMAKSsBpwkLssKl+gEWQbPjbcdrOJajzEE20/ViAqY85BlOv8aTvWh+xjZ6m5k=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzzJvC0m305QM/ZcUu+leQ2Ma1iriYquBcQWGdXCkGDXZ1V5X30
+	l3B0Ryf2ccuN8WDeftkAVypb33ohGIn05LZ9C/s8ucvhHV5T2wm//cYbmtoUoQmkYSqwYFlVdyN
+	/XB6JG9a8de3EZBss46PKrvXDZjg=
+X-Google-Smtp-Source: AGHT+IGm8eIOeLca63f83AqImC+zVqFGI93UuBfBZ5xueBxTEARESEtsHEq22J09YaHER9vhHPJ4rDa/9u3scuSd9Qc=
+X-Received: by 2002:a05:6512:238d:b0:531:4c6d:b8ef with SMTP id
+ 2adb3069b0e04-53546aef19fmr9277332e87.6.1725312403293; Mon, 02 Sep 2024
+ 14:26:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 20240813144738.2048302-1-maz@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <214e37e9-7aba-1e61-f63f-85cb10c9a878@huawei.com>
+ <86zfotuoio.wl-maz@kernel.org> <CAMj1kXGocnZPe4EfzsB6xd2QZacp-a45R5f5f6FDpVtVEXCcGQ@mail.gmail.com>
+ <86y14dun1f.wl-maz@kernel.org>
+In-Reply-To: <86y14dun1f.wl-maz@kernel.org>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Mon, 2 Sep 2024 23:26:32 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXF3JrDs=xvRmvTxS9du1F-gjSVe5qVZrPO5JLT5ho0riA@mail.gmail.com>
+Message-ID: <CAMj1kXF3JrDs=xvRmvTxS9du1F-gjSVe5qVZrPO5JLT5ho0riA@mail.gmail.com>
+Subject: Re: Question on get random long worse in VM than on host
+To: Marc Zyngier <maz@kernel.org>
+Cc: Tangnianyao <tangnianyao@huawei.com>, Will Deacon <will@kernel.org>, oliver.upton@linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	kvmarm@lists.linux.dev, "guoyang (C)" <guoyang2@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, 22 Aug 2024 00:35:37 +0100,
-Mark Brown <broonie@kernel.org> wrote:
-> 
-> When the guest does not support FEAT_TCR2 we should not allow any access
-> to it in order to ensure that we do not create spurious issues with guest
-> migration. Add a visibility operation for it.
-> 
-> Fixes: fbff56068232 ("KVM: arm64: Save/restore TCR2_EL1")
-> Signed-off-by: Mark Brown <broonie@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_host.h |  3 +++
->  arch/arm64/kvm/sys_regs.c         | 29 ++++++++++++++++++++++++++---
->  2 files changed, 29 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index ab4c675b491d..7889e5f4009f 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -1476,4 +1476,7 @@ void kvm_set_vm_id_reg(struct kvm *kvm, u32 reg, u64 val);
->  		(pa + pi + pa3) == 1;					\
->  	})
->  
-> +#define kvm_has_tcr2(k)				\
-> +	(kvm_has_feat((k), ID_AA64MMFR3_EL1, TCRX, IMP))
-> +
->  #endif /* __ARM64_KVM_HOST_H__ */
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 1af15140e067..6d5f43781042 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -2319,6 +2319,27 @@ static bool access_zcr_el2(struct kvm_vcpu *vcpu,
->  	return true;
->  }
->  
-> +static unsigned int tcr2_visibility(const struct kvm_vcpu *vcpu,
-> +				    const struct sys_reg_desc *rd)
-> +{
-> +	if (kvm_has_tcr2(vcpu->kvm))
-> +		return 0;
-> +
-> +	return REG_HIDDEN;
-> +}
-> +
-> +static unsigned int tcr2_el2_visibility(const struct kvm_vcpu *vcpu,
-> +				    const struct sys_reg_desc *rd)
-> +{
-> +	unsigned int r;
-> +
-> +	r = el2_visibility(vcpu, rd);
-> +	if (r)
-> +		return r;
-> +
-> +	return tcr2_visibility(vcpu, rd);
-> +}
-> +
->  /*
->   * Architected system registers.
->   * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
-> @@ -2503,7 +2524,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	{ SYS_DESC(SYS_TTBR0_EL1), access_vm_reg, reset_unknown, TTBR0_EL1 },
->  	{ SYS_DESC(SYS_TTBR1_EL1), access_vm_reg, reset_unknown, TTBR1_EL1 },
->  	{ SYS_DESC(SYS_TCR_EL1), access_vm_reg, reset_val, TCR_EL1, 0 },
-> -	{ SYS_DESC(SYS_TCR2_EL1), access_vm_reg, reset_val, TCR2_EL1, 0 },
-> +	{ SYS_DESC(SYS_TCR2_EL1), access_vm_reg, reset_val, TCR2_EL1, 0,
-> +	  .visibility = tcr2_visibility },
+On Sat, 31 Aug 2024 at 10:14, Marc Zyngier <maz@kernel.org> wrote:
+>
+> On Sat, 31 Aug 2024 08:56:23 +0100,
+> Ard Biesheuvel <ardb@kernel.org> wrote:
+> >
+> > As for RNDR/RNDRRS vs TRNG: the former is not a raw entropy source, it
+> > is a DRBG (or CSPRNG) which provides cryptographically secure random
+> > numbers whose security strength is limited by the size of the seed.
+> > TRNG does not have this limitation in principle, although non-p KVM
+> > happily seeds it from the kernel's entropy pool, which has the same
+> > limitation in practice.
+>
+> Is that something we should address? I assume that this has an impact
+> on the quality of the provided random numbers?
+>
 
-With this, we should be able to simplify the accessor, shouldn't we?
+To be honest, I personally find the distinction rather theoretical - I
+think it will be mostly the FIPS fetishists who may object to the
+seeding of a DRBG of security strength 'n' from the kernel entropy
+pool without proving that the sample has 'n' bits of entropy.
 
->  
->  	PTRAUTH_KEY(APIA),
->  	PTRAUTH_KEY(APIB),
-> @@ -2820,7 +2842,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	EL2_REG(TTBR0_EL2, access_rw, reset_val, 0),
->  	EL2_REG(TTBR1_EL2, access_rw, reset_val, 0),
->  	EL2_REG(TCR_EL2, access_rw, reset_val, TCR_EL2_RES1),
-> -	EL2_REG(TCR2_EL2, access_tcr2_el2, reset_val, TCR2_EL2_RES1),
-> +	EL2_REG_FILTERED(TCR2_EL2, access_tcr2_el2, reset_val, TCR2_EL2_RES1,
-> +			 tcr2_el2_visibility),
-
-Same thing here.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+For pKVM, the concern was that the untrusted host could observe and
+manipulate the entropy and therefore the protected guest's entropy
+source, which is why the hypervisor relays TRNG SMCCC calls directly
+to the secure firmware in that case. The quality of the entropy was
+never a concern here.
