@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1E6E13AD05;
-	Mon,  2 Sep 2024 03:54:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06BF436D;
+	Mon,  2 Sep 2024 05:13:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725249240; cv=none; b=EY8yVhFGKMJy+su4IgR3V+4qbUBB3KN+4EaAksCc7ddg70kpHn9okJ6IRN3GxXEB5KQGRK5AKTo/w2PIPNTxc/nLRAIYLrfVMm4vwH4RRnHa3nh4/TkwZ8Uon+v7ekm84xnzoi+VcCkV9XMdEdgW21ybT0yagUlGIs1Gojcwi3U=
+	t=1725254036; cv=none; b=RYWn/s+43h4xiPJN+MMC2cT00Oy4hP4hYhlg0V+KnNj0K1HU4BG5GgGfbUgLROiJtN0FoVMbhITR0Vwiti5ylw7Z7RkpuEOy0ZesUYD547H1I1s6XhT0unrOYiOUJq0Gy6Y6+xf4sWAl3ni3EnpkPLwN4qI4vrsOMsMJaNw5WfI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725249240; c=relaxed/simple;
-	bh=Z2ELWNCkGX3hzs4HPgsi9vE8uXzdpWzO9MtIN3QEEds=;
+	s=arc-20240116; t=1725254036; c=relaxed/simple;
+	bh=TPpkqPR8V96Q4pNrawsjjZ2uf1OIDvvR3Rbrdkwd92U=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=FsUaEpQklln6snnns/fjWfrgK2HEbLQqhZrkLQphx1L8wdjVs/TrxCBFnf0mjek2caWWB4G7svKnixXJyHGEqbv1ZHQD2pyRXfFD5MgkEcBdqgWd7GH13FhQs0YQkqbzut4DeuDyqs7k97N8JDdlT31Rx4YMHRf++RUw4CU1V1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LJql3XKZ; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=LvjCSq+RUS/Vrw1oueLSZ3hL7YL7njxa3YWl8kV7Zpy027N/jH4c+A591PeK4fR4uw6JJeLMy7Iqa/B8IOtTxtheMDmC4jfx+Gw6J/KBu7xChzkcuZI8Z7XR5ayYd7V+74BcszsgsN//rgo3J9IeBSijedgL6OP+8P0ALwfXWM0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F+cRk6C+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LJql3XKZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6C30C4CEC2;
-	Mon,  2 Sep 2024 03:53:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F+cRk6C+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27587C4CEC2;
+	Mon,  2 Sep 2024 05:13:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725249240;
-	bh=Z2ELWNCkGX3hzs4HPgsi9vE8uXzdpWzO9MtIN3QEEds=;
+	s=k20201202; t=1725254035;
+	bh=TPpkqPR8V96Q4pNrawsjjZ2uf1OIDvvR3Rbrdkwd92U=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=LJql3XKZ8ETVLWL6Og53CNSY7XP3ko+0vDScfLV4pxcKvDx6HEh6ulc7kBBORiw/l
-	 1LVKME+UWXr0K+t4JWQDnH6ywqUS7mwUvxhRyrVaoo7L8p22hs3rU1venIg3ERmnFF
-	 yEKEl3Jx/J7QcyG3jO1t3ZfQGFgCSg4BjfP8l53zvcUM4K9P659dZuI/xt3RHBHJUL
-	 6TYNhIQS68nsQcSg4X0mH/flEPTR30b5OqI0gJohLXzOJWYm/BEj6BORSUBS3goSL9
-	 jKsXl4NChIiCSKTicSdgQHFgmRONiMrc85TDuZ8EKHjcS4b+TqLRzhtop3vG9S0V6B
-	 xD0RPZZqy1Zqw==
+	b=F+cRk6C+jqe45JXc4w0ECr/xyLVyKeWB5ttckCESjF9gnaHUrOZIp8Cmy+ADMZKhT
+	 tvJ/Mj1jcRGsNTD2I3ilGlwKnBJxhytLCKBTOL88ChzM/p4dk4bFnL1IXmikmLOPpg
+	 IKe0ZuJqsVLJ4gssWyapKhx+alqZeAa0cJUFNn7R6ydE3J8Y8b6om477nBFwLlQFNF
+	 u7856rqq+XyEfM7IHFLpz/kGK3C49BoRt829dJs7gXtEVGT0Fr6Z2lKet8BsO/OX9g
+	 Gf8EslHcIoX9C/L3qe+ov4ALSnSN/wERdqmBqy5UEgkJugvvdXRHwRF3SmeLUr59/C
+	 Mfrf3Gj2qRKdA==
 X-Mailer: emacs 31.0.50 (via feedmail 11-beta-1 I)
 From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
 To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
@@ -45,15 +45,13 @@ Cc: Steven Price <steven.price@arm.com>,
 	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
 	Gavin Shan <gshan@redhat.com>,
 	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	Sami Mujawar <sami.mujawar@arm.com>
-Subject: Re: [PATCH v5 19/19] virt: arm-cca-guest: TSM_REPORT support for
- realms
-In-Reply-To: <20240819131924.372366-20-steven.price@arm.com>
-References: <20240819131924.372366-1-steven.price@arm.com>
- <20240819131924.372366-20-steven.price@arm.com>
-Date: Mon, 02 Sep 2024 09:23:51 +0530
-Message-ID: <yq5aikveemnk.fsf@kernel.org>
+	Alper Gun <alpergun@google.com>
+Subject: Re: [PATCH v4 43/43] KVM: arm64: Allow activating realms
+In-Reply-To: <20240821153844.60084-44-steven.price@arm.com>
+References: <20240821153844.60084-1-steven.price@arm.com>
+ <20240821153844.60084-44-steven.price@arm.com>
+Date: Mon, 02 Sep 2024 10:43:43 +0530
+Message-ID: <yq5afrqieiyg.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -64,28 +62,60 @@ Content-Type: text/plain
 
 Steven Price <steven.price@arm.com> writes:
 
-> From: Sami Mujawar <sami.mujawar@arm.com>
- 
-...
- 
-> --- /dev/null
-> +++ b/drivers/virt/coco/arm-cca-guest/Kconfig
-> @@ -0,0 +1,11 @@
-> +config ARM_CCA_GUEST
-> +	tristate "Arm CCA Guest driver"
-> +	depends on ARM64
-> +	default m
-> +	select TSM_REPORTS
-> +	help
-> +	  The driver provides userspace interface to request and
-> +	  attestation report from the Realm Management Monitor(RMM).
+> Add the ioctl to activate a realm and set the static branch to enable
+> access to the realm functionality if the RMM is detected.
+>
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+>  arch/arm64/kvm/rme.c | 19 ++++++++++++++++++-
+>  1 file changed, 18 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
+> index 9f415411d3b5..1eeef9e15d1c 100644
+> --- a/arch/arm64/kvm/rme.c
+> +++ b/arch/arm64/kvm/rme.c
+> @@ -1194,6 +1194,20 @@ static int kvm_init_ipa_range_realm(struct kvm *kvm,
+>  	return realm_init_ipa_state(realm, addr, end);
+>  }
+>  
+> +static int kvm_activate_realm(struct kvm *kvm)
+> +{
+> +	struct realm *realm = &kvm->arch.realm;
 > +
-> +	  If you choose 'M' here, this module will be called
-> +	  arm-cca-guest.
+> +	if (kvm_realm_state(kvm) != REALM_STATE_NEW)
+> +		return -EINVAL;
+> +
+> +	if (rmi_realm_activate(virt_to_phys(realm->rd)))
+> +		return -ENXIO;
+> +
+> +	WRITE_ONCE(realm->state, REALM_STATE_ACTIVE);
+> +	return 0;
+> +}
+> +
+>  /* Protects access to rme_vmid_bitmap */
+>  static DEFINE_SPINLOCK(rme_vmid_lock);
+>  static unsigned long *rme_vmid_bitmap;
+> @@ -1343,6 +1357,9 @@ int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
+>  		r = kvm_populate_realm(kvm, &args);
+>  		break;
+>  	}
+> +	case KVM_CAP_ARM_RME_ACTIVATE_REALM:
+> +		r = kvm_activate_realm(kvm);
+> +		break;
+>  	default:
+>  		r = -EINVAL;
+>  		break;
+> @@ -1599,5 +1616,5 @@ void kvm_init_rme(void)
+>  	if (rme_vmid_init())
+>  		return;
+>  
+> -	/* Future patch will enable static branch kvm_rme_is_available */
+> +	static_branch_enable(&kvm_rme_is_available);
 >
 
-Can we rename the generic Kconfig variable to ARM_CCA_TSM_REPORT?. Also
-should the directory be arm64-cca-guest?
+like rsi_present, we might want to use this outside kvm, ex: for TIO.
+Can we move this outside module init so that we can have a helper
+like is_rme_supported()
 
 
 -aneesh
