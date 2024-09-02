@@ -1,118 +1,83 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D3751CB508
-	for <kvmarm@lists.linux.dev>; Mon,  2 Sep 2024 14:59:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8ED41CB500;
+	Mon,  2 Sep 2024 15:07:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725289180; cv=none; b=OMCGuYGI0/7QGUyzDV1T0oP523WQIBkoGnuKlR0KDP2jlzAtG/NC2/D9AmG9UnujBSZfUbznUhrWMLkCjR+wReP371ca2wKr33F3NVF4bL85+9OrgbynzaFcvxLa33zj/cjN9JDqgkjQfS/4X+umYaw918U5PcyVuyr3vduTL6k=
+	t=1725289651; cv=none; b=PK+8ZRyw8lhTJMU3zaOa+ptHYJ5U84eOM38CIJfGBuBKWUYRKpzCzFb1PLKOTqsJiNgGvP0n5jtgTCsaWqxqnh6utOs1e/IU5R6EsXd0uAZxeJmVRSup6o0yFsges+HVpHRfYNXIw6X6HmODme3Fk8+cqKWdQfRT0dgOUTBUifc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725289180; c=relaxed/simple;
-	bh=CgTyxOo8Jl5Q+k9OoEFPn1JOt4mCXe8pIKl51Z9r2Zs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=p9Al/Wx0ZXwfaMSWeM8/Xd2Ep2JHwMkfOBUbaqFgKmgpIGAMPzW7gufyZNGh3TKPRTHPxCEgxaqrhoPynUgxqlNpOUr/7QrFsDGQg35JPS//ULFFhfBpIPKB2PDNviZOR6wqXHboPjAnrEvMb07RgBmg4q9lx19LWXBJa147lGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LV8Vx42t; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1725289651; c=relaxed/simple;
+	bh=CDvImeaHi1qQ6IcRM7Vkr3C6C7NX0roxJJAoEE8EYho=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gNhm9t/rtBOfJ4yScWorGfz6MQ+JpuI9t9EjDYFSXibp83yATnzojh84Y2qMySf6JRa0pO/1ywSFjWw5RYI6ojZcNIiJqgoqvI0TRNGh2+gxwzbsXdKQqsI77WYTZjw2g3f+1SFKvWF+ZeyNIQJAznfYQFY713HYgRIoC0m1YI8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nhhqpjOi; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LV8Vx42t"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725289177;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CgTyxOo8Jl5Q+k9OoEFPn1JOt4mCXe8pIKl51Z9r2Zs=;
-	b=LV8Vx42tAAZaZ36mdUjQ4MTM8A17brHdDv7mBrK0BiT4l+7BYqaMAUikzNzqGfHOtV/GQA
-	GJvpCQGF6/em+V+sbKzhdQBhl6JKryJNFNU9JC9xFH7ESn2jOpMWqAFsBiGF9D2n0Aj80W
-	R+5SkPUi8xY5h3cCRummllTiPjilBaY=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-228-6hUVOL2zMEKqYwE3uptN8w-1; Mon, 02 Sep 2024 10:59:36 -0400
-X-MC-Unique: 6hUVOL2zMEKqYwE3uptN8w-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-42c7936e564so20000725e9.2
-        for <kvmarm@lists.linux.dev>; Mon, 02 Sep 2024 07:59:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725289175; x=1725893975;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CgTyxOo8Jl5Q+k9OoEFPn1JOt4mCXe8pIKl51Z9r2Zs=;
-        b=Sw444ZqxKyxLZY69XW3ZWsad0QN+FRq3k2cGm0gORy7gGXCMNrPN4YCsgb+PC5G2ww
-         s8DZbf2lpAdHBGmzNpx15uJvD2TmUlzkS5kF1+kMuCVu7UAF/vVsZZb/c0a66eh5LdUs
-         1uNu6GumpQ/sAZAJaigr8YFyjYDehtIT6D5cWoe+TO/pf84dJ8Pnha4CALiZpnhmGH1a
-         pkRRHrwKEJlxVgO9i+nM8MQDgS8K7eFa69FSjK/yZhc9D/HyzyBdfR35xOuZHSx9Kpdx
-         FGsCwRHOoN0NCrH28SbKXC0pWKHA3Vt69QxJI6VyItOmP31VNCLCEanUN0mal8E6F7D9
-         s+FQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUT2FwNi1LdAUo2ItzeTmYlK4TBNBFqEa+oJLTB9an44q1oyKBcUzRWUqiUjw/x99FzDdrgbtQ=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyerHVHyGZueSfIk2ra0EjlfWy9Top6OazRQmnBZ+n2w6dOkxni
-	LTBZxrIobxuaOkS3aWe2BWtKNqWzx781FrfzDONc+H5djp34LMk57ogE/yvosKffGgQBxqJWIkN
-	7WlkCeBLND0DcMv6e5Yu552+rc96r0LJToRUTBJy7esAqevqExUIDz/tqTAdQfyqOJPqI/XXHp1
-	R12ezVnuFabt4lLr1dao8MsFfcQ7dm
-X-Received: by 2002:a5d:4e01:0:b0:374:bd03:ab7c with SMTP id ffacd0b85a97d-374eccc299bmr199094f8f.33.1725289175429;
-        Mon, 02 Sep 2024 07:59:35 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFgxSO4P7+F3cMCBY369yImj7GvTpdVVLeLtGciNsfYGQwOJyWr8f63VuFOvFicjE9kRzThXGBTwX2LQ8U0ciA=
-X-Received: by 2002:a5d:4e01:0:b0:374:bd03:ab7c with SMTP id
- ffacd0b85a97d-374eccc299bmr199075f8f.33.1725289174997; Mon, 02 Sep 2024
- 07:59:34 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nhhqpjOi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4EB19C4CEC4;
+	Mon,  2 Sep 2024 15:07:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725289650;
+	bh=CDvImeaHi1qQ6IcRM7Vkr3C6C7NX0roxJJAoEE8EYho=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=nhhqpjOiUkLi/x1OXaP4Z8L/mpO8y510GALi9VNfj8pWo0Qm+kb065UbYmcVmDVLi
+	 euOLwursgHkfVkS0zF0g9+WQWULITJa0bNMk1DOeSk9gT9roQ32CPg//I0kSubGXB4
+	 Tvj81sKmEOc2OGtIEVYZa2bNEkI5p1A3mEyg69X3SD9pYBlIQ9cdB4oMAgUhh3QLhk
+	 VGJKz83mWr/b7rDMCus15QaOPxDuYKNQBYJVfvVpwYwgB5RLJMJVq2u0Ecj5M9eqmJ
+	 2gSaUihqJi3Hzj0qmHJEBqfDfA470i4lDw9aUzHx5L31K2e/qTdlsHPIKRF1KHAVHQ
+	 QCNtdNqIr8nOw==
+Date: Mon, 2 Sep 2024 16:07:26 +0100
+From: Will Deacon <will@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Marc Zyngier <maz@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.11, round #2
+Message-ID: <20240902150725.GA11571@willie-the-truck>
+References: <Zsb4kbq6FAfgg4WA@linux.dev>
+ <ZshONupF3nIhAlRf@arm.com>
+ <CABgObfZ=P-Qc20SD=duFtDbCefWGO9YoEcA=S0DaTo59x58iYg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <Zsb4kbq6FAfgg4WA@linux.dev> <ZshONupF3nIhAlRf@arm.com>
-In-Reply-To: <ZshONupF3nIhAlRf@arm.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 2 Sep 2024 16:59:23 +0200
-Message-ID: <CABgObfZ=P-Qc20SD=duFtDbCefWGO9YoEcA=S0DaTo59x58iYg@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.11, round #2
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, 
-	Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Will Deacon <will@kernel.org>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CABgObfZ=P-Qc20SD=duFtDbCefWGO9YoEcA=S0DaTo59x58iYg@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Fri, Aug 23, 2024 at 10:54=E2=80=AFAM Catalin Marinas
-<catalin.marinas@arm.com> wrote:
->
-> Hi Oliver,
->
-> On Thu, Aug 22, 2024 at 01:36:33AM -0700, Oliver Upton wrote:
-> > Paolo is on holiday for a few weeks and has asked that KVM arch maintai=
-ners
-> > send pulls through the architecture trees in his absence.
+On Mon, Sep 02, 2024 at 04:59:23PM +0200, Paolo Bonzini wrote:
+> On Fri, Aug 23, 2024 at 10:54 AM Catalin Marinas
+> <catalin.marinas@arm.com> wrote:
 > >
-> > So lucky you, here's a pile of kvmarm crap from the past week.
+> > Hi Oliver,
 > >
-> > Details can be found in the tag, but this is a set of small fixes
-> > around the shop thanks to syzkaller bringup on KVM/arm64 and a few
-> > recently introduced bugs.
->
-> Pulled into the arm64 for-next/fixes branch. I'll send a pull request to
-> Linus later today.
+> > On Thu, Aug 22, 2024 at 01:36:33AM -0700, Oliver Upton wrote:
+> > > Paolo is on holiday for a few weeks and has asked that KVM arch maintainers
+> > > send pulls through the architecture trees in his absence.
+> > >
+> > > So lucky you, here's a pile of kvmarm crap from the past week.
+> > >
+> > > Details can be found in the tag, but this is a set of small fixes
+> > > around the shop thanks to syzkaller bringup on KVM/arm64 and a few
+> > > recently introduced bugs.
+> >
+> > Pulled into the arm64 for-next/fixes branch. I'll send a pull request to
+> > Linus later today.
+> 
+> Looks like this pull request was never sent (the last arm64 fixes PR
+> is from August 16), so I pulled this now.
+> 
+> Duplicate commits are generally harmless so it shouldn't be an issue
+> if they end up being sent by Catalin as well.
 
-Looks like this pull request was never sent (the last arm64 fixes PR
-is from August 16), so I pulled this now.
+I think this was all pulled by Linus over a week ago:
 
-Duplicate commits are generally harmless so it shouldn't be an issue
-if they end up being sent by Catalin as well.
+https://lore.kernel.org/all/ZsjE6BXzDznbg6R-@arm.com/
 
-Thanks,
-
-Paolo
-
-> BTW, I'm also away next week. I'll randomly check emails but if you have
-> another pull request, better send it to Will.
->
-> Thanks.
->
-> --
-> Catalin
->
-
+Will
