@@ -1,96 +1,154 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2EF11A3A98;
-	Mon,  2 Sep 2024 19:08:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2635E1A3A93;
+	Mon,  2 Sep 2024 19:12:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725304095; cv=none; b=p3vzszjm99V5wnn340YmXygAiQK4QLMWgBOjregPDbujI4YIj6N0Xd+LcvRA3AdJGb9aamsFiIBCpjOR4api/fq1A4mVi2jp1vtjC7Z/aQ3MqpGQkTdFiOmYuon47mz7PwinmAcMmbsvEXI+KZFwD+D/byLeZHqTAxVFb63u6x0=
+	t=1725304375; cv=none; b=FdJ9SXTjCx3RcJUuaLR2PHqorzB1+6FGpKL7jn7ioUBr2goTl1RSf61zaGnsnJLYXK29dN8fxh6qTqJ56hfRkzANofg3xVmEhEwvZivPCw6Y+vlENblb22Cf678wJ24Os8wlFHHqXk9WNcj95tgqiCJme7dPf6eCIZHJjvN8Xxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725304095; c=relaxed/simple;
-	bh=gVEYgyHdEpAGYFOHD7x27yBSQkNSfiEEw/kpvT4OFcQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qfjRwXz2vVNzvxeNAk8D2uB1Jpq9/sV9Sy4qulH+l+M2RkS0kOY4xMmRmP5rR0jH1NL7wWhyRyMUqKKpwfuMpYjVJ9ZfF5LurXu4akO0Sdi4AMw4ccUclKYI4tI7XgRAlxatSHgHkrcBIycYmXKUykR7A7ft4kRVzRwcRWcQPx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FCD8C4CEC2;
-	Mon,  2 Sep 2024 19:08:10 +0000 (UTC)
-Date: Mon, 2 Sep 2024 20:08:08 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Will Deacon <will@kernel.org>
-Cc: Joey Gouly <joey.gouly@arm.com>, linux-arm-kernel@lists.infradead.org,
-	nd@arm.com, akpm@linux-foundation.org, aneesh.kumar@kernel.org,
-	aneesh.kumar@linux.ibm.com, anshuman.khandual@arm.com, bp@alien8.de,
-	broonie@kernel.org, christophe.leroy@csgroup.eu,
-	dave.hansen@linux.intel.com, hpa@zytor.com,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
-	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
-	oliver.upton@linux.dev, shuah@kernel.org, skhan@linuxfoundation.org,
-	szabolcs.nagy@arm.com, tglx@linutronix.de, x86@kernel.org,
-	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v5 06/30] arm64: context switch POR_EL0 register
-Message-ID: <ZtYNGBrcE-j35fpw@arm.com>
-References: <20240822151113.1479789-1-joey.gouly@arm.com>
- <20240822151113.1479789-7-joey.gouly@arm.com>
- <20240823144531.GH32156@willie-the-truck>
- <Zsi7ovLOfuFdfuuz@arm.com>
- <20240823170835.GA1181@willie-the-truck>
- <ZsjXtE7Kg0LQwNAL@arm.com>
- <20240827113803.GB4318@willie-the-truck>
+	s=arc-20240116; t=1725304375; c=relaxed/simple;
+	bh=GMVnn22J0kYs5YTaIdMO4all44aS9lj+6fg+x5dH8D0=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ECnjmAS9NG0v3G/i3jhYR78LpTMVviCMgxVmUaHi6XWkN1ojhDUvCKT6PCTlGHG8WdrY7oAI48eBelQ3vMvTBuDJVLl/PgwV0tUJpbWB/tF1NAsftWyjcs2cdacD+cDAwjI74ZVJKxnU9ImdnkMgX8P9KRis9lX0ZMmEGOJS6eM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pY5N3Kj/; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pY5N3Kj/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EB3FC4CEC2;
+	Mon,  2 Sep 2024 19:12:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725304374;
+	bh=GMVnn22J0kYs5YTaIdMO4all44aS9lj+6fg+x5dH8D0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=pY5N3Kj/BU1o+ddbmefgRH5itJPL7HzzRHShngaIA00aPwOvX4i416FEgAJU5TzNE
+	 yZsQjysi6g2pmEXdy1C5TgF4yxwwklqpPj44O078O/rQGagLwa0mFWTrRIOhO+Q2n9
+	 vKopbc/51ysI+HKKObFXrPx9pXTsADlynHTi4dZc0x3dEfFjSh210EfrgoixlRfESt
+	 kMDSdEMmv4/gOSkl5GL1bL1OjnMEvLSCHXLHs9Y+71CFbv13wp/93AaxQAoCCvdadq
+	 K5uonAVrDRMQzDLONq1d7XneiA2WW1GfI0suYXoWNSkJ0itOdV0OVDd4ZlVX+9wcH5
+	 xRrQ2OfDeGcQQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1slCTs-0091pX-0Q;
+	Mon, 02 Sep 2024 20:12:52 +0100
+Date: Mon, 02 Sep 2024 20:12:51 +0100
+Message-ID: <86ttexvpho.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	20240813144738.2048302-1-maz@kernel.org
+Subject: Re: [PATCH v2 2/3] KVM: arm64: Hide TCR2_EL1 from userspace when disabled for guests
+In-Reply-To: <20240822-kvm-arm64-hide-pie-regs-v2-2-376624fa829c@kernel.org>
+References: <20240822-kvm-arm64-hide-pie-regs-v2-0-376624fa829c@kernel.org>
+	<20240822-kvm-arm64-hide-pie-regs-v2-2-376624fa829c@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240827113803.GB4318@willie-the-truck>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 20240813144738.2048302-1-maz@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Aug 27, 2024 at 12:38:04PM +0100, Will Deacon wrote:
-> On Fri, Aug 23, 2024 at 07:40:52PM +0100, Catalin Marinas wrote:
-> > On Fri, Aug 23, 2024 at 06:08:36PM +0100, Will Deacon wrote:
-> > > On Fri, Aug 23, 2024 at 05:41:06PM +0100, Catalin Marinas wrote:
-> > > > On Fri, Aug 23, 2024 at 03:45:32PM +0100, Will Deacon wrote:
-> > > > > On Thu, Aug 22, 2024 at 04:10:49PM +0100, Joey Gouly wrote:
-> > > > > > +static void permission_overlay_switch(struct task_struct *next)
-> > > > > > +{
-> > > > > > +	if (!system_supports_poe())
-> > > > > > +		return;
-> > > > > > +
-> > > > > > +	current->thread.por_el0 = read_sysreg_s(SYS_POR_EL0);
-> > > > > > +	if (current->thread.por_el0 != next->thread.por_el0) {
-> > > > > > +		write_sysreg_s(next->thread.por_el0, SYS_POR_EL0);
-> > > > > > +		/* ISB required for kernel uaccess routines when chaning POR_EL0 */
-> > > > > 
-> > > > > nit: typo "chaning".
-> > > > > 
-> > > > > But more substantially, is this just to prevent spurious faults in the
-> > > > > context of a new thread using a stale value for POR_EL0?
-> > > > 
-> > > > Not just prevent faults but enforce the permissions from the new
-> > > > thread's POR_EL0. The kernel may continue with a uaccess routine from
-> > > > here, we can't tell.
-[...]
-> > > So what do we actually gain by having the uaccess routines honour this?
-> > 
-> > I guess where it matters is more like not accidentally faulting because
-> > the previous thread had more restrictive permissions.
+On Thu, 22 Aug 2024 00:35:37 +0100,
+Mark Brown <broonie@kernel.org> wrote:
 > 
-> That's what I wondered initially, but won't the fault handler retry in
-> that case?
+> When the guest does not support FEAT_TCR2 we should not allow any access
+> to it in order to ensure that we do not create spurious issues with guest
+> migration. Add a visibility operation for it.
+> 
+> Fixes: fbff56068232 ("KVM: arm64: Save/restore TCR2_EL1")
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  3 +++
+>  arch/arm64/kvm/sys_regs.c         | 29 ++++++++++++++++++++++++++---
+>  2 files changed, 29 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index ab4c675b491d..7889e5f4009f 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -1476,4 +1476,7 @@ void kvm_set_vm_id_reg(struct kvm *kvm, u32 reg, u64 val);
+>  		(pa + pi + pa3) == 1;					\
+>  	})
+>  
+> +#define kvm_has_tcr2(k)				\
+> +	(kvm_has_feat((k), ID_AA64MMFR3_EL1, TCRX, IMP))
+> +
+>  #endif /* __ARM64_KVM_HOST_H__ */
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 1af15140e067..6d5f43781042 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -2319,6 +2319,27 @@ static bool access_zcr_el2(struct kvm_vcpu *vcpu,
+>  	return true;
+>  }
+>  
+> +static unsigned int tcr2_visibility(const struct kvm_vcpu *vcpu,
+> +				    const struct sys_reg_desc *rd)
+> +{
+> +	if (kvm_has_tcr2(vcpu->kvm))
+> +		return 0;
+> +
+> +	return REG_HIDDEN;
+> +}
+> +
+> +static unsigned int tcr2_el2_visibility(const struct kvm_vcpu *vcpu,
+> +				    const struct sys_reg_desc *rd)
+> +{
+> +	unsigned int r;
+> +
+> +	r = el2_visibility(vcpu, rd);
+> +	if (r)
+> +		return r;
+> +
+> +	return tcr2_visibility(vcpu, rd);
+> +}
+> +
+>  /*
+>   * Architected system registers.
+>   * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
+> @@ -2503,7 +2524,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	{ SYS_DESC(SYS_TTBR0_EL1), access_vm_reg, reset_unknown, TTBR0_EL1 },
+>  	{ SYS_DESC(SYS_TTBR1_EL1), access_vm_reg, reset_unknown, TTBR1_EL1 },
+>  	{ SYS_DESC(SYS_TCR_EL1), access_vm_reg, reset_val, TCR_EL1, 0 },
+> -	{ SYS_DESC(SYS_TCR2_EL1), access_vm_reg, reset_val, TCR2_EL1, 0 },
+> +	{ SYS_DESC(SYS_TCR2_EL1), access_vm_reg, reset_val, TCR2_EL1, 0,
+> +	  .visibility = tcr2_visibility },
 
-Yes, it will retry and this should be fine (I assume you are only
-talking about the dropping ISB in the context switch).
+With this, we should be able to simplify the accessor, shouldn't we?
 
-For the case of running with a more permissive stale POR_EL0, arguably it's
-slightly more predictable for the user but, OTOH, some syscalls like
-readv() could be routed through GUP with no checks. As with MTE, we
-don't guarantee uaccesses honour the user permissions.
+>  
+>  	PTRAUTH_KEY(APIA),
+>  	PTRAUTH_KEY(APIB),
+> @@ -2820,7 +2842,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	EL2_REG(TTBR0_EL2, access_rw, reset_val, 0),
+>  	EL2_REG(TTBR1_EL2, access_rw, reset_val, 0),
+>  	EL2_REG(TCR_EL2, access_rw, reset_val, TCR_EL2_RES1),
+> -	EL2_REG(TCR2_EL2, access_tcr2_el2, reset_val, TCR2_EL2_RES1),
+> +	EL2_REG_FILTERED(TCR2_EL2, access_tcr2_el2, reset_val, TCR2_EL2_RES1,
+> +			 tcr2_el2_visibility),
 
-That said, at some point we should sanitise this path anyway and have a
-single ISB at the end. In the meantime, I'm fine with dropping the ISB
-here.
+Same thing here.
+
+Thanks,
+
+	M.
 
 -- 
-Catalin
+Without deviation from the norm, progress is not possible.
