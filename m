@@ -1,90 +1,88 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECF1813D244
-	for <kvmarm@lists.linux.dev>; Mon,  2 Sep 2024 16:30:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A5511A3A93;
+	Mon,  2 Sep 2024 18:54:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725294618; cv=none; b=di/TlDGJN751RJPE4WSaapLjZbwOF4F+20MxgaTBX3BWFUV/EqfljxeWay2xQ1JsY5bRr34zaeKZG00Nrh+jDfM+LMJ1sRbM5POjP8d0fkVy3JtkDFmuhe2iRazRxIMkD2n0EKoPNhdKw8WZFGqLU+VdpR3ccOaiG2A9ud6q6Yg=
+	t=1725303275; cv=none; b=bCXMvJDjr1nwGw6pfKYwmmYnPdIwMR/EZOWBF/JKRlKUE6Yw1lnbMP4dX4MAnXKKF4YwryjS/VL/MMVNIjEWjWlQAhFTg5mnjkUfTNhRRvwQQpqNSIjJsCh0xwT0baY/xO/8zRXZ8L9BzQ4VG897BeXG1qRTg5Awg05+xLWZ300=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725294618; c=relaxed/simple;
-	bh=y9rmIZUkhHhDge1AsTeRB/wi3YCOD8AGEoMcFfCtP50=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sUekDvpD+ZVS8BAPlUV7T8TPk5061kAyF3G/Q/nnITT2hHAuYU9CuaU+SuKPMa8zKCPB4nI/v4Q3GAQjvRYgr5aIBnVFfQZJCKKjTisKuYPlxI5ImXodJjLjRxP0Vx7CzWnkgpYLaF9KEE1bBDSEzv+2NJ/kDNKbpQshvSOkO5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GJaN8xfY; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GJaN8xfY"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725294615;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=y9rmIZUkhHhDge1AsTeRB/wi3YCOD8AGEoMcFfCtP50=;
-	b=GJaN8xfYp+PAn5ky8tGNfF7yCHmrcoHN8vwori4q1a4/KYikMZLkMH2+098C3QSgfYSdgP
-	lr8QdwbTgfcxG4ZOvJgNITNRm+gPrVjXMcqzCviTKwbDY2zGfmoT81ClGWshlfd0C7r/5v
-	FMGNhgvicm+v8zG9jrR3NlfwDdJs4WU=
-Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
- [209.85.210.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-359-0rUkoCZzNUy59LMGiue2ZA-1; Mon, 02 Sep 2024 12:30:14 -0400
-X-MC-Unique: 0rUkoCZzNUy59LMGiue2ZA-1
-Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-71447abc57fso4268461b3a.3
-        for <kvmarm@lists.linux.dev>; Mon, 02 Sep 2024 09:30:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725294614; x=1725899414;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=y9rmIZUkhHhDge1AsTeRB/wi3YCOD8AGEoMcFfCtP50=;
-        b=MynB2MnpXHydLXCmXVALynNdK/+scLnNMlOkS0x72dab33gI+qLbgeCeMWnXNBkugX
-         yYKgE1Wj/xJrm/KJ4Rzb+96CTGejXv3l6zHL9rd21MtUKhFM8H/9zqGLiACdC+ggju67
-         /UfcjkWwCJzNZHmTTA4UlI3EKE26Eqb+yLhm+LIlLQMcZBTbyf8CrgZeHHYEPJNrw9Gy
-         U18eZWuAunnpRX4dAZdaC+9sGenjGJvzzxHm27GTIS8kq+bTO1y4l/D/rogme24xQMQE
-         nLweLRpAU4Mbbot7akOpASkPny/L8YOfwXrgpBvG4FRqU7N9etu8oIjDxQIs3j2E0ifZ
-         zUDg==
-X-Forwarded-Encrypted: i=1; AJvYcCXASvwjySYBBoymFC2181t7abIO1b5nGjD1OAx/vUxDJhAsTeb47LquLrl9kHEfnB7qSY/OORk=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzYQ3e7yQhutkWC7s82JwyIVlqtobpuoXK3g0tKXAXfJJBq4WTe
-	/BCR0gxJIruPmPNUo3Awr905Soscv36XrA7Q6g3qernT7p8nVz3OSJPK5vPLiFH9zMXo1/vDlgS
-	Mr/OMCXezm9sdudeJ9rohb4/PEwoO0Kh33NA8uK1cxWg5RNCSFGooAE+QBGpckh+VbitcpnDUQX
-	9ACk/tu7uLexLOALG2lFsd7knEUY/P
-X-Received: by 2002:a05:6a21:394a:b0:1cc:e4d0:84e9 with SMTP id adf61e73a8af0-1cece50235dmr8036823637.17.1725294612295;
-        Mon, 02 Sep 2024 09:30:12 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGoBISUpaETKmXWjYLMX9OvXWf6NhGf8camXMY3dXDdiY//ktjWVoWIvLx/zwhZ290M/DMXm/zvrJoNfltI2Mk=
-X-Received: by 2002:a05:6a21:394a:b0:1cc:e4d0:84e9 with SMTP id
- adf61e73a8af0-1cece50235dmr8036803637.17.1725294611883; Mon, 02 Sep 2024
- 09:30:11 -0700 (PDT)
+	s=arc-20240116; t=1725303275; c=relaxed/simple;
+	bh=gTSzzy8qy3//EGLWo3rinOcx/5vjdLEbDiuK+VMVDls=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LuTjzeRLAzclKmrrqxFe0CwryZyaUFMiehMcE1DHHd5Zhz2r0h0e/x5ud2gNs+J7sY+XIOQYfCird7ALmj3iyJJrYV7cGEJe+eHxOzT/UZ9K/vSk4fbmB/FWQVarYgpb5nfW62OTc0aLnnSAPy38MSFxeL7YGxTCEeu0r1XpDRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B088C4CEC2;
+	Mon,  2 Sep 2024 18:54:27 +0000 (UTC)
+Date: Mon, 2 Sep 2024 19:54:25 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Florian Weimer <fweimer@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
+	Ross Burton <ross.burton@arm.com>,
+	Yury Khrustalev <yury.khrustalev@arm.com>,
+	Wilco Dijkstra <wilco.dijkstra@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v12 19/39] arm64/mm: Handle GCS data aborts
+Message-ID: <ZtYJ4SUDLxrjDDBX@arm.com>
+References: <20240829-arm64-gcs-v12-0-42fec947436a@kernel.org>
+ <20240829-arm64-gcs-v12-19-42fec947436a@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <Zsb4kbq6FAfgg4WA@linux.dev> <ZshONupF3nIhAlRf@arm.com>
- <CABgObfZ=P-Qc20SD=duFtDbCefWGO9YoEcA=S0DaTo59x58iYg@mail.gmail.com> <20240902150725.GA11571@willie-the-truck>
-In-Reply-To: <20240902150725.GA11571@willie-the-truck>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 2 Sep 2024 18:29:58 +0200
-Message-ID: <CABgObfa-hR5Xx5ORXAhTmvxChK=77WpWhD5erWK=cz1MTZoJsw@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.11, round #2
-To: Will Deacon <will@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Marc Zyngier <maz@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240829-arm64-gcs-v12-19-42fec947436a@kernel.org>
 
-On Mon, Sep 2, 2024 at 5:07=E2=80=AFPM Will Deacon <will@kernel.org> wrote:
-> I think this was all pulled by Linus over a week ago:
->
-> https://lore.kernel.org/all/ZsjE6BXzDznbg6R-@arm.com/
+On Thu, Aug 29, 2024 at 12:27:35AM +0100, Mark Brown wrote:
+> All GCS operations at EL0 must happen on a page which is marked as
+> having UnprivGCS access, including read operations.  If a GCS operation
+> attempts to access a page without this then it will generate a data
+> abort with the GCS bit set in ESR_EL1.ISS2.
+> 
+> EL0 may validly generate such faults, for example due to copy on write
+> which will cause the GCS data to be stored in a read only page with no
+> GCS permissions until the actual copy happens.  Since UnprivGCS allows
+> both reads and writes to the GCS (though only through GCS operations) we
+> need to ensure that the memory management subsystem handles GCS accesses
+> as writes at all times.  Do this by adding FAULT_FLAG_WRITE to any GCS
+> page faults, adding handling to ensure that invalid cases are identfied
+> as such early so the memory management core does not think they will
+> succeed.  The core cannot distinguish between VMAs which are generally
+> writeable and VMAs which are only writeable through GCS operations.
+> 
+> EL1 may validly write to EL0 GCS for management purposes (eg, while
+> initialising with cap tokens).
+> 
+> We also report any GCS faults in VMAs not marked as part of a GCS as
+> access violations, causing a fault to be delivered to userspace if it
+> attempts to do GCS operations outside a GCS.
+> 
+> Reviewed-by: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
+> Signed-off-by: Mark Brown <broonie@kernel.org>
 
-Yeah, that's what happens if you "git rebase v6.11-rc6" on the wrong machin=
-e.
-
-Paolo
-
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
