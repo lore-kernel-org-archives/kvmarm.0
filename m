@@ -1,114 +1,127 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 862692AE66
-	for <kvmarm@lists.linux.dev>; Tue,  3 Sep 2024 15:04:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D9C21885B6
+	for <kvmarm@lists.linux.dev>; Tue,  3 Sep 2024 15:29:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725375883; cv=none; b=pz+ALvtCAjl9HIHMzCjrAmFlOrmmFsiYoKr4HcZi6KEaaCqZP1pnqBKDMxAJmqmaOHJnYbocCiPf8W6/P77TVUvWnmgWdtm9rIIMjfdVkk5N2Ty+gld6Y7CWGlc/utftoWiTZ1GnBb9UlZyfCnF/r0MCbMaCkqDeYouo/TcyULU=
+	t=1725377387; cv=none; b=FrX7MynpFDXKhds/gRdqbpR0UltUi987UGN0KpH6oqtM5ESLbL08IIxdkULpY1NftF+1StZT/p9bE6iDIMYmfGD9I0rfhBYJ1rWnIje/X8fPvqsto2c6ZMWzhYnfXB/mYv3kbwBhJ6O5XU5P09/CLyGfYXsFEEAZRb7ZXl/tB1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725375883; c=relaxed/simple;
-	bh=lmrSBif61BRlFHCzXpca5MPMB56saeOdUQqUjYlg/Co=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=G/9D9eqHV4429sgJEayF0k5VDgaOJo+xTuXzxVq5/OuBwJpQFxkqmlaOABBFoy82GA5wQ2OJ6TtMbLPkSgnOyKa3bFQCqVMVH1O20sgChg4rgOk38vLESmoHnRVUOys35BjSNH8deVtiaqInQCXGHXRo8nMQt0bzMQ9vKEE7UzU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gTnH/X/x; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gTnH/X/x"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28C4CC4CEC4
-	for <kvmarm@lists.linux.dev>; Tue,  3 Sep 2024 15:04:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725375883;
-	bh=lmrSBif61BRlFHCzXpca5MPMB56saeOdUQqUjYlg/Co=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=gTnH/X/xuNM8lzLUAsnru8hikmU7qWVYGdgIAlO8LjzIH2ETPBQtoK9FizzjV9je7
-	 tB/LEb3g3kR6FDxGe2P4+QsOpnPvoSjtMuff6x743LBwJdysWltQXh+1zz3GNSVaIa
-	 zBEALopTX/yOlUMfkKvSUgpsx0RZtcp7+gOzUGoMNOf5ZfjKnYGGfGc1FTMqMDfZgG
-	 dcU7p8kiINQfuMkAgexSpJ0omfnpVXn2mV1sTc+c+rbIHTlwJ+ZsnuXamWvfMb9/tA
-	 rWOwVNj4uf/U3nh3OXvq4E1ZNTB9rSfdazTpucNilBH9IQhrkAgV9oJ315nbjW/++D
-	 g1YIWR9NPaEHg==
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-53349d3071eso7191623e87.2
-        for <kvmarm@lists.linux.dev>; Tue, 03 Sep 2024 08:04:43 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCWq1FtzmlI6v3tLT7zAbSNuQfbOMDq+xB6o31rcYfTaL19dLZHUYZwhl32Prm4vyh5e+Pu2JY4=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxTRAaB/T9VQ/MF2vbgnJE23u0UTEMrSeboUyt5vmhbm5+S2xUE
-	WGdQwo76iZmYPYXTliEp+Ss1l6P/wlLooi5iJg+YTg25xKrtI2AHLCVYv+ZzdWrXEFvRkWjl7wG
-	BplC8xcp7Yx+48/+L8SpIa9wBMnM=
-X-Google-Smtp-Source: AGHT+IG7gus73VBjLSHysH1wwSV9ysu4ymNNtJXZol3arJRV6nMVPo8fAFNviB0AK2N5lnISmpZGdtR5+wtX5w0Po4Y=
-X-Received: by 2002:a05:6512:3d28:b0:52c:e670:7a12 with SMTP id
- 2adb3069b0e04-53546bc2c75mr8928117e87.60.1725375881495; Tue, 03 Sep 2024
- 08:04:41 -0700 (PDT)
+	s=arc-20240116; t=1725377387; c=relaxed/simple;
+	bh=0h/zNY8bJ/TNcS1t7SeY1xaa/nugscrq+MyZ7fVrr3s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cR07VTg5VHDOO906ezZrcQ6iaSamoBzPAxK4R4itUcEJak+6OdMbJemH8TLMLQlmK1YEey8rUK4/eKcFJpbiNPatwEynjgXb1BwYQymzNFTBBD6SNK+eS3meujAlRZNYjYH1jp7asrXItSH55+uZfhlUkGT0K+Fnyg5xJtKhzgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 46809FEC;
+	Tue,  3 Sep 2024 08:30:12 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 841EB3F66E;
+	Tue,  3 Sep 2024 08:29:42 -0700 (PDT)
+Date: Tue, 3 Sep 2024 16:29:37 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, nd@arm.com,
+	akpm@linux-foundation.org, aneesh.kumar@kernel.org,
+	aneesh.kumar@linux.ibm.com, anshuman.khandual@arm.com, bp@alien8.de,
+	catalin.marinas@arm.com, christophe.leroy@csgroup.eu,
+	dave.hansen@linux.intel.com, hpa@zytor.com,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
+	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
+	oliver.upton@linux.dev, shuah@kernel.org, skhan@linuxfoundation.org,
+	szabolcs.nagy@arm.com, tglx@linutronix.de, will@kernel.org,
+	x86@kernel.org, kvmarm@lists.linux.dev,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v5 16/30] arm64: handle PKEY/POE faults
+Message-ID: <20240903152937.GA3768522@e124191.cambridge.arm.com>
+References: <20240822151113.1479789-1-joey.gouly@arm.com>
+ <20240822151113.1479789-17-joey.gouly@arm.com>
+ <40600b75-68eb-421a-a122-256bd20afb89@sirena.org.uk>
+ <20240903144823.GA3669886@e124191.cambridge.arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <214e37e9-7aba-1e61-f63f-85cb10c9a878@huawei.com>
- <86zfotuoio.wl-maz@kernel.org> <CAMj1kXGocnZPe4EfzsB6xd2QZacp-a45R5f5f6FDpVtVEXCcGQ@mail.gmail.com>
- <86y14dun1f.wl-maz@kernel.org> <CAMj1kXF3JrDs=xvRmvTxS9du1F-gjSVe5qVZrPO5JLT5ho0riA@mail.gmail.com>
- <f39ccb21-cc28-b878-bf5e-e81e378a299e@huawei.com>
-In-Reply-To: <f39ccb21-cc28-b878-bf5e-e81e378a299e@huawei.com>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Tue, 3 Sep 2024 17:04:30 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXGyJSwD=ok=Ag11mMh3d6onQkN0b_-iVwVDdyrwk5rj6Q@mail.gmail.com>
-Message-ID: <CAMj1kXGyJSwD=ok=Ag11mMh3d6onQkN0b_-iVwVDdyrwk5rj6Q@mail.gmail.com>
-Subject: Re: Question on get random long worse in VM than on host
-To: Tangnianyao <tangnianyao@huawei.com>
-Cc: Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, oliver.upton@linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	kvmarm@lists.linux.dev, "guoyang (C)" <guoyang2@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240903144823.GA3669886@e124191.cambridge.arm.com>
 
-On Tue, 3 Sept 2024 at 03:39, Tangnianyao <tangnianyao@huawei.com> wrote:
->
->
->
-> On 9/3/2024 5:26, Ard Biesheuvel wrote:
-> > On Sat, 31 Aug 2024 at 10:14, Marc Zyngier <maz@kernel.org> wrote:
-> >> On Sat, 31 Aug 2024 08:56:23 +0100,
-> >> Ard Biesheuvel <ardb@kernel.org> wrote:
-> >>> As for RNDR/RNDRRS vs TRNG: the former is not a raw entropy source, it
-> >>> is a DRBG (or CSPRNG) which provides cryptographically secure random
-> >>> numbers whose security strength is limited by the size of the seed.
-> >>> TRNG does not have this limitation in principle, although non-p KVM
-> >>> happily seeds it from the kernel's entropy pool, which has the same
-> >>> limitation in practice.
-> >> Is that something we should address? I assume that this has an impact
-> >> on the quality of the provided random numbers?
-> >>
-> > To be honest, I personally find the distinction rather theoretical - I
-> > think it will be mostly the FIPS fetishists who may object to the
-> > seeding of a DRBG of security strength 'n' from the kernel entropy
-> > pool without proving that the sample has 'n' bits of entropy.
-> >
-> > For pKVM, the concern was that the untrusted host could observe and
-> > manipulate the entropy and therefore the protected guest's entropy
-> > source, which is why the hypervisor relays TRNG SMCCC calls directly
-> > to the secure firmware in that case. The quality of the entropy was
-> > never a concern here.
-> >
-> > .
-> >
->
-> Thank you for reply.
->
-> In case that EL3 firmware not support SMCCC TRNG, host and guest can only
-> get randomness from DRBG-based RNDRRS, right?
->
+On Tue, Sep 03, 2024 at 03:50:46PM +0100, Joey Gouly wrote:
+> On Thu, Aug 29, 2024 at 06:55:07PM +0100, Mark Brown wrote:
+> > On Thu, Aug 22, 2024 at 04:10:59PM +0100, Joey Gouly wrote:
+> > 
+> > > +static bool fault_from_pkey(unsigned long esr, struct vm_area_struct *vma,
+> > > +			unsigned int mm_flags)
+> > > +{
+> > > +	unsigned long iss2 = ESR_ELx_ISS2(esr);
+> > > +
+> > > +	if (!system_supports_poe())
+> > > +		return false;
+> > > +
+> > > +	if (iss2 & ESR_ELx_Overlay)
+> > > +		return true;
+> > 
+> > Does this need an is_data_abort() && is_instruction_abort() check?
+> > Overlay doesn't appear to be defined for all exception types and it
+> > wasn't clear enough to me that the callers have done this check.
+> 
+> The only callers are in do_page_fault(), which should only be data or
+> instruction aborts. I talked with Catalin and he said it's fine to not check
+> again here.
+> 
+> I can add a permissions check though:
+> 
+> commit 033270f5a9462e998b4dee11fc91b43ac7929756
+> Author: Joey Gouly <joey.gouly@arm.com>
+> Date:   Tue Sep 3 15:45:59 2024 +0100
+> 
+>     fixup! arm64: handle PKEY/POE faults
+> 
+> diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
+> index a68055150950..f651553a8ab8 100644
+> --- a/arch/arm64/mm/fault.c
+> +++ b/arch/arm64/mm/fault.c
+> @@ -495,6 +495,9 @@ static bool fault_from_pkey(unsigned long esr, struct vm_area_struct *vma,
+>         if (!system_supports_poe())
+>                 return false;
+>  
+> +       if (!esr_fsc_is_permission_fault(esr))
+> +               return false;
+> +
+>         if (iss2 & ESR_ELx_Overlay)
+>                 return true;
+>  
+> 
+> 
+> Since the ESR_EL1 documentation says:
+> 	If a memory access generates a Data Abort for a Permission fault, then this field holds information
+> 	about the fault.
+> 
 
-There are other, non-architected ways too to get entropy and/or
-randomness. There are many hardware random number generator
-peripherals that the OS can drive directly, and there are vendor
-specific EL3 services too that a system might use.
+Sorry, I was a bit too eager with that patch.  The previous patch was bailing
+out before the vma-backed checks could take place.
 
-RNDR/RNDRRS does not exist yet in practical terms - there are very few
-SOCs that actually implement that used in the field.
+It should be:
 
-> In this case, guest get DRBG-based randomness via HVC and host, but the
-> randomness returned by host kvm is not really backed by EL3 SMCCC TRNG,
-> and actually get from DRBG-based RNDRRS.
-> Is this hvc process is redundancy?
->
+commit 7b67b149f2f492e907b27521c95639f4ea208221 (HEAD -> permission_overlay_v6)
+Author: Joey Gouly <joey.gouly@arm.com>
+Date:   Tue Sep 3 15:45:59 2024 +0100
 
-I don't understand this question. How the host obtains its entropy
-and/or randomness and how the guest does it are completely separate
-concerns.
+    fixup! arm64: handle PKEY/POE faults
+
+diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
+index a68055150950..8b281cf308b3 100644
+--- a/arch/arm64/mm/fault.c
++++ b/arch/arm64/mm/fault.c
+@@ -495,7 +495,7 @@ static bool fault_from_pkey(unsigned long esr, struct vm_area_struct *vma,
+        if (!system_supports_poe())
+                return false;
+ 
+-       if (iss2 & ESR_ELx_Overlay)
++       if (esr_fsc_is_permission_fault(esr) && (iss2 & ESR_ELx_Overlay))
+                return true;
+ 
+        return !arch_vma_access_permitted(vma,
