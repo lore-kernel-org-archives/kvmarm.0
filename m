@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E044618B48E;
-	Tue,  3 Sep 2024 15:38:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5561B18BBB5;
+	Tue,  3 Sep 2024 15:38:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725377923; cv=none; b=TSOXypIjdoUbKYxOYBt2XxrIB7IaW/cJLSXSp6ibxNfK2MkkRs2RBb/PaCuOsl6H3xCpe+zQ38gvPFqYQKogIFF5dBy/r9w2f1DKsSro290SAKo3IFuy1N5pXNCVbGYhlwD93zRladLZsBZSMCIjwC879F+yy8smlPWADnvSKSg=
+	t=1725377923; cv=none; b=dlCQV20ulVaTMKGfMFYi4bgCBWNI2wDJ5UC81z22U/k84mXvMlOw4/1EnA8M79HpxA058X0yOq+q/hYe6epSW0irdjSTmu62NvpvSCbQkaqqtxo2c6RJCtZi5Y3DmdDrlC103Vwznk+as2rvBBa9mVt8S2rMDMhsInSvWI8JlA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1725377923; c=relaxed/simple;
-	bh=pkgmJHcizaayhEd8ulbsug6NNeEqXrEZOAYWnTYo7WI=;
+	bh=xBg/7T72vlqqBclk67wUqwBMmLhylo5lATNxzLaP5sc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ZHQP3tnFi6CCBxUQmS+8qp3/eEfy/iCz41AMOAHAGrnsln9b6DWQtql4sLqVjQtJ2c1vXMX0JBvl8jWv8qNu/uBU84e1+a3b3KDy/2IZNByyvUQLPjhogxigHfsTrrTENjBOp/o3ciyPWDR3/WQOrYY+u0UAtdSie/Ygmc6jPkA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WqEPQbKi; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=Xii4NajPga63Pg9lLahZuI1LU8QmVrzlCgUnZ4JoWRxtevyiska3NcuIgBF8ZK6Vz5qySC9/VsBWUYF/ZYd9ttAwp9yKUdBV97zf9zhnfeiviKPQ5LS1qV44ZVIQul/cR1vp0nAe9UI2jGulkzodoEfy9gSS7kpQGUnPcVz7OSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HJkhVXnF; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WqEPQbKi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0C2FC4CEC6;
-	Tue,  3 Sep 2024 15:38:42 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HJkhVXnF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37A10C4CECC;
+	Tue,  3 Sep 2024 15:38:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725377922;
-	bh=pkgmJHcizaayhEd8ulbsug6NNeEqXrEZOAYWnTYo7WI=;
+	s=k20201202; t=1725377923;
+	bh=xBg/7T72vlqqBclk67wUqwBMmLhylo5lATNxzLaP5sc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WqEPQbKiTXtXY00FiVzQObkuMfds8kZVTvJiqA749FUSy93G7YkE/Rxlbs8CxpPrt
-	 soLipd7nKxdGWa7j3B1J8D7Qdf3auUuDxdHwhxmnRYiOfx9N4XALeORQ3KshonijlJ
-	 +H/h1YtJ+1X17uFp6K7k2gjMzx5QQ4qxs/6a9ORQTCM1csD6uO7E8Ld475Utuk2P8M
-	 4R+SK9JdsoXoX1o/mdmbe8RQ/l0mzqJriNPL70NN0pdnFO+FiDp8ZnKk6YzB3cM+lB
-	 HHEFosAzMdC0UmcRSCjrSV0BNdxmU4cnFEb9qCwLAZrWuuJiG7xncm0nkK7jvwAJgV
-	 vGeIfXh2hdwNw==
+	b=HJkhVXnFKj8ypVgSw0297pRrdu4LVmIyptyOG+ZnRLjannTx/NDeT4l3IyiZ3YUrw
+	 rYjFdWLiqNal2Qwr25kTrEKCwJ9EA/BWCj+CGNpyKzCPI0WJHg5Eo4zO1114eTgZ4r
+	 Kv/stVtiVD9pRdMFdbO1U9LZ3r2XQnyTEsjWvRAVqVZ51iG7HOIFEhw9FD5JEKM671
+	 eH8WK9uMBNAkPVpw/VVVLzqj5pTSybgRVXS/YnYuhT6Yq71mzsOLXjvUCwre51a48v
+	 5Iy5U7j8p4qRf5qGNLT1nXVxOiA0JSNDZuWdtEuqp/Y9wiTg3x7fKLtscCoJNolaZB
+	 EWTsWuXw6EV3w==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1slVc9-009Hr9-2j;
+	id 1slVc9-009Hr9-Gx;
 	Tue, 03 Sep 2024 16:38:41 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -43,9 +43,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v2 12/16] KVM: arm64: Implement AT S1PIE support
-Date: Tue,  3 Sep 2024 16:38:30 +0100
-Message-Id: <20240903153834.1909472-13-maz@kernel.org>
+Subject: [PATCH v2 14/16] KVM: arm64: Hide TCR2_EL1 from userspace when disabled for guests
+Date: Tue,  3 Sep 2024 16:38:32 +0100
+Message-Id: <20240903153834.1909472-15-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240903153834.1909472-1-maz@kernel.org>
 References: <20240903153834.1909472-1-maz@kernel.org>
@@ -61,183 +61,94 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-It doesn't take much effort to imple,emt S1PIE support in AT.
-This is only a matter of using the AArch64.S1IndirectBasePermissions()
-encodings for the permission, ignoring GCS which has no impact on AT,
-and enforce FEAT_PAN3 being enabled as this is a requirement of
-FEAT_S1PIE.
+From: Mark Brown <broonie@kernel.org>
 
+When the guest does not support FEAT_TCR2 we should not allow any access
+to it in order to ensure that we do not create spurious issues with guest
+migration. Add a visibility operation for it.
+
+Fixes: fbff56068232 ("KVM: arm64: Save/restore TCR2_EL1")
+Signed-off-by: Mark Brown <broonie@kernel.org>
+Link: https://lore.kernel.org/r/20240822-kvm-arm64-hide-pie-regs-v2-2-376624fa829c@kernel.org
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/at.c | 136 +++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 135 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_host.h |  3 +++
+ arch/arm64/kvm/sys_regs.c         | 29 ++++++++++++++++++++++++++---
+ 2 files changed, 29 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index 68f5b89598ec..bd7e1b32b049 100644
---- a/arch/arm64/kvm/at.c
-+++ b/arch/arm64/kvm/at.c
-@@ -736,6 +736,23 @@ static u64 compute_par_s1(struct kvm_vcpu *vcpu, struct s1_walk_result *wr,
- 	return par;
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index ab4c675b491d..7889e5f4009f 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -1476,4 +1476,7 @@ void kvm_set_vm_id_reg(struct kvm *kvm, u32 reg, u64 val);
+ 		(pa + pi + pa3) == 1;					\
+ 	})
+ 
++#define kvm_has_tcr2(k)				\
++	(kvm_has_feat((k), ID_AA64MMFR3_EL1, TCRX, IMP))
++
+ #endif /* __ARM64_KVM_HOST_H__ */
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 4ee74e2d4f08..64562b0c2359 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2319,6 +2319,27 @@ static bool access_zcr_el2(struct kvm_vcpu *vcpu,
+ 	return true;
  }
  
-+static bool s1pie_enabled(struct kvm_vcpu *vcpu, enum trans_regime regime)
++static unsigned int tcr2_visibility(const struct kvm_vcpu *vcpu,
++				    const struct sys_reg_desc *rd)
 +{
-+	if (!kvm_has_feat(vcpu->kvm, ID_AA64MMFR3_EL1, S1PIE, IMP))
-+		return false;
++	if (kvm_has_tcr2(vcpu->kvm))
++		return 0;
 +
-+	switch (regime) {
-+	case TR_EL2:
-+	case TR_EL20:
-+		return __vcpu_sys_reg(vcpu, TCR2_EL2) & TCR2_EL2_PIE;
-+	case TR_EL10:
-+		return  (__vcpu_sys_reg(vcpu, HCRX_EL2) & HCRX_EL2_TCR2En) &&
-+			(__vcpu_sys_reg(vcpu, TCR2_EL1) & TCR2_EL1x_PIE);
-+	default:
-+		BUG();
-+	}
++	return REG_HIDDEN;
 +}
 +
- static bool pan3_enabled(struct kvm_vcpu *vcpu, enum trans_regime regime)
- {
- 	u64 sctlr;
-@@ -743,6 +760,9 @@ static bool pan3_enabled(struct kvm_vcpu *vcpu, enum trans_regime regime)
- 	if (!kvm_has_feat(vcpu->kvm, ID_AA64MMFR1_EL1, PAN, PAN3))
- 		return false;
- 
-+	if (s1pie_enabled(vcpu, regime))
-+		return true;
++static unsigned int tcr2_el2_visibility(const struct kvm_vcpu *vcpu,
++				    const struct sys_reg_desc *rd)
++{
++	unsigned int r;
 +
- 	if (regime == TR_EL10)
- 		sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL1);
- 	else
-@@ -826,12 +846,126 @@ static void compute_s1_hierarchical_permissions(struct kvm_vcpu *vcpu,
++	r = el2_visibility(vcpu, rd);
++	if (r)
++		return r;
++
++	return tcr2_visibility(vcpu, rd);
++}
++
+ /*
+  * Architected system registers.
+  * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
+@@ -2503,7 +2524,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_TTBR0_EL1), access_vm_reg, reset_unknown, TTBR0_EL1 },
+ 	{ SYS_DESC(SYS_TTBR1_EL1), access_vm_reg, reset_unknown, TTBR1_EL1 },
+ 	{ SYS_DESC(SYS_TCR_EL1), access_vm_reg, reset_val, TCR_EL1, 0 },
+-	{ SYS_DESC(SYS_TCR2_EL1), access_vm_reg, reset_val, TCR2_EL1, 0 },
++	{ SYS_DESC(SYS_TCR2_EL1), access_vm_reg, reset_val, TCR2_EL1, 0,
++	  .visibility = tcr2_visibility },
+ 
+ 	PTRAUTH_KEY(APIA),
+ 	PTRAUTH_KEY(APIB),
+@@ -2820,7 +2842,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	EL2_REG(TTBR0_EL2, access_rw, reset_val, 0),
+ 	EL2_REG(TTBR1_EL2, access_rw, reset_val, 0),
+ 	EL2_REG(TCR_EL2, access_rw, reset_val, TCR_EL2_RES1),
+-	EL2_REG(TCR2_EL2, access_tcr2_el2, reset_val, TCR2_EL2_RES1),
++	EL2_REG_FILTERED(TCR2_EL2, access_tcr2_el2, reset_val, TCR2_EL2_RES1,
++			 tcr2_el2_visibility),
+ 	EL2_REG_VNCR(VTTBR_EL2, reset_val, 0),
+ 	EL2_REG_VNCR(VTCR_EL2, reset_val, 0),
+ 
+@@ -4679,7 +4702,7 @@ void kvm_calculate_traps(struct kvm_vcpu *vcpu)
+ 		if (kvm_has_feat(kvm, ID_AA64ISAR2_EL1, MOPS, IMP))
+ 			vcpu->arch.hcrx_el2 |= (HCRX_EL2_MSCEn | HCRX_EL2_MCE2);
+ 
+-		if (kvm_has_feat(kvm, ID_AA64MMFR3_EL1, TCRX, IMP))
++		if (kvm_has_tcr2(kvm))
+ 			vcpu->arch.hcrx_el2 |= HCRX_EL2_TCR2En;
  	}
- }
  
-+#define pi_idx(v, r, i)	((__vcpu_sys_reg((v), (r)) >> ((i) * 4)) & 0xf)
-+
-+#define set_priv_perms(p, r, w, x)	\
-+	do {				\
-+		(p)->pr = (r);		\
-+		(p)->pw = (w);		\
-+		(p)->px = (x);		\
-+	} while (0)
-+
-+#define set_unpriv_perms(p, r, w, x)	\
-+	do {				\
-+		(p)->ur = (r);		\
-+		(p)->uw = (w);		\
-+		(p)->ux = (x);		\
-+	} while (0)
-+
-+/* Similar to AArch64.S1IndirectBasePermissions(), without GCS  */
-+#define set_perms(w, p, ip)						\
-+	do {								\
-+		switch ((ip)) {						\
-+		case 0b0000:						\
-+			set_ ## w ## _perms((p), false, false, false);	\
-+			break;						\
-+		case 0b0001:						\
-+			set_ ## w ## _perms((p), true , false, false);	\
-+			break;						\
-+		case 0b0010:						\
-+			set_ ## w ## _perms((p), false, false, true );	\
-+			break;						\
-+		case 0b0011:						\
-+			set_ ## w ## _perms((p), true , false, true );	\
-+			break;						\
-+		case 0b0100:						\
-+			set_ ## w ## _perms((p), false, false, false);	\
-+			break;						\
-+		case 0b0101:						\
-+			set_ ## w ## _perms((p), true , true , false);	\
-+			break;						\
-+		case 0b0110:						\
-+			set_ ## w ## _perms((p), true , true , true );	\
-+			break;						\
-+		case 0b0111:						\
-+			set_ ## w ## _perms((p), true , true , true );	\
-+			break;						\
-+		case 0b1000:						\
-+			set_ ## w ## _perms((p), true , false, false);	\
-+			break;						\
-+		case 0b1001:						\
-+			set_ ## w ## _perms((p), true , false, false);	\
-+			break;						\
-+		case 0b1010:						\
-+			set_ ## w ## _perms((p), true , false, true );	\
-+			break;						\
-+		case 0b1011:						\
-+			set_ ## w ## _perms((p), false, false, false);	\
-+			break;						\
-+		case 0b1100:						\
-+			set_ ## w ## _perms((p), true , true , false);	\
-+			break;						\
-+		case 0b1101:						\
-+			set_ ## w ## _perms((p), false, false, false);	\
-+			break;						\
-+		case 0b1110:						\
-+			set_ ## w ## _perms((p), true , true , true );	\
-+			break;						\
-+		case 0b1111:						\
-+			set_ ## w ## _perms((p), false, false, false);	\
-+			break;						\
-+		}							\
-+	} while (0)
-+
-+static void compute_s1_indirect_permissions(struct kvm_vcpu *vcpu,
-+					    struct s1_walk_info *wi,
-+					    struct s1_walk_result *wr,
-+					    struct s1_perms *s1p)
-+{
-+	u8 up, pp, idx;
-+
-+	idx = (FIELD_GET(GENMASK(54, 53), wr->desc) << 2	|
-+	       FIELD_GET(BIT(51), wr->desc) << 1		|
-+	       FIELD_GET(BIT(6), wr->desc));
-+
-+	switch (wi->regime) {
-+	case TR_EL10:
-+		pp = pi_idx(vcpu, PIR_EL1, idx);
-+		up = pi_idx(vcpu, PIRE0_EL1, idx);
-+		break;
-+	case TR_EL20:
-+		pp = pi_idx(vcpu, PIR_EL2, idx);
-+		up = pi_idx(vcpu, PIRE0_EL2, idx);
-+		break;
-+	case TR_EL2:
-+		pp = pi_idx(vcpu, PIR_EL2, idx);
-+		up = 0;
-+		break;
-+	}
-+
-+	set_perms(priv, s1p, pp);
-+
-+	if (wi->regime != TR_EL2)
-+		set_perms(unpriv, s1p, up);
-+	else
-+		set_unpriv_perms(s1p, false, false, false);
-+
-+	if (s1p->px && s1p->uw) {
-+		set_priv_perms(s1p, false, false, false);
-+		set_unpriv_perms(s1p, false, false, false);
-+	}
-+}
-+
- static void compute_s1_permissions(struct kvm_vcpu *vcpu, u32 op,
- 				   struct s1_walk_info *wi,
- 				   struct s1_walk_result *wr,
- 				   struct s1_perms *s1p)
- {
--	compute_s1_direct_permissions(vcpu, wi, wr, s1p);
-+	if (!s1pie_enabled(vcpu, wi->regime))
-+		compute_s1_direct_permissions(vcpu, wi, wr, s1p);
-+	else
-+		compute_s1_indirect_permissions(vcpu, wi, wr, s1p);
-+
- 	compute_s1_hierarchical_permissions(vcpu, wi, wr, s1p);
- 
- 	if (op == OP_AT_S1E1RP || op == OP_AT_S1E1WP) {
 -- 
 2.39.2
 
