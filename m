@@ -1,127 +1,142 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D9C21885B6
-	for <kvmarm@lists.linux.dev>; Tue,  3 Sep 2024 15:29:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B192187552;
+	Tue,  3 Sep 2024 15:38:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725377387; cv=none; b=FrX7MynpFDXKhds/gRdqbpR0UltUi987UGN0KpH6oqtM5ESLbL08IIxdkULpY1NftF+1StZT/p9bE6iDIMYmfGD9I0rfhBYJ1rWnIje/X8fPvqsto2c6ZMWzhYnfXB/mYv3kbwBhJ6O5XU5P09/CLyGfYXsFEEAZRb7ZXl/tB1g=
+	t=1725377921; cv=none; b=AEVUYkHFhvE/4R6eEqANn+eD9Ynj5AeEapiyaN9JCErmTVLkAAR2LiPw/vckqbAdhf12xDytqW4jqMJ0awf9qt6Qrgoj7u3FUgnIG5SOyty/CziNtFzB5fDjqYoK0GCp/ZM/5F7c+zyMWiEqc3tixN1MsLU1tyZFz9tDtdzhhBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725377387; c=relaxed/simple;
-	bh=0h/zNY8bJ/TNcS1t7SeY1xaa/nugscrq+MyZ7fVrr3s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cR07VTg5VHDOO906ezZrcQ6iaSamoBzPAxK4R4itUcEJak+6OdMbJemH8TLMLQlmK1YEey8rUK4/eKcFJpbiNPatwEynjgXb1BwYQymzNFTBBD6SNK+eS3meujAlRZNYjYH1jp7asrXItSH55+uZfhlUkGT0K+Fnyg5xJtKhzgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 46809FEC;
-	Tue,  3 Sep 2024 08:30:12 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 841EB3F66E;
-	Tue,  3 Sep 2024 08:29:42 -0700 (PDT)
-Date: Tue, 3 Sep 2024 16:29:37 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Mark Brown <broonie@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, nd@arm.com,
-	akpm@linux-foundation.org, aneesh.kumar@kernel.org,
-	aneesh.kumar@linux.ibm.com, anshuman.khandual@arm.com, bp@alien8.de,
-	catalin.marinas@arm.com, christophe.leroy@csgroup.eu,
-	dave.hansen@linux.intel.com, hpa@zytor.com,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
-	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
-	oliver.upton@linux.dev, shuah@kernel.org, skhan@linuxfoundation.org,
-	szabolcs.nagy@arm.com, tglx@linutronix.de, will@kernel.org,
-	x86@kernel.org, kvmarm@lists.linux.dev,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v5 16/30] arm64: handle PKEY/POE faults
-Message-ID: <20240903152937.GA3768522@e124191.cambridge.arm.com>
-References: <20240822151113.1479789-1-joey.gouly@arm.com>
- <20240822151113.1479789-17-joey.gouly@arm.com>
- <40600b75-68eb-421a-a122-256bd20afb89@sirena.org.uk>
- <20240903144823.GA3669886@e124191.cambridge.arm.com>
+	s=arc-20240116; t=1725377921; c=relaxed/simple;
+	bh=XrW/cKYLr+6PTjBoU7yH2dU4ZzW4CFoX1auS2BCTSnM=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=E9oZs4n6KPm8grzS2Ya0Txrp9K8n98rKsTX3A19KNkEEoE+aay6pydK6nPWryUwDp8D9pn/mayjuGqX+HTn2X44PkCMWOfMAe1zF9FTpNeRAoO6vtWEMLDCJRm0hHsWh/QjzLVWLwbO13opMd8/2OuFFB1T0E4S1NtqW/tb7rug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AJWTojUM; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AJWTojUM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB69AC4CEC8;
+	Tue,  3 Sep 2024 15:38:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725377920;
+	bh=XrW/cKYLr+6PTjBoU7yH2dU4ZzW4CFoX1auS2BCTSnM=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=AJWTojUM2pP/Qdzpy8Apm7ev5ENIEg0NwT/ZoqJy+o2SSt+hw2sR1xlaoy/v1v162
+	 9RkXB3Dli31SHZt8mo7i2q3ivBECAh03/tkA0DsfFEbKGBgE2GN0tbMdiYkbTdYkPX
+	 ZtdzEr7RLW/wR+SDwqeXRflBHbvyQJULuwV00Pu5WRIe8m2wxGPaUVhEEYo5YZJoI4
+	 g/C+GyBJ/Q5lYU/OqgffWWMrMtX37Da0X296WNTVQF95xSRmBPUisbWCyLFi5rDXzc
+	 Menr6O8fRPGjncgdUlkVhHkGwxN6tVXtfKuzPil51y51oQ0emH2QtpOISpiDfckswW
+	 FEfhxx5MGt9Pg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1slVc6-009Hr9-Ml;
+	Tue, 03 Sep 2024 16:38:38 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Mark Brown <broonie@kernel.org>
+Subject: [PATCH v2 01/16] KVM: arm64: nv: Handle CNTHCTL_EL2 specially
+Date: Tue,  3 Sep 2024 16:38:19 +0100
+Message-Id: <20240903153834.1909472-2-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240903153834.1909472-1-maz@kernel.org>
+References: <20240903153834.1909472-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240903144823.GA3669886@e124191.cambridge.arm.com>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com, alexandru.elisei@arm.com, broonie@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Sep 03, 2024 at 03:50:46PM +0100, Joey Gouly wrote:
-> On Thu, Aug 29, 2024 at 06:55:07PM +0100, Mark Brown wrote:
-> > On Thu, Aug 22, 2024 at 04:10:59PM +0100, Joey Gouly wrote:
-> > 
-> > > +static bool fault_from_pkey(unsigned long esr, struct vm_area_struct *vma,
-> > > +			unsigned int mm_flags)
-> > > +{
-> > > +	unsigned long iss2 = ESR_ELx_ISS2(esr);
-> > > +
-> > > +	if (!system_supports_poe())
-> > > +		return false;
-> > > +
-> > > +	if (iss2 & ESR_ELx_Overlay)
-> > > +		return true;
-> > 
-> > Does this need an is_data_abort() && is_instruction_abort() check?
-> > Overlay doesn't appear to be defined for all exception types and it
-> > wasn't clear enough to me that the callers have done this check.
-> 
-> The only callers are in do_page_fault(), which should only be data or
-> instruction aborts. I talked with Catalin and he said it's fine to not check
-> again here.
-> 
-> I can add a permissions check though:
-> 
-> commit 033270f5a9462e998b4dee11fc91b43ac7929756
-> Author: Joey Gouly <joey.gouly@arm.com>
-> Date:   Tue Sep 3 15:45:59 2024 +0100
-> 
->     fixup! arm64: handle PKEY/POE faults
-> 
-> diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
-> index a68055150950..f651553a8ab8 100644
-> --- a/arch/arm64/mm/fault.c
-> +++ b/arch/arm64/mm/fault.c
-> @@ -495,6 +495,9 @@ static bool fault_from_pkey(unsigned long esr, struct vm_area_struct *vma,
->         if (!system_supports_poe())
->                 return false;
->  
-> +       if (!esr_fsc_is_permission_fault(esr))
-> +               return false;
-> +
->         if (iss2 & ESR_ELx_Overlay)
->                 return true;
->  
-> 
-> 
-> Since the ESR_EL1 documentation says:
-> 	If a memory access generates a Data Abort for a Permission fault, then this field holds information
-> 	about the fault.
-> 
+Accessing CNTHCTL_EL2 is fraught with danger if running with
+HCR_EL2.E2H=1: half of the bits are held in CNTKCTL_EL1, and
+thus can be changed behind our back, while the rest lives
+in the CNTHCTL_EL2 shadow copy that is memory-based.
 
-Sorry, I was a bit too eager with that patch.  The previous patch was bailing
-out before the vma-backed checks could take place.
+Yes, this is a lot of fun!
 
-It should be:
+Make sure that we merge the two on read access, while we can
+write to CNTKCTL_EL1 in a more straightforward manner.
 
-commit 7b67b149f2f492e907b27521c95639f4ea208221 (HEAD -> permission_overlay_v6)
-Author: Joey Gouly <joey.gouly@arm.com>
-Date:   Tue Sep 3 15:45:59 2024 +0100
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/sys_regs.c    | 28 ++++++++++++++++++++++++++++
+ include/kvm/arm_arch_timer.h |  3 +++
+ 2 files changed, 31 insertions(+)
 
-    fixup! arm64: handle PKEY/POE faults
-
-diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
-index a68055150950..8b281cf308b3 100644
---- a/arch/arm64/mm/fault.c
-+++ b/arch/arm64/mm/fault.c
-@@ -495,7 +495,7 @@ static bool fault_from_pkey(unsigned long esr, struct vm_area_struct *vma,
-        if (!system_supports_poe())
-                return false;
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 5ab0b2799393..7563826f286a 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -140,6 +140,21 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+ 		if (!is_hyp_ctxt(vcpu))
+ 			goto memory_read;
  
--       if (iss2 & ESR_ELx_Overlay)
-+       if (esr_fsc_is_permission_fault(esr) && (iss2 & ESR_ELx_Overlay))
-                return true;
++		/*
++		 * CNTHCTL_EL2 requires some special treatment to
++		 * account for the bits that can be set via CNTKCTL_EL1.
++		 */
++		switch (reg) {
++		case CNTHCTL_EL2:
++			if (vcpu_el2_e2h_is_set(vcpu)) {
++				val = read_sysreg_el1(SYS_CNTKCTL);
++				val &= CNTKCTL_VALID_BITS;
++				val |= __vcpu_sys_reg(vcpu, reg) & ~CNTKCTL_VALID_BITS;
++				return val;
++			}
++			break;
++		}
++
+ 		/*
+ 		 * If this register does not have an EL1 counterpart,
+ 		 * then read the stored EL2 version.
+@@ -190,6 +205,19 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
+ 		 */
+ 		__vcpu_sys_reg(vcpu, reg) = val;
  
-        return !arch_vma_access_permitted(vma,
++		switch (reg) {
++		case CNTHCTL_EL2:
++			/*
++			 * If E2H=0, CNHTCTL_EL2 is a pure shadow register.
++			 * Otherwise, some of the bits are backed by
++			 * CNTKCTL_EL1, while the rest is kept in memory.
++			 * Yes, this is fun stuff.
++			 */
++			if (vcpu_el2_e2h_is_set(vcpu))
++				write_sysreg_el1(val, SYS_CNTKCTL);
++			return;
++		}
++
+ 		/* No EL1 counterpart? We're done here.? */
+ 		if (reg == el1r)
+ 			return;
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+index c819c5d16613..fd650a8789b9 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -147,6 +147,9 @@ u64 timer_get_cval(struct arch_timer_context *ctxt);
+ void kvm_timer_cpu_up(void);
+ void kvm_timer_cpu_down(void);
+ 
++/* CNTKCTL_EL1 valid bits as of DDI0487J.a */
++#define CNTKCTL_VALID_BITS	(BIT(17) | GENMASK_ULL(9, 0))
++
+ static inline bool has_cntpoff(void)
+ {
+ 	return (has_vhe() && cpus_have_final_cap(ARM64_HAS_ECV_CNTPOFF));
+-- 
+2.39.2
+
