@@ -1,84 +1,131 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D678188900;
-	Tue,  3 Sep 2024 15:58:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05E45189915;
+	Tue,  3 Sep 2024 16:24:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725379104; cv=none; b=gmqC5ZRf04j9+08I8rvyt7iFY8HV+8uTc3HKcQLqyFTj4f3PHnfvunb6HRrfkzt5QcmzZzM0Zpi51pPC2loM9PYwH9gvYklM12BL+3ih2pE8HSUB+8p336hdjJQHwHnArU5mh/2Ki/+VCasg8Vl0HEfm/flz/IR5QyVkbCKfKqg=
+	t=1725380668; cv=none; b=RMOik9t6nvzYmQ5ecYnwkwsl227r+XKEn+0Ju3Ub7N2IFJIdEDaXUbs1PY5HKw9W1IHXnYLeHJauOK5sFNX5YWLQ6JvU2H1cRwwKjB7sYVx/K5JIWpxAomN7MqKYEkvp25EsYo2aIk8AvzcBEc/nwIIk7niRNe26X2143OYGSUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725379104; c=relaxed/simple;
-	bh=o6VRWeGGCvTcoven7MIqlGWqibIzLWkxMSmdXNHoSUM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u6JOXNm2mgq1+W3pq4oNRsgDQZbfo+y0CdQEKIEE7vgY/FQ3ssZQTmkkwz380nQ9cBfP7rvOb0nmmVcB+H5J58siP/UHfmSaE4WwEdEq44YLosoIk0GpNylBggnuuqoHGxx54DxvbcHqqOGCOoDWw5Iwku8/T8yqAFwuKE582k8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q30lpJEJ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1725380668; c=relaxed/simple;
+	bh=9iVOVu/9OW9hC1XMij8LOQYkL6JBtfZqflc0EqcwKzo=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Oqn5NFMxffPzhtBIVrX4upX+ZE+41rXbwig8fXFid4L8i6/yKUH4zk70VSA5AKsXWqVxq4Yd3B977G9MAQieBFCEwi+oxmcor4ru4jmduO4jE1TePzasUamUO+eX6qj2ysLO6hx9bKM9WvFtP9XMWR7q+zOstqpPI2NssRADbPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sg6V9ryn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q30lpJEJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0985DC4CEC4;
-	Tue,  3 Sep 2024 15:58:21 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sg6V9ryn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66625C4CEC4;
+	Tue,  3 Sep 2024 16:24:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725379104;
-	bh=o6VRWeGGCvTcoven7MIqlGWqibIzLWkxMSmdXNHoSUM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=q30lpJEJOcXtNqczw5Z1pOFcJkLi00aA8JhiYTSpbNOhJHOOzEjuYal4rOZ1j7plS
-	 IwS8SGdtyO0o9bBob0xZ1QS0yEXCj0skc2cowm3B3cnTmYADdVf5IzdFZk6G3GX6wQ
-	 9H1gHcOlmCK9KBBrM2OxgfFeRMOFz7U/5xSTkvX2LHWjdRcU7X4NGN/LsbPczllCDf
-	 khshndLt7WGyBn2mQFYJcVhKjiNcxh+3AaE4ljN0cGkeY8OmsnAe/3CNiwQg4yIjD9
-	 RMyQErDSmgBaheqHu46Mu1Sa6OJwlKQFeFGlhTMXKrr3/CTfUt2AhXn1cQ3AxD4s1x
-	 WjuaUiChiZ79Q==
-Date: Tue, 3 Sep 2024 16:58:18 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	s=k20201202; t=1725380667;
+	bh=9iVOVu/9OW9hC1XMij8LOQYkL6JBtfZqflc0EqcwKzo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Sg6V9rynIO66aMzDEBdKiQ0PGMnzTSeEnWtbuUwm1PMyXSw6Eb5HLrr+fSzCLg5VS
+	 RpTpcLZdH0/HhnyFmkx7TdZyKyFyZyb2qNdRz3JhkQrXjbDjTft5YAHYZX93CBNlS7
+	 CJlI1eqDSRpSThx4MCtKO9jqYyuli7Keqv5WG70qcjiQ5cCbYfJf5Lv8ERlynMtaid
+	 lzVOPLg/KQ+9XmZQmpdlE39b4X7g4bqYuZVHPFpOgmTf1jNIgR/+ZnL/1E+0kWG8+i
+	 iua2ccNDnbGg78bfE4O5uA36r5FQCvCw5QYJDz5l7ZWpbwBbCiVV9kck1fdcGNeMcK
+	 dTaJAroCrhjDg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1slWKP-009J5x-7F;
+	Tue, 03 Sep 2024 17:24:25 +0100
+Date: Tue, 03 Sep 2024 17:24:24 +0100
+Message-ID: <86r0a0vh6v.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Catalin Marinas <catalin.marinas@arm.com>,	Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>
+Cc:	Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>, Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH v2 16/16] KVM: arm64: Rely on visibility to let
- PIR*_ELx/TCR2_ELx UNDEF
-Message-ID: <0518de00-aec5-440c-9278-5c85d18719a3@sirena.org.uk>
-References: <20240903153834.1909472-1-maz@kernel.org>
- <20240903153834.1909472-17-maz@kernel.org>
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
+	Kees Cook <kees@kernel.org>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Florian Weimer <fweimer@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
+	Ross Burton <ross.burton@arm.com>,
+	Yury Khrustalev <yury.khrustalev@arm.com>,
+	Wilco Dijkstra <wilco.dijkstra@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v12 15/39] KVM: arm64: Manage GCS access and registers for guests
+In-Reply-To: <20240829-arm64-gcs-v12-15-42fec947436a@kernel.org>
+References: <20240829-arm64-gcs-v12-0-42fec947436a@kernel.org>
+	<20240829-arm64-gcs-v12-15-42fec947436a@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="fj+Dn3RVYX/MU6I0"
-Content-Disposition: inline
-In-Reply-To: <20240903153834.1909472-17-maz@kernel.org>
-X-Cookie: Words must be weighed, not counted.
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: catalin.marinas@arm.com, will@kernel.org, broonie@kernel.org, corbet@lwn.net, akpm@linux-foundation.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, arnd@arndb.de, oleg@redhat.com, ebiederm@xmission.com, shuah@kernel.org, rick.p.edgecombe@intel.com, debug@rivosinc.com, ardb@kernel.org, Szabolcs.Nagy@arm.com, kees@kernel.org, hjl.tools@gmail.com, paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, fweimer@redhat.com, brauner@kernel.org, thiago.bauermann@linaro.org, ross.burton@arm.com, yury.khrustalev@arm.com, wilco.dijkstra@arm.com, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org, linux-mm@kvack.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Thu, 29 Aug 2024 00:27:31 +0100,
+Mark Brown <broonie@kernel.org> wrote:
+> 
+> GCS introduces a number of system registers for EL1 and EL0, on systems
+> with GCS we need to context switch them and expose them to VMMs to allow
+> guests to use GCS.
+> 
+> In order to allow guests to use GCS we also need to configure
+> HCRX_EL2.GCSEn, if this is not set GCS instructions will be noops and
+> CHKFEAT will report GCS as disabled.  Also enable fine grained traps for
+> access to the GCS registers by guests which do not have the feature
+> enabled.
+> 
+> In order to allow userspace to control availability of the feature to
+> guests we enable writability for only ID_AA64PFR1_EL1.GCS, this is a
+> deliberately conservative choice to avoid errors due to oversights.
+> Further fields should be made writable in future.
+> 
+> Reviewed-by: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h          | 12 ++++++++
+>  arch/arm64/include/asm/vncr_mapping.h      |  2 ++
+>  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 49 ++++++++++++++++++++++++------
+>  arch/arm64/kvm/sys_regs.c                  | 27 +++++++++++++++-
+>  4 files changed, 79 insertions(+), 11 deletions(-)
 
---fj+Dn3RVYX/MU6I0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+FWIW, this patch is going to conflict badly with -next, because of the
+"conservative" approach to dealing with ID_AA64PFR1_EL1 (thankfully,
+the *progressive* approach has been merged).
 
-On Tue, Sep 03, 2024 at 04:38:34PM +0100, Marc Zyngier wrote:
-> With a visibility defined for these registers, there is no need
-> to check again for S1PIE or TCRX being implemented as perform_access()
-> already handles it.
+If it gets stuck on a branch together with patch #11 (which seems to
+be the minimum for things to compile), I can take it independently and
+fix it myself. Just let me know.
 
-Ah, thanks for updating this:
+Thanks,
 
-Reviewed-by: Mark Brown <broonie@kernel.org>
+	M.
 
---fj+Dn3RVYX/MU6I0
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmbXMhoACgkQJNaLcl1U
-h9B2igf+OsUVv1cKXIxUIIZEGsgyNjz3nxOXyEjVnJs4ZnEfLlSLmAfUiydbSj/y
-4yAOBCx8qLXfAEjcWu5GHm8k1CgeSCS2WgBf6VlnFkLBl1gIKokrYBOKPD5mU9hS
-a2UEYa33f0pTHNQ7CChwGqMMOfPgc2WOibsmIAaxiLr9Nclom4JAC0El7Spszqrv
-mtuXEMcLSuJX6mz+HHaetPUZR8f89EYfB3Ihe37VIg8xK0eyOCV9kh8xt2V81Kp+
-Z/cEsQPMMzso0nM3GsiTYrIblUTLCBo67hjFmmB8WbvyUTdVRg5NOqbDUz5fv1ub
-giZS/jjtUpukThtIw4S1N1wycM7UpQ==
-=dCMc
------END PGP SIGNATURE-----
-
---fj+Dn3RVYX/MU6I0--
+-- 
+Without deviation from the norm, progress is not possible.
