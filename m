@@ -1,131 +1,74 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05E45189915;
-	Tue,  3 Sep 2024 16:24:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3234B18B483
+	for <kvmarm@lists.linux.dev>; Tue,  3 Sep 2024 16:30:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725380668; cv=none; b=RMOik9t6nvzYmQ5ecYnwkwsl227r+XKEn+0Ju3Ub7N2IFJIdEDaXUbs1PY5HKw9W1IHXnYLeHJauOK5sFNX5YWLQ6JvU2H1cRwwKjB7sYVx/K5JIWpxAomN7MqKYEkvp25EsYo2aIk8AvzcBEc/nwIIk7niRNe26X2143OYGSUY=
+	t=1725381058; cv=none; b=UpeqywrltzU1OW4j/9KrwtpKABgXOS4SPwgjxHArBSKJ/Qke6kSU7RctR/b8Q792g8MCa/rjhF1tZMSZhF2FZeNluCAXX5E1tXPsXSruUP6eJSySg+tMxK09neyXltVrm2zLiqaEJUa5cCwkyhVCEav/gYDTzgt3tHoNqXk+P5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725380668; c=relaxed/simple;
-	bh=9iVOVu/9OW9hC1XMij8LOQYkL6JBtfZqflc0EqcwKzo=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Oqn5NFMxffPzhtBIVrX4upX+ZE+41rXbwig8fXFid4L8i6/yKUH4zk70VSA5AKsXWqVxq4Yd3B977G9MAQieBFCEwi+oxmcor4ru4jmduO4jE1TePzasUamUO+eX6qj2ysLO6hx9bKM9WvFtP9XMWR7q+zOstqpPI2NssRADbPs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sg6V9ryn; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1725381058; c=relaxed/simple;
+	bh=DVNaHrhGdeeNDyxAyeSdLv3wZlzpfgoOzo7WchAjbq8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jjg22ekV234c6T+iAK6ZdrPzrNI0gfzZPTr93yMMirxv2/APEBftm/r3LoiYUOxt5kZdKFgftM19Vqdyu7o646DfXhKlW9BalNb5KpNZLKGAiM6cIoRLecJhV+YMqiWGzOIua2dt6ZQ72JzSBsH/GVLmwP4w/LDxHJQUwpJC5yo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wCxhUgXy; arc=none smtp.client-ip=91.218.175.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sg6V9ryn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66625C4CEC4;
-	Tue,  3 Sep 2024 16:24:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725380667;
-	bh=9iVOVu/9OW9hC1XMij8LOQYkL6JBtfZqflc0EqcwKzo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Sg6V9rynIO66aMzDEBdKiQ0PGMnzTSeEnWtbuUwm1PMyXSw6Eb5HLrr+fSzCLg5VS
-	 RpTpcLZdH0/HhnyFmkx7TdZyKyFyZyb2qNdRz3JhkQrXjbDjTft5YAHYZX93CBNlS7
-	 CJlI1eqDSRpSThx4MCtKO9jqYyuli7Keqv5WG70qcjiQ5cCbYfJf5Lv8ERlynMtaid
-	 lzVOPLg/KQ+9XmZQmpdlE39b4X7g4bqYuZVHPFpOgmTf1jNIgR/+ZnL/1E+0kWG8+i
-	 iua2ccNDnbGg78bfE4O5uA36r5FQCvCw5QYJDz5l7ZWpbwBbCiVV9kck1fdcGNeMcK
-	 dTaJAroCrhjDg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1slWKP-009J5x-7F;
-	Tue, 03 Sep 2024 17:24:25 +0100
-Date: Tue, 03 Sep 2024 17:24:24 +0100
-Message-ID: <86r0a0vh6v.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>,	Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>
-Cc:	Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-	Kees Cook <kees@kernel.org>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Florian Weimer <fweimer@redhat.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
-	Ross Burton <ross.burton@arm.com>,
-	Yury Khrustalev <yury.khrustalev@arm.com>,
-	Wilco Dijkstra <wilco.dijkstra@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wCxhUgXy"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1725381053;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ItTT1ofl67Qx6qoM/paB6gC9h88l9uMn+lTF4xll28I=;
+	b=wCxhUgXywgh+iCSp5MYg6y1jvSHm2x6diiCwreF2/QMspOI24IUZvviIXnFNZ11wawMDci
+	3Nz4MnXUCSaklvWm8V8TqnIff8oAwwCmd2J9Q1zJGal5hQB0Dr6SHRgUOONajgn4bpxXSB
+	+z8T3JToDc0X+uzmbf5/QTNUkjfaPYU=
+From: Andrew Jones <andrew.jones@linux.dev>
+To: kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
 	kvmarm@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v12 15/39] KVM: arm64: Manage GCS access and registers for guests
-In-Reply-To: <20240829-arm64-gcs-v12-15-42fec947436a@kernel.org>
-References: <20240829-arm64-gcs-v12-0-42fec947436a@kernel.org>
-	<20240829-arm64-gcs-v12-15-42fec947436a@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	linuxppc-dev@lists.ozlabs.org,
+	linux-s390@vger.kernel.org
+Cc: pbonzini@redhat.com,
+	thuth@redhat.com,
+	lvivier@redhat.com,
+	frankja@linux.ibm.com,
+	imbrenda@linux.ibm.com,
+	nrb@linux.ibm.com,
+	atishp@rivosinc.com,
+	cade.richard@berkeley.edu,
+	jamestiotio@gmail.com
+Subject: [kvm-unit-tests PATCH 0/3] Support cross compiling with clang
+Date: Tue,  3 Sep 2024 18:30:47 +0200
+Message-ID: <20240903163046.869262-5-andrew.jones@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: catalin.marinas@arm.com, will@kernel.org, broonie@kernel.org, corbet@lwn.net, akpm@linux-foundation.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, arnd@arndb.de, oleg@redhat.com, ebiederm@xmission.com, shuah@kernel.org, rick.p.edgecombe@intel.com, debug@rivosinc.com, ardb@kernel.org, Szabolcs.Nagy@arm.com, kees@kernel.org, hjl.tools@gmail.com, paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, fweimer@redhat.com, brauner@kernel.org, thiago.bauermann@linaro.org, ross.burton@arm.com, yury.khrustalev@arm.com, wilco.dijkstra@arm.com, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org, linux-mm@kvack.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, 29 Aug 2024 00:27:31 +0100,
-Mark Brown <broonie@kernel.org> wrote:
-> 
-> GCS introduces a number of system registers for EL1 and EL0, on systems
-> with GCS we need to context switch them and expose them to VMMs to allow
-> guests to use GCS.
-> 
-> In order to allow guests to use GCS we also need to configure
-> HCRX_EL2.GCSEn, if this is not set GCS instructions will be noops and
-> CHKFEAT will report GCS as disabled.  Also enable fine grained traps for
-> access to the GCS registers by guests which do not have the feature
-> enabled.
-> 
-> In order to allow userspace to control availability of the feature to
-> guests we enable writability for only ID_AA64PFR1_EL1.GCS, this is a
-> deliberately conservative choice to avoid errors due to oversights.
-> Further fields should be made writable in future.
-> 
-> Reviewed-by: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
-> Signed-off-by: Mark Brown <broonie@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_host.h          | 12 ++++++++
->  arch/arm64/include/asm/vncr_mapping.h      |  2 ++
->  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 49 ++++++++++++++++++++++++------
->  arch/arm64/kvm/sys_regs.c                  | 27 +++++++++++++++-
->  4 files changed, 79 insertions(+), 11 deletions(-)
+Modify configure to allow --cc=clang and a cross-prefix to be specified
+together (as well as --cflags). This allows compiling with clang, but
+using cross binutils for everything else, including the linker. So far
+tested on riscv 32- and 64-bit and aarch64 (with some hacks to the code
+to get it to compile - which is why there's no gitlab-ci patch for aarch64
+in this series). I suspect it should work for other architectures too.
 
-FWIW, this patch is going to conflict badly with -next, because of the
-"conservative" approach to dealing with ID_AA64PFR1_EL1 (thankfully,
-the *progressive* approach has been merged).
+Andrew Jones (3):
+  riscv: Drop mstrict-align
+  configure: Support cross compiling with clang
+  riscv: gitlab-ci: Add clang build tests
 
-If it gets stuck on a branch together with patch #11 (which seems to
-be the minimum for things to compile), I can take it independently and
-fix it myself. Just let me know.
-
-Thanks,
-
-	M.
+ .gitlab-ci.yml | 28 ++++++++++++++++++++++++++++
+ configure      | 11 ++++++++---
+ riscv/Makefile |  2 +-
+ 3 files changed, 37 insertions(+), 4 deletions(-)
 
 -- 
-Without deviation from the norm, progress is not possible.
+2.46.0
+
