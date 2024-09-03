@@ -1,32 +1,32 @@
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+Received: from out-185.mta1.migadu.com (out-185.mta1.migadu.com [95.215.58.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3BAC18BC37
-	for <kvmarm@lists.linux.dev>; Tue,  3 Sep 2024 16:31:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BB0918BC18
+	for <kvmarm@lists.linux.dev>; Tue,  3 Sep 2024 16:31:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725381064; cv=none; b=BuH2fLlFEy2xzGchWI59RP1fLncaDV4B7irQVzPVhgXYSQ0Kk8NFOu19uL7HWt7masze2h3JzzZEGvDMjfJeXv369h+k4sizJkgWKda8u1cbQ98jj1B8NUgs9m7oNVVDAqQKNzM8rTB96bICp/8j0lhEhXeVkMOA/sKPZxeODgU=
+	t=1725381066; cv=none; b=eJ0r1qCMK/xd++UqwZEFGBmNj9PRCDttOm1l01W8pJzkXPrn+9rnQ5ALD6dE55Imul/ehvlma/5hoKo5f2POTeXYJf/rC2tsJiTzK4Q79kzCkZPgc1h5a2oRSXVFIoMosUQoqpJZCzLJQW7TZKcwQjcSI+UiIAHYjUnWYLNNAxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725381064; c=relaxed/simple;
-	bh=JoVGmAznTB8rAuBFZfUmjldvgv18ZdbJysSiPzN86lM=;
+	s=arc-20240116; t=1725381066; c=relaxed/simple;
+	bh=1e2PJ9C4cSjp3/AMqt3JlJ1Cx1fmp2V4q5C273sWOSk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QMK3vvB0SmVYW18hAlJ+DJ/SlYXahx0zsOz1PH+3Vk6ujei7fUmm8G8fyebTXp9ebajKDdizLZjgbfJmh/eZzu+VrtK/yBV9oOSXzQZHTkIKFd9jF12dvPGujCdFzNQ229AmG5b32XKI9CcMI3xx5aZSdh9GFcmO+v8Yqr49YQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QZSx9FlW; arc=none smtp.client-ip=95.215.58.182
+	 MIME-Version; b=AGyYZ8XVTt2aIPn6eBazO++mqTMIrYZP8eYz+NzhQ8mO3iYZiUVmMLjRwPtwkItg6bwhPTNOYbDolQdPk43HTXSlnTfBeaEhP4uBFOVORQDSikBBXFPvqbYmir7OBbHMNXizl2uLTkV33P21ye209eaVJSw7689fW+d5pqbWZvw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fnHXhWjW; arc=none smtp.client-ip=95.215.58.185
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QZSx9FlW"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fnHXhWjW"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1725381059;
+	t=1725381063;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=9YGHRkZZZq6gSBTbmL0m4A7pOzURwmJyYm0zSj6RQgA=;
-	b=QZSx9FlW5q/PKHaiVhKUcE209XR2Jv2S4PWXyQ+C2agSThKJDI3G35n7oWlu97ZlgiXY50
-	NWkXNF5Pfg/x/RNjS/zCybHxNXq9ELm9dkqtnVKppPm1dm+hrrQOx7Ubqnb3lIfPcgqtJx
-	psaZB3pKvx15c+peLES4B+uoKed0yPY=
+	bh=3BZJkoNgFN6URY+7lN/rD+PAMiteNcprRb2IpocXJAk=;
+	b=fnHXhWjWeEn3rcGrQ/Z+7smSSzd/z9fh1Rnug/H9guDSc4s33GknopNiQVzNKy5PuQFyIs
+	lUoEGLn1k6hs+3yDmWrR2nEIJHY1TctbeZQLU/9yK8DdjZ8Q7W4H6vDdr228KqSUmG7Lmz
+	ed4VefAucFdC2jsCKGcgx0TDyicuR/4=
 From: Andrew Jones <andrew.jones@linux.dev>
 To: kvm@vger.kernel.org,
 	kvm-riscv@lists.infradead.org,
@@ -42,9 +42,9 @@ Cc: pbonzini@redhat.com,
 	atishp@rivosinc.com,
 	cade.richard@berkeley.edu,
 	jamestiotio@gmail.com
-Subject: [kvm-unit-tests PATCH 2/3] configure: Support cross compiling with clang
-Date: Tue,  3 Sep 2024 18:30:49 +0200
-Message-ID: <20240903163046.869262-7-andrew.jones@linux.dev>
+Subject: [kvm-unit-tests PATCH 3/3] riscv: gitlab-ci: Add clang build tests
+Date: Tue,  3 Sep 2024 18:30:50 +0200
+Message-ID: <20240903163046.869262-8-andrew.jones@linux.dev>
 In-Reply-To: <20240903163046.869262-5-andrew.jones@linux.dev>
 References: <20240903163046.869262-5-andrew.jones@linux.dev>
 Precedence: bulk
@@ -56,78 +56,54 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-When a user specifies the compiler with --cc assume it's already
-fully named, even if the user also specifies a cross-prefix. This
-allows clang to be selected for the compiler, which doesn't use
-prefixes, but also still provide a cross prefix for binutils. If
-a user needs a prefix on the compiler that they specify with --cc,
-then they'll just have to specify it with the prefix prepended.
-
-Also ensure user provided cflags are used when testing the compiler,
-since the flags may drastically change behavior, such as the --target
-flag for clang.
-
-With these changes it's possible to cross compile for riscv with
-clang after configuring with
-
- ./configure --arch=riscv64 --cc=clang --cflags='--target=riscv64' \
-             --cross-prefix=riscv64-linux-gnu-
+Test building 32 and 64-bit with clang. Throw a test of in- and out-
+of-tree building in too by swapping which is done to which (32-bit
+vs. 64-bit) with respect to the gcc build tests.
 
 Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
 ---
- configure | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ .gitlab-ci.yml | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
-diff --git a/configure b/configure
-index 27ae9cc89657..337af07374df 100755
---- a/configure
-+++ b/configure
-@@ -130,6 +130,7 @@ while [[ "$1" = -* ]]; do
- 	    ;;
- 	--cc)
- 	    cc="$arg"
-+	    cc_selected=yes
- 	    ;;
- 	--cflags)
- 	    cflags="$arg"
-@@ -200,6 +201,10 @@ while [[ "$1" = -* ]]; do
-     esac
- done
+diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+index 67a9a15733f1..033ed65aec26 100644
+--- a/.gitlab-ci.yml
++++ b/.gitlab-ci.yml
+@@ -176,6 +176,34 @@ build-riscv64-efi:
+       | tee results.txt
+  - grep -q PASS results.txt && ! grep -q FAIL results.txt
  
-+if [ -z "$cc_selected" ] && [ "$cross_prefix" ]; then
-+    cc="$cross_prefix$cc"
-+fi
++build-riscv64-clang:
++ extends: .outoftree_template
++ script:
++ - dnf install -y qemu-system-riscv gcc-riscv64-linux-gnu clang
++ - mkdir build
++ - cd build
++ - ../configure --arch=riscv64 --cc=clang --cflags='--target=riscv64' --cross-prefix=riscv64-linux-gnu-
++ - make -j2
++ - printf "FOO=foo\nBAR=bar\nBAZ=baz\nMVENDORID=0\nMARCHID=0\nMIMPID=0\n" >test-env
++ - ACCEL=tcg KVM_UNIT_TESTS_ENV=test-env ./run_tests.sh
++      selftest
++      sbi
++      | tee results.txt
++ - grep -q PASS results.txt && ! grep -q FAIL results.txt
 +
- if [ -z "$efi" ] || [ "$efi" = "n" ]; then
-     [ "$efi_direct" = "y" ] && efi_direct=
- fi
-@@ -370,7 +375,7 @@ fi
- cat << EOF > lib-test.c
- __UINT32_TYPE__
- EOF
--u32_long=$("$cross_prefix$cc" -E lib-test.c | grep -v '^#' | grep -q long && echo yes)
-+u32_long=$("$cc" $cflags -E lib-test.c | grep -v '^#' | grep -q long && echo yes)
- rm -f lib-test.c
- 
- # check if slash can be used for division
-@@ -379,7 +384,7 @@ if [ "$arch" = "i386" ] || [ "$arch" = "x86_64" ]; then
- foo:
-     movl (8 / 2), %eax
- EOF
--  wa_divide=$("$cross_prefix$cc" -c lib-test.S >/dev/null 2>&1 || echo yes)
-+  wa_divide=$("$cc" $cflags -c lib-test.S >/dev/null 2>&1 || echo yes)
-   rm -f lib-test.{o,S}
- fi
- 
-@@ -442,7 +447,7 @@ ARCH=$arch
- ARCH_NAME=$arch_name
- ARCH_LIBDIR=$arch_libdir
- PROCESSOR=$processor
--CC=$cross_prefix$cc
-+CC=$cc
- CFLAGS=$cflags
- LD=$cross_prefix$ld
- OBJCOPY=$cross_prefix$objcopy
++build-riscv32-clang:
++ extends: .intree_template
++ script:
++ - dnf install -y qemu-system-riscv gcc-riscv64-linux-gnu clang
++ - ./configure --arch=riscv32 --cc=clang --cflags='--target=riscv32' --cross-prefix=riscv64-linux-gnu-
++ - make -j2
++ - printf "FOO=foo\nBAR=bar\nBAZ=baz\nMVENDORID=0\nMARCHID=0\nMIMPID=0\n" >test-env
++ - ACCEL=tcg KVM_UNIT_TESTS_ENV=test-env ./run_tests.sh
++      selftest
++      sbi
++      | tee results.txt
++ - grep -q PASS results.txt && ! grep -q FAIL results.txt
++
+ build-s390x:
+  extends: .outoftree_template
+  script:
 -- 
 2.46.0
 
