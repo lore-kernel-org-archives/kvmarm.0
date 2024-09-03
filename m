@@ -1,109 +1,83 @@
-Received: from out-185.mta1.migadu.com (out-185.mta1.migadu.com [95.215.58.185])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BB0918BC18
-	for <kvmarm@lists.linux.dev>; Tue,  3 Sep 2024 16:31:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 896121E492;
+	Tue,  3 Sep 2024 16:38:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725381066; cv=none; b=eJ0r1qCMK/xd++UqwZEFGBmNj9PRCDttOm1l01W8pJzkXPrn+9rnQ5ALD6dE55Imul/ehvlma/5hoKo5f2POTeXYJf/rC2tsJiTzK4Q79kzCkZPgc1h5a2oRSXVFIoMosUQoqpJZCzLJQW7TZKcwQjcSI+UiIAHYjUnWYLNNAxU=
+	t=1725381508; cv=none; b=T++WO783FrpPY2vc9wHmTyuQ9vTv7Gg6qYWIK8ebms8lxNym3DKtIVpMI6tBKTx79U5XvzA98yl228oWt7tIUUqtPjYokc3c232Nk+DrfsLoEtcO/xTTJu3duuvM/hvdUOnLQLEhXQYgt7jBBwsAEyiAlr1YtciKr58VSHEKYd4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725381066; c=relaxed/simple;
-	bh=1e2PJ9C4cSjp3/AMqt3JlJ1Cx1fmp2V4q5C273sWOSk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AGyYZ8XVTt2aIPn6eBazO++mqTMIrYZP8eYz+NzhQ8mO3iYZiUVmMLjRwPtwkItg6bwhPTNOYbDolQdPk43HTXSlnTfBeaEhP4uBFOVORQDSikBBXFPvqbYmir7OBbHMNXizl2uLTkV33P21ye209eaVJSw7689fW+d5pqbWZvw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fnHXhWjW; arc=none smtp.client-ip=95.215.58.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fnHXhWjW"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1725381063;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3BZJkoNgFN6URY+7lN/rD+PAMiteNcprRb2IpocXJAk=;
-	b=fnHXhWjWeEn3rcGrQ/Z+7smSSzd/z9fh1Rnug/H9guDSc4s33GknopNiQVzNKy5PuQFyIs
-	lUoEGLn1k6hs+3yDmWrR2nEIJHY1TctbeZQLU/9yK8DdjZ8Q7W4H6vDdr228KqSUmG7Lmz
-	ed4VefAucFdC2jsCKGcgx0TDyicuR/4=
-From: Andrew Jones <andrew.jones@linux.dev>
-To: kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-s390@vger.kernel.org
-Cc: pbonzini@redhat.com,
-	thuth@redhat.com,
-	lvivier@redhat.com,
-	frankja@linux.ibm.com,
-	imbrenda@linux.ibm.com,
-	nrb@linux.ibm.com,
-	atishp@rivosinc.com,
-	cade.richard@berkeley.edu,
-	jamestiotio@gmail.com
-Subject: [kvm-unit-tests PATCH 3/3] riscv: gitlab-ci: Add clang build tests
-Date: Tue,  3 Sep 2024 18:30:50 +0200
-Message-ID: <20240903163046.869262-8-andrew.jones@linux.dev>
-In-Reply-To: <20240903163046.869262-5-andrew.jones@linux.dev>
-References: <20240903163046.869262-5-andrew.jones@linux.dev>
+	s=arc-20240116; t=1725381508; c=relaxed/simple;
+	bh=Ch4EB9z7SxI24U7kqiSf5J+jgI5aAF15vq3HqTETrBM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=icu5rb78oz2n6lVIP1F409yDGst5OIkMCOLc87ztgcnepa51hvYzlLCqrEo3RPqGoXHscQh3OBDu3TQQnb4zrsXgPhJuktx4xM5LIcGxEUX+HheLpIg39gCEn94qGxKpLYvKMfeG4roj3Gq3lh+iUTBuYzMIU5bttOqcr3tkXv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 697ECC4CEC4;
+	Tue,  3 Sep 2024 16:38:22 +0000 (UTC)
+Date: Tue, 3 Sep 2024 17:38:20 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Florian Weimer <fweimer@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
+	Ross Burton <ross.burton@arm.com>,
+	Yury Khrustalev <yury.khrustalev@arm.com>,
+	Wilco Dijkstra <wilco.dijkstra@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v12 26/39] arm64/ptrace: Expose GCS via ptrace and core
+ files
+Message-ID: <Ztc7fIneIhCEmesI@arm.com>
+References: <20240829-arm64-gcs-v12-0-42fec947436a@kernel.org>
+ <20240829-arm64-gcs-v12-26-42fec947436a@kernel.org>
+ <ZtYKYMWjApRxFO_-@arm.com>
+ <3f190f54-477e-48dd-8a57-8d61ea20413b@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3f190f54-477e-48dd-8a57-8d61ea20413b@sirena.org.uk>
 
-Test building 32 and 64-bit with clang. Throw a test of in- and out-
-of-tree building in too by swapping which is done to which (32-bit
-vs. 64-bit) with respect to the gcc build tests.
+On Mon, Sep 02, 2024 at 07:58:28PM +0100, Mark Brown wrote:
+> On Mon, Sep 02, 2024 at 07:56:32PM +0100, Catalin Marinas wrote:
+> > On Thu, Aug 29, 2024 at 12:27:42AM +0100, Mark Brown wrote:
+> 
+> > > +static int gcs_get(struct task_struct *target,
+> > > +		   const struct user_regset *regset,
+> > > +		   struct membuf to)
+> 
+> > > +	if (target == current)
+> > > +		gcs_preserve_current_state();
+> 
+> > What's the use-case where target == current and do we need something
+> > similar for gcs_set()?
+> 
+> IIRC core file generation so no.
 
-Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
----
- .gitlab-ci.yml | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+Ah, true. Makes sense.
 
-diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-index 67a9a15733f1..033ed65aec26 100644
---- a/.gitlab-ci.yml
-+++ b/.gitlab-ci.yml
-@@ -176,6 +176,34 @@ build-riscv64-efi:
-       | tee results.txt
-  - grep -q PASS results.txt && ! grep -q FAIL results.txt
- 
-+build-riscv64-clang:
-+ extends: .outoftree_template
-+ script:
-+ - dnf install -y qemu-system-riscv gcc-riscv64-linux-gnu clang
-+ - mkdir build
-+ - cd build
-+ - ../configure --arch=riscv64 --cc=clang --cflags='--target=riscv64' --cross-prefix=riscv64-linux-gnu-
-+ - make -j2
-+ - printf "FOO=foo\nBAR=bar\nBAZ=baz\nMVENDORID=0\nMARCHID=0\nMIMPID=0\n" >test-env
-+ - ACCEL=tcg KVM_UNIT_TESTS_ENV=test-env ./run_tests.sh
-+      selftest
-+      sbi
-+      | tee results.txt
-+ - grep -q PASS results.txt && ! grep -q FAIL results.txt
-+
-+build-riscv32-clang:
-+ extends: .intree_template
-+ script:
-+ - dnf install -y qemu-system-riscv gcc-riscv64-linux-gnu clang
-+ - ./configure --arch=riscv32 --cc=clang --cflags='--target=riscv32' --cross-prefix=riscv64-linux-gnu-
-+ - make -j2
-+ - printf "FOO=foo\nBAR=bar\nBAZ=baz\nMVENDORID=0\nMARCHID=0\nMIMPID=0\n" >test-env
-+ - ACCEL=tcg KVM_UNIT_TESTS_ENV=test-env ./run_tests.sh
-+      selftest
-+      sbi
-+      | tee results.txt
-+ - grep -q PASS results.txt && ! grep -q FAIL results.txt
-+
- build-s390x:
-  extends: .outoftree_template
-  script:
 -- 
-2.46.0
-
+Catalin
