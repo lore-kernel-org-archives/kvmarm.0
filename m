@@ -1,50 +1,79 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 461051D86F7
-	for <kvmarm@lists.linux.dev>; Wed,  4 Sep 2024 12:55:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 943CC1DB551
+	for <kvmarm@lists.linux.dev>; Wed,  4 Sep 2024 14:48:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725454514; cv=none; b=pisRobpP/PCiYaBV2N5jXJi0rRYrsdHnb4jsfuqXlC1J83ExNS2yCY1641RJi9+be0D7Tuj7KU1TL5AIrHxf6gMJJp1h/K8/+zp09RGSijiPFiAFQFVOUJhBxB0/tPtMpuSRoR714zjgQbPHvDy6IB2LE8i/NjjZHykYI0r1elw=
+	t=1725461286; cv=none; b=Ao2zuqy8A09yvuukekiYySrMkvmfvE4gRZmxarw0JXmGewIrRAX2XuTlKT7v1wy35ofOQQRo/6xZr4UhPvriQSFufN1aERz+2xrOm7gRFXaiLHTM0kfYPQk173j/1B0+74TIrGOJAbZjKlT/evh5ZCZSBDU3OdsWUNSKA6b6rbY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725454514; c=relaxed/simple;
-	bh=qMejZA9PsIbPUUClShG+nT87oLFIDssyt2kEGog2XX0=;
+	s=arc-20240116; t=1725461286; c=relaxed/simple;
+	bh=zwkevx0JOA1sU3/G6Uk1dmNSxwY1PH5EmMk1/KtzlkA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Er2pdJWtC+ljxN7VLGmZQoEMDg1BaisJYArx2hXHAUXfXVGyV8ny0vRlix5JzAwR5SP9Opan5HtgIc5M3j2jjx22OgpKamAXgQ9WERnnaOZauiyU6yfEKpojMc7roPNqC3+h6z+j3f6GAEIZkezaBKR5TytfG8P7r8hNqN0jV+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9FBD8FEC;
-	Wed,  4 Sep 2024 05:55:37 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 369393F73B;
-	Wed,  4 Sep 2024 05:55:08 -0700 (PDT)
-Date: Wed, 4 Sep 2024 13:55:03 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Will Deacon <will@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	linux-arm-kernel@lists.infradead.org, nd@arm.com,
-	akpm@linux-foundation.org, aneesh.kumar@kernel.org,
-	aneesh.kumar@linux.ibm.com, anshuman.khandual@arm.com, bp@alien8.de,
-	broonie@kernel.org, christophe.leroy@csgroup.eu,
-	dave.hansen@linux.intel.com, hpa@zytor.com,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
-	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
-	oliver.upton@linux.dev, shuah@kernel.org, skhan@linuxfoundation.org,
-	szabolcs.nagy@arm.com, tglx@linutronix.de, x86@kernel.org,
-	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v5 06/30] arm64: context switch POR_EL0 register
-Message-ID: <20240904125503.GA3901671@e124191.cambridge.arm.com>
-References: <20240823144531.GH32156@willie-the-truck>
- <Zsi7ovLOfuFdfuuz@arm.com>
- <20240823170835.GA1181@willie-the-truck>
- <ZsjXtE7Kg0LQwNAL@arm.com>
- <20240827113803.GB4318@willie-the-truck>
- <ZtYNGBrcE-j35fpw@arm.com>
- <20240903145413.GB3669886@e124191.cambridge.arm.com>
- <20240904102254.GA13280@willie-the-truck>
- <20240904113221.GA3891700@e124191.cambridge.arm.com>
- <20240904114301.GA13550@willie-the-truck>
+	 Content-Type:Content-Disposition:In-Reply-To; b=EHIbvlgkvTy3rcXbLHIH3qye03Sci3jfE7+3H7Bp2qo7rPwVS1mc6aG/FZG1IvMtwGEkrh0eFJKJGdkGXxbtcFV+iV+uNpbAZr+ypWBF/CPPgVj3z7g3o0BTz8EUfHjtvqUtk0T6a6Y6/fkOraa8wNEp7soxWQImUrf0C+9xsMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=E2ypGIlf; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="E2ypGIlf"
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-42bbdf7f860so47033825e9.3
+        for <kvmarm@lists.linux.dev>; Wed, 04 Sep 2024 07:48:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1725461283; x=1726066083; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=j6kEIYFtkOtx+DJY9n3gGx8oC/72d34oJtC4eMa+2Jo=;
+        b=E2ypGIlfvOioqogj8/466W/tgFUez/KbtvE0zsx7s5p5IOSc1djIj100T8KfZ+OEUM
+         1oZB0RmlcFIpkpY2W/4A1+C4iS13Azu4rSNL75R3H1n75Zb3AmIGG48bi8gEXpzLN3rK
+         552mXqtow/jQJZWXM1laRvnQCjFri+NG0tLp19gClIIjeBicFX8vDhKeZPs18CUjikQy
+         Z0Vin7njeFJY+W7uAxLOFModVNrFk/Jd8S+D8Com1D7qYDWJHXRLvNm6u9KuswBiJO67
+         fMg02aPXjglQ6HM4I2Y9Ci33fPqLTa8iNjb8b+472EAOWbtmeokRx7J0F1lNyikgA+G0
+         hq7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725461283; x=1726066083;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=j6kEIYFtkOtx+DJY9n3gGx8oC/72d34oJtC4eMa+2Jo=;
+        b=Szjy7lql0HsV6bZ+yP6frsXm7aOCivxLjTlBlTeiWp89lUBKzLcGeE7tpAUpstZwnK
+         i50C8cG2WOZcDmdIQblghFrBrOPkYLdUPc1tapjmT39HAjhJ+jiK8akRBUIIH/Ch+jJ4
+         T2nhKrXlZVFjyHzqqk9X5wwOpVB4Fg47YXJKOUqtYBFL0m0K0k/37tYDD2LE2xElKMez
+         AIL6gIc2vdhyAyp21BATVpyxWnkdRzDs1PrVrsyOvSMxSCnizFVEww0kUoXZ7Rx3TFZY
+         0IVdIQd2B+1psTq7ZTP4E1G/IWuWj1Tp3KC6kqU0ucscXlLcvuvyOYlJJihttsh5lAbL
+         sqDA==
+X-Forwarded-Encrypted: i=1; AJvYcCXVZTKxajemYXeXP6tQ7l2pmLhVoleFqfoEzG3Z0Ezkqm9/beu4I88Kf7vQFjZ8g+WinFOt3AE=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yzv4b7t7IVVxVADH8SsEFltBLar+nlFIQiUA+0chrA2rvnzngxx
+	DIlGvDGF6puSWhPHK8GWs5GN2cnaq+u+ao6CioWxA1ugfTZ8yngi9gpBXiNrq3o=
+X-Google-Smtp-Source: AGHT+IHKZyt11Lslz0HlasHPTxHt7BSYAR0Jjt79ONBZBuyaQ3ymGqrpolN3WJVQPOJE6wYCFvw0hQ==
+X-Received: by 2002:a05:600c:3b8e:b0:426:616e:db8d with SMTP id 5b1f17b1804b1-42bb01b556bmr164929245e9.15.1725461282171;
+        Wed, 04 Sep 2024 07:48:02 -0700 (PDT)
+Received: from myrica ([2.221.137.100])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42bb01d300csm218202355e9.15.2024.09.04.07.48.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Sep 2024 07:48:01 -0700 (PDT)
+Date: Wed, 4 Sep 2024 15:48:21 +0100
+From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>
+Subject: Re: [PATCH v4 21/43] arm64: RME: Runtime faulting of memory
+Message-ID: <20240904144821.GA223966@myrica>
+References: <20240821153844.60084-1-steven.price@arm.com>
+ <20240821153844.60084-22-steven.price@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -53,112 +82,87 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240904114301.GA13550@willie-the-truck>
+In-Reply-To: <20240821153844.60084-22-steven.price@arm.com>
 
-On Wed, Sep 04, 2024 at 12:43:02PM +0100, Will Deacon wrote:
-> On Wed, Sep 04, 2024 at 12:32:21PM +0100, Joey Gouly wrote:
-> > On Wed, Sep 04, 2024 at 11:22:54AM +0100, Will Deacon wrote:
-> > > On Tue, Sep 03, 2024 at 03:54:13PM +0100, Joey Gouly wrote:
-> > > > On Mon, Sep 02, 2024 at 08:08:08PM +0100, Catalin Marinas wrote:
-> > > > > On Tue, Aug 27, 2024 at 12:38:04PM +0100, Will Deacon wrote:
-> > > > > > On Fri, Aug 23, 2024 at 07:40:52PM +0100, Catalin Marinas wrote:
-> > > > > > > On Fri, Aug 23, 2024 at 06:08:36PM +0100, Will Deacon wrote:
-> > > > > > > > On Fri, Aug 23, 2024 at 05:41:06PM +0100, Catalin Marinas wrote:
-> > > > > > > > > On Fri, Aug 23, 2024 at 03:45:32PM +0100, Will Deacon wrote:
-> > > > > > > > > > On Thu, Aug 22, 2024 at 04:10:49PM +0100, Joey Gouly wrote:
-> > > > > > > > > > > +static void permission_overlay_switch(struct task_struct *next)
-> > > > > > > > > > > +{
-> > > > > > > > > > > +	if (!system_supports_poe())
-> > > > > > > > > > > +		return;
-> > > > > > > > > > > +
-> > > > > > > > > > > +	current->thread.por_el0 = read_sysreg_s(SYS_POR_EL0);
-> > > > > > > > > > > +	if (current->thread.por_el0 != next->thread.por_el0) {
-> > > > > > > > > > > +		write_sysreg_s(next->thread.por_el0, SYS_POR_EL0);
-> > > > > > > > > > > +		/* ISB required for kernel uaccess routines when chaning POR_EL0 */
-> > > > > > > > > >
-> > > > > > > > > > nit: typo "chaning".
-> > > > > > > > > >
-> > > > > > > > > > But more substantially, is this just to prevent spurious faults in the
-> > > > > > > > > > context of a new thread using a stale value for POR_EL0?
-> > > > > > > > >
-> > > > > > > > > Not just prevent faults but enforce the permissions from the new
-> > > > > > > > > thread's POR_EL0. The kernel may continue with a uaccess routine from
-> > > > > > > > > here, we can't tell.
-> > > > > [...]
-> > > > > > > > So what do we actually gain by having the uaccess routines honour this?
-> > > > > > >
-> > > > > > > I guess where it matters is more like not accidentally faulting because
-> > > > > > > the previous thread had more restrictive permissions.
-> > > > > >
-> > > > > > That's what I wondered initially, but won't the fault handler retry in
-> > > > > > that case?
-> > > > >
-> > > > > Yes, it will retry and this should be fine (I assume you are only
-> > > > > talking about the dropping ISB in the context switch).
-> > > > >
-> > > > > For the case of running with a more permissive stale POR_EL0, arguably it's
-> > > > > slightly more predictable for the user but, OTOH, some syscalls like
-> > > > > readv() could be routed through GUP with no checks. As with MTE, we
-> > > > > don't guarantee uaccesses honour the user permissions.
-> > > > >
-> > > > > That said, at some point we should sanitise this path anyway and have a
-> > > > > single ISB at the end. In the meantime, I'm fine with dropping the ISB
-> > > > > here.
-> > > > >
-> > > > 
-> > > > commit 3141fb86bee8d48ae47cab1594dad54f974a8899
-> > > > Author: Joey Gouly <joey.gouly@arm.com>
-> > > > Date:   Tue Sep 3 15:47:26 2024 +0100
-> > > > 
-> > > >     fixup! arm64: context switch POR_EL0 register
-> > > > 
-> > > > diff --git a/arch/arm64/kernel/process.c b/arch/arm64/kernel/process.c
-> > > > index a3a61ecdb165..c224b0955f1a 100644
-> > > > --- a/arch/arm64/kernel/process.c
-> > > > +++ b/arch/arm64/kernel/process.c
-> > > > @@ -515,11 +515,8 @@ static void permission_overlay_switch(struct task_struct *next)
-> > > >                 return;
-> > > > 
-> > > >         current->thread.por_el0 = read_sysreg_s(SYS_POR_EL0);
-> > > > -       if (current->thread.por_el0 != next->thread.por_el0) {
-> > > > +       if (current->thread.por_el0 != next->thread.por_el0)
-> > > >                 write_sysreg_s(next->thread.por_el0, SYS_POR_EL0);
-> > > > -               /* ISB required for kernel uaccess routines when chaning POR_EL0 */
-> > > > -               isb();
-> > > > -       }
-> > > >  }
-> > > 
-> > > What about the one in flush_poe()? I'm inclined to drop that as well.
-> > 
-> > Yes I guess that one can be removed too. Catalin any comments?
-> > 
-> > > 
-> > > > Will, do you want me to re-send the series with this and the permissions
-> > > > diff from the other thread [1],
-> > > > or you ok with applying them when you pull it in?
-> > > 
-> > > I'll have a crack now, but if it fails miserably then I'll let you know.
-> > 
-> > Thanks! Just to make sure, you should pick the patch up from
-> > 
-> > 	https://lore.kernel.org/linux-arm-kernel/20240903152937.GA3768522@e124191.cambridge.arm.com/
-> > 
-> > Not the one I linked to in [1] in my previous e-mail.
-> 
-> Right, there's quite a lot I need to do:
-> 
-> - Uncorrupt your patches
-> - Fix the conflict in the kvm selftests
-> - Drop the unnecessary ISBs
-> - Fix the ESR checking
-> - Fix the el2_setup labels
-> - Reorder the patches
-> - Drop the patch that is already in kvmarm
-> 
-> Working on it...
+On Wed, Aug 21, 2024 at 04:38:22PM +0100, Steven Price wrote:
+> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
+> index 2c4e28b457be..337b3dd1e00c 100644
+> --- a/arch/arm64/kvm/rme.c
+> +++ b/arch/arm64/kvm/rme.c
+> @@ -627,6 +627,181 @@ static int fold_rtt(struct realm *realm, unsigned long addr, int level)
+>  	return 0;
+>  }
+>  
+> +static phys_addr_t rtt_get_phys(struct realm *realm, struct rtt_entry *rtt)
+> +{
+> +	bool lpa2 = realm->params->flags & RMI_REALM_PARAM_FLAG_LPA2;
 
-Sorry! I'm happy to rebase onto some arm64 branch if that will help, just let me know.
+At this point realm->params is NULL, cleared by kvm_create_realm()
 
-> 
-> Will
-> 
+Thanks,
+Jean
+
+> +
+> +	if (lpa2)
+> +		return rtt->desc & GENMASK(49, 12);
+> +	return rtt->desc & GENMASK(47, 12);
+> +}
+> +
+> +int realm_map_protected(struct realm *realm,
+> +			unsigned long base_ipa,
+> +			struct page *dst_page,
+> +			unsigned long map_size,
+> +			struct kvm_mmu_memory_cache *memcache)
+> +{
+> +	phys_addr_t dst_phys = page_to_phys(dst_page);
+> +	phys_addr_t rd = virt_to_phys(realm->rd);
+> +	unsigned long phys = dst_phys;
+> +	unsigned long ipa = base_ipa;
+> +	unsigned long size;
+> +	int map_level;
+> +	int ret = 0;
+> +
+> +	if (WARN_ON(!IS_ALIGNED(ipa, map_size)))
+> +		return -EINVAL;
+> +
+> +	switch (map_size) {
+> +	case PAGE_SIZE:
+> +		map_level = 3;
+> +		break;
+> +	case RME_L2_BLOCK_SIZE:
+> +		map_level = 2;
+> +		break;
+> +	default:
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (map_level < RME_RTT_MAX_LEVEL) {
+> +		/*
+> +		 * A temporary RTT is needed during the map, precreate it,
+> +		 * however if there is an error (e.g. missing parent tables)
+> +		 * this will be handled below.
+> +		 */
+> +		realm_create_rtt_levels(realm, ipa, map_level,
+> +					RME_RTT_MAX_LEVEL, memcache);
+> +	}
+> +
+> +	for (size = 0; size < map_size; size += PAGE_SIZE) {
+> +		if (rmi_granule_delegate(phys)) {
+> +			struct rtt_entry rtt;
+> +
+> +			/*
+> +			 * It's possible we raced with another VCPU on the same
+> +			 * fault. If the entry exists and matches then exit
+> +			 * early and assume the other VCPU will handle the
+> +			 * mapping.
+> +			 */
+> +			if (rmi_rtt_read_entry(rd, ipa, RME_RTT_MAX_LEVEL, &rtt))
+> +				goto err;
+> +
+> +			/*
+> +			 * FIXME: For a block mapping this could race at level
+> +			 * 2 or 3... currently we don't support block mappings
+> +			 */
+> +			if (WARN_ON((rtt.walk_level != RME_RTT_MAX_LEVEL ||
+> +				     rtt.state != RMI_ASSIGNED ||
+> +				     rtt_get_phys(realm, &rtt) != phys))) {
