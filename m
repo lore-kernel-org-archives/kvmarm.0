@@ -1,35 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D758E14F9FD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D766A17C9AA;
 	Wed,  4 Sep 2024 08:24:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725438280; cv=none; b=o/yDauTIGLJzrQz1lqR/ToFaHW3EJHrLzJeIf58pDhB4i5q2MP1THZY+n85e4RwNyJFDXYTX7Zm3LFKlYY1Y3aM0NpI/2A/wOcpRyIm6E/1NPo1Xh2mkx/Xh/1K+5cbH84i0bvsWnJLRddy3KoiutpLbfIsohRwKonRDblwZ3rk=
+	t=1725438280; cv=none; b=AwKHxxKH3Dd2LYlOk6BEJgCUOWwmga8thy2Eh21Hgo7UW9ofkL0VPAauybUTxpNDqojkttUgZl42NniFy/DWI0FfzOc4a7GBJsql9aGFYwgyTeTbJJkSrPE6pO8bmP0VaJ1Uq+MdHGtR8CSm9XWMVoqOO4OomaghnDgQG5f33c8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1725438280; c=relaxed/simple;
-	bh=O5vZyMzug2hfi0WUZ+7tWFsjuAc2OLNoqgduTkj7QBA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rbCj7Kn9CxFsmpRPu2e2M4BTEN2Rf55UjAor4n39ro3Z57V+7OBd+G9UzZG8d98hjLuDCpaOaWZ39kJY+hrdNkPkUWUclQjwzpkhO7pUkunq+/I0ict0BByZHg3MuWp4DQH1ynjl+PC7IVBlEcX8h6OBGtXLZNBG4d1TURK+a+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KkeR3001; arc=none smtp.client-ip=10.30.226.201
+	bh=Fhau2/U9M+BMgStDw+xZRk0wrsOilXlXn/q0zd3fcrw=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=lNLjq3vv3Nz1DmE/JR/4swdGXrTAEK5O4hnpgE2vu75vVQQ3oPQPGHRAPL6skegibV7Y48XtRz4zd2FoegAkYEhPJAyUx/FeDBjJYVqdQ08Q93P+MaHHIO8TT98evGxU1guB83esrlhlsgaQekorWg/HNlnyIdkjxWfzQYzdQVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VA4vu3BP; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KkeR3001"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8828DC4CEC2;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VA4vu3BP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D573C4CEC8;
 	Wed,  4 Sep 2024 08:24:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1725438280;
-	bh=O5vZyMzug2hfi0WUZ+7tWFsjuAc2OLNoqgduTkj7QBA=;
-	h=From:To:Cc:Subject:Date:From;
-	b=KkeR3001iosJpJ6q/vRE2/Hyhi6bSKxYQCJzYX1VKJmOSvBR12/oi4uKIZDv84AsK
-	 vjJRwUdGBRGTxV8AK/lyG78xrexjSUOqkuzsEHl/nJ41rA5bz/VLLVWBQU0h3c3Jih
-	 IoSU1kyhwTG05cqMiVInyX4RTYiHWHyYxlQm+HqTq6MpnBa7+qzqeX9BqXT1p8S/Mi
-	 TIfiRccEsij6nsBN7kbnHCDAGAbAqh4HU6+xX8DrEcYowY7KLjMKrrP0AEXGtEAdpg
-	 e6kac418LNv+T/qhrxVn/9A3KO16MdiwO4ItCZZhY0w9HrGwcYEwqBdEPiassMpYaT
-	 nBytBzx6sQ83A==
+	bh=Fhau2/U9M+BMgStDw+xZRk0wrsOilXlXn/q0zd3fcrw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=VA4vu3BPknG/Obx0pIjackogjRv5u15j+TfoA+6I8De+vJGJoZkn2Qewj2a4EMlhF
+	 6Szr1TPenZP55XizUZNyvSHWJcTknL/8k4JO49FrPcBmHaT4XyXtbCIdRdjGCEoCJv
+	 Syrk2DV5UJQ/bz7+9pk06uLfatWG7LAjaGxfMlEnpWotn+ZXa/BQPx8oa0xRM7jQAG
+	 k5Z52WyUmpBq24z7kW/devw2p2ZEk/jY54fCLu4nqEl16jIQL/KC3iKnJ1ao+hPYyK
+	 CWFmvR8V6gHO0Ny6DK59XsRWuP/vJU6Rp4W4stNpa4bTSM1cpMfWAfwRZwHuQ9Heqx
+	 VRuptPWSKW/lQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sllJe-009VF3-9L;
+	id 1sllJe-009VF3-R3;
 	Wed, 04 Sep 2024 09:24:38 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -39,10 +40,12 @@ Cc: James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 0/3] KVM: arm64: Get rid of REG_HIDDEN_USER
-Date: Wed,  4 Sep 2024 09:24:16 +0100
-Message-Id: <20240904082419.1982402-1-maz@kernel.org>
+Subject: [PATCH 3/3] KVM: arm64: Get rid of REG_HIDDEN_USER visibility qualifier
+Date: Wed,  4 Sep 2024 09:24:19 +0100
+Message-Id: <20240904082419.1982402-4-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240904082419.1982402-1-maz@kernel.org>
+References: <20240904082419.1982402-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -55,29 +58,97 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-REG_HIDDEN_USER was introduced as a way to deal with the ARMv8.3 flavour of
-FEAT_NV, where most EL12 sysreg accesses would trap and yet be mapped to a
-EL1 register (KVM doing in SW what FEAT_NV2 does in HW). This handling
-imposed that the EL12 register shouldn't be visible to userspace, hence the
-special REG_HIDDEN_USER visibility.
+Now that REG_HIDDEN_USER has no direct user anymore, remove it
+entirely and update all users of sysreg_hidden_user() to call
+sysreg_hidden() instead.
 
-Since 4d4f52052ba8 ("KVM: arm64: nv: Drop EL12 register traps that are
-redirected to VNCR") and the admission that KVM would never be supporting
-the original FEAT_NV, REG_HIDDEN_USER only had a few users, all of which
-could either be replaced by a more ad-hoc mechanism, or removed altogether.
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/sys_regs.c | 17 +++--------------
+ arch/arm64/kvm/sys_regs.h | 14 ++------------
+ 2 files changed, 5 insertions(+), 26 deletions(-)
 
-This series goes ahead and cleans it up for good, removing a tiny bit of
-unnecessary complexity.
-
-Marc Zyngier (3):
-  KVM: arm64: Simplify handling of CNTKCTL_EL12
-  KVM: arm64: Simplify visibility handling of AArch32 SPSR_*
-  KVM: arm64: Get rid of REG_HIDDEN_USER visibility qualifier
-
- arch/arm64/kvm/sys_regs.c | 52 +++++++++++++++------------------------
- arch/arm64/kvm/sys_regs.h | 14 ++---------
- 2 files changed, 22 insertions(+), 44 deletions(-)
-
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 2586ad29eaa0..09a6a45efb49 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2094,17 +2094,6 @@ static bool bad_redir_trap(struct kvm_vcpu *vcpu,
+ #define EL2_REG_VNCR(name, rst, v)	EL2_REG(name, bad_vncr_trap, rst, v)
+ #define EL2_REG_REDIR(name, rst, v)	EL2_REG(name, bad_redir_trap, rst, v)
+ 
+-/*
+- * EL{0,1}2 registers are the EL2 view on an EL0 or EL1 register when
+- * HCR_EL2.E2H==1, and only in the sysreg table for convenience of
+- * handling traps. Given that, they are always hidden from userspace.
+- */
+-static unsigned int hidden_user_visibility(const struct kvm_vcpu *vcpu,
+-					   const struct sys_reg_desc *rd)
+-{
+-	return REG_HIDDEN_USER;
+-}
+-
+ /*
+  * Since reset() callback and field val are not used for idregs, they will be
+  * used for specific purposes for idregs.
+@@ -4364,7 +4353,7 @@ int kvm_sys_reg_get_user(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg,
+ 	int ret;
+ 
+ 	r = id_to_sys_reg_desc(vcpu, reg->id, table, num);
+-	if (!r || sysreg_hidden_user(vcpu, r))
++	if (!r || sysreg_hidden(vcpu, r))
+ 		return -ENOENT;
+ 
+ 	if (r->get_user) {
+@@ -4408,7 +4397,7 @@ int kvm_sys_reg_set_user(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg,
+ 		return -EFAULT;
+ 
+ 	r = id_to_sys_reg_desc(vcpu, reg->id, table, num);
+-	if (!r || sysreg_hidden_user(vcpu, r))
++	if (!r || sysreg_hidden(vcpu, r))
+ 		return -ENOENT;
+ 
+ 	if (sysreg_user_write_ignore(vcpu, r))
+@@ -4494,7 +4483,7 @@ static int walk_one_sys_reg(const struct kvm_vcpu *vcpu,
+ 	if (!(rd->reg || rd->get_user))
+ 		return 0;
+ 
+-	if (sysreg_hidden_user(vcpu, rd))
++	if (sysreg_hidden(vcpu, rd))
+ 		return 0;
+ 
+ 	if (!copy_reg_to_user(rd, uind))
+diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
+index dfb2ec83b284..1d94ed6efad2 100644
+--- a/arch/arm64/kvm/sys_regs.h
++++ b/arch/arm64/kvm/sys_regs.h
+@@ -95,9 +95,8 @@ struct sys_reg_desc {
+ };
+ 
+ #define REG_HIDDEN		(1 << 0) /* hidden from userspace and guest */
+-#define REG_HIDDEN_USER		(1 << 1) /* hidden from userspace only */
+-#define REG_RAZ			(1 << 2) /* RAZ from userspace and guest */
+-#define REG_USER_WI		(1 << 3) /* WI from userspace only */
++#define REG_RAZ			(1 << 1) /* RAZ from userspace and guest */
++#define REG_USER_WI		(1 << 2) /* WI from userspace only */
+ 
+ static __printf(2, 3)
+ inline void print_sys_reg_msg(const struct sys_reg_params *p,
+@@ -165,15 +164,6 @@ static inline bool sysreg_hidden(const struct kvm_vcpu *vcpu,
+ 	return sysreg_visibility(vcpu, r) & REG_HIDDEN;
+ }
+ 
+-static inline bool sysreg_hidden_user(const struct kvm_vcpu *vcpu,
+-				      const struct sys_reg_desc *r)
+-{
+-	if (likely(!r->visibility))
+-		return false;
+-
+-	return r->visibility(vcpu, r) & (REG_HIDDEN | REG_HIDDEN_USER);
+-}
+-
+ static inline bool sysreg_visible_as_raz(const struct kvm_vcpu *vcpu,
+ 					 const struct sys_reg_desc *r)
+ {
 -- 
 2.39.2
 
