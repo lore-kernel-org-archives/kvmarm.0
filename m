@@ -1,32 +1,32 @@
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF8A01CE6E1
-	for <kvmarm@lists.linux.dev>; Wed,  4 Sep 2024 10:50:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E41D91CCB5B
+	for <kvmarm@lists.linux.dev>; Wed,  4 Sep 2024 10:50:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725447031; cv=none; b=WYLdcMrmdd9bwW7QXgI4WBaAWLIKIEaKHN+AuaKlBGX39k1D0D2IVA9IYH0cOEFpEJ90W28byIsvJ7vMF2WcqqC+SOjt0SRtHI7RXCeDepjjgKapMQEA7WDgBoiDNlkTX9bGAz0JLaveVykZ90AbcjcSGdQzitYUX1toXBcaF+M=
+	t=1725447032; cv=none; b=KRLSyvfsEvNkwYsLFG6jq1CwY0IFAq5zlyPeGnoJtW1Jud8A3Z3TFCO5ueyZXsJ+lu7uTr3m1st6IYcjt/iG+5R2w9NlHmzdiNg9h+/8tSDLDikMYEr38N9hURzmqVc/lZJ9PRzsMHCNKieAxT3eY0HK1v3y8eKv44XUXMTKKjA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725447031; c=relaxed/simple;
-	bh=OdXf2H2QDLSAtlOxK+CnZ9ratRbha5XGfAp3jGdKS2Y=;
+	s=arc-20240116; t=1725447032; c=relaxed/simple;
+	bh=LOlwO9hPMr2XN89BLGxjZ+LzXopK9uHBbqNh8lmkT24=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZLfOhZ8DJhEqPH1dZricsfOmHmYbtvkZvCd+ijylAsMZonFagYuWQRvkj/J2FRlksCyfG5z0ypKe+2foXOA7GVgEfcfOODvK6ZbR2uRpDDt6/3NB7OY8J/zn1pVjO0skIJ6sB1TS8r632mXL/q06gp7fCwo77+/kPwf5HJwYUA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fZ0sTCwl; arc=none smtp.client-ip=95.215.58.178
+	 MIME-Version; b=k2V9vUuKkOsfWLAyVxTsm513lSdaMhne1uZsj9+moY3/mBAqWYXJbx6M8xqz4WmoOs8l8blnhVDNZSwH3IcsVA1Ug96GTm2SancvA/hU89lpAimRxmIHudWcXCCUfZ0yM7chMDM0rVafgmvW4+QZvYaqPeGDQzbcPF6ebn1JYug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HHF2H9yX; arc=none smtp.client-ip=95.215.58.189
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fZ0sTCwl"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HHF2H9yX"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1725447026;
+	t=1725447029;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=P8NNLQYH8P4X4ClL5Bx8RReyaTo01W2Due3h6Q3oXYc=;
-	b=fZ0sTCwlLwmNS4Qx14Caj3m7+Wf9GvHpK45FyYLnYSoeN3sTNUc9ZNhvJFFXKjE2qIit3w
-	xrRRlddFhToMEzSHA9L71dLm3+ol7hxzwVSZI5woh4aBt6SMFmmXNpDbpi/I3M9lEtpG9g
-	qWnZMd/+09bOVCE2Sd/kwb0IjKBB0FY=
+	bh=1Myu9U8IEbrxLCMMi6SGb7S+yIVucaaKwRIVAbRfcI4=;
+	b=HHF2H9yXkjxJiYAPY3icEMi+j2QRE1ZCsM+RJp4sNwAXeNrVZM2TGzSxwZ0eOKf2tcQ5/d
+	zRSsTShl3LGbta5Efi5TVD3aVX7fEV3W1Xz91D8WaM+UnLqEqQ+0eVVTLG93W3QyOHFggR
+	VkeMJay9znbhrKvHgqJQFKS5p/aE14I=
 From: Andrew Jones <andrew.jones@linux.dev>
 To: kvm@vger.kernel.org,
 	kvm-riscv@lists.infradead.org,
@@ -42,9 +42,9 @@ Cc: pbonzini@redhat.com,
 	atishp@rivosinc.com,
 	cade.richard@berkeley.edu,
 	jamestiotio@gmail.com
-Subject: [kvm-unit-tests PATCH v2 1/4] riscv: Drop mstrict-align
-Date: Wed,  4 Sep 2024 12:50:22 +0200
-Message-ID: <20240904105020.1179006-7-andrew.jones@linux.dev>
+Subject: [kvm-unit-tests PATCH v2 2/4] Makefile: Prepare for clang EFI builds
+Date: Wed,  4 Sep 2024 12:50:23 +0200
+Message-ID: <20240904105020.1179006-8-andrew.jones@linux.dev>
 In-Reply-To: <20240904105020.1179006-6-andrew.jones@linux.dev>
 References: <20240904105020.1179006-6-andrew.jones@linux.dev>
 Precedence: bulk
@@ -56,29 +56,30 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-The spec says unaligned accesses are supported, so this isn't required
-and clang doesn't support it. A platform might have slow unaligned
-accesses, but kvm-unit-tests isn't about speed anyway.
+clang complains about GNU extensions such as variable sized types not
+being at the end of structs unless -Wno-gnu is used. We may
+eventually want -Wno-gnu, but for now let's just handle the warnings
+as they come. Add -Wno-gnu-variable-sized-type-not-at-end to avoid
+the warning issued for the initrd_dev_path struct.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
 ---
- riscv/Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ Makefile | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/riscv/Makefile b/riscv/Makefile
-index 179a373dbacf..2ee7c5bb5ad8 100644
---- a/riscv/Makefile
-+++ b/riscv/Makefile
-@@ -76,7 +76,7 @@ LDFLAGS += -melf32lriscv
+diff --git a/Makefile b/Makefile
+index 3d51cb726120..7471f7285b78 100644
+--- a/Makefile
++++ b/Makefile
+@@ -50,6 +50,8 @@ EFI_CFLAGS += -fshort-wchar
+ # EFI applications use PIC as they are loaded to dynamic addresses, not a fixed
+ # starting address
+ EFI_CFLAGS += -fPIC
++# Avoid error with the initrd_dev_path struct
++EFI_CFLAGS += -Wno-gnu-variable-sized-type-not-at-end
+ # Create shared library
+ EFI_LDFLAGS := -Bsymbolic -shared -nostdlib
  endif
- CFLAGS += -DCONFIG_RELOC
- CFLAGS += -mcmodel=medany
--CFLAGS += -mstrict-align
-+#CFLAGS += -mstrict-align
- CFLAGS += -std=gnu99
- CFLAGS += -ffreestanding
- CFLAGS += -O2
 -- 
 2.46.0
 
