@@ -1,84 +1,118 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D46A51DC1B1
-	for <kvmarm@lists.linux.dev>; Wed,  4 Sep 2024 15:04:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B3EF1DB94D;
+	Wed,  4 Sep 2024 15:49:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725462244; cv=none; b=ELUAbb9L6Je1Zu7QSY3RgxIlXtvmvrAEV9DAGyXE61ifktKUQmgDG0X08oScXbf2d2a13TH4D6r/IRQRZ8iowJ4Asdz3qAsBopL7MrAvvUwWSf73F3UUbwTYpwsllAeylVQZrb+K4tKK4M3BzSnaHWAUu1sTj5ZWR8OEXIGa5SA=
+	t=1725464943; cv=none; b=PKu83Vhp+tFA6NJc+2zmTwRZanrmhIvMgV1w7UYFcNbcqTIqvNIJYKsq9hCN+C4LY5Z0FjpID/SKXn4j0R0kxASXyqyCwSTe46Amg/qm9Ux2l7Ra+ICQvfusbGjjm6yLI6gwPzKCM1s4DqjArTD5UchDBz8mW2im8vgmThxR6rk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725462244; c=relaxed/simple;
-	bh=cyh9GNwkSeiWX8VVWJet6cmrStrv1Y1BhHYKMAKCy08=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uI5zAJXzpWUoJZgABxcHIPoXgEGskaftgQqDoqKalKWQ7xTlurz0WKDipYE1rZcvMeOpV25cRSSEe7u+ef8O7NPPuJzgI5sxztVa3aOy+mtWP8MEHS/jtTp56IWGoUZHYq1mLjnHzoTnoa9wdawc8FaLdrU1GORiST3KhF37mvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ll8HoOkR; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1725464943; c=relaxed/simple;
+	bh=9ET7CwVzW3Y/Gyot7w2SlJZJyyMRXdJh6HR64nY8rkU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KZPBZ9+dqQsIbPkBYkci/N1+71V8ZzwGOQbbnDl0jsvTauOCWrBc/XLjho5AU1GiGdjLwULs8+SkJJK1Bww5JazTEdylEiTqxppdFYIYWB0v4lhD146XrzFxXK1lDLa4J1QB1ZvsHM6sZf3z3yVIIA2i1qXoQmUljQE/Iak0X8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VLp1/ysF; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ll8HoOkR"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725462241;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cyh9GNwkSeiWX8VVWJet6cmrStrv1Y1BhHYKMAKCy08=;
-	b=Ll8HoOkRe3qwTVfFKLaY5+vNGKRmlFzGa/2f6eFmcwF2G8tUkAKxoX4vAXLlYWCAskpSKq
-	of2HIHt03Pf1tvg87Kcd4sVtf7MbFAHcLYuGfogTD7bDuC/UtzPZ9wi4Bqu9M6c+ZpgoHQ
-	37lB0YLD14/RcojDUbgnRdcWCKkqHgc=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-633-BCdAfi9BNyOJcJCcVTiTfA-1; Wed,
- 04 Sep 2024 11:03:57 -0400
-X-MC-Unique: BCdAfi9BNyOJcJCcVTiTfA-1
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AC6E219560BD;
-	Wed,  4 Sep 2024 15:03:52 +0000 (UTC)
-Received: from virtlab1023.lab.eng.rdu2.redhat.com (virtlab1023.lab.eng.rdu2.redhat.com [10.8.1.187])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C2A273000239;
-	Wed,  4 Sep 2024 15:03:47 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: Sean Christopherson <seanjc@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VLp1/ysF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AEBA3C4CEC2;
+	Wed,  4 Sep 2024 15:49:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725464943;
+	bh=9ET7CwVzW3Y/Gyot7w2SlJZJyyMRXdJh6HR64nY8rkU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=VLp1/ysF6DNSNO7GL+lptXOXMih/o19RRXSbna4n9p2UQVehTAt5TTgji07VG4MO7
+	 TJ/6r3kgHQgQmw6g34tnLEWs0UMQiJeO5m8SnvnuJEnZ7v1kUrALGPFprQJRSXpRYR
+	 Tk8t1/ZchChOsYBlkLG74RfLdjIDWexxLmjrJ1WiuRIYO9i1UI+4exEZEaJKicRzpv
+	 qa6+3CHQW4o+gyRhpVtPAbFtD2DGYnQMEaLpoL8eUF1VcC2iIl61k3xUnbU5NilLTX
+	 gqs+dfup3GHOW9mCUOS1qM9+UEnxIFaYZDXnT2kq6JEKYbQRmA/5Td9mfcijoFrtiY
+	 TM3LzdzZXuaFA==
+Date: Wed, 4 Sep 2024 16:48:57 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Dave Martin <Dave.Martin@arm.com>
 Cc: Marc Zyngier <maz@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Tianrui Zhao <zhaotianrui@loongson.cn>,
-	Bibo Mao <maobibo@loongson.cn>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	loongarch@lists.linux.dev,
-	linux-mips@vger.kernel.org,
-	kvm-riscv@lists.infradead.org,
-	linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Chao Gao <chao.gao@intel.com>,
-	Kai Huang <kai.huang@intel.com>,
-	Farrah Chen <farrah.chen@intel.com>
-Subject: Re: [PATCH v4 00/10] KVM: Register cpuhp/syscore callbacks when enabling virt
-Date: Wed,  4 Sep 2024 11:03:44 -0400
-Message-ID: <20240904150344.177870-1-pbonzini@redhat.com>
-In-Reply-To: <20240830043600.127750-1-seanjc@google.com>
-References: 
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Fuad Tabba <tabba@google.com>, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v4 0/4] KVM: arm64: Fix underallocation of storage for
+ SVE state
+Message-ID: <a3f2f13e-be22-4a09-a8a6-5faef818defe@sirena.org.uk>
+References: <20240704-kvm-arm64-fix-pkvm-sve-vl-v4-0-b6898ab23dc4@kernel.org>
+ <86a5iw3ri2.wl-maz@kernel.org>
+ <fec60c7f-0cc3-44e2-8be1-09c120e8523e@sirena.org.uk>
+ <ZowGFl/1AEuevh96@e133380.arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="yeKNGGR1n0YihxRe"
+Content-Disposition: inline
+In-Reply-To: <ZowGFl/1AEuevh96@e133380.arm.com>
+X-Cookie: Linux is obsolete
 
-Queued, thanks.
 
-Paolo
+--yeKNGGR1n0YihxRe
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
+On Mon, Jul 08, 2024 at 04:30:30PM +0100, Dave Martin wrote:
+> On Fri, Jul 05, 2024 at 06:18:50PM +0100, Mark Brown wrote:
+> > On Fri, Jul 05, 2024 at 02:20:05PM +0100, Marc Zyngier wrote:
+> > > Mark Brown <broonie@kernel.org> wrote:
 
+> > > > As observed during review the pKVM support for saving host SVE state is
+> > > > broken if an asymmetric system has VLs larger than the maximum shared
+> > > > VL, fix this by discovering then using the maximum VL for allocations
+> > > > and using RDVL during the save/restore process.
+
+> > > I really don't see why we need such complexity here.
+
+> The first patch is orthogonal cleanup, and the rest doesn't really add
+> complexity IIUC.
+
+...
+
+> > Basically it's maintainability concerns, especially with the enumeration
+> > code.
+
+> I tend to agree here.
+
+Did anyone have any further thoughts on this?  It's been roughly a
+release cycle since I originally posted this, and there's been no
+changes requested since -rc1 (which was itself just a rebase).
+
+> The host could never use over-max VLs except in non-preemptible kernel
+> code, since code doing that would be non-migratable to other physical
+> CPUs.  This is done to probe SVE only, and the extra bits in the vector
+> registers are never used at all.
+
+> Can't pKVM just hide the non symmetrically supported VLs using ZCR_EL2,
+> just as regular KVM does for the guest?
+
+> (I may be making bad assumptions about pKVM's relationship with the host
+> kernel.)
+
+That's one for the pKVM people.
+
+--yeKNGGR1n0YihxRe
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmbYgWgACgkQJNaLcl1U
+h9BHAwf8D6ZCKGynDWz+yMuGcpeCTTE+wTrnOK/GQN3mMYt6pN4v0L8z5XEQZeco
+bL8rVYjugL/uRRv19TrzJcvm46VQlmDtkRD41B1dy7vZFp7DCID2tAkMQyFxu0NU
+jYF48UHUWtnDa5Tpluj+eSNvdHjqk4bvqLXSMmigSnQibu2R1HZ01l+bSrQgmwqn
+9B1d2VgTJPKnTtJJ8CNLocEM5zs2ZhPG3H+p4omSClALzNvSBUuUozhdfDeWm+1O
+IPwAVQR/1HG0YfYpah8cZKIYmz7pJHDSVol1SrfHF8LyLmdsTFGTMvloEiByi64I
+Stg+7CNujMMqFiaG7OxYFQ66xqJigQ==
+=dleX
+-----END PGP SIGNATURE-----
+
+--yeKNGGR1n0YihxRe--
