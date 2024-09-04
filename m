@@ -1,30 +1,32 @@
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 641441CCB5B
-	for <kvmarm@lists.linux.dev>; Wed,  4 Sep 2024 10:50:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF8A01CE6E1
+	for <kvmarm@lists.linux.dev>; Wed,  4 Sep 2024 10:50:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725447030; cv=none; b=hInLIx0yvSdu1kRStU6VE45jCV4n1QlaoZi77CjyN5xVSwbYcwC1NvDeHQeQgJLF5fl3eYXdlOWw2+BEEkY3ZtgCbxZFebQX7TpZUVaXEFy3Koygt0yOZwYz5EdceTnki0prZ//3O6P3KB9/vuWpOUBNzQF67Fmuu/QFLz/RR5Q=
+	t=1725447031; cv=none; b=WYLdcMrmdd9bwW7QXgI4WBaAWLIKIEaKHN+AuaKlBGX39k1D0D2IVA9IYH0cOEFpEJ90W28byIsvJ7vMF2WcqqC+SOjt0SRtHI7RXCeDepjjgKapMQEA7WDgBoiDNlkTX9bGAz0JLaveVykZ90AbcjcSGdQzitYUX1toXBcaF+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725447030; c=relaxed/simple;
-	bh=sEuKPtqYHBL0OQ8kh6UQG6Xi7tkjFRJXzncitRYwtjs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=R447ij7T0YkE4D7iVQN3H4RDA/mkzuyEg3swlMOa5CbJWWlBuR0u/zjmJRaMBtIPy39XKjoKoFPpisVrfrGikiThNXj2hLDP7z6GZe4YppjUKHPW7YmlT1V59SIogEQBBIHfZoySzQmQGoRRcMrWI0z8wuSpYVUY7iqnjAkGurA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=EFbICRFV; arc=none smtp.client-ip=95.215.58.179
+	s=arc-20240116; t=1725447031; c=relaxed/simple;
+	bh=OdXf2H2QDLSAtlOxK+CnZ9ratRbha5XGfAp3jGdKS2Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ZLfOhZ8DJhEqPH1dZricsfOmHmYbtvkZvCd+ijylAsMZonFagYuWQRvkj/J2FRlksCyfG5z0ypKe+2foXOA7GVgEfcfOODvK6ZbR2uRpDDt6/3NB7OY8J/zn1pVjO0skIJ6sB1TS8r632mXL/q06gp7fCwo77+/kPwf5HJwYUA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fZ0sTCwl; arc=none smtp.client-ip=95.215.58.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="EFbICRFV"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fZ0sTCwl"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1725447024;
+	t=1725447026;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=mriS1H0sJTSVPaDrzCARMiATA5eWDief//MW7qUXAF0=;
-	b=EFbICRFVSqlYITPSXqcNWPA0WOazR4AJIycYCljwu7mNHiJFebjXOtL5fzFKuZYVoKO9Cd
-	pOcp3gcZ48wUuLBSpa1aOPsCbNaq75WpYmjB7vvlrqTDN/cGmY7FPpiWjkpJ26p+8tfK7G
-	tE8sDUQ3EV8W3bQqkYlCr4uyaDo6fps=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=P8NNLQYH8P4X4ClL5Bx8RReyaTo01W2Due3h6Q3oXYc=;
+	b=fZ0sTCwlLwmNS4Qx14Caj3m7+Wf9GvHpK45FyYLnYSoeN3sTNUc9ZNhvJFFXKjE2qIit3w
+	xrRRlddFhToMEzSHA9L71dLm3+ol7hxzwVSZI5woh4aBt6SMFmmXNpDbpi/I3M9lEtpG9g
+	qWnZMd/+09bOVCE2Sd/kwb0IjKBB0FY=
 From: Andrew Jones <andrew.jones@linux.dev>
 To: kvm@vger.kernel.org,
 	kvm-riscv@lists.infradead.org,
@@ -40,9 +42,11 @@ Cc: pbonzini@redhat.com,
 	atishp@rivosinc.com,
 	cade.richard@berkeley.edu,
 	jamestiotio@gmail.com
-Subject: [kvm-unit-tests PATCH v2 0/4] Support cross compiling with clang
-Date: Wed,  4 Sep 2024 12:50:21 +0200
-Message-ID: <20240904105020.1179006-6-andrew.jones@linux.dev>
+Subject: [kvm-unit-tests PATCH v2 1/4] riscv: Drop mstrict-align
+Date: Wed,  4 Sep 2024 12:50:22 +0200
+Message-ID: <20240904105020.1179006-7-andrew.jones@linux.dev>
+In-Reply-To: <20240904105020.1179006-6-andrew.jones@linux.dev>
+References: <20240904105020.1179006-6-andrew.jones@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -52,30 +56,29 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Modify configure to allow --cc=clang and a cross-prefix to be specified
-together (as well as --cflags). This allows compiling with clang, but
-using cross binutils for everything else, including the linker. So far
-tested on riscv 32- and 64-bit and aarch64 (with some hacks to the code
-to get it to compile - which is why there's no gitlab-ci patch for aarch64
-in this series). I suspect it should work for other architectures too.
+The spec says unaligned accesses are supported, so this isn't required
+and clang doesn't support it. A platform might have slow unaligned
+accesses, but kvm-unit-tests isn't about speed anyway.
 
-v2:
- - fix building with clang and --config-efi by suppressing a warning
- - added riscv clang efi build to CI
- - picked up Thomas's tags
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
+---
+ riscv/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Andrew Jones (4):
-  riscv: Drop mstrict-align
-  Makefile: Prepare for clang EFI builds
-  configure: Support cross compiling with clang
-  riscv: gitlab-ci: Add clang build tests
-
- .gitlab-ci.yml | 43 +++++++++++++++++++++++++++++++++++++++++++
- Makefile       |  2 ++
- configure      | 11 ++++++++---
- riscv/Makefile |  2 +-
- 4 files changed, 54 insertions(+), 4 deletions(-)
-
+diff --git a/riscv/Makefile b/riscv/Makefile
+index 179a373dbacf..2ee7c5bb5ad8 100644
+--- a/riscv/Makefile
++++ b/riscv/Makefile
+@@ -76,7 +76,7 @@ LDFLAGS += -melf32lriscv
+ endif
+ CFLAGS += -DCONFIG_RELOC
+ CFLAGS += -mcmodel=medany
+-CFLAGS += -mstrict-align
++#CFLAGS += -mstrict-align
+ CFLAGS += -std=gnu99
+ CFLAGS += -ffreestanding
+ CFLAGS += -O2
 -- 
 2.46.0
 
