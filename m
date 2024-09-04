@@ -1,57 +1,41 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E2031CF5C3;
-	Wed,  4 Sep 2024 10:23:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC8A91CF7CE
+	for <kvmarm@lists.linux.dev>; Wed,  4 Sep 2024 10:31:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725445383; cv=none; b=gmqrYjuWSRgiLiUx07PDSs8ZWy1zUIH76bUNraqXt3vjNYoLbIJpnqNK19s63BmKJgpXl8nlEl8X+p9ENa4J5nMkyKE3vH569Ef5Vr6SYowIcqKdFrVZdRfB98hiiPlpFctccZqy55BI3CbXc6cdU/9UE7gSdmEvsoEiiZqF9QI=
+	t=1725445873; cv=none; b=D0s+OCcFkIGceV54Or3E2in+HpD+ODbmhnEghbbaE1/2QE7UyeF0XsfSDy+6wa/+I3Q4mrEYD9RqP+HynWExqmwr+/GwyaJ397lT5BEz1Jo5Bhu93UxrYGN0/hcfvQSPsF0whalqfR9awJVSdtRWjGlo6uKwzAlGik8y3yzxd0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725445383; c=relaxed/simple;
-	bh=x6g+EMj9hEE7gJBznAvd51VhitMf4AGn6YNEwakOXnM=;
+	s=arc-20240116; t=1725445873; c=relaxed/simple;
+	bh=yv0iiZG0Kyn4Al40nqXubRhpkBZN/vHgckwGLpDXWv0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OJxgnYI4acjk65mV/L8gHpuQ+EwBudAvI7GlTUTYff+T5DkA5XyUMvEOwyAY2hKVFuLDfY+IvpKsCfozoXj0On4kz18F0Hbqz6Qyou2daupbQEkhKX8Nh3EgFEVV1vx7Cs3RG6fYKj7gOs6r2WfqqokdC3wOyluXwF5TrVZS+Ew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XFuWolvo; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=XYfX6biNnc8EDP7xzBhqb5yCAe7dY80AMhO7jNowkgu0JHJNwNEduhX/NY0W3jHItO86oVhpIfCau15xe18bCXBDFGJCrTpk2m2ilXXqK0uHIeTxtSNAz0jLz9sB4XSfpYh3acoGUKU+ni5SWVYqEelqszGtASAfYZZQKzP+z70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=a1K0DUpO; arc=none smtp.client-ip=95.215.58.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XFuWolvo"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E02FEC4CEC6;
-	Wed,  4 Sep 2024 10:22:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725445382;
-	bh=x6g+EMj9hEE7gJBznAvd51VhitMf4AGn6YNEwakOXnM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XFuWolvohOrzFjBimZJsYPU40a03g6/+mE8Mf5MyAP+BtHCQ04YOEk3qScOLHFauH
-	 LHvXml9pB5vCkZObjlHtsowepQgfnDM0ZXqIYnHwqg+RVtgRYP0PCfrbaEsNTbu9Nf
-	 LklDAmkyWdjN4wkHFRPAcV7LSz7OKTnxR4MAvSHC0x1f8PBWRcwOlhLJ2k0w14koAs
-	 86Fgnm5u0+u999x7MXvWytZryAmoTWHrymaEp+DTUrlT1oUzsmEaY8g7A2F/gyuSgW
-	 0TSCRY37gyHXmyfic0kLPzDjGO4QFwgv25bixlW6H66a5BOAIPiZ0AZR+kAufu8J+E
-	 maWhiRUgAL2EA==
-Date: Wed, 4 Sep 2024 11:22:54 +0100
-From: Will Deacon <will@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	linux-arm-kernel@lists.infradead.org, nd@arm.com,
-	akpm@linux-foundation.org, aneesh.kumar@kernel.org,
-	aneesh.kumar@linux.ibm.com, anshuman.khandual@arm.com, bp@alien8.de,
-	broonie@kernel.org, christophe.leroy@csgroup.eu,
-	dave.hansen@linux.intel.com, hpa@zytor.com,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
-	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
-	oliver.upton@linux.dev, shuah@kernel.org, skhan@linuxfoundation.org,
-	szabolcs.nagy@arm.com, tglx@linutronix.de, x86@kernel.org,
-	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v5 06/30] arm64: context switch POR_EL0 register
-Message-ID: <20240904102254.GA13280@willie-the-truck>
-References: <20240822151113.1479789-1-joey.gouly@arm.com>
- <20240822151113.1479789-7-joey.gouly@arm.com>
- <20240823144531.GH32156@willie-the-truck>
- <Zsi7ovLOfuFdfuuz@arm.com>
- <20240823170835.GA1181@willie-the-truck>
- <ZsjXtE7Kg0LQwNAL@arm.com>
- <20240827113803.GB4318@willie-the-truck>
- <ZtYNGBrcE-j35fpw@arm.com>
- <20240903145413.GB3669886@e124191.cambridge.arm.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="a1K0DUpO"
+Date: Wed, 4 Sep 2024 12:31:03 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1725445868;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VyKvNgtoMrVx3fAVtA4/OoVtytmNaDZAp4IyKrDyjcI=;
+	b=a1K0DUpO8mmErOfKiPgYIgei6ZCFtp1C2g0grZ5qpQey1pE+U28UYPP/mvF2Yor9qCra6i
+	DQMbXlZP2SpLxrunSfSiRNIcOqjlRzeD7CaCqH2l4S16/xYJ10yf3sYekwjJJoB9bYrsw4
+	EOuiWCeXPXU5Y7KCOOnts/OmTGKGLB0=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org
+Cc: pbonzini@redhat.com, thuth@redhat.com, lvivier@redhat.com, 
+	frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com, atishp@rivosinc.com, 
+	cade.richard@berkeley.edu, jamestiotio@gmail.com
+Subject: Re: [kvm-unit-tests PATCH 0/3] Support cross compiling with clang
+Message-ID: <20240904-b4568b20f98773096c0ebbf8@orel>
+References: <20240903163046.869262-5-andrew.jones@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -60,85 +44,43 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240903145413.GB3669886@e124191.cambridge.arm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20240903163046.869262-5-andrew.jones@linux.dev>
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Sep 03, 2024 at 03:54:13PM +0100, Joey Gouly wrote:
-> On Mon, Sep 02, 2024 at 08:08:08PM +0100, Catalin Marinas wrote:
-> > On Tue, Aug 27, 2024 at 12:38:04PM +0100, Will Deacon wrote:
-> > > On Fri, Aug 23, 2024 at 07:40:52PM +0100, Catalin Marinas wrote:
-> > > > On Fri, Aug 23, 2024 at 06:08:36PM +0100, Will Deacon wrote:
-> > > > > On Fri, Aug 23, 2024 at 05:41:06PM +0100, Catalin Marinas wrote:
-> > > > > > On Fri, Aug 23, 2024 at 03:45:32PM +0100, Will Deacon wrote:
-> > > > > > > On Thu, Aug 22, 2024 at 04:10:49PM +0100, Joey Gouly wrote:
-> > > > > > > > +static void permission_overlay_switch(struct task_struct *next)
-> > > > > > > > +{
-> > > > > > > > +	if (!system_supports_poe())
-> > > > > > > > +		return;
-> > > > > > > > +
-> > > > > > > > +	current->thread.por_el0 = read_sysreg_s(SYS_POR_EL0);
-> > > > > > > > +	if (current->thread.por_el0 != next->thread.por_el0) {
-> > > > > > > > +		write_sysreg_s(next->thread.por_el0, SYS_POR_EL0);
-> > > > > > > > +		/* ISB required for kernel uaccess routines when chaning POR_EL0 */
-> > > > > > >
-> > > > > > > nit: typo "chaning".
-> > > > > > >
-> > > > > > > But more substantially, is this just to prevent spurious faults in the
-> > > > > > > context of a new thread using a stale value for POR_EL0?
-> > > > > >
-> > > > > > Not just prevent faults but enforce the permissions from the new
-> > > > > > thread's POR_EL0. The kernel may continue with a uaccess routine from
-> > > > > > here, we can't tell.
-> > [...]
-> > > > > So what do we actually gain by having the uaccess routines honour this?
-> > > >
-> > > > I guess where it matters is more like not accidentally faulting because
-> > > > the previous thread had more restrictive permissions.
-> > >
-> > > That's what I wondered initially, but won't the fault handler retry in
-> > > that case?
-> >
-> > Yes, it will retry and this should be fine (I assume you are only
-> > talking about the dropping ISB in the context switch).
-> >
-> > For the case of running with a more permissive stale POR_EL0, arguably it's
-> > slightly more predictable for the user but, OTOH, some syscalls like
-> > readv() could be routed through GUP with no checks. As with MTE, we
-> > don't guarantee uaccesses honour the user permissions.
-> >
-> > That said, at some point we should sanitise this path anyway and have a
-> > single ISB at the end. In the meantime, I'm fine with dropping the ISB
-> > here.
-> >
+On Tue, Sep 03, 2024 at 06:30:47PM GMT, Andrew Jones wrote:
+> Modify configure to allow --cc=clang and a cross-prefix to be specified
+> together (as well as --cflags). This allows compiling with clang, but
+> using cross binutils for everything else, including the linker. So far
+> tested on riscv 32- and 64-bit and aarch64 (with some hacks to the code
+> to get it to compile - which is why there's no gitlab-ci patch for aarch64
+> in this series). I suspect it should work for other architectures too.
 > 
-> commit 3141fb86bee8d48ae47cab1594dad54f974a8899
-> Author: Joey Gouly <joey.gouly@arm.com>
-> Date:   Tue Sep 3 15:47:26 2024 +0100
+> Andrew Jones (3):
+>   riscv: Drop mstrict-align
+>   configure: Support cross compiling with clang
+>   riscv: gitlab-ci: Add clang build tests
 > 
->     fixup! arm64: context switch POR_EL0 register
+>  .gitlab-ci.yml | 28 ++++++++++++++++++++++++++++
+>  configure      | 11 ++++++++---
+>  riscv/Makefile |  2 +-
+>  3 files changed, 37 insertions(+), 4 deletions(-)
 > 
-> diff --git a/arch/arm64/kernel/process.c b/arch/arm64/kernel/process.c
-> index a3a61ecdb165..c224b0955f1a 100644
-> --- a/arch/arm64/kernel/process.c
-> +++ b/arch/arm64/kernel/process.c
-> @@ -515,11 +515,8 @@ static void permission_overlay_switch(struct task_struct *next)
->                 return;
-> 
->         current->thread.por_el0 = read_sysreg_s(SYS_POR_EL0);
-> -       if (current->thread.por_el0 != next->thread.por_el0) {
-> +       if (current->thread.por_el0 != next->thread.por_el0)
->                 write_sysreg_s(next->thread.por_el0, SYS_POR_EL0);
-> -               /* ISB required for kernel uaccess routines when chaning POR_EL0 */
-> -               isb();
-> -       }
->  }
+> -- 
+> 2.46.0
 
-What about the one in flush_poe()? I'm inclined to drop that as well.
+When compiling with clang and --config-efi I hit
 
-> Will, do you want me to re-send the series with this and the permissions
-> diff from the other thread [1],
-> or you ok with applying them when you pull it in?
+lib/efi.c:342:29: error: field 'vendor' with variable sized type 'struct efi_vendor_dev_path' not at the end of a struct or class is a GNU extension [-Werror,-Wgnu-variable-sized-type-not-at-end]
+  342 |         struct efi_vendor_dev_path      vendor;
+      |                                         ^
+1 error generated.
 
-I'll have a crack now, but if it fails miserably then I'll let you know.
+Our efi code is exactly the same as the Linux code, but Linux avoids that
+warning with -Wno-gnu. We could also add that to EFI_CFLAGS, but I think
+I'll just add -Wno-gnu-variable-sized-type-not-at-end since I like seeing
+these things as they come.
 
-Will
+I'll send a v2 with a Makefile patch added.
+
+Thanks,
+drew
