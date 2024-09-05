@@ -1,51 +1,59 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F2D3198A2A;
-	Thu,  5 Sep 2024 08:11:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DB0027735;
+	Thu,  5 Sep 2024 08:17:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725523875; cv=none; b=WzgqS9czp+/DOP0cDt9No9q3HvK2wkD9mkggLcQWLL6SwmVsEu5rmdsL1B1lexEjkZWPN1yuL7UnVoB6+/MOKjxvR0xrnSbjzKYVSJLcWa5W+3bWrDIhHH1L74ZQ6RfkFSud11f+ECxEXD3MiegUnMUHOAPXePiIq43Du6obTBk=
+	t=1725524272; cv=none; b=TBIWN17IN7D8zSO707NK4keCwie+p/QJ/nR4Wy/mxLtTKMIMRP9Gayry2/dDcqWyR58R9eHze/5Rp1cohu5lDtjBnMYv9YHfK5El/+VpDn0dynJhE6WrW/XotEs9XekBpDe4KnOMULf3bl/3K8bduqpX7l7zAPmY39oXYqBUmyU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725523875; c=relaxed/simple;
-	bh=eUD04zlafn+wiXqeYlufuTdlxuxhQPQinUvJdRHnqy0=;
+	s=arc-20240116; t=1725524272; c=relaxed/simple;
+	bh=4BgpG7pyrHOCPPJY6stTA1hZpalX0Vyz6jSvDtEs21k=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qLYYqQC0Um8SmIXDyQb3n5swLiFoCYKDFCMTKln4ZnJ68tXmTh0PulvKqsY5wjVrszd1I09ZgBfmDNDfi/063beTLkKZDvhQze6a8XHNV+8+K2pwilwJhwWeFHOPDI/f6WKgWNmbxdn8svLZzU9+ik7MTnOLbY4KnwfwXsYF5mk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yto2ZNSi; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=ZvKXiNNuohBJzFNBh2oNHejf2rbo3n7NHxpmgqjbVCes4b+WInaQBDuxeSF1eRpwjN5s3qEvvKZQRwjSH9OS1EL2OVoDw3Ce5wkxwBMrSuKVn7t5a8urA5uCCQFxWNG2saYaHwIBDJbf/MUXJ6bYeIumxjglUSbA9mOrrg9goM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WWyeyYtc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yto2ZNSi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 824FBC4CEC4;
-	Thu,  5 Sep 2024 08:11:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WWyeyYtc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01043C4CEC6;
+	Thu,  5 Sep 2024 08:17:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725523874;
-	bh=eUD04zlafn+wiXqeYlufuTdlxuxhQPQinUvJdRHnqy0=;
+	s=k20201202; t=1725524272;
+	bh=4BgpG7pyrHOCPPJY6stTA1hZpalX0Vyz6jSvDtEs21k=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Yto2ZNSiJbYgqNuZgAF8BVoVKlFLn3SWpT+2IdwIHG10gmH6rRxOGOuaBuFoLsKQy
-	 EiQghyh9NOAHk52FjbzPgUzXdj24+OFD+CW916ZIvzs/8VFrSlivW2e3qycekYeIvK
-	 EjiptqE66af0nt322Gd978d2WHAPl36ZZPoVFP6THed3CRxPFnS6+XYt0rY5QhgPSl
-	 2jR+ENyHGjFn4N4D4dF003yLHrav7DcMhKJqOHTVErWv/S2hVyuXE5Igu5FJ5UJtgG
-	 MeoN2gS4Htj26o5FkszjqwycGI5gHpHBKlHv4yLAvLUFvzpS1d9/wzBeUq/GQ1ULnR
-	 lGnSccPjqXsWA==
+	b=WWyeyYtcPUUdm/2HfEdk3D8kxVLsWtQ/nWkjwM9J6Y/elUalWvhJ7Mp2OBGhQVQxN
+	 MpVZ3TSNFobeWrxwDPNgJ/a4uLzuh/G7762jrsVXNM/g3Xe1qicjmGnLyS+gBvJIsN
+	 PqJbIHV+HCpLAc782dyqiZEopKjxo3NuWAQpTAM5yvxQOiIUdZESIfgBYXpRBkasBp
+	 J96jA9wuYLcy8E7//xMlT6TUc7Iq2xcXaYZuG2w6wGOCpRQKlJ2SuvIyMiw9m6HSao
+	 u2+aDQfskgGQpLtOAf2hD3BeNeyb+nOwQQ51V3glA43pRPwDagbd7bmI0taw1UFBKl
+	 BaajngYl/5dCw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sm7aB-009rdr-Jj;
-	Thu, 05 Sep 2024 09:11:11 +0100
-Date: Thu, 05 Sep 2024 09:11:11 +0100
-Message-ID: <86mskmv7ts.wl-maz@kernel.org>
+	id 1sm7gb-009rov-Fa;
+	Thu, 05 Sep 2024 09:17:49 +0100
+Date: Thu, 05 Sep 2024 09:17:49 +0100
+Message-ID: <86jzfqv7iq.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: qixiang.xu@outlook.com
-Cc: oliver.upton@linux.dev,
-	will@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/1] KVM: arm64: Make nVHE ASLR conditional on nokaslr
-In-Reply-To: <SEZPR04MB631983048A8586896CEFE8829E9D2@SEZPR04MB6319.apcprd04.prod.outlook.com>
-References: <20240905061659.3410362-1-qixiang.xu@outlook.com>
-	<20240905063026.3411766-1-qixiang.xu@outlook.com>
-	<SEZPR04MB631983048A8586896CEFE8829E9D2@SEZPR04MB6319.apcprd04.prod.outlook.com>
+To: Tangnianyao <tangnianyao@huawei.com>
+Cc: Ard Biesheuvel <ardb@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	<oliver.upton@linux.dev>,
+	<linux-arm-kernel@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>,
+	<kvmarm@lists.linux.dev>,
+	"guoyang (C)"
+	<guoyang2@huawei.com>
+Subject: Re: Question on get random long worse in VM than on host
+In-Reply-To: <bdf1471e-56aa-893c-0336-81828c8cb5c1@huawei.com>
+References: <214e37e9-7aba-1e61-f63f-85cb10c9a878@huawei.com>
+	<86zfotuoio.wl-maz@kernel.org>
+	<CAMj1kXGocnZPe4EfzsB6xd2QZacp-a45R5f5f6FDpVtVEXCcGQ@mail.gmail.com>
+	<86y14dun1f.wl-maz@kernel.org>
+	<CAMj1kXF3JrDs=xvRmvTxS9du1F-gjSVe5qVZrPO5JLT5ho0riA@mail.gmail.com>
+	<f39ccb21-cc28-b878-bf5e-e81e378a299e@huawei.com>
+	<CAMj1kXGyJSwD=ok=Ag11mMh3d6onQkN0b_-iVwVDdyrwk5rj6Q@mail.gmail.com>
+	<bdf1471e-56aa-893c-0336-81828c8cb5c1@huawei.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -57,62 +65,95 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: qixiang.xu@outlook.com, oliver.upton@linux.dev, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: tangnianyao@huawei.com, ardb@kernel.org, will@kernel.org, oliver.upton@linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, guoyang2@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 05 Sep 2024 07:30:26 +0100,
-qixiang.xu@outlook.com wrote:
+On Thu, 05 Sep 2024 04:12:42 +0100,
+Tangnianyao <tangnianyao@huawei.com> wrote:
 > 
-> From: Qxiang Xu <qixiang.xu@outlook.com>
 > 
-> The random tag of hyp VA is determined by the `CONFIG_RANDOMIZE_BASE`
-> option, so even if `nokaslr` is set in the cmdline, KASLR cannot be
-> disabled for hyp VA. To align with kernel behavior, disable KASLR if
-> the kernel cmdline includes `nokaslr`.
 > 
-> Link: https://lore.kernel.org/r/20240905061659.3410362-1-qixiang.xu@outlook.com
-
-I get a 404.
-
-> Signed-off-by: Qxiang Xu <qixiang.xu@outlook.com>
-> ---
->  arch/arm64/kvm/va_layout.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> On 9/3/2024 23:04, Ard Biesheuvel wrote:
+> > On Tue, 3 Sept 2024 at 03:39, Tangnianyao <tangnianyao@huawei.com> wrote:
+> >>
+> >>
+> >> On 9/3/2024 5:26, Ard Biesheuvel wrote:
+> >>> On Sat, 31 Aug 2024 at 10:14, Marc Zyngier <maz@kernel.org> wrote:
+> >>>> On Sat, 31 Aug 2024 08:56:23 +0100,
+> >>>> Ard Biesheuvel <ardb@kernel.org> wrote:
+> >>>>> As for RNDR/RNDRRS vs TRNG: the former is not a raw entropy source, it
+> >>>>> is a DRBG (or CSPRNG) which provides cryptographically secure random
+> >>>>> numbers whose security strength is limited by the size of the seed.
+> >>>>> TRNG does not have this limitation in principle, although non-p KVM
+> >>>>> happily seeds it from the kernel's entropy pool, which has the same
+> >>>>> limitation in practice.
+> >>>> Is that something we should address? I assume that this has an impact
+> >>>> on the quality of the provided random numbers?
+> >>>>
+> >>> To be honest, I personally find the distinction rather theoretical - I
+> >>> think it will be mostly the FIPS fetishists who may object to the
+> >>> seeding of a DRBG of security strength 'n' from the kernel entropy
+> >>> pool without proving that the sample has 'n' bits of entropy.
+> >>>
+> >>> For pKVM, the concern was that the untrusted host could observe and
+> >>> manipulate the entropy and therefore the protected guest's entropy
+> >>> source, which is why the hypervisor relays TRNG SMCCC calls directly
+> >>> to the secure firmware in that case. The quality of the entropy was
+> >>> never a concern here.
+> >>>
+> >>> .
+> >>>
+> >> Thank you for reply.
+> >>
+> >> In case that EL3 firmware not support SMCCC TRNG, host and guest can only
+> >> get randomness from DRBG-based RNDRRS, right?
+> >>
+> > There are other, non-architected ways too to get entropy and/or
+> > randomness. There are many hardware random number generator
+> > peripherals that the OS can drive directly, and there are vendor
+> > specific EL3 services too that a system might use.
+> >
+> > RNDR/RNDRRS does not exist yet in practical terms - there are very few
+> > SOCs that actually implement that used in the field.
+> >
+> >> In this case, guest get DRBG-based randomness via HVC and host, but the
+> >> randomness returned by host kvm is not really backed by EL3 SMCCC TRNG,
+> >> and actually get from DRBG-based RNDRRS.
+> >> Is this hvc process is redundancy?
+> >>
+> > I don't understand this question. How the host obtains its entropy
+> > and/or randomness and how the guest does it are completely separate
+> > concerns.
+> >
+> > .
+> >
 > 
-> diff --git a/arch/arm64/kvm/va_layout.c b/arch/arm64/kvm/va_layout.c
-> index 91b22a014610..bebb4b1ddc82 100644
-> --- a/arch/arm64/kvm/va_layout.c
-> +++ b/arch/arm64/kvm/va_layout.c
-> @@ -72,7 +72,7 @@ __init void kvm_compute_layout(void)
->  	va_mask = GENMASK_ULL(tag_lsb - 1, 0);
->  	tag_val = hyp_va_msb;
->  
-> -	if (IS_ENABLED(CONFIG_RANDOMIZE_BASE) && tag_lsb != (vabits_actual - 1)) {
-> +	if (kaslr_enabled() && tag_lsb != (vabits_actual - 1)) {
->  		/* We have some free bits to insert a random tag. */
->  		tag_val |= get_random_long() & GENMASK_ULL(vabits_actual - 2, tag_lsb);
->  	}
+> Process is different between host and guest in arch/arm64, arch_get_random_seed_longs.
+> (1) In host , smccc_trng_available is false, it get randomness from RNDRRS.
+> 
+> (2) In guest, smccc_trng_available is true, because kvm emulate it. Guest use smccc trng
+> and hvc, and trap to host kvm. Then in host call stack:
+> kvm_smccc_call_handler
+> kvm_trng_call
+> kvm_trng_do_rnd
+> get_random_long
+> ...
+> arch_get_random_seed_longs
+> 
+> host get randomness as (1) and return random u64 to guest.
+> So the randomness guest finally get is from RNDRRS too.
+> Can we let guest get randomness directly from RNDRRS, not using hvc first?
+> The process for guest like (1):
+> 1) kvm not emulated smccc trng for guest
+> 2) guest check smccc trng, and get smccc_trng_available=false
+> 3) guest get randomness from RNDRRS
 
-This is a change in behaviour that would leave the 2 implementations
-affected by Spectre-v3a unmitigated and leaking information to
-*guests*, while they would have been safe until this change. Is this
-what we really want to do?
-
-This is also not disabling the whole thing, since we still do the
-indirect vector dance.
-
-So while I'm not opposed to having an option that disables the
-randomisation, it has to match two requirements:
-
-- it has to be a *new* option -- changing an existing behaviour is not
-  acceptable,
-
-- it has to disable both the VA alteration and the vector indirection.
-
-Thanks,
+I think I gave you the answer to this in my first reply [1].
 
 	M.
+
+[1] https://lore.kernel.org/all/86zfotuoio.wl-maz@kernel.org/
 
 -- 
 Without deviation from the norm, progress is not possible.
