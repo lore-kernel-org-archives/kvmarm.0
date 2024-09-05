@@ -1,235 +1,116 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A71219B587
-	for <kvmarm@lists.linux.dev>; Thu,  5 Sep 2024 13:58:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 970C019A2B7;
+	Thu,  5 Sep 2024 14:57:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725544709; cv=none; b=SHEm+3nDI40AM0k/tDb3DxtW+pWtHjdJksIeS17vlGmEJAesrhflSAFGdyDocoTr5sEd9x5sgZwRU3/iHqgGvaPnW/u9FwbQXpVWhq/t1vHwf8u9vFX6pV09IeBEnd8DoRppoQVBsZHiC/oaY8gpKPagmCQPCCxUFxXTS59MBMI=
+	t=1725548238; cv=none; b=B5GbsCXxVsemFnAbE1zTPKFq/IwCO3r88m0U61ovMd0K6QIFZG5aAOFy3g8UCgrFaivYFtYkATQiEO/Myw/Sk/PXWjb4vHe4TDJCsZZGpdddsLyt8j66i/fCB82NuPhgKGwZFZ0r6YCQGkPH34nSp5Gd2mK2jK2jSv0aXR1+hJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725544709; c=relaxed/simple;
-	bh=a5Kk3x/Tvcg3X5Q0R0DgBGxKuFTS9FJU13+dfqvRM+Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UMNZ7Da6MYb25PZs7w3F/7BCtfE0M5vPL+EUrpgpa36Yd891ziKq9K5ozBLrzfkm83ofd/scKztcE08wzIz9wBDxdAR2lOiVQ0pJ0rtVoDCiwTET3gYgc3+V/kAI7EO63Y8eGZ9QGPLX//2ZQYe733zV1DBV1K0UUXXXEnnP4fw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 61916FEC;
-	Thu,  5 Sep 2024 06:58:53 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6CAF53F73F;
-	Thu,  5 Sep 2024 06:58:25 -0700 (PDT)
-Date: Thu, 5 Sep 2024 14:58:20 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+	s=arc-20240116; t=1725548238; c=relaxed/simple;
+	bh=KAHi3umxUR4oy96Bn7I3kG7qlY5Uqzhzj0ufsrwwPRA=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Q0NY5Xg+rFtUH8VT/iMWZ44vWbe3I7Yn4ECjL4oD1ZHaFmzVTkHEUqfKekYUcSze6FJ3Q9lVMbMIRQ/swj5l9bSWXPsQBfQ4tTJMywCLrmnl/ccm8dYAY2bPB1snyWihhNYQqAl65OI6vBEHJNHUGblffO30XHHvvejmIrh8L4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MdMAbHlu; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MdMAbHlu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C0A3C4CECB;
+	Thu,  5 Sep 2024 14:57:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725548238;
+	bh=KAHi3umxUR4oy96Bn7I3kG7qlY5Uqzhzj0ufsrwwPRA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=MdMAbHlumLZf52D59lasIUksNWhnyWNNT3REL5qMUhs4Nn30USb1tTXrki98khANW
+	 suzL5zOptzsWiEul+DcEFVNwPZREgLSBNoGhYjpWtdb08YEQc2444oQ/BYA3wCG4Uj
+	 AftAJzNUu0vli8PVoPp81kBHkDsIMF0bVUZHQkGiu3iTmJAG+ssxjcK40Q4EMRW6rq
+	 oUcaVSoCN8Rc7KxG/iokcR8OaIXYyEo+erAbYrJlYgMy1M4mfywMsR9/RzjqecbsLu
+	 m63CyWq7NBmkeiux+/abXF5HX6OLeqHFXachfWMqzf+qg2UllC8JRfjT6zDek3/Ara
+	 yA5PtnwBX58Dg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1smDv8-009zQN-DJ;
+	Thu, 05 Sep 2024 15:57:15 +0100
+Date: Thu, 05 Sep 2024 15:57:13 +0100
+Message-ID: <86ikvaup12.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Mark Brown <broonie@kernel.org>
 Subject: Re: [PATCH v2 12/16] KVM: arm64: Implement AT S1PIE support
-Message-ID: <20240905135820.GA4142389@e124191.cambridge.arm.com>
+In-Reply-To: <20240905135820.GA4142389@e124191.cambridge.arm.com>
 References: <20240903153834.1909472-1-maz@kernel.org>
- <20240903153834.1909472-13-maz@kernel.org>
+	<20240903153834.1909472-13-maz@kernel.org>
+	<20240905135820.GA4142389@e124191.cambridge.arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240903153834.1909472-13-maz@kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, alexandru.elisei@arm.com, broonie@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hello Marc!
+Hi Joey,
 
-On Tue, Sep 03, 2024 at 04:38:30PM +0100, Marc Zyngier wrote:
-> It doesn't take much effort to imple,emt S1PIE support in AT.
-> This is only a matter of using the AArch64.S1IndirectBasePermissions()
-> encodings for the permission, ignoring GCS which has no impact on AT,
-> and enforce FEAT_PAN3 being enabled as this is a requirement of
-> FEAT_S1PIE.
+Thanks for having a look.
+
+On Thu, 05 Sep 2024 14:58:20 +0100,
+Joey Gouly <joey.gouly@arm.com> wrote:
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/at.c | 136 +++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 135 insertions(+), 1 deletion(-)
+> Hello Marc!
 > 
-> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-> index 68f5b89598ec..bd7e1b32b049 100644
-> --- a/arch/arm64/kvm/at.c
-> +++ b/arch/arm64/kvm/at.c
-> @@ -736,6 +736,23 @@ static u64 compute_par_s1(struct kvm_vcpu *vcpu, struct s1_walk_result *wr,
->  	return par;
->  }
->  
-> +static bool s1pie_enabled(struct kvm_vcpu *vcpu, enum trans_regime regime)
-> +{
-> +	if (!kvm_has_feat(vcpu->kvm, ID_AA64MMFR3_EL1, S1PIE, IMP))
-> +		return false;
-> +
-> +	switch (regime) {
-> +	case TR_EL2:
-> +	case TR_EL20:
-> +		return __vcpu_sys_reg(vcpu, TCR2_EL2) & TCR2_EL2_PIE;
-> +	case TR_EL10:
-> +		return  (__vcpu_sys_reg(vcpu, HCRX_EL2) & HCRX_EL2_TCR2En) &&
-> +			(__vcpu_sys_reg(vcpu, TCR2_EL1) & TCR2_EL1x_PIE);
-> +	default:
-> +		BUG();
-> +	}
-> +}
-> +
->  static bool pan3_enabled(struct kvm_vcpu *vcpu, enum trans_regime regime)
->  {
->  	u64 sctlr;
-> @@ -743,6 +760,9 @@ static bool pan3_enabled(struct kvm_vcpu *vcpu, enum trans_regime regime)
->  	if (!kvm_has_feat(vcpu->kvm, ID_AA64MMFR1_EL1, PAN, PAN3))
->  		return false;
->  
-> +	if (s1pie_enabled(vcpu, regime))
-> +		return true;
-> +
->  	if (regime == TR_EL10)
->  		sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL1);
->  	else
-> @@ -826,12 +846,126 @@ static void compute_s1_hierarchical_permissions(struct kvm_vcpu *vcpu,
->  	}
->  }
->  
-> +#define pi_idx(v, r, i)	((__vcpu_sys_reg((v), (r)) >> ((i) * 4)) & 0xf)
-> +
-> +#define set_priv_perms(p, r, w, x)	\
-> +	do {				\
-> +		(p)->pr = (r);		\
-> +		(p)->pw = (w);		\
-> +		(p)->px = (x);		\
-> +	} while (0)
-> +
-> +#define set_unpriv_perms(p, r, w, x)	\
-> +	do {				\
-> +		(p)->ur = (r);		\
-> +		(p)->uw = (w);		\
-> +		(p)->ux = (x);		\
-> +	} while (0)
-> +
-> +/* Similar to AArch64.S1IndirectBasePermissions(), without GCS  */
-> +#define set_perms(w, p, ip)						\
-> +	do {								\
-> +		switch ((ip)) {						\
-> +		case 0b0000:						\
-> +			set_ ## w ## _perms((p), false, false, false);	\
-> +			break;						\
-> +		case 0b0001:						\
-> +			set_ ## w ## _perms((p), true , false, false);	\
-> +			break;						\
-> +		case 0b0010:						\
-> +			set_ ## w ## _perms((p), false, false, true );	\
-> +			break;						\
-> +		case 0b0011:						\
-> +			set_ ## w ## _perms((p), true , false, true );	\
-> +			break;						\
-> +		case 0b0100:						\
-> +			set_ ## w ## _perms((p), false, false, false);	\
-> +			break;						\
-> +		case 0b0101:						\
-> +			set_ ## w ## _perms((p), true , true , false);	\
-> +			break;						\
-> +		case 0b0110:						\
-> +			set_ ## w ## _perms((p), true , true , true );	\
-> +			break;						\
-> +		case 0b0111:						\
-> +			set_ ## w ## _perms((p), true , true , true );	\
-> +			break;						\
-> +		case 0b1000:						\
-> +			set_ ## w ## _perms((p), true , false, false);	\
-> +			break;						\
-> +		case 0b1001:						\
-> +			set_ ## w ## _perms((p), true , false, false);	\
-> +			break;						\
-> +		case 0b1010:						\
-> +			set_ ## w ## _perms((p), true , false, true );	\
-> +			break;						\
-> +		case 0b1011:						\
-> +			set_ ## w ## _perms((p), false, false, false);	\
-> +			break;						\
-> +		case 0b1100:						\
-> +			set_ ## w ## _perms((p), true , true , false);	\
-> +			break;						\
-> +		case 0b1101:						\
-> +			set_ ## w ## _perms((p), false, false, false);	\
-> +			break;						\
-> +		case 0b1110:						\
-> +			set_ ## w ## _perms((p), true , true , true );	\
-> +			break;						\
-> +		case 0b1111:						\
-> +			set_ ## w ## _perms((p), false, false, false);	\
-> +			break;						\
-> +		}							\
-> +	} while (0)
-> +
-> +static void compute_s1_indirect_permissions(struct kvm_vcpu *vcpu,
-> +					    struct s1_walk_info *wi,
-> +					    struct s1_walk_result *wr,
-> +					    struct s1_perms *s1p)
-> +{
-> +	u8 up, pp, idx;
-> +
-> +	idx = (FIELD_GET(GENMASK(54, 53), wr->desc) << 2	|
-> +	       FIELD_GET(BIT(51), wr->desc) << 1		|
-> +	       FIELD_GET(BIT(6), wr->desc));
-> +
-> +	switch (wi->regime) {
-> +	case TR_EL10:
-> +		pp = pi_idx(vcpu, PIR_EL1, idx);
-> +		up = pi_idx(vcpu, PIRE0_EL1, idx);
-> +		break;
-> +	case TR_EL20:
-> +		pp = pi_idx(vcpu, PIR_EL2, idx);
-> +		up = pi_idx(vcpu, PIRE0_EL2, idx);
-> +		break;
-> +	case TR_EL2:
-> +		pp = pi_idx(vcpu, PIR_EL2, idx);
-> +		up = 0;
-> +		break;
-> +	}
-> +
-> +	set_perms(priv, s1p, pp);
-> +
-> +	if (wi->regime != TR_EL2)
-> +		set_perms(unpriv, s1p, up);
-> +	else
-> +		set_unpriv_perms(s1p, false, false, false);
-> +
-> +	if (s1p->px && s1p->uw) {
-> +		set_priv_perms(s1p, false, false, false);
-> +		set_unpriv_perms(s1p, false, false, false);
-> +	}
-> +}
-> +
->  static void compute_s1_permissions(struct kvm_vcpu *vcpu, u32 op,
->  				   struct s1_walk_info *wi,
->  				   struct s1_walk_result *wr,
->  				   struct s1_perms *s1p)
->  {
-> -	compute_s1_direct_permissions(vcpu, wi, wr, s1p);
-> +	if (!s1pie_enabled(vcpu, wi->regime))
-> +		compute_s1_direct_permissions(vcpu, wi, wr, s1p);
-> +	else
-> +		compute_s1_indirect_permissions(vcpu, wi, wr, s1p);
-> +
->  	compute_s1_hierarchical_permissions(vcpu, wi, wr, s1p);
+> >  static void compute_s1_permissions(struct kvm_vcpu *vcpu, u32 op,
+> >  				   struct s1_walk_info *wi,
+> >  				   struct s1_walk_result *wr,
+> >  				   struct s1_perms *s1p)
+> >  {
+> > -	compute_s1_direct_permissions(vcpu, wi, wr, s1p);
+> > +	if (!s1pie_enabled(vcpu, wi->regime))
+> > +		compute_s1_direct_permissions(vcpu, wi, wr, s1p);
+> > +	else
+> > +		compute_s1_indirect_permissions(vcpu, wi, wr, s1p);
+> > +
+> >  	compute_s1_hierarchical_permissions(vcpu, wi, wr, s1p);
+> 
+> Is this (and the previous patch to split this up) right?
+> 
+> Looking at this from the ARM ARM (ARM DDI 0487K.a):
+> 
+> 	R JHSVW If Indirect permissions are used, then hierarchical
+> 	permissions are disabled and TCR_ELx.HPDn are RES 1.
 
-Is this (and the previous patch to split this up) right?
+Odd. I was convinced that it was when S1POE is enabled that HPs were
+disabled. But you are absolutely right, and it is once more proven
+that I can't read. Oh well.
 
-Looking at this from the ARM ARM (ARM DDI 0487K.a):
+Not to worry, I've since found other issues with this series. I have
+forgotten the patch dealing with the fast path on another branch, and
+since decided that TCR2_EL2 needed extra care to cope with individual
+features being disabled.
 
-	R JHSVW If Indirect permissions are used, then hierarchical permissions are disabled and TCR_ELx.HPDn are RES 1.
+The rework is still useful, as I'm looking at POE as well, but I need
+to hoist the HP stuff up a notch.
 
->  
->  	if (op == OP_AT_S1E1RP || op == OP_AT_S1E1WP) {
-> -- 
+I'll repost things once I've sorted these things up.
 
-Thanks,
-Joey
+Thanks again,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
