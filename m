@@ -1,106 +1,224 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B33DD529
-	for <kvmarm@lists.linux.dev>; Thu,  5 Sep 2024 15:37:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 694781B5ED6;
+	Thu,  5 Sep 2024 23:58:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725550669; cv=none; b=dF6Jqbs4u+OmSkXH9fGTjJ5xYL2akKetPoNLiG7cOWJNrytZoD2z46Oxzhx/9aJjVTyvwQ+wIeZHbXEQKwWG0rQyy5hKn6CXbSY6BbJyDITtagmf+/TbDAXrOaFMFNjsH//fhLrwcS4IIQv4f/7vVaIqXh9k9quLdEXmtAcvY8o=
+	t=1725580735; cv=none; b=tY+KCRirqxwIAB/9LY5+O6A3yH/jCOJRmFxj1gbrZXZlG/wqdZjqG4jk5P3ldLqTPmhwLE66JZmgqU4LNaSudQZzwZEnMsUYJlF5jr4wDo3q8melIyf5zuTMKWTZoXOcLuQBOe/s74xHxffJenuZN4FP5Cne2j9DUZ1iIazaSPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725550669; c=relaxed/simple;
-	bh=sdrEi2mbWLJaX/PRLp9kc2aep1cLeaLKEG5CEoDrwf4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u75I7HmvSVnsbfxmIuEMQVt/sy+QDQ4QW9zWlFeThDReg9eH8WUU7udREsq/xHjkaE1rgjD7kivHM7c2GNt3iWBWkx8V0FZmJXUvCZIIcBHrs5giYoeMYO7LZHa5v6hv8zDX5cFHiwFa0/FtOOwWKCBT9YA7WvnqnrmhY3R6hWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3E3F9FEC;
-	Thu,  5 Sep 2024 08:38:08 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 028173F73B;
-	Thu,  5 Sep 2024 08:37:39 -0700 (PDT)
-Date: Thu, 5 Sep 2024 16:37:34 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v2 12/16] KVM: arm64: Implement AT S1PIE support
-Message-ID: <20240905153734.GA4157679@e124191.cambridge.arm.com>
-References: <20240903153834.1909472-1-maz@kernel.org>
- <20240903153834.1909472-13-maz@kernel.org>
- <20240905135820.GA4142389@e124191.cambridge.arm.com>
- <86ikvaup12.wl-maz@kernel.org>
+	s=arc-20240116; t=1725580735; c=relaxed/simple;
+	bh=8ZHNDVjmXPanHn2/Wa0JiV+2BK75PQlWnht1eUfa8vI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fAgRjSBFdHqkDnJYQZC7UstX+nUCyOBLtyiS5c0maXLf0ag2uXbSc5B+hd9rrEqYwcgK6TzFjBaXTtzW5aNUdqa3vkSa5UJwj+fDaUaVDLLOjo8umNA7OYwXvQzxhM1vv/B7IRS1Ie7Vef1YDw+ENsV9M+Js0vLAfRUrQjMdCSI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B5eOm0Co; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B5eOm0Co"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2617C4CECD;
+	Thu,  5 Sep 2024 23:58:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725580734;
+	bh=8ZHNDVjmXPanHn2/Wa0JiV+2BK75PQlWnht1eUfa8vI=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=B5eOm0CoMNNtBGAfzLYf8iSwLLiY/j7DStFcMfcnkf9CEVGR2+rzAvHpdqU1ufPAz
+	 ZXNBWrkrzKbQ0dPoU+m9kiZZy2mf1ax8lTPOVLHG4OfaI/6QCwA/KkJ8uw2DhmYEX+
+	 jqAFae7PHeufingMEUSCO/HyhPfYewM66O9VK5YcU3IFfULOAbUILhiNODGo/zoF+U
+	 QFkYv+fmmy6KA3KdsyUVWIB4XzK5/8Lr2BUsMj1j79Xh3Jf6+abGf4pfmOS7lHIzWX
+	 KLUQBlKoGvLO3jcTevRA6vQ1NIOa9Esc4apvfVRmuh5VUBi4BdBKP8cHdpNYisvQga
+	 b6jqytV8FYQLQ==
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2f74e468aa8so12609131fa.1;
+        Thu, 05 Sep 2024 16:58:54 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVq0+GIQTdfS/SS7nmIxvnSwraEm2fWBmWXFjcpvhZYNdXZxdIvet66Mh286xGhes3XEZnCM/8=@lists.linux.dev, AJvYcCX/sbaQAxV/DEj4TFA1DSAckhxIL8aWrDZ1TNDbP770LGWCj6zFkdUOMxpEMwmkeBP0tQ2YOQ==@lists.linux.dev
+X-Gm-Message-State: AOJu0Yxis+jQwsl4URx6LHvAALCxYV7RidM+MRS+k14DnRvwYD0ZNBaE
+	4nBY/SXMSFlIY1s/n4wIcCpUAHqk5Le2CpBdGShoG7lW1fNy1X9qFZxVmQPntOOCZSOb1yfgi2a
+	zt0sej6XY1kxcKOn5K/8z/+YXi64=
+X-Google-Smtp-Source: AGHT+IHwpQbkJrhmqboJoKb4jCLkJYJBTykwt13Bk4HzG9cGEgSCAjDEko9J5cj0FalKeiGaalBZ5m+OpradSeMR65w=
+X-Received: by 2002:a05:651c:542:b0:2f0:1a8f:4cd2 with SMTP id
+ 38308e7fff4ca-2f75249602fmr3868171fa.33.1725580733429; Thu, 05 Sep 2024
+ 16:58:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86ikvaup12.wl-maz@kernel.org>
+References: <20240807-macos-build-support-v1-0-4cd1ded85694@samsung.com>
+ <20240807-macos-build-support-v1-8-4cd1ded85694@samsung.com>
+ <CGME20240807110435eucas1p2eca071b0a0122b8686d43c57bd94dc8c@eucas1p2.samsung.com>
+ <2024080717-cross-retiree-862e@gregkh> <dxkmmrlhlhsrjulnyabfgcr37ojway2dxaypelf3uchkmhw4jn@z54e33jdpxmr>
+ <2024080720-skyline-recapture-d80d@gregkh> <20240807-mottled-stoic-degu-d1e4cb@lindesnes>
+ <20240823225450.spuvjs5b5ruujim4@AALNPWDAGOMEZ1.aal.scsc.local>
+ <ZtIjNBhqdxmMBxfM@fjasle.eu> <CAK7LNAQhHBi7nSG5SAbqD3HFO3uMR6GHckZHcQXgWao7G8i9gw@mail.gmail.com>
+ <20240905085626.ehhc5p7qwi57dagm@AALNPWDAGOMEZ1.aal.scsc.local>
+In-Reply-To: <20240905085626.ehhc5p7qwi57dagm@AALNPWDAGOMEZ1.aal.scsc.local>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Fri, 6 Sep 2024 08:58:15 +0900
+X-Gmail-Original-Message-ID: <CAK7LNASt2eP6q46YP0hCN=f5frt5r5qmwj25tiYrxjwOmGOwEg@mail.gmail.com>
+Message-ID: <CAK7LNASt2eP6q46YP0hCN=f5frt5r5qmwj25tiYrxjwOmGOwEg@mail.gmail.com>
+Subject: Re: [PATCH 08/12] include: add elf.h support
+To: Daniel Gomez <da.gomez@samsung.com>
+Cc: Nicolas Schier <nicolas@fjasle.eu>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Lucas De Marchi <lucas.demarchi@intel.com>, 
+	=?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>, 
+	Rodrigo Vivi <rodrigo.vivi@intel.com>, 
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
+	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Daniel Vetter <daniel@ffwll.ch>, 
+	William Hubbs <w.d.hubbs@gmail.com>, Chris Brannon <chris@the-brannons.com>, 
+	Kirk Reiser <kirk@reisers.ca>, Samuel Thibault <samuel.thibault@ens-lyon.org>, 
+	Paul Moore <paul@paul-moore.com>, Stephen Smalley <stephen.smalley.work@gmail.com>, 
+	Ondrej Mosnacek <omosnace@redhat.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Jiri Slaby <jirislaby@kernel.org>, 
+	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
+	Justin Stitt <justinstitt@google.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, 
+	"intel-xe@lists.freedesktop.org" <intel-xe@lists.freedesktop.org>, 
+	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>, 
+	"speakup@linux-speakup.org" <speakup@linux-speakup.org>, 
+	"selinux@vger.kernel.org" <selinux@vger.kernel.org>, 
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
+	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>, 
+	"llvm@lists.linux.dev" <llvm@lists.linux.dev>, Finn Behrens <me@kloenk.dev>, 
+	"Daniel Gomez (Samsung)" <d+samsung@kruces.com>, "gost.dev@samsung.com" <gost.dev@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 05, 2024 at 03:57:13PM +0100, Marc Zyngier wrote:
-> Hi Joey,
-> 
-> Thanks for having a look.
-> 
-> On Thu, 05 Sep 2024 14:58:20 +0100,
-> Joey Gouly <joey.gouly@arm.com> wrote:
-> > 
-> > Hello Marc!
-> > 
-> > >  static void compute_s1_permissions(struct kvm_vcpu *vcpu, u32 op,
-> > >  				   struct s1_walk_info *wi,
-> > >  				   struct s1_walk_result *wr,
-> > >  				   struct s1_perms *s1p)
-> > >  {
-> > > -	compute_s1_direct_permissions(vcpu, wi, wr, s1p);
-> > > +	if (!s1pie_enabled(vcpu, wi->regime))
-> > > +		compute_s1_direct_permissions(vcpu, wi, wr, s1p);
-> > > +	else
-> > > +		compute_s1_indirect_permissions(vcpu, wi, wr, s1p);
-> > > +
-> > >  	compute_s1_hierarchical_permissions(vcpu, wi, wr, s1p);
-> > 
-> > Is this (and the previous patch to split this up) right?
-> > 
-> > Looking at this from the ARM ARM (ARM DDI 0487K.a):
-> > 
-> > 	R JHSVW If Indirect permissions are used, then hierarchical
-> > 	permissions are disabled and TCR_ELx.HPDn are RES 1.
-> 
-> Odd. I was convinced that it was when S1POE is enabled that HPs were
-> disabled. But you are absolutely right, and it is once more proven
-> that I can't read. Oh well.
+On Thu, Sep 5, 2024 at 5:56=E2=80=AFPM Daniel Gomez <da.gomez@samsung.com> =
+wrote:
+>
+> On Mon, Sep 02, 2024 at 01:15:01AM +0900, Masahiro Yamada wrote:
+> > On Sat, Aug 31, 2024 at 4:54=E2=80=AFAM Nicolas Schier <nicolas@fjasle.=
+eu> wrote:
+> > >
+> > > On Sat, Aug 24, 2024 at 12:54:50AM +0200 Daniel Gomez wrote:
+> > > > On Wed, Aug 07, 2024 at 05:46:03PM +0200, Nicolas Schier wrote:
+> > > > > On Wed, Aug 07, 2024 at 04:18:54PM +0200, Greg Kroah-Hartman wrot=
+e:
+> > > > > > On Wed, Aug 07, 2024 at 02:13:57PM +0000, Daniel Gomez wrote:
+> > > > > > > > Also, as this is not internal for the kernel, but rather fo=
+r userspace
+> > > > > > > > builds, shouldn't the include/ path be different?
+> > > > > > >
+> > > > > > > Can you suggest an alternative path or provide documentation =
+that could help
+> > > > > > > identify the correct location? Perhaps usr/include?
+> > > > > >
+> > > > > > That is better than the generic include path as you are attempt=
+ing to
+> > > > > > mix userspace and kernel headers in the same directory :(
+> > > > >
+> > > > > Please keep in mind, that usr/include/ currently does not hold a =
+single
+> > > > > header file but is used for dynamically composing the UAPI header=
+ tree.
+> > > > >
+> > > > > In general, I do not like the idea of keeping a elf.h file here t=
+hat
+> > > > > possibly is out-of-sync with the actual system's version (even th=
+ough
+> > > > > elf.h should not see that much changes).  Might it be more helpfu=
+l to
+> > > > > provide a "development kit" for Linux devs that need to build on =
+MacOS
+> > > > > that provides necessary missing system header files, instead of m=
+erging
+> > > > > those into upstream?
+> > > >
+> > > > I took this suggestion and tried pushing a Homebrew formula/package=
+ here [1].
+> > > > I think I chose a wrong name and maybe something like "development =
+kit" would
+> > > > have been better. However, would it be possible instead to include =
+the *.rb file
+> > > > in the scripts/ directory? So users of this can generate the develo=
+pment kit in
+> > > > their environments. I would maintain the script to keep it in sync =
+with the
+> > > > required glibc version for the latest kernel version.
+> > > >
+> > > > [1] https://protect2.fireeye.com/v1/url?k=3D96027706-f7896236-9603f=
+c49-000babffaa23-452f645d7a72e234&q=3D1&e=3D343dd31c-5e5b-4b09-8ee5-6c59a1f=
+f826e&u=3Dhttps%3A%2F%2Fgithub.com%2FHomebrew%2Fhomebrew-core%2Fpull%2F1818=
+85
+> > >
+> > > I think it sounds sensible to hold that formula file in the upstream =
+tree.  But
+> > > I am not sure if scripts/ is the best location.
+> > >
+> > > Masahiro, what do you think?
+> >
+> >
+> > I do not know much about the homebrew, but why does the upstream
+> > kernel need to merge such masOS stuff?
+>
+> The missing headers (in macOS) need to be provided somehow. One way can b=
+e
+> having the formula (*.rb file) in-tree, so users of this can install them=
+ in
+> their systems. This would also require to have a tarball with the missing
+> headers either in-tree or somewhere accessible so it can be fetched.
+>
+> To avoid having the formula and a tarball in-tree, I've created a Homebre=
+w Tap
+> (3rd-Party Repository) called 'Bee Headers Project' [1][2][3] that can pr=
+ovision
+> the missing headers. The project provides a bee-headers package and formu=
+la
+> that will install byteswap.h, elf.h and endian.h in the user's system Hom=
+brew
+> directory. It also provides a *.pc file so pkg-config can be used to find=
+ the
+> location of these headers. I have a v2 with this solution ready, perhaps =
+is
+> easier to discuss this with the code.
 
-For POE there is:
 
-	RBVXDG Hierarchical Permissions are disabled and the TCR_ELx.{HPD0, HPD1} bits are RES1 for stage 1 of a translation
-	regime using VMSAv8-64 if one or more of POE and E0POE (for EL1&0, EL2&0) is enabled for that translation
-	regime.
+It is up to you what project you start in Github.
 
-> 
-> Not to worry, I've since found other issues with this series. I have
-> forgotten the patch dealing with the fast path on another branch, and
-> since decided that TCR2_EL2 needed extra care to cope with individual
-> features being disabled.
-> 
-> The rework is still useful, as I'm looking at POE as well, but I need
-> to hoist the HP stuff up a notch.
-> 
-> I'll repost things once I've sorted these things up.
+Then, what do you need to submit v2 for this?
 
-I think the rest of this patch looked fine though.
 
-> 
-> Thanks again,
-> 
-> 	M.
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
+
+
+
+>
+> I think we can extend the same package and include extra headers if we ne=
+ed
+> more in the future. I see for x86_64 asm/types.h and others might be requ=
+ired.
+> The bee-headers package can then be the repository to place and distribut=
+e them.
+>
+> Please, let me know if you think of an alternative solution, I can give a=
+ try
+> and explore.
+>
+> [1] Project:
+> https://github.com/bee-headers
+> [2] Headers repository:
+> https://github.com/bee-headers/headers.git
+> [3] Homebrew Tap formula:
+> https://github.com/bee-headers/homebrew-bee-headers.git
+>
+>
+> >
+> >
+> >
+> > >
+> > > Kind regards,
+> > > Nicolas
+> >
+> >
+> >
+> > --
+> > Best Regards
+> > Masahiro Yamada
+
+
+
+--=20
+Best Regards
+Masahiro Yamada
