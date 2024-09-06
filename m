@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94F7F1CC15B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9A311CBE83;
 	Fri,  6 Sep 2024 11:01:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725620500; cv=none; b=mdW+yuZYS8UB/31nDo1ymx+TPQcTQ2o0LAQoGffiHskOJkFJwYlravpindeGnfkvfqmxCN0lStj06I6U+0hwpQG7pkTbAuyah4T/t6ZDC4rVtudlfgZXykdRnQ7ueH0URE96o+flZa1ib6nTa4McnC8SqJtgZ0Y8ia/QiZsB4E0=
+	t=1725620500; cv=none; b=INnRUU5XIr9yXyU4bxz04xFaZ67nhN8XeOvmn7Okw5PaTaI5tmJ0SW9XSKkO53d2IIvDsypdIpbT59O/+8MmSPVYLBWRatKa7fPeJadAjJF1TqlAcFrZxvTzgsXZVlIBNmSd6Wqcfsb+ZbplJA7zwXP0Ffplh9Hx8gwiP3Pv524=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1725620500; c=relaxed/simple;
-	bh=CZ4Sd6zgDNuwEmkc90VthiZDpWCvWQy9Kc+RHCEsgOQ=;
+	bh=c3x0bnHapZyCsRyRYyC+LIZeB+J3ImlDAXTdLaX80xs=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=p2lDrMZPSWG426CoGjW1qh6IlNTa598IYlx3snDKVDTU+GzyO+HFaKsDfU8Of6F2PplkrkAMKkl+c7mJy5vEsLAiZ0GxsJa0TTw3k/uY51n2qFJZMf/dQEhimvU+CLXK/0fFDUGaem8SZX/DIUZPc+v+DWL0EgA5bZoyfOdvycs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oglDOhcp; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=Tj+DNr+dJoezLT0glcqvtW5rqHppOnNLYiDWnOz7pngLnb5ehxP+2zbxvFZ11buqMuOvYHDMrrYB4tb3t702ySFQCO3Gdfkm3d27Z/0tfjT14sNekc2QnIlqXT6Tuo7B1/a0As9OvRbve3lWx9IqKrN2q9vj7UrrQMTM+1k3PoE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=btJcAfy2; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oglDOhcp"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1084BC4CED2;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="btJcAfy2"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3DFD2C4CED7;
 	Fri,  6 Sep 2024 11:01:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1725620500;
-	bh=CZ4Sd6zgDNuwEmkc90VthiZDpWCvWQy9Kc+RHCEsgOQ=;
+	bh=c3x0bnHapZyCsRyRYyC+LIZeB+J3ImlDAXTdLaX80xs=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=oglDOhcpmxg9zNKmWK35loqmfWrq7174vQW7yOghE6cQoKUenmq2yyJv/Cjvv5Gfa
-	 B7APbxvqjPtzat5d7GEz4LRj1BlDqJho81gJ2VlPC5WU/fRJceZ2YQqAQUDQPwabz6
-	 ZIcseOPSymTnnag5e4VDOr2Vhu/o9BxQZvZqF0WaiLcxtyYFqqusWSf4ZLepaUcVoP
-	 EwHPTxoArQy2AZfFl356S5M96+SaSjnLjq94zELtCpg6wn2K0dxXbk443nAvcG64sF
-	 9WhIAely/i3QNyL1X69KfQkdT1FMFa+jWJWSGvK4NWw5INPEJr0HAuQ8OvgxV98y2e
-	 E556rhbiZVAlQ==
+	b=btJcAfy2qgqbbzAjf01oYt2H2oCyEH+vlSb9AqgkhlNPrxpmns232Sx4cuPfLwwjM
+	 hHbkAWRN13hCR7wXpO++PMYCsV5cAmp2hKrfplof8dSKh7FoKXzAG6WWDLti13Vfcz
+	 rmWqzNmPtFb7k3trfzp+b4JT4aoeWBJOSQ3Z5fM1b6PgHfTOLg5kT+IyYSup1Z4UgI
+	 uqKbdZwzV7o66NMqvBqHKW0NBqoXm1QoY7dHM4kzkuhX1aPkGPoSjT6F7dHGu+wOUT
+	 87PrKn1vC+Hq2JXEgbfPHChyYNK3Z19nJuPDZVUGAo4mBzIo6ScQ+HRTPA3L0AkgNQ
+	 N6bYnBjieudmQ==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 045F7CE7AFB;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35CA2CE7AFB;
 	Fri,  6 Sep 2024 11:01:40 +0000 (UTC)
 From: Daniel Gomez via B4 Relay <devnull+da.gomez.samsung.com@kernel.org>
-Date: Fri, 06 Sep 2024 13:01:28 +0200
-Subject: [PATCH v2 1/8] scripts: subarch.include: fix SUBARCH on macOS
- hosts
+Date: Fri, 06 Sep 2024 13:01:30 +0200
+Subject: [PATCH v2 3/8] drm/xe: xe_gen_wa_oob: fix
+ program_invocation_short_name for macos
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -41,7 +41,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240906-macos-build-support-v2-1-06beff418848@samsung.com>
+Message-Id: <20240906-macos-build-support-v2-3-06beff418848@samsung.com>
 References: <20240906-macos-build-support-v2-0-06beff418848@samsung.com>
 In-Reply-To: <20240906-macos-build-support-v2-0-06beff418848@samsung.com>
 To: Masahiro Yamada <masahiroy@kernel.org>, 
@@ -74,14 +74,13 @@ Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
  linux-serial@vger.kernel.org, llvm@lists.linux.dev, 
  Finn Behrens <me@kloenk.dev>, 
  "Daniel Gomez (Samsung)" <d+samsung@kruces.com>, gost.dev@samsung.com, 
- Daniel Gomez <da.gomez@samsung.com>, 
- Nick Desaulniers <nick.desaulniers@gmail.com>
+ Daniel Gomez <da.gomez@samsung.com>
 X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1725620498; l=1281;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1725620498; l=1428;
  i=da.gomez@samsung.com; s=20240621; h=from:subject:message-id;
- bh=ijKRG+KyDGNZNJsR1osTMsvKgO5/NVSV4G6aYDCZyuU=;
- b=bCEWBORAMhzM3X1JpnkGQsiKqWPlOJG9GDKEFa1LXCWwoKrNbvWue+SUs1Xdr1tCLoWm1yKtz
- vPqgnpTHecbDCQLGjD2lGrqM/d5qSwRAFEBNf23yetInPepO8yTVkDi
+ bh=x6LVlKYatdZUIjJiYp2s+9CbUoAxRcL8dRJGWqQIBj4=;
+ b=BH4HpeG8hB04KMzAeLGkcCFK3N10hMq/U4+Vzh7fajdBsdql7CZEFfKmy7OI6MFwP2a4PKqq6
+ h6W1X3yzs24B7Hn3G4bxlap2pj1Vdv/+pm0/KH5H8aSiskiYjxDyb27
 X-Developer-Key: i=da.gomez@samsung.com; a=ed25519;
  pk=BqYk31UHkmv0WZShES6pIZcdmPPGay5LbzifAdZ2Ia4=
 X-Endpoint-Received: by B4 Relay for da.gomez@samsung.com/20240621 with
@@ -89,39 +88,54 @@ X-Endpoint-Received: by B4 Relay for da.gomez@samsung.com/20240621 with
 X-Original-From: Daniel Gomez <da.gomez@samsung.com>
 Reply-To: da.gomez@samsung.com
 
-From: Nick Desaulniers <nick.desaulniers@gmail.com>
+From: Daniel Gomez <da.gomez@samsung.com>
 
-When building the Linux kernel on an aarch64 macOS based host, if we don't
-specify a value for ARCH when invoking make, we default to arm and thus
-multi_v7_defconfig rather than the expected arm64 and arm64's defconfig.
+Use getprogname() [1] instead of program_invocation_short_name() [2]
+for macOS hosts.
 
-This is because subarch.include invokes `uname -m` which on MacOS hosts
-evaluates to `arm64` but on Linux hosts evaluates to `aarch64`,
+[1]:
+https://www.gnu.org/software/gnulib/manual/html_node/
+program_005finvocation_005fshort_005fname.html
 
-This allows us to build ARCH=arm64 natively on macOS (as in ARCH need
-not be specified on an aarch64-based system).
+[2]:
+https://developer.apple.com/library/archive/documentation/System/
+Conceptual/ManPages_iPhoneOS/man3/getprogname.3.html
 
-Avoid matching arm64 by excluding it from the arm.* sed expression.
+Fixes build error for macOS hosts:
 
-Signed-off-by: Nick Desaulniers <nick.desaulniers@gmail.com>
+drivers/gpu/drm/xe/xe_gen_wa_oob.c:34:3: error: use of
+undeclared identifier 'program_invocation_short_name'    34 |
+program_invocation_short_name);       |                 ^ 1 error
+generated.
+
 Signed-off-by: Daniel Gomez <da.gomez@samsung.com>
+Reviewed-by: Lucas De Marchi <lucas.demarchi@intel.com>
 ---
- scripts/subarch.include | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/gpu/drm/xe/xe_gen_wa_oob.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/scripts/subarch.include b/scripts/subarch.include
-index 4bd327d0ae42..c4592d59d69b 100644
---- a/scripts/subarch.include
-+++ b/scripts/subarch.include
-@@ -6,7 +6,7 @@
+diff --git a/drivers/gpu/drm/xe/xe_gen_wa_oob.c b/drivers/gpu/drm/xe/xe_gen_wa_oob.c
+index 904cf47925aa..0d933644d8a0 100644
+--- a/drivers/gpu/drm/xe/xe_gen_wa_oob.c
++++ b/drivers/gpu/drm/xe/xe_gen_wa_oob.c
+@@ -8,6 +8,7 @@
+ #include <errno.h>
+ #include <stdbool.h>
+ #include <stdio.h>
++#include <stdlib.h>
+ #include <string.h>
  
- SUBARCH := $(shell uname -m | sed -e s/i.86/x86/ -e s/x86_64/x86/ \
- 				  -e s/sun4u/sparc64/ \
--				  -e s/arm.*/arm/ -e s/sa110/arm/ \
-+				  -e /^arm64$$/!s/arm.*/arm/ -e s/sa110/arm/ \
- 				  -e s/s390x/s390/ \
- 				  -e s/ppc.*/powerpc/ -e s/mips.*/mips/ \
- 				  -e s/sh[234].*/sh/ -e s/aarch64.*/arm64/ \
+ #define HEADER \
+@@ -30,6 +31,9 @@
+ 
+ static void print_usage(FILE *f)
+ {
++#ifdef __APPLE__
++	const char *program_invocation_short_name = getprogname();
++#endif
+ 	fprintf(f, "usage: %s <input-rule-file> <generated-c-source-file> <generated-c-header-file>\n",
+ 		program_invocation_short_name);
+ }
 
 -- 
 2.46.0
