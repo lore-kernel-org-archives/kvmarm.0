@@ -1,224 +1,157 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 694781B5ED6;
-	Thu,  5 Sep 2024 23:58:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EFB23FEC
+	for <kvmarm@lists.linux.dev>; Fri,  6 Sep 2024 00:11:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725580735; cv=none; b=tY+KCRirqxwIAB/9LY5+O6A3yH/jCOJRmFxj1gbrZXZlG/wqdZjqG4jk5P3ldLqTPmhwLE66JZmgqU4LNaSudQZzwZEnMsUYJlF5jr4wDo3q8melIyf5zuTMKWTZoXOcLuQBOe/s74xHxffJenuZN4FP5Cne2j9DUZ1iIazaSPU=
+	t=1725581517; cv=none; b=Mc0rN4thxKn93Dzulxupotfo2I7KIuWVm4tOtsvJ/NQtat0zhhRo8gaXcO44a6CCifv/aWZZu8G/Mrjyals3PVvfiq+Lk8TQ0S8UgSOFIh9qOl6mG3gHeJfmk+AUfA5JBsSHPj8YOlC2wv1Ifz4uYVl6FhW7EEI/LdAqe4ce0+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725580735; c=relaxed/simple;
-	bh=8ZHNDVjmXPanHn2/Wa0JiV+2BK75PQlWnht1eUfa8vI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fAgRjSBFdHqkDnJYQZC7UstX+nUCyOBLtyiS5c0maXLf0ag2uXbSc5B+hd9rrEqYwcgK6TzFjBaXTtzW5aNUdqa3vkSa5UJwj+fDaUaVDLLOjo8umNA7OYwXvQzxhM1vv/B7IRS1Ie7Vef1YDw+ENsV9M+Js0vLAfRUrQjMdCSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B5eOm0Co; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1725581517; c=relaxed/simple;
+	bh=WiXv8hX9YZancIkVdHpHwSwJynH9Vx0kkTy6hfFFNvA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EJC54pSWaGCg7LD/P6Y69r6g5r2wN+KZvmITEabusoiqsIQRhYsi+dhzAKN9C1GzDQzNxfJyZ6a6KEEhoaG0p2u6nLFi//A/dbzjUHaCl+BXCdEHzR8kRU9xIbdwoXSLvMfMNTrV174shkyOx1E3YUsIeHYz5/YM+dcnYOjitiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KichCM/Z; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B5eOm0Co"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2617C4CECD;
-	Thu,  5 Sep 2024 23:58:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725580734;
-	bh=8ZHNDVjmXPanHn2/Wa0JiV+2BK75PQlWnht1eUfa8vI=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=B5eOm0CoMNNtBGAfzLYf8iSwLLiY/j7DStFcMfcnkf9CEVGR2+rzAvHpdqU1ufPAz
-	 ZXNBWrkrzKbQ0dPoU+m9kiZZy2mf1ax8lTPOVLHG4OfaI/6QCwA/KkJ8uw2DhmYEX+
-	 jqAFae7PHeufingMEUSCO/HyhPfYewM66O9VK5YcU3IFfULOAbUILhiNODGo/zoF+U
-	 QFkYv+fmmy6KA3KdsyUVWIB4XzK5/8Lr2BUsMj1j79Xh3Jf6+abGf4pfmOS7lHIzWX
-	 KLUQBlKoGvLO3jcTevRA6vQ1NIOa9Esc4apvfVRmuh5VUBi4BdBKP8cHdpNYisvQga
-	 b6jqytV8FYQLQ==
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2f74e468aa8so12609131fa.1;
-        Thu, 05 Sep 2024 16:58:54 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVq0+GIQTdfS/SS7nmIxvnSwraEm2fWBmWXFjcpvhZYNdXZxdIvet66Mh286xGhes3XEZnCM/8=@lists.linux.dev, AJvYcCX/sbaQAxV/DEj4TFA1DSAckhxIL8aWrDZ1TNDbP770LGWCj6zFkdUOMxpEMwmkeBP0tQ2YOQ==@lists.linux.dev
-X-Gm-Message-State: AOJu0Yxis+jQwsl4URx6LHvAALCxYV7RidM+MRS+k14DnRvwYD0ZNBaE
-	4nBY/SXMSFlIY1s/n4wIcCpUAHqk5Le2CpBdGShoG7lW1fNy1X9qFZxVmQPntOOCZSOb1yfgi2a
-	zt0sej6XY1kxcKOn5K/8z/+YXi64=
-X-Google-Smtp-Source: AGHT+IHwpQbkJrhmqboJoKb4jCLkJYJBTykwt13Bk4HzG9cGEgSCAjDEko9J5cj0FalKeiGaalBZ5m+OpradSeMR65w=
-X-Received: by 2002:a05:651c:542:b0:2f0:1a8f:4cd2 with SMTP id
- 38308e7fff4ca-2f75249602fmr3868171fa.33.1725580733429; Thu, 05 Sep 2024
- 16:58:53 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KichCM/Z"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1725581514;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JCf63UUAEsoVjhHUgMARlZrjCRqgXN/a16VIpsPHI30=;
+	b=KichCM/ZTZ0nnHpBB8xTaQ0f4LKuQV5xCo5Y7XjYLS3ibt7nAEiyZdvRdMMSs/QA+pQOtQ
+	8ZXpnTfJdHh/zdS5k40fdQMi2E5gaXWwjP80VwMtKbdb4oKEVnk+xfaaC9h9yFF4q4DAL6
+	Mlgp9hf2xaEEo7z5md7+9Fpg+I+IUq4=
+Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
+ [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-687-U8aTLmJQPhiS2OQxzx2X_g-1; Thu, 05 Sep 2024 20:11:50 -0400
+X-MC-Unique: U8aTLmJQPhiS2OQxzx2X_g-1
+Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-718d6ad6105so240037b3a.1
+        for <kvmarm@lists.linux.dev>; Thu, 05 Sep 2024 17:11:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725581509; x=1726186309;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JCf63UUAEsoVjhHUgMARlZrjCRqgXN/a16VIpsPHI30=;
+        b=dhlK+8jWb92dKHy/m71f1/cryIVFP0RV6oTy6OVfEYwrguqlSj8LGaTuetOf9WONCR
+         ysVW8WXZ8ZF9dzwxFNpq7wbIfzx2afgleQYFdkeYHtP+e+u02GpgfUlVL4HB3mIPjodp
+         QqwEOEKbBs0x2gGK9DYhjuVDLqvKlqe78+8zoDQBrglEhyhXN3W+8qenzlkUrHEMDLrM
+         6DFHcY7qYNy7EzkA+0I1SZCUaixPp8S7rjBxKh6W5QtCrBTvQYtJaUA30ug6Z3k+OMtZ
+         rLpGqyzUeohKNhP5qiolT6bq32uCnqvyO346L8a11I2oJlx1Y6z5rBPoQXWI2thEMeBM
+         X7IA==
+X-Forwarded-Encrypted: i=1; AJvYcCUURhGqvjC2NgP+0/xMv3y7g8spgHdAQi4VkynewlHWWXGh0uvZm8G40Qai48rVFy/HLKdCJuo=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxwQNhPfO9aLvQaQgSl2K+B88FJ1C/N3MsT/P5NaBxES6+z04VW
+	uLRsjDIEWmy4IQXshY+etKgHlFQb2frs7pkrXMtN5NNFR+l3YX2jOYgGNyFnh+eiDM3kgG0CvLY
+	dDZBBUJxPJCcxz2Sr3ZQHGCtObJglLyTHaJhgG/8va/1YllxlRKN6YQ==
+X-Received: by 2002:a05:6a00:2d89:b0:717:90df:7cbb with SMTP id d2e1a72fcca58-718d5f32a78mr828864b3a.22.1725581509045;
+        Thu, 05 Sep 2024 17:11:49 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHQ1mDgKhDpSBr33m3qRjdU1KN0Ixr0d3LiEv3WDkhrTsLXZpCco0dlZ/A1QyM+Jkkdv532Jg==
+X-Received: by 2002:a05:6a00:2d89:b0:717:90df:7cbb with SMTP id d2e1a72fcca58-718d5f32a78mr828823b3a.22.1725581508457;
+        Thu, 05 Sep 2024 17:11:48 -0700 (PDT)
+Received: from [192.168.68.54] ([103.210.27.31])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-718087d92ffsm535625b3a.153.2024.09.05.17.11.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 05 Sep 2024 17:11:46 -0700 (PDT)
+Message-ID: <fc168fe2-2b19-4930-85cf-047260aeaef0@redhat.com>
+Date: Fri, 6 Sep 2024 10:11:37 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20240807-macos-build-support-v1-0-4cd1ded85694@samsung.com>
- <20240807-macos-build-support-v1-8-4cd1ded85694@samsung.com>
- <CGME20240807110435eucas1p2eca071b0a0122b8686d43c57bd94dc8c@eucas1p2.samsung.com>
- <2024080717-cross-retiree-862e@gregkh> <dxkmmrlhlhsrjulnyabfgcr37ojway2dxaypelf3uchkmhw4jn@z54e33jdpxmr>
- <2024080720-skyline-recapture-d80d@gregkh> <20240807-mottled-stoic-degu-d1e4cb@lindesnes>
- <20240823225450.spuvjs5b5ruujim4@AALNPWDAGOMEZ1.aal.scsc.local>
- <ZtIjNBhqdxmMBxfM@fjasle.eu> <CAK7LNAQhHBi7nSG5SAbqD3HFO3uMR6GHckZHcQXgWao7G8i9gw@mail.gmail.com>
- <20240905085626.ehhc5p7qwi57dagm@AALNPWDAGOMEZ1.aal.scsc.local>
-In-Reply-To: <20240905085626.ehhc5p7qwi57dagm@AALNPWDAGOMEZ1.aal.scsc.local>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Fri, 6 Sep 2024 08:58:15 +0900
-X-Gmail-Original-Message-ID: <CAK7LNASt2eP6q46YP0hCN=f5frt5r5qmwj25tiYrxjwOmGOwEg@mail.gmail.com>
-Message-ID: <CAK7LNASt2eP6q46YP0hCN=f5frt5r5qmwj25tiYrxjwOmGOwEg@mail.gmail.com>
-Subject: Re: [PATCH 08/12] include: add elf.h support
-To: Daniel Gomez <da.gomez@samsung.com>
-Cc: Nicolas Schier <nicolas@fjasle.eu>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Lucas De Marchi <lucas.demarchi@intel.com>, 
-	=?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>, 
-	Rodrigo Vivi <rodrigo.vivi@intel.com>, 
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Daniel Vetter <daniel@ffwll.ch>, 
-	William Hubbs <w.d.hubbs@gmail.com>, Chris Brannon <chris@the-brannons.com>, 
-	Kirk Reiser <kirk@reisers.ca>, Samuel Thibault <samuel.thibault@ens-lyon.org>, 
-	Paul Moore <paul@paul-moore.com>, Stephen Smalley <stephen.smalley.work@gmail.com>, 
-	Ondrej Mosnacek <omosnace@redhat.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Jiri Slaby <jirislaby@kernel.org>, 
-	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, 
-	"intel-xe@lists.freedesktop.org" <intel-xe@lists.freedesktop.org>, 
-	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>, 
-	"speakup@linux-speakup.org" <speakup@linux-speakup.org>, 
-	"selinux@vger.kernel.org" <selinux@vger.kernel.org>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
-	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>, 
-	"llvm@lists.linux.dev" <llvm@lists.linux.dev>, Finn Behrens <me@kloenk.dev>, 
-	"Daniel Gomez (Samsung)" <d+samsung@kruces.com>, "gost.dev@samsung.com" <gost.dev@samsung.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 05/43] arm64: RME: Add SMC definitions for calling the
+ RMM
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun <alpergun@google.com>
+References: <20240821153844.60084-1-steven.price@arm.com>
+ <20240821153844.60084-6-steven.price@arm.com>
+From: Gavin Shan <gshan@redhat.com>
+In-Reply-To: <20240821153844.60084-6-steven.price@arm.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Sep 5, 2024 at 5:56=E2=80=AFPM Daniel Gomez <da.gomez@samsung.com> =
-wrote:
->
-> On Mon, Sep 02, 2024 at 01:15:01AM +0900, Masahiro Yamada wrote:
-> > On Sat, Aug 31, 2024 at 4:54=E2=80=AFAM Nicolas Schier <nicolas@fjasle.=
-eu> wrote:
-> > >
-> > > On Sat, Aug 24, 2024 at 12:54:50AM +0200 Daniel Gomez wrote:
-> > > > On Wed, Aug 07, 2024 at 05:46:03PM +0200, Nicolas Schier wrote:
-> > > > > On Wed, Aug 07, 2024 at 04:18:54PM +0200, Greg Kroah-Hartman wrot=
-e:
-> > > > > > On Wed, Aug 07, 2024 at 02:13:57PM +0000, Daniel Gomez wrote:
-> > > > > > > > Also, as this is not internal for the kernel, but rather fo=
-r userspace
-> > > > > > > > builds, shouldn't the include/ path be different?
-> > > > > > >
-> > > > > > > Can you suggest an alternative path or provide documentation =
-that could help
-> > > > > > > identify the correct location? Perhaps usr/include?
-> > > > > >
-> > > > > > That is better than the generic include path as you are attempt=
-ing to
-> > > > > > mix userspace and kernel headers in the same directory :(
-> > > > >
-> > > > > Please keep in mind, that usr/include/ currently does not hold a =
-single
-> > > > > header file but is used for dynamically composing the UAPI header=
- tree.
-> > > > >
-> > > > > In general, I do not like the idea of keeping a elf.h file here t=
-hat
-> > > > > possibly is out-of-sync with the actual system's version (even th=
-ough
-> > > > > elf.h should not see that much changes).  Might it be more helpfu=
-l to
-> > > > > provide a "development kit" for Linux devs that need to build on =
-MacOS
-> > > > > that provides necessary missing system header files, instead of m=
-erging
-> > > > > those into upstream?
-> > > >
-> > > > I took this suggestion and tried pushing a Homebrew formula/package=
- here [1].
-> > > > I think I chose a wrong name and maybe something like "development =
-kit" would
-> > > > have been better. However, would it be possible instead to include =
-the *.rb file
-> > > > in the scripts/ directory? So users of this can generate the develo=
-pment kit in
-> > > > their environments. I would maintain the script to keep it in sync =
-with the
-> > > > required glibc version for the latest kernel version.
-> > > >
-> > > > [1] https://protect2.fireeye.com/v1/url?k=3D96027706-f7896236-9603f=
-c49-000babffaa23-452f645d7a72e234&q=3D1&e=3D343dd31c-5e5b-4b09-8ee5-6c59a1f=
-f826e&u=3Dhttps%3A%2F%2Fgithub.com%2FHomebrew%2Fhomebrew-core%2Fpull%2F1818=
-85
-> > >
-> > > I think it sounds sensible to hold that formula file in the upstream =
-tree.  But
-> > > I am not sure if scripts/ is the best location.
-> > >
-> > > Masahiro, what do you think?
-> >
-> >
-> > I do not know much about the homebrew, but why does the upstream
-> > kernel need to merge such masOS stuff?
->
-> The missing headers (in macOS) need to be provided somehow. One way can b=
-e
-> having the formula (*.rb file) in-tree, so users of this can install them=
- in
-> their systems. This would also require to have a tarball with the missing
-> headers either in-tree or somewhere accessible so it can be fetched.
->
-> To avoid having the formula and a tarball in-tree, I've created a Homebre=
-w Tap
-> (3rd-Party Repository) called 'Bee Headers Project' [1][2][3] that can pr=
-ovision
-> the missing headers. The project provides a bee-headers package and formu=
-la
-> that will install byteswap.h, elf.h and endian.h in the user's system Hom=
-brew
-> directory. It also provides a *.pc file so pkg-config can be used to find=
- the
-> location of these headers. I have a v2 with this solution ready, perhaps =
-is
-> easier to discuss this with the code.
+Hi Steven,
 
+On 8/22/24 1:38 AM, Steven Price wrote:
+> The RMM (Realm Management Monitor) provides functionality that can be
+> accessed by SMC calls from the host.
+> 
+> The SMC definitions are based on DEN0137[1] version 1.0-rel0-rc1
+> 
+> [1] https://developer.arm.com/-/cdn-downloads/permalink/PDF/Architectures/DEN0137_1.0-rel0-rc1_rmm-arch_external.pdf
+> 
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+> Changes since v3:
+>   * Update to match RMM spec v1.0-rel0-rc1.
+> Changes since v2:
+>   * Fix specification link.
+>   * Rename rec_entry->rec_enter to match spec.
+>   * Fix size of pmu_ovf_status to match spec.
+> ---
+>   arch/arm64/include/asm/rmi_smc.h | 253 +++++++++++++++++++++++++++++++
+>   1 file changed, 253 insertions(+)
+>   create mode 100644 arch/arm64/include/asm/rmi_smc.h
+> 
 
-It is up to you what project you start in Github.
+[...]
 
-Then, what do you need to submit v2 for this?
+> +
+> +#define RMI_FEATURE_REGISTER_0_S2SZ		GENMASK(7, 0)
+> +#define RMI_FEATURE_REGISTER_0_LPA2		BIT(8)
+> +#define RMI_FEATURE_REGISTER_0_SVE_EN		BIT(9)
+> +#define RMI_FEATURE_REGISTER_0_SVE_VL		GENMASK(13, 10)
+> +#define RMI_FEATURE_REGISTER_0_NUM_BPS		GENMASK(19, 14)
+> +#define RMI_FEATURE_REGISTER_0_NUM_WPS		GENMASK(25, 20)
+> +#define RMI_FEATURE_REGISTER_0_PMU_EN		BIT(26)
+> +#define RMI_FEATURE_REGISTER_0_PMU_NUM_CTRS	GENMASK(31, 27)
+> +#define RMI_FEATURE_REGISTER_0_HASH_SHA_256	BIT(32)
+> +#define RMI_FEATURE_REGISTER_0_HASH_SHA_512	BIT(33)
+> +#define RMI_FEATURE_REGISTER_0_GICV3_NUM_LRS	GENMASK(37, 34)
+> +#define RMI_FEATURE_REGISTER_0_MAX_RECS_ORDER	GENMASK(41, 38)
+> +
 
+Those definitions aren't consistent to tf-rmm at least. For example, the latest tf-rmm
+has bit-28 and bit-29 for RMI_FEATURE_REGISTER_0_HASH_SHA_{256, 512}. I didn't check the
+specification yet, but they need to be corrected in Linux host or tf-rmm.
 
+   git@github.com:TF-RMM/tf-rmm.git
+   head: 258b7952640b Merge "fix(tools/clang-tidy): ignore header include check" into integration
 
+   [gshan@gshan tf-rmm]$ git grep RMI_FEATURE_REGISTER_0_HASH_SHA.*_SHIFT
+   lib/smc/include/smc-rmi.h:#define RMI_FEATURE_REGISTER_0_HASH_SHA_256_SHIFT     UL(28)
+   lib/smc/include/smc-rmi.h:#define RMI_FEATURE_REGISTER_0_HASH_SHA_512_SHIFT     UL(29)
 
+Due to the inconsistent definitions, I'm unable to start a guest with the following
+combination: linux-host/cca-host/v4, linux-guest/cca-guest/v5, kvmtool/cca/v2.
 
->
-> I think we can extend the same package and include extra headers if we ne=
-ed
-> more in the future. I see for x86_64 asm/types.h and others might be requ=
-ired.
-> The bee-headers package can then be the repository to place and distribut=
-e them.
->
-> Please, let me know if you think of an alternative solution, I can give a=
- try
-> and explore.
->
-> [1] Project:
-> https://github.com/bee-headers
-> [2] Headers repository:
-> https://github.com/bee-headers/headers.git
-> [3] Homebrew Tap formula:
-> https://github.com/bee-headers/homebrew-bee-headers.git
->
->
-> >
-> >
-> >
-> > >
-> > > Kind regards,
-> > > Nicolas
-> >
-> >
-> >
-> > --
-> > Best Regards
-> > Masahiro Yamada
+   # ./start_guest.sh
+   Info: # lkvm run -k Image -m 256 -c 2 --name guest-152
+   [  145.894085] config_realm_hash_algo: unsupported ALGO_SHA256 by rmm_feat_reg0=0x0000000034488e30
+   KVM_CAP_RME(KVM_CAP_ARM_RME_CONFIG_REALM) hash_algo: Invalid argument
 
+Thanks,
+Gavin
 
-
---=20
-Best Regards
-Masahiro Yamada
