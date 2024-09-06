@@ -1,55 +1,55 @@
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAEF21D0490
-	for <kvmarm@lists.linux.dev>; Fri,  6 Sep 2024 15:06:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82F711D1F73
+	for <kvmarm@lists.linux.dev>; Fri,  6 Sep 2024 15:08:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725635212; cv=none; b=rEovtnBh3gk/xgPEqOG7CpqUSpe8bVB5mviT9HNULGBAOKON0jSc/uxrLN8jdf00L8McIeW0pWULqP98FOOdb04Zj22xg9QStHYkM+vynoXQ79LLyBm4YAi/p4F0JfM3Exgt4KAxq2pPoq5ZIAm8CK4byheIxHROBGano4jvol4=
+	t=1725635302; cv=none; b=QihLeCDC03YSB9tj0NWnF51V+Ce0zPSHiBFleRA+1EHqrc47GmIsiriLw57FVno+wD/IKtiVqxQ442/Oko3Tbu0NOtVCc2XXEoriEzYAUo7v7YVdZApJNlhFOIXlJafawFClV3Nt05M8TDD2HoRd8Tsm9sMIVrtdSaR5MIVsDUI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725635212; c=relaxed/simple;
-	bh=aQLKfK6IyeVlvPZdEpJhpjuD9yzE9AaUJBwaw3oLa4c=;
+	s=arc-20240116; t=1725635302; c=relaxed/simple;
+	bh=CfwA+7g+HrXEdbWCSTlc/6vfhCHNjAmjh8fb1L7ct9k=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=umSIs7J7LwxfioH+biDAZS85Ps4AU3vcPM5wemXZtn9lH/Kc9+g3FCf1RKlt8tknkiotUSwVR0U+qqyg4/cfErqPeY/GAceOe0ll6E26pgUdvlclEyW+Ez2Eqfny9Q/N651cyOLX8oMKS7bAHbnFVACQMH2qjUorm0D2v+bO84c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kruces.com; spf=pass smtp.mailfrom=kruces.com; dkim=pass (2048-bit key) header.d=kruces-com.20230601.gappssmtp.com header.i=@kruces-com.20230601.gappssmtp.com header.b=D0N1Kpxh; arc=none smtp.client-ip=209.85.218.52
+	 To:Cc:Content-Type; b=Fr2P7W26c14guiOS8cQHPr15bmFrEPHNKurNKupUBG0Ero17M6QE2+7e0dp21M0RFytkCAxR7xps1/PNdk/MYd23zcabIKl/y/wWv+wd/CejnBzI5u7815Z7CoTLzpmghO2hgDImmUZkkag9QWy8n5ufnxTMYd9Up9YgWq8ILD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kruces.com; spf=pass smtp.mailfrom=kruces.com; dkim=pass (2048-bit key) header.d=kruces-com.20230601.gappssmtp.com header.i=@kruces-com.20230601.gappssmtp.com header.b=dO25Phae; arc=none smtp.client-ip=209.85.208.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kruces.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kruces.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kruces-com.20230601.gappssmtp.com header.i=@kruces-com.20230601.gappssmtp.com header.b="D0N1Kpxh"
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a868b739cd9so279031366b.2
-        for <kvmarm@lists.linux.dev>; Fri, 06 Sep 2024 08:06:50 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kruces-com.20230601.gappssmtp.com header.i=@kruces-com.20230601.gappssmtp.com header.b="dO25Phae"
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5c241feb80dso6242285a12.0
+        for <kvmarm@lists.linux.dev>; Fri, 06 Sep 2024 08:08:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kruces-com.20230601.gappssmtp.com; s=20230601; t=1725635209; x=1726240009; darn=lists.linux.dev;
+        d=kruces-com.20230601.gappssmtp.com; s=20230601; t=1725635299; x=1726240099; darn=lists.linux.dev;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=h9ZAlMwEyYD75XfvfcvFROEESwWLuQ5Z/p2zffJIs9s=;
-        b=D0N1Kpxhpia0LS9+gQ1s8tqAU3atdqKIbkzCsKd7AnUYLMLBLBkUnKcX9w0BgRhYnI
-         ZP8C8VFoSvUMSjocOdT/8fv2abZzBFdHvMr5dmikc0xFXMINMcEPZaVbwVCxsJY7M35j
-         3yap+t7gdtcgsVDBH9pI7wcZOmip/wPZbVh0kpzI9YClvrkLUATeL0ArMSD8kW2Dh0L5
-         NS9eire9Jzs91PYe4ck5u4VtEhiqKbLWeBMP6oKVLPZMSDloRLUzKQ4ourNof4ev6sTM
-         KWK2Z/D7e9jjlEjcGzHLLDbm1f2dEj04GdAnRFQHzcnUd9hA3CYfWZ6iUzn+XLzuuq46
-         vu9w==
+        bh=n8bMi8neSlk0H33MBuzRIDN5M+I0beTdNpKiekVDuiU=;
+        b=dO25PhaekuPKuNlWSbuE3w4jpge7R2z+vbxsb8x9xoee+V2+hSEoq9pEhWsjXD1Vhs
+         1OSbE4ghysa292Wf7fqsz7Om5US7W+rvfm0968Su02YEJUk+LXZSUfJt/YY3w8WqUYNA
+         c3Ci+cL3BK+nIuvnZE+ExedYQrWELW9OfBG2IyHvxpX7TzmL2Hgp/l2bVa0rdKqNGS3x
+         g0hRDYmZwfiuAdG+9xk1ShL7OrM8Vk487jgQy+xw6L2Q7xM7ebTg7OvPOyi/3T+cNNwZ
+         OqwUqT1QYRaMvA2bg1BREcER2kztTW3OD7ATQ+Y4A8hSWL/uf0GbOnSHx6fc3Ri+iWYd
+         6zlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725635209; x=1726240009;
+        d=1e100.net; s=20230601; t=1725635299; x=1726240099;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=h9ZAlMwEyYD75XfvfcvFROEESwWLuQ5Z/p2zffJIs9s=;
-        b=Vm4mTHzKvrk+BuLSd28XktvdgB4E1aqYn9pz4XScjIDH/CB2KrTwUlz3bLHm+6/uUQ
-         +MtoKcp6BGCgyjLsLJ9kxKaLc/MdJ3dEdzqn4UQT2t1X4R4xtMneXCZ03KoQLvyg8YL8
-         /fGBUT0NEJ+xv22Z8PvioWTK9f8CCGIvt4Gs11ezXky9HocAgcjuOcjU3AQ5FQzAhmhF
-         G0AD3xpCaRlmfWNNKbWP8pMf20dPKPMABQbjnyQTGlKnK3y24IVBbRi5omWGw8cPEuKX
-         3LnrQM1Z9kamcmJWObnWivx8cQp0QOKRlOdt/jh1mt6UmIFHKDfQpde1EfrUGcfhPRfI
-         NY3w==
-X-Forwarded-Encrypted: i=1; AJvYcCXwPVL3qRmWp0gEFK4Kt575k8zg5ercG6GeJDoiRp+G/FnYu4Ek+q17p963PPVL9DNV09WE66w=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzXtWFtNdjMbZUwmsXP6OAejgWFVVa2A3OjJpt/46tj3yLw5J/K
-	gP/Nl/iAAen+llgO9ffyNA05toVUzCo9J9fp+5xELj3I66PHpCXove+f1cHVIr0BYL9JyRPqq1M
-	/jZP6cadAiuMbjSrGcJrk5YIFqH86J5h5oGm6UQ==
-X-Google-Smtp-Source: AGHT+IE5oYDSfTzIe6hHUgUBH7wdkZoXXSF0xeHeSRG+IYdoi10a74SFm4+xUjHqeOxdrh5qK7III9nawL/szJxa908=
-X-Received: by 2002:a17:906:c141:b0:a8b:ddf4:46f1 with SMTP id
- a640c23a62f3a-a8bddf45606mr100660666b.63.1725635208952; Fri, 06 Sep 2024
- 08:06:48 -0700 (PDT)
+        bh=n8bMi8neSlk0H33MBuzRIDN5M+I0beTdNpKiekVDuiU=;
+        b=p/8etAT229CBhyj38ySHNx2qLrrwEaZZoJZbucY4mU9JFlmGs0+FJaUqLu9569rfXM
+         9SaThKrKhfXJ0I63x+DafydCwzw8wHmJ33Sz6xf87CE77PDX6glI+CJCxB9Gv5vO3REK
+         OgHpXCASzMD8Zz/glN4oRq1aSKULFMPLaMbuijTwcu+N8RyfrPrEpTnub0L9N4uwqUVC
+         dfqPiavoCuEXfm+9uCa9G7yOdQW47B0xBNR0VYvkMmpkx086engxrb3255GIGEczKB3M
+         dP/PIu2P+iVatRAo7nmTWRKpoZwLB7xneG9gYzomiwOTpDAFFf8/2utZwDb5HtGFe/fe
+         zaCA==
+X-Forwarded-Encrypted: i=1; AJvYcCX+sp9a0HsOba3lefruWwS4MEwH66SA7oyYHVL7Ld3iQooPbD5tFNrq/b9iMRqYq88pGz8HBMc=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzIsDQP+X0NcAXJvxtlDjuat4TlBtPnoTkJ+9MveE5NoTAyo5Tj
+	zP2hJXMhSUcz4KUzARsh8ID1K20afYJUc26tQ0baJnOs2N5KlnbHBj1OF501+XUgmeMh4uLY9A/
+	CZDNj/6NVufIxLDqI3IL2jwtukH1mt4yd6PiejQ==
+X-Google-Smtp-Source: AGHT+IGUA1wnLPvaqVG65cpWb2qjjv+ZYvS15NsPxrxeFhQA7Z9cxOvMhyKovH+37PHRvGwnr/HounhIwA1d4bXQ4q8=
+X-Received: by 2002:a17:907:ea7:b0:a7d:89ac:9539 with SMTP id
+ a640c23a62f3a-a8a42f8af35mr889231466b.7.1725635298533; Fri, 06 Sep 2024
+ 08:08:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -57,12 +57,13 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 References: <20240906-macos-build-support-v2-0-06beff418848@samsung.com>
- <20240906-macos-build-support-v2-7-06beff418848@samsung.com> <CAHC9VhQkstJ8Ox-T+FLU34s9U0gezRba6bMA-tUPs80u6sVh2g@mail.gmail.com>
-In-Reply-To: <CAHC9VhQkstJ8Ox-T+FLU34s9U0gezRba6bMA-tUPs80u6sVh2g@mail.gmail.com>
+ <20240906-macos-build-support-v2-6-06beff418848@samsung.com> <CAHC9VhRpHgqN2fp1J3x9=zBqNr3QHsSDgUnoZ7M-SuOQ6hQ4nw@mail.gmail.com>
+In-Reply-To: <CAHC9VhRpHgqN2fp1J3x9=zBqNr3QHsSDgUnoZ7M-SuOQ6hQ4nw@mail.gmail.com>
 From: "Daniel Gomez (Samsung)" <d+samsung@kruces.com>
-Date: Fri, 6 Sep 2024 17:06:22 +0200
-Message-ID: <CABj0suCtCfd58+i0s5LzsTUwwd=1o1nMRvmqsxsraJcTiX2mSQ@mail.gmail.com>
-Subject: Re: [PATCH v2 7/8] selinux: move genheaders to security/selinux/
+Date: Fri, 6 Sep 2024 17:07:52 +0200
+Message-ID: <CABj0suDY3duFeZx8ghEJm3vTuJvcVuoYZ6BpYn9SCaHetw3oNA@mail.gmail.com>
+Subject: Re: [PATCH v2 6/8] selinux: do not include <linux/*.h> headers from
+ host programs
 To: Paul Moore <paul@paul-moore.com>
 Cc: da.gomez@samsung.com, Masahiro Yamada <masahiroy@kernel.org>, 
 	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, 
@@ -89,7 +90,7 @@ Cc: da.gomez@samsung.com, Masahiro Yamada <masahiroy@kernel.org>,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Sep 6, 2024 at 4:54=E2=80=AFPM Paul Moore <paul@paul-moore.com> wro=
+On Fri, Sep 6, 2024 at 4:56=E2=80=AFPM Paul Moore <paul@paul-moore.com> wro=
 te:
 >
 > On Fri, Sep 6, 2024 at 7:01=E2=80=AFAM Daniel Gomez via B4 Relay
@@ -97,38 +98,67 @@ te:
 > >
 > > From: Masahiro Yamada <masahiroy@kernel.org>
 > >
-> > This tool is only used in security/selinux/Makefile.
+> > Commit bfc5e3a6af39 ("selinux: use the kernel headers when building
+> > scripts/selinux") is not the right thing to do.
 > >
-> > There is no reason to keep it under scripts/.
+> > It is clear from the warning in include/uapi/linux/types.h:
+> >
+> >   #ifndef __EXPORTED_HEADERS__
+> >   #warning "Attempt to use kernel headers from user space, see https://=
+kernelnewbies.org/KernelHeaders"
+> >   #endif /* __EXPORTED_HEADERS__ */
+> >
+> > If you are inclined to define __EXPORTED_HEADERS__, you are likely doin=
+g
+> > wrong.
+> >
+> > Adding the comment:
+> >
+> >   /* NOTE: we really do want to use the kernel headers here */
+> >
+> > does not justify the hack in any way.
+> >
+> > Currently, <linux/*.h> headers are included for the following purposes:
+> >
+> >  - <linux/capability.h> is included to check CAP_LAST_CAP
+> >  - <linux/socket.h> in included to check PF_MAX
+> >
+> > We can skip these checks when building host programs, as they will
+> > be eventually tested when building the kernel space.
+> >
+> > I got rid of <linux/stddef.h> from initial_sid_to_string.h because
+> > it is likely that NULL is already defined. If you insist on making
+> > it self-contained, you can add the following:
+> >
+> >   #ifdef __KERNEL__
+> >   #include <linux/stddef.h>
+> >   #else
+> >   #include <stddef.h>
+> >   #endif
+> >
+> > scripts/selinux/mdp/mdp.c still includes <linux/kconfig.h>, which is
+> > also discouraged and should be fixed by a follow-up refactoring.
 > >
 > > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 > > ---
-> >  scripts/remove-stale-files                                    | 3 +++
-> >  scripts/selinux/Makefile                                      | 2 +-
-> >  scripts/selinux/genheaders/.gitignore                         | 2 --
-> >  scripts/selinux/genheaders/Makefile                           | 3 ---
-> >  security/selinux/.gitignore                                   | 1 +
-> >  security/selinux/Makefile                                     | 7 ++++=
-+--
-> >  {scripts/selinux/genheaders =3D> security/selinux}/genheaders.c | 0
-> >  7 files changed, 10 insertions(+), 8 deletions(-)
+> >  scripts/selinux/genheaders/Makefile              |  4 +---
+> >  scripts/selinux/genheaders/genheaders.c          |  3 ---
+> >  scripts/selinux/mdp/Makefile                     |  2 +-
+> >  scripts/selinux/mdp/mdp.c                        |  4 ----
+> >  security/selinux/include/classmap.h              | 19 ++++++++++++----=
+---
+> >  security/selinux/include/initial_sid_to_string.h |  2 --
+> >  6 files changed, 14 insertions(+), 20 deletions(-)
 >
-> Did you read my comments on your previous posting of this patch?  Here
-> is a lore link in case you missed it or it was swallowed by your
-> inbox:
+> Similar to patch 7/8, please read my comments on your previous posting
+> of this patch, it doesn't appear that you've made any of the changes I
+> asked for in your previous posting.
+
+Sorry for the noise, Paul. I=E2=80=99ll review this one as well.
+
 >
-> https://lore.kernel.org/selinux/3447459d08dd7ebb58972129cddf1c44@paul-moo=
+> https://lore.kernel.org/selinux/317c7d20ab8a72975571cb554589522b@paul-moo=
 re.com
-
-Apologies for the unnecessary noise. I=E2=80=99ll review your feedback and
-revisit the patch accordingly.
-
-Daniel
-
->
-> Unless there is an serious need for this relocation, and I don't see
-> one explicitly documented either in this patchset or the previous, I
-> don't want to see this patch go upstream.
 >
 > --
 > paul-moore.com
