@@ -1,336 +1,328 @@
-Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2078.outbound.protection.outlook.com [40.107.22.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF3071CB306
-	for <kvmarm@lists.linux.dev>; Fri,  6 Sep 2024 11:08:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.22.78
-ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725620906; cv=fail; b=cyVoo/Gd+UldtTuA1dapl3jbwPmVO7+rPTPJ3ngFtX+cozqIZON8xxL4m5yPrGEevzj/D0SX/ys4ttjaPh5TEepAHdN/uO6eTKdC0NR+TrGiyjcC2sjEB5/D2U55DUiQ8zrb/GdJHJgDDNTqap+kcEnO2O0TVbyp5RI+CpsrIJI=
-ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725620906; c=relaxed/simple;
-	bh=IDQcveTj3Z7tsYMYd/U7PkJLwxrIQ7zK1XUC72ksgDs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=oASvBWiRp/fuf37/a1ZX3aVLOUA+0oNUl/ZJdub2aFdt8Hoox4Na4gmoIgH9BJZCDJ0KOF6HF+qB1bXCoGaV0zp9vFRm11ATrBox6S3wUJtJSZ4VtCZBO5Ipl8L2swgUVIt1PAjrFrvZwbwpvn9b4aGVjegKXKXoFcQM0igm2l4=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=D2kECHoM; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=D2kECHoM; arc=fail smtp.client-ip=40.107.22.78
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 070111CF2AD;
+	Fri,  6 Sep 2024 13:55:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725630911; cv=none; b=mvXdJqsZPDLioxkKJWJ7U2oTH5tj7hCQQdYJrKVK8uwfZDSuUAquDr/2VsoyrSUFE/5TWnfmqql4OtGQ+RmH4kEsF4K0lq0rvDVxw6umGrhlF+8sS5Xd8i4ZLf4qDUWZ8bVh6clgePE/Em822Nem0WTO373tSrmHEc+t+7WG27A=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725630911; c=relaxed/simple;
+	bh=oqZ+WpHd3rE4CnKLStyBnVW9tRRPxGCdLI5yqLavC8M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mgy467JRuWfDVe2AgID7enPKZ3Ywg0lQoxBauXQlanCRsFnirzTd7zmAQ21/DAbgY9+AeuNWtGcvnkaJyDPzBEc+wRuNpg++ZhdzpiyJ6D6FTy7NqHpj3V2mNHGRdLGsbFnDgLgKlyi2XqVAkJwxwZJ+UFUi9Dnz57BsCfLv0i0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="D2kECHoM";
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="D2kECHoM"
-ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
- b=WpDHxQuVLREcbCji+iQjlsAxucaP52At55VClLUBwwRJn7yshhFtvuag6Wg3Ub8DyBCMNX0cOP1d0WMFgRUwhD95roxur3GMFyJRcGP4s6jMwEbVAcupUfx7Vte7h6HzEZbhUASUqbhbjt5Nt+eRQCsUXRcDvSBCGFzsh1ebGRJg0D+ens42/ZHWD40ljL1URKs6PZDoqjkt0+/TdbR/yc+tI6BZL9fzvq2BjnzaRlOEYxJvgTYSbdvq2TmvnqIPIauHOYJtuXKlbwMC7vPsP6IRvRZ8aMjN1beJZ7JMXRWmfQw5R4uqoPLj/WAqdmf1Hp3n0klL4xJ/wqslrdGJmg==
-ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yuGZavkWIIH1h02+xTDKXt3DJz7tzsCjDU++TkIxlUI=;
- b=Zh7aRiU1VB4iTFCO8KSm88+tzsErwKYrv1DF+VeL3r8SOYS8B+rdRSZq44haEbAJX/89ospKoSnIwloV8CLS7blLwjm08lMDjH3WkkJm2ZNWbg4WHdlZ/3kz3vTSpz9CLAhGcVVqfNXuU7vv8jz3xNQtl5y9vjm3SOe+imoaQ5uWjhm9h1rF4Xg55FbAcxPXI4/wlNoMft/aATIynB1cSvubML19MkV4yZ9yYVaGkDezzuVKENt2G+1OXei00CInE6/zk1+Bbo+T45+m/7xL9Hlk/qQeJRnnPppDzcprJt8CQOeqOgFNY+uoqM/xypvydFXb2D9B7wNBuKvLafx6tg==
-ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
- 63.35.35.123) smtp.rcpttodomain=lists.linux.dev smtp.mailfrom=arm.com;
- dmarc=pass (p=none sp=none pct=100) action=none header.from=arm.com;
- dkim=pass (signature was verified) header.d=arm.com; arc=pass (0 oda=1 ltdi=1
- spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
- dmarc=[1,1,header.from=arm.com])
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yuGZavkWIIH1h02+xTDKXt3DJz7tzsCjDU++TkIxlUI=;
- b=D2kECHoM21OD0D0NzMlAsSasCHhz643+AitqPdswj4VnuDfhi9IY91vT5bthBJxR3TO5JJTbwmp+q8OLUK2Wqyy5sfwjtKDc8HaSRtJyxEmexXT8tyuMsEnWKANXDqyfo6K+8cyRpv5jn5+DFTf31vCkRMs8OTgCSnD9sMP7nAw=
-Received: from AM0PR04CA0084.eurprd04.prod.outlook.com (2603:10a6:208:be::25)
- by VI1PR08MB5470.eurprd08.prod.outlook.com (2603:10a6:803:136::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7939.16; Fri, 6 Sep
- 2024 11:08:13 +0000
-Received: from AM4PEPF00027A63.eurprd04.prod.outlook.com
- (2603:10a6:208:be:cafe::be) by AM0PR04CA0084.outlook.office365.com
- (2603:10a6:208:be::25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7939.17 via Frontend
- Transport; Fri, 6 Sep 2024 11:08:13 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 63.35.35.123)
- smtp.mailfrom=arm.com; dkim=pass (signature was verified)
- header.d=arm.com;dmarc=pass action=none header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 63.35.35.123 as permitted sender) receiver=protection.outlook.com;
- client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
- pr=C
-Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
- AM4PEPF00027A63.mail.protection.outlook.com (10.167.16.73) with Microsoft
- SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.7918.13
- via Frontend Transport; Fri, 6 Sep 2024 11:08:13 +0000
-Received: ("Tessian outbound a13c34f08745:v437"); Fri, 06 Sep 2024 11:08:13 +0000
-X-CheckRecipientChecked: true
-X-CR-MTA-CID: 0a912932261d8174
-X-CR-MTA-TID: 64aa7808
-Received: from Lb668a72e7cf9.1
-	by 64aa7808-outbound-1.mta.getcheckrecipient.com id 9AE62DB3-54CA-4EB5-B219-749B3FE139D6.1;
-	Fri, 06 Sep 2024 11:08:11 +0000
-Received: from EUR03-VI1-obe.outbound.protection.outlook.com
-    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id Lb668a72e7cf9.1
-    (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
-    Fri, 06 Sep 2024 11:08:11 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=RmrVnQETqhcT1uAlEKkasOnHhTf9PcOIHgaJHfe+JyL+MtMsYpd9lvjaz3ARbdGE5rXqHPHVUTbYs91wC8S9smf9wsGzrKxeTnF2Z8KqsI5v6m22EF1nMXiZRNkjgoXI/Ee+5WDTEL7GyL9GfT9yZj1O7uK7pCg9qnQbcIzXpBBglptISmMMpI8hL/XIX2MC11FNkeaJAsld0irpDuV4bHvbYx/ci/PeXBBI1QamFYXzg+ksV3jAYhLKhVK4c3NfTbYkGRSqiSlMrGbUYg+YFy4EOLvofCtzNNJpKJsx21Neb0Z0j5A0BPyqDp4bcNYsAFN6rDAZls01iNYkRw5fxw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yuGZavkWIIH1h02+xTDKXt3DJz7tzsCjDU++TkIxlUI=;
- b=l9omlfwFvI1rqtOAGIwyM5iFOk/Yus4ZSk7O0Mpn9jSMDRNiN6HOQ9R90mudAaTMMPIMdU/NkyHRXe+YPwyydyiSITHJ5K8q5VODVAIyHFpkR5F4ZpMzPQs+J5j44OhKAmOcGe444cxMbG+WT5Xo0SoqMtJJU+66FjzwPs+vMfvFm2Ad20uAYgaLEfWeyAAZhdURRHjn1/lZDzDCN7zpasxcZpNsIQuYXLr4u/7Quw0CTgfKVlM4rxVQUZwlA2N9AqZ8UsgY0aKZXCEppVwNWdrBxwrl8YKCpFjTPPNKT83JsyezFUnk8JuSPKzRuoM/GRsK6FkrhaPSmky4QzpV0Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
- header.d=arm.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yuGZavkWIIH1h02+xTDKXt3DJz7tzsCjDU++TkIxlUI=;
- b=D2kECHoM21OD0D0NzMlAsSasCHhz643+AitqPdswj4VnuDfhi9IY91vT5bthBJxR3TO5JJTbwmp+q8OLUK2Wqyy5sfwjtKDc8HaSRtJyxEmexXT8tyuMsEnWKANXDqyfo6K+8cyRpv5jn5+DFTf31vCkRMs8OTgCSnD9sMP7nAw=
-Authentication-Results-Original: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-Received: from DB9PR08MB7179.eurprd08.prod.outlook.com (2603:10a6:10:2cc::19)
- by AS8PR08MB10269.eurprd08.prod.outlook.com (2603:10a6:20b:63c::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7962.9; Fri, 6 Sep
- 2024 11:08:03 +0000
-Received: from DB9PR08MB7179.eurprd08.prod.outlook.com
- ([fe80::7d7e:3788:b094:b809]) by DB9PR08MB7179.eurprd08.prod.outlook.com
- ([fe80::7d7e:3788:b094:b809%6]) with mapi id 15.20.7939.016; Fri, 6 Sep 2024
- 11:08:03 +0000
-Date: Fri, 6 Sep 2024 12:07:49 +0100
-From: Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-To: Mark Brown <broonie@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Kees Cook <kees@kernel.org>
-Cc: "H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Florian Weimer <fweimer@redhat.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
-	Ross Burton <ross.burton@arm.com>,
-	Yury Khrustalev <yury.khrustalev@arm.com>,
-	Wilco Dijkstra <wilco.dijkstra@arm.com>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v12 21/39] arm64/gcs: Ensure that new threads have a GCS
-Message-ID: <ZtrihWQFyb2/XrQV@arm.com>
-References: <20240829-arm64-gcs-v12-0-42fec947436a@kernel.org>
- <20240829-arm64-gcs-v12-21-42fec947436a@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240829-arm64-gcs-v12-21-42fec947436a@kernel.org>
-X-ClientProxiedBy: LO3P123CA0021.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:388::9) To DB9PR08MB7179.eurprd08.prod.outlook.com
- (2603:10a6:10:2cc::19)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5E0FDFEC;
+	Fri,  6 Sep 2024 06:55:34 -0700 (PDT)
+Received: from [10.1.36.22] (e122027.cambridge.arm.com [10.1.36.22])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B883D3F844;
+	Fri,  6 Sep 2024 06:55:03 -0700 (PDT)
+Message-ID: <8a675a19-52c1-43c7-b560-fbadce0c5145@arm.com>
+Date: Fri, 6 Sep 2024 14:55:01 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-TrafficTypeDiagnostic:
-	DB9PR08MB7179:EE_|AS8PR08MB10269:EE_|AM4PEPF00027A63:EE_|VI1PR08MB5470:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5b100e04-8b15-48a3-1261-08dcce643375
-x-checkrecipientrouted: true
-NoDisclaimer: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted:
- BCL:0;ARA:13230040|7416014|376014|1800799024|366016|921020;
-X-Microsoft-Antispam-Message-Info-Original:
- =?utf-8?B?aTBoNDBnUkp3R0IvTEVEV2IxSHZKQlZRVE1JNW9ndFcvdHFTWThjRGdLeEU0?=
- =?utf-8?B?dzMwWGxZbGhXTHR2YUwzK0lIS2pwUlhqOWdkckpsaC90Y3pEeXdCbDUrMFVm?=
- =?utf-8?B?WldpTUVaT3Z5VFAwMGljRlU0bGh3Z3owK3RVekh4ZGVXNFIrNWZrZ1NnaFlw?=
- =?utf-8?B?NUpoQUVSTmVqQ0x1ZXhRT2FEdTRlTlptZ1ljLzRnMmJhVnpIMkVvc25HZHhn?=
- =?utf-8?B?UjJ5aitlekx6bTVnc09rQWJWSjAyalUxUnVURVVhR3FGVzk0MjZZZHRFRlFI?=
- =?utf-8?B?M0NTbmREc2FnVlNnakQ0Q0NLaU5MMU8vQk1DM25YSnJCTFltUWY4Z29Lb2Vx?=
- =?utf-8?B?Qmo5SXJtNEhOYmZpaElENDdpd0NyRWNCS095NnpMYnRHQThKMm1EUUEyVytn?=
- =?utf-8?B?R0RPYzdXOWo4ZWZhWG5sN1NQODJ4WnRVSzM3SGJSSWhlektDZVp4QnduSlBl?=
- =?utf-8?B?VEI2Nk5IbXhNMnNWV3IxcnkvdFBPc050dFZoUkZmSjE2aDVBM3czME5rYkNH?=
- =?utf-8?B?a2tKaWl5cVlEaDNUMTFSWkZCc2ZnK0ZLT0VsYk9uVnZuWDlLbFNaUllJNkdn?=
- =?utf-8?B?SVd4ZFd4N3AvYjZMWFgzbTBpcmw4VjBCdTdWU3phK1k3MTNCeW1UWTFtWXov?=
- =?utf-8?B?aGxtaU1EdkdzSGNqRk0vck1JR0dneURhdmpuWStGaFAxbU9Edmk3ZGFyU0c1?=
- =?utf-8?B?ckJQSFo1Nm45ajJDeEN5Z0hIcWJ3dmdsek9abW12SGZwL1dKK0crcHEwSUJl?=
- =?utf-8?B?cTJCZXh4My92bkJJb09jMy9YWk4zNDgrQUJVZG45SVhndm10UmhBb2orSHRE?=
- =?utf-8?B?Vk01YVNrbjRXcmpWSHZrM0FZdlQ3bVdaTUJxVFZZNlVheGozcVdyZlEwZ1dy?=
- =?utf-8?B?bHd6SlQ3NmxOeXhzeHl1TS9MaENOQ0FBelZZbVJOOGNMcklJcTRiRHVpMHFO?=
- =?utf-8?B?OUYzV3RLSFNpd1R0VjlDZllFOG14aW5aTnkrWnZ2UklieFFnK2tkM2FLSTh5?=
- =?utf-8?B?NnRpMEtETkVlUVJqWUxldUFSb2JsVS8yQ1h0TFl0YmZJaTlkK25QaFkyNlh1?=
- =?utf-8?B?SnIzMEorSW9aZDJTYXdnUzVFL2F1dGtqajN0TXpqQTVvNk1xVFhja0xLaExB?=
- =?utf-8?B?ZW1Wb0VSSWk1QmhtRnNWQUxNNjIxeU4vRkhGTGtaVFFGQ05GZU5mc0c0TXF3?=
- =?utf-8?B?Q2xWREtXTm5tRzl1R0l4MlJtNGhhUFhqakRsdk5LOE5VNVd2WERUNTNQRXht?=
- =?utf-8?B?S3FqZGU0b25NYlBoaEdYSVFxc1luQVpyWUZ3WU44UFc2d0cxNkI5ZUNMS3da?=
- =?utf-8?B?V0FmQVltQzFTSU4xeWtOMHNhRStnTlEzVjVFZmMwNnVOdXhpK2dxaHk1aWJL?=
- =?utf-8?B?TittOForc1ZnT1llZzdqcnhNSWZNcWlrM29DMVJYdzJaVzArRWh4aU5KVHlT?=
- =?utf-8?B?N3BNUW9ZeWJEeUJmaE8vZmdvaEhqanlJK3NCQklNMmt5QjNRTWdXQ29iejRp?=
- =?utf-8?B?SXhqK29GR0EwdW5GNksxc05OOHVSSnpBOEhINWl6K1AzSk9jMi82czFHNHFT?=
- =?utf-8?B?K3hvVUo2UzI1ZC9QMjRvcDVSSnNZbEtIeGwyaDhjZGdybnBhVGluV3NVME5v?=
- =?utf-8?B?alZWcEhMQmZMN0FTbnprMmp4MFp4bGRqQ0ZFSFFKNjdENlNGRzlmUVdjN1dk?=
- =?utf-8?B?Nnl5bjg5YlV6SUVnSmlQT1VzQmphaEdwaGFCb1d2ejNBRW9EcTdpRGk0SFM4?=
- =?utf-8?B?M0d2QlhSd3lOSTV3MmQvaDBmM0hFM1JXVjlkRlcrVlJSZERML0xJVmVlRnk4?=
- =?utf-8?B?Sms5ME1KRDRqd2ppV0xSUU5JczVVRHdsTEVNTjdQWUpKQXcySm1MTCtYV09Y?=
- =?utf-8?Q?EkULOeDYPt909?=
-X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB9PR08MB7179.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB10269
-Original-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-X-EOPAttributedMessage: 0
-X-MS-Exchange-SkipListedInternetSender:
- ip=[2603:10a6:10:2cc::19];domain=DB9PR08MB7179.eurprd08.prod.outlook.com
-X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- AM4PEPF00027A63.eurprd04.prod.outlook.com
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	8663ad94-83de-4d14-3bb0-08dcce642d17
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|35042699022|36860700013|82310400026|376014|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Zjh3TFFNYjBGVkVOR1RzaDQ2NFJpdUFTU0RlMTkxM3FqbDQxK1dEYUhoZHEy?=
- =?utf-8?B?dzR2S2Q0ZjhjcE5PYkN5YUIwSnIxK1gvTUtRSEdkU1ppOFhIUE0rMWJRdEps?=
- =?utf-8?B?NDdiS2FqcEZqOEJCK0hIbTE0ZUUvWDl3VVRkaTE0UUtLa0ZOdDBkQW03dVFz?=
- =?utf-8?B?YzNPNnZNZTQ3T08wNDJrQXZ0WkFFYWlIYzdNcmgrdGRsTmhvYTBvcFBEVEVL?=
- =?utf-8?B?TXBLZUdGYzNzYjFGTTlrNWJ1b3liKzVZQ1dFcGFMdmVRNDU1cm9nZzB6VW92?=
- =?utf-8?B?QWJGUG05MC9HM21tRksxL0xjeDd2dGZwZGZDTzYrUTFPQ3dvRW9aUjhGdmpq?=
- =?utf-8?B?UVlFeWVsQUl2OEkrVkN3YkpoekZFZ3VycjdsRHFSM25ZcHhOR2hiemMybHlr?=
- =?utf-8?B?SWxWVFkwTzM4VkZzMEM0LzRVamh1NjlsTndxN1FSUWFyRkQ3N0ptZVYxOHlT?=
- =?utf-8?B?T0hUL0JONUZLUldXTjlGVTBQM2tUYysyTC9hWG4zK2FZeHY2WUlweUoxQ3k2?=
- =?utf-8?B?Rk5Xbk96eXNGai9RcDJuaUMvemUxYzh3RlRYQVdDTmczQXM0TFRSb2xURm5N?=
- =?utf-8?B?cjdlZGhjNndlWDNMb1A3Zks3b0dhZFFpYytvL3pPZ0wyakFWV2taRWRCYkhz?=
- =?utf-8?B?RHVEKzl4SmlYVFpjOVRjZ05aZUR4Vkw1c2ZNYXFuKzFxLzIrZmw2MXVZc3dU?=
- =?utf-8?B?aDlMZGVXN0lmU1QydW1tQ0pncWdXd3RZRHdLUEpieXlGQWJma1ZoalZjRHFC?=
- =?utf-8?B?UHlWRXhDK0ZXbUVTZCs2a2tNUDNidnpJV0JtYzBUUFpkOXRwNkJ2QlBDb0tF?=
- =?utf-8?B?YW84YWdiekpjTEZOYWpyRnh2RXU4dkdxQTlTRFZkWEZuOFVSSjFobHRSWjhP?=
- =?utf-8?B?ZkVzNGpKRlRjUWhRUEpOOEZUWDRaRGovdmpTRlpvM3pZWTFQODRIMERxd3Vu?=
- =?utf-8?B?TmxZWVZWMmFXQTU0U3AyUFlOTXJSTHdWbGVuMEVySVFLWG9SSmZ3dXZQbjBw?=
- =?utf-8?B?Y0xpY2dYMk4xeGNyMmh0RlJiaXRTa1hMdDhPZEs0RnZMdHg5Wk10MmEva2lr?=
- =?utf-8?B?dHQzdWtTNnU4anBrRVhiMVJUSVhad1FZWEZZMW5wT3lVd1QrTGpsUUNiVDhD?=
- =?utf-8?B?QkNrNkU1VmZ1RGl0NElzMEEzVTZIbU5ka2FZYUR0Q2Y2ZFIvRS9DNTFib3da?=
- =?utf-8?B?cFROWHhjMmE2TTJwaXd0SzFCR1hvbDZpMk9WMkNhWEJQSFJBZHdwQTlSQ0I2?=
- =?utf-8?B?K3RzRzFIZ2l4WUhZWHZGdUo1OFVxNERDeGJMdDFJZGo5aUZ6d2x0dzBibHBp?=
- =?utf-8?B?c0NIYlBPcWp0L1JDR3BuUmVZb09vTzd3Y3FlRFdreTRkWTMydnBjVUZpSEtW?=
- =?utf-8?B?Ym45dWlpNThoRkFnckp4Uzg2Vm5qWWRubkwrQ24xTjhxM1FmOVNRZDIyR0dz?=
- =?utf-8?B?VjMzbU9BYkJ3V0NLMkJaVjFodTY3enV2VGhGQUJzRmJhUkVtVS8yMFRmWGlN?=
- =?utf-8?B?bXNPUEFXVXlYRnkyVXBHUFNFblkvL0VnQjVOTHpXdVhDd0JuOVhBSnFwZklS?=
- =?utf-8?B?T08wNFVEeUtJdzVvS000MFVFYnM2RTd6Um5QS3ZOcjdsc2tQYmZMNzJ2dVdh?=
- =?utf-8?B?WnFmclJsTXJyQzYyK1VDSFJ0WDdIRmpJY3ZHazloa1V1Vll4M214ekZqbkJE?=
- =?utf-8?B?Vk5COXdiTmRPajJvSjVFR3V1Q2FrWXE4TmpSdjA0cFoxTS8vNTdncEEzZGJL?=
- =?utf-8?B?cjQ2aTZ1TzIvSWJkRmxlNXl3aWJzK0IvelpvUjREbWVCRisraHlxaXlTVHNh?=
- =?utf-8?B?UHg5Q0pGS2RxTEJDNHZERDVUUWdLNUN1VGFjbTJIZWcwVVNQcmNVTXZmYjdK?=
- =?utf-8?B?a01WOG5neUFYOVpROUlaSmh6Wm8rT1c5T2xFalNpdmMzbjFZWldnSDRjdVFx?=
- =?utf-8?B?RW9laVZFbDBaL3RJVnBSbjErdWk2R1VVUjhBWkdDS2NWZ1pkVFd4SU1Cb2ov?=
- =?utf-8?B?R2cyaDBJR29BPT0=?=
-X-Forefront-Antispam-Report:
-	CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFS:(13230040)(1800799024)(35042699022)(36860700013)(82310400026)(376014)(921020);DIR:OUT;SFP:1101;
-X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Sep 2024 11:08:13.3879
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5b100e04-8b15-48a3-1261-08dcce643375
-X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[63.35.35.123];Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	AM4PEPF00027A63.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB5470
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 07/19] arm64: rsi: Add support for checking whether an
+ MMIO is protected
+To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun <alpergun@google.com>
+References: <20240819131924.372366-1-steven.price@arm.com>
+ <20240819131924.372366-8-steven.price@arm.com>
+ <fe3da777-c6de-451d-8a8a-19fdda8e82e5@redhat.com>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <fe3da777-c6de-451d-8a8a-19fdda8e82e5@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-The 08/29/2024 00:27, Mark Brown wrote:
-> Unfortunately plain clone() is not extensible and existing clone3()
-> users will not specify a stack so all existing code would be broken if
-> we mandated specifying the stack explicitly.  For compatibility with
-> these cases and also x86 (which did not initially implement clone3()
-> support for shadow stacks) if no GCS is specified we will allocate one
-> so when a thread is created which has GCS enabled allocate one for it.
-> We follow the extensively discussed x86 implementation and allocate
-> min(RLIMIT_STACK, 2G).  Since the GCS only stores the call stack and not
-> any variables this should be more than sufficient for most applications.
-
-the code has RLIMIT_STACK/2
-
-(which is what i expect on arm64, since gcs entry size
-is min stack frame / 2 if the stack is correctly aligned)
-
+On 06/09/2024 05:32, Gavin Shan wrote:
+> Hi Steven,
 > 
-> GCSs allocated via this mechanism will be freed when the thread exits.
+> On 8/19/24 11:19 PM, Steven Price wrote:
+>> From: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>
+>> On Arm CCA, with RMM-v1.0, all MMIO regions are shared. However, in
+>> the future, an Arm CCA-v1.0 compliant guest may be run in a lesser
+>> privileged partition in the Realm World (with Arm CCA-v1.1 Planes
+>> feature). In this case, some of the MMIO regions may be emulated
+>> by a higher privileged component in the Realm world, i.e, protected.
+>>
+>> Thus the guest must decide today, whether a given MMIO region is shared
+>> vs Protected and create the stage1 mapping accordingly. On Arm CCA, this
+>> detection is based on the "IPA State" (RIPAS == RIPAS_IO). Provide a
+>> helper to run this check on a given range of MMIO.
+>>
+>> Also, provide a arm64 helper which may be hooked in by other solutions.
+>>
+>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>> New patch for v5
+>> ---
+>>   arch/arm64/include/asm/io.h       |  8 ++++++++
+>>   arch/arm64/include/asm/rsi.h      |  3 +++
+>>   arch/arm64/include/asm/rsi_cmds.h | 21 +++++++++++++++++++++
+>>   arch/arm64/kernel/rsi.c           | 26 ++++++++++++++++++++++++++
+>>   4 files changed, 58 insertions(+)
+>>
+>> diff --git a/arch/arm64/include/asm/io.h b/arch/arm64/include/asm/io.h
+>> index 1ada23a6ec19..a6c551c5e44e 100644
+>> --- a/arch/arm64/include/asm/io.h
+>> +++ b/arch/arm64/include/asm/io.h
+>> @@ -17,6 +17,7 @@
+>>   #include <asm/early_ioremap.h>
+>>   #include <asm/alternative.h>
+>>   #include <asm/cpufeature.h>
+>> +#include <asm/rsi.h>
+>>     /*
+>>    * Generic IO read/write.  These perform native-endian accesses.
+>> @@ -318,4 +319,11 @@ extern bool
+>> arch_memremap_can_ram_remap(resource_size_t offset, size_t size,
+>>                       unsigned long flags);
+>>   #define arch_memremap_can_ram_remap arch_memremap_can_ram_remap
+>>   +static inline bool arm64_is_iomem_private(phys_addr_t phys_addr,
+>> size_t size)
+>> +{
+>> +    if (unlikely(is_realm_world()))
+>> +        return arm64_rsi_is_protected_mmio(phys_addr, size);
+>> +    return false;
+>> +}
+>> +
+>>   #endif    /* __ASM_IO_H */
+>> diff --git a/arch/arm64/include/asm/rsi.h b/arch/arm64/include/asm/rsi.h
+>> index 2bc013badbc3..e31231b50b6a 100644
+>> --- a/arch/arm64/include/asm/rsi.h
+>> +++ b/arch/arm64/include/asm/rsi.h
+>> @@ -13,6 +13,9 @@ DECLARE_STATIC_KEY_FALSE(rsi_present);
+>>     void __init arm64_rsi_init(void);
+>>   void __init arm64_rsi_setup_memory(void);
+>> +
+>> +bool arm64_rsi_is_protected_mmio(phys_addr_t base, size_t size);
+>> +
+>>   static inline bool is_realm_world(void)
+>>   {
+>>       return static_branch_unlikely(&rsi_present);
+>> diff --git a/arch/arm64/include/asm/rsi_cmds.h
+>> b/arch/arm64/include/asm/rsi_cmds.h
+>> index 968b03f4e703..c2363f36d167 100644
+>> --- a/arch/arm64/include/asm/rsi_cmds.h
+>> +++ b/arch/arm64/include/asm/rsi_cmds.h
+>> @@ -45,6 +45,27 @@ static inline unsigned long
+>> rsi_get_realm_config(struct realm_config *cfg)
+>>       return res.a0;
+>>   }
+>>   +static inline unsigned long rsi_ipa_state_get(phys_addr_t start,
+>> +                          phys_addr_t end,
+>> +                          enum ripas *state,
+>> +                          phys_addr_t *top)
+>> +{
+>> +    struct arm_smccc_res res;
+>> +
+>> +    arm_smccc_smc(SMC_RSI_IPA_STATE_GET,
+>> +              start, end, 0, 0, 0, 0, 0,
+>> +              &res);
+>> +
+>> +    if (res.a0 == RSI_SUCCESS) {
+>> +        if (top)
+>> +            *top = res.a1;
+>> +        if (state)
+>> +            *state = res.a2;
+>> +    }
+>> +
+>> +    return res.a0;
+>> +}
+>> +
+>>   static inline unsigned long rsi_set_addr_range_state(phys_addr_t start,
+>>                                phys_addr_t end,
+>>                                enum ripas state,
+>> diff --git a/arch/arm64/kernel/rsi.c b/arch/arm64/kernel/rsi.c
+>> index e968a5c9929e..381a5b9a5333 100644
+>> --- a/arch/arm64/kernel/rsi.c
+>> +++ b/arch/arm64/kernel/rsi.c
+>> @@ -67,6 +67,32 @@ void __init arm64_rsi_setup_memory(void)
+>>       }
+>>   }
+>>   +bool arm64_rsi_is_protected_mmio(phys_addr_t base, size_t size)
+>> +{
+>> +    enum ripas ripas;
+>> +    phys_addr_t end, top;
+>> +
+>> +    /* Overflow ? */
+>> +    if (WARN_ON(base + size < base))
+>> +        return false;
+>> +
+>> +    end = ALIGN(base + size, RSI_GRANULE_SIZE);
+>> +    base = ALIGN_DOWN(base, RSI_GRANULE_SIZE);
+>> +
+>> +    while (base < end) {
+>> +        if (WARN_ON(rsi_ipa_state_get(base, end, &ripas, &top)))
+>> +            break;
+>> +        if (WARN_ON(top <= base))
+>> +            break;
+>> +        if (ripas != RSI_RIPAS_IO)
+>> +            break;
+>> +        base = top;
+>> +    }
+>> +
+>> +    return (size && base >= end);
+>> +}
+> 
+> I don't understand why @size needs to be checked here. Its initial value
+> taken from the input parameter should be larger than zero and its value
+> is never updated in the loop. So I'm understanding @size is always larger
+> than zero, and the condition would be something like below if I'm correct.
 
-i see gcs still mapped after thread exit when testing.
+Yes you are correct. I'm not entirely sure why it was written that way.
+The only change dropping 'size' as you suggest is that a zero-sized
+region is considered protected. But I'd consider it a bug if this is
+called with size=0. I'll drop 'size' here.
 
-> +static unsigned long gcs_size(unsigned long size)
-> +{
-> +	if (size)
-> +		return PAGE_ALIGN(size);
+>        return (base >= end);     /* RSI_RIPAS_IO returned for all
+> granules */
+> 
+> Another issue is @top is always zero with the latest tf-rmm. More details
+> are provided below.
 
-no /2
+That suggests that you are not actually using the 'latest' tf-rmm ;)
+(for some definition of 'latest' which might not be obvious!)
 
-> +
-> +	/* Allocate RLIMIT_STACK/2 with limits of PAGE_SIZE..2G */
-> +	size = PAGE_ALIGN(min_t(unsigned long long,
-> +				rlimit(RLIMIT_STACK) / 2, SZ_2G));
+From the cover letter:
 
-has /2
+> As mentioned above the new RMM specification means that corresponding
+> changes need to be made in the RMM, at this time these changes are still
+> in review (see 'topics/rmm-1.0-rel0-rc1'). So you'll need to fetch the
+> changes[3] from the gerrit instance until they are pushed to the main
+> branch.
+>
+> [3] https://review.trustedfirmware.org/c/TF-RMM/tf-rmm/+/30485
 
-> +	return max(PAGE_SIZE, size);
-> +}
-> +
-> +unsigned long gcs_alloc_thread_stack(struct task_struct *tsk,
-> +				     const struct kernel_clone_args *args)
-> +{
-> +	unsigned long addr, size;
-> +
-> +	if (!system_supports_gcs())
-> +		return 0;
-> +
-> +	if (!task_gcs_el0_enabled(tsk))
-> +		return 0;
-> +
-> +	if ((args->flags & (CLONE_VFORK | CLONE_VM)) != CLONE_VM) {
-> +		tsk->thread.gcspr_el0 = read_sysreg_s(SYS_GCSPR_EL0);
-> +		return 0;
-> +	}
-> +
-> +	size = args->stack_size;
+Sorry, I should probably have made this much more prominent in the cover
+letter.
 
-no /2 (i think this should be divided)
+Running something like...
 
-> +
-> +	size = gcs_size(size);
-> +	addr = alloc_gcs(0, size);
-> +	if (IS_ERR_VALUE(addr))
-> +		return addr;
-> +
-> +	tsk->thread.gcs_base = addr;
-> +	tsk->thread.gcs_size = size;
-> +	tsk->thread.gcspr_el0 = addr + size - sizeof(u64);
-> +
-> +	return addr;
-> +}
-...
->  void gcs_free(struct task_struct *task)
->  {
-> +
-> +	/*
-> +	 * When fork() with CLONE_VM fails, the child (tsk) already
-> +	 * has a GCS allocated, and exit_thread() calls this function
-> +	 * to free it.  In this case the parent (current) and the
-> +	 * child share the same mm struct.
-> +	 */
-> +	if (!task->mm || task->mm != current->mm)
-> +		return;
-> +
->  	if (task->thread.gcs_base)
->  		vm_munmap(task->thread.gcs_base, task->thread.gcs_size);
+ git fetch https://git.trustedfirmware.org/TF-RMM/tf-rmm.git \
+	refs/changes/85/30485/11
 
-not sure why this logic fails to free thread gcs
-(created with clone3 in glibc)
+... should get you the latest. Hopefully these changes will get merged
+to the main branch soon.
 
-other the gcs leak, my tests pass.
+Steve
+
+>> +EXPORT_SYMBOL(arm64_rsi_is_protected_mmio);
+>> +
+>>   void __init arm64_rsi_init(void)
+>>   {
+>>       /*
+> 
+> The unexpected calltrace is continuously observed with host/v4, guest/v5
+> and
+> latest upstream tf-rmm on 'WARN_ON(top <= base)' because @top is never
+> updated
+> by the latest tf-rmm. The following call path indicates how
+> SMC_RSI_IPA_STATE_GET
+> is handled by tf-rmm. I don't see RSI_RIPAS_IO is defined there and @top is
+> updated.
+> 
+> [    0.000000] ------------[ cut here ]------------
+> [    0.000000] WARNING: CPU: 0 PID: 0 at arch/arm64/kernel/rsi.c:103
+> arm64_rsi_is_protected_mmio+0xf0/0x110
+> [    0.000000] Modules linked in:
+> [    0.000000] CPU: 0 UID: 0 PID: 0 Comm: swapper Not tainted
+> 6.11.0-rc1-gavin-g3527d001084e #1
+> [    0.000000] Hardware name: linux,dummy-virt (DT)
+> [    0.000000] pstate: 200000c5 (nzCv daIF -PAN -UAO -TCO -DIT -SSBS
+> BTYPE=--)
+> [    0.000000] pc : arm64_rsi_is_protected_mmio+0xf0/0x110
+> [    0.000000] lr : arm64_rsi_is_protected_mmio+0x80/0x110
+> [    0.000000] sp : ffffcd7097053bf0
+> [    0.000000] x29: ffffcd7097053c30 x28: 0000000000000000 x27:
+> 0000000000000000
+> [    0.000000] x26: 00000000000003d0 x25: 00000000ffffff8e x24:
+> ffffcd7096831bd0
+> [    0.000000] x23: ffffcd7097053c08 x22: 00000000c4000198 x21:
+> 0000000000001000
+> [    0.000000] x20: 0000000001001000 x19: 0000000001000000 x18:
+> 0000000000000002
+> [    0.000000] x17: 0000000000000000 x16: 0000000000000010 x15:
+> 0001000080000000
+> [    0.000000] x14: 0068000000000703 x13: ffffffffff5fe000 x12:
+> ffffcd7097053ba4
+> [    0.000000] x11: 00000000000003d0 x10: ffffcd7097053bc4 x9 :
+> 0000000000000444
+> [    0.000000] x8 : ffffffffff5fe000 x7 : 0000000000000000 x6 :
+> 0000000000000000
+> [    0.000000] x5 : 0000000000000000 x4 : 0000000000000000 x3 :
+> 0000000000000000
+> [    0.000000] x2 : 0000000000000000 x1 : 0000000000000000 x0 :
+> 0000000000000000
+> [    0.000000] Call trace:
+> [    0.000000]  arm64_rsi_is_protected_mmio+0xf0/0x110
+> [    0.000000]  set_fixmap_io+0x8c/0xd0
+> [    0.000000]  of_setup_earlycon+0xa0/0x294
+> [    0.000000]  early_init_dt_scan_chosen_stdout+0x104/0x1dc
+> [    0.000000]  acpi_boot_table_init+0x1a4/0x2d8
+> [    0.000000]  setup_arch+0x240/0x610
+> [    0.000000]  start_kernel+0x6c/0x708
+> [    0.000000]  __primary_switched+0x80/0x88
+> 
+> ===> tf-rmm: git@github.com:TF-RMM/tf-rmm.git
+> 
+> handle_realm_rsi
+>   handle_rsi_ipa_state_get
+>     realm_ipa_get_ripas
+> 
+> ===> tf-rmm/lib/s2tt/include/ripas.h
+> 
+> enum ripas {
+>         RIPAS_EMPTY = RMI_EMPTY,        /* Unused IPA for Realm */
+>         RIPAS_RAM = RMI_RAM,            /* IPA used for Code/Data by
+> Realm */
+>         RIPAS_DESTROYED = RMI_DESTROYED /* IPA is inaccessible to the
+> Realm */
+> };
+> 
+> ===> tf-rmm/runtime/rsi/memory.c
+> 
+> void handle_rsi_ipa_state_get(struct rec *rec,
+>                               struct rsi_result *res)
+> {
+>         unsigned long ipa = rec->regs[1];
+>         enum s2_walk_status ws;
+>         enum ripas ripas_val = RIPAS_EMPTY;
+> 
+>         res->action = UPDATE_REC_RETURN_TO_REALM;
+> 
+>         if (!GRANULE_ALIGNED(ipa) || !addr_in_rec_par(rec, ipa)) {
+>                 res->smc_res.x[0] = RSI_ERROR_INPUT;
+>                 return;
+>         }
+> 
+>         ws = realm_ipa_get_ripas(rec, ipa, &ripas_val);
+>         if (ws == WALK_SUCCESS) {
+>                 res->smc_res.x[0] = RSI_SUCCESS;
+>                 res->smc_res.x[1] = (unsigned long)ripas_val;
+>         } else {
+>                 res->smc_res.x[0] = RSI_ERROR_INPUT;
+>         }
+> }
+> 
+> Thanks,
+> Gavin
+> 
+
