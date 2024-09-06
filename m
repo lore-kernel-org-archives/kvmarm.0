@@ -1,193 +1,336 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2078.outbound.protection.outlook.com [40.107.22.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B09A1CCB5E;
-	Fri,  6 Sep 2024 11:01:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725620501; cv=none; b=AnThNKbmY2MJcrgrqoPlB7CHWAHy9ONry6PKc1HJZ/4FNAfD5n8gVICXniScFINfz61EWQQDWApoIO8O7qTGGP9sWA5ia8OfdYjx5JjbnUdE8eiI8aX7TRWu7zhJaCsGRmLy0QuGKiAQVDxJ57i1iTPmG5jLkfhK1KpcSb9aJcM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725620501; c=relaxed/simple;
-	bh=XLEFleBi1dpezrCN0L236rCr8UnL4qKgiVJMT/gVdZo=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=eMhrQSaTB0jFeYYTuSy+gyqaabeStpcSeXhmnegQ/YWr2nKks6E+p+FqzaqBl42a8MbQTvhbZBybomsva5mwuS/An55tN26gmprseN2+bCu5zxllR9qkslIILGCYQJfnI6ssP33ca+gWtTN3KHEVqgv1ixRSKXyYlheCLSsKVSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MRCQHnm7; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF3071CB306
+	for <kvmarm@lists.linux.dev>; Fri,  6 Sep 2024 11:08:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.22.78
+ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725620906; cv=fail; b=cyVoo/Gd+UldtTuA1dapl3jbwPmVO7+rPTPJ3ngFtX+cozqIZON8xxL4m5yPrGEevzj/D0SX/ys4ttjaPh5TEepAHdN/uO6eTKdC0NR+TrGiyjcC2sjEB5/D2U55DUiQ8zrb/GdJHJgDDNTqap+kcEnO2O0TVbyp5RI+CpsrIJI=
+ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725620906; c=relaxed/simple;
+	bh=IDQcveTj3Z7tsYMYd/U7PkJLwxrIQ7zK1XUC72ksgDs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=oASvBWiRp/fuf37/a1ZX3aVLOUA+0oNUl/ZJdub2aFdt8Hoox4Na4gmoIgH9BJZCDJ0KOF6HF+qB1bXCoGaV0zp9vFRm11ATrBox6S3wUJtJSZ4VtCZBO5Ipl8L2swgUVIt1PAjrFrvZwbwpvn9b4aGVjegKXKXoFcQM0igm2l4=
+ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=D2kECHoM; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=D2kECHoM; arc=fail smtp.client-ip=40.107.22.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MRCQHnm7"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C72E0C4AF55;
-	Fri,  6 Sep 2024 11:01:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725620500;
-	bh=XLEFleBi1dpezrCN0L236rCr8UnL4qKgiVJMT/gVdZo=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=MRCQHnm7DALEbPuviJjS6zZwzYuQkJA9x6div0Fqn6MZQ06mWVihWBozJsiUvGcAc
-	 bJR6fiu5HZGRuaPcnQFN1Genvd4fYchjFtcLVcT23784VO+uuEQRHSxBO8fDEBnhHa
-	 RtINq3H7JdCCsRq12zSOhLMcz03TSXWgNcf/eqBmlmVUYzaKGBFIks6ZbLh2hADNAK
-	 cs6fBUh/DRTcvIwpUpNC0qgp0hKNjsyVf276mku+BTTSmdHMdImMz5MqqH2VlWkXWF
-	 KN9Rw33I1rINwOweAvT5vZKBA1rJiD1bAr2c5/O7k5JHtpE474mXigAC3KJkRU30W8
-	 ouI72lr0Is0kw==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBCBDCE7B00;
-	Fri,  6 Sep 2024 11:01:40 +0000 (UTC)
-From: Daniel Gomez via B4 Relay <devnull+da.gomez.samsung.com@kernel.org>
-Date: Fri, 06 Sep 2024 13:01:35 +0200
-Subject: [PATCH v2 8/8] Documentation: add howto build in macos
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="D2kECHoM";
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="D2kECHoM"
+ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
+ b=WpDHxQuVLREcbCji+iQjlsAxucaP52At55VClLUBwwRJn7yshhFtvuag6Wg3Ub8DyBCMNX0cOP1d0WMFgRUwhD95roxur3GMFyJRcGP4s6jMwEbVAcupUfx7Vte7h6HzEZbhUASUqbhbjt5Nt+eRQCsUXRcDvSBCGFzsh1ebGRJg0D+ens42/ZHWD40ljL1URKs6PZDoqjkt0+/TdbR/yc+tI6BZL9fzvq2BjnzaRlOEYxJvgTYSbdvq2TmvnqIPIauHOYJtuXKlbwMC7vPsP6IRvRZ8aMjN1beJZ7JMXRWmfQw5R4uqoPLj/WAqdmf1Hp3n0klL4xJ/wqslrdGJmg==
+ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yuGZavkWIIH1h02+xTDKXt3DJz7tzsCjDU++TkIxlUI=;
+ b=Zh7aRiU1VB4iTFCO8KSm88+tzsErwKYrv1DF+VeL3r8SOYS8B+rdRSZq44haEbAJX/89ospKoSnIwloV8CLS7blLwjm08lMDjH3WkkJm2ZNWbg4WHdlZ/3kz3vTSpz9CLAhGcVVqfNXuU7vv8jz3xNQtl5y9vjm3SOe+imoaQ5uWjhm9h1rF4Xg55FbAcxPXI4/wlNoMft/aATIynB1cSvubML19MkV4yZ9yYVaGkDezzuVKENt2G+1OXei00CInE6/zk1+Bbo+T45+m/7xL9Hlk/qQeJRnnPppDzcprJt8CQOeqOgFNY+uoqM/xypvydFXb2D9B7wNBuKvLafx6tg==
+ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
+ 63.35.35.123) smtp.rcpttodomain=lists.linux.dev smtp.mailfrom=arm.com;
+ dmarc=pass (p=none sp=none pct=100) action=none header.from=arm.com;
+ dkim=pass (signature was verified) header.d=arm.com; arc=pass (0 oda=1 ltdi=1
+ spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
+ dmarc=[1,1,header.from=arm.com])
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yuGZavkWIIH1h02+xTDKXt3DJz7tzsCjDU++TkIxlUI=;
+ b=D2kECHoM21OD0D0NzMlAsSasCHhz643+AitqPdswj4VnuDfhi9IY91vT5bthBJxR3TO5JJTbwmp+q8OLUK2Wqyy5sfwjtKDc8HaSRtJyxEmexXT8tyuMsEnWKANXDqyfo6K+8cyRpv5jn5+DFTf31vCkRMs8OTgCSnD9sMP7nAw=
+Received: from AM0PR04CA0084.eurprd04.prod.outlook.com (2603:10a6:208:be::25)
+ by VI1PR08MB5470.eurprd08.prod.outlook.com (2603:10a6:803:136::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7939.16; Fri, 6 Sep
+ 2024 11:08:13 +0000
+Received: from AM4PEPF00027A63.eurprd04.prod.outlook.com
+ (2603:10a6:208:be:cafe::be) by AM0PR04CA0084.outlook.office365.com
+ (2603:10a6:208:be::25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7939.17 via Frontend
+ Transport; Fri, 6 Sep 2024 11:08:13 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 63.35.35.123)
+ smtp.mailfrom=arm.com; dkim=pass (signature was verified)
+ header.d=arm.com;dmarc=pass action=none header.from=arm.com;
+Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
+ 63.35.35.123 as permitted sender) receiver=protection.outlook.com;
+ client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
+ pr=C
+Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
+ AM4PEPF00027A63.mail.protection.outlook.com (10.167.16.73) with Microsoft
+ SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.7918.13
+ via Frontend Transport; Fri, 6 Sep 2024 11:08:13 +0000
+Received: ("Tessian outbound a13c34f08745:v437"); Fri, 06 Sep 2024 11:08:13 +0000
+X-CheckRecipientChecked: true
+X-CR-MTA-CID: 0a912932261d8174
+X-CR-MTA-TID: 64aa7808
+Received: from Lb668a72e7cf9.1
+	by 64aa7808-outbound-1.mta.getcheckrecipient.com id 9AE62DB3-54CA-4EB5-B219-749B3FE139D6.1;
+	Fri, 06 Sep 2024 11:08:11 +0000
+Received: from EUR03-VI1-obe.outbound.protection.outlook.com
+    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id Lb668a72e7cf9.1
+    (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
+    Fri, 06 Sep 2024 11:08:11 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=RmrVnQETqhcT1uAlEKkasOnHhTf9PcOIHgaJHfe+JyL+MtMsYpd9lvjaz3ARbdGE5rXqHPHVUTbYs91wC8S9smf9wsGzrKxeTnF2Z8KqsI5v6m22EF1nMXiZRNkjgoXI/Ee+5WDTEL7GyL9GfT9yZj1O7uK7pCg9qnQbcIzXpBBglptISmMMpI8hL/XIX2MC11FNkeaJAsld0irpDuV4bHvbYx/ci/PeXBBI1QamFYXzg+ksV3jAYhLKhVK4c3NfTbYkGRSqiSlMrGbUYg+YFy4EOLvofCtzNNJpKJsx21Neb0Z0j5A0BPyqDp4bcNYsAFN6rDAZls01iNYkRw5fxw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yuGZavkWIIH1h02+xTDKXt3DJz7tzsCjDU++TkIxlUI=;
+ b=l9omlfwFvI1rqtOAGIwyM5iFOk/Yus4ZSk7O0Mpn9jSMDRNiN6HOQ9R90mudAaTMMPIMdU/NkyHRXe+YPwyydyiSITHJ5K8q5VODVAIyHFpkR5F4ZpMzPQs+J5j44OhKAmOcGe444cxMbG+WT5Xo0SoqMtJJU+66FjzwPs+vMfvFm2Ad20uAYgaLEfWeyAAZhdURRHjn1/lZDzDCN7zpasxcZpNsIQuYXLr4u/7Quw0CTgfKVlM4rxVQUZwlA2N9AqZ8UsgY0aKZXCEppVwNWdrBxwrl8YKCpFjTPPNKT83JsyezFUnk8JuSPKzRuoM/GRsK6FkrhaPSmky4QzpV0Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
+ header.d=arm.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yuGZavkWIIH1h02+xTDKXt3DJz7tzsCjDU++TkIxlUI=;
+ b=D2kECHoM21OD0D0NzMlAsSasCHhz643+AitqPdswj4VnuDfhi9IY91vT5bthBJxR3TO5JJTbwmp+q8OLUK2Wqyy5sfwjtKDc8HaSRtJyxEmexXT8tyuMsEnWKANXDqyfo6K+8cyRpv5jn5+DFTf31vCkRMs8OTgCSnD9sMP7nAw=
+Authentication-Results-Original: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=arm.com;
+Received: from DB9PR08MB7179.eurprd08.prod.outlook.com (2603:10a6:10:2cc::19)
+ by AS8PR08MB10269.eurprd08.prod.outlook.com (2603:10a6:20b:63c::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7962.9; Fri, 6 Sep
+ 2024 11:08:03 +0000
+Received: from DB9PR08MB7179.eurprd08.prod.outlook.com
+ ([fe80::7d7e:3788:b094:b809]) by DB9PR08MB7179.eurprd08.prod.outlook.com
+ ([fe80::7d7e:3788:b094:b809%6]) with mapi id 15.20.7939.016; Fri, 6 Sep 2024
+ 11:08:03 +0000
+Date: Fri, 6 Sep 2024 12:07:49 +0100
+From: Szabolcs Nagy <Szabolcs.Nagy@arm.com>
+To: Mark Brown <broonie@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Kees Cook <kees@kernel.org>
+Cc: "H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Florian Weimer <fweimer@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
+	Ross Burton <ross.burton@arm.com>,
+	Yury Khrustalev <yury.khrustalev@arm.com>,
+	Wilco Dijkstra <wilco.dijkstra@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v12 21/39] arm64/gcs: Ensure that new threads have a GCS
+Message-ID: <ZtrihWQFyb2/XrQV@arm.com>
+References: <20240829-arm64-gcs-v12-0-42fec947436a@kernel.org>
+ <20240829-arm64-gcs-v12-21-42fec947436a@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240829-arm64-gcs-v12-21-42fec947436a@kernel.org>
+X-ClientProxiedBy: LO3P123CA0021.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:388::9) To DB9PR08MB7179.eurprd08.prod.outlook.com
+ (2603:10a6:10:2cc::19)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240906-macos-build-support-v2-8-06beff418848@samsung.com>
-References: <20240906-macos-build-support-v2-0-06beff418848@samsung.com>
-In-Reply-To: <20240906-macos-build-support-v2-0-06beff418848@samsung.com>
-To: Masahiro Yamada <masahiroy@kernel.org>, 
- Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, 
- Lucas De Marchi <lucas.demarchi@intel.com>, 
- =?utf-8?q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>, 
- Rodrigo Vivi <rodrigo.vivi@intel.com>, 
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
- David Airlie <airlied@gmail.com>, William Hubbs <w.d.hubbs@gmail.com>, 
- Chris Brannon <chris@the-brannons.com>, Kirk Reiser <kirk@reisers.ca>, 
- Samuel Thibault <samuel.thibault@ens-lyon.org>, 
- Paul Moore <paul@paul-moore.com>, 
- Stephen Smalley <stephen.smalley.work@gmail.com>, 
- Ondrej Mosnacek <omosnace@redhat.com>, 
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
- James Morse <james.morse@arm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Zenghui Yu <yuzenghui@huawei.com>, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- Jiri Slaby <jirislaby@kernel.org>, 
- Nick Desaulniers <ndesaulniers@google.com>, 
- Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
- Simona Vetter <simona.vetter@ffwll.ch>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
- intel-xe@lists.freedesktop.org, dri-devel@lists.freedesktop.org, 
- speakup@linux-speakup.org, selinux@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
- linux-serial@vger.kernel.org, llvm@lists.linux.dev, 
- Finn Behrens <me@kloenk.dev>, 
- "Daniel Gomez (Samsung)" <d+samsung@kruces.com>, gost.dev@samsung.com, 
- Daniel Gomez <da.gomez@samsung.com>
-X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1725620498; l=3295;
- i=da.gomez@samsung.com; s=20240621; h=from:subject:message-id;
- bh=d0Jf83ehBVzZd/6sDJAXa3klyzghUuKXMDUak+RyqVk=;
- b=HHVXUAKYpwg0oAq4Llj7Qicr7YTY8yOi8z/Ymdnnl/W0ykKZJbrrJ5EOU8LrjlVkcwlA+JR2O
- 50rFNWri/6gCAgythyvckdtJX73zV3YaMq3ZWFUY7eZPAc4+9wznTjX
-X-Developer-Key: i=da.gomez@samsung.com; a=ed25519;
- pk=BqYk31UHkmv0WZShES6pIZcdmPPGay5LbzifAdZ2Ia4=
-X-Endpoint-Received: by B4 Relay for da.gomez@samsung.com/20240621 with
- auth_id=175
-X-Original-From: Daniel Gomez <da.gomez@samsung.com>
-Reply-To: da.gomez@samsung.com
+X-MS-TrafficTypeDiagnostic:
+	DB9PR08MB7179:EE_|AS8PR08MB10269:EE_|AM4PEPF00027A63:EE_|VI1PR08MB5470:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5b100e04-8b15-48a3-1261-08dcce643375
+x-checkrecipientrouted: true
+NoDisclaimer: true
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam-Untrusted:
+ BCL:0;ARA:13230040|7416014|376014|1800799024|366016|921020;
+X-Microsoft-Antispam-Message-Info-Original:
+ =?utf-8?B?aTBoNDBnUkp3R0IvTEVEV2IxSHZKQlZRVE1JNW9ndFcvdHFTWThjRGdLeEU0?=
+ =?utf-8?B?dzMwWGxZbGhXTHR2YUwzK0lIS2pwUlhqOWdkckpsaC90Y3pEeXdCbDUrMFVm?=
+ =?utf-8?B?WldpTUVaT3Z5VFAwMGljRlU0bGh3Z3owK3RVekh4ZGVXNFIrNWZrZ1NnaFlw?=
+ =?utf-8?B?NUpoQUVSTmVqQ0x1ZXhRT2FEdTRlTlptZ1ljLzRnMmJhVnpIMkVvc25HZHhn?=
+ =?utf-8?B?UjJ5aitlekx6bTVnc09rQWJWSjAyalUxUnVURVVhR3FGVzk0MjZZZHRFRlFI?=
+ =?utf-8?B?M0NTbmREc2FnVlNnakQ0Q0NLaU5MMU8vQk1DM25YSnJCTFltUWY4Z29Lb2Vx?=
+ =?utf-8?B?Qmo5SXJtNEhOYmZpaElENDdpd0NyRWNCS095NnpMYnRHQThKMm1EUUEyVytn?=
+ =?utf-8?B?R0RPYzdXOWo4ZWZhWG5sN1NQODJ4WnRVSzM3SGJSSWhlektDZVp4QnduSlBl?=
+ =?utf-8?B?VEI2Nk5IbXhNMnNWV3IxcnkvdFBPc050dFZoUkZmSjE2aDVBM3czME5rYkNH?=
+ =?utf-8?B?a2tKaWl5cVlEaDNUMTFSWkZCc2ZnK0ZLT0VsYk9uVnZuWDlLbFNaUllJNkdn?=
+ =?utf-8?B?SVd4ZFd4N3AvYjZMWFgzbTBpcmw4VjBCdTdWU3phK1k3MTNCeW1UWTFtWXov?=
+ =?utf-8?B?aGxtaU1EdkdzSGNqRk0vck1JR0dneURhdmpuWStGaFAxbU9Edmk3ZGFyU0c1?=
+ =?utf-8?B?ckJQSFo1Nm45ajJDeEN5Z0hIcWJ3dmdsek9abW12SGZwL1dKK0crcHEwSUJl?=
+ =?utf-8?B?cTJCZXh4My92bkJJb09jMy9YWk4zNDgrQUJVZG45SVhndm10UmhBb2orSHRE?=
+ =?utf-8?B?Vk01YVNrbjRXcmpWSHZrM0FZdlQ3bVdaTUJxVFZZNlVheGozcVdyZlEwZ1dy?=
+ =?utf-8?B?bHd6SlQ3NmxOeXhzeHl1TS9MaENOQ0FBelZZbVJOOGNMcklJcTRiRHVpMHFO?=
+ =?utf-8?B?OUYzV3RLSFNpd1R0VjlDZllFOG14aW5aTnkrWnZ2UklieFFnK2tkM2FLSTh5?=
+ =?utf-8?B?NnRpMEtETkVlUVJqWUxldUFSb2JsVS8yQ1h0TFl0YmZJaTlkK25QaFkyNlh1?=
+ =?utf-8?B?SnIzMEorSW9aZDJTYXdnUzVFL2F1dGtqajN0TXpqQTVvNk1xVFhja0xLaExB?=
+ =?utf-8?B?ZW1Wb0VSSWk1QmhtRnNWQUxNNjIxeU4vRkhGTGtaVFFGQ05GZU5mc0c0TXF3?=
+ =?utf-8?B?Q2xWREtXTm5tRzl1R0l4MlJtNGhhUFhqakRsdk5LOE5VNVd2WERUNTNQRXht?=
+ =?utf-8?B?S3FqZGU0b25NYlBoaEdYSVFxc1luQVpyWUZ3WU44UFc2d0cxNkI5ZUNMS3da?=
+ =?utf-8?B?V0FmQVltQzFTSU4xeWtOMHNhRStnTlEzVjVFZmMwNnVOdXhpK2dxaHk1aWJL?=
+ =?utf-8?B?TittOForc1ZnT1llZzdqcnhNSWZNcWlrM29DMVJYdzJaVzArRWh4aU5KVHlT?=
+ =?utf-8?B?N3BNUW9ZeWJEeUJmaE8vZmdvaEhqanlJK3NCQklNMmt5QjNRTWdXQ29iejRp?=
+ =?utf-8?B?SXhqK29GR0EwdW5GNksxc05OOHVSSnpBOEhINWl6K1AzSk9jMi82czFHNHFT?=
+ =?utf-8?B?K3hvVUo2UzI1ZC9QMjRvcDVSSnNZbEtIeGwyaDhjZGdybnBhVGluV3NVME5v?=
+ =?utf-8?B?alZWcEhMQmZMN0FTbnprMmp4MFp4bGRqQ0ZFSFFKNjdENlNGRzlmUVdjN1dk?=
+ =?utf-8?B?Nnl5bjg5YlV6SUVnSmlQT1VzQmphaEdwaGFCb1d2ejNBRW9EcTdpRGk0SFM4?=
+ =?utf-8?B?M0d2QlhSd3lOSTV3MmQvaDBmM0hFM1JXVjlkRlcrVlJSZERML0xJVmVlRnk4?=
+ =?utf-8?B?Sms5ME1KRDRqd2ppV0xSUU5JczVVRHdsTEVNTjdQWUpKQXcySm1MTCtYV09Y?=
+ =?utf-8?Q?EkULOeDYPt909?=
+X-Forefront-Antispam-Report-Untrusted:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB9PR08MB7179.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB10269
+Original-Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=arm.com;
+X-EOPAttributedMessage: 0
+X-MS-Exchange-SkipListedInternetSender:
+ ip=[2603:10a6:10:2cc::19];domain=DB9PR08MB7179.eurprd08.prod.outlook.com
+X-MS-Exchange-Transport-CrossTenantHeadersStripped:
+ AM4PEPF00027A63.eurprd04.prod.outlook.com
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id-Prvs:
+	8663ad94-83de-4d14-3bb0-08dcce642d17
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|35042699022|36860700013|82310400026|376014|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?Zjh3TFFNYjBGVkVOR1RzaDQ2NFJpdUFTU0RlMTkxM3FqbDQxK1dEYUhoZHEy?=
+ =?utf-8?B?dzR2S2Q0ZjhjcE5PYkN5YUIwSnIxK1gvTUtRSEdkU1ppOFhIUE0rMWJRdEps?=
+ =?utf-8?B?NDdiS2FqcEZqOEJCK0hIbTE0ZUUvWDl3VVRkaTE0UUtLa0ZOdDBkQW03dVFz?=
+ =?utf-8?B?YzNPNnZNZTQ3T08wNDJrQXZ0WkFFYWlIYzdNcmgrdGRsTmhvYTBvcFBEVEVL?=
+ =?utf-8?B?TXBLZUdGYzNzYjFGTTlrNWJ1b3liKzVZQ1dFcGFMdmVRNDU1cm9nZzB6VW92?=
+ =?utf-8?B?QWJGUG05MC9HM21tRksxL0xjeDd2dGZwZGZDTzYrUTFPQ3dvRW9aUjhGdmpq?=
+ =?utf-8?B?UVlFeWVsQUl2OEkrVkN3YkpoekZFZ3VycjdsRHFSM25ZcHhOR2hiemMybHlr?=
+ =?utf-8?B?SWxWVFkwTzM4VkZzMEM0LzRVamh1NjlsTndxN1FSUWFyRkQ3N0ptZVYxOHlT?=
+ =?utf-8?B?T0hUL0JONUZLUldXTjlGVTBQM2tUYysyTC9hWG4zK2FZeHY2WUlweUoxQ3k2?=
+ =?utf-8?B?Rk5Xbk96eXNGai9RcDJuaUMvemUxYzh3RlRYQVdDTmczQXM0TFRSb2xURm5N?=
+ =?utf-8?B?cjdlZGhjNndlWDNMb1A3Zks3b0dhZFFpYytvL3pPZ0wyakFWV2taRWRCYkhz?=
+ =?utf-8?B?RHVEKzl4SmlYVFpjOVRjZ05aZUR4Vkw1c2ZNYXFuKzFxLzIrZmw2MXVZc3dU?=
+ =?utf-8?B?aDlMZGVXN0lmU1QydW1tQ0pncWdXd3RZRHdLUEpieXlGQWJma1ZoalZjRHFC?=
+ =?utf-8?B?UHlWRXhDK0ZXbUVTZCs2a2tNUDNidnpJV0JtYzBUUFpkOXRwNkJ2QlBDb0tF?=
+ =?utf-8?B?YW84YWdiekpjTEZOYWpyRnh2RXU4dkdxQTlTRFZkWEZuOFVSSjFobHRSWjhP?=
+ =?utf-8?B?ZkVzNGpKRlRjUWhRUEpOOEZUWDRaRGovdmpTRlpvM3pZWTFQODRIMERxd3Vu?=
+ =?utf-8?B?TmxZWVZWMmFXQTU0U3AyUFlOTXJSTHdWbGVuMEVySVFLWG9SSmZ3dXZQbjBw?=
+ =?utf-8?B?Y0xpY2dYMk4xeGNyMmh0RlJiaXRTa1hMdDhPZEs0RnZMdHg5Wk10MmEva2lr?=
+ =?utf-8?B?dHQzdWtTNnU4anBrRVhiMVJUSVhad1FZWEZZMW5wT3lVd1QrTGpsUUNiVDhD?=
+ =?utf-8?B?QkNrNkU1VmZ1RGl0NElzMEEzVTZIbU5ka2FZYUR0Q2Y2ZFIvRS9DNTFib3da?=
+ =?utf-8?B?cFROWHhjMmE2TTJwaXd0SzFCR1hvbDZpMk9WMkNhWEJQSFJBZHdwQTlSQ0I2?=
+ =?utf-8?B?K3RzRzFIZ2l4WUhZWHZGdUo1OFVxNERDeGJMdDFJZGo5aUZ6d2x0dzBibHBp?=
+ =?utf-8?B?c0NIYlBPcWp0L1JDR3BuUmVZb09vTzd3Y3FlRFdreTRkWTMydnBjVUZpSEtW?=
+ =?utf-8?B?Ym45dWlpNThoRkFnckp4Uzg2Vm5qWWRubkwrQ24xTjhxM1FmOVNRZDIyR0dz?=
+ =?utf-8?B?VjMzbU9BYkJ3V0NLMkJaVjFodTY3enV2VGhGQUJzRmJhUkVtVS8yMFRmWGlN?=
+ =?utf-8?B?bXNPUEFXVXlYRnkyVXBHUFNFblkvL0VnQjVOTHpXdVhDd0JuOVhBSnFwZklS?=
+ =?utf-8?B?T08wNFVEeUtJdzVvS000MFVFYnM2RTd6Um5QS3ZOcjdsc2tQYmZMNzJ2dVdh?=
+ =?utf-8?B?WnFmclJsTXJyQzYyK1VDSFJ0WDdIRmpJY3ZHazloa1V1Vll4M214ekZqbkJE?=
+ =?utf-8?B?Vk5COXdiTmRPajJvSjVFR3V1Q2FrWXE4TmpSdjA0cFoxTS8vNTdncEEzZGJL?=
+ =?utf-8?B?cjQ2aTZ1TzIvSWJkRmxlNXl3aWJzK0IvelpvUjREbWVCRisraHlxaXlTVHNh?=
+ =?utf-8?B?UHg5Q0pGS2RxTEJDNHZERDVUUWdLNUN1VGFjbTJIZWcwVVNQcmNVTXZmYjdK?=
+ =?utf-8?B?a01WOG5neUFYOVpROUlaSmh6Wm8rT1c5T2xFalNpdmMzbjFZWldnSDRjdVFx?=
+ =?utf-8?B?RW9laVZFbDBaL3RJVnBSbjErdWk2R1VVUjhBWkdDS2NWZ1pkVFd4SU1Cb2ov?=
+ =?utf-8?B?R2cyaDBJR29BPT0=?=
+X-Forefront-Antispam-Report:
+	CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFS:(13230040)(1800799024)(35042699022)(36860700013)(82310400026)(376014)(921020);DIR:OUT;SFP:1101;
+X-OriginatorOrg: arm.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Sep 2024 11:08:13.3879
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5b100e04-8b15-48a3-1261-08dcce643375
+X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[63.35.35.123];Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	AM4PEPF00027A63.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB5470
 
-From: Daniel Gomez <da.gomez@samsung.com>
+The 08/29/2024 00:27, Mark Brown wrote:
+> Unfortunately plain clone() is not extensible and existing clone3()
+> users will not specify a stack so all existing code would be broken if
+> we mandated specifying the stack explicitly.  For compatibility with
+> these cases and also x86 (which did not initially implement clone3()
+> support for shadow stacks) if no GCS is specified we will allocate one
+> so when a thread is created which has GCS enabled allocate one for it.
+> We follow the extensively discussed x86 implementation and allocate
+> min(RLIMIT_STACK, 2G).  Since the GCS only stores the call stack and not
+> any variables this should be more than sufficient for most applications.
 
-Add documentation under kbuild/llvm to inform about the experimental
-support for building the Linux kernel in macOS hosts environments.
+the code has RLIMIT_STACK/2
 
-Signed-off-by: Daniel Gomez <da.gomez@samsung.com>
----
- Documentation/kbuild/llvm.rst | 78 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 78 insertions(+)
+(which is what i expect on arm64, since gcs entry size
+is min stack frame / 2 if the stack is correctly aligned)
 
-diff --git a/Documentation/kbuild/llvm.rst b/Documentation/kbuild/llvm.rst
-index 6dc66b4f31a7..de3bde925793 100644
---- a/Documentation/kbuild/llvm.rst
-+++ b/Documentation/kbuild/llvm.rst
-@@ -186,6 +186,84 @@ yet. Bug reports are always welcome at the issue tracker below!
-      - Supported
-      - ``LLVM=1``
- 
-+Experimental Build in macOS
-+---------------------------
-+
-+Building on macOS with LLVM is experimental. This section provides steps to
-+install dependencies via Homebrew, set up the environment, and start the build
-+process.
-+
-+1. **Create a Case-Sensitive Volume**
-+
-+   For fetching and building the project, you need a case-sensitive volume. Use the following
-+   command to create one:
-+
-+   .. code-block:: shell
-+
-+      diskutil apfs addVolume /dev/disk<N> "Case-sensitive APFS" linux
-+
-+   Replace `/dev/disk<N>` with the appropriate disk identifier.
-+
-+2. **Install Build Dependencies**
-+
-+Use Homebrew to install the required build dependencies.
-+
-+- **Core Utilities**: `coreutils`, `findutils`, `gnu-sed`, `gnu-tar`, `grep`,
-+  `llvm`, `make`, and `pkg-config`.
-+
-+   .. code-block:: shell
-+
-+      brew install coreutils findutils gnu-sed gnu-tar grep llvm make pkg-config
-+
-+- **Bee Headers**: Install byteswap, elf and endian headers using the
-+  `Bee Headers Project <https://github.com/bee-headers/headers>`_.
-+
-+   .. code-block:: shell
-+
-+      brew tap bee-headers/bee-headers
-+      brew install bee-headers/bee-headers/bee-headers
-+
-+   After installation, verify the `CFLAGS` with `pkg-config`:
-+
-+   .. code-block:: shell
-+
-+      pkg-config --cflags bee-headers
-+      -I/opt/homebrew/Cellar/bee-headers/0.1/include
-+
-+3. **Configure the PATH**
-+
-+   Include all the required GNU tools and LLVM in your `PATH`. This ensures that
-+   the necessary tools are available during the build process.
-+
-+   .. code-block:: shell
-+
-+      PATH="/opt/homebrew/opt/coreutils/libexec/gnubin:$PATH"
-+      PATH="/opt/homebrew/opt/findutils/libexec/gnubin:$PATH"
-+      PATH="/opt/homebrew/opt/gnu-sed/libexec/gnubin:$PATH"
-+      PATH="/opt/homebrew/opt/gnu-tar/libexec/gnubin:$PATH"
-+      PATH="/opt/homebrew/opt/grep/libexec/gnubin:$PATH"
-+      PATH="/opt/homebrew/opt/make/libexec/gnubin:$PATH"
-+      PATH="/opt/homebrew/opt/llvm/bin:$PATH"
-+
-+Building the Project
-+--------------------
-+
-+Once the environment is set up, you can start the build process using LLVM. Run
-+the following commands to initiate the build:
-+
-+.. code-block:: shell
-+
-+   make LLVM=1 allyesconfig
-+   make LLVM=1 -j$(nproc)
-+
-+Supported in macOS
-+~~~~~~~~~~~~~~~~~~
-+
-+At the moment, only arm64 is supported and tested with `allyesconfig` Makefile
-+configuration target. Other Kconfig options not included in `allyesconfig`
-+target and architectures may be supported as well as support in macOS is based
-+on LLVM effort and maintenance.
-+
- Getting Help
- ------------
- 
+> 
+> GCSs allocated via this mechanism will be freed when the thread exits.
 
--- 
-2.46.0
+i see gcs still mapped after thread exit when testing.
 
+> +static unsigned long gcs_size(unsigned long size)
+> +{
+> +	if (size)
+> +		return PAGE_ALIGN(size);
 
+no /2
+
+> +
+> +	/* Allocate RLIMIT_STACK/2 with limits of PAGE_SIZE..2G */
+> +	size = PAGE_ALIGN(min_t(unsigned long long,
+> +				rlimit(RLIMIT_STACK) / 2, SZ_2G));
+
+has /2
+
+> +	return max(PAGE_SIZE, size);
+> +}
+> +
+> +unsigned long gcs_alloc_thread_stack(struct task_struct *tsk,
+> +				     const struct kernel_clone_args *args)
+> +{
+> +	unsigned long addr, size;
+> +
+> +	if (!system_supports_gcs())
+> +		return 0;
+> +
+> +	if (!task_gcs_el0_enabled(tsk))
+> +		return 0;
+> +
+> +	if ((args->flags & (CLONE_VFORK | CLONE_VM)) != CLONE_VM) {
+> +		tsk->thread.gcspr_el0 = read_sysreg_s(SYS_GCSPR_EL0);
+> +		return 0;
+> +	}
+> +
+> +	size = args->stack_size;
+
+no /2 (i think this should be divided)
+
+> +
+> +	size = gcs_size(size);
+> +	addr = alloc_gcs(0, size);
+> +	if (IS_ERR_VALUE(addr))
+> +		return addr;
+> +
+> +	tsk->thread.gcs_base = addr;
+> +	tsk->thread.gcs_size = size;
+> +	tsk->thread.gcspr_el0 = addr + size - sizeof(u64);
+> +
+> +	return addr;
+> +}
+...
+>  void gcs_free(struct task_struct *task)
+>  {
+> +
+> +	/*
+> +	 * When fork() with CLONE_VM fails, the child (tsk) already
+> +	 * has a GCS allocated, and exit_thread() calls this function
+> +	 * to free it.  In this case the parent (current) and the
+> +	 * child share the same mm struct.
+> +	 */
+> +	if (!task->mm || task->mm != current->mm)
+> +		return;
+> +
+>  	if (task->thread.gcs_base)
+>  		vm_munmap(task->thread.gcs_base, task->thread.gcs_size);
+
+not sure why this logic fails to free thread gcs
+(created with clone3 in glibc)
+
+other the gcs leak, my tests pass.
