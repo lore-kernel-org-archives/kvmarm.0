@@ -1,104 +1,134 @@
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AB251CBEA6
-	for <kvmarm@lists.linux.dev>; Fri,  6 Sep 2024 16:14:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5BA31D31A9;
+	Fri,  6 Sep 2024 16:35:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725639290; cv=none; b=NIJ4EvsAI/e1ibaV6CYXHsiFGt/fA5/QAxQNqMkR0ENqFEeHzO720oD7LzsOaKWnt8vx8LPGIDvkSKUHXWcK985mVGlaLmXM5k4tsMtQaBu4/HxrWJYDxfhdRWKHsK498/GQBpFXaG3j+yCaYdgzJt4ycA+y3l6BTbw2j/BBy+Y=
+	t=1725640542; cv=none; b=NlgvknDAPBF7S9Z/YhaPgC1odPJcQQsoqoTu/cQvyPjOxjkuoePANZ2nSFidwQYfxLou30a6N7/fyAydRqE/1osobTeIoFPD12l3GbKtWtd+sfiNFyfgh0P4wM/vTIcCicotBSfY3xdIPmuxyLkOBOZVj421fozE+6Jr6VuXmlI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725639290; c=relaxed/simple;
-	bh=d7Xo+RfZkvV5Im86rGD5nZcCUUCXRDcL9EuyMzVxPzQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=m21fBxfkgqIU7JkpHY8Psdt+ongEFVpy9dP73Rzetx1TfrLryl7fpts43iE0R1o5qX4+02Efw9NWSDcjj/yGkR5l3MqljvGMYncBGSie+fRryXW7ekIa4WZqK+srEbACv/J2pS1Jg/cE7tOCuHG/ash0ZIMj7fXH34MTqUSeHks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LdPkfn5h; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1725640542; c=relaxed/simple;
+	bh=6fgAXad1syfSTJKtcJj8sAwYW4bPeTU9Trm2C5UltDI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SLBzYQZ1jypqLrjkpj7ZffccIrZgO7gRM9Ws8i+At1OZWj7+T+U33i/C/UGTlt9UvKt9k5bSDT2HCanrtLluaiYAmVBR0Uw2CRtw9L3vA6eAQdJ35C4vDt0M3mmHu1kW9YlAATWqpYSWs+un2Qe75vdH7URtzwG/amVcM13s/jY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JS3ULYHA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LdPkfn5h"
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-42bba6a003bso56245e9.0
-        for <kvmarm@lists.linux.dev>; Fri, 06 Sep 2024 09:14:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1725639287; x=1726244087; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=d7Xo+RfZkvV5Im86rGD5nZcCUUCXRDcL9EuyMzVxPzQ=;
-        b=LdPkfn5h1uPJuzmRIGt5ABP3mCV40qJ3u+SsgLUPklbQ5Ffgg9CyMWTpPaWAjYoGYZ
-         m3JJypVHDHyIhhYKaK67oe+JfQ2FaB10wMPMD561r187/DnJdy45sAQ4V5g1uyVa3zVH
-         kKBVla1PPVlaLJBBYnmIMR9EoI8p3HjH+IdB2vujXxZXH/Gc5WNf1mRk9Gne+nVorNB/
-         La4vcmGeujx7ySWlLIJWbpTUaglMYgczsfMNHsDFVNlk2Squd/DQBapVQ46vp1eLwK54
-         CRSrUJZ9p4YI2fpEpwXIIbHfLEruC+nCPgK1isENx6CqM7P74RqQo+HwPKylNWKzZCnR
-         LNyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725639287; x=1726244087;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=d7Xo+RfZkvV5Im86rGD5nZcCUUCXRDcL9EuyMzVxPzQ=;
-        b=xFVGXDe7abKm49Jd7wD8v5zsKBrgFnN+N+a/PAGmbnD98jdwrQXtKfegTAxCOfVYC1
-         JjfT/cEksf3WVeLuVIjqAJYmyIu327lfaQ/X6PcSRIvySDBmWf6T3swAELIM31KDSwZ7
-         m5mpq9KvQ8pDaduvuH0JyQvDgfkkNB+cmnFiLsCklIL+ApoTkcYGhDH4BJGspbH1ycUc
-         C/+ja4MAKbs9x0irIC1/PwecNZ+TKADiXFacyRwhfR2wulHHXiie4LOWHUzUJEmGuUDM
-         7HpJAEQNwAg6c/eSMlAM7qq+K5kJQtRmnSjIJQIcSadbp9cULci0STzmjHCBXfpdjHjk
-         VGEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWxxWSYKbdIaXBdCM9dvCqx8B9xw0JEAcYmOyRduSDM9RBSHE1WEih5k8Xxh5tiMogA2jc0raE=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yz93NKIUgjFdEoI3/Ka3Z72z1lTVDQ54wqYKW4isGzn6Iwt9m8E
-	SVFGq97qhwy01qThOVR+W4TIDZrwIVkKUir1zbHbqIyoxtNmGYh+2kY5UZC4ccL4nfJXlBn5QAO
-	5l11x099ky8qkZXJ7FM8oDBP7m+dygOiM/Akl
-X-Google-Smtp-Source: AGHT+IFv++mggnfzy5t3bb9fWZkEUp45jrBIXinNKhaV4bb3A0qs16A2pUmUqjVrnmxrsaDxzWbJOV3LKYwj01XAx2w=
-X-Received: by 2002:a05:600c:1f0b:b0:426:6edd:61a7 with SMTP id
- 5b1f17b1804b1-42ca0d73c41mr990575e9.7.1725639287225; Fri, 06 Sep 2024
- 09:14:47 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JS3ULYHA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A616BC4CEC4;
+	Fri,  6 Sep 2024 16:35:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725640542;
+	bh=6fgAXad1syfSTJKtcJj8sAwYW4bPeTU9Trm2C5UltDI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=JS3ULYHAwmxeeeuP2MnCRTbcNb3OCtYWMoxxJS4D1pW6ck4O3gu+KVS3MdIO/8qmx
+	 NL3FyMDaQqKObH4DxptJNG2J2+JUhsCUthCLmlHL2AMsFj2OnBwKz5nDesOz2zRg3q
+	 uUbFAn/YbLKASKiDxcQx/b6o7UkTgOBakt1z7yhDuh+lqsoBAVffKttn3qhvaAik4a
+	 qhkj/hYbF2iini3Lmt4sTr3VgLKek9f4EkRKHrV53S7ispe6VJvnsqga9O3i1SHtw9
+	 8jVQHpwIIV8g6XWPZOckiF1KVa0JIJmRSHS5Vg39mIQnaX1SwSdaLlUP/UtO0yhGHs
+	 3ZDqe7az1aoeg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1smbvv-00AMkA-TG;
+	Fri, 06 Sep 2024 17:35:40 +0100
+Date: Fri, 06 Sep 2024 17:35:39 +0100
+Message-ID: <86ed5wvixw.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Snehal Koukuntla <snehalreddy@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Sudeep Holla <sudeep.holla@arm.com>,
+	Sebastian Ene <sebastianene@google.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Add memory length checks before it is xfered
+In-Reply-To: <20240906092732.113152-1-snehalreddy@google.com>
+References: <20240906092732.113152-1-snehalreddy@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20240704-kvm-arm64-fix-pkvm-sve-vl-v4-0-b6898ab23dc4@kernel.org>
- <86a5iw3ri2.wl-maz@kernel.org> <fec60c7f-0cc3-44e2-8be1-09c120e8523e@sirena.org.uk>
- <ZowGFl/1AEuevh96@e133380.arm.com> <a3f2f13e-be22-4a09-a8a6-5faef818defe@sirena.org.uk>
- <CA+EHjTyCvG2KL=LPhbAf+Wo66QoC_EMk1xn+R9X-yKunHQ-JhA@mail.gmail.com> <Ztspjf0SHx7nz2lV@finisterre.sirena.org.uk>
-In-Reply-To: <Ztspjf0SHx7nz2lV@finisterre.sirena.org.uk>
-From: Fuad Tabba <tabba@google.com>
-Date: Fri, 6 Sep 2024 17:14:09 +0100
-Message-ID: <CA+EHjTyjVMw5CtEiLoZzvnnano94UGx_URhFBd7BRYm89K+XmQ@mail.gmail.com>
-Subject: Re: [PATCH v4 0/4] KVM: arm64: Fix underallocation of storage for SVE state
-To: Mark Brown <broonie@kernel.org>
-Cc: Dave Martin <Dave.Martin@arm.com>, Marc Zyngier <maz@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: snehalreddy@google.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, sudeep.holla@arm.com, sebastianene@google.com, vdonnefort@google.com, jean-philippe@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 6 Sept 2024 at 17:10, Mark Brown <broonie@kernel.org> wrote:
->
-> On Fri, Sep 06, 2024 at 04:35:29PM +0100, Fuad Tabba wrote:
->
-> > > > Can't pKVM just hide the non symmetrically supported VLs using ZCR_EL2,
-> > > > just as regular KVM does for the guest?
->
-> > > > (I may be making bad assumptions about pKVM's relationship with the host
-> > > > kernel.)
->
-> > > That's one for the pKVM people.
->
-> > Yes, but that's not really the issue here, unless I'm missing
-> > something else. The issue is that pKVM needs to store the host's SVE
-> > state too, to be able to restore it. So hiding non-symmetrically
-> > supported VLs for the guests shouldn't be relevant.
->
-> If the host kernel is also running at EL1 and it's only the hypervisor
-> running at EL2 then the hypervisor can control the VLs that the host
-> kernel is able to access?
+Hi Snehal,
 
-Yes it can. But do we want to impose limits on host VLs when running
-pKVM that might not exist without pKVM?
+On Fri, 06 Sep 2024 10:27:32 +0100,
+Snehal Koukuntla <snehalreddy@google.com> wrote:
+> 
+> From: Snehal <snehalreddy@google.com>
+> 
+> Check size during allocation to fix discrepancy in memory reclaim path.
+> Currently only happens during memory reclaim, inconsistent with mem_xfer
 
-Although AFAIK, such hardware doesn't exist in practice, the reason we
-went down this rabbit hole from the beginning was to ensure that we
-wouldn't run into problems if it were to happen.
+Can you please elaborate? It doesn't seem to fail at allocation time
+here, as everything is pre-allocated. Some context would greatly help,
+as my FFA-foo is as basic as it gets (I did read the spec once and ran
+away screaming).
+
+>
+> Signed-off-by: Snehal Koukuntla <snehalreddy@google.com>
+
+The From: and Signed-off-by: tags do not match. You may want to add a
+[user] section to your .gitconfig with your full name so that this
+issue is sorted once and for all.
+
+> ---
+>  arch/arm64/kvm/hyp/nvhe/ffa.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> index e715c157c2c4..e9223cc4f913 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> @@ -461,6 +461,11 @@ static __always_inline void do_ffa_mem_xfer(const u64 func_id,
+
+/facepalm: why do we have this __always_inline here? Nothing to do
+with your patch, but definitely worth understanding why it is
+required.
+
+>  		goto out_unlock;
+>  	}
+>  
+> +	if (len > ffa_desc_buf.len) {
+> +		ret = FFA_RET_NO_MEMORY;
+> +		goto out_unlock;
+> +	}
+> +
+
+It took some digging to understand how the various queues are sized,
+and a comment explaining the relation between ffa_desc_buf and the
+other queues would be very welcome.
+
+I also notice that we have other places (apparently dealing with
+fragments) that do not have such checks. Do they need anything else?
+
+>  	buf = hyp_buffers.tx;
+>  	memcpy(buf, host_buffers.tx, fraglen);
+>  
+
+Finally, this probably deserves a Fixes: tag and a Cc: stable so that
+it can be backported.
 
 Thanks,
-/fuad
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
