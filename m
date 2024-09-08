@@ -1,41 +1,41 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4C49191;
-	Sun,  8 Sep 2024 01:18:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4526C149;
+	Sun,  8 Sep 2024 01:30:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725758306; cv=none; b=tsDAUYjxzfFXPy3gydUSfSHg2Tid8Di9+JVLzomWKYDtgpiMd+9DnI3o62caMmU+ORSSe6fLlrbfKCMB6j5H1xiFQg95Ly/fvZkKPolZ44NeT/E3Ihs0MdRdYMxIGMAILezdcAT76opJxRXAISAEzFm91d9meDb88RYthdwBHWU=
+	t=1725759008; cv=none; b=kPtPLRFiZPMznQvnQJHRJuhoCP+sSmU9fI4Kidh96CfdDe7V82Ub9VYmMKXhuzB+M2K6eXCdQaA7nQyzbRhKVhXeEKoDKOeBXwd5RQRYXzpqg7QcRf/GUgg0pNbc/KmECtel7F17HIotoxcngUK6ic6aqhZbWeFpIuaWbCpw5yg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725758306; c=relaxed/simple;
-	bh=M8wGQ4W/KVkVnctgfPoNFBJOh6tq/LCaviiGYsF9L8s=;
+	s=arc-20240116; t=1725759008; c=relaxed/simple;
+	bh=fyOnv3k2017y/ErSznnZHp0l9XWS0bPVAmjp32U6Etk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VUPKN6gE3LsxiRqEku1EwPvB1X/fRdf9bGnkqUaAAWTzxWcY1WMthMgzQBZ7e2nFiT3fxq3L5NMB+LxRj9QMwxLDmV5bZn8KQmLKA++EWt8rMX9H7qYH3IqL581BMAVXxKEKfqRh0rQMyF/XcM9kuyZdj9ZIduJEINgwOEDfIbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cq9lwmXg; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=IwSQsblCiMKSenuHlh/X/YW5yEur9R0BRE/UJaabWbjqDADMZtQwsDt//86WNV5Cds70Y7+qroZtgf9gpdJ6zUftQx/kFhRGvKPhJsmMuWDRINNCx5/bNReWc/i908jBeRffcnuW5lEAumL+FJQ5QA6pu+RYosaLtps1jGNpaq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iw0ZyrY4; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cq9lwmXg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39F4AC4CEDC;
-	Sun,  8 Sep 2024 01:18:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iw0ZyrY4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41E55C4CECF;
+	Sun,  8 Sep 2024 01:30:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725758306;
-	bh=M8wGQ4W/KVkVnctgfPoNFBJOh6tq/LCaviiGYsF9L8s=;
+	s=k20201202; t=1725759008;
+	bh=fyOnv3k2017y/ErSznnZHp0l9XWS0bPVAmjp32U6Etk=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=cq9lwmXgWqhZPEPEknJJ6MusaNmJeXzo45ZYCP7ssXKwk+6pZEIShmFZ0bjRL2S69
-	 ABj7sxuwzlMeZtfiuSVujQMmsIXJkZtFQd7pHlDm6BUyiPgE+fRCrnf8beNYJuy+ji
-	 oQOUNrABUCQYCeiOkIaYFeDPjuOLfYgzj/2JTZK6tv2u55Q21XGQb8RQjQDXYie67v
-	 MdshnfSfCPObqDnnZxY2ynGVQzEQcWiGZH9lFGCcniAEiK0rSLkI2qtihQaaKcK2t3
-	 NSADrCgThi939DlQOQEISpxvU/bWX7VErE7YTncTlMIeCFowuYeR4y/5JWrhSOJFDa
-	 LlWxCtzCQOwmA==
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5365aec6fc1so2030112e87.3;
-        Sat, 07 Sep 2024 18:18:26 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUw8fKhwy2ffXVr7Kr5so0TaVz2R/RcWlFHELTk+bSTH2CtrbOlCQ1HpQl1v1+k1hETiXWR5Ao=@lists.linux.dev, AJvYcCV8vTLKfkPMF8a/aKsfZoOmJPnbVXh9QF48unMJF8664E8my1yTGwnq+APfdiJtakoKpvXvxw==@lists.linux.dev
-X-Gm-Message-State: AOJu0YyPQz3p/dPdjDaZHI8WUjgBsR4CkVnun+P8sX/t2lNHTXKIiXFQ
-	+E5B9A+smLNxfJZAIONn74udiKAf7peLlpfrMvbeCB1+Yj64eaZxd4JyCh+ztHvPdSet6ReCATu
-	OsqnG4ajxK1t3KpSSfv+SZ0VRbuE=
-X-Google-Smtp-Source: AGHT+IG//4gp0E4CfR083hPUBPN1CAx4mVwnwf3ahT0xcRrWXpKuALg+jAmTZu237ZONFZpFVA24RBtvauTzOfWgMvg=
-X-Received: by 2002:a05:6512:224b:b0:536:56d6:ea4f with SMTP id
- 2adb3069b0e04-536587b4312mr5939673e87.29.1725758304396; Sat, 07 Sep 2024
- 18:18:24 -0700 (PDT)
+	b=iw0ZyrY4vuLZ21JCPOC7RhuX7jH+ga/520Dv1aaM8uNgOoHpA/cMaELxoMFbt9WhQ
+	 6cWjNnSP4o7rT5Xc1qm3XtbFn4YS0prmu2KTWtXTjxFFhomNRnXeVVh9JP5z7M7miU
+	 RsaI6nAFHnSgzlWx+0avsFEestaO6zMIOeHJmmJYY2W/sPtsC3Enk28MuA6dyzDfS8
+	 B0BwayB0He+GmuHbYvmm98cgYqbFocvJdNDrBPe2nLlyhExI1t8DoPlC1Xy7y6a7TS
+	 6nqNvu2hKR3rjjA6O1+SusQWQQ2vp9f+8BBS60UzZLI2p5UciVSLsD54+sq6iFumv2
+	 XlPJ61sFI6v6g==
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-536562739baso2513847e87.1;
+        Sat, 07 Sep 2024 18:30:08 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVkjNI6xngTKGjm0ZJSccbu3O9jHLgqOIQPy6FYcI1gW4PNfhZz03iQRohLaCrtlyD4tXuKTrg=@lists.linux.dev, AJvYcCX9JOa4c+E7dUUYm4esjW6+gf3vw0t+A1oz/wGZZx2M7ClEcneys6HqoI0AgtakspGwnGyqhA==@lists.linux.dev
+X-Gm-Message-State: AOJu0YwRErFZ77PWCeYhbdAAlAJgsKxJkbb2yejjhqv31d35RfVUNtPQ
+	5AaTvV4VrazAFZsSlTsVWCrlh5F2Vdov0VTBsHjpkowBIt7kriMufDFIz1yvjFTIch+rPKA1JyS
+	Fidu7kNk06aObD570dZWwN7MNRuA=
+X-Google-Smtp-Source: AGHT+IF+h293KpoI++f+ufbs7y7oQSzJ8FqYF6U09FVXsYlA3fTualWC6YvD7rLK4LHaRVS5cfnW7EaXVcZxWqO9e3g=
+X-Received: by 2002:a05:6512:1598:b0:535:66bb:3303 with SMTP id
+ 2adb3069b0e04-536587a4100mr4487964e87.12.1725759006849; Sat, 07 Sep 2024
+ 18:30:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -43,14 +43,14 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 References: <20240906-macos-build-support-v2-0-06beff418848@samsung.com>
- <20240906-macos-build-support-v2-4-06beff418848@samsung.com>
- <CAK7LNARTnJ10ABuD96U-MaYitnX3AF=GD+N-skH7VBfAmOw9RQ@mail.gmail.com> <CABj0suDiPf0ySOwQx=6k+6bTZqRmq1+tjPx7=dxSTO5DVqO4nQ@mail.gmail.com>
-In-Reply-To: <CABj0suDiPf0ySOwQx=6k+6bTZqRmq1+tjPx7=dxSTO5DVqO4nQ@mail.gmail.com>
+ <20240906-macos-build-support-v2-8-06beff418848@samsung.com>
+ <CAK7LNASpWSXbjF_7n0MhosNism=BpvHOnKsa344RPM_wmC9dGA@mail.gmail.com> <CABj0suBQCc8=0tLng=OWW=K1hjFuLFZWhbjsqHtz2FzZt4i0sw@mail.gmail.com>
+In-Reply-To: <CABj0suBQCc8=0tLng=OWW=K1hjFuLFZWhbjsqHtz2FzZt4i0sw@mail.gmail.com>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Sun, 8 Sep 2024 10:17:48 +0900
-X-Gmail-Original-Message-ID: <CAK7LNATc8-mxNLRjLLwd6bKs9mbpo2FxhChWbJHwiGpOr_hzBg@mail.gmail.com>
-Message-ID: <CAK7LNATc8-mxNLRjLLwd6bKs9mbpo2FxhChWbJHwiGpOr_hzBg@mail.gmail.com>
-Subject: Re: [PATCH v2 4/8] arm64: nvhe: add bee-headers support
+Date: Sun, 8 Sep 2024 10:29:30 +0900
+X-Gmail-Original-Message-ID: <CAK7LNARqUTC2GixVeUQpMvzWt=h8KZvLHTHvp3ftxNwJQU6pWQ@mail.gmail.com>
+Message-ID: <CAK7LNARqUTC2GixVeUQpMvzWt=h8KZvLHTHvp3ftxNwJQU6pWQ@mail.gmail.com>
+Subject: Re: [PATCH v2 8/8] Documentation: add howto build in macos
 To: "Daniel Gomez (Samsung)" <d+samsung@kruces.com>
 Cc: da.gomez@samsung.com, Nathan Chancellor <nathan@kernel.org>, 
 	Nicolas Schier <nicolas@fjasle.eu>, Lucas De Marchi <lucas.demarchi@intel.com>, 
@@ -76,189 +76,43 @@ Cc: da.gomez@samsung.com, Nathan Chancellor <nathan@kernel.org>,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Sep 7, 2024 at 6:28=E2=80=AFPM Daniel Gomez (Samsung)
+On Sat, Sep 7, 2024 at 6:32=E2=80=AFPM Daniel Gomez (Samsung)
 <d+samsung@kruces.com> wrote:
 >
-> On Fri, Sep 6, 2024 at 4:03=E2=80=AFPM Masahiro Yamada <masahiroy@kernel.=
-org> wrote:
+> On Sat, Sep 7, 2024 at 10:33=E2=80=AFAM Masahiro Yamada <masahiroy@kernel=
+.org> wrote:
 > >
 > > On Fri, Sep 6, 2024 at 8:01=E2=80=AFPM Daniel Gomez via B4 Relay
 > > <devnull+da.gomez.samsung.com@kernel.org> wrote:
 > > >
 > > > From: Daniel Gomez <da.gomez@samsung.com>
 > > >
-> > > endian.h header is not provided by default in macOS. Use pkg-config w=
-ith
-> > > the new development package 'bee-headers' [1] to find the path where =
-the
-> > > headers are installed.
-> > >
-> > > [1] Bee Headers Project links:
-> > > https://github.com/bee-headers/headers
-> > > https://github.com/bee-headers/homebrew-bee-headers
-> > >
-> > > It requires to install bee-headers Homebrew Tap:
-> > >
-> > >   brew tap bee-headers/bee-headers
-> > >   brew install bee-headers/bee-headers/bee-headers
+> > > Add documentation under kbuild/llvm to inform about the experimental
+> > > support for building the Linux kernel in macOS hosts environments.
 > > >
 > > > Signed-off-by: Daniel Gomez <da.gomez@samsung.com>
-> > > ---
-> > >  arch/arm64/kernel/pi/Makefile     | 1 +
-> > >  arch/arm64/kernel/vdso32/Makefile | 1 +
-> > >  arch/arm64/kvm/hyp/nvhe/Makefile  | 3 ++-
-> > >  3 files changed, 4 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/arch/arm64/kernel/pi/Makefile b/arch/arm64/kernel/pi/Mak=
-efile
-> > > index 4d11a8c29181..259c9a45fba0 100644
-> > > --- a/arch/arm64/kernel/pi/Makefile
-> > > +++ b/arch/arm64/kernel/pi/Makefile
-> > > @@ -20,6 +20,7 @@ KBUILD_CFLAGS :=3D $(filter-out $(CC_FLAGS_SCS), $(=
-KBUILD_CFLAGS))
-> > >  KBUILD_CFLAGS  :=3D $(filter-out $(CC_FLAGS_LTO), $(KBUILD_CFLAGS))
-> > >
-> > >  hostprogs      :=3D relacheck
-> > > +HOSTCFLAGS_relacheck.o =3D $(shell $(HOSTPKG_CONFIG) --cflags bee-he=
-aders 2> /dev/null)
-> > >
-> > >  quiet_cmd_piobjcopy =3D $(quiet_cmd_objcopy)
-> > >        cmd_piobjcopy =3D $(cmd_objcopy) && $(obj)/relacheck $(@) $(<)
-> > > diff --git a/arch/arm64/kernel/vdso32/Makefile b/arch/arm64/kernel/vd=
-so32/Makefile
-> > > index 25a2cb6317f3..6cb8a04bd829 100644
-> > > --- a/arch/arm64/kernel/vdso32/Makefile
-> > > +++ b/arch/arm64/kernel/vdso32/Makefile
-> > > @@ -107,6 +107,7 @@ VDSO_LDFLAGS +=3D --orphan-handling=3D$(CONFIG_LD=
-_ORPHAN_WARN_LEVEL)
-> > >  # $(hostprogs) with $(obj)
-> > >  munge :=3D ../../../arm/vdso/vdsomunge
-> > >  hostprogs :=3D $(munge)
-> > > +HOSTCFLAGS_$(munge).o =3D $(shell $(HOSTPKG_CONFIG) --cflags bee-hea=
-ders 2> /dev/null)
-> > >
-> > >  c-obj-vdso :=3D note.o
-> > >  c-obj-vdso-gettimeofday :=3D vgettimeofday.o
-> > > diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nv=
-he/Makefile
-> > > index b43426a493df..d20a440b6964 100644
-> > > --- a/arch/arm64/kvm/hyp/nvhe/Makefile
-> > > +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-> > > @@ -15,7 +15,8 @@ ccflags-y +=3D -fno-stack-protector     \
-> > >              $(DISABLE_STACKLEAK_PLUGIN)
-> > >
-> > >  hostprogs :=3D gen-hyprel
-> > > -HOST_EXTRACFLAGS +=3D -I$(objtree)/include
-> > > +HOST_EXTRACFLAGS +=3D -I$(objtree)/include \
-> > > +       $(shell $(HOSTPKG_CONFIG) --cflags bee-headers 2> /dev/null)
-> > >
-> > >  lib-objs :=3D clear_page.o copy_page.o memcpy.o memset.o
-> > >  lib-objs :=3D $(addprefix ../../../lib/, $(lib-objs))
-> > >
-> > > --
-> > > 2.46.0
-> > >
-> > >
 > >
-> > NACK.
 > >
-> > Developers working on Linux distributions have no interest
-> > in your homebrew setup.
+> > Instead, you can add this instruction to:
 > >
-> > For 99% of users, pkg-config does not do anything good.
-> > It is a waste of process forks.
+> > https://github.com/bee-headers/homebrew-bee-headers/blob/main/README.md
 >
-> I didn't think of this, and I agree with you.
->
-> >
-> >
-> >
-> > You need to do it outside.
-> >
-> >
-> >  $ HOSTCFLAGS=3D$(pkg-config --cflags bee-headers) make
-> >
-> > or
-> >
-> >  $ export HOSTCFLAGS=3D$(pkg-config --cflags bee-headers)
-> >  $ make
->
-> Would a Makefile variable be suitable for this use case to make it
-> easier in the command-line?
+> Sure, that can be done as well. But the effort here is to have this
+> integrated. So, I think documentation should be in-tree.
 
 
 
-HOSTCFLAGS is an environment variable.
+I do not think so.
 
 
-See Documentation/kbuild/kbuild.rst
+Most people are not compile-testing on macOS.
 
-
-  HOSTCFLAGS
-  ----------
-  Additional flags to be passed to $(HOSTCC) when building host programs.
+This is an unofficial tip, which you can advertise
+somewhere else.
 
 
 
 
-If you do not want to type it every time,
-add the following to ~/.profile or ~/.bashrc, etc.
-
-
-export HOSTCFLAGS=3D"$(pkg-config --cflags bee-headers) -D_UUID_T
--D__GETHOSTUUID_H"
-
-
-
-
-Or, if you want to limit this HOSTCFLAGS definition
-only to a specific kernel tree, you can add GNUmakefile
-to wrap Makefile.
-
-This is how people often add local setups without
-typing a long command.
-
-
-
-GNUmakefile:
-
-  export HOSTCFLAGS =3D $(shell pkg-config --cflags bee-headers)
--D_UUID_T -D__GETHOSTUUID_H
-  include Makefile
-
-
-
-
-Then, you do not need to bother the upstream kernel.
-
-
-
-
-
-
-
-> We can detect we are in a non-linux based environment and enable a
-> Makefile <VAR> (e.g., NOLINUX=3D1) and handle the NOLINUX build case
-> (with pkg-config/bee-headers) inside the Makefiles for these non-linux
-> cases.
-
-
-NACK.
-
-
-
->
-> >
-> >
-> >
-> >
-> >
-> > --
-> > Best Regards
-> > Masahiro Yamada
-
-
-
---
+--=20
 Best Regards
 Masahiro Yamada
