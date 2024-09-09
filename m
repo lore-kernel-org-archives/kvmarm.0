@@ -1,198 +1,108 @@
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1854B1B78F7
-	for <kvmarm@lists.linux.dev>; Mon,  9 Sep 2024 13:04:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 526431B9B2A
+	for <kvmarm@lists.linux.dev>; Mon,  9 Sep 2024 13:08:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725887096; cv=none; b=iVtm1KJqB4WqiEf21pUz7FdiJUHkzReFx8/bBOgY+ND8zcSHzd5MGqOpZ9l/dBivFDC5m+SpDiVVrYibkxsA4LQoIoxytdymPuixdSyuRuRKUoUKc89i3MI4Cwv43lb3Db91e/O46pUNCPEUSAEs1qTeQuIrg3+8hEqN3mYR9wo=
+	t=1725887324; cv=none; b=aaIzNr7Md2dxIv8TDrt3o+q+W59806bJE24YYn20yPPmw69IiKlXH+EPZ9jRlsadca0ckY+biKiDjd9JMX9A6HhbRBUHnDDrG32FbPIc2Wf8bAJah84NB4crMyo1EeaQ/YR2IUsP+F6vLSuppKmbNtiwW2Mmyim6LwYbqWlXIVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725887096; c=relaxed/simple;
-	bh=L0vwODwwSSBymebWFKwW4WyiZMvG/NRkmKNHnmKLW7U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MIfG8TYGhEwYi+djGIuM1hKTj/BCJaxThYzAXeOBy/76e0X7GyQV2Fni3c3YfOVp4d9iQKnP2girgnasftxO2omdRAu3FFXw2Ybj2Lfe7u23KFgfzT05IsiriHKaB+eajZkct0a8CoHbsmlhO639BVclBHxVQNTrSegciEOPm78=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QSxT9/16; arc=none smtp.client-ip=209.85.210.181
+	s=arc-20240116; t=1725887324; c=relaxed/simple;
+	bh=VimrJNUrhgwuXOUZQj8K1x4oJhjSufEAbZfaXLz2Bbs=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=G+PU1HEIl3kO4pjlXpugf4EGYyQ2jCxxFpMkPri8ZGZbYAyccdE8g7j56FSao7eSLDb9G5ZoGdch5mcmPIt6lANGb/X/2RR+Fla0Rv9wTaeM4SeNQk0Qty74pbO223pKvtlhI1Og6N1rx09sUsraz5AMTWa8A7V5/kMo3xOAAMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--snehalreddy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=a8y/pfrw; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--snehalreddy.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QSxT9/16"
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-7178df70f28so3484563b3a.2
-        for <kvmarm@lists.linux.dev>; Mon, 09 Sep 2024 06:04:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="a8y/pfrw"
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e1a7fd2eb36so8881202276.0
+        for <kvmarm@lists.linux.dev>; Mon, 09 Sep 2024 06:08:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1725887094; x=1726491894; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cVvLY2VfZB6N+n3cVr06yApvKJo36SMbCLMd3Fv1sX4=;
-        b=QSxT9/16lJYyoZqOzfXqZW7BS/W8QJR4UXi5CYowlbrzOR1nL5up7RVgzWf9p4hjs2
-         hUNgT5w6x8hnp3lViEpxj4DrYAcyhZmxc2nC6DUd3COiJH/KQYBZlbnFd0tGKmLN4UNc
-         1rHsuFQfqEWIeA0hy5r7KREj5roVH9jBSfaSvIq4NPnkMMMB8WiBr6JIj/PNnDcfhams
-         xw26ai42kHdjhPcZ5fDn/cmVgrS5SEimV0oU2Tb9sSttutiNnc5i8NRZ/k6TEDy9qIqD
-         Sv1WBY5grLlKcAEqti8IP52AQdEUOFlKmjxnvAtjyz2/kJJdfj1uktEyWXiuG4jquTue
-         sYPA==
+        d=google.com; s=20230601; t=1725887322; x=1726492122; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=gkcR1LQPE4FCQJPuyJ1psNJiBytHsKUOZJ03Mjoli6E=;
+        b=a8y/pfrw3yP++LBJw/UMnFhzz4XRq/9ogsA3fKVosE/1GGyPNALzPGRaN1xNMOqAXF
+         yJPalrTy24uKzBBQjw/YM1bENmAYYarsLVH8GG4qIwdD7NoVZ1gwfKiT2e/rsqLssWd2
+         CeZJTJIYsiVv48hoh3Z44hhNe5XX1bmt4sexjkRMqDQpcTcAp7qOshY9je1HrR9RyqxF
+         KlzvG1tSHg+DSBbac7Vf0hguR1TLoFdUykeP49R5aJpLWgDYI5B45IauQ9rt6pKchQPu
+         0RStW7PI+KH5s6cKWyGd1REyhN5Z1CsPyQNCNYPDMrIOTeAy3QqYgh0glqBKYTs30nSk
+         w8ew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725887094; x=1726491894;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cVvLY2VfZB6N+n3cVr06yApvKJo36SMbCLMd3Fv1sX4=;
-        b=GIhQ6566JQQQyzKBSxu2zuCXky8yZ48fKvG9FCGxxqZpH/jc6U3HlcwjdbqSJ+GeNC
-         tWjYhX7DmRR0MeyNthOFRn6ayYTK8pkMLlBUexNpTUi5KuAKkW5PAa58/c9WiydW81F+
-         uIRw4oAwfJyAbG4HxdGRJnpNHKECqJg0NwE8N7F6F5huVKgM0li8HxHmSpoTmQoSFjRF
-         KQwIkNCeSict+ofsnxOBwER1vXgiemAuOGSC4MdXrb/DxLsPFrKuSnwFeeuu2I7CvuHr
-         9abWKP+Xk/dAgt/KIiMuZHJbW43hGeafrcdv6x0/XCLiTLyvqOLJpSJPquUOITmTFu+1
-         CDkw==
-X-Forwarded-Encrypted: i=1; AJvYcCUJ2oK0/YOLfoimrG4AEE/nX0m9Xods6/eJxF1e90DBu0SYUYdkNcsjF9gQHEoO7hqHSRSsKbw=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyJC+QcnE3OXonctUYduUQmCAmCfusa11qvWSp5LXRvQwTz7Cg8
-	L9DodR6DVKMVZC670xTMphuGB3GGDciNHvO9uhH2KMC8k/w/QmNzKMgxRuUZYwRw3nAEDG6g4c0
-	7QuVGS7zdsupdb7+cVC9xtFICRc+51vixsUcg
-X-Google-Smtp-Source: AGHT+IFDy1qA+jlhwHF+kHq/KdBfZulF7F5n7E3iDmjlp1f+VOo/2osLQxLbnpMn7rApXlRIUljt3vDobqmAHL+Uua0=
-X-Received: by 2002:a05:6a00:99f:b0:717:87af:fca0 with SMTP id
- d2e1a72fcca58-718d5c3644amr12733053b3a.0.1725887093727; Mon, 09 Sep 2024
- 06:04:53 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1725887322; x=1726492122;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gkcR1LQPE4FCQJPuyJ1psNJiBytHsKUOZJ03Mjoli6E=;
+        b=P+VZXG9tZ6rFc5fqmqFv+CwcayCHZdZEt8UsKBw9hHP367zYYWqH5NVYZadpLqlJpx
+         aquZrZdqsus9pJvZAPRlKeVTX8WSSphzy9oafg1nLiCXC2SXUbdELkpzat9qb6vWWaOh
+         mirJYgOJr9nJ1vFGq0fEpvUb7phm+konqF69nAirEWQob7MBJ+xGBA8oCXYGMW2g4P3t
+         AU9ljUtm8xKj3GFSASfO+rNqmZZX+Na/wmYgCTVK6BeskosnJRslPyQooA8D8o9H2du3
+         KT+tb0ui2oNaV5Ss1ayt4TbmUeQtWVhexpLXX52rU7RUwf8jzBXp6szPTN+D7Bgfgr/r
+         yZEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX7vEgVBSxV6G4to3iOGrcjRs/nSPY5qb7UTXQiwM1VAJj4AQQ/NsWwjrO8i37iKkr5bNBfgdc=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwFA3gvDcxdGqkgfTNrctc6rwjC+gx9VoM9DNs05UomtiU2WCPD
+	5Ah0WzEGbAyI4PQSeYVIQ1lEX8BdGyAIUHdMihKLGH62JTKaEWH/ipJjnn0wxQfxADyaGJBihHe
+	r4QP+4/zxlHJ+E/Sk0fekOg==
+X-Google-Smtp-Source: AGHT+IHZHeeJzJA+rBQ2ukVV7/hhG+otbYJ/RCdAhQjZtiHGvPzEoizdzLQoCYDilJms56oKXlfXRy7wmQN6XoFmtg==
+X-Received: from snehalreddy-1.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:c1f])
+ (user=snehalreddy job=sendgmr) by 2002:a05:6902:4d1:b0:e0b:cce3:45c7 with
+ SMTP id 3f1490d57ef6-e1d349e38d5mr19825276.9.1725887322131; Mon, 09 Sep 2024
+ 06:08:42 -0700 (PDT)
+Date: Mon,  9 Sep 2024 13:08:32 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20240906092732.113152-1-snehalreddy@google.com>
- <86ed5wvixw.wl-maz@kernel.org> <Zt6gvd4NwMmjS8JB@google.com>
-In-Reply-To: <Zt6gvd4NwMmjS8JB@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.46.0.469.g59c65b2a67-goog
+Message-ID: <20240909130832.1203849-1-snehalreddy@google.com>
+Subject: [PATCH v2] KVM: arm64: Add memory length checks and remove inline in do_ffa_mem_xfer
 From: Snehal Koukuntla <snehalreddy@google.com>
-Date: Mon, 9 Sep 2024 14:04:42 +0100
-Message-ID: <CADTD=jYYWSi-J08T17YAhjFYDcCjMegpwuO9hVPfWMRQ4=6E7g@mail.gmail.com>
-Subject: Re: [PATCH] KVM: arm64: Add memory length checks before it is xfered
-To: Sebastian Ene <sebastianene@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
+Cc: James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
 	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
 	Will Deacon <will@kernel.org>, Sudeep Holla <sudeep.holla@arm.com>, 
-	Vincent Donnefort <vdonnefort@google.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>, 
+	Sebastian Ene <sebastianene@google.com>, Vincent Donnefort <vdonnefort@google.com>, 
+	Snehal <snehalreddy@google.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>, 
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
 	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi,
+Check size during allocation to fix discrepancy in memory reclaim path.
+Currently only happens during memory reclaim, inconsistent with mem_xfer
+Also  do_ffa_mem_xfer() does not need __always_inline
 
-Thanks Sebastian for replying to Marc's comments.
+Signed-off-by: Snehal Koukuntla <snehalreddy@google.com>
+---
+ arch/arm64/kvm/hyp/nvhe/ffa.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-> > > --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > > +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > > @@ -461,6 +461,11 @@ static __always_inline void do_ffa_mem_xfer(cons=
-t u64 func_id,
-> >
-> > /facepalm: why do we have this __always_inline here? Nothing to do
-> > with your patch, but definitely worth understanding why it is
-> > required.
-> I don't think it is needed, we can drop it. Maybe as part of this patch
-> ?
+diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
+index e715c157c2c4..637425f63fd1 100644
+--- a/arch/arm64/kvm/hyp/nvhe/ffa.c
++++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
+@@ -426,7 +426,7 @@ static void do_ffa_mem_frag_tx(struct arm_smccc_res *res,
+ 	return;
+ }
+ 
+-static __always_inline void do_ffa_mem_xfer(const u64 func_id,
++static void do_ffa_mem_xfer(const u64 func_id,
+ 					    struct arm_smccc_res *res,
+ 					    struct kvm_cpu_context *ctxt)
+ {
+@@ -461,6 +461,11 @@ static __always_inline void do_ffa_mem_xfer(const u64 func_id,
+ 		goto out_unlock;
+ 	}
+ 
++	if (len > ffa_desc_buf.len) {
++		ret = FFA_RET_NO_MEMORY;
++		goto out_unlock;
++	}
++
+ 	buf = hyp_buffers.tx;
+ 	memcpy(buf, host_buffers.tx, fraglen);
+ 
+-- 
+2.46.0.469.g59c65b2a67-goog
 
-I will send an updated patch removing the inline then.
-
-> > The From: and Signed-off-by: tags do not match. You may want to add a
-> > [user] section to your .gitconfig with your full name so that this
-> > issue is sorted once and for all.
-
-Thanks, I will update my git config to fix the inconsistency.
-
-Thanks,
-Snehal
-
-
-On Mon, Sep 9, 2024 at 8:16=E2=80=AFAM Sebastian Ene <sebastianene@google.c=
-om> wrote:
->
-> On Fri, Sep 06, 2024 at 05:35:39PM +0100, Marc Zyngier wrote:
->
-> Hi,
->
-> > Hi Snehal,
-> >
-> > On Fri, 06 Sep 2024 10:27:32 +0100,
-> > Snehal Koukuntla <snehalreddy@google.com> wrote:
-> > >
-> > > From: Snehal <snehalreddy@google.com>
-> > >
-> > > Check size during allocation to fix discrepancy in memory reclaim pat=
-h.
-> > > Currently only happens during memory reclaim, inconsistent with mem_x=
-fer
-> >
-> > Can you please elaborate? It doesn't seem to fail at allocation time
-> > here, as everything is pre-allocated. Some context would greatly help,
-> > as my FFA-foo is as basic as it gets (I did read the spec once and ran
-> > away screaming).
-> >
->
-> Right, I think what happens is that we use the fragmentation API to
-> transfer memory to Trustzone that normally won't fit on the reclaim path
-> where we use an auxiliary buffer to store the descriptors.
->
-> All the descriptors are identified by the same handle and the reclaim
-> will try to store them into the ffa_desc_buf before nuking the FF-A
-> annotation from the stage-2.
->
-> > >
-> > > Signed-off-by: Snehal Koukuntla <snehalreddy@google.com>
-> >
-> > The From: and Signed-off-by: tags do not match. You may want to add a
-> > [user] section to your .gitconfig with your full name so that this
-> > issue is sorted once and for all.
-> >
-> > > ---
-> > >  arch/arm64/kvm/hyp/nvhe/ffa.c | 5 +++++
-> > >  1 file changed, 5 insertions(+)
-> > >
-> > > diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/=
-ffa.c
-> > > index e715c157c2c4..e9223cc4f913 100644
-> > > --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > > +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > > @@ -461,6 +461,11 @@ static __always_inline void do_ffa_mem_xfer(cons=
-t u64 func_id,
-> >
-> > /facepalm: why do we have this __always_inline here? Nothing to do
-> > with your patch, but definitely worth understanding why it is
-> > required.
-> >
->
-> I don't think it is needed, we can drop it. Maybe as part of this patch
-> ?
->
-> > >             goto out_unlock;
-> > >     }
-> > >
-> > > +   if (len > ffa_desc_buf.len) {
-> > > +           ret =3D FFA_RET_NO_MEMORY;
-> > > +           goto out_unlock;
-> > > +   }
-> > > +
-> >
-> > It took some digging to understand how the various queues are sized,
-> > and a comment explaining the relation between ffa_desc_buf and the
-> > other queues would be very welcome.
-> >
-> > I also notice that we have other places (apparently dealing with
-> > fragments) that do not have such checks. Do they need anything else?
-> >
->
-> I think we don't need that check in other parts.
->
-> > >     buf =3D hyp_buffers.tx;
-> > >     memcpy(buf, host_buffers.tx, fraglen);
-> > >
-> >
-> > Finally, this probably deserves a Fixes: tag and a Cc: stable so that
-> > it can be backported.
-> >
-> > Thanks,
-> >
-> >       M.
-> >
->
-> Seb
->
-> > --
-> > Without deviation from the norm, progress is not possible.
