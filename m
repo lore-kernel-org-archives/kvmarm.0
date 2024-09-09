@@ -1,95 +1,240 @@
-Received: from mx.astralinux.ru (mx.astralinux.ru [89.232.161.68])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B7C614A0A7;
-	Mon,  9 Sep 2024 10:40:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.232.161.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B2EC1B4C4A;
+	Mon,  9 Sep 2024 10:58:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725878408; cv=none; b=bpB427yGz9Oqn1aIal9S7ocRd1siuD5HmvYryAq116XwqOkjueQGYO42QVco4Lh02zInb2yr0th0NiQbmLDpx4XPnVDq0H+Ff1YUEpipDdun4N3gIoeIjxO/j81evgqkrV6ZeLuXClNZqqjhdeRmX0Z6Wv/S9GTs0W+VMkMe2Z4=
+	t=1725879510; cv=none; b=gh5eUuH3bIiJ0ScEp+YDPeQ7Ql438CXuHS9wGP8a+D1RAirNHeQN577i3HA5e06uk0bcpLqAD78SUEA89ilgW0KnOA9ncIkcLImHlcr6jhNhwaMIlA/JDeQjUX5ib/1RJk4wIlby5eH9tWKZR4Cy4B/mFOy0rQ1JTK++L2U5Xug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725878408; c=relaxed/simple;
-	bh=W/5Byqc4HSQmvKdLXbLG4kDtafYkNIOD/L1geBtLHjY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=JfopayH8dsfCX6opnX8GBxGNEvjBPHDeqWJA2waysr5KbTxVKiKMyIysFnFL+7uZfC7PaUjOYj5quWvfnpbx9Sqpn88e75JYHPvQgQJJDrNjMblPRKBBnvTvHQtO4TjnyazdmUrh5oT24HAEudWgFPR+WYjiZ9aZgh/aix2pr+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=astralinux.ru; spf=pass smtp.mailfrom=astralinux.ru; arc=none smtp.client-ip=89.232.161.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=astralinux.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=astralinux.ru
-Received: from [10.177.185.111] (helo=new-mail.astralinux.ru)
-	by mx.astralinux.ru with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <abelova@astralinux.ru>)
-	id 1snbmp-00BGaU-87; Mon, 09 Sep 2024 13:38:23 +0300
-Received: from rbta-msk-lt-106062.astralinux.ru (unknown [10.198.22.134])
-	by new-mail.astralinux.ru (Postfix) with ESMTPA id 4X2Ncg5b7tz1c0X1;
-	Mon,  9 Sep 2024 13:39:31 +0300 (MSK)
-From: Anastasia Belova <abelova@astralinux.ru>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Anastasia Belova <abelova@astralinux.ru>,
-	Oliver Upton <oliver.upton@linux.dev>,
+	s=arc-20240116; t=1725879510; c=relaxed/simple;
+	bh=uziYmtq37+Z6zrJILw3P2Hf7wc6u5U+5m+2Q4a9lW0E=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Lqd1WjuTcRdTb28l24jk4wAnF4pUc3EWCzh2cxwwfzO96o3m1JQDRYStL8bfcn5e/u8MwBLWep2zFWd/ddL8tXr4Sk6P+SpM2SsobdWGqo2wUnMc8GOcK57wt0dPWoslLSHepa1ZekWWAYxNWRKNG4T9miWQHRjbIejpER3IRNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qffQQga7; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qffQQga7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90409C4CEC5;
+	Mon,  9 Sep 2024 10:58:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725879509;
+	bh=uziYmtq37+Z6zrJILw3P2Hf7wc6u5U+5m+2Q4a9lW0E=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=qffQQga7/SG35bqfaVeksLac24dsmrxzJxAEEqumjUCyUf4Gj+5yMly0tKAWri7Lq
+	 LGH9/6BQe2VBgsp6ho6ZubAwbpbm+FEM7L381+GytW+K/6lNBLHYWhc183KB02VlPj
+	 IHPsl4HNopDwU0HLtJjq0Yk/6pIW8RXkSYOsi55m8Al1S/+nouoGCTwu3+V2Lm7NK7
+	 YAeH/56EdSrhWwIXIMJeJmHuE/fTVHl5qq1FrueLhcoL9EMJTnbedF2/2ngDAjrubn
+	 uocnuJ0s89oAUunHYLfDHCVONaMJshQKyPNPEnwbTLtH7X5KSjtSnGYXVwIo8Ykk2T
+	 VVypRZWtxyBPA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1snc6D-00B0FE-OV;
+	Mon, 09 Sep 2024 11:58:27 +0100
+Date: Mon, 09 Sep 2024 11:58:04 +0100
+Message-ID: <865xr5856r.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Anastasia Belova <abelova@astralinux.ru>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
-	Matt Evans <matt.evans@arm.com>,
-	Christoffer Dall <christoffer.dall@linaro.org>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	lvc-project@linuxtesting.org,
 	stable@vger.kernel.org
-Subject: [PATCH 1/2] arm64: KVM: prevent overflow in inject_abt64
-Date: Mon,  9 Sep 2024 13:38:27 +0300
-Message-Id: <20240909103828.16699-2-abelova@astralinux.ru>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240909103828.16699-1-abelova@astralinux.ru>
+Subject: Re: [PATCH 1/2] arm64: KVM: prevent overflow in inject_abt64
+In-Reply-To: <20240909103828.16699-2-abelova@astralinux.ru>
 References: <20240909103828.16699-1-abelova@astralinux.ru>
+	<20240909103828.16699-2-abelova@astralinux.ru>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-DrWeb-SpamScore: 0
-X-DrWeb-SpamState: legit
-X-DrWeb-SpamDetail: gggruggvucftvghtrhhoucdtuddrgedvfedrvdehuddgtddvucetufdoteggodetrfcurfhrohhfihhlvgemucfftfghgfeunecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvfevufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpeetnhgrshhtrghsihgruceuvghlohhvrgcuoegrsggvlhhovhgrsegrshhtrhgrlhhinhhugidrrhhuqeenucggtffrrghtthgvrhhnpeevhfduuefhueektdefkedvgfekgfekffegvdetffehfefhffejhfehveevudeigfenucffohhmrghinheplhhinhhugihtvghsthhinhhgrdhorhhgnecukfhppedutddrudelkedrvddvrddufeegnecurfgrrhgrmhephhgvlhhopehrsghtrgdqmhhskhdqlhhtqddutdeitdeivddrrghsthhrrghlihhnuhigrdhruhdpihhnvghtpedutddrudelkedrvddvrddufeegmeefheeifeekpdhmrghilhhfrhhomheprggsvghlohhvrgesrghsthhrrghlihhnuhigrdhruhdpnhgspghrtghpthhtohepudehpdhrtghpthhtohepmhgriieskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprggsvghlohhvrgesrghsthhrrghlihhnuhigrdhruhdprhgtphhtthhopeholhhivhgvrhdruhhpthhonheslhhinhhugidruggvvhdprhgtphhtthhopehjrghmvghsrdhmohhrshgvsegrrhhmrdgtohhmpdhrtghpthhtohepshhuiihukhhirdhpohhulhhoshgvsegrrh
- hmrdgtohhmpdhrtghpthhtohephihuiigvnhhghhhuiheshhhurgifvghirdgtohhmpdhrtghpthhtoheptggrthgrlhhinhdrmhgrrhhinhgrshesrghrmhdrtghomhdprhgtphhtthhopeifihhllheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepmhgrthhtrdgvvhgrnhhssegrrhhmrdgtohhmpdhrtghpthhtoheptghhrhhishhtohhffhgvrhdruggrlhhlsehlihhnrghrohdrohhrghdprhgtphhtthhopehlihhnuhigqdgrrhhmqdhkvghrnhgvlheslhhishhtshdrihhnfhhrrgguvggrugdrohhrghdprhgtphhtthhopehkvhhmrghrmheslhhishhtshdrlhhinhhugidruggvvhdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlvhgtqdhprhhojhgvtghtsehlihhnuhigthgvshhtihhnghdrohhrghdprhgtphhtthhopehsthgrsghlvgesvhhgvghrrdhkvghrnhgvlhdrohhrghenucffrhdrhggvsgcutehnthhishhprghmmecunecuvfgrghhsme
-X-DrWeb-SpamVersion: Dr.Web Antispam 1.0.7.202406240#1725640479#02
-X-AntiVirus: Checked by Dr.Web [MailD: 11.1.19.2307031128, SE: 11.1.12.2210241838, Core engine: 7.00.65.05230, Virus records: 12165305, Updated: 2024-Sep-09 08:42:30 UTC]
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: abelova@astralinux.ru, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-ESR_ELx_EC_IABT_LOW << ESR_ELx_EC_SHIFT = 0x20 << 26.
-ESR_ELx_EC_IABT_CUR << ESR_ELx_EC_SHIFT = 0x21 << 26.
-There operations' results are int with 1 in 32th bit.
-While casting these values into u64 (esr is u64) 1
-fills 32 highest bits.
+[dropping Christoffer and Matt from the list, as these addresses are
+pretty obsolete and I doubt they actually care]
 
-Add explicit casting to prevent it.
+Anastasia,
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
+On Mon, 09 Sep 2024 11:38:27 +0100,
+Anastasia Belova <abelova@astralinux.ru> wrote:
+> 
+> ESR_ELx_EC_IABT_LOW << ESR_ELx_EC_SHIFT = 0x20 << 26.
+> ESR_ELx_EC_IABT_CUR << ESR_ELx_EC_SHIFT = 0x21 << 26.
+> There operations' results are int with 1 in 32th bit.
+> While casting these values into u64 (esr is u64) 1
+> fills 32 highest bits.
+> 
+> Add explicit casting to prevent it.
+> 
+> Found by Linux Verification Center (linuxtesting.org) with SVACE.
+> 
+> Fixes: aa8eff9bfbd5 ("arm64: KVM: fault injection into a guest")
+> Signed-off-by: Anastasia Belova <abelova@astralinux.ru>
+> ---
+>  arch/arm64/kvm/inject_fault.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+> index a640e839848e..b6b2cfff6629 100644
+> --- a/arch/arm64/kvm/inject_fault.c
+> +++ b/arch/arm64/kvm/inject_fault.c
+> @@ -74,9 +74,9 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
+>  	 * an AArch32 fault, it means we managed to trap an EL0 fault.
+>  	 */
+>  	if (is_aarch32 || (cpsr & PSR_MODE_MASK) == PSR_MODE_EL0t)
+> -		esr |= (ESR_ELx_EC_IABT_LOW << ESR_ELx_EC_SHIFT);
+> +		esr |= ((u64)ESR_ELx_EC_IABT_LOW << ESR_ELx_EC_SHIFT);
+>  	else
+> -		esr |= (ESR_ELx_EC_IABT_CUR << ESR_ELx_EC_SHIFT);
+> +		esr |= ((u64)ESR_ELx_EC_IABT_CUR << ESR_ELx_EC_SHIFT);
+>  
+>  	if (!is_iabt)
+>  		esr |= ESR_ELx_EC_DABT_LOW << ESR_ELx_EC_SHIFT;
 
-Fixes: aa8eff9bfbd5 ("arm64: KVM: fault injection into a guest")
-Signed-off-by: Anastasia Belova <abelova@astralinux.ru>
----
- arch/arm64/kvm/inject_fault.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Thanks for this. Although correct, this is a point fix that leaves
+plenty of opportunities for problems.
 
-diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-index a640e839848e..b6b2cfff6629 100644
---- a/arch/arm64/kvm/inject_fault.c
-+++ b/arch/arm64/kvm/inject_fault.c
-@@ -74,9 +74,9 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
- 	 * an AArch32 fault, it means we managed to trap an EL0 fault.
- 	 */
- 	if (is_aarch32 || (cpsr & PSR_MODE_MASK) == PSR_MODE_EL0t)
--		esr |= (ESR_ELx_EC_IABT_LOW << ESR_ELx_EC_SHIFT);
-+		esr |= ((u64)ESR_ELx_EC_IABT_LOW << ESR_ELx_EC_SHIFT);
- 	else
--		esr |= (ESR_ELx_EC_IABT_CUR << ESR_ELx_EC_SHIFT);
-+		esr |= ((u64)ESR_ELx_EC_IABT_CUR << ESR_ELx_EC_SHIFT);
+I'd rather you update all the ESR_ELx_EC_* constants to be defined as
+UL(0x..) instead of (0x..), which will allow us to forget this
+forever. Something like this (based on my working tree and won't apply
+on upstream, but you will hopefully get the idea):
+
+diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+index cc1b0ec7a51be..47799a7f95cf8 100644
+--- a/arch/arm64/include/asm/esr.h
++++ b/arch/arm64/include/asm/esr.h
+@@ -10,64 +10,64 @@
+ #include <asm/memory.h>
+ #include <asm/sysreg.h>
  
- 	if (!is_iabt)
- 		esr |= ESR_ELx_EC_DABT_LOW << ESR_ELx_EC_SHIFT;
--- 
-2.30.2
+-#define ESR_ELx_EC_UNKNOWN	(0x00)
+-#define ESR_ELx_EC_WFx		(0x01)
++#define ESR_ELx_EC_UNKNOWN	UL(0x00)
++#define ESR_ELx_EC_WFx		UL(0x01)
+ /* Unallocated EC: 0x02 */
+-#define ESR_ELx_EC_CP15_32	(0x03)
+-#define ESR_ELx_EC_CP15_64	(0x04)
+-#define ESR_ELx_EC_CP14_MR	(0x05)
+-#define ESR_ELx_EC_CP14_LS	(0x06)
+-#define ESR_ELx_EC_FP_ASIMD	(0x07)
+-#define ESR_ELx_EC_CP10_ID	(0x08)	/* EL2 only */
+-#define ESR_ELx_EC_PAC		(0x09)	/* EL2 and above */
+-#define ESR_ELx_EC_LS64B	(0x0A)
++#define ESR_ELx_EC_CP15_32	UL(0x03)
++#define ESR_ELx_EC_CP15_64	UL(0x04)
++#define ESR_ELx_EC_CP14_MR	UL(0x05)
++#define ESR_ELx_EC_CP14_LS	UL(0x06)
++#define ESR_ELx_EC_FP_ASIMD	UL(0x07)
++#define ESR_ELx_EC_CP10_ID	UL(0x08)	/* EL2 only */
++#define ESR_ELx_EC_PAC		UL(0x09)	/* EL2 and above */
++#define ESR_ELx_EC_LS64B	UL(0x0A)
+ /* Unallocated EC: 0x0B */
+-#define ESR_ELx_EC_CP14_64	(0x0C)
+-#define ESR_ELx_EC_BTI		(0x0D)
+-#define ESR_ELx_EC_ILL		(0x0E)
++#define ESR_ELx_EC_CP14_64	UL(0x0C)
++#define ESR_ELx_EC_BTI		UL(0x0D)
++#define ESR_ELx_EC_ILL		UL(0x0E)
+ /* Unallocated EC: 0x0F - 0x10 */
+-#define ESR_ELx_EC_SVC32	(0x11)
+-#define ESR_ELx_EC_HVC32	(0x12)	/* EL2 only */
+-#define ESR_ELx_EC_SMC32	(0x13)	/* EL2 and above */
++#define ESR_ELx_EC_SVC32	UL(0x11)
++#define ESR_ELx_EC_HVC32	UL(0x12)	/* EL2 only */
++#define ESR_ELx_EC_SMC32	UL(0x13)	/* EL2 and above */
+ /* Unallocated EC: 0x14 */
+-#define ESR_ELx_EC_SVC64	(0x15)
+-#define ESR_ELx_EC_HVC64	(0x16)	/* EL2 and above */
+-#define ESR_ELx_EC_SMC64	(0x17)	/* EL2 and above */
+-#define ESR_ELx_EC_SYS64	(0x18)
+-#define ESR_ELx_EC_SVE		(0x19)
+-#define ESR_ELx_EC_ERET		(0x1a)	/* EL2 only */
++#define ESR_ELx_EC_SVC64	UL(0x15)
++#define ESR_ELx_EC_HVC64	UL(0x16)	/* EL2 and above */
++#define ESR_ELx_EC_SMC64	UL(0x17)	/* EL2 and above */
++#define ESR_ELx_EC_SYS64	UL(0x18)
++#define ESR_ELx_EC_SVE		UL(0x19)
++#define ESR_ELx_EC_ERET		UL(0x1a)	/* EL2 only */
+ /* Unallocated EC: 0x1B */
+-#define ESR_ELx_EC_FPAC		(0x1C)	/* EL1 and above */
+-#define ESR_ELx_EC_SME		(0x1D)
++#define ESR_ELx_EC_FPAC		UL(0x1C)	/* EL1 and above */
++#define ESR_ELx_EC_SME		UL(0x1D)
+ /* Unallocated EC: 0x1E */
+-#define ESR_ELx_EC_IMP_DEF	(0x1f)	/* EL3 only */
+-#define ESR_ELx_EC_IABT_LOW	(0x20)
+-#define ESR_ELx_EC_IABT_CUR	(0x21)
+-#define ESR_ELx_EC_PC_ALIGN	(0x22)
++#define ESR_ELx_EC_IMP_DEF	UL(0x1f)	/* EL3 only */
++#define ESR_ELx_EC_IABT_LOW	UL(0x20)
++#define ESR_ELx_EC_IABT_CUR	UL(0x21)
++#define ESR_ELx_EC_PC_ALIGN	UL(0x22)
+ /* Unallocated EC: 0x23 */
+-#define ESR_ELx_EC_DABT_LOW	(0x24)
+-#define ESR_ELx_EC_DABT_CUR	(0x25)
+-#define ESR_ELx_EC_SP_ALIGN	(0x26)
+-#define ESR_ELx_EC_MOPS		(0x27)
+-#define ESR_ELx_EC_FP_EXC32	(0x28)
++#define ESR_ELx_EC_DABT_LOW	UL(0x24)
++#define ESR_ELx_EC_DABT_CUR	UL(0x25)
++#define ESR_ELx_EC_SP_ALIGN	UL(0x26)
++#define ESR_ELx_EC_MOPS		UL(0x27)
++#define ESR_ELx_EC_FP_EXC32	UL(0x28)
+ /* Unallocated EC: 0x29 - 0x2B */
+-#define ESR_ELx_EC_FP_EXC64	(0x2C)
++#define ESR_ELx_EC_FP_EXC64	UL(0x2C)
+ /* Unallocated EC: 0x2D - 0x2E */
+-#define ESR_ELx_EC_SERROR	(0x2F)
+-#define ESR_ELx_EC_BREAKPT_LOW	(0x30)
+-#define ESR_ELx_EC_BREAKPT_CUR	(0x31)
+-#define ESR_ELx_EC_SOFTSTP_LOW	(0x32)
+-#define ESR_ELx_EC_SOFTSTP_CUR	(0x33)
+-#define ESR_ELx_EC_WATCHPT_LOW	(0x34)
+-#define ESR_ELx_EC_WATCHPT_CUR	(0x35)
++#define ESR_ELx_EC_SERROR	UL(0x2F)
++#define ESR_ELx_EC_BREAKPT_LOW	UL(0x30)
++#define ESR_ELx_EC_BREAKPT_CUR	UL(0x31)
++#define ESR_ELx_EC_SOFTSTP_LOW	UL(0x32)
++#define ESR_ELx_EC_SOFTSTP_CUR	UL(0x33)
++#define ESR_ELx_EC_WATCHPT_LOW	UL(0x34)
++#define ESR_ELx_EC_WATCHPT_CUR	UL(0x35)
+ /* Unallocated EC: 0x36 - 0x37 */
+-#define ESR_ELx_EC_BKPT32	(0x38)
++#define ESR_ELx_EC_BKPT32	UL(0x38)
+ /* Unallocated EC: 0x39 */
+-#define ESR_ELx_EC_VECTOR32	(0x3A)	/* EL2 only */
++#define ESR_ELx_EC_VECTOR32	UL(0x3A)	/* EL2 only */
+ /* Unallocated EC: 0x3B */
+-#define ESR_ELx_EC_BRK64	(0x3C)
++#define ESR_ELx_EC_BRK64	UL(0x3C)
+ /* Unallocated EC: 0x3D - 0x3F */
+-#define ESR_ELx_EC_MAX		(0x3F)
++#define ESR_ELx_EC_MAX		UL(0x3F)
+ 
+ #define ESR_ELx_EC_SHIFT	(26)
+ #define ESR_ELx_EC_WIDTH	(6)
 
+Could you please respin this quickly so that it can be taken in v6.12?
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
