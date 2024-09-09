@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09C2B1B1502;
-	Mon,  9 Sep 2024 09:12:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 150481B29DB;
+	Mon,  9 Sep 2024 09:31:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725873152; cv=none; b=Kx9ceXETFqI2/23LQ6ryyUE1DAkDgtkcazuseF9VFNzIQLIdjK8UJO5XHVt4GhkcZjeZOjqmVtNmd89mJaGzZ2mXtusObtI7+mU1YArOyG4n5/QHFhw03G+F0epVarvEzlpaO++/hCpL8ECI6ot5cGJnSxfKuJIvqb5yPlMtfwI=
+	t=1725874292; cv=none; b=hlzrMGIxSn3FQFswAImRnW34eIvSh1iTYGi0oUfpgpTz1U/8uFMOabBLuO3IJZ68YHDE1+nZhBgHqh6w7Szs8s7awD1ZkJKfjLLmqIclNsJdBMGPjXBvXI0CZG5uANJiAOFS3gmP1KsV7ddJdM1+cCs3J7rGhiunU9PC4+/NIIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725873152; c=relaxed/simple;
-	bh=mZifNs88hExMfQNezko5ETnWOiKsW5xtuzhY2WfF+v0=;
+	s=arc-20240116; t=1725874292; c=relaxed/simple;
+	bh=/LeU09/yb8X79A7M5WmRsenF9Bao67AQn5cY3Xz60kI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=crW7ka8ZWtF+7tI/RqLtZS3uQLqVqMScILqKIw5b7CQYWZvzzoNhlenNMSdTIsTjQZ3cUJB1kdQVtsrkHmjI6APsGv//m8LvlMBNYzXvEAmejhnxhGgoNxWaDf+uDZ8ytvjAXTTQR+2yUBVHz3vIZGPVsRD3GiwK1OQC3w8jmaA=
+	 In-Reply-To:Content-Type; b=M3A/yDqSR/AYb3xVTjgMf9acmerDUC3aZNgAEBZPQlnIH0svg+3Wmd71XY11ShzF+x5dJUSN2ySsi56UcQgKLXf5xYaoSXkzyt90cYz5BylWzc0woyRMV8iVo6vBgOV7+HvjQOEivorPmNKOjPWwHNduk7EGMBpC9QTcLXQcblA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9D2A1FEC;
-	Mon,  9 Sep 2024 02:12:57 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 03749FEC;
+	Mon,  9 Sep 2024 02:31:58 -0700 (PDT)
 Received: from [10.57.74.73] (unknown [10.57.74.73])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2E1733F66E;
-	Mon,  9 Sep 2024 02:12:25 -0700 (PDT)
-Message-ID: <7b9a7d5b-ffd7-4add-88b4-fb5f1242c2ce@arm.com>
-Date: Mon, 9 Sep 2024 10:12:23 +0100
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 66AEB3F66E;
+	Mon,  9 Sep 2024 02:31:24 -0700 (PDT)
+Message-ID: <00dee9c5-5d5c-4a5e-9a24-22a4c9fe2e67@arm.com>
+Date: Mon, 9 Sep 2024 10:31:22 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,7 +27,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 03/19] arm64: rsi: Add RSI definitions
+Subject: Re: [PATCH v5 07/19] arm64: rsi: Add support for checking whether an
+ MMIO is protected
 To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
@@ -41,476 +42,196 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
  Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun <alpergun@google.com>
 References: <20240819131924.372366-1-steven.price@arm.com>
- <20240819131924.372366-4-steven.price@arm.com>
- <c44e9d4f-9ad2-4ff7-9b18-ede351950149@redhat.com>
+ <20240819131924.372366-8-steven.price@arm.com>
+ <fe3da777-c6de-451d-8a8a-19fdda8e82e5@redhat.com>
+ <8a675a19-52c1-43c7-b560-fbadce0c5145@arm.com>
+ <8ed3b6da-8bd2-4c98-9364-8b14c1baae7f@redhat.com>
 From: Steven Price <steven.price@arm.com>
 Content-Language: en-GB
-In-Reply-To: <c44e9d4f-9ad2-4ff7-9b18-ede351950149@redhat.com>
+In-Reply-To: <8ed3b6da-8bd2-4c98-9364-8b14c1baae7f@redhat.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 09/09/2024 06:10, Gavin Shan wrote:
-> On 8/19/24 11:19 PM, Steven Price wrote:
->> From: Suzuki K Poulose <suzuki.poulose@arm.com>
+On 09/09/2024 00:53, Gavin Shan wrote:
+> On 9/6/24 11:55 PM, Steven Price wrote:
+>> On 06/09/2024 05:32, Gavin Shan wrote:
+>>> On 8/19/24 11:19 PM, Steven Price wrote:
+>>>> From: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>>>
+>>>> On Arm CCA, with RMM-v1.0, all MMIO regions are shared. However, in
+>>>> the future, an Arm CCA-v1.0 compliant guest may be run in a lesser
+>>>> privileged partition in the Realm World (with Arm CCA-v1.1 Planes
+>>>> feature). In this case, some of the MMIO regions may be emulated
+>>>> by a higher privileged component in the Realm world, i.e, protected.
+>>>>
+>>>> Thus the guest must decide today, whether a given MMIO region is shared
+>>>> vs Protected and create the stage1 mapping accordingly. On Arm CCA,
+>>>> this
+>>>> detection is based on the "IPA State" (RIPAS == RIPAS_IO). Provide a
+>>>> helper to run this check on a given range of MMIO.
+>>>>
+>>>> Also, provide a arm64 helper which may be hooked in by other solutions.
+>>>>
+>>>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>>> Signed-off-by: Steven Price <steven.price@arm.com>
+>>>> ---
+>>>> New patch for v5
+>>>> ---
+>>>>    arch/arm64/include/asm/io.h       |  8 ++++++++
+>>>>    arch/arm64/include/asm/rsi.h      |  3 +++
+>>>>    arch/arm64/include/asm/rsi_cmds.h | 21 +++++++++++++++++++++
+>>>>    arch/arm64/kernel/rsi.c           | 26 ++++++++++++++++++++++++++
+>>>>    4 files changed, 58 insertions(+)
+> 
+> [...]
+> 
+>>>> diff --git a/arch/arm64/kernel/rsi.c b/arch/arm64/kernel/rsi.c
+>>>> index e968a5c9929e..381a5b9a5333 100644
+>>>> --- a/arch/arm64/kernel/rsi.c
+>>>> +++ b/arch/arm64/kernel/rsi.c
+>>>> @@ -67,6 +67,32 @@ void __init arm64_rsi_setup_memory(void)
+>>>>        }
+>>>>    }
+>>>>    +bool arm64_rsi_is_protected_mmio(phys_addr_t base, size_t size)
+>>>> +{
+>>>> +    enum ripas ripas;
+>>>> +    phys_addr_t end, top;
+>>>> +
+>>>> +    /* Overflow ? */
+>>>> +    if (WARN_ON(base + size < base))
+>>>> +        return false;
+>>>> +
+>>>> +    end = ALIGN(base + size, RSI_GRANULE_SIZE);
+>>>> +    base = ALIGN_DOWN(base, RSI_GRANULE_SIZE);
+>>>> +
+>>>> +    while (base < end) {
+>>>> +        if (WARN_ON(rsi_ipa_state_get(base, end, &ripas, &top)))
+>>>> +            break;
+>>>> +        if (WARN_ON(top <= base))
+>>>> +            break;
+>>>> +        if (ripas != RSI_RIPAS_IO)
+>>>> +            break;
+>>>> +        base = top;
+>>>> +    }
+>>>> +
+>>>> +    return (size && base >= end);
+>>>> +}
+>>>
+>>> I don't understand why @size needs to be checked here. Its initial value
+>>> taken from the input parameter should be larger than zero and its value
+>>> is never updated in the loop. So I'm understanding @size is always
+>>> larger
+>>> than zero, and the condition would be something like below if I'm
+>>> correct.
 >>
->> The RMM (Realm Management Monitor) provides functionality that can be
->> accessed by a realm guest through SMC (Realm Services Interface) calls.
->>
->> The SMC definitions are based on DEN0137[1] version 1.0-rel0-rc1.
->>
->> [1]
->> https://developer.arm.com/-/cdn-downloads/permalink/PDF/Architectures/DEN0137_1.0-rel0-rc1_rmm-arch_external.pdf
->>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->> Changes since v4:
->>   * Update to match the latest RMM spec version 1.0-rel0-rc1.
->>   * Make use of the ARM_SMCCC_CALL_VAL macro.
->>   * Cast using (_UL macro) various values to unsigned long.
->> Changes since v3:
->>   * Drop invoke_rsi_fn_smc_with_res() function and call arm_smccc_smc()
->>     directly instead.
->>   * Rename header guard in rsi_smc.h to be consistent.
->> Changes since v2:
->>   * Rename rsi_get_version() to rsi_request_version()
->>   * Fix size/alignment of struct realm_config
->> ---
->>   arch/arm64/include/asm/rsi_cmds.h | 136 +++++++++++++++++++++
->>   arch/arm64/include/asm/rsi_smc.h  | 189 ++++++++++++++++++++++++++++++
->>   2 files changed, 325 insertions(+)
->>   create mode 100644 arch/arm64/include/asm/rsi_cmds.h
->>   create mode 100644 arch/arm64/include/asm/rsi_smc.h
+>> Yes you are correct. I'm not entirely sure why it was written that way.
+>> The only change dropping 'size' as you suggest is that a zero-sized
+>> region is considered protected. But I'd consider it a bug if this is
+>> called with size=0. I'll drop 'size' here.
 >>
 > 
-> With the following minor comments addressed:
+> The check 'size == 0' could be squeezed to the overflow check if you agree.
 > 
-> Reviewed-by: Gavin Shan <gshan@redht.com>
-
-Thanks for the review!
-
->> diff --git a/arch/arm64/include/asm/rsi_cmds.h
->> b/arch/arm64/include/asm/rsi_cmds.h
->> new file mode 100644
->> index 000000000000..968b03f4e703
->> --- /dev/null
->> +++ b/arch/arm64/include/asm/rsi_cmds.h
->> @@ -0,0 +1,136 @@
->> +/* SPDX-License-Identifier: GPL-2.0-only */
->> +/*
->> + * Copyright (C) 2023 ARM Ltd.
->> + */
->> +
->> +#ifndef __ASM_RSI_CMDS_H
->> +#define __ASM_RSI_CMDS_H
->> +
->> +#include <linux/arm-smccc.h>
->> +
->> +#include <asm/rsi_smc.h>
->> +
->> +#define RSI_GRANULE_SHIFT        12
->> +#define RSI_GRANULE_SIZE        (_AC(1, UL) << RSI_GRANULE_SHIFT)
->> +
->> +enum ripas {
->> +    RSI_RIPAS_EMPTY = 0,
->> +    RSI_RIPAS_RAM = 1,
->> +    RSI_RIPAS_DESTROYED = 2,
->> +    RSI_RIPAS_IO = 3,
->> +};
->> +
+>     /* size == 0 or overflow */
+>     if (WARN_ON(base + size) <= base)
+>         return false;
+>     :
+>         return (base >= end);
 > 
-> The 'RSI_RIPAS_IO' corresponds to 'RIPAS_DEV' defined in
-> tf-rmm/lib/s2tt/include/ripas.h.
-> Shall we rename it to RSI_RIPAS_DEV so that the name is matched with
-> that defined in
-> tf-rmm?
 
-Yes it should be renamed. This was posted based on the v1.0-rel0-rc1
-spec and follows the naming there. But shortly after that spec was
-released the decision to rename to RIPAS_DEV was made (as it's really
-specifying that it's a device not that I/O is happening at an address).
-I kept the naming to match the spec, but the next release of the spec
-should have the RIPAS_DEV so I'll update to match that.
+Yes that makes sense, thanks for the suggestion.
 
-> ---> tf-rmm/lib/s2tt/include/ripas.h
+>>>         return (base >= end);     /* RSI_RIPAS_IO returned for all
+>>> granules */
+>>>
+>>> Another issue is @top is always zero with the latest tf-rmm. More
+>>> details
+>>> are provided below.
+>>
+>> That suggests that you are not actually using the 'latest' tf-rmm ;)
+>> (for some definition of 'latest' which might not be obvious!)
+>>
+>>> From the cover letter:
+>>
+>>> As mentioned above the new RMM specification means that corresponding
+>>> changes need to be made in the RMM, at this time these changes are still
+>>> in review (see 'topics/rmm-1.0-rel0-rc1'). So you'll need to fetch the
+>>> changes[3] from the gerrit instance until they are pushed to the main
+>>> branch.
+>>>
+>>> [3] https://review.trustedfirmware.org/c/TF-RMM/tf-rmm/+/30485
+>>
+>> Sorry, I should probably have made this much more prominent in the cover
+>> letter.
+>>
+>> Running something like...
+>>
+>>   git fetch https://git.trustedfirmware.org/TF-RMM/tf-rmm.git \
+>>     refs/changes/85/30485/11
+>>
+>> ... should get you the latest. Hopefully these changes will get merged
+>> to the main branch soon.
+>>
 > 
-> /*
->  * The RmmRipas enumeration represents realm IPA state.
->  *
->  * Map RmmRipas to RmiRipas to simplify code/decode operations.
->  */
-> enum ripas {
->         RIPAS_EMPTY = RMI_EMPTY,        /* Unused IPA for Realm */
->         RIPAS_RAM = RMI_RAM,            /* IPA used for Code/Data by
-> Realm */
->         RIPAS_DESTROYED = RMI_DESTROYED,/* IPA is inaccessible to the
-> Realm */
->         RIPAS_DEV                       /* Address where memory of an
-> assigned
->                                            Realm device is mapped */
-> };
-> 
->> +static inline unsigned long rsi_request_version(unsigned long req,
->> +                        unsigned long *out_lower,
->> +                        unsigned long *out_higher)
->> +{
->> +    struct arm_smccc_res res;
->> +
->> +    arm_smccc_smc(SMC_RSI_ABI_VERSION, req, 0, 0, 0, 0, 0, 0, &res);
->> +
->> +    if (out_lower)
->> +        *out_lower = res.a1;
->> +    if (out_higher)
->> +        *out_higher = res.a2;
->> +
->> +    return res.a0;
->> +}
->> +
->> +static inline unsigned long rsi_get_realm_config(struct realm_config
->> *cfg)
->> +{
->> +    struct arm_smccc_res res;
->> +
->> +    arm_smccc_smc(SMC_RSI_REALM_CONFIG, virt_to_phys(cfg),
->> +              0, 0, 0, 0, 0, 0, &res);
->> +    return res.a0;
->> +}
->> +
->> +static inline unsigned long rsi_set_addr_range_state(phys_addr_t start,
->> +                             phys_addr_t end,
->> +                             enum ripas state,
->> +                             unsigned long flags,
->> +                             phys_addr_t *top)
->> +{
->> +    struct arm_smccc_res res;
->> +
->> +    arm_smccc_smc(SMC_RSI_IPA_STATE_SET, start, end, state,
->> +              flags, 0, 0, 0, &res);
->> +
->> +    if (top)
->> +        *top = res.a1;
->> +
->> +    return res.a0;
->> +}
->> +
->> +/**
->> + * rsi_attestation_token_init - Initialise the operation to retrieve an
->> + * attestation token.
->> + *
->> + * @challenge:    The challenge data to be used in the attestation token
->> + *        generation.
->> + * @size:    Size of the challenge data in bytes.
->> + *
->> + * Initialises the attestation token generation and returns an upper
->> bound
->> + * on the attestation token size that can be used to allocate an
->> adequate
->> + * buffer. The caller is expected to subsequently call
->> + * rsi_attestation_token_continue() to retrieve the attestation token
->> data on
->> + * the same CPU.
->> + *
->> + * Returns:
->> + *  On success, returns the upper limit of the attestation report size.
->> + *  Otherwise, -EINVAL
->> + */
->> +static inline unsigned long
->> +rsi_attestation_token_init(const u8 *challenge, unsigned long size)
->> +{
->> +    struct arm_smccc_1_2_regs regs = { 0 };
->> +
->> +    /* The challenge must be at least 32bytes and at most 64bytes */
->> +    if (!challenge || size < 32 || size > 64)
->> +        return -EINVAL;
->> +
->> +    regs.a0 = SMC_RSI_ATTESTATION_TOKEN_INIT;
->> +    memcpy(&regs.a1, challenge, size);
->> +    arm_smccc_1_2_smc(&regs, &regs);
->> +
->> +    if (regs.a0 == RSI_SUCCESS)
->> +        return regs.a1;
->> +
->> +    return -EINVAL;
->> +}
->> +
-> 
-> The type of the return value would be 'long' instead of 'unsigned long'
-> since
-> '-EINVAL' can be returned.
+> My bad. I didn't check the cover letter in time. With this specific
+> TF-RMM branch,
+> I'm able to boot the guest with cca/host-v4 and cca/guest-v5. However,
+> there are
+> messages indicating unhandled system register accesses, as below.
 
-Good spot! The call site is casting back to long, so it "should work",
-but clearly this is the wrong type.
+To some extent unhandled system register accesses are expected. The
+kernel will probe for features, and if the RMM doesn't support them it
+will be emulating those registers as RAZ/WI. I believe RAZ/WI is an
+appropriate emulation, so Linux won't have any trouble here, and I don't
+think there's anything wrong with Linux probing these registers.
 
->> +/**
->> + * rsi_attestation_token_continue - Continue the operation to
->> retrieve an
->> + * attestation token.
->> + *
->> + * @granule: {I}PA of the Granule to which the token will be written.
->> + * @offset:  Offset within Granule to start of buffer in bytes.
->> + * @size:    The size of the buffer.
->> + * @len:     The number of bytes written to the buffer.
->> + *
->> + * Retrieves up to a RSI_GRANULE_SIZE worth of token data per call.
->> The caller
->> + * is expected to call rsi_attestation_token_init() before calling this
->> + * function to retrieve the attestation token.
->> + *
->> + * Return:
->> + * * %RSI_SUCCESS     - Attestation token retrieved successfully.
->> + * * %RSI_INCOMPLETE  - Token generation is not complete.
->> + * * %RSI_ERROR_INPUT - A parameter was not valid.
->> + * * %RSI_ERROR_STATE - Attestation not in progress.
->> + */
->> +static inline int rsi_attestation_token_continue(phys_addr_t granule,
->> +                         unsigned long offset,
->> +                         unsigned long size,
->> +                         unsigned long *len)
->> +{
->> +    struct arm_smccc_res res;
->> +
->> +    arm_smccc_1_1_invoke(SMC_RSI_ATTESTATION_TOKEN_CONTINUE,
->> +                 granule, offset, size, 0, &res);
->> +
->> +    if (len)
->> +        *len = res.a1;
->> +    return res.a0;
->> +}
->> +
->> +#endif /* __ASM_RSI_CMDS_H */
->> diff --git a/arch/arm64/include/asm/rsi_smc.h
->> b/arch/arm64/include/asm/rsi_smc.h
->> new file mode 100644
->> index 000000000000..b76b03a8fea8
->> --- /dev/null
->> +++ b/arch/arm64/include/asm/rsi_smc.h
->> @@ -0,0 +1,189 @@
->> +/* SPDX-License-Identifier: GPL-2.0-only */
->> +/*
->> + * Copyright (C) 2023 ARM Ltd.
->> + */
->> +
->> +#ifndef __ASM_RSI_SMC_H_
->> +#define __ASM_RSI_SMC_H_
->> +
->> +#include <linux/arm-smccc.h>
->> +
->> +/*
->> + * This file describes the Realm Services Interface (RSI) Application
->> Binary
->> + * Interface (ABI) for SMC calls made from within the Realm to the
->> RMM and
->> + * serviced by the RMM.
->> + */
->> +
->> +/*
->> + * The major version number of the RSI implementation.  This is
->> increased when
->> + * the binary format or semantics of the SMC calls change.
->> + */
->> +#define RSI_ABI_VERSION_MAJOR        UL(1)
->> +
->> +/*
->> + * The minor version number of the RSI implementation.  This is
->> increased when
->> + * a bug is fixed, or a feature is added without breaking binary
->> compatibility.
->> + */
->> +#define RSI_ABI_VERSION_MINOR        UL(0)
->> +
->> +#define RSI_ABI_VERSION            ((RSI_ABI_VERSION_MAJOR << 16) | \
->> +                     RSI_ABI_VERSION_MINOR)
->> +
->> +#define RSI_ABI_VERSION_GET_MAJOR(_version) ((_version) >> 16)
->> +#define RSI_ABI_VERSION_GET_MINOR(_version) ((_version) & 0xFFFF)
->> +
->> +#define RSI_SUCCESS        UL(0)
->> +#define RSI_ERROR_INPUT        UL(1)
->> +#define RSI_ERROR_STATE        UL(2)
->> +#define RSI_INCOMPLETE        UL(3)
->> +#define RSI_ERROR_UNKNOWN    UL(4)
->> +
->> +#define SMC_RSI_FID(n)       
->> ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,      \
->> +                           ARM_SMCCC_SMC_64,         \
->> +                           ARM_SMCCC_OWNER_STANDARD, \
->> +                           n)
->> +
->> +/*
->> + * Returns RSI version.
->> + *
->> + * arg1 == Requested interface revision
->> + * ret0 == Status /error
->> + * ret1 == Lower implemented interface revision
->> + * ret2 == Higher implemented interface revision
->> + */
->> +#define SMC_RSI_ABI_VERSION    SMC_RSI_FID(0x190)
->> +
->> +/*
->> + * Read feature register.
->> + *
->> + * arg1 == Feature register index
->> + * ret0 == Status /error
->               ^^^^^^^^^^^^^
->               Status / error
-
-Ack
-
->> + * ret1 == Feature register value
->> + */
->> +#define SMC_RSI_FEATURES            SMC_RSI_FID(0x191)
->> +
->> +/*
->> + * Read measurement for the current Realm.
->> + *
->> + * arg1 == Index, which measurements slot to read
->> + * ret0 == Status / error
->> + * ret1 == Measurement value, bytes:  0 -  7
->> + * ret2 == Measurement value, bytes:  7 - 15
->                                          ^^^^^^
->                                          8 - 15
-> 
->> + * ret3 == Measurement value, bytes: 16 - 23
->> + * ret4 == Measurement value, bytes: 24 - 31
->> + * ret5 == Measurement value, bytes: 32 - 39
->> + * ret6 == Measurement value, bytes: 40 - 47
->> + * ret7 == Measurement value, bytes: 48 - 55
->> + * ret8 == Measurement value, bytes: 56 - 63
->> + */
->> +#define SMC_RSI_MEASUREMENT_READ        SMC_RSI_FID(0x192)
->> +
->> +/*
->> + * Extend Realm Extensible Measurement (REM) value.
->> + *
->> + * arg1  == Index, which measurements slot to extend
->> + * arg2  == Size of realm measurement in bytes, max 64 bytes
->> + * arg3  == Measurement value, bytes:  0 -  7
->> + * arg4  == Measurement value, bytes:  7 - 15
->                                           ^^^^^^
->                                           8 - 15
-> 
->> + * arg5  == Measurement value, bytes: 16 - 23
->> + * arg6  == Measurement value, bytes: 24 - 31
->> + * arg7  == Measurement value, bytes: 32 - 39
->> + * arg8  == Measurement value, bytes: 40 - 47
->> + * arg9  == Measurement value, bytes: 48 - 55
->> + * arg10 == Measurement value, bytes: 56 - 63
->> + * ret0  == Status / error
->> + */
->> +#define SMC_RSI_MEASUREMENT_EXTEND        SMC_RSI_FID(0x193)
->> +
->> +/*
->> + * Initialize the operation to retrieve an attestation token.
->> + *
->> + * arg1 == Challenge value, bytes:  0 -  7
->> + * arg2 == Challenge value, bytes:  7 - 15
->                                        ^^^^^^
->                                        8 - 15
-
-One mistake and too much copy/pasting :(
-
->> + * arg3 == Challenge value, bytes: 16 - 23
->> + * arg4 == Challenge value, bytes: 24 - 31
->> + * arg5 == Challenge value, bytes: 32 - 39
->> + * arg6 == Challenge value, bytes: 40 - 47
->> + * arg7 == Challenge value, bytes: 48 - 55
->> + * arg8 == Challenge value, bytes: 56 - 63
->> + * ret0 == Status / error
->> + * ret1 == Upper bound of token size in bytes
->> + */
->> +#define SMC_RSI_ATTESTATION_TOKEN_INIT        SMC_RSI_FID(0x194)
->> +
->> +/*
->> + * Continue the operation to retrieve an attestation token.
->> + *
->> + * arg1 == The IPA of token buffer
->> + * arg2 == Offset within the granule of the token buffer
->> + * arg3 == Size of the granule buffer
->> + * ret0 == Status / error
->> + * ret1 == Length of token bytes copied to the granule buffer
->> + */
->> +#define SMC_RSI_ATTESTATION_TOKEN_CONTINUE    SMC_RSI_FID(0x195)
->> +
->> +#ifndef __ASSEMBLY__
->> +
->> +struct realm_config {
->> +    union {
->> +        struct {
->> +            unsigned long ipa_bits; /* Width of IPA in bits */
->> +            unsigned long hash_algo; /* Hash algorithm */
->> +        };
->> +        u8 pad[0x200];
->> +    };
->> +    union {
->> +        u8 rpv[64]; /* Realm Personalization Value */
->> +        u8 pad2[0xe00];
->> +    };
->> +    /*
->> +     * The RMM requires the configuration structure to be aligned to
->> a 4k
->> +     * boundary, ensure this happens by aligning this structure.
->> +     */
->> +} __aligned(0x1000);
->> +
->> +#endif /* __ASSEMBLY__ */
->> +
->> +/*
->> + * Read configuration for the current Realm.
->> + *
->> + * arg1 == struct realm_config addr
->> + * ret0 == Status / error
->> + */
->> +#define SMC_RSI_REALM_CONFIG            SMC_RSI_FID(0x196)
->> +
->> +/*
->> + * Request RIPAS of a target IPA range to be changed to a specified
->> value.
->> + *
->> + * arg1 == Base IPA address of target region
->> + * arg2 == Top of the region
->> + * arg3 == RIPAS value
->> + * arg4 == flags
->> + * ret0 == Status / error
->> + * ret1 == Top of modified IPA range
->> + */
->> +#define SMC_RSI_IPA_STATE_SET            SMC_RSI_FID(0x197)
->> +
->> +#define RSI_NO_CHANGE_DESTROYED            UL(0)
->> +#define RSI_CHANGE_DESTROYED            UL(1)
->> +
-> 
-> According to the linked specification, the description for the third
-> return value
-> has been missed here.
-> 
-> ret2 == Whether the host accepted or rejected the request
-
-Worse than just a documentation error - I'd completely forgotten to
-check this extra return value in rsi_set_addr_range_state(). Thanks for
-spotting this!
+So the question really is whether the RMM needs to have dummy handlers
+to silence the 'warnings'. They are currently output using 'INFO' so
+priority - so will only be visible in a 'debug' build (or if the log
+level has been explicitly set).
 
 Steve
 
->> +/*
->> + * Get RIPAS of a target IPA range.
->> + *
->> + * arg1 == Base IPA of target region
->> + * arg2 == End of target IPA region
->> + * ret0 == Status / error
->> + * ret1 == Top of IPA region which has the reported RIPAS value
->> + * ret2 == RIPAS value
->> + */
->> +#define SMC_RSI_IPA_STATE_GET            SMC_RSI_FID(0x198)
->> +
->> +/*
->> + * Make a Host call.
->> + *
->> + * arg1 == IPA of host call structure
->> + * ret0 == Status / error
->> + */
->> +#define SMC_RSI_HOST_CALL            SMC_RSI_FID(0x199)
->> +
->> +#endif /* __ASM_RSI_SMC_H_ */
+> # ./start.sh
+>   Info: # lkvm run -k Image -m 256 -c 2 --name guest-152
+>   Info: Removed ghost socket file "/root/.lkvm//guest-152.sock".
+> [   rmm ] SMC_RMI_REALM_CREATE          882860000 880856000 > RMI_SUCCESS
+> [   rmm ] SMC_RMI_REC_AUX_COUNT         882860000 > RMI_SUCCESS 10
+> [   rmm ] SMC_RMI_REC_CREATE            882860000 88bdc5000 88bdc4000 >
+> RMI_SUCCESS
+> [   rmm ] SMC_RMI_REC_CREATE            882860000 88bdd7000 88bdc4000 >
+> RMI_SUCCESS
+> [   rmm ] SMC_RMI_REALM_ACTIVATE        882860000 > RMI_SUCCESS
+> [   rmm ] Unhandled write S2_0_C0_C2_2
+> [   rmm ] Unhandled write S3_3_C9_C14_0
+> [   rmm ] SMC_RSI_VERSION               10000 > RSI_SUCCESS 10000 10000
+> [   rmm ] SMC_RSI_REALM_CONFIG          82b2b000 > RSI_SUCCESS
+> [   rmm ] SMC_RSI_IPA_STATE_SET         80000000 90000000 1 0 >
+> RSI_SUCCESS 90000000 0
+> [   rmm ] SMC_RSI_IPA_STATE_GET         1000000 1001000 > RSI_SUCCESS
+> 1001000 0
+>      :
+> [    1.835570] DMA: preallocated 128 KiB GFP_KERNEL|GFP_DMA32 pool for
+> atomic allocations
+> [    1.865993] audit: initializing netlink subsys (disabled)
+> [    1.891218] audit: type=2000 audit(0.492:1): state=initialized
+> audit_enabled=0 res=1
+> [    1.899066] thermal_sys: Registered thermal governor 'step_wise'
+> [    1.920869] thermal_sys: Registered thermal governor 'power_allocator'
+> [    1.944151] cpuidle: using governor menu
+> [    1.988588] hw-breakpoint: found 16 breakpoint and 16 watchpoint
+> registers.
+> [   rmm ] Unhandled write S2_0_C0_C0_5
+> [   rmm ] Unhandled write S2_0_C0_C0_4
+> [   rmm ] Unhandled write S2_0_C0_C1_5
+> [   rmm ] Unhandled write S2_0_C0_C1_4
+> [   rmm ] Unhandled write S2_0_C0_C2_5
+>      :
+> [   rmm ] Unhandled write S2_0_C0_C13_6
+> [   rmm ] Unhandled write S2_0_C0_C14_7
+> [   rmm ] Unhandled write S2_0_C0_C14_6
+> [   rmm ] Unhandled write S2_0_C0_C15_7
+> [   rmm ] Unhandled write S2_0_C0_C15_6
 > 
 > Thanks,
 > Gavin
