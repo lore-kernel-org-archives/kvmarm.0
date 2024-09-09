@@ -1,240 +1,224 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B2EC1B4C4A;
-	Mon,  9 Sep 2024 10:58:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44D151B791D
+	for <kvmarm@lists.linux.dev>; Mon,  9 Sep 2024 12:47:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725879510; cv=none; b=gh5eUuH3bIiJ0ScEp+YDPeQ7Ql438CXuHS9wGP8a+D1RAirNHeQN577i3HA5e06uk0bcpLqAD78SUEA89ilgW0KnOA9ncIkcLImHlcr6jhNhwaMIlA/JDeQjUX5ib/1RJk4wIlby5eH9tWKZR4Cy4B/mFOy0rQ1JTK++L2U5Xug=
+	t=1725886048; cv=none; b=keuCQeCaeSZp8/MZEAlQcSZ9Erlnfqmt+qyKtpoEQPDvBRwyjsHwjrl4toQ0ySZEckS7athGEpsINK4pHmM6Tpd+UJW+FmMfy1nkQw22WMx3JA+KtyI/06yX1GwutPmBm0H58v7wgegyqEjv56N/mgnXo9a5Z43iBm//f7+8uLc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725879510; c=relaxed/simple;
-	bh=uziYmtq37+Z6zrJILw3P2Hf7wc6u5U+5m+2Q4a9lW0E=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Lqd1WjuTcRdTb28l24jk4wAnF4pUc3EWCzh2cxwwfzO96o3m1JQDRYStL8bfcn5e/u8MwBLWep2zFWd/ddL8tXr4Sk6P+SpM2SsobdWGqo2wUnMc8GOcK57wt0dPWoslLSHepa1ZekWWAYxNWRKNG4T9miWQHRjbIejpER3IRNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qffQQga7; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1725886048; c=relaxed/simple;
+	bh=H/NVYlGTHG1CXjE08kuE1gJa++H9PJIKBPlhRFnY2lE=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=DiyDmKHTReJSYQYh5bkHfj3gVARZZZ0e2MNXbZF3bnR0QVZ/nsrTOdKIEGsqFog7I5foML+kcy60ZTAjyhLINkln+C6D56ef9XY2RlT7DydhKSstReomuI4Xj6Cf9z4uGC7N0Ysz4ICIRZnAR3RQzkAmBYYV0eBduMpIvgrzfiA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U921uBEW; arc=none smtp.client-ip=209.85.128.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qffQQga7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90409C4CEC5;
-	Mon,  9 Sep 2024 10:58:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725879509;
-	bh=uziYmtq37+Z6zrJILw3P2Hf7wc6u5U+5m+2Q4a9lW0E=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qffQQga7/SG35bqfaVeksLac24dsmrxzJxAEEqumjUCyUf4Gj+5yMly0tKAWri7Lq
-	 LGH9/6BQe2VBgsp6ho6ZubAwbpbm+FEM7L381+GytW+K/6lNBLHYWhc183KB02VlPj
-	 IHPsl4HNopDwU0HLtJjq0Yk/6pIW8RXkSYOsi55m8Al1S/+nouoGCTwu3+V2Lm7NK7
-	 YAeH/56EdSrhWwIXIMJeJmHuE/fTVHl5qq1FrueLhcoL9EMJTnbedF2/2ngDAjrubn
-	 uocnuJ0s89oAUunHYLfDHCVONaMJshQKyPNPEnwbTLtH7X5KSjtSnGYXVwIo8Ykk2T
-	 VVypRZWtxyBPA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1snc6D-00B0FE-OV;
-	Mon, 09 Sep 2024 11:58:27 +0100
-Date: Mon, 09 Sep 2024 11:58:04 +0100
-Message-ID: <865xr5856r.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Anastasia Belova <abelova@astralinux.ru>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH 1/2] arm64: KVM: prevent overflow in inject_abt64
-In-Reply-To: <20240909103828.16699-2-abelova@astralinux.ru>
-References: <20240909103828.16699-1-abelova@astralinux.ru>
-	<20240909103828.16699-2-abelova@astralinux.ru>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U921uBEW"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-42cbadcbb6eso3249095e9.2
+        for <kvmarm@lists.linux.dev>; Mon, 09 Sep 2024 05:47:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1725886045; x=1726490845; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=IlZyZtIGrV2CPbYg0OEeBmlf5fsA3oDUDmzVRgQ/v3c=;
+        b=U921uBEW5914OMNd6dqvVmLp70/1HX5yTZdaFA7RcaeshClSSvO6o7W733+x2d3VdM
+         RzQ0eb0DB4mY9dO2k7tWxXBHNYt9KWa23CLX5l10AkGv8xwtuT2/sN7/lMKKq6Yr1d6Y
+         f0Pa7LgrlDji+5+qEiGHhXdhCSL9sSNT4EJCXTm+EDMjE45sGtnrnntjr0lt/Cs6XkW1
+         gk5bwTOhOrOS5qcvKV7YpXon4GPJC5wuE2zKBg2Hll1hBpfknTsrCbNn2WUOwU8zKtlx
+         fHqIHKuRiItg47NidNJ7/bcRo0QtL9iHz6EMM/Tvm6mt7gjh+mXFWaveDzC+yLY5H3NL
+         Qa0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725886045; x=1726490845;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=IlZyZtIGrV2CPbYg0OEeBmlf5fsA3oDUDmzVRgQ/v3c=;
+        b=vjOdtqMztUvjJP309B0boMXVdc+Y70spOQl75g1cxyAUhvDhNAUNzgrj+/xukcpAD9
+         0SyNpOI63nX9uHAoymUbyHanYHiIxMPj7U0FrMd/Wr+pKMjt6EszffU+BhaelVjKfkyC
+         tYKL+FO/p8TZaaPsqtflZdZ+xWOabAsqqFVdLEpaEMhxmF1D1UogM0ffZSOoUW8nAtoJ
+         ILwD7SdkDT23d/c7vPgR6pGb2ItNqXOdFNr2PT3hSsDTu2a/3O+DeELqQPGS2pT0tcxW
+         WZUYutUnLUQDT+BzZ+RBaRcS/Yk7KWHJxcPtcK+ziHlKiHplSXqbseegls92kt50DloO
+         hXJQ==
+X-Gm-Message-State: AOJu0YyGzS6oMtjsMvh2SD34D3Ls/yLSShzuN1JsZAeQrKVwsS6xi35S
+	KgYr/PWfbdnESzSiS8NfQNmaulhUjYJ4hP5OOAI9fUAnUdopb/mfRCE1yPQ6W+DLgb0X7QhDpIL
+	7wThfxh7iGM02p1aJCmLo1AcSFw==
+X-Google-Smtp-Source: AGHT+IFPy2PIuXKZYcZ1PpWXhqlsmpm8ImunIqIrLYSf8HL4qfOuEF6su/TfY2ypMjBdw3Dnvz3I1KPqRvnLXHq94pc=
+X-Received: from sebkvm.c.googlers.com ([fda3:e722:ac3:cc00:68:fe9:ac10:f1b7])
+ (user=sebastianene job=sendgmr) by 2002:a05:600c:5845:b0:428:1088:edc with
+ SMTP id 5b1f17b1804b1-42c9f8bf2c2mr485515e9.0.1725886044561; Mon, 09 Sep 2024
+ 05:47:24 -0700 (PDT)
+Date: Mon,  9 Sep 2024 12:47:16 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: abelova@astralinux.ru, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org, stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.46.0.469.g59c65b2a67-goog
+Message-ID: <20240909124721.1672199-1-sebastianene@google.com>
+Subject: [PATCH v10 0/5] arm64: ptdump: View the second stage page-tables
+From: Sebastian Ene <sebastianene@google.com>
+To: akpm@linux-foundation.org, alexghiti@rivosinc.com, ankita@nvidia.com, 
+	ardb@kernel.org, catalin.marinas@arm.com, christophe.leroy@csgroup.eu, 
+	james.morse@arm.com, vdonnefort@google.com, mark.rutland@arm.com, 
+	maz@kernel.org, oliver.upton@linux.dev, rananta@google.com, 
+	ryan.roberts@arm.com, sebastianene@google.com, shahuang@redhat.com, 
+	suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, kernel-team@android.com
+Content-Type: text/plain; charset="UTF-8"
 
-[dropping Christoffer and Matt from the list, as these addresses are
-pretty obsolete and I doubt they actually care]
+Hi,
 
-Anastasia,
 
-On Mon, 09 Sep 2024 11:38:27 +0100,
-Anastasia Belova <abelova@astralinux.ru> wrote:
-> 
-> ESR_ELx_EC_IABT_LOW << ESR_ELx_EC_SHIFT = 0x20 << 26.
-> ESR_ELx_EC_IABT_CUR << ESR_ELx_EC_SHIFT = 0x21 << 26.
-> There operations' results are int with 1 in 32th bit.
-> While casting these values into u64 (esr is u64) 1
-> fills 32 highest bits.
-> 
-> Add explicit casting to prevent it.
-> 
-> Found by Linux Verification Center (linuxtesting.org) with SVACE.
-> 
-> Fixes: aa8eff9bfbd5 ("arm64: KVM: fault injection into a guest")
-> Signed-off-by: Anastasia Belova <abelova@astralinux.ru>
-> ---
->  arch/arm64/kvm/inject_fault.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-> index a640e839848e..b6b2cfff6629 100644
-> --- a/arch/arm64/kvm/inject_fault.c
-> +++ b/arch/arm64/kvm/inject_fault.c
-> @@ -74,9 +74,9 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
->  	 * an AArch32 fault, it means we managed to trap an EL0 fault.
->  	 */
->  	if (is_aarch32 || (cpsr & PSR_MODE_MASK) == PSR_MODE_EL0t)
-> -		esr |= (ESR_ELx_EC_IABT_LOW << ESR_ELx_EC_SHIFT);
-> +		esr |= ((u64)ESR_ELx_EC_IABT_LOW << ESR_ELx_EC_SHIFT);
->  	else
-> -		esr |= (ESR_ELx_EC_IABT_CUR << ESR_ELx_EC_SHIFT);
-> +		esr |= ((u64)ESR_ELx_EC_IABT_CUR << ESR_ELx_EC_SHIFT);
->  
->  	if (!is_iabt)
->  		esr |= ESR_ELx_EC_DABT_LOW << ESR_ELx_EC_SHIFT;
+This series extends the ptdump support to allow dumping the guest
+stage-2 pagetables. When CONFIG_PTDUMP_STAGE2_DEBUGFS is enabled, ptdump
+registers the new following files under debugfs:
+- /sys/debug/kvm/<guest_id>/stage2_page_tables
+- /sys/debug/kvm/<guest_id>/stage2_levels
+- /sys/debug/kvm/<guest_id>/ipa_range
 
-Thanks for this. Although correct, this is a point fix that leaves
-plenty of opportunities for problems.
+This allows userspace tools (eg. cat) to dump the stage-2 pagetables by
+reading the 'stage2_page_tables' file.
+The output format has the following fields:
+<IPA range> <size> <level> <access permissions> <mem_attributes>
 
-I'd rather you update all the ESR_ELx_EC_* constants to be defined as
-UL(0x..) instead of (0x..), which will allow us to forget this
-forever. Something like this (based on my working tree and won't apply
-on upstream, but you will hopefully get the idea):
+Below is the output of a guest stage-2 pagetable dump running under Qemu.
+After a VM is created, the following files are available:
 
-diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-index cc1b0ec7a51be..47799a7f95cf8 100644
---- a/arch/arm64/include/asm/esr.h
-+++ b/arch/arm64/include/asm/esr.h
-@@ -10,64 +10,64 @@
- #include <asm/memory.h>
- #include <asm/sysreg.h>
+# cat /sys/kernel/debug/kvm/256-4/stage2_levels 
+4
+# cat /sys/kernel/debug/kvm/256-4/ipa_range 
+44
+# cat /sys/kernel/debug/kvm/256-4/stage2_page_tables 
+---[ Guest IPA ]---
+0x0000000000000000-0x0000000001000000          16M 2
+0x0000000001000000-0x0000000001020000         128K 3
+0x0000000001020000-0x0000000001021000           4K 3   R W X AF    
+0x0000000001021000-0x0000000001200000        1916K 3
+0x0000000001200000-0x0000000040000000        1006M 2
+0x0000000040000000-0x0000000080000000           1G 0
+0x0000000080000000-0x0000000081200000          18M 2   R W   AF BLK
+0x0000000081200000-0x0000000081a00000           8M 2   R W X AF BLK
+0x0000000081a00000-0x0000000081c00000           2M 2   R W   AF BLK
+0x0000000081c00000-0x0000000082200000           6M 2   R W X AF BLK
+0x0000000082200000-0x0000000082400000           2M 2   R W   AF BLK
+0x0000000082400000-0x0000000082800000           4M 2   R W X AF BLK
+0x0000000082800000-0x0000000082a00000           2M 2   R W   AF BLK
+0x0000000082a00000-0x0000000082c00000           2M 2
+0x0000000082c00000-0x0000000083200000           6M 2   R W X AF BLK
+0x0000000083200000-0x0000000083400000           2M 2
+0x0000000083400000-0x0000000083a00000           6M 2   R W X AF BLK
+0x0000000083a00000-0x000000008fe00000         196M 2
+0x000000008fe00000-0x0000000090000000           2M 2   R W   AF BLK
+0x0000000090000000-0x0000000099400000         148M 2
+0x0000000099400000-0x0000000099600000           2M 2   R W X AF BLK
+0x0000000099600000-0x000000009b600000          32M 2
+0x000000009b600000-0x000000009be00000           8M 2   R W X AF BLK
+0x000000009be00000-0x000000009c000000           2M 2   R W   AF BLK
+0x000000009c000000-0x00000000c0000000         576M 2
+
+Changelog:
+v9 -> current:
+ * fixed an issue reported by Mark - when using CONFIG_ARM64_VA_BITS=47
+   and CONFIG_PAGE_SIZE_16KB=y ptdump was entering a check used for
+   kernel pagetables to interpret the folded levels, thus overriding the
+   current page table level. This was resulting in bogus output when ran
+   on the stage-2 pagetables. 
+
+ * folded the Kconfig patch in the one that introduces kvm/ptdump.c as
+   suggested by Vincent. Collected Vincent's Reviewed-by tag, thanks.
+
+ * applied Mark's sugegstion to use the callbacks by construct when
+   interpretting the level and the ipa_bits instead of a string
+   comparison on the pseudo-file.
+
+ * fixed a bunch of nits
+
+v8 -> v9:
+ * squashed the last 3 patches and separated the Kconfig change as the
+   last patch.
+ * updated the commit message of the 3rd patch
+ * printing level numbers instead of names as suggested by Mark
+ * fixed one return code to ERR_PTR(-ENOMEM) as spotted by Vincent
+ * dropped a barely empty header 'kvm_ptdump.h'
+ * general cosmetic changes 
+
+v7 -> v8:
+ * applied Will's feedback and prefixed the exported structure names
+   with ptdump_
+ * dropped PTE_CONT and PTE_NG attribute parsing from Oliver's
+   suggestion
+ * fixed spurious BLK annotation reported by Vincent
+ * repurposed `stage2_levels` debugfs file to show the number of the
+   levels
+ * tried changing the order of the patches:
+   "5/6 Initialize the ptdump parser with stage-2 attributes" before
+   exposing the debugfs file but ended up keeping the same order
+   as this depends on the later one.
+
+ v6 -> v7:
+ * Reworded commit for this patch : [PATCH v6 2/6] arm64: ptdump: Expose
+   the attribute parsing functionality
+ * fixed minor conflicts in the struct pg_state definition
+ * moved the kvm_ptdump_guest_registration in the
+ * kvm_arch_create_vm_debugfs
+ * reset the parse state before walking the pagetables
+ * copy the level name to the pg_level buffer
+
+ v5 -> v6:
+ * don't return an error if the kvm_arch_create_vm_debugfs fails to
+   initialize (ref.
+https://lore.kernel.org/all/20240216155941.2029458-1-oliver.upton@linux.dev/)  
+ * fix use-after-free suggested by getting a reference to the
+   KVM struct while manipulating the debugfs files
+   and put the reference on the file close.
+ * do all the allocations at once for the ptdump parser state tracking
+   and simplify the initialization.
+ * move the ptdump parser state initialization as part of the file_open
+ * create separate files for printing the guest stage-2 pagetable
+   configuration such as: the start level of the pagetable walk and the
+   number of bits used for the IPA space representation.
+ * fixed the wrong header format for the newly added file
+ * include missing patch which hasn't been posted on the v5:
+   "KVM-arm64-Move-pagetable-definitions-to-common-heade.patch" 
+
  
--#define ESR_ELx_EC_UNKNOWN	(0x00)
--#define ESR_ELx_EC_WFx		(0x01)
-+#define ESR_ELx_EC_UNKNOWN	UL(0x00)
-+#define ESR_ELx_EC_WFx		UL(0x01)
- /* Unallocated EC: 0x02 */
--#define ESR_ELx_EC_CP15_32	(0x03)
--#define ESR_ELx_EC_CP15_64	(0x04)
--#define ESR_ELx_EC_CP14_MR	(0x05)
--#define ESR_ELx_EC_CP14_LS	(0x06)
--#define ESR_ELx_EC_FP_ASIMD	(0x07)
--#define ESR_ELx_EC_CP10_ID	(0x08)	/* EL2 only */
--#define ESR_ELx_EC_PAC		(0x09)	/* EL2 and above */
--#define ESR_ELx_EC_LS64B	(0x0A)
-+#define ESR_ELx_EC_CP15_32	UL(0x03)
-+#define ESR_ELx_EC_CP15_64	UL(0x04)
-+#define ESR_ELx_EC_CP14_MR	UL(0x05)
-+#define ESR_ELx_EC_CP14_LS	UL(0x06)
-+#define ESR_ELx_EC_FP_ASIMD	UL(0x07)
-+#define ESR_ELx_EC_CP10_ID	UL(0x08)	/* EL2 only */
-+#define ESR_ELx_EC_PAC		UL(0x09)	/* EL2 and above */
-+#define ESR_ELx_EC_LS64B	UL(0x0A)
- /* Unallocated EC: 0x0B */
--#define ESR_ELx_EC_CP14_64	(0x0C)
--#define ESR_ELx_EC_BTI		(0x0D)
--#define ESR_ELx_EC_ILL		(0x0E)
-+#define ESR_ELx_EC_CP14_64	UL(0x0C)
-+#define ESR_ELx_EC_BTI		UL(0x0D)
-+#define ESR_ELx_EC_ILL		UL(0x0E)
- /* Unallocated EC: 0x0F - 0x10 */
--#define ESR_ELx_EC_SVC32	(0x11)
--#define ESR_ELx_EC_HVC32	(0x12)	/* EL2 only */
--#define ESR_ELx_EC_SMC32	(0x13)	/* EL2 and above */
-+#define ESR_ELx_EC_SVC32	UL(0x11)
-+#define ESR_ELx_EC_HVC32	UL(0x12)	/* EL2 only */
-+#define ESR_ELx_EC_SMC32	UL(0x13)	/* EL2 and above */
- /* Unallocated EC: 0x14 */
--#define ESR_ELx_EC_SVC64	(0x15)
--#define ESR_ELx_EC_HVC64	(0x16)	/* EL2 and above */
--#define ESR_ELx_EC_SMC64	(0x17)	/* EL2 and above */
--#define ESR_ELx_EC_SYS64	(0x18)
--#define ESR_ELx_EC_SVE		(0x19)
--#define ESR_ELx_EC_ERET		(0x1a)	/* EL2 only */
-+#define ESR_ELx_EC_SVC64	UL(0x15)
-+#define ESR_ELx_EC_HVC64	UL(0x16)	/* EL2 and above */
-+#define ESR_ELx_EC_SMC64	UL(0x17)	/* EL2 and above */
-+#define ESR_ELx_EC_SYS64	UL(0x18)
-+#define ESR_ELx_EC_SVE		UL(0x19)
-+#define ESR_ELx_EC_ERET		UL(0x1a)	/* EL2 only */
- /* Unallocated EC: 0x1B */
--#define ESR_ELx_EC_FPAC		(0x1C)	/* EL1 and above */
--#define ESR_ELx_EC_SME		(0x1D)
-+#define ESR_ELx_EC_FPAC		UL(0x1C)	/* EL1 and above */
-+#define ESR_ELx_EC_SME		UL(0x1D)
- /* Unallocated EC: 0x1E */
--#define ESR_ELx_EC_IMP_DEF	(0x1f)	/* EL3 only */
--#define ESR_ELx_EC_IABT_LOW	(0x20)
--#define ESR_ELx_EC_IABT_CUR	(0x21)
--#define ESR_ELx_EC_PC_ALIGN	(0x22)
-+#define ESR_ELx_EC_IMP_DEF	UL(0x1f)	/* EL3 only */
-+#define ESR_ELx_EC_IABT_LOW	UL(0x20)
-+#define ESR_ELx_EC_IABT_CUR	UL(0x21)
-+#define ESR_ELx_EC_PC_ALIGN	UL(0x22)
- /* Unallocated EC: 0x23 */
--#define ESR_ELx_EC_DABT_LOW	(0x24)
--#define ESR_ELx_EC_DABT_CUR	(0x25)
--#define ESR_ELx_EC_SP_ALIGN	(0x26)
--#define ESR_ELx_EC_MOPS		(0x27)
--#define ESR_ELx_EC_FP_EXC32	(0x28)
-+#define ESR_ELx_EC_DABT_LOW	UL(0x24)
-+#define ESR_ELx_EC_DABT_CUR	UL(0x25)
-+#define ESR_ELx_EC_SP_ALIGN	UL(0x26)
-+#define ESR_ELx_EC_MOPS		UL(0x27)
-+#define ESR_ELx_EC_FP_EXC32	UL(0x28)
- /* Unallocated EC: 0x29 - 0x2B */
--#define ESR_ELx_EC_FP_EXC64	(0x2C)
-+#define ESR_ELx_EC_FP_EXC64	UL(0x2C)
- /* Unallocated EC: 0x2D - 0x2E */
--#define ESR_ELx_EC_SERROR	(0x2F)
--#define ESR_ELx_EC_BREAKPT_LOW	(0x30)
--#define ESR_ELx_EC_BREAKPT_CUR	(0x31)
--#define ESR_ELx_EC_SOFTSTP_LOW	(0x32)
--#define ESR_ELx_EC_SOFTSTP_CUR	(0x33)
--#define ESR_ELx_EC_WATCHPT_LOW	(0x34)
--#define ESR_ELx_EC_WATCHPT_CUR	(0x35)
-+#define ESR_ELx_EC_SERROR	UL(0x2F)
-+#define ESR_ELx_EC_BREAKPT_LOW	UL(0x30)
-+#define ESR_ELx_EC_BREAKPT_CUR	UL(0x31)
-+#define ESR_ELx_EC_SOFTSTP_LOW	UL(0x32)
-+#define ESR_ELx_EC_SOFTSTP_CUR	UL(0x33)
-+#define ESR_ELx_EC_WATCHPT_LOW	UL(0x34)
-+#define ESR_ELx_EC_WATCHPT_CUR	UL(0x35)
- /* Unallocated EC: 0x36 - 0x37 */
--#define ESR_ELx_EC_BKPT32	(0x38)
-+#define ESR_ELx_EC_BKPT32	UL(0x38)
- /* Unallocated EC: 0x39 */
--#define ESR_ELx_EC_VECTOR32	(0x3A)	/* EL2 only */
-+#define ESR_ELx_EC_VECTOR32	UL(0x3A)	/* EL2 only */
- /* Unallocated EC: 0x3B */
--#define ESR_ELx_EC_BRK64	(0x3C)
-+#define ESR_ELx_EC_BRK64	UL(0x3C)
- /* Unallocated EC: 0x3D - 0x3F */
--#define ESR_ELx_EC_MAX		(0x3F)
-+#define ESR_ELx_EC_MAX		UL(0x3F)
- 
- #define ESR_ELx_EC_SHIFT	(26)
- #define ESR_ELx_EC_WIDTH	(6)
-
-Could you please respin this quickly so that it can be taken in v6.12?
+Links to previous versions:
+v9:
+https://lore.kernel.org/all/20240827084549.45731-1-sebastianene@google.com/
+v8:
+https://lore.kernel.org/all/20240816123906.3683425-1-sebastianene@google.com/  
+v7:
+https://lore.kernel.org/all/20240621123230.1085265-1-sebastianene@google.com/
+v6:
+https://lore.kernel.org/all/20240220151035.327199-1-sebastianene@google.com/
+v5:
+https://lore.kernel.org/all/20240207144832.1017815-2-sebastianene@google.com/
 
 Thanks,
+Sebastian
 
-	M.
+Sebastian Ene (5):
+  KVM: arm64: Move pagetable definitions to common header
+  arm64: ptdump: Expose the attribute parsing functionality
+  arm64: ptdump: Use the ptdump description from a local context
+  arm64: ptdump: Don't override the level when operating on the stage-2
+    tables
+  KVM: arm64: Register ptdump with debugfs on guest creation
+
+ arch/arm64/include/asm/kvm_host.h    |   6 +
+ arch/arm64/include/asm/kvm_pgtable.h |  42 +++++
+ arch/arm64/include/asm/ptdump.h      |  42 ++++-
+ arch/arm64/kvm/Kconfig               |  17 ++
+ arch/arm64/kvm/Makefile              |   1 +
+ arch/arm64/kvm/arm.c                 |   1 +
+ arch/arm64/kvm/hyp/pgtable.c         |  42 -----
+ arch/arm64/kvm/ptdump.c              | 268 +++++++++++++++++++++++++++
+ arch/arm64/mm/ptdump.c               |  70 ++-----
+ 9 files changed, 396 insertions(+), 93 deletions(-)
+ create mode 100644 arch/arm64/kvm/ptdump.c
 
 -- 
-Without deviation from the norm, progress is not possible.
+2.46.0.469.g59c65b2a67-goog
+
