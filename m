@@ -1,139 +1,115 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0653192581
-	for <kvmarm@lists.linux.dev>; Tue, 10 Sep 2024 04:15:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B23317C208
+	for <kvmarm@lists.linux.dev>; Tue, 10 Sep 2024 07:17:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725941756; cv=none; b=apmUixPlEm6H71Y/GTqPsx3oM4gOQIb+9G0Tl68zPgN19oQl1NOB/iijD9IN+PVa2oqyb7eoOvy3+5MEJnVe4H/cuQ5IT7ZoGfuEgOK+VlCS7eBHqwYKxfQB9oOBvmAIN/Qns2jW+QMHv1vkq2jxJ3fN9JWEqXLU/G2TRjjuCbo=
+	t=1725952623; cv=none; b=PI7hgQV0ukZe11em8xGnUBGeS230rpdnlJJ5JtNZbIjRIdm/cXv5pDx71w1GbjLu8uIT+vD6KwWn4vtcaMQsEZpAjintAd4+ndQ8FDEWRnsRYi+39JZxoUy1I6viD7A78VpuZsVdjtn4PDdpbRZyOTwdnFfe8+wO2YtfIR4ANOE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725941756; c=relaxed/simple;
-	bh=gkZzcVeOY1zKE6Oa+cxE4jiLx/E16ZR2j2sfe3+e4vI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=THK3C5hKdyOEt2jtNE8dJe26LuEYByDXOhY8FaZGEcnwrlEKJD0sdtv0x4xTtlJ0DOOqynMT/HfvlA5nZ6RmgX83c7gT7U2vTYJC3dfTE4c9r9idiqKRkAWYMfacSAtj4WggJ9VUE6x6nFd1PMA1efmdzSo+Svikj07ubBOwe+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YDP7NQNK; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YDP7NQNK"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725941753;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=u/+FRQQ8Ru8+M5tm0CToElnSS7luR16tiIP4Dg8B3y8=;
-	b=YDP7NQNKdmTgwhBpGBLGvuTBuCs/cIk61kktkXoMh1A3uOqkZdz4M4wG1nefO/BfGQbi4O
-	D7i4g9gvW3LWYwgGoeRuSeoFBBZ/6ymOr6+YpSGj0Q7ndFNOXQs6EL1pXiyki62dJriG0y
-	6qAI7iNxXVtGJvqy+zmzDnvEIHqrQjY=
-Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
- [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-660-7Q2Jhjn7NjemEPoTK9ZhsA-1; Tue, 10 Sep 2024 00:15:50 -0400
-X-MC-Unique: 7Q2Jhjn7NjemEPoTK9ZhsA-1
-Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-207302f244aso17952165ad.0
-        for <kvmarm@lists.linux.dev>; Mon, 09 Sep 2024 21:15:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725941749; x=1726546549;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=u/+FRQQ8Ru8+M5tm0CToElnSS7luR16tiIP4Dg8B3y8=;
-        b=MDWkkbp0hVG6mDJWyMp6L8uD2tdA8/6jwpkWeH6AdfeTBEB0EqN1ISh6UG9s8N2puZ
-         izwBJeesPDTNphP6jQpDT3JJ+YwvXz8epRAe/We3wbcXXNXADhMlvuGuxfLdV68feqCw
-         osYCdpDqKekjlon4SjKRCWXDd5xQRBZ6HwMZtndbDwQ6vEp8/BV981AzLyRAd5dzIsLS
-         F6AjH3njjXQftDJCW6d6CJD5Pj0rE4zD19kt3BVTuoziyNxxUdmGPf/p1Ti1NFHRybJa
-         UGCkZBatdC/oZaDbcobcGuh8x7gXZTUk+yfsHBABl6h+16WTQoQ3RYBuOM7EKeGxFBgM
-         wrVg==
-X-Forwarded-Encrypted: i=1; AJvYcCXoJoDyHfPphxIF0K0/D0CAEQS38hyeQdQsE77tXKSgduwwnMoQQ9/rBoALox1SWQ0wGsxjdUQ=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxsAO1c2VywGVywvkjsElrxA6uOe0Nlc5n60x9ikfxpiDJUobE2
-	+oVIjd0osHhOI3kCf6eZ/J7xKCMyGrI+eWxeLA7PBwKfB88ozzbrI+nJHUxaNj5n5RVWEXtdQ0N
-	1EpcZW4DrZC2iQ49tSPErw7WIXco6h1Tyqm3dfcUB3nbuC5rpeofzDg==
-X-Received: by 2002:a17:902:f549:b0:202:5af:47fc with SMTP id d9443c01a7336-206f0511f66mr213103765ad.13.1725941749245;
-        Mon, 09 Sep 2024 21:15:49 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IESpzFJPvUaYPPTKHz8T4YHLbc03zqgmBJU6sgzN1/EtRPQmV6cfuytRj9V1iBRvh9wsUVF0g==
-X-Received: by 2002:a17:902:f549:b0:202:5af:47fc with SMTP id d9443c01a7336-206f0511f66mr213103255ad.13.1725941748534;
-        Mon, 09 Sep 2024 21:15:48 -0700 (PDT)
-Received: from [192.168.68.54] ([103.210.27.31])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20710e0efbesm40682855ad.40.2024.09.09.21.15.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Sep 2024 21:15:48 -0700 (PDT)
-Message-ID: <29016e56-e632-422d-a4d2-1891fad2c565@redhat.com>
-Date: Tue, 10 Sep 2024 14:15:39 +1000
+	s=arc-20240116; t=1725952623; c=relaxed/simple;
+	bh=2Cw9mNBhZURvNnlO42Hu3NILmNZJ3TmRQ7D/nqNfoWQ=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=eZ9IvN0ZV5nKaNLAvSeuE9TTnZtF/UNloFk8jZPdVYNVKtq60sH1cqj2p6G+tHvQclBKhRz2h0ehmpMkIdvr6aJ4IACF4eoCD7ZF/Z+4kD+JFJaCkLYeoRLThqpmR/0hv6kPjPPzmQwqjav4+r+8en04VlpU07xnslejVcd1wls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4X2w3W4bxgzyR17;
+	Tue, 10 Sep 2024 15:16:07 +0800 (CST)
+Received: from kwepemd200010.china.huawei.com (unknown [7.221.188.124])
+	by mail.maildlp.com (Postfix) with ESMTPS id 1F3F51400D1;
+	Tue, 10 Sep 2024 15:16:52 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
+ kwepemd200010.china.huawei.com (7.221.188.124) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.34; Tue, 10 Sep 2024 15:16:51 +0800
+Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
+ lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.039;
+ Tue, 10 Sep 2024 08:16:49 +0100
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
+CC: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, Sebastian Ott
+	<sebott@redhat.com>, James Morse <james.morse@arm.com>, Suzuki K Poulose
+	<suzuki.poulose@arm.com>, yuzenghui <yuzenghui@huawei.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, Shaoqin Huang
+	<shahuang@redhat.com>, Eric Auger <eric.auger@redhat.com>, "Wangzhou (B)"
+	<wangzhou1@hisilicon.com>
+Subject: RE: [PATCH v5 07/10] KVM: arm64: Treat CTR_EL0 as a VM feature ID
+ register
+Thread-Topic: [PATCH v5 07/10] KVM: arm64: Treat CTR_EL0 as a VM feature ID
+ register
+Thread-Index: AQHawm/0TP9B4WSU3kSdeZvzR1wQjLJQDNGggAAIPQCAAAfwgIAAEmkA///8m4CAAOuFwA==
+Date: Tue, 10 Sep 2024 07:16:49 +0000
+Message-ID: <6abe14d969da42638d648db205d39fe7@huawei.com>
+References: <20240619174036.483943-1-oliver.upton@linux.dev>
+ <20240619174036.483943-8-oliver.upton@linux.dev>
+ <0db19a081d9e41f08b0043baeef16f16@huawei.com> <864j6o94fz.wl-maz@kernel.org>
+ <Zt8o6fStuQXANSrX@linux.dev> <8e361ab82d6c4adcb15890cd3cab48ee@huawei.com>
+ <Zt81ga44ztdX_KET@linux.dev>
+In-Reply-To: <Zt81ga44ztdX_KET@linux.dev>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 12/19] efi: arm64: Map Device with Prot Shared
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun <alpergun@google.com>
-References: <20240819131924.372366-1-steven.price@arm.com>
- <20240819131924.372366-13-steven.price@arm.com>
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20240819131924.372366-13-steven.price@arm.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 
-On 8/19/24 11:19 PM, Steven Price wrote:
-> From: Suzuki K Poulose <suzuki.poulose@arm.com>
-> 
-> Device mappings need to be emualted by the VMM so must be mapped shared
-> with the host.
-> 
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Changes since v4:
->   * Reworked to use arm64_is_iomem_private() to decide whether the memory
->     needs to be decrypted or not.
-> ---
->   arch/arm64/kernel/efi.c | 12 ++++++++++--
->   1 file changed, 10 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/kernel/efi.c b/arch/arm64/kernel/efi.c
-> index 712718aed5dd..95f8e8bf07f8 100644
-> --- a/arch/arm64/kernel/efi.c
-> +++ b/arch/arm64/kernel/efi.c
-> @@ -34,8 +34,16 @@ static __init pteval_t create_mapping_protection(efi_memory_desc_t *md)
->   	u64 attr = md->attribute;
->   	u32 type = md->type;
->   
-> -	if (type == EFI_MEMORY_MAPPED_IO)
-> -		return PROT_DEVICE_nGnRE;
-> +	if (type == EFI_MEMORY_MAPPED_IO) {
-> +		pgprot_t prot = __pgprot(PROT_DEVICE_nGnRE);
-> +
-> +		if (arm64_is_iomem_private(md->phys_addr,
-> +					   md->num_pages << EFI_PAGE_SHIFT))
-> +			prot = pgprot_encrypted(prot);
-> +		else
-> +			prot = pgprot_decrypted(prot);
-> +		return pgprot_val(prot);
-> +	}
->   
-
-Question: the second parameter (@size) passed to arm64_is_iomem_private() covers the
-whole region. In [PATCH v5 10/19] arm64: Override set_fixmap_io, the size has been
-truncated to the granule size (4KB). They look inconsistent and I don't understand
-the reason.
-
-Thanks,
-Gavin
-
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogT2xpdmVyIFVwdG9uIDxv
+bGl2ZXIudXB0b25AbGludXguZGV2Pg0KPiBTZW50OiBNb25kYXksIFNlcHRlbWJlciA5LCAyMDI0
+IDY6NTEgUE0NCj4gVG86IFNoYW1lZXJhbGkgS29sb3RodW0gVGhvZGkgPHNoYW1lZXJhbGkua29s
+b3RodW0udGhvZGlAaHVhd2VpLmNvbT4NCj4gQ2M6IE1hcmMgWnluZ2llciA8bWF6QGtlcm5lbC5v
+cmc+OyBrdm1hcm1AbGlzdHMubGludXguZGV2OyBTZWJhc3RpYW4gT3R0DQo+IDxzZWJvdHRAcmVk
+aGF0LmNvbT47IEphbWVzIE1vcnNlIDxqYW1lcy5tb3JzZUBhcm0uY29tPjsgU3V6dWtpIEsNCj4g
+UG91bG9zZSA8c3V6dWtpLnBvdWxvc2VAYXJtLmNvbT47IHl1emVuZ2h1aSA8eXV6ZW5naHVpQGh1
+YXdlaS5jb20+Ow0KPiBrdm1Admdlci5rZXJuZWwub3JnOyBTaGFvcWluIEh1YW5nIDxzaGFodWFu
+Z0ByZWRoYXQuY29tPjsgRXJpYyBBdWdlcg0KPiA8ZXJpYy5hdWdlckByZWRoYXQuY29tPjsgV2Fu
+Z3pob3UgKEIpIDx3YW5nemhvdTFAaGlzaWxpY29uLmNvbT4NCj4gU3ViamVjdDogUmU6IFtQQVRD
+SCB2NSAwNy8xMF0gS1ZNOiBhcm02NDogVHJlYXQgQ1RSX0VMMCBhcyBhIFZNIGZlYXR1cmUgSUQN
+Cj4gcmVnaXN0ZXINCj4gDQo+IE9uIE1vbiwgU2VwIDA5LCAyMDI0IGF0IDA1OjE2OjU1UE0gKzAw
+MDAsIFNoYW1lZXJhbGkgS29sb3RodW0gVGhvZGkNCj4gd3JvdGU6DQo+ID4gPiA+IEl0IHNob3Vs
+ZCBiZSBzYWZlLCBhcyBhIFBJUFQgQ01PIGFsd2F5cyBkb2VzIGF0IGxlYXN0IHRoZSBzYW1lIGFz
+DQo+ID4gPiA+IFZJUFQsIGFuZCBwb3RlbnRpYWxseSBtb3JlIGlmIHRoZXJlIGlzIGFsaWFzaW5n
+Lg0KPiA+ID4NCj4gPiA+ICsxLCB0aGVyZSB3YXMgbm8gcGFydGljdWxhciByZWFzb24gd2h5IHRo
+aXMgd2Fzbid0IGhhbmRsZWQgYmVmb3JlLg0KPiA+ID4NCj4gPiA+IFdlIHNob3VsZCBiZSBjYXJl
+ZnVsIHRvIG9ubHkgYWxsb3cgdXNlcnNwYWNlIHRvIHNlbGVjdCBWSVBUIG9yIFBJUFQNCj4gKHdo
+ZXJlDQo+ID4gPiBwZXJtaXNzaWJsZSksIGFuZCBub3QgbmVjZXNzYXJpbHkgYW55IHZhbHVlIGxv
+d2VyIHRoYW4gd2hhdCdzIHJlcG9ydGVkIGJ5DQo+ID4gPiBoYXJkd2FyZS4NCj4gPg0KPiA+IFZJ
+UFQgMGIxMA0KPiA+IFBJUFQgMGIxMQ0KPiA+DQo+ID4gT2suIEp1c3QgdG8gY2xhcmlmeSB0aGF0
+ICIgbm90IG5lY2Vzc2FyaWx5IGFueSB2YWx1ZSBsb3dlciB0aGFuIHdoYXQncw0KPiByZXBvcnRl
+ZCBieQ0KPiA+IGhhcmR3YXJlIiBtZWFucyB1c2Vyc3BhY2UgY2FuIHNldCBQSVBUIGlmIGhhcmR3
+YXJlIHN1cHBvcnRzIFZJUFQ/DQo+IA0KPiBCeSB0aGF0IEkgbWVhbnQgd2UgZGlzYWxsb3cgdXNl
+cnNwYWNlIGZyb20gc2VsZWN0aW5nIEFJVklWVCAoMGIwMSkgYW5kDQo+IFZQSVBUICgwYjAwKS4g
+VGhlIGZvcm1lciBpcyByZXNlcnZlZCBpbiBBUk12OCwgYW5kIEkgZG9uJ3QgdGhpbmsgYW55b25l
+DQo+IGhhcyBldmVyIGJ1aWx0IHRoZSBsYXR0ZXIuDQo+IA0KPiA+IEJhc2VkIG9uIHRoaXMsDQo+
+ID4gIiBJZiB3ZSBoYXZlIGRpZmZlcmluZyBJLWNhY2hlIHBvbGljaWVzLCByZXBvcnQgaXQgYXMg
+dGhlIHdlYWtlc3QgLSBWSVBULiIgLCBJDQo+IHdhcyB0aGlua2luZw0KPiA+IHRoZSBvdGhlciB3
+YXkgYXJvdW5kKHNlZSAic2FmZSB0byBkb3duZ3JhZGUgUElQVCB0byBWSVBUIikuIEJ1dCBNYXJj
+IGFsc28NCj4gPiBzZWVtcyB0byBzdWdnZXN0IFBJUFQgQ01PIGVuZHMgdXAgZG9pbmcgYXRsZWFz
+dCBzYW1lIGFzIFZJUFQgYW5kIG1vcmUsDQo+IHNvIGl0IGxvb2tzIGxpa2UNCj4gPiB0aGUgb3Ro
+ZXIgd2F5LiBJZiB0aGF0J3MgdGhlIGNhc2UsIHdoYXQgZG9lcyB0aGF0ICJyZXBvcnQgaXQgYXMg
+dGhlIHdlYWtlc3QiDQo+IG1lYW5zIGZvciBob3N0Pw0KPiANCj4gUElQVCBpcyB0aGUgbm9uLWFs
+aWFzaW5nIGZsYXZvciBvZiBJJC4gVXNpbmcgYSBWSVBUIHNvZnR3YXJlIG1vZGVsIG9uDQo+IFBJ
+UFQgd2lsbCBsZWFkIHRvIG92ZXJpbnZhbGlkYXRpbmcsIGJ1dCBzdGlsbCBjb3JyZWN0LiBDYW5u
+b3QgZG8gaXQgdGhlDQo+IG90aGVyIHdheSBhcm91bmQuDQoNCk9rLiBUaGFua3MgYm90aC4gSSB3
+aWxsIHNlbmQgb3V0IGEgcGF0Y2ggc29vbi4NCg0KQW5kIG5vdyB0byB0aGUgZWxlcGhhbnQgaW4g
+dGhlIHJvb20sIGhhbmRsaW5nIE1JRFIgZGlmZmVyZW5jZXMgYW5kIGFzc29jaWF0ZWQgZXJyYXRh
+DQptYW5hZ2VtZW50IPCfmIoNCg0KTWFyYywgeW91IG1lbnRpb25lZCBhYm91dCBhICBwcm90b3R5
+cGUgc29sdXRpb24geW91IGhhdmUgYSB3aGlsZSBiYWNrWzBdLA0KaGFzIHRoYXQgYmVlbiBzaGFy
+ZWQgcHVibGljPw0KDQpBbHNvIG5vdCBzdXJlIEFSTSBoYXMgYW55IHBsYW5zIHRvIG1ha2UgdGhp
+cyBhIHNwZWNpZmljYXRpb24gc29vbi4NCg0KSSB3YXMgdGhpbmtpbmcgb2YgaGFuZGxpbmcgdGhp
+cyBpbiB1c2Vyc3BhY2UgZm9yIG5vdyBieSBpZ25vcmluZyB0aGUgTUlEUiB3cml0ZQ0KZXJyb3Ig
+b24gTWlncmF0aW9uIGFuZCBrZWVwaW5nIHRoZSBob3N0IE1JRFIgdmFsdWUgZm9yIGRlc3RpbmF0
+aW9uIFZNLiBUaGlzIGlzDQpmb3IgdXNlIGNhc2VzIHdoZXJlIHdlIGtub3cgdGhhdCB0aGUgaG9z
+dHMgZG9lc24ndCBoYXZlIGFueSBNSURSIGJhc2VkIGVycmF0YSBvcg0KZXJyYXRhIGRpZmZlcmVu
+Y2UgZG9lc24ndCBtYXR0ZXIgYW5kIGFzc3VtaW5nIHRoZSB1c2VyIGtub3dzIHdoYXQgdGhleSBh
+cmUgZG9pbmcuDQoNClBsZWFzZSBsZXQgbWUga25vdywgaWYgdGhlcmUgYXJlIGFueSBvdGhlciBz
+dWdnZXN0aW9ucyBvciB3b3JrIGluIHByb2dyZXNzIG9uIHRoaXMgb25lLg0KDQpUaGFua3MsDQpT
+aGFtZWVyDQpbMF0gaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcvbGludXgtYXJtLWtlcm5lbC84Njdj
+dDhtbmVsLndsLW1hekBrZXJuZWwub3JnLw0KDQo=
