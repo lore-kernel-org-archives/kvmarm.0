@@ -1,65 +1,56 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6702818784B;
-	Tue, 10 Sep 2024 09:00:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 239C01885AA;
+	Tue, 10 Sep 2024 09:08:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725958851; cv=none; b=atNvoCSWdcCieF9sWTPTr97hNtm5b2WEAbTRccEvVyAKwSta2kaQ9np5gr5JddRMMEdLxiu4StPDCqhWnstB4GZK5VcX9VlZn7LEJN5vqn8tJCYSIU6xprTg6LSu44Jut4mjsBSYu46dKOAeLb56HWDisETpivFCot+7vpJWn4w=
+	t=1725959333; cv=none; b=SA1aGra1zb4I/iT/VeqA+PsrVxmI9Wr847hkj/0xGMaRYhcmBZZWQIuVH1eMAq2XRyhMj9UULvxzdGUdZ8p1tOY6oLKlc1d7tme8M9+K5EWiWKB45O+qPp0SPaYELQpDQoqghVFsBNeoA+VV+bX1aHyS1auGXlwdJUuKIUFs/uo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725958851; c=relaxed/simple;
-	bh=71rfz1s67YzT+RLcc8Z5sytb/FLjGZKI4TF20Wfm914=;
+	s=arc-20240116; t=1725959333; c=relaxed/simple;
+	bh=T/HKp5JbA0TTvWWFoCQ/ayf2yy3UYyJBk7cb6yAQ8wc=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bRE3ZWf+/UogmMs1VqNbWS8ktRFDfqVSIe6WzyaR2s5f2D9DMFdt4yu9EVVo4y07yA8Prh7okpxzaHbkpL0fDOHYJKSXXTS39sfDi5u9mUsUOUOJIfoWZGPZFCAfq7c3uTf9J0VKj97oP0mntV7gH0z5rMnTxB9gxHN565rNObc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ENuYQyGp; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=TbWj7kMOgoqC62fvHST4NP5QAe9cJPQJKH86nMXxmS9/MQJ1jEvUsxWjdkTeUy0ZSXjAPEmwWHRSY0V7CO0hirS8aj7KBecy45nYDzcUntIb1Sf35sJW/97+/IWAtqLwAp3npEDq8xTUG6LIh0gE+63u2JXZ8RyyPxzXHQyRlIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cObyiDRb; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ENuYQyGp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2AB5C4CEC3;
-	Tue, 10 Sep 2024 09:00:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cObyiDRb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72A11C4CEC3;
+	Tue, 10 Sep 2024 09:08:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725958850;
-	bh=71rfz1s67YzT+RLcc8Z5sytb/FLjGZKI4TF20Wfm914=;
+	s=k20201202; t=1725959332;
+	bh=T/HKp5JbA0TTvWWFoCQ/ayf2yy3UYyJBk7cb6yAQ8wc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ENuYQyGp9cpvi8OnGYy5irDliRneRaJaGyVm9tUwo+LEn370faXEJw2y19TAtlfvI
-	 f+AMb93sgYAyHkNEVFXGEt2dCJI6LPDpOc/HMqUYrydbULCmr9SwB8i+yjtP1W0xdh
-	 rP0slUO6MiEfYOs/OdmKBh+HrA/5J1iIEZEekGROLZ6dDdx2boZtWkM9/QqUZdww7B
-	 REmassKjGe/1+HsQsNZLQgWUYDJFE8z5H/c1tcvv+WQqC6ILonnHqwEJjMzhPS1Tyw
-	 MFWC8ogjuiXh+SmsfBTUFxrJjQvP0h1inqeMqecUh27Oajr5EON2KATeVWDOrEIoxb
-	 su7uGfpc3pekg==
+	b=cObyiDRb4NHLiFz1ocLk8sYrWXRftoejhpEa3/CbdSGHkE0LKfV8ZVaFQNFhBy+mj
+	 brdOsuvmmnRGhoYH94/GPx1anwbKmSTb1EwhDB2Cy5fHnY8DDjw2HAsllCb+F6i20+
+	 syTH/VCqrz6QAgMMe943ipoGOxxWoUj1cUJcmJgoStvi942uKFuP/s4udIIipWgm+y
+	 X3Pvy+Nz8boAV5pD2RhGudxwvK8hFqhGNqB9KsWl1XyGAJr/nS4GB5uK989VRYAUFb
+	 p33/CLtx6MNqiLk9blYcNlewQi9jaKKYPCSY5BUtvU/ssPn5f3jFLlLQAhQ9f+WDP9
+	 Hxcs+r5JFxPMg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1snwjw-00BfZi-JD;
-	Tue, 10 Sep 2024 10:00:48 +0100
-Date: Tue, 10 Sep 2024 10:00:48 +0100
-Message-ID: <86wmjj7uin.wl-maz@kernel.org>
+	id 1snwri-00Bfjh-3y;
+	Tue, 10 Sep 2024 10:08:50 +0100
+Date: Tue, 10 Sep 2024 10:08:49 +0100
+Message-ID: <86v7z37u5a.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To: 	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Anastasia Belova <abelova@astralinux.ru>
 Cc: Oliver Upton <oliver.upton@linux.dev>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	Sebastian Ott
-	<sebott@redhat.com>,
 	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose
-	<suzuki.poulose@arm.com>,
-	yuzenghui <yuzenghui@huawei.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	Shaoqin Huang
-	<shahuang@redhat.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	"Wangzhou (B)"
-	<wangzhou1@hisilicon.com>
-Subject: Re: [PATCH v5 07/10] KVM: arm64: Treat CTR_EL0 as a VM feature ID register
-In-Reply-To: <6abe14d969da42638d648db205d39fe7@huawei.com>
-References: <20240619174036.483943-1-oliver.upton@linux.dev>
-	<20240619174036.483943-8-oliver.upton@linux.dev>
-	<0db19a081d9e41f08b0043baeef16f16@huawei.com>
-	<864j6o94fz.wl-maz@kernel.org>
-	<Zt8o6fStuQXANSrX@linux.dev>
-	<8e361ab82d6c4adcb15890cd3cab48ee@huawei.com>
-	<Zt81ga44ztdX_KET@linux.dev>
-	<6abe14d969da42638d648db205d39fe7@huawei.com>
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	lvc-project@linuxtesting.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v2] arm64: KVM: define ESR_ELx_EC_* constants as UL
+In-Reply-To: <20240910085016.32120-1-abelova@astralinux.ru>
+References: <865xr5856r.wl-maz@kernel.org>
+	<20240910085016.32120-1-abelova@astralinux.ru>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -69,57 +60,43 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: shameerali.kolothum.thodi@huawei.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, sebott@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvm@vger.kernel.org, shahuang@redhat.com, eric.auger@redhat.com, wangzhou1@hisilicon.com
+X-SA-Exim-Rcpt-To: catalin.marinas@arm.com, will@kernel.org, abelova@astralinux.ru, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org, stable@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 10 Sep 2024 08:16:49 +0100,
-Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
->=20
-> And now to the elephant in the room, handling MIDR differences and associ=
-ated errata
-> management =F0=9F=98=8A
->=20
-> Marc, you mentioned about a  prototype solution you have a while back[0],
-> has that been shared public?
+On Tue, 10 Sep 2024 09:50:16 +0100,
+Anastasia Belova <abelova@astralinux.ru> wrote:
+> 
+> Add explicit casting to prevent expantion of 32th bit of
+> u32 into highest half of u64 in several places.
+> 
+> For example, in inject_abt64:
+> ESR_ELx_EC_DABT_LOW << ESR_ELx_EC_SHIFT = 0x24 << 26.
+> This operation's result is int with 1 in 32th bit.
+> While casting this value into u64 (esr is u64) 1
+> fills 32 highest bits.
+> 
+> Found by Linux Verification Center (linuxtesting.org) with SVACE.
+> 
+> Fixes: aa8eff9bfbd5 ("arm64: KVM: fault injection into a guest")
+> Signed-off-by: Anastasia Belova <abelova@astralinux.ru>
 
-Nah, and I didn't have any time to get back to it. But maybe that's a
-KVM Forum hackathon project! To be honest, this has little to do with
-KVM itself. It is mostly guest enlightenment and a bit of
-infrastructure to communicate the constraints back to the guest.
+nit: the subject line is misleading, as this doesn't only affect KVM,
+but the whole of the arm64 port (the exception classes form a generic
+architectural construct).
 
-> Also not sure ARM has any plans to make this a specification soon.
+This also probably deserve a Cc stable.
 
-Probably not until we come up with a decent prototype that solves the
-problem.
+Will, Catalin: I'm happy to queue this in the KVM tree, but if you are
+taking it directly:
 
-> I was thinking of handling this in userspace for now by ignoring the MIDR=
- write
-> error on Migration and keeping the host MIDR value for destination VM. Th=
-is is
-> for use cases where we know that the hosts doesn't have any MIDR based er=
-rata or
-> errata difference doesn't matter and assuming the user knows what they ar=
-e doing.
-
-If you know of *any* host that doesn't have errata to be mitigated in
-the guest, send it to me, and I'll find you one pretty quickly! :D
-
-But yes, you can always play that game (which is what I do for
-big-little by letting the guest migrating between CPU types). But it
-is ultimately doomed.
-
-> Please let me know, if there are any other suggestions or work in progres=
-s on this one.
-
-I don't have much free time at the moment, but I'll do what I can.
+Acked-by: Marc Zyngier <maz@kernel.org>
 
 Thanks,
 
 	M.
 
---=20
+-- 
 Without deviation from the norm, progress is not possible.
