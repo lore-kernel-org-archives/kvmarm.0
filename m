@@ -1,191 +1,125 @@
-Received: from mx.astralinux.ru (mx.astralinux.ru [89.232.161.68])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2213E17624C;
-	Tue, 10 Sep 2024 08:51:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.232.161.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6702818784B;
+	Tue, 10 Sep 2024 09:00:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725958307; cv=none; b=pTw16oDpze/TJTxhyhkHl8NMK2PrMk1vol7ou59iqtrXrS8Kqp8iPpZ1RCoAJo1q6Pki/LLuVmC8aLLdZrsrnSuwrdh2o9F/RWXGYAmA3gMfqy7B4muDFoMkavzBz/qbi8GxretUW4eWPoK6jLD1J4F1kaqQj5NUp9ON1RsNWzg=
+	t=1725958851; cv=none; b=atNvoCSWdcCieF9sWTPTr97hNtm5b2WEAbTRccEvVyAKwSta2kaQ9np5gr5JddRMMEdLxiu4StPDCqhWnstB4GZK5VcX9VlZn7LEJN5vqn8tJCYSIU6xprTg6LSu44Jut4mjsBSYu46dKOAeLb56HWDisETpivFCot+7vpJWn4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725958307; c=relaxed/simple;
-	bh=XVGXGzADbsLu3p+a2MUO3UozEei62Ba2NCZZ3KNQTWM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=H7IiOhEO2DdcPczIEvMtC3WZhkr2dWolWDz0emhlsPk06AQhfKVK8pCHeQ6CzM61Olwx+uqVVjLMXKAqIhuANVmKN+wedczWnvwVxndfjNX9436wfpZETT151IqzqgpSNyaBJHEgMANWp0nvVToqp7ZiKjQzFM0pl/C+iXAF8eo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=astralinux.ru; spf=pass smtp.mailfrom=astralinux.ru; arc=none smtp.client-ip=89.232.161.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=astralinux.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=astralinux.ru
-Received: from [10.177.185.111] (helo=new-mail.astralinux.ru)
-	by mx.astralinux.ru with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <abelova@astralinux.ru>)
-	id 1snwZS-00BYd3-TK; Tue, 10 Sep 2024 11:49:58 +0300
-Received: from rbta-msk-lt-106062.astralinux.ru (unknown [10.177.20.58])
-	by new-mail.astralinux.ru (Postfix) with ESMTPA id 4X2y983ntBz1c0mR;
-	Tue, 10 Sep 2024 11:51:08 +0300 (MSK)
-From: Anastasia Belova <abelova@astralinux.ru>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Anastasia Belova <abelova@astralinux.ru>,
-	Oliver Upton <oliver.upton@linux.dev>,
+	s=arc-20240116; t=1725958851; c=relaxed/simple;
+	bh=71rfz1s67YzT+RLcc8Z5sytb/FLjGZKI4TF20Wfm914=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bRE3ZWf+/UogmMs1VqNbWS8ktRFDfqVSIe6WzyaR2s5f2D9DMFdt4yu9EVVo4y07yA8Prh7okpxzaHbkpL0fDOHYJKSXXTS39sfDi5u9mUsUOUOJIfoWZGPZFCAfq7c3uTf9J0VKj97oP0mntV7gH0z5rMnTxB9gxHN565rNObc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ENuYQyGp; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ENuYQyGp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2AB5C4CEC3;
+	Tue, 10 Sep 2024 09:00:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725958850;
+	bh=71rfz1s67YzT+RLcc8Z5sytb/FLjGZKI4TF20Wfm914=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ENuYQyGp9cpvi8OnGYy5irDliRneRaJaGyVm9tUwo+LEn370faXEJw2y19TAtlfvI
+	 f+AMb93sgYAyHkNEVFXGEt2dCJI6LPDpOc/HMqUYrydbULCmr9SwB8i+yjtP1W0xdh
+	 rP0slUO6MiEfYOs/OdmKBh+HrA/5J1iIEZEekGROLZ6dDdx2boZtWkM9/QqUZdww7B
+	 REmassKjGe/1+HsQsNZLQgWUYDJFE8z5H/c1tcvv+WQqC6ILonnHqwEJjMzhPS1Tyw
+	 MFWC8ogjuiXh+SmsfBTUFxrJjQvP0h1inqeMqecUh27Oajr5EON2KATeVWDOrEIoxb
+	 su7uGfpc3pekg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1snwjw-00BfZi-JD;
+	Tue, 10 Sep 2024 10:00:48 +0100
+Date: Tue, 10 Sep 2024 10:00:48 +0100
+Message-ID: <86wmjj7uin.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	Sebastian Ott
+	<sebott@redhat.com>,
 	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org,
-	stable@vger.kernel.org
-Subject: [PATCH v2] arm64: KVM: define ESR_ELx_EC_* constants as UL
-Date: Tue, 10 Sep 2024 11:50:16 +0300
-Message-Id: <20240910085016.32120-1-abelova@astralinux.ru>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <865xr5856r.wl-maz@kernel.org>
-References: 
+	Suzuki K Poulose
+	<suzuki.poulose@arm.com>,
+	yuzenghui <yuzenghui@huawei.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	Shaoqin Huang
+	<shahuang@redhat.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	"Wangzhou (B)"
+	<wangzhou1@hisilicon.com>
+Subject: Re: [PATCH v5 07/10] KVM: arm64: Treat CTR_EL0 as a VM feature ID register
+In-Reply-To: <6abe14d969da42638d648db205d39fe7@huawei.com>
+References: <20240619174036.483943-1-oliver.upton@linux.dev>
+	<20240619174036.483943-8-oliver.upton@linux.dev>
+	<0db19a081d9e41f08b0043baeef16f16@huawei.com>
+	<864j6o94fz.wl-maz@kernel.org>
+	<Zt8o6fStuQXANSrX@linux.dev>
+	<8e361ab82d6c4adcb15890cd3cab48ee@huawei.com>
+	<Zt81ga44ztdX_KET@linux.dev>
+	<6abe14d969da42638d648db205d39fe7@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-DrWeb-SpamScore: 0
-X-DrWeb-SpamState: legit
-X-DrWeb-SpamDetail: gggruggvucftvghtrhhoucdtuddrgedvfedrvdehuddgtddvucetufdoteggodetrfcurfhrohhfihhlvgemucfftfghgfeunecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvfevufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpeetnhgrshhtrghsihgruceuvghlohhvrgcuoegrsggvlhhovhgrsegrshhtrhgrlhhinhhugidrrhhuqeenucggtffrrghtthgvrhhnpeevhfduuefhueektdefkedvgfekgfekffegvdetffehfefhffejhfehveevudeigfenucffohhmrghinheplhhinhhugihtvghsthhinhhgrdhorhhgnecukfhppedutddrudejjedrvddtrdehkeenucfrrghrrghmpehhvghloheprhgsthgrqdhmshhkqdhlthdquddtiedtiedvrdgrshhtrhgrlhhinhhugidrrhhupdhinhgvthepuddtrddujeejrddvtddrheekmeegleehjeekpdhmrghilhhfrhhomheprggsvghlohhvrgesrghsthhrrghlihhnuhigrdhruhdpnhgspghrtghpthhtohepudefpdhrtghpthhtohepmhgriieskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprggsvghlohhvrgesrghsthhrrghlihhnuhigrdhruhdprhgtphhtthhopeholhhivhgvrhdruhhpthhonheslhhinhhugidruggvvhdprhgtphhtthhopehjrghmvghsrdhmohhrshgvsegrrhhmrdgtohhmpdhrtghpthhtohepshhuiihukhhirdhpohhulhhoshgvsegrrhhmrd
- gtohhmpdhrtghpthhtohephihuiigvnhhghhhuiheshhhurgifvghirdgtohhmpdhrtghpthhtoheptggrthgrlhhinhdrmhgrrhhinhgrshesrghrmhdrtghomhdprhgtphhtthhopeifihhllheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqrghrmhdqkhgvrhhnvghlsehlihhsthhsrdhinhhfrhgruggvrggurdhorhhgpdhrtghpthhtohepkhhvmhgrrhhmsehlihhsthhsrdhlihhnuhigrdguvghvpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhvtgdqphhrohhjvggttheslhhinhhugihtvghsthhinhhgrdhorhhgpdhrtghpthhtohepshhtrggslhgvsehvghgvrhdrkhgvrhhnvghlrdhorhhgnecuffhrrdghvggsucetnhhtihhsphgrmhemucenucfvrghgshem
-X-DrWeb-SpamVersion: Dr.Web Antispam 1.0.7.202406240#1725912977#02
-X-AntiVirus: Checked by Dr.Web [MailD: 11.1.19.2307031128, SE: 11.1.12.2210241838, Core engine: 7.00.65.05230, Virus records: 12167075, Updated: 2024-Sep-10 07:11:52 UTC]
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: shameerali.kolothum.thodi@huawei.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, sebott@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvm@vger.kernel.org, shahuang@redhat.com, eric.auger@redhat.com, wangzhou1@hisilicon.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add explicit casting to prevent expantion of 32th bit of
-u32 into highest half of u64 in several places.
+On Tue, 10 Sep 2024 08:16:49 +0100,
+Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
+>=20
+> And now to the elephant in the room, handling MIDR differences and associ=
+ated errata
+> management =F0=9F=98=8A
+>=20
+> Marc, you mentioned about a  prototype solution you have a while back[0],
+> has that been shared public?
 
-For example, in inject_abt64:
-ESR_ELx_EC_DABT_LOW << ESR_ELx_EC_SHIFT = 0x24 << 26.
-This operation's result is int with 1 in 32th bit.
-While casting this value into u64 (esr is u64) 1
-fills 32 highest bits.
+Nah, and I didn't have any time to get back to it. But maybe that's a
+KVM Forum hackathon project! To be honest, this has little to do with
+KVM itself. It is mostly guest enlightenment and a bit of
+infrastructure to communicate the constraints back to the guest.
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
+> Also not sure ARM has any plans to make this a specification soon.
 
-Fixes: aa8eff9bfbd5 ("arm64: KVM: fault injection into a guest")
-Signed-off-by: Anastasia Belova <abelova@astralinux.ru>
----
-v2: move casting from usage to definition
- arch/arm64/include/asm/esr.h | 88 ++++++++++++++++++------------------
- 1 file changed, 44 insertions(+), 44 deletions(-)
+Probably not until we come up with a decent prototype that solves the
+problem.
 
-diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-index 56c148890daf..2f3d56857a97 100644
---- a/arch/arm64/include/asm/esr.h
-+++ b/arch/arm64/include/asm/esr.h
-@@ -10,63 +10,63 @@
- #include <asm/memory.h>
- #include <asm/sysreg.h>
- 
--#define ESR_ELx_EC_UNKNOWN	(0x00)
--#define ESR_ELx_EC_WFx		(0x01)
-+#define ESR_ELx_EC_UNKNOWN	UL(0x00)
-+#define ESR_ELx_EC_WFx		UL(0x01)
- /* Unallocated EC: 0x02 */
--#define ESR_ELx_EC_CP15_32	(0x03)
--#define ESR_ELx_EC_CP15_64	(0x04)
--#define ESR_ELx_EC_CP14_MR	(0x05)
--#define ESR_ELx_EC_CP14_LS	(0x06)
--#define ESR_ELx_EC_FP_ASIMD	(0x07)
--#define ESR_ELx_EC_CP10_ID	(0x08)	/* EL2 only */
--#define ESR_ELx_EC_PAC		(0x09)	/* EL2 and above */
-+#define ESR_ELx_EC_CP15_32	UL(0x03)
-+#define ESR_ELx_EC_CP15_64	UL(0x04)
-+#define ESR_ELx_EC_CP14_MR	UL(0x05)
-+#define ESR_ELx_EC_CP14_LS	UL(0x06)
-+#define ESR_ELx_EC_FP_ASIMD	UL(0x07)
-+#define ESR_ELx_EC_CP10_ID	UL(0x08)	/* EL2 only */
-+#define ESR_ELx_EC_PAC		UL(0x09)	/* EL2 and above */
- /* Unallocated EC: 0x0A - 0x0B */
--#define ESR_ELx_EC_CP14_64	(0x0C)
--#define ESR_ELx_EC_BTI		(0x0D)
--#define ESR_ELx_EC_ILL		(0x0E)
-+#define ESR_ELx_EC_CP14_64	UL(0x0C)
-+#define ESR_ELx_EC_BTI		UL(0x0D)
-+#define ESR_ELx_EC_ILL		UL(0x0E)
- /* Unallocated EC: 0x0F - 0x10 */
--#define ESR_ELx_EC_SVC32	(0x11)
--#define ESR_ELx_EC_HVC32	(0x12)	/* EL2 only */
--#define ESR_ELx_EC_SMC32	(0x13)	/* EL2 and above */
-+#define ESR_ELx_EC_SVC32	UL(0x11)
-+#define ESR_ELx_EC_HVC32	UL(0x12)	/* EL2 only */
-+#define ESR_ELx_EC_SMC32	UL(0x13)	/* EL2 and above */
- /* Unallocated EC: 0x14 */
--#define ESR_ELx_EC_SVC64	(0x15)
--#define ESR_ELx_EC_HVC64	(0x16)	/* EL2 and above */
--#define ESR_ELx_EC_SMC64	(0x17)	/* EL2 and above */
--#define ESR_ELx_EC_SYS64	(0x18)
--#define ESR_ELx_EC_SVE		(0x19)
--#define ESR_ELx_EC_ERET		(0x1a)	/* EL2 only */
-+#define ESR_ELx_EC_SVC64	UL(0x15)
-+#define ESR_ELx_EC_HVC64	UL(0x16)	/* EL2 and above */
-+#define ESR_ELx_EC_SMC64	UL(0x17)	/* EL2 and above */
-+#define ESR_ELx_EC_SYS64	UL(0x18)
-+#define ESR_ELx_EC_SVE		UL(0x19)
-+#define ESR_ELx_EC_ERET		UL(0x1a)	/* EL2 only */
- /* Unallocated EC: 0x1B */
--#define ESR_ELx_EC_FPAC		(0x1C)	/* EL1 and above */
--#define ESR_ELx_EC_SME		(0x1D)
-+#define ESR_ELx_EC_FPAC		UL(0x1C)	/* EL1 and above */
-+#define ESR_ELx_EC_SME		UL(0x1D)
- /* Unallocated EC: 0x1E */
--#define ESR_ELx_EC_IMP_DEF	(0x1f)	/* EL3 only */
--#define ESR_ELx_EC_IABT_LOW	(0x20)
--#define ESR_ELx_EC_IABT_CUR	(0x21)
--#define ESR_ELx_EC_PC_ALIGN	(0x22)
-+#define ESR_ELx_EC_IMP_DEF	UL(0x1f)	/* EL3 only */
-+#define ESR_ELx_EC_IABT_LOW	UL(0x20)
-+#define ESR_ELx_EC_IABT_CUR	UL(0x21)
-+#define ESR_ELx_EC_PC_ALIGN	UL(0x22)
- /* Unallocated EC: 0x23 */
--#define ESR_ELx_EC_DABT_LOW	(0x24)
--#define ESR_ELx_EC_DABT_CUR	(0x25)
--#define ESR_ELx_EC_SP_ALIGN	(0x26)
--#define ESR_ELx_EC_MOPS		(0x27)
--#define ESR_ELx_EC_FP_EXC32	(0x28)
-+#define ESR_ELx_EC_DABT_LOW	UL(0x24)
-+#define ESR_ELx_EC_DABT_CUR	UL(0x25)
-+#define ESR_ELx_EC_SP_ALIGN	UL(0x26)
-+#define ESR_ELx_EC_MOPS		UL(0x27)
-+#define ESR_ELx_EC_FP_EXC32	UL(0x28)
- /* Unallocated EC: 0x29 - 0x2B */
--#define ESR_ELx_EC_FP_EXC64	(0x2C)
-+#define ESR_ELx_EC_FP_EXC64	UL(0x2C)
- /* Unallocated EC: 0x2D - 0x2E */
--#define ESR_ELx_EC_SERROR	(0x2F)
--#define ESR_ELx_EC_BREAKPT_LOW	(0x30)
--#define ESR_ELx_EC_BREAKPT_CUR	(0x31)
--#define ESR_ELx_EC_SOFTSTP_LOW	(0x32)
--#define ESR_ELx_EC_SOFTSTP_CUR	(0x33)
--#define ESR_ELx_EC_WATCHPT_LOW	(0x34)
--#define ESR_ELx_EC_WATCHPT_CUR	(0x35)
-+#define ESR_ELx_EC_SERROR	UL(0x2F)
-+#define ESR_ELx_EC_BREAKPT_LOW	UL(0x30)
-+#define ESR_ELx_EC_BREAKPT_CUR	UL(0x31)
-+#define ESR_ELx_EC_SOFTSTP_LOW	UL(0x32)
-+#define ESR_ELx_EC_SOFTSTP_CUR	UL(0x33)
-+#define ESR_ELx_EC_WATCHPT_LOW	UL(0x34)
-+#define ESR_ELx_EC_WATCHPT_CUR	UL(0x35)
- /* Unallocated EC: 0x36 - 0x37 */
--#define ESR_ELx_EC_BKPT32	(0x38)
-+#define ESR_ELx_EC_BKPT32	UL(0x38)
- /* Unallocated EC: 0x39 */
--#define ESR_ELx_EC_VECTOR32	(0x3A)	/* EL2 only */
-+#define ESR_ELx_EC_VECTOR32	UL(0x3A)	/* EL2 only */
- /* Unallocated EC: 0x3B */
--#define ESR_ELx_EC_BRK64	(0x3C)
-+#define ESR_ELx_EC_BRK64	UL(0x3C)
- /* Unallocated EC: 0x3D - 0x3F */
--#define ESR_ELx_EC_MAX		(0x3F)
-+#define ESR_ELx_EC_MAX		UL(0x3F)
- 
- #define ESR_ELx_EC_SHIFT	(26)
- #define ESR_ELx_EC_WIDTH	(6)
--- 
-2.30.2
+> I was thinking of handling this in userspace for now by ignoring the MIDR=
+ write
+> error on Migration and keeping the host MIDR value for destination VM. Th=
+is is
+> for use cases where we know that the hosts doesn't have any MIDR based er=
+rata or
+> errata difference doesn't matter and assuming the user knows what they ar=
+e doing.
 
+If you know of *any* host that doesn't have errata to be mitigated in
+the guest, send it to me, and I'll find you one pretty quickly! :D
+
+But yes, you can always play that game (which is what I do for
+big-little by letting the guest migrating between CPU types). But it
+is ultimately doomed.
+
+> Please let me know, if there are any other suggestions or work in progres=
+s on this one.
+
+I don't have much free time at the moment, but I'll do what I can.
+
+Thanks,
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
