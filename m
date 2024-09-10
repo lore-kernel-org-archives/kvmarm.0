@@ -1,65 +1,65 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A502210EC
-	for <kvmarm@lists.linux.dev>; Mon,  9 Sep 2024 23:57:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D24DD23AB
+	for <kvmarm@lists.linux.dev>; Tue, 10 Sep 2024 00:09:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725926225; cv=none; b=c2wIVCVf+7B0rDWuzgF/jKwiAH+yX5zQJUBLcTn33yMbQGWOA6bt9F4mDetFqq/y/jlDK0veYuPw1rvQEnHnlzW3teRaRttkNeP34BoJIygQm/SZAxmzEiv4qGIpD3znx0izk6GbBqGg1if85gTJ6G2/AbAko3HjdaqVQ6DZkMw=
+	t=1725926993; cv=none; b=JfXkRqsCPaKxf/QwOzICHDrgYKJEbMF1uWZTX623Lc3A7Stb5A43B10jsi8puxw5nWXB9WUNADd2cbMkTz0sY28JDriinERyMw06N1HGj2fYMHH9kgCiYU9C9j/bk2k15xevnOUXFeXZ+JHt09Ml/JmLpmdDMmcBSo+oA5BhApY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725926225; c=relaxed/simple;
-	bh=3XI5IVZuxU96tWCq021MKnBptmnTHpNo8/GtC8SKI6s=;
+	s=arc-20240116; t=1725926993; c=relaxed/simple;
+	bh=V+ndQboUKQbl2kpi9ghwnfZz1sbDkngsuOFkFc275Jg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dIQ2X4c4xm0hO8uifkGxa9uwXk+CUmprhFm6ywLxG0dL8H/CWx52CoqhN11maOsRr219S+HLdsoJamiilXqu99WNYeAb1ww8YaXAH8mrO/KyzrDTw+pefqcru1AsZ+bDb5NaTE7XFhSOlznK7IHcFj/0SH3/5YFphmhU+AdNqoY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=itQsml/5; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=Nh3nIoPs1Xei6p7NNXMeDk9q3CxJVN8o9Fh/SaVdCsrkf4h8/oaKTiFS4Cr3HbVITqt9zryNH9WldlN4ht5FmXLsul42eNBs6mBSG7WMFOgvMvbBSb4AMtAgUbJAhHtVNIAdCt7UGFBKNaMb7QJ8qBOyhufmb3KDrjrjtqfIC8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=h4Wk8dEG; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="itQsml/5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h4Wk8dEG"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725926223;
+	s=mimecast20190719; t=1725926990;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=5KDrfnw4h4KPFm9gkKjM5Pcm4Qn58KLQZ4qPPhdTka4=;
-	b=itQsml/54rxNNuresKAHUjR7n8sAgJLZs/FHDCmB3EXZKq5eURJhMugnMi6O9AbvkJWSGL
-	uBo4TiDnbcYWhTlykOVt3OWuVslVVXx4x5kjV3rGJIZ1+7CxYEYwhggcrwxH+UjTb3Kg3z
-	t8lwOwPqGB9zHEBu7ytn9FeSt/An7j8=
+	bh=NMaP86bC+hPhOjPzwPjEKilwC9SBm5gKL8ioVFK2IxE=;
+	b=h4Wk8dEGgZhvLhmxdDlBhlcgRGcRneNcs0SEnmtUCBUq6Aina7liXNDs+/Ms46JiRSb95h
+	Pa8Ok/xC4c9dyiJets7Yt+rF3bctTWtogK68wcUUnzAtIJGi7LNyffjHzm5WYx6oC/wz2y
+	GZeb+Ksp2xYjf/AACoGOWY/V/DGX9iw=
 Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
  [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-622-cGmLxx31N3mSiZrlmiNRCA-1; Mon, 09 Sep 2024 19:57:01 -0400
-X-MC-Unique: cGmLxx31N3mSiZrlmiNRCA-1
-Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-718dedf3615so209246b3a.1
-        for <kvmarm@lists.linux.dev>; Mon, 09 Sep 2024 16:57:01 -0700 (PDT)
+ us-mta-596-niErF_6fOmqW7FM6-7Rx1A-1; Mon, 09 Sep 2024 20:09:49 -0400
+X-MC-Unique: niErF_6fOmqW7FM6-7Rx1A-1
+Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-718e129311aso2943248b3a.0
+        for <kvmarm@lists.linux.dev>; Mon, 09 Sep 2024 17:09:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725926221; x=1726531021;
+        d=1e100.net; s=20230601; t=1725926988; x=1726531788;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5KDrfnw4h4KPFm9gkKjM5Pcm4Qn58KLQZ4qPPhdTka4=;
-        b=EDhtLOITUQD/UncSIztac8o89f58b/pAGsJN0sxVNH+k0D5M7C3FL6ub1ohWCHdlIc
-         jkbMhYdx4x8iVf+P4m11a2Ov8I2ZjHAZ5iNplrl2gdjDBWABV8VnKGGQAvuI9C36zvaF
-         1YXDf0bRm0jKwx6bzgN01aRqIlSblH9vX9kHxbwcsF9DfZXSZiH4VpmyClJd4NPG33RV
-         myBxUbHLVaIgqU6uXxMTjJwi6nu40Ukc1bura9BoBiqrnnK6BptbbYGC7I/wsj2HfCSG
-         AUFIGlaePgOy6UW7JNp5WY6Gv0cMZtRMrEkNbAQGOWYhjitUl9bEepMYGIPJ868UWX5w
-         ywPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWe8Q02dd51heVNVeyZmGaqgCnaaib7/2BGmXYzIpuZ6kg5/+uepHNudPNe7LhSf0ify5dutmU=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxSAipjBE4mnAgF001GSU1tdfs058Y03MbsM8f5KuYeBdqobc3D
-	vd6H9rD6PNRra9cvJweOtrubH/x95Pf+tJAKPkysYfUOdwVdCYxqOe4DO1KIaz/gX1Jd0dIWEMP
-	55ZLi/uWDPn3x69weeHRixjEQT6CnWe8oOW/Og1aKSlgOZnpHHYYqDw==
-X-Received: by 2002:a05:6a00:3c85:b0:718:d740:b870 with SMTP id d2e1a72fcca58-718e3352956mr12735779b3a.2.1725926220682;
-        Mon, 09 Sep 2024 16:57:00 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEsgj8V1pojC58pqDKayl2QgqKFvt9FHbNtmUL06MwiNOepfTXdxL0EwUPYChJ+RhkrUXN3AQ==
-X-Received: by 2002:a05:6a00:3c85:b0:718:d740:b870 with SMTP id d2e1a72fcca58-718e3352956mr12735733b3a.2.1725926220087;
-        Mon, 09 Sep 2024 16:57:00 -0700 (PDT)
+        bh=NMaP86bC+hPhOjPzwPjEKilwC9SBm5gKL8ioVFK2IxE=;
+        b=P79bVwDqA3sMxy7RwsuILsKfq+BLr+x87ObiJlshDPI1qLTYmlO2d/agFA1T7oqLd3
+         USHSvo3EOK5y9ru3Q1mawWOCT/SskYpnZz+RqxhW8esxqHIN6DP9ChyObY8jBk88p2KO
+         SwBT+BwTm0tO130F4hqi/t67JqQ0Z+cfy3oyCP19XqCckYc3FZeI/vp0Yv2aC4IChGmC
+         ufdsndutghM4OslYvENDQVnWYvASNSREg+Z33joHac1A2WqQjIsFjRqBWOq7noyGqFA6
+         G+hds0vs5osbS1zysxicO5zAaDW9yy3FLj6x7w5YZU4rjoHZxAsCi6KvQd2XAuhoBS2N
+         SQXg==
+X-Forwarded-Encrypted: i=1; AJvYcCWvcfUwijdVyBnlJL5CJcDAKvT1z9Rh05SG2An6fctjhB8i52d8fAgg4jV6Ar/pn0NjpXPQe74=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxX3W32GV1jsHF2oI9tXquaRlRVSvWfKE2sM0ZsIcdo+Tx9BUL/
+	ndPEWGDoJsRLmBsC5bIwU+YoocZZJpLVmOVyqvSigKiU0JY8lucOW7fyZy5tt/jgePxl0WCRIfQ
+	7GADIc9vkqyXmEBZ5DDTgUhUZMnmqv1XvG2zNIc/JJVh1/nZLnHLbPA==
+X-Received: by 2002:a05:6a00:2ea8:b0:717:9896:fb03 with SMTP id d2e1a72fcca58-71907eb88a7mr1676602b3a.6.1725926988286;
+        Mon, 09 Sep 2024 17:09:48 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEOPTJ+MAzzAaW9hu5Sm5LtqVY+qPsIcrMrv6ipiDOnyMneCo1T4P1xJfwBR5Lh/LAWTBHDRg==
+X-Received: by 2002:a05:6a00:2ea8:b0:717:9896:fb03 with SMTP id d2e1a72fcca58-71907eb88a7mr1676558b3a.6.1725926987824;
+        Mon, 09 Sep 2024 17:09:47 -0700 (PDT)
 Received: from [192.168.68.54] ([103.210.27.31])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71909092258sm269939b3a.127.2024.09.09.16.56.52
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71908fe29f6sm283845b3a.67.2024.09.09.17.09.40
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Sep 2024 16:56:59 -0700 (PDT)
-Message-ID: <41d7c549-072c-4e55-beab-cf339f441ec5@redhat.com>
-Date: Tue, 10 Sep 2024 09:56:49 +1000
+        Mon, 09 Sep 2024 17:09:47 -0700 (PDT)
+Message-ID: <bb69bde0-4564-49d6-bbd6-95bcbd4d272e@redhat.com>
+Date: Tue, 10 Sep 2024 10:09:38 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -67,12 +67,12 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 04/19] firmware/psci: Add psci_early_test_conduit()
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
+Subject: Re: [PATCH v5 05/19] arm64: Detect if in a realm and set RIPAS RAM
+To: Steven Price <steven.price@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, Marc Zyngier
+ <maz@kernel.org>, Will Deacon <will@kernel.org>,
+ James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
  Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
  <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
  linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
@@ -80,107 +80,63 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
  linux-coco@lists.linux.dev,
  Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>
+ Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun <alpergun@google.com>
 References: <20240819131924.372366-1-steven.price@arm.com>
- <20240819131924.372366-5-steven.price@arm.com>
+ <20240819131924.372366-6-steven.price@arm.com> <ZsxTDBm57ga6MkPu@arm.com>
+ <2e8caa91-bf66-4555-87b3-52f469b2c7ef@arm.com>
 From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20240819131924.372366-5-steven.price@arm.com>
+In-Reply-To: <2e8caa91-bf66-4555-87b3-52f469b2c7ef@arm.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 8/19/24 11:19 PM, Steven Price wrote:
-> From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+On 8/31/24 1:54 AM, Steven Price wrote:
+> On 26/08/2024 11:03, Catalin Marinas wrote:
+>> On Mon, Aug 19, 2024 at 02:19:10PM +0100, Steven Price wrote:
+
+[...]
+
+>>> +
+>>> +void __init arm64_rsi_setup_memory(void)
+>>> +{
+>>> +	u64 i;
+>>> +	phys_addr_t start, end;
+>>> +
+>>> +	if (!is_realm_world())
+>>> +		return;
+>>> +
+>>> +	/*
+>>> +	 * Iterate over the available memory ranges and convert the state to
+>>> +	 * protected memory. We should take extra care to ensure that we DO NOT
+>>> +	 * permit any "DESTROYED" pages to be converted to "RAM".
+>>> +	 *
+>>> +	 * BUG_ON is used because if the attempt to switch the memory to
+>>> +	 * protected has failed here, then future accesses to the memory are
+>>> +	 * simply going to be reflected as a SEA (Synchronous External Abort)
+>>> +	 * which we can't handle.  Bailing out early prevents the guest limping
+>>> +	 * on and dying later.
+>>> +	 */
+>>> +	for_each_mem_range(i, &start, &end) {
+>>> +		BUG_ON(rsi_set_memory_range_protected_safe(start, end));
+>>> +	}
+>>
+>> Would it help debugging if we print the memory ranges as well rather
+>> than just a BUG_ON()?
+>>
 > 
-> Add a function to test early if PSCI is present and what conduit it
-> uses. Because the PSCI conduit corresponds to the SMCCC one, this will
-> let the kernel know whether it can use SMC instructions to discuss with
-> the Realm Management Monitor (RMM), early enough to enable RAM and
-> serial access when running in a Realm.
-> 
-> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> v4: New patch
-> ---
->   drivers/firmware/psci/psci.c | 25 +++++++++++++++++++++++++
->   include/linux/psci.h         |  5 +++++
->   2 files changed, 30 insertions(+)
+> Yes that would probably be useful - I'll fix that.
 > 
 
-Question: Do we need same check for ACPI based system?
+One potential issue I'm seeing is WARN_ON() followed by BUG_ON(). They're a bit
+duplicate. I would suggest to remove the WARN_ON() and print informative messages
+in rsi_set_memory_range().
 
-> diff --git a/drivers/firmware/psci/psci.c b/drivers/firmware/psci/psci.c
-> index 2328ca58bba6..2b308f97ef2c 100644
-> --- a/drivers/firmware/psci/psci.c
-> +++ b/drivers/firmware/psci/psci.c
-> @@ -13,6 +13,7 @@
->   #include <linux/errno.h>
->   #include <linux/linkage.h>
->   #include <linux/of.h>
-> +#include <linux/of_fdt.h>
->   #include <linux/pm.h>
->   #include <linux/printk.h>
->   #include <linux/psci.h>
-> @@ -769,6 +770,30 @@ int __init psci_dt_init(void)
->   	return ret;
->   }
->   
-> +/*
-> + * Test early if PSCI is supported, and if its conduit matches @conduit
-> + */
-
-Nit: The comments needn't span into multiple lines.
-
-> +bool __init psci_early_test_conduit(enum arm_smccc_conduit conduit)
-> +{
-> +	int len;
-> +	int psci_node;
-> +	const char *method;
-> +	unsigned long dt_root;
-> +
-> +	/* DT hasn't been unflattened yet, we have to work with the flat blob */
-> +	dt_root = of_get_flat_dt_root();
-> +	psci_node = of_get_flat_dt_subnode_by_name(dt_root, "psci");
-> +	if (psci_node <= 0)
-> +		return false;
-> +
-
-Nit: Strictly speaking, "psci_node == 0" isn't an error. So the check would be
-"if (psci_node < 0)" if I'm correct.
-
-> +	method = of_get_flat_dt_prop(psci_node, "method", &len);
-> +	if (!method)
-> +		return false;
-> +
-> +	return  (conduit == SMCCC_CONDUIT_SMC && strncmp(method, "smc", len) == 0) ||
-> +		(conduit == SMCCC_CONDUIT_HVC && strncmp(method, "hvc", len) == 0);
-> +}
-> +
->   #ifdef CONFIG_ACPI
->   /*
->    * We use PSCI 0.2+ when ACPI is deployed on ARM64 and it's
-> diff --git a/include/linux/psci.h b/include/linux/psci.h
-> index 4ca0060a3fc4..a1fc1703ba20 100644
-> --- a/include/linux/psci.h
-> +++ b/include/linux/psci.h
-> @@ -45,8 +45,13 @@ struct psci_0_1_function_ids get_psci_0_1_function_ids(void);
->   
->   #if defined(CONFIG_ARM_PSCI_FW)
->   int __init psci_dt_init(void);
-> +bool __init psci_early_test_conduit(enum arm_smccc_conduit conduit);
->   #else
->   static inline int psci_dt_init(void) { return 0; }
-> +static inline bool psci_early_test_conduit(enum arm_smccc_conduit conduit)
-> +{
-> +	return false;
-> +}
->   #endif
->   
->   #if defined(CONFIG_ARM_PSCI_FW) && defined(CONFIG_ACPI)
+   setup_arch
+   arm64_rsi_setup_memory                    // BUG_ON(error)
+   rsi_set_memory_range_protected_safe
+   rsi_set_memory_range                      // WARN_ON(error)
 
 Thanks,
 Gavin
