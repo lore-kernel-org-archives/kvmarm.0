@@ -1,225 +1,174 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-175.mta0.migadu.com (out-175.mta0.migadu.com [91.218.175.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA46A17B4FC;
-	Tue, 10 Sep 2024 19:49:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C03CF1A38F4
+	for <kvmarm@lists.linux.dev>; Tue, 10 Sep 2024 19:53:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725997772; cv=none; b=p+SGoR3Crd746z7KxDmayVvbKlGUT3Vc8WpKBxuqYIyDxcbuyjE+4G7svTaR77LGNoRAjtI169BfD2OE175ew1OCM5LrxIKURXs/d8oWltUneNWXhRL+lKfWZZu/q34qLKB1GBs+QmprbxiFA2gDT3VsyDnWlvRXMgg+nnKHRAU=
+	t=1725998010; cv=none; b=uFq53m36hd2UewvlfANOGt9tM4D/oTUVqfLcMq38/8Ns5WuQ/4W2M/rx2wiWQ4v/E/JMGmaPuugNUVfjWtmxybQHNX9zHSYhy05Gr6JrCY/SDsYWhYa9CiDqiggFLlO+VZseGEpMBvv4l7piWf51dGMc6zT4eaIDoRu3L4daJH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725997772; c=relaxed/simple;
-	bh=WeJYGSqNPinOi/i72aoMwHeFytB58XDIlbPCMg7IpcI=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LjUIu7P4V/mUmvnXw/1W/ojrbq88x8eZFl+IPK/8c+eampcX8yTTv8ksWZ9BshsUTISWOapr5BZZ6dUvb1DNPDcPk4/Wz7gsY7G7k0+GHvqtB5C4cEfNr5WlB7/XzI98tXN0uJ4Y4dBfoN7YAsE84YI9jJNdojsd8GwQGPgwabE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WD2HTelg; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1725998010; c=relaxed/simple;
+	bh=wb0mIEZ445H14RdqGSutn3RkwklWd6CjNMMvc/kGgtc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oke6igOu7nIkKGudxTzdV1Jc7fRq21iZ1JDz5N/T+YAj/ig0g0BrxyNN7u2+ZnM6416ufIqfEX9HEWI1/eGLkRONoP/Th14s5jyTNSnI+54Ly5S1I7g1vRtYfuk9rjimlnnt0PKT46ygE2rc8jjvddPSwuKSI7Mc6o6FP6okDc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=iEFrinx+; arc=none smtp.client-ip=91.218.175.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WD2HTelg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1966DC4CEC3;
-	Tue, 10 Sep 2024 19:49:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725997771;
-	bh=WeJYGSqNPinOi/i72aoMwHeFytB58XDIlbPCMg7IpcI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WD2HTelgMn18myn/iTh5fxPpWrVOUt9wCDMMBP+BuTkRo7LMkPYCbSZF4FVhydHze
-	 QHFZIfBw8BmPK6+0Ica+jH0v+cy5mjol5+ubhAmoUWgajB2R9aaLcNAb8iKKWFsyfi
-	 jcdbNvKJIZ2DK0eUeLa8rHaklU5icysta40CmHgqNsoyJcOhfoB5Xy6OBaAioi8c4Q
-	 9AtTCYK7BnOJz7R1ai7u3fqiH9XPIIVZ0eviMrvAFHS0lflpwoaqI8DnI9K3fR7vaQ
-	 cVZbPSMc7e46LzJSP3LrRs1cfWcGwfrEwYm0wBkWPtsILXrul2MSUr2RRctcHASEQA
-	 4WAlliLJxEymQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1so6rg-00Brkl-QO;
-	Tue, 10 Sep 2024 20:49:28 +0100
-Date: Tue, 10 Sep 2024 20:49:28 +0100
-Message-ID: <86r09r70hj.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="iEFrinx+"
+Date: Tue, 10 Sep 2024 19:53:19 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1725998006;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UwT2cDw4vpxQs5a0kYXfI29D3vXun6olssb+L8yJHrI=;
+	b=iEFrinx+wGacDxIL48vDE1DP42Urot1X6o5O8GbZpcdj2hbSRSBLB9QNRVno6MFHoNQWFY
+	7saLxY37KYfAuS6ZlVfxF6t8EDNm8Sow76TEzNoXmzDFg6YYb3Zqa1cdWDYvMZ3DuI+ZyF
+	jt5StS43eWYqKrIPlYhmPRGaG6SDNSo=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
 Cc: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>,
 	Snehal Koukuntla <snehalreddy@google.com>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Sudeep Holla <sudeep.holla@arm.com>,
+	Will Deacon <will@kernel.org>, Sudeep Holla <sudeep.holla@arm.com>,
 	Sebastian Ene <sebastianene@google.com>,
 	Vincent Donnefort <vdonnefort@google.com>,
 	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v3] KVM: arm64: Add memory length checks and remove inline in do_ffa_mem_xfer
-In-Reply-To: <ZuCNge74gVpJi2Sf@linux.dev>
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH v3] KVM: arm64: Add memory length checks and remove
+ inline in do_ffa_mem_xfer
+Message-ID: <ZuCjrzNBJQ7sdCi8@linux.dev>
 References: <20240909180154.3267939-1-snehalreddy@google.com>
-	<rm2pihr27elmdf4zcgrv5khs7qluhn77tkivkr6xkvqcybtl4m@7hesctcacm4h>
-	<ZuCNge74gVpJi2Sf@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <rm2pihr27elmdf4zcgrv5khs7qluhn77tkivkr6xkvqcybtl4m@7hesctcacm4h>
+ <ZuCNge74gVpJi2Sf@linux.dev>
+ <86r09r70hj.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, r09922117@csie.ntu.edu.tw, snehalreddy@google.com, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, sudeep.holla@arm.com, sebastianene@google.com, vdonnefort@google.com, jean-philippe@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86r09r70hj.wl-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, 10 Sep 2024 19:18:41 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> On Wed, Sep 11, 2024 at 12:32:29AM +0800, Wei-Lin Chang wrote:
-> > Hi everyone,
+On Tue, Sep 10, 2024 at 08:49:28PM +0100, Marc Zyngier wrote:
+> On Tue, 10 Sep 2024 19:18:41 +0100,
+> Oliver Upton <oliver.upton@linux.dev> wrote:
 > > 
-> > On Mon, Sep 09, 2024 at 06:01:54PM GMT, Snehal Koukuntla wrote:
-> > > When we share memory through FF-A and the description of the buffers
-> > > exceeds the size of the mapped buffer, the fragmentation API is used.
-> > > The fragmentation API allows specifying chunks of descriptors in subsequent
-> > > FF-A fragment calls and no upper limit has been established for this.
-> > > The entire memory region transferred is identified by a handle which can be
-> > > used to reclaim the transferred memory.
-> > > To be able to reclaim the memory, the description of the buffers has to fit
-> > > in the ffa_desc_buf.
-> > > Add a bounds check on the FF-A sharing path to prevent the memory reclaim
-> > > from failing.
+> > On Wed, Sep 11, 2024 at 12:32:29AM +0800, Wei-Lin Chang wrote:
+> > > Hi everyone,
 > > > 
-> > > Also do_ffa_mem_xfer() does not need __always_inline
+> > > On Mon, Sep 09, 2024 at 06:01:54PM GMT, Snehal Koukuntla wrote:
+> > > > When we share memory through FF-A and the description of the buffers
+> > > > exceeds the size of the mapped buffer, the fragmentation API is used.
+> > > > The fragmentation API allows specifying chunks of descriptors in subsequent
+> > > > FF-A fragment calls and no upper limit has been established for this.
+> > > > The entire memory region transferred is identified by a handle which can be
+> > > > used to reclaim the transferred memory.
+> > > > To be able to reclaim the memory, the description of the buffers has to fit
+> > > > in the ffa_desc_buf.
+> > > > Add a bounds check on the FF-A sharing path to prevent the memory reclaim
+> > > > from failing.
+> > > > 
+> > > > Also do_ffa_mem_xfer() does not need __always_inline
+> > > > 
+> > > > Fixes: 634d90cf0ac65 ("KVM: arm64: Handle FFA_MEM_LEND calls from the host")
+> > > > Cc: stable@vger.kernel.org
+> > > > Reviewed-by: Sebastian Ene <sebastianene@google.com>
+> > > > Signed-off-by: Snehal Koukuntla <snehalreddy@google.com>
+> > > > ---
+> > > >  arch/arm64/kvm/hyp/nvhe/ffa.c | 7 ++++++-
+> > > >  1 file changed, 6 insertions(+), 1 deletion(-)
+> > > > 
+> > > > diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> > > > index e715c157c2c4..637425f63fd1 100644
+> > > > --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
+> > > > +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> > > > @@ -426,7 +426,7 @@ static void do_ffa_mem_frag_tx(struct arm_smccc_res *res,
+> > > >  	return;
+> > > >  }
+> > > >  
+> > > > -static __always_inline void do_ffa_mem_xfer(const u64 func_id,
+> > > > +static void do_ffa_mem_xfer(const u64 func_id,
 > > > 
-> > > Fixes: 634d90cf0ac65 ("KVM: arm64: Handle FFA_MEM_LEND calls from the host")
-> > > Cc: stable@vger.kernel.org
-> > > Reviewed-by: Sebastian Ene <sebastianene@google.com>
-> > > Signed-off-by: Snehal Koukuntla <snehalreddy@google.com>
-> > > ---
-> > >  arch/arm64/kvm/hyp/nvhe/ffa.c | 7 ++++++-
-> > >  1 file changed, 6 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > > index e715c157c2c4..637425f63fd1 100644
-> > > --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > > +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > > @@ -426,7 +426,7 @@ static void do_ffa_mem_frag_tx(struct arm_smccc_res *res,
-> > >  	return;
-> > >  }
-> > >  
-> > > -static __always_inline void do_ffa_mem_xfer(const u64 func_id,
-> > > +static void do_ffa_mem_xfer(const u64 func_id,
+> > > I am seeing a compilation error because of this.
 > > 
-> > I am seeing a compilation error because of this.
+> > Thanks for reporting this. Looks like the __always_inline was slightly
+> > more load bearing...
+> > 
+> > Marc, can you put something like this on top?
+> > 
+> > 
+> > From c2712eaa94989ae6457baad3ec459cf363ec5119 Mon Sep 17 00:00:00 2001
+> > From: Oliver Upton <oliver.upton@linux.dev>
+> > Date: Tue, 10 Sep 2024 16:45:30 +0000
+> > Subject: [PATCH] KVM: arm64: Drop BUILD_BUG_ON() from do_ffa_mem_xfer()
+> > 
+> > __always_inline was recently discarded from do_ffa_mem_xfer() since it
+> > appeared to be unnecessary. Of course, this was ~immediately proven
+> > wrong, as the compile-time check against @func_id depends on inlining
+> > for the value to be known.
+> > 
+> > Just downgrade to a WARN_ON() instead of putting the old mess back in
+> > place. Fix the wrapping/indentation of the function parameters while at
+> > it.
+> >
+> > Fixes: 39dacbeeee70 ("KVM: arm64: Add memory length checks and remove inline in do_ffa_mem_xfer")
+> > Reported-by: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> > ---
+> >  arch/arm64/kvm/hyp/nvhe/ffa.c | 11 ++++++-----
+> >  1 file changed, 6 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> > index 637425f63fd1..316d269341f3 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> > @@ -426,9 +426,8 @@ static void do_ffa_mem_frag_tx(struct arm_smccc_res *res,
+> >  	return;
+> >  }
+> >  
+> > -static void do_ffa_mem_xfer(const u64 func_id,
+> > -					    struct arm_smccc_res *res,
+> > -					    struct kvm_cpu_context *ctxt)
+> > +static void do_ffa_mem_xfer(const u64 func_id, struct arm_smccc_res *res,
+> > +			    struct kvm_cpu_context *ctxt)
+> >  {
+> >  	DECLARE_REG(u32, len, ctxt, 1);
+> >  	DECLARE_REG(u32, fraglen, ctxt, 2);
+> > @@ -440,8 +439,10 @@ static void do_ffa_mem_xfer(const u64 func_id,
+> >  	u32 offset, nr_ranges;
+> >  	int ret = 0;
+> >  
+> > -	BUILD_BUG_ON(func_id != FFA_FN64_MEM_SHARE &&
+> > -		     func_id != FFA_FN64_MEM_LEND);
+> > +	if (WARN_ON(func_id != FFA_FN64_MEM_SHARE && func_id != FFA_FN64_MEM_LEND)) {
+> > +		ret = SMCCC_RET_NOT_SUPPORTED;
+> > +		goto out;
+> > +	}
 > 
-> Thanks for reporting this. Looks like the __always_inline was slightly
-> more load bearing...
 > 
-> Marc, can you put something like this on top?
-> 
-> 
-> From c2712eaa94989ae6457baad3ec459cf363ec5119 Mon Sep 17 00:00:00 2001
-> From: Oliver Upton <oliver.upton@linux.dev>
-> Date: Tue, 10 Sep 2024 16:45:30 +0000
-> Subject: [PATCH] KVM: arm64: Drop BUILD_BUG_ON() from do_ffa_mem_xfer()
-> 
-> __always_inline was recently discarded from do_ffa_mem_xfer() since it
-> appeared to be unnecessary. Of course, this was ~immediately proven
-> wrong, as the compile-time check against @func_id depends on inlining
-> for the value to be known.
-> 
-> Just downgrade to a WARN_ON() instead of putting the old mess back in
-> place. Fix the wrapping/indentation of the function parameters while at
-> it.
->
-> Fixes: 39dacbeeee70 ("KVM: arm64: Add memory length checks and remove inline in do_ffa_mem_xfer")
-> Reported-by: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  arch/arm64/kvm/hyp/nvhe/ffa.c | 11 ++++++-----
->  1 file changed, 6 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> index 637425f63fd1..316d269341f3 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> @@ -426,9 +426,8 @@ static void do_ffa_mem_frag_tx(struct arm_smccc_res *res,
->  	return;
->  }
->  
-> -static void do_ffa_mem_xfer(const u64 func_id,
-> -					    struct arm_smccc_res *res,
-> -					    struct kvm_cpu_context *ctxt)
-> +static void do_ffa_mem_xfer(const u64 func_id, struct arm_smccc_res *res,
-> +			    struct kvm_cpu_context *ctxt)
->  {
->  	DECLARE_REG(u32, len, ctxt, 1);
->  	DECLARE_REG(u32, fraglen, ctxt, 2);
-> @@ -440,8 +439,10 @@ static void do_ffa_mem_xfer(const u64 func_id,
->  	u32 offset, nr_ranges;
->  	int ret = 0;
->  
-> -	BUILD_BUG_ON(func_id != FFA_FN64_MEM_SHARE &&
-> -		     func_id != FFA_FN64_MEM_LEND);
-> +	if (WARN_ON(func_id != FFA_FN64_MEM_SHARE && func_id != FFA_FN64_MEM_LEND)) {
-> +		ret = SMCCC_RET_NOT_SUPPORTED;
-> +		goto out;
-> +	}
+> I'm not overly on the WARN_ON(), as it has pretty fatal effects on
+> pKVM (it simply panics).
 
+It's unexpected, what else are you wanting? :P
 
-I'm not overly on the WARN_ON(), as it has pretty fatal effects on
-pKVM (it simply panics). What do you think of this instead, which
-compiles with my prehistoric version of clang (14.0.6):
+> What do you think of this instead, which
+> compiles with my prehistoric version of clang (14.0.6):
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-index 637425f63fd1b..e433dfab882aa 100644
---- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-+++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-@@ -426,9 +426,9 @@ static void do_ffa_mem_frag_tx(struct arm_smccc_res *res,
- 	return;
- }
- 
--static void do_ffa_mem_xfer(const u64 func_id,
--					    struct arm_smccc_res *res,
--					    struct kvm_cpu_context *ctxt)
-+static void __do_ffa_mem_xfer(const u64 func_id,
-+			      struct arm_smccc_res *res,
-+			      struct kvm_cpu_context *ctxt)
- {
- 	DECLARE_REG(u32, len, ctxt, 1);
- 	DECLARE_REG(u32, fraglen, ctxt, 2);
-@@ -440,9 +440,6 @@ static void do_ffa_mem_xfer(const u64 func_id,
- 	u32 offset, nr_ranges;
- 	int ret = 0;
- 
--	BUILD_BUG_ON(func_id != FFA_FN64_MEM_SHARE &&
--		     func_id != FFA_FN64_MEM_LEND);
--
- 	if (addr_mbz || npages_mbz || fraglen > len ||
- 	    fraglen > KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE) {
- 		ret = FFA_RET_INVALID_PARAMETERS;
-@@ -517,6 +514,13 @@ static void do_ffa_mem_xfer(const u64 func_id,
- 	goto out_unlock;
- }
- 
-+#define do_ffa_mem_xfer(fid, res, ctxt)				\
-+	do {							\
-+		BUILD_BUG_ON((fid) != FFA_FN64_MEM_SHARE &&	\
-+			     (fid) != FFA_FN64_MEM_LEND);	\
-+		__do_ffa_mem_xfer((fid), (res), (ctxt));	\
-+	} while (0);
-+
- static void do_ffa_mem_reclaim(struct arm_smccc_res *res,
- 			       struct kvm_cpu_context *ctxt)
- {
+LGTM, macro expansion makes the relation a bit more obvious. Feel free
+to add:
 
-It preserves the build-time assertion, which was the intention of the
-original author.
-
-I can easily squash that in the original commit, avoiding the headache
-of backporting both patch to stable.
-
-	M.
+Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 
 -- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+Oliver
