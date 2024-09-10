@@ -1,102 +1,128 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 239C01885AA;
-	Tue, 10 Sep 2024 09:08:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BD37171671;
+	Tue, 10 Sep 2024 09:15:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725959333; cv=none; b=SA1aGra1zb4I/iT/VeqA+PsrVxmI9Wr847hkj/0xGMaRYhcmBZZWQIuVH1eMAq2XRyhMj9UULvxzdGUdZ8p1tOY6oLKlc1d7tme8M9+K5EWiWKB45O+qPp0SPaYELQpDQoqghVFsBNeoA+VV+bX1aHyS1auGXlwdJUuKIUFs/uo=
+	t=1725959721; cv=none; b=k81ItrsuDo9npDxWlIeGwGFfKLtPdQH9vByoVP6UwV1f0Mn/UxdAeCWJeLFzMBlfgGuUkPPhjimoRG1flvlGMUqwUsky5NT55UVdM9s25OJmFDV+QL92HX7NC4VQmvjwusPW5bm+FTAzuL4ZsOhg8ufk7l9eXr0xogzyW/7SILQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725959333; c=relaxed/simple;
-	bh=T/HKp5JbA0TTvWWFoCQ/ayf2yy3UYyJBk7cb6yAQ8wc=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TbWj7kMOgoqC62fvHST4NP5QAe9cJPQJKH86nMXxmS9/MQJ1jEvUsxWjdkTeUy0ZSXjAPEmwWHRSY0V7CO0hirS8aj7KBecy45nYDzcUntIb1Sf35sJW/97+/IWAtqLwAp3npEDq8xTUG6LIh0gE+63u2JXZ8RyyPxzXHQyRlIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cObyiDRb; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cObyiDRb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72A11C4CEC3;
-	Tue, 10 Sep 2024 09:08:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725959332;
-	bh=T/HKp5JbA0TTvWWFoCQ/ayf2yy3UYyJBk7cb6yAQ8wc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=cObyiDRb4NHLiFz1ocLk8sYrWXRftoejhpEa3/CbdSGHkE0LKfV8ZVaFQNFhBy+mj
-	 brdOsuvmmnRGhoYH94/GPx1anwbKmSTb1EwhDB2Cy5fHnY8DDjw2HAsllCb+F6i20+
-	 syTH/VCqrz6QAgMMe943ipoGOxxWoUj1cUJcmJgoStvi942uKFuP/s4udIIipWgm+y
-	 X3Pvy+Nz8boAV5pD2RhGudxwvK8hFqhGNqB9KsWl1XyGAJr/nS4GB5uK989VRYAUFb
-	 p33/CLtx6MNqiLk9blYcNlewQi9jaKKYPCSY5BUtvU/ssPn5f3jFLlLQAhQ9f+WDP9
-	 Hxcs+r5JFxPMg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1snwri-00Bfjh-3y;
-	Tue, 10 Sep 2024 10:08:50 +0100
-Date: Tue, 10 Sep 2024 10:08:49 +0100
-Message-ID: <86v7z37u5a.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Anastasia Belova <abelova@astralinux.ru>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v2] arm64: KVM: define ESR_ELx_EC_* constants as UL
-In-Reply-To: <20240910085016.32120-1-abelova@astralinux.ru>
-References: <865xr5856r.wl-maz@kernel.org>
-	<20240910085016.32120-1-abelova@astralinux.ru>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1725959721; c=relaxed/simple;
+	bh=sWmvYjt7uSUB9j2qE+JpMvBWwIknNNTJ9dnFTdiTjzM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:References:
+	 In-Reply-To:Content-Type; b=QuSr4eJ3cU9j1XwUvGeby/d8P5vOwuVeCVgcix3JM1bXoWKEfkoiUwO/qPap2iBEnWgl36O0db6sazb79b9RhKCXqMYoWKR+Ym0vF5qVIC7B15SZIEdpXa6FfZOa8HFd5k+f5TBnwKvRHVKVgWk0i5ttnBxx3h8u3C9ATRF5UB8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E4C1E113E;
+	Tue, 10 Sep 2024 02:15:47 -0700 (PDT)
+Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 689113F66E;
+	Tue, 10 Sep 2024 02:15:14 -0700 (PDT)
+Message-ID: <dfc21e62-8429-4df3-8df7-2460781e3c58@arm.com>
+Date: Tue, 10 Sep 2024 10:15:13 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: catalin.marinas@arm.com, will@kernel.org, abelova@astralinux.ru, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org, stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 12/19] efi: arm64: Map Device with Prot Shared
+To: Gavin Shan <gshan@redhat.com>, Steven Price <steven.price@arm.com>,
+ kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun <alpergun@google.com>
+Content-Language: en-US
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+References: <20240819131924.372366-1-steven.price@arm.com>
+ <20240819131924.372366-13-steven.price@arm.com>
+ <29016e56-e632-422d-a4d2-1891fad2c565@redhat.com>
+In-Reply-To: <29016e56-e632-422d-a4d2-1891fad2c565@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, 10 Sep 2024 09:50:16 +0100,
-Anastasia Belova <abelova@astralinux.ru> wrote:
+On 10/09/2024 05:15, Gavin Shan wrote:
+> On 8/19/24 11:19 PM, Steven Price wrote:
+>> From: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>
+>> Device mappings need to be emualted by the VMM so must be mapped shared
+>> with the host.
+>>
+>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>> Changes since v4:
+>>   * Reworked to use arm64_is_iomem_private() to decide whether the memory
+>>     needs to be decrypted or not.
+>> ---
+>>   arch/arm64/kernel/efi.c | 12 ++++++++++--
+>>   1 file changed, 10 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/arch/arm64/kernel/efi.c b/arch/arm64/kernel/efi.c
+>> index 712718aed5dd..95f8e8bf07f8 100644
+>> --- a/arch/arm64/kernel/efi.c
+>> +++ b/arch/arm64/kernel/efi.c
+>> @@ -34,8 +34,16 @@ static __init pteval_t 
+>> create_mapping_protection(efi_memory_desc_t *md)
+>>       u64 attr = md->attribute;
+>>       u32 type = md->type;
+>> -    if (type == EFI_MEMORY_MAPPED_IO)
+>> -        return PROT_DEVICE_nGnRE;
+>> +    if (type == EFI_MEMORY_MAPPED_IO) {
+>> +        pgprot_t prot = __pgprot(PROT_DEVICE_nGnRE);
+>> +
+>> +        if (arm64_is_iomem_private(md->phys_addr,
+>> +                       md->num_pages << EFI_PAGE_SHIFT))
+>> +            prot = pgprot_encrypted(prot);
+>> +        else
+>> +            prot = pgprot_decrypted(prot);
+>> +        return pgprot_val(prot);
+>> +    }
 > 
-> Add explicit casting to prevent expantion of 32th bit of
-> u32 into highest half of u64 in several places.
+> Question: the second parameter (@size) passed to 
+> arm64_is_iomem_private() covers the
+> whole region. In [PATCH v5 10/19] arm64: Override set_fixmap_io, the 
+> size has been
+> truncated to the granule size (4KB). They look inconsistent and I don't 
+> understand
+> the reason.
+
+Agreed, and the comment in patches 09/19 and 10/19 kind of vaguely 
+explains this. For set_fixmap_io, we are trying to map a PAGE_SIZE, 
+always. And when we want to check the "Is the range Private ?" the
+answer could be different based on the PAGE_SIZE used by the kernel.
+This is due to the fact that RMM always tracks the RIPAS for a 4K
+granule and not the OS page size. So, if the kernel uses a 64K page
+size, the RMM cannot confirm that the region is entirely RIPAS_DEV
+if only the 4K granule is indeed marked as RIPAS_DEV. However, given
+the same driver works for a 4K page size kernel, we can safely assume
+that the driver doesn't access it beyond the 4K range  with FIXMAP.
+
+e.g:
+
+Addr  = 0x100000        +0x2000              0x110000
+RIPAS = [ EMPTY | EMPTY | DEV | EMPTY | ...] [EMPTY | ...]
+
+So, if we were to check the RIPAS of 0x102000, we have to restrict the
+check to 4K (for the FIXMAP). Elswhere, we get the exact size of the
+requested map region and can use that to check the state.
+
+I agree that we should have a comment explaining this in the appropriate
+patch.
+
+Kind regards
+Suzuki
+
+
 > 
-> For example, in inject_abt64:
-> ESR_ELx_EC_DABT_LOW << ESR_ELx_EC_SHIFT = 0x24 << 26.
-> This operation's result is int with 1 in 32th bit.
-> While casting this value into u64 (esr is u64) 1
-> fills 32 highest bits.
+> Thanks,
+> Gavin
 > 
-> Found by Linux Verification Center (linuxtesting.org) with SVACE.
-> 
-> Fixes: aa8eff9bfbd5 ("arm64: KVM: fault injection into a guest")
-> Signed-off-by: Anastasia Belova <abelova@astralinux.ru>
 
-nit: the subject line is misleading, as this doesn't only affect KVM,
-but the whole of the arm64 port (the exception classes form a generic
-architectural construct).
-
-This also probably deserve a Cc stable.
-
-Will, Catalin: I'm happy to queue this in the KVM tree, but if you are
-taking it directly:
-
-Acked-by: Marc Zyngier <maz@kernel.org>
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
