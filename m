@@ -1,51 +1,51 @@
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1FB7191F97
-	for <kvmarm@lists.linux.dev>; Tue, 10 Sep 2024 15:25:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01590193081
+	for <kvmarm@lists.linux.dev>; Tue, 10 Sep 2024 15:25:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725981913; cv=none; b=GVCeeA7++RYZzIQXbANE1fg7I4c23Qcmc2ezIwTs8p4LEsZBiadKgerZOIUCzXWAdhq6hz0z3rEPeA7EBB6mCmkodvNM5m5B7z3C+Y2dE9IqI+NM8xzQrHzC3E0DtsaR865AJKPEpZJj9GhHrR80yg97fxt4fQfQ3xtYV6J1Irw=
+	t=1725981934; cv=none; b=O6HNytuj+m5lEL6sIKN+1u1BljRpYqcOodOBhPDKwW5QzS4H3pY8rcQzRrJ7+hf49bzNQMxXg+ZYc2gHDAk/D00U8l+bHeeVUaC+q3Taot2/r7P+R8hSapEfoWROicKi/uA5Htlrb1/P4oMi3Kd9De3Wgk7rvaMr2PVIfTQMOSc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725981913; c=relaxed/simple;
-	bh=GMykZu9zJGf4fBCWBKK4YMIS2yhYXrut9F4hJMLGt9E=;
+	s=arc-20240116; t=1725981934; c=relaxed/simple;
+	bh=lwh5M10z4RNM2Da7RQPLG2d6B6aeiw/t0tqiRaPr1iw=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LJa0sjrMOD6SClJ+MjncIzu0fklBVekCVNL6FP5ldAQYAjrxPNjEFqqnU4MB0Lpi34dqY8Ozyd+aK6xPakyMGv2Hz7q1n6WKe8oi+iC/VGA0FXjWfvYRgXFZYLod8rjWoU5mGutnwI1lteP5LjUwD8BiG0FszxNNJPzX5tFug30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b=ATSBV3pE; arc=none smtp.client-ip=99.78.197.220
+	 MIME-Version:Content-Type; b=Aq7nhpgnKEqgaz9dbP+CtD4fyJCyiMT4azBAyukoiW+bjCz1hiLLIdWWByEUFsW2EYgYCoiupiSRcJYxoRetbi9UMnBdZREfFO6WnqhdYUqrfbcWfpWz6MefUfNxGqFScMRJkVQvROWUTDg07F5t3ErFxEG4s7+Xi6/CvTX5M/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b=jHnIZcIX; arc=none smtp.client-ip=52.119.213.152
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b="ATSBV3pE"
+	dkim=pass (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b="jHnIZcIX"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1725981911; x=1757517911;
+  t=1725981933; x=1757517933;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=VCZtCvHosy1tl36gR64QE1Z05bT4o2QPSCtwKVmrIoM=;
-  b=ATSBV3pEUrwOOAvtFIbX/4t3OFjpZ7mjAMLTSg1Z1rcy7l0BJ424rojS
-   aGfHOLuL/UA5Z08w2b/F77DHtOCj5/5g08XpZYD3c1J5Eg4FhNM0ETeh4
-   L6LA/ykHxSuV/iTH2nTxLS74cYzAzMfeGreHhBIEtwE4zKBXqC99ZJMJy
-   I=;
+  bh=LBFZ6gE4Eg8idRjndx3TROKSBGwrVfkZ4QZJ3iCcd00=;
+  b=jHnIZcIXwE/qjiI0+18HU4tYyKi1gQpwkAbAvRw9l+ewtfDndEgF7AaK
+   3gcEgrWSv9IGdXBjINbBryn6bkgr8rRJmmVWuJl+hmi4cGyZozYfirJl6
+   XXrQYXPjB7HDjAkSikT5Z3MXpw5Q4RgdD+l5SjBicOWBPLnqF5/pDYI0/
+   U=;
 X-IronPort-AV: E=Sophos;i="6.10,217,1719878400"; 
-   d="scan'208";a="124219849"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2024 15:25:11 +0000
-Received: from EX19MTAEUC001.ant.amazon.com [10.0.17.79:31177]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.13.80:2525] with esmtp (Farcaster)
- id 21c9d66f-c03c-4e6f-b416-01e7a52443d5; Tue, 10 Sep 2024 15:25:10 +0000 (UTC)
-X-Farcaster-Flow-ID: 21c9d66f-c03c-4e6f-b416-01e7a52443d5
-Received: from EX19D004EUA004.ant.amazon.com (10.252.50.183) by
- EX19MTAEUC001.ant.amazon.com (10.252.51.155) with Microsoft SMTP Server
+   d="scan'208";a="24631299"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2024 15:25:30 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.38.20:1552]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.40.54:2525] with esmtp (Farcaster)
+ id a5951997-5357-4874-bf9e-57a899457c9a; Tue, 10 Sep 2024 15:25:29 +0000 (UTC)
+X-Farcaster-Flow-ID: a5951997-5357-4874-bf9e-57a899457c9a
+Received: from EX19D020UWC002.ant.amazon.com (10.13.138.147) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 10 Sep 2024 15:25:10 +0000
-Received: from EX19MTAUEC001.ant.amazon.com (10.252.135.222) by
- EX19D004EUA004.ant.amazon.com (10.252.50.183) with Microsoft SMTP Server
+ Tue, 10 Sep 2024 15:25:28 +0000
+Received: from EX19MTAUWB001.ant.amazon.com (10.250.64.248) by
+ EX19D020UWC002.ant.amazon.com (10.13.138.147) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 10 Sep 2024 15:25:09 +0000
+ Tue, 10 Sep 2024 15:25:28 +0000
 Received: from dev-dsk-nikwip-1b-bc9ec026.eu-west-1.amazon.com (10.253.74.52)
- by mail-relay.amazon.com (10.252.135.200) with Microsoft SMTP Server
+ by mail-relay.amazon.com (10.250.64.254) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34
- via Frontend Transport; Tue, 10 Sep 2024 15:25:08 +0000
+ via Frontend Transport; Tue, 10 Sep 2024 15:25:26 +0000
 From: Nikolas Wipper <nikwip@amazon.de>
 To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson
 	<seanjc@google.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
@@ -57,9 +57,9 @@ CC: Nicolas Saenz Julienne <nsaenz@amazon.com>, Alexander Graf
 	<kvm@vger.kernel.org>, <x86@kernel.org>, <linux-doc@vger.kernel.org>,
 	<linux-kselftest@vger.kernel.org>, <kvmarm@lists.linux.dev>,
 	<kvm-riscv@lists.infradead.org>, Nikolas Wipper <nikwip@amazon.de>
-Subject: [PATCH 10/15] KVM: x86/mmu: Implement PWALK_STATUS_READ_ONLY_PTE_GPA in page walker
-Date: Tue, 10 Sep 2024 15:22:02 +0000
-Message-ID: <20240910152207.38974-11-nikwip@amazon.de>
+Subject: [PATCH 11/15] KVM: x86: Introduce generic gva to gpa translation function
+Date: Tue, 10 Sep 2024 15:22:03 +0000
+Message-ID: <20240910152207.38974-12-nikwip@amazon.de>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20240910152207.38974-1-nikwip@amazon.de>
 References: <20240910152207.38974-1-nikwip@amazon.de>
@@ -72,46 +72,51 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 
-Implement PWALK_STATUS_READ_ONLY_PTE_GPA in the page walker. This status
-flag is set when setting an accessed or dirty bit fails, because the
-memory of the page table entry was marked as read-only
+Introduce a function to translate gvas to gpas with the ability to control
+set_bit_mode, access mode and flags, as well as receive status codes.
 
 Signed-off-by: Nikolas Wipper <nikwip@amazon.de>
 ---
- arch/x86/include/asm/kvm_host.h | 2 ++
- arch/x86/kvm/mmu/paging_tmpl.h  | 5 ++++-
- 2 files changed, 6 insertions(+), 1 deletion(-)
+ arch/x86/include/asm/kvm_host.h |  3 +++
+ arch/x86/kvm/x86.c              | 11 +++++++++++
+ 2 files changed, 14 insertions(+)
 
 diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 1c5aaf55c683..7ac1956f6f9b 100644
+index 7ac1956f6f9b..ae05e917d7ea 100644
 --- a/arch/x86/include/asm/kvm_host.h
 +++ b/arch/x86/include/asm/kvm_host.h
-@@ -290,6 +290,8 @@ enum x86_intercept_stage;
- #define PWALK_FORCE_SET_ACCESSED	BIT(2)
- #define PWALK_SET_ALL	(PWALK_SET_ACCESSED | PWALK_SET_DIRTY)
+@@ -2160,6 +2160,9 @@ static inline bool kvm_mmu_unprotect_gfn_and_retry(struct kvm_vcpu *vcpu,
+ void kvm_mmu_free_roots(struct kvm *kvm, struct kvm_mmu *mmu,
+ 			ulong roots_to_free);
+ void kvm_mmu_free_guest_mode_roots(struct kvm *kvm, struct kvm_mmu *mmu);
++gpa_t kvm_mmu_gva_to_gpa(struct kvm_vcpu *vcpu, gva_t gva, u64 access,
++			 u64 flags, struct x86_exception *exception,
++			 u16 *status);
+ gpa_t kvm_mmu_gva_to_gpa_read(struct kvm_vcpu *vcpu, gva_t gva,
+ 			      struct x86_exception *exception);
+ gpa_t kvm_mmu_gva_to_gpa_write(struct kvm_vcpu *vcpu, gva_t gva,
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index be696b60aba6..27fc71aaa1e4 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -7577,6 +7577,17 @@ gpa_t translate_nested_gpa(struct kvm_vcpu *vcpu, gpa_t gpa, u64 access,
+ 	return t_gpa;
+ }
  
-+#define PWALK_STATUS_READ_ONLY_PTE_GPA BIT(0)
++gpa_t kvm_mmu_gva_to_gpa(struct kvm_vcpu *vcpu, gva_t gva, u64 access,
++			 u64 flags, struct x86_exception *exception,
++			 u16 *status)
++{
++	struct kvm_mmu *mmu = vcpu->arch.walk_mmu;
 +
- /* apic attention bits */
- #define KVM_APIC_CHECK_VAPIC	0
- /*
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 985a19dda603..0eefa48e0e7f 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -244,8 +244,11 @@ static int FNAME(update_accessed_dirty_bits)(struct kvm_vcpu *vcpu,
- 		 * overwrite the read-only memory to set the accessed and dirty
- 		 * bits.
- 		 */
--		if (unlikely(!walker->pte_writable[level - 1]))
-+		if (unlikely(!walker->pte_writable[level - 1])) {
-+			if (status)
-+				*status |= PWALK_STATUS_READ_ONLY_PTE_GPA;
- 			continue;
-+		}
- 
- 		ret = __try_cmpxchg_user(ptep_user, &orig_pte, pte, fault);
- 		if (ret)
++	return mmu->gva_to_gpa(vcpu, mmu, gva, access, flags, exception,
++			       status);
++}
++EXPORT_SYMBOL_GPL(kvm_mmu_gva_to_gpa);
++
+ gpa_t kvm_mmu_gva_to_gpa_read(struct kvm_vcpu *vcpu, gva_t gva,
+ 			      struct x86_exception *exception)
+ {
 -- 
 2.40.1
 
