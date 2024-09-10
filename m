@@ -1,42 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4FED17C7C9;
-	Tue, 10 Sep 2024 20:27:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1A451741E8;
+	Tue, 10 Sep 2024 20:35:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726000070; cv=none; b=hIxLpeY6UKPrxqP6QTAVAUg8xIRsHNiaeTRYfV076T2pBjh2yscyMTc2iLeeRXucY+khSyrxuqy/t17bw3AFKyXI8Zm+sR5aFEtY0surs3SOBl+v/7d/hxeYdYb4uZAAEwIdwXXYLEaol7oRRi7iXqUkZUOexGtAFWPolA9ieLI=
+	t=1726000540; cv=none; b=Pklz9mdlg4zK3/H+iJvJqZk+bm+Auzn8IdP6TIeYeWphYbfKhY0iqEZ5cZrvWFpNtcVNaOL04YloGfTSUKQ33D8l5YsEU7GojQHti09+YQUrZBx42NVBnD2NRCfN3S6CIUSK72XynRBpQ4XrzGPL26YrAOuyx2FyGu0hpydWAfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726000070; c=relaxed/simple;
-	bh=F1/9VLarbTJ9VCxON6d1CtL/BQZZi7nOBEwpu4FUHaA=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sy52HVe2ZVET8iPLl81U3tycZDlQCcOazXtQz6qIZAKMjBNybPTYsYCkZCt1hK2s6DBMG4haEIEBFHpLnhNPNABCLDS06R7B+bLAIJzKaRtskqndCrI7kuQnoT7M8b1iy1k8CID8LrpUkUb1nZBNECfQg87pqx/jma6cKDFBokc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A33fyGBi; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1726000540; c=relaxed/simple;
+	bh=ZBvdMqjUSCBx/TtQ+mFeqJuGoEfmT4hpGxtbN9BKUzs=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bb3bsIteNVT1z18JYLFEMFYH8qzgGeysU+0L7xUMoUPr9dwEsVf23cVBMsD67C6s+oQ0FYiFxaAugcWEXc4SjRHEaqVbtibYX+ETtPx/yIrax1AExM7oFlAXMLNylmmRPraZiQWuslvFyuMdYp9OI6dHLF4w7wkF2Ejt/kKprHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Plh5EDmU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A33fyGBi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87540C4CEC3;
-	Tue, 10 Sep 2024 20:27:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Plh5EDmU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D395C4CEC3;
+	Tue, 10 Sep 2024 20:35:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726000070;
-	bh=F1/9VLarbTJ9VCxON6d1CtL/BQZZi7nOBEwpu4FUHaA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=A33fyGBijBMkVnizFcOT9RMyk3X4W5JkxFmasSOR/p0mBtCxuWRSvb6DvtBdETrGm
-	 pvBoFWjtYWd23vigu96nDocpSRQDf4tAkALbcIzMCLh3Gep1c6ZDQLquA4kbNrhYdQ
-	 Vy2iJyj125yym7qJ/UDZl+iViuRuAfLnJW3vTseIKaD+9hqQLbcYD/tARb5wYzVsCY
-	 VU/GBqakb7x3YFe3kxguXRH1jUq23zYIPY6Qp4tu5AUI8UUX+ZxOxQlWegxbZwS51C
-	 tljaJjvhbk5RnSnNDMRMUh9KVNLdDtZNPub4pTLmaagHqIJDJyO1Ep4Ja6Q/52BK6+
-	 1oaxqUo2UPZpg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	s=k20201202; t=1726000539;
+	bh=ZBvdMqjUSCBx/TtQ+mFeqJuGoEfmT4hpGxtbN9BKUzs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=Plh5EDmUDB3Ck7HOx2XXcxpVfImxu3quUJBIqWEwAEAYZAEH02wM4xFqWDLaTOEQX
+	 4lSuQRfeJrMfmsTfEm+3cK0gVLKyJiOaTiuFLLiXZLLPM/nuAAGTD/wkYI+i20MfEH
+	 4eV03xyfI5y0Hd73JhxAmh6hLmo+PZwPe3g6d0m85bnaGUI1HZh9QdJdbYVw6gljLS
+	 HMyqb+sLW0B9uLv2O1Ie0pYJMD0VrIUYHdhSiTVUa4XN7hCGfovjdOmr/pfik4Izt1
+	 34Zvfp7Y5vpF007iPyfWBrsFBrczFkocj31jV5V8DCpsCMxJYLq1+xBxz92xxkgnSf
+	 j+R7RIA1Ta8Bg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1so7Sm-00BsCg-Am;
-	Tue, 10 Sep 2024 21:27:48 +0100
-Date: Tue, 10 Sep 2024 21:27:47 +0100
-Message-ID: <86plpb6ypo.wl-maz@kernel.org>
+	id 1so7aL-00BsI0-42;
+	Tue, 10 Sep 2024 21:35:37 +0100
 From: Marc Zyngier <maz@kernel.org>
-To: Sebastian Ene <sebastianene@google.com>
-Cc: akpm@linux-foundation.org,
+To: akpm@linux-foundation.org,
 	alexghiti@rivosinc.com,
 	ankita@nvidia.com,
 	ardb@kernel.org,
@@ -52,74 +49,57 @@ Cc: akpm@linux-foundation.org,
 	suzuki.poulose@arm.com,
 	will@kernel.org,
 	yuzenghui@huawei.com,
-	kvmarm@lists.linux.dev,
+	Sebastian Ene <sebastianene@google.com>
+Cc: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	kernel-team@android.com
-Subject: Re: [PATCH v10 5/5] KVM: arm64: Register ptdump with debugfs on guest creation
-In-Reply-To: <20240909124721.1672199-6-sebastianene@google.com>
+Subject: Re: [PATCH v10 0/5] arm64: ptdump: View the second stage page-tables
+Date: Tue, 10 Sep 2024 21:35:33 +0100
+Message-Id: <172600049355.391902.15401581703143159469.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240909124721.1672199-1-sebastianene@google.com>
 References: <20240909124721.1672199-1-sebastianene@google.com>
-	<20240909124721.1672199-6-sebastianene@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sebastianene@google.com, akpm@linux-foundation.org, alexghiti@rivosinc.com, ankita@nvidia.com, ardb@kernel.org, catalin.marinas@arm.com, christophe.leroy@csgroup.eu, james.morse@arm.com, vdonnefort@google.com, mark.rutland@arm.com, oliver.upton@linux.dev, rananta@google.com, ryan.roberts@arm.com, shahuang@redhat.com, suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kernel-team@android.com
+X-SA-Exim-Rcpt-To: akpm@linux-foundation.org, alexghiti@rivosinc.com, ankita@nvidia.com, ardb@kernel.org, catalin.marinas@arm.com, christophe.leroy@csgroup.eu, james.morse@arm.com, vdonnefort@google.com, mark.rutland@arm.com, oliver.upton@linux.dev, rananta@google.com, ryan.roberts@arm.com, shahuang@redhat.com, suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com, sebastianene@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 09 Sep 2024 13:47:21 +0100,
-Sebastian Ene <sebastianene@google.com> wrote:
+On Mon, 09 Sep 2024 12:47:16 +0000, Sebastian Ene wrote:
+> This series extends the ptdump support to allow dumping the guest
+> stage-2 pagetables. When CONFIG_PTDUMP_STAGE2_DEBUGFS is enabled, ptdump
+> registers the new following files under debugfs:
+> - /sys/debug/kvm/<guest_id>/stage2_page_tables
+> - /sys/debug/kvm/<guest_id>/stage2_levels
+> - /sys/debug/kvm/<guest_id>/ipa_range
 > 
-> While arch/*/mem/ptdump handles the kernel pagetable dumping code,
-> introduce KVM/ptdump to show the guest stage-2 pagetables. The
-> separation is necessary because most of the definitions from the
-> stage-2 pagetable reside in the KVM path and we will be invoking
-> functionality specific to KVM. Introduce the PTDUMP_STAGE2_DEBUGFS config.
-> 
-> When a guest is created, register a new file entry under the guest
-> debugfs dir which allows userspace to show the contents of the guest
-> stage-2 pagetables when accessed.
-> 
-> Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
-> ---
->  arch/arm64/include/asm/kvm_host.h |   6 +
->  arch/arm64/kvm/Kconfig            |  17 ++
->  arch/arm64/kvm/Makefile           |   1 +
->  arch/arm64/kvm/arm.c              |   1 +
->  arch/arm64/kvm/ptdump.c           | 268 ++++++++++++++++++++++++++++++
->  5 files changed, 293 insertions(+)
->  create mode 100644 arch/arm64/kvm/ptdump.c
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index a33f5996ca9f..4acd589f086b 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -1473,4 +1473,10 @@ void kvm_set_vm_id_reg(struct kvm *kvm, u32 reg, u64 val);
->  		(pa + pi + pa3) == 1;					\
->  	})
->  
-> +#ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
-> +void kvm_s2_ptdump_create_debugfs(struct kvm *kvm);
-> +#else
-> +static inline void kvm_s2_ptdump_create_debugfs(struct kvm *kvm) {}
-> +#endif /* CONFIG_PTDUMP_STAGE2_DEBUGFS */
-> +
+> [...]
 
-I made the executive decision to move this to kvm_mmu.h, as this is
-slightly more logical.
+Applied to next, thanks!
 
-Thanks,
+[1/5] KVM: arm64: Move pagetable definitions to common header
+      commit: 29caeda359da15d16963096043cda39530f81cc4
+[2/5] arm64: ptdump: Expose the attribute parsing functionality
+      commit: acc3d3a8176651a839056c7da4b925ea0bcc38c2
+[3/5] arm64: ptdump: Use the ptdump description from a local context
+      commit: 9182301a7bd2564fb050ade9820333c8b1adfcc2
+[4/5] arm64: ptdump: Don't override the level when operating on the stage-2 tables
+      commit: 79c4c7284f92d5e780c8532c343ca2cacfaf5125
+[5/5] KVM: arm64: Register ptdump with debugfs on guest creation
+      commit: 7c4f73548ed15476daf1101f66648085eda65067
+
+Cheers,
 
 	M.
-
 -- 
 Without deviation from the norm, progress is not possible.
+
+
