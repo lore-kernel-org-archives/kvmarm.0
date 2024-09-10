@@ -1,127 +1,125 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C502BA45;
-	Tue, 10 Sep 2024 20:26:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4FED17C7C9;
+	Tue, 10 Sep 2024 20:27:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725999972; cv=none; b=EvsjLOI2g28MPvD/RLjLzSg/wXRHmel1aPLQqIWhEIZ5SdexBjgGpCo73+MW5WBPPvqaZgB8UltOERBHhunTAxTzzOqDsZsb0hXO49GJx0CZgrd2HUxw5L1kj6NBBeike/A18KzcVpFbQGVqfCrS94VsAQyEB44XoHgUzhuP2jg=
+	t=1726000070; cv=none; b=hIxLpeY6UKPrxqP6QTAVAUg8xIRsHNiaeTRYfV076T2pBjh2yscyMTc2iLeeRXucY+khSyrxuqy/t17bw3AFKyXI8Zm+sR5aFEtY0surs3SOBl+v/7d/hxeYdYb4uZAAEwIdwXXYLEaol7oRRi7iXqUkZUOexGtAFWPolA9ieLI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725999972; c=relaxed/simple;
-	bh=/vRC6UW5TKpXSnzoNSBj6lJfT63gnYyuAM0O5g3j+7U=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Fl2eRjHiutPckTw2p1jqmTx4GGpwIraiUEHlWTUpybdnO7PMK0XzI30yf6oMhtIrQLye9mkovYt2zAOO2O3mCjvNlvu3ZHxyq1wyghdolt/al1kTITY5/icNviM2Vs/Y8bbrpoZXvo3TjMKeoGyvfVvdJRgI3Mhl2c/9yMnTVy0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IVpLwP3P; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1726000070; c=relaxed/simple;
+	bh=F1/9VLarbTJ9VCxON6d1CtL/BQZZi7nOBEwpu4FUHaA=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sy52HVe2ZVET8iPLl81U3tycZDlQCcOazXtQz6qIZAKMjBNybPTYsYCkZCt1hK2s6DBMG4haEIEBFHpLnhNPNABCLDS06R7B+bLAIJzKaRtskqndCrI7kuQnoT7M8b1iy1k8CID8LrpUkUb1nZBNECfQg87pqx/jma6cKDFBokc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A33fyGBi; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IVpLwP3P"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A9B3C4CEC3;
-	Tue, 10 Sep 2024 20:26:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A33fyGBi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87540C4CEC3;
+	Tue, 10 Sep 2024 20:27:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725999971;
-	bh=/vRC6UW5TKpXSnzoNSBj6lJfT63gnYyuAM0O5g3j+7U=;
-	h=From:Date:Subject:To:Cc:From;
-	b=IVpLwP3PN5TyPmbrRqw1W0DMCfJhFrKyDJadAo4MTiFrd+NEaiaeyOu9wmWUkEbQs
-	 NvtNVo4V9yXvAfmT1Eq8kpdfG2Z+F4+TFFZpDpMDnGSCsob0RJc6Zsc6kkGcciIlll
-	 LlZ7pxUTP6R/4PX3mrSNDpviRRPv/9p5VcaMy7CtYu934yFVt2izSkqzAKsVWg9WLn
-	 4P02gs7VIZN63MeZl3FcdE3psz+nnWPEHKfyx/59Q/19n/4HlURh/Cw7di6CwDeYHd
-	 qqr4RcOc1ZCgiDoir1vlwK/PbvGDE+GLtPtznQVmJ4rXcktL0Yd6j8dcUSXv8aT9b+
-	 lM5aZgWGbdv4Q==
-From: Mark Brown <broonie@kernel.org>
-Date: Tue, 10 Sep 2024 21:21:17 +0100
-Subject: [PATCH] KVM: arm64: Constrain the host to the maximum shared SVE
- VL with pKVM
+	s=k20201202; t=1726000070;
+	bh=F1/9VLarbTJ9VCxON6d1CtL/BQZZi7nOBEwpu4FUHaA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=A33fyGBijBMkVnizFcOT9RMyk3X4W5JkxFmasSOR/p0mBtCxuWRSvb6DvtBdETrGm
+	 pvBoFWjtYWd23vigu96nDocpSRQDf4tAkALbcIzMCLh3Gep1c6ZDQLquA4kbNrhYdQ
+	 Vy2iJyj125yym7qJ/UDZl+iViuRuAfLnJW3vTseIKaD+9hqQLbcYD/tARb5wYzVsCY
+	 VU/GBqakb7x3YFe3kxguXRH1jUq23zYIPY6Qp4tu5AUI8UUX+ZxOxQlWegxbZwS51C
+	 tljaJjvhbk5RnSnNDMRMUh9KVNLdDtZNPub4pTLmaagHqIJDJyO1Ep4Ja6Q/52BK6+
+	 1oaxqUo2UPZpg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1so7Sm-00BsCg-Am;
+	Tue, 10 Sep 2024 21:27:48 +0100
+Date: Tue, 10 Sep 2024 21:27:47 +0100
+Message-ID: <86plpb6ypo.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sebastian Ene <sebastianene@google.com>
+Cc: akpm@linux-foundation.org,
+	alexghiti@rivosinc.com,
+	ankita@nvidia.com,
+	ardb@kernel.org,
+	catalin.marinas@arm.com,
+	christophe.leroy@csgroup.eu,
+	james.morse@arm.com,
+	vdonnefort@google.com,
+	mark.rutland@arm.com,
+	oliver.upton@linux.dev,
+	rananta@google.com,
+	ryan.roberts@arm.com,
+	shahuang@redhat.com,
+	suzuki.poulose@arm.com,
+	will@kernel.org,
+	yuzenghui@huawei.com,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kernel-team@android.com
+Subject: Re: [PATCH v10 5/5] KVM: arm64: Register ptdump with debugfs on guest creation
+In-Reply-To: <20240909124721.1672199-6-sebastianene@google.com>
+References: <20240909124721.1672199-1-sebastianene@google.com>
+	<20240909124721.1672199-6-sebastianene@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240910-kvm-arm64-limit-guest-vl-v1-1-54df40b95ffb@kernel.org>
-X-B4-Tracking: v=1; b=H4sIADyq4GYC/x3MQQ5AMBBA0avIrE1SgoariEXVqAlF2mok4u4ay
- 7f4/wFPjslDlz3gKLLnY08o8gz0onZDyFMylKKsRFsIXKNF5WxT4caWA5qLfMC44VTPoxJaai1
- HSPnpaOb7X/fD+370TlaQagAAAA==
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
- James Morse <james.morse@arm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
- Fuad Tabba <tabba@google.com>
-Cc: Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org, 
- kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
- Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.15-dev-99b12
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2951; i=broonie@kernel.org;
- h=from:subject:message-id; bh=/vRC6UW5TKpXSnzoNSBj6lJfT63gnYyuAM0O5g3j+7U=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBm4KtgcGbqP1jiMA0U/QcL+yIVnZS3mIQtN3BHVkLk
- 4xEBMuaJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZuCrYAAKCRAk1otyXVSH0NRNB/
- 9XT/BOpsS6KyJqP7dJyHRnbt2jwFRAsoob01rk9CYemGuCAfn1bn6pN+6N0RA9ES9oYMzOPiZEIVp4
- BOtvReHeQdsP6UgU2oNuJJJtH1GhZwySs/fZuqtUc8f1a8wTQwNxFp0s1Vmei0l9AC9NGQIDSKm2SQ
- ATsU+dJMFccAbu2Oj38S669xLUhrEg3C8UbXRPu1PoonmI3bVeI1CVx5QKD4XyiQ2BHAsEvC76jPCt
- p63n7FvwLJx2OudS9fLMc5waRvjv059MECo7nAIWU2MKSVIdQVAZYaFBATL4iHylY7TuIOPLgh5emD
- reohv4tECOV66tjrhaOjFAxuvYnFwu
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: sebastianene@google.com, akpm@linux-foundation.org, alexghiti@rivosinc.com, ankita@nvidia.com, ardb@kernel.org, catalin.marinas@arm.com, christophe.leroy@csgroup.eu, james.morse@arm.com, vdonnefort@google.com, mark.rutland@arm.com, oliver.upton@linux.dev, rananta@google.com, ryan.roberts@arm.com, shahuang@redhat.com, suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-When pKVM saves and restores the host floating point state on a SVE system
-it programs the vector length in ZCR_EL2.LEN to be whatever the maximum VL
-for the PE is but uses a buffer allocated with kvm_host_sve_max_vl, the
-maximum VL shared by all PEs in the system. This means that if we run on a
-system where the maximum VLs are not consistent we will overflow the buffer
-on PEs which support larger VLs.
+On Mon, 09 Sep 2024 13:47:21 +0100,
+Sebastian Ene <sebastianene@google.com> wrote:
+> 
+> While arch/*/mem/ptdump handles the kernel pagetable dumping code,
+> introduce KVM/ptdump to show the guest stage-2 pagetables. The
+> separation is necessary because most of the definitions from the
+> stage-2 pagetable reside in the KVM path and we will be invoking
+> functionality specific to KVM. Introduce the PTDUMP_STAGE2_DEBUGFS config.
+> 
+> When a guest is created, register a new file entry under the guest
+> debugfs dir which allows userspace to show the contents of the guest
+> stage-2 pagetables when accessed.
+> 
+> Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |   6 +
+>  arch/arm64/kvm/Kconfig            |  17 ++
+>  arch/arm64/kvm/Makefile           |   1 +
+>  arch/arm64/kvm/arm.c              |   1 +
+>  arch/arm64/kvm/ptdump.c           | 268 ++++++++++++++++++++++++++++++
+>  5 files changed, 293 insertions(+)
+>  create mode 100644 arch/arm64/kvm/ptdump.c
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index a33f5996ca9f..4acd589f086b 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -1473,4 +1473,10 @@ void kvm_set_vm_id_reg(struct kvm *kvm, u32 reg, u64 val);
+>  		(pa + pi + pa3) == 1;					\
+>  	})
+>  
+> +#ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
+> +void kvm_s2_ptdump_create_debugfs(struct kvm *kvm);
+> +#else
+> +static inline void kvm_s2_ptdump_create_debugfs(struct kvm *kvm) {}
+> +#endif /* CONFIG_PTDUMP_STAGE2_DEBUGFS */
+> +
 
-Since the host will not currently attempt to make use of non-shared VLs fix
-this by explicitly setting the EL2 VL to be the maximum shared VL when we
-save and restore. This will enforce the limit on host VL usage. Should we
-wish to support asymmetric VLs this code will need to be updated along with
-the required changes for the host, patches have previously been posted:
+I made the executive decision to move this to kvm_mmu.h, as this is
+slightly more logical.
 
-  https://lore.kernel.org/r/20240730-kvm-arm64-fix-pkvm-sve-vl-v6-0-cae8a2e0bd66@kernel.org
+Thanks,
 
-Fixes: b5b9955617bc ("KVM: arm64: Eagerly restore host fpsimd/sve state in pKVM")
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- arch/arm64/kvm/hyp/include/hyp/switch.h | 2 +-
- arch/arm64/kvm/hyp/nvhe/hyp-main.c      | 7 ++++---
- 2 files changed, 5 insertions(+), 4 deletions(-)
+	M.
 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index f59ccfe11ab9..ab1425baf0e9 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -339,7 +339,7 @@ static inline void __hyp_sve_save_host(void)
- 	struct cpu_sve_state *sve_state = *host_data_ptr(sve_state);
- 
- 	sve_state->zcr_el1 = read_sysreg_el1(SYS_ZCR);
--	write_sysreg_s(ZCR_ELx_LEN_MASK, SYS_ZCR_EL2);
-+	write_sysreg_s(sve_vq_from_vl(kvm_host_sve_max_vl), SYS_ZCR_EL2);
- 	__sve_save_state(sve_state->sve_regs + sve_ffr_offset(kvm_host_sve_max_vl),
- 			 &sve_state->fpsr,
- 			 true);
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index f43d845f3c4e..90ff79950912 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -45,10 +45,11 @@ static void __hyp_sve_restore_host(void)
- 	 * the host. The layout of the data when saving the sve state depends
- 	 * on the VL, so use a consistent (i.e., the maximum) host VL.
- 	 *
--	 * Setting ZCR_EL2 to ZCR_ELx_LEN_MASK sets the effective length
--	 * supported by the system (or limited at EL3).
-+	 * Note that this constrains the PE to the maximum shared VL
-+	 * that was discovered, if we wish to use larger VLs this will
-+	 * need to be revisited.
- 	 */
--	write_sysreg_s(ZCR_ELx_LEN_MASK, SYS_ZCR_EL2);
-+	write_sysreg_s(sve_vq_from_vl(kvm_host_sve_max_vl), SYS_ZCR_EL2);
- 	__sve_restore_state(sve_state->sve_regs + sve_ffr_offset(kvm_host_sve_max_vl),
- 			    &sve_state->fpsr,
- 			    true);
-
----
-base-commit: 7c626ce4bae1ac14f60076d00eafe71af30450ba
-change-id: 20240910-kvm-arm64-limit-guest-vl-d5fba0c7cc7b
-
-Best regards,
 -- 
-Mark Brown <broonie@kernel.org>
-
+Without deviation from the norm, progress is not possible.
