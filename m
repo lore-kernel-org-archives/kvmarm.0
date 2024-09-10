@@ -1,200 +1,159 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 425C4198842;
-	Tue, 10 Sep 2024 16:59:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E489178384
+	for <kvmarm@lists.linux.dev>; Tue, 10 Sep 2024 18:18:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725987590; cv=none; b=lfx+yA8IxXpNHGDJ78DcBELM1hE1RAjDzdnYXLRpyrl6VFYwztTgRAml5LI6uqZuopEpnK4qeCEnIvk66MO1Fl1qYrK1WHChR7BRm3fIv2DsQ1RFcZ++CtP97K/A42fv7Zqmy7nCmdk34H/w7U9Zr2eEMo1/85vm/q5NOqe0zIA=
+	t=1725992332; cv=none; b=iTZG5xFCWcOTS8olah/RMBWHeoxMe0OjTXE+dsgL4OYvDhm2D7GaCb5Qu1Oekfo+bZ5ShhhF9yUthzay+qzH9SmK2n8PiZ1vf8+yzcPrDhoLkPvpptGLrE6gM5dexp8e5Q+gY2zaZnMsSAziB8SooMqDhU/QbUXfHB5gDLUAW7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725987590; c=relaxed/simple;
-	bh=3wuFIoLr691b/skwnVl1HScAP75KBHcXvy/8/CQt2WQ=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QFkWcq8r/4TQeXnavWORnBJWusimRGSVKEABFQ8AUQdQKbxjh/4+PO8JDREqEsXwVkKihdEySo+5uqEH2OWTTOG0ultSYz/WxLWYHty3y7zxPLBF6628wqnzP06+hWrElRsG2v6KR12AZ4suTl2s6NR1D+yLknNMU+pKyJIDG1s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rMWgz2BD; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1725992332; c=relaxed/simple;
+	bh=cX8E7Kd7KJjcUM/fS5ucxgvF6aBOoZSTP6rRvIrRuvE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=orkiuTDYWljVjsAQAWXoqUXISEreYKkSq1J9FrI7+M94tqjPw87lMl0PJbAHaCOgpSAh48Iv65dcHNmxBSMMtTEv/T5U0HukPxBCXxJFehR7BknZHVZoSvTun/ti3iQ97DxrbdUvR/46Vyeb1F3/TlnKq1E4/l8InUSm49jaahU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=eMBNfTv8; arc=none smtp.client-ip=91.218.175.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rMWgz2BD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2F4CC4CEC3;
-	Tue, 10 Sep 2024 16:59:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725987589;
-	bh=3wuFIoLr691b/skwnVl1HScAP75KBHcXvy/8/CQt2WQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rMWgz2BD95r+OzSxcnV1ug802GJby0Nl3G+E7GaDhe2myIcFLUMgUAcy83hFvvyYv
-	 49QXK+X0dNKojqKsAVOXx7g58v01C4nXNCmrBpY35i0vjwHH3wsP6NFCg8Cpsvi51c
-	 D5Uc16seSI3iKgV8lQnM49ucEnSRrGjJski63YAkQyHHAhP6pIa+Hx4AIbMvepFKSp
-	 16Nrh3InpnJZOmZ2r4QT8xgM73vpgLVTkGMwrGsaLvVZVmAT8yApx08ybQxDnee0b1
-	 MPfy4psKrzlfc5icIE3WwtvBafdcj5wr8hLULv509j+vP5vbol7oVekK9XFuAbQfoJ
-	 Twt4AQ9CFsDag==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1so4DT-00BoOW-Ag;
-	Tue, 10 Sep 2024 17:59:47 +0100
-Date: Tue, 10 Sep 2024 17:59:46 +0100
-Message-ID: <86seu778cd.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Will Deacon <will@kernel.org>
-Cc: Sebastian Ene <sebastianene@google.com>,
-	akpm@linux-foundation.org,
-	alexghiti@rivosinc.com,
-	ankita@nvidia.com,
-	ardb@kernel.org,
-	catalin.marinas@arm.com,
-	christophe.leroy@csgroup.eu,
-	james.morse@arm.com,
-	vdonnefort@google.com,
-	mark.rutland@arm.com,
-	oliver.upton@linux.dev,
-	rananta@google.com,
-	ryan.roberts@arm.com,
-	shahuang@redhat.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	kernel-team@android.com
-Subject: Re: [PATCH v10 2/5] arm64: ptdump: Expose the attribute parsing functionality
-In-Reply-To: <20240910095718.GB20813@willie-the-truck>
-References: <20240909124721.1672199-1-sebastianene@google.com>
-	<20240909124721.1672199-3-sebastianene@google.com>
-	<20240910095718.GB20813@willie-the-truck>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="eMBNfTv8"
+Date: Tue, 10 Sep 2024 18:18:41 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1725992327;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LpLtxrldAJA6kgdh8lUC/02V3THaPKjHYDTFam1Jz4g=;
+	b=eMBNfTv8PX2paFmyRCbblRB9zsv/mmCbzE2Fpg7oXKcoAvgF0kEr5/rtrEq5Tw9ARFOpX/
+	NfHgL2yakpaA63qSOBtnU7DMECvFPmaE/ReI2KldPTPxwFN42Mbr9hLaELfAAsJ+X3HZRi
+	xbN8pKnfxwfNtEgmgbdN62+vVZo0Hcc=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+Cc: Snehal Koukuntla <snehalreddy@google.com>,
+	Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Sudeep Holla <sudeep.holla@arm.com>,
+	Sebastian Ene <sebastianene@google.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH v3] KVM: arm64: Add memory length checks and remove
+ inline in do_ffa_mem_xfer
+Message-ID: <ZuCNge74gVpJi2Sf@linux.dev>
+References: <20240909180154.3267939-1-snehalreddy@google.com>
+ <rm2pihr27elmdf4zcgrv5khs7qluhn77tkivkr6xkvqcybtl4m@7hesctcacm4h>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: will@kernel.org, sebastianene@google.com, akpm@linux-foundation.org, alexghiti@rivosinc.com, ankita@nvidia.com, ardb@kernel.org, catalin.marinas@arm.com, christophe.leroy@csgroup.eu, james.morse@arm.com, vdonnefort@google.com, mark.rutland@arm.com, oliver.upton@linux.dev, rananta@google.com, ryan.roberts@arm.com, shahuang@redhat.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <rm2pihr27elmdf4zcgrv5khs7qluhn77tkivkr6xkvqcybtl4m@7hesctcacm4h>
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, 10 Sep 2024 10:57:18 +0100,
-Will Deacon <will@kernel.org> wrote:
+On Wed, Sep 11, 2024 at 12:32:29AM +0800, Wei-Lin Chang wrote:
+> Hi everyone,
 > 
-> On Mon, Sep 09, 2024 at 12:47:18PM +0000, Sebastian Ene wrote:
-> > Reuse the descriptor parsing functionality to keep the same output format
-> > as the original ptdump code. In order for this to happen, move the state
-> > tracking objects into a common header.
+> On Mon, Sep 09, 2024 at 06:01:54PM GMT, Snehal Koukuntla wrote:
+> > When we share memory through FF-A and the description of the buffers
+> > exceeds the size of the mapped buffer, the fragmentation API is used.
+> > The fragmentation API allows specifying chunks of descriptors in subsequent
+> > FF-A fragment calls and no upper limit has been established for this.
+> > The entire memory region transferred is identified by a handle which can be
+> > used to reclaim the transferred memory.
+> > To be able to reclaim the memory, the description of the buffers has to fit
+> > in the ffa_desc_buf.
+> > Add a bounds check on the FF-A sharing path to prevent the memory reclaim
+> > from failing.
 > > 
-> > Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> > Also do_ffa_mem_xfer() does not need __always_inline
+> > 
+> > Fixes: 634d90cf0ac65 ("KVM: arm64: Handle FFA_MEM_LEND calls from the host")
+> > Cc: stable@vger.kernel.org
+> > Reviewed-by: Sebastian Ene <sebastianene@google.com>
+> > Signed-off-by: Snehal Koukuntla <snehalreddy@google.com>
 > > ---
-> >  arch/arm64/include/asm/ptdump.h | 41 +++++++++++++++++++++++-
-> >  arch/arm64/mm/ptdump.c          | 55 +++++++--------------------------
-> >  2 files changed, 51 insertions(+), 45 deletions(-)
+> >  arch/arm64/kvm/hyp/nvhe/ffa.c | 7 ++++++-
+> >  1 file changed, 6 insertions(+), 1 deletion(-)
 > > 
-> > diff --git a/arch/arm64/include/asm/ptdump.h b/arch/arm64/include/asm/ptdump.h
-> > index 5b1701c76d1c..bd5d3ee3e8dc 100644
-> > --- a/arch/arm64/include/asm/ptdump.h
-> > +++ b/arch/arm64/include/asm/ptdump.h
-> > @@ -9,6 +9,7 @@
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> > index e715c157c2c4..637425f63fd1 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> > @@ -426,7 +426,7 @@ static void do_ffa_mem_frag_tx(struct arm_smccc_res *res,
+> >  	return;
+> >  }
 > >  
-> >  #include <linux/mm_types.h>
-> >  #include <linux/seq_file.h>
-> > +#include <linux/ptdump.h>
-> >  
-> >  struct addr_marker {
-> >  	unsigned long start_address;
-> > @@ -21,14 +22,52 @@ struct ptdump_info {
-> >  	unsigned long			base_addr;
-> >  };
-> >  
-> > +struct ptdump_prot_bits {
-> > +	u64		mask;
-> > +	u64		val;
-> > +	const char	*set;
-> > +	const char	*clear;
-> > +};
-> > +
-> > +struct ptdump_pg_level {
-> > +	const struct ptdump_prot_bits *bits;
-> > +	char name[4];
-> > +	int num;
-> > +	u64 mask;
-> > +};
-> > +
-> > +/*
-> > + * The page dumper groups page table entries of the same type into a single
-> > + * description. It uses pg_state to track the range information while
-> > + * iterating over the pte entries. When the continuity is broken it then
-> > + * dumps out a description of the range.
-> > + */
-> > +struct ptdump_pg_state {
-> > +	struct ptdump_state ptdump;
-> > +	struct seq_file *seq;
-> > +	const struct addr_marker *marker;
-> > +	const struct mm_struct *mm;
-> > +	unsigned long start_address;
-> > +	int level;
-> > +	u64 current_prot;
-> > +	bool check_wx;
-> > +	unsigned long wx_pages;
-> > +	unsigned long uxn_pages;
-> > +};
-> > +
-> >  void ptdump_walk(struct seq_file *s, struct ptdump_info *info);
-> > +void note_page(struct ptdump_state *pt_st, unsigned long addr, int level,
-> > +	       u64 val);
-> >  #ifdef CONFIG_PTDUMP_DEBUGFS
-> >  #define EFI_RUNTIME_MAP_END	DEFAULT_MAP_WINDOW_64
-> >  void __init ptdump_debugfs_register(struct ptdump_info *info, const char *name);
-> >  #else
-> >  static inline void ptdump_debugfs_register(struct ptdump_info *info,
-> >  					   const char *name) { }
-> > -#endif
-> > +#endif /* CONFIG_PTDUMP_DEBUGFS */
-> > +#else
-> > +static inline void note_page(void *pt_st, unsigned long addr,
-> > +			     int level, u64 val) { }
+> > -static __always_inline void do_ffa_mem_xfer(const u64 func_id,
+> > +static void do_ffa_mem_xfer(const u64 func_id,
 > 
-> nit: but why isn't 'pt_st' a pointer to 'struct ptdump_state'?
-> 
-> Perhaps you should #include <linux/ptdump.h> before the #ifdef
-> CONFIG_PTDUMP_CORE ?
+> I am seeing a compilation error because of this.
 
-Yup, that seems to do the trick. I'm folding this into the patch:
+Thanks for reporting this. Looks like the __always_inline was slightly
+more load bearing...
 
-diff --git a/arch/arm64/include/asm/ptdump.h b/arch/arm64/include/asm/ptdump.h
-index 71a7ed01153a4..6cf4aae052191 100644
---- a/arch/arm64/include/asm/ptdump.h
-+++ b/arch/arm64/include/asm/ptdump.h
-@@ -5,11 +5,12 @@
- #ifndef __ASM_PTDUMP_H
- #define __ASM_PTDUMP_H
- 
-+#include <linux/ptdump.h>
-+
- #ifdef CONFIG_PTDUMP_CORE
- 
- #include <linux/mm_types.h>
- #include <linux/seq_file.h>
--#include <linux/ptdump.h>
- 
- struct addr_marker {
- 	unsigned long start_address;
-@@ -67,7 +68,7 @@ static inline void ptdump_debugfs_register(struct ptdump_info *info,
- 					   const char *name) { }
- #endif /* CONFIG_PTDUMP_DEBUGFS */
- #else
--static inline void note_page(void *pt_st, unsigned long addr,
-+static inline void note_page(struct ptdump_state *pt_st, unsigned long addr,
- 			     int level, u64 val) { }
- #endif /* CONFIG_PTDUMP_CORE */
- 
-> In any case, the meat of the patch is fine:
-> 
-> Acked-by: Will Deacon <will@kernel.org>
+Marc, can you put something like this on top?
 
-Thanks,
 
-	M.
+From c2712eaa94989ae6457baad3ec459cf363ec5119 Mon Sep 17 00:00:00 2001
+From: Oliver Upton <oliver.upton@linux.dev>
+Date: Tue, 10 Sep 2024 16:45:30 +0000
+Subject: [PATCH] KVM: arm64: Drop BUILD_BUG_ON() from do_ffa_mem_xfer()
+
+__always_inline was recently discarded from do_ffa_mem_xfer() since it
+appeared to be unnecessary. Of course, this was ~immediately proven
+wrong, as the compile-time check against @func_id depends on inlining
+for the value to be known.
+
+Just downgrade to a WARN_ON() instead of putting the old mess back in
+place. Fix the wrapping/indentation of the function parameters while at
+it.
+
+Fixes: 39dacbeeee70 ("KVM: arm64: Add memory length checks and remove inline in do_ffa_mem_xfer")
+Reported-by: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+---
+ arch/arm64/kvm/hyp/nvhe/ffa.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
+index 637425f63fd1..316d269341f3 100644
+--- a/arch/arm64/kvm/hyp/nvhe/ffa.c
++++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
+@@ -426,9 +426,8 @@ static void do_ffa_mem_frag_tx(struct arm_smccc_res *res,
+ 	return;
+ }
+ 
+-static void do_ffa_mem_xfer(const u64 func_id,
+-					    struct arm_smccc_res *res,
+-					    struct kvm_cpu_context *ctxt)
++static void do_ffa_mem_xfer(const u64 func_id, struct arm_smccc_res *res,
++			    struct kvm_cpu_context *ctxt)
+ {
+ 	DECLARE_REG(u32, len, ctxt, 1);
+ 	DECLARE_REG(u32, fraglen, ctxt, 2);
+@@ -440,8 +439,10 @@ static void do_ffa_mem_xfer(const u64 func_id,
+ 	u32 offset, nr_ranges;
+ 	int ret = 0;
+ 
+-	BUILD_BUG_ON(func_id != FFA_FN64_MEM_SHARE &&
+-		     func_id != FFA_FN64_MEM_LEND);
++	if (WARN_ON(func_id != FFA_FN64_MEM_SHARE && func_id != FFA_FN64_MEM_LEND)) {
++		ret = SMCCC_RET_NOT_SUPPORTED;
++		goto out;
++	}
+ 
+ 	if (addr_mbz || npages_mbz || fraglen > len ||
+ 	    fraglen > KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE) {
+-- 
+2.46.0.598.g6f2099f65c-goog
+
 
 -- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+Oliver
