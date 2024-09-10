@@ -1,65 +1,65 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B3BF46444
-	for <kvmarm@lists.linux.dev>; Tue, 10 Sep 2024 03:51:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0653192581
+	for <kvmarm@lists.linux.dev>; Tue, 10 Sep 2024 04:15:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725940290; cv=none; b=RXKY+LBLdRbTSSf1MIjTEICZFbIeD7DdvBOnwEWp97D4QE/VxVyeTfUrSP5oNUGm3qXt8i9DtO7roGmNKefhx1rtBGn1eso8J++w8eSbwapkltIKsyYWNgbt6ue2btoNDBoV9Y+59EQKBr16UATHAp49SI0BaPWeS3NIG7ckElM=
+	t=1725941756; cv=none; b=apmUixPlEm6H71Y/GTqPsx3oM4gOQIb+9G0Tl68zPgN19oQl1NOB/iijD9IN+PVa2oqyb7eoOvy3+5MEJnVe4H/cuQ5IT7ZoGfuEgOK+VlCS7eBHqwYKxfQB9oOBvmAIN/Qns2jW+QMHv1vkq2jxJ3fN9JWEqXLU/G2TRjjuCbo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725940290; c=relaxed/simple;
-	bh=ccnQ8BldDhlgnZ8uiHo0FZ7kW1WSeCWe7cu8HrONIcg=;
+	s=arc-20240116; t=1725941756; c=relaxed/simple;
+	bh=gkZzcVeOY1zKE6Oa+cxE4jiLx/E16ZR2j2sfe3+e4vI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=N37kRAs15zHwEAO2mzDz384Ky5e364HYAWb/GnfJjlBzfBN7OQPEhltW4CjoxiTOwbg1XFAnJuTwZdCrgR9VJwQZIXWIwE7Cqbg+QlOOYZkNqDCvxih4iXUY1Fm3Q8KUj/ctSebpo72kgEObKFWzqodPEhwQLLXqW5OsvRXK95M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JEFWGGME; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=THK3C5hKdyOEt2jtNE8dJe26LuEYByDXOhY8FaZGEcnwrlEKJD0sdtv0x4xTtlJ0DOOqynMT/HfvlA5nZ6RmgX83c7gT7U2vTYJC3dfTE4c9r9idiqKRkAWYMfacSAtj4WggJ9VUE6x6nFd1PMA1efmdzSo+Svikj07ubBOwe+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YDP7NQNK; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JEFWGGME"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YDP7NQNK"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725940287;
+	s=mimecast20190719; t=1725941753;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=/I3+YXY+JwS3qdscq18bmJNKDLcufBeHf8bjRwDJT1w=;
-	b=JEFWGGMECG9Wsur0jZmkGEN5a0hJsW3mUJMzV03wSstL8BEjv7CHSLPwHGPBbr+ZlFtDcn
-	SOyxhqKgh3RxhFIQni/9W2vdU9o9rfLbVxFA7b1/03v8pmXyaH9YySnl6uZE1K5P6DxFgm
-	KoRTCLx0rwiPXZSgNRqKmSRsuDqj1CQ=
-Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
- [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=u/+FRQQ8Ru8+M5tm0CToElnSS7luR16tiIP4Dg8B3y8=;
+	b=YDP7NQNKdmTgwhBpGBLGvuTBuCs/cIk61kktkXoMh1A3uOqkZdz4M4wG1nefO/BfGQbi4O
+	D7i4g9gvW3LWYwgGoeRuSeoFBBZ/6ymOr6+YpSGj0Q7ndFNOXQs6EL1pXiyki62dJriG0y
+	6qAI7iNxXVtGJvqy+zmzDnvEIHqrQjY=
+Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
+ [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-312-oh-J4ML0NLyC7IxEp5iUhw-1; Mon, 09 Sep 2024 23:51:24 -0400
-X-MC-Unique: oh-J4ML0NLyC7IxEp5iUhw-1
-Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-71813b66919so4359928b3a.2
-        for <kvmarm@lists.linux.dev>; Mon, 09 Sep 2024 20:51:23 -0700 (PDT)
+ us-mta-660-7Q2Jhjn7NjemEPoTK9ZhsA-1; Tue, 10 Sep 2024 00:15:50 -0400
+X-MC-Unique: 7Q2Jhjn7NjemEPoTK9ZhsA-1
+Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-207302f244aso17952165ad.0
+        for <kvmarm@lists.linux.dev>; Mon, 09 Sep 2024 21:15:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725940283; x=1726545083;
+        d=1e100.net; s=20230601; t=1725941749; x=1726546549;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/I3+YXY+JwS3qdscq18bmJNKDLcufBeHf8bjRwDJT1w=;
-        b=DpNUuaBFCwmni3k5STyPpxNPiBYGhXTyCgaJ5UVhzfnZs0iRNJeB2Rthv6bTtpTcxw
-         5KPVQPfsiEQCV5LGDz9HgUeIuu2l8+Q+uspQfxVMBxnkURzlY85RJG3diNYZIRmUwsL4
-         uBfMbrT8Uldx3vgIV57sYZUXAuO2tKSdaU3ApYpkEGPA/b02hgTozHv3aOAut3Weg/oP
-         oxotIAuu/OE/2EXZWvpKqG9klcwVUBaDrQdK2aBtuZsOuG4ajVT9QzAUU5sWitxnrChV
-         ivTChRBliA4ZmbZ+PY0MDiHi/Ij7bY3JzKZi6e+2Z1otfTOVqp3EnsCGp+F7tYX8NQAc
-         luLw==
-X-Forwarded-Encrypted: i=1; AJvYcCVWRA2My2t4hUZQuapiXHHwAhw6KTjI1CHZOfk2joF2+T5AJIPi881YpsoI0t6pSU2jJAMthpY=@lists.linux.dev
-X-Gm-Message-State: AOJu0YygJs1k211I7Cmuigork1sGYDM1b6vP4XB4LdZOImXQKvElCx/x
-	QvKbFzIokq78VdSThkI5hG2Gl4cApV58C0j36IGj08PQpMXwhr0mvP2B9dkkkYYQBwPTm7dDBiM
-	/9QKTaaqWLQtSJk7ie/AFQ6P1jGQk09zTVD/hi1NfaCXUd+X2MrRCVQ==
-X-Received: by 2002:a05:6a00:17a9:b0:714:20a8:d79f with SMTP id d2e1a72fcca58-718d5e52b97mr16304613b3a.14.1725940282889;
-        Mon, 09 Sep 2024 20:51:22 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE/d19sKSMFsfHliPT47QFiITi7JaTPVoNF1P6pGKw0CeBAi1klKPcTxxhOABv3xB54UTlCPw==
-X-Received: by 2002:a05:6a00:17a9:b0:714:20a8:d79f with SMTP id d2e1a72fcca58-718d5e52b97mr16304574b3a.14.1725940282285;
-        Mon, 09 Sep 2024 20:51:22 -0700 (PDT)
+        bh=u/+FRQQ8Ru8+M5tm0CToElnSS7luR16tiIP4Dg8B3y8=;
+        b=MDWkkbp0hVG6mDJWyMp6L8uD2tdA8/6jwpkWeH6AdfeTBEB0EqN1ISh6UG9s8N2puZ
+         izwBJeesPDTNphP6jQpDT3JJ+YwvXz8epRAe/We3wbcXXNXADhMlvuGuxfLdV68feqCw
+         osYCdpDqKekjlon4SjKRCWXDd5xQRBZ6HwMZtndbDwQ6vEp8/BV981AzLyRAd5dzIsLS
+         F6AjH3njjXQftDJCW6d6CJD5Pj0rE4zD19kt3BVTuoziyNxxUdmGPf/p1Ti1NFHRybJa
+         UGCkZBatdC/oZaDbcobcGuh8x7gXZTUk+yfsHBABl6h+16WTQoQ3RYBuOM7EKeGxFBgM
+         wrVg==
+X-Forwarded-Encrypted: i=1; AJvYcCXoJoDyHfPphxIF0K0/D0CAEQS38hyeQdQsE77tXKSgduwwnMoQQ9/rBoALox1SWQ0wGsxjdUQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxsAO1c2VywGVywvkjsElrxA6uOe0Nlc5n60x9ikfxpiDJUobE2
+	+oVIjd0osHhOI3kCf6eZ/J7xKCMyGrI+eWxeLA7PBwKfB88ozzbrI+nJHUxaNj5n5RVWEXtdQ0N
+	1EpcZW4DrZC2iQ49tSPErw7WIXco6h1Tyqm3dfcUB3nbuC5rpeofzDg==
+X-Received: by 2002:a17:902:f549:b0:202:5af:47fc with SMTP id d9443c01a7336-206f0511f66mr213103765ad.13.1725941749245;
+        Mon, 09 Sep 2024 21:15:49 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IESpzFJPvUaYPPTKHz8T4YHLbc03zqgmBJU6sgzN1/EtRPQmV6cfuytRj9V1iBRvh9wsUVF0g==
+X-Received: by 2002:a17:902:f549:b0:202:5af:47fc with SMTP id d9443c01a7336-206f0511f66mr213103255ad.13.1725941748534;
+        Mon, 09 Sep 2024 21:15:48 -0700 (PDT)
 Received: from [192.168.68.54] ([103.210.27.31])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71908feb36dsm462585b3a.58.2024.09.09.20.51.15
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20710e0efbesm40682855ad.40.2024.09.09.21.15.41
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Sep 2024 20:51:21 -0700 (PDT)
-Message-ID: <a64defd3-d202-4b65-9ebb-46821717cf20@redhat.com>
-Date: Tue, 10 Sep 2024 13:51:12 +1000
+        Mon, 09 Sep 2024 21:15:48 -0700 (PDT)
+Message-ID: <29016e56-e632-422d-a4d2-1891fad2c565@redhat.com>
+Date: Tue, 10 Sep 2024 14:15:39 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -67,8 +67,7 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 07/19] arm64: rsi: Add support for checking whether an
- MMIO is protected
+Subject: Re: [PATCH v5 12/19] efi: arm64: Map Device with Prot Shared
 To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
  kvmarm@lists.linux.dev
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
@@ -83,9 +82,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
  Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun <alpergun@google.com>
 References: <20240819131924.372366-1-steven.price@arm.com>
- <20240819131924.372366-8-steven.price@arm.com>
+ <20240819131924.372366-13-steven.price@arm.com>
 From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20240819131924.372366-8-steven.price@arm.com>
+In-Reply-To: <20240819131924.372366-13-steven.price@arm.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
@@ -95,59 +94,45 @@ Content-Transfer-Encoding: 7bit
 On 8/19/24 11:19 PM, Steven Price wrote:
 > From: Suzuki K Poulose <suzuki.poulose@arm.com>
 > 
-> On Arm CCA, with RMM-v1.0, all MMIO regions are shared. However, in
-> the future, an Arm CCA-v1.0 compliant guest may be run in a lesser
-> privileged partition in the Realm World (with Arm CCA-v1.1 Planes
-> feature). In this case, some of the MMIO regions may be emulated
-> by a higher privileged component in the Realm world, i.e, protected.
-> 
-> Thus the guest must decide today, whether a given MMIO region is shared
-> vs Protected and create the stage1 mapping accordingly. On Arm CCA, this
-> detection is based on the "IPA State" (RIPAS == RIPAS_IO). Provide a
-> helper to run this check on a given range of MMIO.
-> 
-> Also, provide a arm64 helper which may be hooked in by other solutions.
+> Device mappings need to be emualted by the VMM so must be mapped shared
+> with the host.
 > 
 > Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 > Signed-off-by: Steven Price <steven.price@arm.com>
 > ---
-> New patch for v5
+> Changes since v4:
+>   * Reworked to use arm64_is_iomem_private() to decide whether the memory
+>     needs to be decrypted or not.
 > ---
->   arch/arm64/include/asm/io.h       |  8 ++++++++
->   arch/arm64/include/asm/rsi.h      |  3 +++
->   arch/arm64/include/asm/rsi_cmds.h | 21 +++++++++++++++++++++
->   arch/arm64/kernel/rsi.c           | 26 ++++++++++++++++++++++++++
->   4 files changed, 58 insertions(+)
+>   arch/arm64/kernel/efi.c | 12 ++++++++++--
+>   1 file changed, 10 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/io.h b/arch/arm64/include/asm/io.h
-> index 1ada23a6ec19..a6c551c5e44e 100644
-> --- a/arch/arm64/include/asm/io.h
-> +++ b/arch/arm64/include/asm/io.h
-> @@ -17,6 +17,7 @@
->   #include <asm/early_ioremap.h>
->   #include <asm/alternative.h>
->   #include <asm/cpufeature.h>
-> +#include <asm/rsi.h>
+> diff --git a/arch/arm64/kernel/efi.c b/arch/arm64/kernel/efi.c
+> index 712718aed5dd..95f8e8bf07f8 100644
+> --- a/arch/arm64/kernel/efi.c
+> +++ b/arch/arm64/kernel/efi.c
+> @@ -34,8 +34,16 @@ static __init pteval_t create_mapping_protection(efi_memory_desc_t *md)
+>   	u64 attr = md->attribute;
+>   	u32 type = md->type;
 >   
->   /*
->    * Generic IO read/write.  These perform native-endian accesses.
-> @@ -318,4 +319,11 @@ extern bool arch_memremap_can_ram_remap(resource_size_t offset, size_t size,
->   					unsigned long flags);
->   #define arch_memremap_can_ram_remap arch_memremap_can_ram_remap
->   
-> +static inline bool arm64_is_iomem_private(phys_addr_t phys_addr, size_t size)
-> +{
-> +	if (unlikely(is_realm_world()))
-> +		return arm64_rsi_is_protected_mmio(phys_addr, size);
-> +	return false;
-> +}
+> -	if (type == EFI_MEMORY_MAPPED_IO)
+> -		return PROT_DEVICE_nGnRE;
+> +	if (type == EFI_MEMORY_MAPPED_IO) {
+> +		pgprot_t prot = __pgprot(PROT_DEVICE_nGnRE);
 > +
+> +		if (arm64_is_iomem_private(md->phys_addr,
+> +					   md->num_pages << EFI_PAGE_SHIFT))
+> +			prot = pgprot_encrypted(prot);
+> +		else
+> +			prot = pgprot_decrypted(prot);
+> +		return pgprot_val(prot);
+> +	}
+>   
 
-I guess it might be better to unify the function names here. The name of
-arm64_is_iomem_private() indicates the IO region is private, while the
-name of arm64_rsi_is_protected_mmio() indicates the IO region is protected.
-I think it would be nice to rename arm64_is_iomem_private() arm64_is_protected_iomem(),
-or rename arm64_rsi_is_protected_mmio() to arm64_rsi_is_private_iomem().
+Question: the second parameter (@size) passed to arm64_is_iomem_private() covers the
+whole region. In [PATCH v5 10/19] arm64: Override set_fixmap_io, the size has been
+truncated to the granule size (4KB). They look inconsistent and I don't understand
+the reason.
 
 Thanks,
 Gavin
