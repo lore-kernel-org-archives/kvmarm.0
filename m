@@ -1,152 +1,292 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A5F21AC454;
-	Wed, 11 Sep 2024 13:52:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFA37155747
+	for <kvmarm@lists.linux.dev>; Wed, 11 Sep 2024 14:15:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726062723; cv=none; b=aeE0PbWXhfo74B9lHwDNOxXbIO0PvYeXb/OCYAlAvro8rQiSHhUUfQ/1OEGCp6u/unCJlP/YpIvlQi85ZNJphH1tswNDBQFqh460YpsLKBWL30UR1x3a/cpjsHw3kiu9z+OKckm5elDqSvkuvJvRZ4CfotacXXwBmlGQsoJANZQ=
+	t=1726064123; cv=none; b=MD3B2M8Ccp9c8OSke4Etw/3025GHBbd2LbBB8i297qK4UPt/SL0k3s6l/owVJAEOhXrad7HYGvbY6wNfjZj7d9cb3QrQ+4Tmv72O7kl1CmJoK9z40u0aF2YmLqxtE5F0+xmTj536gULajceTH51OfrhwkwEmt6U/1kM+ZR1SSDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726062723; c=relaxed/simple;
-	bh=6fUfxlZvENDHy8WhKhH+zIyfrC51DoyzQlLrr2TDlsI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=m2cgTIj/DiMVXEEouaDdc9c3xGOt+N0l7FI/kTgvZ1k3u4yJvAceLhQqiGSB50wzIE43FmykEL7adpqsD0ZJkNXPWBAzxa+XEHsyjxSnKT6bclehZfyvRHjlu+zvFBaiwh/3TXbJvsE7pFa1iaZXODj6bNGYsSP1jKkt1lsz7sU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t9uKhXmr; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t9uKhXmr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF5A3C4CEC0;
-	Wed, 11 Sep 2024 13:52:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726062723;
-	bh=6fUfxlZvENDHy8WhKhH+zIyfrC51DoyzQlLrr2TDlsI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=t9uKhXmrxTmQfV14nzO62ZYLhW1hudiS2HSrLRzcPlWZEoOv9++dH96dOx0XZ07HV
-	 Xr1qUst9nDlaFvGGcYWv0eDw73Jshc9hIHQyfeFqRKSMGTek46x3wEeqB+VJTTt5fM
-	 RkOce4b49pelCLlSnnwtVLU0o9s2x9ZrjFtQTh0axZT55GTdBLeOzWNJxB7++q1D8r
-	 coztuHa6e2XQZwm2ZwSvsSCA6ylGeQi1wklCqUW2zYNwp0UpfBanoW8iSk7JQyjZM8
-	 Ot4iEHlG7zAIxZwSdDLZQ0isJaaWBN0yPPJl+LoERgj59pcZRxznv7+ze2Qnnt0Y12
-	 xZkCDXYijdrkQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1soNlJ-00C7tL-8X;
-	Wed, 11 Sep 2024 14:52:01 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: James Morse <james.morse@arm.com>,
+	s=arc-20240116; t=1726064123; c=relaxed/simple;
+	bh=C/fI7kaD7EtAk3Iav89lmxsAr0NqFH6Ak9vhkIs7pSo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bCTr33DSrlef846CVzTMSahNmfm7nXLW5NgMNTvPXtqE18bVF0M3BEJCrWuux2cOu77/+Dt7zzb/Y9+sWJV17BmD62r2giifbINhnI6jT6IE97kFKX/wQJPZXmhuVl2tEew2dPE7GNVRVjWL0kQCqrPC9EOUwzPONZohfZOADFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 701331007;
+	Wed, 11 Sep 2024 07:15:49 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8BC303F73B;
+	Wed, 11 Sep 2024 07:15:18 -0700 (PDT)
+Date: Wed, 11 Sep 2024 15:15:13 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Joey Gouly <joey.gouly@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v3 24/24] KVM: arm64: Rely on visibility to let PIR*_ELx/TCR2_ELx UNDEF
-Date: Wed, 11 Sep 2024 14:51:51 +0100
-Message-Id: <20240911135151.401193-25-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240911135151.401193-1-maz@kernel.org>
+Subject: Re: [PATCH v3 18/24] KVM: arm64: Split S1 permission evaluation into
+ direct and hierarchical parts
+Message-ID: <20240911141513.GA1080224@e124191.cambridge.arm.com>
 References: <20240911135151.401193-1-maz@kernel.org>
+ <20240911135151.401193-19-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com, alexandru.elisei@arm.com, broonie@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240911135151.401193-19-maz@kernel.org>
 
-With a visibility defined for these registers, there is no need
-to check again for S1PIE or TCRX being implemented as perform_access()
-already handles it.
+On Wed, Sep 11, 2024 at 02:51:45PM +0100, Marc Zyngier wrote:
+> The AArch64.S1DirectBasePermissions() pseudocode deals with both
+> direct and hierarchical S1 permission evaluation. While this is
+> probably convenient in the pseudocode, we would like a bit more
+> flexibility to slot things like indirect permissions.
+> 
+> To that effect, split the two permission check parts out of
+> handle_at_slow() and into their own functions. The permissions
+> are passed around in a new s1_perms type that contains the
+> individual permissions across the flow.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/at.c | 164 ++++++++++++++++++++++++++------------------
+>  1 file changed, 99 insertions(+), 65 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> index 73b2ee662f371..d6ee3a5c30bc2 100644
+> --- a/arch/arm64/kvm/at.c
+> +++ b/arch/arm64/kvm/at.c
+> @@ -47,6 +47,10 @@ struct s1_walk_result {
+>  	bool	failed;
+>  };
+>  
+> +struct s1_perms {
+> +	bool	ur, uw, ux, pr, pw, px;
+> +};
+> +
+>  static void fail_s1_walk(struct s1_walk_result *wr, u8 fst, bool ptw, bool s2)
+>  {
+>  	wr->fst		= fst;
+> @@ -764,111 +768,141 @@ static bool pan3_enabled(struct kvm_vcpu *vcpu, enum trans_regime regime)
+>  	return sctlr & SCTLR_EL1_EPAN;
+>  }
+>  
+> -static u64 handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+> +static void compute_s1_direct_permissions(struct kvm_vcpu *vcpu,
+> +					  struct s1_walk_info *wi,
+> +					  struct s1_walk_result *wr,
+> +					  struct s1_perms *s1p)
+>  {
+> -	bool perm_fail, ur, uw, ux, pr, pw, px;
+> -	struct s1_walk_result wr = {};
+> -	struct s1_walk_info wi = {};
+> -	int ret, idx;
+> -
+> -	ret = setup_s1_walk(vcpu, op, &wi, &wr, vaddr);
+> -	if (ret)
+> -		goto compute_par;
+> -
+> -	if (wr.level == S1_MMU_DISABLED)
+> -		goto compute_par;
+> -
+> -	idx = srcu_read_lock(&vcpu->kvm->srcu);
+> -
+> -	ret = walk_s1(vcpu, &wi, &wr, vaddr);
+> -
+> -	srcu_read_unlock(&vcpu->kvm->srcu, idx);
+> -
+> -	if (ret)
+> -		goto compute_par;
+> -
+> -	/* FIXME: revisit when adding indirect permission support */
+> -	/* AArch64.S1DirectBasePermissions() */
+> -	if (wi.regime != TR_EL2) {
+> -		switch (FIELD_GET(PTE_USER | PTE_RDONLY, wr.desc)) {
+> +	/* Non-hierarchical part of AArch64.S1DirectBasePermissions() */
+> +	if (wi->regime != TR_EL2) {
+> +		switch (FIELD_GET(PTE_USER | PTE_RDONLY, wr->desc)) {
+>  		case 0b00:
+> -			pr = pw = true;
+> -			ur = uw = false;
+> +			s1p->pr = s1p->pw = true;
+> +			s1p->ur = s1p->uw = false;
+>  			break;
+>  		case 0b01:
+> -			pr = pw = ur = uw = true;
+> +			s1p->pr = s1p->pw = s1p->ur = s1p->uw = true;
+>  			break;
+>  		case 0b10:
+> -			pr = true;
+> -			pw = ur = uw = false;
+> +			s1p->pr = true;
+> +			s1p->pw = s1p->ur = s1p->uw = false;
+>  			break;
+>  		case 0b11:
+> -			pr = ur = true;
+> -			pw = uw = false;
+> +			s1p->pr = s1p->ur = true;
+> +			s1p->pw = s1p->uw = false;
+>  			break;
+>  		}
+>  
+> -		switch (wr.APTable) {
+> +		/* We don't use px for anything yet, but hey... */
+> +		s1p->px = !((wr->desc & PTE_PXN) || s1p->uw);
+> +		s1p->ux = !(wr->desc & PTE_UXN);
+> +	} else {
+> +		s1p->ur = s1p->uw = s1p->ux = false;
+> +
+> +		if (!(wr->desc & PTE_RDONLY)) {
+> +			s1p->pr = s1p->pw = true;
+> +		} else {
+> +			s1p->pr = true;
+> +			s1p->pw = false;
+> +		}
+> +
+> +		/* XN maps to UXN */
+> +		s1p->px = !(wr->desc & PTE_UXN);
+> +	}
+> +}
+> +
+> +static void compute_s1_hierarchical_permissions(struct kvm_vcpu *vcpu,
+> +						struct s1_walk_info *wi,
+> +						struct s1_walk_result *wr,
+> +						struct s1_perms *s1p)
+> +{
 
-Reviewed-by: Mark Brown <broonie@kernel.org>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/sys_regs.c | 36 +++---------------------------------
- 1 file changed, 3 insertions(+), 33 deletions(-)
+How about:
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index d8fb894832776..e467cfb91549b 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -361,18 +361,6 @@ static bool access_rw(struct kvm_vcpu *vcpu,
- 	return true;
- }
- 
--static bool check_s1pie_access_rw(struct kvm_vcpu *vcpu,
--				  struct sys_reg_params *p,
--				  const struct sys_reg_desc *r)
--{
--	if (!kvm_has_feat(vcpu->kvm, ID_AA64MMFR3_EL1, S1PIE, IMP)) {
--		kvm_inject_undefined(vcpu);
--		return false;
--	}
--
--	return access_rw(vcpu, p, r);
--}
--
- /*
-  * See note at ARMv7 ARM B1.14.4 (TL;DR: S/W ops are not easily virtualized).
-  */
-@@ -439,12 +427,6 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
- 	bool was_enabled = vcpu_has_cache_enabled(vcpu);
- 	u64 val, mask, shift;
- 
--	if (reg_to_encoding(r) == SYS_TCR2_EL1 &&
--	    !kvm_has_feat(vcpu->kvm, ID_AA64MMFR3_EL1, TCRX, IMP)) {
--		kvm_inject_undefined(vcpu);
--		return false;
--	}
--
- 	BUG_ON(!p->is_write);
- 
- 	get_access_mask(r, &mask, &shift);
-@@ -463,18 +445,6 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
- 	return true;
- }
- 
--static bool access_tcr2_el2(struct kvm_vcpu *vcpu,
--			    struct sys_reg_params *p,
--			    const struct sys_reg_desc *r)
--{
--	if (!kvm_has_feat(vcpu->kvm, ID_AA64MMFR3_EL1, TCRX, IMP)) {
--		kvm_inject_undefined(vcpu);
--		return false;
--	}
--
--	return access_rw(vcpu, p, r);
--}
--
- static bool access_actlr(struct kvm_vcpu *vcpu,
- 			 struct sys_reg_params *p,
- 			 const struct sys_reg_desc *r)
-@@ -2880,7 +2850,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	EL2_REG(TTBR0_EL2, access_rw, reset_val, 0),
- 	EL2_REG(TTBR1_EL2, access_rw, reset_val, 0),
- 	EL2_REG(TCR_EL2, access_rw, reset_val, TCR_EL2_RES1),
--	EL2_REG_FILTERED(TCR2_EL2, access_tcr2_el2, reset_val, TCR2_EL2_RES1,
-+	EL2_REG_FILTERED(TCR2_EL2, access_rw, reset_val, TCR2_EL2_RES1,
- 			 tcr2_el2_visibility),
- 	EL2_REG_VNCR(VTTBR_EL2, reset_val, 0),
- 	EL2_REG_VNCR(VTCR_EL2, reset_val, 0),
-@@ -2913,9 +2883,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	EL2_REG(HPFAR_EL2, access_rw, reset_val, 0),
- 
- 	EL2_REG(MAIR_EL2, access_rw, reset_val, 0),
--	EL2_REG_FILTERED(PIRE0_EL2, check_s1pie_access_rw, reset_val, 0,
-+	EL2_REG_FILTERED(PIRE0_EL2, access_rw, reset_val, 0,
- 			 s1pie_el2_visibility),
--	EL2_REG_FILTERED(PIR_EL2, check_s1pie_access_rw, reset_val, 0,
-+	EL2_REG_FILTERED(PIR_EL2, access_rw, reset_val, 0,
- 			 s1pie_el2_visibility),
- 	EL2_REG(AMAIR_EL2, access_rw, reset_val, 0),
- 
--- 
-2.39.2
+	if (wi->hpd)
+		return;
 
+> +	/* Hierarchical part of AArch64.S1DirectBasePermissions() */
+> +	if (wi->regime != TR_EL2) {
+> +		switch (wr->APTable) {
+>  		case 0b00:
+>  			break;
+>  		case 0b01:
+> -			ur = uw = false;
+> +			s1p->ur = s1p->uw = false;
+>  			break;
+>  		case 0b10:
+> -			pw = uw = false;
+> +			s1p->pw = s1p->uw = false;
+>  			break;
+>  		case 0b11:
+> -			pw = ur = uw = false;
+> +			s1p->pw = s1p->ur = s1p->uw = false;
+>  			break;
+>  		}
+>  
+> -		/* We don't use px for anything yet, but hey... */
+> -		px = !((wr.desc & PTE_PXN) || wr.PXNTable || uw);
+> -		ux = !((wr.desc & PTE_UXN) || wr.UXNTable);
+> -
+> -		if (op == OP_AT_S1E1RP || op == OP_AT_S1E1WP) {
+> -			bool pan;
+> -
+> -			pan = *vcpu_cpsr(vcpu) & PSR_PAN_BIT;
+> -			pan &= ur || uw || (pan3_enabled(vcpu, wi.regime) && ux);
+> -			pw &= !pan;
+> -			pr &= !pan;
+> -		}
+> +		s1p->px &= !wr->PXNTable;
+> +		s1p->ux &= !wr->UXNTable;
+>  	} else {
+> -		ur = uw = ux = false;
+> +		if (wr->APTable & BIT(1))
+> +			s1p->pw = false;
+>  
+> -		if (!(wr.desc & PTE_RDONLY)) {
+> -			pr = pw = true;
+> -		} else {
+> -			pr = true;
+> -			pw = false;
+> -		}
+> +		/* XN maps to UXN */
+> +		s1p->px &= !wr->UXNTable;
+> +	}
+> +}
+>  
+> -		if (wr.APTable & BIT(1))
+> -			pw = false;
+> +static void compute_s1_permissions(struct kvm_vcpu *vcpu, u32 op,
+> +				   struct s1_walk_info *wi,
+> +				   struct s1_walk_result *wr,
+> +				   struct s1_perms *s1p)
+> +{
+> +	compute_s1_direct_permissions(vcpu, wi, wr, s1p);
+> +	compute_s1_hierarchical_permissions(vcpu, wi, wr, s1p);
+>  
+> -		/* XN maps to UXN */
+> -		px = !((wr.desc & PTE_UXN) || wr.UXNTable);
+> +	if (op == OP_AT_S1E1RP || op == OP_AT_S1E1WP) {
+> +		bool pan;
+> +
+> +		pan = *vcpu_cpsr(vcpu) & PSR_PAN_BIT;
+> +		pan &= s1p->ur || s1p->uw || (pan3_enabled(vcpu, wi->regime) && s1p->ux);
+> +		s1p->pw &= !pan;
+> +		s1p->pr &= !pan;
+>  	}
+> +}
+> +
+> +static u64 handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+> +{
+> +	struct s1_walk_result wr = {};
+> +	struct s1_walk_info wi = {};
+> +	struct s1_perms s1p = {};
+> +	bool perm_fail = false;
+> +	int ret, idx;
+> +
+> +	ret = setup_s1_walk(vcpu, op, &wi, &wr, vaddr);
+> +	if (ret)
+> +		goto compute_par;
+> +
+> +	if (wr.level == S1_MMU_DISABLED)
+> +		goto compute_par;
+> +
+> +	idx = srcu_read_lock(&vcpu->kvm->srcu);
+> +
+> +	ret = walk_s1(vcpu, &wi, &wr, vaddr);
+> +
+> +	srcu_read_unlock(&vcpu->kvm->srcu, idx);
+> +
+> +	if (ret)
+> +		goto compute_par;
+>  
+> -	perm_fail = false;
+> +	compute_s1_permissions(vcpu, op, &wi, &wr, &s1p);
+>  
+>  	switch (op) {
+>  	case OP_AT_S1E1RP:
+>  	case OP_AT_S1E1R:
+>  	case OP_AT_S1E2R:
+> -		perm_fail = !pr;
+> +		perm_fail = !s1p.pr;
+>  		break;
+>  	case OP_AT_S1E1WP:
+>  	case OP_AT_S1E1W:
+>  	case OP_AT_S1E2W:
+> -		perm_fail = !pw;
+> +		perm_fail = !s1p.pw;
+>  		break;
+>  	case OP_AT_S1E0R:
+> -		perm_fail = !ur;
+> +		perm_fail = !s1p.ur;
+>  		break;
+>  	case OP_AT_S1E0W:
+> -		perm_fail = !uw;
+> +		perm_fail = !s1p.uw;
+>  		break;
+>  	case OP_AT_S1E1A:
+>  	case OP_AT_S1E2A:
+> -- 
+> 2.39.2
+> 
