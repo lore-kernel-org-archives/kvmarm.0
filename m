@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 867D91A305F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEC7B1A38F1;
 	Wed, 11 Sep 2024 13:51:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726062719; cv=none; b=AlLNRvavJWRz3D9Gk6tY5gOViWte6s6cJF5zCOGGW+qOBk/2EaeMxQSRrEIrkd67ad42C6YHcaRZ0ZYKb+Gmiz5S/IhaVl1Vqy/PtgGotGQnZzi31JzZUV6bZLHjM5ObvkJrdyMLSpxZlWEKcbEv/My0FtAXacMJbMdW4M/jCYM=
+	t=1726062719; cv=none; b=KBQNjKdn5r2y7YLow+M3QSq/5qaEZGmPjzyddCBjzr0t9aPTFK8jLyExNXEqY712jDggQ7A+ywjEyNmNyGyWq3yfXr4Qal6BIUEuS6ZzISuqT8cACaY2sxjT7nMF/9zcWmsTS0jW+gDaq+kzd4yGl5LsizVwNxFmle+4lOGE78M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1726062719; c=relaxed/simple;
-	bh=5YGXuwiUxlZQBipzQGoJLItpXcJCcadukeWGI7HrfK4=;
+	bh=EkNOxajA1sXIEet1JDQdUnqLS3wZ1Qi/EB3YjEcrH9g=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=iOqlF8hUc8WHCMI3nOZLWt0B0Slpev4+Q+BdpPM5frQGdQC6tS/4/2GFXp4icQKij6o2HmjAycxq8+s0/I6k4QX1Er73SulbvA4fwui4rW0oUF2c8nlrJLKnwbVjq/5ZGkmV1pMiaqyrQHrL0E5wajoLG5Q+pxY7h7XLsH/0KqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PGiYicIt; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=TI/i2HTAAM1XCErAdGSotIMP+Q931Us+giCF9LtaY1M5wKmDCVyMwknBmvk4IVXfHoGFsQWUkiyxFHbVh1LQQh6Fe6U1ZStsLDmXb5anycMuMfiShihCioiUrfz+p3tFn6NXR/9nznehQmWT/IdoUGeOwuN2Na3C0WpVUVFZe6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JJdH6lDr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PGiYicIt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 608E5C4CEC7;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JJdH6lDr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EB28C4CECE;
 	Wed, 11 Sep 2024 13:51:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1726062719;
-	bh=5YGXuwiUxlZQBipzQGoJLItpXcJCcadukeWGI7HrfK4=;
+	bh=EkNOxajA1sXIEet1JDQdUnqLS3wZ1Qi/EB3YjEcrH9g=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=PGiYicItBvybfb4lpEay3p1RiPuxKTt/wxiXpwc16c1zajkwxqHUYrNF6T8hDLWXn
-	 t/ZRTH6iIOWvv8pXTMD0dahxwH8zPgUdAzXtAVqX+Zll2Lnjz6FBodTRYExCTloGXm
-	 +PZveCOpi6OQCqrAs8owYIcjQuNxXIIsADHFHRUio3aIgwLxKrydslTD+ScHdjxGcy
-	 xHJNFKLY/63tlEELbTrkEq2NCaeFZOG5PtvCbP7YH8xfsUN7E/aHQ+AisAGrm3cJ6P
-	 Zat2A0MhzgkbABN7T9+sZUT6pgH1oZiOArq2OFGs7Ophde/6Op9Y9rS+5GtO9nJNRC
-	 qGgiy6zSmH/nw==
+	b=JJdH6lDr9OKubB4xQ/F9Y+oq7SYRm1CUFeR7Fm5qHGP35S5muTiN9h2Yv+5fCd4jL
+	 6/DjHEC4P26TpR1oBWJpPIp/goOHjAf9WTkPwNTjqQvIEiWt5LSdF7SM78hCED2CxZ
+	 bYuuY0x7+xwmTUjpAf2zvOQTPLydcB+SClYcjVY9gAZNnc7dcE2uxjeKAIShY857iv
+	 KFkGud2+aqLF8beW/cRz6waklO3Q9Xx1lUvnxznGTUSUSaAc+CNvM0VW+kTp+9y6vl
+	 rYxEFancpPUCpckRVo7th7UGQP+DAQzyCSy6ZRd2eqOgaLNwkpLQFXdGB8NuRYxuw6
+	 trSYl0wWdJgpg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1soNlF-00C7tL-8k;
+	id 1soNlF-00C7tL-Mc;
 	Wed, 11 Sep 2024 14:51:57 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -43,9 +43,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v3 05/24] KVM: arm64: nv: Handle CNTHCTL_EL2 specially
-Date: Wed, 11 Sep 2024 14:51:32 +0100
-Message-Id: <20240911135151.401193-6-maz@kernel.org>
+Subject: [PATCH v3 07/24] KVM: arm64: Correctly access TCR2_EL1, PIR_EL1, PIRE0_EL1 with VHE
+Date: Wed, 11 Sep 2024 14:51:34 +0100
+Message-Id: <20240911135151.401193-8-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240911135151.401193-1-maz@kernel.org>
 References: <20240911135151.401193-1-maz@kernel.org>
@@ -61,82 +61,58 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Accessing CNTHCTL_EL2 is fraught with danger if running with
-HCR_EL2.E2H=1: half of the bits are held in CNTKCTL_EL1, and
-thus can be changed behind our back, while the rest lives
-in the CNTHCTL_EL2 shadow copy that is memory-based.
+For code that accesses any of the guest registers for emulation
+purposes, it is crucial to know where the most up-to-date data is.
 
-Yes, this is a lot of fun!
+While this is pretty clear for nVHE (memory is the sole repository),
+things are a lot muddier for VHE, as depending on the SYSREGS_ON_CPU
+flag, registers can either be loaded on the HW or be in memory.
 
-Make sure that we merge the two on read access, while we can
-write to CNTKCTL_EL1 in a more straightforward manner.
+Even worse with NV, where the loaded state is by definition partial.
 
+For these reasons, KVM offers the vcpu_read_sys_reg() and
+vcpu_write_sys_reg() primitives that always do the right thing.
+However, these primitive must know what register to access, and
+this is the role of the __vcpu_read_sys_reg_from_cpu() and
+__vcpu_write_sys_reg_to_cpu() helpers.
+
+As it turns out, TCR2_EL1, PIR_EL1, PIRE0_EL1 and not described
+in the latter helpers, meaning that the AT code cannot use them
+to emulate S1PIE.
+
+Add the three registers to the (long) list.
+
+Fixes: 86f9de9db178 ("KVM: arm64: Save/restore PIE registers")
 Signed-off-by: Marc Zyngier <maz@kernel.org>
+Cc: Joey Gouly <joey.gouly@arm.com>
 ---
- arch/arm64/kvm/sys_regs.c    | 28 ++++++++++++++++++++++++++++
- include/kvm/arm_arch_timer.h |  3 +++
- 2 files changed, 31 insertions(+)
+ arch/arm64/include/asm/kvm_host.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 46db7988d1b50..e4ce1e1c19bef 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -149,6 +149,21 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
- 		if (!is_hyp_ctxt(vcpu))
- 			goto memory_read;
- 
-+		/*
-+		 * CNTHCTL_EL2 requires some special treatment to
-+		 * account for the bits that can be set via CNTKCTL_EL1.
-+		 */
-+		switch (reg) {
-+		case CNTHCTL_EL2:
-+			if (vcpu_el2_e2h_is_set(vcpu)) {
-+				val = read_sysreg_el1(SYS_CNTKCTL);
-+				val &= CNTKCTL_VALID_BITS;
-+				val |= __vcpu_sys_reg(vcpu, reg) & ~CNTKCTL_VALID_BITS;
-+				return val;
-+			}
-+			break;
-+		}
-+
- 		/*
- 		 * If this register does not have an EL1 counterpart,
- 		 * then read the stored EL2 version.
-@@ -199,6 +214,19 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
- 		 */
- 		__vcpu_sys_reg(vcpu, reg) = val;
- 
-+		switch (reg) {
-+		case CNTHCTL_EL2:
-+			/*
-+			 * If E2H=0, CNHTCTL_EL2 is a pure shadow register.
-+			 * Otherwise, some of the bits are backed by
-+			 * CNTKCTL_EL1, while the rest is kept in memory.
-+			 * Yes, this is fun stuff.
-+			 */
-+			if (vcpu_el2_e2h_is_set(vcpu))
-+				write_sysreg_el1(val, SYS_CNTKCTL);
-+			return;
-+		}
-+
- 		/* No EL1 counterpart? We're done here.? */
- 		if (reg == el1r)
- 			return;
-diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-index c819c5d16613b..fd650a8789b91 100644
---- a/include/kvm/arm_arch_timer.h
-+++ b/include/kvm/arm_arch_timer.h
-@@ -147,6 +147,9 @@ u64 timer_get_cval(struct arch_timer_context *ctxt);
- void kvm_timer_cpu_up(void);
- void kvm_timer_cpu_down(void);
- 
-+/* CNTKCTL_EL1 valid bits as of DDI0487J.a */
-+#define CNTKCTL_VALID_BITS	(BIT(17) | GENMASK_ULL(9, 0))
-+
- static inline bool has_cntpoff(void)
- {
- 	return (has_vhe() && cpus_have_final_cap(ARM64_HAS_ECV_CNTPOFF));
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index a33f5996ca9f1..5265a1a929514 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -1012,6 +1012,9 @@ static inline bool __vcpu_read_sys_reg_from_cpu(int reg, u64 *val)
+ 	case TTBR0_EL1:		*val = read_sysreg_s(SYS_TTBR0_EL12);	break;
+ 	case TTBR1_EL1:		*val = read_sysreg_s(SYS_TTBR1_EL12);	break;
+ 	case TCR_EL1:		*val = read_sysreg_s(SYS_TCR_EL12);	break;
++	case TCR2_EL1:		*val = read_sysreg_s(SYS_TCR2_EL12);	break;
++	case PIR_EL1:		*val = read_sysreg_s(SYS_PIR_EL12);	break;
++	case PIRE0_EL1:		*val = read_sysreg_s(SYS_PIRE0_EL12);	break;
+ 	case ESR_EL1:		*val = read_sysreg_s(SYS_ESR_EL12);	break;
+ 	case AFSR0_EL1:		*val = read_sysreg_s(SYS_AFSR0_EL12);	break;
+ 	case AFSR1_EL1:		*val = read_sysreg_s(SYS_AFSR1_EL12);	break;
+@@ -1058,6 +1061,9 @@ static inline bool __vcpu_write_sys_reg_to_cpu(u64 val, int reg)
+ 	case TTBR0_EL1:		write_sysreg_s(val, SYS_TTBR0_EL12);	break;
+ 	case TTBR1_EL1:		write_sysreg_s(val, SYS_TTBR1_EL12);	break;
+ 	case TCR_EL1:		write_sysreg_s(val, SYS_TCR_EL12);	break;
++	case TCR2_EL1:		write_sysreg_s(val, SYS_TCR2_EL12);	break;
++	case PIR_EL1:		write_sysreg_s(val, SYS_PIR_EL12);	break;
++	case PIRE0_EL1:		write_sysreg_s(val, SYS_PIRE0_EL12);	break;
+ 	case ESR_EL1:		write_sysreg_s(val, SYS_ESR_EL12);	break;
+ 	case AFSR0_EL1:		write_sysreg_s(val, SYS_AFSR0_EL12);	break;
+ 	case AFSR1_EL1:		write_sysreg_s(val, SYS_AFSR1_EL12);	break;
 -- 
 2.39.2
 
