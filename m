@@ -1,57 +1,57 @@
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56F6A1BDA8D
-	for <kvmarm@lists.linux.dev>; Wed, 11 Sep 2024 20:42:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14BE11BDAA8
+	for <kvmarm@lists.linux.dev>; Wed, 11 Sep 2024 20:42:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726087361; cv=none; b=gx/Q5X7ZUydE4jWDCG0TQI5r/+7CVLZCWd1kxqJZkxYr1gTK9qF6W7+LDb1J+xEbGNN2zN7mBZfPRP0seWEFP7827fYp9VfEF531Q4YdOg7O4SmLSzAdJtHBzTMZfNJiAS8bVHsmhYwUkv+FdDiC3va/j74KVIAV84MMuCiWzYA=
+	t=1726087363; cv=none; b=n8v5RqERocE+FcILNwKUoQP7wMnriNGsALxkJqY2Id66uGm34jtVJKiEHcTmTbri2gLPJ+W5QG4Tg81ilsQ3RtldSA4Yxy7mxeqsIXTTRjE+ASVUB4r424LOpKb/KSQjScQJ9BO40OmImRl8iuE432QoSxnzdg3Zd9u4mvhuE9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726087361; c=relaxed/simple;
-	bh=gMePtUPb5fvMNYGIlnFPhk6LbY7QAcbzAoZpHwWYGO8=;
+	s=arc-20240116; t=1726087363; c=relaxed/simple;
+	bh=hTKlj60rYtk0bD0DOzR2zSTjrZ18AZM0vgeJHBtr2dM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=LAFKfazO/IAL4oLGlNL3aV7s/41ztRWS8V+Xcy/B2j25CSGfK2GxYtQFyKfPLp50oKQsUW0zM6OyAasWOR0gwwDoI5/J9EPKVZkAu0kvXxDS+3yfZNn9NyIgEv5OCrtqcPzZXu9ai+QwStKbAuc8CCqEhn+yYb5AWFTBNC1hKJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h0p7s6ar; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=AIrdb2Qqm3da6Jx0NVwYSVWi+Hs1Qeu0ISUUfDYfYB7e88jlf9yxFcUbwaYVg6QAJ7j2RDXQe1OLvZeCNOROY6HLDhSHAW18E/skW/0d9VE67980UmuDwmadqche+pK9/fqNUg7jmB8E8oE2zKnkC5RM/5H9XVegMOAoPgkIOPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SpTsyTcc; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h0p7s6ar"
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-7c6a9c1a9b8so547306a12.0
-        for <kvmarm@lists.linux.dev>; Wed, 11 Sep 2024 13:42:40 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SpTsyTcc"
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7cd7614d826so1604291a12.1
+        for <kvmarm@lists.linux.dev>; Wed, 11 Sep 2024 13:42:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726087359; x=1726692159; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1726087361; x=1726692161; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=4Mm6F1KdfaC470dFwf81yhaZh6FdF3AX9IDG0p0k3Sc=;
-        b=h0p7s6arxdjaRma0GR1IVhVF41WVS/uxhSF2YD8hk0ONuUElGqlCW5oLJWk4OLnuLS
-         4Oz3hut59lHdZRRZXLPxJ+IJ70qZ2oQWi68BMT4YtNlsmd2t0YfkIw6HKvoLs09trlzB
-         zB/m4eUgwB+9S0IGL9v00Ie4v0FD1z5x6cgTKf9EUpR15ZD0SWCWl3eYiFDjnPf1mdRG
-         bZqUHX62IE7OZ12iT3Fyo5CMVsPtqdmnobSGqj/DW8w9yC8PbWJGpP2dYE5BsQxiY1b9
-         bYN8MNNesavcGNElmbgCV32got6g/jvn9bSepAG8N6W8DPBzTV+urvoAkytVk6ZGyKFu
-         iiHQ==
+        bh=5I/tJcOHFIa65Wz9gc3TwU6W0/w2a3V6j4MGXxqQ3K8=;
+        b=SpTsyTccGfO+OCfnmZp6rU+A8mHnGgdP2iC8MoBJzSHCrM7cqAbwpyJQSsg9lMYbE1
+         a1AGTy8Nzr1nF4yDvgiXA9VnudkUmobNxd95zQBBuWoTFnlqAaE7z1lTbejKXbxtn0Zm
+         2zxDGfAVjGm8tP29GDD0PZBK1fTQdHSBnJScWplY74Fe3K7CG+d1F7UGI1bmAUdDnhhM
+         BQG/Ag3q8Oh8HSn9iyx/47WPb+ajKsVwoLT4nMOCAM/HCW7eAHm6k2g6Eu7rHFYDWhw6
+         mXGlalWwiVkRTLVj8HHzKsPq2ED6rQaeCsg6QPEA4wyh4AVGbbvjxfK6t4LuKJVDOBRM
+         Iq6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726087359; x=1726692159;
+        d=1e100.net; s=20230601; t=1726087361; x=1726692161;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=4Mm6F1KdfaC470dFwf81yhaZh6FdF3AX9IDG0p0k3Sc=;
-        b=IenPZwLoYuRBHjglHYpyJYdluHgddKsN5vtkju8ANLlvvsToINLsNMd3RAOoPaPJwK
-         Q9wTgsDEqAVAltOOD4KLO25Zqrjxu7qC7DqxFZF+Vb61xE7iy0ED4MJ9QSfdSAZBEi2U
-         QDwhGq36clJPKLhY0IRfZ9cVP2e022ehq3jph27/SUMVChkMt6XYO8w5tLou8sdPRPSb
-         DiZw0hsfA36nuzfVJ6ZfQ6/ppydy/RaT9SqUMcwK/ys36XKVooW9s2ERYfX/7M75egU5
-         CEAeXWNocXKsFMdisvVyzY/SLHg4KEFdODUF5VMER3VgdxsGMU1Rx7lvjHCM7rwLiY9j
-         n2qQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWzYl+pyXjG7Myt8hMV8FADUZoGo9whPOUAoixVgdATrQ2UhKpu51HRzaWznzPrh0eZdAmyumA=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yy/ZP5Wq7uVEkrIDb9aw6W9NsnynOBPq3Hh42Svf4uXcz62+tw5
-	bzbC1xA6nmfeKKDyTW6KuPhD0z6SkOLxyHnTmM/aw09ZUahlWxRWAIBf/ZE+6I/ih5puCx2miR8
-	DRg==
-X-Google-Smtp-Source: AGHT+IH2JHcNsNqRshbivfFJlAxw7IQtkbHmI9wZd8VBGGSLJ0WTJqdKfu0VETV264VsvIEa8GzsVh026XU=
+        bh=5I/tJcOHFIa65Wz9gc3TwU6W0/w2a3V6j4MGXxqQ3K8=;
+        b=VFMWe1sdRg3Q4ztqseUoh41noZK/z8XUCguY66WmQ6fY4VglDoptyJhY9N/jRrF2ki
+         MNuF7AANQb1HJ6T803JD6aSvdIHr6Ri430Fva0sNK0morYhSmxHky2XrVwcc5NCKHkiT
+         xbh8U7qtfjupXVeUlFEl+r8iumrpzeKEhdMNoC/s/BeqqxaxvCc6CzcIi7y6CaDqay+L
+         zq/NdtzDRvHu7BMbXXAXb1uqATcEuNaQ7quKUWyLzYtH5CFvJ0YK+FWE/sHq4tX5qyLl
+         zoEQYCxjyG51tsu5D67z5pXPLPa4v+Iq2xn7qjk6e/Eta1zLWbAjidSTvsy9n9f48ba6
+         85zQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU8PAcRdYngchvQiFH9OgKmY1R7E7tnosW8hO1hwh8QVNC/PhF6yupQA6+6MgaGZ5vTdr5P+Hw=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwesrXlZksBokWg0z6SNzL4HKCb9IE5Fo3mu/ot8RwyW/W6xP3K
+	QVtfN34AlRb2ohzpn4jFaYg0jVGgWJUofRzbQXZhyz7321R37hkrxrFNwZbcMplOXitHVy/zzn9
+	zZg==
+X-Google-Smtp-Source: AGHT+IFOw2zNAqVhdCkeZdNi5IKOGHn5wgnynX/KErJqxVULBd4txDltmiT4cacd3crmvx8FKohy/M+nAhA=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a02:4a5:b0:7db:18fc:3068 with SMTP id
- 41be03b00d2f7-7db205d627emr1361a12.5.1726087359304; Wed, 11 Sep 2024 13:42:39
- -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:90a:6fa6:b0:2d3:b1af:ae48 with SMTP id
+ 98e67ed59e1d1-2db9fcb47f3mr17342a91.2.1726087361313; Wed, 11 Sep 2024
+ 13:42:41 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 11 Sep 2024 13:41:54 -0700
+Date: Wed, 11 Sep 2024 13:41:55 -0700
 In-Reply-To: <20240911204158.2034295-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,8 +61,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240911204158.2034295-1-seanjc@google.com>
 X-Mailer: git-send-email 2.46.0.598.g6f2099f65c-goog
-Message-ID: <20240911204158.2034295-10-seanjc@google.com>
-Subject: [PATCH v2 09/13] KVM: selftests: Enable mmu_stress_test on arm64
+Message-ID: <20240911204158.2034295-11-seanjc@google.com>
+Subject: [PATCH v2 10/13] KVM: selftests: Use vcpu_arch_put_guest() in mmu_stress_test
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Anup Patel <anup@brainfault.org>, Paolo Bonzini <pbonzini@redhat.com>, 
@@ -74,30 +74,27 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Sean Christopherson <seanjc@google.com>, James Houghton <jthoughton@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Enable the mmu_stress_test on arm64.  The intent was to enable the test
-across all architectures when it was first added, but a few goofs made it
-unrunnable on !x86.  Now that those goofs are fixed, at least for arm64,
-enable the test.
+Use vcpu_arch_put_guest() to write memory from the guest in
+mmu_stress_test as an easy way to provide a bit of extra coverage.
 
-Cc: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/Makefile | 1 +
- 1 file changed, 1 insertion(+)
+ tools/testing/selftests/kvm/mmu_stress_test.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 93d6e2596b3e..5150fad7a8c0 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -174,6 +174,7 @@ TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
- TEST_GEN_PROGS_aarch64 += kvm_page_table_test
- TEST_GEN_PROGS_aarch64 += memslot_modification_stress_test
- TEST_GEN_PROGS_aarch64 += memslot_perf_test
-+TEST_GEN_PROGS_aarch64 += mmu_stress_test
- TEST_GEN_PROGS_aarch64 += rseq_test
- TEST_GEN_PROGS_aarch64 += set_memory_region_test
- TEST_GEN_PROGS_aarch64 += steal_time
+diff --git a/tools/testing/selftests/kvm/mmu_stress_test.c b/tools/testing/selftests/kvm/mmu_stress_test.c
+index 5467b12f5903..80863e8290db 100644
+--- a/tools/testing/selftests/kvm/mmu_stress_test.c
++++ b/tools/testing/selftests/kvm/mmu_stress_test.c
+@@ -22,7 +22,7 @@ static void guest_code(uint64_t start_gpa, uint64_t end_gpa, uint64_t stride)
+ 
+ 	for (;;) {
+ 		for (gpa = start_gpa; gpa < end_gpa; gpa += stride)
+-			*((volatile uint64_t *)gpa) = gpa;
++			vcpu_arch_put_guest(*((volatile uint64_t *)gpa), gpa);
+ 		GUEST_SYNC(0);
+ 	}
+ }
 -- 
 2.46.0.598.g6f2099f65c-goog
 
