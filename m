@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0ECF1A4B6E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0C5F1A4B70;
 	Wed, 11 Sep 2024 13:52:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726062720; cv=none; b=qeX+WVKvBJhFyTn5+VlRdXDX+zaiKrH7LMespN5EAVzf5IrpcCZhBQYYfCt1kCg1L9BqQ3dVA8ru6XIwJfPFkxo1ifg219OcQO+17ySphMDiLBOiVqxAlDMqlkavD09l/WM0Bj+oZs+q+3tIlTI/sxjBjwbssljMyf4IMMqg2Gg=
+	t=1726062720; cv=none; b=iUd8nbpSx/1BnRLe+xLUINgigXE+9j0bKkyB8u5pph5V7gl9HVNjwUnzZRd8k9fi5hN+fchS9JdQGQ/PDfoW/4AMusYh/zaE1i5HEPdMYlJoqFDeQCzbnz+7OrcB9tDpUw54PbUxY/O1TMpotDLWlriV5J41DPtId1wwjbHAHNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1726062720; c=relaxed/simple;
-	bh=j3MRUKRWtRAJZkC8zV5u5etxXLxKO0gKd2ISADHupEI=;
+	bh=esCYn35EAa3r+loWUK/gYzwxyvAMjhUZtz09hoWtNyY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=jWUHqYi4KbLWxSEIfsRSdKd/AC6Ffo6E7OpkfZVayI9Cm/i/8wRgqgxY/MTVy92LQFBIExd7Q0qvwanykf1bd7EELQOEoV0KIukDmbXdf4RGuXUsij1G6J6qC/agNsyiHDDC4RnbrDpeGEIk/gGkK0n0h4CnpQs+ayfc2BO+hkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eniJJ7W1; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=QkMD9azHLF9FAWR/CllTORlxuwRYErvnPc+qhjkgpFSVdN3llASSkB1h7lisYfCkAyudWd2gGVtG4+5hjAhKFyku98wyds/Zh6XQARdJTJPZFo96+5fvrgicLMJT+LVYZKNPzbiSC9HNTZrWW0OX0//WYdqkxqZzncqEg9smqZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ppLcMPl3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eniJJ7W1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60018C4CECD;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ppLcMPl3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1F74C4CEC7;
 	Wed, 11 Sep 2024 13:52:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1726062720;
-	bh=j3MRUKRWtRAJZkC8zV5u5etxXLxKO0gKd2ISADHupEI=;
+	bh=esCYn35EAa3r+loWUK/gYzwxyvAMjhUZtz09hoWtNyY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=eniJJ7W16J8g5p6RnWco1+fySP0/AJ1NA31DCG7Ns8p+mmh8h6tIkgntxt/SI3/uu
-	 adc7GBDyB0WgXVm4Dg53TV9zWXi76X4bHk5VwPg5kUWcDvWDRVJWfHIsStoGrEx9BJ
-	 Uz31Os7sV1clEVsW9u8PBpHNGOBU6vS0gXkzp8KyuIBOdCtGPlKwy56HPsvO92xLxc
-	 8j5SMVKL15zPd+RCqCspgJkqatnaDi5KfGFXcttbUDSAFi4Ig9qjmHkyGiK5s2eWjj
-	 mjfX5hGV0WuiO8aJW4dvo6+GznXOPAnZIZUf6RC4GDtGCb7CIQRTCtEdRztHKz9WdQ
-	 j7dS/kDyPQ01w==
+	b=ppLcMPl31KfcLFAD5icg5rs1UF0tjIvUmJXSp78p5tfkoZ/ybdIV94dQYsq4Phy0K
+	 xc3Dr3PUqp+l32snPM7jDmOMWoAc8C6ClSvlQUexDjlA2pdTwpMDoetmiPD6YxGjVe
+	 7KF1sEPOT0uy7Qb0elH9aySWa8xXpvRYiZnmSkrLTa/Lr6JuD8CO0ngdT3Rn9YKL7e
+	 BCV7l8rRFS0aJ94aG6Ncg7GXDr6c/jdO537Jhh/oLfuRj3L04lb35ZqXdzC0kCD14w
+	 Yc2lXqUrV3R7TcP/RDkr6GKqGRptBFbcjnqiDbMWLktLTabHnxs35TbTZPlvDrziOw
+	 MvjIOC5yZYQzg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1soNlG-00C7tL-Fv;
+	id 1soNlG-00C7tL-T5;
 	Wed, 11 Sep 2024 14:51:58 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -43,9 +43,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v3 11/24] KVM: arm64: Sanitise TCR2_EL2
-Date: Wed, 11 Sep 2024 14:51:38 +0100
-Message-Id: <20240911135151.401193-12-maz@kernel.org>
+Subject: [PATCH v3 13/24] KVM: arm64: Add PIR{,E0}_EL2 to the sysreg arrays
+Date: Wed, 11 Sep 2024 14:51:40 +0100
+Message-Id: <20240911135151.401193-14-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240911135151.401193-1-maz@kernel.org>
 References: <20240911135151.401193-1-maz@kernel.org>
@@ -61,50 +61,41 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-TCR2_EL2 is a bag of control bits, all of which are only valid if
-certain features are present, and RES0 otherwise.
-
-Describe these constraints and register them with the masking
-infrastructure.
+Add the FEAT_S1PIE EL2 registers to the per-vcpu sysreg register
+array.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/nested.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ arch/arm64/include/asm/kvm_host.h | 2 ++
+ arch/arm64/kvm/sys_regs.c         | 2 ++
+ 2 files changed, 4 insertions(+)
 
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index fd9ddd0d31400..a566efd6ca4f2 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -1183,6 +1183,28 @@ int kvm_init_nv_sysregs(struct kvm *kvm)
- 		res0 |= ~(res0 | res1);
- 	set_sysreg_masks(kvm, HAFGRTR_EL2, res0, res1);
- 
-+	/* TCR2_EL2 */
-+	res0 = TCR2_EL2_RES0;
-+	res1 = TCR2_EL2_RES1;
-+	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, D128, IMP))
-+		res0 |= (TCR2_EL2_DisCH0 | TCR2_EL2_DisCH1 | TCR2_EL2_D128);
-+	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, MEC, IMP))
-+		res0 |= TCR2_EL2_AMEC1 | TCR2_EL2_AMEC0;
-+	if (!kvm_has_feat(kvm, ID_AA64MMFR1_EL1, HAFDBS, HAFT))
-+		res0 |= TCR2_EL2_HAFT;
-+	if (!kvm_has_feat(kvm, ID_AA64PFR1_EL1, THE, IMP))
-+		res0 |= TCR2_EL2_PTTWI | TCR2_EL2_PnCH;
-+	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, AIE, IMP))
-+		res0 |= TCR2_EL2_AIE;
-+	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, S1POE, IMP))
-+		res0 |= TCR2_EL2_POE | TCR2_EL2_E0POE;
-+	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, S1PIE, IMP))
-+		res0 |= TCR2_EL2_PIE;
-+	if (!kvm_has_feat(kvm, ID_AA64MMFR1_EL1, VH, IMP))
-+		res0 |= (TCR2_EL2_E0POE | TCR2_EL2_D128 |
-+			 TCR2_EL2_AMEC1 | TCR2_EL2_DisCH0 | TCR2_EL2_DisCH1);
-+	set_sysreg_masks(kvm, TCR2_EL2, res0, res1);
-+
- 	/* SCTLR_EL1 */
- 	res0 = SCTLR_EL1_RES0;
- 	res1 = SCTLR_EL1_RES1;
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index fac6c458afc79..34318842bd2da 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -465,6 +465,8 @@ enum vcpu_sysreg {
+ 	TTBR0_EL2,	/* Translation Table Base Register 0 (EL2) */
+ 	TTBR1_EL2,	/* Translation Table Base Register 1 (EL2) */
+ 	TCR_EL2,	/* Translation Control Register (EL2) */
++	PIRE0_EL2,	/* Permission Indirection Register 0 (EL2) */
++	PIR_EL2,	/* Permission Indirection Register 1 (EL2) */
+ 	SPSR_EL2,	/* EL2 saved program status register */
+ 	ELR_EL2,	/* EL2 exception link register */
+ 	AFSR0_EL2,	/* Auxiliary Fault Status Register 0 (EL2) */
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 886ff9557d14c..c109f9c8c5c64 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -127,6 +127,8 @@ static bool get_el2_to_el1_mapping(unsigned int reg,
+ 		MAPPED_EL2_SYSREG(FAR_EL2,     FAR_EL1,     NULL	     );
+ 		MAPPED_EL2_SYSREG(MAIR_EL2,    MAIR_EL1,    NULL	     );
+ 		MAPPED_EL2_SYSREG(TCR2_EL2,    TCR2_EL1,    NULL	     );
++		MAPPED_EL2_SYSREG(PIR_EL2,     PIR_EL1,     NULL	     );
++		MAPPED_EL2_SYSREG(PIRE0_EL2,   PIRE0_EL1,   NULL	     );
+ 		MAPPED_EL2_SYSREG(AMAIR_EL2,   AMAIR_EL1,   NULL	     );
+ 		MAPPED_EL2_SYSREG(ELR_EL2,     ELR_EL1,	    NULL	     );
+ 		MAPPED_EL2_SYSREG(SPSR_EL2,    SPSR_EL1,    NULL	     );
 -- 
 2.39.2
 
