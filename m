@@ -1,151 +1,81 @@
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A284DF42
-	for <kvmarm@lists.linux.dev>; Wed, 11 Sep 2024 00:39:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5592913D28A
+	for <kvmarm@lists.linux.dev>; Wed, 11 Sep 2024 08:15:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726015154; cv=none; b=FOwfPVLwll2tzf9QLyv0H2wNVjmy9II5Vkxhr5De2n66l3EUrlTnk7Rbv5A1oQnKqDlQ4+UqjwYktbqr5q5V+KuzCqPCyW8DH7qa6Sk4yKbCJx7HetFZupA+v24Qs800Fmi98Y9HRuSB7oFiEXBvyI9TscdlmwZUBlZOJ7ACOk8=
+	t=1726042525; cv=none; b=eSeTkEHF62y9Hu11NY8L8aEyjTrBxPa7eXNSzPthThQVXikoV0syVV+eO9RvZFk6KHutR5LA+85/JocFTU87sNybDBGV2zHyjnnHblqENkmCkpRV3hdVy7zQwqDqfYnYPK/nNm7H96EaDwJRqT3Yo48dlLVYwJ+2TABsrCWKipY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726015154; c=relaxed/simple;
-	bh=ZnBdl2cA4ztUKelTqdaewmKZZClVReaKhYlkQ6TOZVM=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=sVyHZJW92xij/5MpevDchPQrZiVU5Fp7x0DLZLy3e2RemLrbBjYVIXE73e4I/ySv1EFUY6CLOvM0yrpjtqhrsdTcaSymyabVdyIU1tXK0eOsAZEoRWNhiM+oy4mLieiFb82yN6oXUJT6h/STkevz4Z+pqotFQr3w6o1eADOSZj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WPXlCXZC; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1726042525; c=relaxed/simple;
+	bh=eVUKOIYAw5aoyTC7VA+7kbvlur+eIyJI8kzLj6ED0Og=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=G1vMYY9fmuc5sVhoIWcHJ7oH+QvC9MYoO2BbS7OU7Vr2bsTrnRpcm1eUvZmYWVrMER079jBk/P8htqpILwJlAoz3rAdHHL9cPSsdUxivcs7mSPCxRwLPGHitkY4utK6gHAo08r9YZ8nVe0qPpq6z+YdRn1VcfrmQPueEzeUYkCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QH20hfCv; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WPXlCXZC"
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-71911585911so888165b3a.3
-        for <kvmarm@lists.linux.dev>; Tue, 10 Sep 2024 17:39:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726015152; x=1726619952; darn=lists.linux.dev;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aU2W8CjkecEHnTcSi2eLdxjM7yES0Dfnh45fYE5GR5I=;
-        b=WPXlCXZCn/fBOO3xG/jbqbvFGu6kchRxhEp4T+idgBoLdqteiqjK1IrdO24XWitcgJ
-         a7gTYsTJ1fkcRzd1aHelUv48/FJsG3SVeiamu4H4KgVANLo5midRm416UCEkL6cjm5b6
-         pmgV57GaZxxoyTb7bLFcjqHH0Ek0YQuWYaInNUvHFoXbDhFEa7+HPXD+VmD7qIy0aiuZ
-         8cFQqVa9a6mxMafkj3F9s/UrXz+ToY4IVBpTVcnrnFGM3sIbA8G7KFnpIvohtfUHzOwG
-         b0yiMT4o5u/YaMIegJ8LTIRQoiJfF/zjN06zhECeYsk7a99XULAmfzQfaZz5wg9bNa+U
-         dghw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726015152; x=1726619952;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=aU2W8CjkecEHnTcSi2eLdxjM7yES0Dfnh45fYE5GR5I=;
-        b=j1HHclGZyWIzI0JlJIdaRrobgc1PhggG0vxS2+4ZosvWckYTtBKSoSvvAUoVXnn3qO
-         HLBthwF1L7gfvRGXOcmdOajBSYnf8181Kmu44kESd9FadXThQclqzhXnWy9fYZjiWd5B
-         MfJ3R59P2wCYtvJUFtQeI0+5PKy90kqSPduIBdpeQRYM8NUp4C66qOub6XDYkkhOhtV6
-         Qb0tKXSovWzuFnFzs/J/65wR95bJF/sdzLEsOY+rrQfeUM0zUf0gA1lXA0KR61ltNMbU
-         kZwPnZzR63Y7T8dgJg+Cms4AUbwWdI+wCH+q53cTlIm51Lnnv5OBApO9rfpozswkcZcp
-         9ZiA==
-X-Forwarded-Encrypted: i=1; AJvYcCXZnDvx4ikBQO2WAsC6U2CMsq2NS/sUv7GQzHl4atbxFUBG+VhsB9fB1jrX1odQI3Zhz1FxFZY=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyL4UTiaq2u+by4MjR634gP/dZE6aii4isTWJcodsO3NJmujhsV
-	lpU8PZ7hy4htij5LzYYY30ABImFKPC2yexMBj20I7P75yPNA8jsNMJ2EVA==
-X-Google-Smtp-Source: AGHT+IHRKKq+mrn5RGMG8qqoe7SoGI6xTYPwCUO1y//ca3K0M+pW44jdvdBPQb4Ae3YMIwaUEIB4lw==
-X-Received: by 2002:a05:6a00:21cd:b0:714:1bce:913a with SMTP id d2e1a72fcca58-7191712345fmr1713499b3a.21.1726015152432;
-        Tue, 10 Sep 2024 17:39:12 -0700 (PDT)
-Received: from localhost ([1.146.47.52])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-719090b038bsm1909998b3a.152.2024.09.10.17.39.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Sep 2024 17:39:12 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QH20hfCv"
+Date: Wed, 11 Sep 2024 10:15:14 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1726042520;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=V987fBm6F9emK0J95GoYEdiv+Gd6fbUioktZ1lszOmg=;
+	b=QH20hfCvh9Cvy1MeUujlEhHWUY3A3d/I1Y15631aaDCYouDnUvYEgYv1OOPLoU+JNzJQaz
+	FcUHxiszgnbUqFJoRPq5D1Dlgfyo7jviih14D+7UJeIBS0ez7V96uKkLujVBgHmY5K4Imh
+	SYjV42ODWjbbywoFaXc1JSYBM7/02a0=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Nicholas Piggin <npiggin@gmail.com>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org, 
+	pbonzini@redhat.com, thuth@redhat.com, lvivier@redhat.com, frankja@linux.ibm.com, 
+	imbrenda@linux.ibm.com, nrb@linux.ibm.com, atishp@rivosinc.com, 
+	cade.richard@berkeley.edu, jamestiotio@gmail.com
+Subject: Re: [kvm-unit-tests PATCH 1/2] configure: Introduce add-config
+Message-ID: <20240911-d6ec4d38091c5f852f825d17@orel>
+References: <20240903143946.834864-4-andrew.jones@linux.dev>
+ <20240903143946.834864-5-andrew.jones@linux.dev>
+ <D431AYECDJV3.1AVQCTIRV2J4G@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Wed, 11 Sep 2024 10:39:03 +1000
-Message-Id: <D431AYECDJV3.1AVQCTIRV2J4G@gmail.com>
-Cc: <pbonzini@redhat.com>, <thuth@redhat.com>, <lvivier@redhat.com>,
- <frankja@linux.ibm.com>, <imbrenda@linux.ibm.com>, <nrb@linux.ibm.com>,
- <atishp@rivosinc.com>, <cade.richard@berkeley.edu>, <jamestiotio@gmail.com>
-Subject: Re: [kvm-unit-tests PATCH 1/2] configure: Introduce add-config
-From: "Nicholas Piggin" <npiggin@gmail.com>
-To: "Andrew Jones" <andrew.jones@linux.dev>, <kvm@vger.kernel.org>,
- <kvm-riscv@lists.infradead.org>, <kvmarm@lists.linux.dev>,
- <linuxppc-dev@lists.ozlabs.org>, <linux-s390@vger.kernel.org>
-X-Mailer: aerc 0.18.2
-References: <20240903143946.834864-4-andrew.jones@linux.dev>
- <20240903143946.834864-5-andrew.jones@linux.dev>
-In-Reply-To: <20240903143946.834864-5-andrew.jones@linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <D431AYECDJV3.1AVQCTIRV2J4G@gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed Sep 4, 2024 at 12:39 AM AEST, Andrew Jones wrote:
-> Allow users to add additional CONFIG_* and override defaults
-> by concatenating a given file with #define's and #undef's to
-> lib/config.h
+On Wed, Sep 11, 2024 at 10:39:03AM GMT, Nicholas Piggin wrote:
+> On Wed Sep 4, 2024 at 12:39 AM AEST, Andrew Jones wrote:
+> > Allow users to add additional CONFIG_* and override defaults
+> > by concatenating a given file with #define's and #undef's to
+> > lib/config.h
+> 
+> That's a horrible config format lol, but probbaly the simplest way to
+> get something working. What if you included the user config first, then
+> make the generated config test ifndef before defining the default?
 
-That's a horrible config format lol, but probbaly the simplest way to
-get something working. What if you included the user config first, then
-make the generated config test ifndef before defining the default?
+User config first and then #ifndef would indeed be better.
 
-Is it better to have a config file than to just add more --options to
-configure? If we had thousands of options maybe, but so far we are
-getting by with configure options. I think I prefer that for now
-unless we wholesale moved everything to a .config style.
+> 
+> Is it better to have a config file than to just add more --options to
+> configure? If we had thousands of options maybe, but so far we are
+> getting by with configure options.
+
+I have some unposted patches where I introduce two more configs, which
+is what inspired me to stop adding configure command line options.
+
+> I think I prefer that for now
+> unless we wholesale moved everything to a .config style.
+
+Moving to .config would be good, and importing and applying Kconfiglib
+doesn't look too daunting either. We can put this --add-config idea on
+hold until we've had a chance to experiment.
 
 Thanks,
-Nick
-
->
-> Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
-> ---
->  configure | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
->
-> diff --git a/configure b/configure
-> index 27ae9cc89657..7a1317d0650d 100755
-> --- a/configure
-> +++ b/configure
-> @@ -64,6 +64,8 @@ usage() {
->  	                           no environ is provided by the user (enabled =
-by default)
->  	    --erratatxt=3DFILE       specify a file to use instead of errata.tx=
-t. Use
->  	                           '--erratatxt=3D' to ensure no file is used.
-> +	    --add-config=3DFILE      specify a file containing configs (CONFIG_=
-*) to add on to the
-> +	                           generated lib/config.h. Use #undef to overri=
-de default configs.
->  	    --host-key-document=3DHOST_KEY_DOCUMENT
->  	                           Specify the machine-specific host-key docume=
-nt for creating
->  	                           a PVM image with 'genprotimg' (s390x only)
-> @@ -153,6 +155,10 @@ while [[ "$1" =3D -* ]]; do
->  	    erratatxt=3D
->  	    [ "$arg" ] && erratatxt=3D$(eval realpath "$arg")
->  	    ;;
-> +	--add-config)
-> +	    add_config=3D
-> +	    [ "$arg" ] && add_config=3D$(eval realpath "$arg")
-> +	    ;;
->  	--host-key-document)
->  	    host_key_document=3D"$arg"
->  	    ;;
-> @@ -213,6 +219,10 @@ if [ "$erratatxt" ] && [ ! -f "$erratatxt" ]; then
->      echo "erratatxt: $erratatxt does not exist or is not a regular file"
->      exit 1
->  fi
-> +if [ "$add_config" ] && [ ! -f "$add_config" ]; then
-> +    echo "add-config: $add_config does not exist or is not a regular fil=
-e"
-> +    exit 1
-> +fi
-> =20
->  arch_name=3D$arch
->  [ "$arch" =3D "aarch64" ] && arch=3D"arm64"
-> @@ -502,4 +512,8 @@ cat <<EOF >> lib/config.h
-> =20
->  EOF
->  fi
-> +if [ "$add_config" ]; then
-> +    echo "/* Additional configs from $add_config */" >> lib/config.h
-> +    cat "$add_config" >> lib/config.h
-> +fi
->  echo "#endif" >> lib/config.h
-
+drew
