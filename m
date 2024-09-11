@@ -1,57 +1,57 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E13B1BD035
-	for <kvmarm@lists.linux.dev>; Wed, 11 Sep 2024 20:42:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B1081BD503
+	for <kvmarm@lists.linux.dev>; Wed, 11 Sep 2024 20:42:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726087357; cv=none; b=BTumgzMHNJ+LgU5pyTVx2P8HudVOM+5lyoOTaQRmJ942sDhgs0H17Q7rnkmsMrGTIgkXSy5JIfVt21M7OHxpYMvpCR7KZKQcc415bzA52kWTBUQwnrtgJGBQmn1gAvYcrOujjKzDhoWu9db+dKtnI778GDbjmzAOn56w2EzhKt8=
+	t=1726087359; cv=none; b=hTy5t4EVef/qiaNCHBDMVSUmulKi8DQXboJx3zU+obVZFuOti4bZs2K4FiC6Cy3JjRzF2j/ECfhM82V16tkWHzSqn27FzVehmg5ffeaa5uFVJuHtpP+QPngymtswCnsbJOH0PQd1HQXFjXTKSFCY71btSDYpeTahqzdYR41OFPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726087357; c=relaxed/simple;
-	bh=9BzyYeYR+XG9DqVDsSkYPxqvMFHUbhRYSHXP8tVaSKk=;
+	s=arc-20240116; t=1726087359; c=relaxed/simple;
+	bh=fr34CVsgL2g82sb+1gvS8yCzrvuGG/23h2+dDn8u8kM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=GrRf2c/Vj1yO49QsCFGpQObdexZWpVmuSqEhJcqSv7lhT+XvvUIeAXBqbBQv8QNPAhG+o2CNt3yzMHPqaz4s8Qj6wW4ABJV0AGLdCCFjiTPSI8a8i/uy2XSKrDTWbXZDAu6OXdMHlSoDIbYO3SQlFwuWqrvlb1XTbLOQRW9ZgrE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ledQNfzS; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=KgM5+Q+1E4osE83St/DuHgZbCCglBXWoXborWltcl/EeEmqAy/n2ZJ7NMIFkgBR7n/8HFrVI6qrG4LCmIOjlL902jAKQzqAyO+PxgpVbisJp8PiVuTPJT2W0YcLPSBYG7quyuDiWNWkv2J9UEp/Dp5J+J6m+Q4EVzRo6f7MdpX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=M/vpPZvK; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ledQNfzS"
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e1a91576564so1017095276.0
-        for <kvmarm@lists.linux.dev>; Wed, 11 Sep 2024 13:42:36 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="M/vpPZvK"
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e1a74f824f9so704799276.1
+        for <kvmarm@lists.linux.dev>; Wed, 11 Sep 2024 13:42:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726087355; x=1726692155; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1726087357; x=1726692157; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=mDeUl+tBis0dtonBgnOqcF+rjd+/029ZvfofLpY6Be0=;
-        b=ledQNfzSlVOj5X+fJJmAYiivB/oUKf8iZNYnO90Rn3V7OA8RFXQS8HUSgcLitPFARp
-         U92zcdADzmpg24ZtYzKVE38vE0PCixP1amDritDkoIZR63xKomxfv2R1vJ/NNUtkez+U
-         wh3tPDEW5266L+2EDWM6winXCE5rNjZuLvW4L8clTjqILtKMGa1waCOW2Q9FTfCFjCZ0
-         Mr9vqOOVJ2nBXlZOXRAHOq9nPpgT9mHC39Wy5wZuBlzdCP32BROPxeFTUPkTKZk/c35/
-         6DSkQcqdRujMe3MFamnAv91Os63NwutUaM8GnMDNyukFY37Lwx0hiTZbhYbXrATLAJZA
-         ILiA==
+        bh=47BQJJiikboIPrV2PD33si1kPUmickrZ0k1m7wYEIK0=;
+        b=M/vpPZvKtJSpgR3Q1dnkgMSYo8pW1mo4Q+RqPabZbjCkuEylrSaEf9+ckkVMGZpmIj
+         Ou/fB+NQySAyt1/nFxF9ugfHbnzfaP2+TQR8hIsASQvTfLpRmoBGcLZC9SB8/EaBY7/y
+         oX9RRaL6ZlY/p9/OmgOiagY202dGZsCP2tmHbkhaK6kdU9morw2j4nDIg8MTn9kwwnzM
+         7QygVxGZgoCKSIoGoGQwBbGD64PD6c1mrBbfLL8L6PaK2i/6Ns2B8hERuBTiRatqibSX
+         gIrT0jXIfDG6KecCAoCj3ivHW8aWYwQJykttJnwi6n1rKoR/PB5himlJ6p4cQF7f818p
+         WUXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726087355; x=1726692155;
+        d=1e100.net; s=20230601; t=1726087357; x=1726692157;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=mDeUl+tBis0dtonBgnOqcF+rjd+/029ZvfofLpY6Be0=;
-        b=HpCv+4SubpiENfz1ASZMK5TmH2Il2zWHQwDcfas0K/AXOUSokFxynvCHAhP+jFI/IE
-         Gw3dYVhbfU5Kx6kcts/9s4182FlGbMWVGI261XdwFvysbzxO5yxfRAlyZRWZTVSprocA
-         vGyh3+TqeeRGehs3fAgxcnE6mAS20u7uP1KDPwcaA6Gu5icMjD+JgrIGA+39tdJKoUrJ
-         H/ZarexlaSrwWEh164isoC8qfdA082ZlFNoDOhR24i3nK+N8VosHdUB1cxmSNES0fI5S
-         gQuVoOB1QqlJSSuJ8YHrOkec6F8qJ9YSy1iTiaGTFhA0Mo5NtZZi+zQRQskzvZW+KnFX
-         s4rg==
-X-Forwarded-Encrypted: i=1; AJvYcCUNuJENviNXiWMddh8gv56pkLloLPCfH79hZyxVayP9HrJAZ/NQvjSIGdUhmKD7/+nPDngorro=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyotZvys0s4v1Dr1BQBgu73RkdIP2nlhRYRetpXTlaYcu9NhZhd
-	g54dKIb7U8m4xLfQqj0Qikqm4MhM6J9SXUj4gLPgfig/jSb6hduUVr7OfATEdHcS2B26vXs13+j
-	H7A==
-X-Google-Smtp-Source: AGHT+IGxqix6H/PLMvvIcFrC3JMaLMXEJXlPHwcg40gW3P6CGrRnyhAhRYR7DkVEhB/fpO0WlA4G6vBj/5E=
+        bh=47BQJJiikboIPrV2PD33si1kPUmickrZ0k1m7wYEIK0=;
+        b=J4a2Wpg76sSGO5P1AJepfMRkiwfTdLwG9PQCdJTjoEkcsiXEgwPyK6GORzefVmCBqS
+         1scjThoL7z08oyCEbkxEkNUrQp7brrxZ0maW5dPhFzXmTfF7xDpErIt7khyvKYimEBrM
+         VwIbQagQBJRHknIxIO7QXHySQILg/ygLV8r2L6oafljTc1dBmZVaKrUBkA+yfAAVPqtD
+         yDNUJvOwEhSGTQZfOazjQ6oeq9+dRJUgVcC7C5W2n+GftJ245sRMiQAqwmMRWwlQ1MWi
+         9yRqOnWOkj0DO9WrXGFdYSGkgzBKsUZRrQrAJBz+oae2lXCfjX5nkc6Wq++Aex/ZCR7M
+         ne9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWN+OjH3TBddwbsw+tTchReEkYV/ncG7rxXNr/B3AyxMXYZoj/8jVdwdsLugSX6JbDMbCRjTD0=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yz3Qr/GvaBpzXqrxGd0LhHM4sEA47uJHRrhKMNWNZnfu0gKFkUx
+	KwWh+EvmSRznnKACrTID3N4iKLaWd2wGH+B0r+uWmCc2COgiEM2hkf35DBAObp+84xCQo4V4K26
+	8HQ==
+X-Google-Smtp-Source: AGHT+IGKCOrdvuPh1JFZJTD4VhxgbmNdEtpijYplyDxOyPTYxT/JV5RegfErX1F5y84KkH5DsNf+hpV7TUg=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:9108:0:b0:e16:4e62:8a17 with SMTP id
- 3f1490d57ef6-e1d9db9ca04mr3916276.2.1726087355066; Wed, 11 Sep 2024 13:42:35
+ (user=seanjc job=sendgmr) by 2002:a25:c206:0:b0:e11:7039:ff92 with SMTP id
+ 3f1490d57ef6-e1d9dc6f379mr708276.11.1726087357418; Wed, 11 Sep 2024 13:42:37
  -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 11 Sep 2024 13:41:52 -0700
+Date: Wed, 11 Sep 2024 13:41:53 -0700
 In-Reply-To: <20240911204158.2034295-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,8 +61,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240911204158.2034295-1-seanjc@google.com>
 X-Mailer: git-send-email 2.46.0.598.g6f2099f65c-goog
-Message-ID: <20240911204158.2034295-8-seanjc@google.com>
-Subject: [PATCH v2 07/13] KVM: selftests: Only muck with SREGS on x86 in mmu_stress_test
+Message-ID: <20240911204158.2034295-9-seanjc@google.com>
+Subject: [PATCH v2 08/13] KVM: selftests: Compute number of extra pages needed
+ in mmu_stress_test
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Anup Patel <anup@brainfault.org>, Paolo Bonzini <pbonzini@redhat.com>, 
@@ -74,46 +75,36 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Sean Christopherson <seanjc@google.com>, James Houghton <jthoughton@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Try to get/set SREGS in mmu_stress_test only when running on x86, as the
-ioctls are supported only by x86 and PPC, and the latter doesn't yet
-support KVM selftests.
+Create mmu_stress_tests's VM with the correct number of extra pages needed
+to map all of memory in the guest.  The bug hasn't been noticed before as
+the test currently runs only on x86, which maps guest memory with 1GiB
+pages, i.e. doesn't need much memory in the guest for page tables.
 
+Reviewed-by: James Houghton <jthoughton@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/mmu_stress_test.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ tools/testing/selftests/kvm/mmu_stress_test.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/tools/testing/selftests/kvm/mmu_stress_test.c b/tools/testing/selftests/kvm/mmu_stress_test.c
-index 0b9678858b6d..847da23ec1b1 100644
+index 847da23ec1b1..5467b12f5903 100644
 --- a/tools/testing/selftests/kvm/mmu_stress_test.c
 +++ b/tools/testing/selftests/kvm/mmu_stress_test.c
-@@ -59,10 +59,10 @@ static void run_vcpu(struct kvm_vcpu *vcpu)
+@@ -209,7 +209,13 @@ int main(int argc, char *argv[])
+ 	vcpus = malloc(nr_vcpus * sizeof(*vcpus));
+ 	TEST_ASSERT(vcpus, "Failed to allocate vCPU array");
  
- static void *vcpu_worker(void *data)
- {
-+	struct kvm_sregs __maybe_unused sregs;
- 	struct vcpu_info *info = data;
- 	struct kvm_vcpu *vcpu = info->vcpu;
- 	struct kvm_vm *vm = vcpu->vm;
--	struct kvm_sregs sregs;
- 
- 	vcpu_args_set(vcpu, 3, info->start_gpa, info->end_gpa, vm->page_size);
- 
-@@ -70,12 +70,12 @@ static void *vcpu_worker(void *data)
- 
- 	run_vcpu(vcpu);
- 	rendezvous_with_boss();
+-	vm = vm_create_with_vcpus(nr_vcpus, guest_code, vcpus);
++	vm = __vm_create_with_vcpus(VM_SHAPE_DEFAULT, nr_vcpus,
 +#ifdef __x86_64__
- 	vcpu_sregs_get(vcpu, &sregs);
--#ifdef __x86_64__
- 	/* Toggle CR0.WP to trigger a MMU context reset. */
- 	sregs.cr0 ^= X86_CR0_WP;
--#endif
- 	vcpu_sregs_set(vcpu, &sregs);
++				    max_mem / SZ_1G,
++#else
++				    max_mem / vm_guest_mode_params[VM_MODE_DEFAULT].page_size,
 +#endif
- 	rendezvous_with_boss();
++				    guest_code, vcpus);
  
- 	run_vcpu(vcpu);
+ 	max_gpa = vm->max_gfn << vm->page_shift;
+ 	TEST_ASSERT(max_gpa > (4 * slot_size), "MAXPHYADDR <4gb ");
 -- 
 2.46.0.598.g6f2099f65c-goog
 
