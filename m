@@ -1,51 +1,51 @@
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D784D19F11A
-	for <kvmarm@lists.linux.dev>; Wed, 11 Sep 2024 14:37:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62C291A2622
+	for <kvmarm@lists.linux.dev>; Wed, 11 Sep 2024 14:38:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726065468; cv=none; b=KGo1/EX5F2RjDdzDIjx0TkzcY8QKctuzu/oagdwy3+AqPHb3H1e6k2mDg5CT/xArRFBWXeac1UaeNXo+VAhlr2cMRUlopNFwVHKfZM9QAhGoj0evTv+GfWohtegMymRV2tMEmloEU+MdT/0COZRAQAzCnusPuDculK70tquH4nM=
+	t=1726065485; cv=none; b=PCQ2U1vZY6Fu1AfzwLRMU4G6y+nDp2qqm7itZ12/NHpRCzH8kGPqeUcn1AmImEAdgRiJLnQCsEj233M7iwfojbZA9aC4n2ytRVUtMNLR9zsTx4JGzSCFNGRcNlAHWX/J/Qxc7qzqF0tBc1X7yBZaYtzm4gXEMDxbkwjupW0Hpu8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726065468; c=relaxed/simple;
-	bh=feRSGJHJU4EXR47b3J41bw3N15CyZRe4CKUQtrdHZqY=;
+	s=arc-20240116; t=1726065485; c=relaxed/simple;
+	bh=Lpd9Dv852KN81mDxr313SZ2EVA4RHwbx7HlJ0kkCpAY=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FHLoS5KYGe7LHaNhH0xqd74k7FUVSGT9JbRoZcbIcCOkpKipHho4NRckcTbselMapu1NMT1qTsTplB/UFpMo4uZ0nIdxtCnRuCp2OtEw7reVEfmswm1JQWQM1DV84E6aKtM6jVvolfm2MzIC1Y/hv46ogrmwtabGJDsFMRIPUBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b=fP/foVYv; arc=none smtp.client-ip=207.171.184.29
+	 MIME-Version:Content-Type; b=PXLcwWQMdMv1i68tNbi5y74eaK7dt/HeSlLfj3+I7KOW1pN7fxdVkg4fRGrF9399TWjAQWmQh+hAK71FpaRj4GGmH35SSABEu9Y3TMbMkVkR8m91yUgTkuoPIxeqF7JNafkfPps+RhFLqGD1R4ORDX7702m8pQcYPvfqgpCwQfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b=OvYiy/RL; arc=none smtp.client-ip=52.119.213.152
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b="fP/foVYv"
+	dkim=pass (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b="OvYiy/RL"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1726065467; x=1757601467;
+  t=1726065484; x=1757601484;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=rCn+xTWUjnpsWnBBnpI3iR0NNWrWMHIE+UutE4x6c8o=;
-  b=fP/foVYvIedlOjkxTffZG9ffRlV5MWod3Keodu7uiEvWZFZkwI6A1tVy
-   Wl41huZOdJk2H6huy5WaSPO23dIISv/Hukne75pgeGkm3mvQXR/PqDqLX
-   gD5sIrdv1bBmS/Pcb3LMrB5BOEZ84FpiLE72GlV/6oJcUqEfGF5syqPJa
-   c=;
+  bh=gUT0NHH1rkNY0jIUGubcfNpyrpnEMMZzd9a2sKPpzdA=;
+  b=OvYiy/RLGsHEw2Y91pabEnpcXnmrBn5OxpEOSY4fZg7eJvCNNl9k1u6U
+   6RytsYo8D8Dgvhb4Qro4VfUlQ0oRZ3Fq9uXT5szAXy51l05C6RmBDuJV9
+   CRK68EfikhoQ1iw0jRkrusXQzmX3HiTj+JdtFn2aLISg6R6j3hkvqb66v
+   M=;
 X-IronPort-AV: E=Sophos;i="6.10,220,1719878400"; 
-   d="scan'208";a="452953260"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2024 14:36:30 +0000
-Received: from EX19MTAEUC001.ant.amazon.com [10.0.17.79:20048]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.13.80:2525] with esmtp (Farcaster)
- id 337e7469-1cf4-42a1-a92c-28b8d968fd53; Wed, 11 Sep 2024 14:36:28 +0000 (UTC)
-X-Farcaster-Flow-ID: 337e7469-1cf4-42a1-a92c-28b8d968fd53
-Received: from EX19D007EUB001.ant.amazon.com (10.252.51.82) by
- EX19MTAEUC001.ant.amazon.com (10.252.51.155) with Microsoft SMTP Server
+   d="scan'208";a="24916368"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2024 14:36:54 +0000
+Received: from EX19MTAEUA001.ant.amazon.com [10.0.10.100:10017]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.27.59:2525] with esmtp (Farcaster)
+ id f9f29f1f-caf9-4ac7-bc5d-27f9e417256f; Wed, 11 Sep 2024 14:36:52 +0000 (UTC)
+X-Farcaster-Flow-ID: f9f29f1f-caf9-4ac7-bc5d-27f9e417256f
+Received: from EX19D007EUA001.ant.amazon.com (10.252.50.133) by
+ EX19MTAEUA001.ant.amazon.com (10.252.50.223) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Wed, 11 Sep 2024 14:36:22 +0000
+ Wed, 11 Sep 2024 14:36:52 +0000
 Received: from EX19MTAUEC001.ant.amazon.com (10.252.135.222) by
- EX19D007EUB001.ant.amazon.com (10.252.51.82) with Microsoft SMTP Server
+ EX19D007EUA001.ant.amazon.com (10.252.50.133) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Wed, 11 Sep 2024 14:36:21 +0000
+ Wed, 11 Sep 2024 14:36:51 +0000
 Received: from dev-dsk-faresx-1b-27755bf1.eu-west-1.amazon.com (10.253.79.181)
  by mail-relay.amazon.com (10.252.135.200) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34
- via Frontend Transport; Wed, 11 Sep 2024 14:36:19 +0000
+ via Frontend Transport; Wed, 11 Sep 2024 14:36:49 +0000
 From: Fares Mehanna <faresx@amazon.de>
 To: 
 CC: <nh-open-source@amazon.com>, Fares Mehanna <faresx@amazon.de>, "Marc
@@ -67,9 +67,9 @@ CC: <nh-open-source@amazon.com>, Fares Mehanna <faresx@amazon.de>, "Marc
  ARM64 (KVM/arm64)" <kvmarm@lists.linux.dev>, open list
 	<linux-kernel@vger.kernel.org>, "open list:MEMORY MANAGEMENT"
 	<linux-mm@kvack.org>
-Subject: [RFC PATCH 3/7] arm64: KVM: Refactor C-code to access vCPU gp-registers through macros
-Date: Wed, 11 Sep 2024 14:34:02 +0000
-Message-ID: <20240911143421.85612-4-faresx@amazon.de>
+Subject: [RFC PATCH 4/7] KVM: Refactor Assembly-code to access vCPU gp-registers through a macro
+Date: Wed, 11 Sep 2024 14:34:03 +0000
+Message-ID: <20240911143421.85612-5-faresx@amazon.de>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20240911143421.85612-1-faresx@amazon.de>
 References: <20240911143421.85612-1-faresx@amazon.de>
@@ -82,144 +82,242 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 
-Unify how KVM accesses vCPU gp-regs by using two macros vcpu_gp_regs() and
-ctxt_gp_regs(). This is prerequisite to move the gp-regs later to be dynamically
-allocated for vCPUs.
+Right now assembly code accesses vCPU gp-regs directly from the context struct
+"struct kvm_cpu_context" using "CPU_XREG_OFFSET()".
+
+Since we want to move gp-regs to dynamic memory, we can no longer assume that
+gp-regs will be embedded in the context struct, thus split the access to two
+steps.
+
+The first is to get the gp-regs from the context using the assembly macro
+"get_ctxt_gp_regs".
+
+And the second is to access the gp-registers directly from within the
+"struct user_pt_regs" by removing the offset "CPU_USER_PT_REGS" from the access
+macro "CPU_XREG_OFFSET()".
+
+I also changed variable naming and comments where appropriate.
 
 Signed-off-by: Fares Mehanna <faresx@amazon.de>
 ---
- arch/arm64/include/asm/kvm_emulate.h           |  2 +-
- arch/arm64/include/asm/kvm_host.h              |  3 ++-
- arch/arm64/kvm/guest.c                         |  8 ++++----
- arch/arm64/kvm/hyp/include/hyp/switch.h        |  2 +-
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h     | 10 +++++-----
- arch/arm64/kvm/hyp/include/nvhe/trap_handler.h |  2 +-
- 6 files changed, 14 insertions(+), 13 deletions(-)
+ arch/arm64/include/asm/kvm_asm.h | 48 +++++++++++++++++---------------
+ arch/arm64/kvm/hyp/entry.S       | 15 ++++++++++
+ arch/arm64/kvm/hyp/nvhe/host.S   | 20 ++++++++++---
+ 3 files changed, 57 insertions(+), 26 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index a601a9305b10..cabfb76ca514 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -170,7 +170,7 @@ static __always_inline void vcpu_set_reg(struct kvm_vcpu *vcpu, u8 reg_num,
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index 2181a11b9d92..fa4fb642a5f5 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -313,6 +313,10 @@ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr, u64 elr_virt,
+ 	str	\vcpu, [\ctxt, #HOST_CONTEXT_VCPU]
+ .endm
  
- static inline bool vcpu_is_el2_ctxt(const struct kvm_cpu_context *ctxt)
- {
--	switch (ctxt->regs.pstate & (PSR_MODE32_BIT | PSR_MODE_MASK)) {
-+	switch (ctxt_gp_regs(ctxt)->pstate & (PSR_MODE32_BIT | PSR_MODE_MASK)) {
- 	case PSR_MODE_EL2h:
- 	case PSR_MODE_EL2t:
- 		return true;
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index a33f5996ca9f..31cbd62a5d06 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -946,7 +946,8 @@ struct kvm_vcpu_arch {
- #define vcpu_clear_on_unsupported_cpu(vcpu)				\
- 	vcpu_clear_flag(vcpu, ON_UNSUPPORTED_CPU)
- 
--#define vcpu_gp_regs(v)		(&(v)->arch.ctxt.regs)
-+#define ctxt_gp_regs(ctxt)	(&(ctxt)->regs)
-+#define vcpu_gp_regs(v)		(ctxt_gp_regs(&(v)->arch.ctxt))
- 
++.macro get_ctxt_gp_regs ctxt, regs
++	add	\regs, \ctxt, #CPU_USER_PT_REGS
++.endm
++
  /*
-  * Only use __vcpu_sys_reg/ctxt_sys_reg if you know you want the
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 11098eb7eb44..821a2b7de388 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -134,16 +134,16 @@ static void *core_reg_addr(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 	     KVM_REG_ARM_CORE_REG(regs.regs[30]):
- 		off -= KVM_REG_ARM_CORE_REG(regs.regs[0]);
- 		off /= 2;
--		return &vcpu->arch.ctxt.regs.regs[off];
-+		return &vcpu_gp_regs(vcpu)->regs[off];
+  * KVM extable for unexpected exceptions.
+  * Create a struct kvm_exception_table_entry output to a section that can be
+@@ -329,7 +333,7 @@ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr, u64 elr_virt,
+ 	.popsection
+ .endm
  
- 	case KVM_REG_ARM_CORE_REG(regs.sp):
--		return &vcpu->arch.ctxt.regs.sp;
-+		return &vcpu_gp_regs(vcpu)->sp;
+-#define CPU_XREG_OFFSET(x)	(CPU_USER_PT_REGS + 8*x)
++#define CPU_XREG_OFFSET(x)	(8 * (x))
+ #define CPU_LR_OFFSET		CPU_XREG_OFFSET(30)
+ #define CPU_SP_EL0_OFFSET	(CPU_LR_OFFSET + 8)
  
- 	case KVM_REG_ARM_CORE_REG(regs.pc):
--		return &vcpu->arch.ctxt.regs.pc;
-+		return &vcpu_gp_regs(vcpu)->pc;
+@@ -337,34 +341,34 @@ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr, u64 elr_virt,
+  * We treat x18 as callee-saved as the host may use it as a platform
+  * register (e.g. for shadow call stack).
+  */
+-.macro save_callee_saved_regs ctxt
+-	str	x18,      [\ctxt, #CPU_XREG_OFFSET(18)]
+-	stp	x19, x20, [\ctxt, #CPU_XREG_OFFSET(19)]
+-	stp	x21, x22, [\ctxt, #CPU_XREG_OFFSET(21)]
+-	stp	x23, x24, [\ctxt, #CPU_XREG_OFFSET(23)]
+-	stp	x25, x26, [\ctxt, #CPU_XREG_OFFSET(25)]
+-	stp	x27, x28, [\ctxt, #CPU_XREG_OFFSET(27)]
+-	stp	x29, lr,  [\ctxt, #CPU_XREG_OFFSET(29)]
++.macro save_callee_saved_regs regs
++	str	x18,      [\regs, #CPU_XREG_OFFSET(18)]
++	stp	x19, x20, [\regs, #CPU_XREG_OFFSET(19)]
++	stp	x21, x22, [\regs, #CPU_XREG_OFFSET(21)]
++	stp	x23, x24, [\regs, #CPU_XREG_OFFSET(23)]
++	stp	x25, x26, [\regs, #CPU_XREG_OFFSET(25)]
++	stp	x27, x28, [\regs, #CPU_XREG_OFFSET(27)]
++	stp	x29, lr,  [\regs, #CPU_XREG_OFFSET(29)]
+ .endm
  
- 	case KVM_REG_ARM_CORE_REG(regs.pstate):
--		return &vcpu->arch.ctxt.regs.pstate;
-+		return &vcpu_gp_regs(vcpu)->pstate;
+-.macro restore_callee_saved_regs ctxt
+-	// We require \ctxt is not x18-x28
+-	ldr	x18,      [\ctxt, #CPU_XREG_OFFSET(18)]
+-	ldp	x19, x20, [\ctxt, #CPU_XREG_OFFSET(19)]
+-	ldp	x21, x22, [\ctxt, #CPU_XREG_OFFSET(21)]
+-	ldp	x23, x24, [\ctxt, #CPU_XREG_OFFSET(23)]
+-	ldp	x25, x26, [\ctxt, #CPU_XREG_OFFSET(25)]
+-	ldp	x27, x28, [\ctxt, #CPU_XREG_OFFSET(27)]
+-	ldp	x29, lr,  [\ctxt, #CPU_XREG_OFFSET(29)]
++.macro restore_callee_saved_regs regs
++	// We require \regs is not x18-x28
++	ldr	x18,      [\regs, #CPU_XREG_OFFSET(18)]
++	ldp	x19, x20, [\regs, #CPU_XREG_OFFSET(19)]
++	ldp	x21, x22, [\regs, #CPU_XREG_OFFSET(21)]
++	ldp	x23, x24, [\regs, #CPU_XREG_OFFSET(23)]
++	ldp	x25, x26, [\regs, #CPU_XREG_OFFSET(25)]
++	ldp	x27, x28, [\regs, #CPU_XREG_OFFSET(27)]
++	ldp	x29, lr,  [\regs, #CPU_XREG_OFFSET(29)]
+ .endm
  
- 	case KVM_REG_ARM_CORE_REG(sp_el1):
- 		return __ctxt_sys_reg(&vcpu->arch.ctxt, SP_EL1);
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 37ff87d782b6..d2ed0938fc90 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -649,7 +649,7 @@ static inline void synchronize_vcpu_pstate(struct kvm_vcpu *vcpu, u64 *exit_code
- 	    ESR_ELx_EC(read_sysreg_el2(SYS_ESR)) == ESR_ELx_EC_PAC)
- 		write_sysreg_el2(*vcpu_cpsr(vcpu), SYS_SPSR);
+-.macro save_sp_el0 ctxt, tmp
++.macro save_sp_el0 regs, tmp
+ 	mrs	\tmp,	sp_el0
+-	str	\tmp,	[\ctxt, #CPU_SP_EL0_OFFSET]
++	str	\tmp,	[\regs, #CPU_SP_EL0_OFFSET]
+ .endm
  
--	vcpu->arch.ctxt.regs.pstate = read_sysreg_el2(SYS_SPSR);
-+	vcpu_gp_regs(vcpu)->pstate = read_sysreg_el2(SYS_SPSR);
- }
+-.macro restore_sp_el0 ctxt, tmp
+-	ldr	\tmp,	  [\ctxt, #CPU_SP_EL0_OFFSET]
++.macro restore_sp_el0 regs, tmp
++	ldr	\tmp,	  [\regs, #CPU_SP_EL0_OFFSET]
+ 	msr	sp_el0, \tmp
+ .endm
  
- /*
-diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-index 4c0fdabaf8ae..d17033766010 100644
---- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-@@ -105,13 +105,13 @@ static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
+diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+index 4433a234aa9b..628a123bcdc1 100644
+--- a/arch/arm64/kvm/hyp/entry.S
++++ b/arch/arm64/kvm/hyp/entry.S
+@@ -28,6 +28,9 @@ SYM_FUNC_START(__guest_enter)
  
- static inline void __sysreg_save_el2_return_state(struct kvm_cpu_context *ctxt)
- {
--	ctxt->regs.pc			= read_sysreg_el2(SYS_ELR);
-+	ctxt_gp_regs(ctxt)->pc		= read_sysreg_el2(SYS_ELR);
- 	/*
- 	 * Guest PSTATE gets saved at guest fixup time in all
- 	 * cases. We still need to handle the nVHE host side here.
- 	 */
- 	if (!has_vhe() && ctxt->__hyp_running_vcpu)
--		ctxt->regs.pstate	= read_sysreg_el2(SYS_SPSR);
-+		ctxt_gp_regs(ctxt)->pstate = read_sysreg_el2(SYS_SPSR);
+ 	adr_this_cpu x1, kvm_hyp_ctxt, x2
  
- 	if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN))
- 		ctxt_sys_reg(ctxt, DISR_EL1) = read_sysreg_s(SYS_VDISR_EL2);
-@@ -202,7 +202,7 @@ static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
- /* Read the VCPU state's PSTATE, but translate (v)EL2 to EL1. */
- static inline u64 to_hw_pstate(const struct kvm_cpu_context *ctxt)
- {
--	u64 mode = ctxt->regs.pstate & (PSR_MODE_MASK | PSR_MODE32_BIT);
-+	u64 mode = ctxt_gp_regs(ctxt)->pstate & (PSR_MODE_MASK | PSR_MODE32_BIT);
++	// Get gp-regs pointer from the context
++	get_ctxt_gp_regs x1, x1
++
+ 	// Store the hyp regs
+ 	save_callee_saved_regs x1
  
- 	switch (mode) {
- 	case PSR_MODE_EL2t:
-@@ -213,7 +213,7 @@ static inline u64 to_hw_pstate(const struct kvm_cpu_context *ctxt)
- 		break;
- 	}
+@@ -62,6 +65,9 @@ alternative_else_nop_endif
+ 	// when this feature is enabled for kernel code.
+ 	ptrauth_switch_to_guest x29, x0, x1, x2
  
--	return (ctxt->regs.pstate & ~(PSR_MODE_MASK | PSR_MODE32_BIT)) | mode;
-+	return (ctxt_gp_regs(ctxt)->pstate & ~(PSR_MODE_MASK | PSR_MODE32_BIT)) | mode;
- }
++	// Get gp-regs pointer from the context
++	get_ctxt_gp_regs x29, x29
++
+ 	// Restore the guest's sp_el0
+ 	restore_sp_el0 x29, x0
  
- static inline void __sysreg_restore_el2_return_state(struct kvm_cpu_context *ctxt)
-@@ -235,7 +235,7 @@ static inline void __sysreg_restore_el2_return_state(struct kvm_cpu_context *ctx
- 	if (!(mode & PSR_MODE32_BIT) && mode >= PSR_MODE_EL2t)
- 		pstate = PSR_MODE_EL2h | PSR_IL_BIT;
+@@ -108,6 +114,7 @@ SYM_INNER_LABEL(__guest_exit_panic, SYM_L_GLOBAL)
+ 	// current state is saved to the guest context but it will only be
+ 	// accurate if the guest had been completely restored.
+ 	adr_this_cpu x0, kvm_hyp_ctxt, x1
++	get_ctxt_gp_regs x0, x0
+ 	adr_l	x1, hyp_panic
+ 	str	x1, [x0, #CPU_XREG_OFFSET(30)]
  
--	write_sysreg_el2(ctxt->regs.pc,			SYS_ELR);
-+	write_sysreg_el2(ctxt_gp_regs(ctxt)->pc,	SYS_ELR);
- 	write_sysreg_el2(pstate,			SYS_SPSR);
+@@ -120,6 +127,7 @@ SYM_INNER_LABEL(__guest_exit, SYM_L_GLOBAL)
+ 	// vcpu x0-x1 on the stack
  
- 	if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN))
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/trap_handler.h b/arch/arm64/kvm/hyp/include/nvhe/trap_handler.h
-index 45a84f0ade04..dfe5be0d70ef 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/trap_handler.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/trap_handler.h
-@@ -11,7 +11,7 @@
+ 	add	x1, x1, #VCPU_CONTEXT
++	get_ctxt_gp_regs x1, x1
  
- #include <asm/kvm_host.h>
+ 	ALTERNATIVE(nop, SET_PSTATE_PAN(1), ARM64_HAS_PAN, CONFIG_ARM64_PAN)
  
--#define cpu_reg(ctxt, r)	(ctxt)->regs.regs[r]
-+#define cpu_reg(ctxt, r)	(ctxt_gp_regs((ctxt))->regs[r])
- #define DECLARE_REG(type, name, ctxt, reg)	\
- 				type name = (type)cpu_reg(ctxt, (reg))
+@@ -145,6 +153,10 @@ SYM_INNER_LABEL(__guest_exit, SYM_L_GLOBAL)
+ 	// Store the guest's sp_el0
+ 	save_sp_el0	x1, x2
+ 
++	// Recover vCPU context to x1
++	get_vcpu_ptr    x1, x2
++	add     x1, x1, #VCPU_CONTEXT
++
+ 	adr_this_cpu x2, kvm_hyp_ctxt, x3
+ 
+ 	// Macro ptrauth_switch_to_hyp format:
+@@ -157,6 +169,9 @@ SYM_INNER_LABEL(__guest_exit, SYM_L_GLOBAL)
+ 	// mte_switch_to_hyp(g_ctxt, h_ctxt, reg1)
+ 	mte_switch_to_hyp x1, x2, x3
+ 
++	// Get gp-regs pointer from the context
++	get_ctxt_gp_regs x2, x2
++
+ 	// Restore hyp's sp_el0
+ 	restore_sp_el0 x2, x3
+ 
+diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
+index 3d610fc51f4d..31afa7396294 100644
+--- a/arch/arm64/kvm/hyp/nvhe/host.S
++++ b/arch/arm64/kvm/hyp/nvhe/host.S
+@@ -17,6 +17,12 @@
+ SYM_FUNC_START(__host_exit)
+ 	get_host_ctxt	x0, x1
+ 
++	/* Keep host context in x1 */
++	mov	x1, x0
++
++	/* Get gp-regs pointer from the context */
++	get_ctxt_gp_regs x0, x0
++
+ 	/* Store the host regs x2 and x3 */
+ 	stp	x2, x3,   [x0, #CPU_XREG_OFFSET(2)]
+ 
+@@ -36,7 +42,10 @@ SYM_FUNC_START(__host_exit)
+ 	/* Store the host regs x18-x29, lr */
+ 	save_callee_saved_regs x0
+ 
+-	/* Save the host context pointer in x29 across the function call */
++	/* Save the host context pointer in x28 across the function call */
++	mov	x28, x1
++
++	/* Save the host gp-regs pointer in x29 across the function call */
+ 	mov	x29, x0
+ 
+ #ifdef CONFIG_ARM64_PTR_AUTH_KERNEL
+@@ -46,7 +55,7 @@ alternative_else_nop_endif
+ 
+ alternative_if ARM64_KVM_PROTECTED_MODE
+ 	/* Save kernel ptrauth keys. */
+-	add x18, x29, #CPU_APIAKEYLO_EL1
++	add x18, x28, #CPU_APIAKEYLO_EL1
+ 	ptrauth_save_state x18, x19, x20
+ 
+ 	/* Use hyp keys. */
+@@ -58,6 +67,7 @@ alternative_else_nop_endif
+ __skip_pauth_save:
+ #endif /* CONFIG_ARM64_PTR_AUTH_KERNEL */
+ 
++	mov	x0, x28
+ 	bl	handle_trap
+ 
+ __host_enter_restore_full:
+@@ -68,7 +78,7 @@ b __skip_pauth_restore
+ alternative_else_nop_endif
+ 
+ alternative_if ARM64_KVM_PROTECTED_MODE
+-	add x18, x29, #CPU_APIAKEYLO_EL1
++	add x18, x28, #CPU_APIAKEYLO_EL1
+ 	ptrauth_restore_state x18, x19, x20
+ alternative_else_nop_endif
+ __skip_pauth_restore:
+@@ -101,7 +111,8 @@ SYM_FUNC_END(__host_exit)
+  * void __noreturn __host_enter(struct kvm_cpu_context *host_ctxt);
+  */
+ SYM_FUNC_START(__host_enter)
+-	mov	x29, x0
++	mov	x28, x0
++	get_ctxt_gp_regs x0, x29
+ 	b	__host_enter_restore_full
+ SYM_FUNC_END(__host_enter)
+ 
+@@ -141,6 +152,7 @@ SYM_FUNC_START(__hyp_do_panic)
+ 
+ 	/* Enter the host, conditionally restoring the host context. */
+ 	cbz	x29, __host_enter_without_restoring
++	get_ctxt_gp_regs x29, x29
+ 	b	__host_enter_for_panic
+ SYM_FUNC_END(__hyp_do_panic)
  
 -- 
 2.40.1
