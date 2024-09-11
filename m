@@ -1,57 +1,57 @@
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 712DC2F30
-	for <kvmarm@lists.linux.dev>; Wed, 11 Sep 2024 00:26:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A284DF42
+	for <kvmarm@lists.linux.dev>; Wed, 11 Sep 2024 00:39:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726014374; cv=none; b=q4lVvo60N7WawTku+dg0LYCxunWBSLe4MmtRBg8Rxd3ovnn7HjR3Wib85knQGYOr0w0+hB7p4XHxJU9lyFDmibPh9Oe0pPFS7k0L/fE6J0+YmZdcLr7Ov243g/DMc9hwhjJWpVE4JA5pB6itSuP576bc3vIm2PBl3nDTiEQ2Biw=
+	t=1726015154; cv=none; b=FOwfPVLwll2tzf9QLyv0H2wNVjmy9II5Vkxhr5De2n66l3EUrlTnk7Rbv5A1oQnKqDlQ4+UqjwYktbqr5q5V+KuzCqPCyW8DH7qa6Sk4yKbCJx7HetFZupA+v24Qs800Fmi98Y9HRuSB7oFiEXBvyI9TscdlmwZUBlZOJ7ACOk8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726014374; c=relaxed/simple;
-	bh=itxfKfmbD/zsCr0etIDjn7Mvr1MVTsWI0y9iTbmeGSc=;
-	h=Mime-Version:Content-Type:Date:Message-Id:To:Cc:Subject:From:
-	 References:In-Reply-To; b=DiWrQmZSq6IvVTB9OVH6suG9yjOxaMb6o+G7Z5WVPhiaLDrTqJYg5KAsSvIQm/RRi95Fg8cMvIIxJ55m3xPAhMxnbahWoIBVlWckicr3dloi4vf5hNIwV7XXyj4MfTIYyUF+/ED7FGRJ+I/xfnYRK7ji26dzsot+5Sc36qJEFVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Er6VUUmU; arc=none smtp.client-ip=209.85.214.174
+	s=arc-20240116; t=1726015154; c=relaxed/simple;
+	bh=ZnBdl2cA4ztUKelTqdaewmKZZClVReaKhYlkQ6TOZVM=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=sVyHZJW92xij/5MpevDchPQrZiVU5Fp7x0DLZLy3e2RemLrbBjYVIXE73e4I/ySv1EFUY6CLOvM0yrpjtqhrsdTcaSymyabVdyIU1tXK0eOsAZEoRWNhiM+oy4mLieiFb82yN6oXUJT6h/STkevz4Z+pqotFQr3w6o1eADOSZj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WPXlCXZC; arc=none smtp.client-ip=209.85.210.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Er6VUUmU"
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-20551e2f1f8so61705925ad.2
-        for <kvmarm@lists.linux.dev>; Tue, 10 Sep 2024 17:26:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WPXlCXZC"
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-71911585911so888165b3a.3
+        for <kvmarm@lists.linux.dev>; Tue, 10 Sep 2024 17:39:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726014373; x=1726619173; darn=lists.linux.dev;
-        h=in-reply-to:references:from:subject:cc:to:message-id:date
+        d=gmail.com; s=20230601; t=1726015152; x=1726619952; darn=lists.linux.dev;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
          :content-transfer-encoding:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=cEyXAdKeEJQoAHfFQf1BZ5A9dLRXujoz25bWx+9TXyc=;
-        b=Er6VUUmUyTn4G8s/sbI1+QPK0XuQR5wRiE50encTdNHUy2LDNIMmBE+WNJ8KzHEvGE
-         Yv3AYZmfnLupek1DLNYb+EwYhS4UijoEB1YpxAIHavApVjCbveRCM5p3i2r024En6bgk
-         eV81CBDKey5T7abrFwzi54Gwwd3IP8rXlMDb/c6UoDOZpJXG/sxWpvXfOSIqk1TfiqKE
-         /uGWp9BYpLEjdmh9U18P+FacVYfC7vajEyF1CRlPwKCBIcP0nOVT1vsqAUyyjMhYc/jY
-         5klY2LIVcCWL7AQy1LE/Yw30Zi56YTBCH2jMGs1dsVp/SP37YheJr37wALcpqVenk5eP
-         NcSQ==
+        bh=aU2W8CjkecEHnTcSi2eLdxjM7yES0Dfnh45fYE5GR5I=;
+        b=WPXlCXZCn/fBOO3xG/jbqbvFGu6kchRxhEp4T+idgBoLdqteiqjK1IrdO24XWitcgJ
+         a7gTYsTJ1fkcRzd1aHelUv48/FJsG3SVeiamu4H4KgVANLo5midRm416UCEkL6cjm5b6
+         pmgV57GaZxxoyTb7bLFcjqHH0Ek0YQuWYaInNUvHFoXbDhFEa7+HPXD+VmD7qIy0aiuZ
+         8cFQqVa9a6mxMafkj3F9s/UrXz+ToY4IVBpTVcnrnFGM3sIbA8G7KFnpIvohtfUHzOwG
+         b0yiMT4o5u/YaMIegJ8LTIRQoiJfF/zjN06zhECeYsk7a99XULAmfzQfaZz5wg9bNa+U
+         dghw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726014373; x=1726619173;
-        h=in-reply-to:references:from:subject:cc:to:message-id:date
+        d=1e100.net; s=20230601; t=1726015152; x=1726619952;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
          :content-transfer-encoding:mime-version:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=cEyXAdKeEJQoAHfFQf1BZ5A9dLRXujoz25bWx+9TXyc=;
-        b=oMeyWgfTczj3hcef+h/UNzuUIbkrHBjNUQB0IFMQjawWFtDE3g/VJvdhPiBZy1A6wF
-         bsNPioDegOAVRwtqB3tfCvgKVDRTG2VPL3ZtEqvfwYWzuN/hIOYKVMV359+zd20WN1vx
-         MzzCygomXUoXrat5TzakwDHbnrs4aSRokCXdRXvqxaWpRfw+ILd9BrYOxPRElEbwBvGc
-         03wN4Dw3zO+NOntauz87Ojl0p03m1eBvp9O1XuoxIx5nHMFGc8ty+2BNMX24pHlABp/t
-         RsH8RFJejUKB9GQVIUdGf2L5CaKgqcIRTJGlqqRaNo72L6YHDPvqv5sS/S+Ss6cufgFC
-         Cr4A==
-X-Forwarded-Encrypted: i=1; AJvYcCW95HDcQ3lJsxPspPvdqCrBE8tTOPhvvjWhggHL4tAIJfeXRikZJBmBECpkzG6Ip4RLDN6M1Xs=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzNstDkphlCGSUnME34erXA6RYKLgoLJZZrOFTpyGzf2ErLSTEp
-	kxTNVQmye1fL1DlTrMr+9/pZQDOlxEweZ7jDWPoiVKhAi/k0Z7AN
-X-Google-Smtp-Source: AGHT+IHdupOZtZNvqV8Jq+ivzEDY7SaRBw9l5Q5S/ff1gCan8RdbB7OhqPF/t1bFYOvCzz+LolCTIQ==
-X-Received: by 2002:a17:902:ce11:b0:206:c486:4c33 with SMTP id d9443c01a7336-2074c631b1amr37647145ad.30.1726014372538;
-        Tue, 10 Sep 2024 17:26:12 -0700 (PDT)
+        bh=aU2W8CjkecEHnTcSi2eLdxjM7yES0Dfnh45fYE5GR5I=;
+        b=j1HHclGZyWIzI0JlJIdaRrobgc1PhggG0vxS2+4ZosvWckYTtBKSoSvvAUoVXnn3qO
+         HLBthwF1L7gfvRGXOcmdOajBSYnf8181Kmu44kESd9FadXThQclqzhXnWy9fYZjiWd5B
+         MfJ3R59P2wCYtvJUFtQeI0+5PKy90kqSPduIBdpeQRYM8NUp4C66qOub6XDYkkhOhtV6
+         Qb0tKXSovWzuFnFzs/J/65wR95bJF/sdzLEsOY+rrQfeUM0zUf0gA1lXA0KR61ltNMbU
+         kZwPnZzR63Y7T8dgJg+Cms4AUbwWdI+wCH+q53cTlIm51Lnnv5OBApO9rfpozswkcZcp
+         9ZiA==
+X-Forwarded-Encrypted: i=1; AJvYcCXZnDvx4ikBQO2WAsC6U2CMsq2NS/sUv7GQzHl4atbxFUBG+VhsB9fB1jrX1odQI3Zhz1FxFZY=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyL4UTiaq2u+by4MjR634gP/dZE6aii4isTWJcodsO3NJmujhsV
+	lpU8PZ7hy4htij5LzYYY30ABImFKPC2yexMBj20I7P75yPNA8jsNMJ2EVA==
+X-Google-Smtp-Source: AGHT+IHRKKq+mrn5RGMG8qqoe7SoGI6xTYPwCUO1y//ca3K0M+pW44jdvdBPQb4Ae3YMIwaUEIB4lw==
+X-Received: by 2002:a05:6a00:21cd:b0:714:1bce:913a with SMTP id d2e1a72fcca58-7191712345fmr1713499b3a.21.1726015152432;
+        Tue, 10 Sep 2024 17:39:12 -0700 (PDT)
 Received: from localhost ([1.146.47.52])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20710eea95esm53895415ad.161.2024.09.10.17.26.06
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-719090b038bsm1909998b3a.152.2024.09.10.17.39.05
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Sep 2024 17:26:12 -0700 (PDT)
+        Tue, 10 Sep 2024 17:39:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -60,94 +60,92 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Date: Wed, 11 Sep 2024 10:26:03 +1000
-Message-Id: <D431108K19Z2.3EDZQCSG5RC4X@gmail.com>
-To: "Andrew Jones" <andrew.jones@linux.dev>, <kvm@vger.kernel.org>,
- <kvm-riscv@lists.infradead.org>, <kvmarm@lists.linux.dev>,
- <linuxppc-dev@lists.ozlabs.org>, <linux-s390@vger.kernel.org>
+Date: Wed, 11 Sep 2024 10:39:03 +1000
+Message-Id: <D431AYECDJV3.1AVQCTIRV2J4G@gmail.com>
 Cc: <pbonzini@redhat.com>, <thuth@redhat.com>, <lvivier@redhat.com>,
  <frankja@linux.ibm.com>, <imbrenda@linux.ibm.com>, <nrb@linux.ibm.com>,
  <atishp@rivosinc.com>, <cade.richard@berkeley.edu>, <jamestiotio@gmail.com>
-Subject: Re: [kvm-unit-tests PATCH v2 4/4] riscv: gitlab-ci: Add clang build
- tests
+Subject: Re: [kvm-unit-tests PATCH 1/2] configure: Introduce add-config
 From: "Nicholas Piggin" <npiggin@gmail.com>
+To: "Andrew Jones" <andrew.jones@linux.dev>, <kvm@vger.kernel.org>,
+ <kvm-riscv@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+ <linuxppc-dev@lists.ozlabs.org>, <linux-s390@vger.kernel.org>
 X-Mailer: aerc 0.18.2
-References: <20240904105020.1179006-6-andrew.jones@linux.dev>
- <20240904105020.1179006-10-andrew.jones@linux.dev>
-In-Reply-To: <20240904105020.1179006-10-andrew.jones@linux.dev>
+References: <20240903143946.834864-4-andrew.jones@linux.dev>
+ <20240903143946.834864-5-andrew.jones@linux.dev>
+In-Reply-To: <20240903143946.834864-5-andrew.jones@linux.dev>
 
-On Wed Sep 4, 2024 at 8:50 PM AEST, Andrew Jones wrote:
-> Test building 32 and 64-bit with clang. Throw a test of in- and out-
-> of-tree building in too by swapping which is done to which (32-bit
-> vs. 64-bit) with respect to the gcc build tests.
+On Wed Sep 4, 2024 at 12:39 AM AEST, Andrew Jones wrote:
+> Allow users to add additional CONFIG_* and override defaults
+> by concatenating a given file with #define's and #undef's to
+> lib/config.h
+
+That's a horrible config format lol, but probbaly the simplest way to
+get something working. What if you included the user config first, then
+make the generated config test ifndef before defining the default?
+
+Is it better to have a config file than to just add more --options to
+configure? If we had thousands of options maybe, but so far we are
+getting by with configure options. I think I prefer that for now
+unless we wholesale moved everything to a .config style.
+
+Thanks,
+Nick
+
 >
-Acked-by: Nicholas Piggin <npiggin@gmail.com>
-
-> Acked-by: Thomas Huth <thuth@redhat.com>
 > Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
 > ---
->  .gitlab-ci.yml | 43 +++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 43 insertions(+)
+>  configure | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
 >
-> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-> index 67a9a15733f1..b7ad99870e5a 100644
-> --- a/.gitlab-ci.yml
-> +++ b/.gitlab-ci.yml
-> @@ -176,6 +176,49 @@ build-riscv64-efi:
->        | tee results.txt
->   - grep -q PASS results.txt && ! grep -q FAIL results.txt
+> diff --git a/configure b/configure
+> index 27ae9cc89657..7a1317d0650d 100755
+> --- a/configure
+> +++ b/configure
+> @@ -64,6 +64,8 @@ usage() {
+>  	                           no environ is provided by the user (enabled =
+by default)
+>  	    --erratatxt=3DFILE       specify a file to use instead of errata.tx=
+t. Use
+>  	                           '--erratatxt=3D' to ensure no file is used.
+> +	    --add-config=3DFILE      specify a file containing configs (CONFIG_=
+*) to add on to the
+> +	                           generated lib/config.h. Use #undef to overri=
+de default configs.
+>  	    --host-key-document=3DHOST_KEY_DOCUMENT
+>  	                           Specify the machine-specific host-key docume=
+nt for creating
+>  	                           a PVM image with 'genprotimg' (s390x only)
+> @@ -153,6 +155,10 @@ while [[ "$1" =3D -* ]]; do
+>  	    erratatxt=3D
+>  	    [ "$arg" ] && erratatxt=3D$(eval realpath "$arg")
+>  	    ;;
+> +	--add-config)
+> +	    add_config=3D
+> +	    [ "$arg" ] && add_config=3D$(eval realpath "$arg")
+> +	    ;;
+>  	--host-key-document)
+>  	    host_key_document=3D"$arg"
+>  	    ;;
+> @@ -213,6 +219,10 @@ if [ "$erratatxt" ] && [ ! -f "$erratatxt" ]; then
+>      echo "erratatxt: $erratatxt does not exist or is not a regular file"
+>      exit 1
+>  fi
+> +if [ "$add_config" ] && [ ! -f "$add_config" ]; then
+> +    echo "add-config: $add_config does not exist or is not a regular fil=
+e"
+> +    exit 1
+> +fi
 > =20
-> +build-riscv32-clang:
-> + extends: .intree_template
-> + script:
-> + - dnf install -y qemu-system-riscv gcc-riscv64-linux-gnu clang
-> + - ./configure --arch=3Driscv32 --cc=3Dclang --cflags=3D'--target=3Drisc=
-v32' --cross-prefix=3Driscv64-linux-gnu-
-> + - make -j2
-> + - printf "FOO=3Dfoo\nBAR=3Dbar\nBAZ=3Dbaz\nMVENDORID=3D0\nMARCHID=3D0\n=
-MIMPID=3D0\n" >test-env
-> + - ACCEL=3Dtcg KVM_UNIT_TESTS_ENV=3Dtest-env ./run_tests.sh
-> +      selftest
-> +      sbi
-> +      | tee results.txt
-> + - grep -q PASS results.txt && ! grep -q FAIL results.txt
-> +
-> +build-riscv64-clang:
-> + extends: .outoftree_template
-> + script:
-> + - dnf install -y qemu-system-riscv gcc-riscv64-linux-gnu clang
-> + - mkdir build
-> + - cd build
-> + - ../configure --arch=3Driscv64 --cc=3Dclang --cflags=3D'--target=3Dris=
-cv64' --cross-prefix=3Driscv64-linux-gnu-
-> + - make -j2
-> + - printf "FOO=3Dfoo\nBAR=3Dbar\nBAZ=3Dbaz\nMVENDORID=3D0\nMARCHID=3D0\n=
-MIMPID=3D0\n" >test-env
-> + - ACCEL=3Dtcg KVM_UNIT_TESTS_ENV=3Dtest-env ./run_tests.sh
-> +      selftest
-> +      sbi
-> +      | tee results.txt
-> + - grep -q PASS results.txt && ! grep -q FAIL results.txt
-> +
-> +build-riscv64-clang-efi:
-> + extends: .intree_template
-> + script:
-> + - dnf install -y edk2-riscv64 qemu-system-riscv gcc-riscv64-linux-gnu c=
-lang
-> + - cp /usr/share/edk2/riscv/RISCV_VIRT_CODE.fd .
-> + - truncate -s 32M RISCV_VIRT_CODE.fd
-> + - ./configure --arch=3Driscv64 --cc=3Dclang --cflags=3D'--target=3Drisc=
-v64' --cross-prefix=3Driscv64-linux-gnu- --enable-efi
-> + - make -j2
-> + - printf "FOO=3Dfoo\nBAR=3Dbar\nBAZ=3Dbaz\nMVENDORID=3D0\nMARCHID=3D0\n=
-MIMPID=3D0\n" >test-env
-> + - ACCEL=3Dtcg KVM_UNIT_TESTS_ENV=3Dtest-env ./run_tests.sh
-> +      selftest
-> +      sbi
-> +      | tee results.txt
-> + - grep -q PASS results.txt && ! grep -q FAIL results.txt
-> +
->  build-s390x:
->   extends: .outoftree_template
->   script:
+>  arch_name=3D$arch
+>  [ "$arch" =3D "aarch64" ] && arch=3D"arm64"
+> @@ -502,4 +512,8 @@ cat <<EOF >> lib/config.h
+> =20
+>  EOF
+>  fi
+> +if [ "$add_config" ]; then
+> +    echo "/* Additional configs from $add_config */" >> lib/config.h
+> +    cat "$add_config" >> lib/config.h
+> +fi
+>  echo "#endif" >> lib/config.h
 
