@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07FA01A264B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2168F1A265E;
 	Wed, 11 Sep 2024 13:51:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726062719; cv=none; b=UCPnR4J8TZG9UWuIeRidIdpeVx2so0r9QqcOn0qjUk2tvxy5P/+JwCRjonNLEGSIy5MRA3uH4UOF9oDCO+SXqt7p//Hqg4askt+R7lNCwRHbaTdqGLkp1fsIdUmJFlS5pcMMGMZpd9haHgVjB8LPoBD9p8EZaIjdae4LxK9MCEM=
+	t=1726062719; cv=none; b=KktGRuvt2EhGGrtknd6X3k9Gspy8lLogQHpTuHrC1UN5NcekPNXG2m0gi+O9FUrqqac9uGXd3kto4LMYKjhK0/dkcstM3f2zNFkZcb/YvH/jRcmJJ/iJFTF+RjHkekEUY+FQeGtyZbqrfnJYwTF2ZS5emIdDaMfNjBUzfinOijc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1726062719; c=relaxed/simple;
-	bh=k8KPgOAvxgo0liwV0NdHjTyRjPyRBrre7BS0OvWG+lc=;
+	bh=DoItppUl16RwlwUFW5kd+LC35Szb7CzFjd1PiApkHmo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qXReHyA5ht/QQtSIsWxhOdrzL9nfMQ0/0ovfByRY0ixPtns/zC2gPx9uNXfnmb3yhqhTIQldjeCroJDpJmHDFnRcsbHnFYV9ainYO90mGREV3lH8fUIN6iOvvtf0Yaj6rnowMeLV1zsOTghYEhJauefLSZyje26TffZyQBA/GZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hjhrCuSD; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=gf8/d0JnnmWu/ZqJtHw15gniXz449IRnccQRwgG4LNSmXEcB3YK77IAu8mOerWMr+FTEboXvf5YL92A5YESViiRE9sHGOxmiJyznBe9GCWPy4ZSzJTnPg2l2c+7tC6LQ7+fSE7upHQ7zNFYcgCW6F27eTTU/OTigtW9CyYLnIlk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FcFwrJJB; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hjhrCuSD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B79F8C4CED0;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FcFwrJJB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF9A2C4CECE;
 	Wed, 11 Sep 2024 13:51:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1726062718;
-	bh=k8KPgOAvxgo0liwV0NdHjTyRjPyRBrre7BS0OvWG+lc=;
+	bh=DoItppUl16RwlwUFW5kd+LC35Szb7CzFjd1PiApkHmo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hjhrCuSD5I7X3LZHAO1HxT7vE41ZpAePOc9VUImQ526ozS0FgAszWC5iHz0/pEBOY
-	 1CO7/VEDZTOj8hqxbcpN3wMZfof/LrthN+iYybyYLFdQ41IyHVIE4dSJK0Nfn4COZV
-	 ZZt0XaHzN42BF6eqklstvIL7uik9O94IWPIdNCj4D6NDFThJZWXeJCliiKamEE2Dbp
-	 5tc/JC8gl1yW0n1MesgT3X+0CIznARHKklyHY3WmHAx+jUEM7mvcu/HmwnyyOiR00H
-	 bUEhAqaYq8okExRw99DKL3rDY60QwFuTE3Ff0vbCHlmU/lyA9adiGhQ26+aY8DdyzD
-	 Txo29g7OZppSg==
+	b=FcFwrJJBZyW9IBUIad7hcx/w0CRdP2g5+UAYI/pZoGk7fsoOfHCQJOsqdNbafwebt
+	 lPqrz14oLGpMbVFQATWU5aL5o9J/4JTK+Lry870bqzUZY0vZj5jVnSyXgpH0YHfVnL
+	 aQP1YJL6e1zH8ecPAf49YXGPZoMn5jMiWXqwSaLxzhNri79GnlP0/UcZRGqLW/kpPl
+	 qpZXt9sZEBB9TPLWBeKqRaU7hM/NtRgd+Ge8qHI+L7nq+P9EQHfWx2Vm/wV4Zr9+IT
+	 2U2wYkgRvunxX3YojCNvK4gw/vQKLv/JaKceGxERUAPI0z7RXuJvyszm4YySmddECP
+	 iULjnIIS/gGaQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1soNlE-00C7tL-SE;
+	id 1soNlE-00C7tL-K3;
 	Wed, 11 Sep 2024 14:51:56 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -43,9 +43,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v3 03/24] arm64: Add encoding for PIRE0_EL2
-Date: Wed, 11 Sep 2024 14:51:30 +0100
-Message-Id: <20240911135151.401193-4-maz@kernel.org>
+Subject: [PATCH v3 02/24] arm64: Remove VNCR definition for PIRE0_EL2
+Date: Wed, 11 Sep 2024 14:51:29 +0100
+Message-Id: <20240911135151.401193-3-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240911135151.401193-1-maz@kernel.org>
 References: <20240911135151.401193-1-maz@kernel.org>
@@ -61,32 +61,31 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-PIRE0_EL2 is the equivalent of PIRE0_EL1 for the EL2&0 translation
-regime, and it is sorely missing from the sysreg file.
+As of the ARM ARM Known Issues document 102105_K.a_04_en, D22677
+fixes a problem with the PIRE0_EL2 register, resulting in its
+removal from the VNCR page (it had no purpose being there the
+first place).
 
-Add the sucker.
+Follow the architecture update by removing this offset.
 
 Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/tools/sysreg | 4 ++++
- 1 file changed, 4 insertions(+)
+ arch/arm64/include/asm/vncr_mapping.h | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index 27c71fe3952f1..d80859565547e 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -2852,6 +2852,10 @@ Sysreg	PIRE0_EL12	3	5	10	2	2
- Fields	PIRx_ELx
- EndSysreg
- 
-+Sysreg	PIRE0_EL2	3	4	10	2	2
-+Fields	PIRx_ELx
-+EndSysreg
-+
- Sysreg	PIR_EL1		3	0	10	2	3
- Fields	PIRx_ELx
- EndSysreg
+diff --git a/arch/arm64/include/asm/vncr_mapping.h b/arch/arm64/include/asm/vncr_mapping.h
+index df2c47c559728..9e593bb609750 100644
+--- a/arch/arm64/include/asm/vncr_mapping.h
++++ b/arch/arm64/include/asm/vncr_mapping.h
+@@ -50,7 +50,6 @@
+ #define VNCR_VBAR_EL1           0x250
+ #define VNCR_TCR2_EL1		0x270
+ #define VNCR_PIRE0_EL1		0x290
+-#define VNCR_PIRE0_EL2		0x298
+ #define VNCR_PIR_EL1		0x2A0
+ #define VNCR_ICH_LR0_EL2        0x400
+ #define VNCR_ICH_LR1_EL2        0x408
 -- 
 2.39.2
 
