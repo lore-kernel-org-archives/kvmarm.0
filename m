@@ -1,40 +1,51 @@
-Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 492AC1B9B26
-	for <kvmarm@lists.linux.dev>; Wed, 11 Sep 2024 18:00:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 506D258AC4;
+	Wed, 11 Sep 2024 19:32:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726077619; cv=none; b=cAk8udHc/DB4R1W8Qy2Q7Nk7hk0OXU37ONBYrgVfJLaEPG6SO4AACAYrIyDP3qItiTw9Nd7ISJTOCPKWitO8KmtJU5K55QuNcqsL501Mx6TJF2cI4aUGmW1JFT7Nsl1TuNZTQKmhhWPMkqo2/2mQVRBc4L2PKllmSI5dMElCCZM=
+	t=1726083156; cv=none; b=KXw/V1Ru3yk0RZ4UbrKnLJPgcyzZOtOxwsa+mI5nhcZCV0/3foz6vAg8/P2d938aQ1heczOn8mVz0cMwKMGkOhtEl+Dtbl9W/hwjcxNzSqF12MNw2cf3DaZiaja82/iuGvU6e1U/SZsGZKHglfQejW6SiqlCx5B/g26Ys1CjVBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726077619; c=relaxed/simple;
-	bh=IhnRCaZJTTAr/WcA+mYQrUVycqjcQVe3BQ0esoraofI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ppx8xYaT08yH/mAhJ2+13OVlZbCE0350ny52nzES/9sELkwn3NsKptgt0Ivm3FT28GaNPKFMn2OGz9do13/ck9ZSvOZ36p9oka2+KrZiE9w2Nh93nZH6k4DJ1Hwumegdntuectu1Nyz74VeniCN2b7uwTtFYg2F/nhL36dD69Zw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NA9D5xLd; arc=none smtp.client-ip=95.215.58.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1726083156; c=relaxed/simple;
+	bh=VdsQg9HsZmbhwQYQyJYLohUBcRLUGY8hZaRUHcNVfW8=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=g1E1wYa41BXchkysjS2bMCrgCNLsCbcE3xyUgzCLKE/hQNtydJsEeR2FtTAZCkLLuoeF8EBGvLUKNe/9h1XJ92R/EnLNHAWM8Eu+iL1jfs6lF6mbiTBJ64JnAhTlVDMWErlWeS1ZhFd3Mhj9loTNQ5IFlAvHhtsGppCfII1n93g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RV8JSEQY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NA9D5xLd"
-Date: Wed, 11 Sep 2024 11:00:05 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1726077613;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0ihUxWnJ1ESYco5Pe6kpjdBw8nJlk/3qj/ALs1xfzIA=;
-	b=NA9D5xLd9af5GmohRLDHBX/ZD3NVd7AlhaZTqjyjEg8mJGwFv4ZsCJ+1CM3qgzlceWrf8L
-	J/uEx+oZ9wy0Jw0FKSrCVgAm3JchXgWwSLiMX7x95t1U4ZnyMOQJHg74heIYduK+3WOMOX
-	L1a5umMbadBCOtFfkKgP0GbmVHsFMRo=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RV8JSEQY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C69D3C4CEC0;
+	Wed, 11 Sep 2024 19:32:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726083155;
+	bh=VdsQg9HsZmbhwQYQyJYLohUBcRLUGY8hZaRUHcNVfW8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=RV8JSEQY7uVop6vG8+ApZXPJR+YhYk4wDQ+6W1myXYRhH+3N/PEfQ8OsSfX5SDvV5
+	 159ZetBAZsYOONtcE6pVXiwFdMo61x08SnVyC88NgfFbANN0WbnXKWuTZvLzWkTatg
+	 iGOTpFIMQPG54lla5ZVvdhojCp+piwcWcoc/7Ib+0oPWuYHcrmqWgZQiPjxdb9+obJ
+	 8v0Cy1rbuoHLxRvZBo8orZ1BqzjIi+0A66lIwjY8Yve4nmd+0WUSJj3BWdSPBAQyEe
+	 odLvBQOw0aD0X5YDsYc//7st9WEcpFOmsqVeSh99rPMRUv5ZQ6UreXEy3uKfK6kZwf
+	 +J9Hpt9+lQopQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1soT4r-00CDGU-Nm;
+	Wed, 11 Sep 2024 20:32:33 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Marc Zyngier <maz@kernel.org>
+Cc: James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
 Subject: Re: [PATCH 0/3] KVM: arm64: Get rid of REG_HIDDEN_USER
-Message-ID: <ZuHapdH3F8ZnSuIC@linux.dev>
+Date: Wed, 11 Sep 2024 20:32:31 +0100
+Message-Id: <172608314298.404616.5760924324456191456.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240904082419.1982402-1-maz@kernel.org>
 References: <20240904082419.1982402-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -42,12 +53,14 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240904082419.1982402-1-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Sep 04, 2024 at 09:24:16AM +0100, Marc Zyngier wrote:
+On Wed, 04 Sep 2024 09:24:16 +0100, Marc Zyngier wrote:
 > REG_HIDDEN_USER was introduced as a way to deal with the ARMv8.3 flavour of
 > FEAT_NV, where most EL12 sysreg accesses would trap and yet be mapped to a
 > EL1 register (KVM doing in SW what FEAT_NV2 does in HW). This handling
@@ -59,13 +72,21 @@ On Wed, Sep 04, 2024 at 09:24:16AM +0100, Marc Zyngier wrote:
 > the original FEAT_NV, REG_HIDDEN_USER only had a few users, all of which
 > could either be replaced by a more ad-hoc mechanism, or removed altogether.
 > 
-> This series goes ahead and cleans it up for good, removing a tiny bit of
-> unnecessary complexity.
+> [...]
 
-Yeah, let's toss it.
+Applied to next, thanks!
 
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+[1/3] KVM: arm64: Simplify handling of CNTKCTL_EL12
+      commit: 989fce63b2cb5061701c9fa04711d992dfaff5c6
+[2/3] KVM: arm64: Simplify visibility handling of AArch32 SPSR_*
+      commit: 84ed45456cee7e77effea8407f4f32b262f2e2ea
+[3/3] KVM: arm64: Get rid of REG_HIDDEN_USER visibility qualifier
+      commit: 0746096faca01823021f662282e1f067a69b965b
 
+Cheers,
+
+	M.
 -- 
-Thanks,
-Oliver
+Without deviation from the norm, progress is not possible.
+
+
