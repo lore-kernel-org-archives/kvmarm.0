@@ -1,57 +1,57 @@
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 418F01B9B58
-	for <kvmarm@lists.linux.dev>; Wed, 11 Sep 2024 20:42:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E937C1BE87B
+	for <kvmarm@lists.linux.dev>; Wed, 11 Sep 2024 20:42:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726087367; cv=none; b=lGhluiN23ha26LdP/Ku532EC6cYPokfUM7x1+9siagzAvknp9z7b+YNwbr2dYTIZSryDiWNzxKMhdXDEvMwwsjOGejeQe36qK0Fx+CXI/FVUVwCU74X5gVd7cS3qWPjhFNWk3fXxi3BFRr/VSmtqQjCbRSpctMMjqP7fQWff5Qo=
+	t=1726087369; cv=none; b=ZaL00DCsvYyrHuR3DarKhhgFlygHmTWKSb4aZqyTVNk3BDzWT75Hpu12U3vL3kr1SMp6GjaaRzhBMwiFk3uHVoigA8/pY0Ih+QzhPH34QpXPzE+lwJmAEMLjkcubqq9QnRbTI3tz+bf2Stz40oxrmbj+h2SDskF4ng7ig14hKsY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726087367; c=relaxed/simple;
-	bh=8oi3u31KxpdCNwifk0F+crB0nVZG46vd0de0WiqVC9c=;
+	s=arc-20240116; t=1726087369; c=relaxed/simple;
+	bh=nzjwfSdD3cO6aEdd4P/TaF27B9tCLmQVt0LgI5quIXs=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=gqz+Vqi73WBdq5LMO6P9QsVdqca6CXgB/0txOBRK9GJZSCGCHn3IiUtsnY+6X+yHjK0r37BAmSVRXOr9vT2XFS9BYwbJ4wn1QBXnA1uo3Omi7aygwHHcuXNJh1zYNkKGZuIv3iDnB8Vqp0zzU2Tbgu0barfAj6pHUkM6cR2GVaw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BKdx9+Hi; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=syTCLmOstf8Ex/UZNoBfyx41bBk+T8ZdU7uWrAL1IjnMnZoHI3lvUZ8z9sYgkxZpysrMQm2CE1M4wIfgZcoXbcsosqs93yAlhJi1IuMIzVjtybbUyg7SeBAZ8IfVHg4l/W6OrZUWn3oAruy5ubPZmwv8w6EeAZmS5yGT3476gak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HSCHeuaZ; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BKdx9+Hi"
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-206d8c47496so5453165ad.2
-        for <kvmarm@lists.linux.dev>; Wed, 11 Sep 2024 13:42:46 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HSCHeuaZ"
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7d7cbd87bfaso174810a12.2
+        for <kvmarm@lists.linux.dev>; Wed, 11 Sep 2024 13:42:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726087365; x=1726692165; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1726087367; x=1726692167; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=hqBHipBEc9VIgDpl6wbsMWiAPCMzGAxUDsb/VQrQ1Fg=;
-        b=BKdx9+Hi+V1IR3Jja3hOpZ0EBQKu3C2XwkDkmGE2dt0Z8/OXybUbCVRK5wY0koMhsq
-         XIyl4b7l655C23J7Oq1UNqQJswQoYzMD9lgT2eXFRqFTBgDkBMwNHUpdDCDy4LonZ90i
-         uuQ2kKjEWdvn576QXuNJ6CkURfXSDySCAltW/OjcnB8WX+d71tfmDv3NkTINbgnCNHvu
-         NLVXUwCGFmrKTOcZSC0K2d4NTtoW6WsC/ydgRaM6H4Y3p4ic39t8sPDtYpkmn21i3ffT
-         +qfZ9tngS5+xkMATqpxqcJyHZSmLgu/8Xe/c3JM5AKgzdLzv+NsjfynRDUhqwFHgH8ah
-         m1EA==
+        bh=9gVKeS9zxIWQJ6wZPVMMrqlZKwDoa69fsuapAtj2LII=;
+        b=HSCHeuaZ3InavNYk5DXryFLrcCvc1qojS5fQnys4cHX7tuDeZquH5vrsxZFgd2D54u
+         pvkwPKQLRrdTfjdPDCdSXsMH/kPLDA97slu/ql3nWDiL4G+S8n4rvwp87OVBKb0bJBUW
+         SqUNk4AUAjOXAW3pMMO1v5YloBROFVe7agg62GBv76liEJUVMf18OuKKHKdoWMGs4nWm
+         aQQaWv3kE/dEnmLDRCecp8RTTfcePNe08sy/LTgMS7S+y2w8BqhxDD41FwV2qkUTsgaW
+         Fvi8Y70uqRw/WKz5Fbko5vaf5lq3EvlZZIkB8pYmJyW5bAKHp8wgEzZrKVTnSUb9eavm
+         1eVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726087365; x=1726692165;
+        d=1e100.net; s=20230601; t=1726087367; x=1726692167;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=hqBHipBEc9VIgDpl6wbsMWiAPCMzGAxUDsb/VQrQ1Fg=;
-        b=sPL0LLM7kbXvfBeYCaSOaPArxWROKgpubqXOA/veHFpJOhUF5yc8nTmW51j8qWyHX0
-         NC97RLbALzOmpKSKgWYeLcpv9fMclb9gYxdt7EUb/sNYj748dCp9iu9VY7I5e+mCFVAl
-         yXu20/kEbAkpIIjORKoylxpcWXEISVPuBuykaAy8Nr9WprQhnkwfr7vme2y84IBp1Wb3
-         slOp//45S1tgmwtBBJJNBTfW8DAiUI7q/4okBgujAz1LCsqZLObJzhGBZMOC3OonGDVP
-         5JqrVT/VS315zK6dU5StgqGwlROJ+gdOE7lhthmQ8QBx0ahoLLqxpESaITBLTy0m0HfQ
-         Wdeg==
-X-Forwarded-Encrypted: i=1; AJvYcCUsqFMf5qmswhr9KnRbtRyj5TgPR4DulW9acGx5IGtV290YBIrebADvQWfuuOIMRlTNWDcN/f8=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxM/MwC2cYWbBzrXW0wPSKRQ11j1dDv0kW6Yl2hqmwP+WvOOIwf
-	nBur8Q3g2kw1pBroh7XmIDDbR7V0xVFx7JAPkX/xGcEegT5z9ivFE13O7r81xVD6MLxg7XhOa/K
-	UJA==
-X-Google-Smtp-Source: AGHT+IGFL4zTHrWHCMVM8aBCteHxHmYI7HhRHME2L0vYSDU/f35eVCRnBetmKBLszuGgfMu2jElNurnmeFg=
+        bh=9gVKeS9zxIWQJ6wZPVMMrqlZKwDoa69fsuapAtj2LII=;
+        b=hZmJZpJhq9R7/KxUUjtV4YYVwPMyu6IrLxa5JtBOBnyeSte/zawzM2b0O9pDM8SLCC
+         8VBnJkKCWrZMuh8Ng/EoQFcKGCX5s/XV7YJJDPujqkFa3XxB13mZlh67m7Ddv42uDZIS
+         uv3Xvkg8tblj7H2VWiSUtQ/ZZT4d2FI/3ONgSg1jIk4ze5wjVLEmkVAjxORNdlKv2Qlu
+         NfAeFb0P+MO5J9wvi3zSO9YnLC9ok4VP6FWdm0lAHgH97JdWkssBk6F6lQOAT7PYoguY
+         OQrGbVrmJHxMhOqppeh8AYepVKryiBNIOkQc+cEmaFZej8Q7S9JZ2c/tIGDFbohO2vMU
+         esfA==
+X-Forwarded-Encrypted: i=1; AJvYcCWYG5hau154ZJIeFbbEo/DNBYpgRekFESCFRj/Vr1RC7VoDNFJL3PDxg47Jb3Vw226D3X8JIRI=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzhAlD5WEC8QM6iRYCr3dMeUs/aw/JXEbCUA07AZKg3FAfFuvCf
+	NiOrAPdKKY6Txx9a22K56zZtH2ZwZUxgcg6XqkUqtLvEI0ymMT9vd9RHuthRqMBet+nEOh6cflH
+	1dg==
+X-Google-Smtp-Source: AGHT+IGelrPvd4nOI5BY8vHHV3fhWRQXV6KTNrZs/VYSkLr9yCzToyzIxt0KpWTMZ3YrjpacOP321gVr5gM=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:f90b:b0:205:937f:3acb with SMTP id
- d9443c01a7336-2076e4768d5mr74435ad.10.1726087365359; Wed, 11 Sep 2024
- 13:42:45 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a63:721a:0:b0:7cd:6621:8cd5 with SMTP id
+ 41be03b00d2f7-7db2057eeb1mr17290a12.3.1726087367261; Wed, 11 Sep 2024
+ 13:42:47 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 11 Sep 2024 13:41:57 -0700
+Date: Wed, 11 Sep 2024 13:41:58 -0700
 In-Reply-To: <20240911204158.2034295-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,8 +61,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240911204158.2034295-1-seanjc@google.com>
 X-Mailer: git-send-email 2.46.0.598.g6f2099f65c-goog
-Message-ID: <20240911204158.2034295-13-seanjc@google.com>
-Subject: [PATCH v2 12/13] KVM: selftests: Add a read-only mprotect() phase to mmu_stress_test
+Message-ID: <20240911204158.2034295-14-seanjc@google.com>
+Subject: [PATCH v2 13/13] KVM: selftests: Verify KVM correctly handles mprotect(PROT_READ)
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Anup Patel <anup@brainfault.org>, Paolo Bonzini <pbonzini@redhat.com>, 
@@ -74,71 +74,179 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Sean Christopherson <seanjc@google.com>, James Houghton <jthoughton@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Add a third phase of mmu_stress_test to verify that mprotect()ing guest
-memory to make it read-only doesn't cause explosions, e.g. to verify KVM
-correctly handles the resulting mmu_notifier invalidations.
+Add two phases to mmu_stress_test to verify that KVM correctly handles
+guest memory that was writable, and then made read-only in the primary MMU,
+and then made writable again.
+
+Add bonus coverage for x86 and arm64 to verify that all of guest memory was
+marked read-only.  Making forward progress (without making memory writable)
+requires arch specific code to skip over the faulting instruction, but the
+test can at least verify each vCPU's starting page was made read-only for
+other architectures.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/mmu_stress_test.c | 22 +++++++++++++++----
- 1 file changed, 18 insertions(+), 4 deletions(-)
+ tools/testing/selftests/kvm/mmu_stress_test.c | 104 +++++++++++++++++-
+ 1 file changed, 101 insertions(+), 3 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/mmu_stress_test.c b/tools/testing/selftests/kvm/mmu_stress_test.c
-index 9573ed0e696d..50c3a17418c4 100644
+index 50c3a17418c4..c07c15d7cc9a 100644
 --- a/tools/testing/selftests/kvm/mmu_stress_test.c
 +++ b/tools/testing/selftests/kvm/mmu_stress_test.c
-@@ -27,6 +27,10 @@ static void guest_code(uint64_t start_gpa, uint64_t end_gpa, uint64_t stride)
- 		GUEST_SYNC(i);
- 	}
+@@ -16,6 +16,8 @@
+ #include "guest_modes.h"
+ #include "processor.h"
  
++static bool mprotect_ro_done;
++
+ static void guest_code(uint64_t start_gpa, uint64_t end_gpa, uint64_t stride)
+ {
+ 	uint64_t gpa;
+@@ -31,6 +33,42 @@ static void guest_code(uint64_t start_gpa, uint64_t end_gpa, uint64_t stride)
+ 		*((volatile uint64_t *)gpa);
+ 	GUEST_SYNC(2);
+ 
++	/*
++	 * Write to the region while mprotect(PROT_READ) is underway.  Keep
++	 * looping until the memory is guaranteed to be read-only, otherwise
++	 * vCPUs may complete their writes and advance to the next stage
++	 * prematurely.
++	 *
++	 * For architectures that support skipping the faulting instruction,
++	 * generate the store via inline assembly to ensure the exact length
++	 * of the instruction is known and stable (vcpu_arch_put_guest() on
++	 * fixed-length architectures should work, but the cost of paranoia
++	 * is low in this case).  For x86, hand-code the exact opcode so that
++	 * there is no room for variability in the generated instruction.
++	 */
++	do {
++		for (gpa = start_gpa; gpa < end_gpa; gpa += stride)
++#ifdef __x86_64__
++			asm volatile(".byte 0x48,0x89,0x00" :: "a"(gpa) : "memory"); /* mov %rax, (%rax) */
++#elif defined(__aarch64__)
++			asm volatile("str %0, [%0]" :: "r" (gpa) : "memory");
++#else
++			vcpu_arch_put_guest(*((volatile uint64_t *)gpa), gpa);
++#endif
++	} while (!READ_ONCE(mprotect_ro_done));
++
++	/*
++	 * Only architectures that write the entire range can explicitly sync,
++	 * as other architectures will be stuck on the write fault.
++	 */
++#if defined(__x86_64__) || defined(__aarch64__)
++	GUEST_SYNC(3);
++#endif
++
 +	for (gpa = start_gpa; gpa < end_gpa; gpa += stride)
-+		*((volatile uint64_t *)gpa);
-+	GUEST_SYNC(2);
++		vcpu_arch_put_guest(*((volatile uint64_t *)gpa), gpa);
++	GUEST_SYNC(4);
 +
  	GUEST_ASSERT(0);
  }
  
-@@ -94,6 +98,10 @@ static void *vcpu_worker(void *data)
- 	run_vcpu(vcpu, 1);
- 	rendezvous_with_boss();
+@@ -78,6 +116,7 @@ static void *vcpu_worker(void *data)
+ 	struct vcpu_info *info = data;
+ 	struct kvm_vcpu *vcpu = info->vcpu;
+ 	struct kvm_vm *vm = vcpu->vm;
++	int r;
  
-+	/* Stage 2, read all of guest memory, which is now read-only. */
-+	run_vcpu(vcpu, 2);
+ 	vcpu_args_set(vcpu, 3, info->start_gpa, info->end_gpa, vm->page_size);
+ 
+@@ -100,6 +139,57 @@ static void *vcpu_worker(void *data)
+ 
+ 	/* Stage 2, read all of guest memory, which is now read-only. */
+ 	run_vcpu(vcpu, 2);
++
++	/*
++	 * Stage 3, write guest memory and verify KVM returns -EFAULT for once
++	 * the mprotect(PROT_READ) lands.  Only architectures that support
++	 * validating *all* of guest memory sync for this stage, as vCPUs will
++	 * be stuck on the faulting instruction for other architectures.  Go to
++	 * stage 3 without a rendezvous
++	 */
++	do {
++		r = _vcpu_run(vcpu);
++	} while (!r);
++	TEST_ASSERT(r == -1 && errno == EFAULT,
++		    "Expected EFAULT on write to RO memory, got r = %d, errno = %d", r, errno);
++
++#if defined(__x86_64__) || defined(__aarch64__)
++	/*
++	 * Verify *all* writes from the guest hit EFAULT due to the VMA now
++	 * being read-only.  x86 and arm64 only at this time as skipping the
++	 * instruction that hits the EFAULT requires advancing the program
++	 * counter, which is arch specific and relies on inline assembly.
++	 */
++#ifdef __x86_64__
++	vcpu->run->kvm_valid_regs = KVM_SYNC_X86_REGS;
++#endif
++	for (;;) {
++		r = _vcpu_run(vcpu);
++		if (!r)
++			break;
++		TEST_ASSERT_EQ(errno, EFAULT);
++#if defined(__x86_64__)
++		WRITE_ONCE(vcpu->run->kvm_dirty_regs, KVM_SYNC_X86_REGS);
++		vcpu->run->s.regs.regs.rip += 3;
++#elif defined(__aarch64__)
++		vcpu_set_reg(vcpu, ARM64_CORE_REG(regs.pc),
++			     vcpu_get_reg(vcpu, ARM64_CORE_REG(regs.pc)) + 4);
++#endif
++
++	}
++	assert_sync_stage(vcpu, 3);
++#endif /* __x86_64__ || __aarch64__ */
 +	rendezvous_with_boss();
 +
- 	return NULL;
- }
++	/*
++	 * Stage 4.  Run to completion, waiting for mprotect(PROT_WRITE) to
++	 * make the memory writable again.
++	 */
++	do {
++		r = _vcpu_run(vcpu);
++	} while (r && errno == EFAULT);
++	TEST_ASSERT_EQ(r, 0);
++	assert_sync_stage(vcpu, 4);
+ 	rendezvous_with_boss();
  
-@@ -174,7 +182,7 @@ int main(int argc, char *argv[])
+ 	return NULL;
+@@ -182,7 +272,7 @@ int main(int argc, char *argv[])
  	const uint64_t start_gpa = SZ_4G;
  	const int first_slot = 1;
  
--	struct timespec time_start, time_run1, time_reset, time_run2;
-+	struct timespec time_start, time_run1, time_reset, time_run2, time_ro;
+-	struct timespec time_start, time_run1, time_reset, time_run2, time_ro;
++	struct timespec time_start, time_run1, time_reset, time_run2, time_ro, time_rw;
  	uint64_t max_gpa, gpa, slot_size, max_mem, i;
  	int max_slots, slot, opt, fd;
  	bool hugepages = false;
-@@ -278,14 +286,20 @@ int main(int argc, char *argv[])
- 	rendezvous_with_vcpus(&time_reset, "reset");
+@@ -287,19 +377,27 @@ int main(int argc, char *argv[])
  	rendezvous_with_vcpus(&time_run2, "run 2");
  
-+	mprotect(mem, slot_size, PROT_READ);
-+	rendezvous_with_vcpus(&time_ro, "mprotect RO");
+ 	mprotect(mem, slot_size, PROT_READ);
++	usleep(10);
++	mprotect_ro_done = true;
++	sync_global_to_guest(vm, mprotect_ro_done);
 +
-+	time_ro    = timespec_sub(time_ro,     time_run2);
+ 	rendezvous_with_vcpus(&time_ro, "mprotect RO");
++	mprotect(mem, slot_size, PROT_READ | PROT_WRITE);
++	rendezvous_with_vcpus(&time_rw, "mprotect RW");
+ 
++	time_rw    = timespec_sub(time_rw,     time_ro);
+ 	time_ro    = timespec_sub(time_ro,     time_run2);
  	time_run2  = timespec_sub(time_run2,   time_reset);
--	time_reset = timespec_sub(time_reset, time_run1);
-+	time_reset = timespec_sub(time_reset,  time_run1);
+ 	time_reset = timespec_sub(time_reset,  time_run1);
  	time_run1  = timespec_sub(time_run1,   time_start);
  
--	pr_info("run1 = %ld.%.9lds, reset = %ld.%.9lds, run2 =  %ld.%.9lds\n",
-+	pr_info("run1 = %ld.%.9lds, reset = %ld.%.9lds, run2 = %ld.%.9lds, "
-+		"ro = %ld.%.9lds\n",
+ 	pr_info("run1 = %ld.%.9lds, reset = %ld.%.9lds, run2 = %ld.%.9lds, "
+-		"ro = %ld.%.9lds\n",
++		"ro = %ld.%.9lds, rw = %ld.%.9lds\n",
  		time_run1.tv_sec, time_run1.tv_nsec,
  		time_reset.tv_sec, time_reset.tv_nsec,
--		time_run2.tv_sec, time_run2.tv_nsec);
-+		time_run2.tv_sec, time_run2.tv_nsec,
-+		time_ro.tv_sec, time_ro.tv_nsec);
+ 		time_run2.tv_sec, time_run2.tv_nsec,
+-		time_ro.tv_sec, time_ro.tv_nsec);
++		time_ro.tv_sec, time_ro.tv_nsec,
++		time_rw.tv_sec, time_rw.tv_nsec);
  
  	/*
  	 * Delete even numbered slots (arbitrary) and unmap the first half of
