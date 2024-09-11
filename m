@@ -1,36 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC9871A2642;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0622C19E963;
 	Wed, 11 Sep 2024 13:51:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726062718; cv=none; b=WsLq1bv40Q//r5pIRc6qXJ6JSqslBF1/pHPb+ATBgRVczR3Cru9akEn06prNkqdA02/mLUnLjYuwwjAjQGkHKfDVidDxfVJvXXQy5SrsBpdFa50NDwOO23wAeZMwZdQvj/lvjuCGjefmYtygXmkRm2Xeebm0KSw9Lp4fANR6pgs=
+	t=1726062719; cv=none; b=FbJqf9PPn3kjRWWYOvCNl2nsBrrYqfCsxFxMAKV17rXZDjy1rAaqm9P3UTZ3g+CBucX2rL2wFYrYPhfDnzodKZbUNK72xQnIq4gcfGx2gHLqntJDJzsCXzLs1VZe/y3fcAn2Mf9dMQsbgkMtNdeP+XGMYTC1/xsZOPmmGY1TLiE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726062718; c=relaxed/simple;
-	bh=wO+H1x7RpunI39z5g6QQtUvPj7qwwksh4Ah0uJkrFLE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Rw/PENJTKz9rz6KWNTY1XM5h00osLZb9b1dGQCcsTRTU0+GNtALYe4R2t6g2sYMkTyXf4gAdglVn0UVwC5CftpN1shEBZFQJusRA6XJyF8ah2NUgqbHlfl4Ld9WNWvxiUshXtlkHlSt0lh6Lw4Nk0UeHsXFrq3sX9ZUuc/bwSg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PVIAQbyv; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1726062719; c=relaxed/simple;
+	bh=vBcgrNUTs+DW/BFJA4olVE/S2NNia6ZOy16359zpk1I=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=HV4pIkV0A2PgzACm8dplVBG+vdlGgcc5lDZBUCLg209CPxRPmPAT2E6UCFQ25EZQIUbvqr4SB+XYia6u7DmzyUqP1Tk0gwxagzmc7halxaC1LIHN/Sf3Iu7PQ1QrFNB80znBbQghS4OsB6tA52rwLDXYSQakP4/H+yq0gDn2J1w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iT/RSc+z; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PVIAQbyv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8411BC4CEC0;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iT/RSc+z"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B24E2C4CECF;
 	Wed, 11 Sep 2024 13:51:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1726062718;
-	bh=wO+H1x7RpunI39z5g6QQtUvPj7qwwksh4Ah0uJkrFLE=;
-	h=From:To:Cc:Subject:Date:From;
-	b=PVIAQbyvTmBKzZc8GMOcpEMjA1U8Ip58tOgkLvur+UCu0ygdjB74YvSN6CACy1jQf
-	 pbKiOr/duVQ7wmo+jNBqrANTjLbcI2lIHZNO8Pn+xYxY+wcg8BOn81FZj/EaizREXr
-	 Oi/iQziLKJLbLJOkSXhvGdbzwaI2p3twd9Ta0dwRYX9T1dmo3Nn5uaosuXwTjxROjh
-	 bVe3xG62EDcdYoLmY2p1QlS1hWH3V09Sn0xZwo1YsNYF7sEnTo0oHdWPviJyc31Gr2
-	 SymSnLlR7woYJ1zprgqdpF0Tr6YawTCaT1acpEuI7jeD55QteQouLsZq0/IfoYzdxr
-	 KXx/gj8OFPJcg==
+	bh=vBcgrNUTs+DW/BFJA4olVE/S2NNia6ZOy16359zpk1I=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=iT/RSc+zV1ejg1T37Mca4WH5kYBA/Hc7AQVAFsu64pWisBznUQ9VC/Sbvl49q/7K5
+	 bxfJ1qg7gLqLzALErNNkO4Us0laVkFpDYeH4n4wCCbjLk1Z4bdRmOXQrrDnQlCopMw
+	 m8ZM48W8XlHvfM/R5Du5MdQ3t925cpu1GE7HI2PSoXz8OaFUkrhA6O2AyCxq39VLOe
+	 iLmOyzbQMhCr/NejUMNlC+JccF8i0fB3Cu7ZxTAf6ujIG0H+nLt2RVfoz1e0jRWoKO
+	 y39+urZq15kS8w6QNCrQkVIs0dPGngsLG26lDaKeHNdNCULEgRn0FjjQHXGCCuShuL
+	 eA4FNQKz0FG5Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1soNlE-00C7tL-6c;
-	Wed, 11 Sep 2024 14:51:56 +0100
+	id 1soNlF-00C7tL-2K;
+	Wed, 11 Sep 2024 14:51:57 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -42,10 +43,12 @@ Cc: James Morse <james.morse@arm.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v3 00/24] KVM: arm64: Add EL2 support to FEAT_S1PIE
-Date: Wed, 11 Sep 2024 14:51:27 +0100
-Message-Id: <20240911135151.401193-1-maz@kernel.org>
+Subject: [PATCH v3 04/24] KVM: arm64: nv: Add missing EL2->EL1 mappings in get_el2_to_el1_mapping()
+Date: Wed, 11 Sep 2024 14:51:31 +0100
+Message-Id: <20240911135151.401193-5-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240911135151.401193-1-maz@kernel.org>
+References: <20240911135151.401193-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -58,96 +61,44 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-This series serves a few purposes:
+As KVM has grown a bunch of new system register for NV, it appears
+that we are missing them in the get_el2_to_el1_mapping() list.
 
-- Complete the S1PIE support to include EL2
-- Sneak in the EL2 system register world switch
+Most of them are not crucial as they don't tend to be accessed via
+vcpu_read_sys_reg() and vcpu_write_sys_reg().
 
-As mentioned in few of the patches, this implementation relies on a
-very recent fix to the architecture (D22677 in [0]).
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/sys_regs.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-* From v2 [2]:
-
-  - Correctly reprogram the context for AT in the fast path when S1PIE
-    is in use
-
-  - Generalised sysreg RES0/RES1 masking, and added TCR2_EL2 RES0/RES1
-    bit handling
-
-  - Fix TCR2_EL1, PIR_EL1, PIRE0_EL1 access with VHE
-
-  - Add a bunch of missing registers to get_el2_to_el1_mapping()
-
-  - Correctly map {TCR2,PIR,PIRE0}_EL2 to their EL1 equivalent on NV
-
-  - Disable hierarchical permissions when S1PIE is enabled
-
-  - Make EL2 world switch directly act on the vcpu rather than an
-    arbitrary context
-
-  - Remove SKL{0,1} from the TCR2_EL2 description
-
-* From the initial posting [1]:
-
-- Rebased on top of the AT support branch, which is currently sitting
-  in kvmarm/next
-
-- Add handling for S1 indirect permission in AT, which I'm sure will
-  give Alexandru another king-sized headache
-
-- Picked Mark Brown's series [3] dealing with TCRX and S1PIE
-  visibility, and slapped an extra fix on top for good measure
-
-- Picked up RBs from Joey, with thanks.
-
-[0] https://developer.arm.com/documentation/102105/ka-04/
-[1] https://lore.kernel.org/r/20240813144738.2048302-1-maz@kernel.org
-[2] https://lore.kernel.org/r/20240903153834.1909472-1-maz@kernel.org
-[3] https://lore.kernel.org/r/20240822-kvm-arm64-hide-pie-regs-v2-0-376624fa829c@kernel.org
-
-Marc Zyngier (21):
-  arm64: Drop SKL0/SKL1 from TCR2_EL2
-  arm64: Remove VNCR definition for PIRE0_EL2
-  arm64: Add encoding for PIRE0_EL2
-  KVM: arm64: nv: Add missing EL2->EL1 mappings in
-    get_el2_to_el1_mapping()
-  KVM: arm64: nv: Handle CNTHCTL_EL2 specially
-  KVM: arm64: nv: Save/Restore vEL2 sysregs
-  KVM: arm64: Correctly access TCR2_EL1, PIR_EL1, PIRE0_EL1 with VHE
-  KVM: arm64: Extend masking facility to arbitrary registers
-  arm64: Define ID_AA64MMFR1_EL1.HAFDBS advertising FEAT_HAFT
-  KVM: arm64: Add TCR2_EL2 to the sysreg arrays
-  KVM: arm64: Sanitise TCR2_EL2
-  KVM: arm64: Add save/restore for TCR2_EL2
-  KVM: arm64: Add PIR{,E0}_EL2 to the sysreg arrays
-  KVM: arm64: Add save/restore for PIR{,E0}_EL2
-  KVM: arm64: Handle PIR{,E0}_EL2 traps
-  KVM: arm64: Sanitise ID_AA64MMFR3_EL1
-  KVM: arm64: Add AT fast-path support for S1PIE
-  KVM: arm64: Split S1 permission evaluation into direct and
-    hierarchical parts
-  KVM: arm64: Disable hierarchical permissions when S1PIE is enabled
-  KVM: arm64: Implement AT S1PIE support
-  KVM: arm64: Rely on visibility to let PIR*_ELx/TCR2_ELx UNDEF
-
-Mark Brown (3):
-  KVM: arm64: Define helper for EL2 registers with custom visibility
-  KVM: arm64: Hide TCR2_EL1 from userspace when disabled for guests
-  KVM: arm64: Hide S1PIE registers from userspace when disabled for
-    guests
-
- arch/arm64/include/asm/kvm_host.h          |  34 ++-
- arch/arm64/include/asm/vncr_mapping.h      |   1 -
- arch/arm64/kvm/at.c                        | 322 +++++++++++++++++----
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h |   5 +-
- arch/arm64/kvm/hyp/nvhe/sysreg-sr.c        |   2 +-
- arch/arm64/kvm/hyp/vhe/sysreg-sr.c         | 155 +++++++++-
- arch/arm64/kvm/nested.c                    |  34 ++-
- arch/arm64/kvm/sys_regs.c                  | 129 ++++++++-
- arch/arm64/tools/sysreg                    |   8 +-
- include/kvm/arm_arch_timer.h               |   3 +
- 10 files changed, 597 insertions(+), 96 deletions(-)
-
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 5ab0b27993936..46db7988d1b50 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -102,6 +102,14 @@ static bool get_el2_to_el1_mapping(unsigned int reg,
+ 		PURE_EL2_SYSREG(  RVBAR_EL2	);
+ 		PURE_EL2_SYSREG(  TPIDR_EL2	);
+ 		PURE_EL2_SYSREG(  HPFAR_EL2	);
++		PURE_EL2_SYSREG(  HCRX_EL2	);
++		PURE_EL2_SYSREG(  HFGRTR_EL2	);
++		PURE_EL2_SYSREG(  HFGWTR_EL2	);
++		PURE_EL2_SYSREG(  HFGITR_EL2	);
++		PURE_EL2_SYSREG(  HDFGRTR_EL2	);
++		PURE_EL2_SYSREG(  HDFGWTR_EL2	);
++		PURE_EL2_SYSREG(  HAFGRTR_EL2	);
++		PURE_EL2_SYSREG(  CNTVOFF_EL2	);
+ 		PURE_EL2_SYSREG(  CNTHCTL_EL2	);
+ 		MAPPED_EL2_SYSREG(SCTLR_EL2,   SCTLR_EL1,
+ 				  translate_sctlr_el2_to_sctlr_el1	     );
+@@ -122,6 +130,7 @@ static bool get_el2_to_el1_mapping(unsigned int reg,
+ 		MAPPED_EL2_SYSREG(ELR_EL2,     ELR_EL1,	    NULL	     );
+ 		MAPPED_EL2_SYSREG(SPSR_EL2,    SPSR_EL1,    NULL	     );
+ 		MAPPED_EL2_SYSREG(ZCR_EL2,     ZCR_EL1,     NULL	     );
++		MAPPED_EL2_SYSREG(CONTEXTIDR_EL2, CONTEXTIDR_EL1, NULL	     );
+ 	default:
+ 		return false;
+ 	}
 -- 
 2.39.2
 
