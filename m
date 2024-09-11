@@ -1,97 +1,83 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 329F51AC452;
-	Wed, 11 Sep 2024 15:38:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA64819CC31
+	for <kvmarm@lists.linux.dev>; Wed, 11 Sep 2024 15:51:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726069128; cv=none; b=JGYXwBasphCisX/2KWsmrgQAJr3IZyP7A/B2MN0xqXUnUu7h1RZw9b2rSK2trjCJJkqn7oTbkLzklWPpLbiyw7eaFAQ0hxpY4cK6D/lUOkHra7HidvPysjDr+mZUB/JpAo+ikcEg2oEIpRTFp14unM/qkR/KZQP707dhfwwndMc=
+	t=1726069897; cv=none; b=JUJWHMeMbQZ6EH5qweyv5YMuvoyJVxNLYoZefHJQQpz65bkJAb3uFvfZqeMC3vA8zhTc/NZEuHZ5XLdTDeYm6cKKJfY2dz/ilrpF1P5BZsVFss3BIq3jmt68IFZwjenAa0lR3FXtDkkNua39V8rFnHy85bF6oCZW5j5c8F/tzp0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726069128; c=relaxed/simple;
-	bh=QXNbUMRnp7GSpzgS2NMBHKjIaE+3Iot+Pwen86lwgm0=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=l++aRnyVh3taB4fapFNcgKSpQckewNrF0BEsn4gb8IGnTSeEus6ecImi/TczaJXZLu6O5enrTnIT8MNBfGcC86RfOuCQYP4TiA0xB6QtUp4ug7X/RLcMu7qWypkHLy95OlYzGCf5fHsWQeG3j1o0TSLlAZ2yv+E+OFE1RXdzK9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q2kRUeGq; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q2kRUeGq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7413C4CEC7;
-	Wed, 11 Sep 2024 15:38:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726069127;
-	bh=QXNbUMRnp7GSpzgS2NMBHKjIaE+3Iot+Pwen86lwgm0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Q2kRUeGqilM3z+qHYizbvhdFYxTz61KWW2q9694IOZOkj9LQhGIP5w0VgQI8WISU/
-	 Q95oYFiblD2zkHFGtiwuY6hl+ghy+VgQkeGkXr8sF0it1oM6itF3/qdtlzuAWz/EUu
-	 ggHjXMwZtssNrcE/xTvAc6/zBV6LqpnLKGKNTHpjzOBD5x4Yc6E+Z2oYNmGdV2vsew
-	 ABovSiAJs0/c0co1y0sj1wJooFZpMz/t8mJDdEMGEPCN9TfBMW8WQV6o69RJBkinIy
-	 ta7yjGqMJABR3NdpucKri+WAjHgzrykeTVn5CaQyZ/DYSNe6FzL4vcUcRnRvKUOKyB
-	 4kClu4N4nUvuA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1soPQb-00CALu-Q9;
-	Wed, 11 Sep 2024 16:38:45 +0100
-Date: Wed, 11 Sep 2024 16:38:45 +0100
-Message-ID: <86o74u6vzu.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
+	s=arc-20240116; t=1726069897; c=relaxed/simple;
+	bh=DJcG4Jwz42u8yWiFSfRgZEJvIBcA6akcJZnWRTWkVcw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mcZJsWVyihAjzolUfyGjox/j2z89GBLqxchMomb8X4gRmDj2FJC+SkrkPWl8djsYfqv6L4YpiSizjQ42e3CVZikGiqtpqEfTBcGF/J/EEdgE82r5yY2LhbY/v9LnqK0pj9hUbc7GFDlJKMI+wubALim7oxscnyQGRUUfrrvZwzU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 686B01063;
+	Wed, 11 Sep 2024 08:52:04 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7F7FF3F66E;
+	Wed, 11 Sep 2024 08:51:33 -0700 (PDT)
+Date: Wed, 11 Sep 2024 16:51:28 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v3 18/24] KVM: arm64: Split S1 permission evaluation into direct and hierarchical parts
-In-Reply-To: <20240911141513.GA1080224@e124191.cambridge.arm.com>
+Subject: Re: [PATCH v3 18/24] KVM: arm64: Split S1 permission evaluation into
+ direct and hierarchical parts
+Message-ID: <20240911155128.GA1087252@e124191.cambridge.arm.com>
 References: <20240911135151.401193-1-maz@kernel.org>
-	<20240911135151.401193-19-maz@kernel.org>
-	<20240911141513.GA1080224@e124191.cambridge.arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <20240911135151.401193-19-maz@kernel.org>
+ <20240911141513.GA1080224@e124191.cambridge.arm.com>
+ <86o74u6vzu.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, alexandru.elisei@arm.com, broonie@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86o74u6vzu.wl-maz@kernel.org>
 
-On Wed, 11 Sep 2024 15:15:13 +0100,
-Joey Gouly <joey.gouly@arm.com> wrote:
+On Wed, Sep 11, 2024 at 04:38:45PM +0100, Marc Zyngier wrote:
+> On Wed, 11 Sep 2024 15:15:13 +0100,
+> Joey Gouly <joey.gouly@arm.com> wrote:
+> > 
+> > On Wed, Sep 11, 2024 at 02:51:45PM +0100, Marc Zyngier wrote:
 > 
-> On Wed, Sep 11, 2024 at 02:51:45PM +0100, Marc Zyngier wrote:
-
-[...]
-
-> > +static void compute_s1_hierarchical_permissions(struct kvm_vcpu *vcpu,
-> > +						struct s1_walk_info *wi,
-> > +						struct s1_walk_result *wr,
-> > +						struct s1_perms *s1p)
-> > +{
+> [...]
 > 
-> How about:
+> > > +static void compute_s1_hierarchical_permissions(struct kvm_vcpu *vcpu,
+> > > +						struct s1_walk_info *wi,
+> > > +						struct s1_walk_result *wr,
+> > > +						struct s1_perms *s1p)
+> > > +{
+> > 
+> > How about:
+> > 
+> > 	if (wi->hpd)
+> > 		return;
 > 
-> 	if (wi->hpd)
-> 		return;
+> I was hoping not to add anything like this, because all the table bits
+> are 0 (we simply don't collect them), and thus don't have any effect.
 
-I was hoping not to add anything like this, because all the table bits
-are 0 (we simply don't collect them), and thus don't have any effect.
+I just thought it was more obvious that they wouldn't apply in this case, don't
+feel super strongly about it.
 
-Or did you spot any edge case where that would result in in a
-different set of permissions?
+> 
+> Or did you spot any edge case where that would result in in a
+> different set of permissions?
+> 
+> Thanks,
+> 
+> 	M.
+> 
 
 Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Joey
