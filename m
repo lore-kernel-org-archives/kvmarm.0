@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 530F61A76A6;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DFFD1A7AF6;
 	Wed, 11 Sep 2024 13:52:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726062721; cv=none; b=RgW8aCOdEjAb4naUqzN3sR6AOlUHYqzXcwDYWhlBvQVNMBR4zRrTZxPFZmX8InaOgeGPCRBBfRMlYl+GDu2XR2HH5t5p2dwmtl2kn4Ga7P1qRUYW5vn+53M/V7i2A87oHuYfedezuCLR/67UP6ntYDWo+DBzOBdFXpOpls4xCOs=
+	t=1726062721; cv=none; b=cjFu3umK13tNlEDfx/FWPpDzV0nbwbe1Igno5GOEAwVIurrQu3QTGTSHqHQH2u8WjlGvZ9WKga3DypwA+KODoGrU6X7e098swc+QF5VAG62vtYhDMEezZUm8L1/ODsSVtmqPF3cSg/j966Yw627oFaM8dssq0uMIEbQFWTCkwhg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1726062721; c=relaxed/simple;
-	bh=I8opGiuqFUxiSXZuaqA7KAMi/5a4PI7HF5UfCvQZp8M=;
+	bh=PTUzu+KadUY07TjmmveL7BnYa56xmn8W8GB86+YtGDU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=iuB3XIqJM6n1TU8hEdrpzI5wACspgmMlPsDN596RRdcwfVfDrtkDbwTfra5FBe9l25yzLrcHM+HInCmYRkGC7EeqQi3kwtldAj2uHQxRMWBkE7L+2tVg2OaEMXyIreNJ+Kk99AwIQN1fKdrc90J3cVufds5cv14Sb4a4pt3EV7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CCt/PH1N; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=ZIuHwSXMe9mb3YWJ6ZYmt4uJ2Idx+GkXz4MWzl18Ge7tYE0bzaKdD8nObN1F3X28TirEmOqVFmo5JgWCmdB8Ho5YSZdDCcDXIqLi3Ofk8sMmqAXq4R5T5lFczxzr62U8lUbe/iYZ+Pwx38Sr8wrlOKm233J7Y7pc/ZsX4u1IHlU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BqF8PIPo; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CCt/PH1N"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF5A1C4CEC5;
-	Wed, 11 Sep 2024 13:52:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BqF8PIPo"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D5C0C4CEC7;
+	Wed, 11 Sep 2024 13:52:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726062720;
-	bh=I8opGiuqFUxiSXZuaqA7KAMi/5a4PI7HF5UfCvQZp8M=;
+	s=k20201202; t=1726062721;
+	bh=PTUzu+KadUY07TjmmveL7BnYa56xmn8W8GB86+YtGDU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=CCt/PH1NLgk3mOv14rGFiXCjOOj4fmWkxrr0/3rE5Wv0QvQ2LxcBKY4ah8qLxcm20
-	 NlXyLHbcuUaOzWFiEmSneNZL8jsIdwHcWTXzIKs92uWtyAroRnzMvf3XelKuyqmRTV
-	 xcQadcZNCn4k55fTyd0lW6oFGwcmRDv9SrUawNoG+YnIJdanRXrA4nqyaPgz3TORhg
-	 9Gi5VYjU2nhgNKTAwn0mu29e9rfptNNSGQzyhAL9wScHtbmCCr6qyTGHvqvIH+0XPb
-	 hISffa3YeO6H2fhb8/ODTrwB0LQcgXlV5YDRBMa1w+mn4ujEhSKah03HtuxMfUj90j
-	 ba8BG80SCAxIg==
+	b=BqF8PIPo5x+6knSjQwrjTre3OK3VvcwpWDzu8cIx6lUBc/sjm0XSA/C0RdgQq1Y9s
+	 2ZQcPKOOLenmJvueGw4JGJKECicObHmF4SBBZ6NkYebs19iNFQZAcmAbLcbRZfSwr2
+	 hXxmBtJQJAeUZUO3OxVY1qNfmdt3prPj+YH0aLIzMD4wz3gWkmoWXagweyCiluKuTO
+	 Jf9ETqKOhviPKIkleKQiXWuBD94E89t7tGRjCyjrF+cndfaig9OHJKyFkqW7WS/NQb
+	 6Xr1OZ4zE8cQ5bPWi6YfTX6qT6ONvyhKsJWR83q2lcFKx3MFldUbapSbcpkPPTC1om
+	 HHMb53IMPzglQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1soNlH-00C7tL-4S;
+	id 1soNlH-00C7tL-OE;
 	Wed, 11 Sep 2024 14:51:59 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -43,9 +43,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v3 14/24] KVM: arm64: Add save/restore for PIR{,E0}_EL2
-Date: Wed, 11 Sep 2024 14:51:41 +0100
-Message-Id: <20240911135151.401193-15-maz@kernel.org>
+Subject: [PATCH v3 17/24] KVM: arm64: Add AT fast-path support for S1PIE
+Date: Wed, 11 Sep 2024 14:51:44 +0100
+Message-Id: <20240911135151.401193-18-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240911135151.401193-1-maz@kernel.org>
 References: <20240911135151.401193-1-maz@kernel.org>
@@ -61,55 +61,76 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Like their EL1 equivalent, the EL2-specific FEAT_S1PIE registers
-are context-switched. This is made conditional on both FEAT_TCRX
-and FEAT_S1PIE being adversised.
+Emulating AT using AT instructions requires that the live state
+matches the translation regime the AT instruction targets.
 
-Note that this change only makes sense if read together with the
-issue D22677 contained in 102105_K.a_04_en.
+If targeting the EL1&0 translation regime and that S1PIE is
+supported, we also need to restore that state (covering TCR2_EL1,
+PIR_EL1, and PIRE0_EL1).
+
+Add the required system register switcheroo.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/vhe/sysreg-sr.c | 15 +++++++++++++--
- 1 file changed, 13 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/at.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-index 5f69a1f713cfe..005175c10b4a9 100644
---- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-@@ -51,9 +51,15 @@ static void __sysreg_save_vel2_state(struct kvm_vcpu *vcpu)
- 		__vcpu_sys_reg(vcpu, TTBR1_EL2)	= read_sysreg_el1(SYS_TTBR1);
- 		__vcpu_sys_reg(vcpu, TCR_EL2)	= read_sysreg_el1(SYS_TCR);
- 
--		if (ctxt_has_tcrx(&vcpu->arch.ctxt))
-+		if (ctxt_has_tcrx(&vcpu->arch.ctxt)) {
- 			__vcpu_sys_reg(vcpu, TCR2_EL2) = read_sysreg_el1(SYS_TCR2);
- 
-+			if (ctxt_has_s1pie(&vcpu->arch.ctxt)) {
-+				__vcpu_sys_reg(vcpu, PIRE0_EL2) = read_sysreg_el1(SYS_PIRE0);
-+				__vcpu_sys_reg(vcpu, PIR_EL2) = read_sysreg_el1(SYS_PIR);
-+			}
-+		}
-+
- 		/*
- 		 * The EL1 view of CNTKCTL_EL1 has a bunch of RES0 bits where
- 		 * the interesting CNTHCTL_EL2 bits live. So preserve these
-@@ -111,9 +117,14 @@ static void __sysreg_restore_vel2_state(struct kvm_vcpu *vcpu)
- 		write_sysreg_el1(val, SYS_TCR);
- 	}
- 
--	if (ctxt_has_tcrx(&vcpu->arch.ctxt))
-+	if (ctxt_has_tcrx(&vcpu->arch.ctxt)) {
- 		write_sysreg_el1(__vcpu_sys_reg(vcpu, TCR2_EL2), SYS_TCR2);
- 
-+		if (ctxt_has_s1pie(&vcpu->arch.ctxt)) {
-+			write_sysreg_el1(__vcpu_sys_reg(vcpu, PIR_EL2), SYS_PIR);
-+			write_sysreg_el1(__vcpu_sys_reg(vcpu, PIRE0_EL2), SYS_PIRE0);
+diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+index 39f0e87a340e8..73b2ee662f371 100644
+--- a/arch/arm64/kvm/at.c
++++ b/arch/arm64/kvm/at.c
+@@ -412,6 +412,9 @@ struct mmu_config {
+ 	u64	ttbr1;
+ 	u64	tcr;
+ 	u64	mair;
++	u64	tcr2;
++	u64	pir;
++	u64	pire0;
+ 	u64	sctlr;
+ 	u64	vttbr;
+ 	u64	vtcr;
+@@ -424,6 +427,13 @@ static void __mmu_config_save(struct mmu_config *config)
+ 	config->ttbr1	= read_sysreg_el1(SYS_TTBR1);
+ 	config->tcr	= read_sysreg_el1(SYS_TCR);
+ 	config->mair	= read_sysreg_el1(SYS_MAIR);
++	if (cpus_have_final_cap(ARM64_HAS_TCR2)) {
++		config->tcr2	= read_sysreg_el1(SYS_TCR2);
++		if (cpus_have_final_cap(ARM64_HAS_S1PIE)) {
++			config->pir	= read_sysreg_el1(SYS_PIR);
++			config->pire0	= read_sysreg_el1(SYS_PIRE0);
 +		}
 +	}
+ 	config->sctlr	= read_sysreg_el1(SYS_SCTLR);
+ 	config->vttbr	= read_sysreg(vttbr_el2);
+ 	config->vtcr	= read_sysreg(vtcr_el2);
+@@ -444,6 +454,13 @@ static void __mmu_config_restore(struct mmu_config *config)
+ 	write_sysreg_el1(config->ttbr1,	SYS_TTBR1);
+ 	write_sysreg_el1(config->tcr,	SYS_TCR);
+ 	write_sysreg_el1(config->mair,	SYS_MAIR);
++	if (cpus_have_final_cap(ARM64_HAS_TCR2)) {
++		write_sysreg_el1(config->tcr2, SYS_TCR2);
++		if (cpus_have_final_cap(ARM64_HAS_S1PIE)) {
++			write_sysreg_el1(config->pir, SYS_PIR);
++			write_sysreg_el1(config->pire0, SYS_PIRE0);
++		}
++	}
+ 	write_sysreg_el1(config->sctlr,	SYS_SCTLR);
+ 	write_sysreg(config->vttbr,	vttbr_el2);
+ 	write_sysreg(config->vtcr,	vtcr_el2);
+@@ -914,6 +931,13 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+ 	write_sysreg_el1(vcpu_read_sys_reg(vcpu, TTBR1_EL1),	SYS_TTBR1);
+ 	write_sysreg_el1(vcpu_read_sys_reg(vcpu, TCR_EL1),	SYS_TCR);
+ 	write_sysreg_el1(vcpu_read_sys_reg(vcpu, MAIR_EL1),	SYS_MAIR);
++	if (kvm_has_feat(vcpu->kvm, ID_AA64MMFR3_EL1, TCRX, IMP)) {
++		write_sysreg_el1(vcpu_read_sys_reg(vcpu, TCR2_EL1), SYS_TCR2);
++		if (kvm_has_feat(vcpu->kvm, ID_AA64MMFR3_EL1, S1PIE, IMP)) {
++			write_sysreg_el1(vcpu_read_sys_reg(vcpu, PIR_EL1), SYS_PIR);
++			write_sysreg_el1(vcpu_read_sys_reg(vcpu, PIRE0_EL1), SYS_PIRE0);
++		}
++	}
+ 	write_sysreg_el1(vcpu_read_sys_reg(vcpu, SCTLR_EL1),	SYS_SCTLR);
+ 	__load_stage2(mmu, mmu->arch);
  
- 	write_sysreg_el1(__vcpu_sys_reg(vcpu, ESR_EL2),		SYS_ESR);
- 	write_sysreg_el1(__vcpu_sys_reg(vcpu, AFSR0_EL2),	SYS_AFSR0);
 -- 
 2.39.2
 
