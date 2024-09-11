@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2168F1A265E;
-	Wed, 11 Sep 2024 13:51:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 867D91A305F;
+	Wed, 11 Sep 2024 13:51:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726062719; cv=none; b=KktGRuvt2EhGGrtknd6X3k9Gspy8lLogQHpTuHrC1UN5NcekPNXG2m0gi+O9FUrqqac9uGXd3kto4LMYKjhK0/dkcstM3f2zNFkZcb/YvH/jRcmJJ/iJFTF+RjHkekEUY+FQeGtyZbqrfnJYwTF2ZS5emIdDaMfNjBUzfinOijc=
+	t=1726062719; cv=none; b=AlLNRvavJWRz3D9Gk6tY5gOViWte6s6cJF5zCOGGW+qOBk/2EaeMxQSRrEIrkd67ad42C6YHcaRZ0ZYKb+Gmiz5S/IhaVl1Vqy/PtgGotGQnZzi31JzZUV6bZLHjM5ObvkJrdyMLSpxZlWEKcbEv/My0FtAXacMJbMdW4M/jCYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1726062719; c=relaxed/simple;
-	bh=DoItppUl16RwlwUFW5kd+LC35Szb7CzFjd1PiApkHmo=;
+	bh=5YGXuwiUxlZQBipzQGoJLItpXcJCcadukeWGI7HrfK4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=gf8/d0JnnmWu/ZqJtHw15gniXz449IRnccQRwgG4LNSmXEcB3YK77IAu8mOerWMr+FTEboXvf5YL92A5YESViiRE9sHGOxmiJyznBe9GCWPy4ZSzJTnPg2l2c+7tC6LQ7+fSE7upHQ7zNFYcgCW6F27eTTU/OTigtW9CyYLnIlk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FcFwrJJB; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=iOqlF8hUc8WHCMI3nOZLWt0B0Slpev4+Q+BdpPM5frQGdQC6tS/4/2GFXp4icQKij6o2HmjAycxq8+s0/I6k4QX1Er73SulbvA4fwui4rW0oUF2c8nlrJLKnwbVjq/5ZGkmV1pMiaqyrQHrL0E5wajoLG5Q+pxY7h7XLsH/0KqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PGiYicIt; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FcFwrJJB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF9A2C4CECE;
-	Wed, 11 Sep 2024 13:51:58 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PGiYicIt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 608E5C4CEC7;
+	Wed, 11 Sep 2024 13:51:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726062718;
-	bh=DoItppUl16RwlwUFW5kd+LC35Szb7CzFjd1PiApkHmo=;
+	s=k20201202; t=1726062719;
+	bh=5YGXuwiUxlZQBipzQGoJLItpXcJCcadukeWGI7HrfK4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=FcFwrJJBZyW9IBUIad7hcx/w0CRdP2g5+UAYI/pZoGk7fsoOfHCQJOsqdNbafwebt
-	 lPqrz14oLGpMbVFQATWU5aL5o9J/4JTK+Lry870bqzUZY0vZj5jVnSyXgpH0YHfVnL
-	 aQP1YJL6e1zH8ecPAf49YXGPZoMn5jMiWXqwSaLxzhNri79GnlP0/UcZRGqLW/kpPl
-	 qpZXt9sZEBB9TPLWBeKqRaU7hM/NtRgd+Ge8qHI+L7nq+P9EQHfWx2Vm/wV4Zr9+IT
-	 2U2wYkgRvunxX3YojCNvK4gw/vQKLv/JaKceGxERUAPI0z7RXuJvyszm4YySmddECP
-	 iULjnIIS/gGaQ==
+	b=PGiYicItBvybfb4lpEay3p1RiPuxKTt/wxiXpwc16c1zajkwxqHUYrNF6T8hDLWXn
+	 t/ZRTH6iIOWvv8pXTMD0dahxwH8zPgUdAzXtAVqX+Zll2Lnjz6FBodTRYExCTloGXm
+	 +PZveCOpi6OQCqrAs8owYIcjQuNxXIIsADHFHRUio3aIgwLxKrydslTD+ScHdjxGcy
+	 xHJNFKLY/63tlEELbTrkEq2NCaeFZOG5PtvCbP7YH8xfsUN7E/aHQ+AisAGrm3cJ6P
+	 Zat2A0MhzgkbABN7T9+sZUT6pgH1oZiOArq2OFGs7Ophde/6Op9Y9rS+5GtO9nJNRC
+	 qGgiy6zSmH/nw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1soNlE-00C7tL-K3;
-	Wed, 11 Sep 2024 14:51:56 +0100
+	id 1soNlF-00C7tL-8k;
+	Wed, 11 Sep 2024 14:51:57 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -43,9 +43,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v3 02/24] arm64: Remove VNCR definition for PIRE0_EL2
-Date: Wed, 11 Sep 2024 14:51:29 +0100
-Message-Id: <20240911135151.401193-3-maz@kernel.org>
+Subject: [PATCH v3 05/24] KVM: arm64: nv: Handle CNTHCTL_EL2 specially
+Date: Wed, 11 Sep 2024 14:51:32 +0100
+Message-Id: <20240911135151.401193-6-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240911135151.401193-1-maz@kernel.org>
 References: <20240911135151.401193-1-maz@kernel.org>
@@ -61,31 +61,82 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-As of the ARM ARM Known Issues document 102105_K.a_04_en, D22677
-fixes a problem with the PIRE0_EL2 register, resulting in its
-removal from the VNCR page (it had no purpose being there the
-first place).
+Accessing CNTHCTL_EL2 is fraught with danger if running with
+HCR_EL2.E2H=1: half of the bits are held in CNTKCTL_EL1, and
+thus can be changed behind our back, while the rest lives
+in the CNTHCTL_EL2 shadow copy that is memory-based.
 
-Follow the architecture update by removing this offset.
+Yes, this is a lot of fun!
 
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+Make sure that we merge the two on read access, while we can
+write to CNTKCTL_EL1 in a more straightforward manner.
+
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/vncr_mapping.h | 1 -
- 1 file changed, 1 deletion(-)
+ arch/arm64/kvm/sys_regs.c    | 28 ++++++++++++++++++++++++++++
+ include/kvm/arm_arch_timer.h |  3 +++
+ 2 files changed, 31 insertions(+)
 
-diff --git a/arch/arm64/include/asm/vncr_mapping.h b/arch/arm64/include/asm/vncr_mapping.h
-index df2c47c559728..9e593bb609750 100644
---- a/arch/arm64/include/asm/vncr_mapping.h
-+++ b/arch/arm64/include/asm/vncr_mapping.h
-@@ -50,7 +50,6 @@
- #define VNCR_VBAR_EL1           0x250
- #define VNCR_TCR2_EL1		0x270
- #define VNCR_PIRE0_EL1		0x290
--#define VNCR_PIRE0_EL2		0x298
- #define VNCR_PIR_EL1		0x2A0
- #define VNCR_ICH_LR0_EL2        0x400
- #define VNCR_ICH_LR1_EL2        0x408
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 46db7988d1b50..e4ce1e1c19bef 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -149,6 +149,21 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+ 		if (!is_hyp_ctxt(vcpu))
+ 			goto memory_read;
+ 
++		/*
++		 * CNTHCTL_EL2 requires some special treatment to
++		 * account for the bits that can be set via CNTKCTL_EL1.
++		 */
++		switch (reg) {
++		case CNTHCTL_EL2:
++			if (vcpu_el2_e2h_is_set(vcpu)) {
++				val = read_sysreg_el1(SYS_CNTKCTL);
++				val &= CNTKCTL_VALID_BITS;
++				val |= __vcpu_sys_reg(vcpu, reg) & ~CNTKCTL_VALID_BITS;
++				return val;
++			}
++			break;
++		}
++
+ 		/*
+ 		 * If this register does not have an EL1 counterpart,
+ 		 * then read the stored EL2 version.
+@@ -199,6 +214,19 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
+ 		 */
+ 		__vcpu_sys_reg(vcpu, reg) = val;
+ 
++		switch (reg) {
++		case CNTHCTL_EL2:
++			/*
++			 * If E2H=0, CNHTCTL_EL2 is a pure shadow register.
++			 * Otherwise, some of the bits are backed by
++			 * CNTKCTL_EL1, while the rest is kept in memory.
++			 * Yes, this is fun stuff.
++			 */
++			if (vcpu_el2_e2h_is_set(vcpu))
++				write_sysreg_el1(val, SYS_CNTKCTL);
++			return;
++		}
++
+ 		/* No EL1 counterpart? We're done here.? */
+ 		if (reg == el1r)
+ 			return;
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+index c819c5d16613b..fd650a8789b91 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -147,6 +147,9 @@ u64 timer_get_cval(struct arch_timer_context *ctxt);
+ void kvm_timer_cpu_up(void);
+ void kvm_timer_cpu_down(void);
+ 
++/* CNTKCTL_EL1 valid bits as of DDI0487J.a */
++#define CNTKCTL_VALID_BITS	(BIT(17) | GENMASK_ULL(9, 0))
++
+ static inline bool has_cntpoff(void)
+ {
+ 	return (has_vhe() && cpus_have_final_cap(ARM64_HAS_ECV_CNTPOFF));
 -- 
 2.39.2
 
