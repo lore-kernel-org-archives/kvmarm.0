@@ -1,86 +1,89 @@
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+Received: from out-184.mta1.migadu.com (out-184.mta1.migadu.com [95.215.58.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DB9614A097
-	for <kvmarm@lists.linux.dev>; Wed, 11 Sep 2024 08:24:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C59013C8F9
+	for <kvmarm@lists.linux.dev>; Wed, 11 Sep 2024 09:14:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726043052; cv=none; b=EPAEPHCs7caB06uS3kuNFQypaGI3MkLvSJJ+IfBNTN9h4seC78rpIz40+adnUbmgXpPIJEunwGlwQv0ylJz4iExMWKjBzia16yzlDwLcHLp0fidqaRNQnbMqfwMOWA6AMXmi1daBjKpUppV7n8zvuFhlCOqQe5NiC0Y9MH05Q7k=
+	t=1726046057; cv=none; b=HNrlQd5dXuJ2uLd6DiCqFDTxHPOmzSZzDO/ii3Ot8fZyqbrzBuwcYHHwaQGz+40nYqW1+YD+rOJVY29hxixmXGecfXHBo+nu6be+hKWCPM07n08xQ3LjIIDteL0OMEfRS40JDcoijzsfzzvaNFinGm2E5EgPDchVlntN8PNSG3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726043052; c=relaxed/simple;
-	bh=wmPNf1tPTS1FEKpH/lAzR4g+Ek+a2/MNrQx1KRfjAwI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KXdzSCoFkiKTqW2w5sUP3IyUyrIZs6JL6isc0K8kDKkK/q+1iUbtMwuEY2IjqRCxu3gDuTi3Cas5fAWZJw9Q5MtFSkvJQaWzXeilXS6PWbO/RZenXTUgzIFN9U/T9fO+ThRrecNB/dLshE+b2WW4bu3XBr0Oh4JXYZ2bpZU9J5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RZFxghiL; arc=none smtp.client-ip=91.218.175.181
+	s=arc-20240116; t=1726046057; c=relaxed/simple;
+	bh=h5ySaVfM8I8xxT2S6UUVoBpC3hcCM3GhiFxSe7b4r/Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oVWyspvM0en7rBpAGc+LEsTduUa1wYS+feUEQkSzAqVNuXNqs4fI/uP7/54hdpWdqDh3EpFoOaneuEYPGG0369N1O8qXSImpiF4S+CaaK126Q17wVNTKRj8CBfn7sN2vZ44M01UWm1B1QncFfviVd10QO03JtItTbcuUyS8yp5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=oKszq2B1; arc=none smtp.client-ip=95.215.58.184
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RZFxghiL"
-Date: Wed, 11 Sep 2024 10:24:00 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1726043047;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/1TI8bsOlziGCU+hlwwiFofGLl9oRjkXX9zj1uFoMWU=;
-	b=RZFxghiLIKxKCgLnibfFH4ohiv33HX3hbHVAGyIE8JlT9bIGx4BVzkUhVwpdBmmzi5vbnx
-	FXAdcQ+RcA1B0CKKjMtElVrxXAM+19onH2byFb5ATKCVdXi3TiCVL7kt+yNLzMeWmiseys
-	DJ3Cud9yYsRK1+D+SAwjKYJhn87Te1Q=
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oKszq2B1"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1726046053;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=fyMdMsKCQOu5UpiuFGR47iMoCTLzsA/eJycU3Mv3Vbs=;
+	b=oKszq2B1bo4frYhI+HQHEPnCnV3/e3p6ugg//2xh2MI4JsYftikgOuS1vQ+4oMt2JMkY9i
+	VZQsA3cFF+ltiew9QSW8n05L1CiXrG5Wc4PEjk90wixvGnHNjYBMMwZmuVDiCTEREz0xec
+	8qdsrA6rXSby9QN0vXw59rOVHlVWzcU=
 From: Andrew Jones <andrew.jones@linux.dev>
-To: Nicholas Piggin <npiggin@gmail.com>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org, 
-	pbonzini@redhat.com, thuth@redhat.com, lvivier@redhat.com, frankja@linux.ibm.com, 
-	imbrenda@linux.ibm.com, nrb@linux.ibm.com, atishp@rivosinc.com, 
-	cade.richard@berkeley.edu, jamestiotio@gmail.com
-Subject: Re: [kvm-unit-tests PATCH v2 3/4] configure: Support cross compiling
- with clang
-Message-ID: <20240911-99a010a84e453f4362566c6b@orel>
-References: <20240904105020.1179006-6-andrew.jones@linux.dev>
- <20240904105020.1179006-9-andrew.jones@linux.dev>
- <D430ZV4FP2GE.3B7VE2I37RPXX@gmail.com>
+To: kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-s390@vger.kernel.org
+Cc: pbonzini@redhat.com,
+	thuth@redhat.com,
+	lvivier@redhat.com,
+	frankja@linux.ibm.com,
+	imbrenda@linux.ibm.com,
+	nrb@linux.ibm.com,
+	atishp@rivosinc.com,
+	cade.richard@berkeley.edu,
+	jamestiotio@gmail.com
+Subject: [kvm-unit-tests PATCH v3 0/5] Support cross compiling with clang
+Date: Wed, 11 Sep 2024 11:14:07 +0200
+Message-ID: <20240911091406.134240-7-andrew.jones@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <D430ZV4FP2GE.3B7VE2I37RPXX@gmail.com>
+Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-On Wed, Sep 11, 2024 at 10:24:34AM GMT, Nicholas Piggin wrote:
-> On Wed Sep 4, 2024 at 8:50 PM AEST, Andrew Jones wrote:
-> > When a user specifies the compiler with --cc assume it's already
-> > fully named, even if the user also specifies a cross-prefix. This
-> > allows clang to be selected for the compiler, which doesn't use
-> > prefixes, but also still provide a cross prefix for binutils. If
-> > a user needs a prefix on the compiler that they specify with --cc,
-> > then they'll just have to specify it with the prefix prepended.
-> 
-> Makes sense.
-> 
-> > Also ensure user provided cflags are used when testing the compiler,
-> > since the flags may drastically change behavior, such as the --target
-> > flag for clang.
-> 
-> Could be a separate patch but no big deal.
-> 
-> >
-> > With these changes it's possible to cross compile for riscv with
-> > clang after configuring with
-> >
-> >  ./configure --arch=riscv64 --cc=clang --cflags='--target=riscv64' \
-> >              --cross-prefix=riscv64-linux-gnu-
-> 
-> Nice. Perhaps add a recipe to README?
+Modify configure to allow --cc=clang and a cross-prefix to be specified
+together (as well as --cflags). This allows compiling with clang, but
+using cross binutils for everything else, including the linker. So far
+tested on riscv 32- and 64-bit and aarch64 (with some hacks to the code
+to get it to compile - which is why there's no gitlab-ci patch for aarch64
+in this series). I suspect it should work for other architectures too.
 
-Sure.
+v3:
+ - Add README patch for cross-compiling, clang, and cross-clang [Nick]
+ - Add comment to the commenting-out of mstrict-align [Nick]
+ - Add the reason to ignore warnings vs. fix code to commit message of
+   patch2
+ - Picked up Nick's tags
+v2:
+ - fix building with clang and --config-efi by suppressing a warning
+ - added riscv clang efi build to CI
+ - picked up Thomas's tags
 
-> 
-> Reviewed-by: Nicholas Piggin <npiggin@gmail.com>
+Andrew Jones (5):
+  riscv: Drop mstrict-align
+  Makefile: Prepare for clang EFI builds
+  configure: Support cross compiling with clang
+  riscv: gitlab-ci: Add clang build tests
+  README: Add cross and clang recipes
 
-Thanks,
-drew
+ .gitlab-ci.yml | 43 +++++++++++++++++++++++++++++++++++++++++++
+ Makefile       |  2 ++
+ README.md      | 22 ++++++++++++++++++++++
+ configure      | 11 ++++++++---
+ riscv/Makefile |  4 +++-
+ 5 files changed, 78 insertions(+), 4 deletions(-)
+
+-- 
+2.46.0
+
