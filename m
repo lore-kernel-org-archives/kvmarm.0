@@ -1,121 +1,71 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EBA81AD3E3;
-	Wed, 11 Sep 2024 16:10:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 492AC1B9B26
+	for <kvmarm@lists.linux.dev>; Wed, 11 Sep 2024 18:00:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726071007; cv=none; b=IwBX1ivVkRpS0Ju5ftdpdOKHCGaZrH9VQqGJe5u42ncFSDayLylA1M7pf1MXmrg6J4XJo7Q49CGbsONq0I7cIiPaRIP8F8uBn6Rhm0R6C58JqZTXt5KQ1IvSswjvq0ZVPjh4SaFcZsZGwaH+1Qi10ODibVbpn5x1TQI1wTrV1kk=
+	t=1726077619; cv=none; b=cAk8udHc/DB4R1W8Qy2Q7Nk7hk0OXU37ONBYrgVfJLaEPG6SO4AACAYrIyDP3qItiTw9Nd7ISJTOCPKWitO8KmtJU5K55QuNcqsL501Mx6TJF2cI4aUGmW1JFT7Nsl1TuNZTQKmhhWPMkqo2/2mQVRBc4L2PKllmSI5dMElCCZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726071007; c=relaxed/simple;
-	bh=n3zgqizMvbrvZLnqLGYPpKZnWKf0e2LcRkhxNBqsjvc=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qdL2Dfo7P8besfxsWPFHwckcz8vvt3XkHvSOT4FuOZEmVuiwOi2LxpUZKzh+UB351PxDVE2ovpI0ZpyaJ0SDgFxx3cxZHNxO1S+OWRVDA2wG+0eHLBse/kwe9V5TqhMP860TTs75PgaTFTR91+mYlUYFj11iX/QASgc8UAOybI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cJ53Rfrr; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1726077619; c=relaxed/simple;
+	bh=IhnRCaZJTTAr/WcA+mYQrUVycqjcQVe3BQ0esoraofI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ppx8xYaT08yH/mAhJ2+13OVlZbCE0350ny52nzES/9sELkwn3NsKptgt0Ivm3FT28GaNPKFMn2OGz9do13/ck9ZSvOZ36p9oka2+KrZiE9w2Nh93nZH6k4DJ1Hwumegdntuectu1Nyz74VeniCN2b7uwTtFYg2F/nhL36dD69Zw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NA9D5xLd; arc=none smtp.client-ip=95.215.58.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cJ53Rfrr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 869E0C4CED2;
-	Wed, 11 Sep 2024 16:10:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726071006;
-	bh=n3zgqizMvbrvZLnqLGYPpKZnWKf0e2LcRkhxNBqsjvc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=cJ53RfrrQgECSOr1FX3ZKvn4orPRiAmMck+nUrMh666hvi2GEN22z91zwZ4Z+sneY
-	 +uj0JblZ7PK7Odd8ykfsNE/l+y8mmTPpgQOCP3cFbBJx1c4vmm8CtyfwGfaCZLTVt0
-	 oXb+zW8VucH1CKRAfPVHuPCht2De8GCYynT1C504U8ZeC3UoQwKeHv1itkCGfUNwDq
-	 BhqpyCkLaqveKVJLLF1Vp2Vkg1QxUO900uYtWxOGyWHm/h8ZQDsV4i4hWqECDE0ecX
-	 3/f0xELPkXhc3RObMQtPKkWbiYdvEqVKUjrQB/Vpxo5GtaqATCtfzI01PzWwfhxjLt
-	 eDIEOJaDIne3g==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1soPuu-00CAxN-I5;
-	Wed, 11 Sep 2024 17:10:04 +0100
-Date: Wed, 11 Sep 2024 17:10:04 +0100
-Message-ID: <86mske6ujn.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NA9D5xLd"
+Date: Wed, 11 Sep 2024 11:00:05 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1726077613;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0ihUxWnJ1ESYco5Pe6kpjdBw8nJlk/3qj/ALs1xfzIA=;
+	b=NA9D5xLd9af5GmohRLDHBX/ZD3NVd7AlhaZTqjyjEg8mJGwFv4ZsCJ+1CM3qgzlceWrf8L
+	J/uEx+oZ9wy0Jw0FKSrCVgAm3JchXgWwSLiMX7x95t1U4ZnyMOQJHg74heIYduK+3WOMOX
+	L1a5umMbadBCOtFfkKgP0GbmVHsFMRo=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v3 18/24] KVM: arm64: Split S1 permission evaluation into direct and hierarchical parts
-In-Reply-To: <20240911155128.GA1087252@e124191.cambridge.arm.com>
-References: <20240911135151.401193-1-maz@kernel.org>
-	<20240911135151.401193-19-maz@kernel.org>
-	<20240911141513.GA1080224@e124191.cambridge.arm.com>
-	<86o74u6vzu.wl-maz@kernel.org>
-	<20240911155128.GA1087252@e124191.cambridge.arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 0/3] KVM: arm64: Get rid of REG_HIDDEN_USER
+Message-ID: <ZuHapdH3F8ZnSuIC@linux.dev>
+References: <20240904082419.1982402-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, alexandru.elisei@arm.com, broonie@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240904082419.1982402-1-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, 11 Sep 2024 16:51:28 +0100,
-Joey Gouly <joey.gouly@arm.com> wrote:
+On Wed, Sep 04, 2024 at 09:24:16AM +0100, Marc Zyngier wrote:
+> REG_HIDDEN_USER was introduced as a way to deal with the ARMv8.3 flavour of
+> FEAT_NV, where most EL12 sysreg accesses would trap and yet be mapped to a
+> EL1 register (KVM doing in SW what FEAT_NV2 does in HW). This handling
+> imposed that the EL12 register shouldn't be visible to userspace, hence the
+> special REG_HIDDEN_USER visibility.
 > 
-> On Wed, Sep 11, 2024 at 04:38:45PM +0100, Marc Zyngier wrote:
-> > On Wed, 11 Sep 2024 15:15:13 +0100,
-> > Joey Gouly <joey.gouly@arm.com> wrote:
-> > > 
-> > > On Wed, Sep 11, 2024 at 02:51:45PM +0100, Marc Zyngier wrote:
-> > 
-> > [...]
-> > 
-> > > > +static void compute_s1_hierarchical_permissions(struct kvm_vcpu *vcpu,
-> > > > +						struct s1_walk_info *wi,
-> > > > +						struct s1_walk_result *wr,
-> > > > +						struct s1_perms *s1p)
-> > > > +{
-> > > 
-> > > How about:
-> > > 
-> > > 	if (wi->hpd)
-> > > 		return;
-> > 
-> > I was hoping not to add anything like this, because all the table bits
-> > are 0 (we simply don't collect them), and thus don't have any effect.
+> Since 4d4f52052ba8 ("KVM: arm64: nv: Drop EL12 register traps that are
+> redirected to VNCR") and the admission that KVM would never be supporting
+> the original FEAT_NV, REG_HIDDEN_USER only had a few users, all of which
+> could either be replaced by a more ad-hoc mechanism, or removed altogether.
 > 
-> I just thought it was more obvious that they wouldn't apply in this case, don't
-> feel super strongly about it.
+> This series goes ahead and cleans it up for good, removing a tiny bit of
+> unnecessary complexity.
 
-If you want it to be obvious, how about this instead?
+Yeah, let's toss it.
 
-diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index 8a5e1c4682619..fb9de5fc2cc26 100644
---- a/arch/arm64/kvm/at.c
-+++ b/arch/arm64/kvm/at.c
-@@ -985,7 +985,8 @@ static void compute_s1_permissions(struct kvm_vcpu *vcpu, u32 op,
- 	else
- 		compute_s1_indirect_permissions(vcpu, wi, wr, s1p);
- 
--	compute_s1_hierarchical_permissions(vcpu, wi, wr, s1p);
-+	if (!wi->hpd)
-+		compute_s1_hierarchical_permissions(vcpu, wi, wr, s1p);
- 
- 	if (op == OP_AT_S1E1RP || op == OP_AT_S1E1WP) {
- 		bool pan;
-
-
-Thanks,
-
-	M.
+Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 
 -- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+Oliver
