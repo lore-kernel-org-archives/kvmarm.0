@@ -1,57 +1,57 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C40CF1BB6B1
-	for <kvmarm@lists.linux.dev>; Wed, 11 Sep 2024 20:42:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ABC31BBBCB
+	for <kvmarm@lists.linux.dev>; Wed, 11 Sep 2024 20:42:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726087349; cv=none; b=N8QOQ3hIVhgSzh4KYMYb+2XNc4IZ6r71V9qcMwf8beimjBX0cCDmSSc0gsfRk1hHEBVGZs2YlUOL+VktZSU/zc70sxh+XUC4+Qmcp5QG66m8TOs5QEW3UuG7PloyEAO9wC7XILJ4gLFkX+aZxkK3n1TcTlsb2DRV7fjEUIY6qSY=
+	t=1726087350; cv=none; b=XShL/BUflZGWusWif8aKvy/E5wTWEdNjBAD4KnSqnMccSaEa/sXTh0sOlDO0ZzJgYioZi0BKpKlmlqjr6V9wR1KH5wcQ1wlPMXEJ+43cZNaVZ7z7lC6AF/v31/HWjQBO6BHY8tV1dF8Yr1qtE136BIDRHw/V+dMsXd9SV9dR770=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726087349; c=relaxed/simple;
-	bh=5YqUPUoGyBdt/adqoIWM9Cz9Mw8TIzoRKb4sIV2JQsY=;
+	s=arc-20240116; t=1726087350; c=relaxed/simple;
+	bh=p49LU2Zhb7gbb5LKY/h5ptEGGa6l2hQP4h0k8idJ1n8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=U5oj9j4XmwEscwtYysYfJ0N4jY4xgNtpO0pMbmj4Zz/mkYS7OYNf3cXRqhIQdu0jRthr6/2KD0cuTca9s2X9s09kFnetmrPKFy/9H/H6Iasvwsis7w28H5xFSguyDzIA78xtv0bb5TKauVSMwsOxfv9J5JeYT+/mHHualiqXFJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mjo8L8dB; arc=none smtp.client-ip=209.85.128.201
+	 To:Cc:Content-Type; b=D6GtvEYPJmPI6wZ2tKlGff06dRRFqbqMz4L6YzppmdTDA5m8wuiThpxOKoWD28XeR36c5LK6pRUZzr2rQQ4s8tPDu9Jhl+RMUyNQ9ee44hf1ouPY6a8mccB1RCi+/5FeDMZZQSkfbJ7/CR0+ixt1JLP6dnB9E5gqiHREFtdHcj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bybZezAX; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mjo8L8dB"
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6d475205628so9695697b3.0
-        for <kvmarm@lists.linux.dev>; Wed, 11 Sep 2024 13:42:27 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bybZezAX"
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7db1762d70fso349927a12.2
+        for <kvmarm@lists.linux.dev>; Wed, 11 Sep 2024 13:42:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726087347; x=1726692147; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1726087349; x=1726692149; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=I5+MRLsHgDUkEu/213kX3+YnOYKTSZyhH328nXdj8ZY=;
-        b=mjo8L8dBDCVGM2QiwSGMnXEtpVni+xH9RUuev3aIk5r2diVwtVKP/AwrWN0CdUSmbb
-         /667CpQNgdTMH5nLuzntYeuxLCIcoRRQHhufl5IP6z5JP4SYXF2mFTjBt1axz032NrkP
-         DG6hWbc9hBucVwMD8I5T5HDoNosNKJYFFIeUE92p+9gl+HkcZOglZ/yTcLxj4u77HfA+
-         gLGzippnl2AIy8YBdnFfkgE/2oeQni/UwC8JTBcE+02X7kPaYRfB09D0xHpUwgznFQ4x
-         s0bZ29uNo6+A8Ctz7+ZHDm7wDBecrz4daKq0M6387vBJNaenVMR3NYOfaBy8o84u8eHV
-         KVZQ==
+        bh=ZSI8dsTyNYYmZluhAXeYyfAeB1n1NlxlB5JW+pr40RY=;
+        b=bybZezAXW97YPF3hLl9WYTdYNLY2+FUXW1hXbnM8TMUlJ38G70nR9BNgcm91lQfl16
+         LA9QQLINfu7bb23Mg64dLdQK3dTh4IzzU9Qx9odWB6qvHfy9dgQZEoWdaF6yWAmhNDWm
+         DxntLQ+8miuXD8i3MNjm4jkxXFtM6e8j5SEuAwxGAJZ/fUYnxmRBr8YZa+fvOTGVW98s
+         MnPYb4EFQmSVOskWvzEt0MT/kyATOEgK3d1Epj736rGDBCLt4sWtxDZtYPBG+ErY8JK8
+         R0h9Q38EQauAslqJHj3Lnm4FanK7DcdL0Ioex/VspV6KWMH0FrCAOXJ7BT0lz8o/aECZ
+         zh5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726087347; x=1726692147;
+        d=1e100.net; s=20230601; t=1726087349; x=1726692149;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=I5+MRLsHgDUkEu/213kX3+YnOYKTSZyhH328nXdj8ZY=;
-        b=BLwpj1CqMFWh3gC7++n1o9+EzTam0GwEbXvD/DhqZ8ujVkvsZB/kZCxRxIujgKorSt
-         vs+ScMJM/PS8yiJfWQgNWyphSmd9x3FUN8AO901j1K6kjnS5zoNeyA+ylVL0TU/AKnYA
-         ewgStl3XteVE6G58V8/cE1qepM7AW0tE/W9XmTweWL2mnZK8TN6rjWTWH4uoBKPw21U8
-         zzRnFYLwUTzSsBvssg4iW4SM0yySN+mrogAroUF9s28IjHyuONYLrZ8cI6FvoxLS2GRn
-         /41GNpoGnwwVXbzfkR2g9aQU1n3f0rHWT8zqJ+PFwU72vR5reoXgOA9JSg9iY5JHzwkR
-         P0JA==
-X-Forwarded-Encrypted: i=1; AJvYcCUW0SjQj5kiLxqFIU4sXVnZXVafCiMIrtTm8TuK2loWTMYihyS0Uv9mTHD1eDAe+tzLXmRUKdE=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yw3GP5ZaFcD3WXY8yKXLy4avjSeVdFfBnk44tUc6fTuYvlYeGkt
-	viw6o6kEmdCEsnB5xjT+Ip9eOJYkNLeui3P0uz5vPs4CxCHKUnAa9MORxK3w9nTxjRaEmSqpzwr
-	Ztw==
-X-Google-Smtp-Source: AGHT+IHjCnU+25WZuBONT4gBCIxwCF19WEi2vWiBq4GXfH9hGN5Xz3FJR6dlFxBZ6NyYinSbokZ9vN2oU0w=
+        bh=ZSI8dsTyNYYmZluhAXeYyfAeB1n1NlxlB5JW+pr40RY=;
+        b=tT2DcckYIvnyok5lgy9Etly4G5Hc5bZFgLIqncox5yQczRvRs3wO83OKhQIJWrE10c
+         MHgQExEDngnHJBsFBIhsDDVHIongrNZyxsiSvw+DorfO76EHrnWp5V754rFE7F1p6czT
+         d4VTLu/KdLMZXSdb6BFdaLNZ3tNFWHIdQr1jqQ1NTauOYB0MTntPPTYxtrOeWPSBgDSd
+         pf/L4WBZPHWc5rT4whGdWbzsM5A8J3H5DCOJVkGEgO2eeTcXjxV2jHzy4rISiHCR9fwi
+         hmeeb4KNPLfHik2TvADW8r+FUQgsXQYrbqSaQsmYV22pZuKScRjNAdk0FOBJtryCO95J
+         gZQA==
+X-Forwarded-Encrypted: i=1; AJvYcCXYxr/AxUQ1zLQdfwE64qaST/qjWl898jYz7UFJiOgu9VjmyPiZjxwi/C6RDJpNVgQJK/dpyWU=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxTsRh3yd+1TmXiP7gYBwF1mc6hrRYKS5BTGVd5+e/5vgZkSpfK
+	eFDShDfjjP/YfTRQOYIL79wmUcju2KLdBZyRPRnqJCBxxtAQiixEoNxK+6MHQqKnikUY2Tyd5pq
+	/Pg==
+X-Google-Smtp-Source: AGHT+IFVhcOXMpYuiCLKMEBjF0GLRF0droi6YIr05t4juUD0iWZSecyCNUnHqr+/fAL8PrR1+nheHNVoid8=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:4983:b0:62f:1f63:ae4f with SMTP id
- 00721157ae682-6dbb6abce79mr220417b3.1.1726087346868; Wed, 11 Sep 2024
- 13:42:26 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:903:41d1:b0:206:99b3:52de with SMTP id
+ d9443c01a7336-2076e47cc2dmr175945ad.10.1726087348954; Wed, 11 Sep 2024
+ 13:42:28 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 11 Sep 2024 13:41:48 -0700
+Date: Wed, 11 Sep 2024 13:41:49 -0700
 In-Reply-To: <20240911204158.2034295-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,9 +61,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240911204158.2034295-1-seanjc@google.com>
 X-Mailer: git-send-email 2.46.0.598.g6f2099f65c-goog
-Message-ID: <20240911204158.2034295-4-seanjc@google.com>
-Subject: [PATCH v2 03/13] KVM: selftests: Fudge around an apparent gcc bug in
- arm64's PMU test
+Message-ID: <20240911204158.2034295-5-seanjc@google.com>
+Subject: [PATCH v2 04/13] KVM: selftests: Assert that vcpu_{g,s}et_reg() won't truncate
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Anup Patel <anup@brainfault.org>, Paolo Bonzini <pbonzini@redhat.com>, 
@@ -75,108 +74,40 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Sean Christopherson <seanjc@google.com>, James Houghton <jthoughton@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Use u64_replace_bits() instead of u64p_replace_bits() to set PMCR.N in
-arm64's vPMU counter access test to fudge around what appears to be a gcc
-bug.  With the recent change to have vcpu_get_reg() return a value in lieu
-of an out-param, some versions of gcc completely ignore the operation
-performed by set_pmcr_n(), i.e. ignore the output param.
+Assert that the the register being read/written by vcpu_{g,s}et_reg() is
+no larger than a uint64_t, i.e. that a selftest isn't unintentionally
+truncating the value being read/written.
 
-The issue is most easily observed by making set_pmcr_n() noinline and
-wrapping the call with printf(), e.g. sans comments, for this code:
-
-  printf("orig = %lx, next = %lx, want = %lu\n", pmcr_orig, pmcr, pmcr_n);
-  set_pmcr_n(&pmcr, pmcr_n);
-  printf("orig = %lx, next = %lx, want = %lu\n", pmcr_orig, pmcr, pmcr_n);
-
-gcc-13 generates:
-
- 0000000000401c90 <set_pmcr_n>:
-  401c90:       f9400002        ldr     x2, [x0]
-  401c94:       b3751022        bfi     x2, x1, #11, #5
-  401c98:       f9000002        str     x2, [x0]
-  401c9c:       d65f03c0        ret
-
- 0000000000402660 <test_create_vpmu_vm_with_pmcr_n>:
-  402724:       aa1403e3        mov     x3, x20
-  402728:       aa1503e2        mov     x2, x21
-  40272c:       aa1603e0        mov     x0, x22
-  402730:       aa1503e1        mov     x1, x21
-  402734:       940060ff        bl      41ab30 <_IO_printf>
-  402738:       aa1403e1        mov     x1, x20
-  40273c:       910183e0        add     x0, sp, #0x60
-  402740:       97fffd54        bl      401c90 <set_pmcr_n>
-  402744:       aa1403e3        mov     x3, x20
-  402748:       aa1503e2        mov     x2, x21
-  40274c:       aa1503e1        mov     x1, x21
-  402750:       aa1603e0        mov     x0, x22
-  402754:       940060f7        bl      41ab30 <_IO_printf>
-
-with the value stored in [sp + 0x60] ignored by both printf() above and
-in the test proper, resulting in a false failure due to vcpu_set_reg()
-simply storing the original value, not the intended value.
-
-  $ ./vpmu_counter_access
-  Random seed: 0x6b8b4567
-  orig = 3040, next = 3040, want = 0
-  orig = 3040, next = 3040, want = 0
-  ==== Test Assertion Failure ====
-    aarch64/vpmu_counter_access.c:505: pmcr_n == get_pmcr_n(pmcr)
-    pid=71578 tid=71578 errno=9 - Bad file descriptor
-       1	0x400673: run_access_test at vpmu_counter_access.c:522
-       2	 (inlined by) main at vpmu_counter_access.c:643
-       3	0x4132d7: __libc_start_call_main at libc-start.o:0
-       4	0x413653: __libc_start_main at ??:0
-       5	0x40106f: _start at ??:0
-    Failed to update PMCR.N to 0 (received: 6)
-
-Somewhat bizarrely, gcc-11 also exhibits the same behavior, but only if
-set_pmcr_n() is marked noinline, whereas gcc-13 fails even if set_pmcr_n()
-is inlined in its sole caller.
-
-All signs point to this being a gcc bug, as clang doesn't exhibit the same
-issue, the code generated by u64p_replace_bits() is correct, and the error
-is somewhat transient, e.g. varies between gcc versions and depends on
-surrounding code.
-
-For now, work around the issue to unblock the vcpu_get_reg() cleanup, and
-because arguably using u64_replace_bits() makes the code a wee bit more
-intuitive.
+Ideally, the assert would be done at compile-time, but that would limit
+the checks to hardcoded accesses and/or require fancier compile-time
+assertion infrastructure to filter out dynamic usage.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c | 8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
+ tools/testing/selftests/kvm/include/kvm_util.h | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-index 30d9c9e7ae35..74da8252b884 100644
---- a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-+++ b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-@@ -45,11 +45,6 @@ static uint64_t get_pmcr_n(uint64_t pmcr)
- 	return FIELD_GET(ARMV8_PMU_PMCR_N, pmcr);
+diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+index 429a7f003fe3..80230e49e35f 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util.h
++++ b/tools/testing/selftests/kvm/include/kvm_util.h
+@@ -683,6 +683,8 @@ static inline uint64_t vcpu_get_reg(struct kvm_vcpu *vcpu, uint64_t id)
+ 	uint64_t val;
+ 	struct kvm_one_reg reg = { .id = id, .addr = (uint64_t)&val };
+ 
++	TEST_ASSERT(KVM_REG_SIZE(id) <= sizeof(val), "Reg %lx too big", id);
++
+ 	vcpu_ioctl(vcpu, KVM_GET_ONE_REG, &reg);
+ 	return val;
  }
- 
--static void set_pmcr_n(uint64_t *pmcr, uint64_t pmcr_n)
--{
--	u64p_replace_bits((__u64 *) pmcr, pmcr_n, ARMV8_PMU_PMCR_N);
--}
--
- static uint64_t get_counters_mask(uint64_t n)
+@@ -690,6 +692,8 @@ static inline void vcpu_set_reg(struct kvm_vcpu *vcpu, uint64_t id, uint64_t val
  {
- 	uint64_t mask = BIT(ARMV8_PMU_CYCLE_IDX);
-@@ -484,13 +479,12 @@ static void test_create_vpmu_vm_with_pmcr_n(uint64_t pmcr_n, bool expect_fail)
- 	vcpu = vpmu_vm.vcpu;
+ 	struct kvm_one_reg reg = { .id = id, .addr = (uint64_t)&val };
  
- 	pmcr_orig = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0));
--	pmcr = pmcr_orig;
- 
- 	/*
- 	 * Setting a larger value of PMCR.N should not modify the field, and
- 	 * return a success.
- 	 */
--	set_pmcr_n(&pmcr, pmcr_n);
-+	pmcr = u64_replace_bits(pmcr_orig, pmcr_n, ARMV8_PMU_PMCR_N);
- 	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), pmcr);
- 	pmcr = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0));
++	TEST_ASSERT(KVM_REG_SIZE(id) <= sizeof(val), "Reg %lx too big", id);
++
+ 	vcpu_ioctl(vcpu, KVM_SET_ONE_REG, &reg);
+ }
  
 -- 
 2.46.0.598.g6f2099f65c-goog
