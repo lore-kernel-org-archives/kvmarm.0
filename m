@@ -1,185 +1,117 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D2A518F2D3
-	for <kvmarm@lists.linux.dev>; Thu, 12 Sep 2024 08:49:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B40F18A6A9
+	for <kvmarm@lists.linux.dev>; Thu, 12 Sep 2024 09:11:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726130994; cv=none; b=e7p0U0tfQiAQhSDhmzR4Eoa3jZfhNcB7HaKDakZdT9r8Mskyt5WA3Lwsy96vVyeSbHgpHiEYneQdt+n9j2pwJ3S72IipOP4uxatRQb++ilS9+ZCO5elGpgv/F4CrVkAOmmQ47D54ndepC3eCDjjYvkzDzOjTs4SZyHwf7Vbs7WM=
+	t=1726132294; cv=none; b=hmtP2ZKjVjkQlNAqTSbms5oAxiRPApG02/a5YeiT4foj19I8oJ6pgXavgCq6vOYHa7HNH7Tyxq1vVgxrDGkDM6W2YfRrsNTm9Lbp/yYEROdmzWjVlmiL+eJQsrnSMhnAzsCHzb1v/Vrtc9Rcrdbem6d0MtJWYmBXG6UyRiwc1+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726130994; c=relaxed/simple;
-	bh=Dw6vJSOcKXJoxKUfF+YEWcXIuVRn04+szgZm935OPDY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kAXrQJctNWIOGziCjoxk1L3B3P7FWSGSdZAbp5q5ks/JNJ3ZlHP3FcHZGSj0c6l0Mikoi41gsxGRnX/ZOE9hdm5Q7Fe28W7EwecLFkQKGHj8IxD1+VopkiURpVOZ7szretcgFMSfwsnwjxNAY4X2M/Q6tGFloOXZwuvhqK9THfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gsE0IaFr; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1726132294; c=relaxed/simple;
+	bh=9rBEz/3jZQ2qE0fBtpr1iiAKAP97cuv1yvGYvb/WCo8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=l0hnb5XmbqbvmQg00w85IMXaZTxRivi9hxm2jl/0AYYM1xcCEcY713PvvlCr03NUd0W+ntOg00hV9sXz6HHkvo6A4bFa8CiLVskU/kd6CdwyuLFlKZNnsoVJNwjsEaS6EZRZ1pU+5KzryCNbggmMHfy8Rf8rOeHn/97ZuXFcW08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=JqF7Pc9c; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gsE0IaFr"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1726130991;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nlbjGqxPrkeon87/oeRHHfBNj7EM9vRLefgULYdvY+w=;
-	b=gsE0IaFr6/b/7PzRz7hjQQM8j79xxE5UY3iWN18789CFUlB367YLemVWkafDyMcUMV93Ee
-	Bt2Ak2boJ4Mi7f02Md3H0uxIhKX8YhtkAYkc18MhzKNi4ERcfr+YuhOZ+smaUmN4EMCRry
-	fHgsQT+sVpKJGgRPiGBm2+Ht+ekH1eE=
-Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
- [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-619-FsuSlb2LOSKxc81wuVdV8Q-1; Thu, 12 Sep 2024 04:49:49 -0400
-X-MC-Unique: FsuSlb2LOSKxc81wuVdV8Q-1
-Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-205425b7e27so10078615ad.0
-        for <kvmarm@lists.linux.dev>; Thu, 12 Sep 2024 01:49:49 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="JqF7Pc9c"
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5c3d20eed0bso804165a12.0
+        for <kvmarm@lists.linux.dev>; Thu, 12 Sep 2024 02:11:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1726132291; x=1726737091; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=KDYukj80mIHPYCgHSB2w3O30EP7PG7QCtWy9R/+4O+8=;
+        b=JqF7Pc9cHJrS9dHDi1aAZfa0WG/9LqTOg9/WrgP1Vm/XEUYpRAfPQB26+/66UJH9PE
+         KjeUOoNabKajrY1h10DnwsQgEwm9z+fX8/f5/fIyld0QgmcpotEs48z7AoTX49jCbdx4
+         7sp1nlrv4qZA6JqV8NmHhYERTKpRzmbSOmLrgjgEjolOAk96I4Da/b+Fdq/AKEC9aIkp
+         9ODwgQ4ZUrv65ZUno4+ehMgBY78eNb7OPB6ISUlbNIx5W1gKcrQvNhXznwdqxcgh58e5
+         Ve+cXsxPR7DtF5Zk9W+j17Ba/oSoRTXq5syi5YBNzuU+Rm8DJywNeH8Zq1umZ0TrdUzX
+         MIRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726130989; x=1726735789;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nlbjGqxPrkeon87/oeRHHfBNj7EM9vRLefgULYdvY+w=;
-        b=aGcSzFFph/u2vHE0xmZ5X0YuyTKu7G43KlGimK42ikAAIpc6D2XG0IBMc6zaV4OEkf
-         TEw+6cMF92tOeDJPVXS0u2gNcvgiUI3kn1k7LEAbQ5f3bgIF0vMlCu+wQ9xhNuR0zEyQ
-         U0hvAd5DUnN1rhA7yUplwIiW+Gj4Evvgbo3mFtp9yDFuoNK2WVTSzrLK05LngNXqiVXy
-         zpriwFMN81KwtVqmvLGhBCeKwme8jKF1Rt1R7OFTsMB7r4Cm1lmUKgcNKVjhIf3GI7cg
-         dVG3aagEHxx+0mkykqVVya7xw8uc/mfYgU9jzYpfHBnYaqvJ9nCxsRTSdDNquUecUXjN
-         uTxA==
-X-Forwarded-Encrypted: i=1; AJvYcCX63Sct0WuPFRJUoImVXARr87smEopgazJbCjRoX0bAXokVOnDLXTV7ORe+hhD+KqdMnYVbSgY=@lists.linux.dev
-X-Gm-Message-State: AOJu0Ywf594pKn1asIRTbemQFOGFGKRQjB6nrR7mIL3/tx5vrKIIWa9E
-	teXV1K9NKUAP4xTDxaDh/JM/rWgJtr/giTBQeaGhChm52TzOT6V06ZrylC3kGDQp+q9NDsOO76K
-	wxkSLBS4xbliejEs3ZilZVDC5BAFlH2kpsmXQsENiy7grr1xkyMzgUw==
-X-Received: by 2002:a17:902:da88:b0:206:b250:1e1 with SMTP id d9443c01a7336-2076e4239fdmr35741755ad.45.1726130988825;
-        Thu, 12 Sep 2024 01:49:48 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFPAkVBoX5O51FPnWXRKfp2ysY+5b/bgkEdmVhjUV5BvvY4BoXMPZkD0mwXpBtdC2wzCEryIw==
-X-Received: by 2002:a17:902:da88:b0:206:b250:1e1 with SMTP id d9443c01a7336-2076e4239fdmr35741415ad.45.1726130988229;
-        Thu, 12 Sep 2024 01:49:48 -0700 (PDT)
-Received: from [192.168.68.54] ([103.210.27.31])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2076af25117sm10632455ad.39.2024.09.12.01.49.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Sep 2024 01:49:47 -0700 (PDT)
-Message-ID: <8e17105a-8732-46df-8f3e-01a168558231@redhat.com>
-Date: Thu, 12 Sep 2024 18:49:38 +1000
+        d=1e100.net; s=20230601; t=1726132291; x=1726737091;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KDYukj80mIHPYCgHSB2w3O30EP7PG7QCtWy9R/+4O+8=;
+        b=VWRSHMt0ifZrnf6e+VXlAYB7XNyb5pO2tXhr0QTttAlUkMex33m87WtB1CSkdWMujb
+         5Juje9ITkAff105aHWJ+fAq2Mqleyjx4Xx8ch9p5JXDA8etcwpg3ZkIMmFetCNCsQQEJ
+         r2wSzrzcjJJO+3p+EWojKdBos6SnteDllZY+ONsucw/PK50E+sHlw3ffcVGAkmyrWU/X
+         D9WVUifSI2W1zuY4qtOS5n13kIRixkGLBRAap9amzaEscaBRYYMTAl7Sb8bF19kSiZ98
+         CPtfMN7M4XdeYx86rFTlF85W+z9LWx2gFGvhfXcfcHXao3j5yf2fAkw0jK3YxUONQe+U
+         RSXA==
+X-Forwarded-Encrypted: i=1; AJvYcCUFW74KaoTtuKT+1ItGfZqbJmAA3yyhqfa/nYrpd6tqej67NtIZbVFufgZ49AoKijyoHzlkJfk=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw8GUNz5wwjlxCcqsNGJQmKnS3wxEd/5jOBU5PUBRkaad1oNcSs
+	fJ5QaT32R5edY8kBpA/UAeOycCBw7jjy2C6FIcaYW4noR+RTr35CGMSKI7NQoYE=
+X-Google-Smtp-Source: AGHT+IFYGstY7Ee7hZURlNK3JZABLF8M1RnLjnl2KXSy/Qm7bwNeqA+fGuOPSyrnOfiIz4Olnre2Gw==
+X-Received: by 2002:a50:cdd4:0:b0:5c2:1f74:114f with SMTP id 4fb4d7f45d1cf-5c413e54913mr1194735a12.34.1726132289759;
+        Thu, 12 Sep 2024 02:11:29 -0700 (PDT)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c3ebd467desm6239500a12.40.2024.09.12.02.11.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Sep 2024 02:11:29 -0700 (PDT)
+Date: Thu, 12 Sep 2024 11:11:28 +0200
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Anup Patel <anup@brainfault.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, James Houghton <jthoughton@google.com>
+Subject: Re: [PATCH v2 02/13] KVM: selftests: Return a value from
+ vcpu_get_reg() instead of using an out-param
+Message-ID: <20240912-a3894135370bf3fe551ed018@orel>
+References: <20240911204158.2034295-1-seanjc@google.com>
+ <20240911204158.2034295-3-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 07/43] arm64: RME: Check for RME support at KVM init
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun <alpergun@google.com>
-References: <20240821153844.60084-1-steven.price@arm.com>
- <20240821153844.60084-8-steven.price@arm.com>
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20240821153844.60084-8-steven.price@arm.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240911204158.2034295-3-seanjc@google.com>
 
-On 8/22/24 1:38 AM, Steven Price wrote:
-> Query the RMI version number and check if it is a compatible version. A
-> static key is also provided to signal that a supported RMM is available.
+On Wed, Sep 11, 2024 at 01:41:47PM GMT, Sean Christopherson wrote:
+> Return a uint64_t from vcpu_get_reg() instead of having the caller provide
+> a pointer to storage, as none of the KVM_GET_ONE_REG usage in KVM selftests
+
+"none of the vcpu_get_reg() usage"
+
+(There is KVM_GET_ONE_REG usage accessing larger registers, but those are
+ done through __vcpu_get_reg(). See get-reg-list.c)
+
+> accesses a register larger than 64 bits, and vcpu_set_reg() only accepts a
+> 64-bit value.  If a use case comes along that needs to get a register that
+> is larger than 64 bits, then a utility can be added to assert success and
+> take a void pointer, but until then, forcing an out param yields ugly code
+> and prevents feeding the output of vcpu_get_reg() into vcpu_set_reg().
 > 
-> Functions are provided to query if a VM or VCPU is a realm (or rec)
-> which currently will always return false.
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
-> Changes since v2:
->   * Drop return value from kvm_init_rme(), it was always 0.
->   * Rely on the RMM return value to identify whether the RSI ABI is
->     compatible.
-> ---
->   arch/arm64/include/asm/kvm_emulate.h | 17 +++++++++
->   arch/arm64/include/asm/kvm_host.h    |  4 ++
->   arch/arm64/include/asm/kvm_rme.h     | 56 ++++++++++++++++++++++++++++
->   arch/arm64/include/asm/virt.h        |  1 +
->   arch/arm64/kvm/Makefile              |  3 +-
->   arch/arm64/kvm/arm.c                 |  6 +++
->   arch/arm64/kvm/rme.c                 | 50 +++++++++++++++++++++++++
->   7 files changed, 136 insertions(+), 1 deletion(-)
->   create mode 100644 arch/arm64/include/asm/kvm_rme.h
->   create mode 100644 arch/arm64/kvm/rme.c
-> 
+>  .../selftests/kvm/aarch64/aarch32_id_regs.c   | 10 +--
+>  .../selftests/kvm/aarch64/debug-exceptions.c  |  4 +-
+>  .../selftests/kvm/aarch64/hypercalls.c        |  6 +-
+>  .../testing/selftests/kvm/aarch64/psci_test.c |  6 +-
+>  .../selftests/kvm/aarch64/set_id_regs.c       | 18 ++---
+>  .../kvm/aarch64/vpmu_counter_access.c         | 19 +++---
+>  .../testing/selftests/kvm/include/kvm_util.h  |  6 +-
+>  .../selftests/kvm/lib/aarch64/processor.c     |  8 +--
+>  .../selftests/kvm/lib/riscv/processor.c       | 66 +++++++++----------
+>  .../testing/selftests/kvm/riscv/arch_timer.c  |  2 +-
+>  .../testing/selftests/kvm/riscv/ebreak_test.c |  2 +-
+>  .../selftests/kvm/riscv/sbi_pmu_test.c        |  2 +-
+>  tools/testing/selftests/kvm/s390x/resets.c    |  2 +-
+>  tools/testing/selftests/kvm/steal_time.c      |  3 +-
+>  14 files changed, 77 insertions(+), 77 deletions(-)
+>
 
-[...]
+Other than the commit message not being quite right,
 
-> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
-> new file mode 100644
-> index 000000000000..418685fbf6ed
-> --- /dev/null
-> +++ b/arch/arm64/kvm/rme.c
-> @@ -0,0 +1,50 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright (C) 2023 ARM Ltd.
-> + */
-> +
-> +#include <linux/kvm_host.h>
-> +
-> +#include <asm/rmi_cmds.h>
-> +#include <asm/virt.h>
-> +
-> +static int rmi_check_version(void)
-> +{
-> +	struct arm_smccc_res res;
-> +	int version_major, version_minor;
-> +	unsigned long host_version = RMI_ABI_VERSION(RMI_ABI_MAJOR_VERSION,
-> +						     RMI_ABI_MINOR_VERSION);
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_VERSION, host_version, &res);
-> +
-> +	if (res.a0 == SMCCC_RET_NOT_SUPPORTED)
-> +		return -ENXIO;
-> +
-> +	version_major = RMI_ABI_VERSION_GET_MAJOR(res.a1);
-> +	version_minor = RMI_ABI_VERSION_GET_MINOR(res.a1);
-> +
-> +	if (res.a0 != RMI_SUCCESS) {
-> +		kvm_err("Unsupported RMI ABI (v%d.%d) host supports v%d.%d\n",
-> +			version_major, version_minor,
-> +			RMI_ABI_MAJOR_VERSION,
-> +			RMI_ABI_MINOR_VERSION);
-
-This message is perhaps something like below since a range of versions can be
-supported by one particular RMM release.
-
-     kvm_err("Unsupported RMI ABI v%d.%d. Host supports v%ld.%ld - v%ld.%ld\n",
-             RMI_ABI_MAJOR_VERSION, RMI_ABI_MINOR_VERSION,
-             RMI_ABI_VERSION_GET_MAJOR(res.a1), RMI_ABI_VERSION_GET_MINOR(res.a1),
-             RMI_ABI_VERSION_GET_MAJOR(res.a2), RMI_ABI_VERSION_GET_MINOR(res.a2));
-
-> +		return -ENXIO;
-> +	}
-> +
-> +	kvm_info("RMI ABI version %d.%d\n", version_major, version_minor);
-> +
-
-We probably need to print the requested version, instead of the lower implemented
-version, if I'm correct. At present, both of them have been fixed to v1.0 and we
-don't have a problem though.
-
-         kvm_info("RMI ABI version v%d.%d\n", RMI_ABI_MAJOR_VERSION, RMI_ABI_MINOR_VERSION);
-
-> +	return 0;
-> +}
-> +
+Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
 
 Thanks,
-Gavin
-
+drew
