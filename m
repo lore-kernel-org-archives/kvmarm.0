@@ -1,153 +1,198 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E16CC288BD;
-	Thu, 12 Sep 2024 11:39:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ADB71A264E
+	for <kvmarm@lists.linux.dev>; Thu, 12 Sep 2024 11:48:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726141191; cv=none; b=Ij3kOuUaYoW70vwy50hABQHOeEM/IloQxi4KFUexocVKk/dEzAhTnmo+y7aktSjGFmIlZUCIDi7/KlZECCUHR/vHHPpOrz6DGRg4esJp4kjWQ0AM+bnjy/Ub1OXsPwXS7NYy9CZdKZbLCFpq7c7ud4agBwAS2CCczbv9VZj9+qw=
+	t=1726141719; cv=none; b=ga/Lgwe8KF/UqBjKoQw0nu84SPChUz2kp0abm+y6yFISDgXELdqbmqpCGiKYqYcUzOPpmsOtqE8750zb76rtsBkvtGzOA/X/xBqZilh0fEE5OTP47XKD4k25K6It68Bp3dl8BuOstbjd88rvMWn6ATW6SwUTNWer2kc1WyjGovU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726141191; c=relaxed/simple;
-	bh=T7L5DaGqzTOTtAvvzaHbnlKPp7RFKeCBqLlFYkwSqLw=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=gg8lp/9sMkUOeAu0Ejfg4LxmJpGSWMX3QfMbnPC/QU0/OJ8sfEboewUZ/946yTghZtN4FGN39LZYZBVkk3JJx5AKeh7Z/CTfe8/4Yja4GoVss3LrCXD63EONiF05CdFSgXEky3ABHHLLdd8qfMxdda+U0jplaCePLoPibio6g0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BFgoCJvO; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1726141719; c=relaxed/simple;
+	bh=5MeAB3wNWXW6zxJcKzD345TpEvs6pJEG8GzU2zkj5H4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GGUaGPnBIGsgIVDG+MGlbK2MPoI83v1jrrXfVWgsPV1fC8XGyClqRE5w7WYwKILXaeD7ojDVWe7wzhnPQMe/7vZJJYVbYyaxsrQgGDp3RINXE71J6+tdm2qgDayxgMkla3z3vYoffNcI0qDn6QMmD03NsPSzyNixOnX/3lCayXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=cteZ2MVb; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BFgoCJvO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2FD2C4CEC3;
-	Thu, 12 Sep 2024 11:39:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726141190;
-	bh=T7L5DaGqzTOTtAvvzaHbnlKPp7RFKeCBqLlFYkwSqLw=;
-	h=From:Date:Subject:To:Cc:From;
-	b=BFgoCJvOJyY3bOglFn+ZWACYg8QtpwGdz8pOmQIFdE74BGNSBRZXNsZoGc/3TT7wU
-	 pIYxqLan4KPTOpjpP3inHAEGVz5vjDDn23KuJSrIa2Gh7FVzJBuV/k/LXxPe3+Q0ni
-	 UxSRctHpb+A+bzBZ+GJFLciS/UxrF1oD6HIA+Uxzva1OvjsWjmYuzEnkHwAmN8qAdl
-	 PXIKZxopbrVwRHXv18u1bl6aaU4/E4iCrt+rscPGfyPRH/fJ0geN15PGYk7hcwJJ9i
-	 nRCqVzomZ99TqboGrk3OaOACn4KrFWa9imbTwv9SKXuf5FYeqltPTWHPlOB0xPjzD4
-	 G8Evs7cywhkEQ==
-From: Mark Brown <broonie@kernel.org>
-Date: Thu, 12 Sep 2024 12:39:35 +0100
-Subject: [PATCH v2] KVM: arm64: Constrain the host to the maximum shared
- SVE VL with pKVM
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="cteZ2MVb"
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-42cbbb1727eso7065515e9.2
+        for <kvmarm@lists.linux.dev>; Thu, 12 Sep 2024 04:48:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1726141716; x=1726746516; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=w4n+GYZ6xQGCnhlI0MzrUhScT+W1XwcIKjMSfmbo9NU=;
+        b=cteZ2MVbv5cIZrWwar9U3rMr8QmZ3LgNYD/nHBStatFkGKcb9sTKEe43va7S+GTixL
+         E5cyft9dE/8StaPFoJEn+2Eb3q+qbUjjF7F29m5QieHfluKWbHCst/hlvr844RO66QCA
+         4I8OihSzwK3T1BykEqbMWlW4kaOoqAvwjD+W1QHK4SCdFL9tJMZSZICLvUEoEw8CnCa4
+         +p6mspE4bKtXdYcoWgp/8ZedBjER1uCD+BnWuc6wRQQaEvg4T3vnlLKRo1AC/NBVEyNZ
+         mVy8V6OwASOa1vYPZqEHZLurTC0xcigYt/lV1XF79XPWeLUpib6eCSEZ4/MPXllKzNs1
+         hC/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726141716; x=1726746516;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=w4n+GYZ6xQGCnhlI0MzrUhScT+W1XwcIKjMSfmbo9NU=;
+        b=wnZuRMDg2ciWDR1exk/w6L5rMYuQ5gcbJE9m9brN26hfaQ85A1QbqVFk+Hlk4kpRm0
+         EjFRVQSrqkjd/tdwBmBpXbptoiLKHPtp21rFSbVK1D9dw/j4WiAQSrj9BHRDYCPlJfF7
+         O37c1aWwb3rk6f4ZK7QBrNzZy5XWJprmbfntT4ZltyNnhj6C19/FuHx9z8J4/pp5g5kv
+         G0Me2CQYQnxkqEe2unlRl2HWARJ/E9oNjtMhDmkD2/HLSZ2CpWZUM6TiQVMtsrfKrVDN
+         d3KkzAyoFo5gY8a+cYZAewr+5T1t1Yho3gEohB6kjClwmyLMaLejIX3ISuuTUcUY/R4m
+         yIog==
+X-Forwarded-Encrypted: i=1; AJvYcCUrjt+3OrXcaZVGHTriSZiRuomWGwwPiH34WReSoxeb+1Ve3t+6tA/wBblUuX+MuZvokNEVZ+8=@lists.linux.dev
+X-Gm-Message-State: AOJu0Ywi64TlEuKW1zGgChejxnIJU+E2qYSQeW6ntelABkPi5he4w7nI
+	pb3noOwZEm220dd7qAUAxfgMbVg2NDADqYPukq4hUK10i8da02PuCUhrqWJrUBY=
+X-Google-Smtp-Source: AGHT+IGuLMW5PBxZVZzC5sjGav8GQCfg4HAZBPxOo7KZmIvu+1pf6lJkOGjLrp49iZcF/LWq3PE2sw==
+X-Received: by 2002:a05:600c:548e:b0:42c:a905:9384 with SMTP id 5b1f17b1804b1-42cdb54d606mr17694175e9.20.1726141714874;
+        Thu, 12 Sep 2024 04:48:34 -0700 (PDT)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37895675b7esm14162196f8f.50.2024.09.12.04.48.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Sep 2024 04:48:34 -0700 (PDT)
+Date: Thu, 12 Sep 2024 13:48:33 +0200
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Anup Patel <anup@brainfault.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, James Houghton <jthoughton@google.com>
+Subject: Re: [PATCH v2 00/13] KVM: selftests: Morph max_guest_mem to
+ mmu_stress
+Message-ID: <20240912-757a952b867ea1136cb260cf@orel>
+References: <20240911204158.2034295-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240912-kvm-arm64-limit-guest-vl-v2-1-dd2c29cb2ac9@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAPbS4mYC/42NTQ6CMBBGr0Jm7ZiWFAmuvIdhQcsUJvxmio2Gc
- HcrJ3D5XvK9b4dAwhTgnu0gFDnwMifILxm4vpk7Qm4TQ65yoyqtcIgTNjLdDI488Ybdi8KGccS
- 28LZRrnSutJDmq5Dn95l+1ol7Dtsin/Mp6p/9Ixo1aixM642yVeG9fQwkM43XRTqoj+P4AoWw2
- gjBAAAA
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
- James Morse <james.morse@arm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
- Fuad Tabba <tabba@google.com>
-Cc: Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org, 
- kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
- Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.15-dev-99b12
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4033; i=broonie@kernel.org;
- h=from:subject:message-id; bh=T7L5DaGqzTOTtAvvzaHbnlKPp7RFKeCBqLlFYkwSqLw=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBm4tMBhIe/LyjljX9tuBWlDKk4ejJQHl0QK9VwvpLj
- RdUeHXiJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZuLTAQAKCRAk1otyXVSH0IdqB/
- 4gXr5PVu25pExDRTo3+OAEvKWTRTw/ws6HXCW3rva49UeNE2tmd+L2YNmgFAG6FI8kzDofraRBM2GG
- +fzc+m+LBymMfeYGHklB+aqfJoHbA7l+9YvehpcWE3LaNEpAgzko5Q6I8lPl/mZHe1A94WsFNPCtS4
- UOmAqc4Lzzv+xMT7qTpL82zmc1HGD4ltyzxY2Pv9OQry5CXAdoZ478qOyq6khV0Q/yZyMs4CpYMKsH
- n5MwpGNqRxJlAoCnk899KSVkD6mV6g6waZ/x/+8epabahAKZ4Oae6UNcc6+OPxqSMXnn9oXPz9JCN0
- Z9WCmy2EdR4M6ffd2/BEwbQu5q7afS
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240911204158.2034295-1-seanjc@google.com>
 
-When pKVM saves and restores the host floating point state on a SVE system
-it programs the vector length in ZCR_EL2.LEN to be whatever the maximum VL
-for the PE is but uses a buffer allocated with kvm_host_sve_max_vl, the
-maximum VL shared by all PEs in the system. This means that if we run on a
-system where the maximum VLs are not consistent we will overflow the buffer
-on PEs which support larger VLs.
+On Wed, Sep 11, 2024 at 01:41:45PM GMT, Sean Christopherson wrote:
+> Marc/Oliver,
+> 
+> I would love a sanity check on patches 2 and 3 before I file a bug against
+> gcc.  The code is pretty darn simple, so I don't think I've misdiagnosed the
+> problem, but I've also been second guessing myself _because_ it's so simple;
+> it seems super unlikely that no one else would have run into this before.
+> 
+> On to the patches...
+> 
+> The main purpose of this series is to convert the max_guest_memory_test into
+> a more generic mmu_stress_test.  The patches were originally posted as part
+> a KVM x86/mmu series to test the x86/mmu changes, hence the v2.
+> 
+> The basic gist of the "conversion" is to have the test do mprotect() on
+> guest memory while vCPUs are accessing said memory, e.g. to verify KVM and
+> mmu_notifiers are working as intended.
+> 
+> Patches 1-4 are a somewhat unexpected side quest that I can (arguably should)
+> post separately if that would make things easier.  The original plan was that
+> patch 2 would be a single patch, but things snowballed.
+> 
+> Patch 2 reworks vcpu_get_reg() to return a value instead of using an
+> out-param.  This is the entire motivation for including these patches;
+> having to define a variable just to bump the program counter on arm64
+> annoyed me.
+> 
+> Patch 4 adds hardening to vcpu_{g,s}et_reg() to detect potential truncation,
+> as KVM's uAPI allows for registers greater than the 64 bits the are supported
+> in the "outer" selftests APIs ((vcpu_set_reg() takes a u64, vcpu_get_reg()
+> now returns a u64).
+> 
+> Patch 1 is a change to KVM's uAPI headers to move the KVM_REG_SIZE
+> definition to common code so that the selftests side of things doesn't
+> need #ifdefs to implement the hardening in patch 4.
+> 
+> Patch 3 is the truly unexpected part.  With the vcpu_get_reg() rework,
+> arm64's vpmu_counter_test fails when compiled with gcc-13, and on gcc-11
+> with an added "noinline".  AFAICT, the failure doesn't actually have
+> anything to with vcpu_get_reg(); I suspect the largely unrelated change
+> just happened to run afoul of a latent gcc bug.
+> 
+> Pending a sanity check, I will file a gcc bug.  In the meantime, I am
+> hoping to fudge around the issue in KVM selftests so that the vcpu_get_reg()
+> cleanup isn't blocked, and because the hack-a-fix is arguably a cleanup
+> on its own.
+> 
+> v2:
+>  - Rebase onto kvm/next.
+>  - Add the aforementioned vcpu_get_reg() changes/disaster.
+>  - Actually add arm64 support for the fancy mprotect() testcase (I did this
+>    before v1, but managed to forget to include the changes when posting).
+>  - Emit "mov %rax, (%rax)" on x86. [James]
+>  - Add a comment to explain the fancy mprotect() vs. vCPUs logic.
+>  - Drop the KVM x86 patches (applied and/or will be handled separately).
+> 
+> v1: https://lore.kernel.org/all/20240809194335.1726916-1-seanjc@google.com
+> 
+> Sean Christopherson (13):
+>   KVM: Move KVM_REG_SIZE() definition to common uAPI header
+>   KVM: selftests: Return a value from vcpu_get_reg() instead of using an
+>     out-param
+>   KVM: selftests: Fudge around an apparent gcc bug in arm64's PMU test
+>   KVM: selftests: Assert that vcpu_{g,s}et_reg() won't truncate
+>   KVM: selftests: Check for a potential unhandled exception iff KVM_RUN
+>     succeeded
+>   KVM: selftests: Rename max_guest_memory_test to mmu_stress_test
+>   KVM: selftests: Only muck with SREGS on x86 in mmu_stress_test
+>   KVM: selftests: Compute number of extra pages needed in
+>     mmu_stress_test
+>   KVM: selftests: Enable mmu_stress_test on arm64
+>   KVM: selftests: Use vcpu_arch_put_guest() in mmu_stress_test
+>   KVM: selftests: Precisely limit the number of guest loops in
+>     mmu_stress_test
+>   KVM: selftests: Add a read-only mprotect() phase to mmu_stress_test
+>   KVM: selftests: Verify KVM correctly handles mprotect(PROT_READ)
+> 
+>  arch/arm64/include/uapi/asm/kvm.h             |   3 -
+>  arch/riscv/include/uapi/asm/kvm.h             |   3 -
+>  include/uapi/linux/kvm.h                      |   4 +
+>  tools/testing/selftests/kvm/Makefile          |   3 +-
+>  .../selftests/kvm/aarch64/aarch32_id_regs.c   |  10 +-
+>  .../selftests/kvm/aarch64/debug-exceptions.c  |   4 +-
+>  .../selftests/kvm/aarch64/hypercalls.c        |   6 +-
+>  .../testing/selftests/kvm/aarch64/psci_test.c |   6 +-
+>  .../selftests/kvm/aarch64/set_id_regs.c       |  18 +-
+>  .../kvm/aarch64/vpmu_counter_access.c         |  27 ++-
+>  .../testing/selftests/kvm/include/kvm_util.h  |  10 +-
+>  .../selftests/kvm/lib/aarch64/processor.c     |   8 +-
+>  tools/testing/selftests/kvm/lib/kvm_util.c    |   3 +-
+>  .../selftests/kvm/lib/riscv/processor.c       |  66 +++----
+>  ..._guest_memory_test.c => mmu_stress_test.c} | 161 ++++++++++++++++--
+>  .../testing/selftests/kvm/riscv/arch_timer.c  |   2 +-
+>  .../testing/selftests/kvm/riscv/ebreak_test.c |   2 +-
+>  .../selftests/kvm/riscv/sbi_pmu_test.c        |   2 +-
+>  tools/testing/selftests/kvm/s390x/resets.c    |   2 +-
+>  tools/testing/selftests/kvm/steal_time.c      |   3 +-
+>  20 files changed, 236 insertions(+), 107 deletions(-)
+>  rename tools/testing/selftests/kvm/{max_guest_memory_test.c => mmu_stress_test.c} (60%)
+> 
+> 
+> base-commit: 15e1c3d65975524c5c792fcd59f7d89f00402261
+> -- 
+> 2.46.0.598.g6f2099f65c-goog
 
-Since the host will not currently attempt to make use of non-shared VLs fix
-this by explicitly setting the EL2 VL to be the maximum shared VL when we
-save and restore. This will enforce the limit on host VL usage. Should we
-wish to support asymmetric VLs this code will need to be updated along with
-the required changes for the host, patches have previously been posted:
+I gave this test a try on riscv, but it appears to hang in
+rendezvous_with_vcpus(). My platform is QEMU, so maybe I was just too
+impatient. Anyway, I haven't read the test yet, so I don't even know
+what it's doing. It's possibly it's trying to do something not yet
+supported on riscv. I'll add investigating that to my TODO, but I'm
+not sure when I'll get to it.
 
-  https://lore.kernel.org/r/20240730-kvm-arm64-fix-pkvm-sve-vl-v6-0-cae8a2e0bd66@kernel.org
+As for this series, another patch (or a sneaky change to one
+of the patches...) should add 
 
-Fixes: b5b9955617bc ("KVM: arm64: Eagerly restore host fpsimd/sve state in pKVM")
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
-Changes in v2:
-- Update all places where we constrain the host VL, not just those where
-  we save and restore host state.
-- The value written to the register is 0 based, not 1 based.
-- Link to v1: https://lore.kernel.org/r/20240910-kvm-arm64-limit-guest-vl-v1-1-54df40b95ffb@kernel.org
----
- arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +-
- arch/arm64/kvm/hyp/nvhe/hyp-main.c      | 12 +++++++-----
- 2 files changed, 8 insertions(+), 6 deletions(-)
+ #include "ucall_common.h"
 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index f59ccfe11ab9..c2cfb4d6dc92 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -339,7 +339,7 @@ static inline void __hyp_sve_save_host(void)
- 	struct cpu_sve_state *sve_state = *host_data_ptr(sve_state);
- 
- 	sve_state->zcr_el1 = read_sysreg_el1(SYS_ZCR);
--	write_sysreg_s(ZCR_ELx_LEN_MASK, SYS_ZCR_EL2);
-+	write_sysreg_s(sve_vq_from_vl(kvm_host_sve_max_vl) - 1, SYS_ZCR_EL2);
- 	__sve_save_state(sve_state->sve_regs + sve_ffr_offset(kvm_host_sve_max_vl),
- 			 &sve_state->fpsr,
- 			 true);
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index f43d845f3c4e..dd1c6aa907a2 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -33,7 +33,7 @@ static void __hyp_sve_save_guest(struct kvm_vcpu *vcpu)
- 	 */
- 	sve_cond_update_zcr_vq(vcpu_sve_max_vq(vcpu) - 1, SYS_ZCR_EL2);
- 	__sve_save_state(vcpu_sve_pffr(vcpu), &vcpu->arch.ctxt.fp_regs.fpsr, true);
--	write_sysreg_s(ZCR_ELx_LEN_MASK, SYS_ZCR_EL2);
-+	write_sysreg_s(sve_vq_from_vl(kvm_host_sve_max_vl) - 1, SYS_ZCR_EL2);
- }
- 
- static void __hyp_sve_restore_host(void)
-@@ -45,10 +45,11 @@ static void __hyp_sve_restore_host(void)
- 	 * the host. The layout of the data when saving the sve state depends
- 	 * on the VL, so use a consistent (i.e., the maximum) host VL.
- 	 *
--	 * Setting ZCR_EL2 to ZCR_ELx_LEN_MASK sets the effective length
--	 * supported by the system (or limited at EL3).
-+	 * Note that this constrains the PE to the maximum shared VL
-+	 * that was discovered, if we wish to use larger VLs this will
-+	 * need to be revisited.
- 	 */
--	write_sysreg_s(ZCR_ELx_LEN_MASK, SYS_ZCR_EL2);
-+	write_sysreg_s(sve_vq_from_vl(kvm_host_sve_max_vl) - 1, SYS_ZCR_EL2);
- 	__sve_restore_state(sve_state->sve_regs + sve_ffr_offset(kvm_host_sve_max_vl),
- 			    &sve_state->fpsr,
- 			    true);
-@@ -479,7 +480,8 @@ void handle_trap(struct kvm_cpu_context *host_ctxt)
- 	case ESR_ELx_EC_SVE:
- 		cpacr_clear_set(0, CPACR_ELx_ZEN);
- 		isb();
--		sve_cond_update_zcr_vq(ZCR_ELx_LEN_MASK, SYS_ZCR_EL2);
-+		sve_cond_update_zcr_vq(sve_vq_from_vl(kvm_host_sve_max_vl) - 1,
-+				       SYS_ZCR_EL2);
- 		break;
- 	case ESR_ELx_EC_IABT_LOW:
- 	case ESR_ELx_EC_DABT_LOW:
+to mmu_stress_test.c since it's not there yet despite using get_ucall().
+Building riscv faild because of that.
 
----
-base-commit: 7c626ce4bae1ac14f60076d00eafe71af30450ba
-change-id: 20240910-kvm-arm64-limit-guest-vl-d5fba0c7cc7b
-
-Best regards,
--- 
-Mark Brown <broonie@kernel.org>
-
+Thanks,
+drew
