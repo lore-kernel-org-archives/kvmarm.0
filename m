@@ -1,91 +1,97 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 684043A1DB;
-	Thu, 12 Sep 2024 14:45:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E823F15D5D9;
+	Thu, 12 Sep 2024 14:56:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726152333; cv=none; b=fHeWEyuQFKIderKaT3P29sIds5oeYOKmEKaIU7JbdR5CnOydh3tpIMGhcUqEC7yYGtL+Ny5lq99pCC9CUppjNiD/ApStlzDLTxVgFkEFXp8cX0q+EG5RQ1vLD3jUkcMQ7dLp8mSrQLeLLji/cqocvYi91gmTxrSADysD9pUsHOw=
+	t=1726152977; cv=none; b=UnNeZ3/zwYrcfGM4Q5IqjmEWQWSMyuVj8Eo0f/MsdCoOK5cnV/hIEsvG/8gUa1t1rq0MbUBFGzALQoJCZhpo2NGDpPiuVBaNHKcuN8XIH9OuCZDwtjGduclxI0+6xwuKwvxtzDcu477G3Eov7YELIPWzPUV8f4VezPYDpY2pdq0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726152333; c=relaxed/simple;
-	bh=mxjYBhgowa+hjwoRUX8TMN4qUXla0ab3yShjgqYmAZY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NWvyVFX93erbH+96TH0IKYwsjYUIqdXDwViP1Sq6uLCTonFqu1Aw8GTYZqiR4ZOIQNjPeC9h/ur6qLJxTzuEhwjmjlu5SxLGcvBcdqk1UAebe74MSdYxtzGYkaYSfWGbC9HYj3qTgdnQhEnp7l6DarCdeYQgg2Two54Wf2uNieI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mdcLyu/k; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1726152977; c=relaxed/simple;
+	bh=86au2B0wjGy7LvSXF0wyg5cS7DuvPtZR14wDerQ7g1I=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FZSAyVfGgUrejU6Wdd6w+XeH66pXvtMULuFew9J8YHN4H0rxGIIrX2OZjLr1y3mi5Yi7BOkrMAFjadtV3W5GAYAA8YbrBpGFmHWImh0suikshP8+tB3doY7NB5OF7zROeMfeho9KeaLQJtvF32bAKiFDNRMOcXsj6xB/D19E4Io=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=czMOKCYj; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mdcLyu/k"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5E51C4CEC3;
-	Thu, 12 Sep 2024 14:45:30 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="czMOKCYj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CEBBC4CEC3;
+	Thu, 12 Sep 2024 14:56:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726152332;
-	bh=mxjYBhgowa+hjwoRUX8TMN4qUXla0ab3yShjgqYmAZY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mdcLyu/kHFaLs5fJSP8jTKdCOlB/C9IumoxREhx5ws9z5SAyNHEgDAqVCapVd14lS
-	 k+m21hvwCzp1wgmpxC+HReq3XV5DI/WoREwlDEKTnpPEUvAQB30AaNcXzBDjf98H85
-	 cEtriWooeu9kmTM/+3WmwYEnlr8oGabYVfOTd2xoWszjAQzgVE5kpQ5XVhRloeKMsi
-	 RJ14l1PJKPvWH5SbhEEMT4qo3ocrdpnxrnBz3nF6a4rC0ZPTVoQin2tzFvgoSOK13v
-	 UD2icaiMgnbDxgIPtRsPek44bI18ul/7T2k9o0FanhzcrhJzixmVW9uAK85z79e/vG
-	 mmwyLbHfC9YDg==
-Date: Thu, 12 Sep 2024 15:45:27 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+	s=k20201202; t=1726152976;
+	bh=86au2B0wjGy7LvSXF0wyg5cS7DuvPtZR14wDerQ7g1I=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=czMOKCYjYsq1PPOlsslj/EcWjZZO2zmwTlE6Lg+dzTcRAFQmvZ7SXFh87LsersfQT
+	 bGqilWmXHHW+ETTnM3rqK8ENZvZxvJzScKo1fKK8nKHBF+hRJir79nblDaUUN/gp4X
+	 sVVyxt5FxN1gfG9C6JHNdGXFP4rWmmPeQWadE0JxVCapAzyecyVudf4LuiHIOUE3Zf
+	 aw7UJuWgzUwbkbxeRVVs2acCGcjRx7cGiuBMpgdMd392vNuNlWIMY4PwqyvLxpW7rw
+	 rA+lV1IhX5cUGAGEJSBc2Bng3fQ7nSfj5e/E0ERLQZRc3cSLicuxqbxdnHWmmpoI3c
+	 ttoBCTIxBCAIA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1solF0-00CTTg-5d;
+	Thu, 12 Sep 2024 15:56:14 +0100
+Date: Thu, 12 Sep 2024 15:56:13 +0100
+Message-ID: <86ldzw7wfm.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Fuad Tabba <tabba@google.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Dave Martin <Dave.Martin@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	Will Deacon <will@kernel.org>,
+	Dave Martin <Dave.Martin@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] KVM: arm64: Constrain the host to the maximum shared
- SVE VL with pKVM
-Message-ID: <17cb5e48-ca96-433a-a351-639dd339dfb7@sirena.org.uk>
+Subject: Re: [PATCH v2] KVM: arm64: Constrain the host to the maximum shared SVE VL with pKVM
+In-Reply-To: <17cb5e48-ca96-433a-a351-639dd339dfb7@sirena.org.uk>
 References: <20240912-kvm-arm64-limit-guest-vl-v2-1-dd2c29cb2ac9@kernel.org>
- <CA+EHjTyJcP0NcvhF0WeuF9_zuFSa1o7w8tA5J2eU=GutF+ZmRA@mail.gmail.com>
+	<CA+EHjTyJcP0NcvhF0WeuF9_zuFSa1o7w8tA5J2eU=GutF+ZmRA@mail.gmail.com>
+	<17cb5e48-ca96-433a-a351-639dd339dfb7@sirena.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="zvLpLCutOfqrtBno"
-Content-Disposition: inline
-In-Reply-To: <CA+EHjTyJcP0NcvhF0WeuF9_zuFSa1o7w8tA5J2eU=GutF+ZmRA@mail.gmail.com>
-X-Cookie: Happiness is the greatest good.
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, tabba@google.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, Dave.Martin@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Thu, 12 Sep 2024 15:45:27 +0100,
+Mark Brown <broonie@kernel.org> wrote:
+> 
+> [1  <text/plain; us-ascii (7bit)>]
+> On Thu, Sep 12, 2024 at 03:21:43PM +0100, Fuad Tabba wrote:
+> 
+> > One part that you haven't changed is setting ZCR_EL2 during el2 setup:
+> > arch/arm64/include/asm/el2_setup.h: .Linit_sve_ : lines 290/291
+> 
+> > I guess at that point it's not straightforward to figure sve_max_vl.
+> > Is there a window after el2 setup where we might actually get the VL
+> > implied by ZCR_ELx_LEN_MASK, or would it always get set to
+> > sve_vq_from_vl(kvm_host_sve_max_vl) - 1 ?
+> 
+> Yeah, at that point we have no idea what any other cores might look like
+> and there's just generally a bootstrapping issue - we need to see the
+> actual maximum VLs for the PEs to work out what the maximum VL for the
+> system is so we can tell KVM what to enforce.
 
---zvLpLCutOfqrtBno
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+That's fine. By the time KVM initialises, all the "early" CPUs will be
+on, and pKVM actively prevents any late onlining of CPUs.
 
-On Thu, Sep 12, 2024 at 03:21:43PM +0100, Fuad Tabba wrote:
+The only gotcha would be if "something" snapshots the "large" VL in
+between two CPU boots, but we really don't expect that sort of things.
 
-> One part that you haven't changed is setting ZCR_EL2 during el2 setup:
-> arch/arm64/include/asm/el2_setup.h: .Linit_sve_ : lines 290/291
+	M.
 
-> I guess at that point it's not straightforward to figure sve_max_vl.
-> Is there a window after el2 setup where we might actually get the VL
-> implied by ZCR_ELx_LEN_MASK, or would it always get set to
-> sve_vq_from_vl(kvm_host_sve_max_vl) - 1 ?
-
-Yeah, at that point we have no idea what any other cores might look like
-and there's just generally a bootstrapping issue - we need to see the
-actual maximum VLs for the PEs to work out what the maximum VL for the
-system is so we can tell KVM what to enforce.
-
---zvLpLCutOfqrtBno
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmbi/ocACgkQJNaLcl1U
-h9DwIQgAgHAplmlFimeXOPg87QCxQYwQgB69MEEXPWng96GZ7ERHdeiWQrYeVXp/
-nb+0pFchKtsQA0yG9m2EgTqXfTof58gl7jt9lEkHSu6eKnrKfL+CunUMN1ppDdvv
-qxGoPWsGlv8y6ecu4WsBmcV5NXnaefdtPSy4+SU5Yjn1eSU9I+Tm63645qO+dznr
-clV5kdld6v5Ac5T35ZueNxB9lKbZ02p/iKUB/vuyy0+vNynoDkph8UEpUsCjQb+1
-Y0ADncVYT4a5FiLf05o5Fr8H4aktWP/yT59JSRqlNnQikXMgTWkn0qF4GjFIh2hJ
-FK0q++YGLADrJF+lB+aIk+73HguFgQ==
-=Hd54
------END PGP SIGNATURE-----
-
---zvLpLCutOfqrtBno--
+-- 
+Without deviation from the norm, progress is not possible.
