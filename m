@@ -1,67 +1,65 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E3801A2C2B
-	for <kvmarm@lists.linux.dev>; Thu, 12 Sep 2024 13:49:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ACA21AD265
+	for <kvmarm@lists.linux.dev>; Thu, 12 Sep 2024 14:03:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726148984; cv=none; b=LaIzkDqAH97kwmoLkrwpA930bBLtMG8UIMD1WyUY3f8tr72ThrdxXfvmLiqiHDXcsEBtjl8tx7J/TtrLcwagUcKr7usD/nNB7TKGwOYhs2Kn6j0YFwEOT6Rl5c2nR3mXWZc6/PZ8ZxwACdcjUU5wsSHKm71WP3AwvvKlDmbFcXI=
+	t=1726149832; cv=none; b=FEwwmBCNbbEbA4lbUWDPVzI2eCPjoU8rGahV8ad/GMHRxKErg4oCvEbcQod/O8AXfY4ZrL26cYndWKh6vaWiiFfk9Yz0Wr7i7U76i4jD7racfkTGD9Dpl1Z1dY/V4Q3figi6SUBC5/LbUj2X9DrRgvfxsVsv9a56lvLWqRsi7Nk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726148984; c=relaxed/simple;
-	bh=TK63ZITwXiK1tpwBleYE7XvV84aecTotysnL7Q6Y+UI=;
+	s=arc-20240116; t=1726149832; c=relaxed/simple;
+	bh=f4ub2ioH2rAq4LrWkvf3tWt0xuhXdG4XmLanIfAoLdo=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ho7ijDtjXvR9VvrEVLsW/DLDn7HbcD/PHYLt7gDjnFzXG3QbsLlhem4cZkW65W+mxcrFcdB25NKwKZSg1y6RXcdl/pp2Bxw3kzoDEgdUEXJ00hHbX3sNHFgPUAUWR5uMk9uGeTSwz1NE5y7Hwyz3Ya1mNCSSAYVWm+wDyB+kVCY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CtKTGDcl; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=tMHwK4yC21ujXhEyRcQbPZ49znjDXCU2rAN2KcEJY1Mi5TFjZEtigIumyXTT4yORFk5R0ngm9FcxkJK65hFI7R60cY+B6/kX/6UDXTejTjDJlzpH/fBNq1MiHD4DY8gf2FnSnIWMfyBv+3rccRBYOlaYsngjkwoK/IqKAxtHPw8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xGBBnXjP; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CtKTGDcl"
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6d6bb05f2e9so16964687b3.0
-        for <kvmarm@lists.linux.dev>; Thu, 12 Sep 2024 06:49:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xGBBnXjP"
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6b8d96aa5ebso24012497b3.1
+        for <kvmarm@lists.linux.dev>; Thu, 12 Sep 2024 07:03:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726148982; x=1726753782; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1726149830; x=1726754630; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XqdrXm4ZcBhMxArHEVqbh0H8bhyUvIJvDn8m8Oi5KOY=;
-        b=CtKTGDclj4K5pSWhHsPcRO8HH/glHpVf/xEZvFJXLh1nv8Zw0vX0oHcta6wPy8o64W
-         4XCiLju+WCvQE6sTMGdKpTxpyFu4AcRSZQ7IgfnYl+Imy80GdexX0f8tNnBxXyBtTxW1
-         OopRr/vuj4tmYMcSIEgRCaDi1BmzOwF1bhULWpqJoF1tx5cQckb3ajEZf8hejiTueLCP
-         CrbnOO19ja946k0vgZn4NA/o2y9Jg9HkKud26YCKLDqijTizz5jj8YrsnDsQ3CsXUn51
-         KhxVTKDEgbdHdLQa+jwNCyKyEir7MD+6H0D6gRCi0BcdFh261azddVev4PDboS4P8hDE
-         yhyw==
+        bh=WJF8OdeeEbgD1lB1UBEPz4l4GIXf0/aw8YXbCeOR8js=;
+        b=xGBBnXjPmc8EQou3b1JXIHXDVVwC5DDIPTTLsPzCb2iNPobwzgL9wzEWJlbiZW91Qm
+         DeUVf+He0/ZSnHaog0wP/8iEJGXM0bTp88Xx3jtMZwVGkfyhAIWO7rVUXFCA+KM0Sfb2
+         udJHKBzPWHNaxksE7WlNd7o7CKAjHYOMNCq/N3dUP1g3qblPSW6JTDi6sJM2W5TEtD0m
+         9Sb/TSRpYbywOydk27Ym1SnnZhYaVUDai/wh1QaXdtSbbGmkd4eRiBQ73+MDiFNqgFzB
+         EyJDcY4wCpycFvHeTjFJZk1ZACuhzQVYAOFgzc18q806jEpz/mVw1XEwPZNzMsZBCK/7
+         eSGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726148982; x=1726753782;
+        d=1e100.net; s=20230601; t=1726149830; x=1726754630;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XqdrXm4ZcBhMxArHEVqbh0H8bhyUvIJvDn8m8Oi5KOY=;
-        b=MkkJQRvsTiRiEJ/PUgmrd9iEOH6tvVP0ED1UUKSQhWB5Nn9vX2Q1hk3k0Tz0CwUqR8
-         ATgv8loZUGGDOSfcORN4wNqj9Sff12IYRS8xLNDgfwQFsbl5uRXsILOXPwFE4a70h/gl
-         OGt8Ty/grtFOTeCHlGt/x3dN4NDkOAQT583mPbhShjwSoxWFGNHGyHFWOMylg1phXJQB
-         l9Wt/P5N10KOBiscJ0PXIfQjiJdrirpMJ+BF6PPWyqx10el1c8m2CnpdlTMU1VWTEOzu
-         seMQibEh8utkdbcIP4LW0uf3d16FytzxQQp15wpzPDpD+THqcBrJpuJaYOZMMWpv/V+M
-         F/wg==
-X-Forwarded-Encrypted: i=1; AJvYcCXZn3DjD8qCEckO6NDbbYPfzZ8eV33lfrKBqv2IfguhwR8i9E3wIcZGkgq+rg9mVLT38y+cG0Q=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yxp0Sc1wsXOFB3A3REsWrLIuVPVO52YiHiC6L9B7ddRv6nZZV9b
-	QAoQcMfnl7LWEAKGFyQBvkMeN7IxoDnrmpQvt3YHcxvvr/dV59N+GqEq4pquBlhKNzUDdhSL1NY
-	Obg==
-X-Google-Smtp-Source: AGHT+IERWDyZH0lw1THIMdF1ZNEMNfNEpIHjvdgU0tin44x4h90whZRVuXvE3+8fuo4JVbUfWmxTfJ+4tEs=
+        bh=WJF8OdeeEbgD1lB1UBEPz4l4GIXf0/aw8YXbCeOR8js=;
+        b=BahIQkD216gc8hlXEmHvVKw/0ps+WvnLCRTfdmGzxlM2zit+yRtTJi7E3Qm0M1tDdw
+         voaI2qzdQ0sgjC503VEvZStqXM56ARzSWhctICtQALUPgDB8RMWrIktRd+BK95b97Y4k
+         +FLXD2AFZzZHNIW2kIc5Js05adV+Stj0XdQGaprYeMoURJCVyQ91FmswCj9k6vVb7FId
+         4gM/7VWq7cItlEwr9rybsp1RXFo4R/AV9xuJ2Ln0wqFY8iSjpUan5zFIlhTsmf0/Fesr
+         kTfHp2ImXOnjftHrF5MSD1FTulZChPSdUMN4wnGb3B2hFtsyn5Cd//5+VbVYlBJZHWGC
+         +5jA==
+X-Forwarded-Encrypted: i=1; AJvYcCWGtFq9DACrkOjdihP/DKG0IOmPXZLqHYIu3oxgNidrjgBz4uneL1JR48t2+HrGMTpS8lljhR8=@lists.linux.dev
+X-Gm-Message-State: AOJu0YylK/KbdBMLwpLkOSEzVL+8glmIN2iCrNJ/AdekWgP1eLec+BLx
+	EuFpSOYiyMDmpnIQwBdcraw7XdntSmVL7JXgqbX8L3T/CJfjGigEy0fNz1TMwR7vtCHeL+xsg+8
+	upg==
+X-Google-Smtp-Source: AGHT+IG9MDMwcr2ud0GqvqLu65vyfg3SEL0UKjpaqJLZjzXIU9brTD+du2LqNfe439QMw4Yu0UCoNCtm5zw=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:50c:b0:e1d:a616:602 with SMTP id
- 3f1490d57ef6-e1da6160834mr2247276.7.1726148982380; Thu, 12 Sep 2024 06:49:42
- -0700 (PDT)
-Date: Thu, 12 Sep 2024 06:49:40 -0700
-In-Reply-To: <20240912-a3894135370bf3fe551ed018@orel>
+ (user=seanjc job=sendgmr) by 2002:a05:690c:209d:b0:64a:d1b0:4f24 with SMTP id
+ 00721157ae682-6dbb6bb7dc7mr477817b3.7.1726149830238; Thu, 12 Sep 2024
+ 07:03:50 -0700 (PDT)
+Date: Thu, 12 Sep 2024 07:03:48 -0700
+In-Reply-To: <20240912-757a952b867ea1136cb260cf@orel>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20240911204158.2034295-1-seanjc@google.com> <20240911204158.2034295-3-seanjc@google.com>
- <20240912-a3894135370bf3fe551ed018@orel>
-Message-ID: <ZuLxIjMT4QzrUaad@google.com>
-Subject: Re: [PATCH v2 02/13] KVM: selftests: Return a value from
- vcpu_get_reg() instead of using an out-param
+References: <20240911204158.2034295-1-seanjc@google.com> <20240912-757a952b867ea1136cb260cf@orel>
+Message-ID: <ZuL0xEIB1ol5epEE@google.com>
+Subject: Re: [PATCH v2 00/13] KVM: selftests: Morph max_guest_mem to mmu_stress
 From: Sean Christopherson <seanjc@google.com>
 To: Andrew Jones <ajones@ventanamicro.com>
 Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
@@ -74,14 +72,25 @@ Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
 Content-Type: text/plain; charset="us-ascii"
 
 On Thu, Sep 12, 2024, Andrew Jones wrote:
-> On Wed, Sep 11, 2024 at 01:41:47PM GMT, Sean Christopherson wrote:
-> > Return a uint64_t from vcpu_get_reg() instead of having the caller provide
-> > a pointer to storage, as none of the KVM_GET_ONE_REG usage in KVM selftests
-> 
-> "none of the vcpu_get_reg() usage"
-> 
-> (There is KVM_GET_ONE_REG usage accessing larger registers, but those are
->  done through __vcpu_get_reg(). See get-reg-list.c)
+> I gave this test a try on riscv, but it appears to hang in
+> rendezvous_with_vcpus(). My platform is QEMU, so maybe I was just too
+> impatient.
 
-Doh, right, which was also part of my reasoning for making the conversion (tests
-can use __vcpu_get_reg() if they need to get a larger register).
+Try running with " -m 1 -s 1", which tells the test to use only 1GiB of memory.
+That should run quite quickly, even in an emulator.
+
+> Anyway, I haven't read the test yet, so I don't even know what it's doing.
+> It's possibly it's trying to do something not yet supported on riscv. I'll
+> add investigating that to my TODO, but I'm not sure when I'll get to it.
+> 
+> As for this series, another patch (or a sneaky change to one
+> of the patches...) should add 
+> 
+>  #include "ucall_common.h"
+> 
+> to mmu_stress_test.c since it's not there yet despite using get_ucall().
+> Building riscv faild because of that.
+
+Roger that.
+
+Thanks!
