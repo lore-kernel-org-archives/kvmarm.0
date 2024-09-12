@@ -1,70 +1,42 @@
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BCE61922EE
-	for <kvmarm@lists.linux.dev>; Thu, 12 Sep 2024 09:41:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 090B8192B6D
+	for <kvmarm@lists.linux.dev>; Thu, 12 Sep 2024 10:04:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726134077; cv=none; b=mQqyo+O5nLHpfZLCncUR8I3zV2pyLnlkJZC6zQ4Ru6MHggtpdxI9WxfetZbIVC251moEeDHqH9acxoukIJAb92ky5M58srdgftzQEH/ieRZmFylMuLqCmKwsLfG8ZiBtEt4hwX0rWK5RGMRhhzmewxAWZiwVFr7QQnAJyuepcBk=
+	t=1726135483; cv=none; b=qIn9q4WTdR2e31FYUmnowTZfRN7NLW7AuaJOzA2ByaCDciy4ra3PrdN7cJH/OJPvqZ24XMfWBOSDHLCl7l8aH2Nf0SLxbTNB+BrhaHoxLYAFX6E2uD9DUxfr4VWVoP7nhAqUsH7HClhyBSFmKpHir9sqMYNt1SFRsziyS7URmss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726134077; c=relaxed/simple;
-	bh=j4p7rekU9XpaxoYQxOygTZbro1GDTOZAkbJ5AtXBJiM=;
+	s=arc-20240116; t=1726135483; c=relaxed/simple;
+	bh=9g5kxZXNC+JzmL6CmFu2yIDGL/vmZExNTwoAcSSACkY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UWKynibO/w81XXFk3BOs7PJD1ipucwPxHqyyZcFktKhJz6ivxo/W240qOsKkg+L6EKroBCe/vsgCAYGaeGerHVvLzHnChiG07JVdlOxbhYAK7TtzfXOHQL7hjlAa7MxxGLLVFWPP7bLCdEffJjGgJ16aVmPhIVEYgTyXbzPsZ90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=SX9wgmNe; arc=none smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="SX9wgmNe"
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-53659867cbdso1057966e87.3
-        for <kvmarm@lists.linux.dev>; Thu, 12 Sep 2024 02:41:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1726134073; x=1726738873; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=aiemgFzmdlVArSRtl/VBHqqgaU54TtFT6LBWQAz3Kr8=;
-        b=SX9wgmNeReb7qOp/9sD5Xjza59b2EyHR3jYpfqLmnSBozRbtX4JFwuRleFGD4ePGoT
-         3ZleL+9VS90/8pKMEnOfIVRroKzNyJabvDgk+KyS5WSu0cYNjjcl4570ZRQoWxYLV7au
-         ZZsOSaEsVF6jYWenDmKgD+I8NyVdXiH200i994vHTGdVpLwMIt/y/ttv48raW/VLlfJG
-         KKGz3iOCdFZwEDjLIcdUuClZrum2vARm3j2kBH+K59O7xdvqMit3YHU9DDqNPUO2/8u/
-         NlTOg7R7jDg872+fCWVOVZk8qDDLuk3rorLMPZomsPU3SBSCBdpZVvdXyyjPMQqf/XKj
-         AFhg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726134073; x=1726738873;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aiemgFzmdlVArSRtl/VBHqqgaU54TtFT6LBWQAz3Kr8=;
-        b=N/6ANRCWtEH+JsQOz/RBhvXis8Sr8BZb0jitGvX3u+YXgX47p6A0AbpPCKAEl0LtwW
-         j5MceDkA7sv3fOJkAgLfippkKYV5GwI3cI2gXrE7RG2AJE81HzOCJxTSzh46HBYjpstc
-         VR6OjIP64eKDMI9ovEf7fr5NVWU9hiKPAwPOwy15MfrZv+a16UB3sc13H000ktGtqJfs
-         O4s77PAowU46/WGU2hiYqUjPyoeE0i72MS4rb/cGaUGL2CkqoA3nIxKJA8d0mutMmU0F
-         cx5+Yk2aG/S9H569d3pw/KgRr2Yw6UC0WToZMRgOCV/uc3dohdEz9WVpecAjoR/SgZ6X
-         /g8A==
-X-Forwarded-Encrypted: i=1; AJvYcCXx2XlMooO1s2bPKut1I3TE3MX6+cdQwEjksSUP/I2GqqqANwS+/T4qUBswKyB/Ad9EygbvuNQ=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yzs03OXsLGwohTQXizWY3TaFENNkIDVTZA5Wp5VzW2RgjMd0hC5
-	esrpfs8Fohn53IfLz55+AyMXUvBiR6LJ/CZ40HdNyYTsmUKzrBkXsCRNGR7C+gM=
-X-Google-Smtp-Source: AGHT+IE8hrIDE8jMWqmlxIeW/6mf22/C3WP/B4LyK9EfIJcAxDLa0UZEL1XXRZvbqP4WfQWiTVCnKg==
-X-Received: by 2002:a05:6512:31d3:b0:536:5509:8857 with SMTP id 2adb3069b0e04-53678fb7196mr1697881e87.21.1726134072038;
-        Thu, 12 Sep 2024 02:41:12 -0700 (PDT)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8d25c72757sm721848266b.103.2024.09.12.02.41.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Sep 2024 02:41:11 -0700 (PDT)
-Date: Thu, 12 Sep 2024 11:41:10 +0200
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Anup Patel <anup@brainfault.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, James Houghton <jthoughton@google.com>
-Subject: Re: [PATCH v2 04/13] KVM: selftests: Assert that vcpu_{g,s}et_reg()
- won't truncate
-Message-ID: <20240912-75f992936cd9878d0e507498@orel>
-References: <20240911204158.2034295-1-seanjc@google.com>
- <20240911204158.2034295-5-seanjc@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=uTlO1BW1OW21FHFVa3M8+0D/h3TiEmzUvO3/HcsFwONjegTMDgAQfnlJinn8DNnxPxqsXZokgE/T+Tdaai0/CXH1lEfERehoDuPuqDxanj8maK5OsZdGeR6evxx3Qbu1xPk1gJ8tE2OlKJg3WI4WSbBTuvwljTsqO4uE3JsHaoA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B82D6DA7;
+	Thu, 12 Sep 2024 03:05:09 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D10A63F73B;
+	Thu, 12 Sep 2024 03:04:38 -0700 (PDT)
+Date: Thu, 12 Sep 2024 11:04:33 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH v3 18/24] KVM: arm64: Split S1 permission evaluation into
+ direct and hierarchical parts
+Message-ID: <20240912100433.GA1162893@e124191.cambridge.arm.com>
+References: <20240911135151.401193-1-maz@kernel.org>
+ <20240911135151.401193-19-maz@kernel.org>
+ <20240911141513.GA1080224@e124191.cambridge.arm.com>
+ <86o74u6vzu.wl-maz@kernel.org>
+ <20240911155128.GA1087252@e124191.cambridge.arm.com>
+ <86mske6ujn.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -73,51 +45,65 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240911204158.2034295-5-seanjc@google.com>
+In-Reply-To: <86mske6ujn.wl-maz@kernel.org>
 
-On Wed, Sep 11, 2024 at 01:41:49PM GMT, Sean Christopherson wrote:
-> Assert that the the register being read/written by vcpu_{g,s}et_reg() is
-> no larger than a uint64_t, i.e. that a selftest isn't unintentionally
-> truncating the value being read/written.
+On Wed, Sep 11, 2024 at 05:10:04PM +0100, Marc Zyngier wrote:
+> On Wed, 11 Sep 2024 16:51:28 +0100,
+> Joey Gouly <joey.gouly@arm.com> wrote:
+> > 
+> > On Wed, Sep 11, 2024 at 04:38:45PM +0100, Marc Zyngier wrote:
+> > > On Wed, 11 Sep 2024 15:15:13 +0100,
+> > > Joey Gouly <joey.gouly@arm.com> wrote:
+> > > > 
+> > > > On Wed, Sep 11, 2024 at 02:51:45PM +0100, Marc Zyngier wrote:
+> > > 
+> > > [...]
+> > > 
+> > > > > +static void compute_s1_hierarchical_permissions(struct kvm_vcpu *vcpu,
+> > > > > +						struct s1_walk_info *wi,
+> > > > > +						struct s1_walk_result *wr,
+> > > > > +						struct s1_perms *s1p)
+> > > > > +{
+> > > > 
+> > > > How about:
+> > > > 
+> > > > 	if (wi->hpd)
+> > > > 		return;
+> > > 
+> > > I was hoping not to add anything like this, because all the table bits
+> > > are 0 (we simply don't collect them), and thus don't have any effect.
+> > 
+> > I just thought it was more obvious that they wouldn't apply in this case, don't
+> > feel super strongly about it.
 > 
-> Ideally, the assert would be done at compile-time, but that would limit
-> the checks to hardcoded accesses and/or require fancier compile-time
-> assertion infrastructure to filter out dynamic usage.
+> If you want it to be obvious, how about this instead?
 > 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  tools/testing/selftests/kvm/include/kvm_util.h | 4 ++++
->  1 file changed, 4 insertions(+)
+> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> index 8a5e1c4682619..fb9de5fc2cc26 100644
+> --- a/arch/arm64/kvm/at.c
+> +++ b/arch/arm64/kvm/at.c
+> @@ -985,7 +985,8 @@ static void compute_s1_permissions(struct kvm_vcpu *vcpu, u32 op,
+>  	else
+>  		compute_s1_indirect_permissions(vcpu, wi, wr, s1p);
+>  
+> -	compute_s1_hierarchical_permissions(vcpu, wi, wr, s1p);
+> +	if (!wi->hpd)
+> +		compute_s1_hierarchical_permissions(vcpu, wi, wr, s1p);
+>  
+>  	if (op == OP_AT_S1E1RP || op == OP_AT_S1E1WP) {
+>  		bool pan;
 > 
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> index 429a7f003fe3..80230e49e35f 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> @@ -683,6 +683,8 @@ static inline uint64_t vcpu_get_reg(struct kvm_vcpu *vcpu, uint64_t id)
->  	uint64_t val;
->  	struct kvm_one_reg reg = { .id = id, .addr = (uint64_t)&val };
->  
-> +	TEST_ASSERT(KVM_REG_SIZE(id) <= sizeof(val), "Reg %lx too big", id);
-> +
->  	vcpu_ioctl(vcpu, KVM_GET_ONE_REG, &reg);
->  	return val;
->  }
-> @@ -690,6 +692,8 @@ static inline void vcpu_set_reg(struct kvm_vcpu *vcpu, uint64_t id, uint64_t val
->  {
->  	struct kvm_one_reg reg = { .id = id, .addr = (uint64_t)&val };
->  
-> +	TEST_ASSERT(KVM_REG_SIZE(id) <= sizeof(val), "Reg %lx too big", id);
-> +
->  	vcpu_ioctl(vcpu, KVM_SET_ONE_REG, &reg);
->  }
->  
-> -- 
-> 2.46.0.598.g6f2099f65c-goog
->
 
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+That's even better, if you're happy to include it.
 
-Shouldn't patches 3 and 4 come before patch 2 in this series?
+> 
+> Thanks,
+> 
+> 	M.
 
 Thanks,
-drew
+	J.
+
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
