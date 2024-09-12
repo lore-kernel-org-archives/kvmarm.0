@@ -1,219 +1,185 @@
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 350F55227
-	for <kvmarm@lists.linux.dev>; Thu, 12 Sep 2024 00:20:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D2A518F2D3
+	for <kvmarm@lists.linux.dev>; Thu, 12 Sep 2024 08:49:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726100404; cv=none; b=cHYCb5w/+yxx93m9mbAfADymFg43MlU/pUfDfHU8JxncKJYr2KDnWeMUVaC0ujb+uYyD1j8FHVYl4YFfJ/pCgv3zCr62a3S+dO7IogVbLC1SYj/fLXSLSipKTNQSECmPIipaCGemYuKZIw3Xa6vHV3kngb3ZBlbYeGEnDzv8xwM=
+	t=1726130994; cv=none; b=e7p0U0tfQiAQhSDhmzR4Eoa3jZfhNcB7HaKDakZdT9r8Mskyt5WA3Lwsy96vVyeSbHgpHiEYneQdt+n9j2pwJ3S72IipOP4uxatRQb++ilS9+ZCO5elGpgv/F4CrVkAOmmQ47D54ndepC3eCDjjYvkzDzOjTs4SZyHwf7Vbs7WM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726100404; c=relaxed/simple;
-	bh=7ZHE6rnn9Pm63u68EhYfwOZZSNVSjSnrzypykdDVVhg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qey3zlTuMx8JOv1R/t0e5aUprUXpXa9M7tF3e6WDwW4MCv8wuFGVbX/vl6r05ExxynPdJvkBsjvHHr27BmSDd6BlS31KGHcaL8//qP5a2Mvc/C+v5OEv2rSNk0VukGpuAdvdm4mgufVbj+0IFSptN+qCPCymRlLA8RdVeV2vUWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B/dWxgPV; arc=none smtp.client-ip=209.85.128.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1726130994; c=relaxed/simple;
+	bh=Dw6vJSOcKXJoxKUfF+YEWcXIuVRn04+szgZm935OPDY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kAXrQJctNWIOGziCjoxk1L3B3P7FWSGSdZAbp5q5ks/JNJ3ZlHP3FcHZGSj0c6l0Mikoi41gsxGRnX/ZOE9hdm5Q7Fe28W7EwecLFkQKGHj8IxD1+VopkiURpVOZ7szretcgFMSfwsnwjxNAY4X2M/Q6tGFloOXZwuvhqK9THfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gsE0IaFr; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B/dWxgPV"
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-6d4f1d9951fso3540127b3.1
-        for <kvmarm@lists.linux.dev>; Wed, 11 Sep 2024 17:20:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726100401; x=1726705201; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=6gfaXOaocGV5N/sXdVJlpTgJOtMKxsPAOrOzp4Kg5Zo=;
-        b=B/dWxgPVn4Y01yVKTH8iy4xD/pDZUBUN6gSr1+jMcAQD9ITelsBTwspiKOmAulmIvX
-         PjxKo1dlY3IiK2sf06tUxbIdgairOvRcA+L1g+CtNh0EARpyWtC6u9mKuvWGi8TGfGyw
-         N+KlgAYRH/9X/DCCIpkmcVn3PS7kN40b36h94erDsLdW5APltKFKL/jabNQgoo9vvcIm
-         q+uRClQgksLb1pVVaZwkg4J76m8kWFNh/xFTtwzfgjelwpDcQPZyRKThCGIs4AYT6A2+
-         AbeihDIUiYEzPrZsp3FV2kZsT8YPtWgiZMQgRxcDbHDu0xwoivbJmLeUazZPfutTjDdc
-         6xQw==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gsE0IaFr"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1726130991;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nlbjGqxPrkeon87/oeRHHfBNj7EM9vRLefgULYdvY+w=;
+	b=gsE0IaFr6/b/7PzRz7hjQQM8j79xxE5UY3iWN18789CFUlB367YLemVWkafDyMcUMV93Ee
+	Bt2Ak2boJ4Mi7f02Md3H0uxIhKX8YhtkAYkc18MhzKNi4ERcfr+YuhOZ+smaUmN4EMCRry
+	fHgsQT+sVpKJGgRPiGBm2+Ht+ekH1eE=
+Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
+ [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-619-FsuSlb2LOSKxc81wuVdV8Q-1; Thu, 12 Sep 2024 04:49:49 -0400
+X-MC-Unique: FsuSlb2LOSKxc81wuVdV8Q-1
+Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-205425b7e27so10078615ad.0
+        for <kvmarm@lists.linux.dev>; Thu, 12 Sep 2024 01:49:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726100401; x=1726705201;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6gfaXOaocGV5N/sXdVJlpTgJOtMKxsPAOrOzp4Kg5Zo=;
-        b=nD1OzXdNdtw6XPWiUwWlFFVrGg/ptEuvIqyY1JQVjnwwoadMEELO4AvKpWnCF3BF6B
-         aTk+2nbyVXFh2omhiuf1Co/KRYaO7mPt/zRIy1m2wOx+AgqJIRPhn+D59CKLihQXTiGR
-         bvugkPAuPUf37KRyruCpimcuwsjfKmmakNGf5ZQtXPS9pwY4HXXpZtl6ivhegpu76mdn
-         9cW28cnl5sK4UlBYZVFQ54Nx530+nmNtaQN7ENvC2J0n5EmMcZQSBD4xGv4HUoDnYOJm
-         X+AsjhHMokwtqkB0Q+wEmEwJS96tJpyC5oru0L/gT20V/7wNqLMtq4LRy4TgL3G2UqI9
-         D+Fg==
-X-Forwarded-Encrypted: i=1; AJvYcCV002hZt1GeW8pZSfoXo3N1HIE5pLQwL9OOcFHJuZXuP9A+g77hUYw3eYbP1aeXrbAe4H/GMY0=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxUPOTK4KgXUoEGgqJBQ5DHvTzGyO5onMBCF5zsFuyJNpk193k8
-	DxWntx/jLFxY+liqzFSpVdH74ohYjPFuTZxc3MGZ+ISwGh2tw5utsl6sOGkLdaAkCyCc65MDQWW
-	7+F2kYNZABaMb+IySn6MZ1RDZSd144PbRiD0i
-X-Google-Smtp-Source: AGHT+IFCSQW9OkhxWu5GixWfZA3Akz697w6Am0RhcKLgULCV/kD0mPJsOAT48WevjQEwyJGw4vOMbwN8aQtB8tw8odU=
-X-Received: by 2002:a05:690c:ec8:b0:6db:b1d5:5116 with SMTP id
- 00721157ae682-6dbb6add2fdmr14504987b3.9.1726100400935; Wed, 11 Sep 2024
- 17:20:00 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1726130989; x=1726735789;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nlbjGqxPrkeon87/oeRHHfBNj7EM9vRLefgULYdvY+w=;
+        b=aGcSzFFph/u2vHE0xmZ5X0YuyTKu7G43KlGimK42ikAAIpc6D2XG0IBMc6zaV4OEkf
+         TEw+6cMF92tOeDJPVXS0u2gNcvgiUI3kn1k7LEAbQ5f3bgIF0vMlCu+wQ9xhNuR0zEyQ
+         U0hvAd5DUnN1rhA7yUplwIiW+Gj4Evvgbo3mFtp9yDFuoNK2WVTSzrLK05LngNXqiVXy
+         zpriwFMN81KwtVqmvLGhBCeKwme8jKF1Rt1R7OFTsMB7r4Cm1lmUKgcNKVjhIf3GI7cg
+         dVG3aagEHxx+0mkykqVVya7xw8uc/mfYgU9jzYpfHBnYaqvJ9nCxsRTSdDNquUecUXjN
+         uTxA==
+X-Forwarded-Encrypted: i=1; AJvYcCX63Sct0WuPFRJUoImVXARr87smEopgazJbCjRoX0bAXokVOnDLXTV7ORe+hhD+KqdMnYVbSgY=@lists.linux.dev
+X-Gm-Message-State: AOJu0Ywf594pKn1asIRTbemQFOGFGKRQjB6nrR7mIL3/tx5vrKIIWa9E
+	teXV1K9NKUAP4xTDxaDh/JM/rWgJtr/giTBQeaGhChm52TzOT6V06ZrylC3kGDQp+q9NDsOO76K
+	wxkSLBS4xbliejEs3ZilZVDC5BAFlH2kpsmXQsENiy7grr1xkyMzgUw==
+X-Received: by 2002:a17:902:da88:b0:206:b250:1e1 with SMTP id d9443c01a7336-2076e4239fdmr35741755ad.45.1726130988825;
+        Thu, 12 Sep 2024 01:49:48 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFPAkVBoX5O51FPnWXRKfp2ysY+5b/bgkEdmVhjUV5BvvY4BoXMPZkD0mwXpBtdC2wzCEryIw==
+X-Received: by 2002:a17:902:da88:b0:206:b250:1e1 with SMTP id d9443c01a7336-2076e4239fdmr35741415ad.45.1726130988229;
+        Thu, 12 Sep 2024 01:49:48 -0700 (PDT)
+Received: from [192.168.68.54] ([103.210.27.31])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2076af25117sm10632455ad.39.2024.09.12.01.49.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Sep 2024 01:49:47 -0700 (PDT)
+Message-ID: <8e17105a-8732-46df-8f3e-01a168558231@redhat.com>
+Date: Thu, 12 Sep 2024 18:49:38 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20240911204158.2034295-1-seanjc@google.com> <20240911204158.2034295-14-seanjc@google.com>
-In-Reply-To: <20240911204158.2034295-14-seanjc@google.com>
-From: James Houghton <jthoughton@google.com>
-Date: Wed, 11 Sep 2024 17:19:24 -0700
-Message-ID: <CADrL8HW+hUNKPbaL7xYb0FEesB2t-AwAw07iOCDj8KHp0RwVpQ@mail.gmail.com>
-Subject: Re: [PATCH v2 13/13] KVM: selftests: Verify KVM correctly handles mprotect(PROT_READ)
-To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Anup Patel <anup@brainfault.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
-Content-Type: multipart/mixed; boundary="0000000000003f3d950621e1110c"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 07/43] arm64: RME: Check for RME support at KVM init
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun <alpergun@google.com>
+References: <20240821153844.60084-1-steven.price@arm.com>
+ <20240821153844.60084-8-steven.price@arm.com>
+From: Gavin Shan <gshan@redhat.com>
+In-Reply-To: <20240821153844.60084-8-steven.price@arm.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
---0000000000003f3d950621e1110c
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Sep 11, 2024 at 1:42=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> Add two phases to mmu_stress_test to verify that KVM correctly handles
-> guest memory that was writable, and then made read-only in the primary MM=
-U,
-> and then made writable again.
->
-> Add bonus coverage for x86 and arm64 to verify that all of guest memory w=
-as
-> marked read-only.  Making forward progress (without making memory writabl=
-e)
-> requires arch specific code to skip over the faulting instruction, but th=
-e
-> test can at least verify each vCPU's starting page was made read-only for
-> other architectures.
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+On 8/22/24 1:38 AM, Steven Price wrote:
+> Query the RMI version number and check if it is a compatible version. A
+> static key is also provided to signal that a supported RMM is available.
+> 
+> Functions are provided to query if a VM or VCPU is a realm (or rec)
+> which currently will always return false.
+> 
+> Signed-off-by: Steven Price <steven.price@arm.com>
 > ---
->  tools/testing/selftests/kvm/mmu_stress_test.c | 104 +++++++++++++++++-
->  1 file changed, 101 insertions(+), 3 deletions(-)
->
-> diff --git a/tools/testing/selftests/kvm/mmu_stress_test.c b/tools/testin=
-g/selftests/kvm/mmu_stress_test.c
-> index 50c3a17418c4..c07c15d7cc9a 100644
-> --- a/tools/testing/selftests/kvm/mmu_stress_test.c
-> +++ b/tools/testing/selftests/kvm/mmu_stress_test.c
-> @@ -16,6 +16,8 @@
->  #include "guest_modes.h"
->  #include "processor.h"
->
-> +static bool mprotect_ro_done;
+> Changes since v2:
+>   * Drop return value from kvm_init_rme(), it was always 0.
+>   * Rely on the RMM return value to identify whether the RSI ABI is
+>     compatible.
+> ---
+>   arch/arm64/include/asm/kvm_emulate.h | 17 +++++++++
+>   arch/arm64/include/asm/kvm_host.h    |  4 ++
+>   arch/arm64/include/asm/kvm_rme.h     | 56 ++++++++++++++++++++++++++++
+>   arch/arm64/include/asm/virt.h        |  1 +
+>   arch/arm64/kvm/Makefile              |  3 +-
+>   arch/arm64/kvm/arm.c                 |  6 +++
+>   arch/arm64/kvm/rme.c                 | 50 +++++++++++++++++++++++++
+>   7 files changed, 136 insertions(+), 1 deletion(-)
+>   create mode 100644 arch/arm64/include/asm/kvm_rme.h
+>   create mode 100644 arch/arm64/kvm/rme.c
+> 
+
+[...]
+
+> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
+> new file mode 100644
+> index 000000000000..418685fbf6ed
+> --- /dev/null
+> +++ b/arch/arm64/kvm/rme.c
+> @@ -0,0 +1,50 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright (C) 2023 ARM Ltd.
+> + */
 > +
->  static void guest_code(uint64_t start_gpa, uint64_t end_gpa, uint64_t st=
-ride)
->  {
->         uint64_t gpa;
-> @@ -31,6 +33,42 @@ static void guest_code(uint64_t start_gpa, uint64_t en=
-d_gpa, uint64_t stride)
->                 *((volatile uint64_t *)gpa);
->         GUEST_SYNC(2);
->
-> +       /*
-> +        * Write to the region while mprotect(PROT_READ) is underway.  Ke=
-ep
-> +        * looping until the memory is guaranteed to be read-only, otherw=
-ise
-> +        * vCPUs may complete their writes and advance to the next stage
-> +        * prematurely.
-> +        *
-> +        * For architectures that support skipping the faulting instructi=
-on,
-> +        * generate the store via inline assembly to ensure the exact len=
-gth
-> +        * of the instruction is known and stable (vcpu_arch_put_guest() =
-on
-> +        * fixed-length architectures should work, but the cost of parano=
-ia
-> +        * is low in this case).  For x86, hand-code the exact opcode so =
-that
-> +        * there is no room for variability in the generated instruction.
-> +        */
-> +       do {
-> +               for (gpa =3D start_gpa; gpa < end_gpa; gpa +=3D stride)
-> +#ifdef __x86_64__
-> +                       asm volatile(".byte 0x48,0x89,0x00" :: "a"(gpa) :=
- "memory"); /* mov %rax, (%rax) */
-
-I'm curious what you think about using labels (in asm, but perhaps
-also in C) and *setting* the PC instead of incrementing the PC. Diff
-attached (tested on x86). It might even be safe/okay to always use
-vcpu_arch_put_guest(), just set the PC to a label immediately
-following it.
-
-I don't feel strongly, so feel free to ignore.
-
-
-
-> +#elif defined(__aarch64__)
-> +                       asm volatile("str %0, [%0]" :: "r" (gpa) : "memor=
-y");
-> +#else
-> +                       vcpu_arch_put_guest(*((volatile uint64_t *)gpa), =
-gpa);
-> +#endif
-> +       } while (!READ_ONCE(mprotect_ro_done));
+> +#include <linux/kvm_host.h>
 > +
-> +       /*
-> +        * Only architectures that write the entire range can explicitly =
-sync,
-> +        * as other architectures will be stuck on the write fault.
-> +        */
-> +#if defined(__x86_64__) || defined(__aarch64__)
-> +       GUEST_SYNC(3);
-> +#endif
+> +#include <asm/rmi_cmds.h>
+> +#include <asm/virt.h>
+> +
+> +static int rmi_check_version(void)
+> +{
+> +	struct arm_smccc_res res;
+> +	int version_major, version_minor;
+> +	unsigned long host_version = RMI_ABI_VERSION(RMI_ABI_MAJOR_VERSION,
+> +						     RMI_ABI_MINOR_VERSION);
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_VERSION, host_version, &res);
+> +
+> +	if (res.a0 == SMCCC_RET_NOT_SUPPORTED)
+> +		return -ENXIO;
+> +
+> +	version_major = RMI_ABI_VERSION_GET_MAJOR(res.a1);
+> +	version_minor = RMI_ABI_VERSION_GET_MINOR(res.a1);
+> +
+> +	if (res.a0 != RMI_SUCCESS) {
+> +		kvm_err("Unsupported RMI ABI (v%d.%d) host supports v%d.%d\n",
+> +			version_major, version_minor,
+> +			RMI_ABI_MAJOR_VERSION,
+> +			RMI_ABI_MINOR_VERSION);
 
---0000000000003f3d950621e1110c
-Content-Type: application/x-patch; name="labels.diff"
-Content-Disposition: attachment; filename="labels.diff"
-Content-Transfer-Encoding: base64
-Content-ID: <f_m0yjcx7b0>
-X-Attachment-Id: f_m0yjcx7b0
+This message is perhaps something like below since a range of versions can be
+supported by one particular RMM release.
 
-ZGlmZiAtLWdpdCBhL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2t2bS9tbXVfc3RyZXNzX3Rlc3Qu
-YyBiL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2t2bS9tbXVfc3RyZXNzX3Rlc3QuYwppbmRleCBj
-MDdjMTVkN2NjOWEuLmE3Y2NlZDVjM2U2NyAxMDA2NDQKLS0tIGEvdG9vbHMvdGVzdGluZy9zZWxm
-dGVzdHMva3ZtL21tdV9zdHJlc3NfdGVzdC5jCisrKyBiL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3Rz
-L2t2bS9tbXVfc3RyZXNzX3Rlc3QuYwpAQCAtMTYsOCArMTYsMTMgQEAKICNpbmNsdWRlICJndWVz
-dF9tb2Rlcy5oIgogI2luY2x1ZGUgInByb2Nlc3Nvci5oIgogCisjaWYgZGVmaW5lZChfX3g4Nl82
-NF9fKSB8fCBkZWZpbmVkKF9fYWFyY2g2NF9fKQorZXh0ZXJuIHZvaWQgKnNraXBfcGFnZTsKKyNl
-bmRpZgorCiBzdGF0aWMgYm9vbCBtcHJvdGVjdF9yb19kb25lOwogCisKIHN0YXRpYyB2b2lkIGd1
-ZXN0X2NvZGUodWludDY0X3Qgc3RhcnRfZ3BhLCB1aW50NjRfdCBlbmRfZ3BhLCB1aW50NjRfdCBz
-dHJpZGUpCiB7CiAJdWludDY0X3QgZ3BhOwpAQCAtNDAsMTggKzQ1LDIxIEBAIHN0YXRpYyB2b2lk
-IGd1ZXN0X2NvZGUodWludDY0X3Qgc3RhcnRfZ3BhLCB1aW50NjRfdCBlbmRfZ3BhLCB1aW50NjRf
-dCBzdHJpZGUpCiAJICogcHJlbWF0dXJlbHkuCiAJICoKIAkgKiBGb3IgYXJjaGl0ZWN0dXJlcyB0
-aGF0IHN1cHBvcnQgc2tpcHBpbmcgdGhlIGZhdWx0aW5nIGluc3RydWN0aW9uLAotCSAqIGdlbmVy
-YXRlIHRoZSBzdG9yZSB2aWEgaW5saW5lIGFzc2VtYmx5IHRvIGVuc3VyZSB0aGUgZXhhY3QgbGVu
-Z3RoCi0JICogb2YgdGhlIGluc3RydWN0aW9uIGlzIGtub3duIGFuZCBzdGFibGUgKHZjcHVfYXJj
-aF9wdXRfZ3Vlc3QoKSBvbgotCSAqIGZpeGVkLWxlbmd0aCBhcmNoaXRlY3R1cmVzIHNob3VsZCB3
-b3JrLCBidXQgdGhlIGNvc3Qgb2YgcGFyYW5vaWEKLQkgKiBpcyBsb3cgaW4gdGhpcyBjYXNlKS4g
-IEZvciB4ODYsIGhhbmQtY29kZSB0aGUgZXhhY3Qgb3Bjb2RlIHNvIHRoYXQKLQkgKiB0aGVyZSBp
-cyBubyByb29tIGZvciB2YXJpYWJpbGl0eSBpbiB0aGUgZ2VuZXJhdGVkIGluc3RydWN0aW9uLgor
-CSAqIGdlbmVyYXRlIHRoZSBzdG9yZSB2aWEgaW5saW5lIGFzc2VtYmx5IHRvIGVuc3VyZSB3ZSBj
-YW4gY29ycmVjdGx5CisJICogYWRqdXN0IHRoZSBQQyB1cG9uIGZhdWx0aW5nLgogCSAqLwogCWRv
-IHsKIAkJZm9yIChncGEgPSBzdGFydF9ncGE7IGdwYSA8IGVuZF9ncGE7IGdwYSArPSBzdHJpZGUp
-CiAjaWZkZWYgX194ODZfNjRfXwotCQkJYXNtIHZvbGF0aWxlKCIuYnl0ZSAweDQ4LDB4ODksMHgw
-MCIgOjogImEiKGdwYSkgOiAibWVtb3J5Iik7IC8qIG1vdiAlcmF4LCAoJXJheCkgKi8KKwkJCWFz
-bSB2b2xhdGlsZSgiLmdsb2JhbCBza2lwX3BhZ2U7IgorCQkJCSAgICAgIm1vdiAlMCwgKCUwKTsi
-CisJCQkJICAgICAic2tpcF9wYWdlOjsiCisJCQkJICAgICA6OiAiciIgKGdwYSkgOiAibWVtb3J5
-Iik7CiAjZWxpZiBkZWZpbmVkKF9fYWFyY2g2NF9fKQotCQkJYXNtIHZvbGF0aWxlKCJzdHIgJTAs
-IFslMF0iIDo6ICJyIiAoZ3BhKSA6ICJtZW1vcnkiKTsKKwkJCWFzbSB2b2xhdGlsZSgiLmdsb2Jh
-bCBza2lwX3BhZ2U7IgorCQkJCSAgICAgInN0ciAlMCwgWyUwXTsiCisJCQkJICAgICAic2tpcF9w
-YWdlOjsiCisJCQkJICAgICA6OiAiciIgKGdwYSkgOiAibWVtb3J5Iik7CiAjZWxzZQogCQkJdmNw
-dV9hcmNoX3B1dF9ndWVzdCgqKCh2b2xhdGlsZSB1aW50NjRfdCAqKWdwYSksIGdwYSk7CiAjZW5k
-aWYKQEAgLTE3MCwxMCArMTc4LDEwIEBAIHN0YXRpYyB2b2lkICp2Y3B1X3dvcmtlcih2b2lkICpk
-YXRhKQogCQlURVNUX0FTU0VSVF9FUShlcnJubywgRUZBVUxUKTsKICNpZiBkZWZpbmVkKF9feDg2
-XzY0X18pCiAJCVdSSVRFX09OQ0UodmNwdS0+cnVuLT5rdm1fZGlydHlfcmVncywgS1ZNX1NZTkNf
-WDg2X1JFR1MpOwotCQl2Y3B1LT5ydW4tPnMucmVncy5yZWdzLnJpcCArPSAzOworCQl2Y3B1LT5y
-dW4tPnMucmVncy5yZWdzLnJpcCA9ICh2bV92YWRkcl90KSZza2lwX3BhZ2U7CiAjZWxpZiBkZWZp
-bmVkKF9fYWFyY2g2NF9fKQogCQl2Y3B1X3NldF9yZWcodmNwdSwgQVJNNjRfQ09SRV9SRUcocmVn
-cy5wYyksCi0JCQkgICAgIHZjcHVfZ2V0X3JlZyh2Y3B1LCBBUk02NF9DT1JFX1JFRyhyZWdzLnBj
-KSkgKyA0KTsKKwkJCSAgICAgKHZtX3ZhZGRyX3QpJnNraXBfcGFnZSk7CiAjZW5kaWYKIAogCX0K
---0000000000003f3d950621e1110c--
+     kvm_err("Unsupported RMI ABI v%d.%d. Host supports v%ld.%ld - v%ld.%ld\n",
+             RMI_ABI_MAJOR_VERSION, RMI_ABI_MINOR_VERSION,
+             RMI_ABI_VERSION_GET_MAJOR(res.a1), RMI_ABI_VERSION_GET_MINOR(res.a1),
+             RMI_ABI_VERSION_GET_MAJOR(res.a2), RMI_ABI_VERSION_GET_MINOR(res.a2));
+
+> +		return -ENXIO;
+> +	}
+> +
+> +	kvm_info("RMI ABI version %d.%d\n", version_major, version_minor);
+> +
+
+We probably need to print the requested version, instead of the lower implemented
+version, if I'm correct. At present, both of them have been fixed to v1.0 and we
+don't have a problem though.
+
+         kvm_info("RMI ABI version v%d.%d\n", RMI_ABI_MAJOR_VERSION, RMI_ABI_MINOR_VERSION);
+
+> +	return 0;
+> +}
+> +
+
+Thanks,
+Gavin
+
