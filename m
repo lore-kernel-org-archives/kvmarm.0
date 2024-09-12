@@ -1,198 +1,275 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ADB71A264E
-	for <kvmarm@lists.linux.dev>; Thu, 12 Sep 2024 11:48:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E02A19E96A;
+	Thu, 12 Sep 2024 12:02:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726141719; cv=none; b=ga/Lgwe8KF/UqBjKoQw0nu84SPChUz2kp0abm+y6yFISDgXELdqbmqpCGiKYqYcUzOPpmsOtqE8750zb76rtsBkvtGzOA/X/xBqZilh0fEE5OTP47XKD4k25K6It68Bp3dl8BuOstbjd88rvMWn6ATW6SwUTNWer2kc1WyjGovU=
+	t=1726142538; cv=none; b=ie+EdVi6nbWaPBd0za0nGVfU0/+Khe1tqNPt1Mf14JWqA9HE/bv2dMxAMwQ2gtxT0MvUzZaAGI4P2otzU9l2bfcBRA9piksJGKOkbwGOANqur5ejOGqF5Tp1QsTMlF+DEv4Y1DoJJakymSknHbn6ygVkvz7theqYje5tN6WalwY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726141719; c=relaxed/simple;
-	bh=5MeAB3wNWXW6zxJcKzD345TpEvs6pJEG8GzU2zkj5H4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GGUaGPnBIGsgIVDG+MGlbK2MPoI83v1jrrXfVWgsPV1fC8XGyClqRE5w7WYwKILXaeD7ojDVWe7wzhnPQMe/7vZJJYVbYyaxsrQgGDp3RINXE71J6+tdm2qgDayxgMkla3z3vYoffNcI0qDn6QMmD03NsPSzyNixOnX/3lCayXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=cteZ2MVb; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+	s=arc-20240116; t=1726142538; c=relaxed/simple;
+	bh=NisE6b5jBkIYG8cahohTY3odH/OlkvvqfpDW2Y9e3CU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=l4TXDKOrNQh7PEoyfSEcgc63gHt53I4BOQfgbQzrQEnf74hSKTKQgCmaEo8B+N3UxmeVWid/4uJi/NR68Z+JQYa773bTzJBX7AHtADw/KbNKouar1obEiBTozu7AsjMQcOD9+PQv+RBOGPluEYyh7t5xQWZQA1NwVRPTjqUpC6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iQjm0KOl; arc=none smtp.client-ip=209.85.167.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="cteZ2MVb"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-42cbbb1727eso7065515e9.2
-        for <kvmarm@lists.linux.dev>; Thu, 12 Sep 2024 04:48:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iQjm0KOl"
+Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-3e04a6feef3so393556b6e.3;
+        Thu, 12 Sep 2024 05:02:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1726141716; x=1726746516; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=w4n+GYZ6xQGCnhlI0MzrUhScT+W1XwcIKjMSfmbo9NU=;
-        b=cteZ2MVbv5cIZrWwar9U3rMr8QmZ3LgNYD/nHBStatFkGKcb9sTKEe43va7S+GTixL
-         E5cyft9dE/8StaPFoJEn+2Eb3q+qbUjjF7F29m5QieHfluKWbHCst/hlvr844RO66QCA
-         4I8OihSzwK3T1BykEqbMWlW4kaOoqAvwjD+W1QHK4SCdFL9tJMZSZICLvUEoEw8CnCa4
-         +p6mspE4bKtXdYcoWgp/8ZedBjER1uCD+BnWuc6wRQQaEvg4T3vnlLKRo1AC/NBVEyNZ
-         mVy8V6OwASOa1vYPZqEHZLurTC0xcigYt/lV1XF79XPWeLUpib6eCSEZ4/MPXllKzNs1
-         hC/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726141716; x=1726746516;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1726142535; x=1726747335; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=w4n+GYZ6xQGCnhlI0MzrUhScT+W1XwcIKjMSfmbo9NU=;
-        b=wnZuRMDg2ciWDR1exk/w6L5rMYuQ5gcbJE9m9brN26hfaQ85A1QbqVFk+Hlk4kpRm0
-         EjFRVQSrqkjd/tdwBmBpXbptoiLKHPtp21rFSbVK1D9dw/j4WiAQSrj9BHRDYCPlJfF7
-         O37c1aWwb3rk6f4ZK7QBrNzZy5XWJprmbfntT4ZltyNnhj6C19/FuHx9z8J4/pp5g5kv
-         G0Me2CQYQnxkqEe2unlRl2HWARJ/E9oNjtMhDmkD2/HLSZ2CpWZUM6TiQVMtsrfKrVDN
-         d3KkzAyoFo5gY8a+cYZAewr+5T1t1Yho3gEohB6kjClwmyLMaLejIX3ISuuTUcUY/R4m
-         yIog==
-X-Forwarded-Encrypted: i=1; AJvYcCUrjt+3OrXcaZVGHTriSZiRuomWGwwPiH34WReSoxeb+1Ve3t+6tA/wBblUuX+MuZvokNEVZ+8=@lists.linux.dev
-X-Gm-Message-State: AOJu0Ywi64TlEuKW1zGgChejxnIJU+E2qYSQeW6ntelABkPi5he4w7nI
-	pb3noOwZEm220dd7qAUAxfgMbVg2NDADqYPukq4hUK10i8da02PuCUhrqWJrUBY=
-X-Google-Smtp-Source: AGHT+IGuLMW5PBxZVZzC5sjGav8GQCfg4HAZBPxOo7KZmIvu+1pf6lJkOGjLrp49iZcF/LWq3PE2sw==
-X-Received: by 2002:a05:600c:548e:b0:42c:a905:9384 with SMTP id 5b1f17b1804b1-42cdb54d606mr17694175e9.20.1726141714874;
-        Thu, 12 Sep 2024 04:48:34 -0700 (PDT)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37895675b7esm14162196f8f.50.2024.09.12.04.48.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Sep 2024 04:48:34 -0700 (PDT)
-Date: Thu, 12 Sep 2024 13:48:33 +0200
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Anup Patel <anup@brainfault.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, James Houghton <jthoughton@google.com>
-Subject: Re: [PATCH v2 00/13] KVM: selftests: Morph max_guest_mem to
- mmu_stress
-Message-ID: <20240912-757a952b867ea1136cb260cf@orel>
-References: <20240911204158.2034295-1-seanjc@google.com>
+        bh=RhlE/sT3sXQgkwTWsPGrGAWEL/QnHXai566ohH4s0z0=;
+        b=iQjm0KOlG0bdcWtGOdEryGQjGnaJu6i+LrEN9aUJT8ocW6mFgua23YbxgDf/3pJanu
+         LJUZSu5REbEovD3Kg3y3iZs6dRsrLFvSmCWUCMdvVUgCj3GTc1sNACKI4COp24Hv60Bl
+         BMaq/117LdYVxRfF+EtCkljcQkPn1p+R5T8j7/1nQWZkzja+L61SKUC1sG6yqTVaSH4Z
+         JDxfDDsOVkAIE2f3fQZKhR+/oaMm2WJbA7XH7ADK3pa/iBkz2/NAcylFdrr1VDQhPCrE
+         WZnMbrvY1ZBjIZ3APjaAlmCsm2X4l3xEgVMWfJrGfygY41EoTpYfvlVqxv1OoTpHxOoK
+         FXfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726142535; x=1726747335;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RhlE/sT3sXQgkwTWsPGrGAWEL/QnHXai566ohH4s0z0=;
+        b=FwTW8JkpDsj0cflBznH4FdAcb6wZl2LY2sNd1DdeyDe5MptQbSima3Md/uD6VIc/Zg
+         tKubYYgjyaqYhAcP45RCKkoRPazmwC2p4HvREufMxbrIahTS4GOrBetzZTqOlvAUvLnP
+         h4yQQbDfvq32ftbtTG5L9rM5pgkzGEFom+uZcwHb9egFBRlDFdPDs+kTxC2LlOzCRNID
+         ccYuJWaCCroexFayfxwQ2BR35NhUCyb0l+qQmUWZFBJmRfJYAGV98ein0NVzZaRLC5Lr
+         9yRUrRr2N0kBnFveAdc5SsyQ0F7+cJEvF5IuO7ZWXm5v4Wn2t3+T4vDmpCi8hXVzz9Gl
+         A53Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUuHF3mZptN4dAuTyT+XbVRtbMvpki5dceLJGj48L7lX8KgTUhbkfInb6vQvrLINiR8CsvkQA==@lists.linux.dev, AJvYcCVNM7FpGVEiy+c61nq/znXWh1HxEg/xubs1hDuKXojt8DEbPdmc2TmxCws8cGXNqvkAVDInC/w=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yzpjan7MaMg9/2lDqqpWOCMHgZdy40G7pWaCqmRHImlhjFukcZy
+	xTEaqi6v9DbL6o7zy4ggg9ZALBlwjFUmW69YSrAVwDu8hiJYI/q6kv96ASvNYPDS6O8H7fx9xZF
+	8NhfJfhi9wSwCi+wc5XZXnwKow4g=
+X-Google-Smtp-Source: AGHT+IFDEn0YDYeD/9jctAipL6iMdSyGrxKEkVhZltDVHssnsNZVCgDM2BbSFzNex8/uLR3y/m0Zd6KEYQB/81KqoJU=
+X-Received: by 2002:a05:6808:1897:b0:3e0:422e:f05b with SMTP id
+ 5614622812f47-3e071ae3bdamr1684193b6e.29.1726142534514; Thu, 12 Sep 2024
+ 05:02:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240911204158.2034295-1-seanjc@google.com>
+References: <20240906-macos-build-support-v2-0-06beff418848@samsung.com>
+In-Reply-To: <20240906-macos-build-support-v2-0-06beff418848@samsung.com>
+From: Jeff Xie <xiehuan09@gmail.com>
+Date: Thu, 12 Sep 2024 20:02:03 +0800
+Message-ID: <CAEr6+EAcwq5n7R8BmsKg8B46TkrSvEL9hDmjZeD3ek_1rKg_hQ@mail.gmail.com>
+Subject: Re: [PATCH v2 0/8] Enable build system on macOS hosts
+To: da.gomez@samsung.com
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Nicolas Schier <nicolas@fjasle.eu>, Lucas De Marchi <lucas.demarchi@intel.com>, 
+	=?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>, 
+	Rodrigo Vivi <rodrigo.vivi@intel.com>, 
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
+	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, 
+	William Hubbs <w.d.hubbs@gmail.com>, Chris Brannon <chris@the-brannons.com>, 
+	Kirk Reiser <kirk@reisers.ca>, Samuel Thibault <samuel.thibault@ens-lyon.org>, 
+	Paul Moore <paul@paul-moore.com>, Stephen Smalley <stephen.smalley.work@gmail.com>, 
+	Ondrej Mosnacek <omosnace@redhat.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Jiri Slaby <jirislaby@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
+	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
+	Simona Vetter <simona.vetter@ffwll.ch>, linux-kernel@vger.kernel.org, 
+	linux-kbuild@vger.kernel.org, intel-xe@lists.freedesktop.org, 
+	dri-devel@lists.freedesktop.org, speakup@linux-speakup.org, 
+	selinux@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-serial@vger.kernel.org, llvm@lists.linux.dev, 
+	Finn Behrens <me@kloenk.dev>, "Daniel Gomez (Samsung)" <d+samsung@kruces.com>, gost.dev@samsung.com, 
+	Nick Desaulniers <nick.desaulniers@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 11, 2024 at 01:41:45PM GMT, Sean Christopherson wrote:
-> Marc/Oliver,
-> 
-> I would love a sanity check on patches 2 and 3 before I file a bug against
-> gcc.  The code is pretty darn simple, so I don't think I've misdiagnosed the
-> problem, but I've also been second guessing myself _because_ it's so simple;
-> it seems super unlikely that no one else would have run into this before.
-> 
-> On to the patches...
-> 
-> The main purpose of this series is to convert the max_guest_memory_test into
-> a more generic mmu_stress_test.  The patches were originally posted as part
-> a KVM x86/mmu series to test the x86/mmu changes, hence the v2.
-> 
-> The basic gist of the "conversion" is to have the test do mprotect() on
-> guest memory while vCPUs are accessing said memory, e.g. to verify KVM and
-> mmu_notifiers are working as intended.
-> 
-> Patches 1-4 are a somewhat unexpected side quest that I can (arguably should)
-> post separately if that would make things easier.  The original plan was that
-> patch 2 would be a single patch, but things snowballed.
-> 
-> Patch 2 reworks vcpu_get_reg() to return a value instead of using an
-> out-param.  This is the entire motivation for including these patches;
-> having to define a variable just to bump the program counter on arm64
-> annoyed me.
-> 
-> Patch 4 adds hardening to vcpu_{g,s}et_reg() to detect potential truncation,
-> as KVM's uAPI allows for registers greater than the 64 bits the are supported
-> in the "outer" selftests APIs ((vcpu_set_reg() takes a u64, vcpu_get_reg()
-> now returns a u64).
-> 
-> Patch 1 is a change to KVM's uAPI headers to move the KVM_REG_SIZE
-> definition to common code so that the selftests side of things doesn't
-> need #ifdefs to implement the hardening in patch 4.
-> 
-> Patch 3 is the truly unexpected part.  With the vcpu_get_reg() rework,
-> arm64's vpmu_counter_test fails when compiled with gcc-13, and on gcc-11
-> with an added "noinline".  AFAICT, the failure doesn't actually have
-> anything to with vcpu_get_reg(); I suspect the largely unrelated change
-> just happened to run afoul of a latent gcc bug.
-> 
-> Pending a sanity check, I will file a gcc bug.  In the meantime, I am
-> hoping to fudge around the issue in KVM selftests so that the vcpu_get_reg()
-> cleanup isn't blocked, and because the hack-a-fix is arguably a cleanup
-> on its own.
-> 
-> v2:
->  - Rebase onto kvm/next.
->  - Add the aforementioned vcpu_get_reg() changes/disaster.
->  - Actually add arm64 support for the fancy mprotect() testcase (I did this
->    before v1, but managed to forget to include the changes when posting).
->  - Emit "mov %rax, (%rax)" on x86. [James]
->  - Add a comment to explain the fancy mprotect() vs. vCPUs logic.
->  - Drop the KVM x86 patches (applied and/or will be handled separately).
-> 
-> v1: https://lore.kernel.org/all/20240809194335.1726916-1-seanjc@google.com
-> 
-> Sean Christopherson (13):
->   KVM: Move KVM_REG_SIZE() definition to common uAPI header
->   KVM: selftests: Return a value from vcpu_get_reg() instead of using an
->     out-param
->   KVM: selftests: Fudge around an apparent gcc bug in arm64's PMU test
->   KVM: selftests: Assert that vcpu_{g,s}et_reg() won't truncate
->   KVM: selftests: Check for a potential unhandled exception iff KVM_RUN
->     succeeded
->   KVM: selftests: Rename max_guest_memory_test to mmu_stress_test
->   KVM: selftests: Only muck with SREGS on x86 in mmu_stress_test
->   KVM: selftests: Compute number of extra pages needed in
->     mmu_stress_test
->   KVM: selftests: Enable mmu_stress_test on arm64
->   KVM: selftests: Use vcpu_arch_put_guest() in mmu_stress_test
->   KVM: selftests: Precisely limit the number of guest loops in
->     mmu_stress_test
->   KVM: selftests: Add a read-only mprotect() phase to mmu_stress_test
->   KVM: selftests: Verify KVM correctly handles mprotect(PROT_READ)
-> 
->  arch/arm64/include/uapi/asm/kvm.h             |   3 -
->  arch/riscv/include/uapi/asm/kvm.h             |   3 -
->  include/uapi/linux/kvm.h                      |   4 +
->  tools/testing/selftests/kvm/Makefile          |   3 +-
->  .../selftests/kvm/aarch64/aarch32_id_regs.c   |  10 +-
->  .../selftests/kvm/aarch64/debug-exceptions.c  |   4 +-
->  .../selftests/kvm/aarch64/hypercalls.c        |   6 +-
->  .../testing/selftests/kvm/aarch64/psci_test.c |   6 +-
->  .../selftests/kvm/aarch64/set_id_regs.c       |  18 +-
->  .../kvm/aarch64/vpmu_counter_access.c         |  27 ++-
->  .../testing/selftests/kvm/include/kvm_util.h  |  10 +-
->  .../selftests/kvm/lib/aarch64/processor.c     |   8 +-
->  tools/testing/selftests/kvm/lib/kvm_util.c    |   3 +-
->  .../selftests/kvm/lib/riscv/processor.c       |  66 +++----
->  ..._guest_memory_test.c => mmu_stress_test.c} | 161 ++++++++++++++++--
->  .../testing/selftests/kvm/riscv/arch_timer.c  |   2 +-
->  .../testing/selftests/kvm/riscv/ebreak_test.c |   2 +-
->  .../selftests/kvm/riscv/sbi_pmu_test.c        |   2 +-
->  tools/testing/selftests/kvm/s390x/resets.c    |   2 +-
->  tools/testing/selftests/kvm/steal_time.c      |   3 +-
->  20 files changed, 236 insertions(+), 107 deletions(-)
->  rename tools/testing/selftests/kvm/{max_guest_memory_test.c => mmu_stress_test.c} (60%)
-> 
-> 
-> base-commit: 15e1c3d65975524c5c792fcd59f7d89f00402261
-> -- 
-> 2.46.0.598.g6f2099f65c-goog
+Thank you for submitting this patchset. This problem has troubled me
+for two years.
+I have always built the kernel in the docker container. I have tested
+this patchset and it is very good.
+Tested-by: Jeff Xie <xiehuan09@gmail.com>
 
-I gave this test a try on riscv, but it appears to hang in
-rendezvous_with_vcpus(). My platform is QEMU, so maybe I was just too
-impatient. Anyway, I haven't read the test yet, so I don't even know
-what it's doing. It's possibly it's trying to do something not yet
-supported on riscv. I'll add investigating that to my TODO, but I'm
-not sure when I'll get to it.
+On Fri, Sep 6, 2024 at 7:04=E2=80=AFPM Daniel Gomez via B4 Relay
+<devnull+da.gomez.samsung.com@kernel.org> wrote:
+>
+> This patch set allows for building the Linux kernel for arm64 in macOS
+> with LLVM.
+>
+> Patches are based on previous Nick's work and suggestions [1][2][3] to
+> enable the Linux kernel build system on macOS hosts.
+>
+> macOS does not provide certain headers that are available in a GNU/Linux
+> distribution with development headers installed, usually provided by
+> the GNU C Library (glibc) and/or other projects. These missing headers
+> are needed as build dependencies. To address this, the patches depend
+> on a new Bee Headers Homebrew Tap formula [6][7][8] that provides them
+> together with a pkg-config file to locate the include directory.
+>
+> To locate them, Makefiles include something like:
+>         $(shell $(HOSTPKG_CONFIG) --cflags bee-headers 2> /dev/null)
+>
+> [6] Project:
+> https://github.com/bee-headers
+> [7] Headers repository:
+> https://github.com/bee-headers/headers.git
+> [8] Homebrew Tap formula:
+> https://github.com/bee-headers/homebrew-bee-headers.git
+>
+> To set up the environment, documentation is provided via last patch in
+> this series.
+>
+> More configurations and architectures as well as support for Rust
+> (from Finn Behrens [4] [5]) can be added in the future to extend build
+> support.
+>
+> [1]: WIP: build Linux on MacOS
+> https://github.com/ClangBuiltLinux/linux/commit/f06333e29addbc3d714adb340=
+355f471c1dfe95a
+>
+> [2] Subject: [PATCH] scripts: subarch.include: fix SUBARCH on MacOS hosts
+> https://lore.kernel.org/all/20221113233812.36784-1-nick.desaulniers@gmail=
+.com/
+>
+> [3] Subject: Any interest in building the Linux kernel from a MacOS host?
+> https://lore.kernel.org/all/CAH7mPvj64Scp6_Nbaj8KOfkoV5f7_N5L=3DTv5Z9zGyn=
+5SS+gsUw@mail.gmail.com/
+>
+> [4] https://github.com/kloenk/linux/commits/rust-project_macos-dylib/
+>
+> [5] https://kloenk.eu/posts/build-linux-on-m1-macos/
+>
+> To: Masahiro Yamada <masahiroy@kernel.org>
+> To: Nathan Chancellor <nathan@kernel.org>
+> To: Nicolas Schier <nicolas@fjasle.eu>
+> To: Lucas De Marchi <lucas.demarchi@intel.com>
+> To: Thomas Hellstr=C3=B6m <thomas.hellstrom@linux.intel.com>
+> To: Rodrigo Vivi <rodrigo.vivi@intel.com>
+> To: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
+> To: Maxime Ripard <mripard@kernel.org>
+> To: Thomas Zimmermann <tzimmermann@suse.de>
+> To: David Airlie <airlied@gmail.com>
+> To: Daniel Vetter <daniel@ffwll.ch>
+> To: William Hubbs <w.d.hubbs@gmail.com>
+> To: Chris Brannon <chris@the-brannons.com>
+> To: Kirk Reiser <kirk@reisers.ca>
+> To: Samuel Thibault <samuel.thibault@ens-lyon.org>
+> To: Paul Moore <paul@paul-moore.com>
+> To: Stephen Smalley <stephen.smalley.work@gmail.com>
+> To: Ondrej Mosnacek <omosnace@redhat.com>
+> To: Catalin Marinas <catalin.marinas@arm.com>
+> To: Will Deacon <will@kernel.org>
+> To: Marc Zyngier <maz@kernel.org>
+> To: Oliver Upton <oliver.upton@linux.dev>
+> To: James Morse <james.morse@arm.com>
+> To: Suzuki K Poulose <suzuki.poulose@arm.com>
+> To: Zenghui Yu <yuzenghui@huawei.com>
+> To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> To: Jiri Slaby <jirislaby@kernel.org>
+> To: Nick Desaulniers <ndesaulniers@google.com>
+> To: Bill Wendling <morbo@google.com>
+> To: Justin Stitt <justinstitt@google.com>
+> Cc: linux-kernel@vger.kernel.org
+> Cc: linux-kbuild@vger.kernel.org
+> Cc: intel-xe@lists.freedesktop.org
+> Cc: dri-devel@lists.freedesktop.org
+> Cc: speakup@linux-speakup.org
+> Cc: selinux@vger.kernel.org
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: kvmarm@lists.linux.dev
+> Cc: linux-serial@vger.kernel.org
+> Cc: llvm@lists.linux.dev
+> Cc: Finn Behrens <me@kloenk.dev>
+> Cc: Daniel Gomez (Samsung) <d+samsung@kruces.com>
+> Cc: gost.dev@samsung.com
+>
+> Signed-off-by: Daniel Gomez <da.gomez@samsung.com>
+> ---
+> Changes in v2:
+> - Add documentation and set this 'feature' as experimental.
+> - Update cover letter.
+> - Drop unnecessary changes. Patches removed:
+>         - kbuild: add header_install dependency to scripts
+>         - include: add endian.h support
+>         - include: add elf.h support
+> - Update Makefiles to find Bee Headers with pkg-config.
+> - Update file2alias to solve uuid_t conflicts inside Makefile as
+> suggested by Nicolas Schier.
+> - Adapt xe_gen_wa_oob to solve getprogname()/
+> program_invocation_short_name in runtime. as suggested by Lucas De
+> Marchi.
+> - Remove linux/version.h in accessibility/speakup as suggested by
+> Masahiro Yamada.
+> - Replace selinux patches with new Masahiro Yamada's patches:
+>         Message-id: 20240809122007.1220219-1-masahiroy@kernel.org
+>         Link: https://lore.kernel.org/all/20240809122007.1220219-1-masahi=
+roy@kernel.org/
+> - Replace tty/vt with new Masahiro Yamada's patch:
+>         Message-id: 20240809160853.1269466-1-masahiroy@kernel.org
+>         Link: https://lore.kernel.org/all/20240809160853.1269466-1-masahi=
+roy@kernel.org/
+>         (Already merged in the linux-next tag used)
+> - Replace scripts/kallsyms patch with Masahiro Yamada's patch:
+>         Message-id: 20240807181148.660157-1-masahiroy@kernel.org
+>         Link: https://lore.kernel.org/all/20240807181148.660157-1-masahir=
+oy@kernel.org/
+>         (Already merged in the linux-next tag used)
+> - Link to v1: https://lore.kernel.org/r/20240807-macos-build-support-v1-0=
+-4cd1ded85694@samsung.com
+>
+> ---
+> Daniel Gomez (5):
+>       file2alias: fix uuid_t definitions for macos
+>       drm/xe: xe_gen_wa_oob: fix program_invocation_short_name for macos
+>       arm64: nvhe: add bee-headers support
+>       scripts: add bee-headers support
+>       Documentation: add howto build in macos
+>
+> Masahiro Yamada (2):
+>       selinux: do not include <linux/*.h> headers from host programs
+>       selinux: move genheaders to security/selinux/
+>
+> Nick Desaulniers (1):
+>       scripts: subarch.include: fix SUBARCH on macOS hosts
+>
+>  Documentation/kbuild/llvm.rst                      | 78 ++++++++++++++++=
+++++++
+>  arch/arm64/kernel/pi/Makefile                      |  1 +
+>  arch/arm64/kernel/vdso32/Makefile                  |  1 +
+>  arch/arm64/kvm/hyp/nvhe/Makefile                   |  3 +-
+>  drivers/gpu/drm/xe/xe_gen_wa_oob.c                 |  4 ++
+>  scripts/Makefile                                   |  4 +-
+>  scripts/mod/Makefile                               |  7 ++
+>  scripts/mod/file2alias.c                           |  3 +
+>  scripts/remove-stale-files                         |  3 +
+>  scripts/selinux/Makefile                           |  2 +-
+>  scripts/selinux/genheaders/.gitignore              |  2 -
+>  scripts/selinux/genheaders/Makefile                |  5 --
+>  scripts/selinux/mdp/Makefile                       |  2 +-
+>  scripts/selinux/mdp/mdp.c                          |  4 --
+>  scripts/subarch.include                            |  2 +-
+>  security/selinux/.gitignore                        |  1 +
+>  security/selinux/Makefile                          |  7 +-
+>  .../genheaders =3D> security/selinux}/genheaders.c   |  3 -
+>  security/selinux/include/classmap.h                | 19 ++++--
+>  security/selinux/include/initial_sid_to_string.h   |  2 -
+>  20 files changed, 123 insertions(+), 30 deletions(-)
+> ---
+> base-commit: ad40aff1edffeccc412cde93894196dca7bc739e
+> change-id: 20240807-macos-build-support-9ca0d77adb17
+>
+> Best regards,
+> --
+> Daniel Gomez <da.gomez@samsung.com>
+>
+>
+>
 
-As for this series, another patch (or a sneaky change to one
-of the patches...) should add 
 
- #include "ucall_common.h"
-
-to mmu_stress_test.c since it's not there yet despite using get_ucall().
-Building riscv faild because of that.
-
+--=20
 Thanks,
-drew
+JeffXie
