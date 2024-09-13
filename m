@@ -1,83 +1,136 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1D811D86FD;
-	Fri, 13 Sep 2024 13:52:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1829584DF8;
+	Fri, 13 Sep 2024 15:15:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726235566; cv=none; b=EaywomaTjEdOcqiEjpBvVzzmW1rlzLd+ESfSp1Vq4JDkkqIGv0N7oQtQZEpZqwoYjj8TCC2M2B5qG9KGD3Rh2GWnwRCmaNdpcN4KJlx2VEWJpotEfyFjMgITkTbR34qGSJSWeK1aLreeKjJFCxyVbKnHqfYW8ykfk2JXpafDynE=
+	t=1726240509; cv=none; b=rr/UmsZN4IiGYg6dVKSTg7uLiOew2BSybEalWBp/dScVnBblB9VjLduA4QqngpBPmfhMa5fZIMzA9OSIAQEXHT/iejqEKbK+WJ3RV18bwGa54rDjBWhDd8pRKND/IFbigE+3t5x6lcZPgn59yjLCpr96CMhnIBXMnDdubsWd90Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726235566; c=relaxed/simple;
-	bh=I+E10dZp9h10g1VxXIbj1/pHLRChuRvZfeT9ZUzKBjc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eyAdvbAzgvCRSwnv2oNweLiwqC+ky/FibQPuV0Vq1Z5RYbZ69grwSJMNNIfFxt7fsApgGB1wWb2rul8wvwW2lq1BYbEmzWb+Ke5wex4QSmhZtr/ssZBkv1fAGsRX9vxivRiha3hr5X5cEqPMSp+UDN5KpgFAPvEQ/CnKOivG6b0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1106A13D5;
-	Fri, 13 Sep 2024 06:53:13 -0700 (PDT)
-Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 16F153F73B;
-	Fri, 13 Sep 2024 06:52:40 -0700 (PDT)
-Message-ID: <2f9f10cf-7356-458a-bf63-ed6a757df81f@arm.com>
-Date: Fri, 13 Sep 2024 14:52:39 +0100
+	s=arc-20240116; t=1726240509; c=relaxed/simple;
+	bh=hG0+mr6n6c2AOqquKXji3PgaSzohcst94Wj42JS1S+I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IG2AadRtVMt9s/1+sSnVKnlIK62tcOLSS0iU6lLaAJZEoNY1Pjj4yZSQp4Sg/1HcVTn/xJC2zipCESxl5o3CJgVvUQaUkvxBqfZMoTtucJvDSfC4A67rdAEqisgc3XZ2RCfhEY1s0lhJNI+k7J7fFAbsUNJ7cf56QtvuNRj3tn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BWnylCm4; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BWnylCm4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BB3AC4CEC0;
+	Fri, 13 Sep 2024 15:15:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726240508;
+	bh=hG0+mr6n6c2AOqquKXji3PgaSzohcst94Wj42JS1S+I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BWnylCm4mReU8AS0leB+Zu+H/60Ov75IX+4RcMT07bw/NSlFUtgczPE92soGj0A0q
+	 542x8M8eWvcVYa3w8j1pJ4wodResMwstCU9WRWL+4Bv7klLpSkpILEqOXkK2xTbvjI
+	 k7LO3FcSRX+QQPQ85stGEPkaCLs/93PocVVcAqwc97TkLzlGfXUTiDkvoa/W31NhS8
+	 ZTsEo1Zfjv/PTpTlD075NPfKSAhzSd7lUsWT3ZAvYgMWVY06K4V/tyQXnFNxB9zsX0
+	 tss/gEKf+QaNU/wq7UCRsBMZMRdCi4O4eV+W/SoX8gfoYY4bCaUnaRFI3uHHSOXLks
+	 8MndKUMe6veNw==
+Date: Fri, 13 Sep 2024 16:14:59 +0100
+From: Will Deacon <will@kernel.org>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: Dave Hansen <dave.hansen@intel.com>,
+	Kevin Brodsky <kevin.brodsky@arm.com>,
+	linux-arm-kernel@lists.infradead.org, nd@arm.com,
+	akpm@linux-foundation.org, aneesh.kumar@kernel.org,
+	aneesh.kumar@linux.ibm.com, anshuman.khandual@arm.com, bp@alien8.de,
+	broonie@kernel.org, catalin.marinas@arm.com,
+	christophe.leroy@csgroup.eu, dave.hansen@linux.intel.com,
+	hpa@zytor.com, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
+	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
+	oliver.upton@linux.dev, shuah@kernel.org, skhan@linuxfoundation.org,
+	szabolcs.nagy@arm.com, tglx@linutronix.de, x86@kernel.org,
+	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v5 06/30] arm64: context switch POR_EL0 register
+Message-ID: <20240913151459.GA24129@willie-the-truck>
+References: <20240822151113.1479789-1-joey.gouly@arm.com>
+ <20240822151113.1479789-7-joey.gouly@arm.com>
+ <425b8f8c-b6b5-422a-b5f4-41dd2d1ae3bb@arm.com>
+ <6c8ad091-a56b-41ba-b403-2e3c2e578100@intel.com>
+ <20240912105017.GA22788@willie-the-truck>
+ <20240912124835.GA1220495@e124191.cambridge.arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 04/19] firmware/psci: Add psci_early_test_conduit()
-To: Catalin Marinas <catalin.marinas@arm.com>,
- Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, Marc Zyngier
- <maz@kernel.org>, Will Deacon <will@kernel.org>,
- James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
- Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>,
- Jean-Philippe Brucker <jean-philippe@linaro.org>
-References: <20240819131924.372366-1-steven.price@arm.com>
- <20240819131924.372366-5-steven.price@arm.com> <ZsxS52IBVVLKrTEX@arm.com>
-Content-Language: en-US
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <ZsxS52IBVVLKrTEX@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240912124835.GA1220495@e124191.cambridge.arm.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On 26/08/2024 11:03, Catalin Marinas wrote:
-> On Mon, Aug 19, 2024 at 02:19:09PM +0100, Steven Price wrote:
->> From: Jean-Philippe Brucker <jean-philippe@linaro.org>
->>
->> Add a function to test early if PSCI is present and what conduit it
->> uses. Because the PSCI conduit corresponds to the SMCCC one, this will
->> let the kernel know whether it can use SMC instructions to discuss with
->> the Realm Management Monitor (RMM), early enough to enable RAM and
->> serial access when running in a Realm.
->>
->> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
->> Signed-off-by: Steven Price <steven.price@arm.com>
+On Thu, Sep 12, 2024 at 01:48:35PM +0100, Joey Gouly wrote:
+> On Thu, Sep 12, 2024 at 11:50:18AM +0100, Will Deacon wrote:
+> > On Wed, Sep 11, 2024 at 08:33:54AM -0700, Dave Hansen wrote:
+> > > On 9/11/24 08:01, Kevin Brodsky wrote:
+> > > > On 22/08/2024 17:10, Joey Gouly wrote:
+> > > >> @@ -371,6 +382,9 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
+> > > >>  		if (system_supports_tpidr2())
+> > > >>  			p->thread.tpidr2_el0 = read_sysreg_s(SYS_TPIDR2_EL0);
+> > > >>  
+> > > >> +		if (system_supports_poe())
+> > > >> +			p->thread.por_el0 = read_sysreg_s(SYS_POR_EL0);
+> > > > Here we are only reloading POR_EL0's value if the target is a user
+> > > > thread. However, as this series stands, POR_EL0 is also relevant to
+> > > > kthreads, because any uaccess or GUP done from a kthread will also be
+> > > > checked against POR_EL0. This is especially important in cases like the
+> > > > io_uring kthread, which accesses the memory of the user process that
+> > > > spawned it. To prevent such a kthread from inheriting a stale value of
+> > > > POR_EL0, it seems that we should reload POR_EL0's value in all cases
+> > > > (user and kernel thread).
+> > > 
+> > > The problem with this is trying to figure out which POR_EL0 to use.  The
+> > > kthread could have been spawned ages ago and might not have a POR_EL0
+> > > which is very different from the current value of any of the threads in
+> > > the process right now.
+> > > 
+> > > There's also no great way for a kthread to reach out and grab an updated
+> > > value.  It's all completely inherently racy.
+> > > 
+> > > > Other approaches could also be considered (e.g. resetting POR_EL0 to
+> > > > unrestricted when creating a kthread), see my reply on v4 [1].
+> > > 
+> > > I kinda think this is the only way to go.  It's the only sensible,
+> > > predictable way.  I _think_ it's what x86 will end up doing with PKRU,
+> > > but there's been enough churn there that I'd need to go double check
+> > > what happens in practice.
+> > 
+> > I agree.
+> > 
+> > > Either way, it would be nice to get an io_uring test in here that
+> > > actually spawns kthreads:
+> > > 
+> > > 	tools/testing/selftests/mm/protection_keys.c
+> > 
+> > It would be good to update Documentation/core-api/protection-keys.rst
+> > as well, since the example with read() raises more questions than it
+> > answers!
+> > 
+> > Kevin, Joey -- I've got this series queued in arm64 as-is, so perhaps
+> > you could send some patches on top so we can iron this out in time for
+> > 6.12? I'll also be at LPC next week if you're about.
 > 
-> On the code itself:
+> I found the code in arch/x86 that does this, I must have missed this previously.
 > 
-> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+> arch/x86/kernel/process.c: int copy_thread()                                                                                                                   
 > 
-> However, Will has a point and it would be good if we can avoid this
-> early setup as much as possible. If it's just the early console used for
-> debugging, maybe just pass the full IPA address on the command line and
-> allow those high addresses in fixmap. Not sure about the EFI map.
+>         /* Kernel thread ? */                                                                                                                                                                  
+>         if (unlikely(p->flags & PF_KTHREAD)) {                                                                                                                                                 
+>                 p->thread.pkru = pkru_get_init_value();                                                                                                                                        
+>                 memset(childregs, 0, sizeof(struct pt_regs));                                                                                                                                  
+>                 kthread_frame_init(frame, args->fn, args->fn_arg);                                                                                                                             
+>                 return 0;                                                                                                                                                                      
+>         }
 > 
+> I can send a similar patch for arm64.  I have no idea how to write io_uring
+> code, so looking for examples I can work with to get a test written. Might just
+> send the arm64 fix first, if that's fine?
 
-We could delay the RSI init until we have probed the PSCI conduit.
-This could be done from setup_arch(), after the psci_{dt,acpi}_init().
-This is safe, as the EFI maps are only created later, as an 
-early_initcall().
+I think fix + documentation is what we need before 6.12, but you've still
+got plenty of time after the merge window.
 
-Kind regards
-Suzuki
+Cheers,
 
+Will
