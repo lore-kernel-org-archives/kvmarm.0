@@ -1,100 +1,82 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66D1410A1C
-	for <kvmarm@lists.linux.dev>; Wed, 18 Sep 2024 17:05:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54AB919ADA4
+	for <kvmarm@lists.linux.dev>; Thu, 19 Sep 2024 09:12:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726679123; cv=none; b=CH5hvHonz/PKzMuJ8kPCdYrZeX/aiHABrgSQWGJzi7AL7trbNEY64f49HRPaKjCeJ4bTcC5V8tXIDW3dNWJy85w0we3bwQDS+tiqeRRw9Up9GkIucEeuA92YV9CY7NB6C8PGKdCKjkJRwrjs2SfUDNR+FPnnUuGHNILUP7UeYL8=
+	t=1726737124; cv=none; b=ofeEujyK5bqd+Tl3kwNN17Lf2tL8DmjA1NH1v9OYTmYs7v2s/vfdpT3zdoEZV7HKl2bcGHdnMb18gxi8WNBEvpId7w09IuTQUTE01/8DP3E+rkt3IgnpS7fJmA+Pvz/t6OLUDtLiRz8Y/N31Rns4eOix/8qPccf6qyzlej9r0M0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726679123; c=relaxed/simple;
-	bh=C6Sdin4L4P8Uc223o2WpV/b0UsB7Giv3pLkwQ+LPdJQ=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=KzwbQn58nuZvRaWKim77cWRxAQ+pd5M4J5U5QN6io+i8NzWf9icfflPgW5xj8pzvucECo+RkK0SV7/M2jBlnxlcGrlZmO41ySkvLP88k4Agu1h6BSN1c66NUv0eVjeeiCCkkksF6Zfjr9wr2xjlOQzDFoiu/HTmh7iFLn0Ue17o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RBws4eJi; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
+	s=arc-20240116; t=1726737124; c=relaxed/simple;
+	bh=6rAF1Svpd8vBBvWUfaNilf4YD3O1FlwDk4ri/1NJPB8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=faiBuz5tpTBSxxSlFDsXjaPm4hm/PvionAOSM7hipRFu/OGOw5uASkpnHhf7GApMRJgUCx+an5qQKm4q/9YcgJjLG0nXCKoAy867UaKADOm56mE5CrZnR3pGmVNl+rqcmRzjv/UhPkxDT+hFt6DCGWBVyPKQJPvN64EtWNRjpmY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vPUhqOG+; arc=none smtp.client-ip=95.215.58.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RBws4eJi"
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6ddd7800734so57097207b3.3
-        for <kvmarm@lists.linux.dev>; Wed, 18 Sep 2024 10:05:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726679121; x=1727283921; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=W0m5lhjqNfvnG9TQVTKzkJ/jW36WtD3+uHO46+Dw1pI=;
-        b=RBws4eJiFfbaw+mJgzVqddnH5XIyB5s4/9ffgWevlTNv/J+MRoxqgDw3jDuT+Q8Wcb
-         v5Xv4/8K4RFfk9Mqs+Ssi4Q9foP6YtSiaqculq5LQwiVDTThb8yDVDBX3LSbi7ZUStaa
-         fM0JiLpTBiU3pGNVgqG9fFdbNzp59jc0S92WlIclSfiaWnJ1QBxPgrv5tdy5+78goyVh
-         Y5aB9Qv6E0XYdqCmdr6rQQ8cesHlz9j0c+hGOweO+xbJ0ZtitXikIKJUCaJdzoIhasht
-         J3tL0enXgvB3WN0/Kms89/3K0SXeUft2Ar6gxt5un5ehLXDrxGu5nUaF+cqkZvU/JUKD
-         CLxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726679121; x=1727283921;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=W0m5lhjqNfvnG9TQVTKzkJ/jW36WtD3+uHO46+Dw1pI=;
-        b=QB3MaRnzyIcl+vvq6fawJBqbb7t00kFeEOqkgJ6KFD9mFCu5GnClMNvRd1IlMTviBG
-         EPYaj+dEZA8x6wmOmhJvqGIGYDyQZLnhpY6n2YXn/oo8KrcEwwRlywXN0g27mCVllTo2
-         Az7gwYGrPxCP+UOJdogaHkmM565rQGE8vDPhMHJK5yej7yNByfGu9qgTpgc3JBLFfO2a
-         84qbGDrAwsB3UWibBobyP4iWl6wTWj74PrGft82oIlz8o2Vy7H2jhcvtA7ItojZB+ej2
-         Cvhbwth4rW9PS/d/YzcvR7E87YeLShIWrmFwnM/LKrBgkqm8XR6nUAn4H8IQ6FrPyx0h
-         pjPg==
-X-Forwarded-Encrypted: i=1; AJvYcCXU9lWtipHtPHIfuDfsNHs6H9nXVKQ6hyV8FWX5f9IX3sKvH9W1I501p3FPsQAylRPRU+WVLEs=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyHYCGnZPBy/1pVXp7TWBDbehm4nm2trzk3BYatK503t597twb9
-	0W5Aup0Iij5pozhlFVnUvu7H0ASZbhpvNv+t/snB/1A3vEYhtlzv4JnYnvNL3rpo7Ny0s7lNPwq
-	G4fjkvKzpYaUzAd/qKg==
-X-Google-Smtp-Source: AGHT+IEC2GIWL/IMW1+MJjGNTmLl5DZPq+aRo/g3k+8N2morVQNRZoj3JOGgZgDYgRbMTH2FbauBcbxx/BFZ5Rpk
-X-Received: from vdonnefort.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:2eea])
- (user=vdonnefort job=sendgmr) by 2002:a05:690c:d88:b0:68e:8de6:618b with SMTP
- id 00721157ae682-6dbcc21ebc2mr7976957b3.2.1726679121112; Wed, 18 Sep 2024
- 10:05:21 -0700 (PDT)
-Date: Wed, 18 Sep 2024 18:05:02 +0100
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vPUhqOG+"
+Date: Thu, 19 Sep 2024 02:11:51 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1726737120;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SDI9ysSiZI8BDMOOphPs7LmwKx7q2jcPwhENrySxiwA=;
+	b=vPUhqOG+H9KeTsysJMAqMuCfqWmU7+3PlKqtZSPW8LoRbth3fH2oE43m92do6CRtAv7uN3
+	ZY78LLhPQ0YyxTsc1iu/RCkzUYZbGXbWSIyoLn4ZYvt9KP1Jg5nLLNyObcneQ6la+xKuvU
+	tTo0PBflMSVYjvp6s3e+kGGLM7mMPxA=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Lilit Janpoladyan <lilitj@amazon.com>
+Cc: kvm@vger.kernel.org, maz@kernel.org, james.morse@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	nh-open-source@amazon.com, kvmarm@lists.linux.dev
+Subject: Re: [PATCH 0/8] *** RFC: ARM KVM dirty tracking device ***
+Message-ID: <Zuvq18Nrgy6j_pZW@linux.dev>
+References: <20240918152807.25135-1-lilitj@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.46.0.662.g92d0881bb0-goog
-Message-ID: <20240918170502.1881517-1-vdonnefort@google.com>
-Subject: [PATCH] KVM: arm64: Fix __pkvm_init_vcpu cptr_el2 error path
-From: Vincent Donnefort <vdonnefort@google.com>
-To: maz@kernel.org, oliver.upton@linux.dev
-Cc: tabba@google.com, kvmarm@lists.linux.dev, kernel-team@android.com, 
-	Vincent Donnefort <vdonnefort@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240918152807.25135-1-lilitj@amazon.com>
+X-Migadu-Flow: FLOW_OUT
 
-On an error, hyp_vcpu will be accessed while this memory has already
-been relinquished to the host and unmapped from the hypervisor. Move
-the CPTR assignment to prevent that access.
+Hi Lilit,
 
-Fixes: b5b9955617bc ("KVM: arm64: Eagerly restore host fpsimd/sve state in pKVM")
-Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
++cc kvmarm mailing list, get_maintainer is your friend :)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index 187a5f4d56c0..7e7dd5fc66e3 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -571,14 +571,15 @@ int __pkvm_init_vcpu(pkvm_handle_t handle, struct kvm_vcpu *host_vcpu,
- 
- 	hyp_vm->vcpus[idx] = hyp_vcpu;
- 	hyp_vm->nr_vcpus++;
-+
-+	hyp_vcpu->vcpu.arch.cptr_el2 = kvm_get_reset_cptr_el2(&hyp_vcpu->vcpu);
-+
- unlock:
- 	hyp_spin_unlock(&vm_table_lock);
- 
- 	if (ret)
- 		unmap_donated_memory(hyp_vcpu, sizeof(*hyp_vcpu));
- 
--	hyp_vcpu->vcpu.arch.cptr_el2 = kvm_get_reset_cptr_el2(&hyp_vcpu->vcpu);
--
- 	return ret;
- }
- 
+On Wed, Sep 18, 2024 at 03:27:59PM +0000, Lilit Janpoladyan wrote:
+> An example of a device that tracks accesses to stage-2 translations and will
+> implement page_tracking_device interface is AWS Graviton Page Tracking Agent
+> (PTA). We'll be posting code for the Graviton PTA device driver in a separate
+> series of patches.
 
-base-commit: 98f7e32f20d28ec452afb208f9cffc08448a2652
+In order to actually review these patches, we need to see an
+implementation of such a page tracking device. Otherwise it's hard to
+tell that the interface accomplishes the right abstractions.
+
+Beyond that, I have some reservations about maintaining support for
+features that cannot actually be tested outside of your own environment.
+
+> When ARM architectural solution (FEAT_HDBSS feature) is available, we intend to
+> use it via the same interface most likely with adaptations.
+
+Will the PTA stuff eventually get retired once you get support for FEAT_HDBSS
+in hardware?
+
+I think the best way forward here is to implement the architecture, and
+hopefully after that your legacy driver can be made to fit the
+interface. The FVP implements FEAT_HDBSS, so there's some (slow)
+reference hardware to test against.
+
+This is a very interesting feature, so hopefully we can move towards
+something workable.
+
 -- 
-2.46.0.662.g92d0881bb0-goog
-
+Thanks,
+Oliver
