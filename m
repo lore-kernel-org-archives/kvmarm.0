@@ -1,294 +1,120 @@
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5148A20B35;
-	Thu, 19 Sep 2024 19:12:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27AFE5339F
+	for <kvmarm@lists.linux.dev>; Fri, 20 Sep 2024 10:12:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726773147; cv=none; b=cRmdLXv6yojPm7E5dA8G4lqqe6jp708TPvKncb4CgAfwGsckwe5XWcn9+kXjHUOlx45SOTB7JMagX1lzRmBZIjHhpiBt4KhxsFEw/jbkAiDVFEy/sNX2ITlZRupYvqCiRI/5RpNs5nV1p3pAZQHfWyVIVeePKyYMLDUDgWjb/uE=
+	t=1726827178; cv=none; b=aBR6v9NrAJx4Thgus0KIGl2XsamhLQ0X0bHFUnHWyNMk+Fboqj/ezI3MsRxfD1qXHpBRy2zaXLcnpwt+3uJA75vZJPYF6DP4rk+u3KQ1c3Cgt0ZM2sfI85ClFmashEQF9vYku/rcrh3raUehTHweucvWe6DM2ZkxTvLeDpNpaok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726773147; c=relaxed/simple;
-	bh=zGHRtNH0HtiNux6L2M1nTJQ42ddSQcZjRws0nmEhOqk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:From:In-Reply-To:
-	 Content-Type:References; b=tEgxcgBpFIV07IqzeuJhyinP/7WyWJ79Gr3xe/7OshtQvfVwC8SKvbtpwkAWxUX5Qyhmi37kYM0SA88yBzBUWaubpVjKTqVFGQkpGJUMFmGEaFSnIy15nzIJ0NRtwCrefkmt8Qz2Wxc+PhKQkI9UY7pX0Zq9Cwmnigx8MED9Bzs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=fzvLBANY; arc=none smtp.client-ip=210.118.77.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1726827178; c=relaxed/simple;
+	bh=1JHmjw7QMNGDtqilEywwf0ed+pw5TjF6z/RCiXLxpGg=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=hpEQiCZfnxAnpQ5TicwbNXF8NOon+3Phu5V1Q1Aabz6kiF8Ax6T03FhkL+64gMXCxSToMfUP27CJlGV2gEIGX26aaLz5PPNEkmIguJHiKbtQYqwjIWxfAMRLCaZms12NQkKL27/Ii12CtyWn7DrJAZPixQz8qhVO5PniG/QcDHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b=iMisntQx; arc=none smtp.client-ip=207.171.184.29
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="fzvLBANY"
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20240919191221euoutp010ddd44cc9e7483f2de1362b72161a6e4~2uwYTi6ct2616526165euoutp01c;
-	Thu, 19 Sep 2024 19:12:21 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20240919191221euoutp010ddd44cc9e7483f2de1362b72161a6e4~2uwYTi6ct2616526165euoutp01c
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1726773141;
-	bh=5wMWZ+g85x3/VQ4fe0nCOsxCOPo6Ph9ygPWjlPbrfW0=;
-	h=Date:Subject:To:CC:From:In-Reply-To:References:From;
-	b=fzvLBANYeCN29tswLwUd47pXXc6AIHl4SdOotmBcpN7h4RgkQuES0RWvwTyB+1PqY
-	 l6fR+qZymcrJAUga1SRkwi8ZqVPiz8MlXoCeBIAsBlKEdUKM91n2A8+xvmdQxxaeiC
-	 HXq/LEs57wGuy/k0nXaH8BWMs//KbjyFOD+WNJ8w=
-Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-	20240919191221eucas1p17631c52c12e9eac528029fc313e0de7c~2uwX8PxpR2404624046eucas1p1A;
-	Thu, 19 Sep 2024 19:12:21 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-	eusmges1new.samsung.com (EUCPMTA) with SMTP id 7C.44.09624.5977CE66; Thu, 19
-	Sep 2024 20:12:21 +0100 (BST)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-	20240919191220eucas1p23f207681d0268c632f46323fd5ac9107~2uwXFO6tm3227632276eucas1p2i;
-	Thu, 19 Sep 2024 19:12:20 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-	eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20240919191220eusmtrp2b6213760a633a6ab532f5875087dc3ab~2uwXCvxYJ2424224242eusmtrp2m;
-	Thu, 19 Sep 2024 19:12:20 +0000 (GMT)
-X-AuditID: cbfec7f2-c11ff70000002598-0c-66ec7795e51c
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-	eusmgms1.samsung.com (EUCPMTA) with SMTP id 13.E4.14621.4977CE66; Thu, 19
-	Sep 2024 20:12:20 +0100 (BST)
-Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
-	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20240919191220eusmtip26823cf362cdfc852c6290fd3d6148856~2uwWtZnoN2388723887eusmtip2S;
-	Thu, 19 Sep 2024 19:12:20 +0000 (GMT)
-Received: from [106.110.32.87] (106.110.32.87) by CAMSVWEXC02.scsc.local
-	(2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-	Thu, 19 Sep 2024 20:12:17 +0100
-Message-ID: <d2726a61-37fa-4c39-aad6-08bf99d8d14b@samsung.com>
-Date: Thu, 19 Sep 2024 21:12:15 +0200
+	dkim=pass (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b="iMisntQx"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1726827177; x=1758363177;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:mime-version:
+   content-transfer-encoding;
+  bh=1JHmjw7QMNGDtqilEywwf0ed+pw5TjF6z/RCiXLxpGg=;
+  b=iMisntQxFFkHF7scX5n867+jjuRiEWA5qVuMUzaW/GisVV8L7pjkc8P7
+   3Owv4vWmf/AAK5seUhiyfFOxyGeDtqmhyeqztxWTh8E4zLcWjA7FbJUxY
+   0Pk46h/hv3SQkl5JpRKC2Yzqa7LUPaTdb/WsA0uHCR8SzR6NCLKEUUQ9F
+   E=;
+X-IronPort-AV: E=Sophos;i="6.10,244,1719878400"; 
+   d="scan'208";a="456105080"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2024 10:12:51 +0000
+Received: from EX19MTAEUC001.ant.amazon.com [10.0.10.100:58745]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.17.12:2525] with esmtp (Farcaster)
+ id 0d98d482-c0d6-4f01-8e68-bb9bd4049837; Fri, 20 Sep 2024 10:12:49 +0000 (UTC)
+X-Farcaster-Flow-ID: 0d98d482-c0d6-4f01-8e68-bb9bd4049837
+Received: from EX19D017EUB004.ant.amazon.com (10.252.51.70) by
+ EX19MTAEUC001.ant.amazon.com (10.252.51.193) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Fri, 20 Sep 2024 10:12:49 +0000
+Received: from EX19D018EUC002.ant.amazon.com (10.252.51.143) by
+ EX19D017EUB004.ant.amazon.com (10.252.51.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Fri, 20 Sep 2024 10:12:49 +0000
+Received: from EX19D018EUC002.ant.amazon.com ([fe80::59f1:9703:f248:892f]) by
+ EX19D018EUC002.ant.amazon.com ([fe80::59f1:9703:f248:892f%3]) with mapi id
+ 15.02.1258.034; Fri, 20 Sep 2024 10:12:49 +0000
+From: "Janpoladyan, Lilit" <lilitj@amazon.de>
+To: Oliver Upton <oliver.upton@linux.dev>
+CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "maz@kernel.org"
+	<maz@kernel.org>, "james.morse@arm.com" <james.morse@arm.com>,
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "yuzenghui@huawei.com"
+	<yuzenghui@huawei.com>, "nh-open-source@amazon.com"
+	<nh-open-source@amazon.com>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "Zamler, Shiran" <shiranz@amazon.com>
+Subject: Re: [PATCH 0/8] *** RFC: ARM KVM dirty tracking device ***
+Thread-Topic: [PATCH 0/8] *** RFC: ARM KVM dirty tracking device ***
+Thread-Index: AQHbCd9gSIT2Jn71hUWtg2pZwkDFcrJe1C6AgAHE4wA=
+Date: Fri, 20 Sep 2024 10:12:49 +0000
+Message-ID: <56DFFCE6-C626-4621-8DF7-A39A72143A54@amazon.de>
+References: <20240918152807.25135-1-lilitj@amazon.com>
+ <Zuvq18Nrgy6j_pZW@linux.dev>
+In-Reply-To: <Zuvq18Nrgy6j_pZW@linux.dev>
+Accept-Language: en-GB, en-US
+Content-Language: en-GB
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <98EEDE6D8E8E854F852A8CD02E0DDF09@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/8] drm/xe: xe_gen_wa_oob: fix
- program_invocation_short_name for macos
-Content-Language: en-GB
-To: Masahiro Yamada <masahiroy@kernel.org>
-CC: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier
-	<nicolas@fjasle.eu>, Lucas De Marchi <lucas.demarchi@intel.com>,
-	=?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>, Maarten Lankhorst
-	<maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>,
-	William Hubbs <w.d.hubbs@gmail.com>, Chris Brannon <chris@the-brannons.com>,
-	Kirk Reiser <kirk@reisers.ca>, Samuel Thibault
-	<samuel.thibault@ens-lyon.org>, Paul Moore <paul@paul-moore.com>, "Stephen
- Smalley" <stephen.smalley.work@gmail.com>, Ondrej Mosnacek
-	<omosnace@redhat.com>, Catalin Marinas <catalin.marinas@arm.com>, Will
-	Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton
-	<oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, Suzuki K
-	Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, "Greg
- Kroah-Hartman" <gregkh@linuxfoundation.org>, Jiri Slaby
-	<jirislaby@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, "Bill
- Wendling" <morbo@google.com>, Justin Stitt <justinstitt@google.com>, "Simona
- Vetter" <simona.vetter@ffwll.ch>, <linux-kernel@vger.kernel.org>,
-	<linux-kbuild@vger.kernel.org>, <intel-xe@lists.freedesktop.org>,
-	<dri-devel@lists.freedesktop.org>, <speakup@linux-speakup.org>,
-	<selinux@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>, <linux-serial@vger.kernel.org>,
-	<llvm@lists.linux.dev>, Finn Behrens <me@kloenk.dev>, "Daniel Gomez
- (Samsung)" <d+samsung@kruces.com>, <gost.dev@samsung.com>
-From: Daniel Gomez <da.gomez@samsung.com>
-In-Reply-To: <CAK7LNAQDxVGOa5g3f_dqZ5nD_u8_a++T+ussL+AWuOXs-XOsow@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format="flowed"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-	CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Ta0yTVxjHPe+1INWXStejEIldumUQmCboziZBt/DhXYKJlw8ys0y68YJM
-	bmkpbm5GRO7gxkUodNAhlFtlQysgV3HAWjpAQBCRy2CRu1ynjovMjlLM+PZ/nvP7P8/5n+Tw
-	cMFrag8vIDiMkwVLA8WUNVGpX+lwSb8w47d/6qUQtTzOw9B8YRJAeu0kjmpNQzjqeTlPoav5
-	ZRRavjOJoeF7RRiay3FAGTfzKaTuMhJouryJQLqnvSRaq6nCUHdNNoXa8q/RaPR6A4XGnhZS
-	6MZiBYH+GukjUXW2kUT1Zd0U0nU/J1FMfCGJYkvGKLSQbMLQeH0LidJXZig0m/w7jQZSlQRq
-	UPXSqHhZCVCHQU8jU8NeVFnVDtBERxpAWQMDAD2rWh9cPpNCoryYD1DU4EH0pOAWfdSJLVWX
-	ArZO306x9f/kEmxN4x2KrVYN0WyuTsFGNc+SbH7dFMbqtPEUq45XY6zp2gjJNpvyaPZGRDrO
-	qo0n2IacUpodTjRgx+EZa3dfLjAgnJO97+FjfS6mNpMOnd77TcTN7RFgUpQArHiQcYPKSTVI
-	ANY8AVMMYFNsBW0pXgAYvZyHmykB8xzAfzMlbxxZtRGUBSoCcHC2ebNYh14tpW0W1QDqO1oI
-	s4XPeEDdgyVg1gQjgbdq50hL3xYas0Y3GCHjCIf7M2mz3sX4wIIE5QaPMyIY+aJkg7djnOBg
-	QRxpXoAzUzZwIrVzw0wx78F7Rt2G2Yo5AdVRf65r3jr0EVS2fGqZ4wivVvyEWyLsg5kpJYRF
-	X4J/lPdj5pmQqd0OC283kpYDTzg3ZtyEdsFpQzlt0Q7QVP0zZtH+UPOrapMJhXUDKtK8FzKH
-	4Q9tgZb2x7BszYBZ2jtg36yt5To7YGqlEk8GEtWWl1BtSaz6P4BqS4BcQGiBiFPIg/w5+YFg
-	7oKrXBokVwT7u34VEqQD61+k9bXh7yqQM73o2ggwHmgEkIeL7fiihSk/Ad9X+u1FThZyVqYI
-	5OSNwJ5HiEV8ia8jJ2D8pWHceY4L5WRvTjGe1Z4IjBdx+rvVw5rVDLfOZ6aetyQtXp2/ZPu8
-	i+mzT43f9r4c03vSTubYcX/V9vShhVFh/nzSqZNj9p454R9OdOFKr6b6ZEnrl5ELS2ekI3e1
-	ogRx0aL7F9ijT74XeOAZLp2XNCkhjo8Mv7Xv65OIAxTuV8Z3DmmOK1wOKdWSh86Ul+agzcP4
-	aFrS/06c/2fO2kjC/ZV18f36Rd+gNJFwjZdUW9fNVwjHghyWcx7HSJOqekabvS+mGBShsZrG
-	bd47n5iOxF05u63ncrhNtN+K9q7n1yFt9keDAj8vSuZnHdv99phDz/Wu+dYmbX54lPD8j4nO
-	6snoBjc2/kHskd1FiWGD5ftnmsSE/Jz0gBMuk0v/A5xW+OaRBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Te0yTVxjGPV+/S0GYHxXCgRHFJixCYqFA8WCAbQmZ3xYzZWK2wQAb+bhf
-	TEsFXYzNIHUUMSAqUKFiG1Aum65cLJTLYKzIGJLRwZgIuClyEUEGKjiwA8oS/vud8z7v87zn
-	5Bwuh3eXdObGp6SxkhRxEp+0xnvedo3uu5w+E+NlGnBA9/7QYGiu4gJAxqpJDjKYRzjo95dz
-	JMrU3ibRUu0khsZab2JottQFXa3Wkkj9WzeOput+wpHu8SCBVpr0GDI1lZDoV20uhZ5cbiPR
-	+OMKEt2Yr8fRX4+GCNRY0k2gltsmEulMCwRSZFcQ6HzlOIle5Jkx9LTlHoGuLM+Q6HnezxQa
-	vlSIozbVIIVuLRUC1NdlpJC5bRdq0PcCNNFXAFDx8DBAz/RrxnUz+QTSKPajrIci9Gf5HeoD
-	D6ZGXQOYZmMvybS8KsOZpo5akmlUjVBMmU7GZHU+Jxht8xTG6KqySUadrcYYc+4jguk0ayjm
-	hvwKh1F3hzBtpTUUM5bThR2BYYIASaosjXWNS5WmBfLDhchbIPRHAm9ff4HQZ3/EAW8R3zMo
-	IJpNij/FSjyDjgviFIYi6uT0rgx59XY5mHRUAisupH1hsUFOKoE1l0eXA9hfqsEsBRf4w+IA
-	YeGdcGVQuSmaB7BCn7O5aASwaDxzo8OWDoK6+6/BOuO0G7xjmCUs+3awu/gJvs4O9G449qCI
-	Wued9HFYrizc0HNoR/jNYuWG3p72gA/LvyXWAzj0hA08f0uHWdI0GOzXjm6kkbQ7bO3WbThZ
-	0SFQnTVKWZwQ1M60b/JumFl/jWM5wx5YlF+JW/gsXFh9CvKAg2rLgKotg6i2WKm2WJUBvArY
-	szJpcmyyVCiQipOlspRYwYnUZB1Ye8ENxuVaPVBPzws6AMYFHQByOXx7W8cXUzE822jx6TOs
-	JDVKIktipR1AtHZL+RxnhxOpa18gJS1K6OclEvr6+XuJ/P18+I62H5n6Ynh0rDiNTWTZk6zk
-	/z6Ma+Usx04lMZ9mlX14eDl0OXdHztRLyvcXm72dE831nzXyE2Nmffr1wW6ai1czMkcC4NeG
-	g4PtxRE20ZENipCDRVYXI123lZTWykP6icaZQNPNdCv3c70GP55LwqF/ek43/AgJuGB0c7Ie
-	0r/zSWhynsLp+6++e/8s7RmGuEcH4qvD/9W/MkGdKGT2820KLLp9X/r2yXEZqZrLiFsNi+ap
-	90TefYZlX3fvNKY05a944b0fc5WH/r7+4FigwT3qrS48tL4kaNU1ZuTI/OuFa+L77znWti6t
-	RPRgb84l2CgTqYL6gpwCWH3mSx/jgPldwZtFeztZwiWe3URZ3Y4+py8OD104EBx8lI9L48RC
-	D45EKv4P8XlwBEoEAAA=
-X-CMS-MailID: 20240919191220eucas1p23f207681d0268c632f46323fd5ac9107
-X-Msg-Generator: CA
-X-RootMTR: 20240906144003eucas1p1b8c2be4807e04ced52c4902bfbfb9783
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20240906144003eucas1p1b8c2be4807e04ced52c4902bfbfb9783
-References: <20240906-macos-build-support-v2-0-06beff418848@samsung.com>
-	<20240906-macos-build-support-v2-3-06beff418848@samsung.com>
-	<CGME20240906144003eucas1p1b8c2be4807e04ced52c4902bfbfb9783@eucas1p1.samsung.com>
-	<CAK7LNAQDxVGOa5g3f_dqZ5nD_u8_a++T+ussL+AWuOXs-XOsow@mail.gmail.com>
+Content-Transfer-Encoding: base64
 
-On 9/6/2024 4:39 PM, Masahiro Yamada wrote:
-> On Fri, Sep 6, 2024 at 8:01 PM Daniel Gomez via B4 Relay
-> <devnull+da.gomez.samsung.com@kernel.org> wrote:
->>
->> From: Daniel Gomez <da.gomez@samsung.com>
->>
->> Use getprogname() [1] instead of program_invocation_short_name() [2]
->> for macOS hosts.
->>
->> [1]:
->> https://www.gnu.org/software/gnulib/manual/html_node/
->> program_005finvocation_005fshort_005fname.html
->>
->> [2]:
->> https://developer.apple.com/library/archive/documentation/System/
->> Conceptual/ManPages_iPhoneOS/man3/getprogname.3.html
->>
->> Fixes build error for macOS hosts:
->>
->> drivers/gpu/drm/xe/xe_gen_wa_oob.c:34:3: error: use of
->> undeclared identifier 'program_invocation_short_name'    34 |
->> program_invocation_short_name);       |                 ^ 1 error
->> generated.
->>
->> Signed-off-by: Daniel Gomez <da.gomez@samsung.com>
->> Reviewed-by: Lucas De Marchi <lucas.demarchi@intel.com>
->> ---
->>   drivers/gpu/drm/xe/xe_gen_wa_oob.c | 4 ++++
->>   1 file changed, 4 insertions(+)
->>
->> diff --git a/drivers/gpu/drm/xe/xe_gen_wa_oob.c b/drivers/gpu/drm/xe/xe_gen_wa_oob.c
->> index 904cf47925aa..0d933644d8a0 100644
->> --- a/drivers/gpu/drm/xe/xe_gen_wa_oob.c
->> +++ b/drivers/gpu/drm/xe/xe_gen_wa_oob.c
->> @@ -8,6 +8,7 @@
->>   #include <errno.h>
->>   #include <stdbool.h>
->>   #include <stdio.h>
->> +#include <stdlib.h>
->>   #include <string.h>
->>
->>   #define HEADER \
->> @@ -30,6 +31,9 @@
->>
->>   static void print_usage(FILE *f)
->>   {
->> +#ifdef __APPLE__
->> +       const char *program_invocation_short_name = getprogname();
->> +#endif
->>          fprintf(f, "usage: %s <input-rule-file> <generated-c-source-file> <generated-c-header-file>\n",
->>                  program_invocation_short_name);
->>   }
->>
->> --
->> 2.46.0
->>
->>
-> 
-> 
-> 
-> Before adding such #ifdef, you should check how other programs do.
-> 
-> 
-> 
-> 
-> 
-> 
-> 
-> 
-> 
-> Solution 1 : hard-code the program name
-> 
-> 
-> diff --git a/drivers/gpu/drm/xe/xe_gen_wa_oob.c
-> b/drivers/gpu/drm/xe/xe_gen_wa_oob.c
-> index 106ee2b027f0..9e9a29e2cecf 100644
-> --- a/drivers/gpu/drm/xe/xe_gen_wa_oob.c
-> +++ b/drivers/gpu/drm/xe/xe_gen_wa_oob.c
-> @@ -30,8 +30,7 @@
-> 
->   static void print_usage(FILE *f)
->   {
-> -       fprintf(f, "usage: %s <input-rule-file>
-> <generated-c-source-file> <generated-c-header-file>\n",
-> -               program_invocation_short_name);
-> +       fprintf(f, "usage: xe_gen_wa_oob <input-rule-file>
-> <generated-c-source-file> <generated-c-header-file>\n");
->   }
-> 
->   static void print_parse_error(const char *err_msg, const char *line,
-> 
-> 
-> 
-> 
-> 
-> 
-> 
-> 
-> Solution 2: use argv[0]
-> 
-> 
-> diff --git a/drivers/gpu/drm/xe/xe_gen_wa_oob.c
-> b/drivers/gpu/drm/xe/xe_gen_wa_oob.c
-> index 106ee2b027f0..600c63e88e46 100644
-> --- a/drivers/gpu/drm/xe/xe_gen_wa_oob.c
-> +++ b/drivers/gpu/drm/xe/xe_gen_wa_oob.c
-> @@ -28,10 +28,10 @@
->          "\n" \
->          "#endif\n"
-> 
-> -static void print_usage(FILE *f)
-> +static void print_usage(FILE *f, const char *progname)
->   {
->          fprintf(f, "usage: %s <input-rule-file>
-> <generated-c-source-file> <generated-c-header-file>\n",
-> -               program_invocation_short_name);
-> +               progname);
->   }
-> 
->   static void print_parse_error(const char *err_msg, const char *line,
-> @@ -136,7 +136,7 @@ int main(int argc, const char *argv[])
-> 
->          if (argc < 3) {
->                  fprintf(stderr, "ERROR: wrong arguments\n");
-> -               print_usage(stderr);
-> +               print_usage(stderr, argv[0]);
->                  return 1;
->          }
-
-
-This approach looks good to me. I will drop Lucas' tag in favor to this. 
-Please, Lucas let me know if you disagree any of the proposals here or 
-if you have any preference. Otherwise, I'll resend this with solution 2.
-
-
-
-> 
-> 
-> 
-> 
-> 
-> 
-> 
-> 
+SGkgT2xpdmVyLA0KDQrvu79PbiAxOS4wOS4yNCwgMTE6MTIsICJPbGl2ZXIgVXB0b24iIDxvbGl2
+ZXIudXB0b25AbGludXguZGV2IDxtYWlsdG86b2xpdmVyLnVwdG9uQGxpbnV4LmRldj4+IHdyb3Rl
+Og0KDQo+IEhpIExpbGl0LA0KDQoNCj4gK2NjIGt2bWFybSBtYWlsaW5nIGxpc3QsIGdldF9tYWlu
+dGFpbmVyIGlzIHlvdXIgZnJpZW5kIDopDQoNCg0KPiBPbiBXZWQsIFNlcCAxOCwgMjAyNCBhdCAw
+MzoyNzo1OVBNICswMDAwLCBMaWxpdCBKYW5wb2xhZHlhbiB3cm90ZToNCj4gPiBBbiBleGFtcGxl
+IG9mIGEgZGV2aWNlIHRoYXQgdHJhY2tzIGFjY2Vzc2VzIHRvIHN0YWdlLTIgdHJhbnNsYXRpb25z
+IGFuZCB3aWxsDQo+ID4gaW1wbGVtZW50IHBhZ2VfdHJhY2tpbmdfZGV2aWNlIGludGVyZmFjZSBp
+cyBBV1MgR3Jhdml0b24gUGFnZSBUcmFja2luZyBBZ2VudA0KPiA+IChQVEEpLiBXZSdsbCBiZSBw
+b3N0aW5nIGNvZGUgZm9yIHRoZSBHcmF2aXRvbiBQVEEgZGV2aWNlIGRyaXZlciBpbiBhIHNlcGFy
+YXRlDQo+ID4gc2VyaWVzIG9mIHBhdGNoZXMuDQoNCg0KPiBJbiBvcmRlciB0byBhY3R1YWxseSBy
+ZXZpZXcgdGhlc2UgcGF0Y2hlcywgd2UgbmVlZCB0byBzZWUgYW4NCj4gaW1wbGVtZW50YXRpb24g
+b2Ygc3VjaCBhIHBhZ2UgdHJhY2tpbmcgZGV2aWNlLiBPdGhlcndpc2UgaXQncyBoYXJkIHRvDQo+
+IHRlbGwgdGhhdCB0aGUgaW50ZXJmYWNlIGFjY29tcGxpc2hlcyB0aGUgcmlnaHQgYWJzdHJhY3Rp
+b25zLg0KDQpXZSdsbCBiZSBwb3N0aW5nIGRyaXZlciBwYXRjaGVzIGluIHRoZSBjb21pbmcgd2Vl
+a3MsIHRoZXkgc2hvdWxkIGV4cGxhaW4gZGV2aWNlDQpmdW5jdGlvbmFsaXR5Lg0KDQoNCj4gQmV5
+b25kIHRoYXQsIEkgaGF2ZSBzb21lIHJlc2VydmF0aW9ucyBhYm91dCBtYWludGFpbmluZyBzdXBw
+b3J0IGZvcg0KPiBmZWF0dXJlcyB0aGF0IGNhbm5vdCBhY3R1YWxseSBiZSB0ZXN0ZWQgb3V0c2lk
+ZSBvZiB5b3VyIG93biBlbnZpcm9ubWVudC4NCg0KSSB1bmRlcnN0YW5kLCB3ZSdsbCBzZWUgaG93
+IHdlIGNhbiBlbXVsYXRlIHRoZSBmdW5jdGlvbmFsaXR5IGFuZCBtYWtlIGludGVyZmFjZQ0KdGVz
+dGFibGUuDQoNCj4gPiBXaGVuIEFSTSBhcmNoaXRlY3R1cmFsIHNvbHV0aW9uIChGRUFUX0hEQlNT
+IGZlYXR1cmUpIGlzIGF2YWlsYWJsZSwgd2UgaW50ZW5kIHRvDQo+ID4gdXNlIGl0IHZpYSB0aGUg
+c2FtZSBpbnRlcmZhY2UgbW9zdCBsaWtlbHkgd2l0aCBhZGFwdGF0aW9ucy4NCg0KDQo+IFdpbGwg
+dGhlIFBUQSBzdHVmZiBldmVudHVhbGx5IGdldCByZXRpcmVkIG9uY2UgeW91IGdldCBzdXBwb3J0
+IGZvciBGRUFUX0hEQlNTDQo+IGluIGhhcmR3YXJlPw0KDQpXZSdkIG5lZWQgdG8ga2VlcCB0aGUg
+aW50ZXJmYWNlIGZvciBhcyBsb25nIGFzIGhhcmR3YXJlIHdpdGhvdXQgRkVBVF9IREJTUw0KYnV0
+IHdpdGggUFRBIGlzIGluIHVzZSwgaGVuY2UgdGhlIGF0dGVtcHQgb2YgZ2VuZXJhbGlzYXRpb24u
+DQoNCj4gSSB0aGluayB0aGUgYmVzdCB3YXkgZm9yd2FyZCBoZXJlIGlzIHRvIGltcGxlbWVudCB0
+aGUgYXJjaGl0ZWN0dXJlLCBhbmQNCj4gaG9wZWZ1bGx5IGFmdGVyIHRoYXQgeW91ciBsZWdhY3kg
+ZHJpdmVyIGNhbiBiZSBtYWRlIHRvIGZpdCB0aGUNCj4gaW50ZXJmYWNlLiBUaGUgRlZQIGltcGxl
+bWVudHMgRkVBVF9IREJTUywgc28gdGhlcmUncyBzb21lIChzbG93KQ0KPiByZWZlcmVuY2UgaGFy
+ZHdhcmUgdG8gdGVzdCBhZ2FpbnN0Lg0KDQpUaGFua3MgZm9yIHRoZSBpZGVhLCB3ZSdsbCB0ZXN0
+IHdpdGggRlZQLCBidXQgd2UnZCBuZWVkIEZFQVRfSERCU1MNCmRvY3VtZW50YXRpb24gZm9yIHRo
+YXQuIEkgZG9uJ3QgdGhpbmsgaXQncyBhdmFpbGFibGUgeWV0LCBpcyBpdD8NCg0KPiBUaGlzIGlz
+IGEgdmVyeSBpbnRlcmVzdGluZyBmZWF0dXJlLCBzbyBob3BlZnVsbHkgd2UgY2FuIG1vdmUgdG93
+YXJkcw0KPiBzb21ldGhpbmcgd29ya2FibGUuDQoNCg0KPiAtLSANCj4gVGhhbmtzLA0KPiBPbGl2
+ZXINCg0KVGhhbmtzIGZvciB0aGUgZmVlZGJhY2ssIHdlJ2xsIGJlIHdvcmtpbmcgb24gdGhlIGRp
+c2N1c3NlZCBwb2ludHMsDQpMaWxpdA0KDQoKCgpBbWF6b24gV2ViIFNlcnZpY2VzIERldmVsb3Bt
+ZW50IENlbnRlciBHZXJtYW55IEdtYkgKS3JhdXNlbnN0ci4gMzgKMTAxMTcgQmVybGluCkdlc2No
+YWVmdHNmdWVocnVuZzogQ2hyaXN0aWFuIFNjaGxhZWdlciwgSm9uYXRoYW4gV2Vpc3MKRWluZ2V0
+cmFnZW4gYW0gQW10c2dlcmljaHQgQ2hhcmxvdHRlbmJ1cmcgdW50ZXIgSFJCIDI1Nzc2NCBCClNp
+dHo6IEJlcmxpbgpVc3QtSUQ6IERFIDM2NSA1MzggNTk3Cg==
 
