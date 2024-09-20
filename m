@@ -1,127 +1,135 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2538B1E498;
-	Fri, 20 Sep 2024 12:37:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EFB71422AB
+	for <kvmarm@lists.linux.dev>; Fri, 20 Sep 2024 13:19:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726835873; cv=none; b=OS7FL0890B9jEOg9T7iOyT7I6WV1WKGW0GiHjytoE6+avAjG0NsBr+6UFMjbW3IlLl38MtfX5krRAWqXqwXDdkOqoB5oFY7+rhv9EPL6UzjO/wuKQtpmhgrdh/WaVICmPwDtIPxC8XnqGo2UuUmaiN4BRLtgynmQRJKcQyaE1AI=
+	t=1726838386; cv=none; b=gVyS7HxOaclSu0ylpV/yVBv1FGf35MaqISuznS2eYrf3RHuOkK82AmYajgFzGJVoCF6Dgax/gQ9cqNuwuC6j5TZxi/PSHScCuInpDgoYb7WlGedvil/mv6To5JnghBiJzrQvm7LgEyfDzDnVV4Bz1tgIahlXm68HkrHVeQ1lib4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726835873; c=relaxed/simple;
-	bh=+xuRPrmR7i0CxITWrMzA6Rbir0u7SYmmYJphYrBfy3A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tWEY+9cZm4DSDXsnjveuD9AaW+cowHdkZpXMFCT0LvHRFz+YKXP1MoGsf+W+qrEUW9+SCc+9P8cjnaR1Tvfn3wOCSzOI833VWnt8iOCVQifm2N3DNHpG91LuY/lJ5+PhL2beR7nGVqq4JSAHh1VbgU5NsX+2jyon4QxX/aJlYTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IAosnox0; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1726838386; c=relaxed/simple;
+	bh=DFJqtOF4lDhc4gTyULxbIXKWq6CAYC2v6Kd9JudlogQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=f2RvLVxJm1Ur/vGSit1sN/W6mKmUe18wJ+4CVcckjVRZNcxmBfbDtf+dLHvw07xfwZkScyAOMjs7eLA2JMgUgrgYtJgGX4ASUtEgRsi2fIQJD15V4tVynEZL9QL2iS6QcLPbyV7aezLoy9kBtS2cDyIKcY1MKnaCx6IMNLl4ghw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.de; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=rWXJ2Vvt; arc=none smtp.client-ip=99.78.197.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IAosnox0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4EA7AC4CEC3;
-	Fri, 20 Sep 2024 12:37:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726835872;
-	bh=+xuRPrmR7i0CxITWrMzA6Rbir0u7SYmmYJphYrBfy3A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IAosnox004cPJJHW+Yce205KY2IrNZcl+CtEsZ66I+gYMKSE+fq8pE685GUG2D+EJ
-	 m1zHF9oNmFE5rcXk0uhVHyuVttL0SFDxoMmoHxvysv6F2CHInFj21hnvq8/iTgGvaI
-	 Q3F9Bzi0P6PuACKEq3bddrqjg6qomtCcOLXBXoXXTNzVyDGGdVqdOkG3hPCklQBNDX
-	 L21vx5LuGCCOeJwSeoogKTVj0e12k8ritzzV/uJzPJe1YtsMAZZCdiYNjwRjHJV5zI
-	 vWETvKPasLYzMiOdZPf2d7yNQ5bzAxvXcQ/uVvOECT/6dHsW12+8mHdktGo0VDm/eR
-	 yNTmeAkf5u+8w==
-Date: Fri, 20 Sep 2024 14:34:47 +0200
-From: Mike Rapoport <rppt@kernel.org>
-To: Fares Mehanna <faresx@amazon.de>
-Cc: nh-open-source@amazon.com, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Kemeng Shi <shikemeng@huaweicloud.com>,
-	=?iso-8859-1?Q?Pierre-Cl=E9ment?= Tosi <ptosi@google.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Javier Martinez Canillas <javierm@redhat.com>,
-	Arnd Bergmann <arnd@arndb.de>, Fuad Tabba <tabba@google.com>,
-	Mark Brown <broonie@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Kristina Martsenko <kristina.martsenko@arm.com>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	David Hildenbrand <david@redhat.com>,
-	Roman Kagan <rkagan@amazon.de>,
-	"moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" <linux-arm-kernel@lists.infradead.org>,
-	"open list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" <kvmarm@lists.linux.dev>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:MEMORY MANAGEMENT" <linux-mm@kvack.org>
-Subject: Re: [RFC PATCH 0/7] support for mm-local memory allocations and use
- it
-Message-ID: <Zu1r5-JnL3sduoqy@kernel.org>
-References: <20240911143421.85612-1-faresx@amazon.de>
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="rWXJ2Vvt"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1726838385; x=1758374385;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=DFJqtOF4lDhc4gTyULxbIXKWq6CAYC2v6Kd9JudlogQ=;
+  b=rWXJ2VvtRydnM1O1TirWZ7Qt8+6jVDxAs4bxVDY56TVTFs64kT4osPCc
+   E8sxBRco6KjtfW9604ts41Jls7ETfDX14QzPlkfCWzAlFwxn8LvR77cPL
+   PSYxqCCTX7pWhCDjazeECpHS6v1k78Jk1kWYrxnW3U+ovq/vzs63hwLWZ
+   g=;
+X-IronPort-AV: E=Sophos;i="6.10,244,1719878400"; 
+   d="scan'208";a="128029568"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2024 13:19:42 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:28574]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.51.228:2525] with esmtp (Farcaster)
+ id 02076010-c227-44f5-850a-0b401f639afb; Fri, 20 Sep 2024 13:19:42 +0000 (UTC)
+X-Farcaster-Flow-ID: 02076010-c227-44f5-850a-0b401f639afb
+Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Fri, 20 Sep 2024 13:19:40 +0000
+Received: from [0.0.0.0] (10.253.83.51) by EX19D020UWC004.ant.amazon.com
+ (10.13.138.149) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34; Fri, 20 Sep 2024
+ 13:19:34 +0000
+Message-ID: <23d90b50-f087-4daa-b4bc-4da406160c9d@amazon.com>
+Date: Fri, 20 Sep 2024 15:19:32 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 0/7] support for mm-local memory allocations and use
+ it
+To: Fares Mehanna <faresx@amazon.de>
+CC: <nh-open-source@amazon.com>, Marc Zyngier <maz@kernel.org>, Oliver Upton
+	<oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, Suzuki K Poulose
+	<suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas
+	<catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Andrew Morton
+	<akpm@linux-foundation.org>, Kemeng Shi <shikemeng@huaweicloud.com>,
+	=?UTF-8?Q?Pierre-Cl=C3=A9ment_Tosi?= <ptosi@google.com>, Ard Biesheuvel
+	<ardb@kernel.org>, Mark Rutland <mark.rutland@arm.com>, "Javier Martinez
+ Canillas" <javierm@redhat.com>, Arnd Bergmann <arnd@arndb.de>, Fuad Tabba
+	<tabba@google.com>, Mark Brown <broonie@kernel.org>, Joey Gouly
+	<joey.gouly@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, "Randy
+ Dunlap" <rdunlap@infradead.org>, Bjorn Helgaas <bhelgaas@google.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>, "Mike Rapoport (IBM)"
+	<rppt@kernel.org>, David Hildenbrand <david@redhat.com>, Roman Kagan
+	<rkagan@amazon.de>, "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64
+ (KVM/arm64)" <linux-arm-kernel@lists.infradead.org>, "open list:KERNEL
+ VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" <kvmarm@lists.linux.dev>, open list
+	<linux-kernel@vger.kernel.org>, "open list:MEMORY MANAGEMENT"
+	<linux-mm@kvack.org>, <mark.rutland@arm.com>, Mike Rapoport
+	<mikerapoport@microsoft.com>
+References: <20240911143421.85612-1-faresx@amazon.de>
+Content-Language: en-US
+From: Alexander Graf <graf@amazon.com>
 In-Reply-To: <20240911143421.85612-1-faresx@amazon.de>
+X-ClientProxiedBy: EX19D037UWB002.ant.amazon.com (10.13.138.121) To
+ EX19D020UWC004.ant.amazon.com (10.13.138.149)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 
-Hi,
+T24gMTEuMDkuMjQgMTY6MzMsIEZhcmVzIE1laGFubmEgd3JvdGU6Cj4gSW4gYSBzZXJpZXMgcG9z
+dGVkIGEgZmV3IHllYXJzIGFnbyBbMV0sIGEgcHJvcG9zYWwgd2FzIHB1dCBmb3J3YXJkIHRvIGFs
+bG93IHRoZQo+IGtlcm5lbCB0byBhbGxvY2F0ZSBtZW1vcnkgbG9jYWwgdG8gYSBtbSBhbmQgdGh1
+cyBwdXNoIGl0IG91dCBvZiByZWFjaCBmb3IKPiBjdXJyZW50IGFuZCBmdXR1cmUgc3BlY3VsYXRp
+b24tYmFzZWQgY3Jvc3MtcHJvY2VzcyBhdHRhY2tzLiAgV2Ugc3RpbGwgYmVsaWV2ZQo+IHRoaXMg
+aXMgYSBuaWNlIHRoaW5nIHRvIGhhdmUuCj4KPiBIb3dldmVyLCBpbiB0aGUgdGltZSBwYXNzZWQg
+c2luY2UgdGhhdCBwb3N0IExpbnV4IG1tIGhhcyBncm93biBxdWl0ZSBhIGZldyBuZXcKPiBnb29k
+aWVzLCBzbyB3ZSdkIGxpa2UgdG8gZXhwbG9yZSBwb3NzaWJpbGl0aWVzIHRvIGltcGxlbWVudCB0
+aGlzIGZ1bmN0aW9uYWxpdHkKPiB3aXRoIGxlc3MgZWZmb3J0IGFuZCBjaHVybiBsZXZlcmFnaW5n
+IHRoZSBub3cgYXZhaWxhYmxlIGZhY2lsaXRpZXMuCj4KPiBBbiBSRkMgd2FzIHBvc3RlZCBmZXcg
+bW9udGhzIGJhY2sgWzJdIHRvIHNob3cgdGhlIHByb29mIG9mIGNvbmNlcHQgYW5kIGEgc2ltcGxl
+Cj4gdGVzdCBkcml2ZXIuCj4KPiBJbiB0aGlzIFJGQywgd2UncmUgdXNpbmcgdGhlIHNhbWUgYXBw
+cm9hY2ggb2YgaW1wbGVtZW50aW5nIG1tLWxvY2FsIGFsbG9jYXRpb25zCj4gcGlnZ3ktYmFja2lu
+ZyBvbiBtZW1mZF9zZWNyZXQoKSwgdXNpbmcgcmVndWxhciB1c2VyIGFkZHJlc3NlcyBidXQgcGlu
+bmluZyB0aGUKPiBwYWdlcyBhbmQgZmxpcHBpbmcgdGhlIHVzZXIvc3VwZXJ2aXNvciBmbGFnIG9u
+IHRoZSByZXNwZWN0aXZlIFBURXMgdG8gbWFrZSB0aGVtCj4gZGlyZWN0bHkgYWNjZXNzaWJsZSBm
+cm9tIGtlcm5lbC4KPiBJbiBhZGRpdGlvbiB0byB0aGF0IHdlIGFyZSBzdWJtaXR0aW5nIDUgcGF0
+Y2hlcyB0byB1c2UgdGhlIHNlY3JldCBtZW1vcnkgdG8gaGlkZQo+IHRoZSB2Q1BVIGdwLXJlZ3Mg
+YW5kIGZwLXJlZ3Mgb24gYXJtNjQgVkhFIHN5c3RlbXMuCj4KPiBUaGUgZ2VuZXJpYyBkcmF3YmFj
+a3Mgb2YgdXNpbmcgdXNlciB2aXJ0dWFsIGFkZHJlc3NlcyBtZW50aW9uZWQgaW4gdGhlIHByZXZp
+b3VzCj4gUkZDIFsyXSBzdGlsbCBob2xkLCBpbiBhZGRpdGlvbiB0byBhIG1vcmUgc3BlY2lmaWMg
+b25lOgo+Cj4gLSBXaGlsZSB0aGUgdXNlciB2aXJ0dWFsIGFkZHJlc3NlcyBhbGxvY2F0ZWQgZm9y
+IGtlcm5lbCBzZWNyZXQgbWVtb3J5IGFyZSBub3QKPiAgICBkaXJlY3RseSBhY2Nlc3NpYmxlIGJ5
+IHVzZXJzcGFjZSBhcyB0aGUgUFRFcyByZXN0cmljdCB0aGF0LCBjb3B5X2Zyb21fdXNlcigpCj4g
+ICAgYW5kIGNvcHlfdG9fdXNlcigpIGNhbiBvcGVyYXRlIG9uIHRob3NlIHJhbmdlcywgc28gdGhh
+dCBlLmcuIHRoZSB1c2VybW9kZSBjYW4KPiAgICBndWVzcyB0aGUgYWRkcmVzcyBhbmQgcGFzcyBp
+dCBhcyB0aGUgdGFyZ2V0IGJ1ZmZlciBmb3IgcmVhZCgpLCBtYWtpbmcgdGhlCj4gICAga2VybmVs
+IG92ZXJ3cml0ZSBpdCB3aXRoIHRoZSB1c2VyLWNvbnRyb2xsZWQgY29udGVudC4gRWZmZWN0aXZl
+bHkgbWFraW5nIHRoZQo+ICAgIHNlY3JldCBtZW1vcnkgaW4gdGhlIGN1cnJlbnQgaW1wbGVtZW50
+YXRpb24gbWlzc2luZyBjb25maWRlbnRpYWxpdHkgYW5kCj4gICAgaW50ZWdyaXR5IGd1YXJhbnRl
+ZXMuCj4KPiBJbiB0aGUgc3BlY2lmaWMgY2FzZSBvZiB2Q1BVIHJlZ2lzdGVycywgdGhpcyBpcyBm
+aW5lIGJlY2F1c2UgdGhlIG93bmVyIHByb2Nlc3MKPiBjYW4gcmVhZCBhbmQgd3JpdGUgdG8gdGhl
+bSB1c2luZyBLVk0gSU9DVExzIGFueXdheS4gQnV0IGluIHRoZSBnZW5lcmFsIGNhc2UgdGhpcwo+
+IHJlcHJlc2VudHMgYSBzZWN1cml0eSBjb25jZXJuIGFuZCBuZWVkcyB0byBiZSBhZGRyZXNzZWQu
+Cj4KPiBBIHBvc3NpYmxlIHdheSBmb3J3YXJkIGZvciB0aGUgYXJjaC1hZ25vc3RpYyBpbXBsZW1l
+bnRhdGlvbiBpcyB0byBsaW1pdCB0aGUgdXNlcgo+IHZpcnR1YWwgYWRkcmVzc2VzIHVzZWQgZm9y
+IGtlcm5lbCB0byBzcGVjaWZpYyByYW5nZSB0aGF0IGNhbiBiZSBjaGVja2VkIGFnYWluc3QKPiBp
+biBjb3B5X2Zyb21fdXNlcigpIGFuZCBjb3B5X3RvX3VzZXIoKS4KPgo+IEZvciBhcmNoIHNwZWNp
+ZmljIGltcGxlbWVudGF0aW9uLCB1c2luZyBzZXBhcmF0ZSBQR0QgaXMgdGhlIHdheSB0byBnby4K
+Pgo+IFsxXSBodHRwczovL2xvcmUua2VybmVsLm9yZy9sa21sLzIwMTkwNjEyMTcwODM0LjE0ODU1
+LTEtbWhpbGxlbmJAYW1hem9uLmRlLwo+IFsyXSBodHRwczovL2xvcmUua2VybmVsLm9yZy9sa21s
+LzIwMjQwNjIxMjAxNTAxLjEwNTk5NDgtMS1ya2FnYW5AYW1hem9uLmRlLwoKCkhleSBNYXJrIGFu
+ZCBNaWtlLAoKV2UgdGFsa2VkIGF0IExQQyBhYm91dCBtbS1sb2NhbCBtZW1vcnkgYW5kIHlvdSBo
+YWQgc29tZSBpbnB1dHMuIEl0IHdvdWxkIApiZSBhbWF6aW5nIHRvIHdyaXRlIHRoZW0gZG93biBo
+ZXJlIHNvIEkgZG9uJ3QgZW5kIHVwIHBsYXlpbmcgZ2FtZSBvZiAKdGVsZXBob25lIDopCgoKVGhh
+bmtzIQoKCgoKQW1hem9uIFdlYiBTZXJ2aWNlcyBEZXZlbG9wbWVudCBDZW50ZXIgR2VybWFueSBH
+bWJICktyYXVzZW5zdHIuIDM4CjEwMTE3IEJlcmxpbgpHZXNjaGFlZnRzZnVlaHJ1bmc6IENocmlz
+dGlhbiBTY2hsYWVnZXIsIEpvbmF0aGFuIFdlaXNzCkVpbmdldHJhZ2VuIGFtIEFtdHNnZXJpY2h0
+IENoYXJsb3R0ZW5idXJnIHVudGVyIEhSQiAyNTc3NjQgQgpTaXR6OiBCZXJsaW4KVXN0LUlEOiBE
+RSAzNjUgNTM4IDU5Nwo=
 
-On Wed, Sep 11, 2024 at 02:33:59PM +0000, Fares Mehanna wrote:
-> In a series posted a few years ago [1], a proposal was put forward to allow the
-> kernel to allocate memory local to a mm and thus push it out of reach for
-> current and future speculation-based cross-process attacks.  We still believe
-> this is a nice thing to have.
-> 
-> However, in the time passed since that post Linux mm has grown quite a few new
-> goodies, so we'd like to explore possibilities to implement this functionality
-> with less effort and churn leveraging the now available facilities.
-> 
-> An RFC was posted few months back [2] to show the proof of concept and a simple
-> test driver.
-> 
-> In this RFC, we're using the same approach of implementing mm-local allocations
-> piggy-backing on memfd_secret(), using regular user addresses but pinning the
-> pages and flipping the user/supervisor flag on the respective PTEs to make them
-> directly accessible from kernel.
-> In addition to that we are submitting 5 patches to use the secret memory to hide
-> the vCPU gp-regs and fp-regs on arm64 VHE systems.
-> 
-> The generic drawbacks of using user virtual addresses mentioned in the previous
-> RFC [2] still hold, in addition to a more specific one:
-> 
-> - While the user virtual addresses allocated for kernel secret memory are not
->   directly accessible by userspace as the PTEs restrict that, copy_from_user()
->   and copy_to_user() can operate on those ranges, so that e.g. the usermode can
->   guess the address and pass it as the target buffer for read(), making the
->   kernel overwrite it with the user-controlled content. Effectively making the
->   secret memory in the current implementation missing confidentiality and
->   integrity guarantees.
-
-Having a VMA in user mappings for kernel memory seems weird to say the
-least.
-Core MM does not expect to have VMAs for kernel memory. What will happen if
-userspace ftruncates that VMA? Or registers it with userfaultfd?
- 
-> In the specific case of vCPU registers, this is fine because the owner process
-> can read and write to them using KVM IOCTLs anyway. But in the general case this
-> represents a security concern and needs to be addressed.
-> 
-> A possible way forward for the arch-agnostic implementation is to limit the user
-> virtual addresses used for kernel to specific range that can be checked against
-> in copy_from_user() and copy_to_user().
-> 
-> For arch specific implementation, using separate PGD is the way to go.
-> 
-> [1] https://lore.kernel.org/lkml/20190612170834.14855-1-mhillenb@amazon.de/
-
-This approach seems much more reasonable and it's not that it was entirely
-arch-specific. There is some plumbing at arch level, but the allocator is
-anyway arch-independent. 
-
--- 
-Sincerely yours,
-Mike.
