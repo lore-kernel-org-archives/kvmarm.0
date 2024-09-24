@@ -1,115 +1,256 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82E80156F2B;
-	Sun, 22 Sep 2024 05:49:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C36914F9F8;
+	Tue, 24 Sep 2024 08:51:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726984160; cv=none; b=CT88odkiriti5F3L79wYweydK2YSaiow64Y8x//fKjzAoZxRVe8BiCfHhHU7WtHATIYMyCmKBPuE7hdKNDkKs8KNUnhEsFm1gOnhqTIGBaIx7HqOvi3lpU1QVvX6V0s20f7Hc19ChqWonFwg5HdgHfl2Yyk9LnTQ6yKPkdhuTSQ=
+	t=1727167917; cv=none; b=KVT8ufj0hDvGeJHsxF4i3ZEEneoIwc9BTJO3jLOomQNy0oUwkd9rznULuaEMFNSPshbKdVYnSOCINMxDw/936lQSRjvu6/9rrnnxfe1bSHMf4ri2utu3PxBwB72vAJdAWhKAkfe+5/Jec9BqfhcBgbAyrQz8YqJPNWLpV+oLkt8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726984160; c=relaxed/simple;
-	bh=jJW9B3d+KU2/i9btemTRtY7T483RJ0ApDaKU8HYkSB0=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=NgumcTGmhGoN5hDn6FEWFaTmJYd6iDCkeLrIR0rQuABg1MijQj3aGbQrOkcSowQTrFwbz9fxd/ElrsxT9CsaiyGlCHYDIajDOX4eyAf2TWqExtUhpceeBN090KKw3QW409yeSWUX/+9My//pdd/QXEwxJhtwJ4QJzGHkfha07hI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GMzlE5wf; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1727167917; c=relaxed/simple;
+	bh=OGJsRxm/aSvp0aTvmxcwKCi2GclZN3honIQF+YDTsPs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:From:In-Reply-To:
+	 Content-Type:References; b=JTJd4uvC/4GDOjK35NbtKZwV3pgT+7+z4fSZZoWUkSR8GBDj7t6We9+OeBKVRrULl2P66EFP3sUjjAvE1objdaNRc5cnrgY6jkjtOu9hjKDrPPePh2RDL0LARG0JZknbRXfRTNcVHWWBlQCP1grD8OYYA5zEr2gJ1WmPaZPdJig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=FTyRjvbe; arc=none smtp.client-ip=210.118.77.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GMzlE5wf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E85BBC4CEC3;
-	Sun, 22 Sep 2024 05:49:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726984160;
-	bh=jJW9B3d+KU2/i9btemTRtY7T483RJ0ApDaKU8HYkSB0=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=GMzlE5wf59FKARtlJgGs2n6P5kt5vtAqTeuh9OzKTGqWA0YNUSM/use4EZK3Gg3TN
-	 0xlIRGf6HUJRm/EOzi9BsTj8f3/JaQhU76dvvIGb5K+P3oQvXr5gC260w+FOMGsqGA
-	 B0dLfWBFoen4Sdr91RK2j18kS7kz6ve/pGOnaB0vdKo9NItHCOlavdg5GfnPWwZwk4
-	 w2kQ6rNTlWA26ls+omY8Jj5l7bg1VpYAwB/dHmY31O0qpj0ekunANrkaW1UVsxvc9O
-	 lIdu08TLrfzzxfRfV24zyAboJdh0Avrop6trmGiu2sl5KLRNbDjmyNWFk/bdqVRukb
-	 gdn7eRvixtCOA==
-X-Mailer: emacs 31.0.50 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: Dave Hansen <dave.hansen@intel.com>,
-	Kevin Brodsky <kevin.brodsky@arm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	linux-arm-kernel@lists.infradead.org
-Cc: nd@arm.com, akpm@linux-foundation.org, aneesh.kumar@linux.ibm.com,
-	anshuman.khandual@arm.com, bp@alien8.de, broonie@kernel.org,
-	catalin.marinas@arm.com, christophe.leroy@csgroup.eu,
-	dave.hansen@linux.intel.com, hpa@zytor.com,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
-	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
-	oliver.upton@linux.dev, shuah@kernel.org, skhan@linuxfoundation.org,
-	szabolcs.nagy@arm.com, tglx@linutronix.de, will@kernel.org,
-	x86@kernel.org, kvmarm@lists.linux.dev,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v5 06/30] arm64: context switch POR_EL0 register
-In-Reply-To: <6c8ad091-a56b-41ba-b403-2e3c2e578100@intel.com>
-References: <20240822151113.1479789-1-joey.gouly@arm.com>
- <20240822151113.1479789-7-joey.gouly@arm.com>
- <425b8f8c-b6b5-422a-b5f4-41dd2d1ae3bb@arm.com>
- <6c8ad091-a56b-41ba-b403-2e3c2e578100@intel.com>
-Date: Sun, 22 Sep 2024 11:19:05 +0530
-Message-ID: <yq5awmj4tezy.fsf@kernel.org>
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="FTyRjvbe"
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20240924085148euoutp014d81d8b6306e607e4bf3f5cba5893293~4Ig-EUA_-1855518555euoutp013;
+	Tue, 24 Sep 2024 08:51:48 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20240924085148euoutp014d81d8b6306e607e4bf3f5cba5893293~4Ig-EUA_-1855518555euoutp013
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1727167908;
+	bh=+OENs58HAqzqyrRb3PODk/cmg326VKfftT83cloY8MU=;
+	h=Date:Subject:To:CC:From:In-Reply-To:References:From;
+	b=FTyRjvbeE8EmsNK62SMrSA+7VgKYquSRnqZ8sf0a/9Musfv8e59SiytOejz1XTuAF
+	 ZpB/Gv7ZqjLHR2EMfyY6JnPfWgaV4W8+nzvH7mc2A1VNNathWqbn/2Ho5N4Q/wVepu
+	 7ptaX/HQSCvyxEcLlm+wPp3PsblRfCKylcQi6+gI=
+Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
+	eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+	20240924085147eucas1p14ec5d74b01509ae2d000edd5e6bfff9c~4Ig_1XQHX0782607826eucas1p1R;
+	Tue, 24 Sep 2024 08:51:47 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+	eusmges3new.samsung.com (EUCPMTA) with SMTP id D3.BE.09620.3AD72F66; Tue, 24
+	Sep 2024 09:51:47 +0100 (BST)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+	20240924085147eucas1p166c893c894c86bb9c9f1a4a588f00c0f~4Ig_M8NsH1841818418eucas1p1T;
+	Tue, 24 Sep 2024 08:51:47 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+	eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20240924085147eusmtrp15fcc19f3a3d28b3166e599dba1351bbd~4Ig_KNUiJ2571425714eusmtrp1h;
+	Tue, 24 Sep 2024 08:51:47 +0000 (GMT)
+X-AuditID: cbfec7f5-d1bff70000002594-30-66f27da3d6f1
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+	eusmgms2.samsung.com (EUCPMTA) with SMTP id 7B.88.19096.3AD72F66; Tue, 24
+	Sep 2024 09:51:47 +0100 (BST)
+Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
+	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20240924085146eusmtip2621f4dfeadc8cf4bdb0ef250758c5e04~4Ig92tMVK1318013180eusmtip28;
+	Tue, 24 Sep 2024 08:51:46 +0000 (GMT)
+Received: from [106.110.32.87] (106.110.32.87) by CAMSVWEXC02.scsc.local
+	(2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+	Tue, 24 Sep 2024 09:51:44 +0100
+Message-ID: <33953236-138f-4141-a5af-9ea60d148ed3@samsung.com>
+Date: Tue, 24 Sep 2024 10:51:43 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 8/8] Documentation: add howto build in macos
+Content-Language: en-GB
+To: Marc Zyngier <maz@kernel.org>
+CC: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor
+	<nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, Lucas De Marchi
+	<lucas.demarchi@intel.com>, =?UTF-8?Q?Thomas_Hellstr=C3=B6m?=
+	<thomas.hellstrom@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard
+	<mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, David Airlie
+	<airlied@gmail.com>, William Hubbs <w.d.hubbs@gmail.com>, Chris Brannon
+	<chris@the-brannons.com>, Kirk Reiser <kirk@reisers.ca>, Samuel Thibault
+	<samuel.thibault@ens-lyon.org>, Paul Moore <paul@paul-moore.com>, "Stephen
+ Smalley" <stephen.smalley.work@gmail.com>, Ondrej Mosnacek
+	<omosnace@redhat.com>, Catalin Marinas <catalin.marinas@arm.com>, Will
+	Deacon <will@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, James Morse
+	<james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+	<yuzenghui@huawei.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Jiri Slaby" <jirislaby@kernel.org>, Nick Desaulniers
+	<ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, Justin Stitt
+	<justinstitt@google.com>, Simona Vetter <simona.vetter@ffwll.ch>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>,
+	"intel-xe@lists.freedesktop.org" <intel-xe@lists.freedesktop.org>,
+	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+	"speakup@linux-speakup.org" <speakup@linux-speakup.org>,
+	"selinux@vger.kernel.org" <selinux@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "linux-serial@vger.kernel.org"
+	<linux-serial@vger.kernel.org>, "llvm@lists.linux.dev"
+	<llvm@lists.linux.dev>, Finn Behrens <me@kloenk.dev>, "gost.dev@samsung.com"
+	<gost.dev@samsung.com>, "Daniel Gomez (Samsung)" <d+samsung@kruces.com>
+From: Daniel Gomez <da.gomez@samsung.com>
+In-Reply-To: <86cylev7o7.wl-maz@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format="flowed"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
+	CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
+X-Brightmail-Tracker: H4sIAAAAAAAAA01TbUxTVxjOuW1vC1vxiiycIAFhkAXYmIqMEzDOyTDX/XGLGUY3szVwi4TP
+	tCC6AKmATEAmoPJRBaGVTxmwAl1BSmPFQoEKBMMKHVBTQGBFRGTAxuygFyP/nvd5n+d53/ck
+	h8Owf4M7cSJjEyhBLC/aHbdlyjXrTz6Rprzi75d3+aGePyQYWqy6BpCmbpaBHljGGejpyiKO
+	0qWNOFprnsXQZGc1hl6UOqPC+1IclQ1pmWi+5RETyUwjLLTRrsDQcPsdHPVLc9lo6qYKR9Om
+	KhxVLLUy0TOjnoXa7mhZSNk4jCPZ8DILZWZVsdDPtdM4eplnwdCMsoeFbq2bcbSQ95iNDAVF
+	TKQSj7BRzVoRQAPdGjayqFyQXKED6PnADYBKDAaA/lJsBreY81lIkhmAMv70R6OVTeyj3mR9
+	WT0gOzQ6nFT+Xc4k29XNONkmHmeT5bJEMqNrgUVKO+YwUlaXhZNlWWUYack1ssgui4RNVohu
+	Mcgy7TekqrSeTU7mdGNfw7O2h8Op6MgLlODTIz/anu9/RMXr912cmTPgIjDmlA1sOJA4BCfV
+	KyAb2HLsiRoAh7t/Y9LFawB7V6+w6GIZQJ3kKfOt5d8cNU43qgHMKb75TmVSmrbD2gA0DCyB
+	LQuXOAKNjWLGFmYSnnC8IYdF87uhtmTKGvsB4Qonx4rZW3gPEQwVfb9b9QzCEaa9rrXqHQg3
+	+GpQax3AIDp2waapPusAnPCCnVqZ1WxD+EDtpHST52yKAmFRzwk6xxWmt95m0Ce4weL82u1z
+	UmBvyxhG4wfvQfmcLY2/hPLh0W1+D5zvbmHT2Bn23bi27Y2A9xrE2zgedhjErK2xkAiCv/RH
+	0/QX0NCwzqZpO6hf2E1vYwcL5EWMPOAp3vEQ4h0Hi9/tL96xfzlg1gFHKlEYE0EJ/WKpJF8h
+	L0aYGBvhGxYXIwObX6TvTfeKAtTML/mqAcYBagA5DHcHbsHoEt+eG8679BMliPtBkBhNCdVg
+	L4fp7sj1DHel7IkIXgIVRVHxlOBtF+PYOIkw6X/P0tIveR2fWLUb4pf7mPcfL4lZ4B/tvdBX
+	qLlbKgnWzlBhj59/VpLAnTW62PgcG1WFVn77UibS6Zr8e8OI7z9Ub5xM9FIpyYD3q5pXI8+G
+	3tWHSo0O5wb511f+cU1ejovXBdpcHgG3Y4MmuCHOSQkeAQczr6tChqKGhAc0+uj706dOv3ji
+	LOIHJacVHLxX8bndsdTKPAV4WH1a4dg+uBEcJTmXupDyVWay6DuzQ3mLW0i+weLXcWafrtCs
+	73QzJjp4pH5UetXOqcrsfdUL9A4euuKRffKhMmkkeeLXw12hucLMy4H+GWcG+S5rxMh4yIpJ
+	FuV3cXH5VKur0669H5vcmcLzvAPeDIGQ9z9+jZ1mkQQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Ta1BTRxiGu+fknBNoMz0glzW1KulVWwIJt4Uqvc20x1pnan/YInUwowdQ
+	gTi5OK0jHTSUQpQRgqikkAECCJQpEoEE5FITCwRhqA1ELkVALoKFKqitFGoKiZ3h37P7ve/7
+	fbuzy8U9jSSfeyhJwcqSJAkC0p1z42n7bX998kJsYMnPJOq4VYyh+2VnAGqrnMbRVccwjnof
+	3yeRSl9NoidXpjE00nIJQ38WbEDnf9STSHfTykH3ai0cZBi3E2i50YQhW2M+ibr0mRSaONdK
+	osnxMhIVzddx0NhoP4Ea8q0Eaq62kchge0igtIwyAn1fMUmiB1kODE01dxAod3GWRHNZv1Bo
+	SHOBg1q1dgqVP7kAUE97G4UcrRtRvakboLs9OQDlDQ0B9IdpJbh2NptAxWlhKPX3EDRQepl6
+	bytTpasCTFNbN8k0/1XIYRrNV0imQTtMMYUGJZN6fY5g9E0zGGOozCAZXYYOYxyZowRz3VFM
+	MUUpuTijs+5mWguqKGbkdDv2Gdwr3CaTKhXs5nipXLFdEC1CYqEoHAnFweFCUVDYvghxiCAg
+	cttBNuHQMVYWELlfGN9lYY/2b/56amaITAGDfDVw40I6GC6dNpNq4M71pEsBtJTV4a7CBljz
+	qI9w8Tq4bFc/E80DuHhZg7sWDQDeXurnrKp4dCQcrdY63Rz6NTj802nCte8BrXkTTo03vQmO
+	DF6kVnkd/SE03TA69TjtC089qnDqvWg/uPCrFaw2wOmmF+H4bA3h6qbGYfbJTqebpLfAFqvB
+	yW70W9A6ogeuJAT1s9coF2+Cqrofnp3HD17MruC4OBk+/HcKZAFv7ZoBtWsG0a6J0q6JKgSc
+	SuDFKuWJcYlysVAuSZQrk+KEB6SJBrDyguvbFmtNoOLevNAMMC4wA8jFBV48zcB8rCfvoOSb
+	46xMGiNTJrByMwhZuaVsnO99QLryBZIUMaLQwBBRcGh4YEh4aJDAl0f29sR60nESBXuEZY+y
+	sv99GNeNn4Ltjce6f7Otr/1qqEAq1u4BldEdph0lZOwXhuSxSPuJXRpjSYOqUxpcn+5j1+Z8
+	nOufPve37fVvd9DmVj61K/eF59YnqV8ZOxbZeesjxkf3NG1qd579Zl/L2LlhVR1yV76/MSe/
+	r/TUdO/oJftjSbmC3B4xMRzA8KI+5apHwvLufODn/nJTm0XGvup2bVT8/CQ3Jn9f8uEH/Uci
+	cN+oN2qM3prjhp3kO5+8G9V5xsw97PhHlf6l5eyy154ZXHWVr/DQfNf9UnLH0n57UaZSd/LO
+	2wM7PWhvS7PRNrElp8V9wL+jPCuPN2P7PPG8JsanYCG0882uQTwnOpU4YQwS1t01ewg48niJ
+	aCsuk0v+A+CoJCNKBAAA
+X-CMS-MailID: 20240924085147eucas1p166c893c894c86bb9c9f1a4a588f00c0f
+X-Msg-Generator: CA
+X-RootMTR: 20240908090349eucas1p2a9561859c83a19a8bad4ea2eef184e35
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20240908090349eucas1p2a9561859c83a19a8bad4ea2eef184e35
+References: <20240906-macos-build-support-v2-0-06beff418848@samsung.com>
+	<20240906-macos-build-support-v2-8-06beff418848@samsung.com>
+	<CAK7LNASpWSXbjF_7n0MhosNism=BpvHOnKsa344RPM_wmC9dGA@mail.gmail.com>
+	<CABj0suBQCc8=0tLng=OWW=K1hjFuLFZWhbjsqHtz2FzZt4i0sw@mail.gmail.com>
+	<CGME20240908090349eucas1p2a9561859c83a19a8bad4ea2eef184e35@eucas1p2.samsung.com>
+	<86cylev7o7.wl-maz@kernel.org>
 
-Dave Hansen <dave.hansen@intel.com> writes:
+On 9/8/2024 11:03 AM, Marc Zyngier wrote:
+> On Sat, 07 Sep 2024 10:32:20 +0100,
+> "Daniel Gomez (Samsung)" <d+samsung@kruces.com> wrote:
+>>
+>> On Sat, Sep 7, 2024 at 10:33 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
+>>>
+>>> On Fri, Sep 6, 2024 at 8:01 PM Daniel Gomez via B4 Relay
+>>> <devnull+da.gomez.samsung.com@kernel.org> wrote:
+>>>>
+>>>> From: Daniel Gomez <da.gomez@samsung.com>
+>>>>
+>>>> Add documentation under kbuild/llvm to inform about the experimental
+>>>> support for building the Linux kernel in macOS hosts environments.
+>>>>
+>>>> Signed-off-by: Daniel Gomez <da.gomez@samsung.com>
+>>>
+>>>
+>>> Instead, you can add this instruction to:
+>>>
+>>> https://protect2.fireeye.com/v1/url?k=f33af8a2-92b1ed94-f33b73ed-74fe485cbff1-7d382b34bfd617fc&q=1&e=c7a3e869-d48e-4168-88a9-03cd717797f0&u=https%3A%2F%2Fgithub.com%2Fbee-headers%2Fhomebrew-bee-headers%2Fblob%2Fmain%2FREADME.md
+>>
+>> Sure, that can be done as well. But the effort here is to have this
+>> integrated. So, I think documentation should be in-tree.
+> 
+> I think this ship sailed the moment you ended-up with an external
+> dependency.
 
-> On 9/11/24 08:01, Kevin Brodsky wrote:
->> On 22/08/2024 17:10, Joey Gouly wrote:
->>> @@ -371,6 +382,9 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
->>>  		if (system_supports_tpidr2())
->>>  			p->thread.tpidr2_el0 = read_sysreg_s(SYS_TPIDR2_EL0);
->>>  
->>> +		if (system_supports_poe())
->>> +			p->thread.por_el0 = read_sysreg_s(SYS_POR_EL0);
->> Here we are only reloading POR_EL0's value if the target is a user
->> thread. However, as this series stands, POR_EL0 is also relevant to
->> kthreads, because any uaccess or GUP done from a kthread will also be
->> checked against POR_EL0. This is especially important in cases like the
->> io_uring kthread, which accesses the memory of the user process that
->> spawned it. To prevent such a kthread from inheriting a stale value of
->> POR_EL0, it seems that we should reload POR_EL0's value in all cases
->> (user and kernel thread).
->
-> The problem with this is trying to figure out which POR_EL0 to use.  The
-> kthread could have been spawned ages ago and might not have a POR_EL0
-> which is very different from the current value of any of the threads in
-> the process right now.
->
-> There's also no great way for a kthread to reach out and grab an updated
-> value.  It's all completely inherently racy.
->
->> Other approaches could also be considered (e.g. resetting POR_EL0 to
->> unrestricted when creating a kthread), see my reply on v4 [1].
->
-> I kinda think this is the only way to go.  It's the only sensible,
-> predictable way.  I _think_ it's what x86 will end up doing with PKRU,
-> but there's been enough churn there that I'd need to go double check
-> what happens in practice.
->
+The external dependency is not different in Linux hosts. We depend on 
+byteswap.h, elf.h and endian.h headers. However, these are provided by 
+glibc and musl, and macOS (at least in arm64/Homebrew) does not provide 
+any of these.
 
+To fix the dependency with these missing headers, it was suggested in v1 
+[1][2] to create a "development kit" for this hosts. And that is what 
+Bee Headers [3][4] aims to provide.
 
-that is also what powerpc does. 
+[1]https://lore.kernel.org/all/20240807-mottled-stoic-degu-d1e4cb@lindesnes/
+[2]https://lore.kernel.org/all/ZrSoOM9z4VnqhOf2@fjasle.eu/
 
-/* usage of kthread_use_mm() should inherit the
- * AMR value of the operating address space. But, the AMR value is
- * thread-specific and we inherit the address space and not thread
- * access restrictions. Because of this ignore AMR value when accessing
- * userspace via kernel thread.
- */
-static __always_inline u64 current_thread_amr(void)
-{
-	if (current->thread.regs)
-		return current->thread.regs->amr;
-	return default_amr;
-}
+[3] https://github.com/bee-headers/headers
+[4] https://github.com/bee-headers/homebrew-bee-headers
 
+I don't see any other alternative to provide the missing headers other 
+than the suggested. Please let me know if you think other paths can be 
+explored and tested.
 
--aneesh
+> 
+> Having looked at this series (and in particular patch #4 which falls
+> under my remit), I can't help but think that the whole thing should
+> simply live as a wrapper around the pristine build system instead of
+> hacking things inside of it. You already pull external dependencies
+> (the include files). Just add a script that sets things up
+> (environment variables that already exist) and calls 'make' in the
+> kernel tree.
+
+Agree. This aligns very well with other feedback.
+
+I've added a script to the Bee Headers [5] to help users init their 
+shell/Makefile environment.
+
+[5] 
+https://github.com/bee-headers/homebrew-bee-headers/blob/main/bee-headers.rb#L28
+
+> 
+> I also dislike that this is forcing "native" developers to cater for
+> an operating system they are unlikely to have access to. If I break
+> this hack tomorrow by adding a new dependency that MacOS doesn't
+> provide, how do I fix it? Should I drop my changes on the floor?
+> 
+> As an alternative, and since you already have to create a special
+> file-system to contain your kernel tree, you may as well run Linux in
+> a VM, which I am told works pretty well (QEMU supports HVF, and there
+> are plenty of corporate-friendly alternatives). This would solve your
+> problem once and for all.
+
+This is a use case I'm trying to avoid with this series. QEMU HVF works 
+very well indeed but extracting the built objects/vmlinux/*.ko etc is 
+tedious and slow. Building natively allows users to boot a VM with QEMU 
+and -kernel argument directly. This is way faster than the suggested 
+alternative. In addition, lldb can be used to debug the kernel from the 
+host.
+
+> 
+> Please don't take the above the wrong way. I'm sympathetic to what you
+> are trying to do. But this is IMO going in the wrong direction.
+
+First patch has been merged already and after some fixes in the build 
+system from Masahiro, this series only requires a small change in 
+xe_gen_wa_oob to make this work if users of this provide the missing 
+headers and set up the build environment properly.
+
+I will send a v3 later today with the remaining patch.
+
+Thanks Marc for sharing your views!
+
+> 
+> Thanks,
+> 
+> 	M.
+> 
+
