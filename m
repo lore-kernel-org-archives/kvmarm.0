@@ -1,166 +1,100 @@
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82A271D5ABD
-	for <kvmarm@lists.linux.dev>; Wed, 25 Sep 2024 15:41:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 507E317AE01
+	for <kvmarm@lists.linux.dev>; Thu, 26 Sep 2024 03:23:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727278881; cv=none; b=PF0dh4LG0MtrhTDZtYhSrtcDYDB54aoY3+DB53iwKhWFsHwoQt1VsGzqFPCQ4lQySs60gkdU72AvycYqF78zGOAH17pdCuhrYczATnZXJyBkZ2NNRoKRvJ0eLmg4dTXSjtoIoB/XkIrD6qg8+Hp0eTd5yKMGW89aQDLOBTyWnwU=
+	t=1727320995; cv=none; b=YxxnRth2F4GwEtQovi76XMBkU3mUjxLDUkIUNrGFJf5d1o8WgjGEydlgHvFQoJoJzvkIF5ZDumNlF1vRtykjI3+ilyDFJRRDw0cItwJdh+S3yXf/P+1K+SD82GjCuEKvhWTXCb0btDrlpt17kV8e5IuowlTsS1BoGRteJnZCPAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727278881; c=relaxed/simple;
-	bh=XdIiP8QBavfMPgjp8RGBjGQ1EnwyjLA9PTXezUXK+sM=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HqGFPv0jkgbqtf1hc1bru3CoPqLf5J5YEGHo13HP/5v1aO+J3yGKNbgoebDIO1KT9ntMI3d1GHJTYNeSgAx4EQeZwmzXSX7tUUCJ2DFWCrV3KUn8mnsH9NKjHIan+INGQRZ/4p/OIWw4+B1+W2TiqUJN4GnB8R4aGeJRoxmeYFk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b=Yf1hxXlz; arc=none smtp.client-ip=99.78.197.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
+	s=arc-20240116; t=1727320995; c=relaxed/simple;
+	bh=aS+E/GhEnI/jNLkdS8HmnQFwD2dvp31zgXghAu3a8hc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HkaMtYW0qIcpkXDYTJRcTjtEE6qVcPmt9WXu4oepO5ubY40AZwul/Pg95/HeBh79gDsOsDTZHLhrVUvU1VswurLri3ABvrvg6IOu0JG1hqJn+EhEHkp1a5t3exfVBRzUWozj8OMIxQk/T0+6UW+Hj0nsxLf/8a6CjwwCgK77m2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WVnuaLHS; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b="Yf1hxXlz"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1727278879; x=1758814879;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=w3ztpLhKheiGL86VzRoyFegLW0y8yDiy4GWDc/IATVw=;
-  b=Yf1hxXlzHW6mH7WEQEWm8CMe2+fu3DsrWSXgKTFqJtwmZ55Fo3Rmx6YS
-   TAFEI8p9c3/QZP/A7WBR0HsgDDEZnr+aN3dfSwFhkTchutp5n6ct9Pd2R
-   HctS9CxUNpSq+6EqFQM9fZkj95jAEomivn6+p/evEro/nTklfVmRHh33o
-   Y=;
-X-IronPort-AV: E=Sophos;i="6.10,257,1719878400"; 
-   d="scan'208";a="335009767"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2024 15:41:01 +0000
-Received: from EX19MTAEUB002.ant.amazon.com [10.0.17.79:26531]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.17.12:2525] with esmtp (Farcaster)
- id e0ffb752-46f6-4514-b306-44d8338eba99; Wed, 25 Sep 2024 15:40:59 +0000 (UTC)
-X-Farcaster-Flow-ID: e0ffb752-46f6-4514-b306-44d8338eba99
-Received: from EX19D007EUA001.ant.amazon.com (10.252.50.133) by
- EX19MTAEUB002.ant.amazon.com (10.252.51.59) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Wed, 25 Sep 2024 15:40:59 +0000
-Received: from EX19MTAUWA002.ant.amazon.com (10.250.64.202) by
- EX19D007EUA001.ant.amazon.com (10.252.50.133) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Wed, 25 Sep 2024 15:40:58 +0000
-Received: from email-imr-corp-prod-iad-1box-1a-6851662a.us-east-1.amazon.com
- (10.25.36.210) by mail-relay.amazon.com (10.250.64.203) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
- 15.2.1258.34 via Frontend Transport; Wed, 25 Sep 2024 15:40:58 +0000
-Received: from dev-dsk-faresx-1b-27755bf1.eu-west-1.amazon.com (dev-dsk-faresx-1b-27755bf1.eu-west-1.amazon.com [10.253.79.181])
-	by email-imr-corp-prod-iad-1box-1a-6851662a.us-east-1.amazon.com (Postfix) with ESMTPS id 578CC401C3;
-	Wed, 25 Sep 2024 15:40:55 +0000 (UTC)
-From: Fares Mehanna <faresx@amazon.de>
-To: <rppt@kernel.org>
-CC: <akpm@linux-foundation.org>, <ardb@kernel.org>, <arnd@arndb.de>,
-	<bhelgaas@google.com>, <broonie@kernel.org>, <catalin.marinas@arm.com>,
-	<david@redhat.com>, <faresx@amazon.de>, <james.morse@arm.com>,
-	<javierm@redhat.com>, <jean-philippe@linaro.org>, <joey.gouly@arm.com>,
-	<kristina.martsenko@arm.com>, <kvmarm@lists.linux.dev>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<linux-mm@kvack.org>, <mark.rutland@arm.com>, <maz@kernel.org>,
-	<nh-open-source@amazon.com>, <oliver.upton@linux.dev>, <ptosi@google.com>,
-	<rdunlap@infradead.org>, <rkagan@amazon.de>, <shikemeng@huaweicloud.com>,
-	<suzuki.poulose@arm.com>, <tabba@google.com>, <will@kernel.org>,
-	<yuzenghui@huawei.com>
-Subject: Re: [RFC PATCH 0/7] support for mm-local memory allocations and use it
-Date: Wed, 25 Sep 2024 15:33:47 +0000
-Message-ID: <20240925153347.94589-1-faresx@amazon.de>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <Zu1r5-JnL3sduoqy@kernel.org>
-References: <Zu1r5-JnL3sduoqy@kernel.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WVnuaLHS"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1727320993;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=G9f4byrjiwH6wxJoG0csJWGAC6yAuVUSWGNgTr0uQkg=;
+	b=WVnuaLHSiuijaMN3BsNOYvJOnSsd2aavAIQdji7VDa/gOLYqlhk+cQhL09WWYopHZYkliI
+	kZIzdYljyBYG+oFHElywnrbIF4KX8FkD2IRsvLfbi8/4ythn+0dO5TNgQviYa16aiwsHuL
+	fhjp++mDEUfSTIZoR6XoE09mr6TyGTY=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-546-zbadzE0GN4uVCShacfgS2g-1; Wed,
+ 25 Sep 2024 23:23:08 -0400
+X-MC-Unique: zbadzE0GN4uVCShacfgS2g-1
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (unknown [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A8EBF1933EB5;
+	Thu, 26 Sep 2024 03:23:05 +0000 (UTC)
+Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (unknown [10.8.1.196])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id DA91219560A3;
+	Thu, 26 Sep 2024 03:23:00 +0000 (UTC)
+From: Shaoqin Huang <shahuang@redhat.com>
+To: Oliver Upton <oliver.upton@linux.dev>,
+	Marc Zyngier <maz@kernel.org>,
+	kvmarm@lists.linux.dev
+Cc: Eric Auger <eauger@redhat.com>,
+	Sebastian Ott <sebott@redhat.com>,
+	Cornelia Huck <cohuck@redhat.com>,
+	Shaoqin Huang <shahuang@redhat.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	James Morse <james.morse@arm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Kristina Martsenko <kristina.martsenko@arm.com>,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Mark Brown <broonie@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [RFC PATCH v1 0/2] Allow the RAS feature bit in ID_AA64PFR0_EL1 writable from userspace
+Date: Wed, 25 Sep 2024 23:22:38 -0400
+Message-Id: <20240926032244.3666579-1-shahuang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Hi,
+Currently the RAS feature bit is not writable in ID_AA64PFR0EL1, this makes
+migration fail when migration from the machine which RAS is 1 to another machine
+which RAS is 2.
 
-Thanks for taking a look and apologies for my delayed response.
+Allow RAS writable from userspace would make the migration possible between two
+machines which RAS is different.
 
-> Having a VMA in user mappings for kernel memory seems weird to say the
-> least.
+Shaoqin Huang (2):
+  KVM: arm64: Use kvm_has_feat() to check if FEAT_RAS is advertised to
+    the guest
+  KVM: arm64: Allow the RAS feature bit in ID_AA64PFR0_EL1 writable from
+    userspace
 
-I see your point and agree with you. Let me explain the motivation, pros and
-cons of the approach after answering your questions.
+ arch/arm64/kvm/guest.c                            | 4 ++--
+ arch/arm64/kvm/handle_exit.c                      | 2 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h           | 2 +-
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h        | 7 +++++--
+ arch/arm64/kvm/sys_regs.c                         | 3 +--
+ tools/testing/selftests/kvm/aarch64/set_id_regs.c | 1 +
+ 6 files changed, 11 insertions(+), 8 deletions(-)
 
-> Core MM does not expect to have VMAs for kernel memory. What will happen if
-> userspace ftruncates that VMA? Or registers it with userfaultfd?
-
-In the patch, I make sure the pages are faulted in, locked and sealed to make
-sure the VMA is practically off-limits from the owner process. Only after that
-I change the permissions to be used by the kernel.
-
-> This approach seems much more reasonable and it's not that it was entirely
-> arch-specific. There is some plumbing at arch level, but the allocator is
-> anyway arch-independent. 
-
-So I wanted to explore a simple solution to implement mm-local kernel secret
-memory without much arch dependent code. I also wanted to reuse as much of
-memfd_secret() as possible to benefit from what is done already and possible
-future improvements to it.
-
-Keeping the secret pages in user virtual addresses is easier as the page table
-entries are not global by default so no special handling for spawn(). keeping
-them tracked in VMA shouldn't require special handling for fork().
-
-The challenge was to keep the virtual addresses / VMA away from user control as
-long as the kernel is using it, and signal the mm core that this VMA is special
-so it is not merged with other VMAs.
-
-I believe locking the pages, sealing the VMA, prefaulting the pages should make
-it practicality away of user space influence.
-
-But the current approach have those downsides: (That I can think of)
-1. Kernel secret user virtual addresses can still be used in functions accepting
-   user virtual addresses like copy_from_user / copy_to_user.
-2. Even if we are sure the VMA is off-limits to userspace, adding VMA with
-   kernel addresses will increase attack surface between userspace and the
-   kernel.
-3. Since kernel secret memory is mapped in user virtual addresses, it is very
-   easy to guess the exact virtual address (using binary search), and since
-   this functionality is designed to keep user data, it is fair to assume the
-   userspace will always be able to influence what is written there.
-   So it kind of breaks KASLR for those specific pages.
-4. It locks user virtual memory away, this may break some software if they
-   assumed they can mmap() into specific places.
-
-One way to address most of those concerns while keeping the solution almost arch
-agnostic is is to allocate reasonable chunk of user virtual memory to be only
-used for kernel secret memory, and not track them in VMAs.
-This is similar to the old approach but instead of creating non-global kernel
-PGD per arch it will use chunk of user virtual memory. This chunk can be defined
-per arch, and this solution won't use memfd_secret().
-We can then easily enlighten the kernel about this range so the kernel can test
-for this range in functions like access_ok(). This approach however will make
-downside #4 even worse, as it will reserve bigger chunk of user virtual memory
-if this feature is enabled.
-
-I'm also very okay switching back to the old approach with the expense of:
-1. Supporting fewer architectures that can afford to give away single PGD.
-2. More complicated arch specific code.
-
-Also @graf mentioned how aarch64 uses TTBR0/TTBR1 for user and kernel page
-tables, I haven't looked at this yet but it probably means that kernel page
-table will be tracked per process and TTBR1 will be switched during context
-switching.
-
-What do you think? I would appreciate your opinion before working on the next
-RFC patch set.
-
-Thanks!
-Fares.
-
-
-
-Amazon Web Services Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
-Sitz: Berlin
-Ust-ID: DE 365 538 597
+-- 
+2.40.1
 
