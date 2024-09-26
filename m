@@ -1,46 +1,46 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD0921741C6
-	for <kvmarm@lists.linux.dev>; Thu, 26 Sep 2024 03:23:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 788BC187554
+	for <kvmarm@lists.linux.dev>; Thu, 26 Sep 2024 03:23:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727320999; cv=none; b=hp/gkStj8KEG7J3Xp/mSBPQgXuazG0l0FE86Gn8AdgbhM1eNwC1/6nwpUvCvQzyqbIY5rXot4xnzXBsFr+8JTqnVhCusQGIg+7pqHVfWpbO3zFXMaduL/4W//MJzp6os93aaqGTFjvnXJ6TO//JMIH43dUC5UfurN66T6eTe5Zs=
+	t=1727321002; cv=none; b=NlflpMFRr9SJ09Ej4RG+QBB6KxlMvRWPcpwIwVTXqoLqj6C36LQ5nI/IyTOp1BPduxMh+f8iAruhAE7omfujURoO26e4ayiOZki5P2a7N8G4RN/5ZHUzsM7DZOEWJuCMrLQckT+xhs5XPCi+scUVkwEXposwu+OexMlAe8oIuNE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727320999; c=relaxed/simple;
-	bh=hoBmpJX/k+/y8Mvi9dseWa6KwUJolOVVIYw5Z72BIaY=;
+	s=arc-20240116; t=1727321002; c=relaxed/simple;
+	bh=624SmO8XUNU38mpOIvZAumZSxp/fQT8P4sS1GJiW+pw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=IiAvFaT2DuXWSm/6Y6JWzmOjxl0D5G4h6DUd1siZtgbSSafQkqTFTYo5a8m94qZ+FvcobocKf0wk81H5PIjBxZpRq9XKdDBoF2Ue8TwKRma9ZqRoe20sBWNXPQxGtxBdynctNM7vdLwpe7Kn+sA+4/JjcSv65KtwSQpwUS22pAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ABrLzieY; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=NFOvKF9Zz6ydwpJq+ufiN+CT02Htl+FogXGAyz6l0oQbP5ZPUo1zUVTwLUOb+D17LenH+ODd4gy/rMiHls6iVRNrXFG+Eq8kZNKehKID/6vEPGJJU5zBTo1uHKlIYqDaimCLgik4eLt9t6EKRl9JuLFajgQ3tCEpiMKRYgoD28Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JdEnEsW1; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ABrLzieY"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JdEnEsW1"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1727320996;
+	s=mimecast20190719; t=1727320999;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=J7+hyoxMPs/6YsZ4hAk6EhlN0QJa+uQdbWMbmUd1Kbw=;
-	b=ABrLzieY5to9BV0x9T3VEJ1Q/cTf3J1ED9MfWGNhQzB/AukXzdC8OONmM8cBpuB8rE2ebW
-	bS8zB/4zfxjckox5ToanEqbipLZY4T5Bjl4OhrnYfD+vh9KzLEz9k+em554GFnKVOZAWzK
-	0zql47F+vdaRWu+uTjaBuSiWE27kFfg=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+	bh=utrx0K/+VugFVIukkmcrJK6P1DSpckYEB9F1vob9W3U=;
+	b=JdEnEsW1plWAC6HZP0NR+Qfwt/Lj5m3ryUIsyIrpFw10gZWPWm7ocJnUsV5FTIx95crh7B
+	LoHm8riShPrZyXs67cR+MAXdpn+KHbTWUjaBwfX28+KR34y/jnVDgN06KzyjKNJD8ruN/s
+	tWjRT97BINKhb+P9hrvxf4U9NJab+ZM=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-27-xppY4uQsN_OCBX0c_obmhw-1; Wed,
- 25 Sep 2024 23:23:13 -0400
-X-MC-Unique: xppY4uQsN_OCBX0c_obmhw-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-584-7yAz8LruPE6dXZbcRoFGBw-1; Wed,
+ 25 Sep 2024 23:23:16 -0400
+X-MC-Unique: 7yAz8LruPE6dXZbcRoFGBw-1
 Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (unknown [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 717E819772DE;
-	Thu, 26 Sep 2024 03:23:11 +0000 (UTC)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B8B8E19373E5;
+	Thu, 26 Sep 2024 03:23:14 +0000 (UTC)
 Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (unknown [10.8.1.196])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1CA1D19560A3;
-	Thu, 26 Sep 2024 03:23:09 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1217A19560A3;
+	Thu, 26 Sep 2024 03:23:11 +0000 (UTC)
 From: Shaoqin Huang <shahuang@redhat.com>
 To: Oliver Upton <oliver.upton@linux.dev>,
 	Marc Zyngier <maz@kernel.org>,
@@ -54,15 +54,15 @@ Cc: Eric Auger <eauger@redhat.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
-	Mark Brown <broonie@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Kristina Martsenko <kristina.martsenko@arm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
 	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [RFC PATCH v1 1/2] KVM: arm64: Use kvm_has_feat() to check if FEAT_RAS is advertised to the guest
-Date: Wed, 25 Sep 2024 23:22:39 -0400
-Message-Id: <20240926032244.3666579-2-shahuang@redhat.com>
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [RFC PATCH v1 2/2] KVM: arm64: Allow the RAS feature bit in ID_AA64PFR0_EL1 writable from userspace
+Date: Wed, 25 Sep 2024 23:22:40 -0400
+Message-Id: <20240926032244.3666579-3-shahuang@redhat.com>
 In-Reply-To: <20240926032244.3666579-1-shahuang@redhat.com>
 References: <20240926032244.3666579-1-shahuang@redhat.com>
 Precedence: bulk
@@ -74,118 +74,43 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Use kvm_has_feat() to check if FEAT_RAS is advertised to the guest, this
-is useful when FEAT_RAS is writable.
+Currently FEAT_RAS is not writable, this makes migration fail between
+systems where this feature differ. Allow the FEAT_RAS writable in
+ID_AA64PFR0_EL1 to let the migration possible when the RAS is differ
+between two machines.
+
+Also update the kselftest to test the RAS field.
 
 Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
 ---
- arch/arm64/kvm/guest.c                     | 4 ++--
- arch/arm64/kvm/handle_exit.c               | 2 +-
- arch/arm64/kvm/hyp/include/hyp/switch.h    | 2 +-
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 7 +++++--
- arch/arm64/kvm/sys_regs.c                  | 2 +-
- 5 files changed, 10 insertions(+), 7 deletions(-)
+ arch/arm64/kvm/sys_regs.c                         | 1 -
+ tools/testing/selftests/kvm/aarch64/set_id_regs.c | 1 +
+ 2 files changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 11098eb7eb44..938e3cd05d1e 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -819,7 +819,7 @@ int __kvm_arm_vcpu_get_events(struct kvm_vcpu *vcpu,
- 			      struct kvm_vcpu_events *events)
- {
- 	events->exception.serror_pending = !!(vcpu->arch.hcr_el2 & HCR_VSE);
--	events->exception.serror_has_esr = cpus_have_final_cap(ARM64_HAS_RAS_EXTN);
-+	events->exception.serror_has_esr = kvm_has_feat(vcpu->kvm, ID_AA64PFR0_EL1, RAS, IMP);
- 
- 	if (events->exception.serror_pending && events->exception.serror_has_esr)
- 		events->exception.serror_esr = vcpu_get_vsesr(vcpu);
-@@ -841,7 +841,7 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
- 	bool ext_dabt_pending = events->exception.ext_dabt_pending;
- 
- 	if (serror_pending && has_esr) {
--		if (!cpus_have_final_cap(ARM64_HAS_RAS_EXTN))
-+		if (!kvm_has_feat(vcpu->kvm, ID_AA64PFR0_EL1, RAS, IMP))
- 			return -EINVAL;
- 
- 		if (!((events->exception.serror_esr) & ~ESR_ELx_ISS_MASK))
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index d7c2990e7c9e..99f256629ead 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -405,7 +405,7 @@ int handle_exit(struct kvm_vcpu *vcpu, int exception_index)
- void handle_exit_early(struct kvm_vcpu *vcpu, int exception_index)
- {
- 	if (ARM_SERROR_PENDING(exception_index)) {
--		if (this_cpu_has_cap(ARM64_HAS_RAS_EXTN)) {
-+		if (kvm_has_feat(vcpu->kvm, ID_AA64PFR0_EL1, RAS, IMP)) {
- 			u64 disr = kvm_vcpu_get_disr(vcpu);
- 
- 			kvm_handle_guest_serror(vcpu, disr_to_esr(disr));
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 37ff87d782b6..bf176a3cc594 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -272,7 +272,7 @@ static inline void ___activate_traps(struct kvm_vcpu *vcpu, u64 hcr)
- 
- 	write_sysreg(hcr, hcr_el2);
- 
--	if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN) && (hcr & HCR_VSE))
-+	if (kvm_has_feat(vcpu->kvm, ID_AA64PFR0_EL1, RAS, IMP) && (hcr & HCR_VSE))
- 		write_sysreg_s(vcpu->arch.vsesr_el2, SYS_VSESR_EL2);
- }
- 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-index 4c0fdabaf8ae..98526556d4e5 100644
---- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-@@ -105,6 +105,8 @@ static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
- 
- static inline void __sysreg_save_el2_return_state(struct kvm_cpu_context *ctxt)
- {
-+	struct kvm_vcpu *vcpu = ctxt_to_vcpu(ctxt);
-+
- 	ctxt->regs.pc			= read_sysreg_el2(SYS_ELR);
- 	/*
- 	 * Guest PSTATE gets saved at guest fixup time in all
-@@ -113,7 +115,7 @@ static inline void __sysreg_save_el2_return_state(struct kvm_cpu_context *ctxt)
- 	if (!has_vhe() && ctxt->__hyp_running_vcpu)
- 		ctxt->regs.pstate	= read_sysreg_el2(SYS_SPSR);
- 
--	if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN))
-+	if (kvm_has_feat(vcpu->kvm, ID_AA64PFR0_EL1, RAS, IMP))
- 		ctxt_sys_reg(ctxt, DISR_EL1) = read_sysreg_s(SYS_VDISR_EL2);
- }
- 
-@@ -220,6 +222,7 @@ static inline void __sysreg_restore_el2_return_state(struct kvm_cpu_context *ctx
- {
- 	u64 pstate = to_hw_pstate(ctxt);
- 	u64 mode = pstate & PSR_AA32_MODE_MASK;
-+	struct kvm_vcpu *vcpu = ctxt_to_vcpu(ctxt);
- 
- 	/*
- 	 * Safety check to ensure we're setting the CPU up to enter the guest
-@@ -238,7 +241,7 @@ static inline void __sysreg_restore_el2_return_state(struct kvm_cpu_context *ctx
- 	write_sysreg_el2(ctxt->regs.pc,			SYS_ELR);
- 	write_sysreg_el2(pstate,			SYS_SPSR);
- 
--	if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN))
-+	if (kvm_has_feat(vcpu->kvm, ID_AA64PFR0_EL1, RAS, IMP))
- 		write_sysreg_s(ctxt_sys_reg(ctxt, DISR_EL1), SYS_VDISR_EL2);
- }
- 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 31e49da867ff..b09f8ba3525b 100644
+index b09f8ba3525b..51ff66a11793 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -4513,7 +4513,7 @@ static void vcpu_set_hcr(struct kvm_vcpu *vcpu)
- 
- 	if (has_vhe() || has_hvhe())
- 		vcpu->arch.hcr_el2 |= HCR_E2H;
--	if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN)) {
-+	if (kvm_has_feat(kvm, ID_AA64PFR0_EL1, RAS, IMP)) {
- 		/* route synchronous external abort exceptions to EL2 */
- 		vcpu->arch.hcr_el2 |= HCR_TEA;
- 		/* trap error record accesses */
+@@ -2364,7 +2364,6 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	  .val = ~(ID_AA64PFR0_EL1_AMU |
+ 		   ID_AA64PFR0_EL1_MPAM |
+ 		   ID_AA64PFR0_EL1_SVE |
+-		   ID_AA64PFR0_EL1_RAS |
+ 		   ID_AA64PFR0_EL1_GIC |
+ 		   ID_AA64PFR0_EL1_AdvSIMD |
+ 		   ID_AA64PFR0_EL1_FP), },
+diff --git a/tools/testing/selftests/kvm/aarch64/set_id_regs.c b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
+index d20981663831..d2dd78ce0e02 100644
+--- a/tools/testing/selftests/kvm/aarch64/set_id_regs.c
++++ b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
+@@ -126,6 +126,7 @@ static const struct reg_ftr_bits ftr_id_aa64pfr0_el1[] = {
+ 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, CSV2, 0),
+ 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, DIT, 0),
+ 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, SEL2, 0),
++	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, RAS, 0),
+ 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, EL3, 0),
+ 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, EL2, 0),
+ 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, EL1, 0),
 -- 
 2.40.1
 
