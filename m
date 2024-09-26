@@ -1,49 +1,62 @@
 Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D118154BEC;
-	Thu, 26 Sep 2024 10:00:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62B5C1D5ABA;
+	Thu, 26 Sep 2024 16:31:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727344844; cv=none; b=E+o+EbT+nxRbSTYo2n2Lzd1R2gK9kxPWuu0jACbhpDWhUNwZUqQOSzv7CXHERogQm4D+5wXEUfcxh2noGW5P9AjRDVXWye2phZ66UcTaWwvH6owKiEHxDlmqcoZTaFDEE7Q+W4j7LeSHEpJfu512Kl2i/cP2LI1VEAKuhELrQtE=
+	t=1727368273; cv=none; b=WfBc9DJJhqFP3falB3vcNdi7zU5FvCdmI3RXGJTcaYiSxCVI51hkbvSvBTGA08MOwD3P+kjVqsgZSP/8U6I1hBEFYEss/u9anDgO7v0y12YsLR5GWUPhGBSmjyoH32wyxy/jo3DORdwPf+rRDniPEXS6SfSE/S5RALORxTDl308=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727344844; c=relaxed/simple;
-	bh=3o6FHL+Hd+ksolKn81lihV/MwUPBOP0E6nfCnoM9lsc=;
+	s=arc-20240116; t=1727368273; c=relaxed/simple;
+	bh=R2SAgAU3SD0+3EUdvJ+P7gLf/qhRTqPh2ZMR51GQ0sY=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=PBfbsnyxjEOS6ei3eX2ysa+BSzcu70Bs7A+i+jUy/60dvlupSUab8aRmKcseSHocKYskGJGbxk1BDgHxRkdrqJNI3mrUmaFTJh+NnHmbWv0IxHWyqOaoGYOCG/TDw4Y6ECGB24YEOihXh8hcV3rSJTS5pp1hhJraZAqB9bQlxa8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=PndBQQTI; arc=none smtp.client-ip=90.155.50.34
+	 Content-Type:MIME-Version; b=k7N9LoGjC4jaFlhvV0G+UCJq1P9300smSR2o0U3NEbgCOh2jRdVJn2aF0Q6r//46xgNJOEUGu27IVuCEFDeB+MMsoQSaCq5HrgwLMrraJr7UVJ+Hi92RuG8JH0br/jLZuSgYlYx85eTxf9p/bEIFkt5gKPZeEaieL5OPDK+id7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=qKTOBJFM; arc=none smtp.client-ip=90.155.50.34
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="PndBQQTI"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="qKTOBJFM"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
 	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=3o6FHL+Hd+ksolKn81lihV/MwUPBOP0E6nfCnoM9lsc=; b=PndBQQTIraZ2Cx8izLVC9CzuXR
-	hMwLWBMeGUA5XXf56pxe04lAuVfVaq/Er4Rxp8xnqOyxEDvyYNhh4puc4qzlXocnlSw6Bctjgn1/P
-	ca5Dd3CEhOnzXEWfdsn2xJB1i/Way40u69CGScjJ3Nw869rJXbXzCrNZ89hLAQrwhkmiuFv4gkgR9
-	uIoP1Na1EIqgnvkrWjXyU2HuOyNPoYagOZUNEAqx8MeLg3DIBADvyF2QGxZQzE9hvagOqE9OxF9wL
-	falegJSHIWncPAKk0NDc8lFPHCfIsXHAjqoYFOxyer4kqkPaLUaqXbze7r2pg2E6RIzYyaM1tqeV4
-	SCrO4HXQ==;
+	bh=R2SAgAU3SD0+3EUdvJ+P7gLf/qhRTqPh2ZMR51GQ0sY=; b=qKTOBJFMhXe331Y93nTJnrRUeQ
+	HmzB+OQgleTko8h7zKFLNGNxgIVmQH8SBhD7MgcZvK/XWeMhOjXZBve/yi4+12x0/pN4O3Zs1JrsB
+	UFg3LZhh2EHSjHywd+llCYXzySa+xSU692tuVJpnlIwnFHqgZ84fOlS8UzU4UXUEM9OsgJqwweNh9
+	MD7pagOyG6y6ewaS9+2mA/oaN1vvubFCyj76ZTn7MSXGtpbItY/SkYMDttrqmIivPe4J5jmn+dVe0
+	ApKWNIX/RBdVzpLvtsTsSl8eSoyn9pREQCQXfzEUjXmKw9JEsYSGmYwanAAsCJ2Y6LoH6HEF1heDD
+	J8wF4QfA==;
 Received: from [2001:8b0:10b:5:16cf:fc6a:25d9:f696] (helo=u3832b3a9db3152.ant.amazon.com)
 	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1stlId-00000006LbT-3IMz;
-	Thu, 26 Sep 2024 10:00:40 +0000
-Message-ID: <c309adcc88d7fb55d1ca7fdb9c32a6cd9c827c74.camel@infradead.org>
-Subject: Re: [PATCH 0/8] *** RFC: ARM KVM dirty tracking device ***
+	id 1strOH-000000075TU-0ZlN;
+	Thu, 26 Sep 2024 16:30:54 +0000
+Message-ID: <d23d2cdcab3a2fca5cb36023b42ad9d4a0c7ff22.camel@infradead.org>
+Subject: Re: [PATCH v4 1/6] firmware/psci: Add definitions for PSCI v1.3
+ specification
 From: David Woodhouse <dwmw2@infradead.org>
-To: Oliver Upton <oliver.upton@linux.dev>, Lilit Janpoladyan
- <lilitj@amazon.com>
-Cc: kvm@vger.kernel.org, maz@kernel.org, james.morse@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, nh-open-source@amazon.com, 
-	kvmarm@lists.linux.dev
-Date: Thu, 26 Sep 2024 11:00:39 +0100
-In-Reply-To: <Zuvq18Nrgy6j_pZW@linux.dev>
-References: <20240918152807.25135-1-lilitj@amazon.com>
-	 <Zuvq18Nrgy6j_pZW@linux.dev>
+To: Miguel Luis <miguel.luis@oracle.com>, Souvik Chakravarty
+	 <Souvik.Chakravarty@arm.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, James
+ Morse <james.morse@arm.com>,  Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas
+ <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Mark Rutland
+ <mark.rutland@arm.com>, Lorenzo Pieralisi <lpieralisi@kernel.org>, "Rafael
+ J. Wysocki" <rafael@kernel.org>, Pavel Machek <pavel@ucw.cz>, Len Brown
+ <len.brown@intel.com>, Shuah Khan <shuah@kernel.org>, "kvm@vger.kernel.org"
+ <kvm@vger.kernel.org>,  "linux-doc@vger.kernel.org"
+ <linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
+ <kvmarm@lists.linux.dev>, "linux-pm@vger.kernel.org"
+ <linux-pm@vger.kernel.org>,  "linux-kselftest@vger.kernel.org"
+ <linux-kselftest@vger.kernel.org>
+Date: Thu, 26 Sep 2024 17:30:52 +0100
+In-Reply-To: <2868989D-73CA-4208-8B54-CC3C78A2F1EF@oracle.com>
+References: <20240924160512.4138879-1-dwmw2@infradead.org>
+	 <2868989D-73CA-4208-8B54-CC3C78A2F1EF@oracle.com>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-X7RhqzEhlTPh06y7CJRW"
+	boundary="=-RQ5kqStBEoBL1nPfD3FZ"
 User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -54,82 +67,62 @@ MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
 
---=-X7RhqzEhlTPh06y7CJRW
+--=-RQ5kqStBEoBL1nPfD3FZ
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, 2024-09-19 at 02:11 -0700, Oliver Upton wrote:
-> Hi Lilit,
+On Thu, 2024-09-26 at 09:56 +0000, Miguel Luis wrote:
 >=20
-> +cc kvmarm mailing list, get_maintainer is your friend :)
+> > +/* PSCI v1.3 hibernate type for SYSTEM_OFF2 */
+> > +#define PSCI_1_3_HIBERNATE_TYPE_OFF 0
 >=20
-> On Wed, Sep 18, 2024 at 03:27:59PM +0000, Lilit Janpoladyan wrote:
-> > An example of a device that tracks accesses to stage-2 translations and=
- will
-> > implement page_tracking_device interface is AWS Graviton Page Tracking =
-Agent
-> > (PTA). We'll be posting code for the Graviton PTA device driver in a se=
-parate
-> > series of patches.
->=20
-> In order to actually review these patches, we need to see an
-> implementation of such a page tracking device. Otherwise it's hard to
-> tell that the interface accomplishes the right abstractions.
+> Should it be 1 as hibernate type?
 
-Absolutely. That one is coming soon, but I was chasing the team to post
-the API and KVM glue parts as early as possible to kick-start the
-discussion, especially about the upcoming architectural solution.
+It is in discovery, as BIT(PSCI_1_3_HIBERNATE_TYPE_OFF) =3D=3D 1<<0 =3D=3D =
+1.
 
-> Beyond that, I have some reservations about maintaining support for
-> features that cannot actually be tested outside of your own environment.
+But using a bitmask was only supposed to be for the discovery with
+PSCI_FEATURES, as that has to advertise all the available hibernation
+types.
 
-That's more about the hardware driver itself which will follow, than
-the core API posted here.
+The actual SYSTEM_OFF2 call was supposed to just take the numeric value
+as an argument, since obviously *that* one isn't a bitmask.=20
 
-I understand the reservation, but I think it's fine.=C2=A0In general, Linux
-does support esoteric hardware that not everyone can test every
-time.=C2=A0We do sweeping changes across all Ethernet drivers, for example,
-and some of those barely even exist any more.
+Except... I see that now the spec has finally been updated, it seems to
+say that 0x1 is the value to pass to the SYSTEM_OFF2 call for
+HIBERNATE_OFF, not 0x0. Which doesn't seem to make much sense, and I
+don't recall it being what we discussed. Souvik, what happened there?
 
-This particular device should be available on bare metal EC2 instances,
-of course, but perhaps we should also implement it in QEMU. That would
-actually be beneficial for our internal testing anyway, as it would
-allow us to catch regressions much earlier in our own development
-process.
+My understanding was that for each supported hibernation type #n, for
+which HIBERERNATE_OFF is zero), the PSCI_FEATURES query would include
+the bit (1<<n) to indicate that it is supported, and then the actual
+SYSTEM_OFF2 call parameter would be (n) itself, precisely as
+implemented here.
 
-> > When ARM architectural solution (FEAT_HDBSS feature) is available, we i=
-ntend to
-> > use it via the same interface most likely with adaptations.
->=20
-> Will the PTA stuff eventually get retired once you get support for FEAT_H=
-DBSS
-> in hardware?
+But the spec now seems to say that HIBERNATE_OFF is advertised as
+(1<<0) in PSCI_FEATURES, but invoked with the value (1).
 
-I don't think there is a definitive answer to that which is ready to
-tape out, but it certainly seems possible that future generations will
-eventually move to FEAT_HDBSS, maybe even reaching production by the
-end of the decade, at the earliest? And then a decade or two later, the
-existing hardware generations might even get retired, yes=C2=B9.
+Is it too late to fix?
 
-=C2=B9 #include <forward-looking statement.disclaimer>
+If it isn't just a thinko, what is the intent in the current spec?
 
-> I think the best way forward here is to implement the architecture, and
-> hopefully after that your legacy driver can be made to fit the
-> interface. The FVP implements FEAT_HDBSS, so there's some (slow)
-> reference hardware to test against.
+If we have new hibernate types such that
 
-Is there actually any documentation available about FEAT_HDBSS? We've
-been asking, but haven't received it. I can find one or two mentions
-e.g. https://arm.jonpalmisc.com/2023_09_sysreg/AArch64-hdbssbr_el2 but
-nothing particularly useful.
+ #define PSCI_1_3_HIBERNATE_TYPE_OFF 0
+ #define PSCI_1_3_HIBERNATE_TYPE_FOO 1
+ #define PSCI_1_3_HIBERNATE_TYPE_BAR 2
 
-The main reason for posting this series early is to make sure we do all
-we can to accommodate FEAT_HDBSS. It's not the *end* of the world if
-the kernel-internal API has to be tweaked slightly when FEAT_HDBSS
-actually becomes reality in future, but obviously we'd prefer to
-support it right from the start.
+It seems obvious that the PSCI_FEATURES response will contain (1<<0),
+(1<<1) and (1<<2) for them respectively, but what is supposed to be
+passed to the actual SYSTEM_OFF2 call? Is it always just going to be
+(PSCI_1_3_HIBERNATE_TYPE_xxx + 1)?
 
---=-X7RhqzEhlTPh06y7CJRW
+I think we should just fix =C2=A75.1.10 to report that 0x0 is HIBERNATE_OFF=
+,
+yes?
+
+
+--=-RQ5kqStBEoBL1nPfD3FZ
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -221,24 +214,24 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwOTI2MTAwMDM5WjAvBgkqhkiG9w0BCQQxIgQgKf7ucjpf
-ZlpX7QDlIuFImfH+xNyCeweAOMPVO9Zqgf8wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwOTI2MTYzMDUyWjAvBgkqhkiG9w0BCQQxIgQg8FotIJwA
+XX01nxLRsAFTvzzQBNAM/srTRdM5bHIs/TUwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAI22biPFKFZHHwLwtm6PsT0Yro/LzjWDAR
-J2nonn11MWLY/XsaTPFZgvtQUKOClV0FxGeHkNYFYr3HUiKLdVkPoHMsNc/nCprRXL5X0odzBSdO
-kwKcrg60Lc9BqCOmnP4xxy8maz+X30Y/ys3/dpgMTbMkMBTA0qsbZwwR54535ozMPOQU3M8sGelr
-yX4h8uxFcriZUqstpyCgZ9JXyf+LUgevy2tOW70rbA9ZjDNy6G1LxZv3rMZfujRivk9eW6aQg8AU
-WzxuGZqf4xM20iBBp75kehiXnMvzPt7ZrN56T5BWtNiQ0fdeMs5BTVrzTViBX1XtO1EVN6tPARc8
-b/3iWk5JquQi8sUMVAHKlUuI73FhTBeqskZFxwdjLOT/9wJea2RlC6WLwtKEdId3twgzcWK/qWjK
-fjtTpoIlMCeuRZwLwgpsLc4AXu1M3Fo0j9Czd6Ew/wLvLj0MicFErltub7rv4b6NVNPm79NUFThv
-hQ75w49L9quEcOXt9m8Sm+9zzRJ0qdd2gHLuUCf93nRa0d9htYFeoF+W/HIh0WRa8CALLfugV4RT
-MkwYhs9JgtakD1zLtpidbTIhP8tb4KKgFr2NvvEGgwvktxJlyUbZiLim1byhGAERCiIo+I3u/2UY
-/zcTuOtPKh2rA89oLq5VDuOt2cJAx9ZzbhFYfaq8agAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBvB3dSpamtlQvIFZTh4twt13j55zaj84jW
+2RhzPN3eEQi/KCBjMYazzteoAmtb0twFfnMZ1Rc9q/LWw883jR/DI5nGY/iQRiHNLlORCt4sxqrJ
+M1kFvDehSq2tsqV8Lz9Ukoa8p2BshHvxn0LX+/s4kg4O9Z58znGwPwU11QPia2zqr3vw2MVR0+iR
+tIHNO1a7Iy95W371AQHtRYy3oVsPb4mQ6h22cX84Pszp2SYw13fhEvMXkVH/muvL/Fqld8O7QA0y
+vTeBbxIz0fd8jAqNqvuDk08TSj4llnX+IkCJ4DniZrmcBcl+CmlLaGAAEDriydJ0Sw0l6uEAtkx+
+oTscO6ZwxDO6snBGW5ahsIcbYEPWFVAYPYD493YVIY4qLd9UUauJizNKyvHnp4zXphTj6W0ix+WD
+D2tBemztpbioaZp9XQ47J24sdTgRNufNGfUoL4S/w6uoB9BhcKGa5dVrMjPpEy3hqxsukzFwYl7l
+LQleQVWiZOfQZF4Y1aDFwqqCueB2RkuxSV3HMr6/EFlDCoXehCmjwoDbKFA6EiEiB4m+71tuulQe
+mduA9GsmCWDWmfW6slm0JCVhbdpg8b9Ddm1Jb5fbvsLWqRTqftbmm+mjGNjUoPQGUS+XEr3KWNez
+WwHJEAHAR/Na8o42hNK0kdZswdcveg5+ZIx/YxUstgAAAAAAAA==
 
 
---=-X7RhqzEhlTPh06y7CJRW--
+--=-RQ5kqStBEoBL1nPfD3FZ--
