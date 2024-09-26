@@ -1,37 +1,36 @@
 Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81A4F1D5ABC;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2989415DBB2;
 	Thu, 26 Sep 2024 18:46:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727376367; cv=none; b=NL4+n145l0ETkiZMuFlD0Sua1oDkXyjP95H0Jo1SGhhwsMoqKlL4bIBXAcQRHWdkxydYXEXoIPaMFV/0BIEZzUu5Bbg54wXp5vJAxqTrym4DnMG4YQb5SYWREfItest0SCyJ4T57VavnvvMmVNHmofUoNOxLGp4uFznOXsw+bho=
+	t=1727376367; cv=none; b=afuXRuUE0+jEZLnvV8oxyv3RKkNddsXsmosn7AYWDbxb7BKOMR/7B5BuUrM9acSsX+pfSUm29pmed6KvuOkgQ6ae4AUNuq15Cy8dg8JpeBPkO15EO1eIBv2VvqIv2OsGo4tDNt9HqK4iB8+0YA+4fuSjyNKgeFRrOD1TKieL3pc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1727376367; c=relaxed/simple;
-	bh=+dCD6AZPxHSBa4BNwNlX6ikA85sfYkJhBtLZ/HQ4UUE=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LCqM5hpQi5SV0/NLDspcW50vsIyEZS7+pTMkMtcWwrTrOjV5n+Zqk/w0tBQtVVC4H27IYP+s0nw0ZWFbde3/H/oy4biT1/DjSDLGFhfCkNDFBu0Y4jla0lv4DzAm8rgft4hJm4oxKGQG85tmWjRaOHSNzs2KsXzFgPWbOdEb5Aw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=nEHxsSel; arc=none smtp.client-ip=90.155.50.34
+	bh=K+bUjFKd41jFcNzn05wYMay17uH5DKFW9c2HEdgts0M=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=gP4bpPup8EgcPQNYboaQlUXLuqx73N0j/0Py9mOvy1coo87NZcpVS4GKBwipHcvi0oDH6+eiHaquk/G5ZYL4s+SRgRuoXFrhsT8mrDnhKWTJighfIFeEC0oSrDMfQYA5lZnZalqoz63fQHZIHmiT/bMVLp/cQ+HE9RNRPb/c9jM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=SE29JUvJ; arc=none smtp.client-ip=90.155.50.34
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="nEHxsSel"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="SE29JUvJ"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:To:From:Reply-To:
-	Cc:Content-Type:Content-ID:Content-Description;
-	bh=t5+pyUN1sWxxhbIk0LBuAt0+sAfCDv06OwTbegq7gnw=; b=nEHxsSelvEuHOj/+u+QP04x/rg
-	ZMwVJxdXDlmfvNpVkwJG9JFHbfTQFgFJbOtleuud8XJGM6EiYnd8GDqv0UXTQXljM5wqHghTX8kQ6
-	WVZQw9FYrIqS6fe6uCNDZJrHngoeH6knJ9vDjB4Mjv8TPaVIkTT2nTXqNA16YosJIScRwuzW0RSZF
-	ysj3OBkUwg+11dX8CqTbBn3b1KxvwnZW4hBgzFrykxfeX1sFZQfjk8Fq7iUUwT27/oScJyu32cJw7
-	s9+2wA6Lin0bJTl3YV7cwRqHz7pVGhIaYCY3kZPN1K95IlNqjF9nIhcI4olCtIiBcKDT47YHzOElU
-	dbLMEEdA==;
+	MIME-Version:Message-ID:Date:Subject:To:From:Reply-To:Cc:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=9odw1NEG4SokToSv0eALme++DFz1wAP7aZWxWSDMshE=; b=SE29JUvJ3ULBV+pZtEembIWeN3
+	4DrAyjaK4JS5T3PvpvbygaM//MM6xPEAwYW0cYfUhWpKPooJYruSiyj2qBBgA1LDyS5PsTnlbs026
+	4zTn0PJISWejctvLHY1VwAqufiwFBnab8l0kpaEmEQ58ubv++yXPbAxlap8j1LINo18Z4dV2GWS6z
+	ftq9OgBhTcrrlt/Jt57IdMmUDFYFRSpowVphJYUwOuiF7X0uQRxVEpjlpGthnfRnk8njmthsqzDf5
+	z3GqaCWW7OdTrM7/2+LMQddaU5usF4rKyhcUJJ4sYDkKAtIq14hZ/klIN8Qooo8TsK3ExyfbMcmWC
+	KdV/Je6g==;
 Received: from [2001:8b0:10b:1::ebe] (helo=i7.infradead.org)
 	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1sttUq-00000007NA9-2Vg4;
+	id 1sttUq-00000007N9u-1wag;
 	Thu, 26 Sep 2024 18:45:49 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sttUq-00000003Ybj-40qP;
+	id 1sttUq-00000003YbD-35bQ;
 	Thu, 26 Sep 2024 19:45:48 +0100
 From: David Woodhouse <dwmw2@infradead.org>
 To: Paolo Bonzini <pbonzini@redhat.com>,
@@ -59,12 +58,10 @@ To: Paolo Bonzini <pbonzini@redhat.com>,
 	linux-kselftest@vger.kernel.org,
 	Francesco Lavra <francescolavra.fl@gmail.com>,
 	Miguel Luis <miguel.luis@oracle.com>
-Subject: [PATCH v5 5/5] KVM: arm64: nvhe: Pass through PSCI v1.3 SYSTEM_OFF2 call
-Date: Thu, 26 Sep 2024 19:38:00 +0100
-Message-ID: <20240926184546.833516-6-dwmw2@infradead.org>
+Subject: [PATCH v5 0/5] Add PSCI v1.3 SYSTEM_OFF2 support for hibernation
+Date: Thu, 26 Sep 2024 19:37:55 +0100
+Message-ID: <20240926184546.833516-1-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240926184546.833516-1-dwmw2@infradead.org>
-References: <20240926184546.833516-1-dwmw2@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -75,28 +72,63 @@ Content-Transfer-Encoding: 8bit
 Sender: David Woodhouse <dwmw2@infradead.org>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
-From: David Woodhouse <dwmw@amazon.co.uk>
+The PSCI v1.3 spec (https://developer.arm.com/documentation/den0022)
+adds support for a SYSTEM_OFF2 function enabling a HIBERNATE_OFF state
+which is analogous to ACPI S4. This will allow hosting environments to
+determine that a guest is hibernated rather than just powered off, and
+ensure that they preserve the virtual environment appropriately to
+allow the guest to resume safely (or bump the hardware_signature in the
+FACS to trigger a clean reboot instead).
 
-Pass through the SYSTEM_OFF2 function for hibernation, just like SYSTEM_OFF.
+This updates KVM to support advertising PSCI v1.3, and unconditionally
+enables the SYSTEM_OFF2 support when PSCI v1.3 is enabled.
 
-Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
----
- arch/arm64/kvm/hyp/nvhe/psci-relay.c | 2 ++
- 1 file changed, 2 insertions(+)
+For the guest side, add a new SYS_OFF_MODE_POWER_OFF handler with higher
+priority than the EFI one, but which *only* triggers when there's a
+hibernation in progress. There are other ways to do this (see the commit
+message for more details) but this seemed like the simplest.
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/psci-relay.c b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-index dfe8fe0f7eaf..9c2ce1e0e99a 100644
---- a/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-+++ b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-@@ -265,6 +265,8 @@ static unsigned long psci_1_0_handler(u64 func_id, struct kvm_cpu_context *host_
- 	case PSCI_1_0_FN_PSCI_FEATURES:
- 	case PSCI_1_0_FN_SET_SUSPEND_MODE:
- 	case PSCI_1_1_FN64_SYSTEM_RESET2:
-+	case PSCI_1_3_FN_SYSTEM_OFF2:
-+	case PSCI_1_3_FN64_SYSTEM_OFF2:
- 		return psci_forward(host_ctxt);
- 	case PSCI_1_0_FN64_SYSTEM_SUSPEND:
- 		return psci_system_suspend(func_id, host_ctxt);
--- 
-2.44.0
+Version 2 of the patch series splits out the psci.h definitions into a
+separate commit (a dependency for both the guest and KVM side), and adds
+definitions for the other new functions added in v1.3. It also moves the
+pKVM psci-relay support to a separate commit; although in arch/arm64/kvm
+that's actually about the *guest* side of SYSTEM_OFF2 (i.e. using it
+from the host kernel, relayed through nVHE).
+
+Version 3 dropped the KVM_CAP which allowed userspace to explicitly opt
+in to the new feature like with SYSTEM_SUSPEND, and makes it depend only
+on PSCI v1.3 being exposed to the guest.
+
+Version 4 is no longer RFC, as the PSCI v1.3 spec is finally published.
+Minor fixes from the last round of review, and an added KVM self test.
+
+Version 5 drops some of the changes which didn't make it to the final 
+v1.3 spec, and cleans up a couple of places which still referred to it 
+as 'alpha' or 'beta'. It also temporarily drops the guest-side patch to 
+invoke SYSTEM_OFF2 for hibernation, pending confirmation that the final 
+PSCI v1.3 spec just has a typo where it changed to saying that 0x1 
+should be passed to mean HIBERNATE_OFF, even though it's advertised as 
+bit 0. That can be sent under separate cover, and perhaps should have 
+been anyway. The change in question doesn't matter for any of the KVM 
+patches, because we just treat SYSTEM_OFF2 like the existing 
+SYSTEM_RESET2, setting a flag to indicate that it was a SYSTEM_OFF2 
+call, but not actually caring about the argument; that's for userspace 
+to worry about.
+
+David Woodhouse (5):
+      firmware/psci: Add definitions for PSCI v1.3 specification
+      KVM: arm64: Add PSCI v1.3 SYSTEM_OFF2 function for hibernation
+      KVM: arm64: Add support for PSCI v1.2 and v1.3
+      KVM: selftests: Add test for PSCI SYSTEM_OFF2
+      KVM: arm64: nvhe: Pass through PSCI v1.3 SYSTEM_OFF2 call
+
+ Documentation/virt/kvm/api.rst                  | 11 +++++
+ arch/arm64/include/uapi/asm/kvm.h               |  6 +++
+ arch/arm64/kvm/hyp/nvhe/psci-relay.c            |  2 +
+ arch/arm64/kvm/hypercalls.c                     |  2 +
+ arch/arm64/kvm/psci.c                           | 43 ++++++++++++++++-
+ include/kvm/arm_psci.h                          |  4 +-
+ include/uapi/linux/psci.h                       |  5 ++
+ tools/testing/selftests/kvm/aarch64/psci_test.c | 61 +++++++++++++++++++++++++
+ 8 files changed, 132 insertions(+), 2 deletions(-)
 
