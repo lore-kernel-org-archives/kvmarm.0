@@ -1,79 +1,94 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9893E188900
-	for <kvmarm@lists.linux.dev>; Fri, 27 Sep 2024 10:59:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DF8518CC01
+	for <kvmarm@lists.linux.dev>; Fri, 27 Sep 2024 12:30:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727434757; cv=none; b=XfF9I7aM19t878vM2mkTACZYillPATTMOqAJWV8jB0UmgCPbI0jlo1DwDvUJyEbcg5gKvNSHn9DR1p4GQWYIicngrIlbO0x8PcodEg54H8znGH9hz0S+v7KA0NOrz9IvtD4N9eVI55kby7ORYvwKYYbAOuf5QMOh4Y33XBhmRI4=
+	t=1727440238; cv=none; b=UFd45/3IxPNmfV12pwJF7bHlKtWhBu04ZBonjoezrhz8E1Dd7G6x0uLQOvmHSaTqcCUK4oeG2yxeowHhqhOzdMHXRLGz0CkwS4Uh32LAAkIkBoYvvAoTZhJ/pV4t7Hdim7fj1sZkTIn5p0c9eK2JmfTDDtVGJiecmZqTeTZGp/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727434757; c=relaxed/simple;
-	bh=EU4pxLS8rUHNF48vnD3s6Ce9WpwsDE4z/ta7DcmWlG4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O3HTAc8PZS341gfCSxa1ZQIP1fWOmJDnbhxxDqrzswOoEVG670XHw5OuoRj8ouK19ORbIXb+nQApTKV4GodvphER/aQ1IvLoweD4dNy8Pig969xTFQiMol4ucUqWTatq+3hZJq/xrZZ9xtNPGt0a1nmjLl33HGfPtwPDrb1ueho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 837A41474;
-	Fri, 27 Sep 2024 03:59:43 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D78E73F587;
-	Fri, 27 Sep 2024 03:59:12 -0700 (PDT)
-Date: Fri, 27 Sep 2024 11:59:07 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
+	s=arc-20240116; t=1727440238; c=relaxed/simple;
+	bh=3Pn9eA1WNvxj7KUL7ubzyUfODv2qFAQBlZ/vrM5V+PU=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=X4WFLWwydlP4w0wQxQn23Cr45uNMWOqyAUOAlVe1SzonedCYStOG7eegs+lHeylIL5S4GB7qzxg1O+v2x36VGfjjLJh/ldCOfmzsfZPv/6zfhMbV7AjRO89fws77oaeMarR/QygDo/hhMvw7J2NQUz+FsDw0JrNd5xjwtmkQL3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4XFV9k2JpdzWf3d;
+	Fri, 27 Sep 2024 20:28:10 +0800 (CST)
+Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
+	by mail.maildlp.com (Postfix) with ESMTPS id 71EA618010A;
+	Fri, 27 Sep 2024 20:30:28 +0800 (CST)
+Received: from [10.174.178.219] (10.174.178.219) by
+ kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Fri, 27 Sep 2024 20:30:27 +0800
 Subject: Re: [PATCH] KVM: arm64: Another reviewer reshuffle
-Message-ID: <20240927105907.GA814573@e124191.cambridge.arm.com>
+To: Marc Zyngier <maz@kernel.org>
+CC: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<kvm@vger.kernel.org>, Oliver Upton <oliver.upton@linux.dev>, Joey Gouly
+	<joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Will Deacon
+	<will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>
 References: <20240927104956.1223658-1-maz@kernel.org>
- <ZvaOiuvmZNq__ivV@linux.dev>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <17304d38-d435-2e97-9e5e-329b4479bbca@huawei.com>
+Date: Fri, 27 Sep 2024 20:30:18 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZvaOiuvmZNq__ivV@linux.dev>
+In-Reply-To: <20240927104956.1223658-1-maz@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemm600007.china.huawei.com (7.193.23.208)
 
-On Fri, Sep 27, 2024 at 12:52:58PM +0200, Oliver Upton wrote:
-> On Fri, Sep 27, 2024 at 11:49:56AM +0100, Marc Zyngier wrote:
-> > It has been a while since James had any significant bandwidth to
-> > review KVM/arm64 patches. But in the meantime, Joey has stepped up
-> > and did a really good job reviewing some terrifying patch series.
-> > 
-> > Having talked with the interested parties, it appears that James
-> > is unlikely to have time for KVM in the near future, and that Joey
-> > is willing to take more responsibilities.
-> > 
-> > So let's appoint Joey as an official reviewer, and give James some
-> > breathing space, as well as my personal thanks. I'm sure he will
-> > be back one way or another!
+On 2024/9/27 18:49, Marc Zyngier wrote:
+> It has been a while since James had any significant bandwidth to
+> review KVM/arm64 patches. But in the meantime, Joey has stepped up
+> and did a really good job reviewing some terrifying patch series.
 > 
-> Yes, thank you James for everything, I'm sure we'll still be seeing you
-> around ;-)
+> Having talked with the interested parties, it appears that James
+> is unlikely to have time for KVM in the near future, and that Joey
+> is willing to take more responsibilities.
 > 
-> > Cc: Oliver Upton <oliver.upton@linux.dev>
-> > Cc: Joey Gouly <joey.gouly@arm.com>
-> > Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-> > Cc: Zenghui Yu <yuzenghui@huawei.com>
-> > Cc: Will Deacon <will@kernel.org>
-> > Cc: Catalin Marinas <catalin.marinas@arm.com>
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> 
-> Welcome to the party, Joey!
+> So let's appoint Joey as an official reviewer, and give James some
+> breathing space, as well as my personal thanks. I'm sure he will
+> be back one way or another!
 
-Thanks!
+With my thanks to James :-)
 
-Acked-by: Joey Gouly <joey.gouly@arm.com>
+> Cc: Oliver Upton <oliver.upton@linux.dev>
+> Cc: Joey Gouly <joey.gouly@arm.com>
+> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Cc: Zenghui Yu <yuzenghui@huawei.com>
+> Cc: Will Deacon <will@kernel.org>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  MAINTAINERS | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 878dcd23b3317..fe2028b5b250f 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -12270,7 +12270,7 @@ F:	virt/kvm/*
+>  KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)
+>  M:	Marc Zyngier <maz@kernel.org>
+>  M:	Oliver Upton <oliver.upton@linux.dev>
+> -R:	James Morse <james.morse@arm.com>
+> +R:	Joey Gouly <joey.gouly@arm.com>
+>  R:	Suzuki K Poulose <suzuki.poulose@arm.com>
+>  R:	Zenghui Yu <yuzenghui@huawei.com>
+>  L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
 
-> 
-> Acked-by: Oliver Upton <oliver.upton@linux.dev>
-> 
-> -- 
-> Thanks,
-> Oliver
+Acked-by: Zenghui Yu <yuzenghui@huawei.com>
+
+Welcome!
