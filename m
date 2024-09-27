@@ -1,36 +1,36 @@
 Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D73DA2D;
-	Fri, 27 Sep 2024 13:20:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76EC612E1D1;
+	Fri, 27 Sep 2024 14:24:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727443256; cv=none; b=XXSqois+cR7CH6fcGRv9aGsexLjDuPNOl6XxiUiMzglhQGtWToWBuaBPJEguKRqsM5wpw8nB2VzUGTvnvXKLnZc/XY48vy3KfdTxZ262QeXox2/k6hqj8V1XbMDBmC/GkqgrHfKYJB63Vb/abGw6ytM4+PRVhXkkYxjWnNJ7tho=
+	t=1727447101; cv=none; b=nn4HUaBpNQ7DJ12zub1AYdxHrcalgXLHHqoeJTBUJccQha2O3cqnMgup4sGGPD8NAiISNHLBXUlPqEk5n8IpWQl7hVb89nwOwslTiVAtXBF9l6y3FLBz0YKw4BVBiMnhh8FYDJutdBPNecSSRlwoqzpUAORXPSJ2Dqo4XQsMjTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727443256; c=relaxed/simple;
-	bh=YC5k2II+Vqw1wJT8UUzQti3hDpI/Rqu55WxSqBixewU=;
+	s=arc-20240116; t=1727447101; c=relaxed/simple;
+	bh=gavA5CmzkoOwq9uc9AHy+DZvNBptdrIcT+g38MDxCH0=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=hl+lLBK3HnzSmOoQOB70VqCxt1yvva1KmNawe6JTvtgGcCfkIqA8GBvqvneZc4ZmDM1xCPHgAla/Px2Xz2KbN/8Wg5GniPhp0g0t/kZYyVe3r0NmIwokak88A0HVbTvbagbnKdJ1eyz6EUUCh268tbKbed6c9R4N8dU5g3fQDtI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=QnNcsXYz; arc=none smtp.client-ip=90.155.50.34
+	 Content-Type:MIME-Version; b=lsri1oXGRlgHI2QwLqYbRmgcrwItv/RODGhOP65ipysHG9rYshGqT7jvfEDSFgwi+FfvJKwlUjWEMb1o+s2zbK2UjT65nEUDfssNIWRKczVVIn9fvLplKEMvG6HynJYndafF+pDiRRfR6P60oAir+8DqrFN01AbJFToRYgmSYZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=WGXNlhov; arc=none smtp.client-ip=90.155.50.34
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="QnNcsXYz"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="WGXNlhov"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
 	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=YC5k2II+Vqw1wJT8UUzQti3hDpI/Rqu55WxSqBixewU=; b=QnNcsXYz43DscdMxitOA68oaPr
-	CCn5eRktcYHijXHlOipE4YTicwshA+eZpB9Bl24Go2GKONJlw+06bHKhrC7ESqgDY9rbaNDpPJZch
-	+fvgvcDBLniZ+B8mkHYcT7gjKYn/RzUnZYj/TDjMcWjl2VWPYi0ZGK65dLj3lZGrRMlMvOj6EtEVW
-	GGSOoiaohdfYrvnviWOD3OqQOWHGFgcAKKC+980fQqSGoIx69JrRLH8/iuzviLFqNbzDLbMd6UbHk
-	kFzjJfPme/JI06eDLWp4snVd0svCF4qIHlqyr0sEtW3cgzPbHfGPK+2MqjRNKwO2yxIkMJl7e5AMG
-	aWctdv2w==;
+	bh=Rs01ZRpIZLcrUgd9cPMujX8QNFJErEnOgp1YcqWPRDo=; b=WGXNlhovxvsg5jB3c+meL5xRd4
+	zhOCnFqErk++hfhGEScKuRPxN2b0uLJ/ASyP7K8o3gZQGBG/p3BWykcS+g4EVJdhz9sc30+cWyx81
+	YK2oQ1Cnj/BOvFgMsz+tSF91EUNl2GMfAVx9abYKdZ+LDtr90v+CHBqisY73/NH1joxkyYw7DyRM0
+	HUBsf01T/pf9OGLVh7U70n6jjcFTonz3FgbwraqEaPuPJ818jUo0ExL0P/OWfx+AqVKG/Jk3g3T/L
+	v2W0rtA6Kal5gqHHSwDf8AprzZovcOGYg5dBLzpGQETRfjEZSGKdp9EQG0F4Iq71CNSph28Ow0fwG
+	j+k/HwmQ==;
 Received: from [2001:8b0:10b:5:40e6:99a4:ff80:ef9a] (helo=u3832b3a9db3152.ant.amazon.com)
 	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1suAtY-00000009exv-2VmK;
-	Fri, 27 Sep 2024 13:20:29 +0000
-Message-ID: <c31638c715c9a78a8244ca47270085b73972e747.camel@infradead.org>
+	id 1suBtl-00000009nbt-3apL;
+	Fri, 27 Sep 2024 14:24:46 +0000
+Message-ID: <378d3797a94df5df655d47b3bd733da8853cc2e4.camel@infradead.org>
 Subject: Re: [PATCH v4 1/6] firmware/psci: Add definitions for PSCI v1.3
  specification
 From: David Woodhouse <dwmw2@infradead.org>
@@ -51,14 +51,14 @@ Cc: Souvik Chakravarty <Souvik.Chakravarty@arm.com>, Paolo Bonzini
  <kvmarm@lists.linux.dev>, "linux-pm@vger.kernel.org"
  <linux-pm@vger.kernel.org>,  "linux-kselftest@vger.kernel.org"
  <linux-kselftest@vger.kernel.org>
-Date: Fri, 27 Sep 2024 14:20:28 +0100
+Date: Fri, 27 Sep 2024 15:24:45 +0100
 In-Reply-To: <CB344CC7-E6E2-4325-9669-9BE7EA47C56B@oracle.com>
 References: <20240924160512.4138879-1-dwmw2@infradead.org>
 	 <2868989D-73CA-4208-8B54-CC3C78A2F1EF@oracle.com>
 	 <d23d2cdcab3a2fca5cb36023b42ad9d4a0c7ff22.camel@infradead.org>
 	 <CB344CC7-E6E2-4325-9669-9BE7EA47C56B@oracle.com>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-GPtW0JwtqCOwYKpASzrm"
+	boundary="=-OXU5+e/3aAwPCT5oBvKH"
 User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -69,75 +69,64 @@ MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
 
---=-GPtW0JwtqCOwYKpASzrm
+--=-OXU5+e/3aAwPCT5oBvKH
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Fri, 2024-09-27 at 12:43 +0000, Miguel Luis wrote:
-> Hi David,
 >=20
-> > On 26 Sep 2024, at 16:30, David Woodhouse <dwmw2@infradead.org> wrote:
-> >=20
-> > On Thu, 2024-09-26 at 09:56 +0000, Miguel Luis wrote:
-> > >=20
-> > > > +/* PSCI v1.3 hibernate type for SYSTEM_OFF2 */
-> > > > +#define PSCI_1_3_HIBERNATE_TYPE_OFF 0
-> > >=20
-> > > Should it be 1 as hibernate type?
-> >=20
-> > It is in discovery, as BIT(PSCI_1_3_HIBERNATE_TYPE_OFF) =3D=3D 1<<0 =3D=
-=3D 1.
-> >=20
->=20
-> Now I see the definition for PSCI_1_3_HIBERNATE_TYPE_OFF was misleading f=
-or me
-> when BIT(PSCI_1_3_HIBERNATE_TYPE_OFF) works for both discovery and as arg=
-ument
-> for SYSTEM_OFF2.
-
-That *wasn't* the intent, as I understood it.
-
-An early version of the spec just returned PSCI_1_3_HIBERNATE_TYPE_OFF
-(zero) for discovery and also used it as the argument for SYSTEM_OFF2.
-
-Obviously that doesn't allow for supporting any other types (at least,
-not unless an implementation had to support *all* types up to the one
-it advertises). So for *discovery* it was changed to a bitmap,
-returning BIT(PSCI_1_3_HIBERNATE_TYPE_OFF), and explicitly documented
-as "this field is a bitmap".
-
-We discussed that, and settled on the changes, and I had completely
-failed to spot that the beta spec then also quietly changed the actual
-argument to SYSTEM_OFF2 from 0x0 to 0x1 for HIBERNATE_OFF too. I do not
-recall that change ever being discussed, so thanks for catching it!
-
 > The common factor being the bit offset in the bitmap for SYSTEM_OFF2 disc=
 overy
 > and argument to call SYSTEM_OFF2 as well. Would it be clearer something l=
 ike:
 >=20
 > #define=C2=A0 PSCI_1_3_HIBERNATE_TYPE_OFF BIT(0)
->=20
-> Assuming future definitions would keep the same common factor can be help=
-ful, however
-> please let me know whether I am missing something.
 
-Right. If the spec is going to stay as it is, then just defining it as
-BIT(0) probably makes sense.
+I've updated the tree at
+https://git.infradead.org/users/dwmw2/linux.git/shortlog/refs/heads/psci-hi=
+bernate
+to do it that way.
 
-In practice, as I said, it doesn't make a lot of difference because the
-KVM code handling SYSTEM_OFF2 doesn't even look at the argument. It
-just sets a flag to let userspace know it was a SYSTEM_OFF2 call
-instead of SYSTEM_OFF. Precisely the same way that SYSTEM_RESET2 is
-handled.
+As I did so, I realised that KVM *does* care about the argument to
+SYSTEM_OFF2. This is a straight copy of the SYSTEM_RESET2 handling.
+Although it doesn't pass the argument up to userspace (presumably
+userspace is expected to look at the registers if it cares), it *does*
+check it's within the range of permitted values and return
+PSCI_RET_INVALID_PARAMS if not.
 
-If userspace wants to know the precise argument, I think it's supposed
-to go digging in the registers for itself? And the only implementation
-in existence that I know of doesn't bother; it treats *all* SYSTEM_OFF2
-calls just the same, regardless of the argument. Since there is only
-one possibility anyway.
+I've changed that check to:
 
---=-GPtW0JwtqCOwYKpASzrm
+		arg =3D smccc_get_arg1(vcpu);
+		/*
+		 * Permit zero to mean HIBERNATE_OFF as well as the bitmap
+		 * form which was introduced in PSCI v1.3 beta.
+		 */
+		if (arg && arg !=3D PSCI_1_3_HIBERNATE_TYPE_OFF) {
+			val =3D PSCI_RET_INVALID_PARAMS;
+			break;
+		}
+		kvm_psci_system_off2(vcpu);
+
+
+On the guest side, I've changed the invocation to:
+
+static int psci_sys_hibernate(struct sys_off_data *data)
+{
+	/*
+	 * Zero is an acceptable alternative to PSCI_1_3_HIBERNATE_TYPE_OFF
+	 * and is supported by hypervisors implementing an earlier version
+	 * of the pSCI v1.3 spec.
+	 */
+	if (system_entering_hibernation())
+		invoke_psci_fn(PSCI_FN_NATIVE(1_3, SYSTEM_OFF2),
+			       0 /*PSCI_1_3_HIBERNATE_TYPE_OFF*/, 0, 0);
+	return NOTIFY_DONE;
+}
+
+I'm going to do some careful interop testing with existing and new
+hypervisors before reposting this version.
+
+--=-OXU5+e/3aAwPCT5oBvKH
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -229,24 +218,24 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwOTI3MTMyMDI4WjAvBgkqhkiG9w0BCQQxIgQgiO9QRaWN
-p0/A0omezkUS+GSfTewCXcYISqwRuVwH3oMwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwOTI3MTQyNDQ1WjAvBgkqhkiG9w0BCQQxIgQgvsgBsJq1
+eMZ08pCEouB07yA5zNCeARz1AEfZMpyHwjUwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBBlagtc2GS5zYjZlgH09YjTxwrJBoIaf1c
-7Q+Hmxv20r6rpprmtYqKRFvYVLHonnuERXo5ASME6cjhmLAkEyykowYlADSCrSSiRPpgs/E1dUp5
-l07A9ClIOkTgIajtwhZtlaSQHlu49s0euC8iOCMhLR9t0Y3nqqaZAx0H4wfLCOZHbdAAXYj1mbNq
-SLf9XZuZaXzX/H+aAQIldoOYTGUS1A6F/A0t/ndgSP8UZdPBR/CmlHBAPK6KoD/wRL3519X7ST4/
-K9gPB8hI8uHwEFLlYKaAQ9oR5J6VVGvptIqMq89bLu9H+gSUTZimLFWEZX3QGSm9DQb8MI9elY3g
-92coIG0nCeRm9rPnjcH65knYONON6XIFpknFoyhHbdueFkW3FkEKg2nLGRbf+8ow2MqnMs5AEfE0
-qXrnPCz58nvM616+H/ukxpbXbICJ2ophrT+1xPpqf8AU/LpW5tLzzX2ZzmE9zHS/6LXR8WPZCgJu
-+vxG7QMzAmY+8XHt95QDlX2oXfXD56HTrPhIzVqTiqOHDOQTJpVDXPcHk7KMsuD6aTW58CDzi7iy
-2gEj7cSmByehlrwvwzRIHUJhAVWrzVrl8T5fBrq7P31YT1PZMSbkXImovjb/aCfxv+EtFBfFFwbw
-Qdyiqk6/ONIziVbzcgbyl3I/Ak9hV6w5Zp1r54FojgAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCF6DdrxaNzp7m2JJFI8pImTHozLJEB0rRH
+TI8Rf9dMnWgt51XafsZsl/osnIxmqCnQL4dQpwWOXZ9O9SgbpFjwXrvDMzujALSRv0Xt6VnWGwTU
+Jjp1MVd+IAhjQMH/+H+GvHhRjYYfz4UMEvYwqNRqVc90egwkCeVIvsuJlYTINi5IP9lqVW4M6mMb
+EI++DLjMM4AALJiYZfdkGA2rpqFKaZODllVPWgysXrRUwvHdryxB6OKkBawBGNOxrjJuhVuPA6BA
+guBJyghUAEloPFapYf4BcwUc7jUtpxZBcN5vINwbugQ/xCzPUZaQuhC4zITeO8H3LaaKaYTOchZS
+dDw9cZrYHfAo/gL7MwbnuZDQWGsd3GW+jalUKG26orsKCpXQ7EOQn9HG8Q8aTUM3ez1nXov7Zz8E
+cfQRsiZGPNcPNDxcjDf2eQdM6DqITwzwfQaua2chFAtvMnTaDYASTaymyvONLNmm5RXzD5gHg4Rl
+o9lF7yO1xsyr75C750tgUGvLjSgfCZHljyvpygSqXh+oa2OCsdDqGf4CsC1p4480TojEZB+dXsBo
+d1xjc2/ByTrwY9TWfYS7LgbNyHMIz6bU7zpihXt5QuS6+4IlRjBtgQBocDoyxwkJJUCoQX8T50fJ
+V5UMU6ceWeszc+JNf5Gj/rz2/koAPEtdnLDNMFOw9AAAAAAAAA==
 
 
---=-GPtW0JwtqCOwYKpASzrm--
+--=-OXU5+e/3aAwPCT5oBvKH--
