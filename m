@@ -1,92 +1,123 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02C841C1722;
-	Fri, 27 Sep 2024 15:21:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECD0217C8B
+	for <kvmarm@lists.linux.dev>; Sun, 29 Sep 2024 04:47:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727450491; cv=none; b=oTEkQXjVDOrpengE1wc2at8oYq9Rr/YrPmlzZT7aDgHqe9SO8l2TFmsq6lZkoFnKOIjHgyRbmJFQxJgt6lWUWrD/PL3VProfACPsBe7CF64hlUqpusU2RbW3YoYd1OH3tdJNldblUeqIIWdSc4JworIhZs8VZU9Rp69Al9iAkTs=
+	t=1727585237; cv=none; b=U8j2Xd4jpyom8eY8XVBhIj6+mp8efsG5zEgVwrA4RtSCxCvuZMVVNF6t6jbDgPk0RKLh25p7xzGj/smZGDbKa+8AjAmyzLuYFTuXdUAt880bGHPt7f/OfOJc/pIo8vaT3A5/ZONIUwEzhP3P8/LRWElIBgyQ4Zgw0y1Mhu76j54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727450491; c=relaxed/simple;
-	bh=1WCmFJhiKXxWGemw9OzjjWcFBusiAndw+m3K35nodxs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=r7b82AE4mro5rWyIHeTVyDuDcZSiDyEXC6krPe1k5EzluAcFQxv/DgWv8u2GqaGdixw5Y0u0E3VJNg5CltsHclG/6t4Enj3rwstzbZkh9lMixA8wUKLJIJXLMxjTwP9dWdQUAwzGtTF5KwWkEOtXXBlaqvVgWnNEt+sd353rNgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BE0A314BF;
-	Fri, 27 Sep 2024 08:21:57 -0700 (PDT)
-Received: from [10.1.37.46] (e122027.cambridge.arm.com [10.1.37.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CB4B83F587;
-	Fri, 27 Sep 2024 08:21:21 -0700 (PDT)
-Message-ID: <56886e2e-b5ce-4753-b36f-43d1d7ac427b@arm.com>
-Date: Fri, 27 Sep 2024 16:21:19 +0100
+	s=arc-20240116; t=1727585237; c=relaxed/simple;
+	bh=0gVAvVq9QWjCEzx+xpvsDjjt2Opmges2p9QPYWzAETk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=M4qYhDVPHnqYkv0m0MV7tAahP10FzpzcvIe/GBlQhPvGKhpxTeF5wYgj8ooMiUR/vlxjp35bm+iauomeVPhx8ifEctY8GE/LnzjLb9a5aG0eiRDnJTBYvIdadv/gR0bf1ptZ2O4QhY6k+dKtT4RubjxU2EGw/z/4JG+sHSV6L04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T0//1qoc; arc=none smtp.client-ip=209.85.222.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T0//1qoc"
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7a99fd5beb6so368266985a.0
+        for <kvmarm@lists.linux.dev>; Sat, 28 Sep 2024 21:47:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727585235; x=1728190035; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=fMFE0GTqbW0T50ivmGcDcpWDKEF/OBy4KQ/5LsKTloY=;
+        b=T0//1qocKIkx5Z2AWu+EsnTsCtsOuTGPr0EKcZ+qYrs5JrMeFATXAtukHgol1vUhdw
+         79e/P+B8OJdQnpS+/jGA9dbU2TfJGbQqWSLSt8NtsYltSTFTyNxoW+t/OlAfPCvFxQ3I
+         WL848Ao4vlubtbKNvs4v9FhXGSge+rAoldm42OwSKk+EktKAQu1ze4hyXKQJpB7Vm/Kp
+         +EV36j3hpvYi+B/a3RMmtWKONzK1Fsa+vMgw+8GnOBOfJ13ZAxWWasgKb3YEFVsDyN86
+         /QpQmb+bgCuFGozcz5guY1k/A6ffmkVsyVlzh9VSKfvggqhEBGkK0Z89mHj5FpljgVC5
+         CoHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727585235; x=1728190035;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fMFE0GTqbW0T50ivmGcDcpWDKEF/OBy4KQ/5LsKTloY=;
+        b=EkI38I0BLY0iuQxnrB/2zY+1eAXTh46euNj29LBWotxcu0zF1Mn+qbaElZHoZC5bvf
+         b/93dus/E1oZkGwgDC5qfinoS2vOffy6aP8TORiwQuxhs8wllKYMOk1uCe0dc74RB2c6
+         onj4gxdb9Tz09fDWnejZaXznC4YooBcvLRG7VOXin/08F6F21ibMg/Qe2yBW8dRf+lfg
+         Ulr09n3CYJSUb/7lvVRDO/NQputjEtRGEPA39B5H6I1OS0Z23MsE5XaFxPubNY7oWJHU
+         PM5DJbHxuXpQ3BSqI5Zroj+mMc29zzk5jx7v/tUhNh1ewFQnGwAfZH7UiAbNUgZxfTBm
+         YSfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXB2jzSMb6xCUAhxz+B5l8IA98HfXmeEucbNbneBYq/EJm3LLNecrOkQcnPoKHUUQWhy7wi/GE=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzX2SbTOms1wmvGJQyOKCfJbQ/Gjn/KKQ3myJT0KI+Y2ebiEg7u
+	OJfNt9zdJMY2DNr9Q0b3rvSmSVDv4hbhYtRsfbfre8XBdjnM/XEc
+X-Google-Smtp-Source: AGHT+IHZvcEw/8OZTzrIKSCDcpNxoH4EfzOWCLhV8ZiAVwg04IbAxDIGxPpmTDDtLuStHKwADjYamw==
+X-Received: by 2002:a05:620a:178c:b0:7a9:a356:a5dd with SMTP id af79cd13be357-7ae373a7a7dmr1433156385a.20.1727585234780;
+        Sat, 28 Sep 2024 21:47:14 -0700 (PDT)
+Received: from localhost.localdomain ([185.221.23.200])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7ae3783ff45sm265461385a.115.2024.09.28.21.47.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 28 Sep 2024 21:47:13 -0700 (PDT)
+From: jiaqingtong97@gmail.com
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Cc: Jia Qingtong <jiaqingtong@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: arm64: vgic: fix GICR_STATUSR in vgic_v3_rd_registers
+Date: Sun, 29 Sep 2024 12:39:35 +0800
+Message-ID: <20240929043937.242769-2-jiaqingtong97@gmail.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 19/19] virt: arm-cca-guest: TSM_REPORT support for
- realms
-To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, Sami Mujawar <sami.mujawar@arm.com>
-References: <20240819131924.372366-1-steven.price@arm.com>
- <20240819131924.372366-20-steven.price@arm.com> <yq5aikveemnk.fsf@kernel.org>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <yq5aikveemnk.fsf@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 02/09/2024 04:53, Aneesh Kumar K.V wrote:
-> Steven Price <steven.price@arm.com> writes:
-> 
->> From: Sami Mujawar <sami.mujawar@arm.com>
->  
-> ...
->  
->> --- /dev/null
->> +++ b/drivers/virt/coco/arm-cca-guest/Kconfig
->> @@ -0,0 +1,11 @@
->> +config ARM_CCA_GUEST
->> +	tristate "Arm CCA Guest driver"
->> +	depends on ARM64
->> +	default m
->> +	select TSM_REPORTS
->> +	help
->> +	  The driver provides userspace interface to request and
->> +	  attestation report from the Realm Management Monitor(RMM).
->> +
->> +	  If you choose 'M' here, this module will be called
->> +	  arm-cca-guest.
->>
-> 
-> Can we rename the generic Kconfig variable to ARM_CCA_TSM_REPORT?. Also
-> should the directory be arm64-cca-guest?
+From: Jia Qingtong <jiaqingtong@huawei.com>
 
-This matches the existing sev-guest and tdx-guest directories (and
-SEV_GUEST/TDX_GUEST_DRIVER kconfig), although I agree it's not great
-naming as it stands.
+vgic_uaccess use bsearch search regs in vgic_io_device.regions, but the
+GICR_STATUSR have wrong order in vgic_v3_rd_registers.
+When check all vgic_register_region, it turned out that only
+vgic_v3_rd_registers has this problem.
 
-But I'm also wondering if this will one day expand to include some other
-communication with the RMM. For example I know it's been discussed
-whether the guest should have involvement with firmware updates or
-migration to another host. So there's a reasonable chance we could end
-up renaming it back to a general "arm_cca_guest" if it grows more
-capabilities in the future.
+It's harmless since vgic_uaccess behaves as RAZ&WI when it can't find the
+specified reg. This is exactly the same as the behavior of the GICR_STATUSR
+register.
 
-Steve
+So just move GICR_STATUSR to the right place.
+
+Signed-off-by: Jia Qingtong <jiaqingtong@huawei.com>
+---
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+index 9e50928f5d7d..822b4c1a01dc 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+@@ -651,9 +651,6 @@ static const struct vgic_register_region vgic_v3_rd_registers[] = {
+ 	REGISTER_DESC_WITH_LENGTH(GICR_CTLR,
+ 		vgic_mmio_read_v3r_ctlr, vgic_mmio_write_v3r_ctlr, 4,
+ 		VGIC_ACCESS_32bit),
+-	REGISTER_DESC_WITH_LENGTH(GICR_STATUSR,
+-		vgic_mmio_read_raz, vgic_mmio_write_wi, 4,
+-		VGIC_ACCESS_32bit),
+ 	REGISTER_DESC_WITH_LENGTH(GICR_IIDR,
+ 		vgic_mmio_read_v3r_iidr, vgic_mmio_write_wi, 4,
+ 		VGIC_ACCESS_32bit),
+@@ -661,6 +658,9 @@ static const struct vgic_register_region vgic_v3_rd_registers[] = {
+ 		vgic_mmio_read_v3r_typer, vgic_mmio_write_wi,
+ 		NULL, vgic_mmio_uaccess_write_wi, 8,
+ 		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICR_STATUSR,
++		vgic_mmio_read_raz, vgic_mmio_write_wi, 4,
++		VGIC_ACCESS_32bit),
+ 	REGISTER_DESC_WITH_LENGTH(GICR_WAKER,
+ 		vgic_mmio_read_raz, vgic_mmio_write_wi, 4,
+ 		VGIC_ACCESS_32bit),
+
+base-commit: 17a0005644994087794f6552d7a5e105d6976184
+-- 
+2.46.0
 
