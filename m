@@ -1,55 +1,53 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C3031428FA;
-	Sun, 29 Sep 2024 09:38:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DA3613AA4E
+	for <kvmarm@lists.linux.dev>; Sun, 29 Sep 2024 10:07:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727602719; cv=none; b=p1jhcxHhASvdC+jptrM5jGLsJIy1/trU+2mmIrTUxdc7GzHU3KorbLTe/u3knzRqPyDDPk6irwj4uusMcGoykgLzslWQaD3zCQckqxjQeelcWfCuaU91dybswd2IofCVM3qhm2JWV6cSuJIYmqNDz3kS6BBEF6D3XIuEQYH/kVA=
+	t=1727604462; cv=none; b=KELyNXGoajZ330v/9C+QQpapN1NsDMTv9LPlhja5JU8MjNGkWooSXWDPlnqmce2MbbgMIhrbwLbcUj4UB4/VdOn461G+4sGN3V9mLUjQyswkAGv0HE6JJctgUmNqjPGERmruU6/9j2vywHTKZf2yrniGja0qclT31f1KaIxCWbk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727602719; c=relaxed/simple;
-	bh=kl8V5IsDsE3p1fGajjYA/Y3X9DNawVe6buZRKJlZ7iw=;
+	s=arc-20240116; t=1727604462; c=relaxed/simple;
+	bh=+1tsaAkdafs2R/KYuS4+eiY1pbGwsl8xbGU+N6LiyW0=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HZD+onO9rLhLb4LeSS4P3bX1YdW5DM3oumsNDNDQjpjbr0UCWGlpZZXDFnka/ayXo2ZmQ2+funMKPqgSoM9viLq744gyGnuMZiViyt/3Ka87wNJAOcd/3Hqt704LNnWqweKxbU5ebMUe2JWow/Tuy/U+uOQPJglakXhFe9bqU5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bz9WR7m9; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=iZz+9XezQ87GH31CCm2HTLm/AsTCEWP0/SFMEoh7PDkTyItMhvlFk+kXEOaRk4+wOpH0PF0wbloVhE2Ou9jT6uJ7+YUIdugK3K5NYWygLeiaMzLPYtGLCH0M7XkarE2Q8rjUSNfClGAVw7lD4na7FEFGp40rT9HuHDO1slR154s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ipW+2SN7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bz9WR7m9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75B29C4CEC5;
-	Sun, 29 Sep 2024 09:38:38 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ipW+2SN7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90C3FC4CEC5;
+	Sun, 29 Sep 2024 10:07:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727602718;
-	bh=kl8V5IsDsE3p1fGajjYA/Y3X9DNawVe6buZRKJlZ7iw=;
+	s=k20201202; t=1727604461;
+	bh=+1tsaAkdafs2R/KYuS4+eiY1pbGwsl8xbGU+N6LiyW0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bz9WR7m9Kw5OQPzaPSrqyRf75yLGjyHVrsNohzqKtyUJB3menm2ztv0U2ujiGl37V
-	 QQsc7Lr9O8pN4YnDhCsYLwbe5yGJV3BQ+cDzufBDwYtOeu6PR/v1PV41aFbxqMw21m
-	 lM/siBpUU0joceQ/nzzCrzIvbW+X6Nc0UCidhhVPggT67/DDKx6JB9pTCZ22q1jzQB
-	 bw3zHhSst0FYG3UmOqHwCRgm+9q9NhgHmf7YqFhZsDlNsiStHBBB5i4MQyHeuB0eS7
-	 E47ypMRXYjrLdMrSehLWHndlCD2+tZfpJUdyaaM5Jv/Iz1BFk6JYCmIppceYMFMVrr
-	 li8268Cy/PXLA==
+	b=ipW+2SN70UgWObZAA4QScmZaRbtWf4ugPuJwRbN3pwSUqIBRQAQVwBcMOjMKWZGIt
+	 r0NJYtSilA8ts7jbwxdghvms1MD5EvpDWeTS2bXrmKWoopZbB8ELj1nWqVYlhCWqQz
+	 JWjejq3l/qfLBoDOxiCG3kCNwNR5hKJvz2hLLA9IoFbCQOvnwYvT06pOTJt4VeMjEK
+	 ZbbsZhAQgX/xdkskVH6esEwgGKxC+vrxE8YSuZkB+yA9Ib8yqDy27dbHKDuGGyUTvz
+	 xXpdeGvBkMS0y4B71Faan1AFbrZ8uKQhqON1wZQAN3JkZjqfPtN5XVjXxYvei/jpeC
+	 Kn9on9HvhbYfA==
 Received: from [185.143.37.16] (helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1suqNw-00GC4u-0U;
-	Sun, 29 Sep 2024 10:38:36 +0100
-Date: Sun, 29 Sep 2024 10:38:35 +0100
-Message-ID: <87v7yevlyc.wl-maz@kernel.org>
+	id 1suqq3-00GCGs-G3;
+	Sun, 29 Sep 2024 11:07:39 +0100
+Date: Sun, 29 Sep 2024 11:07:38 +0100
+Message-ID: <87ttdyvklx.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: jiaqingtong97@gmail.com
+To: Kunkun Jiang <jiangkunkun@huawei.com>
 Cc: Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Jia Qingtong <jiaqingtong@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: vgic: fix GICR_STATUSR in vgic_v3_rd_registers
-In-Reply-To: <20240929043937.242769-2-jiaqingtong97@gmail.com>
-References: <20240929043937.242769-2-jiaqingtong97@gmail.com>
+	<linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>,
+	<wanghaibin.wang@huawei.com>,
+	<tangnianyao@huawei.com>,
+	<wangzhou1@hisilicon.com>
+Subject: Re: [bug report] KVM: arm64: vgic-v4: Occasionally issue VMOVP to an unmapped VPE on GICv4.1
+In-Reply-To: <c182ece6-2ba0-ce4f-3404-dba7a3ab6c52@huawei.com>
+References: <c182ece6-2ba0-ce4f-3404-dba7a3ab6c52@huawei.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -60,40 +58,121 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 X-SA-Exim-Connect-IP: 185.143.37.16
-X-SA-Exim-Rcpt-To: jiaqingtong97@gmail.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, jiaqingtong@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: jiangkunkun@huawei.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, wanghaibin.wang@huawei.com, tangnianyao@huawei.com, wangzhou1@hisilicon.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sun, 29 Sep 2024 05:39:35 +0100,
-jiaqingtong97@gmail.com wrote:
-> 
-> From: Jia Qingtong <jiaqingtong@huawei.com>
-> 
-> vgic_uaccess use bsearch search regs in vgic_io_device.regions, but the
-> GICR_STATUSR have wrong order in vgic_v3_rd_registers.
-> When check all vgic_register_region, it turned out that only
-> vgic_v3_rd_registers has this problem.
-> 
-> It's harmless since vgic_uaccess behaves as RAZ&WI when it can't find the
-> specified reg. This is exactly the same as the behavior of the GICR_STATUSR
-> register.
->
-> So just move GICR_STATUSR to the right place.
+On Sun, 29 Sep 2024 08:18:41 +0100,
+Kunkun Jiang <jiangkunkun@huawei.com> wrote:
+>=20
+> Hi all,
+>=20
+> I found a problem with occasionally issuing VMOVP to an unmapped VPE
+> on GICv4.1. In my test environment, operating an unmapped VPE will
+> generate RAS, so I found this problem. The detailed analysis is as
+> follows.
+>=20
+> The vgic_v4_teardown() will be executed when VM is destroyed to free
+> the GICv4 data structures. The code is as follows:
+> > /**
+> >  * vgic_v4_teardown - Free the GICv4 data structures
+> >  * @kvm:        Pointer to the VM being destroyed
+> >  */
+> > void vgic_v4_teardown(struct kvm *kvm)
+> > {
+> >         struct its_vm *its_vm =3D &kvm->arch.vgic.its_vm;
+> >         int i;
+> >=20
+> >         lockdep_assert_held(&kvm->arch.config_lock);
+> >=20
+> >         if (!its_vm->vpes)
+> >                 return;
+> >=20
+> >         for (i =3D 0; i < its_vm->nr_vpes; i++) {
+> >                 struct kvm_vcpu *vcpu =3D kvm_get_vcpu(kvm, i);
+> >                 int irq =3D its_vm->vpes[i]->irq;
+> >=20
+> >                 irq_clear_status_flags(irq, DB_IRQ_FLAGS);
+> >                 free_irq(irq, vcpu);
+> >         }
+> >=20
+> >         its_free_vcpu_irqs(its_vm);
+> >         kfree(its_vm->vpes);
+> >         its_vm->nr_vpes =3D 0;
+> >         its_vm->vpes =3D NULL;
+> > }
+>=20
+> [1] In irq_clear_status_flags(irq, DB_IRQ_FLAGS), the status flags of
+> a doorbell are cleared. DB_IRQ_FLAGS contains IRQ_NO_BALANCING. So
+> after this,the irqbalance.service can schedule the doorbell.
+> [2] In free_irq(), the VPE is unmaped.
+> [3] In its_free_vcpu_irqs(its_vm), unregister_irq_proc() is called to
+> delete the contents in /proc/irq/xx/ of the doorbell.
+>=20
+> For VPEs in large-scale VM, there is a centain time window between [2]
+> and [3]. The irqbalance.service got a chance to schedule the
+> doorbell. Therefore, the VMOVP is issued to an unmapped VPE.
+>=20
+> I tried not clearing IRQ_NO_BALANCING and the problem was solved. But
+> it's not clear if there's any other problem with doing so.
 
-That looks correct, but I think we should have some code that ensures
-that these tables are correct at boot time, just like we're doing for
-the system registers. Or completely remove our reliance on bsearch().
+I don't think that's a good idea, because whoever request the same
+interrupt number again for a different purpose will have the flag set
+and will experience odd behaviours.
 
-Another thing is that GICD_STATUSR looks pretty wrong. It is handled
-as RAO, but we never clear any "error" (it is WI). This has been buggy
-since GICv3 save/restore was added, 7 years ago.
-
-Do you mind spinning a series fixing this up?
+I'd rather fix it for good, given that we have all the necessary
+tracking in place already. Something like the patch below, as usual
+untested.
 
 Thanks,
 
 	M.
 
--- 
+=46rom c0fe216c50651458fdf1ebb6b3a1e4ffe2bcc6c2 Mon Sep 17 00:00:00 2001
+From: Marc Zyngier <maz@kernel.org>
+Date: Sun, 29 Sep 2024 10:58:19 +0100
+Subject: [PATCH] irqchip/gic-v4: Don't allow a VMOVP on a dying VPE
+
+Kunkun Jiang reports that there is a small window of opportunity for
+userspace to force a change of affinity for a VPE while the VPE has
+already been unmapped, but the corresponding doorbell interrupt still
+visible in /proc/irq/.
+
+Plug the race by checking the value of vmapp_count, which tracks whether
+the VPE is mapped ot not, and returning an error in this case.
+
+Reported-by: Kunkun Jiang <jiangkunkun@huawei.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Link: https://lore.kernel.org/r/c182ece6-2ba0-ce4f-3404-dba7a3ab6c52@huawei=
+.com
+---
+ drivers/irqchip/irq-gic-v3-its.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-=
+its.c
+index fdec478ba5e7..ba9734d1a41f 100644
+--- a/drivers/irqchip/irq-gic-v3-its.c
++++ b/drivers/irqchip/irq-gic-v3-its.c
+@@ -3806,6 +3806,13 @@ static int its_vpe_set_affinity(struct irq_data *d,
+ 	struct cpumask *table_mask;
+ 	unsigned long flags;
+=20
++	/*
++	 * Check if we're racing against a VPE being destroyed, for
++	 * which we don't want to allow a VMOVP.
++	 */
++	if (!atomic_read(&vpe->vmapp_count))
++		return -EINVAL;
++
+ 	/*
+ 	 * Changing affinity is mega expensive, so let's be as lazy as
+ 	 * we can and only do it if we really have to. Also, if mapped
+--=20
+2.43.0
+
+
+--=20
 Without deviation from the norm, progress is not possible.
