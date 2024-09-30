@@ -1,133 +1,83 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58766168488;
-	Mon, 30 Sep 2024 20:02:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9029D186E52
+	for <kvmarm@lists.linux.dev>; Mon, 30 Sep 2024 21:56:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727726540; cv=none; b=JJlJzS3jt00wGbY7zcHv21dd1unu0X6P75rOtgHFDnMI53jmIe6fQnPJ+pwMvzHIOE/MYNYI3GcMSwftA7atEFsY6e/AJgEBJINlEfyLMBZBqHAT+X0BSLK1rBq3b+IGaiwuRMWCNsIxkB3xviIV3MzQitfvj7+ixM8shUt3mUk=
+	t=1727733413; cv=none; b=WRSYbfPu/5LlV3/C59pI4DyrONBP+4bCFIbGJ98gmzozvfEFbvpNU1EKvXgH1gOSsVBG65aCr0fn99DLeQILdvdqpGdevFGsDW2u0ZN8vnmnSBDT9pisrcpO1/DEfAcqTbJWf/MkXX4NYKcJH5rti484L5vlLsU7EJWodLq105Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727726540; c=relaxed/simple;
-	bh=9QLOa/TQi7lR+XJ+LawxAWx/A8C/LVBvDC8G9OxcET8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=iRj8syNE4KVPCfz91NzIwf5oTFW4KtsnoSEiqUNOdWYq9r/UWkrpRDiMn49f3qSE87DwOf0nYg4DafM/suyGmPhUS6Qcreen28aQS8mDTBymNsBCAqEpXH77Q89onIPQTU1ReYbqbYsZt/Z/32yttbsPqm+lF6RZ6gxMIFTfpnc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QQ2YWLsX; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1727733413; c=relaxed/simple;
+	bh=EI35CoEM1AcSciWaRt5Y7P85pwkoV/1G1OSkpZxfbPg=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Content-Type; b=YMYMQgxg3flmyzZ+ZGmnOTjTFiCxe1R2fEothVfz28wTkLUl4JSeu7YrYdbz6Qe74Mbu6qs7cmVYknSmNh8TDuKnzDkDtvr4psh8pJr582qHfr/WXXYbiGu1ToZCAGhz1+Z0lIj57MW7HHeyZ3yq/xwH4bnwrbdg/YOAbcTmFX8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NeEwifml; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QQ2YWLsX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF62AC4CECD;
-	Mon, 30 Sep 2024 20:02:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727726539;
-	bh=9QLOa/TQi7lR+XJ+LawxAWx/A8C/LVBvDC8G9OxcET8=;
-	h=From:Date:Subject:To:Cc:From;
-	b=QQ2YWLsX3ueDajhEnXyMWoBBGAX23cIRKnhaTUGB1yHqVLXg/BLicPTYZp+muqT1y
-	 XSTfV6IuLURDetyTT2n0hhTbSCjEV9+av8PqJbz6KV6zAWzMuji/O4GeTjK7pMoA/i
-	 hGi8TAwQv6AL/l90pDrbv30sZwIUcaYSqqhQUXauAJ0BBiRlrxUmodTueOLixHQjNA
-	 um6CXzBsc0BQxznWInFhfJV17upuwhyd05Rr0RZ5H9sF4KVR0jJbuRYxwYroT4BWy+
-	 qyRDiTtY8NNPQ1aAoLYh7FA3aQBfn6JX39jNpDBDXDY0aw+kb2Y4XUpT7mJIpoEmi/
-	 lW1Q+hVqXLEOQ==
-From: Mark Brown <broonie@kernel.org>
-Date: Mon, 30 Sep 2024 21:02:04 +0100
-Subject: [PATCH v4] KVM: arm64: Fix confusion in documentation for pKVM SME
- assert
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NeEwifml"
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2e08735ed9dso6684678a91.3
+        for <kvmarm@lists.linux.dev>; Mon, 30 Sep 2024 14:56:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1727733412; x=1728338212; darn=lists.linux.dev;
+        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=PntPBodbq4krAqAL/kXN8N5SHx+RiWW9dX81Z4mrKcI=;
+        b=NeEwifmlixz/oYOvuJ9ak2/A6/t4qE7sO1eroHce1bdFVQFHwEaG+UdrVWDO7waZRr
+         9XmrqqTn/vWXKB05c6uGXeQIYmrQ/FA2mObcFSgyf/aicDhXfdTLr2f3lhNM4PX99jyz
+         nihH+/lEzI3gYyu4ol54/+CFD8SFbDjs/aVnHpkI+VDRWgYM08ZgHdsuKf7pbxTpkT+7
+         WzAvSMr1bU7RKaRCU0YhfZlPl5BI6ZBfsd2AyRmtKcMzTcX/lDxYareDJxsUmoqheOLr
+         agOPpyApo0bicDYy5BqL4FfVH/VeAYlzX4f4k8Ls8cdA0n7e9RwyxTqttHUZHG9lDXn5
+         PuQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727733412; x=1728338212;
+        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PntPBodbq4krAqAL/kXN8N5SHx+RiWW9dX81Z4mrKcI=;
+        b=Y5wbecWxkS6W6od5u5pHBNlu4xelqX4KPfNRgmjfVZa5gyq0hpe7YuF23/AnOHzARW
+         BEXlrMUjszAvMDCg2gVAK0/pf7xSBa1zN1pJNFIFfd7lX0K0Vrzzipr7+iwHQ83+hAF7
+         i6pZb6wf95/+lORKV8EE9wxqH4yd0OTJ2z10V8QgeO3y2CBZv4KHP2QZxSnQOfaEAtFA
+         DTTPKwM5268tobZ13qczIaatnDjfmfM0KIicJiys13buCONv2mCVwFCXp3oRv27wq3Oe
+         T/aI/NRRgqPHcuoRiLBDxVtJ+KNshreZDix4dlDmGzuPvyO9uGfuK+3f0aiufCzBAW6i
+         ovRw==
+X-Forwarded-Encrypted: i=1; AJvYcCWd1/eFIp4xULFL8amJiVbJ3eI4c/OTIZ8CZ9CB9Z6vrTJBqT+HuktlZXPfmSom8XF97693P3c=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyheQYpY4q9XcZrfR6FE3Y8m4yCERqwxvduqvjAgPtNJM9W7Z7G
+	fC4YQQkP9Zyb4Iw3K/hNTiDRak5F8SBG+d244wQR5SrubFVd040mqlSXTcgmuMwzlFsFYISlwKX
+	CYw==
+X-Google-Smtp-Source: AGHT+IFa/3NUudFCuE72HcCwi+hM+UVm+5oAl6XGWfqHgohNP2i/0xjhJQmHwp45qjEiLZEOk9HWi9na7w8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:f691:b0:20b:aed1:bf77 with SMTP id
+ d9443c01a7336-20baed1c097mr62225ad.7.1727733411419; Mon, 30 Sep 2024 14:56:51
+ -0700 (PDT)
+Date: Mon, 30 Sep 2024 14:56:49 -0700
+In-Reply-To: <20240911204158.2034295-4-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240930-kvm-arm64-sme-assert-v4-1-3c9df71db688@kernel.org>
-X-B4-Tracking: v=1; b=H4sIALsD+2YC/4XOQQ6CMBAF0KuQrq0p7RSKK+9hXBQ6QIOAaUmjI
- dzdwkaNIS7/JP/9mYlHZ9GTUzITh8F6Ow4xwCEhVauHBqk1MRPOOLCMAe1CT7XrM6C+R6p97E9
- UapNLaQCVzkis3h3W9rGxl2vMrfXT6J7bSkjX6x8wpDSl0hRKgDKM1ercoRvwdhxdQ1Yx8E9F7
- ih8VUAUacmY4DX8KOKt5ILtKCIqKisKkICyKr9/WZblBbGLZ+NFAQAA
+Mime-Version: 1.0
+References: <20240911204158.2034295-1-seanjc@google.com> <20240911204158.2034295-4-seanjc@google.com>
+Message-ID: <ZvseoZLzmaS4MEbc@google.com>
+Subject: Re: [PATCH v2 03/13] KVM: selftests: Fudge around an apparent gcc bug
+ in arm64's PMU test
+From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
- James Morse <james.morse@arm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
- Fuad Tabba <tabba@google.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
- linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.15-dev-99b12
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2717; i=broonie@kernel.org;
- h=from:subject:message-id; bh=9QLOa/TQi7lR+XJ+LawxAWx/A8C/LVBvDC8G9OxcET8=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBm+wPHrpL2ZXNqc4NnavNhLe4f/lNGtPo60qn5Z9gM
- GpYr7+CJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZvsDxwAKCRAk1otyXVSH0D/yB/
- wNGk1Zcr4S98KVGltp4VROk5qXQlS19eOBb7ijfYZNcEfOkmheZpc1maxdJh+Y+f45R9r7JvTtdYsA
- DH13NrRsDvjh/LGNISFR9EXst+La55VJOSpDSKVZ22ckOn3EYr8kh5ahPp6djQbeQONlPMDv0pTzKt
- eFb27+s6icmzDJeb0SSiDDkv+KGqvVQLPW86qOZ5Ev/4NG4UxMxDk+67DAjyeT9ScPMAIpUZjwzbgz
- oTkszWm/AP6vOLENMc/tOqAGjB3U+B/sQ9Vnd05SVm7Y8IPd4iFzSaQAM8wtz71vqNqR3GUnAuVxmQ
- ClA5ag7kC5Ehp8sD9C79iTMZnfwcT/
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+	Anup Patel <anup@brainfault.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	James Houghton <jthoughton@google.com>
+Content-Type: text/plain; charset="us-ascii"
 
-As raised in the review comments for the original patch the assert and
-comment added in afb91f5f8ad7 ("KVM: arm64: Ensure that SME controls are
-disabled in protected mode") are bogus. The comments says that we check
-that we do not have SME enabled for a pKVM guest but the assert actually
-checks to see if the host has anything set in SVCR which is unrelated to
-the guest features or state, regardless of if those guests are protected
-or not. This check is also made in the hypervisor, it will refuse to run
-a guest if the check fails, so it appears that the assert here is
-intended to improve diagnostics.
+On Wed, Sep 11, 2024, Sean Christopherson wrote:
+> Use u64_replace_bits() instead of u64p_replace_bits() to set PMCR.N in
+> arm64's vPMU counter access test to fudge around what appears to be a gcc
+> bug.  With the recent change to have vcpu_get_reg() return a value in lieu
+> of an out-param, some versions of gcc completely ignore the operation
+> performed by set_pmcr_n(), i.e. ignore the output param.
 
-Update the comment to reflect the check in the code, and to clarify that
-we do actually enforce this in the hypervisor. While we're here also
-update to use a WARN_ON_ONCE() to avoid log spam if this triggers.
+Filed a gcc bug: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=116912
 
-Fixes: afb91f5f8ad7 ("KVM: arm64: Ensure that SME controls are disabled in protected mode")
-Reviewed-by: Fuad Tabba <tabba@google.com>
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
-This has gone more than a kernel release with only positive review
-comments...
----
-Changes in v4:
-- Rebase onto v6.12-rc1
-- Link to v3: https://lore.kernel.org/r/20240730-kvm-arm64-sme-assert-v3-1-8699454e5cb8@kernel.org
-
-Changes in v3:
-- Rebase onto v6.11-rc1.
-- Link to v2: https://lore.kernel.org/r/20240605-kvm-arm64-sme-assert-v2-1-54391b0032f4@kernel.org
-
-Changes in v2:
-- Commit message tweaks.
-- Change the assert to WARN_ON_ONCE().
-- Link to v1: https://lore.kernel.org/r/20240604-kvm-arm64-sme-assert-v1-1-5d98348d00f8@kernel.org
----
- arch/arm64/kvm/fpsimd.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
-
-diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-index ea5484ce1f3b..5fb9b3fc61ec 100644
---- a/arch/arm64/kvm/fpsimd.c
-+++ b/arch/arm64/kvm/fpsimd.c
-@@ -93,11 +93,14 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
- 	}
- 
- 	/*
--	 * If normal guests gain SME support, maintain this behavior for pKVM
--	 * guests, which don't support SME.
-+	 * The pKVM hypervisor does not yet understand how to save or
-+	 * restore SME state for the host so double check that if we
-+	 * are running with pKVM we have disabled SME.  The hypervisor
-+	 * enforces this when the guest is run, this check is for
-+	 * clearer diagnostics.
- 	 */
--	WARN_ON(is_protected_kvm_enabled() && system_supports_sme() &&
--		read_sysreg_s(SYS_SVCR));
-+	WARN_ON_ONCE(is_protected_kvm_enabled() && system_supports_sme() &&
-+		     read_sysreg_s(SYS_SVCR));
- }
- 
- /*
-
----
-base-commit: 9852d85ec9d492ebef56dc5f229416c925758edc
-change-id: 20240604-kvm-arm64-sme-assert-5ad755d4e8a6
-
-Best regards,
--- 
-Mark Brown <broonie@kernel.org>
-
+I'll report back if anything interesting comes out of that bug.
