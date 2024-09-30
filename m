@@ -1,55 +1,55 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE8BD190075
-	for <kvmarm@lists.linux.dev>; Mon, 30 Sep 2024 14:04:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 384C918EFEB
+	for <kvmarm@lists.linux.dev>; Mon, 30 Sep 2024 14:09:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727705074; cv=none; b=sW9fp9ME+QvVRpqGz/06aiKmHH5cxEKotA5jR8TJhy3Vyiu2CI5DEZGtMl5of3uDLd2meEPpSCiuP9BXT3q36hg6AvZN+jqPfeBQSOVcyvt52OkKDYshkvHscYiex/Hfrh8dIVOE/ADR5GkFZGRmfotW922WzFeEUdvPQqjGFgE=
+	t=1727705396; cv=none; b=og3tdJ0EFyS5tfk2V0BbJudSUcLC44YRn14gUDbLHHjVjMklJa4caEM+3T4zvc4uGG+N88/h5yQOB/zCENWzh8cLgZE+dXQDuS/etECulM5KVF2MXE6Kzj/1RCJK8q8mFIKpWwjDlGp8ecG1LiFOK7NvbqmecAdf/Fr2JRFnHkw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727705074; c=relaxed/simple;
-	bh=A2HUR2/uC0CgkLnf9qv7sS7YjA12F1nbKCibR8CagMo=;
+	s=arc-20240116; t=1727705396; c=relaxed/simple;
+	bh=xIhCwLT+5EuwEo8Tx2twzWVA1JnCXRa20LyD9fiNNbc=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LSr5ATWD5uOMNd4BGZBiwR4RKEC+ZlD6m4upZBDx6PD7pnsq66WLEc5laVBrNWVD+GSFPYJ3YeyxH2X3wkgibxPmq4cL0lNl7HN2V51LGOK9RHQD8b6E19thV4Uav2eyl061PHiB8hNN4subnI5cCloT4l+t0/UKxgsJf+L7rag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sCRW2/2X; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=NfXeRUywihtuxR0Bxmgri+a8b1AE6ZFYMyG12HvXw0lA+fVzSdfMc9J3KHBQluP8IO4jFselmy5N3SrtsebwSTMFEp9opVeuUQHea2qpim+EmHnL7YASZ64bxemuoOqJkSH/YoJg/6WTZr3IRn6tBTdsFlOGueT/Osb7VCEqztk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QMUrGcjT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sCRW2/2X"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C9CAC4CED0;
-	Mon, 30 Sep 2024 14:04:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QMUrGcjT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 006A6C4CEC7;
+	Mon, 30 Sep 2024 14:09:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727705074;
-	bh=A2HUR2/uC0CgkLnf9qv7sS7YjA12F1nbKCibR8CagMo=;
+	s=k20201202; t=1727705396;
+	bh=xIhCwLT+5EuwEo8Tx2twzWVA1JnCXRa20LyD9fiNNbc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sCRW2/2XTNHcXcZUgU3ih6dHlIu3vS/ylOZLkmxHV7v3yiq7hqiDCLPvqvhklgbXz
-	 giPDVs+njIWVC/gSuwIfVjyjOwe2CE/RKBte9ImgVsR7C6KG0kHHNVwWmoAQu4nhYE
-	 XSdKLNeRq8vj9Lba28lUVK/58i2wSNLsNzoI98BwFconrz44pZT6Bp0W2CGEKVkRXf
-	 SWj3aFN1xGhVHy2TZhrEZJMJNQ0aB3CqHJGhfYechvQgJDNPc/3r6kDzZa7egYLiYq
-	 Vp+UFAd4Z6BW2rWwZ22eORHX7+QOTgzx2AvCTkTVdwBWRLWMIDtTbocu1lcUtC9uxi
-	 /JHkPvkO+aIdw==
+	b=QMUrGcjT8u1xHeMCd4YfZ6ABDuxEekUa41X3lkhxpZXJKvdMWdx/EhFqTPi9C48MI
+	 1fw4+26PN/lGuQpcQprKEtN2LpVWYbsmCc6aEQAbKVcGtR90WzOauxihPSKNs1y904
+	 4afBWZ0NpSEfZvF6tSj8rMFQXdJIz3tvhRYcQFVPOat8s+P5I+RrMv2MU1A3hdorNB
+	 o5fh8TCHbb+0bfd9Wbbva3aWBiy6YAPyoUjJduczFr14f6xzShO3rLChkubU1Qyxeq
+	 b1ymorqhjFUkZ2Qd+zDfp7q7+stHqT6gUI8uvnqU2AozotFUmoYd3C6HaAk4h5cvIJ
+	 c2ZoVav5hMDlA==
 Received: from [12.191.124.166] (helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1svH0p-00GSnz-EN;
-	Mon, 30 Sep 2024 15:04:31 +0100
-Date: Mon, 30 Sep 2024 15:04:26 +0100
-Message-ID: <87sethutjp.wl-maz@kernel.org>
+	id 1svH61-00GStE-KD;
+	Mon, 30 Sep 2024 15:09:54 +0100
+Date: Mon, 30 Sep 2024 15:09:48 +0100
+Message-ID: <87r091utar.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Cc: Kunkun Jiang <jiangkunkun@huawei.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
+To: Kunkun Jiang <jiangkunkun@huawei.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	wanghaibin.wang@huawei.com,
-	tangnianyao@huawei.com,
-	wangzhou1@hisilicon.com
+	<linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>,
+	<wanghaibin.wang@huawei.com>,
+	<tangnianyao@huawei.com>,
+	<wangzhou1@hisilicon.com>
 Subject: Re: [bug report] KVM: arm64: vgic-v4: Occasionally issue VMOVP to an unmapped VPE on GICv4.1
-In-Reply-To: <f9ba0b4c-b7d6-40da-b84f-525cc0bc4a25@os.amperecomputing.com>
+In-Reply-To: <5ea32d67-f429-acfb-c6d4-06c7860146e2@huawei.com>
 References: <c182ece6-2ba0-ce4f-3404-dba7a3ab6c52@huawei.com>
-	<f9ba0b4c-b7d6-40da-b84f-525cc0bc4a25@os.amperecomputing.com>
+	<87ttdyvklx.wl-maz@kernel.org>
+	<5ea32d67-f429-acfb-c6d4-06c7860146e2@huawei.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -61,30 +61,84 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 12.191.124.166
-X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, jiangkunkun@huawei.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, wanghaibin.wang@huawei.com, tangnianyao@huawei.com, wangzhou1@hisilicon.com
+X-SA-Exim-Rcpt-To: jiangkunkun@huawei.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, wanghaibin.wang@huawei.com, tangnianyao@huawei.com, wangzhou1@hisilicon.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 30 Sep 2024 06:18:29 +0100,
-Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+On Mon, 30 Sep 2024 07:25:28 +0100,
+Kunkun Jiang <jiangkunkun@huawei.com> wrote:
 > 
+> Hi Marc,
 > 
-> Hi Kunkun,
-> 
-> On 29-09-2024 12:48 pm, Kunkun Jiang wrote:
-> > Hi all,
+> On 2024/9/29 18:07, Marc Zyngier wrote:
+> > On Sun, 29 Sep 2024 08:18:41 +0100,
+> > Kunkun Jiang <jiangkunkun@huawei.com> wrote:
+> >> 
+> >> Hi all,
+> >> 
+> >> I found a problem with occasionally issuing VMOVP to an unmapped VPE
+> >> on GICv4.1. In my test environment, operating an unmapped VPE will
+> >> generate RAS, so I found this problem. The detailed analysis is as
+> >> follows.
+> >> 
+> >> The vgic_v4_teardown() will be executed when VM is destroyed to free
+> >> the GICv4 data structures. The code is as follows:
+> >>> /**
+> >>>   * vgic_v4_teardown - Free the GICv4 data structures
+> >>>   * @kvm:        Pointer to the VM being destroyed
+> >>>   */
+> >>> void vgic_v4_teardown(struct kvm *kvm)
+> >>> {
+> >>>          struct its_vm *its_vm = &kvm->arch.vgic.its_vm;
+> >>>          int i;
+> >>> 
+> >>>          lockdep_assert_held(&kvm->arch.config_lock);
+> >>> 
+> >>>          if (!its_vm->vpes)
+> >>>                  return;
+> >>> 
+> >>>          for (i = 0; i < its_vm->nr_vpes; i++) {
+> >>>                  struct kvm_vcpu *vcpu = kvm_get_vcpu(kvm, i);
+> >>>                  int irq = its_vm->vpes[i]->irq;
+> >>> 
+> >>>                  irq_clear_status_flags(irq, DB_IRQ_FLAGS);
+> >>>                  free_irq(irq, vcpu);
+> >>>          }
+> >>> 
+> >>>          its_free_vcpu_irqs(its_vm);
+> >>>          kfree(its_vm->vpes);
+> >>>          its_vm->nr_vpes = 0;
+> >>>          its_vm->vpes = NULL;
+> >>> }
+> >> 
+> >> [1] In irq_clear_status_flags(irq, DB_IRQ_FLAGS), the status flags of
+> >> a doorbell are cleared. DB_IRQ_FLAGS contains IRQ_NO_BALANCING. So
+> >> after this,the irqbalance.service can schedule the doorbell.
+> >> [2] In free_irq(), the VPE is unmaped.
+> >> [3] In its_free_vcpu_irqs(its_vm), unregister_irq_proc() is called to
+> >> delete the contents in /proc/irq/xx/ of the doorbell.
+> >> 
+> >> For VPEs in large-scale VM, there is a centain time window between [2]
+> >> and [3]. The irqbalance.service got a chance to schedule the
+> >> doorbell. Therefore, the VMOVP is issued to an unmapped VPE.
+> >> 
+> >> I tried not clearing IRQ_NO_BALANCING and the problem was solved. But
+> >> it's not clear if there's any other problem with doing so.
 > > 
-> > I found a problem with occasionally issuing VMOVP to an unmapped VPE
-> > on GICv4.1. In my test environment, operating an unmapped VPE will
-> > generate RAS, so I found this problem. The detailed analysis is as
-> > follows.
+> > I don't think that's a good idea, because whoever request the same
+> > interrupt number again for a different purpose will have the flag set
+> > and will experience odd behaviours.
 > > 
+> > I'd rather fix it for good, given that we have all the necessary
+> > tracking in place already. Something like the patch below, as usual
+> > untested.
 > 
-> May I know, what specific RAS errors you are getting?
+> After testing, the patch below fixes my problem.
 
-That'd be IMPDEF, as the GIC architecture doesn't specify how these
-errors are reported (see 5.5 "ITS command error encodings" in the
-GICv3 spec).
+Thanks. But it also introduces a regression on GICv4.0, which doesn't
+use vmapp_count. So the fix is slightly more involved.
+
+I'll try to post a more complete patch later this week.
 
 	M.
 
