@@ -1,132 +1,133 @@
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAA8F18C01E
-	for <kvmarm@lists.linux.dev>; Mon, 30 Sep 2024 17:33:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58766168488;
+	Mon, 30 Sep 2024 20:02:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727717645; cv=none; b=GjsblIpt0d9DqlevN1KAwAARCUTUpxl/siZIhKsI4+iifsTrk74tnuECSx2/61KBJaLUwjQbPRrU1pIY6rmYJW3x3nQBOktduVsz6J15yM6ldwqE5mkoCdnq/9MxWRZkJ9L/1ZoDV9fKTgx5jiMoaWvflcMDdqTO6/8wpjUTnJU=
+	t=1727726540; cv=none; b=JJlJzS3jt00wGbY7zcHv21dd1unu0X6P75rOtgHFDnMI53jmIe6fQnPJ+pwMvzHIOE/MYNYI3GcMSwftA7atEFsY6e/AJgEBJINlEfyLMBZBqHAT+X0BSLK1rBq3b+IGaiwuRMWCNsIxkB3xviIV3MzQitfvj7+ixM8shUt3mUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727717645; c=relaxed/simple;
-	bh=WBFgmih4XDphQtQvpQVn0y9UX7p+bwx3yLTouWZLfo4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NiOtyeJwzShl6+XaIray8WJKuBeRfNhuTG99FiqBqEp0/bbmz0Wt3wJjxiSLaZ4NxGhsz07MJcOKUCsnrGz5Uwjj5DLLBNcPMCTB15ei3vOj1ZZKYOSi0NSmueHr3j3dk4l3wJOHNIWLNIpNkCbRqb92lB9bookE8VlKAsfXtkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vpIrdrLy; arc=none smtp.client-ip=91.218.175.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1727726540; c=relaxed/simple;
+	bh=9QLOa/TQi7lR+XJ+LawxAWx/A8C/LVBvDC8G9OxcET8=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=iRj8syNE4KVPCfz91NzIwf5oTFW4KtsnoSEiqUNOdWYq9r/UWkrpRDiMn49f3qSE87DwOf0nYg4DafM/suyGmPhUS6Qcreen28aQS8mDTBymNsBCAqEpXH77Q89onIPQTU1ReYbqbYsZt/Z/32yttbsPqm+lF6RZ6gxMIFTfpnc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QQ2YWLsX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vpIrdrLy"
-Date: Mon, 30 Sep 2024 10:33:50 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1727717637;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ogJbp6u/vFspt7UJMT890uGNRUquUQecrB2wvxTdQpg=;
-	b=vpIrdrLybXMFg5ErJc8BKY0FmhG5mLCpONBaqJeuqHuw7jZUz5IRvqSJ/apTMwZV0uXwdW
-	01S8HF2tA7WYgbAt75YjLLWQgzY+lnRQXNhgGzQVrDlkc8tkJfvsW25te4cNWZC+IuFAIf
-	dveL98A3ryc3x2tEb7vN8GCNag2hcrU=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Lilit Janpoladyan <lilitj@amazon.com>, kvm@vger.kernel.org,
-	maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, nh-open-source@amazon.com,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH 0/8] *** RFC: ARM KVM dirty tracking device ***
-Message-ID: <Zvrg_r3lWtL-TZf_@linux.dev>
-References: <20240918152807.25135-1-lilitj@amazon.com>
- <Zuvq18Nrgy6j_pZW@linux.dev>
- <c309adcc88d7fb55d1ca7fdb9c32a6cd9c827c74.camel@infradead.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QQ2YWLsX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF62AC4CECD;
+	Mon, 30 Sep 2024 20:02:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727726539;
+	bh=9QLOa/TQi7lR+XJ+LawxAWx/A8C/LVBvDC8G9OxcET8=;
+	h=From:Date:Subject:To:Cc:From;
+	b=QQ2YWLsX3ueDajhEnXyMWoBBGAX23cIRKnhaTUGB1yHqVLXg/BLicPTYZp+muqT1y
+	 XSTfV6IuLURDetyTT2n0hhTbSCjEV9+av8PqJbz6KV6zAWzMuji/O4GeTjK7pMoA/i
+	 hGi8TAwQv6AL/l90pDrbv30sZwIUcaYSqqhQUXauAJ0BBiRlrxUmodTueOLixHQjNA
+	 um6CXzBsc0BQxznWInFhfJV17upuwhyd05Rr0RZ5H9sF4KVR0jJbuRYxwYroT4BWy+
+	 qyRDiTtY8NNPQ1aAoLYh7FA3aQBfn6JX39jNpDBDXDY0aw+kb2Y4XUpT7mJIpoEmi/
+	 lW1Q+hVqXLEOQ==
+From: Mark Brown <broonie@kernel.org>
+Date: Mon, 30 Sep 2024 21:02:04 +0100
+Subject: [PATCH v4] KVM: arm64: Fix confusion in documentation for pKVM SME
+ assert
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <c309adcc88d7fb55d1ca7fdb9c32a6cd9c827c74.camel@infradead.org>
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240930-kvm-arm64-sme-assert-v4-1-3c9df71db688@kernel.org>
+X-B4-Tracking: v=1; b=H4sIALsD+2YC/4XOQQ6CMBAF0KuQrq0p7RSKK+9hXBQ6QIOAaUmjI
+ dzdwkaNIS7/JP/9mYlHZ9GTUzITh8F6Ow4xwCEhVauHBqk1MRPOOLCMAe1CT7XrM6C+R6p97E9
+ UapNLaQCVzkis3h3W9rGxl2vMrfXT6J7bSkjX6x8wpDSl0hRKgDKM1ercoRvwdhxdQ1Yx8E9F7
+ ih8VUAUacmY4DX8KOKt5ILtKCIqKisKkICyKr9/WZblBbGLZ+NFAQAA
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+ James Morse <james.morse@arm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+ Fuad Tabba <tabba@google.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+ linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>
+X-Mailer: b4 0.15-dev-99b12
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2717; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=9QLOa/TQi7lR+XJ+LawxAWx/A8C/LVBvDC8G9OxcET8=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBm+wPHrpL2ZXNqc4NnavNhLe4f/lNGtPo60qn5Z9gM
+ GpYr7+CJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZvsDxwAKCRAk1otyXVSH0D/yB/
+ wNGk1Zcr4S98KVGltp4VROk5qXQlS19eOBb7ijfYZNcEfOkmheZpc1maxdJh+Y+f45R9r7JvTtdYsA
+ DH13NrRsDvjh/LGNISFR9EXst+La55VJOSpDSKVZ22ckOn3EYr8kh5ahPp6djQbeQONlPMDv0pTzKt
+ eFb27+s6icmzDJeb0SSiDDkv+KGqvVQLPW86qOZ5Ev/4NG4UxMxDk+67DAjyeT9ScPMAIpUZjwzbgz
+ oTkszWm/AP6vOLENMc/tOqAGjB3U+B/sQ9Vnd05SVm7Y8IPd4iFzSaQAM8wtz71vqNqR3GUnAuVxmQ
+ ClA5ag7kC5Ehp8sD9C79iTMZnfwcT/
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-On Thu, Sep 26, 2024 at 11:00:39AM +0100, David Woodhouse wrote:
-> > Beyond that, I have some reservations about maintaining support for
-> > features that cannot actually be tested outside of your own environment.
-> 
-> That's more about the hardware driver itself which will follow, than
-> the core API posted here.
-> 
-> I understand the reservation, but I think it's fine. In general, Linux
-> does support esoteric hardware that not everyone can test every
-> time. We do sweeping changes across all Ethernet drivers, for example,
-> and some of those barely even exist any more.
+As raised in the review comments for the original patch the assert and
+comment added in afb91f5f8ad7 ("KVM: arm64: Ensure that SME controls are
+disabled in protected mode") are bogus. The comments says that we check
+that we do not have SME enabled for a pKVM guest but the assert actually
+checks to see if the host has anything set in SVCR which is unrelated to
+the guest features or state, regardless of if those guests are protected
+or not. This check is also made in the hypervisor, it will refuse to run
+a guest if the check fails, so it appears that the assert here is
+intended to improve diagnostics.
 
-Of course, but I think it is also reasonable to say that ethernet
-support in the kernel is rather mature with a good variety of hardware.
-By comparison, what we have here is a brand new driver interface with
-architecture / KVM code, which is pretty rare, with a single
-implementation.
+Update the comment to reflect the check in the code, and to clarify that
+we do actually enforce this in the hypervisor. While we're here also
+update to use a WARN_ON_ONCE() to avoid log spam if this triggers.
 
-I'm perfectly happy to tinker on page tracking interface(s) in the
-future w/o testing everything, but I must insist that we have *some*
-way of testing the initial infrastructure before even considering taking
-it.
+Fixes: afb91f5f8ad7 ("KVM: arm64: Ensure that SME controls are disabled in protected mode")
+Reviewed-by: Fuad Tabba <tabba@google.com>
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+This has gone more than a kernel release with only positive review
+comments...
+---
+Changes in v4:
+- Rebase onto v6.12-rc1
+- Link to v3: https://lore.kernel.org/r/20240730-kvm-arm64-sme-assert-v3-1-8699454e5cb8@kernel.org
 
-> This particular device should be available on bare metal EC2 instances,
-> of course, but perhaps we should also implement it in QEMU. That would
-> actually be beneficial for our internal testing anyway, as it would
-> allow us to catch regressions much earlier in our own development
-> process.
+Changes in v3:
+- Rebase onto v6.11-rc1.
+- Link to v2: https://lore.kernel.org/r/20240605-kvm-arm64-sme-assert-v2-1-54391b0032f4@kernel.org
 
-QEMU would be interesting, but hardware is always welcome too ;-)
+Changes in v2:
+- Commit message tweaks.
+- Change the assert to WARN_ON_ONCE().
+- Link to v1: https://lore.kernel.org/r/20240604-kvm-arm64-sme-assert-v1-1-5d98348d00f8@kernel.org
+---
+ arch/arm64/kvm/fpsimd.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-> > > When ARM architectural solution (FEAT_HDBSS feature) is available, we intend to
-> > > use it via the same interface most likely with adaptations.
-> > 
-> > Will the PTA stuff eventually get retired once you get support for FEAT_HDBSS
-> > in hardware?
-> 
-> I don't think there is a definitive answer to that which is ready to
-> tape out, but it certainly seems possible that future generations will
-> eventually move to FEAT_HDBSS, maybe even reaching production by the
-> end of the decade, at the earliest? And then a decade or two later, the
-> existing hardware generations might even get retired, yes¹.
-> 
-> ¹ #include <forward-looking statement.disclaimer>
+diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
+index ea5484ce1f3b..5fb9b3fc61ec 100644
+--- a/arch/arm64/kvm/fpsimd.c
++++ b/arch/arm64/kvm/fpsimd.c
+@@ -93,11 +93,14 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
+ 	}
+ 
+ 	/*
+-	 * If normal guests gain SME support, maintain this behavior for pKVM
+-	 * guests, which don't support SME.
++	 * The pKVM hypervisor does not yet understand how to save or
++	 * restore SME state for the host so double check that if we
++	 * are running with pKVM we have disabled SME.  The hypervisor
++	 * enforces this when the guest is run, this check is for
++	 * clearer diagnostics.
+ 	 */
+-	WARN_ON(is_protected_kvm_enabled() && system_supports_sme() &&
+-		read_sysreg_s(SYS_SVCR));
++	WARN_ON_ONCE(is_protected_kvm_enabled() && system_supports_sme() &&
++		     read_sysreg_s(SYS_SVCR));
+ }
+ 
+ /*
 
-Well, hopefully that means you folks will look after it then :)
+---
+base-commit: 9852d85ec9d492ebef56dc5f229416c925758edc
+change-id: 20240604-kvm-arm64-sme-assert-5ad755d4e8a6
 
-> > I think the best way forward here is to implement the architecture, and
-> > hopefully after that your legacy driver can be made to fit the
-> > interface. The FVP implements FEAT_HDBSS, so there's some (slow)
-> > reference hardware to test against.
-> 
-> Is there actually any documentation available about FEAT_HDBSS? We've
-> been asking, but haven't received it. I can find one or two mentions
-> e.g. https://arm.jonpalmisc.com/2023_09_sysreg/AArch64-hdbssbr_el2 but
-> nothing particularly useful.
-
-Annoyingly no, the Arm ARM tends to lag the architecture by quite a bit.
-The sysreg XML (from which I think this website is derived) gets updated
-much more frequently.
-
-> The main reason for posting this series early is to make sure we do all
-> we can to accommodate FEAT_HDBSS. It's not the *end* of the world if
-> the kernel-internal API has to be tweaked slightly when FEAT_HDBSS
-> actually becomes reality in future, but obviously we'd prefer to
-> support it right from the start.
-
-Jury is still out on how FEAT_HDBSS is gonna fit with this PTA stuff.
-I'm guessing your hardware has some way of disambiguating dirtied
-addresses by VMID.
-
-The architected solution, OTOH, is tied to a particular stage-2 MMU
-configuration. KVM proper might need to manage the dirty tracking
-hardware in that case as it'll need to be context switched on the
-vcpu_load() / vcpu_put() boundary.
-
+Best regards,
 -- 
-Thanks,
-Oliver
+Mark Brown <broonie@kernel.org>
+
