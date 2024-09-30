@@ -1,122 +1,132 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E0DA2032A;
-	Mon, 30 Sep 2024 14:45:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAA8F18C01E
+	for <kvmarm@lists.linux.dev>; Mon, 30 Sep 2024 17:33:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727707526; cv=none; b=Mj2Ry8d13E7JIA2IhDFOeFfLYRzpcy4ryrF1lvMK/jntO/j/mDFUZyhcDNcwDh1rYpiIUPL9t380+BqXMh/RSTAqOq+tXQjF4nCfZhQkqv6cZUFJJWa/F4XfEo8dZpjy2/RHgQQLb6fAmVcWd8YhXhGDO2NxGPjT2gqVPIgBzr4=
+	t=1727717645; cv=none; b=GjsblIpt0d9DqlevN1KAwAARCUTUpxl/siZIhKsI4+iifsTrk74tnuECSx2/61KBJaLUwjQbPRrU1pIY6rmYJW3x3nQBOktduVsz6J15yM6ldwqE5mkoCdnq/9MxWRZkJ9L/1ZoDV9fKTgx5jiMoaWvflcMDdqTO6/8wpjUTnJU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727707526; c=relaxed/simple;
-	bh=toXibZWzNbQCTDtO/xK4MILxz8ZPi0W2drIRCMgiiS0=;
-	h=Date:Message-ID:From:To:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pS/fPm4Eu2GLqdC4wLvShutzCw0eC1vjZeIGZxqELbfKMUp4CqEteYOUsFSSkPiU5lxfTVv5loy0NKKe5Fu1uXIRdCbVmGSf1PnLGyoY3mcTwPngW7vap5UbLNqKrsDEbQDjDLSHz6+a+57SMcYmrOIbV9oOZA5iJTTr6boyJ0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Iz98trQn; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1727717645; c=relaxed/simple;
+	bh=WBFgmih4XDphQtQvpQVn0y9UX7p+bwx3yLTouWZLfo4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NiOtyeJwzShl6+XaIray8WJKuBeRfNhuTG99FiqBqEp0/bbmz0Wt3wJjxiSLaZ4NxGhsz07MJcOKUCsnrGz5Uwjj5DLLBNcPMCTB15ei3vOj1ZZKYOSi0NSmueHr3j3dk4l3wJOHNIWLNIpNkCbRqb92lB9bookE8VlKAsfXtkI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vpIrdrLy; arc=none smtp.client-ip=91.218.175.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Iz98trQn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CA42C4CEC7;
-	Mon, 30 Sep 2024 14:45:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727707526;
-	bh=toXibZWzNbQCTDtO/xK4MILxz8ZPi0W2drIRCMgiiS0=;
-	h=Date:From:To:Subject:In-Reply-To:References:From;
-	b=Iz98trQnFK36YYFCrVz90DGb6srEAyESJuwt/TSfUGS2v7PUNzUt0cau1Ny4h/n6B
-	 /YgDdz/CDQOv0xUn8c1xhTdqPbYZOTRsnIU4vQZpQ6hdSqHshokNZKEzdQe3JSfBow
-	 7QkMl/oo+0e/UGT4bl/GsWMJOGhPpiY9ONKvBctuplAP63mT5Wi7u5eVje9eMhg8FT
-	 dJN3aVDDQnzqkji9gelKI2nqeYtLtAanPYGcxqWhEeyxeSngdrtJmkFSPxJJ7K/HLG
-	 YFCygIKvmuHSj/zuWGiQAwgqDxAJ8wptHcYNG2guDNdhtRNwYqn1NLUdtuY7OHI7a2
-	 gaU2kXA6eU3Pw==
-Received: from [12.191.124.166] (helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1svHeN-00GTHo-MC;
-	Mon, 30 Sep 2024 15:45:24 +0100
-Date: Mon, 30 Sep 2024 15:45:17 +0100
-Message-ID: <87o745urnm.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Jia Qingtong <jiaqingtong@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: vgic: fix GICR_STATUSR in vgic_v3_rd_registers
-In-Reply-To: <mhwgdkcgoan7r53bubpvlnu4xoexmnldwlk6ni5zjvkn4cnr72@fhxnwlfw536t>
-References: <20240929043937.242769-2-jiaqingtong97@gmail.com>
-	<87v7yevlyc.wl-maz@kernel.org>
-	<mhwgdkcgoan7r53bubpvlnu4xoexmnldwlk6ni5zjvkn4cnr72@fhxnwlfw536t>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vpIrdrLy"
+Date: Mon, 30 Sep 2024 10:33:50 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1727717637;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ogJbp6u/vFspt7UJMT890uGNRUquUQecrB2wvxTdQpg=;
+	b=vpIrdrLybXMFg5ErJc8BKY0FmhG5mLCpONBaqJeuqHuw7jZUz5IRvqSJ/apTMwZV0uXwdW
+	01S8HF2tA7WYgbAt75YjLLWQgzY+lnRQXNhgGzQVrDlkc8tkJfvsW25te4cNWZC+IuFAIf
+	dveL98A3ryc3x2tEb7vN8GCNag2hcrU=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Lilit Janpoladyan <lilitj@amazon.com>, kvm@vger.kernel.org,
+	maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, nh-open-source@amazon.com,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH 0/8] *** RFC: ARM KVM dirty tracking device ***
+Message-ID: <Zvrg_r3lWtL-TZf_@linux.dev>
+References: <20240918152807.25135-1-lilitj@amazon.com>
+ <Zuvq18Nrgy6j_pZW@linux.dev>
+ <c309adcc88d7fb55d1ca7fdb9c32a6cd9c827c74.camel@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 12.191.124.166
-X-SA-Exim-Rcpt-To: maz@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, jiaqingtong@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <c309adcc88d7fb55d1ca7fdb9c32a6cd9c827c74.camel@infradead.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, 30 Sep 2024 07:20:35 +0100,
-Jia Qingtong <jiaqingtong97@gmail.com> wrote:
+On Thu, Sep 26, 2024 at 11:00:39AM +0100, David Woodhouse wrote:
+> > Beyond that, I have some reservations about maintaining support for
+> > features that cannot actually be tested outside of your own environment.
 > 
-> On 29 Sep 10:38, Marc Zyngier wrote:
-> > On Sun, 29 Sep 2024 05:39:35 +0100,
-> > jiaqingtong97@gmail.com wrote:
-> > > 
-> > > From: Jia Qingtong <jiaqingtong@huawei.com>
-> > > 
-> > > vgic_uaccess use bsearch search regs in vgic_io_device.regions, but the
-> > > GICR_STATUSR have wrong order in vgic_v3_rd_registers.
-> > > When check all vgic_register_region, it turned out that only
-> > > vgic_v3_rd_registers has this problem.
-> > > 
-> > > It's harmless since vgic_uaccess behaves as RAZ&WI when it can't find the
-> > > specified reg. This is exactly the same as the behavior of the GICR_STATUSR
-> > > register.
-> > >
-> > > So just move GICR_STATUSR to the right place.
-> > 
-> > That looks correct, but I think we should have some code that ensures
-> > that these tables are correct at boot time, just like we're doing for
-> > the system registers. Or completely remove our reliance on bsearch().
-> > 
-> struct vgic_register_region was defined in vgic-{its,mmio-v2,mmio-v3},
-> do you think it's appropriate to extern and check tables's item order in
-> vgic-init.c's kvm_vgic_hyp_init?.
-
-I'd rather we have local functions performing the check, one in each
-of the GIC "modules", calling a global helper taking a pointer to the
-register array as a parameter.
-
+> That's more about the hardware driver itself which will follow, than
+> the core API posted here.
 > 
-> > Another thing is that GICD_STATUSR looks pretty wrong. It is handled
-> > as RAO, but we never clear any "error" (it is WI). This has been buggy
-> > since GICv3 save/restore was added, 7 years ago.
+> I understand the reservation, but I think it's fine. In general, Linux
+> does support esoteric hardware that not everyone can test every
+> time. We do sweeping changes across all Ethernet drivers, for example,
+> and some of those barely even exist any more.
+
+Of course, but I think it is also reasonable to say that ethernet
+support in the kernel is rather mature with a good variety of hardware.
+By comparison, what we have here is a brand new driver interface with
+architecture / KVM code, which is pretty rare, with a single
+implementation.
+
+I'm perfectly happy to tinker on page tracking interface(s) in the
+future w/o testing everything, but I must insist that we have *some*
+way of testing the initial infrastructure before even considering taking
+it.
+
+> This particular device should be available on bare metal EC2 instances,
+> of course, but perhaps we should also implement it in QEMU. That would
+> actually be beneficial for our internal testing anyway, as it would
+> allow us to catch regressions much earlier in our own development
+> process.
+
+QEMU would be interesting, but hardware is always welcome too ;-)
+
+> > > When ARM architectural solution (FEAT_HDBSS feature) is available, we intend to
+> > > use it via the same interface most likely with adaptations.
 > > 
-> Let's change it to RAZ? We will implement the complete logic when someone
-> really needs this feature.
-
-Exactly. Which is probably *never*.
-
+> > Will the PTA stuff eventually get retired once you get support for FEAT_HDBSS
+> > in hardware?
 > 
-> > Do you mind spinning a series fixing this up?
-> > 
-> Sure. 
+> I don't think there is a definitive answer to that which is ready to
+> tape out, but it certainly seems possible that future generations will
+> eventually move to FEAT_HDBSS, maybe even reaching production by the
+> end of the decade, at the earliest? And then a decade or two later, the
+> existing hardware generations might even get retired, yes¹.
+> 
+> ¹ #include <forward-looking statement.disclaimer>
 
-Thanks,
+Well, hopefully that means you folks will look after it then :)
 
-	M.
+> > I think the best way forward here is to implement the architecture, and
+> > hopefully after that your legacy driver can be made to fit the
+> > interface. The FVP implements FEAT_HDBSS, so there's some (slow)
+> > reference hardware to test against.
+> 
+> Is there actually any documentation available about FEAT_HDBSS? We've
+> been asking, but haven't received it. I can find one or two mentions
+> e.g. https://arm.jonpalmisc.com/2023_09_sysreg/AArch64-hdbssbr_el2 but
+> nothing particularly useful.
+
+Annoyingly no, the Arm ARM tends to lag the architecture by quite a bit.
+The sysreg XML (from which I think this website is derived) gets updated
+much more frequently.
+
+> The main reason for posting this series early is to make sure we do all
+> we can to accommodate FEAT_HDBSS. It's not the *end* of the world if
+> the kernel-internal API has to be tweaked slightly when FEAT_HDBSS
+> actually becomes reality in future, but obviously we'd prefer to
+> support it right from the start.
+
+Jury is still out on how FEAT_HDBSS is gonna fit with this PTA stuff.
+I'm guessing your hardware has some way of disambiguating dirtied
+addresses by VMID.
+
+The architected solution, OTOH, is tied to a particular stage-2 MMU
+configuration. KVM proper might need to manage the dirty tracking
+hardware in that case as it'll need to be context switched on the
+vcpu_load() / vcpu_put() boundary.
 
 -- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+Oliver
