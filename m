@@ -1,44 +1,38 @@
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1E44257B
-	for <kvmarm@lists.linux.dev>; Tue,  1 Oct 2024 00:17:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60759339AB
+	for <kvmarm@lists.linux.dev>; Tue,  1 Oct 2024 02:44:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727741852; cv=none; b=glXgvSgtbL9vJgzSB9QTaVc+4BtevfTLuj8jfYoBWMgCmvdy5HnWHaFPXCp+tjrXdS93wfTTT7jGkoN9KfkW2S3ZGo1RETvPDlvgJJa53KQ8oXvodCeGlJfZvqL+M95wgubdB4iYTlGjM22zGRSwiv6dCRu+e+Mw6C7j6w/Dx7M=
+	t=1727750649; cv=none; b=uoRFLlv0ub7v3iWHz3AhZvgxJpPM2/XObLlcEA49RMFpoBXp2Tu8TKeoUiVWZgoyjRUi9Vin/K6Fr1ep132KkTTEz4pn6NScg5ho8aII996XZNB3c6hrMfyLxxUKgjVLU0nTEl/1R1UGxD4eJZ8MH0Yj3AV7ejGfMi8c0jgEOzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727741852; c=relaxed/simple;
-	bh=+5QtEZTxI4T9UnYppXHlVhvygO0VDKVzEBuAlbsJ3K0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cXzedNsYGzD1V35YidlVI1poq+AqkyaScgwNmAkmQTSO8CVsew9nuPs3l9VG87OZr4S9TCzndic3xPQ7lJCWA3grBIB2UIzSz0Hvr/IBaCceDqDT6gv6XA1xJIVW+TfdIdcPbFFQa8sV2tOK4PvdJOz/WM1tX6bke6LyIq5OVTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UYGodpwv; arc=none smtp.client-ip=95.215.58.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UYGodpwv"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1727741844;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jI23ctE2xy/Xj9nI5UqKIBjBoNmz1OA8ROpZj9RslKA=;
-	b=UYGodpwvEXxPvJ7HV3SAeEpi+4spREiFHwYs7ynP3uQD26wr4FvI8wPGbE686k4ol5sKSB
-	HkZodxUkeDXH/yCh8yWkNvUyz+7HCvuF6rpCnJkwCFeR8fpu1Kp0xuU6e2JaP9y7TivbGx
-	NYaj70/wkmDvfRUM9aGZ2nFt6TDUB78=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
+	s=arc-20240116; t=1727750649; c=relaxed/simple;
+	bh=gDjB7vrTdqQ1zI5gBVq2+5ri+VIMj0Eqmi20M9CM/sk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ebkvHjwfPVIojGh9TIXJFt+g7+EsBwej8B5o0T7qjdcp8wnQiuFf+x25q46E4S/cuzWzWrpfu0e5lhDsKsYN7ADBHeAYcysuktkmAWuXyKm2FnV76ZP3uNgsI1XE6OMobHRzAjqmFiFg1A9jZtqe3IUATTzBJnejmdDZKam1f3Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DC869367;
+	Mon, 30 Sep 2024 19:44:34 -0700 (PDT)
+Received: from a077893.blr.arm.com (a077893.blr.arm.com [10.162.16.61])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id F284D3F58B;
+	Mon, 30 Sep 2024 19:44:01 -0700 (PDT)
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+To: linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	maz@kernel.org
+Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 3/3] KVM: arm64: nv: Punt stage-2 recycling to a vCPU request
-Date: Tue,  1 Oct 2024 00:17:09 +0000
-Message-ID: <20241001001709.1303668-4-oliver.upton@linux.dev>
-In-Reply-To: <20241001001709.1303668-1-oliver.upton@linux.dev>
-References: <20241001001709.1303668-1-oliver.upton@linux.dev>
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Brown <broonie@kernel.org>
+Subject: [PATCH 00/47] KVM: arm64: Enable FGU (Fine Grained Undefined) for FEAT_FGT2 registers
+Date: Tue,  1 Oct 2024 08:13:09 +0530
+Message-Id: <20241001024356.1096072-1-anshuman.khandual@arm.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -46,122 +40,119 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-Currently, when a nested MMU is repurposed for some other MMU context,
-KVM unmaps everything during vcpu_load() while holding the MMU lock for
-write. This is quite a performance bottleneck for large nested VMs, as
-all vCPU scheduling will spin until the unmap completes.
+This series enables fine grained undefined for FEAT_FGT2 managed registers
+via adding their respective FGT and CGT trap configuration. But first this
+adds many system register definitions in tools/sysreg, which are required
+there after.
 
-Start punting the MMU cleanup to a vCPU request, where it is then
-possible to periodically release the MMU lock and CPU in the presence of
-contention. To make that possible, take a pin on the hardware MMU while
-unmapping it to guarantee the responsible vCPU finds the MMU on the next
-vcpu_load().
+patches 1-44: define system registers in tools/sysreg format
+patch     45: enables FEAT_FGT2 registers access from virtual EL2
+patch     46: enables FGT for FEAT_FGT2
+patch     47: enables CGT for FEAT_FGT2
 
-Ensure that no vCPU winds up using a stale MMU by tracking the pending
-unmap on the S2 MMU itself and requesting an unmap on every vCPU that
-finds it.
+Some notes:
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- arch/arm64/include/asm/kvm_host.h   |  3 +++
- arch/arm64/include/asm/kvm_nested.h |  2 ++
- arch/arm64/kvm/arm.c                |  2 ++
- arch/arm64/kvm/nested.c             | 21 +++++++++++++++++++--
- 4 files changed, 26 insertions(+), 2 deletions(-)
+As kvm_has_feat() does not support non-ID registers following replacements
+have been made for validating presence of correspnding features
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 268f69196380..1d310292c623 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -51,6 +51,7 @@
- #define KVM_REQ_RELOAD_PMU	KVM_ARCH_REQ(5)
- #define KVM_REQ_SUSPEND		KVM_ARCH_REQ(6)
- #define KVM_REQ_RESYNC_PMU_EL0	KVM_ARCH_REQ(7)
-+#define KVM_REQ_NESTED_S2_UNMAP	KVM_ARCH_REQ(8)
- 
- #define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
- 				     KVM_DIRTY_LOG_INITIALLY_SET)
-@@ -216,6 +217,8 @@ struct kvm_s2_mmu {
- 	 * >0: Somebody is actively using this.
- 	 */
- 	atomic_t refcnt;
-+
-+	bool	pending_unmap;
- };
- 
- struct kvm_arch_memory_slot {
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index e74b90dcfac4..233e65522716 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -78,6 +78,8 @@ extern void kvm_s2_mmu_iterate_by_vmid(struct kvm *kvm, u16 vmid,
- extern void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu);
- extern void kvm_vcpu_put_hw_mmu(struct kvm_vcpu *vcpu);
- 
-+extern void check_nested_vcpu_requests(struct kvm_vcpu *vcpu);
-+
- struct kvm_s2_trans {
- 	phys_addr_t output;
- 	unsigned long block_size;
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 367f0d3d3194..ab7d387379a0 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1031,6 +1031,8 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
- 
- 		if (kvm_dirty_ring_check_request(vcpu))
- 			return 0;
-+
-+		check_nested_vcpu_requests(vcpu);
- 	}
- 
- 	return 1;
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 1ba211541290..749babdbda81 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -632,9 +632,9 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
- 	/* Set the scene for the next search */
- 	kvm->arch.nested_mmus_next = (i + 1) % kvm->arch.nested_mmus_size;
- 
--	/* Clear the old state */
-+	/* Make sure we don't forget to do the laundry */
- 	if (kvm_s2_mmu_valid(s2_mmu))
--		kvm_stage2_unmap_range(s2_mmu, 0, kvm_phys_size(s2_mmu), false);
-+		s2_mmu->pending_unmap = true;
- 
- 	/*
- 	 * The virtual VMID (modulo CnP) will be used as a key when matching
-@@ -649,6 +649,9 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
- 	s2_mmu->nested_stage2_enabled = vcpu_read_sys_reg(vcpu, HCR_EL2) & HCR_VM;
- 
- out:
-+	if (s2_mmu->pending_unmap)
-+		kvm_make_request(KVM_REQ_NESTED_S2_UNMAP, vcpu);
-+
- 	kvm_get_s2_mmu(s2_mmu);
- 	return s2_mmu;
- }
-@@ -1186,3 +1189,17 @@ int kvm_init_nv_sysregs(struct kvm *kvm)
- 
- 	return 0;
- }
-+
-+void check_nested_vcpu_requests(struct kvm_vcpu *vcpu)
-+{
-+	if (kvm_check_request(KVM_REQ_NESTED_S2_UNMAP, vcpu)) {
-+		CLASS(vcpu_hw_mmu, mmu)(vcpu);
-+
-+		write_lock(&vcpu->kvm->mmu_lock);
-+		if (mmu->pending_unmap) {
-+			kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), true);
-+			mmu->pending_unmap = false;
-+		}
-+		write_unlock(&vcpu->kvm->mmu_lock);
-+	}
-+}
+- ID_AA64DFR0_EL1.ExtTrcBuff is tested for HDFGRTR2_EL2.nPMSDSFR_EL1
+- ID_AA64DFR0_EL1.PMSVer is tested for HDFGRTR2_EL2.nPMSDSFR_EL1
+
+Following FGT enabled registers don't have corresponding CGT requirements
+
+- TRCITECR_EL1
+- PMSSCR_EL1
+- PMCCNTSVR_EL1
+- PMICNTSVR_EL1
+- RCWSMASK_EL1
+- ERXGSR_EL1
+- PFAR_EL1
+
+Changes in V2:
+
+- Added all system register definitions required for FEAT_FGT2 traps
+- Added all system register access traps managed with new FEAT_FGT2
+  i.e HDFGRTR2_EL2, HDFGWTR2_EL2, HFGRTR2_GROUP, HFGWTR2_GROUP and
+  HFGITR2_GROUP for their VNCR access, FGT and CGT
+- Added all FGT for all register accesses managed with FEAT_FGT2
+- Added all CGT for all register accesses managed with FEAT_FGT2
+
+Changes in RFC V1:
+
+https://lore.kernel.org/linux-arm-kernel/20240620065807.151540-1-anshuman.khandual@arm.com/
+
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>
+Cc: James Morse <james.morse@arm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will@kernel.org>
+Cc: Mark Brown <broonie@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: kvmarm@lists.linux.dev
+Cc: linux-kernel@vger.kernel.org
+
+Anshuman Khandual (47):
+  arm64/sysreg: Update register fields for ID_AA64MMFR0_EL1
+  arm64/sysreg: Update register fields for ID_AA64DFR0_EL1
+  arm64/sysreg: Update register fields for ID_AA64PFR0_EL1
+  arm64/sysreg: Add register fields for ID_AA64DFR2_EL1
+  arm64/sysreg: Add register fields for HDFGRTR2_EL2
+  arm64/sysreg: Add register fields for HDFGWTR2_EL2
+  arm64/sysreg: Add register fields for HFGITR2_EL2
+  arm64/sysreg: Add register fields for HFGRTR2_EL2
+  arm64/sysreg: Add register fields for HFGWTR2_EL2
+  arm64/sysreg: Add register fields for MDSELR_EL1
+  arm64/sysreg: Add register fields for PMSIDR_EL1
+  arm64/sysreg: Add register fields for TRBIDR_EL1
+  arm64/sysreg: Add register fields for TRBMPAM_EL1
+  arm64/sysreg: Add register fields for PMSDSFR_EL1
+  arm64/sysreg: Add register fields for SPMDEVAFF_EL1
+  arm64/sysreg: Add register fields for PFAR_EL1
+  arm64/sysreg: Add register fields for PMIAR_EL1
+  arm64/sysreg: Add register fields for PMECR_EL1
+  arm64/sysreg: Add register fields for PMUACR_EL1
+  arm64/sysreg: Add register fields for PMCCNTSVR_EL1
+  arm64/sysreg: Add register fields for SPMSCR_EL1
+  arm64/sysreg: Add register fields for SPMACCESSR_EL1
+  arm64/sysreg: Add register fields for PMICNTR_EL0
+  arm64/sysreg: Add register fields for PMICFILTR_EL0
+  arm64/sysreg: Add register fields for SPMCR_EL0
+  arm64/sysreg: Add register fields for SPMOVSCLR_EL0
+  arm64/sysreg: Add register fields for SPMOVSSET_EL0
+  arm64/sysreg: Add register fields for SPMINTENCLR_EL1
+  arm64/sysreg: Add register fields for SPMINTENSET_EL1
+  arm64/sysreg: Add register fields for SPMCNTENCLR_EL0
+  arm64/sysreg: Add register fields for SPMCNTENSET_EL0
+  arm64/sysreg: Add register fields for SPMSELR_EL0
+  arm64/sysreg: Add register fields for PMICNTSVR_EL1
+  arm64/sysreg: Add register fields for SPMIIDR_EL1
+  arm64/sysreg: Add register fields for SPMDEVARCH_EL1
+  arm64/sysreg: Add register fields for SPMCFGR_EL1
+  arm64/sysreg: Add register fields for PMSSCR_EL1
+  arm64/sysreg: Add register fields for PMZR_EL0
+  arm64/sysreg: Add register fields for SPMCGCR0_EL1
+  arm64/sysreg: Add register fields for SPMCGCR1_EL1
+  arm64/sysreg: Add register fields for MDSTEPOP_EL1
+  arm64/sysreg: Add register fields for ERXGSR_EL1
+  arm64/sysreg: Add register fields for SPMACCESSR_EL2
+  arm64/sysreg: Add remaining debug registers affected by HDFGxTR2_EL2
+  KVM: arm64: nv: Add FEAT_FGT2 registers access from virtual EL2
+  KVM: arm64: nv: Add FEAT_FGT2 registers based FGU handling
+  KVM: arm64: nv: Add trap forwarding for FEAT_FGT2 described registers
+
+ arch/arm64/include/asm/kvm_arm.h        |  22 +
+ arch/arm64/include/asm/kvm_host.h       |  12 +
+ arch/arm64/include/asm/sysreg.h         |   6 +
+ arch/arm64/include/asm/vncr_mapping.h   |   5 +
+ arch/arm64/kvm/emulate-nested.c         | 444 +++++++++++
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  26 +
+ arch/arm64/kvm/nested.c                 |  52 ++
+ arch/arm64/kvm/sys_regs.c               |  64 ++
+ arch/arm64/tools/sysreg                 | 938 +++++++++++++++++++++++-
+ 9 files changed, 1564 insertions(+), 5 deletions(-)
+
 -- 
-2.46.1.824.gd892dcdcdd-goog
+2.25.1
 
