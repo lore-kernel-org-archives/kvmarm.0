@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42414126BE3
-	for <kvmarm@lists.linux.dev>; Tue,  1 Oct 2024 02:45:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09DE51991B3
+	for <kvmarm@lists.linux.dev>; Tue,  1 Oct 2024 02:45:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727750750; cv=none; b=RBtTs0w9Si6f4SdcMjkdWN9bJrIw50YsHFN9AsiusYbLsj2iUrtmmRilyuL5JBsmn6x6/Mzsg0gy2sfi5nIqN7BCmQfmpgOsAImDsWokD0Sza5nFkXGXB8iZyarUlEcAV+tOmi5F31d8EZqCjyktlf96mIZT1LuGs3xTWi42g6U=
+	t=1727750754; cv=none; b=pEhhHEgLWrSxnK2smH2mYYBgb2O3JplZds48N7pxTcFMo3o8qXhTCzb7JZlhTIjCAuHGepAAmBBr8DdKvLTaV516cJj8YLYmMFibzW8QHL2r/HQM3Uo2P6fIHGCS3tAu0Kck2JYRj2HqDlvJHul16/PSF57ehqPqTYM4uSK2wek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727750750; c=relaxed/simple;
-	bh=FLRR8dtN1Z5ddxSR3XWn3bbxkjuosX1JdY4n+O0q6X0=;
+	s=arc-20240116; t=1727750754; c=relaxed/simple;
+	bh=uGRdedEYQ435jqic7LtklcgutzvTQlJE6lkx17iR5VM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=C2SzjFKNEx9RXJzbQvabGrfRcPVp+YUP46j0RKQkOb8gaFbCRrFsKLwRT2opiMDZDOcjnAcAUcUaMd8BY6xcMnPNcdpzkW/ru/oYH0F74I0QwhVR/LQaH/C/hBP8hk7wFl7JitzE3JxP1deokuE7kFZ5dlzg3Kg1Ij0zj73QvMo=
+	 MIME-Version; b=uQuBb5HrpbNYMYnd5qKI1nk8qgiq7NJ35EfkCLAVR+VGrSQxwC096qzVaDbxq8FzaKh5H5RmUz0rwJCo2MFbWN0EDhozEhWQp7f8QmY3wBmsxsSzritCLr2hHbeyDsh97T6d91O9E+FFzcswb0E6UtfX9m7M9nRr8UTtZTH1m6Y=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 373951424;
-	Mon, 30 Sep 2024 19:46:18 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2839DDA7;
+	Mon, 30 Sep 2024 19:46:22 -0700 (PDT)
 Received: from a077893.blr.arm.com (a077893.blr.arm.com [10.162.16.61])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 4E9693F58B;
-	Mon, 30 Sep 2024 19:45:45 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 3E7B23F58B;
+	Mon, 30 Sep 2024 19:45:48 -0700 (PDT)
 From: Anshuman Khandual <anshuman.khandual@arm.com>
 To: linux-kernel@vger.kernel.org,
 	kvmarm@lists.linux.dev,
@@ -30,9 +30,9 @@ Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH 26/47] arm64/sysreg: Add register fields for SPMOVSCLR_EL0
-Date: Tue,  1 Oct 2024 08:13:35 +0530
-Message-Id: <20241001024356.1096072-27-anshuman.khandual@arm.com>
+Subject: [PATCH 27/47] arm64/sysreg: Add register fields for SPMOVSSET_EL0
+Date: Tue,  1 Oct 2024 08:13:36 +0530
+Message-Id: <20241001024356.1096072-28-anshuman.khandual@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20241001024356.1096072-1-anshuman.khandual@arm.com>
 References: <20241001024356.1096072-1-anshuman.khandual@arm.com>
@@ -44,7 +44,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This adds register fields for SPMOVSCLR_EL0 as per the definitions based
+This adds register fields for SPMOVSSET_EL0 as per the definitions based
 on DDI0601 2024-06.
 
 Cc: Catalin Marinas <catalin.marinas@arm.com>
@@ -58,14 +58,14 @@ Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
  1 file changed, 67 insertions(+)
 
 diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index 770c7ae23ce8..b0ec176f099c 100644
+index b0ec176f099c..6086fcced8cf 100644
 --- a/arch/arm64/tools/sysreg
 +++ b/arch/arm64/tools/sysreg
-@@ -178,6 +178,73 @@ Field	1	P
- Field	0	E
+@@ -245,6 +245,73 @@ Field	1	P1
+ Field	0	P0
  EndSysreg
  
-+Sysreg	SPMOVSCLR_EL0	2	3	9	12	3
++Sysreg	SPMOVSSET_EL0	2	3	9	14	3
 +Field	63	P63
 +Field	62	P62
 +Field	61	P61
