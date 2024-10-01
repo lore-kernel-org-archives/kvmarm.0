@@ -1,110 +1,104 @@
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F387717332B
-	for <kvmarm@lists.linux.dev>; Mon, 30 Sep 2024 22:48:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37FF817FD
+	for <kvmarm@lists.linux.dev>; Tue,  1 Oct 2024 00:17:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727736509; cv=none; b=SChvtShOqB7pmGmtCxqLKM6q04fKhA4C8o7EQrZOLYvHmvlBbjduhrCBfgGvBoK0IoeuP6qZm+lxb2ygk81ObqYWhmnxWUOt+KBAWQgG1GQqKrstspbWzBLYQuUA6uHiTf/7LTi7lsYD87IMYD6EeoH7udGstxu33IBNLXqwRIU=
+	t=1727741844; cv=none; b=e5/5XYBcJand3MmrNoM+33ZoDCVQLOwRe64lN5HJx8R3rAVqBmjmkzilBCtLT9fAvflFXIYvSXhgrXrACiL6qGx+oYnOu1BUFaGYZDxqkkh4KchbfniaP3H+6yBtdt//RB4F2LToOkHt9CXwWb6vZfgtmo/hrmr3qLNqMgXIZCY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727736509; c=relaxed/simple;
-	bh=S2Z1JwX1MU6DLUEoEGwV8nRjiTHOC576ZcrLMcIfVj0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Content-Type; b=TtXR1T34HM5oU3ztoXnoowD7azjdVJnTPQa571O0svHBIOaZbnuKXfVrB7BraowD+v+1Hhb8aqc9omvaP0eu6Nm0NH8FL1LRcOAY/NM6GJDEAQC5GecB+l/CTfM9vBXwwCWWzD/Sg7/hUm7tqzS2Of9O8aGmJs2EGbCQ80Anxb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bSULvwDb; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1727741844; c=relaxed/simple;
+	bh=5Bz9dgHhouk7+tz38w40svcPnL+5UFAu5yG0fk8HamU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Iwp1Cu8n8mPdDQRQg49Epy4NN8kpbfJpWZo6brk3iPa2sSi5ATkzpTHv4QEI7yQDWA1ROyUj6fR32iBW9f7IPl54q05wkgmWYjBSp79N8CXUX6cOQ6JudAqVdR/il4tzy0ja+kZp7gLqecEFFC7OcWkUP/+HYuQvAmSqvI56+/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tAvQuiTQ; arc=none smtp.client-ip=95.215.58.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bSULvwDb"
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-717dfdd7c72so5481373b3a.0
-        for <kvmarm@lists.linux.dev>; Mon, 30 Sep 2024 15:48:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727736507; x=1728341307; darn=lists.linux.dev;
-        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XEKROrbsF+Qc32qai9a0qLWUFdx11pYvvS7Yvup4cZY=;
-        b=bSULvwDbC60vw895ucg6jFvY1aYSA6MChfrSSMNv+ka9N868oWKe3tpZSWvFqN+qSg
-         QDrsowf788yEQN6j5L8g2ZFra+BHCtlw2NIz4IrTGboUgYgBmWn5oi30jZzASeHVe3JS
-         ewCeMsi7g7aSm7/xKwP+kXgrwq9Kpwc84GrH6ik6OqlxuumjWvMNh/glyCGFVbgNg7s1
-         GuXP4sZIx6k7a1c8Ee3phqjHXyET6nhFrSnCS+5/MZfCLDO9qh2p25eVVMDnXjqz97bx
-         A84fNObUG0j+v7A9dExaIpA80nz9vmw58ZKXjHVCIgdOQOSSiCGGtBjgvb+2BwIRSh8T
-         J64w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727736507; x=1728341307;
-        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XEKROrbsF+Qc32qai9a0qLWUFdx11pYvvS7Yvup4cZY=;
-        b=SsbtEU9P6z746rYNXXYU8rkbPheLDaowhHmu/D/XzHKyTSCDtSdefcnSnwfV9Rtib5
-         W0jIJYBNN04Y2lYqh+Pb8Hgz40VPP3RRXX+VYcGigxXcJjieqfsdjRgxVppWy1Q6Chl7
-         qsIcdAfoxzokHBVkIOfWR01IiBJzbzQut9xQapGosqSUVa9nyNRHKM75KZmMxfcIL9fv
-         6/WS00pzsPyEvflI3JRHOe6T+iHEPp2JsQ1Jhy7L5YNZY7R8IIamSF8cTWuNWUVj1x4+
-         pDDi1c+UxC8/kptJqQVeGI0e7UbFwI/YTu4f5vN4ofZ+xZ56TPP4RdcOgojh19pLmLio
-         Hxfw==
-X-Forwarded-Encrypted: i=1; AJvYcCVn0V9nGKGXKZKLBSiSHdaj1Geh924d0/rmiKxnVpiPQOgZYbpHmryxLj6EaYYwbNN+lm92WyM=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwIVJh3OvkPzwKqyTxwZW9dWqZeYHV0JFulorW/wolaPgAFlsqn
-	JnZDZdb8fCT1lFRGSkwbMT3MUcM6Z4LIUfRBDsGjeq8P18jN/UsN7s/WcoJYEya1ZFTjIGpPgsR
-	JIQ==
-X-Google-Smtp-Source: AGHT+IFBqE4b3ETKHUb3GkTpAmeIZlaPPTKak751rxnBHWeoFOgyWmnqPX8beCCGnb8n0RirfB1L8PS0CMc=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:aa7:83ca:0:b0:718:d8af:4551 with SMTP id
- d2e1a72fcca58-71b25f2ca30mr23827b3a.1.1727736507148; Mon, 30 Sep 2024
- 15:48:27 -0700 (PDT)
-Date: Mon, 30 Sep 2024 15:48:25 -0700
-In-Reply-To: <ZvseoZLzmaS4MEbc@google.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tAvQuiTQ"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1727741840;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=OiqfawkVybEAWYXosbyKsbArOAvcQie4DPU9y6Mk8Og=;
+	b=tAvQuiTQCIaOFd2zKdY6urW5fokni+JAaxHiBJITcyCm9F5Z1lJRRhC6rGwqGP6F5lV+Yt
+	bJVpV3sDutXgX+TI4HUoLHy9kJBUrO0eWBX+P2qo+MU6pSi2lLX4mIMlhbMKGTcKzS71e0
+	d+WCKYycXNhkGBuYEusHRDOEQmrhESc=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH 0/3] KVM: arm64: nv: Fixes for stage-2 MMU recycling
+Date: Tue,  1 Oct 2024 00:17:06 +0000
+Message-ID: <20241001001709.1303668-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20240911204158.2034295-1-seanjc@google.com> <20240911204158.2034295-4-seanjc@google.com>
- <ZvseoZLzmaS4MEbc@google.com>
-Message-ID: <Zvsquaq-Lo4umoTI@google.com>
-Subject: Re: [PATCH v2 03/13] KVM: selftests: Fudge around an apparent gcc bug
- in arm64's PMU test
-From: Sean Christopherson <seanjc@google.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Anup Patel <anup@brainfault.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	James Houghton <jthoughton@google.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Sep 30, 2024, Sean Christopherson wrote:
-> On Wed, Sep 11, 2024, Sean Christopherson wrote:
-> > Use u64_replace_bits() instead of u64p_replace_bits() to set PMCR.N in
-> > arm64's vPMU counter access test to fudge around what appears to be a gcc
-> > bug.  With the recent change to have vcpu_get_reg() return a value in lieu
-> > of an out-param, some versions of gcc completely ignore the operation
-> > performed by set_pmcr_n(), i.e. ignore the output param.
-> 
-> Filed a gcc bug: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=116912
-> 
-> I'll report back if anything interesting comes out of that bug.
+I recently found that the path for reclaiming stage-2 MMUs is a bit
+dodgy. We call kvm_stage2_unmap_range() from vcpu_load() when
+repurposing a valid MMU, which itself is allowed to block. We repeat
+this silliness on the next vcpu_load(), eventually leading to a stack
+overflow.
 
-Well, there goes several hours that I'll never get back.  Selftests are compiled
-with -O2, which enables strict-aliasing optimizations, and "unsigned long" and
-"unsigned long long" technically don't alias despite being the same size on 64-bit
-builds, so the compiler is allowed to optimize away the load.  *sigh*
+It also looks like the nested hooks into the MMU notifiers are similarly
+screwed up, ignoring the @may_block parameter and allowing the page
+table walk to block unconditionally.
 
-I'll replace this with a patch to disable strict-aliasing, which the kernel has
-done since forever (literally predates git).  Grr.
+In addition to that, we are not handling vcpu->arch.hw_mmu safely in
+preemptible code, i.e. we could be using a stale pointer on the loaded
+hardware MMU.
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 48d32c5aa3eb..a6f92129bb02 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -235,10 +235,10 @@ CFLAGS += -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
-        -Wno-gnu-variable-sized-type-not-at-end -MD -MP -DCONFIG_64BIT \
-        -fno-builtin-memcmp -fno-builtin-memcpy \
-        -fno-builtin-memset -fno-builtin-strnlen \
--       -fno-stack-protector -fno-PIE -I$(LINUX_TOOL_INCLUDE) \
--       -I$(LINUX_TOOL_ARCH_INCLUDE) -I$(LINUX_HDR_PATH) -Iinclude \
--       -I$(<D) -Iinclude/$(ARCH_DIR) -I ../rseq -I.. $(EXTRA_CFLAGS) \
--       $(KHDR_INCLUDES)
-+       -fno-stack-protector -fno-PIE -fno-strict-aliasing \
-+       -I$(LINUX_TOOL_INCLUDE) -I$(LINUX_TOOL_ARCH_INCLUDE) \
-+       -I$(LINUX_HDR_PATH) -Iinclude -I$(<D) -Iinclude/$(ARCH_DIR) \
-+       -I ../rseq -I.. $(EXTRA_CFLAGS) $(KHDR_INCLUDES)
+Set of fixes to address all of the above, by:
+
+1) Allowing vCPUs to 'pin' the loaded stage-2 MMU, guaranteeing that
+   vcpu->arch.hw_mmu is stable when used in preemptible code
+
+2) Preventing unmap walks from blocking when disallowed by the calling
+   context.
+
+   This is the correct fix for the MMU notifiers, and a "fix" for the
+   reclaim case. Unmapping a whole MMU behind the write lock w/o periodically
+   releasing the lock hurts vCPU scheduling, especially on larger VMs.
+
+3) Push the cleanup of reclaimed MMUs into a vCPU request, allowing the
+   walk to release the lock + CPU as needed.
+
+Applies to 6.12-rc1, tested on M2. An easy way to force the reclaim case
+is to constantly rerun a KVM selftest inside the L1 guest, which is how
+I found this in the first place.
+
+Oliver Upton (3):
+  KVM: arm64: Treat stage-2 MMUs as refcounted generally
+  KVM: arm64: nv: Do not block when unmapping stage-2 if disallowed
+  KVM: arm64: nv: Punt stage-2 recycling to a vCPU request
+
+ arch/arm64/include/asm/kvm_host.h   | 13 ++++++++--
+ arch/arm64/include/asm/kvm_mmu.h    | 40 ++++++++++++++++++++++++++++-
+ arch/arm64/include/asm/kvm_nested.h |  4 ++-
+ arch/arm64/kvm/arm.c                | 12 +++++----
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c  |  2 +-
+ arch/arm64/kvm/hyp/nvhe/pkvm.c      |  2 +-
+ arch/arm64/kvm/hyp/nvhe/switch.c    |  2 +-
+ arch/arm64/kvm/hyp/nvhe/tlb.c       |  4 +--
+ arch/arm64/kvm/hyp/vhe/switch.c     |  2 +-
+ arch/arm64/kvm/hyp/vhe/tlb.c        |  4 +--
+ arch/arm64/kvm/mmu.c                | 34 +++++++++++++-----------
+ arch/arm64/kvm/nested.c             | 39 ++++++++++++++++++++--------
+ arch/arm64/kvm/sys_regs.c           |  6 ++---
+ 13 files changed, 119 insertions(+), 45 deletions(-)
+
+
+base-commit: 9852d85ec9d492ebef56dc5f229416c925758edc
+-- 
+2.46.1.824.gd892dcdcdd-goog
+
