@@ -1,300 +1,133 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 835291B86C0
-	for <kvmarm@lists.linux.dev>; Tue,  1 Oct 2024 04:36:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05DFC3201;
+	Tue,  1 Oct 2024 11:31:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727757389; cv=none; b=cOcpfcKzple5VafEGQNlxIEhYeSx1RyW6t5gnUbDtYEhPZ/jXjnYYNmq+gCxVU8mBIMdQ366kvn2rc0gxkUt1mwacOvWYbTWDdnYnKm3EyatjUF+9iGS+mKPnp9hAAb7sWCAZGZrLMGBgnqi3ecrmoOZ68Y+FTWTkohROynbuBI=
+	t=1727782274; cv=none; b=oABmKVO/J15wC0JsmWr1nzo79cQooOOFTnZgzq9ns9rjX5DP7RaIH4oDOtT8HgUjEaZelQshRpvW77oaB9cs67y5Bdn1EKF6cMjvk1WUibjh4b3HqDRZoua8FymvYJzleNBzO2aZBHci0MotAaz2wpP88v2ENmDW2GwhUsx5gcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727757389; c=relaxed/simple;
-	bh=x6gTjGL7JLbHfqtzbUkvGjqU8hR8T4ozkisxpA1QjBA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=R16rgqFeD85H2/Tgg/vvoWXiO/HDYpADiwKhqrw9HsgP0pvPVwMXjXQSSghD6+RJKIPdvi9I7D+mR0vt24j76RtnsQjQ+k8BdZyVbvTYt5ry6NHPa6GJdfS4Yk0kg4gMGExpbjJHDyd6lYRZ8BP9NOHLzFTLnBlcg6z2NZCPNZs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 51A2A367;
-	Mon, 30 Sep 2024 21:36:56 -0700 (PDT)
-Received: from a077893.blr.arm.com (a077893.blr.arm.com [10.162.16.61])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id DB1B13F58B;
-	Mon, 30 Sep 2024 21:36:22 -0700 (PDT)
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-To: linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Brown <broonie@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	kvmarm@lists.linux.dev
-Subject: [PATCH 3/3] arm64/hw_breakpoint: Enable FEAT_Debugv8p9
-Date: Tue,  1 Oct 2024 10:06:02 +0530
-Message-Id: <20241001043602.1116991-4-anshuman.khandual@arm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20241001043602.1116991-1-anshuman.khandual@arm.com>
-References: <20241001043602.1116991-1-anshuman.khandual@arm.com>
+	s=arc-20240116; t=1727782274; c=relaxed/simple;
+	bh=+SrMuE+SoZT7DS0QWsNQUTjAQrr6pG39ChBTBw8C2SA=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=mAq7g4TDjmiHt9xd/koBYiQo+PkP3vYuv7dzO2FSJ5p++Br4OOEm/8TxKQbxWUOSQ0vmLinujoC62WyxvehcDL4Df17t0i0HkoUOMR8/bz+l248jdpmNQ+JN1hHM6C9S5r90g2RskfRWp0kuXZdbn9WT8LYC4Xkwj3sAMNMDQK8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VMZANMRJ; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VMZANMRJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDE79C4CEC6;
+	Tue,  1 Oct 2024 11:31:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727782273;
+	bh=+SrMuE+SoZT7DS0QWsNQUTjAQrr6pG39ChBTBw8C2SA=;
+	h=From:Subject:Date:To:Cc:From;
+	b=VMZANMRJfCN7tc6o4R68WmEuFqzbBbbNh5U7JcM646/TEMwiXuklg2yLcOT3Zxtzy
+	 vtnWhtq7MZIbDy/g22jymIFz4NMOXlnNzhNv6C+Gxvb54kvcsow2Uvhu8CiZO7kVx8
+	 GC1fSwnv7+L1+2yraYuS1k+10zTlsgXUIjcS0gm366SmrUI0EfFLa+jNYMx9A/OUTk
+	 Fhll32wbymRq5TFu1Zu9WYSAVz+USTGdd4oR7NOh6/YyaYDWI+FQCNTvBb5ut0RDYN
+	 KjnuV3wQx+eIMHUndc8mnLORPwkJyqzmdRKPVT/7M+z5eRQAt15wMQUrA5koBeIJ79
+	 mPedWtZpkBZDQ==
+From: Mark Brown <broonie@kernel.org>
+Subject: [PATCH v7 0/4] KVM: arm64: Fix underallocation of storage for SVE
+ state
+Date: Tue, 01 Oct 2024 12:29:05 +0100
+Message-Id: <20241001-kvm-arm64-fix-pkvm-sve-vl-v7-0-7b0171a36695@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAHd+2YC/33QTWrDMBAF4KsErauin9FIyar3CF1Y1jgRSewgF
+ ZESfPfKgVIXg5ZvmPkG3pNlSpEyO+yeLFGJOU5jDfZtx/pzN56Ix1AzU0KBQAH8Um68SzcEPsQ
+ Hvy8xF+LlyqXug5VDsMELVu/vierKyz5+1nyO+WtK369XRS3TXxUbalFc8N65AciDl+A/LpRGu
+ r5P6cQWtsg1ZVqUrBQ6EdCD9tDLDaXXlG1RulJmT9ZJKzCg2VDwR9lmbQUq5dHtXeeVDj1sKLO
+ mXIsylQpKWmO1A4PbrnBFadGicKm9I9cpEj4g/qPmef4BANhRqToCAAA=
+To: Catalin Marinas <catalin.marinas@arm.com>, 
+ Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+ Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Fuad Tabba <tabba@google.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ kvmarm@lists.linux.dev, Mark Brown <broonie@kernel.org>
+X-Mailer: b4 0.15-dev-99b12
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3017; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=+SrMuE+SoZT7DS0QWsNQUTjAQrr6pG39ChBTBw8C2SA=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBm+917W0zyKEOxeLKUfLoWm9dMufg/yMmKBCEbdYnW
+ hrrEhOqJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZvvdewAKCRAk1otyXVSH0NoNB/
+ 9mXRyA+ZHKb9RvQIPk0kZP4kdYzbOJR6x8Vak4mEsrGfZz26OBrJz4Z0uJScvLsxfCYGDeqq6EBInz
+ VuGwnermd+QIDbG9p6PqMDoFMCd/NkrSFgtQ7L9VFcaR6t6U0Rg4ic9fX0ICOqeIqT62KQbd9kDfv+
+ Em0XIvsW85nKJ7158Zv0wfg14wRY6VWz3gmpvSHJ4rci7QkhHHzDajMXbiBNwdPis0W7YxPjUz1IEf
+ ZFoaPaYoXpUaS3su6npr1FyJNq9xuK/PtX00Hxm4J5hCipG3fSyscUwdJ5SIE+AlgjtCe4nSffwMKA
+ 8znrmUfu74BZgbviEqETEwt+XaegUQ
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-Currently there can be maximum 16 breakpoints, and 16 watchpoints available
-on a given platform - as detected from ID_AA64DFR0_EL1.[BRPs|WRPs] register
-fields. But these breakpoint, and watchpoints can be extended further up to
-64 via a new arch feature FEAT_Debugv8p9.
+As observed during review the pKVM support for saving host SVE state is
+broken if an asymmetric system has VLs larger than the maximum shared
+VL, fix this by discovering then using the maximum VL for allocations
+and using RDVL during the save/restore process.
 
-This first enables banked access for the breakpoint and watchpoint register
-set via MDSELR_EL1, extended exceptions via MDSCR_EL1.EMBWE and determining
-available breakpoints and watchpoints in the platform from ID_AA64DFR1_EL1,
-when FEAT_Debugv8p9 is enabled.
+Fuad posted[1] another attempt to address this issues but as indicated
+in review I have maintanability concerns since the VL configuration does
+not follow best practices and the enumeration is not well integrated
+with the rest of the enumeration code.  I also posted[2] an alternative
+which restricts the host to the maximum shared VL.
 
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will@kernel.org>
-Cc: Mark Rutland <mark.rutland@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org
-Cc: linux-kernel@vger.kernel.org
-Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+This bug has persisted for multiple kernel releases at this point in
+spite of being identified prior the original patch being applied.
+
+[1] https://lore.kernel.org/r/20240606092623.2236172-1-tabba@google.com
+[2] https://lore.kernel.org/r/20240912-kvm-arm64-limit-guest-vl-v2-1-dd2c29cb2ac9@kernel.org
+
+Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
- arch/arm64/include/asm/debug-monitors.h |  1 +
- arch/arm64/include/asm/hw_breakpoint.h  | 50 ++++++++++++++++++++-----
- arch/arm64/kernel/debug-monitors.c      | 16 ++++++--
- arch/arm64/kernel/hw_breakpoint.c       | 33 ++++++++++++++++
- 4 files changed, 86 insertions(+), 14 deletions(-)
+Changes in v7:
+- Rebase ont v6.12-rc1.
+- Link to v6: https://lore.kernel.org/r/20240730-kvm-arm64-fix-pkvm-sve-vl-v6-0-cae8a2e0bd66@kernel.org
 
-diff --git a/arch/arm64/include/asm/debug-monitors.h b/arch/arm64/include/asm/debug-monitors.h
-index 13d437bcbf58..a14097673ae0 100644
---- a/arch/arm64/include/asm/debug-monitors.h
-+++ b/arch/arm64/include/asm/debug-monitors.h
-@@ -20,6 +20,7 @@
- #define DBG_MDSCR_KDE		(1 << 13)
- #define DBG_MDSCR_MDE		(1 << 15)
- #define DBG_MDSCR_MASK		~(DBG_MDSCR_KDE | DBG_MDSCR_MDE)
-+#define DBG_MDSCR_EMBWE		(1UL << 32)
- 
- #define	DBG_ESR_EVT(x)		(((x) >> 27) & 0x7)
- 
-diff --git a/arch/arm64/include/asm/hw_breakpoint.h b/arch/arm64/include/asm/hw_breakpoint.h
-index bd81cf17744a..362c4d4a64ac 100644
---- a/arch/arm64/include/asm/hw_breakpoint.h
-+++ b/arch/arm64/include/asm/hw_breakpoint.h
-@@ -79,8 +79,8 @@ static inline void decode_ctrl_reg(u32 reg,
-  * Limits.
-  * Changing these will require modifications to the register accessors.
-  */
--#define ARM_MAX_BRP		16
--#define ARM_MAX_WRP		16
-+#define ARM_MAX_BRP		64
-+#define ARM_MAX_WRP		64
- 
- /* Virtual debug register bases. */
- #define AARCH64_DBG_REG_BVR	0
-@@ -94,13 +94,25 @@ static inline void decode_ctrl_reg(u32 reg,
- #define AARCH64_DBG_REG_NAME_WVR	wvr
- #define AARCH64_DBG_REG_NAME_WCR	wcr
- 
-+static inline bool is_debug_v8p9_enabled(void)
-+{
-+	u64 dfr0 = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
-+	int dver = cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_DebugVer_SHIFT);
-+
-+	return dver == ID_AA64DFR0_EL1_DebugVer_V8P9;
-+}
-+
- /* Accessor macros for the debug registers. */
- #define AARCH64_DBG_READ(N, REG, VAL) do {\
- 	VAL = read_sysreg(dbg##REG##N##_el1);\
-+	if (is_debug_v8p9_enabled())	\
-+		preempt_enable();	\
- } while (0)
- 
- #define AARCH64_DBG_WRITE(N, REG, VAL) do {\
- 	write_sysreg(VAL, dbg##REG##N##_el1);\
-+	if (is_debug_v8p9_enabled())	\
-+		preempt_enable();	\
- } while (0)
- 
- struct task_struct;
-@@ -138,19 +150,37 @@ static inline void ptrace_hw_copy_thread(struct task_struct *task)
- /* Determine number of BRP registers available. */
- static inline int get_num_brps(void)
- {
--	u64 dfr0 = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
--	return 1 +
--		cpuid_feature_extract_unsigned_field(dfr0,
--						ID_AA64DFR0_EL1_BRPs_SHIFT);
-+	u64 dfr0, dfr1;
-+	int dver, brps;
-+
-+	dfr0 = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
-+	dver = cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_DebugVer_SHIFT);
-+	if (dver == ID_AA64DFR0_EL1_DebugVer_V8P9) {
-+		dfr1 = read_sanitised_ftr_reg(SYS_ID_AA64DFR1_EL1);
-+		brps = cpuid_feature_extract_unsigned_field_width(dfr1,
-+								  ID_AA64DFR1_EL1_BRPs_SHIFT, 8);
-+	} else {
-+		brps = cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_BRPs_SHIFT);
-+	}
-+	return 1 + brps;
- }
- 
- /* Determine number of WRP registers available. */
- static inline int get_num_wrps(void)
- {
--	u64 dfr0 = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
--	return 1 +
--		cpuid_feature_extract_unsigned_field(dfr0,
--						ID_AA64DFR0_EL1_WRPs_SHIFT);
-+	u64 dfr0, dfr1;
-+	int dver, wrps;
-+
-+	dfr0 = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
-+	dver = cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_DebugVer_SHIFT);
-+	if (dver == ID_AA64DFR0_EL1_DebugVer_V8P9) {
-+		dfr1 = read_sanitised_ftr_reg(SYS_ID_AA64DFR1_EL1);
-+		wrps = cpuid_feature_extract_unsigned_field_width(dfr1,
-+								  ID_AA64DFR1_EL1_WRPs_SHIFT, 8);
-+	} else {
-+		wrps = cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_WRPs_SHIFT);
-+	}
-+	return 1 + wrps;
- }
- 
- #ifdef CONFIG_CPU_PM
-diff --git a/arch/arm64/kernel/debug-monitors.c b/arch/arm64/kernel/debug-monitors.c
-index 024a7b245056..af643c935f2e 100644
---- a/arch/arm64/kernel/debug-monitors.c
-+++ b/arch/arm64/kernel/debug-monitors.c
-@@ -23,6 +23,7 @@
- #include <asm/debug-monitors.h>
- #include <asm/system_misc.h>
- #include <asm/traps.h>
-+#include <asm/hw_breakpoint.h>
- 
- /* Determine debug architecture. */
- u8 debug_monitors_arch(void)
-@@ -34,7 +35,7 @@ u8 debug_monitors_arch(void)
- /*
-  * MDSCR access routines.
-  */
--static void mdscr_write(u32 mdscr)
-+static void mdscr_write(u64 mdscr)
- {
- 	unsigned long flags;
- 	flags = local_daif_save();
-@@ -43,7 +44,7 @@ static void mdscr_write(u32 mdscr)
- }
- NOKPROBE_SYMBOL(mdscr_write);
- 
--static u32 mdscr_read(void)
-+static u64 mdscr_read(void)
- {
- 	return read_sysreg(mdscr_el1);
- }
-@@ -76,10 +77,11 @@ early_param("nodebugmon", early_debug_disable);
-  */
- static DEFINE_PER_CPU(int, mde_ref_count);
- static DEFINE_PER_CPU(int, kde_ref_count);
-+static DEFINE_PER_CPU(int, embwe_ref_count);
- 
- void enable_debug_monitors(enum dbg_active_el el)
- {
--	u32 mdscr, enable = 0;
-+	u64 mdscr, enable = 0;
- 
- 	WARN_ON(preemptible());
- 
-@@ -90,6 +92,9 @@ void enable_debug_monitors(enum dbg_active_el el)
- 	    this_cpu_inc_return(kde_ref_count) == 1)
- 		enable |= DBG_MDSCR_KDE;
- 
-+	if (is_debug_v8p9_enabled() && this_cpu_inc_return(embwe_ref_count) == 1)
-+		enable |= DBG_MDSCR_EMBWE;
-+
- 	if (enable && debug_enabled) {
- 		mdscr = mdscr_read();
- 		mdscr |= enable;
-@@ -100,7 +105,7 @@ NOKPROBE_SYMBOL(enable_debug_monitors);
- 
- void disable_debug_monitors(enum dbg_active_el el)
- {
--	u32 mdscr, disable = 0;
-+	u64 mdscr, disable = 0;
- 
- 	WARN_ON(preemptible());
- 
-@@ -111,6 +116,9 @@ void disable_debug_monitors(enum dbg_active_el el)
- 	    this_cpu_dec_return(kde_ref_count) == 0)
- 		disable &= ~DBG_MDSCR_KDE;
- 
-+	if (is_debug_v8p9_enabled() && this_cpu_dec_return(embwe_ref_count) == 0)
-+		disable &= ~DBG_MDSCR_EMBWE;
-+
- 	if (disable) {
- 		mdscr = mdscr_read();
- 		mdscr &= disable;
-diff --git a/arch/arm64/kernel/hw_breakpoint.c b/arch/arm64/kernel/hw_breakpoint.c
-index 722ac45f9f7b..30156d732284 100644
---- a/arch/arm64/kernel/hw_breakpoint.c
-+++ b/arch/arm64/kernel/hw_breakpoint.c
-@@ -103,10 +103,40 @@ int hw_breakpoint_slots(int type)
- 	WRITE_WB_REG_CASE(OFF, 14, REG, VAL);	\
- 	WRITE_WB_REG_CASE(OFF, 15, REG, VAL)
- 
-+static int set_bank_index(int n)
-+{
-+	int mdsel_bank;
-+	int bank = n / 16, index = n % 16;
-+
-+	switch (bank) {
-+	case 0:
-+		mdsel_bank = MDSELR_EL1_BANK_BANK_0;
-+		break;
-+	case 1:
-+		mdsel_bank = MDSELR_EL1_BANK_BANK_1;
-+		break;
-+	case 2:
-+		mdsel_bank = MDSELR_EL1_BANK_BANK_2;
-+		break;
-+	case 3:
-+		mdsel_bank = MDSELR_EL1_BANK_BANK_3;
-+		break;
-+	default:
-+		pr_warn("Unknown register bank %d\n", bank);
-+	}
-+	preempt_disable();
-+	write_sysreg_s(mdsel_bank << MDSELR_EL1_BANK_SHIFT, SYS_MDSELR_EL1);
-+	isb();
-+	return index;
-+}
-+
- static u64 read_wb_reg(int reg, int n)
- {
- 	u64 val = 0;
- 
-+	if (is_debug_v8p9_enabled())
-+		n = set_bank_index(n);
-+
- 	switch (reg + n) {
- 	GEN_READ_WB_REG_CASES(AARCH64_DBG_REG_BVR, AARCH64_DBG_REG_NAME_BVR, val);
- 	GEN_READ_WB_REG_CASES(AARCH64_DBG_REG_BCR, AARCH64_DBG_REG_NAME_BCR, val);
-@@ -122,6 +152,9 @@ NOKPROBE_SYMBOL(read_wb_reg);
- 
- static void write_wb_reg(int reg, int n, u64 val)
- {
-+	if (is_debug_v8p9_enabled())
-+		n = set_bank_index(n);
-+
- 	switch (reg + n) {
- 	GEN_WRITE_WB_REG_CASES(AARCH64_DBG_REG_BVR, AARCH64_DBG_REG_NAME_BVR, val);
- 	GEN_WRITE_WB_REG_CASES(AARCH64_DBG_REG_BCR, AARCH64_DBG_REG_NAME_BCR, val);
+Changes in v6:
+- Rebase onto v6.11-rc1.
+- Link to v5: https://lore.kernel.org/r/20240708-kvm-arm64-fix-pkvm-sve-vl-v5-0-d2175738456b@kernel.org
+
+Changes in v5:
+- Clarify commit message on patch 3.
+- Link to v4: https://lore.kernel.org/r/20240704-kvm-arm64-fix-pkvm-sve-vl-v4-0-b6898ab23dc4@kernel.org
+
+Changes in v4:
+- Roll in Catalin's acks.
+- Link to v3: https://lore.kernel.org/r/20240607-kvm-arm64-fix-pkvm-sve-vl-v3-0-59e781706d65@kernel.org
+
+Changes in v3:
+- Replace %u with %lu in late CPU error message.
+Changes in v2:
+- Downgrade check for a late CPU increasing maximum VL to a warning only
+  but do it unconditionally since pKVM prevents late CPUs anyway.
+- Commit log tweaks.
+- Link to v1: https://lore.kernel.org/r/20240605-kvm-arm64-fix-pkvm-sve-vl-v1-0-680d6b43b4c1@kernel.org
+
+---
+Mark Brown (4):
+      arm64/fpsimd: Introduce __bit_to_vl() helper
+      arm64/fpsimd: Discover maximum vector length implemented by any CPU
+      KVM: arm64: Fix FFR offset calculation for pKVM host state save and restore
+      KVM: arm64: Avoid underallocating storage for host SVE state
+
+ arch/arm64/include/asm/fpsimd.h         | 17 +++++++++++++++
+ arch/arm64/include/asm/kvm_host.h       |  2 +-
+ arch/arm64/include/asm/kvm_hyp.h        |  3 ++-
+ arch/arm64/include/asm/kvm_pkvm.h       |  2 +-
+ arch/arm64/kernel/fpsimd.c              | 38 +++++++++++++++++++++++++++------
+ arch/arm64/kvm/hyp/fpsimd.S             |  5 +++++
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  6 +++---
+ arch/arm64/kvm/hyp/nvhe/pkvm.c          |  2 +-
+ arch/arm64/kvm/reset.c                  |  6 +++---
+ 10 files changed, 65 insertions(+), 18 deletions(-)
+---
+base-commit: 9852d85ec9d492ebef56dc5f229416c925758edc
+change-id: 20240604-kvm-arm64-fix-pkvm-sve-vl-13cd71fd7db0
+
+Best regards,
 -- 
-2.25.1
+Mark Brown <broonie@kernel.org>
 
