@@ -1,108 +1,118 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE8BB158218
-	for <kvmarm@lists.linux.dev>; Tue,  1 Oct 2024 23:28:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C3561CEE8E
+	for <kvmarm@lists.linux.dev>; Tue,  1 Oct 2024 23:49:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727825302; cv=none; b=rB9bROoxFE9w4HkdeQeM358gltykXsee7ZIopw06ppEb9SutB051f4deNh7VhCHkaTeCqR3ZxS1+sZHwFpEMkf4fP0P3wZD7rsnD6Py/K0U7sqg66ziRrcQF4XcuRPJo42dzHEqpBrQZ3LRqX8XN0NX/YIU8kKl4HhSi7TbJCxY=
+	t=1727826570; cv=none; b=g8VXoHXWCRHfToUaIDN9sUBiGa6nb9/VzJcJLz/o8A/9D5DNzSovnn/ERAKyhu4CAG1Iz7NVAuly8+L7enZkmFaAbuhqjqWwxUlSOvsSXBvM69Z0OkphvlvG/2+JUOgKwCfQ8OCovN/Fc9ntPEj/kdt0AiYdY39ji+jB5YS3q14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727825302; c=relaxed/simple;
-	bh=URaS21lxsrvli0OFExDTV2P+EnHET3qehdmO6/xClsQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=jf3ROoAvsRPGAO4i5EIU9VU2I0k6BxehA6F3Z/FULHlY3TR9XZN+B/GxU9ExnjEAEisPfg9O+phHarOkPMG+0uqqOKrWhcxjwpBJuSpY8pykM7abXjii2S8jracztQj90JFDJkQW9WOfpLZ1clq+GrBr1wA8SgtMJ54/jQWRf5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OuJdvuaU; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1727826570; c=relaxed/simple;
+	bh=6OLByul/iGB+FqFJYTFr0DVFRYD1IdpL6JZPzz4PPyQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DHUDhj+z1o6UPgLIdQAtT7VeSDmSSkIfnF587kXanEwGdzsrDPmIiskFB9J4V4k7YItoLGZohE9DgC5S6pnzD3QaQdsrweTwmBA+CQBx8QTp/i9Lf5wVMBIjBLSgvDIpdT815UC5qFUt+zzBbyTcDQ33NeiG1GT3h2g4rLcTYMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FfedSVCd; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OuJdvuaU"
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6d7124939beso98759737b3.2
-        for <kvmarm@lists.linux.dev>; Tue, 01 Oct 2024 16:28:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727825300; x=1728430100; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fqx0eoYDpxDf/AGbKjGil2p5l2k+gj5ioLs3IZX1FiE=;
-        b=OuJdvuaUw+yV2B4gH/B8H3i6MMf5TjIM5bNF6YkueOsokN3rSsyFI88wQP2pre8cbw
-         URgKJ57kQL39amSZV3arux1fZMfK81mqNHvOZ4DfFrUNm+ilawEdKcZXwE0njsNjdi34
-         J4eiB4E83Di7AKtv/+dPG2BSifkEpCoeVUY7zFQq+haYNn0M3NannGSJ5Pw/LkT0zdRJ
-         4TTssfwg/coImRjYiZza5yAXyGe8WtBS3IutBLR01jh68SK0skTeooeRG+QoDGKhhZfg
-         vyAjoOEYh+wD+RHz87Sbj39I26hSEFtPWTtIQVks7RxJvpovkJJaPbHCoehT2w+xRCXS
-         AKnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727825300; x=1728430100;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fqx0eoYDpxDf/AGbKjGil2p5l2k+gj5ioLs3IZX1FiE=;
-        b=nqlIaLVib1MvFdXbuh91aI+qGAuh5+LbhAWyLMy8cKG/49dbsKaxgCSEMFs+DZhU5Q
-         SmMrQsAa34aJzpMlJJyTp21+K2lxBOYztD2lFnxYNMfrFXRPjRWfTrq2m9l9fG0wZxUF
-         0pxKYX2ogADmq5LaNaYlX9PftQ0wvS8kn816yPpFGHYz+w3JmaxEPhhDqi1dbAcHofQS
-         ed+KyP3hr/FuSqEu1Ko7McziLLLa3XTbWuJsfvvWZvtOSzsceJ2B4ysAP6nOwVPVs2MI
-         TH2s5M7ZpFVIuv1yl7U/1A/bf61S6JAJpm1lS8Vg1Qcy5k52XWZjl+3d52d/BaDqqQ3i
-         MzCg==
-X-Gm-Message-State: AOJu0Yw8H20K9U7BA1496LFgRqb2Tzqvo3Rh79EhG4zHDu8++9STik4M
-	hNKRavqEH9hySzPqJi5TiiayyBIF7NZGwXgs5fwwrdJTrXabta7HV5bsXoYqaT6DpaMJJtHBY/i
-	r5g==
-X-Google-Smtp-Source: AGHT+IGOIITmS8E3kuK0Dr84DAJUsfABas8WiwqYbwTxIipxRe4Lksm8mh1qLq9+QNSBOD/UmDgI1hv2VE8=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:3583:b0:6d5:df94:b7f2 with SMTP id
- 00721157ae682-6e2a2e457d7mr339617b3.5.1727825299934; Tue, 01 Oct 2024
- 16:28:19 -0700 (PDT)
-Date: Tue, 1 Oct 2024 16:28:18 -0700
-In-Reply-To: <ZvxeeVn8LphHxWeS@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FfedSVCd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B816CC4CEC6;
+	Tue,  1 Oct 2024 23:49:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727826569;
+	bh=6OLByul/iGB+FqFJYTFr0DVFRYD1IdpL6JZPzz4PPyQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=FfedSVCdpHZ7V4cDtMcE6SuYlaFLQ80EK1v0rFkPge2LCofNw0AiDV6ecDw8PAjTH
+	 RlOc8eWiiTJd2EizAk9s/KYOOn7UDQA7d/sd8yJM/Wnzh5QhRfAK3tdInNW3A7m/e8
+	 1wgT0rN9aDiWBp83xCs01ySGeNniN2cGAuFFaJXx406ewcnkNo+EYWgc48OOxyyc6/
+	 RTg8KKCb8B1XaorBravRJBPrUCajd2qEPp7PiCqkLzaiiM/XzedmacFx6zhWERIysE
+	 kU9g8Ys0C0jI7Jj1vkl5mb2UGvoo2oqbT5uI8i9TsI15sLN4tlkD40P+vxhN+Dqm3I
+	 Bq74nCApvweBw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1svmcR-00Gua0-CY;
+	Wed, 02 Oct 2024 00:49:27 +0100
+Date: Wed, 02 Oct 2024 00:49:27 +0100
+Message-ID: <86cykj75a0.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	kvmarm@lists.linux.dev,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 3/3] KVM: arm64: nv: Punt stage-2 recycling to a vCPU request
+In-Reply-To: <ZvyFkqsRFBAYwqP7@google.com>
+References: <20241001001709.1303668-1-oliver.upton@linux.dev>
+	<20241001001709.1303668-4-oliver.upton@linux.dev>
+	<ZvxH3el9SNuNWwi8@google.com>
+	<ZvxeeVn8LphHxWeS@linux.dev>
+	<ZvyFkqsRFBAYwqP7@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20241001001709.1303668-1-oliver.upton@linux.dev>
- <20241001001709.1303668-4-oliver.upton@linux.dev> <ZvxH3el9SNuNWwi8@google.com>
- <ZvxeeVn8LphHxWeS@linux.dev>
-Message-ID: <ZvyFkqsRFBAYwqP7@google.com>
-Subject: Re: [PATCH 3/3] KVM: arm64: nv: Punt stage-2 recycling to a vCPU request
-From: Sean Christopherson <seanjc@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: seanjc@google.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Oct 01, 2024, Oliver Upton wrote:
-> Hey,
+On Wed, 02 Oct 2024 00:28:18 +0100,
+Sean Christopherson <seanjc@google.com> wrote:
 > 
-> sidebar: I was a bit confused by the diff for a second, since it looks
-> like your email client lowercased some stuff :)
-
-Wasn't my mail client, it was PEBKAC.  I copy+pasted a large chunk in Vim because
-I wanted to pull in the changelog (which I had deleted from my response), but then
-I changed my mind, and in doing so I managed to fat-finger something that converted
-everything to lowercase.  And yeah, it confused me too.
-
-> > >  out:
-> > > +	if (s2_mmu->pending_unmap)
-> > > +		kvm_make_request(kvm_req_nested_s2_unmap, vcpu);
+> On Tue, Oct 01, 2024, Oliver Upton wrote:
+> > Hey,
 > > 
-> > If I followed everything correctly, I don't think a request is needed.  the
-> > request will never be cross-vCPU, and each vCPU holds a reference to the MMU, so
-> > the MMU can't be recycled, i.e. pending_unmap is guaranteed to be relevant to the
-> > vCPU's usage of the MMU.  More thoughts below in check_nested_vcpu_requests().
+> > sidebar: I was a bit confused by the diff for a second, since it looks
+> > like your email client lowercased some stuff :)
 > 
-> I'm (ab)using the request to prevent the vCPU thread from actually
-> entering the VM without first having done the laundry. We have other
-> examples of strictly per-vCPU tasks that are tracked with a request so
-> this doesn't stick out that much.
+> Wasn't my mail client, it was PEBKAC.  I copy+pasted a large chunk in Vim because
+> I wanted to pull in the changelog (which I had deleted from my response), but then
+> I changed my mind, and in doing so I managed to fat-finger something that converted
+> everything to lowercase.  And yeah, it confused me too.
 > 
-> Otherwise we'd need an open-coded check in kvm_vcpu_exit_request() to
-> catch a 'dirty' MMU or take a pin on it from the point we check the
-> dirtiness to the point we disable preemption.
+> > > >  out:
+> > > > +	if (s2_mmu->pending_unmap)
+> > > > +		kvm_make_request(kvm_req_nested_s2_unmap, vcpu);
+> > > 
+> > > If I followed everything correctly, I don't think a request is needed.  the
+> > > request will never be cross-vCPU, and each vCPU holds a reference to the MMU, so
+> > > the MMU can't be recycled, i.e. pending_unmap is guaranteed to be relevant to the
+> > > vCPU's usage of the MMU.  More thoughts below in check_nested_vcpu_requests().
+> > 
+> > I'm (ab)using the request to prevent the vCPU thread from actually
+> > entering the VM without first having done the laundry. We have other
+> > examples of strictly per-vCPU tasks that are tracked with a request so
+> > this doesn't stick out that much.
+> > 
+> > Otherwise we'd need an open-coded check in kvm_vcpu_exit_request() to
+> > catch a 'dirty' MMU or take a pin on it from the point we check the
+> > dirtiness to the point we disable preemption.
+> 
+> Ewww, because kvm_arch_vcpu_put() puts the nested stage-2 when the vCPU is
+> scheduled out.  Mostly out of curiosity, why?  99.9% of the time, the vCPU will
+> be scheduled back in.
 
-Ewww, because kvm_arch_vcpu_put() puts the nested stage-2 when the vCPU is
-scheduled out.  Mostly out of curiosity, why?  99.9% of the time, the vCPU will
-be scheduled back in.
+Because s2 MMU structures are a scarce resource. and other vcpus could
+have the opportunity to make use of an unused slot.
 
-Now that vcpu->scheduled_out is a thing, retaining the nested s2 MMU should be
-quite straightforward.  kvm_arch_vcpu_destroy() would need to put the MMU, but
-that should also be straightforward.
+> Now that vcpu->scheduled_out is a thing, retaining the nested s2 MMU should be
+> quite straightforward.  kvm_arch_vcpu_destroy() would need to put the MMU, but
+> that should also be straightforward.
 
-It wouldn't magically fix the mmu_lock bottleneck, but it would make hw_mmu
-stable (obviously except for the flows that explicitly change it).
+This code long predates scheduled_out, and I don't think this brings
+much to the table. If the vcpu comes back quickly, it will find its
+toys where it left them. If not, someone else will have borrowed them,
+and it will have to pick new ones. It isn't any different from TLBs,
+which s2 MMUs model.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
