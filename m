@@ -1,139 +1,180 @@
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B51B194AD1
-	for <kvmarm@lists.linux.dev>; Tue,  1 Oct 2024 23:13:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CD50158218
+	for <kvmarm@lists.linux.dev>; Tue,  1 Oct 2024 23:23:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727824402; cv=none; b=piux/NEAIxVbXGk1Rv8h/x3meCQedBaEagsSsQNVR+A5HScrVEY+ac7vE+yJKt9Vexn3xeclFUSHYd/4zUoQIqcn0wVNQOGqRUICD4rVObosxPnc0pmjxUJIG8OenPFxvU1vJJmSPymPLxvJMBbojofD7pbrWlE7tdwNFhEwDf4=
+	t=1727825026; cv=none; b=e8NT5w+mQC9W+7sEdi4tT8gkAUa3g53mtybHeG1P+4Onn1HXwfcpdJmyHYGAd4lPBVm677EKlJDiADAploAScBmhzaQM1oe/+o3cCwKjAqUpkulK759+FQYNBoUdVkPfHfLVyeU+WvIyq2nGGd4XKwedohQQtAxtbHFh+dgsaPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727824402; c=relaxed/simple;
-	bh=w++7hzLDS/8dZ/VoZ2hephh+rP/dNT8s02ewb/5KE7A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TIgVLG8fsB4KtQ20Q9laRG16PIk4N7mw5bc+77SqXuMIt4x7DYOQ2Jf/zHi4tBxBpUkIQx5yPZyF0M2bkYMYLqb12KbLLiO/+XIgQB2V4htnGjI7OUQQy0Ng+58XyAGfiNZ93+qUt6uAOMEA86d1schaJdmzrwOxHZff7qzKwq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=WOi74RDz; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+	s=arc-20240116; t=1727825026; c=relaxed/simple;
+	bh=PtsDxebjTQni2Zvds6FRpHilQV90bNhXcFOjDdLtf0U=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TLPeNdzf9m2J13dW/byJYGqcpN5kZuPAXtFUnvnjEpM5ja2gh6BHFWTkr3wjMJkNzKgj2p1BuDAVl5dohSE1syE/oI3nlYywc0BmrPiPGOm+i+1MoS5j8R0rJ3TrYUTydIheAKS3OQsXefyv6P12In/ZgGn2QdO7TicfMbYBH5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jTL/Ov/q; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="WOi74RDz"
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-20b9b35c7c3so24605165ad.3
-        for <kvmarm@lists.linux.dev>; Tue, 01 Oct 2024 16:13:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1727824399; x=1728429199; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vF28sAx//tve6z0mOEzHepFQAlUB74FiXmJYm/deJzs=;
-        b=WOi74RDzxa1Pv5o3q0pzqJ4EWmHk0nSTpar9sOH0c5HtFJbY+iGLE+Zh3PD0lOj3Jz
-         aEKsA2VmCX4BllQTpCwRyjnEvP2cRU49pEqdVNKSK6o/HXZ4lSRi0i64V2IxL3Im+NMY
-         wyYqsGaWu1I43GuQG3rM5iMzSK2lbZNvy5Eeyu6XRieW4nwP/Ub7uxzMUpJhy5O2guPa
-         Vml93gx5BhQuKhba7z1pzVsoI97QvOYbN+hk8hgwdEZZAHRDn8AHtN1RgzWw0F8ETBQc
-         U6xlf++WKVSzYMGQ8ZYI9+5zEv1m1JAii1OLL9ULEFq4V4VPVPcS0Z/V9eViibRneN8r
-         NQJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727824399; x=1728429199;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vF28sAx//tve6z0mOEzHepFQAlUB74FiXmJYm/deJzs=;
-        b=eUrNtQQUOJ1Ay/4CI+K+ZQlaa8ejwsx7oUO2UGH343OMwEp5Ep+a6z1JW5QiQJ6b/j
-         lmIPoWojVXaEZ4dOe5DyavDi3elEvlfoeO11VgcXUt5QZH0K0nlssM/Vs0Usovad8m+D
-         xQDgmJQZPUFZflWxpKea4UBZjjnu1xZrEFjRst8hgMBI+wpptuquuOo+uNo1PHOfck5f
-         vzBixB5r49AWzbtJXIHWlv8k5mXFqon9dskT7Se3XtYN7zMqAu3msKxnmTjEis/2D9B0
-         GqkkSwfdc98KiElRvO6mXcSEEbsg2DMQO10ZaJSzeys89e0TlbnFVns22N/wXs6z5Azr
-         Bt7g==
-X-Forwarded-Encrypted: i=1; AJvYcCV5OXhq5B1kPt716d4D6youfjfw2h7uaOseVJFuyWR9pve57hGuFXB+hBFHatUE2/AG494ZJdA=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyAz0Steg8qnVY8Wx1tl4LK9OwaZX6fQvTnP7cHOrk2w/hudE+J
-	HhUqGm/lBGzj6gmzAC47883NgxYNMfr0qK+GIf5gtcTRAQtEE1rO/KQv3lIZ+Qk=
-X-Google-Smtp-Source: AGHT+IEIrzHYfjGFMSAlwPPGGJUrbwH3BDEgMMmzhiHFcldc7QLYwSfdGVw09IGHWqEtu37pmMpU7g==
-X-Received: by 2002:a17:903:41c4:b0:20b:a431:8f17 with SMTP id d9443c01a7336-20bc5a887b7mr17332045ad.58.1727824398654;
-        Tue, 01 Oct 2024 16:13:18 -0700 (PDT)
-Received: from debug.ba.rivosinc.com ([64.71.180.162])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20b37e37225sm74521465ad.197.2024.10.01.16.13.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Oct 2024 16:13:18 -0700 (PDT)
-Date: Tue, 1 Oct 2024 16:13:15 -0700
-From: Deepak Gupta <debug@rivosinc.com>
-To: Mark Brown <broonie@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jTL/Ov/q"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E649BC4CEC6;
+	Tue,  1 Oct 2024 23:23:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727825025;
+	bh=PtsDxebjTQni2Zvds6FRpHilQV90bNhXcFOjDdLtf0U=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=jTL/Ov/qjMXsppGH49XIZaJeYSfBsX4kuDNjyQxpRllwxi/QMAmCRJji3Z25Hez9U
+	 Re9yGxmy2rNrHNKrDpOAvzE/BnsG0LRpK/XTxMGbKIfRTjy0qqnZV1xadae0INFjVI
+	 oh49hWfCtg9HVyHWDALB4fIRzU8IsaRfO/QOeua0+EY7vxm7VAeeSU5U/piVNUrl5o
+	 gXlj5+crGQ/VUJdCNgT9GsmyfzOmd0pCTL+Dck/jowB/ROG64TyKEFCWIJfwc0cr6K
+	 qaELkvi8ENUZgpVp3UA+WGullrxsL3pB+vtywCn7WF8WqcRTLkQJ5oWdooQIbyV+BK
+	 XitNGbKWgRkBQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1svmDX-00GuKI-KJ;
+	Wed, 02 Oct 2024 00:23:43 +0100
+Date: Wed, 02 Oct 2024 00:23:43 +0100
+Message-ID: <86ed4z76gw.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Florian Weimer <fweimer@redhat.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
-	Ross Burton <ross.burton@arm.com>,
-	David Spickett <david.spickett@arm.com>,
-	Yury Khrustalev <yury.khrustalev@arm.com>,
-	Wilco Dijkstra <wilco.dijkstra@arm.com>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v13 04/40] prctl: arch-agnostic prctl for shadow stack
-Message-ID: <ZvyCC7tJT7QoKO+D@debug.ba.rivosinc.com>
-References: <20241001-arm64-gcs-v13-0-222b78d87eee@kernel.org>
- <20241001-arm64-gcs-v13-4-222b78d87eee@kernel.org>
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 3/3] KVM: arm64: nv: Punt stage-2 recycling to a vCPU request
+In-Reply-To: <20241001001709.1303668-4-oliver.upton@linux.dev>
+References: <20241001001709.1303668-1-oliver.upton@linux.dev>
+	<20241001001709.1303668-4-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20241001-arm64-gcs-v13-4-222b78d87eee@kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Oct 01, 2024 at 11:58:43PM +0100, Mark Brown wrote:
->Three architectures (x86, aarch64, riscv) have announced support for
->shadow stacks with fairly similar functionality.  While x86 is using
->arch_prctl() to control the functionality neither arm64 nor riscv uses
->that interface so this patch adds arch-agnostic prctl() support to
->get and set status of shadow stacks and lock the current configuation to
->prevent further changes, with support for turning on and off individual
->subfeatures so applications can limit their exposure to features that
->they do not need.  The features are:
->
->  - PR_SHADOW_STACK_ENABLE: Tracking and enforcement of shadow stacks,
->    including allocation of a shadow stack if one is not already
->    allocated.
->  - PR_SHADOW_STACK_WRITE: Writes to specific addresses in the shadow
->    stack.
->  - PR_SHADOW_STACK_PUSH: Push additional values onto the shadow stack.
->
->These features are expected to be inherited by new threads and cleared
->on exec(), unknown features should be rejected for enable but accepted
->for locking (in order to allow for future proofing).
->
->This is based on a patch originally written by Deepak Gupta but modified
->fairly heavily, support for indirect landing pads is removed, additional
->modes added and the locking interface reworked.  The set status prctl()
->is also reworked to just set flags, if setting/reading the shadow stack
->pointer is required this could be a separate prctl.
->
->Reviewed-by: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
->Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
->Acked-by: Yury Khrustalev <yury.khrustalev@arm.com>
->Signed-off-by: Mark Brown <broonie@kernel.org>
->---
-> include/linux/mm.h         |  4 ++++
-> include/uapi/linux/prctl.h | 22 ++++++++++++++++++++++
-> kernel/sys.c               | 30 ++++++++++++++++++++++++++++++
-> 3 files changed, 56 insertions(+)
+On Tue, 01 Oct 2024 01:17:09 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> Currently, when a nested MMU is repurposed for some other MMU context,
+> KVM unmaps everything during vcpu_load() while holding the MMU lock for
+> write. This is quite a performance bottleneck for large nested VMs, as
+> all vCPU scheduling will spin until the unmap completes.
+> 
+> Start punting the MMU cleanup to a vCPU request, where it is then
+> possible to periodically release the MMU lock and CPU in the presence of
+> contention. To make that possible, take a pin on the hardware MMU while
+> unmapping it to guarantee the responsible vCPU finds the MMU on the next
+> vcpu_load().
+> 
+> Ensure that no vCPU winds up using a stale MMU by tracking the pending
+> unmap on the S2 MMU itself and requesting an unmap on every vCPU that
+> finds it.
+> 
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/include/asm/kvm_host.h   |  3 +++
+>  arch/arm64/include/asm/kvm_nested.h |  2 ++
+>  arch/arm64/kvm/arm.c                |  2 ++
+>  arch/arm64/kvm/nested.c             | 21 +++++++++++++++++++--
+>  4 files changed, 26 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 268f69196380..1d310292c623 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -51,6 +51,7 @@
+>  #define KVM_REQ_RELOAD_PMU	KVM_ARCH_REQ(5)
+>  #define KVM_REQ_SUSPEND		KVM_ARCH_REQ(6)
+>  #define KVM_REQ_RESYNC_PMU_EL0	KVM_ARCH_REQ(7)
+> +#define KVM_REQ_NESTED_S2_UNMAP	KVM_ARCH_REQ(8)
+>  
+>  #define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
+>  				     KVM_DIRTY_LOG_INITIALLY_SET)
+> @@ -216,6 +217,8 @@ struct kvm_s2_mmu {
+>  	 * >0: Somebody is actively using this.
+>  	 */
+>  	atomic_t refcnt;
+> +
+> +	bool	pending_unmap;
+>  };
+>  
+>  struct kvm_arch_memory_slot {
+> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> index e74b90dcfac4..233e65522716 100644
+> --- a/arch/arm64/include/asm/kvm_nested.h
+> +++ b/arch/arm64/include/asm/kvm_nested.h
+> @@ -78,6 +78,8 @@ extern void kvm_s2_mmu_iterate_by_vmid(struct kvm *kvm, u16 vmid,
+>  extern void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu);
+>  extern void kvm_vcpu_put_hw_mmu(struct kvm_vcpu *vcpu);
+>  
+> +extern void check_nested_vcpu_requests(struct kvm_vcpu *vcpu);
+> +
+>  struct kvm_s2_trans {
+>  	phys_addr_t output;
+>  	unsigned long block_size;
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 367f0d3d3194..ab7d387379a0 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1031,6 +1031,8 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
+>  
+>  		if (kvm_dirty_ring_check_request(vcpu))
+>  			return 0;
+> +
+> +		check_nested_vcpu_requests(vcpu);
+>  	}
+>  
+>  	return 1;
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 1ba211541290..749babdbda81 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -632,9 +632,9 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
+>  	/* Set the scene for the next search */
+>  	kvm->arch.nested_mmus_next = (i + 1) % kvm->arch.nested_mmus_size;
+>  
+> -	/* Clear the old state */
+> +	/* Make sure we don't forget to do the laundry */
+>  	if (kvm_s2_mmu_valid(s2_mmu))
+> -		kvm_stage2_unmap_range(s2_mmu, 0, kvm_phys_size(s2_mmu), false);
+> +		s2_mmu->pending_unmap = true;
+>  
+>  	/*
+>  	 * The virtual VMID (modulo CnP) will be used as a key when matching
+> @@ -649,6 +649,9 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
+>  	s2_mmu->nested_stage2_enabled = vcpu_read_sys_reg(vcpu, HCR_EL2) & HCR_VM;
+>  
+>  out:
+> +	if (s2_mmu->pending_unmap)
+> +		kvm_make_request(KVM_REQ_NESTED_S2_UNMAP, vcpu);
+> +
+>  	kvm_get_s2_mmu(s2_mmu);
+>  	return s2_mmu;
+>  }
+> @@ -1186,3 +1189,17 @@ int kvm_init_nv_sysregs(struct kvm *kvm)
+>  
+>  	return 0;
+>  }
+> +
+> +void check_nested_vcpu_requests(struct kvm_vcpu *vcpu)
+> +{
+> +	if (kvm_check_request(KVM_REQ_NESTED_S2_UNMAP, vcpu)) {
+> +		CLASS(vcpu_hw_mmu, mmu)(vcpu);
 
-Reviewed-by: Deepak Gupta <debug@rivosinc.com>
+I really think a small comment outlining *why* we need to elevate the
+refcount would help. This single line is what holds the whole thing
+together.
 
->
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
