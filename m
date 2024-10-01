@@ -1,180 +1,108 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CD50158218
-	for <kvmarm@lists.linux.dev>; Tue,  1 Oct 2024 23:23:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE8BB158218
+	for <kvmarm@lists.linux.dev>; Tue,  1 Oct 2024 23:28:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727825026; cv=none; b=e8NT5w+mQC9W+7sEdi4tT8gkAUa3g53mtybHeG1P+4Onn1HXwfcpdJmyHYGAd4lPBVm677EKlJDiADAploAScBmhzaQM1oe/+o3cCwKjAqUpkulK759+FQYNBoUdVkPfHfLVyeU+WvIyq2nGGd4XKwedohQQtAxtbHFh+dgsaPk=
+	t=1727825302; cv=none; b=rB9bROoxFE9w4HkdeQeM358gltykXsee7ZIopw06ppEb9SutB051f4deNh7VhCHkaTeCqR3ZxS1+sZHwFpEMkf4fP0P3wZD7rsnD6Py/K0U7sqg66ziRrcQF4XcuRPJo42dzHEqpBrQZ3LRqX8XN0NX/YIU8kKl4HhSi7TbJCxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727825026; c=relaxed/simple;
-	bh=PtsDxebjTQni2Zvds6FRpHilQV90bNhXcFOjDdLtf0U=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TLPeNdzf9m2J13dW/byJYGqcpN5kZuPAXtFUnvnjEpM5ja2gh6BHFWTkr3wjMJkNzKgj2p1BuDAVl5dohSE1syE/oI3nlYywc0BmrPiPGOm+i+1MoS5j8R0rJ3TrYUTydIheAKS3OQsXefyv6P12In/ZgGn2QdO7TicfMbYBH5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jTL/Ov/q; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1727825302; c=relaxed/simple;
+	bh=URaS21lxsrvli0OFExDTV2P+EnHET3qehdmO6/xClsQ=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=jf3ROoAvsRPGAO4i5EIU9VU2I0k6BxehA6F3Z/FULHlY3TR9XZN+B/GxU9ExnjEAEisPfg9O+phHarOkPMG+0uqqOKrWhcxjwpBJuSpY8pykM7abXjii2S8jracztQj90JFDJkQW9WOfpLZ1clq+GrBr1wA8SgtMJ54/jQWRf5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OuJdvuaU; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jTL/Ov/q"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E649BC4CEC6;
-	Tue,  1 Oct 2024 23:23:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727825025;
-	bh=PtsDxebjTQni2Zvds6FRpHilQV90bNhXcFOjDdLtf0U=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jTL/Ov/qjMXsppGH49XIZaJeYSfBsX4kuDNjyQxpRllwxi/QMAmCRJji3Z25Hez9U
-	 Re9yGxmy2rNrHNKrDpOAvzE/BnsG0LRpK/XTxMGbKIfRTjy0qqnZV1xadae0INFjVI
-	 oh49hWfCtg9HVyHWDALB4fIRzU8IsaRfO/QOeua0+EY7vxm7VAeeSU5U/piVNUrl5o
-	 gXlj5+crGQ/VUJdCNgT9GsmyfzOmd0pCTL+Dck/jowB/ROG64TyKEFCWIJfwc0cr6K
-	 qaELkvi8ENUZgpVp3UA+WGullrxsL3pB+vtywCn7WF8WqcRTLkQJ5oWdooQIbyV+BK
-	 XitNGbKWgRkBQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1svmDX-00GuKI-KJ;
-	Wed, 02 Oct 2024 00:23:43 +0100
-Date: Wed, 02 Oct 2024 00:23:43 +0100
-Message-ID: <86ed4z76gw.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 3/3] KVM: arm64: nv: Punt stage-2 recycling to a vCPU request
-In-Reply-To: <20241001001709.1303668-4-oliver.upton@linux.dev>
-References: <20241001001709.1303668-1-oliver.upton@linux.dev>
-	<20241001001709.1303668-4-oliver.upton@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OuJdvuaU"
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6d7124939beso98759737b3.2
+        for <kvmarm@lists.linux.dev>; Tue, 01 Oct 2024 16:28:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1727825300; x=1728430100; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fqx0eoYDpxDf/AGbKjGil2p5l2k+gj5ioLs3IZX1FiE=;
+        b=OuJdvuaUw+yV2B4gH/B8H3i6MMf5TjIM5bNF6YkueOsokN3rSsyFI88wQP2pre8cbw
+         URgKJ57kQL39amSZV3arux1fZMfK81mqNHvOZ4DfFrUNm+ilawEdKcZXwE0njsNjdi34
+         J4eiB4E83Di7AKtv/+dPG2BSifkEpCoeVUY7zFQq+haYNn0M3NannGSJ5Pw/LkT0zdRJ
+         4TTssfwg/coImRjYiZza5yAXyGe8WtBS3IutBLR01jh68SK0skTeooeRG+QoDGKhhZfg
+         vyAjoOEYh+wD+RHz87Sbj39I26hSEFtPWTtIQVks7RxJvpovkJJaPbHCoehT2w+xRCXS
+         AKnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727825300; x=1728430100;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fqx0eoYDpxDf/AGbKjGil2p5l2k+gj5ioLs3IZX1FiE=;
+        b=nqlIaLVib1MvFdXbuh91aI+qGAuh5+LbhAWyLMy8cKG/49dbsKaxgCSEMFs+DZhU5Q
+         SmMrQsAa34aJzpMlJJyTp21+K2lxBOYztD2lFnxYNMfrFXRPjRWfTrq2m9l9fG0wZxUF
+         0pxKYX2ogADmq5LaNaYlX9PftQ0wvS8kn816yPpFGHYz+w3JmaxEPhhDqi1dbAcHofQS
+         ed+KyP3hr/FuSqEu1Ko7McziLLLa3XTbWuJsfvvWZvtOSzsceJ2B4ysAP6nOwVPVs2MI
+         TH2s5M7ZpFVIuv1yl7U/1A/bf61S6JAJpm1lS8Vg1Qcy5k52XWZjl+3d52d/BaDqqQ3i
+         MzCg==
+X-Gm-Message-State: AOJu0Yw8H20K9U7BA1496LFgRqb2Tzqvo3Rh79EhG4zHDu8++9STik4M
+	hNKRavqEH9hySzPqJi5TiiayyBIF7NZGwXgs5fwwrdJTrXabta7HV5bsXoYqaT6DpaMJJtHBY/i
+	r5g==
+X-Google-Smtp-Source: AGHT+IGOIITmS8E3kuK0Dr84DAJUsfABas8WiwqYbwTxIipxRe4Lksm8mh1qLq9+QNSBOD/UmDgI1hv2VE8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:3583:b0:6d5:df94:b7f2 with SMTP id
+ 00721157ae682-6e2a2e457d7mr339617b3.5.1727825299934; Tue, 01 Oct 2024
+ 16:28:19 -0700 (PDT)
+Date: Tue, 1 Oct 2024 16:28:18 -0700
+In-Reply-To: <ZvxeeVn8LphHxWeS@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+References: <20241001001709.1303668-1-oliver.upton@linux.dev>
+ <20241001001709.1303668-4-oliver.upton@linux.dev> <ZvxH3el9SNuNWwi8@google.com>
+ <ZvxeeVn8LphHxWeS@linux.dev>
+Message-ID: <ZvyFkqsRFBAYwqP7@google.com>
+Subject: Re: [PATCH 3/3] KVM: arm64: nv: Punt stage-2 recycling to a vCPU request
+From: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, 01 Oct 2024 01:17:09 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On Tue, Oct 01, 2024, Oliver Upton wrote:
+> Hey,
 > 
-> Currently, when a nested MMU is repurposed for some other MMU context,
-> KVM unmaps everything during vcpu_load() while holding the MMU lock for
-> write. This is quite a performance bottleneck for large nested VMs, as
-> all vCPU scheduling will spin until the unmap completes.
-> 
-> Start punting the MMU cleanup to a vCPU request, where it is then
-> possible to periodically release the MMU lock and CPU in the presence of
-> contention. To make that possible, take a pin on the hardware MMU while
-> unmapping it to guarantee the responsible vCPU finds the MMU on the next
-> vcpu_load().
-> 
-> Ensure that no vCPU winds up using a stale MMU by tracking the pending
-> unmap on the S2 MMU itself and requesting an unmap on every vCPU that
-> finds it.
-> 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  arch/arm64/include/asm/kvm_host.h   |  3 +++
->  arch/arm64/include/asm/kvm_nested.h |  2 ++
->  arch/arm64/kvm/arm.c                |  2 ++
->  arch/arm64/kvm/nested.c             | 21 +++++++++++++++++++--
->  4 files changed, 26 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 268f69196380..1d310292c623 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -51,6 +51,7 @@
->  #define KVM_REQ_RELOAD_PMU	KVM_ARCH_REQ(5)
->  #define KVM_REQ_SUSPEND		KVM_ARCH_REQ(6)
->  #define KVM_REQ_RESYNC_PMU_EL0	KVM_ARCH_REQ(7)
-> +#define KVM_REQ_NESTED_S2_UNMAP	KVM_ARCH_REQ(8)
->  
->  #define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
->  				     KVM_DIRTY_LOG_INITIALLY_SET)
-> @@ -216,6 +217,8 @@ struct kvm_s2_mmu {
->  	 * >0: Somebody is actively using this.
->  	 */
->  	atomic_t refcnt;
-> +
-> +	bool	pending_unmap;
->  };
->  
->  struct kvm_arch_memory_slot {
-> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-> index e74b90dcfac4..233e65522716 100644
-> --- a/arch/arm64/include/asm/kvm_nested.h
-> +++ b/arch/arm64/include/asm/kvm_nested.h
-> @@ -78,6 +78,8 @@ extern void kvm_s2_mmu_iterate_by_vmid(struct kvm *kvm, u16 vmid,
->  extern void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu);
->  extern void kvm_vcpu_put_hw_mmu(struct kvm_vcpu *vcpu);
->  
-> +extern void check_nested_vcpu_requests(struct kvm_vcpu *vcpu);
-> +
->  struct kvm_s2_trans {
->  	phys_addr_t output;
->  	unsigned long block_size;
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 367f0d3d3194..ab7d387379a0 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -1031,6 +1031,8 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
->  
->  		if (kvm_dirty_ring_check_request(vcpu))
->  			return 0;
-> +
-> +		check_nested_vcpu_requests(vcpu);
->  	}
->  
->  	return 1;
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 1ba211541290..749babdbda81 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -632,9 +632,9 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
->  	/* Set the scene for the next search */
->  	kvm->arch.nested_mmus_next = (i + 1) % kvm->arch.nested_mmus_size;
->  
-> -	/* Clear the old state */
-> +	/* Make sure we don't forget to do the laundry */
->  	if (kvm_s2_mmu_valid(s2_mmu))
-> -		kvm_stage2_unmap_range(s2_mmu, 0, kvm_phys_size(s2_mmu), false);
-> +		s2_mmu->pending_unmap = true;
->  
->  	/*
->  	 * The virtual VMID (modulo CnP) will be used as a key when matching
-> @@ -649,6 +649,9 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
->  	s2_mmu->nested_stage2_enabled = vcpu_read_sys_reg(vcpu, HCR_EL2) & HCR_VM;
->  
->  out:
-> +	if (s2_mmu->pending_unmap)
-> +		kvm_make_request(KVM_REQ_NESTED_S2_UNMAP, vcpu);
-> +
->  	kvm_get_s2_mmu(s2_mmu);
->  	return s2_mmu;
->  }
-> @@ -1186,3 +1189,17 @@ int kvm_init_nv_sysregs(struct kvm *kvm)
->  
->  	return 0;
->  }
-> +
-> +void check_nested_vcpu_requests(struct kvm_vcpu *vcpu)
-> +{
-> +	if (kvm_check_request(KVM_REQ_NESTED_S2_UNMAP, vcpu)) {
-> +		CLASS(vcpu_hw_mmu, mmu)(vcpu);
+> sidebar: I was a bit confused by the diff for a second, since it looks
+> like your email client lowercased some stuff :)
 
-I really think a small comment outlining *why* we need to elevate the
-refcount would help. This single line is what holds the whole thing
-together.
+Wasn't my mail client, it was PEBKAC.  I copy+pasted a large chunk in Vim because
+I wanted to pull in the changelog (which I had deleted from my response), but then
+I changed my mind, and in doing so I managed to fat-finger something that converted
+everything to lowercase.  And yeah, it confused me too.
 
-Thanks,
+> > >  out:
+> > > +	if (s2_mmu->pending_unmap)
+> > > +		kvm_make_request(kvm_req_nested_s2_unmap, vcpu);
+> > 
+> > If I followed everything correctly, I don't think a request is needed.  the
+> > request will never be cross-vCPU, and each vCPU holds a reference to the MMU, so
+> > the MMU can't be recycled, i.e. pending_unmap is guaranteed to be relevant to the
+> > vCPU's usage of the MMU.  More thoughts below in check_nested_vcpu_requests().
+> 
+> I'm (ab)using the request to prevent the vCPU thread from actually
+> entering the VM without first having done the laundry. We have other
+> examples of strictly per-vCPU tasks that are tracked with a request so
+> this doesn't stick out that much.
+> 
+> Otherwise we'd need an open-coded check in kvm_vcpu_exit_request() to
+> catch a 'dirty' MMU or take a pin on it from the point we check the
+> dirtiness to the point we disable preemption.
 
-	M.
+Ewww, because kvm_arch_vcpu_put() puts the nested stage-2 when the vCPU is
+scheduled out.  Mostly out of curiosity, why?  99.9% of the time, the vCPU will
+be scheduled back in.
 
--- 
-Without deviation from the norm, progress is not possible.
+Now that vcpu->scheduled_out is a thing, retaining the nested s2 MMU should be
+quite straightforward.  kvm_arch_vcpu_destroy() would need to put the MMU, but
+that should also be straightforward.
+
+It wouldn't magically fix the mmu_lock bottleneck, but it would make hw_mmu
+stable (obviously except for the flows that explicitly change it).
