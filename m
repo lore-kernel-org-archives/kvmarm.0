@@ -1,139 +1,224 @@
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD9E61C9EAB
-	for <kvmarm@lists.linux.dev>; Tue,  1 Oct 2024 15:36:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F2A52F50
+	for <kvmarm@lists.linux.dev>; Tue,  1 Oct 2024 19:05:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727796972; cv=none; b=dAoSPX9cIPu07buXE+dS+loPr50DHTlTB+CpMyt+e+pTrZfzVYwIQiddvFJf00ZZYj93d3oBED7MnbH6kGd3/OnU+kDS0GW+KrBHZvJ2HvKieVnylYvzUS6Am5SmkxnXa3sqkwi5AURKuWfO1zOM1RsJF+A+s4hv9FbfU8SC70I=
+	t=1727809504; cv=none; b=BpwGlCVVNPSEmbyKTZ20g2B5QYl2UitFdJrmF+C+5o2spB9dC1EmxaP4x5EFVGazxUiOJK4yzBtlEz7iQmu+pyHpCedF2eoffMs/QHRjFZka0BI/TZVu98axxSDYIz6gJ3S3UnhlLC1ps17VRatr0I03XBFcDd7kHPDBU/55Tv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727796972; c=relaxed/simple;
-	bh=kN1p3bVPBmWTODx3fCU3W9xMzs9MpIS/egm2ExIsaZw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mZghDqeuVhOYAX4wpY/36MZ7bK+Mzb3uYIbkdQ8vOmdLNP2Eg0zPrvMMkjfygQBIGoGGsrdGQ400XcylZd20cCxAacimZsHd6pHMAiOJU/P3rDg7x+P5eezGvpucL1rP2WDGLK2pDGatqtxdueGLRmtjZlAblCzC0yJFJuvS00k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FR5sHTrm; arc=none smtp.client-ip=91.218.175.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1727809504; c=relaxed/simple;
+	bh=g6Lj84hmed5dHS7oxueyPB4Y5u1TBd2Rxo/Vk7QmwZ0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=CktEAzuadLQOUsZ5NFE+SF+gEfp7pAvCJbiW4JMC5qOHFmzzKQshTCPnQKgRq++nBLTSPq1IdO77XnM02AWw+fOPpj6fXwtUPt9shvp/FW3QbM11Jnx6kkv6g5oCOMRKw+5SY9+lngAmW1itS/Ug6SjbTT45h3gjYirKZ+/BlTE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YvvSyBa2; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FR5sHTrm"
-Date: Tue, 1 Oct 2024 08:35:51 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1727796967;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=32Q5lzmZrkJ5L4hpQaXBrF/A6/szWXXqzVVtbQ1nd7E=;
-	b=FR5sHTrmIz5pif3i2vsHSSam8/HnX26X81OIgTcwQTF1+8b1qzHuS1Uqm82hOXM1VmJrTB
-	Wm4vMkgTbsYpUIJZSEX2UwsnjjQu6FEdEokcLlunUrZFfHMDYEeQG/HpVO6sVUH/SEB8+t
-	3Dy9ZPsJwINeQoLOZhUt1OTywf6nu7o=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
-	Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Pavel Machek <pavel@ucw.cz>, Len Brown <len.brown@intel.com>,
-	Shuah Khan <shuah@kernel.org>, David Woodhouse <dwmw@amazon.co.uk>,
-	kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, linux-pm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Francesco Lavra <francescolavra.fl@gmail.com>,
-	Miguel Luis <miguel.luis@oracle.com>
-Subject: Re: [PATCH v5 3/5] KVM: arm64: Add support for PSCI v1.2 and v1.3
-Message-ID: <ZvwW1y1pWln5l99M@linux.dev>
-References: <20240926184546.833516-1-dwmw2@infradead.org>
- <20240926184546.833516-4-dwmw2@infradead.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YvvSyBa2"
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7d4fc1a2bb7so5134023a12.1
+        for <kvmarm@lists.linux.dev>; Tue, 01 Oct 2024 12:05:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1727809503; x=1728414303; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=KP7bIGn628nPRgFVUP2K8Ks1JDBOckXS9ehhXL76qkI=;
+        b=YvvSyBa2ZeRjE0yFP1De+Y7TSwQ0NAUhcDXoIe+rDztJRsroG5iVe7cQeipcWkV7Lo
+         14h8N68atQrl1NNUIUqvyXUZxrdSSDy84KUyXCiQiHRk9KUnRz+Txh4S6VzXb9do/AIH
+         RFxAiwPp1oYNJoxf4n9xjpE13t/FNUvHsH4XNNqbSZmNpNYJw9+b6Be3EEY1uzKzPvst
+         mSRqv2vA+rPJhRrEtj93SwpLRi5+EFHVYgSj3RSXJJf1K3UptiId1YBaZntVZOs2mRYs
+         zKXIWqT9scEJ1n0xropx4n3xOGZl6DO4CdlCB8A5jkUjUupO7OW2GFwCUQoYXxDjT4Mv
+         kTvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727809503; x=1728414303;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KP7bIGn628nPRgFVUP2K8Ks1JDBOckXS9ehhXL76qkI=;
+        b=Xr9fRsK34MTAt6HGlF0XlHTs6YcshOIm2YWua5NxxAAYvJvwTiALSB1k0m+G0G+THx
+         07tSnoFlAQO9wZEeduB1XHHjU0kCIRBfVbQcq/xxZwimmdJlxQOVsXh1h6VtsfgSjAOB
+         R5BnWhKHjvsFIE3XJiUtjdltz7a+BWTgUrzetkX1bPaUI2k/KQlUAePj28w8dafsK4tn
+         leQRRZCCsFBcmvfrWBT79k4w+Zy7OF6v+sVco6xxtwjCd26W+63GWpGS7IyJ/MdaUBCN
+         jwExnblt8pqDyCWevq5U/GOAQARU0tUTiQFiMomOS2qXnepCDzbpKXj0Sssox1A2f2E7
+         TfyA==
+X-Gm-Message-State: AOJu0YxW62xnK195U5dFvBRe89pdrK+CEjtPVf0CSeE7EcfujDAJEi1T
+	yLzH1LdMQzy/yOpkSfKNnB+2fiUvZac/xtxkr9MiBeeFEZP9Rb4PWmdav9L56sNt7q2VYUo+ujt
+	ToQ==
+X-Google-Smtp-Source: AGHT+IEaG80iOC/lQwZz5wIqmTMZ3vx8eW5Db4JZCb8mBc2PBdAFFduIGmgZqIDSYy5Y2RrtNoNdwSlWElg=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a63:62c7:0:b0:7cd:82fb:3de3 with SMTP id
+ 41be03b00d2f7-7e9afe10227mr500a12.4.1727809502494; Tue, 01 Oct 2024 12:05:02
+ -0700 (PDT)
+Date: Tue, 1 Oct 2024 12:05:01 -0700
+In-Reply-To: <20241001001709.1303668-4-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240926184546.833516-4-dwmw2@infradead.org>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20241001001709.1303668-1-oliver.upton@linux.dev> <20241001001709.1303668-4-oliver.upton@linux.dev>
+Message-ID: <ZvxH3el9SNuNWwi8@google.com>
+Subject: Re: [PATCH 3/3] KVM: arm64: nv: Punt stage-2 recycling to a vCPU request
+From: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Sep 26, 2024 at 07:37:58PM +0100, David Woodhouse wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
-
-Please, add changelogs to your patches.
-
-What we really need here is the detail on *why* we can just bump the
-PSCI version like this, i.e. no new required ABI. On top of that, you
-could mention that KVM has made the implementation choice to provide
-SYSTEM_OFF2 unconditionally in its PSCIv1.3 implementation.
-
-> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-> ---
->  arch/arm64/kvm/hypercalls.c | 2 ++
->  arch/arm64/kvm/psci.c       | 6 +++++-
->  include/kvm/arm_psci.h      | 4 +++-
->  3 files changed, 10 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-> index 5763d979d8ca..9c6267ca2b82 100644
-> --- a/arch/arm64/kvm/hypercalls.c
-> +++ b/arch/arm64/kvm/hypercalls.c
-> @@ -575,6 +575,8 @@ int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->  		case KVM_ARM_PSCI_0_2:
->  		case KVM_ARM_PSCI_1_0:
->  		case KVM_ARM_PSCI_1_1:
-> +		case KVM_ARM_PSCI_1_2:
-> +		case KVM_ARM_PSCI_1_3:
->  			if (!wants_02)
->  				return -EINVAL;
->  			vcpu->kvm->arch.psci_version = val;
-> diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
-> index fd0f82464f7d..5177dda5a411 100644
-> --- a/arch/arm64/kvm/psci.c
-> +++ b/arch/arm64/kvm/psci.c
-> @@ -328,7 +328,7 @@ static int kvm_psci_1_x_call(struct kvm_vcpu *vcpu, u32 minor)
+On Tue, Oct 01, 2024, Oliver Upton wrote:
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 367f0d3d3194..ab7d387379a0 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1031,6 +1031,8 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
 >  
->  	switch(psci_fn) {
->  	case PSCI_0_2_FN_PSCI_VERSION:
-> -		val = minor == 0 ? KVM_ARM_PSCI_1_0 : KVM_ARM_PSCI_1_1;
-> +		val = PSCI_VERSION(1, minor);
->  		break;
->  	case PSCI_1_0_FN_PSCI_FEATURES:
->  		arg = smccc_get_arg1(vcpu);
-> @@ -486,6 +486,10 @@ int kvm_psci_call(struct kvm_vcpu *vcpu)
+>  		if (kvm_dirty_ring_check_request(vcpu))
+>  			return 0;
+> +
+> +		check_nested_vcpu_requests(vcpu);
 >  	}
 >  
->  	switch (version) {
-> +	case KVM_ARM_PSCI_1_3:
-> +		return kvm_psci_1_x_call(vcpu, 3);
-> +	case KVM_ARM_PSCI_1_2:
-> +		return kvm_psci_1_x_call(vcpu, 2);
->  	case KVM_ARM_PSCI_1_1:
->  		return kvm_psci_1_x_call(vcpu, 1);
->  	case KVM_ARM_PSCI_1_0:
-> diff --git a/include/kvm/arm_psci.h b/include/kvm/arm_psci.h
-> index e8fb624013d1..cbaec804eb83 100644
-> --- a/include/kvm/arm_psci.h
-> +++ b/include/kvm/arm_psci.h
-> @@ -14,8 +14,10 @@
->  #define KVM_ARM_PSCI_0_2	PSCI_VERSION(0, 2)
->  #define KVM_ARM_PSCI_1_0	PSCI_VERSION(1, 0)
->  #define KVM_ARM_PSCI_1_1	PSCI_VERSION(1, 1)
-> +#define KVM_ARM_PSCI_1_2	PSCI_VERSION(1, 2)
-> +#define KVM_ARM_PSCI_1_3	PSCI_VERSION(1, 3)
+>  	return 1;
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 1ba211541290..749babdbda81 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -632,9 +632,9 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
+>  	/* set the scene for the next search */
+>  	kvm->arch.nested_mmus_next = (i + 1) % kvm->arch.nested_mmus_size;
 >  
-> -#define KVM_ARM_PSCI_LATEST	KVM_ARM_PSCI_1_1
-> +#define KVM_ARM_PSCI_LATEST	KVM_ARM_PSCI_1_3
->  
->  static inline int kvm_psci_version(struct kvm_vcpu *vcpu)
->  {
-> -- 
-> 2.44.0
-> 
+> -	/* clear the old state */
+> +	/* make sure we don't forget to do the laundry */
+>  	if (kvm_s2_mmu_valid(s2_mmu))
+> -		kvm_stage2_unmap_range(s2_mmu, 0, kvm_phys_size(s2_mmu), false);
+> +		s2_mmu->pending_unmap = true;
 
--- 
-Thanks,
-Oliver
+Question time.  The code that's just out of sight modifies the nested MMU's tlb_vttbr:
+
+	s2_mmu->tlb_vttbr = vcpu_read_sys_reg(vcpu, vttbr_el2) & ~vttbr_cnp_bit;
+	s2_mmu->tlb_vtcr = vcpu_read_sys_reg(vcpu, vtcr_el2);
+	s2_mmu->nested_stage2_enabled = vcpu_read_sys_reg(vcpu, hcr_el2) & hcr_vm;
+
+which is consumed by kvm_s2_mmu_iterate_by_vmid().  IIUC, kvm_s2_mmu_iterate_by_vmid()
+is used only when emulating some form of tlbi that's executed by the guest?  I.e.
+is guaranteed to do the right thing because KVM ensures the old state is purged
+prior to entering the guest?
+
+>  	/*
+>  	 * the virtual vmid (modulo cnp) will be used as a key when matching
+> @@ -649,6 +649,9 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
+>  	s2_mmu->nested_stage2_enabled = vcpu_read_sys_reg(vcpu, hcr_el2) & hcr_vm;
+>  
+>  out:
+> +	if (s2_mmu->pending_unmap)
+> +		kvm_make_request(kvm_req_nested_s2_unmap, vcpu);
+
+If I followed everything correctly, I don't think a request is needed.  the
+request will never be cross-vCPU, and each vCPU holds a reference to the MMU, so
+the MMU can't be recycled, i.e. pending_unmap is guaranteed to be relevant to the
+vCPU's usage of the MMU.  More thoughts below in check_nested_vcpu_requests().
+
+Somewhat of a side topic, the handling of xfer_to_guest_mode_handle_work() in
+kvm_arch_vcpu_ioctl_run() is confusing.  If a signal is pending (ret == -eintr),
+KVM will skip checking requests, e.g. not unmap the nested stage-2, but then continue
+with other pieces of the entry flow.  I'm guessing that's intentional as it looks
+like KVM needs to flush hardware state in case that info is exposed to userspace.
+
+But it really warps the mind when trying to reason about what will happen if
+there is a relevant request, e.g. if the below code needs to load a new stage-2
+for a new vmid, it could do so with the to-be-unmapped contents.
+
+		/*
+		 * check conditions before entering the guest
+		 */
+		ret = xfer_to_guest_mode_handle_work(vcpu);
+		if (!ret)
+			ret = 1;
+
+		if (ret > 0)
+			ret = check_vcpu_requests(vcpu);
+
+		/*
+		 * preparing the interrupts to be injected also
+		 * involves poking the gic, which must be done in a
+		 * non-preemptible context.
+		 */
+		preempt_disable();
+
+		/*
+		 * the vmid allocator only tracks active vmids per
+		 * physical cpu, and therefore the vmid allocated may not be
+		 * preserved on vmid roll-over if the task was preempted,
+		 * making a thread's vmid inactive. so we need to call
+		 * kvm_arm_vmid_update() in non-premptible context.
+		 */
+		if (kvm_arm_vmid_update(&vcpu_to_hw_mmu_unsafe(vcpu)->vmid) &&
+		    has_vhe())
+			__load_stage2(vcpu_to_hw_mmu_unsafe(vcpu),
+				      &vcpu->kvm->arch);
+
+> +
+>  	kvm_get_s2_mmu(s2_mmu);
+>  	return s2_mmu;
+>  }
+> @@ -1186,3 +1189,17 @@ int kvm_init_nv_sysregs(struct kvm *kvm)
+>  
+>  	return 0;
+>  }
+> +
+> +void check_nested_vcpu_requests(struct kvm_vcpu *vcpu)
+> +{
+> +	if (kvm_check_request(kvm_req_nested_s2_unmap, vcpu)) {
+> +		CLASS(vcpu_hw_mmu, mmu)(vcpu);
+> +
+> +		write_lock(&vcpu->kvm->mmu_lock);
+> +		if (mmu->pending_unmap) {
+
+I doubt it's a functional issue, but if multiple vCPUs are purging the same nested
+stage-2 MMU, and the first vCPU yields while unmapping, then KVM will end up with
+multiple vCPUs doing the unmap.  And irrespective of whether or not the first vCPU
+(or vCPUs) yields, they'll all contend for mmu_lock, which is especially problematic
+since pending writers will block future readers.
+
+Would it instead make sense to do something like the below?  Checking for the
+need to unmap outside of mmu_lock would also more or less eliminate the need for
+a request.
+
+#define KVM_S2_UNMAP_PENDING		BIT(0)
+#define KVM_S2_UNMAP_IN_PROGRESS	BIT(1)
+
+	unsigned long ops = atomic_read(mmu->unmap_operations);
+	unsigned long new;
+
+	if (!(ops & KVM_S2_UNMAP_PENDING))
+		return;
+
+	if (!(ops & KVM_S2_UNMAP_IN_PROGRESS)) {
+		ops = cmpxchg(mmu->unmap_operations, ops,
+			      ops | KVM_S2_UNMAP_IN_PROGRESS);
+
+	/* Nothing more to do if the unmap already completed. */
+	if (!(ops & KVM_S2_UNMAP_PENDING))
+		return;
+
+	/* If a different vCPU started the unmap, simply wait for it to finish. */
+	if (ops & KVM_S2_UNMAP_IN_PROGRESS) {
+		while (atomic_read(&mmu->unmap_operations))
+			cond_resched(); /* enter a waitq? */
+		return;
+	}
+
+	write_lock(&vcpu->kvm->mmu_lock);
+	kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), true);
+	write_unlock(&vcpu->kvm->mmu_lock);
+
+	atomic_set(&mmu->unmap_operations, 0);
+
+> +			kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), true);
+> +			mmu->pending_unmap = false;
+> +		}
+> +		write_unlock(&vcpu->kvm->mmu_lock);
+> +	}
+> +}
+> -- 
+> 2.46.1.824.gd892dcdcdd-goog
