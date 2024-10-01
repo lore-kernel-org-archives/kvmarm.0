@@ -1,54 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFB5219D06E;
-	Tue,  1 Oct 2024 14:28:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E83A019D06E
+	for <kvmarm@lists.linux.dev>; Tue,  1 Oct 2024 14:29:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727792938; cv=none; b=CRMd+yJ6a5/Hqtt2bzb4dM3/4kbXsMFlv+X0iVzAuE+m1ghS2/vuSrHkKz9sDYzzlqOZ2JtG5WECdrcmIWiZeHdcQo0TTHCcH+pIdnjUGbkONTO9zErHkFXOrBvaCaS0dLonzMUbzItsA6wp4Fq/tMBMXaRY92mUht+yyne/hQg=
+	t=1727792945; cv=none; b=Rsu69JD76b1KNARuQtTZPjt3TZDyQ9Z68rKgWTFeNSgSVdMZFuJ4dXSN9o1iikkMBcQcmqmJo9NQcyBoAt+Lyhn9OCEY66PnpunqjbRq7wQDB3Hr636wGep4dRlwUPlsR0uNWMTVcl8En+59ITiyTi9SK5TR7s5pqAoyyV78WkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727792938; c=relaxed/simple;
-	bh=iaVKSziNPXvrRl9FZ9+SzKyf8EeIpcYYBf0Surobxdw=;
+	s=arc-20240116; t=1727792945; c=relaxed/simple;
+	bh=91/8EARmqzNF/DvNjl82wkx7d1Z6sPtdCZ95dx/cjgs=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qu7UV6PLSGKdlB4B+1FEpztnLOW6K24DZywtu2mcG19HwCFWVBJE6U7ND7ijKeDuAcgaQJ/Tx7OsRkGP1Jo2vqb6D+xwPMenmcj7iTx8ofck7YyX+Y66nW2ZCWl7Y1GauQ5SWz0ZRv7E0vnrsBFM0/hZwUYLFCUx2fRqdKsSOgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kABweNjh; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=ocx+p06g8ePrTY2Y4rhyCa1hjMxdS+NetQshognqC5738xm967Yf79GxxvOY/1q7EqBRhhtroqnSceWe6ltIcTw+5+Oe9ILOd9e4oh9vnBgX5nj9iCX5Cyb3+DHZ7Jh+zVEqAvZtS4KI0d2F1l/XdHMP8sNfVyjo69TQRrFXSKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dTP5cBHA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kABweNjh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59A79C4CEC6;
-	Tue,  1 Oct 2024 14:28:58 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dTP5cBHA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B422FC4CEC6;
+	Tue,  1 Oct 2024 14:29:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727792938;
-	bh=iaVKSziNPXvrRl9FZ9+SzKyf8EeIpcYYBf0Surobxdw=;
+	s=k20201202; t=1727792944;
+	bh=91/8EARmqzNF/DvNjl82wkx7d1Z6sPtdCZ95dx/cjgs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=kABweNjhIhZyNjyAKBaD18AL2xFS4admXZ7+stRkKq9n4j4gQxZHYqsTfegWsKyz1
-	 SyZcG9z9TtdwJYbmMyDTuBoAxqxOp7Cu22IWToAk2T3Vo+oNBhn+1P5ecadxVZZiVj
-	 uiDhyv8yRuP5TAULZlR5CmgBJvYMXskIfZv5L6E0lgttwhniKBoDfSLGxNCC0ySI6h
-	 oclZjhxihd3QTtn7/1pVyhyO0zcLHZ7Bm+i+AmQpTOC+2+vQDVh/p9QP1moaUNWAAy
-	 oNOhOX1c57HXqWpljptMfJ4eHlLsrZwOt8r6rSRH3jcflkunGQZUunR69FEiMY3rAr
-	 EOrbBsePZ4Zvw==
+	b=dTP5cBHAmOt6eQWwk98S7ejyomGNErVc2coCUYKQzgu6GEFmTWIRdgtKA0sKQKyAc
+	 Hv4+oalkq2t8xyr5ufV1tqO0G3lMTPxG1xk1UltL4G2zvf9zQNqrkCfrUVSEPL6qoF
+	 Gb7jJYd85zjlPyqeKeSyZCcZxSNPOjSH/ZAavgLDpTf96XgpyvQ48+786HifxzYVB1
+	 PrWHolCNjShWaXu89dzTEcRMOG5zUlIvxxc00A1mYzBLBx5XyfptWHZ0ghUtBAEdTL
+	 EnHsKrowK7Z1v2NYNHSvjSQGwW4g4pd6rmnoyV4dkJ/JKWqLDFzTADnMm4qWRIrbc0
+	 nVp26j9b1zg5g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1svdrz-00GmHW-WD;
-	Tue, 01 Oct 2024 15:28:56 +0100
+	id 1svds5-00GmHg-LC;
+	Tue, 01 Oct 2024 15:29:01 +0100
 From: Marc Zyngier <maz@kernel.org>
-To: linux-arm-kernel@lists.infradead.org,
+To: oliver.upton@linux.dev,
+	Vincent Donnefort <vdonnefort@google.com>
+Cc: tabba@google.com,
 	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH] KVM: arm64: Another reviewer reshuffle
-Date: Tue,  1 Oct 2024 15:28:51 +0100
-Message-Id: <172779288244.1647258.5766550239209776023.b4-ty@kernel.org>
+	kernel-team@android.com
+Subject: Re: [PATCH v2] KVM: arm64: Fix __pkvm_init_vcpu cptr_el2 error path
+Date: Tue,  1 Oct 2024 15:28:56 +0100
+Message-Id: <172779288238.1647258.6543049929158020222.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240927104956.1223658-1-maz@kernel.org>
-References: <20240927104956.1223658-1-maz@kernel.org>
+In-Reply-To: <20240919110500.2345927-1-vdonnefort@google.com>
+References: <20240919110500.2345927-1-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -58,25 +53,21 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, vdonnefort@google.com, tabba@google.com, kvmarm@lists.linux.dev, kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 27 Sep 2024 11:49:56 +0100, Marc Zyngier wrote:
-> It has been a while since James had any significant bandwidth to
-> review KVM/arm64 patches. But in the meantime, Joey has stepped up
-> and did a really good job reviewing some terrifying patch series.
+On Thu, 19 Sep 2024 12:05:00 +0100, Vincent Donnefort wrote:
+> On an error, hyp_vcpu will be accessed while this memory has already
+> been relinquished to the host and unmapped from the hypervisor. Protect
+> the CPTR assignment with an early return.
 > 
-> Having talked with the interested parties, it appears that James
-> is unlikely to have time for KVM in the near future, and that Joey
-> is willing to take more responsibilities.
 > 
-> [...]
 
 Applied to fixes, thanks!
 
-[1/1] KVM: arm64: Another reviewer reshuffle
-      commit: 64a1d716615ee234a743b2528e95d8c3a9bef95f
+[1/1] KVM: arm64: Fix __pkvm_init_vcpu cptr_el2 error path
+      commit: 78fee4198bb4d29cf82c457086d07e009955a682
 
 Cheers,
 
