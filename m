@@ -1,35 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05DFC3201;
-	Tue,  1 Oct 2024 11:31:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7ED91C0DF5;
+	Tue,  1 Oct 2024 11:31:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727782274; cv=none; b=oABmKVO/J15wC0JsmWr1nzo79cQooOOFTnZgzq9ns9rjX5DP7RaIH4oDOtT8HgUjEaZelQshRpvW77oaB9cs67y5Bdn1EKF6cMjvk1WUibjh4b3HqDRZoua8FymvYJzleNBzO2aZBHci0MotAaz2wpP88v2ENmDW2GwhUsx5gcM=
+	t=1727782276; cv=none; b=CiuNJ1V7Wiv/7tRX0qzO5khUChNb3aEDpj3WO6fkHhhglm/yY7RhEC9rO8Vu8vZ52jXv1VfdcAxyELHQmKJ8Q+Omr2CCVZQDEMlEkztH6BWQDE1czkrrvreIV00JIkxZhmskMx2l+WDTCpHG2g42YPUfZAZ9UYbP9kXbIgf8xnc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727782274; c=relaxed/simple;
-	bh=+SrMuE+SoZT7DS0QWsNQUTjAQrr6pG39ChBTBw8C2SA=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=mAq7g4TDjmiHt9xd/koBYiQo+PkP3vYuv7dzO2FSJ5p++Br4OOEm/8TxKQbxWUOSQ0vmLinujoC62WyxvehcDL4Df17t0i0HkoUOMR8/bz+l248jdpmNQ+JN1hHM6C9S5r90g2RskfRWp0kuXZdbn9WT8LYC4Xkwj3sAMNMDQK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VMZANMRJ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1727782276; c=relaxed/simple;
+	bh=/8kAC4uyafUpiRRGXlRqbKMN4dLMMXoXHxOXxaPQDDQ=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=A2SG+4iNT6yd6XYIJquAFaxjGNKJj0r2MHYKgKLaBUnIXlEulXjipKrysWN8z/FFq2AJBjAhVkpEszG3PWooMZgGgexcHy6ITe0LlWzBnm6pU0wRV9HbsfDZ4euGt/RAG3wZF5frJI4M81WYo8i6Rt3JNJIoXujzyM97S4rpBFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T5Umuq7l; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VMZANMRJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDE79C4CEC6;
-	Tue,  1 Oct 2024 11:31:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T5Umuq7l"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30BC4C4CECD;
+	Tue,  1 Oct 2024 11:31:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727782273;
-	bh=+SrMuE+SoZT7DS0QWsNQUTjAQrr6pG39ChBTBw8C2SA=;
-	h=From:Subject:Date:To:Cc:From;
-	b=VMZANMRJfCN7tc6o4R68WmEuFqzbBbbNh5U7JcM646/TEMwiXuklg2yLcOT3Zxtzy
-	 vtnWhtq7MZIbDy/g22jymIFz4NMOXlnNzhNv6C+Gxvb54kvcsow2Uvhu8CiZO7kVx8
-	 GC1fSwnv7+L1+2yraYuS1k+10zTlsgXUIjcS0gm366SmrUI0EfFLa+jNYMx9A/OUTk
-	 Fhll32wbymRq5TFu1Zu9WYSAVz+USTGdd4oR7NOh6/YyaYDWI+FQCNTvBb5ut0RDYN
-	 KjnuV3wQx+eIMHUndc8mnLORPwkJyqzmdRKPVT/7M+z5eRQAt15wMQUrA5koBeIJ79
-	 mPedWtZpkBZDQ==
+	s=k20201202; t=1727782276;
+	bh=/8kAC4uyafUpiRRGXlRqbKMN4dLMMXoXHxOXxaPQDDQ=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=T5Umuq7ljlHWXhSLe/eIw8E95ukpdJgREL82FZYdJJxHAVrGCZSWDIckIz7LVxQKp
+	 3tIWa9HnmYvQl2nd2+VeaCoz0P3x9R+DWElTguisIqt3Wosl/cFoZyIEb9Sr6WiPUx
+	 rsNggS0pfUwCI5P0uYcNEUYH6FBQftvAJZn92YAx01DQS9eyiFqReamTnES6Vw0q/L
+	 rqcrPFCFINIW7a3eSb3ySpan+9FOrd1kn0HMD0Mjkvrp4+w2D26bQbLHMwZDeqXeM+
+	 qyPtRFnc0ZjgMjtQxYSobYY4RkH9iV1FuiGbjsWgNGmVrqDdpxeDPnX85em1jr7JSg
+	 BZxCJowBjoO/A==
 From: Mark Brown <broonie@kernel.org>
-Subject: [PATCH v7 0/4] KVM: arm64: Fix underallocation of storage for SVE
- state
-Date: Tue, 01 Oct 2024 12:29:05 +0100
-Message-Id: <20241001-kvm-arm64-fix-pkvm-sve-vl-v7-0-7b0171a36695@kernel.org>
+Date: Tue, 01 Oct 2024 12:29:06 +0100
+Subject: [PATCH v7 1/4] arm64/fpsimd: Introduce __bit_to_vl() helper
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -38,11 +37,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAAHd+2YC/33QTWrDMBAF4KsErauin9FIyar3CF1Y1jgRSewgF
- ZESfPfKgVIXg5ZvmPkG3pNlSpEyO+yeLFGJOU5jDfZtx/pzN56Ix1AzU0KBQAH8Um68SzcEPsQ
- Hvy8xF+LlyqXug5VDsMELVu/vierKyz5+1nyO+WtK369XRS3TXxUbalFc8N65AciDl+A/LpRGu
- r5P6cQWtsg1ZVqUrBQ6EdCD9tDLDaXXlG1RulJmT9ZJKzCg2VDwR9lmbQUq5dHtXeeVDj1sKLO
- mXIsylQpKWmO1A4PbrnBFadGicKm9I9cpEj4g/qPmef4BANhRqToCAAA=
+Message-Id: <20241001-kvm-arm64-fix-pkvm-sve-vl-v7-1-7b0171a36695@kernel.org>
+References: <20241001-kvm-arm64-fix-pkvm-sve-vl-v7-0-7b0171a36695@kernel.org>
+In-Reply-To: <20241001-kvm-arm64-fix-pkvm-sve-vl-v7-0-7b0171a36695@kernel.org>
 To: Catalin Marinas <catalin.marinas@arm.com>, 
  Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, 
  Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
@@ -50,84 +47,98 @@ To: Catalin Marinas <catalin.marinas@arm.com>,
 Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
  kvmarm@lists.linux.dev, Mark Brown <broonie@kernel.org>
 X-Mailer: b4 0.15-dev-99b12
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3017; i=broonie@kernel.org;
- h=from:subject:message-id; bh=+SrMuE+SoZT7DS0QWsNQUTjAQrr6pG39ChBTBw8C2SA=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBm+917W0zyKEOxeLKUfLoWm9dMufg/yMmKBCEbdYnW
- hrrEhOqJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZvvdewAKCRAk1otyXVSH0NoNB/
- 9mXRyA+ZHKb9RvQIPk0kZP4kdYzbOJR6x8Vak4mEsrGfZz26OBrJz4Z0uJScvLsxfCYGDeqq6EBInz
- VuGwnermd+QIDbG9p6PqMDoFMCd/NkrSFgtQ7L9VFcaR6t6U0Rg4ic9fX0ICOqeIqT62KQbd9kDfv+
- Em0XIvsW85nKJ7158Zv0wfg14wRY6VWz3gmpvSHJ4rci7QkhHHzDajMXbiBNwdPis0W7YxPjUz1IEf
- ZFoaPaYoXpUaS3su6npr1FyJNq9xuK/PtX00Hxm4J5hCipG3fSyscUwdJ5SIE+AlgjtCe4nSffwMKA
- 8znrmUfu74BZgbviEqETEwt+XaegUQ
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3064; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=/8kAC4uyafUpiRRGXlRqbKMN4dLMMXoXHxOXxaPQDDQ=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBm+918K2dkt+RyTe17B6hQuE/kqMhTsruB9gMWraGq
+ ay4fjSqJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZvvdfAAKCRAk1otyXVSH0ADvB/
+ 47xx2/156+0n1vm9GXaOjaUWX7fxRYKsC/VK02LjPI2bwp0DxUXHhJAidXhkijDjq6DuXua6jkqdDD
+ kEQN3rBkcn/KcMLk/jkYToMkAcWfeoRFqWzIXZrGQR+3j5E4NHoGxv5yFTKNPNyNkkd3sNW2ReTBne
+ ni4Hi3asHXhG20ls6oh42qwpnDXWAvCG3InygpC60/mxi7LuGdvDeIW6y5gxMzqdjRmP/vy0A1MoYr
+ wdM8ices0RXqLg/lepRarbl0U+kacax9uEc9njx4VrUGsjIXne2rIMqG6bTgYK43yXlruLL0J3lRPj
+ Mscn4z+5Oi8cIZwzIk2cHF7yKWo2S9
 X-Developer-Key: i=broonie@kernel.org; a=openpgp;
  fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-As observed during review the pKVM support for saving host SVE state is
-broken if an asymmetric system has VLs larger than the maximum shared
-VL, fix this by discovering then using the maximum VL for allocations
-and using RDVL during the save/restore process.
+In all cases where we use the existing __bit_to_vq() helper we immediately
+convert the result into a VL. Provide and use __bit_to_vl() doing this
+directly.
 
-Fuad posted[1] another attempt to address this issues but as indicated
-in review I have maintanability concerns since the VL configuration does
-not follow best practices and the enumeration is not well integrated
-with the rest of the enumeration code.  I also posted[2] an alternative
-which restricts the host to the maximum shared VL.
-
-This bug has persisted for multiple kernel releases at this point in
-spite of being identified prior the original patch being applied.
-
-[1] https://lore.kernel.org/r/20240606092623.2236172-1-tabba@google.com
-[2] https://lore.kernel.org/r/20240912-kvm-arm64-limit-guest-vl-v2-1-dd2c29cb2ac9@kernel.org
-
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
-Changes in v7:
-- Rebase ont v6.12-rc1.
-- Link to v6: https://lore.kernel.org/r/20240730-kvm-arm64-fix-pkvm-sve-vl-v6-0-cae8a2e0bd66@kernel.org
+ arch/arm64/include/asm/fpsimd.h |  4 ++++
+ arch/arm64/kernel/fpsimd.c      | 12 ++++++------
+ 2 files changed, 10 insertions(+), 6 deletions(-)
 
-Changes in v6:
-- Rebase onto v6.11-rc1.
-- Link to v5: https://lore.kernel.org/r/20240708-kvm-arm64-fix-pkvm-sve-vl-v5-0-d2175738456b@kernel.org
+diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
+index f2a84efc3618..3c30da35c285 100644
+--- a/arch/arm64/include/asm/fpsimd.h
++++ b/arch/arm64/include/asm/fpsimd.h
+@@ -170,6 +170,10 @@ static inline unsigned int __bit_to_vq(unsigned int bit)
+ 	return SVE_VQ_MAX - bit;
+ }
+ 
++static inline unsigned int __bit_to_vl(unsigned int bit)
++{
++	return sve_vl_from_vq(__bit_to_vq(bit));
++}
+ 
+ struct vl_info {
+ 	enum vec_type type;
+diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+index 77006df20a75..8a080dbd8988 100644
+--- a/arch/arm64/kernel/fpsimd.c
++++ b/arch/arm64/kernel/fpsimd.c
+@@ -530,7 +530,7 @@ static unsigned int find_supported_vector_length(enum vec_type type,
+ 
+ 	bit = find_next_bit(info->vq_map, SVE_VQ_MAX,
+ 			    __vq_to_bit(sve_vq_from_vl(vl)));
+-	return sve_vl_from_vq(__bit_to_vq(bit));
++	return __bit_to_vl(bit);
+ }
+ 
+ #if defined(CONFIG_ARM64_SVE) && defined(CONFIG_SYSCTL)
+@@ -1103,7 +1103,7 @@ int vec_verify_vq_map(enum vec_type type)
+ 	 * Mismatches above sve_max_virtualisable_vl are fine, since
+ 	 * no guest is allowed to configure ZCR_EL2.LEN to exceed this:
+ 	 */
+-	if (sve_vl_from_vq(__bit_to_vq(b)) <= info->max_virtualisable_vl) {
++	if (__bit_to_vl(b) <= info->max_virtualisable_vl) {
+ 		pr_warn("%s: cpu%d: Unsupported vector length(s) present\n",
+ 			info->name, smp_processor_id());
+ 		return -EINVAL;
+@@ -1169,7 +1169,7 @@ void __init sve_setup(void)
+ 		set_bit(__vq_to_bit(SVE_VQ_MIN), info->vq_map);
+ 
+ 	max_bit = find_first_bit(info->vq_map, SVE_VQ_MAX);
+-	info->max_vl = sve_vl_from_vq(__bit_to_vq(max_bit));
++	info->max_vl = __bit_to_vl(max_bit);
+ 
+ 	/*
+ 	 * For the default VL, pick the maximum supported value <= 64.
+@@ -1188,7 +1188,7 @@ void __init sve_setup(void)
+ 		/* No virtualisable VLs?  This is architecturally forbidden. */
+ 		info->max_virtualisable_vl = SVE_VQ_MIN;
+ 	else /* b + 1 < SVE_VQ_MAX */
+-		info->max_virtualisable_vl = sve_vl_from_vq(__bit_to_vq(b + 1));
++		info->max_virtualisable_vl = __bit_to_vl(b + 1);
+ 
+ 	if (info->max_virtualisable_vl > info->max_vl)
+ 		info->max_virtualisable_vl = info->max_vl;
+@@ -1305,10 +1305,10 @@ void __init sme_setup(void)
+ 	WARN_ON(bitmap_empty(info->vq_map, SVE_VQ_MAX));
+ 
+ 	min_bit = find_last_bit(info->vq_map, SVE_VQ_MAX);
+-	info->min_vl = sve_vl_from_vq(__bit_to_vq(min_bit));
++	info->min_vl = __bit_to_vl(min_bit);
+ 
+ 	max_bit = find_first_bit(info->vq_map, SVE_VQ_MAX);
+-	info->max_vl = sve_vl_from_vq(__bit_to_vq(max_bit));
++	info->max_vl = __bit_to_vl(max_bit);
+ 
+ 	WARN_ON(info->min_vl > info->max_vl);
+ 
 
-Changes in v5:
-- Clarify commit message on patch 3.
-- Link to v4: https://lore.kernel.org/r/20240704-kvm-arm64-fix-pkvm-sve-vl-v4-0-b6898ab23dc4@kernel.org
-
-Changes in v4:
-- Roll in Catalin's acks.
-- Link to v3: https://lore.kernel.org/r/20240607-kvm-arm64-fix-pkvm-sve-vl-v3-0-59e781706d65@kernel.org
-
-Changes in v3:
-- Replace %u with %lu in late CPU error message.
-Changes in v2:
-- Downgrade check for a late CPU increasing maximum VL to a warning only
-  but do it unconditionally since pKVM prevents late CPUs anyway.
-- Commit log tweaks.
-- Link to v1: https://lore.kernel.org/r/20240605-kvm-arm64-fix-pkvm-sve-vl-v1-0-680d6b43b4c1@kernel.org
-
----
-Mark Brown (4):
-      arm64/fpsimd: Introduce __bit_to_vl() helper
-      arm64/fpsimd: Discover maximum vector length implemented by any CPU
-      KVM: arm64: Fix FFR offset calculation for pKVM host state save and restore
-      KVM: arm64: Avoid underallocating storage for host SVE state
-
- arch/arm64/include/asm/fpsimd.h         | 17 +++++++++++++++
- arch/arm64/include/asm/kvm_host.h       |  2 +-
- arch/arm64/include/asm/kvm_hyp.h        |  3 ++-
- arch/arm64/include/asm/kvm_pkvm.h       |  2 +-
- arch/arm64/kernel/fpsimd.c              | 38 +++++++++++++++++++++++++++------
- arch/arm64/kvm/hyp/fpsimd.S             |  5 +++++
- arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +-
- arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  6 +++---
- arch/arm64/kvm/hyp/nvhe/pkvm.c          |  2 +-
- arch/arm64/kvm/reset.c                  |  6 +++---
- 10 files changed, 65 insertions(+), 18 deletions(-)
----
-base-commit: 9852d85ec9d492ebef56dc5f229416c925758edc
-change-id: 20240604-kvm-arm64-fix-pkvm-sve-vl-13cd71fd7db0
-
-Best regards,
 -- 
-Mark Brown <broonie@kernel.org>
+2.39.2
 
