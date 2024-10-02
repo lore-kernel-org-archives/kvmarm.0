@@ -1,84 +1,119 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 237E71CF5FB;
-	Wed,  2 Oct 2024 15:52:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B47B41940B0;
+	Wed,  2 Oct 2024 15:55:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727884367; cv=none; b=sMa4qhGYpkvTem8MIUPBjBDNxfG2mZUMUChznvs263y0M9bvy3UQVjZx6UAB8/tUjICVFymUeZgEY8n8DKA2AKU9gcggMGTYEuFJx6t3Kbv2wVFQfmwYLqirck5Rc7rUaOM3uFRaRbBKlOAK1LNVla4/0k2oxUg6rc4UE9nsEKg=
+	t=1727884529; cv=none; b=BFPWknSNz0C56zeMhAWndvH3DZSPm2aEK4v9QU9Dq89fdXYPOMuqhW3PQBA2cBhleMtc79U7Nb9ynC3eXlGRp2vnqce8AyMaU+1aWdqTstilldZEsEBnG6kL+ZilMt39sXE20FZ7GTxR9xuW8s7BpNVbkdG/5Z8OZ4sO1IgdRKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727884367; c=relaxed/simple;
-	bh=wW+32vAtoYvZ0AoUlvBodvZP1M7UKtdKGA11jroyVBE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TVb+m59CQgvHev0IyaC73Fu8nYqK/UAMGvbtYqbQ1Z4s8i9TxfqG0pwoFEqPTxg9wYokDTDhlIztcB6Z2YkKAB/LHzygxCLTUffk7dsBKmVdZqinamoKeJ1gad9aB1myKbKk6S4XL6iviINudC8sjzqX71Tw/44QTLDqUnO9Yq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uJ66jO/L; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1727884529; c=relaxed/simple;
+	bh=27HUeDVHXOs+OLA9bA8uKhz/MQrgdafn0/iAATWL0mM=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BSqb7psb5hJOtY4wAztllP3xLFEOxLzysKVuyaLSvUA/xwhHrgSt4pOdG4ok2wM7w2YVsajBkzeu67SJzgQKyrGhT8equzW91kMPGRI3uS5LED/2CzApd8ej9aH+KNA/Ly8XZHkUIbOmsC+SKrfhj6GW9GSY8EyWiFBG+cA8SaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k9RkyEgh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uJ66jO/L"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AD2EC4CEC2;
-	Wed,  2 Oct 2024 15:52:44 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k9RkyEgh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79667C4CEC2;
+	Wed,  2 Oct 2024 15:55:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727884366;
-	bh=wW+32vAtoYvZ0AoUlvBodvZP1M7UKtdKGA11jroyVBE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=uJ66jO/LkxZ7pxV59Jv9RrF9w+vuQV0F/8mX7AaT9MNGUx+zjbQZO66iowdjzO8vx
-	 UtJU1rh1mJZNndE8/nRK8cizmS69EfkVPxKnAF9c+ZPESZj1hJx2UICXIrOFAjBzHf
-	 COXDVwPcXyQwrHV1pDc4Ngn/7V6htJvUh4Opw3sJahGftgY/OOTb79ojZ6HQK+BX38
-	 SO4ZgRz/nN3IeQyn73VRTjqVfbdtye/5jDkeHygwDZEJ0oiCgTvcR1DcSGrltinyI2
-	 ueCk1ULhSJGdIwcp8o3kErg1sAB+swCIMleOJlUrjkP3SUoY4utgr3qcL6edU+WBSP
-	 rwQOK2/VQ77aA==
-Date: Wed, 2 Oct 2024 16:52:41 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, maz@kernel.org,
+	s=k20201202; t=1727884529;
+	bh=27HUeDVHXOs+OLA9bA8uKhz/MQrgdafn0/iAATWL0mM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=k9RkyEgh+Y/YS87nAPF1Ao6uiCfC2Ka09hloc087gdGHJXHVDYXjBmR2ceETg9ni6
+	 deks86zaFNOb6z1/RiWcTXvOF0U/JLOW08+SpteRcOBc5nPa3btIZx+FKc8OiNN7e+
+	 FEG/zba/f2YQ1sA2bH3Qf0Z5Uaro4RI1sXzvYN+fyrehRew3uav87f7UIuG26TbRhf
+	 SHQvJ+naVNRRTRSJjCOOekaQRb5r/ZRFkTQWCmGQOBDzHBWS9b9AJAbC35w5zYjD/x
+	 A1nX477cbgft4pfSE+Rw4NrdL8NdIF2MVohLnxdgNDdBRy1nbrrn5eOA9cIL3jvekY
+	 d3ZSOc2PuCwsA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sw1hG-00H6P0-9r;
+	Wed, 02 Oct 2024 16:55:26 +0100
+Date: Wed, 02 Oct 2024 16:55:25 +0100
+Message-ID: <86a5fm7b4i.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 00/47] KVM: arm64: Enable FGU (Fine Grained Undefined)
- for FEAT_FGT2 registers
-Message-ID: <88783a82-6bfe-4b9e-abd6-a39169c2e223@sirena.org.uk>
-References: <20241001024356.1096072-1-anshuman.khandual@arm.com>
+	Arnd Bergmann <arnd@arndb.de>,
+	Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
+	Kees Cook <kees@kernel.org>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Florian Weimer <fweimer@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
+	Ross Burton <ross.burton@arm.com>,
+	David Spickett <david.spickett@arm.com>,
+	Yury Khrustalev <yury.khrustalev@arm.com>,
+	Wilco Dijkstra <wilco.dijkstra@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v13 16/40] KVM: arm64: Manage GCS access and registers for guests
+In-Reply-To: <86bk0373nq.wl-maz@kernel.org>
+References: <20241001-arm64-gcs-v13-0-222b78d87eee@kernel.org>
+	<20241001-arm64-gcs-v13-16-222b78d87eee@kernel.org>
+	<86bk0373nq.wl-maz@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="hpkt639cGf9JbXKr"
-Content-Disposition: inline
-In-Reply-To: <20241001024356.1096072-1-anshuman.khandual@arm.com>
-X-Cookie: Know Thy User.
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org, corbet@lwn.net, akpm@linux-foundation.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, arnd@arndb.de, oleg@redhat.com, ebiederm@xmission.com, shuah@kernel.org, rick.p.edgecombe@intel.com, debug@rivosinc.com, ardb@kernel.org, Szabolcs.Nagy@arm.com, kees@kernel.org, hjl.tools@gmail.com, paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, fweimer@redhat.com, brauner@kernel.org, thiago.bauermann@linaro.org, ross.burton@arm.com, david.spickett@arm.com, yury.khrustalev@arm.com, wilco.dijkstra@arm.com, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org, linux-mm@kvack.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Wed, 02 Oct 2024 01:24:25 +0100,
+Marc Zyngier <maz@kernel.org> wrote:
+> 
+> On Tue, 01 Oct 2024 23:58:55 +0100,
+> Mark Brown <broonie@kernel.org> wrote:
+> 
+> > @@ -4714,6 +4735,10 @@ void kvm_calculate_traps(struct kvm_vcpu *vcpu)
+> >  		kvm->arch.fgu[HFGxTR_GROUP] |= (HFGxTR_EL2_nPOR_EL1 |
+> >  						HFGxTR_EL2_nPOR_EL0);
+> >  
+> > +	if (!kvm_has_gcs(kvm))
+> > +		kvm->arch.fgu[HFGxTR_GROUP] |= (HFGxTR_EL2_nGCS_EL0 |
+> > +						HFGxTR_EL2_nGCS_EL1);
+> > +
+> 
+> Why are you still allowing the GCS instructions when GCS isn't
+> enabled?
 
---hpkt639cGf9JbXKr
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Scratch that, they are NOPs when GCS isn't enabled, so there shouldn't
+be any need for extra traps.
 
-On Tue, Oct 01, 2024 at 08:13:09AM +0530, Anshuman Khandual wrote:
-> This series enables fine grained undefined for FEAT_FGT2 managed registers
-> via adding their respective FGT and CGT trap configuration. But first this
-> adds many system register definitions in tools/sysreg, which are required
-> there after.
+	M.
 
-One top level comment: these are updates for DDI0601 2024-06 but we've
-now got 2024-09 available.
-
---hpkt639cGf9JbXKr
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmb9bEgACgkQJNaLcl1U
-h9B8kQf9Gc52nSQ6cJh5LkDe3WliRNM2nMJLabZYXkyNN6oD770DBOF8rEzUQfNm
-3pKj5YY4FSXUj7QojfehqwMdKHk8fdNceyKVSTAmy1HEG9M6O6j0JyY7NZd5us7I
-ST6FI45ky5GrD7BiY9CrZTK3VzqryMOijATj0UWnnb9bMyzfVdkrpaY58yUherky
-zEHfswRfXLA8ulvH/LPO1KqYSTUxU9xvQLQEQOUcowsetlcDNZl7NOZrn0xXN2Fu
-s1JRS7QyXQTlkfQAUkpqAq3sikdLJyY59puvShgGOfo9TYWPKWlzrZzdg76pf5YF
-0zY5kqzYXqMT4yaQp196lgCrEgcUVQ==
-=Fhgb
------END PGP SIGNATURE-----
-
---hpkt639cGf9JbXKr--
+-- 
+Without deviation from the norm, progress is not possible.
