@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D55701D0DCE;
-	Wed,  2 Oct 2024 15:48:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 237E71CF5FB;
+	Wed,  2 Oct 2024 15:52:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727884094; cv=none; b=b0JqH4W7ZwGZIjqEWvq7lyaAcMgE6S8b+ea186mNxsSQa4jq9/tZ+cRFs6kqxshPeOtWHQ86Snx8bX9tgyGle16VfiqvmbD5UVAIPv8sPQiiIv4a5vqil1RVSDgG67d48CwbqGuV8baCrjreBQrxBt1Yc8QNyRg97tLZORodH4k=
+	t=1727884367; cv=none; b=sMa4qhGYpkvTem8MIUPBjBDNxfG2mZUMUChznvs263y0M9bvy3UQVjZx6UAB8/tUjICVFymUeZgEY8n8DKA2AKU9gcggMGTYEuFJx6t3Kbv2wVFQfmwYLqirck5Rc7rUaOM3uFRaRbBKlOAK1LNVla4/0k2oxUg6rc4UE9nsEKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727884094; c=relaxed/simple;
-	bh=7rm0ZZErstTrH9Wflc5dul45MSRZ2U+r7DuzXiQtUTI=;
+	s=arc-20240116; t=1727884367; c=relaxed/simple;
+	bh=wW+32vAtoYvZ0AoUlvBodvZP1M7UKtdKGA11jroyVBE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aqoPUcLLxbd6N40Y4RobqmBJyY7bynfWm6ehemzqR3XBVhKX+KjCHTWqbpXOZ3f8UsjDjF/+oO2LP2PlqD1vEcRoirF9ASQOcdi5KWHFiDBm8+j/FrtQ7n8NFvyLQc3B0EBtSgp1clfGHQZnSqXqUAdAg5WdGdYbspA8U88YAFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZzkrSy/r; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=TVb+m59CQgvHev0IyaC73Fu8nYqK/UAMGvbtYqbQ1Z4s8i9TxfqG0pwoFEqPTxg9wYokDTDhlIztcB6Z2YkKAB/LHzygxCLTUffk7dsBKmVdZqinamoKeJ1gad9aB1myKbKk6S4XL6iviINudC8sjzqX71Tw/44QTLDqUnO9Yq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uJ66jO/L; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZzkrSy/r"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E2D6C4CECD;
-	Wed,  2 Oct 2024 15:48:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uJ66jO/L"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AD2EC4CEC2;
+	Wed,  2 Oct 2024 15:52:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727884094;
-	bh=7rm0ZZErstTrH9Wflc5dul45MSRZ2U+r7DuzXiQtUTI=;
+	s=k20201202; t=1727884366;
+	bh=wW+32vAtoYvZ0AoUlvBodvZP1M7UKtdKGA11jroyVBE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZzkrSy/rOb4YltVk2/zkKuzBsKE2Rp0mGCChlVPnQsMg7+c0wP7zmJqjozYHo1dzh
-	 0XhvR0VbDBk078IXgTS6kj4oeHDiAFcn129DT1LGUvvBsj9V6OxSQ+G0b1YJlAFtlj
-	 pDNJB7MEAWmHFeqphUCyl3qKt3Y+j0CTN2K+2ipk2vTGFwUSBvukZzLMFTe6mhxr6p
-	 IcmiZ982nrmL3jrvLLlLo6pB1pani4fr40u1HlTXomxQt+/z5J3zbdxe6uaY/paItv
-	 rRrqQm+ns7DkZ3Dheu9VWWn6KTNnE3RT5WyPPeJMDx6JxQ3N56hoPpkGoKW4ZaIbH7
-	 XmXBJey1NA/4w==
-Date: Wed, 2 Oct 2024 16:48:07 +0100
+	b=uJ66jO/LkxZ7pxV59Jv9RrF9w+vuQV0F/8mX7AaT9MNGUx+zjbQZO66iowdjzO8vx
+	 UtJU1rh1mJZNndE8/nRK8cizmS69EfkVPxKnAF9c+ZPESZj1hJx2UICXIrOFAjBzHf
+	 COXDVwPcXyQwrHV1pDc4Ngn/7V6htJvUh4Opw3sJahGftgY/OOTb79ojZ6HQK+BX38
+	 SO4ZgRz/nN3IeQyn73VRTjqVfbdtye/5jDkeHygwDZEJ0oiCgTvcR1DcSGrltinyI2
+	 ueCk1ULhSJGdIwcp8o3kErg1sAB+swCIMleOJlUrjkP3SUoY4utgr3qcL6edU+WBSP
+	 rwQOK2/VQ77aA==
+Date: Wed, 2 Oct 2024 16:52:41 +0100
 From: Mark Brown <broonie@kernel.org>
 To: Anshuman Khandual <anshuman.khandual@arm.com>
 Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
@@ -36,11 +36,10 @@ Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 04/47] arm64/sysreg: Add register fields for
- ID_AA64DFR2_EL1
-Message-ID: <fe8a2d61-4aeb-4f56-b0d0-90bbfe512c74@sirena.org.uk>
+Subject: Re: [PATCH 00/47] KVM: arm64: Enable FGU (Fine Grained Undefined)
+ for FEAT_FGT2 registers
+Message-ID: <88783a82-6bfe-4b9e-abd6-a39169c2e223@sirena.org.uk>
 References: <20241001024356.1096072-1-anshuman.khandual@arm.com>
- <20241001024356.1096072-5-anshuman.khandual@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,48 +47,38 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="gG2tVfVCySMVqyPE"
+	protocol="application/pgp-signature"; boundary="hpkt639cGf9JbXKr"
 Content-Disposition: inline
-In-Reply-To: <20241001024356.1096072-5-anshuman.khandual@arm.com>
+In-Reply-To: <20241001024356.1096072-1-anshuman.khandual@arm.com>
 X-Cookie: Know Thy User.
 
 
---gG2tVfVCySMVqyPE
+--hpkt639cGf9JbXKr
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-On Tue, Oct 01, 2024 at 08:13:13AM +0530, Anshuman Khandual wrote:
+On Tue, Oct 01, 2024 at 08:13:09AM +0530, Anshuman Khandual wrote:
+> This series enables fine grained undefined for FEAT_FGT2 managed registers
+> via adding their respective FGT and CGT trap configuration. But first this
+> adds many system register definitions in tools/sysreg, which are required
+> there after.
 
-> This adds register fields for ID_AA64DFR2_EL1 as per the definitions based
-> on DDI0601 2024-06.
+One top level comment: these are updates for DDI0601 2024-06 but we've
+now got 2024-09 available.
 
-DDI0601 2024-09 has now been released...
-
-> +Sysreg	ID_AA64DFR2_EL1	3	0	0	5	2
-> +Res0	63:8
-> +UnsignedEnum	7:4	BWE
-> +	0b0000	NI
-> +	0b0001	IMP
-> +	0b0010	IMP_WPT
-
-Could equally name that BWE2 since this is for FEAT_BWE2.  I'm OK either
-way I think, with a slight preference for BWE2 I think.  Either way:
-
-Reviewed-by: Mark Brown <broonie@kernel.org>
-
---gG2tVfVCySMVqyPE
+--hpkt639cGf9JbXKr
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmb9azcACgkQJNaLcl1U
-h9CA5gf/VjvdDGZBLGVqW/uJTCSnns5G7gTG+7EMnA7jOH8QIOqeVy2MFCKL6aDj
-AFcJEcIXHbNmEkQkL9BeeeV15DkOutIMpeNZw886SyHpznhadi5QPzRmcMimOmJM
-E+zkpSWskoQyDSDVPqhlxD6viOyifeCqPF0HWhs7Ufs7uZz7VlZcWFXa1IXgVCGN
-TUBWBzVjCdkyv47ipsdfLR4Oaf3RQp4AY/4w2Szd/h9u4fnfkDIXBlYmADojalJD
-6Q3ZB8ot+r+VKLu/hOnsfsGUcDP/TJBonBVHSyWZXUAvkngafy1EhHFGe0vj5h+X
-jUIwV6D/5zXaNx34TG87BZFVhKVvUQ==
-=9u3o
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmb9bEgACgkQJNaLcl1U
+h9B8kQf9Gc52nSQ6cJh5LkDe3WliRNM2nMJLabZYXkyNN6oD770DBOF8rEzUQfNm
+3pKj5YY4FSXUj7QojfehqwMdKHk8fdNceyKVSTAmy1HEG9M6O6j0JyY7NZd5us7I
+ST6FI45ky5GrD7BiY9CrZTK3VzqryMOijATj0UWnnb9bMyzfVdkrpaY58yUherky
+zEHfswRfXLA8ulvH/LPO1KqYSTUxU9xvQLQEQOUcowsetlcDNZl7NOZrn0xXN2Fu
+s1JRS7QyXQTlkfQAUkpqAq3sikdLJyY59puvShgGOfo9TYWPKWlzrZzdg76pf5YF
+0zY5kqzYXqMT4yaQp196lgCrEgcUVQ==
+=Fhgb
 -----END PGP SIGNATURE-----
 
---gG2tVfVCySMVqyPE--
+--hpkt639cGf9JbXKr--
