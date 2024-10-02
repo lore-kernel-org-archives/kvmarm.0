@@ -1,45 +1,69 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB9011D1E66;
-	Wed,  2 Oct 2024 16:09:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E440F1D0BA2;
+	Wed,  2 Oct 2024 18:24:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727885356; cv=none; b=D0unObyKE8tZvlDyPbrND/nq2grQ5aGLeBgkgQEU+TxbSfdwsYs2S3zPdAeksFHWGVc56w7845dcEzilGsFSfMQLPLfTcSzHsmQwD1KwSuggowelQepvnsPixVnLmYxrSxgPlfl37MGzs1aTSa2ACUBm7HLxscdPTOmBU4dCOSQ=
+	t=1727893465; cv=none; b=PfkXg2L7vJHCMMjUPdVfs9UFvti754YU9W1Z3s2YUhItkZudMlUMlfJbmbm4i8g8u6q/xbpkaVYnqFaMEUiDhJ+xah9y0WpixFk1AIO8wuUPYJhrzFm3GBzJfVHmUz2kqN9wTusnYjiU6jcmSB8BaCPV/nMLHjI/FJ3VRGgUTWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727885356; c=relaxed/simple;
-	bh=NnPPh84H6rriMYyIgEGnLPj+0FNAGeC7blVrVx+XsJI=;
+	s=arc-20240116; t=1727893465; c=relaxed/simple;
+	bh=Xn5r/F/y3n+IVpjGqNQ5xxlIqpNtWX913WJmrs1pThE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XeP0L+MXwi1JOnNUAIM51OUdZz9x+mZi3ZByFTehSb6kBRJefBo/fR5CbcYexsCbs2yYK+hT2bLef0f5EfmJ+R6jsYX4Ixiukrzc8JBhKhcRY4pYVIFwOWES2NqGFu51GWEk/LWI4bgwt+3iMB1UvN8r3x8qGUpC8/xGrF0uq4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H7gh3qGW; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=u7uWIBxI9rCW4y8mrtACrt3pke4a1pYL+uiRPDB/6k2cLiQnO3smwt7TASScNSkkfzsyuW25qkEMzbfPWj/UzpIbfFlKFaIz4tqJDof2KUWyIt03s4K5R6x/wiDAmbhJ3KszeGT3YiA1cHxzcSrjaIJsqDRrDa+SC2if9Oz2YjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HpLyxwDc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H7gh3qGW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5328DC4CEC2;
-	Wed,  2 Oct 2024 16:09:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HpLyxwDc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4524BC4CEC2;
+	Wed,  2 Oct 2024 18:24:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727885355;
-	bh=NnPPh84H6rriMYyIgEGnLPj+0FNAGeC7blVrVx+XsJI=;
+	s=k20201202; t=1727893464;
+	bh=Xn5r/F/y3n+IVpjGqNQ5xxlIqpNtWX913WJmrs1pThE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=H7gh3qGWy/SjdGthuuySx9dGx5h00u952VV2Jz0TtrkDA1Uhssj+pjfjI7oaCBYk6
-	 Z6TbcKyJ6+bAiNrjrtQZGfuod/gRerry5x/i5lRDNU3pDbz6/cMVokd8lJOVfOefhg
-	 2x5lk9DQk6tIln4oka/jeC28XLn+MmCd2hbEuoE32gHnLdWEOCKR0mrAdxXhhleZMU
-	 096wFx9DR5QRMAA+srci6zR24dDH1hWFjMAqtcm7NSb8fADhg7mvLETJcwtVaVt1jN
-	 j5m20lQGRYhOMfWYrMTKnbc7pyX5rCvxx7YBP2d6vlKgHiOOhp1kr/GIOFxlrTmvKh
-	 zUDYHRKx/csxQ==
-Date: Wed, 2 Oct 2024 17:09:08 +0100
+	b=HpLyxwDchSeqF4R9rk9zqytwWCTBbpujg7WnOnXPszioolkSCIFdMKzkLWZeF4ohP
+	 PssFFutZ0TqK/qn3q51d9EEuAw1pmYyCIWQjcAmufjUCC0l618/rZcYNJWnnizCg2G
+	 1CNq7+MXFCmw+6MEaE1iTjnB6QQMMH8g2IbrGHBviaxXC3DKarwixTHZrjcuZIVaF8
+	 uykmFydsc/VUQbPXgNyiEqKDEo6UDITxmpz1IbAxb3J0yd96UH6KQ5fJ2jmwinS3Lh
+	 bV3306MvladnEqvxq3o8HLRZ428Zey8544gcd+Ycx/nCEeiynVhb3l2MR99n+DXhMT
+	 0AeL/bD/KzbNQ==
+Date: Wed, 2 Oct 2024 19:24:12 +0100
 From: Mark Brown <broonie@kernel.org>
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, maz@kernel.org,
+To: Marc Zyngier <maz@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 06/47] arm64/sysreg: Add register fields for HDFGWTR2_EL2
-Message-ID: <7447d3b9-fb94-439c-b3bd-d714aa9b40a6@sirena.org.uk>
-References: <20241001024356.1096072-1-anshuman.khandual@arm.com>
- <20241001024356.1096072-7-anshuman.khandual@arm.com>
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Florian Weimer <fweimer@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
+	Ross Burton <ross.burton@arm.com>,
+	David Spickett <david.spickett@arm.com>,
+	Yury Khrustalev <yury.khrustalev@arm.com>,
+	Wilco Dijkstra <wilco.dijkstra@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v13 16/40] KVM: arm64: Manage GCS access and registers
+ for guests
+Message-ID: <37fbc082-6bda-46e3-9ee7-9240b41f26fd@sirena.org.uk>
+References: <20241001-arm64-gcs-v13-0-222b78d87eee@kernel.org>
+ <20241001-arm64-gcs-v13-16-222b78d87eee@kernel.org>
+ <86bk0373nq.wl-maz@kernel.org>
+ <86a5fm7b4i.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,38 +71,48 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="qgxCz6UQnfGfz0wo"
+	protocol="application/pgp-signature"; boundary="f644fc4VKEnWPPLA"
 Content-Disposition: inline
-In-Reply-To: <20241001024356.1096072-7-anshuman.khandual@arm.com>
+In-Reply-To: <86a5fm7b4i.wl-maz@kernel.org>
 X-Cookie: Know Thy User.
 
 
---qgxCz6UQnfGfz0wo
+--f644fc4VKEnWPPLA
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-On Tue, Oct 01, 2024 at 08:13:15AM +0530, Anshuman Khandual wrote:
+On Wed, Oct 02, 2024 at 04:55:25PM +0100, Marc Zyngier wrote:
+> Marc Zyngier <maz@kernel.org> wrote:
 
-> This adds register fields for HDFGWTR2_EL2 as per the definitions based
-> on DDI0601 2024-06.
+> > > +	if (!kvm_has_gcs(kvm))
+> > > +		kvm->arch.fgu[HFGxTR_GROUP] |= (HFGxTR_EL2_nGCS_EL0 |
+> > > +						HFGxTR_EL2_nGCS_EL1);
 
-Reviewed-by: Mark Brown <broonie@kernel.org>
+> > Why are you still allowing the GCS instructions when GCS isn't
+> > enabled?
 
-modulo the old version.
+> Scratch that, they are NOPs when GCS isn't enabled, so there shouldn't
+> be any need for extra traps.
 
---qgxCz6UQnfGfz0wo
+They are, though really they should UNDEF if GCS isn't there (which I
+had thought was what you were referencing here).  Equally we only have
+traps for a subset of GCS instructions and it's not like there aren't a
+whole bunch of untrappable extensions anyway so it's not clear it's
+worth the effort just for that.
+
+--f644fc4VKEnWPPLA
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmb9cCMACgkQJNaLcl1U
-h9CLzAf/VFc3h4HkrAwq14jODydjqnbWg+QNoDEJJoFRzmds4F7bDpiRg6QT1RUa
-EM5aZNFh7y0vfT1LKW3VrQW086TH2eGilLr3bNBBmtIeDXYC5+5WO28E7uS4+f+b
-6yyhJL1GRZm44NLA0xlo+QPZf4Wa+aflyeCpNetS++Fn4L1/ilXz5Mleqg0U8+Ys
-tfttI4p204NENSAygL+qI3F0A9zx4idSJrHXgl6VLl/kkGHrUmAOf5sxrgYa6dDs
-TFmXR9f1dH6NHVvqRZ2dUTNOfucWpyBZ32y+li2iKOvq/Fioa9oQlsOIG2+Cf5Pq
-HzgOqfuxKGqRbPe/+7S0Uq1C+iXFig==
-=S2uZ
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmb9j8sACgkQJNaLcl1U
+h9AOWQf8DFoVOjrYp2ocafOH0wTbI6Jawr1ucPRjwYcn5sAGuTLywrEihNxOR42y
+l62ygvYkYtUWpgViQZqrQznNkYbdxg7O6dnvc4ywKu0iWo1KPVJFT0At7NZp6Pxy
+z8z/9OOYjxelIy33541t+XgjS3MxR3LA2PJSZd7ZOd4sHZMl7t1oLNi/s9HV0LAK
+/xkcFEkwnX1y0EndbVnntD9crF+J0pBIuO1z3wtywncxixscc0PgM3e1mvmTmYu6
+k62weouXEqlaiF5DZ6hHH4iHj8mPMYlnmvEz6Dsiev6PWcCm2hYrKiIO44ThjQJU
+OggiVTV8pqPtukHW/VmVN/VFPC5k6w==
+=YDrc
 -----END PGP SIGNATURE-----
 
---qgxCz6UQnfGfz0wo--
+--f644fc4VKEnWPPLA--
