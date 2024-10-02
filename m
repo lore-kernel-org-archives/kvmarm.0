@@ -1,127 +1,95 @@
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EBF41D2B00
-	for <kvmarm@lists.linux.dev>; Wed,  2 Oct 2024 15:45:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D55701D0DCE;
+	Wed,  2 Oct 2024 15:48:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727883907; cv=none; b=fc2M3WMXIbEOO2jkPCEbVU+xnYQaPhV+X4AfSIPgFac0vxhmtzC5VDkCyW31HTq1j4d+X3kaN/JSQUyo/3Orlq3Suo5+HMDyQgHDzOJabnz4y7WIRmCN+r4270sbebmGts9OO8RhznY+T4fdbyfxPXGgpIZe8/XczjSiSgfYdMI=
+	t=1727884094; cv=none; b=b0JqH4W7ZwGZIjqEWvq7lyaAcMgE6S8b+ea186mNxsSQa4jq9/tZ+cRFs6kqxshPeOtWHQ86Snx8bX9tgyGle16VfiqvmbD5UVAIPv8sPQiiIv4a5vqil1RVSDgG67d48CwbqGuV8baCrjreBQrxBt1Yc8QNyRg97tLZORodH4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727883907; c=relaxed/simple;
-	bh=XhEkyMPnd7QPKpP6cWGqvwHoptTT9TVgsgWK3bsOzFg=;
+	s=arc-20240116; t=1727884094; c=relaxed/simple;
+	bh=7rm0ZZErstTrH9Wflc5dul45MSRZ2U+r7DuzXiQtUTI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pb8+XCYp9jeKR2QopD/y+OVzUJgFl7EVr5z2QBFCaqJ13/weteep/CpnnmIAk+yWrsVEB3wFx8IwPPsHeZtgYADffJ+yvIPOxvuHtWpnIZNv81cHrr3OUhfVygUWkb31c+/Ngep0R/3C7S6vMm9rENxMZ1Kqgi1oCJQDAPu51sc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=q8bSSi2P; arc=none smtp.client-ip=95.215.58.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	 Content-Type:Content-Disposition:In-Reply-To; b=aqoPUcLLxbd6N40Y4RobqmBJyY7bynfWm6ehemzqR3XBVhKX+KjCHTWqbpXOZ3f8UsjDjF/+oO2LP2PlqD1vEcRoirF9ASQOcdi5KWHFiDBm8+j/FrtQ7n8NFvyLQc3B0EBtSgp1clfGHQZnSqXqUAdAg5WdGdYbspA8U88YAFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZzkrSy/r; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="q8bSSi2P"
-Date: Wed, 2 Oct 2024 15:44:56 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1727883901;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wEAc2RAWQRgyOGkrtK+hXeUGOKjWMXazGBlHNjqjAxY=;
-	b=q8bSSi2P8Cw0ujL9ST61nvd/gqIWijgFSbaaZ0INnXV/5HM8EP0m0sHcjlHxdpCWefrmaq
-	W/MfEY8alBRwsV7PMVEECMiCOYhMp5qbXshOkbrcAbTQnbPo2APWPzE173u8A1mByCfZMx
-	MhnJ9IvBERVDfSkv+67X2Ldhmi9HdnE=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: James Clark <james.clark@linaro.org>
-Cc: kvmarm@lists.linux.dev,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	will@kernel.org, tabba@google.com, maz@kernel.org
-Subject: Re: [bug report] KVM: arm64: BUG when reading kcore with
- kvm-arm.mode=protected
-Message-ID: <Zv1qeOOHjF0mv5Su@linux.dev>
-References: <f99c7436-502f-4f51-9a3c-c402b70bac58@linaro.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZzkrSy/r"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E2D6C4CECD;
+	Wed,  2 Oct 2024 15:48:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727884094;
+	bh=7rm0ZZErstTrH9Wflc5dul45MSRZ2U+r7DuzXiQtUTI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZzkrSy/rOb4YltVk2/zkKuzBsKE2Rp0mGCChlVPnQsMg7+c0wP7zmJqjozYHo1dzh
+	 0XhvR0VbDBk078IXgTS6kj4oeHDiAFcn129DT1LGUvvBsj9V6OxSQ+G0b1YJlAFtlj
+	 pDNJB7MEAWmHFeqphUCyl3qKt3Y+j0CTN2K+2ipk2vTGFwUSBvukZzLMFTe6mhxr6p
+	 IcmiZ982nrmL3jrvLLlLo6pB1pani4fr40u1HlTXomxQt+/z5J3zbdxe6uaY/paItv
+	 rRrqQm+ns7DkZ3Dheu9VWWn6KTNnE3RT5WyPPeJMDx6JxQ3N56hoPpkGoKW4ZaIbH7
+	 XmXBJey1NA/4w==
+Date: Wed, 2 Oct 2024 16:48:07 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, maz@kernel.org,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 04/47] arm64/sysreg: Add register fields for
+ ID_AA64DFR2_EL1
+Message-ID: <fe8a2d61-4aeb-4f56-b0d0-90bbfe512c74@sirena.org.uk>
+References: <20241001024356.1096072-1-anshuman.khandual@arm.com>
+ <20241001024356.1096072-5-anshuman.khandual@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="gG2tVfVCySMVqyPE"
+Content-Disposition: inline
+In-Reply-To: <20241001024356.1096072-5-anshuman.khandual@arm.com>
+X-Cookie: Know Thy User.
+
+
+--gG2tVfVCySMVqyPE
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f99c7436-502f-4f51-9a3c-c402b70bac58@linaro.org>
-X-Migadu-Flow: FLOW_OUT
 
-+cc relevant folks
+On Tue, Oct 01, 2024 at 08:13:13AM +0530, Anshuman Khandual wrote:
 
-Hi James,
+> This adds register fields for ID_AA64DFR2_EL1 as per the definitions based
+> on DDI0601 2024-06.
 
-On Wed, Oct 02, 2024 at 02:23:32PM +0100, James Clark wrote:
-> Hi,
-> 
-> I noticed this when running the Perf tests so I'm reporting it here (I don't
-> actually need kcore FWIW). I tested from 6.1 to 6.11 with the same results:
+DDI0601 2024-09 has now been released...
 
-Yeah, this is (somewhat) intended behavior. By reading kcore you wind up
-reading from memory that isn't in a visible state for the host (e.g. hyp
-text).
+> +Sysreg	ID_AA64DFR2_EL1	3	0	0	5	2
+> +Res0	63:8
+> +UnsignedEnum	7:4	BWE
+> +	0b0000	NI
+> +	0b0001	IMP
+> +	0b0010	IMP_WPT
 
-Protected mode is very much a WIP, and is expected to be rough around the
-edges like this. Eventually the hypervisor will inject an abort into the
-host for disallowed memory accesses instead of tripping a BUG_ON(). We
-don't have that upstream right now.
+Could equally name that BWE2 since this is for FEAT_BWE2.  I'm OK either
+way I think, with a slight preference for BWE2 I think.  Either way:
 
->   # On the host:
->   $ cat /proc/cmdline
-> 
->   BOOT_IMAGE=/boot/vmlinuz-6.11.0-rc6+
-> root=UUID=090f43e8-dbb2-48e4-a9e2-efd6291fb21f ro earlycon=pl011,0x2A400000
-> kpti=off vfio-pci.ids=10ee:9038 kvm-arm.mode=protected
-> 
->   $ sudo dd if=/proc/kcore of=/dev/null
-> 
->  # Wait a few seconds
-> 
->    kvm [732]: nVHE hyp BUG at: arch/arm64/kvm/hyp/nvhe/mem_protect.c:540!
->    kvm [732]: nVHE call trace:
->    kvm [732]:  [<ffff8000090c2654>] __kvm_nvhe_$x.158+0x44/0x80
->    kvm [732]:  [<ffff8000090c88d4>] __kvm_nvhe_$x.90+0x34/0x124
->    kvm [732]:  [<ffff8000090c4844>] __kvm_nvhe_$x.1+0x4c/0x84
->    kvm [732]:  [<ffff8000090c3864>] __kvm_nvhe_$x.0+0x64/0x64
->    kvm [732]: ---[ end nVHE call trace ]---
->    kvm [732]: Hyp Offset: 0xfffeffff97e00000
->    Kernel panic - not syncing: HYP panic:
->    PS:a04003c9 PC:00008000712c89c8 ESR:00000000f2000800
->    FAR:ffff0000712bf000 HPFAR:0000000000f12bf0 PAR:0000000000000800
->    VCPU:0000000000000000
->    CPU: 1 PID: 732 Comm: dd Not tainted 6.4.0+ #54
->    Call trace:
->     dump_backtrace+0x100/0x158
->     show_stack+0x24/0x40
->     dump_stack_lvl+0x60/0x80
->     dump_stack+0x18/0x28
->     panic+0x148/0x360
->     nvhe_hyp_panic_handler+0x110/0x1a0
->     _copy_to_iter+0xd8/0x520
->     read_kcore_iter+0x54c/0x768
->     proc_reg_read_iter+0xa0/0x118
->     vfs_read+0x1b4/0x290
->     ksys_read+0x80/0xf8
->     __arm64_sys_read+0x28/0x40
->     invoke_syscall+0x4c/0x120
->     el0_svc_common+0xd0/0x120
->     do_el0_svc+0x3c/0xb8
->     el0_svc+0x44/0xb0
->     el0t_64_sync_handler+0x84/0xf0
->     el0t_64_sync+0x190/0x198
->    SMP: stopping secondary CPUs
->    Kernel Offset: disabled
->    CPU features: 0x000000,4040180c,6400720b
->    Memory Limit: none
->    pstore: backend (efi_pstore) writing error (-5)
->    ---[ end Kernel panic - not syncing: HYP panic:
->    PS:a04003c9 PC:00008000712c89c8 ESR:00000000f2000800
->    FAR:ffff0000712bf000 HPFAR:0000000000f12bf0 PAR:0000000000000800
->    VCPU:0000000000000000 ]---
-> 
-> 
-> 
+Reviewed-by: Mark Brown <broonie@kernel.org>
 
--- 
-Thanks,
-Oliver
+--gG2tVfVCySMVqyPE
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmb9azcACgkQJNaLcl1U
+h9CA5gf/VjvdDGZBLGVqW/uJTCSnns5G7gTG+7EMnA7jOH8QIOqeVy2MFCKL6aDj
+AFcJEcIXHbNmEkQkL9BeeeV15DkOutIMpeNZw886SyHpznhadi5QPzRmcMimOmJM
+E+zkpSWskoQyDSDVPqhlxD6viOyifeCqPF0HWhs7Ufs7uZz7VlZcWFXa1IXgVCGN
+TUBWBzVjCdkyv47ipsdfLR4Oaf3RQp4AY/4w2Szd/h9u4fnfkDIXBlYmADojalJD
+6Q3ZB8ot+r+VKLu/hOnsfsGUcDP/TJBonBVHSyWZXUAvkngafy1EhHFGe0vj5h+X
+jUIwV6D/5zXaNx34TG87BZFVhKVvUQ==
+=9u3o
+-----END PGP SIGNATURE-----
+
+--gG2tVfVCySMVqyPE--
