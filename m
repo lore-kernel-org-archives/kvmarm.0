@@ -1,163 +1,153 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80C6919E99E;
-	Wed,  2 Oct 2024 23:26:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DBE119F41B
+	for <kvmarm@lists.linux.dev>; Wed,  2 Oct 2024 23:31:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727911612; cv=none; b=RDy8KrZB59AweZ/faCppk9MFchspmlOps9Y2UhSbKrESzkRfojcbYzCAvIlWQ7efIhqrmcJ2NMYrketKPXtp50zUDW/rXCZ5ZgQwWNKMN6WvZhlfK6hSYPlCve+qV/ncqp2w+dFCGBLfBcvQPC647oLC+QtKw8NXutvIBjF/wS4=
+	t=1727911897; cv=none; b=bxfEFhod1vsDJ2PilwscMbqgLtSDrd7Hh1VReEX7tbmVI58uW8j2U/DF2Pit87l7dQwu6MNE7MRcyWShOF2ka6S/TwjepRwqoR7dP4LGpuxCOw70Oo1gUyJj4/WbWt6iMMnf7vmaqV3J1P+xlH7qyVBk3blpFyaXNXe0E273iFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727911612; c=relaxed/simple;
-	bh=MOddhoRdVUNlZ6rFQAiTxa6MCDC1OsTEaQH/tMohL3g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=upwHFmkuQTfJYUBhzNCXdpkyvKO6A29KtjLGP7zX0IN60wEF1AyFEuWH5YPWIeqAGgihSC5rZy9TesOpLP++aFDCuhMZkhAtvxgGqz2vWgW//jVhAh1239Bjk8kbp7SkbVuats0RmmKXKcH+s7rFxvqHDP0qYQy2K3HtlxnTdHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XtNIDTmS; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1727911897; c=relaxed/simple;
+	bh=b9k142UEPNcRoLhx968tqtjfFjFXruuIbLA8U2LtAks=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iHiw11+YDnKf9oSScmYo1S67HuXTOUGFMWgMQKVXyHXTeFSmIVkLOTirLXq+d4toERVotCZFCWbUdOjAxNYdfAdXXBVqJ4Cc6OLEoHwD6SKHTni0ZES25/UvQrMAwCNEdP/GXTLdViuP5e5DqqrTsdr4WoCr7KKwo0nD27jEi2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o5z3xJgn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XtNIDTmS"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1727911610; x=1759447610;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=MOddhoRdVUNlZ6rFQAiTxa6MCDC1OsTEaQH/tMohL3g=;
-  b=XtNIDTmSRdYOLZf+5X7EYvgTm1bYzK6O7lSKxpC4VTNbVWIOj+7qRpFp
-   wL79HXZmHMdTBnE9oVBnM+53lhvXeG+P/XIzYgoFyWPfzrFMqfc59BMqL
-   dBj+v/mj2751nu2VnnnKWLeuq7yJ0hW+2gVEwTlc7g15uIYi490XomDSb
-   SiJX6+YD4IVoF9HsOw0uVfaAbuJGfE0tZFvnKEKEgOdghEHEztbKWwAE3
-   ZRD5wOfG93KzoWsek3JPcg4E7CmWxH+EEvzREo1fHDjNeV9cdLAfvU3Bf
-   GF4DdXMqf1QUpQRnHQCiu101UdvzLTC6SFpWugeceZNTkeLzu+D/IW4I3
-   g==;
-X-CSE-ConnectionGUID: i1nrcdkwT7G41IQzwAjKBQ==
-X-CSE-MsgGUID: ZINJl+IRQyiW9YImjXdmBA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11213"; a="29967245"
-X-IronPort-AV: E=Sophos;i="6.11,173,1725346800"; 
-   d="scan'208";a="29967245"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Oct 2024 16:26:47 -0700
-X-CSE-ConnectionGUID: PP/MMty1QC2Zciupl7lINQ==
-X-CSE-MsgGUID: XZzzxy2nTnOY4iLOwmrNaQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,173,1725346800"; 
-   d="scan'208";a="74158157"
-Received: from lkp-server01.sh.intel.com (HELO 53e96f405c61) ([10.239.97.150])
-  by fmviesa009.fm.intel.com with ESMTP; 02 Oct 2024 16:26:44 -0700
-Received: from kbuild by 53e96f405c61 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sw8jw-000UgV-35;
-	Wed, 02 Oct 2024 23:26:40 +0000
-Date: Thu, 3 Oct 2024 07:25:57 +0800
-From: kernel test robot <lkp@intel.com>
-To: Anshuman Khandual <anshuman.khandual@arm.com>,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o5z3xJgn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A23A7C4CECE;
+	Wed,  2 Oct 2024 23:31:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727911896;
+	bh=b9k142UEPNcRoLhx968tqtjfFjFXruuIbLA8U2LtAks=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=o5z3xJgnz9r58iTjvytAtOj7Y+V5ke8bfdtsk0SjiUdZHHXkJjndgU50be7+UgNB4
+	 R4iRmkWb5p5iuJRRn324zwMPR1H76wu7ZS4vYszizWAMHy69DsVHsVJS9u8q4pDfp9
+	 vkK/b9NLAOTC6slk8/HU+pb8AKjddEe1e1/gaosmepWScHsUR/d5vihyCqf+dPP/c8
+	 Nv+N9OoOCuMjEq0lEwjKavwmQMIG9BD9bo8E17AwX//yliFdhKCw6ObAGJ6QvCzeev
+	 IhjbKz+ePy6o+cbpnPb8s5k9iadr9Y/MAVNzlwlMN2abp4I8wc0bs1z+FJRA5c8EVx
+	 e535hGXE113yw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sw8og-00HByZ-JS;
+	Thu, 03 Oct 2024 00:31:34 +0100
+Date: Thu, 03 Oct 2024 00:31:33 +0100
+Message-ID: <865xqa6q0a.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	kvmarm@lists.linux.dev,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>, kvmarm@lists.linux.dev,
-	linux-doc@vger.kernel.org
-Subject: Re: [PATCH 2/3] arm64/boot: Enable EL2 requirements for
- FEAT_Debugv8p9
-Message-ID: <202410030702.9xBCVi6s-lkp@intel.com>
-References: <20241001043602.1116991-3-anshuman.khandual@arm.com>
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 3/3] KVM: arm64: nv: Punt stage-2 recycling to a vCPU request
+In-Reply-To: <ZvySjfDWOhl2O1IA@google.com>
+References: <20241001001709.1303668-1-oliver.upton@linux.dev>
+	<20241001001709.1303668-4-oliver.upton@linux.dev>
+	<ZvxH3el9SNuNWwi8@google.com>
+	<ZvxeeVn8LphHxWeS@linux.dev>
+	<ZvyFkqsRFBAYwqP7@google.com>
+	<86cykj75a0.wl-maz@kernel.org>
+	<ZvyOcnZqNzfD7MZx@linux.dev>
+	<ZvySjfDWOhl2O1IA@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241001043602.1116991-3-anshuman.khandual@arm.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: seanjc@google.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Anshuman,
+On Wed, 02 Oct 2024 01:23:41 +0100,
+Sean Christopherson <seanjc@google.com> wrote:
+> 
+> On Tue, Oct 01, 2024, Oliver Upton wrote:
+> > On Wed, Oct 02, 2024 at 12:49:27AM +0100, Marc Zyngier wrote:
+> > > On Wed, 02 Oct 2024 00:28:18 +0100,
+> > > Sean Christopherson <seanjc@google.com> wrote:
+> > > > 
+> > > > On Tue, Oct 01, 2024, Oliver Upton wrote:
+> > > > > Hey,
+> > > > > 
+> > > > > sidebar: I was a bit confused by the diff for a second, since it looks
+> > > > > like your email client lowercased some stuff :)
+> > > > 
+> > > > Wasn't my mail client, it was PEBKAC.  I copy+pasted a large chunk in Vim because
+> > > > I wanted to pull in the changelog (which I had deleted from my response), but then
+> > > > I changed my mind, and in doing so I managed to fat-finger something that converted
+> > > > everything to lowercase.  And yeah, it confused me too.
+> > > > 
+> > > > > > >  out:
+> > > > > > > +	if (s2_mmu->pending_unmap)
+> > > > > > > +		kvm_make_request(kvm_req_nested_s2_unmap, vcpu);
+> > > > > > 
+> > > > > > If I followed everything correctly, I don't think a request is needed.  the
+> > > > > > request will never be cross-vCPU, and each vCPU holds a reference to the MMU, so
+> > > > > > the MMU can't be recycled, i.e. pending_unmap is guaranteed to be relevant to the
+> > > > > > vCPU's usage of the MMU.  More thoughts below in check_nested_vcpu_requests().
+> > > > > 
+> > > > > I'm (ab)using the request to prevent the vCPU thread from actually
+> > > > > entering the VM without first having done the laundry. We have other
+> > > > > examples of strictly per-vCPU tasks that are tracked with a request so
+> > > > > this doesn't stick out that much.
+> > > > > 
+> > > > > Otherwise we'd need an open-coded check in kvm_vcpu_exit_request() to
+> > > > > catch a 'dirty' MMU or take a pin on it from the point we check the
+> > > > > dirtiness to the point we disable preemption.
+> > > > 
+> > > > Ewww, because kvm_arch_vcpu_put() puts the nested stage-2 when the vCPU is
+> > > > scheduled out.  Mostly out of curiosity, why?  99.9% of the time, the vCPU will
+> > > > be scheduled back in.
+> > > 
+> > > Because s2 MMU structures are a scarce resource. and other vcpus could
+> > > have the opportunity to make use of an unused slot.
+> 
+> But that slot is less unused than other unused slots, in the sense that KVM _knows_
+> at least one vCPU intends to use that MMU in the near future, whereas KVM has no
+> tracking to know if an MMU with no references whatsoever is likely to be reused.
 
-kernel test robot noticed the following build errors:
+How do you know that? I'd happily borrow your crystal ball. By the
+time that vcpu is restarted, other vcpus could have done a lot of
+useful work by using that S2 MMU.
 
-[auto build test ERROR on arm64/for-next/core]
-[also build test ERROR on kvmarm/next soc/for-next arm/for-next arm/fixes linus/master v6.12-rc1 next-20241002]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> IIUC, KVM round-robins across 2*nr_vcpus MMUs, and when L1 switches to a different
+> VTTBR, it will first drop its reference to the previous MMU.  So at any given time,
+> there are nr_vcpus worth of unused MMUs, i.e. a vCPU is guaranteed to be able to
+> find an unused slot, even if vCPUs that are scheduled out hold onto their S2 MMU
+> reference.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Anshuman-Khandual/arm64-cpufeature-Add-field-details-for-ID_AA64DFR1_EL1-register/20241001-123752
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-next/core
-patch link:    https://lore.kernel.org/r/20241001043602.1116991-3-anshuman.khandual%40arm.com
-patch subject: [PATCH 2/3] arm64/boot: Enable EL2 requirements for FEAT_Debugv8p9
-config: arm64-randconfig-002-20241003 (https://download.01.org/0day-ci/archive/20241003/202410030702.9xBCVi6s-lkp@intel.com/config)
-compiler: clang version 15.0.7 (https://github.com/llvm/llvm-project 8dfdcc7b7bf66834a761bd8de445840ef68e4d1a)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241003/202410030702.9xBCVi6s-lkp@intel.com/reproduce)
+It's not about not finding a slot, but about making sure that vcpus
+that context switch rapidly between VTTBRs for their own guests can do
+so freely without sacrificing the TLBs they have just produced. Not
+reusing the TLBs hogged by a vcpu that cannot run is a waste of
+resource.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202410030702.9xBCVi6s-lkp@intel.com/
+>
+> At that point, choosing an MMU that no vCPU is using seems more likely to recycle
+> a cold/dead MMU than a soon-to-be-reused MMU.
+> 
+> And the round-robin approach makes it all heavily luck-based anyways.  E.g. if
+> a vCPU puts VTTBR A and then loads VTTBR B, B could recycle A's S2 MMU if that
+> MMU slot is next up for recycling.
 
-All errors (new ones prefixed by >>):
+Well, we'll have to agree to disagree. It's a terrible hack to add
+artificial ties between a vcpu and TLBs. Because that's what the
+shadow MMU is, nothing else.
 
->> <instantiation>:3:10: error: expected compatible register, symbol or integer in range [0, 4095]
-    cmp x1, #ID_AA64MMFR0_EL1_FGT_FGT2
-            ^
-   <instantiation>:12:2: note: while in macro instantiation
-    __init_el2_fgt2
-    ^
-   arch/arm64/kernel/head.S:317:2: note: while in macro instantiation
-    init_el2_state
-    ^
->> <instantiation>:1:5: error: expected absolute expression
-   .if (((HDFGWTR2_EL2_nMDSELR_EL1) >> 31) == 0 || ((HDFGWTR2_EL2_nMDSELR_EL1) >> 31) == 0x1ffffffff)
-       ^
-   <instantiation>:11:2: note: while in macro instantiation
-    mov_q x0, HDFGWTR2_EL2_nMDSELR_EL1
-    ^
-   <instantiation>:12:2: note: while in macro instantiation
-    __init_el2_fgt2
-    ^
-   arch/arm64/kernel/head.S:317:2: note: while in macro instantiation
-    init_el2_state
-    ^
-   <instantiation>:4:6: error: expected absolute expression
-    .if (((HDFGWTR2_EL2_nMDSELR_EL1) >> 47) == 0 || ((HDFGWTR2_EL2_nMDSELR_EL1) >> 47) == 0x1ffff)
-        ^
-   <instantiation>:11:2: note: while in macro instantiation
-    mov_q x0, HDFGWTR2_EL2_nMDSELR_EL1
-    ^
-   <instantiation>:12:2: note: while in macro instantiation
-    __init_el2_fgt2
-    ^
-   arch/arm64/kernel/head.S:317:2: note: while in macro instantiation
-    init_el2_state
-    ^
->> <instantiation>:1:6: error: expected constant expression
-   .inst(0xd5000000|(SYS_HDFGWTR2_EL2)|(.L__gpr_num_x0))
-        ^
-   <instantiation>:12:2: note: while in macro instantiation
-    msr_s SYS_HDFGWTR2_EL2, x0
-    ^
-   <instantiation>:12:2: note: while in macro instantiation
-    __init_el2_fgt2
-    ^
-   arch/arm64/kernel/head.S:317:2: note: while in macro instantiation
-    init_el2_state
-    ^
->> <instantiation>:1:6: error: expected constant expression
-   .inst(0xd5000000|(SYS_HDFGRTR2_EL2)|(.L__gpr_num_x0))
-        ^
-   <instantiation>:13:2: note: while in macro instantiation
-    msr_s SYS_HDFGRTR2_EL2, x0
-    ^
-   <instantiation>:12:2: note: while in macro instantiation
-    __init_el2_fgt2
-    ^
-   arch/arm64/kernel/head.S:317:2: note: while in macro instantiation
-    init_el2_state
-    ^
+So if you don't like the TLB eviction policy, please come up with a
+better one, making sure that a recently preempted vcpu gets its S2 MMU
+recycled last. But please don't add the notion of "locked TLBs" to the
+mix, because that's a pretty dodgy architectural concept.
+
+	M.
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Without deviation from the norm, progress is not possible.
