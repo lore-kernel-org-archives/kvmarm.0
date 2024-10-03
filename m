@@ -1,178 +1,189 @@
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B48374C92
-	for <kvmarm@lists.linux.dev>; Thu,  3 Oct 2024 00:12:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6AD820309;
+	Thu,  3 Oct 2024 03:40:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727914379; cv=none; b=DE+YKkTZfcapiOfP3mg5CDjnNSlf34i19APC6sZ22LhNAQ8ytgTTw7RxWTNsijX8YsppLuL3mJzqpYV8XTQV88xlazKm314ilps1+gEdS+IoP7DV+/3YnWN5HbqKdmd9MJYyxo8D/U4xfm+1kVfMJEZ8nAwTfhOzbRjDm99NSWk=
+	t=1727926848; cv=none; b=lfOtgp9ndybFYK+aR73Wg8OFSmXUdL8avdW3SWznPsuGHIGlf/OPjlVwBjmdU9dB95RKhrwIy+iGbBY28RAmNnVH/CdpNcK1VgtpZ7C4pE0+J9NDBQznEk6nz5qrMRNrL0M5srmY/qjPyefFIahqjuM15jRR9eWYOI4B4MUHwUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727914379; c=relaxed/simple;
-	bh=Y62vgAdPMqyAk56mFW+wIy0i9uAnDSmro1exnTXwaLY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R54oegU87J2lKby1oRXHSvQn1W0AGaArr7pHLH+uFO6EteI5K3Dqu8I78CxlT+CWEtvpSh2t1N7YhjyuXkJbJIJighnnyHR5OpFw5jsmvXwaQqUW3jsTU04JaBgAesNRCWBNKjba+A1s/YZNlY38ceWSLCB3HPpwHQKdzNE2SX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FGqUcIK2; arc=none smtp.client-ip=95.215.58.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FGqUcIK2"
-Date: Thu, 3 Oct 2024 00:12:48 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1727914374;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TjhSod9+vVM0x9AQtvn4kjgpPDKTDcl2kmuRYLvi3i0=;
-	b=FGqUcIK26lS6bFt/naWa6Zl1FNPKoHW0mmIn4HQJrDiCf1kbRO9MgCKN52x8mLq/dwH1a/
-	X3oV5bfqAHycczYQMDg6ho6x3ncJdY0bxHuheaMQB2nRAANV4H6n4LBo+tt+sx2/3zvw8k
-	fD2gvXJ8iaMA/GDk1gf0ZuP+RgGG2gY=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Sean Christopherson <seanjc@google.com>, kvmarm@lists.linux.dev,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 3/3] KVM: arm64: nv: Punt stage-2 recycling to a vCPU
- request
-Message-ID: <Zv3hgOhjaQGAuIOG@linux.dev>
-References: <20241001001709.1303668-1-oliver.upton@linux.dev>
- <20241001001709.1303668-4-oliver.upton@linux.dev>
- <ZvxH3el9SNuNWwi8@google.com>
- <ZvxeeVn8LphHxWeS@linux.dev>
- <ZvyFkqsRFBAYwqP7@google.com>
- <86cykj75a0.wl-maz@kernel.org>
- <ZvyOcnZqNzfD7MZx@linux.dev>
- <ZvySjfDWOhl2O1IA@google.com>
- <865xqa6q0a.wl-maz@kernel.org>
- <Zv3fcT9lCSujib7J@linux.dev>
+	s=arc-20240116; t=1727926848; c=relaxed/simple;
+	bh=ggf4pIh3/wTu8uu9dZOwqC1+gRnjRUQ0lepm5IfBHnc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qBj6XKM+ZgaGj/YLq64Tl84dgBQC6gX2zq6WLgSzm9h423qG6uNqAyN45KMU4NpK5M5HsxM5ilXQnpAGwRxjNh9r9nIkBSTk2y64A6DD1CVxZZucnfLdmDGnJ+HVUBuq75FImOhpe2mw2DsGyPspppEga8GWa7kDh+BkcitxqUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 60D71339;
+	Wed,  2 Oct 2024 20:41:15 -0700 (PDT)
+Received: from [10.163.37.202] (unknown [10.163.37.202])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A624C3F640;
+	Wed,  2 Oct 2024 20:40:41 -0700 (PDT)
+Message-ID: <eae3b6bd-b69a-41cb-8963-feb766f9d528@arm.com>
+Date: Thu, 3 Oct 2024 09:10:40 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zv3fcT9lCSujib7J@linux.dev>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/3] arm64/hw_breakpoint: Enable FEAT_Debugv8p9
+To: kernel test robot <lkp@intel.com>, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org
+Cc: oe-kbuild-all@lists.linux.dev, Jonathan Corbet <corbet@lwn.net>,
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ James Morse <james.morse@arm.com>, Suzuki K Poulose
+ <suzuki.poulose@arm.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>,
+ Mark Rutland <mark.rutland@arm.com>, kvmarm@lists.linux.dev
+References: <20241001043602.1116991-4-anshuman.khandual@arm.com>
+ <202410030700.kZSan6G6-lkp@intel.com>
+Content-Language: en-US
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+In-Reply-To: <202410030700.kZSan6G6-lkp@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Oct 03, 2024 at 12:04:06AM +0000, Oliver Upton wrote:
-> Hey,
-> 
-> On Thu, Oct 03, 2024 at 12:31:33AM +0100, Marc Zyngier wrote:
-> > On Wed, 02 Oct 2024 01:23:41 +0100, Sean Christopherson <seanjc@google.com> wrote:
-> > > IIUC, KVM round-robins across 2*nr_vcpus MMUs, and when L1 switches to a different
-> > > VTTBR, it will first drop its reference to the previous MMU.  So at any given time,
-> > > there are nr_vcpus worth of unused MMUs, i.e. a vCPU is guaranteed to be able to
-> > > find an unused slot, even if vCPUs that are scheduled out hold onto their S2 MMU
-> > > reference.
-> > 
-> > It's not about not finding a slot, but about making sure that vcpus
-> > that context switch rapidly between VTTBRs for their own guests can do
-> > so freely without sacrificing the TLBs they have just produced. Not
-> > reusing the TLBs hogged by a vcpu that cannot run is a waste of
-> > resource.
-> 
-> OTOH, our global TLBs don't model hardware exactly since a vCPU doing
-> rapid context switches trash the TLBs of *all* vCPUs in the system.
-> The cost of reusing an MMU is quite noticeable, since our unmap
-> implementation is slightly crap at the moment, the cost of which shows
-> up both on sides of the reclaim (victim and user).
 
-Oh, and why unmap is crap:
 
-The walker has no way of informing the iterator how far into the range
-the walk actually got. Instead, the iterator forcibly walks every
-PUD/PMD sized chunk.
+On 10/3/24 05:06, kernel test robot wrote:
+> Hi Anshuman,
+> 
+> kernel test robot noticed the following build errors:
+> 
+> [auto build test ERROR on arm64/for-next/core]
+> [also build test ERROR on kvmarm/next soc/for-next arm/for-next arm/fixes linus/master v6.12-rc1 next-20241002]
+> [If your patch is applied to the wrong git tree, kindly drop us a note.
+> And when submitting patch, we suggest to use '--base' as documented in
+> https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> 
+> url:    https://github.com/intel-lab-lkp/linux/commits/Anshuman-Khandual/arm64-cpufeature-Add-field-details-for-ID_AA64DFR1_EL1-register/20241001-123752
+> base:   https://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-next/core
+> patch link:    https://lore.kernel.org/r/20241001043602.1116991-4-anshuman.khandual%40arm.com
+> patch subject: [PATCH 3/3] arm64/hw_breakpoint: Enable FEAT_Debugv8p9
+> config: arm64-randconfig-004-20241003 (https://download.01.org/0day-ci/archive/20241003/202410030700.kZSan6G6-lkp@intel.com/config)
+> compiler: aarch64-linux-gcc (GCC) 14.1.0
+> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241003/202410030700.kZSan6G6-lkp@intel.com/reproduce)
+> 
+> If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202410030700.kZSan6G6-lkp@intel.com/
+> 
+> All errors (new ones prefixed by >>):
+> 
+>    arch/arm64/kernel/hw_breakpoint.c: In function 'set_bank_index':
+>>> arch/arm64/kernel/hw_breakpoint.c:113:30: error: 'MDSELR_EL1_BANK_BANK_0' undeclared (first use in this function)
+>      113 |                 mdsel_bank = MDSELR_EL1_BANK_BANK_0;
+>          |                              ^~~~~~~~~~~~~~~~~~~~~~
+>    arch/arm64/kernel/hw_breakpoint.c:113:30: note: each undeclared identifier is reported only once for each function it appears in
+>>> arch/arm64/kernel/hw_breakpoint.c:116:30: error: 'MDSELR_EL1_BANK_BANK_1' undeclared (first use in this function)
+>      116 |                 mdsel_bank = MDSELR_EL1_BANK_BANK_1;
+>          |                              ^~~~~~~~~~~~~~~~~~~~~~
+>>> arch/arm64/kernel/hw_breakpoint.c:119:30: error: 'MDSELR_EL1_BANK_BANK_2' undeclared (first use in this function)
+>      119 |                 mdsel_bank = MDSELR_EL1_BANK_BANK_2;
+>          |                              ^~~~~~~~~~~~~~~~~~~~~~
+>>> arch/arm64/kernel/hw_breakpoint.c:122:30: error: 'MDSELR_EL1_BANK_BANK_3' undeclared (first use in this function)
+>      122 |                 mdsel_bank = MDSELR_EL1_BANK_BANK_3;
+>          |                              ^~~~~~~~~~~~~~~~~~~~~~
+>    In file included from arch/arm64/include/asm/cputype.h:226,
+>                     from arch/arm64/include/asm/cache.h:43,
+>                     from include/linux/cache.h:6,
+>                     from include/linux/time.h:5,
+>                     from include/linux/compat.h:10,
+>                     from arch/arm64/kernel/hw_breakpoint.c:12:
+>>> arch/arm64/kernel/hw_breakpoint.c:128:38: error: 'MDSELR_EL1_BANK_SHIFT' undeclared (first use in this function); did you mean 'CSSELR_EL1_InD_SHIFT'?
+>      128 |         write_sysreg_s(mdsel_bank << MDSELR_EL1_BANK_SHIFT, SYS_MDSELR_EL1);
+>          |                                      ^~~~~~~~~~~~~~~~~~~~~
+>    arch/arm64/include/asm/sysreg.h:1168:27: note: in definition of macro 'write_sysreg_s'
+>     1168 |         u64 __val = (u64)(v);                                           \
+>          |                           ^
+>>> arch/arm64/kernel/hw_breakpoint.c:128:61: error: 'SYS_MDSELR_EL1' undeclared (first use in this function); did you mean 'SYS_MDSCR_EL1'?
+>      128 |         write_sysreg_s(mdsel_bank << MDSELR_EL1_BANK_SHIFT, SYS_MDSELR_EL1);
+>          |                                                             ^~~~~~~~~~~~~~
+>    arch/arm64/include/asm/sysreg.h:1169:46: note: in definition of macro 'write_sysreg_s'
+>     1169 |         u32 __maybe_unused __check_r = (u32)(r);                        \
+>          |                                              ^
+> 
+> 
+> vim +/MDSELR_EL1_BANK_BANK_0 +113 arch/arm64/kernel/hw_breakpoint.c
+> 
+>     59	
+>     60	#define READ_WB_REG_CASE(OFF, N, REG, VAL)	\
+>     61		case (OFF + N):				\
+>     62			AARCH64_DBG_READ(N, REG, VAL);	\
+>     63			break
+>     64	
+>     65	#define WRITE_WB_REG_CASE(OFF, N, REG, VAL)	\
+>     66		case (OFF + N):				\
+>     67			AARCH64_DBG_WRITE(N, REG, VAL);	\
+>     68			break
+>     69	
+>     70	#define GEN_READ_WB_REG_CASES(OFF, REG, VAL)	\
+>     71		READ_WB_REG_CASE(OFF,  0, REG, VAL);	\
+>     72		READ_WB_REG_CASE(OFF,  1, REG, VAL);	\
+>     73		READ_WB_REG_CASE(OFF,  2, REG, VAL);	\
+>     74		READ_WB_REG_CASE(OFF,  3, REG, VAL);	\
+>     75		READ_WB_REG_CASE(OFF,  4, REG, VAL);	\
+>     76		READ_WB_REG_CASE(OFF,  5, REG, VAL);	\
+>     77		READ_WB_REG_CASE(OFF,  6, REG, VAL);	\
+>     78		READ_WB_REG_CASE(OFF,  7, REG, VAL);	\
+>     79		READ_WB_REG_CASE(OFF,  8, REG, VAL);	\
+>     80		READ_WB_REG_CASE(OFF,  9, REG, VAL);	\
+>     81		READ_WB_REG_CASE(OFF, 10, REG, VAL);	\
+>     82		READ_WB_REG_CASE(OFF, 11, REG, VAL);	\
+>     83		READ_WB_REG_CASE(OFF, 12, REG, VAL);	\
+>     84		READ_WB_REG_CASE(OFF, 13, REG, VAL);	\
+>     85		READ_WB_REG_CASE(OFF, 14, REG, VAL);	\
+>     86		READ_WB_REG_CASE(OFF, 15, REG, VAL)
+>     87	
+>     88	#define GEN_WRITE_WB_REG_CASES(OFF, REG, VAL)	\
+>     89		WRITE_WB_REG_CASE(OFF,  0, REG, VAL);	\
+>     90		WRITE_WB_REG_CASE(OFF,  1, REG, VAL);	\
+>     91		WRITE_WB_REG_CASE(OFF,  2, REG, VAL);	\
+>     92		WRITE_WB_REG_CASE(OFF,  3, REG, VAL);	\
+>     93		WRITE_WB_REG_CASE(OFF,  4, REG, VAL);	\
+>     94		WRITE_WB_REG_CASE(OFF,  5, REG, VAL);	\
+>     95		WRITE_WB_REG_CASE(OFF,  6, REG, VAL);	\
+>     96		WRITE_WB_REG_CASE(OFF,  7, REG, VAL);	\
+>     97		WRITE_WB_REG_CASE(OFF,  8, REG, VAL);	\
+>     98		WRITE_WB_REG_CASE(OFF,  9, REG, VAL);	\
+>     99		WRITE_WB_REG_CASE(OFF, 10, REG, VAL);	\
+>    100		WRITE_WB_REG_CASE(OFF, 11, REG, VAL);	\
+>    101		WRITE_WB_REG_CASE(OFF, 12, REG, VAL);	\
+>    102		WRITE_WB_REG_CASE(OFF, 13, REG, VAL);	\
+>    103		WRITE_WB_REG_CASE(OFF, 14, REG, VAL);	\
+>    104		WRITE_WB_REG_CASE(OFF, 15, REG, VAL)
+>    105	
+>    106	static int set_bank_index(int n)
+>    107	{
+>    108		int mdsel_bank;
+>    109		int bank = n / 16, index = n % 16;
+>    110	
+>    111		switch (bank) {
+>    112		case 0:
+>  > 113			mdsel_bank = MDSELR_EL1_BANK_BANK_0;
+>    114			break;
+>    115		case 1:
+>  > 116			mdsel_bank = MDSELR_EL1_BANK_BANK_1;
+>    117			break;
+>    118		case 2:
+>  > 119			mdsel_bank = MDSELR_EL1_BANK_BANK_2;
+>    120			break;
+>    121		case 3:
+>  > 122			mdsel_bank = MDSELR_EL1_BANK_BANK_3;
+>    123			break;
+>    124		default:
+>    125			pr_warn("Unknown register bank %d\n", bank);
+>    126		}
+>    127		preempt_disable();
+>  > 128		write_sysreg_s(mdsel_bank << MDSELR_EL1_BANK_SHIFT, SYS_MDSELR_EL1);
+>    129		isb();
+>    130		return index;
+>    131	}
+>    132	
+> 
 
-So if you have massive holes in your IPA space (which we generally do)
-then you wind up revisiting the same invalid PGD entry a bunch of times.
-And TLBI for it too when you have TLBIRANGE.
-
-I'm working on a fix for this too, but what I have right now needs to be
-aggressively de-crapified first.
-
-> > >
-> > > At that point, choosing an MMU that no vCPU is using seems more likely to recycle
-> > > a cold/dead MMU than a soon-to-be-reused MMU.
-> > > 
-> > > And the round-robin approach makes it all heavily luck-based anyways.  E.g. if
-> > > a vCPU puts VTTBR A and then loads VTTBR B, B could recycle A's S2 MMU if that
-> > > MMU slot is next up for recycling.
-> > 
-> > Well, we'll have to agree to disagree. It's a terrible hack to add
-> > artificial ties between a vcpu and TLBs. Because that's what the
-> > shadow MMU is, nothing else.
-> > 
-> > So if you don't like the TLB eviction policy, please come up with a
-> > better one, making sure that a recently preempted vcpu gets its S2 MMU
-> > recycled last. But please don't add the notion of "locked TLBs" to the
-> > mix, because that's a pretty dodgy architectural concept.
-> 
-> Well, I've effectively implemented "locked" TLBs by way of allowing
-> vCPUs to pin an MMU when doing some MMU operation. It's just that the
-> detail gets encoded in the callsite instead of being some general
-> property of MMU assignment.
-> 
-> After fiddling with this a bit more (diff below), I'm actually inclined
-> to go for holding a reference on scheduled out vCPUs *if* we have reason
-> to believe it is gonna do something useful. You get a stable hw_mmu
-> pointer in the places where it matters and can avoid taking the MMU lock
-> for write during vcpu_load() in the 'fast path'.
-> 
-> Still should drop the reference in most other cases, as I do *not* want
-> to entertain vCPUs holding a reference when they've gone out to
-> userspace.
-> 
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index f9e30dd34c7a..df670c14e1c6 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -663,6 +663,13 @@ void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu)
->  
->  void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu)
->  {
-> +	/*
-> +	 * The vCPU kept its reference on the MMU after the last put, keep
-> +	 * rolling with it.
-> +	 */
-> +	if (vcpu->arch.hw_mmu)
-> +		return;
-> +
->  	if (is_hyp_ctxt(vcpu)) {
->  		vcpu->arch.hw_mmu = &vcpu->kvm->arch.mmu;
->  	} else {
-> @@ -674,10 +681,18 @@ void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu)
->  
->  void kvm_vcpu_put_hw_mmu(struct kvm_vcpu *vcpu)
->  {
-> -	if (kvm_is_nested_s2_mmu(vcpu->kvm, vcpu->arch.hw_mmu)) {
-> +	/*
-> +	 * Keep a reference on the associated stage-2 MMU if the vCPU is
-> +	 * scheduling out and not in WFI emulation, suggesting it is likely to
-> +	 * reuse the MMU sometime soon.
-> +	 */
-> +	if (vcpu->scheduled_out && !vcpu_get_flag(vcpu, IN_WFI))
-> +		return;
-> +
-> +	if (kvm_is_nested_s2_mmu(vcpu->kvm, vcpu->arch.hw_mmu))
->  		atomic_dec(&vcpu->arch.hw_mmu->refcnt);
-> -		vcpu->arch.hw_mmu = NULL;
-> -	}
-> +
-> +	vcpu->arch.hw_mmu = NULL;
->  }
->  
->  /*
-> -- 
-> 2.47.0.rc0.187.ge670bccf7e-goog
-> 
-> 
-> -- 
-> Thanks,
-> Oliver
-
--- 
-Thanks,
-Oliver
+This build failure and also the other two on the series here are false positives
+caused by non-availability of used register field definitions which are provided
+via the dependent KVM FEAT_FGT2 FGU series.
