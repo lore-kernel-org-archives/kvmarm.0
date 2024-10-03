@@ -1,243 +1,157 @@
-Received: from EUR02-VI1-obe.outbound.protection.outlook.com (mail-vi1eur02on2061.outbound.protection.outlook.com [40.107.241.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BBD319F42F
-	for <kvmarm@lists.linux.dev>; Thu,  3 Oct 2024 16:26:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.241.61
-ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727972763; cv=fail; b=S+HbnYOqKlje5flf+VKi3M/NFL5mo2AoDW6BhqjeRsc1p8+5JdygZ/r21QqW+5N2asaEkfriQXPmz3iEqjjWQ37sVaZKMHbSv3oGjsULwFeO8gEuyZ6+AmIDJAYQbCTqdcq2Na4sFTrDEbkm7RWUbaIqNiozPpqgn+gY7dATXs8=
-ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727972763; c=relaxed/simple;
-	bh=WWq1RvtrGZKMosG8DoAVsl8KpsVJqgyMTdM2sW9xVI8=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kTAV5K/bH3LuNgzgTCJAR+cv5eoqH7QmK795HKOZx60Ko757HMllOWEkNQvjkYHk7kbTWmj85dnqp0OpvEcGkpM9OTinxnYlCuFZ/6UhRNpQQHR6yFcmQPX8ckHhmGMZ5YFzmlMsi7QmtkJxme2SHApEq1ZwQ38etgMiQo60ltU=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=T729HnV1; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=T729HnV1; arc=fail smtp.client-ip=40.107.241.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A5861779A5
+	for <kvmarm@lists.linux.dev>; Thu,  3 Oct 2024 16:45:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1727973944; cv=none; b=eM1uLbNMF7jqpt3SKo6ynFcYB0ttD2rPDNxNAvMNKpd5bdQXdZwGUhX5aC4a6YZ6h8K7b8TrXTL/lapZ5X5sJFL/OKr082/mJkB/0Cbz6a14UW8oLG6DvEisawQ8H3gv/VFf6XrsV4V0syA2+5jPuE1o5PDCTccawAeQx0AZ89E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1727973944; c=relaxed/simple;
+	bh=wk9V0Mtzbg8KE2zjSWEnXkYHnOXtRr0v8qPxIZPtLC0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=iywh+sNmO56/xZZmras8yDUvaNPgH0BOY9zoi0U4bDKucrDIq4q3AWvaz6TpXbdfGtnB5Uk5lmSFxcUxzKssPDjz79dF+i0XzEOLMGms4FVLEhTKgLr+FyxJqqvbvLY8NbiVQFBXBkV2cPczySd82vk4X8553esNVQzguiKBHDM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yEzr1SbG; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="T729HnV1";
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="T729HnV1"
-ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
- b=sp/u15pPej/NdsyK/CRynHGKyk5z7+EE2J2am0vlOm3ZxBa9P1RoRVH9ec3iBokzt4E73gw/wxs+plq96g5qZLGO0BLxxZ+W0mP7BQA8F9tJH6IlxNysOXPQdr4V4Pa7RW2zTad3lLKqBWr47VaeIjJ53zB78zoH9r+Ivbjbk8QyBZat8GSJT1WCblT92USKNpwmsDCqAE7abE6UT8KctC+OPpSbKMeQ7JQ0q2dZpYTmQMXxdj9HsDGPKTMpp1XlOdsWa5P644/JdZNMrAk06nJ/tuWi9iEzvKYsOFFtYyawL8zWBrpGTIfJYab5e3n9/3lDJMo+7jVH46VnLsncaQ==
-ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Y8bUP8pfbQz6muJqZlHMDu2399IoR6iXiLCJQPxtKjs=;
- b=iQ1n9WHB8053wPhdgVmQ/fNS1kkOo6i5yEmkQQ1M/u9TMqv+c7c5n0Zl20PaB1Q2KwddB/2omxoewo8cZTTgoJPF5DcuipQp0YIduSP/+7dAZ6075cIYcy3nyoknj4o1H69BTQOyLXa2KDo8sTGZq7p7pOk9TGomQBP7TqeJmkHx1CP3zT4qGpbgcDEVj8+Y9po1hZhA4PYFsVuou30iYBeq9o506NrHpzefTIv5rX0F47cX1PRqR6qI+6zlVen+9Ef4RVakw7P4wv6CzG+56vKIWS5y0SDcXYr1oEyjBtOhZAxmdxvOLjJuawT4/9Njr3v+M0825hIZ8vZ5AlDnNQ==
-ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
- 63.35.35.123) smtp.rcpttodomain=lists.linux.dev smtp.mailfrom=arm.com;
- dmarc=pass (p=none sp=none pct=100) action=none header.from=arm.com;
- dkim=pass (signature was verified) header.d=arm.com; arc=pass (0 oda=1 ltdi=1
- spf=[1,1,smtp.mailfrom=arm.com] dmarc=[1,1,header.from=arm.com])
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Y8bUP8pfbQz6muJqZlHMDu2399IoR6iXiLCJQPxtKjs=;
- b=T729HnV1d3YzZSFdybokhO/nxZhmgfEhNbWvg2OlXUtyjkCBEfRQ6CYUkn5AaP6RuixBBkAS9odU729qi4yu4QAvmiW//FvnKJVT3Z81KR+XGhQyptQi/FnucB22sX+/wTn0vILAXGjyf8zbudF/tMbE74UYcDs1v+A8SHTaUK0=
-Received: from DB3PR06CA0021.eurprd06.prod.outlook.com (2603:10a6:8:1::34) by
- PA6PR08MB10527.eurprd08.prod.outlook.com (2603:10a6:102:3d0::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8026.16; Thu, 3 Oct
- 2024 16:25:55 +0000
-Received: from DU6PEPF00009524.eurprd02.prod.outlook.com
- (2603:10a6:8:1:cafe::a0) by DB3PR06CA0021.outlook.office365.com
- (2603:10a6:8:1::34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8026.17 via Frontend
- Transport; Thu, 3 Oct 2024 16:25:55 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 63.35.35.123)
- smtp.mailfrom=arm.com; dkim=pass (signature was verified)
- header.d=arm.com;dmarc=pass action=none header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 63.35.35.123 as permitted sender) receiver=protection.outlook.com;
- client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
- pr=C
-Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
- DU6PEPF00009524.mail.protection.outlook.com (10.167.8.5) with Microsoft SMTP
- Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.8026.11 via
- Frontend Transport; Thu, 3 Oct 2024 16:25:55 +0000
-Received: ("Tessian outbound bcce15e2414a:v473"); Thu, 03 Oct 2024 16:25:54 +0000
-X-CheckRecipientChecked: true
-X-CR-MTA-CID: 4e90799dea60ef9e
-X-TessianGatewayMetadata: IF406E2NVOIFiXRMbuixlvdY0LfJgZR9AMmShAAlmhttGJfQeAYOYSCbZhYh2Ti+nmHbQBBe3HifxkkepticuSgFiZA2+glvO/u55hPCMAJrqK/14zh7nhcimx+xz18rBvCOz384enzWSWLP3e8yjw==
-X-CR-MTA-TID: 64aa7808
-Received: from L6f6aa0bf32e9.1
-	by 64aa7808-outbound-1.mta.getcheckrecipient.com id 7644A89E-DC81-43F0-9876-09150D533089.1;
-	Thu, 03 Oct 2024 16:25:48 +0000
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com
-    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id L6f6aa0bf32e9.1
-    (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
-    Thu, 03 Oct 2024 16:25:47 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=PUbYYsWhR5PBnawqSnkZON6nMJr9GqcHbnEjrZJLcKGaF52TVkVnWDPkcMqfp5ZWEoEIXamTJaJde1fdOKunjuqxUjWMrEsjCrHG7hu23VFS7UKKSkGwFaLHJqw+Lwo/JkikJLuDRWk14yraZz3jDAUWIe8QqJMnj0j18OOOkNTvfLXjmrkY7h42dQk235sYIJ2r9GN+AlK+1BiSSBWwHMb2d5tAMS7XzCnHGnbE/cu4u35hyKmZiiWMyDlStzqcyKLt50bK1PjJ0Cv4R8Oq7WvZByxkMCkmuzoqZ9pLsQfXAQBk7xxGMOglbf1hMjCwf2uFyx9+eRWiQrzpiU5akw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Y8bUP8pfbQz6muJqZlHMDu2399IoR6iXiLCJQPxtKjs=;
- b=ERsQT13DCust0Y//m7n3jtK1gDMcshDsRCtA8cIMPJ5Z0PKVDJY5f3vvtjUrSsPAg2FJxmDSLDYLsGlEXfAROBAi1k2ys7nlv/6/yd2FQ7+HXNC4oA8c8SKGLC5FS7bT0AyMlaHN2Fuln9aPpzmXKbhRdJCaXsidQYkz7M0VNR6yZkYzajA5pv3TPseVy2DR6uGl79y6pP5XVV9x1FWEmt7hQ5xLIE/VvwmUE2xiMksaOkyg90VNmvGiHXsOwZ59e/8iYvF/PXyDCCmtIwSeWderOgQsW2F0/9eD4MtX+HAuVk0xBja8R0rtIYdOdz9L5aTDviroRPySbBhc24I+8A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 40.67.248.234) smtp.rcpttodomain=kernel.org smtp.mailfrom=arm.com; dmarc=pass
- (p=none sp=none pct=100) action=none header.from=arm.com; dkim=none (message
- not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Y8bUP8pfbQz6muJqZlHMDu2399IoR6iXiLCJQPxtKjs=;
- b=T729HnV1d3YzZSFdybokhO/nxZhmgfEhNbWvg2OlXUtyjkCBEfRQ6CYUkn5AaP6RuixBBkAS9odU729qi4yu4QAvmiW//FvnKJVT3Z81KR+XGhQyptQi/FnucB22sX+/wTn0vILAXGjyf8zbudF/tMbE74UYcDs1v+A8SHTaUK0=
-Received: from AM0PR08CA0004.eurprd08.prod.outlook.com (2603:10a6:208:d2::17)
- by DBBPR08MB10507.eurprd08.prod.outlook.com (2603:10a6:10:53a::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8026.16; Thu, 3 Oct
- 2024 16:25:42 +0000
-Received: from AMS0EPF000001B6.eurprd05.prod.outlook.com
- (2603:10a6:208:d2:cafe::64) by AM0PR08CA0004.outlook.office365.com
- (2603:10a6:208:d2::17) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8026.17 via Frontend
- Transport; Thu, 3 Oct 2024 16:25:42 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 40.67.248.234)
- smtp.mailfrom=arm.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 40.67.248.234 as permitted sender) receiver=protection.outlook.com;
- client-ip=40.67.248.234; helo=nebula.arm.com; pr=C
-Received: from nebula.arm.com (40.67.248.234) by
- AMS0EPF000001B6.mail.protection.outlook.com (10.167.16.170) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7918.13 via Frontend Transport; Thu, 3 Oct 2024 16:25:42 +0000
-Received: from AZ-NEU-EX03.Arm.com (10.251.24.31) by AZ-NEU-EX04.Arm.com
- (10.251.24.32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 3 Oct
- 2024 16:25:41 +0000
-Received: from arm.com (10.1.26.195) by mail.arm.com (10.251.24.31) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39 via Frontend
- Transport; Thu, 3 Oct 2024 16:25:40 +0000
-Date: Thu, 3 Oct 2024 17:25:39 +0100
-From: Yury Khrustalev <yury.khrustalev@arm.com>
-To: Mark Brown <broonie@kernel.org>
-CC: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>, Andrew Morton <akpm@linux-foundation.org>,
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, "James
- Morse" <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
-	"Arnd Bergmann" <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>, Eric
- Biederman <ebiederm@xmission.com>, Shuah Khan <shuah@kernel.org>, "Rick P.
- Edgecombe" <rick.p.edgecombe@intel.com>, Deepak Gupta <debug@rivosinc.com>,
-	"Ard Biesheuvel" <ardb@kernel.org>, Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-	"Kees Cook" <kees@kernel.org>, "H.J. Lu" <hjl.tools@gmail.com>, Paul Walmsley
-	<paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou
-	<aou@eecs.berkeley.edu>, Florian Weimer <fweimer@redhat.com>, "Christian
- Brauner" <brauner@kernel.org>, Thiago Jung Bauermann
-	<thiago.bauermann@linaro.org>, Ross Burton <ross.burton@arm.com>, "David
- Spickett" <david.spickett@arm.com>, Wilco Dijkstra <wilco.dijkstra@arm.com>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-doc@vger.kernel.org>,
-	<kvmarm@lists.linux.dev>, <linux-fsdevel@vger.kernel.org>,
-	<linux-arch@vger.kernel.org>, <linux-mm@kvack.org>,
-	<linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-riscv@lists.infradead.org>
-Subject: Re: [PATCH v13 18/40] arm64/hwcap: Add hwcap for GCS
-Message-ID: <Zv7Fg7BkP18O9CdS@arm.com>
-References: <20241001-arm64-gcs-v13-0-222b78d87eee@kernel.org>
- <20241001-arm64-gcs-v13-18-222b78d87eee@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yEzr1SbG"
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6e278b2a5c4so21287857b3.2
+        for <kvmarm@lists.linux.dev>; Thu, 03 Oct 2024 09:45:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1727973942; x=1728578742; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=04mzxfGmXyJ4MT+Ke78VUtxlKFsv2NVMG3lAKc3ZGPY=;
+        b=yEzr1SbGhxouwjV0JkkGXZCuNfWaowWt+i0IQ0Q5wa17CwXiGMsFOwI7snraFhntvN
+         Hyoow/uN3hodTZ2jwCYZxLJ4mUYBhd3ANodtI+psdGZRINv9tTDZER6QK2B4ePVoL8jW
+         ZvHYKHf3CpNVqJElhVcK6+X1oRKpovdcAsWLIUECj/a/FF0UBCTMKbqoaWYQc8tV56D1
+         iuGn1BPIounXX4DVtv2J2M24UysnycZeciCbI0GuNkIdpwfygHv5u8l5HvH8LNpel4DN
+         ZG8BT0pqJ2F6FH/1nIYsJrBC5cxX/Mq1+1MXAFNQJtqU0szvO+ZFbGX5Dr6QXudHOPDj
+         wOJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727973942; x=1728578742;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=04mzxfGmXyJ4MT+Ke78VUtxlKFsv2NVMG3lAKc3ZGPY=;
+        b=vANVM5dM/8E3E9B9jQoSzPEy2AZxF2r9UhbNwElXxYjcycP15PP2CpbmseMRbqgpGs
+         2xGzpcjFgrFNlTDs8GQzLodeEIBwtmy6qgjQcEypjF07Pptdv+oiPAaZJwnLbDjOKZvD
+         1n9iNxacU925C7Jz0lvO3lvTAJA/GyHZOU6sfZAQ2ovGR42Wsybg3KB0Wm51DKQYv4IX
+         KCtoveubTOSIPiNumtn/KaWtJIkAxmYVNb48lhQ6aieHKIMFSvn7YkKmZF65rIFq5OuH
+         tMv54GetJFvrxcEhWQO+apBct4/Q4ZBF/b8p5QMTJRKqp6Tdp3xuUq3tGQqQ287aSgwK
+         ZR/w==
+X-Forwarded-Encrypted: i=1; AJvYcCX/KUTV4JaaU7M2+mAQPe7aNydZ0/XX/7uWvDXpZvsgMgWez48HhzPxz4fITNhyxroiR6SkUmA=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyrZ7BWYSW8X4tdZClXmgpIJ1VNhQLYo9xcBuT+8fev/ZBfwHZI
+	Ji1MO9Zkc5eBisbasURrZ6JwMtdg0xrGrnc4rM5fS4jXKE2zqrvFExOPOl8V+oofgsn0PPxjnL1
+	PHg==
+X-Google-Smtp-Source: AGHT+IGDZSwW96xge+RMgP0cpWWM9mcSzylTfeYpcdzKxjsPSn/L9lANYgFFFnWLVM7i93X60jjDGBWA6GE=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:6ac8:b0:6e2:2600:ed65 with SMTP id
+ 00721157ae682-6e2a2ad8e5fmr1248917b3.1.1727973941957; Thu, 03 Oct 2024
+ 09:45:41 -0700 (PDT)
+Date: Thu, 3 Oct 2024 09:45:40 -0700
+In-Reply-To: <Zv3hgOhjaQGAuIOG@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
+Mime-Version: 1.0
+References: <20241001001709.1303668-4-oliver.upton@linux.dev>
+ <ZvxH3el9SNuNWwi8@google.com> <ZvxeeVn8LphHxWeS@linux.dev>
+ <ZvyFkqsRFBAYwqP7@google.com> <86cykj75a0.wl-maz@kernel.org>
+ <ZvyOcnZqNzfD7MZx@linux.dev> <ZvySjfDWOhl2O1IA@google.com>
+ <865xqa6q0a.wl-maz@kernel.org> <Zv3fcT9lCSujib7J@linux.dev> <Zv3hgOhjaQGAuIOG@linux.dev>
+Message-ID: <Zv7KNFX4Mykff6I5@google.com>
+Subject: Re: [PATCH 3/3] KVM: arm64: nv: Punt stage-2 recycling to a vCPU request
+From: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>
 Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20241001-arm64-gcs-v13-18-222b78d87eee@kernel.org>
-X-EOPAttributedMessage: 1
-X-MS-TrafficTypeDiagnostic:
-	AMS0EPF000001B6:EE_|DBBPR08MB10507:EE_|DU6PEPF00009524:EE_|PA6PR08MB10527:EE_
-X-MS-Office365-Filtering-Correlation-Id: ca88ebcf-39f9-4892-0ba4-08dce3c80e81
-x-checkrecipientrouted: true
-NoDisclaimer: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted:
- BCL:0;ARA:13230040|376014|7416014|82310400026|36860700013|1800799024;
-X-Microsoft-Antispam-Message-Info-Original:
- =?us-ascii?Q?hP7p46UKxp2ySWE7jzcxYuYBJyVfWkRIHtdnwgcT7nr9bz2ll6nBMdoMjbq9?=
- =?us-ascii?Q?YqVp0YJy0qN3B6jzG1STi2rJInulzOOVt4/i6gG9qkEiUYs3VzFVmpPE+Kjl?=
- =?us-ascii?Q?Hx9TpAz1ynXEOskGxvbL9drKSNHhBCufatzPSoZS12JtA4xH+if9s96jGZE2?=
- =?us-ascii?Q?fd8L72ji/xuOU8xSFWWLhcUmeOSmqgav/vJXDhwWyOrqo4UoRi9vsvglQbZH?=
- =?us-ascii?Q?AqnvGsl8v0bUvPVxZ7FMJrhi67XMDt47S1MrKAAQuoRmpqIN832ErUosaKed?=
- =?us-ascii?Q?vDmMVsFY0QTNSXP9AIutjvaXVsiiOMWqJl9O1J8qIjrF8erHU8r5gDm9rjsD?=
- =?us-ascii?Q?m7RUcCW4UxhflJHaTauojOT8z9dnTo95meT5cIesTwFi0rQi+1ZEEF3vvKnj?=
- =?us-ascii?Q?SFqJzkOb9E4VG93ibkGGj8ovPfvu4Mc+RauauueiqMDSzFAwijGE6G1VdgH4?=
- =?us-ascii?Q?sxTPGDIyfnuciiPIK8Onav3hWWg+F+X6K3A3WyefZFCPh5oKy3OjqcRjEV9Z?=
- =?us-ascii?Q?f+/Tw9KM4F/9Wtsot8atK7sEy3mUB/kWkVv2WkAbz5g9JWr/PZ0rYpc555pw?=
- =?us-ascii?Q?kF5BBfJXLjegRwx132AJ1Vqc+2mF7WQ8BOfN6jk7bYcufPTe1LFApOxkFA9y?=
- =?us-ascii?Q?Nk3DM7zIfG0iGZZ0Rl3KwL7YGGDA7Z8LRu6SarhMUJ76DmIeLwiFQ54XwpD8?=
- =?us-ascii?Q?WhwMrN5JIqnItB32YhENIhkNaBhGAXpjgxmzTPM0uQakM11cns2Np7sJDMz8?=
- =?us-ascii?Q?2zJXbd4Andy4M4pA+OBUB9OK+XOVh3e18iQ1VG62vTxqlefJKKlNwWaxDXu4?=
- =?us-ascii?Q?h25vb25ucxIeJ8PF8iJ557J7l6OKMic7syjarHpywFkzhA9iXy74vKm1tWLT?=
- =?us-ascii?Q?55pHIrqOGrB+YZk7kYpJgN55WcH8+Ju02MxUFNDChfCC9UY/LIH5DelgBF9j?=
- =?us-ascii?Q?IZJloaTyPdWPYJm76MWMB6Rox7Dzg5vwExWk3eNZidtBiun88dpckOAZDTxQ?=
- =?us-ascii?Q?2SjESxrYPGfYDW09LCtrnB5YHC7YvqpGqZrpeEJ6yOuieCProFKyhLWCZBof?=
- =?us-ascii?Q?118hsuPMQnfnIQWJwAJ2k7isM/kha03nIvnSn3T5PL5J2D+zRj1bzJOFbZVa?=
- =?us-ascii?Q?hs5irVxunnI9Lq+fq8AfyarXjKeP8HL55fcDbYdjwQGw3G5wqyymjc71W1o5?=
- =?us-ascii?Q?S4G9llEvkIi8THCwHPKT08KimIOtPF1iy8gmXeSWE5UulZ7Bp+TvTIY6dOYC?=
- =?us-ascii?Q?Z4pjduByNtVopwI0vtRN/D+3P2RvaubuNfQquzF0fGEQTRCmogGfm3Fea2s7?=
- =?us-ascii?Q?DE0vV3wy9PjCqyCx4PVfhqQ5JeL/1BfVdyTJxKyQSxhVQ8ZOO5dE6RngAf8Z?=
- =?us-ascii?Q?kD9u/LBBpU7pX/4/985bZ9RVqo9F?=
-X-Forefront-Antispam-Report-Untrusted:
- CIP:40.67.248.234;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:nebula.arm.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(7416014)(82310400026)(36860700013)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR08MB10507
-X-MS-Exchange-SkipListedInternetSender:
- ip=[2603:10a6:208:d2::17];domain=AM0PR08CA0004.eurprd08.prod.outlook.com
-X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- DU6PEPF00009524.eurprd02.prod.outlook.com
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	2d6d03c8-dddd-40be-a3b0-08dce3c806bf
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|35042699022|82310400026|376014|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?OoYjNa2mLjT3j4QKN7t5ZZ+E1QWHmzACXzWjbMNY56DWWEP1qQkxcFOSkILg?=
- =?us-ascii?Q?azTOYbI0lSCkqJotLXY4cA23NvyH6q/+yxrtEPPWTf5Y+smB13hjD3RLDvr+?=
- =?us-ascii?Q?ruUeboJXfkcKyFogTEgsdVkUTupgWjBnZN4AoF8VCvFvGH8UqkA+g3eD0utT?=
- =?us-ascii?Q?jN23ShvAufBbaSC4M+2ur9MWXC1Yu5sqYqwq/DQn6Wy4ZrUWNXMZCBfW3yAy?=
- =?us-ascii?Q?/nMBPEk9yDlYTGDTP2fi/FrTHlJOhMhbiDDgaD/D6JbdvEMnXurb/MQDpVwh?=
- =?us-ascii?Q?xJI/JlNJ0uMKOJWhFvg57fOORWVkHE5BrvyHsvOfIEmEkgo5/l4yWpoaincZ?=
- =?us-ascii?Q?i4v3YgifZVjbUaOvddHisUZKYSjI/QAWJ9fmQf80wsCgdqOap6vWgb4Q+/D8?=
- =?us-ascii?Q?ENa/2mn/gtnUhEZD+sXyl84tzsZCqzSxAyEYUkVR5rIVDALtBZtU3enQ6RoP?=
- =?us-ascii?Q?gvOuBlYjWNT+HABSFxS09t0ba8wSG7edjHMqToKY+jpV0EyAWwdixrKP4Gcj?=
- =?us-ascii?Q?s6mVk2Ku2HusUFFQzI9oLrIx8dYF6MRXfs/3vegN+8iLUL5zcpcB13p0LfPO?=
- =?us-ascii?Q?iYekOsZDMsgdGwVpHQ1EyEIsxCU6dKtp+T3Zy78d/GgDnTBcwDWiVNcJa5GJ?=
- =?us-ascii?Q?OogiDo4z8tLzS24bkHe4PGNKwJgy4xDSFHDCcHaXkRlJ0EPMC1NZ15za9LoK?=
- =?us-ascii?Q?owM+Pdil5jbNT/w4CSCMJ69K5k7FFm4bZn3Mq6cAuj0vkKBcXp4VWifegpti?=
- =?us-ascii?Q?72OfOevhuA90C2ov+R9VUi6KVs/p/5aXECvK86lmQjx4IGJ+L9P/Hpl53p40?=
- =?us-ascii?Q?l1/ffT6ceB2HPB0thkl2JVf8NG65RifTGWnkQa0Qm2VugvHLGlwbxY+uF7eP?=
- =?us-ascii?Q?+tJ+DSY0HGfsOZVsB1h7OYOA7DVwBMeV1t3M4FLINa/F9idA/d/HhF8wDkmC?=
- =?us-ascii?Q?3iwr6YT8+13hvJo/Mj3SmVof8n1fkj7uSv3BUWKzEAon1uIM3T0hzM5v3cLq?=
- =?us-ascii?Q?0+AvLBC20HvEHY9CmewTCfOA6f4Ys+zObtPf1QvpSv+XveTpEeYt9ptjlKtl?=
- =?us-ascii?Q?ox9ObxPFt5jkj5Qu2GS6NKeFb4jAy+mrG4c3MtQSeZUpHItDhzVqdVCFC9T0?=
- =?us-ascii?Q?1sIFwgYqNq7BPTxbKT6cB+LonCm2No3jIWPueYT8Wn2ZtDvyJdUH6lFNiuBD?=
- =?us-ascii?Q?Nc+mogwg61hTcPwqt6/f52QhDxws4fuiwHDwx74eUlOFEQpk5rZg9yX8sDE7?=
- =?us-ascii?Q?9GvuFM9H4okoyy5WZ8ieLSMkCYy6Jou351cZZV4LOJD+Y6+0I1RmlM8geFYx?=
- =?us-ascii?Q?rKc4bDF1W/uwPZ2hrhqocKawZVCFACK2otaPFKQoX6EwwO8uHzdknU2vZ47J?=
- =?us-ascii?Q?32zqYqXosQMPWJ3ZHPohU+B/+ntA?=
-X-Forefront-Antispam-Report:
-	CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFS:(13230040)(1800799024)(35042699022)(82310400026)(376014)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Oct 2024 16:25:55.5132
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ca88ebcf-39f9-4892-0ba4-08dce3c80e81
-X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[63.35.35.123];Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DU6PEPF00009524.eurprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA6PR08MB10527
 
-On Tue, Oct 01, 2024 at 11:58:57PM +0100, Mark Brown wrote:
-> Provide a hwcap to enable userspace to detect support for GCS.
+On Thu, Oct 03, 2024, Oliver Upton wrote:
+> On Thu, Oct 03, 2024 at 12:04:06AM +0000, Oliver Upton wrote:
+> > Hey,
+> > 
+> > On Thu, Oct 03, 2024 at 12:31:33AM +0100, Marc Zyngier wrote:
+> > > On Wed, 02 Oct 2024 01:23:41 +0100, Sean Christopherson <seanjc@google.com> wrote:
+> > > > IIUC, KVM round-robins across 2*nr_vcpus MMUs, and when L1 switches to a different
+> > > > VTTBR, it will first drop its reference to the previous MMU.  So at any given time,
+> > > > there are nr_vcpus worth of unused MMUs, i.e. a vCPU is guaranteed to be able to
+> > > > find an unused slot, even if vCPUs that are scheduled out hold onto their S2 MMU
+> > > > reference.
+> > > 
+> > > It's not about not finding a slot, but about making sure that vcpus
+> > > that context switch rapidly between VTTBRs for their own guests can do
+> > > so freely without sacrificing the TLBs they have just produced. Not
+> > > reusing the TLBs hogged by a vcpu that cannot run is a waste of
+> > > resource.
+
+I don't think it's a complete waste.  There's value in not having to unmap and
+rebuild an S2 MMU that is likely to be reused in the near future, especially for
+a vCPU that was preempted.  E.g. the preempted L2 vCPU is already going to
+experience some amount of jitter, forcing it to recycle a different S2 MMU and
+then rebuild its S2 MMU is going to exacerbate the jitter.
+
+Jitter aside, for a well-behaved system, it's unlikely a vCPU in the same VM will
+be able to switch between L2s (VTTBRs) so fast that it would be a net positive to
+recycle the TLB/MMU of a VTTBR that is "active", but scheduled out.  E.g. if the
+L0 scheduler doesn't give the scheduled out vCPU a time slice "soon", then the L1
+VM is going to be quite unhappy.
+
+> > OTOH, our global TLBs don't model hardware exactly since a vCPU doing
+> > rapid context switches trash the TLBs of *all* vCPUs in the system.
+> > The cost of reusing an MMU is quite noticeable, since our unmap
+> > implementation is slightly crap at the moment, the cost of which shows
+> > up both on sides of the reclaim (victim and user).
 > 
-> Signed-off-by: Mark Brown <broonie@kernel.org>
->  #define HWCAP_PACA		(1 << 30)
->  #define HWCAP_PACG		(1UL << 31)
-> +#define HWCAP_GCS		(1UL << 32)
->
+> Oh, and why unmap is crap:
 
-Acked-by: Yury Khrustalev <yury.khrustalev@arm.com>
+Heh, isn't unmap by definition crap?  If KVM needs to unmap and rebuild an S2 MMU,
+then KVM is already in a slow, sub-optimal situation.  I'm not saying unmap and
+rebuild shouldn't be optimized as much as possible, just that weighting heavily
+twoards avoiding unmap+rebuild will likely yield better overall performance and
+experience, even if it means holding references across certain boundaries.
 
+> > > > At that point, choosing an MMU that no vCPU is using seems more likely to recycle
+> > > > a cold/dead MMU than a soon-to-be-reused MMU.
+> > > > 
+> > > > And the round-robin approach makes it all heavily luck-based anyways.  E.g. if
+> > > > a vCPU puts VTTBR A and then loads VTTBR B, B could recycle A's S2 MMU if that
+> > > > MMU slot is next up for recycling.
+> > > 
+> > > Well, we'll have to agree to disagree. It's a terrible hack to add
+> > > artificial ties between a vcpu and TLBs.
+
+But those ties already exist, in that nested_mmus_size scales with the number of
+L1 vCPUs.
+ 
+> > Still should drop the reference in most other cases, as I do *not* want
+> > to entertain vCPUs holding a reference when they've gone out to
+> > userspace.
+
+Why not?  The vCPU is still running, keeping its S2 MMU resident is desirable, no?
+It's extremely unlikely userspace will terminate or refuse to run the vCPU unless
+the entire L1 VM is doomed.
+
+Similarly, if an L1 vCPU is running multiple L2s, i.e. multiple VTTBRs, then it's
+desirable to keep references to multiple S2 MMUs as well, e.g. so that switching
+between two VTTBRs is guaranteed to get a cache hit on both.
+
+Essentially all I'm suggesting is that instead of having a common pool of 2*vCPUs
+TLBs per L1 VMM, have 2 (or however many) TLBs per L1 vCPU, plus maybe N extra
+TLBs per L1 VMM.  I.e. mimic the hierarchical design of hardware caches and TLBs
+to some extent.
+
+vCPUs can still spill past their dedicated 2 TLBs, e.g. if L1 is only running L2s
+in a subset of vCPUs.  Yeah, there will be wasted memory if a vCPU stops running
+L2s, as KVM won't know when to drop references to its VTTBRs.  But that's a very
+manageable problem (though definitely something for the future), e.g. by detecting
+effective TLB pressure and requesting vCPUs to drop references to VTTBRs that
+aren't actively being used, or by dropping references if the VM clobbers the
+associated stage-2 PTEs that are being shadowed (i.e. if L1 is no longer using
+that memory for page tables).
+
+I'm not suggesting an overhaul to fix the preemption bug, but I do think that
+effectively acquiring references on-demand is an unnecessarily complex solution.
