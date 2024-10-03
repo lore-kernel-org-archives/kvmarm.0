@@ -1,51 +1,67 @@
-Received: from out-175.mta0.migadu.com (out-175.mta0.migadu.com [91.218.175.175])
+Received: from fgw21-7.mail.saunalahti.fi (fgw21-7.mail.saunalahti.fi [62.142.5.82])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E291B1B0128
-	for <kvmarm@lists.linux.dev>; Thu,  3 Oct 2024 22:03:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADA5A1AC89A
+	for <kvmarm@lists.linux.dev>; Thu,  3 Oct 2024 22:33:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.142.5.82
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727992995; cv=none; b=lpwBSqZizcIIwtMxFNbBndnKJnXb36OlPtrNLLVHiljhsC3x1CPq3snzFLJ3SmTDQHoUMFkoyTjrISvbxBRb8HNs/NBsJSIbrixBFhLJ/HqBfrn89kUmtvUsI4zh5PjtPMvNV0zvCu2P/gHlM5DIGi2xjLVzSV/3AMvNqgZYrDM=
+	t=1727994806; cv=none; b=C/A9BqAyg6+d72eqUb+eo1JELmm0DReJwUjlMUyJa1ZikxYQAMH4l5SAxZMVdysSKzMqgOkdVGDId5TKESWOOCvCmO59W5D+XMhx5N7VsUXOl9BflT71pmYv1e2oTWIRALwcxVw36S519IV4UiLIn8KftX5LX1yIAHxP95V4XzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727992995; c=relaxed/simple;
-	bh=+lTvyA/52YqlDRDE+Duq7tIHKJoAz1lKasl1XJEMpEc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n1Hh9jdH9LWGs4biLbmXvjWGOqYuAtYvV0D0FpNRyjXYkt2n4BkiUgYUnH0pN9BJemSZQjBRxtEOXdsU7XbC+CqKwRkZANDOINTb6kVlwP31wQbbToWPZgYjJTM24+hGR+4a+Yk8InbiHH098sfqoEpYagBkMMKiDqNjSU6/DB4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mxr+SL3F; arc=none smtp.client-ip=91.218.175.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mxr+SL3F"
-Date: Thu, 3 Oct 2024 15:03:04 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1727992989;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xrRurHdEImnrmwD+VXbixWPyqn6Q045pXhmaqABhGYc=;
-	b=mxr+SL3FtlaFk9dXEBtud3uYcrtHW+sWJAogY4eociNU4hmsGS2KYjWnmnaEQqKa1bnd2a
-	bqd57FBj0OfADbpxlERzxfZn2j5bjP+mHwehz0rs/bMVlOSUCzGL3fkeb3pVx8wxZxn8Ws
-	HP6gYKZXjdr3P1U2NWQcaRFp3VE2L20=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-	Joey Gouly <joey.gouly@arm.com>,
+	s=arc-20240116; t=1727994806; c=relaxed/simple;
+	bh=9pOyjIY2Fu8sZWJ+h9Hhks0ngUMcydTiz+NvzoER/+Y=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hycSzto39WyLtOQUEt3e5B2gJ6cSJQnXWG1NzrCEUhEWuOTY0dVmgETD6VeYIqkOB8Ck691VUA38QVai4PHXeaUShMNOynwmoH4DYpvbc6uwZ725TLN0XhVg4Dz7JJTaLqIP8uHDcRm54rxz0uceBykHxZVX1/rDJP4eHjIenkg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com; spf=fail smtp.mailfrom=gmail.com; arc=none smtp.client-ip=62.142.5.82
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=gmail.com
+Received: from localhost (88-113-25-87.elisa-laajakaista.fi [88.113.25.87])
+	by fgw20.mail.saunalahti.fi (Halon) with ESMTP
+	id 6ccef329-81d7-11ef-995b-005056bd6ce9;
+	Fri, 04 Oct 2024 01:32:55 +0300 (EEST)
+From: Andy Shevchenko <andy.shevchenko@gmail.com>
+Date: Fri, 4 Oct 2024 01:32:50 +0300
+To: Daniel Gomez <da.gomez@samsung.com>
+Cc: Masahiro Yamada <masahiroy@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nicolas@fjasle.eu>,
+	Lucas De Marchi <lucas.demarchi@intel.com>,
+	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	David Airlie <airlied@gmail.com>,
+	William Hubbs <w.d.hubbs@gmail.com>,
+	Chris Brannon <chris@the-brannons.com>,
+	Kirk Reiser <kirk@reisers.ca>,
+	Samuel Thibault <samuel.thibault@ens-lyon.org>,
+	Paul Moore <paul@paul-moore.com>,
+	Stephen Smalley <stephen.smalley.work@gmail.com>,
+	Ondrej Mosnacek <omosnace@redhat.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 3/3] KVM: arm64: nv: Punt stage-2 recycling to a vCPU
- request
-Message-ID: <Zv8UmMfXOqT2A9_A@linux.dev>
-References: <ZvyFkqsRFBAYwqP7@google.com>
- <86cykj75a0.wl-maz@kernel.org>
- <ZvyOcnZqNzfD7MZx@linux.dev>
- <ZvySjfDWOhl2O1IA@google.com>
- <865xqa6q0a.wl-maz@kernel.org>
- <Zv3fcT9lCSujib7J@linux.dev>
- <Zv3hgOhjaQGAuIOG@linux.dev>
- <Zv7KNFX4Mykff6I5@google.com>
- <Zv7Z4D0L3bnxJi8h@linux.dev>
- <Zv7hKD_6Pvhg4ULY@google.com>
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jirislaby@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Simona Vetter <simona.vetter@ffwll.ch>,
+	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
+	intel-xe@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+	speakup@linux-speakup.org, selinux@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-serial@vger.kernel.org, llvm@lists.linux.dev,
+	Finn Behrens <me@kloenk.dev>,
+	"Daniel Gomez (Samsung)" <d+samsung@kruces.com>,
+	gost.dev@samsung.com
+Subject: Re: [PATCH v2 2/8] file2alias: fix uuid_t definitions for macos
+Message-ID: <Zv8bkoJA5oDIe6If@surfacebook.localdomain>
+References: <20240906-macos-build-support-v2-0-06beff418848@samsung.com>
+ <20240906-macos-build-support-v2-2-06beff418848@samsung.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -54,82 +70,46 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Zv7hKD_6Pvhg4ULY@google.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20240906-macos-build-support-v2-2-06beff418848@samsung.com>
 
-On Thu, Oct 03, 2024 at 11:23:36AM -0700, Sean Christopherson wrote:
-> > > Why not?  The vCPU is still running, keeping its S2 MMU resident is desirable, no?
-> > 
-> > How could we possibly know what the intent of userspace is? The VMM
-> > could just as well throw that vCPU fd on ice for an eternity.
-> > 
-> > For example, you could have a PSCI implementation that lives in
-> > userspace. Guest does CPU_OFF and the VMM decides to terminate the
-> > backing thread and keep the FD around for the next CPU_ON.
+Fri, Sep 06, 2024 at 01:01:29PM +0200, Daniel Gomez kirjoitti:
+> The uuid_t struct defined in sys/types.h on macOS hosts conflicts with
+> the one defined in file2alias, resulting in the typedef redefinition
+> error below. To resolve this conflict, define the _UUID_T and
+> __GETHOSTUUID_ in file2alias HOSTCFLAGS.
 > 
-> Yes, but we need to play the odds.
+> Error:
+>   HOSTCC  scripts/mod/file2alias.o scripts/mod/file2alias.c:45:3:
+> error: typedef redefinition with different types ('struct uuid_t' vs
+> '__darwin_uuid_t' (aka 'unsigned char[16]'))    45 | } uuid_t;       |
+> ^
+> /Library/Developer/CommandLineTools/SDKs/MacOSX14.sdk/usr/include/
+>    sys/_types/_uuid_t.h:31:25: note: previous definition is here 31 |
+>    typedef __darwin_uuid_t uuid_t;    |                         ^
+> scripts/mod/file2alias.c:1354:7: error: member reference base
+>  type 'typeof (((struct tee_client_device_id *)0)->uuid)' (aka
+>  'unsigned char[16]') is not a structure or union 1354 |
+>  uuid->b[0], uuid->b[1], uuid->b[2], uuid->b[3], uuid->b[4],      |
+>  ~~~~^ ~
+> /Library/Developer/CommandLineTools/SDKs/MacOSX14.sdk/usr/include/
+>    secure/_stdio.h:47:56: note: expanded from macro 'sprintf' 47 |
+>    __builtin___sprintf_chk (str, 0, __darwin_obsz(str), __VA_ARGS__)
+>    |                                                        ^~~~~~~~~~~
+> scripts/mod/file2alias.c:1354:19: error: member reference base
+>  type 'typeof (((struct tee_client_device_id *)0)->uuid)' (aka
+>  'unsigned char[16]') is not a structure or union 1354 |
+>  uuid->b[0], uuid->b[1], uuid->b[2], uuid->b[3], uuid->b[4],      |
+>  ~~~~^ ~
+> /Library/Developer/CommandLineTools/SDKs/MacOSX14.sdk/usr/include/
+>    secure/_stdio.h:47:56: note: expanded from macro 'sprintf' 47 |
+>    __builtin___sprintf_chk (str, 0, __darwin_obsz(str), __VA_ARGS__)
+>    |                                                        ^~~~~~~~~~~
 
-I agree that we can make an educated guess about the state of a vCPU
-when it remains in kernel, but anything outside of that is guesswork.
-
-> I.e. make the common case fast/efficient.
-> KVM obviously needs to not fallover or crater performance in the presence of edge
-> cases, but IMO, disallowing a vCPU from pinning a vCPU because it _might_ go
-> offline is the wrong tradeoff.
-
-But in the event of a 'rare' offline event the vCPU took out an MMU slot
-forever, or at least until the VM decides to online it again. That feels
-off to me.
-
-So like I mentioned earlier, the common case is that the L1 is running a
-VM where all of the vCPUs are sharing the same stage-2 MMU context.
-
-In this case, it is highly likely that the L2 VM's nested MMU keeps an
-elevated refcount, as at least one of the vCPUs remains in the KVM_RUN
-loop.
-
-In addition to that, we likely have quite a few free slots as we
-overprovision the nested MMUs to make sure the worst case remains
-functional. The only practical situation in which we would see thrashing
-of the nested stage-2 MMUs is if the L1 were running more than 2*NR_VCPUS
-VMs, which is already a 2x overcommit of the L1.
-
-> > Since KVM still views that fd as 'runnable', it'd sit on the reference
-> > that vCPU holds indefinitely. On top of that, it adds complexity to the
-> > implementation since we would need more refcount cleanup flows to handle
-> > these straggler references.
-> 
-> But only one flow, vCPU destruction, is mandatory.  Anything beyond that is pure
-> optimization.
-
-vcpu_load() / vcpu_put() is the mandatory flow in this design. We reload
-the vCPU to handle nested transitions (i.e. L1<->L2), and we need to attach
-an MMU that matches the new context.
-
-> > > Essentially all I'm suggesting is that instead of having a common pool of 2*vCPUs
-> > > TLBs per L1 VMM, have 2 (or however many) TLBs per L1 vCPU, plus maybe N extra
-> > > TLBs per L1 VMM.  I.e. mimic the hierarchical design of hardware caches and TLBs
-> > > to some extent.
-> > 
-> > Making TLBs private to the L1 vCPU is almost guaranteed to be a net loss
-> > in performance.
-> 
-> I'm not saying make TLBs private, I'm saying allow each vCPU to "pin" (i.e. hold
-> a reference) up to N TLBs/MMUs, regardless of "where" that vCPU is in the flow
-> of things.  Versus the proposed behavior of pinning TLBs only when it's absolutely
-> mandatory to do so for functional correctness.
-
-Ah, got it. It is an interesting idea, if we want to explore any meaningful
-value of N then we're gonna need to fix the allocation scheme. We'd
-probably also need that mechanism to be more tightly integrated into
-TLBIs to potentially drop references when a scope has been invalidated.
-
-> Holding a reference across preemption would be the first step towards that model.
-
-I'm OK with doing this for non-WFI preemption, which has the favorable
-property of avoiding lock serialization at vcpu_load() in most cases
-too.
+Please, shrink this to the valuable ~3-5 lines. No need to repeat the same for
+each case!
 
 -- 
-Thanks,
-Oliver
+With Best Regards,
+Andy Shevchenko
+
+
