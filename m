@@ -1,120 +1,135 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-175.mta0.migadu.com (out-175.mta0.migadu.com [91.218.175.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1949D1A7274;
-	Thu,  3 Oct 2024 20:37:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E291B1B0128
+	for <kvmarm@lists.linux.dev>; Thu,  3 Oct 2024 22:03:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727987858; cv=none; b=LWLROzjrviuCVFg65B+/LM2XxN4t+6pzs+xTOsfKHpxtgxGiWK8zocJZlKVlztEbtnngtVRY51I+5IdRNjTNqErfcUa1obXsG9yW6LE/KYjm4zXeM/dtJXXrHDFrtn3kRhs5D6x4ZY3qm+uJ73ukQ/B0XQ/pd23t0g+YFVKt600=
+	t=1727992995; cv=none; b=lpwBSqZizcIIwtMxFNbBndnKJnXb36OlPtrNLLVHiljhsC3x1CPq3snzFLJ3SmTDQHoUMFkoyTjrISvbxBRb8HNs/NBsJSIbrixBFhLJ/HqBfrn89kUmtvUsI4zh5PjtPMvNV0zvCu2P/gHlM5DIGi2xjLVzSV/3AMvNqgZYrDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727987858; c=relaxed/simple;
-	bh=8T6eykxd6XDU5qs08iAO7QM6z+RQFEJlVhLiF5MG0UI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=DWKoNwuubqTpsyO5bCi/N4lvyUP6SAv52zLb5pQ6VVIz9YEDzRVkGQ3SwqC8eF3VbNVXDfbg9Qe+a/DIc3pfItt37r/p0q5zCbFK25Sc8WC8rMufIVKJrXDZd42nzNdi2Ldy6FqWiF6Lr5Oa0vZSKl8/L0V8HTgugZR4N0egbBo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pQS8+bex; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1727992995; c=relaxed/simple;
+	bh=+lTvyA/52YqlDRDE+Duq7tIHKJoAz1lKasl1XJEMpEc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=n1Hh9jdH9LWGs4biLbmXvjWGOqYuAtYvV0D0FpNRyjXYkt2n4BkiUgYUnH0pN9BJemSZQjBRxtEOXdsU7XbC+CqKwRkZANDOINTb6kVlwP31wQbbToWPZgYjJTM24+hGR+4a+Yk8InbiHH098sfqoEpYagBkMMKiDqNjSU6/DB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mxr+SL3F; arc=none smtp.client-ip=91.218.175.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pQS8+bex"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A6A8C4CEC5;
-	Thu,  3 Oct 2024 20:37:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727987857;
-	bh=8T6eykxd6XDU5qs08iAO7QM6z+RQFEJlVhLiF5MG0UI=;
-	h=From:To:Cc:Subject:Date:From;
-	b=pQS8+bexM6YUntvxK7zqyuqMa8eY2VkKi8f8MLEN5wDlnzbYli9UoSlIAMW6xjfz8
-	 vbTXTy4RM1ejkNNVIaKCdVD4fZeSlYCnoJfsABjaaVLkJ2rZ7Ys9fDpSyM8bjm0fws
-	 TJbcvCbjx2azEdUHepy/CCP6UorLo0GrBP38DO46QZ82amN+0qBe02Us8zq3/yvhL6
-	 bJsBxVpUfIsxA/cXiaUV1jybcESvikfLrb8U7+MINPPTzN4ATr+xj2OglLZp/gBeKE
-	 m8tLjRRiV/heCkwkn/zu/6136s5HcmejOb9ZAWULFFenrP2S2BuCd4Z9w99QuY7xK2
-	 Euvx0wyoXLwXg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1swSZr-00HX6X-3Z;
-	Thu, 03 Oct 2024 21:37:35 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Fuad Tabba <tabba@google.com>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mxr+SL3F"
+Date: Thu, 3 Oct 2024 15:03:04 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1727992989;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xrRurHdEImnrmwD+VXbixWPyqn6Q045pXhmaqABhGYc=;
+	b=mxr+SL3FtlaFk9dXEBtud3uYcrtHW+sWJAogY4eociNU4hmsGS2KYjWnmnaEQqKa1bnd2a
+	bqd57FBj0OfADbpxlERzxfZn2j5bjP+mHwehz0rs/bMVlOSUCzGL3fkeb3pVx8wxZxn8Ws
+	HP6gYKZXjdr3P1U2NWQcaRFp3VE2L20=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
 	Joey Gouly <joey.gouly@arm.com>,
-	Mark Brown <broonie@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Will Deacon <will@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	James Morse <james.morse@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org
-Subject: [GIT PULL] KVM/arm64 fixes for 6.12, take #1
-Date: Thu,  3 Oct 2024 21:37:23 +0100
-Message-Id: <20241003203723.2062286-1-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 3/3] KVM: arm64: nv: Punt stage-2 recycling to a vCPU
+ request
+Message-ID: <Zv8UmMfXOqT2A9_A@linux.dev>
+References: <ZvyFkqsRFBAYwqP7@google.com>
+ <86cykj75a0.wl-maz@kernel.org>
+ <ZvyOcnZqNzfD7MZx@linux.dev>
+ <ZvySjfDWOhl2O1IA@google.com>
+ <865xqa6q0a.wl-maz@kernel.org>
+ <Zv3fcT9lCSujib7J@linux.dev>
+ <Zv3hgOhjaQGAuIOG@linux.dev>
+ <Zv7KNFX4Mykff6I5@google.com>
+ <Zv7Z4D0L3bnxJi8h@linux.dev>
+ <Zv7hKD_6Pvhg4ULY@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, catalin.marinas@arm.com, tabba@google.com, joey.gouly@arm.com, broonie@kernel.org, oliver.upton@linux.dev, suzuki.poulose@arm.com, vdonnefort@google.com, will@kernel.org, yuzenghui@huawei.com, james.morse@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zv7hKD_6Pvhg4ULY@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-Paolo,
+On Thu, Oct 03, 2024 at 11:23:36AM -0700, Sean Christopherson wrote:
+> > > Why not?  The vCPU is still running, keeping its S2 MMU resident is desirable, no?
+> > 
+> > How could we possibly know what the intent of userspace is? The VMM
+> > could just as well throw that vCPU fd on ice for an eternity.
+> > 
+> > For example, you could have a PSCI implementation that lives in
+> > userspace. Guest does CPU_OFF and the VMM decides to terminate the
+> > backing thread and keep the FD around for the next CPU_ON.
+> 
+> Yes, but we need to play the odds.
 
-Here's the first set of fixes for 6.12. We have fixes for a couple of
-pretty theoretical pKVM issues, plus a slightly more annoying fix for
-the feature detection infrastructure (details in the tag below). I
-expect to have a few more fixes in the coming weeks. Oh, and Joey is
-now an official reviewer, replacing James
+I agree that we can make an educated guess about the state of a vCPU
+when it remains in kernel, but anything outside of that is guesswork.
 
-Please pull,
+> I.e. make the common case fast/efficient.
+> KVM obviously needs to not fallover or crater performance in the presence of edge
+> cases, but IMO, disallowing a vCPU from pinning a vCPU because it _might_ go
+> offline is the wrong tradeoff.
 
-	M.
+But in the event of a 'rare' offline event the vCPU took out an MMU slot
+forever, or at least until the VM decides to online it again. That feels
+off to me.
 
-The following changes since commit 9852d85ec9d492ebef56dc5f229416c925758edc:
+So like I mentioned earlier, the common case is that the L1 is running a
+VM where all of the vCPUs are sharing the same stage-2 MMU context.
 
-  Linux 6.12-rc1 (2024-09-29 15:06:19 -0700)
+In this case, it is highly likely that the L2 VM's nested MMU keeps an
+elevated refcount, as at least one of the vCPUs remains in the KVM_RUN
+loop.
 
-are available in the Git repository at:
+In addition to that, we likely have quite a few free slots as we
+overprovision the nested MMUs to make sure the worst case remains
+functional. The only practical situation in which we would see thrashing
+of the nested stage-2 MMUs is if the L1 were running more than 2*NR_VCPUS
+VMs, which is already a 2x overcommit of the L1.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.12-1
+> > Since KVM still views that fd as 'runnable', it'd sit on the reference
+> > that vCPU holds indefinitely. On top of that, it adds complexity to the
+> > implementation since we would need more refcount cleanup flows to handle
+> > these straggler references.
+> 
+> But only one flow, vCPU destruction, is mandatory.  Anything beyond that is pure
+> optimization.
 
-for you to fetch changes up to a1d402abf8e3ff1d821e88993fc5331784fac0da:
+vcpu_load() / vcpu_put() is the mandatory flow in this design. We reload
+the vCPU to handle nested transitions (i.e. L1<->L2), and we need to attach
+an MMU that matches the new context.
 
-  KVM: arm64: Fix kvm_has_feat*() handling of negative features (2024-10-03 19:35:27 +0100)
+> > > Essentially all I'm suggesting is that instead of having a common pool of 2*vCPUs
+> > > TLBs per L1 VMM, have 2 (or however many) TLBs per L1 vCPU, plus maybe N extra
+> > > TLBs per L1 VMM.  I.e. mimic the hierarchical design of hardware caches and TLBs
+> > > to some extent.
+> > 
+> > Making TLBs private to the L1 vCPU is almost guaranteed to be a net loss
+> > in performance.
+> 
+> I'm not saying make TLBs private, I'm saying allow each vCPU to "pin" (i.e. hold
+> a reference) up to N TLBs/MMUs, regardless of "where" that vCPU is in the flow
+> of things.  Versus the proposed behavior of pinning TLBs only when it's absolutely
+> mandatory to do so for functional correctness.
 
-----------------------------------------------------------------
-KVM/arm64 fixes for 6.12, take #1
+Ah, got it. It is an interesting idea, if we want to explore any meaningful
+value of N then we're gonna need to fix the allocation scheme. We'd
+probably also need that mechanism to be more tightly integrated into
+TLBIs to potentially drop references when a scope has been invalidated.
 
-- Fix pKVM error path on init, making sure we do not change critical
-  system registers as we're about to fail
+> Holding a reference across preemption would be the first step towards that model.
 
-- Make sure that the host's vector length is at capped by a value
-  common to all CPUs
+I'm OK with doing this for non-WFI preemption, which has the favorable
+property of avoiding lock serialization at vcpu_load() in most cases
+too.
 
-- Fix kvm_has_feat*() handling of "negative" features, as the current
-  code is pretty broken
-
-- Promote Joey to the status of official reviewer, while James steps
-  down -- hopefully only temporarly
-
-----------------------------------------------------------------
-Marc Zyngier (2):
-      KVM: arm64: Another reviewer reshuffle
-      KVM: arm64: Fix kvm_has_feat*() handling of negative features
-
-Mark Brown (1):
-      KVM: arm64: Constrain the host to the maximum shared SVE VL with pKVM
-
-Vincent Donnefort (1):
-      KVM: arm64: Fix __pkvm_init_vcpu cptr_el2 error path
-
- MAINTAINERS                             |  2 +-
- arch/arm64/include/asm/kvm_host.h       | 25 +++++++++++++------------
- arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +-
- arch/arm64/kvm/hyp/nvhe/hyp-main.c      | 12 +++++++-----
- arch/arm64/kvm/hyp/nvhe/pkvm.c          |  6 ++++--
- 5 files changed, 26 insertions(+), 21 deletions(-)
+-- 
+Thanks,
+Oliver
