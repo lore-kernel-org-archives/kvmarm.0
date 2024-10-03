@@ -1,158 +1,134 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F8A21EA80
-	for <kvmarm@lists.linux.dev>; Thu,  3 Oct 2024 04:16:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 370E81E52C;
+	Thu,  3 Oct 2024 14:51:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727928975; cv=none; b=u7kol6UsF5SAB6cHX/ecQp9UcmEZhTw2w/8xDoBeMcK97ygL0J+aBH8qCQ3PXzRdzdzhzQNiqWXqWLHJPtHypSF00d8a9CVEO+yE6dhbDOSAv66het25RCrMeEml3qOhuK01lHPE0p8EFuwCuAhun/dQNfzYM+JZ2KLu56yE8w4=
+	t=1727967062; cv=none; b=TM4Rc2uAhBet7HBW+6ObcM61SW/+oKNpivI3LrGTrt76jgg3yGmmsoacfj8cOY2n2p5YV05o2avwGl4Uy3lJv0IFxqsYzdD+kC7quHBHVu6OVdzUp+9P9q6pDDqsA/sauCa7InCfeuewF2fAo5IiE7CYkvTNJrtRMvBTOPM+ZX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727928975; c=relaxed/simple;
-	bh=4xDnWeCuXcvVb2LMvsZGEYaX9TMiLXgcTBGSPn5XnCo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DARjE3tOZy7q1fpKyYK79K09Zu2AGvRxybHUrtjnDwtRQiCuSr2s45lwby3h2A8nNKHjOzwOtvN9nFXU+sGyf9hnEegX8Qf2DQ6dRtLr2uijtfHnfUc4PloWuD7T3tnxPWSsXmAOfzx7mQKMma7YMXr43Fg8ZpC4O1FvHFIjGnc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 83F5E339;
-	Wed,  2 Oct 2024 21:16:42 -0700 (PDT)
-Received: from [10.163.37.202] (unknown [10.163.37.202])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 16D3B3F64C;
-	Wed,  2 Oct 2024 21:16:09 -0700 (PDT)
-Message-ID: <cae8c6ca-d999-4b93-a82d-7a1f9924fcee@arm.com>
-Date: Thu, 3 Oct 2024 09:46:08 +0530
+	s=arc-20240116; t=1727967062; c=relaxed/simple;
+	bh=84mxqz11Cs3IrhMMq/BoLGimGyYEOQcc4TuOpIDegpo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sAQGUBI7arMhkQd2/JSBXZQJ8ZWp4giunLbB0QyuOdHprQ+9Gu50iqD0D2GXpWFd+C6IXGsNqr/L+VahvNTOXLxKDhRq7l+Xh+R5Y0z/71W3iLIK5rUcsC7QIgLXGAHW5rsskQxFiHktSfwMQUR5neaZZl9y/0KD8/sP2QXldUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SozEYIMN; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SozEYIMN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E93DC4CEC5;
+	Thu,  3 Oct 2024 14:50:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727967061;
+	bh=84mxqz11Cs3IrhMMq/BoLGimGyYEOQcc4TuOpIDegpo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SozEYIMNfQdA08ap8zdn8koBK0e5WTFzbIvCrwSxzNz2okoVA4Jx2ISGiwZcQMrUP
+	 /TLWP6uF2cb6g0RNpjG4GheIE3lAb32d74kKnEgOKsiDOPJe0zDlVAmWLdr2dGh8lk
+	 U9TRTmA/9PqNPDvOaDo7Szldk08hT7tOyKoM0RvAYRBqtvmtNRpoEhRJ1vTST8kSbp
+	 8kePx2BdLGQOLdH2pvbKe5TaKxhNT1zvBzqboN5sDp6/ze1cLtrOXfBr55ZZAuxDw0
+	 xK/xXsog4yA9O6+RT0K+o4ID+cG6v8tIPPKVpIDa0N4xb6B6bS3JHGF5xok5wdLF1A
+	 +oqqmKo+tGMiw==
+Date: Thu, 3 Oct 2024 15:50:47 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Florian Weimer <fweimer@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
+	Ross Burton <ross.burton@arm.com>,
+	David Spickett <david.spickett@arm.com>,
+	Yury Khrustalev <yury.khrustalev@arm.com>,
+	Wilco Dijkstra <wilco.dijkstra@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v13 16/40] KVM: arm64: Manage GCS access and registers
+ for guests
+Message-ID: <1ec14d13-7db6-4642-a14b-db8ae362e594@sirena.org.uk>
+References: <20241001-arm64-gcs-v13-0-222b78d87eee@kernel.org>
+ <20241001-arm64-gcs-v13-16-222b78d87eee@kernel.org>
+ <86bk0373nq.wl-maz@kernel.org>
+ <86a5fm7b4i.wl-maz@kernel.org>
+ <37fbc082-6bda-46e3-9ee7-9240b41f26fd@sirena.org.uk>
+ <868qv6717r.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 47/47] KVM: arm64: nv: Add trap forwarding for FEAT_FGT2
- described registers
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, maz@kernel.org,
- James Morse <james.morse@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>
-References: <20241001024356.1096072-1-anshuman.khandual@arm.com>
- <20241001024356.1096072-48-anshuman.khandual@arm.com>
- <ZvwLRWOKpggCvmH4@linux.dev>
-Content-Language: en-US
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <ZvwLRWOKpggCvmH4@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="Hfl6icctJG+FIkDo"
+Content-Disposition: inline
+In-Reply-To: <868qv6717r.wl-maz@kernel.org>
+X-Cookie: I'm into SOFTWARE!
 
 
+--Hfl6icctJG+FIkDo
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On 10/1/24 20:16, Oliver Upton wrote:
-> Hi Anshuman,
-> 
-> On Tue, Oct 01, 2024 at 08:13:56AM +0530, Anshuman Khandual wrote:
->> +#define check_cntr_accessible(num)						\
->> +static enum trap_behaviour check_cntr_accessible_##num(struct kvm_vcpu *vcpu)	\
->> +{										\
->> +	u64 mdcr_el2 = __vcpu_sys_reg(vcpu, MDCR_EL2);				\
->> +	int cntr = FIELD_GET(MDCR_EL2_HPMN_MASK, mdcr_el2);			\
->> +										\
->> +	if (num >= cntr)							\
->> +		return BEHAVE_FORWARD_ANY;					\
->> +	return BEHAVE_HANDLE_LOCALLY;						\
->> +}										\
->> +
->> +check_cntr_accessible(0)
->> +check_cntr_accessible(1)
->> +check_cntr_accessible(2)
->> +check_cntr_accessible(3)
->> +check_cntr_accessible(4)
->> +check_cntr_accessible(5)
->> +check_cntr_accessible(6)
->> +check_cntr_accessible(7)
->> +check_cntr_accessible(8)
->> +check_cntr_accessible(9)
->> +check_cntr_accessible(10)
->> +check_cntr_accessible(11)
->> +check_cntr_accessible(12)
->> +check_cntr_accessible(13)
->> +check_cntr_accessible(14)
->> +check_cntr_accessible(15)
->> +check_cntr_accessible(16)
->> +check_cntr_accessible(17)
->> +check_cntr_accessible(18)
->> +check_cntr_accessible(19)
->> +check_cntr_accessible(20)
->> +check_cntr_accessible(21)
->> +check_cntr_accessible(22)
->> +check_cntr_accessible(23)
->> +check_cntr_accessible(24)
->> +check_cntr_accessible(25)
->> +check_cntr_accessible(26)
->> +check_cntr_accessible(27)
->> +check_cntr_accessible(28)
->> +check_cntr_accessible(29)
->> +check_cntr_accessible(30)
-> 
-> I'd rather we not use templates for this problem. It bloats the kernel text
-> as well as the trap encoding space.
+On Wed, Oct 02, 2024 at 08:29:28PM +0100, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
 
-Alright, fair point.
+> > They are, though really they should UNDEF if GCS isn't there (which I
+> > had thought was what you were referencing here).  Equally we only have
+> > traps for a subset of GCS instructions and it's not like there aren't a
+> > whole bunch of untrappable extensions anyway so it's not clear it's
+> > worth the effort just for that.
 
-> 
-> I have a patch in the nested PMU series that uses a single complex trap
-> ID to evaluate HPMN, and derives the index from ESR_EL2. I think it
-> could also be extended to the PMEVCNTSVR<n> range as well.
+> If the encodings UNDEF when GCS is not implemented (i.e. they are not
+> in the NOP space), then all trapable instructions should absolutely
+> UNDEF (and yes, it is worth the effort, even if it is only to
+> demonstrate that the architecture is sub-par).
 
-Just for reference - the mentioned complex trap ID function from the
-given link below.
+Yes, see DDI0487 K.a C5.9.  If you're concerned about being unable to
+generate UNDEFs there's a rather large set of existing extensions where
+that's not possible, most of the hwcaps in the hwcap selftest that don't
+set sigill_reliable but do have a SIGILL generator for a start.
 
-static enum trap_behaviour check_mdcr_hpmn(struct kvm_vcpu *vcpu)
-{
-	u32 sysreg = esr_sys64_to_sysreg(kvm_vcpu_get_esr(vcpu));
-	u64 mask = kvm_pmu_accessible_counter_mask(vcpu);
-	unsigned int idx;
+> So I expect the next version to handle traps for GCSPUSHX, GCSPOPX,
+> GCSPUSHM, GCSSTR and GCSSTTR when GCS isn't enabled.
 
+OK, I already had that change locally after your first message.
 
-	switch (sysreg) {
-	case SYS_PMEVTYPERn_EL0(0) ... SYS_PMEVTYPERn_EL0(30):
-	case SYS_PMEVCNTRn_EL0(0) ... SYS_PMEVCNTRn_EL0(30):
+> I'm also pretty sure this is missing some form of sanitisation for
+> PSTATE.EXLOCK, and looking at the pseudocode, you seem to be missing
+> the handling of that bit on exception injection.
 
----------------------------------------------------------------------
-Just add the new system register range here ?
+Ah, yes - I think I see the missing exception injection handling in
+enter_exception64().  I'm not seeing what you're referencing with
+sanitisation though, could you give me some more specific pointers
+please?
 
-+	case SYS_PMEVCNTSVR_EL1(0)... SYS_PMEVCNTSVR_EL1(31):
----------------------------------------------------------------------
+--Hfl6icctJG+FIkDo
+Content-Type: application/pgp-signature; name="signature.asc"
 
-		idx = (sys_reg_CRm(sysreg) & 0x3) << 3 | sys_reg_Op2(sysreg);
-		break;
-	case SYS_PMXEVTYPER_EL0:
-	case SYS_PMXEVCNTR_EL0:
-		idx = __vcpu_sys_reg(vcpu, PMSELR_EL0) & ARMV8_PMU_COUNTER_MASK;
-		break;
-	default:
-		/* Someone used this trap helper for something else... */
-		KVM_BUG_ON(1, vcpu->kvm);
-		return BEHAVE_HANDLE_LOCALLY;
-	}
+-----BEGIN PGP SIGNATURE-----
 
-	/*
-	 * Programming HPMN=0 is CONSTRAINED UNPREDICTABLE if FEAT_HPMN0 isn't
-	 * implemented. Since KVM's ability to emulate HPMN=0 does not directly
-	 * depend on hardware (all PMU registers are trapped), make the
-	 * implementation choice that all counters are included in the second
-	 * range reserved for EL2/EL3.
-	 */
-	return !(BIT(idx) & mask) ? (BEHAVE_FORWARD_RW | BEHAVE_IN_HOST_EL0) :
-			BEHAVE_HANDLE_LOCALLY;
-}
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmb+r0YACgkQJNaLcl1U
+h9CPnwf/RsvoCd86wK5IpYW+I+BQekRext2o88ILr987SA+imxBsKq7L8n9hdvkg
+XOQxpyooxGUM9SkA9nuEFp0h5XNzoKf9AgiI+7lypHe0Nr07zzVdh4oq/A5WuiKB
+v231xK6ewa2AEAEvwwYxzafSbmn7fU0Cbjg1+ioSRCNWAa5XVA8rEFJX8ND6TVff
+pzx8UKtoFPltnc8jZHY/cPDTnXHvugmZiz/FC/9KDy/hCmuTCkYJBstD1zP9g3f0
+1e3X2QZ804cZ5n6MGJSpU3ReexcVxbVoXsdiZiV017zmN6qUMnjJnQJ/NknLUWdK
+80HXbpm8hN30vdK0zT5J7KSqtxLkzQ==
+=8W1g
+-----END PGP SIGNATURE-----
 
-> 
-> Also, keep in mind that the HPMN trap is annoying since it affects Host
-> EL0 in addition to 'guest' ELs.
-
-Does this require any more special handling other than the above complex trap
-ID function ?
-
-> 
-> [*]: https://lore.kernel.org/kvmarm/20240827002235.1753237-9-oliver.upton@linux.dev/
-> 
+--Hfl6icctJG+FIkDo--
