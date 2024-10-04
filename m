@@ -1,90 +1,118 @@
-Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C19315574C
-	for <kvmarm@lists.linux.dev>; Fri,  4 Oct 2024 10:44:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.190.10
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A42B71DFFC
+	for <kvmarm@lists.linux.dev>; Fri,  4 Oct 2024 11:07:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728038695; cv=none; b=blX4LOFrch20Ty2TzgPnLqh4L+0op9lyBOnCQGhAyCdpOD6wlOlTEZc6hu3bRMD0wWSHXNgY/QprAJUMwcc81wO8WRbql9NZGRiTgpmcBxgsjfgKzdWL6Lbfie4iLGJ+mvg6IWp1N9YbalcQUZat59iKL7bn4tnYtlloxHTTPzc=
+	t=1728040050; cv=none; b=FdRJEK6PrM8eyYE4RM1fKuQ70KzS/i6rVj5r5kkAhNz/wYIWktaQBRGmkh5LfQdBpVf8FVkR4LUouBXXXBJjwAlPimU8BFfm/x0soOKLWt3OlBt/O4NHE2e2K8iwUqRHfJ7vS8DtPPY/4BcVL5z8D2UFKfvaPCDCNGHQDK7YGY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728038695; c=relaxed/simple;
-	bh=pPE4/I601JrMIy+XM5295Vjl31RBUgIJ/rXqcSjo5c4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=c5ZveeXmr/ejAtMeauXZq04EY4Eh12edhzdHxVhB3n3uDWIrS65i1lVjkCDynWDqBvATiOov1g0eQhysEq4+LHSmDqDuCMrgLIGuVLhbhY2KINM+LDGuZ98o9LGyOfPd4RlTJeUmjlO2l+CuaVwHUSpLMnYBy0qTizyZDHfna8Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b=oR3Of1Wf; arc=none smtp.client-ip=207.171.190.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b="oR3Of1Wf"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1728038694; x=1759574694;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=pPE4/I601JrMIy+XM5295Vjl31RBUgIJ/rXqcSjo5c4=;
-  b=oR3Of1Wf3HEo0dnwjdj9QbOoKLlal8JmUjY1VqjmajiWOso5ovkldN2a
-   nW3HSKi2u16NPX0mCuCfjeOhqn2MYK1icoyhHtZwgINDo1LHvqJKtIGZM
-   dJkftOs02UjrtQ1EUALedb+9lnWyUkHF1IzVWw2JMVw2OxvCyZwR/u/Me
-   Y=;
-X-IronPort-AV: E=Sophos;i="6.11,177,1725321600"; 
-   d="scan'208";a="372905230"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Oct 2024 10:44:44 +0000
-Received: from EX19MTAEUC002.ant.amazon.com [10.0.10.100:37237]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.45.76:2525] with esmtp (Farcaster)
- id 1351fef0-1ef8-4c2c-b61d-a56b05783d23; Fri, 4 Oct 2024 10:44:42 +0000 (UTC)
-X-Farcaster-Flow-ID: 1351fef0-1ef8-4c2c-b61d-a56b05783d23
-Received: from EX19D041EUB003.ant.amazon.com (10.252.61.118) by
- EX19MTAEUC002.ant.amazon.com (10.252.51.181) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 4 Oct 2024 10:44:41 +0000
-Received: from [10.95.86.80] (10.95.86.80) by EX19D041EUB003.ant.amazon.com
- (10.252.61.118) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34; Fri, 4 Oct 2024
- 10:44:35 +0000
-Message-ID: <3208be2b-7e9f-413b-a9dc-c36ef4e3d177@amazon.de>
-Date: Fri, 4 Oct 2024 12:44:30 +0200
+	s=arc-20240116; t=1728040050; c=relaxed/simple;
+	bh=ID0gGOOAf6WDRp+MI4Lk4oC8XEmCP3VsmdJkzrwrQio=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=sXfgA45flfGIRYXvc3qxej+ruEEtgmKmI+c9KXbF+xLcv8l8apVqQ7JT/duILgrpeUVCtn4A1J/Nvi71dnK1EAc03EXK5paL88ECKdtEUBQQpgthQPii22Vu1E/o5a+HEFfBtW7daFgxrzzYo33rCgBPhXRpY6sT56t/zZ0UzZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DE9ED339;
+	Fri,  4 Oct 2024 04:07:51 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BB2833F640;
+	Fri,  4 Oct 2024 04:07:20 -0700 (PDT)
+From: Joey Gouly <joey.gouly@arm.com>
+To: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Cc: anshuman.khandual@arm.com,
+	james.morse@arm.com,
+	joey.gouly@arm.com,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Jing Zhang <jingzhangos@google.com>,
+	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Subject: [PATCH v4 0/7] KVM: arm64: Hide unsupported MPAM from the guest
+Date: Fri,  4 Oct 2024 12:07:07 +0100
+Message-Id: <20241004110714.2051604-1-joey.gouly@arm.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/15] KVM: x86: Introduce new ioctl KVM_TRANSLATE2
-To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson
-	<seanjc@google.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
-CC: Nicolas Saenz Julienne <nsaenz@amazon.com>, Alexander Graf
-	<graf@amazon.de>, James Gowans <jgowans@amazon.com>,
-	<nh-open-source@amazon.com>, Thomas Gleixner <tglx@linutronix.de>, "Ingo
- Molnar" <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
-	<dave.hansen@linux.intel.com>, <linux-kernel@vger.kernel.org>,
-	<kvm@vger.kernel.org>, <x86@kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-kselftest@vger.kernel.org>, <kvmarm@lists.linux.dev>,
-	<kvm-riscv@lists.infradead.org>, Nikolas Wipper <nik.wipper@gmx.de>
-References: <20240910152207.38974-1-nikwip@amazon.de>
-From: Nikolas Wipper <nikwip@amazon.de>
-Content-Language: en-US
-In-Reply-To: <20240910152207.38974-1-nikwip@amazon.de>
-X-ClientProxiedBy: EX19D046UWB003.ant.amazon.com (10.13.139.174) To
- EX19D041EUB003.ant.amazon.com (10.252.61.118)
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 8bit
 
-SSBzYXcgdGhpcyBvbiBhbm90aGVyIHNlcmllc1sqXToKCj4gaWYgS1ZNX1RSQU5TTEFURTIgbGFu
-ZHMgKHRob3VnaCBJJ20gc29tZXdoYXQgY3VyaW91cyBhcyB0byB3aHkgUUVNVSBkb2Vzbid0IGRv
-Cj4gdGhlIHBhZ2Ugd2Fsa3MgaXRzZWxmKS4KClRoZSBzaW1wbGUgcmVhc29uIGZvciBrZWVwaW5n
-IHRoaXMgZnVuY3Rpb25hbGl0eSBpbiBLVk0sIGlzIHRoYXQgaXQgYWxyZWFkeQpoYXMgYSBtYXR1
-cmUsIHByb2R1Y3Rpb24tbGV2ZWwgcGFnZSB3YWxrZXIgKHdoaWNoIGlzIGFscmVhZHkgZXhwb3Nl
-ZCkgYW5kCmNyZWF0aW5nIHNvbWV0aGluZyBzaW1pbGFyIFFFTVUgd291bGQgdGFrZSBhIGxvdCBs
-b25nZXIgYW5kIHdvdWxkIGJlIG11Y2gKaGFyZGVyIHRvIG1haW50YWluIHRoYW4ganVzdCBjcmVh
-dGluZyBhbiBBUEkgdGhhdCBsZXZlcmFnZXMgdGhlIGV4aXN0aW5nCndhbGtlci4KClsqXSBodHRw
-czovL2xvcmUua2VybmVsLm9yZy9sa21sL1p2SnNlVm9UN2dOX0dCRzNAZ29vZ2xlLmNvbS9ULyNt
-YjBiMjNhMWY1MDIzMTkyYTQ0MmRiNGExNjYyOWQ5Y2E3NGViNmI1ZQoKcHM6IHRoaXMgaXMgYWxz
-byBhIGdlbnRsZSBwaW5nIGZvciByZXZpZXcsIGlmIHRoaXMgZ290IGxvc3QgaW4gYmV0d2Vlbgpj
-b25mZXJlbmNlcwoKCgpBbWF6b24gV2ViIFNlcnZpY2VzIERldmVsb3BtZW50IENlbnRlciBHZXJt
-YW55IEdtYkgKS3JhdXNlbnN0ci4gMzgKMTAxMTcgQmVybGluCkdlc2NoYWVmdHNmdWVocnVuZzog
-Q2hyaXN0aWFuIFNjaGxhZWdlciwgSm9uYXRoYW4gV2Vpc3MKRWluZ2V0cmFnZW4gYW0gQW10c2dl
-cmljaHQgQ2hhcmxvdHRlbmJ1cmcgdW50ZXIgSFJCIDI1Nzc2NCBCClNpdHo6IEJlcmxpbgpVc3Qt
-SUQ6IERFIDM2NSA1MzggNTk3Cg==
+Hi,
+
+I have taken over these patches from James, as he doesn't have the time to push
+them forward currently.
+
+James wrote:
+	This series fixes up a long standing bug where MPAM was accidentally exposed
+	to a guest, but the feature was not otherwise trapped or context switched.
+	This could result in KVM warning about unexpected traps, and injecting an
+	undef into the guest contradicting the ID registers.
+	This would prevent an MPAM aware kernel from booting - fortunately, there
+	aren't any of those.
+
+	Ideally, we'd take the MPAM feature away from the ID registers, but that
+	would leave existing guests unable to migrate to a newer kernel. Instead,
+	just ignore that field when it matches the hardware. KVM wasn't going to
+	expose MPAM anyway. The guest will not see MPAM in the id registers.
+
+	This series includes the head.S and KVM changes to enable/disable traps. If
+	MPAM is neither enabled nor emulated by EL3 firmware, these system register
+	accesses will trap to EL3.
+	If your kernel doesn't boot, and the problem bisects here - please update
+	your firmware. MPAM has been supported by trusted firmware since v1.6 in
+	2018. (also noted on patch 3).
+
+changes since v3 [1]:
+	- Converted to the new generated sysreg file
+	- Added MPAM_frac support
+	- Changed the Kconfig to hopefully make it obvious that it doesn't
+	  actually enable MPAM for users
+	- rebased onto v6.12-rc1
+
+Thanks,
+Joey
+
+[1] https://lore.kernel.org/kvmarm/20240321165728.31907-1-james.morse@arm.com/
+
+James Morse (7):
+  arm64: head.S: Initialise MPAM EL2 registers and disable traps
+  arm64/sysreg: Convert existing MPAM sysregs and add the remaining
+    entries
+  arm64: cpufeature: discover CPU support for MPAM
+  KVM: arm64: Fix missing traps of guest accesses to the MPAM registers
+  KVM: arm64: Add a macro for creating filtered sys_reg_descs entries
+  KVM: arm64: Disable MPAM visibility by default and ignore VMM writes
+  KVM: arm64: selftests: Test ID_AA64PFR0.MPAM isn't completely ignored
+
+ .../arch/arm64/cpu-feature-registers.rst      |   2 +
+ arch/arm64/Kconfig                            |  20 +++
+ arch/arm64/include/asm/cpu.h                  |   1 +
+ arch/arm64/include/asm/cpucaps.h              |   2 +
+ arch/arm64/include/asm/cpufeature.h           |  12 ++
+ arch/arm64/include/asm/el2_setup.h            |  16 ++
+ arch/arm64/include/asm/kvm_arm.h              |   1 +
+ arch/arm64/include/asm/mpam.h                 |  32 ++++
+ arch/arm64/include/asm/sysreg.h               |  12 --
+ arch/arm64/kernel/Makefile                    |   2 +
+ arch/arm64/kernel/cpufeature.c                |  97 ++++++++++
+ arch/arm64/kernel/cpuinfo.c                   |   4 +
+ arch/arm64/kernel/image-vars.h                |   5 +
+ arch/arm64/kernel/mpam.c                      |   8 +
+ arch/arm64/kvm/hyp/include/hyp/switch.h       |  32 ++++
+ arch/arm64/kvm/sys_regs.c                     | 114 +++++++++---
+ arch/arm64/tools/cpucaps                      |   1 +
+ arch/arm64/tools/sysreg                       | 166 ++++++++++++++++++
+ .../selftests/kvm/aarch64/set_id_regs.c       | 100 ++++++++++-
+ 19 files changed, 587 insertions(+), 40 deletions(-)
+ create mode 100644 arch/arm64/include/asm/mpam.h
+ create mode 100644 arch/arm64/kernel/mpam.c
+
+-- 
+2.25.1
 
