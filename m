@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81D4E21791B;
-	Fri,  4 Oct 2024 14:43:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03B5A21F432;
+	Fri,  4 Oct 2024 14:43:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728053027; cv=none; b=t35/KHc5+z21sI+mV3Ej9/kAdf2/WSvQ9pjq6pLt2G7Qlv3P1uoVclwsmrm+7s6RVAJpOAEMysJ5yIdEzFFYiCChm6Nf8yNnBCN74h5tJ0nFK6Df/kl5wmKQ7Kt0jdL+Z6cCUX8eRFV0IBX67R+4A3lX87wqtFU6Paju/Cb6acM=
+	t=1728053030; cv=none; b=hciszmcLs9X+aXl1OCdJ9doVuAjqQzJ1poFzDSk1gY1/55cWqzf/PhCypM2rnPLYnPVBbPH+f3ha4tx/bmRtkYsZLqMY2Igfm70M04PYlIYIeuotYAX7nl8w59ZrHS62ZdntwjKPoFV7J8GyzgQc611oDqoEk7yEb5fRGRh7xQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728053027; c=relaxed/simple;
-	bh=6T2d3dmaL99UVzukHsb6UJSbtHsdJVwciJ1VSN9Np1k=;
+	s=arc-20240116; t=1728053030; c=relaxed/simple;
+	bh=ODJvRYmJGJNMTpJGPR+NNS8Px3aQ57wX3mDurAsVaaA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Uz2zs1QGqP3//5EvIUlcHixLZJhHYTu/Q7ZCjWAhp17jskaOTS3MGdzSs0zrLJpTBw1OzS+jyo2FvzqxLAf794F55EUsf3upXumCq2i5IraaSucFMw8zDcKsL63gzYWJ2weRv5ESHJ/Do4vP1v9mg97o2O3P7DNsmJHXVJairOM=
+	 MIME-Version; b=Z0oNw4K83dllxGQq20bGYUGgYYhx372ivmR3oeB793oJ3tDEHXAAKDHjvj0llWQOMShemA5PPbIaSpeM1mDqEnu0XR0BxFcFWfJAs1C7ejB649y7HFC9w6Bs5gkseBnytLmBb+wJjz5vXAlgGMkQIido7S949kAezzQzk0JqiK4=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 39657150C;
-	Fri,  4 Oct 2024 07:44:14 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F100C339;
+	Fri,  4 Oct 2024 07:44:17 -0700 (PDT)
 Received: from e122027.cambridge.arm.com (unknown [10.1.25.25])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 153A93F58B;
-	Fri,  4 Oct 2024 07:43:40 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id ED6403F58B;
+	Fri,  4 Oct 2024 07:43:44 -0700 (PDT)
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -41,9 +41,9 @@ Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Alper Gun <alpergun@google.com>,
 	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
 	Steven Price <steven.price@arm.com>
-Subject: [PATCH v6 04/11] arm64: rsi: Add support for checking whether an MMIO is protected
-Date: Fri,  4 Oct 2024 15:42:59 +0100
-Message-Id: <20241004144307.66199-5-steven.price@arm.com>
+Subject: [PATCH v6 05/11] arm64: rsi: Map unprotected MMIO as decrypted
+Date: Fri,  4 Oct 2024 15:43:00 +0100
+Message-Id: <20241004144307.66199-6-steven.price@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241004144307.66199-1-steven.price@arm.com>
 References: <20241004144307.66199-1-steven.price@arm.com>
@@ -57,137 +57,57 @@ Content-Transfer-Encoding: 8bit
 
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-On Arm CCA, with RMM-v1.0, all MMIO regions are shared. However, in
-the future, an Arm CCA-v1.0 compliant guest may be run in a lesser
-privileged partition in the Realm World (with Arm CCA-v1.1 Planes
-feature). In this case, some of the MMIO regions may be emulated
-by a higher privileged component in the Realm world, i.e, protected.
+Instead of marking every MMIO as shared, check if the given region is
+"Protected" and apply the permissions accordingly.
 
-Thus the guest must decide today, whether a given MMIO region is shared
-vs Protected and create the stage1 mapping accordingly. On Arm CCA, this
-detection is based on the "IPA State" (RIPAS == RIPAS_IO). Provide a
-helper to run this check on a given range of MMIO.
-
-Also, provide a arm64 helper which may be hooked in by other solutions.
-
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
 New patch for v5
 ---
- arch/arm64/include/asm/io.h       |  8 ++++++++
- arch/arm64/include/asm/rsi.h      |  2 ++
- arch/arm64/include/asm/rsi_cmds.h | 21 +++++++++++++++++++++
- arch/arm64/kernel/rsi.c           | 26 ++++++++++++++++++++++++++
- 4 files changed, 57 insertions(+)
+ arch/arm64/kernel/rsi.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/arch/arm64/include/asm/io.h b/arch/arm64/include/asm/io.h
-index 1ada23a6ec19..cce445ff8e3f 100644
---- a/arch/arm64/include/asm/io.h
-+++ b/arch/arm64/include/asm/io.h
-@@ -17,6 +17,7 @@
- #include <asm/early_ioremap.h>
- #include <asm/alternative.h>
- #include <asm/cpufeature.h>
-+#include <asm/rsi.h>
- 
- /*
-  * Generic IO read/write.  These perform native-endian accesses.
-@@ -318,4 +319,11 @@ extern bool arch_memremap_can_ram_remap(resource_size_t offset, size_t size,
- 					unsigned long flags);
- #define arch_memremap_can_ram_remap arch_memremap_can_ram_remap
- 
-+static inline bool arm64_is_mmio_private(phys_addr_t phys_addr, size_t size)
-+{
-+	if (unlikely(is_realm_world()))
-+		return arm64_is_protected_mmio(phys_addr, size);
-+	return false;
-+}
-+
- #endif	/* __ASM_IO_H */
-diff --git a/arch/arm64/include/asm/rsi.h b/arch/arm64/include/asm/rsi.h
-index acba065eb00e..42ff93c7b0ba 100644
---- a/arch/arm64/include/asm/rsi.h
-+++ b/arch/arm64/include/asm/rsi.h
-@@ -14,6 +14,8 @@ DECLARE_STATIC_KEY_FALSE(rsi_present);
- 
- void __init arm64_rsi_init(void);
- 
-+bool arm64_is_protected_mmio(phys_addr_t base, size_t size);
-+
- static inline bool is_realm_world(void)
- {
- 	return static_branch_unlikely(&rsi_present);
-diff --git a/arch/arm64/include/asm/rsi_cmds.h b/arch/arm64/include/asm/rsi_cmds.h
-index b661331c9204..fdb47f690307 100644
---- a/arch/arm64/include/asm/rsi_cmds.h
-+++ b/arch/arm64/include/asm/rsi_cmds.h
-@@ -45,6 +45,27 @@ static inline unsigned long rsi_get_realm_config(struct realm_config *cfg)
- 	return res.a0;
- }
- 
-+static inline unsigned long rsi_ipa_state_get(phys_addr_t start,
-+					      phys_addr_t end,
-+					      enum ripas *state,
-+					      phys_addr_t *top)
-+{
-+	struct arm_smccc_res res;
-+
-+	arm_smccc_smc(SMC_RSI_IPA_STATE_GET,
-+		      start, end, 0, 0, 0, 0, 0,
-+		      &res);
-+
-+	if (res.a0 == RSI_SUCCESS) {
-+		if (top)
-+			*top = res.a1;
-+		if (state)
-+			*state = res.a2;
-+	}
-+
-+	return res.a0;
-+}
-+
- static inline unsigned long rsi_set_addr_range_state(phys_addr_t start,
- 						     phys_addr_t end,
- 						     enum ripas state,
 diff --git a/arch/arm64/kernel/rsi.c b/arch/arm64/kernel/rsi.c
-index a6495a64d9bb..d7bba4cee627 100644
+index d7bba4cee627..f1add76f89ce 100644
 --- a/arch/arm64/kernel/rsi.c
 +++ b/arch/arm64/kernel/rsi.c
-@@ -66,6 +66,32 @@ static void __init arm64_rsi_setup_memory(void)
- 	}
- }
+@@ -6,6 +6,8 @@
+ #include <linux/jump_label.h>
+ #include <linux/memblock.h>
+ #include <linux/psci.h>
++
++#include <asm/io.h>
+ #include <asm/rsi.h>
  
-+bool arm64_is_protected_mmio(phys_addr_t base, size_t size)
+ struct realm_config config;
+@@ -92,6 +94,16 @@ bool arm64_is_protected_mmio(phys_addr_t base, size_t size)
+ }
+ EXPORT_SYMBOL(arm64_is_protected_mmio);
+ 
++static int realm_ioremap_hook(phys_addr_t phys, size_t size, pgprot_t *prot)
 +{
-+	enum ripas ripas;
-+	phys_addr_t end, top;
++	if (arm64_is_protected_mmio(phys, size))
++		*prot = pgprot_encrypted(*prot);
++	else
++		*prot = pgprot_decrypted(*prot);
 +
-+	/* Overflow ? */
-+	if (WARN_ON(base + size <= base))
-+		return false;
-+
-+	end = ALIGN(base + size, RSI_GRANULE_SIZE);
-+	base = ALIGN_DOWN(base, RSI_GRANULE_SIZE);
-+
-+	while (base < end) {
-+		if (WARN_ON(rsi_ipa_state_get(base, end, &ripas, &top)))
-+			break;
-+		if (WARN_ON(top <= base))
-+			break;
-+		if (ripas != RSI_RIPAS_DEV)
-+			break;
-+		base = top;
-+	}
-+
-+	return base >= end;
++	return 0;
 +}
-+EXPORT_SYMBOL(arm64_is_protected_mmio);
 +
  void __init arm64_rsi_init(void)
  {
  	if (arm_smccc_1_1_get_conduit() != SMCCC_CONDUIT_SMC)
+@@ -102,6 +114,9 @@ void __init arm64_rsi_init(void)
+ 		return;
+ 	prot_ns_shared = BIT(config.ipa_bits - 1);
+ 
++	if (arm64_ioremap_prot_hook_register(realm_ioremap_hook))
++		return;
++
+ 	arm64_rsi_setup_memory();
+ 
+ 	static_branch_enable(&rsi_present);
 -- 
 2.34.1
 
