@@ -1,67 +1,47 @@
-Received: from fgw21-7.mail.saunalahti.fi (fgw21-7.mail.saunalahti.fi [62.142.5.82])
+Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADA5A1AC89A
-	for <kvmarm@lists.linux.dev>; Thu,  3 Oct 2024 22:33:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.142.5.82
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63B69211C
+	for <kvmarm@lists.linux.dev>; Fri,  4 Oct 2024 05:01:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727994806; cv=none; b=C/A9BqAyg6+d72eqUb+eo1JELmm0DReJwUjlMUyJa1ZikxYQAMH4l5SAxZMVdysSKzMqgOkdVGDId5TKESWOOCvCmO59W5D+XMhx5N7VsUXOl9BflT71pmYv1e2oTWIRALwcxVw36S519IV4UiLIn8KftX5LX1yIAHxP95V4XzQ=
+	t=1728018092; cv=none; b=Od0JXpf/j8D3zP4QMRisx9mptE2pIs6vFfulV4pMoLjh+8JcYqQnjm9Mb5ZVyWlaWxc3m+2EfmedbnK5kyAEeUydJxQObwDFTUwXCS9vs5FGZxxyARgFX04PqmAFBhyEIfbcCmYUoUef2+Y6t5kErlAlkpkyQMeyNxr4bJjW0ug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727994806; c=relaxed/simple;
-	bh=9pOyjIY2Fu8sZWJ+h9Hhks0ngUMcydTiz+NvzoER/+Y=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hycSzto39WyLtOQUEt3e5B2gJ6cSJQnXWG1NzrCEUhEWuOTY0dVmgETD6VeYIqkOB8Ck691VUA38QVai4PHXeaUShMNOynwmoH4DYpvbc6uwZ725TLN0XhVg4Dz7JJTaLqIP8uHDcRm54rxz0uceBykHxZVX1/rDJP4eHjIenkg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com; spf=fail smtp.mailfrom=gmail.com; arc=none smtp.client-ip=62.142.5.82
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=gmail.com
-Received: from localhost (88-113-25-87.elisa-laajakaista.fi [88.113.25.87])
-	by fgw20.mail.saunalahti.fi (Halon) with ESMTP
-	id 6ccef329-81d7-11ef-995b-005056bd6ce9;
-	Fri, 04 Oct 2024 01:32:55 +0300 (EEST)
-From: Andy Shevchenko <andy.shevchenko@gmail.com>
-Date: Fri, 4 Oct 2024 01:32:50 +0300
-To: Daniel Gomez <da.gomez@samsung.com>
-Cc: Masahiro Yamada <masahiroy@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nicolas@fjasle.eu>,
-	Lucas De Marchi <lucas.demarchi@intel.com>,
-	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	David Airlie <airlied@gmail.com>,
-	William Hubbs <w.d.hubbs@gmail.com>,
-	Chris Brannon <chris@the-brannons.com>,
-	Kirk Reiser <kirk@reisers.ca>,
-	Samuel Thibault <samuel.thibault@ens-lyon.org>,
-	Paul Moore <paul@paul-moore.com>,
-	Stephen Smalley <stephen.smalley.work@gmail.com>,
-	Ondrej Mosnacek <omosnace@redhat.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
+	s=arc-20240116; t=1728018092; c=relaxed/simple;
+	bh=n+hq+ke8KIBDS78Wt9NIB7KmLpdUY9ZL/UEBkJnixbU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Hlpsb0lnDf96phxlh+tu2OmDodXq2CHieCid3ow0pqyUJKS3aJN4dMFbZ2rVOsKze6J/phEbhQY/GnI694TjNXat82ao4zD44EmDNNI1J0xvRoJ5N68tN17c7vvpEKzGcifNJKm8ixztTcdo+jBhAJsBXNvuLx5ByrGaRy1tsKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=drUKYhiU; arc=none smtp.client-ip=95.215.58.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="drUKYhiU"
+Date: Thu, 3 Oct 2024 22:01:18 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1728018087;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AbVygyhcJER/ikyVDJU/xvRALSb1JCr8R5Un1y4HJmM=;
+	b=drUKYhiUO0iMloMMld3oZWw9NerZxmcRjYAbDR8dbiSXzYTLATw/ksPKMV4v3CQkudNnXS
+	7dwu7pQXP5n5UU9bO46cGGjoLhEBxv+jlKTxtkeevgBmW3xJjH5Ocx6jrc5uE6+J2CVRFP
+	hZ9/ZYIPHd40c4N1lrYPzLTHj8iJf0Y=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, maz@kernel.org,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jiri Slaby <jirislaby@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Simona Vetter <simona.vetter@ffwll.ch>,
-	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
-	intel-xe@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-	speakup@linux-speakup.org, selinux@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-serial@vger.kernel.org, llvm@lists.linux.dev,
-	Finn Behrens <me@kloenk.dev>,
-	"Daniel Gomez (Samsung)" <d+samsung@kruces.com>,
-	gost.dev@samsung.com
-Subject: Re: [PATCH v2 2/8] file2alias: fix uuid_t definitions for macos
-Message-ID: <Zv8bkoJA5oDIe6If@surfacebook.localdomain>
-References: <20240906-macos-build-support-v2-0-06beff418848@samsung.com>
- <20240906-macos-build-support-v2-2-06beff418848@samsung.com>
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH 47/47] KVM: arm64: nv: Add trap forwarding for FEAT_FGT2
+ described registers
+Message-ID: <Zv92nsoLxbfI45Ji@linux.dev>
+References: <20241001024356.1096072-1-anshuman.khandual@arm.com>
+ <20241001024356.1096072-48-anshuman.khandual@arm.com>
+ <ZvwLRWOKpggCvmH4@linux.dev>
+ <cae8c6ca-d999-4b93-a82d-7a1f9924fcee@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -70,46 +50,57 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240906-macos-build-support-v2-2-06beff418848@samsung.com>
+In-Reply-To: <cae8c6ca-d999-4b93-a82d-7a1f9924fcee@arm.com>
+X-Migadu-Flow: FLOW_OUT
 
-Fri, Sep 06, 2024 at 01:01:29PM +0200, Daniel Gomez kirjoitti:
-> The uuid_t struct defined in sys/types.h on macOS hosts conflicts with
-> the one defined in file2alias, resulting in the typedef redefinition
-> error below. To resolve this conflict, define the _UUID_T and
-> __GETHOSTUUID_ in file2alias HOSTCFLAGS.
+On Thu, Oct 03, 2024 at 09:46:08AM +0530, Anshuman Khandual wrote:
+> > I have a patch in the nested PMU series that uses a single complex trap
+> > ID to evaluate HPMN, and derives the index from ESR_EL2. I think it
+> > could also be extended to the PMEVCNTSVR<n> range as well.
 > 
-> Error:
->   HOSTCC  scripts/mod/file2alias.o scripts/mod/file2alias.c:45:3:
-> error: typedef redefinition with different types ('struct uuid_t' vs
-> '__darwin_uuid_t' (aka 'unsigned char[16]'))    45 | } uuid_t;       |
-> ^
-> /Library/Developer/CommandLineTools/SDKs/MacOSX14.sdk/usr/include/
->    sys/_types/_uuid_t.h:31:25: note: previous definition is here 31 |
->    typedef __darwin_uuid_t uuid_t;    |                         ^
-> scripts/mod/file2alias.c:1354:7: error: member reference base
->  type 'typeof (((struct tee_client_device_id *)0)->uuid)' (aka
->  'unsigned char[16]') is not a structure or union 1354 |
->  uuid->b[0], uuid->b[1], uuid->b[2], uuid->b[3], uuid->b[4],      |
->  ~~~~^ ~
-> /Library/Developer/CommandLineTools/SDKs/MacOSX14.sdk/usr/include/
->    secure/_stdio.h:47:56: note: expanded from macro 'sprintf' 47 |
->    __builtin___sprintf_chk (str, 0, __darwin_obsz(str), __VA_ARGS__)
->    |                                                        ^~~~~~~~~~~
-> scripts/mod/file2alias.c:1354:19: error: member reference base
->  type 'typeof (((struct tee_client_device_id *)0)->uuid)' (aka
->  'unsigned char[16]') is not a structure or union 1354 |
->  uuid->b[0], uuid->b[1], uuid->b[2], uuid->b[3], uuid->b[4],      |
->  ~~~~^ ~
-> /Library/Developer/CommandLineTools/SDKs/MacOSX14.sdk/usr/include/
->    secure/_stdio.h:47:56: note: expanded from macro 'sprintf' 47 |
->    __builtin___sprintf_chk (str, 0, __darwin_obsz(str), __VA_ARGS__)
->    |                                                        ^~~~~~~~~~~
+> Just for reference - the mentioned complex trap ID function from the
+> given link below.
+> 
+> static enum trap_behaviour check_mdcr_hpmn(struct kvm_vcpu *vcpu)
+> {
+> 	u32 sysreg = esr_sys64_to_sysreg(kvm_vcpu_get_esr(vcpu));
+> 	u64 mask = kvm_pmu_accessible_counter_mask(vcpu);
+> 	unsigned int idx;
+> 
+> 
+> 	switch (sysreg) {
+> 	case SYS_PMEVTYPERn_EL0(0) ... SYS_PMEVTYPERn_EL0(30):
+> 	case SYS_PMEVCNTRn_EL0(0) ... SYS_PMEVCNTRn_EL0(30):
+> 
+> ---------------------------------------------------------------------
+> Just add the new system register range here ?
+> 
+> +	case SYS_PMEVCNTSVR_EL1(0)... SYS_PMEVCNTSVR_EL1(31):
+> ---------------------------------------------------------------------
+> 
+> 		idx = (sys_reg_CRm(sysreg) & 0x3) << 3 | sys_reg_Op2(sysreg);
+> 		break;
 
-Please, shrink this to the valuable ~3-5 lines. No need to repeat the same for
-each case!
+Yes, so long as the layout of encodings matches the established pattern
+for value / type registers (I haven't checked this).
+
+> > 
+> > Also, keep in mind that the HPMN trap is annoying since it affects Host
+> > EL0 in addition to 'guest' ELs.
+> 
+> Does this require any more special handling other than the above complex trap
+> ID function ?
+
+There's another patch in that series I linked that allows EL2 traps to
+describe behavior that takes effect in host EL0.
+
+So I don't believe there's anything in particular related to HPMN that
+you need to evaluate. I wanted to mention it because some of the PMU
+related traps besides HPMN take effect in Host EL0, so do keep it in
+mind.
+
+With that said, I haven't seen an FGT yet that applies to Host EL0.
 
 -- 
-With Best Regards,
-Andy Shevchenko
-
-
+Thanks,
+Oliver
