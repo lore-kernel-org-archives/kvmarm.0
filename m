@@ -1,111 +1,180 @@
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f48.google.com (mail-oa1-f48.google.com [209.85.160.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FBC41C3059
-	for <kvmarm@lists.linux.dev>; Fri,  4 Oct 2024 16:21:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A26384E1CA
+	for <kvmarm@lists.linux.dev>; Fri,  4 Oct 2024 18:00:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728058894; cv=none; b=gXSh2DzjeMLOnYIs8KH1Q9hQNWM6aIf6A6+afF2vDjFwiT6jqh1IjrGHNtxRwv3D5P/ZkIuQIAYrjjzNK4J50ON4hrMRrO/vv4qPDzrmbesH4Wud4WjsnYEgYhm/jnc4GIuAg2ZFidFUdMosZy34JyG6Nk2m/Y4qQ/8Z/T+BkQI=
+	t=1728064816; cv=none; b=llAeZDEjIOaOxL4LO0VM4DsAPds940tz5OHd+M8j3zHEXs0Ja9dm2AxzBFyFasdHVxxM7wnZhr8+lgak3gBx25KOErJboGRAU0We6i6IVAgDmces7i7VNQuQAPlSFO3LVpeo3lZ+Xu7IqUacGjd4KlHSKz2SEqdovX2Qm2Ord+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728058894; c=relaxed/simple;
-	bh=fbSBeFv4y2bND28JAXVuOJpQ4t3ohxSV4OnX4+OhxEA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l+Dj/riWDdRXyFtxvdS736bKgi6Gobn6mEdkGCvqC1ccCNqKc/r+SjmwN/GN+BJ85OwRD2Nh9px4/wEKGVybROw2ZBDIeLgLZFbtP1gelwVh7715O08SX0WdFRNdp7i6m9OpsMKbYiFadKcQOAiuJZL6p0QDt94ArD5Adv758/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lSOjAaTq; arc=none smtp.client-ip=91.218.175.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1728064816; c=relaxed/simple;
+	bh=PMOM/qjJaiv5NGfVvQQtJMlId91TctdxelpJsDxocLg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JM49T9h+TRDQwSP+JP5xTmIb/SdR1Yr3KsTV+kcsY+3TESkuPtMLpEEf06mhViRktHmGF/ndMlFjWA+FA6LtljFFWpRfeJ/ocIZORT+AuZ6dGwOdT3w2TBO3vzdcjn3uyzp4IgUwcz9igPl6shO9MEyuY4/D2ygXVqBbCiiOJ5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=oQKG7Czy; arc=none smtp.client-ip=209.85.160.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lSOjAaTq"
-Date: Fri, 4 Oct 2024 09:21:21 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1728058889;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zlM8m7v/qswLm5RCIdVV6zcxY4xUPPYPHOAIW5U70Sc=;
-	b=lSOjAaTqUpZvTU6T8QVVY02TEP5Ti3WOAE+d2atngJNuLQ7fVaEjcYA1WT0s1/E46OuU6Y
-	kpwXZjwQFFbbscrh2qD/IkA4IIGc9l/n74Kqtt+OLdJJSAgr0eLB0uWY1ypqHw9OUyxFH5
-	03sVn0dZ65TN/TUObvZxxJ07yvWSEqU=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Ahmad Fatoum <a.fatoum@pengutronix.de>, qemu-arm@nongnu.org,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	Enrico Joerns <ejo@pengutronix.de>
-Subject: Re: [BUG] ARM64 KVM: Data abort executing post-indexed LDR on MMIO
- address
-Message-ID: <ZwAWAaTfHGUCGUPQ@linux.dev>
-References: <89f184d6-5b61-4c77-9f3b-c0a8f6a75d60@pengutronix.de>
- <CAFEAcA_Yv2a=XCKw80y9iyBRoC27UL6Sfzgy4KwFDkC1gbzK7w@mail.gmail.com>
- <a4c06f55-28ec-4620-b594-b7ff0bb1e162@pengutronix.de>
- <CAFEAcA9F3AR-0OCKDy__eVBJRMi80G7bWNfANGZRR2W8iMhfJA@mail.gmail.com>
- <ZwAPWc-v9GhMbERF@linux.dev>
- <CAFEAcA9bnJR__3v2ixjjEyQD+Kwz4oR9+HO=w8u6JsVjgnXE2w@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="oQKG7Czy"
+Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-287212be9aeso99516fac.3
+        for <kvmarm@lists.linux.dev>; Fri, 04 Oct 2024 11:00:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1728064814; x=1728669614; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OmLcbw3dTY3w/Owkai0ppDRQaaYIubHSutnZXhKguwE=;
+        b=oQKG7CzyNBTjBLtElck0H1f8n0klaE2BOGe48w6Hd0m7wrR3XlfugIU5z0wxOF0ci5
+         lLr0Lg+DZrvUGCneWIc2p8Yc1BTbku9Jr8DiIM/NZBDyWBcZUiTVUL6pfB2h0d9wYmc3
+         hgMR0LtzwLoDfZOEx5d79TSK9AZx3ERxFKg8g=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728064814; x=1728669614;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OmLcbw3dTY3w/Owkai0ppDRQaaYIubHSutnZXhKguwE=;
+        b=R2ZMMq5oO9LhL6zcK4BwR3oIrgEMVx8CRk83WS/2UseGdZ516BOBSVaO+BEmNk2CDH
+         F1O5R4p1RFsp4ERHc20UqgJQLv42o1/ycLaFA+mDO0bX+xxcpQo3G+OpqHIhrq855ynX
+         6UfGaizZR9nC8heeDgJ9PTPZN1w2RdwuBRVwA/I5oLcbMoq02069DXCoclQ0huOAqOaR
+         REgLcPT5jJy4EjmoYwPh81BClhcD6XLABn8+ZhIkpj6p7Wr6N85l//S96961LkJKhNSy
+         W5Q1QKIXI4OWu+0G4fS26+3FFjcUIe8HpJ3MWMmndOtcl8YCKIda48fPm/udb38WRnsn
+         W0mw==
+X-Forwarded-Encrypted: i=1; AJvYcCVM1Bt/s4XxosaEiU+VSb53fx7uc+rDb61hmhoyfJEDOtxn1pXnWG3GHI2EaGLZY84U6tmySaI=@lists.linux.dev
+X-Gm-Message-State: AOJu0Ywdjizwx3DQuUjQpP2lwkiSiv1eeOQ2N87BU+dV2WMBw2cBLHM2
+	vLojweWH11kfv6Y4e/yW+NhWPeJLS6iysdocDGl98KqU1cklM4fXHZxcmhlRdw3/j8WX4o1lfTq
+	lvStALSGYAj0D5Y+k04C3UL8InF/kRFgiK4j2
+X-Google-Smtp-Source: AGHT+IG1zOkPi9cSpKoSowBdUikBePmdVz5SvwucHk6LYufziJDiV0GIln1NM20ppD8iWK+zVkJ9Tq1c8Kj3vOZeY5g=
+X-Received: by 2002:a05:6870:89a3:b0:286:f523:4d76 with SMTP id
+ 586e51a60fabf-287c1e16b7dmr727983fac.6.1728064813669; Fri, 04 Oct 2024
+ 11:00:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9bnJR__3v2ixjjEyQD+Kwz4oR9+HO=w8u6JsVjgnXE2w@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
+References: <zghnfw2vvrvlxenzx3oi55hzznxbx2nhcuwfk5zpe42bm4dxzv@zknjtfa2fu7n> <20240925152509.87152-1-faresx@amazon.de>
+In-Reply-To: <20240925152509.87152-1-faresx@amazon.de>
+From: Jeff Xu <jeffxu@chromium.org>
+Date: Fri, 4 Oct 2024 11:00:00 -0700
+Message-ID: <CABi2SkWrQOdxdai7YLoYKKc6GAwxue=jc+bH1=CgE-bKRO-GhA@mail.gmail.com>
+Subject: Re: [RFC PATCH 1/7] mseal: expose interface to seal / unseal user
+ memory ranges
+To: Fares Mehanna <faresx@amazon.de>, Kees Cook <keescook@chromium.org>
+Cc: liam.howlett@oracle.com, akpm@linux-foundation.org, ardb@kernel.org, 
+	arnd@arndb.de, bhelgaas@google.com, broonie@kernel.org, 
+	catalin.marinas@arm.com, david@redhat.com, james.morse@arm.com, 
+	javierm@redhat.com, jean-philippe@linaro.org, joey.gouly@arm.com, 
+	kristina.martsenko@arm.com, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, mark.rutland@arm.com, maz@kernel.org, 
+	nh-open-source@amazon.com, oliver.upton@linux.dev, ptosi@google.com, 
+	rdunlap@infradead.org, rkagan@amazon.de, rppt@kernel.org, 
+	shikemeng@huaweicloud.com, suzuki.poulose@arm.com, tabba@google.com, 
+	will@kernel.org, yuzenghui@huawei.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Oct 04, 2024 at 04:57:56PM +0100, Peter Maydell wrote:
-> On Fri, 4 Oct 2024 at 16:53, Oliver Upton <oliver.upton@linux.dev> wrote:
-> >
-> > On Fri, Oct 04, 2024 at 01:10:48PM +0100, Peter Maydell wrote:
-> > > On Fri, 4 Oct 2024 at 12:51, Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
-> > > > > Strictly speaking this is a missing feature in KVM (in an
-> > > > > ideal world it would let you do MMIO with any instruction
-> > > > > that you could use on real hardware).
-> > > >
-> > > > I assume that's because KVM doesn't want to handle interruptions
-> > > > in the middle of such "composite" instructions?
-> > >
-> > > It's because with the ISV=1 information in the ESR_EL2,
-> > > KVM has everything it needs to emulate the load/store:
-> > > it has the affected register number, the data width, etc. When
-> > > ISV is 0, simulating the load/store would require KVM
-> > > to load the actual instruction word, decode it to figure
-> > > out what kind of load/store it was, and then emulate
-> > > its behaviour. The instruction decode would be complicated
-> > > and if done in the kernel would increase the attack surface
-> > > exposed to the guest.
-> >
-> > On top of that, the only way to 'safely' fetch the instruction would be
-> > to pause all vCPUs in the VM to prevent the guest from remapping the
-> > address space behind either KVM or the VMM's back.
-> 
-> Do we actually care about that, though?
+Hi Fares,
 
-Judging from the fact that our existing MMIO flows have a similar "bug",
-I'd say no. I was just being pedantic about how annoying it'd be to do
-this faithfully, including the VA -> IPA translation.
+Please add me to this series and I'm interested in everything related
+to mseal :-)
 
-> If the guest does
-> that isn't it equivalent to a hardware CPU happening to
-> fetch the insn just-after a remapping rather than just-before?
-> If you decode the insn and it's not a store you could just
-> restart the guest...
+I also added Kees, since mseal is a security feature, and kees is CCed
+on security matters.
 
-Definitely, you'd need to restart any time the instruction doesn't line
-up with the ESR. The pedantic thing I was thinking about was if the
-instruction bytes remain the same but marked as non-executable:
+On Wed, Sep 25, 2024 at 8:25=E2=80=AFAM Fares Mehanna <faresx@amazon.de> wr=
+ote:
+>
+> Hi,
+>
+> Thanks for taking a look and apologies for my delayed response.
+>
+> > It is not clear from the change log above or the cover letter as to why
+> > you need to go this route instead of using the mmap lock.
+>
+> In the current form of the patches I use memfd_secret() to allocate the p=
+ages
+> and remove them from kernel linear address. [1]
+>
+> This allocate pages, map them in user virtual addresses and track them in=
+ a VMA.
+>
+> Before flipping the permissions on those pages to be used by the kernel, =
+I need
+> to make sure that those virtual addresses and this VMA is off-limits to t=
+he
+> owning process.
+>
+> memfd_secret() pages are locked by default, so they won't swap out. I nee=
+d to
+> seal the VMA to make sure the owner process can't unmap/remap/... or chan=
+ge the
+> protection of this VMA.
+>
+> So before changing the permissions on the secret pages, I make sure the p=
+ages
+> are faulted in, locked and sealed. So userspace can't influence this mapp=
+ing.
+>
+> > We can't use the mseal feature for this; it is supposed to be a one way
+> > transition.
+>
+> For this approach, I need the unseal operation when releasing the memory =
+range.
+>
+> The kernel can be done with the secret pages in one of two scenarios:
+> 1. During lifecycle of the process.
+> 2. When the process terminates.
+>
+> For the first case, I need to unmap the VMA so it can be reused by the ow=
+ning
+> process later, so I need the unseal operation. For the second case howeve=
+r we
+> don't need that since the process mm is already destructed or just about =
+to be
+> destructed anyway, regardless of sealed/unsealed VMAs. [1]
+>
+> I didn't expose the unseal operation to userspace.
+>
+In general, we should avoid having do_unseal, even though the
+operation is restricted to the kernel itself.
 
-	T1				T2
-	==				==
-					readl(addr);
-					< MMIO data abort >
-					insn = fetch(readl);
-	set_nx(readl);
-	tlbi(readl);
-	dsb(ish);
-					emulate(insn);
+However, from what you have described, without looking at your code,
+the case is closer to mseal, except that you need to unmap it within
+the kernel code.
 
--- 
-Thanks,
-Oliver
+For this, there might be two options that I can think of now, post
+here for discussion:
+
+1> Add a new flag in vm_flags, to allow unmap while sealed. However,
+this will not prevent user space from unmap the area.
+
+2> pass a flag in do_vmi_align_munmap() to skip sealing checks for
+your particular call. The do_vmi_align_munmap() already has a flag
+such as unlock.
+
+will the above work for your case ? or I  miss-understood the requirement.
+
+Thanks
+-Jeff
+
+
+
+> [1] https://lore.kernel.org/linux-arm-kernel/20240911143421.85612-3-fares=
+x@amazon.de/
+>
+> Thanks!
+> Fares.
+>
+>
+>
+> Amazon Web Services Development Center Germany GmbH
+> Krausenstr. 38
+> 10117 Berlin
+> Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+> Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
+> Sitz: Berlin
+> Ust-ID: DE 365 538 597
+>
+>
