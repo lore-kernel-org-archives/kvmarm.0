@@ -1,180 +1,186 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69D0B212EEE;
-	Fri,  4 Oct 2024 13:52:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 630142178E6;
+	Fri,  4 Oct 2024 14:43:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728049949; cv=none; b=S+2ZB1/9HsoURbtcaIYbyiC2clZn3iIIWDOYQEz92gOxHD/6Dzld5MnsE+h7pIFG9Ia/kXK3owQ1rFHJ4J/NTGzdgzP79YCPyDzET/52jlzC0F6H3e097zhFxUKtGmVbJX4w1omxI3bhBCeynIMyzjVxZZiH951ChNcKtQrf5nA=
+	t=1728053009; cv=none; b=Oa8mMlqdsTJZCrl99eQqXv4ir4uJ/SqX1JNmtV4mkcG3Q9L/fsM4EdSnaPrX7EzKszqjkT3xiC8UjoZU336EH3Us8VcuyxzPEJKIBK/YpQxC5QV1P5PQC8H7MmmiXWquhDdX7bA7ficNdWqaJSP5t9JM2mPiCjTu6lheRMK9n5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728049949; c=relaxed/simple;
-	bh=CgGaF1WPSG5Fi8uzeesZWuMpwpxItmoNQIqnngNVELo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sljDY5+XXEMXzWYrpiDuD5MNo9CB6aHrJiF11d72/VJgWTljhoGn1CCFdhMR2TY7mulIsBsBaWhbKTVcWq4YkAN21wG1YQ9KQgW/tRAH9H6in90/Yk7SU844WzmZTZu4yP6KIxQivp7j4c6FRaXYtuZqvyh7BKLeoZEBooN9VbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96531C4CEC6;
-	Fri,  4 Oct 2024 13:52:22 +0000 (UTC)
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Will Deacon <will@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
+	s=arc-20240116; t=1728053009; c=relaxed/simple;
+	bh=V/n3a/RmyEFaEXOi7ye94B3gyl3XifclsxOHGAcIQLQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=gsxd58oyVFyJ2jEy0OjtiHS70PGuTQDqVeDI7NQYfNSB4SZetpXV6Bo9PrJR36UjtWidI/5zBaEx3rZui2dWnuf1VzvxCxGZy/EHIp+6yeq0GNXT6cXh19KN3uXjTIIRXBorU6Bsy0Lubv3lwsnXeUu3BrIgFrQ/95vojGWzZwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1388A339;
+	Fri,  4 Oct 2024 07:43:56 -0700 (PDT)
+Received: from e122027.cambridge.arm.com (unknown [10.1.25.25])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2305E3F58B;
+	Fri,  4 Oct 2024 07:43:21 -0700 (PDT)
+From: Steven Price <steven.price@arm.com>
+To: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Cc: Steven Price <steven.price@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
 	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
+	Will Deacon <will@kernel.org>,
 	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-	Kees Cook <kees@kernel.org>,
-	Mark Brown <broonie@kernel.org>
-Cc: "H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Florian Weimer <fweimer@redhat.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
-	Ross Burton <ross.burton@arm.com>,
-	David Spickett <david.spickett@arm.com>,
-	Yury Khrustalev <yury.khrustalev@arm.com>,
-	Wilco Dijkstra <wilco.dijkstra@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
 	linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	David Hildenbrand <david@redhat.com>,
-	"Mike Rapoport (IBM)" <rppt@kernel.org>,
-	Shuah Khan <skhan@linuxfoundation.org>
-Subject: Re: (subset) [PATCH v13 00/40] arm64/gcs: Provide support for GCS in userspace
-Date: Fri,  4 Oct 2024 14:52:20 +0100
-Message-Id: <172804948348.2705006.18010706949544079891.b4-ty@arm.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20241001-arm64-gcs-v13-0-222b78d87eee@kernel.org>
-References: <20241001-arm64-gcs-v13-0-222b78d87eee@kernel.org>
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+Subject: [PATCH v6 00/11] arm64: Support for running as a guest in Arm CCA
+Date: Fri,  4 Oct 2024 15:42:55 +0100
+Message-Id: <20241004144307.66199-1-steven.price@arm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-On Tue, 01 Oct 2024 23:58:39 +0100, Mark Brown wrote:
-> The arm64 Guarded Control Stack (GCS) feature provides support for
-> hardware protected stacks of return addresses, intended to provide
-> hardening against return oriented programming (ROP) attacks and to make
-> it easier to gather call stacks for applications such as profiling.
-> 
-> When GCS is active a secondary stack called the Guarded Control Stack is
-> maintained, protected with a memory attribute which means that it can
-> only be written with specific GCS operations.  The current GCS pointer
-> can not be directly written to by userspace.  When a BL is executed the
-> value stored in LR is also pushed onto the GCS, and when a RET is
-> executed the top of the GCS is popped and compared to LR with a fault
-> being raised if the values do not match.  GCS operations may only be
-> performed on GCS pages, a data abort is generated if they are not.
-> 
-> [...]
+This series adds support for running Linux in a protected VM under the
+Arm Confidential Compute Architecture (CCA). This is a trimmed down
+series following the feedback from the v5 posting[1]. Thanks for the
+feedback!
 
-I applied most of the series to arm64 (for-next/gcs), apart from two KVM
-patches - 16 and 40 (the latter is the kselftest). I usually start
-picking patches at -rc3 but the glibc folk are waiting for these patches
-to at least end up in a maintainer's branch. Of course, these patches
-are subject to change until the final 6.13 release.
+Individual patches have a change log. But things to highlight:
 
-The KVM patches can go on top once agreed (or they can go in via the KVM
-tree, I don't mind either way).
+ * Some patches have been merged already. The first two patches from v4
+   were borrowed from pKVM were merged as part of that series. The GIC
+   ITS patches[2][3] have been merged via the tip tree.
 
-Thanks!
+ * Final RMM v1.0 spec[4] - only minor changes over the previous spec,
+   but we've now got a proper release.
 
-[01/40] mm: Introduce ARCH_HAS_USER_SHADOW_STACK
-        https://git.kernel.org/arm64/c/bcc9d04e749a
-[02/40] mm: Define VM_HIGH_ARCH_6
-        https://git.kernel.org/arm64/c/9ab515b18f84
-[03/40] arm64/mm: Restructure arch_validate_flags() for extensibility
-        https://git.kernel.org/arm64/c/f645e888b1a6
-[04/40] prctl: arch-agnostic prctl for shadow stack
-        https://git.kernel.org/arm64/c/91e102e79740
-[05/40] mman: Add map_shadow_stack() flags
-        https://git.kernel.org/arm64/c/3630e82ab6bd
-[06/40] arm64: Document boot requirements for Guarded Control Stacks
-        https://git.kernel.org/arm64/c/830ae8a39685
-[07/40] arm64/gcs: Document the ABI for Guarded Control Stacks
-        https://git.kernel.org/arm64/c/7058bf87cd59
-[08/40] arm64/sysreg: Add definitions for architected GCS caps
-        https://git.kernel.org/arm64/c/ce0641d48ddd
-[09/40] arm64/gcs: Add manual encodings of GCS instructions
-        https://git.kernel.org/arm64/c/dad947cc22cf
-[10/40] arm64/gcs: Provide put_user_gcs()
-        https://git.kernel.org/arm64/c/d0aa2b435186
-[11/40] arm64/gcs: Provide basic EL2 setup to allow GCS usage at EL0 and EL1
-        https://git.kernel.org/arm64/c/ff5181d8a2a8
-[12/40] arm64/cpufeature: Runtime detection of Guarded Control Stack (GCS)
-        https://git.kernel.org/arm64/c/6487c963083c
-[13/40] arm64/mm: Allocate PIE slots for EL0 guarded control stack
-        https://git.kernel.org/arm64/c/092055f1508c
-[14/40] mm: Define VM_SHADOW_STACK for arm64 when we support GCS
-        https://git.kernel.org/arm64/c/ae80e1629aea
-[15/40] arm64/mm: Map pages for guarded control stack
-        https://git.kernel.org/arm64/c/6497b66ba694
-[17/40] arm64/idreg: Add overrride for GCS
-        https://git.kernel.org/arm64/c/a94452112ce4
-[18/40] arm64/hwcap: Add hwcap for GCS
-        https://git.kernel.org/arm64/c/eefc98711f84
-[19/40] arm64/traps: Handle GCS exceptions
-        https://git.kernel.org/arm64/c/8ce71d270536
-[20/40] arm64/mm: Handle GCS data aborts
-        https://git.kernel.org/arm64/c/cfad706e8f6d
-[21/40] arm64/gcs: Context switch GCS state for EL0
-        https://git.kernel.org/arm64/c/fc84bc5378a8
-[22/40] arm64/gcs: Ensure that new threads have a GCS
-        https://git.kernel.org/arm64/c/506496bcbb42
-[23/40] arm64/gcs: Implement shadow stack prctl() interface
-        https://git.kernel.org/arm64/c/b57180c75c7e
-[24/40] arm64/mm: Implement map_shadow_stack()
-        https://git.kernel.org/arm64/c/8f3e750673b2
-[25/40] arm64/signal: Set up and restore the GCS context for signal handlers
-        https://git.kernel.org/arm64/c/eaf62ce1563b
-[26/40] arm64/signal: Expose GCS state in signal frames
-        https://git.kernel.org/arm64/c/16f47bb9ac8a
-[27/40] arm64/ptrace: Expose GCS via ptrace and core files
-        https://git.kernel.org/arm64/c/7ec3b57cb29f
-[28/40] arm64: Add Kconfig for Guarded Control Stack (GCS)
-        https://git.kernel.org/arm64/c/5d8b172e7005
-[29/40] kselftest/arm64: Verify the GCS hwcap
-        https://git.kernel.org/arm64/c/7a2f671db61f
-[30/40] kselftest/arm64: Add GCS as a detected feature in the signal tests
-        https://git.kernel.org/arm64/c/b2d2f11ff5d6
-[31/40] kselftest/arm64: Add framework support for GCS to signal handling tests
-        https://git.kernel.org/arm64/c/0d426f7dd9a0
-[32/40] kselftest/arm64: Allow signals tests to specify an expected si_code
-        https://git.kernel.org/arm64/c/956573ac1890
-[33/40] kselftest/arm64: Always run signals tests with GCS enabled
-        https://git.kernel.org/arm64/c/42155a8eb0f6
-[34/40] kselftest/arm64: Add very basic GCS test program
-        https://git.kernel.org/arm64/c/3d37d4307e0f
-[35/40] kselftest/arm64: Add a GCS test program built with the system libc
-        https://git.kernel.org/arm64/c/a505a52b4e29
-[36/40] kselftest/arm64: Add test coverage for GCS mode locking
-        https://git.kernel.org/arm64/c/58d69a3e3582
-[37/40] kselftest/arm64: Add GCS signal tests
-        https://git.kernel.org/arm64/c/794b64ca5665
-[38/40] kselftest/arm64: Add a GCS stress test
-        https://git.kernel.org/arm64/c/05e6cfff58c4
-[39/40] kselftest/arm64: Enable GCS for the FP stress tests
-        https://git.kernel.org/arm64/c/bb9ae1a66c85
+ * Probing/initialisation of the RMM is now done later. This means
+   there's no need for finding the PSCI conduit and can drop the patch
+   for that.
+
+ * The patches for set_fixmap_io() is also gone - we the RMM is detected
+   later it's now too late for earlycon. See below for instructions on
+   how to use earlycon.
+
+ * Mainline no longer uses PHYS_MASK_SHIFT for manipulating PTEs, so we
+   can drop the patch for making that dynamic.
+
+ * There's now some documentation! In particular this clarifies a change
+   in the boot requirements - memory must now be RIPAS RAM for a realm
+   guest.
+
+This series is based on v6.12-rc1.
+
+Testing
+=======
+
+Since a couple of the patches have been merged separately, and there was
+also a bug[5] in -rc1 which impacts 9p filesystems, I've provided the
+below git tree with everything you need for a CCA guest:
+
+https://gitlab.arm.com/linux-arm/linux-cca cca-guest/v6
+
+Back by popular demand is also a tree with both host and guest changes:
+
+https://gitlab.arm.com/linux-arm/linux-cca cca-full/v5+v6
+
+(I'll post the v5 series of the host changes shortly)
+
+You will also need an up-to-date RMM - the necessary changes have been
+merged into the 'main' branch of upstream:
+
+https://git.trustedfirmware.org/TF-RMM/tf-rmm.git main
+
+And you also need an updated kvmtool, there's a branch with the
+necessary changes here:
+
+https://git.gitlab.arm.com/linux-arm/kvmtool-cca.git cca/v3
+
+earlycon
+--------
+
+If using 'earlycon' on the kernel command line it is now necessary to
+pass the address of the serial port *in the unprotected IPA*. This is
+because the fixmap changes were dropped (due to the late probing of the
+RMM). E.g. for kvmtool you will need:
+
+  earlycon=uart,mmio,0x101000000
+
+This is the main drawback to late probing. One potential improvement
+would be an option like "earlycon=realm" to identify that the earlycon
+uart is in the unprotected space without having to know the actual IPA.
+I've left this out for now as I'm not sure whether there is any actual
+interest in this.
+
+[1] https://lore.kernel.org/r/20240819131924.372366-1-steven.price%40arm.com
+[2] e36d4165f079 ("irqchip/gic-v3-its: Rely on genpool alignment")
+[3] b08e2f42e86b ("irqchip/gic-v3-its: Share ITS tables with a non-trusted hypervisor")
+[4] https://developer.arm.com/documentation/den0137/1-0rel0/
+[5] https://lore.kernel.org/all/cbaf141ba6c0e2e209717d02746584072844841a.1727722269.git.osandov@fb.com/
+
+Sami Mujawar (1):
+  virt: arm-cca-guest: TSM_REPORT support for realms
+
+Steven Price (4):
+  arm64: realm: Query IPA size from the RMM
+  arm64: Enforce bounce buffers for realm DMA
+  arm64: mm: Avoid TLBI when marking pages as valid
+  arm64: Document Arm Confidential Compute
+
+Suzuki K Poulose (6):
+  arm64: rsi: Add RSI definitions
+  arm64: Detect if in a realm and set RIPAS RAM
+  arm64: rsi: Add support for checking whether an MMIO is protected
+  arm64: rsi: Map unprotected MMIO as decrypted
+  efi: arm64: Map Device with Prot Shared
+  arm64: Enable memory encrypt for Realms
+
+ Documentation/arch/arm64/arm-cca.rst          |  67 ++++++
+ Documentation/arch/arm64/booting.rst          |   3 +
+ Documentation/arch/arm64/index.rst            |   1 +
+ arch/arm64/Kconfig                            |   3 +
+ arch/arm64/include/asm/io.h                   |   8 +
+ arch/arm64/include/asm/mem_encrypt.h          |   9 +
+ arch/arm64/include/asm/pgtable-prot.h         |   4 +
+ arch/arm64/include/asm/pgtable.h              |   5 +
+ arch/arm64/include/asm/rsi.h                  |  68 ++++++
+ arch/arm64/include/asm/rsi_cmds.h             | 160 +++++++++++++
+ arch/arm64/include/asm/rsi_smc.h              | 193 ++++++++++++++++
+ arch/arm64/include/asm/set_memory.h           |   3 +
+ arch/arm64/kernel/Makefile                    |   3 +-
+ arch/arm64/kernel/efi.c                       |  12 +-
+ arch/arm64/kernel/rsi.c                       | 141 ++++++++++++
+ arch/arm64/kernel/setup.c                     |   3 +
+ arch/arm64/mm/init.c                          |  10 +-
+ arch/arm64/mm/pageattr.c                      |  98 +++++++-
+ drivers/virt/coco/Kconfig                     |   2 +
+ drivers/virt/coco/Makefile                    |   1 +
+ drivers/virt/coco/arm-cca-guest/Kconfig       |  11 +
+ drivers/virt/coco/arm-cca-guest/Makefile      |   2 +
+ .../virt/coco/arm-cca-guest/arm-cca-guest.c   | 211 ++++++++++++++++++
+ 23 files changed, 1010 insertions(+), 8 deletions(-)
+ create mode 100644 Documentation/arch/arm64/arm-cca.rst
+ create mode 100644 arch/arm64/include/asm/rsi.h
+ create mode 100644 arch/arm64/include/asm/rsi_cmds.h
+ create mode 100644 arch/arm64/include/asm/rsi_smc.h
+ create mode 100644 arch/arm64/kernel/rsi.c
+ create mode 100644 drivers/virt/coco/arm-cca-guest/Kconfig
+ create mode 100644 drivers/virt/coco/arm-cca-guest/Makefile
+ create mode 100644 drivers/virt/coco/arm-cca-guest/arm-cca-guest.c
 
 -- 
-Catalin
+2.34.1
 
