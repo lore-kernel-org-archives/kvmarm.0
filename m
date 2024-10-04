@@ -1,111 +1,138 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC0541D5AD8;
-	Fri,  4 Oct 2024 11:50:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 748501D5AD8
+	for <kvmarm@lists.linux.dev>; Fri,  4 Oct 2024 11:51:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728042619; cv=none; b=S5AarNBgJUmP63fqpOcfwj+AhPtpLj7HHk9TJO5ndyPQsL1p2qNMNbzXxKQwHy+TeCdaLbGJn3vUHFejs9ZjniMkNdnvyllUf+MGEnmYFjFmfT8GU0p8eJsVkupfHzXurmdgUyimdK22niYEKnoDXEXuFNeEp1sdea9XMmxFftI=
+	t=1728042705; cv=none; b=WvZIbv1b/JRXzkEjXUiOiRq9NOYepnJ+ZsBPr3SkGJuxPY/12NwN/01HtIHu13xwnViM+WMlhcrpDWiieXTisKhqfk70Wg4e8JIwIIxHm2Gyq6BrJJApG+dLE4e6ccIy9zCDZ8uQL4sA+5Wz+gTrqqk3f8UhbECk8YslxfpTOv4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728042619; c=relaxed/simple;
-	bh=+BeodDaFGWOje549S0KudeQ/WQofpaiwc9P5QexdJr4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O13Ic9kOUeIdwP7Hpvq0DJ/oG65uHXhkWSvAQ+eLFyFjXK3z0rDkr7gf8nU0vLbZIlyZ+jXQ3u3kYDg+KESLiRuvANuzquIHkHMZVSQeVR+is8lE7NptAYP0a0tzpXY+9whttbIKNR8WobKYyOZINyd5gWhvetsYrf3XIFe5FH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k6TkvVj7; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k6TkvVj7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83680C4CEC6;
-	Fri,  4 Oct 2024 11:50:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728042618;
-	bh=+BeodDaFGWOje549S0KudeQ/WQofpaiwc9P5QexdJr4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=k6TkvVj7GMjGbmKB1HJLF/vkMjkfzBK2z4CFAq24H++hZNqit5hWnu+qiurDMqtJ9
-	 DW7IidlCRTM3QaMhphpojCHjZ9fTG9JpZUW3qZPbU5yq9fQl1YgOGiV+fPAEKsj4YY
-	 lHObhuf9Yt8SIkxWEEYLeXqbYgcv7Or4B9En46bl/EKtkJpsJKrdkSrdZTlfIUvbGS
-	 HHtgo5u5ZT9DkHGaMrAGkcfT9+xGVcKVHfYCKheZIw9xBKQUz0jS4MB3qmjis5vPXQ
-	 hgzdrNECfwJPJwiQuKv4im1uOOuAQYJSeqvyP18pTTVOMYiRTqVEpfylWiGr7FpOK+
-	 w/AUkl/4UDraA==
-Date: Fri, 4 Oct 2024 12:50:08 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Florian Weimer <fweimer@redhat.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
-	Ross Burton <ross.burton@arm.com>,
-	David Spickett <david.spickett@arm.com>,
-	Yury Khrustalev <yury.khrustalev@arm.com>,
-	Wilco Dijkstra <wilco.dijkstra@arm.com>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v13 22/40] arm64/gcs: Ensure that new threads have a GCS
-Message-ID: <0e4d84e6-81ae-41ea-a17e-484df90f4444@sirena.org.uk>
-References: <20241001-arm64-gcs-v13-0-222b78d87eee@kernel.org>
- <20241001-arm64-gcs-v13-22-222b78d87eee@kernel.org>
- <Zv_PFVffwIkKevzE@arm.com>
+	s=arc-20240116; t=1728042705; c=relaxed/simple;
+	bh=+RV8w+SqG5co486pne4E9Kdn1l5e8/2DOkhj/ma8W7U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mwxEjNXZw4ICJNNPDu3lL/coJqL4jSXYzekpdQx97GbFdNNraYsr+WhhTGgynBLYmDtvPoqB/XiCGXBvcwp0np1IATH372C8pTrl9cb4I/6d9+sa8Yuq3suDjLQ1y4iUkSKrktjMRrcBMShK8GJBVO94lJb+vfilXMn4IiILyIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
+	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
+	(envelope-from <a.fatoum@pengutronix.de>)
+	id 1swgqT-0006pg-26; Fri, 04 Oct 2024 13:51:41 +0200
+Message-ID: <a4c06f55-28ec-4620-b594-b7ff0bb1e162@pengutronix.de>
+Date: Fri, 4 Oct 2024 13:51:39 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="LKVsNEPzgkEHa/nF"
-Content-Disposition: inline
-In-Reply-To: <Zv_PFVffwIkKevzE@arm.com>
-X-Cookie: A bachelor is an unaltared male.
+User-Agent: Mozilla Thunderbird
+Subject: Re: [BUG] ARM64 KVM: Data abort executing post-indexed LDR on MMIO
+ address
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+ Pengutronix Kernel Team <kernel@pengutronix.de>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>, Enrico Joerns <ejo@pengutronix.de>
+References: <89f184d6-5b61-4c77-9f3b-c0a8f6a75d60@pengutronix.de>
+ <CAFEAcA_Yv2a=XCKw80y9iyBRoC27UL6Sfzgy4KwFDkC1gbzK7w@mail.gmail.com>
+Content-Language: en-US
+From: Ahmad Fatoum <a.fatoum@pengutronix.de>
+In-Reply-To: <CAFEAcA_Yv2a=XCKw80y9iyBRoC27UL6Sfzgy4KwFDkC1gbzK7w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
+X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: kvmarm@lists.linux.dev
+
+Hello Peter,
+
+Thanks for your quick response.
+
+On 04.10.24 12:40, Peter Maydell wrote:
+> On Fri, 4 Oct 2024 at 10:47, Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
+>> I am investigating a data abort affecting the barebox bootloader built for aarch64
+>> that only manifests with qemu-system-aarch64 -enable-kvm.
+>>
+>> The issue happens when using the post-indexed form of LDR on a MMIO address:
+>>
+>>         ldr     x0, =0x9000fe0           // MMIO address
+>>         ldr     w1, [x0], #4             // data abort, but only with -enable-kvm
+> 
+> Don't do this -- KVM doesn't support it. For access to MMIO,
+> stick to instructions which will set the ISV bit in ESR_EL1.
+>
+> That is:
+> 
+>  * AArch64 loads and stores of a single general-purpose register
+>    (including the register specified with 0b11111, including those
+>    with Acquire/Release semantics, but excluding Load Exclusive
+>    or Store Exclusive and excluding those with writeback).
+>  * AArch32 instructions where the instruction:
+>     - Is an LDR, LDA, LDRT, LDRSH, LDRSHT, LDRH, LDAH, LDRHT,
+>       LDRSB, LDRSBT, LDRB, LDAB, LDRBT, STR, STL, STRT, STRH,
+>       STLH, STRHT, STRB, STLB, or STRBT instruction.
+>     - Is not performing register writeback.
+>     - Is not using R15 as a source or destination register.
+> 
+> Your instruction is doing writeback. Do the address update
+> as a separate instruction.
+
+This was enlightening, thanks. I will prepare patches to implement
+readl/writel in barebox in ARM assembly, like Linux does
+instead of the current fallback to the generic C version
+that just does volatile accesses.
+
+> Strictly speaking this is a missing feature in KVM (in an
+> ideal world it would let you do MMIO with any instruction
+> that you could use on real hardware).
+
+I assume that's because KVM doesn't want to handle interruptions
+in the middle of such "composite" instructions?
+
+> In practice it is not
+> a major issue because you don't typically want to do odd
+> things when you're doing MMIO, you just want to load or
+> store a single data item. If you're running into this then
+> your guest software is usually doing something a bit strange.
+
+The AMBA Peripheral ID consists of 4 bytes with some padding
+in-between. The barebox code to read it out looks is this:
+
+static inline u32 amba_device_get_pid(void *base, u32 size)
+{
+        int i;
+        u32 pid; 
+
+        for (pid = 0, i = 0; i < 4; i++)
+                pid |= (readl(base + size - 0x20 + 4 * i) & 255) <<
+                        (i * 8);
+
+        return pid;
+}
+
+static inline u32 __raw_readl(const volatile void __iomem *addr)
+{
+        return *(const volatile u32 __force *)addr;
+}
+
+I wouldn't necessarily characterize this as strange, we just erroneously
+assumed that with strongly ordered memory for MMIO regions and volatile
+accesses we had our bases covered and indeed we did until the bases
+shifted to include hardware-assisted virtualization. :-)
+
+Thanks,
+Ahmad
+
+> 
+> thanks
+> -- PMM
+> 
 
 
---LKVsNEPzgkEHa/nF
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On Fri, Oct 04, 2024 at 02:18:45PM +0300, Catalin Marinas wrote:
-
-> I think Szabolcs mentioned a GCS leak with v12:
-
-> https://lore.kernel.org/r/ZtrihWQFyb2/XrQV@arm.com
-
-> (and in some private messages IIRC)
-
-> Has this been identified? The changelog only mentions a leak in v8.
-
-Yes, it's this in the changelog:
-
-  - Implement mm_release() and free transparently allocated GCSs there.
-
---LKVsNEPzgkEHa/nF
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmb/1m8ACgkQJNaLcl1U
-h9CX5Qf/YXV4PCUMoouOlHODLlWL0QpqxDnrB4g2yYs90X9BTpJIF7Ax3i9mVe6N
-UETYxylUWRj9l39/OFtO1HFZkJcLdlWYkYREST9X6NX4htudvuu/5oAN06NXH9jd
-znOG1a/FdzPxRygtN3Lt6P6eodHJct9XRgduDANTu4oCEl7PAuW6ob88izh/c+FO
-MaiKZXsdWB+nc0KOSVk3HA0ogs8szrCQcWNti/LArlYFZWwurCtfYxgCUQFEzSSh
-SDemv5W+sFX+l7V/S4YCawDcIcLv0B+jV9lx0ECWzyhLeOrIxBDTYSKr3ukgLR7n
-+XdVZaKYGBSKeIaoCVbZcVM3Ul+CTQ==
-=zRYX
------END PGP SIGNATURE-----
-
---LKVsNEPzgkEHa/nF--
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
