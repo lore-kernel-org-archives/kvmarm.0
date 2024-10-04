@@ -1,180 +1,131 @@
-Received: from mail-oa1-f48.google.com (mail-oa1-f48.google.com [209.85.160.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A26384E1CA
-	for <kvmarm@lists.linux.dev>; Fri,  4 Oct 2024 18:00:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DE4D1E1021
+	for <kvmarm@lists.linux.dev>; Fri,  4 Oct 2024 19:50:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728064816; cv=none; b=llAeZDEjIOaOxL4LO0VM4DsAPds940tz5OHd+M8j3zHEXs0Ja9dm2AxzBFyFasdHVxxM7wnZhr8+lgak3gBx25KOErJboGRAU0We6i6IVAgDmces7i7VNQuQAPlSFO3LVpeo3lZ+Xu7IqUacGjd4KlHSKz2SEqdovX2Qm2Ord+Q=
+	t=1728071427; cv=none; b=J44lpZBuyj4uSKh5bM/g5wKT2MyLyX6gzbLHOYE8dubGYJ8A0KvBeLLIzbk3Hia8LwEisdBpXGQrPPke3M+gN7FPAG4vkPmV+r/79RptPNfBVYBf4Mh8p93HsVzM9z2Rc2rR9lBVvHbrynJFylq02LzUA2W5+Z7IoyJDgr6sc1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728064816; c=relaxed/simple;
-	bh=PMOM/qjJaiv5NGfVvQQtJMlId91TctdxelpJsDxocLg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JM49T9h+TRDQwSP+JP5xTmIb/SdR1Yr3KsTV+kcsY+3TESkuPtMLpEEf06mhViRktHmGF/ndMlFjWA+FA6LtljFFWpRfeJ/ocIZORT+AuZ6dGwOdT3w2TBO3vzdcjn3uyzp4IgUwcz9igPl6shO9MEyuY4/D2ygXVqBbCiiOJ5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=oQKG7Czy; arc=none smtp.client-ip=209.85.160.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="oQKG7Czy"
-Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-287212be9aeso99516fac.3
-        for <kvmarm@lists.linux.dev>; Fri, 04 Oct 2024 11:00:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1728064814; x=1728669614; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OmLcbw3dTY3w/Owkai0ppDRQaaYIubHSutnZXhKguwE=;
-        b=oQKG7CzyNBTjBLtElck0H1f8n0klaE2BOGe48w6Hd0m7wrR3XlfugIU5z0wxOF0ci5
-         lLr0Lg+DZrvUGCneWIc2p8Yc1BTbku9Jr8DiIM/NZBDyWBcZUiTVUL6pfB2h0d9wYmc3
-         hgMR0LtzwLoDfZOEx5d79TSK9AZx3ERxFKg8g=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728064814; x=1728669614;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OmLcbw3dTY3w/Owkai0ppDRQaaYIubHSutnZXhKguwE=;
-        b=R2ZMMq5oO9LhL6zcK4BwR3oIrgEMVx8CRk83WS/2UseGdZ516BOBSVaO+BEmNk2CDH
-         F1O5R4p1RFsp4ERHc20UqgJQLv42o1/ycLaFA+mDO0bX+xxcpQo3G+OpqHIhrq855ynX
-         6UfGaizZR9nC8heeDgJ9PTPZN1w2RdwuBRVwA/I5oLcbMoq02069DXCoclQ0huOAqOaR
-         REgLcPT5jJy4EjmoYwPh81BClhcD6XLABn8+ZhIkpj6p7Wr6N85l//S96961LkJKhNSy
-         W5Q1QKIXI4OWu+0G4fS26+3FFjcUIe8HpJ3MWMmndOtcl8YCKIda48fPm/udb38WRnsn
-         W0mw==
-X-Forwarded-Encrypted: i=1; AJvYcCVM1Bt/s4XxosaEiU+VSb53fx7uc+rDb61hmhoyfJEDOtxn1pXnWG3GHI2EaGLZY84U6tmySaI=@lists.linux.dev
-X-Gm-Message-State: AOJu0Ywdjizwx3DQuUjQpP2lwkiSiv1eeOQ2N87BU+dV2WMBw2cBLHM2
-	vLojweWH11kfv6Y4e/yW+NhWPeJLS6iysdocDGl98KqU1cklM4fXHZxcmhlRdw3/j8WX4o1lfTq
-	lvStALSGYAj0D5Y+k04C3UL8InF/kRFgiK4j2
-X-Google-Smtp-Source: AGHT+IG1zOkPi9cSpKoSowBdUikBePmdVz5SvwucHk6LYufziJDiV0GIln1NM20ppD8iWK+zVkJ9Tq1c8Kj3vOZeY5g=
-X-Received: by 2002:a05:6870:89a3:b0:286:f523:4d76 with SMTP id
- 586e51a60fabf-287c1e16b7dmr727983fac.6.1728064813669; Fri, 04 Oct 2024
- 11:00:13 -0700 (PDT)
+	s=arc-20240116; t=1728071427; c=relaxed/simple;
+	bh=d+uNb1YxSbc18Y/ikkvakxRW0zWVs7tZrrGcMxydxoM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CiaC2uc7Q6IKr6FW9HG+dtfIjUAd/fKvQwRTQN8jHdlG+fZkE0FJvd+1fnGcuziFTuw+BgRaxEvptV2e5BVE48LPCGdnfymzvR0E1LVpLxhfr4fiFDtdDg+eARrf95VL1Lqm/vh0Fzs9Pvky9wetzALPvnmLVVoIQOkWY3P4psI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
+	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
+	(envelope-from <a.fatoum@pengutronix.de>)
+	id 1swoJg-0001qQ-83; Fri, 04 Oct 2024 21:50:20 +0200
+Message-ID: <4d559b9e-c208-46f3-851a-68086dc8a50f@pengutronix.de>
+Date: Fri, 4 Oct 2024 21:50:18 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <zghnfw2vvrvlxenzx3oi55hzznxbx2nhcuwfk5zpe42bm4dxzv@zknjtfa2fu7n> <20240925152509.87152-1-faresx@amazon.de>
-In-Reply-To: <20240925152509.87152-1-faresx@amazon.de>
-From: Jeff Xu <jeffxu@chromium.org>
-Date: Fri, 4 Oct 2024 11:00:00 -0700
-Message-ID: <CABi2SkWrQOdxdai7YLoYKKc6GAwxue=jc+bH1=CgE-bKRO-GhA@mail.gmail.com>
-Subject: Re: [RFC PATCH 1/7] mseal: expose interface to seal / unseal user
- memory ranges
-To: Fares Mehanna <faresx@amazon.de>, Kees Cook <keescook@chromium.org>
-Cc: liam.howlett@oracle.com, akpm@linux-foundation.org, ardb@kernel.org, 
-	arnd@arndb.de, bhelgaas@google.com, broonie@kernel.org, 
-	catalin.marinas@arm.com, david@redhat.com, james.morse@arm.com, 
-	javierm@redhat.com, jean-philippe@linaro.org, joey.gouly@arm.com, 
-	kristina.martsenko@arm.com, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, mark.rutland@arm.com, maz@kernel.org, 
-	nh-open-source@amazon.com, oliver.upton@linux.dev, ptosi@google.com, 
-	rdunlap@infradead.org, rkagan@amazon.de, rppt@kernel.org, 
-	shikemeng@huaweicloud.com, suzuki.poulose@arm.com, tabba@google.com, 
-	will@kernel.org, yuzenghui@huawei.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [BUG] ARM64 KVM: Data abort executing post-indexed LDR on MMIO
+ address
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+ Pengutronix Kernel Team <kernel@pengutronix.de>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>, Enrico Joerns <ejo@pengutronix.de>
+References: <89f184d6-5b61-4c77-9f3b-c0a8f6a75d60@pengutronix.de>
+ <CAFEAcA_Yv2a=XCKw80y9iyBRoC27UL6Sfzgy4KwFDkC1gbzK7w@mail.gmail.com>
+ <a4c06f55-28ec-4620-b594-b7ff0bb1e162@pengutronix.de>
+ <CAFEAcA9F3AR-0OCKDy__eVBJRMi80G7bWNfANGZRR2W8iMhfJA@mail.gmail.com>
+Content-Language: en-US
+From: Ahmad Fatoum <a.fatoum@pengutronix.de>
+In-Reply-To: <CAFEAcA9F3AR-0OCKDy__eVBJRMi80G7bWNfANGZRR2W8iMhfJA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
+X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: kvmarm@lists.linux.dev
 
-Hi Fares,
+Hi,
 
-Please add me to this series and I'm interested in everything related
-to mseal :-)
+On 04.10.24 14:10, Peter Maydell wrote:
+> On Fri, 4 Oct 2024 at 12:51, Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
+>> On 04.10.24 12:40, Peter Maydell wrote:
+>>> Don't do this -- KVM doesn't support it. For access to MMIO,
+>>> stick to instructions which will set the ISV bit in ESR_EL1.
+>>>
+>>> That is:
+>>>
+>>>  * AArch64 loads and stores of a single general-purpose register
+>>>    (including the register specified with 0b11111, including those
+>>>    with Acquire/Release semantics, but excluding Load Exclusive
+>>>    or Store Exclusive and excluding those with writeback).
+>>>  * AArch32 instructions where the instruction:
+>>>     - Is an LDR, LDA, LDRT, LDRSH, LDRSHT, LDRH, LDAH, LDRHT,
+>>>       LDRSB, LDRSBT, LDRB, LDAB, LDRBT, STR, STL, STRT, STRH,
+>>>       STLH, STRHT, STRB, STLB, or STRBT instruction.
+>>>     - Is not performing register writeback.
+>>>     - Is not using R15 as a source or destination register.
+>>>
+>>> Your instruction is doing writeback. Do the address update
+>>> as a separate instruction.
 
-I also added Kees, since mseal is a security feature, and kees is CCed
-on security matters.
+With readl/writel implemented in assembly, I get beyond that point, but
+now I get a data abort running an DC IVAC instruction on address 0x1000,
+where the cfi-flash is located. This instruction is part of a routine
+to remap the cfi-flash to start a page later, so the zero page can be
+mapped faulting.
 
-On Wed, Sep 25, 2024 at 8:25=E2=80=AFAM Fares Mehanna <faresx@amazon.de> wr=
-ote:
->
-> Hi,
->
-> Thanks for taking a look and apologies for my delayed response.
->
-> > It is not clear from the change log above or the cover letter as to why
-> > you need to go this route instead of using the mmap lock.
->
-> In the current form of the patches I use memfd_secret() to allocate the p=
-ages
-> and remove them from kernel linear address. [1]
->
-> This allocate pages, map them in user virtual addresses and track them in=
- a VMA.
->
-> Before flipping the permissions on those pages to be used by the kernel, =
-I need
-> to make sure that those virtual addresses and this VMA is off-limits to t=
-he
-> owning process.
->
-> memfd_secret() pages are locked by default, so they won't swap out. I nee=
-d to
-> seal the VMA to make sure the owner process can't unmap/remap/... or chan=
-ge the
-> protection of this VMA.
->
-> So before changing the permissions on the secret pages, I make sure the p=
-ages
-> are faulted in, locked and sealed. So userspace can't influence this mapp=
-ing.
->
-> > We can't use the mseal feature for this; it is supposed to be a one way
-> > transition.
->
-> For this approach, I need the unseal operation when releasing the memory =
-range.
->
-> The kernel can be done with the secret pages in one of two scenarios:
-> 1. During lifecycle of the process.
-> 2. When the process terminates.
->
-> For the first case, I need to unmap the VMA so it can be reused by the ow=
-ning
-> process later, so I need the unseal operation. For the second case howeve=
-r we
-> don't need that since the process mm is already destructed or just about =
-to be
-> destructed anyway, regardless of sealed/unsealed VMAs. [1]
->
-> I didn't expose the unseal operation to userspace.
->
-In general, we should avoid having do_unseal, even though the
-operation is restricted to the kernel itself.
+Simple reproducer:
 
-However, from what you have described, without looking at your code,
-the case is closer to mseal, except that you need to unmap it within
-the kernel code.
+start:
+        ldr     x0, =0x1000
+        ldr     x1, =0x1040
+        bl      v8_inv_dcache_range
 
-For this, there might be two options that I can think of now, post
-here for discussion:
+        mov     w10, '!'
+        bl      putch
 
-1> Add a new flag in vm_flags, to allow unmap while sealed. However,
-this will not prevent user space from unmap the area.
+        ret
 
-2> pass a flag in do_vmi_align_munmap() to skip sealing checks for
-your particular call. The do_vmi_align_munmap() already has a flag
-such as unlock.
+v8_inv_dcache_range:
+        mrs     x3, ctr_el0
+        lsr     x3, x3, #16
+        and     x3, x3, #0xf
+        mov     x2, #0x4
+        lsl     x2, x2, x3
+        sub     x3, x2, #0x1
+        bic     x0, x0, x3
+1:
+        dc      ivac, x0
+        add     x0, x0, x2
+        cmp     x0, x1
+        b.cc    1b
+        dsb     sy
+        ret
 
-will the above work for your case ? or I  miss-understood the requirement.
+This prints ! without KVM, but triggers a data abort before that with -enable-kvm:
 
-Thanks
--Jeff
+  DABT (current EL) exception (ESR 0x96000010) at 0x0000000000001000
+  elr: 000000007fbe0550 lr : 000000007fbe01ac
+  [snip]
+
+  Call trace:
+  [<7fbe0550>] (v8_inv_dcache_range+0x1c/0x34) from [<7fbe0218>] (arch_remap_range+0x64/0x70)
+  [<7fbe0218>] (arch_remap_range+0x64/0x70) from [<7fb8795c>] (of_platform_device_create+0x1e8/0x22c)
+  [<7fb8795c>] (of_platform_device_create+0x1e8/0x22c) from [<7fb87a04>] (of_platform_bus_create+0x64/0xbc)
+  [snip]
+
+Any idea what this is about?
+
+Thanks,
+Ahmad
 
 
-
-> [1] https://lore.kernel.org/linux-arm-kernel/20240911143421.85612-3-fares=
-x@amazon.de/
->
-> Thanks!
-> Fares.
->
->
->
-> Amazon Web Services Development Center Germany GmbH
-> Krausenstr. 38
-> 10117 Berlin
-> Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-> Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
-> Sitz: Berlin
-> Ust-ID: DE 365 538 597
->
->
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
