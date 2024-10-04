@@ -1,106 +1,159 @@
-Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63B69211C
-	for <kvmarm@lists.linux.dev>; Fri,  4 Oct 2024 05:01:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E14433FD
+	for <kvmarm@lists.linux.dev>; Fri,  4 Oct 2024 09:47:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728018092; cv=none; b=Od0JXpf/j8D3zP4QMRisx9mptE2pIs6vFfulV4pMoLjh+8JcYqQnjm9Mb5ZVyWlaWxc3m+2EfmedbnK5kyAEeUydJxQObwDFTUwXCS9vs5FGZxxyARgFX04PqmAFBhyEIfbcCmYUoUef2+Y6t5kErlAlkpkyQMeyNxr4bJjW0ug=
+	t=1728035269; cv=none; b=J92FK3kP73wK/xz4Q2T0YEyGDSQoBaMqQIKXxMaWX6iAVVzBFKlmym29Uz8Ir+k7LfSooiJpuvhhkvDjDdE/YmtEyCiYywqsA3mhN8sbBgQJiBR8EB3BsnGGEpC4Nu5JWoxJlRqJpvGBtpy/m9Yp5HdU3VtU0e4ga7bKtbKEfoo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728018092; c=relaxed/simple;
-	bh=n+hq+ke8KIBDS78Wt9NIB7KmLpdUY9ZL/UEBkJnixbU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Hlpsb0lnDf96phxlh+tu2OmDodXq2CHieCid3ow0pqyUJKS3aJN4dMFbZ2rVOsKze6J/phEbhQY/GnI694TjNXat82ao4zD44EmDNNI1J0xvRoJ5N68tN17c7vvpEKzGcifNJKm8ixztTcdo+jBhAJsBXNvuLx5ByrGaRy1tsKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=drUKYhiU; arc=none smtp.client-ip=95.215.58.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="drUKYhiU"
-Date: Thu, 3 Oct 2024 22:01:18 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1728018087;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AbVygyhcJER/ikyVDJU/xvRALSb1JCr8R5Un1y4HJmM=;
-	b=drUKYhiUO0iMloMMld3oZWw9NerZxmcRjYAbDR8dbiSXzYTLATw/ksPKMV4v3CQkudNnXS
-	7dwu7pQXP5n5UU9bO46cGGjoLhEBxv+jlKTxtkeevgBmW3xJjH5Ocx6jrc5uE6+J2CVRFP
-	hZ9/ZYIPHd40c4N1lrYPzLTHj8iJf0Y=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, maz@kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH 47/47] KVM: arm64: nv: Add trap forwarding for FEAT_FGT2
- described registers
-Message-ID: <Zv92nsoLxbfI45Ji@linux.dev>
-References: <20241001024356.1096072-1-anshuman.khandual@arm.com>
- <20241001024356.1096072-48-anshuman.khandual@arm.com>
- <ZvwLRWOKpggCvmH4@linux.dev>
- <cae8c6ca-d999-4b93-a82d-7a1f9924fcee@arm.com>
+	s=arc-20240116; t=1728035269; c=relaxed/simple;
+	bh=9A6k4PPTKD+QchoqbxsN/vE8iMob1frembJFyHQRBTE=;
+	h=Message-ID:Date:MIME-Version:From:Subject:Cc:To:Content-Type; b=exVxUv8mM9iy3vqIrEyyx0+DydWliDlgNvBG2yY/ymftJuWG5AQuSTQHFcQ5XjxF2+goyYg2n7gflKylEZ5qg5SNnu6pIIZSxknyIxEwYLpCAcX5TF4LI/q9p6ruYX6ak93rEU35hQ6WQtdIvvKJdVjTvfij++D7oGGfHgQj/cw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
+	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
+	(envelope-from <a.fatoum@pengutronix.de>)
+	id 1sweuW-0007En-7h; Fri, 04 Oct 2024 11:47:44 +0200
+Message-ID: <89f184d6-5b61-4c77-9f3b-c0a8f6a75d60@pengutronix.de>
+Date: Fri, 4 Oct 2024 11:47:41 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cae8c6ca-d999-4b93-a82d-7a1f9924fcee@arm.com>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+From: Ahmad Fatoum <a.fatoum@pengutronix.de>
+Subject: [BUG] ARM64 KVM: Data abort executing post-indexed LDR on MMIO
+ address
+Cc: peter.maydell@linaro.org, kvm@vger.kernel.org,
+ Pengutronix Kernel Team <kernel@pengutronix.de>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>, Enrico Joerns <ejo@pengutronix.de>
+To: qemu-arm@nongnu.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
+X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: kvmarm@lists.linux.dev
 
-On Thu, Oct 03, 2024 at 09:46:08AM +0530, Anshuman Khandual wrote:
-> > I have a patch in the nested PMU series that uses a single complex trap
-> > ID to evaluate HPMN, and derives the index from ESR_EL2. I think it
-> > could also be extended to the PMEVCNTSVR<n> range as well.
-> 
-> Just for reference - the mentioned complex trap ID function from the
-> given link below.
-> 
-> static enum trap_behaviour check_mdcr_hpmn(struct kvm_vcpu *vcpu)
-> {
-> 	u32 sysreg = esr_sys64_to_sysreg(kvm_vcpu_get_esr(vcpu));
-> 	u64 mask = kvm_pmu_accessible_counter_mask(vcpu);
-> 	unsigned int idx;
-> 
-> 
-> 	switch (sysreg) {
-> 	case SYS_PMEVTYPERn_EL0(0) ... SYS_PMEVTYPERn_EL0(30):
-> 	case SYS_PMEVCNTRn_EL0(0) ... SYS_PMEVCNTRn_EL0(30):
-> 
-> ---------------------------------------------------------------------
-> Just add the new system register range here ?
-> 
-> +	case SYS_PMEVCNTSVR_EL1(0)... SYS_PMEVCNTSVR_EL1(31):
-> ---------------------------------------------------------------------
-> 
-> 		idx = (sys_reg_CRm(sysreg) & 0x3) << 3 | sys_reg_Op2(sysreg);
-> 		break;
+Hi,
 
-Yes, so long as the layout of encodings matches the established pattern
-for value / type registers (I haven't checked this).
+I am investigating a data abort affecting the barebox bootloader built for aarch64
+that only manifests with qemu-system-aarch64 -enable-kvm.
 
-> > 
-> > Also, keep in mind that the HPMN trap is annoying since it affects Host
-> > EL0 in addition to 'guest' ELs.
-> 
-> Does this require any more special handling other than the above complex trap
-> ID function ?
+The issue happens when using the post-indexed form of LDR on a MMIO address:
 
-There's another patch in that series I linked that allows EL2 traps to
-describe behavior that takes effect in host EL0.
+        ldr     x0, =0x9000fe0           // MMIO address
+        ldr     w1, [x0], #4             // data abort, but only with -enable-kvm
 
-So I don't believe there's anything in particular related to HPMN that
-you need to evaluate. I wanted to mention it because some of the PMU
-related traps besides HPMN take effect in Host EL0, so do keep it in
-mind.
+Here's a full example to reproduce this:
 
-With that said, I haven't seen an FGT yet that applies to Host EL0.
+start:
+        mov     w10, 'o'
+        bl      putch
+
+        bl      amba_device_read_pid
+
+        mov     w10, 'k'
+        bl      putch
+
+        ret
+
+amba_device_read_pid:
+        ldr     x0, =0x9000fe0
+        ldr     w1, [x0], #4             // data abort unless #4 is removed or KVM disabled
+        ret
+
+putch:
+        ldr     x8, =0x9000018
+1:
+        /* Wait until there is space in the FIFO */
+        ldr     w9, [x8]
+        tbnz    w9, #5, 1b
+
+        /* Send the character */
+        mov     x9, #0x9000000
+        str     w10, [x9]
+2:
+        /* Wait to make sure it hits the line, in case we die too soon. */
+        ldr     w9, [x8]
+        tbnz    w9, #5, 2b
+        ret
+
+It assumes 0x9000000-0x9000fff is a PL011 UART as is the case on the Virt platform.
+It will print an 'o', try to access 0x9000fe0, which contains the first byte
+of the AMBA Product ID and then print a 'k' using the same PL011.
+
+To build:
+
+  aarch64-linux-gnu-as reproducer.S -o reproducer.o
+  aarch64-linux-gnu-objcopy -O binary reproducer.o reproducer.bin
+
+To run (whether -bios or -kernel doesn't seem to matter):
+
+  taskset -a --cpu-list 2-5 qemu-system-aarch64 -bios reproducer.bin -machine virt,secure=off \
+  -cpu max -m 1024M -nographic -serial mon:stdio -trace file=/dev/null
+
+When run _without_ kvm, this will output:
+
+  ok
+
+When run with -enable-kvm, this will trigger a data abort in amba_device_read_pid:
+
+  o
+
+The data abort can also be avoided by removing the post index-increment:
+
+  -ldr     w1, [x0], #4
+  +ldr     w1, [x0]
+
+This doesn't introduce a functional difference, because x0 isn't used again anyway,
+but it makes the code work under KVM.
+
+I am using debian-arm64 Bookworm on an Amlogic A311D (4x CA72, 2x CA53) with:
+
+  QEMU emulator version 9.1.50 (v9.1.0-704-g423be09ab9)
+  Linux 6.11-arm64 #1 SMP Debian 6.11-1~exp1 (2024-09-19) aarch64 GNU/Linux
+
+This issue was first noticed by openembedded-core CI while testing this patch series
+adding support for testing the barebox and U-Boot bootloaders:
+
+https://lore.kernel.org/all/ee536d88a5b6468b20e37f3daabe4aa63047d1ad.camel@pengutronix.de/
+
+AFAICS, the U-Boot breakage has the same root cause as barebox', except that it's
+a str instruction that has the post-increment and the PCI MMIO region is what's
+being accessed.
+
+I haven't been successful in getting QEMU/GDB to trap on data aborts, so here's an
+excerpt from my original barebox stack trace instead that sent me down the rabbit
+hole:
+
+  DABT (current EL) exception (ESR 0x96000010) at 0x0000000009030fe0
+  elr: 000000007fb2221c lr : 000000007fb22250
+  [...]
+  
+  Call trace:
+  [<7fb2221c>] (amba_device_get_pid.constprop.0.isra.0+0x10/0x34) from [<7fb01e3c>] (start_barebox+0x88/0xb4)
+  [...]
+
+This looks pretty much like a bug to me, but then I would have expected more
+software to be affected by this.. Maybe it's memory mapping related?
+I only tested with either MMU disabled or MMIO region mapped strongly-ordered.
+
+Please let me know if there's further information I can provide.
+
+Thanks,
+Ahmad
 
 -- 
-Thanks,
-Oliver
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+
