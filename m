@@ -1,192 +1,91 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 905FC145A17
-	for <kvmarm@lists.linux.dev>; Fri,  4 Oct 2024 11:07:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAA2B13B792
+	for <kvmarm@lists.linux.dev>; Fri,  4 Oct 2024 11:18:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728040057; cv=none; b=fTtHjcY0RazybbdIeWcP2zpd5oLRMI29h+kfbO4o4COEUZyOy1wfyGYF7Opo02OFc3o0pkqeZdFRH8t6Ne/7IORuUmShWQI+RkaedW5aLSo68WCa98tjq4BPsUrWPG0t0TZb+h2/xoUeZhTJsoE1VnkgHU4cpHUPECaQeHW9+p0=
+	t=1728040736; cv=none; b=VW7Knnu9G5xdq2hOvPhZdf5wFpQ4ZYtiqqW7ZsXreZgFgUvmvUIJ3OneaVbGXkGbba8VE7IN9F12Q26vQvtXyOzbO42ATL2Y9X2gIgl1+4WCUnBegCChwcT6FiUo5Hker+iekPhxAM8zkQk4Ct9jTQXnV1JzQxSe++lXdGKUPnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728040057; c=relaxed/simple;
-	bh=7ArrqeheIeAENcSgTtsbglX7A+t6sTvBce+mm8xA4sM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=faPFgAEe2drX1eMGmnp3eWubacxslx3UNn161NsiFwdwcPq5HYOzgHEWFUbhm+WBR8SaUCpMk6khAF8ZpQ8DVu09AgHN4Lujdi5LmGrf3Tit5LrLRHgDfEWtCOBcUFMAnEr2ykC0esIpmZEN80D01/9UGKbyQU+Cd9aQYlWCk+A=
+	s=arc-20240116; t=1728040736; c=relaxed/simple;
+	bh=pZHox8K1Nmvgt3lxsApWtJFu8tZf+W8GEvc4spiFT0A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o3kjrljMSxvGGSKBmubQjma5vGj/0PH5b2OTKTPnb38LSrJXXp1rzelLuNM4O4KLwDJ1xbO5VoKcbuhTq0IBgtgfEqfZOHXuzG6M8SHwOJqxuZHNMDGUglk95mEY79PInsCOd+UDFA6B9EauP/xyLSDavspP6vyDyioJ5sToypg=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DEB1E153B;
-	Fri,  4 Oct 2024 04:08:04 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BCECE3F640;
-	Fri,  4 Oct 2024 04:07:33 -0700 (PDT)
-From: Joey Gouly <joey.gouly@arm.com>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Cc: anshuman.khandual@arm.com,
-	james.morse@arm.com,
-	joey.gouly@arm.com,
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8DEE0339;
+	Fri,  4 Oct 2024 04:19:23 -0700 (PDT)
+Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0DE1F3F640;
+	Fri,  4 Oct 2024 04:18:47 -0700 (PDT)
+Date: Fri, 4 Oct 2024 14:18:45 +0300
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
 	Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Subject: [PATCH v4 7/7] KVM: arm64: selftests: Test ID_AA64PFR0.MPAM isn't completely ignored
-Date: Fri,  4 Oct 2024 12:07:14 +0100
-Message-Id: <20241004110714.2051604-8-joey.gouly@arm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20241004110714.2051604-1-joey.gouly@arm.com>
-References: <20241004110714.2051604-1-joey.gouly@arm.com>
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Florian Weimer <fweimer@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
+	Ross Burton <ross.burton@arm.com>,
+	David Spickett <david.spickett@arm.com>,
+	Yury Khrustalev <yury.khrustalev@arm.com>,
+	Wilco Dijkstra <wilco.dijkstra@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v13 22/40] arm64/gcs: Ensure that new threads have a GCS
+Message-ID: <Zv_PFVffwIkKevzE@arm.com>
+References: <20241001-arm64-gcs-v13-0-222b78d87eee@kernel.org>
+ <20241001-arm64-gcs-v13-22-222b78d87eee@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241001-arm64-gcs-v13-22-222b78d87eee@kernel.org>
 
-From: James Morse <james.morse@arm.com>
+On Tue, Oct 01, 2024 at 11:59:01PM +0100, Mark Brown wrote:
+> When a new thread is created by a thread with GCS enabled the GCS needs
+> to be specified along with the regular stack.
+> 
+> Unfortunately plain clone() is not extensible and existing clone3()
+> users will not specify a stack so all existing code would be broken if
+> we mandated specifying the stack explicitly.  For compatibility with
+> these cases and also x86 (which did not initially implement clone3()
+> support for shadow stacks) if no GCS is specified we will allocate one
+> so when a thread is created which has GCS enabled allocate one for it.
+> We follow the extensively discussed x86 implementation and allocate
+> min(RLIMIT_STACK/2, 2G).  Since the GCS only stores the call stack and not
+> any variables this should be more than sufficient for most applications.
+> 
+> GCSs allocated via this mechanism will be freed when the thread exits.
 
-The ID_AA64PFR0.MPAM bit was previously accidentally exposed to guests,
-and is ignored by KVM. KVM will always present the guest with 0 here,
-and trap the MPAM system registers to inject an undef.
+I think Szabolcs mentioned a GCS leak with v12:
 
-But, this value is still needed to prevent migration when the value
-is incompatible with the target hardware. Add a kvm unit test to try
-and write multiple values to ID_AA64PFR0.MPAM. Only the hardware value
-previously exposed should be ignored, all other values should be
-rejected.
+https://lore.kernel.org/r/ZtrihWQFyb2/XrQV@arm.com
 
-Signed-off-by: James Morse <james.morse@arm.com>
-Signed-off-by: Joey Gouly <joey.gouly@arm.com>
----
- .../selftests/kvm/aarch64/set_id_regs.c       | 100 +++++++++++++++++-
- 1 file changed, 99 insertions(+), 1 deletion(-)
+(and in some private messages IIRC)
 
-diff --git a/tools/testing/selftests/kvm/aarch64/set_id_regs.c b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-index 2a3fe7914b72..d985ead2cc45 100644
---- a/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-+++ b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-@@ -433,6 +433,103 @@ static void test_vm_ftr_id_regs(struct kvm_vcpu *vcpu, bool aarch64_only)
- 	}
- }
- 
-+#define MPAM_IDREG_TEST	6
-+static void test_user_set_mpam_reg(struct kvm_vcpu *vcpu)
-+{
-+	uint64_t masks[KVM_ARM_FEATURE_ID_RANGE_SIZE];
-+	struct reg_mask_range range = {
-+		.addr = (__u64)masks,
-+	};
-+	uint64_t val, ftr_mask;
-+	int idx, err;
-+
-+	/*
-+	 * If ID_AA64PFR0.MPAM is _not_ officially modifiable and is zero,
-+	 * check that if it can be set to 1, (i.e. it is supported by the
-+	 * hardware), that it can't be set to other values.
-+	 */
-+
-+	/* Get writable masks for feature ID registers */
-+	memset(range.reserved, 0, sizeof(range.reserved));
-+	vm_ioctl(vcpu->vm, KVM_ARM_GET_REG_WRITABLE_MASKS, &range);
-+
-+	/* Writeable? Nothing to test! */
-+	idx = encoding_to_range_idx(SYS_ID_AA64PFR0_EL1);
-+	ftr_mask = ID_AA64PFR0_EL1_MPAM_MASK;
-+	if ((masks[idx] & ftr_mask) == ftr_mask) {
-+		ksft_test_result_skip("ID_AA64PFR0_EL1.MPAM is officially writable, nothing to test\n");
-+		return;
-+	}
-+
-+	/* Get the id register value */
-+	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR0_EL1), &val);
-+
-+	/* Try to set MPAM=0. This should always be possible. */
-+	val &= ~GENMASK_ULL(44, 40);
-+	val |= FIELD_PREP(GENMASK_ULL(44, 40), 0);
-+	err = __vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR0_EL1), val);
-+	if (err)
-+		ksft_test_result_fail("ID_AA64PFR0_EL1.MPAM=0 was not accepted\n");
-+	else
-+		ksft_test_result_pass("ID_AA64PFR0_EL1.MPAM=0 worked\n");
-+
-+	/* Try to set MPAM=1 */
-+	val &= ~GENMASK_ULL(44, 40);
-+	val |= FIELD_PREP(GENMASK_ULL(44, 40), 1);
-+	err = __vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR0_EL1), val);
-+	if (err)
-+		ksft_test_result_skip("ID_AA64PFR0_EL1.MPAM is not writable, nothing to test\n");
-+	else
-+		ksft_test_result_pass("ID_AA64PFR0_EL1.MPAM=1 was writable\n");
-+
-+	/* Try to set MPAM=2 */
-+	val &= ~GENMASK_ULL(43, 40);
-+	val |= FIELD_PREP(GENMASK_ULL(43, 40), 2);
-+	err = __vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR0_EL1), val);
-+	if (err)
-+		ksft_test_result_pass("ID_AA64PFR0_EL1.MPAM not arbitrarily modifiable\n");
-+	else
-+		ksft_test_result_fail("ID_AA64PFR0_EL1.MPAM value should not be ignored\n");
-+
-+	/* And again for ID_AA64PFR1_EL1.MPAM_frac */
-+	idx = encoding_to_range_idx(SYS_ID_AA64PFR1_EL1);
-+	ftr_mask = ID_AA64PFR1_EL1_MPAM_frac_MASK;
-+	if ((masks[idx] & ftr_mask) == ftr_mask) {
-+		ksft_test_result_skip("ID_AA64PFR1_EL1.MPAM_frac is officially writable, nothing to test\n");
-+		return;
-+	}
-+
-+	/* Get the id register value */
-+	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR1_EL1), &val);
-+
-+	/* Try to set MPAM_frac=0. This should always be possible. */
-+	val &= ~GENMASK_ULL(19, 16);
-+	val |= FIELD_PREP(GENMASK_ULL(19, 16), 0);
-+	err = __vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR1_EL1), val);
-+	if (err)
-+		ksft_test_result_fail("ID_AA64PFR0_EL1.MPAM_frac=0 was not accepted\n");
-+	else
-+		ksft_test_result_pass("ID_AA64PFR0_EL1.MPAM_frac=0 worked\n");
-+
-+	/* Try to set MPAM_frac=1 */
-+	val &= ~GENMASK_ULL(19, 16);
-+	val |= FIELD_PREP(GENMASK_ULL(19, 16), 1);
-+	err = __vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR1_EL1), val);
-+	if (err)
-+		ksft_test_result_skip("ID_AA64PFR1_EL1.MPAM_frac is not writable, nothing to test\n");
-+	else
-+		ksft_test_result_pass("ID_AA64PFR0_EL1.MPAM_frac=1 was writable\n");
-+
-+	/* Try to set MPAM_frac=2 */
-+	val &= ~GENMASK_ULL(19, 16);
-+	val |= FIELD_PREP(GENMASK_ULL(19, 16), 2);
-+	err = __vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR1_EL1), val);
-+	if (err)
-+		ksft_test_result_pass("ID_AA64PFR1_EL1.MPAM_frac not arbitrarily modifiable\n");
-+	else
-+		ksft_test_result_fail("ID_AA64PFR1_EL1.MPAM_frac value should not be ignored\n");
-+}
-+
- static void test_guest_reg_read(struct kvm_vcpu *vcpu)
- {
- 	bool done = false;
-@@ -571,12 +668,13 @@ int main(void)
- 		   ARRAY_SIZE(ftr_id_aa64isar2_el1) + ARRAY_SIZE(ftr_id_aa64pfr0_el1) +
- 		   ARRAY_SIZE(ftr_id_aa64mmfr0_el1) + ARRAY_SIZE(ftr_id_aa64mmfr1_el1) +
- 		   ARRAY_SIZE(ftr_id_aa64mmfr2_el1) + ARRAY_SIZE(ftr_id_aa64zfr0_el1) -
--		   ARRAY_SIZE(test_regs) + 2;
-+		   ARRAY_SIZE(test_regs) + 2 + MPAM_IDREG_TEST;
- 
- 	ksft_set_plan(test_cnt);
- 
- 	test_vm_ftr_id_regs(vcpu, aarch64_only);
- 	test_vcpu_ftr_id_regs(vcpu);
-+	test_user_set_mpam_reg(vcpu);
- 
- 	test_guest_reg_read(vcpu);
- 
+Has this been identified? The changelog only mentions a leak in v8.
+
 -- 
-2.25.1
-
+Catalin
