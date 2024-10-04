@@ -1,313 +1,198 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B13B91AA7A4;
-	Fri,  4 Oct 2024 15:05:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1450F1AA7A0;
+	Fri,  4 Oct 2024 15:28:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728054326; cv=none; b=SeMihjQI3ffDRx8HVB5z6ycbD7VeSAmcFTxFuwxupG/3HwBAYDFSFc7KWmaZtUNoNX+mXCBaHU2Z1JvLy2EChbtnZSJy8Etwcj6/GuMt7aqnWwCtZwfFBNHKVd/G48xNyt8b3bMCgWQeFTb/1kP4sxhqR3brEkjE2MaspTTckc8=
+	t=1728055700; cv=none; b=n6zK0jNfoePwX8ZFt6P2AAcvEv2fWvPci7vXyrQ07CBCaEGFk9RZ2x7oENpPqZ88Wkpl6p86aoC3/G3c/FxEOGFP6uSbi3XVDY7C2WEcJD6FCJQ2p5WitrUQiH16mVaZbhp2VSrZcCMx2l2va6qrrjK45gsJRVEuzbjhSMClX/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728054326; c=relaxed/simple;
-	bh=2CmLgUGcu2mav0PWca+261/vB/u7pLjpuKZvF8743S4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Yq8fQkxtMNldQJD2DeD3uWlT2erjpzS+Hwb2jB7NEgZG5fzShhcrzyXlu1yx0BKZngXMDIB/nHE8mjKKsiPJ3YORgf5HGtQ8oyirAPyS90DtFxYLdhrcdpF6sckTD7sUk/1ES7kLclx7/Gz1hFgVAr22zIcZMDmaR4smELplRqQ=
+	s=arc-20240116; t=1728055700; c=relaxed/simple;
+	bh=Se8b6VFgsyj2rTyxu6m6eFSEwMKvePm3IUqdq01sXig=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=Rjk6lqyWG47ErbG9C78cQnVi75LUgRF5fSsJ+2PsUSfOPfGx4ayyaxcJ/h5VXiYAaW7GUMHZKzWFdhrD31iVE97k7gDt1ZY4vO1X62L2C4sLETwuaGDRj8heut0fXNQ/C4Dq0jqb1WKhLU/Dj6QFucQbSg7RfK6uBhIRlMx6QAc=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 862B6339;
-	Fri,  4 Oct 2024 08:05:53 -0700 (PDT)
-Received: from [10.1.25.25] (unknown [10.1.25.25])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2E1C73F640;
-	Fri,  4 Oct 2024 08:05:19 -0700 (PDT)
-Message-ID: <085896de-9a39-4f90-9a2d-3f8662c2e2a2@arm.com>
-Date: Fri, 4 Oct 2024 16:05:17 +0100
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1200B339;
+	Fri,  4 Oct 2024 08:28:47 -0700 (PDT)
+Received: from e122027.cambridge.arm.com (unknown [10.1.25.25])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E50133F640;
+	Fri,  4 Oct 2024 08:28:12 -0700 (PDT)
+From: Steven Price <steven.price@arm.com>
+To: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Cc: Steven Price <steven.price@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+Subject: [PATCH v5 00/43] arm64: Support for Arm CCA in KVM
+Date: Fri,  4 Oct 2024 16:27:21 +0100
+Message-Id: <20241004152804.72508-1-steven.price@arm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 02/11] arm64: Detect if in a realm and set RIPAS RAM
-To: kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>
-References: <20241004144307.66199-1-steven.price@arm.com>
- <20241004144307.66199-3-steven.price@arm.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <20241004144307.66199-3-steven.price@arm.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 04/10/2024 15:42, Steven Price wrote:
-> From: Suzuki K Poulose <suzuki.poulose@arm.com>
-> 
-> Detect that the VM is a realm guest by the presence of the RSI
-> interface. This is done after PSCI has been initialised so that we can
-> check the SMCCC conduit before making any RSI calls.
-> 
-> If in a realm then all memory needs to be marked as RIPAS RAM initially,
-> the loader may or may not have done this for us. To be sure iterate over
-> all RAM and mark it as such. Any failure is fatal as that implies the
-> RAM regions passed to Linux are incorrect - which would mean failing
-> later when attempting to access non-existent RAM.
+This series adds support for running protected VMs using KVM under the
+Arm Confidential Compute Architecture (CCA).
 
-And it appears I didn't review this closely enough before posting ;)
-Suzuki pointed out to me that this patch description doesn't make sense
-given my comments in the cover letter about the VMM or bootloader having
-to set everything RIPAS RAM.
+The related guest support was posted[1] earlier. As with the guest this
+series moves to the "v1.0-rel0" version of the specification[2].
 
-I should have reworded this commit message to something like:
+Almost all changes since v4[3] are either due to rebasing or minor
+changes to improve the code following review comments. There are two bug
+fixes:
 
-"""
-Detect that the VM is a realm guest by the presence of the RSI
-interface. This is done after PSCI has been initialised so that we can
-check the SMCCC conduit before making any RSI calls.
+ * Setting the GPRS on entry after an exit where the host is allowed to
+   change registers is now done in kvm_rec_enter(). This fixes a bug
+   where register updates done by user space were being ignored.
 
-If in a realm then iterate over all memory ensuring that it is marked as
-RIPAS RAM. The loader is required to do this for us, however if some
-memory is missed this will cause the guest to receive a hard to debug
-external abort at some random point in the future. So for a
-belt-and-braces approach set all memory to RIPAS RAM. Any failure here
-implies that the RAM regions passed to Linux are incorrect so panic()
-promptly to make the situation clear.
-"""
+ * Drop the PTE_SHARED bit for unprotected page table entries - this bit
+   isn't controlled by the host and the RMM now enforces the bit is
+   zero.
 
-Steve
+Major limitations:
 
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Co-developed-by: Steven Price <steven.price@arm.com>
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Changes since v5:
->  * Replace BUG_ON() with a panic() call that provides a message with the
->    memory range that couldn't be set to RIPAS_RAM.
->  * Move the call to arm64_rsi_init() later so that it is after PSCI,
->    this means we can use arm_smccc_1_1_get_conduit() to check if it is
->    safe to make RSI calls.
-> Changes since v4:
->  * Minor tidy ups.
-> Changes since v3:
->  * Provide safe/unsafe versions for converting memory to protected,
->    using the safer version only for the early boot.
->  * Use the new psci_early_test_conduit() function to avoid calling an
->    SMC if EL3 is not present (or not configured to handle an SMC).
-> Changes since v2:
->  * Use DECLARE_STATIC_KEY_FALSE rather than "extern struct
->    static_key_false".
->  * Rename set_memory_range() to rsi_set_memory_range().
->  * Downgrade some BUG()s to WARN()s and handle the condition by
->    propagating up the stack. Comment the remaining case that ends in a
->    BUG() to explain why.
->  * Rely on the return from rsi_request_version() rather than checking
->    the version the RMM claims to support.
->  * Rename the generic sounding arm64_setup_memory() to
->    arm64_rsi_setup_memory() and move the call site to setup_arch().
-> ---
->  arch/arm64/include/asm/rsi.h | 66 +++++++++++++++++++++++++++++++
->  arch/arm64/kernel/Makefile   |  3 +-
->  arch/arm64/kernel/rsi.c      | 75 ++++++++++++++++++++++++++++++++++++
->  arch/arm64/kernel/setup.c    |  3 ++
->  4 files changed, 146 insertions(+), 1 deletion(-)
->  create mode 100644 arch/arm64/include/asm/rsi.h
->  create mode 100644 arch/arm64/kernel/rsi.c
-> 
-> diff --git a/arch/arm64/include/asm/rsi.h b/arch/arm64/include/asm/rsi.h
-> new file mode 100644
-> index 000000000000..e4c01796c618
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/rsi.h
-> @@ -0,0 +1,66 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Copyright (C) 2024 ARM Ltd.
-> + */
-> +
-> +#ifndef __ASM_RSI_H_
-> +#define __ASM_RSI_H_
-> +
-> +#include <linux/errno.h>
-> +#include <linux/jump_label.h>
-> +#include <asm/rsi_cmds.h>
-> +
-> +DECLARE_STATIC_KEY_FALSE(rsi_present);
-> +
-> +void __init arm64_rsi_init(void);
-> +
-> +static inline bool is_realm_world(void)
-> +{
-> +	return static_branch_unlikely(&rsi_present);
-> +}
-> +
-> +static inline int rsi_set_memory_range(phys_addr_t start, phys_addr_t end,
-> +				       enum ripas state, unsigned long flags)
-> +{
-> +	unsigned long ret;
-> +	phys_addr_t top;
-> +
-> +	while (start != end) {
-> +		ret = rsi_set_addr_range_state(start, end, state, flags, &top);
-> +		if (WARN_ON(ret || top < start || top > end))
-> +			return -EINVAL;
-> +		start = top;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +/*
-> + * Convert the specified range to RAM. Do not use this if you rely on the
-> + * contents of a page that may already be in RAM state.
-> + */
-> +static inline int rsi_set_memory_range_protected(phys_addr_t start,
-> +						 phys_addr_t end)
-> +{
-> +	return rsi_set_memory_range(start, end, RSI_RIPAS_RAM,
-> +				    RSI_CHANGE_DESTROYED);
-> +}
-> +
-> +/*
-> + * Convert the specified range to RAM. Do not convert any pages that may have
-> + * been DESTROYED, without our permission.
-> + */
-> +static inline int rsi_set_memory_range_protected_safe(phys_addr_t start,
-> +						      phys_addr_t end)
-> +{
-> +	return rsi_set_memory_range(start, end, RSI_RIPAS_RAM,
-> +				    RSI_NO_CHANGE_DESTROYED);
-> +}
-> +
-> +static inline int rsi_set_memory_range_shared(phys_addr_t start,
-> +					      phys_addr_t end)
-> +{
-> +	return rsi_set_memory_range(start, end, RSI_RIPAS_EMPTY,
-> +				    RSI_CHANGE_DESTROYED);
-> +}
-> +#endif /* __ASM_RSI_H_ */
-> diff --git a/arch/arm64/kernel/Makefile b/arch/arm64/kernel/Makefile
-> index 2b112f3b7510..71c29a2a2f19 100644
-> --- a/arch/arm64/kernel/Makefile
-> +++ b/arch/arm64/kernel/Makefile
-> @@ -33,7 +33,8 @@ obj-y			:= debug-monitors.o entry.o irq.o fpsimd.o		\
->  			   return_address.o cpuinfo.o cpu_errata.o		\
->  			   cpufeature.o alternative.o cacheinfo.o		\
->  			   smp.o smp_spin_table.o topology.o smccc-call.o	\
-> -			   syscall.o proton-pack.o idle.o patching.o pi/
-> +			   syscall.o proton-pack.o idle.o patching.o pi/	\
-> +			   rsi.o
->  
->  obj-$(CONFIG_COMPAT)			+= sys32.o signal32.o			\
->  					   sys_compat.o
-> diff --git a/arch/arm64/kernel/rsi.c b/arch/arm64/kernel/rsi.c
-> new file mode 100644
-> index 000000000000..9bf757b4b00c
-> --- /dev/null
-> +++ b/arch/arm64/kernel/rsi.c
-> @@ -0,0 +1,75 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (C) 2023 ARM Ltd.
-> + */
-> +
-> +#include <linux/jump_label.h>
-> +#include <linux/memblock.h>
-> +#include <linux/psci.h>
-> +#include <asm/rsi.h>
-> +
-> +DEFINE_STATIC_KEY_FALSE_RO(rsi_present);
-> +EXPORT_SYMBOL(rsi_present);
-> +
-> +static bool rsi_version_matches(void)
-> +{
-> +	unsigned long ver_lower, ver_higher;
-> +	unsigned long ret = rsi_request_version(RSI_ABI_VERSION,
-> +						&ver_lower,
-> +						&ver_higher);
-> +
-> +	if (ret == SMCCC_RET_NOT_SUPPORTED)
-> +		return false;
-> +
-> +	if (ret != RSI_SUCCESS) {
-> +		pr_err("RME: RMM doesn't support RSI version %lu.%lu. Supported range: %lu.%lu-%lu.%lu\n",
-> +		       RSI_ABI_VERSION_MAJOR, RSI_ABI_VERSION_MINOR,
-> +		       RSI_ABI_VERSION_GET_MAJOR(ver_lower),
-> +		       RSI_ABI_VERSION_GET_MINOR(ver_lower),
-> +		       RSI_ABI_VERSION_GET_MAJOR(ver_higher),
-> +		       RSI_ABI_VERSION_GET_MINOR(ver_higher));
-> +		return false;
-> +	}
-> +
-> +	pr_info("RME: Using RSI version %lu.%lu\n",
-> +		RSI_ABI_VERSION_GET_MAJOR(ver_lower),
-> +		RSI_ABI_VERSION_GET_MINOR(ver_lower));
-> +
-> +	return true;
-> +}
-> +
-> +static void __init arm64_rsi_setup_memory(void)
-> +{
-> +	u64 i;
-> +	phys_addr_t start, end;
-> +
-> +	/*
-> +	 * Iterate over the available memory ranges and convert the state to
-> +	 * protected memory. We should take extra care to ensure that we DO NOT
-> +	 * permit any "DESTROYED" pages to be converted to "RAM".
-> +	 *
-> +	 * panic() is used because if the attempt to switch the memory to
-> +	 * protected has failed here, then future accesses to the memory are
-> +	 * simply going to be reflected as a SEA (Synchronous External Abort)
-> +	 * which we can't handle.  Bailing out early prevents the guest limping
-> +	 * on and dying later.
-> +	 */
-> +	for_each_mem_range(i, &start, &end) {
-> +		if (rsi_set_memory_range_protected_safe(start, end))
-> +			panic("Failed to set memory range to protected: %pa-%pa",
-> +			      &start, &end);
-> +	}
-> +}
-> +
-> +void __init arm64_rsi_init(void)
-> +{
-> +	if (arm_smccc_1_1_get_conduit() != SMCCC_CONDUIT_SMC)
-> +		return;
-> +	if (!rsi_version_matches())
-> +		return;
-> +
-> +	arm64_rsi_setup_memory();
-> +
-> +	static_branch_enable(&rsi_present);
-> +}
-> +
-> diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
-> index b22d28ec8028..b5e1e306fa51 100644
-> --- a/arch/arm64/kernel/setup.c
-> +++ b/arch/arm64/kernel/setup.c
-> @@ -43,6 +43,7 @@
->  #include <asm/cpu_ops.h>
->  #include <asm/kasan.h>
->  #include <asm/numa.h>
-> +#include <asm/rsi.h>
->  #include <asm/scs.h>
->  #include <asm/sections.h>
->  #include <asm/setup.h>
-> @@ -351,6 +352,8 @@ void __init __no_sanitize_address setup_arch(char **cmdline_p)
->  	else
->  		psci_acpi_init();
->  
-> +	arm64_rsi_init();
-> +
->  	init_bootcpu_ops();
->  	smp_init_cpus();
->  	smp_build_mpidr_hash();
+ * Only supports 4k host PAGE_SIZE (if PAGE_SIZE != 4k then the realm
+   extensions are disabled).
+
+ * No support for huge pages when mapping the guest's pages. There is
+   some 'dead' code left over from before guest_mem was supported. This
+   is partly a current limitation of guest_memfd.
+
+The ABI to the RMM (the RMI) is based on RMM v1.0-rel0 specification[2].
+
+This series is based on v6.12-rc1. It is also available as a git
+repository:
+
+https://gitlab.arm.com/linux-arm/linux-cca cca-host/v5
+
+Work in progress changes for kvmtool are available from the git
+repository below:
+
+https://gitlab.arm.com/linux-arm/kvmtool-cca cca/v3
+
+[1] https://lore.kernel.org/r/20241004144307.66199-1-steven.price%40arm.com
+[2] https://developer.arm.com/documentation/den0137/1-0rel0/
+[3] https://lore.kernel.org/r/20240821153844.60084-1-steven.price%40arm.com
+
+Jean-Philippe Brucker (7):
+  arm64: RME: Propagate number of breakpoints and watchpoints to
+    userspace
+  arm64: RME: Set breakpoint parameters through SET_ONE_REG
+  arm64: RME: Initialize PMCR.N with number counter supported by RMM
+  arm64: RME: Propagate max SVE vector length from RMM
+  arm64: RME: Configure max SVE vector length for a Realm
+  arm64: RME: Provide register list for unfinalized RME RECs
+  arm64: RME: Provide accurate register list
+
+Joey Gouly (2):
+  arm64: rme: allow userspace to inject aborts
+  arm64: rme: support RSI_HOST_CALL
+
+Sean Christopherson (1):
+  KVM: Prepare for handling only shared mappings in mmu_notifier events
+
+Steven Price (29):
+  arm64: RME: Handle Granule Protection Faults (GPFs)
+  arm64: RME: Add SMC definitions for calling the RMM
+  arm64: RME: Add wrappers for RMI calls
+  arm64: RME: Check for RME support at KVM init
+  arm64: RME: Define the user ABI
+  arm64: RME: ioctls to create and configure realms
+  arm64: kvm: Allow passing machine type in KVM creation
+  arm64: RME: Keep a spare page delegated to the RMM
+  arm64: RME: RTT tear down
+  arm64: RME: Allocate/free RECs to match vCPUs
+  arm64: RME: Support for the VGIC in realms
+  KVM: arm64: Support timers in realm RECs
+  arm64: RME: Allow VMM to set RIPAS
+  arm64: RME: Handle realm enter/exit
+  KVM: arm64: Handle realm MMIO emulation
+  arm64: RME: Allow populating initial contents
+  arm64: RME: Runtime faulting of memory
+  KVM: arm64: Handle realm VCPU load
+  KVM: arm64: Validate register access for a Realm VM
+  KVM: arm64: Handle Realm PSCI requests
+  KVM: arm64: WARN on injected undef exceptions
+  arm64: Don't expose stolen time for realm guests
+  arm64: RME: Always use 4k pages for realms
+  arm64: rme: Prevent Device mappings for Realms
+  arm_pmu: Provide a mechanism for disabling the physical IRQ
+  arm64: rme: Enable PMU support with a realm guest
+  kvm: rme: Hide KVM_CAP_READONLY_MEM for realm guests
+  arm64: kvm: Expose support for private memory
+  KVM: arm64: Allow activating realms
+
+Suzuki K Poulose (4):
+  kvm: arm64: pgtable: Track the number of pages in the entry level
+  kvm: arm64: Include kvm_emulate.h in kvm/arm_psci.h
+  kvm: arm64: Expose debug HW register numbers for Realm
+  arm64: rme: Allow checking SVE on VM instance
+
+ Documentation/virt/kvm/api.rst       |    3 +
+ arch/arm64/include/asm/kvm_emulate.h |   34 +
+ arch/arm64/include/asm/kvm_host.h    |   16 +-
+ arch/arm64/include/asm/kvm_pgtable.h |    2 +
+ arch/arm64/include/asm/kvm_rme.h     |  155 +++
+ arch/arm64/include/asm/rmi_cmds.h    |  510 ++++++++
+ arch/arm64/include/asm/rmi_smc.h     |  255 ++++
+ arch/arm64/include/asm/virt.h        |    1 +
+ arch/arm64/include/uapi/asm/kvm.h    |   49 +
+ arch/arm64/kvm/Kconfig               |    1 +
+ arch/arm64/kvm/Makefile              |    3 +-
+ arch/arm64/kvm/arch_timer.c          |   45 +-
+ arch/arm64/kvm/arm.c                 |  166 ++-
+ arch/arm64/kvm/guest.c               |   99 +-
+ arch/arm64/kvm/hyp/pgtable.c         |    5 +-
+ arch/arm64/kvm/hypercalls.c          |    4 +-
+ arch/arm64/kvm/inject_fault.c        |    2 +
+ arch/arm64/kvm/mmio.c                |   10 +-
+ arch/arm64/kvm/mmu.c                 |  185 ++-
+ arch/arm64/kvm/pmu-emul.c            |    7 +-
+ arch/arm64/kvm/psci.c                |   29 +
+ arch/arm64/kvm/reset.c               |   23 +-
+ arch/arm64/kvm/rme-exit.c            |  207 ++++
+ arch/arm64/kvm/rme.c                 | 1628 ++++++++++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c            |   83 +-
+ arch/arm64/kvm/vgic/vgic-v3.c        |    8 +-
+ arch/arm64/kvm/vgic/vgic.c           |   41 +-
+ arch/arm64/mm/fault.c                |   31 +-
+ drivers/perf/arm_pmu.c               |   15 +
+ include/kvm/arm_arch_timer.h         |    2 +
+ include/kvm/arm_pmu.h                |    4 +
+ include/kvm/arm_psci.h               |    2 +
+ include/linux/kvm_host.h             |    2 +
+ include/linux/perf/arm_pmu.h         |    5 +
+ include/uapi/linux/kvm.h             |   31 +-
+ virt/kvm/kvm_main.c                  |    7 +
+ 36 files changed, 3569 insertions(+), 101 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kvm_rme.h
+ create mode 100644 arch/arm64/include/asm/rmi_cmds.h
+ create mode 100644 arch/arm64/include/asm/rmi_smc.h
+ create mode 100644 arch/arm64/kvm/rme-exit.c
+ create mode 100644 arch/arm64/kvm/rme.c
+
+-- 
+2.34.1
 
