@@ -1,109 +1,115 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 201AC155742;
-	Sat,  5 Oct 2024 16:35:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7E9115B99D
+	for <kvmarm@lists.linux.dev>; Sat,  5 Oct 2024 18:38:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728146156; cv=none; b=FZwnAbPkpgIdYPLt+aeyP05mGYQpikWD0CfgTSV6ZkZPQdxMUivAXCELn4DRljdtf2RWY8dM9y49DZ9u1N8n/UniTk1xSkgPFOdJooMvzH9PQ9RgjYSKcBFwShICSvp6bgbfw42da92o0eHYwPl6aX0LzanDesSnNwQB7UFDY+s=
+	t=1728153526; cv=none; b=Xu7I04LQzycYqtehnAnhuPNhcMiWnYlCBnf/LhlsSsNCNvBo22uxvD9yzOpi78irkT1iEUEDXRi92exEoILI2QZe96F9i8Lh6IovP75U3TChyygRfywVqSqqdnK0GjEnNvuI0hzP5VWD9rAFjrByld7bUnrqEgMq64UK3V5YqL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728146156; c=relaxed/simple;
-	bh=80nL05CVdGDExIrpaz/GZLy22HLnLEgT36r17S9CRx4=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QcNMpxy9lj5uc4KBg1Yn8fcV49pUGiRM5ud1G2aZb4/Rxx2vG0Ry78e0U6qpYZHGCfxeWypn1VmeiU6d31LATY0qA4f5z9iL2bGEIPxdSgxQwcqA2y/jaMP7tYPJ6WY70EcOTlUCLajVQLSuKrhOvCJ0z/QRtgL8VOIgGoqsSEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DnXyVKgu; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DnXyVKgu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E44CC4CEC2;
-	Sat,  5 Oct 2024 16:35:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728146155;
-	bh=80nL05CVdGDExIrpaz/GZLy22HLnLEgT36r17S9CRx4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=DnXyVKgu3+cYcLSUAd1Qooqz2SF7XlYECIssoKYlWO0bXg0vdJ+CrwwyL84wqCRJO
-	 VVhuzighv5ZwhsdTyJlfQaeCIU5GVwtAywuCmDJ0NHY3QbHB0/FlksxH14KuWRxj4G
-	 dwrsvGIVpHEpbPvvrvW9/FZM+L+1V7vHmR36EqmXrXfWm5RRDMfmtqIcpWUS9+G/Vj
-	 XCX+LEc0teLdVMCiuBpUiVH8AL9Uqp87XKPAq8eVFfvIf8WAEpygl80TpYLGiERqma
-	 YnuJG6nDIlb4Zww0VTrT8ZasZkjzGWcf9Bb6I1nOcvAHatENPWZKOGNiwBtYvQeYB4
-	 BCy85pHodRlrg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sx7l3-000dt3-BM;
-	Sat, 05 Oct 2024 17:35:53 +0100
-Date: Sat, 05 Oct 2024 17:35:52 +0100
-Message-ID: <87bjzyv76f.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v14 4/5] KVM: arm64: Set PSTATE.EXLOCK when entering an exception
-In-Reply-To: <ZwFJvV7lrFStWD-r@finisterre.sirena.org.uk>
-References: <20241005-arm64-gcs-v14-0-59060cd6092b@kernel.org>
-	<20241005-arm64-gcs-v14-4-59060cd6092b@kernel.org>
-	<87h69qvi9y.wl-maz@kernel.org>
-	<ZwFJvV7lrFStWD-r@finisterre.sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1728153526; c=relaxed/simple;
+	bh=WSgpTwUCUNoFVg372JpUaT18YN3U/v0nRdWuQbBYqPw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ouolRSMNMYPgUtHB8B8D9hL68vdRF1+mK46ZbjP87XJ7P7H5UJ5uEkyeMPHQmn6xQg1W27iHQ0SCpuzl2PPWKoKsynSZaLtDRXuuc8FauJ+p8BRUSNavwSjDLGBRKwq2JLmOrYr1El1sQ7z673s9iXQIqQjkKsh0fn5l8EBnlnI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
+	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
+	(envelope-from <a.fatoum@pengutronix.de>)
+	id 1sx9fd-0001EL-CD; Sat, 05 Oct 2024 20:38:25 +0200
+Message-ID: <65ab10d7-6594-490c-be07-39f83ac3559a@pengutronix.de>
+Date: Sat, 5 Oct 2024 20:38:23 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [BUG] ARM64 KVM: Data abort executing post-indexed LDR on MMIO
+ address
+To: Marc Zyngier <maz@kernel.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+ Pengutronix Kernel Team <kernel@pengutronix.de>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>, Enrico Joerns <ejo@pengutronix.de>
+References: <89f184d6-5b61-4c77-9f3b-c0a8f6a75d60@pengutronix.de>
+ <CAFEAcA_Yv2a=XCKw80y9iyBRoC27UL6Sfzgy4KwFDkC1gbzK7w@mail.gmail.com>
+ <a4c06f55-28ec-4620-b594-b7ff0bb1e162@pengutronix.de>
+ <CAFEAcA9F3AR-0OCKDy__eVBJRMi80G7bWNfANGZRR2W8iMhfJA@mail.gmail.com>
+ <4d559b9e-c208-46f3-851a-68086dc8a50f@pengutronix.de>
+ <864j5q7sdq.wl-maz@kernel.org>
+Content-Language: en-US
+From: Ahmad Fatoum <a.fatoum@pengutronix.de>
+In-Reply-To: <864j5q7sdq.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
+X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: kvmarm@lists.linux.dev
 
-On Sat, 05 Oct 2024 15:14:21 +0100,
-Mark Brown <broonie@kernel.org> wrote:
-> 
-> On Sat, Oct 05, 2024 at 01:36:09PM +0100, Marc Zyngier wrote:
-> > Mark Brown <broonie@kernel.org> wrote:
-> 
-> > > +	// PSTATE.EXLOCK is set to 0 upon any exception to a higher
-> > > +	// EL, or to GCSCR_ELx.EXLOCKEN for an exception to the same
-> > > +	// exception level.  See ARM DDI 0487 RWTXBY, D.1.3.2 in K.a.
-> > > +	if (kvm_has_gcs(vcpu->kvm) &&
-> > > +	    (target_mode & PSR_EL_MASK) == (mode & PSR_EL_MASK)) {
-> > > +		u64 gcscr = __vcpu_read_sys_reg(vcpu, GCSCR_EL1);
-> 
-> > No, please. This only works by luck when a guest has AArch32 EL0, and
-> > creates more havoc on a NV guest. In general, this PSR_EL_MASK creates
-> > more problem than anything else, and doesn't fit the rest of the code.
-> 
-> You say luck, I say careful architecture definition but sure.
+Hello Marc,
 
-I wasn't talking about the architecture, but sure.
+On 05.10.24 12:31, Marc Zyngier wrote:
+> On Fri, 04 Oct 2024 20:50:18 +0100,
+> Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
+>> With readl/writel implemented in assembly, I get beyond that point, but
+>> now I get a data abort running an DC IVAC instruction on address 0x1000,
+>> where the cfi-flash is located. This instruction is part of a routine
+>> to remap the cfi-flash to start a page later, so the zero page can be
+>> mapped faulting.
+
+[snip]
+
+>> Any idea what this is about?
+> 
+> IIRC, the QEMU flash is implemented as a read-only memslot. A data
+> cache invalidation is a *write*, as it can be (and is) upgraded to a
+> clean+invalidate by the HW.
+
+So it's a write, even if there are no dirty cache lines?
+
+> KVM cannot satisfy the write, for obvious reasons, and tells the guest
+> to bugger off (__gfn_to_pfn_memslot() returns KVM_PFN_ERR_RO_FAULT,
+> which satisfies is_error_noslot_pfn() -- a slight oddity, but hey, why
+> not).
+> 
+> In the end, you get an exception. We could relax this by
+> special-casing CMOs to RO memslots, but this doesn't look great.
+> 
+> The real question is: what are you trying to achieve with this?
+
+barebox sets up the MMU, but tries to keep a 1:1 mapping. On Virt, we
+want to map the zero page faulting, but still have access to the first
+block of the cfi-flash.
+
+Therefore, barebox will map the cfi-flash one page later
+(virt 0x1000,0x2000,... -> phys 0x0000,0x1000,...) and so on, so the first
+page can be mapped faulting.
+
+The routine[1] that does this remapping invalidates the virtual address range,
+because the attributes may change[2]. This invalidate also happens for cfi-flash,
+but we should never encounter dirty cache lines there as the remap is done
+before driver probe.
+
+Can you advise what should be done differently?
+
+[1]: https://elixir.bootlin.com/barebox/v2024.09.0/source/arch/arm/cpu/mmu_64.c#L193
+[2]: https://lore.kernel.org/barebox/20230526063354.1145474-4-a.fatoum@pengutronix.de/
+
+Thanks,
+Ahmad
 
 > 
-> > So this needs to:
-> > - explicitly only apply to exceptions from AArch64
-> > - handle exception from EL2, since this helper already deals with that
+> 	M.
 > 
-> > The latter point of course means introducing GCSCR_EL2 (and everything
-> > that depends on it, such as the trap handling).
-> 
-> For clarity, which trap handling specifically?
 
-All the traps described in the GCSCR_EL2 documentation -- I see two
-control bits described in K.a, all of which needs to be propagated and
-their effects handled. Similarly, GCSPR_EL2 needs to be defined.
-
-	M.
 
 -- 
-Without deviation from the norm, progress is not possible.
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
