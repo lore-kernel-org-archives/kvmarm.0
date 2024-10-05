@@ -1,115 +1,151 @@
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7E9115B99D
-	for <kvmarm@lists.linux.dev>; Sat,  5 Oct 2024 18:38:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2ED518E1F;
+	Sat,  5 Oct 2024 21:35:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728153526; cv=none; b=Xu7I04LQzycYqtehnAnhuPNhcMiWnYlCBnf/LhlsSsNCNvBo22uxvD9yzOpi78irkT1iEUEDXRi92exEoILI2QZe96F9i8Lh6IovP75U3TChyygRfywVqSqqdnK0GjEnNvuI0hzP5VWD9rAFjrByld7bUnrqEgMq64UK3V5YqL4=
+	t=1728164152; cv=none; b=PUZyLP77U8RBJa/pBuf4YIwE+UrwYDb8r3u0Hpq199+zr0ws8IWQDgCiPZmA8wFZ2PvVgYILiR/9vxJcqvOcQl2JuM6m6oamsFYChwRtokK8zXS4ytIiLmUGZUdGuSMUy8eqbSfNt11d+5OXGtf/c3RAislbEkx5T3Dfis10eQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728153526; c=relaxed/simple;
-	bh=WSgpTwUCUNoFVg372JpUaT18YN3U/v0nRdWuQbBYqPw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ouolRSMNMYPgUtHB8B8D9hL68vdRF1+mK46ZbjP87XJ7P7H5UJ5uEkyeMPHQmn6xQg1W27iHQ0SCpuzl2PPWKoKsynSZaLtDRXuuc8FauJ+p8BRUSNavwSjDLGBRKwq2JLmOrYr1El1sQ7z673s9iXQIqQjkKsh0fn5l8EBnlnI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
-	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
-	(envelope-from <a.fatoum@pengutronix.de>)
-	id 1sx9fd-0001EL-CD; Sat, 05 Oct 2024 20:38:25 +0200
-Message-ID: <65ab10d7-6594-490c-be07-39f83ac3559a@pengutronix.de>
-Date: Sat, 5 Oct 2024 20:38:23 +0200
+	s=arc-20240116; t=1728164152; c=relaxed/simple;
+	bh=4sfPDWl1oJaJQh9DQfDD4n4dpgiSjjXdaE92+qki+no=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rIALBscndcVJnmNBpeiJX67Nh83xqhPnObdktu5adgh3I2776aXdqUVP8d4mf38H6G31dJdr9NQ9H6BgIwK1PeYyu67mE4hbitUN/zBNEmxXZ2za7SW59EYH2PGLGfYX+4PrbHmigImq75sUwQgHNtYT4CUQXr6GoEOMdiUZ0r4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nOpfuY9R; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nOpfuY9R"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21F30C4CECC;
+	Sat,  5 Oct 2024 21:35:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728164152;
+	bh=4sfPDWl1oJaJQh9DQfDD4n4dpgiSjjXdaE92+qki+no=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=nOpfuY9RkAvbGr1+JirOtWdENC8a8hWxm/fOFqgfo4xdotxuvlbrkvdQJVCOzVYed
+	 oEDTlkg4EHoaUSYvw0EafAfcLbV2SAfH53l8Zgyv7dx1xfKDWsf269E3LGWmsOdtyn
+	 2uf1vXvDzqMiUOUJlwUe3t+/mGiAjlT/khk8qmaKdIY2Ww+Rwxq96pP4K9MWFCqdZe
+	 p1FcHyhU0XyArpT9kczq4YZeT1imC4CahdX8/sP+kuFmwkPl9d/tXGTunaPlxCdl6d
+	 0SiTSmoOXKMRIbhrJUw9dOnDDfJnJus7M+I/qcnyadOv8wdrsU0Vc4UocmvcjLC6h0
+	 uqhqGrSdG5krA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sxCRK-000h6U-1X;
+	Sat, 05 Oct 2024 22:35:50 +0100
+Date: Sat, 05 Oct 2024 22:35:49 +0100
+Message-ID: <87a5fiutai.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ahmad Fatoum <a.fatoum@pengutronix.de>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	qemu-arm@nongnu.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	"linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+	Enrico Joerns <ejo@pengutronix.de>
+Subject: Re: [BUG] ARM64 KVM: Data abort executing post-indexed LDR on MMIO address
+In-Reply-To: <65ab10d7-6594-490c-be07-39f83ac3559a@pengutronix.de>
+References: <89f184d6-5b61-4c77-9f3b-c0a8f6a75d60@pengutronix.de>
+	<CAFEAcA_Yv2a=XCKw80y9iyBRoC27UL6Sfzgy4KwFDkC1gbzK7w@mail.gmail.com>
+	<a4c06f55-28ec-4620-b594-b7ff0bb1e162@pengutronix.de>
+	<CAFEAcA9F3AR-0OCKDy__eVBJRMi80G7bWNfANGZRR2W8iMhfJA@mail.gmail.com>
+	<4d559b9e-c208-46f3-851a-68086dc8a50f@pengutronix.de>
+	<864j5q7sdq.wl-maz@kernel.org>
+	<65ab10d7-6594-490c-be07-39f83ac3559a@pengutronix.de>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [BUG] ARM64 KVM: Data abort executing post-indexed LDR on MMIO
- address
-To: Marc Zyngier <maz@kernel.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- kvmarm@lists.linux.dev, kvm@vger.kernel.org,
- Pengutronix Kernel Team <kernel@pengutronix.de>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>, Enrico Joerns <ejo@pengutronix.de>
-References: <89f184d6-5b61-4c77-9f3b-c0a8f6a75d60@pengutronix.de>
- <CAFEAcA_Yv2a=XCKw80y9iyBRoC27UL6Sfzgy4KwFDkC1gbzK7w@mail.gmail.com>
- <a4c06f55-28ec-4620-b594-b7ff0bb1e162@pengutronix.de>
- <CAFEAcA9F3AR-0OCKDy__eVBJRMi80G7bWNfANGZRR2W8iMhfJA@mail.gmail.com>
- <4d559b9e-c208-46f3-851a-68086dc8a50f@pengutronix.de>
- <864j5q7sdq.wl-maz@kernel.org>
-Content-Language: en-US
-From: Ahmad Fatoum <a.fatoum@pengutronix.de>
-In-Reply-To: <864j5q7sdq.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
-X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: kvmarm@lists.linux.dev
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: a.fatoum@pengutronix.de, peter.maydell@linaro.org, qemu-arm@nongnu.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, kernel@pengutronix.de, linux-arm-kernel@lists.infradead.org, ejo@pengutronix.de
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hello Marc,
-
-On 05.10.24 12:31, Marc Zyngier wrote:
-> On Fri, 04 Oct 2024 20:50:18 +0100,
-> Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
->> With readl/writel implemented in assembly, I get beyond that point, but
->> now I get a data abort running an DC IVAC instruction on address 0x1000,
->> where the cfi-flash is located. This instruction is part of a routine
->> to remap the cfi-flash to start a page later, so the zero page can be
->> mapped faulting.
-
-[snip]
-
->> Any idea what this is about?
+On Sat, 05 Oct 2024 19:38:23 +0100,
+Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
 > 
-> IIRC, the QEMU flash is implemented as a read-only memslot. A data
-> cache invalidation is a *write*, as it can be (and is) upgraded to a
-> clean+invalidate by the HW.
-
-So it's a write, even if there are no dirty cache lines?
-
-> KVM cannot satisfy the write, for obvious reasons, and tells the guest
-> to bugger off (__gfn_to_pfn_memslot() returns KVM_PFN_ERR_RO_FAULT,
-> which satisfies is_error_noslot_pfn() -- a slight oddity, but hey, why
-> not).
+> Hello Marc,
 > 
-> In the end, you get an exception. We could relax this by
-> special-casing CMOs to RO memslots, but this doesn't look great.
+> On 05.10.24 12:31, Marc Zyngier wrote:
+> > On Fri, 04 Oct 2024 20:50:18 +0100,
+> > Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
+> >> With readl/writel implemented in assembly, I get beyond that point, but
+> >> now I get a data abort running an DC IVAC instruction on address 0x1000,
+> >> where the cfi-flash is located. This instruction is part of a routine
+> >> to remap the cfi-flash to start a page later, so the zero page can be
+> >> mapped faulting.
 > 
-> The real question is: what are you trying to achieve with this?
-
-barebox sets up the MMU, but tries to keep a 1:1 mapping. On Virt, we
-want to map the zero page faulting, but still have access to the first
-block of the cfi-flash.
-
-Therefore, barebox will map the cfi-flash one page later
-(virt 0x1000,0x2000,... -> phys 0x0000,0x1000,...) and so on, so the first
-page can be mapped faulting.
-
-The routine[1] that does this remapping invalidates the virtual address range,
-because the attributes may change[2]. This invalidate also happens for cfi-flash,
-but we should never encounter dirty cache lines there as the remap is done
-before driver probe.
-
-Can you advise what should be done differently?
-
-[1]: https://elixir.bootlin.com/barebox/v2024.09.0/source/arch/arm/cpu/mmu_64.c#L193
-[2]: https://lore.kernel.org/barebox/20230526063354.1145474-4-a.fatoum@pengutronix.de/
-
-Thanks,
-Ahmad
-
+> [snip]
 > 
-> 	M.
+> >> Any idea what this is about?
+> > 
+> > IIRC, the QEMU flash is implemented as a read-only memslot. A data
+> > cache invalidation is a *write*, as it can be (and is) upgraded to a
+> > clean+invalidate by the HW.
 > 
+> So it's a write, even if there are no dirty cache lines?
 
+Yes.
+
+At the point where this is handled, the CPU has no clue about the
+dirty state of an arbitrary cache line, at an arbitrary cache level.
+The CPU simply forward the CMO downstream, and the permission check
+happens way before that.
+
+> > KVM cannot satisfy the write, for obvious reasons, and tells the guest
+> > to bugger off (__gfn_to_pfn_memslot() returns KVM_PFN_ERR_RO_FAULT,
+> > which satisfies is_error_noslot_pfn() -- a slight oddity, but hey, why
+> > not).
+> > 
+> > In the end, you get an exception. We could relax this by
+> > special-casing CMOs to RO memslots, but this doesn't look great.
+> > 
+> > The real question is: what are you trying to achieve with this?
+> 
+> barebox sets up the MMU, but tries to keep a 1:1 mapping. On Virt, we
+> want to map the zero page faulting, but still have access to the first
+> block of the cfi-flash.
+> 
+> Therefore, barebox will map the cfi-flash one page later
+> (virt 0x1000,0x2000,... -> phys 0x0000,0x1000,...) and so on, so the first
+> page can be mapped faulting.
+> 
+> The routine[1] that does this remapping invalidates the virtual address range,
+> because the attributes may change[2]. This invalidate also happens for cfi-flash,
+> but we should never encounter dirty cache lines there as the remap is done
+> before driver probe.
+>
+> Can you advise what should be done differently?
+
+If you always map the flash as Device memory, there is no need for
+CMOs. Same thing if you map it as NC. And even if you did map it as
+Cacheable, it wouldn't matter. KVM already handles coherency when the
+flash is switching between memory-mapped and programming mode, as the
+physical address space changes (the flash literally drops from the
+memory map).
+
+In general, issuing CMOs to a device is a bizarre concept, because it
+is pretty rare that a device can handle a full cache-line as
+write-back. Devices tend to handle smaller, register-sized accesses,
+not a full 64-byte eviction.
+
+Now, I'm still wondering whether we should simply forward the CMO to
+userspace as we do for other writes, and let the VMM deal with it. The
+main issue is that there is no current way to describe this.
+
+The alternative would be to silently handle the trap and pretend it
+never occurred, as we do for other bizarre behaviours. But that'd be
+something only new kernels would support, and I guess you'd like your
+guest to work today, not tomorrow.
+
+	M.
 
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Without deviation from the norm, progress is not possible.
