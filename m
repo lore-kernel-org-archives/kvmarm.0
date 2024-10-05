@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EE1814F9F3
-	for <kvmarm@lists.linux.dev>; Sat,  5 Oct 2024 12:38:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94422154C08
+	for <kvmarm@lists.linux.dev>; Sat,  5 Oct 2024 12:38:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728131921; cv=none; b=qUGIBmTrInoByM+LQbSIujzIbnFmZFGdtQH/hKffAo1IF3yUD6KUzjms51/GmxzpMYnjLpN1AyZuwXfYsWNXlCB3y5q0+IOHcg6tuz1EM9zVb1J4vIKVPHVLELx14I5s/XiR22Uc+v6cpvf2APT82QsqSWcCwM8fwsgEM1tP8qI=
+	t=1728131924; cv=none; b=IYMgb38NDXtGB27ZJ4Ihegxv0EINUdmUuglgUb1icTiKM35zrT3pG41kk47PKfZy6BqTUfE5X0r21ytw3lIkMv+XCk6Yj/gqpE+MIZTKkFV+yWsHvY3mUgKBK++GJyBiH666QuoUO/lhyxV2uynUuKAIxhIDxlkMsblvnkvYNvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728131921; c=relaxed/simple;
-	bh=JqamoxHm7kNW47ehaGwMfVwVIDgzkqNYDKZYgxUyvj4=;
+	s=arc-20240116; t=1728131924; c=relaxed/simple;
+	bh=feAzXXC1edxnHlLjdNG5JUQhZRVL7SQv8APzcDLiaAc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=exhbXlh3rv3DxKqU8J3l2mYYjf1h4dYx/IATMbT2xhcNp4dp86wFR6wWt2i6OyP7OGHLYlUjB0Efr1HHOAcXk75xIqtgrE1nwLNXnjiH3/drk+O+AXxAaGUg/LS9GUtafcoK+I75rCqWb1WIe8C5WEEDMiJDfR+TdqtkA6ZHM9I=
+	 MIME-Version; b=cVx2vze58Cx5En2y47s4PFRtJ5XvWBsbFjlLulXZ6dkWI5FKaCQpWFnmMjuy9dUwG/1QNfbsaa65ixhSF8+cxbydQTd7ofUGYlaWQgrrLIL1RzQ2PxUhGihDnCDR96o+NXYSeTT0Qfivf1ih2hNLnQLLsThv+1VlTEY1eAjDPbo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D8D0D1063;
-	Sat,  5 Oct 2024 05:39:03 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9B5071007;
+	Sat,  5 Oct 2024 05:39:12 -0700 (PDT)
 Received: from a077893.arm.com (unknown [10.163.39.26])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 8BC6B3F64C;
-	Sat,  5 Oct 2024 05:38:30 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 444DB3F64C;
+	Sat,  5 Oct 2024 05:38:39 -0700 (PDT)
 From: Anshuman Khandual <anshuman.khandual@arm.com>
 To: linux-arm-kernel@lists.infradead.org
 Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
@@ -31,9 +31,9 @@ Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
 	Mark Rutland <mark.rutland@arm.com>,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/5] arm64/mm: Drop pte_mkhuge()
-Date: Sat,  5 Oct 2024 18:08:20 +0530
-Message-Id: <20241005123824.1366397-2-anshuman.khandual@arm.com>
+Subject: [PATCH 3/5] arm64/ptdump: Test PMD_TYPE_MASK for block mapping
+Date: Sat,  5 Oct 2024 18:08:22 +0530
+Message-Id: <20241005123824.1366397-4-anshuman.khandual@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20241005123824.1366397-1-anshuman.khandual@arm.com>
 References: <20241005123824.1366397-1-anshuman.khandual@arm.com>
@@ -45,17 +45,10 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Core HugeTLB defines arch_make_huge_pte() fallback definition, which calls
-platform provided pte_mkhuge(). But if any platform already provides custom
-arch_make_huge_pte(), then it does not need to provide pte_mkhuge(). arm64
-defines arch_make_huge_pte(), but then also calls pte_mkhuge() internally.
-This creates confusion as if both of these callbacks are being used in core
-HugeTLB and required to be defined in the platform.
-
-This changes arch_make_huge_pte() to create block mapping directly and also
-drops off now redundant helper pte_mkhuge(), making things clear. Also this
-changes HugeTLB page creation from just clearing the PTE_TABLE_BIT (bit[1])
-to actually setting bits[1:0] via PTE_TYPE_[MASK|SECT] instead.
+arm64 block mapping requires given page table entry's bits[1:0] to be "01".
+But now only bit[1] is checked to be clear, while also implicitly assuming
+bit[0] to be set. This modifies ptdump to check both the relevant bits via
+the mask PMD_TYPE_MASK and check the resultant value against PMD_TYPE_MASK.
 
 Cc: Catalin Marinas <catalin.marinas@arm.com>
 Cc: Will Deacon <will@kernel.org>
@@ -66,52 +59,28 @@ Cc: linux-arm-kernel@lists.infradead.org
 Cc: linux-kernel@vger.kernel.org
 Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
 ---
- arch/arm64/include/asm/pgtable-hwdef.h | 1 +
- arch/arm64/include/asm/pgtable.h       | 5 -----
- arch/arm64/mm/hugetlbpage.c            | 2 +-
- 3 files changed, 2 insertions(+), 6 deletions(-)
+ arch/arm64/mm/ptdump.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
-index fd330c1db289..956a702cb532 100644
---- a/arch/arm64/include/asm/pgtable-hwdef.h
-+++ b/arch/arm64/include/asm/pgtable-hwdef.h
-@@ -158,6 +158,7 @@
- #define PTE_VALID		(_AT(pteval_t, 1) << 0)
- #define PTE_TYPE_MASK		(_AT(pteval_t, 3) << 0)
- #define PTE_TYPE_PAGE		(_AT(pteval_t, 3) << 0)
-+#define PTE_TYPE_SECT		(_AT(pteval_t, 1) << 0)
- #define PTE_TABLE_BIT		(_AT(pteval_t, 1) << 1)
- #define PTE_USER		(_AT(pteval_t, 1) << 6)		/* AP[1] */
- #define PTE_RDONLY		(_AT(pteval_t, 1) << 7)		/* AP[2] */
-diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
-index c329ea061dc9..fa4c32a9f572 100644
---- a/arch/arm64/include/asm/pgtable.h
-+++ b/arch/arm64/include/asm/pgtable.h
-@@ -438,11 +438,6 @@ static inline void __set_ptes(struct mm_struct *mm,
- 	}
- }
- 
--/*
-- * Huge pte definitions.
-- */
--#define pte_mkhuge(pte)		(__pte(pte_val(pte) & ~PTE_TABLE_BIT))
--
- /*
-  * Hugetlb definitions.
-  */
-diff --git a/arch/arm64/mm/hugetlbpage.c b/arch/arm64/mm/hugetlbpage.c
-index 5f1e2103888b..5922c95630ad 100644
---- a/arch/arm64/mm/hugetlbpage.c
-+++ b/arch/arm64/mm/hugetlbpage.c
-@@ -361,7 +361,7 @@ pte_t arch_make_huge_pte(pte_t entry, unsigned int shift, vm_flags_t flags)
- {
- 	size_t pagesize = 1UL << shift;
- 
--	entry = pte_mkhuge(entry);
-+	entry = __pte((pte_val(entry) & ~PTE_TYPE_MASK) | PTE_TYPE_SECT);
- 	if (pagesize == CONT_PTE_SIZE) {
- 		entry = pte_mkcont(entry);
- 	} else if (pagesize == CONT_PMD_SIZE) {
+diff --git a/arch/arm64/mm/ptdump.c b/arch/arm64/mm/ptdump.c
+index 264c5f9b97d8..8cec0da4cff2 100644
+--- a/arch/arm64/mm/ptdump.c
++++ b/arch/arm64/mm/ptdump.c
+@@ -80,10 +80,10 @@ static const struct ptdump_prot_bits pte_bits[] = {
+ 		.set	= "CON",
+ 		.clear	= "   ",
+ 	}, {
+-		.mask	= PTE_TABLE_BIT,
+-		.val	= PTE_TABLE_BIT,
+-		.set	= "   ",
+-		.clear	= "BLK",
++		.mask	= PMD_TYPE_MASK,
++		.val	= PMD_TYPE_SECT,
++		.set	= "BLK",
++		.clear	= "   ",
+ 	}, {
+ 		.mask	= PTE_UXN,
+ 		.val	= PTE_UXN,
 -- 
 2.25.1
 
