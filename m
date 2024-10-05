@@ -1,105 +1,135 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6DA4D2FA;
-	Sat,  5 Oct 2024 14:33:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB4D1156230;
+	Sat,  5 Oct 2024 15:43:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728138834; cv=none; b=NBoLE1vFrA7dpdOdwIoTvKsOUwCmxemcs7q6Tl+HCzOpdOCiPmYRwWzZCfZeqiWac4/2Sx19rYTaUvwezgrfr2C12lXV9a3FcCHar1vwZjjNVne5KWVDCKdmWH2dIyw84+m2B+raOJ7QBcFfBtY6dcyjqA0wUrJDLiv6Dk/KmTs=
+	t=1728143001; cv=none; b=Txhkc8UopU1ogFFt9YrA6bsft1XbuTvkVPZPM0YwCAJL4OQukzKCzhwp2XTeoMN/Q5I2fLlcDnEgLqhqpTqkUzJtewD+Qbv5Nz7kCHuSTtXdmRNwsFwZ2Q3yVNpcCNrBPvNVL3FQQO9Fg7CCk1fjn7pQyWSoh+ylri8+qzgItNE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728138834; c=relaxed/simple;
-	bh=MU0fRAPqCrXvULNmVt/pnSMsmzjWy+uOjBzDEn46sHE=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uAJFMI1etX6OOYg8hfu5d3/oTOXlolXACJFK0Mepe2TKsMlFb4L6tdKJG3dJ/hEKKFD211sDZgCUN5Qgp03ynuExhRaGCXhStmhZCVI6CVqoXu4nkEq5Zi0cUiztIpVpqdbQgD3IZIWuQaW7cH7YlhVm1/dDckmjeyHfZ73CwJg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OvSDtyHP; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1728143001; c=relaxed/simple;
+	bh=lE5QibUYsKzAyO9poiE6OnCcKvzWQz2/KHWAeEPn714=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=my8UTNQ+wlbrb6VTI0KPK9Otjo+OglrpDP6sP5z4SBNE8k5gI2KtDl3dKyTaxrouBj32Wm+6dNesTsktoE9e+oPw1u4ZiHFdc8rgEE0PLTV23pIBDOXEy2RHWGzfx1dXc54VAxoL7B+oexXr35WdTneUTv6NIVG+QgvQXgHDrsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kOXF97Wa; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OvSDtyHP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58532C4CEC2;
-	Sat,  5 Oct 2024 14:33:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728138833;
-	bh=MU0fRAPqCrXvULNmVt/pnSMsmzjWy+uOjBzDEn46sHE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OvSDtyHPg97pm18qhn1VmhnVbVIflurs/GIKYIChPgjZmpfPcEe8bzCwGaHlMUzCO
-	 9sofmVYLI2aEjdevyG2GSBb0lyLgVCY2I8zPB0CwaQvPy3h13YMPCKdu9k/DhxevcJ
-	 b66WVnfhDqEw6Od/M2ICj7imsUfr53fm0QgVGrLr8ioMJSOveJj6/IakXZTG6PDJTZ
-	 Dfv7vAe3nJmjoWfnSZtKvLnhTjKceM/CqIMgHgIds/YsVGVwzkPiLdv0Q/JlTs+jzI
-	 +ozv3FgXSgMv9uZOOqtwR+H9R978wQtRNalF8ISMpTOcwItPym41W7JJ05sdiDmAZ5
-	 X1oFfmJH/bPCA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sx5qw-000cXV-BW;
-	Sat, 05 Oct 2024 15:33:50 +0100
-Date: Sat, 05 Oct 2024 15:33:48 +0100
-Message-ID: <87cykevctv.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kOXF97Wa"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1728143000; x=1759679000;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=lE5QibUYsKzAyO9poiE6OnCcKvzWQz2/KHWAeEPn714=;
+  b=kOXF97WaJP2KDFZeGOQgOZxiKWXFz7VRH3VN8fY2x0lRtA/Bp2qazd/d
+   tYLdtTPf+x2dUSw02bhnnwnfq0QGFv1d/sYr7ttz5wu0G45tJvcCX/9YG
+   2r7El+w4dXaMrNyB1bkLkPvTtQMp5gmLoCxgpd3W1DjHME2DRl6aCKt6N
+   dNIKjj5kjWyJrmyAzV8lguC4mbDcky3+8o3+WUQjbeH2c7kcOxd/qhRXM
+   OEAvx3SvlqqpHWSzkEjIDNRBeuQWrvN93ATIv1/1z304N0fHa+JaehXhb
+   ONsKkkYXexuH0ney5AJOE2kWHhMcjhl+pQlB5NjofLPL6kcUjxf5SpRmM
+   A==;
+X-CSE-ConnectionGUID: JFL/dk+qQqOPazRaatZ9IQ==
+X-CSE-MsgGUID: fYOpHtv+Q5WDyGmFMLSJ7Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11216"; a="31050212"
+X-IronPort-AV: E=Sophos;i="6.11,180,1725346800"; 
+   d="scan'208";a="31050212"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Oct 2024 08:43:20 -0700
+X-CSE-ConnectionGUID: rfvIPsBNStO9nylfdgJL9w==
+X-CSE-MsgGUID: 9GUcaUHKTuio/s9HEg3f8A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,180,1725346800"; 
+   d="scan'208";a="79772874"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by orviesa005.jf.intel.com with ESMTP; 05 Oct 2024 08:43:14 -0700
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sx6w3-00034g-1e;
+	Sat, 05 Oct 2024 15:43:11 +0000
+Date: Sat, 5 Oct 2024 23:42:49 +0800
+From: kernel test robot <lkp@intel.com>
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Cc: oe-kbuild-all@lists.linux.dev, Sami Mujawar <sami.mujawar@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v14 3/5] KVM: arm64: Manage GCS access and registers for guests
-In-Reply-To: <ZwFMnhXGV_Nj31tE@finisterre.sirena.org.uk>
-References: <20241005-arm64-gcs-v14-0-59060cd6092b@kernel.org>
-	<20241005-arm64-gcs-v14-3-59060cd6092b@kernel.org>
-	<87iku6vl4z.wl-maz@kernel.org>
-	<ZwE6V9cqf7jD1rTc@finisterre.sirena.org.uk>
-	<87frpavgam.wl-maz@kernel.org>
-	<ZwFDmaeIgPKfmJnj@finisterre.sirena.org.uk>
-	<87ed4uveam.wl-maz@kernel.org>
-	<ZwFMnhXGV_Nj31tE@finisterre.sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+	Steven Price <steven.price@arm.com>
+Subject: Re: [PATCH v6 10/11] virt: arm-cca-guest: TSM_REPORT support for
+ realms
+Message-ID: <202410052337.YQFmvTFu-lkp@intel.com>
+References: <20241004144307.66199-11-steven.price@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241004144307.66199-11-steven.price@arm.com>
 
-On Sat, 05 Oct 2024 15:26:38 +0100,
-Mark Brown <broonie@kernel.org> wrote:
-> 
-> [1  <text/plain; us-ascii (7bit)>]
-> On Sat, Oct 05, 2024 at 03:02:09PM +0100, Marc Zyngier wrote:
-> > Mark Brown <broonie@kernel.org> wrote:
-> 
-> > > Ah, I see.  I'd been under the impression that the generic machinery was
-> > > supposed to handle this already using the descriptions in
-> > > emulate-nested.c and we only needed handlers for more specific actions.
-> 
-> > From that very file:
-> 
-> > /*
-> >  * Map encoding to trap bits for exception reported with EC=0x18.
-> >  [...]
-> >  */
-> 
-> > Everything else needs special handling.
-> 
-> I see.  I had noticed that comment on that table but I didn't register
-> that the comment wound up applying to the whole file rather than being
-> about a specific part of the handling.  I'm a bit confused about how
-> things like the SVE traps I mentioned work here...
+Hi Steven,
 
-Like all ECs, the handling starts in handle_exit.c.
+kernel test robot noticed the following build warnings:
 
-	M.
+[auto build test WARNING on arm64/for-next/core]
+[also build test WARNING on linus/master v6.12-rc1 next-20241004]
+[cannot apply to efi/next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Steven-Price/arm64-rsi-Add-RSI-definitions/20241004-225034
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-next/core
+patch link:    https://lore.kernel.org/r/20241004144307.66199-11-steven.price%40arm.com
+patch subject: [PATCH v6 10/11] virt: arm-cca-guest: TSM_REPORT support for realms
+config: arm64-randconfig-004-20241005 (https://download.01.org/0day-ci/archive/20241005/202410052337.YQFmvTFu-lkp@intel.com/config)
+compiler: aarch64-linux-gcc (GCC) 14.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241005/202410052337.YQFmvTFu-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202410052337.YQFmvTFu-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/virt/coco/arm-cca-guest/arm-cca-guest.c:27: warning: Excess struct member 'len' description in 'arm_cca_token_info'
+
+
+vim +27 drivers/virt/coco/arm-cca-guest/arm-cca-guest.c
+
+    15	
+    16	/**
+    17	 * struct arm_cca_token_info - a descriptor for the token buffer.
+    18	 * @granule:	PA of the page to which the token will be written
+    19	 * @offset:	Offset within granule to start of buffer in bytes
+    20	 * @len:	Number of bytes of token data that was retrieved
+    21	 * @result:	result of rsi_attestation_token_continue operation
+    22	 */
+    23	struct arm_cca_token_info {
+    24		phys_addr_t     granule;
+    25		unsigned long   offset;
+    26		int             result;
+  > 27	};
+    28	
 
 -- 
-Without deviation from the norm, progress is not possible.
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
