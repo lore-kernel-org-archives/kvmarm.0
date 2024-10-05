@@ -1,107 +1,161 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4F28231C9B;
-	Fri,  4 Oct 2024 23:20:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AE9313CABC;
+	Sat,  5 Oct 2024 10:31:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728084018; cv=none; b=FNgAOZPQd/gld7kgTudVdyZU8lyh3+WGntLnY4xKJY5ciT27aSUrSmdsTRh22L0dIVqcU2w7h8/ykBmYePIXt6RQ5ODYsyH2bUDqu1lwy8GyUd/XgnSHA4xiMeY4Gmiafh8NBnSj7rWHePWW/bTwsk6nf0qD4ULdaSt6Wfk+czk=
+	t=1728124309; cv=none; b=fnAZ2dILRZccsaNNeQaZld4SLZTcEbwbzGnffAKbFUCMQp/Psiwhz5yB+vpgQAuXxD+L/ySQyQSHvcJyIsoX67ls2xuCfHhTmchY3aoRvOm23p2ChhNZXQEVbeehWB6KnqukmNNQQDvzGEmXBCIQ6DGBq9b/608t6GemQ3Pkly0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728084018; c=relaxed/simple;
-	bh=B+4iUDEw9TYIVwLvNxtIxnldk76z5iKCVi04UblglX0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=tRqqnE/sYsHRMG3L/IxguYiAqcEXVnTq1DeZgNKUHr5R24RBhGOlRZFOS8anM8oV95rqUVn+nM2NYY69rF/X/yG7trZxq6uuSmyAeP1wxhYoIEZ2nFRKes3qjAKQULRbk+/d2frHOtGAJMVwFUJz75krcc297KeLnP6C9qYFKyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l/QzDYNC; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1728124309; c=relaxed/simple;
+	bh=dRfL9j9fox9VAJqc0lt4h4UbPL3AelM/FiWAIcNnBLk=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=L0fbRCL84dCv07y0gUB1kHubwzLJ3pechk5VLFCtG/nM7va1QGwVrN/jYBF2am0/5hunnMvZC2hZxr3T9LAnXhttQyQA7QHVqgUuHwz8JkXY0anPmYry79tbsgHnJAmpG51GfdRzXE1Tjj0rseo5iJ5NQYjZb8ah/jeO0Utz3yk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NaA1b/iz; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l/QzDYNC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FCA9C4CEC6;
-	Fri,  4 Oct 2024 23:20:15 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NaA1b/iz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2FAEC4CEC2;
+	Sat,  5 Oct 2024 10:31:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728084017;
-	bh=B+4iUDEw9TYIVwLvNxtIxnldk76z5iKCVi04UblglX0=;
-	h=From:Date:Subject:To:Cc:From;
-	b=l/QzDYNCQd+WcAHHEAagG146wy7AxW66s3O84md+Me5F5Kw3QRjGlM4eauiFD7/t9
-	 zqlceXVUg7qlz44RJpugiPuhy3VbaE24sO0ngVIHFRW0d0RkXOHgO+nhct/7gWczu9
-	 ci03kMkIhfewR1RleKEocHAHxMN5llaAsIET8RvpJyRz3B9oiYM1updyJnjyppFVO6
-	 M/CT5J4h9dWo15tmgBSVOjysgZFI/u6GcS4IHYqlTFdZubGvcLpfuURRWr0vN5BblQ
-	 nEAceWF6XMnxgZoxrR0VXQL0zzzDEtQotPBVkc9uds373DtNLFzfnbMaJijwVk7CY/
-	 ygZBFtuPrSXwA==
-From: Mark Brown <broonie@kernel.org>
-Date: Sat, 05 Oct 2024 00:19:37 +0100
-Subject: [PATCH] KVM: arm64: Expose S1PIE to guests
+	s=k20201202; t=1728124308;
+	bh=dRfL9j9fox9VAJqc0lt4h4UbPL3AelM/FiWAIcNnBLk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=NaA1b/izRRpGy/Uf2jvZ6tDEg8GmC5EAzwKkwpPGT531aHilzWSVikSp/xeg3vJXF
+	 AZ1MKt49KnY28ZaOyxgw1RGpt1RAgVn0Ee5euMoiu7BzSghRMkAT/LDmHjIq4SEfMk
+	 YJQEOhI/KpjzA0tziqpWGorvzg2U87cFgi9K+BEdJy8a8/Fxqn9xQOM65K+Ikl7EkU
+	 SarcI7gNmfRfw4gyniazOgpihH4zU1+snZ0RKQc+UXxqyaqNSwJMWePibMVGO0XgsZ
+	 cYyQNqt6neknw0DZRQU3N/0GuqhqLlDCLjahFfPViCE7AZUJIUjAMwZeKWtxl+tysE
+	 iO4u/m4eQI9kA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sx24g-000YxZ-Jq;
+	Sat, 05 Oct 2024 11:31:46 +0100
+Date: Sat, 05 Oct 2024 11:31:45 +0100
+Message-ID: <864j5q7sdq.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ahmad Fatoum <a.fatoum@pengutronix.de>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	qemu-arm@nongnu.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	"linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+	Enrico Joerns <ejo@pengutronix.de>
+Subject: Re: [BUG] ARM64 KVM: Data abort executing post-indexed LDR on MMIO address
+In-Reply-To: <4d559b9e-c208-46f3-851a-68086dc8a50f@pengutronix.de>
+References: <89f184d6-5b61-4c77-9f3b-c0a8f6a75d60@pengutronix.de>
+	<CAFEAcA_Yv2a=XCKw80y9iyBRoC27UL6Sfzgy4KwFDkC1gbzK7w@mail.gmail.com>
+	<a4c06f55-28ec-4620-b594-b7ff0bb1e162@pengutronix.de>
+	<CAFEAcA9F3AR-0OCKDy__eVBJRMi80G7bWNfANGZRR2W8iMhfJA@mail.gmail.com>
+	<4d559b9e-c208-46f3-851a-68086dc8a50f@pengutronix.de>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241005-kvm-arm64-fix-s1pie-v1-1-5901f02de749@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAAh4AGcC/x2MWwqAIBAArxL73YLaZtFVog/LrZbogYIE0d2TP
- odh5oHIQThCVzwQOEmU88igywKm1R0Lo/jMYJQhrRThlnZ0YbeEs9wY9SWMzvq2HmmsTEOQyyt
- wlv+1H973A6O8CH9lAAAA
-X-Change-ID: 20241004-kvm-arm64-fix-s1pie-a6d85b4b3274
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
- James Morse <james.morse@arm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
- Joey Gouly <joey.gouly@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
- linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.15-dev-9b746
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1773; i=broonie@kernel.org;
- h=from:subject:message-id; bh=B+4iUDEw9TYIVwLvNxtIxnldk76z5iKCVi04UblglX0=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBnAHguVdE8/fczOI8eVu3Gtw6ubFM8lfSIsMkdjqny
- We4dy7mJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZwB4LgAKCRAk1otyXVSH0FvVB/
- wP8b/onSWhqsc+HF62H78QAJSrpNISggmBlTvuLQ/uZhzEVks1nZZvbzIxilCvSzkLVb+um3XCZ8rh
- jo1FnRi/vdpFblhhRYSqidNv8WtvEuipFpnPX96hVgTlplltDqRxdtPK1DKtD6YpC6p8AiQbXJSRyS
- Cq0Ucc7jENUa8aOhcGkJaz0ZsZP5E4QOrhSVISXgdgPT41YKkMHPZEQUlOUKO7X3NOYDqLhakVBCDJ
- esvmu3uU3HBAdb45ZbDxs1J7kj0NkQDb1ArpHtH54N1xGZ54lBcR46ha1OTPU3gu10IX/M0m1NiGg3
- /1n0CAduaL1aC+X7+ImdEpm1Ce689k
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: a.fatoum@pengutronix.de, peter.maydell@linaro.org, qemu-arm@nongnu.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, kernel@pengutronix.de, linux-arm-kernel@lists.infradead.org, ejo@pengutronix.de
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Prior to commit 70ed7238297f ("KVM: arm64: Sanitise ID_AA64MMFR3_EL1")
-we just exposed the santised view of ID_AA64MMFR3_EL1 to guests, meaning
-that they saw both TCRX and S1PIE if present on the host machine. That
-commit added VMM control over the contents of the register and exposed
-S1POE but removed S1PIE, meaning that the extension is no longer visible
-to guests. Reenable support for S1PIE with VMM control.
+On Fri, 04 Oct 2024 20:50:18 +0100,
+Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
+> 
+> Hi,
+> 
+> On 04.10.24 14:10, Peter Maydell wrote:
+> > On Fri, 4 Oct 2024 at 12:51, Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
+> >> On 04.10.24 12:40, Peter Maydell wrote:
+> >>> Don't do this -- KVM doesn't support it. For access to MMIO,
+> >>> stick to instructions which will set the ISV bit in ESR_EL1.
+> >>>
+> >>> That is:
+> >>>
+> >>>  * AArch64 loads and stores of a single general-purpose register
+> >>>    (including the register specified with 0b11111, including those
+> >>>    with Acquire/Release semantics, but excluding Load Exclusive
+> >>>    or Store Exclusive and excluding those with writeback).
+> >>>  * AArch32 instructions where the instruction:
+> >>>     - Is an LDR, LDA, LDRT, LDRSH, LDRSHT, LDRH, LDAH, LDRHT,
+> >>>       LDRSB, LDRSBT, LDRB, LDAB, LDRBT, STR, STL, STRT, STRH,
+> >>>       STLH, STRHT, STRB, STLB, or STRBT instruction.
+> >>>     - Is not performing register writeback.
+> >>>     - Is not using R15 as a source or destination register.
+> >>>
+> >>> Your instruction is doing writeback. Do the address update
+> >>> as a separate instruction.
+> 
+> With readl/writel implemented in assembly, I get beyond that point, but
+> now I get a data abort running an DC IVAC instruction on address 0x1000,
+> where the cfi-flash is located. This instruction is part of a routine
+> to remap the cfi-flash to start a page later, so the zero page can be
+> mapped faulting.
+> 
+> Simple reproducer:
+> 
+> start:
+>         ldr     x0, =0x1000
+>         ldr     x1, =0x1040
+>         bl      v8_inv_dcache_range
+> 
+>         mov     w10, '!'
+>         bl      putch
+> 
+>         ret
+> 
+> v8_inv_dcache_range:
+>         mrs     x3, ctr_el0
+>         lsr     x3, x3, #16
+>         and     x3, x3, #0xf
+>         mov     x2, #0x4
+>         lsl     x2, x2, x3
+>         sub     x3, x2, #0x1
+>         bic     x0, x0, x3
+> 1:
+>         dc      ivac, x0
+>         add     x0, x0, x2
+>         cmp     x0, x1
+>         b.cc    1b
+>         dsb     sy
+>         ret
+> 
+> This prints ! without KVM, but triggers a data abort before that with -enable-kvm:
+> 
+>   DABT (current EL) exception (ESR 0x96000010) at 0x0000000000001000
+>   elr: 000000007fbe0550 lr : 000000007fbe01ac
+>   [snip]
+> 
+>   Call trace:
+>   [<7fbe0550>] (v8_inv_dcache_range+0x1c/0x34) from [<7fbe0218>] (arch_remap_range+0x64/0x70)
+>   [<7fbe0218>] (arch_remap_range+0x64/0x70) from [<7fb8795c>] (of_platform_device_create+0x1e8/0x22c)
+>   [<7fb8795c>] (of_platform_device_create+0x1e8/0x22c) from [<7fb87a04>] (of_platform_bus_create+0x64/0xbc)
+>   [snip]
+> 
+> Any idea what this is about?
 
-Fixes: 70ed7238297f ("KVM: arm64: Sanitise ID_AA64MMFR3_EL1")
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- arch/arm64/kvm/sys_regs.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+IIRC, the QEMU flash is implemented as a read-only memslot. A data
+cache invalidation is a *write*, as it can be (and is) upgraded to a
+clean+invalidate by the HW.
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index dad88e31f9537fe02e28b117d6a740f15572e0ba..d48f89ad6aa7139078e7991ce6c8ebc4a0543551 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1550,7 +1550,8 @@ static u64 __kvm_read_sanitised_id_reg(const struct kvm_vcpu *vcpu,
- 		val &= ~ID_AA64MMFR2_EL1_CCIDX_MASK;
- 		break;
- 	case SYS_ID_AA64MMFR3_EL1:
--		val &= ID_AA64MMFR3_EL1_TCRX | ID_AA64MMFR3_EL1_S1POE;
-+		val &= ID_AA64MMFR3_EL1_TCRX | ID_AA64MMFR3_EL1_S1POE |
-+			ID_AA64MMFR3_EL1_S1PIE;
- 		break;
- 	case SYS_ID_MMFR4_EL1:
- 		val &= ~ARM64_FEATURE_MASK(ID_MMFR4_EL1_CCIDX);
-@@ -2433,6 +2434,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 					ID_AA64MMFR2_EL1_NV |
- 					ID_AA64MMFR2_EL1_CCIDX)),
- 	ID_WRITABLE(ID_AA64MMFR3_EL1, (ID_AA64MMFR3_EL1_TCRX	|
-+				       ID_AA64MMFR3_EL1_S1PIE   |
- 				       ID_AA64MMFR3_EL1_S1POE)),
- 	ID_SANITISED(ID_AA64MMFR4_EL1),
- 	ID_UNALLOCATED(7,5),
+KVM cannot satisfy the write, for obvious reasons, and tells the guest
+to bugger off (__gfn_to_pfn_memslot() returns KVM_PFN_ERR_RO_FAULT,
+which satisfies is_error_noslot_pfn() -- a slight oddity, but hey, why
+not).
 
----
-base-commit: 9852d85ec9d492ebef56dc5f229416c925758edc
-change-id: 20241004-kvm-arm64-fix-s1pie-a6d85b4b3274
+In the end, you get an exception. We could relax this by
+special-casing CMOs to RO memslots, but this doesn't look great.
 
-Best regards,
+The real question is: what are you trying to achieve with this?
+
+	M.
+
 -- 
-Mark Brown <broonie@kernel.org>
-
+Without deviation from the norm, progress is not possible.
