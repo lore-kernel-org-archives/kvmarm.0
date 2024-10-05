@@ -1,109 +1,98 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 560BA14F9DD
-	for <kvmarm@lists.linux.dev>; Sat,  5 Oct 2024 12:38:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BCCE139578;
+	Sat,  5 Oct 2024 13:08:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728131933; cv=none; b=BOq6feQ/BCGDsyTDg0LyWri9Vov/CSWlW8mhXhv6RAQkcOyY49OGhfsA/DamJJgAGLL8o3bh7MyMFDXOec2wUqXeNOQA+bsdnA23X/94dlJrpzS6IdYcvLgeYQc/2f8SKJw1apmjINPeAs68sbLt6EIAOwxx/hyD1LgZZYGbycY=
+	t=1728133722; cv=none; b=LX3tkoDeXYZv796LwpPKUKpaBcZEa8713ODjNWy+tXSwu2TlAzYiNG5dMNuCV2FnHzJm0dO8G8hiUCcJ+yyph9uDvlAInm2Sv4qw21OVi3nfwYqxW4TzbyhhpP97wgEAyXOMkXBpoMXLCyUdEdUupXT3pKsHu6wrul0/iRMGe5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728131933; c=relaxed/simple;
-	bh=P4renK8VRo+8S283PlYDtwyBxs58Pg1nLMEqFY3M+b0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=DWldk2HKucqr4BCERPGMZNMKSBVLfeevzo3tfTGht3R/GfIp3ThAewbIzREAA9njO4I5Aj1AI/5Z6y2+k3vbkg06FFmEztEGRgl9OuThvu4W26RAl8VbSuZ4LzHYYTCQIThnGI5MjeCto7oWPBKN2/ud0ZSvFJtP/OwGmxeYoHs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5845D1063;
-	Sat,  5 Oct 2024 05:39:21 -0700 (PDT)
-Received: from a077893.arm.com (unknown [10.163.39.26])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 0BCF33F64C;
-	Sat,  5 Oct 2024 05:38:47 -0700 (PDT)
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-To: linux-arm-kernel@lists.infradead.org
-Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
+	s=arc-20240116; t=1728133722; c=relaxed/simple;
+	bh=OehJ0O89f+iqXPi9LRqnKDAU2cxxrfwIrYGp9bcDgUk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=J9KLHX8/uFslOjRvMDjd6mevVfIfrdFtL8ubpRTQMtGAB2wf+XTnYLYl0GWAXrmN3A9CS8dxM1d433wTBJWVhJPk3/OHoR1m8wQx/fDZTEWB+lxW7SCzHkNNj4jkOXICN7kg2pTmMrXkNcO7jgnw1vWEUaGFZfyhxpSI7rl27gc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=utC19Vmt; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="utC19Vmt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C059DC4CEC2;
+	Sat,  5 Oct 2024 13:08:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728133722;
+	bh=OehJ0O89f+iqXPi9LRqnKDAU2cxxrfwIrYGp9bcDgUk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=utC19VmtYWaZpQCAUe68NNnKbI4ACFrsbMCRWM3kPzcsZkHKM3edeT0cL+J+QSxfs
+	 8qNeA3YJEoet4z02oC8D/NzNQkY9j5ePact4qallu1QunaC/OvC/F0tf7hmsLxq+zb
+	 7vPTeXsolPhjcyLGEtvHl+XsMCnaAnCMTqHIyizNEOBF41ZOW4SOI1+2YaXnI5iPMa
+	 InflVz7/5HmMTqTNB6/ND/ub/eumHzX5G9BwxDNyzgCnpF4024G8sycV9VmwUdeXgl
+	 U/hR1BTItonY8YplsRAb9Bmz7APXKp0H50k6uy3l/q0sm2dSS+2uoGnR3nPayYKX/G
+	 cDISZkafgle/A==
+Date: Sat, 5 Oct 2024 14:08:39 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 5/5] arm64/mm: Drop PXD_TABLE_BIT
-Date: Sat,  5 Oct 2024 18:08:24 +0530
-Message-Id: <20241005123824.1366397-6-anshuman.khandual@arm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20241005123824.1366397-1-anshuman.khandual@arm.com>
-References: <20241005123824.1366397-1-anshuman.khandual@arm.com>
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Shuah Khan <shuah@kernel.org>, linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org, kvmarm@lists.linux.dev,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v14 3/5] KVM: arm64: Manage GCS access and registers for
+ guests
+Message-ID: <ZwE6V9cqf7jD1rTc@finisterre.sirena.org.uk>
+References: <20241005-arm64-gcs-v14-0-59060cd6092b@kernel.org>
+ <20241005-arm64-gcs-v14-3-59060cd6092b@kernel.org>
+ <87iku6vl4z.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="0Zl5x4KmDRvfIeyQ"
+Content-Disposition: inline
+In-Reply-To: <87iku6vl4z.wl-maz@kernel.org>
+X-Cookie: Editing is a rewording activity.
 
-This just drops table bit position markers for all page table levels, which
-are not used any more.
 
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will@kernel.org>
-Cc: Ard Biesheuvel <ardb@kernel.org>
-Cc: Ryan Roberts <ryan.roberts@arm.com>
-Cc: Mark Rutland <mark.rutland@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org
-Cc: linux-kernel@vger.kernel.org
-Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
----
- arch/arm64/include/asm/pgtable-hwdef.h | 5 -----
- 1 file changed, 5 deletions(-)
+--0Zl5x4KmDRvfIeyQ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
-index 956a702cb532..a524a8bb570f 100644
---- a/arch/arm64/include/asm/pgtable-hwdef.h
-+++ b/arch/arm64/include/asm/pgtable-hwdef.h
-@@ -97,7 +97,6 @@
-  * Level -1 descriptor (PGD).
-  */
- #define PGD_TYPE_TABLE		(_AT(pgdval_t, 3) << 0)
--#define PGD_TABLE_BIT		(_AT(pgdval_t, 1) << 1)
- #define PGD_TYPE_MASK		(_AT(pgdval_t, 3) << 0)
- #define PGD_TABLE_PXN		(_AT(pgdval_t, 1) << 59)
- #define PGD_TABLE_UXN		(_AT(pgdval_t, 1) << 60)
-@@ -106,7 +105,6 @@
-  * Level 0 descriptor (P4D).
-  */
- #define P4D_TYPE_TABLE		(_AT(p4dval_t, 3) << 0)
--#define P4D_TABLE_BIT		(_AT(p4dval_t, 1) << 1)
- #define P4D_TYPE_MASK		(_AT(p4dval_t, 3) << 0)
- #define P4D_TYPE_SECT		(_AT(p4dval_t, 1) << 0)
- #define P4D_SECT_RDONLY		(_AT(p4dval_t, 1) << 7)		/* AP[2] */
-@@ -117,7 +115,6 @@
-  * Level 1 descriptor (PUD).
-  */
- #define PUD_TYPE_TABLE		(_AT(pudval_t, 3) << 0)
--#define PUD_TABLE_BIT		(_AT(pudval_t, 1) << 1)
- #define PUD_TYPE_MASK		(_AT(pudval_t, 3) << 0)
- #define PUD_TYPE_SECT		(_AT(pudval_t, 1) << 0)
- #define PUD_SECT_RDONLY		(_AT(pudval_t, 1) << 7)		/* AP[2] */
-@@ -130,7 +127,6 @@
- #define PMD_TYPE_MASK		(_AT(pmdval_t, 3) << 0)
- #define PMD_TYPE_TABLE		(_AT(pmdval_t, 3) << 0)
- #define PMD_TYPE_SECT		(_AT(pmdval_t, 1) << 0)
--#define PMD_TABLE_BIT		(_AT(pmdval_t, 1) << 1)
- 
- /*
-  * Section
-@@ -159,7 +155,6 @@
- #define PTE_TYPE_MASK		(_AT(pteval_t, 3) << 0)
- #define PTE_TYPE_PAGE		(_AT(pteval_t, 3) << 0)
- #define PTE_TYPE_SECT		(_AT(pteval_t, 1) << 0)
--#define PTE_TABLE_BIT		(_AT(pteval_t, 1) << 1)
- #define PTE_USER		(_AT(pteval_t, 1) << 6)		/* AP[1] */
- #define PTE_RDONLY		(_AT(pteval_t, 1) << 7)		/* AP[2] */
- #define PTE_SHARED		(_AT(pteval_t, 3) << 8)		/* SH[1:0], inner shareable */
--- 
-2.25.1
+On Sat, Oct 05, 2024 at 12:34:20PM +0100, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
 
+> > +	if (!kvm_has_gcs(kvm)) {
+> > +		kvm->arch.fgu[HFGxTR_GROUP] |=3D (HFGxTR_EL2_nGCS_EL0 |
+> > +						HFGxTR_EL2_nGCS_EL1);
+> > +		kvm->arch.fgu[HFGITR_GROUP] |=3D (HFGITR_EL2_nGCSEPP |
+> > +						HFGITR_EL2_nGCSSTR_EL1 |
+> > +						HFGITR_EL2_nGCSPUSHM_EL1);
+
+> Where is the handling of traps resulting of HFGITR_EL2.nGCSSTR_EL1?
+
+These will trap with an EC of 0x2d which isn't known so I was expecting
+this to get handled in the same way as for example a return of false
+=66rom kvm_hyp_handle_fpsimd() for SVE when unsupported, or for the
+simiarly unknown SME EC, currently.  I gather from your comment that
+you're instead expecting to see an explicit exit handler for this EC
+that just injects the UNDEF directly?
+
+--0Zl5x4KmDRvfIeyQ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmcBOlYACgkQJNaLcl1U
+h9BPNgf+NKmTsL3+8wUVfE0aTQRrfj4Erqq1BDE4dbvUjwaSbqFx2JUxrfPNaIZJ
+j9+kfFc0HH9nUA4g33py2M8TZwQbvjalv7zQYqoZn1JFg2yi16SUD9BieooOtGIs
+tIBvdWV6F8YHte2wvinDjBe9Zhxo/mJ4T90vMPUKwcsq1yP5i+XXs9jlfxX9bdAi
+dMhs0VxWtc7WwaIR2Q68A+oUinqGk63rBnViO0i45u0y/mOb+OQKssk9/KjRRcZH
+/joGYIpGp5k677g63M3bcB2BBonPiPkTo9+YR1cl2Ib96xxWYywNGR6s9+DqFZr2
+wssYGEdqveRLKJkK+lN8TcPqWLYPSA==
+=JcmO
+-----END PGP SIGNATURE-----
+
+--0Zl5x4KmDRvfIeyQ--
