@@ -1,150 +1,196 @@
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9004E15D5C1
-	for <kvmarm@lists.linux.dev>; Sun,  6 Oct 2024 08:00:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B35DA17557C;
+	Sun,  6 Oct 2024 10:28:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728201609; cv=none; b=dzbI1oJ3wiorXlIlIc0yYo4wwHe6TIjrJLu9097GAX+VlEkSEGxCbxo+sA935vpQGyJI8ypNfK/BtVagF5HNeqK2YgY4u/MvVZnoaDozweT+gh5eoEleLT1Fv3UmlfYYGqtUuBo18K9o4N9bcQM/DLGwJEITXkIF4ECuULoPjXA=
+	t=1728210506; cv=none; b=iNuTpcwi6gsY9Uwll066qucQm0soUyOfQjte/b9X/aA6ovxAHuNScg6cKgt4Mb4k4H+rpUHD5ThfEM4FvCa1nYqoQ9wVbX8gYnM7p6CfFpTSwsIUxc5capdiU3vGt9bRHNft5ptcT3stzDCupych7KdK+JiuxyWShdgnC52AsWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728201609; c=relaxed/simple;
-	bh=2Dg/aX+fyf4J6P7e0Zqi6a7C94EFVWd6VSqDE+btM+E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CmzNLw8BHaw8lDceOpYLZNbVn5/u7xq0EQi/BQiEyRVtTHwVY2UwikEnKZyLGObGBcnpj6DtAO/n841MDH8cMOC7ZCr2HKDcEuH0pe+XoUAzPGFzveWUQONtGbxR/uGUkLbcFLR9sT9wzQENOH2U482C+RczduVGqn7ROtLBo0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
-	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
-	(envelope-from <a.fatoum@pengutronix.de>)
-	id 1sxMBJ-0005Tc-KL; Sun, 06 Oct 2024 09:59:57 +0200
-Message-ID: <0352a327-0e78-48d4-a876-d33689fcd766@pengutronix.de>
-Date: Sun, 6 Oct 2024 09:59:56 +0200
+	s=arc-20240116; t=1728210506; c=relaxed/simple;
+	bh=qQResh1CcWQO+c6Odpl8c5StGvv2HmNjqiNTYvGALNg=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iQJ6eb1YCAaltvTcp39zsB4HgqdBzTpXF2uRg1NgSNONuFlglYdGFJPSdF2t19WwJBbmqUDt6Vz13AuGunbrtWMTIMu20Qe5pSSBA0VwuIxiqHwr5hHGTrWeTDoVhEv/gWm2kXu4tlYd7xJM1Or+XWzFNvVbqV26BEWWicVtasw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K3IxjiMy; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K3IxjiMy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 437DFC4CEC5;
+	Sun,  6 Oct 2024 10:28:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728210506;
+	bh=qQResh1CcWQO+c6Odpl8c5StGvv2HmNjqiNTYvGALNg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=K3IxjiMyyiajCHdln/10sV19fD/J+xDyFqAVAcIXluVkjYnKNvOlapBiT7Y/HSrNP
+	 uhgMmCLkK1CkoE++6Bb38HEl3VHA4CME0DyCPvl1aHLksbZ6p39/GulEkPn7Y73aFe
+	 OW89w/nZAikRIJ3qGed6/jnmAIXr6cqQxW5a+eX2rypOtqdgQvju3rGiDGtvnixXdm
+	 0KxnRa1t1l3qcHdFdzXgZngHL3LJF0kxtOhBzIBWmwGgXG2t5yy0PcTZh+5gzDlHzU
+	 xNxhMRG5TduTIc/ZYMLMNpSjllc4di4751gj7gWX4UUQiIL31gHN0seMnPy4P7tTgL
+	 dNkRzVCPcs9rg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sxOUy-000lyd-1W;
+	Sun, 06 Oct 2024 11:28:24 +0100
+Date: Sun, 06 Oct 2024 11:28:23 +0100
+Message-ID: <8634l97cfs.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ahmad Fatoum <a.fatoum@pengutronix.de>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	qemu-arm@nongnu.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	"linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+	Enrico Joerns <ejo@pengutronix.de>
+Subject: Re: [BUG] ARM64 KVM: Data abort executing post-indexed LDR on MMIO address
+In-Reply-To: <0352a327-0e78-48d4-a876-d33689fcd766@pengutronix.de>
+References: <89f184d6-5b61-4c77-9f3b-c0a8f6a75d60@pengutronix.de>
+	<CAFEAcA_Yv2a=XCKw80y9iyBRoC27UL6Sfzgy4KwFDkC1gbzK7w@mail.gmail.com>
+	<a4c06f55-28ec-4620-b594-b7ff0bb1e162@pengutronix.de>
+	<CAFEAcA9F3AR-0OCKDy__eVBJRMi80G7bWNfANGZRR2W8iMhfJA@mail.gmail.com>
+	<4d559b9e-c208-46f3-851a-68086dc8a50f@pengutronix.de>
+	<864j5q7sdq.wl-maz@kernel.org>
+	<65ab10d7-6594-490c-be07-39f83ac3559a@pengutronix.de>
+	<87a5fiutai.wl-maz@kernel.org>
+	<0352a327-0e78-48d4-a876-d33689fcd766@pengutronix.de>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [BUG] ARM64 KVM: Data abort executing post-indexed LDR on MMIO
- address
-To: Marc Zyngier <maz@kernel.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- kvmarm@lists.linux.dev, kvm@vger.kernel.org,
- Pengutronix Kernel Team <kernel@pengutronix.de>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>, Enrico Joerns <ejo@pengutronix.de>
-References: <89f184d6-5b61-4c77-9f3b-c0a8f6a75d60@pengutronix.de>
- <CAFEAcA_Yv2a=XCKw80y9iyBRoC27UL6Sfzgy4KwFDkC1gbzK7w@mail.gmail.com>
- <a4c06f55-28ec-4620-b594-b7ff0bb1e162@pengutronix.de>
- <CAFEAcA9F3AR-0OCKDy__eVBJRMi80G7bWNfANGZRR2W8iMhfJA@mail.gmail.com>
- <4d559b9e-c208-46f3-851a-68086dc8a50f@pengutronix.de>
- <864j5q7sdq.wl-maz@kernel.org>
- <65ab10d7-6594-490c-be07-39f83ac3559a@pengutronix.de>
- <87a5fiutai.wl-maz@kernel.org>
-Content-Language: en-US
-From: Ahmad Fatoum <a.fatoum@pengutronix.de>
-In-Reply-To: <87a5fiutai.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
-X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: kvmarm@lists.linux.dev
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: a.fatoum@pengutronix.de, peter.maydell@linaro.org, qemu-arm@nongnu.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, kernel@pengutronix.de, linux-arm-kernel@lists.infradead.org, ejo@pengutronix.de
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hello Marc,
-
-On 05.10.24 23:35, Marc Zyngier wrote:
-> On Sat, 05 Oct 2024 19:38:23 +0100,
-> Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
->>> IIRC, the QEMU flash is implemented as a read-only memslot. A data
->>> cache invalidation is a *write*, as it can be (and is) upgraded to a
->>> clean+invalidate by the HW.
->>
->> So it's a write, even if there are no dirty cache lines?
+On Sun, 06 Oct 2024 08:59:56 +0100,
+Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
 > 
-> Yes.
+> Hello Marc,
 > 
-> At the point where this is handled, the CPU has no clue about the
-> dirty state of an arbitrary cache line, at an arbitrary cache level.
-> The CPU simply forward the CMO downstream, and the permission check
-> happens way before that.
-
-I see. When I added that invalidation, it was suggested[1] that instead
-of invalidation after the remapping, I would clean the range before
-remapping. Cleaning the zero page triggered a data abort, which I didn't
-understand as there should be no dirty lines, but now I get it.
-
-One more question: This upgrading of DC IVAC to DC CIVAC is because
-the code is run under virtualization, right?
-
-[1]: https://lore.barebox.org/barebox/9809c04c-58c5-6888-2b14-cf17fa7c4b1a@pengutronix.de/
-
->> The routine[1] that does this remapping invalidates the virtual address range,
->> because the attributes may change[2]. This invalidate also happens for cfi-flash,
->> but we should never encounter dirty cache lines there as the remap is done
->> before driver probe.
->>
->> Can you advise what should be done differently?
+> On 05.10.24 23:35, Marc Zyngier wrote:
+> > On Sat, 05 Oct 2024 19:38:23 +0100,
+> > Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
+> >>> IIRC, the QEMU flash is implemented as a read-only memslot. A data
+> >>> cache invalidation is a *write*, as it can be (and is) upgraded to a
+> >>> clean+invalidate by the HW.
+> >>
+> >> So it's a write, even if there are no dirty cache lines?
+> > 
+> > Yes.
+> > 
+> > At the point where this is handled, the CPU has no clue about the
+> > dirty state of an arbitrary cache line, at an arbitrary cache level.
+> > The CPU simply forward the CMO downstream, and the permission check
+> > happens way before that.
 > 
-> If you always map the flash as Device memory, there is no need for
-> CMOs. Same thing if you map it as NC.
-
-Everything, except for RAM, is mapped Device-nGnRnE.
-
-> And even if you did map it as
-> Cacheable, it wouldn't matter. KVM already handles coherency when the
-> flash is switching between memory-mapped and programming mode, as the
-> physical address space changes (the flash literally drops from the
-> memory map).
+> I see. When I added that invalidation, it was suggested[1] that instead
+> of invalidation after the remapping, I would clean the range before
+> remapping. Cleaning the zero page triggered a data abort, which I didn't
+> understand as there should be no dirty lines, but now I get it.
 > 
-> In general, issuing CMOs to a device is a bizarre concept, because it
-> is pretty rare that a device can handle a full cache-line as
-> write-back. Devices tend to handle smaller, register-sized accesses,
-> not a full 64-byte eviction.
+> One more question: This upgrading of DC IVAC to DC CIVAC is because
+> the code is run under virtualization, right?
 
-The same remap_range function is used to:
+Not necessarily. Virtualisation mandates the upgrade, but CIVAC is
+also a perfectly valid implementation of both IVAC and CVAC.  And it
+isn't uncommon that CPUs implement everything the same way.
 
-  - remap normal memory:
-    - Mapping memory regions uncached for memory test
-    - Mapping memory buffers coherent or write-combine
-  - remap ROMs: BootROMs at address zero may be hidden behind the NULL
-    page and need to be mapped differently when calling/peeking into it.
-  - remap device memory, e.g. in the case of the cfi-flash here
+This is why, if you dare looking at the definition of ESR_ELx for a
+data abort, you will notice that ESR_ELx.WnR (which indicates whether
+the abort was triggered by a read or a write) is always 1 (denoting a
+write) on a CMO, irrespective of what CMO triggered it.
 
-The invalidation is done unconditionally for all of them, although it
-makes only the sense in the first case.
+Additionally, FEAT_CMOW requires both read and write permissions to
+not trigger faults on CMOs, but that's a bit orthogonal to your
+problem.
 
-> Now, I'm still wondering whether we should simply forward the CMO to
-> userspace as we do for other writes, and let the VMM deal with it. The
-> main issue is that there is no current way to describe this.
 > 
-> The alternative would be to silently handle the trap and pretend it
-> never occurred, as we do for other bizarre behaviours. But that'd be
-> something only new kernels would support, and I guess you'd like your
-> guest to work today, not tomorrow.
+> [1]: https://lore.barebox.org/barebox/9809c04c-58c5-6888-2b14-cf17fa7c4b1a@pengutronix.de/
+> 
+> >> The routine[1] that does this remapping invalidates the virtual address range,
+> >> because the attributes may change[2]. This invalidate also happens for cfi-flash,
+> >> but we should never encounter dirty cache lines there as the remap is done
+> >> before driver probe.
+> >>
+> >> Can you advise what should be done differently?
+> > 
+> > If you always map the flash as Device memory, there is no need for
+> > CMOs. Same thing if you map it as NC.
+> 
+> Everything, except for RAM, is mapped Device-nGnRnE.
 
-I think following fix on the barebox side may work:
+Right, no problem then.
 
-  - Walk all pages about to be remapped
-  - Execute the AT instruction on the page's base address
-  - Only if the page was previously mapped cacheable, clean + invalidate
-    the cache
-  - Remove the current cache invalidation after remap
+> 
+> > And even if you did map it as
+> > Cacheable, it wouldn't matter. KVM already handles coherency when the
+> > flash is switching between memory-mapped and programming mode, as the
+> > physical address space changes (the flash literally drops from the
+> > memory map).
+> > 
+> > In general, issuing CMOs to a device is a bizarre concept, because it
+> > is pretty rare that a device can handle a full cache-line as
+> > write-back. Devices tend to handle smaller, register-sized accesses,
+> > not a full 64-byte eviction.
+> 
+> The same remap_range function is used to:
+> 
+>   - remap normal memory:
+>     - Mapping memory regions uncached for memory test
+>     - Mapping memory buffers coherent or write-combine
+>   - remap ROMs: BootROMs at address zero may be hidden behind the NULL
+>     page and need to be mapped differently when calling/peeking into it.
+>   - remap device memory, e.g. in the case of the cfi-flash here
+> 
+> The invalidation is done unconditionally for all of them, although it
+> makes only the sense in the first case.
 
-Does that sound sensible?
+Indeed.
+
+> 
+> > Now, I'm still wondering whether we should simply forward the CMO to
+> > userspace as we do for other writes, and let the VMM deal with it. The
+> > main issue is that there is no current way to describe this.
+> > 
+> > The alternative would be to silently handle the trap and pretend it
+> > never occurred, as we do for other bizarre behaviours. But that'd be
+> > something only new kernels would support, and I guess you'd like your
+> > guest to work today, not tomorrow.
+> 
+> I think following fix on the barebox side may work:
+> 
+>   - Walk all pages about to be remapped
+>   - Execute the AT instruction on the page's base address
+
+Why do you need AT if you are walking the PTs? If you walk, you
+already have access to the memory attributes. In general, AT can be
+slower than an actual walk.
+
+Or did you actually mean iterating over the VA range? Even in that
+case, AT can be a bad idea, as you are likely to iterate in page-size
+increments even if you have a block mapping. Walking the PTs tells you
+immediately how much a leaf is mapping (assuming you don't have any
+other tracking).
+
+>   - Only if the page was previously mapped cacheable, clean + invalidate
+>     the cache
+>   - Remove the current cache invalidation after remap
+> 
+> Does that sound sensible?
+
+This looks reasonable (apart from the AT thingy).
 
 Thanks,
-Ahmad
 
-> 
-> 	M.
-> 
-
+	M.
 
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Without deviation from the norm, progress is not possible.
