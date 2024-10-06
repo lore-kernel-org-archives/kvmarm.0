@@ -1,151 +1,152 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2ED518E1F;
-	Sat,  5 Oct 2024 21:35:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E61B11714B3
+	for <kvmarm@lists.linux.dev>; Sun,  6 Oct 2024 07:59:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728164152; cv=none; b=PUZyLP77U8RBJa/pBuf4YIwE+UrwYDb8r3u0Hpq199+zr0ws8IWQDgCiPZmA8wFZ2PvVgYILiR/9vxJcqvOcQl2JuM6m6oamsFYChwRtokK8zXS4ytIiLmUGZUdGuSMUy8eqbSfNt11d+5OXGtf/c3RAislbEkx5T3Dfis10eQs=
+	t=1728201598; cv=none; b=eugMHhNb8bq4W2uIcvUmdafJLrrqqOvMj2KU8+FofQa7BTe8TMcuDJykYmBk0B4i9Rn8YrlARPcfqWr6BW3V9BI2OemZBv90sw53VZ0AafLABcvENg/kOW0tCJJp9vZF4Tw3TKGyN7XXyJx6O3YfIs2ABkxz3x2hp6Tu6jNd9PA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728164152; c=relaxed/simple;
-	bh=4sfPDWl1oJaJQh9DQfDD4n4dpgiSjjXdaE92+qki+no=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rIALBscndcVJnmNBpeiJX67Nh83xqhPnObdktu5adgh3I2776aXdqUVP8d4mf38H6G31dJdr9NQ9H6BgIwK1PeYyu67mE4hbitUN/zBNEmxXZ2za7SW59EYH2PGLGfYX+4PrbHmigImq75sUwQgHNtYT4CUQXr6GoEOMdiUZ0r4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nOpfuY9R; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1728201598; c=relaxed/simple;
+	bh=VqlHx3gXbvON1CW3A1JRBpxXo8Luo3Qf9007uz5xumM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=b/BIZGWm6MYhVwoD61LLayDp//U1TdqsTTOa4EWfNyMwmhEGtyp+FxauEoHll5ur1v4xQ7xxKphHN4YPD9zS2+OIyPBN4ykTT76aOdZYTQ3lHJmZ+MSoI+YrJC/qIk0OF529mA1+fK1iRm+V4zykW9ZeHYa2MTbBX7rDYq5qLuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XqsSvYq2; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nOpfuY9R"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21F30C4CECC;
-	Sat,  5 Oct 2024 21:35:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728164152;
-	bh=4sfPDWl1oJaJQh9DQfDD4n4dpgiSjjXdaE92+qki+no=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nOpfuY9RkAvbGr1+JirOtWdENC8a8hWxm/fOFqgfo4xdotxuvlbrkvdQJVCOzVYed
-	 oEDTlkg4EHoaUSYvw0EafAfcLbV2SAfH53l8Zgyv7dx1xfKDWsf269E3LGWmsOdtyn
-	 2uf1vXvDzqMiUOUJlwUe3t+/mGiAjlT/khk8qmaKdIY2Ww+Rwxq96pP4K9MWFCqdZe
-	 p1FcHyhU0XyArpT9kczq4YZeT1imC4CahdX8/sP+kuFmwkPl9d/tXGTunaPlxCdl6d
-	 0SiTSmoOXKMRIbhrJUw9dOnDDfJnJus7M+I/qcnyadOv8wdrsU0Vc4UocmvcjLC6h0
-	 uqhqGrSdG5krA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sxCRK-000h6U-1X;
-	Sat, 05 Oct 2024 22:35:50 +0100
-Date: Sat, 05 Oct 2024 22:35:49 +0100
-Message-ID: <87a5fiutai.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Ahmad Fatoum <a.fatoum@pengutronix.de>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	qemu-arm@nongnu.org,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	"linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
-	Enrico Joerns <ejo@pengutronix.de>
-Subject: Re: [BUG] ARM64 KVM: Data abort executing post-indexed LDR on MMIO address
-In-Reply-To: <65ab10d7-6594-490c-be07-39f83ac3559a@pengutronix.de>
-References: <89f184d6-5b61-4c77-9f3b-c0a8f6a75d60@pengutronix.de>
-	<CAFEAcA_Yv2a=XCKw80y9iyBRoC27UL6Sfzgy4KwFDkC1gbzK7w@mail.gmail.com>
-	<a4c06f55-28ec-4620-b594-b7ff0bb1e162@pengutronix.de>
-	<CAFEAcA9F3AR-0OCKDy__eVBJRMi80G7bWNfANGZRR2W8iMhfJA@mail.gmail.com>
-	<4d559b9e-c208-46f3-851a-68086dc8a50f@pengutronix.de>
-	<864j5q7sdq.wl-maz@kernel.org>
-	<65ab10d7-6594-490c-be07-39f83ac3559a@pengutronix.de>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XqsSvYq2"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1728201595;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/sKPRBl2RV4hr7+8R+wr2nRbBs8Om/Tz2zinJX3Ieis=;
+	b=XqsSvYq2/aWbjTYRzgpoELgDMEx+aTKTFiCKDq5DIZAgp67SfONcb8NK7swEIg3qbCbm0O
+	q+FQkha9e3liRdYsgvGmNL2ykLK7dCozMPGB23oIqvsCYALMYqR60wZvcv76O2yoqDijrL
+	z5FhtVD6zewsE1QqxcDgxOi6kDch9zo=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-39-LuSIp3M2M0Gi_0S3tvO6KQ-1; Sun, 06 Oct 2024 03:59:54 -0400
+X-MC-Unique: LuSIp3M2M0Gi_0S3tvO6KQ-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-37cd282fb39so2181302f8f.2
+        for <kvmarm@lists.linux.dev>; Sun, 06 Oct 2024 00:59:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728201593; x=1728806393;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/sKPRBl2RV4hr7+8R+wr2nRbBs8Om/Tz2zinJX3Ieis=;
+        b=i6eNNdOsMFkJCXVW4jGJOre5OL7P5rsqdWDE52n8MtM00nAzw2eTv34qk8OCnRc/UW
+         /SPfXDjdADKJdwcoJskwdyzdjkMuLMPurpdSmvdeAYNcIwiKYsEEGZ0okVk/VKQ/OXpW
+         NwLKF4HGHTAnzn8rSsyiW3jgtaSeHSxlMjXzPuLezuZWavL3PkyA1jArltGaRm7OKLdw
+         GdUEKvnVKZoPeGeYmuuuyUqYbKeyQjRD+twofSBCYx3O99ZSMAJ2SG1uAhew5k3FaCyt
+         dttSvNG27itdL+dcllwiL8RbChiwGfrk4WEG8LVz5hJo5dq4L9HPieGoVgClm9tS7SyN
+         2f6g==
+X-Forwarded-Encrypted: i=1; AJvYcCU+3BvczN6dT/JQiD2lSYqpOWkrFwPFJgY0uHmAuVdg8E1vYbw0zkYXJ21BFMytw8U+q8dzv+M=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yz/jYI9qcW/MTub8QFLDlXQ3rVm59ByOCQau/Si/X3iDdZ/4BZj
+	ZCNFnD/TDsNIFy/Mz5fc9SR2DHJHf6n9VGU3wE9n2r30NKgSvebVagSVHbiR5f1b804DQlKR3bF
+	nlEtxqrE26bO5sTMIAo5m+VyCKT441JBE1pezy+5Y3DON8i/k/5UUbTdTUBnC2JOT5s2QxFW9eK
+	/araO1/pijcp9Ih+kymO1gTUGUVX5K
+X-Received: by 2002:a05:6000:4590:b0:368:68d3:32b3 with SMTP id ffacd0b85a97d-37d0e778fd7mr4471283f8f.26.1728201592807;
+        Sun, 06 Oct 2024 00:59:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF0IitrfMDm0CuVeldEaxDs7MDfVljOsqopy8zQjl8XORThr1m0EK3xfHV86KNe6+eIaQLcapC0D/CpoDuFBNc=
+X-Received: by 2002:a05:6000:4590:b0:368:68d3:32b3 with SMTP id
+ ffacd0b85a97d-37d0e778fd7mr4471274f8f.26.1728201592462; Sun, 06 Oct 2024
+ 00:59:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: a.fatoum@pengutronix.de, peter.maydell@linaro.org, qemu-arm@nongnu.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, kernel@pengutronix.de, linux-arm-kernel@lists.infradead.org, ejo@pengutronix.de
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20241003203723.2062286-1-maz@kernel.org>
+In-Reply-To: <20241003203723.2062286-1-maz@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Sun, 6 Oct 2024 09:59:39 +0200
+Message-ID: <CABgObfbP2mkkU+3kxDG_zHA2raSNG9XJhAqpfm8M59vveC9d9Q@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.12, take #1
+To: Marc Zyngier <maz@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Fuad Tabba <tabba@google.com>, 
+	Joey Gouly <joey.gouly@arm.com>, Mark Brown <broonie@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Vincent Donnefort <vdonnefort@google.com>, Will Deacon <will@kernel.org>, 
+	Zenghui Yu <yuzenghui@huawei.com>, James Morse <james.morse@arm.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, 05 Oct 2024 19:38:23 +0100,
-Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
-> 
-> Hello Marc,
-> 
-> On 05.10.24 12:31, Marc Zyngier wrote:
-> > On Fri, 04 Oct 2024 20:50:18 +0100,
-> > Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
-> >> With readl/writel implemented in assembly, I get beyond that point, but
-> >> now I get a data abort running an DC IVAC instruction on address 0x1000,
-> >> where the cfi-flash is located. This instruction is part of a routine
-> >> to remap the cfi-flash to start a page later, so the zero page can be
-> >> mapped faulting.
-> 
-> [snip]
-> 
-> >> Any idea what this is about?
-> > 
-> > IIRC, the QEMU flash is implemented as a read-only memslot. A data
-> > cache invalidation is a *write*, as it can be (and is) upgraded to a
-> > clean+invalidate by the HW.
-> 
-> So it's a write, even if there are no dirty cache lines?
-
-Yes.
-
-At the point where this is handled, the CPU has no clue about the
-dirty state of an arbitrary cache line, at an arbitrary cache level.
-The CPU simply forward the CMO downstream, and the permission check
-happens way before that.
-
-> > KVM cannot satisfy the write, for obvious reasons, and tells the guest
-> > to bugger off (__gfn_to_pfn_memslot() returns KVM_PFN_ERR_RO_FAULT,
-> > which satisfies is_error_noslot_pfn() -- a slight oddity, but hey, why
-> > not).
-> > 
-> > In the end, you get an exception. We could relax this by
-> > special-casing CMOs to RO memslots, but this doesn't look great.
-> > 
-> > The real question is: what are you trying to achieve with this?
-> 
-> barebox sets up the MMU, but tries to keep a 1:1 mapping. On Virt, we
-> want to map the zero page faulting, but still have access to the first
-> block of the cfi-flash.
-> 
-> Therefore, barebox will map the cfi-flash one page later
-> (virt 0x1000,0x2000,... -> phys 0x0000,0x1000,...) and so on, so the first
-> page can be mapped faulting.
-> 
-> The routine[1] that does this remapping invalidates the virtual address range,
-> because the attributes may change[2]. This invalidate also happens for cfi-flash,
-> but we should never encounter dirty cache lines there as the remap is done
-> before driver probe.
+On Thu, Oct 3, 2024 at 10:37=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote=
+:
 >
-> Can you advise what should be done differently?
+> Paolo,
+>
+> Here's the first set of fixes for 6.12. We have fixes for a couple of
+> pretty theoretical pKVM issues, plus a slightly more annoying fix for
+> the feature detection infrastructure (details in the tag below). I
+> expect to have a few more fixes in the coming weeks. Oh, and Joey is
+> now an official reviewer, replacing James
+>
+> Please pull,
+>
+>         M.
 
-If you always map the flash as Device memory, there is no need for
-CMOs. Same thing if you map it as NC. And even if you did map it as
-Cacheable, it wouldn't matter. KVM already handles coherency when the
-flash is switching between memory-mapped and programming mode, as the
-physical address space changes (the flash literally drops from the
-memory map).
+Done, thanks!
 
-In general, issuing CMOs to a device is a bizarre concept, because it
-is pretty rare that a device can handle a full cache-line as
-write-back. Devices tend to handle smaller, register-sized accesses,
-not a full 64-byte eviction.
+Paolo
 
-Now, I'm still wondering whether we should simply forward the CMO to
-userspace as we do for other writes, and let the VMM deal with it. The
-main issue is that there is no current way to describe this.
+> The following changes since commit 9852d85ec9d492ebef56dc5f229416c925758e=
+dc:
+>
+>   Linux 6.12-rc1 (2024-09-29 15:06:19 -0700)
+>
+> are available in the Git repository at:
+>
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kv=
+marm-fixes-6.12-1
+>
+> for you to fetch changes up to a1d402abf8e3ff1d821e88993fc5331784fac0da:
+>
+>   KVM: arm64: Fix kvm_has_feat*() handling of negative features (2024-10-=
+03 19:35:27 +0100)
+>
+> ----------------------------------------------------------------
+> KVM/arm64 fixes for 6.12, take #1
+>
+> - Fix pKVM error path on init, making sure we do not change critical
+>   system registers as we're about to fail
+>
+> - Make sure that the host's vector length is at capped by a value
+>   common to all CPUs
+>
+> - Fix kvm_has_feat*() handling of "negative" features, as the current
+>   code is pretty broken
+>
+> - Promote Joey to the status of official reviewer, while James steps
+>   down -- hopefully only temporarly
+>
+> ----------------------------------------------------------------
+> Marc Zyngier (2):
+>       KVM: arm64: Another reviewer reshuffle
+>       KVM: arm64: Fix kvm_has_feat*() handling of negative features
+>
+> Mark Brown (1):
+>       KVM: arm64: Constrain the host to the maximum shared SVE VL with pK=
+VM
+>
+> Vincent Donnefort (1):
+>       KVM: arm64: Fix __pkvm_init_vcpu cptr_el2 error path
+>
+>  MAINTAINERS                             |  2 +-
+>  arch/arm64/include/asm/kvm_host.h       | 25 +++++++++++++------------
+>  arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +-
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c      | 12 +++++++-----
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c          |  6 ++++--
+>  5 files changed, 26 insertions(+), 21 deletions(-)
+>
 
-The alternative would be to silently handle the trap and pretend it
-never occurred, as we do for other bizarre behaviours. But that'd be
-something only new kernels would support, and I guess you'd like your
-guest to work today, not tomorrow.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
