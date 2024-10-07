@@ -1,104 +1,115 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B843318C013;
-	Mon,  7 Oct 2024 10:34:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 995191D1F70
+	for <kvmarm@lists.linux.dev>; Mon,  7 Oct 2024 11:05:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728297261; cv=none; b=VKZ4g0SZruwdE4ae3FjwNM70EfedP2yO0Fj45xh65xli4cZzCO7qHEFp9qw31P8xn1Y/YZ9HiHXbzsYRG2ksazhp0Mnn93AOiHIHqV2GlU+gtatyT/5fCwtr8LB5tw0+3JoQ8ILejSDBX9PXV4SycX9okSdi1j9DRcmqkfC3eJ4=
+	t=1728299135; cv=none; b=UPhQbRhGT1f/0/BPDOaz79whmDpwk6ZQENjHzqS0cCRzP4/voPFQyodoR8J4VtHyS0DeFjxBuI664Pwiw8vgfC6MPswDMW19HshHsU0ty5EOVVkKOM4HgIJgJA7lGAHkwvFoH8qOacyTGxBzOcXH0aiImoPeDfpHJLR6rNCtIzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728297261; c=relaxed/simple;
-	bh=SRtgvXeFZSpW+RrYYS6tr8keYP5TXm0Uqjm9sx3J1M0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oa2GUQsWSog14GQgKs9AsZKue9NsT5VE8/Y3lb9KlgRLJ3budKq9HaFpc/nmU9MwkXFy1TKEE1wKN9BJ2pL0vToJ2mpZgfvDCL5YDoCOXITfPinaX5LZ702qE+rnV5sAUpj4LvR22kOBz1xSEiLOpidhNyvXG0yQpYqNCEye/Lw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 81B13FEC;
-	Mon,  7 Oct 2024 03:34:48 -0700 (PDT)
-Received: from [10.96.9.194] (PW05HE0L.arm.com [10.96.9.194])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 040BA3F64C;
-	Mon,  7 Oct 2024 03:34:13 -0700 (PDT)
-Message-ID: <de82957b-eb1a-48b6-8f34-575045c62ed1@arm.com>
-Date: Mon, 7 Oct 2024 11:34:11 +0100
+	s=arc-20240116; t=1728299135; c=relaxed/simple;
+	bh=yANMR7+WV8NdFI+yP2ge+3PXooOxWpw4U8uuo/Xj2H4=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mZciMFVD2GXt+O6TdIAZGBe4e+vmE1ifPSeBgfYH/WvuiHHf/bODtYS4jQnfUtfTbw1UnQOxze4xZmOm3WsNsesRV8luK2f7R9McSuHxLgnkn2UTEEZvTHth2c6OMTTg08IHeclTftCj0nosH0hwXigHPiRdKAMOkH1mBK8W9Yg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d1GUX+yc; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d1GUX+yc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7327AC4CED3;
+	Mon,  7 Oct 2024 11:05:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728299135;
+	bh=yANMR7+WV8NdFI+yP2ge+3PXooOxWpw4U8uuo/Xj2H4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=d1GUX+yckCbMtT2b41QjtFKdYmktFaYHHofUNb+Kxedx0fZozXNLBdmWYObSA27y7
+	 QJqBn3tORBMmmtqxLfJ5wOGaI+t8JE2JqRHY4GJadtQpSNYiijFu+MRJLAIch+cwSz
+	 8YH+O/l9s0qyDgEm+UGUjDUpVvmC8eWzJO2giptWeZHi/9/i8i51kxGK59EbPA37Vu
+	 Haq7+XFAWfaIuwP4pAXiiBaE8C4G/6jiHztz3aqlzPhgpqq0kyx6wiHkHjW5OdRiWB
+	 2KHlkLrKKEURtqNm6CxV1iBOVwyy8OU28ai2gCcaNcjRuLt7gVBWZTSa7ZxG51C7U/
+	 LMKspzLAuUZOQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sxlYS-000ysR-Ei;
+	Mon, 07 Oct 2024 12:05:33 +0100
+Date: Mon, 07 Oct 2024 12:05:31 +0100
+Message-ID: <86zfng5g1w.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	anshuman.khandual@arm.com,
+	james.morse@arm.com,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Jing Zhang <jingzhangos@google.com>,
+	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v4 4/7] KVM: arm64: Fix missing traps of guest accesses to the MPAM registers
+In-Reply-To: <20241004110714.2051604-5-joey.gouly@arm.com>
+References: <20241004110714.2051604-1-joey.gouly@arm.com>
+	<20241004110714.2051604-5-joey.gouly@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 07/43] arm64: RME: Check for RME support at KVM init
-Content-Language: en-GB
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>
-References: <20241004152804.72508-1-steven.price@arm.com>
- <20241004152804.72508-8-steven.price@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20241004152804.72508-8-steven.price@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, anshuman.khandual@arm.com, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, jingzhangos@google.com, shameerali.kolothum.thodi@huawei.com, catalin.marinas@arm.com, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 04/10/2024 16:27, Steven Price wrote:
-> Query the RMI version number and check if it is a compatible version. A
-> static key is also provided to signal that a supported RMM is available.
+On Fri, 04 Oct 2024 12:07:11 +0100,
+Joey Gouly <joey.gouly@arm.com> wrote:
 > 
-> Functions are provided to query if a VM or VCPU is a realm (or rec)
-> which currently will always return false.
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
->
-
-> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
-> new file mode 100644
-> index 000000000000..418685fbf6ed
-> --- /dev/null
-> +++ b/arch/arm64/kvm/rme.c
-> @@ -0,0 +1,50 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright (C) 2023 ARM Ltd.
-> + */
-> +
-> +#include <linux/kvm_host.h>
-> +
-> +#include <asm/rmi_cmds.h>
-> +#include <asm/virt.h>
-> +
-> +static int rmi_check_version(void)
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index dad88e31f953..8b1a6cedc49e 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -544,6 +544,14 @@ static bool trap_oslar_el1(struct kvm_vcpu *vcpu,
+>  	return true;
+>  }
+>  
+> +static bool trap_mpam(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+> +		      const struct sys_reg_desc *r)
 > +{
-> +	struct arm_smccc_res res;
-> +	int version_major, version_minor;
-> +	unsigned long host_version = RMI_ABI_VERSION(RMI_ABI_MAJOR_VERSION,
-> +						     RMI_ABI_MINOR_VERSION);
+> +	kvm_inject_undefined(vcpu);
 > +
-> +	arm_smccc_1_1_invoke(SMC_RMI_VERSION, host_version, &res);
+> +	return false;
+> +}
 > +
-> +	if (res.a0 == SMCCC_RET_NOT_SUPPORTED)
-> +		return -ENXIO;
-> +
-> +	version_major = RMI_ABI_VERSION_GET_MAJOR(res.a1);
-> +	version_minor = RMI_ABI_VERSION_GET_MINOR(res.a1);
-> +
-> +	if (res.a0 != RMI_SUCCESS) {
-> +		kvm_err("Unsupported RMI ABI (v%d.%d) host supports v%d.%d\n",
 
-minor nit: s/host supports/we want ? (or something similar)
+I have recently been hunting down re-implementations of undef_access()
+(see commit cd08d3216fc4), and this another case of such duplication.
+Can we stick to this one, given that we have no plan to expose MPAM to
+guests in the foreseeable future?
 
-"host" could be confusing from a user perspective ?
+>  static bool trap_oslsr_el1(struct kvm_vcpu *vcpu,
+>  			   struct sys_reg_params *p,
+>  			   const struct sys_reg_desc *r)
+> @@ -2517,8 +2525,11 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	{ SYS_DESC(SYS_LOREA_EL1), trap_loregion },
+>  	{ SYS_DESC(SYS_LORN_EL1), trap_loregion },
+>  	{ SYS_DESC(SYS_LORC_EL1), trap_loregion },
+> +	{ SYS_DESC(SYS_MPAMIDR_EL1), trap_mpam },
+>  	{ SYS_DESC(SYS_LORID_EL1), trap_loregion },
+>  
+> +	{ SYS_DESC(SYS_MPAM1_EL1), trap_mpam },
+> +	{ SYS_DESC(SYS_MPAM0_EL1), trap_mpam },
+>  	{ SYS_DESC(SYS_VBAR_EL1), access_rw, reset_val, VBAR_EL1, 0 },
+>  	{ SYS_DESC(SYS_DISR_EL1), NULL, reset_val, DISR_EL1, 0 },
+>  
 
-Rest looks good to me
+Thanks,
 
+	M.
 
-Suzuki
+-- 
+Without deviation from the norm, progress is not possible.
