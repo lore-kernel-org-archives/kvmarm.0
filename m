@@ -1,115 +1,74 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 995191D1F70
-	for <kvmarm@lists.linux.dev>; Mon,  7 Oct 2024 11:05:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B70D1D9334
+	for <kvmarm@lists.linux.dev>; Mon,  7 Oct 2024 16:43:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728299135; cv=none; b=UPhQbRhGT1f/0/BPDOaz79whmDpwk6ZQENjHzqS0cCRzP4/voPFQyodoR8J4VtHyS0DeFjxBuI664Pwiw8vgfC6MPswDMW19HshHsU0ty5EOVVkKOM4HgIJgJA7lGAHkwvFoH8qOacyTGxBzOcXH0aiImoPeDfpHJLR6rNCtIzA=
+	t=1728319394; cv=none; b=C1CAkOJfO9fBCOdh+3JmmfoDA4PtvEWZ2//DLoSocfqeYKAU6VqIN3LPIGK7XX+q152EyDr/vXNxd4cYzgQc8p7EwCeWzHmFMI9zj6yOTF88ISc2IqfnPxsDm7CFRdeeLDn/0f16Zn/oOwyc6Ohcg7XG4AFEvSAHcFVoKHrZ1Gk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728299135; c=relaxed/simple;
-	bh=yANMR7+WV8NdFI+yP2ge+3PXooOxWpw4U8uuo/Xj2H4=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mZciMFVD2GXt+O6TdIAZGBe4e+vmE1ifPSeBgfYH/WvuiHHf/bODtYS4jQnfUtfTbw1UnQOxze4xZmOm3WsNsesRV8luK2f7R9McSuHxLgnkn2UTEEZvTHth2c6OMTTg08IHeclTftCj0nosH0hwXigHPiRdKAMOkH1mBK8W9Yg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d1GUX+yc; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1728319394; c=relaxed/simple;
+	bh=1Y/5Z0X56AEsJ8VrOkI/zqV5sQVqUpqb4hRp6aZQO7k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kVF8J2q8GxhMIDQgFcBZQ8VP7FYy2Qqq+u5E961UeSXrWZ5ZKNHXsusuLNnQv5FH9Uv6fAtxLVbEd7DX2Oq3pkGXWgJcG8PM5wLpOB61xVH14EXcmsXJQ8AIZBdyBHvh78dis+xOL05cc44vhOLJm4geTC4/5igyYSABaNmU3TE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dbO/0krW; arc=none smtp.client-ip=95.215.58.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d1GUX+yc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7327AC4CED3;
-	Mon,  7 Oct 2024 11:05:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728299135;
-	bh=yANMR7+WV8NdFI+yP2ge+3PXooOxWpw4U8uuo/Xj2H4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=d1GUX+yckCbMtT2b41QjtFKdYmktFaYHHofUNb+Kxedx0fZozXNLBdmWYObSA27y7
-	 QJqBn3tORBMmmtqxLfJ5wOGaI+t8JE2JqRHY4GJadtQpSNYiijFu+MRJLAIch+cwSz
-	 8YH+O/l9s0qyDgEm+UGUjDUpVvmC8eWzJO2giptWeZHi/9/i8i51kxGK59EbPA37Vu
-	 Haq7+XFAWfaIuwP4pAXiiBaE8C4G/6jiHztz3aqlzPhgpqq0kyx6wiHkHjW5OdRiWB
-	 2KHlkLrKKEURtqNm6CxV1iBOVwyy8OU28ai2gCcaNcjRuLt7gVBWZTSa7ZxG51C7U/
-	 LMKspzLAuUZOQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sxlYS-000ysR-Ei;
-	Mon, 07 Oct 2024 12:05:33 +0100
-Date: Mon, 07 Oct 2024 12:05:31 +0100
-Message-ID: <86zfng5g1w.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	anshuman.khandual@arm.com,
-	james.morse@arm.com,
-	Oliver Upton <oliver.upton@linux.dev>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dbO/0krW"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1728319388;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=DZc3zI8soche5Po0aNFXC4P8XLdXqFm/0ykm3FjNJwY=;
+	b=dbO/0krWbrJEM0ltXanSnQzYQEBDHeP6a7Cn3UNzYmuu8cGYVGOPMR6vWoP/tilV7v9XRD
+	J3OBL+4SJ9XzfkEDxPFxzINAtdho5NZYkWC2zN5mOXKiDAEel3Txxwr53yY5hxO17RHGJL
+	mlKa+ONe19kbh6Aajipf7napjj/nfOs=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v4 4/7] KVM: arm64: Fix missing traps of guest accesses to the MPAM registers
-In-Reply-To: <20241004110714.2051604-5-joey.gouly@arm.com>
-References: <20241004110714.2051604-1-joey.gouly@arm.com>
-	<20241004110714.2051604-5-joey.gouly@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Sean Christopherson <seanjc@google.com>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH v2 0/4] KVM: arm64: nv: Fixes for stage-2 MMU recycling
+Date: Mon,  7 Oct 2024 16:42:51 +0000
+Message-ID: <20241007164256.1795250-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, anshuman.khandual@arm.com, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, jingzhangos@google.com, shameerali.kolothum.thodi@huawei.com, catalin.marinas@arm.com, will@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, 04 Oct 2024 12:07:11 +0100,
-Joey Gouly <joey.gouly@arm.com> wrote:
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index dad88e31f953..8b1a6cedc49e 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -544,6 +544,14 @@ static bool trap_oslar_el1(struct kvm_vcpu *vcpu,
->  	return true;
->  }
->  
-> +static bool trap_mpam(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> +		      const struct sys_reg_desc *r)
-> +{
-> +	kvm_inject_undefined(vcpu);
-> +
-> +	return false;
-> +}
-> +
+v1 -> v2:
+  - Keep a reference on the MMU so long as the vCPU appears runnable
+    (i.e. not in WFI) (Sean)
+  - Add comment clarifying why TLBI unmaps are allowed to reschedule
 
-I have recently been hunting down re-implementations of undef_access()
-(see commit cd08d3216fc4), and this another case of such duplication.
-Can we stick to this one, given that we have no plan to expose MPAM to
-guests in the foreseeable future?
+[*]: https://lore.kernel.org/kvmarm/20241001001709.1303668-1-oliver.upton@linux.dev/#t
 
->  static bool trap_oslsr_el1(struct kvm_vcpu *vcpu,
->  			   struct sys_reg_params *p,
->  			   const struct sys_reg_desc *r)
-> @@ -2517,8 +2525,11 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	{ SYS_DESC(SYS_LOREA_EL1), trap_loregion },
->  	{ SYS_DESC(SYS_LORN_EL1), trap_loregion },
->  	{ SYS_DESC(SYS_LORC_EL1), trap_loregion },
-> +	{ SYS_DESC(SYS_MPAMIDR_EL1), trap_mpam },
->  	{ SYS_DESC(SYS_LORID_EL1), trap_loregion },
->  
-> +	{ SYS_DESC(SYS_MPAM1_EL1), trap_mpam },
-> +	{ SYS_DESC(SYS_MPAM0_EL1), trap_mpam },
->  	{ SYS_DESC(SYS_VBAR_EL1), access_rw, reset_val, VBAR_EL1, 0 },
->  	{ SYS_DESC(SYS_DISR_EL1), NULL, reset_val, DISR_EL1, 0 },
->  
+Oliver Upton (4):
+  KVM: arm64: nv: Keep reference on stage-2 MMU when scheduled out
+  KVM: arm64: nv: Do not block when unmapping stage-2 if disallowed
+  KVM: arm64: nv: Punt stage-2 recycling to a vCPU request
+  KVM: arm64: nv: Clarify safety of allowing TLBI unmaps to reschedule
 
-Thanks,
+ arch/arm64/include/asm/kvm_host.h   |  3 ++
+ arch/arm64/include/asm/kvm_mmu.h    |  3 +-
+ arch/arm64/include/asm/kvm_nested.h |  4 ++-
+ arch/arm64/kvm/arm.c                |  2 ++
+ arch/arm64/kvm/mmu.c                | 15 +++++-----
+ arch/arm64/kvm/nested.c             | 46 ++++++++++++++++++++++++-----
+ arch/arm64/kvm/sys_regs.c           | 33 +++++++++++++++++++--
+ 7 files changed, 87 insertions(+), 19 deletions(-)
 
-	M.
 
+base-commit: 9852d85ec9d492ebef56dc5f229416c925758edc
 -- 
-Without deviation from the norm, progress is not possible.
+2.47.0.rc0.187.ge670bccf7e-goog
+
