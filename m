@@ -1,133 +1,88 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-187.mta0.migadu.com (out-187.mta0.migadu.com [91.218.175.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77D9A1DD9AD
-	for <kvmarm@lists.linux.dev>; Mon,  7 Oct 2024 18:51:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B9B0320F
+	for <kvmarm@lists.linux.dev>; Mon,  7 Oct 2024 19:01:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728327102; cv=none; b=YXdXD9ABMsPVooxZy7K2CqjL4rnub+eAk3rQte6gl0FdpnibY1CeGHOuQdtFFsCOzEpg3q2ebIgyXY7rMMUIeXNRX7z13IjSz7jEiuW/Mn4WDRJG820tHsgtfh5QMedz0ngmrPJ9kBIdYOLgJ6UPVRHQGzjyQ9gALbsdJf8PQ10=
+	t=1728327703; cv=none; b=OG87fBoEYCicMXc+C0lZ9f1n8g9f8Rt9MocBW8w4kVP8075SdCZWm3eMH/sqphl4z/O5PQ8t4FJzlYE1lAYFKG0Z0Wfrvi8snmjXvYXFail5qk3m+aHZiT6YsrptliERGiUFGEfPkwn32zINIeN2cFY69gJur4kN4z+Ik2GtTfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728327102; c=relaxed/simple;
-	bh=Iwt00qRZJKzMpD/SsNl8cwYs3nOX1XtxeoxZE5jQjKU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=s0LpfcKGYqpjbs0luTKrcWjUr2EAMdjD+/ol5U7A95C7JNZn4Uyj5ZpsAvOXdCQx4nWI9SN3QQAqUJJyRSpTWQxG344Wg9Kdam+pw2R5l/5wAUEupk2Wi8uFJB7MMkTlcqD9ma/g96JLu0FvyfLlusaQNd5g9kCNzD5EsdtByV4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tjb89tql; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1728327703; c=relaxed/simple;
+	bh=xpyWHqGivExbSJ7S2uVZrScEQBC6epvg5+pG2WEENu0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JPJveBe599TpyVKKIzrnG7/FqsDMPSlL1g+1dbc0REtvaS1aJV6xV3eUg9T8CvDiNqCWuiP1v0XSycLdDF5UqWTDn5sXc3yNBMNDxxKgDBfjt85wdykg94+PGWBK3CrrbUECgytOFNIu9zUxEzMcy35RWMpZ48ueXLrKz34m7tw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=h5irivX+; arc=none smtp.client-ip=91.218.175.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tjb89tql"
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e25d62bfe12so7425555276.0
-        for <kvmarm@lists.linux.dev>; Mon, 07 Oct 2024 11:51:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728327099; x=1728931899; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sr+clt445+1CFLN2b1lD2RZolPoj2I2apMG3jGPpa7o=;
-        b=tjb89tqll6kN7OFEQvZuaUga9vmY2iOjFO2GdyCLFViCHEZ5/seVn+W/IgqKpIz+FV
-         8aVPbb//La2mxZbHOuew6GblArRApYZncqq+Ov02+Q3C5nAIWi5cvcih6SWb0/5qUIKP
-         4S4k0h3ZAouurJ3bd5dx5E/6cYHBc4d31R7GIbqIrsiErLkgBf0IyXjRQCZMX/5C0Aii
-         A+t63TiAjOap0WDKABS49YkpsScDLPO32RQ10lgMBClgfYyo3pfO3IeZm3L0e+f7HQZq
-         FMl6l88YU0mNckMgfJuvr6Le0CGK7NP5vrCWqqDSYqCiJuEY1+hjwOB0ZY+XD//8HUWs
-         oi7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728327099; x=1728931899;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sr+clt445+1CFLN2b1lD2RZolPoj2I2apMG3jGPpa7o=;
-        b=OukuFAOA3JUxGo07kYnqUXGqfeqvRncATuX3jXhmtnYx5OA+vYLE1jTpPeeJ/wujHz
-         6UdyNHhN2CfUolLoZeyQqpvQR8gLAVEMVIevarsO6yHX8QiAH5wrIBEVXDacfsar6K7H
-         2pIJ7Oxggju+0L/CfmAS/Ap/4quOiReE4YvnHDfDe1v1lKw4Lg2uRS0OyA1O5dIBTnve
-         PkUlth/KwZ7bY6gglHRjAAFNw8pemr7Y7giAn24WdV5TybpLulVWYOoR1G65cE6LzYUi
-         1Kg1EI22LVB0wu+VRwif/NhCyy257TiIL6w0AYR7cb+yVRSzxxGY3/pCKDWtXuyoHCTK
-         sFAw==
-X-Gm-Message-State: AOJu0YzjZxAfDCKkuqGi3ik8gayMLlML47/E+9SKT1a2QP9XwLvGrwWV
-	qkriEUxQBGXIsO23q4iQPuSm3SP06J8bRVSA5z57ki1yZaX6sS9HblM1UnKvw4TWDWLbXuKIBnT
-	UNw==
-X-Google-Smtp-Source: AGHT+IF5aJlStfcNEIx6zdhqB7hP2sbQ0kvGWwzl+K5zval+bMC+DQGZIQ9igXXowSbPiif5mTIetG2u8s8=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a25:ae56:0:b0:e11:5b8c:f9c with SMTP id
- 3f1490d57ef6-e2893501a23mr54811276.0.1728327099342; Mon, 07 Oct 2024 11:51:39
- -0700 (PDT)
-Date: Mon, 7 Oct 2024 11:51:37 -0700
-In-Reply-To: <20241007164256.1795250-5-oliver.upton@linux.dev>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="h5irivX+"
+Date: Mon, 7 Oct 2024 12:01:30 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1728327697;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QzXwIGIqZaBFXRCh371CFF3SJoN/+ruGCqDb32pnidU=;
+	b=h5irivX+JEAjocRRem8cdWz4DNbTTvAKc1FXU1Yiqt2z+5q02vF9qE3EV/1uDyXK2tS7w7
+	K/YjpejIgkQUhGySfr0Ss+DyY/62knwNSL9WzZ+7TB53wfZfs4rndsx5t1SuPReqr4io+7
+	udXVfRbJlErzr2TkKXjzYOlE9buTfBw=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v2 1/4] KVM: arm64: nv: Keep reference on stage-2 MMU
+ when scheduled out
+Message-ID: <ZwQwCqR11wlADRUA@linux.dev>
+References: <20241007164256.1795250-1-oliver.upton@linux.dev>
+ <20241007164256.1795250-2-oliver.upton@linux.dev>
+ <ZwQq6Vk5_7Or4hW1@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20241007164256.1795250-1-oliver.upton@linux.dev> <20241007164256.1795250-5-oliver.upton@linux.dev>
-Message-ID: <ZwQtuQ4mU-i3kY4i@google.com>
-Subject: Re: [PATCH v2 4/4] KVM: arm64: nv: Clarify safety of allowing TLBI
- unmaps to reschedule
-From: Sean Christopherson <seanjc@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZwQq6Vk5_7Or4hW1@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Oct 07, 2024, Oliver Upton wrote:
-> There's been a decent amount of attention around unmaps of nested MMUs,
-> and TLBI handling is no exception to this. Add a comment clarifying why
-> it is safe to reschedule during a TLBI unmap, even without a reference
-> on the MMU in progress.
+On Mon, Oct 07, 2024 at 11:39:37AM -0700, Sean Christopherson wrote:
+> > @@ -674,10 +681,18 @@ void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu)
+> >  
+> >  void kvm_vcpu_put_hw_mmu(struct kvm_vcpu *vcpu)
+> >  {
+> > -	if (kvm_is_nested_s2_mmu(vcpu->kvm, vcpu->arch.hw_mmu)) {
+> > +	/*
+> > +	 * Keep a reference on the associated stage-2 MMU if the vCPU is
+> > +	 * scheduling out and not in WFI emulation, suggesting it is likely to
+> > +	 * reuse the MMU sometime soon.
+> > +	 */
+> > +	if (vcpu->scheduled_out && !vcpu_get_flag(vcpu, IN_WFI))
+> > +		return;
 > 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  arch/arm64/kvm/sys_regs.c | 27 +++++++++++++++++++++++++++
->  1 file changed, 27 insertions(+)
+> Assuming KVM arm64 supports halt-polling, I think it makes more sense to check
+> kvm_vcpu_is_blocking() instead of IN_WFI.  That way, KVM will keep the MMU resident
+> if the vCPU happens to be preempted and halt-polling is successful.
 > 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index e0c7cc16466e..b773d107cd35 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -2955,6 +2955,29 @@ union tlbi_info {
->  static void s2_mmu_unmap_range(struct kvm_s2_mmu *mmu,
->  			       const union tlbi_info *info)
->  {
-> +	/*
-> +	 * The unmap operation is allowed to drop the MMU lock and block, which
-> +	 * means that @mmu could be used for a different context than the one
-> +	 * currently being invalidated.
-> +	 *
-> +	 * This behavior is still safe, as:
-> +	 *
-> +	 *  1) The vCPU that recycled the MMU is responsible for invalidating
-> +	 *     the entire MMU before reusing it, which still honors the intent
-> +	 *     of a TLBI.
+> And somewhat of a side topic, calling kvm_vgic_put() from kvm_arch_vcpu_blocking()
+> instead of kvm_vcpu_wfi() would provide the same optimization for the GIC, as KVM
+> would only need to put/reload the vGIC if the vCPU is actually scheduled out.
 
-I think it's worth calling out that other vCPUs that want to reuse the "new" MMU
-will also ensure the entire MMU is invalidated before reusing it, and maybe even
-that multiple vCPUs can participate in recyling an MMU.  The "The vCPU" wording
-is probably going to be interpreted by most readers as meaning only _one_ vCPU
-will ensure the MMU is invalidated.
+That wouldn't be an optimization, it'd render the halt polling loop
+useless.
 
-> +	 *  2) Until the guest TLBI instruction is 'retired' (i.e. increment PC
-> +	 *     and ERET to the guest), other vCPUs are allowed to use stale
-> +	 *     translations.
-> +	 *
-> +	 *  3) Accidentally unmapping an unrelated MMU context is nonfatal, and
-> +	 *     at worst may cause more aborts for shadow stage-2 fills.
-> +	 *
-> +	 * Dropping the MMU lock also implies that shadow stage-2 fills could
-> +	 * happen behind the back of the TLBI. This is still safe, though, as
-> +	 * the L1 needs to put its stage-2 in a consistent state before doing
-> +	 * the TLBI.
-> +	 */
->  	kvm_stage2_unmap_range(mmu, info->range.start, info->range.size, true);
->  }
->  
-> @@ -3050,6 +3073,10 @@ static void s2_mmu_unmap_ipa(struct kvm_s2_mmu *mmu,
->  	max_size = compute_tlb_inval_range(mmu, info->ipa.addr);
->  	base_addr &= ~(max_size - 1);
->  
-> +	/*
-> +	 * See comment in s2_mmu_unmap_range() for why this is allowed to
-> +	 * reschedule.
-> +	 */
->  	kvm_stage2_unmap_range(mmu, base_addr, max_size, true);
->  }
->  
-> -- 
-> 2.47.0.rc0.187.ge670bccf7e-goog
-> 
+The most recent view of the guest's CPU interface is sitting in
+hardware at this point, so we need to synchronize KVM's view of
+the CPUIF with it to determine if a pending interrupt exceeds the
+priority mask.
+
+On top of that, we need to activate the doorbell IRQ for GICv4 to give
+KVM a kick when something arrives for the vPE.
+
+-- 
+Thanks,
+Oliver
