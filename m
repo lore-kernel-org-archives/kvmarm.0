@@ -1,147 +1,133 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-185.mta1.migadu.com (out-185.mta1.migadu.com [95.215.58.185])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6EF418A6DC
-	for <kvmarm@lists.linux.dev>; Mon,  7 Oct 2024 22:18:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E47618DF96
+	for <kvmarm@lists.linux.dev>; Mon,  7 Oct 2024 22:39:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728339522; cv=none; b=T2rNgHlH2ct4X8iaqWt8ozp8vFoIzTyV0b/zk5n4ok+NcF0arqq447KItb3aDX85ZHo3ByH+an0XnrwxDS8ynmyw6RKItxO0I/DeNpJ+LwyEjt06VrPGluQ1HStkmS4fz8A3pVxIZrzM6P290odGAvuKAg0KOuxRyay6i6ZDedk=
+	t=1728340764; cv=none; b=YtEn8Sf7b3scPq26iLQ0CGUcqU7F76anN+cYX+AKbGn2X3dZSqjWCjqmSAs52xitHJg2Rm4vql5ReBI33RGEoVE8dtH3TtEzL8kUgtE4w8NL6pjjVJ9CcKdsJdXnhicODChfIuynNHDpgxTMATlymcHvB95gj2qrBP23BC/qpD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728339522; c=relaxed/simple;
-	bh=UoEvfxPv/9YHVRTMYfiNwLA7iNAasu6q01J3XudZh/4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=BWyQGN2889FM+0iwd9rky4q/kHjiF6XVxDva8J8MEOW7Hnj3rHIdShe6+I5HlCBPJu5KTPhsXOCsuk63q+2YdQsVSJooPCU1LPCWi+d8J7c+Khjax3iw+5MmHe4mI3atWeJfQw0BG8Dg/ODHvIv/V6cX+sZ7Ex/yrPTM5AUL1U4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=k4UIIUfM; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1728340764; c=relaxed/simple;
+	bh=RgJCYdMYLPTDVb4bwceiaJIeBPbZ4Kb9CfWyytVc1Zg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sAkXlUI9fWkwkUXpiZ9AfrtpgZ/SyK3FH1zOSaUi1ZOSrz3QcLsIDRyEWXeTbBKOtY4jr8zdzfvIpv8MAqSPSwBhoiw/Uz8cqvAYgnCcIaIEXKXtwjP89v6zilwXdDhTTNh1y9s6xoSZZ10HnP2De3+RVN+cpvHnUt0TAllYRqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=J1QyvKSC; arc=none smtp.client-ip=95.215.58.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="k4UIIUfM"
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6e2364f45a4so63570137b3.2
-        for <kvmarm@lists.linux.dev>; Mon, 07 Oct 2024 15:18:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728339520; x=1728944320; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DCJs1Xfk97FhwF9USymt/FHqSPGdwG1SuIlB9CEAQn8=;
-        b=k4UIIUfMDh/IB+zMkn3qC76+/YaM7y0tGM/R/bqWkhu08uLZ4gd/Z6VNfsk1PR2hcs
-         qG8FKP8AZ+KOYxnkTtvhS2CWxM5YzCyd9zEvvWgIefwfY4xWVxroYSKFqZ7Q7TGb/MuB
-         Y+imEnmp6vxzsWZY9aWq02iiqJWVxMTp9Y1K4i/QxwvEyZeTV+Yw2KevEpSkW8cC69c6
-         bIz4XwncetpxPKgMEjspYYRI5QTJFiuW5YMIvYAOycpK7C6+RKAVc/c8/NDXpqda+48K
-         7DBKOtI1dq9KCMM/a1h2nXEwwxptrLcn6zJk7iy/6F3+QMAQKn9zRMEgpv+b13NnMSEF
-         XsQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728339520; x=1728944320;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DCJs1Xfk97FhwF9USymt/FHqSPGdwG1SuIlB9CEAQn8=;
-        b=NcGuMpPSSknBCAxf1MlBFeZkqg5gSg9LX1uqo8ju4EqsPFmvIPCt/7bQfW7I3ZxODd
-         cDrXcZG2HZm2KL7CsLOnH77e4qV4fyAcCqdrveMEOda9uneDyKDm2t/YCDynGxdnpc+S
-         AT8lHslZErheANLk0RolE1pB7dmMDtItTweEETI6BqGzsJIpB8z6x+VAU8HqfIQXaI6l
-         PHlCgWoEcAPimjuN+uKv5+5EXPEogfLihg1lSUMdIZFujI8YZTonsTmQFoMNPMa2PjBF
-         NkOkN8Apc98tCw7HHN/OrbprvWm/9bXchIBsgQBHvtnO52P8t18LhaDpipeuaCGsHngf
-         Oo7w==
-X-Gm-Message-State: AOJu0YzbDWF1qvawhonXdXsgFzrZorlbEzW2oVWsDLWbh+dQ6/U1XKqm
-	S9V73qAbU2ARWjl6hg64M8VbOzwxSVC923vPjPnBlmsrGl2Umx2OaPz2iAIdSct6i83H1vtpLRK
-	mAg==
-X-Google-Smtp-Source: AGHT+IFEuNWlsge45RayOIWan6HYcoWWHK/6Hez2fwcotTj5CQ6cm3iVzqFk2SMfyLwH7k8ff59U11oBAMY=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a25:bc46:0:b0:e26:b34:342b with SMTP id
- 3f1490d57ef6-e28936d6592mr9025276.4.1728339519823; Mon, 07 Oct 2024 15:18:39
- -0700 (PDT)
-Date: Mon, 7 Oct 2024 15:18:38 -0700
-In-Reply-To: <ZwRRKM5dMZ22KYKf@linux.dev>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="J1QyvKSC"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1728340759;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=fOYzIP/IiUF6enYhvf2NXdMbpcmvnkI+ke0RQYJOp5o=;
+	b=J1QyvKSC0kB/FhrFKdFXKxLJFSe6wSgbALCbLvybpzRR3P098Q9DqvS+1ZUDZyA5GOZNnu
+	HkeJC7vnaYb4JTt0JrYpWioWgC/vyzkWmqMaL+dors3TnEWrUYiaw7wBlYYXYmv1IKxiH2
+	0h7QOO+jxoXczyQRCaeD4LinS1pN+Ww=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	stable@vger.kernel.org,
+	Alexander Potapenko <glider@google.com>
+Subject: [PATCH] KVM: arm64: Unregister redistributor for failed vCPU creation
+Date: Mon,  7 Oct 2024 22:39:09 +0000
+Message-ID: <20241007223909.2157336-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20241007164256.1795250-1-oliver.upton@linux.dev>
- <20241007164256.1795250-2-oliver.upton@linux.dev> <ZwQq6Vk5_7Or4hW1@google.com>
- <ZwQwCqR11wlADRUA@linux.dev> <ZwQ8EMcZYtUb6wk_@google.com> <ZwRRKM5dMZ22KYKf@linux.dev>
-Message-ID: <ZwRePkoM4rUsuQrA@google.com>
-Subject: Re: [PATCH v2 1/4] KVM: arm64: nv: Keep reference on stage-2 MMU when
- scheduled out
-From: Sean Christopherson <seanjc@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Oct 07, 2024, Oliver Upton wrote:
-> On Mon, Oct 07, 2024 at 12:52:48PM -0700, Sean Christopherson wrote:
-> > > That wouldn't be an optimization, it'd render the halt polling loop
-> > > useless.
-> 
-> <snip>
-> 
-> > Hmm, but what happens if the wakeup event arrives before IN_WFI is set?  Ah, IIUC,
-> > GICR_VPENDBASER_PendingLast tracks if there's a pending event, KVM makes sure to
-> > read PendingLast after making vPE non-resident, and hardware is required to ensure
-> > either PendingLast=1 or a doorbell is signaled.
-> > 
-> > Niave question time: why not query GICR_VPENDBASER_PendingLast directly in
-> > kvm_vgic_vcpu_pending_irq() instead of putting the vGIC?
-> 
-> The GIC is only required to update GICR_VPENDBASER.PendingLast when
-> software deschedules the loaded vPE, meaning GICR_VPENDBASER.Valid goes
-> from 1 => 0.
+Alex reports that syzkaller has managed to trigger a use-after-free when
+tearing down a VM:
 
-Ugh, that sucks.  I wish we could magically combine Intel+AMD+ARM implementations
-for direct injection.  They all do things just slightly differently, and each one
-has some behaviors that I really like, and each one has at least one behavior that
-makes me sad.
+  BUG: KASAN: slab-use-after-free in kvm_put_kvm+0x300/0xe68 virt/kvm/kvm_main.c:5769
+  Read of size 8 at addr ffffff801c6890d0 by task syz.3.2219/10758
 
-> > > The most recent view of the guest's CPU interface is sitting in
-> > > hardware at this point, so we need to synchronize KVM's view of
-> > > the CPUIF with it to determine if a pending interrupt exceeds the
-> > > priority mask.
-> 
-> </paste>
-> 
-> The guest's enable bits and priority mask are in ICH_VMCR_EL2, and we
-> need to read that out of the CPU in order for this loop to work:
-> 
-> int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
-> {
-> 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-> 	struct vgic_irq *irq;
-> 	bool pending = false;
-> 	unsigned long flags;
-> 	struct vgic_vmcr vmcr;
-> 
-> 	if (!vcpu->kvm->arch.vgic.enabled)
-> 		return false;
-> 
-> 	if (vcpu->arch.vgic_cpu.vgic_v3.its_vpe.pending_last)
-> 		return true;
-> 
-> 	vgic_get_vmcr(vcpu, &vmcr);
-> 
-> 	raw_spin_lock_irqsave(&vgic_cpu->ap_list_lock, flags);
-> 
-> 	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
-> 		raw_spin_lock(&irq->irq_lock);
-> 		pending = irq_is_pending(irq) && irq->enabled &&
-> 			  !irq->active &&
-> 			  irq->priority < vmcr.pmr;		<====== Need latest PMR
-> 		raw_spin_unlock(&irq->irq_lock);
-> 
-> 		if (pending)
-> 			break;
-> 	}
-> 
-> 	raw_spin_unlock_irqrestore(&vgic_cpu->ap_list_lock, flags);
-> 
-> 	return pending;
-> }
-> 
-> KVM's in-memory view of VMCR is updated in vgic_put().
+  CPU: 3 UID: 0 PID: 10758 Comm: syz.3.2219 Not tainted 6.11.0-rc6-dirty #64
+  Hardware name: linux,dummy-virt (DT)
+  Call trace:
+   dump_backtrace+0x17c/0x1a8 arch/arm64/kernel/stacktrace.c:317
+   show_stack+0x2c/0x3c arch/arm64/kernel/stacktrace.c:324
+   __dump_stack lib/dump_stack.c:93 [inline]
+   dump_stack_lvl+0x94/0xc0 lib/dump_stack.c:119
+   print_report+0x144/0x7a4 mm/kasan/report.c:377
+   kasan_report+0xcc/0x128 mm/kasan/report.c:601
+   __asan_report_load8_noabort+0x20/0x2c mm/kasan/report_generic.c:381
+   kvm_put_kvm+0x300/0xe68 virt/kvm/kvm_main.c:5769
+   kvm_vm_release+0x4c/0x60 virt/kvm/kvm_main.c:1409
+   __fput+0x198/0x71c fs/file_table.c:422
+   ____fput+0x20/0x30 fs/file_table.c:450
+   task_work_run+0x1cc/0x23c kernel/task_work.c:228
+   do_notify_resume+0x144/0x1a0 include/linux/resume_user_mode.h:50
+   el0_svc+0x64/0x68 arch/arm64/kernel/entry-common.c:169
+   el0t_64_sync_handler+0x90/0xfc arch/arm64/kernel/entry-common.c:730
+   el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:598
 
-Ah, vgic_get_vmcr() is just unpacking the software-cached VMCR.  I missed that
-on the first few reads.
+Upon closer inspection, it appears that we do not properly tear down the
+MMIO registration for a vCPU that fails creation late in the game, e.g.
+a vCPU w/ the same ID already exists in the VM.
 
-Thanks for being patient :-)
+It is important to consider the context of commit that introduced this bug
+by moving the unregistration out of __kvm_vgic_vcpu_destroy(). That
+change correctly sought to avoid an srcu v. config_lock inversion by
+breaking up the vCPU teardown into two parts, one guarded by the
+config_lock.
 
-> So even w/o GICv4 direct injection, the seemingly premature GIC save/restore
-> is essential for halt polling to actually do something useful.
+Fix the use-after-free while avoiding lock inversion by adding a
+special-cased unregistration to __kvm_vgic_vcpu_destroy(). This is safe
+because failed vCPUs are torn down outside of the config_lock.
+
+Cc: stable@vger.kernel.org
+Fixes: f616506754d3 ("KVM: arm64: vgic: Don't hold config_lock while unregistering redistributors")
+Reported-by: Alexander Potapenko <glider@google.com>
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+---
+ arch/arm64/kvm/vgic/vgic-init.c | 22 +++++++++++++++++++++-
+ 1 file changed, 21 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+index e7c53e8af3d1..57aedf7b2b76 100644
+--- a/arch/arm64/kvm/vgic/vgic-init.c
++++ b/arch/arm64/kvm/vgic/vgic-init.c
+@@ -417,8 +417,28 @@ static void __kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
+ 	kfree(vgic_cpu->private_irqs);
+ 	vgic_cpu->private_irqs = NULL;
+ 
+-	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
++	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
++		/*
++		 * If this vCPU is being destroyed because of a failed creation
++		 * then unregister the redistributor to avoid leaving behind a
++		 * dangling pointer to the vCPU struct.
++		 *
++		 * vCPUs that have been successfully created (i.e. added to
++		 * kvm->vcpu_array) get unregistered in kvm_vgic_destroy(), as
++		 * this function gets called while holding kvm->arch.config_lock
++		 * in the VM teardown path and would otherwise introduce a lock
++		 * inversion w.r.t. kvm->srcu.
++		 *
++		 * vCPUs that failed creation are torn down outside of the
++		 * kvm->arch.config_lock and do not get unregistered in
++		 * kvm_vgic_destroy(), meaning it is both safe and necessary to
++		 * do so here.
++		 */
++		if (kvm_get_vcpu_by_id(vcpu->kvm, vcpu->vcpu_id) != vcpu)
++			vgic_unregister_redist_iodev(vcpu);
++
+ 		vgic_cpu->rd_iodev.base_addr = VGIC_ADDR_UNDEF;
++	}
+ }
+ 
+ void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
+-- 
+2.47.0.rc0.187.ge670bccf7e-goog
+
