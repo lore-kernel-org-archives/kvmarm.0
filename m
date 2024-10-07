@@ -1,196 +1,166 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B35DA17557C;
-	Sun,  6 Oct 2024 10:28:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2804B10A1C;
+	Mon,  7 Oct 2024 04:31:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728210506; cv=none; b=iNuTpcwi6gsY9Uwll066qucQm0soUyOfQjte/b9X/aA6ovxAHuNScg6cKgt4Mb4k4H+rpUHD5ThfEM4FvCa1nYqoQ9wVbX8gYnM7p6CfFpTSwsIUxc5capdiU3vGt9bRHNft5ptcT3stzDCupych7KdK+JiuxyWShdgnC52AsWw=
+	t=1728275505; cv=none; b=RloQfD07wUeO35AIc9O9qqnTh2jhJhmC4MZM2tJbNGYAnQFvowWtYebfg+2RUPfwzUButwkfhY5OUNtCxI+/SP3IaFKTbH6IRsP/cRV3iQdZEiIbPHNhzupaTyvCFKBzG8VhrrShT6hlnihM2IsQ22xIEJIl+AEnui0mt+Nb6N8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728210506; c=relaxed/simple;
-	bh=qQResh1CcWQO+c6Odpl8c5StGvv2HmNjqiNTYvGALNg=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iQJ6eb1YCAaltvTcp39zsB4HgqdBzTpXF2uRg1NgSNONuFlglYdGFJPSdF2t19WwJBbmqUDt6Vz13AuGunbrtWMTIMu20Qe5pSSBA0VwuIxiqHwr5hHGTrWeTDoVhEv/gWm2kXu4tlYd7xJM1Or+XWzFNvVbqV26BEWWicVtasw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K3IxjiMy; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1728275505; c=relaxed/simple;
+	bh=h4BqdarIxiHAkZjTqrf5W1xk6PBnK/XznaYWb774zhU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=c7W4hRViQ6rxnwHolMhRIKgnE3dEx8/ri6x3UVtjI9KtPMOm9SijPM0YSToaaRWKdsYEO3YL8R2UsIjvKKQIgNxDnsTPn2r0ObkurxzAQOardn49tyPxIn8sPc//zj8udPTx+GmUfGkqwgpbqLEWBxIT2cLXW3tur3oIk9+c3Z0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ns5p+FPN; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K3IxjiMy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 437DFC4CEC5;
-	Sun,  6 Oct 2024 10:28:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ns5p+FPN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97E00C4CEC6;
+	Mon,  7 Oct 2024 04:31:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728210506;
-	bh=qQResh1CcWQO+c6Odpl8c5StGvv2HmNjqiNTYvGALNg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=K3IxjiMyyiajCHdln/10sV19fD/J+xDyFqAVAcIXluVkjYnKNvOlapBiT7Y/HSrNP
-	 uhgMmCLkK1CkoE++6Bb38HEl3VHA4CME0DyCPvl1aHLksbZ6p39/GulEkPn7Y73aFe
-	 OW89w/nZAikRIJ3qGed6/jnmAIXr6cqQxW5a+eX2rypOtqdgQvju3rGiDGtvnixXdm
-	 0KxnRa1t1l3qcHdFdzXgZngHL3LJF0kxtOhBzIBWmwGgXG2t5yy0PcTZh+5gzDlHzU
-	 xNxhMRG5TduTIc/ZYMLMNpSjllc4di4751gj7gWX4UUQiIL31gHN0seMnPy4P7tTgL
-	 dNkRzVCPcs9rg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sxOUy-000lyd-1W;
-	Sun, 06 Oct 2024 11:28:24 +0100
-Date: Sun, 06 Oct 2024 11:28:23 +0100
-Message-ID: <8634l97cfs.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Ahmad Fatoum <a.fatoum@pengutronix.de>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	qemu-arm@nongnu.org,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	"linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
-	Enrico Joerns <ejo@pengutronix.de>
-Subject: Re: [BUG] ARM64 KVM: Data abort executing post-indexed LDR on MMIO address
-In-Reply-To: <0352a327-0e78-48d4-a876-d33689fcd766@pengutronix.de>
-References: <89f184d6-5b61-4c77-9f3b-c0a8f6a75d60@pengutronix.de>
-	<CAFEAcA_Yv2a=XCKw80y9iyBRoC27UL6Sfzgy4KwFDkC1gbzK7w@mail.gmail.com>
-	<a4c06f55-28ec-4620-b594-b7ff0bb1e162@pengutronix.de>
-	<CAFEAcA9F3AR-0OCKDy__eVBJRMi80G7bWNfANGZRR2W8iMhfJA@mail.gmail.com>
-	<4d559b9e-c208-46f3-851a-68086dc8a50f@pengutronix.de>
-	<864j5q7sdq.wl-maz@kernel.org>
-	<65ab10d7-6594-490c-be07-39f83ac3559a@pengutronix.de>
-	<87a5fiutai.wl-maz@kernel.org>
-	<0352a327-0e78-48d4-a876-d33689fcd766@pengutronix.de>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1728275504;
+	bh=h4BqdarIxiHAkZjTqrf5W1xk6PBnK/XznaYWb774zhU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=Ns5p+FPNQ6ghH8QdqMYD3NDD1rym469P8SEFY3wude6968PtVUVO1m3sETctDROEx
+	 NLAq6xLzPTAJFQVTGNeUG+y9HE8RtxgdgNvzG0o6v5eEB/pilsUmcb6tOZLL8y2Are
+	 D35iCJC7QYTDWm01Qy6wJmKoUpGFQ3xJkcpCGKy1LljNh95W5yxkt0h7wdyDmhPhy0
+	 ikAU5uV8cEPCeGLLQyVQgUVElKTuilKtfCttAD48Z7x//dJaeI+NQJkLNkf36xPXEC
+	 ASr11zQZ/Y4MLavUsS9PH/8JFhHQnQkx6Nf/dBTeQ5dM2WSk//1i7CB16DuuvY8nt6
+	 9oTQqp+ZnlLMw==
+X-Mailer: emacs 31.0.50 (via feedmail 11-beta-1 I)
+From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Cc: Steven Price <steven.price@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>
+Subject: Re: [PATCH v5 19/43] KVM: arm64: Handle realm MMIO emulation
+In-Reply-To: <20241004152804.72508-20-steven.price@arm.com>
+References: <20241004152804.72508-1-steven.price@arm.com>
+ <20241004152804.72508-20-steven.price@arm.com>
+Date: Mon, 07 Oct 2024 10:01:33 +0530
+Message-ID: <yq5awmik5yai.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: a.fatoum@pengutronix.de, peter.maydell@linaro.org, qemu-arm@nongnu.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, kernel@pengutronix.de, linux-arm-kernel@lists.infradead.org, ejo@pengutronix.de
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain
 
-On Sun, 06 Oct 2024 08:59:56 +0100,
-Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
-> 
-> Hello Marc,
-> 
-> On 05.10.24 23:35, Marc Zyngier wrote:
-> > On Sat, 05 Oct 2024 19:38:23 +0100,
-> > Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
-> >>> IIRC, the QEMU flash is implemented as a read-only memslot. A data
-> >>> cache invalidation is a *write*, as it can be (and is) upgraded to a
-> >>> clean+invalidate by the HW.
-> >>
-> >> So it's a write, even if there are no dirty cache lines?
-> > 
-> > Yes.
-> > 
-> > At the point where this is handled, the CPU has no clue about the
-> > dirty state of an arbitrary cache line, at an arbitrary cache level.
-> > The CPU simply forward the CMO downstream, and the permission check
-> > happens way before that.
-> 
-> I see. When I added that invalidation, it was suggested[1] that instead
-> of invalidation after the remapping, I would clean the range before
-> remapping. Cleaning the zero page triggered a data abort, which I didn't
-> understand as there should be no dirty lines, but now I get it.
-> 
-> One more question: This upgrading of DC IVAC to DC CIVAC is because
-> the code is run under virtualization, right?
+Steven Price <steven.price@arm.com> writes:
 
-Not necessarily. Virtualisation mandates the upgrade, but CIVAC is
-also a perfectly valid implementation of both IVAC and CVAC.  And it
-isn't uncommon that CPUs implement everything the same way.
+> MMIO emulation for a realm cannot be done directly with the VM's
+> registers as they are protected from the host. However, for emulatable
+> data aborts, the RMM uses GPRS[0] to provide the read/written value.
+> We can transfer this from/to the equivalent VCPU's register entry and
+> then depend on the generic MMIO handling code in KVM.
+>
+> For a MMIO read, the value is placed in the shared RecExit structure
+> during kvm_handle_mmio_return() rather than in the VCPU's register
+> entry.
+>
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+> v3: Adapt to previous patch changes
+> ---
+>  arch/arm64/kvm/mmio.c     | 10 +++++++++-
+>  arch/arm64/kvm/rme-exit.c |  6 ++++++
+>  2 files changed, 15 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
+> index cd6b7b83e2c3..66a838b3776a 100644
+> --- a/arch/arm64/kvm/mmio.c
+> +++ b/arch/arm64/kvm/mmio.c
+> @@ -6,6 +6,7 @@
+>  
+>  #include <linux/kvm_host.h>
+>  #include <asm/kvm_emulate.h>
+> +#include <asm/rmi_smc.h>
+>  #include <trace/events/kvm.h>
+>  
+>  #include "trace.h"
+> @@ -90,6 +91,9 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu)
+>  
+>  	vcpu->mmio_needed = 0;
+>  
+> +	if (vcpu_is_rec(vcpu))
+> +		vcpu->arch.rec.run->enter.flags |= REC_ENTER_EMULATED_MMIO;
+> +
+>  	if (!kvm_vcpu_dabt_iswrite(vcpu)) {
+>  		struct kvm_run *run = vcpu->run;
+>  
+> @@ -108,7 +112,11 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu)
+>  		trace_kvm_mmio(KVM_TRACE_MMIO_READ, len, run->mmio.phys_addr,
+>  			       &data);
+>  		data = vcpu_data_host_to_guest(vcpu, data, len);
+> -		vcpu_set_reg(vcpu, kvm_vcpu_dabt_get_rd(vcpu), data);
+> +
+> +		if (vcpu_is_rec(vcpu))
+> +			vcpu->arch.rec.run->enter.gprs[0] = data;
+> +		else
+> +			vcpu_set_reg(vcpu, kvm_vcpu_dabt_get_rd(vcpu), data);
+>  	}
+>  
+>  	/*
+>
 
-This is why, if you dare looking at the definition of ESR_ELx for a
-data abort, you will notice that ESR_ELx.WnR (which indicates whether
-the abort was triggered by a read or a write) is always 1 (denoting a
-write) on a CMO, irrespective of what CMO triggered it.
+Does a kvm_incr_pc(vcpu); make sense for realm guest? Should we do
 
-Additionally, FEAT_CMOW requires both read and write permissions to
-not trigger faults on CMOs, but that's a bit orthogonal to your
-problem.
+modified   arch/arm64/kvm/mmio.c
+@@ -91,9 +91,6 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu)
+ 
+ 	vcpu->mmio_needed = 0;
+ 
+-	if (vcpu_is_rec(vcpu))
+-		vcpu->arch.rec.run->enter.flags |= RMI_EMULATED_MMIO;
+-
+ 	if (!kvm_vcpu_dabt_iswrite(vcpu)) {
+ 		struct kvm_run *run = vcpu->run;
+ 
+@@ -123,7 +120,10 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu)
+ 	 * The MMIO instruction is emulated and should not be re-executed
+ 	 * in the guest.
+ 	 */
+-	kvm_incr_pc(vcpu);
++	if (vcpu_is_rec(vcpu))
++		vcpu->arch.rec.run->enter.flags |= RMI_EMULATED_MMIO;
++	else
++		kvm_incr_pc(vcpu);
+ 
+ 	return 1;
+ }
 
-> 
-> [1]: https://lore.barebox.org/barebox/9809c04c-58c5-6888-2b14-cf17fa7c4b1a@pengutronix.de/
-> 
-> >> The routine[1] that does this remapping invalidates the virtual address range,
-> >> because the attributes may change[2]. This invalidate also happens for cfi-flash,
-> >> but we should never encounter dirty cache lines there as the remap is done
-> >> before driver probe.
-> >>
-> >> Can you advise what should be done differently?
-> > 
-> > If you always map the flash as Device memory, there is no need for
-> > CMOs. Same thing if you map it as NC.
-> 
-> Everything, except for RAM, is mapped Device-nGnRnE.
 
-Right, no problem then.
 
-> 
-> > And even if you did map it as
-> > Cacheable, it wouldn't matter. KVM already handles coherency when the
-> > flash is switching between memory-mapped and programming mode, as the
-> > physical address space changes (the flash literally drops from the
-> > memory map).
-> > 
-> > In general, issuing CMOs to a device is a bizarre concept, because it
-> > is pretty rare that a device can handle a full cache-line as
-> > write-back. Devices tend to handle smaller, register-sized accesses,
-> > not a full 64-byte eviction.
-> 
-> The same remap_range function is used to:
-> 
->   - remap normal memory:
->     - Mapping memory regions uncached for memory test
->     - Mapping memory buffers coherent or write-combine
->   - remap ROMs: BootROMs at address zero may be hidden behind the NULL
->     page and need to be mapped differently when calling/peeking into it.
->   - remap device memory, e.g. in the case of the cfi-flash here
-> 
-> The invalidation is done unconditionally for all of them, although it
-> makes only the sense in the first case.
-
-Indeed.
-
-> 
-> > Now, I'm still wondering whether we should simply forward the CMO to
-> > userspace as we do for other writes, and let the VMM deal with it. The
-> > main issue is that there is no current way to describe this.
-> > 
-> > The alternative would be to silently handle the trap and pretend it
-> > never occurred, as we do for other bizarre behaviours. But that'd be
-> > something only new kernels would support, and I guess you'd like your
-> > guest to work today, not tomorrow.
-> 
-> I think following fix on the barebox side may work:
-> 
->   - Walk all pages about to be remapped
->   - Execute the AT instruction on the page's base address
-
-Why do you need AT if you are walking the PTs? If you walk, you
-already have access to the memory attributes. In general, AT can be
-slower than an actual walk.
-
-Or did you actually mean iterating over the VA range? Even in that
-case, AT can be a bad idea, as you are likely to iterate in page-size
-increments even if you have a block mapping. Walking the PTs tells you
-immediately how much a leaf is mapping (assuming you don't have any
-other tracking).
-
->   - Only if the page was previously mapped cacheable, clean + invalidate
->     the cache
->   - Remove the current cache invalidation after remap
-> 
-> Does that sound sensible?
-
-This looks reasonable (apart from the AT thingy).
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+> diff --git a/arch/arm64/kvm/rme-exit.c b/arch/arm64/kvm/rme-exit.c
+> index e96ea308212c..1ddbff123149 100644
+> --- a/arch/arm64/kvm/rme-exit.c
+> +++ b/arch/arm64/kvm/rme-exit.c
+> @@ -25,6 +25,12 @@ static int rec_exit_reason_notimpl(struct kvm_vcpu *vcpu)
+>  
+>  static int rec_exit_sync_dabt(struct kvm_vcpu *vcpu)
+>  {
+> +	struct realm_rec *rec = &vcpu->arch.rec;
+> +
+> +	if (kvm_vcpu_dabt_iswrite(vcpu) && kvm_vcpu_dabt_isvalid(vcpu))
+> +		vcpu_set_reg(vcpu, kvm_vcpu_dabt_get_rd(vcpu),
+> +			     rec->run->exit.gprs[0]);
+> +
+>  	return kvm_handle_guest_abort(vcpu);
+>  }
+>  
+> -- 
+> 2.34.1
