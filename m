@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EF051B7905;
-	Mon,  7 Oct 2024 10:22:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B843318C013;
+	Mon,  7 Oct 2024 10:34:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728296543; cv=none; b=jfdtpiF96OtsAAUvWD+xGjZfYs7Hjgcmozxe9OXNSRuilGpYZFiLQpCKLFPHG8qIc+UfYInzat+frNsIhxNulv3Wd68urX4qC2Bt1xME4UUXpKdTLrWNQ+63lcj6J8E7qcyYAPBULI05KrRcPvl+ACN0wglTFJnDP8/njcOM2mY=
+	t=1728297261; cv=none; b=VKZ4g0SZruwdE4ae3FjwNM70EfedP2yO0Fj45xh65xli4cZzCO7qHEFp9qw31P8xn1Y/YZ9HiHXbzsYRG2ksazhp0Mnn93AOiHIHqV2GlU+gtatyT/5fCwtr8LB5tw0+3JoQ8ILejSDBX9PXV4SycX9okSdi1j9DRcmqkfC3eJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728296543; c=relaxed/simple;
-	bh=kTc+AjP0b7abuuU4psMJVQLsuk/9Sn+RLxkMe+/u/mc=;
+	s=arc-20240116; t=1728297261; c=relaxed/simple;
+	bh=SRtgvXeFZSpW+RrYYS6tr8keYP5TXm0Uqjm9sx3J1M0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=F59pQIZ9tTI3aR9hOyhpHfNp5w4wiDMzJXXG496wg8WOp3ddZNV+f68qIoX1YdtRDAZ5gaxikXTYVHlXWyXySh7U8UQTOIKXH/stKuoazPQtBE90m6baZHmDLWjFTAMwIIWPPE7y3wym1J0wBlsKrmkwTtHLMZMmCo+xfvLlmlw=
+	 In-Reply-To:Content-Type; b=oa2GUQsWSog14GQgKs9AsZKue9NsT5VE8/Y3lb9KlgRLJ3budKq9HaFpc/nmU9MwkXFy1TKEE1wKN9BJ2pL0vToJ2mpZgfvDCL5YDoCOXITfPinaX5LZ702qE+rnV5sAUpj4LvR22kOBz1xSEiLOpidhNyvXG0yQpYqNCEye/Lw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0E2E7FEC;
-	Mon,  7 Oct 2024 03:22:49 -0700 (PDT)
-Received: from [10.57.78.166] (unknown [10.57.78.166])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B63263F64C;
-	Mon,  7 Oct 2024 03:22:15 -0700 (PDT)
-Message-ID: <3dd5059b-a42d-496b-8de3-e16012d6dafd@arm.com>
-Date: Mon, 7 Oct 2024 11:22:13 +0100
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 81B13FEC;
+	Mon,  7 Oct 2024 03:34:48 -0700 (PDT)
+Received: from [10.96.9.194] (PW05HE0L.arm.com [10.96.9.194])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 040BA3F64C;
+	Mon,  7 Oct 2024 03:34:13 -0700 (PDT)
+Message-ID: <de82957b-eb1a-48b6-8f34-575045c62ed1@arm.com>
+Date: Mon, 7 Oct 2024 11:34:11 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,140 +27,78 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 19/43] KVM: arm64: Handle realm MMIO emulation
-To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, kvm@vger.kernel.org,
+Subject: Re: [PATCH v5 07/43] arm64: RME: Check for RME support at KVM init
+Content-Language: en-GB
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
  kvmarm@lists.linux.dev
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
  Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
  Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>
 References: <20241004152804.72508-1-steven.price@arm.com>
- <20241004152804.72508-20-steven.price@arm.com> <yq5awmik5yai.fsf@kernel.org>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <yq5awmik5yai.fsf@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+ <20241004152804.72508-8-steven.price@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20241004152804.72508-8-steven.price@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 07/10/2024 05:31, Aneesh Kumar K.V wrote:
-> Steven Price <steven.price@arm.com> writes:
+On 04/10/2024 16:27, Steven Price wrote:
+> Query the RMI version number and check if it is a compatible version. A
+> static key is also provided to signal that a supported RMM is available.
 > 
->> MMIO emulation for a realm cannot be done directly with the VM's
->> registers as they are protected from the host. However, for emulatable
->> data aborts, the RMM uses GPRS[0] to provide the read/written value.
->> We can transfer this from/to the equivalent VCPU's register entry and
->> then depend on the generic MMIO handling code in KVM.
->>
->> For a MMIO read, the value is placed in the shared RecExit structure
->> during kvm_handle_mmio_return() rather than in the VCPU's register
->> entry.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->> v3: Adapt to previous patch changes
->> ---
->>  arch/arm64/kvm/mmio.c     | 10 +++++++++-
->>  arch/arm64/kvm/rme-exit.c |  6 ++++++
->>  2 files changed, 15 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
->> index cd6b7b83e2c3..66a838b3776a 100644
->> --- a/arch/arm64/kvm/mmio.c
->> +++ b/arch/arm64/kvm/mmio.c
->> @@ -6,6 +6,7 @@
->>  
->>  #include <linux/kvm_host.h>
->>  #include <asm/kvm_emulate.h>
->> +#include <asm/rmi_smc.h>
->>  #include <trace/events/kvm.h>
->>  
->>  #include "trace.h"
->> @@ -90,6 +91,9 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu)
->>  
->>  	vcpu->mmio_needed = 0;
->>  
->> +	if (vcpu_is_rec(vcpu))
->> +		vcpu->arch.rec.run->enter.flags |= REC_ENTER_EMULATED_MMIO;
->> +
->>  	if (!kvm_vcpu_dabt_iswrite(vcpu)) {
->>  		struct kvm_run *run = vcpu->run;
->>  
->> @@ -108,7 +112,11 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu)
->>  		trace_kvm_mmio(KVM_TRACE_MMIO_READ, len, run->mmio.phys_addr,
->>  			       &data);
->>  		data = vcpu_data_host_to_guest(vcpu, data, len);
->> -		vcpu_set_reg(vcpu, kvm_vcpu_dabt_get_rd(vcpu), data);
->> +
->> +		if (vcpu_is_rec(vcpu))
->> +			vcpu->arch.rec.run->enter.gprs[0] = data;
->> +		else
->> +			vcpu_set_reg(vcpu, kvm_vcpu_dabt_get_rd(vcpu), data);
->>  	}
->>  
->>  	/*
->>
+> Functions are provided to query if a VM or VCPU is a realm (or rec)
+> which currently will always return false.
 > 
-> Does a kvm_incr_pc(vcpu); make sense for realm guest? Should we do
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+>
 
-The PC is ignored when restarting realm guest, so kvm_incr_pr() is
-effectively a no-op. But I guess REC_ENTER_EMULATED_MMIO is our way of
-signalling to the RMM that it should skip the instruction, so your
-proposed patch below makes the code slightly clearer.
+> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
+> new file mode 100644
+> index 000000000000..418685fbf6ed
+> --- /dev/null
+> +++ b/arch/arm64/kvm/rme.c
+> @@ -0,0 +1,50 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright (C) 2023 ARM Ltd.
+> + */
+> +
+> +#include <linux/kvm_host.h>
+> +
+> +#include <asm/rmi_cmds.h>
+> +#include <asm/virt.h>
+> +
+> +static int rmi_check_version(void)
+> +{
+> +	struct arm_smccc_res res;
+> +	int version_major, version_minor;
+> +	unsigned long host_version = RMI_ABI_VERSION(RMI_ABI_MAJOR_VERSION,
+> +						     RMI_ABI_MINOR_VERSION);
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_VERSION, host_version, &res);
+> +
+> +	if (res.a0 == SMCCC_RET_NOT_SUPPORTED)
+> +		return -ENXIO;
+> +
+> +	version_major = RMI_ABI_VERSION_GET_MAJOR(res.a1);
+> +	version_minor = RMI_ABI_VERSION_GET_MINOR(res.a1);
+> +
+> +	if (res.a0 != RMI_SUCCESS) {
+> +		kvm_err("Unsupported RMI ABI (v%d.%d) host supports v%d.%d\n",
 
-Thanks,
-Steve
+minor nit: s/host supports/we want ? (or something similar)
 
-> modified   arch/arm64/kvm/mmio.c
-> @@ -91,9 +91,6 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu)
->  
->  	vcpu->mmio_needed = 0;
->  
-> -	if (vcpu_is_rec(vcpu))
-> -		vcpu->arch.rec.run->enter.flags |= RMI_EMULATED_MMIO;
-> -
->  	if (!kvm_vcpu_dabt_iswrite(vcpu)) {
->  		struct kvm_run *run = vcpu->run;
->  
-> @@ -123,7 +120,10 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu)
->  	 * The MMIO instruction is emulated and should not be re-executed
->  	 * in the guest.
->  	 */
-> -	kvm_incr_pc(vcpu);
-> +	if (vcpu_is_rec(vcpu))
-> +		vcpu->arch.rec.run->enter.flags |= RMI_EMULATED_MMIO;
-> +	else
-> +		kvm_incr_pc(vcpu);
->  
->  	return 1;
->  }
-> 
-> 
-> 
->> diff --git a/arch/arm64/kvm/rme-exit.c b/arch/arm64/kvm/rme-exit.c
->> index e96ea308212c..1ddbff123149 100644
->> --- a/arch/arm64/kvm/rme-exit.c
->> +++ b/arch/arm64/kvm/rme-exit.c
->> @@ -25,6 +25,12 @@ static int rec_exit_reason_notimpl(struct kvm_vcpu *vcpu)
->>  
->>  static int rec_exit_sync_dabt(struct kvm_vcpu *vcpu)
->>  {
->> +	struct realm_rec *rec = &vcpu->arch.rec;
->> +
->> +	if (kvm_vcpu_dabt_iswrite(vcpu) && kvm_vcpu_dabt_isvalid(vcpu))
->> +		vcpu_set_reg(vcpu, kvm_vcpu_dabt_get_rd(vcpu),
->> +			     rec->run->exit.gprs[0]);
->> +
->>  	return kvm_handle_guest_abort(vcpu);
->>  }
->>  
->> -- 
->> 2.34.1
+"host" could be confusing from a user perspective ?
 
+Rest looks good to me
+
+
+Suzuki
