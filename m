@@ -1,616 +1,228 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52E211EA73;
-	Tue,  8 Oct 2024 16:31:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB6F921500F
+	for <kvmarm@lists.linux.dev>; Tue,  8 Oct 2024 20:10:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728405079; cv=none; b=usPKBwe0CFGEH55kWf2xyWBD5KevgaDcOmrfbCLau+l36lO9xawRL5h/BXzSw6TxP5zLt/Nem7BLEdXxe7EAAt8ZkXTAQX0pyiB/CDWOCCXuqE/Fn/a2K8agjsAdzXdaHLgn6c2GszyQCVsCQcug0P5ujm/csoUED+bpfypZhEo=
+	t=1728418250; cv=none; b=adHQ5hkAYxUPDMOxRunQkUJvT1e3g8oHvWECfnTDvPv8QOnuNgeK7v3YOIIgznkjDbXkdJ4+KEsrWWzZwjE9AC/djo25Q7tUsjiuI1e59TRWOvG6jzmF7dTrcHZBULBnWWPfm6WzGE5g3ToV5G/pToAyDBCKS2bYJDV8Wfq8IXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728405079; c=relaxed/simple;
-	bh=DJ9rx/Y/n8OytLpHy2GEh1cAHPy/N/iuOEYUEAyFwuI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=U4K1EmuFTgsmQXImVDP6SX3SnbIr8kTQQ94wpXHAWQvaiwfvZz7s7mAHXUvxBO6Hj3Yk5AKoT0REC9lo4fLxuvrQa0f9VI3EjH4XWltJnNIjHB8K/pSYq2PB5AkVdDi3PRE4vESOGOVWj+t8dUIra32qwcQthDLmhDhpdoLwjQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 370BDDA7;
-	Tue,  8 Oct 2024 09:31:45 -0700 (PDT)
-Received: from [10.96.9.239] (PW05DSGS.arm.com [10.96.9.239])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F208A3F73F;
-	Tue,  8 Oct 2024 09:31:10 -0700 (PDT)
-Message-ID: <391c0a7d-99da-407b-8a34-38ce5e24776d@arm.com>
-Date: Tue, 8 Oct 2024 17:31:08 +0100
+	s=arc-20240116; t=1728418250; c=relaxed/simple;
+	bh=E7zPAoCmwBqBdf7PBNrujyJalnwi15pZnyEj/jpf2DQ=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VM8WXO4bJnaqgRwBHp6F32NIUW4xlJjXuEQt3iGigoUaBrI4fVWlGGxdfMHpcNUiboOO12pwwG2ImgJJsk43IDgH7z1dPUHcW93hACXwr2D6Anj3ejK+vdY2lyKeYP2NzNVNGs228iiLFSVFtk/DtFVXYfoxx4oEx75K8uPZQUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b=Nyj9iPE1; arc=none smtp.client-ip=52.119.213.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b="Nyj9iPE1"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1728418250; x=1759954250;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=BVMFzVxR0Kuh6OmNjVYTpAPSyJ3Xe7jNg3d6jsZiecE=;
+  b=Nyj9iPE1HcWCbuZDdOalYjZCWe8sbzcaQ5WluUWA3Glb3U3g5xOajPhu
+   rqzKjvOgN74i2I8TASuISLGfUnllK9THXDHxKkKeyHCOnL2i8SBEzA0Nk
+   XZufF1svBL+fAXoCwNXOcIYwQ/SE00r99q5evKrWVDO0UeywlnKDTEk26
+   c=;
+X-IronPort-AV: E=Sophos;i="6.11,187,1725321600"; 
+   d="scan'208";a="686074039"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2024 20:10:45 +0000
+Received: from EX19MTAEUB001.ant.amazon.com [10.0.10.100:1906]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.8.31:2525] with esmtp (Farcaster)
+ id bc1728f2-b0d2-4007-a03a-d2d583554258; Tue, 8 Oct 2024 20:10:42 +0000 (UTC)
+X-Farcaster-Flow-ID: bc1728f2-b0d2-4007-a03a-d2d583554258
+Received: from EX19D007EUA004.ant.amazon.com (10.252.50.76) by
+ EX19MTAEUB001.ant.amazon.com (10.252.51.26) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Tue, 8 Oct 2024 20:10:39 +0000
+Received: from EX19MTAUWA002.ant.amazon.com (10.250.64.202) by
+ EX19D007EUA004.ant.amazon.com (10.252.50.76) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Tue, 8 Oct 2024 20:10:38 +0000
+Received: from email-imr-corp-prod-pdx-all-2c-475d797d.us-west-2.amazon.com
+ (10.25.36.210) by mail-relay.amazon.com (10.250.64.203) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
+ 15.2.1258.34 via Frontend Transport; Tue, 8 Oct 2024 20:10:38 +0000
+Received: from dev-dsk-faresx-1b-27755bf1.eu-west-1.amazon.com (dev-dsk-faresx-1b-27755bf1.eu-west-1.amazon.com [10.253.79.181])
+	by email-imr-corp-prod-pdx-all-2c-475d797d.us-west-2.amazon.com (Postfix) with ESMTPS id 82532A0309;
+	Tue,  8 Oct 2024 20:10:34 +0000 (UTC)
+From: Fares Mehanna <faresx@amazon.de>
+To: <rppt@kernel.org>
+CC: <akpm@linux-foundation.org>, <ardb@kernel.org>, <arnd@arndb.de>,
+	<bhelgaas@google.com>, <broonie@kernel.org>, <catalin.marinas@arm.com>,
+	<david@redhat.com>, <faresx@amazon.de>, <james.morse@arm.com>,
+	<javierm@redhat.com>, <jean-philippe@linaro.org>, <joey.gouly@arm.com>,
+	<kristina.martsenko@arm.com>, <kvmarm@lists.linux.dev>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<linux-mm@kvack.org>, <mark.rutland@arm.com>, <maz@kernel.org>,
+	<nh-open-source@amazon.com>, <oliver.upton@linux.dev>, <ptosi@google.com>,
+	<rdunlap@infradead.org>, <rkagan@amazon.de>, <shikemeng@huaweicloud.com>,
+	<suzuki.poulose@arm.com>, <tabba@google.com>, <will@kernel.org>,
+	<yuzenghui@huawei.com>
+Subject: Re: [RFC PATCH 0/7] support for mm-local memory allocations and use it
+Date: Tue, 8 Oct 2024 20:06:32 +0000
+Message-ID: <20241008200632.52082-1-faresx@amazon.de>
+X-Mailer: git-send-email 2.40.1
+In-Reply-To: <ZvZZ0eQ2NUq3GWSj@kernel.org>
+References: <ZvZZ0eQ2NUq3GWSj@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 09/43] arm64: RME: ioctls to create and configure
- realms
-Content-Language: en-GB
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>
-References: <20241004152804.72508-1-steven.price@arm.com>
- <20241004152804.72508-10-steven.price@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20241004152804.72508-10-steven.price@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 
-Hi Steven
-
-On 04/10/2024 16:27, Steven Price wrote:
-> Add the KVM_CAP_ARM_RME_CREATE_RD ioctl to create a realm. This involves
-> delegating pages to the RMM to hold the Realm Descriptor (RD) and for
-> the base level of the Realm Translation Tables (RTT). A VMID also need
-> to be picked, since the RMM has a separate VMID address space a
-> dedicated allocator is added for this purpose.
+> > Hi,
+> > 
+> > Thanks for taking a look and apologies for my delayed response.
+> > 
+> > > Having a VMA in user mappings for kernel memory seems weird to say the
+> > > least.
+> > 
+> > I see your point and agree with you. Let me explain the motivation, pros and
+> > cons of the approach after answering your questions.
+> > 
+> > > Core MM does not expect to have VMAs for kernel memory. What will happen if
+> > > userspace ftruncates that VMA? Or registers it with userfaultfd?
+> > 
+> > In the patch, I make sure the pages are faulted in, locked and sealed to make
+> > sure the VMA is practically off-limits from the owner process. Only after that
+> > I change the permissions to be used by the kernel.
 > 
-> KVM_CAP_ARM_RME_CONFIG_REALM is provided to allow configuring the realm
-> before it is created. Configuration options can be classified as:
+> And what about VMA accesses from the kernel? How do you verify that
+> everything that works with VMAs in the kernel can deal with that being a
+> kernel mapping rather than userspace?
+
+I added `VM_MIXEDMAP` if the secret allocation is intended for kernel usage,
+this should make the VMA special and prevent a lot of operations like VMA merging.
+Maybe the usage of `VM_MIXEDMAP` is not ideal and we can introduce a new kernel
+flag for that. But I'm not aware of a destructive VMA operation from kernel side
+while the VMA is marked special, mixed-map and sealed.
+
+> > > This approach seems much more reasonable and it's not that it was entirely
+> > > arch-specific. There is some plumbing at arch level, but the allocator is
+> > > anyway arch-independent. 
+> > 
+> > So I wanted to explore a simple solution to implement mm-local kernel secret
+> > memory without much arch dependent code. I also wanted to reuse as much of
+> > memfd_secret() as possible to benefit from what is done already and possible
+> > future improvements to it.
 > 
->   1. Parameters specific to the Realm stage2 (e.g. IPA Size, vmid, stage2
->      entry level, entry level RTTs, number of RTTs in start level, LPA2)
->      Most of these are not measured by RMM and comes from KVM book
->      keeping.
+> Adding functionality that normally belongs to userspace into mm/secretmem.c
+> does not feel like a reuse, sorry.
+
+Right, because the mapping in user virtual space most of the operations belongs
+to userspace yes. I thought this way would be easier to demonstrate the approach
+for RFC.
+
+> The only thing your actually share is removal of the allocated pages from
+> the direct map. And hijacking userspace mapping instead of properly
+> implementing a kernel mapping does not seem like proper solution.
+
+Also we get:
+1. PGD is private when creating new process.
+2. Existing kernel-secret mappings for given process will be cloned on fork(),
+   so no need to keep track of them to be cloned on fork().
+3. No special handling for context switching.
+
+> > Keeping the secret pages in user virtual addresses is easier as the page table
+> > entries are not global by default so no special handling for spawn(). keeping
+> > them tracked in VMA shouldn't require special handling for fork().
+> > 
+> > The challenge was to keep the virtual addresses / VMA away from user control as
+> > long as the kernel is using it, and signal the mm core that this VMA is special
+> > so it is not merged with other VMAs.
+> > 
+> > I believe locking the pages, sealing the VMA, prefaulting the pages should make
+> > it practicality away of user space influence.
+> > 
+> > But the current approach have those downsides: (That I can think of)
+> > 1. Kernel secret user virtual addresses can still be used in functions accepting
+> >    user virtual addresses like copy_from_user / copy_to_user.
+> > 2. Even if we are sure the VMA is off-limits to userspace, adding VMA with
+> >    kernel addresses will increase attack surface between userspace and the
+> >    kernel.
+> > 3. Since kernel secret memory is mapped in user virtual addresses, it is very
+> >    easy to guess the exact virtual address (using binary search), and since
+> >    this functionality is designed to keep user data, it is fair to assume the
+> >    userspace will always be able to influence what is written there.
+> >    So it kind of breaks KASLR for those specific pages.
 > 
->   2. Parameters controlling "Arm Architecture features for the VM". (e.g.
->      SVE VL, PMU counters, number of HW BRPs/WPs), configured by the VMM
->      using the "user ID register write" mechanism. These will be
->      supported in the later patches.
+> There is even no need to guess, it will appear on /proc/pid/maps
+
+Yeah but that is easily fixable, however the other issue stays the same unless
+I allocated bigger chunk from userspace and moved away from VMA tracking.
+
+> > 4. It locks user virtual memory away, this may break some software if they
+> >    assumed they can mmap() into specific places.
+> > 
+> > One way to address most of those concerns while keeping the solution almost arch
+> > agnostic is is to allocate reasonable chunk of user virtual memory to be only
+> > used for kernel secret memory, and not track them in VMAs.
+> > This is similar to the old approach but instead of creating non-global kernel
+> > PGD per arch it will use chunk of user virtual memory. This chunk can be defined
+> > per arch, and this solution won't use memfd_secret().
+> > We can then easily enlighten the kernel about this range so the kernel can test
+> > for this range in functions like access_ok(). This approach however will make
+> > downside #4 even worse, as it will reserve bigger chunk of user virtual memory
+> > if this feature is enabled.
+> > 
+> > I'm also very okay switching back to the old approach with the expense of:
+> > 1. Supporting fewer architectures that can afford to give away single PGD.
 > 
->   3. Parameters are not part of the core Arm architecture but defined
->      by the RMM spec (e.g. Hash algorithm for measurement,
->      Personalisation value). These are programmed via
->      KVM_CAP_ARM_RME_CONFIG_REALM.
+> Only few architectures can modify their direct map, and all these can spare
+> a PGD entry.
 > 
-> For the IPA size there is the possibility that the RMM supports a
-> different size to the IPA size supported by KVM for normal guests. At
-> the moment the 'normal limit' is exposed by KVM_CAP_ARM_VM_IPA_SIZE and
-> the IPA size is configured by the bottom bits of vm_type in
-> KVM_CREATE_VM. This means that it isn't easy for the VMM to discover
-> what IPA sizes are supported for Realm guests. Since the IPA is part of
-> the measurement of the realm guest the current expectation is that the
-> VMM will be required to pick the IPA size demanded by attestation and
-> therefore simply failing if this isn't available is fine. An option
-> would be to expose a new capability ioctl to obtain the RMM's maximum
-> IPA size if this is needed in the future.
+> > 2. More complicated arch specific code.
 > 
-> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Changes since v2:
->   * Improved commit description.
->   * Improved return failures for rmi_check_version().
->   * Clear contents of PGD after it has been undelegated in case the RMM
->     left stale data.
->   * Minor changes to reflect changes in previous patches.
-
-Looks fine to me. Some minor comments below.
-
-> ---
->   arch/arm64/include/asm/kvm_emulate.h |   5 +
->   arch/arm64/include/asm/kvm_rme.h     |  19 ++
->   arch/arm64/kvm/arm.c                 |  18 ++
->   arch/arm64/kvm/mmu.c                 |  20 +-
->   arch/arm64/kvm/rme.c                 | 283 +++++++++++++++++++++++++++
->   5 files changed, 341 insertions(+), 4 deletions(-)
+> On x86 similar code already exists for LDT, you may want to look at Andy's
+> comments on old proclocal posting:
 > 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index c7bfb6788c96..5edcfb1b6c68 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -705,6 +705,11 @@ static inline enum realm_state kvm_realm_state(struct kvm *kvm)
->   	return READ_ONCE(kvm->arch.realm.state);
->   }
->   
-> +static inline bool kvm_realm_is_created(struct kvm *kvm)
-> +{
-> +	return kvm_is_realm(kvm) && kvm_realm_state(kvm) != REALM_STATE_NONE;
-> +}
-> +
->   static inline bool vcpu_is_rec(struct kvm_vcpu *vcpu)
->   {
->   	return false;
-> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
-> index 69af5c3a1e44..209cd99f03dd 100644
-> --- a/arch/arm64/include/asm/kvm_rme.h
-> +++ b/arch/arm64/include/asm/kvm_rme.h
-> @@ -6,6 +6,8 @@
->   #ifndef __ASM_KVM_RME_H
->   #define __ASM_KVM_RME_H
->   
-> +#include <uapi/linux/kvm.h>
-> +
->   /**
->    * enum realm_state - State of a Realm
->    */
-> @@ -46,11 +48,28 @@ enum realm_state {
->    * struct realm - Additional per VM data for a Realm
->    *
->    * @state: The lifetime state machine for the realm
-> + * @rd: Kernel mapping of the Realm Descriptor (RD)
-> + * @params: Parameters for the RMI_REALM_CREATE command
-> + * @num_aux: The number of auxiliary pages required by the RMM
-> + * @vmid: VMID to be used by the RMM for the realm
-> + * @ia_bits: Number of valid Input Address bits in the IPA
->    */
->   struct realm {
->   	enum realm_state state;
-> +
-> +	void *rd;
-> +	struct realm_params *params;
-> +
-> +	unsigned long num_aux;
-> +	unsigned int vmid;
-> +	unsigned int ia_bits;
->   };
->   
->   void kvm_init_rme(void);
-> +u32 kvm_realm_ipa_limit(void);
-> +
-> +int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap);
-> +int kvm_init_realm_vm(struct kvm *kvm);
-> +void kvm_destroy_realm(struct kvm *kvm);
->   
->   #endif
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 57da48357ce8..f75cece24217 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -154,6 +154,13 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
->   		}
->   		mutex_unlock(&kvm->slots_lock);
->   		break;
-> +	case KVM_CAP_ARM_RME:
-> +		if (!kvm_is_realm(kvm))
-> +			return -EINVAL;
-> +		mutex_lock(&kvm->lock);
-> +		r = kvm_realm_enable_cap(kvm, cap);
-> +		mutex_unlock(&kvm->lock);
-> +		break;
->   	default:
->   		break;
->   	}
-> @@ -216,6 +223,13 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->   
->   	bitmap_zero(kvm->arch.vcpu_features, KVM_VCPU_MAX_FEATURES);
->   
-> +	/* Initialise the realm bits after the generic bits are enabled */
-> +	if (kvm_is_realm(kvm)) {
-> +		ret = kvm_init_realm_vm(kvm);
-> +		if (ret)
-> +			goto err_free_cpumask;
-> +	}
-> +
->   	return 0;
->   
->   err_free_cpumask:
-> @@ -275,6 +289,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
->   	kvm_unshare_hyp(kvm, kvm + 1);
->   
->   	kvm_arm_teardown_hypercalls(kvm);
-> +	kvm_destroy_realm(kvm);
->   }
->   
->   static bool kvm_has_full_ptr_auth(void)
-> @@ -422,6 +437,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->   	case KVM_CAP_ARM_SUPPORTED_REG_MASK_RANGES:
->   		r = BIT(0);
->   		break;
-> +	case KVM_CAP_ARM_RME:
-> +		r = static_key_enabled(&kvm_rme_is_available);
-> +		break;
->   	default:
->   		r = 0;
->   	}
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index a509b63bd4dd..e01faf72021d 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -862,11 +862,16 @@ static struct kvm_pgtable_mm_ops kvm_s2_mm_ops = {
->   	.icache_inval_pou	= invalidate_icache_guest_page,
->   };
->   
-> -static int kvm_init_ipa_range(struct kvm_s2_mmu *mmu, unsigned long type)
-> +static int kvm_init_ipa_range(struct kvm *kvm,
-> +			      struct kvm_s2_mmu *mmu, unsigned long type)
->   {
->   	u32 kvm_ipa_limit = get_kvm_ipa_limit();
->   	u64 mmfr0, mmfr1;
->   	u32 phys_shift;
-> +	u32 ipa_limit = kvm_ipa_limit;
+> https://lore.kernel.org/lkml/CALCETrXHbS9VXfZ80kOjiTrreM2EbapYeGp68mvJPbosUtorYA@mail.gmail.com/
 
-minor nit: Addition of the "ipa_limit" looks unnecessary, and we could
-reuse the kvm_ipa_limit.
+Ah I see, so no need to think about architectures that can't spare a PGD. thanks!
+I read the discussion and LDT is x86 specific and I wanted to start with aarch64.
 
-> +
-> +	if (kvm_is_realm(kvm))
-> +		ipa_limit = kvm_realm_ipa_limit();
->   
->   	if (type & ~KVM_VM_TYPE_ARM_IPA_SIZE_MASK)
->   		return -EINVAL;
-> @@ -875,12 +880,12 @@ static int kvm_init_ipa_range(struct kvm_s2_mmu *mmu, unsigned long type)
->   	if (is_protected_kvm_enabled()) {
->   		phys_shift = kvm_ipa_limit;
->   	} else if (phys_shift) {
-> -		if (phys_shift > kvm_ipa_limit ||
-> +		if (phys_shift > ipa_limit ||
->   		    phys_shift < ARM64_MIN_PARANGE_BITS)
->   			return -EINVAL;
->   	} else {
->   		phys_shift = KVM_PHYS_SHIFT;
-> -		if (phys_shift > kvm_ipa_limit) {
-> +		if (phys_shift > ipa_limit) {
->   			pr_warn_once("%s using unsupported default IPA limit, upgrade your VMM\n",
->   				     current->comm);
->   			return -EINVAL;
-> @@ -932,7 +937,7 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
->   		return -EINVAL;
->   	}
->   
-> -	err = kvm_init_ipa_range(mmu, type);
-> +	err = kvm_init_ipa_range(kvm, mmu, type);
->   	if (err)
->   		return err;
->   
-> @@ -1055,6 +1060,13 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
->   	struct kvm_pgtable *pgt = NULL;
->   
->   	write_lock(&kvm->mmu_lock);
-> +	if (kvm_is_realm(kvm) &&
-> +	    (kvm_realm_state(kvm) != REALM_STATE_DEAD &&
-> +	     kvm_realm_state(kvm) != REALM_STATE_NONE)) {
-> +		/* Tearing down RTTs will be added in a later patch */
-> +		write_unlock(&kvm->mmu_lock);
-> +		return;
-> +	}
+I'm still thinking about the best approach for aarch64 for my next PoC, aarch64
+track two tables in TTBR0/TTBR1, what I'm thinking of is:
+1. Have kernel page table per process, with all its PGD entries shared other than
+   a single PGD for kernel secret allocations.
+2. On fork, traverse the private PGD part and clone existing page table for the
+   new process.
+3. On context switching, write the table to TTBR1, thus the kernel will have
+   access to all secret allocations per this process.
 
-Do we need to add a comment here on why we return and have to come
-back later from realm_destroy()?
+This will move away from user vaddr and VMA tracking, with the expense of each
+architecture will support it on its own way.
 
->   	pgt = mmu->pgt;
->   	if (pgt) {
->   		mmu->pgd_phys = 0;
-> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
-> index 418685fbf6ed..4d21ec5f2910 100644
-> --- a/arch/arm64/kvm/rme.c
-> +++ b/arch/arm64/kvm/rme.c
-> @@ -5,9 +5,20 @@
->   
->   #include <linux/kvm_host.h>
->   
-> +#include <asm/kvm_emulate.h>
-> +#include <asm/kvm_mmu.h>
->   #include <asm/rmi_cmds.h>
->   #include <asm/virt.h>
->   
-> +#include <asm/kvm_pgtable.h>
-> +
-> +static unsigned long rmm_feat_reg0;
-> +
-> +static bool rme_supports(unsigned long feature)
-> +{
-> +	return !!u64_get_bits(rmm_feat_reg0, feature);
-> +}
-> +
->   static int rmi_check_version(void)
->   {
->   	struct arm_smccc_res res;
-> @@ -36,6 +47,272 @@ static int rmi_check_version(void)
->   	return 0;
->   }
->   
-> +u32 kvm_realm_ipa_limit(void)
-> +{
-> +	return u64_get_bits(rmm_feat_reg0, RMI_FEATURE_REGISTER_0_S2SZ);
-> +}
-> +
-> +static int get_start_level(struct realm *realm)
-> +{
-> +	return 4 - stage2_pgtable_levels(realm->ia_bits);
-> +}
-> +
-> +static int realm_create_rd(struct kvm *kvm)
-> +{
-> +	struct realm *realm = &kvm->arch.realm;
-> +	struct realm_params *params = realm->params;
-> +	void *rd = NULL;
-> +	phys_addr_t rd_phys, params_phys;
-> +	struct kvm_pgtable *pgt = kvm->arch.mmu.pgt;
-> +	int i, r;
-> +
-> +	if (WARN_ON(realm->rd) || WARN_ON(!realm->params))
-> +		return -EEXIST;
-> +
-> +	rd = (void *)__get_free_page(GFP_KERNEL);
-> +	if (!rd)
-> +		return -ENOMEM;
-> +
-> +	rd_phys = virt_to_phys(rd);
-> +	if (rmi_granule_delegate(rd_phys)) {
-> +		r = -ENXIO;
-> +		goto free_rd;
-> +	}
-> +
-> +	for (i = 0; i < pgt->pgd_pages; i++) {
-> +		phys_addr_t pgd_phys = kvm->arch.mmu.pgd_phys + i * PAGE_SIZE;
-> +
-> +		if (rmi_granule_delegate(pgd_phys)) {
-> +			r = -ENXIO;
-> +			goto out_undelegate_tables;
-> +		}
-> +	}
-> +
-> +	realm->ia_bits = VTCR_EL2_IPA(kvm->arch.mmu.vtcr);
-> +
-> +	params->s2sz = VTCR_EL2_IPA(kvm->arch.mmu.vtcr);
-> +	params->rtt_level_start = get_start_level(realm);
-> +	params->rtt_num_start = pgt->pgd_pages;
-> +	params->rtt_base = kvm->arch.mmu.pgd_phys;
-> +	params->vmid = realm->vmid;
-> +
-> +	params_phys = virt_to_phys(params);
-> +
-> +	if (rmi_realm_create(rd_phys, params_phys)) {
-> +		r = -ENXIO;
-> +		goto out_undelegate_tables;
-> +	}
-> +
-> +	realm->rd = rd;
+Does that sound more decent?
 
-Please could we move this after we have don the REC_AUX_COUNT check
-to avoid holding onto a free'd page ?
+Thank you!
+Fares.
 
-> +
-> +	if (WARN_ON(rmi_rec_aux_count(rd_phys, &realm->num_aux))) {
-> +		WARN_ON(rmi_realm_destroy(rd_phys));
-> +		goto out_undelegate_tables;
-
-> +	}
-> +
-
-here :
-
-realm->rd = rd;
-
-> +	return 0;
-> +
-> +out_undelegate_tables:
-> +	while (--i >= 0) {
-> +		phys_addr_t pgd_phys = kvm->arch.mmu.pgd_phys + i * PAGE_SIZE;
-> +
-> +		WARN_ON(rmi_granule_undelegate(pgd_phys));
-> +	}
-> +	WARN_ON(rmi_granule_undelegate(rd_phys));
-> +free_rd:
-> +	free_page((unsigned long)rd);
-> +	return r;
-> +}
-> +
-> +/* Protects access to rme_vmid_bitmap */
-> +static DEFINE_SPINLOCK(rme_vmid_lock);
-> +static unsigned long *rme_vmid_bitmap;
-> +
-> +static int rme_vmid_init(void)
-> +{
-> +	unsigned int vmid_count = 1 << kvm_get_vmid_bits();
-> +
-> +	rme_vmid_bitmap = bitmap_zalloc(vmid_count, GFP_KERNEL);
-> +	if (!rme_vmid_bitmap) {
-> +		kvm_err("%s: Couldn't allocate rme vmid bitmap\n", __func__);
-> +		return -ENOMEM;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int rme_vmid_reserve(void)
-> +{
-> +	int ret;
-> +	unsigned int vmid_count = 1 << kvm_get_vmid_bits();
-> +
-> +	spin_lock(&rme_vmid_lock);
-> +	ret = bitmap_find_free_region(rme_vmid_bitmap, vmid_count, 0);
-> +	spin_unlock(&rme_vmid_lock);
-> +
-> +	return ret;
-> +}
-> +
-> +static void rme_vmid_release(unsigned int vmid)
-> +{
-> +	spin_lock(&rme_vmid_lock);
-> +	bitmap_release_region(rme_vmid_bitmap, vmid, 0);
-> +	spin_unlock(&rme_vmid_lock);
-> +}
-> +
-> +static int kvm_create_realm(struct kvm *kvm)
-> +{
-> +	struct realm *realm = &kvm->arch.realm;
-> +	int ret;
-> +
-> +	if (!kvm_is_realm(kvm))
-> +		return -EINVAL;
-> +	if (kvm_realm_is_created(kvm))
-> +		return -EEXIST;
-> +
-> +	ret = rme_vmid_reserve();
-> +	if (ret < 0)
-> +		return ret;
-> +	realm->vmid = ret;
-> +
-> +	ret = realm_create_rd(kvm);
-> +	if (ret) {
-> +		rme_vmid_release(realm->vmid);
-> +		return ret;
-> +	}
-> +
-> +	WRITE_ONCE(realm->state, REALM_STATE_NEW);
-> +
-> +	/* The realm is up, free the parameters.  */
-> +	free_page((unsigned long)realm->params);
-> +	realm->params = NULL;
-> +
-> +	return 0;
-> +}
-> +
-> +static int config_realm_hash_algo(struct realm *realm,
-> +				  struct kvm_cap_arm_rme_config_item *cfg)
-> +{
-> +	switch (cfg->hash_algo) {
-> +	case KVM_CAP_ARM_RME_MEASUREMENT_ALGO_SHA256:
-> +		if (!rme_supports(RMI_FEATURE_REGISTER_0_HASH_SHA_256))
-> +			return -EINVAL;
-> +		break;
-> +	case KVM_CAP_ARM_RME_MEASUREMENT_ALGO_SHA512:
-> +		if (!rme_supports(RMI_FEATURE_REGISTER_0_HASH_SHA_512))
-> +			return -EINVAL;
-> +		break;
-> +	default:
-> +		return -EINVAL;
-> +	}
-> +	realm->params->hash_algo = cfg->hash_algo;
-> +	return 0;
-> +}
-> +
-> +static int kvm_rme_config_realm(struct kvm *kvm, struct kvm_enable_cap *cap)
-> +{
-> +	struct kvm_cap_arm_rme_config_item cfg;
-> +	struct realm *realm = &kvm->arch.realm;
-> +	int r = 0;
-> +
-> +	if (kvm_realm_is_created(kvm))
-> +		return -EBUSY;
-> +
-> +	if (copy_from_user(&cfg, (void __user *)cap->args[1], sizeof(cfg)))
-> +		return -EFAULT;
-> +
-> +	switch (cfg.cfg) {
-> +	case KVM_CAP_ARM_RME_CFG_RPV:
-> +		memcpy(&realm->params->rpv, &cfg.rpv, sizeof(cfg.rpv));
-> +		break;
-> +	case KVM_CAP_ARM_RME_CFG_HASH_ALGO:
-> +		r = config_realm_hash_algo(realm, &cfg);
-> +		break;
-> +	default:
-> +		r = -EINVAL;
-> +	}
-> +
-> +	return r;
-> +}
-> +
-> +int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
-> +{
-> +	int r = 0;
-> +
-> +	if (!kvm_is_realm(kvm))
-> +		return -EINVAL;
-> +
-> +	switch (cap->args[0]) {
-> +	case KVM_CAP_ARM_RME_CONFIG_REALM:
-> +		r = kvm_rme_config_realm(kvm, cap);
-> +		break;
-> +	case KVM_CAP_ARM_RME_CREATE_RD:
-> +		r = kvm_create_realm(kvm);
-> +		break;
-> +	default:
-> +		r = -EINVAL;
-> +		break;
-> +	}
-> +
-> +	return r;
-> +}
-> +
-> +void kvm_destroy_realm(struct kvm *kvm)
-> +{
-> +	struct realm *realm = &kvm->arch.realm;
-> +	struct kvm_pgtable *pgt = kvm->arch.mmu.pgt;
-> +	int i;
-> +
-> +	if (realm->params) {
-> +		free_page((unsigned long)realm->params);
-> +		realm->params = NULL;
-> +	}
-> +
-> +	if (!kvm_realm_is_created(kvm))
-> +		return;
-> +
-> +	WRITE_ONCE(realm->state, REALM_STATE_DYING);
-> +
-> +	if (realm->rd) {
-> +		phys_addr_t rd_phys = virt_to_phys(realm->rd);
-> +
-> +		if (WARN_ON(rmi_realm_destroy(rd_phys)))
-> +			return;
-> +		if (WARN_ON(rmi_granule_undelegate(rd_phys)))
-> +			return;
-> +		free_page((unsigned long)realm->rd);
-> +		realm->rd = NULL;
-> +	}
-> +
-> +	rme_vmid_release(realm->vmid);
-> +
-> +	for (i = 0; i < pgt->pgd_pages; i++) {
-> +		phys_addr_t pgd_phys = kvm->arch.mmu.pgd_phys + i * PAGE_SIZE;
-> +
-> +		if (WARN_ON(rmi_granule_undelegate(pgd_phys)))
-> +			return;
-> +
-> +		clear_page(phys_to_virt(pgd_phys));
-
-nit: Is this really needed ? If so, please could we have a comment ?
-
-> +	}
-> +
-> +	WRITE_ONCE(realm->state, REALM_STATE_DEAD);
-> +
-> +	/* Now that the Realm is destroyed, free the entry level RTTs */
-> +	kvm_free_stage2_pgd(&kvm->arch.mmu);
-> +}
-> +
-> +int kvm_init_realm_vm(struct kvm *kvm)
-> +{
-> +	struct realm_params *params;
-> +
-> +	params = (struct realm_params *)get_zeroed_page(GFP_KERNEL);
-> +	if (!params)
-> +		return -ENOMEM;
-> +
-> +	kvm->arch.realm.params = params;
-> +	return 0;
-> +}
-> +
->   void kvm_init_rme(void)
->   {
->   	if (PAGE_SIZE != SZ_4K)
-> @@ -46,5 +323,11 @@ void kvm_init_rme(void)
->   		/* Continue without realm support */
->   		return;
->   
-> +	if (WARN_ON(rmi_features(0, &rmm_feat_reg0)))
-> +		return;
-> +
-> +	if (rme_vmid_init())
-> +		return;
-> +
->   	/* Future patch will enable static branch kvm_rme_is_available */
->   }
-
-Suzuki
+> > Also @graf mentioned how aarch64 uses TTBR0/TTBR1 for user and kernel page
+> > tables, I haven't looked at this yet but it probably means that kernel page
+> > table will be tracked per process and TTBR1 will be switched during context
+> > switching.
+> > 
+> > What do you think? I would appreciate your opinion before working on the next
+> > RFC patch set.
+> > 
+> > Thanks!
+> > Fares.
 
 
+
+Amazon Web Services Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
+Sitz: Berlin
+Ust-ID: DE 365 538 597
 
