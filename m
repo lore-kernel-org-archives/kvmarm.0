@@ -1,25 +1,65 @@
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74D89157A5C
-	for <kvmarm@lists.linux.dev>; Wed,  9 Oct 2024 06:11:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3723A36D
+	for <kvmarm@lists.linux.dev>; Wed,  9 Oct 2024 06:12:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728454322; cv=none; b=QG9TnqaZxuOdLXINOYfe5NOVebb9Og7KqC1mBG+b2opdiltLY8fFK+nRmfkszxiKVu5lB4/WUsrBvyjvFI9oy/KolWFPxcehm8Lz2f11EZ7+beMyc5GDDRup/IwPaRk0e6F+PUu8WmIxIT5fiJ+Zdie25w081pEDE6xbgqOdKJ8=
+	t=1728454363; cv=none; b=ZBIuz3Ytfc3McS6bopsszFis+J3SsNOgSgrVj5vjuJeBOZ1uX9Ao2+Uo0x25zOhxQbl/UXRFbB3OvB8OpHMR0i0iQ8v1InsBHHojgANvf4HsMiA7e/Lkzup2bd8Rau+lUTu7BKm+zdlBLgJv6fZmjcDf0SZhV1gdLlZ61VRizjM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728454322; c=relaxed/simple;
-	bh=cRKE11JMe+EoQ5AKczDzkrZzREHOA7C0sg9++MFgw7o=;
+	s=arc-20240116; t=1728454363; c=relaxed/simple;
+	bh=YZArur3xo7i/2B6ae+eMuVtMiHlANQ6P6ZT4tTG1fIg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DeXtsVtXrQFX/T3u1W3xiM9dhKsSX/aKIEH0jK98luPU+uvG6Y67dFzxtdTQgZ4FVMgUAAgzN02Qa0faOKqAR3gUAN56Ufl9eclE2YPAYQiuPhrqQELqeB45xEcJiwkjBTXNu18WvOI5buf1UkihL+VgP45Im5Jc4Da79JO/RmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
-	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
-	(envelope-from <a.fatoum@pengutronix.de>)
-	id 1syPvM-0007eP-OX; Wed, 09 Oct 2024 08:11:52 +0200
-Message-ID: <f096876b-f364-4291-88e0-ac189b4f26fe@pengutronix.de>
-Date: Wed, 9 Oct 2024 08:11:52 +0200
+	 In-Reply-To:Content-Type; b=MQdGKCjcCBd3aIPGaCUfdCgiYlp2FPW6GUN2X2wC0YY48T8VlpCPdZDtq52pEvIR9P/kYt2zARO4nZOyUdCmbWE0EKy+ZeTqFj4+0a1h1vJW279ZaB1S2VzM9PXCwgTfumPf4AuhrCTWxaTMoxfE6AZ9KpixpiSfIi+dp3lhZ+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ex3gADoT; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ex3gADoT"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1728454360;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wWCrDVY1QHGwuzKsAgSCJUox8r6YSpQfYuO0QZvJ8G4=;
+	b=ex3gADoTRtB6RAhUFzrcBwheyHard1Il4Q9ljbkC3I5HgW8LTy5ans3VdRHB6zxFBWTZTU
+	+uhVRRv40aqSgcbAO489XPyHOgsI8pv1stiHANc6QpwQcZNrKwam+CxVyEEAqsAG5U6ZJY
+	fpihjQ/h3lNfrxsd/8HL49gY/M+zXxQ=
+Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com
+ [209.85.215.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-251-1S4WVrzcPm6l0BJUurGUnw-1; Wed, 09 Oct 2024 02:12:39 -0400
+X-MC-Unique: 1S4WVrzcPm6l0BJUurGUnw-1
+Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-5e4df21f22dso500203a12.0
+        for <kvmarm@lists.linux.dev>; Tue, 08 Oct 2024 23:12:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728454359; x=1729059159;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wWCrDVY1QHGwuzKsAgSCJUox8r6YSpQfYuO0QZvJ8G4=;
+        b=LsYCVA4c+Qeaj442/iE6hmWJKIM9k241nZ1PUtdqyNkARTAG7/Nqa58Y0JyghhZGiU
+         0/5hUmQVGhtvOV9K6SLrqUqjCnkW3MZjI6NjNLx4sGWOAG62wUcQ5wwWF9KTyu98HGk7
+         3d36pYhQxb2QzMg3hpgH/G0GIodYIRtkaVXLGEpTIcQ5YRoM8EdxbHuDT2/bs701i9jE
+         o1DAGI0RAE1s31swh7yR+n6UzEde+8DWDfPKFZlS+F1BjVXzPDSHPb6LW62m6acMmr71
+         Tp6F9XOdD7Tuc/q9l8OIASo45bIRwsKDJZ7sGGj/vtND18rhe7Kqj3KsFB4XBgs+t31+
+         YXoA==
+X-Forwarded-Encrypted: i=1; AJvYcCWnHvrLdWLyv+DrQ3/zAQYtEbVq2nKSKxfwPDs4KEdCqGYVbYpzCTci3magyYw2cYDZ5ydxyYY=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxAbNX0Y85Tu7vG1hifN8PmXnme1bRbItIUOAmeUs90D1ZAsjWl
+	6YKbOXQsA3PFNepc6CZMB38aK2p7IKUKNe3eUmPSRhJF51oUIjnQmS3+rNL1ssUz+y7Fl0S9Sr5
+	aKEJKI1nbC0cC5c96jTMcgcwXovl865LB43IQOWlhbMlkM5V9CQj+Zg==
+X-Received: by 2002:a17:90a:9a9:b0:2da:6e46:ad48 with SMTP id 98e67ed59e1d1-2e2a0758299mr2627912a91.1.1728454358718;
+        Tue, 08 Oct 2024 23:12:38 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG7pK3x27vXs8b2CyjV7xUcxV0b7iw89YOVtT9MINIXxU8SElUIYRnvikpH62rBQwvm3L21nA==
+X-Received: by 2002:a17:90a:9a9:b0:2da:6e46:ad48 with SMTP id 98e67ed59e1d1-2e2a0758299mr2627882a91.1.1728454358313;
+        Tue, 08 Oct 2024 23:12:38 -0700 (PDT)
+Received: from [192.168.68.54] ([43.252.112.159])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e2a58574f5sm716293a91.36.2024.10.08.23.12.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Oct 2024 23:12:37 -0700 (PDT)
+Message-ID: <d9098b8e-be0c-41d8-a0ee-a0090fbf8a1a@redhat.com>
+Date: Wed, 9 Oct 2024 16:12:31 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,136 +67,165 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [BUG] ARM64 KVM: Data abort executing post-indexed LDR on MMIO
- address
-To: Marc Zyngier <maz@kernel.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- kvmarm@lists.linux.dev, kvm@vger.kernel.org,
- Pengutronix Kernel Team <kernel@pengutronix.de>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>, Enrico Joerns <ejo@pengutronix.de>
-References: <89f184d6-5b61-4c77-9f3b-c0a8f6a75d60@pengutronix.de>
- <CAFEAcA_Yv2a=XCKw80y9iyBRoC27UL6Sfzgy4KwFDkC1gbzK7w@mail.gmail.com>
- <a4c06f55-28ec-4620-b594-b7ff0bb1e162@pengutronix.de>
- <CAFEAcA9F3AR-0OCKDy__eVBJRMi80G7bWNfANGZRR2W8iMhfJA@mail.gmail.com>
- <4d559b9e-c208-46f3-851a-68086dc8a50f@pengutronix.de>
- <864j5q7sdq.wl-maz@kernel.org>
- <65ab10d7-6594-490c-be07-39f83ac3559a@pengutronix.de>
- <87a5fiutai.wl-maz@kernel.org>
- <0352a327-0e78-48d4-a876-d33689fcd766@pengutronix.de>
- <8634l97cfs.wl-maz@kernel.org>
+Subject: Re: [PATCH v4 5/7] KVM: arm64: Add a macro for creating filtered
+ sys_reg_descs entries
+To: Joey Gouly <joey.gouly@arm.com>, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev
+Cc: anshuman.khandual@arm.com, james.morse@arm.com,
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, Jing Zhang <jingzhangos@google.com>,
+ Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+References: <20241004110714.2051604-1-joey.gouly@arm.com>
+ <20241004110714.2051604-6-joey.gouly@arm.com>
+From: Gavin Shan <gshan@redhat.com>
+In-Reply-To: <20241004110714.2051604-6-joey.gouly@arm.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Language: en-US
-From: Ahmad Fatoum <a.fatoum@pengutronix.de>
-In-Reply-To: <8634l97cfs.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
-X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: kvmarm@lists.linux.dev
 
-Hello Marc,
-
-On 06.10.24 12:28, Marc Zyngier wrote:
-> On Sun, 06 Oct 2024 08:59:56 +0100,
-> Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
->> On 05.10.24 23:35, Marc Zyngier wrote:
->>> On Sat, 05 Oct 2024 19:38:23 +0100,
->>> Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
->> One more question: This upgrading of DC IVAC to DC CIVAC is because
->> the code is run under virtualization, right?
+On 10/4/24 9:07 PM, Joey Gouly wrote:
+> From: James Morse <james.morse@arm.com>
 > 
-> Not necessarily. Virtualisation mandates the upgrade, but CIVAC is
-> also a perfectly valid implementation of both IVAC and CVAC.  And it
-> isn't uncommon that CPUs implement everything the same way.
-
-Makes sense. After all, software should expect cache lines to
-be evicted at any time due to capacity misses anyway.
-
->> I think following fix on the barebox side may work:
->>
->>   - Walk all pages about to be remapped
->>   - Execute the AT instruction on the page's base address
+> The sys_reg_descs array holds function pointers and reset value for
+> managing the user-space and guest view of system registers. These
+> are mostly created by a set of macro's as only some combinations
+> of behaviour are needed.
 > 
-> Why do you need AT if you are walking the PTs? If you walk, you
-> already have access to the memory attributes. In general, AT can be
-> slower than an actual walk.
->
-> Or did you actually mean iterating over the VA range? Even in that
-> case, AT can be a bad idea, as you are likely to iterate in page-size
-> increments even if you have a block mapping. Walking the PTs tells you
-> immediately how much a leaf is mapping (assuming you don't have any
-> other tracking).
-
-There's no other tracking and I hoped that using AT (which is already
-being used for the mmuinfo shell command) would be easier.
-
-I see now that it would be too suboptimal to do it this way and have
-implemented a revised arch_remap_range[1] for barebox, which I just
-Cc'd you on.
-
-[1]: https://lore.kernel.org/barebox/20241009060511.4121157-5-a.fatoum@pengutronix.de/T/#u
-
->>   - Only if the page was previously mapped cacheable, clean + invalidate
->>     the cache
->>   - Remove the current cache invalidation after remap
->>
->> Does that sound sensible?
+> If a register needs special treatment, its sys_reg_descs entry is
+> open-coded. This is true of some id registers where the value provided
+> by user-space is validated by some helpers.
 > 
-> This looks reasonable (apart from the AT thingy).
-
-I have two (hopefully the last!) questions about remaining differing
-behavior with KVM and without:
-
-1) Unaligned stack accesses crash in KVM:
-
-start: /* This will be mapped at 0x40080000 */
-        ldr     x0, =0x4007fff0
-        mov     sp, x0
-        stp     x0, x1, [sp] // This is ok
-
-        ldr     x0, =0x4007fff8
-        mov     sp, x0
-        stp     x0, x1, [sp] // This crashes
-
-I know that the stack should be 16 byte aligned, but why does it crash
-only under KVM?
-
-Context: The barebox Image used for Qemu has a Linux ARM64 "Image" header,
-so it's loaded at an offset and grows the stack down into this memory region
-until the FDT's /memory could be decoded and a proper stack is set up.
-
-A regression introduced earlier this year, caused the stack to grow down
-from a non-16-byte address, which is fixed in [2].
-
-[2]: https://lore.kernel.org/barebox/20241009060511.4121157-5-a.fatoum@pengutronix.de/T/#ma381512862d22530382aff1662caadad2c8bc182
-
-2) Using uncached memory for Virt I/O queues with KVM enabled is considerably
-   slower. My guess is that these accesses keep getting trapped, but what I wonder
-   about is the performance discrepancy between the big.LITTLE cores
-   (measurement of barebox copying 1MiB using `time cp -v /dev/virtioblk0 /tmp`):
-
-    KVM && !CACHED && 1x Cortex-A53:  0.137s
-    KVM && !CACHED && 1x Cortex-A72: 54.030s
-    KVM &&  CACHED && 1x Cortex-A53:  0.120s
-    KVM &&  CACHED && 1x Cortex-A72:  0.035s
-
-The A53s are CPUs 0-1 and the A72 are 2-5.
-
-Any idea why accessing uncached memory from the big core is so much worse?
-
-Thank you!
-Ahmad
-
+> Before adding another one of these, add a helper that covers the
+> existing special cases. 'ID_FILTERED' expects helpers to set the
+> user-space value, and retrieve the modified reset value.
 > 
-> Thanks,
+> Signed-off-by: James Morse <james.morse@arm.com>
+> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+> ---
+>   arch/arm64/kvm/sys_regs.c | 54 ++++++++++++++++++++-------------------
+>   1 file changed, 28 insertions(+), 26 deletions(-)
 > 
-> 	M.
-> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 8b1a6cedc49e..1fd08f12f2bb 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1833,6 +1833,12 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
+>   	return set_id_reg(vcpu, rd, val);
+>   }
+>   
+> +static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+> +			       const struct sys_reg_desc *rd, u64 val)
+> +{
+> +	return set_id_reg(vcpu, rd, val);
+> +}
+> +
+>   /*
+>    * cpufeature ID register user accessors
+>    *
+> @@ -2131,6 +2137,15 @@ static bool bad_redir_trap(struct kvm_vcpu *vcpu,
+>   	.val = 0,				\
+>   }
+>   
+> +/* sys_reg_desc initialiser for cpufeature ID registers that need filtering */
+> +#define ID_FILTERED(sysreg, name, filtered_fields) {	\
+> +	ID_DESC(sysreg),				\
+> +	.set_user = set_##name,				\
+> +	.visibility = id_visibility,			\
+> +	.reset = read_sanitised_##name,			\
+> +	.val = (filtered_fields),			\
+> +}
+> +
+>   /* sys_reg_desc initialiser for known cpufeature ID registers */
+>   #define AA32_ID_SANITISED(name) {		\
+>   	ID_DESC(name),				\
+> @@ -2337,14 +2352,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>   	/* CRm=1 */
+>   	AA32_ID_SANITISED(ID_PFR0_EL1),
+>   	AA32_ID_SANITISED(ID_PFR1_EL1),
+> -	{ SYS_DESC(SYS_ID_DFR0_EL1),
+> -	  .access = access_id_reg,
+> -	  .get_user = get_id_reg,
+> -	  .set_user = set_id_dfr0_el1,
+> -	  .visibility = aa32_id_visibility,
+> -	  .reset = read_sanitised_id_dfr0_el1,
+> -	  .val = ID_DFR0_EL1_PerfMon_MASK |
+> -		 ID_DFR0_EL1_CopDbg_MASK, },
+> +	ID_FILTERED(ID_DFR0_EL1, id_dfr0_el1,
+> +		    ID_DFR0_EL1_PerfMon_MASK |
+> +		    ID_DFR0_EL1_CopDbg_MASK),
+
+The replacement causes logical change because the 'visibility' callback has been
+changed from aa32_id_visibility() to id_visibility(). I think we need an aa32
+variant of ID_FILTERED, to be used here.
+
+  #define AA32_ID_FILTERED(sysreg, name, filtered_fields) {	\
+  	ID_DESC(sysreg),				        \
+	.set_user = set_##name,				        \
+	.visibility = aa32_id_visibility,			\           /* the only differentiated field */
+	.reset = read_sanitised_##name,			        \
+	.val = (filtered_fields),			        \
+}
 
 
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+>   	ID_HIDDEN(ID_AFR0_EL1),
+>   	AA32_ID_SANITISED(ID_MMFR0_EL1),
+>   	AA32_ID_SANITISED(ID_MMFR1_EL1),
+> @@ -2373,17 +2383,13 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>   
+>   	/* AArch64 ID registers */
+>   	/* CRm=4 */
+> -	{ SYS_DESC(SYS_ID_AA64PFR0_EL1),
+> -	  .access = access_id_reg,
+> -	  .get_user = get_id_reg,
+> -	  .set_user = set_id_reg,
+> -	  .reset = read_sanitised_id_aa64pfr0_el1,
+> -	  .val = ~(ID_AA64PFR0_EL1_AMU |
+> -		   ID_AA64PFR0_EL1_MPAM |
+> -		   ID_AA64PFR0_EL1_SVE |
+> -		   ID_AA64PFR0_EL1_RAS |
+> -		   ID_AA64PFR0_EL1_AdvSIMD |
+> -		   ID_AA64PFR0_EL1_FP), },
+> +	ID_FILTERED(ID_AA64PFR0_EL1, id_aa64pfr0_el1,
+> +		    ~(ID_AA64PFR0_EL1_AMU |
+> +		      ID_AA64PFR0_EL1_MPAM |
+> +		      ID_AA64PFR0_EL1_SVE |
+> +		      ID_AA64PFR0_EL1_RAS |
+> +		      ID_AA64PFR0_EL1_AdvSIMD |
+> +		      ID_AA64PFR0_EL1_FP)),
+
+Note that the 'visibility' callback has been changed from NULL to id_visibility(),
+not resulting in logical changes since id_visibility() returns 0 for ID_AA64PFR0_EL1.
+However, it would be nice to be documented in the change log?
+
+>   	ID_SANITISED(ID_AA64PFR1_EL1),
+>   	ID_WRITABLE(ID_AA64PFR2_EL1, ID_AA64PFR2_EL1_FPMR),
+>   	ID_UNALLOCATED(4,3),
+> @@ -2393,13 +2399,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>   	ID_WRITABLE(ID_AA64FPFR0_EL1, ~ID_AA64FPFR0_EL1_RES0),
+>   
+>   	/* CRm=5 */
+> -	{ SYS_DESC(SYS_ID_AA64DFR0_EL1),
+> -	  .access = access_id_reg,
+> -	  .get_user = get_id_reg,
+> -	  .set_user = set_id_aa64dfr0_el1,
+> -	  .reset = read_sanitised_id_aa64dfr0_el1,
+> -	  .val = ID_AA64DFR0_EL1_PMUVer_MASK |
+> -		 ID_AA64DFR0_EL1_DebugVer_MASK, },
+> +	ID_FILTERED(ID_AA64DFR0_EL1, id_aa64dfr0_el1,
+> +		    ID_AA64DFR0_EL1_PMUVer_MASK |
+> +		    ID_AA64DFR0_EL1_DebugVer_MASK),
+
+Same as above. The 'visibility' callback has been changed from NULL to id_visibility(),
+even there is no logical changes.
+
+>   	ID_SANITISED(ID_AA64DFR1_EL1),
+>   	ID_UNALLOCATED(5,2),
+>   	ID_UNALLOCATED(5,3),
+
+Thanks,
+Gavin
+
