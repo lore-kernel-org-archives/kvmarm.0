@@ -1,57 +1,57 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 557E3204F7A
-	for <kvmarm@lists.linux.dev>; Wed,  9 Oct 2024 15:50:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E8A1204F97
+	for <kvmarm@lists.linux.dev>; Wed,  9 Oct 2024 15:50:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728489022; cv=none; b=LVjSVmZzvKvyFJ4Ynh4YcdfRNziwME8iEasVhmabFbunCYYqhlgRa2rjKrk32FvJzd7X1XyynBSX3b/89INwpaBuOxleh/IRaCAQ3eQv/muGXznU3nLjU2aFMyUjbCp0WhUJjrIZOxPy/l7scic+aovJnjGca9xOzlvsyr2PUE4=
+	t=1728489024; cv=none; b=WUu8pDxFOkwB30rlL9xypJL4grrsHz9Hc8fTm+r+gbR62xqRf9N3vA2SLPLLfZyO+E7b/gquZtWBKG6l5q6oCQjWANc/ZKX+tjOgrA99jN52bXMX8rnnMiPpRxqHao7zbyXl+ADB6RwV+PYFrjsMqbdK/mSdyJcAfP+uSJ9APyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728489022; c=relaxed/simple;
-	bh=itS1mlB5ofbsTPJgxID6BNl/jc/V5lwuHkPPw41X7OE=;
+	s=arc-20240116; t=1728489024; c=relaxed/simple;
+	bh=L+zYpIw4P5/gRa37oTXv0c2QuaS7Yn3cq9MWxsxRKK4=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=h+00rWo3UH91zgm0151k4AcTUQeAXErePjWmhVU5otsV1ANR1mB/Eb7BBgTCgIUVAkdeyxQFpXqBHx03Pc9YEHGZ8eXckdMfY7XeHbK+3Ct0Gt34TsGgzt/MixmoKNDNA0QWKuz2XfQgsH1kjX3z/Ad3TaydLjtroS8Zkw2AbK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0fID8NlO; arc=none smtp.client-ip=209.85.128.201
+	 To:Cc:Content-Type; b=l2kG8erQ8FkO59uUGTyPuDu8onczyVuW602/FqlMLVaFniJ9p64Ja7SKsOBqYl86rvmIx7QUyxn5CYyuOD4YANWvEajNjhJgdFIn8u0xXGqli2LzRJOxH5VE3iv31eqlUIphP9gKp+CALtMjfztAHuJvLfPokGHe7knPw4NZyas=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kY5/mvwN; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0fID8NlO"
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6e2270a147aso326187b3.0
-        for <kvmarm@lists.linux.dev>; Wed, 09 Oct 2024 08:50:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kY5/mvwN"
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7db9418552fso6250031a12.0
+        for <kvmarm@lists.linux.dev>; Wed, 09 Oct 2024 08:50:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728489020; x=1729093820; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1728489023; x=1729093823; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=HIeWF4AKDrrEZVf143SgWaofUVl00+qhbF3Z20PXTUE=;
-        b=0fID8NlOItLl68oZvq5oADLZZ5Gg/DpN5ovOZUxcY8pl2ewfRTEb39OTiUui1kjBHA
-         1c0hyy0vE+0uRzSaN6eO3pfbpk85a2VWTlPhO2/8/k0WCjhjjmOjmSvualwcGWUGeaON
-         s0SceyK4+5+RTuqLj1ckPZIzq8n8eCAoknwSbiPlyHckWPpmkM3jICvCkRFxu5f1xDmC
-         TMKx9nagyEVn47l6pMw5Sc3tyfX20Zj68j6cmKIxIMa2mmsWFblDe81PgS67/fyiT/TB
-         PTV5WkSg0eXHefY20fgpDvy5bz9ty6FSjubRSnmHLmV55iqZLbXRTyaeDW0p4+G0x7g9
-         Kr6Q==
+        bh=EGuxTu/doK/WQ641h0uZhH1HM6LHjGgjZS75tNbw6SU=;
+        b=kY5/mvwNM92eZUbhQPPnInTjlN0K52bq3ehHxwlrfbZw6PNi164+vfE4UtaG+YEV19
+         +jb+DUGg25xLfLQny9Og+sDd2ImtblHxokL2lfqI3cVqU/fCF4odv+O5xbi1fG9CBAfq
+         nZUbkrSEXCr3bSbIPqEOEp8IPu0xtUNJaacKN97VpYN3XNagwBGk8JL7OdMji9z4bir3
+         0TBq0rnGAPP4iTF4vf8El9a1ItZy+pZfMQfGoWtHyDe43POPWKt2T35yupvqqmxK0b0B
+         MpnZ+xiWrZS02cHjB4UPCABaB8P7TV2TRj6K/sNF7YGcI2X3/gO+ZWjcW7Nc5mFXAR3r
+         v1uQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728489020; x=1729093820;
+        d=1e100.net; s=20230601; t=1728489023; x=1729093823;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=HIeWF4AKDrrEZVf143SgWaofUVl00+qhbF3Z20PXTUE=;
-        b=QXIWgLnmnnuCV7wMN29z1eE363Raq9mbyvI2VXBQ0S6nh7kHK2VhN+YRhl75eqlFxv
-         AtAeByWKnkx9lqtJ/+VMMZ6Xejs5J7gKu/22bytGdHkhC1bp9bJx34CkXgGuK+qd2xBu
-         d1xsGZzqh2rvO79ddGyeCp8e87MSV5C7E6PM+2dqlzjEAqRNwLK702tD/Az1cuAUh5D1
-         HQZ1HVyAUcvGbp9QVicEVB3bqXgQFlc3We99h/Lmv0cWHtE7iw8Pca/QmU2OjiZieI5T
-         QfDr/KZC7X9gzSRrCmnfQ2uTMLJgq5DHGK87HjM47HHf+y3yDNItwGKD07Tm2LGAL76B
-         Us2g==
-X-Forwarded-Encrypted: i=1; AJvYcCXHFyTpOFnlKPGFH5WosFQlICvw0Bi+ibwF0pfLgquX2uffbS/HCYumYtUf8im3lE6fCZld74w=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyrqrY2TjpLhYWJ7/u2OTtGU3YJoPv2KUYJqAU0/5yISkE2D/zV
-	JhqCmuAqm3tLFP++lbWbkgQ1roJSVE3vIaoS52BnOq89wWDI6Y5ZYZAnVT4FwmHo1U5h6prC2hF
-	mag==
-X-Google-Smtp-Source: AGHT+IGckGzXTau4NGP/kAJ156CIPWl2QZt/eqMK5BUWyK8KyKg1g8Tc1FgMI3mqgA8yRsZ3clSiNLLsE+M=
+        bh=EGuxTu/doK/WQ641h0uZhH1HM6LHjGgjZS75tNbw6SU=;
+        b=qy3JjFusdx/L8Kpx83QhxTWf+M00qmmep85+6Z3oNT75TYNWL9NF0R986MLl/3U1Ep
+         HlhEZC/uvnDNAXIz6OJz23SOfI8sj5wvZAMJWEhbKqWdLo9p1+V+5OG4bISfHTmY5PwV
+         mZGCWky/ZB6T1DwX14I/YZ+j0HydhUcJK828KXVCi3W85sAEpb0FmirP5bb/4pR+ByVK
+         I9+vSC2fKSAMQT+hao5GCS+tr1JM54U4M9zt1cRqTRD6lEfwP8y9DxQUwwOqzWBcyRqp
+         9cvcMPN0IurKdBP0yPU5I5CLI5+FOTPZhgT97yMmY41D+Cuugsu4YL7FXnfw68U0S5Q+
+         NRDg==
+X-Forwarded-Encrypted: i=1; AJvYcCVHr6fKed82airGeXZfjMfUyVLuvJu5+IOBMarmzsFiv6ymQuK3GwHTVtllxBTYzzThWwc/O6s=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzSgpT47aSkOat6XomKLMO2LJ1BALbnLWBmWjj9CPgRdmPR7uMv
+	p1WeP19I0IWJZnNvHN+4BbDSu32goSzvRvs1Jayyp1gKkW2x47E/LcoYcFusk3I0LR/aCZsvCHa
+	/jw==
+X-Google-Smtp-Source: AGHT+IG8czWnoykzOejAJo4GJw9hcMcaR/sDDZx+5vRUFyaEmI5qH9Oe9i56gZjLIllNwEPwjpmEWoICf38=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a05:690c:2093:b0:6d4:30f0:3a74 with SMTP id
- 00721157ae682-6e322171640mr503647b3.6.1728489020502; Wed, 09 Oct 2024
- 08:50:20 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a63:704c:0:b0:7cd:8363:9f29 with SMTP id
+ 41be03b00d2f7-7ea320345ffmr3164a12.2.1728489022361; Wed, 09 Oct 2024 08:50:22
+ -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed,  9 Oct 2024 08:49:51 -0700
+Date: Wed,  9 Oct 2024 08:49:52 -0700
 In-Reply-To: <20241009154953.1073471-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,9 +61,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20241009154953.1073471-1-seanjc@google.com>
 X-Mailer: git-send-email 2.47.0.rc0.187.ge670bccf7e-goog
-Message-ID: <20241009154953.1073471-13-seanjc@google.com>
-Subject: [PATCH v3 12/14] KVM: selftests: Precisely limit the number of guest
- loops in mmu_stress_test
+Message-ID: <20241009154953.1073471-14-seanjc@google.com>
+Subject: [PATCH v3 13/14] KVM: selftests: Add a read-only mprotect() phase to mmu_stress_test
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
@@ -77,79 +76,75 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	James Houghton <jthoughton@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Run the exact number of guest loops required in mmu_stress_test instead
-of looping indefinitely in anticipation of adding more stages that run
-different code (e.g. reads instead of writes).
+Add a third phase of mmu_stress_test to verify that mprotect()ing guest
+memory to make it read-only doesn't cause explosions, e.g. to verify KVM
+correctly handles the resulting mmu_notifier invalidations.
 
 Reviewed-by: James Houghton <jthoughton@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/mmu_stress_test.c | 25 ++++++++++++++-----
- 1 file changed, 19 insertions(+), 6 deletions(-)
+ tools/testing/selftests/kvm/mmu_stress_test.c | 22 +++++++++++++++----
+ 1 file changed, 18 insertions(+), 4 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/mmu_stress_test.c b/tools/testing/selftests/kvm/mmu_stress_test.c
-index 656a837c7f49..c6bf18cb7c89 100644
+index c6bf18cb7c89..0918fade9267 100644
 --- a/tools/testing/selftests/kvm/mmu_stress_test.c
 +++ b/tools/testing/selftests/kvm/mmu_stress_test.c
-@@ -20,12 +20,15 @@
- static void guest_code(uint64_t start_gpa, uint64_t end_gpa, uint64_t stride)
- {
- 	uint64_t gpa;
-+	int i;
- 
--	for (;;) {
-+	for (i = 0; i < 2; i++) {
- 		for (gpa = start_gpa; gpa < end_gpa; gpa += stride)
- 			vcpu_arch_put_guest(*((volatile uint64_t *)gpa), gpa);
--		GUEST_SYNC(0);
-+		GUEST_SYNC(i);
+@@ -28,6 +28,10 @@ static void guest_code(uint64_t start_gpa, uint64_t end_gpa, uint64_t stride)
+ 		GUEST_SYNC(i);
  	}
+ 
++	for (gpa = start_gpa; gpa < end_gpa; gpa += stride)
++		*((volatile uint64_t *)gpa);
++	GUEST_SYNC(2);
 +
-+	GUEST_ASSERT(0);
+ 	GUEST_ASSERT(0);
  }
  
- struct vcpu_info {
-@@ -52,10 +55,18 @@ static void rendezvous_with_boss(void)
- 	}
- }
+@@ -95,6 +99,10 @@ static void *vcpu_worker(void *data)
+ 	run_vcpu(vcpu, 1);
+ 	rendezvous_with_boss();
  
--static void run_vcpu(struct kvm_vcpu *vcpu)
-+static void assert_sync_stage(struct kvm_vcpu *vcpu, int stage)
-+{
-+	struct ucall uc;
++	/* Stage 2, read all of guest memory, which is now read-only. */
++	run_vcpu(vcpu, 2);
++	rendezvous_with_boss();
 +
-+	TEST_ASSERT_EQ(get_ucall(vcpu, &uc), UCALL_SYNC);
-+	TEST_ASSERT_EQ(uc.args[1], stage);
-+}
-+
-+static void run_vcpu(struct kvm_vcpu *vcpu, int stage)
- {
- 	vcpu_run(vcpu);
--	TEST_ASSERT_EQ(get_ucall(vcpu, NULL), UCALL_SYNC);
-+	assert_sync_stage(vcpu, stage);
- }
- 
- static void *vcpu_worker(void *data)
-@@ -69,7 +80,8 @@ static void *vcpu_worker(void *data)
- 
- 	rendezvous_with_boss();
- 
--	run_vcpu(vcpu);
-+	/* Stage 0, write all of guest memory. */
-+	run_vcpu(vcpu, 0);
- 	rendezvous_with_boss();
- #ifdef __x86_64__
- 	vcpu_sregs_get(vcpu, &sregs);
-@@ -79,7 +91,8 @@ static void *vcpu_worker(void *data)
- #endif
- 	rendezvous_with_boss();
- 
--	run_vcpu(vcpu);
-+	/* Stage 1, re-write all of guest memory. */
-+	run_vcpu(vcpu, 1);
- 	rendezvous_with_boss();
- 
  	return NULL;
+ }
+ 
+@@ -175,7 +183,7 @@ int main(int argc, char *argv[])
+ 	const uint64_t start_gpa = SZ_4G;
+ 	const int first_slot = 1;
+ 
+-	struct timespec time_start, time_run1, time_reset, time_run2;
++	struct timespec time_start, time_run1, time_reset, time_run2, time_ro;
+ 	uint64_t max_gpa, gpa, slot_size, max_mem, i;
+ 	int max_slots, slot, opt, fd;
+ 	bool hugepages = false;
+@@ -279,14 +287,20 @@ int main(int argc, char *argv[])
+ 	rendezvous_with_vcpus(&time_reset, "reset");
+ 	rendezvous_with_vcpus(&time_run2, "run 2");
+ 
++	mprotect(mem, slot_size, PROT_READ);
++	rendezvous_with_vcpus(&time_ro, "mprotect RO");
++
++	time_ro    = timespec_sub(time_ro,     time_run2);
+ 	time_run2  = timespec_sub(time_run2,   time_reset);
+-	time_reset = timespec_sub(time_reset, time_run1);
++	time_reset = timespec_sub(time_reset,  time_run1);
+ 	time_run1  = timespec_sub(time_run1,   time_start);
+ 
+-	pr_info("run1 = %ld.%.9lds, reset = %ld.%.9lds, run2 =  %ld.%.9lds\n",
++	pr_info("run1 = %ld.%.9lds, reset = %ld.%.9lds, run2 = %ld.%.9lds, "
++		"ro = %ld.%.9lds\n",
+ 		time_run1.tv_sec, time_run1.tv_nsec,
+ 		time_reset.tv_sec, time_reset.tv_nsec,
+-		time_run2.tv_sec, time_run2.tv_nsec);
++		time_run2.tv_sec, time_run2.tv_nsec,
++		time_ro.tv_sec, time_ro.tv_nsec);
+ 
+ 	/*
+ 	 * Delete even numbered slots (arbitrary) and unmap the first half of
 -- 
 2.47.0.rc0.187.ge670bccf7e-goog
 
