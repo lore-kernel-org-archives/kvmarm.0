@@ -1,65 +1,65 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A166D2AF1D
-	for <kvmarm@lists.linux.dev>; Wed,  9 Oct 2024 05:50:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A8852AF1D
+	for <kvmarm@lists.linux.dev>; Wed,  9 Oct 2024 05:53:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728453031; cv=none; b=CbphUz3CgGk3MVYCuoU7Ivfr9aWuuqN2wo+xGcqJ6oyAwFUtsD6Tmgm3IR9Iy+lFeQrNh5X3PNH5QJQK2oQu+RbhxI35EcX2lIgKIaqnfA2sefkkROmPrROrOazOkYbxDrJEFtu2xTjvh52MDXh+PZULn61XDmyfoTN4KMbsCkI=
+	t=1728453239; cv=none; b=NKX9qWURnoisHULHDcvJ7N4YGyvK0sDgnhgMf+zMdT2r7++unluav1/xTyvjQcwrY9OP9XrZ2dLgMg+9h9a5bscaHoCPCygpj4r+vqNJk25IMgqyYzF1Kz3/yrz4kKjkz53hmDuK5KWbQ9RPiHYyox/gi+KXxOozy2HbpAxfQN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728453031; c=relaxed/simple;
-	bh=9S2jPLYFK+rDY5ycsoEGWF98XMRbhd/RhKW5ulm2iuY=;
+	s=arc-20240116; t=1728453239; c=relaxed/simple;
+	bh=187ircL8dahSfKPzP90scmX2t9tAvwc2+dk0cJPPVJk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=og2nAXDqqNcq4prahJfbvi7BwbBzYypZHKAvoueHIZgqZGkcrW2ptC3TEZ3MqyKGb3kk+UO0LnAGuibskc6Gz6S98Z6Frg7x4BbFSrNZbeUC0lj4mP+S54QIDoAzDVgVgB56fzvV672q2JPasAdfvd9BsiFpfQYB4BThG6Emlrk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ICtLS+5B; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=LBoDHx89Xyqs3+INDztj3DZawVy4ZoKQ/ngqfP2ybZ5zpuciJhzj0YEd7Dnlrq2N7fCKgtUOV03JY67D00YdGIl3exsptEJ3feUVEKjTVWuDHJYCCzQXQvT7kDNd5hUra13RwEPbWAptuhCp6r8dwmqlXF0ZiDnqbyPKr7AkJ/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WurAu2mP; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ICtLS+5B"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WurAu2mP"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728453028;
+	s=mimecast20190719; t=1728453236;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ymX19yxGKNcPPZT9dbIlT7LvMSHhqQQCw6kliOcG++o=;
-	b=ICtLS+5BMZXLdpHKyVoiBNox0vKUi95JgZQ5huVLpyW/VNpXutkzvf/MkEg485Hozd2F7h
-	omdWLBV0UyEIchZnTbHKOkir1o7EPA39cVSS7KUqhs1MNixMcp1bvolbeVKQQsu3J+8//o
-	xL69lYCGIIupxRibY31nBgk6jG8zMU8=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=Slax4z+/KZOsvDd7Ygfjf1nxy1SxhrjMaSfPmKQQdOw=;
+	b=WurAu2mP5Mru8IY3BgwXs90Q6eYwka7uozUpF4CG9NUTyodvtRhC8D/oiZA2cDP7sq6kJW
+	+UtYxlZnrAfM5XGYFp3Y0VRQiP9vVHZgtQ4TjlhIkLoA8AZKf+69J1NBQv2IwmrTjY3qcK
+	2sjrTTZQWyIzFEckMmtS69xLq5Ew2LI=
+Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
+ [209.85.210.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-507-l4Gk2NeEM7ybQpoPzm8BDg-1; Wed, 09 Oct 2024 01:50:25 -0400
-X-MC-Unique: l4Gk2NeEM7ybQpoPzm8BDg-1
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-2e10dec7d0fso5795307a91.2
-        for <kvmarm@lists.linux.dev>; Tue, 08 Oct 2024 22:50:24 -0700 (PDT)
+ us-mta-312-poD2yehdPaGq1tkPnzJuYg-1; Wed, 09 Oct 2024 01:53:55 -0400
+X-MC-Unique: poD2yehdPaGq1tkPnzJuYg-1
+Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-71e0217c5fdso4144208b3a.3
+        for <kvmarm@lists.linux.dev>; Tue, 08 Oct 2024 22:53:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728453024; x=1729057824;
+        d=1e100.net; s=20230601; t=1728453233; x=1729058033;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ymX19yxGKNcPPZT9dbIlT7LvMSHhqQQCw6kliOcG++o=;
-        b=RFYqHkDdY1NUcY8UbTCfqXexMPSNW2ZAQJfTccn/0MDRIpyxb+4mVh3/71OT3jzLBA
-         t+7gJx/+Nwd7aFFx+MvQYWdOLX51dbo+4XBPQohLhTlvnt2X1Jj+m4jia2vsgLEYyDNz
-         3fQFNJ8FlVe37HNPwtQIXKsrnPjJLDE2A1sgvRqhMrDQCMvLVp8xTbtS4rzQYRjTFopV
-         HOgDxwfPzofGsRanYqEMbhJFCO9qJ3e/sOozwgHMwsmx4uA2ZmmhavD+AJ8+OSylJMjS
-         vcUk6ETJJZZ6ofLXbO78slceZfMjYbyTeyZFnkxyTwDXRbbvZg/agaNrZYVQF/rm+mu2
-         4Ouw==
-X-Forwarded-Encrypted: i=1; AJvYcCUXW/74HOr/PO0Pa0/ww1GnIPSFN2igUqn5DXVXkgmYhau5r2jK6QouSphAQsGaZCmHYrlGea4=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwYF0zZLUtMoM54IyjPK5VTfif3hu90gmqh+lyRwMhVyt943kso
-	qgv1EiYsq5dVVd4+C2GtbLmXJDEAfqWslFL5B22GpUGhilWV2dHYL+6SHbeyMjldPSuMaxEP599
-	AwuecFRkQYQ0aZqj2bKIv90MEiVXh90zJ15nxHdse4kG0j6IBlzsf9A==
-X-Received: by 2002:a17:90a:f0c6:b0:2e0:7e80:2013 with SMTP id 98e67ed59e1d1-2e2a2578abemr1740883a91.38.1728453024126;
-        Tue, 08 Oct 2024 22:50:24 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHHPLj8B4geOM4Lg3iZurhkPCvU+Nn9za7W4Emb4G50Z5/U3Z1RUlAVfpPuJ4P+IyR9FEZ/ig==
-X-Received: by 2002:a17:90a:f0c6:b0:2e0:7e80:2013 with SMTP id 98e67ed59e1d1-2e2a2578abemr1740858a91.38.1728453023800;
-        Tue, 08 Oct 2024 22:50:23 -0700 (PDT)
+        bh=Slax4z+/KZOsvDd7Ygfjf1nxy1SxhrjMaSfPmKQQdOw=;
+        b=aECz4J/3JMKq7XKBZgvZYYkxGlnJy4wON3tkDkv5mp/gD0DaORGSsDUpNtrs36r7iP
+         U8DQkV3G/QqFCYvYhfjkhYF3yVgYXzayONKTli21Vjq1vCQNZ1RMkUdYzhQ3O86NSWz3
+         ii4HhdLGUGIMAC416+J2zCKfjJVgq8Wk4ZdW33aHCHdDPEYCUQx42IFBY7AtAqDqUPVl
+         sOQ6oggTtesEWYNO25abyqqCeCxVGyLK/qsxQ5HVUlUMj4v6r01xcOKWRAYAkUX5Tce/
+         mWF82X5XuDfpfpLUarRNZsiRX1WKnhFRu5iP/b3T7WQ4VF3AVwyEPyr9DL7xZA1LBUjT
+         GvlA==
+X-Forwarded-Encrypted: i=1; AJvYcCUU9ZxUcDbE88T1cpDQ1ig6Q4wxTJQ9nm1rSfdPI5JXu2F21E4rHDDbuju9Ge84Zw0DTHyrmx8=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yzwy11M+LjThdU6p9NB1eaFE0RU3FV+UyRATC94RPWeVnBxaInG
+	XZEHJqR/sDLIkV4eJJCcvlnPASrHtpbJqOET5f0pQ9TZb9IzT9fJz3x0UXHSRnMVW2aSyCIw/GW
+	1/TBIpCN9yuwbamNk8lqYkd95CXS1rdgrme9Yv6XC+HSDzrzKk60urcseIurfjA==
+X-Received: by 2002:a05:6a00:1390:b0:71d:ea77:e94e with SMTP id d2e1a72fcca58-71e1db8ecffmr2049722b3a.16.1728453233556;
+        Tue, 08 Oct 2024 22:53:53 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF6K3jrTaX0JnvKghwg74VC2sXr7LYXI22yttoAzoB1pMvX6+MO+r20njF9pYkILpR81LkUww==
+X-Received: by 2002:a05:6a00:1390:b0:71d:ea77:e94e with SMTP id d2e1a72fcca58-71e1db8ecffmr2049703b3a.16.1728453233135;
+        Tue, 08 Oct 2024 22:53:53 -0700 (PDT)
 Received: from [192.168.68.54] ([43.252.112.159])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e2a5aabbb1sm661909a91.35.2024.10.08.22.50.18
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71df0d4a278sm7266851b3a.140.2024.10.08.22.53.48
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Oct 2024 22:50:23 -0700 (PDT)
-Message-ID: <b82215a0-f4e0-4073-86f6-09526f5dfc8f@redhat.com>
-Date: Wed, 9 Oct 2024 15:50:16 +1000
+        Tue, 08 Oct 2024 22:53:52 -0700 (PDT)
+Message-ID: <c98586dc-da5f-44f2-9ed7-1acb6d9afe86@redhat.com>
+Date: Wed, 9 Oct 2024 15:53:46 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -67,7 +67,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 3/7] arm64: cpufeature: discover CPU support for MPAM
+Subject: Re: [PATCH v4 4/7] KVM: arm64: Fix missing traps of guest accesses to
+ the MPAM registers
 To: Joey Gouly <joey.gouly@arm.com>, linux-arm-kernel@lists.infradead.org,
  kvmarm@lists.linux.dev
 Cc: anshuman.khandual@arm.com, james.morse@arm.com,
@@ -77,9 +78,9 @@ Cc: anshuman.khandual@arm.com, james.morse@arm.com,
  Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
  Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
 References: <20241004110714.2051604-1-joey.gouly@arm.com>
- <20241004110714.2051604-4-joey.gouly@arm.com>
+ <20241004110714.2051604-5-joey.gouly@arm.com>
 From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20241004110714.2051604-4-joey.gouly@arm.com>
+In-Reply-To: <20241004110714.2051604-5-joey.gouly@arm.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
@@ -89,72 +90,107 @@ Content-Transfer-Encoding: 7bit
 On 10/4/24 9:07 PM, Joey Gouly wrote:
 > From: James Morse <james.morse@arm.com>
 > 
-> ARMv8.4 adds support for 'Memory Partitioning And Monitoring' (MPAM)
-> which describes an interface to cache and bandwidth controls wherever
-> they appear in the system.
+> commit 011e5f5bf529f ("arm64/cpufeature: Add remaining feature bits in
+> ID_AA64PFR0 register") exposed the MPAM field of AA64PFR0_EL1 to guests,
+> but didn't add trap handling.
 > 
-> Add support to detect MPAM. Like SVE, MPAM has an extra id register that
-> describes some more properties, including the virtualisation support,
-> which is optional. Detect this separately so we can detect
-> mismatched/insane systems, but still use MPAM on the host even if the
-> virtualisation support is missing.
+> If you are unlucky, this results in an MPAM aware guest being delivered
+> an undef during boot. The host prints:
+> | kvm [97]: Unsupported guest sys_reg access at: ffff800080024c64 [00000005]
+> | { Op0( 3), Op1( 0), CRn(10), CRm( 5), Op2( 0), func_read },
 > 
-> MPAM needs enabling at the highest implemented exception level, otherwise
-> the register accesses trap. The 'enabled' flag is accessible to lower
-> exception levels, but its in a register that traps when MPAM isn't enabled.
-> The cpufeature 'matches' hook is extended to test this on one of the
-> CPUs, so that firmware can emulate MPAM as disabled if it is reserved
-> for use by secure world.
+> Which results in:
+> | Internal error: Oops - Undefined instruction: 0000000002000000 [#1] PREEMPT SMP
+> | Modules linked in:
+> | CPU: 0 PID: 1 Comm: swapper/0 Not tainted 6.6.0-rc7-00559-gd89c186d50b2 #14616
+> | Hardware name: linux,dummy-virt (DT)
+> | pstate: 00000005 (nzcv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+> | pc : test_has_mpam+0x18/0x30
+> | lr : test_has_mpam+0x10/0x30
+> | sp : ffff80008000bd90
+> ...
+> | Call trace:
+> |  test_has_mpam+0x18/0x30
+> |  update_cpu_capabilities+0x7c/0x11c
+> |  setup_cpu_features+0x14/0xd8
+> |  smp_cpus_done+0x24/0xb8
+> |  smp_init+0x7c/0x8c
+> |  kernel_init_freeable+0xf8/0x280
+> |  kernel_init+0x24/0x1e0
+> |  ret_from_fork+0x10/0x20
+> | Code: 910003fd 97ffffde 72001c00 54000080 (d538a500)
+> | ---[ end trace 0000000000000000 ]---
+> | Kernel panic - not syncing: Attempted to kill init! exitcode=0x0000000b
+> | ---[ end Kernel panic - not syncing: Attempted to kill init! exitcode=0x0000000b ]---
 > 
-> Secondary CPUs that appear late could trip cpufeature's 'lower safe'
-> behaviour after the MPAM properties have been advertised to user-space.
-> Add a verify call to ensure late secondaries match the existing CPUs.
+> Add the support to enable the traps, and handle the three guest accessible
+> registers by injecting an UNDEF. This stops KVM from spamming the host
+> log, but doesn't yet hide the feature from the id registers.
 > 
-> (If you have a boot failure that bisects here its likely your CPUs
-> advertise MPAM in the id registers, but firmware failed to either enable
-> or MPAM, or emulate the trap as if it were disabled)
+> With MPAM v1.0 we can trap the MPAMIDR_EL1 register only if
+> ARM64_HAS_MPAM_HCR, with v1.1 an additional MPAM2_EL2.TIDR bit traps
+> MPAMIDR_EL1 on platforms that don't have MPAMHCR_EL2. Enable one of
+> these if either is supported. If neither is supported, the guest can
+> discover that the CPU has MPAM support, and how many PARTID etc the
+> host has ... but it can't influence anything, so its harmless.
 > 
+> Fixes: 011e5f5bf529f ("arm64/cpufeature: Add remaining feature bits in ID_AA64PFR0 register")
+> CC: Anshuman Khandual <anshuman.khandual@arm.com>
+> Link: https://lore.kernel.org/linux-arm-kernel/20200925160102.118858-1-james.morse@arm.com/
 > Signed-off-by: James Morse <james.morse@arm.com>
 > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
 > ---
-> Changes since v3:
->   * A proper conversion to sysreg
-> ---
->   .../arch/arm64/cpu-feature-registers.rst      |  2 +
->   arch/arm64/Kconfig                            | 20 ++++
->   arch/arm64/include/asm/cpu.h                  |  1 +
->   arch/arm64/include/asm/cpucaps.h              |  2 +
->   arch/arm64/include/asm/cpufeature.h           | 12 +++
->   arch/arm64/include/asm/mpam.h                 | 32 ++++++
->   arch/arm64/kernel/Makefile                    |  2 +
->   arch/arm64/kernel/cpufeature.c                | 97 +++++++++++++++++++
->   arch/arm64/kernel/cpuinfo.c                   |  4 +
->   arch/arm64/kernel/mpam.c                      |  8 ++
->   arch/arm64/tools/cpucaps                      |  1 +
->   11 files changed, 181 insertions(+)
->   create mode 100644 arch/arm64/include/asm/mpam.h
->   create mode 100644 arch/arm64/kernel/mpam.c
+>   arch/arm64/include/asm/cpufeature.h     |  2 +-
+>   arch/arm64/include/asm/kvm_arm.h        |  1 +
+>   arch/arm64/include/asm/mpam.h           |  2 +-
+>   arch/arm64/kernel/image-vars.h          |  5 ++++
+>   arch/arm64/kvm/hyp/include/hyp/switch.h | 32 +++++++++++++++++++++++++
+>   arch/arm64/kvm/sys_regs.c               | 11 +++++++++
+>   6 files changed, 51 insertions(+), 2 deletions(-)
 > 
+> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+> index 1abe55e62e63..985d966787b1 100644
+> --- a/arch/arm64/include/asm/cpufeature.h
+> +++ b/arch/arm64/include/asm/cpufeature.h
+> @@ -845,7 +845,7 @@ static inline bool system_supports_poe(void)
+>   		alternative_has_cap_unlikely(ARM64_HAS_S1POE);
+>   }
+>   
+> -static inline bool cpus_support_mpam(void)
+> +static __always_inline bool cpus_support_mpam(void)
+>   {
+>   	return alternative_has_cap_unlikely(ARM64_MPAM);
+>   }
 
-[...]
+The changes belong to PATCH[3/7] if I'm correct.
 
-> diff --git a/arch/arm64/kernel/mpam.c b/arch/arm64/kernel/mpam.c
-> new file mode 100644
-> index 000000000000..a29dc58c2da5
-> --- /dev/null
-> +++ b/arch/arm64/kernel/mpam.c
-> @@ -0,0 +1,8 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/* Copyright (C) 2021 Arm Ltd. */
-> +
-> +#include <asm/mpam.h>
-> +
-> +#include <linux/jump_label.h>
-> +
-> +DEFINE_STATIC_KEY_FALSE(arm64_mpam_has_hcr);
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index 109a85ee6910..16afb7a79b15 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -103,6 +103,7 @@
+>   #define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
+>   
+>   #define HCRX_HOST_FLAGS (HCRX_EL2_MSCEn | HCRX_EL2_TCR2En | HCRX_EL2_EnFPM)
+> +#define MPAMHCR_HOST_FLAGS	0
+>   
+>   /* TCR_EL2 Registers bits */
+>   #define TCR_EL2_DS		(1UL << 32)
+> diff --git a/arch/arm64/include/asm/mpam.h b/arch/arm64/include/asm/mpam.h
+> index d3ef0b5cd456..3ffe0f34ffff 100644
+> --- a/arch/arm64/include/asm/mpam.h
+> +++ b/arch/arm64/include/asm/mpam.h
+> @@ -15,7 +15,7 @@
+>   DECLARE_STATIC_KEY_FALSE(arm64_mpam_has_hcr);
+>   
+>   /* check whether all CPUs have MPAM virtualisation support */
+> -static inline bool mpam_cpus_have_mpam_hcr(void)
+> +static __always_inline bool mpam_cpus_have_mpam_hcr(void)
+>   {
+>   	if (IS_ENABLED(CONFIG_ARM64_MPAM))
+>   		return static_branch_unlikely(&arm64_mpam_has_hcr);
 
-linux/jump_label.h has been included to asm/mpam.h. So we needn't include
-it again.
+Save as above, the changes belong to PATCH[3/7].
 
 Thanks,
 Gavin
