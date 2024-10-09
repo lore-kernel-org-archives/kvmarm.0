@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5231E1E5720;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B12BA1E573D;
 	Wed,  9 Oct 2024 19:00:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728500448; cv=none; b=NOm+2SIrbGucKfgDIxrSirdXYtc5/zPOHkPx0gJQveTtRMiRx5HdwibupXm/4Irrr46jLCB1SycuJx8eqLLLY29y7EFq1QbnFiTCD0fZVMJfzaIB2VbnTohQCQCygw9HC3OyPfTLp+FHOWsW4+bWzsbFz4qcoSNX/+yHP3mGgbc=
+	t=1728500448; cv=none; b=cla1YqnOXPfEIrA1Bf57/wRFC2VzuiLZs/GkOP08aLd7cyav2qtbafRHA2iNW0VsMUuuzOUXZt715O3ZML/oySvInhiGT+qLBUZC6jQxjAOXKcTQYLqroVtz+p7lryvy0MCGiTTyhs8ngJsqEYaPq4QjyBkbGw+8ROTaBTt2dDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1728500448; c=relaxed/simple;
-	bh=2MWftYygg8uIBjl90XXJMB7RiCbzJSCjHPiHWt2IHTo=;
+	bh=HTGZPFP6wCgir0oPY+FWnF6tWlbS4B7GKmqbwbybkEE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=pucDfMkkGQd8NoQWGlK4m1OYzkhjdEJoDm6jaPjY2frYwzQTHU4L0jp+RQ6wO8ZB8DB4hTp0nnWWZedDqzP6Qsn6hzK4mj50Lmu8Q3XzmhouJeandtOo3WhEH7inVFAxH/jxpyTwolux/YEfvGwpWsFICp1Bsz/xaWJSnGmgowA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n9Yece0F; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=I8X3OwSUHW/DmkBgWwmR6+l7sclcN+oydzI5wANXpC24amtijs1UkZFkFzqHV37Rse57epEkswsELaOf4gweQz4xruNqaMtg8HE+PFEb0UcaVwzv3G7da97RCYBSpxKR13t4jmD1iZFnJBC1BlakVZJOqAyeS2XDOSSQj1hLaLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AiA0v/5n; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n9Yece0F"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DE38C4CEC3;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AiA0v/5n"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92A30C4CECF;
 	Wed,  9 Oct 2024 19:00:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1728500448;
-	bh=2MWftYygg8uIBjl90XXJMB7RiCbzJSCjHPiHWt2IHTo=;
+	bh=HTGZPFP6wCgir0oPY+FWnF6tWlbS4B7GKmqbwbybkEE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=n9Yece0FlprB/TjuDIKdFHlBt5jDQ905j2CvG4eJXV2FkG/8UcZoS5TyOsM30uCYj
-	 Qw+nWMlWAvpem9LW/B9gg0mH6RbIZFCK6dNq8iZ38HlEZXJ6FkhvMkpPPYSUvnuI8e
-	 FmFLjJsH+Xm3FUwCr4tbZyq34hHcitRwv+X5SkVaCouYIq7cMyI9yZt8t0VMSL5K+6
-	 uGF6vlDBcpZvZb3J7lCFnJoL5RCm32GacEUJP6dGZPfUxZ+bD4jqQtVpjrXtDBM9cL
-	 EPspELq8MNs2is3yVBbf2+jiyzR6Asu7MwAjTCVxhc8DFs3qzYoVF18Sgyab9oBdEE
-	 AY/vB/+NZlfew==
+	b=AiA0v/5nH3i5CZ4JzZBTbPW2yhVKUZ5bsxKJ1xjXpwRN22tgQ05jh4BxiWcz19f/R
+	 guIijjhpVNpJ8z81YoIs6jUTyK1b/088xZVmrrQJDoHdDbuHexyBxJJMZCJilbqmkq
+	 FcO1/i/1AQsVWF1GvOCCtjTD8G70V5A5OxtHkMxJXMFgiaLjopTnEjgBc/ilJRfHG8
+	 i9P2fPVQWS9m8AkTmfflVgNALU3Ttgucmz08ty/9KSmBV4TW8mdkigBQJTUpt0YVkF
+	 WPjyKeQQ6y/2Repb2nYHgLWaJsFGIU1i0P1qyvntgttNqgjAyAWxgyuLZPnsR+gmEH
+	 /UNKyPajN96+Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sybvS-001wcY-Be;
+	id 1sybvS-001wcY-Pq;
 	Wed, 09 Oct 2024 20:00:46 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -42,9 +42,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v4 27/36] KVM: arm64: Add a composite EL2 visibility helper
-Date: Wed,  9 Oct 2024 20:00:10 +0100
-Message-Id: <20241009190019.3222687-28-maz@kernel.org>
+Subject: [PATCH v4 29/36] KVM: arm64: Subject S1PIE/S1POE registers to HCR_EL2.{TVM,TRVM}
+Date: Wed,  9 Oct 2024 20:00:12 +0100
+Message-Id: <20241009190019.3222687-30-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20241009190019.3222687-1-maz@kernel.org>
 References: <20241009190019.3222687-1-maz@kernel.org>
@@ -60,78 +60,29 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-We are starting to have a bunch of visibility helpers checking
-for EL2 + something else, and we are going to add more.
-
-Simplify things somehow by introducing a helper that implement
-extractly that by taking a visibility helper as a parameter,
-and convert the existing ones to that.
+All the El0/EL1 S1PIE/S1POE system register are caught by the HCR_EL2
+TCM and TRVM bits. Reflect this in the coarse grained trap table.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 32 +++++++++++---------------------
- 1 file changed, 11 insertions(+), 21 deletions(-)
+ arch/arm64/kvm/emulate-nested.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index b5c2662662af9..6c20de8607b2d 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2277,16 +2277,18 @@ static u64 reset_hcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
- 	return __vcpu_sys_reg(vcpu, r->reg) = val;
- }
- 
-+static unsigned int __el2_visibility(const struct kvm_vcpu *vcpu,
-+				     const struct sys_reg_desc *rd,
-+				     unsigned int (*fn)(const struct kvm_vcpu *,
-+							const struct sys_reg_desc *))
-+{
-+	return el2_visibility(vcpu, rd) ?: fn(vcpu, rd);
-+}
-+
- static unsigned int sve_el2_visibility(const struct kvm_vcpu *vcpu,
- 				       const struct sys_reg_desc *rd)
- {
--	unsigned int r;
--
--	r = el2_visibility(vcpu, rd);
--	if (r)
--		return r;
--
--	return sve_visibility(vcpu, rd);
-+	return __el2_visibility(vcpu, rd, sve_visibility);
- }
- 
- static bool access_zcr_el2(struct kvm_vcpu *vcpu,
-@@ -2332,13 +2334,7 @@ static unsigned int tcr2_visibility(const struct kvm_vcpu *vcpu,
- static unsigned int tcr2_el2_visibility(const struct kvm_vcpu *vcpu,
- 				    const struct sys_reg_desc *rd)
- {
--	unsigned int r;
--
--	r = el2_visibility(vcpu, rd);
--	if (r)
--		return r;
--
--	return tcr2_visibility(vcpu, rd);
-+	return __el2_visibility(vcpu, rd, tcr2_visibility);
- }
- 
- static unsigned int s1pie_visibility(const struct kvm_vcpu *vcpu,
-@@ -2353,13 +2349,7 @@ static unsigned int s1pie_visibility(const struct kvm_vcpu *vcpu,
- static unsigned int s1pie_el2_visibility(const struct kvm_vcpu *vcpu,
- 					 const struct sys_reg_desc *rd)
- {
--	unsigned int r;
--
--	r = el2_visibility(vcpu, rd);
--	if (r)
--		return r;
--
--	return s1pie_visibility(vcpu, rd);
-+	return __el2_visibility(vcpu, rd, s1pie_visibility);
- }
- 
- /*
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index ddcbaa983de36..0ab0905533545 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -704,6 +704,10 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
+ 	SR_TRAP(SYS_MAIR_EL1,		CGT_HCR_TVM_TRVM),
+ 	SR_TRAP(SYS_AMAIR_EL1,		CGT_HCR_TVM_TRVM),
+ 	SR_TRAP(SYS_CONTEXTIDR_EL1,	CGT_HCR_TVM_TRVM),
++	SR_TRAP(SYS_PIR_EL1,		CGT_HCR_TVM_TRVM),
++	SR_TRAP(SYS_PIRE0_EL1,		CGT_HCR_TVM_TRVM),
++	SR_TRAP(SYS_POR_EL0,		CGT_HCR_TVM_TRVM),
++	SR_TRAP(SYS_POR_EL1,		CGT_HCR_TVM_TRVM),
+ 	SR_TRAP(SYS_TCR2_EL1,		CGT_HCR_TVM_TRVM_HCRX_TCR2En),
+ 	SR_TRAP(SYS_DC_ZVA,		CGT_HCR_TDZ),
+ 	SR_TRAP(SYS_DC_GVA,		CGT_HCR_TDZ),
 -- 
 2.39.2
 
