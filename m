@@ -1,65 +1,65 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0E06208D0
-	for <kvmarm@lists.linux.dev>; Wed,  9 Oct 2024 04:12:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A166D2AF1D
+	for <kvmarm@lists.linux.dev>; Wed,  9 Oct 2024 05:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728447135; cv=none; b=SMGJREiwenUx6EAo7IwVUJRKlLOk4y5FVF7DIw+dTcFWKX1DsFEqeP743Ucvy0a2VSM9nI8alU0PGXpQofnx1B/kJqAXA9qPIWq2mIGSG+PNwEoxjFvngtX/EjFvKIsUHuQnmxiKDmr4iXmsMY91YoUxpy0FpFn3P3KiJDV4ZJY=
+	t=1728453031; cv=none; b=CbphUz3CgGk3MVYCuoU7Ivfr9aWuuqN2wo+xGcqJ6oyAwFUtsD6Tmgm3IR9Iy+lFeQrNh5X3PNH5QJQK2oQu+RbhxI35EcX2lIgKIaqnfA2sefkkROmPrROrOazOkYbxDrJEFtu2xTjvh52MDXh+PZULn61XDmyfoTN4KMbsCkI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728447135; c=relaxed/simple;
-	bh=2EMLfUgJUHVkpCVN1cNfXvsbJ7ebzGu1eT2Gy5FH5OA=;
+	s=arc-20240116; t=1728453031; c=relaxed/simple;
+	bh=9S2jPLYFK+rDY5ycsoEGWF98XMRbhd/RhKW5ulm2iuY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WnRMSMmAX0DjMlYMX3ZHV4re8rNR5zcjkrlSSlysvUaJ6rDj7yVVAeujwzmubd5LUsW5FzPa1upUjgV0Fnkdnyidz16t+uNBrAJGLBkBYc6YjnMhCWfgN+CF+ZpwFYOsOzeHAZvwRuN/5iq3ItKVcaCMoTpDR5bjCJ5h4Y7isiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UKIbbLW6; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=og2nAXDqqNcq4prahJfbvi7BwbBzYypZHKAvoueHIZgqZGkcrW2ptC3TEZ3MqyKGb3kk+UO0LnAGuibskc6Gz6S98Z6Frg7x4BbFSrNZbeUC0lj4mP+S54QIDoAzDVgVgB56fzvV672q2JPasAdfvd9BsiFpfQYB4BThG6Emlrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ICtLS+5B; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UKIbbLW6"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ICtLS+5B"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728447132;
+	s=mimecast20190719; t=1728453028;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=9mVrlUNC3qZXC5+gYbjc1blm2bjjKslr4GeznnATIz8=;
-	b=UKIbbLW6YzGhXau4f5iMYakzGoAqFaVq496o0PNiWa6A9AdTHeHN3W2bylZXkLVGa5szUH
-	5WGSXYrr7zdlb6z38WUCFmHn6JWgvyqPQ5FqPbtjQCV/Hz87MdCHspnzdU6+PfI4YnrIbf
-	bzBs2nDbChI/jt82EscuCjZ3tP+MWeY=
-Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
- [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=ymX19yxGKNcPPZT9dbIlT7LvMSHhqQQCw6kliOcG++o=;
+	b=ICtLS+5BMZXLdpHKyVoiBNox0vKUi95JgZQ5huVLpyW/VNpXutkzvf/MkEg485Hozd2F7h
+	omdWLBV0UyEIchZnTbHKOkir1o7EPA39cVSS7KUqhs1MNixMcp1bvolbeVKQQsu3J+8//o
+	xL69lYCGIIupxRibY31nBgk6jG8zMU8=
+Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
+ [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-365-JAAjYOBXPpmbQpWsvq7pXQ-1; Wed, 09 Oct 2024 00:12:10 -0400
-X-MC-Unique: JAAjYOBXPpmbQpWsvq7pXQ-1
-Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-71dff575924so3947539b3a.1
-        for <kvmarm@lists.linux.dev>; Tue, 08 Oct 2024 21:12:10 -0700 (PDT)
+ us-mta-507-l4Gk2NeEM7ybQpoPzm8BDg-1; Wed, 09 Oct 2024 01:50:25 -0400
+X-MC-Unique: l4Gk2NeEM7ybQpoPzm8BDg-1
+Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-2e10dec7d0fso5795307a91.2
+        for <kvmarm@lists.linux.dev>; Tue, 08 Oct 2024 22:50:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728447130; x=1729051930;
+        d=1e100.net; s=20230601; t=1728453024; x=1729057824;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9mVrlUNC3qZXC5+gYbjc1blm2bjjKslr4GeznnATIz8=;
-        b=kcAAMPeEyV0xJwntwzj2icdDa+FE14qLaW+RGoDwYnQD5C5rjT6TzyguZUAroZ86x/
-         qvO0DGHP57bJF98bk8K8hdEI2AisjPrnDqO9GP2XZb6hIOmPRVUvNs1damjnju2MFJ7V
-         lMQDQXZ3wKsyM9foXBkg1afuc3n8KdR1euu1CDi5nviEyyQoZtNC/tj+TdXHb3e9gL1Z
-         +RIP/E1UKAsT1WMEHJFobeRquvSAXy4/nGHS94neI4yiajF8Bwo/hrn4TgousEoEiVT0
-         5oTmlQpsSHJANoreLPuS0P/SW+vxaVmrb9eTtu0VJODryn7yzm8iA2/iQeDTboWg3mtP
-         BEGg==
-X-Forwarded-Encrypted: i=1; AJvYcCXKkg4gdNi+SNUhI0O1xY2Oa+rN2i53zam8Q1N99FhaqdfhLe0fUEFOfMPvmOIgLhxnDY5mJAg=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzqT1SC93uOPLy6m8Pmvyid+s7chBXmzRtLYzIMC4Z3iLoKLDoG
-	G1nPt7x70dYnbo6VhlhsucXmCmqYkD+0oaznv1qcHb2ebCnuKs545MT5jfHqUIrTlVlcYW7sMtf
-	sYL24uWbrG9O5XvnbtJofOcFY2LqgHBTX/zfr2kMIoawwugYnH6iJDw==
-X-Received: by 2002:a05:6a21:394a:b0:1d6:d2cb:1998 with SMTP id adf61e73a8af0-1d8a3c20781mr1878294637.22.1728447129690;
-        Tue, 08 Oct 2024 21:12:09 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGwN+fTlwoHHbhn40dcTUiTDemBzl2n0N+Z4SeZmeh2YhQva4x/MfDPtJ7gb8mD4oNZt5veow==
-X-Received: by 2002:a05:6a21:394a:b0:1d6:d2cb:1998 with SMTP id adf61e73a8af0-1d8a3c20781mr1878175637.22.1728447127940;
-        Tue, 08 Oct 2024 21:12:07 -0700 (PDT)
+        bh=ymX19yxGKNcPPZT9dbIlT7LvMSHhqQQCw6kliOcG++o=;
+        b=RFYqHkDdY1NUcY8UbTCfqXexMPSNW2ZAQJfTccn/0MDRIpyxb+4mVh3/71OT3jzLBA
+         t+7gJx/+Nwd7aFFx+MvQYWdOLX51dbo+4XBPQohLhTlvnt2X1Jj+m4jia2vsgLEYyDNz
+         3fQFNJ8FlVe37HNPwtQIXKsrnPjJLDE2A1sgvRqhMrDQCMvLVp8xTbtS4rzQYRjTFopV
+         HOgDxwfPzofGsRanYqEMbhJFCO9qJ3e/sOozwgHMwsmx4uA2ZmmhavD+AJ8+OSylJMjS
+         vcUk6ETJJZZ6ofLXbO78slceZfMjYbyTeyZFnkxyTwDXRbbvZg/agaNrZYVQF/rm+mu2
+         4Ouw==
+X-Forwarded-Encrypted: i=1; AJvYcCUXW/74HOr/PO0Pa0/ww1GnIPSFN2igUqn5DXVXkgmYhau5r2jK6QouSphAQsGaZCmHYrlGea4=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwYF0zZLUtMoM54IyjPK5VTfif3hu90gmqh+lyRwMhVyt943kso
+	qgv1EiYsq5dVVd4+C2GtbLmXJDEAfqWslFL5B22GpUGhilWV2dHYL+6SHbeyMjldPSuMaxEP599
+	AwuecFRkQYQ0aZqj2bKIv90MEiVXh90zJ15nxHdse4kG0j6IBlzsf9A==
+X-Received: by 2002:a17:90a:f0c6:b0:2e0:7e80:2013 with SMTP id 98e67ed59e1d1-2e2a2578abemr1740883a91.38.1728453024126;
+        Tue, 08 Oct 2024 22:50:24 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHHPLj8B4geOM4Lg3iZurhkPCvU+Nn9za7W4Emb4G50Z5/U3Z1RUlAVfpPuJ4P+IyR9FEZ/ig==
+X-Received: by 2002:a17:90a:f0c6:b0:2e0:7e80:2013 with SMTP id 98e67ed59e1d1-2e2a2578abemr1740858a91.38.1728453023800;
+        Tue, 08 Oct 2024 22:50:23 -0700 (PDT)
 Received: from [192.168.68.54] ([43.252.112.159])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7e9f6c4a1a8sm7522130a12.93.2024.10.08.21.12.02
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e2a5aabbb1sm661909a91.35.2024.10.08.22.50.18
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Oct 2024 21:12:07 -0700 (PDT)
-Message-ID: <f2ddc184-fdf8-4281-b8a2-c2ea5a35b447@redhat.com>
-Date: Wed, 9 Oct 2024 14:12:00 +1000
+        Tue, 08 Oct 2024 22:50:23 -0700 (PDT)
+Message-ID: <b82215a0-f4e0-4073-86f6-09526f5dfc8f@redhat.com>
+Date: Wed, 9 Oct 2024 15:50:16 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -67,8 +67,7 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 2/7] arm64/sysreg: Convert existing MPAM sysregs and
- add the remaining entries
+Subject: Re: [PATCH v4 3/7] arm64: cpufeature: discover CPU support for MPAM
 To: Joey Gouly <joey.gouly@arm.com>, linux-arm-kernel@lists.infradead.org,
  kvmarm@lists.linux.dev
 Cc: anshuman.khandual@arm.com, james.morse@arm.com,
@@ -78,9 +77,9 @@ Cc: anshuman.khandual@arm.com, james.morse@arm.com,
  Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
  Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
 References: <20241004110714.2051604-1-joey.gouly@arm.com>
- <20241004110714.2051604-3-joey.gouly@arm.com>
+ <20241004110714.2051604-4-joey.gouly@arm.com>
 From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20241004110714.2051604-3-joey.gouly@arm.com>
+In-Reply-To: <20241004110714.2051604-4-joey.gouly@arm.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
@@ -90,246 +89,72 @@ Content-Transfer-Encoding: 7bit
 On 10/4/24 9:07 PM, Joey Gouly wrote:
 > From: James Morse <james.morse@arm.com>
 > 
-> Move the existing MPAM system register defines from sysreg.h to
-> tools/sysreg and add the remaining system registers.
+> ARMv8.4 adds support for 'Memory Partitioning And Monitoring' (MPAM)
+> which describes an interface to cache and bandwidth controls wherever
+> they appear in the system.
+> 
+> Add support to detect MPAM. Like SVE, MPAM has an extra id register that
+> describes some more properties, including the virtualisation support,
+> which is optional. Detect this separately so we can detect
+> mismatched/insane systems, but still use MPAM on the host even if the
+> virtualisation support is missing.
+> 
+> MPAM needs enabling at the highest implemented exception level, otherwise
+> the register accesses trap. The 'enabled' flag is accessible to lower
+> exception levels, but its in a register that traps when MPAM isn't enabled.
+> The cpufeature 'matches' hook is extended to test this on one of the
+> CPUs, so that firmware can emulate MPAM as disabled if it is reserved
+> for use by secure world.
+> 
+> Secondary CPUs that appear late could trip cpufeature's 'lower safe'
+> behaviour after the MPAM properties have been advertised to user-space.
+> Add a verify call to ensure late secondaries match the existing CPUs.
+> 
+> (If you have a boot failure that bisects here its likely your CPUs
+> advertise MPAM in the id registers, but firmware failed to either enable
+> or MPAM, or emulate the trap as if it were disabled)
 > 
 > Signed-off-by: James Morse <james.morse@arm.com>
 > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
 > ---
->   arch/arm64/include/asm/sysreg.h |  12 ---
->   arch/arm64/tools/sysreg         | 166 ++++++++++++++++++++++++++++++++
->   2 files changed, 166 insertions(+), 12 deletions(-)
+> Changes since v3:
+>   * A proper conversion to sysreg
+> ---
+>   .../arch/arm64/cpu-feature-registers.rst      |  2 +
+>   arch/arm64/Kconfig                            | 20 ++++
+>   arch/arm64/include/asm/cpu.h                  |  1 +
+>   arch/arm64/include/asm/cpucaps.h              |  2 +
+>   arch/arm64/include/asm/cpufeature.h           | 12 +++
+>   arch/arm64/include/asm/mpam.h                 | 32 ++++++
+>   arch/arm64/kernel/Makefile                    |  2 +
+>   arch/arm64/kernel/cpufeature.c                | 97 +++++++++++++++++++
+>   arch/arm64/kernel/cpuinfo.c                   |  4 +
+>   arch/arm64/kernel/mpam.c                      |  8 ++
+>   arch/arm64/tools/cpucaps                      |  1 +
+>   11 files changed, 181 insertions(+)
+>   create mode 100644 arch/arm64/include/asm/mpam.h
+>   create mode 100644 arch/arm64/kernel/mpam.c
 > 
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index 9ea97dddefc4..345e81e0d2b3 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -542,18 +542,6 @@
->   
->   #define SYS_MAIR_EL2			sys_reg(3, 4, 10, 2, 0)
->   #define SYS_AMAIR_EL2			sys_reg(3, 4, 10, 3, 0)
-> -#define SYS_MPAMHCR_EL2			sys_reg(3, 4, 10, 4, 0)
-> -#define SYS_MPAMVPMV_EL2		sys_reg(3, 4, 10, 4, 1)
-> -#define SYS_MPAM2_EL2			sys_reg(3, 4, 10, 5, 0)
-> -#define __SYS__MPAMVPMx_EL2(x)		sys_reg(3, 4, 10, 6, x)
-> -#define SYS_MPAMVPM0_EL2		__SYS__MPAMVPMx_EL2(0)
-> -#define SYS_MPAMVPM1_EL2		__SYS__MPAMVPMx_EL2(1)
-> -#define SYS_MPAMVPM2_EL2		__SYS__MPAMVPMx_EL2(2)
-> -#define SYS_MPAMVPM3_EL2		__SYS__MPAMVPMx_EL2(3)
-> -#define SYS_MPAMVPM4_EL2		__SYS__MPAMVPMx_EL2(4)
-> -#define SYS_MPAMVPM5_EL2		__SYS__MPAMVPMx_EL2(5)
-> -#define SYS_MPAMVPM6_EL2		__SYS__MPAMVPMx_EL2(6)
-> -#define SYS_MPAMVPM7_EL2		__SYS__MPAMVPMx_EL2(7)
->   
->   #define SYS_VBAR_EL2			sys_reg(3, 4, 12, 0, 0)
->   #define SYS_RVBAR_EL2			sys_reg(3, 4, 12, 0, 1)
-> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> index 8d637ac4b7c6..73243cfca2d2 100644
-> --- a/arch/arm64/tools/sysreg
-> +++ b/arch/arm64/tools/sysreg
-> @@ -2737,6 +2737,126 @@ Field	1	E2SPE
->   Field	0	E0HSPE
->   EndSysreg
->   
-> +Sysreg	MPAMHCR_EL2	3	4	10	4	0
-> +Res0	63:32
-> +Field	31	TRAP_MPAMIDR_EL1
-> +Res0	30:9
-> +Field	8	GSTAPP_PLK
-> +Res0	7:2
-> +Field	1	EL1_VPMEN
-> +Field	0	EL0_VPMEN
-> +EndSysreg
-> +
-> +Sysreg	MPAMVPMV_EL2	3	4	10	4	1
-> +Res0	63:32
-> +Field	31	VPM_V31
-> +Field	30	VPM_V30
-> +Field	29	VPM_V29
-> +Field	28	VPM_V28
-> +Field	27	VPM_V27
-> +Field	26	VPM_V26
-> +Field	25	VPM_V25
-> +Field	24	VPM_V24
-> +Field	23	VPM_V23
-> +Field	22	VPM_V22
-> +Field	21	VPM_V21
-> +Field	20	VPM_V20
-> +Field	19	VPM_V19
-> +Field	18	VPM_V18
-> +Field	17	VPM_V17
-> +Field	16	VPM_V16
-> +Field	15	VPM_V15
-> +Field	14	VPM_V14
-> +Field	13	VPM_V13
-> +Field	12	VPM_V12
-> +Field	11	VPM_V11
-> +Field	10	VPM_V10
-> +Field	9	VPM_V9
-> +Field	8	VPM_V8
-> +Field	7	VPM_V7
-> +Field	6	VPM_V6
-> +Field	5	VPM_V5
-> +Field	4	VPM_V4
-> +Field	3	VPM_V3
-> +Field	2	VPM_V2
-> +Field	1	VPM_V1
-> +Field	0	VPM_V0
-> +EndSysreg
-> +
-> +Sysreg	MPAM2_EL2	3	4	10	5	0
-> +Field	63	MPAMEN
-> +Res0	62:59
-> +Field	58	TIDR
-> +Res0	57
-> +Field	56	ALTSP_HFC
-> +Field	55	ALTSP_EL2
-> +Field	54	ALTSP_FRCD
-> +Res0	53:51
-> +Field	50	EnMPAMSM
-> +Field	49	TRAPMPAM0EL1
-> +Field	48	TRAPMPAM1EL1
-> +Field	47:40	PMG_D
-> +Field	39:32	PMG_I
-> +Field	31:16	PARTID_D
-> +Field	15:0	PARTID_I
-> +EndSysreg
-> +
-> +Sysreg	MPAMVPM0_EL2	3	4	10	6	0
-> +Field	63:48	PhyPARTID3
-> +Field	47:32	PhyPARTID2
-> +Field	31:16	PhyPARTID1
-> +Field	15:0	PhyPARTID0
-> +EndSysreg
-> +
-> +Sysreg	MPAMVPM1_EL2	3	4	10	6	1
-> +Field	63:48	PhyPARTID7
-> +Field	47:32	PhyPARTID6
-> +Field	31:16	PhyPARTID5
-> +Field	15:0	PhyPARTID4
-> +EndSysreg
-> +
-> +Sysreg	MPAMVPM2_EL2	3	4	10	6	2
-> +Field	63:48	PhyPARTID11
-> +Field	47:32	PhyPARTID10
-> +Field	31:16	PhyPARTID9
-> +Field	15:0	PhyPARTID8
-> +EndSysreg
-> +
-> +Sysreg	MPAMVPM3_EL2	3	4	10	6	3
-> +Field	63:48	PhyPARTID15
-> +Field	47:32	PhyPARTID14
-> +Field	31:16	PhyPARTID13
-> +Field	15:0	PhyPARTID12
-> +EndSysreg
-> +
-> +Sysreg	MPAMVPM4_EL2	3	4	10	6	4
-> +Field	63:48	PhyPARTID19
-> +Field	47:32	PhyPARTID18
-> +Field	31:16	PhyPARTID17
-> +Field	15:0	PhyPARTID16
-> +EndSysreg
-> +
-> +Sysreg	MPAMVPM5_EL2	3	4	10	6	5
-> +Field	63:48	PhyPARTID23
-> +Field	47:32	PhyPARTID22
-> +Field	31:16	PhyPARTID21
-> +Field	15:0	PhyPARTID20
-> +EndSysreg
-> +
-> +Sysreg	MPAMVPM6_EL2	3	4	10	6	6
-> +Field	63:48	PhyPARTID27
-> +Field	47:32	PhyPARTID26
-> +Field	31:16	PhyPARTID25
-> +Field	15:0	PhyPARTID24
-> +EndSysreg
-> +
-> +Sysreg	MPAMVPM7_EL2	3	4	10	6	7
-> +Field	63:48	PhyPARTID31
-> +Field	47:32	PhyPARTID30
-> +Field	31:16	PhyPARTID29
-> +Field	15:0	PhyPARTID28
-> +EndSysreg
-> +
->   Sysreg	CONTEXTIDR_EL2	3	4	13	0	1
->   Fields	CONTEXTIDR_ELx
->   EndSysreg
-> @@ -2769,6 +2889,10 @@ Sysreg	FAR_EL12	3	5	6	0	0
->   Field	63:0	ADDR
->   EndSysreg
->   
-> +Sysreg	MPAM1_EL12	3	5	10	5	0
-> +Fields	MPAM1_ELx
-> +EndSysreg
-> +
->   Sysreg	CONTEXTIDR_EL12	3	5	13	0	1
->   Fields	CONTEXTIDR_ELx
->   EndSysreg
-> @@ -2941,6 +3065,22 @@ Res0	1
->   Field	0	EN
->   EndSysreg
->   
-> +Sysreg	MPAMIDR_EL1	3	0	10	4	4
-> +Res0	63:62
-> +Field	61	HAS_SDEFLT
-> +Field	60	HAS_FORCE_NS
-> +Field	59	SP4
-> +Field	58	HAS_TIDR
-> +Field	57	HAS_ALTSP
-> +Res0	56:40
-> +Field	39:32	PMG_MAX
-> +Res0	31:21
-> +Field	20:18	VPMR_MAX
-> +Field	17	HAS_HCR
-> +Res0	16
-> +Field	15:0	PARTID_MAX
-> +EndSysreg
-> +
->   Sysreg	LORID_EL1	3	0	10	4	7
->   Res0	63:24
->   Field	23:16	LD
-> @@ -2948,6 +3088,32 @@ Res0	15:8
->   Field	7:0	LR
->   EndSysreg
->   
-> +Sysreg	MPAM1_EL1	3	0	10	5	0
-> +Field	63	MPAMEN
-> +Res0	62:59
-> +Field	58	TIDR
-> +Res0	57
-> +Field	56	ALTSP_HFC
-> +Field	55	ALTSP_EL2
-> +Field	54	ALTSP_FRCD
-> +Res0	53:51
-> +Field	50	EnMPAMSM
-> +Field	49	TRAPMPAM0EL1
-> +Field	48	TRAPMPAM1EL1
-> +Field	47:40	PMG_D
-> +Field	39:32	PMG_I
-> +Field	31:16	PARTID_D
-> +Field	15:0	PARTID_I
-> +EndSysreg
-> +
 
-The layout of SYS_MPAM1_EL1 is exactly same to that of SYS_MPAM2_EL2, is it
-intentional or a mistake, even SYS_MPAM1_EL1 is the alias to SYS_MPAM2_EL2
-when HCR_EL2.E2H is set?
+[...]
 
-> +Sysreg	MPAM0_EL1	3	0	10	5	1
-> +Res0	63:48
-> +Field	47:40	PMG_D
-> +Field	39:32	PMG_I
-> +Field	31:16	PARTID_D
-> +Field	15:0	PARTID_I
-> +EndSysreg
+> diff --git a/arch/arm64/kernel/mpam.c b/arch/arm64/kernel/mpam.c
+> new file mode 100644
+> index 000000000000..a29dc58c2da5
+> --- /dev/null
+> +++ b/arch/arm64/kernel/mpam.c
+> @@ -0,0 +1,8 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/* Copyright (C) 2021 Arm Ltd. */
 > +
+> +#include <asm/mpam.h>
+> +
+> +#include <linux/jump_label.h>
+> +
+> +DEFINE_STATIC_KEY_FALSE(arm64_mpam_has_hcr);
 
-Shall we add the definition for SYS_MPAMSM_EL1, which is visible in section
-D23.12 of "ARM DDI 0487K.a"?
-
->   Sysreg	ISR_EL1	3	0	12	1	0
->   Res0	63:11
->   Field	10	IS
+linux/jump_label.h has been included to asm/mpam.h. So we needn't include
+it again.
 
 Thanks,
 Gavin
