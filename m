@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFDA41E7666;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFE051E7674;
 	Wed,  9 Oct 2024 19:00:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728500449; cv=none; b=ZgYjdS3UT6uao13Np62txiBy31CcIwRuzXb9RosJBc2FHmtpiu4302jfZOv0jvKpMKK/anQjVnv/wjocElfRRwU/c8u+rjzY1uq1TB1DGy/GocHILX7r7tgbL+TLvSL9Cn77FcnhpKRupUg3/DrwcvN5GllLWYAWV5jlH+J6Ljc=
+	t=1728500449; cv=none; b=XfA6N2SsKEN8578PV7505ZWd0iAvuNflfLePJdGlXujOfsfd5IrYA5vmjXRYYa79H2LTHm+7U0nRZ34de+/V1gFN0pZL0ohTXtwDaR/o1dqS+VjnASmWdumay2pCOopP6+PzZpZLOkzThhPYr2uJ++Pv9X5Wqq45askt0f9fbE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1728500449; c=relaxed/simple;
-	bh=+8vm5dNrdovwWsJnrJSyy78fRkPIEdrRZEaDCkYUE/I=;
+	bh=WLG6aiuNN/mgMCljFrWmlIWIhDcWjA7d1uKxmA7beSk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Y1u5Q8e/HyahAhiQ718isDYu6Kv5Re7ElZ8qhji5auO3FHL/QUF6AF/88iroohTpg6npHgq3C7mi+k3GtJVnFOJy4f24/bK/wcg4KPW639bEl+66XlDYlnFwCZVidw98qqiPPVv7Hg2tLCcPChkOc47EmP2qKwZtojJlXB6Nz0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=be6VzLdy; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=J233ga7eHKShf3lyRfUoX0adb++KpF3Op321PsIpFmCoB9Mi3+LXHHaWLtguUTH0cHh47bx0YR15ZRHnPQcf/yG2wdgaWCCY6zX/5XGf51PwldtV1c2KYZlHUFxZBWejQkVcIL+/H8gntZSRK/KdDUBQfEMBMvg9eoI+TGnwqMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AwZt04Fp; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="be6VzLdy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2EF4C4CED2;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AwZt04Fp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 638C3C4CECC;
 	Wed,  9 Oct 2024 19:00:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1728500448;
-	bh=+8vm5dNrdovwWsJnrJSyy78fRkPIEdrRZEaDCkYUE/I=;
+	bh=WLG6aiuNN/mgMCljFrWmlIWIhDcWjA7d1uKxmA7beSk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=be6VzLdyY3rHVBcAtm8YClGQH1gcGlepwg4oACIlOb6Ecyb4so8iYQqa8PCYna7uq
-	 jYdMeJuibP8CVFeW23s3pOQxZxq1J40bxEE+yCgDj+VHDEU9Xig6b4VnZA2MfJKYdO
-	 lZJ2oTOZsiu8GG+ap+tDGIyyE8NRJZPiJ9Z5tc0WK7qHu5KEdiP9/aCs1UCTD/2NFP
-	 efsqQCyCy0jiokrdqUe1rJWBP6prcanf/cYrnFOopyGJuFrGK6Z+AnahxqFHiMpTxo
-	 Okn//tC5Q3oxFWKSj5/3SfE8pDelsk9MwSsOtg3zgfW2oCJSSiAj2AqxTxq7PPfUsK
-	 Ou+8zmhQhAMIw==
+	b=AwZt04FpE9AG4PEy6iy5yofEbh1Wa5ZEYHiJB0LivOhzxXf4orGcmMW9/a55++XCq
+	 U9/qaBmpsJhH7gB8UJa/6hpAmJYhlgny1/IPnE3UK+scJkCCDfJtVMZ5fWjFLzG79Y
+	 5rWHDJR2sWyDFEbhfkGlMGqi2EabxXXQ6zIshzMTnqMVvfnHelaZxKSXIKYPg0VdAY
+	 lXnpPyDYFPiErY35fJ87EVYMY1GanRgfVWVBKkbg0QOwONqltZajNsfdJLFebKhiLA
+	 u2rPtKN9RmfGRV4tQXR8itKdZ3udrutC7rypCyu73QKIZWmCr9sTpBcgfuZthfDYP3
+	 CIulrWmYh9Kcw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sybvT-001wcY-0e;
-	Wed, 09 Oct 2024 20:00:47 +0100
+	id 1sybvS-001wcY-Ii;
+	Wed, 09 Oct 2024 20:00:46 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -42,9 +42,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v4 30/36] KVM: arm64: Add basic support for POR_EL2
-Date: Wed,  9 Oct 2024 20:00:13 +0100
-Message-Id: <20241009190019.3222687-31-maz@kernel.org>
+Subject: [PATCH v4 28/36] KVM: arm64: Drop bogus CPTR_EL2.E0POE trap routing
+Date: Wed,  9 Oct 2024 20:00:11 +0100
+Message-Id: <20241009190019.3222687-29-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20241009190019.3222687-1-maz@kernel.org>
 References: <20241009190019.3222687-1-maz@kernel.org>
@@ -60,81 +60,52 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-S1POE support implies support for POR_EL2, which  we provide by
+It took me some time to realise it, but CPTR_EL2.E0POE does not
+apply to a guest, only to EL0 when InHost(). And when InHost(),
+CPCR_EL2 is mapped to CPACR_EL1, maning that the E0POE bit naturally
+takes effect without any trap.
 
-- adding it to the vcpu_sysreg enum
-- advertising it as mapped to its EL1 counterpart in get_el2_to_el1_mapping
-- wiring it in the sys_reg_desc table with the correct visibility
-- handling POR_EL1 in __vcpu_{read,write}_sys_reg_from_cpu()
+To sum it up, this trap bit is better left ignored, we will never
+have to hanedle it.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h | 3 +++
- arch/arm64/kvm/sys_regs.c         | 9 +++++++++
- 2 files changed, 12 insertions(+)
+ arch/arm64/kvm/emulate-nested.c | 8 --------
+ 1 file changed, 8 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 9a6997827ad49..c6ac6a1ea1ec5 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -473,6 +473,7 @@ enum vcpu_sysreg {
- 	TCR_EL2,	/* Translation Control Register (EL2) */
- 	PIRE0_EL2,	/* Permission Indirection Register 0 (EL2) */
- 	PIR_EL2,	/* Permission Indirection Register 1 (EL2) */
-+	POR_EL2,	/* Permission Overlay Register 2 (EL2) */
- 	SPSR_EL2,	/* EL2 saved program status register */
- 	ELR_EL2,	/* EL2 exception link register */
- 	AFSR0_EL2,	/* Auxiliary Fault Status Register 0 (EL2) */
-@@ -1043,6 +1044,7 @@ static inline bool __vcpu_read_sys_reg_from_cpu(int reg, u64 *val)
- 	case TCR2_EL1:		*val = read_sysreg_s(SYS_TCR2_EL12);	break;
- 	case PIR_EL1:		*val = read_sysreg_s(SYS_PIR_EL12);	break;
- 	case PIRE0_EL1:		*val = read_sysreg_s(SYS_PIRE0_EL12);	break;
-+	case POR_EL1:		*val = read_sysreg_s(SYS_POR_EL12);	break;
- 	case ESR_EL1:		*val = read_sysreg_s(SYS_ESR_EL12);	break;
- 	case AFSR0_EL1:		*val = read_sysreg_s(SYS_AFSR0_EL12);	break;
- 	case AFSR1_EL1:		*val = read_sysreg_s(SYS_AFSR1_EL12);	break;
-@@ -1092,6 +1094,7 @@ static inline bool __vcpu_write_sys_reg_to_cpu(u64 val, int reg)
- 	case TCR2_EL1:		write_sysreg_s(val, SYS_TCR2_EL12);	break;
- 	case PIR_EL1:		write_sysreg_s(val, SYS_PIR_EL12);	break;
- 	case PIRE0_EL1:		write_sysreg_s(val, SYS_PIRE0_EL12);	break;
-+	case POR_EL1:		write_sysreg_s(val, SYS_POR_EL12);	break;
- 	case ESR_EL1:		write_sysreg_s(val, SYS_ESR_EL12);	break;
- 	case AFSR0_EL1:		write_sysreg_s(val, SYS_AFSR0_EL12);	break;
- 	case AFSR1_EL1:		write_sysreg_s(val, SYS_AFSR1_EL12);	break;
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 6c20de8607b2d..c9d8450e51fcd 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -137,6 +137,7 @@ static bool get_el2_to_el1_mapping(unsigned int reg,
- 		MAPPED_EL2_SYSREG(TCR2_EL2,    TCR2_EL1,    NULL	     );
- 		MAPPED_EL2_SYSREG(PIR_EL2,     PIR_EL1,     NULL	     );
- 		MAPPED_EL2_SYSREG(PIRE0_EL2,   PIRE0_EL1,   NULL	     );
-+		MAPPED_EL2_SYSREG(POR_EL2,     POR_EL1,     NULL	     );
- 		MAPPED_EL2_SYSREG(AMAIR_EL2,   AMAIR_EL1,   NULL	     );
- 		MAPPED_EL2_SYSREG(ELR_EL2,     ELR_EL1,	    NULL	     );
- 		MAPPED_EL2_SYSREG(SPSR_EL2,    SPSR_EL1,    NULL	     );
-@@ -2322,6 +2323,12 @@ static unsigned int s1poe_visibility(const struct kvm_vcpu *vcpu,
- 	return REG_HIDDEN;
- }
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index 05b6435d02a97..ddcbaa983de36 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -79,7 +79,6 @@ enum cgt_group_id {
+ 	CGT_MDCR_E2TB,
+ 	CGT_MDCR_TDCC,
  
-+static unsigned int s1poe_el2_visibility(const struct kvm_vcpu *vcpu,
-+					 const struct sys_reg_desc *rd)
-+{
-+	return __el2_visibility(vcpu, rd, s1poe_visibility);
-+}
-+
- static unsigned int tcr2_visibility(const struct kvm_vcpu *vcpu,
- 				    const struct sys_reg_desc *rd)
- {
-@@ -2909,6 +2916,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 			 s1pie_el2_visibility),
- 	EL2_REG_FILTERED(PIR_EL2, access_rw, reset_val, 0,
- 			 s1pie_el2_visibility),
-+	EL2_REG_FILTERED(POR_EL2, access_rw, reset_val, 0,
-+			 s1poe_el2_visibility),
- 	EL2_REG(AMAIR_EL2, access_rw, reset_val, 0),
+-	CGT_CPACR_E0POE,
+ 	CGT_CPTR_TAM,
+ 	CGT_CPTR_TCPAC,
  
- 	EL2_REG(VBAR_EL2, access_rw, reset_val, 0),
+@@ -362,12 +361,6 @@ static const struct trap_bits coarse_trap_bits[] = {
+ 		.mask		= MDCR_EL2_TDCC,
+ 		.behaviour	= BEHAVE_FORWARD_ANY,
+ 	},
+-	[CGT_CPACR_E0POE] = {
+-		.index		= CPTR_EL2,
+-		.value		= CPACR_ELx_E0POE,
+-		.mask		= CPACR_ELx_E0POE,
+-		.behaviour	= BEHAVE_FORWARD_ANY,
+-	},
+ 	[CGT_CPTR_TAM] = {
+ 		.index		= CPTR_EL2,
+ 		.value		= CPTR_EL2_TAM,
+@@ -1141,7 +1134,6 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
+ 	SR_TRAP(SYS_AMEVTYPER1_EL0(13),	CGT_CPTR_TAM),
+ 	SR_TRAP(SYS_AMEVTYPER1_EL0(14),	CGT_CPTR_TAM),
+ 	SR_TRAP(SYS_AMEVTYPER1_EL0(15),	CGT_CPTR_TAM),
+-	SR_TRAP(SYS_POR_EL0,		CGT_CPACR_E0POE),
+ 	/* op0=2, op1=1, and CRn<0b1000 */
+ 	SR_RANGE_TRAP(sys_reg(2, 1, 0, 0, 0),
+ 		      sys_reg(2, 1, 7, 15, 7), CGT_CPTR_TTA),
 -- 
 2.39.2
 
