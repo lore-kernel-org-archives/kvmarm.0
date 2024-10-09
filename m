@@ -1,147 +1,155 @@
-Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 462947DA76
-	for <kvmarm@lists.linux.dev>; Tue,  8 Oct 2024 20:32:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADCB01C68F
+	for <kvmarm@lists.linux.dev>; Wed,  9 Oct 2024 03:59:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728419548; cv=none; b=k3i1MyoibQgA7vA6JUNoHHMJnA05UyUTUl7tWMhSmxqbCwzV2yITs2YBGvAtXUWA/SUQc8DYZmYBdjEOQ4XkKV2PuUMRtIpqTdaGd096cRLtOHPZqZ1iOpneZG8PKq2o898jIqKexqvcFAN21y+gCxLtOmL9dswb8HkwAQvRHpk=
+	t=1728446365; cv=none; b=EmeZfOAEKJjLCOZm2K/bqp1crLCaQPX1alNRmPbMvelMRJhWEKpdIJndGV684URFL2ISSqgKHeJJmy47gvOxCAU3rsFoz1T+p05QsbTwvKJ4UpDGR2pcqrqyT7ENvVrif6mwp6keKzeBpt/TTCQtsRniHMmGfH0TvjlekZs/3QU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728419548; c=relaxed/simple;
-	bh=jdvT/l3GIBbx9cRaKqBLFcB1lZvvW12UILwwbY0Yi6M=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VADuC8R3Lyxb36CXWRTmTV5k/TKV+ZqVd/g/F6VwBO3nns/wJ1Xf9d8UDcmrOyqzFKPgRtfNX9R/Y/+dVzkL4M4oljp0yiXAqf1uE49pD+3JgHz1TQ+9+n0DOoOhh5FZBZ7823blhGyVyYbPQS5FoSynoRQGUB9zxkap5hbDnfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b=OLAdtR9k; arc=none smtp.client-ip=52.119.213.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
+	s=arc-20240116; t=1728446365; c=relaxed/simple;
+	bh=bffiJ29RRTw1gznKIWIUPxvqEhykXZbk7YMVWrIO8+o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hCjGHPQDQ9MsaDymqbv1xgDcUd6p15+kWEPQei+KlRsBFXGssWMXWQw1HR9VLh1/nlfDTJPpYizGPYMvSAGvAB0zj8ofqqgPEHvuFNre9Wp2GzYybRRmiWY82BgdJedyEpvQM5VkemWPFm2YoSBN+NOwE7VsPXwvl+TKTigdKgw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZWouHIKa; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b="OLAdtR9k"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1728419546; x=1759955546;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=jdvT/l3GIBbx9cRaKqBLFcB1lZvvW12UILwwbY0Yi6M=;
-  b=OLAdtR9kiVKz9pnjUQJX8Xh+uDTWZZGQxSc6DcQMConnMMoP5fixsCZC
-   TeFtpieiYiaif72aHQSbY6H6NpSFp6A2Oq8GNCrnkUQuCplRcDNwhpJ15
-   nDJQBiWJrgUthTN9jvpOs0PZ+aKVbxaVfq9rF3UiPbh9tMNtsFvjlAUy4
-   U=;
-X-IronPort-AV: E=Sophos;i="6.11,188,1725321600"; 
-   d="scan'208";a="686078738"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2024 20:32:22 +0000
-Received: from EX19MTAEUB001.ant.amazon.com [10.0.43.254:21486]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.45.76:2525] with esmtp (Farcaster)
- id 1d7b4ef1-3508-4a12-b398-40fd11dd0028; Tue, 8 Oct 2024 20:32:20 +0000 (UTC)
-X-Farcaster-Flow-ID: 1d7b4ef1-3508-4a12-b398-40fd11dd0028
-Received: from EX19D007EUB004.ant.amazon.com (10.252.51.85) by
- EX19MTAEUB001.ant.amazon.com (10.252.51.26) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 8 Oct 2024 20:32:20 +0000
-Received: from EX19MTAUEC001.ant.amazon.com (10.252.135.222) by
- EX19D007EUB004.ant.amazon.com (10.252.51.85) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Tue, 8 Oct 2024 20:32:19 +0000
-Received: from email-imr-corp-prod-iad-all-1b-8410187a.us-east-1.amazon.com
- (10.43.8.6) by mail-relay.amazon.com (10.252.135.200) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
- 15.2.1258.34 via Frontend Transport; Tue, 8 Oct 2024 20:32:19 +0000
-Received: from dev-dsk-faresx-1b-27755bf1.eu-west-1.amazon.com (dev-dsk-faresx-1b-27755bf1.eu-west-1.amazon.com [10.253.79.181])
-	by email-imr-corp-prod-iad-all-1b-8410187a.us-east-1.amazon.com (Postfix) with ESMTPS id 2E0CA406CD;
-	Tue,  8 Oct 2024 20:32:17 +0000 (UTC)
-From: Fares Mehanna <faresx@amazon.de>
-To: <jeffxu@chromium.org>
-CC: <akpm@linux-foundation.org>, <ardb@kernel.org>, <arnd@arndb.de>,
-	<bhelgaas@google.com>, <broonie@kernel.org>, <catalin.marinas@arm.com>,
-	<david@redhat.com>, <faresx@amazon.de>, <james.morse@arm.com>,
-	<javierm@redhat.com>, <jean-philippe@linaro.org>, <joey.gouly@arm.com>,
-	<keescook@chromium.org>, <kristina.martsenko@arm.com>,
-	<kvmarm@lists.linux.dev>, <liam.howlett@oracle.com>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<linux-mm@kvack.org>, <mark.rutland@arm.com>, <maz@kernel.org>,
-	<nh-open-source@amazon.com>, <oliver.upton@linux.dev>, <ptosi@google.com>,
-	<rdunlap@infradead.org>, <rkagan@amazon.de>, <rppt@kernel.org>,
-	<shikemeng@huaweicloud.com>, <suzuki.poulose@arm.com>, <tabba@google.com>,
-	<will@kernel.org>, <yuzenghui@huawei.com>
-Subject: Re: [RFC PATCH 1/7] mseal: expose interface to seal / unseal user memory ranges
-Date: Tue, 8 Oct 2024 20:31:48 +0000
-Message-ID: <20241008203148.71580-1-faresx@amazon.de>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <CABi2SkWrQOdxdai7YLoYKKc6GAwxue=jc+bH1=CgE-bKRO-GhA@mail.gmail.com>
-References: <CABi2SkWrQOdxdai7YLoYKKc6GAwxue=jc+bH1=CgE-bKRO-GhA@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZWouHIKa"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1728446362;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cYfnpdnpDhaDHET1qTxR+asRwAv8qKJ2BIt8nlF0EeE=;
+	b=ZWouHIKaW1+PbZZVFBEkMthymsz++0gY9LjSwqcg7eWTL2/aFi5Ri8sfSzRvsxe0bv6j9d
+	SrOM+yWy6yYQ05+lfePc3qWPT/6TzHqtoJCcSbIIHcHJ0ivanlbYc5fGN9wOaW0QgJ+mCb
+	xPzEDcqAvQZ0u1Q7NHzvX3s3gT4DmCc=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-597-QVrfL9FfNhmaf8WNHTscNg-1; Tue, 08 Oct 2024 23:59:19 -0400
+X-MC-Unique: QVrfL9FfNhmaf8WNHTscNg-1
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2e295559c37so753478a91.0
+        for <kvmarm@lists.linux.dev>; Tue, 08 Oct 2024 20:59:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728446358; x=1729051158;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cYfnpdnpDhaDHET1qTxR+asRwAv8qKJ2BIt8nlF0EeE=;
+        b=kZn69ls+0dn9ufgtLIZTqN+4+qlQni+X6EVu9gKRHx6GPha/rYIyc4t+YWiQNopw6E
+         Q5NYhHahFVWE3AgVpxrfsj5kU4HTJfNSoFOHm9aBjB12CRHmsRWjOLbusrTliLEvQS8f
+         PT0aM3L5LX9VHKt9yK4pYJ/flNQukAJ6HtfUJW20uA9YYMWRtp6EqBvga2yuZaCIVY38
+         WbWjbk/gmAGP5ZcvQGG0EA2YVKVnPZXD9SvPWOvGees9wtKRe+0L8+u4PWdMIS8Iqnre
+         TN0vYYqTvZBYyuKr9e7YyYky4s1sTIMeyRE77NqpzS56X8I2l2yMMyjdgsoOKojbqGuB
+         oXyA==
+X-Forwarded-Encrypted: i=1; AJvYcCVU75rfHgB5GUrwcHTOzvPLgWeMp1WjcGoYMS9sjInQlSfLvt7d0VPLNCn0cyvHKIDPSBbXgK0=@lists.linux.dev
+X-Gm-Message-State: AOJu0YybIF5UfVTqSRMa6+Nu6LaFA+7iCAj/NFSiHqnlM+gBwBrjqtl7
+	NEUqk+EO3nL8GwJt8poh9t7kFLKZIACU/1JYrpGR1fmTBuLX0t7CuShmDEgQCnE9lzMpQLPEkjh
+	YxDBxcvlUqN0CoAwA+MWfc6g1CoA82eMFZBHfJB27lG2s6V1LPTx6Xg==
+X-Received: by 2002:a17:90a:8a07:b0:2e2:9522:279d with SMTP id 98e67ed59e1d1-2e2a252b9fdmr1471910a91.29.1728446358383;
+        Tue, 08 Oct 2024 20:59:18 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGsLgq/HbP8ucQ7tgjj9gWBtjpqYvm316NEWB/etdpJV2F7U5XV60Py/mdsUV6RFU7RLTqTmQ==
+X-Received: by 2002:a17:90a:8a07:b0:2e2:9522:279d with SMTP id 98e67ed59e1d1-2e2a252b9fdmr1471888a91.29.1728446358004;
+        Tue, 08 Oct 2024 20:59:18 -0700 (PDT)
+Received: from [192.168.68.54] ([43.252.112.159])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e2a55fc7dbsm451760a91.4.2024.10.08.20.59.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Oct 2024 20:59:17 -0700 (PDT)
+Message-ID: <a779a4e3-5ba4-43c9-9c2f-f1e953098e3e@redhat.com>
+Date: Wed, 9 Oct 2024 13:59:11 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 1/7] arm64: head.S: Initialise MPAM EL2 registers and
+ disable traps
+To: Joey Gouly <joey.gouly@arm.com>, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev
+Cc: anshuman.khandual@arm.com, james.morse@arm.com,
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, Jing Zhang <jingzhangos@google.com>,
+ Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+References: <20241004110714.2051604-1-joey.gouly@arm.com>
+ <20241004110714.2051604-2-joey.gouly@arm.com>
+From: Gavin Shan <gshan@redhat.com>
+In-Reply-To: <20241004110714.2051604-2-joey.gouly@arm.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-SGkgSmVmZiwKCj4gSGkgRmFyZXMsCj4gCj4gUGxlYXNlIGFkZCBtZSB0byB0aGlzIHNlcmllcyBh
-bmQgSSdtIGludGVyZXN0ZWQgaW4gZXZlcnl0aGluZyByZWxhdGVkCj4gdG8gbXNlYWwgOi0pCj4g
-Cj4gSSBhbHNvIGFkZGVkIEtlZXMsIHNpbmNlIG1zZWFsIGlzIGEgc2VjdXJpdHkgZmVhdHVyZSwg
-YW5kIGtlZXMgaXMgQ0NlZAo+IG9uIHNlY3VyaXR5IG1hdHRlcnMuCgpUaGFuayB5b3UgZm9yIHRh
-a2luZyB0aGUgdGltZSB0byB0YWtlIGEgbG9vayEgU3VyZSBJIHdpbGwgYWRkIHlvdSBib3RoIGlu
-IGZ1dHVyZQpSRkNzIGFib3V0IHRoaXMgZmVhdHVyZS4KCj4gT24gV2VkLCBTZXAgMjUsIDIwMjQg
-YXQgODoyNeKAr0FNIEZhcmVzIE1laGFubmEgPGZhcmVzeEBhbWF6b24uZGU+IHdyb3RlOgo+ID4K
-PiA+IEhpLAo+ID4KPiA+IFRoYW5rcyBmb3IgdGFraW5nIGEgbG9vayBhbmQgYXBvbG9naWVzIGZv
-ciBteSBkZWxheWVkIHJlc3BvbnNlLgo+ID4KPiA+ID4gSXQgaXMgbm90IGNsZWFyIGZyb20gdGhl
-IGNoYW5nZSBsb2cgYWJvdmUgb3IgdGhlIGNvdmVyIGxldHRlciBhcyB0byB3aHkKPiA+ID4geW91
-IG5lZWQgdG8gZ28gdGhpcyByb3V0ZSBpbnN0ZWFkIG9mIHVzaW5nIHRoZSBtbWFwIGxvY2suCj4g
-Pgo+ID4gSW4gdGhlIGN1cnJlbnQgZm9ybSBvZiB0aGUgcGF0Y2hlcyBJIHVzZSBtZW1mZF9zZWNy
-ZXQoKSB0byBhbGxvY2F0ZSB0aGUgcGFnZXMKPiA+IGFuZCByZW1vdmUgdGhlbSBmcm9tIGtlcm5l
-bCBsaW5lYXIgYWRkcmVzcy4gWzFdCj4gPgo+ID4gVGhpcyBhbGxvY2F0ZSBwYWdlcywgbWFwIHRo
-ZW0gaW4gdXNlciB2aXJ0dWFsIGFkZHJlc3NlcyBhbmQgdHJhY2sgdGhlbSBpbiBhIFZNQS4KPiA+
-Cj4gPiBCZWZvcmUgZmxpcHBpbmcgdGhlIHBlcm1pc3Npb25zIG9uIHRob3NlIHBhZ2VzIHRvIGJl
-IHVzZWQgYnkgdGhlIGtlcm5lbCwgSSBuZWVkCj4gPiB0byBtYWtlIHN1cmUgdGhhdCB0aG9zZSB2
-aXJ0dWFsIGFkZHJlc3NlcyBhbmQgdGhpcyBWTUEgaXMgb2ZmLWxpbWl0cyB0byB0aGUKPiA+IG93
-bmluZyBwcm9jZXNzLgo+ID4KPiA+IG1lbWZkX3NlY3JldCgpIHBhZ2VzIGFyZSBsb2NrZWQgYnkg
-ZGVmYXVsdCwgc28gdGhleSB3b24ndCBzd2FwIG91dC4gSSBuZWVkIHRvCj4gPiBzZWFsIHRoZSBW
-TUEgdG8gbWFrZSBzdXJlIHRoZSBvd25lciBwcm9jZXNzIGNhbid0IHVubWFwL3JlbWFwLy4uLiBv
-ciBjaGFuZ2UgdGhlCj4gPiBwcm90ZWN0aW9uIG9mIHRoaXMgVk1BLgo+ID4KPiA+IFNvIGJlZm9y
-ZSBjaGFuZ2luZyB0aGUgcGVybWlzc2lvbnMgb24gdGhlIHNlY3JldCBwYWdlcywgSSBtYWtlIHN1
-cmUgdGhlIHBhZ2VzCj4gPiBhcmUgZmF1bHRlZCBpbiwgbG9ja2VkIGFuZCBzZWFsZWQuIFNvIHVz
-ZXJzcGFjZSBjYW4ndCBpbmZsdWVuY2UgdGhpcyBtYXBwaW5nLgo+ID4KPiA+ID4gV2UgY2FuJ3Qg
-dXNlIHRoZSBtc2VhbCBmZWF0dXJlIGZvciB0aGlzOyBpdCBpcyBzdXBwb3NlZCB0byBiZSBhIG9u
-ZSB3YXkKPiA+ID4gdHJhbnNpdGlvbi4KPiA+Cj4gPiBGb3IgdGhpcyBhcHByb2FjaCwgSSBuZWVk
-IHRoZSB1bnNlYWwgb3BlcmF0aW9uIHdoZW4gcmVsZWFzaW5nIHRoZSBtZW1vcnkgcmFuZ2UuCj4g
-Pgo+ID4gVGhlIGtlcm5lbCBjYW4gYmUgZG9uZSB3aXRoIHRoZSBzZWNyZXQgcGFnZXMgaW4gb25l
-IG9mIHR3byBzY2VuYXJpb3M6Cj4gPiAxLiBEdXJpbmcgbGlmZWN5Y2xlIG9mIHRoZSBwcm9jZXNz
-Lgo+ID4gMi4gV2hlbiB0aGUgcHJvY2VzcyB0ZXJtaW5hdGVzLgo+ID4KPiA+IEZvciB0aGUgZmly
-c3QgY2FzZSwgSSBuZWVkIHRvIHVubWFwIHRoZSBWTUEgc28gaXQgY2FuIGJlIHJldXNlZCBieSB0
-aGUgb3duaW5nCj4gPiBwcm9jZXNzIGxhdGVyLCBzbyBJIG5lZWQgdGhlIHVuc2VhbCBvcGVyYXRp
-b24uIEZvciB0aGUgc2Vjb25kIGNhc2UgaG93ZXZlciB3ZQo+ID4gZG9uJ3QgbmVlZCB0aGF0IHNp
-bmNlIHRoZSBwcm9jZXNzIG1tIGlzIGFscmVhZHkgZGVzdHJ1Y3RlZCBvciBqdXN0IGFib3V0IHRv
-IGJlCj4gPiBkZXN0cnVjdGVkIGFueXdheSwgcmVnYXJkbGVzcyBvZiBzZWFsZWQvdW5zZWFsZWQg
-Vk1Bcy4gWzFdCj4gPgo+ID4gSSBkaWRuJ3QgZXhwb3NlIHRoZSB1bnNlYWwgb3BlcmF0aW9uIHRv
-IHVzZXJzcGFjZS4KPiA+Cj4gSW4gZ2VuZXJhbCwgd2Ugc2hvdWxkIGF2b2lkIGhhdmluZyBkb191
-bnNlYWwsIGV2ZW4gdGhvdWdoIHRoZQo+IG9wZXJhdGlvbiBpcyByZXN0cmljdGVkIHRvIHRoZSBr
-ZXJuZWwgaXRzZWxmLgo+IAo+IEhvd2V2ZXIsIGZyb20gd2hhdCB5b3UgaGF2ZSBkZXNjcmliZWQs
-IHdpdGhvdXQgbG9va2luZyBhdCB5b3VyIGNvZGUsCj4gdGhlIGNhc2UgaXMgY2xvc2VyIHRvIG1z
-ZWFsLCBleGNlcHQgdGhhdCB5b3UgbmVlZCB0byB1bm1hcCBpdCB3aXRoaW4KPiB0aGUga2VybmVs
-IGNvZGUuCj4gCj4gRm9yIHRoaXMsIHRoZXJlIG1pZ2h0IGJlIHR3byBvcHRpb25zIHRoYXQgSSBj
-YW4gdGhpbmsgb2Ygbm93LCBwb3N0Cj4gaGVyZSBmb3IgZGlzY3Vzc2lvbjoKPiAKPiAxPiBBZGQg
-YSBuZXcgZmxhZyBpbiB2bV9mbGFncywgdG8gYWxsb3cgdW5tYXAgd2hpbGUgc2VhbGVkLiBIb3dl
-dmVyLAo+IHRoaXMgd2lsbCBub3QgcHJldmVudCB1c2VyIHNwYWNlIGZyb20gdW5tYXAgdGhlIGFy
-ZWEuCj4gCj4gMj4gcGFzcyBhIGZsYWcgaW4gZG9fdm1pX2FsaWduX211bm1hcCgpIHRvIHNraXAg
-c2VhbGluZyBjaGVja3MgZm9yCj4geW91ciBwYXJ0aWN1bGFyIGNhbGwuIFRoZSBkb192bWlfYWxp
-Z25fbXVubWFwKCkgYWxyZWFkeSBoYXMgYSBmbGFnCj4gc3VjaCBhcyB1bmxvY2suCj4gCj4gd2ls
-bCB0aGUgYWJvdmUgd29yayBmb3IgeW91ciBjYXNlID8gb3IgSSAgbWlzcy11bmRlcnN0b29kIHRo
-ZSByZXF1aXJlbWVudC4KClllYWggdGhlIHNlY29uZCBhcHByb2FjaCBpcyBleGFjdGx5IHdoYXQg
-SSdtIGxvb2tpbmcgZm9yLCBqdXN0IHRvIHVubWFwIHRoZSBWTUEKd2hpbGUgYmVpbmcgc2VhbGVk
-IHRvIGZyZWUgcmVzb3VyY2VzLiBCdXQgSSdtIG5vdCBzdXJlIGhvdyBjb21wbGljYXRlZCBpdCB3
-b3VsZApiZSB0byB1c2UuCgpCdXQgSSBnb3QgYSBuZWdhdGl2ZSBmZWVkYmFjayBhYm91dCB0aGUg
-d2hvbGUgYXBwcm9hY2ggb2YgdXNpbmcgdXNlciB2YWRkciBhbmQKVk1BcyB0byB0cmFjayBrZXJu
-ZWwgc2VjcmV0IGFsbG9jYXRpb25zLiBFdmVuIGlmIEkgY2FuIHRvIGtlZXAgdGhlIFZNQSBvZmYt
-bGltaXRzCnRvIHRoZSBvd25pbmcgcHJvY2VzcyBhbmQgcG9zc2libGUgaW1wcm92ZW1lbnQgdG8g
-aGlkZSB0aGUgYWN0dWFsIGxvY2F0aW9uIG9mCnRoZSBzZWNyZXQgbWVtb3J5LgoKV2UncmUgc3Rp
-bGwgdGhpbmtpbmcgb2YgYSBiZXR0ZXIgYXBwcm9hY2gsIGJ1dCBpZiB3ZSB3ZW50IGJhY2sgdG8g
-dGhlIGZpcnN0CmFwcHJvYWNoIG9mIHVzaW5nIHNlcGFyYXRlIFBHRCBpbiBrZXJuZWwgc3BhY2Ug
-SSB3b3VsZG4ndCBiZSBtZXNzaW5nIHdpdGggVk1BcwpvciBzZWFsaW5nLgoKVGhhbmtzIQpGYXJl
-cy4KCj4gVGhhbmtzCj4gLUplZmYKCgoKQW1hem9uIFdlYiBTZXJ2aWNlcyBEZXZlbG9wbWVudCBD
-ZW50ZXIgR2VybWFueSBHbWJICktyYXVzZW5zdHIuIDM4CjEwMTE3IEJlcmxpbgpHZXNjaGFlZnRz
-ZnVlaHJ1bmc6IENocmlzdGlhbiBTY2hsYWVnZXIsIEpvbmF0aGFuIFdlaXNzCkVpbmdldHJhZ2Vu
-IGFtIEFtdHNnZXJpY2h0IENoYXJsb3R0ZW5idXJnIHVudGVyIEhSQiAyNTc3NjQgQgpTaXR6OiBC
-ZXJsaW4KVXN0LUlEOiBERSAzNjUgNTM4IDU5Nwo=
+On 10/4/24 9:07 PM, Joey Gouly wrote:
+> From: James Morse <james.morse@arm.com>
+> 
+> Add code to head.S's el2_setup to detect MPAM and disable any EL2 traps.
+> This register resets to an unknown value, setting it to the default
+> parititons/pmg before we enable the MMU is the best thing to do.
+> 
+> Kexec/kdump will depend on this if the previous kernel left the CPU
+> configured with a restrictive configuration.
+> 
+> If linux is booted at the highest implemented exception level el2_setup
+> will clear the enable bit, disabling MPAM.
+> 
+> This code can't be enabled until a subsequent patch adds the Kconfig
+> and cpufeature boiler plate.
+> 
+> Signed-off-by: James Morse <james.morse@arm.com>
+> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+> ---
+>   arch/arm64/include/asm/el2_setup.h | 16 ++++++++++++++++
+>   1 file changed, 16 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
+> index e0ffdf13a18b..2a84a3d05834 100644
+> --- a/arch/arm64/include/asm/el2_setup.h
+> +++ b/arch/arm64/include/asm/el2_setup.h
+> @@ -220,6 +220,21 @@
+>   	msr	spsr_el2, x0
+>   .endm
+>   
+> +.macro __init_el2_mpam
+> +#ifdef CONFIG_ARM64_MPAM
+> +	/* Memory Partitioning And Monitoring: disable EL2 traps */
+> +	mrs	x1, id_aa64pfr0_el1
+> +	ubfx	x0, x1, #ID_AA64PFR0_EL1_MPAM_SHIFT, #4
+> +	cbz	x0, .Lskip_mpam_\@		// skip if no MPAM
+> +	msr_s	SYS_MPAM2_EL2, xzr		// use the default partition
+> +						// and disable lower traps
+> +	mrs_s	x0, SYS_MPAMIDR_EL1
+> +	tbz	x0, #17, .Lskip_mpam_\@		// skip if no MPAMHCR reg
+> +	msr_s	SYS_MPAMHCR_EL2, xzr		// clear TRAP_MPAMIDR_EL1 -> EL2
+> +.Lskip_mpam_\@:
+> +#endif /* CONFIG_ARM64_MPAM */
+> +.endm
+> +
+
+Bit#17 has been defined as SYS_MPAMIDR_EL1_HAS_HCR_SHIFT in PATCH[v4 2/7]. The
+definition can be used if PATCH#1 and PATCH#2 are swapped.
+
+     tbz    x0, #SYS_MPAMIDR_EL1_HAS_HCR_SHIFT, .Lskip_mpam_\@	// skip if no MPAMHCR
+
+>   /**
+>    * Initialize EL2 registers to sane values. This should be called early on all
+>    * cores that were booted in EL2. Note that everything gets initialised as
+> @@ -237,6 +252,7 @@
+>   	__init_el2_stage2
+>   	__init_el2_gicv3
+>   	__init_el2_hstr
+> +	__init_el2_mpam
+>   	__init_el2_nvhe_idregs
+>   	__init_el2_cptr
+>   	__init_el2_fgt
+
+Thanks,
+Gavin
 
