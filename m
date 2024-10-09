@@ -1,68 +1,45 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97EDD191473;
-	Wed,  9 Oct 2024 20:49:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8FEE1E376D
+	for <kvmarm@lists.linux.dev>; Wed,  9 Oct 2024 23:27:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728506947; cv=none; b=AMQi7SVMrcf+KNrvZoW7l5ukbdxjexC0vmGBtlxp8JYGntGXKRU72l/Z8jn25s1pmexgsrNVWaA5pIMro0D9a588NFpcp+qY7S5e/v+73N2GYzy+EUkhyJfrKBepotRToo8ijBjOQYooDmLcdWDjvQ0DdrBzkAmAWpwt7QqpNMs=
+	t=1728516477; cv=none; b=n5/wuMYAC+3oca/B3Hcsf+hqgPbxE4jvlC5RuWjkKUbZX2JQvtFD3D6hcCXlyBSnuFSJ9AL8MOocRWt0/0GkEuRLpT7O5FGWEleG7Bb9de9UxFrgxpNbY/n8sernU9epNQ5Ka7tzJCEQHOYQ6rpAwhBs9xccP26znil61pDywwU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728506947; c=relaxed/simple;
-	bh=OFXVpQgisC9iUKGKv5IwiYtmzwJhlFDr4RbKRl3vukg=;
+	s=arc-20240116; t=1728516477; c=relaxed/simple;
+	bh=ydfVLP0BdOskPbhpr40z4OF5B6f3E+tOviVfgl6hQQA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=idFqj2QqDMAk3J1S6HW7Bk9lpvbnwKBbI6GA6QF0I+/ILjCYfNitnr/hhaojdBQ9o/uzaUlsIu+B9s3ZKfM1iRzILZHx0xy1mlkDoIgAg7iRjODqfGEBwScJodIEnQO1Zxl09lQg49QK84jjAY/pmu1OW4AN+YweG4cCLai0aJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jwwzqOcs; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=jTyWnHinPYyIbi97n61k9c5uOqINAHUFgs66y2b9VQeEP6h5mTxlCqztJhw249NC3GiczVf0EQoqGwKPjpmfUCiTCyT0v4NN8hfF9xMTfJCQ+vTVdvGLfuVc7HvvAQB6XyYw+4zNtFjiU18aDfdOQeBwtjltWj+GjfB74Y5BwuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=n1YGSMKS; arc=none smtp.client-ip=95.215.58.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jwwzqOcs"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 265F0C4CEC3;
-	Wed,  9 Oct 2024 20:49:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728506947;
-	bh=OFXVpQgisC9iUKGKv5IwiYtmzwJhlFDr4RbKRl3vukg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jwwzqOcsIgLrThOk8MIptc37fnC8WhDVG/Ifwy2LQsuL0Z4HqID9q3xo5GmNvlMWw
-	 eNl92ym/ChcRd1xr8+UyxVIbPr10zOFe2v1P26pHi8j4KqfQyFTCtdCTtFkYDvoNCn
-	 88RqmptFKK8mFSlpJ/NIdqjRbl+D0uHhq6eywBIxXm9OdZjAQYAt25M4X1nG2Vsv2K
-	 iLRcywG3rMMJHxFwy+hAioNwJTf5J1HHiOHMA8h9kEwkXiiZg8fdreE92CqvaoCeOu
-	 aIqJ9lyhQQPATY+NFOgQp6C5iagTBhJ3J8KAevnqDwaRN2s7JeRpB7lhsFX2JgZc0M
-	 kTUhwSaWl5MMA==
-Date: Wed, 9 Oct 2024 13:49:03 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="n1YGSMKS"
+Date: Wed, 9 Oct 2024 23:27:46 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1728516472;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4KeD7odlayOig02YQl1SAcJz/3EmFxKkRZSthX1RFFI=;
+	b=n1YGSMKSZkKbdoTgJGyOQUk+EF5Uki4rP4D9/svYrOjZGnykH9HqdEGNaQQQkh+Qg+BXDv
+	ZMmGJRpuQTWLgyV2Z1Z1yO3vwuBePwqSqNfON8aWVqfsJexQcZ2U27CJDG7Fs/gdDQfRfO
+	B48TmkB6/8vpCiqo+1WwBCUR7+V7abs=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Kees Cook <kees@kernel.org>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Florian Weimer <fweimer@redhat.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
-	Ross Burton <ross.burton@arm.com>,
-	David Spickett <david.spickett@arm.com>,
-	Yury Khrustalev <yury.khrustalev@arm.com>,
-	Wilco Dijkstra <wilco.dijkstra@arm.com>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v13 11/40] arm64/gcs: Provide basic EL2 setup to allow
- GCS usage at EL0 and EL1
-Message-ID: <20241009204903.GA3353168@thelio-3990X>
-References: <20241001-arm64-gcs-v13-0-222b78d87eee@kernel.org>
- <20241001-arm64-gcs-v13-11-222b78d87eee@kernel.org>
+	Zenghui Yu <yuzenghui@huawei.com>, stable@vger.kernel.org,
+	Alexander Potapenko <glider@google.com>
+Subject: Re: [PATCH] KVM: arm64: Don't eagerly teardown the vgic on init error
+Message-ID: <ZwcRct7VWnW0bObA@linux.dev>
+References: <20241009183603.3221824-1-maz@kernel.org>
+ <ZwbYvHJdOqePYjDf@linux.dev>
+ <ZwbbQGpZpGQXaNYK@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -71,63 +48,66 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241001-arm64-gcs-v13-11-222b78d87eee@kernel.org>
+In-Reply-To: <ZwbbQGpZpGQXaNYK@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-Hi Mark,
+On Wed, Oct 09, 2024 at 12:36:32PM -0700, Sean Christopherson wrote:
+> On Wed, Oct 09, 2024, Oliver Upton wrote:
+> > On Wed, Oct 09, 2024 at 07:36:03PM +0100, Marc Zyngier wrote:
+> > > As there is very little ordering in the KVM API, userspace can
+> > > instanciate a half-baked GIC (missing its memory map, for example)
+> > > at almost any time.
+> > > 
+> > > This means that, with the right timing, a thread running vcpu-0
+> > > can enter the kernel without a GIC configured and get a GIC created
+> > > behind its back by another thread. Amusingly, it will pick up
+> > > that GIC and start messing with the data structures without the
+> > > GIC having been fully initialised.
+> > 
+> > Huh, I'm definitely missing something. Could you remind me where we open
+> > up this race between KVM_RUN && kvm_vgic_create()?
 
-On Tue, Oct 01, 2024 at 11:58:50PM +0100, Mark Brown wrote:
-> There is a control HCRX_EL2.GCSEn which must be set to allow GCS
-> features to take effect at lower ELs and also fine grained traps for GCS
-> usage at EL0 and EL1.  Configure all these to allow GCS usage by EL0 and
-> EL1.
+Ah, duh, I see it now. kvm_arch_vcpu_run_pid_change() doesn't serialize
+on a VM lock, and kvm_vgic_map_resources() has an early return for
+vgic_ready() letting it blow straight past the config_lock.
+
+Then if we can't register the MMIO region for the distributor
+everything comes crashing down and a vCPU has made it into the KVM_RUN
+loop w/ the VGIC-shaped rug pulled out from under it. There's definitely
+another functional bug here where a vCPU's attempts to poke the
+distributor wind up reaching userspace as MMIO exits. But we can worry
+about that another day.
+
+If memory serves, kvm_vgic_map_resources() used to do all of this behind
+the config_lock to cure the race, but that wound up inverting lock
+ordering on srcu.
+
+Note to self: Impose strict ordering on GIC initialization v. vCPU
+creation if/when we get a new flavor of irqchip.
+
+> > I'd thought the fact that the latter takes all the vCPU mutexes and
+> > checks if any vCPU in the VM has run would be enough to guard against
+> > such a race, but clearly not...
 > 
-> We also initialise GCSCR_EL1 and GCSCRE0_EL1 to ensure that we can
-> execute function call instructions without faulting regardless of the
-> state when the kernel is started.
-> 
-> Reviewed-by: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
-> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
-> Signed-off-by: Mark Brown <broonie@kernel.org>
+> Any chance that fixing bugs where vCPU0 can be accessed (and run!) before its
+> fully online help?
 
-I just bisected a build failure from a failed linker script assertion
-that I see with allmodconfig to this change in -next as commit
-ff5181d8a2a8 ("arm64/gcs: Provide basic EL2 setup to allow GCS usage at
-EL0 and EL1"):
+That's an equally gross bug, but kvm_vgic_create() should still be safe
+w.r.t. vCPU creation since both hold the kvm->lock in the right spot.
+That is, since kvm_vgic_create() is called under the lock any vCPUs
+visible to userspace should exist in the vCPU xarray.
 
-  $ make -skj"$(nproc)" ARCH=arm64 CROSS_COMPILE=aarch64-linux- mrproper allmodconfig vmlinux
-  aarch64-linux-ld: HYP init code too big
-  make[4]: *** [scripts/Makefile.vmlinux:34: vmlinux] Error 1
-  ...
+The crappy assumption here is kvm_arch_vcpu_run_pid_change() and its
+callees are allowed to destroy VM-scoped structures in error handling.
 
-I see this with both GCC 14 and clang 19, in case toolchain version
-matters. Bisect log included as well.
+> E.g. if that closes the vCPU0 hole, maybe the vCPU1 case can
+> be handled a bit more gracefully?
 
-Cheers,
-Nathan
+I think this is about as graceful as we can be. The sorts of screw-ups
+that precipitate this error handling may involve stupidity across
+several KVM ioctls, meaning it is highly unlikely to be attributable /
+recoverable.
 
-# bad: [b6270c3bca987530eafc6a15f9d54ecd0033e0e3] Add linux-next specific files for 20241009
-# good: [75b607fab38d149f232f01eae5e6392b394dd659] Merge tag 'sched_ext-for-6.12-rc2-fixes' of git://git.kernel.org/pub/scm/linux/kernel/git/tj/sched_ext
-git bisect start 'b6270c3bca987530eafc6a15f9d54ecd0033e0e3' '75b607fab38d149f232f01eae5e6392b394dd659'
-# bad: [76d36603db22f0f0774c19147b25f5a0bcac64e6] Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git
-git bisect bad 76d36603db22f0f0774c19147b25f5a0bcac64e6
-# bad: [e90a3e76b4b8080f633a167179f3a76b93077270] Merge branch 'renesas-clk' of git://git.kernel.org/pub/scm/linux/kernel/git/geert/renesas-drivers.git
-git bisect bad e90a3e76b4b8080f633a167179f3a76b93077270
-# good: [dd60a5d8b8ac2e7dc6810182a6dbc251a746f09e] Merge branch 'perf-tools-next' of git://git.kernel.org/pub/scm/linux/kernel/git/perf/perf-tools-next.git
-git bisect good dd60a5d8b8ac2e7dc6810182a6dbc251a746f09e
-# bad: [fa74fd4773673726bfa8f89d15805d8a1b26f855] Merge branch 'for-next' of git://git.kernel.org/pub/scm/linux/kernel/git/khilman/linux-omap.git
-git bisect bad fa74fd4773673726bfa8f89d15805d8a1b26f855
-# bad: [a7833d5793f83512f1fb6f36fa7588ea03da6b1b] Merge branch 'for-next' of git://git.kernel.org/pub/scm/linux/kernel/git/amlogic/linux.git
-git bisect bad a7833d5793f83512f1fb6f36fa7588ea03da6b1b
-# bad: [c9c0de66c9b5f295f09a116f15401465bdd13263] Merge branch 'for-next/core' of git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux
-git bisect bad c9c0de66c9b5f295f09a116f15401465bdd13263
-# bad: [506496bcbb4204c9ff5cfe82b1b90e1f14366992] arm64/gcs: Ensure that new threads have a GCS
-git bisect bad 506496bcbb4204c9ff5cfe82b1b90e1f14366992
-# good: [d0aa2b4351862cc2ce8d97e00c96bffc02ea16af] arm64/gcs: Provide put_user_gcs()
-git bisect good d0aa2b4351862cc2ce8d97e00c96bffc02ea16af
-# bad: [6497b66ba6945f142902c7e8fce86e47016ead1c] arm64/mm: Map pages for guarded control stack
-git bisect bad 6497b66ba6945f142902c7e8fce86e47016ead1c
-# bad: [6487c963083c24ede289d4267ffa60a9db668cd4] arm64/cpufeature: Runtime detection of Guarded Control Stack (GCS)
-git bisect bad 6487c963083c24ede289d4267ffa60a9db668cd4
-# bad: [ff5181d8a2a82c982276a7e035896185c390e856] arm64/gcs: Provide basic EL2 setup to allow GCS usage at EL0 and EL1
-git bisect bad ff5181d8a2a82c982276a7e035896185c390e856
-# first bad commit: [ff5181d8a2a82c982276a7e035896185c390e856] arm64/gcs: Provide basic EL2 setup to allow GCS usage at EL0 and EL1
+-- 
+Thanks,
+Oliver
