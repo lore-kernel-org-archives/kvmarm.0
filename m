@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A195C1E1A0F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC44B1E1A29;
 	Wed,  9 Oct 2024 19:00:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728500443; cv=none; b=otpr/P7vgLp/5sB0wgDqMLz51RmG3iiqikv8y/QHtnHwZ+YDsyPup0RhDQID3hImivSO9s9HhcKJ/mfoo+k8pnDux340MMrffJrh59lyah1CZ5jZV8VQ9GpX6t+uOAt0PXiMHJTwB4WFhAx+fpHJ/97la/jBrTgyLKQsaDKlIsA=
+	t=1728500443; cv=none; b=WVFhOaQHBsrTULAQ0XhvOSaWydIpBxbHj3Asl62LjEYXJ2qw2Uj/A/xAxfpFY/xca3g6PgHBAzQjl87W3Cqo4c29iYJ+e0aB8ICFxKD5D2cSOGaSV+QnVNRkX8Jc1LTxm7Lm/ts+Jr1p7vb6fCjcD62EUEM94n8ugPjo4PRzw0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1728500443; c=relaxed/simple;
-	bh=V2gaNQUIj9Ndd/20OKV+EYyMNIrQ8wsENOpxc4LklRs=;
+	bh=OpE1g1dXxLnO5r+wMmDCsiL9pglyj4L3QL+7VK1XQcA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=BuAZPVtZqIjj2OZ2yf93sB1LB22MHW6NOB7iIHoQjq+MEWsn0cr2sGuf96DKaE8/hkM6DfkS6mXWdM7uVy7xvXjqsbH2cEU4v6odf44zQZlS9HxpLvKPeb/j0bMpB++svshKGZqH30ezmwA756+zuVGOQQ9/NgKIUaK6EDyLmWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JVzd1RmV; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=P5vK0COKCgZPTb97qwwKm9TfR9Qp6exUKLeF37awqWz8Ue5NmdUq6p89lZHsnTMu2uEwSsewt1jUISGSItg/vuARTkM6YISO4DWgs3vEQxCbG7Q0kCUrUj/M4TYby+7BRhFJvSMn11pDtfya3PxI5M09NKyBp650JfJ/sZwRfFM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TI2Djvuy; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JVzd1RmV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 401FAC4CED5;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TI2Djvuy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7E42C4CECC;
 	Wed,  9 Oct 2024 19:00:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1728500443;
-	bh=V2gaNQUIj9Ndd/20OKV+EYyMNIrQ8wsENOpxc4LklRs=;
+	bh=OpE1g1dXxLnO5r+wMmDCsiL9pglyj4L3QL+7VK1XQcA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=JVzd1RmVUIIgb5Cs80NI2gS8BpMp2i1UY65TxJPgFZEJKN7BU2lCbP268L3soj+zW
-	 MUT+VcnnloSG0IT5tBkbvUjbdojT4VT0Cqgc3Iq/bi2A2v2M6wl9Z+yV1aClFwuksm
-	 XKUV18BnQH5QVve0+tieqNNGtAJUtNpC7nZz15MvwxtZr37DasZzeMz4fQ3TZVT9Bh
-	 055eySESuM/mShecbryv5/wU/n0eOigHSIfkIpounHi3SmO1rCRgV3yro95NINfjnr
-	 3wHevilbViUl76EbWMs+c+3FeVz+57lOabCta25kc7UYDYprAIZZZRr+D6TFhgmh89
-	 zN3z1hDjlPwxg==
+	b=TI2DjvuyxL++VMijuizoWJO0ikf+NEzDOj8r6dO/mgwI8iCaL1WATmUyWDM9MDJDp
+	 29UWwnE7kGeMNbJMHZ+GgMFPy5zHSpfbAwDQ+fOjmj5cuySPQ5TdDDf8u4woBqooZW
+	 YCCawanJNjH4bybcy+tdWbdCiaPlOxN2k5RA3+ZX9pO2pjZKeJ1qAzybekadCfIuOk
+	 KLDH+7cSZB/9/6g/LusANySEzfBjN0d4PClChLReqo6/R8bfx7JQQDFnL6skKIdPxw
+	 E2G5PpR7A6y3CgihQzegCsY+RIOocfvr8dl62f8EXVFK1HkWauY6WbluB6gFU8fyaC
+	 vqpXsBBS4wiPQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sybvN-001wcY-DK;
+	id 1sybvN-001wcY-Pq;
 	Wed, 09 Oct 2024 20:00:41 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -42,9 +42,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v4 04/36] KVM: arm64: Drop useless struct s2_mmu in __kvm_at_s1e2()
-Date: Wed,  9 Oct 2024 19:59:47 +0100
-Message-Id: <20241009190019.3222687-5-maz@kernel.org>
+Subject: [PATCH v4 06/36] KVM: arm64: nv: Handle CNTHCTL_EL2 specially
+Date: Wed,  9 Oct 2024 19:59:49 +0100
+Message-Id: <20241009190019.3222687-7-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20241009190019.3222687-1-maz@kernel.org>
 References: <20241009190019.3222687-1-maz@kernel.org>
@@ -60,31 +60,82 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-__kvm_at_s1e2() contains the definition of an s2_mmu for the
-current context, but doesn't make any use of it. Drop it.
+Accessing CNTHCTL_EL2 is fraught with danger if running with
+HCR_EL2.E2H=1: half of the bits are held in CNTKCTL_EL1, and
+thus can be changed behind our back, while the rest lives
+in the CNTHCTL_EL2 shadow copy that is memory-based.
+
+Yes, this is a lot of fun!
+
+Make sure that we merge the two on read access, while we can
+write to CNTKCTL_EL1 in a more straightforward manner.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/at.c | 3 ---
- 1 file changed, 3 deletions(-)
+ arch/arm64/kvm/sys_regs.c    | 28 ++++++++++++++++++++++++++++
+ include/kvm/arm_arch_timer.h |  3 +++
+ 2 files changed, 31 insertions(+)
 
-diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index 39f0e87a340e8..f04677127fbc0 100644
---- a/arch/arm64/kvm/at.c
-+++ b/arch/arm64/kvm/at.c
-@@ -992,12 +992,9 @@ void __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
- 	 * switching context behind everybody's back, disable interrupts...
- 	 */
- 	scoped_guard(write_lock_irqsave, &vcpu->kvm->mmu_lock) {
--		struct kvm_s2_mmu *mmu;
- 		u64 val, hcr;
- 		bool fail;
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 3cd54656a8e2f..932d2fb7a52a0 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -157,6 +157,21 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+ 		if (!is_hyp_ctxt(vcpu))
+ 			goto memory_read;
  
--		mmu = &vcpu->kvm->arch.mmu;
--
- 		val = hcr = read_sysreg(hcr_el2);
- 		val &= ~HCR_TGE;
- 		val |= HCR_VM;
++		/*
++		 * CNTHCTL_EL2 requires some special treatment to
++		 * account for the bits that can be set via CNTKCTL_EL1.
++		 */
++		switch (reg) {
++		case CNTHCTL_EL2:
++			if (vcpu_el2_e2h_is_set(vcpu)) {
++				val = read_sysreg_el1(SYS_CNTKCTL);
++				val &= CNTKCTL_VALID_BITS;
++				val |= __vcpu_sys_reg(vcpu, reg) & ~CNTKCTL_VALID_BITS;
++				return val;
++			}
++			break;
++		}
++
+ 		/*
+ 		 * If this register does not have an EL1 counterpart,
+ 		 * then read the stored EL2 version.
+@@ -207,6 +222,19 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
+ 		 */
+ 		__vcpu_sys_reg(vcpu, reg) = val;
+ 
++		switch (reg) {
++		case CNTHCTL_EL2:
++			/*
++			 * If E2H=0, CNHTCTL_EL2 is a pure shadow register.
++			 * Otherwise, some of the bits are backed by
++			 * CNTKCTL_EL1, while the rest is kept in memory.
++			 * Yes, this is fun stuff.
++			 */
++			if (vcpu_el2_e2h_is_set(vcpu))
++				write_sysreg_el1(val, SYS_CNTKCTL);
++			return;
++		}
++
+ 		/* No EL1 counterpart? We're done here.? */
+ 		if (reg == el1r)
+ 			return;
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+index c819c5d16613b..fd650a8789b91 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -147,6 +147,9 @@ u64 timer_get_cval(struct arch_timer_context *ctxt);
+ void kvm_timer_cpu_up(void);
+ void kvm_timer_cpu_down(void);
+ 
++/* CNTKCTL_EL1 valid bits as of DDI0487J.a */
++#define CNTKCTL_VALID_BITS	(BIT(17) | GENMASK_ULL(9, 0))
++
+ static inline bool has_cntpoff(void)
+ {
+ 	return (has_vhe() && cpus_have_final_cap(ARM64_HAS_ECV_CNTPOFF));
 -- 
 2.39.2
 
