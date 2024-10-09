@@ -1,109 +1,141 @@
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 537C51714A4
-	for <kvmarm@lists.linux.dev>; Wed,  9 Oct 2024 19:36:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE0921E0DAD
+	for <kvmarm@lists.linux.dev>; Wed,  9 Oct 2024 19:55:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728502596; cv=none; b=nYEG2CZDhSuWvhQWuii+9dIjzkM9pwYm5D7q1dadKBozab8n7nsBKQ3ZDjIvdNbBl1O1+9ljQzt1SV239B6CViuUusSU9tYSXrNHEZOpPun29WJDcgsEA/57mcXr+C0eA1QpglgMjNKEC/+fZrz7dkdYM8RHG5llqQt04MvlBWQ=
+	t=1728503735; cv=none; b=taxn46AD1xUAfQ8qXZ9fQtFba9+Ad/wADr26rOwNwDKl3po9kkMaHuX2ybqLlpr5xpHrfJIS5ZsFFYvMgKJ3Pt6jJQZr6FSWMvRMcMJoDdZiQWA1U7dstHtMfU3jKqk8vXeTXFGAn/1GvWf9TYrRc0DV3PANIax+UL4PPnlGfcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728502596; c=relaxed/simple;
-	bh=tNX0yHtSx+2bxwChEjYCuylXCXHmQGQooGsI3FLrVUg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=erUZAjUBJHyf+SLI8eoH8YgcZfhap/K8Z0+uiTTpvxNQMPHzudpLNblX16exwB0mlBxAG9Pt8qSc4yjPEL0R+9+QKBveda/CyhR8IDB87k4W2SHSXWK9sJx6JvXUw07tqfUb1bdqR35K6u7k+OnZc4vQPGM4zWMupw9hZopU6B0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ABj+ArbY; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1728503735; c=relaxed/simple;
+	bh=Sc4nKdsPXx5tCl7kmTjYsRcV+p7U/RIuhom/uIbzdng=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N8LbQ5IAWa0J2HfmaxNrgvIfSNJdGbVjgGnfyi3odkFVlwWMeVVxd663YicEpusApAjicboRMgcRE4oLNJeV0tCz81o2UHtbIKK4xaCzjmSAqlSdVjO+07cLEbTXvF+3zWzohcNwWihFMybaqwf7za2/giIeIaRPE2pu1pEKiCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hhBUjPzv; arc=none smtp.client-ip=95.215.58.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ABj+ArbY"
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-7e6c40a5795so147315a12.3
-        for <kvmarm@lists.linux.dev>; Wed, 09 Oct 2024 12:36:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728502595; x=1729107395; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=knTcmc30pJl7doPnC19XGWX1FZIh862B8t2b0uPBIZw=;
-        b=ABj+ArbYZetORZcGK4T248XAACS5JHio3LRTPSofi5C3dwu0SXSMm+VZXIYgmRQcfZ
-         zgjTbZmif3WDfRzn2GWP/xjX/I9tvyi4D4k5m8RXVgzh9me7jjllE6mN/rmv8cwMGf5N
-         aKSm72Hi8JLgVYA3RNQpmwMkODkQgbnIDo1VrT0fGDlTnRtbgvEYtNx09lbh6MfCU7s4
-         lkfnXsIL/uDBF1h2fKifDhhudf+5ui8FX7ZGnTCrjWghR6BDUzuVQ9g8wSd7A+ZrQMck
-         HrAA+gRl0J9HIo7X1ajD/MuvFtkP5MDW4nubU1sCFI6aoxohjY7Vyq2YGNNI3n+zZwe7
-         Ec2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728502595; x=1729107395;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=knTcmc30pJl7doPnC19XGWX1FZIh862B8t2b0uPBIZw=;
-        b=hB+1di6z5X/lHSNjQHEOrFbJh9kadDVkDM0yKrBGtILionIBYD2gtTNKzuIkTKt0Xf
-         1UUDFj9jOWyrRpMWkN0Q0RIh+qL47Hw1vswTSfZC0rBtZvhS3ZtjbaEZ2oQHtn9lsHIA
-         kASf4emAuM/kJ4eK1o1WZMvlU1iI7qsmD0lM7jdCP8dxsMmMyqq6/+C0fDmxUJk/zlqz
-         sfi28sni8ZSftrrH7BWf/99HDptSVgMULSHFTDUXPOSVYaRSndU45U/R+mLTK+HVBQB0
-         YSxGlOKDjWGpvGw5H9pJwRrG/TujgSMzbEnzXQ4agoY+PbOR5gNZ6wwz+fwdenFyyiuW
-         5Gcg==
-X-Forwarded-Encrypted: i=1; AJvYcCXUZPcfoqpcWvI18hYs5pEfbSaq9VOBPemjlPAJ6YrjVF8jSsgtqU5VHCX5uNnx0lJ+N+Wmd0o=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzQKbiYn6PKwRHtMw6URTldepciR24IxcaMxhgLyVLK1zJwgyEz
-	w9MBF3822q/rDSYoX8QiXDf10OLQZKDEuiaveaaubtiMJ72lN92axutk2aOQ1FAR2KDd8FpqR5B
-	9Rg==
-X-Google-Smtp-Source: AGHT+IE6qbOZPjiPveauyRffk0TGKVOavv6JppsyQWCFko9+4i4AfWEW7C4di+OyANJtEcVOmeGbBoaiQLU=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a63:5a46:0:b0:7db:539:893c with SMTP id
- 41be03b00d2f7-7ea320ea266mr3439a12.9.1728502594375; Wed, 09 Oct 2024 12:36:34
- -0700 (PDT)
-Date: Wed, 9 Oct 2024 12:36:32 -0700
-In-Reply-To: <ZwbYvHJdOqePYjDf@linux.dev>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hhBUjPzv"
+Date: Wed, 9 Oct 2024 12:55:21 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1728503730;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HZO8ZUZ4JIYjAEgdyh9A4+ZHn421cNn46YVdgA+yVeY=;
+	b=hhBUjPzv2ppG7U3cT1WxcIVI+Ynk3LJC5aRTUlzkg1L8ZjZfvX8szPPsA7CIni6wh9ZNB3
+	cZCmKsQjlK8P2TPb0VN4+w0SsEe56T6uSgi335RaAcOYmdZAWghYnPp64jeCbrYjhNCtcV
+	bII/V3+ViQ2fwKsYl5ApipIztcH6Rxo=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH v4 07/36] KVM: arm64: nv: Save/Restore vEL2 sysregs
+Message-ID: <ZwbfqaxYFoThx_mc@linux.dev>
+References: <20241009190019.3222687-1-maz@kernel.org>
+ <20241009190019.3222687-8-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20241009183603.3221824-1-maz@kernel.org> <ZwbYvHJdOqePYjDf@linux.dev>
-Message-ID: <ZwbbQGpZpGQXaNYK@google.com>
-Subject: Re: [PATCH] KVM: arm64: Don't eagerly teardown the vgic on init error
-From: Sean Christopherson <seanjc@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, stable@vger.kernel.org, 
-	Alexander Potapenko <glider@google.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241009190019.3222687-8-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Oct 09, 2024, Oliver Upton wrote:
-> On Wed, Oct 09, 2024 at 07:36:03PM +0100, Marc Zyngier wrote:
-> > As there is very little ordering in the KVM API, userspace can
-> > instanciate a half-baked GIC (missing its memory map, for example)
-> > at almost any time.
-> > 
-> > This means that, with the right timing, a thread running vcpu-0
-> > can enter the kernel without a GIC configured and get a GIC created
-> > behind its back by another thread. Amusingly, it will pick up
-> > that GIC and start messing with the data structures without the
-> > GIC having been fully initialised.
+On Wed, Oct 09, 2024 at 07:59:50PM +0100, Marc Zyngier wrote:
+> +static void __sysreg_restore_vel2_state(struct kvm_vcpu *vcpu)
+> +{
+> +	u64 val;
+> +
+> +	/* These registers are common with EL1 */
+> +	write_sysreg(__vcpu_sys_reg(vcpu, PAR_EL1),	par_el1);
+> +	write_sysreg(__vcpu_sys_reg(vcpu, TPIDR_EL1),	tpidr_el1);
+> +
+> +	write_sysreg(read_cpuid_id(),				vpidr_el2);
+
+I don't think we need to restore VPIDR_EL2 here, so long as we do it on
+vcpu_put() when leaving a nested VM context. That seems like the right
+place to have it, as we could be running a mix of nested and non-nested
+VMs and don't ever poke VPIDR_EL2 for non-NV VMs.
+
+> @@ -89,7 +192,29 @@ void __vcpu_load_switch_sysregs(struct kvm_vcpu *vcpu)
+>  	 */
+>  	__sysreg32_restore_state(vcpu);
+>  	__sysreg_restore_user_state(guest_ctxt);
+> -	__sysreg_restore_el1_state(guest_ctxt);
+> +
+> +	if (unlikely(__is_hyp_ctxt(guest_ctxt))) {
+> +		__sysreg_restore_vel2_state(vcpu);
+> +	} else {
+> +		if (vcpu_has_nv(vcpu)) {
+> +			/*
+> +			 * Only set VPIDR_EL2 for nested VMs, as this is the
+> +			 * only time it changes. We'll restore the MIDR_EL1
+> +			 * view on put.
+> +			 */
+
+Slightly ambiguous what "VPIDR_EL2" this is referring to (hardware reg
+v. guest value). Maybe:
+
+			/*
+			 * Use the guest hypervisor's VPIDR_EL2 when in a nested
+			 * state. The hardware value of MIDR_EL1 gets restored on
+			 * put.
+			 */
+
+> +			write_sysreg(ctxt_sys_reg(guest_ctxt, VPIDR_EL2), vpidr_el2);
+> +
+> +			/*
+> +			 * As we're restoring a nested guest, set the value
+> +			 * provided by the guest hypervisor.
+> +			 */
+> +			mpidr = ctxt_sys_reg(guest_ctxt, VMPIDR_EL2);
+> +		} else {
+> +			mpidr = ctxt_sys_reg(guest_ctxt, MPIDR_EL1);
+> +		}
+> +
+> +		__sysreg_restore_el1_state(guest_ctxt, mpidr);
+> +	}
+>  
+>  	vcpu_set_flag(vcpu, SYSREGS_ON_CPU);
+>  }
+> @@ -112,12 +237,20 @@ void __vcpu_put_switch_sysregs(struct kvm_vcpu *vcpu)
+>  
+>  	host_ctxt = host_data_ptr(host_ctxt);
+>  
+> -	__sysreg_save_el1_state(guest_ctxt);
+> +	if (unlikely(__is_hyp_ctxt(guest_ctxt)))
+> +		__sysreg_save_vel2_state(vcpu);
+> +	else
+> +		__sysreg_save_el1_state(guest_ctxt);
+> +
+>  	__sysreg_save_user_state(guest_ctxt);
+>  	__sysreg32_save_state(vcpu);
+>  
+>  	/* Restore host user state */
+>  	__sysreg_restore_user_state(host_ctxt);
+>  
+> +	/* If leaving a nesting guest, restore MPIDR_EL1 default view */
+
+typo: MIDR_EL1
+
+> +	if (vcpu_has_nv(vcpu))
+> +		write_sysreg(read_cpuid_id(),	vpidr_el2);
+> +
+>  	vcpu_clear_flag(vcpu, SYSREGS_ON_CPU);
+>  }
+> -- 
+> 2.39.2
 > 
-> Huh, I'm definitely missing something. Could you remind me where we open
-> up this race between KVM_RUN && kvm_vgic_create()?
-> 
-> I'd thought the fact that the latter takes all the vCPU mutexes and
-> checks if any vCPU in the VM has run would be enough to guard against
-> such a race, but clearly not...
 
-Any chance that fixing bugs where vCPU0 can be accessed (and run!) before its
-fully online help?  E.g. if that closes the vCPU0 hole, maybe the vCPU1 case can
-be handled a bit more gracefully?
-
-[*] https://lore.kernel.org/all/20241009150455.1057573-1-seanjc@google.com
-
-> > Similarly, a thread running vcpu-1 can enter the kernel, and try
-> > to init the GIC that was previously created. Since this GIC isn't
-> > properly configured (no memory map), it fails to correctly initialise.
-> > 
-> > And that's the point where we decide to teardown the GIC, freeing all
-> > its resources. Behind vcpu-0's back. Things stop pretty abruptly,
-> > with a variety of symptoms.  Clearly, this isn't good, we should be
-> > a bit more careful about this.
-> > 
-> > It is obvious that this guest is not viable, as it is missing some
-> > important part of its configuration. So instead of trying to tear
-> > bits of it down, let's just mark it as *dead*. It means that any
-> > further interaction from userspace will result in -EIO. The memory
-> > will be released on the "normal" path, when userspace gives up.
+-- 
+Thanks,
+Oliver
