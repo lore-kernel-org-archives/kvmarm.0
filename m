@@ -1,48 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 884AE1E1037;
-	Wed,  9 Oct 2024 18:36:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A7D21E04BF;
+	Wed,  9 Oct 2024 19:00:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728498974; cv=none; b=USahXvbPMcyCTxTYGy72AzZdtrrNUPRudlnv1wF7hqSyviO03Dztj9aWKoJ9b+bev2uEiT+/NyDHDSB23Q3avLT/cPtOqhSJbySuU2gIxJxLywUipaQLqi3Z3un0WqEQgdXEOGAEJIpeST+iXNM+tCZbeo0adlJ+j9Q2dp+0kMs=
+	t=1728500443; cv=none; b=r0soxFwJ/HJAN87m81VQmbtOruxs5YRrC2wyauspPIt9O9T73fMwPyck8rjWjPQWlcrO7UccTtA7RCL0QQv4ZdEvkznkug8XRAsjEZVD+gwzrG+Zd29ZNla9HIJggIVQe3OMCj5/d/VJaH4CDk3Pi6KZ8+yBTf676xmyFSmbZ0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728498974; c=relaxed/simple;
-	bh=M5VW0Gu9YVbBMQ306nAp0Pc7t8pAcoEFUBaMERzl5UM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rQsCV6ZrQCKBEfBwY8Wzd00j7yTXVuFlJfg2MalTdTn4xfOVjBDnWVStaLUmqKYxmLbmFPoD5HGt+/B7IqTWDCWPrqxVdu/A+EX/++NVKL1nTk6dMNw6Glf/LAHwgj0HkJnnQJ1l9Nw58gpNk/7v/XJ+A9nrVLAtoZXPHUowZGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=un+u5UtC; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1728500443; c=relaxed/simple;
+	bh=M4QYVLtutG3Mmpkmx1IWwfT8GCi4U5JB3CwqdkHxglo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mSzeJZnU76hpLDS3TmAZmJrv4+5TVKxO4Isl6cjn0T3CDiwp+wZz+aXg2v+qx2mo9ZKeGNJt4Qcg1GoMlhw1P58/fkiWmKWeqHXDBpi/Avj28lx/h5YZ/SQ1G84ayEThYJtkZIt0NQyD+ky/K/2BECd7uCk0ZSh9Olg3n8SjTUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LyvG5v/X; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="un+u5UtC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AC5AC4CEC3;
-	Wed,  9 Oct 2024 18:36:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LyvG5v/X"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0A51C4CEC3;
+	Wed,  9 Oct 2024 19:00:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728498974;
-	bh=M5VW0Gu9YVbBMQ306nAp0Pc7t8pAcoEFUBaMERzl5UM=;
+	s=k20201202; t=1728500443;
+	bh=M4QYVLtutG3Mmpkmx1IWwfT8GCi4U5JB3CwqdkHxglo=;
 	h=From:To:Cc:Subject:Date:From;
-	b=un+u5UtCjY/0mVfkClFyMkfTvh8ud4sc6N0mD6dp5VOS/3XsdhSFDnAa98LXCfNHH
-	 dsYhBiVpYZ6IX51doBPlaphXpd/O1O4syvQl4kDCfaDuIheX9S3b6MC2jkbMYZodcj
-	 kOW9uC3wPBEVgt3sOB5dubW2JWOCPrFeNDhSxoky1D2KNzWw9J3KMlM9gN2fXKL5lR
-	 RnWdfQe7A3dqNWHXojILKZMFekUncXFGHOQ8MFxxLrxfbmhNbSwbj6ZNjeSJwwq4VM
-	 xpPk4Y01a7DPmcsAQAzhHj7RBCiQOdWm5Ou26wiYT5I+X9XavkVDrSt632vPgVz3Py
-	 vaKwM9st7lBPQ==
+	b=LyvG5v/XbDqDHTg+oO/3V7QNdjdLUOupqOtvjTaPidCE6+TKSgPSwq2OZamEe9GXI
+	 jDmPFhFO4OGG7JLp4ZNF9mlPoPY96UtJ1KZLxqd+6tNnYL4uX4IUNlvtphSc9rpxnN
+	 yZbmylvc+G8GLHJV23Llu6kWfPG/6+ymuHMiYYNU4yCfK1vBnNfxk7KBqGaeySIq94
+	 njNC7YDzYTOYT8i0rE1jdoMs9FEdkvNQCMRDgNJycPKg2ItcQZSeoiABMAAPYZHQ74
+	 vcMKpaS1oqBzBHxXY01K4emYuw0MqtFGHGg+YzPNNUYGndfp4c0X15beuNaRlSj40a
+	 k2Di2YiDEP2uA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sybXf-001wO5-Kh;
-	Wed, 09 Oct 2024 19:36:11 +0100
+	id 1sybvM-001wcY-I9;
+	Wed, 09 Oct 2024 20:00:40 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org
 Cc: Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	stable@vger.kernel.org,
-	Alexander Potapenko <glider@google.com>
-Subject: [PATCH] KVM: arm64: Don't eagerly teardown the vgic on init error
-Date: Wed,  9 Oct 2024 19:36:03 +0100
-Message-Id: <20241009183603.3221824-1-maz@kernel.org>
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Mark Brown <broonie@kernel.org>
+Subject: [PATCH v4 00/36] KVM: arm64: Add EL2 support to FEAT_S1PIE/S1POE
+Date: Wed,  9 Oct 2024 19:59:43 +0100
+Message-Id: <20241009190019.3222687-1-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -52,75 +53,127 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, stable@vger.kernel.org, glider@google.com
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, alexandru.elisei@arm.com, broonie@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-As there is very little ordering in the KVM API, userspace can
-instanciate a half-baked GIC (missing its memory map, for example)
-at almost any time.
+This series serves a few purposes:
 
-This means that, with the right timing, a thread running vcpu-0
-can enter the kernel without a GIC configured and get a GIC created
-behind its back by another thread. Amusingly, it will pick up
-that GIC and start messing with the data structures without the
-GIC having been fully initialised.
+- Complete the S1PIE/S1POE support to include EL2
+- Sneak in the EL2 system register world switch
 
-Similarly, a thread running vcpu-1 can enter the kernel, and try
-to init the GIC that was previously created. Since this GIC isn't
-properly configured (no memory map), it fails to correctly initialise.
+As mentioned in few of the patches, this implementation relies on a
+very recent fix to the architecture (D22677 in [0]).
 
-And that's the point where we decide to teardown the GIC, freeing all
-its resources. Behind vcpu-0's back. Things stop pretty abruptly,
-with a variety of symptoms.  Clearly, this isn't good, we should be
-a bit more careful about this.
+Patches on top of v6.12-rc1.
 
-It is obvious that this guest is not viable, as it is missing some
-important part of its configuration. So instead of trying to tear
-bits of it down, let's just mark it as *dead*. It means that any
-further interaction from userspace will result in -EIO. The memory
-will be released on the "normal" path, when userspace gives up.
+* From v3 [3]:
 
-Cc: stable@vger.kernel.org
-Reported-by: Alexander Potapenko <glider@google.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/arm.c            | 3 +++
- arch/arm64/kvm/vgic/vgic-init.c | 6 +++---
- 2 files changed, 6 insertions(+), 3 deletions(-)
+  - Added a few extra patches to deal with S1POE at EL2, including AT
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index a0d01c46e4084..b97ada19f06a7 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -997,6 +997,9 @@ static int kvm_vcpu_suspend(struct kvm_vcpu *vcpu)
- static int check_vcpu_requests(struct kvm_vcpu *vcpu)
- {
- 	if (kvm_request_pending(vcpu)) {
-+		if (kvm_check_request(KVM_REQ_VM_DEAD, vcpu))
-+			return -EIO;
-+
- 		if (kvm_check_request(KVM_REQ_SLEEP, vcpu))
- 			kvm_vcpu_sleep(vcpu);
- 
-diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-index e7c53e8af3d16..c4cbf798e71a4 100644
---- a/arch/arm64/kvm/vgic/vgic-init.c
-+++ b/arch/arm64/kvm/vgic/vgic-init.c
-@@ -536,10 +536,10 @@ int kvm_vgic_map_resources(struct kvm *kvm)
- out:
- 	mutex_unlock(&kvm->arch.config_lock);
- out_slots:
--	mutex_unlock(&kvm->slots_lock);
--
- 	if (ret)
--		kvm_vgic_destroy(kvm);
-+		kvm_vm_dead(kvm);
-+
-+	mutex_unlock(&kvm->slots_lock);
- 
- 	return ret;
- }
+  - Fix CPTR_EL2.E0POE non-sensical trap entry
+
+  - Make sure that TVM and TRVM are handling the EL1 PIE/POE traps
+
+  - Simplify some of the visibility cruft
+
+  - Rebased on v6.12-rc1
+
+* From v2 [2]:
+
+  - Correctly reprogram the context for AT in the fast path when S1PIE
+    is in use
+
+  - Generalised sysreg RES0/RES1 masking, and added TCR2_EL2 RES0/RES1
+    bit handling
+
+  - Fix TCR2_EL1, PIR_EL1, PIRE0_EL1 access with VHE
+
+  - Add a bunch of missing registers to get_el2_to_el1_mapping()
+
+  - Correctly map {TCR2,PIR,PIRE0}_EL2 to their EL1 equivalent on NV
+
+  - Disable hierarchical permissions when S1PIE is enabled
+
+  - Make EL2 world switch directly act on the vcpu rather than an
+    arbitrary context
+
+  - Remove SKL{0,1} from the TCR2_EL2 description
+
+* From the initial posting [1]:
+
+- Rebased on top of the AT support branch, which is currently sitting
+  in kvmarm/next
+
+- Add handling for S1 indirect permission in AT, which I'm sure will
+  give Alexandru another king-sized headache
+
+- Picked Mark Brown's series dealing with TCRX and S1PIE
+  visibility, and slapped an extra fix on top for good measure
+
+- Picked up RBs from Joey, with thanks.
+
+[0] https://developer.arm.com/documentation/102105/ka-04/
+[1] https://lore.kernel.org/r/20240813144738.2048302-1-maz@kernel.org
+[2] https://lore.kernel.org/r/20240903153834.1909472-1-maz@kernel.org
+[3] https://lore.kernel.org/r/20240911135151.401193-1-maz@kernel.org
+
+Marc Zyngier (33):
+  arm64: Drop SKL0/SKL1 from TCR2_EL2
+  arm64: Remove VNCR definition for PIRE0_EL2
+  arm64: Add encoding for PIRE0_EL2
+  KVM: arm64: Drop useless struct s2_mmu in __kvm_at_s1e2()
+  KVM: arm64: nv: Add missing EL2->EL1 mappings in
+    get_el2_to_el1_mapping()
+  KVM: arm64: nv: Handle CNTHCTL_EL2 specially
+  KVM: arm64: nv: Save/Restore vEL2 sysregs
+  KVM: arm64: Correctly access TCR2_EL1, PIR_EL1, PIRE0_EL1 with VHE
+  KVM: arm64: Extend masking facility to arbitrary registers
+  arm64: Define ID_AA64MMFR1_EL1.HAFDBS advertising FEAT_HAFT
+  KVM: arm64: Add TCR2_EL2 to the sysreg arrays
+  KVM: arm64: Sanitise TCR2_EL2
+  KVM: arm64: Add save/restore for TCR2_EL2
+  KVM: arm64: Add PIR{,E0}_EL2 to the sysreg arrays
+  KVM: arm64: Add save/restore for PIR{,E0}_EL2
+  KVM: arm64: Handle PIR{,E0}_EL2 traps
+  KVM: arm64: Sanitise ID_AA64MMFR3_EL1
+  KVM: arm64: Add AT fast-path support for S1PIE
+  KVM: arm64: Split S1 permission evaluation into direct and
+    hierarchical parts
+  KVM: arm64: Disable hierarchical permissions when S1PIE is enabled
+  KVM: arm64: Implement AT S1PIE support
+  KVM: arm64: Rely on visibility to let PIR*_ELx/TCR2_ELx UNDEF
+  arm64: Add encoding for POR_EL2
+  KVM: arm64: Add a composite EL2 visibility helper
+  KVM: arm64: Drop bogus CPTR_EL2.E0POE trap routing
+  KVM: arm64: Subject S1PIE/S1POE registers to HCR_EL2.{TVM,TRVM}
+  KVM: arm64: Add basic support for POR_EL2
+  KVM: arm64: Add save/retore support for POR_EL2
+  KVM: arm64: Add POE save/restore for AT emulation fast-path
+  KVM: arm64: Disable hierarchical permissions when POE is enabled
+  KVM: arm64: Make PAN conditions part of the S1 walk context
+  KVM: arm64: Handle stage-1 permission overlays
+  KVM: arm64: Handle WXN attribute
+
+Mark Brown (3):
+  KVM: arm64: Define helper for EL2 registers with custom visibility
+  KVM: arm64: Hide TCR2_EL1 from userspace when disabled for guests
+  KVM: arm64: Hide S1PIE registers from userspace when disabled for
+    guests
+
+ arch/arm64/include/asm/kvm_host.h          |  37 +-
+ arch/arm64/include/asm/vncr_mapping.h      |   1 -
+ arch/arm64/kvm/at.c                        | 470 ++++++++++++++++++---
+ arch/arm64/kvm/emulate-nested.c            |  12 +-
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h |   5 +-
+ arch/arm64/kvm/hyp/nvhe/sysreg-sr.c        |   2 +-
+ arch/arm64/kvm/hyp/vhe/sysreg-sr.c         | 161 ++++++-
+ arch/arm64/kvm/nested.c                    |  34 +-
+ arch/arm64/kvm/sys_regs.c                  | 141 ++++++-
+ arch/arm64/tools/sysreg                    |  12 +-
+ include/kvm/arm_arch_timer.h               |   3 +
+ 11 files changed, 766 insertions(+), 112 deletions(-)
+
 -- 
 2.39.2
 
