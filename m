@@ -1,226 +1,126 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 642A1188737;
-	Wed,  9 Oct 2024 08:05:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F14C7189528;
+	Wed,  9 Oct 2024 08:58:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.98
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728461114; cv=none; b=AQymqOPVr1hhGrWB+5H3ChreT9woRZbxw+cRlXaykeihJIUDSVpjheG6uKoXZzY8SOEm4EdDA7gj6v5TPkuh6al9ItpY7lS/gCKVmiZ1DAwps66PbEQ7OpRxO1wo4E4yHok+M6BkHnVFE0h6/bkTBwOLjgGJUOSQCgitRQJhUTE=
+	t=1728464288; cv=none; b=AAZQ6xhch+2zRN8Aaz9I1Gno4dVx40EpXo5Mv5ds8Z6Cad9O/jyqcanhCXqQTQGOqFOL5LnB/d3hYL5/zDOKxrrQmcB/2dWaSJm5SxBPwEszbI86fgOgDdKeXePO3ryMnGdMckpAjJCsaspOeDYr0Td1zYO7YPjvpPx9TjGyiC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728461114; c=relaxed/simple;
-	bh=DPzYwoAXdnJEo3Ar1EbaCUK518yNbF3ZH8uXcbO+nq4=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=F/Iv0CvQcgwbzryW1yg8QyJmAEfzKfnnwMkYcWbVQGuLTrw3zqbqmVxOiTo4rIYvmTXMoHsUyyOs1kYTJl7WeKBjm/A3ZHhXQ/O9kBwGmKfBoa4NzAnONKr/o6tXZKZoEnqIBIPu4eYcDl9Osq4bE8EbKSrHikgiv8zZd61M5nc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IPzXEIep; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1728464288; c=relaxed/simple;
+	bh=ARn9yfmpyUoe1zo2iyo+pgs2zsZ++EsKAVpos3PjaNI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IFqSj0L7onzoscCwyHtyv52m9UdALeJ7pQFOTtwmWsnpEG+q2wpCq2uRRwL3CCM7aLLhGj3jcDB51DIalaUceS1KCOccxG2fUeFV3vdDFnQW7bqFCuS34j6GHCDuaY8XQjQwazBxzDpll0cN2ke5Q56r6u2G6jLrjIv5CtNq3eA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=bJjq5dM5; arc=none smtp.client-ip=115.124.30.98
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IPzXEIep"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4F83C4CEC5;
-	Wed,  9 Oct 2024 08:05:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728461113;
-	bh=DPzYwoAXdnJEo3Ar1EbaCUK518yNbF3ZH8uXcbO+nq4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=IPzXEIepdJLVf61I0DXwipijwI6ari0oinXoyonSihisOYNv0sYl6oq6E4rdnd/zg
-	 OZWfSkOgpfqj3gmbvPWCEwMYDtdQhfVc0GbKH4cMpX+U2o5SfZy8PlE+i/VbXCu0rx
-	 6f6dEXBqpw+RifVS/EDtXz1FGW6BGAE1MdN5FMKw8KIkecygJ5GT7idg9N74bceDO1
-	 IqIIB0H+SiOYkbKQ5KleSiHzHSJgb89+lq0N303FDzOXGb9MFRCpVkRuvR1WItKFtz
-	 YYzGaNqMn7dJJXyaBQ6Cu9UTU37NM+6GOLoS6jONmMxgU7yrh0N4YjI5tNn/RishY1
-	 Xn3Nqxdp6o/4g==
-Received: from 82-132-234-182.dab.02.net ([82.132.234.182] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1syRh0-001iDe-TE;
-	Wed, 09 Oct 2024 09:05:11 +0100
-Date: Wed, 09 Oct 2024 09:05:09 +0100
-Message-ID: <877cahvgzu.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Ahmad Fatoum <a.fatoum@pengutronix.de>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	qemu-arm@nongnu.org,
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="bJjq5dM5"
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1728464278; h=From:To:Subject:Date:Message-ID:MIME-Version;
+	bh=DKxvwHZfnacsX7sqv4P183tNFvAODjSTuNfhtpMMbws=;
+	b=bJjq5dM5zSdN1QAUnlMEXyh41E8joVfXt63yjCBXuvE/V/d8PfMjGkSfpu0u7YIHdIARNUtlKC4YqcgraRENF2lbkShcAu3ZiJbBTNhyY+dNAuPZ5L7IiKwuK4efR6/NuX0lyKj4pn6Xdrr2bMMM80ml+nqh4eYjJOIq/DEBWjY=
+Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0WGiB8vX_1728464276)
+          by smtp.aliyun-inc.com;
+          Wed, 09 Oct 2024 16:57:57 +0800
+From: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	=?UTF-8?q?Pierre-Cl=C3=A9ment=20Tosi?= <ptosi@google.com>,
+	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	"linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
-	Enrico Joerns <ejo@pengutronix.de>
-Subject: Re: [BUG] ARM64 KVM: Data abort executing post-indexed LDR on MMIO address
-In-Reply-To: <f096876b-f364-4291-88e0-ac189b4f26fe@pengutronix.de>
-References: <89f184d6-5b61-4c77-9f3b-c0a8f6a75d60@pengutronix.de>
-	<CAFEAcA_Yv2a=XCKw80y9iyBRoC27UL6Sfzgy4KwFDkC1gbzK7w@mail.gmail.com>
-	<a4c06f55-28ec-4620-b594-b7ff0bb1e162@pengutronix.de>
-	<CAFEAcA9F3AR-0OCKDy__eVBJRMi80G7bWNfANGZRR2W8iMhfJA@mail.gmail.com>
-	<4d559b9e-c208-46f3-851a-68086dc8a50f@pengutronix.de>
-	<864j5q7sdq.wl-maz@kernel.org>
-	<65ab10d7-6594-490c-be07-39f83ac3559a@pengutronix.de>
-	<87a5fiutai.wl-maz@kernel.org>
-	<0352a327-0e78-48d4-a876-d33689fcd766@pengutronix.de>
-	<8634l97cfs.wl-maz@kernel.org>
-	<f096876b-f364-4291-88e0-ac189b4f26fe@pengutronix.de>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev
+Cc: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Subject: [PATCH] KVM: arm64: nVHE: gen-hyprel: Silent build warnings
+Date: Wed,  9 Oct 2024 16:57:51 +0800
+Message-ID: <20241009085751.35976-1-tianjia.zhang@linux.alibaba.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 82.132.234.182
-X-SA-Exim-Rcpt-To: a.fatoum@pengutronix.de, peter.maydell@linaro.org, qemu-arm@nongnu.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, kernel@pengutronix.de, linux-arm-kernel@lists.infradead.org, ejo@pengutronix.de
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Wed, 09 Oct 2024 07:11:52 +0100,
-Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
-> 
-> Hello Marc,
-> 
-> On 06.10.24 12:28, Marc Zyngier wrote:
-> > On Sun, 06 Oct 2024 08:59:56 +0100,
-> > Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
-> >> On 05.10.24 23:35, Marc Zyngier wrote:
-> >>> On Sat, 05 Oct 2024 19:38:23 +0100,
-> >>> Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
-> >> One more question: This upgrading of DC IVAC to DC CIVAC is because
-> >> the code is run under virtualization, right?
-> > 
-> > Not necessarily. Virtualisation mandates the upgrade, but CIVAC is
-> > also a perfectly valid implementation of both IVAC and CVAC.  And it
-> > isn't uncommon that CPUs implement everything the same way.
-> 
-> Makes sense. After all, software should expect cache lines to
-> be evicted at any time due to capacity misses anyway.
-> 
-> >> I think following fix on the barebox side may work:
-> >>
-> >>   - Walk all pages about to be remapped
-> >>   - Execute the AT instruction on the page's base address
-> > 
-> > Why do you need AT if you are walking the PTs? If you walk, you
-> > already have access to the memory attributes. In general, AT can be
-> > slower than an actual walk.
-> >
-> > Or did you actually mean iterating over the VA range? Even in that
-> > case, AT can be a bad idea, as you are likely to iterate in page-size
-> > increments even if you have a block mapping. Walking the PTs tells you
-> > immediately how much a leaf is mapping (assuming you don't have any
-> > other tracking).
-> 
-> There's no other tracking and I hoped that using AT (which is already
-> being used for the mmuinfo shell command) would be easier.
+This patch silent the some mismatch format build warnings
+with clang, like:
 
-Heavy use of AT is debatable.
+  arch/arm64/kvm/hyp/nvhe/gen-hyprel.c:233:2: warning: format specifies
+  type 'unsigned long' but the argument has type 'Elf64_Off'
+  (aka 'unsigned long long') [-Wformat]
+    233 |         assert_ne(off, 0UL, "%lu");
+        |         ^~~~~~~~~~~~~~~~~~~~~~~~~~
+        |                              %llu
+  arch/arm64/kvm/hyp/nvhe/gen-hyprel.c:193:34: note: expanded from macro 'assert_ne'
+    193 | #define assert_ne(lhs, rhs, fmt)        assert_op(lhs, rhs, fmt, !=)
+        |                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  arch/arm64/kvm/hyp/nvhe/gen-hyprel.c:188:19: note: expanded from macro 'assert_op'
+    187 |                                 " failed (lhs=" fmt ", rhs=" fmt        \
+        |                                                 ~~~
+    188 |                                 ", line=%d)", _lhs, _rhs, __LINE__);    \
+        |                                               ^~~~
+  arch/arm64/kvm/hyp/nvhe/gen-hyprel.c:167:17: note: expanded from macro 'fatal_error'
+    166 |                 fprintf(stderr, "error: %s: " fmt "\n",                 \
+        |                                               ~~~
+    167 |                         elf.path, ## __VA_ARGS__);                      \
+        |                                      ^~~~~~~~~~~
 
-It requires heavy synchronisation (the ISB between AT and the PAR_EL1
-readout), traps in some circumstances, and is not guaranteed to report
-the exact content of the page tables when it comes to memory
-attributes (it can instead report what the implementation actually
-does). In turn, it *may* hit in the TLBs. Or thrash them.
+Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+---
+ arch/arm64/kvm/hyp/nvhe/gen-hyprel.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-But the real use of AT is when you do not have a virtual mapping for
-your page tables, making them difficult to walk in SW. For example,
-KVM uses AT to walk the guest's stage-1 PTs on stage-2 fault, because
-we don't have the guest's memory mapped at EL2 in general.
-
-Maybe this doesn't matter in your case, as this doesn't happen often
-enough to justify a dedicated SW walker.
-
-> 
-> I see now that it would be too suboptimal to do it this way and have
-> implemented a revised arch_remap_range[1] for barebox, which I just
-> Cc'd you on.
-
-I'll try to have a look.
-
-> 
-> [1]: https://lore.kernel.org/barebox/20241009060511.4121157-5-a.fatoum@pengutronix.de/T/#u
-> 
-> >>   - Only if the page was previously mapped cacheable, clean + invalidate
-> >>     the cache
-> >>   - Remove the current cache invalidation after remap
-> >>
-> >> Does that sound sensible?
-> > 
-> > This looks reasonable (apart from the AT thingy).
-> 
-> I have two (hopefully the last!) questions about remaining differing
-> behavior with KVM and without:
-> 
-> 1) Unaligned stack accesses crash in KVM:
-> 
-> start: /* This will be mapped at 0x40080000 */
->         ldr     x0, =0x4007fff0
->         mov     sp, x0
->         stp     x0, x1, [sp] // This is ok
-> 
->         ldr     x0, =0x4007fff8
->         mov     sp, x0
->         stp     x0, x1, [sp] // This crashes
-> 
-> I know that the stack should be 16 byte aligned, but why does it crash
-> only under KVM?
-
-KVM shouldn't be involved in any of this. What is SCTLR_EL1.SA set to?
-KVM resets it to 1, which is legal ("On a Warm reset, this field
-resets to an architecturally UNKNOWN value."). You shouldn't rely on
-it being 0 if you are doing unaligned accesses to the stack pointer.
-
-> 
-> Context: The barebox Image used for Qemu has a Linux ARM64 "Image" header,
-> so it's loaded at an offset and grows the stack down into this memory region
-> until the FDT's /memory could be decoded and a proper stack is set up.
-> 
-> A regression introduced earlier this year, caused the stack to grow down
-> from a non-16-byte address, which is fixed in [2].
-> 
-> [2]: https://lore.kernel.org/barebox/20241009060511.4121157-5-a.fatoum@pengutronix.de/T/#ma381512862d22530382aff1662caadad2c8bc182
-> 
-> 2) Using uncached memory for Virt I/O queues with KVM enabled is considerably
->    slower. My guess is that these accesses keep getting trapped, but what I wonder
->    about is the performance discrepancy between the big.LITTLE cores
->    (measurement of barebox copying 1MiB using `time cp -v /dev/virtioblk0 /tmp`):
-> 
->     KVM && !CACHED && 1x Cortex-A53:  0.137s
->     KVM && !CACHED && 1x Cortex-A72: 54.030s
->     KVM &&  CACHED && 1x Cortex-A53:  0.120s
->     KVM &&  CACHED && 1x Cortex-A72:  0.035s
-> 
-> The A53s are CPUs 0-1 and the A72 are 2-5.
-> 
-> Any idea why accessing uncached memory from the big core is so much worse?
-
-KVM shouldn't trap these accesses at all, except for the initial
-faulting-in of the memory (once per page).
-
-But to see such a difference, the problem is likely somewhere else. As
-you seem to be using QEMU as the VMM, you are likely to fall into the
-"Mismatched attributes" sink-hole (see B2.16 "Mismatched memory
-attributes" in the ARM ARM).
-
-The gist of the problem is that QEMU is using a cacheable mapping for
-all of the guest memory, while you are using a NC mapping. Are these
-two guaranteed to be coherent? Not at all. The abysmal level of
-performance is likely to be caused by the rate of miss in the cache on
-the QEMU side. It simply doesn't observe the guest's writes until it
-misses (for fun, giggles and self-promotion, see [1]).
-
-As an experiment, you could run something that actively puts a lot of
-cache pressure in parallel to your guest. You should see the
-performance increase significantly.
-
-Now, this is very much a case of "don't do that". Virtio is, by
-definition, a cache coherent device. So either you use it with
-attributes that maintain coherency (and everything works), or you add
-cache maintenance to your virtio implementation (good luck getting the
-ordering right).
-
-HTH,
-
-	M.
-
-[1] http://events17.linuxfoundation.org/sites/events/files/slides/slides_10.pdf
-
+diff --git a/arch/arm64/kvm/hyp/nvhe/gen-hyprel.c b/arch/arm64/kvm/hyp/nvhe/gen-hyprel.c
+index b63f4e1c1033..0d916d91b13c 100644
+--- a/arch/arm64/kvm/hyp/nvhe/gen-hyprel.c
++++ b/arch/arm64/kvm/hyp/nvhe/gen-hyprel.c
+@@ -230,7 +230,7 @@ static inline const char *section_begin(Elf64_Shdr *shdr)
+ /* Find a section by its offset from the beginning of the file. */
+ static inline Elf64_Shdr *section_by_off(Elf64_Off off)
+ {
+-	assert_ne(off, 0UL, "%lu");
++	assert_ne(off, 0ULL, "%llu");
+ 	return elf_ptr(Elf64_Shdr, off);
+ }
+ 
+@@ -276,7 +276,7 @@ static void init_elf(const char *path)
+ 	close(fd);
+ 
+ 	/* Get pointer to the ELF header. */
+-	assert_ge(stat.st_size, sizeof(*elf.ehdr), "%lu");
++	assert_ge(stat.st_size, (off_t)sizeof(*elf.ehdr), "%llu");
+ 	elf.ehdr = elf_ptr(Elf64_Ehdr, 0);
+ 
+ 	/* Check the ELF magic. */
+@@ -340,7 +340,7 @@ static void emit_rela_abs64(Elf64_Rela *rela, const char *sh_orig_name)
+ 	 * a symbol at the beginning of the relocated section, and <offset>
+ 	 * is `rela->r_offset`.
+ 	 */
+-	printf(".reloc %lu, R_AARCH64_PREL32, %s%s + 0x%lx\n",
++	printf(".reloc %lu, R_AARCH64_PREL32, %s%s + 0x%llx\n",
+ 	       reloc_offset, HYP_SECTION_SYMBOL_PREFIX, sh_orig_name,
+ 	       elf64toh(rela->r_offset));
+ 
+@@ -376,7 +376,7 @@ static void emit_rela_section(Elf64_Shdr *sh_rela)
+ 		uint32_t type = (uint32_t)elf64toh(rela->r_info);
+ 
+ 		/* Check that rela points inside the relocated section. */
+-		assert_lt(elf64toh(rela->r_offset), elf64toh(sh_orig->sh_size), "0x%lx");
++		assert_lt(elf64toh(rela->r_offset), elf64toh(sh_orig->sh_size), "0x%llx");
+ 
+ 		switch (type) {
+ 		/*
 -- 
-Without deviation from the norm, progress is not possible.
+2.47.0
+
