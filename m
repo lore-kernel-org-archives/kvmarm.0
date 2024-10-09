@@ -1,98 +1,120 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60F5918C35F;
-	Wed,  9 Oct 2024 11:07:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D711192B70
+	for <kvmarm@lists.linux.dev>; Wed,  9 Oct 2024 13:20:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728472041; cv=none; b=rMUUrfydVTyetB1YXqty535aVTdeB2lH1XSjj1lDtybmmBy7OZ9efF4oNZCLBYOA+fH7zHq7FahthIYYYFq5b9THOoeT7wzooqVGGPIlIHMFn22MEdSQ3BKoxl7rP6HYUsxDPa6VGimC1gB+iVLRtEEw3Pf5TnuDNm8FARi0vQI=
+	t=1728480022; cv=none; b=oRUAelBkZn3NSBSf6kOhReAlbYgUJInZb2AdLiRhhb01Fnm/pRjCMWi+YxRmMNti+oAkJpSdJMcFcEVi84KrZ0TbtJ2Vb2yAwmy67bA+BxEylJNmraPalj//3hPFFY0YYILjLnBeF+kT/FMQSyV3ZicpOv586pXkAOvEEmgiSdM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728472041; c=relaxed/simple;
-	bh=/R45ZpnbeeOexoK0D50lPQNMccspDFpOctCg08kNaKM=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lNUYwQKHEVrNtf30a0nxX8FQFQJ6jozw5SEJaVxf6jQxk+D6U8XaWtry1MoFT3ltC1rsIFUfwlifrpVSwMQtxaHsAM6TyG796OXbA7mRp/VAjCLJtmHXzqL6xfXmns8YhedbGVx8NTkr0EgnRUG8s4JCJN7vPUgrc0QDfftsC5Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i+QQBYww; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i+QQBYww"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0EFCC4CEC5;
-	Wed,  9 Oct 2024 11:07:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728472040;
-	bh=/R45ZpnbeeOexoK0D50lPQNMccspDFpOctCg08kNaKM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=i+QQBYww1OYht/1pn7PCIbm1ziNS3NLFv6msKUwvkpJWx0I4IsG6IWLBzuvmXsWNL
-	 1V1qN3+mTI6y/oRjrxve4zHCo+wre7i8YaJoso1kW+1X+EEJw6TODgeHwA6m3xlUfb
-	 cDGPQeBtPyJFSMgN57/nLiEVQqJFUPIiwZdqSMPVTDaZIQl74HD2UUvmyfE7//83Yt
-	 gpDhNzLbqklkP3EUuBUlWUxDOoqn934L8GQeYPsm6S4/G5h1k7Lv336QeM3BlMCF34
-	 MVZF6Y1Z0w+kmrwb1Sr4aaxzuybauOaadebbKwgb92AG/IRgTzMjDE/7UfXqI4+32K
-	 ujQoBZy2nFOGw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1syUXG-001nmB-7f;
-	Wed, 09 Oct 2024 12:07:18 +0100
-Date: Wed, 09 Oct 2024 12:07:17 +0100
-Message-ID: <86set55yca.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,	Zenghui Yu
- <yuzenghui@huawei.com>,	Catalin Marinas <catalin.marinas@arm.com>,	Will
- Deacon <will@kernel.org>,	Nathan Chancellor <nathan@kernel.org>,	Nick
- Desaulniers <ndesaulniers@google.com>,	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,	=?UTF-8?B?UGllcnJlLUNsw6ltZW50?=
- Tosi <ptosi@google.com>,	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,	linux-kernel@vger.kernel.org,	llvm@lists.linux.dev
-Subject: Re: [PATCH] KVM: arm64: nVHE: gen-hyprel: Silent build warnings
-In-Reply-To: <20241009085751.35976-1-tianjia.zhang@linux.alibaba.com>
-References: <20241009085751.35976-1-tianjia.zhang@linux.alibaba.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1728480022; c=relaxed/simple;
+	bh=cxz8JqYSfJgKxH0omaM69q1S6g8ZUsSIkHkuApJ4mls=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cnlpTTevgHjxy4/52Tl9DtJeHiBNh8BtBhJr9RnZEsbg5TRBI60RLcRSHYU6kyfmf1P1WiIPOWUx6vQBdt35Oeg3QqLoQQ5jO/X2nurig9NIq7xXSMtthJF3Zwuujl+wrTI/6ykyEJJkXW2PuzjnmugNyYXZ7S67RAMQZn7rtQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9E6EEFEC;
+	Wed,  9 Oct 2024 06:20:48 -0700 (PDT)
+Received: from [10.57.85.216] (unknown [10.57.85.216])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3FD5A3F58B;
+	Wed,  9 Oct 2024 06:20:17 -0700 (PDT)
+Message-ID: <a4372d54-34bb-4a32-8742-ea6aacc0848c@arm.com>
+Date: Wed, 9 Oct 2024 14:20:15 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tianjia.zhang@linux.alibaba.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, nathan@kernel.org, ndesaulniers@google.com, morbo@google.com, justinstitt@google.com, ptosi@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, llvm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/5] arm64/mm: Drop pte_mkhuge()
+Content-Language: en-GB
+To: Anshuman Khandual <anshuman.khandual@arm.com>,
+ linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ James Morse <james.morse@arm.com>, Catalin Marinas
+ <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Ard Biesheuvel <ardb@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20241005123824.1366397-1-anshuman.khandual@arm.com>
+ <20241005123824.1366397-2-anshuman.khandual@arm.com>
+From: Ryan Roberts <ryan.roberts@arm.com>
+In-Reply-To: <20241005123824.1366397-2-anshuman.khandual@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, 09 Oct 2024 09:57:51 +0100,
-Tianjia Zhang <tianjia.zhang@linux.alibaba.com> wrote:
+On 05/10/2024 13:38, Anshuman Khandual wrote:
+> Core HugeTLB defines arch_make_huge_pte() fallback definition, which calls
+> platform provided pte_mkhuge(). But if any platform already provides custom
+> arch_make_huge_pte(), then it does not need to provide pte_mkhuge(). arm64
+> defines arch_make_huge_pte(), but then also calls pte_mkhuge() internally.
+> This creates confusion as if both of these callbacks are being used in core
+> HugeTLB and required to be defined in the platform.
 > 
-> This patch silent the some mismatch format build warnings
-> with clang, like:
+> This changes arch_make_huge_pte() to create block mapping directly and also
+> drops off now redundant helper pte_mkhuge(), making things clear. Also this
+> changes HugeTLB page creation from just clearing the PTE_TABLE_BIT (bit[1])
+> to actually setting bits[1:0] via PTE_TYPE_[MASK|SECT] instead.
 > 
->   arch/arm64/kvm/hyp/nvhe/gen-hyprel.c:233:2: warning: format specifies
->   type 'unsigned long' but the argument has type 'Elf64_Off'
->   (aka 'unsigned long long') [-Wformat]
->     233 |         assert_ne(off, 0UL, "%lu");
->         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~
->         |                              %llu
->   arch/arm64/kvm/hyp/nvhe/gen-hyprel.c:193:34: note: expanded from macro 'assert_ne'
->     193 | #define assert_ne(lhs, rhs, fmt)        assert_op(lhs, rhs, fmt, !=)
->         |                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
->   arch/arm64/kvm/hyp/nvhe/gen-hyprel.c:188:19: note: expanded from macro 'assert_op'
->     187 |                                 " failed (lhs=" fmt ", rhs=" fmt        \
->         |                                                 ~~~
->     188 |                                 ", line=%d)", _lhs, _rhs, __LINE__);    \
->         |                                               ^~~~
->   arch/arm64/kvm/hyp/nvhe/gen-hyprel.c:167:17: note: expanded from macro 'fatal_error'
->     166 |                 fprintf(stderr, "error: %s: " fmt "\n",                 \
->         |                                               ~~~
->     167 |                         elf.path, ## __VA_ARGS__);                      \
->         |                                      ^~~~~~~~~~~
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will@kernel.org>
+> Cc: Ard Biesheuvel <ardb@kernel.org>
+> Cc: Ryan Roberts <ryan.roberts@arm.com>
+> Cc: Mark Rutland <mark.rutland@arm.com>
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: linux-kernel@vger.kernel.org
+> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+> ---
+>  arch/arm64/include/asm/pgtable-hwdef.h | 1 +
+>  arch/arm64/include/asm/pgtable.h       | 5 -----
+>  arch/arm64/mm/hugetlbpage.c            | 2 +-
+>  3 files changed, 2 insertions(+), 6 deletions(-)
 > 
-> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+> diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
+> index fd330c1db289..956a702cb532 100644
+> --- a/arch/arm64/include/asm/pgtable-hwdef.h
+> +++ b/arch/arm64/include/asm/pgtable-hwdef.h
+> @@ -158,6 +158,7 @@
+>  #define PTE_VALID		(_AT(pteval_t, 1) << 0)
+>  #define PTE_TYPE_MASK		(_AT(pteval_t, 3) << 0)
+>  #define PTE_TYPE_PAGE		(_AT(pteval_t, 3) << 0)
+> +#define PTE_TYPE_SECT		(_AT(pteval_t, 1) << 0)
+>  #define PTE_TABLE_BIT		(_AT(pteval_t, 1) << 1)
+>  #define PTE_USER		(_AT(pteval_t, 1) << 6)		/* AP[1] */
+>  #define PTE_RDONLY		(_AT(pteval_t, 1) << 7)		/* AP[2] */
+> diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
+> index c329ea061dc9..fa4c32a9f572 100644
+> --- a/arch/arm64/include/asm/pgtable.h
+> +++ b/arch/arm64/include/asm/pgtable.h
+> @@ -438,11 +438,6 @@ static inline void __set_ptes(struct mm_struct *mm,
+>  	}
+>  }
+>  
+> -/*
+> - * Huge pte definitions.
+> - */
+> -#define pte_mkhuge(pte)		(__pte(pte_val(pte) & ~PTE_TABLE_BIT))
+> -
+>  /*
+>   * Hugetlb definitions.
+>   */
+> diff --git a/arch/arm64/mm/hugetlbpage.c b/arch/arm64/mm/hugetlbpage.c
+> index 5f1e2103888b..5922c95630ad 100644
+> --- a/arch/arm64/mm/hugetlbpage.c
+> +++ b/arch/arm64/mm/hugetlbpage.c
+> @@ -361,7 +361,7 @@ pte_t arch_make_huge_pte(pte_t entry, unsigned int shift, vm_flags_t flags)
+>  {
+>  	size_t pagesize = 1UL << shift;
+>  
+> -	entry = pte_mkhuge(entry);
+> +	entry = __pte((pte_val(entry) & ~PTE_TYPE_MASK) | PTE_TYPE_SECT);
 
-I don't see these warnings. What version of LLVM are you using?
+I think there may be an existing bug here; if pagesize == CONT_PTE_SIZE, then
+entry will be placed in the level 3 table. In this case, shouldn't bit 1 remain
+set, because at level 3, a page mapping is denoted by bits[1:0] = 3 ? Currently
+its being unconditionally cleared.
 
-	M.
+>  	if (pagesize == CONT_PTE_SIZE) {
+>  		entry = pte_mkcont(entry);
+>  	} else if (pagesize == CONT_PMD_SIZE) {
 
--- 
-Without deviation from the norm, progress is not possible.
