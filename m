@@ -1,64 +1,68 @@
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD8ED1E3DF7
-	for <kvmarm@lists.linux.dev>; Wed,  9 Oct 2024 15:49:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C07621FF7C4
+	for <kvmarm@lists.linux.dev>; Wed,  9 Oct 2024 15:49:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728488998; cv=none; b=Y7qv1KdCuM4BA08pRnzhNQlq+Eh07vp5zPJJh4W5CKjgc9nvoBPg76G8jpC39NS2lfZZR8s8zHBK8Nr0VQJ5w8tGlMhaezgEq30ljCQAw5UcExE6tWs7ZhI+gTwTNGfi4UdxCf5fK5aw72IQwZ7P8YW88V7FeVhsHb+j1D5HKRs=
+	t=1728489000; cv=none; b=D6ushoRqH0ndovhwan7OQm6t560ctP9T8MRP1INn/WU1MqhXINrU1HMCCRsrM6o4FFHFtY45k7rltXRmCtuLKRwCW/gNTNppUclmnQPc0eIqi0qaYsgrlxxLM9IPQb76TQ8vnxd52+g7pI0ksBNBquHtSlnVHscPAcw6LUzGuAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728488998; c=relaxed/simple;
-	bh=lSrxQ0o4lzW28SX3OpFxYNNm5zyTaJtY872EDLEASgA=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Yz+sMQ144baK0J2QWzl0sx5CAaZgsDGfZ4HHMHjwsYKKqCfdM+CfkddCb5917rprIL62U7lM2zzXeZ1zE7PJmS791etDygYvdtTnpeupuJVstTGi2Zg0FDju0sHwwMDyDp9VUnrJS2mDU46sax1FigSw4nCSmeo0Qa0Ua7kCtyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xZfDy8ou; arc=none smtp.client-ip=209.85.215.202
+	s=arc-20240116; t=1728489000; c=relaxed/simple;
+	bh=LPFOToixC43DMJpxxdLhELluVDI5pW/ki1X7rgFZYA4=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=O6IK7JrUlrFK0nnubwwEWMBKb1Rnsyx3fmPY+3sm14oQHyL4HDRBPjUX29+YgkKt9iLX2pUKDHfkxh8L81ldp7BsA9zmVTraaIYiTnC0PxckKCAO1u4Pqm1/fO+xLEkxCMxCwdqValMrDbfQur4Fep+OJ89SaxgU3uxp+j1KFZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LKlg6oQh; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xZfDy8ou"
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-7ea0d46d1f0so4487330a12.2
-        for <kvmarm@lists.linux.dev>; Wed, 09 Oct 2024 08:49:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LKlg6oQh"
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6e26ba37314so376217b3.0
+        for <kvmarm@lists.linux.dev>; Wed, 09 Oct 2024 08:49:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728488996; x=1729093796; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mp1GmMvEsdG1xOqt7J6qefXNw1tx4nozkIWjiF4j3SI=;
-        b=xZfDy8ouQyxIakYxJsPWLQmq0FBFpwv/m1JpXVScr2Ho4gn4Br+eLA0EFgTyrdPnqQ
-         D4c8Zc5dDdkEXuijOqQ6mVaLUuC4Sb7sO6G/T+OEQ9iIUR1Us7i4slKtxnV2Nc6GoO40
-         gR8yAsOuTKhAoBl+mVCTOjvDxbluji/iz3kn/2KlOQY89U37RCldrdU3GliSzWPXe/8I
-         ckuyx0LsBKzLrY/k/Ow4oNHbsTm5bXX2h4mWNc5j9m2OatYt8DIeTdYN8VE0sIsotxA4
-         nuNm9DjghAJ7qkaAm0ojCjdNUjpL245ALATKbrTheuE4JNILBc5hYoSPoTeKEJARzCBh
-         P/EQ==
+        d=google.com; s=20230601; t=1728488998; x=1729093798; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=+3zZkwU+2EpnRGguJhn2Ww+Ghmvy6uOMqwsBdHy8Row=;
+        b=LKlg6oQhRM6u1wWZnk1rV0mI8napHBbFrU1Q46svI0DdUBecIOyJ9cnrSD7lkibsZw
+         bKE8LA1T7PaM0a0PiZeQFOJvDZezqDFA8NK0CROuMs0fZws4TAulH7GdlbNO4YhbsEHP
+         KYloGp2sNTdxoov5n4QRfGumt2wV6mC8F6bCIu936KsdB2jpeKc5bF4SUapgXMyCG92r
+         CZ1MNL1Ee/tSFZrtik2KYNW6ojNbA8QbENz9Wd7/anBS5m76Muv7cwlWQy1R9Tw4rI3y
+         L0w/GmkEDWoTwFAbhYEWfJwbNCA4jssU8GkBLKC0A9inyP9TZFLpgZofjfunG0kw0uZO
+         +dyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728488996; x=1729093796;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mp1GmMvEsdG1xOqt7J6qefXNw1tx4nozkIWjiF4j3SI=;
-        b=dY7yPeZp+cA/oalj9tVo226X1MyZ8QatU7f3qiv62PobzqeDmjw+vH7PbOditz+m3I
-         C+JSgKCTX2Kh8ZYMUoV4HGlH+S/9fUI/QKcppGAmaeC86Oo73of02OVariuDQuYG2WIk
-         oOqPx6bNLrpCffVB++OLzX2gmHYgE/yG3UqGr1inRiAy7EVYu1LY6OBnbhOsCWxnsqL2
-         TtAXUSKsdqwS9R2HH1L91ePfAe8DQOYGVBRHTkSZ1ydAhWSo8vClZqmfRNT9ZXrHZNjA
-         +uhM+Vg+EFzlHkWeC1sGCEQvHTkzOltFR8xKN4oXGhPSIf1/ElZo4IM63eiyhIZJPeHC
-         G0vw==
-X-Forwarded-Encrypted: i=1; AJvYcCVlIq0DRyY/jX6p+oqWK2+Q7QGmqhHcW/G4aIZeLopOg5XqmOlOTXDk1G2jVM5hIcRzZ1cXoiA=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwGUY1iXyVwaJcpLhvb1Lok4G3uhcB8lqCRORg31lk+6HgZSBIm
-	xm/22mZayMny9vj8kQ3xMLVPtNZqElMmh5UOxS4bOS89HEKAKn9hKIWrby1qc93x5785qLyANsG
-	iFw==
-X-Google-Smtp-Source: AGHT+IEKF1Ho4VsrxKapa7g6WWX3VRxIkgUDz21gNBA5z4SeEUBMmHmDj2XN+crbLzcKc/g4iyRtc0M+qRE=
+        d=1e100.net; s=20230601; t=1728488998; x=1729093798;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+3zZkwU+2EpnRGguJhn2Ww+Ghmvy6uOMqwsBdHy8Row=;
+        b=prKjtYOzQNVsgdMmcnsqG2NVrow+FymvfcMTLTcRxjbcIKpXSKwIRN/jUil8+PBMZl
+         6tbvpRWl/zkb0AMdlM29KkkqvRRwus3FecGtaxwK+ELNPZWNLs4Kqb8aWHPiU0OuxjU4
+         6W7siUFUeEhAjBylkzS8M5k/qC67harRzYqAK+dATi5bp8MfNvxnbwLtSsO2AXorudlh
+         7EK1O2/IaKPlFYHKj592Ia2iSoiKKGoA3yaBGtlneIN8opLRyhDJBmbVxy0plxmvRCgc
+         0uFWfJWau3FO+okHaJUApLBHm9HUPaksuDx5lOIK/A/7lP9Ufrvj+Uy83sruAKzp/wbA
+         VB5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCX92oYG2u2XZ2bqNJQAaFezg6XuwaLuwPAkNlx7XxFyV0/ImRO+V4gljdJlb/lT2pLc9Gb2ssM=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yx+LC+PxBlXD02mqeeiUCX5e/HGD4wbEaP3Q1T7F3irqCf5L+hi
+	I0RCNkOs//R1/oTDCvDdBcMeV6gRpd81C2bLMhElOyocQ3QaHIYcVe2crqD6TM8TYXhDui7d2r7
+	1og==
+X-Google-Smtp-Source: AGHT+IGq8S+cJ3hbYyw4prFkdU6bbiVB3Ddo6czJU4p6VUDHrgM9P6PS5yQttOYl+xpjVaNBwpEpnchtMNk=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a17:90a:468a:b0:2e0:6c40:e384 with SMTP id
- 98e67ed59e1d1-2e2a251444emr3074a91.4.1728488995562; Wed, 09 Oct 2024 08:49:55
+ (user=seanjc job=sendgmr) by 2002:a05:690c:460d:b0:6db:89f0:b897 with SMTP id
+ 00721157ae682-6e3221683d8mr69407b3.4.1728488997664; Wed, 09 Oct 2024 08:49:57
  -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed,  9 Oct 2024 08:49:39 -0700
+Date: Wed,  9 Oct 2024 08:49:40 -0700
+In-Reply-To: <20241009154953.1073471-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20241009154953.1073471-1-seanjc@google.com>
 X-Mailer: git-send-email 2.47.0.rc0.187.ge670bccf7e-goog
-Message-ID: <20241009154953.1073471-1-seanjc@google.com>
-Subject: [PATCH v3 00/14] KVM: selftests: Morph max_guest_mem to mmu_stress
+Message-ID: <20241009154953.1073471-2-seanjc@google.com>
+Subject: [PATCH v3 01/14] KVM: Move KVM_REG_SIZE() definition to common uAPI header
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
@@ -72,100 +76,61 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	James Houghton <jthoughton@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-The main purpose of this series is to convert the max_guest_memory_test
-into a more generic mmu_stress_test.  The basic gist of the "conversion"
-is to have the test do mprotect() on guest memory while vCPUs are
-accessing said memory, e.g. to verify KVM and mmu_notifiers are working
-as intended.
+Define KVM_REG_SIZE() in the common kvm.h header, and delete the arm64 and
+RISC-V versions.  As evidenced by the surrounding definitions, all aspects
+of the register size encoding are generic, i.e. RISC-V should have moved
+arm64's definition to common code instead of copy+pasting.
 
-Patches 1-4 are a somewhat unexpected side quest.  The original plan was
-that patch 3 would be a single patch, but things snowballed.
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/arm64/include/uapi/asm/kvm.h | 3 ---
+ arch/riscv/include/uapi/asm/kvm.h | 3 ---
+ include/uapi/linux/kvm.h          | 4 ++++
+ 3 files changed, 4 insertions(+), 6 deletions(-)
 
-Patch 3 reworks vcpu_get_reg() to return a value instead of using an
-out-param.  This is the entire motivation for including these patches;
-having to define a variable just to bump the program counter on arm64
-annoyed me.
-
-Patch 4 adds hardening to vcpu_{g,s}et_reg() to detect potential
-truncation, as KVM's uAPI allows for registers greater than the 64 bits
-that are supported in the "outer" selftests APIs ((vcpu_set_reg() takes a
-u64, vcpu_get_reg() now returns a u64).
-
-Patch 1 is a change to KVM's uAPI headers to move the KVM_REG_SIZE
-definition to common code so that the selftests side of things doesn't
-need #ifdefs to implement the hardening in patch 4.
-
-Patch 2 is the truly unexpected part.  With the vcpu_get_reg() rework,
-arm64's vpmu_counter_test fails when compiled with gcc-13, and on gcc-11
-with an added "noinline".  Long story short, selftests are being compiled
-with strict aliasing enabled, which allows the compiler to optimize away
-"u64 *" => "uint64_t *" casts as u64 (unsigned long long) and uint64_t
-(unsigned long) are technically not aliases of each other.  *sigh*
-
-v3:
- - Rebased onto v6.12-rc2.
- - Disable strict aliasing to fix the PMCR snafu.
- - Collect reviews. [Drew]
- - Minor changelog fixes. [Drew]
- - Include ucall_common.h to prep for RISC-V. [Drew]
-
-v2:
- - Rebase onto kvm/next.
- - Add the aforementioned vcpu_get_reg() changes/disaster.
- - Actually add arm64 support for the fancy mprotect() testcase (I did this
-   before v1, but managed to forget to include the changes when posting).
- - Emit "mov %rax, (%rax)" on x86. [James]
- - Add a comment to explain the fancy mprotect() vs. vCPUs logic.
- - Drop the KVM x86 patches (applied and/or will be handled separately).
-
-v1: https://lore.kernel.org/all/20240809194335.1726916-1-seanjc@google.com
-
-Sean Christopherson (14):
-  KVM: Move KVM_REG_SIZE() definition to common uAPI header
-  KVM: selftests: Disable strict aliasing
-  KVM: selftests: Return a value from vcpu_get_reg() instead of using an
-    out-param
-  KVM: selftests: Assert that vcpu_{g,s}et_reg() won't truncate
-  KVM: selftests: Check for a potential unhandled exception iff KVM_RUN
-    succeeded
-  KVM: selftests: Rename max_guest_memory_test to mmu_stress_test
-  KVM: selftests: Only muck with SREGS on x86 in mmu_stress_test
-  KVM: selftests: Compute number of extra pages needed in
-    mmu_stress_test
-  KVM: sefltests: Explicitly include ucall_common.h in mmu_stress_test.c
-  KVM: selftests: Enable mmu_stress_test on arm64
-  KVM: selftests: Use vcpu_arch_put_guest() in mmu_stress_test
-  KVM: selftests: Precisely limit the number of guest loops in
-    mmu_stress_test
-  KVM: selftests: Add a read-only mprotect() phase to mmu_stress_test
-  KVM: selftests: Verify KVM correctly handles mprotect(PROT_READ)
-
- arch/arm64/include/uapi/asm/kvm.h             |   3 -
- arch/riscv/include/uapi/asm/kvm.h             |   3 -
- include/uapi/linux/kvm.h                      |   4 +
- tools/testing/selftests/kvm/Makefile          |  11 +-
- .../selftests/kvm/aarch64/aarch32_id_regs.c   |  10 +-
- .../selftests/kvm/aarch64/debug-exceptions.c  |   4 +-
- .../selftests/kvm/aarch64/hypercalls.c        |   6 +-
- .../selftests/kvm/aarch64/no-vgic-v3.c        |   2 +-
- .../testing/selftests/kvm/aarch64/psci_test.c |   6 +-
- .../selftests/kvm/aarch64/set_id_regs.c       |  18 +-
- .../kvm/aarch64/vpmu_counter_access.c         |  19 +-
- .../testing/selftests/kvm/include/kvm_util.h  |  10 +-
- .../selftests/kvm/lib/aarch64/processor.c     |   8 +-
- tools/testing/selftests/kvm/lib/kvm_util.c    |   3 +-
- .../selftests/kvm/lib/riscv/processor.c       |  66 +++----
- ..._guest_memory_test.c => mmu_stress_test.c} | 162 ++++++++++++++++--
- .../testing/selftests/kvm/riscv/arch_timer.c  |   2 +-
- .../testing/selftests/kvm/riscv/ebreak_test.c |   2 +-
- .../selftests/kvm/riscv/sbi_pmu_test.c        |   2 +-
- tools/testing/selftests/kvm/s390x/resets.c    |   2 +-
- tools/testing/selftests/kvm/steal_time.c      |   3 +-
- 21 files changed, 241 insertions(+), 105 deletions(-)
- rename tools/testing/selftests/kvm/{max_guest_memory_test.c => mmu_stress_test.c} (60%)
-
-
-base-commit: 8cf0b93919e13d1e8d4466eb4080a4c4d9d66d7b
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+index 964df31da975..80b26134e59e 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -43,9 +43,6 @@
+ #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
+ #define KVM_DIRTY_LOG_PAGE_OFFSET 64
+ 
+-#define KVM_REG_SIZE(id)						\
+-	(1U << (((id) & KVM_REG_SIZE_MASK) >> KVM_REG_SIZE_SHIFT))
+-
+ struct kvm_regs {
+ 	struct user_pt_regs regs;	/* sp = sp_el0 */
+ 
+diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/asm/kvm.h
+index e97db3296456..4f8d0c04a47b 100644
+--- a/arch/riscv/include/uapi/asm/kvm.h
++++ b/arch/riscv/include/uapi/asm/kvm.h
+@@ -207,9 +207,6 @@ struct kvm_riscv_sbi_sta {
+ #define KVM_RISCV_TIMER_STATE_OFF	0
+ #define KVM_RISCV_TIMER_STATE_ON	1
+ 
+-#define KVM_REG_SIZE(id)		\
+-	(1U << (((id) & KVM_REG_SIZE_MASK) >> KVM_REG_SIZE_SHIFT))
+-
+ /* If you need to interpret the index values, here is the key: */
+ #define KVM_REG_RISCV_TYPE_MASK		0x00000000FF000000
+ #define KVM_REG_RISCV_TYPE_SHIFT	24
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 637efc055145..9deeb13e3e01 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1070,6 +1070,10 @@ struct kvm_dirty_tlb {
+ 
+ #define KVM_REG_SIZE_SHIFT	52
+ #define KVM_REG_SIZE_MASK	0x00f0000000000000ULL
++
++#define KVM_REG_SIZE(id)		\
++	(1U << (((id) & KVM_REG_SIZE_MASK) >> KVM_REG_SIZE_SHIFT))
++
+ #define KVM_REG_SIZE_U8		0x0000000000000000ULL
+ #define KVM_REG_SIZE_U16	0x0010000000000000ULL
+ #define KVM_REG_SIZE_U32	0x0020000000000000ULL
 -- 
 2.47.0.rc0.187.ge670bccf7e-goog
 
