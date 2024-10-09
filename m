@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFE051E7674;
-	Wed,  9 Oct 2024 19:00:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FA001E7C08;
+	Wed,  9 Oct 2024 19:00:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728500449; cv=none; b=XfA6N2SsKEN8578PV7505ZWd0iAvuNflfLePJdGlXujOfsfd5IrYA5vmjXRYYa79H2LTHm+7U0nRZ34de+/V1gFN0pZL0ohTXtwDaR/o1dqS+VjnASmWdumay2pCOopP6+PzZpZLOkzThhPYr2uJ++Pv9X5Wqq45askt0f9fbE4=
+	t=1728500449; cv=none; b=RkJppUMofhvpDDGc+Cv5ylGExRSambbgXRsataTkyytIhIgQ1FtFI41DbepMnFt43/s19DfOSne4C38RLuAeveg7G18qEqkP2CTGsNyztmk96wijsDYdKMBIPeeou+TjyOm8sf70HdjF5c0HEgZuzubXbRlf5MuqcpzDS5LNpXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1728500449; c=relaxed/simple;
-	bh=WLG6aiuNN/mgMCljFrWmlIWIhDcWjA7d1uKxmA7beSk=;
+	bh=EBML1UPI/XbYRfxzj0vXzXyo3UGhbMQqqUkLLxHimA4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=J233ga7eHKShf3lyRfUoX0adb++KpF3Op321PsIpFmCoB9Mi3+LXHHaWLtguUTH0cHh47bx0YR15ZRHnPQcf/yG2wdgaWCCY6zX/5XGf51PwldtV1c2KYZlHUFxZBWejQkVcIL+/H8gntZSRK/KdDUBQfEMBMvg9eoI+TGnwqMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AwZt04Fp; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=ssDIqy3Y6rj04tOyeWoNawFtIAE6s3q22DrfCDrNrLTHnDa/LLTpHIE5FLsF3w8ZcSTvh35GzznaATsRjFTqjRB5gC/+MKyLJ3ZJ4agCAsNw7nSn6RFNk4A4UFR8dOyOXnwNE32d65SVk/fvDVrSZORiGiNzojKaad/b59RkUuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mISyacbg; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AwZt04Fp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 638C3C4CECC;
-	Wed,  9 Oct 2024 19:00:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mISyacbg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04571C4CECE;
+	Wed,  9 Oct 2024 19:00:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728500448;
-	bh=WLG6aiuNN/mgMCljFrWmlIWIhDcWjA7d1uKxmA7beSk=;
+	s=k20201202; t=1728500449;
+	bh=EBML1UPI/XbYRfxzj0vXzXyo3UGhbMQqqUkLLxHimA4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=AwZt04FpE9AG4PEy6iy5yofEbh1Wa5ZEYHiJB0LivOhzxXf4orGcmMW9/a55++XCq
-	 U9/qaBmpsJhH7gB8UJa/6hpAmJYhlgny1/IPnE3UK+scJkCCDfJtVMZ5fWjFLzG79Y
-	 5rWHDJR2sWyDFEbhfkGlMGqi2EabxXXQ6zIshzMTnqMVvfnHelaZxKSXIKYPg0VdAY
-	 lXnpPyDYFPiErY35fJ87EVYMY1GanRgfVWVBKkbg0QOwONqltZajNsfdJLFebKhiLA
-	 u2rPtKN9RmfGRV4tQXR8itKdZ3udrutC7rypCyu73QKIZWmCr9sTpBcgfuZthfDYP3
-	 CIulrWmYh9Kcw==
+	b=mISyacbg0DxO9q7oP4Ht4u1Fm+cTGec9LkLZjUgfLggVYc/2crgrvx89Ssq7UgYIM
+	 Fa/cYs+2/7hUIl/jUn3f9NftKtfoHbSOgEo/s+4jcmr1lo2Je4TprZdKuwHqloO654
+	 kVEY2RpyzgoQMy6g1VcZRg6Xl0WKxhzfo1gKkUBY1rW+lphcv4EF/Ry/ah/vRYvNDc
+	 jmE8loNZplwW0KMvu9XhZlWzkkjttHDTADcATDd1peOjJXhBeK1sqXmjZy0QzDJSUC
+	 Op2N5bM6ndns9DYllNBWghEG+dIFAU8tS8H0ntS/7Ct7d6TWrYVSlRRM2eMn9X1XaM
+	 qBCWalw1fqUIg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sybvS-001wcY-Ii;
-	Wed, 09 Oct 2024 20:00:46 +0100
+	id 1sybvT-001wcY-78;
+	Wed, 09 Oct 2024 20:00:47 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -42,9 +42,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v4 28/36] KVM: arm64: Drop bogus CPTR_EL2.E0POE trap routing
-Date: Wed,  9 Oct 2024 20:00:11 +0100
-Message-Id: <20241009190019.3222687-29-maz@kernel.org>
+Subject: [PATCH v4 31/36] KVM: arm64: Add save/retore support for POR_EL2
+Date: Wed,  9 Oct 2024 20:00:14 +0100
+Message-Id: <20241009190019.3222687-32-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20241009190019.3222687-1-maz@kernel.org>
 References: <20241009190019.3222687-1-maz@kernel.org>
@@ -60,52 +60,38 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-It took me some time to realise it, but CPTR_EL2.E0POE does not
-apply to a guest, only to EL0 when InHost(). And when InHost(),
-CPCR_EL2 is mapped to CPACR_EL1, maning that the E0POE bit naturally
-takes effect without any trap.
-
-To sum it up, this trap bit is better left ignored, we will never
-have to hanedle it.
+POR_EL2 needs saving when the guest is VHE, and restoring in
+any case.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/emulate-nested.c | 8 --------
- 1 file changed, 8 deletions(-)
+ arch/arm64/kvm/hyp/vhe/sysreg-sr.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 05b6435d02a97..ddcbaa983de36 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -79,7 +79,6 @@ enum cgt_group_id {
- 	CGT_MDCR_E2TB,
- 	CGT_MDCR_TDCC,
+diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+index 005175c10b4a9..86078bd37f8bb 100644
+--- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+@@ -58,6 +58,9 @@ static void __sysreg_save_vel2_state(struct kvm_vcpu *vcpu)
+ 				__vcpu_sys_reg(vcpu, PIRE0_EL2) = read_sysreg_el1(SYS_PIRE0);
+ 				__vcpu_sys_reg(vcpu, PIR_EL2) = read_sysreg_el1(SYS_PIR);
+ 			}
++
++			if (ctxt_has_s1poe(&vcpu->arch.ctxt))
++				__vcpu_sys_reg(vcpu, POR_EL2) = read_sysreg_el1(SYS_POR);
+ 		}
  
--	CGT_CPACR_E0POE,
- 	CGT_CPTR_TAM,
- 	CGT_CPTR_TCPAC,
+ 		/*
+@@ -124,6 +127,9 @@ static void __sysreg_restore_vel2_state(struct kvm_vcpu *vcpu)
+ 			write_sysreg_el1(__vcpu_sys_reg(vcpu, PIR_EL2), SYS_PIR);
+ 			write_sysreg_el1(__vcpu_sys_reg(vcpu, PIRE0_EL2), SYS_PIRE0);
+ 		}
++
++		if (ctxt_has_s1poe(&vcpu->arch.ctxt))
++			write_sysreg_el1(__vcpu_sys_reg(vcpu, POR_EL2), SYS_POR);
+ 	}
  
-@@ -362,12 +361,6 @@ static const struct trap_bits coarse_trap_bits[] = {
- 		.mask		= MDCR_EL2_TDCC,
- 		.behaviour	= BEHAVE_FORWARD_ANY,
- 	},
--	[CGT_CPACR_E0POE] = {
--		.index		= CPTR_EL2,
--		.value		= CPACR_ELx_E0POE,
--		.mask		= CPACR_ELx_E0POE,
--		.behaviour	= BEHAVE_FORWARD_ANY,
--	},
- 	[CGT_CPTR_TAM] = {
- 		.index		= CPTR_EL2,
- 		.value		= CPTR_EL2_TAM,
-@@ -1141,7 +1134,6 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
- 	SR_TRAP(SYS_AMEVTYPER1_EL0(13),	CGT_CPTR_TAM),
- 	SR_TRAP(SYS_AMEVTYPER1_EL0(14),	CGT_CPTR_TAM),
- 	SR_TRAP(SYS_AMEVTYPER1_EL0(15),	CGT_CPTR_TAM),
--	SR_TRAP(SYS_POR_EL0,		CGT_CPACR_E0POE),
- 	/* op0=2, op1=1, and CRn<0b1000 */
- 	SR_RANGE_TRAP(sys_reg(2, 1, 0, 0, 0),
- 		      sys_reg(2, 1, 7, 15, 7), CGT_CPTR_TTA),
+ 	write_sysreg_el1(__vcpu_sys_reg(vcpu, ESR_EL2),		SYS_ESR);
 -- 
 2.39.2
 
