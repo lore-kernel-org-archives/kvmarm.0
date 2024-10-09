@@ -1,89 +1,171 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 078EC19AD86;
-	Wed,  9 Oct 2024 14:43:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD8ED1E3DF7
+	for <kvmarm@lists.linux.dev>; Wed,  9 Oct 2024 15:49:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728484991; cv=none; b=dbJ3PKSMffEWprAIMpiu1FJ5F/tLqlnBGmnbSne6Nc74CZ7jNj5GgCSfsvcm3sFRBmpO2YqS1bb//FAXB3yhxaLBABKWwM2AHAJR9WiQlHMwYKV8VRQc6zJchnmK8j12nvTSZymJzXpJewy0962ZkgmxnEkYD4cgNoL7d1wvkuM=
+	t=1728488998; cv=none; b=Y7qv1KdCuM4BA08pRnzhNQlq+Eh07vp5zPJJh4W5CKjgc9nvoBPg76G8jpC39NS2lfZZR8s8zHBK8Nr0VQJ5w8tGlMhaezgEq30ljCQAw5UcExE6tWs7ZhI+gTwTNGfi4UdxCf5fK5aw72IQwZ7P8YW88V7FeVhsHb+j1D5HKRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728484991; c=relaxed/simple;
-	bh=ghDXhJ8N/Fq5uvX13sqCHmKOKO+si/SzPYqkee2gkCU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IbwVcWmEyWsTGU6TwRh7rkeBcCn9IYPZFKTXBX1UAYIFHk/vfdQu1W7tVyYCj1GrXDxljGDA2Q5qprfEh34c7tPMYn+CNr3mIbN0acaRmrNZV4NFEqYtlgwuOtFbNaPn2Koitla3G1xxZPWV8cj+xqyH432AZAB2KLziHYA+Z3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AxAi7gMo; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1728488998; c=relaxed/simple;
+	bh=lSrxQ0o4lzW28SX3OpFxYNNm5zyTaJtY872EDLEASgA=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Yz+sMQ144baK0J2QWzl0sx5CAaZgsDGfZ4HHMHjwsYKKqCfdM+CfkddCb5917rprIL62U7lM2zzXeZ1zE7PJmS791etDygYvdtTnpeupuJVstTGi2Zg0FDju0sHwwMDyDp9VUnrJS2mDU46sax1FigSw4nCSmeo0Qa0Ua7kCtyw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xZfDy8ou; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AxAi7gMo"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56DCBC4CEC3;
-	Wed,  9 Oct 2024 14:43:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728484990;
-	bh=ghDXhJ8N/Fq5uvX13sqCHmKOKO+si/SzPYqkee2gkCU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=AxAi7gMooCiJGqGzS0LWH7kBxoZwHJn5xIZ5q0R7f2JFhjQ8vFEszC3neoypcep6A
-	 T04nDesXSfu08Vf9+sA3K4h/yiH8T7lKmbtsmltNb0rLX7hIshVw4gzVgAfVGilHON
-	 T0lVRGhKcASYRRGMfUFMkMr67ctpsruVmTf/b0/87df+LAofBUCNmmbLqvjK7vPZ2k
-	 kspRbAd1hTXLUznLCT2elteYkVFC35t8ffslqZHPDDQVxJc3HWCIAs7chSvJU/deEg
-	 YmHhdQwxG3GwSOPLrsvvcQZQ+tHMwtBNb7AHKPREGF1DC1YOwPzF+LLL9SFcA8W16M
-	 a061/KbZx2orA==
-Date: Wed, 9 Oct 2024 15:43:02 +0100
-From: Will Deacon <will@kernel.org>
-To: Kevin Brodsky <kevin.brodsky@arm.com>
-Cc: Joey Gouly <joey.gouly@arm.com>, linux-arm-kernel@lists.infradead.org,
-	nd@arm.com, akpm@linux-foundation.org, aneesh.kumar@kernel.org,
-	aneesh.kumar@linux.ibm.com, anshuman.khandual@arm.com, bp@alien8.de,
-	broonie@kernel.org, catalin.marinas@arm.com,
-	christophe.leroy@csgroup.eu, dave.hansen@linux.intel.com,
-	hpa@zytor.com, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
-	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
-	oliver.upton@linux.dev, shuah@kernel.org, skhan@linuxfoundation.org,
-	szabolcs.nagy@arm.com, tglx@linutronix.de, x86@kernel.org,
-	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v5 19/30] arm64: add POE signal support
-Message-ID: <20241009144301.GA12453@willie-the-truck>
-References: <20240822151113.1479789-1-joey.gouly@arm.com>
- <20240822151113.1479789-20-joey.gouly@arm.com>
- <47e1537f-5b60-4541-aed1-a20e804c137d@arm.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xZfDy8ou"
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-7ea0d46d1f0so4487330a12.2
+        for <kvmarm@lists.linux.dev>; Wed, 09 Oct 2024 08:49:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1728488996; x=1729093796; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mp1GmMvEsdG1xOqt7J6qefXNw1tx4nozkIWjiF4j3SI=;
+        b=xZfDy8ouQyxIakYxJsPWLQmq0FBFpwv/m1JpXVScr2Ho4gn4Br+eLA0EFgTyrdPnqQ
+         D4c8Zc5dDdkEXuijOqQ6mVaLUuC4Sb7sO6G/T+OEQ9iIUR1Us7i4slKtxnV2Nc6GoO40
+         gR8yAsOuTKhAoBl+mVCTOjvDxbluji/iz3kn/2KlOQY89U37RCldrdU3GliSzWPXe/8I
+         ckuyx0LsBKzLrY/k/Ow4oNHbsTm5bXX2h4mWNc5j9m2OatYt8DIeTdYN8VE0sIsotxA4
+         nuNm9DjghAJ7qkaAm0ojCjdNUjpL245ALATKbrTheuE4JNILBc5hYoSPoTeKEJARzCBh
+         P/EQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728488996; x=1729093796;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mp1GmMvEsdG1xOqt7J6qefXNw1tx4nozkIWjiF4j3SI=;
+        b=dY7yPeZp+cA/oalj9tVo226X1MyZ8QatU7f3qiv62PobzqeDmjw+vH7PbOditz+m3I
+         C+JSgKCTX2Kh8ZYMUoV4HGlH+S/9fUI/QKcppGAmaeC86Oo73of02OVariuDQuYG2WIk
+         oOqPx6bNLrpCffVB++OLzX2gmHYgE/yG3UqGr1inRiAy7EVYu1LY6OBnbhOsCWxnsqL2
+         TtAXUSKsdqwS9R2HH1L91ePfAe8DQOYGVBRHTkSZ1ydAhWSo8vClZqmfRNT9ZXrHZNjA
+         +uhM+Vg+EFzlHkWeC1sGCEQvHTkzOltFR8xKN4oXGhPSIf1/ElZo4IM63eiyhIZJPeHC
+         G0vw==
+X-Forwarded-Encrypted: i=1; AJvYcCVlIq0DRyY/jX6p+oqWK2+Q7QGmqhHcW/G4aIZeLopOg5XqmOlOTXDk1G2jVM5hIcRzZ1cXoiA=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwGUY1iXyVwaJcpLhvb1Lok4G3uhcB8lqCRORg31lk+6HgZSBIm
+	xm/22mZayMny9vj8kQ3xMLVPtNZqElMmh5UOxS4bOS89HEKAKn9hKIWrby1qc93x5785qLyANsG
+	iFw==
+X-Google-Smtp-Source: AGHT+IEKF1Ho4VsrxKapa7g6WWX3VRxIkgUDz21gNBA5z4SeEUBMmHmDj2XN+crbLzcKc/g4iyRtc0M+qRE=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a17:90a:468a:b0:2e0:6c40:e384 with SMTP id
+ 98e67ed59e1d1-2e2a251444emr3074a91.4.1728488995562; Wed, 09 Oct 2024 08:49:55
+ -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Wed,  9 Oct 2024 08:49:39 -0700
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <47e1537f-5b60-4541-aed1-a20e804c137d@arm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.0.rc0.187.ge670bccf7e-goog
+Message-ID: <20241009154953.1073471-1-seanjc@google.com>
+Subject: [PATCH v3 00/14] KVM: selftests: Morph max_guest_mem to mmu_stress
+From: Sean Christopherson <seanjc@google.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Sean Christopherson <seanjc@google.com>, Andrew Jones <ajones@ventanamicro.com>, 
+	James Houghton <jthoughton@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Kevin,
+The main purpose of this series is to convert the max_guest_memory_test
+into a more generic mmu_stress_test.  The basic gist of the "conversion"
+is to have the test do mprotect() on guest memory while vCPUs are
+accessing said memory, e.g. to verify KVM and mmu_notifiers are working
+as intended.
 
-On Tue, Sep 24, 2024 at 01:27:58PM +0200, Kevin Brodsky wrote:
-> On 22/08/2024 17:11, Joey Gouly wrote:
-> > @@ -1178,6 +1237,9 @@ static void setup_return(struct pt_regs *regs, struct k_sigaction *ka,
-> >  		sme_smstop();
-> >  	}
-> >  
-> > +	if (system_supports_poe())
-> > +		write_sysreg_s(POR_EL0_INIT, SYS_POR_EL0);
-> 
-> At the point where setup_return() is called, the signal frame has
-> already been written to the user stack. In other words, we write to the
-> user stack first, and then reset POR_EL0. This may be problematic,
-> especially if we are using the alternate signal stack, which the
-> interrupted POR_EL0 may not grant access to. In that situation uaccess
-> will fail and we'll end up with a SIGSEGV.
-> 
-> This issue has already been discussed on the x86 side, and as it happens
-> patches to reset PKRU early [1] have just landed. I don't think this is
-> a blocker for getting this series landed, but we should try and align
-> with x86. If there's no objection, I'm planning to work on a counterpart
-> to the x86 series (resetting POR_EL0 early during signal delivery).
+Patches 1-4 are a somewhat unexpected side quest.  The original plan was
+that patch 3 would be a single patch, but things snowballed.
 
-Did you get a chance to work on that? It would be great to land the
-fixes for 6.12, if possible, so that the first kernel release with POE
-support doesn't land with known issues.
+Patch 3 reworks vcpu_get_reg() to return a value instead of using an
+out-param.  This is the entire motivation for including these patches;
+having to define a variable just to bump the program counter on arm64
+annoyed me.
 
-Cheers,
+Patch 4 adds hardening to vcpu_{g,s}et_reg() to detect potential
+truncation, as KVM's uAPI allows for registers greater than the 64 bits
+that are supported in the "outer" selftests APIs ((vcpu_set_reg() takes a
+u64, vcpu_get_reg() now returns a u64).
 
-Will
+Patch 1 is a change to KVM's uAPI headers to move the KVM_REG_SIZE
+definition to common code so that the selftests side of things doesn't
+need #ifdefs to implement the hardening in patch 4.
+
+Patch 2 is the truly unexpected part.  With the vcpu_get_reg() rework,
+arm64's vpmu_counter_test fails when compiled with gcc-13, and on gcc-11
+with an added "noinline".  Long story short, selftests are being compiled
+with strict aliasing enabled, which allows the compiler to optimize away
+"u64 *" => "uint64_t *" casts as u64 (unsigned long long) and uint64_t
+(unsigned long) are technically not aliases of each other.  *sigh*
+
+v3:
+ - Rebased onto v6.12-rc2.
+ - Disable strict aliasing to fix the PMCR snafu.
+ - Collect reviews. [Drew]
+ - Minor changelog fixes. [Drew]
+ - Include ucall_common.h to prep for RISC-V. [Drew]
+
+v2:
+ - Rebase onto kvm/next.
+ - Add the aforementioned vcpu_get_reg() changes/disaster.
+ - Actually add arm64 support for the fancy mprotect() testcase (I did this
+   before v1, but managed to forget to include the changes when posting).
+ - Emit "mov %rax, (%rax)" on x86. [James]
+ - Add a comment to explain the fancy mprotect() vs. vCPUs logic.
+ - Drop the KVM x86 patches (applied and/or will be handled separately).
+
+v1: https://lore.kernel.org/all/20240809194335.1726916-1-seanjc@google.com
+
+Sean Christopherson (14):
+  KVM: Move KVM_REG_SIZE() definition to common uAPI header
+  KVM: selftests: Disable strict aliasing
+  KVM: selftests: Return a value from vcpu_get_reg() instead of using an
+    out-param
+  KVM: selftests: Assert that vcpu_{g,s}et_reg() won't truncate
+  KVM: selftests: Check for a potential unhandled exception iff KVM_RUN
+    succeeded
+  KVM: selftests: Rename max_guest_memory_test to mmu_stress_test
+  KVM: selftests: Only muck with SREGS on x86 in mmu_stress_test
+  KVM: selftests: Compute number of extra pages needed in
+    mmu_stress_test
+  KVM: sefltests: Explicitly include ucall_common.h in mmu_stress_test.c
+  KVM: selftests: Enable mmu_stress_test on arm64
+  KVM: selftests: Use vcpu_arch_put_guest() in mmu_stress_test
+  KVM: selftests: Precisely limit the number of guest loops in
+    mmu_stress_test
+  KVM: selftests: Add a read-only mprotect() phase to mmu_stress_test
+  KVM: selftests: Verify KVM correctly handles mprotect(PROT_READ)
+
+ arch/arm64/include/uapi/asm/kvm.h             |   3 -
+ arch/riscv/include/uapi/asm/kvm.h             |   3 -
+ include/uapi/linux/kvm.h                      |   4 +
+ tools/testing/selftests/kvm/Makefile          |  11 +-
+ .../selftests/kvm/aarch64/aarch32_id_regs.c   |  10 +-
+ .../selftests/kvm/aarch64/debug-exceptions.c  |   4 +-
+ .../selftests/kvm/aarch64/hypercalls.c        |   6 +-
+ .../selftests/kvm/aarch64/no-vgic-v3.c        |   2 +-
+ .../testing/selftests/kvm/aarch64/psci_test.c |   6 +-
+ .../selftests/kvm/aarch64/set_id_regs.c       |  18 +-
+ .../kvm/aarch64/vpmu_counter_access.c         |  19 +-
+ .../testing/selftests/kvm/include/kvm_util.h  |  10 +-
+ .../selftests/kvm/lib/aarch64/processor.c     |   8 +-
+ tools/testing/selftests/kvm/lib/kvm_util.c    |   3 +-
+ .../selftests/kvm/lib/riscv/processor.c       |  66 +++----
+ ..._guest_memory_test.c => mmu_stress_test.c} | 162 ++++++++++++++++--
+ .../testing/selftests/kvm/riscv/arch_timer.c  |   2 +-
+ .../testing/selftests/kvm/riscv/ebreak_test.c |   2 +-
+ .../selftests/kvm/riscv/sbi_pmu_test.c        |   2 +-
+ tools/testing/selftests/kvm/s390x/resets.c    |   2 +-
+ tools/testing/selftests/kvm/steal_time.c      |   3 +-
+ 21 files changed, 241 insertions(+), 105 deletions(-)
+ rename tools/testing/selftests/kvm/{max_guest_memory_test.c => mmu_stress_test.c} (60%)
+
+
+base-commit: 8cf0b93919e13d1e8d4466eb4080a4c4d9d66d7b
+-- 
+2.47.0.rc0.187.ge670bccf7e-goog
+
