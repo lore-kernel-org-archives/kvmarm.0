@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D0771E32B0;
-	Wed,  9 Oct 2024 19:00:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C6771E32C1;
+	Wed,  9 Oct 2024 19:00:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728500446; cv=none; b=Z2wasQKXh1NrQiyl96qWsi3O6EvLEyQARflXxOKT5UMzeCDs2C8b+bOJV7FAuJb0a3w+uL4MtrIkXJcjTcDQrORhBzbIBzWFtjY6rZO0+Mrn2sjktjOayfw+g+uaSbRhMwNQ7b/OHV3KvX5lhJ6E4ZrF7OGY1hk75nWT5d4vVZk=
+	t=1728500446; cv=none; b=jwBFs1TN8nkNxsbTwV1kckpsP8OT2m7bPfde8IQ7C/sXAbLP7ceP5RyLe1YOU93tVByTSBuE7jQvZk35J+oIUdpCcE7TwRfHBFvthl/F6zbT43Uu3fSPfejeTmGBj3TnU0RmDuX9w1AQsQZZ4LXvA2j+KRBCF46pKPcF42itqC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1728500446; c=relaxed/simple;
-	bh=FgQexBaZfsfQzAHeUxw7obYY6WYgogLcfZPAE0mj4tA=;
+	bh=I8opGiuqFUxiSXZuaqA7KAMi/5a4PI7HF5UfCvQZp8M=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=N62w0ruBFC/dJw/GPuOm60reTxMb0BlLmDkpThgQNp0goZnLtH1lvBpmSDbPvKPCZR7KgJ7pVwrobCGmrTy0afWlAtGJ8wnv4/arZkFnhi/mMXfU3UbAEsIOildvZHZJxdZn70gsVcFWeLUHji7VNZTSjDxn20GO9hMqrkY3oiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WixtwlLo; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=cQvz+CjIVVNFy5zQxeKA1ml8CKgt5uDMaLu7eYu74cWDjFkVBlBfbQffyy5KjItRiYfYgsi3BJhGTfaquhDe2f2mQ782kt2SvwMQehDM/maboROIx0ML+ajoAgJunZ+j87EFbWVLwbSymqnm8b0OZBJKTQLXhemhnMuh0zV5nX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Iw/oTGoK; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WixtwlLo"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD9B6C4CED4;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Iw/oTGoK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AFDCAC4CECC;
 	Wed,  9 Oct 2024 19:00:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1728500445;
-	bh=FgQexBaZfsfQzAHeUxw7obYY6WYgogLcfZPAE0mj4tA=;
+	bh=I8opGiuqFUxiSXZuaqA7KAMi/5a4PI7HF5UfCvQZp8M=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WixtwlLoWOQuDwtZZNW3zKconMpz4W68y2yM5+dYpRiNbwduf37lNfAk6fYsr8KX9
-	 ybFBx+bDuqpR/W7piI3Su8ewDbvQi38Mzk88WM+ot49PDojQ7l4rrkpbsJ6xG37Zz5
-	 /F0AEw0b9/ELTMPGuiTJCbqm3oY1NszchUuaSRHubR2os+TY+JfvPS5/oGlDLOEfTc
-	 WfEopICYTEYV26TdgIFkTC/Ful/zWuAipkFeYX+XL6FN8xnLeD1p3OPjESzqp1VqA+
-	 wWu3tnxbA5ZkZpQk6+Pskj9Zq4Prvci452G8GJwhwKi/mOVLBNYc7Q9NhpJz9JovkC
-	 QF9REJbjSrs/Q==
+	b=Iw/oTGoKKNkrBlMbn7Jl8BsluKQVV6XTT6l4vsfGhAFXvfLrzphQq6ZA5LjincYGR
+	 s2NHbA6XO/Dd136VUY7i3dMD5WzqUHZwVc10J0tXm0jPcqRCgmNANHzH0klfQT65LS
+	 kUukM2zcqTSKsgBfFh/gOsLoiQ0f7tIZ+N55DSWSteDQUavGCHP4j9EOeZpyBoxXTk
+	 T86+jC4q3cokNhc9NlpHFfoSo8ZBnCYIJgyEDvK01yqcMOX4rfTrEx1MkizbR0j/4O
+	 j5Y+vpCzKYDhFmoOvfv3axoqjR8oW7W2WDCur1y0t6vSoOWU1Gzpz3li0deqG5K9PR
+	 orF0yt9jmmQmA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sybvQ-001wcY-42;
-	Wed, 09 Oct 2024 20:00:44 +0100
+	id 1sybvP-001wcY-NY;
+	Wed, 09 Oct 2024 20:00:43 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -42,9 +42,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v4 17/36] KVM: arm64: Sanitise ID_AA64MMFR3_EL1
-Date: Wed,  9 Oct 2024 20:00:00 +0100
-Message-Id: <20241009190019.3222687-18-maz@kernel.org>
+Subject: [PATCH v4 15/36] KVM: arm64: Add save/restore for PIR{,E0}_EL2
+Date: Wed,  9 Oct 2024 19:59:58 +0100
+Message-Id: <20241009190019.3222687-16-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20241009190019.3222687-1-maz@kernel.org>
 References: <20241009190019.3222687-1-maz@kernel.org>
@@ -60,40 +60,55 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add the missing sanitisation of ID_AA64MMFR3_EL1, making sure we
-solely expose S1PIE and TCRX (we currently don't support anything
-else).
+Like their EL1 equivalent, the EL2-specific FEAT_S1PIE registers
+are context-switched. This is made conditional on both FEAT_TCRX
+and FEAT_S1PIE being adversised.
+
+Note that this change only makes sense if read together with the
+issue D22677 contained in 102105_K.a_04_en.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/hyp/vhe/sysreg-sr.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index c42f09a67a7c9..c9638541c0994 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1617,7 +1617,9 @@ static u64 __kvm_read_sanitised_id_reg(const struct kvm_vcpu *vcpu,
- 		val &= ~ID_AA64MMFR2_EL1_CCIDX_MASK;
- 		break;
- 	case SYS_ID_AA64MMFR3_EL1:
--		val &= ID_AA64MMFR3_EL1_TCRX | ID_AA64MMFR3_EL1_S1POE;
+diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+index 5f69a1f713cfe..005175c10b4a9 100644
+--- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+@@ -51,9 +51,15 @@ static void __sysreg_save_vel2_state(struct kvm_vcpu *vcpu)
+ 		__vcpu_sys_reg(vcpu, TTBR1_EL2)	= read_sysreg_el1(SYS_TTBR1);
+ 		__vcpu_sys_reg(vcpu, TCR_EL2)	= read_sysreg_el1(SYS_TCR);
+ 
+-		if (ctxt_has_tcrx(&vcpu->arch.ctxt))
++		if (ctxt_has_tcrx(&vcpu->arch.ctxt)) {
+ 			__vcpu_sys_reg(vcpu, TCR2_EL2) = read_sysreg_el1(SYS_TCR2);
+ 
++			if (ctxt_has_s1pie(&vcpu->arch.ctxt)) {
++				__vcpu_sys_reg(vcpu, PIRE0_EL2) = read_sysreg_el1(SYS_PIRE0);
++				__vcpu_sys_reg(vcpu, PIR_EL2) = read_sysreg_el1(SYS_PIR);
++			}
++		}
 +
-+		val &= ID_AA64MMFR3_EL1_TCRX | ID_AA64MMFR3_EL1_S1POE |
-+		       ID_AA64MMFR3_EL1_S1PIE;
- 		break;
- 	case SYS_ID_MMFR4_EL1:
- 		val &= ~ARM64_FEATURE_MASK(ID_MMFR4_EL1_CCIDX);
-@@ -2500,7 +2502,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 					ID_AA64MMFR2_EL1_NV |
- 					ID_AA64MMFR2_EL1_CCIDX)),
- 	ID_WRITABLE(ID_AA64MMFR3_EL1, (ID_AA64MMFR3_EL1_TCRX	|
--				       ID_AA64MMFR3_EL1_S1POE)),
-+				       ID_AA64MMFR3_EL1_S1POE	|
-+				       ID_AA64MMFR3_EL1_S1PIE)),
- 	ID_SANITISED(ID_AA64MMFR4_EL1),
- 	ID_UNALLOCATED(7,5),
- 	ID_UNALLOCATED(7,6),
+ 		/*
+ 		 * The EL1 view of CNTKCTL_EL1 has a bunch of RES0 bits where
+ 		 * the interesting CNTHCTL_EL2 bits live. So preserve these
+@@ -111,9 +117,14 @@ static void __sysreg_restore_vel2_state(struct kvm_vcpu *vcpu)
+ 		write_sysreg_el1(val, SYS_TCR);
+ 	}
+ 
+-	if (ctxt_has_tcrx(&vcpu->arch.ctxt))
++	if (ctxt_has_tcrx(&vcpu->arch.ctxt)) {
+ 		write_sysreg_el1(__vcpu_sys_reg(vcpu, TCR2_EL2), SYS_TCR2);
+ 
++		if (ctxt_has_s1pie(&vcpu->arch.ctxt)) {
++			write_sysreg_el1(__vcpu_sys_reg(vcpu, PIR_EL2), SYS_PIR);
++			write_sysreg_el1(__vcpu_sys_reg(vcpu, PIRE0_EL2), SYS_PIRE0);
++		}
++	}
+ 
+ 	write_sysreg_el1(__vcpu_sys_reg(vcpu, ESR_EL2),		SYS_ESR);
+ 	write_sysreg_el1(__vcpu_sys_reg(vcpu, AFSR0_EL2),	SYS_AFSR0);
 -- 
 2.39.2
 
