@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B1AE1E47B3;
-	Wed,  9 Oct 2024 19:00:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A40501E47C2;
+	Wed,  9 Oct 2024 19:00:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728500447; cv=none; b=UGz0P1vv5EyDYcXCnbqCoPip8OapJty8OAGGg8pnMEtvGf02NaGsPJHqIrbXdKz+Xakv/m+h9GLquin5ZQ7BIXV0UATOSO+vcIyvRbaOKiXJnXZMbD4TRTyTtIfL8gZnf9VA5pJH1qxgmEYHA4/z/SdAbonjyBUODHkCPe/uXDs=
+	t=1728500447; cv=none; b=MVhgdFnmsx7OTRXnIHi7QuOn/fpPieHOFnbUsg7AjEoBrSVRKlNVlTo26f9GTTs1iV4gxzl399C5l9qwPugq+tYQTrdd99kaXYa9iGlhZVUtrypRHvuBZTbdS9j415xlUKwe6hhqzQyCv72cT16AnUdjs+t9rdjGGYvfhHqP0fw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1728500447; c=relaxed/simple;
-	bh=epoT6/esI1Jik2zpZgz5IDoFxGAgX4t7Ypv2JmRszAE=;
+	bh=iEUI3OefKCYJFOSoEjBNdqE75OBAN4/6dLCG/GX/j98=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=t4h/QWmerQ70KtJxw6Uu3oHXT6FtUQYfZIFhln1eNwgvsVFZxqIWJNcSJo5rLhTMwpGAh+PI8AxiE1Bp+qBjyUbU0ZVrGq7CfHbLLq6MSGZOyw5CSprmxwzO3/RD6ztMIe2+pbuTYG60HwZaL7jHbN9thCc9SeX1eAynokLU/qU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sRYdeNTW; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=XQsuewD2itnUtWPI3FHd2qA81WB1RJtF9S3BHapEwABvxH0VPuRzl/w4Acz/em/+Xi8+cNVbOoXzjCtoYfb6MPwv+i4Y2SwNjkdvtFtuhJkF9em6PmBt6MRyxVDoyhjuIogvC5ZxcXqHM6sHQw10mlUuuv5tY4HDHgmTzBlGx+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ty+/wyUu; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sRYdeNTW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DE6FC4CEC3;
-	Wed,  9 Oct 2024 19:00:47 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ty+/wyUu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 334F8C4CEDE;
+	Wed,  9 Oct 2024 19:00:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728500447;
-	bh=epoT6/esI1Jik2zpZgz5IDoFxGAgX4t7Ypv2JmRszAE=;
+	s=k20201202; t=1728500446;
+	bh=iEUI3OefKCYJFOSoEjBNdqE75OBAN4/6dLCG/GX/j98=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=sRYdeNTWvgb0As/wtSBa1wBYt3PxHFusxxXyEA7oYJsmDIv5ZmgI1hg0XyvUuKhmX
-	 YTeRIlkoM6w9UkGL1g3KhoZ2/TykrO4lZWeCGBrOaqLY7XIhEnE/inrx9GclGxnpjT
-	 8GqzEwJQ2vTHCwa4LKzkIjm733qHegmYEXKeE1M6h3sGrSyXUmcdWM43RWQRnd8sUy
-	 HD/iS86AzpbedxvJc66z/y0+Nsta/Kjh/KWKAGZXdZw1FfzozSul9M7/E8MhId7X0Q
-	 Yy6QCGZz+g20c49Lr+yzQ5OrAf0iICRqiZMK9zY/BWP2ha0UXVzk1kcUbXDeckl+ej
-	 7/Enb1xBEo+fg==
+	b=Ty+/wyUuAT5XRb76XfW9QtAeZ2hoMRTSi5sLt2TJE1PjDRF7+dgd7em1MHJowZioD
+	 nFswA53NZoqTJeRFSxApjku6qku8RmH0PLQ6VOoX7gt3w1kZ4eSg1JxAc7jp3p/0xA
+	 AnZtubpBaNq9Xn0ouPfEyCsMsekbYoIgtPW1MHjii1HRryQwWe6k/OgGsPaxTVetYb
+	 KwKz1C8YUTSF/CflpwiFjgARUCQnH7lp/yjDGkW1OUbmg0OfJz7FjLecvYFKY8AhP5
+	 yIkT+aXK+8Z8WafDs4jm30c60TFqoT54mvi/JaSsFSWJhk4AGv27xIpsPR1NQe9Qis
+	 ZVWLDb/SAJ7wQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sybvR-001wcY-FU;
-	Wed, 09 Oct 2024 20:00:45 +0100
+	id 1sybvQ-001wcY-BK;
+	Wed, 09 Oct 2024 20:00:44 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -42,9 +42,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v4 23/36] KVM: arm64: Hide TCR2_EL1 from userspace when disabled for guests
-Date: Wed,  9 Oct 2024 20:00:06 +0100
-Message-Id: <20241009190019.3222687-24-maz@kernel.org>
+Subject: [PATCH v4 18/36] KVM: arm64: Add AT fast-path support for S1PIE
+Date: Wed,  9 Oct 2024 20:00:01 +0100
+Message-Id: <20241009190019.3222687-19-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20241009190019.3222687-1-maz@kernel.org>
 References: <20241009190019.3222687-1-maz@kernel.org>
@@ -60,94 +60,76 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-From: Mark Brown <broonie@kernel.org>
+Emulating AT using AT instructions requires that the live state
+matches the translation regime the AT instruction targets.
 
-When the guest does not support FEAT_TCR2 we should not allow any access
-to it in order to ensure that we do not create spurious issues with guest
-migration. Add a visibility operation for it.
+If targeting the EL1&0 translation regime and that S1PIE is
+supported, we also need to restore that state (covering TCR2_EL1,
+PIR_EL1, and PIRE0_EL1).
 
-Fixes: fbff56068232 ("KVM: arm64: Save/restore TCR2_EL1")
-Signed-off-by: Mark Brown <broonie@kernel.org>
-Link: https://lore.kernel.org/r/20240822-kvm-arm64-hide-pie-regs-v2-2-376624fa829c@kernel.org
+Add the required system register switcheroo.
+
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h |  3 +++
- arch/arm64/kvm/sys_regs.c         | 29 ++++++++++++++++++++++++++---
- 2 files changed, 29 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/at.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 1a5477181447c..197a7a08b3af5 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -1511,4 +1511,7 @@ void kvm_set_vm_id_reg(struct kvm *kvm, u32 reg, u64 val);
- 	(system_supports_fpmr() &&			\
- 	 kvm_has_feat((k), ID_AA64PFR2_EL1, FPMR, IMP))
+diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+index f04677127fbc0..b9d0992e91972 100644
+--- a/arch/arm64/kvm/at.c
++++ b/arch/arm64/kvm/at.c
+@@ -412,6 +412,9 @@ struct mmu_config {
+ 	u64	ttbr1;
+ 	u64	tcr;
+ 	u64	mair;
++	u64	tcr2;
++	u64	pir;
++	u64	pire0;
+ 	u64	sctlr;
+ 	u64	vttbr;
+ 	u64	vtcr;
+@@ -424,6 +427,13 @@ static void __mmu_config_save(struct mmu_config *config)
+ 	config->ttbr1	= read_sysreg_el1(SYS_TTBR1);
+ 	config->tcr	= read_sysreg_el1(SYS_TCR);
+ 	config->mair	= read_sysreg_el1(SYS_MAIR);
++	if (cpus_have_final_cap(ARM64_HAS_TCR2)) {
++		config->tcr2	= read_sysreg_el1(SYS_TCR2);
++		if (cpus_have_final_cap(ARM64_HAS_S1PIE)) {
++			config->pir	= read_sysreg_el1(SYS_PIR);
++			config->pire0	= read_sysreg_el1(SYS_PIRE0);
++		}
++	}
+ 	config->sctlr	= read_sysreg_el1(SYS_SCTLR);
+ 	config->vttbr	= read_sysreg(vttbr_el2);
+ 	config->vtcr	= read_sysreg(vtcr_el2);
+@@ -444,6 +454,13 @@ static void __mmu_config_restore(struct mmu_config *config)
+ 	write_sysreg_el1(config->ttbr1,	SYS_TTBR1);
+ 	write_sysreg_el1(config->tcr,	SYS_TCR);
+ 	write_sysreg_el1(config->mair,	SYS_MAIR);
++	if (cpus_have_final_cap(ARM64_HAS_TCR2)) {
++		write_sysreg_el1(config->tcr2, SYS_TCR2);
++		if (cpus_have_final_cap(ARM64_HAS_S1PIE)) {
++			write_sysreg_el1(config->pir, SYS_PIR);
++			write_sysreg_el1(config->pire0, SYS_PIRE0);
++		}
++	}
+ 	write_sysreg_el1(config->sctlr,	SYS_SCTLR);
+ 	write_sysreg(config->vttbr,	vttbr_el2);
+ 	write_sysreg(config->vtcr,	vtcr_el2);
+@@ -914,6 +931,13 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+ 	write_sysreg_el1(vcpu_read_sys_reg(vcpu, TTBR1_EL1),	SYS_TTBR1);
+ 	write_sysreg_el1(vcpu_read_sys_reg(vcpu, TCR_EL1),	SYS_TCR);
+ 	write_sysreg_el1(vcpu_read_sys_reg(vcpu, MAIR_EL1),	SYS_MAIR);
++	if (kvm_has_feat(vcpu->kvm, ID_AA64MMFR3_EL1, TCRX, IMP)) {
++		write_sysreg_el1(vcpu_read_sys_reg(vcpu, TCR2_EL1), SYS_TCR2);
++		if (kvm_has_feat(vcpu->kvm, ID_AA64MMFR3_EL1, S1PIE, IMP)) {
++			write_sysreg_el1(vcpu_read_sys_reg(vcpu, PIR_EL1), SYS_PIR);
++			write_sysreg_el1(vcpu_read_sys_reg(vcpu, PIRE0_EL1), SYS_PIRE0);
++		}
++	}
+ 	write_sysreg_el1(vcpu_read_sys_reg(vcpu, SCTLR_EL1),	SYS_SCTLR);
+ 	__load_stage2(mmu, mmu->arch);
  
-+#define kvm_has_tcr2(k)				\
-+	(kvm_has_feat((k), ID_AA64MMFR3_EL1, TCRX, IMP))
-+
- #endif /* __ARM64_KVM_HOST_H__ */
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 170a5bed68fe3..6226949b5bc79 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2348,6 +2348,27 @@ static unsigned int s1poe_visibility(const struct kvm_vcpu *vcpu,
- 	return REG_HIDDEN;
- }
- 
-+static unsigned int tcr2_visibility(const struct kvm_vcpu *vcpu,
-+				    const struct sys_reg_desc *rd)
-+{
-+	if (kvm_has_tcr2(vcpu->kvm))
-+		return 0;
-+
-+	return REG_HIDDEN;
-+}
-+
-+static unsigned int tcr2_el2_visibility(const struct kvm_vcpu *vcpu,
-+				    const struct sys_reg_desc *rd)
-+{
-+	unsigned int r;
-+
-+	r = el2_visibility(vcpu, rd);
-+	if (r)
-+		return r;
-+
-+	return tcr2_visibility(vcpu, rd);
-+}
-+
- /*
-  * Architected system registers.
-  * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
-@@ -2532,7 +2553,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_TTBR0_EL1), access_vm_reg, reset_unknown, TTBR0_EL1 },
- 	{ SYS_DESC(SYS_TTBR1_EL1), access_vm_reg, reset_unknown, TTBR1_EL1 },
- 	{ SYS_DESC(SYS_TCR_EL1), access_vm_reg, reset_val, TCR_EL1, 0 },
--	{ SYS_DESC(SYS_TCR2_EL1), access_vm_reg, reset_val, TCR2_EL1, 0 },
-+	{ SYS_DESC(SYS_TCR2_EL1), access_vm_reg, reset_val, TCR2_EL1, 0,
-+	  .visibility = tcr2_visibility },
- 
- 	PTRAUTH_KEY(APIA),
- 	PTRAUTH_KEY(APIB),
-@@ -2869,7 +2891,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	EL2_REG(TTBR0_EL2, access_rw, reset_val, 0),
- 	EL2_REG(TTBR1_EL2, access_rw, reset_val, 0),
- 	EL2_REG(TCR_EL2, access_rw, reset_val, TCR_EL2_RES1),
--	EL2_REG(TCR2_EL2, access_tcr2_el2, reset_val, TCR2_EL2_RES1),
-+	EL2_REG_FILTERED(TCR2_EL2, access_tcr2_el2, reset_val, TCR2_EL2_RES1,
-+			 tcr2_el2_visibility),
- 	EL2_REG_VNCR(VTTBR_EL2, reset_val, 0),
- 	EL2_REG_VNCR(VTCR_EL2, reset_val, 0),
- 
-@@ -4738,7 +4761,7 @@ void kvm_calculate_traps(struct kvm_vcpu *vcpu)
- 		if (kvm_has_feat(kvm, ID_AA64ISAR2_EL1, MOPS, IMP))
- 			vcpu->arch.hcrx_el2 |= (HCRX_EL2_MSCEn | HCRX_EL2_MCE2);
- 
--		if (kvm_has_feat(kvm, ID_AA64MMFR3_EL1, TCRX, IMP))
-+		if (kvm_has_tcr2(kvm))
- 			vcpu->arch.hcrx_el2 |= HCRX_EL2_TCR2En;
- 
- 		if (kvm_has_fpmr(kvm))
 -- 
 2.39.2
 
