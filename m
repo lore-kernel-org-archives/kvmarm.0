@@ -1,31 +1,31 @@
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B73E229AF
-	for <kvmarm@lists.linux.dev>; Thu, 10 Oct 2024 07:33:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06CE920110A
+	for <kvmarm@lists.linux.dev>; Thu, 10 Oct 2024 07:51:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728545606; cv=none; b=X/SS56cjLi/xgv63ORA4J3Flhn0G/ilR7adTD+yiKZVuck2qEBLSVCdX1/XO7LlDoiLK5MCZfRAHazFof/Omid0Bw4iBQGL6K3oAu8+n14fdzBvsme9fRni5thfE4Ofx79XUVjvpzPaSbGOtypc7kESHXPcSMzlrp3Q4rYhJ2HU=
+	t=1728546667; cv=none; b=ejVRo55uzqRH60fAfJJCFfLH0NZosZY4Fc2HQ6wLtiaxzHJH/cI3Ux0NkezEGDO7tquPYBnUfkkwnlE5E+bEkrsa5IEH1I/sXm1gQYWzS16dBE6UPtkY7ijr3GJpnk75bxyUVrdz6syhQB85wvTsuLh5F7nU3d7zzpK8yakhf1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728545606; c=relaxed/simple;
-	bh=Be0eJLXFlq7mjBiqgm4yOnVtUooau0HPh3foygd6C4Y=;
+	s=arc-20240116; t=1728546667; c=relaxed/simple;
+	bh=uWStj+xilcv9N3dioWNYj7e75BdSNr2PhR0d2cGpAts=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BgTO8tYfNGawZGBzLAO4fRGTKo1zqKBzgjh/uRRtwHGiJBG/MWWQyGi5T5Roi6rScbxPgNvi28baeDs3ZTgFsoMYwb7tZ82yeApnJ6Lcm/xJ/LSaEQ2iObqgEIjtkRIKBQpo8KNyOSgjx1n6FqnxvAp6fUN2+H7QTJdsqHeeRig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BRLh0JkD; arc=none smtp.client-ip=95.215.58.172
+	 Content-Type:Content-Disposition:In-Reply-To; b=SDS6a/DeG07xLO5tNUcIAlND7tbd3kBkNwTiS2sHbUPwpo9jZSjBh2DkhVwesZE9/whEKtMme3K67f4VEI5StVUeHzMX+YDrkHbWMMcuA4f6vZZFlq6WIo6FST1glf0qvBciOoZHlclaea4nEHF4KY4DLMtyErHKGf0N5IywbTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QA9sA4Tb; arc=none smtp.client-ip=95.215.58.183
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BRLh0JkD"
-Date: Thu, 10 Oct 2024 00:33:13 -0700
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QA9sA4Tb"
+Date: Thu, 10 Oct 2024 00:50:53 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1728545601;
+	t=1728546660;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=bq7NXyz5reRJAmTWnErzz1mr3r4s/qAHH6pxo4WQPzI=;
-	b=BRLh0JkDroH7pRT/zrCFJMCckodJTMpEDRiX+emcN+x2wLF3zd7VMLcw94j9x61PculbU8
-	HMTAg75//P8k6Q++uPvDS5pQFfIW/KkLxvIEjoMogF6RPw8fT79eVDZosx0WOvk9gXy/In
-	CLdHLkKoKr2kzli3QVEd3jIjXpxx1AM=
+	bh=n9ENzHg7tPYpJtE43PefYJwyU05UEoBmVVMbi+fFu3o=;
+	b=QA9sA4TbDGSie23xU+ntyEWDGUOLiEwOX3TkWQYWCbFKYsmJmdpKWBYZYLvyRymvlauJG+
+	LedOFexrTPRxdSlRldpf1A5Q29PMCM4vnNrjnVzPBCSKl+Ooq5s9jnBuPqfyQRQXcAc1Bd
+	thdOH+OIX1WMpZV1l2oz3boZKN2PwOM=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Marc Zyngier <maz@kernel.org>
@@ -35,11 +35,11 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v4 20/36] KVM: arm64: Disable hierarchical permissions
- when S1PIE is enabled
-Message-ID: <ZweDOQnT4a0J4ekA@linux.dev>
+Subject: Re: [PATCH v4 23/36] KVM: arm64: Hide TCR2_EL1 from userspace when
+ disabled for guests
+Message-ID: <ZweHXW2lUMmFLw5h@linux.dev>
 References: <20241009190019.3222687-1-maz@kernel.org>
- <20241009190019.3222687-21-maz@kernel.org>
+ <20241009190019.3222687-24-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,65 +48,42 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241009190019.3222687-21-maz@kernel.org>
+In-Reply-To: <20241009190019.3222687-24-maz@kernel.org>
 X-Migadu-Flow: FLOW_OUT
 
-On Wed, Oct 09, 2024 at 08:00:03PM +0100, Marc Zyngier wrote:
-> S1PIE implicitly disables hierarchical permissions, as specified in
-> R_JHSVW, by making TCR_ELx.HPDn RES1.
+On Wed, Oct 09, 2024 at 08:00:06PM +0100, Marc Zyngier wrote:
+> From: Mark Brown <broonie@kernel.org>
 > 
-> Add a predicate for S1PIE being enabled for a given translation regime,
-> and emulate this behaviour by forcing the hpd field to true if S1PIE
-> is enabled for that translation regime.
-> 
+> When the guest does not support FEAT_TCR2 we should not allow any access
+> to it in order to ensure that we do not create spurious issues with guest
+> migration. Add a visibility operation for it.
+
+This should come at the beginning of ths series (same for the subsequent
+S1PIE patch) so the EL2 registers use the correct visibility filtering
+from the start.
+
+> Fixes: fbff56068232 ("KVM: arm64: Save/restore TCR2_EL1")
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> Link: https://lore.kernel.org/r/20240822-kvm-arm64-hide-pie-regs-v2-2-376624fa829c@kernel.org
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  arch/arm64/kvm/at.c | 19 +++++++++++++++++++
->  1 file changed, 19 insertions(+)
+>  arch/arm64/include/asm/kvm_host.h |  3 +++
+>  arch/arm64/kvm/sys_regs.c         | 29 ++++++++++++++++++++++++++---
+>  2 files changed, 29 insertions(+), 3 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-> index adcfce3f67f03..f5bd750288ff5 100644
-> --- a/arch/arm64/kvm/at.c
-> +++ b/arch/arm64/kvm/at.c
-> @@ -93,6 +93,23 @@ static enum trans_regime compute_translation_regime(struct kvm_vcpu *vcpu, u32 o
->  	}
->  }
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 1a5477181447c..197a7a08b3af5 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -1511,4 +1511,7 @@ void kvm_set_vm_id_reg(struct kvm *kvm, u32 reg, u64 val);
+>  	(system_supports_fpmr() &&			\
+>  	 kvm_has_feat((k), ID_AA64PFR2_EL1, FPMR, IMP))
 >  
-> +static bool s1pie_enabled(struct kvm_vcpu *vcpu, enum trans_regime regime)
-> +{
-> +	if (!kvm_has_feat(vcpu->kvm, ID_AA64MMFR3_EL1, S1PIE, IMP))
-> +		return false;
+> +#define kvm_has_tcr2(k)				\
+> +	(kvm_has_feat((k), ID_AA64MMFR3_EL1, TCRX, IMP))
 > +
-> +	switch (regime) {
-> +	case TR_EL2:
-> +	case TR_EL20:
-> +		return vcpu_read_sys_reg(vcpu, TCR2_EL2) & TCR2_EL2_PIE;
-> +	case TR_EL10:
-> +		return  (__vcpu_sys_reg(vcpu, HCRX_EL2) & HCRX_EL2_TCR2En) &&
-> +			(__vcpu_sys_reg(vcpu, TCR2_EL1) & TCR2_EL1x_PIE);
-> +	default:
-> +		BUG();
 
-BUILD_BUG()?
-
-> +	}
-> +}
-> +
->  static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
->  			 struct s1_walk_result *wr, u64 va)
->  {
-> @@ -186,6 +203,8 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
->  		    (va55 ?
->  		     FIELD_GET(TCR_HPD1, tcr) :
->  		     FIELD_GET(TCR_HPD0, tcr)));
-> +	/* R_JHSVW */
-> +	wi->hpd |= s1pie_enabled(vcpu, wi->regime);
->  
->  	/* Someone was silly enough to encode TG0/TG1 differently */
->  	if (va55) {
-> -- 
-> 2.39.2
-> 
+nit: we should consistently use this predicate if we want to keep it.
 
 -- 
 Thanks,
