@@ -1,58 +1,58 @@
 Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C522E1F8F1B
-	for <kvmarm@lists.linux.dev>; Thu, 10 Oct 2024 18:25:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CBF11CFEC9
+	for <kvmarm@lists.linux.dev>; Thu, 10 Oct 2024 18:25:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728584745; cv=none; b=TdMDMPtkXbDBahR6zez13qmKhmrWc66cwbGWi+8Am/vMvfr6YJH00A23Giyc2GEyBKMz7ed75Sv0UDvv6N+3yNaQ2rc8f5KWi0Ngne3IzX9WJlNkD7SjVsbm5HbQAHXaqVT2o/X5U+xL/YIEtjkYygoDEafYAq2K33r1hARS/3c=
+	t=1728584747; cv=none; b=tAiUyZkTuYX3qwz18TXTyBvh631MRfMl9Y/PZxCJnrvt5kv22cxk0q1Q8/mWRUqcAYAB2HoSvb0lz6CXq6UBe/vUQ8opInh8BETk5kthmjDFtDeNwg/je1J2sYNHOyydvHTNuJCH2ZSXjq0jvt+Sv9tsNdh5yFFQ3eslhC8YXzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728584745; c=relaxed/simple;
-	bh=QVyL+E+J2Fu+8nHNQtozyIIO+ywn/WvnTCVSYx092RU=;
+	s=arc-20240116; t=1728584747; c=relaxed/simple;
+	bh=H3zY/Xt0t+c4LMWpCCUO1umdZ2mHGDI4Sis4Gpw2f4E=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=n+JFqhZa9hUc43g5KnXDLRtNby31r7NrKB7Hl4A4WtQgSiXewYhBU90NaxrwhAMvSmbv1WbRlhZSKzuTDcUx2U3OjJF8k2pgDH0CWAgfq9QWQLX2D4aLixWOpV+uP/SUQm9Xt5kE/IvfPUujJJl7G/WCXdOLTSJ+Wf+op/sCiRo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=f1NW+ObY; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=V0HI4gfCzEjFycC/+wOYIV22+VWWgInbTRcNeORlSqKsMJe75U4kZuxLXoV/PUWCLsTOniKXswhiV6ywrioK/mageKeMZ69iSQyA/r6SAKvnRpHIbnpWUUgC7TIZYshL7UX3BJJyCDytBp+kZXyWBqNGR4Z4S6je//iJgY3ApZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ROIszr7o; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="f1NW+ObY"
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e25b39871fso27043617b3.0
-        for <kvmarm@lists.linux.dev>; Thu, 10 Oct 2024 11:25:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ROIszr7o"
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e321d26b38so29252047b3.2
+        for <kvmarm@lists.linux.dev>; Thu, 10 Oct 2024 11:25:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728584743; x=1729189543; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1728584744; x=1729189544; darn=lists.linux.dev;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:reply-to:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=eHAZpPaCzYnE+TRrbh6ni4wh+Yys2pChavpSnHk2YEU=;
-        b=f1NW+ObY9HQUeFikUyHMScVJb5q5N4Q+JBmAPsX52TfNRr4E7GAx12gemrszQ3JAOK
-         O3IQzntsN0sf2LArlaLt25F0jQuJMK0Kr95UJbAihvJ8f6LhArZLFH5nlIHL+ngp6Om2
-         h12VxuE6B11MOxu0EfjlYVNqtFOgtJdFOLWa7F+wfP4xfmyOpBQg8gc4lW21xmbxAZRx
-         PimkBmug8wRi6zItJCWiBtULPuS64adc72OKFfvqXR3kFjyI7CcyCIIAkzBui9+5r9eC
-         MCG9Lmi6spO2g6geiAJHTfLqco5nfdqZ4MgYG8TwlGYMNEyu1F7zeKqJWvdlHyOJIaDj
-         3EpQ==
+        bh=xnti8P2TQudE7lvlkZdCl8Wq+TvGW4tpGYbCykNWsXw=;
+        b=ROIszr7oMfTX5CnHqG1NxTDXMPA+tFXegkjVz77TsQNGt8PHV3pRkYEo6vXKEjZq5M
+         f1kpUEiNMVNzN+RXAK6it5wSBn6mPt8wSTUz+YSpNjGGFJOVdEfPSNC61VaP+iVyHymR
+         EJaJplvqO9ICKxXXIZlqkSCBgoyudMM5WrZHB9I4VpqA21ngzXEap3VadRBqS4/YqeH4
+         XlPrvYaNDu2GWWMS0VPLnvqm+VGCfP4h9B1XEtF015omhf5GNgWgfigk6hwuMG7UoUUq
+         fI7lM1WyFCzqS1Hm5Lhp9Kb4uboFr0RInPt878ZgKqzV97Zhd3RnMNsAb6AUlsUDbj3Y
+         Wo8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728584743; x=1729189543;
+        d=1e100.net; s=20230601; t=1728584744; x=1729189544;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:reply-to:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=eHAZpPaCzYnE+TRrbh6ni4wh+Yys2pChavpSnHk2YEU=;
-        b=NVWPqBN7nw4BQ6natgV4af2gW0yDTjgbNW/fdRShVJ8HP2+1IypOuaTwZo1DgQEKgt
-         jwyW0B6GsEuSBNhJtpdTkLbznc5PbDB+dtv0AlTelTTCQrG5Xwxs1GHMUZCYsu2vQvrf
-         BN5GiIJg7t1kjh71qid11EzDeNWIcl8M90GtPX3wGMbelYYIVUCnyEYKOdgGf3RF1etK
-         rTJr11QDG5t8G7efrCqqBauFrkQHk/WpqHinvHKw5fyZYdqy7QpNsfzsRElO+QhUf1g1
-         bvUOInk+sRW1QY5hSr7iSc70G1L57mdKOiXSsxpzo/8pOHZeTxhl/8/KRYjQvIpo3U+M
-         0BNg==
-X-Forwarded-Encrypted: i=1; AJvYcCWAZBVBxQixdtlY2LHQJyD5/vwut3mzm/IIez3R2zQ2sJ6h2FrkfN7aT0rDCGkR89FeStMDzFA=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxM+WVGs1n8q2a1Jq3bUEoSTSSpQtcS6CUEmRgFr/aXDl1cFwyF
-	ABycXiPtpRzdNESHyzS5EKvBsSU5jJonQk3eue+cbfe2ztE1WXmGEVJXJ+DeL/QUpZXJ21Ahd2D
-	dtA==
-X-Google-Smtp-Source: AGHT+IGUAGxjHNELfO1gnQBoxyShlnhLiinRslmifWPsD1igdN7s2BU3B9tdatRPL4jwPkA1Z0qI9X+JjYQ=
+        bh=xnti8P2TQudE7lvlkZdCl8Wq+TvGW4tpGYbCykNWsXw=;
+        b=R6deumdUxEuM6i6tb2vcoAgjmKiTVAuqdKsWeZo8an3pkxegsYqQuuCGKw5mNGfUzC
+         uH8H7isMCR03d+rL1+iugb4V2kDnfQJ6dSYYVd07ZLIz2K1y5A299J+I7qOApU9Xas5w
+         W/5mN597fy1Qqs9Q+PvbAvt39oENXKDI92LuT6XoSqR5TQsqEu9dIGurxxg6m1qNIj/Q
+         njOK8zinAvV7TLzyXCnBQ6IkPBlnbb1fNoWknR9KIwmZEJKWQeVGdEBAIHHLhyCbts1h
+         xG+J8GebuPZ2A+3XKSl3w9tGB9YSDkhHLvpavDRt0wk30IjL+g0/hU5+ko7daMzmGJO/
+         qfuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV0wyX/6uTar77qXSb8sCmN/xNDD0/33LbESvXaY7waqXxLr4aqkAK2OndzQTf921NapmdoGC0=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzbYTueM+g4jQLi+UTslxuaYAMqTZarg8Bs0iXKGQkRVkPUXY9J
+	UgtZnE0ya1Z0lZ4/GfUspU3pOODgiLZoeBOP4DrcrmNv3kwhbFmCzT0D+bguKBhLT4Xy0s0SmTY
+	Jnw==
+X-Google-Smtp-Source: AGHT+IEdX//xUJq0LlzHSFsWnzcNANrEE9KtnndGvFzP5BAu23zXYFVXA6eeBi51F5M5i08FgAsxiLe5HbY=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a25:9346:0:b0:e28:fc1b:66bb with SMTP id
- 3f1490d57ef6-e28fe4f0fddmr4836276.6.1728584742775; Thu, 10 Oct 2024 11:25:42
- -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:690c:300b:b0:6e3:f32:5fc8 with SMTP id
+ 00721157ae682-6e32217bbe0mr502817b3.1.1728584744665; Thu, 10 Oct 2024
+ 11:25:44 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 10 Oct 2024 11:23:26 -0700
+Date: Thu, 10 Oct 2024 11:23:27 -0700
 In-Reply-To: <20241010182427.1434605-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -62,9 +62,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20241010182427.1434605-1-seanjc@google.com>
 X-Mailer: git-send-email 2.47.0.rc1.288.g06298d1525-goog
-Message-ID: <20241010182427.1434605-25-seanjc@google.com>
-Subject: [PATCH v13 24/85] KVM: nVMX: Drop pointless msr_bitmap_map field from
- struct nested_vmx
+Message-ID: <20241010182427.1434605-26-seanjc@google.com>
+Subject: [PATCH v13 25/85] KVM: nVMX: Add helper to put (unmap) vmcs12 pages
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
@@ -84,67 +83,76 @@ Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Remove vcpu_vmx.msr_bitmap_map and instead use an on-stack structure in
-the one function that uses the map, nested_vmx_prepare_msr_bitmap().
+Add a helper to dedup unmapping the vmcs12 pages.  This will reduce the
+amount of churn when a future patch refactors the kvm_vcpu_unmap() API.
+
+No functional change intended.
 
 Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/nested.c | 8 ++++----
- arch/x86/kvm/vmx/vmx.h    | 2 --
- 2 files changed, 4 insertions(+), 6 deletions(-)
+ arch/x86/kvm/vmx/nested.c | 32 ++++++++++++++++++--------------
+ 1 file changed, 18 insertions(+), 14 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index e94a25373a59..fb37658b62c9 100644
+index fb37658b62c9..81865db18e12 100644
 --- a/arch/x86/kvm/vmx/nested.c
 +++ b/arch/x86/kvm/vmx/nested.c
-@@ -621,7 +621,7 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct=
- kvm_vcpu *vcpu,
- 	int msr;
- 	unsigned long *msr_bitmap_l1;
- 	unsigned long *msr_bitmap_l0 =3D vmx->nested.vmcs02.msr_bitmap;
--	struct kvm_host_map *map =3D &vmx->nested.msr_bitmap_map;
-+	struct kvm_host_map msr_bitmap_map;
+@@ -314,6 +314,21 @@ static void vmx_switch_vmcs(struct kvm_vcpu *vcpu, str=
+uct loaded_vmcs *vmcs)
+ 	vcpu->arch.regs_dirty =3D 0;
+ }
 =20
- 	/* Nothing to do if the MSR bitmap is not in use.  */
- 	if (!cpu_has_vmx_msr_bitmap() ||
-@@ -644,10 +644,10 @@ static inline bool nested_vmx_prepare_msr_bitmap(stru=
-ct kvm_vcpu *vcpu,
- 			return true;
++static void nested_put_vmcs12_pages(struct kvm_vcpu *vcpu)
++{
++	struct vcpu_vmx *vmx =3D to_vmx(vcpu);
++
++	/*
++	 * Unpin physical memory we referred to in the vmcs02.  The APIC access
++	 * page's backing page (yeah, confusing) shouldn't actually be accessed,
++	 * and if it is written, the contents are irrelevant.
++	 */
++	kvm_vcpu_unmap(vcpu, &vmx->nested.apic_access_page_map, false);
++	kvm_vcpu_unmap(vcpu, &vmx->nested.virtual_apic_map, true);
++	kvm_vcpu_unmap(vcpu, &vmx->nested.pi_desc_map, true);
++	vmx->nested.pi_desc =3D NULL;
++}
++
+ /*
+  * Free whatever needs to be freed from vmx->nested when L1 goes down, or
+  * just stops using VMX.
+@@ -346,15 +361,8 @@ static void free_nested(struct kvm_vcpu *vcpu)
+ 	vmx->nested.cached_vmcs12 =3D NULL;
+ 	kfree(vmx->nested.cached_shadow_vmcs12);
+ 	vmx->nested.cached_shadow_vmcs12 =3D NULL;
+-	/*
+-	 * Unpin physical memory we referred to in the vmcs02.  The APIC access
+-	 * page's backing page (yeah, confusing) shouldn't actually be accessed,
+-	 * and if it is written, the contents are irrelevant.
+-	 */
+-	kvm_vcpu_unmap(vcpu, &vmx->nested.apic_access_page_map, false);
+-	kvm_vcpu_unmap(vcpu, &vmx->nested.virtual_apic_map, true);
+-	kvm_vcpu_unmap(vcpu, &vmx->nested.pi_desc_map, true);
+-	vmx->nested.pi_desc =3D NULL;
++
++	nested_put_vmcs12_pages(vcpu);
+=20
+ 	kvm_mmu_free_roots(vcpu->kvm, &vcpu->arch.guest_mmu, KVM_MMU_ROOTS_ALL);
+=20
+@@ -5010,11 +5018,7 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm=
+_exit_reason,
+ 		vmx_update_cpu_dirty_logging(vcpu);
  	}
 =20
--	if (kvm_vcpu_map(vcpu, gpa_to_gfn(vmcs12->msr_bitmap), map))
-+	if (kvm_vcpu_map(vcpu, gpa_to_gfn(vmcs12->msr_bitmap), &msr_bitmap_map))
- 		return false;
+-	/* Unpin physical memory we referred to in vmcs02 */
+-	kvm_vcpu_unmap(vcpu, &vmx->nested.apic_access_page_map, false);
+-	kvm_vcpu_unmap(vcpu, &vmx->nested.virtual_apic_map, true);
+-	kvm_vcpu_unmap(vcpu, &vmx->nested.pi_desc_map, true);
+-	vmx->nested.pi_desc =3D NULL;
++	nested_put_vmcs12_pages(vcpu);
 =20
--	msr_bitmap_l1 =3D (unsigned long *)map->hva;
-+	msr_bitmap_l1 =3D (unsigned long *)msr_bitmap_map.hva;
-=20
- 	/*
- 	 * To keep the control flow simple, pay eight 8-byte writes (sixteen
-@@ -711,7 +711,7 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct=
- kvm_vcpu *vcpu,
- 	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
- 					 MSR_IA32_FLUSH_CMD, MSR_TYPE_W);
-=20
--	kvm_vcpu_unmap(vcpu, &vmx->nested.msr_bitmap_map, false);
-+	kvm_vcpu_unmap(vcpu, &msr_bitmap_map, false);
-=20
- 	vmx->nested.force_msr_bitmap_recalc =3D false;
-=20
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 2325f773a20b..40303b43da6c 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -200,8 +200,6 @@ struct nested_vmx {
- 	struct kvm_host_map virtual_apic_map;
- 	struct kvm_host_map pi_desc_map;
-=20
--	struct kvm_host_map msr_bitmap_map;
--
- 	struct pi_desc *pi_desc;
- 	bool pi_pending;
- 	u16 posted_intr_nv;
+ 	if (vmx->nested.reload_vmcs01_apic_access_page) {
+ 		vmx->nested.reload_vmcs01_apic_access_page =3D false;
 --=20
 2.47.0.rc1.288.g06298d1525-goog
 
