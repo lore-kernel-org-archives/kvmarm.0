@@ -1,100 +1,119 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6516F185B6B;
-	Thu, 10 Oct 2024 16:20:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6865E1991B8
+	for <kvmarm@lists.linux.dev>; Thu, 10 Oct 2024 16:47:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728577245; cv=none; b=nhdxUydbbtQ8OZYhy4iW0FyD/f7GyC8PxJynkHDitLJqjbDC3IPJ8+HIsBT2ovYisiK8YspwZvwb7kfBbtqsnya6aIguypIoAMyLk1IoX7erR8ovHFw6gUJiEODPa6BHJqO4ouOHXCbFEqPj2soYoBJ8dy0bU+hxqrfUFjTS9uw=
+	t=1728578852; cv=none; b=Ad6CyOh/7qzQtnRi+GSB8Gi9aCkXBFD7I17p2MV8uoHzSKlQncLK8lFq2FKSyuu+pa1WcmBUz4BLJ3IkvZjYfGM0kUovmZjg1Zyns6QqaTafLa2WGlpVu3hvoxFaOYtKgoMhvgfKu0jPQgWg6QPCIZ4zvozc2gMww0Evms4hxas=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728577245; c=relaxed/simple;
-	bh=1TMPxMWmvd6Kf4NRLsvezV5L9HKWRBqdlpJ2USYyLEI=;
+	s=arc-20240116; t=1728578852; c=relaxed/simple;
+	bh=o7m0JDUgfMN4k/o6jKXlLti0MBTboCqANWeAfCzYLjs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BP9HPhiPjm9XaWnjN2SVyg4xder0jJDBXhb6KSG9bEdoJxnXeICnyWb7j1qrg/UB08hjMZTCCOtCGeey2h86sa5a03haEG1QHGT/2nHks9PBxnLKq2dKhT6BGKxSOQxI/rkKheNdpx5SFMUFXih2G5qLHrp0aW0aU9wZav8jTd0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PTcuAOF4; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=BbfzP0GWRsy/7VlQdNKx9SWu9k2oOVIM+Jmffax0laE0KHYo6T0n6n2kkpTnjTY8o2TckXoKTTZAqEqTf99DtEJjVLO1O+ipvGIzIr1QPvHaaclEb1rFPL0Ipk8vBAmx6bupsGyg1S3w+M9hZBfPEpLWy4filjHY+Qv8A8BFLdY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=P0IfaB5S; arc=none smtp.client-ip=91.218.175.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PTcuAOF4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93DD8C4CECC;
-	Thu, 10 Oct 2024 16:20:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728577245;
-	bh=1TMPxMWmvd6Kf4NRLsvezV5L9HKWRBqdlpJ2USYyLEI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PTcuAOF455dLBeILPFIyJjVIb6QjIRJFHaig2+Cqq5A1u5/tpqyMwCO39yKuIqAlg
-	 kOqlItq24BeMxcQqnU2mGWvWOmyVfLFyXirX3MX0mkv5Zr1q46MssxwwaQQ9kq7jLC
-	 SqUyD9ymaj6YUtpJsNHByd07qff9KkBe4TI6ISCNVvVbbCPHGFC5Hcq/0dRGG74Orc
-	 tlbAhUCsxdtRnZo3zQC6euqqwjAO06BR5ErFMYkBQui1xQJPsfSNma9fNIqvuLsZTP
-	 x+3Cu2oB2L8zqjsYiqJLtt5td+aW8VvmakGg2bt2FUmN6Ld07hyuam+yEyN9irfmBJ
-	 1nU5tDcVRSAyw==
-Date: Thu, 10 Oct 2024 17:20:41 +0100
-From: Mark Brown <broonie@kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="P0IfaB5S"
+Date: Thu, 10 Oct 2024 09:47:17 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1728578845;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+8PqfZzymdMmU3xYcHveo3/itEaiA3j24fMS5kH/E4Q=;
+	b=P0IfaB5SBVE3gewFVz91R/ZRuruHHvDeAx6+iPQQKzDgwAvtZmngYw0zWz02rpUZzwS26g
+	otaMTn5Vig5PFUkCnjkeSaX1ZatfltHL6eyz6G8SAtzWYEdaqdq+lLSbuWDoQ6/o07L18a
+	64dT4f6ALANgp2QRjHvy5BIY7v5UD1I=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
 To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+Cc: Sean Christopherson <seanjc@google.com>, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH v4 10/36] arm64: Define ID_AA64MMFR1_EL1.HAFDBS
- advertising FEAT_HAFT
-Message-ID: <Zwf-2eW-ypRTZXfx@finisterre.sirena.org.uk>
-References: <20241009190019.3222687-1-maz@kernel.org>
- <20241009190019.3222687-11-maz@kernel.org>
+	Zenghui Yu <yuzenghui@huawei.com>, stable@vger.kernel.org,
+	Alexander Potapenko <glider@google.com>
+Subject: Re: [PATCH] KVM: arm64: Don't eagerly teardown the vgic on init error
+Message-ID: <ZwgFFf4KC-DowMGW@linux.dev>
+References: <20241009183603.3221824-1-maz@kernel.org>
+ <ZwbYvHJdOqePYjDf@linux.dev>
+ <ZwbbQGpZpGQXaNYK@google.com>
+ <ZwcRct7VWnW0bObA@linux.dev>
+ <875xq0v1do.wl-maz@kernel.org>
+ <ZweUiHMC3RNwNXzY@linux.dev>
+ <86plo85dme.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="q4WValHa0s1+hPNt"
-Content-Disposition: inline
-In-Reply-To: <20241009190019.3222687-11-maz@kernel.org>
-X-Cookie: Editing is a rewording activity.
-
-
---q4WValHa0s1+hPNt
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <86plo85dme.wl-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Oct 09, 2024 at 07:59:53PM +0100, Marc Zyngier wrote:
-> This definition is missing, and we are going to need it to sanitise
-> TCR2_ELx.
+On Thu, Oct 10, 2024 at 01:47:05PM +0100, Marc Zyngier wrote:
+> On Thu, 10 Oct 2024 09:47:04 +0100, Oliver Upton <oliver.upton@linux.dev> wrote:
+> > A small but stupid window to race with.
+> 
+> Ah, gotcha. I guess getting rid of the early-out in
+> kvm_vgic_map_resources() would plug that one. Want to post a fix for
+> that?
 
-> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> index 3c812fd28eca2..8db4431093b26 100644
-> --- a/arch/arm64/tools/sysreg
-> +++ b/arch/arm64/tools/sysreg
-> @@ -1688,6 +1688,7 @@ UnsignedEnum	3:0	HAFDBS
->  	0b0000	NI
->  	0b0001	AF
->  	0b0010	DBM
-> +	0b0011	HAFT
->  EndEnum
+Yep, will do.
 
-This is correct in so far as it goes, but we are also mising HDBSS
-according to the 2024-09 XML, plus a couple of new revisions of ETS.
-I'll send a patch doing the full update, it should just be a trivial
-add/add conflict.
+> > 
+> > > > If memory serves, kvm_vgic_map_resources() used to do all of this behind
+> > > > the config_lock to cure the race, but that wound up inverting lock
+> > > > ordering on srcu.
+> > > 
+> > > Probably something like that. We also used to hold the kvm lock, which
+> > > made everything much simpler, but awfully wrong.
+> > > 
+> > > > Note to self: Impose strict ordering on GIC initialization v. vCPU
+> > > > creation if/when we get a new flavor of irqchip.
+> > > 
+> > > One of the things we should have done when introducing GICv3 is to
+> > > impose that at KVM_DEV_ARM_VGIC_CTRL_INIT, the GIC memory map is
+> > > final. I remember some push-back on the QEMU side of things, as they
+> > > like to decouple things, but this has proved to be a nightmare.
+> > 
+> > Pushing more of the initialization complexity into userspace feels like
+> > the right thing. Since we clearly have no idea what we're doing :)
+> 
+> KVM APIv2?
 
-Reviewed-by: Mark Brown <broonie@kernel.org>
+Even better, we can just go straight to v3 and skip all the mistakes we
+would've made in v2.
 
-It tends to make life a bit easier to note which version of the spec is
-being referenced with these updates.
+> > 
+> > > > The crappy assumption here is kvm_arch_vcpu_run_pid_change() and its
+> > > > callees are allowed to destroy VM-scoped structures in error handling.
+> > > 
+> > > I think this is symptomatic of more general issue: we perform VM-wide
+> > > configuration in the context of a vcpu. We have tons of this stuff to
+> > > paper over the lack of a "this VM is fully configured" barrier.
+> > > 
+> > > I wonder whether we could sidestep things by punting the finalisation
+> > > of the VM to a different context (workqueue?)  and simply return
+> > > -EAGAIN or -EINTR to userspace while we're processing it. That doesn't
+> > > solve the "I'm missing parts of the address map and I'm going to die"
+> > > part though.
+> > 
+> > Throwing it back at userspace would be nice, but unfortunately for ABI I
+> > think we need to block/spin vCPUs in the kernel til the VM is in fully
+> > working condition. A fragile userspace could explode for a 'spurious'
+> > EAGAIN/EINTR where there wasn't one before.
+> 
+> EINTR needs to be handled already, as this is how you report
+> preemption by a signal.
 
---q4WValHa0s1+hPNt
-Content-Type: application/pgp-signature; name="signature.asc"
+Of course, I'm just assuming userspace is mean and will complain if no
+signal actually arrives.
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmcH/tgACgkQJNaLcl1U
-h9BewAgAg/hv4R39tRrvxenHo8RtrEfIf/f2jS3aePgmsbrWspqBl0gt+J2BdsIb
-FecMHHcUpPnUVLMbvJZCYFdCdo4NyMT5Rm5+7GIzFRxLVyzRMcbDsLMZKh+ufb20
-2iOegrNkRPi3RuBYoU+R45wo5WtD7HCOlm5U0E2ai7gYgjxzKaTWQOPToRmfuYum
-Q2Wt0cpWzI2xFAGLoqt/+8T9FPgV2FM2JjzuuRFbPjoW5T1E90A9F4h6sP3MdzZr
-a3ZQp5fE1gAOlquDUFqPxMWi5sCHrnqT3TLSZ3XWQBLh1EIFL8zAx/nilLbWURnW
-+39qiG2mtS+Vdx8rHxttdnEer5wyBA==
-=Jh8J
------END PGP SIGNATURE-----
-
---q4WValHa0s1+hPNt--
+-- 
+Thanks,
+Oliver
