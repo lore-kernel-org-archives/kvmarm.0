@@ -1,57 +1,57 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B5F81E3771
-	for <kvmarm@lists.linux.dev>; Thu, 10 Oct 2024 18:25:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BA961E4928
+	for <kvmarm@lists.linux.dev>; Thu, 10 Oct 2024 18:25:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728584707; cv=none; b=JiZQphgOMYlwPwG0oApcs5VQNsG13vCtZRUSVZvfd+KxGR0ecw9SpFCh/OtN5kJmOo9Nt+i8VZ9Pz8R5S7Hqfa3rTP0lL52Ytm1bmXAblRsLRYXMO2SSQmGB+DurrbrniKr6V4KHaVraOCVScDUOInb5Ofj1ofdl0dVcxTgD86I=
+	t=1728584709; cv=none; b=CA3bnzEVF0ZprH0jn7WALdA8IzHxWjW3oTMXm2grcNBIWn6rUFENgDTooqigzcWk/Q0bCdBUXWFt4sACD6mmCNphxMl8h7EvI4cOxbRyhUJ4lvOjDAw8EXbDyUw3Vn2+WuoakRiveBTMtQpBI/WsSYPjI6OCByakJQzz0/b44Bw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728584707; c=relaxed/simple;
-	bh=V8Pz/YRM4TKMSvyoWeXbxNdYc7yxSwxWSxDHm25abTE=;
+	s=arc-20240116; t=1728584709; c=relaxed/simple;
+	bh=zZ6qnR3p2Ej0Et0EkgjdDF1APVKDfMggaSwqeFMbAB0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=D4323BWlNDUSce7u8kPBJCAXE8YnUSePpl1h9PHKJZqMXPBZd7DA6Oq2iVArI95fFhvxOvjoGUQ6qBaeEwS0DczX1Xpy+iV8Y2Xv/6XzeCPGzELkEukjPeN0W8f92ahTpqzi7+OVk4RRN7b55fR0m6bx0OduN8MgEjCuDvy50M0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IJ1DG+cO; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=s7gTXsV6tlu8MsBR1ho/V/tXfIAMVmQfFzV9/EJen1Pu/MkTFYCdmPkcMxTVVES+8o/F7LfjmQbEbCMF0/o0MkrB0KCjsBrI1pnfT0ls7TqrsZhyjWsXSO/MfZZdRIgwCn926s3JGPyS5fESklqkJgtelb/+riVfiDS4oTYhB4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=15SaAGk+; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IJ1DG+cO"
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e28fea2adb6so1485166276.3
-        for <kvmarm@lists.linux.dev>; Thu, 10 Oct 2024 11:25:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="15SaAGk+"
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2e2ca403f5dso1037024a91.1
+        for <kvmarm@lists.linux.dev>; Thu, 10 Oct 2024 11:25:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728584704; x=1729189504; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1728584707; x=1729189507; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=zmCOkT+wuJeT9H1MjXHCrAkGhLQoiMWK376kHF4kwCg=;
-        b=IJ1DG+cOlSEV9yANgRpmCLs/5DxYKLv6kdabe52BHvmPenXM3FAg1cxWI1epmPptys
-         X3FujXVIQdVIPejSMEHlMlC9TTsYczx3BNQcmFKyUVSj3UNkEQL+fzt/APmycXYAgukC
-         eMb29OHWIQWYTlifM1fgo3y27wxWE4Mvh7fvNpTwYfYPO5p0LDZ3T41U+lAip4KCHhaW
-         HwSFuxY0stsAj/tjZKxZj44H2FKtiHI/Rkqoe1Oa21OZw9lGDj1CFyV90SkSX8RYpSgI
-         t4fxx0m54eXV1eJMjfTpmrnBgJ9px25noCdRF/CFd4c4TsKrgy+GDcp/gZBkqTLMugIc
-         Id7A==
+        bh=GZoCfd92gqYHwqsSYOai9KQfQ7K6dxh+JWKccmiJTPU=;
+        b=15SaAGk+jGpD1rLPGWbaB/ms0kdDWyTNbthWVDV+VGlHzStd1KWVXRC+aKRzIzmfs7
+         fU3qRtHouvMCnMuvhiVWWTsesUmtx1igekSAal84slR8gcxNqrccKInNy3R0tlwDfc8Q
+         OJub5L4BIPanoev7Pe6KQFNr5aIY3nYR4JFzVlQygHDSHoRbg7It1GcI3C0m8wsjCvew
+         YW2A13lZAC+CtWxpfsggKjZoDxocEjMvfoNnwVdLa9e8E/CDw/krWlRl8O8eNGSFa8Vy
+         8e0tkxiT5cd8F9BLxk+wf5pqvj7Yjx1XN+LM9iu9J5wxyAggLjFl7nCNRwDl3eRitx0Z
+         SJPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728584704; x=1729189504;
+        d=1e100.net; s=20230601; t=1728584707; x=1729189507;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=zmCOkT+wuJeT9H1MjXHCrAkGhLQoiMWK376kHF4kwCg=;
-        b=Puo+MHb4/iaA4KM10lwNQS/b5vmStvvL/PpVVej4hBMDwKH/7VQi6fjxxzBsLOWWEG
-         lwxSSLmArs4yKP5l0FK5QrwEPmK9ePhc5Gqi+q6ZCq+IQvWK1dMPWVIqm4Ia0kkX5Xj7
-         ThU7MYtj8ZTGZs7R4D1W46nBE+s4bNjzdVddVHQzqJi+U30VU8U3tacXPSYy4+VwPj06
-         B6CkOnF+e/m44o769lD3HfLNich1LtzUKedflpq7Q7FeJBycil++YiGgIdLln4g6+263
-         5Yb15xRpFQktSOkLkvZAc+X5EKjB0WlAX/hHXZItddu5qVPFD7CMParUL5dcAJUq70EU
-         Zvfg==
-X-Forwarded-Encrypted: i=1; AJvYcCWylvl6dz09OqtvO/rmLQurct2+2zaYgM1OojdZe41ZTBf5dhksQstl1Pfh8YdWmONPeBvIhpo=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyOlbBqOO6fyfeL1qBQS2/YeiSLMUnj9mpqOqvqoc0W45uc6KiY
-	8agdSFjdwKP0heNYp/xhMYShcWP4ni5Uik46ODlHuANdwHYde4Fo+z+4woP61xNNFGHstiMouih
-	WHg==
-X-Google-Smtp-Source: AGHT+IHLS32ZnUy4bY0gdVqRjJSlR5N1zmb3UxYk5drKGwVtxhq/Y8NIZIwMp1duovDzYwXPQsOfO5WBu4o=
+        bh=GZoCfd92gqYHwqsSYOai9KQfQ7K6dxh+JWKccmiJTPU=;
+        b=lx6o7qXQsQr5777YhoG43hsx0dCbal1XvaRf7Tj7n/arJiWNAIB5RUbwCZAtz8u9iz
+         y4EQ0C2rsKsIkF+urpQFAqnS1PZeexeBqdBqHmJ/Jt3vjZwdmMydLhgr8oVAbgA3EDre
+         xL7pkHbo8iiSSJqyRmUx3KI0vLCwO1xThTMFullrIxUiN0emogz3/siaq8pj0oQPIRfs
+         8WkiKuU7U8flIaenACz8GvQpnXoxRVgCzDB2FvjJ4ZAE/rBsvhW8FtOub7rL3kL4YPoF
+         jvdQBe4DPZSk41JYP8c9voF21A5tnCeYtzes53RiGjjgpv+9omiAir4QWu72GViIXiV2
+         akEw==
+X-Forwarded-Encrypted: i=1; AJvYcCWi/ZTkbbsLSD1ESCG9htsn4sOLix5FtOl+qb19EzpLfgTLjPjShX5YAi38rExJMcAtCeHnF0Y=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzFzlzRf2ZmcomrUKO2RbPwPxRypTQk5XYcYEcwHmR63wHLYXfp
+	ZRgp2/GaOWwopPnEiF1EGPRnucqPmVlEzxThxR975uVZdgtoWz/kmnz9yBXpzoO3ung+GzUKCle
+	cdQ==
+X-Google-Smtp-Source: AGHT+IH8UDk7ruln14ZDsSWqbj1uDcx7028dIle1wpc1As3ec3XNWN4cizl8I1jAsp9rsgJdiTjtCNc1iNw=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1812:b0:e24:9f58:dd17 with SMTP id
- 3f1490d57ef6-e28fe32f042mr66754276.1.1728584702932; Thu, 10 Oct 2024 11:25:02
+ (user=seanjc job=sendgmr) by 2002:a17:90a:fa84:b0:2e2:da81:40c6 with SMTP id
+ 98e67ed59e1d1-2e2f0a524d4mr44a91.2.1728584705592; Thu, 10 Oct 2024 11:25:05
  -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 10 Oct 2024 11:23:08 -0700
+Date: Thu, 10 Oct 2024 11:23:09 -0700
 In-Reply-To: <20241010182427.1434605-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,8 +61,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20241010182427.1434605-1-seanjc@google.com>
 X-Mailer: git-send-email 2.47.0.rc1.288.g06298d1525-goog
-Message-ID: <20241010182427.1434605-7-seanjc@google.com>
-Subject: [PATCH v13 06/85] KVM: x86/mmu: Invert @can_unsync and renamed to @synchronizing
+Message-ID: <20241010182427.1434605-8-seanjc@google.com>
+Subject: [PATCH v13 07/85] KVM: x86/mmu: Mark new SPTE as Accessed when
+ synchronizing existing SPTE
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
@@ -81,137 +82,61 @@ Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	Andrew Jones <ajones@ventanamicro.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Invert the polarity of "can_unsync" and rename the parameter to
-"synchronizing" to allow a future change to set the Accessed bit if KVM
-is synchronizing an existing SPTE.  Querying "can_unsync" in that case is
-nonsensical, as the fact that KVM can't unsync SPTEs doesn't provide any
-justification for setting the Accessed bit.
+Set the Accessed bit when making a "new" SPTE during SPTE synchronization,
+as _clearing_ the Accessed bit is counter-productive, and even if the
+Accessed bit wasn't set in the old SPTE, odds are very good the guest will
+access the page in the near future, as the most common case where KVM
+synchronizes a shadow-present SPTE is when the guest is making the gPTE
+read-only for Copy-on-Write (CoW).
 
+Preserving the Accessed bit will allow dropping the logic that propagates
+the Accessed bit to the underlying struct page when overwriting an existing
+SPTE, without undue risk of regressing page aging.
+
+Note, KVM's current behavior is very deliberate, as SPTE synchronization
+was the only "speculative" access type as of commit 947da5383069 ("KVM:
+MMU: Set the accessed bit on non-speculative shadow ptes").
+
+But, much has changed since 2008, and more changes are on the horizon.
+Spurious clearing of the Accessed (and Dirty) was mitigated by commit
+e6722d9211b2 ("KVM: x86/mmu: Reduce the update to the spte in
+FNAME(sync_spte)"), which changed FNAME(sync_spte) to only overwrite SPTEs
+if the protections are actually changing.  I.e. KVM is already preserving
+Accessed information for SPTEs that aren't dropping protections.
+
+And with the aforementioned future change to NOT mark the page/folio as
+accessed, KVM's SPTEs will become the "source of truth" so to speak, in
+which case clearing the Accessed bit outside of page aging becomes very
+undesirable.
+
+Suggested-by: Yan Zhao <yan.y.zhao@intel.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c          | 12 ++++++------
- arch/x86/kvm/mmu/mmu_internal.h |  2 +-
- arch/x86/kvm/mmu/paging_tmpl.h  |  2 +-
- arch/x86/kvm/mmu/spte.c         |  4 ++--
- arch/x86/kvm/mmu/spte.h         |  2 +-
- arch/x86/kvm/mmu/tdp_mmu.c      |  4 ++--
- 6 files changed, 13 insertions(+), 13 deletions(-)
+ arch/x86/kvm/mmu/spte.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index a8c64069aa89..0f21d6f76cab 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -2795,7 +2795,7 @@ static void kvm_unsync_page(struct kvm *kvm, struct kvm_mmu_page *sp)
-  * be write-protected.
-  */
- int mmu_try_to_unsync_pages(struct kvm *kvm, const struct kvm_memory_slot *slot,
--			    gfn_t gfn, bool can_unsync, bool prefetch)
-+			    gfn_t gfn, bool synchronizing, bool prefetch)
- {
- 	struct kvm_mmu_page *sp;
- 	bool locked = false;
-@@ -2810,12 +2810,12 @@ int mmu_try_to_unsync_pages(struct kvm *kvm, const struct kvm_memory_slot *slot,
- 
- 	/*
- 	 * The page is not write-tracked, mark existing shadow pages unsync
--	 * unless KVM is synchronizing an unsync SP (can_unsync = false).  In
--	 * that case, KVM must complete emulation of the guest TLB flush before
--	 * allowing shadow pages to become unsync (writable by the guest).
-+	 * unless KVM is synchronizing an unsync SP.  In that case, KVM must
-+	 * complete emulation of the guest TLB flush before allowing shadow
-+	 * pages to become unsync (writable by the guest).
- 	 */
- 	for_each_gfn_valid_sp_with_gptes(kvm, sp, gfn) {
--		if (!can_unsync)
-+		if (synchronizing)
- 			return -EPERM;
- 
- 		if (sp->unsync)
-@@ -2941,7 +2941,7 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
- 	}
- 
- 	wrprot = make_spte(vcpu, sp, slot, pte_access, gfn, pfn, *sptep, prefetch,
--			   true, host_writable, &spte);
-+			   false, host_writable, &spte);
- 
- 	if (*sptep == spte) {
- 		ret = RET_PF_SPURIOUS;
-diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-index c98827840e07..4da83544c4e1 100644
---- a/arch/x86/kvm/mmu/mmu_internal.h
-+++ b/arch/x86/kvm/mmu/mmu_internal.h
-@@ -164,7 +164,7 @@ static inline gfn_t gfn_round_for_level(gfn_t gfn, int level)
- }
- 
- int mmu_try_to_unsync_pages(struct kvm *kvm, const struct kvm_memory_slot *slot,
--			    gfn_t gfn, bool can_unsync, bool prefetch);
-+			    gfn_t gfn, bool synchronizing, bool prefetch);
- 
- void kvm_mmu_gfn_disallow_lpage(const struct kvm_memory_slot *slot, gfn_t gfn);
- void kvm_mmu_gfn_allow_lpage(const struct kvm_memory_slot *slot, gfn_t gfn);
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index ae7d39ff2d07..6e7bd8921c6f 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -963,7 +963,7 @@ static int FNAME(sync_spte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp, int
- 	host_writable = spte & shadow_host_writable_mask;
- 	slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
- 	make_spte(vcpu, sp, slot, pte_access, gfn,
--		  spte_to_pfn(spte), spte, true, false,
-+		  spte_to_pfn(spte), spte, true, true,
- 		  host_writable, &spte);
- 
- 	return mmu_spte_update(sptep, spte);
 diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
-index 5521608077ec..0e47fea1a2d9 100644
+index 0e47fea1a2d9..618059b30b8b 100644
 --- a/arch/x86/kvm/mmu/spte.c
 +++ b/arch/x86/kvm/mmu/spte.c
-@@ -157,7 +157,7 @@ bool spte_has_volatile_bits(u64 spte)
- bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
- 	       const struct kvm_memory_slot *slot,
- 	       unsigned int pte_access, gfn_t gfn, kvm_pfn_t pfn,
--	       u64 old_spte, bool prefetch, bool can_unsync,
-+	       u64 old_spte, bool prefetch, bool synchronizing,
- 	       bool host_writable, u64 *new_spte)
- {
- 	int level = sp->role.level;
-@@ -248,7 +248,7 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
- 		 * e.g. it's write-tracked (upper-level SPs) or has one or more
- 		 * shadow pages and unsync'ing pages is not allowed.
- 		 */
--		if (mmu_try_to_unsync_pages(vcpu->kvm, slot, gfn, can_unsync, prefetch)) {
-+		if (mmu_try_to_unsync_pages(vcpu->kvm, slot, gfn, synchronizing, prefetch)) {
- 			wrprot = true;
- 			pte_access &= ~ACC_WRITE_MASK;
- 			spte &= ~(PT_WRITABLE_MASK | shadow_mmu_writable_mask);
-diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-index 2cb816ea2430..c81cac9358e0 100644
---- a/arch/x86/kvm/mmu/spte.h
-+++ b/arch/x86/kvm/mmu/spte.h
-@@ -499,7 +499,7 @@ bool spte_has_volatile_bits(u64 spte);
- bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
- 	       const struct kvm_memory_slot *slot,
- 	       unsigned int pte_access, gfn_t gfn, kvm_pfn_t pfn,
--	       u64 old_spte, bool prefetch, bool can_unsync,
-+	       u64 old_spte, bool prefetch, bool synchronizing,
- 	       bool host_writable, u64 *new_spte);
- u64 make_huge_page_split_spte(struct kvm *kvm, u64 huge_spte,
- 		      	      union kvm_mmu_page_role role, int index);
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 3c6583468742..76bca7a726c1 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -1033,8 +1033,8 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
- 		new_spte = make_mmio_spte(vcpu, iter->gfn, ACC_ALL);
- 	else
- 		wrprot = make_spte(vcpu, sp, fault->slot, ACC_ALL, iter->gfn,
--					 fault->pfn, iter->old_spte, fault->prefetch, true,
--					 fault->map_writable, &new_spte);
-+				   fault->pfn, iter->old_spte, fault->prefetch,
-+				   false, fault->map_writable, &new_spte);
+@@ -178,7 +178,7 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+ 		spte |= SPTE_TDP_AD_WRPROT_ONLY;
  
- 	if (new_spte == iter->old_spte)
- 		ret = RET_PF_SPURIOUS;
+ 	spte |= shadow_present_mask;
+-	if (!prefetch)
++	if (!prefetch || synchronizing)
+ 		spte |= spte_shadow_accessed_mask(spte);
+ 
+ 	/*
+@@ -259,7 +259,7 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+ 		spte |= spte_shadow_dirty_mask(spte);
+ 
+ out:
+-	if (prefetch)
++	if (prefetch && !synchronizing)
+ 		spte = mark_spte_for_access_track(spte);
+ 
+ 	WARN_ONCE(is_rsvd_spte(&vcpu->arch.mmu->shadow_zero_check, spte, level),
 -- 
 2.47.0.rc1.288.g06298d1525-goog
 
