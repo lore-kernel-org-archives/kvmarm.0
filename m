@@ -1,125 +1,101 @@
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8499D1A0B13
-	for <kvmarm@lists.linux.dev>; Thu, 10 Oct 2024 08:08:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D127619F430;
+	Thu, 10 Oct 2024 08:12:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728547704; cv=none; b=HoicefKvK1rS6q/XcWBF1sOnFXoaF1Q6I3qTCmDMzU/Syfc7WZJNJEp54dsqCibZiVArY/TqFsGvY7iEFIEgb09J2p5p/R66/2dL2uXVmTnqLIw++rw9D9FzaerVKZEtFg4V7L/O/0VYb2a4sO2VqI7uLmdBNuvUy+mT8gA+DVE=
+	t=1728547960; cv=none; b=iHg1j+wIMoIW8eqj+gfJlUKPY8d3xAky85CPpYK5vQk1rZZwvw0tMU5lk7nGKy4FVhwl6wluhdslpVa/F/Y4NuUmFzOiyLpbeqbdOV1EGCVMg3JemYgAzA0RwqIhft+JDFKdork80sccTWMlRO/dCzPCkn3Fhxs3lWpQuPc47Bw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728547704; c=relaxed/simple;
-	bh=mgKDM7ZGN2dxGHMljrLzruLS4Ex748V1tH1cXWkrJk8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qJYBpnaB9whDmGsOd0sR5OqAZE4VxI1fv3UolOUzzcliBxoVPb8n8lNk2tW9TMiGZ6kii7lzcv0+ZVQF7dttVSlnxdTXHh7UMQGheGiFtNjLgnd3ToFaDhP306WU+pUiZfnzbkYk3howZ0V/AXi8Fp5hDrXbDRSs8uEq2Y8uY1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bpTMQl/V; arc=none smtp.client-ip=91.218.175.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1728547960; c=relaxed/simple;
+	bh=RTVS/u/ErF8mhoG7gJZHkNjXnKzucP5XhkEC+vLSzYw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TaIFxvE4Kh7EFe5MRcC2sQNHi9seNja+N7L4v07RKb707FaNlf6R/9fOe3+RvixIK943VZd/AnP7+pHTUilx1u5yMMIGv8kdlwWqMUotbMabdcocacALJdwIEphUewTK2pw28GJMxH6VSuB+02xKWvjy54KlqesLZtjhwzKiADY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=OsOOey/d; arc=none smtp.client-ip=115.124.30.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="bpTMQl/V"
-Date: Thu, 10 Oct 2024 01:08:13 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1728547700;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xYVOzScYvF7RxPJxE1kY3PH7rcWWCODJu8owyPShCxM=;
-	b=bpTMQl/VmGmA05n0JgJRXSVsecTOl/1X8diq1Pohb1PY+z58xpgdDeuJjT3ddxGQYKzx3g
-	i1lBuY0ASePb6275IB3fPrstEYOJtHiVHgmS+ruj+mRG96jbIZflzHkaz12Ooa4Uomq7gX
-	TU/Ak0nz0al4rDd8McfMBGGgFOsMIo0=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v4 33/36] KVM: arm64: Disable hierarchical permissions
- when POE is enabled
-Message-ID: <ZweLbQRD6wAkG6Sz@linux.dev>
-References: <20241009190019.3222687-1-maz@kernel.org>
- <20241009190019.3222687-34-maz@kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="OsOOey/d"
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1728547954; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=rSnUTJJgQiFQvK3VVOuqy3cV5F5MMcsoT+LmuvIhT0I=;
+	b=OsOOey/d7KUwCi6U/SZU71ixXU6SFdvzYkWBywaZ+Aitke9lkhyVtjh42o4LsOKnbrBVnx98YIocvHSQKYkgx9ZKYh45Iiu3OHm3MtY3/y9s60LcamojQ+8uvRgaFM/24LwYPQLTNgxIli3UWIjrrF9Gnc08aJXDFHLxqXRarEo=
+Received: from 30.246.177.51(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0WGljzdQ_1728547950 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Thu, 10 Oct 2024 16:12:31 +0800
+Message-ID: <b3c21234-73a0-43dd-8365-9039c62b7aa7@linux.alibaba.com>
+Date: Thu, 10 Oct 2024 16:12:29 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241009190019.3222687-34-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: arm64: nVHE: gen-hyprel: Silent build warnings
+Content-Language: en-US
+To: Marc Zyngier <maz@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, Nathan Chancellor <nathan@kernel.org>,
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
+ =?UTF-8?Q?Pierre-Cl=C3=A9ment_Tosi?= <ptosi@google.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ linux-kernel@vger.kernel.org, llvm@lists.linux.dev
+References: <20241009085751.35976-1-tianjia.zhang@linux.alibaba.com>
+ <86set55yca.wl-maz@kernel.org>
+From: "tianjia.zhang" <tianjia.zhang@linux.alibaba.com>
+In-Reply-To: <86set55yca.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Oct 09, 2024 at 08:00:16PM +0100, Marc Zyngier wrote:
-> The hierarchical permissions must be disabled when POE is enabled
-> in the translation regime used for a given table walk.
+
+
+On 10/9/24 7:07 PM, Marc Zyngier wrote:
+> On Wed, 09 Oct 2024 09:57:51 +0100,
+> Tianjia Zhang <tianjia.zhang@linux.alibaba.com> wrote:
+>>
+>> This patch silent the some mismatch format build warnings
+>> with clang, like:
+>>
+>>    arch/arm64/kvm/hyp/nvhe/gen-hyprel.c:233:2: warning: format specifies
+>>    type 'unsigned long' but the argument has type 'Elf64_Off'
+>>    (aka 'unsigned long long') [-Wformat]
+>>      233 |         assert_ne(off, 0UL, "%lu");
+>>          |         ^~~~~~~~~~~~~~~~~~~~~~~~~~
+>>          |                              %llu
+>>    arch/arm64/kvm/hyp/nvhe/gen-hyprel.c:193:34: note: expanded from macro 'assert_ne'
+>>      193 | #define assert_ne(lhs, rhs, fmt)        assert_op(lhs, rhs, fmt, !=)
+>>          |                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>>    arch/arm64/kvm/hyp/nvhe/gen-hyprel.c:188:19: note: expanded from macro 'assert_op'
+>>      187 |                                 " failed (lhs=" fmt ", rhs=" fmt        \
+>>          |                                                 ~~~
+>>      188 |                                 ", line=%d)", _lhs, _rhs, __LINE__);    \
+>>          |                                               ^~~~
+>>    arch/arm64/kvm/hyp/nvhe/gen-hyprel.c:167:17: note: expanded from macro 'fatal_error'
+>>      166 |                 fprintf(stderr, "error: %s: " fmt "\n",                 \
+>>          |                                               ~~~
+>>      167 |                         elf.path, ## __VA_ARGS__);                      \
+>>          |                                      ^~~~~~~~~~~
+>>
+>> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
 > 
-> We store the two enable bits in the s1_walk_info structure so that
-> they can be retrieved down the line, as they will be useful.
+> I don't see these warnings. What version of LLVM are you using?
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/at.c | 36 ++++++++++++++++++++++++++++++++++++
->  1 file changed, 36 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-> index 4921284eeedff..301399f17983f 100644
-> --- a/arch/arm64/kvm/at.c
-> +++ b/arch/arm64/kvm/at.c
-> @@ -24,6 +24,8 @@ struct s1_walk_info {
->  	unsigned int		txsz;
->  	int 	     		sl;
->  	bool	     		hpd;
-> +	bool			e0poe;
-> +	bool			poe;
->  	bool	     		be;
->  	bool	     		s2;
->  };
-> @@ -110,6 +112,34 @@ static bool s1pie_enabled(struct kvm_vcpu *vcpu, enum trans_regime regime)
->  	}
->  }
->  
-> +static void compute_s1poe(struct kvm_vcpu *vcpu, struct s1_walk_info *wi)
-> +{
-> +	u64 val;
-> +
-> +	if (!kvm_has_feat(vcpu->kvm, ID_AA64MMFR3_EL1, S1PIE, IMP)) {
 
-nit: kvm_has_s1pie()
+I compiled the kernel on Apple Silicon M3 Pro in macOS 15.0.1, Maybe this is
+a special scenario that is rarely used.
 
-> +		wi->poe = wi->e0poe = false;
-> +		return;
-> +	}
-> +
-> +	switch (wi->regime) {
-> +	case TR_EL2:
-> +	case TR_EL20:
-> +		val = vcpu_read_sys_reg(vcpu, TCR2_EL2);
-> +		wi->poe = val & TCR2_EL2_POE;
-> +		wi->e0poe = val & TCR2_EL2_E0POE;
+Details of clang:
 
-Hmm... E0POE is always false in the EL2 translation regime. The RES0
-mask does the heavy lifting here, but that only works if we force
-userspace to select an nVHE-only or VHE-only vCPU.
+     # clang --version
+     Homebrew clang version 19.1.1
+     Target: arm64-apple-darwin24.0.0
+     Thread model: posix
+     InstalledDir: /opt/homebrew/Cellar/llvm/19.1.1/bin
 
-It might make sense to have TR_EL2 force this to false to make it a bit
-more self-documenting, albeit not a functional issue.
+Cheers,
+Tianjia
 
-> +		break;
-> +	case TR_EL10:
-> +		if (__vcpu_sys_reg(vcpu, HCRX_EL2) & HCRX_EL2_TCR2En) {
-> +			wi->poe = wi->e0poe = false;
-> +			return;
-> +		}
-> +
-> +		val = __vcpu_sys_reg(vcpu, TCR2_EL1);
-> +		wi->poe = val & TCR2_EL1x_POE;
-> +		wi->e0poe = val & TCR2_EL1x_E0POE;
-> +	}
-> +}
-> +
-
--- 
-Thanks,
-Oliver
