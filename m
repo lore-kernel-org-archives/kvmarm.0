@@ -1,55 +1,54 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7507B1BBBCD;
-	Thu, 10 Oct 2024 07:54:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7994D206946;
+	Thu, 10 Oct 2024 08:04:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728546890; cv=none; b=gBYgT/S6mpgtvmj/v/Xi6eUD8usX9Wh4oKiCQ4p2LlUvXdDfy45Nd5Q9cq5PR/od/lTrcrt0MmKla6o36uXCjrA+Giut18l9ZbkXE0rUUx7gwNaO29aKXOI27Sa+z3fiYwQ+6VcNQmtrFVBQ0hi8Akv01jlV29HRd3BPA2hYays=
+	t=1728547460; cv=none; b=dvqrejizCTR83igO2DsW57FdFabgVseUxctVZZSNnjv2nBd/5kO2+FEeLXw0FzEknW90wqLpdC+CHVc+DIATHj6jIQgrIQQO60otAgJZpgKDlc3LlwxxtAiHI7nrzWk4h5jAlkG1YZ5zzkJLoh/oBeGTakv2KKinVm3e3xw8PME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728546890; c=relaxed/simple;
-	bh=PtEdfmqQ1KSB1LMZxHsgTo26bgv/5qlNE0mbtLFCjbI=;
+	s=arc-20240116; t=1728547460; c=relaxed/simple;
+	bh=/sPjONB6CQOWKqaEkTr091Qaj+RDE7ndBBvYW3Bh2BM=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SZ2SKFaQ6sL4Aq7fRmQfAwjZ9FD/fD4pbwH0RDo5Z2xvOkED+kXMyVD/2yhSjw/NoonV6m49TlYpeZuBIhZVxDHWMmOlwenl+U0vb15CUv5CzYzPLzBIjCmRy6HtDks7sBsxEb3lEFQgu+RIyn0ma/qdiMUgefc/Qq8sQSxYIZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JaHy4hYI; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=qyevNBsbYDv2j8bXl30Qwc3z/J7JSE3MpzbI5puQNT41Kd5mkmFY2GVOaywQeITzZm7aboYJy3YEDWL9jThmsIbjx33gie2wuISIm1TPXkgnDx8DQeb9HBgknk5inaINfKG2NM6i9JLg9FsPcUgOwKAXoM7th/fu+J0pq3URGhM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GSGLl4m7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JaHy4hYI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13011C4CECC;
-	Thu, 10 Oct 2024 07:54:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GSGLl4m7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A84BC4CEC5;
+	Thu, 10 Oct 2024 08:04:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728546890;
-	bh=PtEdfmqQ1KSB1LMZxHsgTo26bgv/5qlNE0mbtLFCjbI=;
+	s=k20201202; t=1728547460;
+	bh=/sPjONB6CQOWKqaEkTr091Qaj+RDE7ndBBvYW3Bh2BM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=JaHy4hYIHaiICwTlLPUd+w0GjHO0KBETGJY66GJZBuwuID5TLvmm+xw7yocCNd+sh
-	 ASNLxMqR1kQupaQNh7ZfGEW4R96I58VEd6RQZlHjNflI35owG70S8+Nw1POIrTvQfd
-	 ZXArmiTL1TC0/cais4WxdDLV4O7H8HN3mGn03oc9ISUnbz7m023fBAWnNwZgDWqzEb
-	 Icc6yzRJzpIXN/wgWUC+aWktaS7ZR0Xekq74CDgemX5B73hr0lS28a9n6rZLZRJUy5
-	 kdeh58ThvJyVrm1I1myRYxysdrb0pjxVh9niL0e+Pb+hnFns+rRdQd2tCjQR0UMmTt
-	 qFHZPBLG4n89Q==
+	b=GSGLl4m7u+63lOWLSQy58K/xA305lnd0eyLzq5D5XShfkul4Bz76BrRsijwnCr/Eh
+	 KUH+GIr1XZNofMm2pWElsNhoKe57BXi9rncUF1DMJB5+VNNy8IONse+pMTFGJ9K4CA
+	 jyPiSDZtY5uATSekW8FTvm1r36fEWzxA151fh+a0nK6pQuSJHgqQOBPLcgkSBCD5qy
+	 Ry4KbWqgHe9+z1nn5UEBH4WYL2ENyrnYkT9Z+OyWcAjRtif2beerNGAD6KHLzae/gb
+	 eSbRkFWX6FfYCcXOpzT/NkLzIBJNCihqkyFf0QO1z6sQva2PH6ItOVETqG6MB6q1G5
+	 K0pWaS48bdBYw==
 Received: from [82.132.186.234] (helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1syo0V-0025nn-8W;
-	Thu, 10 Oct 2024 08:54:47 +0100
-Date: Thu, 10 Oct 2024 08:54:43 +0100
-Message-ID: <875xq0v1do.wl-maz@kernel.org>
+	id 1syo9h-0025s6-DA;
+	Thu, 10 Oct 2024 09:04:17 +0100
+Date: Thu, 10 Oct 2024 09:04:11 +0100
+Message-ID: <874j5kv0xw.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Sean Christopherson <seanjc@google.com>,
-	kvmarm@lists.linux.dev,
+Cc: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	stable@vger.kernel.org,
-	Alexander Potapenko <glider@google.com>
-Subject: Re: [PATCH] KVM: arm64: Don't eagerly teardown the vgic on init error
-In-Reply-To: <ZwcRct7VWnW0bObA@linux.dev>
-References: <20241009183603.3221824-1-maz@kernel.org>
-	<ZwbYvHJdOqePYjDf@linux.dev>
-	<ZwbbQGpZpGQXaNYK@google.com>
-	<ZwcRct7VWnW0bObA@linux.dev>
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH v4 20/36] KVM: arm64: Disable hierarchical permissions when S1PIE is enabled
+In-Reply-To: <ZweDOQnT4a0J4ekA@linux.dev>
+References: <20241009190019.3222687-1-maz@kernel.org>
+	<20241009190019.3222687-21-maz@kernel.org>
+	<ZweDOQnT4a0J4ekA@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -61,106 +60,54 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 82.132.186.234
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, seanjc@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, stable@vger.kernel.org, glider@google.com
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, alexandru.elisei@arm.com, broonie@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 10 Oct 2024 00:27:46 +0100,
+On Thu, 10 Oct 2024 08:33:13 +0100,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> On Wed, Oct 09, 2024 at 12:36:32PM -0700, Sean Christopherson wrote:
-> > On Wed, Oct 09, 2024, Oliver Upton wrote:
-> > > On Wed, Oct 09, 2024 at 07:36:03PM +0100, Marc Zyngier wrote:
-> > > > As there is very little ordering in the KVM API, userspace can
-> > > > instanciate a half-baked GIC (missing its memory map, for example)
-> > > > at almost any time.
-> > > >
-> > > > This means that, with the right timing, a thread running vcpu-0
-> > > > can enter the kernel without a GIC configured and get a GIC created
-> > > > behind its back by another thread. Amusingly, it will pick up
-> > > > that GIC and start messing with the data structures without the
-> > > > GIC having been fully initialised.
-> > > 
-> > > Huh, I'm definitely missing something. Could you remind me where we open
-> > > up this race between KVM_RUN && kvm_vgic_create()?
-
-Sorry, I sent the patch bombs away and decided to get my life back for
-the evening... Doesn't help that the commit message isn't very clear
-(if not wrong in some respects),.
-
-> Ah, duh, I see it now. kvm_arch_vcpu_run_pid_change() doesn't serialize
-> on a VM lock, and kvm_vgic_map_resources() has an early return for
-> vgic_ready() letting it blow straight past the config_lock.
-
-That. The problem is not so much with the vgic creation (which doesn't
-do much) but with the vgic_init() part followed by the map_resources
-horror.
-
-> 
-> Then if we can't register the MMIO region for the distributor
-> everything comes crashing down and a vCPU has made it into the KVM_RUN
-> loop w/ the VGIC-shaped rug pulled out from under it. There's definitely
-> another functional bug here where a vCPU's attempts to poke the
-> distributor wind up reaching userspace as MMIO exits. But we can worry
-> about that another day.
-
-I don't think that one is that bad. Userspace got us here, and they
-now see an MMIO exit for something that it is not prepared to handle.
-Suck it up and die (on a black size M t-shirt, please).
-
-> If memory serves, kvm_vgic_map_resources() used to do all of this behind
-> the config_lock to cure the race, but that wound up inverting lock
-> ordering on srcu.
-
-Probably something like that. We also used to hold the kvm lock, which
-made everything much simpler, but awfully wrong.
-
-> Note to self: Impose strict ordering on GIC initialization v. vCPU
-> creation if/when we get a new flavor of irqchip.
-
-One of the things we should have done when introducing GICv3 is to
-impose that at KVM_DEV_ARM_VGIC_CTRL_INIT, the GIC memory map is
-final. I remember some push-back on the QEMU side of things, as they
-like to decouple things, but this has proved to be a nightmare.
-
->
-> > > I'd thought the fact that the latter takes all the vCPU mutexes and
-> > > checks if any vCPU in the VM has run would be enough to guard against
-> > > such a race, but clearly not...
+> On Wed, Oct 09, 2024 at 08:00:03PM +0100, Marc Zyngier wrote:
+> > S1PIE implicitly disables hierarchical permissions, as specified in
+> > R_JHSVW, by making TCR_ELx.HPDn RES1.
 > > 
-> > Any chance that fixing bugs where vCPU0 can be accessed (and run!) before its
-> > fully online help?
+> > Add a predicate for S1PIE being enabled for a given translation regime,
+> > and emulate this behaviour by forcing the hpd field to true if S1PIE
+> > is enabled for that translation regime.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/at.c | 19 +++++++++++++++++++
+> >  1 file changed, 19 insertions(+)
+> > 
+> > diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> > index adcfce3f67f03..f5bd750288ff5 100644
+> > --- a/arch/arm64/kvm/at.c
+> > +++ b/arch/arm64/kvm/at.c
+> > @@ -93,6 +93,23 @@ static enum trans_regime compute_translation_regime(struct kvm_vcpu *vcpu, u32 o
+> >  	}
+> >  }
+> >  
+> > +static bool s1pie_enabled(struct kvm_vcpu *vcpu, enum trans_regime regime)
+> > +{
+> > +	if (!kvm_has_feat(vcpu->kvm, ID_AA64MMFR3_EL1, S1PIE, IMP))
+> > +		return false;
+> > +
+> > +	switch (regime) {
+> > +	case TR_EL2:
+> > +	case TR_EL20:
+> > +		return vcpu_read_sys_reg(vcpu, TCR2_EL2) & TCR2_EL2_PIE;
+> > +	case TR_EL10:
+> > +		return  (__vcpu_sys_reg(vcpu, HCRX_EL2) & HCRX_EL2_TCR2En) &&
+> > +			(__vcpu_sys_reg(vcpu, TCR2_EL1) & TCR2_EL1x_PIE);
+> > +	default:
+> > +		BUG();
 > 
-> That's an equally gross bug, but kvm_vgic_create() should still be safe
-> w.r.t. vCPU creation since both hold the kvm->lock in the right spot.
-> That is, since kvm_vgic_create() is called under the lock any vCPUs
-> visible to userspace should exist in the vCPU xarray.
-> 
-> The crappy assumption here is kvm_arch_vcpu_run_pid_change() and its
-> callees are allowed to destroy VM-scoped structures in error handling.
+> BUILD_BUG()?
 
-I think this is symptomatic of more general issue: we perform VM-wide
-configuration in the context of a vcpu. We have tons of this stuff to
-paper over the lack of a "this VM is fully configured" barrier.
-
-I wonder whether we could sidestep things by punting the finalisation
-of the VM to a different context (workqueue?)  and simply return
--EAGAIN or -EINTR to userspace while we're processing it. That doesn't
-solve the "I'm missing parts of the address map and I'm going to die"
-part though.
-
-> > E.g. if that closes the vCPU0 hole, maybe the vCPU1 case can
-> > be handled a bit more gracefully?
-> 
-> I think this is about as graceful as we can be. The sorts of screw-ups
-> that precipitate this error handling may involve stupidity across
-> several KVM ioctls, meaning it is highly unlikely to be attributable /
-> recoverable.
-
-That's my take as well. We're faced with luserspace that's out to get
-us, and by the time we're in the context of a vcpu, it is too late.
-
-I don't see how to fix this without mandating a UABI change.
+Doesn't work. regime is fished out of the walk_info structure, meaning
+that it is pretty opaque to the compiler, which in turn needs to emit
+code for all cases.
 
 Thanks,
 
