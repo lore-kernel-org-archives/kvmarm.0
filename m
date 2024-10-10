@@ -1,82 +1,170 @@
-Received: from out-175.mta0.migadu.com (out-175.mta0.migadu.com [91.218.175.175])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E79C91BD503
-	for <kvmarm@lists.linux.dev>; Thu, 10 Oct 2024 07:53:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7507B1BBBCD;
+	Thu, 10 Oct 2024 07:54:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728546826; cv=none; b=i4zhGe/2wMytuoqhDWQGa2H40LCuBb0cnY8muaNqx/cNpEZjoDWU7NeQMU1f8BDgIoejIRzlO7M2/LhXl6JGZYL2Jru3at8P4W/tiHEAxXgYG5PI5iRDgJw9EivG9OFGJzGJTbJaNT91NeRTOOzs9NffeBeUPpA2Eh1w0VfQdo0=
+	t=1728546890; cv=none; b=gBYgT/S6mpgtvmj/v/Xi6eUD8usX9Wh4oKiCQ4p2LlUvXdDfy45Nd5Q9cq5PR/od/lTrcrt0MmKla6o36uXCjrA+Giut18l9ZbkXE0rUUx7gwNaO29aKXOI27Sa+z3fiYwQ+6VcNQmtrFVBQ0hi8Akv01jlV29HRd3BPA2hYays=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728546826; c=relaxed/simple;
-	bh=wTkZRZ/vbNluKyAk2HTagc3gkd1h6vnz+dDGfdwi9Gk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VYPBxaBdLKuqUlTJFinLtgbcaBXGLgEpchN+an8tkMSlKQcAj3M4QWuW4PyW0Rjk/sXXmfPUS9hhbYBYVK/nRk5Oc/sZ+RK2yWDI5byyC0YJIdB/i89EQBJ6C+Fs3LOUhcRn8Db4ru+dDoUobK8mMP1G0QfVY8O84EHA/Zvn+vQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cliKSiQI; arc=none smtp.client-ip=91.218.175.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1728546890; c=relaxed/simple;
+	bh=PtEdfmqQ1KSB1LMZxHsgTo26bgv/5qlNE0mbtLFCjbI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SZ2SKFaQ6sL4Aq7fRmQfAwjZ9FD/fD4pbwH0RDo5Z2xvOkED+kXMyVD/2yhSjw/NoonV6m49TlYpeZuBIhZVxDHWMmOlwenl+U0vb15CUv5CzYzPLzBIjCmRy6HtDks7sBsxEb3lEFQgu+RIyn0ma/qdiMUgefc/Qq8sQSxYIZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JaHy4hYI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cliKSiQI"
-Date: Thu, 10 Oct 2024 00:53:35 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1728546822;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uvex2072kSqEXNvE9lc55fHy7VD5yiL1TNOcRVGLrdk=;
-	b=cliKSiQIhdo0vIMUoaxCLuMUMwCsh0utwm22gQ2gvmB01/UGczP+qim9dadB6EsGb3Lziz
-	sAuNCCp4mOIvC23XAcpZYz9A9zqvUX4wakcr79NwK7ZNl6QCE9wqqWpVeNkaz9y5PSkv1i
-	83Y36CReuYULHpKzq0oh0D10uKzWvhc=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JaHy4hYI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13011C4CECC;
+	Thu, 10 Oct 2024 07:54:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728546890;
+	bh=PtEdfmqQ1KSB1LMZxHsgTo26bgv/5qlNE0mbtLFCjbI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=JaHy4hYIHaiICwTlLPUd+w0GjHO0KBETGJY66GJZBuwuID5TLvmm+xw7yocCNd+sh
+	 ASNLxMqR1kQupaQNh7ZfGEW4R96I58VEd6RQZlHjNflI35owG70S8+Nw1POIrTvQfd
+	 ZXArmiTL1TC0/cais4WxdDLV4O7H8HN3mGn03oc9ISUnbz7m023fBAWnNwZgDWqzEb
+	 Icc6yzRJzpIXN/wgWUC+aWktaS7ZR0Xekq74CDgemX5B73hr0lS28a9n6rZLZRJUy5
+	 kdeh58ThvJyVrm1I1myRYxysdrb0pjxVh9niL0e+Pb+hnFns+rRdQd2tCjQR0UMmTt
+	 qFHZPBLG4n89Q==
+Received: from [82.132.186.234] (helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1syo0V-0025nn-8W;
+	Thu, 10 Oct 2024 08:54:47 +0100
+Date: Thu, 10 Oct 2024 08:54:43 +0100
+Message-ID: <875xq0v1do.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Sean Christopherson <seanjc@google.com>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v4 29/36] KVM: arm64: Subject S1PIE/S1POE registers to
- HCR_EL2.{TVM,TRVM}
-Message-ID: <ZweH_1KQlQEc9tUY@linux.dev>
-References: <20241009190019.3222687-1-maz@kernel.org>
- <20241009190019.3222687-30-maz@kernel.org>
+	stable@vger.kernel.org,
+	Alexander Potapenko <glider@google.com>
+Subject: Re: [PATCH] KVM: arm64: Don't eagerly teardown the vgic on init error
+In-Reply-To: <ZwcRct7VWnW0bObA@linux.dev>
+References: <20241009183603.3221824-1-maz@kernel.org>
+	<ZwbYvHJdOqePYjDf@linux.dev>
+	<ZwbbQGpZpGQXaNYK@google.com>
+	<ZwcRct7VWnW0bObA@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241009190019.3222687-30-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 82.132.186.234
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, seanjc@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, stable@vger.kernel.org, glider@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Oct 09, 2024 at 08:00:12PM +0100, Marc Zyngier wrote:
-> All the El0/EL1 S1PIE/S1POE system register are caught by the HCR_EL2
-> TCM and TRVM bits. Reflect this in the coarse grained trap table.
-
-typo: TVM
-
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/emulate-nested.c | 4 ++++
->  1 file changed, 4 insertions(+)
+On Thu, 10 Oct 2024 00:27:46 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> index ddcbaa983de36..0ab0905533545 100644
-> --- a/arch/arm64/kvm/emulate-nested.c
-> +++ b/arch/arm64/kvm/emulate-nested.c
-> @@ -704,6 +704,10 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
->  	SR_TRAP(SYS_MAIR_EL1,		CGT_HCR_TVM_TRVM),
->  	SR_TRAP(SYS_AMAIR_EL1,		CGT_HCR_TVM_TRVM),
->  	SR_TRAP(SYS_CONTEXTIDR_EL1,	CGT_HCR_TVM_TRVM),
-> +	SR_TRAP(SYS_PIR_EL1,		CGT_HCR_TVM_TRVM),
-> +	SR_TRAP(SYS_PIRE0_EL1,		CGT_HCR_TVM_TRVM),
-> +	SR_TRAP(SYS_POR_EL0,		CGT_HCR_TVM_TRVM),
-> +	SR_TRAP(SYS_POR_EL1,		CGT_HCR_TVM_TRVM),
->  	SR_TRAP(SYS_TCR2_EL1,		CGT_HCR_TVM_TRVM_HCRX_TCR2En),
->  	SR_TRAP(SYS_DC_ZVA,		CGT_HCR_TDZ),
->  	SR_TRAP(SYS_DC_GVA,		CGT_HCR_TDZ),
-> -- 
-> 2.39.2
+> On Wed, Oct 09, 2024 at 12:36:32PM -0700, Sean Christopherson wrote:
+> > On Wed, Oct 09, 2024, Oliver Upton wrote:
+> > > On Wed, Oct 09, 2024 at 07:36:03PM +0100, Marc Zyngier wrote:
+> > > > As there is very little ordering in the KVM API, userspace can
+> > > > instanciate a half-baked GIC (missing its memory map, for example)
+> > > > at almost any time.
+> > > >
+> > > > This means that, with the right timing, a thread running vcpu-0
+> > > > can enter the kernel without a GIC configured and get a GIC created
+> > > > behind its back by another thread. Amusingly, it will pick up
+> > > > that GIC and start messing with the data structures without the
+> > > > GIC having been fully initialised.
+> > > 
+> > > Huh, I'm definitely missing something. Could you remind me where we open
+> > > up this race between KVM_RUN && kvm_vgic_create()?
+
+Sorry, I sent the patch bombs away and decided to get my life back for
+the evening... Doesn't help that the commit message isn't very clear
+(if not wrong in some respects),.
+
+> Ah, duh, I see it now. kvm_arch_vcpu_run_pid_change() doesn't serialize
+> on a VM lock, and kvm_vgic_map_resources() has an early return for
+> vgic_ready() letting it blow straight past the config_lock.
+
+That. The problem is not so much with the vgic creation (which doesn't
+do much) but with the vgic_init() part followed by the map_resources
+horror.
+
 > 
+> Then if we can't register the MMIO region for the distributor
+> everything comes crashing down and a vCPU has made it into the KVM_RUN
+> loop w/ the VGIC-shaped rug pulled out from under it. There's definitely
+> another functional bug here where a vCPU's attempts to poke the
+> distributor wind up reaching userspace as MMIO exits. But we can worry
+> about that another day.
+
+I don't think that one is that bad. Userspace got us here, and they
+now see an MMIO exit for something that it is not prepared to handle.
+Suck it up and die (on a black size M t-shirt, please).
+
+> If memory serves, kvm_vgic_map_resources() used to do all of this behind
+> the config_lock to cure the race, but that wound up inverting lock
+> ordering on srcu.
+
+Probably something like that. We also used to hold the kvm lock, which
+made everything much simpler, but awfully wrong.
+
+> Note to self: Impose strict ordering on GIC initialization v. vCPU
+> creation if/when we get a new flavor of irqchip.
+
+One of the things we should have done when introducing GICv3 is to
+impose that at KVM_DEV_ARM_VGIC_CTRL_INIT, the GIC memory map is
+final. I remember some push-back on the QEMU side of things, as they
+like to decouple things, but this has proved to be a nightmare.
+
+>
+> > > I'd thought the fact that the latter takes all the vCPU mutexes and
+> > > checks if any vCPU in the VM has run would be enough to guard against
+> > > such a race, but clearly not...
+> > 
+> > Any chance that fixing bugs where vCPU0 can be accessed (and run!) before its
+> > fully online help?
+> 
+> That's an equally gross bug, but kvm_vgic_create() should still be safe
+> w.r.t. vCPU creation since both hold the kvm->lock in the right spot.
+> That is, since kvm_vgic_create() is called under the lock any vCPUs
+> visible to userspace should exist in the vCPU xarray.
+> 
+> The crappy assumption here is kvm_arch_vcpu_run_pid_change() and its
+> callees are allowed to destroy VM-scoped structures in error handling.
+
+I think this is symptomatic of more general issue: we perform VM-wide
+configuration in the context of a vcpu. We have tons of this stuff to
+paper over the lack of a "this VM is fully configured" barrier.
+
+I wonder whether we could sidestep things by punting the finalisation
+of the VM to a different context (workqueue?)  and simply return
+-EAGAIN or -EINTR to userspace while we're processing it. That doesn't
+solve the "I'm missing parts of the address map and I'm going to die"
+part though.
+
+> > E.g. if that closes the vCPU0 hole, maybe the vCPU1 case can
+> > be handled a bit more gracefully?
+> 
+> I think this is about as graceful as we can be. The sorts of screw-ups
+> that precipitate this error handling may involve stupidity across
+> several KVM ioctls, meaning it is highly unlikely to be attributable /
+> recoverable.
+
+That's my take as well. We're faced with luserspace that's out to get
+us, and by the time we're in the context of a vcpu, it is too late.
+
+I don't see how to fix this without mandating a UABI change.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
