@@ -1,57 +1,57 @@
 Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2494E1CEAD2
-	for <kvmarm@lists.linux.dev>; Thu, 10 Oct 2024 18:25:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B5F81E3771
+	for <kvmarm@lists.linux.dev>; Thu, 10 Oct 2024 18:25:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728584703; cv=none; b=jEehHmPbFgMznZYgTaxkrPkT22lBg+TN+dXZZdUifzpt5JGsz0kkAFoIOxLQsKhF/dXwPlR1G2OpVU9P2wihWJ4Rz3/4TPKDmLnrLwho8qrdNTR2GDTa6St5HJgf3lnt7X2PbPOG2NQyD1MgWAWNdjBKVRDVdDklnu4BTsMj9lM=
+	t=1728584707; cv=none; b=JiZQphgOMYlwPwG0oApcs5VQNsG13vCtZRUSVZvfd+KxGR0ecw9SpFCh/OtN5kJmOo9Nt+i8VZ9Pz8R5S7Hqfa3rTP0lL52Ytm1bmXAblRsLRYXMO2SSQmGB+DurrbrniKr6V4KHaVraOCVScDUOInb5Ofj1ofdl0dVcxTgD86I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728584703; c=relaxed/simple;
-	bh=uAiI5uzFAMXWntu4OPmR0EhFBczJTAI1tjFERMQUX4o=;
+	s=arc-20240116; t=1728584707; c=relaxed/simple;
+	bh=V8Pz/YRM4TKMSvyoWeXbxNdYc7yxSwxWSxDHm25abTE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=WGWG7BiKRhcE98heRO2hbluyTADLHOQsuba4CaXFTMovUGh9RX87Vfk3yowLQCAaqeK2WQcATk2SBfaAJR/mQey1C3BCL0NE61uDzCFeCfxzi6kcwrsyCRFmvtHOVG3fLJXebPeCUpfaFiCboqLtnI26uXB6xmLaP3w/1mkz1E4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZeDzQQGD; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=D4323BWlNDUSce7u8kPBJCAXE8YnUSePpl1h9PHKJZqMXPBZd7DA6Oq2iVArI95fFhvxOvjoGUQ6qBaeEwS0DczX1Xpy+iV8Y2Xv/6XzeCPGzELkEukjPeN0W8f92ahTpqzi7+OVk4RRN7b55fR0m6bx0OduN8MgEjCuDvy50M0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IJ1DG+cO; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZeDzQQGD"
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e290947f6f8so1842477276.2
-        for <kvmarm@lists.linux.dev>; Thu, 10 Oct 2024 11:25:01 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IJ1DG+cO"
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e28fea2adb6so1485166276.3
+        for <kvmarm@lists.linux.dev>; Thu, 10 Oct 2024 11:25:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728584701; x=1729189501; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1728584704; x=1729189504; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=pPAj0F/7+N3G0fgp8rSBmKqwV8uR3Qu6XgX2gyD+fUo=;
-        b=ZeDzQQGDR4GjGLNMl2TpTXqusTv6MNZt5v7Sk3p59RUwXjTK8k8NiKBCMJqXIKIe6F
-         WTOjFi7MVPOO7ar7n/sxQtRTxkk31yuDrxXd0u3fJoYQ1nGaYU7eEw+qPSGPWnjNrcv4
-         OM19uBbh/6AVtAHuSw1uDnG6HBdk9pDvTIgF2A4vUDS+ihoQhOwgyd/o5n7zgNAULNE4
-         x39sy6l1KSDTJuhdjn5pB5CjCe44zz2H1Z9gBt1+6PnkBOMjbqoMsj2aJUY1eQ3zi99P
-         TaSSVHeY1KxbOGm3ljBfmSwvCDcg8d7xI5tyXrwaaiXQjqv7Rd9uJXysdrhIbARXd9pT
-         +3lg==
+        bh=zmCOkT+wuJeT9H1MjXHCrAkGhLQoiMWK376kHF4kwCg=;
+        b=IJ1DG+cOlSEV9yANgRpmCLs/5DxYKLv6kdabe52BHvmPenXM3FAg1cxWI1epmPptys
+         X3FujXVIQdVIPejSMEHlMlC9TTsYczx3BNQcmFKyUVSj3UNkEQL+fzt/APmycXYAgukC
+         eMb29OHWIQWYTlifM1fgo3y27wxWE4Mvh7fvNpTwYfYPO5p0LDZ3T41U+lAip4KCHhaW
+         HwSFuxY0stsAj/tjZKxZj44H2FKtiHI/Rkqoe1Oa21OZw9lGDj1CFyV90SkSX8RYpSgI
+         t4fxx0m54eXV1eJMjfTpmrnBgJ9px25noCdRF/CFd4c4TsKrgy+GDcp/gZBkqTLMugIc
+         Id7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728584701; x=1729189501;
+        d=1e100.net; s=20230601; t=1728584704; x=1729189504;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=pPAj0F/7+N3G0fgp8rSBmKqwV8uR3Qu6XgX2gyD+fUo=;
-        b=ZTA4xIQvYC0nIP/l3WPupdUDr5aEKQhtVRI9FG+cy19j7RwehuKeiyXu5fvfTN1qfw
-         anIT+Kx37seWLqIxNAJniv35F88X+DwLWw522lY/YE2MYInqMQl94zI5rQlPRwlpVUXM
-         /GKIkZVR3JOTG4EbgD86l/vZTMxBtTGm3roFv1Fp6BJsUiBzi/WX90vt++bfO5639EC2
-         2hADMae6fdLaYFz1enC6pSBZ89cVzWxIXXi1avoh8Ldsls8wbYoNsimVLsVeHh3LVAAI
-         IHmtW+YJWxgSxXFsf5FqfJCzE7CFvQBNN1U5vKQV4sDxSlr/f1gDp3O8C6dfhexyEsBa
-         FBYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWxyW5usYsY9oTb4Rrs96bQxcfQiaTQMRhlJhafwi1C00p6iwD6MQy9EMtHkOXQptHErHkDUEg=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yy7l2XEq4ZYVZv+ukPCVN41msqunIDA+r0cvK7doYeqzXnuog3q
-	/ax1Ov86LHkNhvvMrof2ISLrmlN7hdezjOJBje76Ayoi87BUbO6lTgDbnVG/r4pUi7gWywomEpv
-	M8Q==
-X-Google-Smtp-Source: AGHT+IHQgMXiDY3ifHkkle2NgOnYNSR5nXtws6LnwLsJ4J6Fqip1dtdD5j5lAqBgp/4MJdCcEXFALInKEMI=
+        bh=zmCOkT+wuJeT9H1MjXHCrAkGhLQoiMWK376kHF4kwCg=;
+        b=Puo+MHb4/iaA4KM10lwNQS/b5vmStvvL/PpVVej4hBMDwKH/7VQi6fjxxzBsLOWWEG
+         lwxSSLmArs4yKP5l0FK5QrwEPmK9ePhc5Gqi+q6ZCq+IQvWK1dMPWVIqm4Ia0kkX5Xj7
+         ThU7MYtj8ZTGZs7R4D1W46nBE+s4bNjzdVddVHQzqJi+U30VU8U3tacXPSYy4+VwPj06
+         B6CkOnF+e/m44o769lD3HfLNich1LtzUKedflpq7Q7FeJBycil++YiGgIdLln4g6+263
+         5Yb15xRpFQktSOkLkvZAc+X5EKjB0WlAX/hHXZItddu5qVPFD7CMParUL5dcAJUq70EU
+         Zvfg==
+X-Forwarded-Encrypted: i=1; AJvYcCWylvl6dz09OqtvO/rmLQurct2+2zaYgM1OojdZe41ZTBf5dhksQstl1Pfh8YdWmONPeBvIhpo=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyOlbBqOO6fyfeL1qBQS2/YeiSLMUnj9mpqOqvqoc0W45uc6KiY
+	8agdSFjdwKP0heNYp/xhMYShcWP4ni5Uik46ODlHuANdwHYde4Fo+z+4woP61xNNFGHstiMouih
+	WHg==
+X-Google-Smtp-Source: AGHT+IHLS32ZnUy4bY0gdVqRjJSlR5N1zmb3UxYk5drKGwVtxhq/Y8NIZIwMp1duovDzYwXPQsOfO5WBu4o=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a25:69c3:0:b0:e1a:9ed2:67f4 with SMTP id
- 3f1490d57ef6-e28fe4313ffmr4949276.2.1728584700890; Thu, 10 Oct 2024 11:25:00
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1812:b0:e24:9f58:dd17 with SMTP id
+ 3f1490d57ef6-e28fe32f042mr66754276.1.1728584702932; Thu, 10 Oct 2024 11:25:02
  -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 10 Oct 2024 11:23:07 -0700
+Date: Thu, 10 Oct 2024 11:23:08 -0700
 In-Reply-To: <20241010182427.1434605-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,9 +61,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20241010182427.1434605-1-seanjc@google.com>
 X-Mailer: git-send-email 2.47.0.rc1.288.g06298d1525-goog
-Message-ID: <20241010182427.1434605-6-seanjc@google.com>
-Subject: [PATCH v13 05/85] KVM: x86/mmu: Don't overwrite shadow-present MMU
- SPTEs when prefaulting
+Message-ID: <20241010182427.1434605-7-seanjc@google.com>
+Subject: [PATCH v13 06/85] KVM: x86/mmu: Invert @can_unsync and renamed to @synchronizing
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
@@ -82,59 +81,137 @@ Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	Andrew Jones <ajones@ventanamicro.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Treat attempts to prefetch/prefault MMU SPTEs as spurious if there's an
-existing shadow-present SPTE, as overwriting a SPTE that may have been
-create by a "real" fault is at best confusing, and at worst potentially
-harmful.  E.g. mmu_try_to_unsync_pages() doesn't unsync when prefetching,
-which creates a scenario where KVM could try to replace a Writable SPTE
-with a !Writable SPTE, as sp->unsync is checked prior to acquiring
-mmu_unsync_pages_lock.
-
-Note, this applies to three of the four flavors of "prefetch" in KVM:
-
-  - KVM_PRE_FAULT_MEMORY
-  - Async #PF (host or PV)
-  - Prefetching
-
-The fourth flavor, SPTE synchronization, i.e. FNAME(sync_spte), _only_
-overwrites shadow-present SPTEs when calling make_spte().  But SPTE
-synchronization specifically uses mmu_spte_update(), and so naturally
-avoids the @prefetch check in mmu_set_spte().
+Invert the polarity of "can_unsync" and rename the parameter to
+"synchronizing" to allow a future change to set the Accessed bit if KVM
+is synchronizing an existing SPTE.  Querying "can_unsync" in that case is
+nonsensical, as the fact that KVM can't unsync SPTEs doesn't provide any
+justification for setting the Accessed bit.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c     | 3 +++
- arch/x86/kvm/mmu/tdp_mmu.c | 3 +++
- 2 files changed, 6 insertions(+)
+ arch/x86/kvm/mmu/mmu.c          | 12 ++++++------
+ arch/x86/kvm/mmu/mmu_internal.h |  2 +-
+ arch/x86/kvm/mmu/paging_tmpl.h  |  2 +-
+ arch/x86/kvm/mmu/spte.c         |  4 ++--
+ arch/x86/kvm/mmu/spte.h         |  2 +-
+ arch/x86/kvm/mmu/tdp_mmu.c      |  4 ++--
+ 6 files changed, 13 insertions(+), 13 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index a9a23e058555..a8c64069aa89 100644
+index a8c64069aa89..0f21d6f76cab 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -2919,6 +2919,9 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
+@@ -2795,7 +2795,7 @@ static void kvm_unsync_page(struct kvm *kvm, struct kvm_mmu_page *sp)
+  * be write-protected.
+  */
+ int mmu_try_to_unsync_pages(struct kvm *kvm, const struct kvm_memory_slot *slot,
+-			    gfn_t gfn, bool can_unsync, bool prefetch)
++			    gfn_t gfn, bool synchronizing, bool prefetch)
+ {
+ 	struct kvm_mmu_page *sp;
+ 	bool locked = false;
+@@ -2810,12 +2810,12 @@ int mmu_try_to_unsync_pages(struct kvm *kvm, const struct kvm_memory_slot *slot,
+ 
+ 	/*
+ 	 * The page is not write-tracked, mark existing shadow pages unsync
+-	 * unless KVM is synchronizing an unsync SP (can_unsync = false).  In
+-	 * that case, KVM must complete emulation of the guest TLB flush before
+-	 * allowing shadow pages to become unsync (writable by the guest).
++	 * unless KVM is synchronizing an unsync SP.  In that case, KVM must
++	 * complete emulation of the guest TLB flush before allowing shadow
++	 * pages to become unsync (writable by the guest).
+ 	 */
+ 	for_each_gfn_valid_sp_with_gptes(kvm, sp, gfn) {
+-		if (!can_unsync)
++		if (synchronizing)
+ 			return -EPERM;
+ 
+ 		if (sp->unsync)
+@@ -2941,7 +2941,7 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
  	}
  
- 	if (is_shadow_present_pte(*sptep)) {
-+		if (prefetch)
-+			return RET_PF_SPURIOUS;
-+
- 		/*
- 		 * If we overwrite a PTE page pointer with a 2MB PMD, unlink
- 		 * the parent of the now unreachable PTE.
+ 	wrprot = make_spte(vcpu, sp, slot, pte_access, gfn, pfn, *sptep, prefetch,
+-			   true, host_writable, &spte);
++			   false, host_writable, &spte);
+ 
+ 	if (*sptep == spte) {
+ 		ret = RET_PF_SPURIOUS;
+diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+index c98827840e07..4da83544c4e1 100644
+--- a/arch/x86/kvm/mmu/mmu_internal.h
++++ b/arch/x86/kvm/mmu/mmu_internal.h
+@@ -164,7 +164,7 @@ static inline gfn_t gfn_round_for_level(gfn_t gfn, int level)
+ }
+ 
+ int mmu_try_to_unsync_pages(struct kvm *kvm, const struct kvm_memory_slot *slot,
+-			    gfn_t gfn, bool can_unsync, bool prefetch);
++			    gfn_t gfn, bool synchronizing, bool prefetch);
+ 
+ void kvm_mmu_gfn_disallow_lpage(const struct kvm_memory_slot *slot, gfn_t gfn);
+ void kvm_mmu_gfn_allow_lpage(const struct kvm_memory_slot *slot, gfn_t gfn);
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index ae7d39ff2d07..6e7bd8921c6f 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -963,7 +963,7 @@ static int FNAME(sync_spte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp, int
+ 	host_writable = spte & shadow_host_writable_mask;
+ 	slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
+ 	make_spte(vcpu, sp, slot, pte_access, gfn,
+-		  spte_to_pfn(spte), spte, true, false,
++		  spte_to_pfn(spte), spte, true, true,
+ 		  host_writable, &spte);
+ 
+ 	return mmu_spte_update(sptep, spte);
+diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+index 5521608077ec..0e47fea1a2d9 100644
+--- a/arch/x86/kvm/mmu/spte.c
++++ b/arch/x86/kvm/mmu/spte.c
+@@ -157,7 +157,7 @@ bool spte_has_volatile_bits(u64 spte)
+ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+ 	       const struct kvm_memory_slot *slot,
+ 	       unsigned int pte_access, gfn_t gfn, kvm_pfn_t pfn,
+-	       u64 old_spte, bool prefetch, bool can_unsync,
++	       u64 old_spte, bool prefetch, bool synchronizing,
+ 	       bool host_writable, u64 *new_spte)
+ {
+ 	int level = sp->role.level;
+@@ -248,7 +248,7 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+ 		 * e.g. it's write-tracked (upper-level SPs) or has one or more
+ 		 * shadow pages and unsync'ing pages is not allowed.
+ 		 */
+-		if (mmu_try_to_unsync_pages(vcpu->kvm, slot, gfn, can_unsync, prefetch)) {
++		if (mmu_try_to_unsync_pages(vcpu->kvm, slot, gfn, synchronizing, prefetch)) {
+ 			wrprot = true;
+ 			pte_access &= ~ACC_WRITE_MASK;
+ 			spte &= ~(PT_WRITABLE_MASK | shadow_mmu_writable_mask);
+diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
+index 2cb816ea2430..c81cac9358e0 100644
+--- a/arch/x86/kvm/mmu/spte.h
++++ b/arch/x86/kvm/mmu/spte.h
+@@ -499,7 +499,7 @@ bool spte_has_volatile_bits(u64 spte);
+ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+ 	       const struct kvm_memory_slot *slot,
+ 	       unsigned int pte_access, gfn_t gfn, kvm_pfn_t pfn,
+-	       u64 old_spte, bool prefetch, bool can_unsync,
++	       u64 old_spte, bool prefetch, bool synchronizing,
+ 	       bool host_writable, u64 *new_spte);
+ u64 make_huge_page_split_spte(struct kvm *kvm, u64 huge_spte,
+ 		      	      union kvm_mmu_page_role role, int index);
 diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 3b996c1fdaab..3c6583468742 100644
+index 3c6583468742..76bca7a726c1 100644
 --- a/arch/x86/kvm/mmu/tdp_mmu.c
 +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -1026,6 +1026,9 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
- 	if (WARN_ON_ONCE(sp->role.level != fault->goal_level))
- 		return RET_PF_RETRY;
- 
-+	if (fault->prefetch && is_shadow_present_pte(iter->old_spte))
-+		return RET_PF_SPURIOUS;
-+
- 	if (unlikely(!fault->slot))
+@@ -1033,8 +1033,8 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
  		new_spte = make_mmio_spte(vcpu, iter->gfn, ACC_ALL);
  	else
+ 		wrprot = make_spte(vcpu, sp, fault->slot, ACC_ALL, iter->gfn,
+-					 fault->pfn, iter->old_spte, fault->prefetch, true,
+-					 fault->map_writable, &new_spte);
++				   fault->pfn, iter->old_spte, fault->prefetch,
++				   false, fault->map_writable, &new_spte);
+ 
+ 	if (new_spte == iter->old_spte)
+ 		ret = RET_PF_SPURIOUS;
 -- 
 2.47.0.rc1.288.g06298d1525-goog
 
