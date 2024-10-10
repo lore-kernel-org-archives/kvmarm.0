@@ -1,57 +1,57 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 415FE210C2B
-	for <kvmarm@lists.linux.dev>; Thu, 10 Oct 2024 18:27:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74235212634
+	for <kvmarm@lists.linux.dev>; Thu, 10 Oct 2024 18:27:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728584844; cv=none; b=WJlEldTrvu6vDTKI33Th2mG5JCS3xwSsnRt4uKoYSX6LTFDhK+5JRiFECZxVz/ohNDWM4H0FnxnYw9SL7JxqM/ibWIc00D5kUcx1hp/uxcojfBFh5gRBQPJdmRpPN4gGmqDtjaXRYUiI4MfSXg1zNWdKQ0o6LGpPSpB4pdFI1EM=
+	t=1728584847; cv=none; b=G4OIlzj0Lu0DmPg01inYbm+ntOIaKK+3xQ2JIYRutbdSoUNhytom4lZyFyR4XD1OlwDyP6hlwG/UiDORE9+bc7jLPMeNy8xFNW3XSOAAdqtfrHUe9L41TFNcFtUOF7cHyor37G9arfrjPff/Nosg1X7naNdInRcQG/6//1BwAp8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728584844; c=relaxed/simple;
-	bh=Q0WfZXD0AwljsCbiw/O0WdULhXfIX1X/By/5X/lP1LI=;
+	s=arc-20240116; t=1728584847; c=relaxed/simple;
+	bh=8dGNSdkZyds89DzrI//tIWXaU4bIHqe2OXPOvN+ci/o=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=mQFdC3J/BOE+L/9wgsUTDvRN8TKy5gug4zOrQZ8b585mfEw5g4Bwr6yuxgDRZuya3P+5UZFFpWNECeZCWKg6eCKMX4nP+JkVatHBeJK3GX669XlhrqNzXz6Mz/FQ4EQgE1OUdtdQ7ISnrgsVfepfxJIK5sdp7WZjp+IIFfbe8lQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JvmfSPaP; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=tZrzNKZmQbfgO+/8Zh6f3DZ6PmqsttLWw6tGTmtfKJB9My7iPkSAD5JHWiU8Q8xOGF3wlabNy1E1csZPzWhI5dlps2HjEOAzZvYCpJ6Pkij9h9ablrUYkeHVhII4sHikY+6LZ6GDB9DlGu7S7nyu+v/M+jbnc+M0ghXo9Aa4Nlc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0gWtMUo/; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JvmfSPaP"
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e284982a31so22467057b3.3
-        for <kvmarm@lists.linux.dev>; Thu, 10 Oct 2024 11:27:23 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0gWtMUo/"
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e2913beeddaso635565276.0
+        for <kvmarm@lists.linux.dev>; Thu, 10 Oct 2024 11:27:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728584842; x=1729189642; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1728584844; x=1729189644; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=OZ/c8QPJoSxQXGCWT5aWp1nMy1t7EEzE7+N8fqq+BFY=;
-        b=JvmfSPaP8jNp20a3Fl2D8EJQb2eyVbDOAlLJZrVdMxVeEPZEn9Ny0blAGNQ4CqNhiX
-         Tp5SRoG4qqdcjYZJMI8p3A+iauImA+wOzv6rtX1dHsM/jAbsHXoTpWiabnFcCfgJPqNh
-         tRGo2kuQV4LhQoz/LXr18B3q60kDKR74UsyHpfy3n9Z3Nq/j2kUz5WYQ6a/fjPKpCftB
-         TN3mP/DLX1+et8NZJJO1OteGcLZzHLNyfuWbHNvYD5nHoxQhQEjCjOIwcKz5VjJhQK7W
-         9HJvNgkioqKeygSkByzknPjrSCjf3RPgEB49jbsFA/6gAlz5AVkpPzAbtNKUmu2O80Qy
-         eJqw==
+        bh=ojyPU0tzKIRRbswoqL6JjpEgqRgu1FFXpokE5rqa8U0=;
+        b=0gWtMUo/b5IbcwZqxRyfuddT6frjeAtrNEtKBGgmUdlOjXY9d6sRPl490AaZZllmvY
+         jwavSc6vorU3VuQRRn+KJu11dqV9T6MPKz03rBQXDCbEDLHGbHHBZLK6s5OTxn3caA3U
+         0Ox558tvK3gpZnHxmTpEpujtPmtdtpvpjp25pkgul/Wi8h7cEOJA391ADD6Op9QCRx2k
+         Bx4uB9JeqWIgxTq70L44WZzI02nW1ljveYKzDYhSOUcev0zpeXf2YpW2yH7lOq6alVuY
+         MAMnBQzCOHkxM7q0XxNv7/Jaxf4tyScsTuq0akusoXUrrhq/UofNoRALnXbfHiLVRTGN
+         5GAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728584842; x=1729189642;
+        d=1e100.net; s=20230601; t=1728584844; x=1729189644;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=OZ/c8QPJoSxQXGCWT5aWp1nMy1t7EEzE7+N8fqq+BFY=;
-        b=lguvMvEGBTTrdjP/7/lxNdJVa3PWcCisyNMqBj5RylzMjhcW1mjAtdKcdc+BJgl54F
-         e6hhSuwCLmEsB75b46fBETomFzp/zwTQvXc/7XM8ruFjjZ5i+g1OOkOKz6gtBOB9V6Ux
-         Gzzbb8V9EM0w1/rcehCbycycoPzgR1ReF6SaZ6z3xfQlhBfd/i5xbxTCN/JFv6v9h+rv
-         Hkfxk6GKsnCJpVGsiVlEnWBEsToLbCODZtWE30PaYvKlOfOoyfh62XUPPWH0HDWMe+FZ
-         pcSVHQpfyoa5wYAfH3yv5API6KEnv1OZ4XqQ0TE8vadfozQ/Nf+YOHB4UzeSgwCCmGoA
-         02Yw==
-X-Forwarded-Encrypted: i=1; AJvYcCWTjEanyBdbUR604e0QMYkMuXWJNAJeOYkw179tP5TgtGGrwhanIgq/UI5PXCxAehpt44EVKwE=@lists.linux.dev
-X-Gm-Message-State: AOJu0YznfumbqSx1oIw78gVvovL+NpJh+iUxJjek1e3cgjxBZaCnVvMv
-	wrsoDK2gvoI67TU6hBZzFcUeuTRQGbWdUbXiwqxyt9vbMiafKMWqBFAQaPJCeWJROr4FvwzettB
-	5jw==
-X-Google-Smtp-Source: AGHT+IHhD+Vk6TwFIS5v8fA24SNPRWU4vCcQM+1g+zVw6L+6pfrMpIdoNti+PehtHCeQDGmk8Jps/9lQ5Ek=
+        bh=ojyPU0tzKIRRbswoqL6JjpEgqRgu1FFXpokE5rqa8U0=;
+        b=T/Tjz/rkpjf50v8YkvTehsTCqA/suZnZOdWCENpI9QocJ9FnLx715j4q56qxs9CFfI
+         3fBJIMexbhrFbaCJ0cWrgRJEDxpxweR9IwPSszckWN6ov6AXyEV4sypZyhv3QZpEEapq
+         L2XYtSaC2pVlY3BnoqnO5fvVsdeeF9xrwZ1WUOnWyGJDD2UfvBLuFUS7/y6lp2r0lQHS
+         IJ9TwexT8PRYqmAcfLMoIXG+j2N7jhPzQyVvvjeZ2ITw6kYlS0qi2EPhkKQ54uXBcsmA
+         CmL+AdZKQOytJ3g+4BpjolJS6cM7u0++mLyiFVZUVYSgGGo9UKLlzHbENZzA8v0QXqbH
+         zCdw==
+X-Forwarded-Encrypted: i=1; AJvYcCWRHgZbB7sTyB0CswUk1lMajnJ1EaUFJTVZu7kwAHug3rC/PXq/5fcrFEfPei37DnXifc2ApKg=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxTzyqJqns3RtJ5YueyKZTUrERWbMPOHxSvY5yvs4IJI7/BOHwh
+	VT4d+39sEM2quNbGul6PbzI+P5hCrbokkSYojbzF1lk/5rfEi8ivX4sQkkEvFkQyhZGxlE0OrM3
+	z2A==
+X-Google-Smtp-Source: AGHT+IHEyKrdGSoNbMWcRNiKhgC/jPgVf/TjauaPCrq7yqhpXyuJQagleroMC0w40O7lZsOojHLr7EwrZqI=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a25:d30a:0:b0:e28:fe07:9cc1 with SMTP id
- 3f1490d57ef6-e28fe4a3a81mr68085276.3.1728584842321; Thu, 10 Oct 2024 11:27:22
+ (user=seanjc job=sendgmr) by 2002:a25:6805:0:b0:e20:cfc2:a326 with SMTP id
+ 3f1490d57ef6-e29184333b9mr26276.6.1728584844184; Thu, 10 Oct 2024 11:27:24
  -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 10 Oct 2024 11:24:13 -0700
+Date: Thu, 10 Oct 2024 11:24:14 -0700
 In-Reply-To: <20241010182427.1434605-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,9 +61,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20241010182427.1434605-1-seanjc@google.com>
 X-Mailer: git-send-email 2.47.0.rc1.288.g06298d1525-goog
-Message-ID: <20241010182427.1434605-72-seanjc@google.com>
-Subject: [PATCH v13 71/85] KVM: MIPS: Mark "struct page" pfns accessed prior
- to dropping mmu_lock
+Message-ID: <20241010182427.1434605-73-seanjc@google.com>
+Subject: [PATCH v13 72/85] KVM: MIPS: Use kvm_faultin_pfn() to map pfns into
+ the guest
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
@@ -82,32 +82,70 @@ Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	Andrew Jones <ajones@ventanamicro.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Mark pages accessed before dropping mmu_lock when faulting in guest memory
-so that MIPS can convert to kvm_release_faultin_page() without tripping
-its lockdep assertion on mmu_lock being held.
+Convert MIPS to kvm_faultin_pfn()+kvm_release_faultin_page(), which
+are new APIs to consolidate arch code and provide consistent behavior
+across all KVM architectures.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/mips/kvm/mmu.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ arch/mips/kvm/mmu.c | 14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
 
 diff --git a/arch/mips/kvm/mmu.c b/arch/mips/kvm/mmu.c
-index f1e4b618ec6d..69463ab24d97 100644
+index 69463ab24d97..d2c3b6b41f18 100644
 --- a/arch/mips/kvm/mmu.c
 +++ b/arch/mips/kvm/mmu.c
-@@ -634,10 +634,9 @@ static int kvm_mips_map_page(struct kvm_vcpu *vcpu, unsigned long gpa,
+@@ -557,6 +557,7 @@ static int kvm_mips_map_page(struct kvm_vcpu *vcpu, unsigned long gpa,
+ 	bool writeable;
+ 	unsigned long prot_bits;
+ 	unsigned long mmu_seq;
++	struct page *page;
  
- 	if (writeable)
- 		kvm_set_pfn_dirty(pfn);
+ 	/* Try the fast path to handle old / clean pages */
+ 	srcu_idx = srcu_read_lock(&kvm->srcu);
+@@ -578,7 +579,7 @@ static int kvm_mips_map_page(struct kvm_vcpu *vcpu, unsigned long gpa,
+ 	mmu_seq = kvm->mmu_invalidate_seq;
+ 	/*
+ 	 * Ensure the read of mmu_invalidate_seq isn't reordered with PTE reads
+-	 * in gfn_to_pfn_prot() (which calls get_user_pages()), so that we don't
++	 * in kvm_faultin_pfn() (which calls get_user_pages()), so that we don't
+ 	 * risk the page we get a reference to getting unmapped before we have a
+ 	 * chance to grab the mmu_lock without mmu_invalidate_retry() noticing.
+ 	 *
+@@ -590,7 +591,7 @@ static int kvm_mips_map_page(struct kvm_vcpu *vcpu, unsigned long gpa,
+ 	smp_rmb();
+ 
+ 	/* Slow path - ask KVM core whether we can access this GPA */
+-	pfn = gfn_to_pfn_prot(kvm, gfn, write_fault, &writeable);
++	pfn = kvm_faultin_pfn(vcpu, gfn, write_fault, &writeable, &page);
+ 	if (is_error_noslot_pfn(pfn)) {
+ 		err = -EFAULT;
+ 		goto out;
+@@ -602,10 +603,10 @@ static int kvm_mips_map_page(struct kvm_vcpu *vcpu, unsigned long gpa,
+ 		/*
+ 		 * This can happen when mappings are changed asynchronously, but
+ 		 * also synchronously if a COW is triggered by
+-		 * gfn_to_pfn_prot().
++		 * kvm_faultin_pfn().
+ 		 */
+ 		spin_unlock(&kvm->mmu_lock);
+-		kvm_release_pfn_clean(pfn);
++		kvm_release_page_unused(page);
+ 		goto retry;
+ 	}
+ 
+@@ -632,10 +633,7 @@ static int kvm_mips_map_page(struct kvm_vcpu *vcpu, unsigned long gpa,
+ 	if (out_buddy)
+ 		*out_buddy = *ptep_buddy(ptep);
+ 
+-	if (writeable)
+-		kvm_set_pfn_dirty(pfn);
+-	kvm_release_pfn_clean(pfn);
 -
--	spin_unlock(&kvm->mmu_lock);
- 	kvm_release_pfn_clean(pfn);
--	kvm_set_pfn_accessed(pfn);
-+
-+	spin_unlock(&kvm->mmu_lock);
++	kvm_release_faultin_page(kvm, page, false, writeable);
+ 	spin_unlock(&kvm->mmu_lock);
  out:
  	srcu_read_unlock(&kvm->srcu, srcu_idx);
- 	return err;
 -- 
 2.47.0.rc1.288.g06298d1525-goog
 
