@@ -1,57 +1,57 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BC15206E9F
-	for <kvmarm@lists.linux.dev>; Thu, 10 Oct 2024 18:26:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 069F0207206
+	for <kvmarm@lists.linux.dev>; Thu, 10 Oct 2024 18:26:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728584805; cv=none; b=B1Fa8FATkc+ryR65b+AsnrIqBrRo3wUS2VxSAf78He2W4waBOkYHGUlQL5zJ8CnnQ2Kqg/R9ibELu/H1m9ef7DdEFHlPsWS7pSGk8RbqUV4DRTDwLJCrZGKm+2vhWWsT2M7npH/n1H5+54fDPQvzr7zjtF/kxNYYn83eavdAr44=
+	t=1728584808; cv=none; b=FQcMxaH8Qr6dCCrDMoB1ISAkH0cG8cj5QRedahGb3ITrFXPfUWH5XtgDLZeUNT2feCrKqyEcqHSZ26slqhsMo4nqgxfw+wo7+uQAL03muf1tWWtjpthiJ5qHzyff8/18/9CQKWhS8q+tRRo0KWsvETl7Xm3cVTHnkaLhc8BvSjk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728584805; c=relaxed/simple;
-	bh=NP4IgcbBDVq5DZEeFtyiO8CdEZFJxxnULnDPMD13pKg=;
+	s=arc-20240116; t=1728584808; c=relaxed/simple;
+	bh=kbjwflG2kz8fn2XlGwl/ZUkp2MoQm+/BMH1MpANV1Tw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=PPATC4KFtowOFz5A0n0CKFjXmInIZnfW1ZO7bRtqvzN7JSoWuB6RUBaKSZjjDZN/dz3UFouA2xlYIEcD1WH1isBXo6Ru6MQjzywJAzGO3CFlFpFYmQ6/eZeXKO2fgwbDgNgNq9/pnSW9c33iandvvAzgOBF7c4cO+YyNTauj8ig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VOAu6FQJ; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=t3LoeXkgTHszd3eJuNc5PIaucneIKbJ0T3fLYHnEpnkt2VG+6ssn9khniXxtVA+45V5GbRcfkDQIInZcMItcdamtlkHxHk4+Tk8gn0Ttzw7xms1o0u7q3Nd0HBiIPrxQsJ9aTJXrNvhwKVOdN0ol6i0PT2XrbN2nXu6BEzBGgKg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KOPgrrdI; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VOAu6FQJ"
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e32f43c797so11877177b3.1
-        for <kvmarm@lists.linux.dev>; Thu, 10 Oct 2024 11:26:44 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KOPgrrdI"
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2e2d3d5fb4eso897526a91.2
+        for <kvmarm@lists.linux.dev>; Thu, 10 Oct 2024 11:26:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728584803; x=1729189603; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1728584805; x=1729189605; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=/fC7L3Fchvvuu9GyGKk9VEzuiyLOIeBtO2SWEaXDNWE=;
-        b=VOAu6FQJxOSBF2wQuYSaSPsw3V/iMoY/LaexZqkIIaPmYHwIxJhLxkMpToZf49/0yl
-         DrqJfbmDrJ8ZPuf57ypesre4MJbPZajaheo+gWm9bkXzM8d0pt/S7XaBF6rha7vWPEtW
-         YWJ4YEMC+H+C/kjGyBbxbr4saGg7A6JpsQ+0fzqOSRYYsuOcsk4ix8rJz4rDVd+s/DDZ
-         RnZGG+27dXpdY2KGIEu0n+dVY3FVcMvcPNvZmHEjBM4BRG41MnWFlWv/1OfwEYSGVQ9M
-         Y0irpTK4xF5zApt1IEVQzHFWxen61hZ5GxUWg6n2Sf/mVeW1XZr4rkJ7P5ULlfXeC6TV
-         T70Q==
+        bh=RAEBOjiR86B8MKio5svj+gL/GJb0VtWq7ImNxArS0H8=;
+        b=KOPgrrdIQuxv55g2QNpQWt6OmHHUR4RKLO7D+Zc/FE9w5jHQ8QroI9PpH3788B9Cx1
+         ANsuA34N227F16ki3fTO94u/rQtyI8/3d3CmDGyzTWWXKIziO8vB9w1zXlS2Ao9XXga4
+         pqxx2HR73lF5P4ZBuJDKLrfXOLtGi7EVBJLZFQMdqRXqDTmKWeEFfWWIiyyUAjgfttQA
+         XZOeR+aiFbCF1Wq30QZtVmYbC/FVP/HnjpieNPlc6vxLM78ocMpKO37JCfyRpKwkYlir
+         RXdSMxaBdEGfI7dAkDPcnaO3vU2GUbCe+Q9Snb6Rsivl7HEHsN0QLVwY0TRIkmdBIRqt
+         yarg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728584803; x=1729189603;
+        d=1e100.net; s=20230601; t=1728584805; x=1729189605;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=/fC7L3Fchvvuu9GyGKk9VEzuiyLOIeBtO2SWEaXDNWE=;
-        b=hKaGu0lkZqmTGY8/Nby3svWfXt1vJ/weC+YcE4AJTh3caFCd5EvUVyY29Vk9Yx0uCU
-         cEAbFzaa5pzRvz1swH70xuWJ3vw5WGEFVUT/+qasxwzIYyqMThBD/nNRSMDwvGybdD5B
-         pa+/5XngEY/cT6RqTPj2O4K4M9xdREyanQvU2w2CncmW+9XlK4CdevMX90HWyV+8+KW0
-         d8iyUqnxX+CllTXMa/Sq8ZLxA9R4oWTpr9OeAheiLzFZXV9hALLz/vVb2R9bTU03Q4Lj
-         F2CZjyqlmz7+olVp/syhDVfO+Gw5IJ2zsu7kuknd41DBInOJOz5K9ayMj1mnuQTgda6F
-         U91A==
-X-Forwarded-Encrypted: i=1; AJvYcCXEfMekMecQFpgir3wEv+oP8CrauQOCU/CoxUcgxAddAFkP91QQbu1FZx54Wx4u59n0+qcGKpU=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyLIbtTwWDG6eX5Yi2CqwRzNsrRdu66hSg29jkpdGm/ynmoHPaY
-	qghzNZ2II/GhAbUf1P4jsNWSCFQff6cWDY7sZCj2m0k9BHJJJM7ZfpXIpVCO4RKz6MadiIvdH7p
-	tFQ==
-X-Google-Smtp-Source: AGHT+IF0bQSeBV+k7XDKFBXYzNvC7N99ueMTlOEEH5KNk6JZHzu/00W1ndtLnT51eyBFoV94Bmz3yNyB+P4=
+        bh=RAEBOjiR86B8MKio5svj+gL/GJb0VtWq7ImNxArS0H8=;
+        b=h69N2qJcNCMI11lVNXF6SE3F98c23ML2hEZXSEU5/242M4Nyy+1VSOVKKvLseioz1t
+         yySI6x2+Tjg66cxEzwO5Oudr0xyoTZ2YrnoH79IeRzC1UbJ/Hh7rb4udwudQJb+r88Fw
+         cD+MSzwREZsJH7E3lAGr3ZceOlXKi2VJyNl/E1doLnKGy+L2yNM080ehbLCPDWV3Gdh/
+         phqzLmcwRGQ1Y9fFCtuRwe/Frkmx8zpGRSxvkTwhJJip8OJeuVmbNpNF30Q0VCbqd5H+
+         GM0/lmy9w0ez5ZxWn4/s0H34I2sdEXOhdFW0jemhGLzc7lJMe6HlMxsieJxd+KJ/E/gD
+         m81w==
+X-Forwarded-Encrypted: i=1; AJvYcCVVwtTw5l5cg0y/e9ZyiMfrYqup4gvRWWOeXngjmHwB/NtswJwEoWSWSUyptKfJfJw7TmR81gI=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwZPIVUVLrfvDIBFgeh6Y7mtAoCn8mLrvPcjN2DJRuvlaWNX/7i
+	AjzEsVQheUgcg/ohxPwxJ3fY4CB6V0oIQU0eKtHfKhDHRWiYb5jxjB7jQnRvN8hRXC8rYhLUYyI
+	YIw==
+X-Google-Smtp-Source: AGHT+IH3g+or1uGKI8zaqA7g6VjAId1uToioip8sNGZo/KyXggeZoODfUOK1q5z450FXHERnWYgwR7EwX2I=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a05:690c:dd1:b0:6db:e464:addc with SMTP id
- 00721157ae682-6e344ce9308mr1337b3.4.1728584803335; Thu, 10 Oct 2024 11:26:43
+ (user=seanjc job=sendgmr) by 2002:a17:90a:5107:b0:2e2:ca3e:10fe with SMTP id
+ 98e67ed59e1d1-2e2f0f88a54mr24a91.8.1728584805241; Thu, 10 Oct 2024 11:26:45
  -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 10 Oct 2024 11:23:54 -0700
+Date: Thu, 10 Oct 2024 11:23:55 -0700
 In-Reply-To: <20241010182427.1434605-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,8 +61,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20241010182427.1434605-1-seanjc@google.com>
 X-Mailer: git-send-email 2.47.0.rc1.288.g06298d1525-goog
-Message-ID: <20241010182427.1434605-53-seanjc@google.com>
-Subject: [PATCH v13 52/85] KVM: PPC: e500: Mark "struct page" dirty in kvmppc_e500_shadow_map()
+Message-ID: <20241010182427.1434605-54-seanjc@google.com>
+Subject: [PATCH v13 53/85] KVM: PPC: e500: Mark "struct page" pfn accessed
+ before dropping mmu_lock
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
@@ -81,64 +82,34 @@ Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	Andrew Jones <ajones@ventanamicro.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Mark the underlying page as dirty in kvmppc_e500_ref_setup()'s sole
-caller, kvmppc_e500_shadow_map(), which will allow converting e500 to
-__kvm_faultin_pfn() + kvm_release_faultin_page() without having to do
-a weird dance between ref_setup() and shadow_map().
-
-Opportunistically drop the redundant kvm_set_pfn_accessed(), as
-shadow_map() puts the page via kvm_release_pfn_clean().
+Mark pages accessed before dropping mmu_lock when faulting in guest memory
+so that shadow_map() can convert to kvm_release_faultin_page() without
+tripping its lockdep assertion on mmu_lock being held.  Marking pages
+accessed outside of mmu_lock is ok (not great, but safe), but marking
+pages _dirty_ outside of mmu_lock can make filesystems unhappy.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/powerpc/kvm/e500_mmu_host.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+ arch/powerpc/kvm/e500_mmu_host.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
 diff --git a/arch/powerpc/kvm/e500_mmu_host.c b/arch/powerpc/kvm/e500_mmu_host.c
-index c664fdec75b1..5c2adfd19e12 100644
+index 5c2adfd19e12..334dd96f8081 100644
 --- a/arch/powerpc/kvm/e500_mmu_host.c
 +++ b/arch/powerpc/kvm/e500_mmu_host.c
-@@ -242,7 +242,7 @@ static inline int tlbe_is_writable(struct kvm_book3e_206_tlb_entry *tlbe)
- 	return tlbe->mas7_3 & (MAS3_SW|MAS3_UW);
- }
+@@ -498,11 +498,9 @@ static inline int kvmppc_e500_shadow_map(struct kvmppc_vcpu_e500 *vcpu_e500,
+ 	kvmppc_mmu_flush_icache(pfn);
  
--static inline void kvmppc_e500_ref_setup(struct tlbe_ref *ref,
-+static inline bool kvmppc_e500_ref_setup(struct tlbe_ref *ref,
- 					 struct kvm_book3e_206_tlb_entry *gtlbe,
- 					 kvm_pfn_t pfn, unsigned int wimg)
- {
-@@ -252,11 +252,7 @@ static inline void kvmppc_e500_ref_setup(struct tlbe_ref *ref,
- 	/* Use guest supplied MAS2_G and MAS2_E */
- 	ref->flags |= (gtlbe->mas2 & MAS2_ATTRIB_MASK) | wimg;
- 
--	/* Mark the page accessed */
--	kvm_set_pfn_accessed(pfn);
+ out:
+-	spin_unlock(&kvm->mmu_lock);
 -
--	if (tlbe_is_writable(gtlbe))
--		kvm_set_pfn_dirty(pfn);
-+	return tlbe_is_writable(gtlbe);
+ 	/* Drop refcount on page, so that mmu notifiers can clear it */
+ 	kvm_release_pfn_clean(pfn);
+-
++	spin_unlock(&kvm->mmu_lock);
+ 	return ret;
  }
  
- static inline void kvmppc_e500_ref_release(struct tlbe_ref *ref)
-@@ -337,6 +333,7 @@ static inline int kvmppc_e500_shadow_map(struct kvmppc_vcpu_e500 *vcpu_e500,
- 	unsigned int wimg = 0;
- 	pgd_t *pgdir;
- 	unsigned long flags;
-+	bool writable = false;
- 
- 	/* used to check for invalidations in progress */
- 	mmu_seq = kvm->mmu_invalidate_seq;
-@@ -490,7 +487,9 @@ static inline int kvmppc_e500_shadow_map(struct kvmppc_vcpu_e500 *vcpu_e500,
- 			goto out;
- 		}
- 	}
--	kvmppc_e500_ref_setup(ref, gtlbe, pfn, wimg);
-+	writable = kvmppc_e500_ref_setup(ref, gtlbe, pfn, wimg);
-+	if (writable)
-+		kvm_set_pfn_dirty(pfn);
- 
- 	kvmppc_e500_setup_stlbe(&vcpu_e500->vcpu, gtlbe, tsize,
- 				ref, gvaddr, stlbe);
 -- 
 2.47.0.rc1.288.g06298d1525-goog
 
