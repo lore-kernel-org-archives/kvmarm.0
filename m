@@ -1,57 +1,54 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D92451C5798;
-	Thu, 10 Oct 2024 12:47:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43D271C7B70;
+	Thu, 10 Oct 2024 13:03:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728564428; cv=none; b=Jv66M7s/JDIYiqMSvxLh5iztLXK7bx69HIaulBTiCRqmZ0gbfyh1DIDcAbDwwuet5wnqiueWPJHNa5gxTTdfPVSOgxaNFZRWVz15BkauG/QN1NIaCdWT6FWtLR6gbec00O/6029/pAb1F7J9VSURbeJbPmdAP82GDkp8rRHJvGs=
+	t=1728565415; cv=none; b=XFIglxma88v5r+vZ42//7W2nkhPn7IhVT+ai8VFMk7QOgvxHI2KWPWvyGykyEmVmNNpdfyJPKC02If3uJQbIzBlh889CmO0UsNKoeC5560BS0dPxdRPyqKEQdWW5uRpN9VH7+dZXcv6aDJgzLzW1Ht/z3KZtjsc+9t2/jVl7g5o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728564428; c=relaxed/simple;
-	bh=SP9MED2OcZY+ELggC9MXpPB7Hg/40uqQ0bfhipI8oN4=;
+	s=arc-20240116; t=1728565415; c=relaxed/simple;
+	bh=lxTwG9FeY6tGa/suySl5tWQBbHE4hFx2E8w3ZHNgXu4=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=g9m7VReTqTnhPsFF/99cyBXQwZ6rEQNJMxv0tJDcMfG4/gN1DXL0dC2t03+FDxe4CXM1TKK9SjC3FdWBzUMR27mhdxLhDTHh6UCMeLTcZyG2cyn0J/fWHz9SHgJpSLtSpC5w8gJc4CCBc0OM696suu9PIuiKR6Jmwp9GNcrgfZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HnVQ/ZeE; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=OLeTWvH7OVP6fUTCyiPouilYwS8aX1ejhZfAnafovvoOaiPaGTcFV3l1biOpFSMXuBuaLp1JpqzjkfFYDTCWchyrm18leWCc77klJKgiW7cNOgU8UTzLitdSJWrnfwwpB556W5/0RtwGm9ObUNYP42lwhni8UAN5RbWN/Ga3/p0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UO5kNgvI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HnVQ/ZeE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D5ECC4CEC5;
-	Thu, 10 Oct 2024 12:47:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UO5kNgvI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF9D1C4CECC;
+	Thu, 10 Oct 2024 13:03:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728564428;
-	bh=SP9MED2OcZY+ELggC9MXpPB7Hg/40uqQ0bfhipI8oN4=;
+	s=k20201202; t=1728565414;
+	bh=lxTwG9FeY6tGa/suySl5tWQBbHE4hFx2E8w3ZHNgXu4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=HnVQ/ZeEHx78m5NLTbAXpSAxfiUxCSrMaAsmyHeZ+JyK6fziJxUQHyjPZ/h7/IhtD
-	 zYkxDqG/PMovCrjBYsGZFhtx/2dBeFA581G3SrO/YAiPJJOJ+rG1MOggCqQtWexuW5
-	 8GQSFHErl2RA+Uxc0Rg+qU7ZTjIKSjxuPgiFoOk30rPoszzO4L8B21Y+lSFkagW/dp
-	 YNPtmaUpVvm3ysp5ndo+/ud5TQDGgy/my/8hmJx35za/346/GIk13zPUcweSvY7Rfz
-	 T0ztAKyGRXEijRglGyjPexUkLBkjADc0lUU686mPUeJmsYhabegL7PYZ8LAo/sZWyC
-	 JT9d0gOQFigSw==
+	b=UO5kNgvIcGDuHVNFYCYI0c+G0EbwoaMcgQWGOu4kZKes9aOcnYvxyWuBiC618dyNm
+	 QW0R+QFFjozmPlaezhHAuBP2U/1A0f55vTY68kB93dJ0gBFn5InP54GDYqomD+eIsY
+	 jRAvuk2q7UkZb7JNJwgfHPy+qnBHm3Ih75R17T0K1/99sx6vU/gDkp8yTMiB5OZKut
+	 px7ZyVjo8MgdeZkAAYYuM+U7p0MD+0yV7G0CpyqtEUMe901bxURJbPfJqk5LwSM/3O
+	 2WL7360heBCEkHl1qq7+TO6mSQPyJhcZsb0UUWiSrSa7L+Rq9IbP+pVLBFzqclMNrN
+	 TEFLMCrXJQVfw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sysZO-002BTI-0F;
-	Thu, 10 Oct 2024 13:47:06 +0100
-Date: Thu, 10 Oct 2024 13:47:05 +0100
-Message-ID: <86plo85dme.wl-maz@kernel.org>
+	id 1syspI-002BvM-9A;
+	Thu, 10 Oct 2024 14:03:32 +0100
+Date: Thu, 10 Oct 2024 14:03:31 +0100
+Message-ID: <86o73s5cv0.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Sean Christopherson <seanjc@google.com>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	stable@vger.kernel.org,
-	Alexander Potapenko <glider@google.com>
-Subject: Re: [PATCH] KVM: arm64: Don't eagerly teardown the vgic on init error
-In-Reply-To: <ZweUiHMC3RNwNXzY@linux.dev>
-References: <20241009183603.3221824-1-maz@kernel.org>
-	<ZwbYvHJdOqePYjDf@linux.dev>
-	<ZwbbQGpZpGQXaNYK@google.com>
-	<ZwcRct7VWnW0bObA@linux.dev>
-	<875xq0v1do.wl-maz@kernel.org>
-	<ZweUiHMC3RNwNXzY@linux.dev>
+To: "tianjia.zhang" <tianjia.zhang@linux.alibaba.com>
+Cc: Nick Desaulniers <ndesaulniers@google.com>,	Oliver Upton
+ <oliver.upton@linux.dev>,	Joey Gouly <joey.gouly@arm.com>,	Suzuki K Poulose
+ <suzuki.poulose@arm.com>,	Zenghui Yu <yuzenghui@huawei.com>,	Catalin
+ Marinas <catalin.marinas@arm.com>,	Will Deacon <will@kernel.org>,	Nathan
+ Chancellor <nathan@kernel.org>,	Bill Wendling <morbo@google.com>,	Justin
+ Stitt <justinstitt@google.com>,	=?UTF-8?B?UGllcnJlLUNsw6ltZW50?= Tosi
+ <ptosi@google.com>,	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,	linux-kernel@vger.kernel.org,	llvm@lists.linux.dev
+Subject: Re: [PATCH] KVM: arm64: nVHE: gen-hyprel: Silent build warnings
+In-Reply-To: <b3c21234-73a0-43dd-8365-9039c62b7aa7@linux.alibaba.com>
+References: <20241009085751.35976-1-tianjia.zhang@linux.alibaba.com>
+	<86set55yca.wl-maz@kernel.org>
+	<b3c21234-73a0-43dd-8365-9039c62b7aa7@linux.alibaba.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -63,99 +60,69 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, seanjc@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, stable@vger.kernel.org, glider@google.com
+X-SA-Exim-Rcpt-To: tianjia.zhang@linux.alibaba.com, ndesaulniers@google.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, nathan@kernel.org, morbo@google.com, justinstitt@google.com, ptosi@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, llvm@lists.linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 10 Oct 2024 09:47:04 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On Thu, 10 Oct 2024 09:12:29 +0100,
+"tianjia.zhang" <tianjia.zhang@linux.alibaba.com> wrote:
 > 
-> On Thu, Oct 10, 2024 at 08:54:43AM +0100, Marc Zyngier wrote:
-> > On Thu, 10 Oct 2024 00:27:46 +0100, Oliver Upton <oliver.upton@linux.dev> wrote:
-> > > Then if we can't register the MMIO region for the distributor
-> > > everything comes crashing down and a vCPU has made it into the KVM_RUN
-> > > loop w/ the VGIC-shaped rug pulled out from under it. There's definitely
-> > > another functional bug here where a vCPU's attempts to poke the
-> > > distributor wind up reaching userspace as MMIO exits. But we can worry
-> > > about that another day.
+> 
+> 
+> On 10/9/24 7:07 PM, Marc Zyngier wrote:
+> > On Wed, 09 Oct 2024 09:57:51 +0100,
+> > Tianjia Zhang <tianjia.zhang@linux.alibaba.com> wrote:
+> >> 
+> >> This patch silent the some mismatch format build warnings
+> >> with clang, like:
+> >> 
+> >>    arch/arm64/kvm/hyp/nvhe/gen-hyprel.c:233:2: warning: format specifies
+> >>    type 'unsigned long' but the argument has type 'Elf64_Off'
+> >>    (aka 'unsigned long long') [-Wformat]
+> >>      233 |         assert_ne(off, 0UL, "%lu");
+> >>          |         ^~~~~~~~~~~~~~~~~~~~~~~~~~
+> >>          |                              %llu
+> >>    arch/arm64/kvm/hyp/nvhe/gen-hyprel.c:193:34: note: expanded from macro 'assert_ne'
+> >>      193 | #define assert_ne(lhs, rhs, fmt)        assert_op(lhs, rhs, fmt, !=)
+> >>          |                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> >>    arch/arm64/kvm/hyp/nvhe/gen-hyprel.c:188:19: note: expanded from macro 'assert_op'
+> >>      187 |                                 " failed (lhs=" fmt ", rhs=" fmt        \
+> >>          |                                                 ~~~
+> >>      188 |                                 ", line=%d)", _lhs, _rhs, __LINE__);    \
+> >>          |                                               ^~~~
+> >>    arch/arm64/kvm/hyp/nvhe/gen-hyprel.c:167:17: note: expanded from macro 'fatal_error'
+> >>      166 |                 fprintf(stderr, "error: %s: " fmt "\n",                 \
+> >>          |                                               ~~~
+> >>      167 |                         elf.path, ## __VA_ARGS__);                      \
+> >>          |                                      ^~~~~~~~~~~
+> >> 
+> >> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
 > > 
-> > I don't think that one is that bad. Userspace got us here, and they
-> > now see an MMIO exit for something that it is not prepared to handle.
-> > Suck it up and die (on a black size M t-shirt, please).
+> > I don't see these warnings. What version of LLVM are you using?
+> > 
 > 
-> LOL, I'll remember that.
+> I compiled the kernel on Apple Silicon M3 Pro in macOS 15.0.1, Maybe this is
+> a special scenario that is rarely used.
 > 
-> The situation I have in mind is a bit harder to blame on userspace,
-> though. Supposing that the whole VM was set up correctly, multiple vCPUs
-> entering KVM_RUN concurrently could cause this race and have 'unexpected'
-> MMIO exits go out to userspace.
+> Details of clang:
 > 
-> 	vcpu-0				vcpu-1
-> 	======				======
-> 	kvm_vgic_map_resources()
-> 	  dist->ready = true
-> 	  mutex_unlock(config_lock)
-> 	  				kvm_vgic_map_resources()
-> 					  if (vgic_ready())
-> 					    return 0
-> 
-> 					< enter guest >
-> 					typer = writel(0, GICD_CTLR)
-> 
-> 					< data abort >
-> 					kvm_io_bus_write(...)	<= No GICD, out to userspace
-> 
->        vgic_register_dist_iodev()
-> 
-> A small but stupid window to race with.
+>     # clang --version
+>     Homebrew clang version 19.1.1
+>     Target: arm64-apple-darwin24.0.0
+>     Thread model: posix
+>     InstalledDir: /opt/homebrew/Cellar/llvm/19.1.1/bin
 
-Ah, gotcha. I guess getting rid of the early-out in
-kvm_vgic_map_resources() would plug that one. Want to post a fix for
-that?
+What I have is similar enough:
 
-> 
-> > > If memory serves, kvm_vgic_map_resources() used to do all of this behind
-> > > the config_lock to cure the race, but that wound up inverting lock
-> > > ordering on srcu.
-> > 
-> > Probably something like that. We also used to hold the kvm lock, which
-> > made everything much simpler, but awfully wrong.
-> > 
-> > > Note to self: Impose strict ordering on GIC initialization v. vCPU
-> > > creation if/when we get a new flavor of irqchip.
-> > 
-> > One of the things we should have done when introducing GICv3 is to
-> > impose that at KVM_DEV_ARM_VGIC_CTRL_INIT, the GIC memory map is
-> > final. I remember some push-back on the QEMU side of things, as they
-> > like to decouple things, but this has proved to be a nightmare.
-> 
-> Pushing more of the initialization complexity into userspace feels like
-> the right thing. Since we clearly have no idea what we're doing :)
+ClangBuiltLinux clang version 19.1.1 (https://github.com/llvm/llvm-project.git d401987fe349a87c53fe25829215b080b70c0c1a)
+Target: aarch64-unknown-linux-gnu
+Thread model: posix
+InstalledDir: /home/maz/hot-poop/llvm/llvm-19.1.1-aarch64/bin
 
-KVM APIv2?
+and yet this doesn't fire. Can you try with a compiler actually
+targeting with Linux instead of MacOS?
 
-> 
-> > > The crappy assumption here is kvm_arch_vcpu_run_pid_change() and its
-> > > callees are allowed to destroy VM-scoped structures in error handling.
-> > 
-> > I think this is symptomatic of more general issue: we perform VM-wide
-> > configuration in the context of a vcpu. We have tons of this stuff to
-> > paper over the lack of a "this VM is fully configured" barrier.
-> > 
-> > I wonder whether we could sidestep things by punting the finalisation
-> > of the VM to a different context (workqueue?)  and simply return
-> > -EAGAIN or -EINTR to userspace while we're processing it. That doesn't
-> > solve the "I'm missing parts of the address map and I'm going to die"
-> > part though.
-> 
-> Throwing it back at userspace would be nice, but unfortunately for ABI I
-> think we need to block/spin vCPUs in the kernel til the VM is in fully
-> working condition. A fragile userspace could explode for a 'spurious'
-> EAGAIN/EINTR where there wasn't one before.
-
-EINTR needs to be handled already, as this is how you report
-preemption by a signal. But yeah, overall, I'm not enthralled with
-much so far...
+Thanks,
 
 	M.
 
