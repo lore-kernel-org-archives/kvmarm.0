@@ -1,140 +1,188 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB77321644E;
-	Fri, 11 Oct 2024 13:28:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CF032194A7;
+	Fri, 11 Oct 2024 14:14:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728653313; cv=none; b=ldsu7SGPrMn5B7rZeLx7TamZQlTX+W/dF3v7xNfLqr10Dc4kj0gHEdGbe1eY94MXtq+vJ0zYpP7L3/0eZErRq9apt4Ki+iNlZp9e6JQNYR8irbsK5yLKYSWsBbImUYUwEBAXE2ivbnxVNr1el5YrsXV3Kw6hZNL0yEheO+ZcH64=
+	t=1728656071; cv=none; b=ZrFJ5tiBZ9qL8PrBYEtwYS8qjdZwbI/7r4IPz9580oZMk8nlVOT/jOIDb2R1WK2QHRyv7uVlVxXv6Wubkc2VmDJ29RZBJg49a1EhOAMkyszmbWR7VtuRQFRXboHziN1CbTvduTNtJcExutaALtmzuVnmYGyov+EY0bCFiD+LKII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728653313; c=relaxed/simple;
-	bh=XnQ3OWZmFFbbEbN0nuRCP99ploKH8REo3FMrNxhzftk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KUq4cTCI+lRje5JkMzIjF0rSCaNACHZ/rwHQ4D97BtKAOgK8klccr+y4FTekRR/vmGC0ue79hh+dl+3GH2f/gyQcqmMs6o9B+6RgpoQIBHqRAInJw5Rz9A5VvG4OD5syb7Asdv9hFAH2a4zbeY+5Q44ux6sXlHlJp+SymOFURWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HMYFhmhE; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HMYFhmhE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52242C4CEC3;
-	Fri, 11 Oct 2024 13:28:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728653313;
-	bh=XnQ3OWZmFFbbEbN0nuRCP99ploKH8REo3FMrNxhzftk=;
-	h=From:To:Cc:Subject:Date:From;
-	b=HMYFhmhESzKOcwvBG48mNXHKBp3jSeryZBYdzFM5birAyAQdVuaZ7nqkACztUEiV6
-	 7Q40Zqq85bhWldnpkCKsllSU97Vumzk4iL9+uY3ek0lKO29SGdrzHaZlxw7eHaQ/5G
-	 2EowimbnmHdyOonqP6U6m160fXtirsrh1JwXBT9C1IZQLe+ftG6N6272/YbsKvoRuG
-	 HnyEQfXn6eSTBrtUE1g9nvegSUktEjq9fEocRrp1HQSByM8rGjDx/B0Lce4VOdmMeH
-	 gTtOf4NhbO6/Xv7j0CYPPdSEuui2XONFFyUSwroCiWL5T5F5XS+IEOJOvOxRyF+XeH
-	 m4IQTxxrYlkow==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1szFh1-002Z8g-Dg;
-	Fri, 11 Oct 2024 14:28:31 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Alexander Potapenko <glider@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Mark Brown <broonie@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Shaoqin Huang <shahuang@redhat.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Subject: [GIT PULL] KVM/arm64 fixes for 6.12, take #2
-Date: Fri, 11 Oct 2024 14:27:56 +0100
-Message-Id: <20241011132756.3793137-1-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1728656071; c=relaxed/simple;
+	bh=EpiWcUKOAJX5vxoU+2IwEgs3Lyy8D2KXOdZl2yeOQWI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NK8/6l6+0HttauA96Em2n/QNLGakYhJFhbPumFR5Ls4iwHU0nAXJGpkwem5S38MeaNj54yAQBbNhPMIqz7eZS+VqaeMx6QcZUDTGdUFf/42XtYtdQAbSS19L0hILhnOCZdF6UnjW6olzR89pJj1NBaF50S0P7g4dsLYTLk39FcY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 01F7E497;
+	Fri, 11 Oct 2024 07:14:58 -0700 (PDT)
+Received: from [10.1.31.21] (e122027.cambridge.arm.com [10.1.31.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 608673F5A1;
+	Fri, 11 Oct 2024 07:14:25 -0700 (PDT)
+Message-ID: <77030ef8-e180-46bb-872c-e41c8b25bbc2@arm.com>
+Date: Fri, 11 Oct 2024 15:14:24 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 01/11] arm64: rsi: Add RSI definitions
+To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
+ <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+ Gavin Shan <gshan@redht.com>
+References: <20241004144307.66199-1-steven.price@arm.com>
+ <20241004144307.66199-2-steven.price@arm.com>
+ <2ed92455-b97f-40ba-b5d6-695e885be62f@redhat.com>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <2ed92455-b97f-40ba-b5d6-695e885be62f@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, glider@google.com, joey.gouly@arm.com, broonie@kernel.org, oliver.upton@linux.dev, shameerali.kolothum.thodi@huawei.com, shahuang@redhat.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Paolo,
+On 08/10/2024 00:08, Gavin Shan wrote:
+> On 10/5/24 12:42 AM, Steven Price wrote:
+>> From: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>
+>> The RMM (Realm Management Monitor) provides functionality that can be
+>> accessed by a realm guest through SMC (Realm Services Interface) calls.
+>>
+>> The SMC definitions are based on DEN0137[1] version 1.0-rel0.
+>>
+>> [1] https://developer.arm.com/documentation/den0137/1-0rel0/
+>>
+>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+>> Reviewed-by: Gavin Shan <gshan@redht.com>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+> 
+> [...]
+> 
+>> +
+>> +static inline unsigned long rsi_set_addr_range_state(phys_addr_t start,
+>> +                             phys_addr_t end,
+>> +                             enum ripas state,
+>> +                             unsigned long flags,
+>> +                             phys_addr_t *top)
+>> +{
+>> +    struct arm_smccc_res res;
+>> +
+>> +    arm_smccc_smc(SMC_RSI_IPA_STATE_SET, start, end, state,
+>> +              flags, 0, 0, 0, &res);
+>> +
+>> +    if (top)
+>> +        *top = res.a1;
+>> +
+>> +    if (res.a2 != RSI_ACCEPT)
+>> +        return -EPERM;
+>> +
+>> +    return res.a0;
+>> +}
+>> +
+> 
+> Similar to rsi_attestation_token_init(), the return value type needs to
+> be 'long'
+> since '-EPERM' can be returned from the function.
 
-Here's the second set of fixes for 6.12.
+Good spot.
 
-We have a handful of fixes for the ID register configuration (I had
-originally queued them for -rc1, and somehow managed to accidentally
-drop the branch on the floor), our NV shadow page tables, the vgic,
-and a fix for a regression introduced in -rc1.
+>> +/**
+>> + * rsi_attestation_token_init - Initialise the operation to retrieve an
+>> + * attestation token.
+>> + *
+>> + * @challenge:    The challenge data to be used in the attestation token
+>> + *        generation.
+>> + * @size:    Size of the challenge data in bytes.
+>> + *
+>> + * Initialises the attestation token generation and returns an upper
+>> bound
+>> + * on the attestation token size that can be used to allocate an
+>> adequate
+>> + * buffer. The caller is expected to subsequently call
+>> + * rsi_attestation_token_continue() to retrieve the attestation token
+>> data on
+>> + * the same CPU.
+>> + *
+>> + * Returns:
+>> + *  On success, returns the upper limit of the attestation report size.
+>> + *  Otherwise, -EINVAL
+>> + */
+>> +static inline long
+>> +rsi_attestation_token_init(const u8 *challenge, unsigned long size)
+>> +{
+>> +    struct arm_smccc_1_2_regs regs = { 0 };
+>> +
+>> +    /* The challenge must be at least 32bytes and at most 64bytes */
+>> +    if (!challenge || size < 32 || size > 64)
+>> +        return -EINVAL;
+>> +
+>> +    regs.a0 = SMC_RSI_ATTESTATION_TOKEN_INIT;
+>> +    memcpy(&regs.a1, challenge, size);
+>> +    arm_smccc_1_2_smc(&regs, &regs);
+>> +
+>> +    if (regs.a0 == RSI_SUCCESS)
+>> +        return regs.a1;
+>> +
+>> +    return -EINVAL;
+>> +}
+>> +
+>> +/**
+>> + * rsi_attestation_token_continue - Continue the operation to
+>> retrieve an
+>> + * attestation token.
+>> + *
+>> + * @granule: {I}PA of the Granule to which the token will be written.
+>> + * @offset:  Offset within Granule to start of buffer in bytes.
+>> + * @size:    The size of the buffer.
+>> + * @len:     The number of bytes written to the buffer.
+>> + *
+>> + * Retrieves up to a RSI_GRANULE_SIZE worth of token data per call.
+>> The caller
+>> + * is expected to call rsi_attestation_token_init() before calling this
+>> + * function to retrieve the attestation token.
+>> + *
+>> + * Return:
+>> + * * %RSI_SUCCESS     - Attestation token retrieved successfully.
+>> + * * %RSI_INCOMPLETE  - Token generation is not complete.
+>> + * * %RSI_ERROR_INPUT - A parameter was not valid.
+>> + * * %RSI_ERROR_STATE - Attestation not in progress.
+>> + */
+>> +static inline int rsi_attestation_token_continue(phys_addr_t granule,
+>> +                         unsigned long offset,
+>> +                         unsigned long size,
+>> +                         unsigned long *len)
+>> +{
+>> +    struct arm_smccc_res res;
+>> +
+>> +    arm_smccc_1_1_invoke(SMC_RSI_ATTESTATION_TOKEN_CONTINUE,
+>> +                 granule, offset, size, 0, &res);
+>> +
+>> +    if (len)
+>> +        *len = res.a1;
+>> +    return res.a0;
+>> +}
+>> +
+> 
+> The return value type of this function needs to be 'unsigned long' even
+> it's
+> converted to 'int' in arm_cca_attestation_continue(). In this way, the
+> wrapper
+> functions has consistent return value type, which is 'unsigned long' or
+> 'long'.
 
-As usual, details in the tag.
+Ack, seems reasonable.
 
-Please pull,
+Thanks,
+Steve
 
-	M.
-
-The following changes since commit a1d402abf8e3ff1d821e88993fc5331784fac0da:
-
-  KVM: arm64: Fix kvm_has_feat*() handling of negative features (2024-10-03 19:35:27 +0100)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.12-2
-
-for you to fetch changes up to df5fd75ee305cb5927e0b1a0b46cc988ad8db2b1:
-
-  KVM: arm64: Don't eagerly teardown the vgic on init error (2024-10-11 13:40:25 +0100)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for 6.12, take #2
-
-- Fix the guest view of the ID registers, making the relevant fields
-  writable from userspace (affecting ID_AA64DFR0_EL1 and ID_AA64PFR1_EL1)
-
-- Correcly expose S1PIE to guests, fixing a regression introduced
-  in 6.12-rc1 with the S1POE support
-
-- Fix the recycling of stage-2 shadow MMUs by tracking the context
-  (are we allowed to block or not) as well as the recycling state
-
-- Address a couple of issues with the vgic when userspace misconfigures
-  the emulation, resulting in various splats. Headaches courtesy
-  of our Syzkaller friends
-
-----------------------------------------------------------------
-Marc Zyngier (2):
-      Merge branch kvm-arm64/idregs-6.12 into kvmarm/fixes
-      KVM: arm64: Don't eagerly teardown the vgic on init error
-
-Mark Brown (1):
-      KVM: arm64: Expose S1PIE to guests
-
-Oliver Upton (5):
-      KVM: arm64: Unregister redistributor for failed vCPU creation
-      KVM: arm64: nv: Keep reference on stage-2 MMU when scheduled out
-      KVM: arm64: nv: Do not block when unmapping stage-2 if disallowed
-      KVM: arm64: nv: Punt stage-2 recycling to a vCPU request
-      KVM: arm64: nv: Clarify safety of allowing TLBI unmaps to reschedule
-
-Shameer Kolothum (1):
-      KVM: arm64: Make the exposed feature bits in AA64DFR0_EL1 writable from userspace
-
-Shaoqin Huang (4):
-      KVM: arm64: Disable fields that KVM doesn't know how to handle in ID_AA64PFR1_EL1
-      KVM: arm64: Use kvm_has_feat() to check if FEAT_SSBS is advertised to the guest
-      KVM: arm64: Allow userspace to change ID_AA64PFR1_EL1
-      KVM: selftests: aarch64: Add writable test for ID_AA64PFR1_EL1
-
- arch/arm64/include/asm/kvm_host.h                 |  7 +++
- arch/arm64/include/asm/kvm_mmu.h                  |  3 +-
- arch/arm64/include/asm/kvm_nested.h               |  4 +-
- arch/arm64/kvm/arm.c                              |  5 ++
- arch/arm64/kvm/hypercalls.c                       | 12 ++--
- arch/arm64/kvm/mmu.c                              | 15 ++---
- arch/arm64/kvm/nested.c                           | 53 +++++++++++++---
- arch/arm64/kvm/sys_regs.c                         | 75 +++++++++++++++++++++--
- arch/arm64/kvm/vgic/vgic-init.c                   | 28 +++++++--
- tools/testing/selftests/kvm/aarch64/set_id_regs.c | 16 ++++-
- 10 files changed, 183 insertions(+), 35 deletions(-)
