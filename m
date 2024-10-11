@@ -1,648 +1,123 @@
-Received: from EUR02-VI1-obe.outbound.protection.outlook.com (mail-vi1eur02on2066.outbound.protection.outlook.com [40.107.241.66])
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1374D18027;
-	Fri, 11 Oct 2024 16:22:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.241.66
-ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728663764; cv=fail; b=q9wBiQCZA3zFsrQHbgMGS98nl3RJ2Q3Fdrz72qx1uLGaF4U6TF3G3hgcsKitT2iYAWCknfUUrD+EXeMoTO0oWvOh5JQ8JVehDnJ6/Cs8gB4VC5YP/SdUGnyBDgKMyBA0OU9063rDgU37vOZfKAMBwZ2qRzZ4zj5W6IeOIDIsx20=
-ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728663764; c=relaxed/simple;
-	bh=rB3xN7b0CjhrmQk7vpH18S5AOBDSWx0xSre2sHRkV9Q=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=serYv5ihMHC+YQa/PGpuvH6ysc8LhY4SoyQbEW/qsDuFtgZyG/XgOw0+02g0L6i209YNjwsrp/niSxmyiIplxSlepTmLZmZF7KEgD5kuBzJpia+OfgOzLzZ1DlX8ysCPNz4P7mVBwxfGQo4Yw6S8/dLCJ7AUGXC22I/1p0zgWpc=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=KAb+KGI9; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=KAb+KGI9; arc=fail smtp.client-ip=40.107.241.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCDE8839EB
+	for <kvmarm@lists.linux.dev>; Fri, 11 Oct 2024 17:07:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1728666458; cv=none; b=Ep7dwvRQ1dbH5nARj5Mx29TXSt+iqnHkWaeLF1b04POwsWvi2l6PWYL3OJnJ+1bGMsYHIhnVejI1bKm/Nh5mxeCP7ou4vAna1tjVxt0Z0wp/yR7w+4my/07VH4QzBqCiNh1GVXAwlL1OMum+HT8+DkAWPl+xOO9Q9o8imj6tf1Y=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1728666458; c=relaxed/simple;
+	bh=EdLNFzYgBv6ON5GklIDUzCSCqxp3LdQEQNvY6fWjudg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Kt7cJEId0Txw4lQhF1o4fbVttEj89afsUFsQV4vHPTmzOTOKPLv3LFm8KelOL5kqQdh3aug61/ubY/R1iUfcahztCM52OkHMYVhG+gLYnbZ2R0N15rTeHS4JKpzA+rjhIKxh9fiUiM0tXtqprnmGzpU7Wrexbd8mZmMEwWTbDI0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=GJws6XVE; arc=none smtp.client-ip=91.218.175.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="KAb+KGI9";
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="KAb+KGI9"
-ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
- b=jfmXDrfMjkazApybaFNhdx6xObhvij1HoNHEs8OWmv5pnZELY+Kj5k03L9Hh/GonMTynC31upeTp8aHtGnxmyUtaqaqB9ExbYawXZz3xfkSJofY7MdWjpp0y06PF1NPwY7KfdjYRmY5Wk2zpo20ORpZmz4iyNsXn8Fh7LNttIObmg53BmLoV6HK6UPwltTll2bOFdSufaB1Yj5ZvazFRGl7oAhtghQUc8NXtO1k1g7qQmemV5uZ4lbAWhIyjy89i3ZkHgtspudzOHecZCBVDrFKB5uMFzoobUkmpUBdFC6y+sEWSkFRsmZjKx8Tp8rqR6xm2X+lJmvQ3rm3F722RUA==
-ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uBdm1MRiRqqpHmaZfT6UOaI8T/vKVAAtjgsugempIbU=;
- b=jUxNnEwlA1SJ3zLlI1FwrUxubIEWd6xlp012CRaw5UGnQg6pBEn3zuNTpF4LoCg8UMV53wA/Ro5+Dn2avbpF7KIbtU71rqt6RxURrwyov3E5+c+losKAuBJL1zS45hUtn4zj10/PjTSJDgXh6ihcUlO7mCgFc3Zq4La3YY62UHxKKbcB7Jqt4oHbuRZdwGSruUce300Gr8rP04i3Ax3rNYHAtSaXIErWMyi9qX6ewE62PvjiJGtlP4AxYTl6b0lZ9xZVrRDUVX8sxQRuM3B+zGD2NTFxlNldden179PiZMNtmkqjSnDStziwK8Ba1gZE2xaFJBseDFK6yX3jxRmSmA==
-ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
- 63.35.35.123) smtp.rcpttodomain=lists.linux.dev smtp.mailfrom=arm.com;
- dmarc=pass (p=none sp=none pct=100) action=none header.from=arm.com;
- dkim=pass (signature was verified) header.d=arm.com; arc=pass (0 oda=1 ltdi=1
- spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
- dmarc=[1,1,header.from=arm.com])
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uBdm1MRiRqqpHmaZfT6UOaI8T/vKVAAtjgsugempIbU=;
- b=KAb+KGI9Z23jH3l4Bbq3oyVcCHzN2/v+g8NLw4ojzoitZYiC41lI2zhMDNALZ9L1YrNgUl/HISmvb5JjhJHr7ZUNVlLCcMSBU4dXmVTdX+q2lu+sCd8x5VMCn63e2md3igH5y21+c4YK+8NLi6rj1iIWrwICXIM4tTmoWFutfAQ=
-Received: from AM0PR10CA0011.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:208:17c::21)
- by PAXPR08MB6624.eurprd08.prod.outlook.com (2603:10a6:102:dd::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.18; Fri, 11 Oct
- 2024 16:22:36 +0000
-Received: from AM3PEPF0000A798.eurprd04.prod.outlook.com
- (2603:10a6:208:17c:cafe::2d) by AM0PR10CA0011.outlook.office365.com
- (2603:10a6:208:17c::21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.18 via Frontend
- Transport; Fri, 11 Oct 2024 16:22:35 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 63.35.35.123)
- smtp.mailfrom=arm.com; dkim=pass (signature was verified)
- header.d=arm.com;dmarc=pass action=none header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 63.35.35.123 as permitted sender) receiver=protection.outlook.com;
- client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
- pr=C
-Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
- AM3PEPF0000A798.mail.protection.outlook.com (10.167.16.103) with Microsoft
- SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.8048.13
- via Frontend Transport; Fri, 11 Oct 2024 16:22:35 +0000
-Received: ("Tessian outbound 0658930cd478:v473"); Fri, 11 Oct 2024 16:22:34 +0000
-X-CheckRecipientChecked: true
-X-CR-MTA-CID: f651a13edeff2ba9
-X-TessianGatewayMetadata: vKymkcsAP75eHoLcnw3inokIDTesRXTv8tLix4LVm/A+XaU+7/XfrzX7V1Rmg2qS3FxErPe9x8o4iW8ay/i2Hq5BC1mT20Yimw2orjpUEZ2Yyp12VsVNoKI9ow6WtXXNLIHbV0j5ePo992ofOyK1nQ8iOMczvr1Xvql1LAmQ5j0=
-X-CR-MTA-TID: 64aa7808
-Received: from Lf1451d181c08.2
-	by 64aa7808-outbound-1.mta.getcheckrecipient.com id E497F276-C08B-44E3-9295-3FE0A98402A4.1;
-	Fri, 11 Oct 2024 16:22:24 +0000
-Received: from EUR03-VI1-obe.outbound.protection.outlook.com
-    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id Lf1451d181c08.2
-    (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
-    Fri, 11 Oct 2024 16:22:24 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=wiVktydkJy/Yzz33gU0XioYhpkxVifcVqo2SThcv4OpFBSsEnpyJJXQr4I1EPdlg4xOSzvPRKdOVbL210l62kHnh5Wa3Qyhr5nKwqsy1mniCe+JD1lxorhPGZ7L+6LPTXI7IYrY5KqRPDaZDzhJgzfhyZl0th1q/YzNk6ySPtt/VnwcfvB0ZZ7pErVaLVC7Hjg1ckV/B17WXfukY1rkHvpQzAeZ/nJGFLQeOrXZ8fZJyDMKxB1HZwQ9zOFjNqaTXL7ofJ/HOcCHX/eIkS8gn1nVGyc4xSFnDvZNZYWsKu60d+wGZGsaHvjo+cGHv5XUHj9J0kz5Tq/g2fp+zq7JlQQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uBdm1MRiRqqpHmaZfT6UOaI8T/vKVAAtjgsugempIbU=;
- b=bmwnFctHKl2Gm8QH2spyXe3QrtMzmCCapyrwVOtgVnfqS99t+ZxfPXkJ1bWv/4JBwn5zJGsSyOzjvyWfw+xuFRIYPnSx1Md9fGjVcgzMTjkbJlB0B0rJNeeCQ4shxW0L8lrIUy7G+ZVaX9c40vO8h+g3p1pQmk4NI8iYXw/qGTdDlFUv40W5Ji1Dcm1nvsRqB4hHAYh1YdWPJvLCZ79aMK4Hx2kb3wyOZEAlFu3mDnX876JfaTNSqTi/2tfkrc9GQCKrHuaCLYp+H+Qt5PrgXnB5/gO8U2zXaNp5jIb9lL8Dm8NEvVNZ7LL8T79fBTKdL+GlRJRWl/Sg2XX7G/3Cng==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
- header.d=arm.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uBdm1MRiRqqpHmaZfT6UOaI8T/vKVAAtjgsugempIbU=;
- b=KAb+KGI9Z23jH3l4Bbq3oyVcCHzN2/v+g8NLw4ojzoitZYiC41lI2zhMDNALZ9L1YrNgUl/HISmvb5JjhJHr7ZUNVlLCcMSBU4dXmVTdX+q2lu+sCd8x5VMCn63e2md3igH5y21+c4YK+8NLi6rj1iIWrwICXIM4tTmoWFutfAQ=
-Authentication-Results-Original: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-Received: from GVXPR08MB7727.eurprd08.prod.outlook.com (2603:10a6:150:6b::6)
- by AM8PR08MB6594.eurprd08.prod.outlook.com (2603:10a6:20b:36a::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.20; Fri, 11 Oct
- 2024 16:22:20 +0000
-Received: from GVXPR08MB7727.eurprd08.prod.outlook.com
- ([fe80::9672:63f7:61b8:5469]) by GVXPR08MB7727.eurprd08.prod.outlook.com
- ([fe80::9672:63f7:61b8:5469%7]) with mapi id 15.20.8048.017; Fri, 11 Oct 2024
- 16:22:20 +0000
-Message-ID: <7a83461d-40fd-4e61-8833-5dae2abaf82b@arm.com>
-Date: Fri, 11 Oct 2024 17:22:17 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 10/11] virt: arm-cca-guest: TSM_REPORT support for
- realms
-Content-Language: en-GB
-To: Steven Price <steven.price@arm.com>, Gavin Shan <gshan@redhat.com>,
- kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Sami Mujawar <sami.mujawar@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, Dan Williams <dan.j.williams@intel.com>,
- "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-References: <20241004144307.66199-1-steven.price@arm.com>
- <20241004144307.66199-11-steven.price@arm.com>
- <5a3432d1-6a79-434c-bc93-6317c8c6435c@redhat.com>
- <6c306817-fbd7-402c-8425-a4523ed43114@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <6c306817-fbd7-402c-8425-a4523ed43114@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: LO4P265CA0043.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:2ac::22) To GVXPR08MB7727.eurprd08.prod.outlook.com
- (2603:10a6:150:6b::6)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="GJws6XVE"
+Date: Fri, 11 Oct 2024 10:07:24 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1728666453;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=B7SnnnTfOwt4kWHiPAWUzLS15XAxy5TfsaE83NvMhaE=;
+	b=GJws6XVEr6jYMDBApSbVk0SwWkV0U5j3dE4Z2bGBFsXKdio+v64vTPEW0yoqaGWny9nitT
+	Jc8INvHNXmV9fLafK1AWciGDKPrF9Ztr5ldjWYz0MZvQT2Pf6+useQwi7nykgtxqvCJsxD
+	Nm03XvHEGqkYbPRxskRUniNSxVuvDQ4=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Cc: kvmarm@lists.linux.dev, maz@kernel.org, catalin.marinas@arm.com,
+	will@kernel.org, mark.rutland@arm.com, cohuck@redhat.com,
+	eric.auger@redhat.com, yuzenghui@huawei.com,
+	wangzhou1@hisilicon.com, jiangkunkun@huawei.com,
+	jonathan.cameron@huawei.com, anthony.jebson@huawei.com,
+	linux-arm-kernel@lists.infradead.org, linuxarm@huawei.com
+Subject: Re: [RFC PATCH 0/6] KVM: arm64: Errata management for VM Live
+ migration
+Message-ID: <ZwlbTCwoKQyh3vmF@linux.dev>
+References: <20241011075053.80540-1-shameerali.kolothum.thodi@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-TrafficTypeDiagnostic:
-	GVXPR08MB7727:EE_|AM8PR08MB6594:EE_|AM3PEPF0000A798:EE_|PAXPR08MB6624:EE_
-X-MS-Office365-Filtering-Correlation-Id: a740525e-f988-418e-a34a-08dcea10eaa3
-x-checkrecipientrouted: true
-NoDisclaimer: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted:
- BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info-Original:
- =?utf-8?B?b3NhY3c4eCtIZHo2ZjdhSlNqVDBGOWNtN3pPTndDV2FSNURxS1JLc1Q1b0pO?=
- =?utf-8?B?TEdYZ1JKYmRlcFVyOGkrM1o4R1RQbzJDRkJndVNJOVZWcG8vZmxEYWEvZVU5?=
- =?utf-8?B?K25sN3M5VUw4SFhCT24zL2tnSFEvTm4zT2N0NmxUSC95VjgzS0ZnV000Z0No?=
- =?utf-8?B?NXdNaG5vbXptandDZU93RlQzWWxuOEVra2FBU1VQQzJoV3NQUXJ3L2M3MTh3?=
- =?utf-8?B?YThpd0VCTHpncjJQSzg1bzRmK3NpWkNIZG1HWDJPb3BFbEt4OVVzUWZub01w?=
- =?utf-8?B?WmdMaWlVbXRMQ1dHQUZCV05PY1RwdFI3RjdCU2h4V2pHVVZ5cnA3Zkw2ZlRr?=
- =?utf-8?B?eWtBN1lNaDRPY0ovTWRlZHF3bEs1OFFFaG1YZWZmTG9BNWZNOWZQelcyT3hD?=
- =?utf-8?B?VHBXcXZROEVjaVRxbi9qNzlITUk1MlJ1VUJFbGVVTlYrL3dKTEFDb3g2bDRY?=
- =?utf-8?B?R3ZCSWxLZWtsbFVMMmZEOEFJVnVxTXo2M1pMNTZ3dGlDRW5USW43S3VqTVVB?=
- =?utf-8?B?dHRvODZFd2dFbWpkbVVMUXpZbGJzK0RwVFB2N0hoNWNLQlA1eTBvc0lNOTU5?=
- =?utf-8?B?NC91K0F4eW5xc05pVTJiRmtFbk9ZR2JzZjU2REFhSjFNb2pXdWRLWFFYbzdR?=
- =?utf-8?B?K25TQVZnUHF4L2xIdXcyNDFZUndLeFF6eUdScHY4OHhaQ04yK1BKSGFYclRx?=
- =?utf-8?B?bEZJM0tDd1J4OExueGRhcHp2N0hpVSswQXdad2ZjT1ZXSUxOaDJrUWZ6M1VT?=
- =?utf-8?B?TzVzK3FidkFLbitkREQ5dWVTQ3Y5Q3p4K2crcTBoZVhuVFpTMHpibDNBUkJ0?=
- =?utf-8?B?Z09LMkJReWlpVTZuTjJMS1c4SE5BRjdJazZOa1NBTUNUUmRhekxHYk0wL2RP?=
- =?utf-8?B?U0FvZ1dWZU81UDEza2N6bFByY05JRThYVUNzNzFCWGVBZW5IKytVbHJpWXhG?=
- =?utf-8?B?ck1wTUUwMWgrOHRNM3ZuQUhBaFVnYVhtd01wdUMreDdydmdFR3lLZHk0SW8x?=
- =?utf-8?B?UlNHSTJkYXBvU0tpUEFXL3JyUElvSHpCaU9ydzh1dkd1b213UXlJSTR5eUxS?=
- =?utf-8?B?QTJMWWhWcTNqL1hnMUxXUk10bFJ5QW1URittVDdaL29xUklEajl2ZXdPb09u?=
- =?utf-8?B?Z29FcjVxcEhKRlJEOUdhaEpxZVJhSENkUTJDUDlhNytJZWxKZ1lVU0ZRcUox?=
- =?utf-8?B?WFN6NGZlWTBKQjhnNzd4SjlmZS9aaHU3enAxY2l2U3VUUXNEbkkvU1RNQmJn?=
- =?utf-8?B?WWtEVGg3emg1TkVPRzF6bTdLaVUraG5aa0tDcnlYOGZCaytxckRaTzhFOFJL?=
- =?utf-8?B?VFZWalpITW1yeS9ybG80QWovR2VlZjZ5VSttTnViSmFhWnU4SGZ0V3MrZHU2?=
- =?utf-8?B?RkpDYzlLMzAwcVRBbTg1K2lScE1yTUl5WW1QWjFXNlR6NVlpcmlub1VWckJG?=
- =?utf-8?B?R1NST3BnWTNHNG9Odkp3RnYyem5LRFVwbzAvTDNmaEszNkhucFh5N3JrUWJo?=
- =?utf-8?B?YmZ4bVVxRks4NHVaUTQ1clJ3MmRDcFFXZGhLcXJ0R2ZRVXdvUVlSTk1iMmhL?=
- =?utf-8?B?UEFicW1SMmx5VzF2djBlWEt0RXpiWHhYS1pXY2dyRXppRElPWHBjWGdpcjBq?=
- =?utf-8?B?R2FHc3c5SGRKOEN6Vm9PelpoVC9ldUlBNzVmSm9KamVDWDQreGVIZXZ0cFds?=
- =?utf-8?B?NmlDbHVhVDROQUNKcEgyWjZxMkhQVUNLeDFNQjMzbzE4eFpEL0tKWFlBPT0=?=
-X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GVXPR08MB7727.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8PR08MB6594
-Original-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-X-EOPAttributedMessage: 0
-X-MS-Exchange-SkipListedInternetSender:
- ip=[2603:10a6:150:6b::6];domain=GVXPR08MB7727.eurprd08.prod.outlook.com
-X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- AM3PEPF0000A798.eurprd04.prod.outlook.com
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	f903a1c5-037c-4ec1-c6ea-08dcea10e128
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|35042699022|376014|36860700013|82310400026|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?aTRuR1g2S1U2ckpPZXRCS1FaMDdWTmJKdHAvd1pGbkpBdm96K1BUTEZWMkkz?=
- =?utf-8?B?aGxWbThaUzBrRG1OdjJQZkc1QnRqdkR3V0RFVGR6a0liQnRJeW5leTk3bS9Y?=
- =?utf-8?B?UGgyc0NNTC92NzY2V25yUkV3RW1KdC9KaFNJVUMwTkxHSzJVQXgwT0lLVW1W?=
- =?utf-8?B?RGJubmt5bW5xbVdiZUwyV1dkc0lkUjBBL05tYmRYZmpvTUk5bnAzaEsvOWVH?=
- =?utf-8?B?MS9aeWZGVXQ3UkJYbXJzUGo1aEZEQVNWeTUxbUtLUkZNUEhDdmhwME9vU3dk?=
- =?utf-8?B?a1BsalpIR0NzQ0FRQ2Y4eXRMaVpIQUs0TTJaZm9QYkIyRFlHYXhzbVU5ZFpJ?=
- =?utf-8?B?R0MxREh3T2ljTEFkZHZ6RTArOEhhNU1WVm5Eb1YvNzFTblArdGxEblVaUWts?=
- =?utf-8?B?MFBHVlgrZVY4T1kxdDVWY0tiNDhPN2ErdVBEbnlOZ0NXUThQam9rU0hYV3dR?=
- =?utf-8?B?N1NzMkJESFJ1dkdBcGUrQzRRenFjaVRSOWhmbS9rNlJqcDYzTVhqc1drQjN2?=
- =?utf-8?B?SEFLSU1wc0I3Zmh3U2FWRDVoYjdrTWxmYmJrcWNxNGRvc25JODlLUEFTYVJx?=
- =?utf-8?B?RXB2WDJTSjgraGZzYzJKbER4aDB0eGxQU2FhYmJmdVRwTEwzdVluS09BaTV3?=
- =?utf-8?B?Nlg1SFQ5RllSN29veGtTOFM2TEl0TVlVc0MyUHhuZisvZ3RUd3lGT2llbEJq?=
- =?utf-8?B?RmVncHJORmU5UUZJTmNrcmhaWHlXc2hHN0R3eWxZUVZHRyt0YngxdTE2Z1lM?=
- =?utf-8?B?cStlUVZPR09QZkk5OVhXL1cyRzA2NW5GQkI5Znl1dFplc2R1QVRJMDBFRWJq?=
- =?utf-8?B?eFRSOGt0NkNTUW55clNHZmhaSC8xZXFUbTh4OG9KN1l1V0hsNWpZOFB6YzAr?=
- =?utf-8?B?QUFwZnF0YWxDMFZOM3BZZlVlbXVlMlREbHg1UnRQVUZUUXUwT1FwSnZqSndk?=
- =?utf-8?B?cm1MUGdPcjNCMWtpN1ZYSTFreUVPSkhscFc5ZE5LdU9BVDh6T2ZENUU0NkxG?=
- =?utf-8?B?eVVOWHdYalM3cW5ia2tIcXpVZGx4VlFkcDVibHN2UTJpTXNvVlJNa3p2d1JS?=
- =?utf-8?B?UmhjTmdvcjR1WDFYcGZQRzNER2dETVUyeWZNQnNXWUFOY2Z3NWdZMm9jREVH?=
- =?utf-8?B?SjlIbHQwalJXOW1ITWJXQjVTOHpOV3lzeWdLK0pmQSs1V2ltbThYZzRsNU82?=
- =?utf-8?B?czNZSld2Z01JaElCcjA2T01vak5ZUWxEOFRsbE5wa1dFVmpRSm4rNnYwOW5s?=
- =?utf-8?B?dzM0QllIYmhnMmdoNXdvcyt1RVJGNWR0b2xyVnVQSng0MFNFVk9haTlzN2k3?=
- =?utf-8?B?dlFUT1o4Z3RLWWZuZWE3U0RzMTdHVTF4d01hYTBHZitjdUZIUnFKNzRTNm1Q?=
- =?utf-8?B?N3U1MGVld213OXdwOEJsTGgvZmlaY1pNcEd1d1M3cWJCeDRlc1d4bklLNkg4?=
- =?utf-8?B?S0ltWHY0Vk1tdkRZMlE5amFoWmFaMWUydWNHMVFSaGpHSkRwbmRRWjFZM1o5?=
- =?utf-8?B?QjYwWmxaOGdGYit4MWtnT2tDWU1CaW9nSmdZbTRXVUJ3Yi9rUVNIeHVKN2xX?=
- =?utf-8?B?eHZBOHNybHFzRHgxS0E2ajM2bXJmdm9pMUFVMEtwVmI2ZEpxVzlrRVV6YnRn?=
- =?utf-8?B?a0gyd2kwZGtGZENHZnNKYUkzM2FKMnovWmNHVFlQTFl5cUo1VVBDZGwxOHJ6?=
- =?utf-8?B?NXR6dUt5R1lZOWRmcER5NVJuUityVzZzTTB1Ty90RjduV3VjcEIwUGhJcVBN?=
- =?utf-8?B?OHNaWVY5T3dsZWpqQmZiNkQ4QmNLNnIxUHdGWFNOdkY4aVArSHdCK0x0ZS95?=
- =?utf-8?B?NVpqdEFLc0ROd2RPanZDUUdqQVZtOW16bzZ6bmEzT3VuekNUQk9CeFYrWGpM?=
- =?utf-8?Q?9Y1cFM3mulVOC?=
-X-Forefront-Antispam-Report:
-	CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFS:(13230040)(35042699022)(376014)(36860700013)(82310400026)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Oct 2024 16:22:35.5799
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: a740525e-f988-418e-a34a-08dcea10eaa3
-X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[63.35.35.123];Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	AM3PEPF0000A798.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR08MB6624
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241011075053.80540-1-shameerali.kolothum.thodi@huawei.com>
+X-Migadu-Flow: FLOW_OUT
 
-On 11/10/2024 15:14, Steven Price wrote:
-> On 08/10/2024 05:12, Gavin Shan wrote:
->> On 10/5/24 12:43 AM, Steven Price wrote:
->>> From: Sami Mujawar <sami.mujawar@arm.com>
->>>
->>> Introduce an arm-cca-guest driver that registers with
->>> the configfs-tsm module to provide user interfaces for
->>> retrieving an attestation token.
->>>
->>> When a new report is requested the arm-cca-guest driver
->>> invokes the appropriate RSI interfaces to query an
->>> attestation token.
->>>
->>> The steps to retrieve an attestation token are as follows:
->>>     1. Mount the configfs filesystem if not already mounted
->>>        mount -t configfs none /sys/kernel/config
->>>     2. Generate an attestation token
->>>        report=/sys/kernel/config/tsm/report/report0
->>>        mkdir $report
->>>        dd if=/dev/urandom bs=64 count=1 > $report/inblob
->>>        hexdump -C $report/outblob
->>>        rmdir $report
->>>
->>> Signed-off-by: Sami Mujawar <sami.mujawar@arm.com>
->>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->>> Signed-off-by: Steven Price <steven.price@arm.com>
->>> ---
->>> v3: Minor improvements to comments and adapt to the renaming of
->>> GRANULE_SIZE to RSI_GRANULE_SIZE.
->>> ---
->>>    drivers/virt/coco/Kconfig                     |   2 +
->>>    drivers/virt/coco/Makefile                    |   1 +
->>>    drivers/virt/coco/arm-cca-guest/Kconfig       |  11 +
->>>    drivers/virt/coco/arm-cca-guest/Makefile      |   2 +
->>>    .../virt/coco/arm-cca-guest/arm-cca-guest.c   | 211 ++++++++++++++++++
->>>    5 files changed, 227 insertions(+)
->>>    create mode 100644 drivers/virt/coco/arm-cca-guest/Kconfig
->>>    create mode 100644 drivers/virt/coco/arm-cca-guest/Makefile
->>>    create mode 100644 drivers/virt/coco/arm-cca-guest/arm-cca-guest.c
->>>
->>> diff --git a/drivers/virt/coco/Kconfig b/drivers/virt/coco/Kconfig
->>> index d9ff676bf48d..ff869d883d95 100644
->>> --- a/drivers/virt/coco/Kconfig
->>> +++ b/drivers/virt/coco/Kconfig
->>> @@ -14,3 +14,5 @@ source "drivers/virt/coco/pkvm-guest/Kconfig"
->>>    source "drivers/virt/coco/sev-guest/Kconfig"
->>>      source "drivers/virt/coco/tdx-guest/Kconfig"
->>> +
->>> +source "drivers/virt/coco/arm-cca-guest/Kconfig"
->>> diff --git a/drivers/virt/coco/Makefile b/drivers/virt/coco/Makefile
->>> index b69c30c1c720..c3d07cfc087e 100644
->>> --- a/drivers/virt/coco/Makefile
->>> +++ b/drivers/virt/coco/Makefile
->>> @@ -7,3 +7,4 @@ obj-$(CONFIG_EFI_SECRET)    += efi_secret/
->>>    obj-$(CONFIG_ARM_PKVM_GUEST)    += pkvm-guest/
->>>    obj-$(CONFIG_SEV_GUEST)        += sev-guest/
->>>    obj-$(CONFIG_INTEL_TDX_GUEST)    += tdx-guest/
->>> +obj-$(CONFIG_ARM_CCA_GUEST)    += arm-cca-guest/
->>> diff --git a/drivers/virt/coco/arm-cca-guest/Kconfig
->>> b/drivers/virt/coco/arm-cca-guest/Kconfig
->>> new file mode 100644
->>> index 000000000000..9dd27c3ee215
->>> --- /dev/null
->>> +++ b/drivers/virt/coco/arm-cca-guest/Kconfig
->>> @@ -0,0 +1,11 @@
->>> +config ARM_CCA_GUEST
->>> +    tristate "Arm CCA Guest driver"
->>> +    depends on ARM64
->>> +    default m
->>> +    select TSM_REPORTS
->>> +    help
->>> +      The driver provides userspace interface to request and
->>> +      attestation report from the Realm Management Monitor(RMM).
->>> +
->>> +      If you choose 'M' here, this module will be called
->>> +      arm-cca-guest.
->>> diff --git a/drivers/virt/coco/arm-cca-guest/Makefile
->>> b/drivers/virt/coco/arm-cca-guest/Makefile
->>> new file mode 100644
->>> index 000000000000..69eeba08e98a
->>> --- /dev/null
->>> +++ b/drivers/virt/coco/arm-cca-guest/Makefile
->>> @@ -0,0 +1,2 @@
->>> +# SPDX-License-Identifier: GPL-2.0-only
->>> +obj-$(CONFIG_ARM_CCA_GUEST) += arm-cca-guest.o
->>> diff --git a/drivers/virt/coco/arm-cca-guest/arm-cca-guest.c
->>> b/drivers/virt/coco/arm-cca-guest/arm-cca-guest.c
->>> new file mode 100644
->>> index 000000000000..e22a565cb425
->>> --- /dev/null
->>> +++ b/drivers/virt/coco/arm-cca-guest/arm-cca-guest.c
->>> @@ -0,0 +1,211 @@
->>> +// SPDX-License-Identifier: GPL-2.0-only
->>> +/*
->>> + * Copyright (C) 2023 ARM Ltd.
->>> + */
->>> +
->>> +#include <linux/arm-smccc.h>
->>> +#include <linux/cc_platform.h>
->>> +#include <linux/kernel.h>
->>> +#include <linux/module.h>
->>> +#include <linux/smp.h>
->>> +#include <linux/tsm.h>
->>> +#include <linux/types.h>
->>> +
->>> +#include <asm/rsi.h>
->>> +
->>> +/**
->>> + * struct arm_cca_token_info - a descriptor for the token buffer.
->>> + * @granule:    PA of the page to which the token will be written
->>                        ^^^^^^^^
->>
->> s/the page/the granule. They are same thing when we have 4KB page size,
->> but there are conceptually different if I'm correct.
-> 
-> Indeed they are different, the granule is always 4KB, the host (and
-> guest) page size could be bigger (although that's not yet supported).
-> 
-> Here 'granule' does indeed point to a (host) page (because it's returned
-> from alloc_pages_exact()), but that's just a confusing detail.
-> 
-> I'll update as you suggest.
-> 
->>> + * @offset:    Offset within granule to start of buffer in bytes
->>> + * @len:    Number of bytes of token data that was retrieved
->>> + * @result:    result of rsi_attestation_token_continue operation
->>> + */
->>> +struct arm_cca_token_info {
->>> +    phys_addr_t     granule;
->>> +    unsigned long   offset;
->>> +    int             result;
->>> +};
->>> +
->>> +/**
->>> + * arm_cca_attestation_continue - Retrieve the attestation token data.
->>> + *
->>> + * @param: pointer to the arm_cca_token_info
->>> + *
->>> + * Attestation token generation is a long running operation and
->>> therefore
->>> + * the token data may not be retrieved in a single call. Moreover, the
->>> + * token retrieval operation must be requested on the same CPU on
->>> which the
->>> + * attestation token generation was initialised.
->>> + * This helper function is therefore scheduled on the same CPU multiple
->>> + * times until the entire token data is retrieved.
->>> + */
->>> +static void arm_cca_attestation_continue(void *param)
->>> +{
->>> +    unsigned long len;
->>> +    unsigned long size;
->>> +    struct arm_cca_token_info *info;
->>> +
->>> +    if (!param)
->>> +        return;
->>
->> This check seems unnecessary and can be dropped.
-> 
-> Ack
-> 
->>> +
->>> +    info = (struct arm_cca_token_info *)param;
->>> +
->>> +    size = RSI_GRANULE_SIZE - info->offset;
->>> +    info->result = rsi_attestation_token_continue(info->granule,
->>> +                              info->offset, size, &len);
->>> +    info->offset += len;
->>> +}
->>> +
->>
->> As I suggested in another reply, the return value type of
->> rsi_attestation_token_continue()
->> needs to be 'unsigned long'. In that case, the type of struct
->> arm_cca_token_info::result
->> needs to be adjusted either.
-> 
-> Ack
-> 
->>> +/**
->>> + * arm_cca_report_new - Generate a new attestation token.
->>> + *
->>> + * @report: pointer to the TSM report context information.
->>> + * @data:  pointer to the context specific data for this module.
->>> + *
->>> + * Initialise the attestation token generation using the challenge data
->>> + * passed in the TSM descriptor. Allocate memory for the attestation
->>> token
->>> + * and schedule calls to retrieve the attestation token on the same CPU
->>> + * on which the attestation token generation was initialised.
->>> + *
->>> + * The challenge data must be at least 32 bytes and no more than 64
->>> bytes. If
->>> + * less than 64 bytes are provided it will be zero padded to 64 bytes.
->>> + *
->>> + * Return:
->>> + * * %0        - Attestation token generated successfully.
->>> + * * %-EINVAL  - A parameter was not valid.
->>> + * * %-ENOMEM  - Out of memory.
->>> + * * %-EFAULT  - Failed to get IPA for memory page(s).
->>> + * * A negative status code as returned by smp_call_function_single().
->>> + */
->>> +static int arm_cca_report_new(struct tsm_report *report, void *data)
->>> +{
->>> +    int ret;
->>> +    int cpu;
->>> +    long max_size;
->>> +    unsigned long token_size;
->>> +    struct arm_cca_token_info info;
->>> +    void *buf;
->>> +    u8 *token __free(kvfree) = NULL;
->>> +    struct tsm_desc *desc = &report->desc;
->>> +
->>> +    if (!report)
->>> +        return -EINVAL;
->>> +
->>
->> This check seems unnecessary and can be dropped.
-> 
-> Ack
-> 
->>> +    if (desc->inblob_len < 32 || desc->inblob_len > 64)
->>> +        return -EINVAL;
->>> +
->>> +    /*
->>> +     * Get a CPU on which the attestation token generation will be
->>> +     * scheduled and initialise the attestation token generation.
->>> +     */
->>> +    cpu = get_cpu();
->>> +    max_size = rsi_attestation_token_init(desc->inblob,
->>> desc->inblob_len);
->>> +    put_cpu();
->>> +
->>
->> It seems that put_cpu() is called early, meaning the CPU can go away before
->> the subsequent call to arm_cca_attestation_continue() ?
-> 
-> Indeed, good spot. I'll move it to the end of the function and update
-> the error paths below.
+Hey Shameer,
 
-Actually this was on purpose, not to block the CPU hotplug. The
-attestation must be completed on the same CPU.
+Thank you for posting this series. This'll help might cross-host
+migrations on arm64 a little less sketch :)
 
-We can detect the failure from "smp_call" further down and make sure
-we can safely complete the operation or restart it.
+On Fri, Oct 11, 2024 at 08:50:47AM +0100, Shameer Kolothum wrote:
+> Hi,
+> 
+> On ARM64 platforms most of the errata workarounds are based on CPU
+> MIDR/REVIDR values and a number of these workarounds need to be
+> implemented by the Guest kernel as well. This creates a problem when
+> Guest needs to be migrated to a platform that differs in these
+> MIDR/REVIDR values even if the VMM can come up with a common minimum
+> feature list for the Guest using the recently introduced "Writable
+> ID registers" support.
+> 
+> (This is roughly based on a discussion I had with Marc and Oliver
+> at KVM forum. Marc outlined his idea for a solution and this is an
+> attempt to implement it. Thanks to both and I take all the blame
+> if this is nowhere near what is intended/required)
+> 
+> This RFC proposes a solution to handle the above issue by introducing
+> the following,
+> 
+> 1. A new VM IOCTL,
+>    KVM_ARM_SET_MIGRN_TARGET_CPUS  _IOW(KVMIO,  0xb7, struct kvm_arm_migrn_cpus)
+>    This can be used by the userspace(VMM) to set the target CPUs the
+>    Guest will run in its lifetime. See patch #2
+> 2. Add hypercall support for Guest kernel to retrieve any migration
+>    errata bitmap(ARM_SMCCC_VENDOR_HYP_KVM_MIGRN_ERRATA)
+>    The above will return the bitmaps in R0-R3 registers. See patch #4
+> 3. The "capability" field in struct arm64_cpu_capabilities is a generated
+>    one at present and may get renumbered or reordered. Hence, we can't use
+>    this directly for migration errata bitmaps. Instead, introduced
+>    "migartion_safe_cap", which has to be set statically for any
+>    erratum that needs to be enabled and is safe for migration
+>    purposes. See patches 3 & 6.
+> 4. Rest of the patches includes the plumbing required to populate the
+>    errata bitmap based on the target CPUs set by the VMM and update the
+>    system_cap based on it.
+> 
+> ToDos:-
+>   -We still need a way to  handle the error in setting the invariant
+>    registers(MIDR/REVIDR/AIDR) during Guest migration. Perhaps we can
+>    handle it in userspace?
+
+This seems entirely reasonable.
+
+There's nothing KVM can do to unilaterally prevent userspace from
+migrating VMs between different implementations already, and the
+invariance of MIDR/REVIDR is just a speed bump and not an outright
+blocker.
+
+Ultimately this is now a contract between the VMM and guest, so we may
+as well let userspace advertise whatever implementation it wants in the
+ID registers.
 
 
+> Please take a look and let me know your thoughts.
 
-Suzuki
+Looking at the guest side of things, it'd be nice if we hide the entire
+MIDR abstraction behind is_midr_in_range() et al and stop letting
+callers provide the MIDR. Internally that can find the MIDR of the
+current CPU or walk the array of MIDRs supplied by the hypervisor.
 
-> 
->>> +    if (max_size <= 0)
->>> +        return -EINVAL;
->>> +
->>> +    /* Allocate outblob */
->>> +    token = kvzalloc(max_size, GFP_KERNEL);
->>> +    if (!token)
->>> +        return -ENOMEM;
->>> +
->>> +    /*
->>> +     * Since the outblob may not be physically contiguous, use a page
->>> +     * to bounce the buffer from RMM.
->>> +     */
->>> +    buf = alloc_pages_exact(RSI_GRANULE_SIZE, GFP_KERNEL);
->>> +    if (!buf)
->>> +        return -ENOMEM;
->>> +
->>> +    /* Get the PA of the memory page(s) that were allocated. */
->>> +    info.granule = (unsigned long)virt_to_phys(buf);
->>> +
->>> +    token_size = 0;
->>
->> This initial assignment can be moved to where the variable is declared.
-> 
-> Ack
-> 
->>> +    /* Loop until the token is ready or there is an error. */
->>                                                               ^^
->>
->> Maybe it's the personal preference, I personally prefer to avoid the ending
->> character '.' for the single line of comment.
-> 
-> I agree, my preference is the same. I'll update this.
-> 
->>> +    do {
->>> +        /* Retrieve one RSI_GRANULE_SIZE data per loop iteration. */
->>> +        info.offset = 0;
->>> +        do {
->>> +            /*
->>> +             * Schedule a call to retrieve a sub-granule chunk
->>> +             * of data per loop iteration.
->>> +             */
->>> +            ret = smp_call_function_single(cpu,
->>> +                               arm_cca_attestation_continue,
->>> +                               (void *)&info, true);
->>> +            if (ret != 0) {
->>> +                token_size = 0;
->>> +                goto exit_free_granule_page;
->>> +            }
->>> +
->>> +            ret = info.result;
->>> +        } while ((ret == RSI_INCOMPLETE) &&
->>> +             (info.offset < RSI_GRANULE_SIZE));
->>
->> It may be clearer to use 'info.result' here. Besides, unnecessary () exists
->> in the check.
->>
->>                  } while (info.result == RSI_INCOMPLETE &&
->>                           info.offset < RSI_GRANULE_SIZE);
-> 
-> Sure
-> 
->> Apart from that, we needn't to copy the token over when info.result isn't
->> RSI_SUCCESS nor RSI_INCOMPLETE.
-> 
-> I'll move the error case up to avoid the copy.
-> 
->>> +
->>> +        /*
->>> +         * Copy the retrieved token data from the granule
->>> +         * to the token buffer, ensuring that the RMM doesn't
->>> +         * overflow the buffer.
->>> +         */
->>> +        if (WARN_ON(token_size + info.offset > max_size))
->>> +            break;
->>> +        memcpy(&token[token_size], buf, info.offset);
->>> +        token_size += info.offset;
->>> +    } while (ret == RSI_INCOMPLETE);
->>> +
->>
->> As above, it may be clearer to use 'info.result' in the check.
->>
->>          } while (info.result == RSI_INCOMPLETE);
-> 
-> Ack
-> 
->>> +    if (ret != RSI_SUCCESS) {
->>> +        ret = -ENXIO;
->>> +        token_size = 0;
->>> +        goto exit_free_granule_page;
->>> +    }
->>> +
->>> +    report->outblob = no_free_ptr(token);
->>> +exit_free_granule_page:
->>> +    report->outblob_len = token_size;
->>> +    free_pages_exact(buf, RSI_GRANULE_SIZE);
->>> +    return ret;
->>> +}
->>> +
->>> +static const struct tsm_ops arm_cca_tsm_ops = {
->>> +    .name = KBUILD_MODNAME,
->>> +    .report_new = arm_cca_report_new,
->>> +};
->>> +
->>> +/**
->>> + * arm_cca_guest_init - Register with the Trusted Security Module (TSM)
->>> + * interface.
->>> + *
->>> + * Return:
->>> + * * %0        - Registered successfully with the TSM interface.
->>> + * * %-ENODEV  - The execution context is not an Arm Realm.
->>> + * * %-EINVAL  - A parameter was not valid.
->>> + * * %-EBUSY   - Already registered.
->>> + */
->>> +static int __init arm_cca_guest_init(void)
->>> +{
->>> +    int ret;
->>> +
->>> +    if (!is_realm_world())
->>> +        return -ENODEV;
->>> +
->>> +    ret = tsm_register(&arm_cca_tsm_ops, NULL);
->>> +    if (ret < 0)
->>> +        pr_err("Failed to register with TSM.\n");
->>> +
->>> +    return ret;
->>> +}
->>> +module_init(arm_cca_guest_init);
->>> +
->>
->> It's probably a bit helpful to print the errno returned from
->> tsm_register().
->>
->>    pr_err("Error %d registering with TSM\n", ret);
->>
->> The only errno that can be returned from tsm_register() is -EBUSY. So there
->> is no way for arm_cca_guest_init() to return -EINVAL. The comments need
->> correction by dropping the description relevant to -EINVAL.
-> 
-> Ack
-> 
->>> +/**
->>> + * arm_cca_guest_exit - unregister with the Trusted Security Module
->>> (TSM)
->>> + * interface.
->>> + */
->>> +static void __exit arm_cca_guest_exit(void)
->>> +{
->>> +    tsm_unregister(&arm_cca_tsm_ops);
->>> +}
->>> +module_exit(arm_cca_guest_exit);
->>> +
->>> +MODULE_AUTHOR("Sami Mujawar <sami.mujawar@arm.com>");
->>> +MODULE_DESCRIPTION("Arm CCA Guest TSM Driver.");
->>> +MODULE_LICENSE("GPL");
->>
->> The ending character '.' for the module's description may not be needed
->> and can be
->> dropped.
-> 
-> Ack.
-> 
-> Thanks for the review!
-> 
-> Steve
-> 
+Beyond that, we probably need a way to clue in userspace on the game in
+case it has some behaviors keyed off MIDR too.
 
+-- 
+Thanks,
+Oliver
