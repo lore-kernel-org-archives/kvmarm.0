@@ -1,200 +1,180 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57A6F21C168;
-	Fri, 11 Oct 2024 14:14:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD5682185AF
+	for <kvmarm@lists.linux.dev>; Fri, 11 Oct 2024 14:14:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728656085; cv=none; b=F1gXpcbylqJHIeqSofQTl2UF3blrCu8VRtovp0Vf41xR5mZLF+NCuFUUgYmZHHlTePRxr8TtY9aeCfQKW5hlX/4zuY65SyT8LCVCoOR/n7pLTmGZ7kGfji8D3/bS/cVhpVSTxU7STdNmvym7c680QVsoW/gn8/THCpphrhCzUt4=
+	t=1728656085; cv=none; b=q/AmL80QWx5HKIw34LVEQc0EaXOGPQ7Ktako03ozgwNbghLOUKgLmG1h5IKYsYXQpBt3d0814/FcoQY6dCWi2bKRfy/ELV7HzsFxJ6LpXYHNAIf2OqdZ8qL4VwUnSvjKTGF1OirQN66YmQgm/G85mRAN0iQkoSP/8ENkHkUxDYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1728656085; c=relaxed/simple;
-	bh=hx3NqEpss88x2cPcLraT/sKCh3o4Zthu/vHlVDApes4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=O4w4oCLIzqbp7gKLOuArYqT5+woSPz1l/DiMaNQTpP0agnDOWnXGaguEjbZz1LLskx4LTUBkwoCf3HsfNyt5V+P6hTd79PyG7iX18jNIx3J7wRoBFtAeN7HXLOkR4a5Ef2LqwPi8zZjehencqsegvuxduOWtAMdLM0yZmP/myko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9292E1570;
-	Fri, 11 Oct 2024 07:15:11 -0700 (PDT)
-Received: from [10.1.31.21] (e122027.cambridge.arm.com [10.1.31.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 56A8C3F5A1;
-	Fri, 11 Oct 2024 07:14:39 -0700 (PDT)
-Message-ID: <846c43a8-9720-4dd5-b40a-73ec00b9a9a7@arm.com>
-Date: Fri, 11 Oct 2024 15:14:32 +0100
+	bh=KuEvSXWchR6WvW2acuAOXk78Epu080AQjYkaoqRyzSs=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=KJXxFL5tCzJckKxZNB806dNEPJn0CxCHTWbDQplpnV/b2OA9ra3HvFvHvg61jRDvL+7HIIGIxLM7M669e5TkuNckclpNh4lROJooc1fKPxbyvvNo5luJFrMXt92/LkkMZfNYwcfjKRDVp/OaAShFWUduHB0+TYK54CZWvoMyfNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eEwm4ZO1; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eEwm4ZO1"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1728656082;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+6TCPgkIuI75pPPy7xgIkD4f7dDd4S1TDJrEU/GmgCI=;
+	b=eEwm4ZO1aYimS2dKnKhYBdLmPgBl8feT1BsNnL1Q4HgJcdCZSKRh+3Kneur5xrgSZnDpx+
+	pLji3NUbEMc5tmpS6sr/QvOVRsWM6sNXcWupd7Iwdb8yWMc8E0bz+X/328RrVZgB3R3HqX
+	Y/mXdst2jGSYTCqQ3QfQ0Ku2iN0Oa1E=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-231-G52hpAYRO-6yNatmDDkiIQ-1; Fri,
+ 11 Oct 2024 10:14:41 -0400
+X-MC-Unique: G52hpAYRO-6yNatmDDkiIQ-1
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CC4B11955F77;
+	Fri, 11 Oct 2024 14:14:38 +0000 (UTC)
+Received: from localhost (dhcp-192-244.str.redhat.com [10.33.192.244])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1511619560AA;
+	Fri, 11 Oct 2024 14:14:35 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+ "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, "maz@kernel.org"
+ <maz@kernel.org>, "oliver.upton@linux.dev" <oliver.upton@linux.dev>
+Cc: "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "will@kernel.org"
+ <will@kernel.org>, "mark.rutland@arm.com" <mark.rutland@arm.com>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>, yuzenghui
+ <yuzenghui@huawei.com>, "Wangzhou (B)" <wangzhou1@hisilicon.com>,
+ jiangkunkun <jiangkunkun@huawei.com>, Jonathan Cameron
+ <jonathan.cameron@huawei.com>, Anthony Jebson <anthony.jebson@huawei.com>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>, Linuxarm <linuxarm@huawei.com>
+Subject: RE: [RFC PATCH 0/6] KVM: arm64: Errata management for VM Live
+ migration
+In-Reply-To: <54afcc8182d341d8ab294d8a54c1fbf3@huawei.com>
+Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
+ Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
+ 153243,
+ =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
+ Michael O'Neill, Amy
+ Ross"
+References: <20241011075053.80540-1-shameerali.kolothum.thodi@huawei.com>
+ <87jzeerd6z.fsf@redhat.com> <54afcc8182d341d8ab294d8a54c1fbf3@huawei.com>
+User-Agent: Notmuch/0.38.3 (https://notmuchmail.org)
+Date: Fri, 11 Oct 2024 16:14:33 +0200
+Message-ID: <87h69irak6.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 11/11] arm64: Document Arm Confidential Compute
-To: Jean-Philippe Brucker <jean-philippe@linaro.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>
-References: <20241004144307.66199-1-steven.price@arm.com>
- <20241004144307.66199-12-steven.price@arm.com>
- <20241008110549.GA1058742@myrica>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <20241008110549.GA1058742@myrica>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
 
-On 08/10/2024 12:05, Jean-Philippe Brucker wrote:
-> On Fri, Oct 04, 2024 at 03:43:06PM +0100, Steven Price wrote:
->> Add some documentation on Arm CCA and the requirements for running Linux
->> as a Realm guest. Also update booting.rst to describe the requirement
->> for RIPAS RAM.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->>  Documentation/arch/arm64/arm-cca.rst | 67 ++++++++++++++++++++++++++++
->>  Documentation/arch/arm64/booting.rst |  3 ++
->>  Documentation/arch/arm64/index.rst   |  1 +
->>  3 files changed, 71 insertions(+)
->>  create mode 100644 Documentation/arch/arm64/arm-cca.rst
->>
->> diff --git a/Documentation/arch/arm64/arm-cca.rst b/Documentation/arch/arm64/arm-cca.rst
->> new file mode 100644
->> index 000000000000..ab7f90e64c2f
->> --- /dev/null
->> +++ b/Documentation/arch/arm64/arm-cca.rst
->> @@ -0,0 +1,67 @@
->> +.. SPDX-License-Identifier: GPL-2.0
->> +
->> +=====================================
->> +Arm Confidential Compute Architecture
->> +=====================================
->> +
->> +Arm systems that support the Realm Management Extension (RME) contain
->> +hardware to allow a VM guest to be run in a way which protects the code
->> +and data of the guest from the hypervisor. It extends the older "two
->> +world" model (Normal and Secure World) into four worlds: Normal, Secure,
->> +Root and Realm. Linux can then also be run as a guest to a monitor
->> +running in the Realm world.
->> +
->> +The monitor running in the Realm world is known as the Realm Management
->> +Monitor (RMM) and implements the Realm Management Monitor
->> +specification[1]. The monitor acts a bit like a hypervisor (e.g. it runs
->> +in EL2 and manages the stage 2 page tables etc of the guests running in
->> +Realm world), however much of the control is handled by a hypervisor
->> +running in the Normal World. The Normal World hypervisor uses the Realm
->> +Management Interface (RMI) defined by the RMM specification to request
->> +the RMM to perform operations (e.g. mapping memory or executing a vCPU).
->> +
->> +The RMM defines an environment for guests where the address space (IPA)
->> +is split into two. The lower half is protected - any memory that is
->> +mapped in this half cannot be seen by the Normal World and the RMM
->> +restricts what operations the Normal World can perform on this memory
->> +(e.g. the Normal World cannot replace pages in this region without the
->> +guest's cooperation). The upper half is shared, the Normal World is free
->> +to make changes to the pages in this region, and is able to emulate MMIO
->> +devices in this region too.
->> +
->> +A guest running in a Realm may also communicate with the RMM to request
->> +changes in its environment or to perform attestation about its
->> +environment. In particular it may request that areas of the protected
->> +address space are transitioned between 'RAM' and 'EMPTY' (in either
->> +direction). This allows a Realm guest to give up memory to be returned
->> +to the Normal World, or to request new memory from the Normal World.
->> +Without an explicit request from the Realm guest the RMM will otherwise
->> +prevent the Normal World from making these changes.
-> 
-> We could mention that this interface is "RSI", so readers know what to
-> look for next
+On Fri, Oct 11 2024, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
 
-Good idea.
+>> -----Original Message-----
+>> From: Cornelia Huck <cohuck@redhat.com>
+>> Sent: Friday, October 11, 2024 2:18 PM
+>> To: Shameerali Kolothum Thodi
+>> <shameerali.kolothum.thodi@huawei.com>; kvmarm@lists.linux.dev;
+>> maz@kernel.org; oliver.upton@linux.dev
+>> Cc: catalin.marinas@arm.com; will@kernel.org; mark.rutland@arm.com;
+>> eric.auger@redhat.com; yuzenghui <yuzenghui@huawei.com>; Wangzhou
+>> (B) <wangzhou1@hisilicon.com>; jiangkunkun
+>> <jiangkunkun@huawei.com>; Jonathan Cameron
+>> <jonathan.cameron@huawei.com>; Anthony Jebson
+>> <anthony.jebson@huawei.com>; linux-arm-kernel@lists.infradead.org;
+>> Linuxarm <linuxarm@huawei.com>
+>> Subject: Re: [RFC PATCH 0/6] KVM: arm64: Errata management for VM Live
+>> migration
+>> 
+>> On Fri, Oct 11 2024, Shameer Kolothum
+>> <shameerali.kolothum.thodi@huawei.com> wrote:
+>> 
+>> > Hi,
+>> >
+>> > On ARM64 platforms most of the errata workarounds are based on CPU
+>> > MIDR/REVIDR values and a number of these workarounds need to be
+>> > implemented by the Guest kernel as well. This creates a problem when
+>> > Guest needs to be migrated to a platform that differs in these
+>> > MIDR/REVIDR values even if the VMM can come up with a common
+>> minimum
+>> > feature list for the Guest using the recently introduced "Writable
+>> > ID registers" support.
+>> >
+>> > (This is roughly based on a discussion I had with Marc and Oliver
+>> > at KVM forum. Marc outlined his idea for a solution and this is an
+>> > attempt to implement it. Thanks to both and I take all the blame
+>> > if this is nowhere near what is intended/required)
+>> >
+>> > This RFC proposes a solution to handle the above issue by introducing
+>> > the following,
+>> >
+>> > 1. A new VM IOCTL,
+>> >    KVM_ARM_SET_MIGRN_TARGET_CPUS  _IOW(KVMIO,  0xb7, struct
+>> kvm_arm_migrn_cpus)
+>> >    This can be used by the userspace(VMM) to set the target CPUs the
+>> >    Guest will run in its lifetime. See patch #2
+>> > 2. Add hypercall support for Guest kernel to retrieve any migration
+>> >    errata bitmap(ARM_SMCCC_VENDOR_HYP_KVM_MIGRN_ERRATA)
+>> >    The above will return the bitmaps in R0-R3 registers. See patch #4
+>> > 3. The "capability" field in struct arm64_cpu_capabilities is a generated
+>> >    one at present and may get renumbered or reordered. Hence, we can't
+>> use
+>> >    this directly for migration errata bitmaps. Instead, introduced
+>> >    "migartion_safe_cap", which has to be set statically for any
+>> >    erratum that needs to be enabled and is safe for migration
+>> >    purposes. See patches 3 & 6.
+>> > 4. Rest of the patches includes the plumbing required to populate the
+>> >    errata bitmap based on the target CPUs set by the VMM and update the
+>> >    system_cap based on it.
+>> >
+>> > ToDos:-
+>> >   -We still need a way to  handle the error in setting the invariant
+>> >    registers(MIDR/REVIDR/AIDR) during Guest migration. Perhaps we can
+>> >    handle it in userspace?
+>> > -  Possibly we could do better to avoid the additional
+>> "migartion_safe_cap" use.
+>> >    Suggestions welcome.
+>> >   -There are errata that require more than MIDR/REVIDR, eg: CTR_EL0.
+>> >    How to handle those?
+>> >   -Check for locking requirements if any.
+>> >
+>> > This is lightly tested on a HiSilicon ARM64 platform.
+>> >
+>> > Please take a look and let me know your thoughts.
+>> 
+>> So, I've only taken a very quick look at it, but IIUC, the idea is for
+>> the VMM to do the following:
+>> - figure out where we want to possibly run
+>
+>
+> Yes.
+>
+>> - figure out the least common denominator for writable features
+>
+> Yes
+>
+>> - tell KVM about the possible target cpu resp. the errata it wants
+>
+> This might change as per Marc's comments. VMM has to handle hypercall
+> directly and provide the target CPU list to Guest.
+>
+>> - build a frankencpu via the writable id reg infrastructure, fiddling
+>>   with invariant handling as needed?
+>
+> That is my idea of handling the invariant registers. If the VMM has provided a list of 
+> target CPUs for the Guest,  make sure the incoming CPU is part of the list 
+> during migration and ignore invariant(MIDR/REVIDR) reg SET errors.
 
->> +
->> +Linux as a Realm Guest
->> +----------------------
->> +
->> +To run Linux as a guest within a Realm, the following must be provided
->> +either by the VMM or by a `boot loader` run in the Realm before Linux:
->> +
->> + * All protected RAM described to Linux (by DT or ACPI) must be marked
->> +   RIPAS RAM before handing over the Linux.
-> 
-> "handing control over to Linux", or something like that?
+Thanks!
 
-Indeed that actually makes grammatical sense! ;)
-
->> +
->> + * MMIO devices must be either unprotected (e.g. emulated by the Normal
->> +   World) or marked RIPAS DEV.
->> +
->> + * MMIO devices emulated by the Normal World and used very early in boot
->> +   (specifically earlycon) must be specified in the upper half of IPA.
->> +   For earlycon this can be done by specifying the address on the
->> +   command line, e.g.: ``earlycon=uart,mmio,0x101000000``
-> 
-> This is going to be needed frequently, so maybe we should explain in a
-> little more detail how we come up with this value: "e.g. with an IPA size
-> of 33 and the base address of the emulated UART at 0x1000000,
-> ``earlycon=uart,mmio,0x101000000``"
-> 
-> (Because the example IPA size is rather unintuitive and specific to the
-> kvmtool memory map)
-
-Agreed.
-
-Thanks,
-Steve
-
-> Thanks,
-> Jean
-> 
->> +
->> + * Linux will use bounce buffers for communicating with unprotected
->> +   devices. It will transition some protected memory to RIPAS EMPTY and
->> +   expect to be able to access unprotected pages at the same IPA address
->> +   but with the highest valid IPA bit set. The expectation is that the
->> +   VMM will remove the physical pages from the protected mapping and
->> +   provide those pages as unprotected pages.
->> +
->> +References
->> +----------
->> +[1] https://developer.arm.com/documentation/den0137/
->> diff --git a/Documentation/arch/arm64/booting.rst b/Documentation/arch/arm64/booting.rst
->> index b57776a68f15..30164fb24a24 100644
->> --- a/Documentation/arch/arm64/booting.rst
->> +++ b/Documentation/arch/arm64/booting.rst
->> @@ -41,6 +41,9 @@ to automatically locate and size all RAM, or it may use knowledge of
->>  the RAM in the machine, or any other method the boot loader designer
->>  sees fit.)
->>  
->> +For Arm Confidential Compute Realms this includes ensuring that all
->> +protected RAM has a Realm IPA state (RIPAS) of "RAM".
->> +
->>  
->>  2. Setup the device tree
->>  -------------------------
->> diff --git a/Documentation/arch/arm64/index.rst b/Documentation/arch/arm64/index.rst
->> index 78544de0a8a9..12c243c3af20 100644
->> --- a/Documentation/arch/arm64/index.rst
->> +++ b/Documentation/arch/arm64/index.rst
->> @@ -10,6 +10,7 @@ ARM64 Architecture
->>      acpi_object_usage
->>      amu
->>      arm-acpi
->> +    arm-cca
->>      asymmetric-32bit
->>      booting
->>      cpu-feature-registers
->> -- 
->> 2.34.1
->>
->>
+I hope I'll be able to spend some time on this next week.
 
