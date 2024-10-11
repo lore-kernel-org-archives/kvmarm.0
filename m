@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BB3121A6EF;
-	Fri, 11 Oct 2024 14:14:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7C0921B42F;
+	Fri, 11 Oct 2024 14:14:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728656076; cv=none; b=SzfHFT4zaUpVe6GVQqAUugBY8yRY7xsLxy3cqriwsrbFHgkaiuW3/SRY8JqburW0KP+QwaZPH6XJWSAV6qq9BPL013c3OoKGe/Se7bUsSlXBoTuYNYEDrirLeLCKvFAsdnv8cveGoFBX8Bvz1LpBMQCXambtGENaBCnN0FFO6Sg=
+	t=1728656078; cv=none; b=KVaQQrmIucc9Th3961/8+BFl9NAzDuQKVpSP0oLmR/f9QJUk98YeD08eak51YtpbGAovyRm4tVJZgO+rWk2xabnULBQHiwuHXlYNnPeuCgsodIGClPV6aiS0I5MWBYId2trdSxL8obJK+Kcze4YBdKDe79aMmWz2LOmmReIs8I4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728656076; c=relaxed/simple;
-	bh=1hM8PIdzTTl0Yk1nkOCOVqrtci/YwOwp8fQa94Vp3ik=;
+	s=arc-20240116; t=1728656078; c=relaxed/simple;
+	bh=DbiVmwouyJNeA7alfmbBFu8o0wUvXSoDNmpEX8DrDl8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lpeLqkNXU2ze3beAjZhgErw2AfF6BKNrgEXnVRL67DZplPbrytywsl2HggfPX+9JUQV3XrGeRzknpSVOrzNRlBzyHfC6R0DVZlZdRCbxUQZAvOqkZSiMRNQoJfip8JGoEF9BCNxq4emF021u6rWKOo4BezM9wNpWXJ6/aXkUUaM=
+	 In-Reply-To:Content-Type; b=rIT3gb3J3n7FuZrpwsapS4c8bXRYyA8sQVbbuXcxuGHvkinFxkxLe40bmuZpz78EniuMrZkMEg2RhVoPCg4OxP3Vh6tVA0R8qNiXt9axbOot1S/elDoBwOGjjSiC2YqLmoeQOq5oM7xTOxSfiFGvhb8E93xfRLsG2tI+7ftqub4=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 33747DA7;
-	Fri, 11 Oct 2024 07:15:02 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A372B152B;
+	Fri, 11 Oct 2024 07:15:05 -0700 (PDT)
 Received: from [10.1.31.21] (e122027.cambridge.arm.com [10.1.31.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B59763F5A1;
-	Fri, 11 Oct 2024 07:14:28 -0700 (PDT)
-Message-ID: <5540892e-bb25-47fe-8bf4-ac4481498470@arm.com>
-Date: Fri, 11 Oct 2024 15:14:26 +0100
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 045923F5A1;
+	Fri, 11 Oct 2024 07:14:32 -0700 (PDT)
+Message-ID: <6c7c7409-c3d2-4e77-b4d4-1e0042466fc0@arm.com>
+Date: Fri, 11 Oct 2024 15:14:28 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,7 +27,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 02/11] arm64: Detect if in a realm and set RIPAS RAM
+Subject: Re: [PATCH v6 04/11] arm64: rsi: Add support for checking whether an
+ MMIO is protected
 To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
 Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
  Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
@@ -41,157 +42,182 @@ Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
  Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
  <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
 References: <20241004144307.66199-1-steven.price@arm.com>
- <20241004144307.66199-3-steven.price@arm.com>
- <8a8ad27f-dc8f-4d44-bb35-67fd1133afbb@redhat.com>
+ <20241004144307.66199-5-steven.price@arm.com>
+ <2b161369-b9b3-4103-9cf4-fa316dec0ca1@redhat.com>
 From: Steven Price <steven.price@arm.com>
 Content-Language: en-GB
-In-Reply-To: <8a8ad27f-dc8f-4d44-bb35-67fd1133afbb@redhat.com>
+In-Reply-To: <2b161369-b9b3-4103-9cf4-fa316dec0ca1@redhat.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 08/10/2024 00:31, Gavin Shan wrote:
+On 08/10/2024 01:24, Gavin Shan wrote:
 > On 10/5/24 12:42 AM, Steven Price wrote:
 >> From: Suzuki K Poulose <suzuki.poulose@arm.com>
 >>
->> Detect that the VM is a realm guest by the presence of the RSI
->> interface. This is done after PSCI has been initialised so that we can
->> check the SMCCC conduit before making any RSI calls.
+>> On Arm CCA, with RMM-v1.0, all MMIO regions are shared. However, in
+>> the future, an Arm CCA-v1.0 compliant guest may be run in a lesser
+>> privileged partition in the Realm World (with Arm CCA-v1.1 Planes
+>> feature). In this case, some of the MMIO regions may be emulated
+>> by a higher privileged component in the Realm world, i.e, protected.
 >>
->> If in a realm then all memory needs to be marked as RIPAS RAM initially,
->> the loader may or may not have done this for us. To be sure iterate over
->> all RAM and mark it as such. Any failure is fatal as that implies the
->> RAM regions passed to Linux are incorrect - which would mean failing
->> later when attempting to access non-existent RAM.
+>> Thus the guest must decide today, whether a given MMIO region is shared
+>> vs Protected and create the stage1 mapping accordingly. On Arm CCA, this
+>> detection is based on the "IPA State" (RIPAS == RIPAS_IO). Provide a
+>> helper to run this check on a given range of MMIO.
 >>
+>> Also, provide a arm64 helper which may be hooked in by other solutions.
+>>
+>> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 >> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Co-developed-by: Steven Price <steven.price@arm.com>
 >> Signed-off-by: Steven Price <steven.price@arm.com>
 >> ---
->> Changes since v5:
->>   * Replace BUG_ON() with a panic() call that provides a message with the
->>     memory range that couldn't be set to RIPAS_RAM.
->>   * Move the call to arm64_rsi_init() later so that it is after PSCI,
->>     this means we can use arm_smccc_1_1_get_conduit() to check if it is
->>     safe to make RSI calls.
->> Changes since v4:
->>   * Minor tidy ups.
->> Changes since v3:
->>   * Provide safe/unsafe versions for converting memory to protected,
->>     using the safer version only for the early boot.
->>   * Use the new psci_early_test_conduit() function to avoid calling an
->>     SMC if EL3 is not present (or not configured to handle an SMC).
->> Changes since v2:
->>   * Use DECLARE_STATIC_KEY_FALSE rather than "extern struct
->>     static_key_false".
->>   * Rename set_memory_range() to rsi_set_memory_range().
->>   * Downgrade some BUG()s to WARN()s and handle the condition by
->>     propagating up the stack. Comment the remaining case that ends in a
->>     BUG() to explain why.
->>   * Rely on the return from rsi_request_version() rather than checking
->>     the version the RMM claims to support.
->>   * Rename the generic sounding arm64_setup_memory() to
->>     arm64_rsi_setup_memory() and move the call site to setup_arch().
+>> New patch for v5
 >> ---
->>   arch/arm64/include/asm/rsi.h | 66 +++++++++++++++++++++++++++++++
->>   arch/arm64/kernel/Makefile   |  3 +-
->>   arch/arm64/kernel/rsi.c      | 75 ++++++++++++++++++++++++++++++++++++
->>   arch/arm64/kernel/setup.c    |  3 ++
->>   4 files changed, 146 insertions(+), 1 deletion(-)
->>   create mode 100644 arch/arm64/include/asm/rsi.h
->>   create mode 100644 arch/arm64/kernel/rsi.c
+>>   arch/arm64/include/asm/io.h       |  8 ++++++++
+>>   arch/arm64/include/asm/rsi.h      |  2 ++
+>>   arch/arm64/include/asm/rsi_cmds.h | 21 +++++++++++++++++++++
+>>   arch/arm64/kernel/rsi.c           | 26 ++++++++++++++++++++++++++
+>>   4 files changed, 57 insertions(+)
 >>
 > 
-> Two nitpicks below.
+> With the following nitpick addressed:
 > 
 > Reviewed-by: Gavin Shan <gshan@redhat.com>
 > 
->> diff --git a/arch/arm64/include/asm/rsi.h b/arch/arm64/include/asm/rsi.h
->> new file mode 100644
->> index 000000000000..e4c01796c618
->> --- /dev/null
->> +++ b/arch/arm64/include/asm/rsi.h
->> @@ -0,0 +1,66 @@
->> +/* SPDX-License-Identifier: GPL-2.0-only */
->> +/*
->> + * Copyright (C) 2024 ARM Ltd.
->> + */
->> +
->> +#ifndef __ASM_RSI_H_
->> +#define __ASM_RSI_H_
->> +
->> +#include <linux/errno.h>
->> +#include <linux/jump_label.h>
->> +#include <asm/rsi_cmds.h>
->> +
->> +DECLARE_STATIC_KEY_FALSE(rsi_present);
->> +
->> +void __init arm64_rsi_init(void);
->> +
->> +static inline bool is_realm_world(void)
+>> diff --git a/arch/arm64/include/asm/io.h b/arch/arm64/include/asm/io.h
+>> index 1ada23a6ec19..cce445ff8e3f 100644
+>> --- a/arch/arm64/include/asm/io.h
+>> +++ b/arch/arm64/include/asm/io.h
+>> @@ -17,6 +17,7 @@
+>>   #include <asm/early_ioremap.h>
+>>   #include <asm/alternative.h>
+>>   #include <asm/cpufeature.h>
+>> +#include <asm/rsi.h>
+>>     /*
+>>    * Generic IO read/write.  These perform native-endian accesses.
+>> @@ -318,4 +319,11 @@ extern bool
+>> arch_memremap_can_ram_remap(resource_size_t offset, size_t size,
+>>                       unsigned long flags);
+>>   #define arch_memremap_can_ram_remap arch_memremap_can_ram_remap
+>>   +static inline bool arm64_is_mmio_private(phys_addr_t phys_addr,
+>> size_t size)
 >> +{
->> +    return static_branch_unlikely(&rsi_present);
->> +}
->> +
->> +static inline int rsi_set_memory_range(phys_addr_t start, phys_addr_t
->> end,
->> +                       enum ripas state, unsigned long flags)
->> +{
->> +    unsigned long ret;
->> +    phys_addr_t top;
->> +
->> +    while (start != end) {
->> +        ret = rsi_set_addr_range_state(start, end, state, flags, &top);
->> +        if (WARN_ON(ret || top < start || top > end))
->> +            return -EINVAL;
->> +        start = top;
->> +    }
->> +
->> +    return 0;
+>> +    if (unlikely(is_realm_world()))
+>> +        return arm64_is_protected_mmio(phys_addr, size);
+>> +    return false;
 >> +}
 >> +
 > 
-> The WARN_ON() is redundant when the caller is arm64_rsi_setup_memory(),
-> where
-> system panic is invoked on any errors. So we perhaps need to drop the
-> WARN_ON().
-
-Actually this is error when I was preparing the series - the WARN_ON is
-then dropped in the next patch. Thanks for pointing it out!
-
-> [...]
+> The function names (arm64_is_{mmio_private, protected_mmio} are
+> indicators to the
+> MMIO region's state or property. arm64_is_mmio_private() indicates the
+> MMIO region
+> is 'private MMIO' while arm64_is_protected_mmio() indicates the MMIO
+> region is
+> 'protected MMIO'. They are equivalent and it may be worthy to unify the
+> function
+> names (indicators) as below.
 > 
->> +
->> +static void __init arm64_rsi_setup_memory(void)
->> +{
->> +    u64 i;
->> +    phys_addr_t start, end;
->> +
->> +    /*
->> +     * Iterate over the available memory ranges and convert the state to
->> +     * protected memory. We should take extra care to ensure that we
->> DO NOT
->> +     * permit any "DESTROYED" pages to be converted to "RAM".
->> +     *
->> +     * panic() is used because if the attempt to switch the memory to
->> +     * protected has failed here, then future accesses to the memory are
->> +     * simply going to be reflected as a SEA (Synchronous External
->> Abort)
->> +     * which we can't handle.  Bailing out early prevents the guest
->> limping
->> +     * on and dying later.
->> +     */
->> +    for_each_mem_range(i, &start, &end) {
->> +        if (rsi_set_memory_range_protected_safe(start, end))
->> +            panic("Failed to set memory range to protected: %pa-%pa",
->> +                  &start, &end);
->> +    }
->> +}
->> +
+>   option#1                         option#2
+>   --------                         --------
+>   arm64_is_private_mmio            arm64_is_protected_mmio
+>   __arm64_is_private_mmio          __arm64_is_protected_mmio
 > 
-> {} is needed since the panic statement spans multiple lines.
 
-Ack.
+Very valid point, I think I prefer option #2 here - "protected" is the
+architectural term in CCA.
 
 Thanks,
 Steve
+
+>>   #endif    /* __ASM_IO_H */
+>> diff --git a/arch/arm64/include/asm/rsi.h b/arch/arm64/include/asm/rsi.h
+>> index acba065eb00e..42ff93c7b0ba 100644
+>> --- a/arch/arm64/include/asm/rsi.h
+>> +++ b/arch/arm64/include/asm/rsi.h
+>> @@ -14,6 +14,8 @@ DECLARE_STATIC_KEY_FALSE(rsi_present);
+>>     void __init arm64_rsi_init(void);
+>>   +bool arm64_is_protected_mmio(phys_addr_t base, size_t size);
+>> +
+>>   static inline bool is_realm_world(void)
+>>   {
+>>       return static_branch_unlikely(&rsi_present);
+>> diff --git a/arch/arm64/include/asm/rsi_cmds.h
+>> b/arch/arm64/include/asm/rsi_cmds.h
+>> index b661331c9204..fdb47f690307 100644
+>> --- a/arch/arm64/include/asm/rsi_cmds.h
+>> +++ b/arch/arm64/include/asm/rsi_cmds.h
+>> @@ -45,6 +45,27 @@ static inline unsigned long
+>> rsi_get_realm_config(struct realm_config *cfg)
+>>       return res.a0;
+>>   }
+>>   +static inline unsigned long rsi_ipa_state_get(phys_addr_t start,
+>> +                          phys_addr_t end,
+>> +                          enum ripas *state,
+>> +                          phys_addr_t *top)
+>> +{
+>> +    struct arm_smccc_res res;
+>> +
+>> +    arm_smccc_smc(SMC_RSI_IPA_STATE_GET,
+>> +              start, end, 0, 0, 0, 0, 0,
+>> +              &res);
+>> +
+>> +    if (res.a0 == RSI_SUCCESS) {
+>> +        if (top)
+>> +            *top = res.a1;
+>> +        if (state)
+>> +            *state = res.a2;
+>> +    }
+>> +
+>> +    return res.a0;
+>> +}
+>> +
+>>   static inline unsigned long rsi_set_addr_range_state(phys_addr_t start,
+>>                                phys_addr_t end,
+>>                                enum ripas state,
+>> diff --git a/arch/arm64/kernel/rsi.c b/arch/arm64/kernel/rsi.c
+>> index a6495a64d9bb..d7bba4cee627 100644
+>> --- a/arch/arm64/kernel/rsi.c
+>> +++ b/arch/arm64/kernel/rsi.c
+>> @@ -66,6 +66,32 @@ static void __init arm64_rsi_setup_memory(void)
+>>       }
+>>   }
+>>   +bool arm64_is_protected_mmio(phys_addr_t base, size_t size)
+>> +{
+>> +    enum ripas ripas;
+>> +    phys_addr_t end, top;
+>> +
+>> +    /* Overflow ? */
+>> +    if (WARN_ON(base + size <= base))
+>> +        return false;
+>> +
+>> +    end = ALIGN(base + size, RSI_GRANULE_SIZE);
+>> +    base = ALIGN_DOWN(base, RSI_GRANULE_SIZE);
+>> +
+>> +    while (base < end) {
+>> +        if (WARN_ON(rsi_ipa_state_get(base, end, &ripas, &top)))
+>> +            break;
+>> +        if (WARN_ON(top <= base))
+>> +            break;
+>> +        if (ripas != RSI_RIPAS_DEV)
+>> +            break;
+>> +        base = top;
+>> +    }
+>> +
+>> +    return base >= end;
+>> +}
+>> +EXPORT_SYMBOL(arm64_is_protected_mmio);
+>> +
+> 
+> The function may be worthy to be renamed to __arm64_is_private_mmio, as
+> explained
+> as above.
+> 
+>>   void __init arm64_rsi_init(void)
+>>   {
+>>       if (arm_smccc_1_1_get_conduit() != SMCCC_CONDUIT_SMC)
+> 
+> Thanks,
+> Gavin
+> 
 
