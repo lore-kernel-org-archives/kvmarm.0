@@ -1,245 +1,295 @@
-Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76A32218588
-	for <kvmarm@lists.linux.dev>; Fri, 11 Oct 2024 12:56:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC371218582
+	for <kvmarm@lists.linux.dev>; Fri, 11 Oct 2024 12:58:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728651377; cv=none; b=T1mjq1Mr/Seo8daT+3wetb0OaylnLq/rCqrw77UbnWat1isVqUA9ky0Bbs39R0EW4k+ZP+byy6KTgFDwscED+Rk8emgf7Lw3S5RGZHo+LRc0VClSaM0haVb4ZtfKHeOhn5m7srBb0y6OwOGlMJKT62Lb6bah3PA1nlogz1IE4W0=
+	t=1728651527; cv=none; b=b2KO2mCjWi5NNuvgnEmYcEPQgjuCgO3aXzLqgf4gWAyF8Y0VMVFsun0paG3fSbeXC///6Xgpg/DCQAaj72u2BzLQkhUMcft5V+g+ePqA4Lf/JaKqUPPTjoZiAm6o0S5gF7252WyOsaTbRptXT7dP3ZWA7TMsqYKp5kBRXuvO3os=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728651377; c=relaxed/simple;
-	bh=F65bfxBMhT5sT+0wha2wr3NScIjN5BrEZRD/gdbDLt4=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=t4RZoen5MmcPZMoLsSKDaWy64UV3eGXdlTZhw1fqJZ9ja/xtRMkjmUVuEzmaDx85TaEsyNjfIDcTGjtR7Uppm/kfYEPH/WFnFk5OZDH/4xUS5EbPIFz/Bf8S7a6CZTlDFD09ClDejbRUTprE4hh2bq5zWqpVsEDtfVs0dsVHd+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b=f7BZcfmm; arc=none smtp.client-ip=207.171.188.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
+	s=arc-20240116; t=1728651527; c=relaxed/simple;
+	bh=+7mddZED1wYsecI+uoxMxnniKJWRDPds6zSxyllw4ZQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=P1474k9hnYMoW5ZOLgGpZhhN1DS0ReyLlN4ILrCIu1sWAO8cd2Cc6OZQlyM5E+PCsSdgvYKxxnl3LRQcDVjd0yaR98ianRhk59d6P4sa5Fxele7snf8Q7UCuXAKWQ95r3qDVq1jx/z7aDwzJld74thj9N0thzzn7rjTfgVux1xA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QSVeHKL9; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b="f7BZcfmm"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1728651376; x=1760187376;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:mime-version:
-   content-transfer-encoding;
-  bh=F65bfxBMhT5sT+0wha2wr3NScIjN5BrEZRD/gdbDLt4=;
-  b=f7BZcfmmpeO1gcaAV7yIB17RZEnlT632ZBuNPWpchRe4LmilQrDe+dlY
-   QnnMder0Y52zzd/IfY9p9fDnJqAVbVciIe9rT4EdVardlOnBnFHxC2igZ
-   INS5i1nlR7jWSpO6RxNWXJOUZhzfLL5WnebwlNz8OjpEM0vVdyIB3YF1i
-   I=;
-X-IronPort-AV: E=Sophos;i="6.11,195,1725321600"; 
-   d="scan'208";a="765755123"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Oct 2024 12:56:09 +0000
-Received: from EX19MTAEUB001.ant.amazon.com [10.0.43.254:53171]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.34.166:2525] with esmtp (Farcaster)
- id ca804dee-56b2-48f1-9ffb-e8dcd06beabd; Fri, 11 Oct 2024 12:56:07 +0000 (UTC)
-X-Farcaster-Flow-ID: ca804dee-56b2-48f1-9ffb-e8dcd06beabd
-Received: from EX19D007EUB003.ant.amazon.com (10.252.51.43) by
- EX19MTAEUB001.ant.amazon.com (10.252.51.28) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 11 Oct 2024 12:56:06 +0000
-Received: from EX19D026EUB001.ant.amazon.com (10.252.61.12) by
- EX19D007EUB003.ant.amazon.com (10.252.51.43) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Fri, 11 Oct 2024 12:56:06 +0000
-Received: from EX19D026EUB001.ant.amazon.com ([fe80::461a:a9c3:6352:d9d1]) by
- EX19D026EUB001.ant.amazon.com ([fe80::461a:a9c3:6352:d9d1%4]) with mapi id
- 15.02.1258.034; Fri, 11 Oct 2024 12:56:06 +0000
-From: "Mediouni, Mohamed" <mediou@amazon.de>
-To: David Hildenbrand <david@redhat.com>
-CC: "Mehanna, Fares" <faresx@amazon.de>, "akpm@linux-foundation.org"
-	<akpm@linux-foundation.org>, "ardb@kernel.org" <ardb@kernel.org>,
-	"arnd@arndb.de" <arnd@arndb.de>, "bhelgaas@google.com" <bhelgaas@google.com>,
-	"broonie@kernel.org" <broonie@kernel.org>, "catalin.marinas@arm.com"
-	<catalin.marinas@arm.com>, "james.morse@arm.com" <james.morse@arm.com>,
-	"javierm@redhat.com" <javierm@redhat.com>, "jean-philippe@linaro.org"
-	<jean-philippe@linaro.org>, "joey.gouly@arm.com" <joey.gouly@arm.com>,
-	"kristina.martsenko@arm.com" <kristina.martsenko@arm.com>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"mark.rutland@arm.com" <mark.rutland@arm.com>, "maz@kernel.org"
-	<maz@kernel.org>, "nh-open-source@amazon.com" <nh-open-source@amazon.com>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, "ptosi@google.com"
-	<ptosi@google.com>, "rdunlap@infradead.org" <rdunlap@infradead.org>, "Kagan,
- Roman" <rkagan@amazon.de>, "rppt@kernel.org" <rppt@kernel.org>,
-	"shikemeng@huaweicloud.com" <shikemeng@huaweicloud.com>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "tabba@google.com"
-	<tabba@google.com>, "will@kernel.org" <will@kernel.org>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>
-Subject: Re: [RFC PATCH 0/7] support for mm-local memory allocations and use
- it
-Thread-Topic: [RFC PATCH 0/7] support for mm-local memory allocations and use
- it
-Thread-Index: AQHbBFfTHkfWP5JGCkGvLyon8je4I7JrsYmAgBSeggCAAVKjAIAACPEAgAAFhAA=
-Date: Fri, 11 Oct 2024 12:56:06 +0000
-Message-ID: <C35C04F5-DEC3-45B3-A049-ED433F34767D@amazon.de>
-References: <813b9bcb-afde-40b6-a604-cdb71b4b6d7a@redhat.com>
- <20241010155210.13321-1-faresx@amazon.de>
- <465ce78b-d023-40e6-b066-5e4a01e266b6@redhat.com>
- <6E620679-FC47-4B13-BEF6-B63975881CCD@amazon.de>
-In-Reply-To: <6E620679-FC47-4B13-BEF6-B63975881CCD@amazon.de>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <EBDB2140A2C29844AFECAE6F8BCF96F5@amazon.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QSVeHKL9"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1728651524;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=HymYYfVW1qZz3H508wC+nWBcyxC6MerXDfv7v9abyNQ=;
+	b=QSVeHKL9N4fGC4c9fTsz3Zv54kf18R7pnkzAXy8ZUuXGUfqxcmaQybwYKYlx9ycTSKOMsj
+	YwJJcBd0QqhCwzdjEga0/mZL5b5tEnECDP7ImtOYdkOmHSxENq/I0DUnFiSgI5t68Ch/TV
+	ht99mXfAlIbkNshBe8/ycBJuG+ixWqs=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-693-A7r6VL0hM6y2QCHyHOsNpQ-1; Fri, 11 Oct 2024 08:58:41 -0400
+X-MC-Unique: A7r6VL0hM6y2QCHyHOsNpQ-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-37d5606250aso291566f8f.2
+        for <kvmarm@lists.linux.dev>; Fri, 11 Oct 2024 05:58:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728651521; x=1729256321;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=HymYYfVW1qZz3H508wC+nWBcyxC6MerXDfv7v9abyNQ=;
+        b=GFHP+nLf0CC4CerD2nbdtwyvN6uzJfhfARyDbQGue1r2l5mMIF+240Gm095KQg32Ft
+         WaDxPtiQN6fiDXYXj3IBV6YtYsYL+3i/vB88zPYjJbCnnUpfn97C+VQE/fgt/ya4OYhd
+         hW6tYDsVMEI5Hf3/80ysY12nQZe6QhB82eYNyqUS9+8C71WdApoPmqeavXV33yIljI3f
+         R5ZyomEX+w5H1E+AS830/DzjfqUkqqm4D8e/2DPxI+8FBy+5t/NehbCEv5tvA1Y7mHO1
+         s6owz68lA5DoKzyzDDqUOlGZdednPO2zSq250zy/PIvHP9oxIpT4rIIEv4hr0U3OZJNF
+         WqkQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVgW0Wa4mykado4AirT6qhR3eVivsG+AZIAngppFVrEcL+lNovGpeGA44GXzRXD6fJOOorRII8=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yxa1garE1e2v+bMgyEe16+bAe3JWHSLYHYQfODfkoZPPADxvKDD
+	4KgxEeyOCXTL/WlP9dyCLHcsJbrEJQqDFC9YEDb9yREOpOIn5mklnhnemuFOrDw2AOhbbhFBiKW
+	+uuUjMktmI78oKju2kKm0Ujc47GPYJh+V23yqmsVtf94GmB1WfGMA2A==
+X-Received: by 2002:adf:a111:0:b0:37d:4a80:c395 with SMTP id ffacd0b85a97d-37d551b965dmr1729803f8f.21.1728651520607;
+        Fri, 11 Oct 2024 05:58:40 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE1xS+pAjaQ098/BCA16JIYTmXKgXmYVulc5ENoXgDJM+UuCSTduUy8KRzdbADsXgm3sUTwlA==
+X-Received: by 2002:adf:a111:0:b0:37d:4a80:c395 with SMTP id ffacd0b85a97d-37d551b965dmr1729779f8f.21.1728651520150;
+        Fri, 11 Oct 2024 05:58:40 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c749:9100:c078:eec6:f2f4:dd3b? (p200300cbc7499100c078eec6f2f4dd3b.dip0.t-ipconnect.de. [2003:cb:c749:9100:c078:eec6:f2f4:dd3b])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d4b6a8ac3sm3875758f8f.3.2024.10.11.05.58.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 11 Oct 2024 05:58:39 -0700 (PDT)
+Message-ID: <63d112d8-62d0-4e95-81f0-3031f990abc4@redhat.com>
+Date: Fri, 11 Oct 2024 14:58:38 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 0/7] support for mm-local memory allocations and use
+ it
+To: "Mediouni, Mohamed" <mediou@amazon.de>
+Cc: "Mehanna, Fares" <faresx@amazon.de>,
+ "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+ "ardb@kernel.org" <ardb@kernel.org>, "arnd@arndb.de" <arnd@arndb.de>,
+ "bhelgaas@google.com" <bhelgaas@google.com>,
+ "broonie@kernel.org" <broonie@kernel.org>,
+ "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+ "james.morse@arm.com" <james.morse@arm.com>,
+ "javierm@redhat.com" <javierm@redhat.com>,
+ "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+ "joey.gouly@arm.com" <joey.gouly@arm.com>,
+ "kristina.martsenko@arm.com" <kristina.martsenko@arm.com>,
+ "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-mm@kvack.org" <linux-mm@kvack.org>,
+ "mark.rutland@arm.com" <mark.rutland@arm.com>,
+ "maz@kernel.org" <maz@kernel.org>,
+ "nh-open-source@amazon.com" <nh-open-source@amazon.com>,
+ "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+ "ptosi@google.com" <ptosi@google.com>,
+ "rdunlap@infradead.org" <rdunlap@infradead.org>,
+ "Kagan, Roman" <rkagan@amazon.de>, "rppt@kernel.org" <rppt@kernel.org>,
+ "shikemeng@huaweicloud.com" <shikemeng@huaweicloud.com>,
+ "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+ "tabba@google.com" <tabba@google.com>, "will@kernel.org" <will@kernel.org>,
+ "yuzenghui@huawei.com" <yuzenghui@huawei.com>
+References: <813b9bcb-afde-40b6-a604-cdb71b4b6d7a@redhat.com>
+ <20241010155210.13321-1-faresx@amazon.de>
+ <465ce78b-d023-40e6-b066-5e4a01e266b6@redhat.com>
+ <6E620679-FC47-4B13-BEF6-B63975881CCD@amazon.de>
+ <C35C04F5-DEC3-45B3-A049-ED433F34767D@amazon.de>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <C35C04F5-DEC3-45B3-A049-ED433F34767D@amazon.de>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-DQoNCj4gT24gMTEuIE9jdCAyMDI0LCBhdCAxNDozNiwgTWVkaW91bmksIE1vaGFtZWQgPG1lZGlv
-dUBhbWF6b24uZGU+IHdyb3RlOg0KPiANCj4gDQo+IA0KPj4gT24gMTEuIE9jdCAyMDI0LCBhdCAx
-NDowNCwgRGF2aWQgSGlsZGVuYnJhbmQgPGRhdmlkQHJlZGhhdC5jb20+IHdyb3RlOg0KPj4gDQo+
-PiBPbiAxMC4xMC4yNCAxNzo1MiwgRmFyZXMgTWVoYW5uYSB3cm90ZToNCj4+Pj4+IEluIGEgc2Vy
-aWVzIHBvc3RlZCBhIGZldyB5ZWFycyBhZ28gWzFdLCBhIHByb3Bvc2FsIHdhcyBwdXQgZm9yd2Fy
-ZCB0byBhbGxvdyB0aGUNCj4+Pj4+IGtlcm5lbCB0byBhbGxvY2F0ZSBtZW1vcnkgbG9jYWwgdG8g
-YSBtbSBhbmQgdGh1cyBwdXNoIGl0IG91dCBvZiByZWFjaCBmb3INCj4+Pj4+IGN1cnJlbnQgYW5k
-IGZ1dHVyZSBzcGVjdWxhdGlvbi1iYXNlZCBjcm9zcy1wcm9jZXNzIGF0dGFja3MuICBXZSBzdGls
-bCBiZWxpZXZlDQo+Pj4+PiB0aGlzIGlzIGEgbmljZSB0aGluZyB0byBoYXZlLg0KPj4+Pj4gDQo+
-Pj4+PiBIb3dldmVyLCBpbiB0aGUgdGltZSBwYXNzZWQgc2luY2UgdGhhdCBwb3N0IExpbnV4IG1t
-IGhhcyBncm93biBxdWl0ZSBhIGZldyBuZXcNCj4+Pj4+IGdvb2RpZXMsIHNvIHdlJ2QgbGlrZSB0
-byBleHBsb3JlIHBvc3NpYmlsaXRpZXMgdG8gaW1wbGVtZW50IHRoaXMgZnVuY3Rpb25hbGl0eQ0K
-Pj4+Pj4gd2l0aCBsZXNzIGVmZm9ydCBhbmQgY2h1cm4gbGV2ZXJhZ2luZyB0aGUgbm93IGF2YWls
-YWJsZSBmYWNpbGl0aWVzLg0KPj4+Pj4gDQo+Pj4+PiBBbiBSRkMgd2FzIHBvc3RlZCBmZXcgbW9u
-dGhzIGJhY2sgWzJdIHRvIHNob3cgdGhlIHByb29mIG9mIGNvbmNlcHQgYW5kIGEgc2ltcGxlDQo+
-Pj4+PiB0ZXN0IGRyaXZlci4NCj4+Pj4+IA0KPj4+Pj4gSW4gdGhpcyBSRkMsIHdlJ3JlIHVzaW5n
-IHRoZSBzYW1lIGFwcHJvYWNoIG9mIGltcGxlbWVudGluZyBtbS1sb2NhbCBhbGxvY2F0aW9ucw0K
-Pj4+Pj4gcGlnZ3ktYmFja2luZyBvbiBtZW1mZF9zZWNyZXQoKSwgdXNpbmcgcmVndWxhciB1c2Vy
-IGFkZHJlc3NlcyBidXQgcGlubmluZyB0aGUNCj4+Pj4+IHBhZ2VzIGFuZCBmbGlwcGluZyB0aGUg
-dXNlci9zdXBlcnZpc29yIGZsYWcgb24gdGhlIHJlc3BlY3RpdmUgUFRFcyB0byBtYWtlIHRoZW0N
-Cj4+Pj4+IGRpcmVjdGx5IGFjY2Vzc2libGUgZnJvbSBrZXJuZWwuDQo+Pj4+PiBJbiBhZGRpdGlv
-biB0byB0aGF0IHdlIGFyZSBzdWJtaXR0aW5nIDUgcGF0Y2hlcyB0byB1c2UgdGhlIHNlY3JldCBt
-ZW1vcnkgdG8gaGlkZQ0KPj4+Pj4gdGhlIHZDUFUgZ3AtcmVncyBhbmQgZnAtcmVncyBvbiBhcm02
-NCBWSEUgc3lzdGVtcy4NCj4+Pj4gDQo+Pj4+IEknbSBhIGJpdCBsb3N0IG9uIHdoYXQgZXhhY3Rs
-eSB3ZSB3YW50IHRvIGFjaGlldmUuIFRoZSBwb2ludCB3aGVyZSB3ZQ0KPj4+PiBzdGFydCBmbGlw
-cGluZyB1c2VyL3N1cGVydmlzb3IgZmxhZ3MgY29uZnVzZXMgbWUgOikNCj4+Pj4gDQo+Pj4+IFdp
-dGggc2VjcmV0bWVtLCB5b3UnZCBnZXQgbWVtb3J5IGFsbG9jYXRlZCB0aGF0DQo+Pj4+IChhKSBJ
-cyBhY2Nlc3NpYmxlIGJ5IHVzZXIgc3BhY2UgLS0gbWFwcGVkIGludG8gdXNlciBzcGFjZS4NCj4+
-Pj4gKGIpIElzIGluYWNjZXNzaWJsZSBieSBrZXJuZWwgc3BhY2UgLS0gbm90IG1hcHBlZCBpbnRv
-IHRoZSBkaXJlY3QgbWFwDQo+Pj4+IChjKSBHVVAgd2lsbCBmYWlsLCBidXQgY29weV9mcm9tIC8g
-Y29weV90byB1c2VyIHdpbGwgd29yay4NCj4+Pj4gDQo+Pj4+IA0KPj4+PiBBbm90aGVyIHdheSwg
-d2l0aG91dCBzZWNyZXRtZW0sIHdvdWxkIGJlIHRvIGNvbnNpZGVyIHRoZXNlICJzZWNyZXRzIg0K
-Pj4+PiBrZXJuZWwgYWxsb2NhdGlvbnMgdGhhdCBjYW4gYmUgbWFwcGVkIGludG8gdXNlciBzcGFj
-ZSB1c2luZyBtbWFwKCkgb2YgYQ0KPj4+PiBzcGVjaWFsIGZkLiBUaGF0IGlzLCB0aGV5IHdvdWxk
-bid0IGhhdmUgdGhlaXIgb3JpZ2luIGluIHNlY3JldG1lbSwgYnV0DQo+Pj4+IGluIEtWTSBhcyBh
-IGtlcm5lbCBhbGxvY2F0aW9uLiBJdCBjb3VsZCBiZSBhY2hpZXZlZCBieSB1c2luZyBWTV9NSVhF
-RE1BUA0KPj4+PiB3aXRoIHZtX2luc2VydF9wYWdlcygpLCBtYW51YWxseSByZW1vdmluZyB0aGVt
-IGZyb20gdGhlIGRpcmVjdG1hcC4NCj4+Pj4gDQo+Pj4+IEJ1dCwgSSBhbSBub3Qgc3VyZSB3aG8g
-aXMgc3VwcG9zZWQgdG8gYWNjZXNzIHdoYXQuIExldCdzIGV4cGxvcmUgdGhlDQo+Pj4+IHJlcXVp
-cmVtZW50cy4gSSBhc3N1bWUgd2Ugd2FudDoNCj4+Pj4gDQo+Pj4+IChhKSBQYWdlcyBhY2Nlc3Np
-YmxlIGJ5IHVzZXIgc3BhY2UgLS0gbWFwcGVkIGludG8gdXNlciBzcGFjZS4NCj4+Pj4gKGIpIFBh
-Z2VzIGluYWNjZXNzaWJsZSBieSBrZXJuZWwgc3BhY2UgLS0gbm90IG1hcHBlZCBpbnRvIHRoZSBk
-aXJlY3QgbWFwDQo+Pj4+IChjKSBHVVAgdG8gZmFpbCAobm8gZGlyZWN0IG1hcCkuDQo+Pj4+IChk
-KSBjb3B5X2Zyb20gLyBjb3B5X3RvIHVzZXIgdG8gZmFpbD8NCj4+Pj4gDQo+Pj4+IEFuZCBvbiB0
-b3Agb2YgdGhhdCwgc29tZSB3YXkgdG8gYWNjZXNzIHRoZXNlIHBhZ2VzIG9uIGRlbWFuZCBmcm9t
-IGtlcm5lbA0KPj4+PiBzcGFjZT8gKHRlbXBvcmFyeSBDUFUtbG9jYWwgbWFwcGluZz8pDQo+Pj4+
-IA0KPj4+PiBPciBob3cgd291bGQgdGhlIGtlcm5lbCBtYWtlIHVzZSBvZiB0aGVzZSBhbGxvY2F0
-aW9ucz8NCj4+Pj4gDQo+Pj4+IC0tIA0KPj4+PiBDaGVlcnMsDQo+Pj4+IA0KPj4+PiBEYXZpZCAv
-IGRoaWxkZW5iDQo+Pj4gSGkgRGF2aWQsDQo+PiANCj4+IEhpIEZhcmVzIQ0KPj4gDQo+Pj4gVGhh
-bmtzIGZvciB0YWtpbmcgYSBsb29rIGF0IHRoZSBwYXRjaGVzIQ0KPj4+IFdlJ3JlIHRyeWluZyB0
-byBhbGxvY2F0ZSBhIGtlcm5lbCBtZW1vcnkgdGhhdCBpcyBhY2Nlc3NpYmxlIHRvIHRoZSBrZXJu
-ZWwgYnV0DQo+Pj4gb25seSB3aGVuIHRoZSBjb250ZXh0IG9mIHRoZSBwcm9jZXNzIGlzIGxvYWRl
-ZC4NCj4+PiBTbyB0aGlzIGlzIGEga2VybmVsIG1lbW9yeSB0aGF0IGlzIG5vdCBuZWVkZWQgdG8g
-b3BlcmF0ZSB0aGUga2VybmVsIGl0c2VsZiwgaXQNCj4+PiBpcyB0byBzdG9yZSAmIHByb2Nlc3Mg
-ZGF0YSBvbiBiZWhhbGYgb2YgYSBwcm9jZXNzLiBUaGUgcmVxdWlyZW1lbnQgZm9yIHRoaXMNCj4+
-PiBtZW1vcnkgaXMgdGhhdCBpdCB3b3VsZCBuZXZlciBiZSB0b3VjaGVkIHVubGVzcyB0aGUgcHJv
-Y2VzcyBpcyBzY2hlZHVsZWQgb24gdGhpcw0KPj4+IGNvcmUuIG90aGVyd2lzZSBhbnkgb3RoZXIg
-YWNjZXNzIHdpbGwgY3Jhc2ggdGhlIGtlcm5lbC4NCj4+PiBTbyB0aGlzIG1lbW9yeSBzaG91bGQg
-b25seSBiZSBkaXJlY3RseSByZWFkYWJsZSBhbmQgd3JpdGFibGUgYnkgdGhlIGtlcm5lbCwgYnV0
-DQo+Pj4gb25seSB3aGVuIHRoZSBwcm9jZXNzIGNvbnRleHQgaXMgbG9hZGVkLiBUaGUgbWVtb3J5
-IHNob3VsZG4ndCBiZSByZWFkYWJsZSBvcg0KPj4+IHdyaXRhYmxlIGJ5IHRoZSBvd25lciBwcm9j
-ZXNzIGF0IGFsbC4NCj4+PiBUaGlzIGlzIGJhc2ljYWxseSBkb25lIGJ5IHJlbW92aW5nIHRob3Nl
-IHBhZ2VzIGZyb20ga2VybmVsIGxpbmVhciBhZGRyZXNzIGFuZA0KPj4+IGF0dGFjaGluZyB0aGVt
-IG9ubHkgaW4gdGhlIHByb2Nlc3MgbW1fc3RydWN0LiBTbyBkdXJpbmcgY29udGV4dCBzd2l0Y2hp
-bmcgdGhlDQo+Pj4ga2VybmVsIGxvc2VzIGFjY2VzcyB0byB0aGUgc2VjcmV0IG1lbW9yeSBzY2hl
-ZHVsZWQgb3V0IGFuZCBnYWluIGFjY2VzcyB0byB0aGUNCj4+PiBuZXcgcHJvY2VzcyBzZWNyZXQg
-bWVtb3J5Lg0KPj4+IFRoaXMgZ2VuZXJhbGx5IHByb3RlY3RzIGFnYWluc3Qgc3BlY3VsYXRpb24g
-YXR0YWNrcywgYW5kIGlmIG90aGVyIHByb2Nlc3MgbWFuYWdlZA0KPj4+IHRvIHRyaWNrIHRoZSBr
-ZXJuZWwgdG8gbGVhayBkYXRhIGZyb20gbWVtb3J5LiBJbiB0aGlzIGNhc2UgdGhlIGtlcm5lbCB3
-aWxsIGNyYXNoDQo+Pj4gaWYgaXQgdHJpZXMgdG8gYWNjZXNzIG90aGVyIHByb2Nlc3NlcyBzZWNy
-ZXQgbWVtb3J5Lg0KPj4+IFNpbmNlIHRoaXMgbWVtb3J5IGlzIHNwZWNpYWwgaW4gdGhlIHNlbnNl
-IHRoYXQgaXQgaXMga2VybmVsIG1lbW9yeSBidXQgb25seSBtYWtlDQo+Pj4gc2Vuc2UgaW4gdGhl
-IHRlcm0gb2YgdGhlIG93bmVyIHByb2Nlc3MsIEkgdHJpZWQgaW4gdGhpcyBwYXRjaCBzZXJpZXMg
-dG8gZXhwbG9yZQ0KPj4+IHRoZSBwb3NzaWJpbGl0eSBvZiByZXVzaW5nIG1lbWZkX3NlY3JldCgp
-IHRvIGFsbG9jYXRlIHRoaXMgbWVtb3J5IGluIHVzZXIgdmlydHVhbA0KPj4+IGFkZHJlc3Mgc3Bh
-Y2UsIG1hbmFnZSBpdCBpbiBhIFZNQSwgZmxpcHBpbmcgdGhlIHBlcm1pc3Npb25zIHdoaWxlIGtl
-ZXBpbmcgdGhlDQo+Pj4gY29udHJvbCBvZiB0aGUgbWFwcGluZyBleGNsdXNpdmVseSB3aXRoIHRo
-ZSBrZXJuZWwuDQo+Pj4gUmlnaHQgbm93IGl0IGlzOg0KPj4+IChhKSBQYWdlcyBub3QgYWNjZXNz
-aWJsZSBieSB1c2VyIHNwYWNlIC0tIGV2ZW4gdGhvdWdoIHRoZXkgYXJlIG1hcHBlZCBpbnRvIHVz
-ZXINCj4+PiAgICBzcGFjZSwgdGhlIFBURXMgYXJlIG1hcmtlZCBmb3Iga2VybmVsIHVzYWdlLg0K
-Pj4gDQo+PiBBaCwgdGhhdCBpcyB0aGUgZGV0YWlsIEkgd2FzIG1pc3NpbmcsIG5vdyBJIHNlZSB3
-aGF0IHlvdSBhcmUgdHJ5aW5nIHRvIGFjaGlldmUsIHRoYW5rcyENCj4+IA0KPj4gSXQgaXMgYSBi
-aXQgYXJjaGl0ZWN0dXJlIHNwZWNpZmljLCBiZWNhdXNlIC4uLiBpbWFnaW5lIGFyY2hpdGVjdHVy
-ZXMgdGhhdCBoYXZlIHNlcGFyYXRlIGtlcm5lbCt1c2VyIHNwYWNlIHBhZ2UgdGFibGUgaGllcmFy
-Y2hpZXMsIGFuZCBub3QgYSBzaW1wbGUgUFRFIGZsYWcgdG8gY2hhbmdlIGFjY2VzcyBwZXJtaXNz
-aW9ucyBiZXR3ZWVuIGtlcm5lbC91c2VyIHNwYWNlLg0KPj4gDQo+PiBJSVJDIHMzOTAgaXMgb25l
-IHN1Y2ggYXJjaGl0ZWN0dXJlIHRoYXQgdXNlcyBzZXBhcmF0ZSBwYWdlIHRhYmxlcyBmb3IgdGhl
-IHVzZXItc3BhY2UgKyBrZXJuZWwtc3BhY2UgcG9ydGlvbnMuDQo+PiANCj4+PiAoYikgUGFnZXMg
-YWNjZXNzaWJsZSBieSBrZXJuZWwgc3BhY2UgLS0gZXZlbiB0aG91Z2ggdGhleSBhcmUgbm90IG1h
-cHBlZCBpbnRvIHRoZQ0KPj4+ICAgIGRpcmVjdCBtYXAsIHRoZSBQVEVzIGluIHV2YWRkciBhcmUg
-bWFya2VkIGZvciBrZXJuZWwgdXNhZ2UuDQo+Pj4gKGMpIGNvcHlfZnJvbSAvIGNvcHlfdG8gdXNl
-ciB3b24ndCBmYWlsIC0tIGJlY2F1c2UgaXQgaXMgaW4gdGhlIHVzZXIgcmFuZ2UsIGJ1dA0KPj4+
-ICAgIHRoaXMgY2FuIGJlIGZpeGVkIGJ5IGFsbG9jYXRpbmcgc3BlY2lmaWMgcmFuZ2UgaW4gdXNl
-ciB2YWRkciB0byB0aGlzIGZlYXR1cmUNCj4+PiAgICBhbmQgY2hlY2sgYWdhaW5zdCB0aGlzIHJh
-bmdlIHRoZXJlLg0KPj4+IChkKSBUaGUgc2VjcmV0IG1lbW9yeSB2YWRkciBpcyBndWVzc2FibGUg
-YnkgdGhlIG93bmVyIHByb2Nlc3MgLS0gdGhhdCBjYW4gYWxzbw0KPj4+ICAgIGJlIGZpeGVkIGJ5
-IGFsbG9jYXRpbmcgYmlnZ2VyIGNodW5rIG9mIHVzZXIgdmFkZHIgZm9yIHRoaXMgZmVhdHVyZSBh
-bmQNCj4+PiAgICByYW5kb21seSBwbGFjaW5nIHRoZSBzZWNyZXQgbWVtb3J5IHRoZXJlLg0KPj4+
-IChlKSBNYXBwaW5nIGlzIG9mZi1saW1pdHMgdG8gdGhlIG93bmVyIHByb2Nlc3MgYnkgbWFya2lu
-ZyB0aGUgVk1BIGFzIGxvY2tlZCwNCj4+PiAgICBzZWFsZWQgYW5kIHNwZWNpYWwuDQo+PiANCj4+
-IE9rYXksIHNvIGluIHRoaXMgUkZDIHlvdSBhcmUganVtcGluZyB0aHJvdWdoIHF1aXRlIHNvbWUg
-aG9vcHMgdG8gaGF2ZSBhIGtlcm5lbCBhbGxvY2F0aW9uIHVubWFwcGVkIGZyb20gdGhlIGRpcmVj
-dCBtYXAgYnV0IG1hcHBlZCBpbnRvIGEgcGVyLXByb2Nlc3MgcGFnZSB0YWJsZSBvbmx5IGFjY2Vz
-c2libGUgYnkga2VybmVsIHNwYWNlLiA6KQ0KPj4gDQo+PiBTbyB5b3UgcmVhbGx5IGRvbid0IHdh
-bnQgdGhpcyBtYXBwZWQgaW50byB1c2VyIHNwYWNlIGF0IGFsbCAoY29uc2VxdWVudGx5LCBubyBH
-VVAsIG5vIGFjY2Vzcywgbm8gY29weV9mcm9tX3VzZXIgLi4uKS4gSW4gdGhpcyBSRkMgaXQncyBt
-YXBwZWQgYnV0IHR1cm5lZCBpbmFjY2Vzc2libGUgYnkgZmxpcHBpbmcgdGhlICJrZXJuZWwgdnMu
-IHVzZXIiIHN3aXRjaC4NCj4+IA0KPj4+IE90aGVyIGFsdGVybmF0aXZlICh0aGF0IHdhcyBpbXBs
-ZW1lbnRlZCBpbiB0aGUgZmlyc3Qgc3VibWlzc2lvbikgaXMgdG8gdHJhY2sgdGhvc2UNCj4+PiBh
-bGxvY2F0aW9ucyBpbiBhIG5vbi1zaGFyZWQga2VybmVsIFBHRCBwZXIgcHJvY2VzcywgdGhlbiBo
-YW5kbGUgY3JlYXRpbmcsIGZvcmtpbmcNCj4+PiBhbmQgY29udGV4dC1zd2l0Y2hpbmcgdGhpcyBQ
-R0QuDQo+PiANCj4+IFRoYXQgc291bmRzIGxpa2UgYSBiZXR0ZXIgYXBwcm9hY2guIFNvIHdlIHdv
-dWxkIHJlbW92ZSB0aGUgcGFnZXMgZnJvbSB0aGUgc2hhcmVkIGtlcm5lbCBkaXJlY3QgbWFwIGFu
-ZCBtYXAgdGhlbSBpbnRvIGEgc2VwYXJhdGUga2VybmVsLXBvcnRpb24gaW4gdGhlIHBlci1NTSBw
-YWdlIHRhYmxlcz8NCj4+IA0KPj4gQ2FuIHlvdSBlbnZpc2lvbiB0aGF0IHdvdWxkIGFsc28gd29y
-ayB3aXRoIGFyY2hpdGVjdHVyZXMgbGlrZSBzMzkweD8gSSBhc3N1bWUgd2Ugd291bGQgbm90IG9u
-bHkgbmVlZCB0aGUgcGVyLU1NIHVzZXIgc3BhY2UgcGFnZSB0YWJsZSBoaWVyYXJjaHksIGJ1dCBh
-bHNvIGEgcGVyLU1NIGtlcm5lbCBzcGFjZSBwYWdlIHRhYmxlIGhpZXJhcmNoeSwgaW50byB3aGlj
-aCB3ZSBhbHNvIG1hcCB0aGUgY29tbW9uL3NoYXJlZC1hbW9uZy1hbGwtcHJvY2Vzc2VzIGtlcm5l
-bCBzcGFjZSBwYWdlIHRhYmxlcyAoZS5nLiwgZGlyZWN0bWFwKS4NCj4gWWVzLCB0aGF04oCZcyBh
-bHNvIGFwcGxpY2FibGUgdG8gYXJtNjQuIFRoZXJl4oCZcyBjdXJyZW50bHkgbm8gc2VwYXJhdGUg
-cGVyLW1tIHVzZXIgc3BhY2UgcGFnZSBoaWVyYXJjaHkgdGhlcmUuDQp0eXBvLCByZWFkIGtlcm5l
-bA0KDQpUaGFua3MsDQotTW9oYW1lZA0KPj4+IFdoYXQgSSBsaWtlIGFib3V0IHRoZSBtZW1mZF9z
-ZWNyZXQoKSBhcHByb2FjaCBpcyB0aGUgc2ltcGxpY2l0eSBhbmQgYmVpbmcgYXJjaA0KPj4+IGFn
-bm9zdGljLCB3aGF0IEkgZG9uJ3QgbGlrZSBpcyB0aGUgaW5jcmVhc2VkIGF0dGFjayBzdXJmYWNl
-IGJ5IHVzaW5nIFZNQXMgdG8NCj4+PiB0cmFjayB0aG9zZSBhbGxvY2F0aW9ucy4NCj4+IA0KPj4g
-WWVzLCBidXQgbWVtZmRfc2VjcmV0KCkgd2FzIHJlYWxseSBkZXNpZ24gZm9yIHVzZXIgc3BhY2Ug
-dG8gaG9sZCBzZWNyZXRzLiBCdXQgSSBjYW4gc2VlIGhvdyB5b3UgY2FtZSB0byB0aGlzIHNvbHV0
-aW9uLg0KPj4gDQo+Pj4gSSdtIHRoaW5raW5nIG9mIHdvcmtpbmcgb24gYSBQb0MgdG8gaW1wbGVt
-ZW50IHRoZSBmaXJzdCBhcHByb2FjaCBvZiB1c2luZyBhDQo+Pj4gbm9uLXNoYXJlZCBrZXJuZWwg
-UEdEIGZvciBzZWNyZXQgbWVtb3J5IGFsbG9jYXRpb25zIG9uIGFybTY0LiBUaGlzIGluY2x1ZGVz
-DQo+Pj4gYWRkaW5nIGtlcm5lbCBwYWdlIHRhYmxlIHBlciBwcm9jZXNzIHdoZXJlIGFsbCBQR0Rz
-IGFyZSBzaGFyZWQgYnV0IG9uZSB3aGljaA0KPj4+IHdpbGwgYmUgdXNlZCBmb3Igc2VjcmV0IGFs
-bG9jYXRpb25zIG1hcHBpbmcuIEFuZCBoYW5kbGUgdGhlIGZvcmsgJiBjb250ZXh0DQo+Pj4gc3dp
-dGNoaW5nIChUVEJSMSBzd2l0Y2hpbmcoPykpIGNvcnJlY3RseSBmb3IgdGhlIHNlY3JldCBtZW1v
-cnkgUEdELg0KPj4+IFdoYXQgZG8geW91IHRoaW5rPyBJJ2QgcmVhbGx5IGFwcHJlY2lhdGUgb3Bp
-bmlvbnMgYW5kIHBvc3NpYmxlIHdheXMgZm9yd2FyZC4NCj4+IA0KPj4gTmFpdmUgcXVlc3Rpb246
-IGRvZXMgYXJtNjQgcmF0aGVyIHJlc2VtYmxlIHRoZSBzMzkweCBtb2RlbCBvciB0aGUgeDg2LTY0
-IG1vZGVsPw0KPiBhcm02NCBoYXMgc2VwYXJhdGUgcGFnZSB0YWJsZXMgZm9yIGtlcm5lbCBhbmQg
-dXNlci1tb2RlLiBFeGNlcHQgZm9yIHRoZSBLUFRJIGNhc2UsIHRoZSBrZXJuZWwgcGFnZSB0YWJs
-ZXMgYXJlbuKAmXQgc3dhcHBlZCBwZXItcHJvY2VzcyBhbmQgc3RheSB0aGUgc2FtZSBhbGwgdGhl
-IHRpbWUuDQo+IA0KPiBUaGFua3MsDQo+IC1Nb2hhbWVkDQo+PiAtLSANCj4+IENoZWVycywNCj4+
-IA0KPj4gRGF2aWQgLyBkaGlsZGVuYg0KPj4gDQo+IA0KDQoKCgpBbWF6b24gV2ViIFNlcnZpY2Vz
-IERldmVsb3BtZW50IENlbnRlciBHZXJtYW55IEdtYkgKS3JhdXNlbnN0ci4gMzgKMTAxMTcgQmVy
-bGluCkdlc2NoYWVmdHNmdWVocnVuZzogQ2hyaXN0aWFuIFNjaGxhZWdlciwgSm9uYXRoYW4gV2Vp
-c3MKRWluZ2V0cmFnZW4gYW0gQW10c2dlcmljaHQgQ2hhcmxvdHRlbmJ1cmcgdW50ZXIgSFJCIDI1
-Nzc2NCBCClNpdHo6IEJlcmxpbgpVc3QtSUQ6IERFIDM2NSA1MzggNTk3Cg==
+On 11.10.24 14:56, Mediouni, Mohamed wrote:
+> 
+> 
+>> On 11. Oct 2024, at 14:36, Mediouni, Mohamed <mediou@amazon.de> wrote:
+>>
+>>
+>>
+>>> On 11. Oct 2024, at 14:04, David Hildenbrand <david@redhat.com> wrote:
+>>>
+>>> On 10.10.24 17:52, Fares Mehanna wrote:
+>>>>>> In a series posted a few years ago [1], a proposal was put forward to allow the
+>>>>>> kernel to allocate memory local to a mm and thus push it out of reach for
+>>>>>> current and future speculation-based cross-process attacks.  We still believe
+>>>>>> this is a nice thing to have.
+>>>>>>
+>>>>>> However, in the time passed since that post Linux mm has grown quite a few new
+>>>>>> goodies, so we'd like to explore possibilities to implement this functionality
+>>>>>> with less effort and churn leveraging the now available facilities.
+>>>>>>
+>>>>>> An RFC was posted few months back [2] to show the proof of concept and a simple
+>>>>>> test driver.
+>>>>>>
+>>>>>> In this RFC, we're using the same approach of implementing mm-local allocations
+>>>>>> piggy-backing on memfd_secret(), using regular user addresses but pinning the
+>>>>>> pages and flipping the user/supervisor flag on the respective PTEs to make them
+>>>>>> directly accessible from kernel.
+>>>>>> In addition to that we are submitting 5 patches to use the secret memory to hide
+>>>>>> the vCPU gp-regs and fp-regs on arm64 VHE systems.
+>>>>>
+>>>>> I'm a bit lost on what exactly we want to achieve. The point where we
+>>>>> start flipping user/supervisor flags confuses me :)
+>>>>>
+>>>>> With secretmem, you'd get memory allocated that
+>>>>> (a) Is accessible by user space -- mapped into user space.
+>>>>> (b) Is inaccessible by kernel space -- not mapped into the direct map
+>>>>> (c) GUP will fail, but copy_from / copy_to user will work.
+>>>>>
+>>>>>
+>>>>> Another way, without secretmem, would be to consider these "secrets"
+>>>>> kernel allocations that can be mapped into user space using mmap() of a
+>>>>> special fd. That is, they wouldn't have their origin in secretmem, but
+>>>>> in KVM as a kernel allocation. It could be achieved by using VM_MIXEDMAP
+>>>>> with vm_insert_pages(), manually removing them from the directmap.
+>>>>>
+>>>>> But, I am not sure who is supposed to access what. Let's explore the
+>>>>> requirements. I assume we want:
+>>>>>
+>>>>> (a) Pages accessible by user space -- mapped into user space.
+>>>>> (b) Pages inaccessible by kernel space -- not mapped into the direct map
+>>>>> (c) GUP to fail (no direct map).
+>>>>> (d) copy_from / copy_to user to fail?
+>>>>>
+>>>>> And on top of that, some way to access these pages on demand from kernel
+>>>>> space? (temporary CPU-local mapping?)
+>>>>>
+>>>>> Or how would the kernel make use of these allocations?
+>>>>>
+>>>>> -- 
+>>>>> Cheers,
+>>>>>
+>>>>> David / dhildenb
+>>>> Hi David,
+>>>
+>>> Hi Fares!
+>>>
+>>>> Thanks for taking a look at the patches!
+>>>> We're trying to allocate a kernel memory that is accessible to the kernel but
+>>>> only when the context of the process is loaded.
+>>>> So this is a kernel memory that is not needed to operate the kernel itself, it
+>>>> is to store & process data on behalf of a process. The requirement for this
+>>>> memory is that it would never be touched unless the process is scheduled on this
+>>>> core. otherwise any other access will crash the kernel.
+>>>> So this memory should only be directly readable and writable by the kernel, but
+>>>> only when the process context is loaded. The memory shouldn't be readable or
+>>>> writable by the owner process at all.
+>>>> This is basically done by removing those pages from kernel linear address and
+>>>> attaching them only in the process mm_struct. So during context switching the
+>>>> kernel loses access to the secret memory scheduled out and gain access to the
+>>>> new process secret memory.
+>>>> This generally protects against speculation attacks, and if other process managed
+>>>> to trick the kernel to leak data from memory. In this case the kernel will crash
+>>>> if it tries to access other processes secret memory.
+>>>> Since this memory is special in the sense that it is kernel memory but only make
+>>>> sense in the term of the owner process, I tried in this patch series to explore
+>>>> the possibility of reusing memfd_secret() to allocate this memory in user virtual
+>>>> address space, manage it in a VMA, flipping the permissions while keeping the
+>>>> control of the mapping exclusively with the kernel.
+>>>> Right now it is:
+>>>> (a) Pages not accessible by user space -- even though they are mapped into user
+>>>>     space, the PTEs are marked for kernel usage.
+>>>
+>>> Ah, that is the detail I was missing, now I see what you are trying to achieve, thanks!
+>>>
+>>> It is a bit architecture specific, because ... imagine architectures that have separate kernel+user space page table hierarchies, and not a simple PTE flag to change access permissions between kernel/user space.
+>>>
+>>> IIRC s390 is one such architecture that uses separate page tables for the user-space + kernel-space portions.
+>>>
+>>>> (b) Pages accessible by kernel space -- even though they are not mapped into the
+>>>>     direct map, the PTEs in uvaddr are marked for kernel usage.
+>>>> (c) copy_from / copy_to user won't fail -- because it is in the user range, but
+>>>>     this can be fixed by allocating specific range in user vaddr to this feature
+>>>>     and check against this range there.
+>>>> (d) The secret memory vaddr is guessable by the owner process -- that can also
+>>>>     be fixed by allocating bigger chunk of user vaddr for this feature and
+>>>>     randomly placing the secret memory there.
+>>>> (e) Mapping is off-limits to the owner process by marking the VMA as locked,
+>>>>     sealed and special.
+>>>
+>>> Okay, so in this RFC you are jumping through quite some hoops to have a kernel allocation unmapped from the direct map but mapped into a per-process page table only accessible by kernel space. :)
+>>>
+>>> So you really don't want this mapped into user space at all (consequently, no GUP, no access, no copy_from_user ...). In this RFC it's mapped but turned inaccessible by flipping the "kernel vs. user" switch.
+>>>
+>>>> Other alternative (that was implemented in the first submission) is to track those
+>>>> allocations in a non-shared kernel PGD per process, then handle creating, forking
+>>>> and context-switching this PGD.
+>>>
+>>> That sounds like a better approach. So we would remove the pages from the shared kernel direct map and map them into a separate kernel-portion in the per-MM page tables?
+>>>
+>>> Can you envision that would also work with architectures like s390x? I assume we would not only need the per-MM user space page table hierarchy, but also a per-MM kernel space page table hierarchy, into which we also map the common/shared-among-all-processes kernel space page tables (e.g., directmap).
+>> Yes, that’s also applicable to arm64. There’s currently no separate per-mm user space page hierarchy there.
+> typo, read kernel
+
+
+Okay, thanks. So going into that direction makes more sense.
+
+I do wonder if we really have to deal with fork() ... if the primary 
+users don't really have meaning in the forked child (e.g., just like 
+fork() with KVM IIRC) we might just get away by "losing" these 
+allocations in the child process.
+
+Happy to learn why fork() must be supported.
+
+-- 
+Cheers,
+
+David / dhildenb
 
