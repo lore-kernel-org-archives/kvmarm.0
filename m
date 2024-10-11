@@ -1,166 +1,140 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5D55218D90
-	for <kvmarm@lists.linux.dev>; Fri, 11 Oct 2024 13:24:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB77321644E;
+	Fri, 11 Oct 2024 13:28:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728653093; cv=none; b=qdnt28mi+KBsMYQO5t3KDTwmOVbyGioB2ReOXk4gfYwr1xxWEi9ni6WYa3JcVCH4Cqw3irXnCN2dhqQl6haV9oajqsTf1+9o/BRKBSI2wejmK023DhtKiK8nkkjHCPZEX3Q/mIsKneXhU1X00u5oRCASy5NssOY1qlaFgGDwW6c=
+	t=1728653313; cv=none; b=ldsu7SGPrMn5B7rZeLx7TamZQlTX+W/dF3v7xNfLqr10Dc4kj0gHEdGbe1eY94MXtq+vJ0zYpP7L3/0eZErRq9apt4Ki+iNlZp9e6JQNYR8irbsK5yLKYSWsBbImUYUwEBAXE2ivbnxVNr1el5YrsXV3Kw6hZNL0yEheO+ZcH64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728653093; c=relaxed/simple;
-	bh=np4/hIzUsk1/W3lSTHEriU5nOtZuWqrsViQztPhkVVk=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=T0nem3gVRCl4xAQqq/BzRk+Q152z8iKUppkvgiPv6VkXNBf741Y3gULl82ySCtmFppkt0vRgnNe9hWFfhKHf2dn3MbzJAvch7d1MzQ4sYwJBJn9q1f+PrLOyjXoKVYfHKZgg3CmSa+y2oGYLm1pfhzsHwTgGQabbpVoqVdqsiWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.216])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4XQ6kz73mbz6K5tM;
-	Fri, 11 Oct 2024 21:23:23 +0800 (CST)
-Received: from frapeml100005.china.huawei.com (unknown [7.182.85.132])
-	by mail.maildlp.com (Postfix) with ESMTPS id 2BF6D140A78;
-	Fri, 11 Oct 2024 21:24:48 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (7.182.85.71) by
- frapeml100005.china.huawei.com (7.182.85.132) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Fri, 11 Oct 2024 15:24:47 +0200
-Received: from frapeml500008.china.huawei.com ([7.182.85.71]) by
- frapeml500008.china.huawei.com ([7.182.85.71]) with mapi id 15.01.2507.039;
- Fri, 11 Oct 2024 15:24:47 +0200
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: Cornelia Huck <cohuck@redhat.com>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "maz@kernel.org" <maz@kernel.org>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>
-CC: "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "will@kernel.org"
-	<will@kernel.org>, "mark.rutland@arm.com" <mark.rutland@arm.com>,
-	"eric.auger@redhat.com" <eric.auger@redhat.com>, yuzenghui
-	<yuzenghui@huawei.com>, "Wangzhou (B)" <wangzhou1@hisilicon.com>, jiangkunkun
-	<jiangkunkun@huawei.com>, Jonathan Cameron <jonathan.cameron@huawei.com>,
-	Anthony Jebson <anthony.jebson@huawei.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, Linuxarm <linuxarm@huawei.com>
-Subject: RE: [RFC PATCH 0/6] KVM: arm64: Errata management for VM Live
- migration
-Thread-Topic: [RFC PATCH 0/6] KVM: arm64: Errata management for VM Live
- migration
-Thread-Index: AQHbG7LLpfYBbF3MrkilC6zl/kSmBLKBZvgAgAAh/jA=
-Date: Fri, 11 Oct 2024 13:24:47 +0000
-Message-ID: <54afcc8182d341d8ab294d8a54c1fbf3@huawei.com>
-References: <20241011075053.80540-1-shameerali.kolothum.thodi@huawei.com>
- <87jzeerd6z.fsf@redhat.com>
-In-Reply-To: <87jzeerd6z.fsf@redhat.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1728653313; c=relaxed/simple;
+	bh=XnQ3OWZmFFbbEbN0nuRCP99ploKH8REo3FMrNxhzftk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KUq4cTCI+lRje5JkMzIjF0rSCaNACHZ/rwHQ4D97BtKAOgK8klccr+y4FTekRR/vmGC0ue79hh+dl+3GH2f/gyQcqmMs6o9B+6RgpoQIBHqRAInJw5Rz9A5VvG4OD5syb7Asdv9hFAH2a4zbeY+5Q44ux6sXlHlJp+SymOFURWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HMYFhmhE; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HMYFhmhE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52242C4CEC3;
+	Fri, 11 Oct 2024 13:28:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728653313;
+	bh=XnQ3OWZmFFbbEbN0nuRCP99ploKH8REo3FMrNxhzftk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=HMYFhmhESzKOcwvBG48mNXHKBp3jSeryZBYdzFM5birAyAQdVuaZ7nqkACztUEiV6
+	 7Q40Zqq85bhWldnpkCKsllSU97Vumzk4iL9+uY3ek0lKO29SGdrzHaZlxw7eHaQ/5G
+	 2EowimbnmHdyOonqP6U6m160fXtirsrh1JwXBT9C1IZQLe+ftG6N6272/YbsKvoRuG
+	 HnyEQfXn6eSTBrtUE1g9nvegSUktEjq9fEocRrp1HQSByM8rGjDx/B0Lce4VOdmMeH
+	 gTtOf4NhbO6/Xv7j0CYPPdSEuui2XONFFyUSwroCiWL5T5F5XS+IEOJOvOxRyF+XeH
+	 m4IQTxxrYlkow==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1szFh1-002Z8g-Dg;
+	Fri, 11 Oct 2024 14:28:31 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Alexander Potapenko <glider@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Mark Brown <broonie@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Shaoqin Huang <shahuang@redhat.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org
+Subject: [GIT PULL] KVM/arm64 fixes for 6.12, take #2
+Date: Fri, 11 Oct 2024 14:27:56 +0100
+Message-Id: <20241011132756.3793137-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, glider@google.com, joey.gouly@arm.com, broonie@kernel.org, oliver.upton@linux.dev, shameerali.kolothum.thodi@huawei.com, shahuang@redhat.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+Paolo,
 
+Here's the second set of fixes for 6.12.
 
-> -----Original Message-----
-> From: Cornelia Huck <cohuck@redhat.com>
-> Sent: Friday, October 11, 2024 2:18 PM
-> To: Shameerali Kolothum Thodi
-> <shameerali.kolothum.thodi@huawei.com>; kvmarm@lists.linux.dev;
-> maz@kernel.org; oliver.upton@linux.dev
-> Cc: catalin.marinas@arm.com; will@kernel.org; mark.rutland@arm.com;
-> eric.auger@redhat.com; yuzenghui <yuzenghui@huawei.com>; Wangzhou
-> (B) <wangzhou1@hisilicon.com>; jiangkunkun
-> <jiangkunkun@huawei.com>; Jonathan Cameron
-> <jonathan.cameron@huawei.com>; Anthony Jebson
-> <anthony.jebson@huawei.com>; linux-arm-kernel@lists.infradead.org;
-> Linuxarm <linuxarm@huawei.com>
-> Subject: Re: [RFC PATCH 0/6] KVM: arm64: Errata management for VM Live
-> migration
->=20
-> On Fri, Oct 11 2024, Shameer Kolothum
-> <shameerali.kolothum.thodi@huawei.com> wrote:
->=20
-> > Hi,
-> >
-> > On ARM64 platforms most of the errata workarounds are based on CPU
-> > MIDR/REVIDR values and a number of these workarounds need to be
-> > implemented by the Guest kernel as well. This creates a problem when
-> > Guest needs to be migrated to a platform that differs in these
-> > MIDR/REVIDR values even if the VMM can come up with a common
-> minimum
-> > feature list for the Guest using the recently introduced "Writable
-> > ID registers" support.
-> >
-> > (This is roughly based on a discussion I had with Marc and Oliver
-> > at KVM forum. Marc outlined his idea for a solution and this is an
-> > attempt to implement it. Thanks to both and I take all the blame
-> > if this is nowhere near what is intended/required)
-> >
-> > This RFC proposes a solution to handle the above issue by introducing
-> > the following,
-> >
-> > 1. A new VM IOCTL,
-> >    KVM_ARM_SET_MIGRN_TARGET_CPUS  _IOW(KVMIO,  0xb7, struct
-> kvm_arm_migrn_cpus)
-> >    This can be used by the userspace(VMM) to set the target CPUs the
-> >    Guest will run in its lifetime. See patch #2
-> > 2. Add hypercall support for Guest kernel to retrieve any migration
-> >    errata bitmap(ARM_SMCCC_VENDOR_HYP_KVM_MIGRN_ERRATA)
-> >    The above will return the bitmaps in R0-R3 registers. See patch #4
-> > 3. The "capability" field in struct arm64_cpu_capabilities is a generat=
-ed
-> >    one at present and may get renumbered or reordered. Hence, we can't
-> use
-> >    this directly for migration errata bitmaps. Instead, introduced
-> >    "migartion_safe_cap", which has to be set statically for any
-> >    erratum that needs to be enabled and is safe for migration
-> >    purposes. See patches 3 & 6.
-> > 4. Rest of the patches includes the plumbing required to populate the
-> >    errata bitmap based on the target CPUs set by the VMM and update the
-> >    system_cap based on it.
-> >
-> > ToDos:-
-> >   -We still need a way to  handle the error in setting the invariant
-> >    registers(MIDR/REVIDR/AIDR) during Guest migration. Perhaps we can
-> >    handle it in userspace?
-> > -  Possibly we could do better to avoid the additional
-> "migartion_safe_cap" use.
-> >    Suggestions welcome.
-> >   -There are errata that require more than MIDR/REVIDR, eg: CTR_EL0.
-> >    How to handle those?
-> >   -Check for locking requirements if any.
-> >
-> > This is lightly tested on a HiSilicon ARM64 platform.
-> >
-> > Please take a look and let me know your thoughts.
->=20
-> So, I've only taken a very quick look at it, but IIUC, the idea is for
-> the VMM to do the following:
-> - figure out where we want to possibly run
+We have a handful of fixes for the ID register configuration (I had
+originally queued them for -rc1, and somehow managed to accidentally
+drop the branch on the floor), our NV shadow page tables, the vgic,
+and a fix for a regression introduced in -rc1.
 
+As usual, details in the tag.
 
-Yes.
+Please pull,
 
-> - figure out the least common denominator for writable features
+	M.
 
-Yes
+The following changes since commit a1d402abf8e3ff1d821e88993fc5331784fac0da:
 
-> - tell KVM about the possible target cpu resp. the errata it wants
+  KVM: arm64: Fix kvm_has_feat*() handling of negative features (2024-10-03 19:35:27 +0100)
 
-This might change as per Marc's comments. VMM has to handle hypercall
-directly and provide the target CPU list to Guest.
+are available in the Git repository at:
 
-> - build a frankencpu via the writable id reg infrastructure, fiddling
->   with invariant handling as needed?
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.12-2
 
-That is my idea of handling the invariant registers. If the VMM has provide=
-d a list of=20
-target CPUs for the Guest,  make sure the incoming CPU is part of the list=
-=20
-during migration and ignore invariant(MIDR/REVIDR) reg SET errors.
+for you to fetch changes up to df5fd75ee305cb5927e0b1a0b46cc988ad8db2b1:
 
-Thanks,
-Shameer
+  KVM: arm64: Don't eagerly teardown the vgic on init error (2024-10-11 13:40:25 +0100)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for 6.12, take #2
+
+- Fix the guest view of the ID registers, making the relevant fields
+  writable from userspace (affecting ID_AA64DFR0_EL1 and ID_AA64PFR1_EL1)
+
+- Correcly expose S1PIE to guests, fixing a regression introduced
+  in 6.12-rc1 with the S1POE support
+
+- Fix the recycling of stage-2 shadow MMUs by tracking the context
+  (are we allowed to block or not) as well as the recycling state
+
+- Address a couple of issues with the vgic when userspace misconfigures
+  the emulation, resulting in various splats. Headaches courtesy
+  of our Syzkaller friends
+
+----------------------------------------------------------------
+Marc Zyngier (2):
+      Merge branch kvm-arm64/idregs-6.12 into kvmarm/fixes
+      KVM: arm64: Don't eagerly teardown the vgic on init error
+
+Mark Brown (1):
+      KVM: arm64: Expose S1PIE to guests
+
+Oliver Upton (5):
+      KVM: arm64: Unregister redistributor for failed vCPU creation
+      KVM: arm64: nv: Keep reference on stage-2 MMU when scheduled out
+      KVM: arm64: nv: Do not block when unmapping stage-2 if disallowed
+      KVM: arm64: nv: Punt stage-2 recycling to a vCPU request
+      KVM: arm64: nv: Clarify safety of allowing TLBI unmaps to reschedule
+
+Shameer Kolothum (1):
+      KVM: arm64: Make the exposed feature bits in AA64DFR0_EL1 writable from userspace
+
+Shaoqin Huang (4):
+      KVM: arm64: Disable fields that KVM doesn't know how to handle in ID_AA64PFR1_EL1
+      KVM: arm64: Use kvm_has_feat() to check if FEAT_SSBS is advertised to the guest
+      KVM: arm64: Allow userspace to change ID_AA64PFR1_EL1
+      KVM: selftests: aarch64: Add writable test for ID_AA64PFR1_EL1
+
+ arch/arm64/include/asm/kvm_host.h                 |  7 +++
+ arch/arm64/include/asm/kvm_mmu.h                  |  3 +-
+ arch/arm64/include/asm/kvm_nested.h               |  4 +-
+ arch/arm64/kvm/arm.c                              |  5 ++
+ arch/arm64/kvm/hypercalls.c                       | 12 ++--
+ arch/arm64/kvm/mmu.c                              | 15 ++---
+ arch/arm64/kvm/nested.c                           | 53 +++++++++++++---
+ arch/arm64/kvm/sys_regs.c                         | 75 +++++++++++++++++++++--
+ arch/arm64/kvm/vgic/vgic-init.c                   | 28 +++++++--
+ tools/testing/selftests/kvm/aarch64/set_id_regs.c | 16 ++++-
+ 10 files changed, 183 insertions(+), 35 deletions(-)
