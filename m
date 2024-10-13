@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E002B13D279
-	for <kvmarm@lists.linux.dev>; Sun, 13 Oct 2024 12:14:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79D732AF1E
+	for <kvmarm@lists.linux.dev>; Sun, 13 Oct 2024 12:43:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728821695; cv=none; b=rutFkvQJsWVVm+utB5REyuDhTtODgbWDadlkQAWff3j5ZDaTV5LN6o3mRGlTUZ3DSdPTYialnA2UudNiyib9/eFnocIYF7Jx76hy0cWg4j7TUOAhNbaAIzSSq2tvcG2kt5fAv7TYdvSRqxpqW/wlMTIT2jidr6WJrlTFXWA2WYA=
+	t=1728823408; cv=none; b=nl29fkxuVdZ3RVnSPAcDo0O2A+hKN1QvZQvP4UVcCA/lLrm1jN+7QB0qYgofyOl6oTk0xxHlZZ8vkUfaEH905+yKPZ9gJYBK1GZUTw9rTS9zqBrrkiSHbQO926YxTsIllXbzysFj6XmAieZWW5IgNiabsT5JIdyk8AmJR9iEbZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728821695; c=relaxed/simple;
-	bh=W2AzQbB3wlStDJVhnumXB1vqiKpl/dRzXf9BnsOljnI=;
+	s=arc-20240116; t=1728823408; c=relaxed/simple;
+	bh=dAioUaBGSTAm7LYT9Kp7KP4Nn6/FZmlo+oJUGVFmoGo=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NQq5jIUNwG9YzSR0ZM8vyZwCSJ37sgPRNvZb7vta7ijBM6LNQffbbGuaBx/8yS2NY7qHKPF/eNnxQROCsYyr8z1OFz2ns8rMDrJeRHVM/kcVH89CLDWdvD/Gv81i3vlitgEW595FzX2vzoMqZ3ABoGK/cJAi+WOHtbIOFs9Wu6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QkcaExiL; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=VWFDFIDYqMxgqZP3A7gBgmQuvei2RXqajVePzPNWnXNCXETG47IEJlXVBpNoaVmHFeV3hLmP7jM9ysSj2xQuSFudvnjr09Civ1JKRPIfKW4CWnP1Z+xG/0SUMYsGxudbRsNm1WXMvppB/Bv03QpNdbWx11S7+AhYU78YBvuw4rM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sPoVwVtT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QkcaExiL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C40BC4CEC5;
-	Sun, 13 Oct 2024 12:14:54 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sPoVwVtT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11A88C4CEC5;
+	Sun, 13 Oct 2024 12:43:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728821694;
-	bh=W2AzQbB3wlStDJVhnumXB1vqiKpl/dRzXf9BnsOljnI=;
+	s=k20201202; t=1728823408;
+	bh=dAioUaBGSTAm7LYT9Kp7KP4Nn6/FZmlo+oJUGVFmoGo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QkcaExiL1kmBiYssi8doKmtYVfOINBa9Bvp364gnvDGcH9CbDXNYqk+pzHiU8gQbv
-	 M7w/IdkPf+sNGZueM5R8RvrLSIrpVw7O5sTCIZAs6d8rxd32Gp9vsIphkhqUejNE2O
-	 JB68IypvqprQWFWK29WWKwBRNG1kuNkIcPNroBZNHAcsJJgzwHonyaij8mBZ+Yyop0
-	 l/gB1cty2lMyhnh3KywyodQMZI/RSkUlBBKXEpoAWJ7ot0j6p2433ZV0jDMTyTMavN
-	 3iutifVl3XQRf8o6AC3yScBwEtGmBDWGrEyh+545x6OscWzGK6D6hmrQo0dNx6A9x5
-	 KoekLJmzQV8AQ==
+	b=sPoVwVtTZHF92JBV6iEQD0tRio7IvcCLJFDc9mjc3hfmnUBBUUIIbZ+H5YVMLw3CA
+	 hbuncvxf7rbtTR56PyyFHkas4jHFoLOR16dRcRz/+0M/JhGNCtORF6nmLhdz/4Ke3t
+	 NkfKNj4WdR6By07LDtk/Xp2IqhnZGgb8SYnX34qcMdzAePvZg8SPtYg0B2366YAj+t
+	 h/ZTQaKsNWJVQ8EDXB24zq8Aftd8EK5RVuT8FCFhO0dzTMRbrc9ja85w9eOSvgc6rb
+	 atyxF6bW0ssQsL9QPVH10WkMGyYY83FdzzcsrjatKX/+65zLH/UfxFwwuMfuRjZNLJ
+	 D0GXOxYzjcBpg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1szxUq-0036oH-Fz;
-	Sun, 13 Oct 2024 13:14:52 +0100
-Date: Sun, 13 Oct 2024 13:14:52 +0100
-Message-ID: <86bjzo5hdv.wl-maz@kernel.org>
+	id 1szxwT-0036yp-Th;
+	Sun, 13 Oct 2024 13:43:26 +0100
+Date: Sun, 13 Oct 2024 13:43:25 +0100
+Message-ID: <86a5f85g2a.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
@@ -41,10 +41,9 @@ Cc: kvmarm@lists.linux.dev,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Anshuman Khandual <anshuman.khandual@arm.com>
-Subject: Re: [PATCH v3 12/17] KVM: arm64: nv: Adjust range of accessible PMCs according to HPMN
-In-Reply-To: <20241007174559.1830205-13-oliver.upton@linux.dev>
+Subject: Re: [PATCH v3 00/17] KVM: arm64: nv: Support for EL2 PMU controls
+In-Reply-To: <20241007174559.1830205-1-oliver.upton@linux.dev>
 References: <20241007174559.1830205-1-oliver.upton@linux.dev>
-	<20241007174559.1830205-13-oliver.upton@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -60,48 +59,28 @@ X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@ar
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 07 Oct 2024 18:45:54 +0100,
+On Mon, 07 Oct 2024 18:45:42 +0100,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> The value of MDCR_EL2.HPMN controls the number of event counters made
-> visible to EL0 and EL1. This means it is possible for the guest
-> hypervisor to allow direct access to event counters to the L2.
-> 
-> Rework KVM's PMU register emulation to take the effects of HPMN into
-> account when handling a trap. For bitmask-style registers, writes only
-> affect accessible registers.
-> 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  arch/arm64/kvm/pmu-emul.c | 14 +++++++++++++-
->  arch/arm64/kvm/sys_regs.c | 12 ++++++------
->  include/kvm/arm_pmu.h     |  5 +++++
->  3 files changed, 24 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> index ca5da1da477d..746ff1ceb998 100644
-> --- a/arch/arm64/kvm/pmu-emul.c
-> +++ b/arch/arm64/kvm/pmu-emul.c
-> @@ -276,6 +276,18 @@ bool kvm_pmu_counter_is_hyp(struct kvm_vcpu *vcpu, unsigned int idx)
->  	return idx >= hpmn;
->  }
->  
-> +u64 kvm_pmu_accessible_counter_mask(struct kvm_vcpu *vcpu)
-> +{
-> +	u64 mask = kvm_pmu_implemented_counter_mask(vcpu);
-> +	u64 hpmn;
-> +
-> +	if (!vcpu_has_nv(vcpu) || vcpu_is_el2(vcpu))
-> +		return mask;
-> +
-> +	hpmn = SYS_FIELD_GET(MDCR_EL2, HPMN, __vcpu_sys_reg(vcpu, MDCR_EL2));
-> +	return mask & GENMASK(hpmn - 1, 0);
+> Marc, I stole patch 1 from you for the sake of sending out a consistent
+> series. I can sort things out when I apply patches if that patch is a
+> common base for the both of us.
 
-Doesn't this break the cycle counter (bit 31)? Also, this is not going
-to play very well with FEAT_ICNTR, where the instruction counter is
-bit 32 in the mask.
+np, this is common infrastructure that is sorely needed anyway.
 
-Could we instead clear the bits from (PMCR_EL0.N - 1) down to HPMN?
+> 
+> v2 -> v3:
+>  - Use the sysreg sanitisation infrastructure to apply RES0/RES1 masks
+>    to MDCR_EL2
+>  - Drop trap_config bit describing if a trap applies to Host EL0
+>  - Honor MDCR_EL2.{HPME,HLP} for the 'hypervisor range' of PMU counters
+> 
+> v2: https://lore.kernel.org/kvmarm/20240827002235.1753237-1-oliver.upton@linux.dev/#r
+
+Other than the couple of small issues I mentioned, this looks solid to
+me, and I'd be happy to see this being merged. Can't test it,
+unfortunately, but I trust that it's seen HW more compliant than the
+one I'm using.
 
 Thanks,
 
