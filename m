@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 851DD12C54D
-	for <kvmarm@lists.linux.dev>; Sun, 13 Oct 2024 11:28:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1A0213A3F4
+	for <kvmarm@lists.linux.dev>; Sun, 13 Oct 2024 11:40:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728818921; cv=none; b=YuSjs4GNruypg+6HMDNePEcpkUSPusG7vXxthgvvxDerZhyUpOVOS7c8yZQaA2Pl1TexzQYlQlEMNtZfCCtYzO29MBPTAieT1Nyd8UQ2kEmDs//Yy3Mo5M5ySYGePBv8X2KO4Ai+sWam9tLWcM3saK+R5cHpoUH3G7EaBO9x1kQ=
+	t=1728819616; cv=none; b=iExzWhBVd7yz/SlkANEL8oVso+iQDlaKojh86doM0XdescdVi0LoFuO5An5KKQyTc3++xFoDhY8Iu6vslJMOxO79c9jWMo9bE4u6MmVBbUKn7GqfhKKrwo+EW4lCA1VTKPaSKqHgctvQ0Favf3AKu+DS2xicFFY8gi60JdTfRTk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728818921; c=relaxed/simple;
-	bh=99sXhszgiuQ7MMoImeaJPX7WEzoLJRRVkMfLIkNdd88=;
+	s=arc-20240116; t=1728819616; c=relaxed/simple;
+	bh=CcrZdoF2r9ztZsp/3YrhmFggAe13OdnhXSR69cwg9Kw=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eslFjhvrztnTPGFF/TLGpYml/IatS7tY8bZpivOGk8+OLadQpjWZhmjiny2690gc2EbQnMAZU8FvhBSQKVSv7tx4TvhoRQ9/mFxFo3EvbI9psA2xbNUHOwCAdSQCyUrwkLkUU4Dngbhw+fW0fpTHnBVdVTPXht3tnONS6DCYgtU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YNuX/5qz; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=jteAdy1B7etv8S4dEc9YAXUCu64VtPprdNVBlocHOGIHltWYcUvXyifMZ+HGhNtSoKlbvxfk/gVFxHa5X2XCkBlhIH+P7rBqN4m35B1AHV2iMDeYloMelnIRTVCRgk4B9pbxNBoLkPf5tqJzqoyWOOH48BKsvCRs0ux6rFHYciU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hGlEVo2j; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YNuX/5qz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F483C4CEC5;
-	Sun, 13 Oct 2024 11:28:40 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hGlEVo2j"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60161C4CEC5;
+	Sun, 13 Oct 2024 11:40:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728818920;
-	bh=99sXhszgiuQ7MMoImeaJPX7WEzoLJRRVkMfLIkNdd88=;
+	s=k20201202; t=1728819616;
+	bh=CcrZdoF2r9ztZsp/3YrhmFggAe13OdnhXSR69cwg9Kw=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=YNuX/5qzSN1H4F7B+OhfvbqGGKIE5GZpcJ2OWDEohTSFnUst8LuQzGuXdnOWpH55a
-	 M4jJR/7I6YAT3ONLVNRrkBECWYVILYdtO0rbPOHU6MgWu4UGmQlXZ0IB9LqRAf/2JO
-	 mqXNlLCL/3hcGlO7mIcA36qHCFU9AB+4NaNSBeAaHp4QJz9Rj0FyXzSF6C9elIWYMy
-	 zllD/9mtF6ybouOVkYjl5bzCaEVRHG/ZoVKIfiAx6Kz7Twk/MCM1xJN0txMz9rNktw
-	 uxAnaUFdHxjtz+PZgFUgsDpwCsTir+WstUjlauuag8f7Z9TVGHTEmCniL9F6NFG1Ew
-	 0u1yfyMV4TZgA==
+	b=hGlEVo2jWhMIv5FGjVTBqB8JQ1CAo7+w2F1ovwEynhZonCm38V1wzffr9vgNQ85QF
+	 7/OGnCUwYr4hCyQr1exgf5eZ+XiFeRct1XHWdsPmPiiBc3wNAdh4ysC0MBHvlfu0Fw
+	 if2CtHlXxwNzyCkqihzntTNjGT1FhVjmj2XEw/eoKf8Z+pjJMDCfLg0MsBYUEqxORk
+	 SM7dfzbfsdsM08WPzzcXTBxcb0P1s3RoummVX6wNls0oHgSLbYzu5J8kXQ8AvN0G00
+	 Jn+mMFZU4dli3pqLe83hiE9vEjHZ7tbxpLf7TpqcIqxbXFSqVp/s3yNhF2/bKW6DOm
+	 QDebXbFMAyIGQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1szwm5-0036SC-LO;
-	Sun, 13 Oct 2024 12:28:37 +0100
-Date: Sun, 13 Oct 2024 12:28:36 +0100
-Message-ID: <86frp05jiz.wl-maz@kernel.org>
+	id 1szwxK-0036Yi-5A;
+	Sun, 13 Oct 2024 12:40:14 +0100
+Date: Sun, 13 Oct 2024 12:40:13 +0100
+Message-ID: <86ed4k5izm.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
@@ -41,10 +41,10 @@ Cc: kvmarm@lists.linux.dev,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Anshuman Khandual <anshuman.khandual@arm.com>
-Subject: Re: [PATCH v3 02/17] arm64: sysreg: Migrate MDCR_EL2 definition to table
-In-Reply-To: <20241007174559.1830205-3-oliver.upton@linux.dev>
+Subject: Re: [PATCH v3 04/17] KVM: arm64: Describe RES0/RES1 bits of MDCR_EL2
+In-Reply-To: <20241007174559.1830205-5-oliver.upton@linux.dev>
 References: <20241007174559.1830205-1-oliver.upton@linux.dev>
-	<20241007174559.1830205-3-oliver.upton@linux.dev>
+	<20241007174559.1830205-5-oliver.upton@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -60,106 +60,103 @@ X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@ar
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 07 Oct 2024 18:45:44 +0100,
+On Mon, 07 Oct 2024 18:45:46 +0100,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> We're about to add some more MDCR_EL2 definitions, may as well migrate
-> to the new way of the world at this point.
+> Add support for sanitising MDCR_EL2 and describe the RES0/RES1 bits
+> according to the feature set exposed to the VM.
 > 
 > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > ---
->  arch/arm64/include/asm/kvm_arm.h | 29 ----------------------------
->  arch/arm64/tools/sysreg          | 33 ++++++++++++++++++++++++++++++++
->  2 files changed, 33 insertions(+), 29 deletions(-)
+>  arch/arm64/include/asm/kvm_host.h |  2 +-
+>  arch/arm64/kvm/nested.c           | 35 +++++++++++++++++++++++++++++++
+>  2 files changed, 36 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index 109a85ee6910..fb8d15f299a4 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -311,35 +311,6 @@
->  				 GENMASK(19, 18) |	\
->  				 GENMASK(15, 0))
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 7764ca71ac6e..98ae79f7e0bc 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -464,7 +464,6 @@ enum vcpu_sysreg {
+>  	/* EL2 registers */
+>  	SCTLR_EL2,	/* System Control Register (EL2) */
+>  	ACTLR_EL2,	/* Auxiliary Control Register (EL2) */
+> -	MDCR_EL2,	/* Monitor Debug Configuration Register (EL2) */
+>  	CPTR_EL2,	/* Architectural Feature Trap Register (EL2) */
+>  	HACR_EL2,	/* Hypervisor Auxiliary Control Register */
+>  	ZCR_EL2,	/* SVE Control Register (EL2) */
+> @@ -492,6 +491,7 @@ enum vcpu_sysreg {
 >  
-> -/* Hyp Debug Configuration Register bits */
-> -#define MDCR_EL2_E2TB_MASK	(UL(0x3))
-> -#define MDCR_EL2_E2TB_SHIFT	(UL(24))
-> -#define MDCR_EL2_HPMFZS		(UL(1) << 36)
-> -#define MDCR_EL2_HPMFZO		(UL(1) << 29)
-> -#define MDCR_EL2_MTPME		(UL(1) << 28)
-> -#define MDCR_EL2_TDCC		(UL(1) << 27)
-> -#define MDCR_EL2_HLP		(UL(1) << 26)
-> -#define MDCR_EL2_HCCD		(UL(1) << 23)
-> -#define MDCR_EL2_TTRF		(UL(1) << 19)
-> -#define MDCR_EL2_HPMD		(UL(1) << 17)
-> -#define MDCR_EL2_TPMS		(UL(1) << 14)
-> -#define MDCR_EL2_E2PB_MASK	(UL(0x3))
-> -#define MDCR_EL2_E2PB_SHIFT	(UL(12))
-> -#define MDCR_EL2_TDRA		(UL(1) << 11)
-> -#define MDCR_EL2_TDOSA		(UL(1) << 10)
-> -#define MDCR_EL2_TDA		(UL(1) << 9)
-> -#define MDCR_EL2_TDE		(UL(1) << 8)
-> -#define MDCR_EL2_HPME		(UL(1) << 7)
-> -#define MDCR_EL2_TPM		(UL(1) << 6)
-> -#define MDCR_EL2_TPMCR		(UL(1) << 5)
-> -#define MDCR_EL2_HPMN_MASK	(UL(0x1F))
-> -#define MDCR_EL2_RES0		(GENMASK(63, 37) |	\
-> -				 GENMASK(35, 30) |	\
-> -				 GENMASK(25, 24) |	\
-> -				 GENMASK(22, 20) |	\
-> -				 BIT(18) |		\
-> -				 GENMASK(16, 15))
-> -
->  /*
->   * FGT register definitions
->   *
-> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> index 8d637ac4b7c6..0cb381c7e582 100644
-> --- a/arch/arm64/tools/sysreg
-> +++ b/arch/arm64/tools/sysreg
-> @@ -2388,6 +2388,39 @@ Field	1	AFSR1_EL1
->  Field	0	AFSR0_EL1
->  EndSysregFields
+>  	/* Anything from this can be RES0/RES1 sanitised */
+>  	MARKER(__SANITISED_REG_START__),
+> +	MDCR_EL2,	/* Monitor Debug Configuration Register (EL2) */
 >  
-> +Sysreg MDCR_EL2		3	4	1	1	1
-> +Res0	63:44
-> +Field	43	EBWE
-> +Res0	42
-> +Field	41:40	PMEE
-> +Res0	39:37
-> +Field	36	HPMFZS
-> +Res0	35:32
-> +Field	31:30	PMSSE
-> +Field	29	HPMFZO
-> +Field	28	MTPME
-> +Field	27	TDCC
-> +Field	26	HLP
-> +Field	25:24	E2TB
-> +Field	23	HCCD
-> +Res0	22:20
-> +Field	19	TTRF
-> +Res0	18
-> +Field	17	HPMD
-> +Res0	16
-> +Field	15	EnSPM
-> +Field	14	TPMS
-> +Field	13:12	E2PB
-> +Field	11	TDRA
-> +Field	10	TDOSA
-> +Field	9	TDA
-> +Field	8	TDE
-> +Field	7	HPME
-> +Field	6	TPM
-> +Field	5	TPMCR
-> +Field	4:0	HPMN
-> +EndSysreg
-> +
->  Sysreg HFGRTR_EL2	3	4	1	1	4
->  Fields	HFGxTR_EL2
->  EndSysreg
+>  	/* Any VNCR-capable reg goes after this point */
+>  	MARKER(__VNCR_START__),
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index b20b3bfb9cae..33d85db860f3 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -1186,5 +1186,40 @@ int kvm_init_nv_sysregs(struct kvm *kvm)
+>  		res0 |= SCTLR_EL1_EPAN;
+>  	set_sysreg_masks(kvm, SCTLR_EL1, res0, res1);
+>  
+> +	/* MDCR_EL2 */
+> +	res0 = MDCR_EL2_RES0;
+> +	res1 = MDCR_EL2_RES1;
+> +	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMUVer, IMP))
+> +		res0 |= (MDCR_EL2_HPMN | MDCR_EL2_TPMCR |
+> +			 MDCR_EL2_TPM | MDCR_EL2_HPME);
+> +	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMSVer, IMP))
+> +		res0 |= MDCR_EL2_E2PB | MDCR_EL2_TPMS;
+> +	if (!kvm_has_feat(kvm, ID_AA64DFR1_EL1, SPMU, IMP))
+> +		res0 |= MDCR_EL2_EnSPM;
+> +	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMUVer, V3P1))
+> +		res0 |= MDCR_EL2_HPMD;
+> +	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, TraceFilt, IMP))
+> +		res0 |= MDCR_EL2_TTRF;
+> +	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMUVer, V3P5))
+> +		res0 |= MDCR_EL2_HCCD | MDCR_EL2_HLP;
+> +	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, TraceBuffer, IMP))
+> +		res0 |= MDCR_EL2_E2TB;
+> +	if (!kvm_has_feat(kvm, ID_AA64MMFR0_EL1, FGT, IMP))
+> +		res0 |= MDCR_EL2_TDCC;
+> +	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, MTPMU, IMP) &&
+> +	    !kvm_has_feat(kvm, ID_AA64PFR0_EL1, EL3, IMP))
+> +		res0 |= MDCR_EL2_MTPME;
 
-Since you are already adding fields compared to the original version,
-how about upgrading directly to the 2024-09 XML drop? It at least
-contains the instruction stuffing control (EnSTEPOP, bit 50).
+This doesn't seem to match the spec:
+
+<quote>
+When FEAT_MTPMU is implemented and EL3 is not implemented:
+[...]
+Otherwise:
+Reserved, RES0.
+</quote>
+
+I would have expected something like:
+
+	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, MTPMU, IMP) ||
+	    kvm_has_feat(kvm, ID_AA64PFR0_EL1, EL3, IMP))
+		res0 |= MDCR_EL2_MTPME;
+
+making it forever RES0, since NV always exposes an EL3 so that SMC
+appears as a valid instruction, even in situations where EL3 isn't
+implemented.
+
+> +	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMUVer, V3P7))
+> +		res0 |= MDCR_EL2_HPMFZO;
+> +	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMSS, IMP))
+> +		res0 |= MDCR_EL2_PMSSE;
+> +	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMSVer, V1P2))
+> +		res0 |= MDCR_EL2_HPMFZS;
+> +	if (!kvm_has_feat(kvm, ID_AA64DFR1_EL1, EBEP, IMP))
+> +		res0 |= MDCR_EL2_PMEE;
+> +	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, DebugVer, V8P9))
+> +		res0 |= MDCR_EL2_EBWE;
+> +	set_sysreg_masks(kvm, MDCR_EL2, res0, res1);
+> +
+>  	return 0;
+>  }
 
 Thanks,
 
