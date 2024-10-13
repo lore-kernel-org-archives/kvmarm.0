@@ -1,52 +1,57 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79D732AF1E
-	for <kvmarm@lists.linux.dev>; Sun, 13 Oct 2024 12:43:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B266A143871;
+	Sun, 13 Oct 2024 14:27:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728823408; cv=none; b=nl29fkxuVdZ3RVnSPAcDo0O2A+hKN1QvZQvP4UVcCA/lLrm1jN+7QB0qYgofyOl6oTk0xxHlZZ8vkUfaEH905+yKPZ9gJYBK1GZUTw9rTS9zqBrrkiSHbQO926YxTsIllXbzysFj6XmAieZWW5IgNiabsT5JIdyk8AmJR9iEbZQ=
+	t=1728829645; cv=none; b=eehVGrk91R1y/HlzxrhWvgg37pWWTXWANUl9ft+pmG2EacLuXTtRZy2OjKXq8vSjC6IQI5MOb2dWOKtLmT4mIYfAIiDoD83kicpdpzDHDS0CvW7IXTFSHJ+NSTrfniCV2OtV7Tz+v7rhTX0uG29RkTgFCqPAEJWOwtkdAuQNbHs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728823408; c=relaxed/simple;
-	bh=dAioUaBGSTAm7LYT9Kp7KP4Nn6/FZmlo+oJUGVFmoGo=;
+	s=arc-20240116; t=1728829645; c=relaxed/simple;
+	bh=1DenOp6yAbDdzFmC3Cf8Axxvq2UCc4WSNT9M1HmtA0g=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VWFDFIDYqMxgqZP3A7gBgmQuvei2RXqajVePzPNWnXNCXETG47IEJlXVBpNoaVmHFeV3hLmP7jM9ysSj2xQuSFudvnjr09Civ1JKRPIfKW4CWnP1Z+xG/0SUMYsGxudbRsNm1WXMvppB/Bv03QpNdbWx11S7+AhYU78YBvuw4rM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sPoVwVtT; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=MBXgn39Ip3Ea3jrR6eeOhpJfRjzN5iL/rgVQbzJsIP92GzIhR7L9IzBBBo4D7kZDjwblofr/n8LV/1P9bIxABNIu8D+0nk3fnunWO9qxDx90KDb77LF5+frvDugL032qzWTycYCTPjFBb5DXX/4Vh4gid2zGio9gyrCN+nAv0GY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gkk5qey0; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sPoVwVtT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11A88C4CEC5;
-	Sun, 13 Oct 2024 12:43:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gkk5qey0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45BEBC4CEC5;
+	Sun, 13 Oct 2024 14:27:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728823408;
-	bh=dAioUaBGSTAm7LYT9Kp7KP4Nn6/FZmlo+oJUGVFmoGo=;
+	s=k20201202; t=1728829645;
+	bh=1DenOp6yAbDdzFmC3Cf8Axxvq2UCc4WSNT9M1HmtA0g=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sPoVwVtTZHF92JBV6iEQD0tRio7IvcCLJFDc9mjc3hfmnUBBUUIIbZ+H5YVMLw3CA
-	 hbuncvxf7rbtTR56PyyFHkas4jHFoLOR16dRcRz/+0M/JhGNCtORF6nmLhdz/4Ke3t
-	 NkfKNj4WdR6By07LDtk/Xp2IqhnZGgb8SYnX34qcMdzAePvZg8SPtYg0B2366YAj+t
-	 h/ZTQaKsNWJVQ8EDXB24zq8Aftd8EK5RVuT8FCFhO0dzTMRbrc9ja85w9eOSvgc6rb
-	 atyxF6bW0ssQsL9QPVH10WkMGyYY83FdzzcsrjatKX/+65zLH/UfxFwwuMfuRjZNLJ
-	 D0GXOxYzjcBpg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	b=Gkk5qey0ATDS5bGAKlvAUMyNzDAUdsbxMX2sj+CJ8cV70/Wk/zXhOG3zos+/1gCx6
+	 DVn7sWTS5KipxxqSXqRhbuj9BnXJaX5jFOHEXEywYH1oROs9A8fspbNKJVtc5LOAUs
+	 ZDNcnrgqn8rCBuLM01v06K4A/lG3CfRw9Cpr2TlO+xokyfUqH2Z+MmaBxx6tAXbEvF
+	 1YgFglSxpaMiJz3quUjgFtlFozXIfriYmduhjp2zcPGYfmPdNa4pPQssYXKDtP/EYx
+	 smuHRqi6S9G5TLVaVcuVXvrsoMlnOInWlx3tCSTJOL8IEq/e/xEMVFBwAr6G0EKvpf
+	 5jsC+rJAyLPvA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1szxwT-0036yp-Th;
-	Sun, 13 Oct 2024 13:43:26 +0100
-Date: Sun, 13 Oct 2024 13:43:25 +0100
-Message-ID: <86a5f85g2a.wl-maz@kernel.org>
+	id 1szzZ5-0037am-52;
+	Sun, 13 Oct 2024 15:27:23 +0100
+Date: Sun, 13 Oct 2024 15:27:22 +0100
+Message-ID: <871q0kulh1.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>
-Subject: Re: [PATCH v3 00/17] KVM: arm64: nv: Support for EL2 PMU controls
-In-Reply-To: <20241007174559.1830205-1-oliver.upton@linux.dev>
-References: <20241007174559.1830205-1-oliver.upton@linux.dev>
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH v4 33/36] KVM: arm64: Disable hierarchical permissions when POE is enabled
+In-Reply-To: <ZweLbQRD6wAkG6Sz@linux.dev>
+References: <20241009190019.3222687-1-maz@kernel.org>
+	<20241009190019.3222687-34-maz@kernel.org>
+	<ZweLbQRD6wAkG6Sz@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -55,32 +60,76 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, anshuman.khandual@arm.com
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, alexandru.elisei@arm.com, broonie@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 07 Oct 2024 18:45:42 +0100,
+On Thu, 10 Oct 2024 09:08:13 +0100,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Marc, I stole patch 1 from you for the sake of sending out a consistent
-> series. I can sort things out when I apply patches if that patch is a
-> common base for the both of us.
+> On Wed, Oct 09, 2024 at 08:00:16PM +0100, Marc Zyngier wrote:
+> > The hierarchical permissions must be disabled when POE is enabled
+> > in the translation regime used for a given table walk.
+> > 
+> > We store the two enable bits in the s1_walk_info structure so that
+> > they can be retrieved down the line, as they will be useful.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/at.c | 36 ++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 36 insertions(+)
+> > 
+> > diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> > index 4921284eeedff..301399f17983f 100644
+> > --- a/arch/arm64/kvm/at.c
+> > +++ b/arch/arm64/kvm/at.c
+> > @@ -24,6 +24,8 @@ struct s1_walk_info {
+> >  	unsigned int		txsz;
+> >  	int 	     		sl;
+> >  	bool	     		hpd;
+> > +	bool			e0poe;
+> > +	bool			poe;
+> >  	bool	     		be;
+> >  	bool	     		s2;
+> >  };
+> > @@ -110,6 +112,34 @@ static bool s1pie_enabled(struct kvm_vcpu *vcpu, enum trans_regime regime)
+> >  	}
+> >  }
+> >  
+> > +static void compute_s1poe(struct kvm_vcpu *vcpu, struct s1_walk_info *wi)
+> > +{
+> > +	u64 val;
+> > +
+> > +	if (!kvm_has_feat(vcpu->kvm, ID_AA64MMFR3_EL1, S1PIE, IMP)) {
+> 
+> nit: kvm_has_s1pie()
 
-np, this is common infrastructure that is sorely needed anyway.
+Nah, that's a gold plated bug, and really should check for S1POE. I
+guess I'll add a helper (kvm_has_s1poe), and use that throughout.
 
 > 
-> v2 -> v3:
->  - Use the sysreg sanitisation infrastructure to apply RES0/RES1 masks
->    to MDCR_EL2
->  - Drop trap_config bit describing if a trap applies to Host EL0
->  - Honor MDCR_EL2.{HPME,HLP} for the 'hypervisor range' of PMU counters
+> > +		wi->poe = wi->e0poe = false;
+> > +		return;
+> > +	}
+> > +
+> > +	switch (wi->regime) {
+> > +	case TR_EL2:
+> > +	case TR_EL20:
+> > +		val = vcpu_read_sys_reg(vcpu, TCR2_EL2);
+> > +		wi->poe = val & TCR2_EL2_POE;
+> > +		wi->e0poe = val & TCR2_EL2_E0POE;
 > 
-> v2: https://lore.kernel.org/kvmarm/20240827002235.1753237-1-oliver.upton@linux.dev/#r
+> Hmm... E0POE is always false in the EL2 translation regime. The RES0
+> mask does the heavy lifting here, but that only works if we force
+> userspace to select an nVHE-only or VHE-only vCPU.
 
-Other than the couple of small issues I mentioned, this looks solid to
-me, and I'd be happy to see this being merged. Can't test it,
-unfortunately, but I trust that it's seen HW more compliant than the
-one I'm using.
+Which is the plan of record, but yeah, you can't work that out from
+this snippet.
+
+> It might make sense to have TR_EL2 force this to false to make it a bit
+> more self-documenting, albeit not a functional issue.
+
+Sure, I'll add a mask if that helps making sense of the whole thing.
 
 Thanks,
 
