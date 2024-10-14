@@ -1,155 +1,179 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0CB915B966
-	for <kvmarm@lists.linux.dev>; Mon, 14 Oct 2024 10:24:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F272158DC4
+	for <kvmarm@lists.linux.dev>; Mon, 14 Oct 2024 10:48:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728901470; cv=none; b=CAT4aWxJMkSj8kEIR1eTJ5eAuBEMw952W1gNC1ekQ22SgjcgMKQhHY7DOv+DlOIlmAiCdN3sl1v1xqSlngFLzp5nKvS+bslTjaCFz7ajF0GTP/cNIJ3T7eRgmEY7DmBinY6QIcN9eX61PCqcAQM6zHs7eQxY77n1SKm037/dYT4=
+	t=1728902885; cv=none; b=pmz5KUn4XNNy+3AQ3j4dNR9G+zKKLKSsLPULpmHHM8jXb+h9oFxE8rYAzsHt7lQA3ITdqcMVMzlVBhQF4mbIPau5qwDyfn3VIRiNQhU+90QlB1wA+LFIAASaLWkl4R+uj07sUFk7yUJ3FJlXqfIZx5sNt8/isvL0UkQASxBR/EY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728901470; c=relaxed/simple;
-	bh=+Tttj1w9r93mHCVP+3hFymnwHbdS9EM+4BBwyKSiaFM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=abyrDR/xzI2/SfzXEE3sRPFbRuVncFp9xBwZeqm3wUtZMJQxAms1ciWAn8QvDE/8Ju+7WYQAN11DOxVMp6KVeFY6e+ssvb2uahx1g/Pkvhm0iCEcGa6uWvbhjLKQPVx1RrIxpeCT5InV3Cx+RBJoaW19sHfhD9ml+qtPrVelr8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Q2gwbQEn; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Q2gwbQEn"
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e293150c2c6so3627063276.1
-        for <kvmarm@lists.linux.dev>; Mon, 14 Oct 2024 03:24:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728901466; x=1729506266; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hBsiOuoUPTJrqcIbqk4lagLElR1Q8/+Viz4LI9Vn2n8=;
-        b=Q2gwbQEniK1uSQdniB+QGiuy6P0uMUkFAgsLBswLIkJfK5H3JCrJo0kxMDzKj5wF7I
-         EIyNTPjc1PhAkGtdcWetRUuIOwDlAJS7wPgk7sqczlNae2ekthco8WpF1U/TgnA/RkoS
-         sQO41cZxsXsILIPjkXm6YhGzhsmab3huwC/0A0Hkf6yiV2Os/YtgrCNZtfYrLXV/WWU0
-         D3x4kIvpEwycoppsr6GVY+BtO/Xp7jHfCTbOpPDOkEIdY/aSNjMafDMV8qc3rXRL+plx
-         EM60ci8DBRpxA5TMkBUM/TEOzuR8JchVu9Ufy4iSRc6xPC/O+DLDv9/xJVfVYGEQr5fN
-         dmuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728901466; x=1729506266;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hBsiOuoUPTJrqcIbqk4lagLElR1Q8/+Viz4LI9Vn2n8=;
-        b=RHUQIEQiwng6brUCgPO/mSI+GvPfqLpno5YVAUyXnpSvuepDN34MO2VJomAeUT1wF5
-         GVyt4NSqFrgXU1oEjYEL8b2cykSNfQCVZCaHrXe9m6FUhw4QugD0Zjv4/w2r9DYWufJW
-         ZnGAuBCSZ2GbO4g5FKa8l/YOSWhH5pcYUt4iid5hWQeQdS2TnHKdObbqqIgpnTHfZxJw
-         BZ/9NOGK1CjV2okTZZ4xmsefoLGgFax9l7M0pRiDlhsmNF+19LdX7Tz+/2DbjVfsffPj
-         PLMzc1OSIASAL0ecBBuETjFGWpELj1DztR/inC5bCJiLd7cEe5TNYuVnKNKfmW2anEBZ
-         m2uQ==
-X-Gm-Message-State: AOJu0YwfAa7GUamUMoEIdQD/lMhdEivMwOMO8klxC2J1wMhtjfCDmik2
-	bCnJfWhuVtD397BjLngAsVLreWNkhQEg0ZCq0ezxN0WPJbJqVWu0JbVwUckZSh4NhLKSaFIx1iR
-	sMWCZfe252uknKSFQhvmqyfSZmqHxC5QvhuN/5z0pd1SBVI7hP68cri5jnC8s56sCBi7KZHs4pa
-	xiCxgg+gZvZ9A9tmG8u53La2AZaYs=
-X-Google-Smtp-Source: AGHT+IEFdh0hVyoj2MgBQwLbfceN8az12r7Q/BkvckNAufGyr7TTJGLmDcpzKe8fudSZaser7BMS7ijsNw==
-X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a25:8745:0:b0:e28:fc1b:66bb with SMTP id
- 3f1490d57ef6-e2919df896dmr7437276.6.1728901464850; Mon, 14 Oct 2024 03:24:24
- -0700 (PDT)
-Date: Mon, 14 Oct 2024 11:24:12 +0100
-In-Reply-To: <20241014102413.4092725-1-tabba@google.com>
+	s=arc-20240116; t=1728902885; c=relaxed/simple;
+	bh=Fy8O4T0wrSTEzzQEqExtz1vMOSLdBu40q/2KIJ6LpQM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oA4ULTIxgLSCRytz26/yHOtKborZICsk7ObqinCeIZmdcSkBz1Ig3P1Xy2DPAQCyYbu5ZJnOeHsy6wywd5ee/Lgzb3QdBPnWDnvEg+PFYwboz2hIhrVXWV4zV2Gvb4qhDd/rdKHs3ajKcEv5BUe6CLr7n9zdmJP54ZHNTSihA4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F01891007;
+	Mon, 14 Oct 2024 03:48:31 -0700 (PDT)
+Received: from [10.163.38.184] (unknown [10.163.38.184])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2D27F3F51B;
+	Mon, 14 Oct 2024 03:47:58 -0700 (PDT)
+Message-ID: <61203419-014e-4815-823c-62079aea93c9@arm.com>
+Date: Mon, 14 Oct 2024 16:18:00 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20241014102413.4092725-1-tabba@google.com>
-X-Mailer: git-send-email 2.47.0.rc1.288.g06298d1525-goog
-Message-ID: <20241014102413.4092725-5-tabba@google.com>
-Subject: [PATCH v1 4/4] KVM: arm64: Initialize trap register values in hyp in pKVM
-From: Fuad Tabba <tabba@google.com>
-To: kvmarm@lists.linux.dev
-Cc: maz@kernel.org, oliver.upton@linux.dev, catalin.marinas@arm.com, 
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	will@kernel.org, tabba@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/5] arm64/mm: Replace PXD_TABLE_BIT with
+ PXD_TYPE_[MASK|SECT]
+To: Ryan Roberts <ryan.roberts@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ James Morse <james.morse@arm.com>, Catalin Marinas
+ <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Ard Biesheuvel <ardb@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20241005123824.1366397-1-anshuman.khandual@arm.com>
+ <20241005123824.1366397-3-anshuman.khandual@arm.com>
+ <bb1dcfcf-302a-4932-a0d5-3abf5ed958c5@arm.com>
+Content-Language: en-US
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+In-Reply-To: <bb1dcfcf-302a-4932-a0d5-3abf5ed958c5@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Handle the initialization of trap registers at the hypervisor in
-pKVM, even for non-protected guests. The host is not trusted with
-the values of the trap registers, regardless of the VM type.
-Therefore, when switching between the host and the guests, only
-flush the required bits of the trap registers from the host's
-view that are required for hyp-host communication.
 
-Reported-by: Will Deacon <will@kernel.org>
-Fixes: 814ad8f96e92 ("KVM: arm64: Drop trapping of PAuth instructions/keys")
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
- arch/arm64/kvm/hyp/nvhe/hyp-main.c |  4 +++-
- arch/arm64/kvm/hyp/nvhe/pkvm.c     | 35 ++++++++++++++++++++++++++++++
- 2 files changed, 38 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 1a224d5df207..6aa0b13d86e5 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -105,8 +105,10 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
- 
- 	hyp_vcpu->vcpu.arch.hw_mmu	= host_vcpu->arch.hw_mmu;
- 
--	hyp_vcpu->vcpu.arch.hcr_el2	= host_vcpu->arch.hcr_el2;
- 	hyp_vcpu->vcpu.arch.mdcr_el2	= host_vcpu->arch.mdcr_el2;
-+	hyp_vcpu->vcpu.arch.hcr_el2 &= ~(HCR_TWI | HCR_TWE);
-+	hyp_vcpu->vcpu.arch.hcr_el2 |= READ_ONCE(host_vcpu->arch.hcr_el2) &
-+						 (HCR_TWI | HCR_TWE);
- 
- 	hyp_vcpu->vcpu.arch.iflags	= host_vcpu->arch.iflags;
- 
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index 954df57a935f..01616c39a810 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -204,11 +204,46 @@ static void pvm_init_trap_regs(struct kvm_vcpu *vcpu)
- 	}
- }
- 
-+static void pkvm_vcpu_reset_hcr(struct kvm_vcpu *vcpu)
-+{
-+	vcpu->arch.hcr_el2 = HCR_GUEST_FLAGS;
-+
-+	if (has_hvhe())
-+		vcpu->arch.hcr_el2 |= HCR_E2H;
-+
-+	if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN)) {
-+		/* route synchronous external abort exceptions to EL2 */
-+		vcpu->arch.hcr_el2 |= HCR_TEA;
-+		/* trap error record accesses */
-+		vcpu->arch.hcr_el2 |= HCR_TERR;
-+	}
-+
-+	if (cpus_have_final_cap(ARM64_HAS_STAGE2_FWB))
-+		vcpu->arch.hcr_el2 |= HCR_FWB;
-+
-+	if (cpus_have_final_cap(ARM64_HAS_EVT) &&
-+	    !cpus_have_final_cap(ARM64_MISMATCHED_CACHE_TYPE))
-+		vcpu->arch.hcr_el2 |= HCR_TID4;
-+	else
-+		vcpu->arch.hcr_el2 |= HCR_TID2;
-+
-+	if (vcpu_has_ptrauth(vcpu))
-+		vcpu->arch.hcr_el2 |= (HCR_API | HCR_APK);
-+}
-+
- /*
-  * Initialize trap register values in protected mode.
-  */
- static void pkvm_vcpu_init_traps(struct kvm_vcpu *vcpu)
+On 10/9/24 18:58, Ryan Roberts wrote:
+> On 05/10/2024 13:38, Anshuman Khandual wrote:
+>> This modifies existing block mapping related helpers e.g [pmd|pud]_mkhuge()
+>> , mk_[pmd|pud]_sect_prot() and pmd_trans_huge() to use PXD_TYPE_[MASK|SECT]
+>> instead of corresponding PXD_TABLE_BIT. This also moves pmd_sect() earlier
+>> for the symbol's availability preventing a build warning.
+>>
+>> While here this also drops pmd_val() check from pmd_trans_huge() helper, as
+>> pmd_present() returning true already ensures that pmd_val() cannot be false
+>>
+>> Cc: Catalin Marinas <catalin.marinas@arm.com>
+>> Cc: Will Deacon <will@kernel.org>
+>> Cc: Ard Biesheuvel <ardb@kernel.org>
+>> Cc: Ryan Roberts <ryan.roberts@arm.com>
+>> Cc: Mark Rutland <mark.rutland@arm.com>
+>> Cc: linux-arm-kernel@lists.infradead.org
+>> Cc: linux-kernel@vger.kernel.org
+>> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+>> ---
+>>  arch/arm64/include/asm/pgtable.h | 15 ++++++++-------
+>>  1 file changed, 8 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
+>> index fa4c32a9f572..45c49c5ace80 100644
+>> --- a/arch/arm64/include/asm/pgtable.h
+>> +++ b/arch/arm64/include/asm/pgtable.h
+>> @@ -484,12 +484,12 @@ static inline pmd_t pte_pmd(pte_t pte)
+>>  
+>>  static inline pgprot_t mk_pud_sect_prot(pgprot_t prot)
+>>  {
+>> -	return __pgprot((pgprot_val(prot) & ~PUD_TABLE_BIT) | PUD_TYPE_SECT);
+>> +	return __pgprot((pgprot_val(prot) & ~PUD_TYPE_MASK) | PUD_TYPE_SECT);
+>>  }
+>>  
+>>  static inline pgprot_t mk_pmd_sect_prot(pgprot_t prot)
+>>  {
+>> -	return __pgprot((pgprot_val(prot) & ~PMD_TABLE_BIT) | PMD_TYPE_SECT);
+>> +	return __pgprot((pgprot_val(prot) & ~PMD_TYPE_MASK) | PMD_TYPE_SECT);
+>>  }
+>>  
+>>  static inline pte_t pte_swp_mkexclusive(pte_t pte)
+>> @@ -554,10 +554,13 @@ static inline int pmd_protnone(pmd_t pmd)
+>>   * THP definitions.
+>>   */
+>>  
+>> +#define pmd_sect(pmd)		((pmd_val(pmd) & PMD_TYPE_MASK) == \
+>> +				 PMD_TYPE_SECT)
+>> +
+>>  #ifdef CONFIG_TRANSPARENT_HUGEPAGE
+>>  static inline int pmd_trans_huge(pmd_t pmd)
+>>  {
+>> -	return pmd_val(pmd) && pmd_present(pmd) && !(pmd_val(pmd) & PMD_TABLE_BIT);
+>> +	return pmd_present(pmd) && pmd_sect(pmd);
+> 
+> Bug? Prevously we would have returned true for a "present-invalid" PMD block
+> mapping - that's one which is formatted as a PMD block mapping except the
+> PTE_VALID bit is clear and PTE_PRESENT_INVALID is set. But now, due to
+> pmd_sect() testing VALID is set (via PMD_TYPE_SECT), we no longer return true in
+> this case.
+
+Agreed, that will be problematic but the situation can be rectified by decoupling
+pmd_present_invalid() from pte_present_invalid() by checking for both last bits
+instead of just the valid bit against PTE_PRESENT_INVALID.
+
+#define pmd_sect(pmd)          ((pmd_val(pmd) & PMD_TYPE_MASK) == \
+                                PMD_TYPE_SECT)
+
+#define pmd_present_invalid(pmd) \
+       ((pmd_val(pmd) & (PMD_TYPE_MASK | PTE_PRESENT_INVALID)) == PTE_PRESENT_INVALID)
+
+ #ifdef CONFIG_TRANSPARENT_HUGEPAGE
+ static inline int pmd_trans_huge(pmd_t pmd)
  {
-+	vcpu->arch.cptr_el2 = kvm_get_reset_cptr_el2(vcpu);
-+	vcpu->arch.mdcr_el2 = 0;
-+
-+	pkvm_vcpu_reset_hcr(vcpu);
-+
-+	if ((!vcpu_is_protected(vcpu)))
-+		return;
-+
- 	pvm_init_trap_regs(vcpu);
- 	pvm_init_traps_aa64pfr0(vcpu);
- 	pvm_init_traps_aa64pfr1(vcpu);
--- 
-2.47.0.rc1.288.g06298d1525-goog
+	return pmd_sect(pmd) || pmd_present_invalid(pmd);
+ }
+ #endif /* CONFIG_TRANSPARENT_HUGEPAGE */
 
+> 
+>>  }
+>>  #endif /* CONFIG_TRANSPARENT_HUGEPAGE */
+>>  
+>> @@ -586,7 +589,7 @@ static inline int pmd_trans_huge(pmd_t pmd)
+>>  
+>>  #define pmd_write(pmd)		pte_write(pmd_pte(pmd))
+>>  
+>> -#define pmd_mkhuge(pmd)		(__pmd(pmd_val(pmd) & ~PMD_TABLE_BIT))
+>> +#define pmd_mkhuge(pmd)		(__pmd((pmd_val(pmd) & ~PMD_TYPE_MASK) | PMD_TYPE_SECT))
+> 
+> I'm not sure if this also suffers from a similar problem? Is it possible that a
+> present-invalid pmd would be passed to pmd_mkhuge()? If so, then we are now
+> incorrectly setting the PTE_VALID bit.
+pmd_mkhuge() converts a regular pmd into a huge page and on arm64
+creating a huge page also involves setting PTE_VALID. Why would a
+present-invalid pmd is passed into pmd_mkhuge() without intending
+to make a huge entry ?
+
+There just two generic use cases for pmd_mkhuge().
+
+insert_pfn_pmd
+	   entry = pmd_mkhuge(pfn_t_pmd(pfn, prot));
+
+set_huge_zero_folio
+        entry = mk_pmd(&zero_folio->page, vma->vm_page_prot);
+        entry = pmd_mkhuge(entry);
+
+As instances in mm/debug_vm_pgtable.c, pmd_mkinvalid() should be
+called on a PMD entry after pmd_mkhuge() not the other way around.
+
+> 
+>>  
+>>  #ifdef CONFIG_TRANSPARENT_HUGEPAGE
+>>  #define pmd_devmap(pmd)		pte_devmap(pmd_pte(pmd))
+>> @@ -614,7 +617,7 @@ static inline pmd_t pmd_mkspecial(pmd_t pmd)
+>>  #define pud_mkyoung(pud)	pte_pud(pte_mkyoung(pud_pte(pud)))
+>>  #define pud_write(pud)		pte_write(pud_pte(pud))
+>>  
+>> -#define pud_mkhuge(pud)		(__pud(pud_val(pud) & ~PUD_TABLE_BIT))
+>> +#define pud_mkhuge(pud)		(__pud((pud_val(pud) & ~PUD_TYPE_MASK) | PUD_TYPE_SECT))
+>>  
+>>  #define __pud_to_phys(pud)	__pte_to_phys(pud_pte(pud))
+>>  #define __phys_to_pud_val(phys)	__phys_to_pte_val(phys)
+>> @@ -712,8 +715,6 @@ extern pgprot_t phys_mem_access_prot(struct file *file, unsigned long pfn,
+>>  
+>>  #define pmd_table(pmd)		((pmd_val(pmd) & PMD_TYPE_MASK) == \
+>>  				 PMD_TYPE_TABLE)
+>> -#define pmd_sect(pmd)		((pmd_val(pmd) & PMD_TYPE_MASK) == \
+>> -				 PMD_TYPE_SECT)
+>>  #define pmd_leaf(pmd)		(pmd_present(pmd) && !pmd_table(pmd))
+>>  #define pmd_bad(pmd)		(!pmd_table(pmd))
+>>  
+> 
