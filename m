@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37B6F197A7F
-	for <kvmarm@lists.linux.dev>; Mon, 14 Oct 2024 11:08:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE37245C1C
+	for <kvmarm@lists.linux.dev>; Mon, 14 Oct 2024 11:33:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728904113; cv=none; b=PkCgjxOs8QimulA9vePcNSv3zz13QIGyY66MY1y6ZWlFIz9hshK4XIjHnRW3D19JftyNIOAgX9qx5WhqjFA0ezviTC1l+oYZ+iQ6T3mFPuiEfVO1FMQDURyx6ONZxL15qol8gBzE7yvCq4rpM0f6QktRi89cB2h+fc1yTaJUv4U=
+	t=1728905613; cv=none; b=PXoyPJx29p57IamkWLXlyuLGMm+NQXZtLQ3SWD2eaKp1GZiaYiM2inZ3tbGn7XTnrXwYLXVIFTyT98tABx4/t4tujq02SsC+H2XOOl7KCybeRwP0swcU4Zd0SGFaPHY6qSExEesks7kg84Wad79uSnl8hu3MBjLbIrVYz7rTPmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728904113; c=relaxed/simple;
-	bh=vtEgCTxGZDgLyHPqBJeeO57xsUmq3uC2TGRhYpM97sM=;
+	s=arc-20240116; t=1728905613; c=relaxed/simple;
+	bh=Tx1VvYK07XZ81PXcF8k0/TFw2EiAs5sAgXOJg1i0AVs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uGI/L1xKIaOVCAiXUiqZXNVu2qTE1vINO9ALF8k9Glvx5JZGIEwb9CiQG7n0gZYXSZ2grZfdEjh87e3tMq87w+emWtRz8xZ7KZ4xfNVjxbOlM/jXoGfEpKMsEOLpMhn/ZAnKCSrFgJ5ZUIzXgdXwP+V4tiVPy1sYCdIfR+XNcQU=
+	 In-Reply-To:Content-Type; b=sfgXOJ1Mdtg1kCcWMnNGGRDncUsXSmEbdcU/+K/gJcB5d2bkhN/0W6A+MNEXV+e84KbZydzBSxFQ4DE75GI9VcCblvXhunr3beOKwaLHh+nxqX+Bs2g+x1aR4fhnUw8qjCq5Zniogw9/IDppF6na458o12eJcsTis6v+4tbPFTQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 551401688;
-	Mon, 14 Oct 2024 04:09:01 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D3ACE1424;
+	Mon, 14 Oct 2024 04:33:59 -0700 (PDT)
 Received: from [10.57.86.130] (unknown [10.57.86.130])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EAB983F51B;
-	Mon, 14 Oct 2024 04:08:29 -0700 (PDT)
-Message-ID: <e8f8f9e8-b042-4df8-92ea-1439a5e1ffb4@arm.com>
-Date: Mon, 14 Oct 2024 12:08:28 +0100
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 77B9E3F51B;
+	Mon, 14 Oct 2024 04:33:28 -0700 (PDT)
+Message-ID: <38469540-2759-4a65-8e7f-e2b309d58614@arm.com>
+Date: Mon, 14 Oct 2024 12:33:26 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,7 +27,9 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/5] arm64/mm: Drop pte_mkhuge()
+Subject: Re: [PATCH 2/5] arm64/mm: Replace PXD_TABLE_BIT with
+ PXD_TYPE_[MASK|SECT]
+Content-Language: en-GB
 To: Anshuman Khandual <anshuman.khandual@arm.com>,
  linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
@@ -36,31 +38,26 @@ Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
  Ard Biesheuvel <ardb@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
  kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
 References: <20241005123824.1366397-1-anshuman.khandual@arm.com>
- <20241005123824.1366397-2-anshuman.khandual@arm.com>
- <a4372d54-34bb-4a32-8742-ea6aacc0848c@arm.com>
- <a91df2f6-e0d6-4902-ae22-5df132f00737@arm.com>
-Content-Language: en-GB
+ <20241005123824.1366397-3-anshuman.khandual@arm.com>
+ <bb1dcfcf-302a-4932-a0d5-3abf5ed958c5@arm.com>
+ <61203419-014e-4815-823c-62079aea93c9@arm.com>
 From: Ryan Roberts <ryan.roberts@arm.com>
-In-Reply-To: <a91df2f6-e0d6-4902-ae22-5df132f00737@arm.com>
+In-Reply-To: <61203419-014e-4815-823c-62079aea93c9@arm.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 14/10/2024 09:59, Anshuman Khandual wrote:
+On 14/10/2024 11:48, Anshuman Khandual wrote:
 > 
 > 
-> On 10/9/24 18:50, Ryan Roberts wrote:
+> On 10/9/24 18:58, Ryan Roberts wrote:
 >> On 05/10/2024 13:38, Anshuman Khandual wrote:
->>> Core HugeTLB defines arch_make_huge_pte() fallback definition, which calls
->>> platform provided pte_mkhuge(). But if any platform already provides custom
->>> arch_make_huge_pte(), then it does not need to provide pte_mkhuge(). arm64
->>> defines arch_make_huge_pte(), but then also calls pte_mkhuge() internally.
->>> This creates confusion as if both of these callbacks are being used in core
->>> HugeTLB and required to be defined in the platform.
+>>> This modifies existing block mapping related helpers e.g [pmd|pud]_mkhuge()
+>>> , mk_[pmd|pud]_sect_prot() and pmd_trans_huge() to use PXD_TYPE_[MASK|SECT]
+>>> instead of corresponding PXD_TABLE_BIT. This also moves pmd_sect() earlier
+>>> for the symbol's availability preventing a build warning.
 >>>
->>> This changes arch_make_huge_pte() to create block mapping directly and also
->>> drops off now redundant helper pte_mkhuge(), making things clear. Also this
->>> changes HugeTLB page creation from just clearing the PTE_TABLE_BIT (bit[1])
->>> to actually setting bits[1:0] via PTE_TYPE_[MASK|SECT] instead.
+>>> While here this also drops pmd_val() check from pmd_trans_huge() helper, as
+>>> pmd_present() returning true already ensures that pmd_val() cannot be false
 >>>
 >>> Cc: Catalin Marinas <catalin.marinas@arm.com>
 >>> Cc: Will Deacon <will@kernel.org>
@@ -71,87 +68,135 @@ On 14/10/2024 09:59, Anshuman Khandual wrote:
 >>> Cc: linux-kernel@vger.kernel.org
 >>> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
 >>> ---
->>>  arch/arm64/include/asm/pgtable-hwdef.h | 1 +
->>>  arch/arm64/include/asm/pgtable.h       | 5 -----
->>>  arch/arm64/mm/hugetlbpage.c            | 2 +-
->>>  3 files changed, 2 insertions(+), 6 deletions(-)
+>>>  arch/arm64/include/asm/pgtable.h | 15 ++++++++-------
+>>>  1 file changed, 8 insertions(+), 7 deletions(-)
 >>>
->>> diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
->>> index fd330c1db289..956a702cb532 100644
->>> --- a/arch/arm64/include/asm/pgtable-hwdef.h
->>> +++ b/arch/arm64/include/asm/pgtable-hwdef.h
->>> @@ -158,6 +158,7 @@
->>>  #define PTE_VALID		(_AT(pteval_t, 1) << 0)
->>>  #define PTE_TYPE_MASK		(_AT(pteval_t, 3) << 0)
->>>  #define PTE_TYPE_PAGE		(_AT(pteval_t, 3) << 0)
->>> +#define PTE_TYPE_SECT		(_AT(pteval_t, 1) << 0)
->>>  #define PTE_TABLE_BIT		(_AT(pteval_t, 1) << 1)
->>>  #define PTE_USER		(_AT(pteval_t, 1) << 6)		/* AP[1] */
->>>  #define PTE_RDONLY		(_AT(pteval_t, 1) << 7)		/* AP[2] */
 >>> diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
->>> index c329ea061dc9..fa4c32a9f572 100644
+>>> index fa4c32a9f572..45c49c5ace80 100644
 >>> --- a/arch/arm64/include/asm/pgtable.h
 >>> +++ b/arch/arm64/include/asm/pgtable.h
->>> @@ -438,11 +438,6 @@ static inline void __set_ptes(struct mm_struct *mm,
->>>  	}
+>>> @@ -484,12 +484,12 @@ static inline pmd_t pte_pmd(pte_t pte)
+>>>  
+>>>  static inline pgprot_t mk_pud_sect_prot(pgprot_t prot)
+>>>  {
+>>> -	return __pgprot((pgprot_val(prot) & ~PUD_TABLE_BIT) | PUD_TYPE_SECT);
+>>> +	return __pgprot((pgprot_val(prot) & ~PUD_TYPE_MASK) | PUD_TYPE_SECT);
 >>>  }
 >>>  
->>> -/*
->>> - * Huge pte definitions.
->>> - */
->>> -#define pte_mkhuge(pte)		(__pte(pte_val(pte) & ~PTE_TABLE_BIT))
->>> -
->>>  /*
->>>   * Hugetlb definitions.
->>>   */
->>> diff --git a/arch/arm64/mm/hugetlbpage.c b/arch/arm64/mm/hugetlbpage.c
->>> index 5f1e2103888b..5922c95630ad 100644
->>> --- a/arch/arm64/mm/hugetlbpage.c
->>> +++ b/arch/arm64/mm/hugetlbpage.c
->>> @@ -361,7 +361,7 @@ pte_t arch_make_huge_pte(pte_t entry, unsigned int shift, vm_flags_t flags)
+>>>  static inline pgprot_t mk_pmd_sect_prot(pgprot_t prot)
 >>>  {
->>>  	size_t pagesize = 1UL << shift;
+>>> -	return __pgprot((pgprot_val(prot) & ~PMD_TABLE_BIT) | PMD_TYPE_SECT);
+>>> +	return __pgprot((pgprot_val(prot) & ~PMD_TYPE_MASK) | PMD_TYPE_SECT);
+>>>  }
 >>>  
->>> -	entry = pte_mkhuge(entry);
->>> +	entry = __pte((pte_val(entry) & ~PTE_TYPE_MASK) | PTE_TYPE_SECT);
+>>>  static inline pte_t pte_swp_mkexclusive(pte_t pte)
+>>> @@ -554,10 +554,13 @@ static inline int pmd_protnone(pmd_t pmd)
+>>>   * THP definitions.
+>>>   */
+>>>  
+>>> +#define pmd_sect(pmd)		((pmd_val(pmd) & PMD_TYPE_MASK) == \
+>>> +				 PMD_TYPE_SECT)
+>>> +
+>>>  #ifdef CONFIG_TRANSPARENT_HUGEPAGE
+>>>  static inline int pmd_trans_huge(pmd_t pmd)
+>>>  {
+>>> -	return pmd_val(pmd) && pmd_present(pmd) && !(pmd_val(pmd) & PMD_TABLE_BIT);
+>>> +	return pmd_present(pmd) && pmd_sect(pmd);
 >>
->> I think there may be an existing bug here; if pagesize == CONT_PTE_SIZE, then
->> entry will be placed in the level 3 table. In this case, shouldn't bit 1 remain
->> set, because at level 3, a page mapping is denoted by bits[1:0] = 3 ? Currently
->> its being unconditionally cleared.
+>> Bug? Prevously we would have returned true for a "present-invalid" PMD block
+>> mapping - that's one which is formatted as a PMD block mapping except the
+>> PTE_VALID bit is clear and PTE_PRESENT_INVALID is set. But now, due to
+>> pmd_sect() testing VALID is set (via PMD_TYPE_SECT), we no longer return true in
+>> this case.
 > 
-> That's not a problem, pte_mkcont() brings back both the bits
-> via PTE_TYPE_PAGE along with PTE_CONT.
+> Agreed, that will be problematic but the situation can be rectified by decoupling
+> pmd_present_invalid() from pte_present_invalid() by checking for both last bits
+> instead of just the valid bit against PTE_PRESENT_INVALID.
 > 
->         if (pagesize == CONT_PTE_SIZE) {
->                 entry = pte_mkcont(entry);
->         } else if (pagesize == CONT_PMD_SIZE) {
->                 entry = pmd_pte(pmd_mkcont(pte_pmd(entry)));
->         } else if (pagesize != PUD_SIZE && pagesize != PMD_SIZE) {
->                 pr_warn("%s: unrecognized huge page size 0x%lx\n",
->                         __func__, pagesize);
->         }
-> 
-> static inline pte_t pte_mkcont(pte_t pte)
-> {
-> 	pte = set_pte_bit(pte, __pgprot(PTE_CONT));
->       	return set_pte_bit(pte, __pgprot(PTE_TYPE_PAGE));
+> #define pmd_sect(pmd)          ((pmd_val(pmd) & PMD_TYPE_MASK) == \
+>                                 PMD_TYPE_SECT)
 
-Oh wow, that's pretty hacky. Good job we never call pte_mkcont() on a
-PTE_PRESENT_INVALID PTE. This would turn it valid again.
+I know this is pre-existing, but the fact that this depends on PMD_VALID being
+set feels like something waiting to bite us. From the SW's PoV, we should get
+the same answer regardless of whether PMD_VALID xor PTE_PRESENT_INVALID is set.
+I know there is nobody depending on that right now, but it feels like a bug
+waiting to happen. I'm not sure how you would fix that without having the SW
+explcitly know about the table bit's existance though.
 
-> }
 > 
-> Although the same is not required for CONT_PMD_SIZE size huge
-> pages where only PTE_CONT is enough.
+> #define pmd_present_invalid(pmd) \
+>        ((pmd_val(pmd) & (PMD_TYPE_MASK | PTE_PRESENT_INVALID)) == PTE_PRESENT_INVALID)
+
+I read this as "if the type field is 0 and PTE_PRESENT_INVALID is 1 then it's
+present-invalid". That doesn't really feel any better to me than the code
+knowing there is a table bit. What's the benefit of doing this vs what the code
+already does? It all feels quite hacky to me.
+
 > 
-> static inline pmd_t pmd_mkcont(pmd_t pmd)
-> {
->         return __pmd(pmd_val(pmd) | PMD_SECT_CONT);
-> }
->  
->>>  	if (pagesize == CONT_PTE_SIZE) {
->>>  		entry = pte_mkcont(entry);
->>>  	} else if (pagesize == CONT_PMD_SIZE) {
+>  #ifdef CONFIG_TRANSPARENT_HUGEPAGE
+>  static inline int pmd_trans_huge(pmd_t pmd)
+>  {
+> 	return pmd_sect(pmd) || pmd_present_invalid(pmd);
+>  }
+>  #endif /* CONFIG_TRANSPARENT_HUGEPAGE */
+> >>
+>>>  }
+>>>  #endif /* CONFIG_TRANSPARENT_HUGEPAGE */
+>>>  
+>>> @@ -586,7 +589,7 @@ static inline int pmd_trans_huge(pmd_t pmd)
+>>>  
+>>>  #define pmd_write(pmd)		pte_write(pmd_pte(pmd))
+>>>  
+>>> -#define pmd_mkhuge(pmd)		(__pmd(pmd_val(pmd) & ~PMD_TABLE_BIT))
+>>> +#define pmd_mkhuge(pmd)		(__pmd((pmd_val(pmd) & ~PMD_TYPE_MASK) | PMD_TYPE_SECT))
+>>
+>> I'm not sure if this also suffers from a similar problem? Is it possible that a
+>> present-invalid pmd would be passed to pmd_mkhuge()? If so, then we are now
+>> incorrectly setting the PTE_VALID bit.
+> pmd_mkhuge() converts a regular pmd into a huge page and on arm64
+> creating a huge page also involves setting PTE_VALID. Why would a
+> present-invalid pmd is passed into pmd_mkhuge() without intending
+> to make a huge entry ?
+> 
+> There just two generic use cases for pmd_mkhuge().
+> 
+> insert_pfn_pmd
+> 	   entry = pmd_mkhuge(pfn_t_pmd(pfn, prot));
+> 
+> set_huge_zero_folio
+>         entry = mk_pmd(&zero_folio->page, vma->vm_page_prot);
+>         entry = pmd_mkhuge(entry);
+> 
+> As instances in mm/debug_vm_pgtable.c, pmd_mkinvalid() should be
+> called on a PMD entry after pmd_mkhuge() not the other way around.
+
+I guess it depends on your perspective. I agree there is no issue today. But
+from the core-mm's PoV, a present-invalid PMD should be indistinguishable from a
+present (-valid) one.
+
+
+> 
+>>
+>>>  
+>>>  #ifdef CONFIG_TRANSPARENT_HUGEPAGE
+>>>  #define pmd_devmap(pmd)		pte_devmap(pmd_pte(pmd))
+>>> @@ -614,7 +617,7 @@ static inline pmd_t pmd_mkspecial(pmd_t pmd)
+>>>  #define pud_mkyoung(pud)	pte_pud(pte_mkyoung(pud_pte(pud)))
+>>>  #define pud_write(pud)		pte_write(pud_pte(pud))
+>>>  
+>>> -#define pud_mkhuge(pud)		(__pud(pud_val(pud) & ~PUD_TABLE_BIT))
+>>> +#define pud_mkhuge(pud)		(__pud((pud_val(pud) & ~PUD_TYPE_MASK) | PUD_TYPE_SECT))
+>>>  
+>>>  #define __pud_to_phys(pud)	__pte_to_phys(pud_pte(pud))
+>>>  #define __phys_to_pud_val(phys)	__phys_to_pte_val(phys)
+>>> @@ -712,8 +715,6 @@ extern pgprot_t phys_mem_access_prot(struct file *file, unsigned long pfn,
+>>>  
+>>>  #define pmd_table(pmd)		((pmd_val(pmd) & PMD_TYPE_MASK) == \
+>>>  				 PMD_TYPE_TABLE)
+>>> -#define pmd_sect(pmd)		((pmd_val(pmd) & PMD_TYPE_MASK) == \
+>>> -				 PMD_TYPE_SECT)
+>>>  #define pmd_leaf(pmd)		(pmd_present(pmd) && !pmd_table(pmd))
+>>>  #define pmd_bad(pmd)		(!pmd_table(pmd))
+>>>  
 >>
 
