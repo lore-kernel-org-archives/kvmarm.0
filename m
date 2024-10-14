@@ -1,95 +1,148 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86E071C3043;
-	Mon, 14 Oct 2024 17:10:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B5A51BFE01
+	for <kvmarm@lists.linux.dev>; Mon, 14 Oct 2024 17:13:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728925831; cv=none; b=jAWd9hWdu+nD6kkA8y+sjdu/zLMQSigvN5DsKDKq/uft6j60j8yXz7sZB6qwNYOkoEjwrx+ZChQUJ1R6w9wj5bYVXSwT+MPyF2P/Ivm0FW4J7ln7boxI5EQEbwToxOZfSkIFTl0Lnk+vw+rRM0YTJlEWFxB2ueIyRWmBjLEGLPE=
+	t=1728926014; cv=none; b=MhXgcUmj1LKuYO/mG32NKr44BBEs1h3qr6BydmAWgZy9JNRKBYLyoEhWg46BS3c4FaA7XmlrF16//oAs23hDvy4S6Kd8nFLz1vS2ZbDPS0Jws3Ll+9eVVscm8XWB9Hoj+RCa7R/D19gQ73V/yWmU2AFeOc8U0CpiW6Cu6O4RC2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728925831; c=relaxed/simple;
-	bh=iLl0lXkXeALAMr5KDjF+8vkYFyZnHpji9UAQw4I8NLM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ld6kisKV+KGqo+BXNqB61tMsmjXeGDPFYFW++iBXJGaGHqBmXaeCxahyFbsrpuffq/4Y5z9C9m2BHzrUs9SdlCdXPS8ug5Fy1/zMqG3lTZObZjZ1hmJCXOQNkEH/VKBaauVZaAJ6rlQcvq1cJC7Iy8CcZp7IV0ejFD3XUuu8yp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fZuGXBvf; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1728926014; c=relaxed/simple;
+	bh=ywEKv1/QUdsbt4q6SS2Ia3z+ofR2/ou8Y45Uii5/ZTI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jD8bJi3zIBHehFMRpDaIlBUmiECC14QyuS6Q7kEOqHfFjDGAar+zOuATVpXawazS3UB6VBFNYTwZUsTVjgY0eVOdN3E2iT22d3NC/bNunL//Fp2+ddFeUJwwNRnnQQzWBz4693/uCpIFS63tnqbiNZCIL43CYrqnOWSz6Afqe5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dAfiFkMq; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fZuGXBvf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 932D4C4CEC3;
-	Mon, 14 Oct 2024 17:10:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dAfiFkMq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0276FC4CEC3;
+	Mon, 14 Oct 2024 17:13:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728925831;
-	bh=iLl0lXkXeALAMr5KDjF+8vkYFyZnHpji9UAQw4I8NLM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fZuGXBvfqai+/3NsOa9W9cD3IlOY9aT3U0WbINyOpuWErGCK6ZB6IOUBzMOrcOcny
-	 pu72RD2Q/eOijBUJKudsa5AgJol2pWXeoLojf4MNniYLbSJgH2kEtVhDGVb6Gm14Df
-	 9EGatG41Z1BUkjfjmG1t0dtC3E9OVP/UsR4ZXtN7/cC9OYFti03Mmwc+YQYgMcx9FF
-	 id1TyF5286pt2Y3czQbj/ZxkcUQEN2KJW1lxao1NLV3WYoMqD/KKpW+g9w8uWA2Aqn
-	 /L7Px0nG8PKBofrF7r6MreT7d1B0i8Jz1iBY6w6RO2ZAzUeeOvYCehz+aQLkdHLfpI
-	 KopOxy2RDs1Dw==
-Date: Mon, 14 Oct 2024 18:10:23 +0100
-From: Will Deacon <will@kernel.org>
-To: Kevin Brodsky <kevin.brodsky@arm.com>
-Cc: Joey Gouly <joey.gouly@arm.com>, linux-arm-kernel@lists.infradead.org,
-	nd@arm.com, akpm@linux-foundation.org, aneesh.kumar@kernel.org,
-	aneesh.kumar@linux.ibm.com, anshuman.khandual@arm.com, bp@alien8.de,
-	broonie@kernel.org, catalin.marinas@arm.com,
-	christophe.leroy@csgroup.eu, dave.hansen@linux.intel.com,
-	hpa@zytor.com, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
-	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
-	oliver.upton@linux.dev, shuah@kernel.org, skhan@linuxfoundation.org,
-	szabolcs.nagy@arm.com, tglx@linutronix.de, x86@kernel.org,
-	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v5 19/30] arm64: add POE signal support
-Message-ID: <20241014171023.GA18295@willie-the-truck>
-References: <20240822151113.1479789-1-joey.gouly@arm.com>
- <20240822151113.1479789-20-joey.gouly@arm.com>
- <47e1537f-5b60-4541-aed1-a20e804c137d@arm.com>
- <20241009144301.GA12453@willie-the-truck>
+	s=k20201202; t=1728926014;
+	bh=ywEKv1/QUdsbt4q6SS2Ia3z+ofR2/ou8Y45Uii5/ZTI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=dAfiFkMqR4hGjqaQ2cOntZfqHEJZnw3DHBi9+RSWCM+Wgrn+Qwz46RBHS2mHQvTut
+	 +niuXq8UoSaRfGx0/rxvnzcRlV0TOA5NvWzqGRCPcuRbgL7fyGPml/AZmY2Fi0rdF/
+	 d2rpfKktyfFnmkS5UBKkQErevzhxn0IbOyIOoIxpDove5qpH15ClDMCN5ZigSkHXHH
+	 QJ+09HzMiHITg8WfxxPNAX5o6MZdIhuTfXxTaKdqbTOFNT27NBdnc3ygJWOqLeWuut
+	 +Fp9/cx3fvigRGPX2b9NH6IN/2Ad0gLL11kcvy3UCm7+fdYTimbRoHc1s0inP4P/g8
+	 MaNRkBUyHAq4w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1t0OdP-003T5b-LM;
+	Mon, 14 Oct 2024 18:13:31 +0100
+Date: Mon, 14 Oct 2024 18:13:31 +0100
+Message-ID: <867caa6210.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev,
+	oliver.upton@linux.dev,
+	catalin.marinas@arm.com,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	will@kernel.org,
+	christoffer.dall@arm.com
+Subject: Re: [PATCH v1 3/4] KVM: arm64: Convert KVM_ARM_VCPU_* features into an enum
+In-Reply-To: <20241014165809.984883-4-tabba@google.com>
+References: <20241014165809.984883-1-tabba@google.com>
+	<20241014165809.984883-4-tabba@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241009144301.GA12453@willie-the-truck>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, oliver.upton@linux.dev, catalin.marinas@arm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, will@kernel.org, christoffer.dall@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Kevin, Joey,
-
-On Wed, Oct 09, 2024 at 03:43:01PM +0100, Will Deacon wrote:
-> On Tue, Sep 24, 2024 at 01:27:58PM +0200, Kevin Brodsky wrote:
-> > On 22/08/2024 17:11, Joey Gouly wrote:
-> > > @@ -1178,6 +1237,9 @@ static void setup_return(struct pt_regs *regs, struct k_sigaction *ka,
-> > >  		sme_smstop();
-> > >  	}
-> > >  
-> > > +	if (system_supports_poe())
-> > > +		write_sysreg_s(POR_EL0_INIT, SYS_POR_EL0);
-> > 
-> > At the point where setup_return() is called, the signal frame has
-> > already been written to the user stack. In other words, we write to the
-> > user stack first, and then reset POR_EL0. This may be problematic,
-> > especially if we are using the alternate signal stack, which the
-> > interrupted POR_EL0 may not grant access to. In that situation uaccess
-> > will fail and we'll end up with a SIGSEGV.
-> > 
-> > This issue has already been discussed on the x86 side, and as it happens
-> > patches to reset PKRU early [1] have just landed. I don't think this is
-> > a blocker for getting this series landed, but we should try and align
-> > with x86. If there's no objection, I'm planning to work on a counterpart
-> > to the x86 series (resetting POR_EL0 early during signal delivery).
+On Mon, 14 Oct 2024 17:58:08 +0100,
+Fuad Tabba <tabba@google.com> wrote:
 > 
-> Did you get a chance to work on that? It would be great to land the
-> fixes for 6.12, if possible, so that the first kernel release with POE
-> support doesn't land with known issues.
+> Instead of using compile time defines, convert the KVM_ARM_VCPU_*
+> features into an enum. Among other things, this reduces the
+> chances of missing to update KVM_ARM_VCPU_MAX_FEATURES.
+> 
+> Also rename KVM_VCPU_MAX_FEATURES and KVM_ARM_VCPU_VALID_FEATURES
+> to KVM_ARM_VCPU_MAX_FEATURES and KVM_ARM_VCPU_VALID_FEATURES in
+> order to match the features they're counting.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  2 +-
+>  arch/arm64/include/uapi/asm/kvm.h | 25 ++++++++++++++-----------
+>  arch/arm64/kvm/arm.c              | 10 +++++-----
+>  3 files changed, 20 insertions(+), 17 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 85901afeb332..9b7bf4ba07a3 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -326,7 +326,7 @@ struct kvm_arch {
+>  	unsigned long flags;
+>  
+>  	/* VM-wide vCPU feature set */
+> -	DECLARE_BITMAP(vcpu_features, KVM_VCPU_MAX_FEATURES);
+> +	DECLARE_BITMAP(vcpu_features, KVM_ARM_VCPU_MAX_FEATURES);
+>  
+>  	/* MPIDR to vcpu index mapping, optional */
+>  	struct kvm_mpidr_data *mpidr_data;
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index 2d5fd0ed7dff..b6ebd79b8373 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -100,17 +100,20 @@ struct kvm_regs {
+>  #define KVM_VGIC_V3_REDIST_SIZE		(2 * SZ_64K)
+>  #define KVM_VGIC_V3_ITS_SIZE		(2 * SZ_64K)
+>  
+> -#define KVM_ARM_VCPU_POWER_OFF		0 /* CPU is started in OFF state */
+> -#define KVM_ARM_VCPU_EL1_32BIT		1 /* CPU running a 32bit VM */
+> -#define KVM_ARM_VCPU_PSCI_0_2		2 /* CPU uses PSCI v0.2 */
+> -#define KVM_ARM_VCPU_PMU_V3		3 /* Support guest PMUv3 */
+> -#define KVM_ARM_VCPU_SVE		4 /* enable SVE for this CPU */
+> -#define KVM_ARM_VCPU_PTRAUTH_ADDRESS	5 /* VCPU uses address authentication */
+> -#define KVM_ARM_VCPU_PTRAUTH_GENERIC	6 /* VCPU uses generic authentication */
+> -#define KVM_ARM_VCPU_HAS_EL2		7 /* Support nested virtualization */
+> -
+> -#define KVM_VCPU_MAX_FEATURES 8
+> -#define KVM_VCPU_VALID_FEATURES	(BIT(KVM_VCPU_MAX_FEATURES) - 1)
+> +enum kvm_arm_vcpu_features {
+> +	KVM_ARM_VCPU_POWER_OFF = 0,	/* CPU is started in OFF state */
+> +	KVM_ARM_VCPU_EL1_32BIT,		/* CPU running a 32bit VM */
+> +	KVM_ARM_VCPU_PSCI_0_2,		/* CPU uses PSCI v0.2 */
+> +	KVM_ARM_VCPU_PMU_V3,		/* Support guest PMUv3 */
+> +	KVM_ARM_VCPU_SVE,		/* enable SVE for this CPU */
+> +	KVM_ARM_VCPU_PTRAUTH_ADDRESS,	/* VCPU uses address authentication */
+> +	KVM_ARM_VCPU_PTRAUTH_GENERIC,	/* VCPU uses generic authentication */
+> +	KVM_ARM_VCPU_HAS_EL2,		/* Support nested virtualization */
+> +
+> +	KVM_ARM_VCPU_MAX_FEATURES,	/* Must be last */
+> +};
 
-Looking a little more at this, I think we have quite a weird behaviour
-on arm64 as it stands. It looks like we rely on the signal frame to hold
-the original POR_EL0 so, if for some reason we fail to allocate space
-for the POR context, I think we'll return back from the signal with
-POR_EL0_INIT. That seems bad?
+This is going to break any userspace that has code shaped like this:
 
-Will
+#ifdef KVM_ARM_VCPU_SVE
+[...]
+#endif
+
+Not necessarily a good pattern, but nonetheless a valid one. So you
+*must* preserve the #defines, even if you define them along the lines
+of:
+
+#define	KVM_ARM_VCPU_SVE	KVM_ARM_VCPU_SVE
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
