@@ -1,25 +1,26 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AE261D9A46
-	for <kvmarm@lists.linux.dev>; Mon, 14 Oct 2024 11:02:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC08A1AA787
+	for <kvmarm@lists.linux.dev>; Mon, 14 Oct 2024 11:02:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728903727; cv=none; b=DB4G0KiFFRkGHzBQbeeFhbCDho4BHEoiLMZbbESZFQMUhplUYEH3ncHUvTorG9+OY09aNBmhttScF52MOd+LOC0CJNzpvqiJ98gorO7ptQjj7ZAJUUIyPq1OQul057+2zjN21bOJ/K9bFTueb89hl+QPoIdHe18lYgqOYRSlQxg=
+	t=1728903730; cv=none; b=Kd1FrbSwCdfgRm9R8dWsJGzksectavW5+1E9FUCey9IPYi1kpOJbEzy6GA+SGnbTkjFHA/Uchak1VYOQXUCE/KgiZe4V4wmXh5JEbkGVPfEmBAXPd4OltyNrix9pgUI4uWtow50pfPvEzEpzbVmBlCPfb5o/1n8nIkxqQHRJxQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728903727; c=relaxed/simple;
-	bh=BKIWzn9UnlQ2N8rj7swnRq+vBQjr60y2aGLASxxR9f4=;
+	s=arc-20240116; t=1728903730; c=relaxed/simple;
+	bh=cdF7k0JsDR53oZjM+CReXrKImAQ0AxOb85WhdpVuhCc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dhiVmUJ3QI8rJ/UIMqNjZZ6wrOJVfjZbPnI9vBUFgxUezn6t5F3ZysbRRz9bf1pDfEAm8MR0SfVTNvUDrTiPwFhVwU10dUxHtDUGdVumDRSMbRHXOXSJAUVyp01ZukpgD7VUO2XLMdhARhNRlr4YLSZbTk0KycI0ie/QcjGCunc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	 MIME-Version; b=heyLcUIgMWjMVXrr6CERGg6onRYoN5o+kMD3YIJyixhONZNbFG/o/XMsYRnQRv3D+fZk5PClmsR/VlOAVAA+yOqIW3Bp75k5eAmao7gLMBWcVSDUQV58SjKkIjn/JxwW3PBr9xkSaP8iu1tzWHQ61zHXo281s3NEm8Ag9nyIuwI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com; spf=fail smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 926581A2D;
-	Mon, 14 Oct 2024 04:02:34 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 08F6A1713;
+	Mon, 14 Oct 2024 04:02:38 -0700 (PDT)
 Received: from e125769.cambridge.arm.com (e125769.cambridge.arm.com [10.1.196.27])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 55EA53F51B;
-	Mon, 14 Oct 2024 04:02:02 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 44CBF3F51B;
+	Mon, 14 Oct 2024 04:02:05 -0700 (PDT)
 From: Ryan Roberts <ryan.roberts@arm.com>
-To: Andrew Morton <akpm@linux-foundation.org>,
+To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
 	Anshuman Khandual <anshuman.khandual@arm.com>,
 	Ard Biesheuvel <ardb@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>,
@@ -31,16 +32,19 @@ To: Andrew Morton <akpm@linux-foundation.org>,
 	Mark Rutland <mark.rutland@arm.com>,
 	Matthias Brugger <mbrugger@suse.com>,
 	Miroslav Benes <mbenes@suse.cz>,
+	Nick Piggin <npiggin@gmail.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
+	Peter Zijlstra <peterz@infradead.org>,
 	Will Deacon <will@kernel.org>
 Cc: Ryan Roberts <ryan.roberts@arm.com>,
 	kvmarm@lists.linux.dev,
+	linux-arch@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	linux-mm@kvack.org
-Subject: [RFC PATCH v1 52/57] arm64: Remove PAGE_SIZE from assembly code
-Date: Mon, 14 Oct 2024 11:58:59 +0100
-Message-ID: <20241014105912.3207374-52-ryan.roberts@arm.com>
+Subject: [RFC PATCH v1 53/57] arm64: Runtime-fold pmd level
+Date: Mon, 14 Oct 2024 11:59:00 +0100
+Message-ID: <20241014105912.3207374-53-ryan.roberts@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20241014105912.3207374-1-ryan.roberts@arm.com>
 References: <20241014105514.3206191-1-ryan.roberts@arm.com>
@@ -53,24 +57,19 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Remove usage of PAGE_SHIFT, PAGE_SIZE and PAGE_MASK macros from assembly
-code since these are no longer compile-time constants when boot-time
-page size is in use.
+For a given VA size, the number of levels of lookup depends on the page
+size. With boot-time page size selection, we therefore don't know how
+many levels of lookup we require until boot time. So we need to
+runtime-fold some levels of lookup.
 
-For the most part, they are replaced with run-time lookups based on the
-value of TG0. This is done outside of loops so while there is a cost of
-a few extra instructions, performance should not be impacted.
+We already have code to runtime-fold p4d and pud levels; that exists for
+LPA2 fallback paths and can be repurposed for our needs. But pmd level
+also needs to support runtime folding; for example, 16K/36-bit and
+64K/42-bit configs require only 2 levels.
 
-However, invalid_host_el2_vect requires that the page shift be an
-immediate since it has no registers to spare. So for this, let's use
-alternatives patching. This code is guarranteed not to run until after
-patching is complete.
-
-__pi_copy_page has no registers to spare to hold the page size, and we
-want to avoid having to reload it on every iteration of the loop. Since
-I couldn't provably conclude that the function is not called prior to
-alternatives patching, I opted to make a copy of the function for each
-page size and branch to the right one at the start.
+So let's add the required code. However, note that until we actually add
+the boot-time page size config, pgtable_l3_enabled() simply returns the
+compile-time determined answer.
 
 Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
 ---
@@ -79,330 +78,400 @@ Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
 Any confused maintainers may want to read the cover note here for context:
 https://lore.kernel.org/all/20241014105514.3206191-1-ryan.roberts@arm.com/
 
- arch/arm64/include/asm/assembler.h  | 18 +++++++++++++---
- arch/arm64/kernel/hibernate-asm.S   |  6 ++++--
- arch/arm64/kernel/relocate_kernel.S | 10 ++++++---
- arch/arm64/kvm/hyp/nvhe/host.S      | 10 ++++++++-
- arch/arm64/lib/clear_page.S         |  7 ++++--
- arch/arm64/lib/copy_page.S          | 33 +++++++++++++++++++++--------
- arch/arm64/lib/mte.S                | 27 +++++++++++++++++------
- 7 files changed, 85 insertions(+), 26 deletions(-)
+ arch/arm64/include/asm/pgalloc.h |  16 +++-
+ arch/arm64/include/asm/pgtable.h | 123 +++++++++++++++++++++++--------
+ arch/arm64/include/asm/tlb.h     |   3 +
+ arch/arm64/kernel/cpufeature.c   |   4 +-
+ arch/arm64/kvm/mmu.c             |   9 +--
+ arch/arm64/mm/fixmap.c           |   2 +-
+ arch/arm64/mm/hugetlbpage.c      |  16 ++--
+ arch/arm64/mm/init.c             |   2 +-
+ arch/arm64/mm/mmu.c              |   2 +-
+ arch/arm64/mm/ptdump.c           |   3 +-
+ 10 files changed, 126 insertions(+), 54 deletions(-)
 
-diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
-index 77c2d707adb1a..6424fd6be1cbe 100644
---- a/arch/arm64/include/asm/assembler.h
-+++ b/arch/arm64/include/asm/assembler.h
-@@ -495,9 +495,11 @@ alternative_endif
- .Lskip_\@:
- 	.endm
- /*
-- * copy_page - copy src to dest using temp registers t1-t8
-+ * copy_page - copy src to dest using temp registers t1-t9
-  */
--	.macro copy_page dest:req src:req t1:req t2:req t3:req t4:req t5:req t6:req t7:req t8:req
-+	.macro copy_page dest:req src:req t1:req t2:req t3:req t4:req t5:req t6:req t7:req t8:req t9:req
-+	get_page_size \t9
-+	sub	\t9, \t9, #1			// (PAGE_SIZE - 1) in \t9
- 9998:	ldp	\t1, \t2, [\src]
- 	ldp	\t3, \t4, [\src, #16]
- 	ldp	\t5, \t6, [\src, #32]
-@@ -508,7 +510,7 @@ alternative_endif
- 	stnp	\t5, \t6, [\dest, #32]
- 	stnp	\t7, \t8, [\dest, #48]
- 	add	\dest, \dest, #64
--	tst	\src, #(PAGE_SIZE - 1)
-+	tst	\src, \t9
- 	b.ne	9998b
- 	.endm
+diff --git a/arch/arm64/include/asm/pgalloc.h b/arch/arm64/include/asm/pgalloc.h
+index 8ff5f2a2579e4..51cc2f32931d2 100644
+--- a/arch/arm64/include/asm/pgalloc.h
++++ b/arch/arm64/include/asm/pgalloc.h
+@@ -15,6 +15,7 @@
  
-@@ -911,4 +913,14 @@ alternative_cb_end
- 	.macro	tgran_lpa2, val, tg0
- 	value_for_page_size \val, \tg0, ID_AA64MMFR0_EL1_TGRAN4_52_BIT, ID_AA64MMFR0_EL1_TGRAN16_52_BIT, -1
- 	.endm
+ #define __HAVE_ARCH_PGD_FREE
+ #define __HAVE_ARCH_PUD_FREE
++#define __HAVE_ARCH_PMD_FREE
+ #include <asm-generic/pgalloc.h>
+ 
+ #define PGD_SIZE	(PTRS_PER_PGD * sizeof(pgd_t))
+@@ -23,7 +24,8 @@
+ 
+ static inline void __pud_populate(pud_t *pudp, phys_addr_t pmdp, pudval_t prot)
+ {
+-	set_pud(pudp, __pud(__phys_to_pud_val(pmdp) | prot));
++	if (pgtable_l3_enabled())
++		set_pud(pudp, __pud(__phys_to_pud_val(pmdp) | prot));
+ }
+ 
+ static inline void pud_populate(struct mm_struct *mm, pud_t *pudp, pmd_t *pmdp)
+@@ -33,6 +35,18 @@ static inline void pud_populate(struct mm_struct *mm, pud_t *pudp, pmd_t *pmdp)
+ 	pudval |= (mm == &init_mm) ? PUD_TABLE_UXN : PUD_TABLE_PXN;
+ 	__pud_populate(pudp, __pa(pmdp), pudval);
+ }
 +
-+	.macro	get_page_size, val
-+	get_tg0 \val
-+	value_for_page_size \val, \val, SZ_4K, SZ_16K, SZ_64K
-+	.endm
++static inline void pmd_free(struct mm_struct *mm, pmd_t *pmd)
++{
++	struct ptdesc *ptdesc = virt_to_ptdesc(pmd);
 +
-+	.macro	get_page_mask, val
-+	get_tg0 \val
-+	value_for_page_size \val, \val, (~(SZ_4K-1)), (~(SZ_16K-1)), (~(SZ_64K-1))
-+	.endm
- #endif	/* __ASM_ASSEMBLER_H */
-diff --git a/arch/arm64/kernel/hibernate-asm.S b/arch/arm64/kernel/hibernate-asm.S
-index 0e1d9c3c6a933..375b2fcf82e84 100644
---- a/arch/arm64/kernel/hibernate-asm.S
-+++ b/arch/arm64/kernel/hibernate-asm.S
-@@ -57,6 +57,8 @@ SYM_CODE_START(swsusp_arch_suspend_exit)
- 	mov	x24, x4
- 	mov	x25, x5
- 
-+	get_page_size x12
++	if (!pgtable_l3_enabled())
++		return;
 +
- 	/* walk the restore_pblist and use copy_page() to over-write memory */
- 	mov	x19, x3
++	BUG_ON((unsigned long)pmd & (PAGE_SIZE-1));
++	pagetable_pmd_dtor(ptdesc);
++	pagetable_free(ptdesc);
++}
+ #else
+ static inline void __pud_populate(pud_t *pudp, phys_addr_t pmdp, pudval_t prot)
+ {
+diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
+index fd47f70a42396..8ead41da715b0 100644
+--- a/arch/arm64/include/asm/pgtable.h
++++ b/arch/arm64/include/asm/pgtable.h
+@@ -672,15 +672,21 @@ extern pgprot_t phys_mem_access_prot(struct file *file, unsigned long pfn,
+ #define pmd_leaf_size(pmd)	(pmd_cont(pmd) ? CONT_PMD_SIZE : PMD_SIZE)
+ #define pte_leaf_size(pte)	(pte_cont(pte) ? CONT_PTE_SIZE : PAGE_SIZE)
  
-@@ -64,9 +66,9 @@ SYM_CODE_START(swsusp_arch_suspend_exit)
- 	mov	x0, x10
- 	ldr	x1, [x19, #HIBERN_PBE_ADDR]
- 
--	copy_page	x0, x1, x2, x3, x4, x5, x6, x7, x8, x9
-+	copy_page	x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x11
- 
--	add	x1, x10, #PAGE_SIZE
-+	add	x1, x10, x12
- 	/* Clean the copied page to PoU - based on caches_clean_inval_pou() */
- 	raw_dcache_line_size x2, x3
- 	sub	x3, x2, #1
-diff --git a/arch/arm64/kernel/relocate_kernel.S b/arch/arm64/kernel/relocate_kernel.S
-index 413f899e4ac63..bc4f37fba6c74 100644
---- a/arch/arm64/kernel/relocate_kernel.S
-+++ b/arch/arm64/kernel/relocate_kernel.S
-@@ -46,6 +46,10 @@ SYM_CODE_START(arm64_relocate_new_kernel)
- 	ldr	x27, [x0, #KIMAGE_ARCH_EL2_VECTORS]
- 	ldr	x26, [x0, #KIMAGE_ARCH_DTB_MEM]
- 
-+	/* Grab page size values. */
-+	get_page_size x10			/* x10 = PAGE_SIZE */
-+	get_page_mask x11			/* x11 = PAGE_MASK */
+-#if defined(CONFIG_ARM64_64K_PAGES) || CONFIG_PGTABLE_LEVELS < 3
+-static inline bool pud_sect(pud_t pud) { return false; }
+-static inline bool pud_table(pud_t pud) { return true; }
+-#else
+-#define pud_sect(pud)		((pud_val(pud) & PUD_TYPE_MASK) == \
+-				 PUD_TYPE_SECT)
+-#define pud_table(pud)		((pud_val(pud) & PUD_TYPE_MASK) == \
+-				 PUD_TYPE_TABLE)
+-#endif
++static inline bool pgtable_l3_enabled(void);
 +
- 	/* Setup the list loop variables. */
- 	ldr	x18, [x0, #KIMAGE_ARCH_ZERO_PAGE] /* x18 = zero page for BBM */
- 	ldr	x17, [x0, #KIMAGE_ARCH_TTBR1]	/* x17 = linear map copy */
-@@ -54,7 +58,7 @@ SYM_CODE_START(arm64_relocate_new_kernel)
- 	raw_dcache_line_size x15, x1		/* x15 = dcache line size */
- 	break_before_make_ttbr_switch	x18, x17, x1, x2 /* set linear map */
- .Lloop:
--	and	x12, x16, PAGE_MASK		/* x12 = addr */
-+	and	x12, x16, x11			/* x12 = addr */
- 	sub	x12, x12, x22			/* Convert x12 to virt */
- 	/* Test the entry flags. */
- .Ltest_source:
-@@ -62,8 +66,8 @@ SYM_CODE_START(arm64_relocate_new_kernel)
++static inline bool pud_sect(pud_t pud)
++{
++	if (PAGE_SIZE == SZ_64K || !pgtable_l3_enabled())
++		return false;
++	return (pud_val(pud) & PUD_TYPE_MASK) == PUD_TYPE_SECT;
++}
++
++static inline bool pud_table(pud_t pud)
++{
++	if (PAGE_SIZE == SZ_64K || !pgtable_l3_enabled())
++		return true;
++	return (pud_val(pud) & PUD_TYPE_MASK) == PUD_TYPE_TABLE;
++}
  
- 	/* Invalidate dest page to PoC. */
- 	mov	x19, x13
--	copy_page x13, x12, x1, x2, x3, x4, x5, x6, x7, x8
--	add	x1, x19, #PAGE_SIZE
-+	copy_page x13, x12, x1, x2, x3, x4, x5, x6, x7, x8, x9
-+	add	x1, x19, x10
- 	dcache_by_myline_op civac, sy, x19, x1, x15, x20
- 	b	.Lnext
- .Ltest_indirection:
-diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
-index 3d610fc51f4d3..2b0d583fcf1af 100644
---- a/arch/arm64/kvm/hyp/nvhe/host.S
-+++ b/arch/arm64/kvm/hyp/nvhe/host.S
-@@ -193,7 +193,15 @@ SYM_FUNC_END(__host_hvc)
+ extern pgd_t init_pg_dir[];
+ extern pgd_t init_pg_end[];
+@@ -699,12 +705,10 @@ static inline bool in_swapper_pgdir(void *addr)
+ 
+ static inline void set_pmd(pmd_t *pmdp, pmd_t pmd)
+ {
+-#ifdef __PAGETABLE_PMD_FOLDED
+-	if (in_swapper_pgdir(pmdp)) {
++	if (!pgtable_l3_enabled() && in_swapper_pgdir(pmdp)) {
+ 		set_swapper_pgd((pgd_t *)pmdp, __pgd(pmd_val(pmd)));
+ 		return;
+ 	}
+-#endif /* __PAGETABLE_PMD_FOLDED */
+ 
+ 	WRITE_ONCE(*pmdp, pmd);
+ 
+@@ -749,20 +753,27 @@ static inline unsigned long pmd_page_vaddr(pmd_t pmd)
+ 
+ #if CONFIG_PGTABLE_LEVELS > 2
+ 
++static __always_inline bool pgtable_l3_enabled(void)
++{
++	return true;
++}
++
++static inline bool mm_pmd_folded(const struct mm_struct *mm)
++{
++	return !pgtable_l3_enabled();
++}
++#define mm_pmd_folded  mm_pmd_folded
++
+ #define pmd_ERROR(e)	\
+ 	pr_err("%s:%d: bad pmd %016llx.\n", __FILE__, __LINE__, pmd_val(e))
+ 
+-#define pud_none(pud)		(!pud_val(pud))
+-#define pud_bad(pud)		(!pud_table(pud))
+-#define pud_present(pud)	pte_present(pud_pte(pud))
+-#ifndef __PAGETABLE_PMD_FOLDED
+-#define pud_leaf(pud)		(pud_present(pud) && !pud_table(pud))
+-#else
+-#define pud_leaf(pud)		false
+-#endif
+-#define pud_valid(pud)		pte_valid(pud_pte(pud))
+-#define pud_user(pud)		pte_user(pud_pte(pud))
+-#define pud_user_exec(pud)	pte_user_exec(pud_pte(pud))
++#define pud_none(pud)		(pgtable_l3_enabled() && !pud_val(pud))
++#define pud_bad(pud)		(pgtable_l3_enabled() && !pud_table(pud))
++#define pud_present(pud)	(!pgtable_l3_enabled() || pte_present(pud_pte(pud)))
++#define pud_leaf(pud)		(pgtable_l3_enabled() && pte_present(pud_pte(pud)) && !pud_table(pud))
++#define pud_valid(pud)		(pgtable_l3_enabled() && pte_valid(pud_pte(pud)))
++#define pud_user(pud)		(pgtable_l3_enabled() && pte_user(pud_pte(pud)))
++#define pud_user_exec(pud)	(pgtable_l3_enabled() && pte_user_exec(pud_pte(pud)))
+ 
+ static inline bool pgtable_l4_enabled(void);
+ 
+@@ -783,7 +794,8 @@ static inline void set_pud(pud_t *pudp, pud_t pud)
+ 
+ static inline void pud_clear(pud_t *pudp)
+ {
+-	set_pud(pudp, __pud(0));
++	if (pgtable_l3_enabled())
++		set_pud(pudp, __pud(0));
+ }
+ 
+ static inline phys_addr_t pud_page_paddr(pud_t pud)
+@@ -791,25 +803,74 @@ static inline phys_addr_t pud_page_paddr(pud_t pud)
+ 	return __pud_to_phys(pud);
+ }
+ 
++#define pmd_index(addr)		(((addr) >> PMD_SHIFT) & (PTRS_PER_PMD - 1))
++
++static inline pmd_t *pud_to_folded_pmd(pud_t *pudp, unsigned long addr)
++{
++	return (pmd_t *)pudp;
++}
++
+ static inline pmd_t *pud_pgtable(pud_t pud)
+ {
+ 	return (pmd_t *)__va(pud_page_paddr(pud));
+ }
+ 
+-/* Find an entry in the second-level page table. */
+-#define pmd_offset_phys(dir, addr)	(pud_page_paddr(READ_ONCE(*(dir))) + pmd_index(addr) * sizeof(pmd_t))
++static inline phys_addr_t pmd_offset_phys(pud_t *pudp, unsigned long addr)
++{
++	BUG_ON(!pgtable_l3_enabled());
++
++	return pud_page_paddr(READ_ONCE(*pudp)) + pmd_index(addr) * sizeof(pmd_t);
++}
++
++static inline pmd_t *pmd_offset_lockless(pud_t *pudp, pud_t pud,
++					 unsigned long addr)
++{
++	if (!pgtable_l3_enabled())
++		return pud_to_folded_pmd(pudp, addr);
++	return (pmd_t *)__va(pud_page_paddr(pud)) + pmd_index(addr);
++}
++#define pmd_offset_lockless pmd_offset_lockless
+ 
+-#define pmd_set_fixmap(addr)		((pmd_t *)set_fixmap_offset(FIX_PMD, addr))
+-#define pmd_set_fixmap_offset(pud, addr)	pmd_set_fixmap(pmd_offset_phys(pud, addr))
+-#define pmd_clear_fixmap()		clear_fixmap(FIX_PMD)
++static inline pmd_t *pmd_offset(pud_t *pudp, unsigned long addr)
++{
++	return pmd_offset_lockless(pudp, READ_ONCE(*pudp), addr);
++}
++#define pmd_offset pmd_offset
+ 
+-#define pud_page(pud)			phys_to_page(__pud_to_phys(pud))
++static inline pmd_t *pmd_set_fixmap(unsigned long addr)
++{
++	if (!pgtable_l3_enabled())
++		return NULL;
++	return (pmd_t *)set_fixmap_offset(FIX_PMD, addr);
++}
++
++static inline pmd_t *pmd_set_fixmap_offset(pud_t *pudp, unsigned long addr)
++{
++	if (!pgtable_l3_enabled())
++		return pud_to_folded_pmd(pudp, addr);
++	return pmd_set_fixmap(pmd_offset_phys(pudp, addr));
++}
++
++static inline void pmd_clear_fixmap(void)
++{
++	if (pgtable_l3_enabled())
++		clear_fixmap(FIX_PMD);
++}
+ 
+ /* use ONLY for statically allocated translation tables */
+-#define pmd_offset_kimg(dir,addr)	((pmd_t *)__phys_to_kimg(pmd_offset_phys((dir), (addr))))
++static inline pmd_t *pmd_offset_kimg(pud_t *pudp, u64 addr)
++{
++	if (!pgtable_l3_enabled())
++		return pud_to_folded_pmd(pudp, addr);
++	return (pmd_t *)__phys_to_kimg(pmd_offset_phys(pudp, addr));
++}
++
++#define pud_page(pud)			phys_to_page(__pud_to_phys(pud))
+ 
+ #else
+ 
++static inline bool pgtable_l3_enabled(void) { return false; }
++
+ #define pud_valid(pud)		false
+ #define pud_page_paddr(pud)	({ BUILD_BUG(); 0; })
+ #define pud_user_exec(pud)	pud_user(pud) /* Always 0 with folding */
+diff --git a/arch/arm64/include/asm/tlb.h b/arch/arm64/include/asm/tlb.h
+index a947c6e784ed2..527630f0803c6 100644
+--- a/arch/arm64/include/asm/tlb.h
++++ b/arch/arm64/include/asm/tlb.h
+@@ -92,6 +92,9 @@ static inline void __pmd_free_tlb(struct mmu_gather *tlb, pmd_t *pmdp,
+ {
+ 	struct ptdesc *ptdesc = virt_to_ptdesc(pmdp);
+ 
++	if (!pgtable_l3_enabled())
++		return;
++
+ 	pagetable_pmd_dtor(ptdesc);
+ 	tlb_remove_ptdesc(tlb, ptdesc);
+ }
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index e5618423bb99d..663cc76569a27 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -1923,8 +1923,10 @@ static int __init __kpti_install_ng_mappings(void *__unused)
+ 
+ 	if (levels == 5 && !pgtable_l5_enabled())
+ 		levels = 4;
+-	else if (levels == 4 && !pgtable_l4_enabled())
++	if (levels == 4 && !pgtable_l4_enabled())
+ 		levels = 3;
++	if (levels == 3 && !pgtable_l3_enabled())
++		levels = 2;
+ 
+ 	remap_fn = (void *)__pa_symbol(idmap_kpti_install_ng_mappings);
+ 
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 248a2d7ad6dbb..146ecdaaaf647 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1370,12 +1370,11 @@ static int get_vma_page_shift(struct vm_area_struct *vma, unsigned long hva)
+ 
+ 	pa = (vma->vm_pgoff << PAGE_SHIFT) + (hva - vma->vm_start);
+ 
+-#ifndef __PAGETABLE_PMD_FOLDED
+-	if ((hva & (PUD_SIZE - 1)) == (pa & (PUD_SIZE - 1)) &&
++	if (pgtable_l3_enabled() &&
++	    (hva & (PUD_SIZE - 1)) == (pa & (PUD_SIZE - 1)) &&
+ 	    ALIGN_DOWN(hva, PUD_SIZE) >= vma->vm_start &&
+ 	    ALIGN(hva, PUD_SIZE) <= vma->vm_end)
+ 		return PUD_SHIFT;
+-#endif
+ 
+ 	if ((hva & (PMD_SIZE - 1)) == (pa & (PMD_SIZE - 1)) &&
+ 	    ALIGN_DOWN(hva, PMD_SIZE) >= vma->vm_start &&
+@@ -1487,12 +1486,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 		vma_shift = get_vma_page_shift(vma, hva);
+ 	}
+ 
+-#ifndef __PAGETABLE_PMD_FOLDED
+-	if (vma_shift == PUD_SHIFT) {
++	if (pgtable_l3_enabled() && vma_shift == PUD_SHIFT) {
+ 		if (!fault_supports_stage2_huge_mapping(memslot, hva, PUD_SIZE))
+ 			vma_shift = PMD_SHIFT;
+ 	}
+-#endif
+ 	if (vma_shift == CONT_PMD_SHIFT) {
+ 		vma_shift = PMD_SHIFT;
+ 	}
+diff --git a/arch/arm64/mm/fixmap.c b/arch/arm64/mm/fixmap.c
+index a0dcf2375ccb4..f2c6678046a96 100644
+--- a/arch/arm64/mm/fixmap.c
++++ b/arch/arm64/mm/fixmap.c
+@@ -87,7 +87,7 @@ static void __init early_fixmap_init_pud(p4d_t *p4dp, unsigned long addr,
+ 	p4d_t p4d = READ_ONCE(*p4dp);
+ 	pud_t *pudp;
+ 
+-	if (CONFIG_PGTABLE_LEVELS > 3 && !p4d_none(p4d) &&
++	if (ptg_pgtable_levels > 3 && !p4d_none(p4d) &&
+ 	    p4d_page_paddr(p4d) != __pa_symbol(bm_pud)) {
+ 		/*
+ 		 * We only end up here if the kernel mapping and the fixmap
+diff --git a/arch/arm64/mm/hugetlbpage.c b/arch/arm64/mm/hugetlbpage.c
+index bc98c20655bba..2add0839179e3 100644
+--- a/arch/arm64/mm/hugetlbpage.c
++++ b/arch/arm64/mm/hugetlbpage.c
+@@ -51,10 +51,9 @@ void __init arm64_hugetlb_cma_reserve(void)
+ 
+ static bool __hugetlb_valid_size(unsigned long size)
+ {
+-#ifndef __PAGETABLE_PMD_FOLDED
+-	if (size == PUD_SIZE)
++	if (pgtable_l3_enabled() && size == PUD_SIZE)
+ 		return pud_sect_supported();
+-#endif
++
+ 	if (size == CONT_PMD_SIZE || size == PMD_SIZE || size == CONT_PTE_SIZE)
+ 		return true;
+ 
+@@ -100,13 +99,10 @@ static inline int num_contig_ptes(unsigned long size, size_t *pgsize)
+ 
+ 	*pgsize = size;
+ 
+-#ifndef __PAGETABLE_PMD_FOLDED
+-	if (size == PUD_SIZE) {
++	if (pgtable_l3_enabled() && size == PUD_SIZE) {
+ 		if (pud_sect_supported())
+ 			contig_ptes = 1;
+-	} else
+-#endif
+-	if (size == PMD_SIZE) {
++	} else if (size == PMD_SIZE) {
+ 		contig_ptes = 1;
+ 	} else if (size == CONT_PMD_SIZE) {
+ 		*pgsize = PMD_SIZE;
+@@ -331,10 +327,8 @@ unsigned long hugetlb_mask_last_page(struct hstate *h)
+ {
+ 	unsigned long hp_size = huge_page_size(h);
+ 
+-#ifndef __PAGETABLE_PMD_FOLDED
+-	if (hp_size == PUD_SIZE)
++	if (pgtable_l3_enabled() && hp_size == PUD_SIZE)
+ 		return PGDIR_SIZE - PUD_SIZE;
+-#endif
+ 	if (hp_size == CONT_PMD_SIZE)
+ 		return PUD_SIZE - CONT_PMD_SIZE;
+ 	if (hp_size == PMD_SIZE)
+diff --git a/arch/arm64/mm/init.c b/arch/arm64/mm/init.c
+index 4d24034418b39..62587104f30d8 100644
+--- a/arch/arm64/mm/init.c
++++ b/arch/arm64/mm/init.c
+@@ -396,7 +396,7 @@ void __init mem_init(void)
+ 	 * scratch using the virtual address range and page size.
  	 */
- 	add	sp, sp, x0			// sp' = sp + x0
- 	sub	x0, sp, x0			// x0' = sp' - x0 = (sp + x0) - x0 = sp
--	tbz	x0, #PAGE_SHIFT, .L__hyp_sp_overflow\@
-+alternative_if ARM64_USE_PAGE_SIZE_4K
-+	tbz	x0, #ARM64_PAGE_SHIFT_4K, .L__hyp_sp_overflow\@
-+alternative_else_nop_endif
-+alternative_if ARM64_USE_PAGE_SIZE_16K
-+	tbz	x0, #ARM64_PAGE_SHIFT_16K, .L__hyp_sp_overflow\@
-+alternative_else_nop_endif
-+alternative_if ARM64_USE_PAGE_SIZE_64K
-+	tbz	x0, #ARM64_PAGE_SHIFT_64K, .L__hyp_sp_overflow\@
-+alternative_else_nop_endif
- 	sub	x0, sp, x0			// x0'' = sp' - x0' = (sp + x0) - sp = x0
- 	sub	sp, sp, x0			// sp'' = sp' - x0 = (sp + x0) - x0 = sp
+ 	VM_BUG_ON(ARM64_HW_PGTABLE_LEVELS(CONFIG_ARM64_VA_BITS) !=
+-		  CONFIG_PGTABLE_LEVELS);
++		  ptg_pgtable_levels);
  
-diff --git a/arch/arm64/lib/clear_page.S b/arch/arm64/lib/clear_page.S
-index ebde40e7fa2b2..b6f2cb8d704cc 100644
---- a/arch/arm64/lib/clear_page.S
-+++ b/arch/arm64/lib/clear_page.S
-@@ -15,6 +15,9 @@
-  *	x0 - dest
-  */
- SYM_FUNC_START(__pi_clear_page)
-+	get_page_size x3
-+	sub	x3, x3, #1	/* (PAGE_SIZE - 1) in x3 */
-+
- 	mrs	x1, dczid_el0
- 	tbnz	x1, #4, 2f	/* Branch if DC ZVA is prohibited */
- 	and	w1, w1, #0xf
-@@ -23,7 +26,7 @@ SYM_FUNC_START(__pi_clear_page)
+ 	if (PAGE_SIZE >= 16384 && get_num_physpages() <= 128) {
+ 		extern int sysctl_overcommit_memory;
+diff --git a/arch/arm64/mm/mmu.c b/arch/arm64/mm/mmu.c
+index ad7fd3fda705a..b78a341cd9e70 100644
+--- a/arch/arm64/mm/mmu.c
++++ b/arch/arm64/mm/mmu.c
+@@ -1046,7 +1046,7 @@ static void free_empty_pmd_table(pud_t *pudp, unsigned long addr,
+ 		free_empty_pte_table(pmdp, addr, next, floor, ceiling);
+ 	} while (addr = next, addr < end);
  
- 1:	dc	zva, x0
- 	add	x0, x0, x1
--	tst	x0, #(PAGE_SIZE - 1)
-+	tst	x0, x3
- 	b.ne	1b
- 	ret
+-	if (CONFIG_PGTABLE_LEVELS <= 2)
++	if (!pgtable_l3_enabled())
+ 		return;
  
-@@ -32,7 +35,7 @@ SYM_FUNC_START(__pi_clear_page)
- 	stnp	xzr, xzr, [x0, #32]
- 	stnp	xzr, xzr, [x0, #48]
- 	add	x0, x0, #64
--	tst	x0, #(PAGE_SIZE - 1)
-+	tst	x0, x3
- 	b.ne	2b
- 	ret
- SYM_FUNC_END(__pi_clear_page)
-diff --git a/arch/arm64/lib/copy_page.S b/arch/arm64/lib/copy_page.S
-index 6a56d7cf309da..6c19b03ab4d69 100644
---- a/arch/arm64/lib/copy_page.S
-+++ b/arch/arm64/lib/copy_page.S
-@@ -10,14 +10,7 @@
- #include <asm/cpufeature.h>
- #include <asm/alternative.h>
+ 	if (!pgtable_range_aligned(start, end, floor, ceiling, PUD_MASK))
+diff --git a/arch/arm64/mm/ptdump.c b/arch/arm64/mm/ptdump.c
+index 6986827e0d645..045a4188afc10 100644
+--- a/arch/arm64/mm/ptdump.c
++++ b/arch/arm64/mm/ptdump.c
+@@ -230,7 +230,8 @@ static void note_page(struct ptdump_state *pt_st, unsigned long addr, int level,
  
--/*
-- * Copy a page from src to dest (both are page aligned)
-- *
-- * Parameters:
-- *	x0 - dest
-- *	x1 - src
-- */
--SYM_FUNC_START(__pi_copy_page)
-+	.macro	copy_page_body, page_size
- 	ldp	x2, x3, [x1]
- 	ldp	x4, x5, [x1, #16]
- 	ldp	x6, x7, [x1, #32]
-@@ -30,7 +23,7 @@ SYM_FUNC_START(__pi_copy_page)
- 	add	x0, x0, #256
- 	add	x1, x1, #128
- 1:
--	tst	x0, #(PAGE_SIZE - 1)
-+	tst	x0, #(\page_size - 1)
+ 	/* check if the current level has been folded dynamically */
+ 	if ((level == 1 && mm_p4d_folded(st->mm)) ||
+-	    (level == 2 && mm_pud_folded(st->mm)))
++	    (level == 2 && mm_pud_folded(st->mm)) ||
++	    (level == 3 && mm_pmd_folded(st->mm)))
+ 		level = 0;
  
- 	stnp	x2, x3, [x0, #-256]
- 	ldp	x2, x3, [x1]
-@@ -62,7 +55,29 @@ SYM_FUNC_START(__pi_copy_page)
- 	stnp	x12, x13, [x0, #80 - 256]
- 	stnp	x14, x15, [x0, #96 - 256]
- 	stnp	x16, x17, [x0, #112 - 256]
-+	.endm
- 
-+/*
-+ * Copy a page from src to dest (both are page aligned)
-+ *
-+ * Parameters:
-+ *	x0 - dest
-+ *	x1 - src
-+ */
-+SYM_FUNC_START(__pi_copy_page)
-+	get_tg0	x2
-+.Lsz_64k:
-+	cmp	x2, #TCR_TG0_64K
-+	b.ne	.Lsz_16k
-+	copy_page_body SZ_64K
-+	ret
-+.Lsz_16k:
-+	cmp	x2, #TCR_TG0_16K
-+	b.ne	.Lsz_4k
-+	copy_page_body SZ_16K
-+	ret
-+.Lsz_4k:
-+	copy_page_body SZ_4K
- 	ret
- SYM_FUNC_END(__pi_copy_page)
- SYM_FUNC_ALIAS(copy_page, __pi_copy_page)
-diff --git a/arch/arm64/lib/mte.S b/arch/arm64/lib/mte.S
-index 5018ac03b6bf3..b4f6f5be0ec79 100644
---- a/arch/arm64/lib/mte.S
-+++ b/arch/arm64/lib/mte.S
-@@ -28,10 +28,13 @@
-  *   x0 - address of the page to be cleared
-  */
- SYM_FUNC_START(mte_clear_page_tags)
-+	get_page_size x3
-+	sub	x3, x3, #1		// (PAGE_SIZE - 1) in x3
-+
- 	multitag_transfer_size x1, x2
- 1:	stgm	xzr, [x0]
- 	add	x0, x0, x1
--	tst	x0, #(PAGE_SIZE - 1)
-+	tst	x0, x3
- 	b.ne	1b
- 	ret
- SYM_FUNC_END(mte_clear_page_tags)
-@@ -43,6 +46,9 @@ SYM_FUNC_END(mte_clear_page_tags)
-  *	x0 - address to the beginning of the page
-  */
- SYM_FUNC_START(mte_zero_clear_page_tags)
-+	get_page_size x3
-+	sub	x3, x3, #1		// (PAGE_SIZE - 1) in x3
-+
- 	and	x0, x0, #(1 << MTE_TAG_SHIFT) - 1	// clear the tag
- 	mrs	x1, dczid_el0
- 	tbnz	x1, #4, 2f	// Branch if DC GZVA is prohibited
-@@ -52,12 +58,12 @@ SYM_FUNC_START(mte_zero_clear_page_tags)
- 
- 1:	dc	gzva, x0
- 	add	x0, x0, x1
--	tst	x0, #(PAGE_SIZE - 1)
-+	tst	x0, x3
- 	b.ne	1b
- 	ret
- 
- 2:	stz2g	x0, [x0], #(MTE_GRANULE_SIZE * 2)
--	tst	x0, #(PAGE_SIZE - 1)
-+	tst	x0, x3
- 	b.ne	2b
- 	ret
- SYM_FUNC_END(mte_zero_clear_page_tags)
-@@ -68,6 +74,9 @@ SYM_FUNC_END(mte_zero_clear_page_tags)
-  *   x1 - address of the source page
-  */
- SYM_FUNC_START(mte_copy_page_tags)
-+	get_page_size x7
-+	sub	x7, x7, #1		// (PAGE_SIZE - 1) in x7
-+
- 	mov	x2, x0
- 	mov	x3, x1
- 	multitag_transfer_size x5, x6
-@@ -75,7 +84,7 @@ SYM_FUNC_START(mte_copy_page_tags)
- 	stgm	x4, [x2]
- 	add	x2, x2, x5
- 	add	x3, x3, x5
--	tst	x2, #(PAGE_SIZE - 1)
-+	tst	x2, x7
- 	b.ne	1b
- 	ret
- SYM_FUNC_END(mte_copy_page_tags)
-@@ -137,6 +146,9 @@ SYM_FUNC_END(mte_copy_tags_to_user)
-  *   x1 - tag storage, MTE_PAGE_TAG_STORAGE bytes
-  */
- SYM_FUNC_START(mte_save_page_tags)
-+	get_page_size x3
-+	sub	x3, x3, #1		// (PAGE_SIZE - 1) in x3
-+
- 	multitag_transfer_size x7, x5
- 1:
- 	mov	x2, #0
-@@ -149,7 +161,7 @@ SYM_FUNC_START(mte_save_page_tags)
- 
- 	str	x2, [x1], #8
- 
--	tst	x0, #(PAGE_SIZE - 1)
-+	tst	x0, x3
- 	b.ne	1b
- 
- 	ret
-@@ -161,6 +173,9 @@ SYM_FUNC_END(mte_save_page_tags)
-  *   x1 - tag storage, MTE_PAGE_TAG_STORAGE bytes
-  */
- SYM_FUNC_START(mte_restore_page_tags)
-+	get_page_size x3
-+	sub	x3, x3, #1		// (PAGE_SIZE - 1) in x3
-+
- 	multitag_transfer_size x7, x5
- 1:
- 	ldr	x2, [x1], #8
-@@ -170,7 +185,7 @@ SYM_FUNC_START(mte_restore_page_tags)
- 	tst	x0, #0xFF
- 	b.ne	2b
- 
--	tst	x0, #(PAGE_SIZE - 1)
-+	tst	x0, x3
- 	b.ne	1b
- 
- 	ret
+ 	if (level >= 0)
 -- 
 2.43.0
 
