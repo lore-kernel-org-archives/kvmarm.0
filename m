@@ -1,149 +1,109 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73313154439
-	for <kvmarm@lists.linux.dev>; Mon, 14 Oct 2024 08:59:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA698156676
+	for <kvmarm@lists.linux.dev>; Mon, 14 Oct 2024 10:24:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728896392; cv=none; b=Z5kG9Z0WRvFn6inltUiJjHOIbotsVxxYWObd36WV8w33stkDciXglWeL45lSKdaIyozFyX7tg/IHdhv/1KnDwD0NlbKwaRXNIpGyfkR8dyvMrORjT9rdqFoJKtGV0GQQmrzo195dM+LHi8uPdNjL3Yhqvrn7fAVFzH0IxsUsX5E=
+	t=1728901459; cv=none; b=gOFyA6XcNl/OOUs7znepR5fLfK/63gnqieb72AaS9C7oEBvLfejwPLOEl5Zar90jKrEr2nW633nndmP3FRig1NoFhBKbZVzc8siiV0h4uBGaq4R5wQ+wxjAe9OoOE40HAL9l8bGhVncobwXB48zMdDlzz9GKYta6y75dyMuvJpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728896392; c=relaxed/simple;
-	bh=jRUrqrcUQ/cfKT11cpnjzllP2EcHwRhCubyxVYmFnyY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NW++cksATXM4cGFeuyBVrx1DDPx8jt48hlkMSip5AicVgsSXYVoHGbbGTfxOr/yEiyLYggEnF4C3UCnZFINN/dTo3Nig7oqyfkkyUsca2TFWc/PldzNxbqOTA3f3apovho4xa2X4FcFDw5dPHR5xosACmW5uqzaD3GksvxEAh6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2C0DF1424;
-	Mon, 14 Oct 2024 02:00:19 -0700 (PDT)
-Received: from [10.163.38.184] (unknown [10.163.38.184])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 40EEA3F71E;
-	Mon, 14 Oct 2024 01:59:46 -0700 (PDT)
-Message-ID: <a91df2f6-e0d6-4902-ae22-5df132f00737@arm.com>
-Date: Mon, 14 Oct 2024 14:29:49 +0530
+	s=arc-20240116; t=1728901459; c=relaxed/simple;
+	bh=k+cIoTw4AjYMBRQI25BH32jgec6i4oQllPHohlP2IVI=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=rppHpO5DlXlfSxuyfBWrdAoQmxdOOumxCRbaylhPOQpK2dn/OxaoIT9z+5n4jLR2K8IuVwJuS7TQpS4DkanvGWZDK9cIjy9HWYYNOMbMkDrt+hffWwB0FSYUxA6izIGIO825jDs3l7gwSLsa2ajZgZ8AlPYwkrY0FeDeK6jVbs8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=baXYboYQ; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="baXYboYQ"
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e2946a143efso1315342276.1
+        for <kvmarm@lists.linux.dev>; Mon, 14 Oct 2024 03:24:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1728901456; x=1729506256; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=8k2idgPYUza+mPX/Cnkz7zCa4DRegqLGNpcbrNa5L1s=;
+        b=baXYboYQFigk8uFIeP1p+/2f2oXsn7jPrNTpDCNC0dE/ytcmRrzylZ82S/yKAN4SWU
+         WSxYYb8HTnV0bypjKhjXUkXynF4izNa9TxCf+mrpdwG2q/EE3zx63nLFix0M4xWXhEVm
+         qJc0G6Dbd5pA2fW1YLtOsvyLGDH/UOJYQH06qFX4xuPhP9s4WnE/VpmJRFYTmdcy5mMH
+         QnIy+fRxaVbhpmD99HmdSqu2UuUrgrTHBqpvA+LIGrpJhCQpPu3SBJ1xW7nD35efp9+k
+         Kv9zKFFHIZCyNk3HZbJ9RYAVeemd386+GOWx9V3h6YDScDZ15xJGQXvZxI6CTtYr9XSB
+         aKVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728901456; x=1729506256;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8k2idgPYUza+mPX/Cnkz7zCa4DRegqLGNpcbrNa5L1s=;
+        b=r42zXGe+lvaNKFVUL6iwRKmcpig+t61pDPWHANwdSHIekLJJqhsf0SJZXTeH7sTWhx
+         hsnxY7Hn9BiN5bv6YIHzKJ1/f8CrQ4ZxLeD4oONlOZpNHWZR93YmxVQBGVXf5x75dJh4
+         iX7laTy8Acd7GCM6pZfrTPX7mHIv0V59xFuWzT/ELmI8GF3Q6kChMbKnj2ZxLWy1K5VN
+         tS+89KyOGlOawLYNqfuv1yduciAz6Jzbmpa/KzITrjqiNj6V0Lmj4F2TqqMhkdTtQEoi
+         9AvAy8XF72nlD2qmfMNWu6S6WvVntvK+qrRwd2DGnbTHZv/UliOjy+RCZhQpdpLPdMU/
+         ZswQ==
+X-Gm-Message-State: AOJu0YxaE8vsb7mQj0Zdor57YOX5lLxfnYccyIdVcGMIADS6TN4JSZCs
+	mLNIaPW5hIre+PUvJ60/o4p3gpRUT/RutukBQfFVzn++6p4RcDfvcy+oYEMQ8BfSkDVdry97s54
+	myJE0kaoNShIzK5G/zqMAxPLCFqdlwGPnWmHBGBR34JwKLgiTqNKEjU363QxlwhFcTs4Tk7GGFk
+	psnEa1iX0/7B1WZePcf2AWvYdX4jk=
+X-Google-Smtp-Source: AGHT+IEYMMe5UqXSHlbyzhtM6fqu85YUpP5e468FK0ht0vpvc8Zo0di7afXpMFSYc9NPvsIRkHsL5u6CeA==
+X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
+ (user=tabba job=sendgmr) by 2002:a25:dd06:0:b0:e28:fdd7:bb27 with SMTP id
+ 3f1490d57ef6-e290b89e3e2mr145012276.3.1728901454943; Mon, 14 Oct 2024
+ 03:24:14 -0700 (PDT)
+Date: Mon, 14 Oct 2024 11:24:08 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/5] arm64/mm: Drop pte_mkhuge()
-To: Ryan Roberts <ryan.roberts@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- James Morse <james.morse@arm.com>, Catalin Marinas
- <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Ard Biesheuvel <ardb@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-References: <20241005123824.1366397-1-anshuman.khandual@arm.com>
- <20241005123824.1366397-2-anshuman.khandual@arm.com>
- <a4372d54-34bb-4a32-8742-ea6aacc0848c@arm.com>
-Content-Language: en-US
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <a4372d54-34bb-4a32-8742-ea6aacc0848c@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.0.rc1.288.g06298d1525-goog
+Message-ID: <20241014102413.4092725-1-tabba@google.com>
+Subject: [PATCH v1 0/4] KVM: arm64: Fix initialization of trap register values
+ in pKVM
+From: Fuad Tabba <tabba@google.com>
+To: kvmarm@lists.linux.dev
+Cc: maz@kernel.org, oliver.upton@linux.dev, catalin.marinas@arm.com, 
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	will@kernel.org, tabba@google.com
+Content-Type: text/plain; charset="UTF-8"
+
+The patch that dropped PAuth instruction/key traps [1] did not
+apply to non-protected VMs in protected mode, since as noted [2],
+the hypervisor is supposed to handle trap register values in
+pKVM. However, in pKVM upstream code the hypervisor does not set
+all necessary trap register values in protected mode, and running
+non-protected VMs with PAuth enabled in pKVM has been broken
+since then [1].
+
+This patch series lets the hypervisor initialize the values of
+trap registers for both non-protected and protected VMs,
+including setting PAuth traps depending on whether PAuth is
+available in the system and configured for the target VCPU.
+
+Based on Linux 6.12-rc3 (8e929cb546ee).
+
+Cheers,
+/fuad
+
+[1] Commit 814ad8f96e92 ("KVM: arm64: Drop trapping of PAuth instructions/keys")
+[2] Commit 7e814a20f6da ("KVM: arm64: Tidying up PAuth code in KVM")
+
+Fuad Tabba (4):
+  KVM: arm64: Move pkvm_vcpu_init_traps() to init_pkvm_hyp_vcpu()
+  KVM: arm64: Refactor kvm_vcpu_enable_ptrauth() for hyp use
+  KVM: arm64: Initialize the hypervisor's VM state at EL2
+  KVM: arm64: Initialize trap register values in hyp in pKVM
+
+ arch/arm64/include/asm/kvm_asm.h              |   1 -
+ arch/arm64/include/asm/kvm_emulate.h          |   4 +
+ arch/arm64/kvm/arm.c                          |   8 --
+ .../arm64/kvm/hyp/include/nvhe/trap_handler.h |   2 -
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  12 +-
+ arch/arm64/kvm/hyp/nvhe/pkvm.c                | 116 +++++++++++++++++-
+ arch/arm64/kvm/reset.c                        |   5 -
+ 7 files changed, 122 insertions(+), 26 deletions(-)
 
 
+base-commit: 8e929cb546ee42c9a61d24fae60605e9e3192354
+-- 
+2.47.0.rc1.288.g06298d1525-goog
 
-On 10/9/24 18:50, Ryan Roberts wrote:
-> On 05/10/2024 13:38, Anshuman Khandual wrote:
->> Core HugeTLB defines arch_make_huge_pte() fallback definition, which calls
->> platform provided pte_mkhuge(). But if any platform already provides custom
->> arch_make_huge_pte(), then it does not need to provide pte_mkhuge(). arm64
->> defines arch_make_huge_pte(), but then also calls pte_mkhuge() internally.
->> This creates confusion as if both of these callbacks are being used in core
->> HugeTLB and required to be defined in the platform.
->>
->> This changes arch_make_huge_pte() to create block mapping directly and also
->> drops off now redundant helper pte_mkhuge(), making things clear. Also this
->> changes HugeTLB page creation from just clearing the PTE_TABLE_BIT (bit[1])
->> to actually setting bits[1:0] via PTE_TYPE_[MASK|SECT] instead.
->>
->> Cc: Catalin Marinas <catalin.marinas@arm.com>
->> Cc: Will Deacon <will@kernel.org>
->> Cc: Ard Biesheuvel <ardb@kernel.org>
->> Cc: Ryan Roberts <ryan.roberts@arm.com>
->> Cc: Mark Rutland <mark.rutland@arm.com>
->> Cc: linux-arm-kernel@lists.infradead.org
->> Cc: linux-kernel@vger.kernel.org
->> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
->> ---
->>  arch/arm64/include/asm/pgtable-hwdef.h | 1 +
->>  arch/arm64/include/asm/pgtable.h       | 5 -----
->>  arch/arm64/mm/hugetlbpage.c            | 2 +-
->>  3 files changed, 2 insertions(+), 6 deletions(-)
->>
->> diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
->> index fd330c1db289..956a702cb532 100644
->> --- a/arch/arm64/include/asm/pgtable-hwdef.h
->> +++ b/arch/arm64/include/asm/pgtable-hwdef.h
->> @@ -158,6 +158,7 @@
->>  #define PTE_VALID		(_AT(pteval_t, 1) << 0)
->>  #define PTE_TYPE_MASK		(_AT(pteval_t, 3) << 0)
->>  #define PTE_TYPE_PAGE		(_AT(pteval_t, 3) << 0)
->> +#define PTE_TYPE_SECT		(_AT(pteval_t, 1) << 0)
->>  #define PTE_TABLE_BIT		(_AT(pteval_t, 1) << 1)
->>  #define PTE_USER		(_AT(pteval_t, 1) << 6)		/* AP[1] */
->>  #define PTE_RDONLY		(_AT(pteval_t, 1) << 7)		/* AP[2] */
->> diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
->> index c329ea061dc9..fa4c32a9f572 100644
->> --- a/arch/arm64/include/asm/pgtable.h
->> +++ b/arch/arm64/include/asm/pgtable.h
->> @@ -438,11 +438,6 @@ static inline void __set_ptes(struct mm_struct *mm,
->>  	}
->>  }
->>  
->> -/*
->> - * Huge pte definitions.
->> - */
->> -#define pte_mkhuge(pte)		(__pte(pte_val(pte) & ~PTE_TABLE_BIT))
->> -
->>  /*
->>   * Hugetlb definitions.
->>   */
->> diff --git a/arch/arm64/mm/hugetlbpage.c b/arch/arm64/mm/hugetlbpage.c
->> index 5f1e2103888b..5922c95630ad 100644
->> --- a/arch/arm64/mm/hugetlbpage.c
->> +++ b/arch/arm64/mm/hugetlbpage.c
->> @@ -361,7 +361,7 @@ pte_t arch_make_huge_pte(pte_t entry, unsigned int shift, vm_flags_t flags)
->>  {
->>  	size_t pagesize = 1UL << shift;
->>  
->> -	entry = pte_mkhuge(entry);
->> +	entry = __pte((pte_val(entry) & ~PTE_TYPE_MASK) | PTE_TYPE_SECT);
-> 
-> I think there may be an existing bug here; if pagesize == CONT_PTE_SIZE, then
-> entry will be placed in the level 3 table. In this case, shouldn't bit 1 remain
-> set, because at level 3, a page mapping is denoted by bits[1:0] = 3 ? Currently
-> its being unconditionally cleared.
-
-That's not a problem, pte_mkcont() brings back both the bits
-via PTE_TYPE_PAGE along with PTE_CONT.
-
-        if (pagesize == CONT_PTE_SIZE) {
-                entry = pte_mkcont(entry);
-        } else if (pagesize == CONT_PMD_SIZE) {
-                entry = pmd_pte(pmd_mkcont(pte_pmd(entry)));
-        } else if (pagesize != PUD_SIZE && pagesize != PMD_SIZE) {
-                pr_warn("%s: unrecognized huge page size 0x%lx\n",
-                        __func__, pagesize);
-        }
-
-static inline pte_t pte_mkcont(pte_t pte)
-{
-	pte = set_pte_bit(pte, __pgprot(PTE_CONT));
-      	return set_pte_bit(pte, __pgprot(PTE_TYPE_PAGE));
-}
-
-Although the same is not required for CONT_PMD_SIZE size huge
-pages where only PTE_CONT is enough.
-
-static inline pmd_t pmd_mkcont(pmd_t pmd)
-{
-        return __pmd(pmd_val(pmd) | PMD_SECT_CONT);
-}
- 
->>  	if (pagesize == CONT_PTE_SIZE) {
->>  		entry = pte_mkcont(entry);
->>  	} else if (pagesize == CONT_PMD_SIZE) {
-> 
