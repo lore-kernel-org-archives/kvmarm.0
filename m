@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B5A51BFE01
-	for <kvmarm@lists.linux.dev>; Mon, 14 Oct 2024 17:13:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC9E529A0
+	for <kvmarm@lists.linux.dev>; Mon, 14 Oct 2024 17:17:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728926014; cv=none; b=MhXgcUmj1LKuYO/mG32NKr44BBEs1h3qr6BydmAWgZy9JNRKBYLyoEhWg46BS3c4FaA7XmlrF16//oAs23hDvy4S6Kd8nFLz1vS2ZbDPS0Jws3Ll+9eVVscm8XWB9Hoj+RCa7R/D19gQ73V/yWmU2AFeOc8U0CpiW6Cu6O4RC2A=
+	t=1728926226; cv=none; b=Cd8XYrVwHUZEgUP0BpaM2UY1WC5lVJQDhNrmj0Gl9bSdxIKFqGp5Jp8VdMk4CSb3B5+4pNiw/lQl0VBgO9EYecU3e3pg/X+p8tdxlsqABrbdemR93O7m+dW1a6BdBXnBYj6kcA/zK/Xglw5jvBtNx8HAE+Prj7HWsEiAEOtd4X8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728926014; c=relaxed/simple;
-	bh=ywEKv1/QUdsbt4q6SS2Ia3z+ofR2/ou8Y45Uii5/ZTI=;
+	s=arc-20240116; t=1728926226; c=relaxed/simple;
+	bh=tkZMzrqCa7d7qPIHP+rVs3i1sSt4NE0tKsGuYhfbrvo=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jD8bJi3zIBHehFMRpDaIlBUmiECC14QyuS6Q7kEOqHfFjDGAar+zOuATVpXawazS3UB6VBFNYTwZUsTVjgY0eVOdN3E2iT22d3NC/bNunL//Fp2+ddFeUJwwNRnnQQzWBz4693/uCpIFS63tnqbiNZCIL43CYrqnOWSz6Afqe5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dAfiFkMq; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=Jae2Wa7VeoVJBF/hCoO+SP86pw3Ji2W6oLycvQ/j0OGkU7vvdTcbpKu7oKOuyyJH/kkbE2AcX7YjxD7vKa1gUK/i7Mm6C0W2vMTV7/LTRyVQzcAtquXhyfGQP0zXWmIswEEsI1w+nhMJ41dkYA6KVTHZmEK00RYI9GFrr668Aho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DbVav+KN; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dAfiFkMq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0276FC4CEC3;
-	Mon, 14 Oct 2024 17:13:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DbVav+KN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D308C4CECE;
+	Mon, 14 Oct 2024 17:17:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728926014;
-	bh=ywEKv1/QUdsbt4q6SS2Ia3z+ofR2/ou8Y45Uii5/ZTI=;
+	s=k20201202; t=1728926225;
+	bh=tkZMzrqCa7d7qPIHP+rVs3i1sSt4NE0tKsGuYhfbrvo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dAfiFkMqR4hGjqaQ2cOntZfqHEJZnw3DHBi9+RSWCM+Wgrn+Qwz46RBHS2mHQvTut
-	 +niuXq8UoSaRfGx0/rxvnzcRlV0TOA5NvWzqGRCPcuRbgL7fyGPml/AZmY2Fi0rdF/
-	 d2rpfKktyfFnmkS5UBKkQErevzhxn0IbOyIOoIxpDove5qpH15ClDMCN5ZigSkHXHH
-	 QJ+09HzMiHITg8WfxxPNAX5o6MZdIhuTfXxTaKdqbTOFNT27NBdnc3ygJWOqLeWuut
-	 +Fp9/cx3fvigRGPX2b9NH6IN/2Ad0gLL11kcvy3UCm7+fdYTimbRoHc1s0inP4P/g8
-	 MaNRkBUyHAq4w==
+	b=DbVav+KNhHCpLex6SCOtR9ao0YSW2EY9EI7rRUjNsblgNv/zkuXtoGiTZAXl/5g06
+	 qcSV4x4D9TsD7g96grDxSZtSGaUF1TTfv0ECk+akP5hZ1vIRBxBwEJDt1j6Uihrt1i
+	 sGVJbByz8hbGl89QqZ0hQnU+ia1cPsC1kC9bWO0za77qdssy4KxO24wnmwOsdwyBbC
+	 hVYPsLxQEgsL8FMY7TIOMeoo5V/4PFKqlhr4i3aseFwHYyi8Fdcdzf2TjQhpj2YlMF
+	 TugzCsT4VW2a5GK5zgULGSTMpTc9T9C/XBw5o4CoW3TY8/q3TsmA68AEoC8oycs4i5
+	 kGvEG77LZ2j2w==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1t0OdP-003T5b-LM;
-	Mon, 14 Oct 2024 18:13:31 +0100
-Date: Mon, 14 Oct 2024 18:13:31 +0100
-Message-ID: <867caa6210.wl-maz@kernel.org>
+	id 1t0Ogp-003T8M-Aq;
+	Mon, 14 Oct 2024 18:17:03 +0100
+Date: Mon, 14 Oct 2024 18:17:03 +0100
+Message-ID: <865xpu61v4.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Fuad Tabba <tabba@google.com>
 Cc: kvmarm@lists.linux.dev,
@@ -44,10 +44,9 @@ Cc: kvmarm@lists.linux.dev,
 	yuzenghui@huawei.com,
 	will@kernel.org,
 	christoffer.dall@arm.com
-Subject: Re: [PATCH v1 3/4] KVM: arm64: Convert KVM_ARM_VCPU_* features into an enum
-In-Reply-To: <20241014165809.984883-4-tabba@google.com>
+Subject: Re: [PATCH v1 0/4] KVM: arm64: Update KVM_VCPU_MAX_FEATURES and refactor to avoid same issue
+In-Reply-To: <20241014165809.984883-1-tabba@google.com>
 References: <20241014165809.984883-1-tabba@google.com>
-	<20241014165809.984883-4-tabba@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -63,82 +62,16 @@ X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, oliver.upton@linux.
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 14 Oct 2024 17:58:08 +0100,
+On Mon, 14 Oct 2024 17:58:05 +0100,
 Fuad Tabba <tabba@google.com> wrote:
 > 
-> Instead of using compile time defines, convert the KVM_ARM_VCPU_*
-> features into an enum. Among other things, this reduces the
-> chances of missing to update KVM_ARM_VCPU_MAX_FEATURES.
-> 
-> Also rename KVM_VCPU_MAX_FEATURES and KVM_ARM_VCPU_VALID_FEATURES
-> to KVM_ARM_VCPU_MAX_FEATURES and KVM_ARM_VCPU_VALID_FEATURES in
-> order to match the features they're counting.
-> 
-> No functional change intended.
-> 
-> Signed-off-by: Fuad Tabba <tabba@google.com>
-> ---
->  arch/arm64/include/asm/kvm_host.h |  2 +-
->  arch/arm64/include/uapi/asm/kvm.h | 25 ++++++++++++++-----------
->  arch/arm64/kvm/arm.c              | 10 +++++-----
->  3 files changed, 20 insertions(+), 17 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 85901afeb332..9b7bf4ba07a3 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -326,7 +326,7 @@ struct kvm_arch {
->  	unsigned long flags;
->  
->  	/* VM-wide vCPU feature set */
-> -	DECLARE_BITMAP(vcpu_features, KVM_VCPU_MAX_FEATURES);
-> +	DECLARE_BITMAP(vcpu_features, KVM_ARM_VCPU_MAX_FEATURES);
->  
->  	/* MPIDR to vcpu index mapping, optional */
->  	struct kvm_mpidr_data *mpidr_data;
-> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> index 2d5fd0ed7dff..b6ebd79b8373 100644
-> --- a/arch/arm64/include/uapi/asm/kvm.h
-> +++ b/arch/arm64/include/uapi/asm/kvm.h
-> @@ -100,17 +100,20 @@ struct kvm_regs {
->  #define KVM_VGIC_V3_REDIST_SIZE		(2 * SZ_64K)
->  #define KVM_VGIC_V3_ITS_SIZE		(2 * SZ_64K)
->  
-> -#define KVM_ARM_VCPU_POWER_OFF		0 /* CPU is started in OFF state */
-> -#define KVM_ARM_VCPU_EL1_32BIT		1 /* CPU running a 32bit VM */
-> -#define KVM_ARM_VCPU_PSCI_0_2		2 /* CPU uses PSCI v0.2 */
-> -#define KVM_ARM_VCPU_PMU_V3		3 /* Support guest PMUv3 */
-> -#define KVM_ARM_VCPU_SVE		4 /* enable SVE for this CPU */
-> -#define KVM_ARM_VCPU_PTRAUTH_ADDRESS	5 /* VCPU uses address authentication */
-> -#define KVM_ARM_VCPU_PTRAUTH_GENERIC	6 /* VCPU uses generic authentication */
-> -#define KVM_ARM_VCPU_HAS_EL2		7 /* Support nested virtualization */
-> -
-> -#define KVM_VCPU_MAX_FEATURES 8
-> -#define KVM_VCPU_VALID_FEATURES	(BIT(KVM_VCPU_MAX_FEATURES) - 1)
-> +enum kvm_arm_vcpu_features {
-> +	KVM_ARM_VCPU_POWER_OFF = 0,	/* CPU is started in OFF state */
-> +	KVM_ARM_VCPU_EL1_32BIT,		/* CPU running a 32bit VM */
-> +	KVM_ARM_VCPU_PSCI_0_2,		/* CPU uses PSCI v0.2 */
-> +	KVM_ARM_VCPU_PMU_V3,		/* Support guest PMUv3 */
-> +	KVM_ARM_VCPU_SVE,		/* enable SVE for this CPU */
-> +	KVM_ARM_VCPU_PTRAUTH_ADDRESS,	/* VCPU uses address authentication */
-> +	KVM_ARM_VCPU_PTRAUTH_GENERIC,	/* VCPU uses generic authentication */
-> +	KVM_ARM_VCPU_HAS_EL2,		/* Support nested virtualization */
-> +
-> +	KVM_ARM_VCPU_MAX_FEATURES,	/* Must be last */
-> +};
+> The value of KVM_VCPU_MAX_FEATURES has not been updated since
+> adding new features in commit 89b0e7de3451 ("KVM: arm64: nv:
+> Introduce nested virtualization VCPU feature").
 
-This is going to break any userspace that has code shaped like this:
-
-#ifdef KVM_ARM_VCPU_SVE
-[...]
-#endif
-
-Not necessarily a good pattern, but nonetheless a valid one. So you
-*must* preserve the #defines, even if you define them along the lines
-of:
-
-#define	KVM_ARM_VCPU_SVE	KVM_ARM_VCPU_SVE
+Could you please expand on what is broken? 89b0e7de3451 makes a point
+in *not* exposing this to userspace, as outlined in the commit
+message -- this is done on purpose, because NV is not functional yet.
 
 Thanks,
 
